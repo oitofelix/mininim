@@ -1,0 +1,5 @@
+#!/bin/sh
+
+for f in *.bmp; do convert "$f" -transparent black "${f%bmp}png" && rm "$f"; done
+for f in *.png; do pngcrush -force -brute -rem alla -rem text "$f" "$f-new" &&
+    mv "$f-new" "$f"; done
