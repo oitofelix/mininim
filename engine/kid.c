@@ -38,8 +38,10 @@ static ALLEGRO_BITMAP *kid_normal,
   *kid_turn_run_13,
   *kid_walk_01, *kid_walk_02, *kid_walk_03, *kid_walk_04, *kid_walk_05,
   *kid_walk_06, *kid_walk_07, *kid_walk_08, *kid_walk_09, *kid_walk_10,
-  *kid_walk_11, *kid_walk_12;
-
+  *kid_walk_11, *kid_walk_12,
+  *kid_jump_01, *kid_jump_02, *kid_jump_03, *kid_jump_04, *kid_jump_05, *kid_jump_06,
+  *kid_jump_07, *kid_jump_08, *kid_jump_09, *kid_jump_10, *kid_jump_11, *kid_jump_12,
+  *kid_jump_13, *kid_jump_14, *kid_jump_15, *kid_jump_16, *kid_jump_17, *kid_jump_18;
 
 void (*draw_kid) (void); /* kid mutable draw function */
 static struct anim kid; /* kid animation object */
@@ -53,6 +55,7 @@ static void draw_kid_run (void);
 static void draw_kid_turn (void);
 static void draw_kid_turn_run (void);
 static void draw_kid_stabilize (void);
+static void draw_kid_jump (void);
 
 void
 load_kid (void)
@@ -105,6 +108,24 @@ load_kid (void)
   kid_walk_10 = load_bitmap (KID_WALK_10);
   kid_walk_11 = load_bitmap (KID_WALK_11);
   kid_walk_12 = load_bitmap (KID_WALK_12);
+  kid_jump_01 = load_bitmap (KID_JUMP_01);
+  kid_jump_02 = load_bitmap (KID_JUMP_02);
+  kid_jump_03 = load_bitmap (KID_JUMP_03);
+  kid_jump_04 = load_bitmap (KID_JUMP_04);
+  kid_jump_05 = load_bitmap (KID_JUMP_05);
+  kid_jump_06 = load_bitmap (KID_JUMP_06);
+  kid_jump_07 = load_bitmap (KID_JUMP_07);
+  kid_jump_08 = load_bitmap (KID_JUMP_08);
+  kid_jump_09 = load_bitmap (KID_JUMP_09);
+  kid_jump_10 = load_bitmap (KID_JUMP_10);
+  kid_jump_11 = load_bitmap (KID_JUMP_11);
+  kid_jump_12 = load_bitmap (KID_JUMP_12);
+  kid_jump_13 = load_bitmap (KID_JUMP_13);
+  kid_jump_14 = load_bitmap (KID_JUMP_14);
+  kid_jump_15 = load_bitmap (KID_JUMP_15);
+  kid_jump_16 = load_bitmap (KID_JUMP_16);
+  kid_jump_17 = load_bitmap (KID_JUMP_17);
+  kid_jump_18 = load_bitmap (KID_JUMP_18);
 
   kid.room = 1;
   kid.x = 230;
@@ -168,6 +189,24 @@ unload_kid (void)
   al_destroy_bitmap (kid_walk_10);
   al_destroy_bitmap (kid_walk_11);
   al_destroy_bitmap (kid_walk_12);
+  al_destroy_bitmap (kid_jump_01);
+  al_destroy_bitmap (kid_jump_02);
+  al_destroy_bitmap (kid_jump_03);
+  al_destroy_bitmap (kid_jump_04);
+  al_destroy_bitmap (kid_jump_05);
+  al_destroy_bitmap (kid_jump_06);
+  al_destroy_bitmap (kid_jump_07);
+  al_destroy_bitmap (kid_jump_08);
+  al_destroy_bitmap (kid_jump_09);
+  al_destroy_bitmap (kid_jump_10);
+  al_destroy_bitmap (kid_jump_11);
+  al_destroy_bitmap (kid_jump_12);
+  al_destroy_bitmap (kid_jump_13);
+  al_destroy_bitmap (kid_jump_14);
+  al_destroy_bitmap (kid_jump_15);
+  al_destroy_bitmap (kid_jump_16);
+  al_destroy_bitmap (kid_jump_17);
+  al_destroy_bitmap (kid_jump_18);
 }
 
 static
@@ -180,6 +219,8 @@ void draw_kid_normal ()
   bool run = ((kid.dir == RIGHT) && right_key) || ((kid.dir == LEFT) && left_key);
   bool walk = ((kid.dir == RIGHT) && right_key && shift_key)
     || ((kid.dir == LEFT) && left_key && shift_key);
+  bool jump = ((kid.dir == RIGHT) && right_key && up_key)
+    || ((kid.dir == LEFT) && left_key && up_key);
 
   /* comming from stabilize */
   if (kid.frame == kid_stabilize_08) {
@@ -189,9 +230,13 @@ void draw_kid_normal ()
   /* comming from walk */
   else if (kid.frame == kid_walk_12)
     draw_anim (&kid, kid_normal, +0, 0);
+  /* comming from jump */
+  else if (kid.frame == kid_jump_18)
+    draw_anim (&kid, kid_normal, -4, 0);
   /* comming from normal */
   else if (kid.frame == kid_normal) {
-    if (turn) draw_kid_turn ();
+    if (jump) draw_kid_jump ();
+    else if (turn) draw_kid_turn ();
     else if (walk) draw_kid_walk ();
     else if (run) draw_kid_start_run ();
     else draw_anim (&kid, kid_normal, +0, 0);
@@ -360,6 +405,8 @@ void draw_kid_turn ()
 
   bool run = (kid.dir == RIGHT) ? left_key : right_key;
   bool walk = run && shift_key;
+  bool jump = ((kid.dir == RIGHT) && left_key && up_key)
+    || ((kid.dir == LEFT) && right_key && up_key);
   static bool turn = false;
   if (! turn) turn = ((kid.dir == RIGHT) && right_key)
                 || ((kid.dir == LEFT) && left_key);
@@ -390,6 +437,7 @@ void draw_kid_turn ()
       draw_kid = draw_kid_turn;
       turn = false;
     }
+    else if (jump) draw_kid = draw_kid_jump;
     else if (walk) draw_kid = draw_kid_walk;
     else if (run) draw_kid = draw_kid_start_run;
     else draw_kid = draw_kid_stabilize;
@@ -437,6 +485,8 @@ void draw_kid_stabilize ()
   bool run = ((kid.dir == RIGHT) && right_key) || ((kid.dir == LEFT) && left_key);
   bool walk = ((kid.dir == RIGHT) && right_key && shift_key)
     || ((kid.dir == LEFT) && left_key && shift_key);
+  bool jump = ((kid.dir == RIGHT) && right_key && up_key)
+    || ((kid.dir == LEFT) && left_key && up_key);
 
   /* comming from stop run */
   if (kid.frame == kid_stop_run_04)
@@ -454,7 +504,68 @@ void draw_kid_stabilize ()
     draw_kid = draw_kid_normal;
   } else error (-1, 0, "%s: unknown kid frame (%p)", __func__, kid.frame);
 
-  if (turn) draw_kid = draw_kid_turn;
+  if (jump) draw_kid = draw_kid_jump;
+  else if (turn) draw_kid = draw_kid_turn;
   else if (walk) draw_kid = draw_kid_walk;
   else if (run) draw_kid = draw_kid_start_run;
+}
+
+static void
+draw_kid_jump (void)
+{
+  draw_kid = draw_kid_jump;
+  kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
+
+  /* comming from normal */
+  if (kid.frame == kid_normal)
+    draw_anim (&kid, kid_jump_01, +2, 0);
+  /* comming from turn */
+  else if (kid.frame == kid_turn_04)
+    draw_anim (&kid, kid_jump_01, +2, 0);
+  /* comming from stabilize */
+  else if (kid.frame == kid_stabilize_05)
+    draw_anim (&kid, kid_jump_01, +2, 0);
+  else if (kid.frame == kid_stabilize_06)
+    draw_anim (&kid, kid_jump_01, +6, 0);
+  else if (kid.frame == kid_stabilize_07)
+    draw_anim (&kid, kid_jump_01, +4, 0);
+  else if (kid.frame == kid_stabilize_08)
+    draw_anim (&kid, kid_jump_01, +0, 0);
+  /* comming from jump */
+  else if (kid.frame == kid_jump_01)
+    draw_anim (&kid, kid_jump_02, -2, 0);
+  else if (kid.frame == kid_jump_02)
+    draw_anim (&kid, kid_jump_03, -4, 0);
+  else if (kid.frame == kid_jump_03)
+    draw_anim (&kid, kid_jump_04, -5, 0);
+  else if (kid.frame == kid_jump_04)
+    draw_anim (&kid, kid_jump_05, -3, 0);
+  else if (kid.frame == kid_jump_05)
+    draw_anim (&kid, kid_jump_06, -6, 0);
+  else if (kid.frame == kid_jump_06)
+    draw_anim (&kid, kid_jump_07, -3, 0);
+  else if (kid.frame == kid_jump_07)
+    draw_anim (&kid, kid_jump_08, -17, 0);
+  else if (kid.frame == kid_jump_08)
+    draw_anim (&kid, kid_jump_09, -21, 0);
+  else if (kid.frame == kid_jump_09)
+    draw_anim (&kid, kid_jump_10, -11, -6);
+  else if (kid.frame == kid_jump_10)
+    draw_anim (&kid, kid_jump_11, -2, +6);
+  else if (kid.frame == kid_jump_11)
+    draw_anim (&kid, kid_jump_12, -9, 0);
+  else if (kid.frame == kid_jump_12)
+    draw_anim (&kid, kid_jump_13, +6, 0);
+  else if (kid.frame == kid_jump_13)
+    draw_anim (&kid, kid_jump_14, -11, 0);
+  else if (kid.frame == kid_jump_14)
+    draw_anim (&kid, kid_jump_15, +0, 0);
+  else if (kid.frame == kid_jump_15)
+    draw_anim (&kid, kid_jump_16, +0, 0);
+  else if (kid.frame == kid_jump_16)
+    draw_anim (&kid, kid_jump_17, +1, 0);
+  else if (kid.frame == kid_jump_17) {
+    draw_anim (&kid, kid_jump_18, +0, 0);
+    draw_kid = draw_kid_normal;
+  } else error (-1, 0, "%s: unknown kid frame (%p)", __func__, kid.frame);
 }

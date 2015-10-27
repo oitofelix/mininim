@@ -22,7 +22,8 @@
 
 /* variables */
 extern ALLEGRO_KEYBOARD_STATE keyboard_state;
-extern bool left_key, right_key, shift_key, esc_key, pause_key, enter_key;
+extern bool up_key, down_key, left_key, right_key, shift_key, esc_key, pause_key,
+  enter_key;
 
 /* functions */
 void init_keyboard (void);

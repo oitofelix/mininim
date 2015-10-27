@@ -23,7 +23,7 @@
 /* keyboard state */
 ALLEGRO_KEYBOARD_STATE keyboard_state;
 
-bool left_key, right_key, shift_key, esc_key, pause_key, enter_key;
+bool up_key, down_key, left_key, right_key, shift_key, esc_key, pause_key, enter_key;
 
 void
 init_keyboard (void)
@@ -36,6 +36,8 @@ void
 get_keyboard_state (void)
 {
   al_get_keyboard_state (&keyboard_state);
+  up_key = al_key_down (&keyboard_state, ALLEGRO_KEY_UP);
+  down_key = al_key_down (&keyboard_state, ALLEGRO_KEY_DOWN);
   left_key = al_key_down (&keyboard_state, ALLEGRO_KEY_LEFT);
   right_key = al_key_down (&keyboard_state, ALLEGRO_KEY_RIGHT);
   shift_key = al_key_down (&keyboard_state, ALLEGRO_KEY_LSHIFT)
