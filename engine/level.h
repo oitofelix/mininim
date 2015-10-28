@@ -20,6 +20,8 @@
 #ifndef FREEPOP_LEVEL_H
 #define FREEPOP_LEVEL_H
 
+#include "anim.h"
+
 #define LEVEL_ROOMS 25
 #define LEVEL_FLOORS 3
 #define LEVEL_PLACES 10
@@ -57,6 +59,8 @@ extern uint32_t random_seed;
 void play_level (struct level *level);
 enum level_object level_obj (struct level_pos pos);
 enum level_object level_obj_rel (struct level_pos pos, int floor, int place);
+struct level_pos anim_pos (struct anim anim);
+unsigned int obj_dist (struct anim);
 struct level_pos norm_pos (struct level_pos pos, bool floor_first);
 struct level_pos norm_pos_floor (struct level_pos pos);
 struct level_pos norm_pos_place (struct level_pos pos);

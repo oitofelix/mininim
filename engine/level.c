@@ -52,6 +52,42 @@ level_obj_rel (struct level_pos pos, int floor, int place)
 }
 
 struct level_pos
+anim_pos (struct anim anim)
+{
+  struct level_pos pos;
+  int w = al_get_bitmap_width (anim.frame);
+  int x = (anim.dir == LEFT) ? anim.x : anim.x + w - 1 - 3;
+  int y = anim.y;
+
+  unsigned int qx = x / (ORIGINAL_WIDTH / LEVEL_PLACES);
+  unsigned int rx = x % (ORIGINAL_WIDTH / LEVEL_PLACES);
+  unsigned int qy = y / ((ORIGINAL_HEIGHT - 11) / LEVEL_FLOORS);
+  unsigned int ry = y % ((ORIGINAL_HEIGHT - 11) / LEVEL_FLOORS);
+
+  pos.room = anim.room;
+  pos.place = (rx < 13) ? qx - 1 : qx;
+  pos.floor = (ry < 3) ? qy - 1 : qy;
+
+  if (x < 0) pos.place = -1;
+
+  return pos;
+}
+
+unsigned int
+obj_dist (struct anim anim)
+{
+  struct level_pos pos = anim_pos (anim);
+  int w = al_get_bitmap_width (anim.frame);
+  int x = (anim.dir == LEFT) ? anim.x : anim.x + w - 1 - 3;
+
+  unsigned int qx = x / (ORIGINAL_WIDTH / LEVEL_PLACES);
+  unsigned int rx = x % (ORIGINAL_WIDTH / LEVEL_PLACES);
+
+  if (anim.dir == LEFT) return (qx - pos.place) * 32 + rx - 13;
+  else return (pos.place + 1) * 32 + 12 - x;
+}
+
+struct level_pos
 norm_pos (struct level_pos pos, bool floor_first)
 {
   if (pos.room >= LEVEL_ROOMS)
@@ -146,5 +182,5 @@ level_anim (void)
   clear_bitmap (screen, BLACK);
   draw_room (1);
   draw_fire (1);
-  (*draw_kid) ();
+  kid.draw ();
 }

@@ -93,6 +93,6 @@ void load_kid (void);
 void unload_kid (void);
 
 /* variables */
-extern void (*draw_kid) (void); /* mutable kid draw function */
+extern struct anim kid; /* kid animation object */
 
 #endif	/* FREEPOP_KID_H */

@@ -22,6 +22,7 @@
 #include "kernel/video.h"
 #include "kernel/keyboard.h"
 #include "anim.h"
+#include "physics.h"
 
 /* set to true to quit animation */
 bool quit_anim;
@@ -87,13 +88,39 @@ draw_anim (struct anim *anim, ALLEGRO_BITMAP *frame,
   int oh = al_get_bitmap_height (anim->frame);
   int w = al_get_bitmap_width (frame);
   int h = al_get_bitmap_height (frame);
+  int x = anim->x;
+  int y = anim->y;
+  struct anim new_anim;
 
-  if (draw_anim_inv) anim->x += (anim->dir == LEFT) ? ow - w - dx : dx;
-  else anim->x += (anim->dir == LEFT) ? dx : ow - w - dx;
-  anim->y += oh - h + dy;
+  if (draw_anim_inv) x += (anim->dir == LEFT) ? ow - w - dx : dx;
+  else x += (anim->dir == LEFT) ? dx : ow - w - dx;
+  y += oh - h + dy;
+
+  new_anim.room = anim->room;
+  new_anim.frame = frame;
+  new_anim.dir = anim->dir;
+  new_anim.x = x;
+  new_anim.y = y;
+  new_anim.collision = anim->collision;
+
+  if (is_colliding (new_anim)) {
+    anim->odraw = anim->draw;
+    anim->draw = anim->collision;
+
+    do {
+      if (anim->dir == LEFT) new_anim.x++;
+      else if (anim->dir == RIGHT) new_anim.x--;
+      else if (anim->dir == TOP) new_anim.y++;
+      else if (anim->dir == BOTTOM) new_anim.y--;
+      x = new_anim.x;
+      y = new_anim.y;
+    } while (is_colliding (new_anim));
+  }
+
+  draw_bitmap (frame, screen, x, y, anim->flip);
   anim->frame = frame;
-
-  draw_bitmap (frame, screen, anim->x, anim->y, anim->flip);
+  anim->x = x;
+  anim->y = y;
 }
 
 bool

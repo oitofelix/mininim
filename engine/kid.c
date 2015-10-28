@@ -17,10 +17,12 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include <error.h>
 #include "kernel/video.h"
 #include "kernel/keyboard.h"
 #include "anim.h"
+#include "physics.h"
 #include "level.h"
 #include "kid.h"
 
@@ -43,12 +45,15 @@ static ALLEGRO_BITMAP *kid_normal,
   *kid_jump_07, *kid_jump_08, *kid_jump_09, *kid_jump_10, *kid_jump_11, *kid_jump_12,
   *kid_jump_13, *kid_jump_14, *kid_jump_15, *kid_jump_16, *kid_jump_17, *kid_jump_18;
 
-void (*draw_kid) (void); /* kid mutable draw function */
-static struct anim kid; /* kid animation object */
+struct anim kid; /* kid animation object */
 
 /* functions */
 static void draw_kid_normal (void);
 static void draw_kid_walk (void);
+static void draw_kid_walk_min (void);
+static void draw_kid_walk_short (void);
+static void draw_kid_walk_long (void);
+static void draw_kid_walk_max (void);
 static void draw_kid_start_run (void);
 static void draw_kid_stop_run (void);
 static void draw_kid_run (void);
@@ -56,6 +61,8 @@ static void draw_kid_turn (void);
 static void draw_kid_turn_run (void);
 static void draw_kid_stabilize (void);
 static void draw_kid_jump (void);
+static void draw_kid_collision (void);
+static void draw_kid_hit_wall (void);
 
 void
 load_kid (void)
@@ -130,11 +137,12 @@ load_kid (void)
   kid.room = 1;
   kid.x = 230;
   /* kid.x = 10; */
-  kid.y = 15 + 63 * 1;
+  kid.y = 15 + 63 * 0;
   kid.frame = kid_normal;
   kid.dir = LEFT;
+  kid.collision = draw_kid_collision;
 
-  draw_kid = draw_kid_normal;
+  kid.draw = draw_kid_normal;
 }
 
 void
@@ -212,7 +220,7 @@ unload_kid (void)
 static
 void draw_kid_normal ()
 {
-  draw_kid = draw_kid_normal;
+  kid.draw = draw_kid_normal;
   kid.flip = (kid.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
   bool turn = ((kid.dir == RIGHT) && left_key) || ((kid.dir == LEFT) && right_key);
@@ -221,6 +229,21 @@ void draw_kid_normal ()
     || ((kid.dir == LEFT) && left_key && shift_key);
   bool jump = ((kid.dir == RIGHT) && right_key && up_key)
     || ((kid.dir == LEFT) && left_key && up_key);
+
+  struct level_pos pos = anim_pos (kid);
+  enum level_object obj =
+    level_obj_rel (pos, 0, (kid.dir == LEFT) ? -1 : 1);
+  unsigned int dist = obj_dist (kid);
+
+  if (a_key) kid.x--;
+  if (d_key) kid.x++;
+  if (w_key) kid.y--;
+  if (s_key) kid.y++;
+
+  unsigned int qx = kid.x / 32;
+  unsigned int rx = kid.x % 32;
+  printf ("floor = %u, place = %u, qx = %u, rx = %u, dist = %u\n",
+          pos.floor, pos.place, qx, rx, dist);
 
   /* comming from stabilize */
   if (kid.frame == kid_stabilize_08) {
@@ -238,7 +261,9 @@ void draw_kid_normal ()
     if (jump) draw_kid_jump ();
     else if (turn) draw_kid_turn ();
     else if (walk) draw_kid_walk ();
-    else if (run) draw_kid_start_run ();
+    else if (run)
+      if (obj == WALL && dist < 32) draw_kid_walk ();
+      else draw_kid_start_run ();
     else draw_anim (&kid, kid_normal, +0, 0);
   } else
     error (-1, 0, "%s: unknown kid frame (%p)", __func__, kid.frame);
@@ -247,8 +272,19 @@ void draw_kid_normal ()
 static
 void draw_kid_walk ()
 {
-  draw_kid = draw_kid_walk;
+  kid.draw = draw_kid_walk;
   kid.flip = (kid.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
+
+  struct level_pos pos = anim_pos (kid);
+  enum level_object obj =
+    level_obj_rel (pos, 0, (kid.dir == LEFT) ? -1 : 1);
+  unsigned int dist = obj_dist (kid);
+
+  if (obj == WALL && dist == 0) {
+    draw_anim (&kid, kid_normal, +0, 0);
+    kid.draw = draw_kid_normal;
+    return;
+  }
 
   /* comming from turn */
   if (kid.frame == kid_turn_04)
@@ -265,7 +301,109 @@ void draw_kid_walk ()
   /* comming from normal */
   else if (kid.frame == kid_normal)
     draw_anim (&kid, kid_walk_01, +0, 0);
-  else if (kid.frame == kid_walk_01)
+  /* comming from walk */
+  else if (kid.frame == kid_walk_01) {
+    if (obj == WALL) {
+      if (dist < 8) draw_kid_walk_min ();
+      else if (dist < 15) draw_kid_walk_short ();
+      else if (dist < 23) draw_kid_walk_long ();
+      else draw_kid_walk_max ();
+    } else draw_kid_walk_max ();
+  } else error (-1, 0, "%s: unknown frame (%p)", __func__, kid.frame);
+}
+
+static void
+draw_kid_walk_min (void)
+{
+  kid.draw = draw_kid_walk_min;
+  kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
+
+  /* comming from walk */
+  if (kid.frame == kid_walk_01)
+    draw_anim (&kid, kid_walk_02, -1, 0);
+  else if (kid.frame == kid_walk_02)
+    draw_anim (&kid, kid_walk_03, -2, 0);
+  else if (kid.frame == kid_walk_03) {
+    kid.x += (kid.dir == LEFT) ? -32 : +32;
+    while (is_colliding (kid)) kid.x += (kid.dir == LEFT) ? +1 : -1;
+    draw_anim (&kid, kid_walk_11, 0, 0);
+  } else if (kid.frame == kid_walk_11) {
+    draw_anim (&kid, kid_walk_12, +0, 0);
+    kid.draw = draw_kid_normal;
+    kid.collision = draw_kid_collision;
+  } else error (-1, 0, "%s: unknown frame (%p)", __func__, kid.frame);
+}
+
+static void
+draw_kid_walk_short (void)
+{
+  kid.draw = draw_kid_walk_short;
+  kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
+
+  /* comming from walk */
+  if (kid.frame == kid_walk_01)
+    draw_anim (&kid, kid_walk_02, -1, 0);
+  else if (kid.frame == kid_walk_02)
+    draw_anim (&kid, kid_walk_03, -2, 0);
+  else if (kid.frame == kid_walk_03) {
+    kid.x += (kid.dir == LEFT) ? -32 : +32;
+    while (is_colliding (kid)) kid.x += (kid.dir == LEFT) ? +1 : -1;
+    draw_anim (&kid, kid_walk_04, 0, 0);
+  } else if (kid.frame == kid_walk_04)
+    draw_anim (&kid, kid_walk_09, +0, 0);
+  else if (kid.frame == kid_walk_09)
+    draw_anim (&kid, kid_walk_10, +0, 0);
+  else if (kid.frame == kid_walk_10)
+    draw_anim (&kid, kid_walk_11, +0, 0);
+  else if (kid.frame == kid_walk_11) {
+    draw_anim (&kid, kid_walk_12, +0, 0);
+    kid.draw = draw_kid_normal;
+  } else error (-1, 0, "%s: unknown kid frame (%p)", __func__, kid.frame);
+}
+
+
+static void
+draw_kid_walk_long (void)
+{
+  kid.draw = draw_kid_walk_long;
+  kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
+
+  /* comming from walk */
+  if (kid.frame == kid_walk_01)
+    draw_anim (&kid, kid_walk_02, -1, 0);
+  else if (kid.frame == kid_walk_02)
+    draw_anim (&kid, kid_walk_03, -2, 0);
+  else if (kid.frame == kid_walk_03)
+    draw_anim (&kid, kid_walk_04, -8, 0);
+  else if (kid.frame == kid_walk_04) {
+    kid.x += (kid.dir == LEFT) ? -32 : +32;
+    while (is_colliding (kid)) kid.x += (kid.dir == LEFT) ? +1 : -1;
+    draw_anim (&kid, kid_walk_05, 0, 0);
+  } else if (kid.frame == kid_walk_05)
+    draw_anim (&kid, kid_walk_09, +0, 0);
+  else if (kid.frame == kid_walk_09)
+    draw_anim (&kid, kid_walk_10, +0, 0);
+  else if (kid.frame == kid_walk_10)
+    draw_anim (&kid, kid_walk_11, +0, 0);
+  else if (kid.frame == kid_walk_11) {
+    draw_anim (&kid, kid_walk_12, +0, 0);
+    kid.draw = draw_kid_normal;
+  } else error (-1, 0, "%s: unknown kid frame (%p)", __func__, kid.frame);
+}
+
+static
+void draw_kid_walk_max ()
+{
+  kid.draw = draw_kid_walk_max;
+  kid.flip = (kid.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
+
+  struct level_pos pos = anim_pos (kid);
+  enum level_object obj =
+    level_obj_rel (pos, 0, (kid.dir == LEFT) ? -1 : 1);
+  unsigned int dist = obj_dist (kid);
+
+  /* comming from walk */
+  if (kid.frame == kid_walk_01)
     draw_anim (&kid, kid_walk_02, -1, 0);
   else if (kid.frame == kid_walk_02)
     draw_anim (&kid, kid_walk_03, -2, 0);
@@ -286,8 +424,10 @@ void draw_kid_walk ()
   else if (kid.frame == kid_walk_10)
     draw_anim (&kid, kid_walk_11, +0, 0);
   else if (kid.frame == kid_walk_11) {
+    if (obj == WALL  && dist < 3)
+      kid.x += (kid.dir == LEFT) ? -dist : dist;
     draw_anim (&kid, kid_walk_12, +0, 0);
-    draw_kid = draw_kid_normal;
+    kid.draw = draw_kid_normal;
   }
   else error (-1, 0, "%s: unknown kid frame (%p)", __func__, kid.frame);
 }
@@ -295,7 +435,7 @@ void draw_kid_walk ()
 static
 void draw_kid_start_run ()
 {
-  draw_kid = draw_kid_start_run;
+  kid.draw = draw_kid_start_run;
   kid.flip = (kid.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
   bool run = (kid.dir == RIGHT) ? right_key : left_key;
@@ -325,23 +465,28 @@ void draw_kid_start_run ()
     draw_anim (&kid, kid_start_run_04, -3, 0);
   else if (kid.frame == kid_start_run_04) {
     draw_anim (&kid, kid_start_run_05, -8, 0);
-    if (turn_run) draw_kid = draw_kid_stop_run;
+    if (turn_run) kid.draw = draw_kid_stop_run;
   } else if (kid.frame == kid_start_run_05) {
     draw_anim (&kid, kid_start_run_06, -8, 0);
-    if (turn_run) draw_kid = draw_kid_stop_run;
+    if (turn_run) kid.draw = draw_kid_stop_run;
   } else if (kid.frame == kid_start_run_06) {
     draw_anim (&kid, kid_start_run_07, -7, 0);
-    draw_kid = run ? draw_kid_run : draw_kid_stop_run;
+    kid.draw = run ? draw_kid_run : draw_kid_stop_run;
   } else error (-1, 0, "%s: unknown kid frame (%p)", __func__, kid.frame);
 }
 
 static
 void draw_kid_stop_run ()
 {
-  draw_kid = draw_kid_stop_run;
+  kid.draw = draw_kid_stop_run;
   kid.flip = (kid.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
   bool turn_run = (kid.dir == RIGHT) ? left_key : right_key;
+
+  struct level_pos pos = anim_pos (kid);
+  enum level_object obj =
+    level_obj_rel (pos, 0, (kid.dir == LEFT) ? -1 : 1);
+  unsigned int dist = obj_dist (kid);
 
   /* comming from start run or run */
   if (kid.frame == kid_start_run_05 || kid.frame == kid_start_run_06
@@ -354,18 +499,21 @@ void draw_kid_stop_run ()
   /* comming from stop run */
   else if (kid.frame == kid_stop_run_01)
     draw_anim (&kid, kid_stop_run_02, -6, 0);
-  else if (kid.frame == kid_stop_run_02)
-    draw_anim (&kid, kid_stop_run_03, -16, 0);
-  else if (kid.frame == kid_stop_run_03) {
+  else if (kid.frame == kid_stop_run_02) {
+    if (obj == WALL && dist < 16) {
+      draw_anim (&kid, kid_stop_run_04, -5, 0);
+      kid.draw = turn_run ? draw_kid_turn_run : draw_kid_stabilize;
+    } else draw_anim (&kid, kid_stop_run_03, -16, 0);
+  } else if (kid.frame == kid_stop_run_03) {
     draw_anim (&kid, kid_stop_run_04, +0, 0);
-    draw_kid = turn_run ? draw_kid_turn_run : draw_kid_stabilize;
+    kid.draw = turn_run ? draw_kid_turn_run : draw_kid_stabilize;
   } else error (-1, 0, "%s: unknown kid frame (%p)", __func__,  kid.frame);
 }
 
 static
 void draw_kid_run ()
 {
-  draw_kid = draw_kid_run;
+  kid.draw = draw_kid_run;
   kid.flip = (kid.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
   bool stop = ! ((kid.dir == RIGHT) ? right_key : left_key);
@@ -394,13 +542,13 @@ void draw_kid_run ()
   else
     error (-1, 0, "%s: unknown kid frame (%p)", __func__, kid.frame);
 
-  if (stop) draw_kid = draw_kid_stop_run;
+  if (stop) kid.draw = draw_kid_stop_run;
 }
 
 static
 void draw_kid_turn ()
 {
-  draw_kid = draw_kid_turn;
+  kid.draw = draw_kid_turn;
   kid.flip = (kid.dir == RIGHT) ? 0 : ALLEGRO_FLIP_HORIZONTAL;
 
   bool run = (kid.dir == RIGHT) ? left_key : right_key;
@@ -434,20 +582,20 @@ void draw_kid_turn ()
     draw_anim (&kid, kid_turn_04, +0, 0);
     kid.dir = (kid.dir == RIGHT) ? LEFT : RIGHT;
     if (turn) {
-      draw_kid = draw_kid_turn;
+      kid.draw = draw_kid_turn;
       turn = false;
     }
-    else if (jump) draw_kid = draw_kid_jump;
-    else if (walk) draw_kid = draw_kid_walk;
-    else if (run) draw_kid = draw_kid_start_run;
-    else draw_kid = draw_kid_stabilize;
+    else if (jump) kid.draw = draw_kid_jump;
+    else if (walk) kid.draw = draw_kid_walk;
+    else if (run) kid.draw = draw_kid_start_run;
+    else kid.draw = draw_kid_stabilize;
   } else error (-1, 0, "%s: unknown kid frame (%p)", __func__, kid.frame);
 }
 
 static
 void draw_kid_turn_run ()
 {
-  draw_kid = draw_kid_turn_run;
+  kid.draw = draw_kid_turn_run;
   kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
   /* comming from stop run */
@@ -471,14 +619,14 @@ void draw_kid_turn_run ()
   else if (kid.frame == kid_turn_run_12) {
     draw_anim (&kid, kid_turn_run_13, +4, 0);
     kid.dir = (kid.dir == RIGHT) ? LEFT : RIGHT;
-    draw_kid = draw_kid_run;
+    kid.draw = draw_kid_run;
   } else error (-1, 0, "%s: unknown kid frame (%p)", __func__, kid.frame);
 }
 
 static
 void draw_kid_stabilize ()
 {
-  draw_kid = draw_kid_stabilize;
+  kid.draw = draw_kid_stabilize;
   kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
   bool turn = ((kid.dir == RIGHT) && left_key) || ((kid.dir == LEFT) && right_key);
@@ -487,6 +635,13 @@ void draw_kid_stabilize ()
     || ((kid.dir == LEFT) && left_key && shift_key);
   bool jump = ((kid.dir == RIGHT) && right_key && up_key)
     || ((kid.dir == LEFT) && left_key && up_key);
+
+  struct level_pos pos = anim_pos (kid);
+  enum level_object obj =
+    level_obj_rel (pos, 0, (kid.dir == LEFT) ? -1 : 1);
+  unsigned int dist = obj_dist (kid);
+
+  kid.collision = NULL;
 
   /* comming from stop run */
   if (kid.frame == kid_stop_run_04)
@@ -501,19 +656,25 @@ void draw_kid_stabilize ()
     draw_anim (&kid, kid_stabilize_07, +3, 0);
   else if (kid.frame == kid_stabilize_07) {
     draw_anim (&kid, kid_stabilize_08, +4, 0);
-    draw_kid = draw_kid_normal;
+    kid.draw = draw_kid_normal;
   } else error (-1, 0, "%s: unknown kid frame (%p)", __func__, kid.frame);
 
-  if (jump) draw_kid = draw_kid_jump;
-  else if (turn) draw_kid = draw_kid_turn;
-  else if (walk) draw_kid = draw_kid_walk;
-  else if (run) draw_kid = draw_kid_start_run;
+  kid.collision = draw_kid_collision;
+
+  if (jump) kid.draw = draw_kid_jump;
+  else if (turn) kid.draw = draw_kid_turn;
+  else if (walk) kid.draw = draw_kid_walk;
+  else if (run) {
+    if (obj == WALL && dist < 32) kid.draw = draw_kid_walk;
+    else kid.draw = draw_kid_start_run;
+  }
+
 }
 
 static void
 draw_kid_jump (void)
 {
-  draw_kid = draw_kid_jump;
+  kid.draw = draw_kid_jump;
   kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
   /* comming from normal */
@@ -566,6 +727,37 @@ draw_kid_jump (void)
     draw_anim (&kid, kid_jump_17, +1, 0);
   else if (kid.frame == kid_jump_17) {
     draw_anim (&kid, kid_jump_18, +0, 0);
-    draw_kid = draw_kid_normal;
+    kid.draw = draw_kid_normal;
   } else error (-1, 0, "%s: unknown kid frame (%p)", __func__, kid.frame);
+}
+
+static void
+draw_kid_collision (void)
+{
+  kid.draw = draw_kid_collision;
+  kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
+
+  if (kid.odraw == draw_kid_walk_max)
+    draw_kid_walk_max ();
+  else if (kid.odraw == draw_kid_turn_run)
+    draw_kid_turn_run ();
+  else draw_kid_hit_wall ();
+}
+
+static void
+draw_kid_hit_wall (void)
+{
+  kid.draw = draw_kid_hit_wall;
+  kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
+
+  if (kid.frame == kid_walk_01)
+    draw_anim (&kid, kid_stabilize_06, +0, 0);
+  else if (kid.frame == kid_stabilize_06)
+    draw_anim (&kid, kid_stabilize_07, +3, 0);
+  else if (kid.frame == kid_stabilize_07) {
+    draw_anim (&kid, kid_stabilize_08, +4, 0);
+    kid.draw = draw_kid_normal;
+  } else
+    draw_anim (&kid, kid_walk_01, +0, 0);
+
 }

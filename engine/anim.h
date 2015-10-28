@@ -20,7 +20,7 @@
 #ifndef FREEPOP_ANIM_H
 #define FREEPOP_ANIM_H
 
-#include <allegro5/allegro.h>
+#include "kernel/video.h"
 
 /* types */
 struct anim {
@@ -30,6 +30,9 @@ struct anim {
   int dir;
   unsigned int repeat;
   int flip;
+  void (*draw) (void);
+  void (*odraw) (void);
+  void (*collision) (void);
 };
 
 enum direction {
