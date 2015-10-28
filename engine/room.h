@@ -45,12 +45,14 @@
 #define VDUNGEON_PILLAR_LEFT "dat/vdungeon/pillar/pillar left.png"
 #define VDUNGEON_PILLAR_RIGHT "dat/vdungeon/pillar/pillar right main.png"
 #define VDUNGEON_PILLAR_TOP "dat/vdungeon/pillar/pillar right top.png"
+#define VDUNGEON_PILLAR "dat/vdungeon/pillar/pillar.png"
 #define VDUNGEON_BRICKS_1 "dat/vdungeon/background/bricks01.png"
 #define VDUNGEON_TORCH "dat/vdungeon/background/torch.png"
 
 void load_room (void);
 void unload_room (void);
 void draw_room (int room);
+void draw_room_fg (int room);
 
 enum floor_type {
   NO_FLOOR_TYPE, NORMAL, BROKEN, LOOSE,

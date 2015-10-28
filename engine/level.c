@@ -183,4 +183,5 @@ level_anim (void)
   draw_room (1);
   draw_fire (1);
   kid.draw ();
+  draw_room_fg (1);
 }
