@@ -23,6 +23,7 @@
 #include "kernel/keyboard.h"
 #include "anim.h"
 #include "physics.h"
+#include "kid.h"
 
 /* set to true to quit animation */
 bool quit_anim;
@@ -102,20 +103,39 @@ draw_anim (struct anim *anim, ALLEGRO_BITMAP *frame,
   new_anim.x = x;
   new_anim.y = y;
   new_anim.collision = anim->collision;
+  new_anim.fall = anim->fall;
 
   if (is_colliding (new_anim)) {
     anim->odraw = anim->draw;
     anim->draw = anim->collision;
 
     do {
-      if (anim->dir == LEFT) new_anim.x++;
-      else if (anim->dir == RIGHT) new_anim.x--;
-      else if (anim->dir == TOP) new_anim.y++;
-      else if (anim->dir == BOTTOM) new_anim.y--;
-      x = new_anim.x;
-      y = new_anim.y;
+      if (new_anim.dir == LEFT) new_anim.x++;
+      else if (new_anim.dir == RIGHT) new_anim.x--;
+      else if (new_anim.dir == TOP) new_anim.y++;
+      else if (new_anim.dir == BOTTOM) new_anim.y--;
     } while (is_colliding (new_anim));
+
+  } else if (is_falling (new_anim)
+             && anim->draw != anim->fall
+             && anim->draw != anim->collision) {
+    anim->odraw = anim->draw;
+    anim->draw = anim->fall;
+
+    if (anim != &kid || command != JUMP) {
+
+      do {
+        if (new_anim.dir == LEFT) new_anim.x++;
+        else if (new_anim.dir == RIGHT) new_anim.x--;
+        else if (new_anim.dir == TOP) new_anim.y++;
+        else if (new_anim.dir == BOTTOM) new_anim.y--;
+      } while (is_falling (new_anim));
+    }
   }
+
+
+  x = new_anim.x;
+  y = new_anim.y;
 
   draw_bitmap (frame, screen, x, y, anim->flip);
   anim->frame = frame;

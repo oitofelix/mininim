@@ -33,6 +33,7 @@ struct anim {
   void (*draw) (void);
   void (*odraw) (void);
   void (*collision) (void);
+  void (*fall) (void);
 };
 
 enum direction {

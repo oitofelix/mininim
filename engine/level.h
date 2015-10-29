@@ -22,48 +22,9 @@
 
 #include "anim.h"
 
-#define LEVEL_ROOMS 25
-#define LEVEL_FLOORS 3
-#define LEVEL_PLACES 10
-
-struct level {
-  enum {
-    DUNGEON, PALACE,
-  } type;
-
-  enum level_object {
-      NO_FLOOR,
-      NORMAL_FLOOR,
-      NORMAL_FLOOR_BRICKS_1,
-      NORMAL_FLOOR_TORCH,
-      BROKEN_FLOOR,
-      LOOSE_FLOOR,
-      WALL,
-      PILLAR,
-  } object[LEVEL_ROOMS][LEVEL_FLOORS][LEVEL_PLACES];
-
-  unsigned int link[LEVEL_ROOMS][4];
-};
-
-struct level_pos {
-  unsigned int room;
-  int floor, place;
-};
-
 /* current level */
 extern struct level *level;
 
-/* random number generator seed */
-extern uint32_t random_seed;
-
 void play_level (struct level *level);
-enum level_object level_obj (struct level_pos pos);
-enum level_object level_obj_rel (struct level_pos pos, int floor, int place);
-struct level_pos anim_pos (struct anim anim);
-unsigned int obj_dist (struct anim);
-struct level_pos norm_pos (struct level_pos pos, bool floor_first);
-struct level_pos norm_pos_floor (struct level_pos pos);
-struct level_pos norm_pos_place (struct level_pos pos);
-unsigned int prandom_pos (struct level_pos pos, unsigned int i, unsigned int max);
 
 #endif	/* FREEPOP_LEVEL_H */

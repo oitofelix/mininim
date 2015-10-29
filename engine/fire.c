@@ -20,6 +20,7 @@
 #include <error.h>
 #include "kernel/video.h"
 #include "kernel/random.h"
+#include "physics.h"
 #include "level.h"
 #include "fire.h"
 
@@ -78,16 +79,16 @@ get_fire_frame (unsigned int i)
 void
 draw_fire (int room)
 {
-  struct level_pos pos;
+  struct pos pos;
   pos.room = room;
 
   static unsigned int i = 0;
 
   ALLEGRO_BITMAP *fire;
 
-  for (pos.floor = LEVEL_FLOORS - 1; pos.floor >= 0; pos.floor--)
-    for (pos.place = -1; pos.place + 1 < LEVEL_PLACES; pos.place++) {
-      if (level_obj (pos) == NORMAL_FLOOR_TORCH) {
+  for (pos.floor = FLOORS - 1; pos.floor >= 0; pos.floor--)
+    for (pos.place = -1; pos.place + 1 < PLACES; pos.place++) {
+      if (obj (pos) == NORMAL_FLOOR_TORCH) {
 
         fire = get_fire_frame (prandom_pos (pos, i, 8));
         draw_bitmap (fire, screen, 32 * (pos.place + 1) + 8, 63 * pos.floor + 4,

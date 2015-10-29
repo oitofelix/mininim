@@ -23,11 +23,13 @@
 #include "prince.h"
 #include "kernel/video.h"
 #include "kernel/random.h"
-#include "room.h"
+#include "physics.h"
 #include "level.h"
+#include "room.h"
+#include "kid.h"
 
 static ALLEGRO_BITMAP *floor_normal_left, *floor_normal_right, *floor_normal_base,
-  *floor_broken_left, *floor_broken_right,
+  *floor_broken_left, *floor_broken_right, *floor_broken_front,
   *wall_left, *wall_center, *wall_right, *wall_single, *wall_face, *wall_face_top,
   *wall_left_base, *wall_center_base, *wall_right_base, *wall_single_base,
   *wall_gray_block, *wall_wide_divider, *wall_narrow_divider, *wall_mark_top_left,
@@ -41,15 +43,17 @@ static ALLEGRO_BITMAP *room_bg;
 static unsigned int room = -1;
 
 static void draw_room_bg (void);
-static void draw_floor (struct level_pos pos, enum floor_type floor, enum bg_type bg);
-static void draw_pillar (struct level_pos pos);
-static void draw_wall (ALLEGRO_BITMAP *bitmap, struct level_pos pos);
-static enum wall_correlation wall_correlation (struct level_pos pos);
-static void draw_wall_randomization (ALLEGRO_BITMAP *bitmap, struct level_pos pos);
-static void draw_wall_left_mark (ALLEGRO_BITMAP *bitmap, struct level_pos,
+static void draw_floor (struct pos pos, enum floor_type floor, enum bg_type bg);
+static void draw_pillar (struct pos pos);
+static void draw_wall (ALLEGRO_BITMAP *bitmap, struct pos pos);
+static enum wall_correlation wall_correlation (struct pos pos);
+static void draw_wall_randomization (ALLEGRO_BITMAP *bitmap, struct pos pos);
+static void draw_wall_left_mark (ALLEGRO_BITMAP *bitmap, struct pos,
                                  int random_0, int random_1, int random_2);
-static void draw_wall_right_mark (ALLEGRO_BITMAP *bitmap, struct level_pos pos,
+static void draw_wall_right_mark (ALLEGRO_BITMAP *bitmap, struct pos pos,
                                   int random_0, int random_1);
+static void draw_floor_fg (struct pos, enum floor_type floor);
+
 
 void
 load_room (void)
@@ -66,6 +70,7 @@ load_room (void)
         floor_normal_base = load_bitmap (VDUNGEON_FLOOR_NORMAL_BASE);
         floor_broken_left = load_bitmap (VDUNGEON_FLOOR_BROKEN_LEFT);
         floor_broken_right = load_bitmap (VDUNGEON_FLOOR_BROKEN_RIGHT);
+        floor_broken_front = load_bitmap (VDUNGEON_FLOOR_BROKEN_FRONT);
         wall_left = load_bitmap (VDUNGEON_WALL_LEFT);
         wall_center = load_bitmap (VDUNGEON_WALL_CENTER);
         wall_right = load_bitmap (VDUNGEON_WALL_RIGHT);
@@ -110,6 +115,7 @@ unload_room (void)
   al_destroy_bitmap (floor_normal_base);
   al_destroy_bitmap (floor_broken_left);
   al_destroy_bitmap (floor_broken_right);
+  al_destroy_bitmap (floor_broken_front);
   al_destroy_bitmap (wall_left);
   al_destroy_bitmap (wall_center);
   al_destroy_bitmap (wall_right);
@@ -149,14 +155,14 @@ draw_room (int _room)
 static void
 draw_room_bg (void)
 {
-  struct level_pos pos;
+  struct pos pos;
   pos.room = room;
 
   clear_bitmap (room_bg, BLACK);
 
-  for (pos.floor = LEVEL_FLOORS - 1; pos.floor >= -1; pos.floor--)
-    for (pos.place = -1; pos.place < LEVEL_PLACES; pos.place++) {
-      switch (level_obj (pos)) {
+  for (pos.floor = FLOORS - 1; pos.floor >= -1; pos.floor--)
+    for (pos.place = -1; pos.place < PLACES; pos.place++) {
+      switch (obj (pos)) {
       case NO_FLOOR:
         draw_floor (pos, NO_FLOOR_TYPE, NO_BG);
         break;
@@ -182,13 +188,13 @@ draw_room_bg (void)
         draw_wall (room_bg, pos);
         break;
       default:
-        error (-1, 0, "%s: unknown level object (%i)", __func__, level_obj (pos));
+        error (-1, 0, "%s: unknown level object (%i)", __func__, obj (pos));
       }
     }
 }
 
 static void
-draw_floor (struct level_pos pos, enum floor_type floor, enum bg_type bg)
+draw_floor (struct pos pos, enum floor_type floor, enum bg_type bg)
 {
   ALLEGRO_BITMAP *floor_left;
   ALLEGRO_BITMAP *floor_right;
@@ -225,7 +231,7 @@ draw_floor (struct level_pos pos, enum floor_type floor, enum bg_type bg)
       if (pos.floor >= 0 && pos.place >= 0)
         draw_bitmap (floor_left, room_bg,
                      32 * pos.place, 63 * pos.floor + 50, 0);
-      if (pos.floor >= 0 && pos.place + 1 < LEVEL_PLACES)
+      if (pos.floor >= 0 && pos.place + 1 < PLACES)
         draw_bitmap (floor_right, room_bg,
                      32 * (pos.place + 1), 63 * pos.floor + 50, 0);
     }
@@ -235,12 +241,12 @@ draw_floor (struct level_pos pos, enum floor_type floor, enum bg_type bg)
     case NO_BG:
       break;
     case BRICKS_1:
-      if (pos.floor >= 0 && pos.place + 1 < LEVEL_PLACES)
+      if (pos.floor >= 0 && pos.place + 1 < PLACES)
         draw_bitmap (bricks_1, room_bg,
                      32 * (pos.place + 1), 63 * pos.floor + 15, 0);
       break;
     case TORCH:
-      if (pos.floor >= 0 && pos.place + 1 < LEVEL_PLACES)
+      if (pos.floor >= 0 && pos.place + 1 < PLACES)
         draw_bitmap (torch, room_bg,
                      32 * (pos.place + 1), 63 * pos.floor + 22, 0);
       break;
@@ -250,7 +256,7 @@ draw_floor (struct level_pos pos, enum floor_type floor, enum bg_type bg)
 }
 
 static void
-draw_pillar (struct level_pos pos)
+draw_pillar (struct pos pos)
 {
   if (pos.place >= 0)
     draw_bitmap (floor_normal_base, room_bg,
@@ -258,16 +264,16 @@ draw_pillar (struct level_pos pos)
   if (pos.floor >= 0 && pos.place >= 0)
     draw_bitmap (pillar_left, room_bg,
                  32 * pos.place, 63 * pos.floor + 3, 0);
-  if (pos.floor >= 0 && pos.place + 1 < LEVEL_PLACES)
+  if (pos.floor >= 0 && pos.place + 1 < PLACES)
     draw_bitmap (pillar_right, room_bg,
                  32 * (pos.place + 1), 63 * pos.floor + 3, 0);
-  if (pos.floor > 0 && pos.place + 1 < LEVEL_PLACES)
+  if (pos.floor > 0 && pos.place + 1 < PLACES)
     draw_bitmap (pillar_top, room_bg,
                  32 * (pos.place + 1), 63 * pos.floor - 4, 0);
 }
 
 static void
-draw_wall (ALLEGRO_BITMAP *bitmap, struct level_pos pos)
+draw_wall (ALLEGRO_BITMAP *bitmap, struct pos pos)
 {
   switch (wall_correlation (pos)) {
   case SWS:
@@ -277,10 +283,10 @@ draw_wall (ALLEGRO_BITMAP *bitmap, struct level_pos pos)
     if (pos.floor >= 0 && pos.place >= 0)
       draw_bitmap (wall_single, bitmap,
                    32 * pos.place, 63 * pos.floor + 3, 0);
-    if (pos.floor >= 0 && pos.place + 1 < LEVEL_PLACES)
+    if (pos.floor >= 0 && pos.place + 1 < PLACES)
       draw_bitmap (wall_face, bitmap,
                    32 * (pos.place + 1), 63 * pos.floor + 3, 0);
-    if (pos.floor > 0 && pos.place + 1 < LEVEL_PLACES)
+    if (pos.floor > 0 && pos.place + 1 < PLACES)
       draw_bitmap (wall_face_top, bitmap,
                    32 * (pos.place + 1), 63 * pos.floor - 9, 0);
     break;
@@ -299,10 +305,10 @@ draw_wall (ALLEGRO_BITMAP *bitmap, struct level_pos pos)
     if (pos.floor >= 0 && pos.place >= 0)
       draw_bitmap (wall_right, bitmap,
                    32 * pos.place, 63 * pos.floor + 3, 0);
-    if (pos.floor >= 0 && pos.place + 1 < LEVEL_PLACES)
+    if (pos.floor >= 0 && pos.place + 1 < PLACES)
       draw_bitmap (wall_face, bitmap,
                    32 * (pos.place + 1), 63 * pos.floor + 3, 0);
-    if (pos.floor > 0 && pos.place + 1 < LEVEL_PLACES)
+    if (pos.floor > 0 && pos.place + 1 < PLACES)
       draw_bitmap (wall_face_top, bitmap,
                    32 * (pos.place + 1), 63 * pos.floor - 9, 0);
     break;
@@ -323,20 +329,20 @@ draw_wall (ALLEGRO_BITMAP *bitmap, struct level_pos pos)
 }
 
 enum wall_correlation
-wall_correlation (struct level_pos pos)
+wall_correlation (struct pos pos)
 {
-  if (level_obj (pos) != WALL)
+  if (obj (pos) != WALL)
     error (-1, 0, "%s: requested wall correlation on non-wall (%u, %u. %u)",
            __func__, pos.room, pos.floor, pos.place);
 
-  if (level_obj_rel (pos, 0, -1) != WALL
-      && level_obj_rel (pos, 0, +1) != WALL) return SWS;
-  else if (level_obj_rel (pos, 0, -1) != WALL
-           && level_obj_rel (pos, 0, +1) == WALL) return SWW;
-  else if (level_obj_rel (pos, 0, -1) == WALL
-           && level_obj_rel (pos, 0, +1) != WALL) return WWS;
-  else if (level_obj_rel (pos, 0, -1) == WALL
-           && level_obj_rel (pos, 0, +1) == WALL) return WWW;
+  if (obj_rel (pos, 0, -1) != WALL
+      && obj_rel (pos, 0, +1) != WALL) return SWS;
+  else if (obj_rel (pos, 0, -1) != WALL
+           && obj_rel (pos, 0, +1) == WALL) return SWW;
+  else if (obj_rel (pos, 0, -1) == WALL
+           && obj_rel (pos, 0, +1) != WALL) return WWS;
+  else if (obj_rel (pos, 0, -1) == WALL
+           && obj_rel (pos, 0, +1) == WALL) return WWW;
   else
     error (-1, 0, "%s: unknown wall correlation (%u, %u. %u)",
            __func__, pos.room, pos.floor, pos.place);
@@ -346,12 +352,12 @@ wall_correlation (struct level_pos pos)
 
 
 void
-draw_wall_randomization (ALLEGRO_BITMAP *bitmap, struct level_pos pos)
+draw_wall_randomization (ALLEGRO_BITMAP *bitmap, struct pos pos)
 {
   if (level->type != DUNGEON && video_mode == VGA) return;
 
   uint32_t random_seed_backup = random_seed;
-  random_seed = pos.room + pos.floor * LEVEL_PLACES + pos.place;
+  random_seed = pos.room + pos.floor * PLACES + pos.place;
   prandom (1);
   unsigned int r0 = prandom(1);
   unsigned int r1 = prandom(4);
@@ -445,7 +451,7 @@ draw_wall_randomization (ALLEGRO_BITMAP *bitmap, struct level_pos pos)
 }
 
 void
-draw_wall_left_mark (ALLEGRO_BITMAP *bitmap, struct level_pos pos,
+draw_wall_left_mark (ALLEGRO_BITMAP *bitmap, struct pos pos,
                      int random_0, int random_1, int random_2)
 {
   ALLEGRO_BITMAP *wall_mark = wall_mark_top_left;
@@ -465,7 +471,7 @@ draw_wall_left_mark (ALLEGRO_BITMAP *bitmap, struct level_pos pos,
 
 
 void
-draw_wall_right_mark (ALLEGRO_BITMAP *bitmap, struct level_pos pos,
+draw_wall_right_mark (ALLEGRO_BITMAP *bitmap, struct pos pos,
                       int random_0, int random_1)
 {
   ALLEGRO_BITMAP *wall_mark;
@@ -484,30 +490,110 @@ draw_wall_right_mark (ALLEGRO_BITMAP *bitmap, struct level_pos pos,
 }
 
 void
-draw_room_fg (room)
+draw_room_fg (struct pos p)
 {
-  struct level_pos pos;
-  pos.room = room;
-
-  for (pos.floor = LEVEL_FLOORS - 1; pos.floor >= 0; pos.floor--)
-    for (pos.place = 0; pos.place < LEVEL_PLACES; pos.place++) {
-      switch (level_obj (pos)) {
-      case PILLAR:
-        if (pos.floor >= 0 && pos.place >= 0)
-          draw_bitmap (pillar, screen,
-                       32 * pos.place + 8, 63 * pos.floor + 3, 0);
-        break;
-      case WALL:
-        switch (wall_correlation (pos)) {
-        case SWS:
-          draw_wall (screen, pos);
-        case SWW:
-          draw_wall (screen, pos);
-        default:
-          break;
-        }
-      default:
-          break;
-      }
+  switch (obj (p)) {
+  case NORMAL_FLOOR:
+    draw_floor_fg (p, NORMAL);
+    break;
+  case BROKEN_FLOOR:
+    draw_floor_fg (p, BROKEN);
+    break;
+  case LOOSE_FLOOR:
+    draw_floor_fg (p, LOOSE);
+    break;
+  case NORMAL_FLOOR_BRICKS_1:
+    draw_floor_fg (p, NORMAL);
+    break;
+  case NORMAL_FLOOR_TORCH:
+    draw_floor_fg (p, NORMAL);
+    break;
+  case PILLAR:
+    if (p.floor >= 0 && p.place >= 0)
+      draw_bitmap
+        (pillar, screen, 32 * p.place + 8,
+         63 * p.floor + 3, 0);
+    break;
+  case WALL:
+    switch (wall_correlation (p)) {
+    case SWS:
+      draw_wall (screen, p);
+    case SWW:
+      draw_wall (screen, p);
+    default:
+      break;
     }
+  default:
+    break;
+  }
+}
+
+static void
+draw_floor_fg (struct pos pos, enum floor_type floor)
+{
+  ALLEGRO_BITMAP *floor_left;
+  /* ALLEGRO_BITMAP *floor_right; */
+  ALLEGRO_BITMAP *floor_base;
+
+  if (floor == BROKEN) {
+    if (pos.floor >= 0 && pos.place >= 0)
+      draw_bitmap (floor_broken_front, screen,
+                   32 * pos.place, 63 * pos.floor + 54, 0);
+  }
+
+  if (! is_falling (kid)) return;
+
+  switch (floor)
+    {
+    case NO_FLOOR_TYPE:
+      break;
+    case NORMAL:
+      floor_left = floor_normal_left;
+      /* floor_right = floor_normal_right; */
+      floor_base = floor_normal_base;
+      break;
+    case BROKEN:
+      floor_left = floor_broken_left;
+      /* floor_right = floor_broken_right; */
+      floor_base = floor_normal_base;
+      break;
+    case LOOSE:
+      floor_left = floor_normal_left;
+      /* floor_right = floor_normal_right; */
+      floor_base = floor_normal_base;
+      break;
+    default:
+      error (-1, 0, "%s: unknown floor type (%u)", __func__, floor);
+    }
+
+  if (floor != NO_FLOOR_TYPE)
+    {
+      if (pos.place >= 0)
+        draw_bitmap (floor_base, screen,
+                     32 * pos.place, 63 * (pos.floor + 1), 0);
+      if (pos.floor >= 0 && pos.place >= 0)
+        draw_bitmap (floor_left, screen,
+                     32 * pos.place, 63 * pos.floor + 50, 0);
+      /* if (pos.floor >= 0 && pos.place + 1 < PLACES) */
+      /*   draw_bitmap (floor_right, screen, */
+      /*                32 * (pos.place + 1), 63 * pos.floor + 50, 0); */
+    }
+}
+
+struct pos
+room_pos_xy (unsigned int room, int x, int y)
+{
+  struct pos pos;
+
+  unsigned int qy = y / PLACE_HEIGHT;
+  unsigned int ry = y % PLACE_HEIGHT;
+
+  pos.room = room;
+  pos.place = x / PLACE_WIDTH;
+  pos.floor = (ry < 3) ? qy - 1 : qy;
+
+  if (x < 0) pos.place = -1;
+  if (y < 0) pos.floor = -1;
+
+  return pos;
 }

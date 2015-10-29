@@ -23,10 +23,11 @@
 #include "kernel/random.h"
 
 #include "anim.h"
-#include "level.h"
+#include "physics.h"
 #include "room.h"
 #include "fire.h"
 #include "kid.h"
+#include "level.h"
 
 /* functions */
 static void load_level (void);
@@ -35,121 +36,6 @@ static void level_anim (void);
 
 /* current level */
 struct level *level;
-
-enum level_object
-level_obj (struct level_pos pos)
-{
-  pos = norm_pos (pos, true);
-  return level->object[pos.room][pos.floor][pos.place];
-}
-
-enum level_object
-level_obj_rel (struct level_pos pos, int floor, int place)
-{
-  pos.floor += floor;
-  pos.place += place;
-  return level_obj (pos);
-}
-
-struct level_pos
-anim_pos (struct anim anim)
-{
-  struct level_pos pos;
-  int w = al_get_bitmap_width (anim.frame);
-  int x = (anim.dir == LEFT) ? anim.x : anim.x + w - 1 - 3;
-  int y = anim.y;
-
-  unsigned int qx = x / (ORIGINAL_WIDTH / LEVEL_PLACES);
-  unsigned int rx = x % (ORIGINAL_WIDTH / LEVEL_PLACES);
-  unsigned int qy = y / ((ORIGINAL_HEIGHT - 11) / LEVEL_FLOORS);
-  unsigned int ry = y % ((ORIGINAL_HEIGHT - 11) / LEVEL_FLOORS);
-
-  pos.room = anim.room;
-  pos.place = (rx < 13) ? qx - 1 : qx;
-  pos.floor = (ry < 3) ? qy - 1 : qy;
-
-  if (x < 0) pos.place = -1;
-
-  return pos;
-}
-
-unsigned int
-obj_dist (struct anim anim)
-{
-  struct level_pos pos = anim_pos (anim);
-  int w = al_get_bitmap_width (anim.frame);
-  int x = (anim.dir == LEFT) ? anim.x : anim.x + w - 1 - 3;
-
-  unsigned int qx = x / (ORIGINAL_WIDTH / LEVEL_PLACES);
-  unsigned int rx = x % (ORIGINAL_WIDTH / LEVEL_PLACES);
-
-  if (anim.dir == LEFT) return (qx - pos.place) * 32 + rx - 13;
-  else return (pos.place + 1) * 32 + 12 - x;
-}
-
-struct level_pos
-norm_pos (struct level_pos pos, bool floor_first)
-{
-  if (pos.room >= LEVEL_ROOMS)
-    error (-1, 0, "%s: room out of range (%u)", __func__, pos.room);
-
-  if (floor_first) {
-    pos = norm_pos_floor (pos);
-    pos = norm_pos_place (pos);
-  } else {
-    pos = norm_pos_place (pos);
-    pos = norm_pos_floor (pos);
-  }
-
-  return pos;
-}
-
-struct level_pos
-norm_pos_floor (struct level_pos pos)
-{
-  unsigned int room_offset;
-  if (pos.floor < 0) {
-    unsigned int q = (-pos.floor) / LEVEL_FLOORS;
-    unsigned int r = (-pos.floor) % LEVEL_FLOORS;
-    pos.floor = r ? LEVEL_FLOORS - r : 0;
-    for (room_offset = r ? q + 1 : q; room_offset > 0; room_offset--)
-      pos.room = level->link[pos.room][TOP];
-  } else if (pos.floor >= LEVEL_FLOORS) {
-    unsigned int q = pos.floor / LEVEL_FLOORS;
-    unsigned int r = pos.floor % LEVEL_FLOORS;
-    pos.floor = r;
-    for (room_offset = q; room_offset > 0; room_offset--)
-      pos.room = level->link[pos.room][BOTTOM];
-  }
-  return pos;
-}
-
-struct level_pos
-norm_pos_place (struct level_pos pos)
-{
-  unsigned int room_offset;
-  if (pos.place < 0) {
-    unsigned int q = (-pos.place) / LEVEL_PLACES;
-    unsigned int r = (-pos.place) % LEVEL_PLACES;
-    pos.place = r ? LEVEL_PLACES - r : 0;
-    for (room_offset = r ? q + 1 : q; room_offset > 0; room_offset--)
-      pos.room = level->link[pos.room][LEFT];
-  } else if (pos.place >= LEVEL_PLACES) {
-    unsigned int q = pos.place / LEVEL_PLACES;
-    unsigned int r = pos.place % LEVEL_PLACES;
-    pos.floor = r;
-    for (room_offset = q; room_offset > 0; room_offset--)
-      pos.room = level->link[pos.room][RIGHT];
-  }
-  return pos;
-}
-
-unsigned int
-prandom_pos (struct level_pos pos, unsigned int i, unsigned int max)
-{
-  return
-    prandom_uniq (pos.room + pos.floor * LEVEL_PLACES + pos.place + i, max);
-}
 
 void
 play_level (struct level *_level)
@@ -183,5 +69,24 @@ level_anim (void)
   draw_room (1);
   draw_fire (1);
   kid.draw ();
-  draw_room_fg (1);
+
+  int w = al_get_bitmap_width (kid.frame);
+  int h = al_get_bitmap_height (kid.frame);
+
+  struct pos p;
+
+  p = room_pos_xy (kid.room, kid.x, kid.y + h - 1);
+  draw_room_fg (p);
+
+  p = room_pos_xy (kid.room, kid.x + w - 1, kid.y + h - 1);
+  draw_room_fg (p);
+
+  p = room_pos_xy (kid.room, kid.x + w / 2, kid.y + h / 2);
+  draw_room_fg (p);
+
+  p = room_pos_xy (kid.room, kid.x, kid.y);
+  draw_room_fg (p);
+
+  p = room_pos_xy (kid.room, kid.x + w - 1, kid.y);
+  draw_room_fg (p);
 }

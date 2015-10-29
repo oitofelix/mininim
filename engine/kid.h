@@ -87,6 +87,29 @@
 #define KID_JUMP_16 "dat/kid/simple jump/frame16.png"
 #define KID_JUMP_17 "dat/kid/simple jump/frame17.png"
 #define KID_JUMP_18 "dat/kid/simple jump/frame18.png"
+#define KID_FALL_13 "dat/kid/hanging and falling/frame13.png"
+#define KID_FALL_14 "dat/kid/hanging and falling/frame14.png"
+#define KID_FALL_15 "dat/kid/hanging and falling/frame15.png"
+#define KID_FALL_16 "dat/kid/hanging and falling/frame16.png"
+#define KID_FALL_17 "dat/kid/hanging and falling/frame17.png"
+#define KID_COUCH_01 "dat/kid/couching/frame01.png"
+#define KID_COUCH_02 "dat/kid/couching/frame02.png"
+#define KID_COUCH_03 "dat/kid/couching/frame03.png"
+#define KID_COUCH_04 "dat/kid/couching/frame04.png"
+#define KID_COUCH_05 "dat/kid/couching/frame05.png"
+#define KID_COUCH_06 "dat/kid/couching/frame06.png"
+#define KID_COUCH_07 "dat/kid/couching/frame07.png"
+#define KID_COUCH_08 "dat/kid/couching/frame08.png"
+#define KID_COUCH_09 "dat/kid/couching/frame09.png"
+#define KID_COUCH_10 "dat/kid/couching/frame10.png"
+#define KID_COUCH_11 "dat/kid/couching/frame11.png"
+#define KID_COUCH_12 "dat/kid/couching/frame12.png"
+#define KID_COUCH_13 "dat/kid/couching/frame13.png"
+
+enum command {
+  RUN,
+  JUMP,
+};
 
 /* functions */
 void load_kid (void);
@@ -94,5 +117,26 @@ void unload_kid (void);
 
 /* variables */
 extern struct anim kid; /* kid animation object */
+extern enum command command;
+
+extern ALLEGRO_BITMAP *kid_normal,
+  *kid_start_run_01, *kid_start_run_02, *kid_start_run_03, *kid_start_run_04,
+  *kid_start_run_05, *kid_start_run_06, *kid_start_run_07,
+  *kid_run_08, *kid_run_09, *kid_run_10, *kid_run_11,
+  *kid_run_12, *kid_run_13, *kid_run_14,
+  *kid_turn_01, *kid_turn_02, *kid_turn_03, *kid_turn_04,
+  *kid_stabilize_05, *kid_stabilize_06, *kid_stabilize_07, *kid_stabilize_08,
+  *kid_stop_run_01, *kid_stop_run_02, *kid_stop_run_03, *kid_stop_run_04,
+  *kid_turn_run_05, *kid_turn_run_06, *kid_turn_run_07, *kid_turn_run_08,
+  *kid_turn_run_09, *kid_turn_run_10, *kid_turn_run_11, *kid_turn_run_12,
+  *kid_turn_run_13,
+  *kid_walk_01, *kid_walk_02, *kid_walk_03, *kid_walk_04, *kid_walk_05,
+  *kid_walk_06, *kid_walk_07, *kid_walk_08, *kid_walk_09, *kid_walk_10,
+  *kid_walk_11, *kid_walk_12,
+  *kid_jump_01, *kid_jump_02, *kid_jump_03, *kid_jump_04, *kid_jump_05, *kid_jump_06,
+  *kid_jump_07, *kid_jump_08, *kid_jump_09, *kid_jump_10, *kid_jump_11, *kid_jump_12,
+  *kid_jump_13, *kid_jump_14, *kid_jump_15, *kid_jump_16, *kid_jump_17, *kid_jump_18,
+  *kid_fall_13, *kid_fall_14, *kid_fall_15, *kid_fall_16, *kid_fall_17;
+
 
 #endif	/* FREEPOP_KID_H */

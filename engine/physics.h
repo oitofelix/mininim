@@ -22,6 +22,52 @@
 
 #include "anim.h"
 
+#define ROOMS 25
+#define FLOORS 3
+#define PLACES 10
+
+#define PLACE_WIDTH (ORIGINAL_WIDTH / PLACES)
+#define PLACE_HEIGHT ((ORIGINAL_HEIGHT - 11) / FLOORS)
+
+/* types */
+struct level {
+  enum {
+    DUNGEON, PALACE,
+  } type;
+
+  enum obj {
+      NO_FLOOR,
+      NORMAL_FLOOR,
+      NORMAL_FLOOR_BRICKS_1,
+      NORMAL_FLOOR_TORCH,
+      BROKEN_FLOOR,
+      LOOSE_FLOOR,
+      WALL,
+      PILLAR,
+  } obj[ROOMS][FLOORS][PLACES];
+
+  unsigned int link[ROOMS][4];
+};
+
+struct pos {
+  unsigned int room;
+  int floor, place;
+};
+
+/* functions */
+enum obj obj (struct pos pos);
+enum obj obj_rel (struct pos pos, int floor, int place);
+struct pos norm_pos (struct pos pos, bool floor_first);
+struct pos norm_pos_floor (struct pos pos);
+struct pos norm_pos_place (struct pos pos);
+unsigned int prandom_pos (struct pos pos, unsigned int i,
+                          unsigned int max);
+struct pos pos_xy (unsigned int room, int x, int y);
+struct pos pos (struct anim anim);
 bool is_colliding (struct anim anim);
+unsigned int dist_collision (struct anim anim);
+unsigned int dist_fall (struct anim anim);
+bool is_falling (struct anim anim);
+void to_edge (struct anim *anim);
 
 #endif	/* FREEPOP_PHYSICS_H */

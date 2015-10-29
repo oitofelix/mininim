@@ -25,6 +25,7 @@
 #define VDUNGEON_FLOOR_NORMAL_BASE "dat/vdungeon/floor panels/normal base.png"
 #define VDUNGEON_FLOOR_BROKEN_LEFT "dat/vdungeon/floor panels/broken left.png"
 #define VDUNGEON_FLOOR_BROKEN_RIGHT "dat/vdungeon/floor panels/broken right.png"
+#define VDUNGEON_FLOOR_BROKEN_FRONT "dat/vdungeon/floor panels/broken left02.png"
 #define VDUNGEON_WALL_LEFT "dat/vdungeon/walls/left stack main.png"
 #define VDUNGEON_WALL_CENTER "dat/vdungeon/walls/centre stack main.png"
 #define VDUNGEON_WALL_RIGHT "dat/vdungeon/walls/right stack main.png"
@@ -52,7 +53,8 @@
 void load_room (void);
 void unload_room (void);
 void draw_room (int room);
-void draw_room_fg (int room);
+void draw_room_fg (struct pos p);
+struct pos room_pos_xy (unsigned int room, int x, int y);
 
 enum floor_type {
   NO_FLOOR_TYPE, NORMAL, BROKEN, LOOSE,

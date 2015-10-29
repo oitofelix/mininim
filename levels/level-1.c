@@ -18,12 +18,13 @@
 */
 
 #include "kernel/video.h"
+#include "engine/physics.h"
 #include "engine/level.h"
 
 static struct level level_1 = {
   .type = DUNGEON,
 
-  .object = {
+  .obj = {
     [0] =
     {{WALL, NO_FLOOR, NO_FLOOR, NO_FLOOR, NO_FLOOR,
       NO_FLOOR, NO_FLOOR, NO_FLOOR, NO_FLOOR, WALL},
