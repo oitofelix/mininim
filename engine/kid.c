@@ -785,10 +785,6 @@ draw_kid_collision (void)
   kid.draw = draw_kid_collision;
   kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  /* fix bug in which the kid stand in thin air if colliding while
-     jumping */
-  if (kid.frame == kid_jump_10) kid.y += 6;
-
   if (kid.odraw == draw_kid_walk_max)
     draw_kid_walk_max ();
   else if (kid.odraw == draw_kid_turn_run)
@@ -799,6 +795,15 @@ draw_kid_collision (void)
     draw_kid_stabilize ();
   else if (kid.odraw == draw_kid_fall)
     draw_kid_fall ();
+  else if (kid.odraw == draw_kid_jump) {
+    /* fix bug in which the kid stand in thin air if colliding while
+     jumping */
+    if (kid.frame == kid_jump_10) kid.y += 6;
+    if (kid.frame == kid_jump_09 || kid.frame == kid_jump_10
+        || kid.frame == kid_jump_11)
+      draw_kid_couch ();
+    else draw_kid_hit_wall ();
+  }
   else draw_kid_hit_wall ();
 }
 
