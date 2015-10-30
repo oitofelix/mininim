@@ -286,8 +286,8 @@ void draw_kid_normal ()
   unsigned int rx = kid.x % PLACE_WIDTH;
   unsigned int dc = dist_collision (kid);
   unsigned int df = dist_fall (kid);
-  printf ("floor = %u, place = %u, qx = %u, rx = %u, dc = %u, df = %u\n",
-          p.floor, p.place, qx, rx, dc, df);
+  if (a_key || d_key || w_key || s_key || enter_key)
+    printf ("floor = %u, place = %u, qx = %u, rx = %u, dc = %u, df = %u\n", p.floor, p.place, qx, rx, dc, df);
 
   /* comming from stabilize */
   if (kid.frame == kid_stabilize_08) {
@@ -784,6 +784,10 @@ draw_kid_collision (void)
 {
   kid.draw = draw_kid_collision;
   kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
+
+  /* fix bug in which the kid stand in thin air if colliding while
+     jumping */
+  if (kid.frame == kid_jump_10) kid.y += 6;
 
   if (kid.odraw == draw_kid_walk_max)
     draw_kid_walk_max ();
