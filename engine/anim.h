@@ -43,6 +43,8 @@ enum direction {
 /* functions */
 void play_anim (void (*callback) (void), unsigned int freq);
 void draw_anim (struct anim *anim, ALLEGRO_BITMAP *new_frame, int dx, int dy);
+struct anim next_anim (struct anim a, ALLEGRO_BITMAP* frame, int dx, int dy);
+void draw_anim_on_edge (struct anim *a, ALLEGRO_BITMAP* frame, int dx, int dy);
 bool wait_anim (unsigned int cycles);
 
 /* variables */

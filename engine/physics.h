@@ -65,9 +65,12 @@ unsigned int prandom_pos (struct pos pos, unsigned int i,
 struct pos pos_xy (unsigned int room, int x, int y);
 struct pos pos (struct anim anim);
 bool is_colliding (struct anim anim);
-unsigned int dist_collision (struct anim anim);
-unsigned int dist_fall (struct anim anim);
+int dist_collision (struct anim anim);
+int dist_fall (struct anim anim);
 bool is_falling (struct anim anim);
 void to_edge (struct anim *anim);
+void apply_physics (struct anim *a, ALLEGRO_BITMAP *frame,
+                    int dx, int dy);
+
 
 #endif	/* FREEPOP_PHYSICS_H */

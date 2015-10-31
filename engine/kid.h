@@ -28,7 +28,7 @@
 #define KID_START_RUN_04 "dat/kid/running/frame04.png"
 #define KID_START_RUN_05 "dat/kid/running/frame05.png"
 #define KID_START_RUN_06 "dat/kid/running/frame06.png"
-#define KID_START_RUN_07 "dat/kid/running/frame07.png"
+#define KID_RUN_07 "dat/kid/running/frame07.png"
 #define KID_RUN_08 "dat/kid/running/frame08.png"
 #define KID_RUN_09 "dat/kid/running/frame09.png"
 #define KID_RUN_10 "dat/kid/running/frame10.png"
@@ -115,13 +115,18 @@ enum command {
 void load_kid (void);
 void unload_kid (void);
 
+void draw_kid_stabilize (void);
+bool is_kid_stop_run (void);
+bool is_kid_fall (void);
+bool is_kid_start_jump (void);
+
 /* variables */
 extern struct anim kid; /* kid animation object */
 extern enum command command;
 
 extern ALLEGRO_BITMAP *kid_normal,
   *kid_start_run_01, *kid_start_run_02, *kid_start_run_03, *kid_start_run_04,
-  *kid_start_run_05, *kid_start_run_06, *kid_start_run_07,
+  *kid_start_run_05, *kid_start_run_06, *kid_run_07,
   *kid_run_08, *kid_run_09, *kid_run_10, *kid_run_11,
   *kid_run_12, *kid_run_13, *kid_run_14,
   *kid_turn_01, *kid_turn_02, *kid_turn_03, *kid_turn_04,

@@ -17,11 +17,13 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include <error.h>
 #include "kernel/random.h"
 #include "physics.h"
 #include "level.h"
 #include "kid.h"
+#include "anim.h"
 
 enum obj
 obj (struct pos pos)
@@ -135,7 +137,7 @@ is_colliding (struct anim anim)
 {
   if (! anim.collision) return false;
 
-  anim.x += (anim.dir == LEFT) ? 0 : -3;
+  anim.x += (anim.dir == LEFT) ? 0 : 0;
   struct pos p = pos (anim);
   enum obj o = obj (p);
   if (o == WALL) {
@@ -143,18 +145,20 @@ is_colliding (struct anim anim)
   } else return false;
 }
 
-unsigned int
+int
 dist_collision (struct anim anim)
 {
-  unsigned int i = 0;
   int inc = (anim.dir == LEFT) ? -1 : +1;
-  while (! is_colliding (anim))
-    if (i == PLACE_WIDTH) break;
-    else {
-      i++;
+  int x = anim.x;
+
+  if (! is_colliding (anim))
+    while (! is_colliding (anim) && abs (x - anim.x) != PLACE_WIDTH)
       anim.x += inc;
-    }
-  return i;
+  else
+    while (is_colliding (anim) && abs (x - anim.x) != PLACE_WIDTH)
+      anim.x -= inc;
+
+  return inc * (anim.x - x);
 }
 
 bool
@@ -162,42 +166,64 @@ is_falling (struct anim anim)
 {
   if (! anim.fall) return false;
 
-  if ((anim.frame == kid_jump_08 || anim.frame == kid_jump_09
-       || anim.frame == kid_jump_10))
-    return false;
-
-  if (anim.frame == kid_fall_13 || anim.frame == kid_fall_14
-      || anim.frame == kid_fall_15 || anim.frame == kid_fall_16)
-    return true;
-
   anim.x += (anim.dir == LEFT) ? 4 : -5;
   struct pos p = pos (anim);
   enum obj o = obj (p);
+
   if (o == NO_FLOOR) {
     return true;
-  } else return false;
+  }
+
+  return false;
 }
 
-unsigned int
+int
 dist_fall (struct anim anim)
 {
-  unsigned int i = 0;
   int inc = (anim.dir == LEFT) ? -1 : +1;
-  while (! is_falling (anim))
-    if (i == PLACE_WIDTH) break;
-    else {
-      i++;
+  int x = anim.x;
+
+  if (! is_falling (anim))
+    while (! is_falling (anim) && abs (x - anim.x) != PLACE_WIDTH)
       anim.x += inc;
-    }
-  return i;
+  else
+    while (is_falling (anim) && abs (x - anim.x) != PLACE_WIDTH)
+      anim.x -= inc;
+
+  return inc * (anim.x - x);
 }
 
 void
 to_edge (struct anim *anim)
 {
-  unsigned int dc = dist_collision (*anim);
-  unsigned int df = dist_fall (*anim);
+  int dc = dist_collision (*anim);
+  int df = dist_fall (*anim);
 
-  anim->x += ((anim->dir == LEFT) ? -1 : +1) * ((dc < PLACE_WIDTH) ? dc - 1 : 0);
-  anim->x += ((anim->dir == LEFT) ? -1 : +1) * ((df < PLACE_WIDTH) ? df - 1 : 0);
+  int dir = (anim->dir == LEFT) ? -1 : +1;
+
+  anim->x += dir * ((abs (dc) < PLACE_WIDTH) ? dc - 1 : 0);
+  anim->x += dir * ((abs (df) < PLACE_WIDTH) ? df - 1 : 0);
+
+  printf ("dc = %i, df = %i\n", dc, df);
+}
+
+void
+apply_physics (struct anim *a, ALLEGRO_BITMAP *frame,
+               int dx, int dy)
+{
+  struct anim na = next_anim (*a, frame, dx, dy);
+
+  if (is_colliding (na)
+      && na.draw != na.collision) {
+    na.odraw = na.draw;
+    na.draw = na.collision;
+    to_edge (&na);
+  } else if (is_falling (na)
+             && na.draw != na.fall
+             && na.draw != na.collision) {
+    na.odraw = na.draw;
+    na.draw = na.fall;
+  }
+
+  (*a) = na;
 }

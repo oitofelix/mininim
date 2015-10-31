@@ -82,65 +82,40 @@ play_anim (void (*callback) (void), unsigned int freq)
 bool draw_anim_inv; /* invert draw_anim offset interpretation  */
 
 void
-draw_anim (struct anim *anim, ALLEGRO_BITMAP *frame,
+draw_anim (struct anim *a, ALLEGRO_BITMAP *frame,
              int dx, int dy)
 {
-  int ow = al_get_bitmap_width (anim->frame);
-  int oh = al_get_bitmap_height (anim->frame);
+  apply_physics (a, frame, dx, dy);
+  draw_bitmap (a->frame, screen, a->x, a->y, a->flip);
+}
+
+struct anim
+next_anim (struct anim a, ALLEGRO_BITMAP* frame, int dx, int dy)
+{
+  struct anim na;
+  memcpy (&na, &a, sizeof (struct anim));
+
+  int ow = al_get_bitmap_width (a.frame);
+  int oh = al_get_bitmap_height (a.frame);
   int w = al_get_bitmap_width (frame);
   int h = al_get_bitmap_height (frame);
-  int x = anim->x;
-  int y = anim->y;
-  struct anim new_anim;
 
-  if (draw_anim_inv) x += (anim->dir == LEFT) ? ow - w - dx : dx;
-  else x += (anim->dir == LEFT) ? dx : ow - w - dx;
-  y += oh - h + dy;
+  if (draw_anim_inv) na.x += (a.dir == LEFT) ? ow - w - dx : dx;
+  else na.x += (a.dir == LEFT) ? dx : ow - w - dx;
+  na.y += oh - h + dy;
 
-  new_anim.room = anim->room;
-  new_anim.frame = frame;
-  new_anim.dir = anim->dir;
-  new_anim.x = x;
-  new_anim.y = y;
-  new_anim.collision = anim->collision;
-  new_anim.fall = anim->fall;
+  na.frame = frame;
 
-  if (is_colliding (new_anim)) {
-    anim->odraw = anim->draw;
-    anim->draw = anim->collision;
+  return na;
+}
 
-    do {
-      if (new_anim.dir == LEFT) new_anim.x++;
-      else if (new_anim.dir == RIGHT) new_anim.x--;
-      else if (new_anim.dir == TOP) new_anim.y++;
-      else if (new_anim.dir == BOTTOM) new_anim.y--;
-    } while (is_colliding (new_anim));
-
-  } else if (is_falling (new_anim)
-             && anim->draw != anim->fall
-             && anim->draw != anim->collision) {
-    anim->odraw = anim->draw;
-    anim->draw = anim->fall;
-
-    if (anim != &kid || command != JUMP) {
-
-      do {
-        if (new_anim.dir == LEFT) new_anim.x++;
-        else if (new_anim.dir == RIGHT) new_anim.x--;
-        else if (new_anim.dir == TOP) new_anim.y++;
-        else if (new_anim.dir == BOTTOM) new_anim.y--;
-      } while (is_falling (new_anim));
-    }
-  }
-
-
-  x = new_anim.x;
-  y = new_anim.y;
-
-  draw_bitmap (frame, screen, x, y, anim->flip);
-  anim->frame = frame;
-  anim->x = x;
-  anim->y = y;
+void
+draw_anim_on_edge (struct anim *a, ALLEGRO_BITMAP* frame, int dx, int dy)
+{
+  struct anim na = next_anim (*a, frame, dx, dy);
+  (*a) = na;
+  to_edge (a);
+  draw_anim (a, frame, +0, 0);
 }
 
 bool

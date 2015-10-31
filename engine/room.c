@@ -541,7 +541,16 @@ draw_floor_fg (struct pos pos, enum floor_type floor)
                    32 * pos.place, 63 * pos.floor + 54, 0);
   }
 
-  if (! is_falling (kid)) return;
+  /* fix a bug where the floor would be redraw over the last kid
+     stabilization frame when turning on the edge */
+  if (kid.frame == kid_stabilize_08) return;
+
+  /* don't redraw floors while the kid is on them */
+  if ((! is_falling (kid) && ! is_kid_fall ())
+
+      /* don't draw floors over kid's foots when jumping from the
+         edge */
+      || is_kid_start_jump ()) return;
 
   switch (floor)
     {
