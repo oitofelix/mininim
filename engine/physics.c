@@ -194,17 +194,21 @@ dist_fall (struct anim anim)
 }
 
 void
-to_edge (struct anim *anim)
+to_collision_edge (struct anim *anim)
 {
   int dc = dist_collision (*anim);
-  int df = dist_fall (*anim);
-
   int dir = (anim->dir == LEFT) ? -1 : +1;
-
   anim->x += dir * ((abs (dc) < PLACE_WIDTH) ? dc - 1 : 0);
-  anim->x += dir * ((abs (df) < PLACE_WIDTH) ? df - 1 : 0);
+  printf ("dc = %i\n", dc);
+}
 
-  printf ("dc = %i, df = %i\n", dc, df);
+void
+to_fall_edge (struct anim *anim)
+{
+  int df = dist_fall (*anim);
+  int dir = (anim->dir == LEFT) ? -1 : +1;
+  anim->x += dir * ((abs (df) < PLACE_WIDTH) ? df - 1 : 0);
+  printf ("df = %i\n", df);
 }
 
 void
@@ -217,7 +221,7 @@ apply_physics (struct anim *a, ALLEGRO_BITMAP *frame,
       && na.draw != na.collision) {
     na.odraw = na.draw;
     na.draw = na.collision;
-    to_edge (&na);
+    to_collision_edge (&na);
   } else if (is_falling (na)
              && na.draw != na.fall
              && na.draw != na.collision) {

@@ -532,7 +532,7 @@ static void
 draw_floor_fg (struct pos pos, enum floor_type floor)
 {
   ALLEGRO_BITMAP *floor_left;
-  /* ALLEGRO_BITMAP *floor_right; */
+  ALLEGRO_BITMAP *floor_right;
   ALLEGRO_BITMAP *floor_base;
 
   if (floor == BROKEN) {
@@ -546,7 +546,7 @@ draw_floor_fg (struct pos pos, enum floor_type floor)
   if (kid.frame == kid_stabilize_08) return;
 
   /* don't redraw floors while the kid is on them */
-  if ((! is_falling (kid) && ! is_kid_fall ())
+  if ((! is_falling (kid) && ! is_kid_fall () && ! is_kid_vjump ())
 
       /* don't draw floors over kid's foots when jumping from the
          edge */
@@ -558,17 +558,17 @@ draw_floor_fg (struct pos pos, enum floor_type floor)
       break;
     case NORMAL:
       floor_left = floor_normal_left;
-      /* floor_right = floor_normal_right; */
+      floor_right = floor_normal_right;
       floor_base = floor_normal_base;
       break;
     case BROKEN:
       floor_left = floor_broken_left;
-      /* floor_right = floor_broken_right; */
+      floor_right = floor_broken_right;
       floor_base = floor_normal_base;
       break;
     case LOOSE:
       floor_left = floor_normal_left;
-      /* floor_right = floor_normal_right; */
+      floor_right = floor_normal_right;
       floor_base = floor_normal_base;
       break;
     default:
@@ -583,9 +583,25 @@ draw_floor_fg (struct pos pos, enum floor_type floor)
       if (pos.floor >= 0 && pos.place >= 0)
         draw_bitmap (floor_left, screen,
                      32 * pos.place, 63 * pos.floor + 50, 0);
-      /* if (pos.floor >= 0 && pos.place + 1 < PLACES) */
-      /*   draw_bitmap (floor_right, screen, */
-      /*                32 * (pos.place + 1), 63 * pos.floor + 50, 0); */
+      if (pos.floor >= 0 && pos.place + 1 < PLACES)
+        draw_bitmap (floor_right, screen,
+                     32 * (pos.place + 1), 63 * pos.floor + 50, 0);
+
+      /* draw next floor left side to cover right edge of the current
+         one */
+      switch (obj_rel (pos, 0, +1)) {
+      case NO_FLOOR_TYPE:
+        break;
+      case NORMAL:
+      case NORMAL_FLOOR_BRICKS_1:
+      case NORMAL_FLOOR_TORCH:
+        if (pos.floor >= 0 && pos.place + 1 < PLACES)
+          draw_bitmap (floor_left, screen,
+                       32 * (pos.place + 1), 63 * pos.floor + 50, 0);
+      default:
+        break;
+      }
+
     }
 }
 

@@ -48,7 +48,11 @@ ALLEGRO_BITMAP *kid_normal,
   *kid_couch_01, *kid_couch_02, *kid_couch_03, *kid_couch_04,
   *kid_couch_05, *kid_couch_06, *kid_couch_07, *kid_couch_08,
   *kid_couch_09, *kid_couch_10, *kid_couch_11, *kid_couch_12,
-  *kid_couch_13;
+  *kid_couch_13,
+  *kid_vjump_01, *kid_vjump_02, *kid_vjump_03, *kid_vjump_04, *kid_vjump_05,
+  *kid_vjump_06, *kid_vjump_07, *kid_vjump_08, *kid_vjump_09, *kid_vjump_10,
+  *kid_vjump_11, *kid_vjump_12, *kid_vjump_13, *kid_vjump_15, *kid_vjump_16,
+  *kid_vjump_17, *kid_vjump_18, *kid_vjump_19;
 
 struct anim kid; /* kid animation object */
 enum command command;
@@ -165,6 +169,24 @@ load_kid (void)
   kid_couch_11 = load_bitmap (KID_COUCH_11);
   kid_couch_12 = load_bitmap (KID_COUCH_12);
   kid_couch_13 = load_bitmap (KID_COUCH_13);
+  kid_vjump_01 = load_bitmap (KID_VJUMP_01);
+  kid_vjump_02 = load_bitmap (KID_VJUMP_02);
+  kid_vjump_03 = load_bitmap (KID_VJUMP_03);
+  kid_vjump_04 = load_bitmap (KID_VJUMP_04);
+  kid_vjump_05 = load_bitmap (KID_VJUMP_05);
+  kid_vjump_06 = load_bitmap (KID_VJUMP_06);
+  kid_vjump_07 = load_bitmap (KID_VJUMP_07);
+  kid_vjump_08 = load_bitmap (KID_VJUMP_08);
+  kid_vjump_09 = load_bitmap (KID_VJUMP_09);
+  kid_vjump_10 = load_bitmap (KID_VJUMP_10);
+  kid_vjump_11 = load_bitmap (KID_VJUMP_11);
+  kid_vjump_12 = load_bitmap (KID_VJUMP_12);
+  kid_vjump_13 = load_bitmap (KID_VJUMP_13);
+  kid_vjump_15 = load_bitmap (KID_VJUMP_15);
+  kid_vjump_16 = load_bitmap (KID_VJUMP_16);
+  kid_vjump_17 = load_bitmap (KID_VJUMP_17);
+  kid_vjump_18 = load_bitmap (KID_VJUMP_18);
+  kid_vjump_19 = load_bitmap (KID_VJUMP_19);
 
   kid.room = 1;
   kid.x = 230;
@@ -266,6 +288,24 @@ unload_kid (void)
   al_destroy_bitmap (kid_couch_11);
   al_destroy_bitmap (kid_couch_12);
   al_destroy_bitmap (kid_couch_13);
+  al_destroy_bitmap (kid_vjump_01);
+  al_destroy_bitmap (kid_vjump_02);
+  al_destroy_bitmap (kid_vjump_03);
+  al_destroy_bitmap (kid_vjump_04);
+  al_destroy_bitmap (kid_vjump_05);
+  al_destroy_bitmap (kid_vjump_06);
+  al_destroy_bitmap (kid_vjump_07);
+  al_destroy_bitmap (kid_vjump_08);
+  al_destroy_bitmap (kid_vjump_09);
+  al_destroy_bitmap (kid_vjump_10);
+  al_destroy_bitmap (kid_vjump_11);
+  al_destroy_bitmap (kid_vjump_12);
+  al_destroy_bitmap (kid_vjump_13);
+  al_destroy_bitmap (kid_vjump_15);
+  al_destroy_bitmap (kid_vjump_16);
+  al_destroy_bitmap (kid_vjump_17);
+  al_destroy_bitmap (kid_vjump_18);
+  al_destroy_bitmap (kid_vjump_19);
 }
 
 static
@@ -281,6 +321,7 @@ void draw_kid_normal ()
   bool jump = ((kid.dir == RIGHT) && right_key && up_key)
     || ((kid.dir == LEFT) && left_key && up_key);
   bool couch = down_key;
+  bool vjump = up_key;
 
   if (a_key) kid.x--;
   if (d_key) kid.x++;
@@ -309,10 +350,14 @@ void draw_kid_normal ()
   /* comming from couch */
   else if (kid.frame == kid_couch_13)
     draw_anim (&kid, kid_normal, -1, 0);
+  /* comming from vjump */
+  else if (kid.frame == kid_vjump_19)
+    draw_anim (&kid, kid_normal, +2, 0);
   /* comming from normal */
   else if (kid.frame == kid_normal) {
     if (couch) draw_kid_couch ();
     else if (jump) draw_kid_jump ();
+    else if (vjump) draw_kid_vjump ();
     else if (turn) draw_kid_turn ();
     else if (walk) draw_kid_walk ();
     else if (run)
@@ -1217,4 +1262,106 @@ is_kid_stop_couch (void)
     || kid.frame == kid_couch_11
     || kid.frame == kid_couch_12
     || kid.frame == kid_couch_13;
+}
+
+void
+draw_kid_vjump (void)
+{
+  static int i = 0;
+
+  kid.draw = draw_kid_vjump;
+  kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
+
+  /* don't fall while jumping */
+  kid.fall = NULL;
+
+  /* comming from normal */
+  if (kid.frame == kid_normal)
+    draw_anim (&kid, kid_vjump_01, +5, 0);
+  /* comming form vjump */
+  else if (kid.frame == kid_vjump_01)
+    draw_anim (&kid, kid_vjump_02, +0, 0);
+  else if (kid.frame == kid_vjump_02)
+    draw_anim (&kid, kid_vjump_03, -1, 0);
+  else if (kid.frame == kid_vjump_03)
+    draw_anim (&kid, kid_vjump_04, +1, 0);
+  else if (kid.frame == kid_vjump_04)
+    draw_anim (&kid, kid_vjump_05, +0, 0);
+  else if (kid.frame == kid_vjump_05)
+    draw_anim (&kid, kid_vjump_06, +0, 0);
+  else if (kid.frame == kid_vjump_06)
+    draw_anim (&kid, kid_vjump_07, +0, 0);
+  else if (kid.frame == kid_vjump_07)
+    draw_anim (&kid, kid_vjump_08, -2, 0);
+  else if (kid.frame == kid_vjump_08)
+    draw_anim (&kid, kid_vjump_09, +0, 0);
+  else if (kid.frame == kid_vjump_09)
+    draw_anim (&kid, kid_vjump_10, -7, 0);
+  else if (kid.frame == kid_vjump_10)
+    draw_anim (&kid, kid_vjump_11, +0, 0);
+  else if (kid.frame == kid_vjump_11)
+    draw_anim (&kid, kid_vjump_12, +0, -3);
+  else if (kid.frame == kid_vjump_12)
+    draw_anim (&kid, kid_vjump_13, +0, -7);
+  else if (kid.frame == kid_vjump_13 && i == 0)
+    draw_anim (&kid, kid_vjump_13, +0, -4), i++;
+  else if (kid.frame == kid_vjump_13 && i == 1)
+    draw_anim (&kid, kid_vjump_13, +0, -2), i++;
+  else if (kid.frame == kid_vjump_13 && i == 2)
+    draw_anim (&kid, kid_vjump_13, +0, +0), i++;
+  else if (kid.frame == kid_vjump_13 && i == 3)
+    draw_anim (&kid, kid_vjump_13, +0, +2), i++;
+  else if (kid.frame == kid_vjump_13 && i == 4)
+    draw_anim (&kid, kid_vjump_15, -2, +12), i++;
+  else if (kid.frame == kid_vjump_15)
+    draw_anim (&kid, kid_vjump_16, +1, +2);
+  else if (kid.frame == kid_vjump_16)
+    draw_anim (&kid, kid_vjump_17, +0, 0);
+  else if (kid.frame == kid_vjump_17)
+    draw_anim (&kid, kid_vjump_18, -1, 0);
+  else if (kid.frame == kid_vjump_18) {
+    draw_anim (&kid, kid_vjump_19, -2, 0);
+    kid.draw = draw_kid_normal;
+  } else error (-1, 0, "%s: unknown frame (%p)", __func__, kid.frame);
+
+  /* if this function won't be called next, restore the fall and
+     collision behavior, and reset the frame counter */
+  if (kid.draw != draw_kid_vjump) {
+    kid.collision = draw_kid_collision;
+    kid.fall = draw_kid_fall;
+    i = 0;
+  }
+}
+
+bool
+is_kid_start_vjump (void)
+{
+  return kid.frame == kid_vjump_01
+    || kid.frame == kid_vjump_02
+    || kid.frame == kid_vjump_03
+    || kid.frame == kid_vjump_04
+    || kid.frame == kid_vjump_05
+    || kid.frame == kid_vjump_06
+    || kid.frame == kid_vjump_07
+    || kid.frame == kid_vjump_08
+    || kid.frame == kid_vjump_09
+    || kid.frame == kid_vjump_10
+    || kid.frame == kid_vjump_11;
+}
+
+bool
+is_kid_vjump (void)
+{
+  return kid.frame == kid_vjump_12
+    || kid.frame == kid_vjump_13;
+}
+
+bool
+is_kid_stop_vjump (void)
+{
+  return kid.frame == kid_vjump_15
+    || kid.frame == kid_vjump_16
+    || kid.frame == kid_vjump_17
+    || kid.frame == kid_vjump_18
+    || kid.frame == kid_vjump_19;
 }

@@ -105,6 +105,24 @@
 #define KID_COUCH_11 "dat/kid/couching/frame11.png"
 #define KID_COUCH_12 "dat/kid/couching/frame12.png"
 #define KID_COUCH_13 "dat/kid/couching/frame13.png"
+#define KID_VJUMP_01 "dat/kid/scaling/frame01.png"
+#define KID_VJUMP_02 "dat/kid/scaling/frame02.png"
+#define KID_VJUMP_03 "dat/kid/scaling/frame03.png"
+#define KID_VJUMP_04 "dat/kid/scaling/frame04.png"
+#define KID_VJUMP_05 "dat/kid/scaling/frame05.png"
+#define KID_VJUMP_06 "dat/kid/scaling/frame06.png"
+#define KID_VJUMP_07 "dat/kid/scaling/frame07.png"
+#define KID_VJUMP_08 "dat/kid/scaling/frame08.png"
+#define KID_VJUMP_09 "dat/kid/scaling/frame09.png"
+#define KID_VJUMP_10 "dat/kid/scaling/frame10.png"
+#define KID_VJUMP_11 "dat/kid/scaling/frame11.png"
+#define KID_VJUMP_12 "dat/kid/scaling/frame12.png"
+#define KID_VJUMP_13 "dat/kid/scaling/frame13.png"
+#define KID_VJUMP_15 "dat/kid/scaling/frame15.png"
+#define KID_VJUMP_16 "dat/kid/scaling/frame16.png"
+#define KID_VJUMP_17 "dat/kid/scaling/frame17.png"
+#define KID_VJUMP_18 "dat/kid/scaling/frame18.png"
+#define KID_VJUMP_19 "dat/kid/scaling/frame19.png"
 
 enum command {
   RUN,
@@ -116,9 +134,12 @@ void load_kid (void);
 void unload_kid (void);
 
 void draw_kid_stabilize (void);
+void draw_kid_vjump (void);
 bool is_kid_stop_run (void);
 bool is_kid_fall (void);
 bool is_kid_start_jump (void);
+bool is_kid_vjump (void);
+
 
 /* variables */
 extern struct anim kid; /* kid animation object */
