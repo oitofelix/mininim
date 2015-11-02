@@ -20,52 +20,27 @@
 #ifndef FREEPOP_ROOM_H
 #define FREEPOP_ROOM_H
 
-#define VDUNGEON_FLOOR_NORMAL_LEFT "dat/vdungeon/floor panels/normal left.png"
-#define VDUNGEON_FLOOR_NORMAL_RIGHT "dat/vdungeon/floor panels/normal right.png"
-#define VDUNGEON_FLOOR_NORMAL_BASE "dat/vdungeon/floor panels/normal base.png"
-#define VDUNGEON_FLOOR_BROKEN_LEFT "dat/vdungeon/floor panels/broken left.png"
-#define VDUNGEON_FLOOR_BROKEN_RIGHT "dat/vdungeon/floor panels/broken right.png"
-#define VDUNGEON_FLOOR_BROKEN_FRONT "dat/vdungeon/floor panels/broken left02.png"
-#define VDUNGEON_WALL_LEFT "dat/vdungeon/walls/left stack main.png"
-#define VDUNGEON_WALL_CENTER "dat/vdungeon/walls/centre stack main.png"
-#define VDUNGEON_WALL_RIGHT "dat/vdungeon/walls/right stack main.png"
-#define VDUNGEON_WALL_SINGLE "dat/vdungeon/walls/single stack main.png"
-#define VDUNGEON_WALL_FACE "dat/vdungeon/walls/face stack main.png"
-#define VDUNGEON_WALL_FACE_TOP "dat/vdungeon/walls/face stack top.png"
-#define VDUNGEON_WALL_LEFT_BASE "dat/vdungeon/walls/left stack base.png"
-#define VDUNGEON_WALL_CENTER_BASE "dat/vdungeon/walls/centre stack base.png"
-#define VDUNGEON_WALL_RIGHT_BASE "dat/vdungeon/walls/right stack base.png"
-#define VDUNGEON_WALL_SINGLE_BASE "dat/vdungeon/walls/single stack base.png"
-#define VDUNGEON_WALL_GRAY_BLOCK "dat/vdungeon/walls/random block.png"
-#define VDUNGEON_WALL_WIDE_DIVIDER "dat/vdungeon/walls/divider01.png"
-#define VDUNGEON_WALL_NARROW_DIVIDER "dat/vdungeon/walls/divider02.png"
-#define VDUNGEON_WALL_MARK_TOP_LEFT "dat/vdungeon/walls/mark01.png"
-#define VDUNGEON_WALL_MARK_TOP_RIGHT "dat/vdungeon/walls/mark03.png"
-#define VDUNGEON_WALL_MARK_BOTTOM_LEFT "dat/vdungeon/walls/mark02.png"
-#define VDUNGEON_WALL_MARK_BOTTOM_RIGHT "dat/vdungeon/walls/mark04.png"
-#define VDUNGEON_PILLAR_LEFT "dat/vdungeon/pillar/pillar left.png"
-#define VDUNGEON_PILLAR_RIGHT "dat/vdungeon/pillar/pillar right main.png"
-#define VDUNGEON_PILLAR_TOP "dat/vdungeon/pillar/pillar right top.png"
-#define VDUNGEON_PILLAR "dat/vdungeon/pillar/pillar.png"
 #define VDUNGEON_BRICKS_1 "dat/vdungeon/background/bricks01.png"
 #define VDUNGEON_TORCH "dat/vdungeon/background/torch.png"
 
 void load_room (void);
 void unload_room (void);
-void draw_room (int room);
+void draw_room (int _room);
+void draw_room_bg (void);
+void draw_construct (ALLEGRO_BITMAP *bitmap, struct pos pos);
+void draw_construct_fg (ALLEGRO_BITMAP *bitmap, struct pos pos);
+void draw_construct_bg (ALLEGRO_BITMAP *bitmap, struct pos pos);
+void draw_bricks_01 (ALLEGRO_BITMAP *bitmap, struct pos pos);
+struct xy bricks_xy (struct pos pos);
+void draw_torch (ALLEGRO_BITMAP *bitmap, struct pos pos);
+struct xy torch_xy (struct pos pos);
+void draw_room_anim_fg (struct anim a);
 void draw_room_fg (struct pos p);
+struct pos room_pos_bl (struct anim a);
+struct pos room_pos_br (struct anim a);
+struct pos room_pos_mid (struct anim a);
+struct pos room_pos_tl (struct anim a);
+struct pos room_pos_tr (struct anim a);
 struct pos room_pos_xy (unsigned int room, int x, int y);
-
-enum floor_type {
-  NO_FLOOR_TYPE, NORMAL, BROKEN, LOOSE,
-};
-
-enum bg_type {
-  NO_BG, BRICKS_1, TORCH,
-};
-
-enum wall_correlation {
-  SWS, SWW, WWS, WWW
-};
 
 #endif	/* FREEPOP_ROOM_H */

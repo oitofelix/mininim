@@ -69,24 +69,5 @@ level_anim (void)
   draw_room (1);
   draw_fire (1);
   kid.draw ();
-
-  int w = al_get_bitmap_width (kid.frame);
-  int h = al_get_bitmap_height (kid.frame);
-
-  struct pos p;
-
-  p = room_pos_xy (kid.room, kid.x, kid.y + h - 1);
-  draw_room_fg (p);
-
-  p = room_pos_xy (kid.room, kid.x + w - 1, kid.y + h - 1);
-  draw_room_fg (p);
-
-  p = room_pos_xy (kid.room, kid.x + w / 2, kid.y + h / 2);
-  draw_room_fg (p);
-
-  p = room_pos_xy (kid.room, kid.x, kid.y);
-  draw_room_fg (p);
-
-  p = room_pos_xy (kid.room, kid.x + w - 1, kid.y);
-  draw_room_fg (p);
+  draw_room_anim_fg (kid);
 }

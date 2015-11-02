@@ -25,19 +25,19 @@
 #include "kid.h"
 #include "anim.h"
 
-enum obj
-obj (struct pos pos)
+struct construct
+construct (struct pos pos)
 {
   pos = norm_pos (pos, true);
-  return level->obj[pos.room][pos.floor][pos.place];
+  return level->construct[pos.room][pos.floor][pos.place];
 }
 
-enum obj
-obj_rel (struct pos pos, int floor, int place)
+struct construct
+construct_rel (struct pos pos, int floor, int place)
 {
   pos.floor += floor;
   pos.place += place;
-  return obj (pos);
+  return construct (pos);
 }
 
 struct pos
@@ -139,8 +139,8 @@ is_colliding (struct anim anim)
 
   anim.x += (anim.dir == LEFT) ? 0 : 0;
   struct pos p = pos (anim);
-  enum obj o = obj (p);
-  if (o == WALL) {
+  struct construct c = construct (p);
+  if (c.fg == WALL) {
     return true;
   } else return false;
 }
@@ -168,9 +168,9 @@ is_falling (struct anim anim)
 
   anim.x += (anim.dir == LEFT) ? 4 : -5;
   struct pos p = pos (anim);
-  enum obj o = obj (p);
+  struct construct c = construct (p);
 
-  if (o == NO_FLOOR) {
+  if (c.fg == NO_FLOOR) {
     return true;
   }
 

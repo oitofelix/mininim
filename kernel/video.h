@@ -42,6 +42,10 @@ enum video_effect {
   VIDEO_FADE_OUT, VIDEO_ROLL_RIGHT, VIDEO_FLICKERING,
 };
 
+struct xy {
+  int x, y;
+};
+
 /* functions */
 void init_video (void);
 void finalize_video (void);
@@ -51,6 +55,8 @@ ALLEGRO_BITMAP *load_bitmap (char *filename);
 void clear_bitmap (ALLEGRO_BITMAP *bitmap, ALLEGRO_COLOR color);
 void draw_bitmap (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
                   float dx, float dy, int flags);
+void draw_bitmap_xy (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
+                     struct xy xy, int flags);
 void draw_bitmap_region (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
                          float sx, float sy, float sw, float sh,
                          float dx, float dy, int flags);

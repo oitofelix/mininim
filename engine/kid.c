@@ -1353,14 +1353,14 @@ bool
 is_kid_vjump (void)
 {
   return kid.frame == kid_vjump_12
-    || kid.frame == kid_vjump_13;
+    || kid.frame == kid_vjump_13
+    || kid.frame == kid_vjump_15;
 }
 
 bool
 is_kid_stop_vjump (void)
 {
-  return kid.frame == kid_vjump_15
-    || kid.frame == kid_vjump_16
+  return kid.frame == kid_vjump_16
     || kid.frame == kid_vjump_17
     || kid.frame == kid_vjump_18
     || kid.frame == kid_vjump_19;

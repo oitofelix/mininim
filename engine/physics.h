@@ -35,16 +35,21 @@ struct level {
     DUNGEON, PALACE,
   } type;
 
-  enum obj {
+  struct construct {
+    enum {
       NO_FLOOR,
-      NORMAL_FLOOR,
-      NORMAL_FLOOR_BRICKS_1,
-      NORMAL_FLOOR_TORCH,
+      FLOOR,
       BROKEN_FLOOR,
       LOOSE_FLOOR,
-      WALL,
       PILLAR,
-  } obj[ROOMS][FLOORS][PLACES];
+      WALL,
+    } fg;
+    enum {
+      NO_BG,
+      BRICKS_01,
+      TORCH,
+    } bg;
+  } construct[ROOMS][FLOORS][PLACES];
 
   unsigned int link[ROOMS][4];
 };
@@ -55,8 +60,8 @@ struct pos {
 };
 
 /* functions */
-enum obj obj (struct pos pos);
-enum obj obj_rel (struct pos pos, int floor, int place);
+struct construct construct (struct pos pos);
+struct construct construct_rel (struct pos pos, int floor, int place);
 struct pos norm_pos (struct pos pos, bool floor_first);
 struct pos norm_pos_floor (struct pos pos);
 struct pos norm_pos_place (struct pos pos);
