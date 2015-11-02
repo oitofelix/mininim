@@ -67,13 +67,13 @@ norm_pos_floor (struct pos pos)
     unsigned int r = (-pos.floor) % FLOORS;
     pos.floor = r ? FLOORS - r : 0;
     for (room_offset = r ? q + 1 : q; room_offset > 0; room_offset--)
-      pos.room = level->link[pos.room][TOP];
+      pos.room = level->link[pos.room].a;
   } else if (pos.floor >= FLOORS) {
     unsigned int q = pos.floor / FLOORS;
     unsigned int r = pos.floor % FLOORS;
     pos.floor = r;
     for (room_offset = q; room_offset > 0; room_offset--)
-      pos.room = level->link[pos.room][BOTTOM];
+      pos.room = level->link[pos.room].b;
   }
   return pos;
 }
@@ -87,13 +87,13 @@ norm_pos_place (struct pos pos)
     unsigned int r = (-pos.place) % PLACES;
     pos.place = r ? PLACES - r : 0;
     for (room_offset = r ? q + 1 : q; room_offset > 0; room_offset--)
-      pos.room = level->link[pos.room][LEFT];
+      pos.room = level->link[pos.room].l;
   } else if (pos.place >= PLACES) {
     unsigned int q = pos.place / PLACES;
     unsigned int r = pos.place % PLACES;
     pos.floor = r;
     for (room_offset = q; room_offset > 0; room_offset--)
-      pos.room = level->link[pos.room][RIGHT];
+      pos.room = level->link[pos.room].r;
   }
   return pos;
 }

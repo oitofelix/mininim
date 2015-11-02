@@ -40,10 +40,19 @@ static struct level level_1 = {
       {WALL}, {WALL}, {WALL}, {WALL}, {WALL}},
      {{WALL}, {WALL}, {WALL}, {WALL}, {BROKEN_FLOOR},
       {PILLAR}, {LOOSE_FLOOR}, {FLOOR,BRICKS_01}, {FLOOR}, {WALL}}},
+
+    [2] =
+    {{{NO_FLOOR,BRICKS_03}, {NO_FLOOR}, {WALL}, {WALL}, {WALL},
+      {WALL}, {NO_FLOOR,BRICKS_03}, {NO_FLOOR}, {WALL}, {WALL}},
+     {{FLOOR,TORCH}, {FLOOR}, {PILLAR}, {FLOOR,TORCH}, {FLOOR},
+      {PILLAR}, {FLOOR}, {FLOOR,BRICKS_01}, {PILLAR}, {FLOOR}},
+     {{WALL}, {WALL}, {WALL}, {WALL}, {WALL},
+      {WALL}, {WALL}, {WALL}, {WALL}, {WALL}}},
   },
 
   .link = {{0, 0, 0, 0},
-           {0, 0, 0, 0},},
+           {0, 0, 0, 2},
+           {0, 0, 1, 0},},
 };
 
 void

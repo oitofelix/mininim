@@ -20,7 +20,7 @@
 #include <error.h>
 
 #include "kernel/video.h"
-#include "kernel/random.h"
+#include "kernel/keyboard.h"
 
 #include "anim.h"
 #include "physics.h"
@@ -65,9 +65,22 @@ unload_level (void)
 static void
 level_anim (void)
 {
+  static unsigned int room = 1;
+
+  unsigned int prev_room = room;
+
+  if (h_key) room = level->link[room].l;
+  if (j_key) room = level->link[room].r;
+  if (u_key) room = level->link[room].a;
+  if (n_key) room = level->link[room].b;
+
+  if (room == 0) room = prev_room;
+
   clear_bitmap (screen, BLACK);
-  draw_room (1);
-  draw_fire (1);
-  kid.draw ();
-  draw_room_anim_fg (kid);
+  draw_room (room);
+  draw_fire (room);
+  if (room == kid.room) {
+    kid.draw ();
+    draw_room_anim_fg (kid);
+  }
 }

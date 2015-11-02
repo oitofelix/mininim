@@ -47,11 +47,17 @@ struct level {
     enum {
       NO_BG,
       BRICKS_01,
+      BRICKS_02,
+      BRICKS_03,
+      BRICKS_04,
       TORCH,
+      WINDOW,
     } bg;
   } construct[ROOMS][FLOORS][PLACES];
 
-  unsigned int link[ROOMS][4];
+  struct {
+    unsigned int l, r, a, b;
+  } link[ROOMS];
 };
 
 struct pos {

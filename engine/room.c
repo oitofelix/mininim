@@ -32,13 +32,14 @@
 #include "room.h"
 
 
-ALLEGRO_BITMAP *bricks_1, *torch;
+ALLEGRO_BITMAP *bricks_01, *bricks_02, *bricks_03, *bricks_04,
+  *window, *torch;
 
 /* room bitmap */
 ALLEGRO_BITMAP *room_bg;
 
 /* current room */
-static unsigned int room = -1;
+static unsigned int current_room = -1;
 
 void
 load_room (void)
@@ -52,8 +53,12 @@ load_room (void)
       load_vdungeon_floor ();
       load_vdungeon_wall ();
       load_vdungeon_pillar ();
-      bricks_1 = load_bitmap (VDUNGEON_BRICKS_1);
+      bricks_01 = load_bitmap (VDUNGEON_BRICKS_01);
+      bricks_02 = load_bitmap (VDUNGEON_BRICKS_02);
+      bricks_03 = load_bitmap (VDUNGEON_BRICKS_03);
+      bricks_04 = load_bitmap (VDUNGEON_BRICKS_04);
       torch = load_bitmap (VDUNGEON_TORCH);
+      window = load_bitmap (VDUNGEON_WINDOW);
       break;
     default:
       error (-1, 0, "%s: unknown video mode (%u)", __func__, video_mode);
@@ -74,15 +79,19 @@ unload_room (void)
   unload_pillar ();
 
   /* bitmaps */
-  al_destroy_bitmap (bricks_1);
+  al_destroy_bitmap (bricks_01);
+  al_destroy_bitmap (bricks_02);
+  al_destroy_bitmap (bricks_03);
+  al_destroy_bitmap (bricks_04);
   al_destroy_bitmap (torch);
+  al_destroy_bitmap (window);
 }
 
 void
-draw_room (int _room)
+draw_room (int room)
 {
-  if (_room != room) {
-    room = _room;
+  if (room != current_room) {
+    current_room = room;
     draw_room_bg ();
   }
   draw_bitmap (room_bg, screen, 0, 0, 0);
@@ -93,11 +102,11 @@ void
 draw_room_bg (void)
 {
   struct pos p;
-  p.room = room;
+  p.room = current_room;
 
   clear_bitmap (room_bg, BLACK);
 
-  for (p.floor = FLOORS - 1; p.floor >= -1; p.floor--)
+  for (p.floor = FLOORS; p.floor >= -1; p.floor--)
     for (p.place = -1; p.place < PLACES; p.place++)
       draw_construct (room_bg, p);
 }
@@ -145,8 +154,20 @@ draw_construct_bg (ALLEGRO_BITMAP *bitmap, struct pos p)
   case BRICKS_01:
     draw_bricks_01 (bitmap, p);
     break;
+  case BRICKS_02:
+    draw_bricks_02 (bitmap, p);
+    break;
+  case BRICKS_03:
+    draw_bricks_03 (bitmap, p);
+    break;
+  case BRICKS_04:
+    draw_bricks_04 (bitmap, p);
+    break;
   case TORCH:
     draw_torch (bitmap, p);
+    break;
+  case WINDOW:
+    draw_window (bitmap, p);
     break;
   default:
     error (-1, 0, "%s: unknown background (%u)",
@@ -157,7 +178,25 @@ draw_construct_bg (ALLEGRO_BITMAP *bitmap, struct pos p)
 void
 draw_bricks_01 (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
-  draw_bitmap_xy (bricks_1, bitmap, bricks_xy (p) , 0);
+  draw_bitmap_xy (bricks_01, bitmap, bricks_xy (p) , 0);
+}
+
+void
+draw_bricks_02 (ALLEGRO_BITMAP *bitmap, struct pos p)
+{
+  draw_bitmap_xy (bricks_02, bitmap, bricks_xy (p) , 0);
+}
+
+void
+draw_bricks_03 (ALLEGRO_BITMAP *bitmap, struct pos p)
+{
+  draw_bitmap_xy (bricks_03, bitmap, bricks_xy (p) , 0);
+}
+
+void
+draw_bricks_04 (ALLEGRO_BITMAP *bitmap, struct pos p)
+{
+  draw_bitmap_xy (bricks_04, bitmap, bricks_xy (p) , 0);
 }
 
 struct xy
@@ -181,6 +220,21 @@ torch_xy (struct pos p)
   struct xy xy;
   xy.x = PLACE_WIDTH * (p.place + 1);
   xy.y = PLACE_HEIGHT * p.floor + 22;
+  return xy;
+}
+
+void
+draw_window (ALLEGRO_BITMAP *bitmap, struct pos p)
+{
+  draw_bitmap_xy (window, bitmap, window_xy (p), 0);
+}
+
+struct xy
+window_xy (struct pos p)
+{
+  struct xy xy;
+  xy.x = PLACE_WIDTH * (p.place + 1);
+  xy.y = PLACE_HEIGHT * p.floor + 5;
   return xy;
 }
 

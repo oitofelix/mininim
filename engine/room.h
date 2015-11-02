@@ -20,20 +20,29 @@
 #ifndef FREEPOP_ROOM_H
 #define FREEPOP_ROOM_H
 
-#define VDUNGEON_BRICKS_1 "dat/vdungeon/background/bricks01.png"
+#define VDUNGEON_BRICKS_01 "dat/vdungeon/background/bricks01.png"
+#define VDUNGEON_BRICKS_02 "dat/vdungeon/background/bricks02.png"
+#define VDUNGEON_BRICKS_03 "dat/vdungeon/background/bricks03.png"
+#define VDUNGEON_BRICKS_04 "dat/vdungeon/background/bricks04.png"
 #define VDUNGEON_TORCH "dat/vdungeon/background/torch.png"
+#define VDUNGEON_WINDOW "dat/vdungeon/background/window.png"
 
 void load_room (void);
 void unload_room (void);
-void draw_room (int _room);
+void draw_room (int room);
 void draw_room_bg (void);
 void draw_construct (ALLEGRO_BITMAP *bitmap, struct pos pos);
 void draw_construct_fg (ALLEGRO_BITMAP *bitmap, struct pos pos);
 void draw_construct_bg (ALLEGRO_BITMAP *bitmap, struct pos pos);
 void draw_bricks_01 (ALLEGRO_BITMAP *bitmap, struct pos pos);
+void draw_bricks_02 (ALLEGRO_BITMAP *bitmap, struct pos pos);
+void draw_bricks_03 (ALLEGRO_BITMAP *bitmap, struct pos pos);
+void draw_bricks_04 (ALLEGRO_BITMAP *bitmap, struct pos pos);
 struct xy bricks_xy (struct pos pos);
 void draw_torch (ALLEGRO_BITMAP *bitmap, struct pos pos);
 struct xy torch_xy (struct pos pos);
+void draw_window (ALLEGRO_BITMAP *bitmap, struct pos pos);
+struct xy window_xy (struct pos pos);
 void draw_room_anim_fg (struct anim a);
 void draw_room_fg (struct pos p);
 struct pos room_pos_bl (struct anim a);

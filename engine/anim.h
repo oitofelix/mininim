@@ -38,7 +38,7 @@ struct anim {
 };
 
 enum direction {
-  LEFT, TOP, RIGHT, BOTTOM,
+  LEFT, RIGHT, TOP, BOTTOM,
 };
 
 /* functions */
