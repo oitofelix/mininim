@@ -24,6 +24,7 @@
 #include "anim.h"
 #include "physics.h"
 #include "level.h"
+#include "room.h"
 #include "kid.h"
 
 /* variables */
@@ -196,6 +197,7 @@ load_kid (void)
   kid.dir = LEFT;
   kid.collision = draw_kid_collision;
   kid.fall = draw_kid_fall;
+  kid.ceiling = draw_kid_ceiling;
 
   kid.draw = draw_kid_normal;
 }
@@ -875,8 +877,6 @@ draw_kid_jump (void)
   kid.draw = draw_kid_jump;
   kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  unsigned int dc = dist_collision (kid);
-
   /* comming from normal */
   if (kid.frame == kid_normal)
     draw_anim (&kid, kid_jump_01, +2, 0);
@@ -1364,4 +1364,28 @@ is_kid_stop_vjump (void)
     || kid.frame == kid_vjump_17
     || kid.frame == kid_vjump_18
     || kid.frame == kid_vjump_19;
+}
+
+void
+draw_kid_ceiling (void)
+{
+  kid.draw = draw_kid_ceiling;
+  kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
+
+  if (kid.frame == kid_vjump_15)
+    draw_anim (&kid, kid_vjump_16, +1, +2);
+  else if (kid.frame == kid_vjump_16)
+    draw_anim (&kid, kid_vjump_17, +0, +0);
+  else if (kid.frame == kid_vjump_17)
+    draw_anim (&kid, kid_vjump_18, -1, +0);
+  else if (kid.frame == kid_vjump_18)
+    draw_anim (&kid, kid_vjump_19, -1, +0);
+  else if (kid.frame == kid_vjump_19) {
+    draw_anim (&kid, kid_normal, +1, +0);
+    kid.draw = draw_kid_normal;
+  } else {
+    struct pos p = room_pos_br (kid);
+    kid.y = PLACE_HEIGHT * p.floor;
+    draw_anim (&kid, kid_vjump_15, -2, +4);
+  }
 }

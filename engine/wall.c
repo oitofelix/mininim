@@ -125,16 +125,7 @@ draw_wall_www (ALLEGRO_BITMAP *bitmap, struct pos p)
 void
 draw_wall_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
-  switch (wall_correlation (p)) {
-  case SWS: draw_wall (screen, p); break;
-  case SWW: draw_wall (screen, p); break;
-  case WWS: break;
-  case WWW: break;
-  default:
-    error (-1, 0, "%s: unknown wall correlation (%u, %u. %u)",
-           __func__, p.room, p.floor, p.place);
-    break;
-  }
+  draw_wall (bitmap, p);
 }
 
 struct xy

@@ -24,6 +24,7 @@
 #include "level.h"
 #include "kid.h"
 #include "anim.h"
+#include "room.h"
 
 struct construct
 construct (struct pos pos)
@@ -125,20 +126,19 @@ pos_xy (unsigned int room, int x, int y)
 }
 
 struct pos
-pos (struct anim anim)
+pos (struct anim a)
 {
-  int w = al_get_bitmap_width (anim.frame);
-  return pos_xy (anim.room, (anim.dir == LEFT) ? anim.x : anim.x + w - 1,
-                 anim.y);
+  int w = al_get_bitmap_width (a.frame);
+  return pos_xy (a.room, (a.dir == LEFT) ? a.x : a.x + w - 1, a.y);
 }
 
 bool
-is_colliding (struct anim anim)
+is_colliding (struct anim a)
 {
-  if (! anim.collision) return false;
+  if (! a.collision) return false;
 
-  anim.x += (anim.dir == LEFT) ? 0 : 0;
-  struct pos p = pos (anim);
+  a.x += (a.dir == LEFT) ? 0 : 0;
+  struct pos p = pos (a);
   struct construct c = construct (p);
   if (c.fg == WALL) {
     return true;
@@ -146,28 +146,28 @@ is_colliding (struct anim anim)
 }
 
 int
-dist_collision (struct anim anim)
+dist_collision (struct anim a)
 {
-  int inc = (anim.dir == LEFT) ? -1 : +1;
-  int x = anim.x;
+  int inc = (a.dir == LEFT) ? -1 : +1;
+  int x = a.x;
 
-  if (! is_colliding (anim))
-    while (! is_colliding (anim) && abs (x - anim.x) != PLACE_WIDTH)
-      anim.x += inc;
+  if (! is_colliding (a))
+    while (! is_colliding (a) && abs (x - a.x) != PLACE_WIDTH)
+      a.x += inc;
   else
-    while (is_colliding (anim) && abs (x - anim.x) != PLACE_WIDTH)
-      anim.x -= inc;
+    while (is_colliding (a) && abs (x - a.x) != PLACE_WIDTH)
+      a.x -= inc;
 
-  return inc * (anim.x - x);
+  return inc * (a.x - x);
 }
 
 bool
-is_falling (struct anim anim)
+is_falling (struct anim a)
 {
-  if (! anim.fall) return false;
+  if (! a.fall) return false;
 
-  anim.x += (anim.dir == LEFT) ? 4 : -5;
-  struct pos p = pos (anim);
+  a.x += (a.dir == LEFT) ? 4 : -5;
+  struct pos p = pos (a);
   struct construct c = construct (p);
 
   if (c.fg == NO_FLOOR) {
@@ -178,36 +178,52 @@ is_falling (struct anim anim)
 }
 
 int
-dist_fall (struct anim anim)
+dist_fall (struct anim a)
 {
-  int inc = (anim.dir == LEFT) ? -1 : +1;
-  int x = anim.x;
+  int inc = (a.dir == LEFT) ? -1 : +1;
+  int x = a.x;
 
-  if (! is_falling (anim))
-    while (! is_falling (anim) && abs (x - anim.x) != PLACE_WIDTH)
-      anim.x += inc;
+  if (! is_falling (a))
+    while (! is_falling (a) && abs (x - a.x) != PLACE_WIDTH)
+      a.x += inc;
   else
-    while (is_falling (anim) && abs (x - anim.x) != PLACE_WIDTH)
-      anim.x -= inc;
+    while (is_falling (a) && abs (x - a.x) != PLACE_WIDTH)
+      a.x -= inc;
 
-  return inc * (anim.x - x);
+  return inc * (a.x - x);
+}
+
+bool
+is_hitting_ceiling (struct anim a)
+{
+  if (! a.ceiling) return false;
+
+  struct pos top = room_pos_tl (a);
+  struct pos bottom = room_pos_br (a);
+  struct construct c = construct (top);
+
+  if (! is_kid_vjump ()) return false;
+
+  if (top.floor != bottom.floor && c.fg != NO_FLOOR) return true;
+
+  return false;
 }
 
 void
-to_collision_edge (struct anim *anim)
+to_collision_edge (struct anim *a)
 {
-  int dc = dist_collision (*anim);
-  int dir = (anim->dir == LEFT) ? -1 : +1;
-  anim->x += dir * ((abs (dc) < PLACE_WIDTH) ? dc - 1 : 0);
+  int dc = dist_collision (*a);
+  int dir = (a->dir == LEFT) ? -1 : +1;
+  a->x += dir * ((abs (dc) < PLACE_WIDTH) ? dc - 1 : 0);
   printf ("dc = %i\n", dc);
 }
 
 void
-to_fall_edge (struct anim *anim)
+to_fall_edge (struct anim *a)
 {
-  int df = dist_fall (*anim);
-  int dir = (anim->dir == LEFT) ? -1 : +1;
-  anim->x += dir * ((abs (df) < PLACE_WIDTH) ? df - 1 : 0);
+  int df = dist_fall (*a);
+  int dir = (a->dir == LEFT) ? -1 : +1;
+  a->x += dir * ((abs (df) < PLACE_WIDTH) ? df - 1 : 0);
   printf ("df = %i\n", df);
 }
 
@@ -217,7 +233,10 @@ apply_physics (struct anim *a, ALLEGRO_BITMAP *frame,
 {
   struct anim na = next_anim (*a, frame, dx, dy);
 
-  if (is_colliding (na)
+  if (is_hitting_ceiling (na)) {
+    na.odraw = na.draw;
+    na.draw = na.ceiling;
+  } else if (is_colliding (na)
       && na.draw != na.collision) {
     na.odraw = na.draw;
     na.draw = na.collision;

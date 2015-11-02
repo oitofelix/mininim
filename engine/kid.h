@@ -139,6 +139,7 @@ bool is_kid_stop_run (void);
 bool is_kid_fall (void);
 bool is_kid_start_jump (void);
 bool is_kid_vjump (void);
+void draw_kid_ceiling (void);
 
 
 /* variables */
