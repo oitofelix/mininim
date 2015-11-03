@@ -191,8 +191,9 @@ draw_wall_randomization (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
   if (level->type != DUNGEON && video_mode == VGA) return;
 
+  struct pos np = norm_pos (p, true);
   uint32_t random_seed_backup = random_seed;
-  random_seed = p.room + p.floor * PLACES + p.place;
+  random_seed = np.room + np.floor * PLACES + np.place;
   prandom (1);
   unsigned int r0 = prandom(1);
   unsigned int r1 = prandom(4);

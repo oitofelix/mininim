@@ -27,102 +27,102 @@
 #include "room.h"
 
 struct construct
-construct (struct pos pos)
+construct (struct pos p)
 {
-  pos = norm_pos (pos, true);
-  return level->construct[pos.room][pos.floor][pos.place];
+  p = norm_pos (p, true);
+  return level->construct[p.room][p.floor][p.place];
 }
 
 struct construct
-construct_rel (struct pos pos, int floor, int place)
+construct_rel (struct pos p, int floor, int place)
 {
-  pos.floor += floor;
-  pos.place += place;
-  return construct (pos);
+  p.floor += floor;
+  p.place += place;
+  return construct (p);
 }
 
 struct pos
-norm_pos (struct pos pos, bool floor_first)
+norm_pos (struct pos p, bool floor_first)
 {
-  if (pos.room >= ROOMS)
-    error (-1, 0, "%s: room out of range (%u)", __func__, pos.room);
+  if (p.room >= ROOMS)
+    error (-1, 0, "%s: room out of range (%u)", __func__, p.room);
 
   if (floor_first) {
-    pos = norm_pos_floor (pos);
-    pos = norm_pos_place (pos);
+    p = norm_pos_floor (p);
+    p = norm_pos_place (p);
   } else {
-    pos = norm_pos_place (pos);
-    pos = norm_pos_floor (pos);
+    p = norm_pos_place (p);
+    p = norm_pos_floor (p);
   }
 
-  return pos;
+  return p;
 }
 
 struct pos
-norm_pos_floor (struct pos pos)
+norm_pos_floor (struct pos p)
 {
   unsigned int room_offset;
-  if (pos.floor < 0) {
-    unsigned int q = (-pos.floor) / FLOORS;
-    unsigned int r = (-pos.floor) % FLOORS;
-    pos.floor = r ? FLOORS - r : 0;
+  if (p.floor < 0) {
+    unsigned int q = (-p.floor) / FLOORS;
+    unsigned int r = (-p.floor) % FLOORS;
+    p.floor = r ? FLOORS - r : 0;
     for (room_offset = r ? q + 1 : q; room_offset > 0; room_offset--)
-      pos.room = level->link[pos.room].a;
-  } else if (pos.floor >= FLOORS) {
-    unsigned int q = pos.floor / FLOORS;
-    unsigned int r = pos.floor % FLOORS;
-    pos.floor = r;
+      p.room = level->link[p.room].a;
+  } else if (p.floor >= FLOORS) {
+    unsigned int q = p.floor / FLOORS;
+    unsigned int r = p.floor % FLOORS;
+    p.floor = r;
     for (room_offset = q; room_offset > 0; room_offset--)
-      pos.room = level->link[pos.room].b;
+      p.room = level->link[p.room].b;
   }
-  return pos;
+  return p;
 }
 
 struct pos
-norm_pos_place (struct pos pos)
+norm_pos_place (struct pos p)
 {
   unsigned int room_offset;
-  if (pos.place < 0) {
-    unsigned int q = (-pos.place) / PLACES;
-    unsigned int r = (-pos.place) % PLACES;
-    pos.place = r ? PLACES - r : 0;
+  if (p.place < 0) {
+    unsigned int q = (-p.place) / PLACES;
+    unsigned int r = (-p.place) % PLACES;
+    p.place = r ? PLACES - r : 0;
     for (room_offset = r ? q + 1 : q; room_offset > 0; room_offset--)
-      pos.room = level->link[pos.room].l;
-  } else if (pos.place >= PLACES) {
-    unsigned int q = pos.place / PLACES;
-    unsigned int r = pos.place % PLACES;
-    pos.floor = r;
+      p.room = level->link[p.room].l;
+  } else if (p.place >= PLACES) {
+    unsigned int q = p.place / PLACES;
+    unsigned int r = p.place % PLACES;
+    p.floor = r;
     for (room_offset = q; room_offset > 0; room_offset--)
-      pos.room = level->link[pos.room].r;
+      p.room = level->link[p.room].r;
   }
-  return pos;
+  return p;
 }
 
 unsigned int
-prandom_pos (struct pos pos, unsigned int i, unsigned int max)
+prandom_pos (struct pos p, unsigned int i, unsigned int max)
 {
   return
-    prandom_uniq (pos.room + pos.floor * PLACES + pos.place + i, max);
+    prandom_uniq (p.room + p.floor * PLACES + p.place + i, max);
 }
 
 struct pos
 pos_xy (unsigned int room, int x, int y)
 {
-  struct pos pos;
+  struct pos p;
 
   unsigned int qx = x / PLACE_WIDTH;
   unsigned int rx = x % PLACE_WIDTH;
   unsigned int qy = y / PLACE_HEIGHT;
   unsigned int ry = y % PLACE_HEIGHT;
 
-  pos.room = room;
-  pos.place = (rx < 13) ? qx - 1 : qx;
-  pos.floor = (ry < 3) ? qy - 1 : qy;
+  p.room = room;
+  p.place = (rx < 13) ? qx - 1 : qx;
+  p.floor = (ry < 3) ? qy - 1 : qy;
 
-  if (x < 0) pos.place = -1;
-  if (y < 0) pos.floor = -1;
+  if (x < 0) p.place = -1;
+  if (y < 0) p.floor = -1;
 
-  return pos;
+  return p;
 }
 
 struct pos
