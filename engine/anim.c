@@ -50,9 +50,9 @@ play_anim (void (*callback) (void), unsigned int freq)
     case ALLEGRO_EVENT_TIMER:
       if (event.timer.source == timer) {
         get_keyboard_state ();
-        if (was_key_pressed (ALLEGRO_KEY_ESCAPE, true))
+        if (was_key_pressed (ALLEGRO_KEY_ESCAPE, false))
           pause_anim = true;
-        if (was_key_pressed (ALLEGRO_KEY_P, false))
+        if (was_key_pressed (ALLEGRO_KEY_P, true))
           pause_anim = false;
         if (! pause_anim
             || (pause_anim &&
