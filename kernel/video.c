@@ -79,6 +79,16 @@ finalize_video (void)
   al_shutdown_font_addon ();
 }
 
+ALLEGRO_EVENT_SOURCE *
+get_display_event_source (ALLEGRO_DISPLAY *display)
+{
+  ALLEGRO_EVENT_SOURCE *event_source = al_get_display_event_source (display);
+  if (! event_source)
+    error (-1, 0, "%s: failed to get display event source (%p)",
+           __func__,  display);
+  return event_source;
+}
+
 ALLEGRO_BITMAP *
 create_bitmap (int w, int h)
 {
@@ -181,6 +191,21 @@ draw_roll_right (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
 }
 
 void
+draw_pattern (ALLEGRO_BITMAP *bitmap, int ox, int oy, int w, int h,
+              ALLEGRO_COLOR color_0, ALLEGRO_COLOR color_1)
+{
+  int x, y;
+  draw_bitmap (bitmap, memory_bitmap, 0, 0, 0);
+  al_set_target_bitmap (memory_bitmap);
+  al_lock_bitmap (memory_bitmap, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_WRITEONLY);
+  for (y = oy; y < oy + h; y++)
+    for (x = ox; x < ox + w; x++)
+      al_put_pixel (x, y, (x % 2 != y % 2) ? color_0 : color_1);
+  al_unlock_bitmap (memory_bitmap);
+  draw_bitmap (memory_bitmap, bitmap, 0, 0, 0);
+}
+
+void
 start_video_effect (enum video_effect type, unsigned int duration)
 {
   video_effect.type = type;
@@ -239,19 +264,4 @@ show (void)
   }
 
   flip_display (effect_buffer);
-}
-
-void
-draw_pattern (ALLEGRO_BITMAP *bitmap, int ox, int oy, int w, int h,
-              ALLEGRO_COLOR color_0, ALLEGRO_COLOR color_1)
-{
-  int x, y;
-  draw_bitmap (bitmap, memory_bitmap, 0, 0, 0);
-  al_set_target_bitmap (memory_bitmap);
-  al_lock_bitmap (memory_bitmap, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_WRITEONLY);
-  for (y = oy; y < oy + h; y++)
-    for (x = ox; x < ox + w; x++)
-      al_put_pixel (x, y, (x % 2 != y % 2) ? color_0 : color_1);
-  al_unlock_bitmap (memory_bitmap);
-  draw_bitmap (memory_bitmap, bitmap, 0, 0, 0);
 }

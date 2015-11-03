@@ -23,6 +23,9 @@
 /* keyboard state */
 ALLEGRO_KEYBOARD_STATE keyboard_state;
 
+int key; /* last key pressed */
+
+/* real time keys */
 bool up_key, down_key, left_key, right_key, shift_key, esc_key,
   pause_key, enter_key, a_key, w_key, d_key, s_key, h_key, j_key,
   u_key, n_key;
@@ -32,6 +35,21 @@ init_keyboard (void)
 {
   if (! al_install_keyboard ())
     error (-1, 0, "%s (void): cannot install keyboard", __func__);
+}
+
+void
+finalize_keyboard (void)
+{
+  al_uninstall_keyboard ();
+}
+
+ALLEGRO_EVENT_SOURCE *
+get_keyboard_event_source (void)
+{
+  ALLEGRO_EVENT_SOURCE *event_source = al_get_keyboard_event_source ();
+  if (! event_source)
+    error (-1, 0, "%s: failed to get keyboard event source", __func__);
+  return event_source;
 }
 
 void
@@ -57,8 +75,11 @@ get_keyboard_state (void)
   n_key = al_key_down (&keyboard_state, ALLEGRO_KEY_N);
 }
 
-void
-finalize_keyboard (void)
+bool
+was_key_pressed (int dkey, bool consume)
 {
-  al_uninstall_keyboard ();
+  if (key == dkey) {
+    if (consume) key = 0;
+    return true;
+  } else return false;
 }

@@ -69,10 +69,14 @@ level_anim (void)
 
   unsigned int prev_room = room;
 
-  if (h_key) room = level->link[room].l;
-  if (j_key) room = level->link[room].r;
-  if (u_key) room = level->link[room].a;
-  if (n_key) room = level->link[room].b;
+  if (was_key_pressed (ALLEGRO_KEY_H, true))
+    room = level->link[room].l;
+  if (was_key_pressed (ALLEGRO_KEY_J, true))
+    room = level->link[room].r;
+  if (was_key_pressed (ALLEGRO_KEY_U, true))
+    room = level->link[room].a;
+  if (was_key_pressed (ALLEGRO_KEY_N, true))
+    room = level->link[room].b;
 
   if (room == 0) room = prev_room;
 

@@ -22,13 +22,16 @@
 
 /* variables */
 extern ALLEGRO_KEYBOARD_STATE keyboard_state;
+extern int key;
 extern bool up_key, down_key, left_key, right_key, shift_key,
   esc_key, pause_key, enter_key, a_key, w_key, d_key, s_key,
   h_key, j_key, u_key, n_key;
 
 /* functions */
 void init_keyboard (void);
-void get_keyboard_state (void);
 void finalize_keyboard (void);
+ALLEGRO_EVENT_SOURCE *get_keyboard_event_source (void);
+void get_keyboard_state (void);
+bool was_key_pressed (int dkey, bool consume);
 
 #endif	/* FREEPOP_KEYBOARD_H */

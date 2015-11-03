@@ -38,7 +38,8 @@ play_anim (void (*callback) (void), unsigned int freq)
   ALLEGRO_EVENT event;
   ALLEGRO_TIMER *timer = create_timer (1.0 / freq);
   ALLEGRO_EVENT_QUEUE *event_queue = create_event_queue ();
-  al_register_event_source (event_queue, al_get_display_event_source (display));
+  al_register_event_source (event_queue, get_display_event_source (display));
+  al_register_event_source (event_queue, get_keyboard_event_source ());
   al_register_event_source (event_queue, get_timer_event_source (video_timer));
   al_register_event_source (event_queue, get_timer_event_source (timer));
   al_start_timer (timer);
@@ -49,9 +50,14 @@ play_anim (void (*callback) (void), unsigned int freq)
     case ALLEGRO_EVENT_TIMER:
       if (event.timer.source == timer) {
         get_keyboard_state ();
-        if (esc_key) pause_anim = true;
-        if (esc_key && shift_key) pause_anim = false;
-        if (! pause_anim || (pause_anim && esc_key)) (*callback) ();
+        if (was_key_pressed (ALLEGRO_KEY_ESCAPE, true))
+          pause_anim = true;
+        if (was_key_pressed (ALLEGRO_KEY_P, false))
+          pause_anim = false;
+        if (! pause_anim
+            || (pause_anim &&
+                was_key_pressed (ALLEGRO_KEY_ESCAPE, true)))
+          (*callback) ();
         if (! is_video_effect_started ()) show ();
         drop_all_events_from_source
           (event_queue, get_timer_event_source (timer));
@@ -72,6 +78,9 @@ play_anim (void (*callback) (void), unsigned int freq)
       break;
     case ALLEGRO_EVENT_DISPLAY_CLOSE:
       exit (0);
+      break;
+    case ALLEGRO_EVENT_KEY_DOWN:
+      key = event.keyboard.keycode;
       break;
     }
   }
