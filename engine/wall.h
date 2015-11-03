@@ -61,9 +61,15 @@ struct xy wall_face_top_xy (struct pos pos);
 enum wall_correlation wall_correlation (struct pos pos);
 void draw_wall_randomization (ALLEGRO_BITMAP *bitmap, struct pos pos);
 void draw_wall_left_mark (ALLEGRO_BITMAP *bitmap, struct pos pos,
-                          int random_0, int random_1, int random_2);
+                          int r);
 void draw_wall_right_mark (ALLEGRO_BITMAP *bitmap, struct pos pos,
-                           int random_0, int random_1);
+                           int r);
+void draw_wall_gray_block (ALLEGRO_BITMAP *bitmap, struct pos p);
+struct xy wall_gray_block_xy (struct pos p);
+void draw_wall_divider_00 (ALLEGRO_BITMAP *bitmap, struct pos p);
+struct xy wall_divider_00_xy (struct pos p);
+void draw_wall_divider_01 (ALLEGRO_BITMAP *bitmap, struct pos p);
+struct xy wall_divider_01_xy (struct pos p);
 
 enum wall_correlation {
   SWS, SWW, WWS, WWW

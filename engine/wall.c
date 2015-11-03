@@ -186,6 +186,12 @@ wall_correlation (struct pos p)
   return -1;
 }
 
+/* wall randomization auxiliary numbers */
+static unsigned int r0, r1, r2, r3;
+
+/* wall randomization dividers */
+static ALLEGRO_BITMAP *wall_divider_00, *wall_divider_01;
+
 void
 draw_wall_randomization (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
@@ -195,88 +201,51 @@ draw_wall_randomization (ALLEGRO_BITMAP *bitmap, struct pos p)
   uint32_t random_seed_backup = random_seed;
   random_seed = np.room + np.floor * PLACES + np.place;
   prandom (1);
-  unsigned int r0 = prandom(1);
-  unsigned int r1 = prandom(4);
-  unsigned int r2 = prandom(1);
-  unsigned int r3 = prandom(4);
+  r0 = prandom(1);
+  r1 = prandom(4);
+  r2 = prandom(1);
+  r3 = prandom(4);
 
-  ALLEGRO_BITMAP *wall_divider_0 = r2 ? wall_narrow_divider : wall_wide_divider;
-  ALLEGRO_BITMAP *wall_divider_1 = r0 ? wall_narrow_divider : wall_wide_divider;
-  unsigned int wall_divider_0_w = r2 ? 8 : 9;
+  wall_divider_00 = r2 ? wall_narrow_divider : wall_wide_divider;
+  wall_divider_01 = r0 ? wall_narrow_divider : wall_wide_divider;
 
   enum wall_correlation wc = wall_correlation (p);
 
   switch (wc) {
   case WWW:
-    /* gray block randomization  */
-    if (prandom (4) == 0 && p.floor >= 0 && p.place >= 0)
-      draw_bitmap (wall_gray_block, bitmap,
-                   32 * p.place, 63 * p.floor + 3, 0);
-
-    /* wall divider randomization  */
-    if (p.floor >= 0 && p.place >= 0)
-      draw_bitmap (wall_divider_1, bitmap,
-                   32 * p.place + 8 + r1, 63 * p.floor + 24, 0);
-
-    /* wall divider randomization  */
-    if (p.floor >= 0 && p.place >= 0)
-      draw_bitmap (wall_divider_0, bitmap,
-                   32 * p.place + r3, 63 * p.floor + 45, 0);
-
-    /* wall divider randomization (room above)  */
-    if (p.floor < 0 && p.place >=0)
-      draw_bitmap_region (wall_divider_0, bitmap, 0, 18, wall_divider_0_w, 3,
-                          32 * p.place + r3, 0, 0);
-
-    /* wall mark randomization */
+    if (prandom (4) == 0) draw_wall_gray_block (bitmap, p);
+    draw_wall_divider_01 (bitmap, p);
+    draw_wall_divider_00 (bitmap, p);
     if (level->type == DUNGEON) {
-      if (prandom(4) == 0) draw_wall_right_mark (bitmap, p, r1, prandom (3));
-      if (prandom(4) == 0) draw_wall_left_mark (bitmap, p, r3 - r2, r1 - r0, prandom (4));
+      if (prandom(4) == 0)
+        draw_wall_right_mark (bitmap, p, prandom (3));
+      if (prandom(4) == 0)
+        draw_wall_left_mark (bitmap, p, prandom (4));
     }
     break;
   case SWS:
-    /* wall mark randomization */
     if (level->type == DUNGEON && prandom (6) == 0)
-      draw_wall_left_mark (bitmap, p, r3 - r2, r1 - r0, prandom (1));
+      draw_wall_left_mark (bitmap, p, prandom (1));
     break;
   case SWW:
-    /* gray block randomization  */
-    if (prandom (4) == 0 && p.floor >= 0 && p.place >= 0)
-      draw_bitmap (wall_gray_block, bitmap,
-                   32 * p.place, 63 * p.floor + 3, 0);
-
-    /* wall divider randomization  */
-    if (p.floor >= 0 && p.place >= 0)
-      draw_bitmap (wall_divider_1, bitmap,
-                   32 * p.place + 8 + r1, 63 * p.floor + 24, 0);
-
-    /* wall mark randomization */
+    if (prandom (4) == 0)
+      draw_wall_gray_block (bitmap, p);
+    draw_wall_divider_01 (bitmap, p);
     if (level->type == DUNGEON) {
-      if (prandom(4) == 0) draw_wall_right_mark (bitmap, p, r1, prandom (3));
-      if (prandom(4) == 0) draw_wall_left_mark (bitmap, p, r3 - r2, r1 - r0, prandom (3));
+      if (prandom(4) == 0)
+        draw_wall_right_mark (bitmap, p, prandom (3));
+      if (prandom(4) == 0)
+        draw_wall_left_mark (bitmap, p, prandom (3));
     }
     break;
   case WWS:
-    /* wall divider randomization  */
-    if (p.floor >= 0 && p.place >= 0)
-      draw_bitmap (wall_divider_1, bitmap,
-                   32 * p.place + 8 + r1, 63 * p.floor + 24, 0);
-
-    /* wall divider randomization  */
-    if (p.floor >= 0 && p.place >= 0)
-      draw_bitmap (wall_divider_0, bitmap,
-                   32 * p.place + r3, 63 * p.floor + 45, 0);
-
-    /* wall divider randomization (room above)  */
-    if (p.floor < 0 && p.place >=0)
-      draw_bitmap_region (wall_divider_0, bitmap, 0, 18, wall_divider_0_w, 3,
-                          32 * p.place + r3, 0, 0);
-
-
-    /* wall mark randomization */
+    draw_wall_divider_01 (bitmap, p);
+    draw_wall_divider_00 (bitmap, p);
     if (level->type == DUNGEON) {
-      if (prandom(4) == 0) draw_wall_right_mark (bitmap, p, r1, prandom (1) + 2);
-      if (prandom(4) == 0) draw_wall_left_mark (bitmap, p, r3 - r2, r1 - r0, prandom (4));
+      if (prandom(4) == 0)
+        draw_wall_right_mark (bitmap, p, prandom (1) + 2);
+      if (prandom(4) == 0)
+        draw_wall_left_mark (bitmap, p, prandom (4));
     }
     break;
   default:
@@ -287,39 +256,78 @@ draw_wall_randomization (ALLEGRO_BITMAP *bitmap, struct pos p)
 }
 
 void
-draw_wall_left_mark (ALLEGRO_BITMAP *bitmap, struct pos p,
-                     int random_0, int random_1, int random_2)
+draw_wall_left_mark (ALLEGRO_BITMAP *bitmap, struct pos p, int r)
 {
   ALLEGRO_BITMAP *wall_mark = wall_mark_top_left;
   const unsigned int floor_offset[5] = {58, 41, 37, 20, 16};
   unsigned int place_offset = 0;
 
-  if (random_2 % 2) wall_mark = wall_mark_bottom_left;
-  if (random_2 > 3) place_offset = random_0 + 6;
-  else if (random_2 > 1) place_offset = random_1 + 6;
+  if (r % 2) wall_mark = wall_mark_bottom_left;
+  if (r > 3) place_offset = r3 - r2 + 6;
+  else if (r > 1) place_offset = r1 - r0 + 6;
 
-  if (p.floor >= 0 && p.place >= 0)
-    draw_bitmap (wall_mark, bitmap,
-                 32 * p.place + place_offset +
-                 8 * (((random_2 == 2) || (random_2 == 3)) ? 1 : 0),
-                 63 * p.floor + 61 - floor_offset[random_2], 0);
+  draw_bitmap (wall_mark, bitmap,
+               32 * p.place + place_offset +
+               8 * (((r == 2) || (r == 3)) ? 1 : 0),
+               63 * p.floor + 61 - floor_offset[r], 0);
 }
 
 void
-draw_wall_right_mark (ALLEGRO_BITMAP *bitmap, struct pos p,
-                      int random_0, int random_1)
+draw_wall_right_mark (ALLEGRO_BITMAP *bitmap, struct pos p, int r)
 {
   ALLEGRO_BITMAP *wall_mark;
   const unsigned int floor_offset[4] = {52, 42, 31, 21};
 
-  if (random_1 % 2) wall_mark = wall_mark_bottom_right;
+  if (r % 2) wall_mark = wall_mark_bottom_right;
   else wall_mark = wall_mark_top_right;
 
-  if (random_1 < 2) random_0 = 24;
-  else random_0 -= 3;
+  draw_bitmap (wall_mark, bitmap,
+               32 * p.place + 8 * ((r > 1) ? 1 : 0)
+               + ((r < 2) ? 24 : r1 - 3),
+               63 * p.floor + 56 - floor_offset[r], 0);
+}
 
-  if (p.floor >= 0 && p.place >= 0)
-    draw_bitmap (wall_mark, bitmap,
-                 32 * p.place + 8 * ((random_1 > 1) ? 1 : 0) + random_0,
-                 63 * p.floor + 56 - floor_offset[random_1], 0);
+void
+draw_wall_gray_block (ALLEGRO_BITMAP *bitmap, struct pos p)
+{
+  draw_bitmap_xy (wall_gray_block, bitmap, wall_gray_block_xy (p), 0);
+}
+
+struct xy
+wall_gray_block_xy (struct pos p)
+{
+  struct xy xy;
+  xy.x = PLACE_WIDTH * p.place;
+  xy.y = PLACE_HEIGHT * p.floor + 3;
+  return xy;
+}
+
+void
+draw_wall_divider_00 (ALLEGRO_BITMAP *bitmap, struct pos p)
+{
+  draw_bitmap_xy (wall_divider_00, bitmap, wall_divider_00_xy (p), 0);
+}
+
+struct xy
+wall_divider_00_xy (struct pos p)
+{
+  struct xy xy;
+  xy.x = PLACE_WIDTH * p.place + r3;
+  xy.y = PLACE_HEIGHT * p.floor + 45;
+  return xy;
+}
+
+void
+draw_wall_divider_01 (ALLEGRO_BITMAP *bitmap, struct pos p)
+{
+  draw_bitmap_xy (wall_divider_01, bitmap, wall_divider_01_xy (p), 0);
+}
+
+struct xy
+wall_divider_01_xy (struct pos p)
+{
+  struct xy xy;
+  xy.x = PLACE_WIDTH * p.place + 8 + r1;
+  xy.y = PLACE_HEIGHT * p.floor + 24;
+  return xy;
 }
