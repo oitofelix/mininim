@@ -27,6 +27,7 @@
 #include "room.h"
 #include "fire.h"
 #include "kid.h"
+#include "floor.h"
 #include "level.h"
 
 /* functions */
@@ -82,7 +83,15 @@ level_anim (void)
 
   level_draw_base ();
   if (room_view == kid.room) {
+    prev_room = kid.room;
     kid.draw ();
+    if (kid.room != prev_room) {
+      room_view = kid.room;
+      level_draw_base ();
+      draw_anim (&kid, kid.frame, 0, 0);
+    }
+    draw_shake_floor ();
+    draw_release_loose_floor ();
     draw_room_anim_fg (kid);
   }
 }

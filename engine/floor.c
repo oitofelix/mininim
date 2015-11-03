@@ -23,10 +23,14 @@
 #include "kid.h"
 #include "pillar.h"
 #include "wall.h"
+#include "level.h"
+#include "room.h"
 #include "floor.h"
 
 ALLEGRO_BITMAP *floor_normal_left, *floor_normal_right, *floor_normal_base,
-  *floor_broken_left, *floor_broken_right, *floor_broken_front;
+  *floor_broken_left, *floor_broken_right, *floor_broken_front, *floor_loose_left_01,
+  *floor_loose_right_01, *floor_loose_base_01, *floor_loose_left_02,
+  *floor_loose_right_02, *floor_loose_base_02, *floor_loose_02;
 
 void
 load_vdungeon_floor (void)
@@ -37,6 +41,15 @@ load_vdungeon_floor (void)
   floor_broken_left = load_bitmap (VDUNGEON_FLOOR_BROKEN_LEFT);
   floor_broken_right = load_bitmap (VDUNGEON_FLOOR_BROKEN_RIGHT);
   floor_broken_front = load_bitmap (VDUNGEON_FLOOR_BROKEN_FRONT);
+  floor_loose_left_01 = load_bitmap (VDUNGEON_FLOOR_LOOSE_LEFT_01);
+  floor_loose_right_01 = load_bitmap (VDUNGEON_FLOOR_LOOSE_RIGHT_01);
+  floor_loose_base_01 = load_bitmap (VDUNGEON_FLOOR_LOOSE_BASE_01);
+  floor_loose_left_02 = load_bitmap (VDUNGEON_FLOOR_LOOSE_LEFT_02);
+  floor_loose_right_02 = load_bitmap (VDUNGEON_FLOOR_LOOSE_RIGHT_02);
+  floor_loose_base_02 = load_bitmap (VDUNGEON_FLOOR_LOOSE_BASE_02);
+
+  /* used for loose floor falling animation */
+  floor_loose_02 = create_floor_loose_02_bitmap ();
 }
 
 void
@@ -49,6 +62,32 @@ unload_floor (void)
   al_destroy_bitmap (floor_broken_left);
   al_destroy_bitmap (floor_broken_right);
   al_destroy_bitmap (floor_broken_front);
+  al_destroy_bitmap (floor_loose_left_01);
+  al_destroy_bitmap (floor_loose_right_01);
+  al_destroy_bitmap (floor_loose_base_01);
+  al_destroy_bitmap (floor_loose_left_02);
+  al_destroy_bitmap (floor_loose_right_02);
+  al_destroy_bitmap (floor_loose_base_02);
+  al_destroy_bitmap (floor_loose_02);
+}
+
+ALLEGRO_BITMAP *
+create_floor_loose_02_bitmap (void)
+{
+  int wl = al_get_bitmap_width (floor_loose_left_02);
+  int wr = al_get_bitmap_width (floor_loose_right_02);
+  int w = wl + wr;
+  int hl = al_get_bitmap_height (floor_loose_left_02);
+  int hr = al_get_bitmap_height (floor_loose_right_02);
+  int hb = al_get_bitmap_height (floor_loose_base_02);
+  int h = max (hl, hr) + hb;
+
+  ALLEGRO_BITMAP *bitmap = create_bitmap (w, h);
+  draw_bitmap (floor_loose_base_02, bitmap, 0, 14, 0);
+  draw_bitmap (floor_loose_left_02, bitmap, 0, 1, 0);
+  draw_bitmap (floor_loose_right_02, bitmap, 32, 0, 0);
+
+  return bitmap;
 }
 
 void
@@ -60,10 +99,38 @@ draw_floor (ALLEGRO_BITMAP *bitmap, struct pos p)
 }
 
 void
+draw_floor_left (ALLEGRO_BITMAP *bitmap, struct pos p)
+{
+  draw_bitmap_xy (floor_normal_base, bitmap, floor_base_xy (p), 0);
+  draw_bitmap_xy (floor_normal_left, bitmap, floor_left_xy (p), 0);
+}
+
+void
+draw_floor_right (ALLEGRO_BITMAP *bitmap, struct pos p)
+{
+  draw_bitmap_xy (floor_normal_base, bitmap, floor_base_xy (p), 0);
+  draw_bitmap_xy (floor_normal_right, bitmap, floor_right_xy (p), 0);
+}
+
+void
 draw_broken_floor (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
   draw_bitmap_xy (floor_normal_base, bitmap, floor_base_xy (p), 0);
   draw_bitmap_xy (floor_broken_left, bitmap, floor_left_xy (p), 0);
+  draw_bitmap_xy (floor_broken_right, bitmap, floor_right_xy (p), 0);
+}
+
+void
+draw_broken_floor_left (ALLEGRO_BITMAP *bitmap, struct pos p)
+{
+  draw_bitmap_xy (floor_normal_base, bitmap, floor_base_xy (p), 0);
+  draw_bitmap_xy (floor_broken_left, bitmap, floor_left_xy (p), 0);
+}
+
+void
+draw_broken_floor_right (ALLEGRO_BITMAP *bitmap, struct pos p)
+{
+  draw_bitmap_xy (floor_normal_base, bitmap, floor_base_xy (p), 0);
   draw_bitmap_xy (floor_broken_right, bitmap, floor_right_xy (p), 0);
 }
 
@@ -86,39 +153,13 @@ draw_floor_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
 
       /* don't draw floors over kid's foots when jumping from the
          edge */
-      || is_kid_start_jump ()) return;
+      || is_kid_start_jump () || is_kid_jump ()) return;
 
   draw_floor (bitmap, p);
 
   /* draw next floor left side to cover right edge of the current
      one */
-  p.place++;
-  switch (construct (p).fg) {
-  case NO_FLOOR:
-    break;
-  case FLOOR:
-    draw_bitmap_xy (floor_normal_base, bitmap, floor_base_xy (p), 0);
-    draw_bitmap_xy (floor_normal_left, bitmap, floor_left_xy (p), 0);
-    break;
-  case BROKEN_FLOOR:
-    draw_bitmap_xy (floor_normal_base, bitmap, floor_base_xy (p), 0);
-    draw_bitmap_xy (floor_broken_left, bitmap, floor_left_xy (p), 0);
-    break;
-  case LOOSE_FLOOR:
-    draw_bitmap_xy (floor_normal_base, bitmap, floor_base_xy (p), 0);
-    draw_bitmap_xy (floor_normal_left, bitmap, floor_left_xy (p), 0);
-    break;
-  case PILLAR:
-    draw_bitmap_xy (floor_normal_base, bitmap, floor_base_xy (p), 0);
-    draw_bitmap_xy (pillar_left, bitmap, pillar_left_xy (p), 0);
-    break;
-  case WALL:
-    draw_wall (bitmap, p);
-    break;
-  default:
-    error (-1, 0, "%s: unknown foreground (%u)",
-           __func__, construct (p).fg);
-  }
+  draw_construct_left (bitmap, pos_rel (p, 0, +1));
 }
 
 struct xy
@@ -154,5 +195,137 @@ broken_floor_front_xy (struct pos p)
   struct xy xy;
   xy.x = PLACE_WIDTH * p.place;
   xy.y = PLACE_HEIGHT * p.floor + 54;
+  return xy;
+}
+
+static struct loose_floor loose_floor[PLACES * FLOORS];
+
+void
+release_loose_floor (struct pos p)
+{
+  size_t i = 0;
+
+  if (construct (p).fg != LOOSE_FLOOR)
+    error (-1, 0, "%s: impossible to release non-loose floor (%u)",
+           __func__, construct (p).fg);
+
+  while (loose_floor[i].p.room && i < PLACES * FLOORS) {
+    if (is_pos_eq (loose_floor[i].p, p)) return;
+    i++;
+  }
+  if (i == PLACES * FLOORS)
+    error (-1, 0, "%s: no free loose floor release slot (%u)",
+           __func__, construct (p).fg);
+
+  loose_floor[i].p = p;
+  loose_floor[i].i = 0;
+}
+
+void
+draw_shake_floor (void)
+{
+  static unsigned int i = 0;
+  if (kid.room != room_view
+      || (i == 0
+          && kid.frame != kid_jump_13
+          && (! kid.just_fall || kid.frame != kid_couch_02)
+          && kid.frame != kid_vjump_19)) return;
+
+  struct pos p = pos (kid);
+
+  for (p.place = -1; p.place < PLACES; p.place++)
+    if (construct (p).fg == LOOSE_FLOOR) {
+      draw_no_floor (screen, p);
+      switch (i) {
+      case 0: draw_loose_floor_01 (screen, p); break;
+      case 1: draw_floor (screen, p); break;
+      case 2: draw_loose_floor_02 (screen, p); break;
+      case 3: draw_floor (screen, p); break;
+      }
+      i = (i < 3)? i + 1 : 0;
+      draw_construct_left (screen, pos_rel (p, 0, +1));
+      draw_anim (&kid, kid.frame, 0, 0);
+    }
+}
+
+void
+draw_release_loose_floor (void)
+{
+  size_t i;
+  for (i = 0; i < PLACES * FLOORS; i++)
+    if (loose_floor[i].p.room) {
+      struct pos p = loose_floor[i].p;
+      draw_no_floor (screen, p);
+      switch (loose_floor[i].i) {
+      case 0: draw_loose_floor_01 (screen, p); break;
+      case 1: draw_floor (screen, p); break;
+      case 2: draw_loose_floor_02 (screen, p); break;
+      case 3: draw_loose_floor_02 (screen, p); break;
+      case 4: draw_floor (screen, p); break;
+      case 5: draw_floor (screen, p); break;
+      case 6: draw_floor (screen, p); break;
+      case 7: draw_loose_floor_02 (screen, p); break;
+      case 8: draw_loose_floor_02 (screen, p); break;
+      case 9: draw_loose_floor_02 (screen, p); break;
+      case 10:
+        set_construct_fg (p, NO_FLOOR);
+        struct xy xy = floor_left_xy (loose_floor[i].p);
+        loose_floor[i].a.frame = floor_loose_02;
+        loose_floor[i].a.room = loose_floor[i].p.room;
+        loose_floor[i].a.x = xy.x;
+        loose_floor[i].a.y = xy.y;
+        loose_floor[i].draw = draw_floor_fall;
+        break;
+      default:
+        /* loose_floor[i].draw (&loose_floor[i]); */
+        loose_floor[i].p.room = 0;
+        break;
+      }
+      loose_floor[i].i++;
+      draw_construct_left (screen, pos_rel (p, 0, +1));
+      draw_anim (&kid, kid.frame, 0, 0);
+    }
+}
+
+void
+draw_floor_fall (struct loose_floor *f)
+{
+  unsigned int speed = 3 * (f->i - 10);
+  if (speed < 33) f->i++;
+  speed = (speed > 33) ? 33 : speed;
+  draw_anim (&f->a, floor_loose_02, 0, speed);
+}
+
+void
+draw_loose_floor_01 (ALLEGRO_BITMAP *bitmap, struct pos p)
+{
+  draw_bitmap_xy (floor_loose_base_01, bitmap, floor_base_xy (p), 0);
+  draw_bitmap_xy (floor_loose_left_01, bitmap, floor_loose_left_xy (p), 0);
+  draw_bitmap_xy (floor_loose_right_01, bitmap, floor_loose_right_xy (p), 0);
+}
+
+void
+draw_loose_floor_02 (ALLEGRO_BITMAP *bitmap, struct pos p)
+{
+  draw_bitmap_xy (floor_loose_base_02, bitmap, floor_base_xy (p), 0);
+  draw_bitmap_xy (floor_loose_left_02, bitmap, floor_left_xy (p), 0);
+  draw_bitmap_xy (floor_loose_right_02, bitmap, floor_loose_right_xy (p), 0);
+}
+
+struct xy
+floor_loose_left_xy (struct pos p)
+{
+  struct xy xy;
+  xy.x = PLACE_WIDTH * p.place;
+  xy.y = PLACE_HEIGHT * p.floor + 50 - 1;
+  return xy;
+}
+
+struct xy
+floor_loose_right_xy (struct pos p)
+{
+  struct xy xy;
+  xy.x = PLACE_WIDTH * (p.place + 1);
+  xy.y = PLACE_HEIGHT * p.floor + 50 - 1;
   return xy;
 }

@@ -334,8 +334,8 @@ void draw_kid_normal ()
   else if (kid.frame == kid_normal) {
     if (couch) draw_kid_couch ();
     else if (jump) draw_kid_jump ();
-    else if (vjump) draw_kid_vjump ();
     else if (turn) draw_kid_turn ();
+    else if (vjump) draw_kid_vjump ();
     else if (walk) draw_kid_walk ();
     else if (run)
       if (dc < 29) draw_kid_walk ();
@@ -1087,6 +1087,7 @@ draw_kid_fall (void)
     kid.frame = kid_normal;
     draw_kid_couch ();
     i = 0;
+    kid.just_fall = true;
     return;
   }
 
@@ -1188,6 +1189,7 @@ draw_kid_couch (void)
   else if (kid.frame == kid_couch_12) {
     draw_anim (&kid, kid_couch_13, +4, 0);
     kid.draw = draw_kid_normal;
+    kid.just_fall = false;
   } else {
     if (is_kid_start_run ()) inertia = 4;
     else if (is_kid_run ()) inertia = 8;

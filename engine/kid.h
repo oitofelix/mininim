@@ -164,7 +164,9 @@ bool is_kid_fall (void);
 bool is_kid_start_jump (void);
 bool is_kid_jump (void);
 bool is_kid_stop_jump (void);
+bool is_kid_start_vjump (void);
 bool is_kid_vjump (void);
+bool is_kid_stop_vjump (void);
 
 
 /* variables */
@@ -188,7 +190,16 @@ extern ALLEGRO_BITMAP *kid_normal,
   *kid_jump_01, *kid_jump_02, *kid_jump_03, *kid_jump_04, *kid_jump_05, *kid_jump_06,
   *kid_jump_07, *kid_jump_08, *kid_jump_09, *kid_jump_10, *kid_jump_11, *kid_jump_12,
   *kid_jump_13, *kid_jump_14, *kid_jump_15, *kid_jump_16, *kid_jump_17, *kid_jump_18,
-  *kid_fall_13, *kid_fall_14, *kid_fall_15, *kid_fall_16, *kid_fall_17;
+     *kid_fall_13, *kid_fall_14, *kid_fall_15, *kid_fall_16, *kid_fall_17,
+   *kid_couch_01, *kid_couch_02, *kid_couch_03, *kid_couch_04,
+  *kid_couch_05, *kid_couch_06, *kid_couch_07, *kid_couch_08,
+  *kid_couch_09, *kid_couch_10, *kid_couch_11, *kid_couch_12,
+  *kid_couch_13,
+  *kid_vjump_01, *kid_vjump_02, *kid_vjump_03, *kid_vjump_04, *kid_vjump_05,
+  *kid_vjump_06, *kid_vjump_07, *kid_vjump_08, *kid_vjump_09, *kid_vjump_10,
+  *kid_vjump_11, *kid_vjump_12, *kid_vjump_13, *kid_vjump_15, *kid_vjump_16,
+  *kid_vjump_17, *kid_vjump_18, *kid_vjump_19;
+;
 
 
 #endif	/* FREEPOP_KID_H */

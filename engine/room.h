@@ -20,6 +20,8 @@
 #ifndef FREEPOP_ROOM_H
 #define FREEPOP_ROOM_H
 
+#include "physics.h"
+
 #define VDUNGEON_BRICKS_01 "dat/vdungeon/background/bricks01.png"
 #define VDUNGEON_BRICKS_02 "dat/vdungeon/background/bricks02.png"
 #define VDUNGEON_BRICKS_03 "dat/vdungeon/background/bricks03.png"
@@ -34,6 +36,10 @@ void draw_room_bg (void);
 void draw_construct (ALLEGRO_BITMAP *bitmap, struct pos pos);
 void draw_construct_fg (ALLEGRO_BITMAP *bitmap, struct pos pos);
 void draw_construct_bg (ALLEGRO_BITMAP *bitmap, struct pos pos);
+void draw_construct_left (ALLEGRO_BITMAP *bitmap, struct pos p);
+void draw_construct_right (ALLEGRO_BITMAP *bitmap, struct pos p);
+void draw_no_floor_base (ALLEGRO_BITMAP *bitmap, struct pos p);
+void draw_no_floor (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_bricks_01 (ALLEGRO_BITMAP *bitmap, struct pos pos);
 void draw_bricks_02 (ALLEGRO_BITMAP *bitmap, struct pos pos);
 void draw_bricks_03 (ALLEGRO_BITMAP *bitmap, struct pos pos);

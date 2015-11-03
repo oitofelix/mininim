@@ -31,6 +31,7 @@ struct anim {
   int dir;
   unsigned int repeat;
   int flip;
+  bool just_fall;
   void (*draw) (void);
   void (*odraw) (void);
   void (*collision) (void);

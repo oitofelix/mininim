@@ -36,7 +36,7 @@ struct level {
   } type;
 
   struct construct {
-    enum {
+    enum construct_fg {
       NO_FLOOR,
       FLOOR,
       BROKEN_FLOOR,
@@ -44,7 +44,7 @@ struct level {
       PILLAR,
       WALL,
     } fg;
-    enum {
+    enum construct_bg {
       NO_BG,
       BRICKS_01,
       BRICKS_02,
@@ -68,6 +68,7 @@ struct pos {
 /* functions */
 struct construct construct (struct pos pos);
 struct construct construct_rel (struct pos pos, int floor, int place);
+void set_construct_fg (struct pos p, enum construct_fg fg);
 void norm_anim (struct anim *a);
 struct pos norm_pos (struct pos pos, bool floor_first);
 struct pos norm_pos_floor (struct pos pos);
@@ -76,6 +77,8 @@ unsigned int prandom_pos (struct pos pos, unsigned int i,
                           unsigned int max);
 struct pos pos_xy (unsigned int room, int x, int y);
 struct pos pos (struct anim anim);
+struct pos pos_rel (struct pos, int floor, int place);
+bool is_pos_eq (struct pos p0, struct pos p1);
 bool is_colliding (struct anim anim);
 int dist_collision (struct anim anim);
 int dist_fall (struct anim anim);

@@ -49,6 +49,7 @@ struct xy {
 /* functions */
 void init_video (void);
 void finalize_video (void);
+int max (int a, int b);
 ALLEGRO_EVENT_SOURCE *get_display_event_source (ALLEGRO_DISPLAY *display);
 ALLEGRO_BITMAP *create_bitmap (int w, int h);
 ALLEGRO_BITMAP *clone_bitmap (ALLEGRO_BITMAP *bitmap);

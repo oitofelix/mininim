@@ -176,6 +176,95 @@ draw_construct_bg (ALLEGRO_BITMAP *bitmap, struct pos p)
 }
 
 void
+draw_construct_left (ALLEGRO_BITMAP *bitmap, struct pos p)
+{
+  switch (construct (p).fg) {
+  case NO_FLOOR:
+    break;
+  case FLOOR:
+    draw_floor_left (bitmap, p);
+    break;
+  case BROKEN_FLOOR:
+    draw_broken_floor_left (bitmap, p);
+    break;
+  case LOOSE_FLOOR:
+    draw_floor_left (bitmap, p);
+    break;
+  case PILLAR:
+    draw_pillar_left (bitmap, p);
+    break;
+  case WALL:
+    draw_wall (bitmap, p);
+    break;
+  default:
+    error (-1, 0, "%s: unknown foreground (%u)",
+           __func__, construct (p).fg);
+  }
+}
+
+void
+draw_construct_right (ALLEGRO_BITMAP *bitmap, struct pos p)
+{
+  switch (construct (p).fg) {
+  case NO_FLOOR:
+    break;
+  case FLOOR:
+    draw_floor_right (bitmap, p);
+    break;
+  case BROKEN_FLOOR:
+    draw_broken_floor_right (bitmap, p);
+    break;
+  case LOOSE_FLOOR:
+    draw_floor_right (bitmap, p);
+    break;
+  case PILLAR:
+    draw_pillar_right (bitmap, p);
+    break;
+  case WALL:
+    draw_wall (bitmap, p);
+    break;
+  default:
+    error (-1, 0, "%s: unknown foreground (%u)",
+           __func__, construct (p).fg);
+  }
+}
+
+void
+draw_no_floor_base (ALLEGRO_BITMAP *bitmap, struct pos p)
+{
+  struct xy xy = floor_base_xy (p);
+  int w = al_get_bitmap_width (floor_normal_base);
+  int h = al_get_bitmap_height (floor_normal_base);
+
+  al_set_target_bitmap (bitmap);
+  al_set_clipping_rectangle (xy.x, xy.y, w, h);
+  al_clear_to_color (BLACK);
+  al_reset_clipping_rectangle ();
+}
+
+void
+draw_no_floor (ALLEGRO_BITMAP *bitmap, struct pos p)
+{
+  struct xy xy = floor_left_xy (p);
+  int wl = al_get_bitmap_width (floor_normal_left);
+  int wr = al_get_bitmap_width (floor_normal_right);
+  int w = wl + wr;
+  int hl = al_get_bitmap_height (floor_normal_left);
+  int hr = al_get_bitmap_height (floor_normal_right);
+  int hb = al_get_bitmap_height (floor_normal_base);
+  int h = max (hl, hr) + hb;
+
+  al_set_target_bitmap (bitmap);
+  al_set_clipping_rectangle (xy.x, xy.y, w, h);
+  al_clear_to_color (BLACK);
+  al_reset_clipping_rectangle ();
+
+  draw_construct_right (bitmap, pos_rel (p, 0, -1));
+  draw_construct_right (bitmap, pos_rel (p, +1, -1));
+  draw_construct_left (bitmap, pos_rel (p, 0, +1));
+}
+
+void
 draw_bricks_01 (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
   draw_bitmap_xy (bricks_01, bitmap, bricks_xy (p) , 0);

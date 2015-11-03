@@ -20,11 +20,12 @@
 #include <stdio.h>
 #include <error.h>
 #include "kernel/random.h"
-#include "physics.h"
 #include "level.h"
 #include "kid.h"
 #include "anim.h"
 #include "room.h"
+#include "floor.h"
+#include "physics.h"
 
 struct construct
 construct (struct pos p)
@@ -39,6 +40,13 @@ construct_rel (struct pos p, int floor, int place)
   p.floor += floor;
   p.place += place;
   return construct (p);
+}
+
+void
+set_construct_fg (struct pos p, enum construct_fg fg)
+{
+  p = norm_pos (p, true);
+  level->construct[p.room][p.floor][p.place].fg = fg;
 }
 
 void
@@ -149,6 +157,21 @@ pos (struct anim a)
 {
   int w = al_get_bitmap_width (a.frame);
   return pos_xy (a.room, (a.dir == LEFT) ? a.x : a.x + w - 1, a.y);
+}
+
+struct pos
+pos_rel (struct pos p, int floor, int place)
+{
+  p.floor += floor;
+  p.place += place;
+  return p;
+}
+
+bool
+is_pos_eq (struct pos p0, struct pos p1)
+{
+  return p0.room == p1.room && p0.floor == p1.floor
+    && p0.place == p1.place;
 }
 
 bool
@@ -277,16 +300,10 @@ apply_physics (struct anim *a, ALLEGRO_BITMAP *frame,
              && na.draw != na.collision) {
     na.odraw = na.draw;
     na.draw = na.fall;
-  } else if (is_on_loose_floor (na)) {
-    struct pos p = pos (na);
-    level->construct[p.room][p.floor][p.place].fg = NO_FLOOR;
-  }
+  } else if (is_on_loose_floor (na))
+    release_loose_floor (pos (na));
 
   norm_anim (&na);
-  if (a->id == &kid && room_view == a->room && a->room != na.room) {
-    room_view = na.room;
-    level_draw_base ();
-  }
 
   (*a) = na;
 }
