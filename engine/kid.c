@@ -58,31 +58,6 @@ ALLEGRO_BITMAP *kid_normal,
 struct anim kid; /* kid animation object */
 enum command command;
 
-/* functions */
-static void draw_kid_normal (void);
-static void draw_kid_walk (void);
-static void draw_kid_walk_min (void);
-static void draw_kid_walk_short (void);
-static void draw_kid_walk_long (void);
-static void draw_kid_walk_max (void);
-static void draw_kid_start_run (void);
-static void draw_kid_stop_run (void);
-static void draw_kid_run (void);
-static void draw_kid_turn (void);
-static void draw_kid_turn_run (void);
-static void draw_kid_jump (void);
-static void draw_kid_collision (void);
-static void draw_kid_fall (void);
-static void draw_kid_couch (void);
-
-static bool is_kid_start_walk (void);
-static bool is_kid_walk (void);
-static bool is_kid_stop_walk (void);
-static bool is_kid_run (void);
-static bool is_kid_start_couch (void);
-static bool is_kid_couch (void);
-static bool is_kid_stop_couch (void);
-
 void
 load_kid (void)
 {
@@ -189,6 +164,7 @@ load_kid (void)
   kid_vjump_18 = load_bitmap (KID_VJUMP_18);
   kid_vjump_19 = load_bitmap (KID_VJUMP_19);
 
+  kid.id = &kid;
   kid.room = 1;
   kid.x = 230;
   /* kid.x = 10; */
@@ -310,7 +286,6 @@ unload_kid (void)
   al_destroy_bitmap (kid_vjump_19);
 }
 
-static
 void draw_kid_normal ()
 {
   kid.draw = draw_kid_normal;
@@ -376,7 +351,6 @@ is_kid_normal ()
   return kid.frame == kid_normal;
 }
 
-static
 void draw_kid_walk ()
 {
   kid.draw = draw_kid_walk;
@@ -416,7 +390,7 @@ void draw_kid_walk ()
   } else error (-1, 0, "%s: unknown frame (%p)", __func__, kid.frame);
 }
 
-static void
+void
 draw_kid_walk_min (void)
 {
   kid.draw = draw_kid_walk_min;
@@ -436,7 +410,7 @@ draw_kid_walk_min (void)
   } else error (-1, 0, "%s: unknown frame (%p)", __func__, kid.frame);
 }
 
-static void
+void
 draw_kid_walk_short (void)
 {
   kid.draw = draw_kid_walk_short;
@@ -462,7 +436,7 @@ draw_kid_walk_short (void)
 }
 
 
-static void
+void
 draw_kid_walk_long (void)
 {
   kid.draw = draw_kid_walk_long;
@@ -489,7 +463,6 @@ draw_kid_walk_long (void)
   } else error (-1, 0, "%s: unknown kid frame (%p)", __func__, kid.frame);
 }
 
-static
 void draw_kid_walk_max ()
 {
   kid.draw = draw_kid_walk_max;
@@ -527,7 +500,7 @@ void draw_kid_walk_max ()
   else error (-1, 0, "%s: unknown kid frame (%p)", __func__, kid.frame);
 }
 
-static bool
+bool
 is_kid_start_walk (void) {
   return  kid.frame == kid_walk_01
     || kid.frame == kid_walk_02
@@ -535,7 +508,7 @@ is_kid_start_walk (void) {
     || kid.frame == kid_walk_04;
 }
 
-static bool
+bool
 is_kid_walk (void) {
   return kid.frame == kid_walk_05
     || kid.frame == kid_walk_06
@@ -543,7 +516,7 @@ is_kid_walk (void) {
     || kid.frame == kid_walk_08;
 }
 
-static bool
+bool
 is_kid_stop_walk (void) {
   return kid.frame == kid_walk_09
     || kid.frame == kid_walk_10
@@ -551,7 +524,6 @@ is_kid_stop_walk (void) {
     || kid.frame == kid_walk_12;
 }
 
-static
 void draw_kid_start_run ()
 {
   command = RUN;
@@ -602,7 +574,7 @@ void draw_kid_start_run ()
   } else error (-1, 0, "%s: unknown kid frame (%p)", __func__, kid.frame);
 }
 
-static bool
+bool
 is_kid_start_run (void)
 {
   return kid.frame == kid_start_run_01
@@ -613,7 +585,6 @@ is_kid_start_run (void)
     || kid.frame == kid_start_run_06;
 }
 
-static
 void draw_kid_stop_run ()
 {
   kid.draw = draw_kid_stop_run;
@@ -651,7 +622,6 @@ is_kid_stop_run (void) {
     || kid.frame == kid_stop_run_04;
 }
 
-static
 void draw_kid_run ()
 {
   kid.draw = draw_kid_run;
@@ -692,7 +662,7 @@ void draw_kid_run ()
   if (stop) kid.draw = draw_kid_stop_run;
 }
 
-static bool
+bool
 is_kid_run (void)
 {
   return kid.frame == kid_run_07
@@ -705,7 +675,6 @@ is_kid_run (void)
     || kid.frame == kid_run_14;
 }
 
-static
 void draw_kid_turn ()
 {
   kid.draw = draw_kid_turn;
@@ -760,7 +729,6 @@ void draw_kid_turn ()
   kid.fall = draw_kid_fall;
 }
 
-static
 void draw_kid_turn_run ()
 {
   kid.draw = draw_kid_turn_run;
@@ -791,7 +759,7 @@ void draw_kid_turn_run ()
   } else error (-1, 0, "%s: unknown kid frame (%p)", __func__, kid.frame);
 }
 
-static bool
+bool
 is_kid_turn_run (void)
 {
   return kid.frame == kid_turn_run_05
@@ -861,7 +829,7 @@ draw_kid_stabilize (void)
   }
 }
 
-static bool
+bool
 is_kid_stabilize (void)
 {
   return kid.frame == kid_stabilize_05
@@ -870,7 +838,7 @@ is_kid_stabilize (void)
     || kid.frame == kid_stabilize_08;
 }
 
-static void
+void
 draw_kid_jump (void)
 {
   command = JUMP;
@@ -942,7 +910,7 @@ is_kid_start_jump (void) {
     || kid.frame == kid_jump_07;
 }
 
-static bool
+bool
 is_kid_jump (void) {
   return kid.frame == kid_jump_08
     || kid.frame == kid_jump_09
@@ -950,7 +918,7 @@ is_kid_jump (void) {
     || kid.frame == kid_jump_11;
 }
 
-static bool
+bool
 is_kid_stop_jump (void) {
   return kid.frame == kid_jump_12
     || kid.frame == kid_jump_13
@@ -961,7 +929,7 @@ is_kid_stop_jump (void) {
     || kid.frame == kid_jump_18;
 }
 
-static void
+void
 draw_kid_collision (void)
 {
   static bool first_frame = true;
@@ -1046,7 +1014,7 @@ draw_kid_collision (void)
     kid.collision = draw_kid_collision;
 }
 
-static void
+void
 draw_kid_fall (void)
 {
   static unsigned int inertia;
@@ -1168,7 +1136,7 @@ is_kid_fall (void)
     || kid.frame == kid_fall_17;
 }
 
-static void
+void
 draw_kid_couch (void)
 {
   kid.draw = draw_kid_couch;
@@ -1236,20 +1204,20 @@ draw_kid_couch (void)
   }
 }
 
-static bool
+bool
 is_kid_start_couch (void)
 {
   return kid.frame == kid_couch_01
     || kid.frame == kid_couch_02;
 }
 
-static bool
+bool
 is_kid_couch (void)
 {
   return kid.frame == kid_couch_03;
 }
 
-static bool
+bool
 is_kid_stop_couch (void)
 {
   return kid.frame == kid_couch_04

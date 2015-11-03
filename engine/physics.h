@@ -68,6 +68,7 @@ struct pos {
 /* functions */
 struct construct construct (struct pos pos);
 struct construct construct_rel (struct pos pos, int floor, int place);
+void norm_anim (struct anim *a);
 struct pos norm_pos (struct pos pos, bool floor_first);
 struct pos norm_pos_floor (struct pos pos);
 struct pos norm_pos_place (struct pos pos);

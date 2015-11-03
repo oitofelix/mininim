@@ -135,11 +135,36 @@ void unload_kid (void);
 
 void draw_kid_stabilize (void);
 void draw_kid_vjump (void);
+void draw_kid_ceiling (void);
+void draw_kid_normal (void);
+void draw_kid_walk (void);
+void draw_kid_walk_min (void);
+void draw_kid_walk_short (void);
+void draw_kid_walk_long (void);
+void draw_kid_walk_max (void);
+void draw_kid_start_run (void);
+void draw_kid_stop_run (void);
+void draw_kid_run (void);
+void draw_kid_turn (void);
+void draw_kid_turn_run (void);
+void draw_kid_jump (void);
+void draw_kid_collision (void);
+void draw_kid_fall (void);
+void draw_kid_couch (void);
+
+bool is_kid_start_walk (void);
+bool is_kid_walk (void);
+bool is_kid_stop_walk (void);
+bool is_kid_run (void);
+bool is_kid_start_couch (void);
+bool is_kid_couch (void);
+bool is_kid_stop_couch (void);
 bool is_kid_stop_run (void);
 bool is_kid_fall (void);
 bool is_kid_start_jump (void);
+bool is_kid_jump (void);
+bool is_kid_stop_jump (void);
 bool is_kid_vjump (void);
-void draw_kid_ceiling (void);
 
 
 /* variables */

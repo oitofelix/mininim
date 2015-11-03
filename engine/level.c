@@ -62,29 +62,35 @@ unload_level (void)
   unload_kid ();
 }
 
+unsigned int room_view = 1;
+
 static void
 level_anim (void)
 {
-  static unsigned int room = 1;
-
-  unsigned int prev_room = room;
+  unsigned int prev_room = room_view;
 
   if (was_key_pressed (ALLEGRO_KEY_H, true))
-    room = level->link[room].l;
+    room_view = level->link[room_view].l;
   if (was_key_pressed (ALLEGRO_KEY_J, true))
-    room = level->link[room].r;
+    room_view = level->link[room_view].r;
   if (was_key_pressed (ALLEGRO_KEY_U, true))
-    room = level->link[room].a;
+    room_view = level->link[room_view].a;
   if (was_key_pressed (ALLEGRO_KEY_N, true))
-    room = level->link[room].b;
+    room_view = level->link[room_view].b;
 
-  if (room == 0) room = prev_room;
+  if (room_view == 0) room_view = prev_room;
 
-  clear_bitmap (screen, BLACK);
-  draw_room (room);
-  draw_fire (room);
-  if (room == kid.room) {
+  level_draw_base ();
+  if (room_view == kid.room) {
     kid.draw ();
     draw_room_anim_fg (kid);
   }
+}
+
+void
+level_draw_base (void)
+{
+  clear_bitmap (screen, BLACK);
+  draw_room (room_view);
+  draw_fire (room_view);
 }

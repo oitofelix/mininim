@@ -24,7 +24,9 @@
 
 /* current level */
 extern struct level *level;
+extern unsigned int room_view;
 
 void play_level (struct level *level);
+void level_draw_base (void);
 
 #endif	/* FREEPOP_LEVEL_H */

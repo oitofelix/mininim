@@ -48,11 +48,29 @@ static struct level level_1 = {
       {PILLAR}, {FLOOR}, {FLOOR,BRICKS_01}, {PILLAR}, {FLOOR}},
      {{WALL}, {WALL}, {WALL}, {WALL}, {WALL},
       {WALL}, {WALL}, {WALL}, {WALL}, {WALL}}},
+
+    [3] =
+    {{{WALL}, {WALL}, {WALL}, {WALL}, {WALL},
+      {WALL}, {WALL}, {WALL}, {WALL}, {WALL}},
+     {{PILLAR}, {FLOOR,BRICKS_01}, {FLOOR}, {FLOOR,TORCH}, {FLOOR,BRICKS_01},
+      {FLOOR,TORCH}, {FLOOR}, {FLOOR,BRICKS_01}, {FLOOR,BRICKS_01}, {PILLAR}},
+     {{WALL}, {WALL}, {WALL}, {WALL}, {WALL},
+      {WALL}, {WALL}, {WALL}, {WALL}, {WALL}}},
+
+    [9] =
+    {{{FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR},
+      {NO_FLOOR}, {NO_FLOOR,BRICKS_04}, {NO_FLOOR}, {NO_FLOOR}, {WALL}},
+     {{PILLAR}, {FLOOR,BRICKS_01}, {FLOOR,TORCH}, {FLOOR}, {FLOOR},
+      {FLOOR,TORCH}, {FLOOR}, {FLOOR,BRICKS_01}, {FLOOR}, {WALL}},
+     {{WALL}, {WALL}, {WALL}, {WALL}, {WALL},
+      {WALL}, {WALL}, {WALL}, {WALL}, {WALL}}},
   },
 
-  .link = {{0, 0, 0, 0},
-           {0, 0, 0, 2},
-           {0, 0, 1, 0},},
+  .link = {[0] = {0, 0, 0, 0},
+           [1] = {0, 0, 0, 2},
+           [2] = {0, 3, 1, 0},
+           [3] = {2, 9, 0, 0},
+           [9] = {3, 0, 0, 0},},
 };
 
 void

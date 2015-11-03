@@ -41,6 +41,25 @@ construct_rel (struct pos p, int floor, int place)
   return construct (p);
 }
 
+void
+norm_anim (struct anim *a)
+{
+  struct pos p = norm_pos (room_pos_mid (*a), true);
+
+  if (a->room == p.room) return;
+
+  if (level->link[a->room].l == p.room)
+    a->x += PLACE_WIDTH * PLACES;
+  if (level->link[a->room].r == p.room)
+    a->x -= PLACE_WIDTH * PLACES;
+  if (level->link[a->room].a == p.room)
+    a->y += PLACE_HEIGHT * FLOORS;
+  if (level->link[a->room].b == p.room)
+    a->y -= PLACE_HEIGHT * FLOORS;
+
+  a->room = p.room;
+}
+
 struct pos
 norm_pos (struct pos p, bool floor_first)
 {
@@ -202,7 +221,7 @@ is_hitting_ceiling (struct anim a)
   struct pos bottom = room_pos_br (a);
   struct construct c = construct (top);
 
-  if (! is_kid_vjump ()) return false;
+  if (a.id == &kid && ! is_kid_vjump ()) return false;
 
   if (top.floor != bottom.floor && c.fg != NO_FLOOR) return true;
 
@@ -227,6 +246,18 @@ to_fall_edge (struct anim *a)
   printf ("df = %i\n", df);
 }
 
+bool
+is_on_loose_floor (struct anim a)
+{
+  struct pos p = pos (a);
+  struct construct c = construct (p);
+  if (a.id == &kid && (is_kid_start_jump () ||
+                       is_kid_jump () || is_kid_stop_jump ()))
+    return false;
+  if (c.fg == LOOSE_FLOOR) return true;
+  return false;
+}
+
 void
 apply_physics (struct anim *a, ALLEGRO_BITMAP *frame,
                int dx, int dy)
@@ -246,6 +277,15 @@ apply_physics (struct anim *a, ALLEGRO_BITMAP *frame,
              && na.draw != na.collision) {
     na.odraw = na.draw;
     na.draw = na.fall;
+  } else if (is_on_loose_floor (na)) {
+    struct pos p = pos (na);
+    level->construct[p.room][p.floor][p.place].fg = NO_FLOOR;
+  }
+
+  norm_anim (&na);
+  if (a->id == &kid && room_view == a->room && a->room != na.room) {
+    room_view = na.room;
+    level_draw_base ();
   }
 
   (*a) = na;

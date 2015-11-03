@@ -24,6 +24,7 @@
 
 /* types */
 struct anim {
+  struct anim *id;
   unsigned int room;
   int x, y;
   ALLEGRO_BITMAP *frame;
