@@ -1479,19 +1479,40 @@ draw_kid_misstep (void)
 void
 draw_kid_hang (void)
 {
+  static unsigned int i = 0;
   kid.draw = draw_kid_hang;
   kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
   kid.fall = false;
 
   if (kid.frame == kid_vjump_13)
-    draw_anim (&kid, kid_hang_14, -4, 0);
+    draw_anim (&kid, kid_hang_14, -4, +0);
   else if (kid.frame == kid_hang_14)
-    draw_anim (&kid, kid_hang_04, +0, 0);
-  else if (kid.frame == kid_hang_04) {
-    draw_anim (&kid, kid_vjump_15, +8, +8);
-    kid.draw = draw_kid_vjump;
-  }
+    draw_anim (&kid, kid_hang_04, +0, +0);
+  else if (kid.frame == kid_hang_04 && i == 0) {
+    if (shift_key)
+      draw_anim (&kid, kid_hang_05, +1, +0);
+    else {
+      draw_anim (&kid, kid_vjump_15, +8, +8);
+      kid.draw = draw_kid_vjump;
+    }
+  } else if (kid.frame == kid_hang_05 && i == 0)
+    draw_anim (&kid, kid_hang_06, +1, -1), i++;
+  else if (kid.frame == kid_hang_06 && i == 1)
+    draw_anim (&kid, kid_hang_06, +0, +0), i++;
+  else if (kid.frame == kid_hang_06 && i == 2)
+    draw_anim (&kid, kid_hang_05, -1, +1), i++;
+  else if (kid.frame == kid_hang_05 && i == 3)
+    draw_anim (&kid, kid_hang_05, +0, +0), i++;
+  else if (kid.frame == kid_hang_05 && i == 4)
+    draw_anim (&kid, kid_hang_04, -1, +0), i++;
+  else if (kid.frame == kid_hang_04 && i == 5)
+    if (shift_key)  draw_anim (&kid, kid_hang_04, +0, +0);
+    else {
+      draw_anim (&kid, kid_vjump_15, +8, +8);
+      kid.draw = draw_kid_vjump;
+      i = 0;
+    }
   else
     error (-1, 0, "%s: unknown frame (%p)", __func__, kid.frame);
 
