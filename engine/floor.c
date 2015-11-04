@@ -83,6 +83,7 @@ create_floor_loose_02_bitmap (void)
   int h = max (hl, hr) + hb;
 
   ALLEGRO_BITMAP *bitmap = create_bitmap (w, h);
+  clear_bitmap (bitmap, al_map_rgba (0, 0, 0, 0));
   draw_bitmap (floor_loose_base_02, bitmap, 0, 14, 0);
   draw_bitmap (floor_loose_left_02, bitmap, 0, 1, 0);
   draw_bitmap (floor_loose_right_02, bitmap, 32, 0, 0);

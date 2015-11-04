@@ -70,7 +70,6 @@ void draw_jaffar_lower_arms (void);
 void draw_jaffar_turn_walk (void);
 
 /* variables */
-extern void (*draw_jaffar) (void); /* mutable draw function */
 extern struct anim jaffar; /* animation object */
 
 extern ALLEGRO_BITMAP *jaffar_normal,

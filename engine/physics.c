@@ -337,11 +337,16 @@ apply_physics (struct anim *a, ALLEGRO_BITMAP *frame,
 {
   struct anim na = next_anim (*a, frame, dx, dy);
 
+  if (cutscene) {
+    (*a) = na;
+    return;
+  }
+
   if (is_hitting_ceiling (na)) {
     na.odraw = na.draw;
     na.draw = na.ceiling;
   } else if (is_colliding (na)
-      && na.draw != na.collision) {
+             && na.draw != na.collision) {
     na.odraw = na.draw;
     na.draw = na.collision;
     to_collision_edge (&na);

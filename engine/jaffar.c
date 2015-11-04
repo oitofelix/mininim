@@ -38,7 +38,6 @@ ALLEGRO_BITMAP *jaffar_normal,
   *jaffar_lower_arms_30, *jaffar_lower_arms_31, *jaffar_lower_arms_32,
   *jaffar_lower_arms_33, *jaffar_lower_arms_34, *jaffar_lower_arms_35;
 
-void (*draw_jaffar) (void); /* mutable jaffar draw function */
 struct anim jaffar; /* jaffar animation object */
 
 void
@@ -130,7 +129,7 @@ unload_jaffar (void)
 void
 draw_jaffar_normal (void)
 {
-  draw_jaffar = draw_jaffar_normal;
+  jaffar.draw = draw_jaffar_normal;
   jaffar.flip = (jaffar.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
   /* coming from walk */
@@ -148,7 +147,7 @@ draw_jaffar_normal (void)
 void
 draw_jaffar_walk (void)
 {
-  draw_jaffar = draw_jaffar_walk;
+  jaffar.draw = draw_jaffar_walk;
   jaffar.flip = (jaffar.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
   /* comming from turn walk */
@@ -179,14 +178,14 @@ draw_jaffar_walk (void)
       draw_anim (&jaffar, jaffar_walk_08, -2, 0);
   } else if (jaffar.frame == jaffar_walk_08) {
     draw_anim (&jaffar, jaffar_walk_09, +0, 0);
-    draw_jaffar = draw_jaffar_normal;
+    jaffar.draw = draw_jaffar_normal;
   } else error (-1, 0, "%s: unknown frame (%p)", __func__, jaffar.frame);
 }
 
 void
 draw_jaffar_open_arms (void)
 {
-  draw_jaffar = draw_jaffar_open_arms;
+  jaffar.draw = draw_jaffar_open_arms;
   jaffar.flip = (jaffar.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
   /* comming from normal */
@@ -203,7 +202,7 @@ draw_jaffar_open_arms (void)
 void
 draw_jaffar_raise_arms (void)
 {
-  draw_jaffar = draw_jaffar_raise_arms;
+  jaffar.draw = draw_jaffar_raise_arms;
   jaffar.flip = (jaffar.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
   /* comming from open arms */
@@ -238,7 +237,7 @@ draw_jaffar_raise_arms (void)
 void
 draw_jaffar_lower_arms (void)
 {
-  draw_jaffar = draw_jaffar_lower_arms;
+  jaffar.draw = draw_jaffar_lower_arms;
   jaffar.flip = (jaffar.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
   /* comming from raise arms */
@@ -255,14 +254,14 @@ draw_jaffar_lower_arms (void)
     draw_anim (&jaffar, jaffar_lower_arms_34, +0, 0);
   else if (jaffar.frame == jaffar_lower_arms_34) {
     draw_anim (&jaffar, jaffar_lower_arms_35, +7, 0);
-    draw_jaffar = draw_jaffar_normal;
+    jaffar.draw = draw_jaffar_normal;
   } else error (-1, 0, "%s: unknown frame (%p)", __func__, jaffar.frame);
 }
 
 void
 draw_jaffar_turn_walk (void)
 {
-  draw_jaffar = draw_jaffar_turn_walk;
+  jaffar.draw = draw_jaffar_turn_walk;
   jaffar.flip = (jaffar.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
   /* comming from normal */
@@ -288,6 +287,6 @@ draw_jaffar_turn_walk (void)
   else if (jaffar.frame == jaffar_turn_walk_18) {
     draw_anim (&jaffar, jaffar_turn_walk_19, +1, 0);
     jaffar.dir = (jaffar.dir == RIGHT) ? LEFT : RIGHT;
-    draw_jaffar = draw_jaffar_walk;
+    jaffar.draw = draw_jaffar_walk;
   } else error (-1, 0, "%s: unknown frame (%p)", __func__, jaffar.frame);
 }

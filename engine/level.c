@@ -41,6 +41,8 @@ struct level *level;
 void
 play_level (struct level *_level)
 {
+  cutscene = false;
+
   level = _level;
   load_level ();
   play_anim (level_anim, 12);

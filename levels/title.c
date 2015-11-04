@@ -110,6 +110,8 @@ title_unload (void)
 void
 play_title (void)
 {
+  cutscene = true;
+
   title_load ();
   play_anim (title_anim, 8);
   title_unload ();
@@ -196,13 +198,13 @@ title_anim (void)
       princess.y = 124;
       princess.frame = princess_normal;
       princess.dir = LEFT;
-      draw_princess = draw_princess_normal;
+      princess.draw = draw_princess_normal;
 
       jaffar.x = 321;
       jaffar.y = 119;
       jaffar.frame = jaffar_normal;
       jaffar.dir = LEFT;
-      draw_jaffar = draw_jaffar_normal;
+      jaffar.draw = draw_jaffar_normal;
 
       princess_room_clock = NULL;
 
@@ -231,37 +233,37 @@ title_anim (void)
     break;
   case 13:
     if (! is_playing_sample ()) {
-      draw_princess = draw_princess_turn;
+      princess.draw = draw_princess_turn;
       i++;
     }
     break;
   case 14:
     if (princess.frame == princess_normal) {
       play_sample (jaffar_appearing_3);
-      draw_jaffar = draw_jaffar_walk;
+      jaffar.draw = draw_jaffar_walk;
       i++;
     }
     break;
   case 15:
     if (get_sample_position () >= 3.0 && jaffar.frame == jaffar_normal) {
       jaffar.repeat = 5;
-      draw_jaffar = draw_jaffar_walk;
+      jaffar.draw = draw_jaffar_walk;
       i++;
     }
     break;
   case 16:
     if (get_sample_position () >= 12.0 && jaffar.frame == jaffar_normal) {
-      draw_jaffar = draw_jaffar_open_arms;
+      jaffar.draw = draw_jaffar_open_arms;
       i++;
     }
     break;
   case 17:
-    draw_princess = draw_princess_step_back;
+    princess.draw = draw_princess_step_back;
     i++;
     break;
   case 18:
     if (princess.frame == princess_step_back_15) {
-      draw_jaffar = draw_jaffar_raise_arms;
+      jaffar.draw = draw_jaffar_raise_arms;
       i++;
     }
     break;
@@ -274,7 +276,7 @@ title_anim (void)
     break;
   case 20:
     if (! is_video_effect_started () && jaffar.frame == jaffar_raise_arms_29) {
-      draw_jaffar = draw_jaffar_lower_arms;
+      jaffar.draw = draw_jaffar_lower_arms;
       i++;
     }
     break;
@@ -286,14 +288,14 @@ title_anim (void)
     break;
   case 22:
     if (get_sample_position () >= 1.0) {
-      draw_jaffar = draw_jaffar_turn_walk;
+      jaffar.draw = draw_jaffar_turn_walk;
       jaffar.repeat = 5;
       i++;
     }
     break;
   case 23:
     if (get_sample_position () >= 4.0) {
-      draw_princess = draw_princess_look_down;
+      princess.draw = draw_princess_look_down;
       i++;
     }
     break;
@@ -351,8 +353,8 @@ draw_princess_room (void)
   draw_bitmap (princess_room_bed, screen, 0, 142, 0);
   draw_princess_room_stars ();
   draw_princess_room_fire ();
-  (*draw_princess) ();
-  (*draw_jaffar) ();
+  princess.draw ();
+  jaffar.draw ();
   draw_clock ();
   draw_bitmap (princess_room_pillar, screen, 240, 120, 0);
 }

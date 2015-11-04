@@ -47,7 +47,6 @@ void draw_princess_step_back (void);
 void draw_princess_look_down (void);
 
 /* variables */
-extern void (*draw_princess) (void); /* princess mutable draw function */
 extern struct anim princess; /* princess animation object */
 
 extern ALLEGRO_BITMAP *princess_normal,

@@ -29,6 +29,7 @@
 /* set to true to quit animation */
 bool quit_anim;
 bool pause_anim = false;
+bool cutscene = false;
 
 void
 play_anim (void (*callback) (void), unsigned int freq)
@@ -96,7 +97,8 @@ draw_anim (struct anim *a, ALLEGRO_BITMAP *frame,
              int dx, int dy)
 {
   apply_physics (a, frame, dx, dy);
-  if (a->room == room_view) draw_bitmap (a->frame, screen, a->x, a->y, a->flip);
+  if (a->room == room_view || cutscene)
+    draw_bitmap (a->frame, screen, a->x, a->y, a->flip);
 }
 
 struct anim
