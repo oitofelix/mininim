@@ -90,6 +90,10 @@ bool is_on_loose_floor (struct anim a);
 int dist_loose_floor (struct anim a);
 void to_loose_floor_edge (struct anim *a);
 int pos_center_x (struct pos p);
+bool is_hangable (struct anim a);
+int dist_next_place (struct anim a);
+void to_next_place_edge (struct anim *a);
+struct pos pos_mid (struct anim a);
 void apply_physics (struct anim *a, ALLEGRO_BITMAP *frame,
                     int dx, int dy);
 

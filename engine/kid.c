@@ -53,7 +53,11 @@ ALLEGRO_BITMAP *kid_normal,
   *kid_vjump_01, *kid_vjump_02, *kid_vjump_03, *kid_vjump_04, *kid_vjump_05,
   *kid_vjump_06, *kid_vjump_07, *kid_vjump_08, *kid_vjump_09, *kid_vjump_10,
   *kid_vjump_11, *kid_vjump_12, *kid_vjump_13, *kid_vjump_15, *kid_vjump_16,
-  *kid_vjump_17, *kid_vjump_18, *kid_vjump_19;
+  *kid_vjump_17, *kid_vjump_18, *kid_vjump_19,
+  *kid_hang_00, *kid_hang_01, *kid_hang_02, *kid_hang_03,
+  *kid_hang_04, *kid_hang_05, *kid_hang_06, *kid_hang_07,
+  *kid_hang_08, *kid_hang_09, *kid_hang_10, *kid_hang_11,
+  *kid_hang_12, *kid_hang_14;
 
 struct anim kid; /* kid animation object */
 enum command command;
@@ -163,6 +167,20 @@ load_kid (void)
   kid_vjump_17 = load_bitmap (KID_VJUMP_17);
   kid_vjump_18 = load_bitmap (KID_VJUMP_18);
   kid_vjump_19 = load_bitmap (KID_VJUMP_19);
+  kid_hang_00 = load_bitmap (KID_HANG_00);
+  kid_hang_01 = load_bitmap (KID_HANG_01);
+  kid_hang_02 = load_bitmap (KID_HANG_02);
+  kid_hang_03 = load_bitmap (KID_HANG_03);
+  kid_hang_04 = load_bitmap (KID_HANG_04);
+  kid_hang_05 = load_bitmap (KID_HANG_05);
+  kid_hang_06 = load_bitmap (KID_HANG_06);
+  kid_hang_07 = load_bitmap (KID_HANG_07);
+  kid_hang_08 = load_bitmap (KID_HANG_08);
+  kid_hang_09 = load_bitmap (KID_HANG_09);
+  kid_hang_10 = load_bitmap (KID_HANG_10);
+  kid_hang_11 = load_bitmap (KID_HANG_11);
+  kid_hang_12 = load_bitmap (KID_HANG_12);
+  kid_hang_14 = load_bitmap (KID_HANG_14);
 
   kid.id = &kid;
   kid.room = 1;
@@ -284,6 +302,20 @@ unload_kid (void)
   al_destroy_bitmap (kid_vjump_17);
   al_destroy_bitmap (kid_vjump_18);
   al_destroy_bitmap (kid_vjump_19);
+  al_destroy_bitmap (kid_hang_00);
+  al_destroy_bitmap (kid_hang_01);
+  al_destroy_bitmap (kid_hang_02);
+  al_destroy_bitmap (kid_hang_03);
+  al_destroy_bitmap (kid_hang_04);
+  al_destroy_bitmap (kid_hang_05);
+  al_destroy_bitmap (kid_hang_06);
+  al_destroy_bitmap (kid_hang_07);
+  al_destroy_bitmap (kid_hang_08);
+  al_destroy_bitmap (kid_hang_09);
+  al_destroy_bitmap (kid_hang_10);
+  al_destroy_bitmap (kid_hang_11);
+  al_destroy_bitmap (kid_hang_12);
+  al_destroy_bitmap (kid_hang_14);
 }
 
 void draw_kid_normal ()
@@ -1276,6 +1308,11 @@ draw_kid_vjump (void)
   /* don't fall while jumping */
   kid.fall = NULL;
 
+  if (kid.frame == kid_normal && is_hangable (kid)) {
+    to_next_place_edge (&kid);
+    kid.ceiling = false;
+  }
+
   /* comming from normal */
   if (kid.frame == kid_normal)
     draw_anim (&kid, kid_vjump_01, +5, 0);
@@ -1304,9 +1341,10 @@ draw_kid_vjump (void)
     draw_anim (&kid, kid_vjump_12, +0, -3);
   else if (kid.frame == kid_vjump_12)
     draw_anim (&kid, kid_vjump_13, +0, -7);
-  else if (kid.frame == kid_vjump_13 && i == 0)
-    draw_anim (&kid, kid_vjump_13, +0, -4), i++;
-  else if (kid.frame == kid_vjump_13 && i == 1)
+  else if (kid.frame == kid_vjump_13 && i == 0) {
+    if (is_hangable (kid)) draw_kid_hang ();
+    else draw_anim (&kid, kid_vjump_13, +0, -4), i++;
+  } else if (kid.frame == kid_vjump_13 && i == 1)
     draw_anim (&kid, kid_vjump_13, +0, -2), i++;
   else if (kid.frame == kid_vjump_13 && i == 2)
     draw_anim (&kid, kid_vjump_13, +0, +0), i++;
@@ -1330,6 +1368,7 @@ draw_kid_vjump (void)
   if (kid.draw != draw_kid_vjump) {
     kid.collision = draw_kid_collision;
     kid.fall = draw_kid_fall;
+    kid.ceiling = draw_kid_ceiling;
     i = 0;
   }
 }
@@ -1432,4 +1471,30 @@ draw_kid_misstep (void)
   /* if this function won't be called next, restore the fall
      behavior */
   if (kid.draw != draw_kid_couch) kid.fall = draw_kid_fall;
+}
+
+void
+draw_kid_hang (void)
+{
+  kid.draw = draw_kid_hang;
+  kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
+
+  kid.fall = false;
+
+  if (kid.frame == kid_vjump_13)
+    draw_anim (&kid, kid_hang_14, -4, 0);
+  else if (kid.frame == kid_hang_14)
+    draw_anim (&kid, kid_hang_04, +0, 0);
+  else if (kid.frame == kid_hang_04) {
+    draw_anim (&kid, kid_vjump_15, +8, +8);
+    kid.draw = draw_kid_vjump;
+  }
+  else
+    error (-1, 0, "%s: unknown frame (%p)", __func__, kid.frame);
+
+  /* if this function won't be called next, restore the fall and
+     collision behavior, and reset the frame counter */
+  if (kid.draw != draw_kid_vjump) {
+    kid.fall = draw_kid_fall;
+  }
 }

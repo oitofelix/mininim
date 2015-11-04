@@ -160,6 +160,14 @@ pos (struct anim a)
 }
 
 struct pos
+pos_mid (struct anim a)
+{
+  int w = al_get_bitmap_width (a.frame);
+  int h = al_get_bitmap_height (a.frame);
+  return pos_xy (a.room, a.x + w / 2, a.y + h / 2);
+}
+
+struct pos
 pos_rel (struct pos p, int floor, int place)
 {
   p.floor += floor;
@@ -236,6 +244,18 @@ dist_fall (struct anim a)
   else
     while (is_falling (a) && abs (x - a.x) != PLACE_WIDTH)
       a.x -= inc;
+
+  return inc * (a.x - x);
+}
+
+int
+dist_next_place (struct anim a)
+{
+  struct pos p = pos (a);
+  int inc = (a.dir == LEFT) ? -1 : +1;
+  int x = a.x;
+
+  while (p.place == pos (a).place) a.x += inc;
 
   return inc * (a.x - x);
 }
@@ -318,6 +338,15 @@ to_loose_floor_edge (struct anim *a)
 }
 
 void
+to_next_place_edge (struct anim *a)
+{
+  int dn = dist_next_place (*a);
+  int dir = (a->dir == LEFT) ? -1 : +1;
+  a->x += dir * ((abs (dn) < PLACE_WIDTH) ? dn - 1 : 0);
+  printf ("dn = %i\n", dn);
+}
+
+void
 center_anim (struct anim *a)
 {
   struct pos p = pos (*a);
@@ -329,6 +358,18 @@ int
 pos_center_x (struct pos p)
 {
   return p.place * 32 + 28;
+}
+
+bool
+is_hangable (struct anim a)
+{
+  struct pos p = pos_mid (a);
+  int dir = (a.dir == LEFT) ? -1 : +1;
+  enum construct_fg fg = construct_rel (p, -1, dir).fg;
+
+  return (fg == FLOOR || fg == BROKEN_FLOOR
+          || fg == LOOSE_FLOOR || fg == PILLAR)
+    && construct_rel (p, -1, 0).fg == NO_FLOOR;
 }
 
 void

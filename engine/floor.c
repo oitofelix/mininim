@@ -145,7 +145,8 @@ draw_broken_floor_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
 void
 draw_floor_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
-  if (! is_kid_fall () && ! is_kid_vjump ()) return;
+  if ((! is_kid_fall () && ! is_kid_vjump ())
+      || kid.frame == kid_vjump_15) return;
 
   /* /\* fix a bug where the floor would be redraw over the last kid */
   /*    stabilization frame when turning on the edge *\/ */

@@ -123,6 +123,20 @@
 #define KID_VJUMP_17 "dat/kid/scaling/frame17.png"
 #define KID_VJUMP_18 "dat/kid/scaling/frame18.png"
 #define KID_VJUMP_19 "dat/kid/scaling/frame19.png"
+#define KID_HANG_00 "dat/kid/hanging and falling/frame00.png"
+#define KID_HANG_01 "dat/kid/hanging and falling/frame01.png"
+#define KID_HANG_02 "dat/kid/hanging and falling/frame02.png"
+#define KID_HANG_03 "dat/kid/hanging and falling/frame03.png"
+#define KID_HANG_04 "dat/kid/hanging and falling/frame04.png"
+#define KID_HANG_05 "dat/kid/hanging and falling/frame05.png"
+#define KID_HANG_06 "dat/kid/hanging and falling/frame06.png"
+#define KID_HANG_07 "dat/kid/hanging and falling/frame07.png"
+#define KID_HANG_08 "dat/kid/hanging and falling/frame08.png"
+#define KID_HANG_09 "dat/kid/hanging and falling/frame09.png"
+#define KID_HANG_10 "dat/kid/hanging and falling/frame10.png"
+#define KID_HANG_11 "dat/kid/hanging and falling/frame11.png"
+#define KID_HANG_12 "dat/kid/hanging and falling/frame12.png"
+#define KID_HANG_14 "dat/kid/scaling/frame14.png"
 
 enum command {
   RUN,
@@ -152,6 +166,7 @@ void draw_kid_collision (void);
 void draw_kid_fall (void);
 void draw_kid_couch (void);
 void draw_kid_misstep (void);
+void draw_kid_hang (void);
 
 bool is_kid_normal ();
 bool is_kid_start_walk (void);
