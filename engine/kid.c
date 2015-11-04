@@ -310,8 +310,9 @@ void draw_kid_normal ()
   unsigned int rx = kid.x % PLACE_WIDTH;
   int dc = dist_collision (kid);
   int df = dist_fall (kid);
+  int dl = dist_loose_floor (kid);
   if (a_key || d_key || w_key || s_key || enter_key)
-    printf ("floor = %u, place = %u, qx = %u, rx = %u, dc = %i, df = %i\n", p.floor, p.place, qx, rx, dc, df);
+    printf ("floor = %u, place = %u, qx = %u, rx = %u, dc = %i, df = %i, dl = %i\n", p.floor, p.place, qx, rx, dc, df, dl);
 
   /* comming from stabilize */
   if (kid.frame == kid_stabilize_08) {
@@ -353,16 +354,25 @@ is_kid_normal ()
 
 void draw_kid_walk ()
 {
+  static bool misstep = false;
   kid.draw = draw_kid_walk;
   kid.flip = (kid.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
   int dc = dist_collision (kid);
   int df = dist_fall (kid);
+  int dl = dist_loose_floor (kid);
 
   /* in the eminence of collision or fall, keep standing  */
-  if (dc == 1 || df == 1) {
+  if (dc == 1) {
     draw_anim (&kid, kid_normal, +0, 0);
     kid.draw = draw_kid_normal;
+    return;
+  }
+
+  /* in the eminence of fall or steping into a loose floor, misstep. */
+  if ((df == 1 || dl == 1) && ! misstep) {
+    misstep = true;
+    draw_kid_misstep ();
     return;
   }
 
@@ -383,10 +393,13 @@ void draw_kid_walk ()
     draw_anim (&kid, kid_walk_01, +0, 0);
   /* comming from walk */
   else if (kid.frame == kid_walk_01) {
-    if (dc < 9 || df < 9) draw_kid_walk_min ();
-    else if (dc < 16 || df < 16) draw_kid_walk_short ();
-    else if (dc < 27 || df < 27) draw_kid_walk_long ();
-    else draw_kid_walk_max ();
+    if (! misstep) {
+      if (dc < 9 || df < 9 || dl < 9) draw_kid_walk_min ();
+      else if (dc < 16 || df < 16 || dl < 16) draw_kid_walk_short ();
+      else if (dc < 27 || df < 27 || dl < 27) draw_kid_walk_long ();
+      else draw_kid_walk_max ();
+    } else draw_kid_walk_max ();
+    misstep = false;
   } else error (-1, 0, "%s: unknown frame (%p)", __func__, kid.frame);
 }
 
@@ -468,9 +481,6 @@ void draw_kid_walk_max ()
   kid.draw = draw_kid_walk_max;
   kid.flip = (kid.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  int dc = dist_collision (kid);
-  int df = dist_fall (kid);
-
   /* comming from walk */
   if (kid.frame == kid_walk_01)
     draw_anim (&kid, kid_walk_02, -1, 0);
@@ -493,8 +503,7 @@ void draw_kid_walk_max ()
   else if (kid.frame == kid_walk_10)
     draw_anim (&kid, kid_walk_11, +0, 0);
   else if (kid.frame == kid_walk_11) {
-    if (dc < 4 || df < 4) draw_anim_on_edge (&kid, kid_walk_12, +0, 0);
-    else draw_anim (&kid, kid_walk_12, +0, 0);
+    draw_anim (&kid, kid_walk_12, +0, 0);
     kid.draw = draw_kid_normal;
   }
   else error (-1, 0, "%s: unknown kid frame (%p)", __func__, kid.frame);
@@ -727,6 +736,15 @@ void draw_kid_turn ()
 
   /* retore the normal falling behavior */
   kid.fall = draw_kid_fall;
+}
+
+bool
+is_kid_turn (void)
+{
+  return kid.frame == kid_turn_01
+    || kid.frame == kid_turn_02
+    || kid.frame == kid_turn_03
+    || kid.frame == kid_turn_04;
 }
 
 void draw_kid_turn_run ()
@@ -1371,4 +1389,47 @@ draw_kid_ceiling (void)
     kid.y = PLACE_HEIGHT * p.floor;
     draw_anim (&kid, kid_vjump_15, -2, +4);
   }
+}
+
+void
+draw_kid_misstep (void)
+{
+  kid.draw = draw_kid_misstep;
+  kid.flip = (kid.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
+
+  kid.fall = NULL;
+
+  /* comming from normal */
+  if (kid.frame == kid_normal)
+    draw_anim (&kid, kid_walk_01, +0, 0);
+  /* comming from misstep */
+  else if (kid.frame == kid_walk_01)
+    draw_anim (&kid, kid_walk_02, +0, 0);
+  else if (kid.frame == kid_walk_02)
+    draw_anim (&kid, kid_walk_03, +0, 0);
+  else if (kid.frame == kid_walk_03)
+    draw_anim (&kid, kid_walk_04, -8, 0);
+  else if (kid.frame == kid_walk_04)
+    draw_anim (&kid, kid_walk_05, -6, 0);
+  else if (kid.frame == kid_walk_05)
+    draw_anim (&kid, kid_walk_06, -3, 0);
+  else if (kid.frame == kid_walk_06)
+    draw_anim (&kid, kid_jump_14, +6, 0);
+  else if (kid.frame == kid_jump_14)
+    draw_anim (&kid, kid_couch_10, +7, 0);
+  else if (kid.frame == kid_couch_10)
+    draw_anim (&kid, kid_couch_11, +3, 0);
+  else if (kid.frame == kid_couch_11)
+    draw_anim (&kid, kid_couch_12, +0, 0);
+  else if (kid.frame == kid_couch_12)
+    draw_anim (&kid, kid_couch_13, +4, 0);
+  else if (kid.frame == kid_couch_13) {
+    kid.fall = draw_kid_fall;
+    kid.draw = draw_kid_normal;
+    draw_anim_on_fall_or_loose_floor_edge (&kid, kid_normal, 0, +0);
+  }
+
+  /* if this function won't be called next, restore the fall
+     behavior */
+  if (kid.draw != draw_kid_couch) kid.fall = draw_kid_fall;
 }

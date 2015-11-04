@@ -137,12 +137,34 @@ draw_anim_on_fall_edge (struct anim *a, ALLEGRO_BITMAP* frame, int dx, int dy)
 }
 
 void
+draw_anim_on_loose_floor_edge (struct anim *a,
+                               ALLEGRO_BITMAP* frame, int dx, int dy)
+{
+  struct anim na = next_anim (*a, frame, dx, dy);
+  (*a) = na;
+  to_loose_floor_edge (a);
+  draw_anim (a, frame, +0, 0);
+}
+
+void
+draw_anim_on_fall_or_loose_floor_edge
+(struct anim *a, ALLEGRO_BITMAP* frame, int dx, int dy)
+{
+  struct anim na = next_anim (*a, frame, dx, dy);
+  (*a) = na;
+  to_fall_edge (a);
+  to_loose_floor_edge (a);
+  draw_anim (a, frame, +0, 0);
+}
+
+void
 draw_anim_on_edge (struct anim *a, ALLEGRO_BITMAP* frame, int dx, int dy)
 {
   struct anim na = next_anim (*a, frame, dx, dy);
   (*a) = na;
   to_collision_edge (a);
   to_fall_edge (a);
+  to_loose_floor_edge (a);
   draw_anim (a, frame, +0, 0);
 }
 

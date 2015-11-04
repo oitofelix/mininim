@@ -144,17 +144,19 @@ draw_broken_floor_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
 void
 draw_floor_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
-  /* fix a bug where the floor would be redraw over the last kid
-     stabilization frame when turning on the edge */
-  if (kid.frame == kid_stabilize_08) return;
+  if (! is_kid_fall () && ! is_kid_vjump ()) return;
 
-  /* don't redraw floors while the kid is on them */
-  if ((! is_falling (kid) && ! is_kid_fall () && ! is_kid_vjump ())
+  /* /\* fix a bug where the floor would be redraw over the last kid */
+  /*    stabilization frame when turning on the edge *\/ */
+  /* if (kid.frame == kid_stabilize_08) return; */
 
-      /* don't draw floors over kid's foots when jumping from the
-         edge */
-      || (is_kid_normal () || is_kid_start_jump () || is_kid_jump ()
-          || is_kid_start_couch () || is_kid_couch () || is_kid_stop_couch ())) return;
+  /* /\* don't redraw floors while the kid is on them *\/ */
+  /* if ((! is_falling (kid) && ! is_kid_fall () && ! is_kid_vjump ()) */
+
+  /*     /\* don't draw floors over kid's foots when jumping from the */
+  /*        edge *\/ */
+  /*     || (is_kid_normal () || is_kid_start_jump () || is_kid_jump () */
+  /*         || is_kid_start_couch () || is_kid_couch () || is_kid_stop_couch ())) return; */
 
   draw_floor (bitmap, p);
 
@@ -230,7 +232,9 @@ draw_shake_floor (void)
       || (i == 0
           && kid.frame != kid_jump_13
           && (! kid.just_fall || kid.frame != kid_couch_02)
-          && kid.frame != kid_vjump_19)) return;
+          && kid.frame != kid_vjump_19
+          && (kid.frame != kid_couch_11
+              || kid.draw != draw_kid_misstep))) return;
 
   struct pos p = pos (kid);
 

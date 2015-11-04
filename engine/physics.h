@@ -86,6 +86,9 @@ bool is_falling (struct anim anim);
 void to_collision_edge (struct anim *anim);
 void to_fall_edge (struct anim *anim);
 void center_anim (struct anim *a);
+bool is_on_loose_floor (struct anim a);
+int dist_loose_floor (struct anim a);
+void to_loose_floor_edge (struct anim *a);
 int pos_center_x (struct pos p);
 void apply_physics (struct anim *a, ALLEGRO_BITMAP *frame,
                     int dx, int dy);

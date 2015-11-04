@@ -52,6 +52,8 @@ bool wait_anim (unsigned int cycles);
 void draw_anim_on_collision_edge (struct anim *a, ALLEGRO_BITMAP* frame,
                                   int dx, int dy);
 void draw_anim_on_fall_edge (struct anim *a, ALLEGRO_BITMAP* frame, int dx, int dy);
+void draw_anim_on_loose_floor_edge (struct anim *a, ALLEGRO_BITMAP* frame, int dx, int dy);
+void draw_anim_on_fall_or_loose_floor_edge (struct anim *a, ALLEGRO_BITMAP* frame, int dx, int dy);
 
 /* variables */
 extern bool quit_anim; /* set to true to quit animation */

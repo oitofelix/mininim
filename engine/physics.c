@@ -272,6 +272,12 @@ to_fall_edge (struct anim *a)
 bool
 is_on_loose_floor (struct anim a)
 {
+  a.x += (a.dir == LEFT) ? 4 : -5;
+
+  if (a.draw == draw_kid_misstep) return false;
+  if (a.id == &kid && is_kid_stabilize ()) return false;
+  if (a.id == &kid && is_kid_turn ()) return false;
+
   struct pos p = pos (a);
   struct construct c = construct (p);
   if (a.id == &kid && (is_kid_start_jump () ||
@@ -279,6 +285,31 @@ is_on_loose_floor (struct anim a)
     return false;
   if (c.fg == LOOSE_FLOOR) return true;
   return false;
+}
+
+int
+dist_loose_floor (struct anim a)
+{
+  int inc = (a.dir == LEFT) ? -1 : +1;
+  int x = a.x;
+
+  if (! is_on_loose_floor (a))
+    while (! is_on_loose_floor (a) && abs (x - a.x) != PLACE_WIDTH)
+      a.x += inc;
+  else
+    while (is_on_loose_floor (a) && abs (x - a.x) != PLACE_WIDTH)
+      a.x -= inc;
+
+  return inc * (a.x - x);
+}
+
+void
+to_loose_floor_edge (struct anim *a)
+{
+  int dl = dist_loose_floor (*a);
+  int dir = (a->dir == LEFT) ? -1 : +1;
+  a->x += dir * ((abs (dl) < PLACE_WIDTH) ? dl - 1 : 0);
+  printf ("dl = %i\n", dl);
 }
 
 void

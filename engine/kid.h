@@ -151,6 +151,7 @@ void draw_kid_jump (void);
 void draw_kid_collision (void);
 void draw_kid_fall (void);
 void draw_kid_couch (void);
+void draw_kid_misstep (void);
 
 bool is_kid_normal ();
 bool is_kid_start_walk (void);
@@ -168,6 +169,8 @@ bool is_kid_stop_jump (void);
 bool is_kid_start_vjump (void);
 bool is_kid_vjump (void);
 bool is_kid_stop_vjump (void);
+bool is_kid_stabilize (void);
+bool is_kid_turn (void);
 
 
 /* variables */
