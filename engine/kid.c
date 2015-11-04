@@ -1301,6 +1301,7 @@ void
 draw_kid_vjump (void)
 {
   static int i = 0;
+  static bool hang = false;
 
   kid.draw = draw_kid_vjump;
   kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
@@ -1310,6 +1311,7 @@ draw_kid_vjump (void)
 
   if (kid.frame == kid_normal && is_hangable (kid)) {
     to_next_place_edge (&kid);
+    hang = true;
     kid.ceiling = false;
   }
 
@@ -1342,7 +1344,7 @@ draw_kid_vjump (void)
   else if (kid.frame == kid_vjump_12)
     draw_anim (&kid, kid_vjump_13, +0, -7);
   else if (kid.frame == kid_vjump_13 && i == 0) {
-    if (is_hangable (kid)) draw_kid_hang ();
+    if (hang) draw_kid_hang ();
     else draw_anim (&kid, kid_vjump_13, +0, -4), i++;
   } else if (kid.frame == kid_vjump_13 && i == 1)
     draw_anim (&kid, kid_vjump_13, +0, -2), i++;
@@ -1369,6 +1371,7 @@ draw_kid_vjump (void)
     kid.collision = draw_kid_collision;
     kid.fall = draw_kid_fall;
     kid.ceiling = draw_kid_ceiling;
+    hang = false;
     i = 0;
   }
 }
