@@ -152,6 +152,7 @@ void draw_kid_collision (void);
 void draw_kid_fall (void);
 void draw_kid_couch (void);
 
+bool is_kid_normal ();
 bool is_kid_start_walk (void);
 bool is_kid_walk (void);
 bool is_kid_stop_walk (void);

@@ -21,9 +21,10 @@
 #include "kernel/timer.h"
 #include "kernel/video.h"
 #include "kernel/keyboard.h"
-#include "anim.h"
 #include "physics.h"
 #include "kid.h"
+#include "level.h"
+#include "anim.h"
 
 /* set to true to quit animation */
 bool quit_anim;
@@ -95,14 +96,13 @@ draw_anim (struct anim *a, ALLEGRO_BITMAP *frame,
              int dx, int dy)
 {
   apply_physics (a, frame, dx, dy);
-  draw_bitmap (a->frame, screen, a->x, a->y, a->flip);
+  if (a->room == room_view) draw_bitmap (a->frame, screen, a->x, a->y, a->flip);
 }
 
 struct anim
 next_anim (struct anim a, ALLEGRO_BITMAP* frame, int dx, int dy)
 {
-  struct anim na;
-  memcpy (&na, &a, sizeof (struct anim));
+  struct anim na = a;
 
   int ow = al_get_bitmap_width (a.frame);
   int oh = al_get_bitmap_height (a.frame);

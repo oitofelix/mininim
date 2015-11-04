@@ -63,7 +63,7 @@ struct xy broken_floor_front_xy (struct pos pos);
 void release_loose_floor (struct pos p);
 void draw_shake_floor (void);
 void draw_release_loose_floor (void);
-void draw_floor_fall (struct loose_floor *f);
+void draw_floor_fall (void);
 void draw_loose_floor_01 (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_loose_floor_02 (ALLEGRO_BITMAP *bitmap, struct pos p);
 struct xy floor_loose_base_xy (struct pos p);

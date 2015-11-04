@@ -85,6 +85,8 @@ int dist_fall (struct anim anim);
 bool is_falling (struct anim anim);
 void to_collision_edge (struct anim *anim);
 void to_fall_edge (struct anim *anim);
+void center_anim (struct anim *a);
+int pos_center_x (struct pos p);
 void apply_physics (struct anim *a, ALLEGRO_BITMAP *frame,
                     int dx, int dy);
 

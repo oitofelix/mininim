@@ -356,8 +356,8 @@ void draw_kid_walk ()
   kid.draw = draw_kid_walk;
   kid.flip = (kid.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  unsigned int dc = dist_collision (kid);
-  unsigned int df = dist_fall (kid);
+  int dc = dist_collision (kid);
+  int df = dist_fall (kid);
 
   /* in the eminence of collision or fall, keep standing  */
   if (dc == 1 || df == 1) {
@@ -597,7 +597,7 @@ void draw_kid_stop_run ()
     return;
   }
 
-  unsigned int dc = dist_collision (kid);
+  int dc = dist_collision (kid);
 
   /* comming from stop run */
   if (kid.frame == kid_stop_run_01)
@@ -787,7 +787,7 @@ draw_kid_stabilize (void)
     || ((kid.dir == LEFT) && left_key && up_key);
   bool couch = down_key;
 
-  unsigned int dc = dist_collision (kid);
+  int dc = dist_collision (kid);
 
   /* don't fall nor collide */
   kid.collision = NULL;
@@ -1028,8 +1028,13 @@ draw_kid_fall (void)
       && ! is_kid_jump ()) {
     /* reset the inertia */
     inertia = 0;
+
     /* move horizontally so the kid doesn't fall through the floor */
-    kid.x += (kid.dir == LEFT) ? -6 : 8;
+    if (dist_fall (kid) > -13)
+      kid.x += (kid.dir == LEFT) ? -6 : 8;
+
+    /* prevent kid from getting stuck in the edges */
+    /* if (is_pos_eq (pos (kid), p)) center_anim (&kid); */
   }
 
   /* let the kid start the jump without falling */
@@ -1045,7 +1050,11 @@ draw_kid_fall (void)
     /* force fall from this floor */
     force_floor = p.floor;
     /* revert kid's direction */
-    kid.dir = (kid.dir == LEFT) ? RIGHT : LEFT;
+    if (kid.frame != kid_turn_run_13)
+      kid.dir = (kid.dir == LEFT) ? RIGHT : LEFT;
+
+    /* prevent kid from falling inside walls */
+    kid.x += (kid.dir == LEFT) ? 8 : -8;
   }
 
   /* if the kid was starting to run, get a little bit of inertia  */
@@ -1148,10 +1157,10 @@ draw_kid_couch (void)
   /* at each frame reduce the inertia */
   if (inertia > 0) inertia--;
 
-  unsigned int df = dist_fall (kid);
-
-  /* unless the kid is sufficiently next to the edge, don't fall */
-  if (df > 9) kid.fall = NULL;
+  /* don't fall if getting up */
+  if (is_kid_stop_couch ())
+    kid.fall = NULL;
+  else kid.fall = draw_kid_fall;
 
   bool keep_couched = down_key;
   /* if the kid is uncouching and a command is given to couch again,
@@ -1169,7 +1178,11 @@ draw_kid_couch (void)
   else if (kid.frame == kid_couch_03) {
     if (keep_couched)
       draw_anim (&kid, kid_couch_03, inertia ? -3 : 0, 0);
-    else draw_anim (&kid, kid_couch_04, -2, 0);
+    else {
+      /* kid shouldn't fall while uncouching. */
+      kid.fall = NULL;
+      draw_anim (&kid, kid_couch_04, -2, 0);
+    }
   } else if (kid.frame == kid_couch_04)
     draw_anim (&kid, kid_couch_05, +0, 0);
   else if (kid.frame == kid_couch_05)

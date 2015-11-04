@@ -282,6 +282,20 @@ is_on_loose_floor (struct anim a)
 }
 
 void
+center_anim (struct anim *a)
+{
+  struct pos p = pos (*a);
+  int w = al_get_bitmap_width (a->frame);
+  a->x = pos_center_x (p) - w / 2;
+}
+
+int
+pos_center_x (struct pos p)
+{
+  return p.place * 32 + 28;
+}
+
+void
 apply_physics (struct anim *a, ALLEGRO_BITMAP *frame,
                int dx, int dy)
 {

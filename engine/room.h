@@ -29,6 +29,8 @@
 #define VDUNGEON_TORCH "dat/vdungeon/background/torch.png"
 #define VDUNGEON_WINDOW "dat/vdungeon/background/window.png"
 
+extern ALLEGRO_BITMAP *room_bg;
+
 void load_room (void);
 void unload_room (void);
 void draw_room (int room);

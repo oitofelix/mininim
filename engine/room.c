@@ -90,13 +90,14 @@ unload_room (void)
 void
 draw_room (int room)
 {
+  if (room_view != room) return;
+
   if (room != current_room) {
     current_room = room;
     draw_room_bg ();
   }
   draw_bitmap (room_bg, screen, 0, 0, 0);
 }
-
 
 void
 draw_room_bg (void)
@@ -340,6 +341,8 @@ draw_room_anim_fg (struct anim a)
 void
 draw_room_fg (struct pos p)
 {
+  if (room_view != p.room) return;
+
   switch (construct (p).fg) {
   case NO_FLOOR:
     break;

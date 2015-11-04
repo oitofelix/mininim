@@ -153,7 +153,8 @@ draw_floor_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
 
       /* don't draw floors over kid's foots when jumping from the
          edge */
-      || is_kid_start_jump () || is_kid_jump ()) return;
+      || (is_kid_normal () || is_kid_start_jump () || is_kid_jump ()
+          || is_kid_start_couch () || is_kid_couch () || is_kid_stop_couch ())) return;
 
   draw_floor (bitmap, p);
 
@@ -248,6 +249,8 @@ draw_shake_floor (void)
     }
 }
 
+static struct loose_floor *cfloor;
+
 void
 draw_release_loose_floor (void)
 {
@@ -255,7 +258,7 @@ draw_release_loose_floor (void)
   for (i = 0; i < PLACES * FLOORS; i++)
     if (loose_floor[i].p.room) {
       struct pos p = loose_floor[i].p;
-      draw_no_floor (screen, p);
+      if (loose_floor[i].i == 0) draw_no_floor (room_bg, p);
       switch (loose_floor[i].i) {
       case 0: draw_loose_floor_01 (screen, p); break;
       case 1: draw_floor (screen, p); break;
@@ -268,32 +271,58 @@ draw_release_loose_floor (void)
       case 8: draw_loose_floor_02 (screen, p); break;
       case 9: draw_loose_floor_02 (screen, p); break;
       case 10:
+        draw_loose_floor_02 (screen, p);
         set_construct_fg (p, NO_FLOOR);
         struct xy xy = floor_left_xy (loose_floor[i].p);
         loose_floor[i].a.frame = floor_loose_02;
         loose_floor[i].a.room = loose_floor[i].p.room;
         loose_floor[i].a.x = xy.x;
         loose_floor[i].a.y = xy.y;
-        loose_floor[i].draw = draw_floor_fall;
-        break;
+        loose_floor[i].a.fall = draw_floor_fall;
+        loose_floor[i].a.draw = draw_floor_fall;
+      break;
       default:
-        /* loose_floor[i].draw (&loose_floor[i]); */
-        loose_floor[i].p.room = 0;
+        cfloor = &loose_floor[i];
+        loose_floor[i].a.draw ();
         break;
       }
-      loose_floor[i].i++;
-      draw_construct_left (screen, pos_rel (p, 0, +1));
-      draw_anim (&kid, kid.frame, 0, 0);
+      if (loose_floor[i].i < 11) {
+        loose_floor[i].i++;
+        draw_construct_left (screen, pos_rel (p, 0, +1));
+        draw_anim (&kid, kid.frame, 0, 0);
+      }
     }
 }
 
 void
-draw_floor_fall (struct loose_floor *f)
+draw_floor_fall (void)
 {
-  unsigned int speed = 3 * (f->i - 10);
-  if (speed < 33) f->i++;
+  unsigned int speed = 3 * (cfloor->i - 10);
+  if (speed < 33) cfloor->i++;
   speed = (speed > 33) ? 33 : speed;
-  draw_anim (&f->a, floor_loose_02, 0, speed);
+
+  struct pos p = room_pos_mid (cfloor->a);
+  struct pos pn = room_pos_mid (next_anim (cfloor->a, cfloor->a.frame, 0, speed));
+  struct pos pk = pos (kid);
+
+  if (construct (p).fg == NO_FLOOR
+      || is_pos_eq (p, pn)) {
+    draw_anim (&cfloor->a, floor_loose_02, 0, speed);
+    /* draw kid above the floor if he is higher */
+    if (pk.place == p.place && kid.y < cfloor->a.y - 16)
+      draw_anim (&kid, kid.frame, 0, 0);
+    if (room_view == p.room) draw_construct_left (screen, pos_rel (p, 0, +1));
+  } else {
+    set_construct_fg (p, BROKEN_FLOOR);
+    cfloor->p.room = 0;
+    if (room_view == p.room) {
+      draw_construct (room_bg, p);
+      draw_construct_left (room_bg, pos_rel (p, 0, +1));
+      draw_construct (screen, p);
+      draw_construct_left (screen, pos_rel (p, 0, +1));
+      draw_anim (&kid, kid.frame, 0, 0);
+    }
+  }
 }
 
 void
