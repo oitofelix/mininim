@@ -166,6 +166,13 @@ pos_mid (struct anim a)
   return pos_xy (a.room, xy.x, xy.y);
 }
 
+struct pos
+pos_mid_front (struct anim a)
+{
+  struct xy xy = xy_mid_front (a);
+  return pos_xy (a.room, xy.x, xy.y);
+}
+
 struct xy
 xy_mid (struct anim a)
 {
@@ -173,6 +180,17 @@ xy_mid (struct anim a)
   int h = al_get_bitmap_height (a.frame);
   struct xy xy;
   xy.x = a.x + w / 2;
+  xy.y = a.y + h / 2;
+  return xy;
+}
+
+struct xy
+xy_mid_front (struct anim a)
+{
+  int w = al_get_bitmap_width (a.frame);
+  int h = al_get_bitmap_height (a.frame);
+  struct xy xy;
+  xy.x = (a.dir == LEFT) ? a.x : a.x + w - 1;
   xy.y = a.y + h / 2;
   return xy;
 }
@@ -265,7 +283,21 @@ dist_next_place (struct anim a)
   int inc = (a.dir == LEFT) ? -1 : +1;
   int x = a.x;
 
-  while (p.place == pos (a).place) a.x += inc;
+  while (p.place == pos (a).place && abs (x - a.x) != PLACE_WIDTH)
+    a.x += inc;
+
+  return inc * (a.x - x);
+}
+
+int
+dist_prev_place (struct anim a)
+{
+  struct pos p = pos (a);
+  int inc = (a.dir == LEFT) ? +1 : -1;
+  int x = a.x;
+
+  while (p.place == pos (a).place && abs (x - a.x) != PLACE_WIDTH)
+    a.x += inc;
 
   return inc * (a.x - x);
 }
@@ -313,11 +345,12 @@ is_on_loose_floor (struct anim a)
   if (a.id == &kid && is_kid_stabilize ()) return false;
   if (a.id == &kid && is_kid_turn ()) return false;
 
-  struct pos p = pos (a);
-  struct construct c = construct (p);
   if (a.id == &kid && (is_kid_start_jump () ||
                        is_kid_jump () || is_kid_stop_jump ()))
     return false;
+
+  struct construct c = construct (pos (a));
+
   if (c.fg == LOOSE_FLOOR) return true;
   return false;
 }
@@ -357,6 +390,15 @@ to_next_place_edge (struct anim *a)
 }
 
 void
+to_prev_place_edge (struct anim *a)
+{
+  int dp = dist_prev_place (*a);
+  int dir = (a->dir == LEFT) ? +1 : -1;
+  a->x += dir * ((abs (dp) < PLACE_WIDTH) ? dp : 0);
+  printf ("dp = %i\n", dp);
+}
+
+void
 center_anim (struct anim *a)
 {
   struct pos p = pos (*a);
@@ -371,15 +413,21 @@ pos_center_x (struct pos p)
 }
 
 bool
-is_hangable (struct anim a)
+is_hangable_pos (struct pos p, enum direction direction)
 {
-  struct pos p = pos_mid (a);
-  int dir = (a.dir == LEFT) ? -1 : +1;
+  int dir = (direction == LEFT) ? -1 : +1;
   enum construct_fg fg = construct_rel (p, -1, dir).fg;
 
   return (fg == FLOOR || fg == BROKEN_FLOOR
           || fg == LOOSE_FLOOR || fg == PILLAR)
     && construct_rel (p, -1, 0).fg == NO_FLOOR;
+}
+
+bool
+is_hangable (struct anim a)
+{
+  struct pos p = pos_mid_front (a);
+  return is_hangable_pos (p, a.dir);
 }
 
 void

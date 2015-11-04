@@ -183,10 +183,11 @@ load_kid (void)
   kid_hang_14 = load_bitmap (KID_HANG_14);
 
   kid.id = &kid;
-  kid.room = 1;
-  kid.x = 230;
+  kid.room = 9;
+  kid.x = 64;
+  /* kid.x = 230; */
   /* kid.x = 10; */
-  kid.y = 15 + 63 * 0;
+  kid.y = 15 + 63 * 1;
   kid.frame = kid_normal;
   kid.dir = LEFT;
   kid.collision = draw_kid_collision;
@@ -343,8 +344,10 @@ void draw_kid_normal ()
   int dc = dist_collision (kid);
   int df = dist_fall (kid);
   int dl = dist_loose_floor (kid);
+  int dn = dist_next_place (kid);
+  int dp = dist_prev_place (kid);
   if (a_key || d_key || w_key || s_key || enter_key)
-    printf ("floor = %u, place = %u, qx = %u, rx = %u, dc = %i, df = %i, dl = %i\n", p.floor, p.place, qx, rx, dc, df, dl);
+    printf ("floor = %u, place = %u, qx = %u, rx = %u, dc = %i, df = %i, dl = %i, dn = %i, dp = %i\n", p.floor, p.place, qx, rx, dc, df, dl, dn, dp);
 
   /* comming from stabilize */
   if (kid.frame == kid_stabilize_08) {
@@ -1309,8 +1312,16 @@ draw_kid_vjump (void)
   /* don't fall while jumping */
   kid.fall = NULL;
 
+  int dir = (kid.dir == LEFT) ? +1 : -1;
   if (kid.frame == kid_normal && is_hangable (kid)) {
     to_next_place_edge (&kid);
+    hang = true;
+    kid.ceiling = false;
+  } else if (kid.frame == kid_normal
+             && dist_next_place (kid) > 16
+             && is_hangable_pos (pos_rel (pos (kid), 0, dir),
+                                 kid.dir)) {
+    to_prev_place_edge (&kid);
     hang = true;
     kid.ceiling = false;
   }
@@ -1479,48 +1490,128 @@ draw_kid_misstep (void)
 void
 draw_kid_hang (void)
 {
-  static unsigned int i = 0;
   kid.draw = draw_kid_hang;
   kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  kid.fall = false;
+  int dir = (kid.dir == LEFT) ? -1 : +1;
+  enum construct_fg fg = construct_rel (pos_mid (kid), 0, dir).fg;
+
+  kid.fall = NULL;
 
   if (kid.frame == kid_vjump_13)
     draw_anim (&kid, kid_hang_14, -4, +0);
   else if (kid.frame == kid_hang_14)
     draw_anim (&kid, kid_hang_04, +0, +0);
-  else if (kid.frame == kid_hang_04 && i == 0) {
-    if (shift_key)
-      draw_anim (&kid, kid_hang_05, +1, +0);
-    else {
+  else if (kid.frame == kid_hang_04) {
+    if (shift_key && fg == WALL)
+      draw_kid_hang_wall ();
+    else if (shift_key) {
+      draw_kid_hang_free ();
+    } else {
       draw_anim (&kid, kid_vjump_15, +8, +8);
       kid.draw = draw_kid_vjump;
     }
-  } else if (kid.frame == kid_hang_05 && i == 0)
-    draw_anim (&kid, kid_hang_06, +1, -1), i++;
-  else if (kid.frame == kid_hang_06 && i == 1)
-    draw_anim (&kid, kid_hang_06, +0, +0), i++;
-  else if (kid.frame == kid_hang_06 && i == 2)
-    draw_anim (&kid, kid_hang_05, -1, +1), i++;
-  else if (kid.frame == kid_hang_05 && i == 3)
-    draw_anim (&kid, kid_hang_05, +0, +0), i++;
-  else if (kid.frame == kid_hang_05 && i == 4)
-    draw_anim (&kid, kid_hang_04, -1, +0), i++;
-  else if (kid.frame == kid_hang_04 && i == 5)
-    if (shift_key)  draw_anim (&kid, kid_hang_04, +0, +0);
-    else {
-      draw_anim (&kid, kid_vjump_15, +8, +8);
-      kid.draw = draw_kid_vjump;
-      i = 0;
-    }
+  }
   else
     error (-1, 0, "%s: unknown frame (%p)", __func__, kid.frame);
 
-  /* if this function won't be called next, restore the fall and
-     collision behavior, and reset the frame counter */
-  if (kid.draw != draw_kid_vjump) {
+  /* if this function won't be called next, restore the fall
+     behavior */
+  if (kid.draw != draw_kid_hang)
     kid.fall = draw_kid_fall;
+}
+
+void
+draw_kid_hang_wall (void)
+{
+  static unsigned int i = 0;
+
+  kid.draw = draw_kid_hang_wall;
+  kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
+
+  kid.fall = NULL;
+
+  if (! shift_key) {
+    kid.frame = kid_vjump_15;
+    kid.x += (kid.dir == LEFT) ? +8 : -8;;
+    kid.y = 63 * pos_mid (kid).floor;
+    draw_anim (&kid, kid_vjump_15, +0, +0);
+    kid.draw = draw_kid_vjump;
+    i = 0;
+    return;
   }
+
+  switch (i) {
+  case 0: draw_anim (&kid, kid_hang_05, +1, +0); i++; break;
+  case 1: draw_anim (&kid, kid_hang_06, +1, -1); i++; break;
+  case 2: draw_anim (&kid, kid_hang_06, +0, +0); i++; break;
+  case 3: draw_anim (&kid, kid_hang_05, -1, +1); i++; break;
+  case 4: draw_anim (&kid, kid_hang_05, +0, +0); i++; break;
+  case 5: draw_anim (&kid, kid_hang_04, -1, +0); i++; break;
+  case 6: draw_anim (&kid, kid_hang_04, +0, +0); break;
+  }
+
+  /* if this function won't be called next, restore the fall
+     behavior */
+  if (kid.draw != draw_kid_hang_wall)
+    kid.fall = draw_kid_fall;
+}
+
+void
+draw_kid_hang_free (void)
+{
+  static unsigned int i = 0;
+  static unsigned int j = 0;
+
+  kid.draw = draw_kid_hang_free;
+  kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
+
+  kid.fall = NULL;
+
+  if (! shift_key || j == 2) {
+    kid.frame = kid_vjump_15;
+    kid.x += (kid.dir == LEFT) ? +8 : -8;;
+    kid.y = 63 * pos_mid (kid).floor;
+    draw_anim (&kid, kid_vjump_15, +0, +0);
+    kid.draw = draw_kid_vjump;
+    i = 0;
+    j = 0;
+    return;
+  }
+
+  switch (i) {
+  case 0: draw_anim (&kid, kid_hang_03, -2, +0); i++; break;
+  case 1: draw_anim (&kid, kid_hang_02, -3, -2); i++; break;
+  case 2: draw_anim (&kid, kid_hang_01, -6, +0); i++; break;
+  case 3: draw_anim (&kid, kid_hang_00, +0, -2); i++; break;
+  case 4: draw_anim (&kid, kid_hang_00, +0, +0); i++; break;
+  case 5: draw_anim (&kid, kid_hang_00, +0, +0); i++; break;
+  case 6: draw_anim (&kid, kid_hang_01, +0, +2); i++; break;
+  case 7: draw_anim (&kid, kid_hang_02, +6, +0); i++; break;
+  case 8: draw_anim (&kid, kid_hang_03, +3, +2); i++; break;
+  case 9: draw_anim (&kid, kid_hang_04, +2, +0); i++; break;
+  case 10: draw_anim (&kid, kid_hang_05, +3, +0); i++; break;
+  case 11: draw_anim (&kid, kid_hang_06, +1, -1); i++; break;
+  case 12: draw_anim (&kid, kid_hang_07, +2, -1); i++; break;
+  case 13: draw_anim (&kid, kid_hang_08, +0, -2); i++; break;
+  case 14: draw_anim (&kid, kid_hang_09, +0, +0); i++; break;
+  case 15: draw_anim (&kid, kid_hang_10, +1, -1); i++; break;
+  case 16: draw_anim (&kid, kid_hang_11, +0, +0); i++; break;
+  case 17: draw_anim (&kid, kid_hang_12, -3, +0); i++; break;
+  case 18: draw_anim (&kid, kid_hang_11, +3, +0); i++; break;
+  case 19: draw_anim (&kid, kid_hang_10, +0, +0); i++; break;
+  case 20: draw_anim (&kid, kid_hang_09, -1, +1); i++; break;
+  case 21: draw_anim (&kid, kid_hang_08, +0, +0); i++; break;
+  case 22: draw_anim (&kid, kid_hang_07, +0, +2); i++; break;
+  case 23: draw_anim (&kid, kid_hang_06, -2, +1); i++; break;
+  case 24: draw_anim (&kid, kid_hang_05, -1, +1); i++; break;
+  case 25: draw_anim (&kid, kid_hang_04, -3, +0); i = 0; j++; break;
+  }
+
+  /* if this function won't be called next, restore the fall
+     behavior */
+  if (kid.draw != draw_kid_hang_free)
+    kid.fall = draw_kid_fall;
 }
 
 bool

@@ -151,6 +151,8 @@ draw_floor_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
   if (kid.frame == kid_vjump_15
       && xy_mid (kid).y < floor_left_xy (p).y) return;
 
+  if (is_kid_hang () && kid.dir == LEFT) return;
+
   /* /\* fix a bug where the floor would be redraw over the last kid */
   /*    stabilization frame when turning on the edge *\/ */
   /* if (kid.frame == kid_stabilize_08) return; */
@@ -213,9 +215,9 @@ release_loose_floor (struct pos p)
 {
   size_t i = 0;
 
-  if (construct (p).fg != LOOSE_FLOOR)
-    error (-1, 0, "%s: impossible to release non-loose floor (%u)",
-           __func__, construct (p).fg);
+  /* if (construct (p).fg != LOOSE_FLOOR) */
+  /*   error (-1, 0, "%s: impossible to release non-loose floor (%u)", */
+  /*          __func__, construct (p).fg); */
 
   while (loose_floor[i].p.room && i < PLACES * FLOORS) {
     if (is_pos_eq (loose_floor[i].p, p)) return;

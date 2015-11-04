@@ -65,7 +65,7 @@ unload_level (void)
   unload_kid ();
 }
 
-unsigned int room_view = 1;
+unsigned int room_view = 9;
 
 static void
 level_anim (void)

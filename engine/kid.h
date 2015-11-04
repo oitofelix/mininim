@@ -167,6 +167,8 @@ void draw_kid_fall (void);
 void draw_kid_couch (void);
 void draw_kid_misstep (void);
 void draw_kid_hang (void);
+void draw_kid_hang_wall (void);
+void draw_kid_hang_free (void);
 
 bool is_kid_normal ();
 bool is_kid_start_walk (void);
@@ -187,7 +189,6 @@ bool is_kid_stop_vjump (void);
 bool is_kid_stabilize (void);
 bool is_kid_turn (void);
 bool is_kid_hang (void);
-
 
 /* variables */
 extern struct anim kid; /* kid animation object */

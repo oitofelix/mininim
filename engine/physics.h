@@ -95,6 +95,11 @@ bool is_hangable (struct anim a);
 int dist_next_place (struct anim a);
 void to_next_place_edge (struct anim *a);
 struct pos pos_mid (struct anim a);
+struct xy xy_mid_front (struct anim a);
+struct pos pos_mid_front (struct anim a);
+bool is_hangable_pos (struct pos p, enum direction direction);
+void to_prev_place_edge (struct anim *a);
+int dist_prev_place (struct anim a);
 void apply_physics (struct anim *a, ALLEGRO_BITMAP *frame,
                     int dx, int dy);
 
