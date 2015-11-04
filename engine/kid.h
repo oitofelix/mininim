@@ -186,6 +186,7 @@ bool is_kid_vjump (void);
 bool is_kid_stop_vjump (void);
 bool is_kid_stabilize (void);
 bool is_kid_turn (void);
+bool is_kid_hang (void);
 
 
 /* variables */

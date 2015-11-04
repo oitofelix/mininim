@@ -1498,3 +1498,22 @@ draw_kid_hang (void)
     kid.fall = draw_kid_fall;
   }
 }
+
+bool
+is_kid_hang (void)
+{
+  return kid.frame == kid_hang_00
+    || kid.frame == kid_hang_01
+    || kid.frame == kid_hang_02
+    || kid.frame == kid_hang_03
+    || kid.frame == kid_hang_04
+    || kid.frame == kid_hang_05
+    || kid.frame == kid_hang_06
+    || kid.frame == kid_hang_07
+    || kid.frame == kid_hang_08
+    || kid.frame == kid_hang_09
+    || kid.frame == kid_hang_10
+    || kid.frame == kid_hang_11
+    || kid.frame == kid_hang_12
+    || kid.frame == kid_hang_14;
+}

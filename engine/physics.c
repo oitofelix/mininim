@@ -162,9 +162,19 @@ pos (struct anim a)
 struct pos
 pos_mid (struct anim a)
 {
+  struct xy xy = xy_mid (a);
+  return pos_xy (a.room, xy.x, xy.y);
+}
+
+struct xy
+xy_mid (struct anim a)
+{
   int w = al_get_bitmap_width (a.frame);
   int h = al_get_bitmap_height (a.frame);
-  return pos_xy (a.room, a.x + w / 2, a.y + h / 2);
+  struct xy xy;
+  xy.x = a.x + w / 2;
+  xy.y = a.y + h / 2;
+  return xy;
 }
 
 struct pos

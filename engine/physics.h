@@ -90,6 +90,7 @@ bool is_on_loose_floor (struct anim a);
 int dist_loose_floor (struct anim a);
 void to_loose_floor_edge (struct anim *a);
 int pos_center_x (struct pos p);
+struct xy xy_mid (struct anim a);
 bool is_hangable (struct anim a);
 int dist_next_place (struct anim a);
 void to_next_place_edge (struct anim *a);
