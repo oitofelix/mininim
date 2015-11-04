@@ -179,6 +179,11 @@ is_colliding (struct anim a)
 {
   if (! a.collision) return false;
 
+  /* fix bug when vertically jumping near a wall edge */
+  if (a.id == &kid && is_kid_vjump ()) return false;
+  /* fix bug when vertically jumping near a wall face */
+  if (a.id == &kid && is_kid_start_vjump ()) return false;
+
   a.x += (a.dir == LEFT) ? 0 : 0;
   struct pos p = pos (a);
   struct construct c = construct (p);
