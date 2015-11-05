@@ -121,6 +121,15 @@ next_anim (struct anim a, ALLEGRO_BITMAP* frame, int dx, int dy)
 }
 
 void
+draw_anim_on_next_place_edge (struct anim *a, ALLEGRO_BITMAP* frame, int dx, int dy)
+{
+  struct anim na = next_anim (*a, frame, dx, dy);
+  (*a) = na;
+  to_next_place_edge (a);
+  draw_anim (a, frame, +0, 0);
+}
+
+void
 draw_anim_on_collision_edge (struct anim *a, ALLEGRO_BITMAP* frame, int dx, int dy)
 {
   struct anim na = next_anim (*a, frame, dx, dy);

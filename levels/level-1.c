@@ -58,8 +58,8 @@ static struct level level_1 = {
       {WALL}, {WALL}, {WALL}, {WALL}, {WALL}}},
 
     [9] =
-    {{{FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR},
-      {NO_FLOOR}, {NO_FLOOR,BRICKS_04}, {NO_FLOOR}, {NO_FLOOR}, {WALL}},
+    {{{FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {FLOOR},
+      {NO_FLOOR}, {NO_FLOOR,BRICKS_04}, {NO_FLOOR}, {FLOOR}, {WALL}},
      {{PILLAR}, {FLOOR,BRICKS_01}, {FLOOR,TORCH}, {FLOOR}, {FLOOR},
       {FLOOR,TORCH}, {FLOOR}, {FLOOR,BRICKS_01}, {FLOOR}, {WALL}},
      {{WALL}, {WALL}, {WALL}, {WALL}, {WALL},

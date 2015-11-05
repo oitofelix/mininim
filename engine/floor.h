@@ -34,6 +34,9 @@
 #define VDUNGEON_FLOOR_LOOSE_LEFT_02 "dat/vdungeon/floor panels/loose left02.png"
 #define VDUNGEON_FLOOR_LOOSE_RIGHT_02 "dat/vdungeon/floor panels/loose right02.png"
 #define VDUNGEON_FLOOR_LOOSE_BASE_02 "dat/vdungeon/floor panels/loose base02.png"
+#define VDUNGEON_FLOOR_CORNER_01 "dat/vdungeon/floor panels/normal_closer01.png"
+#define VDUNGEON_FLOOR_CORNER_02 "dat/vdungeon/floor panels/normal_closer02.png"
+#define VDUNGEON_FLOOR_CORNER_03 "dat/vdungeon/floor panels/normal_closer03.png"
 
 struct loose_floor {
   struct pos p;
@@ -48,6 +51,7 @@ extern ALLEGRO_BITMAP *floor_normal_left, *floor_normal_right, *floor_normal_bas
 void load_vdungeon_floor (void);
 void unload_floor (void);
 ALLEGRO_BITMAP *create_floor_loose_02_bitmap (void);
+void draw_floor_base (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_floor (ALLEGRO_BITMAP *bitmap, struct pos pos);
 void draw_floor_left (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_floor_right (ALLEGRO_BITMAP *bitmap, struct pos p);
@@ -69,5 +73,11 @@ void draw_loose_floor_02 (ALLEGRO_BITMAP *bitmap, struct pos p);
 struct xy floor_loose_base_xy (struct pos p);
 struct xy floor_loose_left_xy (struct pos p);
 struct xy floor_loose_right_xy (struct pos p);
+void draw_floor_corner_01 (ALLEGRO_BITMAP *bitmap, struct pos p);
+void draw_floor_corner_02 (ALLEGRO_BITMAP *bitmap, struct pos p);
+void draw_floor_corner_03 (ALLEGRO_BITMAP *bitmap, struct pos p);
+struct xy floor_corner_01_xy (struct pos p);
+struct xy floor_corner_02_xy (struct pos p);
+struct xy floor_corner_03_xy (struct pos p);
 
 #endif	/* FREEPOP_FLOOR_H */

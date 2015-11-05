@@ -57,7 +57,11 @@ ALLEGRO_BITMAP *kid_normal,
   *kid_hang_00, *kid_hang_01, *kid_hang_02, *kid_hang_03,
   *kid_hang_04, *kid_hang_05, *kid_hang_06, *kid_hang_07,
   *kid_hang_08, *kid_hang_09, *kid_hang_10, *kid_hang_11,
-  *kid_hang_12, *kid_hang_14;
+  *kid_hang_12, *kid_hang_14,
+  *kid_climb_01, *kid_climb_02, *kid_climb_03, *kid_climb_04,
+  *kid_climb_05, *kid_climb_06, *kid_climb_07, *kid_climb_08,
+  *kid_climb_09, *kid_climb_10, *kid_climb_11, *kid_climb_12,
+  *kid_climb_13, *kid_climb_14, *kid_climb_15;
 
 struct anim kid; /* kid animation object */
 enum command command;
@@ -181,6 +185,21 @@ load_kid (void)
   kid_hang_11 = load_bitmap (KID_HANG_11);
   kid_hang_12 = load_bitmap (KID_HANG_12);
   kid_hang_14 = load_bitmap (KID_HANG_14);
+  kid_climb_01 = load_bitmap (KID_CLIMB_01);
+  kid_climb_02 = load_bitmap (KID_CLIMB_02);
+  kid_climb_03 = load_bitmap (KID_CLIMB_03);
+  kid_climb_04 = load_bitmap (KID_CLIMB_04);
+  kid_climb_05 = load_bitmap (KID_CLIMB_05);
+  kid_climb_06 = load_bitmap (KID_CLIMB_06);
+  kid_climb_07 = load_bitmap (KID_CLIMB_07);
+  kid_climb_08 = load_bitmap (KID_CLIMB_08);
+  kid_climb_09 = load_bitmap (KID_CLIMB_09);
+  kid_climb_10 = load_bitmap (KID_CLIMB_10);
+  kid_climb_11 = load_bitmap (KID_CLIMB_11);
+  kid_climb_12 = load_bitmap (KID_CLIMB_12);
+  kid_climb_13 = load_bitmap (KID_CLIMB_13);
+  kid_climb_14 = load_bitmap (KID_CLIMB_14);
+  kid_climb_15 = load_bitmap (KID_CLIMB_15);
 
   kid.id = &kid;
   kid.room = 9;
@@ -317,6 +336,21 @@ unload_kid (void)
   al_destroy_bitmap (kid_hang_11);
   al_destroy_bitmap (kid_hang_12);
   al_destroy_bitmap (kid_hang_14);
+  al_destroy_bitmap (kid_climb_01);
+  al_destroy_bitmap (kid_climb_02);
+  al_destroy_bitmap (kid_climb_03);
+  al_destroy_bitmap (kid_climb_04);
+  al_destroy_bitmap (kid_climb_05);
+  al_destroy_bitmap (kid_climb_06);
+  al_destroy_bitmap (kid_climb_07);
+  al_destroy_bitmap (kid_climb_08);
+  al_destroy_bitmap (kid_climb_09);
+  al_destroy_bitmap (kid_climb_10);
+  al_destroy_bitmap (kid_climb_11);
+  al_destroy_bitmap (kid_climb_12);
+  al_destroy_bitmap (kid_climb_13);
+  al_destroy_bitmap (kid_climb_14);
+  al_destroy_bitmap (kid_climb_15);
 }
 
 void draw_kid_normal ()
@@ -1300,6 +1334,8 @@ is_kid_stop_couch (void)
     || kid.frame == kid_couch_13;
 }
 
+static struct pos hang_pos;
+
 void
 draw_kid_vjump (void)
 {
@@ -1317,6 +1353,7 @@ draw_kid_vjump (void)
     to_next_place_edge (&kid);
     hang = true;
     kid.ceiling = false;
+    hang_pos = pos (kid);
   } else if (kid.frame == kid_normal
              && dist_next_place (kid) > 16
              && is_hangable_pos (pos_rel (pos (kid), 0, dir),
@@ -1324,6 +1361,7 @@ draw_kid_vjump (void)
     to_prev_place_edge (&kid);
     hang = true;
     kid.ceiling = false;
+    hang_pos = pos (kid);
   }
 
   /* comming from normal */
@@ -1503,7 +1541,10 @@ draw_kid_hang (void)
   else if (kid.frame == kid_hang_14)
     draw_anim (&kid, kid_hang_04, +0, +0);
   else if (kid.frame == kid_hang_04) {
-    if (shift_key && fg == WALL)
+    if (up_key) {
+      draw_kid_climb ();
+    }
+    else if (shift_key && fg == WALL)
       draw_kid_hang_wall ();
     else if (shift_key) {
       draw_kid_hang_free ();
@@ -1577,15 +1618,25 @@ draw_kid_hang_free (void)
     i = 0;
     j = 0;
     return;
+  } if (up_key) {
+    draw_kid_climb ();
+    i = 0;
+    j = 0;
+    return;
   }
 
+ next:
   switch (i) {
   case 0: draw_anim (&kid, kid_hang_03, -2, +0); i++; break;
   case 1: draw_anim (&kid, kid_hang_02, -3, -2); i++; break;
   case 2: draw_anim (&kid, kid_hang_01, -6, +0); i++; break;
   case 3: draw_anim (&kid, kid_hang_00, +0, -2); i++; break;
-  case 4: draw_anim (&kid, kid_hang_00, +0, +0); i++; break;
-  case 5: draw_anim (&kid, kid_hang_00, +0, +0); i++; break;
+  case 4: i++;
+    if (j == 0) draw_anim (&kid, kid_hang_00, +0, +0);
+    else goto next; break;
+  case 5: i++;
+    if (j == 0) draw_anim (&kid, kid_hang_00, +0, +0);
+    else goto next; break;
   case 6: draw_anim (&kid, kid_hang_01, +0, +2); i++; break;
   case 7: draw_anim (&kid, kid_hang_02, +6, +0); i++; break;
   case 8: draw_anim (&kid, kid_hang_03, +3, +2); i++; break;
@@ -1631,4 +1682,79 @@ is_kid_hang (void)
     || kid.frame == kid_hang_11
     || kid.frame == kid_hang_12
     || kid.frame == kid_hang_14;
+}
+
+void
+draw_kid_climb (void)
+{
+  static unsigned int i = 0;
+
+  kid.draw = draw_kid_climb;
+  kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
+
+  kid.fall = NULL;
+
+  switch (i) {
+  case 0:
+    kid.frame = kid_climb_01;
+    int dir = (kid.dir == LEFT) ? 0 : 1;
+    kid.x = PLACE_WIDTH * (hang_pos.place + dir) + 9;
+    kid.y = PLACE_HEIGHT * hang_pos.floor - 9;
+    draw_anim (&kid, kid_climb_01, +0, +0); i++; break;
+  case 1: draw_anim (&kid, kid_climb_02, +0, -9); i++; break;
+  case 2: draw_anim (&kid, kid_climb_03, -4, -5); i++; break;
+  case 3: draw_anim (&kid, kid_climb_04, -7, -6); i++; break;
+  case 4: draw_anim (&kid, kid_climb_05, -5, -4); i++; break;
+  case 5: draw_anim (&kid, kid_climb_06, -2, -5); i++; break;
+  case 6: draw_anim (&kid, kid_climb_07, -1, -5); i++; break;
+  case 7: draw_anim (&kid, kid_climb_08, -4, -8); i++; break;
+  case 8: draw_anim (&kid, kid_climb_09, +0, -4); i++; break;
+  case 9: draw_anim (&kid, kid_climb_10, +0, -1); i++; break;
+  case 10: draw_anim (&kid, kid_climb_11, -3, -4); i++; break;
+  case 11: draw_anim (&kid, kid_climb_12, +1, +0); i++; break;
+  case 12: draw_anim (&kid, kid_climb_13, +0, +0); i++; break;
+  case 13: draw_anim (&kid, kid_climb_14, -1, +0); i++; break;
+  case 14: draw_anim (&kid, kid_climb_15, +0, +0); i++; break;
+  case 15: draw_anim (&kid, kid_couch_12, +8, +0); i++; break;
+  case 16: draw_anim (&kid, kid_couch_13, +4, +0); i++; break;
+  case 17: draw_anim (&kid, kid_normal, -3, +0); i = 0;
+    kid.draw = draw_kid_normal;
+    break;
+  }
+
+  if (kid.draw != draw_kid_climb) {
+    kid.fall = draw_kid_fall;
+    i = 0;
+  }
+
+}
+
+bool
+is_kid_start_climb (void)
+{
+  return kid.frame == kid_climb_01
+    || kid.frame == kid_climb_02;
+}
+
+bool
+is_kid_climb (void)
+{
+  return kid.frame == kid_climb_03
+    || kid.frame == kid_climb_04
+    || kid.frame == kid_climb_05
+    || kid.frame == kid_climb_06
+    || kid.frame == kid_climb_07
+    || kid.frame == kid_climb_08
+    || kid.frame == kid_climb_09
+    || kid.frame == kid_climb_10;
+}
+
+bool
+is_kid_stop_climb (void)
+{
+  return kid.frame == kid_climb_11
+    || kid.frame == kid_climb_12
+    || kid.frame == kid_climb_13
+    || kid.frame == kid_climb_14
+    || kid.frame == kid_climb_15;
 }

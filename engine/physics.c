@@ -173,6 +173,13 @@ pos_mid_front (struct anim a)
   return pos_xy (a.room, xy.x, xy.y);
 }
 
+struct pos
+pos_mid_back (struct anim a)
+{
+  struct xy xy = xy_mid_back (a);
+  return pos_xy (a.room, xy.x, xy.y);
+}
+
 struct xy
 xy_mid (struct anim a)
 {
@@ -191,6 +198,17 @@ xy_mid_front (struct anim a)
   int h = al_get_bitmap_height (a.frame);
   struct xy xy;
   xy.x = (a.dir == LEFT) ? a.x : a.x + w - 1;
+  xy.y = a.y + h / 2;
+  return xy;
+}
+
+struct xy
+xy_mid_back (struct anim a)
+{
+  int w = al_get_bitmap_width (a.frame);
+  int h = al_get_bitmap_height (a.frame);
+  struct xy xy;
+  xy.x = (a.dir == LEFT) ? a.x + w - 1 : a.x;
   xy.y = a.y + h / 2;
   return xy;
 }
