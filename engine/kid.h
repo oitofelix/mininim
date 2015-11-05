@@ -185,6 +185,7 @@ void draw_kid_hang (void);
 void draw_kid_hang_wall (void);
 void draw_kid_hang_free (void);
 void draw_kid_climb (void);
+void draw_kid_unclimb (void);
 
 bool is_kid_normal ();
 bool is_kid_start_walk (void);

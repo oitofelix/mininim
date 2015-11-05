@@ -65,6 +65,7 @@ ALLEGRO_BITMAP *kid_normal,
 
 struct anim kid; /* kid animation object */
 enum command command;
+static struct pos hang_pos;
 
 void
 load_kid (void)
@@ -1239,6 +1240,18 @@ draw_kid_couch (void)
   kid.draw = draw_kid_couch;
   kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
+  struct pos p = pos (kid);
+
+  int dir = (kid.dir == LEFT) ? +1 : -1;
+  if (! is_kid_start_couch () && ! is_kid_couch ()
+      && ! is_kid_stop_couch ()
+      && construct_rel (p, 0, dir).fg == NO_FLOOR
+      && dist_next_place (kid) > 10) {
+    hang_pos = p;
+    draw_kid_unclimb ();
+    return;
+  }
+
   static unsigned int inertia = 0;
 
   /* at each frame reduce the inertia */
@@ -1333,8 +1346,6 @@ is_kid_stop_couch (void)
     || kid.frame == kid_couch_12
     || kid.frame == kid_couch_13;
 }
-
-static struct pos hang_pos;
 
 void
 draw_kid_vjump (void)
@@ -1757,4 +1768,47 @@ is_kid_stop_climb (void)
     || kid.frame == kid_climb_13
     || kid.frame == kid_climb_14
     || kid.frame == kid_climb_15;
+}
+
+void
+draw_kid_unclimb (void)
+{
+  static unsigned int i = 0;
+
+  kid.draw = draw_kid_unclimb;
+  kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
+
+  kid.fall = NULL;
+
+  switch (i) {
+  case 0:
+    kid.frame = kid_climb_14;
+    /* int dir = (kid.dir == LEFT) ? 0 : 1; */
+    kid.x = PLACE_WIDTH * hang_pos.place + 18;
+    kid.y = PLACE_HEIGHT * hang_pos.floor + 25 ;
+    draw_anim (&kid, kid_climb_14, +0, +0); i++; break;
+  case 1: draw_anim (&kid, kid_climb_13, +1, +0); i++; break;
+  case 2: draw_anim (&kid, kid_climb_12, +0, +0); i++; break;
+  case 3: draw_anim (&kid, kid_climb_11, -1, +0); i++; break;
+  case 4: draw_anim (&kid, kid_climb_10, +3, +4); i++; break;
+  case 5: draw_anim (&kid, kid_climb_09, +0, +1); i++; break;
+  case 6: draw_anim (&kid, kid_climb_08, +0, +4); i++; break;
+  case 7: draw_anim (&kid, kid_climb_07, +4, +8); i++; break;
+  case 8: draw_anim (&kid, kid_climb_06, +1, +5); i++; break;
+  case 9: draw_anim (&kid, kid_climb_05, +2, +5); i++; break;
+  case 10: draw_anim (&kid, kid_climb_04, +5, +4); i++; break;
+  case 11: draw_anim (&kid, kid_climb_03, +7, +6); i++; break;
+  case 12: draw_anim (&kid, kid_climb_02, +4, +5); i++; break;
+  case 13: draw_anim (&kid, kid_climb_01, +0, +9); i++; break;
+  case 14: draw_anim (&kid, kid_hang_04, -3, +2); i = 0;
+    kid.draw = draw_kid_hang;
+    hang_pos = pos_rel (hang_pos, +1, (kid.dir == LEFT) ? +1 : -1);
+    break;
+  }
+
+  if (kid.draw != draw_kid_unclimb) {
+    kid.fall = draw_kid_fall;
+    i = 0;
+  }
+
 }
