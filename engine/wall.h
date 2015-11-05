@@ -70,6 +70,8 @@ void draw_wall_divider_00 (ALLEGRO_BITMAP *bitmap, struct pos p);
 struct xy wall_divider_00_xy (struct pos p);
 void draw_wall_divider_01 (ALLEGRO_BITMAP *bitmap, struct pos p);
 struct xy wall_divider_01_xy (struct pos p);
+void draw_wall_wws_no_face (ALLEGRO_BITMAP *bitmap, struct pos p);
+void draw_wall_sws_no_face (ALLEGRO_BITMAP *bitmap, struct pos p);
 
 enum wall_correlation {
   SWS, SWW, WWS, WWW

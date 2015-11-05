@@ -137,17 +137,12 @@ pos_xy (unsigned int room, int x, int y)
 {
   struct pos p;
 
-  unsigned int qx = x / PLACE_WIDTH;
-  unsigned int rx = x % PLACE_WIDTH;
-  unsigned int qy = y / PLACE_HEIGHT;
-  unsigned int ry = y % PLACE_HEIGHT;
-
   p.room = room;
-  p.place = (rx < 13) ? qx - 1 : qx;
-  p.floor = (ry < 3) ? qy - 1 : qy;
+  p.place = (x - 15) / PLACE_WIDTH;
+  p.floor = (y - 3) / PLACE_HEIGHT;
 
-  if (x < 0) p.place = -1;
-  if (y < 0) p.floor = -1;
+  if (x < 15) p.place = -1;
+  if (y < 3) p.floor = -1;
 
   return p;
 }
@@ -177,6 +172,41 @@ struct pos
 pos_mid_back (struct anim a)
 {
   struct xy xy = xy_mid_back (a);
+  return pos_xy (a.room, xy.x, xy.y);
+}
+
+struct pos
+pos_bottom_front (struct anim a)
+{
+  struct xy xy = xy_bottom_front (a);
+  return pos_xy (a.room, xy.x, xy.y);
+}
+
+struct pos
+pos_bottom_back (struct anim a)
+{
+  struct xy xy = xy_bottom_back (a);
+  return pos_xy (a.room, xy.x, xy.y);
+}
+
+struct pos
+pos_mid_top (struct anim a)
+{
+  struct xy xy = xy_mid_top (a);
+  return pos_xy (a.room, xy.x, xy.y);
+}
+
+struct pos
+pos_front_top (struct anim a)
+{
+  struct xy xy = xy_front_top (a);
+  return pos_xy (a.room, xy.x, xy.y);
+}
+
+struct pos
+pos_back_top (struct anim a)
+{
+  struct xy xy = xy_back_top (a);
   return pos_xy (a.room, xy.x, xy.y);
 }
 
@@ -210,6 +240,58 @@ xy_mid_back (struct anim a)
   struct xy xy;
   xy.x = (a.dir == LEFT) ? a.x + w - 1 : a.x;
   xy.y = a.y + h / 2;
+  return xy;
+}
+
+struct xy
+xy_mid_top (struct anim a)
+{
+  int w = al_get_bitmap_width (a.frame);
+  struct xy xy;
+  xy.x = a.x + w / 2;
+  xy.y = a.y;
+  return xy;
+}
+
+struct xy
+xy_front_top (struct anim a)
+{
+  int w = al_get_bitmap_width (a.frame);
+  struct xy xy;
+  xy.x = (a.dir == LEFT) ? a.x : a.x + w - 1;
+  xy.y = a.y;
+  return xy;
+}
+
+struct xy
+xy_back_top (struct anim a)
+{
+  int w = al_get_bitmap_width (a.frame);
+  struct xy xy;
+  xy.x = (a.dir == LEFT) ? a.x + w - 1 : a.x;
+  xy.y = a.y;
+  return xy;
+}
+
+struct xy
+xy_bottom_front (struct anim a)
+{
+  int w = al_get_bitmap_width (a.frame);
+  int h = al_get_bitmap_height (a.frame);
+  struct xy xy;
+  xy.x = (a.dir == LEFT) ? a.x : a.x + w - 1;
+  xy.y = a.y + h - 1;
+  return xy;
+}
+
+struct xy
+xy_bottom_back (struct anim a)
+{
+  int w = al_get_bitmap_width (a.frame);
+  int h = al_get_bitmap_height (a.frame);
+  struct xy xy;
+  xy.x = (a.dir == LEFT) ? a.x + w - 1 : a.x;
+  xy.y = a.y + h - 1;
   return xy;
 }
 
@@ -267,13 +349,36 @@ is_falling (struct anim a)
 {
   if (! a.fall) return false;
 
-  a.x += (a.dir == LEFT) ? 4 : -5;
-  struct pos p = pos (a);
-  struct construct c = construct (p);
+  if (a.id == &kid && (is_kid_start_jump ())) return false;
 
-  if (c.fg == NO_FLOOR) {
+  a.x += (a.dir == LEFT) ? +4 : -4;
+
+  /* a.x += (a.dir == LEFT) ? 4 : -5; */
+  /* struct pos pft = pos_front_top (a); */
+  /* struct pos pmt = pos_mid_top (a); */
+  /* struct pos pbt = pos_back_top (a); */
+
+  /* struct construct cft = construct (pft); */
+  /* struct construct cmt = construct (pmt); */
+  /* struct construct cbt = construct (pbt); */
+
+  struct pos pbf = pos_bottom_front (a);
+  struct construct cbf = construct (pbf);
+  struct xy xybf = xy_bottom_front (a);
+
+  if (
+      cbf.fg == NO_FLOOR
+      || xybf.y + 33 < PLACE_HEIGHT * (pbf.floor + 1) + 3
+
+      /* cft.fg == NO_FLOOR */
+      /* cmt.fg == NO_FLOOR */
+      /* || cbt.fg == NO_FLOOR */
+      ) {
     return true;
   }
+
+  if (a.id == &kid && is_kid_hang ()
+      && construct (hang_pos).fg == NO_FLOOR) return true;
 
   return false;
 }
@@ -354,10 +459,12 @@ to_fall_edge (struct anim *a)
   printf ("df = %i\n", df);
 }
 
+struct pos loose_floor_pos;
+
 bool
 is_on_loose_floor (struct anim a)
 {
-  a.x += (a.dir == LEFT) ? 4 : -5;
+  a.x += (a.dir == LEFT) ? 4 : -4;
 
   if (a.draw == draw_kid_misstep) return false;
   if (a.id == &kid && is_kid_stabilize ()) return false;
@@ -367,9 +474,13 @@ is_on_loose_floor (struct anim a)
                        is_kid_jump () || is_kid_stop_jump ()))
     return false;
 
-  struct construct c = construct (pos (a));
+  struct pos p = pos_mid (a);
+  struct construct c = construct (p);
 
-  if (c.fg == LOOSE_FLOOR) return true;
+  if (c.fg == LOOSE_FLOOR) {
+    loose_floor_pos = p;
+    return true;
+  }
   return false;
 }
 
@@ -441,11 +552,18 @@ is_hangable_pos (struct pos p, enum direction direction)
     && construct_rel (p, -1, 0).fg == NO_FLOOR;
 }
 
+struct pos hang_pos;
+
 bool
 is_hangable (struct anim a)
 {
-  struct pos p = pos_mid_front (a);
-  return is_hangable_pos (p, a.dir);
+  struct pos pmf = pos_mid_front (a);
+  struct pos pmb = pos_mid_back (a);
+  bool hmf = is_hangable_pos (pmf, a.dir);
+  bool hmb = is_hangable_pos (pmb, a.dir);
+  if (hmf) hang_pos = pmf;
+  if (hmb) hang_pos = pmb;
+  return hmf || hmb;
 }
 
 void
@@ -473,7 +591,7 @@ apply_physics (struct anim *a, ALLEGRO_BITMAP *frame,
     na.odraw = na.draw;
     na.draw = na.fall;
   } else if (is_on_loose_floor (na))
-    release_loose_floor (pos (na));
+    release_loose_floor (loose_floor_pos);
 
   norm_anim (&na);
 

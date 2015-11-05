@@ -176,12 +176,17 @@ draw_floor_corner_03 (ALLEGRO_BITMAP *bitmap, struct pos p)
 void
 draw_floor_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
-  if ((! is_kid_fall () && ! is_kid_vjump ())
-      && ! is_kid_hang () && ! is_kid_start_climb ()
-      && ! is_kid_climb ()) return;
+  /* if ((! is_kid_fall () && ! is_kid_vjump ()) */
+  /*     && ! is_kid_hang () && ! is_kid_start_climb () */
+  /*     && ! is_kid_climb ()) return; */
 
-  if (kid.frame == kid_vjump_15
-      && xy_mid (kid).y < floor_left_xy (p).y) return;
+  /* if (kid.frame == kid_vjump_15 */
+  /*     && xy_mid (kid).y < floor_left_xy (p).y) return; */
+
+  struct xy xy = xy_bottom_back (kid);
+
+  if (xy.y - 6 <= floor_left_xy (p).y
+      || xy.x >= floor_right_xy (p).x) return;
 
   if (is_kid_hang () && kid.dir == LEFT) return;
   if (is_kid_climb () && kid.dir == LEFT) return;

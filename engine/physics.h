@@ -102,8 +102,20 @@ void to_prev_place_edge (struct anim *a);
 int dist_prev_place (struct anim a);
 struct xy xy_mid_back (struct anim a);
 struct pos pos_mid_back (struct anim a);
+struct xy xy_bottom_front (struct anim a);
+struct pos pos_bottom_front (struct anim a);
+struct pos pos_mid_top (struct anim a);
+struct xy xy_front_top (struct anim a);
+struct xy xy_back_top (struct anim a);
+struct pos pos_front_top (struct anim a);
+struct pos pos_back_top (struct anim a);
+struct xy xy_mid_top (struct anim a);
+struct xy xy_bottom_back (struct anim a);
+struct pos pos_bottom_back (struct anim a);
 void apply_physics (struct anim *a, ALLEGRO_BITMAP *frame,
                     int dx, int dy);
 
+extern struct pos hang_pos;
+extern struct pos loose_floor_pos;
 
 #endif	/* FREEPOP_PHYSICS_H */

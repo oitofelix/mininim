@@ -153,11 +153,6 @@
 #define KID_CLIMB_14 "dat/kid/clipping/frame14.png"
 #define KID_CLIMB_15 "dat/kid/clipping/frame15.png"
 
-enum command {
-  RUN,
-  JUMP,
-};
-
 /* functions */
 void load_kid (void);
 void unload_kid (void);
@@ -212,7 +207,6 @@ bool is_kid_stop_climb (void);
 
 /* variables */
 extern struct anim kid; /* kid animation object */
-extern enum command command;
 
 extern ALLEGRO_BITMAP *kid_normal,
   *kid_start_run_01, *kid_start_run_02, *kid_start_run_03, *kid_start_run_04,
@@ -249,5 +243,6 @@ extern ALLEGRO_BITMAP *kid_normal,
   *kid_climb_09, *kid_climb_10, *kid_climb_11, *kid_climb_12,
   *kid_climb_13, *kid_climb_14, *kid_climb_15;
 
+extern bool hang_limit;
 
 #endif	/* FREEPOP_KID_H */

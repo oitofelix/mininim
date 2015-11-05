@@ -93,10 +93,16 @@ draw_wall (ALLEGRO_BITMAP *bitmap, struct pos p)
 void
 draw_wall_sws (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
-  draw_bitmap_xy (wall_single_base, bitmap, wall_base_xy (p), 0);
-  draw_bitmap_xy (wall_single, bitmap, wall_xy (p), 0);
+  draw_wall_sws_no_face (bitmap, p);
   draw_bitmap_xy (wall_face, bitmap, wall_face_xy (p), 0);
   draw_bitmap_xy (wall_face_top, bitmap, wall_face_top_xy (p), 0);
+}
+
+void
+draw_wall_sws_no_face (ALLEGRO_BITMAP *bitmap, struct pos p)
+{
+  draw_bitmap_xy (wall_single_base, bitmap, wall_base_xy (p), 0);
+  draw_bitmap_xy (wall_single, bitmap, wall_xy (p), 0);
 }
 
 void
@@ -109,10 +115,16 @@ draw_wall_sww (ALLEGRO_BITMAP *bitmap, struct pos p)
 void
 draw_wall_wws (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
-  draw_bitmap_xy (wall_right_base, bitmap, wall_base_xy (p), 0);
-  draw_bitmap_xy (wall_right, bitmap, wall_xy (p), 0);
+  draw_wall_wws_no_face (bitmap, p);
   draw_bitmap_xy (wall_face, bitmap, wall_face_xy (p), 0);
   draw_bitmap_xy (wall_face_top, bitmap, wall_face_top_xy (p), 0);
+}
+
+void
+draw_wall_wws_no_face (ALLEGRO_BITMAP *bitmap, struct pos p)
+{
+  draw_bitmap_xy (wall_right_base, bitmap, wall_base_xy (p), 0);
+  draw_bitmap_xy (wall_right, bitmap, wall_xy (p), 0);
 }
 
 void
@@ -125,7 +137,16 @@ draw_wall_www (ALLEGRO_BITMAP *bitmap, struct pos p)
 void
 draw_wall_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
-  draw_wall (bitmap, p);
+  switch (wall_correlation (p)) {
+  case SWS: draw_wall_sws_no_face (bitmap, p); break;
+  case SWW: draw_wall_sww (bitmap, p); break;
+  case WWS: draw_wall_wws_no_face (bitmap, p); break;
+  case WWW: draw_wall_www (bitmap, p); break;
+  default:
+    error (-1, 0, "%s: unknown wall correlation (%u, %u. %u)",
+           __func__, p.room, p.floor, p.place);
+  }
+  draw_wall_randomization (bitmap, p);
 }
 
 struct xy
