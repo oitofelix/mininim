@@ -24,7 +24,7 @@
 
 /* current level */
 extern struct level *level;
-extern unsigned int room_view;
+extern int room_view;
 
 void play_level (struct level *level);
 void level_draw_base (void);

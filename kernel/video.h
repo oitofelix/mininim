@@ -24,26 +24,12 @@
 #include <allegro5/allegro_font.h>
 
 #include "event.h"
-
-/* macros */
-
-#define ORIGINAL_WIDTH 320
-#define ORIGINAL_HEIGHT 200
-#define DISPLAY_WIDTH 640
-#define DISPLAY_HEIGHT 400
-#define EFFECT_HZ 30
-#define SECS_TO_VCYCLES(x) ((x) * EFFECT_HZ)
-#define BLACK (al_map_rgb (0, 0, 0))
-#define WHITE (al_map_rgb (255, 255, 255))
+#include "engine/pos.h"
 
 /* types */
 enum video_effect {
   VIDEO_NO_EFFECT, VIDEO_OFF, VIDEO_FADE_IN,
   VIDEO_FADE_OUT, VIDEO_ROLL_RIGHT, VIDEO_FLICKERING,
-};
-
-struct xy {
-  int x, y;
 };
 
 /* functions */
@@ -57,8 +43,8 @@ ALLEGRO_BITMAP *load_bitmap (char *filename);
 void clear_bitmap (ALLEGRO_BITMAP *bitmap, ALLEGRO_COLOR color);
 void draw_bitmap (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
                   float dx, float dy, int flags);
-void draw_bitmap_xy (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
-                     struct xy xy, int flags);
+void draw_bitmapc (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
+                     struct coord c, int flags);
 void draw_bitmap_region (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
                          float sx, float sy, float sw, float sh,
                          float dx, float dy, int flags);
@@ -66,10 +52,10 @@ void draw_text (ALLEGRO_BITMAP *bitmap, char const *text, float x, float y, int 
 void acknowledge_resize (void);
 void draw_fade (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to, float factor);
 void draw_roll_right (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
-                      unsigned int total, unsigned int current);
+                      int total, int current);
 void draw_pattern (ALLEGRO_BITMAP *bitmap, int ox, int oy, int w, int h,
                    ALLEGRO_COLOR color_0, ALLEGRO_COLOR color_1);
-void start_video_effect (enum video_effect type, unsigned int duration);
+void start_video_effect (enum video_effect type, int duration);
 bool is_video_effect_started (void);
 void show (void);
 

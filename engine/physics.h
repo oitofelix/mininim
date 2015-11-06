@@ -20,98 +20,28 @@
 #ifndef FREEPOP_PHYSICS_H
 #define FREEPOP_PHYSICS_H
 
-#include "anim.h"
-
-#define ROOMS 25
-#define FLOORS 3
-#define PLACES 10
-
-#define PLACE_WIDTH (ORIGINAL_WIDTH / PLACES)
-#define PLACE_HEIGHT ((ORIGINAL_HEIGHT - 11) / FLOORS)
-
-/* types */
-struct level {
-  enum {
-    DUNGEON, PALACE,
-  } type;
-
-  struct construct {
-    enum construct_fg {
-      NO_FLOOR,
-      FLOOR,
-      BROKEN_FLOOR,
-      LOOSE_FLOOR,
-      PILLAR,
-      WALL,
-    } fg;
-    enum construct_bg {
-      NO_BG,
-      BRICKS_01,
-      BRICKS_02,
-      BRICKS_03,
-      BRICKS_04,
-      TORCH,
-      WINDOW,
-    } bg;
-  } construct[ROOMS][FLOORS][PLACES];
-
-  struct {
-    unsigned int l, r, a, b;
-  } link[ROOMS];
-};
-
-struct pos {
-  unsigned int room;
-  int floor, place;
-};
+#include "prince.h"
 
 /* functions */
 struct construct construct (struct pos pos);
 struct construct construct_rel (struct pos pos, int floor, int place);
 void set_construct_fg (struct pos p, enum construct_fg fg);
-void norm_anim (struct anim *a);
-struct pos norm_pos (struct pos pos, bool floor_first);
-struct pos norm_pos_floor (struct pos pos);
-struct pos norm_pos_place (struct pos pos);
-unsigned int prandom_pos (struct pos pos, unsigned int i,
-                          unsigned int max);
-struct pos pos_xy (unsigned int room, int x, int y);
-struct pos pos (struct anim anim);
-struct pos pos_rel (struct pos, int floor, int place);
-bool is_pos_eq (struct pos p0, struct pos p1);
 bool is_colliding (struct anim anim);
 int dist_collision (struct anim anim);
 int dist_fall (struct anim anim);
 bool is_falling (struct anim anim);
 void to_collision_edge (struct anim *anim);
 void to_fall_edge (struct anim *anim);
-void center_anim (struct anim *a);
 bool is_on_loose_floor (struct anim a);
 int dist_loose_floor (struct anim a);
 void to_loose_floor_edge (struct anim *a);
-int pos_center_x (struct pos p);
-struct xy xy_mid (struct anim a);
 bool is_hangable (struct anim a);
 int dist_next_place (struct anim a);
 void to_next_place_edge (struct anim *a);
-struct pos pos_mid (struct anim a);
-struct xy xy_mid_front (struct anim a);
-struct pos pos_mid_front (struct anim a);
-bool is_hangable_pos (struct pos p, enum direction direction);
+bool is_hangable_pos (struct pos p, enum dir dir);
 void to_prev_place_edge (struct anim *a);
 int dist_prev_place (struct anim a);
-struct xy xy_mid_back (struct anim a);
-struct pos pos_mid_back (struct anim a);
-struct xy xy_bottom_front (struct anim a);
-struct pos pos_bottom_front (struct anim a);
-struct pos pos_mid_top (struct anim a);
-struct xy xy_front_top (struct anim a);
-struct xy xy_back_top (struct anim a);
-struct pos pos_front_top (struct anim a);
-struct pos pos_back_top (struct anim a);
-struct xy xy_mid_top (struct anim a);
-struct xy xy_bottom_back (struct anim a);
-struct pos pos_bottom_back (struct anim a);
+bool is_visible (struct anim a);
 void apply_physics (struct anim *a, ALLEGRO_BITMAP *frame,
                     int dx, int dy);
 

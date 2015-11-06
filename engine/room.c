@@ -39,7 +39,7 @@ ALLEGRO_BITMAP *bricks_01, *bricks_02, *bricks_03, *bricks_04,
 ALLEGRO_BITMAP *room_bg;
 
 /* current room */
-static unsigned int current_room = -1;
+static int current_room = -1;
 
 void
 load_room (void)
@@ -61,7 +61,7 @@ load_room (void)
       window = load_bitmap (VDUNGEON_WINDOW);
       break;
     default:
-      error (-1, 0, "%s: unknown video mode (%u)", __func__, video_mode);
+      error (-1, 0, "%s: unknown video mode (%i)", __func__, video_mode);
     }
     break;
   case PALACE:
@@ -141,7 +141,7 @@ draw_construct_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
     draw_wall (bitmap, p);
     break;
   default:
-    error (-1, 0, "%s: unknown foreground (%u)",
+    error (-1, 0, "%s: unknown foreground (%i)",
            __func__, construct (p).fg);
   }
 }
@@ -171,7 +171,7 @@ draw_construct_bg (ALLEGRO_BITMAP *bitmap, struct pos p)
     draw_window (bitmap, p);
     break;
   default:
-    error (-1, 0, "%s: unknown background (%u)",
+    error (-1, 0, "%s: unknown background (%i)",
            __func__, construct (p).bg);
   }
 }
@@ -198,7 +198,7 @@ draw_construct_left (ALLEGRO_BITMAP *bitmap, struct pos p)
     draw_wall (bitmap, p);
     break;
   default:
-    error (-1, 0, "%s: unknown foreground (%u)",
+    error (-1, 0, "%s: unknown foreground (%i)",
            __func__, construct (p).fg);
   }
 }
@@ -225,7 +225,7 @@ draw_construct_right (ALLEGRO_BITMAP *bitmap, struct pos p)
     draw_wall (bitmap, p);
     break;
   default:
-    error (-1, 0, "%s: unknown foreground (%u)",
+    error (-1, 0, "%s: unknown foreground (%i)",
            __func__, construct (p).fg);
   }
 }
@@ -233,12 +233,12 @@ draw_construct_right (ALLEGRO_BITMAP *bitmap, struct pos p)
 void
 draw_no_floor_base (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
-  struct xy xy = floor_base_xy (p);
+  struct coord c = floor_base_coord (p);
   int w = al_get_bitmap_width (floor_normal_base);
   int h = al_get_bitmap_height (floor_normal_base);
 
   al_set_target_bitmap (bitmap);
-  al_set_clipping_rectangle (xy.x, xy.y, w, h);
+  al_set_clipping_rectangle (c.x, c.y, w, h);
   al_clear_to_color (BLACK);
   al_reset_clipping_rectangle ();
 }
@@ -246,7 +246,7 @@ draw_no_floor_base (ALLEGRO_BITMAP *bitmap, struct pos p)
 void
 draw_no_floor (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
-  struct xy xy = floor_left_xy (p);
+  struct coord c = floor_left_coord (p);
   int wl = al_get_bitmap_width (floor_normal_left);
   int wr = al_get_bitmap_width (floor_normal_right);
   int w = wl + wr;
@@ -256,86 +256,86 @@ draw_no_floor (ALLEGRO_BITMAP *bitmap, struct pos p)
   int h = max (hl, hr) + hb;
 
   al_set_target_bitmap (bitmap);
-  al_set_clipping_rectangle (xy.x, xy.y, w, h);
+  al_set_clipping_rectangle (c.x, c.y, w, h);
   al_clear_to_color (BLACK);
   al_reset_clipping_rectangle ();
 
-  draw_construct_right (bitmap, pos_rel (p, 0, -1));
-  draw_construct_right (bitmap, pos_rel (p, +1, -1));
-  draw_construct_left (bitmap, pos_rel (p, 0, +1));
+  draw_construct_right (bitmap, prel (p, 0, -1));
+  draw_construct_right (bitmap, prel (p, +1, -1));
+  draw_construct_left (bitmap, prel (p, 0, +1));
 }
 
 void
 draw_bricks_01 (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
-  draw_bitmap_xy (bricks_01, bitmap, bricks_xy (p) , 0);
+  draw_bitmapc (bricks_01, bitmap, bricks_coord (p) , 0);
 }
 
 void
 draw_bricks_02 (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
-  draw_bitmap_xy (bricks_02, bitmap, bricks_xy (p) , 0);
+  draw_bitmapc (bricks_02, bitmap, bricks_coord (p) , 0);
 }
 
 void
 draw_bricks_03 (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
-  draw_bitmap_xy (bricks_03, bitmap, bricks_xy (p) , 0);
+  draw_bitmapc (bricks_03, bitmap, bricks_coord (p) , 0);
 }
 
 void
 draw_bricks_04 (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
-  draw_bitmap_xy (bricks_04, bitmap, bricks_xy (p) , 0);
+  draw_bitmapc (bricks_04, bitmap, bricks_coord (p) , 0);
 }
 
-struct xy
-bricks_xy (struct pos p)
+struct coord
+bricks_coord (struct pos p)
 {
-  struct xy xy;
-  xy.x = PLACE_WIDTH * (p.place + 1);
-  xy.y = PLACE_HEIGHT * p.floor + 15;
-  return xy;
+  struct coord c;
+  c.x = PLACE_WIDTH * (p.place + 1);
+  c.y = PLACE_HEIGHT * p.floor + 15;
+  return c;
 }
 
 void
 draw_torch (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
-  draw_bitmap_xy (torch, bitmap, torch_xy (p), 0);
+  draw_bitmapc (torch, bitmap, torch_coord (p), 0);
 }
 
-struct xy
-torch_xy (struct pos p)
+struct coord
+torch_coord (struct pos p)
 {
-  struct xy xy;
-  xy.x = PLACE_WIDTH * (p.place + 1);
-  xy.y = PLACE_HEIGHT * p.floor + 22;
-  return xy;
+  struct coord c;
+  c.x = PLACE_WIDTH * (p.place + 1);
+  c.y = PLACE_HEIGHT * p.floor + 22;
+  return c;
 }
 
 void
 draw_window (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
-  draw_bitmap_xy (window, bitmap, window_xy (p), 0);
+  draw_bitmapc (window, bitmap, window_coord (p), 0);
 }
 
-struct xy
-window_xy (struct pos p)
+struct coord
+window_coord (struct pos p)
 {
-  struct xy xy;
-  xy.x = PLACE_WIDTH * (p.place + 1);
-  xy.y = PLACE_HEIGHT * p.floor + 5;
-  return xy;
+  struct coord c;
+  c.x = PLACE_WIDTH * (p.place + 1);
+  c.y = PLACE_HEIGHT * p.floor + 5;
+  return c;
 }
 
 void
 draw_room_anim_fg (struct anim a)
 {
-  draw_room_fg (room_pos_bl (a));
-  draw_room_fg (room_pos_br (a));
-  draw_room_fg (room_pos_mid (a));
-  draw_room_fg (room_pos_tl (a));
-  draw_room_fg (room_pos_tr (a));
+  draw_room_fg (posf (coord_bl (a)));
+  draw_room_fg (posf (coord_br (a)));
+  draw_room_fg (posf (coord_m (a)));
+  draw_room_fg (posf (coord_tl (a)));
+  draw_room_fg (posf (coord_tr (a)));
 }
 
 void
@@ -362,61 +362,7 @@ draw_room_fg (struct pos p)
     draw_wall_fg (screen, p);
     break;
   default:
-    error (-1, 0, "%s: unknown foreground (%u)",
+    error (-1, 0, "%s: unknown foreground (%i)",
            __func__, construct (p).fg);
   }
-}
-
-struct pos
-room_pos_bl (struct anim a)
-{
-  int h = al_get_bitmap_height (a.frame);
-  return room_pos_xy (a.room, a.x, a.y + h - 1);
-}
-
-struct pos
-room_pos_br (struct anim a)
-{
-  int w = al_get_bitmap_width (a.frame);
-  int h = al_get_bitmap_height (a.frame);
-  return room_pos_xy (a.room, a.x + w - 1, a.y + h - 1);
-}
-
-struct pos
-room_pos_mid (struct anim a)
-{
-  int w = al_get_bitmap_width (a.frame);
-  int h = al_get_bitmap_height (a.frame);
-  return room_pos_xy (a.room, a.x + w / 2, a.y + h / 2);
-}
-
-struct pos
-room_pos_tl (struct anim a)
-{
-  return room_pos_xy (a.room, a.x, a.y);
-}
-
-struct pos
-room_pos_tr (struct anim a)
-{
-  int w = al_get_bitmap_width (a.frame);
-  return room_pos_xy (a.room, a.x + w - 1, a.y);
-}
-
-struct pos
-room_pos_xy (unsigned int room, int x, int y)
-{
-  struct pos p;
-
-  unsigned int qy = y / PLACE_HEIGHT;
-  unsigned int ry = y % PLACE_HEIGHT;
-
-  p.room = room;
-  p.place = x / PLACE_WIDTH;
-  p.floor = (ry < 3) ? qy - 1 : qy;
-
-  if (x < 0) p.place = -1;
-  if (y < 0) p.floor = -1;
-
-  return p;
 }

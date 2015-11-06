@@ -40,7 +40,7 @@
 
 struct loose_floor {
   struct pos p;
-  unsigned int i;
+  int i;
   struct anim a;
   void (*draw) (struct loose_floor *f);
 };
@@ -60,24 +60,24 @@ void draw_broken_floor_left (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_broken_floor_right (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_broken_floor_fg (ALLEGRO_BITMAP *bitmap, struct pos pos);
 void draw_floor_fg (ALLEGRO_BITMAP *bitmap, struct pos pos);
-struct xy floor_base_xy (struct pos pos);
-struct xy floor_left_xy (struct pos pos);
-struct xy floor_right_xy (struct pos pos);
-struct xy broken_floor_front_xy (struct pos pos);
+struct coord floor_base_coord (struct pos pos);
+struct coord floor_left_coord (struct pos pos);
+struct coord floor_right_coord (struct pos pos);
+struct coord broken_floor_front_coord (struct pos pos);
 void release_loose_floor (struct pos p);
 void draw_shake_floor (void);
 void draw_release_loose_floor (void);
 void draw_floor_fall (void);
 void draw_loose_floor_01 (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_loose_floor_02 (ALLEGRO_BITMAP *bitmap, struct pos p);
-struct xy floor_loose_base_xy (struct pos p);
-struct xy floor_loose_left_xy (struct pos p);
-struct xy floor_loose_right_xy (struct pos p);
+struct coord floor_loose_base_coord (struct pos p);
+struct coord floor_loose_left_coord (struct pos p);
+struct coord floor_loose_right_coord (struct pos p);
 void draw_floor_corner_01 (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_floor_corner_02 (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_floor_corner_03 (ALLEGRO_BITMAP *bitmap, struct pos p);
-struct xy floor_corner_01_xy (struct pos p);
-struct xy floor_corner_02_xy (struct pos p);
-struct xy floor_corner_03_xy (struct pos p);
+struct coord floor_corner_01_coord (struct pos p);
+struct coord floor_corner_02_coord (struct pos p);
+struct coord floor_corner_03_coord (struct pos p);
 
 #endif	/* FREEPOP_FLOOR_H */

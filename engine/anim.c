@@ -32,7 +32,7 @@ bool pause_anim = false;
 bool cutscene = false;
 
 void
-play_anim (void (*callback) (void), unsigned int freq)
+play_anim (void (*callback) (void), int freq)
 {
   quit_anim = false;
 
@@ -97,8 +97,8 @@ draw_anim (struct anim *a, ALLEGRO_BITMAP *frame,
              int dx, int dy)
 {
   apply_physics (a, frame, dx, dy);
-  if (a->room == room_view || cutscene)
-    draw_bitmap (a->frame, screen, a->x, a->y, a->flip);
+  if (is_visible (*a) || cutscene)
+    draw_bitmap (a->frame, screen, a->c.x, a->c.y, a->flip);
 }
 
 struct anim
@@ -111,9 +111,9 @@ next_anim (struct anim a, ALLEGRO_BITMAP* frame, int dx, int dy)
   int w = al_get_bitmap_width (frame);
   int h = al_get_bitmap_height (frame);
 
-  if (draw_anim_inv) na.x += (a.dir == LEFT) ? ow - w - dx : dx;
-  else na.x += (a.dir == LEFT) ? dx : ow - w - dx;
-  na.y += oh - h + dy;
+  if (draw_anim_inv) na.c.x += (a.dir == LEFT) ? ow - w - dx : dx;
+  else na.c.x += (a.dir == LEFT) ? dx : ow - w - dx;
+  na.c.y += oh - h + dy;
 
   na.frame = frame;
 
@@ -180,9 +180,9 @@ draw_anim_on_edge (struct anim *a, ALLEGRO_BITMAP* frame, int dx, int dy)
 }
 
 bool
-wait_anim (unsigned int cycles)
+wait_anim (int cycles)
 {
-  static unsigned int i = 0;
+  static int i = 0;
   if (i == 0) i = cycles + 1;
   return --i;
 }

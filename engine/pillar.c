@@ -45,64 +45,64 @@ unload_pillar (void)
 void
 draw_pillar (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
-  draw_bitmap_xy (floor_normal_base, bitmap, floor_base_xy (p), 0);
-  draw_bitmap_xy (pillar_left, bitmap, pillar_left_xy (p), 0);
-  draw_bitmap_xy (pillar_right, bitmap, pillar_right_xy (p), 0);
-  draw_bitmap_xy (pillar_top, bitmap, pillar_top_xy (p), 0);
+  draw_bitmapc (floor_normal_base, bitmap, floor_base_coord (p), 0);
+  draw_bitmapc (pillar_left, bitmap, pillar_left_coord (p), 0);
+  draw_bitmapc (pillar_right, bitmap, pillar_right_coord (p), 0);
+  draw_bitmapc (pillar_top, bitmap, pillar_top_coord (p), 0);
 }
 
 void
 draw_pillar_left (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
-  draw_bitmap_xy (floor_normal_base, bitmap, floor_base_xy (p), 0);
-  draw_bitmap_xy (pillar_left, bitmap, pillar_left_xy (p), 0);
+  draw_bitmapc (floor_normal_base, bitmap, floor_base_coord (p), 0);
+  draw_bitmapc (pillar_left, bitmap, pillar_left_coord (p), 0);
 }
 
 void
 draw_pillar_right (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
-  draw_bitmap_xy (floor_normal_base, bitmap, floor_base_xy (p), 0);
-  draw_bitmap_xy (pillar_right, bitmap, pillar_right_xy (p), 0);
+  draw_bitmapc (floor_normal_base, bitmap, floor_base_coord (p), 0);
+  draw_bitmapc (pillar_right, bitmap, pillar_right_coord (p), 0);
 }
 
 void
 draw_pillar_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
-  draw_bitmap_xy (pillar, screen, pillar_xy (p), 0);
+  draw_bitmapc (pillar, screen, pillar_coord (p), 0);
 }
 
-struct xy
-pillar_xy (struct pos p)
+struct coord
+pillar_coord (struct pos p)
 {
-  struct xy xy;
-  xy.x = PLACE_WIDTH * p.place + 8;
-  xy.y = PLACE_HEIGHT * p.floor + 3;
-  return xy;
+  struct coord c;
+  c.x = PLACE_WIDTH * p.place + 8;
+  c.y = PLACE_HEIGHT * p.floor + 3;
+  return c;
 }
 
-struct xy
-pillar_left_xy (struct pos p)
+struct coord
+pillar_left_coord (struct pos p)
 {
-  struct xy xy;
-  xy.x = PLACE_WIDTH * p.place;
-  xy.y = PLACE_HEIGHT * p.floor + 3;
-  return xy;
+  struct coord c;
+  c.x = PLACE_WIDTH * p.place;
+  c.y = PLACE_HEIGHT * p.floor + 3;
+  return c;
 }
 
-struct xy
-pillar_right_xy (struct pos p)
+struct coord
+pillar_right_coord (struct pos p)
 {
-  struct xy xy;
-  xy.x = PLACE_WIDTH * (p.place + 1);
-  xy.y = PLACE_HEIGHT * p.floor + 3;
-  return xy;
+  struct coord c;
+  c.x = PLACE_WIDTH * (p.place + 1);
+  c.y = PLACE_HEIGHT * p.floor + 3;
+  return c;
 }
 
-struct xy
-pillar_top_xy (struct pos p)
+struct coord
+pillar_top_coord (struct pos p)
 {
-  struct xy xy;
-  xy.x = PLACE_WIDTH * (p.place + 1);
-  xy.y = PLACE_HEIGHT * p.floor - 4;
-  return xy;
+  struct coord c;
+  c.x = PLACE_WIDTH * (p.place + 1);
+  c.y = PLACE_HEIGHT * p.floor - 4;
+  return c;
 }

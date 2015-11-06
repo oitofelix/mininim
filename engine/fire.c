@@ -22,6 +22,7 @@
 #include "kernel/random.h"
 #include "physics.h"
 #include "level.h"
+#include "pos.h"
 #include "fire.h"
 
 static ALLEGRO_BITMAP *fire_01, *fire_02, *fire_03, *fire_04, *fire_05,
@@ -57,7 +58,7 @@ unload_fire (void)
 }
 
 static ALLEGRO_BITMAP *
-get_fire_frame (unsigned int i)
+get_fire_frame (int i)
 {
   switch (i) {
   case 0: return fire_01;
@@ -70,7 +71,7 @@ get_fire_frame (unsigned int i)
   case 7: return fire_08;
   case 8: return fire_09;
   default:
-    error (-1, 0, "%s (%u): unknown fire frame", __func__, i);
+    error (-1, 0, "%s (%i): unknown fire frame", __func__, i);
   }
 
   return NULL;
@@ -82,7 +83,7 @@ draw_fire (int room)
   struct pos pos;
   pos.room = room;
 
-  static unsigned int i = 0;
+  static int i = 0;
 
   ALLEGRO_BITMAP *fire;
 
@@ -102,7 +103,7 @@ draw_fire (int room)
 void
 draw_princess_room_fire (void)
 {
-  static unsigned int i = 0;
+  static int i = 0;
 
   ALLEGRO_BITMAP *fire_0 = get_fire_frame (prandom_uniq (FIRE_RANDOM_SEED_0 + i, 8));
   ALLEGRO_BITMAP *fire_1 = get_fire_frame (prandom_uniq (FIRE_RANDOM_SEED_1 + i, 8));

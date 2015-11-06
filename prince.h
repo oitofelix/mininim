@@ -20,9 +20,89 @@
 #ifndef FREEPOP_PRINCE_H
 #define FREEPOP_PRINCE_H
 
-/* types */
+#include <allegro5/allegro.h>
+
+#define ROOMS 25
+#define FLOORS 3
+#define PLACES 10
+
+#define DISPLAY_WIDTH 640
+#define DISPLAY_HEIGHT 400
+#define ORIGINAL_WIDTH 320
+#define ORIGINAL_HEIGHT 200
+
+#define PLACE_WIDTH (ORIGINAL_WIDTH / PLACES)
+#define PLACE_HEIGHT ((ORIGINAL_HEIGHT - 11) / FLOORS)
+
+#define EFFECT_HZ 30
+#define SECS_TO_VCYCLES(x) ((x) * EFFECT_HZ)
+#define BLACK (al_map_rgb (0, 0, 0))
+#define WHITE (al_map_rgb (255, 255, 255))
+
+
 enum video_mode {
   CGA, EGA, VGA,
+};
+
+struct pos {
+  int room, floor, place;
+};
+
+struct coord {
+  int room, x, y;
+};
+
+struct dim {
+  int x, y, w, h, fx, bx;
+};
+
+enum dir {
+  LEFT, RIGHT, ABOVE, BELOW
+};
+
+struct anim {
+  struct anim *id;
+  struct coord c;
+  ALLEGRO_BITMAP *frame;
+  enum dir dir;
+  int repeat;
+  int flip;
+  bool just_fall;
+  void (*draw) (void);
+  void (*odraw) (void);
+  void (*collision) (void);
+  void (*fall) (void);
+  void (*ceiling) (void);
+};
+
+struct level {
+  enum {
+    DUNGEON, PALACE,
+  } type;
+
+  struct construct {
+    enum construct_fg {
+      NO_FLOOR,
+      FLOOR,
+      BROKEN_FLOOR,
+      LOOSE_FLOOR,
+      PILLAR,
+      WALL,
+    } fg;
+    enum construct_bg {
+      NO_BG,
+      BRICKS_01,
+      BRICKS_02,
+      BRICKS_03,
+      BRICKS_04,
+      TORCH,
+      WINDOW,
+    } bg;
+  } construct[ROOMS][FLOORS][PLACES];
+
+  struct {
+    int l, r, a, b;
+  } link[ROOMS];
 };
 
 /* current video mode */

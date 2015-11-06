@@ -26,7 +26,7 @@
 /* types */
 struct star {
   int x, y;
-  unsigned int color;
+  int color;
 };
 
 /* functions */

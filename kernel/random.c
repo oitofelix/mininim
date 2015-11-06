@@ -23,24 +23,24 @@
 /* random number generator seed */
 uint32_t random_seed = 0;
 
-unsigned int
-prandom (unsigned int max)
+int
+prandom (int max)
 {
 	if (! random_seed) random_seed = time (NULL);
 	random_seed = random_seed * 214013 + 2531011;
 	return (random_seed >> 16) % (max + 1);
 }
 
-unsigned int
-prandom_uniq (uint32_t seed, unsigned int max)
+int
+prandom_uniq (uint32_t seed, int max)
 {
   uint32_t random_seed_backup = random_seed;
 
   random_seed = seed - 1;
-  unsigned int prev_random = prandom (max);
+  int prev_random = prandom (max);
 
   random_seed = seed;
-  unsigned int next_random = prandom (max);
+  int next_random = prandom (max);
 
   if (prev_random == next_random)
     next_random = (next_random + 1) % (max + 1);

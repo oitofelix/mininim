@@ -54,10 +54,10 @@ void draw_wall_sww (ALLEGRO_BITMAP *bitmap, struct pos pos);
 void draw_wall_wws (ALLEGRO_BITMAP *bitmap, struct pos pos);
 void draw_wall_www (ALLEGRO_BITMAP *bitmap, struct pos pos);
 void draw_wall_fg (ALLEGRO_BITMAP *bitmap, struct pos pos);
-struct xy wall_base_xy (struct pos pos);
-struct xy wall_xy (struct pos pos);
-struct xy wall_face_xy (struct pos pos);
-struct xy wall_face_top_xy (struct pos pos);
+struct coord wall_base_coord (struct pos pos);
+struct coord wall_coord (struct pos pos);
+struct coord wall_face_coord (struct pos pos);
+struct coord wall_face_top_coord (struct pos pos);
 enum wall_correlation wall_correlation (struct pos pos);
 void draw_wall_randomization (ALLEGRO_BITMAP *bitmap, struct pos pos);
 void draw_wall_left_mark (ALLEGRO_BITMAP *bitmap, struct pos pos,
@@ -65,11 +65,11 @@ void draw_wall_left_mark (ALLEGRO_BITMAP *bitmap, struct pos pos,
 void draw_wall_right_mark (ALLEGRO_BITMAP *bitmap, struct pos pos,
                            int r);
 void draw_wall_gray_block (ALLEGRO_BITMAP *bitmap, struct pos p);
-struct xy wall_gray_block_xy (struct pos p);
+struct coord wall_gray_block_coord (struct pos p);
 void draw_wall_divider_00 (ALLEGRO_BITMAP *bitmap, struct pos p);
-struct xy wall_divider_00_xy (struct pos p);
+struct coord wall_divider_00_coord (struct pos p);
 void draw_wall_divider_01 (ALLEGRO_BITMAP *bitmap, struct pos p);
-struct xy wall_divider_01_xy (struct pos p);
+struct coord wall_divider_01_coord (struct pos p);
 void draw_wall_wws_no_face (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_wall_sws_no_face (ALLEGRO_BITMAP *bitmap, struct pos p);
 

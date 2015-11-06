@@ -22,6 +22,7 @@
 #include "kernel/video.h"
 #include "kernel/random.h"
 #include "level.h"
+#include "kid.h"
 #include "wall.h"
 
 ALLEGRO_BITMAP *wall_left, *wall_center, *wall_right, *wall_single, *wall_face,
@@ -84,7 +85,7 @@ draw_wall (ALLEGRO_BITMAP *bitmap, struct pos p)
   case WWS: draw_wall_wws (bitmap, p); break;
   case WWW: draw_wall_www (bitmap, p); break;
   default:
-    error (-1, 0, "%s: unknown wall correlation (%u, %u. %u)",
+    error (-1, 0, "%s: unknown wall correlation (%i, %i. %i)",
            __func__, p.room, p.floor, p.place);
   }
   draw_wall_randomization (bitmap, p);
@@ -94,102 +95,106 @@ void
 draw_wall_sws (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
   draw_wall_sws_no_face (bitmap, p);
-  draw_bitmap_xy (wall_face, bitmap, wall_face_xy (p), 0);
-  draw_bitmap_xy (wall_face_top, bitmap, wall_face_top_xy (p), 0);
+  draw_bitmapc (wall_face, bitmap, wall_face_coord (p), 0);
+  draw_bitmapc (wall_face_top, bitmap, wall_face_top_coord (p), 0);
 }
 
 void
 draw_wall_sws_no_face (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
-  draw_bitmap_xy (wall_single_base, bitmap, wall_base_xy (p), 0);
-  draw_bitmap_xy (wall_single, bitmap, wall_xy (p), 0);
+  draw_bitmapc (wall_single_base, bitmap, wall_base_coord (p), 0);
+  draw_bitmapc (wall_single, bitmap, wall_coord (p), 0);
 }
 
 void
 draw_wall_sww (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
-  draw_bitmap_xy (wall_left_base, bitmap, wall_base_xy (p), 0);
-  draw_bitmap_xy (wall_left, bitmap, wall_xy (p), 0);
+  draw_bitmapc (wall_left_base, bitmap, wall_base_coord (p), 0);
+  draw_bitmapc (wall_left, bitmap, wall_coord (p), 0);
 }
 
 void
 draw_wall_wws (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
   draw_wall_wws_no_face (bitmap, p);
-  draw_bitmap_xy (wall_face, bitmap, wall_face_xy (p), 0);
-  draw_bitmap_xy (wall_face_top, bitmap, wall_face_top_xy (p), 0);
+  draw_bitmapc (wall_face, bitmap, wall_face_coord (p), 0);
+  draw_bitmapc (wall_face_top, bitmap, wall_face_top_coord (p), 0);
 }
 
 void
 draw_wall_wws_no_face (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
-  draw_bitmap_xy (wall_right_base, bitmap, wall_base_xy (p), 0);
-  draw_bitmap_xy (wall_right, bitmap, wall_xy (p), 0);
+  draw_bitmapc (wall_right_base, bitmap, wall_base_coord (p), 0);
+  draw_bitmapc (wall_right, bitmap, wall_coord (p), 0);
 }
 
 void
 draw_wall_www (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
-  draw_bitmap_xy (wall_center_base, bitmap, wall_base_xy (p), 0);
-  draw_bitmap_xy (wall_center, bitmap, wall_xy (p), 0);
+  draw_bitmapc (wall_center_base, bitmap, wall_base_coord (p), 0);
+  draw_bitmapc (wall_center, bitmap, wall_coord (p), 0);
 }
 
 void
 draw_wall_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
   switch (wall_correlation (p)) {
-  case SWS: draw_wall_sws_no_face (bitmap, p); break;
+  case SWS:
+    if (is_kid_vjump ()) draw_wall_sws (bitmap, p);
+    else draw_wall_sws_no_face (bitmap, p); break;
   case SWW: draw_wall_sww (bitmap, p); break;
-  case WWS: draw_wall_wws_no_face (bitmap, p); break;
+  case WWS:
+    if (is_kid_vjump ()) draw_wall_wws (bitmap, p);
+    else draw_wall_wws_no_face (bitmap, p); break;
   case WWW: draw_wall_www (bitmap, p); break;
   default:
-    error (-1, 0, "%s: unknown wall correlation (%u, %u. %u)",
+    error (-1, 0, "%s: unknown wall correlation (%i, %i. %i)",
            __func__, p.room, p.floor, p.place);
   }
   draw_wall_randomization (bitmap, p);
 }
 
-struct xy
-wall_base_xy (struct pos p)
+struct coord
+wall_base_coord (struct pos p)
 {
-  struct xy xy;
-  xy.x = PLACE_WIDTH * p.place;
-  xy.y = PLACE_HEIGHT * (p.floor + 1);
-  return xy;
+  struct coord c;
+  c.x = PLACE_WIDTH * p.place;
+  c.y = PLACE_HEIGHT * (p.floor + 1);
+  return c;
 }
 
-struct xy
-wall_xy (struct pos p)
+struct coord
+wall_coord (struct pos p)
 {
-  struct xy xy;
-  xy.x = PLACE_WIDTH * p.place;
-  xy.y = PLACE_HEIGHT * p.floor + 3;
-  return xy;
+  struct coord c;
+  c.x = PLACE_WIDTH * p.place;
+  c.y = PLACE_HEIGHT * p.floor + 3;
+  return c;
 }
 
-struct xy
-wall_face_xy (struct pos p)
+struct coord
+wall_face_coord (struct pos p)
 {
-  struct xy xy;
-  xy.x = PLACE_WIDTH * (p.place + 1);
-  xy.y = PLACE_HEIGHT * p.floor + 3;
-  return xy;
+  struct coord c;
+  c.x = PLACE_WIDTH * (p.place + 1);
+  c.y = PLACE_HEIGHT * p.floor + 3;
+  return c;
 }
 
-struct xy
-wall_face_top_xy (struct pos p)
+struct coord
+wall_face_top_coord (struct pos p)
 {
-  struct xy xy;
-  xy.x = PLACE_WIDTH * (p.place + 1);
-  xy.y = PLACE_HEIGHT * p.floor - 9;
-  return xy;
+  struct coord c;
+  c.x = PLACE_WIDTH * (p.place + 1);
+  c.y = PLACE_HEIGHT * p.floor - 9;
+  return c;
 }
 
 enum wall_correlation
 wall_correlation (struct pos p)
 {
   if (construct (p).fg != WALL)
-    error (-1, 0, "%s: requested wall correlation on non-wall (%u, %u. %u)",
+    error (-1, 0, "%s: requested wall correlation on non-wall (%i, %i. %i)",
            __func__, p.room, p.floor, p.place);
 
   if (construct_rel (p, 0, -1).fg != WALL
@@ -201,14 +206,14 @@ wall_correlation (struct pos p)
   else if (construct_rel (p, 0, -1).fg == WALL
            && construct_rel (p, 0, +1).fg == WALL) return WWW;
   else
-    error (-1, 0, "%s: unknown wall correlation (%u, %u. %u)",
+    error (-1, 0, "%s: unknown wall correlation (%i, %i. %i)",
            __func__, p.room, p.floor, p.place);
 
   return -1;
 }
 
 /* wall randomization auxiliary numbers */
-static unsigned int r0, r1, r2, r3;
+static int r0, r1, r2, r3;
 
 /* wall randomization dividers */
 static ALLEGRO_BITMAP *wall_divider_00, *wall_divider_01;
@@ -218,7 +223,7 @@ draw_wall_randomization (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
   if (level->type != DUNGEON && video_mode == VGA) return;
 
-  struct pos np = norm_pos (p, true);
+  struct pos np = npos (p);
   uint32_t random_seed_backup = random_seed;
   random_seed = np.room + np.floor * PLACES + np.place;
   prandom (1);
@@ -270,7 +275,7 @@ draw_wall_randomization (ALLEGRO_BITMAP *bitmap, struct pos p)
     }
     break;
   default:
-    error (-1, 0, "%s: unknown wall correlation (%u)", __func__, wc);
+    error (-1, 0, "%s: unknown wall correlation (%i)", __func__, wc);
   }
 
   random_seed = random_seed_backup;
@@ -280,8 +285,8 @@ void
 draw_wall_left_mark (ALLEGRO_BITMAP *bitmap, struct pos p, int r)
 {
   ALLEGRO_BITMAP *wall_mark = wall_mark_top_left;
-  const unsigned int floor_offset[5] = {58, 41, 37, 20, 16};
-  unsigned int place_offset = 0;
+  const int floor_offset[5] = {58, 41, 37, 20, 16};
+  int place_offset = 0;
 
   if (r % 2) wall_mark = wall_mark_bottom_left;
   if (r > 3) place_offset = r3 - r2 + 6;
@@ -297,7 +302,7 @@ void
 draw_wall_right_mark (ALLEGRO_BITMAP *bitmap, struct pos p, int r)
 {
   ALLEGRO_BITMAP *wall_mark;
-  const unsigned int floor_offset[4] = {52, 42, 31, 21};
+  const int floor_offset[4] = {52, 42, 31, 21};
 
   if (r % 2) wall_mark = wall_mark_bottom_right;
   else wall_mark = wall_mark_top_right;
@@ -311,44 +316,44 @@ draw_wall_right_mark (ALLEGRO_BITMAP *bitmap, struct pos p, int r)
 void
 draw_wall_gray_block (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
-  draw_bitmap_xy (wall_gray_block, bitmap, wall_gray_block_xy (p), 0);
+  draw_bitmapc (wall_gray_block, bitmap, wall_gray_block_coord (p), 0);
 }
 
-struct xy
-wall_gray_block_xy (struct pos p)
+struct coord
+wall_gray_block_coord (struct pos p)
 {
-  struct xy xy;
-  xy.x = PLACE_WIDTH * p.place;
-  xy.y = PLACE_HEIGHT * p.floor + 3;
-  return xy;
+  struct coord c;
+  c.x = PLACE_WIDTH * p.place;
+  c.y = PLACE_HEIGHT * p.floor + 3;
+  return c;
 }
 
 void
 draw_wall_divider_00 (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
-  draw_bitmap_xy (wall_divider_00, bitmap, wall_divider_00_xy (p), 0);
+  draw_bitmapc (wall_divider_00, bitmap, wall_divider_00_coord (p), 0);
 }
 
-struct xy
-wall_divider_00_xy (struct pos p)
+struct coord
+wall_divider_00_coord (struct pos p)
 {
-  struct xy xy;
-  xy.x = PLACE_WIDTH * p.place + r3;
-  xy.y = PLACE_HEIGHT * p.floor + 45;
-  return xy;
+  struct coord c;
+  c.x = PLACE_WIDTH * p.place + r3;
+  c.y = PLACE_HEIGHT * p.floor + 45;
+  return c;
 }
 
 void
 draw_wall_divider_01 (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
-  draw_bitmap_xy (wall_divider_01, bitmap, wall_divider_01_xy (p), 0);
+  draw_bitmapc (wall_divider_01, bitmap, wall_divider_01_coord (p), 0);
 }
 
-struct xy
-wall_divider_01_xy (struct pos p)
+struct coord
+wall_divider_01_coord (struct pos p)
 {
-  struct xy xy;
-  xy.x = PLACE_WIDTH * p.place + 8 + r1;
-  xy.y = PLACE_HEIGHT * p.floor + 24;
-  return xy;
+  struct coord c;
+  c.x = PLACE_WIDTH * p.place + 8 + r1;
+  c.y = PLACE_HEIGHT * p.floor + 24;
+  return c;
 }

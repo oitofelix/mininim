@@ -61,7 +61,7 @@ unload_clock (void)
 void
 draw_clock (void)
 {
-  static unsigned int i = 0;
+  static int i = 0;
   ALLEGRO_BITMAP *sand;
 
   if (! princess_room_clock) return;

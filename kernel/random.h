@@ -26,7 +26,7 @@
 extern uint32_t random_seed;
 
 /* functions */
-unsigned int prandom(unsigned int max);
-unsigned int prandom_uniq (uint32_t seed, unsigned int max);
+int prandom(int max);
+int prandom_uniq (uint32_t seed, int max);
 
 #endif	/* FREEPOP_RANDOM_H */

@@ -25,12 +25,16 @@
 #include "anim.h"
 #include "room.h"
 #include "floor.h"
+#include "pos.h"
 #include "physics.h"
+
+struct pos loose_floor_pos;
+struct pos hang_pos;
 
 struct construct
 construct (struct pos p)
 {
-  p = norm_pos (p, true);
+  p = npos (p);
   return level->construct[p.room][p.floor][p.place];
 }
 
@@ -45,269 +49,8 @@ construct_rel (struct pos p, int floor, int place)
 void
 set_construct_fg (struct pos p, enum construct_fg fg)
 {
-  p = norm_pos (p, true);
+  p = npos (p);
   level->construct[p.room][p.floor][p.place].fg = fg;
-}
-
-void
-norm_anim (struct anim *a)
-{
-  struct pos p = norm_pos (room_pos_mid (*a), true);
-
-  if (a->room == p.room) return;
-
-  if (level->link[a->room].l == p.room)
-    a->x += PLACE_WIDTH * PLACES;
-  if (level->link[a->room].r == p.room)
-    a->x -= PLACE_WIDTH * PLACES;
-  if (level->link[a->room].a == p.room)
-    a->y += PLACE_HEIGHT * FLOORS;
-  if (level->link[a->room].b == p.room)
-    a->y -= PLACE_HEIGHT * FLOORS;
-
-  a->room = p.room;
-}
-
-struct pos
-norm_pos (struct pos p, bool floor_first)
-{
-  if (p.room >= ROOMS)
-    error (-1, 0, "%s: room out of range (%u)", __func__, p.room);
-
-  if (floor_first) {
-    p = norm_pos_floor (p);
-    p = norm_pos_place (p);
-  } else {
-    p = norm_pos_place (p);
-    p = norm_pos_floor (p);
-  }
-
-  return p;
-}
-
-struct pos
-norm_pos_floor (struct pos p)
-{
-  unsigned int room_offset;
-  if (p.floor < 0) {
-    unsigned int q = (-p.floor) / FLOORS;
-    unsigned int r = (-p.floor) % FLOORS;
-    p.floor = r ? FLOORS - r : 0;
-    for (room_offset = r ? q + 1 : q; room_offset > 0; room_offset--)
-      p.room = level->link[p.room].a;
-  } else if (p.floor >= FLOORS) {
-    unsigned int q = p.floor / FLOORS;
-    unsigned int r = p.floor % FLOORS;
-    p.floor = r;
-    for (room_offset = q; room_offset > 0; room_offset--)
-      p.room = level->link[p.room].b;
-  }
-  return p;
-}
-
-struct pos
-norm_pos_place (struct pos p)
-{
-  unsigned int room_offset;
-  if (p.place < 0) {
-    unsigned int q = (-p.place) / PLACES;
-    unsigned int r = (-p.place) % PLACES;
-    p.place = r ? PLACES - r : 0;
-    for (room_offset = r ? q + 1 : q; room_offset > 0; room_offset--)
-      p.room = level->link[p.room].l;
-  } else if (p.place >= PLACES) {
-    unsigned int q = p.place / PLACES;
-    unsigned int r = p.place % PLACES;
-    p.floor = r;
-    for (room_offset = q; room_offset > 0; room_offset--)
-      p.room = level->link[p.room].r;
-  }
-  return p;
-}
-
-unsigned int
-prandom_pos (struct pos p, unsigned int i, unsigned int max)
-{
-  return
-    prandom_uniq (p.room + p.floor * PLACES + p.place + i, max);
-}
-
-struct pos
-pos_xy (unsigned int room, int x, int y)
-{
-  struct pos p;
-
-  p.room = room;
-  p.place = (x - 15) / PLACE_WIDTH;
-  p.floor = (y - 3) / PLACE_HEIGHT;
-
-  if (x < 15) p.place = -1;
-  if (y < 3) p.floor = -1;
-
-  return p;
-}
-
-struct pos
-pos (struct anim a)
-{
-  int w = al_get_bitmap_width (a.frame);
-  return pos_xy (a.room, (a.dir == LEFT) ? a.x : a.x + w - 1, a.y);
-}
-
-struct pos
-pos_mid (struct anim a)
-{
-  struct xy xy = xy_mid (a);
-  return pos_xy (a.room, xy.x, xy.y);
-}
-
-struct pos
-pos_mid_front (struct anim a)
-{
-  struct xy xy = xy_mid_front (a);
-  return pos_xy (a.room, xy.x, xy.y);
-}
-
-struct pos
-pos_mid_back (struct anim a)
-{
-  struct xy xy = xy_mid_back (a);
-  return pos_xy (a.room, xy.x, xy.y);
-}
-
-struct pos
-pos_bottom_front (struct anim a)
-{
-  struct xy xy = xy_bottom_front (a);
-  return pos_xy (a.room, xy.x, xy.y);
-}
-
-struct pos
-pos_bottom_back (struct anim a)
-{
-  struct xy xy = xy_bottom_back (a);
-  return pos_xy (a.room, xy.x, xy.y);
-}
-
-struct pos
-pos_mid_top (struct anim a)
-{
-  struct xy xy = xy_mid_top (a);
-  return pos_xy (a.room, xy.x, xy.y);
-}
-
-struct pos
-pos_front_top (struct anim a)
-{
-  struct xy xy = xy_front_top (a);
-  return pos_xy (a.room, xy.x, xy.y);
-}
-
-struct pos
-pos_back_top (struct anim a)
-{
-  struct xy xy = xy_back_top (a);
-  return pos_xy (a.room, xy.x, xy.y);
-}
-
-struct xy
-xy_mid (struct anim a)
-{
-  int w = al_get_bitmap_width (a.frame);
-  int h = al_get_bitmap_height (a.frame);
-  struct xy xy;
-  xy.x = a.x + w / 2;
-  xy.y = a.y + h / 2;
-  return xy;
-}
-
-struct xy
-xy_mid_front (struct anim a)
-{
-  int w = al_get_bitmap_width (a.frame);
-  int h = al_get_bitmap_height (a.frame);
-  struct xy xy;
-  xy.x = (a.dir == LEFT) ? a.x : a.x + w - 1;
-  xy.y = a.y + h / 2;
-  return xy;
-}
-
-struct xy
-xy_mid_back (struct anim a)
-{
-  int w = al_get_bitmap_width (a.frame);
-  int h = al_get_bitmap_height (a.frame);
-  struct xy xy;
-  xy.x = (a.dir == LEFT) ? a.x + w - 1 : a.x;
-  xy.y = a.y + h / 2;
-  return xy;
-}
-
-struct xy
-xy_mid_top (struct anim a)
-{
-  int w = al_get_bitmap_width (a.frame);
-  struct xy xy;
-  xy.x = a.x + w / 2;
-  xy.y = a.y;
-  return xy;
-}
-
-struct xy
-xy_front_top (struct anim a)
-{
-  int w = al_get_bitmap_width (a.frame);
-  struct xy xy;
-  xy.x = (a.dir == LEFT) ? a.x : a.x + w - 1;
-  xy.y = a.y;
-  return xy;
-}
-
-struct xy
-xy_back_top (struct anim a)
-{
-  int w = al_get_bitmap_width (a.frame);
-  struct xy xy;
-  xy.x = (a.dir == LEFT) ? a.x + w - 1 : a.x;
-  xy.y = a.y;
-  return xy;
-}
-
-struct xy
-xy_bottom_front (struct anim a)
-{
-  int w = al_get_bitmap_width (a.frame);
-  int h = al_get_bitmap_height (a.frame);
-  struct xy xy;
-  xy.x = (a.dir == LEFT) ? a.x : a.x + w - 1;
-  xy.y = a.y + h - 1;
-  return xy;
-}
-
-struct xy
-xy_bottom_back (struct anim a)
-{
-  int w = al_get_bitmap_width (a.frame);
-  int h = al_get_bitmap_height (a.frame);
-  struct xy xy;
-  xy.x = (a.dir == LEFT) ? a.x + w - 1 : a.x;
-  xy.y = a.y + h - 1;
-  return xy;
-}
-
-struct pos
-pos_rel (struct pos p, int floor, int place)
-{
-  p.floor += floor;
-  p.place += place;
-  return p;
-}
-
-bool
-is_pos_eq (struct pos p0, struct pos p1)
-{
-  return p0.room == p1.room && p0.floor == p1.floor
-    && p0.place == p1.place;
 }
 
 bool
@@ -320,8 +63,7 @@ is_colliding (struct anim a)
   /* fix bug when vertically jumping near a wall face */
   if (a.id == &kid && is_kid_start_vjump ()) return false;
 
-  a.x += (a.dir == LEFT) ? 0 : 0;
-  struct pos p = pos (a);
+  struct pos p = pos (coord_tf (a));
   struct construct c = construct (p);
   if (c.fg == WALL) {
     return true;
@@ -332,16 +74,16 @@ int
 dist_collision (struct anim a)
 {
   int inc = (a.dir == LEFT) ? -1 : +1;
-  int x = a.x;
+  int x = a.c.x;
 
   if (! is_colliding (a))
-    while (! is_colliding (a) && abs (x - a.x) != PLACE_WIDTH)
-      a.x += inc;
+    while (! is_colliding (a) && abs (x - a.c.x) != PLACE_WIDTH)
+      a.c.x += inc;
   else
-    while (is_colliding (a) && abs (x - a.x) != PLACE_WIDTH)
-      a.x -= inc;
+    while (is_colliding (a) && abs (x - a.c.x) != PLACE_WIDTH)
+      a.c.x -= inc;
 
-  return inc * (a.x - x);
+  return inc * (a.c.x - x);
 }
 
 bool
@@ -351,32 +93,19 @@ is_falling (struct anim a)
 
   if (a.id == &kid && (is_kid_start_jump ())) return false;
 
-  a.x += (a.dir == LEFT) ? +4 : -4;
+  a.c.x += (a.dir == LEFT) ? +4 : -4;
 
-  /* a.x += (a.dir == LEFT) ? 4 : -5; */
-  /* struct pos pft = pos_front_top (a); */
-  /* struct pos pmt = pos_mid_top (a); */
-  /* struct pos pbt = pos_back_top (a); */
+  struct coord cbf = coord_bf (a);
+  struct pos pbf = pos (cbf);
+  struct construct ctbf = construct (pbf);
 
-  /* struct construct cft = construct (pft); */
-  /* struct construct cmt = construct (pmt); */
-  /* struct construct cbt = construct (pbt); */
-
-  struct pos pbf = pos_bottom_front (a);
-  struct construct cbf = construct (pbf);
-  struct xy xybf = xy_bottom_front (a);
-
-  if (
-      cbf.fg == NO_FLOOR
-      || xybf.y + 33 < PLACE_HEIGHT * (pbf.floor + 1) + 3
-
-      /* cft.fg == NO_FLOOR */
-      /* cmt.fg == NO_FLOOR */
-      /* || cbt.fg == NO_FLOOR */
-      ) {
+  if (ctbf.fg == NO_FLOOR
+      || cbf.y + 35 < PLACE_HEIGHT * (pbf.floor + 1) + 3) {
     return true;
   }
 
+  /* needed because when hanging the kid's bottom front position
+     coincides with the wall's */
   if (a.id == &kid && is_kid_hang ()
       && construct (hang_pos).fg == NO_FLOOR) return true;
 
@@ -387,42 +116,42 @@ int
 dist_fall (struct anim a)
 {
   int inc = (a.dir == LEFT) ? -1 : +1;
-  int x = a.x;
+  int x = a.c.x;
 
   if (! is_falling (a))
-    while (! is_falling (a) && abs (x - a.x) != PLACE_WIDTH)
-      a.x += inc;
+    while (! is_falling (a) && abs (x - a.c.x) != PLACE_WIDTH)
+      a.c.x += inc;
   else
-    while (is_falling (a) && abs (x - a.x) != PLACE_WIDTH)
-      a.x -= inc;
+    while (is_falling (a) && abs (x - a.c.x) != PLACE_WIDTH)
+      a.c.x -= inc;
 
-  return inc * (a.x - x);
+  return inc * (a.c.x - x);
 }
 
 int
 dist_next_place (struct anim a)
 {
-  struct pos p = pos (a);
+  struct pos p = pos (coord_tf (a));
   int inc = (a.dir == LEFT) ? -1 : +1;
-  int x = a.x;
+  int x = a.c.x;
 
-  while (p.place == pos (a).place && abs (x - a.x) != PLACE_WIDTH)
-    a.x += inc;
+  while (p.place == pos (coord_tf (a)).place && abs (x - a.c.x) != PLACE_WIDTH)
+    a.c.x += inc;
 
-  return inc * (a.x - x);
+  return inc * (a.c.x - x);
 }
 
 int
 dist_prev_place (struct anim a)
 {
-  struct pos p = pos (a);
+  struct pos p = pos (coord_tf (a));
   int inc = (a.dir == LEFT) ? +1 : -1;
-  int x = a.x;
+  int x = a.c.x;
 
-  while (p.place == pos (a).place && abs (x - a.x) != PLACE_WIDTH)
-    a.x += inc;
+  while (p.place == pos (coord_tf (a)).place && abs (x - a.c.x) != PLACE_WIDTH)
+    a.c.x += inc;
 
-  return inc * (a.x - x);
+  return inc * (a.c.x - x);
 }
 
 bool
@@ -430,13 +159,15 @@ is_hitting_ceiling (struct anim a)
 {
   if (! a.ceiling) return false;
 
-  struct pos top = room_pos_tl (a);
-  struct pos bottom = room_pos_br (a);
-  struct construct c = construct (top);
+  struct pos pt = (a.dir == LEFT)
+    ? pos (coord_tb (a)) : pos (coord_tf (a));
+
+  struct pos pbr = pos (coord_br (a));
+  struct construct c = construct (pt);
 
   if (a.id == &kid && ! is_kid_vjump ()) return false;
 
-  if (top.floor != bottom.floor && c.fg != NO_FLOOR) return true;
+  if (pt.floor != pbr.floor && c.fg != NO_FLOOR) return true;
 
   return false;
 }
@@ -446,7 +177,7 @@ to_collision_edge (struct anim *a)
 {
   int dc = dist_collision (*a);
   int dir = (a->dir == LEFT) ? -1 : +1;
-  a->x += dir * ((abs (dc) < PLACE_WIDTH) ? dc - 1 : 0);
+  a->c.x += dir * ((abs (dc) < PLACE_WIDTH) ? dc - 1 : 0);
   printf ("dc = %i\n", dc);
 }
 
@@ -455,16 +186,14 @@ to_fall_edge (struct anim *a)
 {
   int df = dist_fall (*a);
   int dir = (a->dir == LEFT) ? -1 : +1;
-  a->x += dir * ((abs (df) < PLACE_WIDTH) ? df - 1 : 0);
+  a->c.x += dir * ((abs (df) < PLACE_WIDTH) ? df - 1 : 0);
   printf ("df = %i\n", df);
 }
-
-struct pos loose_floor_pos;
 
 bool
 is_on_loose_floor (struct anim a)
 {
-  a.x += (a.dir == LEFT) ? 4 : -4;
+  a.c.x += (a.dir == LEFT) ? 4 : -4;
 
   if (a.draw == draw_kid_misstep) return false;
   if (a.id == &kid && is_kid_stabilize ()) return false;
@@ -474,7 +203,7 @@ is_on_loose_floor (struct anim a)
                        is_kid_jump () || is_kid_stop_jump ()))
     return false;
 
-  struct pos p = pos_mid (a);
+  struct pos p = pos (coord_m (a));
   struct construct c = construct (p);
 
   if (c.fg == LOOSE_FLOOR) {
@@ -488,16 +217,16 @@ int
 dist_loose_floor (struct anim a)
 {
   int inc = (a.dir == LEFT) ? -1 : +1;
-  int x = a.x;
+  int x = a.c.x;
 
   if (! is_on_loose_floor (a))
-    while (! is_on_loose_floor (a) && abs (x - a.x) != PLACE_WIDTH)
-      a.x += inc;
+    while (! is_on_loose_floor (a) && abs (x - a.c.x) != PLACE_WIDTH)
+      a.c.x += inc;
   else
-    while (is_on_loose_floor (a) && abs (x - a.x) != PLACE_WIDTH)
-      a.x -= inc;
+    while (is_on_loose_floor (a) && abs (x - a.c.x) != PLACE_WIDTH)
+      a.c.x -= inc;
 
-  return inc * (a.x - x);
+  return inc * (a.c.x - x);
 }
 
 void
@@ -505,7 +234,7 @@ to_loose_floor_edge (struct anim *a)
 {
   int dl = dist_loose_floor (*a);
   int dir = (a->dir == LEFT) ? -1 : +1;
-  a->x += dir * ((abs (dl) < PLACE_WIDTH) ? dl - 1 : 0);
+  a->c.x += dir * ((abs (dl) < PLACE_WIDTH) ? dl - 1 : 0);
   printf ("dl = %i\n", dl);
 }
 
@@ -514,7 +243,7 @@ to_next_place_edge (struct anim *a)
 {
   int dn = dist_next_place (*a);
   int dir = (a->dir == LEFT) ? -1 : +1;
-  a->x += dir * ((abs (dn) < PLACE_WIDTH) ? dn - 1 : 0);
+  a->c.x += dir * ((abs (dn) < PLACE_WIDTH) ? dn - 1 : 0);
   printf ("dn = %i\n", dn);
 }
 
@@ -523,26 +252,12 @@ to_prev_place_edge (struct anim *a)
 {
   int dp = dist_prev_place (*a);
   int dir = (a->dir == LEFT) ? +1 : -1;
-  a->x += dir * ((abs (dp) < PLACE_WIDTH) ? dp : 0);
+  a->c.x += dir * ((abs (dp) < PLACE_WIDTH) ? dp : 0);
   printf ("dp = %i\n", dp);
 }
 
-void
-center_anim (struct anim *a)
-{
-  struct pos p = pos (*a);
-  int w = al_get_bitmap_width (a->frame);
-  a->x = pos_center_x (p) - w / 2;
-}
-
-int
-pos_center_x (struct pos p)
-{
-  return p.place * 32 + 28;
-}
-
 bool
-is_hangable_pos (struct pos p, enum direction direction)
+is_hangable_pos (struct pos p, enum dir direction)
 {
   int dir = (direction == LEFT) ? -1 : +1;
   enum construct_fg fg = construct_rel (p, -1, dir).fg;
@@ -552,18 +267,41 @@ is_hangable_pos (struct pos p, enum direction direction)
     && construct_rel (p, -1, 0).fg == NO_FLOOR;
 }
 
-struct pos hang_pos;
-
 bool
 is_hangable (struct anim a)
 {
-  struct pos pmf = pos_mid_front (a);
-  struct pos pmb = pos_mid_back (a);
+  struct pos pmf = pos (coord_mf (a));
+  struct pos pmb = pos (coord_mba (a));
   bool hmf = is_hangable_pos (pmf, a.dir);
   bool hmb = is_hangable_pos (pmb, a.dir);
   if (hmf) hang_pos = pmf;
   if (hmb) hang_pos = pmb;
   return hmf || hmb;
+}
+
+bool
+is_visible (struct anim a)
+{
+  /* if (a.id == &kid) */
+    return ncoord (coord_m (a)).room == room_view;
+  /* else { */
+  /*   if (a.c.room == room_view) return true; */
+
+  /*   /\* struct coord ctl = ncoord (coord_tl (a)); *\/ */
+  /*   /\* struct coord ctr = ncoord (coord_tr (a)); *\/ */
+  /*   /\* struct coord cbl = ncoord (coord_bl (a)); *\/ */
+  /*   /\* struct coord cbr = ncoord (coord_br (a)); *\/ */
+
+  /*   /\* if (ctl.room == room_view *\/ */
+  /*   /\*     || ctr.room == room_view *\/ */
+  /*   /\*     || cbl.room == room_view *\/ */
+  /*   /\*     || cbr.room == room_view) return true; *\/ */
+  /*   /\* else if (roomd (room_view, BELOW) == ctl.room *\/ */
+  /*   /\*          && ctl.y < 11) return true; *\/ */
+  /*   /\* else return false; *\/ */
+  /* } */
+
+  /* return false; */
 }
 
 void
@@ -593,7 +331,7 @@ apply_physics (struct anim *a, ALLEGRO_BITMAP *frame,
   } else if (is_on_loose_floor (na))
     release_loose_floor (loose_floor_pos);
 
-  norm_anim (&na);
+  na.c = nanim (na);
 
   (*a) = na;
 }

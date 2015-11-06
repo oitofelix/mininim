@@ -20,7 +20,7 @@
 #ifndef FREEPOP_ROOM_H
 #define FREEPOP_ROOM_H
 
-#include "physics.h"
+#include "prince.h"
 
 #define VDUNGEON_BRICKS_01 "dat/vdungeon/background/bricks01.png"
 #define VDUNGEON_BRICKS_02 "dat/vdungeon/background/bricks02.png"
@@ -35,29 +35,23 @@ void load_room (void);
 void unload_room (void);
 void draw_room (int room);
 void draw_room_bg (void);
-void draw_construct (ALLEGRO_BITMAP *bitmap, struct pos pos);
-void draw_construct_fg (ALLEGRO_BITMAP *bitmap, struct pos pos);
-void draw_construct_bg (ALLEGRO_BITMAP *bitmap, struct pos pos);
+void draw_construct (ALLEGRO_BITMAP *bitmap, struct pos p);
+void draw_construct_fg (ALLEGRO_BITMAP *bitmap, struct pos p);
+void draw_construct_bg (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_construct_left (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_construct_right (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_no_floor_base (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_no_floor (ALLEGRO_BITMAP *bitmap, struct pos p);
-void draw_bricks_01 (ALLEGRO_BITMAP *bitmap, struct pos pos);
-void draw_bricks_02 (ALLEGRO_BITMAP *bitmap, struct pos pos);
-void draw_bricks_03 (ALLEGRO_BITMAP *bitmap, struct pos pos);
-void draw_bricks_04 (ALLEGRO_BITMAP *bitmap, struct pos pos);
-struct xy bricks_xy (struct pos pos);
-void draw_torch (ALLEGRO_BITMAP *bitmap, struct pos pos);
-struct xy torch_xy (struct pos pos);
-void draw_window (ALLEGRO_BITMAP *bitmap, struct pos pos);
-struct xy window_xy (struct pos pos);
+void draw_bricks_01 (ALLEGRO_BITMAP *bitmap, struct pos p);
+void draw_bricks_02 (ALLEGRO_BITMAP *bitmap, struct pos p);
+void draw_bricks_03 (ALLEGRO_BITMAP *bitmap, struct pos p);
+void draw_bricks_04 (ALLEGRO_BITMAP *bitmap, struct pos p);
+struct coord bricks_coord (struct pos p);
+void draw_torch (ALLEGRO_BITMAP *bitmap, struct pos p);
+struct coord torch_coord (struct pos p);
+void draw_window (ALLEGRO_BITMAP *bitmap, struct pos p);
+struct coord window_coord (struct pos p);
 void draw_room_anim_fg (struct anim a);
 void draw_room_fg (struct pos p);
-struct pos room_pos_bl (struct anim a);
-struct pos room_pos_br (struct anim a);
-struct pos room_pos_mid (struct anim a);
-struct pos room_pos_tl (struct anim a);
-struct pos room_pos_tr (struct anim a);
-struct pos room_pos_xy (unsigned int room, int x, int y);
 
 #endif	/* FREEPOP_ROOM_H */

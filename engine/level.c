@@ -65,12 +65,12 @@ unload_level (void)
   unload_kid ();
 }
 
-unsigned int room_view = 1;
+int room_view = 1;
 
 static void
 level_anim (void)
 {
-  unsigned int prev_room = room_view;
+  int prev_room = room_view;
 
   if (was_key_pressed (ALLEGRO_KEY_H, true))
     room_view = level->link[room_view].l;
@@ -84,11 +84,11 @@ level_anim (void)
   if (room_view == 0) room_view = prev_room;
 
   level_draw_base ();
-  if (room_view == kid.room) {
-    prev_room = kid.room;
+  if (is_visible (kid)) {
+    prev_room = kid.c.room;
     kid.draw ();
-    if (kid.room != prev_room) {
-      room_view = kid.room;
+    if (kid.c.room != prev_room) {
+      room_view = kid.c.room;
       level_draw_base ();
       draw_anim (&kid, kid.frame, 0, 0);
     }

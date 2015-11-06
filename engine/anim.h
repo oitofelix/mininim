@@ -20,35 +20,14 @@
 #ifndef FREEPOP_ANIM_H
 #define FREEPOP_ANIM_H
 
-#include "kernel/video.h"
-
-/* types */
-struct anim {
-  struct anim *id;
-  unsigned int room;
-  int x, y;
-  ALLEGRO_BITMAP *frame;
-  int dir;
-  unsigned int repeat;
-  int flip;
-  bool just_fall;
-  void (*draw) (void);
-  void (*odraw) (void);
-  void (*collision) (void);
-  void (*fall) (void);
-  void (*ceiling) (void);
-};
-
-enum direction {
-  LEFT, RIGHT, TOP, BOTTOM,
-};
+#include "prince.h"
 
 /* functions */
-void play_anim (void (*callback) (void), unsigned int freq);
+void play_anim (void (*callback) (void), int freq);
 void draw_anim (struct anim *anim, ALLEGRO_BITMAP *new_frame, int dx, int dy);
 struct anim next_anim (struct anim a, ALLEGRO_BITMAP* frame, int dx, int dy);
 void draw_anim_on_edge (struct anim *a, ALLEGRO_BITMAP* frame, int dx, int dy);
-bool wait_anim (unsigned int cycles);
+bool wait_anim (int cycles);
 void draw_anim_on_collision_edge (struct anim *a, ALLEGRO_BITMAP* frame,
                                   int dx, int dy);
 void draw_anim_on_fall_edge (struct anim *a, ALLEGRO_BITMAP* frame, int dx, int dy);

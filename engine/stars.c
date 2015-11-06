@@ -28,11 +28,11 @@ static void draw_stars (struct star stars[], size_t count);
 static void
 draw_stars (struct star stars[], size_t count)
 {
-  static unsigned int i = 0;
+  static int i = 0;
 
   if (! count) return;
 
-  unsigned int random = prandom_uniq (STARS_RANDOM_SEED + i, count - 1);
+  int random = prandom_uniq (STARS_RANDOM_SEED + i, count - 1);
   struct star *star = &stars[random];
 
   switch (star->color)

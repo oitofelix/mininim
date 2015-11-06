@@ -120,7 +120,7 @@ play_title (void)
 static void
 title_anim (void)
 {
-  static unsigned int i = 0;
+  static int i = 0;
 
   if (enter_key) {
     quit_anim = true;
@@ -194,14 +194,14 @@ title_anim (void)
     break;
   case 9:
     if (! is_video_effect_started () && ! is_playing_sample ()) {
-      princess.x = 142;
-      princess.y = 124;
+      princess.c.x = 142;
+      princess.c.y = 124;
       princess.frame = princess_normal;
       princess.dir = LEFT;
       princess.draw = draw_princess_normal;
 
-      jaffar.x = 321;
-      jaffar.y = 119;
+      jaffar.c.x = 321;
+      jaffar.c.y = 119;
       jaffar.frame = jaffar_normal;
       jaffar.dir = LEFT;
       jaffar.draw = draw_jaffar_normal;

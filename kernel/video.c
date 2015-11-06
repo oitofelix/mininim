@@ -34,7 +34,7 @@ static ALLEGRO_BITMAP *effect_buffer;
 static ALLEGRO_BITMAP *memory_bitmap;
 static struct {
   enum video_effect type;
-  unsigned int duration;
+  int duration;
 } video_effect = {.type = VIDEO_NO_EFFECT};
 static ALLEGRO_FONT *builtin_font;
 
@@ -126,10 +126,10 @@ draw_bitmap (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to, float dx, float dy, int f
 }
 
 void
-draw_bitmap_xy (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
-                struct xy xy, int flags)
+draw_bitmapc (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
+              struct coord c, int flags)
 {
-  draw_bitmap (from, to, xy.x, xy.y, flags);
+  draw_bitmap (from, to, c.x, c.y, flags);
 }
 
 void
@@ -185,7 +185,7 @@ draw_fade (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to, float factor)
 
 void
 draw_roll_right (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
-                 unsigned int total, unsigned int i)
+                 int total, int i)
 {
   int w = al_get_bitmap_width (from);
   int h = al_get_bitmap_height (from);
@@ -212,7 +212,7 @@ draw_pattern (ALLEGRO_BITMAP *bitmap, int ox, int oy, int w, int h,
 }
 
 void
-start_video_effect (enum video_effect type, unsigned int duration)
+start_video_effect (enum video_effect type, int duration)
 {
   video_effect.type = type;
   video_effect.duration = duration;
@@ -230,7 +230,7 @@ is_video_effect_started (void)
 void
 show (void)
 {
-  static unsigned int i = 0;
+  static int i = 0;
 
   switch (video_effect.type) {
   case VIDEO_NO_EFFECT: flip_display (screen); return;
@@ -265,7 +265,7 @@ show (void)
     draw_roll_right (screen, effect_buffer, video_effect.duration, i);
     break;
   default:
-    error (-1, 0, "%s (void): unknown video effect type (%u)",
+    error (-1, 0, "%s (void): unknown video effect type (%i)",
            __func__, video_effect.type);
   }
 
