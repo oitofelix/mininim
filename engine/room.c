@@ -91,7 +91,7 @@ void
 draw_bitmapc (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
               struct coord c, int flags)
 {
-  if ((to == screen || to == room_bg)
+  if (! cutscene && (to == screen || to == room_bg)
       && c.room != room_view) return;
   draw_bitmap (from, to, c.x, c.y, flags);
 }

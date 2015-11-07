@@ -324,7 +324,7 @@ draw_shake_floor (void)
       }
       i = (i < 3)? i + 1 : 0;
       draw_construct_left (screen, prel (p, 0, +1));
-      draw_anim (&kid, kid.frame, 0, 0);
+      redraw_anim (kid);
     }
 }
 
@@ -348,10 +348,11 @@ draw_release_loose_floor (void)
       case 6: draw_floor (screen, p); break;
       case 7: draw_loose_floor_02 (screen, p); break;
       case 8: draw_loose_floor_02 (screen, p); break;
-      case 9: draw_loose_floor_02 (screen, p); break;
+      case 9:
+        set_construct_fg (p, NO_FLOOR);
+        draw_loose_floor_02 (screen, p); break;
       case 10:
         draw_loose_floor_02 (screen, p);
-        set_construct_fg (p, NO_FLOOR);
         struct coord c = floor_left_coord (loose_floor[i].p);
         loose_floor[i].a.id = NULL;
         loose_floor[i].a.frame = floor_loose_02;
@@ -369,7 +370,7 @@ draw_release_loose_floor (void)
       if (loose_floor[i].i < 11) {
         loose_floor[i].i++;
         draw_construct_left (screen, prel (p, 0, +1));
-        draw_anim (&kid, kid.frame, 0, 0);
+        redraw_anim (kid);
       }
     }
 }
@@ -381,8 +382,6 @@ draw_floor_fall (void)
   int speed;
 
   j = cfloor->i++ - 10;
-  /* if (j < 2) speed = 1 * j; */
-  /* else if (j < 5) speed = 2 * j; */
   speed = 3 * j;
   if (speed > 33) speed = 33;
 
@@ -400,8 +399,8 @@ draw_floor_fall (void)
       struct pos pc = prel (pmt, 0, +1);
       draw_construct_left (screen, pc);
       /* redraw kid if he's over it */
-      if (peq (pc, pk) && kid.frame == kid_normal)
-        draw_anim (&kid, kid.frame, 0, 0);
+      if (peq (pc, pk))
+        redraw_anim (kid);
     }
   } else { /* the floor hit the ground */
     set_construct_fg (p, BROKEN_FLOOR);
@@ -411,7 +410,7 @@ draw_floor_fall (void)
       draw_construct_left (room_bg, prel (p, 0, +1));
       draw_construct (screen, p);
       draw_construct_left (screen, prel (p, 0, +1));
-      draw_anim (&kid, kid.frame, 0, 0);
+      redraw_anim (kid);
     }
   }
 }

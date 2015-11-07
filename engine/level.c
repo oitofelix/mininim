@@ -90,7 +90,7 @@ level_anim (void)
     if (kid.c.room != prev_room) {
       room_view = kid.c.room;
       level_draw_base ();
-      draw_anim (&kid, kid.frame, 0, 0);
+      redraw_anim (kid);
     }
     draw_shake_floor ();
     draw_release_loose_floor ();

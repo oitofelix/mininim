@@ -24,6 +24,7 @@
 #include "physics.h"
 #include "kid.h"
 #include "level.h"
+#include "room.h"
 #include "anim.h"
 
 /* set to true to quit animation */
@@ -97,8 +98,13 @@ draw_anim (struct anim *a, ALLEGRO_BITMAP *frame,
              int dx, int dy)
 {
   apply_physics (a, frame, dx, dy);
-  if (cutscene || is_visible (*a))
-    draw_bitmap (a->frame, screen, a->c.x, a->c.y, a->flip);
+  draw_bitmapc (a->frame, screen, a->c, a->flip);
+}
+
+void
+redraw_anim (struct anim a)
+{
+  draw_bitmapc (a.frame, screen, a.c, a.flip);
 }
 
 struct anim

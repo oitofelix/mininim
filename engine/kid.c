@@ -457,7 +457,8 @@ void draw_kid_walk ()
     return;
   }
 
-  /* in the eminence of fall or steping into a loose floor, misstep. */
+  /* in the eminence of fall or steping into a loose floor,
+     misstep. */
   if ((df == 1 || dl == 1) && ! misstep) {
     misstep = true;
     draw_kid_misstep ();
@@ -568,6 +569,9 @@ void draw_kid_walk_max ()
 {
   kid.draw = draw_kid_walk_max;
   kid.flip = (kid.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
+
+  if (is_kid_start_walk ()) kid.fall = NULL;
+  else kid.fall = draw_kid_fall;
 
   /* comming from walk */
   if (kid.frame == kid_walk_01)
@@ -1232,7 +1236,7 @@ draw_kid_couch (void)
       && ! is_kid_stop_couch ()
       && ! is_kid_fall ()
       && construct_rel (p, 0, dir).fg == NO_FLOOR
-      && dist_next_place (kid) > 10) {
+      && dist_next_place (kid) > 9) {
     hang_pos = p;
     draw_kid_unclimb ();
     return;
