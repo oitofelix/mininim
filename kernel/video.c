@@ -126,13 +126,6 @@ draw_bitmap (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to, float dx, float dy, int f
 }
 
 void
-draw_bitmapc (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
-              struct coord c, int flags)
-{
-  draw_bitmap (from, to, c.x, c.y, flags);
-}
-
-void
 draw_bitmap_region (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to, float sx, float sy,
                     float sw, float sh, float dx, float dy, int flags)
 {

@@ -43,8 +43,6 @@ ALLEGRO_BITMAP *load_bitmap (char *filename);
 void clear_bitmap (ALLEGRO_BITMAP *bitmap, ALLEGRO_COLOR color);
 void draw_bitmap (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
                   float dx, float dy, int flags);
-void draw_bitmapc (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
-                     struct coord c, int flags);
 void draw_bitmap_region (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
                          float sx, float sy, float sw, float sh,
                          float dx, float dy, int flags);

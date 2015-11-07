@@ -97,7 +97,7 @@ draw_anim (struct anim *a, ALLEGRO_BITMAP *frame,
              int dx, int dy)
 {
   apply_physics (a, frame, dx, dy);
-  if (is_visible (*a) || cutscene)
+  if (cutscene || is_visible (*a))
     draw_bitmap (a->frame, screen, a->c.x, a->c.y, a->flip);
 }
 

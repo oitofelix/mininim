@@ -19,6 +19,7 @@
 
 #include "kernel/video.h"
 #include "floor.h"
+#include "room.h"
 #include "pillar.h"
 
 ALLEGRO_BITMAP *pillar_left, *pillar_right, *pillar_top, *pillar;
@@ -77,6 +78,7 @@ pillar_coord (struct pos p)
   struct coord c;
   c.x = PLACE_WIDTH * p.place + 8;
   c.y = PLACE_HEIGHT * p.floor + 3;
+  c.room = p.room;
   return c;
 }
 
@@ -86,6 +88,7 @@ pillar_left_coord (struct pos p)
   struct coord c;
   c.x = PLACE_WIDTH * p.place;
   c.y = PLACE_HEIGHT * p.floor + 3;
+  c.room = p.room;
   return c;
 }
 
@@ -95,6 +98,7 @@ pillar_right_coord (struct pos p)
   struct coord c;
   c.x = PLACE_WIDTH * (p.place + 1);
   c.y = PLACE_HEIGHT * p.floor + 3;
+  c.room = p.room;
   return c;
 }
 
@@ -104,5 +108,6 @@ pillar_top_coord (struct pos p)
   struct coord c;
   c.x = PLACE_WIDTH * (p.place + 1);
   c.y = PLACE_HEIGHT * p.floor - 4;
+  c.room = p.room;
   return c;
 }

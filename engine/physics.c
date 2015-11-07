@@ -282,26 +282,20 @@ is_hangable (struct anim a)
 bool
 is_visible (struct anim a)
 {
-  /* if (a.id == &kid) */
+  if (a.id == &kid)
     return ncoord (coord_m (a)).room == room_view;
-  /* else { */
-  /*   if (a.c.room == room_view) return true; */
+  else {
+    struct coord ntl = ncoord (coord_tl (a));
+    struct coord ntr = ncoord (coord_tr (a));
+    struct coord nbl = ncoord (coord_bl (a));
+    struct coord nbr = ncoord (coord_br (a));
 
-  /*   /\* struct coord ctl = ncoord (coord_tl (a)); *\/ */
-  /*   /\* struct coord ctr = ncoord (coord_tr (a)); *\/ */
-  /*   /\* struct coord cbl = ncoord (coord_bl (a)); *\/ */
-  /*   /\* struct coord cbr = ncoord (coord_br (a)); *\/ */
-
-  /*   /\* if (ctl.room == room_view *\/ */
-  /*   /\*     || ctr.room == room_view *\/ */
-  /*   /\*     || cbl.room == room_view *\/ */
-  /*   /\*     || cbr.room == room_view) return true; *\/ */
-  /*   /\* else if (roomd (room_view, BELOW) == ctl.room *\/ */
-  /*   /\*          && ctl.y < 11) return true; *\/ */
-  /*   /\* else return false; *\/ */
-  /* } */
-
-  /* return false; */
+    if (ntl.room == room_view
+        || ntr.room == room_view
+        || nbl.room == room_view
+        || nbr.room == room_view) return true;
+    else return false;
+  }
 }
 
 void
@@ -330,6 +324,9 @@ apply_physics (struct anim *a, ALLEGRO_BITMAP *frame,
     na.draw = na.fall;
   } else if (is_on_loose_floor (na))
     release_loose_floor (loose_floor_pos);
+
+  struct anim oa = *a;
+  struct anim ona = na;
 
   na.c = nanim (na);
 

@@ -33,6 +33,8 @@ extern ALLEGRO_BITMAP *room_bg;
 
 void load_room (void);
 void unload_room (void);
+void draw_bitmapc (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
+                     struct coord c, int flags);
 void draw_room (int room);
 void draw_room_bg (void);
 void draw_construct (ALLEGRO_BITMAP *bitmap, struct pos p);

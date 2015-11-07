@@ -23,6 +23,7 @@
 #include "kernel/random.h"
 #include "level.h"
 #include "kid.h"
+#include "room.h"
 #include "wall.h"
 
 ALLEGRO_BITMAP *wall_left, *wall_center, *wall_right, *wall_single, *wall_face,
@@ -160,6 +161,7 @@ wall_base_coord (struct pos p)
   struct coord c;
   c.x = PLACE_WIDTH * p.place;
   c.y = PLACE_HEIGHT * (p.floor + 1);
+  c.room = p.room;
   return c;
 }
 
@@ -169,6 +171,7 @@ wall_coord (struct pos p)
   struct coord c;
   c.x = PLACE_WIDTH * p.place;
   c.y = PLACE_HEIGHT * p.floor + 3;
+  c.room = p.room;
   return c;
 }
 
@@ -178,6 +181,7 @@ wall_face_coord (struct pos p)
   struct coord c;
   c.x = PLACE_WIDTH * (p.place + 1);
   c.y = PLACE_HEIGHT * p.floor + 3;
+  c.room = p.room;
   return c;
 }
 
@@ -187,6 +191,7 @@ wall_face_top_coord (struct pos p)
   struct coord c;
   c.x = PLACE_WIDTH * (p.place + 1);
   c.y = PLACE_HEIGHT * p.floor - 9;
+  c.room = p.room;
   return c;
 }
 
@@ -325,6 +330,7 @@ wall_gray_block_coord (struct pos p)
   struct coord c;
   c.x = PLACE_WIDTH * p.place;
   c.y = PLACE_HEIGHT * p.floor + 3;
+  c.room = p.room;
   return c;
 }
 
@@ -340,6 +346,7 @@ wall_divider_00_coord (struct pos p)
   struct coord c;
   c.x = PLACE_WIDTH * p.place + r3;
   c.y = PLACE_HEIGHT * p.floor + 45;
+  c.room = p.room;
   return c;
 }
 
@@ -355,5 +362,6 @@ wall_divider_01_coord (struct pos p)
   struct coord c;
   c.x = PLACE_WIDTH * p.place + 8 + r1;
   c.y = PLACE_HEIGHT * p.floor + 24;
+  c.room = p.room;
   return c;
 }

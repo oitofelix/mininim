@@ -1710,6 +1710,7 @@ draw_kid_climb (void)
 
   switch (i) {
   case 0:
+    hang_pos = npos (hang_pos);
     kid.frame = kid_climb_01;
     int dir = (kid.dir == LEFT) ? 0 : 1;
     kid.c.x = PLACE_WIDTH * (hang_pos.place + dir) + 9;

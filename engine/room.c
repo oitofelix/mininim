@@ -88,6 +88,15 @@ unload_room (void)
 }
 
 void
+draw_bitmapc (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
+              struct coord c, int flags)
+{
+  if ((to == screen || to == room_bg)
+      && c.room != room_view) return;
+  draw_bitmap (from, to, c.x, c.y, flags);
+}
+
+void
 draw_room (int room)
 {
   if (room_view != room) return;
@@ -122,6 +131,7 @@ draw_construct (ALLEGRO_BITMAP *bitmap, struct pos p)
 void
 draw_construct_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
+
   switch (construct (p).fg) {
   case NO_FLOOR:
     break;
@@ -295,6 +305,7 @@ bricks_coord (struct pos p)
   struct coord c;
   c.x = PLACE_WIDTH * (p.place + 1);
   c.y = PLACE_HEIGHT * p.floor + 15;
+  c.room = p.room;
   return c;
 }
 
@@ -310,6 +321,7 @@ torch_coord (struct pos p)
   struct coord c;
   c.x = PLACE_WIDTH * (p.place + 1);
   c.y = PLACE_HEIGHT * p.floor + 22;
+  c.room = p.room;
   return c;
 }
 
@@ -325,6 +337,7 @@ window_coord (struct pos p)
   struct coord c;
   c.x = PLACE_WIDTH * (p.place + 1);
   c.y = PLACE_HEIGHT * p.floor + 5;
+  c.room = p.room;
   return c;
 }
 

@@ -216,6 +216,7 @@ floor_base_coord (struct pos p)
   struct coord c;
   c.x = PLACE_WIDTH * p.place;
   c.y = PLACE_HEIGHT * (p.floor + 1);
+  c.room = p.room;
   return c;
 }
 
@@ -225,6 +226,7 @@ floor_left_coord (struct pos p)
   struct coord c;
   c.x = PLACE_WIDTH * p.place;
   c.y = PLACE_HEIGHT * p.floor + 50;
+  c.room = p.room;
   return c;
 }
 
@@ -234,6 +236,7 @@ floor_right_coord (struct pos p)
   struct coord c;
   c.x = PLACE_WIDTH * (p.place + 1);
   c.y = PLACE_HEIGHT * p.floor + 50;
+  c.room = p.room;
   return c;
 }
 
@@ -243,6 +246,7 @@ broken_floor_front_coord (struct pos p)
   struct coord c;
   c.x = PLACE_WIDTH * p.place;
   c.y = PLACE_HEIGHT * p.floor + 54;
+  c.room = p.room;
   return c;
 }
 
@@ -252,6 +256,7 @@ floor_corner_01_coord (struct pos p)
   struct coord c;
   c.x = PLACE_WIDTH * p.place;
   c.y = PLACE_HEIGHT * p.floor + 53;
+  c.room = p.room;
   return c;
 }
 
@@ -261,6 +266,7 @@ floor_corner_02_coord (struct pos p)
   struct coord c;
   c.x = PLACE_WIDTH * p.place;
   c.y = PLACE_HEIGHT * p.floor + 53;
+  c.room = p.room;
   return c;
 }
 
@@ -270,6 +276,7 @@ floor_corner_03_coord (struct pos p)
   struct coord c;
   c.x = PLACE_WIDTH * p.place;
   c.y = PLACE_HEIGHT * p.floor + 55;
+  c.room = p.room;
   return c;
 }
 
@@ -384,17 +391,11 @@ draw_floor_fall (void)
   struct pos pn =
     pos (coord_mbo (next_anim (cfloor->a, cfloor->a.frame, 0, speed)));
   struct pos pk = pos (coord_mbo (kid));
-  struct coord mb = coord_mbo (cfloor->a);
-  struct coord mbk = coord_mbo (kid);
 
   if (construct (p).fg == NO_FLOOR
       || peq (p, pn)) {
     draw_anim (&cfloor->a, floor_loose_02, 0, speed);
     if (is_visible (cfloor->a)) {
-      /* draw kid above the floor if he is higher */
-      /* if (pk.place == p.place */
-      /*     && mbk.y < mb.y) */
-      /*   draw_anim (&kid, kid.frame, 0, 0); */
       /* redraw construct on the floor's right */
       struct pos pc = prel (pmt, 0, +1);
       draw_construct_left (screen, pc);
@@ -437,6 +438,7 @@ floor_loose_left_coord (struct pos p)
   struct coord c;
   c.x = PLACE_WIDTH * p.place;
   c.y = PLACE_HEIGHT * p.floor + 50 - 1;
+  c.room = p.room;
   return c;
 }
 
@@ -446,5 +448,6 @@ floor_loose_right_coord (struct pos p)
   struct coord c;
   c.x = PLACE_WIDTH * (p.place + 1);
   c.y = PLACE_HEIGHT * p.floor + 50 - 1;
+  c.room = p.room;
   return c;
 }
