@@ -17,6 +17,7 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
 #include "kernel/random.h"
 #include "level.h"
 #include "kid.h"
@@ -78,13 +79,19 @@ npos (struct pos p)
   if (p.place < 0) {
     p.place += PLACES;
     p.room = roomd (p.room, LEFT);
-  } else if (p.place >= PLACES) {
+  }
+
+  if (p.place >= PLACES) {
     p.place -= PLACES;
     p.room = roomd (p.room, RIGHT);
-  } else if (p.floor < 0) {
+  }
+
+  if (p.floor < 0) {
     p.floor += FLOORS;
     p.room = roomd (p.room, ABOVE);
-  } else if (p.floor >= FLOORS) {
+  }
+
+  if (p.floor >= FLOORS) {
     p.floor -= FLOORS;
     p.room = roomd (p.room, BELOW);
   }
@@ -430,6 +437,14 @@ coord_bb (struct anim a)
   c.x = d.bx;
   c.y = d.y + d.h -1;
   return c;
+}
+
+double
+dist_coord (struct coord a, struct coord b)
+{
+  int dx = a.x - b.x;
+  int dy = a.y - b.y;
+  return sqrt (dx * dx + dy * dy);
 }
 
 int

@@ -297,6 +297,7 @@ release_loose_floor (struct pos p)
 
   loose_floor[i].p = p;
   loose_floor[i].i = 0;
+  loose_floor[i].resist = 4;
 }
 
 void
@@ -336,6 +337,7 @@ draw_release_loose_floor (void)
   size_t i;
   for (i = 0; i < PLACES * FLOORS; i++)
     if (loose_floor[i].p.room) {
+      if (loose_floor[i].resist-- > 0) return;
       struct pos p = loose_floor[i].p;
       if (loose_floor[i].i == 0) draw_no_floor (room_bg, p);
       switch (loose_floor[i].i) {

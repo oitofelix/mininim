@@ -17,6 +17,7 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "kernel/event.h"
 #include "kernel/timer.h"
 #include "kernel/video.h"
@@ -57,6 +58,22 @@ play_anim (void (*callback) (void), int freq)
           pause_anim = true;
         if (was_key_pressed (ALLEGRO_KEY_P, true))
           pause_anim = false;
+
+        /* begin kid hack */
+        if (a_key) kid.c.x--;
+        if (d_key) kid.c.x++;
+        if (w_key) kid.c.y--;
+        if (s_key) kid.c.y++;
+        struct pos p = pos (coord_tf (kid));
+        int dc = dist_collision (kid);
+        int df = dist_fall (kid);
+        int dl = dist_loose_floor (kid);
+        int dn = dist_next_place (kid);
+        int dp = dist_prev_place (kid);
+        if (a_key || d_key || w_key || s_key || enter_key)
+          printf ("floor = %i, place = %i, dc = %i, df = %i, dl = %i, dn = %i, dp = %i\n", p.floor, p.place, dc, df, dl, dn, dp);
+        /* end kid hack */
+
         if (! pause_anim
             || (pause_anim &&
                 was_key_pressed (ALLEGRO_KEY_ESCAPE, true)))

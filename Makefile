@@ -9,7 +9,7 @@ MODULES = ${KERNEL_MODULES:%=kernel/%} ${ENGINE_MODULES:%=engine/%}	\
 
 SRCS = ${MODULES:=.c}
 OBJECTS = ${MODULES:=.o}
-LDFLAGS = -lallegro -lallegro_image -lallegro_audio -lallegro_acodec -lallegro_font
+LDFLAGS = -lm -lallegro -lallegro_image -lallegro_audio -lallegro_acodec -lallegro_font
 CFLAGS = -Wall -ggdb3 -Werror -Wno-error=unused-function \
   -Wno-error=unused-variable -Wno-error=unused-but-set-variable
 CPPFLAGS = -I$(shell pwd)

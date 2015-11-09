@@ -42,6 +42,7 @@ struct loose_floor {
   struct pos p;
   int i;
   struct anim a;
+  int resist;
   void (*draw) (struct loose_floor *f);
 };
 

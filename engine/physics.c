@@ -100,7 +100,7 @@ is_falling (struct anim a)
   struct construct ctbf = construct (pbf);
 
   if (ctbf.fg == NO_FLOOR
-      || cbf.y + 36 < PLACE_HEIGHT * (pbf.floor + 1) + 3) {
+      || cbf.y + 33 < PLACE_HEIGHT * (pbf.floor + 1) + 3) {
     return true;
   }
 
@@ -200,10 +200,10 @@ is_on_loose_floor (struct anim a)
   if (a.id == &kid && is_kid_turn ()) return false;
 
   if (a.id == &kid && (is_kid_start_jump () ||
-                       is_kid_jump () || is_kid_stop_jump ()))
+                       is_kid_jump ()))
     return false;
 
-  struct pos p = pos (coord_m (a));
+  struct pos p = pos (coord_tf (a));
   struct construct c = construct (p);
 
   if (c.fg == LOOSE_FLOOR) {
@@ -270,13 +270,34 @@ is_hangable_pos (struct pos p, enum dir direction)
 bool
 is_hangable (struct anim a)
 {
+  if (a.id == &kid && is_kid_jump ()) return false;
+
   struct pos pmf = pos (coord_mf (a));
+  struct pos pm = pos (coord_m (a));
   struct pos pmb = pos (coord_mba (a));
   bool hmf = is_hangable_pos (pmf, a.dir);
+  bool hm = is_hangable_pos (pm, a.dir);
   bool hmb = is_hangable_pos (pmb, a.dir);
+
+  if (! hmf && ! hm && ! hmb) return false;
+
   if (hmf) hang_pos = pmf;
+  if (hm) hang_pos = pm;
   if (hmb) hang_pos = pmb;
-  return hmf || hmb;
+
+  struct coord tf = coord_tf (a);
+  struct coord ch;
+  int dir = (a.dir == LEFT) ? 0 : 1;
+  ch.x = PLACE_WIDTH * (hang_pos.place + dir) + 7 + 12 * dir;
+  ch.y = PLACE_HEIGHT * hang_pos.floor - 6;
+
+  /* printf ("dist_coord = %f\n", dist_coord (tf, ch)); */
+
+  if (a.id == &kid && is_kid_fall ()
+      && a.odraw != draw_kid_turn_run
+      && dist_coord (tf, ch) > 16) return false;
+
+  return true;
 }
 
 bool
@@ -324,9 +345,6 @@ apply_physics (struct anim *a, ALLEGRO_BITMAP *frame,
     na.draw = na.fall;
   } else if (is_on_loose_floor (na))
     release_loose_floor (loose_floor_pos);
-
-  struct anim oa = *a;
-  struct anim ona = na;
 
   na.c = nanim (na);
 

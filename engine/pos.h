@@ -54,6 +54,7 @@ struct coord coord_br (struct anim a);
 struct coord coord_bf (struct anim a);
 struct coord coord_bb (struct anim a);
 
+double dist_coord (struct coord a, struct coord b);
 int prandom_pos (struct pos pos, int i, int max);
 
 #endif	/* FREEPOP_POSITION_H */
