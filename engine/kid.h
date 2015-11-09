@@ -152,6 +152,17 @@
 #define KID_CLIMB_13 "dat/kid/clipping/frame13.png"
 #define KID_CLIMB_14 "dat/kid/clipping/frame14.png"
 #define KID_CLIMB_15 "dat/kid/clipping/frame15.png"
+#define KID_RUN_JUMP_01 "dat/kid/running jump/frame01.png"
+#define KID_RUN_JUMP_02 "dat/kid/running jump/frame02.png"
+#define KID_RUN_JUMP_03 "dat/kid/running jump/frame03.png"
+#define KID_RUN_JUMP_04 "dat/kid/running jump/frame04.png"
+#define KID_RUN_JUMP_05 "dat/kid/running jump/frame05.png"
+#define KID_RUN_JUMP_06 "dat/kid/running jump/frame06.png"
+#define KID_RUN_JUMP_07 "dat/kid/running jump/frame07.png"
+#define KID_RUN_JUMP_08 "dat/kid/running jump/frame08.png"
+#define KID_RUN_JUMP_09 "dat/kid/running jump/frame09.png"
+#define KID_RUN_JUMP_10 "dat/kid/running jump/frame10.png"
+#define KID_RUN_JUMP_11 "dat/kid/running jump/frame11.png"
 
 /* functions */
 void load_kid (void);
@@ -183,6 +194,7 @@ void draw_kid_hang_wall (void);
 void draw_kid_hang_free (void);
 void draw_kid_climb (void);
 void draw_kid_unclimb (void);
+void draw_kid_run_jump (void);
 
 bool is_kid_normal ();
 bool is_kid_start_walk (void);
@@ -206,6 +218,9 @@ bool is_kid_hang (void);
 bool is_kid_start_climb (void);
 bool is_kid_climb (void);
 bool is_kid_stop_climb (void);
+bool is_kid_start_run_jump (void);
+bool is_kid_run_jump ();
+bool is_kid_stop_run_jump ();
 
 /* variables */
 extern struct anim kid; /* kid animation object */

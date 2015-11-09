@@ -61,7 +61,11 @@ ALLEGRO_BITMAP *kid_normal,
   *kid_climb_01, *kid_climb_02, *kid_climb_03, *kid_climb_04,
   *kid_climb_05, *kid_climb_06, *kid_climb_07, *kid_climb_08,
   *kid_climb_09, *kid_climb_10, *kid_climb_11, *kid_climb_12,
-  *kid_climb_13, *kid_climb_14, *kid_climb_15;
+  *kid_climb_13, *kid_climb_14, *kid_climb_15,
+  *kid_run_jump_01, *kid_run_jump_02, *kid_run_jump_03,
+  *kid_run_jump_04, *kid_run_jump_05, *kid_run_jump_06,
+  *kid_run_jump_07, *kid_run_jump_08, *kid_run_jump_09,
+  *kid_run_jump_10, *kid_run_jump_11;
 
 struct anim kid; /* kid animation object */
 bool hang_limit;
@@ -201,6 +205,17 @@ load_kid (void)
   kid_climb_13 = load_bitmap (KID_CLIMB_13);
   kid_climb_14 = load_bitmap (KID_CLIMB_14);
   kid_climb_15 = load_bitmap (KID_CLIMB_15);
+  kid_run_jump_01 = load_bitmap (KID_RUN_JUMP_01);
+  kid_run_jump_02 = load_bitmap (KID_RUN_JUMP_02);
+  kid_run_jump_03 = load_bitmap (KID_RUN_JUMP_03);
+  kid_run_jump_04 = load_bitmap (KID_RUN_JUMP_04);
+  kid_run_jump_05 = load_bitmap (KID_RUN_JUMP_05);
+  kid_run_jump_06 = load_bitmap (KID_RUN_JUMP_06);
+  kid_run_jump_07 = load_bitmap (KID_RUN_JUMP_07);
+  kid_run_jump_08 = load_bitmap (KID_RUN_JUMP_08);
+  kid_run_jump_09 = load_bitmap (KID_RUN_JUMP_09);
+  kid_run_jump_10 = load_bitmap (KID_RUN_JUMP_10);
+  kid_run_jump_11 = load_bitmap (KID_RUN_JUMP_11);
 
   kid.id = &kid;
   kid.c.room = 1;
@@ -351,6 +366,17 @@ unload_kid (void)
   al_destroy_bitmap (kid_climb_13);
   al_destroy_bitmap (kid_climb_14);
   al_destroy_bitmap (kid_climb_15);
+  al_destroy_bitmap (kid_run_jump_01);
+  al_destroy_bitmap (kid_run_jump_02);
+  al_destroy_bitmap (kid_run_jump_03);
+  al_destroy_bitmap (kid_run_jump_04);
+  al_destroy_bitmap (kid_run_jump_05);
+  al_destroy_bitmap (kid_run_jump_06);
+  al_destroy_bitmap (kid_run_jump_07);
+  al_destroy_bitmap (kid_run_jump_08);
+  al_destroy_bitmap (kid_run_jump_09);
+  al_destroy_bitmap (kid_run_jump_10);
+  al_destroy_bitmap (kid_run_jump_11);
 }
 
 void draw_kid_normal ()
@@ -651,9 +677,19 @@ void draw_kid_start_run ()
   bool run = (kid.dir == RIGHT) ? right_key : left_key;
   bool turn_run = (kid.dir == RIGHT) ? left_key : right_key;
   bool couch = down_key;
+  bool jump = ((kid.dir == RIGHT) && right_key && up_key)
+    || ((kid.dir == LEFT) && left_key && up_key);
 
   if (couch) {
     draw_kid_couch ();
+    return;
+  }
+
+  if (jump &&
+      (kid.frame == kid_start_run_01
+       || kid.frame == kid_start_run_02
+       || kid.frame == kid_start_run_03)) {
+    draw_kid_jump ();
     return;
   }
 
@@ -747,19 +783,27 @@ void draw_kid_run ()
   kid.flip = (kid.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
   bool stop = ! ((kid.dir == RIGHT) ? right_key : left_key);
-
   bool couch = down_key;
+  bool jump = ((kid.dir == RIGHT) && right_key && up_key)
+    || ((kid.dir == LEFT) && left_key && up_key);
+
   if (couch) {
     draw_kid_couch ();
+    return;
+  }
+
+  if (jump && kid.frame != kid_run_jump_11) {
+    draw_kid_run_jump ();
     return;
   }
 
   /* comming from turn run */
   if (kid.frame == kid_turn_run_13)
     draw_anim (&kid, kid_run_13, -4, 0);
-  /* comming from start run or the last frame of run */
   else if (kid.frame == kid_run_07)
     draw_anim (&kid, kid_run_08, -10, 0);
+  else if (kid.frame == kid_run_jump_11)
+    draw_anim (&kid, kid_run_07, -15, 0);
   /* comming from run */
   else if (kid.frame == kid_run_08)
     draw_anim (&kid, kid_run_09, -3, 0);
@@ -773,10 +817,7 @@ void draw_kid_run ()
     draw_anim (&kid, kid_run_13, -4, 0);
   else if (kid.frame == kid_run_13)
     draw_anim (&kid, kid_run_14, -8, 0);
-  else if (kid.frame == kid_run_14)
-    draw_anim (&kid, kid_run_07, -9, 0);
-  else
-    error (-1, 0, "%s: unknown kid frame (%p)", __func__, kid.frame);
+  else draw_anim (&kid, kid_run_07, -9, 0);
 
   if (stop) kid.draw = draw_kid_stop_run;
 }
@@ -976,16 +1017,7 @@ draw_kid_jump (void)
   kid.draw = draw_kid_jump;
   kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  /* comming from normal */
-  if (kid.frame == kid_normal)
-    draw_anim (&kid, kid_jump_01, +2, 0);
-  /* comming from turn */
-  else if (kid.frame == kid_turn_04)
-    draw_anim (&kid, kid_jump_01, +2, 0);
-  /* comming from stabilize */
-  else if (kid.frame == kid_stabilize_05)
-    draw_anim (&kid, kid_jump_01, +2, 0);
-  else if (kid.frame == kid_stabilize_06)
+  if (kid.frame == kid_stabilize_06)
     draw_anim (&kid, kid_jump_01, +6, 0);
   else if (kid.frame == kid_stabilize_07)
     draw_anim (&kid, kid_jump_01, +4, 0);
@@ -1027,7 +1059,8 @@ draw_kid_jump (void)
   else if (kid.frame == kid_jump_17) {
     draw_anim (&kid, kid_jump_18, +0, 0);
     kid.draw = draw_kid_normal;
-  } else error (-1, 0, "%s: unknown kid frame (%p)", __func__, kid.frame);
+  } else
+    draw_anim (&kid, kid_jump_01, +2, 0);
 }
 
 bool
@@ -1074,7 +1107,12 @@ draw_kid_collision (void)
 
   /* if in the air (after a jump), but not falling, fall instead of
      standing against the wall */
-  if (is_kid_jump () && ! is_falling (kid)) {
+  if ((is_kid_jump ()
+       || is_kid_start_run_jump ()
+       || is_kid_run_jump ()
+       || is_kid_stop_run_jump ())
+      /* && ! is_falling (kid) */
+      ) {
     draw_kid_fall ();
     return;
   }
@@ -1152,6 +1190,7 @@ draw_kid_fall (void)
   static int force_floor = -1;
   static int i = 0;
   struct pos p = pos (coord_bf (kid));
+  int dx = 0;
 
   /* hang if a edge is reachable and the shift key is pressed */
   if (is_hangable (kid) && shift_key && ! hang_limit) {
@@ -1191,6 +1230,10 @@ draw_kid_fall (void)
   if (is_kid_walk ()) inertia = 6;
   if (is_kid_stop_walk ()) inertia = 6;
   if (is_kid_jump ()) inertia = 10;
+  if (is_kid_run_jump ()) {
+    inertia = 10;
+    dx = -10;
+  }
 
   /* at each frame reduce the inertia */
   if (inertia > 0) inertia--;
@@ -1231,7 +1274,7 @@ draw_kid_fall (void)
     /* this is needed so the kid doesn't fall through the floor when
        hitting a wall */
     int dy = is_falling (kid) ? +17 : -6;
-    draw_anim (&kid, kid_fall_13, 0, dy);
+    draw_anim (&kid, kid_fall_13, dx, dy);
   }
 
 
@@ -1251,6 +1294,7 @@ void
 draw_kid_couch (void)
 {
   misstep = false;
+  void (*odraw) (void) = kid.draw;
 
   kid.draw = draw_kid_couch;
   kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
@@ -1260,7 +1304,7 @@ draw_kid_couch (void)
   int dir = (kid.dir == LEFT) ? +1 : -1;
   if (! is_kid_start_couch () && ! is_kid_couch ()
       && ! is_kid_stop_couch ()
-      && ! is_kid_fall ()
+      && odraw != draw_kid_fall
       && construct_rel (p, 0, dir).fg == NO_FLOOR
       && dist_next_place (kid) > 9) {
     hang_pos = p;
@@ -1846,4 +1890,65 @@ draw_kid_unclimb (void)
     i = 0;
   }
 
+}
+
+void
+draw_kid_run_jump (void)
+{
+  static int i = 0;
+
+  if (kid.draw != draw_kid_run_jump) i = 0;
+
+  kid.draw = draw_kid_run_jump;
+  kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
+
+  if (kid.frame == kid_run_jump_03
+      || kid.frame == kid_run_jump_04
+      || kid.frame == kid_run_jump_05
+      || kid.frame == kid_run_jump_06
+      || kid.frame == kid_run_jump_07
+      || kid.frame == kid_run_jump_08) kid.fall = NULL;
+  else kid.fall = draw_kid_fall;
+
+  switch (i) {
+  case 0: draw_anim (&kid, kid_run_jump_01, -10, +0); i++; break;
+  case 1: draw_anim (&kid, kid_run_jump_02, -11, +0); i++; break;
+  case 2: draw_anim (&kid, kid_run_jump_03, -13, +0); i++; break;
+  case 3: draw_anim (&kid, kid_run_jump_04, -7, +0); i++; break;
+  case 4: draw_anim (&kid, kid_run_jump_05, -12, +0); i++; break;
+  case 5: draw_anim (&kid, kid_run_jump_06, -15, +0); i++; break;
+  case 6: draw_anim (&kid, kid_run_jump_07, -29, -3); i++; break;
+  case 7: draw_anim (&kid, kid_run_jump_08, -17, -9); i++; break;
+  case 8: draw_anim (&kid, kid_run_jump_09, -18, -2); i++; break;
+  case 9: draw_anim (&kid, kid_run_jump_10, -10, +11); i++; break;
+  case 10:
+    draw_anim (&kid, kid_run_jump_11, -8, +3); i = 0;
+    kid.draw = draw_kid_run;
+    break;
+  }
+
+  kid.fall = draw_kid_fall;
+}
+
+bool
+is_kid_start_run_jump (void) {
+  return kid.frame == kid_run_jump_01
+    ||  kid.frame == kid_run_jump_02
+    ||  kid.frame == kid_run_jump_03
+    ||  kid.frame == kid_run_jump_04
+    ||  kid.frame == kid_run_jump_05
+    ||  kid.frame == kid_run_jump_06
+    ||  kid.frame == kid_run_jump_07
+    ||  kid.frame == kid_run_jump_08;
+}
+
+bool
+is_kid_run_jump () {
+  return kid.frame == kid_run_jump_09
+    || kid.frame == kid_run_jump_10;
+}
+
+bool
+is_kid_stop_run_jump () {
+  return kid.frame == kid_run_jump_11;
 }
