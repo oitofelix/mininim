@@ -403,7 +403,7 @@ void draw_kid_normal ()
   }
   /* comming from walk */
   else if (kid.frame == kid_walk_12)
-    draw_anim (&kid, kid_normal, +0, 0);
+    draw_anim (&kid, kid_normal, -1, 0);
   /* comming from jump */
   else if (kid.frame == kid_jump_18)
     draw_anim (&kid, kid_normal, -4, 0);
@@ -450,16 +450,16 @@ void draw_kid_walk ()
   int df = dist_fall (kid);
   int dl = dist_loose_floor (kid);
 
-  /* in the eminence of collision or fall, keep standing  */
-  if (dc == 1) {
+  /* in the eminence of collision, keep standing */
+  if (dc < 3) {
     draw_anim (&kid, kid_normal, +0, 0);
     kid.draw = draw_kid_normal;
     return;
   }
 
   /* in the eminence of fall or steping into a loose floor,
-     misstep. */
-  if ((df == 1 || dl == 1) && ! misstep) {
+     misstep */
+  if ((df < 3 || dl < 3) && ! misstep) {
     misstep = true;
     draw_kid_misstep ();
     return;
@@ -479,15 +479,17 @@ void draw_kid_walk ()
     draw_anim (&kid, kid_walk_01, +0, 0);
   /* comming from normal */
   else if (kid.frame == kid_normal)
-    draw_anim (&kid, kid_walk_01, +0, 0);
+    draw_anim (&kid, kid_walk_01, -1, 0);
   /* comming from walk */
   else if (kid.frame == kid_walk_01) {
-    if (! misstep) {
+    if (! misstep)
       if (dc < 9 || df < 9 || dl < 9) draw_kid_walk_min ();
-      else if (dc < 16 || df < 16 || dl < 16) draw_kid_walk_short ();
-      else if (dc < 27 || df < 27 || dl < 27) draw_kid_walk_long ();
+      else if (dc < 14 || df < 14 || dl < 14) draw_kid_walk_short_short ();
+      else if (dc < 21 || df < 21 || dl < 21) draw_kid_walk_short ();
+      else if (dc < 23 || df < 23 || dl < 23) draw_kid_walk_long ();
+      else if (dc < 27 || df < 27 || dl < 27) draw_kid_walk_long_long ();
       else draw_kid_walk_max ();
-    } else draw_kid_walk_max ();
+    else draw_kid_walk_max ();
     misstep = false;
   } else error (-1, 0, "%s: unknown frame (%p)", __func__, kid.frame);
 }
@@ -495,110 +497,139 @@ void draw_kid_walk ()
 void
 draw_kid_walk_min (void)
 {
+  static int i = 0;
+
   kid.draw = draw_kid_walk_min;
   kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  /* comming from walk */
-  if (kid.frame == kid_walk_01)
-    draw_anim (&kid, kid_walk_02, -1, 0);
-  else if (kid.frame == kid_walk_02)
-    draw_anim (&kid, kid_walk_03, +0, 0);
-  else if (kid.frame == kid_walk_03) {
-    draw_anim_on_edge (&kid, kid_walk_11, 0, 0);
-  } else if (kid.frame == kid_walk_11) {
-    draw_anim (&kid, kid_walk_12, +0, 0);
+  switch (i) {
+  case 0: draw_anim (&kid, kid_walk_02, -1, 0); i++; break;
+  case 1: draw_anim (&kid, kid_walk_03, +0, 0); i++; break;
+  case 2: draw_anim_on_edge (&kid, kid_walk_11, +1, 0); i++; break;
+  case 3: draw_anim (&kid, kid_walk_12, +0, 0); i = 0;
     kid.draw = draw_kid_normal;
     kid.collision = draw_kid_collision;
-  } else error (-1, 0, "%s: unknown frame (%p)", __func__, kid.frame);
+    break;
+  }
+}
+
+void
+draw_kid_walk_short_short (void)
+{
+  static int i = 0;
+
+  kid.draw = draw_kid_walk_short_short;
+  kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
+
+  switch (i) {
+  case 0: draw_anim (&kid, kid_walk_02, -1, 0); i++; break;
+  case 1: draw_anim (&kid, kid_walk_03, +0, 0); i++; break;
+  case 2: draw_anim_on_edge (&kid, kid_walk_04, +1, 0); i++; break;
+  case 3: draw_anim (&kid, kid_walk_10, +1, 0); i++; break;
+  case 4: draw_anim (&kid, kid_walk_11, -1, 0); i++; break;
+  case 5: draw_anim (&kid, kid_walk_12, +0, 0); i = 0;
+    kid.draw = draw_kid_normal;
+    break;
+  }
 }
 
 void
 draw_kid_walk_short (void)
 {
+  static int i = 0;
+
   kid.draw = draw_kid_walk_short;
   kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  /* comming from walk */
-  if (kid.frame == kid_walk_01)
-    draw_anim (&kid, kid_walk_02, -1, 0);
-  else if (kid.frame == kid_walk_02)
-    draw_anim (&kid, kid_walk_03, -2, 0);
-  else if (kid.frame == kid_walk_03) {
-    draw_anim_on_edge (&kid, kid_walk_04, +0, 0);
-  } else if (kid.frame == kid_walk_04)
-    draw_anim (&kid, kid_walk_09, +0, 0);
-  else if (kid.frame == kid_walk_09)
-    draw_anim (&kid, kid_walk_10, +0, 0);
-  else if (kid.frame == kid_walk_10)
-    draw_anim (&kid, kid_walk_11, +0, 0);
-  else if (kid.frame == kid_walk_11) {
-    draw_anim (&kid, kid_walk_12, +0, 0);
+  switch (i) {
+  case 0: draw_anim (&kid, kid_walk_02, -1, 0); i++; break;
+  case 1: draw_anim (&kid, kid_walk_03, +0, 0); i++; break;
+  case 2: draw_anim (&kid, kid_walk_04, -8, 0); i++; break;
+  case 3: draw_anim_on_edge (&kid, kid_walk_05, +1, 0); i++; break;
+  case 4: draw_anim (&kid, kid_walk_08, +3, 0); i++; break;
+  case 5: draw_anim (&kid, kid_walk_09, -1, 0); i++; break;
+  case 6: draw_anim (&kid, kid_walk_10, -1, 0); i++; break;
+  case 7: draw_anim (&kid, kid_walk_11, -1, 0); i++; break;
+  case 8: draw_anim (&kid, kid_walk_12, +0, 0); i = 0;
     kid.draw = draw_kid_normal;
-  } else error (-1, 0, "%s: unknown kid frame (%p)", __func__, kid.frame);
+    break;
+  }
 }
-
 
 void
 draw_kid_walk_long (void)
 {
+  static int i = 0;
+
   kid.draw = draw_kid_walk_long;
   kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  /* comming from walk */
-  if (kid.frame == kid_walk_01)
-    draw_anim (&kid, kid_walk_02, -1, 0);
-  else if (kid.frame == kid_walk_02)
-    draw_anim (&kid, kid_walk_03, -2, 0);
-  else if (kid.frame == kid_walk_03)
-    draw_anim (&kid, kid_walk_04, -8, 0);
-  else if (kid.frame == kid_walk_04) {
-    draw_anim_on_edge (&kid, kid_walk_05, +0, 0);
-  } else if (kid.frame == kid_walk_05)
-    draw_anim (&kid, kid_walk_09, +0, 0);
-  else if (kid.frame == kid_walk_09)
-    draw_anim (&kid, kid_walk_10, +0, 0);
-  else if (kid.frame == kid_walk_10)
-    draw_anim (&kid, kid_walk_11, +0, 0);
-  else if (kid.frame == kid_walk_11) {
-    draw_anim (&kid, kid_walk_12, +0, 0);
+  switch (i) {
+  case 0: draw_anim (&kid, kid_walk_02, -1, 0); i++; break;
+  case 1: draw_anim (&kid, kid_walk_03, +0, 0); i++; break;
+  case 2: draw_anim (&kid, kid_walk_04, -8, 0); i++; break;
+  case 3: draw_anim (&kid, kid_walk_05, -7, 0); i++; break;
+  case 4: draw_anim_on_edge (&kid, kid_walk_06, +1, 0); i++; break;
+  case 5: draw_anim (&kid, kid_walk_08, +3, 0); i++; break;
+  case 6: draw_anim (&kid, kid_walk_09, -1, 0); i++; break;
+  case 7: draw_anim (&kid, kid_walk_10, -1, 0); i++; break;
+  case 8: draw_anim (&kid, kid_walk_11, -1, 0); i++; break;
+  case 9: draw_anim (&kid, kid_walk_12, +0, 0); i = 0;
     kid.draw = draw_kid_normal;
-  } else error (-1, 0, "%s: unknown kid frame (%p)", __func__, kid.frame);
+    break;
+  }
+}
+
+void
+draw_kid_walk_long_long (void)
+{
+  static int i = 0;
+
+  kid.draw = draw_kid_walk_long_long;
+  kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
+
+  switch (i) {
+  case 0: draw_anim (&kid, kid_walk_02, -1, 0); i++; break;
+  case 1: draw_anim (&kid, kid_walk_03, +0, 0); i++; break;
+  case 2: draw_anim (&kid, kid_walk_04, -8, 0); i++; break;
+  case 3: draw_anim (&kid, kid_walk_05, -7, 0); i++; break;
+  case 4: draw_anim (&kid, kid_walk_06, -6, 0); i++; break;
+  case 5: draw_anim_on_edge (&kid, kid_walk_07, +1, 0); i++; break;
+  case 6: draw_anim (&kid, kid_walk_08, +3, 0); i++; break;
+  case 7: draw_anim (&kid, kid_walk_09, -1, 0); i++; break;
+  case 8: draw_anim (&kid, kid_walk_10, -1, 0); i++; break;
+  case 9: draw_anim (&kid, kid_walk_11, -1, 0); i++; break;
+  case 10: draw_anim (&kid, kid_walk_12, +0, 0); i = 0;
+    kid.draw = draw_kid_normal;
+    break;
+  }
 }
 
 void draw_kid_walk_max ()
 {
+  static int i = 0;
+
   kid.draw = draw_kid_walk_max;
   kid.flip = (kid.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
   if (is_kid_start_walk ()) kid.fall = NULL;
   else kid.fall = draw_kid_fall;
 
-  /* comming from walk */
-  if (kid.frame == kid_walk_01)
-    draw_anim (&kid, kid_walk_02, -1, 0);
-  else if (kid.frame == kid_walk_02)
-    draw_anim (&kid, kid_walk_03, -2, 0);
-  else if (kid.frame == kid_walk_03)
-    draw_anim (&kid, kid_walk_04, -8, 0);
-  else if (kid.frame == kid_walk_04)
-    draw_anim (&kid, kid_walk_05, -9, 0);
-  else if (kid.frame == kid_walk_05)
-    draw_anim (&kid, kid_walk_06, -6, 0);
-  else if (kid.frame == kid_walk_06)
-    draw_anim (&kid, kid_walk_07, +1, 0);
-  else if (kid.frame == kid_walk_07)
-    draw_anim (&kid, kid_walk_08, +1, 0);
-  else if (kid.frame == kid_walk_08)
-    draw_anim (&kid, kid_walk_09, -1, 0);
-  else if (kid.frame == kid_walk_09)
-    draw_anim (&kid, kid_walk_10, +0, 0);
-  else if (kid.frame == kid_walk_10)
-    draw_anim (&kid, kid_walk_11, +0, 0);
-  else if (kid.frame == kid_walk_11) {
-    draw_anim (&kid, kid_walk_12, +0, 0);
+  switch (i) {
+  case 0: draw_anim (&kid, kid_walk_02, -1, 0); i++; break;
+  case 1: draw_anim (&kid, kid_walk_03, +0, 0); i++; break;
+  case 2: draw_anim (&kid, kid_walk_04, -8, 0); i++; break;
+  case 3: draw_anim (&kid, kid_walk_05, -7, 0); i++; break;
+  case 4: draw_anim (&kid, kid_walk_06, -6, 0); i++; break;
+  case 5: draw_anim (&kid, kid_walk_07, +3, 0); i++; break;
+  case 6: draw_anim (&kid, kid_walk_08, -2, 0); i++; break;
+  case 7: draw_anim (&kid, kid_walk_09, -1, 0); i++; break;
+  case 8: draw_anim (&kid, kid_walk_10, -1, 0); i++; break;
+  case 9: draw_anim (&kid, kid_walk_11, -2, 0); i++; break;
+  case 10: draw_anim (&kid, kid_walk_12, +0, 0); i = 0;
     kid.draw = draw_kid_normal;
+    break;
   }
-  else error (-1, 0, "%s: unknown kid frame (%p)", __func__, kid.frame);
 }
 
 bool

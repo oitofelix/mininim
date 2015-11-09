@@ -100,7 +100,7 @@ is_falling (struct anim a)
   struct construct ctbf = construct (pbf);
 
   if (ctbf.fg == NO_FLOOR
-      || cbf.y + 35 < PLACE_HEIGHT * (pbf.floor + 1) + 3) {
+      || cbf.y + 36 < PLACE_HEIGHT * (pbf.floor + 1) + 3) {
     return true;
   }
 
