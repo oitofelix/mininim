@@ -63,9 +63,15 @@ is_colliding (struct anim a)
   /* fix bug when vertically jumping near a wall face */
   if (a.id == &kid && is_kid_start_vjump ()) return false;
 
-  struct pos p = pos (coord_tf (a));
-  struct construct c = construct (p);
-  if (c.fg == WALL) {
+  struct pos ptf = pos (coord_tf (a));
+  struct pos pmf = pos (coord_mf (a));
+  struct pos pbf = pos (coord_bf (a));
+
+  struct construct ctf = construct (ptf);
+  struct construct cmf = construct (pmf);
+  struct construct cbf = construct (pbf);
+
+  if (ctf.fg == WALL || cmf.fg == WALL || cbf.fg == WALL) {
     return true;
   } else return false;
 }

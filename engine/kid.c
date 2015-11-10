@@ -1225,7 +1225,9 @@ draw_kid_fall (void)
   int dx = 0;
 
   /* hang if a edge is reachable and the shift key is pressed */
-  if (is_hangable (kid) && shift_key && ! hang_limit) {
+  if (is_hangable (kid) && shift_key && ! hang_limit
+      && is_kid_fall ()
+      && kid.frame != kid_fall_13) {
     play_sample (hang_on_fall);
     draw_kid_hang ();
     force_floor = -2;
@@ -1638,6 +1640,7 @@ draw_kid_hang (void)
   enum construct_fg fg = construct_rel (hang_pos, 0, dir).fg;
 
   kid.fall = NULL;
+  kid.collision = NULL;
 
   if (kid.frame == kid_hang_14)
     draw_anim (&kid, kid_hang_04, +0, +0);
@@ -1650,6 +1653,7 @@ draw_kid_hang (void)
       draw_kid_hang_free ();
     else {
       kid.fall = draw_kid_fall;
+      kid.collision = draw_kid_collision;
       if (is_falling (kid)) {
         draw_kid_fall ();
         return;
@@ -1665,10 +1669,8 @@ draw_kid_hang (void)
     draw_anim (&kid, kid_hang_14, +0, +0);
   }
 
-  /* if this function won't be called next, restore the fall
-     behavior */
-  if (kid.draw != draw_kid_hang)
-    kid.fall = draw_kid_fall;
+  kid.fall = draw_kid_fall;
+  kid.collision = draw_kid_collision;
 }
 
 void
@@ -1680,10 +1682,12 @@ draw_kid_hang_wall (void)
   kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
   kid.fall = NULL;
+  kid.collision = NULL;
 
   if (! shift_key) {
     i = 0;
     kid.fall = draw_kid_fall;
+    kid.collision = draw_kid_collision;
     if (is_falling (kid)) {
       draw_kid_fall ();
       return;
@@ -1695,6 +1699,8 @@ draw_kid_hang_wall (void)
     kid.draw = draw_kid_vjump;
     return;
   } if (up_key) {
+    kid.fall = draw_kid_fall;
+    kid.collision = draw_kid_collision;
     draw_kid_climb ();
     i = 0;
     return;
@@ -1710,10 +1716,8 @@ draw_kid_hang_wall (void)
   case 6: draw_anim (&kid, kid_hang_04, +0, +0); break;
   }
 
-  /* if this function won't be called next, restore the fall
-     behavior */
-  if (kid.draw != draw_kid_hang_wall)
-    kid.fall = draw_kid_fall;
+  kid.fall = draw_kid_fall;
+  kid.collision = draw_kid_collision;
 }
 
 void
@@ -1728,11 +1732,13 @@ draw_kid_hang_free (void)
   kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
   kid.fall = NULL;
+  kid.collision = NULL;
 
   if (! shift_key || hang_limit) {
     i = 0;
     j = 0;
     kid.fall = draw_kid_fall;
+    kid.collision = draw_kid_collision;
     if (is_falling (kid)) {
       draw_kid_fall ();
       hang_limit = false;
@@ -1745,6 +1751,8 @@ draw_kid_hang_free (void)
     hang_limit = false;
     return;
   } if (up_key) {
+    kid.fall = draw_kid_fall;
+    kid.collision = draw_kid_collision;
     draw_kid_climb ();
     i = 0;
     j = 0;
@@ -1785,10 +1793,8 @@ draw_kid_hang_free (void)
   case 25: draw_anim (&kid, kid_hang_04, -3, +0); i = 0; j++; break;
   }
 
-  /* if this function won't be called next, restore the fall
-     behavior */
-  if (kid.draw != draw_kid_hang_free)
-    kid.fall = draw_kid_fall;
+  kid.fall = draw_kid_fall;
+  kid.collision = draw_kid_collision;
 }
 
 bool
@@ -1819,6 +1825,7 @@ draw_kid_climb (void)
   kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
   kid.fall = NULL;
+  kid.collision = NULL;
 
   switch (i) {
   case 0:
@@ -1851,6 +1858,7 @@ draw_kid_climb (void)
 
   if (kid.draw != draw_kid_climb) {
     kid.fall = draw_kid_fall;
+    kid.collision = draw_kid_collision;
     i = 0;
   }
 
@@ -1895,6 +1903,7 @@ draw_kid_unclimb (void)
   kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
   kid.fall = NULL;
+  kid.collision = NULL;
 
   switch (i) {
   case 0:
@@ -1915,17 +1924,16 @@ draw_kid_unclimb (void)
   case 11: draw_anim (&kid, kid_climb_03, +7, +6); i++; break;
   case 12: draw_anim (&kid, kid_climb_02, +2, +5); i++; break;
   case 13: draw_anim (&kid, kid_climb_01, +2, +9); i++; break;
-  case 14: draw_anim (&kid, kid_hang_04, -5, +3); i = 0;
+  case 14: draw_anim (&kid, kid_hang_04, -5, +4); i = 0;
     kid.draw = draw_kid_hang;
     hang_pos = npos (prel (hang_pos, +1, (kid.dir == LEFT) ? +1 : -1));
     break;
   }
 
-  if (kid.draw != draw_kid_unclimb) {
-    kid.fall = draw_kid_fall;
-    i = 0;
-  }
+  kid.fall = draw_kid_fall;
+  kid.collision = draw_kid_collision;
 
+  if (kid.draw != draw_kid_unclimb) i = 0;
 }
 
 void
