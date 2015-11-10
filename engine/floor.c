@@ -20,6 +20,8 @@
 #include <stdio.h>
 #include <error.h>
 #include "kernel/video.h"
+#include "kernel/audio.h"
+#include "kernel/random.h"
 #include "physics.h"
 #include "kid.h"
 #include "pillar.h"
@@ -34,9 +36,14 @@ ALLEGRO_BITMAP *floor_normal_left, *floor_normal_right, *floor_normal_base,
   *floor_loose_right_02, *floor_loose_base_02, *floor_loose_02,
   *floor_corner_01, *floor_corner_02, *floor_corner_03;
 
+ALLEGRO_SAMPLE *loose_floor_01, *loose_floor_02, *loose_floor_03, *broken_floor_sound;
+
+static struct loose_floor *cfloor;
+
 void
 load_vdungeon_floor (void)
 {
+  /* bitmaps */
   floor_normal_left = load_bitmap (VDUNGEON_FLOOR_NORMAL_LEFT);
   floor_normal_right = load_bitmap (VDUNGEON_FLOOR_NORMAL_RIGHT);
   floor_normal_base = load_bitmap (VDUNGEON_FLOOR_NORMAL_BASE);
@@ -55,6 +62,12 @@ load_vdungeon_floor (void)
 
   /* used for loose floor falling animation */
   floor_loose_02 = create_floor_loose_02_bitmap ();
+
+  /* sounds */
+  loose_floor_01 = load_sample (LOOSE_FLOOR_01);
+  loose_floor_02 = load_sample (LOOSE_FLOOR_02);
+  loose_floor_03 = load_sample (LOOSE_FLOOR_03);
+  broken_floor_sound = load_sample (BROKEN_FLOOR_SOUND);
 }
 
 void
@@ -77,6 +90,12 @@ unload_floor (void)
   al_destroy_bitmap (floor_corner_01);
   al_destroy_bitmap (floor_corner_02);
   al_destroy_bitmap (floor_corner_03);
+
+  /* sounds */
+  al_destroy_sample (loose_floor_01);
+  al_destroy_sample (loose_floor_02);
+  al_destroy_sample (loose_floor_03);
+  al_destroy_sample (broken_floor_sound);
 }
 
 ALLEGRO_BITMAP *
@@ -318,10 +337,14 @@ draw_shake_floor (void)
     if (construct (p).fg == LOOSE_FLOOR) {
       draw_no_floor (screen, p);
       switch (i) {
-      case 0: draw_loose_floor_01 (screen, p); break;
-      case 1: draw_floor (screen, p); break;
-      case 2: draw_loose_floor_02 (screen, p); break;
-      case 3: draw_floor (screen, p); break;
+      case 0: draw_loose_floor_01 (screen, p);
+        play_sample (loose_floor_sample ()); break;
+      case 1: draw_floor (screen, p);
+        play_sample (loose_floor_sample ()); break;
+      case 2: draw_loose_floor_02 (screen, p);
+        play_sample (loose_floor_sample ()); break;
+      case 3: draw_floor (screen, p);
+        play_sample (loose_floor_sample ()); break;
       }
       i = (i < 3)? i + 1 : 0;
       draw_construct_left (screen, prel (p, 0, +1));
@@ -329,7 +352,16 @@ draw_shake_floor (void)
     }
 }
 
-static struct loose_floor *cfloor;
+ALLEGRO_SAMPLE *
+loose_floor_sample (void)
+{
+  switch (prandom (2)) {
+  case 0: return loose_floor_01;
+  case 1: return loose_floor_02;
+  case 2: return loose_floor_03;
+  }
+  return loose_floor_01;
+}
 
 void
 draw_release_loose_floor (void)
@@ -341,14 +373,20 @@ draw_release_loose_floor (void)
       struct pos p = loose_floor[i].p;
       if (loose_floor[i].i == 0) draw_no_floor (room_bg, p);
       switch (loose_floor[i].i) {
-      case 0: draw_loose_floor_01 (screen, p); break;
-      case 1: draw_floor (screen, p); break;
-      case 2: draw_loose_floor_02 (screen, p); break;
-      case 3: draw_loose_floor_02 (screen, p); break;
-      case 4: draw_floor (screen, p); break;
+      case 0: draw_loose_floor_01 (screen, p);
+        play_sample (loose_floor_sample ()); break;
+      case 1: draw_floor (screen, p);
+        play_sample (loose_floor_sample ()); break;
+      case 2: draw_loose_floor_02 (screen, p);
+        play_sample (loose_floor_sample ()); break;
+      case 3: draw_loose_floor_02 (screen, p);
+        play_sample (loose_floor_sample ()); break;
+      case 4: draw_floor (screen, p);
+        play_sample (loose_floor_sample ()); break;
       case 5: draw_floor (screen, p); break;
       case 6: draw_floor (screen, p); break;
-      case 7: draw_loose_floor_02 (screen, p); break;
+      case 7: draw_loose_floor_02 (screen, p);
+        play_sample (loose_floor_sample ()); break;
       case 8: draw_loose_floor_02 (screen, p); break;
       case 9:
         set_construct_fg (p, NO_FLOOR);
@@ -405,15 +443,14 @@ draw_floor_fall (void)
         redraw_anim (kid);
     }
   } else { /* the floor hit the ground */
+    play_sample (broken_floor_sound);
     set_construct_fg (p, BROKEN_FLOOR);
     cfloor->p.room = 0;
-    if (room_view == p.room) {
-      draw_construct (room_bg, p);
-      draw_construct_left (room_bg, prel (p, 0, +1));
-      draw_construct (screen, p);
-      draw_construct_left (screen, prel (p, 0, +1));
-      redraw_anim (kid);
-    }
+    draw_construct (room_bg, p);
+    draw_construct_left (room_bg, prel (p, 0, +1));
+    draw_construct (screen, p);
+    draw_construct_left (screen, prel (p, 0, +1));
+    redraw_anim (kid);
   }
 }
 

@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <error.h>
 #include "kernel/video.h"
+#include "kernel/audio.h"
 #include "kernel/keyboard.h"
 #include "anim.h"
 #include "physics.h"
@@ -67,6 +68,8 @@ ALLEGRO_BITMAP *kid_normal,
   *kid_run_jump_07, *kid_run_jump_08, *kid_run_jump_09,
   *kid_run_jump_10, *kid_run_jump_11;
 
+ALLEGRO_SAMPLE *step, *hit_ground, *hit_wall, *hang_on_fall;
+
 struct anim kid; /* kid animation object */
 bool hang_limit;
 bool misstep = false;
@@ -74,6 +77,7 @@ bool misstep = false;
 void
 load_kid (void)
 {
+  /* bitmap */
   kid_normal = load_bitmap (KID_NORMAL);
   kid_start_run_01 = load_bitmap (KID_START_RUN_01);
   kid_start_run_02 = load_bitmap (KID_START_RUN_02);
@@ -216,6 +220,12 @@ load_kid (void)
   kid_run_jump_09 = load_bitmap (KID_RUN_JUMP_09);
   kid_run_jump_10 = load_bitmap (KID_RUN_JUMP_10);
   kid_run_jump_11 = load_bitmap (KID_RUN_JUMP_11);
+
+  /* sound */
+  step = load_sample (STEP);
+  hit_ground = load_sample (HIT_GROUND);
+  hit_wall = load_sample (HIT_WALL);
+  hang_on_fall = load_sample (HANG_ON_FALL);
 
   kid.id = &kid;
   kid.c.room = 1;
@@ -377,6 +387,12 @@ unload_kid (void)
   al_destroy_bitmap (kid_run_jump_09);
   al_destroy_bitmap (kid_run_jump_10);
   al_destroy_bitmap (kid_run_jump_11);
+
+  /* sounds */
+  al_destroy_sample (step);
+  al_destroy_sample (hit_ground);
+  al_destroy_sample (hit_wall);
+  al_destroy_sample (hang_on_fall);
 }
 
 void draw_kid_normal ()
@@ -753,9 +769,10 @@ void draw_kid_stop_run ()
   int dc = dist_collision (kid);
 
   /* comming from stop run */
-  if (kid.frame == kid_stop_run_01)
+  if (kid.frame == kid_stop_run_01) {
     draw_anim (&kid, kid_stop_run_02, -6, 0);
-  else if (kid.frame == kid_stop_run_02) {
+    play_sample (step);
+  } else if (kid.frame == kid_stop_run_02) {
     if (dc < 16) {
       draw_anim (&kid, kid_stop_run_04, (int) -dc + 2, 0);
       kid.draw = turn_run ? draw_kid_turn_run : draw_kid_stabilize;
@@ -763,6 +780,7 @@ void draw_kid_stop_run ()
   } else if (kid.frame == kid_stop_run_03) {
     draw_anim (&kid, kid_stop_run_04, +0, 0);
     kid.draw = turn_run ? draw_kid_turn_run : draw_kid_stabilize;
+    play_sample (step);
   } else
     draw_anim (&kid, kid_stop_run_01, +0, 0);
 }
@@ -798,26 +816,35 @@ void draw_kid_run ()
   }
 
   /* comming from turn run */
-  if (kid.frame == kid_turn_run_13)
+  if (kid.frame == kid_turn_run_13) {
     draw_anim (&kid, kid_run_13, -4, 0);
-  else if (kid.frame == kid_run_07)
+    play_sample (step);
+  } else if (kid.frame == kid_run_07)
     draw_anim (&kid, kid_run_08, -10, 0);
   else if (kid.frame == kid_run_jump_11)
     draw_anim (&kid, kid_run_07, -15, 0);
   /* comming from run */
-  else if (kid.frame == kid_run_08)
+  else if (kid.frame == kid_run_08) {
     draw_anim (&kid, kid_run_09, -3, 0);
+    play_sample (step);
+  }
   else if (kid.frame == kid_run_09)
     draw_anim (&kid, kid_run_10, -5, 0);
   else if (kid.frame == kid_run_10)
     draw_anim (&kid, kid_run_11, -9, 0);
   else if (kid.frame == kid_run_11)
     draw_anim (&kid, kid_run_12, -11, 0);
-  else if (kid.frame == kid_run_12)
+  else if (kid.frame == kid_run_12) {
     draw_anim (&kid, kid_run_13, -4, 0);
+    play_sample (step);
+  }
   else if (kid.frame == kid_run_13)
     draw_anim (&kid, kid_run_14, -8, 0);
-  else draw_anim (&kid, kid_run_07, -9, 0);
+  else {
+    if (kid.frame == kid_run_jump_11)
+      play_sample (step);
+    draw_anim (&kid, kid_run_07, -9, 0);
+  }
 
   if (stop) kid.draw = draw_kid_stop_run;
 }
@@ -1044,15 +1071,17 @@ draw_kid_jump (void)
     draw_anim (&kid, kid_jump_10, -11, -6);
   else if (kid.frame == kid_jump_10)
     draw_anim (&kid, kid_jump_11, -2, +6);
-  else if (kid.frame == kid_jump_11)
+  else if (kid.frame == kid_jump_11) {
     draw_anim (&kid, kid_jump_12, -9, 0);
-  else if (kid.frame == kid_jump_12)
+    play_sample (step);
+  } else if (kid.frame == kid_jump_12)
     draw_anim (&kid, kid_jump_13, +6, 0);
   else if (kid.frame == kid_jump_13)
     draw_anim (&kid, kid_jump_14, -11, 0);
-  else if (kid.frame == kid_jump_14)
+  else if (kid.frame == kid_jump_14) {
     draw_anim (&kid, kid_jump_15, +0, 0);
-  else if (kid.frame == kid_jump_15)
+    play_sample (step);
+  } else if (kid.frame == kid_jump_15)
     draw_anim (&kid, kid_jump_16, +0, 0);
   else if (kid.frame == kid_jump_16)
     draw_anim (&kid, kid_jump_17, +1, 0);
@@ -1113,6 +1142,7 @@ draw_kid_collision (void)
        || is_kid_stop_run_jump ())
       /* && ! is_falling (kid) */
       ) {
+    play_sample (hit_wall);
     draw_kid_fall ();
     return;
   }
@@ -1174,8 +1204,10 @@ draw_kid_collision (void)
    draw_anim (&kid, kid_stabilize_08, +4, 0);
    kid.draw = draw_kid_normal;
    first_frame = true;
- } else
+ } else {
    draw_anim (&kid, kid_stabilize_06, -4, 0);
+   play_sample (hit_wall);
+ }
 
   /* if this function won't be called next, restore the collision
      behavior */
@@ -1187,14 +1219,16 @@ void
 draw_kid_fall (void)
 {
   static int inertia;
-  static int force_floor = -1;
+  static int force_floor = -2;
   static int i = 0;
   struct pos p = pos (coord_bf (kid));
   int dx = 0;
 
   /* hang if a edge is reachable and the shift key is pressed */
   if (is_hangable (kid) && shift_key && ! hang_limit) {
+    play_sample (hang_on_fall);
     draw_kid_hang ();
+    force_floor = -2;
     return;
   }
 
@@ -1202,7 +1236,6 @@ draw_kid_fall (void)
   if (! is_kid_fall ()) {
     /* reset the inertia */
     inertia = 0;
-
     /* move horizontally so the kid doesn't fall through the floor */
     if (dist_fall (kid) > -13)
       kid.c.x += (kid.dir == LEFT) ? -6 : 8;
@@ -1217,7 +1250,6 @@ draw_kid_fall (void)
     /* revert kid's direction */
     if (kid.frame != kid_turn_run_13)
       kid.dir = (kid.dir == LEFT) ? RIGHT : LEFT;
-
     /* prevent kid from falling inside walls */
     kid.c.x += (kid.dir == LEFT) ? 8 : -8;
   }
@@ -1251,7 +1283,9 @@ draw_kid_fall (void)
     kid.c.x += (kid.dir == LEFT) ? -6 : +6;
     kid.frame = kid_normal;
     draw_kid_couch ();
+    if (i > 3) play_sample (hit_ground);
     i = 0;
+    force_floor = -2;
     kid.just_fall = true;
     return;
   }
@@ -1266,8 +1300,7 @@ draw_kid_fall (void)
   else if (kid.frame == kid_fall_16)
     draw_anim (&kid, kid_fall_17, -inertia, +20);
   else if (kid.frame == kid_fall_17) {
-    int speed = +21 + 3 * i;
-    if (speed < 33) i++;
+    int speed = +21 + 3 * (i - 5);
     speed = (speed > 33) ? 33 : speed;
     draw_anim (&kid, kid_fall_17, -inertia, speed);
   } else {
@@ -1277,7 +1310,7 @@ draw_kid_fall (void)
     draw_anim (&kid, kid_fall_13, dx, dy);
   }
 
-
+  i++;
 }
 
 bool
@@ -1574,9 +1607,10 @@ draw_kid_misstep (void)
     draw_anim (&kid, kid_walk_06, -3, 0);
   else if (kid.frame == kid_walk_06)
     draw_anim (&kid, kid_jump_14, +6, 0);
-  else if (kid.frame == kid_jump_14)
+  else if (kid.frame == kid_jump_14) {
     draw_anim (&kid, kid_couch_10, +7, 0);
-  else if (kid.frame == kid_couch_10)
+    play_sample (step);
+  } else if (kid.frame == kid_couch_10)
     draw_anim (&kid, kid_couch_11, +3, 0);
   else if (kid.frame == kid_couch_11)
     draw_anim (&kid, kid_couch_12, +0, 0);
@@ -1701,12 +1735,14 @@ draw_kid_hang_free (void)
     kid.fall = draw_kid_fall;
     if (is_falling (kid)) {
       draw_kid_fall ();
+      hang_limit = false;
       return;
     }
     kid.frame = kid_vjump_15;
     kid.c.y = 63 * pos (coord_m (kid)).floor;
-    draw_anim (&kid, kid_vjump_15, +0, +0);
+    draw_anim (&kid, kid_vjump_15, -10, +0);
     kid.draw = draw_kid_vjump;
+    hang_limit = false;
     return;
   } if (up_key) {
     draw_kid_climb ();
@@ -1911,11 +1947,13 @@ draw_kid_run_jump (void)
   else kid.fall = draw_kid_fall;
 
   switch (i) {
-  case 0: draw_anim (&kid, kid_run_jump_01, -10, +0); i++; break;
+  case 0: draw_anim (&kid, kid_run_jump_01, -10, +0); i++;
+    play_sample (step); break;
   case 1: draw_anim (&kid, kid_run_jump_02, -11, +0); i++; break;
   case 2: draw_anim (&kid, kid_run_jump_03, -13, +0); i++; break;
   case 3: draw_anim (&kid, kid_run_jump_04, -7, +0); i++; break;
-  case 4: draw_anim (&kid, kid_run_jump_05, -12, +0); i++; break;
+  case 4: draw_anim (&kid, kid_run_jump_05, -12, +0); i++;
+    play_sample (step); break;
   case 5: draw_anim (&kid, kid_run_jump_06, -15, +0); i++; break;
   case 6: draw_anim (&kid, kid_run_jump_07, -29, -3); i++; break;
   case 7: draw_anim (&kid, kid_run_jump_08, -17, -9); i++; break;

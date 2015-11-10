@@ -20,8 +20,10 @@
 #ifndef FREEPOP_FLOOR_H
 #define FREEPOP_FLOOR_H
 
+#include "kernel/audio.h"
 #include "physics.h"
 
+/* bitmaps */
 #define VDUNGEON_FLOOR_NORMAL_LEFT "dat/vdungeon/floor panels/normal left.png"
 #define VDUNGEON_FLOOR_NORMAL_RIGHT "dat/vdungeon/floor panels/normal right.png"
 #define VDUNGEON_FLOOR_NORMAL_BASE "dat/vdungeon/floor panels/normal base.png"
@@ -38,6 +40,12 @@
 #define VDUNGEON_FLOOR_CORNER_02 "dat/vdungeon/floor panels/normal_closer02.png"
 #define VDUNGEON_FLOOR_CORNER_03 "dat/vdungeon/floor panels/normal_closer03.png"
 
+/* sounds */
+#define LOOSE_FLOOR_01 "dat/digisnd1/tile moving 1.ogg"
+#define LOOSE_FLOOR_02 "dat/digisnd1/tile moving 2.ogg"
+#define LOOSE_FLOOR_03 "dat/digisnd1/door tile pressed 1.ogg"
+#define BROKEN_FLOOR_SOUND "dat/digisnd1/tile crashing into the floor.ogg"
+
 struct loose_floor {
   struct pos p;
   int i;
@@ -49,6 +57,7 @@ struct loose_floor {
 extern ALLEGRO_BITMAP *floor_normal_left, *floor_normal_right, *floor_normal_base,
   *floor_broken_left, *floor_broken_right, *floor_broken_front;
 
+ALLEGRO_SAMPLE * loose_floor_sample (void);
 void load_vdungeon_floor (void);
 void unload_floor (void);
 ALLEGRO_BITMAP *create_floor_loose_02_bitmap (void);

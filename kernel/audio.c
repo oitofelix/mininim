@@ -19,6 +19,7 @@
 
 #include <math.h>
 #include <error.h>
+#include <stdio.h>
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_acodec.h>
 
@@ -33,7 +34,7 @@ init_audio (void)
     error (-1, 0, "%s (void): cannot initialize audio", __func__);
   if (! al_init_acodec_addon ())
     error (-1, 0, "%s (void): cannot initialize audio codecs", __func__);
-  if (! al_reserve_samples (1))
+  if (! al_reserve_samples (2))
     error (-1, 0, "%s (void): cannot reserve audio samples", __func__);
 }
 

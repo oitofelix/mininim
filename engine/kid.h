@@ -164,6 +164,12 @@
 #define KID_RUN_JUMP_10 "dat/kid/running jump/frame10.png"
 #define KID_RUN_JUMP_11 "dat/kid/running jump/frame11.png"
 
+/* sound resources */
+#define STEP "dat/digisnd1/running 2.ogg"
+#define HIT_GROUND "dat/digisnd1/running 1.ogg"
+#define HIT_WALL "dat/digisnd1/touching a wall.ogg"
+#define HANG_ON_FALL "dat/digisnd1/normal falling.ogg"
+
 /* functions */
 void load_kid (void);
 void unload_kid (void);
