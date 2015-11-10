@@ -174,6 +174,8 @@
 void load_kid (void);
 void unload_kid (void);
 
+void place_kid (int room, int floor, int place);
+
 void draw_kid_stabilize (void);
 void draw_kid_vjump (void);
 void draw_kid_ceiling (void);

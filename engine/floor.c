@@ -34,10 +34,12 @@ ALLEGRO_BITMAP *floor_normal_left, *floor_normal_right, *floor_normal_base,
   *floor_broken_left, *floor_broken_right, *floor_broken_front, *floor_loose_left_01,
   *floor_loose_right_01, *floor_loose_base_01, *floor_loose_left_02,
   *floor_loose_right_02, *floor_loose_base_02, *floor_loose_02,
-  *floor_corner_01, *floor_corner_02, *floor_corner_03;
+  *floor_corner_01, *floor_corner_02, *floor_corner_03,
+  *floor_spikes_left, *floor_spikes_right;
 
 ALLEGRO_SAMPLE *loose_floor_01, *loose_floor_02, *loose_floor_03, *broken_floor_sound;
 
+static struct loose_floor loose_floor[PLACES * FLOORS];
 static struct loose_floor *cfloor;
 
 void
@@ -59,6 +61,8 @@ load_vdungeon_floor (void)
   floor_corner_01 = load_bitmap (VDUNGEON_FLOOR_CORNER_01);
   floor_corner_02 = load_bitmap (VDUNGEON_FLOOR_CORNER_02);
   floor_corner_03 = load_bitmap (VDUNGEON_FLOOR_CORNER_03);
+  floor_spikes_left = load_bitmap (VDUNGEON_FLOOR_SPIKES_LEFT);
+  floor_spikes_right = load_bitmap (VDUNGEON_FLOOR_SPIKES_RIGHT);
 
   /* used for loose floor falling animation */
   floor_loose_02 = create_floor_loose_02_bitmap ();
@@ -90,6 +94,8 @@ unload_floor (void)
   al_destroy_bitmap (floor_corner_01);
   al_destroy_bitmap (floor_corner_02);
   al_destroy_bitmap (floor_corner_03);
+  al_destroy_bitmap (floor_spikes_left);
+  al_destroy_bitmap (floor_spikes_right);
 
   /* sounds */
   al_destroy_sample (loose_floor_01);
@@ -173,6 +179,28 @@ draw_broken_floor_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
   draw_bitmapc (floor_broken_front, bitmap,
                   broken_floor_front_coord (p), 0);
+}
+
+void
+draw_spikes_floor (ALLEGRO_BITMAP *bitmap, struct pos p)
+{
+  draw_floor_base (bitmap, p);
+  draw_bitmapc (floor_spikes_left, bitmap, floor_left_coord (p), 0);
+  draw_bitmapc (floor_spikes_right, bitmap, floor_right_coord (p), 0);
+}
+
+void
+draw_spikes_floor_left (ALLEGRO_BITMAP *bitmap, struct pos p)
+{
+  draw_floor_base (bitmap, p);
+  draw_bitmapc (floor_spikes_left, bitmap, floor_left_coord (p), 0);
+}
+
+void
+draw_spikes_floor_right (ALLEGRO_BITMAP *bitmap, struct pos p)
+{
+  draw_floor_base (bitmap, p);
+  draw_bitmapc (floor_spikes_right, bitmap, floor_right_coord (p), 0);
 }
 
 void
@@ -298,8 +326,6 @@ floor_corner_03_coord (struct pos p)
   c.room = p.room;
   return c;
 }
-
-static struct loose_floor loose_floor[PLACES * FLOORS];
 
 void
 release_loose_floor (struct pos p)

@@ -28,6 +28,7 @@
 #include "fire.h"
 #include "kid.h"
 #include "floor.h"
+#include "spikes.h"
 #include "level.h"
 
 /* functions */
@@ -65,7 +66,7 @@ unload_level (void)
   unload_kid ();
 }
 
-int room_view = 1;
+int room_view = 6;
 
 static void
 level_anim (void)
@@ -94,6 +95,7 @@ level_anim (void)
     }
     draw_shake_floor ();
     draw_release_loose_floor ();
+    draw_spikes ();
     draw_room_anim_fg (kid);
   }
 }

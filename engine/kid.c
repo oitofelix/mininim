@@ -228,17 +228,14 @@ load_kid (void)
   hang_on_fall = load_sample (HANG_ON_FALL);
 
   kid.id = &kid;
-  kid.c.room = 1;
-  /* kid.c.x = 64; */
-  kid.c.x = 230;
-  kid.c.y = 15 + 63 * 0;
   kid.frame = kid_normal;
   kid.dir = LEFT;
   kid.collision = draw_kid_collision;
   kid.fall = draw_kid_fall;
   kid.ceiling = draw_kid_ceiling;
-
   kid.draw = draw_kid_normal;
+
+  place_kid (6, 0, 7);
 }
 
 void
@@ -395,7 +392,16 @@ unload_kid (void)
   al_destroy_sample (hang_on_fall);
 }
 
-void draw_kid_normal ()
+void
+place_kid (int room, int floor, int place)
+{
+  kid.c.room = room;
+  kid.c.x = PLACE_WIDTH * place + 15;
+  kid.c.y = PLACE_HEIGHT * floor + 15;
+}
+
+void
+draw_kid_normal (void)
 {
   kid.draw = draw_kid_normal;
   kid.flip = (kid.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;

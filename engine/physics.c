@@ -101,14 +101,12 @@ is_falling (struct anim a)
 
   a.c.x += (a.dir == LEFT) ? +4 : -4;
 
-  struct coord cbf = coord_bf (a);
-  struct pos pbf = pos (cbf);
-  struct construct ctbf = construct (pbf);
+  struct coord bf = coord_bf (a);
+  struct pos pbf = pos (bf);
+  struct construct cbf = construct (pbf);
+  struct pos pbfn = pos (coord_bf (next_anim (a, a.frame, 0, 33)));
 
-  if (ctbf.fg == NO_FLOOR
-      || cbf.y + 33 < PLACE_HEIGHT * (pbf.floor + 1) + 3) {
-    return true;
-  }
+  if (cbf.fg == NO_FLOOR || pbf.floor == pbfn.floor) return true;
 
   /* needed because when hanging the kid's bottom front position
      coincides with the wall's */

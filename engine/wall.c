@@ -141,11 +141,17 @@ draw_wall_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
   switch (wall_correlation (p)) {
   case SWS:
-    if (is_kid_vjump ()) draw_wall_sws (bitmap, p);
+    if (is_kid_vjump ()) {
+      draw_wall_sws (bitmap, p);
+      draw_construct_left (bitmap, prel (p, -1, +1));
+    }
     else draw_wall_sws_no_face (bitmap, p); break;
   case SWW: draw_wall_sww (bitmap, p); break;
   case WWS:
-    if (is_kid_vjump ()) draw_wall_wws (bitmap, p);
+    if (is_kid_vjump ()) {
+      draw_wall_wws (bitmap, p);
+      draw_construct_left (bitmap, prel (p, -1, +1));
+    }
     else draw_wall_wws_no_face (bitmap, p); break;
   case WWW: draw_wall_www (bitmap, p); break;
   default:
@@ -199,7 +205,7 @@ enum wall_correlation
 wall_correlation (struct pos p)
 {
   if (construct (p).fg != WALL)
-    error (-1, 0, "%s: requested wall correlation on non-wall (%i, %i. %i)",
+    error (-1, 0, "%s: requested wall correlation on non-wall (%i, %i, %i)",
            __func__, p.room, p.floor, p.place);
 
   if (construct_rel (p, 0, -1).fg != WALL

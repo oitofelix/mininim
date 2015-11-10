@@ -86,6 +86,7 @@ struct level {
       FLOOR,
       BROKEN_FLOOR,
       LOOSE_FLOOR,
+      SPIKES_FLOOR,
       PILLAR,
       WALL,
     } fg;

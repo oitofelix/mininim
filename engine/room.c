@@ -29,8 +29,8 @@
 #include "floor.h"
 #include "pillar.h"
 #include "wall.h"
+#include "spikes.h"
 #include "room.h"
-
 
 ALLEGRO_BITMAP *bricks_01, *bricks_02, *bricks_03, *bricks_04,
   *window, *torch;
@@ -51,6 +51,7 @@ load_room (void)
     switch (video_mode) {
     case VGA:
       load_vdungeon_floor ();
+      load_vdungeon_spikes ();
       load_vdungeon_wall ();
       load_vdungeon_pillar ();
       bricks_01 = load_bitmap (VDUNGEON_BRICKS_01);
@@ -75,6 +76,7 @@ void
 unload_room (void)
 {
   unload_floor ();
+  unload_spikes ();
   unload_wall ();
   unload_pillar ();
 
@@ -131,7 +133,6 @@ draw_construct (ALLEGRO_BITMAP *bitmap, struct pos p)
 void
 draw_construct_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
-
   switch (construct (p).fg) {
   case NO_FLOOR:
     break;
@@ -143,6 +144,9 @@ draw_construct_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
     break;
   case LOOSE_FLOOR:
     draw_floor (bitmap, p);
+    break;
+  case SPIKES_FLOOR:
+    draw_spikes_floor (bitmap, p);
     break;
   case PILLAR:
     draw_pillar (bitmap, p);
@@ -201,6 +205,9 @@ draw_construct_left (ALLEGRO_BITMAP *bitmap, struct pos p)
   case LOOSE_FLOOR:
     draw_floor_left (bitmap, p);
     break;
+  case SPIKES_FLOOR:
+    draw_spikes_floor_left (bitmap, p);
+    break;
   case PILLAR:
     draw_pillar_left (bitmap, p);
     break;
@@ -227,6 +234,9 @@ draw_construct_right (ALLEGRO_BITMAP *bitmap, struct pos p)
     break;
   case LOOSE_FLOOR:
     draw_floor_right (bitmap, p);
+    break;
+  case SPIKES_FLOOR:
+    draw_spikes_floor_right (bitmap, p);
     break;
   case PILLAR:
     draw_pillar_right (bitmap, p);
@@ -367,6 +377,9 @@ draw_room_fg (struct pos p)
     break;
   case LOOSE_FLOOR:
     draw_floor_fg (screen, p);
+    break;
+  case SPIKES_FLOOR:
+    draw_spikes_fg (screen, p);
     break;
   case PILLAR:
     draw_pillar_fg (screen, p);
