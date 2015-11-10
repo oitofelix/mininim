@@ -303,20 +303,7 @@ is_hangable (struct anim a)
 bool
 is_visible (struct anim a)
 {
-  if (a.id == &kid)
-    return ncoord (coord_m (a)).room == room_view;
-  else {
-    struct coord ntl = ncoord (coord_tl (a));
-    struct coord ntr = ncoord (coord_tr (a));
-    struct coord nbl = ncoord (coord_bl (a));
-    struct coord nbr = ncoord (coord_br (a));
-
-    if (ntl.room == room_view
-        || ntr.room == room_view
-        || nbl.room == room_view
-        || nbr.room == room_view) return true;
-    else return false;
-  }
+  return nanim (a).room == room_view;
 }
 
 void

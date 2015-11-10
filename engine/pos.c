@@ -167,10 +167,24 @@ nanim (struct anim a)
 {
   if (a.id == &kid) {
     struct dim d = dim (a);
-    struct coord c = ncoord (coord_m (a));
-    c.x -= d.w / 2;
-    c.y -= d.h / 2;
-    return c;
+
+    struct coord m = coord_m (a);
+    struct coord ml = m;
+    struct coord mr = m;
+
+    ml.x += -1;
+    mr.x += +1;
+
+    struct coord nm = ncoord (m);
+    struct coord nml = ncoord (ml);
+    struct coord nmr = ncoord (mr);
+
+    if (nml.room == nmr.room) {
+      struct coord c = nm;
+      c.x -= d.w / 2;
+      c.y -= d.h / 2;
+      return c;
+    } else return a.c;
   } else {
     struct dim d = dim (a);
 

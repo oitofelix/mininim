@@ -1828,8 +1828,8 @@ draw_kid_climb (void)
     kid.c.x = PLACE_WIDTH * (hang_pos.place + dir) + 9;
     kid.c.y = PLACE_HEIGHT * hang_pos.floor - 9;
     draw_anim (&kid, kid_climb_01, +0, +0); i++; break;
-  case 1: draw_anim (&kid, kid_climb_02, +0, -9); i++; break;
-  case 2: draw_anim (&kid, kid_climb_03, -4, -5); i++; break;
+  case 1: draw_anim (&kid, kid_climb_02, -2, -9); i++; break;
+  case 2: draw_anim (&kid, kid_climb_03, -2, -5); i++; break;
   case 3: draw_anim (&kid, kid_climb_04, -7, -6); i++; break;
   case 4: draw_anim (&kid, kid_climb_05, -5, -4); i++; break;
   case 5: draw_anim (&kid, kid_climb_06, -2, -5); i++; break;
@@ -1913,8 +1913,8 @@ draw_kid_unclimb (void)
   case 9: draw_anim (&kid, kid_climb_05, +2, +5); i++; break;
   case 10: draw_anim (&kid, kid_climb_04, +5, +4); i++; break;
   case 11: draw_anim (&kid, kid_climb_03, +7, +6); i++; break;
-  case 12: draw_anim (&kid, kid_climb_02, +4, +5); i++; break;
-  case 13: draw_anim (&kid, kid_climb_01, +0, +9); i++; break;
+  case 12: draw_anim (&kid, kid_climb_02, +2, +5); i++; break;
+  case 13: draw_anim (&kid, kid_climb_01, +2, +9); i++; break;
   case 14: draw_anim (&kid, kid_hang_04, -5, +3); i = 0;
     kid.draw = draw_kid_hang;
     hang_pos = npos (prel (hang_pos, +1, (kid.dir == LEFT) ? +1 : -1));
