@@ -30,6 +30,7 @@
 #include "pillar.h"
 #include "wall.h"
 #include "spikes.h"
+#include "door.h"
 #include "room.h"
 
 ALLEGRO_BITMAP *bricks_01, *bricks_02, *bricks_03, *bricks_04,
@@ -54,6 +55,7 @@ load_room (void)
       load_vdungeon_spikes ();
       load_vdungeon_wall ();
       load_vdungeon_pillar ();
+      load_vdungeon_door ();
       bricks_01 = load_bitmap (VDUNGEON_BRICKS_01);
       bricks_02 = load_bitmap (VDUNGEON_BRICKS_02);
       bricks_03 = load_bitmap (VDUNGEON_BRICKS_03);
@@ -79,6 +81,7 @@ unload_room (void)
   unload_spikes ();
   unload_wall ();
   unload_pillar ();
+  unload_door ();
 
   /* bitmaps */
   al_destroy_bitmap (bricks_01);
@@ -96,6 +99,15 @@ draw_bitmapc (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
   if (! cutscene && (to == screen || to == room_bg)
       && c.room != room_view) return;
   draw_bitmap (from, to, c.x, c.y, flags);
+}
+
+void
+draw_bitmap_regionc (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to, float sx, float sy,
+                     float sw, float sh, struct coord c, int flags)
+{
+  if (! cutscene && (to == screen || to == room_bg)
+      && c.room != room_view) return;
+  draw_bitmap_region (from, to, sx, sy, sw, sh, c.x, c.y, flags);
 }
 
 void
@@ -134,26 +146,14 @@ void
 draw_construct_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
   switch (construct (p).fg) {
-  case NO_FLOOR:
-    break;
-  case FLOOR:
-    draw_floor (bitmap, p);
-    break;
-  case BROKEN_FLOOR:
-    draw_broken_floor (bitmap, p);
-    break;
-  case LOOSE_FLOOR:
-    draw_floor (bitmap, p);
-    break;
-  case SPIKES_FLOOR:
-    draw_spikes_floor (bitmap, p);
-    break;
-  case PILLAR:
-    draw_pillar (bitmap, p);
-    break;
-  case WALL:
-    draw_wall (bitmap, p);
-    break;
+  case NO_FLOOR: break;
+  case FLOOR: draw_floor (bitmap, p); break;
+  case BROKEN_FLOOR: draw_broken_floor (bitmap, p); break;
+  case LOOSE_FLOOR: draw_floor (bitmap, p); break;
+  case SPIKES_FLOOR: draw_spikes_floor (bitmap, p); break;
+  case PILLAR: draw_pillar (bitmap, p); break;
+  case WALL: draw_wall (bitmap, p); break;
+  case DOOR: draw_door (bitmap, p); break;
   default:
     error (-1, 0, "%s: unknown foreground (%i)",
            __func__, construct (p).fg);
@@ -164,26 +164,13 @@ void
 draw_construct_bg (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
   switch (construct (p).bg) {
-  case NO_BG:
-    break;
-  case BRICKS_01:
-    draw_bricks_01 (bitmap, p);
-    break;
-  case BRICKS_02:
-    draw_bricks_02 (bitmap, p);
-    break;
-  case BRICKS_03:
-    draw_bricks_03 (bitmap, p);
-    break;
-  case BRICKS_04:
-    draw_bricks_04 (bitmap, p);
-    break;
-  case TORCH:
-    draw_torch (bitmap, p);
-    break;
-  case WINDOW:
-    draw_window (bitmap, p);
-    break;
+  case NO_BG: break;
+  case BRICKS_01: draw_bricks_01 (bitmap, p); break;
+  case BRICKS_02: draw_bricks_02 (bitmap, p); break;
+  case BRICKS_03: draw_bricks_03 (bitmap, p); break;
+  case BRICKS_04: draw_bricks_04 (bitmap, p); break;
+  case TORCH: draw_torch (bitmap, p); break;
+  case WINDOW: draw_window (bitmap, p); break;
   default:
     error (-1, 0, "%s: unknown background (%i)",
            __func__, construct (p).bg);
@@ -194,26 +181,14 @@ void
 draw_construct_left (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
   switch (construct (p).fg) {
-  case NO_FLOOR:
-    break;
-  case FLOOR:
-    draw_floor_left (bitmap, p);
-    break;
-  case BROKEN_FLOOR:
-    draw_broken_floor_left (bitmap, p);
-    break;
-  case LOOSE_FLOOR:
-    draw_floor_left (bitmap, p);
-    break;
-  case SPIKES_FLOOR:
-    draw_spikes_floor_left (bitmap, p);
-    break;
-  case PILLAR:
-    draw_pillar_left (bitmap, p);
-    break;
-  case WALL:
-    draw_wall (bitmap, p);
-    break;
+  case NO_FLOOR: break;
+  case FLOOR: draw_floor_left (bitmap, p); break;
+  case BROKEN_FLOOR: draw_broken_floor_left (bitmap, p); break;
+  case LOOSE_FLOOR: draw_floor_left (bitmap, p); break;
+  case SPIKES_FLOOR: draw_spikes_floor_left (bitmap, p); break;
+  case PILLAR: draw_pillar_left (bitmap, p); break;
+  case WALL: draw_wall (bitmap, p); break;
+  case DOOR: draw_door_left (bitmap, p); break;
   default:
     error (-1, 0, "%s: unknown foreground (%i)",
            __func__, construct (p).fg);
@@ -224,26 +199,14 @@ void
 draw_construct_right (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
   switch (construct (p).fg) {
-  case NO_FLOOR:
-    break;
-  case FLOOR:
-    draw_floor_right (bitmap, p);
-    break;
-  case BROKEN_FLOOR:
-    draw_broken_floor_right (bitmap, p);
-    break;
-  case LOOSE_FLOOR:
-    draw_floor_right (bitmap, p);
-    break;
-  case SPIKES_FLOOR:
-    draw_spikes_floor_right (bitmap, p);
-    break;
-  case PILLAR:
-    draw_pillar_right (bitmap, p);
-    break;
-  case WALL:
-    draw_wall (bitmap, p);
-    break;
+  case NO_FLOOR: break;
+  case FLOOR: draw_floor_right (bitmap, p); break;
+  case BROKEN_FLOOR: draw_broken_floor_right (bitmap, p); break;
+  case LOOSE_FLOOR: draw_floor_right (bitmap, p); break;
+  case SPIKES_FLOOR: draw_spikes_floor_right (bitmap, p); break;
+  case PILLAR: draw_pillar_right (bitmap, p); break;
+  case WALL: draw_wall (bitmap, p); break;
+  case DOOR: draw_door_right (bitmap, p); break;
   default:
     error (-1, 0, "%s: unknown foreground (%i)",
            __func__, construct (p).fg);
@@ -367,26 +330,14 @@ draw_room_fg (struct pos p)
   if (room_view != p.room) return;
 
   switch (construct (p).fg) {
-  case NO_FLOOR:
-    break;
-  case FLOOR:
-    draw_floor_fg (screen, p);
-    break;
-  case BROKEN_FLOOR:
-    draw_broken_floor_fg (screen, p);
-    break;
-  case LOOSE_FLOOR:
-    draw_floor_fg (screen, p);
-    break;
-  case SPIKES_FLOOR:
-    draw_spikes_fg (screen, p);
-    break;
-  case PILLAR:
-    draw_pillar_fg (screen, p);
-    break;
-  case WALL:
-    draw_wall_fg (screen, p);
-    break;
+  case NO_FLOOR: break;
+  case FLOOR: draw_floor_fg (screen, p); break;
+  case BROKEN_FLOOR: draw_broken_floor_fg (screen, p); break;
+  case LOOSE_FLOOR: draw_floor_fg (screen, p); break;
+  case SPIKES_FLOOR: draw_spikes_fg (screen, p); break;
+  case PILLAR: draw_pillar_fg (screen, p); break;
+  case WALL: draw_wall_fg (screen, p); break;
+  case DOOR: draw_door_fg (screen, p); break;
   default:
     error (-1, 0, "%s: unknown foreground (%i)",
            __func__, construct (p).fg);

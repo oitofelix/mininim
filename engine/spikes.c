@@ -32,6 +32,12 @@ ALLEGRO_BITMAP *spikes_left_01, *spikes_right_01,
 
 ALLEGRO_SAMPLE *spikes_sound;
 
+static int current_room = -1;
+
+static struct spikes {
+  int i, wait, fg;
+} spikes[FLOORS][PLACES + 1];
+
 void
 load_vdungeon_spikes (void)
 {
@@ -80,10 +86,6 @@ unload_spikes (void)
   al_destroy_sample (spikes_sound);
 }
 
-static struct spikes {
-  int i, wait, fg;
-} spikes[FLOORS][PLACES + 1];
-
 bool
 should_spikes_raise_for_pos (struct pos p, struct pos pk)
 {
@@ -107,6 +109,15 @@ draw_spikes (void)
 {
   struct pos p;
   p.room = room_view;
+
+  /* reset the spikes state when entering a new room */
+  if (current_room != room_view) {
+    current_room = room_view;
+    for (p.floor = FLOORS - 1; p.floor >= 0; p.floor--)
+      for (p.place = -1; p.place < PLACES; p.place++)
+        spikes [p.floor][p.place + 1].i = 0;
+  }
+
   struct spikes *s;
 
   struct pos pkf = pos (coord_mf (kid));

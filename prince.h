@@ -89,6 +89,7 @@ struct level {
       SPIKES_FLOOR,
       PILLAR,
       WALL,
+      DOOR,
     } fg;
     enum construct_bg {
       NO_BG,
