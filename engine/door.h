@@ -22,6 +22,9 @@
 
 #include "kernel/video.h"
 
+#define DOORS 30
+#define DOOR_MAX_STEP 47
+
 /* bitmaps */
 #define VDUNGEON_DOOR_LEFT "dat/vdungeon/door/door frame left.png"
 #define VDUNGEON_DOOR_RIGHT "dat/vdungeon/door/door frame right.png"
@@ -37,6 +40,10 @@
 
 void load_vdungeon_door (void);
 void unload_door (void);
+void register_door (struct pos p);
+struct door door_at_pos (struct pos p);
+int door_grid_tip_y (struct pos p);
+void draw_doors (void);
 void draw_door (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_door_left (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_door_right (ALLEGRO_BITMAP *bitmap, struct pos p);

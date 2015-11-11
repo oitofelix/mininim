@@ -26,10 +26,12 @@
 #include "room.h"
 #include "floor.h"
 #include "pos.h"
+#include "door.h"
 #include "physics.h"
 
 struct pos loose_floor_pos;
 struct pos hang_pos;
+enum construct_fg collision_construct;
 
 struct construct
 construct (struct pos p)
@@ -58,22 +60,133 @@ is_colliding (struct anim a)
 {
   if (! a.collision) return false;
 
-  /* fix bug when vertically jumping near a wall edge */
-  if (a.id == &kid && is_kid_vjump ()) return false;
-  /* fix bug when vertically jumping near a wall face */
-  if (a.id == &kid && is_kid_start_vjump ()) return false;
+  struct coord tf = coord_tf (a);
+  struct coord tb = coord_tb (a);
+  struct coord mt = coord_mt (a);
 
-  struct pos ptf = pos (coord_tf (a));
+  struct pos ptf = pos (tf);
+  struct pos ptb = pos (tb);
+  struct pos pmt = pos (mt);
   struct pos pmf = pos (coord_mf (a));
   struct pos pbf = pos (coord_bf (a));
 
   struct construct ctf = construct (ptf);
+  struct construct ctb = construct (ptb);
   struct construct cmf = construct (pmf);
   struct construct cbf = construct (pbf);
+  struct construct cmt = construct (pmt);
 
   if (ctf.fg == WALL || cmf.fg == WALL || cbf.fg == WALL) {
+    if (a.id == &kid && is_kid_vjump ()) return false;
+    if (a.id == &kid && is_kid_start_vjump ()) return false;
+    collision_construct = WALL;
     return true;
-  } else return false;
+  }
+
+  int dy = 10;
+
+  /* if (a.draw == draw_kid_couch) dy = 20; */
+
+  if (ctf.fg == DOOR && a.dir == LEFT
+      && tf.y <= door_grid_tip_y (ptf) - dy
+      && ! peq (ptf, pmt)) {
+    collision_construct = DOOR;
+    return true;
+  }
+
+
+  if (cmt.fg == DOOR && a.dir == RIGHT
+      && mt.y <= door_grid_tip_y (pmt) - dy
+      && ! peq (pmt, ptf)) {
+    collision_construct = DOOR;
+    return true;
+  }
+
+  struct coord tfk = coord_tf (kid);
+  struct pos ptfk = pos (tfk);
+  struct construct ctfk = construct (ptfk);
+
+  /* fix bug in which the kid would pass through a closed door */
+  if (a.frame == kid_turn_run_05 && a.dir == LEFT
+      && cmt.fg == DOOR) {
+    collision_construct = DOOR;
+    return true;
+  }
+
+  if (a.frame == kid_turn_run_05 && a.dir == RIGHT
+      && ctb.fg == DOOR && ! peq (ptb, ptf)) {
+    collision_construct = DOOR;
+    return true;
+  }
+
+  /* if (a.id == &kid */
+  /*     && ctf.fg == DOOR && a.dir == LEFT */
+  /*     && tf.y <= door_grid_tip_y (ptf) - dy) return true; */
+
+  if (a.id == &kid
+      && ctf.fg == DOOR && a.dir == LEFT
+      && tf.y <= door_grid_tip_y (ptf) - dy
+      && ! peq (ptf, ptfk)) {
+    collision_construct = DOOR;
+    return true;
+  }
+
+  if (a.id == &kid
+      && ctfk.fg == DOOR && a.dir == RIGHT
+      && tf.y <= door_grid_tip_y (ptfk) - dy
+      && ! peq (ptfk, ptf)) {
+    collision_construct = DOOR;
+    return true;
+  }
+
+  return false;
+}
+
+bool
+is_back_colliding (struct anim a)
+{
+  if (! a.back_collision) return false;
+
+  struct coord tb = coord_tb (a);
+  struct coord bb = coord_bb (a);
+  struct coord mba = coord_mba (a);
+  struct coord mt = coord_mt (a);
+
+  struct pos ptb = pos (tb);
+  struct pos pbb = pos (bb);
+  struct pos pmba = pos (mba);
+  struct pos pmt = pos (mt);
+
+  struct construct ctb = construct (ptb);
+  struct construct cbb = construct (pbb);
+  struct construct cmba = construct (pmba);
+  struct construct cmt = construct (pmt);
+
+  if (ctb.fg == WALL) {
+    collision_construct = WALL;
+    return true;
+  }
+
+  int dy = 10;
+
+  if (a.draw == draw_kid_couch) dy = 20;
+
+  if (cmt.fg == DOOR && a.dir == LEFT
+      && mt.y <= door_grid_tip_y (pmt) - dy
+      && ! peq (pmt, ptb)) {
+    collision_construct = DOOR;
+    return true;
+  }
+
+
+  if (ctb.fg == DOOR && a.dir == RIGHT
+      && tb.y <= door_grid_tip_y (ptb) - dy
+      && ! peq (ptb, pmt)) {
+    collision_construct = DOOR;
+    return true;
+  }
+
+  return false;
 }
 
 int
@@ -87,6 +200,22 @@ dist_collision (struct anim a)
       a.c.x += inc;
   else
     while (is_colliding (a) && abs (x - a.c.x) != PLACE_WIDTH)
+      a.c.x -= inc;
+
+  return inc * (a.c.x - x);
+}
+
+int
+dist_back_collision (struct anim a)
+{
+  int inc = (a.dir == LEFT) ? +1 : -1;
+  int x = a.c.x;
+
+  if (! is_back_colliding (a))
+    while (! is_back_colliding (a) && abs (x - a.c.x) != PLACE_WIDTH)
+      a.c.x += inc;
+  else
+    while (is_back_colliding (a) && abs (x - a.c.x) != PLACE_WIDTH)
       a.c.x -= inc;
 
   return inc * (a.c.x - x);
@@ -183,6 +312,15 @@ to_collision_edge (struct anim *a)
   int dir = (a->dir == LEFT) ? -1 : +1;
   a->c.x += dir * ((abs (dc) < PLACE_WIDTH) ? dc - 1 : 0);
   printf ("dc = %i\n", dc);
+}
+
+void
+to_back_collision_edge (struct anim *a)
+{
+  int dbc = dist_back_collision (*a);
+  int dir = (a->dir == LEFT) ? +1 : -1;
+  a->c.x += dir * ((abs (dbc) < PLACE_WIDTH) ? dbc - 1 : 0);
+  printf ("dbc = %i\n", dbc);
 }
 
 void
@@ -310,6 +448,22 @@ is_visible (struct anim a)
   return nanim (a).room == room_view;
 }
 
+bool
+is_pos_visible (struct pos p)
+{
+  p = npos (p);
+
+  if (p.room == room_view) return true;
+  if (p.room == roomd (room_view, LEFT) && p.place == PLACES - 1)
+    return true;
+  if (p.room == roomd (room_view, ABOVE) && p.floor == FLOORS - 1)
+    return true;
+  if (p.room == roomd (room_view, BELOW) && p.floor == 0)
+    return true;
+
+  return false;
+}
+
 void
 apply_physics (struct anim *a, ALLEGRO_BITMAP *frame,
                int dx, int dy)
@@ -324,18 +478,27 @@ apply_physics (struct anim *a, ALLEGRO_BITMAP *frame,
   if (is_hitting_ceiling (na)) {
     na.odraw = na.draw;
     na.draw = na.ceiling;
-  } else if (is_colliding (na)
-             && na.draw != na.collision) {
+  }
+
+  if (is_colliding (na)) {
     na.odraw = na.draw;
     na.draw = na.collision;
     to_collision_edge (&na);
-  } else if (is_falling (na)
-             && na.draw != na.fall
-             && na.draw != na.collision) {
+  }
+
+  if (is_back_colliding (na)) {
+    na.odraw = na.draw;
+    na.draw = na.back_collision;
+    to_back_collision_edge (&na);
+  }
+
+  if (is_on_loose_floor (na))
+    release_loose_floor (loose_floor_pos);
+
+  if (is_falling (na)) {
     na.odraw = na.draw;
     na.draw = na.fall;
-  } else if (is_on_loose_floor (na))
-    release_loose_floor (loose_floor_pos);
+  }
 
   na.c = nanim (na);
 

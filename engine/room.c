@@ -92,10 +92,49 @@ unload_room (void)
   al_destroy_bitmap (window);
 }
 
+struct coord
+nbitmap_coord (struct coord c, int w, int h)
+{
+  struct coord tl = c;
+  struct coord tr = c;
+  struct coord bl = c;
+  struct coord br = c;
+
+  tr.x = tl.x + w - 1;
+  bl.y = tl.y + h - 1;
+  br.x = tl.x + w - 1;
+  br.y = tl.y + h - 1;
+
+  struct coord ntl = ncoord (tl);
+  struct coord ntr = ncoord (tr);
+  struct coord nbl = ncoord (bl);
+  struct coord nbr = ncoord (br);
+
+  if (ntl.room == room_view) c = ntl;
+  else if (ntr.room == room_view) {
+    c = ntr;
+    c.x = ntr.x - w + 1;
+  } else if (nbl.room == room_view) {
+    c = nbl;
+    c.y = nbl.y - h + 1;
+  } else if (nbr.room == room_view) {
+    c = nbr;
+    c.x = nbr.x - w + 1;
+    c.y = nbr.y - h + 1;
+  }
+
+  return c;
+}
+
 void
 draw_bitmapc (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
               struct coord c, int flags)
 {
+  int w = al_get_bitmap_width (from);
+  int h = al_get_bitmap_height (from);
+
+  c = nbitmap_coord (c, w, h);
+
   if (! cutscene && (to == screen || to == room_bg)
       && c.room != room_view) return;
   draw_bitmap (from, to, c.x, c.y, flags);
@@ -105,6 +144,8 @@ void
 draw_bitmap_regionc (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to, float sx, float sy,
                      float sw, float sh, struct coord c, int flags)
 {
+  c = nbitmap_coord (c, sw, sh);
+
   if (! cutscene && (to == screen || to == room_bg)
       && c.room != room_view) return;
   draw_bitmap_region (from, to, sx, sy, sw, sh, c.x, c.y, flags);

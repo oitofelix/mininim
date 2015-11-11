@@ -71,6 +71,7 @@ struct anim {
   void (*draw) (void);
   void (*odraw) (void);
   void (*collision) (void);
+  void (*back_collision) (void);
   void (*fall) (void);
   void (*ceiling) (void);
 };

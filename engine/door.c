@@ -17,9 +17,12 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <error.h>
 #include "kernel/audio.h"
+#include "anim.h"
 #include "room.h"
 #include "floor.h"
+#include "kid.h"
 #include "door.h"
 
 ALLEGRO_BITMAP *door_left, *door_right, *door_pole, *door_top, *door_grid,
@@ -67,6 +70,52 @@ unload_door (void)
 }
 
 void
+register_door (struct pos p)
+{
+  int i;
+  for (i = 0; i < DOORS; i++) if (peq (door[i].p, p)) return;
+  for (i = 0; door[i].p.room && i < DOORS; i++);
+  if (i == DOORS)
+    error (-1, 0, "%s: no free door slot (%i)",
+           __func__, construct (p).fg);
+
+  door[i].p = p;
+  door[i].i = 20;
+  /* door[i].i = DOOR_MAX_STEP; */
+}
+
+void
+draw_doors (void)
+{
+  struct pos pk = pos (coord_m (kid));
+
+  int i;
+  for (i = 0; i < DOORS; i++)
+    if (door[i].p.room && is_pos_visible (door[i].p)) {
+      draw_grid (screen, door[i].p, door[i].i);
+      draw_construct_left (screen, prel (door[i].p, -1, +1));
+      if (peq (pk, prel (door[i].p, 0, +1))) redraw_anim (kid);
+    }
+}
+
+struct door
+door_at_pos (struct pos p)
+{
+  int i;
+  for (i = 0; i < DOORS; i++) if (peq (door[i].p, p)) return door[i];
+  error (-1, 0, "%s: no door at position (%i, %i, %i)",
+         __func__, p.room, p.floor, p.place);
+  return door[0];
+}
+
+int
+door_grid_tip_y (struct pos p)
+{
+  int h = al_get_bitmap_height (door_grid_tip);
+  return door_grid_tip_coord (p, door_at_pos (p).i).y + h - 1;
+}
+
+void
 draw_door (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
   draw_bitmapc (floor_normal_base, bitmap, floor_base_coord (p), 0);
@@ -74,7 +123,7 @@ draw_door (ALLEGRO_BITMAP *bitmap, struct pos p)
   draw_bitmapc (door_right, bitmap, door_right_coord (p), 0);
   draw_bitmapc (door_top, bitmap, door_top_coord (p), 0);
 
-  draw_grid (bitmap, p, 47);
+  register_door (p);
 }
 
 void
@@ -95,7 +144,6 @@ void
 draw_door_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
   draw_bitmapc (floor_normal_base, bitmap, floor_base_coord (p), 0);
-  draw_floor_corner_03 (bitmap, p);
   draw_bitmapc (door_pole, screen, door_pole_coord (p), 0);
 }
 

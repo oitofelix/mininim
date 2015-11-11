@@ -231,11 +231,12 @@ load_kid (void)
   kid.frame = kid_normal;
   kid.dir = LEFT;
   kid.collision = draw_kid_collision;
+  kid.back_collision = draw_kid_back_collision;
   kid.fall = draw_kid_fall;
   kid.ceiling = draw_kid_ceiling;
   kid.draw = draw_kid_normal;
 
-  place_kid (6, 0, 7);
+  place_kid (7, 0, 7);
 }
 
 void
@@ -715,6 +716,8 @@ void draw_kid_start_run ()
     return;
   }
 
+  kid.back_collision = NULL;
+
   /* comming from normal */
   if (kid.frame == kid_normal)
     draw_anim (&kid, kid_start_run_01, -1, 0);
@@ -747,6 +750,8 @@ void draw_kid_start_run ()
     draw_anim (&kid, kid_run_07, -7, 0);
     kid.draw = run ? draw_kid_run : draw_kid_stop_run;
   } else error (-1, 0, "%s: unknown kid frame (%p)", __func__, kid.frame);
+
+  kid.back_collision = draw_kid_back_collision;
 }
 
 bool
@@ -774,6 +779,8 @@ void draw_kid_stop_run ()
 
   int dc = dist_collision (kid);
 
+  kid.back_collision = NULL;
+
   /* comming from stop run */
   if (kid.frame == kid_stop_run_01) {
     draw_anim (&kid, kid_stop_run_02, -6, 0);
@@ -789,6 +796,8 @@ void draw_kid_stop_run ()
     play_sample (step);
   } else
     draw_anim (&kid, kid_stop_run_01, +0, 0);
+
+  kid.back_collision = draw_kid_back_collision;
 }
 
 bool
@@ -820,6 +829,8 @@ void draw_kid_run ()
     draw_kid_run_jump ();
     return;
   }
+
+  kid.back_collision = NULL;
 
   /* comming from turn run */
   if (kid.frame == kid_turn_run_13) {
@@ -853,6 +864,8 @@ void draw_kid_run ()
   }
 
   if (stop) kid.draw = draw_kid_stop_run;
+
+  kid.back_collision = draw_kid_back_collision;
 }
 
 bool
@@ -868,7 +881,8 @@ is_kid_run (void)
     || kid.frame == kid_run_14;
 }
 
-void draw_kid_turn ()
+void
+draw_kid_turn (void)
 {
   misstep = false;
 
@@ -883,6 +897,10 @@ void draw_kid_turn ()
   static bool turn = false;
   if (! turn) turn = ((kid.dir == RIGHT) && right_key)
                 || ((kid.dir == LEFT) && left_key);
+
+  /* don't collide while turning */
+  /* kid.back_collision = NULL; */
+  kid.collision = NULL;
 
   /* don't fall while turning */
   kid.fall = NULL;
@@ -920,8 +938,10 @@ void draw_kid_turn ()
     else kid.draw = draw_kid_stabilize;
   } else error (-1, 0, "%s: unknown kid frame (%p)", __func__, kid.frame);
 
-  /* retore the normal falling behavior */
+  /* retore the normal falling and collision behavior */
   kid.fall = draw_kid_fall;
+  kid.collision = draw_kid_collision;
+  /* kid.back_collision = draw_kid_back_collision; */
 }
 
 bool
@@ -995,6 +1015,7 @@ draw_kid_stabilize (void)
 
   /* don't fall nor collide */
   kid.collision = NULL;
+  /* kid.back_collision = NULL; */
   kid.fall = NULL;
 
   /* comming from stop run */
@@ -1029,6 +1050,7 @@ draw_kid_stabilize (void)
      collision behavior */
   if (kid.draw != draw_kid_stabilize) {
     kid.collision = draw_kid_collision;
+    /* kid.back_collision = draw_kid_back_collision; */
     kid.fall = draw_kid_fall;
   }
 }
@@ -1049,6 +1071,8 @@ draw_kid_jump (void)
 
   kid.draw = draw_kid_jump;
   kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
+
+  kid.back_collision = NULL;
 
   if (kid.frame == kid_stabilize_06)
     draw_anim (&kid, kid_jump_01, +6, 0);
@@ -1096,6 +1120,8 @@ draw_kid_jump (void)
     kid.draw = draw_kid_normal;
   } else
     draw_anim (&kid, kid_jump_01, +2, 0);
+
+  kid.back_collision = draw_kid_back_collision;
 }
 
 bool
@@ -1136,6 +1162,8 @@ draw_kid_collision (void)
   kid.draw = draw_kid_collision;
   kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
+  struct pos p = pos (coord_m (kid));
+
   /* fix bug in which the kid stand in thin air if colliding while
      jumping */
   if (kid.frame == kid_jump_10) kid.c.y += 6;
@@ -1149,8 +1177,23 @@ draw_kid_collision (void)
       /* && ! is_falling (kid) */
       ) {
     play_sample (hit_wall);
-    draw_kid_fall ();
-    return;
+    switch (collision_construct) {
+    case WALL:
+      if (is_falling (kid)) {
+        draw_kid_fall ();
+        return;
+      }
+    case DOOR:
+      kid.c.y = 63 * p.floor + 15;
+      kid.c.x += (kid.dir == LEFT) ? -16 : +16;
+      kid.frame = kid_normal;
+      to_collision_edge (&kid);
+      draw_kid_couch ();
+      return;
+    default:
+      error (-1, 0, "%s: unknown collision construction (%i)",
+             __func__, collision_construct);
+    }
   }
 
   /* notice that the following ignore conditions don't nullify the
@@ -1164,6 +1207,14 @@ draw_kid_collision (void)
   /* standing normally */
   if (is_kid_normal ()) {
     draw_kid_normal ();
+    return;
+  }
+
+  /* vjump */
+  if (is_kid_vjump ()
+      || is_kid_start_vjump ()
+      || is_kid_stop_vjump ()) {
+    kid.odraw ();
     return;
   }
 
@@ -1203,22 +1254,76 @@ draw_kid_collision (void)
   /* everything relying on the first frame must be above this */
   first_frame = false;
 
- /* draw the standard sequence of frames for kid's collision */
- if (kid.frame == kid_stabilize_06)
+  /* draw the standard sequence of frames for kid's collision */
+  if (kid.frame == kid_stabilize_06)
     draw_anim (&kid, kid_stabilize_07, +3, 0);
- else if (kid.frame == kid_stabilize_07) {
-   draw_anim (&kid, kid_stabilize_08, +4, 0);
-   kid.draw = draw_kid_normal;
-   first_frame = true;
- } else {
-   draw_anim (&kid, kid_stabilize_06, -4, 0);
-   play_sample (hit_wall);
- }
+  else if (kid.frame == kid_stabilize_07) {
+    draw_anim (&kid, kid_stabilize_08, +4, 0);
+    kid.draw = draw_kid_normal;
+    first_frame = true;
+  } else {
+    draw_anim (&kid, kid_stabilize_06, -4, 0);
+    play_sample (hit_wall);
+  }
 
   /* if this function won't be called next, restore the collision
      behavior */
   if (kid.draw != draw_kid_collision)
     kid.collision = draw_kid_collision;
+}
+
+void
+draw_kid_back_collision (void)
+{
+  kid.draw = draw_kid_collision;
+  kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
+
+  /* standing normally */
+  if (is_kid_normal ()) {
+    draw_kid_normal ();
+    return;
+  }
+
+  /* turning */
+  if (is_kid_turn ()) {
+    draw_kid_turn ();
+    return;
+  }
+
+  /* falling */
+  if (is_kid_fall ()) {
+    draw_kid_fall ();
+    return;
+  }
+
+  /* turning to run */
+  if (is_kid_turn_run ()) {
+    draw_kid_turn_run ();
+    return;
+  }
+
+  /* /\* stabilizing *\/ */
+  /* if (is_kid_stabilize ()) { */
+  /*   draw_kid_stabilize (); */
+  /*   kid.back_collision = draw_kid_back_collision; */
+  /*   return; */
+  /* } */
+
+  /* don't collide recursively */
+  kid.back_collision = NULL;
+
+  /* draw the standard sequence of frames for kid's collision */
+  if (kid.frame == kid_stabilize_06)
+    draw_anim (&kid, kid_stabilize_07, +3, 0);
+  else if (kid.frame == kid_stabilize_07) {
+    draw_anim (&kid, kid_stabilize_08, +4, 0);
+    kid.draw = draw_kid_normal;
+  } else {
+    draw_anim (&kid, kid_stabilize_06, +0, 0);
+    play_sample (hit_wall);
+  }
+
+  kid.back_collision = draw_kid_back_collision;
 }
 
 void
@@ -1371,6 +1476,8 @@ draw_kid_couch (void)
     return;
   }
 
+  kid.back_collision = NULL;
+
   /* comming from couch */
   if (kid.frame == kid_couch_01)
     draw_anim (&kid, kid_couch_02, inertia ? -8 : -5, 0);
@@ -1416,6 +1523,7 @@ draw_kid_couch (void)
      collision behavior */
   if (kid.draw != draw_kid_couch) {
     kid.collision = draw_kid_collision;
+    kid.back_collision = draw_kid_back_collision;
     kid.fall = draw_kid_fall;
   }
 }
@@ -1960,6 +2068,8 @@ draw_kid_run_jump (void)
       || kid.frame == kid_run_jump_08) kid.fall = NULL;
   else kid.fall = draw_kid_fall;
 
+  kid.back_collision = NULL;
+
   switch (i) {
   case 0: draw_anim (&kid, kid_run_jump_01, -10, +0); i++;
     play_sample (step); break;
@@ -1980,6 +2090,7 @@ draw_kid_run_jump (void)
   }
 
   kid.fall = draw_kid_fall;
+  kid.back_collision = draw_kid_back_collision;
 }
 
 bool

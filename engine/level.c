@@ -29,6 +29,7 @@
 #include "kid.h"
 #include "floor.h"
 #include "spikes.h"
+#include "door.h"
 #include "level.h"
 
 /* functions */
@@ -38,6 +39,8 @@ static void level_anim (void);
 
 /* current level */
 struct level *level;
+
+int room_view = 7;
 
 void
 play_level (struct level *_level)
@@ -66,8 +69,6 @@ unload_level (void)
   unload_kid ();
 }
 
-int room_view = 6;
-
 static void
 level_anim (void)
 {
@@ -93,11 +94,13 @@ level_anim (void)
       level_draw_base ();
       redraw_anim (kid);
     }
-    draw_shake_floor ();
-    draw_release_loose_floor ();
-    draw_spikes ();
-    draw_room_anim_fg (kid);
   }
+
+  draw_shake_floor ();
+  draw_release_loose_floor ();
+  draw_spikes ();
+  draw_doors ();
+  draw_room_anim_fg (kid);
 }
 
 void

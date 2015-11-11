@@ -172,8 +172,8 @@ nanim (struct anim a)
     struct coord ml = m;
     struct coord mr = m;
 
-    ml.x += -1;
-    mr.x += +1;
+    ml.x += -3;
+    mr.x += +3;
 
     struct coord nm = ncoord (m);
     struct coord nml = ncoord (ml);

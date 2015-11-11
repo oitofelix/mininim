@@ -332,10 +332,8 @@ release_loose_floor (struct pos p)
 {
   size_t i = 0;
 
-  while (loose_floor[i].p.room && i < PLACES * FLOORS) {
-    if (peq (loose_floor[i].p, p)) return;
-    i++;
-  }
+  for (i = 0; i < PLACES * FLOORS; i++) if (peq (loose_floor[i].p, p)) return;
+  for (i = 0; loose_floor[i].p.room && i < PLACES * FLOORS; i++);
   if (i == PLACES * FLOORS)
     error (-1, 0, "%s: no free loose floor release slot (%i)",
            __func__, construct (p).fg);

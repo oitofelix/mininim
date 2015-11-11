@@ -194,6 +194,7 @@ void draw_kid_turn (void);
 void draw_kid_turn_run (void);
 void draw_kid_jump (void);
 void draw_kid_collision (void);
+void draw_kid_back_collision (void);
 void draw_kid_fall (void);
 void draw_kid_couch (void);
 void draw_kid_misstep (void);
@@ -222,6 +223,7 @@ bool is_kid_vjump (void);
 bool is_kid_stop_vjump (void);
 bool is_kid_stabilize (void);
 bool is_kid_turn (void);
+bool is_kid_turn_run (void);
 bool is_kid_hang (void);
 bool is_kid_start_climb (void);
 bool is_kid_climb (void);
@@ -266,7 +268,11 @@ extern ALLEGRO_BITMAP *kid_normal,
   *kid_climb_01, *kid_climb_02, *kid_climb_03, *kid_climb_04,
   *kid_climb_05, *kid_climb_06, *kid_climb_07, *kid_climb_08,
   *kid_climb_09, *kid_climb_10, *kid_climb_11, *kid_climb_12,
-  *kid_climb_13, *kid_climb_14, *kid_climb_15;
+  *kid_climb_13, *kid_climb_14, *kid_climb_15,
+  *kid_run_jump_01, *kid_run_jump_02, *kid_run_jump_03,
+  *kid_run_jump_04, *kid_run_jump_05, *kid_run_jump_06,
+  *kid_run_jump_07, *kid_run_jump_08, *kid_run_jump_09,
+  *kid_run_jump_10, *kid_run_jump_11 ;
 
 extern bool hang_limit;
 
