@@ -74,7 +74,8 @@ is_colliding (struct anim a)
   int inc = (npos (s.pmf).place >= npos (t.pmf).place) ? -1 : +1;
 
   if (a.dir == LEFT)
-    for (p = s.pmf; ! peq (p, t.pmf); p = prel (p, 0, inc))
+    for (p = s.pmf; npos (p).place != npos (t.pmf).place;
+         p = prel (p, 0, inc))
       if (construct (p).fg == DOOR
           && t.tf.y <= door_grid_tip_y (p) - 10) {
         collision_construct = DOOR;
@@ -82,7 +83,8 @@ is_colliding (struct anim a)
       }
 
   if (a.dir == RIGHT)
-    for (p = s.pmf; ! peq (p, t.pmf); p = prel (p, 0, inc))
+    for (p = s.pmf; npos (p).place != npos (t.pmf).place;
+         p = prel (p, 0, inc))
       if (construct (prel (p, 0, -1)).fg == DOOR
           && t.tf.y <= door_grid_tip_y (prel (p, 0, -1)) - 10) {
         collision_construct = DOOR;
