@@ -159,7 +159,7 @@ draw_spikes (void)
         case 6: draw_spikes_01 (screen, p);
           s->i = 0; s->fg = 1; break;
         }
-        draw_construct_left (screen, prel (p, 0, +1));
+        if (s->fg != 0) draw_construct_left (screen, prel (p, 0, +1));
         break;
       default:
         break;

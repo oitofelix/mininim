@@ -236,7 +236,7 @@ load_kid (void)
   kid.ceiling = draw_kid_ceiling;
   kid.draw = draw_kid_normal;
 
-  place_kid (1, 0, 7);
+  place_kid (6, 0, 7);
 }
 
 void
@@ -1187,7 +1187,7 @@ draw_kid_collision (void)
       }
     case DOOR:
       kid.c.y = 63 * p.floor + 15;
-      kid.c.x += (kid.dir == LEFT) ? -16 : +16;
+      kid.c.x += (kid.dir == LEFT) ? 0 : +15;
       kid.frame = kid_normal;
       to_collision_edge (&kid);
       draw_kid_couch ();

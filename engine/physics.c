@@ -60,77 +60,34 @@ is_colliding (struct anim a)
 {
   if (! a.collision) return false;
 
-  struct coord tf = coord_tf (a);
-  struct coord tb = coord_tb (a);
-  struct coord mt = coord_mt (a);
+  struct survey s = survey (a, pos);
+  struct survey t = survey (*a.id, pos);
 
-  struct pos ptf = pos (tf);
-  struct pos ptb = pos (tb);
-  struct pos pmt = pos (mt);
-  struct pos pmf = pos (coord_mf (a));
-  struct pos pbf = pos (coord_bf (a));
-
-  struct construct ctf = construct (ptf);
-  struct construct ctb = construct (ptb);
-  struct construct cmf = construct (pmf);
-  struct construct cbf = construct (pbf);
-  struct construct cmt = construct (pmt);
-
-  if (ctf.fg == WALL || cmf.fg == WALL || cbf.fg == WALL) {
+  if (s.ctf == WALL || s.cmf == WALL || s.cbf == WALL) {
     if (a.id == &kid && is_kid_vjump ()) return false;
     if (a.id == &kid && is_kid_start_vjump ()) return false;
     collision_construct = WALL;
     return true;
   }
 
-  int dy = 10;
+  struct pos p;
+  int inc = (npos (s.pmf).place >= npos (t.pmf).place) ? -1 : +1;
 
-  /* if (a.draw == draw_kid_couch) dy = 20; */
+  if (a.dir == LEFT)
+    for (p = s.pmf; ! peq (p, t.pmf); p = prel (p, 0, inc))
+      if (construct (p).fg == DOOR
+          && t.tf.y <= door_grid_tip_y (p) - 10) {
+        collision_construct = DOOR;
+        return true;
+      }
 
-  if (ctf.fg == DOOR && a.dir == LEFT
-      && tf.y <= door_grid_tip_y (ptf) - dy
-      && ! peq (ptf, pmt)) {
-    collision_construct = DOOR;
-    return true;
-  }
-
-
-  if (cmt.fg == DOOR && a.dir == RIGHT
-      && mt.y <= door_grid_tip_y (pmt) - dy
-      && ! peq (pmt, ptf)) {
-    collision_construct = DOOR;
-    return true;
-  }
-
-  struct coord tfk = coord_tf (*a.id);
-  struct pos ptfk = pos (tfk);
-  struct construct ctfk = construct (ptfk);
-
-  /* fix bug in which the kid would pass through a closed door */
-  if (a.frame == kid_turn_run_05 && a.dir == LEFT
-      && cmt.fg == DOOR) {
-    collision_construct = DOOR;
-    return true;
-  }
-  if (a.frame == kid_turn_run_05 && a.dir == RIGHT
-      && ctb.fg == DOOR && ! peq (ptb, ptf)) {
-    collision_construct = DOOR;
-    return true;
-  }
-
-  if (ctf.fg == DOOR && a.dir == LEFT
-      && tf.y <= door_grid_tip_y (ptf) - dy
-      && ! peq (ptf, ptfk)) {
-    collision_construct = DOOR;
-    return true;
-  }
-
-  if (ctfk.fg == DOOR && a.dir == RIGHT
-      && tf.y <= door_grid_tip_y (ptfk) - dy
-      && ! peq (ptfk, ptf)) {
-    collision_construct = DOOR;
-    return true;
-  }
+  if (a.dir == RIGHT)
+    for (p = s.pmf; ! peq (p, t.pmf); p = prel (p, 0, inc))
+      if (construct (prel (p, 0, -1)).fg == DOOR
+          && t.tf.y <= door_grid_tip_y (prel (p, 0, -1)) - 10) {
+        collision_construct = DOOR;
+        return true;
+      }
 
   return false;
 }

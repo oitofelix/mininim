@@ -80,8 +80,7 @@ register_door (struct pos p)
            __func__, construct (p).fg);
 
   door[i].p = p;
-  door[i].i = 20;
-  /* door[i].i = DOOR_MAX_STEP; */
+  door[i].i = DOOR_MAX_STEP;
 }
 
 void
@@ -144,13 +143,11 @@ draw_door_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
   draw_bitmapc (floor_normal_base, bitmap, floor_base_coord (p), 0);
   draw_bitmapc (door_pole, screen, door_pole_coord (p), 0);
 
-  struct pos pk = pos (coord_m (kid));
-
-  if (peq (pk, prel (p, 0, +1))) return;
-
-  struct door door = door_at_pos (p);
-  draw_door_grid (screen, p, door.i);
-  draw_construct_left (screen, prel (p, -1, +1));
+  if (peq (kids.pm, p)) {
+    struct door door = door_at_pos (p);
+    draw_door_grid (screen, p, door.i);
+    draw_construct_left (screen, prel (p, -1, +1));
+  }
 }
 
 void
