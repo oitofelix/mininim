@@ -84,6 +84,7 @@ unload_room (void)
   unload_door ();
 
   /* bitmaps */
+  al_destroy_bitmap (room_bg);
   al_destroy_bitmap (bricks_01);
   al_destroy_bitmap (bricks_02);
   al_destroy_bitmap (bricks_03);
@@ -133,10 +134,12 @@ draw_bitmapc (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
   int w = al_get_bitmap_width (from);
   int h = al_get_bitmap_height (from);
 
-  c = nbitmap_coord (c, w, h);
+  if (! cutscene) {
+    c = nbitmap_coord (c, w, h);
+    if ((to == screen || to == room_bg)
+        && c.room != room_view) return;
+  }
 
-  if (! cutscene && (to == screen || to == room_bg)
-      && c.room != room_view) return;
   draw_bitmap (from, to, c.x, c.y, flags);
 }
 
@@ -144,10 +147,12 @@ void
 draw_bitmap_regionc (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to, float sx, float sy,
                      float sw, float sh, struct coord c, int flags)
 {
-  c = nbitmap_coord (c, sw, sh);
+  if (! cutscene) {
+    c = nbitmap_coord (c, sw, sh);
+    if ((to == screen || to == room_bg)
+        && c.room != room_view) return;
+  }
 
-  if (! cutscene && (to == screen || to == room_bg)
-      && c.room != room_view) return;
   draw_bitmap_region (from, to, sx, sy, sw, sh, c.x, c.y, flags);
 }
 
@@ -368,8 +373,13 @@ draw_room_anim_fg (struct anim a)
 void
 draw_room_fg (struct pos p)
 {
-  if (room_view != p.room) return;
+  draw_room_fg_0 (prel (p, 0, -1));
+  draw_room_fg_0 (p);
+}
 
+void
+draw_room_fg_0 (struct pos p)
+{
   switch (construct (p).fg) {
   case NO_FLOOR: break;
   case FLOOR: draw_floor_fg (screen, p); break;

@@ -87,15 +87,13 @@ register_door (struct pos p)
 void
 draw_doors (void)
 {
-  struct pos pk = pos (coord_m (kid));
-
   int i;
   for (i = 0; i < DOORS; i++)
     if (door[i].p.room && is_pos_visible (door[i].p)) {
-      draw_grid (screen, door[i].p, door[i].i);
+      draw_door_grid (screen, door[i].p, door[i].i);
       draw_construct_left (screen, prel (door[i].p, -1, +1));
-      if (peq (pk, prel (door[i].p, 0, +1))) redraw_anim (kid);
     }
+
 }
 
 struct door
@@ -145,10 +143,18 @@ draw_door_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
   draw_bitmapc (floor_normal_base, bitmap, floor_base_coord (p), 0);
   draw_bitmapc (door_pole, screen, door_pole_coord (p), 0);
+
+  struct pos pk = pos (coord_m (kid));
+
+  if (peq (pk, prel (p, 0, +1))) return;
+
+  struct door door = door_at_pos (p);
+  draw_door_grid (screen, p, door.i);
+  draw_construct_left (screen, prel (p, -1, +1));
 }
 
 void
-draw_grid (ALLEGRO_BITMAP *bitmap, struct pos p, int i)
+draw_door_grid (ALLEGRO_BITMAP *bitmap, struct pos p, int i)
 {
   int q = i / 8;
   int r = i % 8;

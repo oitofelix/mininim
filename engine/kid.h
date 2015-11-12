@@ -272,8 +272,9 @@ extern ALLEGRO_BITMAP *kid_normal,
   *kid_run_jump_01, *kid_run_jump_02, *kid_run_jump_03,
   *kid_run_jump_04, *kid_run_jump_05, *kid_run_jump_06,
   *kid_run_jump_07, *kid_run_jump_08, *kid_run_jump_09,
-  *kid_run_jump_10, *kid_run_jump_11 ;
+  *kid_run_jump_10, *kid_run_jump_11;
 
 extern bool hang_limit;
+extern struct survey kids, kidsf;
 
 #endif	/* FREEPOP_KID_H */

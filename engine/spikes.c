@@ -120,9 +120,6 @@ draw_spikes (void)
 
   struct spikes *s;
 
-  struct pos pkf = pos (coord_mf (kid));
-  struct pos pkb = pos (coord_mba (kid));
-
   for (p.floor = FLOORS - 1; p.floor >= 0; p.floor--)
     for (p.place = -1; p.place < PLACES; p.place++)
       switch (construct (p).fg) {
@@ -163,7 +160,6 @@ draw_spikes (void)
           s->i = 0; s->fg = 1; break;
         }
         draw_construct_left (screen, prel (p, 0, +1));
-        if (peq (p, pkf) || peq (p, pkb)) redraw_anim (kid);
         break;
       default:
         break;

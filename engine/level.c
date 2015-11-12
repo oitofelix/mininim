@@ -40,7 +40,9 @@ static void level_anim (void);
 /* current level */
 struct level *level;
 
-int room_view = 7;
+static bool no_room_drawing = false;
+
+int room_view = 1;
 
 void
 play_level (struct level *_level)
@@ -83,9 +85,13 @@ level_anim (void)
   if (was_key_pressed (ALLEGRO_KEY_N, true))
     room_view = level->link[room_view].b;
 
+  if (was_key_pressed (ALLEGRO_KEY_B, true))
+    no_room_drawing = ! no_room_drawing;
+
   if (room_view == 0) room_view = prev_room;
 
   level_draw_base ();
+
   if (is_visible (kid)) {
     prev_room = kid.c.room;
     kid.draw ();
@@ -96,17 +102,35 @@ level_anim (void)
     }
   }
 
-  draw_shake_floor ();
-  draw_release_loose_floor ();
-  draw_spikes ();
-  draw_doors ();
   draw_room_anim_fg (kid);
+
+
+  /* level_draw_base (); */
+  /* if (is_visible (kid)) { */
+  /*   prev_room = kid.c.room; */
+  /*   kid.draw (); */
+  /*   if (kid.c.room != prev_room) { */
+  /*     room_view = kid.c.room; */
+  /*     level_draw_base (); */
+  /*     redraw_anim (kid); */
+  /*   } */
+  /* } */
+
+  /* draw_shake_floor (); */
+  /* draw_release_loose_floor (); */
+  /* draw_spikes (); */
+  /* draw_doors (); */
+  /* draw_room_anim_fg (kid); */
 }
 
 void
 level_draw_base (void)
 {
   clear_bitmap (screen, BLACK);
-  draw_room (room_view);
+  if (! no_room_drawing) draw_room (room_view);
   draw_fire (room_view);
+  draw_shake_floor ();
+  draw_release_loose_floor ();
+  draw_spikes ();
+  draw_doors ();
 }

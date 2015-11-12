@@ -140,19 +140,9 @@ void
 draw_wall_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
   switch (wall_correlation (p)) {
-  case SWS:
-    if (is_kid_vjump ()) {
-      draw_wall_sws (bitmap, p);
-      draw_construct_left (bitmap, prel (p, -1, +1));
-    }
-    else draw_wall_sws_no_face (bitmap, p); break;
+  case SWS: draw_wall_sws_no_face (bitmap, p); break;
   case SWW: draw_wall_sww (bitmap, p); break;
-  case WWS:
-    if (is_kid_vjump ()) {
-      draw_wall_wws (bitmap, p);
-      draw_construct_left (bitmap, prel (p, -1, +1));
-    }
-    else draw_wall_wws_no_face (bitmap, p); break;
+  case WWS: draw_wall_wws_no_face (bitmap, p); break;
   case WWW: draw_wall_www (bitmap, p); break;
   default:
     error (-1, 0, "%s: unknown wall correlation (%i, %i. %i)",

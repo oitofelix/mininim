@@ -28,7 +28,11 @@
 #include "room.h"
 #include "kid.h"
 
-/* variables */
+struct anim kid;
+struct survey kids, kidsf;
+bool hang_limit;
+bool misstep = false;
+
 ALLEGRO_BITMAP *kid_normal,
   *kid_start_run_01, *kid_start_run_02, *kid_start_run_03, *kid_start_run_04,
   *kid_start_run_05, *kid_start_run_06, *kid_run_07,
@@ -69,10 +73,6 @@ ALLEGRO_BITMAP *kid_normal,
   *kid_run_jump_10, *kid_run_jump_11;
 
 ALLEGRO_SAMPLE *step, *hit_ground, *hit_wall, *hang_on_fall;
-
-struct anim kid; /* kid animation object */
-bool hang_limit;
-bool misstep = false;
 
 void
 load_kid (void)
@@ -236,7 +236,7 @@ load_kid (void)
   kid.ceiling = draw_kid_ceiling;
   kid.draw = draw_kid_normal;
 
-  place_kid (7, 0, 7);
+  place_kid (1, 0, 7);
 }
 
 void
@@ -899,8 +899,10 @@ draw_kid_turn (void)
                 || ((kid.dir == LEFT) && left_key);
 
   /* don't collide while turning */
-  /* kid.back_collision = NULL; */
   kid.collision = NULL;
+
+  if (construct (prel (kids.pmba, 0, -1)).fg == WALL)
+    kid.back_collision = NULL;
 
   /* don't fall while turning */
   kid.fall = NULL;
@@ -941,7 +943,7 @@ draw_kid_turn (void)
   /* retore the normal falling and collision behavior */
   kid.fall = draw_kid_fall;
   kid.collision = draw_kid_collision;
-  /* kid.back_collision = draw_kid_back_collision; */
+  kid.back_collision = draw_kid_back_collision;
 }
 
 bool
@@ -1278,9 +1280,11 @@ draw_kid_back_collision (void)
   kid.draw = draw_kid_collision;
   kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  /* standing normally */
-  if (is_kid_normal ()) {
-    draw_kid_normal ();
+  /* vertically jumping */
+  if (is_kid_vjump ()
+      || is_kid_start_vjump ()
+      || is_kid_stop_vjump ()) {
+    draw_kid_vjump ();
     return;
   }
 
@@ -1302,13 +1306,6 @@ draw_kid_back_collision (void)
     return;
   }
 
-  /* /\* stabilizing *\/ */
-  /* if (is_kid_stabilize ()) { */
-  /*   draw_kid_stabilize (); */
-  /*   kid.back_collision = draw_kid_back_collision; */
-  /*   return; */
-  /* } */
-
   /* don't collide recursively */
   kid.back_collision = NULL;
 
@@ -1319,7 +1316,7 @@ draw_kid_back_collision (void)
     draw_anim (&kid, kid_stabilize_08, +4, 0);
     kid.draw = draw_kid_normal;
   } else {
-    draw_anim (&kid, kid_stabilize_06, +0, 0);
+    draw_anim (&kid, kid_stabilize_06, -4, 0);
     play_sample (hit_wall);
   }
 
@@ -1567,9 +1564,6 @@ draw_kid_vjump (void)
   kid.draw = draw_kid_vjump;
   kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  /* don't fall while jumping */
-  kid.fall = NULL;
-
   int dir = (kid.dir == LEFT) ? +1 : -1;
   if (kid.frame == kid_normal
       && dist_next_place (kid) > 16
@@ -1584,6 +1578,11 @@ draw_kid_vjump (void)
     hang = true;
     kid.ceiling = false;
   }
+
+  /* don't fall while jumping */
+  kid.fall = NULL;
+  if (construct (prel (kids.pmba, 0, -1)).fg == WALL)
+    kid.back_collision = NULL;
 
   /* comming from normal */
   if (kid.frame == kid_normal)
@@ -1639,6 +1638,7 @@ draw_kid_vjump (void)
      collision behavior, and reset the frame counter */
   if (kid.draw != draw_kid_vjump) {
     kid.collision = draw_kid_collision;
+    kid.back_collision = draw_kid_collision;
     kid.fall = draw_kid_fall;
     kid.ceiling = draw_kid_ceiling;
     hang = false;

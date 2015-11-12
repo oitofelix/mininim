@@ -102,7 +102,7 @@ is_colliding (struct anim a)
     return true;
   }
 
-  struct coord tfk = coord_tf (kid);
+  struct coord tfk = coord_tf (*a.id);
   struct pos ptfk = pos (tfk);
   struct construct ctfk = construct (ptfk);
 
@@ -112,27 +112,20 @@ is_colliding (struct anim a)
     collision_construct = DOOR;
     return true;
   }
-
   if (a.frame == kid_turn_run_05 && a.dir == RIGHT
       && ctb.fg == DOOR && ! peq (ptb, ptf)) {
     collision_construct = DOOR;
     return true;
   }
 
-  /* if (a.id == &kid */
-  /*     && ctf.fg == DOOR && a.dir == LEFT */
-  /*     && tf.y <= door_grid_tip_y (ptf) - dy) return true; */
-
-  if (a.id == &kid
-      && ctf.fg == DOOR && a.dir == LEFT
+  if (ctf.fg == DOOR && a.dir == LEFT
       && tf.y <= door_grid_tip_y (ptf) - dy
       && ! peq (ptf, ptfk)) {
     collision_construct = DOOR;
     return true;
   }
 
-  if (a.id == &kid
-      && ctfk.fg == DOOR && a.dir == RIGHT
+  if (ctfk.fg == DOOR && a.dir == RIGHT
       && tf.y <= door_grid_tip_y (ptfk) - dy
       && ! peq (ptfk, ptf)) {
     collision_construct = DOOR;
@@ -503,4 +496,9 @@ apply_physics (struct anim *a, ALLEGRO_BITMAP *frame,
   na.c = nanim (na);
 
   (*a) = na;
+
+  if (a == &kid) {
+    kids = survey (*a, &pos);
+    kidsf = survey (*a, &posf);
+  }
 }

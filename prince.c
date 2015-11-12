@@ -41,7 +41,7 @@ main (int argc, char **argv)
   show ();
   clear_bitmap (screen, BLACK);
 
-  /* play_title (); */
+  play_title ();
   play_level_1 ();
 
   finalize_video ();

@@ -17,11 +17,13 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <error.h>
 #include <math.h>
 #include "kernel/random.h"
 #include "level.h"
 #include "kid.h"
 #include "physics.h"
+#include "room.h"
 #include "pos.h"
 
 int
@@ -32,77 +34,82 @@ roomd (int room, enum dir dir)
   case RIGHT: return level->link[room].r;
   case ABOVE: return level->link[room].a;
   case BELOW: return level->link[room].b;
-  default: return room;
+  default:
+    error (-1, 0, "%s: unknown direction (%i)", __func__, dir);
+    return room;
   }
 }
 
 struct coord
 ncoord (struct coord c)
 {
+  struct coord d = c;
+
   if (c.x < 0) {
-    c.x += PLACE_WIDTH * PLACES;
-    c.room = roomd (c.room, LEFT);
+    d.x += PLACE_WIDTH * PLACES;
+    d.room = roomd (c.room, LEFT);
   }
 
   if (c.x >= PLACE_WIDTH * PLACES) {
-    c.x -= PLACE_WIDTH * PLACES;
-    c.room = roomd (c.room, RIGHT);
+    d.x -= PLACE_WIDTH * PLACES;
+    d.room = roomd (c.room, RIGHT);
   }
 
   if (c.y < 0) {
-    c.y += PLACE_HEIGHT * FLOORS;
-    c.room = roomd (c.room, ABOVE);
+    d.y += PLACE_HEIGHT * FLOORS;
+    d.room = roomd (c.room, ABOVE);
   }
 
   if (c.y >= PLACE_HEIGHT * FLOORS + 11) {
-    c.y -= PLACE_HEIGHT * FLOORS;
-    c.room = roomd (c.room, BELOW);
+    d.y -= PLACE_HEIGHT * FLOORS;
+    d.room = roomd (c.room, BELOW);
   }
 
-  if (c.y < 8 && roomd (room_view, BELOW) == c.room) {
-    c.y += PLACE_HEIGHT * FLOORS;
-    c.room = room_view;
+  if (d.y < 8 && roomd (room_view, BELOW) == c.room) {
+    d.y += PLACE_HEIGHT * FLOORS;
+    d.room = room_view;
   }
 
-  if (c.y > PLACE_HEIGHT * FLOORS + 3
-             && roomd (room_view, ABOVE) == c.room) {
-    c.y -= PLACE_HEIGHT * FLOORS;
-    c.room = room_view;
+  if (d.y > PLACE_HEIGHT * FLOORS + 3
+      && roomd (room_view, ABOVE) == c.room) {
+    d.y -= PLACE_HEIGHT * FLOORS;
+    d.room = room_view;
   }
 
-  return c;
+  return d;
 }
 
 struct pos
 npos (struct pos p)
 {
+  struct pos q = p;
+
   if (p.place < 0) {
-    p.place += PLACES;
-    p.room = roomd (p.room, LEFT);
+    q.place += PLACES;
+    q.room = roomd (p.room, LEFT);
   }
 
   if (p.place >= PLACES) {
-    p.place -= PLACES;
-    p.room = roomd (p.room, RIGHT);
+    q.place -= PLACES;
+    q.room = roomd (p.room, RIGHT);
   }
 
   if (p.floor < 0) {
-    p.floor += FLOORS;
-    p.room = roomd (p.room, ABOVE);
+    q.floor += FLOORS;
+    q.room = roomd (p.room, ABOVE);
   }
 
   if (p.floor >= FLOORS) {
-    p.floor -= FLOORS;
-    p.room = roomd (p.room, BELOW);
+    q.floor -= FLOORS;
+    q.room = roomd (p.room, BELOW);
   }
 
-  return p;
+  return q;
 }
 
 struct pos
 pos (struct coord c)
 {
-  /* c = ncoord (c); */
   struct pos p;
 
   p.room = c.room;
@@ -118,7 +125,6 @@ pos (struct coord c)
 struct pos
 posf (struct coord c)
 {
-  /* c = ncoord (c); */
   struct pos p;
 
   p.room = c.room;
@@ -187,28 +193,7 @@ nanim (struct anim a)
     } else return a.c;
   } else {
     struct dim d = dim (a);
-
-    struct coord ntl = ncoord (coord_tl (a));
-    struct coord ntr = ncoord (coord_tr (a));
-    struct coord nbl = ncoord (coord_bl (a));
-    struct coord nbr = ncoord (coord_br (a));
-
-    if (ntl.room == room_view) return ntl;
-    else if (ntr.room == room_view) {
-      a.c.x = ntr.x - d.w + 1;
-      a.c.y = ntr.y;
-      a.c.room = room_view;
-    } else if (nbl.room == room_view) {
-      a.c.x = nbl.x;
-      a.c.y = nbl.y - d.h + 1;
-      a.c.room = room_view;
-    } else if (nbr.room == room_view) {
-      a.c.x = nbr.x - d.w + 1;
-      a.c.y = nbr.y - d.h + 1;
-      a.c.room = room_view;
-    } else return ncoord (a.c);
-
-    return a.c;
+    return nbitmap_coord (a.c, d.w, d.h);
   }
 }
 
@@ -460,6 +445,69 @@ dist_coord (struct coord a, struct coord b)
   int dy = a.y - b.y;
   return sqrt (dx * dx + dy * dy);
 }
+
+struct survey
+survey (struct anim a, struct pos (*pf) (struct coord c))
+{
+  struct survey s;
+
+  s.m = coord_m (a);
+  s.mt = coord_mt (a);
+  s.mbo = coord_mbo (a);
+  s.ml = coord_ml (a);
+  s.mr = coord_mr (a);
+  s.mf = coord_mf (a);
+  s.mba = coord_mba (a);
+
+  s.tl = coord_tl (a);
+  s.tr = coord_tr (a);
+  s.tf = coord_tf (a);
+  s.tb = coord_tb (a);
+
+  s.bl = coord_bl (a);
+  s.br = coord_br (a);
+  s.bf = coord_bf (a);
+  s.bb = coord_bb (a);
+
+  s.pm = pf (s.m);
+  s.pmt = pf (s.mt);
+  s.pmbo = pf (s.mbo);
+  s.pml = pf (s.ml);
+  s.pmr = pf (s.mr);
+  s.pmf = pf (s.mf);
+  s.pmba = pf (s.mba);
+
+  s.ptl = pf (s.tl);
+  s.ptr = pf (s.tr);
+  s.ptf = pf (s.tf);
+  s.ptb = pf (s.tb);
+
+  s.pbl = pf (s.bl);
+  s.pbr = pf (s.br);
+  s.pbf = pf (s.bf);
+  s.pbb = pf (s.bb);
+
+  s.cm = construct (s.pm).fg;
+  s.cmt = construct (s.pmt).fg;
+  s.cmbo = construct (s.pmbo).fg;
+  s.cml = construct (s.pml).fg;
+  s.cmr = construct (s.pmr).fg;
+  s.cmf = construct (s.pmf).fg;
+  s.cmba = construct (s.pmba).fg;
+
+  s.ctl = construct (s.ptl).fg;
+  s.ctr = construct (s.ptr).fg;
+  s.ctf = construct (s.ptf).fg;
+  s.ctb = construct (s.ptb).fg;
+
+  s.cbl = construct (s.pbl).fg;
+  s.cbr = construct (s.pbr).fg;
+  s.cbf = construct (s.pbf).fg;
+  s.cbb = construct (s.pbb).fg;
+
+  return s;
+}
+
 
 int
 prandom_pos (struct pos p, int i, int max)

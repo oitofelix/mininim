@@ -224,36 +224,37 @@ draw_floor_corner_03 (ALLEGRO_BITMAP *bitmap, struct pos p)
 void
 draw_floor_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
-  struct coord c = coord_bb (kid);
-
-  /* if (c.y - 6 <= floor_left_coord (p).y */
-  /*     || c.x >= floor_right_coord (p).x) return; */
-
-  if (c.y - 6 <= floor_left_coord (p).y) return;
-  /* else if (c.x >= floor_right_coord (p).x) return; */
-
-  if (is_kid_hang () && kid.dir == LEFT) return;
-  if (is_kid_climb () && kid.dir == LEFT) return;
-
-  if (is_kid_climb ()) {
-      draw_floor_base (bitmap, p);
-      if (kid.frame == kid_climb_03
-          || kid.frame == kid_climb_09
-               || kid.frame == kid_climb_10)
-        draw_floor_corner_03 (bitmap, p);
-      else if (kid.frame == kid_climb_04
-               || kid.frame == kid_climb_06
-               || kid.frame == kid_climb_07)
-        draw_floor_corner_01 (bitmap, p);
-      else if (kid.frame == kid_climb_08
-               || kid.frame == kid_climb_05)
-        draw_floor_corner_02 (bitmap, p);
-  } else {
+  if (peq (p, prel (kids.ptl, 0, +1))
+      && is_kid_fall ()) draw_floor_left (bitmap, p);
+  else if (peq (kids.ptf, p)
+           && is_kid_climb ()
+           && kid.dir == RIGHT) {
+    draw_floor_base (bitmap, p);
+    if (kid.frame == kid_climb_03
+        || kid.frame == kid_climb_09
+        || kid.frame == kid_climb_10)
+      draw_floor_corner_03 (bitmap, p);
+    else if (kid.frame == kid_climb_04
+             || kid.frame == kid_climb_06
+             || kid.frame == kid_climb_07)
+      draw_floor_corner_01 (bitmap, p);
+    else if (kid.frame == kid_climb_08
+             || kid.frame == kid_climb_05)
+      draw_floor_corner_02 (bitmap, p);
+  } else if ((peq (p, kidsf.ptl)
+              || peq (p, kidsf.ptr)
+              || peq (p, kidsf.pmt)
+              || peq (p, kids.ptl)
+              || peq (p, kids.ptr)
+              || peq (p, kids.pmt))
+             && (peq (p, prel (kidsf.pmbo, -1, 0))
+                 || peq (p, prel (kids.pmbo, -1, 0)))
+             && ! (is_kid_hang () && kid.dir == LEFT)
+             && ! ((is_kid_climb ()
+                    || is_kid_start_climb ())
+                   && kid.dir == LEFT)) {
     draw_floor (bitmap, p);
-
-  /* draw next floor left side to cover right edge of the current
-     one */
-  draw_construct_left (bitmap, prel (p, 0, +1));
+    draw_construct_left (bitmap, prel (p, 0, +1));
   }
 }
 
@@ -372,7 +373,6 @@ draw_shake_floor (void)
       }
       i = (i < 3)? i + 1 : 0;
       draw_construct_left (screen, prel (p, 0, +1));
-      redraw_anim (kid);
     }
 }
 
@@ -434,7 +434,6 @@ draw_release_loose_floor (void)
       if (loose_floor[i].i < 11) {
         loose_floor[i].i++;
         draw_construct_left (screen, prel (p, 0, +1));
-        redraw_anim (kid);
       }
     }
 }
@@ -453,7 +452,6 @@ draw_floor_fall (void)
   struct pos p = pos (coord_mbo (cfloor->a));
   struct pos pn =
     pos (coord_mbo (next_anim (cfloor->a, cfloor->a.frame, 0, speed)));
-  struct pos pk = pos (coord_mbo (kid));
 
   if (construct (p).fg == NO_FLOOR
       || peq (p, pn)) {
@@ -462,9 +460,6 @@ draw_floor_fall (void)
       /* redraw construct on the floor's right */
       struct pos pc = prel (pmt, 0, +1);
       draw_construct_left (screen, pc);
-      /* redraw kid if he's over it */
-      if (peq (pc, pk))
-        redraw_anim (kid);
     }
   } else { /* the floor hit the ground */
     play_sample (broken_floor_sound);
@@ -474,7 +469,6 @@ draw_floor_fall (void)
     draw_construct_left (room_bg, prel (p, 0, +1));
     draw_construct (screen, p);
     draw_construct_left (screen, prel (p, 0, +1));
-    redraw_anim (kid);
   }
 }
 
