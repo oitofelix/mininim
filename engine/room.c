@@ -27,6 +27,7 @@
 #include "level.h"
 #include "kid.h"
 #include "floor.h"
+#include "loose-floor.h"
 #include "pillar.h"
 #include "wall.h"
 #include "spikes.h"
@@ -52,6 +53,7 @@ load_room (void)
     switch (video_mode) {
     case VGA:
       load_vdungeon_floor ();
+      load_vdungeon_loose_floor ();
       load_vdungeon_spikes ();
       load_vdungeon_wall ();
       load_vdungeon_pillar ();
@@ -78,6 +80,7 @@ void
 unload_room (void)
 {
   unload_floor ();
+  unload_loose_floor ();
   unload_spikes ();
   unload_wall ();
   unload_pillar ();

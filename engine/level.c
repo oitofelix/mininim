@@ -27,7 +27,7 @@
 #include "room.h"
 #include "fire.h"
 #include "kid.h"
-#include "floor.h"
+#include "loose-floor.h"
 #include "spikes.h"
 #include "door.h"
 #include "level.h"

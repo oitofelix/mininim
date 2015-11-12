@@ -1,6 +1,6 @@
 KERNEL_MODULES = event timer video audio memory keyboard random
-ENGINE_MODULES = anim pos physics level stars floor spikes door	\
-  pillar wall room fire clock kid princess jaffar
+ENGINE_MODULES = anim pos physics level stars floor loose-floor	\
+  spikes door pillar wall room fire clock kid princess jaffar
 LEVEL_MODULES = title level-1
 MAIN_MODULES = prince
 
