@@ -65,12 +65,12 @@ static struct level level_1 = {
      {{WALL}, {WALL}, {WALL}, {SPIKES_FLOOR}, {SPIKES_FLOOR},
       {WALL}, {WALL}, {WALL}, {WALL}, {WALL}}},
 
-    [7] =
-    {{{FLOOR,TORCH}, {FLOOR,BRICKS_01}, {FLOOR}, {NO_FLOOR}, {PILLAR},
-      {FLOOR}, {FLOOR,BRICKS_01}, {FLOOR,TORCH}, {FLOOR}, {DOOR}},
-     {{WALL}, {WALL}, {WALL}, {NO_FLOOR}, {WALL},
-      {WALL}, {WALL}, {WALL}, {WALL}, {WALL}},
-     {{WALL}, {WALL}, {WALL}, {SPIKES_FLOOR}, {SPIKES_FLOOR},
+    [8] =
+    {{{NO_FLOOR,BRICKS_03}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR},
+      {NO_FLOOR,BRICKS_03}, {OPENER_FLOOR}, {FLOOR,BRICKS_01}, {FLOOR}, {DOOR}},
+     {{FLOOR,TORCH}, {FLOOR,TORCH}, {FLOOR}, {LOOSE_FLOOR}, {NO_FLOOR,BRICKS_03},
+      {FLOOR}, {PILLAR}, {OPENER_FLOOR}, {FLOOR}, {WALL}},
+     {{WALL}, {WALL}, {WALL}, {NO_FLOOR}, {NO_FLOOR},
       {WALL}, {WALL}, {WALL}, {WALL}, {WALL}}},
 
     [9] =
@@ -86,12 +86,12 @@ static struct level level_1 = {
            [1] = {0, 0, 0, 2},
            [2] = {6, 3, 1, 0},
            [3] = {2, 9, 0, 0},
-           [6] = {7, 2, 0, 0},
-           [7] = {0, 6, 0, 0},
+           [6] = {8, 2, 0, 0},
+           [8] = {0, 6, 0, 0},
            [9] = {3, 0, 0, 0},},
 
   .event = {
-    [0] = {{7,0,9}, false},
+    [0] = {{8,0,9}, false},
   }
 };
 

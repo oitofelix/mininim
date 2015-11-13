@@ -206,7 +206,7 @@ draw_construct_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
   case BROKEN_FLOOR: draw_broken_floor (bitmap, p); break;
   case LOOSE_FLOOR: draw_floor (bitmap, p); break;
   case SPIKES_FLOOR: draw_spikes_floor (bitmap, p); break;
-  case OPENER_FLOOR: draw_opener_floor (bitmap, p); break;
+  case OPENER_FLOOR: register_opener_floor (p); break;
   case PILLAR: draw_pillar (bitmap, p); break;
   case WALL: draw_wall (bitmap, p); break;
   case DOOR: draw_door (bitmap, p); break;
@@ -304,6 +304,7 @@ draw_no_floor (ALLEGRO_BITMAP *bitmap, struct pos p)
 
   draw_construct_right (bitmap, prel (p, 0, -1));
   draw_construct_right (bitmap, prel (p, +1, -1));
+  draw_construct_left (bitmap, prel (p, +1, 0));
   draw_construct_left (bitmap, prel (p, 0, +1));
 }
 

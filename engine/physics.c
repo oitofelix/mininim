@@ -311,6 +311,14 @@ is_on_floor (struct anim a, enum construct_fg type)
     return true;
   }
 
+  int dir = (kid.dir == LEFT) ? -1 : +1;
+  if (a.id == &kid
+      && is_kid_hanging_at_pos (prel (s.pmba, -1, dir))
+      && construct (prel (s.pmba, -1, dir)).fg == type) {
+    floor_pos = prel (s.pmba, -1, dir);
+    return true;
+  }
+
   return false;
 }
 

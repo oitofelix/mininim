@@ -162,15 +162,43 @@ draw_opener_floor_base (ALLEGRO_BITMAP *bitmap, struct pos p)
 void
 draw_opener_floor (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
+  if (is_opener_floor_pressed (p))
+    draw_opener_floor_pressed (bitmap, p);
+  else draw_opener_floor_unpressed (bitmap, p);
+}
+
+void
+draw_opener_floor_pressed (ALLEGRO_BITMAP *bitmap, struct pos p)
+{
+  draw_floor (bitmap, p);
+  draw_construct_left (bitmap, prel (p, 0, +1));
+}
+
+void
+draw_opener_floor_unpressed (ALLEGRO_BITMAP *bitmap, struct pos p)
+{
   draw_opener_floor_base (bitmap, p);
   draw_bitmapc (opener_floor_left, bitmap, opener_floor_left_coord (p), 0);
   draw_bitmapc (normal_floor_right, bitmap, opener_floor_right_coord (p), 0);
-
-  register_opener_floor (p);
+  draw_construct_left (bitmap, prel (p, 0, +1));
 }
 
 void
 draw_opener_floor_left (ALLEGRO_BITMAP *bitmap, struct pos p)
+{
+  if (is_opener_floor_pressed (p))
+    draw_opener_floor_pressed_left (bitmap, p);
+  else draw_opener_floor_unpressed_left (bitmap, p);
+}
+
+void
+draw_opener_floor_pressed_left (ALLEGRO_BITMAP *bitmap, struct pos p)
+{
+  draw_floor_left (bitmap, p);
+}
+
+void
+draw_opener_floor_unpressed_left (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
   draw_opener_floor_base (bitmap, p);
   draw_bitmapc (opener_floor_left, bitmap, opener_floor_left_coord (p), 0);
@@ -178,6 +206,20 @@ draw_opener_floor_left (ALLEGRO_BITMAP *bitmap, struct pos p)
 
 void
 draw_opener_floor_right (ALLEGRO_BITMAP *bitmap, struct pos p)
+{
+  if (is_opener_floor_pressed (p))
+    draw_opener_floor_pressed_right (bitmap, p);
+  else draw_opener_floor_unpressed_right (bitmap, p);
+}
+
+void
+draw_opener_floor_pressed_right (ALLEGRO_BITMAP *bitmap, struct pos p)
+{
+  draw_floor_right (bitmap, p);
+}
+
+void
+draw_opener_floor_unpressed_right (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
   draw_opener_floor_base (bitmap, p);
   draw_bitmapc (normal_floor_right, bitmap, opener_floor_right_coord (p), 0);
@@ -214,7 +256,7 @@ draw_floor_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
       draw_floor_left (bitmap, p);
       break;
     case OPENER_FLOOR:
-      draw_opener_floor_left (bitmap, p);
+      draw_opener_floor_fg (bitmap, p);
       break;
     default:
       error (-1, 0, "%s: unknown floor type (%i)",
@@ -255,7 +297,7 @@ draw_floor_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
       draw_floor (bitmap, p);
       break;
     case OPENER_FLOOR:
-      draw_opener_floor (bitmap, p);
+      draw_opener_floor_fg (bitmap, p);
       break;
     default:
       error (-1, 0, "%s: unknown floor type (%i)",

@@ -25,6 +25,7 @@
 #include "floor.h"
 #include "kid.h"
 #include "door.h"
+#include "floor.h"
 #include "opener-floor.h"
 
 static struct opener_floor {
@@ -91,38 +92,40 @@ draw_opener_floors (void)
 
         o->resist_off = 3;
 
-        if (o->resist_on > 0) {
-          o->resist_on--; return;
-        }
+        if (o->resist_on > 0) o->resist_on--;
+        else {
+          if (! o->noise) {
+            play_sample (opener_floor_sound);
+            o->noise = true;
+          }
 
-        if (! o->noise) {
-          play_sample (opener_floor_sound);
-          o->noise = true;
+          open_door (o->event);
         }
-
-        draw_opener_floors_0 (o);
-        open_door (o->event);
       } else {
-        if (o->resist_off > 0) {
-          o->resist_off--;
-          draw_opener_floors_0 (o);
-          return;
+        if (o->resist_off > 0) o->resist_off--;
+        else {
+          o->noise = false;
+          o->resist_on = 1;
         }
-
-        o->pressed = false;
-        o->noise = false;
-        o->resist_on = 1;
       }
+
+      draw_opener_floor (screen, o->p);
+      o->pressed = is_opener_floor_pressed (o->p);
     }
   }
 }
 
-
 void
-draw_opener_floors_0 (struct opener_floor *o)
+draw_opener_floor_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
-  draw_no_floor (screen, o->p);
-  draw_floor (screen, o->p);
-  draw_construct_left (screen, prel (o->p, 0, +1));
-  draw_construct_right (screen, prel (o->p, +1, 0));
+  if (opener_floor_at_pos (p)->pressed)
+    draw_opener_floor_pressed (screen, p);
+  else draw_opener_floor_unpressed (screen, p);
+}
+
+bool
+is_opener_floor_pressed (struct pos p)
+{
+  return is_on_floor (kid, OPENER_FLOOR)
+    && peq (floor_pos, p);
 }

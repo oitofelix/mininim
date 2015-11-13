@@ -2138,3 +2138,14 @@ is_kid_on_air (void)
     || kid.frame == kid_vjump_13
     || kid.frame == kid_vjump_15;
 }
+
+bool
+is_kid_hanging_at_pos (struct pos p)
+{
+  int dir = (kid.dir == LEFT) ? -1 : +1;
+  return ((is_kid_hang ()
+           || is_kid_start_climb ()
+           || is_kid_stop_climb ()
+           || is_kid_climb ())
+          && peq (prel (kids.pbb, -1, dir), p));
+}

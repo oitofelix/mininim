@@ -32,6 +32,7 @@ void unload_opener_floor_sounds (void);
 void register_opener_floor (struct pos p);
 struct opener_floor *opener_floor_at_pos (struct pos p);
 void draw_opener_floors (void);
-void draw_opener_floors_0 (struct opener_floor *o);
+bool is_opener_floor_pressed (struct pos p);
+void draw_opener_floor_fg (ALLEGRO_BITMAP *bitmap, struct pos p);
 
 #endif	/* FREEPOP_OPENER_FLOOR_H */
