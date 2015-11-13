@@ -22,6 +22,8 @@
 
 #include "kernel/audio.h"
 
+#define LOOSE_FLOORS 30
+
 /* bitmaps */
 #define VDUNGEON_FLOOR_LOOSE_LEFT_01 "dat/vdungeon/floor panels/loose left01.png"
 #define VDUNGEON_FLOOR_LOOSE_RIGHT_01 "dat/vdungeon/floor panels/loose right01.png"

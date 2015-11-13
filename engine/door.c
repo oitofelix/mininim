@@ -33,7 +33,7 @@ ALLEGRO_SAMPLE *door_open_sound, *door_close_sound, *door_end_sound;
 static struct door {
   struct pos p;
   int i;
-} door[FLOORS * PLACES];
+} door[DOORS];
 
 void
 load_vdungeon_door (void)
@@ -83,6 +83,16 @@ register_door (struct pos p)
   door[i].i = DOOR_MAX_STEP;
 }
 
+struct door
+door_at_pos (struct pos p)
+{
+  int i;
+  for (i = 0; i < DOORS; i++) if (peq (door[i].p, p)) return door[i];
+  error (-1, 0, "%s: no door at position (%i, %i, %i)",
+         __func__, p.room, p.floor, p.place);
+  return door[0];
+}
+
 void
 draw_doors (void)
 {
@@ -92,17 +102,6 @@ draw_doors (void)
       draw_door_grid (screen, door[i].p, door[i].i);
       draw_construct_left (screen, prel (door[i].p, -1, +1));
     }
-
-}
-
-struct door
-door_at_pos (struct pos p)
-{
-  int i;
-  for (i = 0; i < DOORS; i++) if (peq (door[i].p, p)) return door[i];
-  error (-1, 0, "%s: no door at position (%i, %i, %i)",
-         __func__, p.room, p.floor, p.place);
-  return door[0];
 }
 
 int
@@ -115,7 +114,7 @@ door_grid_tip_y (struct pos p)
 void
 draw_door (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
-  draw_bitmapc (floor_normal_base, bitmap, floor_base_coord (p), 0);
+  draw_bitmapc (normal_floor_base, bitmap, floor_base_coord (p), 0);
   draw_bitmapc (door_left, bitmap, door_left_coord (p), 0);
   draw_bitmapc (door_right, bitmap, door_right_coord (p), 0);
   draw_bitmapc (door_top, bitmap, door_top_coord (p), 0);
@@ -126,21 +125,21 @@ draw_door (ALLEGRO_BITMAP *bitmap, struct pos p)
 void
 draw_door_left (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
-  draw_bitmapc (floor_normal_base, bitmap, floor_base_coord (p), 0);
+  draw_bitmapc (normal_floor_base, bitmap, floor_base_coord (p), 0);
   draw_bitmapc (door_left, bitmap, door_left_coord (p), 0);
 }
 
 void
 draw_door_right (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
-  draw_bitmapc (floor_normal_base, bitmap, floor_base_coord (p), 0);
+  draw_bitmapc (normal_floor_base, bitmap, floor_base_coord (p), 0);
   draw_bitmapc (door_right, bitmap, door_right_coord (p), 0);
 }
 
 void
 draw_door_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
-  draw_bitmapc (floor_normal_base, bitmap, floor_base_coord (p), 0);
+  draw_bitmapc (normal_floor_base, bitmap, floor_base_coord (p), 0);
   draw_bitmapc (door_pole, screen, door_pole_coord (p), 0);
 
   if (peq (kids.pm, p)) {

@@ -69,11 +69,10 @@ play_anim (void (*callback) (void), int freq)
           int dc = dist_collision (kid);
           int dbc = dist_back_collision (kid);
           int df = dist_fall (kid);
-          int dl = dist_loose_floor (kid);
           int dn = dist_next_place (kid);
           int dp = dist_prev_place (kid);
           if (a_key || d_key || w_key || s_key || enter_key)
-            printf ("floor = %i, place = %i, dc = %i, dbc = %i, df = %i, dl = %i, dn = %i, dp = %i\n", p.floor, p.place, dc, dbc, df, dl, dn, dp);
+            printf ("floor = %i, place = %i, dc = %i, dbc = %i, df = %i, dn = %i, dp = %i\n", p.floor, p.place, dc, dbc, df, dn, dp);
         }
         /* end kid hack */
 
@@ -174,34 +173,37 @@ draw_anim_on_fall_edge (struct anim *a, ALLEGRO_BITMAP* frame, int dx, int dy)
 }
 
 void
-draw_anim_on_loose_floor_edge (struct anim *a,
-                               ALLEGRO_BITMAP* frame, int dx, int dy)
+draw_anim_on_floor_edge (struct anim *a,
+                         ALLEGRO_BITMAP* frame, int dx, int dy,
+                         enum construct_fg type)
 {
   struct anim na = next_anim (*a, frame, dx, dy);
   (*a) = na;
-  to_loose_floor_edge (a);
+  to_floor_edge (a, type);
   draw_anim (a, frame, +0, 0);
 }
 
 void
-draw_anim_on_fall_or_loose_floor_edge
-(struct anim *a, ALLEGRO_BITMAP* frame, int dx, int dy)
+draw_anim_on_fall_or_floor_edge
+(struct anim *a, ALLEGRO_BITMAP* frame, int dx, int dy,
+ enum construct_fg type)
 {
   struct anim na = next_anim (*a, frame, dx, dy);
   (*a) = na;
   to_fall_edge (a);
-  to_loose_floor_edge (a);
+  to_floor_edge (a, type);
   draw_anim (a, frame, +0, 0);
 }
 
 void
-draw_anim_on_edge (struct anim *a, ALLEGRO_BITMAP* frame, int dx, int dy)
+draw_anim_on_edge (struct anim *a, ALLEGRO_BITMAP* frame, int dx, int dy,
+                   enum construct_fg type)
 {
   struct anim na = next_anim (*a, frame, +0, 0);
   (*a) = na;
   to_collision_edge (a);
   to_fall_edge (a);
-  to_loose_floor_edge (a);
+  to_floor_edge (a, type);
   draw_anim (a, frame, dx, dy);
 }
 

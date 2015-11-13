@@ -28,6 +28,7 @@
 #include "kid.h"
 #include "floor.h"
 #include "loose-floor.h"
+#include "opener-floor.h"
 #include "pillar.h"
 #include "wall.h"
 #include "spikes.h"
@@ -74,6 +75,8 @@ load_room (void)
   default:
     error (-1, 0, "%s: unknown level type (%i)", __func__, level->type);
   }
+
+  load_opener_floor_sounds ();
 }
 
 void
@@ -85,6 +88,9 @@ unload_room (void)
   unload_wall ();
   unload_pillar ();
   unload_door ();
+
+  /* sounds */
+  unload_opener_floor_sounds ();
 
   /* bitmaps */
   al_destroy_bitmap (room_bg);
@@ -200,6 +206,7 @@ draw_construct_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
   case BROKEN_FLOOR: draw_broken_floor (bitmap, p); break;
   case LOOSE_FLOOR: draw_floor (bitmap, p); break;
   case SPIKES_FLOOR: draw_spikes_floor (bitmap, p); break;
+  case OPENER_FLOOR: draw_opener_floor (bitmap, p); break;
   case PILLAR: draw_pillar (bitmap, p); break;
   case WALL: draw_wall (bitmap, p); break;
   case DOOR: draw_door (bitmap, p); break;
@@ -235,6 +242,7 @@ draw_construct_left (ALLEGRO_BITMAP *bitmap, struct pos p)
   case BROKEN_FLOOR: draw_broken_floor_left (bitmap, p); break;
   case LOOSE_FLOOR: draw_floor_left (bitmap, p); break;
   case SPIKES_FLOOR: draw_spikes_floor_left (bitmap, p); break;
+  case OPENER_FLOOR: draw_opener_floor_left (bitmap, p); break;
   case PILLAR: draw_pillar_left (bitmap, p); break;
   case WALL: draw_wall (bitmap, p); break;
   case DOOR: draw_door_left (bitmap, p); break;
@@ -253,6 +261,7 @@ draw_construct_right (ALLEGRO_BITMAP *bitmap, struct pos p)
   case BROKEN_FLOOR: draw_broken_floor_right (bitmap, p); break;
   case LOOSE_FLOOR: draw_floor_right (bitmap, p); break;
   case SPIKES_FLOOR: draw_spikes_floor_right (bitmap, p); break;
+  case OPENER_FLOOR: draw_opener_floor_right (bitmap, p); break;
   case PILLAR: draw_pillar_right (bitmap, p); break;
   case WALL: draw_wall (bitmap, p); break;
   case DOOR: draw_door_right (bitmap, p); break;
@@ -266,8 +275,8 @@ void
 draw_no_floor_base (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
   struct coord c = floor_base_coord (p);
-  int w = al_get_bitmap_width (floor_normal_base);
-  int h = al_get_bitmap_height (floor_normal_base);
+  int w = al_get_bitmap_width (normal_floor_base);
+  int h = al_get_bitmap_height (normal_floor_base);
 
   al_set_target_bitmap (bitmap);
   al_set_clipping_rectangle (c.x, c.y, w, h);
@@ -279,12 +288,13 @@ void
 draw_no_floor (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
   struct coord c = floor_left_coord (p);
-  int wl = al_get_bitmap_width (floor_normal_left);
-  int wr = al_get_bitmap_width (floor_normal_right);
+  c.y--; /* take opener floor into account */
+  int wl = al_get_bitmap_width (normal_floor_left);
+  int wr = al_get_bitmap_width (normal_floor_right);
   int w = wl + wr;
-  int hl = al_get_bitmap_height (floor_normal_left);
-  int hr = al_get_bitmap_height (floor_normal_right);
-  int hb = al_get_bitmap_height (floor_normal_base);
+  int hl = al_get_bitmap_height (normal_floor_left);
+  int hr = al_get_bitmap_height (normal_floor_right);
+  int hb = al_get_bitmap_height (normal_floor_base);
   int h = max (hl, hr) + hb;
 
   al_set_target_bitmap (bitmap);
@@ -389,6 +399,7 @@ draw_room_fg_0 (struct pos p)
   case BROKEN_FLOOR: draw_broken_floor_fg (screen, p); break;
   case LOOSE_FLOOR: draw_floor_fg (screen, p); break;
   case SPIKES_FLOOR: draw_spikes_fg (screen, p); break;
+  case OPENER_FLOOR: draw_floor_fg (screen, p); break;
   case PILLAR: draw_pillar_fg (screen, p); break;
   case WALL: draw_wall_fg (screen, p); break;
   case DOOR: draw_door_fg (screen, p); break;

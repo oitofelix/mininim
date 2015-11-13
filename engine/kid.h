@@ -231,6 +231,7 @@ bool is_kid_stop_climb (void);
 bool is_kid_start_run_jump (void);
 bool is_kid_run_jump ();
 bool is_kid_stop_run_jump ();
+bool is_kid_on_air (void);
 
 /* variables */
 extern struct anim kid; /* kid animation object */

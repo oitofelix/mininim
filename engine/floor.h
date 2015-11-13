@@ -24,20 +24,22 @@
 #include "physics.h"
 
 /* bitmaps */
-#define VDUNGEON_FLOOR_NORMAL_LEFT "dat/vdungeon/floor panels/normal left.png"
-#define VDUNGEON_FLOOR_NORMAL_RIGHT "dat/vdungeon/floor panels/normal right.png"
-#define VDUNGEON_FLOOR_NORMAL_BASE "dat/vdungeon/floor panels/normal base.png"
-#define VDUNGEON_FLOOR_BROKEN_LEFT "dat/vdungeon/floor panels/broken left.png"
-#define VDUNGEON_FLOOR_BROKEN_RIGHT "dat/vdungeon/floor panels/broken right.png"
-#define VDUNGEON_FLOOR_BROKEN_FRONT "dat/vdungeon/floor panels/broken left02.png"
+#define VDUNGEON_NORMAL_FLOOR_LEFT "dat/vdungeon/floor panels/normal left.png"
+#define VDUNGEON_NORMAL_FLOOR_RIGHT "dat/vdungeon/floor panels/normal right.png"
+#define VDUNGEON_NORMAL_FLOOR_BASE "dat/vdungeon/floor panels/normal base.png"
+#define VDUNGEON_BROKEN_FLOOR_LEFT "dat/vdungeon/floor panels/broken left.png"
+#define VDUNGEON_BROKEN_FLOOR_RIGHT "dat/vdungeon/floor panels/broken right.png"
+#define VDUNGEON_BROKEN_FLOOR_FRONT "dat/vdungeon/floor panels/broken left02.png"
+#define VDUNGEON_SPIKES_FLOOR_LEFT "dat/vdungeon/floor panels/spikes left.png"
+#define VDUNGEON_SPIKES_FLOOR_RIGHT "dat/vdungeon/floor panels/spikes right.png"
+#define VDUNGEON_OPENER_FLOOR_LEFT "dat/vdungeon/floor panels/opener left unpressed.png"
+#define VDUNGEON_OPENER_FLOOR_BASE "dat/vdungeon/floor panels/opener base unpressed.png"
 #define VDUNGEON_FLOOR_CORNER_01 "dat/vdungeon/floor panels/normal_closer01.png"
 #define VDUNGEON_FLOOR_CORNER_02 "dat/vdungeon/floor panels/normal_closer02.png"
 #define VDUNGEON_FLOOR_CORNER_03 "dat/vdungeon/floor panels/normal_closer03.png"
-#define VDUNGEON_FLOOR_SPIKES_LEFT "dat/vdungeon/floor panels/spikes left.png"
-#define VDUNGEON_FLOOR_SPIKES_RIGHT "dat/vdungeon/floor panels/spikes right.png"
 
-extern ALLEGRO_BITMAP *floor_normal_left, *floor_normal_right, *floor_normal_base,
-  *floor_broken_left, *floor_broken_right, *floor_broken_front;
+extern ALLEGRO_BITMAP *normal_floor_left, *normal_floor_right, *normal_floor_base,
+  *broken_floor_left, *broken_floor_right, *broken_floor_front;
 
 void load_vdungeon_floor (void);
 void unload_floor (void);
@@ -52,14 +54,20 @@ void draw_broken_floor_fg (ALLEGRO_BITMAP *bitmap, struct pos pos);
 void draw_spikes_floor (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_spikes_floor_left (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_spikes_floor_right (ALLEGRO_BITMAP *bitmap, struct pos p);
+void draw_opener_floor_base (ALLEGRO_BITMAP *bitmap, struct pos p);
+void draw_opener_floor (ALLEGRO_BITMAP *bitmap, struct pos p);
+void draw_opener_floor_left (ALLEGRO_BITMAP *bitmap, struct pos p);
+void draw_opener_floor_right (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_floor_fg (ALLEGRO_BITMAP *bitmap, struct pos pos);
+void draw_floor_corner_01 (ALLEGRO_BITMAP *bitmap, struct pos p);
+void draw_floor_corner_02 (ALLEGRO_BITMAP *bitmap, struct pos p);
+void draw_floor_corner_03 (ALLEGRO_BITMAP *bitmap, struct pos p);
 struct coord floor_base_coord (struct pos pos);
 struct coord floor_left_coord (struct pos pos);
 struct coord floor_right_coord (struct pos pos);
 struct coord broken_floor_front_coord (struct pos pos);
-void draw_floor_corner_01 (ALLEGRO_BITMAP *bitmap, struct pos p);
-void draw_floor_corner_02 (ALLEGRO_BITMAP *bitmap, struct pos p);
-void draw_floor_corner_03 (ALLEGRO_BITMAP *bitmap, struct pos p);
+struct coord opener_floor_left_coord (struct pos p);
+struct coord opener_floor_right_coord (struct pos p);
 struct coord floor_corner_01_coord (struct pos p);
 struct coord floor_corner_02_coord (struct pos p);
 struct coord floor_corner_03_coord (struct pos p);

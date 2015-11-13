@@ -35,9 +35,9 @@ bool is_falling (struct anim anim);
 void to_collision_edge (struct anim *anim);
 void to_back_collision_edge (struct anim *a);
 void to_fall_edge (struct anim *anim);
-bool is_on_loose_floor (struct anim a);
-int dist_loose_floor (struct anim a);
-void to_loose_floor_edge (struct anim *a);
+bool is_on_floor (struct anim a, enum construct_fg type);
+int dist_floor (struct anim a, enum construct_fg type);
+void to_floor_edge (struct anim *a, enum construct_fg type);
 bool is_hangable (struct anim a);
 int dist_next_place (struct anim a);
 void to_next_place_edge (struct anim *a);
@@ -50,7 +50,7 @@ void apply_physics (struct anim *a, ALLEGRO_BITMAP *frame,
                     int dx, int dy);
 
 extern struct pos hang_pos;
-extern struct pos loose_floor_pos;
+extern struct pos floor_pos;
 extern enum construct_fg collision_construct;
 
 #endif	/* FREEPOP_PHYSICS_H */

@@ -27,14 +27,17 @@ void play_anim (void (*callback) (void), int freq);
 void draw_anim (struct anim *anim, ALLEGRO_BITMAP *new_frame, int dx, int dy);
 void redraw_anim (struct anim a);
 struct anim next_anim (struct anim a, ALLEGRO_BITMAP* frame, int dx, int dy);
-void draw_anim_on_edge (struct anim *a, ALLEGRO_BITMAP* frame, int dx, int dy);
 bool wait_anim (int cycles);
 void draw_anim_on_collision_edge (struct anim *a, ALLEGRO_BITMAP* frame,
                                   int dx, int dy);
 void draw_anim_on_fall_edge (struct anim *a, ALLEGRO_BITMAP* frame, int dx, int dy);
-void draw_anim_on_loose_floor_edge (struct anim *a, ALLEGRO_BITMAP* frame, int dx, int dy);
-void draw_anim_on_fall_or_loose_floor_edge (struct anim *a, ALLEGRO_BITMAP* frame, int dx, int dy);
 void draw_anim_on_next_place_edge (struct anim *a, ALLEGRO_BITMAP* frame, int dx, int dy);
+void draw_anim_on_floor_edge (struct anim *a, ALLEGRO_BITMAP* frame, int dx, int dy,
+                              enum construct_fg type);
+void draw_anim_on_fall_or_floor_edge (struct anim *a, ALLEGRO_BITMAP* frame,
+                                      int dx, int dy, enum construct_fg type);
+void draw_anim_on_edge (struct anim *a, ALLEGRO_BITMAP* frame, int dx, int dy,
+                        enum construct_fg type);
 
 /* variables */
 extern bool quit_anim; /* set to true to quit animation */

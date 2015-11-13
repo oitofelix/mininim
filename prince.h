@@ -88,6 +88,7 @@ struct level {
       BROKEN_FLOOR,
       LOOSE_FLOOR,
       SPIKES_FLOOR,
+      OPENER_FLOOR,
       PILLAR,
       WALL,
       DOOR,

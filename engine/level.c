@@ -28,6 +28,7 @@
 #include "fire.h"
 #include "kid.h"
 #include "loose-floor.h"
+#include "opener-floor.h"
 #include "spikes.h"
 #include "door.h"
 #include "level.h"
@@ -103,24 +104,6 @@ level_anim (void)
   }
 
   draw_room_anim_fg (kid);
-
-
-  /* level_draw_base (); */
-  /* if (is_visible (kid)) { */
-  /*   prev_room = kid.c.room; */
-  /*   kid.draw (); */
-  /*   if (kid.c.room != prev_room) { */
-  /*     room_view = kid.c.room; */
-  /*     level_draw_base (); */
-  /*     redraw_anim (kid); */
-  /*   } */
-  /* } */
-
-  /* draw_shake_floor (); */
-  /* draw_release_loose_floor (); */
-  /* draw_spikes (); */
-  /* draw_doors (); */
-  /* draw_room_anim_fg (kid); */
 }
 
 void
@@ -130,6 +113,7 @@ level_draw_base (void)
   if (! no_room_drawing) draw_room (room_view);
   draw_fire (room_view);
   draw_shake_floor ();
+  draw_opener_floors ();
   draw_release_loose_floor ();
   draw_spikes ();
   draw_doors ();

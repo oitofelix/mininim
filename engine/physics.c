@@ -25,11 +25,12 @@
 #include "anim.h"
 #include "room.h"
 #include "loose-floor.h"
+#include "opener-floor.h"
 #include "pos.h"
 #include "door.h"
 #include "physics.h"
 
-struct pos loose_floor_pos;
+struct pos floor_pos;
 struct pos hang_pos;
 enum construct_fg collision_construct;
 
@@ -285,48 +286,54 @@ to_fall_edge (struct anim *a)
 }
 
 bool
-is_on_loose_floor (struct anim a)
+is_on_floor (struct anim a, enum construct_fg type)
 {
   a.c.x += (a.dir == LEFT) ? 4 : -4;
 
-  if (a.draw == draw_kid_misstep) return false;
-  if (a.id == &kid && is_kid_stabilize ()) return false;
-  if (a.id == &kid && is_kid_turn ()) return false;
+  if (type == LOOSE_FLOOR && a.id == &kid
+      && (a.draw == draw_kid_misstep
+          || is_kid_stabilize ()
+          || is_kid_turn ()
+          || is_kid_start_jump ()
+          || is_kid_jump ())) return false;
 
-  if (a.id == &kid && (is_kid_start_jump () ||
-                       is_kid_jump ()))
-    return false;
+  struct survey s = survey (a, pos);
 
-  struct pos p = pos (coord_tf (a));
-  struct construct c = construct (p);
+  if (is_kid_on_air ()) return false;
 
-  if (c.fg == LOOSE_FLOOR) {
-    loose_floor_pos = p;
+  if (s.ctf == type) {
+    floor_pos = s.ptf;
     return true;
   }
+
+  if (s.cmt == type) {
+    floor_pos = s.pmt;
+    return true;
+  }
+
   return false;
 }
 
 int
-dist_loose_floor (struct anim a)
+dist_floor (struct anim a, enum construct_fg type)
 {
   int inc = (a.dir == LEFT) ? -1 : +1;
   int x = a.c.x;
 
-  if (! is_on_loose_floor (a))
-    while (! is_on_loose_floor (a) && abs (x - a.c.x) != PLACE_WIDTH)
+  if (! is_on_floor (a, type))
+    while (! is_on_floor (a, type) && abs (x - a.c.x) != PLACE_WIDTH)
       a.c.x += inc;
   else
-    while (is_on_loose_floor (a) && abs (x - a.c.x) != PLACE_WIDTH)
+    while (is_on_floor (a, type) && abs (x - a.c.x) != PLACE_WIDTH)
       a.c.x -= inc;
 
   return inc * (a.c.x - x);
 }
 
 void
-to_loose_floor_edge (struct anim *a)
+to_floor_edge (struct anim *a, enum construct_fg type)
 {
-  int dl = dist_loose_floor (*a);
+  int dl = dist_floor (*a, type);
   int dir = (a->dir == LEFT) ? -1 : +1;
   a->c.x += dir * ((abs (dl) < PLACE_WIDTH) ? dl - 1 : 0);
   printf ("dl = %i\n", dl);
@@ -357,7 +364,8 @@ is_hangable_pos (struct pos p, enum dir direction)
   enum construct_fg fg = construct_rel (p, -1, dir).fg;
 
   return (fg == FLOOR || fg == BROKEN_FLOOR
-          || fg == LOOSE_FLOOR || fg == PILLAR)
+          || fg == LOOSE_FLOOR || fg == OPENER_FLOOR
+          || fg == PILLAR)
     && construct_rel (p, -1, 0).fg == NO_FLOOR;
 }
 
@@ -444,8 +452,8 @@ apply_physics (struct anim *a, ALLEGRO_BITMAP *frame,
     to_back_collision_edge (&na);
   }
 
-  if (is_on_loose_floor (na))
-    release_loose_floor (loose_floor_pos);
+  if (is_on_floor (na, LOOSE_FLOOR))
+    release_loose_floor (floor_pos);
 
   if (is_falling (na)) {
     na.odraw = na.draw;

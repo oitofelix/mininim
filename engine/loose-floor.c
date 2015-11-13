@@ -34,7 +34,7 @@ ALLEGRO_BITMAP *floor_loose_left_01, *floor_loose_right_01, *floor_loose_base_01
 
 ALLEGRO_SAMPLE *loose_floor_01, *loose_floor_02, *loose_floor_03, *broken_floor_sound;
 
-static struct loose_floor loose_floor[PLACES * FLOORS];
+static struct loose_floor loose_floor[LOOSE_FLOORS];
 static struct loose_floor *cfloor;
 
 void
@@ -131,11 +131,11 @@ draw_shake_floor (void)
 void
 release_loose_floor (struct pos p)
 {
-  size_t i = 0;
+  int i = 0;
 
-  for (i = 0; i < PLACES * FLOORS; i++) if (peq (loose_floor[i].p, p)) return;
-  for (i = 0; loose_floor[i].p.room && i < PLACES * FLOORS; i++);
-  if (i == PLACES * FLOORS)
+  for (i = 0; i < LOOSE_FLOORS; i++) if (peq (loose_floor[i].p, p)) return;
+  for (i = 0; loose_floor[i].p.room && i < LOOSE_FLOORS; i++);
+  if (i == LOOSE_FLOORS)
     error (-1, 0, "%s: no free loose floor release slot (%i)",
            __func__, construct (p).fg);
 
@@ -159,7 +159,7 @@ void
 draw_release_loose_floor (void)
 {
   size_t i;
-  for (i = 0; i < PLACES * FLOORS; i++)
+  for (i = 0; i < LOOSE_FLOORS; i++)
     if (loose_floor[i].p.room) {
       if (loose_floor[i].resist-- > 0) return;
       struct pos p = loose_floor[i].p;

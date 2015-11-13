@@ -478,7 +478,7 @@ void draw_kid_walk ()
 
   int dc = dist_collision (kid);
   int df = dist_fall (kid);
-  int dl = dist_loose_floor (kid);
+  int dl = dist_floor (kid, LOOSE_FLOOR);
 
   kid.fall = NULL;
 
@@ -539,7 +539,7 @@ draw_kid_walk_min (void)
   switch (i) {
   case 0: draw_anim (&kid, kid_walk_02, -1, 0); i++; break;
   case 1: draw_anim (&kid, kid_walk_03, +0, 0); i++; break;
-  case 2: draw_anim_on_edge (&kid, kid_walk_11, +1, 0); i++; break;
+  case 2: draw_anim_on_edge (&kid, kid_walk_11, +1, 0, LOOSE_FLOOR); i++; break;
   case 3: draw_anim (&kid, kid_walk_12, +0, 0); i = 0;
     kid.draw = draw_kid_normal;
     kid.collision = draw_kid_collision;
@@ -558,7 +558,7 @@ draw_kid_walk_short_short (void)
   switch (i) {
   case 0: draw_anim (&kid, kid_walk_02, -1, 0); i++; break;
   case 1: draw_anim (&kid, kid_walk_03, +0, 0); i++; break;
-  case 2: draw_anim_on_edge (&kid, kid_walk_04, +1, 0); i++; break;
+  case 2: draw_anim_on_edge (&kid, kid_walk_04, +1, 0, LOOSE_FLOOR); i++; break;
   case 3: draw_anim (&kid, kid_walk_10, +1, 0); i++; break;
   case 4: draw_anim (&kid, kid_walk_11, -1, 0); i++; break;
   case 5: draw_anim (&kid, kid_walk_12, +0, 0); i = 0;
@@ -579,7 +579,7 @@ draw_kid_walk_short (void)
   case 0: draw_anim (&kid, kid_walk_02, -1, 0); i++; break;
   case 1: draw_anim (&kid, kid_walk_03, +0, 0); i++; break;
   case 2: draw_anim (&kid, kid_walk_04, -8, 0); i++; break;
-  case 3: draw_anim_on_edge (&kid, kid_walk_05, +1, 0); i++; break;
+  case 3: draw_anim_on_edge (&kid, kid_walk_05, +1, 0, LOOSE_FLOOR); i++; break;
   case 4: draw_anim (&kid, kid_walk_08, +3, 0); i++; break;
   case 5: draw_anim (&kid, kid_walk_09, -1, 0); i++; break;
   case 6: draw_anim (&kid, kid_walk_10, -1, 0); i++; break;
@@ -603,7 +603,7 @@ draw_kid_walk_long (void)
   case 1: draw_anim (&kid, kid_walk_03, +0, 0); i++; break;
   case 2: draw_anim (&kid, kid_walk_04, -8, 0); i++; break;
   case 3: draw_anim (&kid, kid_walk_05, -7, 0); i++; break;
-  case 4: draw_anim_on_edge (&kid, kid_walk_06, +1, 0); i++; break;
+  case 4: draw_anim_on_edge (&kid, kid_walk_06, +1, 0, LOOSE_FLOOR); i++; break;
   case 5: draw_anim (&kid, kid_walk_08, +3, 0); i++; break;
   case 6: draw_anim (&kid, kid_walk_09, -1, 0); i++; break;
   case 7: draw_anim (&kid, kid_walk_10, -1, 0); i++; break;
@@ -628,7 +628,7 @@ draw_kid_walk_long_long (void)
   case 2: draw_anim (&kid, kid_walk_04, -8, 0); i++; break;
   case 3: draw_anim (&kid, kid_walk_05, -7, 0); i++; break;
   case 4: draw_anim (&kid, kid_walk_06, -6, 0); i++; break;
-  case 5: draw_anim_on_edge (&kid, kid_walk_07, +1, 0); i++; break;
+  case 5: draw_anim_on_edge (&kid, kid_walk_07, +1, 0, LOOSE_FLOOR); i++; break;
   case 6: draw_anim (&kid, kid_walk_08, +3, 0); i++; break;
   case 7: draw_anim (&kid, kid_walk_09, -1, 0); i++; break;
   case 8: draw_anim (&kid, kid_walk_10, -1, 0); i++; break;
@@ -1735,7 +1735,7 @@ draw_kid_misstep (void)
   else if (kid.frame == kid_couch_13) {
     kid.fall = draw_kid_fall;
     kid.draw = draw_kid_normal;
-    draw_anim_on_fall_or_loose_floor_edge (&kid, kid_normal, 0, +0);
+    draw_anim_on_fall_or_floor_edge (&kid, kid_normal, 0, +0, LOOSE_FLOOR);
   } else
     draw_anim (&kid, kid_walk_01, +0, 0);
 
@@ -2037,8 +2037,8 @@ draw_kid_unclimb (void)
   case 10: draw_anim (&kid, kid_climb_04, +5, +4); i++; break;
   case 11: draw_anim (&kid, kid_climb_03, +7, +6); i++; break;
   case 12: draw_anim (&kid, kid_climb_02, +2, +5); i++; break;
-  case 13: draw_anim (&kid, kid_climb_01, +2, +9); i++; break;
-  case 14: draw_anim (&kid, kid_hang_04, -5, +4); i = 0;
+  case 13: draw_anim (&kid, kid_climb_01, +0, +11); i++; break;
+  case 14: draw_anim (&kid, kid_hang_04, -3, +2); i = 0;
     kid.draw = draw_kid_hang;
     hang_pos = npos (prel (hang_pos, +1, (kid.dir == LEFT) ? +1 : -1));
     break;
@@ -2094,7 +2094,8 @@ draw_kid_run_jump (void)
 }
 
 bool
-is_kid_start_run_jump (void) {
+is_kid_start_run_jump (void)
+{
   return kid.frame == kid_run_jump_01
     ||  kid.frame == kid_run_jump_02
     ||  kid.frame == kid_run_jump_03
@@ -2106,12 +2107,34 @@ is_kid_start_run_jump (void) {
 }
 
 bool
-is_kid_run_jump () {
+is_kid_run_jump (void)
+{
   return kid.frame == kid_run_jump_09
     || kid.frame == kid_run_jump_10;
 }
 
 bool
-is_kid_stop_run_jump () {
+is_kid_stop_run_jump (void)
+{
   return kid.frame == kid_run_jump_11;
+}
+
+bool
+is_kid_on_air (void)
+{
+  return kid.frame == kid_jump_04
+    || kid.frame == kid_jump_05
+    || kid.frame == kid_jump_06
+    || kid.frame == kid_jump_07
+    || kid.frame == kid_jump_08
+    || kid.frame == kid_jump_09
+    || kid.frame == kid_jump_10
+    || kid.frame == kid_jump_11
+    || kid.frame == kid_run_jump_06
+    || kid.frame == kid_run_jump_07
+    || kid.frame == kid_run_jump_08
+    || kid.frame == kid_run_jump_09
+    || kid.frame == kid_vjump_12
+    || kid.frame == kid_vjump_13
+    || kid.frame == kid_vjump_15;
 }
