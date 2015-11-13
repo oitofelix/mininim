@@ -374,7 +374,7 @@ is_hangable_pos (struct pos p, enum dir direction)
 
   return (fg == FLOOR || fg == BROKEN_FLOOR
           || fg == LOOSE_FLOOR || fg == OPENER_FLOOR
-          || fg == PILLAR)
+          || fg == PILLAR || fg == DOOR)
     && construct_rel (p, -1, 0).fg == NO_FLOOR;
 }
 

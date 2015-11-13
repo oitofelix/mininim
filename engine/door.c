@@ -31,15 +31,7 @@ ALLEGRO_BITMAP *door_left, *door_right, *door_pole, *door_top, *door_grid,
 
 ALLEGRO_SAMPLE *door_open_sound, *door_close_sound, *door_end_sound;
 
-static struct door {
-  struct pos p;
-  int i;
-  enum {
-    NONE, OPEN, CLOSE
-  } action;
-  int wait;
-  bool noise;
-} door[DOORS];
+static struct door door[DOORS];
 
 void
 load_vdungeon_door (void)
@@ -200,6 +192,8 @@ draw_door_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
   draw_bitmapc (normal_floor_base, bitmap, floor_base_coord (p), 0);
   draw_bitmapc (door_pole, screen, door_pole_coord (p), 0);
+
+  if (is_kid_hanging_at_pos (p)) return;
 
   if (peq (kids.pm, p)) {
     struct door *d = door_at_pos (p);

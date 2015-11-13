@@ -43,7 +43,7 @@ struct level *level;
 
 static bool no_room_drawing = false;
 
-int room_view = 6;
+int room_view = 8;
 
 void
 play_level (struct level *_level)

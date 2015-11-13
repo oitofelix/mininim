@@ -39,6 +39,17 @@
 #define DOOR_CLOSE_SOUND "dat/digisnd1/door gate opening 1.ogg"
 #define DOOR_END_SOUND "dat/digisnd1/drinking potion.ogg"
 
+/* types */
+struct door {
+  struct pos p;
+  int i;
+  enum {
+    NONE, OPEN, CLOSE
+  } action;
+  int wait;
+  bool noise;
+};
+
 void load_vdungeon_door (void);
 void unload_door (void);
 void register_door (struct pos p);

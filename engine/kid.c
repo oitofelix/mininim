@@ -26,6 +26,7 @@
 #include "physics.h"
 #include "level.h"
 #include "room.h"
+#include "door.h"
 #include "kid.h"
 
 struct anim kid;
@@ -236,7 +237,7 @@ load_kid (void)
   kid.ceiling = draw_kid_ceiling;
   kid.draw = draw_kid_normal;
 
-  place_kid (6, 0, 7);
+  place_kid (8, 1, 0);
 }
 
 void
@@ -476,6 +477,9 @@ void draw_kid_walk ()
   kid.draw = draw_kid_walk;
   kid.flip = (kid.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
+  kid.fall = draw_kid_fall;
+  kid.collision = draw_kid_collision;
+
   int dc = dist_collision (kid);
   int df = dist_fall (kid);
   int dl = dist_floor (kid, LOOSE_FLOOR);
@@ -483,7 +487,7 @@ void draw_kid_walk ()
   kid.fall = NULL;
 
   /* in the eminence of collision, keep standing */
-  if (dc < 3) {
+  if (dc < 4) {
     draw_anim (&kid, kid_normal, +0, 0);
     kid.draw = draw_kid_normal;
     return;
@@ -491,7 +495,7 @@ void draw_kid_walk ()
 
   /* in the eminence of fall or steping into a loose floor,
      misstep */
-  if ((df < 3 || dl < 3) && ! misstep) {
+  if ((df < 4 || dl < 4) && ! misstep) {
     misstep = true;
     draw_kid_misstep ();
     return;
@@ -526,6 +530,7 @@ void draw_kid_walk ()
   } else error (-1, 0, "%s: unknown frame (%p)", __func__, kid.frame);
 
   kid.fall = draw_kid_fall;
+  kid.collision = draw_kid_collision;
 }
 
 void
@@ -1758,7 +1763,7 @@ draw_kid_hang (void)
   if (kid.frame == kid_hang_14)
     draw_anim (&kid, kid_hang_04, +0, +0);
   else if (kid.frame == kid_hang_04) {
-    if (up_key)
+    if (up_key && ! hang_limit)
       draw_kid_climb ();
     else if (shift_key && fg == WALL)
       draw_kid_hang_wall ();
@@ -1769,10 +1774,12 @@ draw_kid_hang (void)
       kid.collision = draw_kid_collision;
       if (is_falling (kid)) {
         draw_kid_fall ();
+        hang_limit = false;
         return;
       }
       draw_anim (&kid, kid_vjump_15, +8, +6);
       kid.draw = draw_kid_vjump;
+      hang_limit = false;
     }
   } else {
     kid.frame = kid_hang_14;
@@ -1797,12 +1804,13 @@ draw_kid_hang_wall (void)
   kid.fall = NULL;
   kid.collision = NULL;
 
-  if (! shift_key) {
+  if (! shift_key || hang_limit) {
     i = 0;
     kid.fall = draw_kid_fall;
     kid.collision = draw_kid_collision;
     if (is_falling (kid)) {
       draw_kid_fall ();
+      hang_limit = false;
       return;
     }
     kid.frame = kid_vjump_15;
@@ -1810,6 +1818,7 @@ draw_kid_hang_wall (void)
     kid.c.y = 63 * pos (coord_m (kid)).floor;
     draw_anim (&kid, kid_vjump_15, +0, +0);
     kid.draw = draw_kid_vjump;
+    hang_limit = false;
     return;
   } if (up_key) {
     kid.fall = draw_kid_fall;
@@ -1935,6 +1944,7 @@ void
 draw_kid_climb (void)
 {
   static int i = 0;
+  static int wait = 4;
 
   kid.draw = draw_kid_climb;
   kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
@@ -1943,6 +1953,7 @@ draw_kid_climb (void)
   if (construct_rel (hang_pos, -1, dir).fg != NO_FLOOR)
     kid.fall = NULL;
   kid.collision = NULL;
+  kid.back_collision = NULL;
 
   switch (i) {
   case 0:
@@ -1954,7 +1965,24 @@ draw_kid_climb (void)
     draw_anim (&kid, kid_climb_01, +0, +0); i++; break;
   case 1: draw_anim (&kid, kid_climb_02, -2, -9); i++; break;
   case 2: draw_anim (&kid, kid_climb_03, -2, -5); i++; break;
-  case 3: draw_anim (&kid, kid_climb_04, -7, -6); i++; break;
+  case 3:
+    if (wait == 4) draw_anim (&kid, kid_climb_04, -7, -6);
+    if (kids.ctf == DOOR && wait == 0) {
+      wait = 4;
+      i = 0;
+      int dir = (kid.dir == LEFT) ? -1 : +1;
+      hang_pos = prel (hang_pos, -1, dir);
+      hang_limit = true;
+      draw_kid_unclimb ();
+      return;
+    } else if (kids.ctf == DOOR
+               && door_at_pos (kids.ptf)->i > 40
+               && wait > 0) {
+      if (wait < 4) redraw_anim (kid);
+      wait--;
+    }
+    else i++;
+    break;
   case 4: draw_anim (&kid, kid_climb_05, -5, -4); i++; break;
   case 5: draw_anim (&kid, kid_climb_06, -2, -5); i++; break;
   case 6: draw_anim (&kid, kid_climb_07, -1, -5); i++; break;
@@ -1975,9 +2003,9 @@ draw_kid_climb (void)
 
   kid.fall = draw_kid_fall;
   kid.collision = draw_kid_collision;
+  kid.back_collision = draw_kid_back_collision;
 
-  if (kid.draw != draw_kid_climb)
-    i = 0;
+  if (kid.draw != draw_kid_climb) i = 0;
 }
 
 bool
@@ -2014,6 +2042,8 @@ void
 draw_kid_unclimb (void)
 {
   static int i = 0;
+
+  if (kid.draw == draw_kid_climb) i = 11;
 
   kid.draw = draw_kid_unclimb;
   kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;

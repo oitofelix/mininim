@@ -201,9 +201,19 @@ draw_anim_on_edge (struct anim *a, ALLEGRO_BITMAP* frame, int dx, int dy,
 {
   struct anim na = next_anim (*a, frame, +0, 0);
   (*a) = na;
-  to_collision_edge (a);
-  to_fall_edge (a);
-  to_floor_edge (a, type);
+
+  int dc = dist_collision (na);
+  int df = dist_fall (na);
+  int dl = dist_floor (na, LOOSE_FLOOR);
+
+  bool collision = abs (dc) >= PLACE_WIDTH;
+  bool floor = abs (dl) >= PLACE_WIDTH;
+  bool fall = abs (df) >= PLACE_WIDTH;
+
+  if (collision) to_collision_edge (a);
+  else if (floor) to_floor_edge (a, type);
+  else if (fall) to_fall_edge (a);
+
   draw_anim (a, frame, dx, dy);
 }
 
