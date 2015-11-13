@@ -1402,7 +1402,7 @@ draw_kid_fall (void)
 
   /* comming from fall */
   if (kid.frame == kid_fall_13)
-    draw_anim (&kid, kid_fall_14, -inertia, +5);
+    draw_anim (&kid, kid_fall_14, -inertia / 2, +5);
   else if (kid.frame == kid_fall_14)
     draw_anim (&kid, kid_fall_15, -inertia, +10);
   else if (kid.frame == kid_fall_15)
@@ -1709,7 +1709,7 @@ draw_kid_misstep (void)
   kid.draw = draw_kid_misstep;
   kid.flip = (kid.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  kid.fall = NULL;
+  if (kids.cmba != NO_FLOOR) kid.fall = NULL;
 
   if (kid.frame == kid_walk_01)
     draw_anim (&kid, kid_walk_02, +0, 0);
@@ -1739,9 +1739,7 @@ draw_kid_misstep (void)
   } else
     draw_anim (&kid, kid_walk_01, +0, 0);
 
-  /* if this function won't be called next, restore the fall
-     behavior */
-  if (kid.draw != draw_kid_misstep) kid.fall = draw_kid_fall;
+  kid.fall = draw_kid_fall;
 }
 
 void
@@ -1753,7 +1751,8 @@ draw_kid_hang (void)
   int dir = (kid.dir == LEFT) ? -1 : +1;
   enum construct_fg fg = construct_rel (hang_pos, 0, dir).fg;
 
-  kid.fall = NULL;
+  if (construct_rel (hang_pos, -1, dir).fg != NO_FLOOR)
+    kid.fall = NULL;
   kid.collision = NULL;
 
   if (kid.frame == kid_hang_14)
@@ -1845,7 +1844,9 @@ draw_kid_hang_free (void)
   kid.draw = draw_kid_hang_free;
   kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  kid.fall = NULL;
+  int dir = (kid.dir == LEFT) ? -1 : +1;
+  if (construct_rel (hang_pos, -1, dir).fg != NO_FLOOR)
+    kid.fall = NULL;
   kid.collision = NULL;
 
   if (! shift_key || hang_limit) {
@@ -1938,7 +1939,9 @@ draw_kid_climb (void)
   kid.draw = draw_kid_climb;
   kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  kid.fall = NULL;
+  int dir = (kid.dir == LEFT) ? -1 : +1;
+  if (construct_rel (hang_pos, -1, dir).fg != NO_FLOOR)
+    kid.fall = NULL;
   kid.collision = NULL;
 
   switch (i) {
@@ -1970,12 +1973,11 @@ draw_kid_climb (void)
     break;
   }
 
-  if (kid.draw != draw_kid_climb) {
-    kid.fall = draw_kid_fall;
-    kid.collision = draw_kid_collision;
-    i = 0;
-  }
+  kid.fall = draw_kid_fall;
+  kid.collision = draw_kid_collision;
 
+  if (kid.draw != draw_kid_climb)
+    i = 0;
 }
 
 bool
@@ -2134,6 +2136,8 @@ is_kid_on_air (void)
     || kid.frame == kid_run_jump_07
     || kid.frame == kid_run_jump_08
     || kid.frame == kid_run_jump_09
+    || kid.frame == kid_run_jump_10
+    || kid.frame == kid_run_jump_11
     || kid.frame == kid_vjump_12
     || kid.frame == kid_vjump_13
     || kid.frame == kid_vjump_15;
@@ -2145,7 +2149,6 @@ is_kid_hanging_at_pos (struct pos p)
   int dir = (kid.dir == LEFT) ? -1 : +1;
   return ((is_kid_hang ()
            || is_kid_start_climb ()
-           || is_kid_stop_climb ()
            || is_kid_climb ())
           && peq (prel (kids.pbb, -1, dir), p));
 }

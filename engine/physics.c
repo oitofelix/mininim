@@ -295,6 +295,7 @@ is_on_floor (struct anim a, enum construct_fg type)
           || is_kid_stabilize ()
           || is_kid_turn ()
           || is_kid_start_jump ()
+          || is_kid_run_jump ()
           || is_kid_jump ())) return false;
 
   struct survey s = survey (a, pos);
@@ -398,14 +399,13 @@ is_hangable (struct anim a)
   struct coord tf = coord_tf (a);
   struct coord ch;
   int dir = (a.dir == LEFT) ? 0 : 1;
-  ch.x = PLACE_WIDTH * (hang_pos.place + dir) + 7 + 12 * dir;
+  ch.x = PLACE_WIDTH * (hang_pos.place + dir) + 7 + 8 * dir;
   ch.y = PLACE_HEIGHT * hang_pos.floor - 6;
 
-  /* printf ("dist_coord = %f\n", dist_coord (tf, ch)); */
-
   if (a.id == &kid && is_kid_fall ()
-      && a.odraw != draw_kid_turn_run
       && dist_coord (tf, ch) > 16) return false;
+
+  printf ("dist_coord = %f\n", dist_coord (tf, ch));
 
   return true;
 }

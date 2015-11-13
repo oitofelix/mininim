@@ -246,7 +246,11 @@ draw_floor_corner_03 (ALLEGRO_BITMAP *bitmap, struct pos p)
 void
 draw_floor_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
-  if (peq (p, prel (kids.ptl, 0, +1))
+  if ((peq (p, prel (kids.ptl, 0, +1))
+       || peq (p, prel (kids.pm, 0, +1))
+       /* || peq (p, prel (kidsf.ptl, 0, +1)) */
+       /* || peq (p, prel (kidsf.pm, 0, +1)) */
+       )
       && is_kid_fall ())
     switch (construct (p).fg) {
     case FLOOR:
@@ -288,7 +292,8 @@ draw_floor_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
              && ! (is_kid_hang () && kid.dir == LEFT)
              && ! ((is_kid_climb ()
                     || is_kid_start_climb ())
-                   && kid.dir == LEFT)) {
+                   && kid.dir == LEFT)
+             && floor_left_coord (p).y <= kids.tl.y) {
     switch (construct (p).fg) {
     case FLOOR:
       draw_floor (bitmap, p);

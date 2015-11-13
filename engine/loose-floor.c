@@ -105,6 +105,7 @@ draw_shake_floor (void)
           && kid.frame != kid_jump_13
           && (! kid.just_fall || kid.frame != kid_couch_02)
           && kid.frame != kid_vjump_19
+          && kid.frame != kid_run_jump_11
           && (kid.frame != kid_couch_11
               || kid.draw != draw_kid_misstep))) return;
 
@@ -116,14 +117,13 @@ draw_shake_floor (void)
       switch (i) {
       case 0: draw_loose_floor_01 (screen, p);
         play_sample (loose_floor_sample ()); break;
-      case 1: draw_floor (screen, p);
-        play_sample (loose_floor_sample ()); break;
+      case 1: draw_floor (screen, p); break;
       case 2: draw_loose_floor_02 (screen, p);
-        play_sample (loose_floor_sample ()); break;
-      case 3: draw_floor (screen, p);
-        play_sample (loose_floor_sample ()); break;
+        play_sample (loose_floor_sample ());
+        break;
+      case 3: draw_floor (screen, p); break;
       }
-      i = (i < 3)? i + 1 : 0;
+      i = (i < 3) ? i + 1 : 0;
       draw_construct_left (screen, prel (p, 0, +1));
     }
 }
@@ -167,14 +167,11 @@ draw_release_loose_floor (void)
       switch (loose_floor[i].i) {
       case 0: draw_loose_floor_01 (screen, p);
         play_sample (loose_floor_sample ()); break;
-      case 1: draw_floor (screen, p);
-        play_sample (loose_floor_sample ()); break;
+      case 1: draw_floor (screen, p); break;
       case 2: draw_loose_floor_02 (screen, p);
         play_sample (loose_floor_sample ()); break;
-      case 3: draw_loose_floor_02 (screen, p);
-        play_sample (loose_floor_sample ()); break;
-      case 4: draw_floor (screen, p);
-        play_sample (loose_floor_sample ()); break;
+      case 3: draw_loose_floor_02 (screen, p); break;
+      case 4: draw_floor (screen, p); break;
       case 5: draw_floor (screen, p); break;
       case 6: draw_floor (screen, p); break;
       case 7: draw_loose_floor_02 (screen, p);
