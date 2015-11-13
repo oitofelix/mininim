@@ -58,7 +58,7 @@ static struct level level_1 = {
       {WALL}, {WALL}, {WALL}, {WALL}, {WALL}}},
 
     [6] =
-    {{{FLOOR,TORCH}, {FLOOR,BRICKS_01}, {OPENER_FLOOR}, {NO_FLOOR}, {PILLAR},
+    {{{FLOOR,TORCH}, {FLOOR,BRICKS_01}, {OPENER_FLOOR,NO_BG,0}, {NO_FLOOR}, {PILLAR},
       {FLOOR}, {FLOOR,BRICKS_01}, {FLOOR,TORCH}, {FLOOR}, {PILLAR}},
      {{WALL}, {WALL}, {WALL}, {NO_FLOOR}, {WALL},
       {WALL}, {WALL}, {WALL}, {WALL}, {WALL}},
@@ -89,6 +89,10 @@ static struct level level_1 = {
            [6] = {7, 2, 0, 0},
            [7] = {0, 6, 0, 0},
            [9] = {3, 0, 0, 0},},
+
+  .event = {
+    [0] = {{7,0,9}, false},
+  }
 };
 
 void

@@ -23,6 +23,7 @@
 #include "room.h"
 #include "floor.h"
 #include "kid.h"
+#include "level.h"
 #include "door.h"
 
 ALLEGRO_BITMAP *door_left, *door_right, *door_pole, *door_top, *door_grid,
@@ -33,6 +34,11 @@ ALLEGRO_SAMPLE *door_open_sound, *door_close_sound, *door_end_sound;
 static struct door {
   struct pos p;
   int i;
+  enum {
+    NONE, OPEN, CLOSE
+  } action;
+  int wait;
+  bool noise;
 } door[DOORS];
 
 void
@@ -81,34 +87,87 @@ register_door (struct pos p)
 
   door[i].p = p;
   door[i].i = DOOR_MAX_STEP;
+  door[i].action = NONE;
+  door[i].wait = DOOR_WAIT;
+  door[i].noise = false;
 }
 
-struct door
+struct door *
 door_at_pos (struct pos p)
 {
   int i;
-  for (i = 0; i < DOORS; i++) if (peq (door[i].p, p)) return door[i];
+  for (i = 0; i < DOORS; i++) if (peq (door[i].p, p)) return &door[i];
   error (-1, 0, "%s: no door at position (%i, %i, %i)",
          __func__, p.room, p.floor, p.place);
-  return door[0];
+  return &door[0];
+}
+
+
+void
+open_door (int e)
+{
+  do {
+    struct door *d = door_at_pos (level->event[e].p);
+    d->action = OPEN;
+    d->wait = DOOR_WAIT;
+  } while (level->event[e++].next);
 }
 
 void
 draw_doors (void)
 {
   int i;
-  for (i = 0; i < DOORS; i++)
-    if (door[i].p.room && is_pos_visible (door[i].p)) {
-      draw_door_grid (screen, door[i].p, door[i].i);
-      draw_construct_left (screen, prel (door[i].p, -1, +1));
+  for (i = 0; i < DOORS; i++) {
+    struct door *d = &door[i];
+    if (d->p.room) {
+      switch (d->action) {
+      case OPEN:
+        if (d->i == 0 && d->wait == 0) d->action = CLOSE;
+        else if (d->i == 0 && d->wait > 0) {
+          if (! d->noise) {
+            play_sample (door_end_sound);
+            d->noise = true;
+          }
+
+          d->wait--;
+        }
+        else if (d->i > 0) {
+          if (d->i % 2 == 0) play_sample (door_open_sound);
+          d->i--;
+          d->wait = DOOR_WAIT;
+        }
+        break;
+      case CLOSE:
+        if (d->i < DOOR_MAX_STEP) {
+          if (d->wait++ % 4 == 0) {
+            play_sample (door_close_sound);
+            d->i++;
+            d->noise = false;
+          }
+        } else if (d->i == DOOR_MAX_STEP) {
+          play_sample (door_end_sound);
+          d->action = NONE;
+          d->wait = DOOR_WAIT;
+          d->noise = false;
+        }
+        break;
+      default:
+        break;
+      }
+
+      if (is_pos_visible (d->p)) {
+        draw_door_grid (screen, d->p, d->i);
+        draw_construct_left (screen, prel (d->p, -1, +1));
+      }
     }
+  }
 }
 
 int
 door_grid_tip_y (struct pos p)
 {
   int h = al_get_bitmap_height (door_grid_tip);
-  return door_grid_tip_coord (p, door_at_pos (p).i).y + h - 1;
+  return door_grid_tip_coord (p, door_at_pos (p)->i).y + h - 1;
 }
 
 void
@@ -143,8 +202,8 @@ draw_door_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
   draw_bitmapc (door_pole, screen, door_pole_coord (p), 0);
 
   if (peq (kids.pm, p)) {
-    struct door door = door_at_pos (p);
-    draw_door_grid (screen, p, door.i);
+    struct door *d = door_at_pos (p);
+    draw_door_grid (screen, p, d->i);
     draw_construct_left (screen, prel (p, -1, +1));
   }
 }

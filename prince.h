@@ -25,6 +25,7 @@
 #define ROOMS 25
 #define FLOORS 3
 #define PLACES 10
+#define EVENTS 256
 
 #define DISPLAY_WIDTH 640
 #define DISPLAY_HEIGHT 400
@@ -102,11 +103,17 @@ struct level {
       TORCH,
       WINDOW,
     } bg;
+    int event;
   } construct[ROOMS][FLOORS][PLACES];
 
   struct {
     int l, r, a, b;
   } link[ROOMS];
+
+  struct {
+    struct pos p;
+    bool next;
+  } event[EVENTS];
 };
 
 struct survey {

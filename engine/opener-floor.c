@@ -24,10 +24,12 @@
 #include "room.h"
 #include "floor.h"
 #include "kid.h"
+#include "door.h"
 #include "opener-floor.h"
 
 static struct opener_floor {
   struct pos p;
+  int event;
   bool pressed;
   bool noise;
   int resist_on;
@@ -59,6 +61,7 @@ register_opener_floor (struct pos p)
            __func__, construct (p).fg);
 
   opener_floor[i].p = p;
+  opener_floor[i].event = construct (p).event;
   opener_floor[i].pressed = false;
   opener_floor[i].noise = false;
   opener_floor[i].resist_on = 1;
@@ -98,6 +101,7 @@ draw_opener_floors (void)
         }
 
         draw_opener_floors_0 (o);
+        open_door (o->event);
       } else {
         if (o->resist_off > 0) {
           o->resist_off--;
