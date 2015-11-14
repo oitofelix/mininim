@@ -26,6 +26,9 @@
 #define DOOR_MAX_STEP 47
 #define DOOR_WAIT SECS_TO_SCYCLES (5)
 
+#define DOOR_CLIMB_LIMIT 40
+#define DOOR_WAIT_LOOK 4
+
 /* bitmaps */
 #define VDUNGEON_DOOR_LEFT "dat/vdungeon/door/door frame left.png"
 #define VDUNGEON_DOOR_RIGHT "dat/vdungeon/door/door frame right.png"

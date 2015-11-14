@@ -1454,7 +1454,9 @@ draw_kid_couch (void)
       && ! is_kid_stop_couch ()
       && odraw != draw_kid_fall
       && construct_rel (p, 0, dir).fg == NO_FLOOR
-      && dist_next_place (kid) > 9) {
+      && dist_next_place (kid) > 9
+      && ! (kids.ctf == DOOR && kid.dir == LEFT
+            && door_at_pos (kids.ptf)->i > DOOR_CLIMB_LIMIT)) {
     hang_pos = p;
     draw_kid_unclimb ();
     return;
@@ -1521,13 +1523,9 @@ draw_kid_couch (void)
     draw_anim (&kid, kid_couch_01, -1, 0);
   }
 
-  /* if this function won't be called next, restore the fall and
-     collision behavior */
-  if (kid.draw != draw_kid_couch) {
-    kid.collision = draw_kid_collision;
-    kid.back_collision = draw_kid_back_collision;
-    kid.fall = draw_kid_fall;
-  }
+  kid.collision = draw_kid_collision;
+  kid.back_collision = draw_kid_back_collision;
+  kid.fall = draw_kid_fall;
 }
 
 bool
@@ -1944,7 +1942,7 @@ void
 draw_kid_climb (void)
 {
   static int i = 0;
-  static int wait = 4;
+  static int wait = DOOR_WAIT_LOOK;
 
   kid.draw = draw_kid_climb;
   kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
@@ -1966,9 +1964,9 @@ draw_kid_climb (void)
   case 1: draw_anim (&kid, kid_climb_02, -2, -9); i++; break;
   case 2: draw_anim (&kid, kid_climb_03, -2, -5); i++; break;
   case 3:
-    if (wait == 4) draw_anim (&kid, kid_climb_04, -7, -6);
+    if (wait == DOOR_WAIT_LOOK) draw_anim (&kid, kid_climb_04, -7, -6);
     if (kids.ctf == DOOR && wait == 0) {
-      wait = 4;
+      wait = DOOR_WAIT_LOOK;
       i = 0;
       int dir = (kid.dir == LEFT) ? -1 : +1;
       hang_pos = prel (hang_pos, -1, dir);
@@ -1976,9 +1974,9 @@ draw_kid_climb (void)
       draw_kid_unclimb ();
       return;
     } else if (kids.ctf == DOOR
-               && door_at_pos (kids.ptf)->i > 40
+               && door_at_pos (kids.ptf)->i > DOOR_CLIMB_LIMIT
                && wait > 0) {
-      if (wait < 4) redraw_anim (kid);
+      if (wait < DOOR_WAIT_LOOK) redraw_anim (kid);
       wait--;
     }
     else i++;
