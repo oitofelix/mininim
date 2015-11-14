@@ -28,6 +28,7 @@
 #include "wall.h"
 #include "level.h"
 #include "room.h"
+#include "loose-floor.h"
 #include "opener-floor.h"
 #include "floor.h"
 
@@ -246,18 +247,18 @@ draw_floor_corner_03 (ALLEGRO_BITMAP *bitmap, struct pos p)
 void
 draw_floor_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
+  struct loose_floor *l;
+
   if ((peq (p, prel (kids.ptl, 0, +1))
-       || peq (p, prel (kids.pm, 0, +1))
-       /* || peq (p, prel (kidsf.ptl, 0, +1)) */
-       /* || peq (p, prel (kidsf.pm, 0, +1)) */
-       )
+       || peq (p, prel (kids.pm, 0, +1)))
       && is_kid_fall ())
     switch (construct (p).fg) {
     case FLOOR:
       draw_floor_left (bitmap, p);
       break;
     case LOOSE_FLOOR:
-      draw_floor_left (bitmap, p);
+      l = loose_floor_at_pos (p);
+      l->draw_left (bitmap, l);
       break;
     case OPENER_FLOOR:
       draw_opener_floor_fg (bitmap, p);
@@ -299,7 +300,8 @@ draw_floor_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
       draw_floor (bitmap, p);
       break;
     case LOOSE_FLOOR:
-      draw_floor (bitmap, p);
+      l = loose_floor_at_pos (p);
+      l->draw (bitmap, l);
       break;
     case OPENER_FLOOR:
       draw_opener_floor_fg (bitmap, p);

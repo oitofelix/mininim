@@ -237,7 +237,7 @@ load_kid (void)
   kid.ceiling = draw_kid_ceiling;
   kid.draw = draw_kid_normal;
 
-  place_kid (8, 1, 0);
+  place_kid (7, 0, 9);
 }
 
 void
@@ -2048,6 +2048,7 @@ draw_kid_unclimb (void)
 
   kid.fall = NULL;
   kid.collision = NULL;
+  kid.back_collision = NULL;
 
   switch (i) {
   case 0:
@@ -2076,6 +2077,7 @@ draw_kid_unclimb (void)
 
   kid.fall = draw_kid_fall;
   kid.collision = draw_kid_collision;
+  kid.back_collision = draw_kid_back_collision;
 
   if (kid.draw != draw_kid_unclimb) i = 0;
 }

@@ -28,14 +28,7 @@
 #include "floor.h"
 #include "opener-floor.h"
 
-static struct opener_floor {
-  struct pos p;
-  int event;
-  bool pressed;
-  bool noise;
-  int resist_on;
-  int resist_off;
-} opener_floor[OPENER_FLOORS];
+static struct opener_floor opener_floor[OPENER_FLOORS];
 
 ALLEGRO_SAMPLE *opener_floor_sound;
 

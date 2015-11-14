@@ -22,10 +22,21 @@
 
 #include "pos.h"
 
+/* constants */
 #define OPENER_FLOORS 30
 
 /* sounds */
 #define OPENER_FLOOR_SOUND "dat/digisnd1/door tile pressed 1.ogg"
+
+/* types */
+struct opener_floor {
+  struct pos p;
+  int event;
+  bool pressed;
+  bool noise;
+  int resist_on;
+  int resist_off;
+};
 
 void load_opener_floor_sounds (void);
 void unload_opener_floor_sounds (void);

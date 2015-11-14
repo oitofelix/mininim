@@ -466,9 +466,6 @@ apply_physics (struct anim *a, ALLEGRO_BITMAP *frame,
     to_back_collision_edge (&na);
   }
 
-  if (is_on_floor (na, LOOSE_FLOOR))
-    release_loose_floor (floor_pos);
-
   if (is_falling (na)) {
     na.odraw = na.draw;
     na.draw = na.fall;

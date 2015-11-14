@@ -43,7 +43,7 @@ struct level *level;
 
 static bool no_room_drawing = false;
 
-int room_view = 8;
+int room_view = 7;
 
 void
 play_level (struct level *_level)
@@ -52,7 +52,10 @@ play_level (struct level *_level)
 
   level = _level;
   load_level ();
+
+  register_loose_floors ();
   play_anim (level_anim, 12);
+
   unload_level ();
 }
 
@@ -112,9 +115,8 @@ level_draw_base (void)
   clear_bitmap (screen, BLACK);
   if (! no_room_drawing) draw_room (room_view);
   draw_fire (room_view);
-  draw_shake_floor ();
+  draw_loose_floors ();
   draw_opener_floors ();
-  draw_release_loose_floor ();
   draw_spikes ();
   draw_doors ();
 }

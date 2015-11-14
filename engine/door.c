@@ -89,7 +89,7 @@ door_at_pos (struct pos p)
 {
   int i;
   for (i = 0; i < DOORS; i++) if (peq (door[i].p, p)) return &door[i];
-  error (-1, 0, "%s: no door at position (%i, %i, %i)",
+  error (-1, 0, "%s: no door at position has been registered  (%i, %i, %i)",
          __func__, p.room, p.floor, p.place);
   return &door[0];
 }

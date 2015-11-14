@@ -76,6 +76,7 @@ load_room (void)
     error (-1, 0, "%s: unknown level type (%i)", __func__, level->type);
   }
 
+  load_loose_floor_sounds ();
   load_opener_floor_sounds ();
 }
 
@@ -90,6 +91,7 @@ unload_room (void)
   unload_door ();
 
   /* sounds */
+  unload_loose_floor_sounds ();
   unload_opener_floor_sounds ();
 
   /* bitmaps */
@@ -204,7 +206,7 @@ draw_construct_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
   case NO_FLOOR: break;
   case FLOOR: draw_floor (bitmap, p); break;
   case BROKEN_FLOOR: draw_broken_floor (bitmap, p); break;
-  case LOOSE_FLOOR: draw_floor (bitmap, p); break;
+  case LOOSE_FLOOR: break;
   case SPIKES_FLOOR: draw_spikes_floor (bitmap, p); break;
   case OPENER_FLOOR: register_opener_floor (p); break;
   case PILLAR: draw_pillar (bitmap, p); break;
@@ -236,11 +238,16 @@ draw_construct_bg (ALLEGRO_BITMAP *bitmap, struct pos p)
 void
 draw_construct_left (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
+  struct loose_floor *l;
+
   switch (construct (p).fg) {
   case NO_FLOOR: break;
   case FLOOR: draw_floor_left (bitmap, p); break;
   case BROKEN_FLOOR: draw_broken_floor_left (bitmap, p); break;
-  case LOOSE_FLOOR: draw_floor_left (bitmap, p); break;
+  case LOOSE_FLOOR:
+    l = loose_floor_at_pos (p);
+    l->draw_left (bitmap, l);
+    break;
   case SPIKES_FLOOR: draw_spikes_floor_left (bitmap, p); break;
   case OPENER_FLOOR: draw_opener_floor_left (bitmap, p); break;
   case PILLAR: draw_pillar_left (bitmap, p); break;
@@ -255,11 +262,16 @@ draw_construct_left (ALLEGRO_BITMAP *bitmap, struct pos p)
 void
 draw_construct_right (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
+  struct loose_floor *l;
+
   switch (construct (p).fg) {
   case NO_FLOOR: break;
   case FLOOR: draw_floor_right (bitmap, p); break;
   case BROKEN_FLOOR: draw_broken_floor_right (bitmap, p); break;
-  case LOOSE_FLOOR: draw_floor_right (bitmap, p); break;
+  case LOOSE_FLOOR:
+    l = loose_floor_at_pos (p);
+    l->draw_right (bitmap, l);
+    break;
   case SPIKES_FLOOR: draw_spikes_floor_right (bitmap, p); break;
   case OPENER_FLOOR: draw_opener_floor_right (bitmap, p); break;
   case PILLAR: draw_pillar_right (bitmap, p); break;
