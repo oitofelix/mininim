@@ -68,7 +68,6 @@ struct anim {
   enum dir dir;
   int repeat;
   int flip;
-  bool just_fall;
   void (*draw) (void);
   void (*odraw) (void);
   void (*collision) (void);

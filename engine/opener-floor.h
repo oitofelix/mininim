@@ -23,7 +23,12 @@
 #include "pos.h"
 
 /* constants */
-#define OPENER_FLOORS 30
+#define OPENER_FLOOR_ON_RESISTENCE 1
+#define OPENER_FLOOR_OFF_RESISTENCE 3
+
+/* bitmaps */
+#define VDUNGEON_UNPRESSED_OPENER_FLOOR_LEFT "dat/vdungeon/floor panels/opener left unpressed.png"
+#define VDUNGEON_UNPRESSED_OPENER_FLOOR_BASE "dat/vdungeon/floor panels/opener base unpressed.png"
 
 /* sounds */
 #define OPENER_FLOOR_SOUND "dat/digisnd1/door tile pressed 1.ogg"
@@ -32,18 +37,30 @@
 struct opener_floor {
   struct pos p;
   int event;
-  bool pressed;
   bool noise;
   int resist_on;
   int resist_off;
+
+  void (*draw) (ALLEGRO_BITMAP *bitmap, struct opener_floor *l);
+  void (*draw_left) (ALLEGRO_BITMAP *bitmap, struct opener_floor *l);
+  void (*draw_right) (ALLEGRO_BITMAP *bitmap, struct opener_floor *l);
 };
 
+void load_vdungeon_opener_floor (void);
+void unload_opener_floor (void);
 void load_opener_floor_sounds (void);
 void unload_opener_floor_sounds (void);
 void register_opener_floor (struct pos p);
-struct opener_floor *opener_floor_at_pos (struct pos p);
+struct opener_floor * opener_floor_at_pos (struct pos p);
 void draw_opener_floors (void);
-bool is_opener_floor_pressed (struct pos p);
-void draw_opener_floor_fg (ALLEGRO_BITMAP *bitmap, struct pos p);
+void draw_pressed_opener_floor (ALLEGRO_BITMAP *bitmap, struct opener_floor *o);
+void draw_pressed_opener_floor_left (ALLEGRO_BITMAP *bitmap, struct opener_floor *o);
+void draw_pressed_opener_floor_right (ALLEGRO_BITMAP *bitmap, struct opener_floor *o);
+void draw_unpressed_opener_floor_base (ALLEGRO_BITMAP *bitmap, struct pos p);
+void draw_unpressed_opener_floor (ALLEGRO_BITMAP *bitmap, struct opener_floor *o);
+void draw_unpressed_opener_floor_left (ALLEGRO_BITMAP *bitmap, struct opener_floor *o);
+void draw_unpressed_opener_floor_right (ALLEGRO_BITMAP *bitmap, struct opener_floor *o);
+struct coord unpressed_opener_floor_left_coord (struct pos p);
+struct coord unpressed_opener_floor_right_coord (struct pos p);
 
 #endif	/* FREEPOP_OPENER_FLOOR_H */

@@ -192,7 +192,7 @@ is_falling (struct anim a)
   struct coord bf = coord_bf (a);
   struct pos pbf = pos (bf);
   struct construct cbf = construct (pbf);
-  struct pos pbfn = pos (coord_bf (next_anim (a, a.frame, 0, 33)));
+  struct pos pbfn = pos (coord_bf (next_anim (a, a.frame, 0, 34)));
 
   if (cbf.fg == NO_FLOOR || pbf.floor == pbfn.floor) return true;
 

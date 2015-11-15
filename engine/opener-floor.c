@@ -20,6 +20,7 @@
 #include <error.h>
 #include "kernel/audio.h"
 #include "kernel/video.h"
+#include "kernel/array.h"
 #include "physics.h"
 #include "room.h"
 #include "floor.h"
@@ -28,9 +29,26 @@
 #include "floor.h"
 #include "opener-floor.h"
 
-static struct opener_floor opener_floor[OPENER_FLOORS];
+ALLEGRO_BITMAP *unpressed_opener_floor_left, *unpressed_opener_floor_base;
 
 ALLEGRO_SAMPLE *opener_floor_sound;
+
+static struct opener_floor *opener_floor = NULL;
+static size_t opener_floor_nmemb = 0;
+
+void
+load_vdungeon_opener_floor (void)
+{
+  unpressed_opener_floor_left = load_bitmap (VDUNGEON_UNPRESSED_OPENER_FLOOR_LEFT);
+  unpressed_opener_floor_base = load_bitmap (VDUNGEON_UNPRESSED_OPENER_FLOOR_BASE);
+}
+
+void
+unload_opener_floor (void)
+{
+  al_destroy_bitmap (unpressed_opener_floor_left);
+  al_destroy_bitmap (unpressed_opener_floor_base);
+}
 
 void
 load_opener_floor_sounds (void)
@@ -47,26 +65,24 @@ unload_opener_floor_sounds (void)
 void
 register_opener_floor (struct pos p)
 {
-  int i;
-  for (i = 0; i < OPENER_FLOORS; i++) if (peq (opener_floor[i].p, p)) return;
-  for (i = 0; opener_floor[i].p.room && i < OPENER_FLOORS; i++);
-  if (i == OPENER_FLOORS)
-    error (-1, 0, "%s: no free opener floor slot (%i)",
-           __func__, construct (p).fg);
+  struct opener_floor o;
 
-  opener_floor[i].p = p;
-  opener_floor[i].event = construct (p).event;
-  opener_floor[i].pressed = false;
-  opener_floor[i].noise = false;
-  opener_floor[i].resist_on = 1;
-  opener_floor[i].resist_off = 0;
+  o.p = p;
+  o.event = construct (p).event;
+  o.noise = false;
+  o.resist_on = OPENER_FLOOR_ON_RESISTENCE;
+  o.resist_off = OPENER_FLOOR_OFF_RESISTENCE;
+
+  opener_floor =
+    add_to_array (&o, 1, opener_floor, &opener_floor_nmemb,
+                  opener_floor_nmemb, sizeof (o));
 }
 
 struct opener_floor *
 opener_floor_at_pos (struct pos p)
 {
-  int i;
-  for (i = 0; i < OPENER_FLOORS; i++)
+  size_t i;
+  for (i = 0; i < opener_floor_nmemb; i++)
     if (peq (opener_floor[i].p, p)) return &opener_floor[i];
   error (-1, 0, "%s: no opener floor at position has been registered (%i, %i, %i)",
          __func__, p.room, p.floor, p.place);
@@ -76,14 +92,16 @@ opener_floor_at_pos (struct pos p)
 void
 draw_opener_floors (void)
 {
-  int i;
-  for (i = 0; i < OPENER_FLOORS; i++) {
+  if (opener_floor_nmemb == 0) return;
+
+  size_t i;
+  for (i = opener_floor_nmemb - 1; (int) i >= 0; i--) {
     struct opener_floor *o = &opener_floor[i];
-    if (o->p.room && is_pos_visible (o->p)) {
+    if (is_pos_visible (o->p)) {
       if (is_on_floor (kid, OPENER_FLOOR)
           && peq (floor_pos, o->p)) {
 
-        o->resist_off = 3;
+        o->resist_off = OPENER_FLOOR_OFF_RESISTENCE;
 
         if (o->resist_on > 0) o->resist_on--;
         else {
@@ -98,27 +116,112 @@ draw_opener_floors (void)
         if (o->resist_off > 0) o->resist_off--;
         else {
           o->noise = false;
-          o->resist_on = 1;
+          o->resist_on = OPENER_FLOOR_ON_RESISTENCE;
         }
       }
 
-      draw_opener_floor (screen, o->p);
-      o->pressed = is_opener_floor_pressed (o->p);
+      if (is_on_floor (kid, OPENER_FLOOR)
+          && peq (floor_pos, o->p))
+        draw_pressed_opener_floor (screen, o);
+      else draw_unpressed_opener_floor (screen, o);
     }
   }
 }
 
 void
-draw_opener_floor_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_pressed_opener_floor (ALLEGRO_BITMAP *bitmap, struct opener_floor *o)
 {
-  if (opener_floor_at_pos (p)->pressed)
-    draw_opener_floor_pressed (screen, p);
-  else draw_opener_floor_unpressed (screen, p);
+  o->draw = draw_pressed_opener_floor;
+  o->draw_left = draw_pressed_opener_floor_left;
+  o->draw_right = draw_pressed_opener_floor_right;
+
+  draw_floor (bitmap, o->p);
+
+  draw_construct_left (bitmap, prel (o->p, 0, +1));
 }
 
-bool
-is_opener_floor_pressed (struct pos p)
+void
+draw_pressed_opener_floor_left (ALLEGRO_BITMAP *bitmap, struct opener_floor *o)
 {
-  return is_on_floor (kid, OPENER_FLOOR)
-    && peq (floor_pos, p);
+  o->draw = draw_pressed_opener_floor;
+  o->draw_left = draw_pressed_opener_floor_left;
+  o->draw_right = draw_pressed_opener_floor_right;
+
+  draw_floor_left (bitmap, o->p);
+}
+
+void
+draw_pressed_opener_floor_right (ALLEGRO_BITMAP *bitmap, struct opener_floor *o)
+{
+  o->draw = draw_pressed_opener_floor;
+  o->draw_left = draw_pressed_opener_floor_left;
+  o->draw_right = draw_pressed_opener_floor_right;
+
+  draw_floor_right (bitmap, o->p);
+
+  draw_construct_left (bitmap, prel (o->p, 0, +1));
+}
+
+void
+draw_unpressed_opener_floor_base (ALLEGRO_BITMAP *bitmap, struct pos p)
+{
+  draw_bitmapc (unpressed_opener_floor_base, bitmap, floor_base_coord (p), 0);
+}
+
+void
+draw_unpressed_opener_floor (ALLEGRO_BITMAP *bitmap, struct opener_floor *o)
+{
+  o->draw = draw_unpressed_opener_floor;
+  o->draw_left = draw_unpressed_opener_floor_left;
+  o->draw_right = draw_unpressed_opener_floor_right;
+
+  draw_unpressed_opener_floor_base (bitmap, o->p);
+  draw_bitmapc (unpressed_opener_floor_left, bitmap, unpressed_opener_floor_left_coord (o->p), 0);
+  draw_bitmapc (normal_floor_right, bitmap, unpressed_opener_floor_right_coord (o->p), 0);
+
+  draw_construct_left (bitmap, prel (o->p, 0, +1));
+}
+
+void
+draw_unpressed_opener_floor_left (ALLEGRO_BITMAP *bitmap, struct opener_floor *o)
+{
+  o->draw = draw_unpressed_opener_floor;
+  o->draw_left = draw_unpressed_opener_floor_left;
+  o->draw_right = draw_unpressed_opener_floor_right;
+
+  draw_unpressed_opener_floor_base (bitmap, o->p);
+  draw_bitmapc (unpressed_opener_floor_left, bitmap, unpressed_opener_floor_left_coord (o->p), 0);
+}
+
+void
+draw_unpressed_opener_floor_right (ALLEGRO_BITMAP *bitmap, struct opener_floor *o)
+{
+  o->draw = draw_unpressed_opener_floor;
+  o->draw_left = draw_unpressed_opener_floor_left;
+  o->draw_right = draw_unpressed_opener_floor_right;
+
+  draw_unpressed_opener_floor_base (bitmap, o->p);
+  draw_bitmapc (normal_floor_right, bitmap, unpressed_opener_floor_right_coord (o->p), 0);
+
+  draw_construct_left (bitmap, prel (o->p, 0, +1));
+}
+
+struct coord
+unpressed_opener_floor_left_coord (struct pos p)
+{
+  struct coord c;
+  c.x = PLACE_WIDTH * p.place;
+  c.y = PLACE_HEIGHT * p.floor + 50 - 1;
+  c.room = p.room;
+  return c;
+}
+
+struct coord
+unpressed_opener_floor_right_coord (struct pos p)
+{
+  struct coord c;
+  c.x = PLACE_WIDTH * (p.place + 1);
+  c.y = PLACE_HEIGHT * p.floor + 50 - 1;
+  c.room = p.room;
+  return c;
 }

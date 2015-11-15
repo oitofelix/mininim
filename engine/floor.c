@@ -30,17 +30,17 @@
 #include "room.h"
 #include "loose-floor.h"
 #include "opener-floor.h"
+#include "spikes-floor.h"
 #include "floor.h"
 
-ALLEGRO_BITMAP *normal_floor_left, *normal_floor_right, *normal_floor_base,
+ALLEGRO_BITMAP *normal_floor_left, *normal_floor_right,
+  *normal_floor_base,
   *broken_floor_left, *broken_floor_right, *broken_floor_front,
-  *spikes_floor_left, *spikes_floor_right, *opener_floor_left, *opener_floor_base,
   *floor_corner_01, *floor_corner_02, *floor_corner_03;
 
 void
 load_vdungeon_floor (void)
 {
-  /* bitmaps */
   normal_floor_left = load_bitmap (VDUNGEON_NORMAL_FLOOR_LEFT);
   normal_floor_right = load_bitmap (VDUNGEON_NORMAL_FLOOR_RIGHT);
   normal_floor_base = load_bitmap (VDUNGEON_NORMAL_FLOOR_BASE);
@@ -50,16 +50,11 @@ load_vdungeon_floor (void)
   floor_corner_01 = load_bitmap (VDUNGEON_FLOOR_CORNER_01);
   floor_corner_02 = load_bitmap (VDUNGEON_FLOOR_CORNER_02);
   floor_corner_03 = load_bitmap (VDUNGEON_FLOOR_CORNER_03);
-  spikes_floor_left = load_bitmap (VDUNGEON_SPIKES_FLOOR_LEFT);
-  spikes_floor_right = load_bitmap (VDUNGEON_SPIKES_FLOOR_RIGHT);
-  opener_floor_left = load_bitmap (VDUNGEON_OPENER_FLOOR_LEFT);
-  opener_floor_base = load_bitmap (VDUNGEON_OPENER_FLOOR_BASE);
 }
 
 void
 unload_floor (void)
 {
-  /* bitmaps */
   al_destroy_bitmap (normal_floor_left);
   al_destroy_bitmap (normal_floor_right);
   al_destroy_bitmap (normal_floor_base);
@@ -69,10 +64,6 @@ unload_floor (void)
   al_destroy_bitmap (floor_corner_01);
   al_destroy_bitmap (floor_corner_02);
   al_destroy_bitmap (floor_corner_03);
-  al_destroy_bitmap (spikes_floor_left);
-  al_destroy_bitmap (spikes_floor_right);
-  al_destroy_bitmap (opener_floor_left);
-  al_destroy_bitmap (opener_floor_base);
 }
 
 void
@@ -133,100 +124,6 @@ draw_broken_floor_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
 }
 
 void
-draw_spikes_floor (ALLEGRO_BITMAP *bitmap, struct pos p)
-{
-  draw_floor_base (bitmap, p);
-  draw_bitmapc (spikes_floor_left, bitmap, floor_left_coord (p), 0);
-  draw_bitmapc (spikes_floor_right, bitmap, floor_right_coord (p), 0);
-}
-
-void
-draw_spikes_floor_left (ALLEGRO_BITMAP *bitmap, struct pos p)
-{
-  draw_floor_base (bitmap, p);
-  draw_bitmapc (spikes_floor_left, bitmap, floor_left_coord (p), 0);
-}
-
-void
-draw_spikes_floor_right (ALLEGRO_BITMAP *bitmap, struct pos p)
-{
-  draw_floor_base (bitmap, p);
-  draw_bitmapc (spikes_floor_right, bitmap, floor_right_coord (p), 0);
-}
-
-void
-draw_opener_floor_base (ALLEGRO_BITMAP *bitmap, struct pos p)
-{
-  draw_bitmapc (opener_floor_base, bitmap, floor_base_coord (p), 0);
-}
-
-void
-draw_opener_floor (ALLEGRO_BITMAP *bitmap, struct pos p)
-{
-  if (is_opener_floor_pressed (p))
-    draw_opener_floor_pressed (bitmap, p);
-  else draw_opener_floor_unpressed (bitmap, p);
-}
-
-void
-draw_opener_floor_pressed (ALLEGRO_BITMAP *bitmap, struct pos p)
-{
-  draw_floor (bitmap, p);
-  draw_construct_left (bitmap, prel (p, 0, +1));
-}
-
-void
-draw_opener_floor_unpressed (ALLEGRO_BITMAP *bitmap, struct pos p)
-{
-  draw_opener_floor_base (bitmap, p);
-  draw_bitmapc (opener_floor_left, bitmap, opener_floor_left_coord (p), 0);
-  draw_bitmapc (normal_floor_right, bitmap, opener_floor_right_coord (p), 0);
-  draw_construct_left (bitmap, prel (p, 0, +1));
-}
-
-void
-draw_opener_floor_left (ALLEGRO_BITMAP *bitmap, struct pos p)
-{
-  if (is_opener_floor_pressed (p))
-    draw_opener_floor_pressed_left (bitmap, p);
-  else draw_opener_floor_unpressed_left (bitmap, p);
-}
-
-void
-draw_opener_floor_pressed_left (ALLEGRO_BITMAP *bitmap, struct pos p)
-{
-  draw_floor_left (bitmap, p);
-}
-
-void
-draw_opener_floor_unpressed_left (ALLEGRO_BITMAP *bitmap, struct pos p)
-{
-  draw_opener_floor_base (bitmap, p);
-  draw_bitmapc (opener_floor_left, bitmap, opener_floor_left_coord (p), 0);
-}
-
-void
-draw_opener_floor_right (ALLEGRO_BITMAP *bitmap, struct pos p)
-{
-  if (is_opener_floor_pressed (p))
-    draw_opener_floor_pressed_right (bitmap, p);
-  else draw_opener_floor_unpressed_right (bitmap, p);
-}
-
-void
-draw_opener_floor_pressed_right (ALLEGRO_BITMAP *bitmap, struct pos p)
-{
-  draw_floor_right (bitmap, p);
-}
-
-void
-draw_opener_floor_unpressed_right (ALLEGRO_BITMAP *bitmap, struct pos p)
-{
-  draw_opener_floor_base (bitmap, p);
-  draw_bitmapc (normal_floor_right, bitmap, opener_floor_right_coord (p), 0);
-}
-
-void
 draw_floor_corner_01 (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
   draw_bitmapc (floor_corner_01, bitmap, floor_corner_01_coord (p), 0);
@@ -248,6 +145,7 @@ void
 draw_floor_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
   struct loose_floor *l;
+  struct opener_floor *o;
 
   if ((peq (p, prel (kids.ptl, 0, +1))
        || peq (p, prel (kids.pm, 0, +1)))
@@ -261,7 +159,12 @@ draw_floor_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
       l->draw_left (bitmap, l);
       break;
     case OPENER_FLOOR:
-      draw_opener_floor_fg (bitmap, p);
+      o = opener_floor_at_pos (p);
+      o->draw_left (bitmap, o);
+      break;
+    case SPIKES_FLOOR:
+      draw_spikes_floor_floor_left (bitmap, p);
+      draw_spikes_fg (bitmap, p);
       break;
     default:
       error (-1, 0, "%s: unknown floor type (%i)",
@@ -304,8 +207,12 @@ draw_floor_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
       l->draw (bitmap, l);
       break;
     case OPENER_FLOOR:
-      draw_opener_floor_fg (bitmap, p);
+      o = opener_floor_at_pos (p);
+      o->draw (bitmap, o);
       break;
+    case SPIKES_FLOOR:
+      draw_spikes_floor_floor (bitmap, p);
+      draw_spikes_fg (bitmap, p);
     default:
       error (-1, 0, "%s: unknown floor type (%i)",
              __func__, construct (p).fg);
@@ -350,26 +257,6 @@ broken_floor_front_coord (struct pos p)
   struct coord c;
   c.x = PLACE_WIDTH * p.place;
   c.y = PLACE_HEIGHT * p.floor + 54;
-  c.room = p.room;
-  return c;
-}
-
-struct coord
-opener_floor_left_coord (struct pos p)
-{
-  struct coord c;
-  c.x = PLACE_WIDTH * p.place;
-  c.y = PLACE_HEIGHT * p.floor + 50 - 1;
-  c.room = p.room;
-  return c;
-}
-
-struct coord
-opener_floor_right_coord (struct pos p)
-{
-  struct coord c;
-  c.x = PLACE_WIDTH * (p.place + 1);
-  c.y = PLACE_HEIGHT * p.floor + 50 - 1;
   c.room = p.room;
   return c;
 }

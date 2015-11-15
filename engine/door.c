@@ -19,6 +19,7 @@
 
 #include <error.h>
 #include "kernel/audio.h"
+#include "kernel/array.h"
 #include "anim.h"
 #include "room.h"
 #include "floor.h"
@@ -31,37 +32,42 @@ ALLEGRO_BITMAP *door_left, *door_right, *door_pole, *door_top, *door_grid,
 
 ALLEGRO_SAMPLE *door_open_sound, *door_close_sound, *door_end_sound;
 
-static struct door door[DOORS];
+static struct door *door = NULL;
+static size_t door_nmemb = 0;
 
 void
 load_vdungeon_door (void)
 {
-  /* bitmaps */
   door_left = load_bitmap (VDUNGEON_DOOR_LEFT);
   door_right = load_bitmap (VDUNGEON_DOOR_RIGHT);
   door_pole = load_bitmap (VDUNGEON_DOOR_POLE);
   door_top = load_bitmap (VDUNGEON_DOOR_TOP);
   door_grid = load_bitmap (VDUNGEON_DOOR_GRID);
   door_grid_tip = load_bitmap (VDUNGEON_DOOR_GRID_TIP);
-
-  /* sounds */
-  door_open_sound = load_sample (DOOR_OPEN_SOUND);
-  door_close_sound = load_sample (DOOR_CLOSE_SOUND);
-  door_end_sound = load_sample (DOOR_END_SOUND);
 }
 
 void
 unload_door (void)
 {
-  /* bitmaps */
   al_destroy_bitmap (door_left);
   al_destroy_bitmap (door_right);
   al_destroy_bitmap (door_pole);
   al_destroy_bitmap (door_top);
   al_destroy_bitmap (door_grid);
   al_destroy_bitmap (door_grid_tip);
+}
 
-  /* sounds */
+void
+load_door_sounds (void)
+{
+  door_open_sound = load_sample (DOOR_OPEN_SOUND);
+  door_close_sound = load_sample (DOOR_CLOSE_SOUND);
+  door_end_sound = load_sample (DOOR_END_SOUND);
+}
+
+void
+unload_door_sounds (void)
+{
   al_destroy_sample (door_open_sound);
   al_destroy_sample (door_close_sound);
   al_destroy_sample (door_end_sound);
@@ -70,51 +76,41 @@ unload_door (void)
 void
 register_door (struct pos p)
 {
-  int i;
-  for (i = 0; i < DOORS; i++) if (peq (door[i].p, p)) return;
-  for (i = 0; door[i].p.room && i < DOORS; i++);
-  if (i == DOORS)
-    error (-1, 0, "%s: no free door slot (%i)",
-           __func__, construct (p).fg);
+  struct door d;
 
-  door[i].p = p;
-  door[i].i = DOOR_MAX_STEP;
-  door[i].action = NONE;
-  door[i].wait = DOOR_WAIT;
-  door[i].noise = false;
+  d.p = p;
+  d.i = DOOR_MAX_STEP;
+  d.action = NO_DOOR_ACTION;
+  d.wait = DOOR_WAIT;
+  d.noise = false;
+
+  door =
+    add_to_array (&d, 1, door, &door_nmemb, door_nmemb, sizeof (d));
 }
 
 struct door *
 door_at_pos (struct pos p)
 {
   int i;
-  for (i = 0; i < DOORS; i++) if (peq (door[i].p, p)) return &door[i];
+  for (i = 0; i < door_nmemb; i++)
+    if (peq (door[i].p, p)) return &door[i];
   error (-1, 0, "%s: no door at position has been registered  (%i, %i, %i)",
          __func__, p.room, p.floor, p.place);
   return &door[0];
 }
 
-
-void
-open_door (int e)
-{
-  do {
-    struct door *d = door_at_pos (level->event[e].p);
-    d->action = OPEN;
-    d->wait = DOOR_WAIT;
-  } while (level->event[e++].next);
-}
-
 void
 draw_doors (void)
 {
-  int i;
-  for (i = 0; i < DOORS; i++) {
+  if (door_nmemb == 0) return;
+
+  size_t i;
+  for (i = door_nmemb - 1; (int) i >= 0; i--) {
     struct door *d = &door[i];
     if (d->p.room) {
       switch (d->action) {
-      case OPEN:
-        if (d->i == 0 && d->wait == 0) d->action = CLOSE;
+      case OPEN_DOOR:
+        if (d->i == 0 && d->wait == 0) d->action = CLOSE_DOOR;
         else if (d->i == 0 && d->wait > 0) {
           if (! d->noise) {
             play_sample (door_end_sound);
@@ -129,7 +125,7 @@ draw_doors (void)
           d->wait = DOOR_WAIT;
         }
         break;
-      case CLOSE:
+      case CLOSE_DOOR:
         if (d->i < DOOR_MAX_STEP) {
           if (d->wait++ % 4 == 0) {
             play_sample (door_close_sound);
@@ -138,7 +134,7 @@ draw_doors (void)
           }
         } else if (d->i == DOOR_MAX_STEP) {
           play_sample (door_end_sound);
-          d->action = NONE;
+          d->action = NO_DOOR_ACTION;
           d->wait = DOOR_WAIT;
           d->noise = false;
         }
@@ -155,6 +151,16 @@ draw_doors (void)
   }
 }
 
+void
+open_door (int e)
+{
+  do {
+    struct door *d = door_at_pos (level->event[e].p);
+    d->action = OPEN_DOOR;
+    d->wait = DOOR_WAIT;
+  } while (level->event[e++].next);
+}
+
 int
 door_grid_tip_y (struct pos p)
 {
@@ -169,8 +175,6 @@ draw_door (ALLEGRO_BITMAP *bitmap, struct pos p)
   draw_bitmapc (door_left, bitmap, door_left_coord (p), 0);
   draw_bitmapc (door_right, bitmap, door_right_coord (p), 0);
   draw_bitmapc (door_top, bitmap, door_top_coord (p), 0);
-
-  register_door (p);
 }
 
 void

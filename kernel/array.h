@@ -1,5 +1,5 @@
 /*
-  level.h -- level module;
+  array.h -- array module;
 
   Copyright (C) 2015, 2016 Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
 
@@ -17,17 +17,15 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_LEVEL_H
-#define FREEPOP_LEVEL_H
+#include <stddef.h>
 
-#include "anim.h"
+#ifndef FREEPOP_ARRAY_H
+#define FREEPOP_ARRAY_H
 
-/* current level */
-extern struct level *level;
-extern int room_view;
+void * add_to_array (void *s_base, size_t s_nmemb,
+                     void *d_base, size_t *d_nmemb, size_t d_index,
+                     size_t size);
+void * remove_from_array (void *base, size_t *nmemb, size_t index,
+                          size_t count, size_t size);
 
-void play_level (struct level *level);
-void register_constructs (void);
-void level_draw_base (void);
-
-#endif	/* FREEPOP_LEVEL_H */
+#endif	/* FREEPOP_ARRAY_H */

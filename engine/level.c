@@ -29,7 +29,7 @@
 #include "kid.h"
 #include "loose-floor.h"
 #include "opener-floor.h"
-#include "spikes.h"
+#include "spikes-floor.h"
 #include "door.h"
 #include "level.h"
 
@@ -53,10 +53,26 @@ play_level (struct level *_level)
   level = _level;
   load_level ();
 
-  register_loose_floors ();
+  register_constructs ();
   play_anim (level_anim, 12);
 
   unload_level ();
+}
+
+void
+register_constructs (void)
+{
+  struct pos p;
+  for (p.room = 1; p.room < ROOMS; p.room++)
+    for (p.floor = 0; p.floor < FLOORS; p.floor++)
+      for (p.place = 0; p.place < PLACES; p.place++)
+        switch (construct (p).fg) {
+        case LOOSE_FLOOR: register_loose_floor (p); break;
+        case OPENER_FLOOR: register_opener_floor (p); break;
+        case SPIKES_FLOOR: register_spikes_floor (p); break;
+        case DOOR: register_door (p); break;
+        default: break;
+        }
 }
 
 static void
@@ -117,6 +133,6 @@ level_draw_base (void)
   draw_fire (room_view);
   draw_loose_floors ();
   draw_opener_floors ();
-  draw_spikes ();
+  draw_spikes_floors ();
   draw_doors ();
 }

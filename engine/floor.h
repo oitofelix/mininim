@@ -30,10 +30,6 @@
 #define VDUNGEON_BROKEN_FLOOR_LEFT "dat/vdungeon/floor panels/broken left.png"
 #define VDUNGEON_BROKEN_FLOOR_RIGHT "dat/vdungeon/floor panels/broken right.png"
 #define VDUNGEON_BROKEN_FLOOR_FRONT "dat/vdungeon/floor panels/broken left02.png"
-#define VDUNGEON_SPIKES_FLOOR_LEFT "dat/vdungeon/floor panels/spikes left.png"
-#define VDUNGEON_SPIKES_FLOOR_RIGHT "dat/vdungeon/floor panels/spikes right.png"
-#define VDUNGEON_OPENER_FLOOR_LEFT "dat/vdungeon/floor panels/opener left unpressed.png"
-#define VDUNGEON_OPENER_FLOOR_BASE "dat/vdungeon/floor panels/opener base unpressed.png"
 #define VDUNGEON_FLOOR_CORNER_01 "dat/vdungeon/floor panels/normal_closer01.png"
 #define VDUNGEON_FLOOR_CORNER_02 "dat/vdungeon/floor panels/normal_closer02.png"
 #define VDUNGEON_FLOOR_CORNER_03 "dat/vdungeon/floor panels/normal_closer03.png"
@@ -51,20 +47,6 @@ void draw_broken_floor (ALLEGRO_BITMAP *bitmap, struct pos pos);
 void draw_broken_floor_left (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_broken_floor_right (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_broken_floor_fg (ALLEGRO_BITMAP *bitmap, struct pos pos);
-void draw_spikes_floor (ALLEGRO_BITMAP *bitmap, struct pos p);
-void draw_spikes_floor_left (ALLEGRO_BITMAP *bitmap, struct pos p);
-void draw_spikes_floor_right (ALLEGRO_BITMAP *bitmap, struct pos p);
-void draw_opener_floor_base (ALLEGRO_BITMAP *bitmap, struct pos p);
-void draw_opener_floor (ALLEGRO_BITMAP *bitmap, struct pos p);
-void draw_opener_floor_pressed (ALLEGRO_BITMAP *bitmap, struct pos p);
-void draw_opener_floor_unpressed (ALLEGRO_BITMAP *bitmap, struct pos p);
-void draw_opener_floor_left (ALLEGRO_BITMAP *bitmap, struct pos p);
-void draw_opener_floor_pressed_left (ALLEGRO_BITMAP *bitmap, struct pos p);
-void draw_opener_floor_unpressed_left (ALLEGRO_BITMAP *bitmap, struct pos);
-void draw_opener_floor_right (ALLEGRO_BITMAP *bitmap, struct pos p);
-void draw_opener_floor_pressed_right (ALLEGRO_BITMAP *bitmap, struct pos p);
-void draw_opener_floor_unpressed_right (ALLEGRO_BITMAP *bitmap, struct pos p);
-void draw_opener_floor_pressed (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_floor_fg (ALLEGRO_BITMAP *bitmap, struct pos pos);
 void draw_floor_corner_01 (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_floor_corner_02 (ALLEGRO_BITMAP *bitmap, struct pos p);
@@ -73,8 +55,6 @@ struct coord floor_base_coord (struct pos pos);
 struct coord floor_left_coord (struct pos pos);
 struct coord floor_right_coord (struct pos pos);
 struct coord broken_floor_front_coord (struct pos pos);
-struct coord opener_floor_left_coord (struct pos p);
-struct coord opener_floor_right_coord (struct pos p);
 struct coord floor_corner_01_coord (struct pos p);
 struct coord floor_corner_02_coord (struct pos p);
 struct coord floor_corner_03_coord (struct pos p);

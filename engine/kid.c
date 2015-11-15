@@ -28,6 +28,7 @@
 #include "room.h"
 #include "door.h"
 #include "kid.h"
+#include "loose-floor.h"
 
 struct anim kid;
 struct survey kids, kidsf;
@@ -407,6 +408,11 @@ draw_kid_normal (void)
 {
   kid.draw = draw_kid_normal;
   kid.flip = (kid.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
+
+  if (is_falling (kid)) {
+    draw_kid_fall ();
+    return;
+  }
 
   bool turn = ((kid.dir == RIGHT) && left_key) || ((kid.dir == LEFT) && right_key);
   bool run = ((kid.dir == RIGHT) && right_key) || ((kid.dir == LEFT) && left_key);
@@ -1111,9 +1117,10 @@ draw_kid_jump (void)
   else if (kid.frame == kid_jump_11) {
     draw_anim (&kid, kid_jump_12, -9, 0);
     play_sample (step);
-  } else if (kid.frame == kid_jump_12)
+  } else if (kid.frame == kid_jump_12) {
     draw_anim (&kid, kid_jump_13, +6, 0);
-  else if (kid.frame == kid_jump_13)
+    shake_loose_floor_row (kids.pmbo);
+  } else if (kid.frame == kid_jump_13)
     draw_anim (&kid, kid_jump_14, -11, 0);
   else if (kid.frame == kid_jump_14) {
     draw_anim (&kid, kid_jump_15, +0, 0);
@@ -1401,7 +1408,7 @@ draw_kid_fall (void)
     if (i > 3) play_sample (hit_ground);
     i = 0;
     force_floor = -2;
-    kid.just_fall = true;
+    shake_loose_floor_row (p);
     return;
   }
 
@@ -1514,7 +1521,6 @@ draw_kid_couch (void)
   else if (kid.frame == kid_couch_12) {
     draw_anim (&kid, kid_couch_13, +4, 0);
     kid.draw = draw_kid_normal;
-    kid.just_fall = false;
   } else {
     if (is_kid_start_run ()) inertia = 4;
     else if (is_kid_run ()) inertia = 8;
@@ -1572,10 +1578,13 @@ draw_kid_vjump (void)
       && dist_next_place (kid) > 16
       && is_hangable_pos (prel (pos (coord_tf (kid)), 0, dir),
                           kid.dir)) {
-    to_prev_place_edge (&kid);
+    if (construct (prel (kids.ptf, 0, dir)).fg != NO_FLOOR) {
+      to_prev_place_edge (&kid);
+      hang_pos = pos (coord_tf (kid));
+    } else hang_pos = prel (kids.ptf, 0, dir);
+
     hang = true;
     kid.ceiling = false;
-    hang_pos = pos (coord_tf (kid));
   } else if (kid.frame == kid_normal && is_hangable (kid)) {
     to_next_place_edge (&kid);
     hang = true;
@@ -1634,6 +1643,7 @@ draw_kid_vjump (void)
     draw_anim (&kid, kid_vjump_18, -1, 0);
   else if (kid.frame == kid_vjump_18) {
     draw_anim (&kid, kid_vjump_19, -2, 0);
+    shake_loose_floor_row (kids.pmbo);
     kid.draw = draw_kid_normal;
   } else error (-1, 0, "%s: unknown frame (%p)", __func__, kid.frame);
 
@@ -1698,6 +1708,7 @@ draw_kid_ceiling (void)
     draw_anim (&kid, kid_vjump_19, -1, +0);
   else if (kid.frame == kid_vjump_19) {
     draw_anim (&kid, kid_normal, +1, +0);
+    shake_loose_floor_row (kids.pmbo);
     kid.draw = draw_kid_normal;
   } else {
     struct pos p = pos (coord_br (kid));
@@ -1729,9 +1740,10 @@ draw_kid_misstep (void)
   else if (kid.frame == kid_jump_14) {
     draw_anim (&kid, kid_couch_10, +7, 0);
     play_sample (step);
-  } else if (kid.frame == kid_couch_10)
+  } else if (kid.frame == kid_couch_10) {
     draw_anim (&kid, kid_couch_11, +3, 0);
-  else if (kid.frame == kid_couch_11)
+    shake_loose_floor_row (kids.pmbo);
+  } else if (kid.frame == kid_couch_11)
     draw_anim (&kid, kid_couch_12, +0, 0);
   else if (kid.frame == kid_couch_12)
     draw_anim (&kid, kid_couch_13, +4, 0);

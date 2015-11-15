@@ -1,5 +1,5 @@
 /*
-  spikes.h -- spikes module;
+  spikes-floor.h -- spikes floor module;
 
   Copyright (C) 2015, 2016 Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
 
@@ -22,7 +22,12 @@
 
 #include "kernel/video.h"
 
+/* constants */
+#define SPIKES_WAIT SECS_TO_SCYCLES (1)
+
 /* bitmaps */
+#define VDUNGEON_SPIKES_FLOOR_LEFT "dat/vdungeon/floor panels/spikes left.png"
+#define VDUNGEON_SPIKES_FLOOR_RIGHT "dat/vdungeon/floor panels/spikes right.png"
 #define VDUNGEON_SPIKES_LEFT_01 "dat/vdungeon/spikes/frame01 left.png"
 #define VDUNGEON_SPIKES_RIGHT_01 "dat/vdungeon/spikes/frame01 right.png"
 #define VDUNGEON_SPIKES_LEFT_02 "dat/vdungeon/spikes/frame02 left.png"
@@ -42,11 +47,30 @@
 /* sounds */
 #define SPIKES_SOUND "dat/digisnd2/spikes.ogg"
 
-void load_vdungeon_spikes (void);
-void unload_spikes (void);
+/* types */
+struct spikes_floor {
+  struct pos p;
+  int i, wait, fg;
+};
+
+void load_vdungeon_spikes_floor (void);
+void unload_spikes_floor (void);
+void load_spikes_floor_sounds (void);
+void unload_spikes_floor_sounds (void);
+void register_spikes_floor (struct pos p);
+struct spikes_floor * spikes_floor_at_pos (struct pos p);
+void draw_spikes_floors (void);
 bool should_spikes_raise_for_pos (struct pos p, struct pos pk);
 bool should_spikes_raise (struct pos p);
-void draw_spikes (void);
+void draw_spikes_floor (ALLEGRO_BITMAP *bitmap, struct pos p);
+void draw_spikes_floor_left (ALLEGRO_BITMAP *bitmap, struct pos p);
+void draw_spikes_floor_right (ALLEGRO_BITMAP *bitmap, struct pos p);
+void draw_spikes_floor_floor (ALLEGRO_BITMAP *bitmap, struct pos p);
+void draw_spikes_floor_floor_left (ALLEGRO_BITMAP *bitmap, struct pos p);
+void draw_spikes_floor_floor_right (ALLEGRO_BITMAP *bitmap, struct pos p);
+void draw_spikes (ALLEGRO_BITMAP *bitmap, struct pos p);
+void draw_spikes_left (ALLEGRO_BITMAP *bitmap, struct pos p);
+void draw_spikes_right (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_spikes_fg (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_spikes_01 (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_spikes_left_01 (ALLEGRO_BITMAP *bitmap, struct pos p);

@@ -22,7 +22,6 @@
 
 #include "kernel/video.h"
 
-#define DOORS 30
 #define DOOR_MAX_STEP 47
 #define DOOR_WAIT SECS_TO_SCYCLES (5)
 
@@ -47,7 +46,7 @@ struct door {
   struct pos p;
   int i;
   enum {
-    NONE, OPEN, CLOSE
+    NO_DOOR_ACTION, OPEN_DOOR, CLOSE_DOOR,
   } action;
   int wait;
   bool noise;
@@ -55,6 +54,8 @@ struct door {
 
 void load_vdungeon_door (void);
 void unload_door (void);
+void load_door_sounds (void);
+void unload_door_sounds (void);
 void register_door (struct pos p);
 struct door *door_at_pos (struct pos p);
 int door_grid_tip_y (struct pos p);
