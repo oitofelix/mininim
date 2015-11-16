@@ -43,7 +43,7 @@ struct level *level;
 
 static bool no_room_drawing = false;
 
-int room_view = 7;
+int room_view = 6;
 
 void
 play_level (struct level *_level)
@@ -63,7 +63,7 @@ void
 register_constructs (void)
 {
   struct pos p;
-  for (p.room = 1; p.room < ROOMS; p.room++)
+  for (p.room = 0; p.room < ROOMS; p.room++)
     for (p.floor = 0; p.floor < FLOORS; p.floor++)
       for (p.place = 0; p.place < PLACES; p.place++)
         switch (construct (p).fg) {

@@ -276,6 +276,7 @@ draw_loose_floor (ALLEGRO_BITMAP *bitmap, struct loose_floor *l)
   l->draw_left = draw_loose_floor_left;
   l->draw_right = draw_loose_floor_right;
 
+  if (bitmap == room_bg) return;
   draw_floor (bitmap, l->p);
   draw_construct_left (bitmap, prel (l->p, 0, +1));
 }
@@ -287,6 +288,7 @@ draw_loose_floor_left (ALLEGRO_BITMAP *bitmap, struct loose_floor *l)
   l->draw_left = draw_loose_floor_left;
   l->draw_right = draw_loose_floor_right;
 
+  if (bitmap == room_bg) return;
   draw_floor_left (bitmap, l->p);
 }
 
@@ -297,6 +299,7 @@ draw_loose_floor_right (ALLEGRO_BITMAP *bitmap, struct loose_floor *l)
   l->draw_left = draw_loose_floor_left;
   l->draw_right = draw_loose_floor_right;
 
+  if (bitmap == room_bg) return;
   draw_floor_right (bitmap, l->p);
   draw_construct_left (bitmap, prel (l->p, 0, +1));
 }
@@ -308,6 +311,7 @@ draw_loose_floor_01 (ALLEGRO_BITMAP *bitmap, struct loose_floor *l)
   l->draw_left = draw_loose_floor_01_left;
   l->draw_right = draw_loose_floor_01_right;
 
+  if (bitmap == room_bg) return;
   draw_bitmapc (loose_floor_base_01, bitmap, floor_base_coord (l->p), 0);
   draw_bitmapc (loose_floor_left_01, bitmap, loose_floor_left_coord (l->p), 0);
   draw_bitmapc (loose_floor_right_01, bitmap, loose_floor_right_coord (l->p), 0);
@@ -322,6 +326,7 @@ draw_loose_floor_01_left (ALLEGRO_BITMAP *bitmap, struct loose_floor *l)
   l->draw_left = draw_loose_floor_01_left;
   l->draw_right = draw_loose_floor_01_right;
 
+  if (bitmap == room_bg) return;
   draw_bitmapc (loose_floor_base_01, bitmap, floor_base_coord (l->p), 0);
   draw_bitmapc (loose_floor_left_01, bitmap, loose_floor_left_coord (l->p), 0);
 }
@@ -333,6 +338,7 @@ draw_loose_floor_01_right (ALLEGRO_BITMAP *bitmap, struct loose_floor *l)
   l->draw_left = draw_loose_floor_01_left;
   l->draw_right = draw_loose_floor_01_right;
 
+  if (bitmap == room_bg) return;
   draw_bitmapc (loose_floor_base_01, bitmap, floor_base_coord (l->p), 0);
   draw_bitmapc (loose_floor_right_01, bitmap, loose_floor_right_coord (l->p), 0);
 
@@ -346,6 +352,7 @@ draw_loose_floor_02 (ALLEGRO_BITMAP *bitmap, struct loose_floor *l)
   l->draw_left = draw_loose_floor_02_left;
   l->draw_right = draw_loose_floor_02_right;
 
+  if (bitmap == room_bg) return;
   draw_bitmapc (loose_floor_base_02, bitmap, floor_base_coord (l->p), 0);
   draw_bitmapc (loose_floor_left_02, bitmap, floor_left_coord (l->p), 0);
   draw_bitmapc (loose_floor_right_02, bitmap, loose_floor_right_coord (l->p), 0);
@@ -360,6 +367,7 @@ draw_loose_floor_02_left (ALLEGRO_BITMAP *bitmap, struct loose_floor *l)
   l->draw_left = draw_loose_floor_02_left;
   l->draw_right = draw_loose_floor_02_right;
 
+  if (bitmap == room_bg) return;
   draw_bitmapc (loose_floor_base_02, bitmap, floor_base_coord (l->p), 0);
   draw_bitmapc (loose_floor_left_02, bitmap, floor_left_coord (l->p), 0);
 }
@@ -371,6 +379,7 @@ draw_loose_floor_02_right (ALLEGRO_BITMAP *bitmap, struct loose_floor *l)
   l->draw_left = draw_loose_floor_02_left;
   l->draw_right = draw_loose_floor_02_right;
 
+  if (bitmap == room_bg) return;
   draw_bitmapc (loose_floor_base_02, bitmap, floor_base_coord (l->p), 0);
   draw_bitmapc (loose_floor_right_02, bitmap, loose_floor_right_coord (l->p), 0);
 

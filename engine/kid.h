@@ -205,6 +205,10 @@ void draw_kid_climb (void);
 void draw_kid_unclimb (void);
 void draw_kid_run_jump (void);
 
+bool is_kid_colliding (int min_dist);
+void draw_kid_normal_collision (void);
+void draw_kid_couch_collision (void);
+
 bool is_kid_normal ();
 bool is_kid_start_walk (void);
 bool is_kid_walk (void);

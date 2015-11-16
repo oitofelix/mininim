@@ -26,8 +26,8 @@ static struct level level_1 = {
 
   .construct = {
     [0] =
-    {{{WALL}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR},
-      {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {WALL}},
+    {{{WALL}, {WALL}, {WALL}, {WALL}, {WALL},
+      {WALL}, {WALL}, {WALL}, {WALL}, {WALL}},
      {{WALL}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR},
       {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {WALL}},
      {{FLOOR}, {FLOOR}, {FLOOR}, {FLOOR}, {FLOOR},

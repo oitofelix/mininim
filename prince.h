@@ -49,6 +49,11 @@ struct pos {
   int room, floor, place;
 };
 
+struct frameset {
+  ALLEGRO_BITMAP *frame;
+  int dx, dy;
+};
+
 struct coord {
   int room, x, y;
 };

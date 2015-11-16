@@ -49,6 +49,8 @@ extern ALLEGRO_BITMAP *wall_left, *wall_center, *wall_right, *wall_single, *wall
 void load_vdungeon_wall (void);
 void unload_wall (void);
 void draw_wall (ALLEGRO_BITMAP *bitmap, struct pos pos);
+void draw_wall_left (ALLEGRO_BITMAP *bitmap, struct pos p);
+void draw_wall_right (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_wall_sws (ALLEGRO_BITMAP *bitmap, struct pos pos);
 void draw_wall_sww (ALLEGRO_BITMAP *bitmap, struct pos pos);
 void draw_wall_wws (ALLEGRO_BITMAP *bitmap, struct pos pos);

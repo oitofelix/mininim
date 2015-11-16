@@ -80,6 +80,12 @@ unload_wall (void)
 void
 draw_wall (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
+  draw_wall_left (bitmap, p);
+}
+
+void
+draw_wall_left (ALLEGRO_BITMAP *bitmap, struct pos p)
+{
   switch (wall_correlation (p)) {
   case SWS: draw_wall_sws (bitmap, p); break;
   case SWW: draw_wall_sww (bitmap, p); break;
@@ -90,6 +96,13 @@ draw_wall (ALLEGRO_BITMAP *bitmap, struct pos p)
            __func__, p.room, p.floor, p.place);
   }
   draw_wall_randomization (bitmap, p);
+}
+
+void
+draw_wall_right (ALLEGRO_BITMAP *bitmap, struct pos p)
+{
+  draw_wall (bitmap, p);
+  draw_construct_left (bitmap, prel (p, 0, +1));
 }
 
 void

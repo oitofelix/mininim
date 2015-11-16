@@ -60,7 +60,7 @@ play_anim (void (*callback) (void), int freq)
           pause_anim = false;
 
         /* begin kid hack */
-        if (! cutscene && pause_anim) {
+        if (! cutscene) {
           if (a_key) kid.c.x--;
           if (d_key) kid.c.x++;
           if (w_key) kid.c.y--;

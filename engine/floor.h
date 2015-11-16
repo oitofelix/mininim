@@ -47,7 +47,6 @@ void draw_broken_floor (ALLEGRO_BITMAP *bitmap, struct pos pos);
 void draw_broken_floor_left (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_broken_floor_right (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_broken_floor_fg (ALLEGRO_BITMAP *bitmap, struct pos pos);
-void draw_floor_fg (ALLEGRO_BITMAP *bitmap, struct pos pos);
 void draw_floor_corner_01 (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_floor_corner_02 (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_floor_corner_03 (ALLEGRO_BITMAP *bitmap, struct pos p);

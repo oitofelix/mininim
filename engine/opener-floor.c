@@ -72,6 +72,9 @@ register_opener_floor (struct pos p)
   o.noise = false;
   o.resist_on = OPENER_FLOOR_ON_RESISTENCE;
   o.resist_off = OPENER_FLOOR_OFF_RESISTENCE;
+  o.draw = draw_unpressed_opener_floor;
+  o.draw_left = draw_unpressed_opener_floor_left;
+  o.draw_right = draw_unpressed_opener_floor_right;
 
   opener_floor =
     add_to_array (&o, 1, opener_floor, &opener_floor_nmemb,
@@ -135,8 +138,8 @@ draw_pressed_opener_floor (ALLEGRO_BITMAP *bitmap, struct opener_floor *o)
   o->draw_left = draw_pressed_opener_floor_left;
   o->draw_right = draw_pressed_opener_floor_right;
 
+  if (bitmap == room_bg) return;
   draw_floor (bitmap, o->p);
-
   draw_construct_left (bitmap, prel (o->p, 0, +1));
 }
 
@@ -147,6 +150,7 @@ draw_pressed_opener_floor_left (ALLEGRO_BITMAP *bitmap, struct opener_floor *o)
   o->draw_left = draw_pressed_opener_floor_left;
   o->draw_right = draw_pressed_opener_floor_right;
 
+  if (bitmap == room_bg) return;
   draw_floor_left (bitmap, o->p);
 }
 
@@ -157,14 +161,15 @@ draw_pressed_opener_floor_right (ALLEGRO_BITMAP *bitmap, struct opener_floor *o)
   o->draw_left = draw_pressed_opener_floor_left;
   o->draw_right = draw_pressed_opener_floor_right;
 
+  if (bitmap == room_bg) return;
   draw_floor_right (bitmap, o->p);
-
   draw_construct_left (bitmap, prel (o->p, 0, +1));
 }
 
 void
 draw_unpressed_opener_floor_base (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
+  if (bitmap == room_bg) return;
   draw_bitmapc (unpressed_opener_floor_base, bitmap, floor_base_coord (p), 0);
 }
 
@@ -175,6 +180,7 @@ draw_unpressed_opener_floor (ALLEGRO_BITMAP *bitmap, struct opener_floor *o)
   o->draw_left = draw_unpressed_opener_floor_left;
   o->draw_right = draw_unpressed_opener_floor_right;
 
+  if (bitmap == room_bg) return;
   draw_unpressed_opener_floor_base (bitmap, o->p);
   draw_bitmapc (unpressed_opener_floor_left, bitmap, unpressed_opener_floor_left_coord (o->p), 0);
   draw_bitmapc (normal_floor_right, bitmap, unpressed_opener_floor_right_coord (o->p), 0);
@@ -189,6 +195,7 @@ draw_unpressed_opener_floor_left (ALLEGRO_BITMAP *bitmap, struct opener_floor *o
   o->draw_left = draw_unpressed_opener_floor_left;
   o->draw_right = draw_unpressed_opener_floor_right;
 
+  if (bitmap == room_bg) return;
   draw_unpressed_opener_floor_base (bitmap, o->p);
   draw_bitmapc (unpressed_opener_floor_left, bitmap, unpressed_opener_floor_left_coord (o->p), 0);
 }
@@ -200,6 +207,7 @@ draw_unpressed_opener_floor_right (ALLEGRO_BITMAP *bitmap, struct opener_floor *
   o->draw_left = draw_unpressed_opener_floor_left;
   o->draw_right = draw_unpressed_opener_floor_right;
 
+  if (bitmap == room_bg) return;
   draw_unpressed_opener_floor_base (bitmap, o->p);
   draw_bitmapc (normal_floor_right, bitmap, unpressed_opener_floor_right_coord (o->p), 0);
 

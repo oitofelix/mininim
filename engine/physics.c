@@ -185,8 +185,6 @@ is_falling (struct anim a)
 {
   if (! a.fall) return false;
 
-  if (a.id == &kid && (is_kid_start_jump ())) return false;
-
   a.c.x += (a.dir == LEFT) ? +4 : -4;
 
   struct coord bf = coord_bf (a);
@@ -194,7 +192,9 @@ is_falling (struct anim a)
   struct construct cbf = construct (pbf);
   struct pos pbfn = pos (coord_bf (next_anim (a, a.frame, 0, 34)));
 
-  if (cbf.fg == NO_FLOOR || pbf.floor == pbfn.floor) return true;
+  if (cbf.fg == NO_FLOOR
+      || cbf.fg == WALL
+      || pbf.floor == pbfn.floor) return true;
 
   /* needed because when hanging the kid's bottom front position
      coincides with the wall's */
@@ -228,6 +228,22 @@ dist_next_place (struct anim a)
   int x = a.c.x;
 
   while (p.place == pos (coord_tf (a)).place && abs (x - a.c.x) != PLACE_WIDTH)
+    a.c.x += inc;
+
+  return inc * (a.c.x - x);
+}
+
+int
+dist_next_place_0 (struct anim a,
+                   struct coord (*coord_func) (struct anim a),
+                   struct pos (*pos_func) (struct coord c))
+{
+  struct pos p = pos_func (coord_func (a));
+  int inc = (a.dir == LEFT) ? -1 : +1;
+  int x = a.c.x;
+
+  while (p.place == pos_func (coord_func (a)).place
+         && abs (x - a.c.x) != PLACE_WIDTH)
     a.c.x += inc;
 
   return inc * (a.c.x - x);

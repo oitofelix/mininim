@@ -78,6 +78,7 @@ draw_floor (ALLEGRO_BITMAP *bitmap, struct pos p)
   draw_floor_base (bitmap, p);
   draw_bitmapc (normal_floor_left, bitmap, floor_left_coord (p), 0);
   draw_bitmapc (normal_floor_right, bitmap, floor_right_coord (p), 0);
+  draw_construct_left (bitmap, prel (p, 0, +1));
 }
 
 void
@@ -92,6 +93,7 @@ draw_floor_right (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
   draw_floor_base (bitmap, p);
   draw_bitmapc (normal_floor_right, bitmap, floor_right_coord (p), 0);
+  draw_construct_left (bitmap, prel (p, 0, +1));
 }
 
 void
@@ -100,6 +102,7 @@ draw_broken_floor (ALLEGRO_BITMAP *bitmap, struct pos p)
   draw_floor_base (bitmap, p);
   draw_bitmapc (broken_floor_left, bitmap, floor_left_coord (p), 0);
   draw_bitmapc (broken_floor_right, bitmap, floor_right_coord (p), 0);
+  draw_construct_left (bitmap, prel (p, 0, +1));
 }
 
 void
@@ -114,6 +117,7 @@ draw_broken_floor_right (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
   draw_floor_base (bitmap, p);
   draw_bitmapc (broken_floor_right, bitmap, floor_right_coord (p), 0);
+  draw_construct_left (bitmap, prel (p, 0, +1));
 }
 
 void
@@ -139,86 +143,6 @@ void
 draw_floor_corner_03 (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
   draw_bitmapc (floor_corner_03, bitmap, floor_corner_03_coord (p), 0);
-}
-
-void
-draw_floor_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
-{
-  struct loose_floor *l;
-  struct opener_floor *o;
-
-  if ((peq (p, prel (kids.ptl, 0, +1))
-       || peq (p, prel (kids.pm, 0, +1)))
-      && is_kid_fall ())
-    switch (construct (p).fg) {
-    case FLOOR:
-      draw_floor_left (bitmap, p);
-      break;
-    case LOOSE_FLOOR:
-      l = loose_floor_at_pos (p);
-      l->draw_left (bitmap, l);
-      break;
-    case OPENER_FLOOR:
-      o = opener_floor_at_pos (p);
-      o->draw_left (bitmap, o);
-      break;
-    case SPIKES_FLOOR:
-      draw_spikes_floor_floor_left (bitmap, p);
-      draw_spikes_fg (bitmap, p);
-      break;
-    default:
-      error (-1, 0, "%s: unknown floor type (%i)",
-             __func__, construct (p).fg);
-    }
-  else if (peq (kids.ptf, p)
-           && is_kid_climb ()
-           && kid.dir == RIGHT) {
-    draw_floor_base (bitmap, p);
-    if (kid.frame == kid_climb_03
-        || kid.frame == kid_climb_09
-        || kid.frame == kid_climb_10)
-      draw_floor_corner_03 (bitmap, p);
-    else if (kid.frame == kid_climb_04
-             || kid.frame == kid_climb_06
-             || kid.frame == kid_climb_07)
-      draw_floor_corner_01 (bitmap, p);
-    else if (kid.frame == kid_climb_08
-             || kid.frame == kid_climb_05)
-      draw_floor_corner_02 (bitmap, p);
-  } else if ((peq (p, kidsf.ptl)
-              || peq (p, kidsf.ptr)
-              || peq (p, kidsf.pmt)
-              || peq (p, kids.ptl)
-              || peq (p, kids.ptr)
-              || peq (p, kids.pmt))
-             && (peq (p, prel (kidsf.pmbo, -1, 0))
-                 || peq (p, prel (kids.pmbo, -1, 0)))
-             && ! (is_kid_hang () && kid.dir == LEFT)
-             && ! ((is_kid_climb ()
-                    || is_kid_start_climb ())
-                   && kid.dir == LEFT)
-             && floor_left_coord (p).y <= kids.tl.y) {
-    switch (construct (p).fg) {
-    case FLOOR:
-      draw_floor (bitmap, p);
-      break;
-    case LOOSE_FLOOR:
-      l = loose_floor_at_pos (p);
-      l->draw (bitmap, l);
-      break;
-    case OPENER_FLOOR:
-      o = opener_floor_at_pos (p);
-      o->draw (bitmap, o);
-      break;
-    case SPIKES_FLOOR:
-      draw_spikes_floor_floor (bitmap, p);
-      draw_spikes_fg (bitmap, p);
-    default:
-      error (-1, 0, "%s: unknown floor type (%i)",
-             __func__, construct (p).fg);
-    }
-    draw_construct_left (bitmap, prel (p, 0, +1));
-  }
 }
 
 struct coord

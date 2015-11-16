@@ -114,6 +114,8 @@ unload_room (void)
 struct coord
 nbitmap_coord (struct coord c, int w, int h)
 {
+  if (c.room == room_view) return c;
+
   struct coord tl = c;
   struct coord tr = c;
   struct coord bl = c;
@@ -262,7 +264,7 @@ draw_construct_left (ALLEGRO_BITMAP *bitmap, struct pos p)
     o->draw_left (bitmap, o);
     break;
   case PILLAR: draw_pillar_left (bitmap, p); break;
-  case WALL: draw_wall (bitmap, p); break;
+  case WALL: draw_wall_left (bitmap, p); break;
   case DOOR: draw_door_left (bitmap, p); break;
   default:
     error (-1, 0, "%s: unknown foreground (%i)",
@@ -290,7 +292,7 @@ draw_construct_right (ALLEGRO_BITMAP *bitmap, struct pos p)
     o->draw_right (bitmap, o);
     break;
   case PILLAR: draw_pillar_right (bitmap, p); break;
-  case WALL: draw_wall (bitmap, p); break;
+  case WALL: draw_wall_right (bitmap, p); break;
   case DOOR: draw_door_right (bitmap, p); break;
   default:
     error (-1, 0, "%s: unknown foreground (%i)",
@@ -421,18 +423,127 @@ draw_room_fg (struct pos p)
 void
 draw_room_fg_0 (struct pos p)
 {
-  switch (construct (p).fg) {
-  case NO_FLOOR: break;
-  case FLOOR: draw_floor_fg (screen, p); break;
-  case BROKEN_FLOOR: draw_broken_floor_fg (screen, p); break;
-  case LOOSE_FLOOR: draw_floor_fg (screen, p); break;
-  case SPIKES_FLOOR: draw_floor_fg (screen, p); break;
-  case OPENER_FLOOR: draw_floor_fg (screen, p); break;
-  case PILLAR: draw_pillar_fg (screen, p); break;
-  case WALL: draw_wall_fg (screen, p); break;
-  case DOOR: draw_door_fg (screen, p); break;
-  default:
-    error (-1, 0, "%s: unknown foreground (%i)",
-           __func__, construct (p).fg);
+  struct loose_floor *l;
+  struct opener_floor *o;
+
+  /* when falling at construct's left */
+  if ((peq (p, prel (kids.ptl, 0, +1))
+       || peq (p, prel (kids.pm, 0, +1)))
+      && is_kid_fall ())
+    switch (construct (p).fg) {
+    case NO_FLOOR:
+      break;
+    case FLOOR:
+      draw_floor_left (screen, p);
+      break;
+    case BROKEN_FLOOR:
+      draw_broken_floor_left (screen, p);
+      break;
+    case LOOSE_FLOOR:
+      l = loose_floor_at_pos (p);
+      l->draw_left (screen, l);
+      break;
+    case OPENER_FLOOR:
+      o = opener_floor_at_pos (p);
+      o->draw_left (screen, o);
+      break;
+    case SPIKES_FLOOR:
+      draw_spikes_floor_floor_left (screen, p);
+      draw_spikes_fg (screen, p);
+      break;
+    case PILLAR:
+      draw_pillar_left (screen, p);
+      break;
+    case WALL:
+      draw_wall_left (screen, p);
+      break;
+    case DOOR:
+      draw_door_left (screen, p);
+      break;
+    default:
+      error (-1, 0, "%s: unknown foreground construct type (%i)",
+             __func__, construct (p).fg);
+    }
+  /* when climbing the construct */
+  else if (peq (kids.ptf, p)
+           && is_kid_climb ()
+           && kid.dir == RIGHT) {
+    if (construct (p).fg == PILLAR)
+      draw_pillar_fg (screen, p);
+    else if (construct (p).fg == BROKEN_FLOOR)
+      draw_broken_floor_fg (screen, p);
+    else {
+      draw_floor_base (screen, p);
+      if (kid.frame == kid_climb_03
+          || kid.frame == kid_climb_09
+          || kid.frame == kid_climb_10)
+        draw_floor_corner_03 (screen, p);
+      else if (kid.frame == kid_climb_04
+               || kid.frame == kid_climb_06
+               || kid.frame == kid_climb_07)
+        draw_floor_corner_01 (screen, p);
+      else if (kid.frame == kid_climb_08
+               || kid.frame == kid_climb_05)
+        draw_floor_corner_02 (screen, p);
+    }
+    /* when below the construction */
+  } else if ((peq (p, kidsf.ptl)
+              || peq (p, kidsf.ptr)
+              || peq (p, kidsf.pmt)
+              || peq (p, kids.ptl)
+              || peq (p, kids.ptr)
+              || peq (p, kids.pmt))
+             && (peq (p, prel (kidsf.pmbo, -1, 0))
+                 || peq (p, prel (kids.pmbo, -1, 0)))
+             && ! (is_kid_hang () && kid.dir == LEFT)
+             && ! ((is_kid_climb ()
+                    || is_kid_start_climb ())
+                   && kid.dir == LEFT)
+             && floor_left_coord (p).y <= kids.tl.y) {
+    switch (construct (p).fg) {
+    case NO_FLOOR: break;
+    case FLOOR:
+      draw_floor (screen, p);
+      break;
+    case BROKEN_FLOOR:
+      draw_broken_floor (screen, p);
+      break;
+    case LOOSE_FLOOR:
+      l = loose_floor_at_pos (p);
+      l->draw (screen, l);
+      break;
+    case OPENER_FLOOR:
+      o = opener_floor_at_pos (p);
+      o->draw (screen, o);
+      break;
+    case SPIKES_FLOOR:
+      draw_spikes_floor_floor (screen, p);
+      draw_spikes_fg (screen, p);
+      break;
+    case PILLAR:
+      draw_pillar (screen, p);
+      draw_construct_right (screen, prel (p, -1, 0));
+      break;
+    case WALL:
+      draw_wall (screen, p);
+      break;
+    case DOOR:
+      draw_door (screen, p);
+      break;
+    default:
+      error (-1, 0, "%s: unknown foreground construct type (%i)",
+             __func__, construct (p).fg);
+    }
   }
+  /* other cases */
+  else if (construct (p).fg == BROKEN_FLOOR)
+    draw_broken_floor_fg (screen, p);
+  else if (construct (p).fg == SPIKES_FLOOR)
+    draw_spikes_fg (screen, p);
+  else if (construct (p).fg == PILLAR)
+    draw_pillar_fg (screen, p);
+  else if (construct (p).fg == WALL)
+    draw_wall_fg (screen, p);
+  else if (construct (p).fg == DOOR)
+    draw_door_fg (screen, p);
 }
