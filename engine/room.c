@@ -416,13 +416,6 @@ draw_room_anim_fg (struct anim a)
 void
 draw_room_fg (struct pos p)
 {
-  draw_room_fg_0 (prel (p, 0, -1));
-  draw_room_fg_0 (p);
-}
-
-void
-draw_room_fg_0 (struct pos p)
-{
   struct loose_floor *l;
   struct opener_floor *o;
 

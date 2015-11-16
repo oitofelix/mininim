@@ -238,7 +238,7 @@ load_kid (void)
   kid.ceiling = draw_kid_ceiling;
   kid.draw = draw_kid_normal;
 
-  place_kid (6, 0, 1);
+  place_kid (7, 0, 8);
 }
 
 void
@@ -1816,80 +1816,71 @@ draw_kid_hang_wall (void)
 void
 draw_kid_hang_free (void)
 {
-  static int i = 0;
-  static int j = 0;
-
-  hang_limit = (j > 1);
-
   kid.draw = draw_kid_hang_free;
   kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  int dir = (kid.dir == LEFT) ? -1 : +1;
-  if (construct_rel (hang_pos, -1, dir).fg != NO_FLOOR)
-    kid.fall = NULL;
-  kid.collision = NULL;
+  static bool reverse = true;
+  static int i = 3;
+  if (kid.draw != draw_kid_hang_free) i = 0;
+  static int j = 0;
+  static int wait = 3;
+
+  struct frameset frameset[13] =
+    {{kid_hang_00,+0,+0},{kid_hang_01,+0,+0},{kid_hang_02,+6,+0},
+     {kid_hang_03,+3,+2},{kid_hang_04,+2,+0},{kid_hang_05,+3,+0},
+     {kid_hang_06,+1,-1},{kid_hang_07,+2,-1},{kid_hang_08,+0,-2},
+     {kid_hang_09,+0,+0}, {kid_hang_10,+1,-1},{kid_hang_11,+0,+0},
+     {kid_hang_12,-3,+0}};
+
+  ALLEGRO_BITMAP *frame = frameset[i].frame;
+  int dx = (reverse) ? -frameset[i + 1].dx : frameset[i].dx;
+  int dy = (reverse) ? -frameset[i + 1].dy : frameset[i].dy;
 
   if (! shift_key || hang_limit) {
-    i = 0;
-    j = 0;
-    kid.fall = draw_kid_fall;
-    kid.collision = draw_kid_collision;
-    if (is_falling (kid)) {
+    if (kids.cm == NO_FLOOR && i > 6) {
+      reverse = true; i = 3; j = 0; wait = 3;
       draw_kid_fall ();
       hang_limit = false;
       return;
     }
     kid.frame = kid_vjump_15;
-    kid.c.y = 63 * pos (coord_m (kid)).floor;
-    draw_anim (&kid, kid_vjump_15, -10, +0);
+    kid.c.y = PLACE_HEIGHT * kids.pm.floor;
+    draw_anim (&kid, kid_vjump_15, -6, +0);
     kid.draw = draw_kid_vjump;
     hang_limit = false;
+    reverse = true; i = 3; j = 0; wait = 3;
     return;
   } if (up_key) {
-    kid.fall = draw_kid_fall;
-    kid.collision = draw_kid_collision;
     draw_kid_climb ();
-    i = 0;
-    j = 0;
+    reverse = true; i = 3; j = 0; wait = 3;
     return;
   }
 
- next:
-  switch (i) {
-  case 0: draw_anim (&kid, kid_hang_03, -2, +0); i++; break;
-  case 1: draw_anim (&kid, kid_hang_02, -3, -2); i++; break;
-  case 2: draw_anim (&kid, kid_hang_01, -6, +0); i++; break;
-  case 3: draw_anim (&kid, kid_hang_00, +0, -2); i++; break;
-  case 4: i++;
-    if (j == 0) draw_anim (&kid, kid_hang_00, +0, +0);
-    else goto next; break;
-  case 5: i++;
-    if (j == 0) draw_anim (&kid, kid_hang_00, +0, +0);
-    else goto next; break;
-  case 6: draw_anim (&kid, kid_hang_01, +0, +2); i++; break;
-  case 7: draw_anim (&kid, kid_hang_02, +6, +0); i++; break;
-  case 8: draw_anim (&kid, kid_hang_03, +3, +2); i++; break;
-  case 9: draw_anim (&kid, kid_hang_04, +2, +0); i++; break;
-  case 10: draw_anim (&kid, kid_hang_05, +3, +0); i++; break;
-  case 11: draw_anim (&kid, kid_hang_06, +1, -1); i++; break;
-  case 12: draw_anim (&kid, kid_hang_07, +2, -1); i++; break;
-  case 13: draw_anim (&kid, kid_hang_08, +0, -2); i++; break;
-  case 14: draw_anim (&kid, kid_hang_09, +0, +0); i++; break;
-  case 15: draw_anim (&kid, kid_hang_10, +1, -1); i++; break;
-  case 16: draw_anim (&kid, kid_hang_11, +0, +0); i++; break;
-  case 17: draw_anim (&kid, kid_hang_12, -3, +0); i++; break;
-  case 18: draw_anim (&kid, kid_hang_11, +3, +0); i++; break;
-  case 19: draw_anim (&kid, kid_hang_10, +0, +0); i++; break;
-  case 20: draw_anim (&kid, kid_hang_09, -1, +1); i++; break;
-  case 21: draw_anim (&kid, kid_hang_08, +0, +0); i++; break;
-  case 22: draw_anim (&kid, kid_hang_07, +0, +2); i++; break;
-  case 23: draw_anim (&kid, kid_hang_06, -2, +1); i++; break;
-  case 24: draw_anim (&kid, kid_hang_05, -1, +1); i++; break;
-  case 25: draw_anim (&kid, kid_hang_04, -3, +0); i = 0; j++; break;
-  }
+  kid.fall = NULL;
+  kid.collision = NULL;
+  kid.back_collision = NULL;
+
+  draw_anim (&kid, frame, dx, dy);
 
   kid.fall = draw_kid_fall;
   kid.collision = draw_kid_collision;
+  kid.back_collision = draw_kid_back_collision;
+
+  if (reverse && i > 0) {
+    if (i == 4  && j++ > 0) hang_limit = true;
+    i--;
+  } else if (reverse && i == 0) {
+    if (wait == 0) {
+      reverse = false; i++;
+    } else wait--;
+  } else if (! reverse
+             && ((j == 0 && i < 12)
+                 || (j > 0 && i < 9))) i++;
+  else if (! reverse
+           && ((j == 0 && i == 12)
+               || (j > 0 && i == 9))) {
+    reverse = true; i--;
+  }
 }
 
 bool
