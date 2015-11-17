@@ -196,11 +196,6 @@ is_falling (struct anim a)
       || cbf.fg == WALL
       || pbf.floor == pbfn.floor) return true;
 
-  /* needed because when hanging the kid's bottom front position
-     coincides with the wall's */
-  if (a.id == &kid && is_kid_hang ()
-      && construct (hang_pos).fg == NO_FLOOR) return true;
-
   return false;
 }
 
@@ -490,9 +485,4 @@ apply_physics (struct anim *a, ALLEGRO_BITMAP *frame,
   na.c = nanim (na);
 
   (*a) = na;
-
-  if (a == &kid) {
-    kids = survey (*a, &pos);
-    kidsf = survey (*a, &posf);
-  }
 }

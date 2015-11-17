@@ -173,6 +173,8 @@
 /* functions */
 void load_kid (void);
 void unload_kid (void);
+void init_climb_frameset (void);
+void init_hang_frameset (void);
 
 void place_kid (int room, int floor, int place);
 

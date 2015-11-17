@@ -43,7 +43,7 @@ struct level *level;
 
 static bool no_room_drawing = false;
 
-int room_view = 7;
+int room_view = 8;
 
 void
 play_level (struct level *_level)
@@ -114,7 +114,11 @@ level_anim (void)
 
   if (is_visible (kid)) {
     prev_room = kid.c.room;
+    kids = survey (kid, pos);
+    kidsf = survey (kid, posf);
     kid.draw ();
+    kids = survey (kid, pos);
+    kidsf = survey (kid, posf);
     if (kid.c.room != prev_room) {
       room_view = kid.c.room;
       level_draw_base ();

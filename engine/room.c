@@ -471,11 +471,11 @@ draw_room_fg (struct pos p)
           || kid.frame == kid_climb_09
           || kid.frame == kid_climb_10)
         draw_floor_corner_03 (screen, p);
-      else if (kid.frame == kid_climb_04
-               || kid.frame == kid_climb_06
+      else if (kid.frame == kid_climb_06
                || kid.frame == kid_climb_07)
         draw_floor_corner_01 (screen, p);
-      else if (kid.frame == kid_climb_08
+      else if (kid.frame == kid_climb_04
+               || kid.frame == kid_climb_08
                || kid.frame == kid_climb_05)
         draw_floor_corner_02 (screen, p);
     }
