@@ -36,6 +36,7 @@ bool hang_limit;
 bool misstep = false;
 static int inertia = 0;
 static bool critical_edge = false;
+static bool turn = false;
 
 static struct frameset hang_frameset[13];
 static struct frameset climb_frameset[15];
@@ -713,11 +714,31 @@ is_kid_stop_walk (void) {
     || kid.frame == kid_walk_12;
 }
 
-void draw_kid_start_run ()
+void
+draw_kid_start_run (void)
 {
+  void (*odraw) (void) = kid.draw;
   kid.draw = draw_kid_start_run;
   kid.flip = (kid.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
   inertia = 4;
+
+  static int i = 0;
+  if (odraw != draw_kid_start_run) i = 0;
+
+  struct frameset frameset[6] =
+    {{kid_start_run_01,-1,0},{kid_start_run_02,-1,0},
+     {kid_start_run_03,-4,0},{kid_start_run_04,-3,0},
+     {kid_start_run_05,-8,0},{kid_start_run_06,-8,0}};
+
+  ALLEGRO_BITMAP *frame = frameset[i].frame;
+  int dx = frameset[i].dx;
+  int dy = frameset[i].dy;
+
+  if (kid.frame == kid_turn_04) dx = +0;
+  if (kid.frame == kid_stabilize_05) dx = +2;
+  if (kid.frame == kid_stabilize_06) dx = +6;
+  if (kid.frame == kid_stabilize_07) dx = +4;
+  if (kid.frame == kid_stabilize_08) dx = +0;
 
   bool run = (kid.dir == RIGHT) ? right_key : left_key;
   bool turn_run = (kid.dir == RIGHT) ? left_key : right_key;
@@ -725,55 +746,44 @@ void draw_kid_start_run ()
   bool jump = ((kid.dir == RIGHT) && right_key && up_key)
     || ((kid.dir == LEFT) && left_key && up_key);
 
+  /* fall */
+  if (kids.ctf == NO_FLOOR) {
+    draw_kid_fall ();
+    i = 0; return;
+  }
+
   if (couch) {
     draw_kid_couch ();
+    i = 0;
     return;
   }
 
-  if (jump &&
-      (kid.frame == kid_start_run_01
-       || kid.frame == kid_start_run_02
-       || kid.frame == kid_start_run_03)) {
+  if (jump && i < 3) {
     draw_kid_jump ();
+    i = 0;
     return;
   }
 
   kid.back_collision = NULL;
+  kid.collision = NULL;
+  kid.fall = NULL;
 
-  /* comming from normal */
-  if (kid.frame == kid_normal)
-    draw_anim (&kid, kid_start_run_01, -1, 0);
-  /* comming from turn */
-  else if (kid.frame == kid_turn_04)
-    draw_anim (&kid, kid_start_run_01, +0, 0);
-  /* comming from stabilize */
-  else if (kid.frame == kid_stabilize_05)
-    draw_anim (&kid, kid_start_run_01, +2, 0);
-  else if (kid.frame == kid_stabilize_06)
-    draw_anim (&kid, kid_start_run_01, +6, 0);
-  else if (kid.frame == kid_stabilize_07)
-    draw_anim (&kid, kid_start_run_01, +4, 0);
-  else if (kid.frame == kid_stabilize_08)
-    draw_anim (&kid, kid_start_run_01, +0, 0);
-  /* comming from start run */
-  else if (kid.frame == kid_start_run_01)
-    draw_anim (&kid, kid_start_run_02, -1, 0);
-  else if (kid.frame == kid_start_run_02)
-    draw_anim (&kid, kid_start_run_03, -4, 0);
-  else if (kid.frame == kid_start_run_03)
-    draw_anim (&kid, kid_start_run_04, -3, 0);
-  else if (kid.frame == kid_start_run_04) {
-    draw_anim (&kid, kid_start_run_05, -8, 0);
-    if (turn_run) kid.draw = draw_kid_stop_run;
-  } else if (kid.frame == kid_start_run_05) {
-    draw_anim (&kid, kid_start_run_06, -8, 0);
-    if (turn_run) kid.draw = draw_kid_stop_run;
-  } else if (kid.frame == kid_start_run_06) {
-    draw_anim (&kid, kid_run_07, -7, 0);
-    kid.draw = run ? draw_kid_run : draw_kid_stop_run;
-  } else error (-1, 0, "%s: unknown kid frame (%p)", __func__, kid.frame);
+  draw_anim (&kid, frame, dx, dy);
 
+  kid.fall = draw_kid_fall;
+  kid.collision = draw_kid_collision;
   kid.back_collision = draw_kid_back_collision;
+
+  if ((i == 3 || i ==4) && turn_run) {
+    kid.draw = draw_kid_stop_run;
+    i = 0;
+  }
+
+  if (i < 5) i++;
+  else if (i == 5) {
+    kid.draw = run ? draw_kid_run : draw_kid_stop_run;
+    i = 0;
+  }
 }
 
 bool
@@ -923,14 +933,21 @@ draw_kid_turn (void)
   int dx = frameset[i].dx;
   int dy = frameset[i].dy;
 
+  if (kid.frame == kid_stabilize_05) dx = +6;
+  if (kid.frame == kid_stabilize_06) dx = +10;
+  if (kid.frame == kid_stabilize_07) dx = +8;
+  if (kid.frame == kid_stabilize_08) dx = +4;
+  if (kid.frame == kid_turn_04) dx = +3;
+
+  if (! turn)
+    turn = ((kid.dir == RIGHT) && right_key)
+      || ((kid.dir == LEFT) && left_key);
+
   bool run = (kid.dir == RIGHT) ? left_key : right_key;
   bool walk = run && shift_key;
   bool jump = ((kid.dir == RIGHT) && left_key && up_key)
     || ((kid.dir == LEFT) && right_key && up_key);
   bool couch = down_key;
-  static bool turn = false;
-  if (! turn) turn = ((kid.dir == RIGHT) && right_key)
-                || ((kid.dir == LEFT) && left_key);
 
   kid.collision = NULL;
   kid.back_collision = NULL;
@@ -943,10 +960,10 @@ draw_kid_turn (void)
   kid.back_collision = draw_kid_back_collision;
 
   if (i < 3) i++;
-  if (i == 3) {
+  else if (i == 3) {
     i = 0;
     kid.dir = (kid.dir == RIGHT) ? LEFT : RIGHT;
-    if (turn) turn = false;
+    if (turn) kid.draw = draw_kid_turn, turn = false;
     else if (couch) kid.draw = draw_kid_couch;
     else if (jump) kid.draw = draw_kid_jump;
     else if (walk) kid.draw = draw_kid_walk;
@@ -1021,38 +1038,24 @@ draw_kid_stabilize (void)
   if (odraw == draw_kid_stabilize_collision) i = 1, collision = true;
 
   /* actions */
-  bool turn = ((kid.dir == RIGHT) && left_key)
-                || ((kid.dir == LEFT) && right_key);
+  if (! turn)
+    turn = ((kid.dir == RIGHT) && left_key)
+      || ((kid.dir == LEFT) && right_key);
   bool run = ((kid.dir == RIGHT) && right_key)
                || ((kid.dir == LEFT) && left_key);
   bool walk = ((kid.dir == RIGHT) && right_key && shift_key)
                 || ((kid.dir == LEFT) && left_key && shift_key);
   bool couch = down_key;
 
-  if (! collision) {
-    if (couch) {
-      draw_kid_couch ();
-      i = 0; return;
-    } else if (turn) {
-      draw_kid_turn ();
-      i = 0; return;
-    } else if (walk) {
-      draw_kid_walk ();
-      i = 0; return;
-    } else if (run) {
-      if (dist_collision (kid) < 32) draw_kid_walk ();
-      else draw_kid_start_run ();
-      i = 0; return;
-    }
-  }
-
   struct frameset frameset[4] =
-    {{kid_stabilize_05,+0,0},{kid_stabilize_06,-4,0},
+    {{kid_stabilize_05,-3,0},{kid_stabilize_06,-4,0},
      {kid_stabilize_07,+2,0},{kid_stabilize_08,+4,0}};
 
   ALLEGRO_BITMAP *frame = frameset[i].frame;
   int dx = frameset[i].dx;
   int dy = frameset[i].dy;
+
+  if (kid.frame == kid_stop_run_04) dx = -5;
 
   kid.collision = NULL;
   kid.back_collision = NULL;
@@ -1064,10 +1067,27 @@ draw_kid_stabilize (void)
   kid.back_collision = draw_kid_back_collision;
   kid.fall = draw_kid_fall;
 
+  if (! collision) {
+    if (couch) {
+      kid.draw = draw_kid_couch;
+      i = 0; return;
+    } else if (turn) {
+      kid.draw = draw_kid_turn;
+      i = 0; turn = false; return;
+    } else if (walk) {
+      kid.draw = draw_kid_walk;
+      i = 0; return;
+    } else if (run) {
+      if (dist_collision (kid) < 32) kid.draw = draw_kid_walk;
+      else kid.draw = draw_kid_start_run;
+      i = 0; return;
+    }
+  }
+
   if (i < 3) i++;
   else if (i == 3) {
     kid.draw = draw_kid_normal;
-    i = 0; collision = false; return;
+    i = 0; collision = turn = false; return;
   }
 }
 
@@ -1601,9 +1621,9 @@ draw_kid_vjump (void)
     i = j = 0; hang = false;
     return;
   }
-  /* hit ceiling */
+  /* is kid hit ceiling? */
   else if (i == 12 && j == 1
-           && construct_rel (kids.pmt, -1, 0).fg != NO_FLOOR) i++;
+           && construct_rel (kids.ptb, -1, 0).fg != NO_FLOOR) i++;
   else if (j == 4) j = 0, i++;
   else if (i != 12 && i < 17) i++;
   else if (i == 17) {
@@ -1736,6 +1756,8 @@ draw_kid_hang (void)
   int dir = (kid.dir == LEFT) ? 0 : 1;
   kid.c.x = PLACE_WIDTH * (hang_pos.place + dir) + 7;
   kid.c.y = PLACE_HEIGHT * hang_pos.floor - 9;
+
+  critical_edge = (construct (hang_pos).fg == NO_FLOOR);
 
   kid.fall = NULL;
   kid.collision = NULL;
