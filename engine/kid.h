@@ -208,8 +208,12 @@ void draw_kid_unclimb (void);
 void draw_kid_run_jump (void);
 
 bool is_kid_colliding (int min_dist);
-void draw_kid_normal_collision (void);
+int dist_kid_collision (void);
+void kid_to_collision_edge (int min_dist);
+void draw_kid_stabilize_collision (void);
 void draw_kid_couch_collision (void);
+bool is_hangable_pos_for_kid (struct pos p);
+bool can_kid_hang (void);
 
 bool is_kid_normal ();
 bool is_kid_start_walk (void);

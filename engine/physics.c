@@ -460,10 +460,10 @@ apply_physics (struct anim *a, ALLEGRO_BITMAP *frame,
     return;
   }
 
-  if (is_hitting_ceiling (na)) {
-    na.odraw = na.draw;
-    na.draw = na.ceiling;
-  }
+  /* if (is_hitting_ceiling (na)) { */
+  /*   na.odraw = na.draw; */
+  /*   na.draw = na.ceiling; */
+  /* } */
 
   if (is_colliding (na)) {
     na.odraw = na.draw;

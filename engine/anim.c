@@ -71,8 +71,10 @@ play_anim (void (*callback) (void), int freq)
           int df = dist_fall (kid);
           int dn = dist_next_place (kid);
           int dp = dist_prev_place (kid);
+          int kdc = dist_kid_collision ();
           if (a_key || d_key || w_key || s_key || enter_key)
-            printf ("floor = %i, place = %i, dc = %i, dbc = %i, df = %i, dn = %i, dp = %i\n", p.floor, p.place, dc, dbc, df, dn, dp);
+            printf ("kdc = %i, dp = %i\n", kdc, dp);
+            /* printf ("floor = %i, place = %i, dc = %i, dbc = %i, df = %i, dn = %i, dp = %i\n", p.floor, p.place, dc, dbc, df, dn, dp); */
         }
         /* end kid hack */
 

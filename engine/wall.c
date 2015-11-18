@@ -103,6 +103,7 @@ draw_wall_right (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
   draw_wall (bitmap, p);
   draw_construct_left (bitmap, prel (p, 0, +1));
+  draw_construct_left (bitmap, prel (p, -1, +1));
 }
 
 void

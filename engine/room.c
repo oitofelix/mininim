@@ -427,31 +427,31 @@ draw_room_fg (struct pos p)
     case NO_FLOOR:
       break;
     case FLOOR:
-      draw_floor_left (screen, p);
+      draw_floor (screen, p);
       break;
     case BROKEN_FLOOR:
-      draw_broken_floor_left (screen, p);
+      draw_broken_floor (screen, p);
       break;
     case LOOSE_FLOOR:
       l = loose_floor_at_pos (p);
-      l->draw_left (screen, l);
+      l->draw (screen, l);
       break;
     case OPENER_FLOOR:
       o = opener_floor_at_pos (p);
-      o->draw_left (screen, o);
+      o->draw (screen, o);
       break;
     case SPIKES_FLOOR:
-      draw_spikes_floor_floor_left (screen, p);
+      draw_spikes_floor_floor (screen, p);
       draw_spikes_fg (screen, p);
       break;
     case PILLAR:
-      draw_pillar_left (screen, p);
+      draw_pillar (screen, p);
       break;
     case WALL:
-      draw_wall_left (screen, p);
+      draw_wall_right (screen, p);
       break;
     case DOOR:
-      draw_door_left (screen, p);
+      draw_door (screen, p);
       break;
     default:
       error (-1, 0, "%s: unknown foreground construct type (%i)",
@@ -518,7 +518,7 @@ draw_room_fg (struct pos p)
       draw_construct_right (screen, prel (p, -1, 0));
       break;
     case WALL:
-      draw_wall (screen, p);
+      draw_wall_right (screen, p);
       break;
     case DOOR:
       draw_door (screen, p);
