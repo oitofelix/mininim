@@ -222,7 +222,8 @@ dist_next_place (struct anim a)
   int inc = (a.dir == LEFT) ? -1 : +1;
   int x = a.c.x;
 
-  while (p.place == pos (coord_tf (a)).place && abs (x - a.c.x) != PLACE_WIDTH)
+  while (p.place == pos (coord_tf (a)).place
+         && abs (x - a.c.x) != PLACE_WIDTH)
     a.c.x += inc;
 
   return inc * (a.c.x - x);
@@ -231,8 +232,10 @@ dist_next_place (struct anim a)
 int
 dist_next_place_0 (struct anim a,
                    struct coord (*coord_func) (struct anim a),
-                   struct pos (*pos_func) (struct coord c))
+                   struct pos (*pos_func) (struct coord c),
+                   int margin)
 {
+  a.c.x += (a.dir == LEFT) ? +margin : -margin;
   struct pos p = pos_func (coord_func (a));
   int inc = (a.dir == LEFT) ? -1 : +1;
   int x = a.c.x;

@@ -52,7 +52,8 @@ void apply_physics (struct anim *a, ALLEGRO_BITMAP *frame,
 int
 dist_next_place_0 (struct anim a,
                    struct coord (*coord_func) (struct anim a),
-                   struct pos (*pos_func) (struct coord c));
+                   struct pos (*pos_func) (struct coord c),
+                   int margin);
 
 extern struct pos hang_pos;
 extern struct pos floor_pos;

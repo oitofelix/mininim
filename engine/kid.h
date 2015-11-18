@@ -183,12 +183,6 @@ void draw_kid_vjump (void);
 void draw_kid_ceiling (void);
 void draw_kid_normal (void);
 void draw_kid_walk (void);
-void draw_kid_walk_min (void);
-void draw_kid_walk_short_short (void);
-void draw_kid_walk_short (void);
-void draw_kid_walk_long (void);
-void draw_kid_walk_long_long (void);
-void draw_kid_walk_max (void);
 void draw_kid_start_run (void);
 void draw_kid_stop_run (void);
 void draw_kid_run (void);
@@ -210,8 +204,16 @@ void draw_kid_run_jump (void);
 bool is_kid_colliding (int min_dist);
 int dist_kid_collision (void);
 void kid_to_collision_edge (int min_dist);
+bool place_kid_on_collision_edge (ALLEGRO_BITMAP* frame);
 void draw_kid_stabilize_collision (void);
 void draw_kid_couch_collision (void);
+
+bool is_kid_on_construct (int min_dist, enum construct_fg c);
+int dist_kid_construct (enum construct_fg c);
+void kid_to_construct_edge (int min_dist, enum construct_fg c);
+bool place_kid_on_construct_edge (ALLEGRO_BITMAP* frame,
+                                  enum construct_fg c);
+
 bool is_hangable_pos_for_kid (struct pos p);
 bool can_kid_hang (void);
 

@@ -66,14 +66,16 @@ play_anim (void (*callback) (void), int freq)
           if (w_key) kid.c.y--;
           if (s_key) kid.c.y++;
           struct pos p = pos (coord_tf (kid));
-          int dc = dist_collision (kid);
-          int dbc = dist_back_collision (kid);
-          int df = dist_fall (kid);
+          /* int dc = dist_collision (kid); */
+          /* int dbc = dist_back_collision (kid); */
+          /* int df = dist_fall (kid); */
           int dn = dist_next_place (kid);
           int dp = dist_prev_place (kid);
-          int kdc = dist_kid_collision ();
+          int dc = dist_kid_collision ();
+          int df = dist_kid_construct (NO_FLOOR);
+          int dl = dist_kid_construct (LOOSE_FLOOR);
           if (a_key || d_key || w_key || s_key || enter_key)
-            printf ("kdc = %i, dp = %i\n", kdc, dp);
+            printf ("dc = %i, df = %i, dl = %i\n", dc, df, dl);
             /* printf ("floor = %i, place = %i, dc = %i, dbc = %i, df = %i, dn = %i, dp = %i\n", p.floor, p.place, dc, dbc, df, dn, dp); */
         }
         /* end kid hack */
