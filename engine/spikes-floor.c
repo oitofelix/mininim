@@ -172,7 +172,7 @@ should_spikes_raise_for_pos (struct pos p, struct pos pk)
 {
   return peq (pk, p) || peq (pk, prel (p, -1, 0))
     || (peq (pk, prel (p, -2, 0))
-        && construct (prel (p, -1, 0)).fg != WALL);
+        && crel (p, -1, 0).fg != WALL);
 }
 
 bool
@@ -212,7 +212,7 @@ draw_spikes_floor_floor (ALLEGRO_BITMAP *bitmap, struct pos p)
   draw_floor_base (bitmap, p);
   draw_bitmapc (spikes_floor_left, bitmap, floor_left_coord (p), 0);
   draw_bitmapc (spikes_floor_right, bitmap, floor_right_coord (p), 0);
-  draw_construct_left (bitmap, prel (p, 0, +1));
+  draw_con_left (bitmap, prel (p, 0, +1));
 }
 
 void
@@ -227,7 +227,7 @@ draw_spikes_floor_floor_right (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
   draw_floor_base (bitmap, p);
   draw_bitmapc (spikes_floor_right, bitmap, floor_right_coord (p), 0);
-  draw_construct_left (bitmap, prel (p, 0, +1));
+  draw_con_left (bitmap, prel (p, 0, +1));
 }
 
 void
@@ -299,7 +299,7 @@ void
 draw_spikes_right_01 (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
   draw_bitmapc (spikes_right_01, bitmap, spikes_right_01_coord (p), 0);
-  draw_construct_left (bitmap, prel (p, 0, +1));
+  draw_con_left (bitmap, prel (p, 0, +1));
 }
 
 void
@@ -355,7 +355,7 @@ void
 draw_spikes_right_02 (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
   draw_bitmapc (spikes_right_02, bitmap, spikes_right_02_coord (p), 0);
-  draw_construct_left (bitmap, prel (p, 0, +1));
+  draw_con_left (bitmap, prel (p, 0, +1));
 }
 
 void
@@ -411,7 +411,7 @@ void
 draw_spikes_right_03 (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
   draw_bitmapc (spikes_right_03, bitmap, spikes_right_03_coord (p), 0);
-  draw_construct_left (bitmap, prel (p, 0, +1));
+  draw_con_left (bitmap, prel (p, 0, +1));
 }
 
 void
@@ -467,7 +467,7 @@ void
 draw_spikes_right_04 (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
   draw_bitmapc (spikes_right_04, bitmap, spikes_right_04_coord (p), 0);
-  draw_construct_left (bitmap, prel (p, 0, +1));
+  draw_con_left (bitmap, prel (p, 0, +1));
 }
 
 void
@@ -523,7 +523,7 @@ void
 draw_spikes_right_05 (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
   draw_bitmapc (spikes_right_05, bitmap, spikes_right_05_coord (p), 0);
-  draw_construct_left (bitmap, prel (p, 0, +1));
+  draw_con_left (bitmap, prel (p, 0, +1));
 }
 
 void

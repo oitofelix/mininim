@@ -65,18 +65,17 @@ play_anim (void (*callback) (void), int freq)
           if (d_key) kid.c.x++;
           if (w_key) kid.c.y--;
           if (s_key) kid.c.y++;
-          struct pos p = pos (coord_tf (kid));
           /* int dc = dist_collision (kid); */
           /* int dbc = dist_back_collision (kid); */
           /* int df = dist_fall (kid); */
-          int dn = dist_next_place (kid);
-          int dp = dist_prev_place (kid);
+          int dn = dist_next_place (kid, coord_tf, pos, 0, false);
+          int dp = dist_next_place (kid, coord_tf, pos, 0, true);
           int dc = dist_kid_collision ();
-          int df = dist_kid_construct (NO_FLOOR);
-          int dl = dist_kid_construct (LOOSE_FLOOR);
+          int df = dist_kid_con (NO_FLOOR);
+          int dl = dist_kid_con (LOOSE_FLOOR);
           if (a_key || d_key || w_key || s_key || enter_key)
             printf ("dc = %i, df = %i, dl = %i\n", dc, df, dl);
-            /* printf ("floor = %i, place = %i, dc = %i, dbc = %i, df = %i, dn = %i, dp = %i\n", p.floor, p.place, dc, dbc, df, dn, dp); */
+            /* printf ("floor = %i, place = %i, dc = %i, dbc = %i, df = %i, dn = %i, dp = %i\n", kids.ptf.floor, kids.ptf.place, dc, dbc, df, dn, dp); */
         }
         /* end kid hack */
 
@@ -120,7 +119,9 @@ void
 draw_anim (struct anim *a, ALLEGRO_BITMAP *frame,
              int dx, int dy)
 {
-  apply_physics (a, frame, dx, dy);
+  struct anim na = next_anim (*a, frame, dx, dy);
+  if (! cutscene) na.c = nanim (na);
+  (*a) = na;
   draw_bitmapc (a->frame, screen, a->c, a->flip);
 }
 
@@ -147,78 +148,6 @@ next_anim (struct anim a, ALLEGRO_BITMAP* frame, int dx, int dy)
   na.frame = frame;
 
   return na;
-}
-
-void
-draw_anim_on_next_place_edge (struct anim *a, ALLEGRO_BITMAP* frame, int dx, int dy)
-{
-  struct anim na = next_anim (*a, frame, dx, dy);
-  (*a) = na;
-  to_next_place_edge (a);
-  draw_anim (a, frame, +0, 0);
-}
-
-void
-draw_anim_on_collision_edge (struct anim *a, ALLEGRO_BITMAP* frame, int dx, int dy)
-{
-  struct anim na = next_anim (*a, frame, dx, dy);
-  (*a) = na;
-  to_collision_edge (a);
-  draw_anim (a, frame, +0, 0);
-}
-
-void
-draw_anim_on_fall_edge (struct anim *a, ALLEGRO_BITMAP* frame, int dx, int dy)
-{
-  struct anim na = next_anim (*a, frame, dx, dy);
-  (*a) = na;
-  to_fall_edge (a);
-  draw_anim (a, frame, +0, 0);
-}
-
-void
-draw_anim_on_floor_edge (struct anim *a,
-                         ALLEGRO_BITMAP* frame, int dx, int dy,
-                         enum construct_fg type)
-{
-  struct anim na = next_anim (*a, frame, dx, dy);
-  (*a) = na;
-  to_floor_edge (a, type);
-  draw_anim (a, frame, +0, 0);
-}
-
-void
-draw_anim_on_fall_or_floor_edge
-(struct anim *a, ALLEGRO_BITMAP* frame, int dx, int dy,
- enum construct_fg type)
-{
-  struct anim na = next_anim (*a, frame, dx, dy);
-  (*a) = na;
-  to_fall_edge (a);
-  to_floor_edge (a, type);
-  draw_anim (a, frame, +0, 0);
-}
-
-void
-draw_anim_on_edge (struct anim *a, ALLEGRO_BITMAP* frame, int dx, int dy,
-                   enum construct_fg type)
-{
-  struct anim na = next_anim (*a, frame, +0, 0);
-  (*a) = na;
-
-  int dc = dist_collision (na);
-  int df = dist_fall (na);
-  int dl = dist_floor (na, LOOSE_FLOOR);
-
-  bool collision = abs (dc) < PLACE_WIDTH;
-  bool floor = abs (dl) < PLACE_WIDTH;
-  bool fall = abs (df) < PLACE_WIDTH;
-
-  if (collision) to_collision_edge (a);
-  else if (floor) to_floor_edge (a, type);
-  else if (fall) to_fall_edge (a);
-
-  draw_anim (a, frame, dx, dy);
 }
 
 bool

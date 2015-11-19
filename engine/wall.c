@@ -102,8 +102,8 @@ void
 draw_wall_right (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
   draw_wall (bitmap, p);
-  draw_construct_left (bitmap, prel (p, 0, +1));
-  draw_construct_left (bitmap, prel (p, -1, +1));
+  draw_con_left (bitmap, prel (p, 0, +1));
+  draw_con_left (bitmap, prel (p, -1, +1));
 }
 
 void
@@ -208,18 +208,18 @@ wall_face_top_coord (struct pos p)
 enum wall_correlation
 wall_correlation (struct pos p)
 {
-  if (construct (p).fg != WALL)
+  if (con (p).fg != WALL)
     error (-1, 0, "%s: requested wall correlation on non-wall (%i, %i, %i)",
            __func__, p.room, p.floor, p.place);
 
-  if (construct_rel (p, 0, -1).fg != WALL
-      && construct_rel (p, 0, +1).fg != WALL) return SWS;
-  else if (construct_rel (p, 0, -1).fg != WALL
-           && construct_rel (p, 0, +1).fg == WALL) return SWW;
-  else if (construct_rel (p, 0, -1).fg == WALL
-           && construct_rel (p, 0, +1).fg != WALL) return WWS;
-  else if (construct_rel (p, 0, -1).fg == WALL
-           && construct_rel (p, 0, +1).fg == WALL) return WWW;
+  if (crel (p, 0, -1).fg != WALL
+      && crel (p, 0, +1).fg != WALL) return SWS;
+  else if (crel (p, 0, -1).fg != WALL
+           && crel (p, 0, +1).fg == WALL) return SWW;
+  else if (crel (p, 0, -1).fg == WALL
+           && crel (p, 0, +1).fg != WALL) return WWS;
+  else if (crel (p, 0, -1).fg == WALL
+           && crel (p, 0, +1).fg == WALL) return WWW;
   else
     error (-1, 0, "%s: unknown wall correlation (%i, %i. %i)",
            __func__, p.room, p.floor, p.place);

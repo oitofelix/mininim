@@ -74,11 +74,6 @@ struct anim {
   int repeat;
   int flip;
   void (*draw) (void);
-  void (*odraw) (void);
-  void (*collision) (void);
-  void (*back_collision) (void);
-  void (*fall) (void);
-  void (*ceiling) (void);
 };
 
 struct level {
@@ -86,8 +81,8 @@ struct level {
     DUNGEON, PALACE,
   } type;
 
-  struct construct {
-    enum construct_fg {
+  struct con {
+    enum confg {
       NO_FLOOR,
       FLOOR,
       BROKEN_FLOOR,
@@ -98,7 +93,7 @@ struct level {
       WALL,
       DOOR,
     } fg;
-    enum construct_bg {
+    enum conbg {
       NO_BG,
       BRICKS_01,
       BRICKS_02,
@@ -108,7 +103,7 @@ struct level {
       WINDOW,
     } bg;
     int event;
-  } construct[ROOMS][FLOORS][PLACES];
+  } con[ROOMS][FLOORS][PLACES];
 
   struct {
     int l, r, a, b;
@@ -127,7 +122,7 @@ struct survey {
   struct pos pm, pmt, pmbo, pml, pmr, pmf, pmba,
     ptl, ptr, ptf, ptb,
     pbl, pbr, pbf, pbb;
-  enum construct_fg cm, cmt, cmbo, cml, cmr, cmf, cmba,
+  enum confg cm, cmt, cmbo, cml, cmr, cmf, cmba,
     ctl, ctr, ctf, ctb,
     cbl, cbr, cbf, cbb;
 };

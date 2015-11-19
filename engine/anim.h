@@ -33,11 +33,11 @@ void draw_anim_on_collision_edge (struct anim *a, ALLEGRO_BITMAP* frame,
 void draw_anim_on_fall_edge (struct anim *a, ALLEGRO_BITMAP* frame, int dx, int dy);
 void draw_anim_on_next_place_edge (struct anim *a, ALLEGRO_BITMAP* frame, int dx, int dy);
 void draw_anim_on_floor_edge (struct anim *a, ALLEGRO_BITMAP* frame, int dx, int dy,
-                              enum construct_fg type);
+                              enum confg type);
 void draw_anim_on_fall_or_floor_edge (struct anim *a, ALLEGRO_BITMAP* frame,
-                                      int dx, int dy, enum construct_fg type);
+                                      int dx, int dy, enum confg type);
 void draw_anim_on_edge (struct anim *a, ALLEGRO_BITMAP* frame, int dx, int dy,
-                        enum construct_fg type);
+                        enum confg type);
 
 /* variables */
 extern bool quit_anim; /* set to true to quit animation */

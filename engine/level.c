@@ -53,20 +53,20 @@ play_level (struct level *_level)
   level = _level;
   load_level ();
 
-  register_constructs ();
+  register_cons ();
   play_anim (level_anim, 12);
 
   unload_level ();
 }
 
 void
-register_constructs (void)
+register_cons (void)
 {
   struct pos p;
   for (p.room = 0; p.room < ROOMS; p.room++)
     for (p.floor = 0; p.floor < FLOORS; p.floor++)
       for (p.place = 0; p.place < PLACES; p.place++)
-        switch (construct (p).fg) {
+        switch (con (p).fg) {
         case LOOSE_FLOOR: register_loose_floor (p); break;
         case OPENER_FLOOR: register_opener_floor (p); break;
         case SPIKES_FLOOR: register_spikes_floor (p); break;

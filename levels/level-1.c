@@ -24,7 +24,7 @@
 static struct level level_1 = {
   .type = DUNGEON,
 
-  .construct = {
+  .con = {
     [0] =
     {{{WALL}, {WALL}, {WALL}, {WALL}, {WALL},
       {WALL}, {WALL}, {WALL}, {WALL}, {WALL}},

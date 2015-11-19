@@ -40,11 +40,11 @@ void draw_bitmap_regionc (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to, float sx, fl
                      float sw, float sh, struct coord c, int flags);
 void draw_room (int room);
 void draw_room_bg (void);
-void draw_construct (ALLEGRO_BITMAP *bitmap, struct pos p);
-void draw_construct_fg (ALLEGRO_BITMAP *bitmap, struct pos p);
-void draw_construct_bg (ALLEGRO_BITMAP *bitmap, struct pos p);
-void draw_construct_left (ALLEGRO_BITMAP *bitmap, struct pos p);
-void draw_construct_right (ALLEGRO_BITMAP *bitmap, struct pos p);
+void draw_con (ALLEGRO_BITMAP *bitmap, struct pos p);
+void draw_confg (ALLEGRO_BITMAP *bitmap, struct pos p);
+void draw_conbg (ALLEGRO_BITMAP *bitmap, struct pos p);
+void draw_con_left (ALLEGRO_BITMAP *bitmap, struct pos p);
+void draw_con_right (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_no_floor_base (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_no_floor (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_bricks_01 (ALLEGRO_BITMAP *bitmap, struct pos p);

@@ -145,7 +145,7 @@ draw_doors (void)
 
       if (is_pos_visible (d->p)) {
         draw_door_grid (screen, d->p, d->i);
-        draw_construct_left (screen, prel (d->p, -1, +1));
+        draw_con_left (screen, prel (d->p, -1, +1));
       }
     }
   }
@@ -202,7 +202,7 @@ draw_door_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
   if (peq (kids.pm, p)) {
     struct door *d = door_at_pos (p);
     draw_door_grid (screen, p, d->i);
-    draw_construct_left (screen, prel (p, -1, +1));
+    draw_con_left (screen, prel (p, -1, +1));
   }
 }
 

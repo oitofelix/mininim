@@ -89,7 +89,7 @@ draw_fire (int room)
 
   for (pos.floor = FLOORS - 1; pos.floor >= 0; pos.floor--)
     for (pos.place = -1; pos.place + 1 < PLACES; pos.place++) {
-      if (construct (pos).bg == TORCH) {
+      if (con (pos).bg == TORCH) {
 
         fire = get_fire_frame (prandom_pos (pos, i, 8));
         draw_bitmap (fire, screen, 32 * (pos.place + 1) + 8, 63 * pos.floor + 4,
