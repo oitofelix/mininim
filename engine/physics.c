@@ -468,22 +468,22 @@ apply_physics (struct anim *a, ALLEGRO_BITMAP *frame,
   /*   na.draw = na.ceiling; */
   /* } */
 
-  if (is_colliding (na)) {
-    na.odraw = na.draw;
-    na.draw = na.collision;
-    to_collision_edge (&na);
-  }
+  /* if (is_colliding (na)) { */
+  /*   na.odraw = na.draw; */
+  /*   na.draw = na.collision; */
+  /*   to_collision_edge (&na); */
+  /* } */
 
-  if (is_back_colliding (na)) {
-    na.odraw = na.draw;
-    na.draw = na.back_collision;
-    to_back_collision_edge (&na);
-  }
+  /* if (is_back_colliding (na)) { */
+  /*   na.odraw = na.draw; */
+  /*   na.draw = na.back_collision; */
+  /*   to_back_collision_edge (&na); */
+  /* } */
 
-  if (is_falling (na)) {
-    na.odraw = na.draw;
-    na.draw = na.fall;
-  }
+  /* if (is_falling (na)) { */
+  /*   na.odraw = na.draw; */
+  /*   na.draw = na.fall; */
+  /* } */
 
   na.c = nanim (na);
 
