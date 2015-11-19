@@ -38,8 +38,53 @@ static int inertia = 0;
 static bool critical_edge = false;
 static bool turn = false;
 
-static struct frameset hang_frameset[13];
-static struct frameset climb_frameset[15];
+#define WALK_FRAMESET_NMEMB 12
+#define START_RUN_FRAMESET_NMEMB 6
+#define RUN_FRAMESET_NMEMB 8
+#define STOP_RUN_FRAMESET_NMEMB 4
+#define TURN_FRAMESET_NMEMB 4
+#define TURN_RUN_FRAMESET_NMEMB 9
+#define JUMP_FRAMESET_NMEMB 18
+#define VJUMP_FRAMESET_NMEMB 18
+#define RUN_JUMP_FRAMESET_NMEMB 11
+#define MISSTEP_FRAMESET_NMEMB 11
+#define HANG_FRAMESET_NMEMB 13
+#define CLIMB_FRAMESET_NMEMB 15
+#define STABILIZE_FRAMESET_NMEMB 4
+#define COUCH_FRAMESET_NMEMB 13
+#define FALL_FRAMESET_NMEMB 13
+
+static struct frameset walk_frameset[WALK_FRAMESET_NMEMB];
+static struct frameset start_run_frameset[START_RUN_FRAMESET_NMEMB];
+static struct frameset run_frameset[RUN_FRAMESET_NMEMB];
+static struct frameset stop_run_frameset[STOP_RUN_FRAMESET_NMEMB];
+static struct frameset turn_frameset[TURN_FRAMESET_NMEMB];
+static struct frameset turn_run_frameset[TURN_RUN_FRAMESET_NMEMB];
+static struct frameset jump_frameset[JUMP_FRAMESET_NMEMB];
+static struct frameset vjump_frameset[VJUMP_FRAMESET_NMEMB];
+static struct frameset run_jump_frameset[JUMP_FRAMESET_NMEMB];
+static struct frameset misstep_frameset[MISSTEP_FRAMESET_NMEMB];
+static struct frameset hang_frameset[HANG_FRAMESET_NMEMB];
+static struct frameset climb_frameset[CLIMB_FRAMESET_NMEMB];
+static struct frameset stabilize_frameset[STABILIZE_FRAMESET_NMEMB];
+static struct frameset couch_frameset[COUCH_FRAMESET_NMEMB];
+static struct frameset fall_frameset[FALL_FRAMESET_NMEMB];
+
+static void init_walk_frameset (void);
+static void init_start_run_frameset (void);
+static void init_run_frameset (void);
+static void init_stop_run_frameset (void);
+static void init_turn_frameset (void);
+static void init_turn_run_frameset (void);
+static void init_jump_frameset (void);
+static void init_vjump_frameset (void);
+static void init_run_jump_frameset (void);
+static void init_misstep_frameset (void);
+static void init_hang_frameset (void);
+static void init_climb_frameset (void);
+static void init_stabilize_frameset (void);
+static void init_couch_frameset (void);
+static void init_fall_frameset (void);
 
 ALLEGRO_BITMAP *kid_normal,
   *kid_start_run_01, *kid_start_run_02, *kid_start_run_03, *kid_start_run_04,
@@ -83,9 +128,6 @@ ALLEGRO_BITMAP *kid_normal,
 ALLEGRO_SAMPLE *step, *hit_ground, *hit_wall, *hang_on_fall;
 
 static void place_kid (int room, int floor, int place);
-
-static void init_climb_frameset (void);
-static void init_hang_frameset (void);
 
 static void draw_kid_normal (void);
 static void draw_kid_walk (void);
@@ -262,9 +304,22 @@ load_kid (void)
   hit_wall = load_sample (HIT_WALL);
   hang_on_fall = load_sample (HANG_ON_FALL);
 
-  /* shared framesets */
-  init_climb_frameset ();
+  /* framesets */
+  init_walk_frameset ();
+  init_start_run_frameset ();
+  init_run_frameset ();
+  init_stop_run_frameset ();
+  init_turn_frameset ();
+  init_turn_run_frameset ();
+  init_jump_frameset ();
+  init_vjump_frameset ();
+  init_run_jump_frameset ();
+  init_misstep_frameset ();
   init_hang_frameset ();
+  init_climb_frameset ();
+  init_stabilize_frameset ();
+  init_couch_frameset ();
+  init_fall_frameset ();
 
   /* kid himself */
   kid.id = &kid;
@@ -441,23 +496,138 @@ place_kid (int room, int floor, int place)
 
 
 void
-init_climb_frameset (void)
+init_walk_frameset (void)
 {
-  struct frameset frameset[15] =
-    {{kid_climb_01,+1,+0},{kid_climb_02,+0,-9},{kid_climb_03,-4,-5},
-     {kid_climb_04,-8,-6},{kid_climb_05,-5,-4},{kid_climb_06,-2,-5},
-     {kid_climb_07,-1,-5},{kid_climb_08,-4,-8},{kid_climb_09,+0,-4},
-     {kid_climb_10,+0,-1},{kid_climb_11,-3,-4},{kid_climb_12,+1,+0},
-     {kid_climb_13,+0,+0},{kid_climb_14,-1,+0},{kid_climb_15,+0,+0}};
+  struct frameset frameset[WALK_FRAMESET_NMEMB] =
+    {{kid_walk_01,-1,0},{kid_walk_02,-1,0},{kid_walk_03,+0,0},
+     {kid_walk_04,-8,0},{kid_walk_05,-7,0},{kid_walk_06,-6,0},
+     {kid_walk_07,+3,0},{kid_walk_08,-2,0},{kid_walk_09,-1,0},
+     {kid_walk_10,-1,0},{kid_walk_11,-2,0},{kid_walk_12,+0,0}};
 
-  memcpy (&climb_frameset, &frameset,
-          15 * sizeof (struct frameset));
+  memcpy (&walk_frameset, &frameset,
+          WALK_FRAMESET_NMEMB * sizeof (struct frameset));
+}
+
+void
+init_start_run_frameset (void)
+{
+  struct frameset frameset[START_RUN_FRAMESET_NMEMB] =
+    {{kid_start_run_01,-1,0},{kid_start_run_02,-1,0},
+     {kid_start_run_03,-4,0},{kid_start_run_04,-3,0},
+     {kid_start_run_05,-8,0},{kid_start_run_06,-8,0}};
+
+  memcpy (&start_run_frameset, &frameset,
+          START_RUN_FRAMESET_NMEMB * sizeof (struct frameset));
+}
+
+void
+init_run_frameset (void)
+{
+  struct frameset frameset[RUN_FRAMESET_NMEMB] =
+    {{kid_run_07,-9,0},{kid_run_08,-10,0},{kid_run_09,-3,0},
+     {kid_run_10,-5,0},{kid_run_11,-9,0},{kid_run_12,-11,0},
+     {kid_run_13,-4,0},{kid_run_14,-8,0}};
+
+  memcpy (&run_frameset, &frameset,
+          RUN_FRAMESET_NMEMB * sizeof (struct frameset));
+}
+
+void
+init_stop_run_frameset (void)
+{
+  struct frameset frameset[STOP_RUN_FRAMESET_NMEMB] =
+    {{kid_stop_run_01,+0,0},{kid_stop_run_02,-6,0},
+     {kid_stop_run_03,-16,0},{kid_stop_run_04,+0,0}};
+
+  memcpy (&stop_run_frameset, &frameset,
+          STOP_RUN_FRAMESET_NMEMB * sizeof (struct frameset));
+}
+
+void
+init_turn_frameset (void)
+{
+  struct frameset frameset[TURN_FRAMESET_NMEMB] =
+    {{kid_turn_01,+2,0},{kid_turn_02,+1,0},
+     {kid_turn_03,-3,0},{kid_turn_04,+0,+0}};
+
+  memcpy (&turn_frameset, &frameset,
+          TURN_FRAMESET_NMEMB * sizeof (struct frameset));
+}
+
+void
+init_turn_run_frameset (void)
+{
+  struct frameset frameset[9] =
+    {{kid_turn_run_05,-18,0},{kid_turn_run_06,-6,0},{kid_turn_run_07,-4,0},
+     {kid_turn_run_08,+2,0},{kid_turn_run_09,-6,0},{kid_turn_run_10,+3,0},
+     {kid_turn_run_11,-1,0},{kid_turn_run_12,+0,0},{kid_turn_run_13,+4,0}};
+
+  memcpy (&turn_run_frameset, &frameset,
+          TURN_RUN_FRAMESET_NMEMB * sizeof (struct frameset));
+}
+
+void
+init_jump_frameset (void)
+{
+  struct frameset frameset[JUMP_FRAMESET_NMEMB] =
+    {{kid_jump_01,+2,0},{kid_jump_02,-2,0},{kid_jump_03,-4,0},
+     {kid_jump_04,-5,0},{kid_jump_05,-3,0},{kid_jump_06,-6,0},
+     {kid_jump_07,-3,0},{kid_jump_08,-17,0},{kid_jump_09,-21,0},
+     {kid_jump_10,-11,-6},{kid_jump_11,-2,+6},{kid_jump_12,-9,0},
+     {kid_jump_13,+6,0},{kid_jump_14,-11,0},{kid_jump_15,+0,0},
+     {kid_jump_16,+0,0},{kid_jump_17,+1,0},{kid_jump_18,+0,0}};
+
+  memcpy (&jump_frameset, &frameset,
+          JUMP_FRAMESET_NMEMB * sizeof (struct frameset));
+}
+
+void
+init_vjump_frameset (void)
+{
+  struct frameset frameset[VJUMP_FRAMESET_NMEMB] =
+    {{kid_vjump_01,+3,+0},{kid_vjump_02,-1,+0},{kid_vjump_03,-1,+0},
+     {kid_vjump_04,+2,+0},{kid_vjump_05,+0,+0},{kid_vjump_06,-1,+0},
+     {kid_vjump_07,-1,+0},{kid_vjump_08,-3,+0},{kid_vjump_09,-1,+0},
+     {kid_vjump_10,-6,+0},{kid_vjump_11,+0,+0},{kid_vjump_12,+2,-3},
+     {kid_vjump_13,+3,-7},{kid_vjump_15,+0,+8},{kid_vjump_16,+3,+2},
+     {kid_vjump_17,-1,+0},{kid_vjump_18,+0,+0},{kid_vjump_19,+0,0}};
+
+  memcpy (&vjump_frameset, &frameset,
+          VJUMP_FRAMESET_NMEMB * sizeof (struct frameset));
+}
+
+void
+init_run_jump_frameset (void)
+{
+  struct frameset frameset[RUN_JUMP_FRAMESET_NMEMB] =
+    {{kid_run_jump_01,-10,+0},{kid_run_jump_02,-11,+0},
+     {kid_run_jump_03,-13,+0},{kid_run_jump_04,-7,+0},
+     {kid_run_jump_05,-12,+0},{kid_run_jump_06,-15,+0},
+     {kid_run_jump_07,-29,-3},{kid_run_jump_08,-17,-9},
+     {kid_run_jump_09,-18,-2},{kid_run_jump_10,-10,+11},
+     {kid_run_jump_11,-8,+3}};
+
+  memcpy (&run_jump_frameset, &frameset,
+          RUN_JUMP_FRAMESET_NMEMB * sizeof (struct frameset));
+}
+
+void
+init_misstep_frameset (void)
+{
+  struct frameset frameset[MISSTEP_FRAMESET_NMEMB] =
+    {{kid_walk_01,-1,0},{kid_walk_02,-1,0},{kid_walk_03,+0,0},
+     {kid_walk_04,-8,0},{kid_walk_05,-7,0},{kid_walk_06,-4,0},
+     {kid_jump_14,+8,0},{kid_couch_10,+8,0},{kid_couch_11,+3,0},
+     {kid_couch_12,+0,0},{kid_couch_13,+4,0}};
+
+  memcpy (&misstep_frameset, &frameset,
+          MISSTEP_FRAMESET_NMEMB * sizeof (struct frameset));
 }
 
 void
 init_hang_frameset (void)
 {
-  struct frameset frameset[13] =
+  struct frameset frameset[HANG_FRAMESET_NMEMB] =
     {{kid_hang_00,+0,+0},{kid_hang_01,+0,+2},{kid_hang_02,+4,+0},
      {kid_hang_03,+3,+2},{kid_hang_04,+3,+0},{kid_hang_05,+1,+0},
      {kid_hang_06,+1,-1},{kid_hang_07,+2,+0},{kid_hang_08,+0,-3},
@@ -465,7 +635,57 @@ init_hang_frameset (void)
      {kid_hang_12,-3,+0}};
 
   memcpy (&hang_frameset, &frameset,
-          13 * sizeof (struct frameset));
+          HANG_FRAMESET_NMEMB * sizeof (struct frameset));
+}
+
+void
+init_climb_frameset (void)
+{
+  struct frameset frameset[CLIMB_FRAMESET_NMEMB] =
+    {{kid_climb_01,+1,+0},{kid_climb_02,+0,-9},{kid_climb_03,-4,-5},
+     {kid_climb_04,-8,-6},{kid_climb_05,-5,-4},{kid_climb_06,-2,-5},
+     {kid_climb_07,-1,-5},{kid_climb_08,-4,-8},{kid_climb_09,+0,-4},
+     {kid_climb_10,+0,-1},{kid_climb_11,-3,-4},{kid_climb_12,+1,+0},
+     {kid_climb_13,+0,+0},{kid_climb_14,-1,+0},{kid_climb_15,+0,+0}};
+
+  memcpy (&climb_frameset, &frameset,
+          CLIMB_FRAMESET_NMEMB * sizeof (struct frameset));
+}
+
+void
+init_stabilize_frameset (void)
+{
+  struct frameset frameset[STABILIZE_FRAMESET_NMEMB] =
+    {{kid_stabilize_05,-3,0},{kid_stabilize_06,-4,0},
+     {kid_stabilize_07,+2,0},{kid_stabilize_08,+4,0}};
+
+  memcpy (&stabilize_frameset, &frameset,
+          STABILIZE_FRAMESET_NMEMB * sizeof (struct frameset));
+}
+
+void
+init_couch_frameset (void)
+{
+  struct frameset frameset[COUCH_FRAMESET_NMEMB] =
+    {{kid_couch_01,-3,0},{kid_couch_02,-4,0},{kid_couch_03,+0,0},
+     {kid_couch_04,-4,0},{kid_couch_05,-1,0},{kid_couch_06,-4,0},
+     {kid_couch_07,+1,0},{kid_couch_08,-2,0},{kid_couch_09,-1,0},
+     {kid_couch_10,+0,0},{kid_couch_11,+3,0},{kid_couch_12,+0,0},
+     {kid_couch_13,+4,0}};
+
+  memcpy (&couch_frameset, &frameset,
+          COUCH_FRAMESET_NMEMB * sizeof (struct frameset));
+}
+
+void
+init_fall_frameset (void)
+{
+  struct frameset frameset[FALL_FRAMESET_NMEMB] =
+    {{kid_fall_13,+0,+0},{kid_fall_14,+0,+5},{kid_fall_15,+0,+10},
+     {kid_fall_16,+0,+11},{kid_fall_17,+0,+20}};
+
+  memcpy (&fall_frameset, &frameset,
+          FALL_FRAMESET_NMEMB * sizeof (struct frameset));
 }
 
 
@@ -507,11 +727,11 @@ draw_kid_normal (void)
 
     /* printf ("x = %i, y = %i, floor = %i, place = %i\n", px, py, (py -3) / 63, (px - 15) / 32); */
 
-  if (kid.frame == kid_stabilize_08) dx = +2;
-  if (kid.frame == kid_walk_12) dx = -1;
-  if (kid.frame == kid_jump_18) dx = -4;
-  if (kid.frame == kid_couch_13) dx = -2;
-  if (kid.frame == kid_vjump_19) dx = +2;
+  if (kid.frame == stabilize_frameset[3].frame) dx = +2;
+  if (kid.frame == walk_frameset[11].frame) dx = -1;
+  if (kid.frame == jump_frameset[17].frame) dx = -4;
+  if (kid.frame == couch_frameset[12].frame) dx = -2;
+  if (kid.frame == jump_frameset[17].frame) dx = +2;
 
   if (couch) {
     draw_kid_couch ();
@@ -578,15 +798,9 @@ draw_kid_walk (void)
     }
   }
 
-  struct frameset frameset[12] =
-    {{kid_walk_01,-1,0},{kid_walk_02,-1,0},{kid_walk_03,+0,0},
-     {kid_walk_04,-8,0},{kid_walk_05,-7,0},{kid_walk_06,-6,0},
-     {kid_walk_07,+3,0},{kid_walk_08,-2,0},{kid_walk_09,-1,0},
-     {kid_walk_10,-1,0},{kid_walk_11,-2,0},{kid_walk_12,+0,0}};
-
-  ALLEGRO_BITMAP *frame = frameset[i].frame;
-  int dx = frameset[i].dx;
-  int dy = frameset[i].dy;
+  ALLEGRO_BITMAP *frame = walk_frameset[i].frame;
+  int dx = walk_frameset[i].dx;
+  int dy = walk_frameset[i].dy;
 
   if (((i == 10) && walk_0)
       || ((i == 3) && walk_1)
@@ -610,11 +824,11 @@ draw_kid_walk (void)
   }
 
   if (i == 0) {
-    if (kid.frame == kid_turn_04) dx = +0;
-    if (kid.frame == kid_stabilize_05) dx = +2;
-    if (kid.frame == kid_stabilize_06) dx = +6;
-    if (kid.frame == kid_stabilize_07) dx = +3;
-    if (kid.frame == kid_stabilize_08) dx = +0;
+    if (kid.frame == turn_frameset[3].frame) dx = +0;
+    if (kid.frame == stabilize_frameset[0].frame) dx = +2;
+    if (kid.frame == stabilize_frameset[1].frame) dx = +6;
+    if (kid.frame == stabilize_frameset[2].frame) dx = +3;
+    if (kid.frame == stabilize_frameset[3].frame) dx = +0;
   }
 
   /* fall */
@@ -659,20 +873,15 @@ draw_kid_start_run (void)
   static int i = 0;
   if (odraw != draw_kid_start_run) i = 0;
 
-  struct frameset frameset[6] =
-    {{kid_start_run_01,-1,0},{kid_start_run_02,-1,0},
-     {kid_start_run_03,-4,0},{kid_start_run_04,-3,0},
-     {kid_start_run_05,-8,0},{kid_start_run_06,-8,0}};
+  ALLEGRO_BITMAP *frame = start_run_frameset[i].frame;
+  int dx = start_run_frameset[i].dx;
+  int dy = start_run_frameset[i].dy;
 
-  ALLEGRO_BITMAP *frame = frameset[i].frame;
-  int dx = frameset[i].dx;
-  int dy = frameset[i].dy;
-
-  if (kid.frame == kid_turn_04) dx = +0;
-  if (kid.frame == kid_stabilize_05) dx = +2;
-  if (kid.frame == kid_stabilize_06) dx = +6;
-  if (kid.frame == kid_stabilize_07) dx = +4;
-  if (kid.frame == kid_stabilize_08) dx = +0;
+  if (kid.frame == turn_frameset[3].frame) dx = +0;
+  if (kid.frame == stabilize_frameset[0].frame) dx = +2;
+  if (kid.frame == stabilize_frameset[1].frame) dx = +6;
+  if (kid.frame == stabilize_frameset[2].frame) dx = +4;
+  if (kid.frame == stabilize_frameset[3].frame) dx = +0;
 
   bool run = (kid.dir == RIGHT) ? right_key : left_key;
   bool turn_run = (kid.dir == RIGHT) ? left_key : right_key;
@@ -694,8 +903,7 @@ draw_kid_start_run (void)
 
   if (couch) {
     draw_kid_couch ();
-    i = 0;
-    return;
+    i = 0; return;
   }
 
   if (jump && i < 3) {
@@ -729,16 +937,11 @@ draw_kid_run (void)
   static int i = 0;
   if (odraw != draw_kid_run) i = 0;
 
-  struct frameset frameset[8] =
-    {{kid_run_07,-9,0},{kid_run_08,-10,0},{kid_run_09,-3,0},
-     {kid_run_10,-5,0},{kid_run_11,-9,0},{kid_run_12,-11,0},
-     {kid_run_13,-4,0},{kid_run_14,-8,0}};
+  if (kid.frame == turn_run_frameset[8].frame) i = 6;
 
-  if (kid.frame == kid_turn_run_13) i = 6;
-
-  ALLEGRO_BITMAP *frame = frameset[i].frame;
-  int dx = frameset[i].dx;
-  int dy = frameset[i].dy;
+  ALLEGRO_BITMAP *frame = run_frameset[i].frame;
+  int dx = run_frameset[i].dx;
+  int dy = run_frameset[i].dy;
 
   bool stop = ! ((kid.dir == RIGHT) ? right_key : left_key);
   bool couch = down_key;
@@ -762,7 +965,7 @@ draw_kid_run (void)
     i = 0; return;
   }
 
-  if (jump && kid.frame != kid_run_jump_11) {
+  if (jump && kid.frame != run_jump_frameset[10].frame) {
     draw_kid_run_jump ();
     i = 0; return;
   }
@@ -772,9 +975,9 @@ draw_kid_run (void)
     i = 0; return;
   }
 
-  if (kid.frame == kid_start_run_06) dx = -7;
-  if (kid.frame == kid_turn_run_13) dx = -4;
-  if (kid.frame == kid_run_jump_11) dx = -15, play_sample (step);
+  if (kid.frame == start_run_frameset[5].frame) dx = -7;
+  if (kid.frame == turn_run_frameset[8].frame) dx = -4;
+  if (kid.frame == run_jump_frameset[10].frame) dx = -15, play_sample (step);
   if (i == 2 || i == 6) play_sample (step);
 
   draw_anim (&kid, frame, dx, dy);
@@ -794,17 +997,13 @@ draw_kid_stop_run (void)
   static int i = 0;
   if (odraw != draw_kid_stop_run) i = 0;
 
-  struct frameset frameset[4] =
-    {{kid_stop_run_01,+0,0},{kid_stop_run_02,-6,0},
-     {kid_stop_run_03,-16,0},{kid_stop_run_04,+0,0}};
-
   int dc = dist_collision (kid, coord_tf, pos, 0, false);
 
   if (i == 2 && dc < 16) i = 3;
 
-  ALLEGRO_BITMAP *frame = frameset[i].frame;
-  int dx = frameset[i].dx;
-  int dy = frameset[i].dy;
+  ALLEGRO_BITMAP *frame = stop_run_frameset[i].frame;
+  int dx = stop_run_frameset[i].dx;
+  int dy = stop_run_frameset[i].dy;
 
   bool turn_run = (kid.dir == RIGHT) ? left_key : right_key;
   bool couch = down_key;
@@ -849,19 +1048,15 @@ draw_kid_turn (void)
   static int i = 0;
   if (odraw != draw_kid_turn) i = 0;
 
-  struct frameset frameset[4] =
-    {{kid_turn_01,+2,0},{kid_turn_02,+1,0},{kid_turn_03,-3,0},
-     {kid_turn_04,+0,+0}};
+  ALLEGRO_BITMAP *frame = turn_frameset[i].frame;
+  int dx = turn_frameset[i].dx;
+  int dy = turn_frameset[i].dy;
 
-  ALLEGRO_BITMAP *frame = frameset[i].frame;
-  int dx = frameset[i].dx;
-  int dy = frameset[i].dy;
-
-  if (kid.frame == kid_stabilize_05) dx = +6;
-  if (kid.frame == kid_stabilize_06) dx = +10;
-  if (kid.frame == kid_stabilize_07) dx = +8;
-  if (kid.frame == kid_stabilize_08) dx = +4;
-  if (kid.frame == kid_turn_04) dx = +3;
+  if (kid.frame == stabilize_frameset[0].frame) dx = +6;
+  if (kid.frame == stabilize_frameset[1].frame) dx = +10;
+  if (kid.frame == stabilize_frameset[2].frame) dx = +8;
+  if (kid.frame == stabilize_frameset[3].frame) dx = +4;
+  if (kid.frame == turn_frameset[3].frame) dx = +3;
 
   if (! turn)
     turn = ((kid.dir == RIGHT) && right_key)
@@ -897,14 +1092,9 @@ draw_kid_turn_run (void)
   static int i = 0;
   if (odraw != draw_kid_turn_run) i = 0;
 
-  struct frameset frameset[9] =
-    {{kid_turn_run_05,-18,0},{kid_turn_run_06,-6,0},{kid_turn_run_07,-4,0},
-     {kid_turn_run_08,+2,0},{kid_turn_run_09,-6,0},{kid_turn_run_10,+3,0},
-     {kid_turn_run_11,-1,0},{kid_turn_run_12,+0,0},{kid_turn_run_13,+4,0}};
-
-  ALLEGRO_BITMAP *frame = frameset[i].frame;
-  int dx = frameset[i].dx;
-  int dy = frameset[i].dy;
+  ALLEGRO_BITMAP *frame = turn_run_frameset[i].frame;
+  int dx = turn_run_frameset[i].dx;
+  int dy = turn_run_frameset[i].dy;
 
   /* fall */
   if (kids.ctf == NO_FLOOR) {
@@ -938,22 +1128,14 @@ draw_kid_jump (void)
   static int i = 0;
   if (odraw != draw_kid_jump) i = 0;
 
-  struct frameset frameset[18] =
-    {{kid_jump_01,+2,0},{kid_jump_02,-2,0},{kid_jump_03,-4,0},
-     {kid_jump_04,-5,0},{kid_jump_05,-3,0},{kid_jump_06,-6,0},
-     {kid_jump_07,-3,0},{kid_jump_08,-17,0},{kid_jump_09,-21,0},
-     {kid_jump_10,-11,-6},{kid_jump_11,-2,+6},{kid_jump_12,-9,0},
-     {kid_jump_13,+6,0},{kid_jump_14,-11,0},{kid_jump_15,+0,0},
-     {kid_jump_16,+0,0},{kid_jump_17,+1,0},{kid_jump_18,+0,0}};
+  ALLEGRO_BITMAP *frame = jump_frameset[i].frame;
+  int dx = jump_frameset[i].dx;
+  int dy = jump_frameset[i].dy;
 
-  ALLEGRO_BITMAP *frame = frameset[i].frame;
-  int dx = frameset[i].dx;
-  int dy = frameset[i].dy;
-
-  if (kid.frame == kid_stabilize_05) dx = +2;
-  if (kid.frame == kid_stabilize_06) dx = +6;
-  if (kid.frame == kid_stabilize_07) dx = +4;
-  if (kid.frame == kid_stabilize_08) dx = +0;
+  if (kid.frame == stabilize_frameset[0].frame) dx = +2;
+  if (kid.frame == stabilize_frameset[1].frame) dx = +6;
+  if (kid.frame == stabilize_frameset[2].frame) dx = +4;
+  if (kid.frame == stabilize_frameset[3].frame) dx = +0;
 
   /* fall */
   if ((kids.cbb == NO_FLOOR
@@ -996,17 +1178,9 @@ draw_kid_vjump (void)
       || odraw == draw_kid_hang_free) i = 13;
   static bool hang = false;
 
-  struct frameset frameset[18] =
-    {{kid_vjump_01,+3,+0},{kid_vjump_02,-1,+0},{kid_vjump_03,-1,+0},
-     {kid_vjump_04,+2,+0},{kid_vjump_05,+0,+0},{kid_vjump_06,-1,+0},
-     {kid_vjump_07,-1,+0},{kid_vjump_08,-3,+0},{kid_vjump_09,-1,+0},
-     {kid_vjump_10,-6,+0},{kid_vjump_11,+0,+0},{kid_vjump_12,+2,-3},
-     {kid_vjump_13,+3,-7},{kid_vjump_15,+0,+8},{kid_vjump_16,+3,+2},
-     {kid_vjump_17,-1,+0},{kid_vjump_18,+0,+0},{kid_vjump_19,+0,0}};
-
-  ALLEGRO_BITMAP *frame = frameset[i].frame;
-  int dx = frameset[i].dx;
-  int dy = frameset[i].dy;
+  ALLEGRO_BITMAP *frame = vjump_frameset[i].frame;
+  int dx = vjump_frameset[i].dx;
+  int dy = vjump_frameset[i].dy;
 
   if (critical_edge && odraw == draw_kid_hang_free)
     dx -= (kid.dir == LEFT) ? 9 : 13;
@@ -1071,17 +1245,9 @@ draw_kid_run_jump (void)
   static int i = 0;
   if (odraw != draw_kid_run_jump) i = 0;
 
-  struct frameset frameset[11] =
-    {{kid_run_jump_01,-10,+0},{kid_run_jump_02,-11,+0},
-     {kid_run_jump_03,-13,+0},{kid_run_jump_04,-7,+0},
-     {kid_run_jump_05,-12,+0},{kid_run_jump_06,-15,+0},
-     {kid_run_jump_07,-29,-3},{kid_run_jump_08,-17,-9},
-     {kid_run_jump_09,-18,-2},{kid_run_jump_10,-10,+11},
-     {kid_run_jump_11,-8,+3}};
-
-  ALLEGRO_BITMAP *frame = frameset[i].frame;
-  int dx = frameset[i].dx;
-  int dy = frameset[i].dy;
+  ALLEGRO_BITMAP *frame = run_jump_frameset[i].frame;
+  int dx = run_jump_frameset[i].dx;
+  int dy = run_jump_frameset[i].dy;
 
   /* fall */
   if (kids.cmbo == NO_FLOOR
@@ -1119,15 +1285,9 @@ draw_kid_misstep (void)
   static int i = 0;
   if (odraw != draw_kid_misstep) i = 0;
 
-  struct frameset frameset[11] =
-    {{kid_walk_01,-1,0},{kid_walk_02,-1,0},{kid_walk_03,+0,0},
-     {kid_walk_04,-8,0},{kid_walk_05,-7,0},{kid_walk_06,-4,0},
-     {kid_jump_14,+8,0},{kid_couch_10,+8,0},{kid_couch_11,+3,0},
-     {kid_couch_12,+0,0},{kid_couch_13,+4,0}};
-
-  ALLEGRO_BITMAP *frame = frameset[i].frame;
-  int dx = frameset[i].dx;
-  int dy = frameset[i].dy;
+  ALLEGRO_BITMAP *frame = misstep_frameset[i].frame;
+  int dx = misstep_frameset[i].dx;
+  int dy = misstep_frameset[i].dy;
 
   /* fall */
   if (kids.cmba == NO_FLOOR) {
@@ -1203,7 +1363,7 @@ draw_kid_hang_wall (void)
       hang_limit = false;
       return;
     }
-    kid.frame = kid_vjump_15;
+    kid.frame = vjump_frameset[13].frame;
     kid.c.x += (kid.dir == LEFT) ? +12 : -12;
     kid.c.y = PLACE_HEIGHT * kids.pm.floor - 8;
     draw_kid_vjump ();
@@ -1258,7 +1418,7 @@ draw_kid_hang_free (void)
       hang_limit = false;
       return;
     }
-    kid.frame = kid_vjump_15;
+    kid.frame = vjump_frameset[13].frame;
     kid.c.x += (kid.dir == LEFT) ? +1 : -1;
     kid.c.y = PLACE_HEIGHT * kids.pm.floor - 8;
     draw_kid_vjump ();
@@ -1316,7 +1476,7 @@ draw_kid_climb (void)
 
   if (i == 0) {
     hang_pos = npos (hang_pos);
-    kid.frame = kid_climb_01;
+    kid.frame = climb_frameset[0].frame;
     int dir = (kid.dir == LEFT) ? 0 : 1;
     kid.c.x = PLACE_WIDTH * (hang_pos.place + dir) + 9;
     kid.c.y = PLACE_HEIGHT * hang_pos.floor - 9;
@@ -1366,7 +1526,7 @@ draw_kid_unclimb (void)
   int dy = -climb_frameset[i + 1].dy;
 
   if (i == 13) {
-    kid.frame = kid_climb_14;
+    kid.frame = climb_frameset[13].frame;
     kid.c.x = PLACE_WIDTH * hang_pos.place + 18;
     kid.c.y = PLACE_HEIGHT * hang_pos.floor + 25;
   }
@@ -1412,15 +1572,11 @@ draw_kid_stabilize (void)
     || ((kid.dir == LEFT) && left_key && up_key);
   bool couch = down_key;
 
-  struct frameset frameset[4] =
-    {{kid_stabilize_05,-3,0},{kid_stabilize_06,-4,0},
-     {kid_stabilize_07,+2,0},{kid_stabilize_08,+4,0}};
+  ALLEGRO_BITMAP *frame = stabilize_frameset[i].frame;
+  int dx = stabilize_frameset[i].dx;
+  int dy = stabilize_frameset[i].dy;
 
-  ALLEGRO_BITMAP *frame = frameset[i].frame;
-  int dx = frameset[i].dx;
-  int dy = frameset[i].dy;
-
-  if (kid.frame == kid_stop_run_04) dx = -5;
+  if (kid.frame == stop_run_frameset[3].frame) dx = -5;
 
   draw_anim (&kid, frame, dx, dy);
 
@@ -1470,16 +1626,9 @@ draw_kid_couch (void)
   if (odraw == draw_kid_couch_collision) collision = true;
   if (odraw == draw_kid_fall) fall = true;
 
-  struct frameset frameset[13] =
-    {{kid_couch_01,-3,0},{kid_couch_02,-4,0},{kid_couch_03,+0,0},
-     {kid_couch_04,-4,0},{kid_couch_05,-1,0},{kid_couch_06,-4,0},
-     {kid_couch_07,+1,0},{kid_couch_08,-2,0},{kid_couch_09,-1,0},
-     {kid_couch_10,+0,0},{kid_couch_11,+3,0},{kid_couch_12,+0,0},
-     {kid_couch_13,+4,0}};
-
-  ALLEGRO_BITMAP *frame = frameset[i].frame;
-  int dx = frameset[i].dx;
-  int dy = frameset[i].dy;
+  ALLEGRO_BITMAP *frame = couch_frameset[i].frame;
+  int dx = couch_frameset[i].dx;
+  int dy = couch_frameset[i].dy;
 
   if (odraw == draw_kid_climb) dx += 7;
   if (i > 0 && i < 3) dx -= inertia ? 3 : 0;
@@ -1503,7 +1652,7 @@ draw_kid_couch (void)
 
   /* fall */
   if (kids.cm == NO_FLOOR && ! fall) {
-    if (collision) to_collision_edge (&kid, kid_fall_13, coord_tf, pos, 0, false, 0);
+    if (collision) to_collision_edge (&kid, fall_frameset[0].frame, coord_tf, pos, 0, false, 0);
     draw_kid_fall ();
     i = 0; collision = false; return;
   }
@@ -1539,7 +1688,7 @@ draw_kid_stabilize_collision (void)
   kid.draw = draw_kid_stabilize_collision;
 
   play_sample (hit_wall);
-  to_collision_edge (&kid, kid_stabilize_05, coord_tf, pos, 0, false, 0);
+  to_collision_edge (&kid, stabilize_frameset[0].frame, coord_tf, pos, 0, false, 0);
   if (kid.dir == RIGHT) kid.c.x -= 3;
 
   draw_kid_stabilize ();
@@ -1555,7 +1704,7 @@ draw_kid_couch_collision (void)
   kid.frame = kid_normal;
 
   play_sample (hit_wall);
-  to_collision_edge (&kid, kid_couch_01, coord_tf, pos, 0, false, 0);
+  to_collision_edge (&kid, couch_frameset[0].frame, coord_tf, pos, 0, false, 0);
   if (kid.dir == RIGHT) kid.c.x -= 12;
 
   draw_kid_couch ();
@@ -1574,20 +1723,16 @@ draw_kid_fall (void)
   /* turn run */
   if (odraw == draw_kid_turn_run) {
     force_floor = kids.pbf.floor;
-    if (kid.frame != kid_turn_run_13)
+    if (kid.frame != turn_run_frameset[8].frame)
       kid.dir = (kid.dir == LEFT) ? RIGHT : LEFT;
     kid.flip = (kid.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
     kid.c.x += (kid.dir == LEFT) ? +12 : -12;
     kid.c.y += 12;
   }
 
-  struct frameset frameset[5] =
-    {{kid_fall_13,+0,+0},{kid_fall_14,+0,+5},{kid_fall_15,+0,+10},
-     {kid_fall_16,+0,+11},{kid_fall_17,+0,+20}};
-
-  ALLEGRO_BITMAP *frame = frameset[i > 4 ? 4 : i].frame;
-  int dx = frameset[i > 4 ? 4 : i].dx;
-  int dy = frameset[i > 4 ? 4 : i].dy;
+  ALLEGRO_BITMAP *frame = fall_frameset[i > 4 ? 4 : i].frame;
+  int dx = fall_frameset[i > 4 ? 4 : i].dx;
+  int dy = fall_frameset[i > 4 ? 4 : i].dy;
 
   /* put kid in front of the floor */
   if (i == 0) {
