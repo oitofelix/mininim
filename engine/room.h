@@ -57,6 +57,6 @@ struct coord torch_coord (struct pos p);
 void draw_window (ALLEGRO_BITMAP *bitmap, struct pos p);
 struct coord window_coord (struct pos p);
 void draw_room_anim_fg (struct anim a);
-void draw_room_fg (struct pos p);
+void draw_room_fg (struct anim a, struct pos p);
 
 #endif	/* FREEPOP_ROOM_H */

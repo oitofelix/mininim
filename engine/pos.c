@@ -111,33 +111,30 @@ npos (struct pos p)
 }
 
 struct pos
-pos (struct coord c)
+pos_gen (struct coord c, int dx, int dy)
 {
   struct pos p;
 
   p.room = c.room;
-  p.place = (c.x - 15) / PLACE_WIDTH;
-  p.floor = (c.y - 3) / PLACE_HEIGHT;
+  p.place = (c.x - dx) / PLACE_WIDTH;
+  p.floor = (c.y - dy) / PLACE_HEIGHT;
 
-  if (c.x < 15) p.place = -1;
-  if (c.y < 3) p.floor = -1;
+  if (c.x < dx) p.place = -1;
+  if (c.y < dy) p.floor = -1;
 
   return p;
 }
 
 struct pos
+pos (struct coord c)
+{
+  return pos_gen (c, 15, 3);
+}
+
+struct pos
 posf (struct coord c)
 {
-  struct pos p;
-
-  p.room = c.room;
-  p.place = c.x / PLACE_WIDTH;
-  p.floor = (c.y - 3) / PLACE_HEIGHT;
-
-  if (c.x < 0) p.place = -1;
-  if (c.y < 3) p.floor = -1;
-
-  return p;
+  return pos_gen (c, 0, 3);
 }
 
 struct dim

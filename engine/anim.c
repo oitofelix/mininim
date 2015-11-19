@@ -68,13 +68,14 @@ play_anim (void (*callback) (void), int freq)
           /* int dc = dist_collision (kid); */
           /* int dbc = dist_back_collision (kid); */
           /* int df = dist_fall (kid); */
-          int dn = dist_next_place (kid, coord_tf, pos, 0, false);
-          int dp = dist_next_place (kid, coord_tf, pos, 0, true);
-          int dc = dist_kid_collision ();
-          int df = dist_kid_con (NO_FLOOR);
-          int dl = dist_kid_con (LOOSE_FLOOR);
+          int dn = dist_next_place (kid, coord_bf, pos, 0, false);
+          int dp = dist_next_place (kid, coord_bf, pos, 0, true);
+          int dc = dist_collision (kid, coord_tf, pos, 0, false);
+          int df = dist_con (kid, coord_bf, pos, -4, false, NO_FLOOR);
+          int dl = dist_con (kid, coord_bf, pos, -4, false, LOOSE_FLOOR);
           if (a_key || d_key || w_key || s_key || enter_key)
-            printf ("dc = %i, df = %i, dl = %i\n", dc, df, dl);
+            printf ("dn = %i, dp = %i, dc = %i, df = %i, dl = %i\n",
+                    dn, dp, dc, df, dl);
             /* printf ("floor = %i, place = %i, dc = %i, dbc = %i, df = %i, dn = %i, dp = %i\n", kids.ptf.floor, kids.ptf.place, dc, dbc, df, dn, dp); */
         }
         /* end kid hack */

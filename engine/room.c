@@ -406,23 +406,26 @@ window_coord (struct pos p)
 void
 draw_room_anim_fg (struct anim a)
 {
-  draw_room_fg (posf (coord_bl (a)));
-  draw_room_fg (posf (coord_br (a)));
-  draw_room_fg (posf (coord_m (a)));
-  draw_room_fg (posf (coord_tl (a)));
-  draw_room_fg (posf (coord_tr (a)));
+  draw_room_fg (a, posf (coord_bl (a)));
+  draw_room_fg (a, posf (coord_br (a)));
+  draw_room_fg (a, posf (coord_m (a)));
+  draw_room_fg (a, posf (coord_tl (a)));
+  draw_room_fg (a, posf (coord_tr (a)));
 }
 
 void
-draw_room_fg (struct pos p)
+draw_room_fg (struct anim a, struct pos p)
 {
   struct loose_floor *l;
   struct opener_floor *o;
 
+  struct survey s = survey (a, pos);
+  struct survey sf = survey (a, posf);
+
   /* when falling at construct's left */
-  if ((peq (p, prel (kids.ptl, 0, +1))
-       || peq (p, prel (kids.pm, 0, +1)))
-      && is_kid_fall ())
+  if ((peq (p, prel (s.ptl, 0, +1))
+       || peq (p, prel (s.pm, 0, +1)))
+      && is_kid_fall (a))
     switch (con (p).fg) {
     case NO_FLOOR:
       break;
@@ -458,9 +461,9 @@ draw_room_fg (struct pos p)
              __func__, con (p).fg);
     }
   /* when climbing the construct */
-  else if (peq (kids.ptf, p)
-           && is_kid_climb ()
-           && kid.dir == RIGHT) {
+  else if (peq (s.ptf, p)
+           && is_kid_climb (a)
+           && a.dir == RIGHT) {
     if (con (p).fg == PILLAR)
       draw_pillar_fg (screen, p);
     else if (con (p).fg == BROKEN_FLOOR)
@@ -480,19 +483,16 @@ draw_room_fg (struct pos p)
         draw_floor_corner_02 (screen, p);
     }
     /* when below the construction */
-  } else if ((peq (p, kidsf.ptl)
-              || peq (p, kidsf.ptr)
-              || peq (p, kidsf.pmt)
-              || peq (p, kids.ptl)
-              || peq (p, kids.ptr)
-              || peq (p, kids.pmt))
-             && (peq (p, prel (kidsf.pmbo, -1, 0))
-                 || peq (p, prel (kids.pmbo, -1, 0)))
-             && ! (is_kid_hang () && kid.dir == LEFT)
-             && ! ((is_kid_climb ()
-                    || is_kid_start_climb ())
-                   && kid.dir == LEFT)
-             && floor_left_coord (p).y <= kids.tl.y) {
+  } else if ((peq (p, sf.ptl)
+              || peq (p, sf.ptr)
+              || peq (p, sf.pmt)
+              || peq (p, s.ptl)
+              || peq (p, s.ptr)
+              || peq (p, s.pmt))
+             && (peq (p, prel (sf.pmbo, -1, 0))
+                 || peq (p, prel (s.pmbo, -1, 0)))
+             && ! (is_kid_hang_or_climb (a) && a.dir == LEFT)
+             && floor_left_coord (p).y <= s.tl.y) {
     switch (con (p).fg) {
     case NO_FLOOR: break;
     case FLOOR:
@@ -538,5 +538,5 @@ draw_room_fg (struct pos p)
   else if (con (p).fg == WALL)
     draw_wall_fg (screen, p);
   else if (con (p).fg == DOOR)
-    draw_door_fg (screen, p);
+    draw_door_fg (screen, p, a);
 }

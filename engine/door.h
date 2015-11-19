@@ -64,7 +64,8 @@ void draw_doors (void);
 void draw_door (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_door_left (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_door_right (ALLEGRO_BITMAP *bitmap, struct pos p);
-void draw_door_fg (ALLEGRO_BITMAP *bitmap, struct pos p);
+void draw_door_fg (ALLEGRO_BITMAP *bitmap, struct pos p,
+                   struct anim a);
 void draw_door_grid (ALLEGRO_BITMAP *bitmap, struct pos p, int i);
 struct coord door_grid_coord_base (struct pos p);
 struct coord door_grid_coord (struct pos p, int j, int i);

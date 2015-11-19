@@ -30,6 +30,8 @@
 #include "door.h"
 #include "physics.h"
 
+struct pos hang_pos;
+
 struct con
 con (struct pos p)
 {
@@ -74,44 +76,37 @@ is_pos_visible (struct pos p)
   return false;
 }
 
-struct anim
-adjust_anim (struct anim a, int margin, bool reverse)
-{
-  if (reverse) a.dir = (a.dir == LEFT) ? RIGHT : LEFT;
-  a.c.x += (a.dir == LEFT) ? +margin : -margin;
-  return a;
-}
-
 int
 dist_next_place (struct anim a,
                  struct coord (*coord_func) (struct anim a),
                  struct pos (*pos_func) (struct coord c),
                  int margin, bool reverse)
 {
-  a = adjust_anim (a, margin, reverse);
+  a.c.x += (a.dir == LEFT) ? -margin : +margin;
+  int r = reverse ? -1 : 1;
+  int inc = (a.dir == LEFT) ? r * -1 : r * +1;
+
   struct pos p = pos_func (coord_func (a));
-  int inc = (a.dir == LEFT) ? -1 : +1;
   int x = a.c.x;
-
   while (p.place == pos_func (coord_func (a)).place
-         && abs (x - a.c.x) != PLACE_WIDTH)
-    a.c.x += inc;
+         && abs (x - a.c.x) < PLACE_WIDTH) a.c.x += inc;
 
-  return inc * (a.c.x - x);
+  return abs (a.c.x - x);
 }
 
-bool
+void
 to_next_place_edge (struct anim *a,
                     struct coord (*coord_func) (struct anim a),
                     struct pos (*pos_func) (struct coord c),
-                    int margin,
-                    bool reverse)
+                    int margin, bool reverse, int min_dist)
 {
   int dn = dist_next_place (*a, coord_func, pos_func, margin, reverse);
-  struct anim na = adjust_anim (*a, margin, reverse);
-  int dir = (na.dir == LEFT) ? -1 : +1;
-  a->c.x += dir * ((abs (dn) < PLACE_WIDTH) ? dn - 1 : 0);
-  return abs (dn) < PLACE_WIDTH;
+
+  int r = reverse ? -1 : 1;
+  int dir = (a->dir == LEFT) ? r * -1 : r * +1;
+
+  a->c.x += dir * (dn - 1);
+  a->c.x += -dir * min_dist;
 }
 
 bool
@@ -121,8 +116,10 @@ is_colliding (struct anim a,
               int margin, bool reverse, int min_dist)
 {
   int dn = dist_next_place (a, coord_func, pos_func, margin, reverse);
-  a = adjust_anim (a, margin, reverse);
-  int dir = (a.dir == LEFT) ? -1: +1;
+
+  a.c.x += (a.dir == LEFT) ? -margin : +margin;
+  int r = reverse ? -1 : 1;
+  int dir = (a.dir == LEFT) ? r * -1: r * +1;
 
   struct coord c = coord_func (a);
   struct pos p = pos_func (c);
@@ -148,12 +145,104 @@ is_on_con (struct anim a,
            struct pos (*pos_func) (struct coord c),
            int margin, bool reverse, int min_dist, enum confg ct)
 {
-  /* margin = 4 */
-  /* coord_func = coord_mbo */
   int dn = dist_next_place (a, coord_func, pos_func, margin, reverse);
-  a = adjust_anim (a, margin, reverse);
-  int dir = (a.dir == LEFT) ? -1: +1;
+
+  a.c.x += (a.dir == LEFT) ? -margin : +margin;
+  int r = reverse ? -1 : 1;
+  int dir = (a.dir == LEFT) ? r * -1: r * +1;
 
   return dn <= min_dist
     && crel (pos_func (coord_func (a)), 0, dir).fg == ct;
+}
+
+int
+dist_collision (struct anim a,
+                struct coord (*coord_func) (struct anim a),
+                struct pos (*pos_func) (struct coord c),
+                int margin, bool reverse)
+{
+  int dn = dist_next_place (a, coord_func, pos_func, margin, reverse);
+  if (is_colliding (a, coord_func, pos_func, margin, reverse, dn)) return dn;
+  else return PLACE_WIDTH + 1;
+}
+
+int
+dist_con (struct anim a,
+          struct coord (*coord_func) (struct anim a),
+          struct pos (*pos_func) (struct coord c),
+          int margin, bool reverse, enum confg ct)
+{
+  int dn = dist_next_place (a, coord_func, pos_func, margin, reverse);
+  if (is_on_con (a, coord_func, pos_func, margin, reverse, dn, ct)) return dn;
+  else return PLACE_WIDTH + 1;
+}
+
+bool
+to_collision_edge (struct anim *a, ALLEGRO_BITMAP *frame,
+                   struct coord (*coord_func) (struct anim a),
+                   struct pos (*pos_func) (struct coord c),
+                   int margin, bool reverse, int min_dist)
+{
+  *a = next_anim (*a, frame, +0, 0);
+  int dc = dist_collision (*a, coord_func, pos_func, margin, reverse);
+  if (dc > PLACE_WIDTH) return false;
+  else to_next_place_edge (a, coord_func, pos_func, margin, reverse, min_dist);
+  return true;
+}
+
+bool
+to_con_edge (struct anim *a, ALLEGRO_BITMAP *frame,
+             struct coord (*coord_func) (struct anim a),
+             struct pos (*pos_func) (struct coord c),
+             int margin, bool reverse, int min_dist, enum confg ct)
+{
+  *a = next_anim (*a, frame, +0, 0);
+  int dc = dist_con (*a, coord_func, pos_func, margin, reverse, ct);
+  if (dc > PLACE_WIDTH) return false;
+  else to_next_place_edge (a, coord_func, pos_func, margin, reverse, min_dist);
+  return true;
+}
+
+bool
+is_hangable_pos (struct pos p, enum dir d)
+{
+  int dir = (d == LEFT) ? -1 : +1;
+  enum confg fg = crel (p, -1, dir).fg;
+
+  return (fg == FLOOR || fg == BROKEN_FLOOR
+          || fg == LOOSE_FLOOR || fg == OPENER_FLOOR
+          || fg == PILLAR || fg == DOOR)
+    && crel (p, -1, 0).fg == NO_FLOOR;
+}
+
+bool
+can_hang (struct anim a)
+{
+  struct coord tf = coord_tf (a);
+  struct pos pmf = pos (coord_mf (a));
+  struct pos pm = pos (coord_m (a));
+  struct pos pmba = pos (coord_mba (a));
+
+  bool hmf = is_hangable_pos (pmf, a.dir);
+  bool hm = is_hangable_pos (pm, a.dir);
+  bool hmba = is_hangable_pos (pmba, a.dir);
+
+  if (! hmf && ! hm && ! hmba) return false;
+
+  if (hmf) hang_pos = pmf;
+  if (hm) hang_pos = pm;
+  if (hmba) hang_pos = pmba;
+
+  /* for fall */
+  struct coord ch;
+  int dir = (a.dir == LEFT) ? 0 : 1;
+  ch.x = PLACE_WIDTH * (hang_pos.place + dir) + 7 + 8 * dir;
+  ch.y = PLACE_HEIGHT * hang_pos.floor - 6;
+
+  printf ("dist_coord = %f\n", dist_coord (kids.tf, ch));
+
+  if (is_kid_fall (a) &&
+      dist_coord (tf, ch) > 16) return false;
+
+  return true;
 }

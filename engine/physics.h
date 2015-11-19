@@ -22,6 +22,9 @@
 
 #include "prince.h"
 
+/* variables */
+struct pos hang_pos;
+
 /* functions */
 struct con con (struct pos pos);
 struct con crel (struct pos pos, int floor, int place);
@@ -29,19 +32,16 @@ void set_confg (struct pos p, enum confg fg);
 bool is_visible (struct anim a);
 bool is_pos_visible (struct pos p);
 
-struct anim
-adjust_anim (struct anim a, int margin, bool reverse);
-
 int
 dist_next_place (struct anim a,
                  struct coord (*coord_func) (struct anim a),
                  struct pos (*pos_func) (struct coord c),
                  int margin, bool reverse);
-bool
+void
 to_next_place_edge (struct anim *a,
                     struct coord (*coord_func) (struct anim a),
                     struct pos (*pos_func) (struct coord c),
-                    int margin, bool reverse);
+                    int margin, bool reverse, int min_dist);
 
 bool
 is_colliding (struct anim a,
@@ -53,5 +53,30 @@ is_on_con (struct anim a,
            struct coord (*coord_func) (struct anim a),
            struct pos (*pos_func) (struct coord c),
            int margin, bool reverse, int min_dist, enum confg ct);
+
+int
+dist_collision (struct anim a,
+                struct coord (*coord_func) (struct anim a),
+                struct pos (*pos_func) (struct coord c),
+                int margin, bool reverse);
+int
+dist_con (struct anim a,
+          struct coord (*coord_func) (struct anim a),
+          struct pos (*pos_func) (struct coord c),
+          int margin, bool reverse, enum confg ct);
+
+bool
+to_collision_edge (struct anim *a, ALLEGRO_BITMAP *frame,
+                   struct coord (*coord_func) (struct anim a),
+                   struct pos (*pos_func) (struct coord c),
+                   int margin, bool reverse, int min_dist);
+bool
+to_con_edge (struct anim *a, ALLEGRO_BITMAP *frame,
+             struct coord (*coord_func) (struct anim a),
+             struct pos (*pos_func) (struct coord c),
+             int margin, bool reverse, int min_dist, enum confg ct);
+
+bool is_hangable_pos (struct pos p, enum dir d);
+bool can_hang (struct anim a);
 
 #endif	/* FREEPOP_PHYSICS_H */

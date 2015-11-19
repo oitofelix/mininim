@@ -173,122 +173,17 @@
 /* functions */
 void load_kid (void);
 void unload_kid (void);
-void init_climb_frameset (void);
-void init_hang_frameset (void);
-
-void place_kid (int room, int floor, int place);
-
-void draw_kid_stabilize (void);
-void draw_kid_vjump (void);
-void draw_kid_ceiling (void);
-void draw_kid_normal (void);
-void draw_kid_walk (void);
-void draw_kid_start_run (void);
-void draw_kid_stop_run (void);
-void draw_kid_run (void);
-void draw_kid_turn (void);
-void draw_kid_turn_run (void);
-void draw_kid_jump (void);
-void draw_kid_collision (void);
-void draw_kid_back_collision (void);
-void draw_kid_fall (void);
-void draw_kid_couch (void);
-void draw_kid_misstep (void);
-void draw_kid_hang (void);
-void draw_kid_hang_wall (void);
-void draw_kid_hang_free (void);
-void draw_kid_climb (void);
-void draw_kid_unclimb (void);
-void draw_kid_run_jump (void);
-
-/* bool is_kid_colliding (int min_dist); */
-int dist_kid_collision (void);
-void kid_to_collision_edge (int min_dist);
-bool place_kid_on_collision_edge (ALLEGRO_BITMAP* frame);
-void draw_kid_stabilize_collision (void);
-void draw_kid_couch_collision (void);
-
-bool is_kid_on_con (int min_dist, enum confg c);
-int dist_kid_con (enum confg c);
-void kid_to_con_edge (int min_dist, enum confg c);
-bool place_kid_on_con_edge (ALLEGRO_BITMAP* frame,
-                                  enum confg c);
-
-bool is_hangable_pos_for_kid (struct pos p);
-bool can_kid_hang (void);
-
-bool is_kid_normal ();
-bool is_kid_start_walk (void);
-bool is_kid_walk (void);
-bool is_kid_stop_walk (void);
-bool is_kid_run (void);
-bool is_kid_start_couch (void);
-bool is_kid_couch (void);
-bool is_kid_stop_couch (void);
-bool is_kid_stop_run (void);
-bool is_kid_fall (void);
-bool is_kid_start_jump (void);
-bool is_kid_jump (void);
-bool is_kid_stop_jump (void);
-bool is_kid_start_vjump (void);
-bool is_kid_vjump (void);
-bool is_kid_stop_vjump (void);
-bool is_kid_stabilize (void);
-bool is_kid_turn (void);
-bool is_kid_turn_run (void);
-bool is_kid_hang (void);
-bool is_kid_start_climb (void);
-bool is_kid_climb (void);
-bool is_kid_stop_climb (void);
-bool is_kid_start_run_jump (void);
-bool is_kid_run_jump ();
-bool is_kid_stop_run_jump ();
-bool is_kid_on_air (void);
-bool is_kid_hanging_at_pos (struct pos p);
+bool is_kid_fall (struct anim a);
+bool is_kid_hang_or_climb (struct anim a);
+bool is_kid_climb (struct anim a);
+bool is_kid_hanging_at_pos (struct anim a, struct pos p);
 
 /* variables */
 extern struct anim kid; /* kid animation object */
-
-extern ALLEGRO_BITMAP *kid_normal,
-  *kid_start_run_01, *kid_start_run_02, *kid_start_run_03, *kid_start_run_04,
-  *kid_start_run_05, *kid_start_run_06, *kid_run_07,
-  *kid_run_08, *kid_run_09, *kid_run_10, *kid_run_11,
-  *kid_run_12, *kid_run_13, *kid_run_14,
-  *kid_turn_01, *kid_turn_02, *kid_turn_03, *kid_turn_04,
-  *kid_stabilize_05, *kid_stabilize_06, *kid_stabilize_07, *kid_stabilize_08,
-  *kid_stop_run_01, *kid_stop_run_02, *kid_stop_run_03, *kid_stop_run_04,
-  *kid_turn_run_05, *kid_turn_run_06, *kid_turn_run_07, *kid_turn_run_08,
-  *kid_turn_run_09, *kid_turn_run_10, *kid_turn_run_11, *kid_turn_run_12,
-  *kid_turn_run_13,
-  *kid_walk_01, *kid_walk_02, *kid_walk_03, *kid_walk_04, *kid_walk_05,
-  *kid_walk_06, *kid_walk_07, *kid_walk_08, *kid_walk_09, *kid_walk_10,
-  *kid_walk_11, *kid_walk_12,
-  *kid_jump_01, *kid_jump_02, *kid_jump_03, *kid_jump_04, *kid_jump_05, *kid_jump_06,
-  *kid_jump_07, *kid_jump_08, *kid_jump_09, *kid_jump_10, *kid_jump_11, *kid_jump_12,
-  *kid_jump_13, *kid_jump_14, *kid_jump_15, *kid_jump_16, *kid_jump_17, *kid_jump_18,
-     *kid_fall_13, *kid_fall_14, *kid_fall_15, *kid_fall_16, *kid_fall_17,
-   *kid_couch_01, *kid_couch_02, *kid_couch_03, *kid_couch_04,
-  *kid_couch_05, *kid_couch_06, *kid_couch_07, *kid_couch_08,
-  *kid_couch_09, *kid_couch_10, *kid_couch_11, *kid_couch_12,
-  *kid_couch_13,
-  *kid_vjump_01, *kid_vjump_02, *kid_vjump_03, *kid_vjump_04, *kid_vjump_05,
-  *kid_vjump_06, *kid_vjump_07, *kid_vjump_08, *kid_vjump_09, *kid_vjump_10,
-  *kid_vjump_11, *kid_vjump_12, *kid_vjump_13, *kid_vjump_15, *kid_vjump_16,
-  *kid_vjump_17, *kid_vjump_18, *kid_vjump_19,
-  *kid_hang_00, *kid_hang_01, *kid_hang_02, *kid_hang_03,
-  *kid_hang_04, *kid_hang_05, *kid_hang_06, *kid_hang_07,
-  *kid_hang_08, *kid_hang_09, *kid_hang_10, *kid_hang_11,
-  *kid_hang_12, *kid_hang_14,
-  *kid_climb_01, *kid_climb_02, *kid_climb_03, *kid_climb_04,
-  *kid_climb_05, *kid_climb_06, *kid_climb_07, *kid_climb_08,
-  *kid_climb_09, *kid_climb_10, *kid_climb_11, *kid_climb_12,
-  *kid_climb_13, *kid_climb_14, *kid_climb_15,
-  *kid_run_jump_01, *kid_run_jump_02, *kid_run_jump_03,
-  *kid_run_jump_04, *kid_run_jump_05, *kid_run_jump_06,
-  *kid_run_jump_07, *kid_run_jump_08, *kid_run_jump_09,
-  *kid_run_jump_10, *kid_run_jump_11;
-
-extern bool hang_limit;
 extern struct survey kids, kidsf;
+
+extern ALLEGRO_BITMAP *kid_climb_03, *kid_climb_04,
+  *kid_climb_05, *kid_climb_06, *kid_climb_07, *kid_climb_08,
+  *kid_climb_09, *kid_climb_10;
 
 #endif	/* FREEPOP_KID_H */
