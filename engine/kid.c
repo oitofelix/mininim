@@ -788,7 +788,6 @@ draw_kid_walk (void)
 
     if (! misstep) {
       if (df < 4 || dl < 4) {
-        misstep = true;
         draw_kid_misstep ();
         return;
       } else if (dc < 9 || df < 9 || dl < 9) walk_0 = true;
@@ -850,15 +849,9 @@ draw_kid_walk (void)
   else if (i == 6 && walk_4) i = 7;
   else if (i < 11) i++;
   else {
-    if (walk_0 || walk_1 || walk_2 || walk_3 || walk_4) {
-      kid.c.x += (kid.dir == LEFT) ? +10 : -10;
-      to_collision_edge (&kid, kid_normal, coord_tf, pos, 0, false, 0)
-        || to_con_edge (&kid, kid_normal, coord_bf, pos, -4, false, 0, LOOSE_FLOOR)
-        || to_con_edge (&kid, kid_normal, coord_bf, pos, -4, false, 0, NO_FLOOR);
-      walk_0 = walk_1 = walk_2 = walk_3 = walk_4 = false;
-    }
     kid.draw = draw_kid_normal;
-    i = 0;
+    walk_0 = walk_1 = walk_2 = walk_3 = walk_4 = false;
+    misstep = false; i = 0;
   }
 }
 
@@ -1318,6 +1311,7 @@ draw_kid_hang (void)
   void (*odraw) (void) = kid.draw;
   kid.draw = draw_kid_hang;
   kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
+  misstep = false;
   inertia = 0;
 
   kid.frame = kid_hang_14;
@@ -1558,6 +1552,7 @@ draw_kid_stabilize (void)
   void (*odraw) (void) = kid.draw;
   kid.draw = draw_kid_stabilize;
   kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
+  misstep = false;
   inertia = 0;
 
   static int i = 0;
@@ -1599,7 +1594,8 @@ draw_kid_stabilize (void)
       kid.draw = draw_kid_walk;
       i = 0; return;
     } else if (run) {
-      if (dist_collision (kid, coord_tf, pos, 0, false) < 32)
+      if (dist_collision (kid, coord_tf, pos, 0, false)
+          <= PLACE_WIDTH)
         kid.draw = draw_kid_walk;
       else kid.draw = draw_kid_start_run;
       i = 0; return;
@@ -1667,13 +1663,14 @@ draw_kid_couch (void)
   }
 
   /* collision */
-  if (is_colliding (kid, coord_tf, pos, 0, false, -dx)) {
-    if (! collision && ! fall) {
-      draw_kid_stabilize_collision ();
-      kid.c.x += (kid.dir == LEFT) ? +4 : -4;
-      i = 0; collision = false; return;
-    } else to_collision_edge (&kid, frame, coord_tf, pos, 0, false, -dx);
-  }
+
+  /* ensure kid is not colliding */
+  if (con (pos (coord_bf (kid))).fg == WALL)
+    to_next_place_edge (&kid, frame, coord_bf, pos, 0, true, -1);
+
+  /* wall pushes back */
+  if (is_colliding (kid, coord_tf, pos, 0, false, -dx))
+    to_collision_edge (&kid, frame, coord_tf, pos, 0, false, -dx);
 
   draw_anim (&kid, frame, dx, dy);
 
@@ -1735,15 +1732,7 @@ draw_kid_fall (void)
   int dx = fall_frameset[i > 4 ? 4 : i].dx;
   int dy = fall_frameset[i > 4 ? 4 : i].dy;
 
-  if (odraw == draw_kid_run_jump) dx = -12, dy= +12;
-  if (odraw == draw_kid_jump) dx = -12, dy = +12;
-
-  if (i == 1) dx = -inertia;
-  if (i > 1) dx = -inertia;
-  if (i > 4) {
-    int speed = +21 + 3 * (i - 5);
-    dy = (speed > 33) ? 33 : speed;
-  }
+  int dir = (kid.dir == LEFT) ? -1 : +1;
 
   /* put kid in front of the floor */
   if (i == 0
@@ -1753,6 +1742,25 @@ draw_kid_fall (void)
     while (con (pos (coord_bb (kid))).fg != NO_FLOOR)
       kid.c.x += dir;
     kid.c.x += -dir * 12;
+  }
+
+  /* ensure kid's proximity for hang */
+  if (i == 0 && crel (kids.ptf, 0, dir).fg != NO_FLOOR
+      && crel (kids.ptf, 0, dir).fg != WALL
+      && odraw == draw_kid_walk) {
+    to_next_place_edge (&kid, frame, coord_tf, pos, 0, false, 0);
+  } else if (kids.ctf != NO_FLOOR)
+    inertia = 0;
+  else {
+    if (odraw == draw_kid_run_jump) dx = -12, dy= +12;
+    if (odraw == draw_kid_jump) dx = -12, dy = +12;
+  }
+
+  if (i == 1) dx = -inertia;
+  if (i > 1) dx = -inertia;
+  if (i > 4) {
+    int speed = +21 + 3 * (i - 5);
+    dy = (speed > 33) ? 33 : speed;
   }
 
   /* turn run */
@@ -1780,10 +1788,9 @@ draw_kid_fall (void)
     kid.c.x += (kid.dir == LEFT) ? -6 : +6;
     kid.frame = kid_normal;
 
-    if (con (pos (coord_bf (kid))).fg == WALL) {
+    /* ensure kid isn't colliding */
+    if (con (pos (coord_bf (kid))).fg == WALL)
       to_next_place_edge (&kid, frame, coord_bf, pos, 0, true, -1);
-      printf ("Heya 2!\n");
-    }
 
     draw_kid_couch ();
     if (i > 3) play_sample (hit_ground);
@@ -1798,7 +1805,6 @@ draw_kid_fall (void)
       || con (pos (coord_bf (a))).fg == DOOR) {
     to_next_place_edge (&a, frame, coord_bf, pos, 0, true, -1);
     kid = a; dx = 0; dy = 0;
-    printf ("Heya!\n");
   }
 
   /* if (is_colliding (kid, coord_bf, pos, 0, false, -dx)) */
