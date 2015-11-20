@@ -80,16 +80,25 @@ unload_wall (void)
 void
 draw_wall (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
-  draw_wall_left (bitmap, p);
+  switch (wall_correlation (p)) {
+  case SWS: draw_wall_sws (bitmap, p); break;
+  case SWW: draw_wall_sww (bitmap, p); break;
+  case WWS: draw_wall_wws (bitmap, p); break;
+  case WWW: draw_wall_www (bitmap, p); break;
+  default:
+    error (-1, 0, "%s: unknown wall correlation (%i, %i. %i)",
+           __func__, p.room, p.floor, p.place);
+  }
+  draw_wall_randomization (bitmap, p);
 }
 
 void
 draw_wall_left (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
   switch (wall_correlation (p)) {
-  case SWS: draw_wall_sws (bitmap, p); break;
+  case SWS: draw_wall_sws_no_face (bitmap, p); break;
   case SWW: draw_wall_sww (bitmap, p); break;
-  case WWS: draw_wall_wws (bitmap, p); break;
+  case WWS: draw_wall_wws_no_face (bitmap, p); break;
   case WWW: draw_wall_www (bitmap, p); break;
   default:
     error (-1, 0, "%s: unknown wall correlation (%i, %i. %i)",
@@ -153,16 +162,7 @@ draw_wall_www (ALLEGRO_BITMAP *bitmap, struct pos p)
 void
 draw_wall_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
-  switch (wall_correlation (p)) {
-  case SWS: draw_wall_sws_no_face (bitmap, p); break;
-  case SWW: draw_wall_sww (bitmap, p); break;
-  case WWS: draw_wall_wws_no_face (bitmap, p); break;
-  case WWW: draw_wall_www (bitmap, p); break;
-  default:
-    error (-1, 0, "%s: unknown wall correlation (%i, %i. %i)",
-           __func__, p.room, p.floor, p.place);
-  }
-  draw_wall_randomization (bitmap, p);
+  draw_wall_left (bitmap, p);
 }
 
 struct coord

@@ -998,10 +998,6 @@ draw_kid_stop_run (void)
   static int i = 0;
   if (odraw != draw_kid_stop_run) i = 0;
 
-  int dc = dist_collision (kid, coord_tf, pos, 0, false);
-
-  if (i == 2 && dc < 16) i = 3;
-
   ALLEGRO_BITMAP *frame = stop_run_frameset[i].frame;
   int dx = stop_run_frameset[i].dx;
   int dy = stop_run_frameset[i].dy;
@@ -1027,7 +1023,6 @@ draw_kid_stop_run (void)
   }
 
   if (i == 1 || i == 3) play_sample (step);
-  if (i == 2 && dc < 16) dx = -dc + 2;
 
   draw_anim (&kid, frame, dx, dy);
 
@@ -1048,6 +1043,12 @@ draw_kid_turn (void)
 
   static int i = 0;
   if (odraw != draw_kid_turn) i = 0;
+
+  /* fall */
+  if (kids.cmbo == NO_FLOOR) {
+    draw_kid_fall ();
+    return;
+  }
 
   ALLEGRO_BITMAP *frame = turn_frameset[i].frame;
   int dx = turn_frameset[i].dx;
@@ -1252,8 +1253,8 @@ draw_kid_run_jump (void)
   int dy = run_jump_frameset[i].dy;
 
   /* fall */
-  if (kids.cmbo == NO_FLOOR
-      && (i < 4 || i > 8)) {
+  if ((kids.cbf == NO_FLOOR && i < 4)
+      || (kids.cbf == NO_FLOOR && i > 9)) {
     draw_kid_fall ();
     i = 0; return;
   }
@@ -1557,6 +1558,7 @@ draw_kid_stabilize (void)
   void (*odraw) (void) = kid.draw;
   kid.draw = draw_kid_stabilize;
   kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
+  inertia = 0;
 
   static int i = 0;
   static bool collision = false;
@@ -1626,8 +1628,10 @@ draw_kid_couch (void)
   static int cinertia = 0;
   if (odraw != draw_kid_couch) i = 0;
   if (odraw == draw_kid_climb) i = 11, critical_edge = false;
-  if (odraw == draw_kid_couch_collision) collision = true;
-  if (odraw == draw_kid_fall) fall = true;
+  if (odraw == draw_kid_couch_collision)
+    collision = true, inertia = 0;
+  if (odraw == draw_kid_fall)
+    fall = true, inertia = 0;
 
   ALLEGRO_BITMAP *frame = couch_frameset[i].frame;
   int dx = couch_frameset[i].dx;
@@ -1656,7 +1660,7 @@ draw_kid_couch (void)
   }
 
   /* fall */
-  if (kids.cm == NO_FLOOR && ! fall) {
+  if (kids.cm == NO_FLOOR && ! (fall && i == 0)) {
     if (collision) to_collision_edge (&kid, fall_frameset[0].frame, coord_tf, pos, 0, false, 0);
     draw_kid_fall ();
     i = 0; collision = false; return;
@@ -1727,6 +1731,30 @@ draw_kid_fall (void)
   static int i = 0;
   static int force_floor = -2;
 
+  ALLEGRO_BITMAP *frame = fall_frameset[i > 4 ? 4 : i].frame;
+  int dx = fall_frameset[i > 4 ? 4 : i].dx;
+  int dy = fall_frameset[i > 4 ? 4 : i].dy;
+
+  if (odraw == draw_kid_run_jump) dx = -12, dy= +12;
+  if (odraw == draw_kid_jump) dx = -12, dy = +12;
+
+  if (i == 1) dx = -inertia;
+  if (i > 1) dx = -inertia;
+  if (i > 4) {
+    int speed = +21 + 3 * (i - 5);
+    dy = (speed > 33) ? 33 : speed;
+  }
+
+  /* put kid in front of the floor */
+  if (i == 0
+      && con (pos (coord_bb (kid))).fg != NO_FLOOR) {
+    kid = next_anim (kid, frame, +0, 0);
+    int dir = (kid.dir == LEFT) ? -1 : +1;
+    while (con (pos (coord_bb (kid))).fg != NO_FLOOR)
+      kid.c.x += dir;
+    kid.c.x += -dir * 12;
+  }
+
   /* turn run */
   if (odraw == draw_kid_turn_run) {
     force_floor = kids.pbf.floor;
@@ -1737,21 +1765,8 @@ draw_kid_fall (void)
     kid.c.y += 12;
   }
 
-  ALLEGRO_BITMAP *frame = fall_frameset[i > 4 ? 4 : i].frame;
-  int dx = fall_frameset[i > 4 ? 4 : i].dx;
-  int dy = fall_frameset[i > 4 ? 4 : i].dy;
-
-  if (odraw == draw_kid_run_jump) dx = -10;
-  if (odraw == draw_kid_jump) dx = -12, dy = +12;
-
-  if (i == 1) dx = -inertia;
-  if (i > 1) dx = -inertia;
-  if (i > 4) {
-    int speed = +21 + 3 * (i - 5);
-    dy = (speed > 33) ? 33 : speed;
-  }
-
-  struct pos pmbo = pos (coord_mbo (next_anim (kid, kid.frame, 0, 34)));
+  struct pos pmbo =
+    pos (coord_mbo (next_anim (kid, kid.frame, 0, 34)));
 
   /* land on ground */
   if (i > 0
@@ -1759,6 +1774,8 @@ draw_kid_fall (void)
       /* && kids.cmbo != WALL */
       && kids.pmbo.floor != pmbo.floor
       && kids.pmbo.floor != force_floor) {
+    inertia = 0;
+
     kid.c.y = 63 * kids.pbf.floor + 15;
     kid.c.x += (kid.dir == LEFT) ? -6 : +6;
     kid.frame = kid_normal;
@@ -1773,22 +1790,6 @@ draw_kid_fall (void)
     i = 0; force_floor = -2;
     shake_loose_floor_row (kids.pbf);
     return;
-  }
-
-  /* put kid in front of the floor */
-  if (i == 0
-      && odraw != draw_kid_normal
-      && odraw != draw_kid_hang_free
-      && odraw != draw_kid_hang_wall
-      && odraw != draw_kid_couch
-      && odraw != draw_kid_stabilize) {
-    kid = next_anim (kid, frame, +0, 0);
-
-    int dir = (kid.dir == LEFT) ? -1 : +1;
-    while (con (pos (coord_bb (kid))).fg != NO_FLOOR)
-      kid.c.x += dir;
-
-    kid.c.x += -dir * 12;
   }
 
   /* collision */
