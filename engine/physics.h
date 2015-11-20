@@ -38,7 +38,7 @@ dist_next_place (struct anim a,
                  struct pos (*pos_func) (struct coord c),
                  int margin, bool reverse);
 void
-to_next_place_edge (struct anim *a,
+to_next_place_edge (struct anim *a, ALLEGRO_BITMAP *frame,
                     struct coord (*coord_func) (struct anim a),
                     struct pos (*pos_func) (struct coord c),
                     int margin, bool reverse, int min_dist);

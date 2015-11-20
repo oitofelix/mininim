@@ -95,11 +95,12 @@ dist_next_place (struct anim a,
 }
 
 void
-to_next_place_edge (struct anim *a,
+to_next_place_edge (struct anim *a, ALLEGRO_BITMAP *frame,
                     struct coord (*coord_func) (struct anim a),
                     struct pos (*pos_func) (struct coord c),
                     int margin, bool reverse, int min_dist)
 {
+  *a = next_anim (*a, frame, +0, 0);
   int dn = dist_next_place (*a, coord_func, pos_func, margin, reverse);
 
   int r = reverse ? -1 : 1;
@@ -183,10 +184,9 @@ to_collision_edge (struct anim *a, ALLEGRO_BITMAP *frame,
                    struct pos (*pos_func) (struct coord c),
                    int margin, bool reverse, int min_dist)
 {
-  *a = next_anim (*a, frame, +0, 0);
   int dc = dist_collision (*a, coord_func, pos_func, margin, reverse);
   if (dc > PLACE_WIDTH) return false;
-  else to_next_place_edge (a, coord_func, pos_func, margin, reverse, min_dist);
+  else to_next_place_edge (a, frame, coord_func, pos_func, margin, reverse, min_dist);
   return true;
 }
 
@@ -196,10 +196,9 @@ to_con_edge (struct anim *a, ALLEGRO_BITMAP *frame,
              struct pos (*pos_func) (struct coord c),
              int margin, bool reverse, int min_dist, enum confg ct)
 {
-  *a = next_anim (*a, frame, +0, 0);
   int dc = dist_con (*a, coord_func, pos_func, margin, reverse, ct);
   if (dc > PLACE_WIDTH) return false;
-  else to_next_place_edge (a, coord_func, pos_func, margin, reverse, min_dist);
+  else to_next_place_edge (a, frame, coord_func, pos_func, margin, reverse, min_dist);
   return true;
 }
 
