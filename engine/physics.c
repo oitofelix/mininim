@@ -31,6 +31,7 @@
 #include "physics.h"
 
 struct pos hang_pos;
+enum confg confg_collision;
 
 struct con
 con (struct pos p)
@@ -126,18 +127,20 @@ is_colliding (struct anim a,
   struct pos p = pos_func (c);
   enum confg ct = con (p).fg;
 
-  return dn <= min_dist
-    && (/* wall */
-        crel (p, 0, dir).fg == WALL
+  bool wall_collision = (crel (p, 0, dir).fg == WALL);
+  bool door_collision =
+    (a.dir == RIGHT
+     && ct == DOOR
+     && c.y <= door_grid_tip_y (p) - 10)
+    || (a.dir == LEFT
+        && crel (p, 0, -1).fg == DOOR
+        && c.y <=
+        door_grid_tip_y (prel (p, 0, -1)) - 10);
 
-        /* door */
-        || (a.dir == RIGHT
-            && ct == DOOR
-            && c.y <= door_grid_tip_y (p) - 10)
-        || (a.dir == LEFT
-            && crel (p, 0, -1).fg == DOOR
-            && c.y <=
-            door_grid_tip_y (prel (p, 0, -1)) - 10));
+  if (wall_collision) confg_collision = WALL;
+  if (door_collision) confg_collision = DOOR;
+
+  return dn <= min_dist && (door_collision || wall_collision);
 }
 
 bool

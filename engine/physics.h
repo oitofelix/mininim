@@ -23,7 +23,8 @@
 #include "prince.h"
 
 /* variables */
-struct pos hang_pos;
+extern struct pos hang_pos;
+extern enum confg confg_collision;
 
 /* functions */
 struct con con (struct pos pos);

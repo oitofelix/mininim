@@ -35,6 +35,7 @@
 #define VDUNGEON_DOOR_TOP "dat/vdungeon/door/door frame right top.png"
 #define VDUNGEON_DOOR_GRID "dat/vdungeon/door/res00252.png"
 #define VDUNGEON_DOOR_GRID_TIP "dat/vdungeon/door/res00251.png"
+#define VDUNGEON_DOOR_GRID_TOP "dat/vdungeon/door/res00260.png"
 
 /* sounds */
 #define DOOR_OPEN_SOUND "dat/digisnd1/door gate closing slow 1.ogg"
@@ -70,6 +71,7 @@ void draw_door_grid (ALLEGRO_BITMAP *bitmap, struct pos p, int i);
 struct coord door_grid_coord_base (struct pos p);
 struct coord door_grid_coord (struct pos p, int j, int i);
 struct coord door_grid_tip_coord (struct pos p, int i);
+struct coord door_grid_top_coord (struct pos p);
 struct coord door_pole_coord (struct pos p);
 struct coord door_left_coord (struct pos p);
 struct coord door_right_coord (struct pos p);

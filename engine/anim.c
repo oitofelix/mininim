@@ -71,7 +71,7 @@ play_anim (void (*callback) (void), int freq)
           int dn = dist_next_place (kid, coord_bf, pos, 0, false);
           int dp = dist_next_place (kid, coord_bf, pos, 0, true);
           int dc = dist_collision (kid, coord_bf, pos, 0, false);
-          int df = dist_con (kid, coord_bf, pos, -4, false, NO_FLOOR);
+          int df = dist_con (kid, coord_bb, pos, -4, false, NO_FLOOR);
           int dl = dist_con (kid, coord_bf, pos, -4, false, LOOSE_FLOOR);
           if (a_key || d_key || w_key || s_key || enter_key)
             printf ("\

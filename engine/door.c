@@ -17,6 +17,7 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include <error.h>
 #include "kernel/audio.h"
 #include "kernel/array.h"
@@ -27,8 +28,8 @@
 #include "level.h"
 #include "door.h"
 
-ALLEGRO_BITMAP *door_left, *door_right, *door_pole, *door_top, *door_grid,
-  *door_grid_tip;
+ALLEGRO_BITMAP *door_left, *door_right, *door_pole, *door_top,
+  *door_grid, *door_grid_tip, *door_grid_top;
 
 ALLEGRO_SAMPLE *door_open_sound, *door_close_sound, *door_end_sound;
 
@@ -44,6 +45,7 @@ load_vdungeon_door (void)
   door_top = load_bitmap (VDUNGEON_DOOR_TOP);
   door_grid = load_bitmap (VDUNGEON_DOOR_GRID);
   door_grid_tip = load_bitmap (VDUNGEON_DOOR_GRID_TIP);
+  door_grid_top = load_bitmap (VDUNGEON_DOOR_GRID_TOP);
 }
 
 void
@@ -55,6 +57,7 @@ unload_door (void)
   al_destroy_bitmap (door_top);
   al_destroy_bitmap (door_grid);
   al_destroy_bitmap (door_grid_tip);
+  al_destroy_bitmap (door_grid_top);
 }
 
 void
@@ -198,9 +201,18 @@ draw_door_fg (ALLEGRO_BITMAP *bitmap, struct pos p, struct anim a)
   draw_bitmapc (door_pole, screen, door_pole_coord (p), 0);
 
   if (is_kid_hanging_at_pos (a, p)) return;
-  struct pos pm = pos (coord_m (a));
+  struct pos pbf = pos (coord_bf (a));
+  struct pos pmbo = pos (coord_mbo (a));
+  struct pos pbb = pos (coord_bb (a));
 
-  if (peq (pm, p)) {
+  if ((a.dir == RIGHT && peq (pbf, p))
+      || (a.dir == RIGHT
+          && a.draw == draw_kid_vjump
+          && peq (pbb, p))
+      || (a.dir == LEFT
+          && a.draw == draw_kid_turn
+          && peq (pmbo, p))
+      || (a.dir == LEFT && peq (pbb, p))) {
     struct door *d = door_at_pos (p);
     draw_door_grid (screen, p, d->i);
     draw_con_left (screen, prel (p, -1, +1));
@@ -215,6 +227,7 @@ draw_door_grid (ALLEGRO_BITMAP *bitmap, struct pos p, int i)
   int w = al_get_bitmap_width (door_grid);
   int j;
 
+  draw_bitmapc (door_grid_top, bitmap, door_grid_top_coord (p), 0);
   draw_bitmap_regionc (door_grid, bitmap, 0, 7 - r, w, r + 1,
                        door_grid_coord_base (p), 0);
   for (j = 0; j < q; j++)
@@ -258,6 +271,16 @@ door_grid_tip_coord (struct pos p, int i)
 }
 
 struct coord
+door_grid_top_coord (struct pos p)
+{
+  struct coord c;
+  c.x = PLACE_WIDTH * (p.place + 1);
+  c.y = PLACE_HEIGHT * p.floor - 6;
+  c.room = p.room;
+  return c;
+}
+
+struct coord
 door_pole_coord (struct pos p)
 {
   struct coord c;
@@ -292,7 +315,7 @@ door_top_coord (struct pos p)
 {
   struct coord c;
   c.x = PLACE_WIDTH * (p.place + 1);
-  c.y = PLACE_HEIGHT * p.floor - 4;
+  c.y = PLACE_HEIGHT * p.floor - 10;
   c.room = p.room;
   return c;
 }

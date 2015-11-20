@@ -178,6 +178,9 @@ bool is_kid_hang_or_climb (struct anim a);
 bool is_kid_climb (struct anim a);
 bool is_kid_hanging_at_pos (struct anim a, struct pos p);
 
+void draw_kid_turn (void);
+void draw_kid_vjump (void);
+
 /* variables */
 extern struct anim kid; /* kid animation object */
 extern struct survey kids, kidsf;

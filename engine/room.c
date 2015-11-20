@@ -17,6 +17,7 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include <error.h>
 #include <allegro5/allegro.h>
 
@@ -411,6 +412,12 @@ draw_room_anim_fg (struct anim a)
   draw_room_fg (a, posf (coord_m (a)));
   draw_room_fg (a, posf (coord_tl (a)));
   draw_room_fg (a, posf (coord_tr (a)));
+
+  draw_room_fg (a, pos (coord_bl (a)));
+  draw_room_fg (a, pos (coord_br (a)));
+  draw_room_fg (a, pos (coord_m (a)));
+  draw_room_fg (a, pos (coord_tl (a)));
+  draw_room_fg (a, pos (coord_tr (a)));
 }
 
 void
@@ -454,7 +461,7 @@ draw_room_fg (struct anim a, struct pos p)
       draw_wall_right (screen, p);
       break;
     case DOOR:
-      draw_door (screen, p);
+      draw_door_left (screen, p);
       break;
     default:
       error (-1, 0, "%s: unknown foreground construct type (%i)",
