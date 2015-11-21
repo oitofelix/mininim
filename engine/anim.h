@@ -24,8 +24,7 @@
 
 /* functions */
 void play_anim (void (*callback) (void), int freq);
-void draw_anim (struct anim *anim, ALLEGRO_BITMAP *new_frame, int dx, int dy);
-void redraw_anim (struct anim a);
+void draw_anim (struct anim a);
 struct anim next_anim (struct anim a, ALLEGRO_BITMAP* frame, int dx, int dy);
 bool wait_anim (int cycles);
 

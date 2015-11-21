@@ -22,10 +22,6 @@
 
 #include "pos.h"
 
-/* constants */
-#define OPENER_FLOOR_ON_RESISTENCE 1
-#define OPENER_FLOOR_OFF_RESISTENCE 3
-
 /* bitmaps */
 #define VDUNGEON_UNPRESSED_OPENER_FLOOR_LEFT "dat/vdungeon/floor panels/opener left unpressed.png"
 #define VDUNGEON_UNPRESSED_OPENER_FLOOR_BASE "dat/vdungeon/floor panels/opener base unpressed.png"
@@ -37,9 +33,8 @@
 struct opener_floor {
   struct pos p;
   int event;
+  bool pressed;
   bool noise;
-  int resist_on;
-  int resist_off;
 
   void (*draw) (ALLEGRO_BITMAP *bitmap, struct opener_floor *l);
   void (*draw_left) (ALLEGRO_BITMAP *bitmap, struct opener_floor *l);
@@ -52,6 +47,7 @@ void load_opener_floor_sounds (void);
 void unload_opener_floor_sounds (void);
 void register_opener_floor (struct pos p);
 struct opener_floor * opener_floor_at_pos (struct pos p);
+void press_opener_floor (struct pos p);
 void draw_opener_floors (void);
 void draw_pressed_opener_floor (ALLEGRO_BITMAP *bitmap, struct opener_floor *o);
 void draw_pressed_opener_floor_left (ALLEGRO_BITMAP *bitmap, struct opener_floor *o);

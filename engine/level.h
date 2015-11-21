@@ -28,6 +28,5 @@ extern int room_view;
 
 void play_level (struct level *level);
 void register_cons (void);
-void level_draw_base (void);
 
 #endif	/* FREEPOP_LEVEL_H */

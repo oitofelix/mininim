@@ -120,7 +120,7 @@ play_title (void)
 static void
 title_anim (void)
 {
-  static int i = 0;
+  static int i = 9;
 
   if (enter_key) {
     quit_anim = true;
@@ -193,7 +193,9 @@ title_anim (void)
     }
     break;
   case 9:
-    if (! is_video_effect_started () && ! is_playing_sample ()) {
+    if (! is_video_effect_started ()
+        /* && ! is_playing_sample () */
+        ) {
       princess.c.x = 142;
       princess.c.y = 124;
       princess.frame = princess_normal;
@@ -348,13 +350,18 @@ title_anim (void)
 static void
 draw_princess_room (void)
 {
+  /* computation */
+  princess.draw ();
+  jaffar.draw ();
+
+  /* drawing */
   clear_bitmap (screen, BLACK);
   draw_bitmap (princess_room, screen, 0, 0, 0);
   draw_bitmap (princess_room_bed, screen, 0, 142, 0);
   draw_princess_room_stars ();
   draw_princess_room_fire ();
-  princess.draw ();
-  jaffar.draw ();
+  draw_anim (princess);
+  draw_anim (jaffar);
   draw_clock ();
   draw_bitmap (princess_room_pillar, screen, 240, 120, 0);
 }

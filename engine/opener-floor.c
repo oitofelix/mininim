@@ -69,9 +69,8 @@ register_opener_floor (struct pos p)
 
   o.p = p;
   o.event = con (p).event;
+  o.pressed = false;
   o.noise = false;
-  o.resist_on = OPENER_FLOOR_ON_RESISTENCE;
-  o.resist_off = OPENER_FLOOR_OFF_RESISTENCE;
   o.draw = draw_unpressed_opener_floor;
   o.draw_left = draw_unpressed_opener_floor_left;
   o.draw_right = draw_unpressed_opener_floor_right;
@@ -93,6 +92,12 @@ opener_floor_at_pos (struct pos p)
 }
 
 void
+press_opener_floor (struct pos p)
+{
+  opener_floor_at_pos (p)->pressed = true;
+}
+
+void
 draw_opener_floors (void)
 {
   if (opener_floor_nmemb == 0) return;
@@ -101,32 +106,18 @@ draw_opener_floors (void)
   for (i = opener_floor_nmemb - 1; (int) i >= 0; i--) {
     struct opener_floor *o = &opener_floor[i];
     if (is_pos_visible (o->p)) {
-      if (kids.cmbo == OPENER_FLOOR
-          && peq (kids.pmbo, o->p)) {
-
-        o->resist_off = OPENER_FLOOR_OFF_RESISTENCE;
-
-        if (o->resist_on > 0) o->resist_on--;
-        else {
-          if (! o->noise) {
-            play_sample (opener_floor_sound);
-            o->noise = true;
-          }
-
-          open_door (o->event);
+      if (o->pressed) {
+        if (! o->noise) {
+          play_sample (opener_floor_sound);
+          o->noise = true;
         }
-      } else {
-        if (o->resist_off > 0) o->resist_off--;
-        else {
-          o->noise = false;
-          o->resist_on = OPENER_FLOOR_ON_RESISTENCE;
-        }
-      }
-
-      if (kids.cmbo == OPENER_FLOOR
-          && peq (kids.pmbo, o->p))
+        open_door (o->event);
         draw_pressed_opener_floor (screen, o);
-      else draw_unpressed_opener_floor (screen, o);
+      } else {
+        o->noise = false;
+        draw_unpressed_opener_floor (screen, o);
+      }
+      o->pressed = false;
     }
   }
 }

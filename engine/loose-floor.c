@@ -226,7 +226,8 @@ draw_loose_floor_fall (struct loose_floor *l, size_t i)
 
   if (con (s.pmbo).fg == NO_FLOOR
       || peq (s.pmbo, t.pmbo)) {
-    draw_anim (&l->a, loose_floor_02, 0, speed);
+    l->a = next_anim (l->a, loose_floor_02, 0, speed);
+    draw_anim (l->a);
     draw_con_left (screen, s.ptr);
     draw_con_left (screen, s.pbr);
   } else { /* the floor hit the ground */

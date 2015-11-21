@@ -22,6 +22,20 @@
 #include "anim.h"
 #include "princess.h"
 
+struct anim princess;
+
+#define TURN_FRAMESET_NMEMB 8
+#define STEP_BACK_FRAMESET_NMEMB 6
+#define LOOK_DOWN_FRAMESET_NMEMB 2
+
+static struct frameset turn_frameset[TURN_FRAMESET_NMEMB];
+static struct frameset step_back_frameset[STEP_BACK_FRAMESET_NMEMB];
+static struct frameset look_down_frameset[LOOK_DOWN_FRAMESET_NMEMB];
+
+static void init_turn_frameset (void);
+static void init_step_back_frameset (void);
+static void init_look_down_frameset (void);
+
 /* variables */
 ALLEGRO_BITMAP *princess_normal,
   *princess_turn_02, *princess_turn_03, *princess_turn_04, *princess_turn_05,
@@ -29,8 +43,6 @@ ALLEGRO_BITMAP *princess_normal,
   *princess_step_back_10, *princess_step_back_11, *princess_step_back_12,
   *princess_step_back_13, *princess_step_back_14, *princess_step_back_15,
   *princess_look_down_16, *princess_look_down_17;
-
-struct anim princess; /* princess animation object */
 
 void
 load_princess (void)
@@ -52,6 +64,11 @@ load_princess (void)
   princess_step_back_15 = load_bitmap (PRINCESS_STEP_BACK_15);
   princess_look_down_16 = load_bitmap (PRINCESS_LOOK_DOWN_16);
   princess_look_down_17 = load_bitmap (PRINCESS_LOOK_DOWN_17);
+
+  /* framesets */
+  init_turn_frameset ();
+  init_step_back_frameset ();
+  init_look_down_frameset ();
 }
 
 void
@@ -76,92 +93,118 @@ unload_princess (void)
   al_destroy_bitmap (princess_look_down_17);
 }
 
+
+
+void
+init_turn_frameset (void)
+{
+  struct frameset frameset[TURN_FRAMESET_NMEMB] =
+    {{princess_turn_02,+0,0},{princess_turn_03,-1,0},{princess_turn_04,+0,0},
+     {princess_turn_05,+2,0},{princess_turn_06,-6,0},{princess_turn_07,-2,0},
+     {princess_turn_08,+6,0},{princess_turn_09,-2,0}};
+
+  memcpy (&turn_frameset, &frameset,
+          TURN_FRAMESET_NMEMB * sizeof (struct frameset));
+}
+
+void
+init_step_back_frameset (void)
+{
+  struct frameset frameset[STEP_BACK_FRAMESET_NMEMB] =
+    {{princess_step_back_10,-6,0},{princess_step_back_11,-4,0},
+     {princess_step_back_12,-1,0},{princess_step_back_13,-7,0},
+     {princess_step_back_14,-2,0},{princess_step_back_15,+0,0}};
+
+  memcpy (&step_back_frameset, &frameset,
+          STEP_BACK_FRAMESET_NMEMB * sizeof (struct frameset));
+}
+
+void
+init_look_down_frameset (void)
+{
+  struct frameset frameset[LOOK_DOWN_FRAMESET_NMEMB] =
+    {{princess_look_down_16,+0,0},{princess_look_down_17,+0,0}};
+
+  memcpy (&look_down_frameset, &frameset,
+          LOOK_DOWN_FRAMESET_NMEMB * sizeof (struct frameset));
+}
+
+
+
 void
 draw_princess_normal (void)
 {
   princess.draw = draw_princess_normal;
   princess.flip = (princess.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  /* coming from turn */
-  if (princess.frame == princess_turn_09)
-    draw_anim (&princess, princess_normal, 0, 0);
-  /* coming from normal */
-  else if (princess.frame == princess_normal)
-    draw_anim (&princess, princess_normal, +0, 0);
-  else error (-1, 0, "%s: unknown frame (%p)", __func__, princess.frame);
+  ALLEGRO_BITMAP *frame = princess_normal;
+  int dx = +0;
+  int dy = +0;
+
+  princess = next_anim (princess, frame, dy, dx);
 }
 
 void
 draw_princess_turn (void)
 {
+  void (*odraw) (void) = princess.draw;
   princess.draw = draw_princess_turn;
   princess.flip = (princess.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  /* comming from normal */
-  if (princess.frame == princess_normal)
-    draw_anim (&princess, princess_turn_02, +0, 0);
-  /* comming from turn */
-  else if (princess.frame == princess_turn_02)
-    draw_anim (&princess, princess_turn_03, -1, 0);
-  else if (princess.frame == princess_turn_03)
-    draw_anim (&princess, princess_turn_04, +0, 0);
-  else if (princess.frame == princess_turn_04)
-    draw_anim (&princess, princess_turn_05, +2, 0);
-  else if (princess.frame == princess_turn_05)
-    draw_anim (&princess, princess_turn_06, -6, 0);
-  else if (princess.frame == princess_turn_06)
-    draw_anim (&princess, princess_turn_07, -2, 0);
-  else if (princess.frame == princess_turn_07)
-    draw_anim (&princess, princess_turn_08, +6, 0);
-  else if (princess.frame == princess_turn_08) {
-    draw_anim (&princess, princess_turn_09, -2, 0);
+  static int i = 0;
+  if (odraw != draw_princess_turn) i = 0;
+
+  ALLEGRO_BITMAP *frame = turn_frameset[i].frame;
+  int dx = turn_frameset[i].dx;
+  int dy = turn_frameset[i].dy;
+
+  princess = next_anim (princess, frame, dx, dy);
+
+  if (i < 7) i++;
+  else {
     princess.dir = (princess.dir == RIGHT) ? LEFT : RIGHT;
     princess.draw = draw_princess_normal;
-  } else error (-1, 0, "%s: unknown frame (%p)", __func__, princess.frame);
+  }
 }
 
 void
 draw_princess_step_back (void)
 {
+  void (*odraw) (void) = princess.draw;
   princess.draw = draw_princess_step_back;
   princess.flip = (princess.dir == RIGHT) ? 0 : ALLEGRO_FLIP_HORIZONTAL;
 
+  static int i = 0;
+  if (odraw != draw_princess_step_back) i = 0;
+
+  ALLEGRO_BITMAP *frame = step_back_frameset[i].frame;
+  int dx = step_back_frameset[i].dx;
+  int dy = step_back_frameset[i].dy;
+
+  if (i == 5 && princess.frame == step_back_frameset[4].frame) dx = +1;
+
   draw_anim_inv = true;
+  princess = next_anim (princess, frame, dx, dy);
 
-  /* comming from normal */
-  if (princess.frame == princess_normal)
-    draw_anim (&princess, princess_step_back_10, -6, 0);
-  /* comming from step back */
-  else if (princess.frame == princess_step_back_10)
-    draw_anim (&princess, princess_step_back_11, -4, 0);
-  else if (princess.frame == princess_step_back_11)
-    draw_anim (&princess, princess_step_back_12, -1, 0);
-  else if (princess.frame == princess_step_back_12)
-    draw_anim (&princess, princess_step_back_13, -7, 0);
-  else if (princess.frame == princess_step_back_13)
-    draw_anim (&princess, princess_step_back_14, -2, 0);
-  else if (princess.frame == princess_step_back_14)
-    draw_anim (&princess, princess_step_back_15, +1, 0);
-  else if (princess.frame == princess_step_back_15)
-    draw_anim (&princess, princess_step_back_15, 0, 0);
-  else error (-1, 0, "%s: unknown frame (%p)", __func__, princess.frame);
-
-  draw_anim_inv = false;
+  if (draw_anim_inv) draw_anim_inv = false;
+  if (i < 5) i++;
 }
 
 void
 draw_princess_look_down (void)
 {
+  void (*odraw) (void) = princess.draw;
   princess.draw = draw_princess_look_down;
   princess.flip = (princess.dir == RIGHT) ? 0 : ALLEGRO_FLIP_HORIZONTAL;
 
-  /* comming from step back */
-  if (princess.frame == princess_step_back_15)
-    draw_anim (&princess, princess_look_down_16, 0, 0);
-  /* comming from look down */
-  else if (princess.frame == princess_look_down_16)
-    draw_anim (&princess, princess_look_down_17, 0, 0);
-  else if (princess.frame == princess_look_down_17)
-    draw_anim (&princess, princess_look_down_17, 0, 0);
-  else error (-1, 0, "%s: unknown frame (%p)", __func__, princess.frame);
+  static int i = 0;
+  if (odraw != draw_princess_look_down) i = 0;
+
+  ALLEGRO_BITMAP *frame = look_down_frameset[i].frame;
+  int dx = look_down_frameset[i].dx;
+  int dy = look_down_frameset[i].dy;
+
+  princess = next_anim (princess, frame, dx, dy);
+
+  if (i < 1) i++;
 }

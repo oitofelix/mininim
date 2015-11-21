@@ -29,6 +29,7 @@
 #include "door.h"
 #include "kid.h"
 #include "loose-floor.h"
+#include "opener-floor.h"
 
 struct anim kid;
 struct survey kids, kidsf;
@@ -37,6 +38,8 @@ static bool misstep = false;
 static int inertia = 0;
 static bool critical_edge = false;
 static bool turn = false;
+static struct pos pressible_floor_pos[2] = {{.room = -1},
+                                            {.room = -1}};
 
 #define WALK_FRAMESET_NMEMB 12
 #define START_RUN_FRAMESET_NMEMB 6
@@ -150,6 +153,12 @@ static void draw_kid_couch (void);
 static void draw_kid_stabilize_collision (void);
 static void draw_kid_couch_collision (void);
 static void draw_kid_fall (void);
+
+static void
+update_pressible_floor
+(struct coord (*coord_f0) (struct anim a),
+ struct coord (*coord_f1) (struct anim a));
+static void keep_pressible_floor (void);
 
 void
 load_kid (void)
@@ -694,6 +703,7 @@ init_fall_frameset (void)
 void
 draw_kid_normal (void)
 {
+  void (*odraw) (void) = kid.draw;
   kid.draw = draw_kid_normal;
   kid.flip = (kid.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
   inertia = 0;
@@ -757,8 +767,11 @@ draw_kid_normal (void)
     return;
   }
 
-  draw_anim (&kid, frame, dx, dy);
+  kid = next_anim (kid, frame, dx, dy);
   kid.c.y = 63 * kids.ptf.floor + 15;
+
+  /* pressible floors */
+  keep_pressible_floor ();
 }
 
 void
@@ -783,8 +796,9 @@ draw_kid_walk (void)
     dl = dist_con (kid, coord_bf, pos, -4, false, LOOSE_FLOOR);
 
     if (dc < 4) {
-      draw_anim (&kid, kid_normal, +0, 0);
+      kid = next_anim (kid, kid_normal, +0, 0);
       kid.draw = draw_kid_normal;
+      keep_pressible_floor ();
       return;
     }
 
@@ -793,9 +807,9 @@ draw_kid_walk (void)
         draw_kid_misstep ();
         return;
       } else if (dc < 9 || df < 9 || dl < 9) walk_0 = true;
-      else if (dc < 14 || df < 14 || dl < 14) walk_1 = true;
+      else if (dc < 16 || df < 16 || dl < 16) walk_1 = true;
       else if (dc < 21 || df < 21 || dl < 21) walk_2 = true;
-      else if (dc < 23 || df < 23 || dl < 23) walk_3 = true;
+      else if (dc < 24 || df < 24 || dl < 24) walk_3 = true;
       else if (dc < 27 || df < 27 || dl < 27) walk_4 = true;
     }
   }
@@ -842,8 +856,25 @@ draw_kid_walk (void)
     i =0; return;
   }
 
-  draw_anim (&kid, frame, dx, dy);
+  kid = next_anim (kid, frame, dx, dy);
 
+  /* pressible floors */
+  switch (i) {
+  case 0: update_pressible_floor (NULL, coord_bb);
+  case 1: update_pressible_floor (NULL, coord_bb);
+  case 2: update_pressible_floor (NULL, coord_bb);
+  case 3: update_pressible_floor (NULL, coord_bb);
+  case 4: update_pressible_floor (NULL, coord_bb);
+  case 5: update_pressible_floor (NULL, coord_bb);
+  case 6: update_pressible_floor (coord_mbo, coord_bb);
+  case 7: update_pressible_floor (coord_bf, coord_bb);
+  case 8: update_pressible_floor (coord_bf, NULL);
+  case 9: update_pressible_floor (coord_bf, coord_mbo);
+  case 10: update_pressible_floor (coord_bf, coord_mbo);
+  case 11: update_pressible_floor (coord_bf, coord_bb);
+  }
+
+  /* next iteration */
   if (i == 2 && walk_0) i = 10;
   else if (i == 3 && walk_1) i = 9;
   else if (i == 4 && walk_2) i = 7;
@@ -908,7 +939,7 @@ draw_kid_start_run (void)
     return;
   }
 
-  draw_anim (&kid, frame, dx, dy);
+  kid = next_anim (kid, frame, dx, dy);
 
   if ((i == 3 || i ==4) && turn_run) {
     kid.draw = draw_kid_stop_run;
@@ -920,6 +951,9 @@ draw_kid_start_run (void)
     kid.draw = run ? draw_kid_run : draw_kid_stop_run;
     i = 0;
   }
+
+  /* pressible floors */
+  /* update_pressible_floor (); */
 }
 
 void
@@ -976,10 +1010,13 @@ draw_kid_run (void)
   if (kid.frame == run_jump_frameset[10].frame) dx = -15, play_sample (step);
   if (i == 2 || i == 6) play_sample (step);
 
-  draw_anim (&kid, frame, dx, dy);
+  kid = next_anim (kid, frame, dx, dy);
 
   if (i < 7) i++;
   else i = 0;
+
+  /* pressible floors */
+  /* update_pressible_floor (); */
 }
 
 void
@@ -1019,13 +1056,16 @@ draw_kid_stop_run (void)
 
   if (i == 1 || i == 3) play_sample (step);
 
-  draw_anim (&kid, frame, dx, dy);
+  kid = next_anim (kid, frame, dx, dy);
 
   if (i < 3) i++;
   else {
     i = 0;
     kid.draw = turn_run ? draw_kid_turn_run : draw_kid_stabilize;
   }
+
+  /* pressible floors */
+  /* update_pressible_floor (); */
 }
 
 void
@@ -1072,7 +1112,7 @@ draw_kid_turn (void)
     || ((kid.dir == LEFT) && right_key && up_key);
   bool couch = down_key;
 
-  draw_anim (&kid, frame, dx, dy);
+  kid = next_anim (kid, frame, dx, dy);
 
   if (i < 3) i++;
   else if (i == 3) {
@@ -1089,6 +1129,9 @@ draw_kid_turn (void)
       kid.draw = draw_kid_start_run;
     else kid.draw = draw_kid_stabilize;
   }
+
+  /* pressible floors */
+  keep_pressible_floor ();
 }
 
 void
@@ -1116,7 +1159,7 @@ draw_kid_turn_run (void)
   if (is_colliding (kid, coord_tf, pos, 0, false, -dx))
     to_collision_edge (&kid, frame, coord_tf, pos, 0, false, -dx);
 
-  draw_anim (&kid, frame, dx, dy);
+  kid = next_anim (kid, frame, dx, dy);
 
   if (i < 8) i++;
   else {
@@ -1166,7 +1209,7 @@ draw_kid_jump (void)
   if (i == 11 || i == 14) play_sample (step);
   if (i == 12) shake_loose_floor_row (kids.pmbo);
 
-  draw_anim (&kid, frame, dx, dy);
+  kid = next_anim (kid, frame, dx, dy);
 
   if (i++ == 17) {
     kid.draw = draw_kid_normal;
@@ -1200,7 +1243,7 @@ draw_kid_vjump (void)
 
   int dir = (kid.dir == LEFT) ? +1 : -1;
   if (i == 0
-      && dist_next_place (kid, coord_tf, pos, 0, true) < 22
+      && dist_next_place (kid, coord_tf, pos, 0, true) < 23
       && is_hangable_pos (prel (kids.ptf, 0, dir), kid.dir)) {
     to_next_place_edge (&kid, frame, coord_tf, pos, 0, true, 0);
     if (crel (kids.ptf, 0, dir).fg == NO_FLOOR) {
@@ -1234,7 +1277,11 @@ draw_kid_vjump (void)
       && kid.dir == RIGHT)
     to_collision_edge (&kid, frame, coord_tf, pos, 0, false, -dx);
 
-  draw_anim (&kid, frame, dx, dy);
+  /* opener floor */
+  if ((i < 10 || i > 12) && kids.cmbo == OPENER_FLOOR)
+    press_opener_floor (kids.pmbo);
+
+  kid = next_anim (kid, frame, dx, dy);
 
   if (i == 12 && hang) {
     kid.draw = draw_kid_hang;
@@ -1261,10 +1308,12 @@ draw_kid_run_jump (void)
   void (*odraw) (void) = kid.draw;
   kid.draw = draw_kid_run_jump;
   kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
-  inertia = 6;
 
   static int i = 0;
   if (odraw != draw_kid_run_jump) i = 0;
+
+  if (i < 4 || i > 9) inertia = 3;
+  else inertia = 6;
 
   ALLEGRO_BITMAP *frame = run_jump_frameset[i].frame;
   int dx = run_jump_frameset[i].dx;
@@ -1286,7 +1335,7 @@ draw_kid_run_jump (void)
 
   if (i == 0 || i == 4) play_sample (step);
 
-  draw_anim (&kid, frame, dx, dy);
+  kid = next_anim (kid, frame, dx, dy);
 
   if (i < 10) i++;
   else {
@@ -1319,7 +1368,7 @@ draw_kid_misstep (void)
   if (i == 7) play_sample (step);
   if (i == 8) shake_loose_floor_row (kids.pmbo);
 
-  draw_anim (&kid, frame, dx, dy);
+  kid = next_anim (kid, frame, dx, dy);
 
   if (i < 10) i++;
   else {
@@ -1339,6 +1388,8 @@ draw_kid_hang (void)
   misstep = false;
   inertia = 0;
 
+  static int i = 0;
+
   kid.frame = kid_hang_14;
   int dir = (kid.dir == LEFT) ? 0 : 1;
   kid.c.x = PLACE_WIDTH * (hang_pos.place + dir) + 7;
@@ -1346,12 +1397,21 @@ draw_kid_hang (void)
 
   critical_edge = (con (hang_pos).fg == NO_FLOOR);
 
-  if (odraw != draw_kid_couch && odraw != draw_kid_hang)
-    draw_anim (&kid, kid_hang_14, +0, +0);
+  /* opener floor */
+  dir = (kid.dir == LEFT) ? -1 : +1;
+  struct pos hanged_con_pos = prel (hang_pos, -1, dir);
+  if (con (hanged_con_pos).fg == OPENER_FLOOR)
+    press_opener_floor (hanged_con_pos);
+
+  if (i == 0 && odraw != draw_kid_unclimb)
+    kid = next_anim (kid, kid_hang_14, +0, +0);
   else if (kids.cmf == WALL
            || (kids.cmf == DOOR
                && kid.dir == LEFT)) draw_kid_hang_wall ();
   else draw_kid_hang_free ();
+
+  if (i < 1) i++;
+  else i = 0;
 }
 
 void
@@ -1400,7 +1460,7 @@ draw_kid_hang_wall (void)
     return;
   }
 
-  draw_anim (&kid, frame, dx, dy);
+  kid = next_anim (kid, frame, dx, dy);
 
   if (! reverse && i < 6) i++;
   else if (! reverse && i == 6) {
@@ -1408,6 +1468,12 @@ draw_kid_hang_wall (void)
   } else if (reverse && i > 4 && wait == 0) {
     i--; wait = 1;
   } else if (reverse && i >= 4 && wait > 0) wait--;
+
+  /* opener floor */
+  int dir = (kid.dir == LEFT) ? -1 : +1;
+  struct pos hanged_con_pos = prel (hang_pos, -1, dir);
+  if (con (hanged_con_pos).fg == OPENER_FLOOR)
+    press_opener_floor (hanged_con_pos);
 }
 
 void
@@ -1456,7 +1522,7 @@ draw_kid_hang_free (void)
     return;
   }
 
-  draw_anim (&kid, frame, dx, dy);
+  kid = next_anim (kid, frame, dx, dy);
 
   if (reverse && i > 0) {
     if (i == 4  && j++ > 0) hang_limit = true;
@@ -1473,6 +1539,12 @@ draw_kid_hang_free (void)
                || (j > 0 && i == 9))) {
     reverse = true; i--;
   }
+
+  /* opener floor */
+  int dir = (kid.dir == LEFT) ? -1 : +1;
+  struct pos hanged_con_pos = prel (hang_pos, -1, dir);
+  if (con (hanged_con_pos).fg == OPENER_FLOOR)
+    press_opener_floor (hanged_con_pos);
 }
 
 void
@@ -1530,9 +1602,15 @@ draw_kid_climb (void)
     } else if (wait > 0) wait--;
   }
 
-  draw_anim (&kid, frame, dx, dy);
+  kid = next_anim (kid, frame, dx, dy);
 
   if (wait == DOOR_WAIT_LOOK && i < 15) i++;
+
+  /* opener floor */
+  int dir = (kid.dir == LEFT) ? -1 : +1;
+  struct pos hanged_con_pos = prel (hang_pos, -1, dir);
+  if (con (hanged_con_pos).fg == OPENER_FLOOR)
+    press_opener_floor (hanged_con_pos);
 }
 
 void
@@ -1545,6 +1623,17 @@ draw_kid_unclimb (void)
   static int i = 13;
   if (odraw != draw_kid_unclimb) i = 13;
   if (odraw == draw_kid_climb) i = 2;
+
+  if (i == 0) {
+    i = 13;
+    /* in this function the hang_pos variable holds the position of
+       the hanged construction instead of the usual hangable position
+       facing it */
+    hang_pos =
+      npos (prel (hang_pos, +1, (kid.dir == LEFT) ? +1 : -1));
+    draw_kid_hang ();
+    return;
+  }
 
   ALLEGRO_BITMAP *frame = climb_frameset[i].frame;
   int dx = -climb_frameset[i + 1].dx;
@@ -1563,14 +1652,13 @@ draw_kid_unclimb (void)
     return;
   }
 
-  draw_anim (&kid, frame, dx, dy);
+  kid = next_anim (kid, frame, dx, dy);
 
-  if (i-- == 1) {
-    i = 13;
-    kid.draw = draw_kid_hang;
-    hang_pos =
-      npos (prel (hang_pos, +1, (kid.dir == LEFT) ? +1 : -1));
-  }
+  i--;
+
+  /* opener floor */
+  if (con (hang_pos).fg == OPENER_FLOOR)
+    press_opener_floor (hang_pos);
 }
 
 void
@@ -1609,10 +1697,13 @@ draw_kid_stabilize (void)
     || ((kid.dir == LEFT) && left_key && up_key);
   bool couch = down_key;
 
-  draw_anim (&kid, frame, dx, dy);
+  kid = next_anim (kid, frame, dx, dy);
 
   int dc = dist_collision (kid, coord_bb, pos, 0, false);
   int df = dist_con (kid, coord_bb, pos, -4, false, NO_FLOOR);
+
+  /* pressible floors */
+  keep_pressible_floor ();
 
   if (! collision) {
     if (couch) {
@@ -1703,7 +1794,7 @@ draw_kid_couch (void)
   if (is_colliding (kid, coord_tf, pos, 0, false, -dx))
     to_collision_edge (&kid, frame, coord_tf, pos, 0, false, -dx);
 
-  draw_anim (&kid, frame, dx, dy);
+  kid = next_anim (kid, frame, dx, dy);
 
   if (i == 12) {
     kid.draw = draw_kid_normal;
@@ -1719,6 +1810,10 @@ draw_kid_couch (void)
   else if (i != 2 || ! down_key) i++;
 
   if (cinertia > 0) cinertia--;
+
+  /* opener floor */
+  if (kids.cmbo == OPENER_FLOOR)
+    press_opener_floor (kids.pmbo);
 }
 
 void
@@ -1852,7 +1947,7 @@ draw_kid_fall (void)
   /* if (is_colliding (kid, coord_bf, pos, 0, false, -dx)) */
   /*   to_collision_edge (&kid, frame, coord_bf, pos, 0, false, -dx); */
 
-  draw_anim (&kid, frame, dx, dy);
+  kid = next_anim (kid, frame, dx, dy);
 
   i++;
   /* if (inertia > 0 && i % 3) inertia--; */
@@ -1921,4 +2016,43 @@ is_kid_hanging_at_pos (struct anim a, struct pos p)
   int dir = (a.dir == LEFT) ? -1 : +1;
   return (is_kid_hang_or_climb (a)
           && peq (prel (pbb, -1, dir), p));
+}
+
+
+
+
+static void
+update_pressible_floor
+(struct coord (*coord_f0) (struct anim a),
+ struct coord (*coord_f1) (struct anim a))
+{
+  struct pos p0, p1;
+
+  if (coord_f0) p0 = pos (coord_f0 (kid));
+  if (coord_f1) p1 = pos (coord_f1 (kid));
+
+  if (coord_f0 && con (p0).fg == OPENER_FLOOR) {
+    press_opener_floor (p0);
+    pressible_floor_pos[0] = p0;
+  }
+
+  if (coord_f1 && con (p1).fg == OPENER_FLOOR) {
+    press_opener_floor (p1);
+    pressible_floor_pos[1] = p1;
+  }
+
+  if (! coord_f0 || con (p0).fg != OPENER_FLOOR)
+    pressible_floor_pos[0].room = -1;
+
+  if (! coord_f1 || con (p1).fg != OPENER_FLOOR)
+    pressible_floor_pos[1].room = -1;
+}
+
+static void
+keep_pressible_floor (void)
+{
+  if (pressible_floor_pos[0].room != -1)
+    press_opener_floor (pressible_floor_pos[0]);
+  if (pressible_floor_pos[1].room != -1)
+    press_opener_floor (pressible_floor_pos[1]);
 }

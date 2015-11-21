@@ -110,33 +110,21 @@ level_anim (void)
 
   if (room_view == 0) room_view = prev_room;
 
-  level_draw_base ();
+  /* computation */
+  kids = survey (kid, pos);
+  kidsf = survey (kid, posf);
+  prev_room = kid.c.room;
+  kid.draw ();
+  if (prev_room != kid.c.room) room_view = kid.c.room;
 
-  if (is_visible (kid)) {
-    prev_room = kid.c.room;
-    kids = survey (kid, pos);
-    kidsf = survey (kid, posf);
-    kid.draw ();
-    kids = survey (kid, pos);
-    kidsf = survey (kid, posf);
-    if (kid.c.room != prev_room) {
-      room_view = kid.c.room;
-      level_draw_base ();
-      redraw_anim (kid);
-    }
-  }
-
-  draw_room_anim_fg (kid);
-}
-
-void
-level_draw_base (void)
-{
+  /* drawing */
   clear_bitmap (screen, BLACK);
   if (! no_room_drawing) draw_room (room_view);
   draw_fire (room_view);
   draw_loose_floors ();
-  draw_opener_floors ();
   draw_spikes_floors ();
+  draw_opener_floors ();
   draw_doors ();
+  if (is_visible (kid)) draw_anim (kid);
+  draw_room_anim_fg (kid);
 }
