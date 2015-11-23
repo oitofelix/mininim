@@ -114,7 +114,7 @@ level_anim (void)
   kids = survey (kid, pos);
   kidsf = survey (kid, posf);
   prev_room = kid.c.room;
-  kid.draw ();
+  kid.action ();
   if (prev_room != kid.c.room) room_view = kid.c.room;
 
   /* drawing */

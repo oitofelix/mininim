@@ -30,7 +30,7 @@ bool wait_anim (int cycles);
 
 /* variables */
 extern bool quit_anim; /* set to true to quit animation */
-extern bool draw_anim_inv; /* invert draw_anim offset interpretation  */
+extern bool next_anim_inv; /* invert draw_anim offset interpretation  */
 extern bool cutscene; /* don't apply physics if set */
 
 /* macros */

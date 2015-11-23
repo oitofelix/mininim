@@ -115,22 +115,13 @@ f = %i, p = %i, dn = %i, dp = %i, dc = %i, df = %i, dl = %i\n",
   al_stop_timer (timer);
 }
 
-bool draw_anim_inv; /* invert draw_anim offset interpretation  */
-
-/* void */
-/* draw_anim (struct anim *a, ALLEGRO_BITMAP *frame, */
-/*              int dx, int dy) */
-/* { */
-/*   struct anim na = next_anim (*a, frame, dx, dy); */
-/*   (*a) = na; */
-/*   draw_bitmapc (a->frame, screen, a->c, a->flip); */
-/* } */
-
 void
 draw_anim (struct anim a)
 {
   draw_bitmapc (a.frame, screen, a.c, a.flip);
 }
+
+bool next_anim_inv; /* invert next_anim offset interpretation  */
 
 struct anim
 next_anim (struct anim a, ALLEGRO_BITMAP* frame, int dx, int dy)
@@ -142,7 +133,7 @@ next_anim (struct anim a, ALLEGRO_BITMAP* frame, int dx, int dy)
   int w = al_get_bitmap_width (frame);
   int h = al_get_bitmap_height (frame);
 
-  if (draw_anim_inv) na.c.x += (a.dir == LEFT) ? ow - w - dx : dx;
+  if (next_anim_inv) na.c.x += (a.dir == LEFT) ? ow - w - dx : dx;
   else na.c.x += (a.dir == LEFT) ? dx : ow - w - dx;
   na.c.y += oh - h + dy;
 

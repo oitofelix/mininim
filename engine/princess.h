@@ -20,7 +20,7 @@
 #ifndef FREEPOP_PRINCESS_H
 #define FREEPOP_PRINCESS_H
 
-#define PRINCESS_NORMAL "dat/pv/princess/in story/frame01.png"
+#define PRINCESS_NORMAL_00 "dat/pv/princess/in story/frame01.png"
 #define PRINCESS_TURN_02 "dat/pv/princess/in story/frame02.png"
 #define PRINCESS_TURN_03 "dat/pv/princess/in story/frame03.png"
 #define PRINCESS_TURN_04 "dat/pv/princess/in story/frame04.png"
@@ -41,15 +41,15 @@
 /* functions */
 void load_princess (void);
 void unload_princess (void);
-void draw_princess_normal (void);
-void draw_princess_turn (void);
-void draw_princess_step_back (void);
-void draw_princess_look_down (void);
+void princess_normal (void);
+void princess_turn (void);
+void princess_step_back (void);
+void princess_look_down (void);
 
 /* variables */
 extern struct anim princess; /* princess animation object */
 
-extern ALLEGRO_BITMAP *princess_normal,
+extern ALLEGRO_BITMAP *princess_normal_00,
   *princess_turn_02, *princess_turn_03, *princess_turn_04, *princess_turn_05,
   *princess_turn_06, *princess_turn_07, *princess_turn_08, *princess_turn_09,
   *princess_step_back_10, *princess_step_back_11, *princess_step_back_12,

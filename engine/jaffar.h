@@ -20,7 +20,7 @@
 #ifndef FREEPOP_JAFFAR_H
 #define FREEPOP_JAFFAR_H
 
-#define JAFFAR_NORMAL "dat/pv/jaffar/walking/frame07.png"
+#define JAFFAR_NORMAL_00 "dat/pv/jaffar/walking/frame07.png"
 #define JAFFAR_WALK_01 "dat/pv/jaffar/walking/frame01.png"
 #define JAFFAR_WALK_02 "dat/pv/jaffar/walking/frame02.png"
 #define JAFFAR_WALK_03 "dat/pv/jaffar/walking/frame03.png"
@@ -62,17 +62,17 @@
 /* functions */
 void load_jaffar (void);
 void unload_jaffar (void);
-void draw_jaffar_normal (void);
-void draw_jaffar_walk (void);
-void draw_jaffar_open_arms (void);
-void draw_jaffar_raise_arms (void);
-void draw_jaffar_lower_arms (void);
-void draw_jaffar_turn_walk (void);
+void jaffar_normal (void);
+void jaffar_walk (void);
+void jaffar_open_arms (void);
+void jaffar_raise_arms (void);
+void jaffar_lower_arms (void);
+void jaffar_turn_walk (void);
 
 /* variables */
 extern struct anim jaffar; /* animation object */
 
-extern ALLEGRO_BITMAP *jaffar_normal,
+extern ALLEGRO_BITMAP *jaffar_normal_00,
   *jaffar_walk_01, *jaffar_walk_02, *jaffar_walk_03, *jaffar_walk_04, *jaffar_walk_05,
   *jaffar_walk_06, *jaffar_walk_08, *jaffar_walk_09,
   *jaffar_turn_walk_10, *jaffar_turn_walk_11, *jaffar_turn_walk_12,

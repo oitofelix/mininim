@@ -21,7 +21,7 @@
 #define FREEPOP_KID_H
 
 /* bitmap resources */
-#define KID_NORMAL "dat/kid/normal.png"
+#define KID_NORMAL_00 "dat/kid/normal.png"
 #define KID_START_RUN_01 "dat/kid/running/frame01.png"
 #define KID_START_RUN_02 "dat/kid/running/frame02.png"
 #define KID_START_RUN_03 "dat/kid/running/frame03.png"
@@ -178,8 +178,8 @@ bool is_kid_hang_or_climb (struct anim a);
 bool is_kid_climb (struct anim a);
 bool is_kid_hanging_at_pos (struct anim a, struct pos p);
 
-void draw_kid_turn (void);
-void draw_kid_vjump (void);
+void kid_turn (void);
+void kid_vjump (void);
 
 /* variables */
 extern struct anim kid; /* kid animation object */

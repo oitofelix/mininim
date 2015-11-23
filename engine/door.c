@@ -207,10 +207,10 @@ draw_door_fg (ALLEGRO_BITMAP *bitmap, struct pos p, struct anim a)
 
   if ((a.dir == RIGHT && peq (pbf, p))
       || (a.dir == RIGHT
-          && a.draw == draw_kid_vjump
+          && a.action == kid_vjump
           && peq (pbb, p))
       || (a.dir == LEFT
-          && a.draw == draw_kid_turn
+          && a.action == kid_turn
           && peq (pmbo, p))
       || (a.dir == LEFT && peq (pbb, p))) {
     struct door *d = door_at_pos (p);

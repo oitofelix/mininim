@@ -73,7 +73,7 @@ struct anim {
   enum dir dir;
   int repeat;
   int flip;
-  void (*draw) (void);
+  void (*action) (void);
 };
 
 struct level {
