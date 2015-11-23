@@ -147,12 +147,12 @@ princess_normal (void)
 void
 princess_turn (void)
 {
-  void (*odraw) (void) = princess.action;
+  void (*oaction) (void) = princess.action;
   princess.action = princess_turn;
   princess.flip = (princess.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
   static int i = 0;
-  if (odraw != princess_turn) i = 0;
+  if (oaction != princess_turn) i = 0;
 
   ALLEGRO_BITMAP *frame = turn_frameset[i].frame;
   int dx = turn_frameset[i].dx;
@@ -170,12 +170,12 @@ princess_turn (void)
 void
 princess_step_back (void)
 {
-  void (*odraw) (void) = princess.action;
+  void (*oaction) (void) = princess.action;
   princess.action = princess_step_back;
   princess.flip = (princess.dir == RIGHT) ? 0 : ALLEGRO_FLIP_HORIZONTAL;
 
   static int i = 0;
-  if (odraw != princess_step_back) i = 0;
+  if (oaction != princess_step_back) i = 0;
 
   ALLEGRO_BITMAP *frame = step_back_frameset[i].frame;
   int dx = step_back_frameset[i].dx;
@@ -193,12 +193,12 @@ princess_step_back (void)
 void
 princess_look_down (void)
 {
-  void (*odraw) (void) = princess.action;
+  void (*oaction) (void) = princess.action;
   princess.action = princess_look_down;
   princess.flip = (princess.dir == RIGHT) ? 0 : ALLEGRO_FLIP_HORIZONTAL;
 
   static int i = 0;
-  if (odraw != princess_look_down) i = 0;
+  if (oaction != princess_look_down) i = 0;
 
   ALLEGRO_BITMAP *frame = look_down_frameset[i].frame;
   int dx = look_down_frameset[i].dx;

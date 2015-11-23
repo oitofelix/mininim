@@ -38,7 +38,7 @@ static bool misstep = false;
 static int inertia = 0;
 static bool critical_edge = false;
 static bool turn = false;
-static struct pos pressible_floor_pos[2] = {{.room = -1},
+static struct pos depressible_floor_pos[2] = {{.room = -1},
                                             {.room = -1}};
 
 #define WALK_FRAMESET_NMEMB 12
@@ -155,10 +155,10 @@ static void kid_couch_collision (void);
 static void kid_fall (void);
 
 static void
-update_pressible_floor
+update_depressible_floor
 (struct coord (*coord_f0) (struct anim a),
  struct coord (*coord_f1) (struct anim a));
-static void keep_pressible_floor (void);
+static void keep_depressible_floor (void);
 
 void
 load_kid (void)
@@ -521,9 +521,9 @@ void
 init_start_run_frameset (void)
 {
   struct frameset frameset[START_RUN_FRAMESET_NMEMB] =
-    {{kid_start_run_01,-1,0},{kid_start_run_02,-1,0},
-     {kid_start_run_03,-4,0},{kid_start_run_04,-3,0},
-     {kid_start_run_05,-8,0},{kid_start_run_06,-8,0}};
+    {{kid_start_run_01,-1,0},{kid_start_run_02,-2,0},
+     {kid_start_run_03,-5,0},{kid_start_run_04,-1,0},
+     {kid_start_run_05,-7,0},{kid_start_run_06,-6,0}};
 
   memcpy (&start_run_frameset, &frameset,
           START_RUN_FRAMESET_NMEMB * sizeof (struct frameset));
@@ -533,8 +533,8 @@ void
 init_run_frameset (void)
 {
   struct frameset frameset[RUN_FRAMESET_NMEMB] =
-    {{kid_run_07,-9,0},{kid_run_08,-10,0},{kid_run_09,-3,0},
-     {kid_run_10,-5,0},{kid_run_11,-9,0},{kid_run_12,-11,0},
+    {{kid_run_07,-10,0},{kid_run_08,-7,0},{kid_run_09,-4,0},
+     {kid_run_10,-4,0},{kid_run_11,-8,0},{kid_run_12,-11,0},
      {kid_run_13,-4,0},{kid_run_14,-8,0}};
 
   memcpy (&run_frameset, &frameset,
@@ -545,8 +545,8 @@ void
 init_stop_run_frameset (void)
 {
   struct frameset frameset[STOP_RUN_FRAMESET_NMEMB] =
-    {{kid_stop_run_01,+0,0},{kid_stop_run_02,-6,0},
-     {kid_stop_run_03,-16,0},{kid_stop_run_04,+0,0}};
+    {{kid_stop_run_01,+0,0},{kid_stop_run_02,-1,0},
+     {kid_stop_run_03,-21,0},{kid_stop_run_04,-2,0}};
 
   memcpy (&stop_run_frameset, &frameset,
           STOP_RUN_FRAMESET_NMEMB * sizeof (struct frameset));
@@ -579,11 +579,11 @@ void
 init_jump_frameset (void)
 {
   struct frameset frameset[JUMP_FRAMESET_NMEMB] =
-    {{kid_jump_01,+2,0},{kid_jump_02,-2,0},{kid_jump_03,-4,0},
-     {kid_jump_04,-5,0},{kid_jump_05,-3,0},{kid_jump_06,-6,0},
-     {kid_jump_07,-3,0},{kid_jump_08,-17,0},{kid_jump_09,-21,0},
-     {kid_jump_10,-11,-6},{kid_jump_11,-2,+6},{kid_jump_12,-9,0},
-     {kid_jump_13,+6,0},{kid_jump_14,-11,0},{kid_jump_15,+0,0},
+    {{kid_jump_01,+0,0},{kid_jump_02,-2,0},{kid_jump_03,-3,0},
+     {kid_jump_04,-6,0},{kid_jump_05,-2,0},{kid_jump_06,-4,0},
+     {kid_jump_07,-1,0},{kid_jump_08,-12,0},{kid_jump_09,-18,0},
+     {kid_jump_10,-15,-6},{kid_jump_11,-2,+6},{kid_jump_12,-11,0},
+     {kid_jump_13,+5,0},{kid_jump_14,-13,0},{kid_jump_15,+0,0},
      {kid_jump_16,-1,0},{kid_jump_17,-1,0},{kid_jump_18,+0,0}};
 
   memcpy (&jump_frameset, &frameset,
@@ -703,7 +703,7 @@ init_fall_frameset (void)
 void
 kid_normal (void)
 {
-  void (*odraw) (void) = kid.action;
+  void (*oaction) (void) = kid.action;
   kid.action = kid_normal;
   kid.flip = (kid.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
   inertia = 0;
@@ -770,20 +770,20 @@ kid_normal (void)
   kid = next_anim (kid, frame, dx, dy);
   kid.c.y = 63 * kids.ptf.floor + 15;
 
-  /* pressible floors */
-  keep_pressible_floor ();
+  /* depressible floors */
+  keep_depressible_floor ();
 }
 
 void
 kid_walk (void)
 {
-  void (*odraw) (void) = kid.action;
+  void (*oaction) (void) = kid.action;
   kid.action = kid_walk;
   kid.flip = (kid.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
   inertia = 0;
 
   static int i = 0;
-  if (odraw != kid_walk) i = 0;
+  if (oaction != kid_walk) i = 0;
 
   static bool walk_0 = false, walk_1 = false,
     walk_2 = false, walk_3 = false, walk_4 = false;
@@ -798,7 +798,7 @@ kid_walk (void)
     if (dc < 4) {
       kid = next_anim (kid, kid_normal_00, +0, 0);
       kid.action = kid_normal;
-      keep_pressible_floor ();
+      keep_depressible_floor ();
       return;
     }
 
@@ -858,20 +858,20 @@ kid_walk (void)
 
   kid = next_anim (kid, frame, dx, dy);
 
-  /* pressible floors */
+  /* depressible floors */
   switch (i) {
-  case 0: update_pressible_floor (NULL, coord_bb);
-  case 1: update_pressible_floor (NULL, coord_bb);
-  case 2: update_pressible_floor (NULL, coord_bb);
-  case 3: update_pressible_floor (NULL, coord_bb);
-  case 4: update_pressible_floor (NULL, coord_bb);
-  case 5: update_pressible_floor (NULL, coord_bb);
-  case 6: update_pressible_floor (coord_mbo, coord_bb);
-  case 7: update_pressible_floor (coord_bf, coord_bb);
-  case 8: update_pressible_floor (coord_bf, NULL);
-  case 9: update_pressible_floor (coord_bf, coord_mbo);
-  case 10: update_pressible_floor (coord_bf, coord_mbo);
-  case 11: update_pressible_floor (coord_bf, coord_bb);
+  case 0: update_depressible_floor (coord_bf, coord_bb); break;
+  case 1: update_depressible_floor (coord_bf, coord_bb); break;
+  case 2: update_depressible_floor (coord_bf, coord_bb); break;
+  case 3: update_depressible_floor (coord_mbo, coord_bb); break;
+  case 4: update_depressible_floor (coord_mbo, coord_bb); break;
+  case 5: update_depressible_floor (coord_mbo, coord_bb); break;
+  case 6: update_depressible_floor (coord_bf, coord_bb); break;
+  case 7: update_depressible_floor (coord_bf, coord_bb); break;
+  case 8: update_depressible_floor (coord_bf, coord_bb); break;
+  case 9: update_depressible_floor (coord_bf, coord_bb); break;
+  case 10: update_depressible_floor (coord_bf, coord_bb); break;
+  case 11: update_depressible_floor (coord_bf, coord_bb); break;
   }
 
   /* next iteration */
@@ -891,14 +891,14 @@ kid_walk (void)
 void
 kid_start_run (void)
 {
-  void (*odraw) (void) = kid.action;
+  void (*oaction) (void) = kid.action;
   kid.action = kid_start_run;
   kid.flip = (kid.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
   misstep = false;
   inertia = 1;
 
   static int i = 0;
-  if (odraw != kid_start_run) i = 0;
+  if (oaction != kid_start_run) i = 0;
 
   ALLEGRO_BITMAP *frame = start_run_frameset[i].frame;
   int dx = start_run_frameset[i].dx;
@@ -941,6 +941,16 @@ kid_start_run (void)
 
   kid = next_anim (kid, frame, dx, dy);
 
+  /* depressible floors */
+  switch (i) {
+  case 0: update_depressible_floor (coord_mbo, coord_bb); break;
+  case 1: update_depressible_floor (coord_mbo, coord_bb); break;
+  case 2: update_depressible_floor (coord_mbo, coord_bb); break;
+  case 3: update_depressible_floor (coord_mbo, coord_bb); break;
+  case 4: update_depressible_floor (coord_mbo, coord_bb); break;
+  case 5: update_depressible_floor (coord_mbo, coord_bb); break;
+  }
+
   if ((i == 3 || i ==4) && turn_run) {
     kid.action = kid_stop_run;
     i = 0;
@@ -951,21 +961,18 @@ kid_start_run (void)
     kid.action = run ? kid_run : kid_stop_run;
     i = 0;
   }
-
-  /* pressible floors */
-  /* update_pressible_floor (); */
 }
 
 void
 kid_run (void)
 {
-  void (*odraw) (void) = kid.action;
+  void (*oaction) (void) = kid.action;
   kid.action = kid_run;
   kid.flip = (kid.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
   inertia = 3;
 
   static int i = 0;
-  if (odraw != kid_run) i = 0;
+  if (oaction != kid_run) i = 0;
 
   if (kid.frame == turn_run_frameset[8].frame) i = 6;
 
@@ -1005,30 +1012,39 @@ kid_run (void)
     i = 0; return;
   }
 
-  if (kid.frame == start_run_frameset[5].frame) dx = -7;
+  if (kid.frame == start_run_frameset[5].frame) dx = -6;
   if (kid.frame == turn_run_frameset[8].frame) dx = -4;
   if (kid.frame == run_jump_frameset[10].frame) dx = -15, play_sample (step);
   if (i == 2 || i == 6) play_sample (step);
 
   kid = next_anim (kid, frame, dx, dy);
 
+  /* depressible floors */
+  switch (i) {
+  case 0: update_depressible_floor (coord_mbo, coord_bb); break;
+  case 1: update_depressible_floor (coord_mbo, coord_bb); break;
+  case 2: update_depressible_floor (coord_mbo, coord_bb); break;
+  case 3: update_depressible_floor (coord_mbo, coord_bb); break;
+  case 4: update_depressible_floor (coord_mbo, coord_bb); break;
+  case 5: update_depressible_floor (coord_mbo, coord_bb); break;
+  case 6: update_depressible_floor (coord_mbo, coord_bb); break;
+  case 7: update_depressible_floor (coord_mbo, coord_bb); break;
+  }
+
   if (i < 7) i++;
   else i = 0;
-
-  /* pressible floors */
-  /* update_pressible_floor (); */
 }
 
 void
 kid_stop_run (void)
 {
-  void (*odraw) (void) = kid.action;
+  void (*oaction) (void) = kid.action;
   kid.action = kid_stop_run;
   kid.flip = (kid.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
   inertia = 0;
 
   static int i = 0;
-  if (odraw != kid_stop_run) i = 0;
+  if (oaction != kid_stop_run) i = 0;
 
   ALLEGRO_BITMAP *frame = stop_run_frameset[i].frame;
   int dx = stop_run_frameset[i].dx;
@@ -1058,26 +1074,31 @@ kid_stop_run (void)
 
   kid = next_anim (kid, frame, dx, dy);
 
+  /* depressible floors */
+  switch (i) {
+  case 0: update_depressible_floor (coord_bf, coord_mbo); break;
+  case 1: update_depressible_floor (coord_bf, coord_mbo); break;
+  case 2: update_depressible_floor (coord_bf, coord_mbo); break;
+  case 3: update_depressible_floor (coord_bf, coord_mbo); break;
+  }
+
   if (i < 3) i++;
   else {
     i = 0;
     kid.action = turn_run ? kid_turn_run : kid_stabilize;
   }
-
-  /* pressible floors */
-  /* update_pressible_floor (); */
 }
 
 void
 kid_turn (void)
 {
-  void (*odraw) (void) = kid.action;
+  void (*oaction) (void) = kid.action;
   kid.action = kid_turn;
   kid.flip = (kid.dir == RIGHT) ? 0 : ALLEGRO_FLIP_HORIZONTAL;
   misstep = false;
 
   static int i = 0;
-  if (odraw != kid_turn) i = 0;
+  if (oaction != kid_turn) i = 0;
 
   ALLEGRO_BITMAP *frame = turn_frameset[i].frame;
   int dx = turn_frameset[i].dx;
@@ -1114,6 +1135,9 @@ kid_turn (void)
 
   kid = next_anim (kid, frame, dx, dy);
 
+  /* depressible floors */
+  keep_depressible_floor ();
+
   if (i < 3) i++;
   else if (i == 3) {
     i = 0;
@@ -1129,21 +1153,18 @@ kid_turn (void)
       kid.action = kid_start_run;
     else kid.action = kid_stabilize;
   }
-
-  /* pressible floors */
-  keep_pressible_floor ();
 }
 
 void
 kid_turn_run (void)
 {
-  void (*odraw) (void) = kid.action;
+  void (*oaction) (void) = kid.action;
   kid.action = kid_turn_run;
   kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
   inertia = 0;
 
   static int i = 0;
-  if (odraw != kid_turn_run) i = 0;
+  if (oaction != kid_turn_run) i = 0;
 
   ALLEGRO_BITMAP *frame = turn_run_frameset[i].frame;
   int dx = turn_run_frameset[i].dx;
@@ -1161,6 +1182,19 @@ kid_turn_run (void)
 
   kid = next_anim (kid, frame, dx, dy);
 
+  /* depressible floors */
+  switch (i) {
+  case 0: update_depressible_floor (coord_bf, coord_bb); break;
+  case 1: update_depressible_floor (coord_bf, coord_mbo); break;
+  case 2: update_depressible_floor (coord_bf, coord_mbo); break;
+  case 3: update_depressible_floor (coord_bf, coord_mbo); break;
+  case 4: update_depressible_floor (coord_bf, coord_mbo); break;
+  case 5: update_depressible_floor (coord_bf, coord_mbo); break;
+  case 6: update_depressible_floor (coord_bf, coord_mbo); break;
+  case 7: update_depressible_floor (coord_bf, coord_mbo); break;
+  case 8: update_depressible_floor (coord_bf, coord_mbo); break;
+  }
+
   if (i < 8) i++;
   else {
     kid.dir = (kid.dir == RIGHT) ? LEFT : RIGHT;
@@ -1172,14 +1206,14 @@ kid_turn_run (void)
 void
 kid_jump (void)
 {
-  void (*odraw) (void) = kid.action;
+  void (*oaction) (void) = kid.action;
   kid.action = kid_jump;
   kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
   misstep = false;
   inertia = 4;
 
   static int i = 0;
-  if (odraw != kid_jump) i = 0;
+  if (oaction != kid_jump) i = 0;
 
   ALLEGRO_BITMAP *frame = jump_frameset[i].frame;
   int dx = jump_frameset[i].dx;
@@ -1211,6 +1245,28 @@ kid_jump (void)
 
   kid = next_anim (kid, frame, dx, dy);
 
+  /* depressible floors */
+  switch (i) {
+  case 0: update_depressible_floor (coord_bf, coord_bb); break;
+  case 1: update_depressible_floor (coord_bf, coord_bb); break;
+  case 2: update_depressible_floor (coord_mbo, coord_bb); break;
+  case 3: update_depressible_floor (coord_mbo, coord_bb); break;
+  case 4: update_depressible_floor (coord_mbo, coord_bb); break;
+  case 5: update_depressible_floor (coord_mbo, coord_bb); break;
+  case 6: update_depressible_floor (coord_mbo, coord_bb); break;
+  case 7: update_depressible_floor (coord_mbo, coord_bb); break;
+  case 8: update_depressible_floor (NULL, NULL); break;
+  case 9: update_depressible_floor (NULL, NULL); break;
+  case 10: update_depressible_floor (NULL, NULL); break;
+  case 11: update_depressible_floor (coord_mbo, NULL); break;
+  case 12: update_depressible_floor (coord_mbo, NULL); break;
+  case 13: update_depressible_floor (coord_mbo, NULL); break;
+  case 14: update_depressible_floor (coord_bf, coord_mbo); break;
+  case 15: update_depressible_floor (coord_bf, coord_mbo); break;
+  case 16: update_depressible_floor (coord_bf, coord_mbo); break;
+  case 17: update_depressible_floor (coord_bf, coord_mbo); break;
+  }
+
   if (i++ == 17) {
     kid.action = kid_normal;
     i = 0;
@@ -1220,23 +1276,23 @@ kid_jump (void)
 void
 kid_vjump (void)
 {
-  void (*odraw) (void) = kid.action;
+  void (*oaction) (void) = kid.action;
   kid.action = kid_vjump;
   kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
   misstep = false;
 
   static int i = 0, j = 0;
   static bool hit_ceiling = false;
-  if (odraw != kid_vjump) i = j = 0, hit_ceiling = false;
-  if (odraw == kid_hang_wall
-      || odraw == kid_hang_free) i = 13;
+  if (oaction != kid_vjump) i = j = 0, hit_ceiling = false;
+  if (oaction == kid_hang_wall
+      || oaction == kid_hang_free) i = 13;
   static bool hang = false;
 
   ALLEGRO_BITMAP *frame = vjump_frameset[i].frame;
   int dx = vjump_frameset[i].dx;
   int dy = vjump_frameset[i].dy;
 
-  if (critical_edge && odraw == kid_hang_free)
+  if (critical_edge && oaction == kid_hang_free)
     dx -= (kid.dir == LEFT) ? 9 : 13;
   if (critical_edge && i == 11) dx = +7;
   if (i == 12 && j++ > 0) dx = 0, dy += 2 * j + 1;
@@ -1277,11 +1333,29 @@ kid_vjump (void)
       && kid.dir == RIGHT)
     to_collision_edge (&kid, frame, coord_tf, pos, 0, false, -dx);
 
-  /* opener floor */
-  if ((i < 10 || i > 12) && kids.cmbo == OPENER_FLOOR)
-    press_opener_floor (kids.pmbo);
-
   kid = next_anim (kid, frame, dx, dy);
+
+  /* depressible floors */
+  switch (i) {
+  case 0: update_depressible_floor (coord_bf, coord_bb); break;
+  case 1: update_depressible_floor (coord_bf, coord_bb); break;
+  case 2: update_depressible_floor (coord_bf, coord_bb); break;
+  case 3: update_depressible_floor (coord_bf, coord_mbo); break;
+  case 4: update_depressible_floor (coord_bf, coord_mbo); break;
+  case 5: update_depressible_floor (coord_bf, coord_mbo); break;
+  case 6: update_depressible_floor (coord_bf, coord_mbo); break;
+  case 7: update_depressible_floor (coord_bf, coord_mbo); break;
+  case 8: update_depressible_floor (NULL, coord_mbo); break;
+  case 9: update_depressible_floor (NULL, coord_mbo); break;
+  case 10: update_depressible_floor (NULL, coord_mbo); break;
+  case 11: update_depressible_floor (NULL, NULL); break;
+  case 12: update_depressible_floor (NULL, NULL); break;
+  case 13: update_depressible_floor (NULL, NULL); break;
+  case 14: update_depressible_floor (coord_bf, coord_mbo); break;
+  case 15: update_depressible_floor (coord_bf, coord_bb); break;
+  case 16: update_depressible_floor (coord_mbo, coord_bb); break;
+  case 17: update_depressible_floor (coord_mbo, coord_bb); break;
+  }
 
   if (i == 12 && hang) {
     kid.action = kid_hang;
@@ -1305,12 +1379,12 @@ kid_vjump (void)
 void
 kid_run_jump (void)
 {
-  void (*odraw) (void) = kid.action;
+  void (*oaction) (void) = kid.action;
   kid.action = kid_run_jump;
   kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
   static int i = 0;
-  if (odraw != kid_run_jump) i = 0;
+  if (oaction != kid_run_jump) i = 0;
 
   if (i < 4 || i > 9) inertia = 3;
   else inertia = 6;
@@ -1337,6 +1411,21 @@ kid_run_jump (void)
 
   kid = next_anim (kid, frame, dx, dy);
 
+  /* depressible floors */
+  switch (i) {
+  case 0: update_depressible_floor (coord_bf, coord_mbo); break;
+  case 1: update_depressible_floor (coord_mbo, coord_bb); break;
+  case 2: update_depressible_floor (NULL, coord_bb); break;
+  case 3: update_depressible_floor (coord_bf, NULL); break;
+  case 4: update_depressible_floor (coord_bf, coord_bb); break;
+  case 5: update_depressible_floor (coord_mbo, coord_bb); break;
+  case 6: update_depressible_floor (NULL, NULL); break;
+  case 7: update_depressible_floor (NULL, NULL); break;
+  case 8: update_depressible_floor (NULL, NULL); break;
+  case 9: update_depressible_floor (NULL, NULL); break;
+  case 10: update_depressible_floor (coord_mbo, NULL); break;
+  }
+
   if (i < 10) i++;
   else {
     kid.action = kid_run;
@@ -1347,13 +1436,13 @@ kid_run_jump (void)
 void
 kid_misstep (void)
 {
-  void (*odraw) (void) = kid.action;
+  void (*oaction) (void) = kid.action;
   kid.action = kid_misstep;
   kid.flip = (kid.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
   misstep = true;
 
   static int i = 0;
-  if (odraw != kid_misstep) i = 0;
+  if (oaction != kid_misstep) i = 0;
 
   ALLEGRO_BITMAP *frame = misstep_frameset[i].frame;
   int dx = misstep_frameset[i].dx;
@@ -1370,6 +1459,9 @@ kid_misstep (void)
 
   kid = next_anim (kid, frame, dx, dy);
 
+  /* depressible floors */
+  keep_depressible_floor ();
+
   if (i < 10) i++;
   else {
     kid.action = kid_normal;
@@ -1382,7 +1474,7 @@ kid_misstep (void)
 void
 kid_hang (void)
 {
-  void (*odraw) (void) = kid.action;
+  void (*oaction) (void) = kid.action;
   kid.action = kid_hang;
   kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
   misstep = false;
@@ -1397,19 +1489,21 @@ kid_hang (void)
 
   critical_edge = (con (hang_pos).fg == NO_FLOOR);
 
-  /* opener floor */
-  dir = (kid.dir == LEFT) ? -1 : +1;
-  struct pos hanged_con_pos = prel (hang_pos, -1, dir);
-  if (con (hanged_con_pos).fg == OPENER_FLOOR)
-    press_opener_floor (hanged_con_pos);
-
-  if (i == 0 && odraw != kid_unclimb)
+  if (i == 0 && oaction != kid_unclimb)
     kid = next_anim (kid, kid_hang_14, +0, +0);
   else if (kids.cmf == WALL
            || (kids.cmf == DOOR
                && kid.dir == LEFT)) kid_hang_wall ();
   else kid_hang_free ();
 
+  /* depressible floors */
+  update_depressible_floor (NULL, NULL);
+  dir = (kid.dir == LEFT) ? -1 : +1;
+  struct pos hanged_con_pos = prel (hang_pos, -1, dir);
+  if (con (hanged_con_pos).fg == OPENER_FLOOR)
+    press_opener_floor (hanged_con_pos);
+
+  /* next frame */
   if (i < 1) i++;
   else i = 0;
 }
@@ -1462,24 +1556,26 @@ kid_hang_wall (void)
 
   kid = next_anim (kid, frame, dx, dy);
 
+  /* depressible floors */
+  update_depressible_floor (NULL, NULL);
+  int dir = (kid.dir == LEFT) ? -1 : +1;
+  struct pos hanged_con_pos = prel (hang_pos, -1, dir);
+  if (con (hanged_con_pos).fg == OPENER_FLOOR)
+    press_opener_floor (hanged_con_pos);
+
+  /* next frame */
   if (! reverse && i < 6) i++;
   else if (! reverse && i == 6) {
    reverse = true;
   } else if (reverse && i > 4 && wait == 0) {
     i--; wait = 1;
   } else if (reverse && i >= 4 && wait > 0) wait--;
-
-  /* opener floor */
-  int dir = (kid.dir == LEFT) ? -1 : +1;
-  struct pos hanged_con_pos = prel (hang_pos, -1, dir);
-  if (con (hanged_con_pos).fg == OPENER_FLOOR)
-    press_opener_floor (hanged_con_pos);
 }
 
 void
 kid_hang_free (void)
 {
-  void (*odraw) (void) = kid.action;
+  void (*oaction) (void) = kid.action;
   kid.action = kid_hang_free;
   kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
@@ -1487,7 +1583,7 @@ kid_hang_free (void)
   static int i = 4;
   static int j = -1;
   static int wait = 3;
-  if (odraw != kid_hang_free) {
+  if (oaction != kid_hang_free) {
     reverse = true; i = 4; j = -1; wait = 3;
   }
 
@@ -1524,6 +1620,14 @@ kid_hang_free (void)
 
   kid = next_anim (kid, frame, dx, dy);
 
+  /* depressible floors */
+  update_depressible_floor (NULL, NULL);
+  int dir = (kid.dir == LEFT) ? -1 : +1;
+  struct pos hanged_con_pos = prel (hang_pos, -1, dir);
+  if (con (hanged_con_pos).fg == OPENER_FLOOR)
+    press_opener_floor (hanged_con_pos);
+
+  /* next frame */
   if (reverse && i > 0) {
     if (i == 4  && j++ > 0) hang_limit = true;
     i--;
@@ -1539,24 +1643,18 @@ kid_hang_free (void)
                || (j > 0 && i == 9))) {
     reverse = true; i--;
   }
-
-  /* opener floor */
-  int dir = (kid.dir == LEFT) ? -1 : +1;
-  struct pos hanged_con_pos = prel (hang_pos, -1, dir);
-  if (con (hanged_con_pos).fg == OPENER_FLOOR)
-    press_opener_floor (hanged_con_pos);
 }
 
 void
 kid_climb (void)
 {
-  void (*odraw) (void) = kid.action;
+  void (*oaction) (void) = kid.action;
   kid.action = kid_climb;
   kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
   static int i = 0;
   static int wait = DOOR_WAIT_LOOK;
-  if (odraw != kid_climb) i = 0;
+  if (oaction != kid_climb) i = 0;
 
   if (i == 15) {
     kid_couch ();
@@ -1604,25 +1702,27 @@ kid_climb (void)
 
   kid = next_anim (kid, frame, dx, dy);
 
-  if (wait == DOOR_WAIT_LOOK && i < 15) i++;
-
-  /* opener floor */
+  /* depressible floors */
+  update_depressible_floor (NULL, NULL);
   int dir = (kid.dir == LEFT) ? -1 : +1;
   struct pos hanged_con_pos = prel (hang_pos, -1, dir);
   if (con (hanged_con_pos).fg == OPENER_FLOOR)
     press_opener_floor (hanged_con_pos);
+
+  /* next frame */
+  if (wait == DOOR_WAIT_LOOK && i < 15) i++;
 }
 
 void
 kid_unclimb (void)
 {
-  void (*odraw) (void) = kid.action;
+  void (*oaction) (void) = kid.action;
   kid.action = kid_unclimb;
   kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
   static int i = 13;
-  if (odraw != kid_unclimb) i = 13;
-  if (odraw == kid_climb) i = 2;
+  if (oaction != kid_unclimb) i = 13;
+  if (oaction == kid_climb) i = 2;
 
   if (i == 0) {
     i = 13;
@@ -1654,17 +1754,19 @@ kid_unclimb (void)
 
   kid = next_anim (kid, frame, dx, dy);
 
-  i--;
-
-  /* opener floor */
+  /* depressible floors */
+  update_depressible_floor (NULL, NULL);
   if (con (hang_pos).fg == OPENER_FLOOR)
     press_opener_floor (hang_pos);
+
+  /* next frame */
+  i--;
 }
 
 void
 kid_stabilize (void)
 {
-  void (*odraw) (void) = kid.action;
+  void (*oaction) (void) = kid.action;
   kid.action = kid_stabilize;
   kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
   misstep = false;
@@ -1672,8 +1774,8 @@ kid_stabilize (void)
 
   static int i = 0;
   static bool collision = false;
-  if (odraw != kid_stabilize) i = 0;
-  if (odraw == kid_stabilize_collision) i = 1, collision = true;
+  if (oaction != kid_stabilize) i = 0;
+  if (oaction == kid_stabilize_collision) i = 1, collision = true;
 
   ALLEGRO_BITMAP *frame = stabilize_frameset[i].frame;
   int dx = stabilize_frameset[i].dx;
@@ -1699,11 +1801,11 @@ kid_stabilize (void)
 
   kid = next_anim (kid, frame, dx, dy);
 
+  /* depressible floors */
+  keep_depressible_floor ();
+
   int dc = dist_collision (kid, coord_bb, pos, 0, false);
   int df = dist_con (kid, coord_bb, pos, -4, false, NO_FLOOR);
-
-  /* pressible floors */
-  keep_pressible_floor ();
 
   if (! collision) {
     if (couch) {
@@ -1734,7 +1836,7 @@ kid_stabilize (void)
 void
 kid_couch (void)
 {
-  void (*odraw) (void) = kid.action;
+  void (*oaction) (void) = kid.action;
   kid.action = kid_couch;
   kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
   misstep = false;
@@ -1744,28 +1846,28 @@ kid_couch (void)
   static bool collision = false;
   static bool fall = false;
   static int cinertia = 0;
-  if (odraw != kid_couch) i = 0;
-  if (odraw == kid_climb) i = 11, critical_edge = false;
-  if (odraw == kid_couch_collision)
+  if (oaction != kid_couch) i = 0;
+  if (oaction == kid_climb) i = 11, critical_edge = false;
+  if (oaction == kid_couch_collision)
     collision = true, inertia = 0;
-  if (odraw == kid_fall)
+  if (oaction == kid_fall)
     fall = true, inertia = 0;
 
   ALLEGRO_BITMAP *frame = couch_frameset[i].frame;
   int dx = couch_frameset[i].dx;
   int dy = couch_frameset[i].dy;
 
-  if (odraw == kid_climb) dx += 7;
+  if (oaction == kid_climb) dx += 7;
   if (i == 0) cinertia = 2.6 * inertia;
   if (collision || fall) cinertia = 0;
   if (i > 0 && i < 3) dx -= cinertia ? cinertia : 0;
 
   /* unclimb */
   int dir = (kid.dir == LEFT) ? +1 : -1;
-  if (odraw != kid_couch_collision
-      && odraw != kid_fall
+  if (oaction != kid_couch_collision
+      && oaction != kid_fall
       && i == 0
-      && odraw != kid_fall
+      && oaction != kid_fall
       && crel (kids.pbf, 0, dir).fg == NO_FLOOR
       && dist_next_place (kid, coord_tf, pos, 0, true) < 22
       && ! (kids.ctf == DOOR && kid.dir == LEFT
@@ -1796,6 +1898,23 @@ kid_couch (void)
 
   kid = next_anim (kid, frame, dx, dy);
 
+  /* depressible floors */
+  switch (i) {
+  case 0: update_depressible_floor (coord_mbo, coord_mbo); break;
+  case 1: update_depressible_floor (coord_mbo, coord_mbo); break;
+  case 2: update_depressible_floor (coord_bf, coord_mbo); break;
+  case 3: update_depressible_floor (coord_bf, coord_bb); break;
+  case 4: update_depressible_floor (coord_bf, coord_bb); break;
+  case 5: update_depressible_floor (coord_mbo, coord_bb); break;
+  case 6: update_depressible_floor (coord_mbo, coord_bb); break;
+  case 7: update_depressible_floor (coord_mbo, coord_bb); break;
+  case 8: update_depressible_floor (coord_bf, coord_mbo); break;
+  case 9: update_depressible_floor (coord_bf, coord_mbo); break;
+  case 10: update_depressible_floor (coord_bf, coord_mbo); break;
+  case 11: update_depressible_floor (coord_bf, coord_bb); break;
+  case 12: update_depressible_floor (coord_bf, coord_bb); break;
+  }
+
   if (i == 12) {
     kid.action = kid_normal;
     cinertia = 0; i = 0; collision = fall = false;
@@ -1810,10 +1929,6 @@ kid_couch (void)
   else if (i != 2 || ! down_key) i++;
 
   if (cinertia > 0) cinertia--;
-
-  /* opener floor */
-  if (kids.cmbo == OPENER_FLOOR)
-    press_opener_floor (kids.pmbo);
 }
 
 void
@@ -1847,7 +1962,7 @@ kid_couch_collision (void)
 void
 kid_fall (void)
 {
-  void (*odraw) (void) = kid.action;
+  void (*oaction) (void) = kid.action;
   kid.action = kid_fall;
   kid.flip = (kid.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
@@ -1875,12 +1990,12 @@ kid_fall (void)
   /* ensure kid's proximity for hang */
   if (i == 0 && crel (kids.ptf, 0, dir).fg != NO_FLOOR
       && crel (kids.ptf, 0, dir).fg != WALL
-      && odraw == kid_walk) {
+      && oaction == kid_walk) {
     to_next_place_edge (&kid, frame, coord_tf, pos, 0, false, 0);
   } else if (kids.ctf != NO_FLOOR) inertia = 0;
   else {
-    if (odraw == kid_run_jump) dx = -12, dy= +12;
-    if (odraw == kid_jump) dx = -12, dy = +12;
+    if (oaction == kid_run_jump) dx = -12, dy= +12;
+    if (oaction == kid_jump) dx = -12, dy = +12;
   }
 
   /* hang */
@@ -1899,7 +2014,7 @@ kid_fall (void)
   }
 
   /* turn run */
-  if (odraw == kid_turn_run) {
+  if (oaction == kid_turn_run) {
     force_floor = kids.pbf.floor;
     if (kid.frame != turn_run_frameset[8].frame)
       kid.dir = (kid.dir == LEFT) ? RIGHT : LEFT;
@@ -1949,6 +2064,10 @@ kid_fall (void)
 
   kid = next_anim (kid, frame, dx, dy);
 
+  /* depressible floors */
+  update_depressible_floor (NULL, NULL);
+
+  /* next frame */
   i++;
   /* if (inertia > 0 && i % 3) inertia--; */
 }
@@ -2022,7 +2141,7 @@ is_kid_hanging_at_pos (struct anim a, struct pos p)
 
 
 static void
-update_pressible_floor
+update_depressible_floor
 (struct coord (*coord_f0) (struct anim a),
  struct coord (*coord_f1) (struct anim a))
 {
@@ -2033,26 +2152,26 @@ update_pressible_floor
 
   if (coord_f0 && con (p0).fg == OPENER_FLOOR) {
     press_opener_floor (p0);
-    pressible_floor_pos[0] = p0;
+    depressible_floor_pos[0] = p0;
   }
 
   if (coord_f1 && con (p1).fg == OPENER_FLOOR) {
     press_opener_floor (p1);
-    pressible_floor_pos[1] = p1;
+    depressible_floor_pos[1] = p1;
   }
 
   if (! coord_f0 || con (p0).fg != OPENER_FLOOR)
-    pressible_floor_pos[0].room = -1;
+    depressible_floor_pos[0].room = -1;
 
   if (! coord_f1 || con (p1).fg != OPENER_FLOOR)
-    pressible_floor_pos[1].room = -1;
+    depressible_floor_pos[1].room = -1;
 }
 
 static void
-keep_pressible_floor (void)
+keep_depressible_floor (void)
 {
-  if (pressible_floor_pos[0].room != -1)
-    press_opener_floor (pressible_floor_pos[0]);
-  if (pressible_floor_pos[1].room != -1)
-    press_opener_floor (pressible_floor_pos[1]);
+  if (depressible_floor_pos[0].room != -1)
+    press_opener_floor (depressible_floor_pos[0]);
+  if (depressible_floor_pos[1].room != -1)
+    press_opener_floor (depressible_floor_pos[1]);
 }

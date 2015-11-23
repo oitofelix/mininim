@@ -28,7 +28,7 @@ int key; /* last key pressed */
 /* real time keys */
 bool up_key, down_key, left_key, right_key, shift_key, esc_key,
   pause_key, enter_key, a_key, w_key, d_key, s_key, h_key, j_key,
-  u_key, n_key;
+  u_key, n_key, c_key;
 
 void
 init_keyboard (void)
@@ -73,6 +73,7 @@ get_keyboard_state (void)
   j_key = al_key_down (&keyboard_state, ALLEGRO_KEY_J);
   u_key = al_key_down (&keyboard_state, ALLEGRO_KEY_U);
   n_key = al_key_down (&keyboard_state, ALLEGRO_KEY_N);
+  c_key = al_key_down (&keyboard_state, ALLEGRO_KEY_C);
 }
 
 bool

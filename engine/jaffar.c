@@ -239,12 +239,12 @@ jaffar_normal (void)
 void
 jaffar_walk (void)
 {
-  void (*odraw) (void) = jaffar.action;
+  void (*oaction) (void) = jaffar.action;
   jaffar.action = jaffar_walk;
   jaffar.flip = (jaffar.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
   static int i = 0;
-  if (odraw != jaffar_walk) i = 0;
+  if (oaction != jaffar_walk) i = 0;
 
   ALLEGRO_BITMAP *frame = walk_frameset[i].frame;
   int dx = walk_frameset[i].dx;
@@ -266,12 +266,12 @@ jaffar_walk (void)
 void
 jaffar_open_arms (void)
 {
-  void (*odraw) (void) = jaffar.action;
+  void (*oaction) (void) = jaffar.action;
   jaffar.action = jaffar_open_arms;
   jaffar.flip = (jaffar.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
   static int i = 0;
-  if (odraw != jaffar_open_arms) i = 0;
+  if (oaction != jaffar_open_arms) i = 0;
 
   ALLEGRO_BITMAP *frame = open_arms_frameset[i].frame;
   int dx = open_arms_frameset[i].dx;
@@ -287,12 +287,12 @@ jaffar_open_arms (void)
 void
 jaffar_raise_arms (void)
 {
-  void (*odraw) (void) = jaffar.action;
+  void (*oaction) (void) = jaffar.action;
   jaffar.action = jaffar_raise_arms;
   jaffar.flip = (jaffar.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
   static int i = 0;
-  if (odraw != jaffar_raise_arms) i = 0;
+  if (oaction != jaffar_raise_arms) i = 0;
 
   ALLEGRO_BITMAP *frame = raise_arms_frameset[i].frame;
   int dx = raise_arms_frameset[i].dx;
@@ -306,12 +306,12 @@ jaffar_raise_arms (void)
 void
 jaffar_lower_arms (void)
 {
-  void (*odraw) (void) = jaffar.action;
+  void (*oaction) (void) = jaffar.action;
   jaffar.action = jaffar_lower_arms;
   jaffar.flip = (jaffar.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
   static int i = 0;
-  if (odraw != jaffar_lower_arms) i = 0;
+  if (oaction != jaffar_lower_arms) i = 0;
 
   ALLEGRO_BITMAP *frame = lower_arms_frameset[i].frame;
   int dx = lower_arms_frameset[i].dx;
@@ -326,12 +326,12 @@ jaffar_lower_arms (void)
 void
 jaffar_turn_walk (void)
 {
-  void (*odraw) (void) = jaffar.action;
+  void (*oaction) (void) = jaffar.action;
   jaffar.action = jaffar_turn_walk;
   jaffar.flip = (jaffar.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
   static int i = 0;
-  if (odraw != jaffar_turn_walk) i = 0;
+  if (oaction != jaffar_turn_walk) i = 0;
 
   ALLEGRO_BITMAP *frame = turn_walk_frameset[i].frame;
   int dx = turn_walk_frameset[i].dx;
