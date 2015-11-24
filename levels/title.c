@@ -358,8 +358,8 @@ draw_princess_room (void)
   draw_bitmap (princess_room_bed, screen, 0, 142, 0);
   draw_princess_room_stars ();
   draw_princess_room_fire ();
-  draw_anim (princess);
-  draw_anim (jaffar);
+  draw_anim (screen, princess);
+  draw_anim (screen, jaffar);
   draw_clock ();
   draw_bitmap (princess_room_pillar, screen, 240, 120, 0);
 }

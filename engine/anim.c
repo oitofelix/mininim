@@ -29,9 +29,10 @@
 #include "anim.h"
 
 /* set to true to quit animation */
-bool quit_anim;
+bool quit_anim = false;
 bool pause_anim = false;
 bool cutscene = false;
+bool next_anim_inv = false; /* invert next_anim offset interpretation  */
 
 void
 play_anim (void (*callback) (void), int freq)
@@ -116,12 +117,10 @@ f = %i, p = %i, dn = %i, dp = %i, dc = %i, df = %i, dl = %i\n",
 }
 
 void
-draw_anim (struct anim a)
+draw_anim (ALLEGRO_BITMAP *bitmap, struct anim a)
 {
-  draw_bitmapc (a.frame, screen, a.c, a.flip);
+  draw_bitmapc (a.frame, bitmap, a.c, a.flip);
 }
-
-bool next_anim_inv; /* invert next_anim offset interpretation  */
 
 struct anim
 next_anim (struct anim a, ALLEGRO_BITMAP* frame, int dx, int dy)

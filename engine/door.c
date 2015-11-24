@@ -94,62 +94,56 @@ register_door (struct pos p)
 struct door *
 door_at_pos (struct pos p)
 {
-  int i;
+  size_t i;
   for (i = 0; i < door_nmemb; i++)
     if (peq (door[i].p, p)) return &door[i];
-  error (-1, 0, "%s: no door at position has been registered  (%i, %i, %i)",
-         __func__, p.room, p.floor, p.place);
-  return &door[0];
+  return NULL;
 }
 
 void
-draw_doors (void)
+compute_doors (void)
 {
-  if (door_nmemb == 0) return;
-
   size_t i;
-  for (i = door_nmemb - 1; (int) i >= 0; i--) {
-    struct door *d = &door[i];
-    if (d->p.room) {
-      switch (d->action) {
-      case OPEN_DOOR:
-        if (d->i == 0 && d->wait == 0) d->action = CLOSE_DOOR;
-        else if (d->i == 0 && d->wait > 0) {
-          if (! d->noise) {
-            play_sample (door_end_sound);
-            d->noise = true;
-          }
 
-          d->wait--;
-        }
-        else if (d->i > 0) {
-          if (d->i % 2 == 0) play_sample (door_open_sound);
-          d->i--;
-          d->wait = DOOR_WAIT;
-        }
-        break;
-      case CLOSE_DOOR:
-        if (d->i < DOOR_MAX_STEP) {
-          if (d->wait++ % 4 == 0) {
-            play_sample (door_close_sound);
-            d->i++;
-            d->noise = false;
-          }
-        } else if (d->i == DOOR_MAX_STEP) {
+  for (i = 0; i < door_nmemb; i++) {
+    struct door *d = &door[i];
+    if (d->p.room == -1) {
+      /* remove_door (d); i--; */
+      continue;
+    }
+    switch (d->action) {
+    case OPEN_DOOR:
+      if (d->i == 0 && d->wait == 0) d->action = CLOSE_DOOR;
+      else if (d->i == 0 && d->wait > 0) {
+        if (! d->noise) {
           play_sample (door_end_sound);
-          d->action = NO_DOOR_ACTION;
-          d->wait = DOOR_WAIT;
+          d->noise = true;
+        }
+
+        d->wait--;
+      }
+      else if (d->i > 0) {
+        if (d->i % 2 == 0) play_sample (door_open_sound);
+        d->i--;
+        d->wait = DOOR_WAIT;
+      }
+      break;
+    case CLOSE_DOOR:
+      if (d->i < DOOR_MAX_STEP) {
+        if (d->wait++ % 4 == 0) {
+          play_sample (door_close_sound);
+          d->i++;
           d->noise = false;
         }
-        break;
-      default:
-        break;
+      } else if (d->i == DOOR_MAX_STEP) {
+        play_sample (door_end_sound);
+        d->action = NO_DOOR_ACTION;
+        d->wait = DOOR_WAIT;
+        d->noise = false;
       }
-
-      if (is_pos_visible (d->p)) {
-        draw_door_grid (screen, d->p, d->i);
-        draw_con_left (screen, prel (d->p, -1, +1));
-      }
+      break;
+    default:
+      break;
     }
   }
 }
@@ -174,6 +168,17 @@ door_grid_tip_y (struct pos p)
 void
 draw_door (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
+  struct door *d = door_at_pos (p);
+  if (! d) return;
+
+  draw_door_grid (bitmap, d->p, d->i);
+  draw_con_left (bitmap, prel (d->p, -1, +1));
+  draw_con_left (bitmap, prel (d->p, +0, +1));
+}
+
+void
+draw_door_frame (ALLEGRO_BITMAP *bitmap, struct pos p)
+{
   draw_bitmapc (normal_floor_base, bitmap, floor_base_coord (p), 0);
   draw_bitmapc (door_left, bitmap, door_left_coord (p), 0);
   draw_bitmapc (door_right, bitmap, door_right_coord (p), 0);
@@ -181,14 +186,14 @@ draw_door (ALLEGRO_BITMAP *bitmap, struct pos p)
 }
 
 void
-draw_door_left (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_door_frame_left (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
   draw_bitmapc (normal_floor_base, bitmap, floor_base_coord (p), 0);
   draw_bitmapc (door_left, bitmap, door_left_coord (p), 0);
 }
 
 void
-draw_door_right (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_door_frame_right (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
   draw_bitmapc (normal_floor_base, bitmap, floor_base_coord (p), 0);
   draw_bitmapc (door_right, bitmap, door_right_coord (p), 0);
@@ -216,6 +221,7 @@ draw_door_fg (ALLEGRO_BITMAP *bitmap, struct pos p, struct anim a)
     struct door *d = door_at_pos (p);
     draw_door_grid (screen, p, d->i);
     draw_con_left (screen, prel (p, -1, +1));
+    draw_con_left (screen, prel (d->p, +0, +1));
   }
 }
 

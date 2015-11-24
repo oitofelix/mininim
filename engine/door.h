@@ -59,12 +59,13 @@ void load_door_sounds (void);
 void unload_door_sounds (void);
 void register_door (struct pos p);
 struct door *door_at_pos (struct pos p);
-int door_grid_tip_y (struct pos p);
 void open_door (int e);
-void draw_doors (void);
+void compute_doors (void);
+int door_grid_tip_y (struct pos p);
 void draw_door (ALLEGRO_BITMAP *bitmap, struct pos p);
-void draw_door_left (ALLEGRO_BITMAP *bitmap, struct pos p);
-void draw_door_right (ALLEGRO_BITMAP *bitmap, struct pos p);
+void draw_door_frame (ALLEGRO_BITMAP *bitmap, struct pos p);
+void draw_door_frame_left (ALLEGRO_BITMAP *bitmap, struct pos p);
+void draw_door_frame_right (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_door_fg (ALLEGRO_BITMAP *bitmap, struct pos p,
                    struct anim a);
 void draw_door_grid (ALLEGRO_BITMAP *bitmap, struct pos p, int i);

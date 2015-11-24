@@ -103,7 +103,7 @@ register_spikes_floor (struct pos p)
   s.p = p;
   s.i = 0;
   s.wait = SPIKES_WAIT;
-  s.fg = 0;
+  s.state = 0;
 
   spikes_floor =
     add_to_array (&s, 1, spikes_floor, &spikes_floor_nmemb,
@@ -116,52 +116,40 @@ spikes_floor_at_pos (struct pos p)
   size_t i;
   for (i = 0; i < spikes_floor_nmemb; i++)
     if (peq (spikes_floor[i].p, p)) return &spikes_floor[i];
-  error (-1, 0, "%s: no spikes floor at position has been registered (%i, %i, %i)",
-         __func__, p.room, p.floor, p.place);
-  return &spikes_floor[0];
+  return NULL;
 }
 
 void
-draw_spikes_floors (void)
+compute_spikes_floors (void)
 {
-  if (spikes_floor_nmemb == 0) return;
-
   size_t i;
-  for (i = spikes_floor_nmemb - 1; (int) i >= 0; i--) {
-    struct spikes_floor *s= &spikes_floor[i];
+
+  for (i = 0; i < spikes_floor_nmemb; i++) {
+    struct spikes_floor *s = &spikes_floor[i];
+    if (s->p.room == -1) {
+      /* remove_spikes_floor (s); i--; */
+      continue;
+    }
     switch (s->i) {
     case 0: if (should_spikes_raise (s->p)) {
-        draw_spikes_01 (screen, s->p);
         play_sample (spikes_sound);
         s->i++;
         s->wait = 12;
-        s->fg = 1;
-      } else s->fg = 0;
+        s->state = 1;
+      } else s->state = 0;
       break;
-    case 1: draw_spikes_02 (screen, s->p);
-      s->i++; s->fg = 2; break;
-    case 2: draw_spikes_03 (screen, s->p);
-      s->i++; s->fg = 3; break;
-    case 3: draw_spikes_04 (screen, s->p);
-      s->i++; s->fg = 4; break;
+    case 1: s->i++; s->state = 2; break;
+    case 2: s->i++; s->state = 3; break;
+    case 3: s->i++; s->state = 4; break;
     case 4: if (! should_spikes_raise (s->p)) {
         if (s->wait-- == 0) {
-          draw_spikes_03 (screen, s->p);
           s->i++;
-          s->fg = 3;
-        } else {
-          draw_spikes_05 (screen, s->p);
-          s->fg = 5;
-        }
-      } else {
-        draw_spikes_05 (screen, s->p);
-        s->fg = 5;
-      }
+          s->state = 3;
+        } else s->state = 5;
+      } else s->state = 5;
       break;
-    case 5: draw_spikes_02 (screen, s->p);
-      s->i++; s->fg = 2; break;
-    case 6: draw_spikes_01 (screen, s->p);
-      s->i = 0; s->fg = 1; break;
+    case 5: s->i++; s->state = 2; break;
+    case 6: s->i = 0; s->state = 1; break;
     }
   }
 }
@@ -187,22 +175,31 @@ should_spikes_raise (struct pos p)
 void
 draw_spikes_floor (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
+  struct spikes_floor *s = spikes_floor_at_pos (p);
+  if (! s) return;
+
   draw_spikes_floor_floor (bitmap, p);
-  draw_spikes (bitmap, p);
+  draw_spikes (bitmap, s);
 }
 
 void
 draw_spikes_floor_left (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
+  struct spikes_floor *s = spikes_floor_at_pos (p);
+  if (! s) return;
+
   draw_spikes_floor_floor_left (bitmap, p);
-  draw_spikes_left (bitmap, p);
+  draw_spikes_left (bitmap, s);
 }
 
 void
 draw_spikes_floor_right (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
+  struct spikes_floor *s = spikes_floor_at_pos (p);
+  if (! s) return;
+
   draw_spikes_floor_floor_right (bitmap, p);
-  draw_spikes_right (bitmap, p);
+  draw_spikes_right (bitmap, s);
 }
 
 void
@@ -230,39 +227,35 @@ draw_spikes_floor_floor_right (ALLEGRO_BITMAP *bitmap, struct pos p)
 }
 
 void
-draw_spikes (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_spikes (ALLEGRO_BITMAP *bitmap, struct spikes_floor *s)
 {
-  draw_spikes_left (bitmap, p);
-  draw_spikes_right (bitmap, p);
+  draw_spikes_left (bitmap, s);
+  draw_spikes_right (bitmap, s);
 }
 
 void
-draw_spikes_left (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_spikes_left (ALLEGRO_BITMAP *bitmap, struct spikes_floor *s)
 {
-  struct spikes_floor *s = spikes_floor_at_pos (p);
-
-  switch (s->fg) {
+  switch (s->state) {
   case 0: break;
-  case 1: draw_spikes_left_01 (bitmap, p); break;
-  case 2: draw_spikes_left_02 (bitmap, p); break;
-  case 3: draw_spikes_left_03 (bitmap, p); break;
-  case 4: draw_spikes_left_04 (bitmap, p); break;
-  case 5: draw_spikes_left_05 (bitmap, p); break;
+  case 1: draw_spikes_left_01 (bitmap, s->p); break;
+  case 2: draw_spikes_left_02 (bitmap, s->p); break;
+  case 3: draw_spikes_left_03 (bitmap, s->p); break;
+  case 4: draw_spikes_left_04 (bitmap, s->p); break;
+  case 5: draw_spikes_left_05 (bitmap, s->p); break;
   }
 }
 
 void
-draw_spikes_right (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_spikes_right (ALLEGRO_BITMAP *bitmap, struct spikes_floor *s)
 {
-  struct spikes_floor *s = spikes_floor_at_pos (p);
-
-  switch (s->fg) {
+  switch (s->state) {
   case 0: break;
-  case 1: draw_spikes_right_01 (bitmap, p); break;
-  case 2: draw_spikes_right_02 (bitmap, p); break;
-  case 3: draw_spikes_right_03 (bitmap, p); break;
-  case 4: draw_spikes_right_04 (bitmap, p); break;
-  case 5: draw_spikes_right_05 (bitmap, p); break;
+  case 1: draw_spikes_right_01 (bitmap, s->p); break;
+  case 2: draw_spikes_right_02 (bitmap, s->p); break;
+  case 3: draw_spikes_right_03 (bitmap, s->p); break;
+  case 4: draw_spikes_right_04 (bitmap, s->p); break;
+  case 5: draw_spikes_right_05 (bitmap, s->p); break;
   }
 }
 
@@ -270,8 +263,9 @@ void
 draw_spikes_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
   struct spikes_floor *s = spikes_floor_at_pos (p);
+  if (! s) return;
 
-  switch (s->fg) {
+  switch (s->state) {
   case 0: break;
   case 1: draw_spikes_01_fg (bitmap, p); break;
   case 2: draw_spikes_02_fg (bitmap, p); break;

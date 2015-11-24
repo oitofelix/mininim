@@ -36,10 +36,6 @@ struct opener_floor {
   bool pressed;
   bool noise;
   bool broken;
-
-  void (*draw) (ALLEGRO_BITMAP *bitmap, struct opener_floor *l);
-  void (*draw_left) (ALLEGRO_BITMAP *bitmap, struct opener_floor *l);
-  void (*draw_right) (ALLEGRO_BITMAP *bitmap, struct opener_floor *l);
 };
 
 void load_vdungeon_opener_floor (void);
@@ -50,14 +46,18 @@ void register_opener_floor (struct pos p);
 struct opener_floor * opener_floor_at_pos (struct pos p);
 void press_opener_floor (struct pos p);
 void break_opener_floor (struct pos p);
-void draw_opener_floors (void);
-void draw_pressed_opener_floor (ALLEGRO_BITMAP *bitmap, struct opener_floor *o);
-void draw_pressed_opener_floor_left (ALLEGRO_BITMAP *bitmap, struct opener_floor *o);
-void draw_pressed_opener_floor_right (ALLEGRO_BITMAP *bitmap, struct opener_floor *o);
+void unpress_opener_floors (void);
+void compute_opener_floors (void);
+void draw_opener_floor (ALLEGRO_BITMAP *bitmap, struct pos p);
+void draw_opener_floor_left (ALLEGRO_BITMAP *bitmap, struct pos p);
+void draw_opener_floor_right (ALLEGRO_BITMAP *bitmap, struct pos p);
+void draw_pressed_opener_floor (ALLEGRO_BITMAP *bitmap, struct pos p);
+void draw_pressed_opener_floor_left (ALLEGRO_BITMAP *bitmap, struct pos p);
+void draw_pressed_opener_floor_right (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_unpressed_opener_floor_base (ALLEGRO_BITMAP *bitmap, struct pos p);
-void draw_unpressed_opener_floor (ALLEGRO_BITMAP *bitmap, struct opener_floor *o);
-void draw_unpressed_opener_floor_left (ALLEGRO_BITMAP *bitmap, struct opener_floor *o);
-void draw_unpressed_opener_floor_right (ALLEGRO_BITMAP *bitmap, struct opener_floor *o);
+void draw_unpressed_opener_floor (ALLEGRO_BITMAP *bitmap, struct pos p);
+void draw_unpressed_opener_floor_left (ALLEGRO_BITMAP *bitmap, struct pos p);
+void draw_unpressed_opener_floor_right (ALLEGRO_BITMAP *bitmap, struct pos p);
 struct coord unpressed_opener_floor_left_coord (struct pos p);
 struct coord unpressed_opener_floor_right_coord (struct pos p);
 

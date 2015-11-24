@@ -116,15 +116,29 @@ level_anim (void)
   prev_room = kid.c.room;
   kid.action ();
   if (prev_room != kid.c.room) room_view = kid.c.room;
+  compute_loose_floors ();
+  compute_opener_floors ();
+  compute_spikes_floors ();
+  compute_doors ();
 
   /* drawing */
   clear_bitmap (screen, BLACK);
   if (! no_room_drawing) draw_room (room_view);
   draw_fire (room_view);
-  draw_loose_floors ();
-  draw_spikes_floors ();
-  draw_opener_floors ();
-  draw_doors ();
-  if (is_visible (kid)) draw_anim (kid);
+
+  struct pos p;
+  p.room = room_view;
+  if (! no_room_drawing)
+    for (p.floor = FLOORS; p.floor >= -1; p.floor--)
+      for (p.place = -1; p.place < PLACES; p.place++) {
+        draw_loose_floor (screen, p);
+        draw_opener_floor (screen, p);
+        draw_spikes_floor (screen, p);
+        draw_door (screen, p);
+      }
+
+  if (is_visible (kid)) draw_anim (screen, kid);
   draw_room_anim_fg (kid);
+
+  unpress_opener_floors ();
 }
