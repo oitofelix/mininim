@@ -53,6 +53,7 @@ void draw_floor_corner_03 (ALLEGRO_BITMAP *bitmap, struct pos p);
 struct coord floor_base_coord (struct pos pos);
 struct coord floor_left_coord (struct pos pos);
 struct coord floor_right_coord (struct pos pos);
+struct coord broken_floor_right_coord (struct pos p);
 struct coord broken_floor_front_coord (struct pos pos);
 struct coord floor_corner_01_coord (struct pos p);
 struct coord floor_corner_02_coord (struct pos p);

@@ -35,6 +35,7 @@ struct opener_floor {
   int event;
   bool pressed;
   bool noise;
+  bool broken;
 
   void (*draw) (ALLEGRO_BITMAP *bitmap, struct opener_floor *l);
   void (*draw_left) (ALLEGRO_BITMAP *bitmap, struct opener_floor *l);
@@ -48,6 +49,7 @@ void unload_opener_floor_sounds (void);
 void register_opener_floor (struct pos p);
 struct opener_floor * opener_floor_at_pos (struct pos p);
 void press_opener_floor (struct pos p);
+void break_opener_floor (struct pos p);
 void draw_opener_floors (void);
 void draw_pressed_opener_floor (ALLEGRO_BITMAP *bitmap, struct opener_floor *o);
 void draw_pressed_opener_floor_left (ALLEGRO_BITMAP *bitmap, struct opener_floor *o);

@@ -129,41 +129,40 @@ draw_spikes_floors (void)
   size_t i;
   for (i = spikes_floor_nmemb - 1; (int) i >= 0; i--) {
     struct spikes_floor *s= &spikes_floor[i];
-    if (is_pos_visible (s->p))
-      switch (s->i) {
-      case 0: if (should_spikes_raise (s->p)) {
-          draw_spikes_01 (screen, s->p);
-          play_sample (spikes_sound);
+    switch (s->i) {
+    case 0: if (should_spikes_raise (s->p)) {
+        draw_spikes_01 (screen, s->p);
+        play_sample (spikes_sound);
+        s->i++;
+        s->wait = 12;
+        s->fg = 1;
+      } else s->fg = 0;
+      break;
+    case 1: draw_spikes_02 (screen, s->p);
+      s->i++; s->fg = 2; break;
+    case 2: draw_spikes_03 (screen, s->p);
+      s->i++; s->fg = 3; break;
+    case 3: draw_spikes_04 (screen, s->p);
+      s->i++; s->fg = 4; break;
+    case 4: if (! should_spikes_raise (s->p)) {
+        if (s->wait-- == 0) {
+          draw_spikes_03 (screen, s->p);
           s->i++;
-          s->wait = 12;
-          s->fg = 1;
-        } else s->fg = 0;
-        break;
-      case 1: draw_spikes_02 (screen, s->p);
-        s->i++; s->fg = 2; break;
-      case 2: draw_spikes_03 (screen, s->p);
-        s->i++; s->fg = 3; break;
-      case 3: draw_spikes_04 (screen, s->p);
-        s->i++; s->fg = 4; break;
-      case 4: if (! should_spikes_raise (s->p)) {
-          if (s->wait-- == 0) {
-            draw_spikes_03 (screen, s->p);
-            s->i++;
-            s->fg = 3;
-          } else {
-            draw_spikes_05 (screen, s->p);
-            s->fg = 5;
-          }
+          s->fg = 3;
         } else {
           draw_spikes_05 (screen, s->p);
           s->fg = 5;
         }
-        break;
-      case 5: draw_spikes_02 (screen, s->p);
-        s->i++; s->fg = 2; break;
-      case 6: draw_spikes_01 (screen, s->p);
-        s->i = 0; s->fg = 1; break;
+      } else {
+        draw_spikes_05 (screen, s->p);
+        s->fg = 5;
       }
+      break;
+    case 5: draw_spikes_02 (screen, s->p);
+      s->i++; s->fg = 2; break;
+    case 6: draw_spikes_01 (screen, s->p);
+      s->i = 0; s->fg = 1; break;
+    }
   }
 }
 

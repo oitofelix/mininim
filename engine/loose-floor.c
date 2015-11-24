@@ -28,6 +28,7 @@
 #include "room.h"
 #include "floor.h"
 #include "loose-floor.h"
+#include "opener-floor.h"
 
 ALLEGRO_BITMAP *loose_floor_left_01, *loose_floor_right_01, *loose_floor_base_01,
   *loose_floor_left_02, *loose_floor_right_02, *loose_floor_base_02,
@@ -139,6 +140,17 @@ loose_floor_at_pos (struct pos p)
 }
 
 void
+release_loose_floor (struct pos p)
+{
+  struct loose_floor *l = loose_floor_at_pos (p);
+  if (l->action != RELEASE_LOOSE_FLOOR
+      && l->action != FALL_LOOSE_FLOOR) {
+    l->action = RELEASE_LOOSE_FLOOR;
+    l->i = 0;
+  }
+}
+
+void
 draw_loose_floors (void)
 {
   if (loose_floor_nmemb == 0) return;
@@ -146,25 +158,13 @@ draw_loose_floors (void)
   size_t i;
   for (i = loose_floor_nmemb - 1; (int) i >= 0; i--) {
     struct loose_floor *l = &loose_floor[i];
-    if (is_pos_visible (l->p)) {
+    if (is_pos_visible (l->p))
       switch (l->action) {
       case SHAKE_LOOSE_FLOOR: draw_loose_floor_shake (l); break;
       case RELEASE_LOOSE_FLOOR: draw_loose_floor_release (l, i); break;
       case FALL_LOOSE_FLOOR: draw_loose_floor_fall (l, i); break;
-      default:
-        /* release */
-        if (kids.cmbo == LOOSE_FLOOR
-            && peq (kids.pmbo, l->p)) {
-          l->action = RELEASE_LOOSE_FLOOR;
-          l->i = 0;
-          draw_loose_floor_release (l, i);
-        }
-        /* normal */
-        else {
-          draw_loose_floor (screen, l);
-        }
+      default: draw_loose_floor (screen, l); break;
       }
-    }
   }
 }
 
@@ -224,7 +224,7 @@ draw_loose_floor_fall (struct loose_floor *l, size_t i)
   struct survey s = survey (l->a, posf);
   struct survey t = survey (next_anim (l->a, l->a.frame, 0, speed), posf);
 
-  if (con (s.pmbo).fg == NO_FLOOR
+  if (s.cmbo == NO_FLOOR
       || peq (s.pmbo, t.pmbo)) {
     l->a = next_anim (l->a, loose_floor_02, 0, speed);
     draw_anim (l->a);
@@ -232,6 +232,7 @@ draw_loose_floor_fall (struct loose_floor *l, size_t i)
     draw_con_left (screen, s.pbr);
   } else { /* the floor hit the ground */
     play_sample (broken_floor_sound);
+    if (s.cmbo == OPENER_FLOOR) break_opener_floor (s.pmbo);
     set_confg (s.pmbo, BROKEN_FLOOR);
     remove_from_array (loose_floor, &loose_floor_nmemb, i, 1, sizeof (*l));
     shake_loose_floor_row (s.pmbo);
@@ -246,13 +247,14 @@ void
 shake_loose_floor_row (struct pos p)
 {
   struct loose_floor *l;
-  for (p.place = PLACES - 1; p.place >= 0; p.place--) {
+  for (p.place = PLACES - 1; p.place >= 0; p.place--)
     if (con (p).fg == LOOSE_FLOOR) {
       l = loose_floor_at_pos (p);
-      l->action = SHAKE_LOOSE_FLOOR;
-      l->i = 0;
+      if (l->action == NO_LOOSE_FLOOR_ACTION) {
+        l->action = SHAKE_LOOSE_FLOOR;
+        l->i = 0;
+      }
     }
-  }
 }
 
 ALLEGRO_SAMPLE *
