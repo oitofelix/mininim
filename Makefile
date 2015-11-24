@@ -16,7 +16,7 @@ CFLAGS = -Wall -ggdb3 -Werror -Wno-error=unused-function \
 CPPFLAGS = -I$(shell pwd)
 
 prince : ${OBJECTS} .depend
-	${CC} ${CPPFLAGS} ${CFLAGS} ${LDFLAGS} ${OBJECTS} -o $@
+	${CC} ${OBJECTS} -o $@ ${CPPFLAGS} ${CFLAGS} ${LDFLAGS}
 
 .depend: ${SRCS}
 	rm -f .depend
