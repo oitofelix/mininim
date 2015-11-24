@@ -87,12 +87,12 @@ draw_fire (int room)
 
   ALLEGRO_BITMAP *fire;
 
-  for (pos.floor = FLOORS - 1; pos.floor >= 0; pos.floor--)
-    for (pos.place = -1; pos.place + 1 < PLACES; pos.place++) {
+  for (pos.floor = FLOORS; pos.floor >= -1; pos.floor--)
+    for (pos.place = -1; pos.place < PLACES; pos.place++) {
       if (con (pos).bg == TORCH) {
-
         fire = get_fire_frame (prandom_pos (pos, i, 8));
-        draw_bitmap (fire, screen, 32 * (pos.place + 1) + 8, 63 * pos.floor + 4,
+        draw_bitmap (fire, screen, 32 * (pos.place + 1) + 8,
+                     63 * pos.floor + 4,
                      prandom (1) ? ALLEGRO_FLIP_HORIZONTAL : 0);
       }
     }

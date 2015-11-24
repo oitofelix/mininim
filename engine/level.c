@@ -137,7 +137,7 @@ level_anim (void)
         draw_door (screen, p);
       }
 
-  if (is_visible (kid)) draw_anim (screen, kid);
+  draw_anim (screen, kid);
   draw_room_anim_fg (kid);
 
   unpress_opener_floors ();
