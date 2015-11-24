@@ -65,14 +65,14 @@ ncoord (struct coord c)
     d.room = roomd (c.room, BELOW);
   }
 
-  if (d.y < 8 &&
+  if (d.y < 11 &&
       roomd (room_view, BELOW) == c.room
       && room_view != c.room) {
     d.y += PLACE_HEIGHT * FLOORS;
     d.room = room_view;
   }
 
-  if (d.y > PLACE_HEIGHT * FLOORS + 3
+  if (d.y >= PLACE_HEIGHT * FLOORS
       && roomd (room_view, ABOVE) == c.room
       && room_view != c.room) {
     d.y -= PLACE_HEIGHT * FLOORS;
