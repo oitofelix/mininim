@@ -62,6 +62,7 @@ void unload_loose_floor (void);
 void load_loose_floor_sounds (void);
 void unload_loose_floor_sounds (void);
 ALLEGRO_BITMAP *create_loose_floor_02_bitmap (void);
+ALLEGRO_BITMAP * create_broken_floor_bitmap (void);
 void register_loose_floor (struct pos p);
 struct loose_floor * loose_floor_at_pos (struct pos p);
 void remove_loose_floor (struct loose_floor *l);

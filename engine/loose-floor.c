@@ -29,10 +29,11 @@
 #include "floor.h"
 #include "loose-floor.h"
 #include "opener-floor.h"
+#include "spikes-floor.h"
 
 ALLEGRO_BITMAP *loose_floor_left_01, *loose_floor_right_01, *loose_floor_base_01,
   *loose_floor_left_02, *loose_floor_right_02, *loose_floor_base_02,
-  *loose_floor_02;
+  *loose_floor_02, *broken_floor;
 
 ALLEGRO_SAMPLE *loose_floor_01_sound, *loose_floor_02_sound, *loose_floor_03_sound,
   *broken_floor_sound;
@@ -51,6 +52,7 @@ load_vdungeon_loose_floor (void)
   loose_floor_base_02 = load_bitmap (VDUNGEON_LOOSE_FLOOR_BASE_02);
   /* used for loose floor falling animation */
   loose_floor_02 = create_loose_floor_02_bitmap ();
+  broken_floor = create_broken_floor_bitmap ();
 }
 
 void
@@ -99,6 +101,26 @@ create_loose_floor_02_bitmap (void)
   draw_bitmap (loose_floor_base_02, bitmap, 0, 14, 0);
   draw_bitmap (loose_floor_left_02, bitmap, 0, 1, 0);
   draw_bitmap (loose_floor_right_02, bitmap, 32, 0, 0);
+
+  return bitmap;
+}
+
+ALLEGRO_BITMAP *
+create_broken_floor_bitmap (void)
+{
+  int wl = al_get_bitmap_width (broken_floor_left);
+  int wr = al_get_bitmap_width (broken_floor_right);
+  int w = wl + wr;
+  int hl = al_get_bitmap_height (broken_floor_left);
+  int hr = al_get_bitmap_height (broken_floor_right);
+  int hb = al_get_bitmap_height (normal_floor_base);
+  int h = max (hl, hr) + hb;
+
+  ALLEGRO_BITMAP *bitmap = create_bitmap (w, h);
+  clear_bitmap (bitmap, al_map_rgba (0, 0, 0, 0));
+  draw_bitmap (normal_floor_base, bitmap, 0, 14, 0);
+  draw_bitmap (broken_floor_left, bitmap, 0, 1, 0);
+  draw_bitmap (broken_floor_right, bitmap, 32, 0, 0);
 
   return bitmap;
 }
@@ -227,20 +249,48 @@ compute_loose_floor_fall (struct loose_floor *l)
   struct anim a = next_anim (l->a, l->a.frame, 0, speed);
   struct survey s = survey (l->a, posf);
   struct survey t = survey (a, posf);
+  struct pos p;
 
   if (s.cmbo == NO_FLOOR
       || peq (s.pmbo, t.pmbo)) {
-    l->a = a;
-    if (t.cmbo == NO_FLOOR) l->p = t.pmbo;
-  } else { /* the floor hit the ground */
-    if (s.cmbo == OPENER_FLOOR) break_opener_floor (s.pmbo);
-    set_confg (s.pmbo, BROKEN_FLOOR);
-    shake_loose_floor_row (s.pmbo);
-    l->p.room = -1;
-    draw_con (room_bg, s.pmbo);
-    draw_con_left (room_bg, prel (s.pmbo, 0, +1));
-    play_sample (broken_floor_sound);
+    /* the floor hit a rigid structure */
+    if (t.cmbo == WALL
+        || t.cmbo == PILLAR
+        || t.cmbo == DOOR) p = prel (t.pmbo, -1, 0);
+    /* the floor continue to fall */
+    else {
+      l->a = a;
+      if (t.cmbo == NO_FLOOR) l->p = t.pmbo;
+      return;
+    }
+    /* the floor hit the ground */
+  } else {
+    struct loose_floor *m;
+    p = s.pmbo;
+    switch (s.cmbo) {
+    case LOOSE_FLOOR: /* loose floor isn't ground */
+      m = loose_floor_at_pos (s.pmbo);
+      m->p.room = -1;
+      l->a = a;
+      l->a.frame = broken_floor;
+      l->p = s.pmbo;
+      set_confg (s.pmbo, NO_FLOOR);
+      play_sample (broken_floor_sound);
+      return;
+    case OPENER_FLOOR: break_opener_floor (s.pmbo); break;
+    case SPIKES_FLOOR: break_spikes_floor (s.pmbo); break;
+    default: break;
+    }
   }
+
+  /* reach here only if the floor hit a rigid structure or the
+     ground */
+  set_confg (p, BROKEN_FLOOR);
+  shake_loose_floor_row (p);
+  l->p.room = -1;
+  draw_con (room_bg, p);
+  draw_con_left (room_bg, prel (p, 0, +1));
+  play_sample (broken_floor_sound);
 }
 
 void

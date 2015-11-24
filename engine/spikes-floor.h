@@ -59,6 +59,7 @@ void load_spikes_floor_sounds (void);
 void unload_spikes_floor_sounds (void);
 void register_spikes_floor (struct pos p);
 struct spikes_floor * spikes_floor_at_pos (struct pos p);
+void break_spikes_floor (struct pos p);
 void compute_spikes_floors (void);
 bool should_spikes_raise_for_pos (struct pos p, struct pos pk);
 bool should_spikes_raise (struct pos p);

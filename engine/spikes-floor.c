@@ -120,6 +120,14 @@ spikes_floor_at_pos (struct pos p)
 }
 
 void
+break_spikes_floor (struct pos p)
+{
+  struct spikes_floor *s = spikes_floor_at_pos (p);
+  if (! s) return;
+  s->p.room = -1;
+}
+
+void
 compute_spikes_floors (void)
 {
   size_t i;
