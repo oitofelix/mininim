@@ -85,29 +85,30 @@ ncoord (struct coord c)
 struct pos
 npos (struct pos p)
 {
-  struct pos q = p;
+  int room;
 
-  if (p.place < 0) {
-    q.place += PLACES;
-    q.room = roomd (p.room, LEFT);
-  }
+  do {
+    room = p.room;
 
-  if (p.place >= PLACES) {
-    q.place -= PLACES;
-    q.room = roomd (p.room, RIGHT);
-  }
+    if (p.floor < 0) {
+      p.floor += FLOORS;
+      p.room = roomd (p.room, ABOVE);
+    }
+    else if (p.floor >= FLOORS) {
+      p.floor -= FLOORS;
+      p.room = roomd (p.room, BELOW);
+    }
+    else if (p.place < 0) {
+      p.place += PLACES;
+      p.room = roomd (p.room, LEFT);
+    }
+    else if (p.place >= PLACES) {
+      p.place -= PLACES;
+      p.room = roomd (p.room, RIGHT);
+    }
+  } while (room != p.room);
 
-  if (p.floor < 0) {
-    q.floor += FLOORS;
-    q.room = roomd (p.room, ABOVE);
-  }
-
-  if (p.floor >= FLOORS) {
-    q.floor -= FLOORS;
-    q.room = roomd (p.room, BELOW);
-  }
-
-  return q;
+  return p;
 }
 
 struct pos
