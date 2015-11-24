@@ -43,43 +43,43 @@ roomd (int room, enum dir dir)
 struct coord
 ncoord (struct coord c)
 {
-  struct coord d = c;
+  int room;
 
-  if (c.x < 0) {
-    d.x += PLACE_WIDTH * PLACES;
-    d.room = roomd (c.room, LEFT);
-  }
+  do {
+    room = c.room;
 
-  if (c.x >= PLACE_WIDTH * PLACES) {
-    d.x -= PLACE_WIDTH * PLACES;
-    d.room = roomd (c.room, RIGHT);
-  }
+    if (c.y < 0) {
+      c.y += PLACE_HEIGHT * FLOORS;
+      c.room = roomd (c.room, ABOVE);
+    } else if (c.y >= PLACE_HEIGHT * FLOORS + 11) {
+      c.y -= PLACE_HEIGHT * FLOORS;
+      c.room = roomd (c.room, BELOW);
+    } else if (c.x < 0) {
+      c.x += PLACE_WIDTH * PLACES;
+      c.room = roomd (c.room, LEFT);
+    } else if (c.x >= PLACE_WIDTH * PLACES) {
+      c.x -= PLACE_WIDTH * PLACES;
+      c.room = roomd (c.room, RIGHT);
+    }
+  } while (room != c.room);
 
-  if (c.y < 0) {
-    d.y += PLACE_HEIGHT * FLOORS;
-    d.room = roomd (c.room, ABOVE);
-  }
+  do {
+    room = c.room;
 
-  if (c.y >= PLACE_HEIGHT * FLOORS + 11) {
-    d.y -= PLACE_HEIGHT * FLOORS;
-    d.room = roomd (c.room, BELOW);
-  }
+    if (c.y < 11 &&
+        roomd (room_view, BELOW) == c.room
+        && room_view != c.room) {
+      c.y += PLACE_HEIGHT * FLOORS;
+      c.room = room_view;
+    } else if (c.y >= PLACE_HEIGHT * FLOORS
+               && roomd (room_view, ABOVE) == c.room
+               && room_view != c.room) {
+      c.y -= PLACE_HEIGHT * FLOORS;
+      c.room = room_view;
+    }
+  } while (room != c.room);
 
-  if (d.y < 11 &&
-      roomd (room_view, BELOW) == c.room
-      && room_view != c.room) {
-    d.y += PLACE_HEIGHT * FLOORS;
-    d.room = room_view;
-  }
-
-  if (d.y >= PLACE_HEIGHT * FLOORS
-      && roomd (room_view, ABOVE) == c.room
-      && room_view != c.room) {
-    d.y -= PLACE_HEIGHT * FLOORS;
-    d.room = room_view;
-  }
-
-  return d;
+  return c;
 }
 
 struct pos
@@ -93,16 +93,13 @@ npos (struct pos p)
     if (p.floor < 0) {
       p.floor += FLOORS;
       p.room = roomd (p.room, ABOVE);
-    }
-    else if (p.floor >= FLOORS) {
+    } else if (p.floor >= FLOORS) {
       p.floor -= FLOORS;
       p.room = roomd (p.room, BELOW);
-    }
-    else if (p.place < 0) {
+    } else if (p.place < 0) {
       p.place += PLACES;
       p.room = roomd (p.room, LEFT);
-    }
-    else if (p.place >= PLACES) {
+    } else if (p.place >= PLACES) {
       p.place -= PLACES;
       p.room = roomd (p.room, RIGHT);
     }
