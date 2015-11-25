@@ -41,13 +41,14 @@
 #define DOOR_OPEN_SOUND "dat/digisnd1/door gate closing slow 1.ogg"
 #define DOOR_CLOSE_SOUND "dat/digisnd1/door gate opening 1.ogg"
 #define DOOR_END_SOUND "dat/digisnd1/drinking potion.ogg"
+#define DOOR_ABRUPTLY_CLOSE_SOUND "dat/digisnd1/door gate closing fast.ogg"
 
 /* types */
 struct door {
   struct pos p;
   int i;
   enum {
-    NO_DOOR_ACTION, OPEN_DOOR, CLOSE_DOOR,
+    NO_DOOR_ACTION, OPEN_DOOR, CLOSE_DOOR, ABRUPTLY_CLOSE_DOOR,
   } action;
   int wait;
   bool noise;
@@ -60,6 +61,7 @@ void unload_door_sounds (void);
 void register_door (struct pos p);
 struct door *door_at_pos (struct pos p);
 void open_door (int e);
+void close_door (int e);
 void compute_doors (void);
 int door_grid_tip_y (struct pos p);
 void draw_door (ALLEGRO_BITMAP *bitmap, struct pos p);

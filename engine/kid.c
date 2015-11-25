@@ -30,6 +30,7 @@
 #include "kid.h"
 #include "loose-floor.h"
 #include "opener-floor.h"
+#include "closer-floor.h"
 
 struct anim kid;
 struct survey kids, kidsf;
@@ -40,7 +41,9 @@ static bool critical_edge = false;
 static bool turn = false;
 static struct pos depressible_floor_pos[2] = {{.room = -1},
                                             {.room = -1}};
-bool depressible_loose_floor;
+static struct pos depressible_floor_pos_backup[2] = {{.room = -1},
+                                                     {.room = -1}};
+bool depressible_danger_floor;
 
 #define WALK_FRAMESET_NMEMB 12
 #define START_RUN_FRAMESET_NMEMB 6
@@ -160,6 +163,8 @@ update_depressible_floor
 (struct coord (*coord_f0) (struct anim a),
  struct coord (*coord_f1) (struct anim a));
 static void keep_depressible_floor (void);
+static void save_depressible_floor (void);
+static void restore_depressible_floor (void);
 static void press_depressible_floor (struct pos p);
 
 void
@@ -790,12 +795,13 @@ kid_walk (void)
   static bool walk_0 = false, walk_1 = false,
     walk_2 = false, walk_3 = false, walk_4 = false;
 
-  int dc, df, dl;
+  int dc, df, dl, dd;
 
   if (i == 0) {
     dc = dist_collision (kid, coord_tf, pos, +0, false);
     df = dist_con (kid, coord_bf, pos, -4, false, NO_FLOOR);
     dl = dist_con (kid, coord_bf, pos, -4, false, LOOSE_FLOOR);
+    dd = dist_con (kid, coord_bf, pos, -4, false, CLOSER_FLOOR);
 
     if (dc < 4) {
       kid = next_anim (kid, kid_normal_00, +0, 0);
@@ -805,14 +811,26 @@ kid_walk (void)
     }
 
     if (! misstep) {
+      if (dd < 4) {
+        misstep = true;
+        return;
+      }
+
       if (df < 4 || dl < 4) {
         kid_misstep ();
         return;
-      } else if (dc < 9 || df < 9 || dl < 9) walk_0 = true;
-      else if (dc < 16 || df < 16 || dl < 16) walk_1 = true;
-      else if (dc < 21 || df < 21 || dl < 21) walk_2 = true;
-      else if (dc < 24 || df < 24 || dl < 24) walk_3 = true;
-      else if (dc < 27 || df < 27 || dl < 27) walk_4 = true;
+      }
+
+      if (dc < 9 || df < 9 || dl < 9 || dd < 9)
+        walk_0 = true;
+      else if (dc < 16 || df < 16 || dl < 16 || dd < 16)
+        walk_1 = true;
+      else if (dc < 21 || df < 21 || dl < 21 || dd < 21)
+        walk_2 = true;
+      else if (dc < 24 || df < 24 || dl < 24 || dd < 24)
+        walk_3 = true;
+      else if (dc < 27 || df < 27 || dl < 27 || dd < 27)
+        walk_4 = true;
     }
   }
 
@@ -820,14 +838,15 @@ kid_walk (void)
   int dx = walk_frameset[i].dx;
   int dy = walk_frameset[i].dy;
 
-  if (((i == 10) && walk_0)
-      || ((i == 3) && walk_1)
-      || ((i == 4) && walk_2)
-      || ((i == 5) && walk_3)
-      || ((i == 6) && walk_4)) {
+  if ((i == 10 && walk_0)
+      || (i == 3 && walk_1)
+      || (i == 4 && walk_2)
+      || (i == 5 && walk_3)
+      || (i == 6 && walk_4)) {
     dx = +1;
     to_collision_edge (&kid, frame, coord_tf, pos, +0, false, 0)
       || to_con_edge (&kid, frame, coord_bf, pos, -4, false, 0, LOOSE_FLOOR)
+      || to_con_edge (&kid, frame, coord_bf, pos, -4, false, 0, CLOSER_FLOOR)
       || to_con_edge (&kid, frame, coord_bf, pos, -4, false, 0, NO_FLOOR);
   }
 
@@ -861,22 +880,17 @@ kid_walk (void)
   kid = next_anim (kid, frame, dx, dy);
 
   /* depressible floors */
-  depressible_loose_floor = misstep;
+  depressible_danger_floor = misstep;
 
-  switch (i) {
-  case 0: update_depressible_floor (coord_bf, coord_bb); break;
-  case 1: update_depressible_floor (coord_bf, coord_bb); break;
-  case 2: update_depressible_floor (coord_bf, coord_bb); break;
-  case 3: update_depressible_floor (coord_mbo, coord_bb); break;
-  case 4: update_depressible_floor (coord_mbo, coord_bb); break;
-  case 5: update_depressible_floor (coord_mbo, coord_bb); break;
-  case 6: update_depressible_floor (coord_bf, coord_bb); break;
-  case 7: update_depressible_floor (coord_bf, coord_bb); break;
-  case 8: update_depressible_floor (coord_bf, coord_bb); break;
-  case 9: update_depressible_floor (coord_bf, coord_bb); break;
-  case 10: update_depressible_floor (coord_bf, coord_bb); break;
-  case 11: update_depressible_floor (coord_bf, coord_bb); break;
-  }
+  if (i < 6) keep_depressible_floor ();
+  if ((i == 10 && walk_0)
+      || (i == 9 && walk_1)
+      || (i == 7 && walk_2)
+      || (i == 7 && walk_3)
+      || (i == 7 && walk_4)
+      || i == 6)
+    update_depressible_floor (coord_bf, NULL);
+  if (i > 6) keep_depressible_floor ();
 
   /* next iteration */
   if (i == 2 && walk_0) i = 10;
@@ -946,7 +960,7 @@ kid_start_run (void)
   kid = next_anim (kid, frame, dx, dy);
 
   /* depressible floors */
-  depressible_loose_floor = true;
+  depressible_danger_floor = true;
 
   switch (i) {
   case 0: update_depressible_floor (coord_mbo, coord_bb); break;
@@ -1026,7 +1040,7 @@ kid_run (void)
   kid = next_anim (kid, frame, dx, dy);
 
   /* depressible floors */
-  depressible_loose_floor = true;
+  depressible_danger_floor = true;
 
   switch (i) {
   case 0: update_depressible_floor (coord_mbo, coord_bb); break;
@@ -1083,7 +1097,7 @@ kid_stop_run (void)
   kid = next_anim (kid, frame, dx, dy);
 
   /* depressible floors */
-  depressible_loose_floor = true;
+  depressible_danger_floor = true;
 
   switch (i) {
   case 0: update_depressible_floor (coord_bf, coord_mbo); break;
@@ -1193,7 +1207,7 @@ kid_turn_run (void)
   kid = next_anim (kid, frame, dx, dy);
 
   /* depressible floors */
-  depressible_loose_floor = true;
+  depressible_danger_floor = true;
 
   switch (i) {
   case 0: update_depressible_floor (coord_bf, coord_bb); break;
@@ -1258,28 +1272,14 @@ kid_jump (void)
   kid = next_anim (kid, frame, dx, dy);
 
   /* depressible floors */
-  depressible_loose_floor = (i > 13);
+  depressible_danger_floor = (i > 13);
 
-  switch (i) {
-  case 0: update_depressible_floor (coord_bf, coord_bb); break;
-  case 1: update_depressible_floor (coord_bf, coord_bb); break;
-  case 2: update_depressible_floor (coord_mbo, coord_bb); break;
-  case 3: update_depressible_floor (coord_mbo, coord_bb); break;
-  case 4: update_depressible_floor (coord_mbo, coord_bb); break;
-  case 5: update_depressible_floor (coord_mbo, coord_bb); break;
-  case 6: update_depressible_floor (coord_mbo, coord_bb); break;
-  case 7: update_depressible_floor (coord_mbo, coord_bb); break;
-  case 8: update_depressible_floor (NULL, NULL); break;
-  case 9: update_depressible_floor (NULL, NULL); break;
-  case 10: update_depressible_floor (NULL, NULL); break;
-  case 11: update_depressible_floor (coord_mbo, NULL); break;
-  case 12: update_depressible_floor (coord_mbo, NULL); break;
-  case 13: update_depressible_floor (coord_mbo, NULL); break;
-  case 14: update_depressible_floor (coord_bf, coord_mbo); break;
-  case 15: update_depressible_floor (coord_bf, coord_mbo); break;
-  case 16: update_depressible_floor (coord_bf, coord_mbo); break;
-  case 17: update_depressible_floor (coord_bf, coord_mbo); break;
-  }
+  if (i < 8) keep_depressible_floor ();
+  if (i == 8) update_depressible_floor (NULL, NULL);
+  if (i == 11) update_depressible_floor (coord_mbo, NULL);
+  if (i > 11 && i <= 13) keep_depressible_floor ();
+  if (i == 14) update_depressible_floor (coord_bf, coord_mbo);
+  if (i > 14) keep_depressible_floor ();
 
   if (i++ == 17) {
     kid.action = kid_normal;
@@ -1350,29 +1350,18 @@ kid_vjump (void)
   kid = next_anim (kid, frame, dx, dy);
 
   /* depressible floors */
-  depressible_loose_floor = false;
+  depressible_danger_floor = false;
 
-  switch (i) {
-  case 0: update_depressible_floor (coord_bf, coord_bb); break;
-  case 1: update_depressible_floor (coord_bf, coord_bb); break;
-  case 2: update_depressible_floor (coord_bf, coord_bb); break;
-  case 3: update_depressible_floor (coord_bf, coord_mbo); break;
-  case 4: update_depressible_floor (coord_bf, coord_mbo); break;
-  case 5: update_depressible_floor (coord_bf, coord_mbo); break;
-  case 6: update_depressible_floor (coord_bf, coord_mbo); break;
-  case 7: update_depressible_floor (coord_bf, coord_mbo); break;
-  case 8: update_depressible_floor (coord_bf, coord_mbo); break;
-  case 9: update_depressible_floor (coord_bf, coord_mbo); break;
-  case 10: update_depressible_floor (NULL, coord_mbo); break;
-  case 11: update_depressible_floor (NULL, NULL); break;
-  case 12: update_depressible_floor (NULL, NULL); break;
-  case 13: update_depressible_floor (NULL, NULL); break;
-  case 14: update_depressible_floor (coord_bf, coord_mbo); break;
-  case 15: update_depressible_floor (coord_bf, coord_bb); break;
-  case 16: update_depressible_floor (coord_mbo, coord_bb); break;
-  case 17: update_depressible_floor (coord_mbo, coord_bb); break;
-  }
+  if (i < 11) keep_depressible_floor ();
+  if (i == 11)
+    save_depressible_floor (),
+      update_depressible_floor (NULL, NULL);
+  if (i == 14)
+    restore_depressible_floor (),
+      keep_depressible_floor ();
+  if (i > 14) keep_depressible_floor ();
 
+  /* shake ceiling floor */
   if (i == 13 && hit_ceiling) {
     shake_loose_floor_row (kids.ptb);
     if (kids.ctb == LOOSE_FLOOR) release_loose_floor (kids.ptb);
@@ -1434,7 +1423,7 @@ kid_run_jump (void)
   kid = next_anim (kid, frame, dx, dy);
 
   /* depressible floors */
-  depressible_loose_floor = (i < 4 || i > 9);
+  depressible_danger_floor = (i < 4 || i > 9);
 
   switch (i) {
   case 0: update_depressible_floor (coord_bf, coord_mbo); break;
@@ -1918,7 +1907,7 @@ kid_couch (void)
   kid = next_anim (kid, frame, dx, dy);
 
   /* depressible floors */
-  depressible_loose_floor = true;
+  depressible_danger_floor = true;
 
   switch (i) {
   case 0: update_depressible_floor (coord_mbo, coord_mbo); break;
@@ -2172,25 +2161,29 @@ update_depressible_floor
 
   if (coord_f0
       && (con (p0).fg != LOOSE_FLOOR
-          || depressible_loose_floor)) {
+          || depressible_danger_floor
+          || peq (depressible_floor_pos[0], p0))) {
     press_depressible_floor (p0);
     depressible_floor_pos[0] = p0;
   }
 
   if (coord_f1
       && (con (p1).fg != LOOSE_FLOOR
-          || depressible_loose_floor)) {
+          || depressible_danger_floor
+          || peq (depressible_floor_pos[1], p1))) {
     press_depressible_floor (p1);
     depressible_floor_pos[1] = p1;
   }
 
   if (! coord_f0 ||
       (con (p0).fg != OPENER_FLOOR
+       && con (p0).fg != CLOSER_FLOOR
        && con (p0).fg != LOOSE_FLOOR))
     depressible_floor_pos[0].room = -1;
 
   if (! coord_f1 ||
       (con (p1).fg != OPENER_FLOOR
+       && con (p1).fg != CLOSER_FLOOR
        && con (p1).fg != LOOSE_FLOOR))
     depressible_floor_pos[1].room = -1;
 }
@@ -2206,10 +2199,25 @@ keep_depressible_floor (void)
 }
 
 static void
+save_depressible_floor (void)
+{
+  depressible_floor_pos_backup[0] = depressible_floor_pos[0];
+  depressible_floor_pos_backup[1] = depressible_floor_pos[1];
+}
+
+static void
+restore_depressible_floor (void)
+{
+  depressible_floor_pos[0] = depressible_floor_pos_backup[0];
+  depressible_floor_pos[1] = depressible_floor_pos_backup[1];
+}
+
+static void
 press_depressible_floor (struct pos p)
 {
   switch (con (p).fg) {
   case OPENER_FLOOR: press_opener_floor (p); break;
+  case CLOSER_FLOOR: press_closer_floor (p); break;
   case LOOSE_FLOOR: release_loose_floor (p); break;
   default: break;
   }

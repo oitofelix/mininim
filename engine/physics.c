@@ -211,8 +211,8 @@ is_hangable_pos (struct pos p, enum dir d)
   int dir = (d == LEFT) ? -1 : +1;
   enum confg fg = crel (p, -1, dir).fg;
 
-  return (fg == FLOOR || fg == BROKEN_FLOOR
-          || fg == LOOSE_FLOOR || fg == OPENER_FLOOR
+  return (fg == FLOOR || fg == BROKEN_FLOOR || fg == LOOSE_FLOOR
+          || fg == OPENER_FLOOR || fg == CLOSER_FLOOR
           || fg == PILLAR || fg == DOOR)
     && crel (p, -1, 0).fg == NO_FLOOR;
 }

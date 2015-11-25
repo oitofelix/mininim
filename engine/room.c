@@ -30,6 +30,7 @@
 #include "floor.h"
 #include "loose-floor.h"
 #include "opener-floor.h"
+#include "closer-floor.h"
 #include "spikes-floor.h"
 #include "pillar.h"
 #include "wall.h"
@@ -57,6 +58,7 @@ load_room (void)
       load_vdungeon_floor ();
       load_vdungeon_loose_floor ();
       load_vdungeon_opener_floor ();
+      load_vdungeon_closer_floor ();
       load_vdungeon_spikes_floor ();
       load_vdungeon_wall ();
       load_vdungeon_pillar ();
@@ -80,6 +82,7 @@ load_room (void)
 
   load_loose_floor_sounds ();
   load_opener_floor_sounds ();
+  load_closer_floor_sounds ();
   load_spikes_floor_sounds ();
   load_door_sounds ();
 }
@@ -91,6 +94,7 @@ unload_room (void)
   unload_floor ();
   unload_loose_floor ();
   unload_opener_floor ();
+  unload_closer_floor ();
   unload_spikes_floor ();
   unload_wall ();
   unload_pillar ();
@@ -99,6 +103,7 @@ unload_room (void)
   /* sounds */
   unload_loose_floor_sounds ();
   unload_opener_floor_sounds ();
+  unload_closer_floor_sounds ();
   unload_spikes_floor_sounds ();
   unload_door_sounds ();
 
@@ -219,6 +224,7 @@ draw_confg (ALLEGRO_BITMAP *bitmap, struct pos p)
   case LOOSE_FLOOR: break;
   case SPIKES_FLOOR: draw_spikes_floor_floor (bitmap, p); break;
   case OPENER_FLOOR: break;
+  case CLOSER_FLOOR: break;
   case PILLAR: draw_pillar (bitmap, p); break;
   case WALL: draw_wall (bitmap, p); break;
   case DOOR: draw_door_frame (bitmap, p); break;
@@ -255,6 +261,7 @@ draw_con_left (ALLEGRO_BITMAP *bitmap, struct pos p)
   case LOOSE_FLOOR: draw_loose_floor_left (bitmap, p); break;
   case SPIKES_FLOOR: draw_spikes_floor_left (bitmap, p); break;
   case OPENER_FLOOR: draw_opener_floor_left (bitmap, p); break;
+  case CLOSER_FLOOR: draw_closer_floor_left (bitmap, p); break;
   case PILLAR: draw_pillar_left (bitmap, p); break;
   case WALL: draw_wall_left (bitmap, p); break;
   case DOOR: draw_door_frame_left (bitmap, p); break;
@@ -274,6 +281,7 @@ draw_con_right (ALLEGRO_BITMAP *bitmap, struct pos p)
   case LOOSE_FLOOR: draw_loose_floor_right (bitmap, p); break;
   case SPIKES_FLOOR: draw_spikes_floor_right (bitmap, p); break;
   case OPENER_FLOOR: draw_opener_floor_right (bitmap, p); break;
+  case CLOSER_FLOOR: draw_closer_floor_right (bitmap, p); break;
   case PILLAR: draw_pillar_right (bitmap, p); break;
   case WALL: draw_wall_right (bitmap, p); break;
   case DOOR: draw_door_frame_right (bitmap, p); break;
@@ -423,6 +431,7 @@ draw_room_fg (struct anim a, struct pos p)
       break;
     case LOOSE_FLOOR: draw_loose_floor (screen, p); break;
     case OPENER_FLOOR: draw_opener_floor (screen, p); break;
+    case CLOSER_FLOOR: draw_closer_floor (screen, p); break;
     case SPIKES_FLOOR:
       draw_spikes_floor_floor (screen, p);
       draw_spikes_fg (screen, p);
@@ -483,6 +492,7 @@ draw_room_fg (struct anim a, struct pos p)
       break;
     case LOOSE_FLOOR: draw_loose_floor (screen, p); break;
     case OPENER_FLOOR: draw_opener_floor (screen, p); break;
+    case CLOSER_FLOOR: draw_closer_floor (screen, p); break;
     case SPIKES_FLOOR:
       draw_spikes_floor_floor (screen, p);
       draw_spikes_fg (screen, p);

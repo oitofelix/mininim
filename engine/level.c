@@ -29,6 +29,7 @@
 #include "kid.h"
 #include "loose-floor.h"
 #include "opener-floor.h"
+#include "closer-floor.h"
 #include "spikes-floor.h"
 #include "door.h"
 #include "level.h"
@@ -69,6 +70,7 @@ register_cons (void)
         switch (con (p).fg) {
         case LOOSE_FLOOR: register_loose_floor (p); break;
         case OPENER_FLOOR: register_opener_floor (p); break;
+        case CLOSER_FLOOR: register_closer_floor (p); break;
         case SPIKES_FLOOR: register_spikes_floor (p); break;
         case DOOR: register_door (p); break;
         default: break;
@@ -118,6 +120,7 @@ level_anim (void)
   if (prev_room != kid.c.room) room_view = kid.c.room;
   compute_loose_floors ();
   compute_opener_floors ();
+  compute_closer_floors ();
   compute_spikes_floors ();
   compute_doors ();
 
@@ -133,6 +136,7 @@ level_anim (void)
       for (p.place = -1; p.place < PLACES; p.place++) {
         draw_loose_floor (screen, p);
         draw_opener_floor (screen, p);
+        draw_closer_floor (screen, p);
         draw_spikes_floor (screen, p);
         draw_door (screen, p);
       }
@@ -141,4 +145,5 @@ level_anim (void)
   draw_room_anim_fg (kid);
 
   unpress_opener_floors ();
+  unpress_closer_floors ();
 }

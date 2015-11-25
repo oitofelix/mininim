@@ -74,10 +74,11 @@ play_anim (void (*callback) (void), int freq)
           int dc = dist_collision (kid, coord_bf, pos, 0, false);
           int df = dist_con (kid, coord_bf, pos, -4, false, NO_FLOOR);
           int dl = dist_con (kid, coord_bf, pos, -4, false, LOOSE_FLOOR);
+          int dd = dist_con (kid, coord_bf, pos, -4, false, CLOSER_FLOOR);
           if (a_key || d_key || w_key || s_key || enter_key)
             printf ("\
-f = %i, p = %i, dn = %i, dp = %i, dc = %i, df = %i, dl = %i\n",
-                    kids.pbf.floor, kids.pbf.place, dn, dp, dc, df, dl);
+f = %i, p = %i, dn = %i, dp = %i, dc = %i, df = %i, dl = %i, dd = %i\n",
+                    kids.pbf.floor, kids.pbf.place, dn, dp, dc, df, dl, dd);
             /* printf ("floor = %i, place = %i, dc = %i, dbc = %i, df = %i, dn = %i, dp = %i\n", kids.ptf.floor, kids.ptf.place, dc, dbc, df, dn, dp); */
         }
         /* end kid hack */

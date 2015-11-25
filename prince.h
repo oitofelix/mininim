@@ -89,6 +89,7 @@ struct level {
       LOOSE_FLOOR,
       SPIKES_FLOOR,
       OPENER_FLOOR,
+      CLOSER_FLOOR,
       PILLAR,
       WALL,
       DOOR,
