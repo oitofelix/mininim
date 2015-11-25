@@ -33,6 +33,8 @@ void set_confg (struct pos p, enum confg fg);
 bool is_visible (struct anim a);
 bool is_pos_visible (struct pos p);
 
+
+
 int
 dist_next_place (struct anim a,
                  struct coord (*coord_func) (struct anim a),
@@ -77,7 +79,16 @@ to_con_edge (struct anim *a, ALLEGRO_BITMAP *frame,
              struct pos (*pos_func) (struct coord c),
              int margin, bool reverse, int min_dist, enum confg ct);
 
+
 bool is_hangable_pos (struct pos p, enum dir d);
 bool can_hang (struct anim a);
+
+
+void update_depressible_floor (struct anim *a, int dx0, int dx1);
+void keep_depressible_floor (struct anim *a);
+void clear_depressible_floor (struct anim *a);
+void save_depressible_floor (struct anim *a);
+void restore_depressible_floor (struct anim *a);
+void press_depressible_floor (struct pos p);
 
 #endif	/* FREEPOP_PHYSICS_H */

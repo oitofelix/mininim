@@ -26,6 +26,7 @@
 #include "room.h"
 #include "loose-floor.h"
 #include "opener-floor.h"
+#include "closer-floor.h"
 #include "pos.h"
 #include "door.h"
 #include "physics.h"
@@ -77,6 +78,9 @@ is_pos_visible (struct pos p)
   return false;
 }
 
+
+
+
 int
 dist_next_place (struct anim a,
                  struct coord (*coord_func) (struct anim a),
@@ -205,6 +209,10 @@ to_con_edge (struct anim *a, ALLEGRO_BITMAP *frame,
   return true;
 }
 
+
+
+
+
 bool
 is_hangable_pos (struct pos p, enum dir d)
 {
@@ -251,4 +259,82 @@ can_hang (struct anim a)
       dist_coord (tf, ch) > 19) return false;
 
   return true;
+}
+
+
+
+
+void
+update_depressible_floor (struct anim *a, int dx0, int dx1)
+{
+  struct coord c0, c1;
+  struct pos p0, p1;
+
+  int dir = (a->dir == LEFT) ? -1 : 1;
+
+  c0 = coord_bf (*a);
+  c0.x += dir * dx0;
+  p0 = pos (c0);
+
+  c1 = coord_bf (*a);
+  c1.x += dir * dx1;
+  p1 = pos (c1);
+
+  press_depressible_floor (p0);
+  a->df_pos[0] = p0;
+
+  press_depressible_floor (p1);
+  a->df_pos[1] = p1;
+
+  if (con (p0).fg != OPENER_FLOOR
+      && con (p0).fg != CLOSER_FLOOR
+      && con (p0).fg != LOOSE_FLOOR)
+    a->df_pos[0].room = -1;
+
+  if (con (p1).fg != OPENER_FLOOR
+      && con (p1).fg != CLOSER_FLOOR
+      && con (p1).fg != LOOSE_FLOOR)
+    a->df_pos[1].room = -1;
+}
+
+void
+keep_depressible_floor (struct anim *a)
+{
+  struct pos p0 = a->df_pos[0];
+  struct pos p1 = a->df_pos[1];
+
+  if (p0.room != -1) press_depressible_floor (p0);
+  if (p1.room != -1) press_depressible_floor (p1);
+}
+
+void
+clear_depressible_floor (struct anim *a)
+{
+  a->df_pos[0].room = -1;
+  a->df_pos[1].room = -1;
+}
+
+void
+save_depressible_floor (struct anim *a)
+{
+  a->df_posb[0] = a->df_pos[0];
+  a->df_posb[1] = a->df_pos[1];
+}
+
+void
+restore_depressible_floor (struct anim *a)
+{
+  a->df_pos[0] = a->df_posb[0];
+  a->df_pos[1] = a->df_posb[1];
+}
+
+void
+press_depressible_floor (struct pos p)
+{
+  switch (con (p).fg) {
+  case OPENER_FLOOR: press_opener_floor (p); break;
+  case CLOSER_FLOOR: press_closer_floor (p); break;
+  case LOOSE_FLOOR: release_loose_floor (p); break;
+  default: break;
+  }
 }

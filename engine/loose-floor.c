@@ -29,6 +29,7 @@
 #include "floor.h"
 #include "loose-floor.h"
 #include "opener-floor.h"
+#include "closer-floor.h"
 #include "spikes-floor.h"
 
 ALLEGRO_BITMAP *loose_floor_left_01, *loose_floor_right_01, *loose_floor_base_01,
@@ -278,6 +279,7 @@ compute_loose_floor_fall (struct loose_floor *l)
       play_sample (broken_floor_sound);
       return;
     case OPENER_FLOOR: break_opener_floor (s.pmbo); break;
+    case CLOSER_FLOOR: break_closer_floor (s.pmbo); break;
     case SPIKES_FLOOR: break_spikes_floor (s.pmbo); break;
     default: break;
     }

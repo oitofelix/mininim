@@ -74,6 +74,10 @@ struct anim {
   int repeat;
   int flip;
   void (*action) (void);
+
+  /* depressible floor */
+  struct pos df_pos[2];
+  struct pos df_posb[2];
 };
 
 struct level {

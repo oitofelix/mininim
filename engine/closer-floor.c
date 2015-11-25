@@ -104,6 +104,7 @@ break_closer_floor (struct pos p)
   struct closer_floor *c = closer_floor_at_pos (p);
   if (! c) return;
   c->broken = true;
+  press_closer_floor (p);
 }
 
 void
@@ -125,7 +126,7 @@ compute_closer_floors (void)
       /* remove_closer_floor (o); i--; */
       continue;
     }
-    if (c->pressed || c->broken) {
+    if (c->pressed) {
       if (! c->noise) {
         play_sample (closer_floor_sound);
         c->noise = true;
