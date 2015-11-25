@@ -46,6 +46,9 @@ ALLEGRO_BITMAP *room_bg;
 /* current room */
 static int current_room = -1;
 
+/* true if the room should be redrawn */
+bool redraw_room = false;
+
 void
 load_room (void)
 {
@@ -187,9 +190,10 @@ draw_room (int room)
 {
   if (room_view != room) return;
 
-  if (room != current_room) {
+  if (room != current_room || redraw_room == true) {
     current_room = room;
     draw_room_bg ();
+    redraw_room = false;
   }
   draw_bitmap (room_bg, screen, 0, 0, 0);
 }
@@ -221,6 +225,7 @@ draw_confg (ALLEGRO_BITMAP *bitmap, struct pos p)
   case NO_FLOOR: break;
   case FLOOR: draw_floor (bitmap, p); break;
   case BROKEN_FLOOR: draw_broken_floor (bitmap, p); break;
+  case SKELETON_FLOOR: draw_skeleton_floor (bitmap, p); break;
   case LOOSE_FLOOR: break;
   case SPIKES_FLOOR: draw_spikes_floor_floor (bitmap, p); break;
   case OPENER_FLOOR: break;
@@ -258,6 +263,7 @@ draw_con_left (ALLEGRO_BITMAP *bitmap, struct pos p)
   case NO_FLOOR: break;
   case FLOOR: draw_floor_left (bitmap, p); break;
   case BROKEN_FLOOR: draw_broken_floor_left (bitmap, p); break;
+  case SKELETON_FLOOR: draw_skeleton_floor_left (bitmap, p); break;
   case LOOSE_FLOOR: draw_loose_floor_left (bitmap, p); break;
   case SPIKES_FLOOR: draw_spikes_floor_left (bitmap, p); break;
   case OPENER_FLOOR: draw_opener_floor_left (bitmap, p); break;
@@ -278,6 +284,7 @@ draw_con_right (ALLEGRO_BITMAP *bitmap, struct pos p)
   case NO_FLOOR: break;
   case FLOOR: draw_floor_right (bitmap, p); break;
   case BROKEN_FLOOR: draw_broken_floor_right (bitmap, p); break;
+  case SKELETON_FLOOR: draw_skeleton_floor_right (bitmap, p); break;
   case LOOSE_FLOOR: draw_loose_floor_right (bitmap, p); break;
   case SPIKES_FLOOR: draw_spikes_floor_right (bitmap, p); break;
   case OPENER_FLOOR: draw_opener_floor_right (bitmap, p); break;
@@ -421,14 +428,10 @@ draw_room_fg (struct anim a, struct pos p)
        || peq (p, prel (s.pm, 0, +1)))
       && is_kid_fall (a))
     switch (con (p).fg) {
-    case NO_FLOOR:
-      break;
-    case FLOOR:
-      draw_floor (screen, p);
-      break;
-    case BROKEN_FLOOR:
-      draw_broken_floor (screen, p);
-      break;
+    case NO_FLOOR: break;
+    case FLOOR: draw_floor (screen, p); break;
+    case BROKEN_FLOOR: draw_broken_floor (screen, p); break;
+    case SKELETON_FLOOR: draw_skeleton_floor (screen, p); break;
     case LOOSE_FLOOR: draw_loose_floor (screen, p); break;
     case OPENER_FLOOR: draw_opener_floor (screen, p); break;
     case CLOSER_FLOOR: draw_closer_floor (screen, p); break;
@@ -436,15 +439,9 @@ draw_room_fg (struct anim a, struct pos p)
       draw_spikes_floor_floor (screen, p);
       draw_spikes_fg (screen, p);
       break;
-    case PILLAR:
-      draw_pillar (screen, p);
-      break;
-    case WALL:
-      draw_wall_right (screen, p);
-      break;
-    case DOOR:
-      draw_door_frame_left (screen, p);
-      break;
+    case PILLAR: draw_pillar (screen, p); break;
+    case WALL: draw_wall_right (screen, p); break;
+    case DOOR: draw_door_frame_left (screen, p); break;
     default:
       error (-1, 0, "%s: unknown foreground construct type (%i)",
              __func__, con (p).fg);
@@ -484,12 +481,9 @@ draw_room_fg (struct anim a, struct pos p)
              && floor_left_coord (p).y <= s.tl.y) {
     switch (con (p).fg) {
     case NO_FLOOR: break;
-    case FLOOR:
-      draw_floor (screen, p);
-      break;
-    case BROKEN_FLOOR:
-      draw_broken_floor (screen, p);
-      break;
+    case FLOOR: draw_floor (screen, p); break;
+    case BROKEN_FLOOR: draw_broken_floor (screen, p); break;
+    case SKELETON_FLOOR: draw_skeleton_floor (screen, p); break;
     case LOOSE_FLOOR: draw_loose_floor (screen, p); break;
     case OPENER_FLOOR: draw_opener_floor (screen, p); break;
     case CLOSER_FLOOR: draw_closer_floor (screen, p); break;
@@ -501,12 +495,8 @@ draw_room_fg (struct anim a, struct pos p)
       draw_pillar (screen, p);
       draw_con_right (screen, prel (p, -1, 0));
       break;
-    case WALL:
-      draw_wall_right (screen, p);
-      break;
-    case DOOR:
-      draw_door_frame (screen, p);
-      break;
+    case WALL: draw_wall_right (screen, p); break;
+    case DOOR: draw_door_frame (screen, p); break;
     default:
       error (-1, 0, "%s: unknown foreground construct type (%i)",
              __func__, con (p).fg);

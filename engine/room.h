@@ -30,6 +30,7 @@
 #define VDUNGEON_WINDOW "dat/vdungeon/background/window.png"
 
 extern ALLEGRO_BITMAP *room_bg;
+extern bool redraw_room;
 
 void load_room (void);
 void unload_room (void);

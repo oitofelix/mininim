@@ -290,8 +290,7 @@ compute_loose_floor_fall (struct loose_floor *l)
   set_confg (p, BROKEN_FLOOR);
   shake_loose_floor_row (p);
   l->p.room = -1;
-  draw_con (room_bg, p);
-  draw_con_left (room_bg, prel (p, 0, +1));
+  redraw_room = true;
   play_sample (broken_floor_sound);
 }
 

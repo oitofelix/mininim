@@ -697,7 +697,6 @@ init_fall_frameset (void)
 void
 kid_normal (void)
 {
-  void (*oaction) (void) = kid.action;
   kid.action = kid_normal;
   kid.flip = (kid.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
   inertia = 0;

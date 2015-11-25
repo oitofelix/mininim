@@ -90,6 +90,7 @@ struct level {
       NO_FLOOR,
       FLOOR,
       BROKEN_FLOOR,
+      SKELETON_FLOOR,
       LOOSE_FLOOR,
       SPIKES_FLOOR,
       OPENER_FLOOR,

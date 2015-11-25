@@ -30,6 +30,8 @@
 #define VDUNGEON_BROKEN_FLOOR_LEFT "dat/vdungeon/floor panels/broken left.png"
 #define VDUNGEON_BROKEN_FLOOR_RIGHT "dat/vdungeon/floor panels/broken right.png"
 #define VDUNGEON_BROKEN_FLOOR_FRONT "dat/vdungeon/floor panels/broken left02.png"
+#define VDUNGEON_SKELETON_FLOOR_LEFT "dat/vdungeon/floor panels/skeleton left.png"
+#define VDUNGEON_SKELETON_FLOOR_RIGHT "dat/vdungeon/floor panels/skeleton right.png"
 #define VDUNGEON_FLOOR_CORNER_01 "dat/vdungeon/floor panels/normal_closer01.png"
 #define VDUNGEON_FLOOR_CORNER_02 "dat/vdungeon/floor panels/normal_closer02.png"
 #define VDUNGEON_FLOOR_CORNER_03 "dat/vdungeon/floor panels/normal_closer03.png"
@@ -47,6 +49,9 @@ void draw_broken_floor (ALLEGRO_BITMAP *bitmap, struct pos pos);
 void draw_broken_floor_left (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_broken_floor_right (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_broken_floor_fg (ALLEGRO_BITMAP *bitmap, struct pos p);
+void draw_skeleton_floor (ALLEGRO_BITMAP *bitmap, struct pos p);
+void draw_skeleton_floor_left (ALLEGRO_BITMAP *bitmap, struct pos p);
+void draw_skeleton_floor_right (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_floor_corner_01 (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_floor_corner_02 (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_floor_corner_03 (ALLEGRO_BITMAP *bitmap, struct pos p);
@@ -55,6 +60,8 @@ struct coord floor_left_coord (struct pos pos);
 struct coord floor_right_coord (struct pos pos);
 struct coord broken_floor_right_coord (struct pos p);
 struct coord broken_floor_front_coord (struct pos pos);
+struct coord skeleton_floor_left_coord (struct pos p);
+struct coord skeleton_floor_right_coord (struct pos p);
 struct coord floor_corner_01_coord (struct pos p);
 struct coord floor_corner_02_coord (struct pos p);
 struct coord floor_corner_03_coord (struct pos p);
