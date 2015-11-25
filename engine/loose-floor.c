@@ -333,9 +333,9 @@ draw_loose_floor (ALLEGRO_BITMAP *bitmap, struct pos p)
     draw_con_left (bitmap, pbr);
   } else {
     switch (l->state) {
-    case 0: draw_loose_floor_00 (bitmap, l->p); break;
-    case 1: draw_loose_floor_01 (bitmap, l->p); break;
-    case 2: draw_loose_floor_02 (bitmap, l->p); break;
+    case 0: draw_loose_floor_00 (bitmap, p); break;
+    case 1: draw_loose_floor_01 (bitmap, p); break;
+    case 2: draw_loose_floor_02 (bitmap, p); break;
     }
   }
 }
@@ -347,9 +347,9 @@ draw_loose_floor_left (ALLEGRO_BITMAP *bitmap, struct pos p)
   if (! l) return;
 
   switch (l->state) {
-  case 0: draw_loose_floor_00_left (bitmap, l->p); break;
-  case 1: draw_loose_floor_01_left (bitmap, l->p); break;
-  case 2: draw_loose_floor_02_left (bitmap, l->p); break;
+  case 0: draw_loose_floor_00_left (bitmap, p); break;
+  case 1: draw_loose_floor_01_left (bitmap, p); break;
+  case 2: draw_loose_floor_02_left (bitmap, p); break;
   }
 }
 
@@ -360,9 +360,9 @@ draw_loose_floor_right (ALLEGRO_BITMAP *bitmap, struct pos p)
   if (! l) return;
 
   switch (l->state) {
-  case 0: draw_loose_floor_00_right (bitmap, l->p); break;
-  case 1: draw_loose_floor_01_right (bitmap, l->p); break;
-  case 2: draw_loose_floor_02_right (bitmap, l->p); break;
+  case 0: draw_loose_floor_00_right (bitmap, p); break;
+  case 1: draw_loose_floor_01_right (bitmap, p); break;
+  case 2: draw_loose_floor_02_right (bitmap, p); break;
   }
 }
 

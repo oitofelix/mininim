@@ -69,9 +69,12 @@ void draw_spikes_floor_right (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_spikes_floor_floor (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_spikes_floor_floor_left (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_spikes_floor_floor_right (ALLEGRO_BITMAP *bitmap, struct pos p);
-void draw_spikes (ALLEGRO_BITMAP *bitmap, struct spikes_floor *s);
-void draw_spikes_left (ALLEGRO_BITMAP *bitmap, struct spikes_floor *s);
-void draw_spikes_right (ALLEGRO_BITMAP *bitmap, struct spikes_floor *s);
+void draw_spikes (ALLEGRO_BITMAP *bitmap, struct pos p,
+                  struct spikes_floor *s);
+void draw_spikes_left (ALLEGRO_BITMAP *bitmap, struct pos p,
+                       struct spikes_floor *s);
+void draw_spikes_right (ALLEGRO_BITMAP *bitmap, struct pos p,
+                        struct spikes_floor *s);
 void draw_spikes_fg (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_spikes_01 (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_spikes_left_01 (ALLEGRO_BITMAP *bitmap, struct pos p);

@@ -187,7 +187,7 @@ draw_spikes_floor (ALLEGRO_BITMAP *bitmap, struct pos p)
   if (! s) return;
 
   draw_spikes_floor_floor (bitmap, p);
-  draw_spikes (bitmap, s);
+  draw_spikes (bitmap, p, s);
 }
 
 void
@@ -197,7 +197,7 @@ draw_spikes_floor_left (ALLEGRO_BITMAP *bitmap, struct pos p)
   if (! s) return;
 
   draw_spikes_floor_floor_left (bitmap, p);
-  draw_spikes_left (bitmap, s);
+  draw_spikes_left (bitmap, p, s);
 }
 
 void
@@ -207,7 +207,7 @@ draw_spikes_floor_right (ALLEGRO_BITMAP *bitmap, struct pos p)
   if (! s) return;
 
   draw_spikes_floor_floor_right (bitmap, p);
-  draw_spikes_right (bitmap, s);
+  draw_spikes_right (bitmap, p, s);
 }
 
 void
@@ -235,35 +235,38 @@ draw_spikes_floor_floor_right (ALLEGRO_BITMAP *bitmap, struct pos p)
 }
 
 void
-draw_spikes (ALLEGRO_BITMAP *bitmap, struct spikes_floor *s)
+draw_spikes (ALLEGRO_BITMAP *bitmap, struct pos p,
+             struct spikes_floor *s)
 {
-  draw_spikes_left (bitmap, s);
-  draw_spikes_right (bitmap, s);
+  draw_spikes_left (bitmap, p, s);
+  draw_spikes_right (bitmap, p, s);
 }
 
 void
-draw_spikes_left (ALLEGRO_BITMAP *bitmap, struct spikes_floor *s)
+draw_spikes_left (ALLEGRO_BITMAP *bitmap, struct pos p,
+                  struct spikes_floor *s)
 {
   switch (s->state) {
   case 0: break;
-  case 1: draw_spikes_left_01 (bitmap, s->p); break;
-  case 2: draw_spikes_left_02 (bitmap, s->p); break;
-  case 3: draw_spikes_left_03 (bitmap, s->p); break;
-  case 4: draw_spikes_left_04 (bitmap, s->p); break;
-  case 5: draw_spikes_left_05 (bitmap, s->p); break;
+  case 1: draw_spikes_left_01 (bitmap, p); break;
+  case 2: draw_spikes_left_02 (bitmap, p); break;
+  case 3: draw_spikes_left_03 (bitmap, p); break;
+  case 4: draw_spikes_left_04 (bitmap, p); break;
+  case 5: draw_spikes_left_05 (bitmap, p); break;
   }
 }
 
 void
-draw_spikes_right (ALLEGRO_BITMAP *bitmap, struct spikes_floor *s)
+draw_spikes_right (ALLEGRO_BITMAP *bitmap, struct pos p,
+                   struct spikes_floor *s)
 {
   switch (s->state) {
   case 0: break;
-  case 1: draw_spikes_right_01 (bitmap, s->p); break;
-  case 2: draw_spikes_right_02 (bitmap, s->p); break;
-  case 3: draw_spikes_right_03 (bitmap, s->p); break;
-  case 4: draw_spikes_right_04 (bitmap, s->p); break;
-  case 5: draw_spikes_right_05 (bitmap, s->p); break;
+  case 1: draw_spikes_right_01 (bitmap, p); break;
+  case 2: draw_spikes_right_02 (bitmap, p); break;
+  case 3: draw_spikes_right_03 (bitmap, p); break;
+  case 4: draw_spikes_right_04 (bitmap, p); break;
+  case 5: draw_spikes_right_05 (bitmap, p); break;
   }
 }
 

@@ -1329,7 +1329,7 @@ kid_vjump (void)
              && con (hang_pos).fg != NO_FLOOR
              && (kid.dir == LEFT || con (hang_pos).fg != DOOR)) {
     to_next_place_edge (&kid, frame, coord_tf, pos, 0, false, 0);
-    dx -= 3; hang = true;
+    dx -= 4; hang = true;
   }
 
   /* fall */
@@ -1361,8 +1361,8 @@ kid_vjump (void)
   case 5: update_depressible_floor (coord_bf, coord_mbo); break;
   case 6: update_depressible_floor (coord_bf, coord_mbo); break;
   case 7: update_depressible_floor (coord_bf, coord_mbo); break;
-  case 8: update_depressible_floor (NULL, coord_mbo); break;
-  case 9: update_depressible_floor (NULL, coord_mbo); break;
+  case 8: update_depressible_floor (coord_bf, coord_mbo); break;
+  case 9: update_depressible_floor (coord_bf, coord_mbo); break;
   case 10: update_depressible_floor (NULL, coord_mbo); break;
   case 11: update_depressible_floor (NULL, NULL); break;
   case 12: update_depressible_floor (NULL, NULL); break;
@@ -1371,6 +1371,11 @@ kid_vjump (void)
   case 15: update_depressible_floor (coord_bf, coord_bb); break;
   case 16: update_depressible_floor (coord_mbo, coord_bb); break;
   case 17: update_depressible_floor (coord_mbo, coord_bb); break;
+  }
+
+  if (i == 13 && hit_ceiling) {
+    shake_loose_floor_row (kids.ptb);
+    if (kids.ctb == LOOSE_FLOOR) release_loose_floor (kids.ptb);
   }
 
   if (i == 12 && hang) {
@@ -2040,13 +2045,12 @@ kid_fall (void)
   }
 
   struct pos pmbo =
-    pos (coord_mbo (next_anim (kid, kid.frame, 0, 34)));
+    npos (pos (coord_mbo (next_anim (kid, kid.frame, 0, 34))));
 
   /* land on ground */
   if (i > 0
       && kids.cmbo != NO_FLOOR
-      /* && kids.cmbo != WALL */
-      && kids.pmbo.floor != pmbo.floor
+      && npos (kids.pmbo).floor != pmbo.floor
       && kids.pmbo.floor != force_floor) {
     inertia = 0;
 

@@ -221,6 +221,7 @@ bool
 can_hang (struct anim a)
 {
   struct coord tf = coord_tf (a);
+
   struct pos pmf = pos (coord_mf (a));
   struct pos pm = pos (coord_m (a));
   struct pos pmba = pos (coord_mba (a));
@@ -229,11 +230,14 @@ can_hang (struct anim a)
   bool hm = is_hangable_pos (pm, a.dir);
   bool hmba = is_hangable_pos (pmba, a.dir);
 
-  if (! hmf && ! hm && ! hmba) return false;
+  if (! hmf && ! hm && ! hmba)
+    return false;
 
   if (hmf) hang_pos = pmf;
   if (hm) hang_pos = pm;
   if (hmba) hang_pos = pmba;
+
+  hang_pos = npos (hang_pos);
 
   /* for fall */
   struct coord ch;
@@ -244,7 +248,7 @@ can_hang (struct anim a)
   printf ("dist_coord = %f\n", dist_coord (kids.tf, ch));
 
   if (is_kid_fall (a) &&
-      dist_coord (tf, ch) > 16) return false;
+      dist_coord (tf, ch) > 19) return false;
 
   return true;
 }

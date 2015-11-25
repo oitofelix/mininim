@@ -171,9 +171,9 @@ draw_door (ALLEGRO_BITMAP *bitmap, struct pos p)
   struct door *d = door_at_pos (p);
   if (! d) return;
 
-  draw_door_grid (bitmap, d->p, d->i);
-  draw_con_left (bitmap, prel (d->p, -1, +1));
-  draw_con_left (bitmap, prel (d->p, +0, +1));
+  draw_door_grid (bitmap, p, d->i);
+  draw_con_left (bitmap, prel (p, -1, +1));
+  draw_con_left (bitmap, prel (p, +0, +1));
 }
 
 void
@@ -221,7 +221,7 @@ draw_door_fg (ALLEGRO_BITMAP *bitmap, struct pos p, struct anim a)
     struct door *d = door_at_pos (p);
     draw_door_grid (screen, p, d->i);
     draw_con_left (screen, prel (p, -1, +1));
-    draw_con_left (screen, prel (d->p, +0, +1));
+    draw_con_left (screen, prel (p, +0, +1));
   }
 }
 

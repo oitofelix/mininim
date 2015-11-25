@@ -139,8 +139,8 @@ draw_opener_floor (ALLEGRO_BITMAP *bitmap, struct pos p)
   if (! o) return;
 
   if (o->broken) return;
-  if (o->pressed) draw_pressed_opener_floor (bitmap, o->p);
-  else draw_unpressed_opener_floor (bitmap, o->p);
+  if (o->pressed) draw_pressed_opener_floor (bitmap, p);
+  else draw_unpressed_opener_floor (bitmap, p);
 }
 
 void
@@ -150,8 +150,8 @@ draw_opener_floor_left (ALLEGRO_BITMAP *bitmap, struct pos p)
   if (! o) return;
 
   if (o->broken) return;
-  if (o->pressed) draw_pressed_opener_floor_left (bitmap, o->p);
-  else draw_unpressed_opener_floor_left (bitmap, o->p);
+  if (o->pressed) draw_pressed_opener_floor_left (bitmap, p);
+  else draw_unpressed_opener_floor_left (bitmap, p);
 }
 
 void
@@ -161,8 +161,8 @@ draw_opener_floor_right (ALLEGRO_BITMAP *bitmap, struct pos p)
   if (! o) return;
 
   if (o->broken) return;
-  if (o->pressed) draw_pressed_opener_floor_right (bitmap, o->p);
-  else draw_unpressed_opener_floor_right (bitmap, o->p);
+  if (o->pressed) draw_pressed_opener_floor_right (bitmap, p);
+  else draw_unpressed_opener_floor_right (bitmap, p);
 }
 
 void
