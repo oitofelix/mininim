@@ -29,9 +29,15 @@
 #include "engine/pos.h"
 
 /* types */
-enum video_effect {
+enum video_effect_type {
   VIDEO_NO_EFFECT, VIDEO_OFF, VIDEO_FADE_IN,
   VIDEO_FADE_OUT, VIDEO_ROLL_RIGHT, VIDEO_FLICKERING,
+};
+
+struct video_effect {
+  enum video_effect_type type;
+  int duration;
+  ALLEGRO_COLOR color;
 };
 
 typedef ALLEGRO_COLOR (*palette) (ALLEGRO_COLOR c);
@@ -62,7 +68,7 @@ void draw_roll_right (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
                       int total, int current);
 void draw_pattern (ALLEGRO_BITMAP *bitmap, int ox, int oy, int w, int h,
                    ALLEGRO_COLOR color_0, ALLEGRO_COLOR color_1);
-void start_video_effect (enum video_effect type, int duration);
+void start_video_effect (enum video_effect_type type, int duration);
 bool is_video_effect_started (void);
 void show (void);
 
@@ -71,5 +77,6 @@ extern ALLEGRO_DISPLAY *display;
 extern ALLEGRO_BITMAP *screen;
 extern ALLEGRO_TIMER *video_timer;
 extern ALLEGRO_BITMAP *flick_bg_0, *flick_bg_1;
+extern struct video_effect video_effect;
 
 #endif	/* FREEPOP_VIDEO_H */

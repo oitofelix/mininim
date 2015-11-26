@@ -269,6 +269,7 @@ title_anim (void)
     break;
   case 19:
     if (jaffar.frame == jaffar_raise_arms_27) {
+      video_effect.color = WHITE;
       start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (1));
       princess_room_clock = clock_01;
       i++;

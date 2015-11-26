@@ -120,7 +120,23 @@ f = %i, p = %i, dn = %i, dp = %i, dc = %i, df = %i, dl = %i, dd = %i\n",
 void
 draw_anim (ALLEGRO_BITMAP *bitmap, struct anim a)
 {
+  if (! a.frame) return;
+
   draw_bitmapc (a.frame, bitmap, a.c, a.flip);
+}
+
+void
+draw_xanim (ALLEGRO_BITMAP *bitmap, struct anim a)
+{
+  if (! a.xframe) return;
+
+  int w = al_get_bitmap_width (a.xframe);
+  struct coord c = coord_tf (a);
+  c.x += (kid.dir == LEFT) ? a.xdx : -a.xdx - w + 1;
+  c.y += a.xdy;
+  c.room = a.c.room;
+
+  draw_bitmapc (a.xframe, bitmap, c, a.flip);
 }
 
 struct anim

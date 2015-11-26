@@ -32,6 +32,7 @@
 #include "opener-floor.h"
 #include "closer-floor.h"
 #include "potion.h"
+#include "sword.h"
 
 struct anim kid;
 struct survey kids, kidsf;
@@ -40,7 +41,7 @@ static bool misstep = false;
 static int inertia = 0;
 static bool critical_edge = false;
 static bool turn = false;
-static struct pos drink_pos = {.room = -1};
+static struct pos item_pos = {.room = -1};
 
 #define WALK_FRAMESET_NMEMB 12
 #define START_RUN_FRAMESET_NMEMB 6
@@ -58,6 +59,7 @@ static struct pos drink_pos = {.room = -1};
 #define COUCH_FRAMESET_NMEMB 13
 #define FALL_FRAMESET_NMEMB 13
 #define DRINK_FRAMESET_NMEMB 15
+#define RAISE_SWORD_FRAMESET_NMEMB 4
 
 static struct frameset walk_frameset[WALK_FRAMESET_NMEMB];
 static struct frameset start_run_frameset[START_RUN_FRAMESET_NMEMB];
@@ -75,6 +77,7 @@ static struct frameset stabilize_frameset[STABILIZE_FRAMESET_NMEMB];
 static struct frameset couch_frameset[COUCH_FRAMESET_NMEMB];
 static struct frameset fall_frameset[FALL_FRAMESET_NMEMB];
 static struct frameset drink_frameset[DRINK_FRAMESET_NMEMB];
+static struct frameset raise_sword_frameset[RAISE_SWORD_FRAMESET_NMEMB];
 
 static void init_walk_frameset (void);
 static void init_start_run_frameset (void);
@@ -92,6 +95,7 @@ static void init_stabilize_frameset (void);
 static void init_couch_frameset (void);
 static void init_fall_frameset (void);
 static void init_drink_frameset (void);
+static void init_raise_sword_frameset (void);
 
 ALLEGRO_BITMAP *kid_normal_00,
   *kid_start_run_01, *kid_start_run_02, *kid_start_run_03, *kid_start_run_04,
@@ -133,9 +137,10 @@ ALLEGRO_BITMAP *kid_normal_00,
   *kid_run_jump_10, *kid_run_jump_11,
   *kid_drink_01, *kid_drink_02, *kid_drink_03, *kid_drink_04, *kid_drink_05,
   *kid_drink_06, *kid_drink_07, *kid_drink_08, *kid_drink_09, *kid_drink_10,
-  *kid_drink_11, *kid_drink_12, *kid_drink_13, *kid_drink_14, *kid_drink_15;
+  *kid_drink_11, *kid_drink_12, *kid_drink_13, *kid_drink_14, *kid_drink_15,
+  *kid_raise_sword_01, *kid_raise_sword_02, *kid_raise_sword_03, *kid_raise_sword_04;
 
-ALLEGRO_SAMPLE *step, *hit_ground, *hit_wall, *hang_on_fall, *drink;
+ALLEGRO_SAMPLE *step, *hit_ground, *hit_wall, *hang_on_fall, *drink, *glory;
 
 static void place_kid (int room, int floor, int place);
 
@@ -161,6 +166,7 @@ static void kid_stabilize_collision (void);
 static void kid_couch_collision (void);
 static void kid_fall (void);
 static void kid_drink (void);
+static void kid_raise_sword (void);
 
 void
 load_kid (void)
@@ -323,6 +329,10 @@ load_kid (void)
   kid_drink_13 = load_bitmap (KID_DRINK_13);
   kid_drink_14 = load_bitmap (KID_DRINK_14);
   kid_drink_15 = load_bitmap (KID_DRINK_15);
+  kid_raise_sword_01 = load_bitmap (KID_RAISE_SWORD_01);
+  kid_raise_sword_02 = load_bitmap (KID_RAISE_SWORD_02);
+  kid_raise_sword_03 = load_bitmap (KID_RAISE_SWORD_03);
+  kid_raise_sword_04 = load_bitmap (KID_RAISE_SWORD_04);
 
   /* sound */
   step = load_sample (STEP);
@@ -330,6 +340,7 @@ load_kid (void)
   hit_wall = load_sample (HIT_WALL);
   hang_on_fall = load_sample (HANG_ON_FALL);
   drink = load_sample (DRINK);
+  glory = load_sample (GLORY);
 
   /* framesets */
   init_walk_frameset ();
@@ -348,6 +359,7 @@ load_kid (void)
   init_couch_frameset ();
   init_fall_frameset ();
   init_drink_frameset ();
+  init_raise_sword_frameset ();
 
   /* kid himself */
   kid.id = &kid;
@@ -520,6 +532,10 @@ unload_kid (void)
   al_destroy_bitmap (kid_drink_13);
   al_destroy_bitmap (kid_drink_14);
   al_destroy_bitmap (kid_drink_15);
+  al_destroy_bitmap (kid_raise_sword_01);
+  al_destroy_bitmap (kid_raise_sword_02);
+  al_destroy_bitmap (kid_raise_sword_03);
+  al_destroy_bitmap (kid_raise_sword_04);
 
   /* sounds */
   al_destroy_sample (step);
@@ -527,6 +543,7 @@ unload_kid (void)
   al_destroy_sample (hit_wall);
   al_destroy_sample (hang_on_fall);
   al_destroy_sample (drink);
+  al_destroy_sample (glory);
 }
 
 void
@@ -747,6 +764,18 @@ init_drink_frameset (void)
           DRINK_FRAMESET_NMEMB * sizeof (struct frameset));
 }
 
+void
+init_raise_sword_frameset (void)
+{
+  struct frameset frameset[RAISE_SWORD_FRAMESET_NMEMB] =
+    {{kid_raise_sword_01,-4,0},{kid_raise_sword_02,+0,0},
+     {kid_raise_sword_03,+1,0},{kid_raise_sword_04,-1,0}};
+
+  memcpy (&raise_sword_frameset, &frameset,
+          RAISE_SWORD_FRAMESET_NMEMB * sizeof (struct frameset));
+}
+
+
 
 
 void
@@ -766,6 +795,7 @@ kid_normal (void)
   bool couch = down_key;
   bool vjump = up_key;
   bool drink = is_potion (kids.pbf) && shift_key;
+  bool raise_sword = is_sword (kids.pbf) && shift_key;
 
   ALLEGRO_BITMAP *frame = kid_normal_00;
   int dx = +0;
@@ -816,9 +846,13 @@ kid_normal (void)
     else kid_start_run ();
     return;
   } else if (drink) {
-    drink_pos = kids.pbf;
-    int d = (kid.dir == LEFT) ? +8 : 0;
+    item_pos = kids.pbf;
+    int d = (kid.dir == LEFT) ? +8 : +0;
     to_next_place_edge (&kid, frame, coord_bf, pos, 0, true, d);
+    kid_couch ();
+    return;
+  } else if (raise_sword) {
+    item_pos = kids.pbf;
     kid_couch ();
     return;
   }
@@ -1922,8 +1956,11 @@ kid_couch (void)
   if (i == 12) {
     kid.action = kid_normal;
     cinertia = 0; i = 0; collision = fall = false;
-  } else if (i == 2 && drink_pos.room != -1) {
-    kid.action = kid_drink;
+  } else if (i == 2 && item_pos.room != -1) {
+    if (is_potion (item_pos)) kid.action = kid_drink;
+    else if (is_sword (item_pos)) kid.action = kid_raise_sword;
+    else error (-1, 0, "%s: unknown item (%i)",
+                __func__, con (item_pos).ext.item);
     i = 0; wait = 1; collision = fall = false;
   } else if (i == 2 && down_key
            && ((kid.dir == LEFT && left_key)
@@ -2106,7 +2143,7 @@ kid_drink (void)
   if (i == 7 && ! reverse) play_sample (drink);
 
   /* consume bottle */
-  if (i == 0) set_conitem (kids.pbf, NO_ITEM);
+  if (i == 0) set_conitem (item_pos, NO_ITEM);
 
   /* next frame */
   if (i < 14 && ! reverse) i++;
@@ -2116,9 +2153,57 @@ kid_drink (void)
   else {
     kid.action = kid_normal;
     reverse = false, i = 0, wait = 4;
-    drink_pos.room = -1;
+    item_pos.room = -1;
   }
 }
+
+void
+kid_raise_sword (void)
+{
+  void (*oaction) (void) = kid.action;
+  kid.action = kid_raise_sword;
+  kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
+
+  static int i = 0, wait = 5, j = 0;
+  if (oaction != kid_raise_sword) i = 0, wait = 5;
+
+  j = 20 + i;
+
+  ALLEGRO_BITMAP *frame = raise_sword_frameset[i].frame;
+  int dx = raise_sword_frameset[i].dx;
+  int dy = raise_sword_frameset[i].dy;
+
+  if (i == 0 && wait < 5) dx = 0;
+
+  kid = next_anim (kid, frame, dx, dy);
+  kid.xframe = sword_frameset[j].frame;
+  kid.xdx = sword_frameset[j].dx;
+  kid.xdy = sword_frameset[j].dy;
+
+  /* depressible floors */
+  keep_depressible_floor (&kid);
+
+  /* sound */
+  if (i == 0 && wait == 5) {
+    video_effect.color = YELLOW;
+    start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.5));
+    play_sample (glory);
+  }
+
+  /* consume bottle */
+  if (i == 0) set_conitem (item_pos, NO_ITEM);
+
+  /* next frame */
+  if (i == 0 && wait > 0) wait--;
+  else if (i < 3) i++;
+  else {
+    kid.action = kid_normal;
+    i = 0, wait = 5;
+    item_pos.room = -1;
+  }
+}
+
+
 
 
 bool

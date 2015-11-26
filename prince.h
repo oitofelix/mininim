@@ -41,6 +41,7 @@
 #define RED (al_map_rgb (255, 0, 0))
 #define GREEN (al_map_rgb (0, 255, 0))
 #define BLUE (al_map_rgb (0, 0, 255))
+#define YELLOW (al_map_rgb (255, 255, 0))
 #define WHITE (al_map_rgb (255, 255, 255))
 
 enum video_mode {
@@ -80,6 +81,9 @@ struct anim {
   /* depressible floor */
   struct pos df_pos[2];
   struct pos df_posb[2];
+
+  ALLEGRO_BITMAP *xframe;
+  int xdx, xdy;
 };
 
 struct level {

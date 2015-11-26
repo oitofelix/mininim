@@ -97,7 +97,8 @@ draw_potion (ALLEGRO_BITMAP *bitmap, struct pos p, int i)
   palette bubble_palette;
 
   seedp (p);
-  switch (con (p).ext.item) {
+  enum item item = con (p).ext.item;
+  switch (item) {
   case SMALL_LIFE_POTION:
     bottle = small_potion;
     bottle_coord = small_potion_coord (p);
@@ -111,7 +112,7 @@ draw_potion (ALLEGRO_BITMAP *bitmap, struct pos p, int i)
     bubble_coord = big_potion_bubble_coord (p);
     break;
   default:
-    error (-1, 0, "%s (%i): unknown potion type", __func__, i);
+    error (-1, 0, "%s (%i): unknown potion type", __func__, item);
     break;
   }
   draw_bitmapc (bottle, bitmap, bottle_coord,

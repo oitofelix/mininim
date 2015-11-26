@@ -178,6 +178,10 @@
 #define KID_DRINK_13 "dat/kid/drinking/frame13.png"
 #define KID_DRINK_14 "dat/kid/drinking/frame14.png"
 #define KID_DRINK_15 "dat/kid/drinking/frame15.png"
+#define KID_RAISE_SWORD_01 "dat/kid/got sword/frame01.png"
+#define KID_RAISE_SWORD_02 "dat/kid/got sword/frame02.png"
+#define KID_RAISE_SWORD_03 "dat/kid/got sword/frame03.png"
+#define KID_RAISE_SWORD_04 "dat/kid/got sword/frame04.png"
 
 /* sound resources */
 #define STEP "dat/digisnd1/running 2.ogg"
@@ -185,6 +189,7 @@
 #define HIT_WALL "dat/digisnd1/touching a wall.ogg"
 #define HANG_ON_FALL "dat/digisnd1/normal falling.ogg"
 #define DRINK "dat/digisnd3/drinking.ogg"
+#define GLORY "dat/midisnd1/guard death 1.ogg"
 
 /* functions */
 void load_kid (void);

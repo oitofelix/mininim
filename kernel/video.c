@@ -30,10 +30,7 @@ ALLEGRO_BITMAP *flick_bg_0, *flick_bg_1;
 ALLEGRO_TIMER *video_timer;
 static ALLEGRO_BITMAP *effect_buffer;
 static ALLEGRO_BITMAP *memory_bitmap;
-static struct {
-  enum video_effect type;
-  int duration;
-} video_effect = {.type = VIDEO_NO_EFFECT};
+struct video_effect video_effect = {.type = VIDEO_NO_EFFECT};
 static ALLEGRO_FONT *builtin_font;
 
 void
@@ -240,7 +237,7 @@ draw_pattern (ALLEGRO_BITMAP *bitmap, int ox, int oy, int w, int h,
 }
 
 void
-start_video_effect (enum video_effect type, int duration)
+start_video_effect (enum video_effect_type type, int duration)
 {
   video_effect.type = type;
   video_effect.duration = duration;
@@ -277,7 +274,7 @@ show (void)
 
   switch (video_effect.type) {
   case VIDEO_FLICKERING:
-    if (i % 2) clear_bitmap (effect_buffer, WHITE);
+    if (i % 2) clear_bitmap (effect_buffer, video_effect.color);
     else clear_bitmap (effect_buffer, BLACK);
     al_convert_mask_to_alpha (screen, BLACK);
     draw_bitmap (screen, effect_buffer, 0, 0, 0);
