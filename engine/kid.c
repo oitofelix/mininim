@@ -326,11 +326,11 @@ load_kid (void)
   /* kid himself */
   kid.id = &kid;
   kid.frame = kid_normal_00;
-  kid.dir = LEFT;
+  kid.dir = RIGHT;
   kid.action = kid_normal;
   update_depressible_floor (&kid, -4, -10);
 
-  place_kid (7, 0, 8);
+  place_kid (1, 1, 1);
 }
 
 void
