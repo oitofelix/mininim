@@ -128,6 +128,31 @@ clear_bitmap (ALLEGRO_BITMAP *bitmap, ALLEGRO_COLOR color)
   al_clear_to_color (color);
 }
 
+ALLEGRO_BITMAP *
+apply_palette (ALLEGRO_BITMAP *bitmap, palette p)
+{
+  int x, y;
+  ALLEGRO_BITMAP *rbitmap = clone_bitmap (bitmap);
+  int w = al_get_bitmap_width (bitmap);
+  int h = al_get_bitmap_height (bitmap);
+  al_lock_bitmap (rbitmap, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READWRITE);
+  al_set_target_bitmap (rbitmap);
+  for (y = 0; y < h; y++)
+    for (x = 0; x < w; x++)
+      al_put_pixel (x, y, p (al_get_pixel (rbitmap, x, y)));
+  al_unlock_bitmap (rbitmap);
+  return rbitmap;
+}
+
+bool
+color_eq (ALLEGRO_COLOR c0, ALLEGRO_COLOR c1)
+{
+  unsigned char r0, g0, b0, r1, g1, b1;
+  al_unmap_rgb (c0, &r0, &g0, &b0);
+  al_unmap_rgb (c1, &r1, &g1, &b1);
+  return r0 == r1 && g0 == g1 && b0 == b1;
+}
+
 void
 draw_bitmap (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to, float dx, float dy, int flags)
 {

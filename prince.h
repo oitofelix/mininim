@@ -38,8 +38,10 @@
 #define EFFECT_HZ 30
 #define SECS_TO_VCYCLES(x) ((x) * EFFECT_HZ)
 #define BLACK (al_map_rgb (0, 0, 0))
+#define RED (al_map_rgb (255, 0, 0))
+#define GREEN (al_map_rgb (0, 255, 0))
+#define BLUE (al_map_rgb (0, 0, 255))
 #define WHITE (al_map_rgb (255, 255, 255))
-
 
 enum video_mode {
   CGA, EGA, VGA,
@@ -108,7 +110,15 @@ struct level {
       TORCH,
       WINDOW,
     } bg;
-    int event;
+    union conext {
+      int event;
+      enum item {
+        NO_ITEM,
+        SMALL_LIFE_POTION,
+        BIG_LIFE_POTION,
+        SWORD,
+      } item;
+    } ext;
   } con[ROOMS][FLOORS][PLACES];
 
   struct {

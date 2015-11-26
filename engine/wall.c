@@ -240,12 +240,7 @@ draw_wall_randomization (ALLEGRO_BITMAP *bitmap, struct pos p)
 
   struct pos np = npos (p);
   uint32_t random_seed_backup = random_seed;
-  random_seed = np.room + np.floor * PLACES + np.place;
-  /* a null random seed makes the random number generator get a
-     non-null seed based on the current time, but we avoid this
-     non-deterministic behavior because it affects the position
-     (0,0,0) odly */
-  random_seed = random_seed ? random_seed : UINT32_MAX;
+  seedp (np);
   prandom (1);
   r0 = prandom(1);
   r1 = prandom(4);

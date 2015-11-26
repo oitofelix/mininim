@@ -32,7 +32,7 @@ draw_stars (struct star stars[], size_t count)
 
   if (! count) return;
 
-  int random = prandom_uniq (STARS_RANDOM_SEED + i, count - 1);
+  int random = prandom_uniq (STARS_RANDOM_SEED + i, 1, count - 1);
   struct star *star = &stars[random];
 
   switch (star->color)

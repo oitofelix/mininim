@@ -163,12 +163,28 @@
 #define KID_RUN_JUMP_09 "dat/kid/running jump/frame09.png"
 #define KID_RUN_JUMP_10 "dat/kid/running jump/frame10.png"
 #define KID_RUN_JUMP_11 "dat/kid/running jump/frame11.png"
+#define KID_DRINK_01 "dat/kid/drinking/frame01.png"
+#define KID_DRINK_02 "dat/kid/drinking/frame02.png"
+#define KID_DRINK_03 "dat/kid/drinking/frame03.png"
+#define KID_DRINK_04 "dat/kid/drinking/frame04.png"
+#define KID_DRINK_05 "dat/kid/drinking/frame05.png"
+#define KID_DRINK_06 "dat/kid/drinking/frame06.png"
+#define KID_DRINK_07 "dat/kid/drinking/frame07.png"
+#define KID_DRINK_08 "dat/kid/drinking/frame08.png"
+#define KID_DRINK_09 "dat/kid/drinking/frame09.png"
+#define KID_DRINK_10 "dat/kid/drinking/frame10.png"
+#define KID_DRINK_11 "dat/kid/drinking/frame11.png"
+#define KID_DRINK_12 "dat/kid/drinking/frame12.png"
+#define KID_DRINK_13 "dat/kid/drinking/frame13.png"
+#define KID_DRINK_14 "dat/kid/drinking/frame14.png"
+#define KID_DRINK_15 "dat/kid/drinking/frame15.png"
 
 /* sound resources */
 #define STEP "dat/digisnd1/running 2.ogg"
 #define HIT_GROUND "dat/digisnd1/running 1.ogg"
 #define HIT_WALL "dat/digisnd1/touching a wall.ogg"
 #define HANG_ON_FALL "dat/digisnd1/normal falling.ogg"
+#define DRINK "dat/digisnd3/drinking.ogg"
 
 /* functions */
 void load_kid (void);

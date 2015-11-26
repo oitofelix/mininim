@@ -505,11 +505,3 @@ survey (struct anim a, struct pos (*pf) (struct coord c))
 
   return s;
 }
-
-
-int
-prandom_pos (struct pos p, int i, int max)
-{
-  return
-    prandom_uniq (p.room + p.floor * PLACES + p.place + i, max);
-}

@@ -71,7 +71,7 @@ register_closer_floor (struct pos p)
   struct closer_floor c;
 
   c.p = p;
-  c.event = con (p).event;
+  c.event = con (p).ext.event;
   c.pressed = false;
   c.noise = false;
   c.broken = false;

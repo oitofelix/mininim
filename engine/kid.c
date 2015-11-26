@@ -31,6 +31,7 @@
 #include "loose-floor.h"
 #include "opener-floor.h"
 #include "closer-floor.h"
+#include "potion.h"
 
 struct anim kid;
 struct survey kids, kidsf;
@@ -39,6 +40,7 @@ static bool misstep = false;
 static int inertia = 0;
 static bool critical_edge = false;
 static bool turn = false;
+static struct pos drink_pos = {.room = -1};
 
 #define WALK_FRAMESET_NMEMB 12
 #define START_RUN_FRAMESET_NMEMB 6
@@ -55,6 +57,7 @@ static bool turn = false;
 #define STABILIZE_FRAMESET_NMEMB 4
 #define COUCH_FRAMESET_NMEMB 13
 #define FALL_FRAMESET_NMEMB 13
+#define DRINK_FRAMESET_NMEMB 15
 
 static struct frameset walk_frameset[WALK_FRAMESET_NMEMB];
 static struct frameset start_run_frameset[START_RUN_FRAMESET_NMEMB];
@@ -71,6 +74,7 @@ static struct frameset climb_frameset[CLIMB_FRAMESET_NMEMB];
 static struct frameset stabilize_frameset[STABILIZE_FRAMESET_NMEMB];
 static struct frameset couch_frameset[COUCH_FRAMESET_NMEMB];
 static struct frameset fall_frameset[FALL_FRAMESET_NMEMB];
+static struct frameset drink_frameset[DRINK_FRAMESET_NMEMB];
 
 static void init_walk_frameset (void);
 static void init_start_run_frameset (void);
@@ -87,6 +91,7 @@ static void init_climb_frameset (void);
 static void init_stabilize_frameset (void);
 static void init_couch_frameset (void);
 static void init_fall_frameset (void);
+static void init_drink_frameset (void);
 
 ALLEGRO_BITMAP *kid_normal_00,
   *kid_start_run_01, *kid_start_run_02, *kid_start_run_03, *kid_start_run_04,
@@ -125,9 +130,12 @@ ALLEGRO_BITMAP *kid_normal_00,
   *kid_run_jump_01, *kid_run_jump_02, *kid_run_jump_03,
   *kid_run_jump_04, *kid_run_jump_05, *kid_run_jump_06,
   *kid_run_jump_07, *kid_run_jump_08, *kid_run_jump_09,
-  *kid_run_jump_10, *kid_run_jump_11;
+  *kid_run_jump_10, *kid_run_jump_11,
+  *kid_drink_01, *kid_drink_02, *kid_drink_03, *kid_drink_04, *kid_drink_05,
+  *kid_drink_06, *kid_drink_07, *kid_drink_08, *kid_drink_09, *kid_drink_10,
+  *kid_drink_11, *kid_drink_12, *kid_drink_13, *kid_drink_14, *kid_drink_15;
 
-ALLEGRO_SAMPLE *step, *hit_ground, *hit_wall, *hang_on_fall;
+ALLEGRO_SAMPLE *step, *hit_ground, *hit_wall, *hang_on_fall, *drink;
 
 static void place_kid (int room, int floor, int place);
 
@@ -152,6 +160,7 @@ static void kid_couch (void);
 static void kid_stabilize_collision (void);
 static void kid_couch_collision (void);
 static void kid_fall (void);
+static void kid_drink (void);
 
 void
 load_kid (void)
@@ -299,12 +308,28 @@ load_kid (void)
   kid_run_jump_09 = load_bitmap (KID_RUN_JUMP_09);
   kid_run_jump_10 = load_bitmap (KID_RUN_JUMP_10);
   kid_run_jump_11 = load_bitmap (KID_RUN_JUMP_11);
+  kid_drink_01 = load_bitmap (KID_DRINK_01);
+  kid_drink_02 = load_bitmap (KID_DRINK_02);
+  kid_drink_03 = load_bitmap (KID_DRINK_03);
+  kid_drink_04 = load_bitmap (KID_DRINK_04);
+  kid_drink_05 = load_bitmap (KID_DRINK_05);
+  kid_drink_06 = load_bitmap (KID_DRINK_06);
+  kid_drink_07 = load_bitmap (KID_DRINK_07);
+  kid_drink_08 = load_bitmap (KID_DRINK_08);
+  kid_drink_09 = load_bitmap (KID_DRINK_09);
+  kid_drink_10 = load_bitmap (KID_DRINK_10);
+  kid_drink_11 = load_bitmap (KID_DRINK_11);
+  kid_drink_12 = load_bitmap (KID_DRINK_12);
+  kid_drink_13 = load_bitmap (KID_DRINK_13);
+  kid_drink_14 = load_bitmap (KID_DRINK_14);
+  kid_drink_15 = load_bitmap (KID_DRINK_15);
 
   /* sound */
   step = load_sample (STEP);
   hit_ground = load_sample (HIT_GROUND);
   hit_wall = load_sample (HIT_WALL);
   hang_on_fall = load_sample (HANG_ON_FALL);
+  drink = load_sample (DRINK);
 
   /* framesets */
   init_walk_frameset ();
@@ -322,6 +347,7 @@ load_kid (void)
   init_stabilize_frameset ();
   init_couch_frameset ();
   init_fall_frameset ();
+  init_drink_frameset ();
 
   /* kid himself */
   kid.id = &kid;
@@ -479,12 +505,28 @@ unload_kid (void)
   al_destroy_bitmap (kid_run_jump_09);
   al_destroy_bitmap (kid_run_jump_10);
   al_destroy_bitmap (kid_run_jump_11);
+  al_destroy_bitmap (kid_drink_01);
+  al_destroy_bitmap (kid_drink_02);
+  al_destroy_bitmap (kid_drink_03);
+  al_destroy_bitmap (kid_drink_04);
+  al_destroy_bitmap (kid_drink_05);
+  al_destroy_bitmap (kid_drink_06);
+  al_destroy_bitmap (kid_drink_07);
+  al_destroy_bitmap (kid_drink_08);
+  al_destroy_bitmap (kid_drink_09);
+  al_destroy_bitmap (kid_drink_10);
+  al_destroy_bitmap (kid_drink_11);
+  al_destroy_bitmap (kid_drink_12);
+  al_destroy_bitmap (kid_drink_13);
+  al_destroy_bitmap (kid_drink_14);
+  al_destroy_bitmap (kid_drink_15);
 
   /* sounds */
   al_destroy_sample (step);
   al_destroy_sample (hit_ground);
   al_destroy_sample (hit_wall);
   al_destroy_sample (hang_on_fall);
+  al_destroy_sample (drink);
 }
 
 void
@@ -691,6 +733,19 @@ init_fall_frameset (void)
           FALL_FRAMESET_NMEMB * sizeof (struct frameset));
 }
 
+void
+init_drink_frameset (void)
+{
+  struct frameset frameset[DRINK_FRAMESET_NMEMB] =
+    {{kid_drink_01,-7,0},{kid_drink_02,+1,+1},{kid_drink_03,+1,-1},
+     {kid_drink_04,+0,0},{kid_drink_05,+2,0},{kid_drink_06,-1,0},
+     {kid_drink_07,+1,0},{kid_drink_08,+6,0},{kid_drink_09,-1,0},
+     {kid_drink_10,+2,-1},{kid_drink_11,-2,+1},{kid_drink_12,+0,-1},
+     {kid_drink_13,-1,0},{kid_drink_14,+1,0},{kid_drink_15,+1,0}};
+
+  memcpy (&drink_frameset, &frameset,
+          DRINK_FRAMESET_NMEMB * sizeof (struct frameset));
+}
 
 
 
@@ -710,6 +765,7 @@ kid_normal (void)
     || ((kid.dir == LEFT) && left_key && up_key);
   bool couch = down_key;
   bool vjump = up_key;
+  bool drink = is_potion (kids.pbf) && shift_key;
 
   ALLEGRO_BITMAP *frame = kid_normal_00;
   int dx = +0;
@@ -737,6 +793,7 @@ kid_normal (void)
   if (kid.frame == jump_frameset[17].frame) dx = -2;
   if (kid.frame == couch_frameset[12].frame) dx = -2;
   if (kid.frame == vjump_frameset[17].frame) dx = +2;
+  if (kid.frame == drink_frameset[7].frame) dx = +4;
 
   if (couch) {
     kid_couch ();
@@ -757,6 +814,12 @@ kid_normal (void)
     if (dist_collision (kid, coord_tf, pos, 0, false) < 29)
       kid_walk ();
     else kid_start_run ();
+    return;
+  } else if (drink) {
+    drink_pos = kids.pbf;
+    int d = (kid.dir == LEFT) ? +8 : 0;
+    to_next_place_edge (&kid, frame, coord_bf, pos, 0, true, d);
+    kid_couch ();
     return;
   }
 
@@ -1859,6 +1922,9 @@ kid_couch (void)
   if (i == 12) {
     kid.action = kid_normal;
     cinertia = 0; i = 0; collision = fall = false;
+  } else if (i == 2 && drink_pos.room != -1) {
+    kid.action = kid_drink;
+    i = 0; wait = 1; collision = fall = false;
   } else if (i == 2 && down_key
            && ((kid.dir == LEFT && left_key)
                || (kid.dir == RIGHT && right_key))
@@ -2012,7 +2078,47 @@ kid_fall (void)
   /* if (inertia > 0 && i % 3) inertia--; */
 }
 
+void
+kid_drink (void)
+{
+  void (*oaction) (void) = kid.action;
+  kid.action = kid_drink;
+  kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
+  static bool reverse = false;
+  static int i = 0, wait = 4;
+  if (oaction != kid_drink) reverse = false, i = 0, wait = 4;
+
+  ALLEGRO_BITMAP *frame = drink_frameset[i].frame;
+  int dx = drink_frameset[i].dx;
+  int dy = drink_frameset[i].dy;
+
+  if (i == 14 && wait < 4) dx = 0;
+  if (i == 10 && reverse) dx = -2, dy = +1;
+  if (i == 7 && reverse) dx = +1;
+
+  kid = next_anim (kid, frame, dx, dy);
+
+  /* depressible floors */
+  keep_depressible_floor (&kid);
+
+  /* sound */
+  if (i == 7 && ! reverse) play_sample (drink);
+
+  /* consume bottle */
+  if (i == 0) set_conitem (kids.pbf, NO_ITEM);
+
+  /* next frame */
+  if (i < 14 && ! reverse) i++;
+  else if (wait > 0) wait--;
+  else if (i == 14 && wait == 0) reverse = true, i = 10;
+  else if (i == 10 && reverse) i = 7;
+  else {
+    kid.action = kid_normal;
+    reverse = false, i = 0, wait = 4;
+    drink_pos.room = -1;
+  }
+}
 
 
 bool

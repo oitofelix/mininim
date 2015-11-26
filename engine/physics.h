@@ -30,6 +30,7 @@ extern enum confg confg_collision;
 struct con con (struct pos pos);
 struct con crel (struct pos pos, int floor, int place);
 void set_confg (struct pos p, enum confg fg);
+void set_conitem (struct pos p, enum item i);
 bool is_visible (struct anim a);
 bool is_pos_visible (struct pos p);
 

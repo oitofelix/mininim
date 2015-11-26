@@ -23,6 +23,7 @@
 #include "physics.h"
 #include "level.h"
 #include "pos.h"
+#include "room.h"
 #include "fire.h"
 
 static ALLEGRO_BITMAP *fire_01, *fire_02, *fire_03, *fire_04, *fire_05,
@@ -78,22 +79,21 @@ get_fire_frame (int i)
 }
 
 void
-draw_fire (int room)
+draw_fire (ALLEGRO_BITMAP* bitmap, int room)
 {
-  struct pos pos;
-  pos.room = room;
+  struct pos p;
+  p.room = room;
 
   static int i = 0;
 
   ALLEGRO_BITMAP *fire;
 
-  for (pos.floor = FLOORS; pos.floor >= -1; pos.floor--)
-    for (pos.place = -1; pos.place < PLACES; pos.place++) {
-      if (con (pos).bg == TORCH) {
-        fire = get_fire_frame (prandom_pos (pos, i, 8));
-        draw_bitmap (fire, screen, 32 * (pos.place + 1) + 8,
-                     63 * pos.floor + 4,
-                     prandom (1) ? ALLEGRO_FLIP_HORIZONTAL : 0);
+  for (p.floor = FLOORS; p.floor >= -1; p.floor--)
+    for (p.place = -1; p.place < PLACES; p.place++) {
+      if (con (p).bg == TORCH) {
+        fire = get_fire_frame (prandom_pos (p, i, 1, 8));
+        draw_bitmapc (fire, bitmap, fire_coord (p),
+                      prandom (1) ? ALLEGRO_FLIP_HORIZONTAL : 0);
       }
     }
 
@@ -105,11 +105,21 @@ draw_princess_room_fire (void)
 {
   static int i = 0;
 
-  ALLEGRO_BITMAP *fire_0 = get_fire_frame (prandom_uniq (FIRE_RANDOM_SEED_0 + i, 8));
-  ALLEGRO_BITMAP *fire_1 = get_fire_frame (prandom_uniq (FIRE_RANDOM_SEED_1 + i, 8));
+  ALLEGRO_BITMAP *fire_0 = get_fire_frame (prandom_uniq (FIRE_RANDOM_SEED_0 + i, 1, 8));
+  ALLEGRO_BITMAP *fire_1 = get_fire_frame (prandom_uniq (FIRE_RANDOM_SEED_1 + i, 1, 8));
 
   draw_bitmap (fire_0, screen, 92, 99, prandom (1) ? ALLEGRO_FLIP_HORIZONTAL : 0);
   draw_bitmap (fire_1, screen, 210, 99, prandom (1) ? ALLEGRO_FLIP_HORIZONTAL : 0);
 
   i++;
+}
+
+struct coord
+fire_coord (struct pos p)
+{
+  struct coord c;
+  c.x = PLACE_WIDTH * (p.place + 1) + 8;
+  c.y = PLACE_HEIGHT * p.floor + 4;
+  c.room = p.room;
+  return c;
 }

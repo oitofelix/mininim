@@ -57,6 +57,5 @@ struct coord coord_bb (struct anim a);
 
 struct survey survey (struct anim a, struct pos (*pf) (struct coord c));
 double dist_coord (struct coord a, struct coord b);
-int prandom_pos (struct pos pos, int i, int max);
 
 #endif	/* FREEPOP_POSITION_H */

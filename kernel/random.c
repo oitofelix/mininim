@@ -19,6 +19,7 @@
 
 #include <stdint.h>
 #include <time.h>
+#include "engine/pos.h"
 
 /* random number generator seed */
 uint32_t random_seed = 0;
@@ -32,12 +33,17 @@ prandom (int max)
 }
 
 int
-prandom_uniq (uint32_t seed, int max)
+prandom_uniq (uint32_t seed, int period, int max)
 {
   uint32_t random_seed_backup = random_seed;
 
-  random_seed = seed - 1;
+  random_seed = seed - seed % period;
   int prev_random = prandom (max);
+
+  if (seed % period) return prev_random;
+
+  random_seed = (seed - 1) - (seed - 1) % period;
+  prev_random = prandom (max);
 
   random_seed = seed;
   int next_random = prandom (max);
@@ -48,4 +54,22 @@ prandom_uniq (uint32_t seed, int max)
   random_seed = random_seed_backup;
 
   return next_random;
+}
+
+int
+prandom_pos (struct pos p, int i, int period, int max)
+{
+  return
+    prandom_uniq (p.room + p.floor * PLACES + p.place + i, period, max);
+}
+
+void
+seedp (struct pos p)
+{
+  random_seed = p.room + p.floor * PLACES + p.place;
+  /* a null random seed makes the random number generator get a
+     non-null seed based on the current time, but we avoid this
+     non-deterministic behavior because it affects the position
+     (0,0,0) odly */
+  random_seed = random_seed ? random_seed : UINT32_MAX;
 }

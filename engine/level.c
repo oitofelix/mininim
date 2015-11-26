@@ -27,6 +27,7 @@
 #include "physics.h"
 #include "room.h"
 #include "fire.h"
+#include "potion.h"
 #include "kid.h"
 #include "loose-floor.h"
 #include "opener-floor.h"
@@ -83,6 +84,7 @@ load_level (void)
 {
   load_room ();
   load_fire ();
+  load_potion ();
   load_kid ();
 }
 
@@ -91,6 +93,7 @@ unload_level (void)
 {
   unload_room ();
   unload_fire ();
+  unload_potion ();
   unload_kid ();
 }
 
@@ -134,7 +137,7 @@ level_anim (void)
   /* drawing */
   clear_bitmap (screen, BLACK);
   if (! no_room_drawing) draw_room (room_view);
-  draw_fire (room_view);
+  draw_fire (screen, room_view);
 
   struct pos p;
   p.room = room_view;
@@ -150,6 +153,8 @@ level_anim (void)
 
   draw_anim (screen, kid);
   draw_room_anim_fg (kid);
+
+  draw_potions (screen, room_view);
 
   unpress_opener_floors ();
   unpress_closer_floors ();

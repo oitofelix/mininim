@@ -23,7 +23,7 @@
 #include "kernel/audio.h"
 
 /* constants */
-#define LOOSE_FLOOR_RESISTENCE 4
+#define LOOSE_FLOOR_RESISTENCE 0
 
 /* bitmaps */
 #define VDUNGEON_LOOSE_FLOOR_LEFT_01 "dat/vdungeon/floor panels/loose left01.png"

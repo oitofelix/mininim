@@ -68,7 +68,7 @@ register_opener_floor (struct pos p)
   struct opener_floor o;
 
   o.p = p;
-  o.event = con (p).event;
+  o.event = con (p).ext.event;
   o.pressed = false;
   o.noise = false;
   o.broken = false;

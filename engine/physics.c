@@ -56,6 +56,13 @@ set_confg (struct pos p, enum confg fg)
   level->con[p.room][p.floor][p.place].fg = fg;
 }
 
+void
+set_conitem (struct pos p, enum item i)
+{
+  p = npos (p);
+  level->con[p.room][p.floor][p.place].ext.item = i;
+}
+
 bool
 is_visible (struct anim a)
 {
