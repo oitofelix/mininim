@@ -37,7 +37,7 @@
 
 void load_fire (void);
 void unload_fire (void);
-void draw_fire (ALLEGRO_BITMAP* bitmap, int room);
+void draw_fire (ALLEGRO_BITMAP* bitmap, struct pos p, int i);
 void draw_princess_room_fire (void);
 struct coord fire_coord (struct pos p);
 

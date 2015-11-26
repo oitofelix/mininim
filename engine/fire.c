@@ -79,23 +79,13 @@ get_fire_frame (int i)
 }
 
 void
-draw_fire (ALLEGRO_BITMAP* bitmap, int room)
+draw_fire (ALLEGRO_BITMAP* bitmap, struct pos p, int i)
 {
-  struct pos p;
-  p.room = room;
+  if (con (p).bg != TORCH) return;
 
-  static int i = 0;
-
-  ALLEGRO_BITMAP *fire;
-
-  for (p.floor = FLOORS; p.floor >= -1; p.floor--)
-    for (p.place = -1; p.place < PLACES; p.place++) {
-      if (con (p).bg == TORCH) {
-        fire = get_fire_frame (prandom_pos (p, i, 1, 8));
-        draw_bitmapc (fire, bitmap, fire_coord (p),
-                      prandom (1) ? ALLEGRO_FLIP_HORIZONTAL : 0);
-      }
-    }
+  ALLEGRO_BITMAP *fire = get_fire_frame (prandom_pos (p, i, 1, 8));
+  draw_bitmapc (fire, bitmap, fire_coord (p),
+                prandom (1) ? ALLEGRO_FLIP_HORIZONTAL : 0);
 
   i++;
 }

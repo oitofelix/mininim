@@ -1,5 +1,5 @@
 /*
-  random.h -- random module;
+  sword.h -- sword module;
 
   Copyright (C) 2015, 2016 Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
 
@@ -17,20 +17,16 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_RANDOM_H
-#define FREEPOP_RANDOM_H
+#ifndef FREEPOP_SWORD_H
+#define FREEPOP_SWORD_H
 
-#include <stdint.h>
-#include "engine/pos.h"
+/* bitmap resources */
+#define NORMAL_SWORD "dat/prince/sword/in the floor/normal.png"
+#define SHINY_SWORD "dat/prince/sword/in the floor/bright.png"
 
-/* random number generator seed */
-extern uint32_t random_seed;
+void load_sword (void);
+void unload_sword (void);
+void draw_sword (ALLEGRO_BITMAP *bitmap, struct pos p, int i);
+bool is_sword (struct pos p);
 
-/* functions */
-int prandom(int max);
-int prandom_uniq (uint32_t seed, int length, int max);
-int prandom_pos (struct pos p, int i, int length, int max);
-void seedp (struct pos p);
-void unseedp (void);
-
-#endif	/* FREEPOP_RANDOM_H */
+#endif	/* FREEPOP_SWORD_H */

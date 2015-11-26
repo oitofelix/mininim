@@ -239,7 +239,6 @@ draw_wall_randomization (ALLEGRO_BITMAP *bitmap, struct pos p)
   if (level->type != DUNGEON && video_mode == VGA) return;
 
   struct pos np = npos (p);
-  uint32_t random_seed_backup = random_seed;
   seedp (np);
   prandom (1);
   r0 = prandom(1);
@@ -293,7 +292,7 @@ draw_wall_randomization (ALLEGRO_BITMAP *bitmap, struct pos p)
     error (-1, 0, "%s: unknown wall correlation (%i)", __func__, wc);
   }
 
-  random_seed = random_seed_backup;
+  unseedp ();
 }
 
 void

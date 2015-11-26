@@ -88,52 +88,42 @@ get_bubble_frame (int i)
 }
 
 void
-draw_potions (ALLEGRO_BITMAP *bitmap, int room)
+draw_potion (ALLEGRO_BITMAP *bitmap, struct pos p, int i)
 {
-  uint32_t seed = random_seed;
+  if (! is_potion (p)) return;
 
-  static int i = 0;
-  struct pos p;
-  p.room = room;
   ALLEGRO_BITMAP *bottle, *bubble;
   struct coord bottle_coord, bubble_coord;
   palette bubble_palette;
 
-  for (p.floor = FLOORS; p.floor >= -1; p.floor--)
-    for (p.place = -1; p.place < PLACES; p.place++) {
-      if (! is_potion (p)) continue;
-
-      seedp (p);
-      switch (con (p).ext.item) {
-      case SMALL_LIFE_POTION:
-        bottle = small_potion;
-        bottle_coord = small_potion_coord (p);
-        bubble_palette = life_palette;
-        bubble_coord = small_potion_bubble_coord (p);
-        break;
-      case BIG_LIFE_POTION:
-        bottle = big_potion;
-        bottle_coord = big_potion_coord (p);
-        bubble_palette = life_palette;
-        bubble_coord = big_potion_bubble_coord (p);
-        break;
-      default:
-        error (-1, 0, "%s (%i): unknown potion type", __func__, i);
-        break;
-      }
-      draw_bitmapc (bottle, bitmap, bottle_coord,
-                    prandom (1) ? ALLEGRO_FLIP_HORIZONTAL : 0);
-      bubble = get_bubble_frame (i % 7);
-      bubble = apply_palette (bubble, bubble_palette);
-      int r = prandom (1);
-      bubble_coord.x -= r;
-      draw_bitmapc (bubble, bitmap, bubble_coord,
-                    r ? ALLEGRO_FLIP_HORIZONTAL : 0);
-      al_destroy_bitmap (bubble);
-    }
-
-  random_seed = seed;
-  i++;
+  seedp (p);
+  switch (con (p).ext.item) {
+  case SMALL_LIFE_POTION:
+    bottle = small_potion;
+    bottle_coord = small_potion_coord (p);
+    bubble_palette = life_palette;
+    bubble_coord = small_potion_bubble_coord (p);
+    break;
+  case BIG_LIFE_POTION:
+    bottle = big_potion;
+    bottle_coord = big_potion_coord (p);
+    bubble_palette = life_palette;
+    bubble_coord = big_potion_bubble_coord (p);
+    break;
+  default:
+    error (-1, 0, "%s (%i): unknown potion type", __func__, i);
+    break;
+  }
+  draw_bitmapc (bottle, bitmap, bottle_coord,
+                prandom (1) ? ALLEGRO_FLIP_HORIZONTAL : 0);
+  bubble = get_bubble_frame (i % 7);
+  bubble = apply_palette (bubble, bubble_palette);
+  int r = prandom (1);
+  bubble_coord.x -= r;
+  draw_bitmapc (bubble, bitmap, bubble_coord,
+                r ? ALLEGRO_FLIP_HORIZONTAL : 0);
+  al_destroy_bitmap (bubble);
+  unseedp ();
 }
 
 bool

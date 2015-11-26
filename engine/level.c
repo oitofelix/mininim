@@ -28,6 +28,7 @@
 #include "room.h"
 #include "fire.h"
 #include "potion.h"
+#include "sword.h"
 #include "kid.h"
 #include "loose-floor.h"
 #include "opener-floor.h"
@@ -85,6 +86,7 @@ load_level (void)
   load_room ();
   load_fire ();
   load_potion ();
+  load_sword ();
   load_kid ();
 }
 
@@ -94,12 +96,15 @@ unload_level (void)
   unload_room ();
   unload_fire ();
   unload_potion ();
+  unload_sword ();
   unload_kid ();
 }
 
 static void
 level_anim (void)
 {
+  static int i = 0;
+
   char bottom_message[ORIGINAL_WIDTH / 8 + 1];
 
   int prev_room = room_view;
@@ -135,12 +140,17 @@ level_anim (void)
   compute_doors ();
 
   /* drawing */
-  clear_bitmap (screen, BLACK);
-  if (! no_room_drawing) draw_room (room_view);
-  draw_fire (screen, room_view);
-
   struct pos p;
   p.room = room_view;
+
+  clear_bitmap (screen, BLACK);
+  if (! no_room_drawing) draw_room (room_view);
+
+  for (p.floor = FLOORS; p.floor >= -1; p.floor--)
+    for (p.place = -1; p.place < PLACES; p.place++) {
+      draw_fire (screen, p, i);
+    }
+
   if (! no_room_drawing)
     for (p.floor = FLOORS; p.floor >= -1; p.floor--)
       for (p.place = -1; p.place < PLACES; p.place++) {
@@ -154,7 +164,11 @@ level_anim (void)
   draw_anim (screen, kid);
   draw_room_anim_fg (kid);
 
-  draw_potions (screen, room_view);
+  for (p.floor = FLOORS; p.floor >= -1; p.floor--)
+    for (p.place = -1; p.place < PLACES; p.place++) {
+      draw_potion (screen, p, i);
+      draw_sword (screen, p, i);
+    }
 
   unpress_opener_floors ();
   unpress_closer_floors ();
@@ -179,4 +193,6 @@ level_anim (void)
                ORIGINAL_WIDTH / 2.0, ORIGINAL_HEIGHT - 7,
                ALLEGRO_ALIGN_CENTRE);
   }
+
+  i++;
 }

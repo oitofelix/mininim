@@ -33,7 +33,7 @@
 
 void load_potion (void);
 void unload_potion (void);
-void draw_potions (ALLEGRO_BITMAP *bitmap, int room);
+void draw_potion (ALLEGRO_BITMAP *bitmap, struct pos p, int i);
 bool is_potion (struct pos p);
 
 #endif	/* FREEPOP_POTION_H */

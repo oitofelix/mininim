@@ -23,6 +23,7 @@
 
 /* random number generator seed */
 uint32_t random_seed = 0;
+static uint32_t random_seedb = 0;
 
 int
 prandom (int max)
@@ -66,10 +67,17 @@ prandom_pos (struct pos p, int i, int period, int max)
 void
 seedp (struct pos p)
 {
+  random_seedb = random_seed;
   random_seed = p.room + p.floor * PLACES + p.place;
   /* a null random seed makes the random number generator get a
      non-null seed based on the current time, but we avoid this
      non-deterministic behavior because it affects the position
      (0,0,0) odly */
   random_seed = random_seed ? random_seed : UINT32_MAX;
+}
+
+void
+unseedp (void)
+{
+  random_seed = random_seedb;
 }
