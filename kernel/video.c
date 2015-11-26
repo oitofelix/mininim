@@ -19,8 +19,6 @@
 
 #include <stdio.h>
 #include <error.h>
-#include <allegro5/allegro.h>
-#include <allegro5/allegro_image.h>
 
 #include "video.h"
 #include "event.h"
@@ -42,7 +40,8 @@ void
 init_video (void)
 {
   if (! al_init_image_addon ())
-    error (-1, 0, "%s (void): failed to initialize image addon", __func__);
+    error (-1, 0, "%s (void): failed to initialize image addon",
+           __func__);
 
   al_set_new_display_flags (ALLEGRO_WINDOWED | ALLEGRO_RESIZABLE |
                             ALLEGRO_GENERATE_EXPOSE_EVENTS);
@@ -64,6 +63,10 @@ init_video (void)
   builtin_font = al_create_builtin_font ();
   if (! builtin_font)
     error (-1, 0, "%s (void): cannot create builtin font", __func__);
+
+  if (! al_init_primitives_addon ())
+    error (-1, 0, "%s (void): failed to initialize primitives addon",
+           __func__);
 }
 
 void
@@ -77,6 +80,7 @@ finalize_video (void)
   al_destroy_display (display);
   al_shutdown_image_addon ();
   al_shutdown_font_addon ();
+  al_shutdown_primitives_addon ();
 }
 
 int

@@ -18,6 +18,7 @@
 */
 
 #include <error.h>
+#include <stdio.h>
 
 #include "kernel/video.h"
 #include "kernel/keyboard.h"
@@ -96,7 +97,10 @@ unload_level (void)
 static void
 level_anim (void)
 {
+  char bottom_message[ORIGINAL_WIDTH / 8 + 1];
+
   int prev_room = room_view;
+  static bool show_coordinates = false;
 
   if (was_key_pressed (ALLEGRO_KEY_H, true))
     room_view = level->link[room_view].l;
@@ -109,6 +113,9 @@ level_anim (void)
 
   if (was_key_pressed (ALLEGRO_KEY_B, true))
     no_room_drawing = ! no_room_drawing;
+
+  if (was_key_pressed (ALLEGRO_KEY_C, true))
+    show_coordinates = ! show_coordinates;
 
   if (room_view == 0) room_view = prev_room;
 
@@ -146,4 +153,25 @@ level_anim (void)
 
   unpress_opener_floors ();
   unpress_closer_floors ();
+
+  if (show_coordinates) {
+    int s = room_view;
+    int l = roomd (room_view, LEFT);
+    int r = roomd (room_view, RIGHT);
+    int a = roomd (room_view, ABOVE);
+    int b = roomd (room_view, BELOW);
+    int al = roomd (a, LEFT);
+    int ar = roomd (a, RIGHT);
+    int bl = roomd (b, LEFT);
+    int br = roomd (b, RIGHT);
+
+    al_draw_filled_rectangle (0, ORIGINAL_HEIGHT - 8,
+                              ORIGINAL_WIDTH, ORIGINAL_HEIGHT,
+                              al_map_rgba (0, 0, 0, 192));
+    sprintf (bottom_message, "S%i L%i R%i A%i B%i AL%i AR%i BL%i BR%i",
+             s, l, r, a, b, al, ar, bl, br);
+    draw_text (screen, bottom_message,
+               ORIGINAL_WIDTH / 2.0, ORIGINAL_HEIGHT - 7,
+               ALLEGRO_ALIGN_CENTRE);
+  }
 }
