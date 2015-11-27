@@ -19,7 +19,7 @@ CFLAGS = ${CFLAGS_DEV}
 CPPFLAGS = -I$(shell pwd)
 
 prince : ${OBJECTS} .depend
-	${CC} ${CPPFLAGS} ${CFLAGS} ${LDFLAGS} ${OBJECTS} -o $@
+	${CC} ${OBJECTS} -o $@ ${CPPFLAGS} ${CFLAGS} ${LDFLAGS}
 
 .depend: ${SRCS}
 	rm -f .depend
