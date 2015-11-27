@@ -204,7 +204,7 @@ draw_room_bg (void)
   struct pos p;
   p.room = current_room;
 
-  clear_bitmap (room_bg, BLACK);
+  clear_bitmap (room_bg, TRANSPARENT);
 
   for (p.floor = FLOORS; p.floor >= -1; p.floor--)
     for (p.place = -1; p.place < PLACES; p.place++)
@@ -214,8 +214,8 @@ draw_room_bg (void)
 void
 draw_con (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
-  draw_confg (bitmap, p);
   draw_conbg (bitmap, p);
+  draw_confg (bitmap, p);
 }
 
 void
@@ -338,33 +338,43 @@ draw_no_floor (ALLEGRO_BITMAP *bitmap, struct pos p)
 void
 draw_bricks_01 (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
-  draw_bitmapc (bricks_01, bitmap, bricks_coord (p) , 0);
+  draw_bitmapc (bricks_01, bitmap, bricks_coord_12 (p) , 0);
 }
 
 void
 draw_bricks_02 (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
-  draw_bitmapc (bricks_02, bitmap, bricks_coord (p) , 0);
+  draw_bitmapc (bricks_02, bitmap, bricks_coord_12 (p) , 0);
 }
 
 void
 draw_bricks_03 (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
-  draw_bitmapc (bricks_03, bitmap, bricks_coord (p) , 0);
+  draw_bitmapc (bricks_03, bitmap, bricks_coord_34 (p) , 0);
 }
 
 void
 draw_bricks_04 (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
-  draw_bitmapc (bricks_04, bitmap, bricks_coord (p) , 0);
+  draw_bitmapc (bricks_04, bitmap, bricks_coord_34 (p) , 0);
 }
 
 struct coord
-bricks_coord (struct pos p)
+bricks_coord_12 (struct pos p)
 {
   struct coord c;
   c.x = PLACE_WIDTH * (p.place + 1);
   c.y = PLACE_HEIGHT * p.floor + 15;
+  c.room = p.room;
+  return c;
+}
+
+struct coord
+bricks_coord_34 (struct pos p)
+{
+  struct coord c;
+  c.x = PLACE_WIDTH * (p.place + 1);
+  c.y = PLACE_HEIGHT * p.floor + 12;
   c.room = p.room;
   return c;
 }
@@ -396,7 +406,7 @@ window_coord (struct pos p)
 {
   struct coord c;
   c.x = PLACE_WIDTH * (p.place + 1);
-  c.y = PLACE_HEIGHT * p.floor + 5;
+  c.y = PLACE_HEIGHT * p.floor - 13;
   c.room = p.room;
   return c;
 }

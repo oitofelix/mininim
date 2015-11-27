@@ -24,6 +24,7 @@
 #include "kernel/keyboard.h"
 #include "levels/title.h"
 #include "levels/level-1.h"
+#include "levels/consistency-level.h"
 
 /* current video mode */
 enum video_mode video_mode = VGA;
@@ -42,7 +43,8 @@ main (int argc, char **argv)
   clear_bitmap (screen, BLACK);
 
   /* play_title (); */
-  play_level_1 ();
+  /* play_level_1 (); */
+  play_consistency_level ();
 
   finalize_video ();
   finalize_audio ();

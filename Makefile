@@ -2,7 +2,7 @@ KERNEL_MODULES = event timer video audio memory keyboard random array
 ENGINE_MODULES = anim pos physics level stars floor loose-floor			\
   opener-floor closer-floor spikes-floor door pillar wall room fire	\
   potion sword clock kid princess jaffar
-LEVEL_MODULES = title level-1
+LEVEL_MODULES = title level-1 consistency-level
 MAIN_MODULES = prince
 
 MODULES = ${KERNEL_MODULES:%=kernel/%} ${ENGINE_MODULES:%=engine/%}	\

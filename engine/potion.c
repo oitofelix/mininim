@@ -130,8 +130,7 @@ draw_potion (ALLEGRO_BITMAP *bitmap, struct pos p, int i)
 bool
 is_potion (struct pos p)
 {
-  return con (p).fg != OPENER_FLOOR
-    && con (p).fg != CLOSER_FLOOR
+  return con (p).fg == FLOOR
     && (con (p).ext.item == SMALL_LIFE_POTION
         || con (p).ext.item == BIG_LIFE_POTION);
 }

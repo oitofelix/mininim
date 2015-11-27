@@ -170,6 +170,7 @@ open_door (int e)
 {
   do {
     struct door *d = door_at_pos (level->event[e].p);
+    if (! d) continue;
     d->action = OPEN_DOOR;
     d->wait = DOOR_WAIT;
   } while (level->event[e++].next);
@@ -180,6 +181,7 @@ close_door (int e)
 {
   do {
     struct door *d = door_at_pos (level->event[e].p);
+    if (! d) continue;
     d->action = ABRUPTLY_CLOSE_DOOR;
   } while (level->event[e++].next);
 }

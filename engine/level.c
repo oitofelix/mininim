@@ -144,12 +144,13 @@ level_anim (void)
   p.room = room_view;
 
   clear_bitmap (screen, BLACK);
-  if (! no_room_drawing) draw_room (room_view);
 
   for (p.floor = FLOORS; p.floor >= -1; p.floor--)
     for (p.place = -1; p.place < PLACES; p.place++) {
       draw_fire (screen, p, i);
     }
+
+  if (! no_room_drawing) draw_room (room_view);
 
   if (! no_room_drawing)
     for (p.floor = FLOORS; p.floor >= -1; p.floor--)
