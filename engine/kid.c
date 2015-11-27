@@ -60,6 +60,7 @@ static struct pos item_pos = {.room = -1};
 #define FALL_FRAMESET_NMEMB 13
 #define DRINK_FRAMESET_NMEMB 15
 #define RAISE_SWORD_FRAMESET_NMEMB 4
+#define KEEP_SWORD_FRAMESET_NMEMB 10
 
 static struct frameset walk_frameset[WALK_FRAMESET_NMEMB];
 static struct frameset start_run_frameset[START_RUN_FRAMESET_NMEMB];
@@ -78,6 +79,7 @@ static struct frameset couch_frameset[COUCH_FRAMESET_NMEMB];
 static struct frameset fall_frameset[FALL_FRAMESET_NMEMB];
 static struct frameset drink_frameset[DRINK_FRAMESET_NMEMB];
 static struct frameset raise_sword_frameset[RAISE_SWORD_FRAMESET_NMEMB];
+static struct frameset keep_sword_frameset[KEEP_SWORD_FRAMESET_NMEMB];
 
 static void init_walk_frameset (void);
 static void init_start_run_frameset (void);
@@ -96,6 +98,7 @@ static void init_couch_frameset (void);
 static void init_fall_frameset (void);
 static void init_drink_frameset (void);
 static void init_raise_sword_frameset (void);
+static void init_keep_sword_frameset (void);
 
 ALLEGRO_BITMAP *kid_normal_00,
   *kid_start_run_01, *kid_start_run_02, *kid_start_run_03, *kid_start_run_04,
@@ -138,7 +141,10 @@ ALLEGRO_BITMAP *kid_normal_00,
   *kid_drink_01, *kid_drink_02, *kid_drink_03, *kid_drink_04, *kid_drink_05,
   *kid_drink_06, *kid_drink_07, *kid_drink_08, *kid_drink_09, *kid_drink_10,
   *kid_drink_11, *kid_drink_12, *kid_drink_13, *kid_drink_14, *kid_drink_15,
-  *kid_raise_sword_01, *kid_raise_sword_02, *kid_raise_sword_03, *kid_raise_sword_04;
+  *kid_raise_sword_01, *kid_raise_sword_02, *kid_raise_sword_03, *kid_raise_sword_04,
+  *kid_keep_sword_01, *kid_keep_sword_02, *kid_keep_sword_03, *kid_keep_sword_04,
+  *kid_keep_sword_05, *kid_keep_sword_06, *kid_keep_sword_07, *kid_keep_sword_08,
+  *kid_keep_sword_09, *kid_keep_sword_10;
 
 ALLEGRO_SAMPLE *step, *hit_ground, *hit_wall, *hang_on_fall, *drink, *glory;
 
@@ -167,6 +173,7 @@ static void kid_couch_collision (void);
 static void kid_fall (void);
 static void kid_drink (void);
 static void kid_raise_sword (void);
+static void kid_keep_sword (void);
 
 void
 load_kid (void)
@@ -333,6 +340,16 @@ load_kid (void)
   kid_raise_sword_02 = load_bitmap (KID_RAISE_SWORD_02);
   kid_raise_sword_03 = load_bitmap (KID_RAISE_SWORD_03);
   kid_raise_sword_04 = load_bitmap (KID_RAISE_SWORD_04);
+  kid_keep_sword_01 = load_bitmap (KID_KEEP_SWORD_01);
+  kid_keep_sword_02 = load_bitmap (KID_KEEP_SWORD_02);
+  kid_keep_sword_03 = load_bitmap (KID_KEEP_SWORD_03);
+  kid_keep_sword_04 = load_bitmap (KID_KEEP_SWORD_04);
+  kid_keep_sword_05 = load_bitmap (KID_KEEP_SWORD_05);
+  kid_keep_sword_06 = load_bitmap (KID_KEEP_SWORD_06);
+  kid_keep_sword_07 = load_bitmap (KID_KEEP_SWORD_07);
+  kid_keep_sword_08 = load_bitmap (KID_KEEP_SWORD_08);
+  kid_keep_sword_09 = load_bitmap (KID_KEEP_SWORD_09);
+  kid_keep_sword_10 = load_bitmap (KID_KEEP_SWORD_10);
 
   /* sound */
   step = load_sample (STEP);
@@ -360,6 +377,7 @@ load_kid (void)
   init_fall_frameset ();
   init_drink_frameset ();
   init_raise_sword_frameset ();
+  init_keep_sword_frameset ();
 
   /* kid himself */
   kid.id = &kid;
@@ -536,6 +554,16 @@ unload_kid (void)
   al_destroy_bitmap (kid_raise_sword_02);
   al_destroy_bitmap (kid_raise_sword_03);
   al_destroy_bitmap (kid_raise_sword_04);
+  al_destroy_bitmap (kid_keep_sword_01);
+  al_destroy_bitmap (kid_keep_sword_02);
+  al_destroy_bitmap (kid_keep_sword_03);
+  al_destroy_bitmap (kid_keep_sword_04);
+  al_destroy_bitmap (kid_keep_sword_05);
+  al_destroy_bitmap (kid_keep_sword_06);
+  al_destroy_bitmap (kid_keep_sword_07);
+  al_destroy_bitmap (kid_keep_sword_08);
+  al_destroy_bitmap (kid_keep_sword_09);
+  al_destroy_bitmap (kid_keep_sword_10);
 
   /* sounds */
   al_destroy_sample (step);
@@ -775,6 +803,18 @@ init_raise_sword_frameset (void)
           RAISE_SWORD_FRAMESET_NMEMB * sizeof (struct frameset));
 }
 
+void
+init_keep_sword_frameset (void)
+{
+  struct frameset frameset[KEEP_SWORD_FRAMESET_NMEMB] =
+    {{kid_keep_sword_01,+2,0},{kid_keep_sword_02,-2,0},{kid_keep_sword_03,+0,0},
+     {kid_keep_sword_04,+1,0},{kid_keep_sword_05,-6,0},{kid_keep_sword_06,+2,0},
+     {kid_keep_sword_07,+3,0},{kid_keep_sword_08,+0,0},{kid_keep_sword_09,+3,0},
+     {kid_keep_sword_10,+0,0}};
+
+  memcpy (&keep_sword_frameset, &frameset,
+          KEEP_SWORD_FRAMESET_NMEMB * sizeof (struct frameset));
+}
 
 
 
@@ -1180,6 +1220,8 @@ kid_turn (void)
 
   static int i = 0;
   if (oaction != kid_turn) i = 0;
+
+  if (kid.frame == keep_sword_frameset[9].frame) i = 3;
 
   ALLEGRO_BITMAP *frame = turn_frameset[i].frame;
   int dx = turn_frameset[i].dx;
@@ -2190,19 +2232,60 @@ kid_raise_sword (void)
     play_sample (glory);
   }
 
-  /* consume bottle */
+  /* consume sword */
   if (i == 0) set_conitem (item_pos, NO_ITEM);
 
   /* next frame */
   if (i == 0 && wait > 0) wait--;
   else if (i < 3) i++;
   else {
-    kid.action = kid_normal;
+    kid.action = kid_keep_sword;
     i = 0, wait = 5;
     item_pos.room = -1;
   }
 }
 
+void
+kid_keep_sword (void)
+{
+  void (*oaction) (void) = kid.action;
+  kid.action = kid_keep_sword;
+  kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
+
+  static int i = 0, wait = 1, j = 0;
+  if (oaction != kid_keep_sword) i = 0, wait = 1;
+
+  j = 24 + i;
+
+  ALLEGRO_BITMAP *frame = keep_sword_frameset[i].frame;
+  int dx = keep_sword_frameset[i].dx;
+  int dy = keep_sword_frameset[i].dy;
+
+  if (i == 8 && wait < 1) dx = 0;
+  if (i == 9 && wait < 2) dx = 0;
+
+  kid = next_anim (kid, frame, dx, dy);
+  if (i < 4) {
+    kid.xframe = sword_frameset[j].frame;
+    kid.xdx = sword_frameset[j].dx;
+    kid.xdy = sword_frameset[j].dy;
+  }
+
+  /* depressible floors */
+  keep_depressible_floor (&kid);
+
+  /* next frame */
+  if (i < 8) i++;
+  else if (i == 8 && wait > 0) wait--;
+  else if (i == 8 && wait == 0) i++, wait = 2;
+  else if (i == 9 && wait > 0) wait--;
+  else {
+    kid.action = kid_turn;
+    /* kid turn will invert kid's direction */
+    kid.dir = (kid.dir == RIGHT) ? LEFT : RIGHT;
+    i = 0, wait = 1;
+  }
+}
 
 
 

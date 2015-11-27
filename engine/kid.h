@@ -182,6 +182,16 @@
 #define KID_RAISE_SWORD_02 "dat/kid/got sword/frame02.png"
 #define KID_RAISE_SWORD_03 "dat/kid/got sword/frame03.png"
 #define KID_RAISE_SWORD_04 "dat/kid/got sword/frame04.png"
+#define KID_KEEP_SWORD_01 "dat/kid/got sword/frame05.png"
+#define KID_KEEP_SWORD_02 "dat/kid/got sword/frame06.png"
+#define KID_KEEP_SWORD_03 "dat/kid/got sword/frame07.png"
+#define KID_KEEP_SWORD_04 "dat/kid/got sword/frame08.png"
+#define KID_KEEP_SWORD_05 "dat/kid/putting down sword/frame01.png"
+#define KID_KEEP_SWORD_06 "dat/kid/putting down sword/frame02.png"
+#define KID_KEEP_SWORD_07 "dat/kid/putting down sword/frame03.png"
+#define KID_KEEP_SWORD_08 "dat/kid/putting down sword/frame04.png"
+#define KID_KEEP_SWORD_09 "dat/kid/putting down sword/frame05.png"
+#define KID_KEEP_SWORD_10 "dat/kid/putting down sword/frame06.png"
 
 /* sound resources */
 #define STEP "dat/digisnd1/running 2.ogg"
