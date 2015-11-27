@@ -50,6 +50,7 @@ void break_closer_floor (struct pos p);
 void unpress_closer_floors (void);
 void compute_closer_floors (void);
 void draw_closer_floor (ALLEGRO_BITMAP *bitmap, struct pos p);
+void draw_closer_floor_base (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_closer_floor_left (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_closer_floor_right (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_pressed_closer_floor_base (ALLEGRO_BITMAP *bitmap, struct pos p);

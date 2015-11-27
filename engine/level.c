@@ -35,6 +35,7 @@
 #include "closer-floor.h"
 #include "spikes-floor.h"
 #include "door.h"
+#include "consistency.h"
 #include "level.h"
 
 /* functions */
@@ -55,6 +56,7 @@ play_level (struct level *_level)
   cutscene = false;
 
   level = _level;
+  fix_level ();
   load_level ();
 
   register_cons ();
@@ -70,7 +72,7 @@ register_cons (void)
   for (p.room = 0; p.room < ROOMS; p.room++)
     for (p.floor = 0; p.floor < FLOORS; p.floor++)
       for (p.place = 0; p.place < PLACES; p.place++)
-        switch (con (p).fg) {
+        switch (con (p)->fg) {
         case LOOSE_FLOOR: register_loose_floor (p); break;
         case OPENER_FLOOR: register_opener_floor (p); break;
         case CLOSER_FLOOR: register_closer_floor (p); break;

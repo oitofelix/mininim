@@ -205,9 +205,15 @@ draw_door (ALLEGRO_BITMAP *bitmap, struct pos p)
 }
 
 void
-draw_door_frame (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_door_base (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
   draw_bitmapc (normal_floor_base, bitmap, floor_base_coord (p), 0);
+}
+
+void
+draw_door_frame (ALLEGRO_BITMAP *bitmap, struct pos p)
+{
+  draw_door_base (bitmap, p);
   draw_bitmapc (door_left, bitmap, door_left_coord (p), 0);
   draw_bitmapc (door_right, bitmap, door_right_coord (p), 0);
   draw_bitmapc (door_top, bitmap, door_top_coord (p), 0);
@@ -216,21 +222,21 @@ draw_door_frame (ALLEGRO_BITMAP *bitmap, struct pos p)
 void
 draw_door_frame_left (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
-  draw_bitmapc (normal_floor_base, bitmap, floor_base_coord (p), 0);
+  draw_door_base (bitmap, p);
   draw_bitmapc (door_left, bitmap, door_left_coord (p), 0);
 }
 
 void
 draw_door_frame_right (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
-  draw_bitmapc (normal_floor_base, bitmap, floor_base_coord (p), 0);
+  draw_door_base (bitmap, p);
   draw_bitmapc (door_right, bitmap, door_right_coord (p), 0);
 }
 
 void
 draw_door_fg (ALLEGRO_BITMAP *bitmap, struct pos p, struct anim a)
 {
-  draw_bitmapc (normal_floor_base, bitmap, floor_base_coord (p), 0);
+  draw_door_base (bitmap, p);
   draw_bitmapc (door_pole, screen, door_pole_coord (p), 0);
 
   if (is_kid_hanging_at_pos (a, p)) return;

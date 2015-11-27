@@ -34,33 +34,19 @@
 struct pos hang_pos;
 enum confg confg_collision;
 
-struct con
+struct con *
 con (struct pos p)
 {
   p = npos (p);
-  return level->con[p.room][p.floor][p.place];
+  return &level->con[p.room][p.floor][p.place];
 }
 
-struct con
+struct con *
 crel (struct pos p, int floor, int place)
 {
   p.floor += floor;
   p.place += place;
   return con (p);
-}
-
-void
-set_confg (struct pos p, enum confg fg)
-{
-  p = npos (p);
-  level->con[p.room][p.floor][p.place].fg = fg;
-}
-
-void
-set_conitem (struct pos p, enum item i)
-{
-  p = npos (p);
-  level->con[p.room][p.floor][p.place].ext.item = i;
 }
 
 bool
@@ -138,15 +124,15 @@ is_colliding (struct anim a,
 
   struct coord c = coord_func (a);
   struct pos p = pos_func (c);
-  enum confg ct = con (p).fg;
+  enum confg ct = con (p)->fg;
 
-  bool wall_collision = (crel (p, 0, dir).fg == WALL);
+  bool wall_collision = (crel (p, 0, dir)->fg == WALL);
   bool door_collision =
     (a.dir == RIGHT
      && ct == DOOR
      && c.y <= door_grid_tip_y (p) - 10)
     || (a.dir == LEFT
-        && crel (p, 0, -1).fg == DOOR
+        && crel (p, 0, -1)->fg == DOOR
         && c.y <=
         door_grid_tip_y (prel (p, 0, -1)) - 10);
 
@@ -169,7 +155,7 @@ is_on_con (struct anim a,
   int dir = (a.dir == LEFT) ? r * -1: r * +1;
 
   return dn <= min_dist
-    && crel (pos_func (coord_func (a)), 0, dir).fg == ct;
+    && crel (pos_func (coord_func (a)), 0, dir)->fg == ct;
 }
 
 int
@@ -226,12 +212,13 @@ bool
 is_hangable_pos (struct pos p, enum dir d)
 {
   int dir = (d == LEFT) ? -1 : +1;
-  enum confg fg = crel (p, -1, dir).fg;
+  enum confg fg = crel (p, -1, dir)->fg;
 
   return (fg == FLOOR || fg == BROKEN_FLOOR || fg == LOOSE_FLOOR
+          || fg == SKELETON_FLOOR || fg == SPIKES_FLOOR
           || fg == OPENER_FLOOR || fg == CLOSER_FLOOR
           || fg == PILLAR || fg == DOOR)
-    && crel (p, -1, 0).fg == NO_FLOOR;
+    && crel (p, -1, 0)->fg == NO_FLOOR;
 }
 
 bool
@@ -295,14 +282,14 @@ update_depressible_floor (struct anim *a, int dx0, int dx1)
   press_depressible_floor (p1);
   a->df_pos[1] = p1;
 
-  if (con (p0).fg != OPENER_FLOOR
-      && con (p0).fg != CLOSER_FLOOR
-      && con (p0).fg != LOOSE_FLOOR)
+  if (con (p0)->fg != OPENER_FLOOR
+      && con (p0)->fg != CLOSER_FLOOR
+      && con (p0)->fg != LOOSE_FLOOR)
     a->df_pos[0].room = -1;
 
-  if (con (p1).fg != OPENER_FLOOR
-      && con (p1).fg != CLOSER_FLOOR
-      && con (p1).fg != LOOSE_FLOOR)
+  if (con (p1)->fg != OPENER_FLOOR
+      && con (p1)->fg != CLOSER_FLOOR
+      && con (p1)->fg != LOOSE_FLOOR)
     a->df_pos[1].room = -1;
 }
 
@@ -340,7 +327,7 @@ restore_depressible_floor (struct anim *a)
 void
 press_depressible_floor (struct pos p)
 {
-  switch (con (p).fg) {
+  switch (con (p)->fg) {
   case OPENER_FLOOR: press_opener_floor (p); break;
   case CLOSER_FLOOR: press_closer_floor (p); break;
   case LOOSE_FLOOR: release_loose_floor (p); break;

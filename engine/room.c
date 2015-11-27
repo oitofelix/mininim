@@ -221,7 +221,7 @@ draw_con (ALLEGRO_BITMAP *bitmap, struct pos p)
 void
 draw_confg (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
-  switch (con (p).fg) {
+  switch (con (p)->fg) {
   case NO_FLOOR: break;
   case FLOOR: draw_floor (bitmap, p); break;
   case BROKEN_FLOOR: draw_broken_floor (bitmap, p); break;
@@ -235,14 +235,19 @@ draw_confg (ALLEGRO_BITMAP *bitmap, struct pos p)
   case DOOR: draw_door_frame (bitmap, p); break;
   default:
     error (-1, 0, "%s: unknown foreground (%i)",
-           __func__, con (p).fg);
+           __func__, con (p)->fg);
   }
 }
 
 void
 draw_conbg (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
-  switch (con (p).bg) {
+  enum confg fg = con (p)->fg;
+
+  /* consistency: wall and pillars can't have background */
+  if (fg == WALL || fg == PILLAR || fg == DOOR) return;
+
+  switch (con (p)->bg) {
   case NO_BG: break;
   case BRICKS_01: draw_bricks_01 (bitmap, p); break;
   case BRICKS_02: draw_bricks_02 (bitmap, p); break;
@@ -252,14 +257,14 @@ draw_conbg (ALLEGRO_BITMAP *bitmap, struct pos p)
   case WINDOW: draw_window (bitmap, p); break;
   default:
     error (-1, 0, "%s: unknown background (%i)",
-           __func__, con (p).bg);
+           __func__, con (p)->bg);
   }
 }
 
 void
 draw_con_left (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
-  switch (con (p).fg) {
+  switch (con (p)->fg) {
   case NO_FLOOR: break;
   case FLOOR: draw_floor_left (bitmap, p); break;
   case BROKEN_FLOOR: draw_broken_floor_left (bitmap, p); break;
@@ -273,14 +278,14 @@ draw_con_left (ALLEGRO_BITMAP *bitmap, struct pos p)
   case DOOR: draw_door_frame_left (bitmap, p); break;
   default:
     error (-1, 0, "%s: unknown foreground (%i)",
-           __func__, con (p).fg);
+           __func__, con (p)->fg);
   }
 }
 
 void
 draw_con_right (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
-  switch (con (p).fg) {
+  switch (con (p)->fg) {
   case NO_FLOOR: break;
   case FLOOR: draw_floor_right (bitmap, p); break;
   case BROKEN_FLOOR: draw_broken_floor_right (bitmap, p); break;
@@ -294,7 +299,28 @@ draw_con_right (ALLEGRO_BITMAP *bitmap, struct pos p)
   case DOOR: draw_door_frame_right (bitmap, p); break;
   default:
     error (-1, 0, "%s: unknown foreground (%i)",
-           __func__, con (p).fg);
+           __func__, con (p)->fg);
+  }
+}
+
+void
+draw_con_base (ALLEGRO_BITMAP *bitmap, struct pos p)
+{
+  switch (con (p)->fg) {
+  case NO_FLOOR: break;
+  case FLOOR: draw_floor_base (bitmap, p); break;
+  case BROKEN_FLOOR: draw_broken_floor_base (bitmap, p); break;
+  case SKELETON_FLOOR: draw_skeleton_floor_base (bitmap, p); break;
+  case LOOSE_FLOOR: draw_loose_floor_base (bitmap, p); break;
+  case SPIKES_FLOOR: draw_spikes_floor_base (bitmap, p); break;
+  case OPENER_FLOOR: draw_opener_floor_base (bitmap, p); break;
+  case CLOSER_FLOOR: draw_closer_floor_base (bitmap, p); break;
+  case PILLAR: draw_pillar_base (bitmap, p); break;
+  case WALL: draw_wall_base (bitmap, p); break;
+  case DOOR: draw_door_base (bitmap, p); break;
+  default:
+    error (-1, 0, "%s: unknown foreground (%i)",
+           __func__, con (p)->fg);
   }
 }
 
@@ -406,7 +432,7 @@ window_coord (struct pos p)
 {
   struct coord c;
   c.x = PLACE_WIDTH * (p.place + 1);
-  c.y = PLACE_HEIGHT * p.floor - 13;
+  c.y = PLACE_HEIGHT * p.floor - 12;
   c.room = p.room;
   return c;
 }
@@ -453,7 +479,7 @@ draw_room_fg (struct anim a, struct pos p)
   if ((peq (p, prel (s.ptl, 0, +1))
        || peq (p, prel (s.pm, 0, +1)))
       && is_kid_fall (a))
-    switch (con (p).fg) {
+    switch (con (p)->fg) {
     case NO_FLOOR: break;
     case FLOOR: draw_floor (screen, p); break;
     case BROKEN_FLOOR: draw_broken_floor (screen, p); break;
@@ -470,18 +496,18 @@ draw_room_fg (struct anim a, struct pos p)
     case DOOR: draw_door_frame_left (screen, p); break;
     default:
       error (-1, 0, "%s: unknown foreground construct type (%i)",
-             __func__, con (p).fg);
+             __func__, con (p)->fg);
     }
   /* when climbing the construct */
   else if (peq (s.ptf, p)
            && is_kid_climb (a)
            && a.dir == RIGHT) {
-    if (con (p).fg == PILLAR)
+    if (con (p)->fg == PILLAR)
       draw_pillar_fg (screen, p);
-    else if (con (p).fg == BROKEN_FLOOR)
+    else if (con (p)->fg == BROKEN_FLOOR)
       draw_broken_floor_fg (screen, p);
     else {
-      draw_floor_base (screen, p);
+      draw_con_base (screen, p);
       if (kid.frame == kid_climb_03
           || kid.frame == kid_climb_09
           || kid.frame == kid_climb_10)
@@ -505,7 +531,7 @@ draw_room_fg (struct anim a, struct pos p)
                  || peq (p, prel (s.pmbo, -1, 0)))
              && ! (is_kid_hang_or_climb (a) && a.dir == LEFT)
              && floor_left_coord (p).y <= s.tl.y) {
-    switch (con (p).fg) {
+    switch (con (p)->fg) {
     case NO_FLOOR: break;
     case FLOOR: draw_floor (screen, p); break;
     case BROKEN_FLOOR: draw_broken_floor (screen, p); break;
@@ -525,18 +551,18 @@ draw_room_fg (struct anim a, struct pos p)
     case DOOR: draw_door_frame (screen, p); break;
     default:
       error (-1, 0, "%s: unknown foreground construct type (%i)",
-             __func__, con (p).fg);
+             __func__, con (p)->fg);
     }
   }
   /* other cases */
-  else if (con (p).fg == BROKEN_FLOOR)
+  else if (con (p)->fg == BROKEN_FLOOR)
     draw_broken_floor_fg (screen, p);
-  else if (con (p).fg == SPIKES_FLOOR)
+  else if (con (p)->fg == SPIKES_FLOOR)
     draw_spikes_fg (screen, p);
-  else if (con (p).fg == PILLAR)
+  else if (con (p)->fg == PILLAR)
     draw_pillar_fg (screen, p);
-  else if (con (p).fg == WALL)
+  else if (con (p)->fg == WALL)
     draw_wall_fg (screen, p);
-  else if (con (p).fg == DOOR)
+  else if (con (p)->fg == DOOR)
     draw_door_fg (screen, p, a);
 }

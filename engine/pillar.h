@@ -32,6 +32,7 @@ extern ALLEGRO_BITMAP *pillar_left, *pillar_right, *pillar_top, *pillar;
 void load_vdungeon_pillar (void);
 void unload_pillar (void);
 void draw_pillar (ALLEGRO_BITMAP *bitmap, struct pos pos);
+void draw_pillar_base (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_pillar_left (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_pillar_right (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_pillar_fg (ALLEGRO_BITMAP *bitmap, struct pos pos);

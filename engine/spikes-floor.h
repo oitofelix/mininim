@@ -64,6 +64,7 @@ void compute_spikes_floors (void);
 bool should_spikes_raise_for_pos (struct pos p, struct pos pk);
 bool should_spikes_raise (struct pos p);
 void draw_spikes_floor (ALLEGRO_BITMAP *bitmap, struct pos p);
+void draw_spikes_floor_base (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_spikes_floor_left (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_spikes_floor_right (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_spikes_floor_floor (ALLEGRO_BITMAP *bitmap, struct pos p);

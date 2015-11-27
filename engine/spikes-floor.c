@@ -165,9 +165,12 @@ compute_spikes_floors (void)
 bool
 should_spikes_raise_for_pos (struct pos p, struct pos pk)
 {
-  return peq (pk, p) || peq (pk, prel (p, -1, 0))
+  return peq (pk, p)
+    || (peq (pk, prel (p, -1, 0))
+        && crel (p, -1, 0)->fg == NO_FLOOR)
     || (peq (pk, prel (p, -2, 0))
-        && crel (p, -1, 0).fg != WALL);
+        && crel (p, -1, 0)->fg == NO_FLOOR
+        && crel (p, -2, 0)->fg == NO_FLOOR);
 }
 
 bool
@@ -188,6 +191,15 @@ draw_spikes_floor (ALLEGRO_BITMAP *bitmap, struct pos p)
 
   draw_spikes_floor_floor (bitmap, p);
   draw_spikes (bitmap, p, s);
+}
+
+void
+draw_spikes_floor_base (ALLEGRO_BITMAP *bitmap, struct pos p)
+{
+  struct spikes_floor *s = spikes_floor_at_pos (p);
+  if (! s) return;
+
+  draw_floor_base (bitmap, p);
 }
 
 void

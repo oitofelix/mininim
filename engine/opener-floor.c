@@ -68,7 +68,7 @@ register_opener_floor (struct pos p)
   struct opener_floor o;
 
   o.p = p;
-  o.event = con (p).ext.event;
+  o.event = con (p)->ext.event;
   o.pressed = false;
   o.noise = false;
   o.broken = false;
@@ -144,6 +144,17 @@ draw_opener_floor (ALLEGRO_BITMAP *bitmap, struct pos p)
 }
 
 void
+draw_opener_floor_base (ALLEGRO_BITMAP *bitmap, struct pos p)
+{
+  struct opener_floor *o = opener_floor_at_pos (p);
+  if (! o) return;
+
+  if (o->broken) return;
+  if (o->pressed) draw_pressed_opener_floor_base (bitmap, p);
+  else draw_unpressed_opener_floor_base (bitmap, p);
+}
+
+void
 draw_opener_floor_left (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
   struct opener_floor *o = opener_floor_at_pos (p);
@@ -171,6 +182,13 @@ draw_pressed_opener_floor (ALLEGRO_BITMAP *bitmap, struct pos p)
   if (bitmap == room_bg) return;
   draw_floor (bitmap, p);
   draw_con_left (bitmap, prel (p, 0, +1));
+}
+
+void
+draw_pressed_opener_floor_base (ALLEGRO_BITMAP *bitmap, struct pos p)
+{
+  if (bitmap == room_bg) return;
+  draw_floor_base (bitmap, p);
 }
 
 void

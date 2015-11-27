@@ -97,7 +97,7 @@ draw_potion (ALLEGRO_BITMAP *bitmap, struct pos p, int i)
   palette bubble_palette;
 
   seedp (p);
-  enum item item = con (p).ext.item;
+  enum item item = con (p)->ext.item;
   switch (item) {
   case SMALL_LIFE_POTION:
     bottle = small_potion;
@@ -130,9 +130,9 @@ draw_potion (ALLEGRO_BITMAP *bitmap, struct pos p, int i)
 bool
 is_potion (struct pos p)
 {
-  return con (p).fg == FLOOR
-    && (con (p).ext.item == SMALL_LIFE_POTION
-        || con (p).ext.item == BIG_LIFE_POTION);
+  return con (p)->fg == FLOOR
+    && (con (p)->ext.item == SMALL_LIFE_POTION
+        || con (p)->ext.item == BIG_LIFE_POTION);
 }
 
 struct coord

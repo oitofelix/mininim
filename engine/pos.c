@@ -485,23 +485,23 @@ survey (struct anim a, struct pos (*pf) (struct coord c))
   s.pbf = pf (s.bf);
   s.pbb = pf (s.bb);
 
-  s.cm = con (s.pm).fg;
-  s.cmt = con (s.pmt).fg;
-  s.cmbo = con (s.pmbo).fg;
-  s.cml = con (s.pml).fg;
-  s.cmr = con (s.pmr).fg;
-  s.cmf = con (s.pmf).fg;
-  s.cmba = con (s.pmba).fg;
+  s.cm = con (s.pm)->fg;
+  s.cmt = con (s.pmt)->fg;
+  s.cmbo = con (s.pmbo)->fg;
+  s.cml = con (s.pml)->fg;
+  s.cmr = con (s.pmr)->fg;
+  s.cmf = con (s.pmf)->fg;
+  s.cmba = con (s.pmba)->fg;
 
-  s.ctl = con (s.ptl).fg;
-  s.ctr = con (s.ptr).fg;
-  s.ctf = con (s.ptf).fg;
-  s.ctb = con (s.ptb).fg;
+  s.ctl = con (s.ptl)->fg;
+  s.ctr = con (s.ptr)->fg;
+  s.ctf = con (s.ptf)->fg;
+  s.ctb = con (s.ptb)->fg;
 
-  s.cbl = con (s.pbl).fg;
-  s.cbr = con (s.pbr).fg;
-  s.cbf = con (s.pbf).fg;
-  s.cbb = con (s.pbb).fg;
+  s.cbl = con (s.pbl)->fg;
+  s.cbr = con (s.pbr)->fg;
+  s.cbf = con (s.pbf)->fg;
+  s.cbb = con (s.pbb)->fg;
 
   return s;
 }

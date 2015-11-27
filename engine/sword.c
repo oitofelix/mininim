@@ -157,8 +157,8 @@ draw_sword (ALLEGRO_BITMAP *bitmap, struct pos p, int i)
 bool
 is_sword (struct pos p)
 {
-  return con (p).fg == FLOOR
-    && con (p).ext.item == SWORD;
+  return con (p)->fg == FLOOR
+    && con (p)->ext.item == SWORD;
 }
 
 struct coord

@@ -55,16 +55,22 @@ draw_pillar (ALLEGRO_BITMAP *bitmap, struct pos p)
 }
 
 void
-draw_pillar_left (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_pillar_base (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
   draw_bitmapc (normal_floor_base, bitmap, floor_base_coord (p), 0);
+}
+
+void
+draw_pillar_left (ALLEGRO_BITMAP *bitmap, struct pos p)
+{
+  draw_pillar_base (bitmap, p);
   draw_bitmapc (pillar_left, bitmap, pillar_left_coord (p), 0);
 }
 
 void
 draw_pillar_right (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
-  draw_bitmapc (normal_floor_base, bitmap, floor_base_coord (p), 0);
+  draw_pillar_base (bitmap, p);
   draw_bitmapc (pillar_right, bitmap, pillar_right_coord (p), 0);
   draw_con_left (bitmap, prel (p, 0, +1));
 }
@@ -72,7 +78,7 @@ draw_pillar_right (ALLEGRO_BITMAP *bitmap, struct pos p)
 void
 draw_pillar_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
-  draw_bitmapc (normal_floor_base, bitmap, floor_base_coord (p), 0);
+  draw_pillar_base (bitmap, p);
   draw_floor_corner_03 (bitmap, p);
   draw_bitmapc (pillar, screen, pillar_coord (p), 0);
 }

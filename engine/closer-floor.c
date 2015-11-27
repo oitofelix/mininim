@@ -71,7 +71,7 @@ register_closer_floor (struct pos p)
   struct closer_floor c;
 
   c.p = p;
-  c.event = con (p).ext.event;
+  c.event = con (p)->ext.event;
   c.pressed = false;
   c.noise = false;
   c.broken = false;
@@ -148,6 +148,17 @@ draw_closer_floor (ALLEGRO_BITMAP *bitmap, struct pos p)
 }
 
 void
+draw_closer_floor_base (ALLEGRO_BITMAP *bitmap, struct pos p)
+{
+  struct closer_floor *c = closer_floor_at_pos (p);
+  if (! c) return;
+
+  if (c->broken) return;
+  if (c->pressed) draw_pressed_closer_floor_base (bitmap, p);
+  else draw_unpressed_closer_floor_base (bitmap, p);
+}
+
+void
 draw_closer_floor_left (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
   struct closer_floor *c = closer_floor_at_pos (p);
@@ -184,7 +195,7 @@ draw_pressed_closer_floor (ALLEGRO_BITMAP *bitmap, struct pos p)
   draw_bitmapc (normal_floor_left, bitmap, pressed_closer_floor_left_coord (p), 0);
   draw_bitmapc (normal_floor_right, bitmap,
                 pressed_closer_floor_right_coord (p), 0);
-  if (crel (p, 0, +1).fg != NO_FLOOR)
+  if (crel (p, 0, +1)->fg != NO_FLOOR)
     draw_bitmapc (pressed_closer_floor_right, bitmap,
                   floor_right_coord (p), 0);
   draw_con_left (bitmap, prel (p, 0, +1));
@@ -205,7 +216,7 @@ draw_pressed_closer_floor_right (ALLEGRO_BITMAP *bitmap, struct pos p)
   draw_pressed_closer_floor_base (bitmap, p);
   draw_bitmapc (normal_floor_right, bitmap,
                 pressed_closer_floor_right_coord (p), 0);
-  if (crel (p, 0, +1).fg != NO_FLOOR)
+  if (crel (p, 0, +1)->fg != NO_FLOOR)
     draw_bitmapc (pressed_closer_floor_right, bitmap,
                   floor_right_coord (p), 0);
   draw_con_left (bitmap, prel (p, 0, +1));

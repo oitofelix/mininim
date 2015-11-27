@@ -93,6 +93,20 @@ draw_wall (ALLEGRO_BITMAP *bitmap, struct pos p)
 }
 
 void
+draw_wall_base (ALLEGRO_BITMAP *bitmap, struct pos p)
+{
+  switch (wall_correlation (p)) {
+  case SWS: draw_wall_sws_base (bitmap, p); break;
+  case SWW: draw_wall_sww_base (bitmap, p); break;
+  case WWS: draw_wall_wws_base (bitmap, p); break;
+  case WWW: draw_wall_www_base (bitmap, p); break;
+  default:
+    error (-1, 0, "%s: unknown wall correlation (%i, %i. %i)",
+           __func__, p.room, p.floor, p.place);
+  }
+}
+
+void
 draw_wall_left (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
   switch (wall_correlation (p)) {
@@ -124,16 +138,28 @@ draw_wall_sws (ALLEGRO_BITMAP *bitmap, struct pos p)
 }
 
 void
-draw_wall_sws_no_face (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_wall_sws_base (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
   draw_bitmapc (wall_single_base, bitmap, wall_base_coord (p), 0);
+}
+
+void
+draw_wall_sws_no_face (ALLEGRO_BITMAP *bitmap, struct pos p)
+{
+  draw_wall_sws_base (bitmap, p);
   draw_bitmapc (wall_single, bitmap, wall_coord (p), 0);
+}
+
+void
+draw_wall_sww_base (ALLEGRO_BITMAP *bitmap, struct pos p)
+{
+  draw_bitmapc (wall_left_base, bitmap, wall_base_coord (p), 0);
 }
 
 void
 draw_wall_sww (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
-  draw_bitmapc (wall_left_base, bitmap, wall_base_coord (p), 0);
+  draw_wall_sww_base (bitmap, p);
   draw_bitmapc (wall_left, bitmap, wall_coord (p), 0);
 }
 
@@ -146,16 +172,28 @@ draw_wall_wws (ALLEGRO_BITMAP *bitmap, struct pos p)
 }
 
 void
-draw_wall_wws_no_face (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_wall_wws_base (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
   draw_bitmapc (wall_right_base, bitmap, wall_base_coord (p), 0);
+}
+
+void
+draw_wall_wws_no_face (ALLEGRO_BITMAP *bitmap, struct pos p)
+{
+  draw_wall_wws_base (bitmap, p);
   draw_bitmapc (wall_right, bitmap, wall_coord (p), 0);
+}
+
+void
+draw_wall_www_base (ALLEGRO_BITMAP *bitmap, struct pos p)
+{
+  draw_bitmapc (wall_center_base, bitmap, wall_base_coord (p), 0);
 }
 
 void
 draw_wall_www (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
-  draw_bitmapc (wall_center_base, bitmap, wall_base_coord (p), 0);
+  draw_wall_www_base (bitmap, p);
   draw_bitmapc (wall_center, bitmap, wall_coord (p), 0);
 }
 
@@ -208,18 +246,18 @@ wall_face_top_coord (struct pos p)
 enum wall_correlation
 wall_correlation (struct pos p)
 {
-  if (con (p).fg != WALL)
+  if (con (p)->fg != WALL)
     error (-1, 0, "%s: requested wall correlation on non-wall (%i, %i, %i)",
            __func__, p.room, p.floor, p.place);
 
-  if (crel (p, 0, -1).fg != WALL
-      && crel (p, 0, +1).fg != WALL) return SWS;
-  else if (crel (p, 0, -1).fg != WALL
-           && crel (p, 0, +1).fg == WALL) return SWW;
-  else if (crel (p, 0, -1).fg == WALL
-           && crel (p, 0, +1).fg != WALL) return WWS;
-  else if (crel (p, 0, -1).fg == WALL
-           && crel (p, 0, +1).fg == WALL) return WWW;
+  if (crel (p, 0, -1)->fg != WALL
+      && crel (p, 0, +1)->fg != WALL) return SWS;
+  else if (crel (p, 0, -1)->fg != WALL
+           && crel (p, 0, +1)->fg == WALL) return SWW;
+  else if (crel (p, 0, -1)->fg == WALL
+           && crel (p, 0, +1)->fg != WALL) return WWS;
+  else if (crel (p, 0, -1)->fg == WALL
+           && crel (p, 0, +1)->fg == WALL) return WWW;
   else
     error (-1, 0, "%s: unknown wall correlation (%i, %i. %i)",
            __func__, p.room, p.floor, p.place);
