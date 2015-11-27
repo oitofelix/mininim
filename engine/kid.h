@@ -192,6 +192,15 @@
 #define KID_KEEP_SWORD_08 "dat/kid/putting down sword/frame04.png"
 #define KID_KEEP_SWORD_09 "dat/kid/putting down sword/frame05.png"
 #define KID_KEEP_SWORD_10 "dat/kid/putting down sword/frame06.png"
+#define KID_TAKE_SWORD_01 "dat/kid/taking sword out/frame01.png"
+#define KID_TAKE_SWORD_02 "dat/kid/taking sword out/frame02.png"
+#define KID_TAKE_SWORD_03 "dat/kid/taking sword out/frame03.png"
+#define KID_TAKE_SWORD_04 "dat/kid/taking sword out/frame04.png"
+#define KID_SWORD_NORMAL_08 "dat/kid/sword attacking/frame08.png"
+#define KID_SWORD_WALKF_14 "dat/kid/sword attacking/frame14.png"
+#define KID_SWORD_WALKF_15 "dat/kid/sword attacking/frame15.png"
+#define KID_SWORD_WALKB_10 "dat/kid/sword attacking/frame10.png"
+#define KID_SWORD_WALKB_07 "dat/kid/sword attacking/frame07.png"
 
 /* sound resources */
 #define STEP "dat/digisnd1/running 2.ogg"
@@ -200,6 +209,7 @@
 #define HANG_ON_FALL "dat/digisnd1/normal falling.ogg"
 #define DRINK "dat/digisnd3/drinking.ogg"
 #define GLORY "dat/midisnd1/guard death 1.ogg"
+#define TAKE_SWORD "dat/digisnd1/taking out the sword.ogg"
 
 /* functions */
 void load_kid (void);

@@ -129,14 +129,29 @@ void
 draw_xanim (ALLEGRO_BITMAP *bitmap, struct anim a)
 {
   if (! a.xframe) return;
+  draw_bitmapc (a.xframe, bitmap, xanim_coord (a), a.flip);
+}
 
+struct coord
+xanim_coord (struct anim a)
+{
   int w = al_get_bitmap_width (a.xframe);
   struct coord c = coord_tf (a);
   c.x += (kid.dir == LEFT) ? a.xdx : -a.xdx - w + 1;
   c.y += a.xdy;
   c.room = a.c.room;
 
-  draw_bitmapc (a.xframe, bitmap, c, a.flip);
+  return c;
+}
+
+struct anim
+anim_from_xanim (struct anim a)
+{
+  struct anim xa = a;
+  xa.frame = a.xframe;
+  xa.c = xanim_coord (a);
+  xa.xframe = NULL;
+  return xa;
 }
 
 struct anim

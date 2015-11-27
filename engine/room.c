@@ -415,6 +415,22 @@ draw_room_anim_fg (struct anim a)
   draw_room_fg (a, pos (coord_m (a)));
   draw_room_fg (a, pos (coord_tl (a)));
   draw_room_fg (a, pos (coord_tr (a)));
+
+  if (! a.xframe) return;
+
+  struct anim xa = anim_from_xanim (a);
+
+  draw_room_fg (a, posf (coord_bl (xa)));
+  draw_room_fg (a, posf (coord_br (xa)));
+  draw_room_fg (a, posf (coord_m (xa)));
+  draw_room_fg (a, posf (coord_tl (xa)));
+  draw_room_fg (a, posf (coord_tr (xa)));
+
+  draw_room_fg (a, pos (coord_bl (xa)));
+  draw_room_fg (a, pos (coord_br (xa)));
+  draw_room_fg (a, pos (coord_m (xa)));
+  draw_room_fg (a, pos (coord_tl (xa)));
+  draw_room_fg (a, pos (coord_tr (xa)));
 }
 
 void

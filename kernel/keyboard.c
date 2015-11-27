@@ -26,7 +26,7 @@ ALLEGRO_KEYBOARD_STATE keyboard_state;
 int key; /* last key pressed */
 
 /* real time keys */
-bool up_key, down_key, left_key, right_key, shift_key, esc_key,
+bool up_key, down_key, left_key, right_key, shift_key, ctrl_key, esc_key,
   pause_key, enter_key, a_key, w_key, d_key, s_key, h_key, j_key,
   u_key, n_key, c_key;
 
@@ -62,6 +62,8 @@ get_keyboard_state (void)
   right_key = al_key_down (&keyboard_state, ALLEGRO_KEY_RIGHT);
   shift_key = al_key_down (&keyboard_state, ALLEGRO_KEY_LSHIFT)
     || al_key_down (&keyboard_state, ALLEGRO_KEY_RSHIFT);
+  ctrl_key = al_key_down (&keyboard_state, ALLEGRO_KEY_LCTRL)
+    || al_key_down (&keyboard_state, ALLEGRO_KEY_RCTRL);
   esc_key = al_key_down (&keyboard_state, ALLEGRO_KEY_ESCAPE);
   pause_key = al_key_down (&keyboard_state, ALLEGRO_KEY_PAUSE);
   enter_key = al_key_down (&keyboard_state, ALLEGRO_KEY_ENTER);

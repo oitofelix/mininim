@@ -163,9 +163,8 @@ level_anim (void)
 
   draw_anim (screen, kid);
   draw_xanim (screen, kid);
-  kid.xframe = NULL;
-
   draw_room_anim_fg (kid);
+  kid.xframe = NULL;
 
   for (p.floor = FLOORS; p.floor >= -1; p.floor--)
     for (p.place = -1; p.place < PLACES; p.place++) {

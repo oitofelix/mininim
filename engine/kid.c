@@ -42,6 +42,7 @@ static int inertia = 0;
 static bool critical_edge = false;
 static bool turn = false;
 static struct pos item_pos = {.room = -1};
+static bool keep_sword_fast = false;
 
 #define WALK_FRAMESET_NMEMB 12
 #define START_RUN_FRAMESET_NMEMB 6
@@ -61,6 +62,9 @@ static struct pos item_pos = {.room = -1};
 #define DRINK_FRAMESET_NMEMB 15
 #define RAISE_SWORD_FRAMESET_NMEMB 4
 #define KEEP_SWORD_FRAMESET_NMEMB 10
+#define TAKE_SWORD_FRAMESET_NMEMB 4
+#define SWORD_WALKF_FRAMESET_NMEMB 2
+#define SWORD_WALKB_FRAMESET_NMEMB 2
 
 static struct frameset walk_frameset[WALK_FRAMESET_NMEMB];
 static struct frameset start_run_frameset[START_RUN_FRAMESET_NMEMB];
@@ -80,6 +84,9 @@ static struct frameset fall_frameset[FALL_FRAMESET_NMEMB];
 static struct frameset drink_frameset[DRINK_FRAMESET_NMEMB];
 static struct frameset raise_sword_frameset[RAISE_SWORD_FRAMESET_NMEMB];
 static struct frameset keep_sword_frameset[KEEP_SWORD_FRAMESET_NMEMB];
+static struct frameset take_sword_frameset[TAKE_SWORD_FRAMESET_NMEMB];
+static struct frameset sword_walkf_frameset[SWORD_WALKF_FRAMESET_NMEMB];
+static struct frameset sword_walkb_frameset[SWORD_WALKB_FRAMESET_NMEMB];
 
 static void init_walk_frameset (void);
 static void init_start_run_frameset (void);
@@ -99,6 +106,9 @@ static void init_fall_frameset (void);
 static void init_drink_frameset (void);
 static void init_raise_sword_frameset (void);
 static void init_keep_sword_frameset (void);
+static void init_take_sword_frameset (void);
+static void init_sword_walkf_frameset (void);
+static void init_sword_walkb_frameset (void);
 
 ALLEGRO_BITMAP *kid_normal_00,
   *kid_start_run_01, *kid_start_run_02, *kid_start_run_03, *kid_start_run_04,
@@ -144,9 +154,14 @@ ALLEGRO_BITMAP *kid_normal_00,
   *kid_raise_sword_01, *kid_raise_sword_02, *kid_raise_sword_03, *kid_raise_sword_04,
   *kid_keep_sword_01, *kid_keep_sword_02, *kid_keep_sword_03, *kid_keep_sword_04,
   *kid_keep_sword_05, *kid_keep_sword_06, *kid_keep_sword_07, *kid_keep_sword_08,
-  *kid_keep_sword_09, *kid_keep_sword_10;
+  *kid_keep_sword_09, *kid_keep_sword_10,
+  *kid_take_sword_01, *kid_take_sword_02, *kid_take_sword_03, *kid_take_sword_04,
+  *kid_sword_normal_08,
+  *kid_sword_walkf_14, *kid_sword_walkf_15,
+  *kid_sword_walkb_10, *kid_sword_walkb_07;
 
-ALLEGRO_SAMPLE *step, *hit_ground, *hit_wall, *hang_on_fall, *drink, *glory;
+ALLEGRO_SAMPLE *step, *hit_ground, *hit_wall, *hang_on_fall, *drink,
+  *glory, *take_sword;
 
 static void place_kid (int room, int floor, int place);
 
@@ -174,6 +189,10 @@ static void kid_fall (void);
 static void kid_drink (void);
 static void kid_raise_sword (void);
 static void kid_keep_sword (void);
+static void kid_take_sword (void);
+static void kid_sword_normal (void);
+static void kid_sword_walkf (void);
+static void kid_sword_walkb (void);
 
 void
 load_kid (void)
@@ -350,6 +369,15 @@ load_kid (void)
   kid_keep_sword_08 = load_bitmap (KID_KEEP_SWORD_08);
   kid_keep_sword_09 = load_bitmap (KID_KEEP_SWORD_09);
   kid_keep_sword_10 = load_bitmap (KID_KEEP_SWORD_10);
+  kid_take_sword_01 = load_bitmap (KID_TAKE_SWORD_01);
+  kid_take_sword_02 = load_bitmap (KID_TAKE_SWORD_02);
+  kid_take_sword_03 = load_bitmap (KID_TAKE_SWORD_03);
+  kid_take_sword_04 = load_bitmap (KID_TAKE_SWORD_04);
+  kid_sword_normal_08 = load_bitmap (KID_SWORD_NORMAL_08);
+  kid_sword_walkf_14 = load_bitmap (KID_SWORD_WALKF_14);
+  kid_sword_walkf_15 = load_bitmap (KID_SWORD_WALKF_15);
+  kid_sword_walkb_10 = load_bitmap (KID_SWORD_WALKB_10);
+  kid_sword_walkb_07 = load_bitmap (KID_SWORD_WALKB_07);
 
   /* sound */
   step = load_sample (STEP);
@@ -358,6 +386,7 @@ load_kid (void)
   hang_on_fall = load_sample (HANG_ON_FALL);
   drink = load_sample (DRINK);
   glory = load_sample (GLORY);
+  take_sword = load_sample (TAKE_SWORD);
 
   /* framesets */
   init_walk_frameset ();
@@ -378,6 +407,9 @@ load_kid (void)
   init_drink_frameset ();
   init_raise_sword_frameset ();
   init_keep_sword_frameset ();
+  init_take_sword_frameset ();
+  init_sword_walkf_frameset ();
+  init_sword_walkb_frameset ();
 
   /* kid himself */
   kid.id = &kid;
@@ -564,6 +596,15 @@ unload_kid (void)
   al_destroy_bitmap (kid_keep_sword_08);
   al_destroy_bitmap (kid_keep_sword_09);
   al_destroy_bitmap (kid_keep_sword_10);
+  al_destroy_bitmap (kid_take_sword_01);
+  al_destroy_bitmap (kid_take_sword_02);
+  al_destroy_bitmap (kid_take_sword_03);
+  al_destroy_bitmap (kid_take_sword_04);
+  al_destroy_bitmap (kid_sword_normal_08);
+  al_destroy_bitmap (kid_sword_walkf_14);
+  al_destroy_bitmap (kid_sword_walkf_15);
+  al_destroy_bitmap (kid_sword_walkb_10);
+  al_destroy_bitmap (kid_sword_walkb_07);
 
   /* sounds */
   al_destroy_sample (step);
@@ -572,6 +613,7 @@ unload_kid (void)
   al_destroy_sample (hang_on_fall);
   al_destroy_sample (drink);
   al_destroy_sample (glory);
+  al_destroy_sample (take_sword);
 }
 
 void
@@ -816,6 +858,37 @@ init_keep_sword_frameset (void)
           KEEP_SWORD_FRAMESET_NMEMB * sizeof (struct frameset));
 }
 
+void
+init_take_sword_frameset (void)
+{
+  struct frameset frameset[TAKE_SWORD_FRAMESET_NMEMB] =
+    {{kid_take_sword_01,-6,0},{kid_take_sword_02,+0,0},
+     {kid_take_sword_03,-4,0},{kid_take_sword_04,-6,0}};
+
+  memcpy (&take_sword_frameset, &frameset,
+          TAKE_SWORD_FRAMESET_NMEMB * sizeof (struct frameset));
+}
+
+void
+init_sword_walkf_frameset (void)
+{
+  struct frameset frameset[SWORD_WALKF_FRAMESET_NMEMB] =
+    {{kid_sword_walkf_14,-14,0},{kid_sword_walkf_15,-4,0}};
+
+  memcpy (&sword_walkf_frameset, &frameset,
+          SWORD_WALKF_FRAMESET_NMEMB * sizeof (struct frameset));
+}
+
+void
+init_sword_walkb_frameset (void)
+{
+  struct frameset frameset[SWORD_WALKB_FRAMESET_NMEMB] =
+    {{kid_sword_walkb_10,-1,0},{kid_sword_walkb_07,+11,0}};
+
+  memcpy (&sword_walkb_frameset, &frameset,
+          SWORD_WALKB_FRAMESET_NMEMB * sizeof (struct frameset));
+}
+
 
 
 void
@@ -836,6 +909,7 @@ kid_normal (void)
   bool vjump = up_key;
   bool drink = is_potion (kids.pbf) && shift_key;
   bool raise_sword = is_sword (kids.pbf) && shift_key;
+  bool take_sword = ctrl_key;
 
   ALLEGRO_BITMAP *frame = kid_normal_00;
   int dx = +0;
@@ -864,6 +938,7 @@ kid_normal (void)
   if (kid.frame == couch_frameset[12].frame) dx = -2;
   if (kid.frame == vjump_frameset[17].frame) dx = +2;
   if (kid.frame == drink_frameset[7].frame) dx = +4;
+  if (kid.frame == keep_sword_frameset[9].frame) dx = +2;
 
   if (couch) {
     kid_couch ();
@@ -894,6 +969,9 @@ kid_normal (void)
   } else if (raise_sword) {
     item_pos = kids.pbf;
     kid_couch ();
+    return;
+  } else if (take_sword) {
+    kid_take_sword ();
     return;
   }
 
@@ -1232,6 +1310,7 @@ kid_turn (void)
   if (kid.frame == stabilize_frameset[2].frame) dx = +8;
   if (kid.frame == stabilize_frameset[3].frame) dx = +4;
   if (kid.frame == turn_frameset[3].frame) dx = +3;
+  if (kid.frame == keep_sword_frameset[9].frame) dx = -2;
 
   /* fall */
   if (kids.cbf == NO_FLOOR && kids.cbb == NO_FLOOR) {
@@ -2062,12 +2141,19 @@ kid_fall (void)
   int dir = (kid.dir == LEFT) ? -1 : +1;
 
   /* put kid in front of the floor */
-  if (i == 0
-      && con (pos (coord_bb (kid))).fg != NO_FLOOR) {
+  bool should_move_to_front = con (pos (coord_bf (kid))).fg == NO_FLOOR
+    && con (pos (coord_bb (kid))).fg != NO_FLOOR;
+  bool should_move_to_back = con (pos (coord_bf (kid))).fg != NO_FLOOR
+    && con (pos (coord_bb (kid))).fg == NO_FLOOR;
+  struct coord (*coord_func) (struct anim) = (should_move_to_front)
+    ? coord_bb : coord_bf;
+
+  if (i == 0 && (should_move_to_front || should_move_to_back)) {
     kid = next_anim (kid, frame, +0, 0);
     int dir = (kid.dir == LEFT) ? -1 : +1;
+    dir *= (should_move_to_back) ? -1 : +1;
     int x = kid.c.x;
-    while (con (pos (coord_bb (kid))).fg != NO_FLOOR
+    while (con (pos (coord_func (kid))).fg != NO_FLOOR
            && abs (kid.c.x - x) < PLACE_WIDTH)
       kid.c.x += dir;
     kid.c.x += -dir * 12;
@@ -2092,16 +2178,8 @@ kid_fall (void)
     return;
   }
 
-  if (i == 1) dx = -inertia;
-  if (i > 1) dx = -inertia;
-  if (i > 4) {
-    int speed = +21 + 3 * (i - 5);
-    dy = (speed > 33) ? 33 : speed;
-  }
-
   /* turn run */
   if (oaction == kid_turn_run) {
-    force_floor = kids.pbf.floor;
     if (kid.frame != turn_run_frameset[8].frame)
       kid.dir = (kid.dir == LEFT) ? RIGHT : LEFT;
     kid.flip = (kid.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
@@ -2109,10 +2187,10 @@ kid_fall (void)
     kid.c.y += 12;
   }
 
+  /* land on ground */
   struct pos pmbo =
     npos (pos (coord_mbo (next_anim (kid, kid.frame, 0, 34))));
 
-  /* land on ground */
   if (i > 0
       && kids.cmbo != NO_FLOOR
       && npos (kids.pmbo).floor != pmbo.floor
@@ -2133,6 +2211,13 @@ kid_fall (void)
     i = 0; force_floor = -2;
     shake_loose_floor_row (kids.pbf);
     return;
+  }
+
+  if (i == 1) dx = -inertia;
+  if (i > 1) dx = -inertia;
+  if (i > 4) {
+    int speed = +21 + 3 * (i - 5);
+    dy = (speed > 33) ? 33 : speed;
   }
 
   /* collision */
@@ -2222,15 +2307,15 @@ kid_raise_sword (void)
   kid.xdx = sword_frameset[j].dx;
   kid.xdy = sword_frameset[j].dy;
 
-  /* depressible floors */
-  keep_depressible_floor (&kid);
-
   /* sound */
   if (i == 0 && wait == 5) {
     video_effect.color = YELLOW;
     start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.5));
     play_sample (glory);
   }
+
+  /* depressible floors */
+  keep_depressible_floor (&kid);
 
   /* consume sword */
   if (i == 0) set_conitem (item_pos, NO_ITEM);
@@ -2254,6 +2339,7 @@ kid_keep_sword (void)
 
   static int i = 0, wait = 1, j = 0;
   if (oaction != kid_keep_sword) i = 0, wait = 1;
+  if (keep_sword_fast && i % 2 == 0) i++, wait = 0;
 
   j = 24 + i;
 
@@ -2263,6 +2349,8 @@ kid_keep_sword (void)
 
   if (i == 8 && wait < 1) dx = 0;
   if (i == 9 && wait < 2) dx = 0;
+  if (keep_sword_fast && i % 2) dx += keep_sword_frameset[i - 1].dx;
+  if (kid.frame == kid_sword_normal_08) dx = +8;
 
   kid = next_anim (kid, frame, dx, dy);
   if (i < 4) {
@@ -2280,10 +2368,215 @@ kid_keep_sword (void)
   else if (i == 8 && wait == 0) i++, wait = 2;
   else if (i == 9 && wait > 0) wait--;
   else {
-    kid.action = kid_turn;
-    /* kid turn will invert kid's direction */
-    kid.dir = (kid.dir == RIGHT) ? LEFT : RIGHT;
+    if (keep_sword_fast) {
+      kid.action = kid_normal;
+      keep_sword_fast = false;
+    }
+    else {
+      kid.action =  kid_turn;
+      /* kid turn will invert kid's direction */
+      kid.dir = (kid.dir == RIGHT) ? LEFT : RIGHT;
+    }
     i = 0, wait = 1;
+  }
+}
+
+void
+kid_take_sword (void)
+{
+  void (*oaction) (void) = kid.action;
+  kid.action = kid_take_sword;
+  kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
+
+  static int i = 0;
+  if (oaction != kid_take_sword) i = 0;
+
+  ALLEGRO_BITMAP *frame = take_sword_frameset[i].frame;
+  int dx = take_sword_frameset[i].dx;
+  int dy = take_sword_frameset[i].dy;
+
+  /* fall */
+  if (kids.ctf == NO_FLOOR) {
+    kid_fall ();
+    i = 0; return;
+  }
+
+  /* collision */
+  if (is_colliding (kid, coord_tf, pos, 0, false, -dx)) {
+    kid_stabilize_collision ();
+    i = 0; return;
+  }
+
+  kid = next_anim (kid, frame, dx, dy);
+
+  /* sound */
+  if (i == 0) play_sample (take_sword);
+
+  /* depressible floors */
+  keep_depressible_floor (&kid);
+
+  /* next frame */
+  if (i < 3) i++;
+  else {
+    kid.action = kid_sword_normal;
+    i = 0;
+  }
+}
+
+void
+kid_sword_normal (void)
+{
+  kid.action = kid_sword_normal;
+  kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
+
+  int j = 13;
+  kid.xframe = sword_frameset[j].frame;
+  kid.xdx = sword_frameset[j].dx;
+  kid.xdy = sword_frameset[j].dy;
+  int w = al_get_bitmap_width (kid.xframe);
+
+  bool keep_sword = down_key;
+  bool walkf = ((kid.dir == RIGHT) && right_key)
+    || ((kid.dir == LEFT) && left_key);
+  bool walkb = ((kid.dir == RIGHT) && left_key)
+    || ((kid.dir == LEFT) && right_key);
+
+  if (kid.frame == kid_sword_normal_08) {
+    if (keep_sword) {
+      /* keep_sword_fast = true; */
+      kid_keep_sword ();
+      return;
+    } else if (walkf) {
+      kid_sword_walkf ();
+      return;
+    } else if (walkb) {
+      kid_sword_walkb ();
+      return;
+    }
+  }
+
+  /* depressible floors */
+  if (kid.frame == take_sword_frameset[3].frame)
+    update_depressible_floor (&kid, -2, -27);
+  else keep_depressible_floor (&kid);
+
+  ALLEGRO_BITMAP *frame = kid_sword_normal_08;
+  int dx = +0;
+  int dy = +0;
+
+  if (kid.frame == take_sword_frameset[3].frame) dx = -4;
+  if (kid.frame == sword_walkf_frameset[1].frame) dx = +5;
+  if (kid.frame == sword_walkb_frameset[1].frame) dx = +2;
+
+  /* collision */
+  if (is_colliding (kid, coord_tf, pos, 0, false, -dx + w / 2))
+    to_collision_edge (&kid, frame, coord_tf, pos, 0, false, -dx + w / 2);
+
+  /* fall */
+  if (kids.cbf == NO_FLOOR
+      || kids.cmbo == NO_FLOOR
+      || kids.cbb == NO_FLOOR) {
+    kid_fall ();
+    kid.xframe = NULL;
+    return;
+  }
+
+  kid = next_anim (kid, frame, dx, dy);
+}
+
+void
+kid_sword_walkf (void)
+{
+  void (*oaction) (void) = kid.action;
+  kid.action = kid_sword_walkf;
+  kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
+
+  static int i = 0, j = 0;
+  if (oaction != kid_sword_walkf) i = 0;
+
+  j = 13;
+  kid.xframe = sword_frameset[j].frame;
+  kid.xdx = sword_frameset[j].dx;
+  kid.xdy = sword_frameset[j].dy;
+  int w = al_get_bitmap_width (kid.xframe);
+  if (i == 0) kid.xdx = -19;
+  if (i == 1) kid.xdx = -21;
+
+  ALLEGRO_BITMAP *frame = sword_walkf_frameset[i].frame;
+  int dx = sword_walkf_frameset[i].dx;
+  int dy = sword_walkf_frameset[i].dy;
+
+  /* fall */
+  if (kids.cbf == NO_FLOOR
+      || kids.cmbo == NO_FLOOR
+      || kids.cbb == NO_FLOOR) {
+    kid_fall ();
+    kid.xframe = NULL;
+    return;
+  }
+
+  /* collision */
+  if (is_colliding (kid, coord_tf, pos, 0, false, -dx + w / 2))
+    to_collision_edge (&kid, frame, coord_tf, pos, 0, false, -dx + w / 2);
+
+  kid = next_anim (kid, frame, dx, dy);
+
+  /* depressible floors */
+  if (i == 1) update_depressible_floor (&kid, -7, -35);
+  else keep_depressible_floor (&kid);
+
+  /* next frame */
+  if (i < 1) i++;
+  else {
+    kid.action = kid_sword_normal;
+    i = 0;
+  }
+}
+
+void
+kid_sword_walkb (void)
+{
+  void (*oaction) (void) = kid.action;
+  kid.action = kid_sword_walkb;
+  kid.flip = (kid.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
+
+  static int i = 0, j = 0;
+  if (oaction != kid_sword_walkb) i = 0;
+
+  if (i == 0) j = 10;
+  if (i == 1) j = 17;
+  kid.xframe = sword_frameset[j].frame;
+  kid.xdx = sword_frameset[j].dx;
+  kid.xdy = sword_frameset[j].dy;
+
+  ALLEGRO_BITMAP *frame = sword_walkb_frameset[i].frame;
+  int dx = sword_walkb_frameset[i].dx;
+  int dy = sword_walkb_frameset[i].dy;
+
+  /* fall */
+  if (kids.cbf == NO_FLOOR
+      || kids.cmbo == NO_FLOOR
+      || kids.cbb == NO_FLOOR) {
+    kid_fall ();
+    kid.xframe = NULL;
+    return;
+  }
+
+  /* collision */
+  if (is_colliding (kid, coord_bb, pos, 0, true, dx))
+    to_collision_edge (&kid, frame, coord_bb, pos, 0, true, dx + 4);
+
+  kid = next_anim (kid, frame, dx, dy);
+
+  /* depressible floors */
+  if (i == 1) update_depressible_floor (&kid, -1, -24);
+  else keep_depressible_floor (&kid);
+
+  /* next frame */
+  if (i < 1) i++;
+  else {
+    kid.action = kid_sword_normal;
+    i = 0;
   }
 }
 

@@ -130,6 +130,8 @@ is_colliding (struct anim a,
 {
   int dn = dist_next_place (a, coord_func, pos_func, margin, reverse);
 
+  min_dist += (reverse) ? +1 : 0;
+
   a.c.x += (a.dir == LEFT) ? -margin : +margin;
   int r = reverse ? -1 : 1;
   int dir = (a.dir == LEFT) ? r * -1: r * +1;

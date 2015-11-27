@@ -23,7 +23,7 @@
 /* variables */
 extern ALLEGRO_KEYBOARD_STATE keyboard_state;
 extern int key;
-extern bool up_key, down_key, left_key, right_key, shift_key,
+extern bool up_key, down_key, left_key, right_key, shift_key, ctrl_key,
   esc_key, pause_key, enter_key, a_key, w_key, d_key, s_key,
   h_key, j_key, u_key, n_key, c_key;
 
