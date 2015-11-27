@@ -2,3 +2,7 @@
 *.o
 /prince
 .depend
+/GPATH
+/GRTAGS
+/GSYMS
+/GTAGS
