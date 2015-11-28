@@ -17,6 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
+#include <time.h>
 #include "kernel/video.h"
 #include "kernel/random.h"
 #include "engine/level.h"
@@ -28,7 +30,8 @@ init_consistency_level (void)
 {
   struct pos p;
 
-  random_seed = 0;
+  random_seed = time (NULL);
+  printf ("LEVEL NUMBER: %u\n", random_seed);
 
   struct level *lv = &consistency_level;
 
@@ -56,7 +59,7 @@ init_consistency_level (void)
 
         if (c->fg == DOOR) {
           lv->event[r].p = p;
-          lv->event[r].next = prandom (1);
+          lv->event[r].next = true;
         }
 
       }

@@ -49,15 +49,35 @@ fix_level ()
       }
 }
 
+/* Important: the corrections bellow are all made for two perspectives
+   (but just one when symmetrical), because we don't assume levels
+   have consistent linking (if room A is at left from room B's
+   perspective, it doesn't imply room B is necessarily at right from
+   room A's perspective).  If this wasn't the case, we would get an
+   inconsistent behavior, because the correction algorithms would only
+   work from the perspective of the corrected room, and not
+   necessairly from any other adjacent rooms.  Summarizing: without
+   consistent linking the space is relative, and we shoud account for
+   this. */
+
 /* consistency: rigid constructions (pillar, wall, door) must have
    something non-traversable lying on it */
 static void
 fix_rigid_con_no_floor_top (struct pos p)
 {
-  struct con *ca = crel (p, -1, 0);
+  struct pos pa = prel (p, -1, 0);
+  struct con *ca = con (pa);
+
+  /* rigid construction's perspective */
   if (is_rigid_con (p) &&
       (ca->fg == NO_FLOOR
        || ca->fg == LOOSE_FLOOR)) ca->fg = FLOOR;
+
+  /* traversable's perspective */
+  struct pos pb = prel (p, +1, 0);
+  if ((con (p)->fg == NO_FLOOR
+       || con (p)->fg  == LOOSE_FLOOR)
+      && is_rigid_con (pb)) con (p)->fg = FLOOR;
 }
 
 /* consistency: doors should not face a wall nor another door */
@@ -67,18 +87,30 @@ fix_door_adjacent_to_wall_or_door (struct pos p)
   struct con *c = con (p);
   struct con *cl = crel (p, 0, -1);
   struct con *cr = crel (p, 0, +1);
+
+  /* DOOR's perspective*/
   if (c->fg == DOOR &&
       (cr->fg == WALL || cr->fg == DOOR
        || cl->fg == WALL || cl->fg == DOOR)) c->fg = FLOOR;
+
+  /* WALL's perspective */
+  if (c->fg == WALL
+      && (cr->fg == DOOR || cl->fg == DOOR)) c->fg = FLOOR;
 }
 
-/* conssitency: broken floors must have no construction above them */
+/* consistency: broken floors must have no construction above them */
 static void
 fix_broken_floor_lacking_no_floor_on_top (struct pos p)
 {
   struct con *c = con (p);
   struct con *ca = crel (p, -1, 0);
+  struct con *cb = crel (p, +1, 0);
+
+  /* broken floor's perspective */
   if (c->fg == BROKEN_FLOOR && ca->fg != NO_FLOOR) c->fg = FLOOR;
+
+  /* non-no-floor's perspective */
+  if (c->fg != NO_FLOOR && cb->fg == BROKEN_FLOOR) cb->fg = FLOOR;
 }
 
 /* conssitency: skeleton and spikes floors must not have no or loose
@@ -89,10 +121,19 @@ fix_skeleton_or_spikes_floor_with_no_or_loose_floor_at_left (struct pos p)
 {
   struct con *c = con (p);
   struct con *cl = crel (p, 0, -1);
+  struct con *cr = crel (p, 0, +1);
+
+  /* skeleton and spike's perspective */
   if ((c->fg == SKELETON_FLOOR
        || c->fg == SPIKES_FLOOR)
       && (cl->fg == NO_FLOOR
           || cl->fg == LOOSE_FLOOR)) cl->fg = FLOOR;
+
+  /* no and loose floor's perspective  */
+  if ((c->fg == NO_FLOOR
+       || c->fg == LOOSE_FLOOR)
+      && (cr->fg == SKELETON_FLOOR
+          || cr->fg == SPIKES_FLOOR)) cr->fg = FLOOR;
 }
 
 /* consistency: itens can't be adjacent */
@@ -101,7 +142,11 @@ fix_adjacent_itens (struct pos p)
 {
   struct con *c = con (p);
   struct con *cl = crel (p, 0, -1);
-  if (cl->fg == FLOOR && cl->ext.item != NO_ITEM
+  struct con *cr = crel (p, 0, +1);
+
+  /* item's perspective (symmetrical) */
+  if (((cl->fg == FLOOR && cl->ext.item != NO_ITEM)
+       || (cr->fg == FLOOR && cr->ext.item != NO_ITEM))
       && c->fg != OPENER_FLOOR
       && c->fg != CLOSER_FLOOR) c->ext.item = NO_ITEM;
 }
@@ -111,10 +156,11 @@ static void
 fix_item_on_non_normal_floor (struct pos p)
 {
   struct con *c = con (p);
+
+  /* non-no-floor's perspective (symmetrical) */
   if (c->fg != FLOOR
       && c->fg != OPENER_FLOOR
-      && c->fg != CLOSER_FLOOR
-      && c->ext.item != NO_ITEM) c->ext.item = NO_ITEM;
+      && c->fg != CLOSER_FLOOR) c->ext.item = NO_ITEM;
 }
 
 /* consistency: swords can't be placed on the right of walls or
@@ -124,10 +170,19 @@ fix_sword_at_right_of_wall_or_door (struct pos p)
 {
   struct con *c = con (p);
   struct con *cl = crel (p, 0, -1);
+  struct con *cr = crel (p, 0, +1);
+
+  /* sword's perspective */
   if (c->fg == FLOOR
       && c->ext.item == SWORD
       && (cl->fg == WALL
           || cl->fg == DOOR)) c->ext.item = NO_ITEM;
+
+  /* wall and door's perspective  */
+  if ((c->fg == WALL
+       || c->fg == DOOR)
+      && cr->fg == FLOOR
+      && cr->ext.item == SWORD) c->ext.item = NO_ITEM;
 }
 
 static bool
