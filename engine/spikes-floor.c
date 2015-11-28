@@ -250,6 +250,7 @@ void
 draw_spikes (ALLEGRO_BITMAP *bitmap, struct pos p,
              struct spikes_floor *s)
 {
+  if (bitmap == room_bg) return;
   draw_spikes_left (bitmap, p, s);
   draw_spikes_right (bitmap, p, s);
 }
@@ -258,6 +259,7 @@ void
 draw_spikes_left (ALLEGRO_BITMAP *bitmap, struct pos p,
                   struct spikes_floor *s)
 {
+  if (bitmap == room_bg) return;
   switch (s->state) {
   case 0: break;
   case 1: draw_spikes_left_01 (bitmap, p); break;
@@ -272,6 +274,7 @@ void
 draw_spikes_right (ALLEGRO_BITMAP *bitmap, struct pos p,
                    struct spikes_floor *s)
 {
+  if (bitmap == room_bg) return;
   switch (s->state) {
   case 0: break;
   case 1: draw_spikes_right_01 (bitmap, p); break;
@@ -285,6 +288,7 @@ draw_spikes_right (ALLEGRO_BITMAP *bitmap, struct pos p,
 void
 draw_spikes_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
 {
+  if (bitmap == room_bg) return;
   struct spikes_floor *s = spikes_floor_at_pos (p);
   if (! s) return;
 

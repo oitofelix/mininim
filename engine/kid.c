@@ -418,7 +418,7 @@ load_kid (void)
   kid.action = kid_normal;
   update_depressible_floor (&kid, -4, -10);
 
-  place_kid (1, 1, 1);
+  place_kid (12, 2, 0);
 }
 
 void
@@ -1864,7 +1864,7 @@ kid_climb (void)
   }
 
   /* door collision */
-  if (i == 3 && kids.ctf == DOOR
+  if (i == 3 && kids.ctf == DOOR && kid.dir == LEFT
       && door_at_pos (kids.ptf)->i > DOOR_CLIMB_LIMIT) {
     if (wait == 0) {
       wait = DOOR_WAIT_LOOK;
@@ -1977,7 +1977,8 @@ kid_stabilize (void)
   kid = next_anim (kid, frame, dx, dy);
 
   /* depressible floors */
-  keep_depressible_floor (&kid);
+  if (collision && i == 1) update_depressible_floor (&kid, -13, -18);
+  else keep_depressible_floor (&kid);
 
   /* next frame */
   int dc = dist_collision (kid, coord_bb, pos, 0, false);

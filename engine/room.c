@@ -507,6 +507,9 @@ draw_room_fg (struct anim a, struct pos p)
     else if (con (p)->fg == BROKEN_FLOOR)
       draw_broken_floor_fg (screen, p);
     else {
+      if (con (p)->fg == DOOR)
+        draw_door_fg (screen, p, a);
+
       draw_con_base (screen, p);
       if (kid.frame == kid_climb_03
           || kid.frame == kid_climb_09
@@ -548,7 +551,7 @@ draw_room_fg (struct anim a, struct pos p)
       draw_con_right (screen, prel (p, -1, 0));
       break;
     case WALL: draw_wall_right (screen, p); break;
-    case DOOR: draw_door_frame (screen, p); break;
+    case DOOR: draw_full_door (screen, p); break;
     default:
       error (-1, 0, "%s: unknown foreground construct type (%i)",
              __func__, con (p)->fg);
