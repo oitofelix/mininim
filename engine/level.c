@@ -134,7 +134,21 @@ level_anim (void)
   kidsf = survey (kid, posf);
   prev_room = kid.c.room;
   kid.action ();
-  if (prev_room != kid.c.room) room_view = kid.c.room;
+  if (prev_room != kid.c.room)  {
+    room_view = kid.c.room;
+
+    if (roomd (prev_room, LEFT) == room_view)
+      level->link[room_view].r = prev_room;
+    else if (roomd (prev_room, RIGHT) == room_view)
+      level->link[room_view].l = prev_room;
+    else if (roomd (prev_room, ABOVE) == room_view)
+      level->link[room_view].b = prev_room;
+    else if (roomd (prev_room, BELOW) == room_view)
+      level->link[room_view].a = prev_room;
+    else
+      error (-1, 0, "%s: internal inconsistency at room linking",
+             __func__);
+  }
   compute_loose_floors ();
   compute_opener_floors ();
   compute_closer_floors ();
