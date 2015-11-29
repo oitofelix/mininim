@@ -17,11 +17,14 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <error.h>
 #include <stdio.h>
 #include "pos.h"
 #include "level.h"
 #include "physics.h"
 
+static void fix_single_walls_at_place_0 (struct pos p);
+static void fix_impenetrable_row (struct pos p);
 static void fix_rigid_con_no_floor_top (struct pos p);
 static void fix_door_adjacent_to_wall_or_door (struct pos p);
 static void fix_broken_floor_lacking_no_floor_on_top (struct pos p);
@@ -29,7 +32,9 @@ static void fix_skeleton_or_spikes_floor_with_no_or_loose_floor_at_left (struct 
 static void fix_adjacent_itens (struct pos p);
 static void fix_item_on_non_normal_floor (struct pos p);
 static void fix_sword_at_right_of_wall_or_door (struct pos p);
+static void fix_door_lacking_event (struct pos p);
 static bool is_rigid_con (struct pos p);
+static bool is_there_event_handler (int e);
 
 void
 fix_level ()
@@ -39,6 +44,9 @@ fix_level ()
   for (p.room = 0; p.room < ROOMS; p.room++)
     for (p.floor = 0; p.floor < FLOORS; p.floor++)
       for (p.place = 0; p.place < PLACES; p.place++) {
+        fix_door_lacking_event (p);
+        fix_single_walls_at_place_0 (p);
+        fix_impenetrable_row (p);
         fix_rigid_con_no_floor_top (p);
         fix_door_adjacent_to_wall_or_door (p);
         fix_broken_floor_lacking_no_floor_on_top (p);
@@ -59,6 +67,65 @@ fix_level ()
    necessairly from any other adjacent rooms.  Summarizing: without
    consistent linking the space is relative, and we shoud account for
    this. */
+
+/* consistency: wall can't be single at place 0, otherwise the kid
+   disappears from view behind it, or him might view room 0, what may
+   lead to several problems, room on-demand local linking consistency
+   resolution being one example */
+void
+fix_single_walls_at_place_0 (struct pos p)
+{
+  struct con *c = con (p);
+  struct con *cl = crel (p, 0, -1);
+  struct con *cr = crel (p, 0, +1);
+
+  /* wall's perspective */
+  if (p.place == 0
+      && c->fg == WALL
+      && cl->fg != WALL) cl->fg = WALL;
+
+  /* wall left's perspective */
+  if (p.place == 9
+      && c->fg != WALL
+      && cr->fg == WALL) c->fg = WALL;
+}
+
+
+/* consistency: walls should delimit accessible places or walls */
+void
+fix_impenetrable_row (struct pos p)
+{
+  struct pos q;
+  int i = 1;
+  bool imp = false;
+
+  struct con *c = con (p);
+  if (c->fg == WALL)
+    for (i = 1, q = prel (p, 0, i); i < PLACES; q = prel (p, 0, ++i)) {
+      struct con *ca = crel (q, -1, +0);
+      struct con *cq = con (q);
+
+      if (cq->fg == WALL) {
+        if (i >= 2) imp = true;
+        break;
+      }
+
+      if (ca->fg == NO_FLOOR
+          || ca->fg == LOOSE_FLOOR
+          || cq->fg == NO_FLOOR
+          || cq->fg == LOOSE_FLOOR) break;
+    }
+
+  if (imp)
+    for (i = 1, q = prel (p, 0, i); i < PLACES; q = prel (p, 0, ++i)) {
+
+      if (con (q)->fg == WALL) break;
+
+      con (q)->fg = WALL;
+      con (q)->bg = NO_BG;
+      con (q)->ext.item = NO_ITEM;
+    }
+}
 
 /* consistency: rigid constructions (pillar, wall, door) must have
    something non-traversable lying on it */
@@ -183,6 +250,55 @@ fix_sword_at_right_of_wall_or_door (struct pos p)
        || c->fg == DOOR)
       && cr->fg == FLOOR
       && cr->ext.item == SWORD) c->ext.item = NO_ITEM;
+}
+
+/* consistency: doors should have an associated event */
+static void
+fix_door_lacking_event (struct pos p)
+{
+  int i;
+
+  struct con *c = con (p);
+  if (c->fg == DOOR) {
+    for (i = 0; i < EVENTS; i++)
+      if (peq (level->event[i].p, p)
+          && is_there_event_handler (i)) return;
+
+    c->fg = FLOOR;
+    c->bg = NO_BG;
+    c->ext.item = NO_ITEM;
+  }
+}
+
+void
+make_links_locally_consistent (int prev_room, int current_room)
+{
+  if (roomd (prev_room, LEFT) == current_room)
+    level->link[current_room].r = prev_room;
+  else if (roomd (prev_room, RIGHT) == current_room)
+    level->link[current_room].l = prev_room;
+  else if (roomd (prev_room, ABOVE) == current_room)
+    level->link[current_room].b = prev_room;
+  else if (roomd (prev_room, BELOW) == current_room)
+    level->link[current_room].a = prev_room;
+  else
+    error (-1, 0, "%s: internal inconsistency at room linking",
+           __func__);
+}
+
+static bool
+is_there_event_handler (int e)
+{
+  struct pos p;
+
+  for (p.room = 1; p.room < ROOMS; p.room++)
+    for (p.floor = 0; p.floor < FLOORS; p.floor++)
+      for (p.place = 0; p.place < PLACES; p.place++) {
+        if ((con (p)->fg == OPENER_FLOOR
+             || con (p)->fg == CLOSER_FLOOR)
+            && con (p)->ext.event == e) return true;
+          }
+  return false;
 }
 
 static bool

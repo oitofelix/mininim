@@ -48,15 +48,17 @@ struct level *level;
 
 static bool no_room_drawing = false;
 
-int room_view = 12;
+int room_view = 1;
 
 void
 play_level (struct level *_level)
 {
+  int i = 0;
+
   cutscene = false;
 
   level = _level;
-  fix_level ();
+  for (i = 0; i < 2; i++) fix_level ();
   load_level ();
 
   register_cons ();
@@ -136,18 +138,7 @@ level_anim (void)
   kid.action ();
   if (prev_room != kid.c.room)  {
     room_view = kid.c.room;
-
-    if (roomd (prev_room, LEFT) == room_view)
-      level->link[room_view].r = prev_room;
-    else if (roomd (prev_room, RIGHT) == room_view)
-      level->link[room_view].l = prev_room;
-    else if (roomd (prev_room, ABOVE) == room_view)
-      level->link[room_view].b = prev_room;
-    else if (roomd (prev_room, BELOW) == room_view)
-      level->link[room_view].a = prev_room;
-    else
-      error (-1, 0, "%s: internal inconsistency at room linking",
-             __func__);
+    make_links_locally_consistent (prev_room, room_view);
   }
   compute_loose_floors ();
   compute_opener_floors ();

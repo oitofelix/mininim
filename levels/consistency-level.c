@@ -30,22 +30,29 @@ init_consistency_level (void)
 {
   struct pos p;
 
-  random_seed = 1448746126;
+  random_seed = 1;
   /* random_seed = time (NULL); */
   printf ("LEVEL NUMBER: %u\n", random_seed);
 
   struct level *lv = &consistency_level;
 
-  /* p.room = 0; */
-  /* for (p.floor = 0; p.floor < FLOORS; p.floor++) */
-  /*   for (p.place = 0; p.place < PLACES; p.place++) { */
-  /*     struct con *c = &lv->con[p.room][p.floor][p.place]; */
-  /*     c->fg = WALL; */
-  /*     c->bg = NO_BG; */
-  /*   } */
-
   lv->type = DUNGEON;
-  for (p.room = 0; p.room < ROOMS; p.room++)
+
+  /* generate room 0 (delimiter room) */
+  p.room = 0;
+  for (p.floor = 0; p.floor < FLOORS; p.floor++)
+    for (p.place = 0; p.place < PLACES; p.place++) {
+      struct con *c = &lv->con[p.room][p.floor][p.place];
+      c->fg = WALL;
+      c->bg = NO_BG;
+    }
+
+  for (p.room = 1; p.room < ROOMS; p.room++) {
+    lv->link[p.room].l = 0;
+    lv->link[p.room].r = 0;
+    lv->link[p.room].a = 0;
+    lv->link[p.room].b = 0;
+
     for (p.floor = 0; p.floor < FLOORS; p.floor++)
       for (p.place = 0; p.place < PLACES; p.place++) {
         struct con *c = &lv->con[p.room][p.floor][p.place];
@@ -54,80 +61,119 @@ init_consistency_level (void)
         c->ext.item = prandom (SWORD);
 
         int r = prandom (255);
-
         if (c->fg == OPENER_FLOOR
             || c->fg == CLOSER_FLOOR) c->ext.event = r;
-
         if (c->fg == DOOR) {
           lv->event[r].p = p;
           lv->event[r].next = true;
         }
 
       }
-
-  for (p.room = 0; p.room < ROOMS; p.room++) {
-    lv->link[p.room].a = prandom (ROOMS - 1);
-    lv->link[p.room].l = prandom (ROOMS - 1);
-    lv->link[p.room].r = prandom (ROOMS - 1);
-    lv->link[p.room].b = prandom (ROOMS - 1);
   }
 
-  /* int w = prandom (ROOMS - 2) + 1; */
-  /* int w = 4; */
+  int room, a, b, l, r, al, bl, ar, br, la, ra, lb, rb;
 
-  /* for (p.room = 1; p.room < ROOMS; p.room++) { */
-  /*   int r = (p.room - 1) / w; */
-  /*   int c = (p.room - 1) % w; */
+  lv->link[1].l = 2;
+  lv->link[2].r = 1;
 
-  /*   if (r == 0 && c == 0) { */
-  /*     lv->link[p.room].a = 0; */
-  /*     lv->link[p.room].l = p.room - 1; */
-  /*     lv->link[p.room].r = p.room + 1; */
-  /*     lv->link[p.room].b = (r + 1) * w + (c + 1); */
-  /*   } else if (r == 0 && c > 0 && c < w - 1) { */
-  /*     lv->link[p.room].a = 0; */
-  /*     lv->link[p.room].l = p.room - 1; */
-  /*     lv->link[p.room].r = p.room + 1; */
-  /*     lv->link[p.room].b = (r + 1) * w + (c + 1); */
-  /*   } else if (r == 0 && c == w - 1) { */
-  /*     lv->link[p.room].a = 0; */
-  /*     lv->link[p.room].l = p.room - 1; */
-  /*     lv->link[p.room].r = 0; */
-  /*     lv->link[p.room].b = (r + 1) * w + (c + 1); */
-  /*   } else if (r > 0 && r < ROOMS / w && c == 0) { */
-  /*     lv->link[p.room].a = (r - 1) * w + (c + 1); */
-  /*     lv->link[p.room].l = 0; */
-  /*     lv->link[p.room].r = p.room + 1; */
-  /*     lv->link[p.room].b = (r + 1) * w + (c + 1); */
-  /*   } else if (r > 0 && r < ROOMS / w && c > 0 && c < w - 1) { */
-  /*     lv->link[p.room].a = (r - 1) * w + (c + 1); */
-  /*     lv->link[p.room].l = p.room - 1; */
-  /*     lv->link[p.room].r = p.room + 1; */
-  /*     lv->link[p.room].b = (r + 1) * w + (c + 1); */
-  /*   } else if (r > 0 && r < ROOMS / w && c == w - 1) { */
-  /*     lv->link[p.room].a = (r - 1) * w + (c + 1); */
-  /*     lv->link[p.room].l = p.room - 1; */
-  /*     lv->link[p.room].r = 0; */
-  /*     lv->link[p.room].b = (r + 1) * w + (c + 1); */
-  /*   } if (r == ROOMS / w && c == 0) { */
-  /*     lv->link[p.room].a = (r - 1) * w + (c + 1); */
-  /*     lv->link[p.room].l = 0; */
-  /*     lv->link[p.room].r = p.room + 1; */
-  /*     lv->link[p.room].b = 0; */
-  /*   } if (r == ROOMS / w && c > 0 && c < w - 1) { */
-  /*     lv->link[p.room].a = (r - 1) * w + (c + 1); */
-  /*     lv->link[p.room].l = p.room - 1; */
-  /*     lv->link[p.room].r = p.room + 1; */
-  /*     lv->link[p.room].b = 0; */
-  /*   } if (r == ROOMS / w && c == w - 1) { */
-  /*     lv->link[p.room].a = (r - 1) * w + (c + 1); */
-  /*     lv->link[p.room].l = p.room - 1; */
-  /*     lv->link[p.room].r = 0; */
-  /*     lv->link[p.room].b = 0; */
-  /*   } */
+  for (p.room = 3; p.room < ROOMS; p.room++) {
+    for (room = 1; room < ROOMS; room++) {
+      if (p.room == room) continue;
 
-  /*   if (r == ROOMS / w && p.room == ROOMS - 1) lv->link[p.room].r = 0; */
-  /* } */
+      if (! lv->link[room].l) {
+        lv->link[room].l = p.room;
+        lv->link[p.room].r = room;
+
+        a = lv->link[room].a;
+        if (a) {
+          al = lv->link[a].l;
+          if (al) {
+            lv->link[p.room].a = al;
+            lv->link[al].b = p.room;
+          }
+        }
+
+        b = lv->link[room].b;
+        if (b) {
+          bl = lv->link[b].l;
+          if (bl) {
+            lv->link[p.room].b = bl;
+            lv->link[bl].a = p.room;
+          }
+        }
+
+        break;
+      } else if (! lv->link[room].r) {
+        lv->link[room].r = p.room;
+        lv->link[p.room].l = room;
+
+        a = lv->link[room].a;
+        if (a) {
+          ar = lv->link[a].r;
+          if (ar) {
+            lv->link[p.room].a = ar;
+            lv->link[ar].b = p.room;
+          }
+        }
+
+        b = lv->link[room].b;
+        if (b) {
+          br = lv->link[b].r;
+          if (br) {
+            lv->link[p.room].b = br;
+            lv->link[br].a = p.room;
+          }
+        }
+
+        break;
+      } else if (! lv->link[room].a) {
+        lv->link[room].a = p.room;
+        lv->link[p.room].b = room;
+
+        l = lv->link[room].l;
+        if (l) {
+          la = lv->link[l].a;
+          if (la) {
+            lv->link[p.room].l = la;
+            lv->link[la].r = p.room;
+          }
+        }
+
+        r = lv->link[room].r;
+        if (r) {
+          ra = lv->link[r].a;
+          if (ra) {
+            lv->link[p.room].r = ra;
+            lv->link[ra].l = p.room;
+          }
+        }
+        break;
+      } else if (! lv->link[room].b) {
+        lv->link[room].b = p.room;
+        lv->link[p.room].a = room;
+
+        l = lv->link[room].l;
+        if (l) {
+          lb = lv->link[l].b;
+          if (lb) {
+            lv->link[p.room].l = lb;
+            lv->link[lb].r = p.room;
+          }
+        }
+
+        r = lv->link[room].r;
+        if (r) {
+          rb = lv->link[r].b;
+          if (rb) {
+            lv->link[p.room].r = rb;
+            lv->link[rb].l = p.room;
+          }
+        }
+
+        break;
+      }
+    }
+  }
 }
 
 void
