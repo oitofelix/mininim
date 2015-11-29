@@ -619,9 +619,22 @@ unload_kid (void)
 void
 place_kid (int room, int floor, int place)
 {
-  kid.c.room = room;
-  kid.c.x = PLACE_WIDTH * place + 15;
-  kid.c.y = PLACE_HEIGHT * floor + 15;
+  struct pos p;
+
+
+  for (p.room = room; p.room < ROOMS; p.room++)
+    for (p.floor = floor; p.floor < FLOORS; p.floor++)
+      for (p.place = place; p.place < PLACES; p.place++)
+        if (con (p)->fg == FLOOR
+            || con (p)->fg == BROKEN_FLOOR
+            || con (p)->fg == SKELETON_FLOOR
+            || con (p)->fg == PILLAR
+            || con (p)->fg == DOOR) goto end;
+
+ end:
+  kid.c.room = p.room;
+  kid.c.x = PLACE_WIDTH * p.place + 15;
+  kid.c.y = PLACE_HEIGHT * p.floor + 15;
 }
 
 

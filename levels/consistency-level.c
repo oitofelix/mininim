@@ -65,7 +65,7 @@ init_consistency_level (void)
             || c->fg == CLOSER_FLOOR) c->ext.event = r;
         if (c->fg == DOOR) {
           lv->event[r].p = p;
-          lv->event[r].next = true;
+          lv->event[r].next = prandom (1);
         }
 
       }

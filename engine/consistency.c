@@ -24,7 +24,8 @@
 #include "physics.h"
 
 static void fix_single_walls_at_place_0 (struct pos p);
-static void fix_impenetrable_row (struct pos p);
+static void fix_inaccessible_enclosure (struct pos p);
+static void fix_loose_enclosure (struct pos p);
 static void fix_rigid_con_no_floor_top (struct pos p);
 static void fix_door_adjacent_to_wall_or_door (struct pos p);
 static void fix_broken_floor_lacking_no_floor_on_top (struct pos p);
@@ -32,9 +33,16 @@ static void fix_skeleton_or_spikes_floor_with_no_or_loose_floor_at_left (struct 
 static void fix_adjacent_itens (struct pos p);
 static void fix_item_on_non_normal_floor (struct pos p);
 static void fix_sword_at_right_of_wall_or_door (struct pos p);
-static void fix_door_lacking_event (struct pos p);
+static void fix_door_lacking_opener (struct pos p);
+static void fix_opener_or_closer_lacking_door (struct pos p);
+
+void fix_enclosure (struct pos p, enum dir dir);
+
 static bool is_rigid_con (struct pos p);
 static bool is_there_event_handler (int e);
+static bool is_enclosure (struct pos p, bool (*pred) (struct pos p), enum dir dir);
+static bool is_inaccessible (struct pos p);
+static bool is_loose (struct pos p);
 
 void
 fix_level ()
@@ -44,9 +52,11 @@ fix_level ()
   for (p.room = 0; p.room < ROOMS; p.room++)
     for (p.floor = 0; p.floor < FLOORS; p.floor++)
       for (p.place = 0; p.place < PLACES; p.place++) {
-        fix_door_lacking_event (p);
+        fix_door_lacking_opener (p);
+        fix_opener_or_closer_lacking_door (p);
         fix_single_walls_at_place_0 (p);
-        fix_impenetrable_row (p);
+        fix_inaccessible_enclosure (p);
+        fix_loose_enclosure (p);
         fix_rigid_con_no_floor_top (p);
         fix_door_adjacent_to_wall_or_door (p);
         fix_broken_floor_lacking_no_floor_on_top (p);
@@ -90,41 +100,20 @@ fix_single_walls_at_place_0 (struct pos p)
       && cr->fg == WALL) c->fg = WALL;
 }
 
-
 /* consistency: walls should delimit accessible places or walls */
 void
-fix_impenetrable_row (struct pos p)
+fix_inaccessible_enclosure (struct pos p)
 {
-  struct pos q;
-  int i = 1;
-  bool imp = false;
+  if (is_enclosure (p, is_inaccessible, LEFT)) fix_enclosure (p, LEFT);
+  if (is_enclosure (p, is_inaccessible, RIGHT)) fix_enclosure (p, RIGHT);
+}
 
-  struct con *c = con (p);
-  if (c->fg == WALL)
-    for (i = 1, q = prel (p, 0, i); i < PLACES; q = prel (p, 0, ++i)) {
-      struct con *ca = crel (q, -1, +0);
-      struct con *cq = con (q);
-
-      if (cq->fg == WALL) {
-        if (i >= 2) imp = true;
-        break;
-      }
-
-      if (ca->fg == NO_FLOOR
-          || ca->fg == LOOSE_FLOOR
-          || cq->fg == NO_FLOOR
-          || cq->fg == LOOSE_FLOOR) break;
-    }
-
-  if (imp)
-    for (i = 1, q = prel (p, 0, i); i < PLACES; q = prel (p, 0, ++i)) {
-
-      if (con (q)->fg == WALL) break;
-
-      con (q)->fg = WALL;
-      con (q)->bg = NO_BG;
-      con (q)->ext.item = NO_ITEM;
-    }
+/* consistency: walls delimiting only loose floors are not valid */
+void
+fix_loose_enclosure (struct pos p)
+{
+  /* if (is_enclosure (p, is_loose, LEFT)) fix_enclosure (p, LEFT); */
+  /* if (is_enclosure (p, is_loose, RIGHT)) fix_enclosure (p, RIGHT); */
 }
 
 /* consistency: rigid constructions (pillar, wall, door) must have
@@ -252,9 +241,9 @@ fix_sword_at_right_of_wall_or_door (struct pos p)
       && cr->ext.item == SWORD) c->ext.item = NO_ITEM;
 }
 
-/* consistency: doors should have an associated event */
+/* consistency: doors should have an associated event and opener floor */
 static void
-fix_door_lacking_event (struct pos p)
+fix_door_lacking_opener (struct pos p)
 {
   int i;
 
@@ -263,6 +252,32 @@ fix_door_lacking_event (struct pos p)
     for (i = 0; i < EVENTS; i++)
       if (peq (level->event[i].p, p)
           && is_there_event_handler (i)) return;
+
+    fprintf (stderr, "%s: replaced %s by %s at pos (%i, %i, %i)\n",
+             __func__, "DOOR", "FLOOR", p.room, p.floor, p.place);
+
+    c->fg = FLOOR;
+    c->bg = NO_BG;
+    c->ext.item = NO_ITEM;
+  }
+}
+
+/* consistency: opener and closer floors should have an associated
+   event and door */
+static void
+fix_opener_or_closer_lacking_door (struct pos p)
+{
+  struct con *c = con (p);
+  if (c->fg == OPENER_FLOOR
+      || c->fg == CLOSER_FLOOR) {
+    int i = c->ext.event;
+    do {
+      if (con (level->event[i].p)->fg == DOOR) return;
+    } while (level->event[i++].next);
+
+    fprintf (stderr, "%s: replaced %s (event %i) by %s at pos (%i, %i, %i)\n",
+             __func__, c->fg == OPENER_FLOOR ? "OPENER_FLOOR" : "CLOSER_FLOOR",
+             c->ext.event, "FLOOR", p.room, p.floor, p.place);
 
     c->fg = FLOOR;
     c->bg = NO_BG;
@@ -281,23 +296,24 @@ make_links_locally_consistent (int prev_room, int current_room)
     level->link[current_room].b = prev_room;
   else if (roomd (prev_room, BELOW) == current_room)
     level->link[current_room].a = prev_room;
-  else
-    error (-1, 0, "%s: internal inconsistency at room linking",
-           __func__);
 }
 
 static bool
 is_there_event_handler (int e)
 {
   struct pos p;
+  int i = 0;
 
   for (p.room = 1; p.room < ROOMS; p.room++)
     for (p.floor = 0; p.floor < FLOORS; p.floor++)
       for (p.place = 0; p.place < PLACES; p.place++) {
-        if ((con (p)->fg == OPENER_FLOOR
-             || con (p)->fg == CLOSER_FLOOR)
-            && con (p)->ext.event == e) return true;
-          }
+        if (con (p)->fg == OPENER_FLOOR) {
+          i = con (p)->ext.event;
+          do {
+            if (i == e) return true;
+          } while (level->event[i++].next);
+        }
+      }
   return false;
 }
 
@@ -306,4 +322,58 @@ is_rigid_con (struct pos p)
 {
   enum confg fg = con (p)->fg;
   return fg == PILLAR || fg == WALL || fg == DOOR;
+}
+
+void
+fix_enclosure (struct pos p, enum dir dir)
+{
+  int i;
+  int d = (dir == LEFT) ? -1 : +1;
+  struct pos q;
+
+  for (i = d, q = prel (p, 0, i); abs (i) < PLACES; i += d, q = prel (p, 0, i)) {
+
+    if (con (q)->fg == WALL) break;
+
+    con (q)->fg = WALL;
+    con (q)->bg = NO_BG;
+    con (q)->ext.item = NO_ITEM;
+  }
+}
+
+static bool
+is_enclosure (struct pos p, bool (*pred) (struct pos p), enum dir dir)
+{
+  int i;
+  int d = (dir == LEFT) ? -1 : +1;
+  struct pos q;
+
+  if (con (p)->fg == WALL)
+    for (i = d, q = prel (p, 0, i); abs (i) < PLACES; i += d, q = prel (p, 0, i)) {
+      if (con (q)->fg == WALL) {
+        if (i >= 2) return true;
+        else return false;
+      }
+
+      if (! pred (q)) return false;
+    }
+  return false;
+}
+
+static bool
+is_inaccessible (struct pos p)
+{
+  struct con *c = con (p);
+  struct con *ca = crel (p, -1, +0);
+
+  return c->fg != NO_FLOOR
+    && c->fg != LOOSE_FLOOR
+    && ca->fg != NO_FLOOR
+    && ca->fg != LOOSE_FLOOR;
+}
+
+static bool
+is_loose (struct pos p)
+{
+  return con (p)->fg == LOOSE_FLOOR;
 }
