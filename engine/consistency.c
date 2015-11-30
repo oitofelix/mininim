@@ -112,8 +112,8 @@ fix_inaccessible_enclosure (struct pos p)
 void
 fix_loose_enclosure (struct pos p)
 {
-  /* if (is_enclosure (p, is_loose, LEFT)) fix_enclosure (p, LEFT); */
-  /* if (is_enclosure (p, is_loose, RIGHT)) fix_enclosure (p, RIGHT); */
+  if (is_enclosure (p, is_loose, LEFT)) fix_enclosure (p, LEFT);
+  if (is_enclosure (p, is_loose, RIGHT)) fix_enclosure (p, RIGHT);
 }
 
 /* consistency: rigid constructions (pillar, wall, door) must have
@@ -351,7 +351,7 @@ is_enclosure (struct pos p, bool (*pred) (struct pos p), enum dir dir)
   if (con (p)->fg == WALL)
     for (i = d, q = prel (p, 0, i); abs (i) < PLACES; i += d, q = prel (p, 0, i)) {
       if (con (q)->fg == WALL) {
-        if (i >= 2) return true;
+        if (abs (i) >= 2) return true;
         else return false;
       }
 

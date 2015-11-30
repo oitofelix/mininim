@@ -84,12 +84,17 @@ dist_next_place (struct anim a,
   int r = reverse ? -1 : 1;
   int inc = (a.dir == LEFT) ? r * -1 : r * +1;
 
-  struct pos p = pos_func (coord_func (a));
-  int x = a.c.x;
-  while (p.place == pos_func (coord_func (a)).place
-         && abs (x - a.c.x) < PLACE_WIDTH) a.c.x += inc;
+  int i = 0;
 
-  return abs (a.c.x - x);
+  struct pos p = npos (pos_func (coord_func (a)));
+  while (p.place == npos (pos_func (coord_func (a))).place
+         && abs (i) < PLACE_WIDTH) {
+    i += inc;
+    a.c.x += inc;
+    a.c = nanim (a);
+  }
+
+  return abs (i);
 }
 
 void
