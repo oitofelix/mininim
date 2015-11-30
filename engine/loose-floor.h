@@ -77,6 +77,7 @@ void draw_loose_floor (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_loose_floor_base (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_loose_floor_left (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_loose_floor_right (ALLEGRO_BITMAP *bitmap, struct pos p);
+void draw_falling_loose_floor (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_loose_floor_00 (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_loose_floor_00_base (ALLEGRO_BITMAP *bitmap, struct pos p);
 void draw_loose_floor_00_left (ALLEGRO_BITMAP *bitmap, struct pos p);

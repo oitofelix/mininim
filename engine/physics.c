@@ -217,18 +217,31 @@ bool
 is_hangable_pos (struct pos p, enum dir d)
 {
   int dir = (d == LEFT) ? -1 : +1;
-  enum confg fg = crel (p, -1, dir)->fg;
+  struct pos ph = prel (p, -1, dir);
+  struct con *ch = con (ph);
+  struct pos pa = prel (p, -1, 0);
+  struct con *ca = con (pa);
 
-  return (fg == FLOOR || fg == BROKEN_FLOOR || fg == LOOSE_FLOOR
-          || fg == SKELETON_FLOOR || fg == SPIKES_FLOOR
-          || fg == OPENER_FLOOR || fg == CLOSER_FLOOR
-          || fg == PILLAR || fg == DOOR)
-    && crel (p, -1, 0)->fg == NO_FLOOR;
+  return (ch->fg == FLOOR
+          || ch->fg == BROKEN_FLOOR
+          || (ch->fg == LOOSE_FLOOR
+              && loose_floor_at_pos (ph)->action
+              != RELEASE_LOOSE_FLOOR)
+          || ch->fg == SKELETON_FLOOR
+          || ch->fg == SPIKES_FLOOR
+          || ch->fg == OPENER_FLOOR
+          || ch->fg == CLOSER_FLOOR
+          || ch->fg == PILLAR || ch->fg == DOOR)
+    && (ca->fg == NO_FLOOR
+        || (ca->fg == LOOSE_FLOOR
+            && loose_floor_at_pos (pa)->action
+            == RELEASE_LOOSE_FLOOR));
 }
 
 bool
 can_hang (struct anim a)
 {
+  a.c = nanim (a);
   struct coord tf = coord_tf (a);
 
   struct pos pmf = pos (coord_mf (a));
@@ -246,7 +259,7 @@ can_hang (struct anim a)
   if (hm) hang_pos = pm;
   if (hmba) hang_pos = pmba;
 
-  hang_pos = npos (hang_pos);
+  hang_pos = pos2view (hang_pos);
 
   /* for fall */
   struct coord ch;
@@ -254,7 +267,7 @@ can_hang (struct anim a)
   ch.x = PLACE_WIDTH * (hang_pos.place + dir) + 7 + 8 * dir;
   ch.y = PLACE_HEIGHT * hang_pos.floor - 6;
 
-  printf ("dist_coord = %f\n", dist_coord (kids.tf, ch));
+  printf ("dist_coord = %f\n", dist_coord (tf, ch));
 
   if (is_kid_fall (a) &&
       dist_coord (tf, ch) > 19) return false;

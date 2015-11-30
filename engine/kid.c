@@ -414,11 +414,11 @@ load_kid (void)
   /* kid himself */
   kid.id = &kid;
   kid.frame = kid_normal_00;
-  kid.dir = RIGHT;
+  kid.dir = LEFT;
   kid.action = kid_normal;
   update_depressible_floor (&kid, -4, -10);
 
-  place_kid (1, 2, 0);
+  place_kid (13, 0, 8);
 }
 
 void
@@ -976,7 +976,7 @@ kid_normal (void)
   } else if (drink) {
     item_pos = kids.pbf;
     /* keep this value this way, or the kid might fall if on edge */
-    int d = (kid.dir == LEFT) ? +8 : +12;
+    int d = (kid.dir == LEFT) ? +10 : +12;
     to_next_place_edge (&kid, frame, coord_bf, pos, 0, true, d);
     kid_couch ();
     return;
@@ -1143,7 +1143,8 @@ kid_start_run (void)
     || ((kid.dir == LEFT) && left_key && up_key);
 
   /* fall */
-  if (kids.ctf == NO_FLOOR) {
+  if (kids.cmbo == NO_FLOOR
+      || kids.ctf == NO_FLOOR) {
     kid_fall ();
     i = 0; return;
   }
@@ -1213,7 +1214,7 @@ kid_run (void)
   }
 
   /* collision */
-  if (is_colliding (kid, coord_tf, pos, 0, false, -dx)) {
+  if (is_colliding (kid, coord_tf, pos, 0, false, -dx + 2)) {
     kid_stabilize_collision ();
     i = 0; return;
   }
@@ -1276,7 +1277,7 @@ kid_stop_run (void)
   }
 
   /* collision */
-  if (is_colliding (kid, coord_tf, pos, 0, false, -dx)) {
+  if (is_colliding (kid, coord_tf, pos, 0, false, -dx + 2)) {
     kid_stabilize_collision ();
     i = 0; return;
   }
@@ -1328,6 +1329,7 @@ kid_turn (void)
 
   /* fall */
   if (kids.cbf == NO_FLOOR && kids.cbb == NO_FLOOR) {
+    if (i > 0) kid.dir = (kid.dir == RIGHT) ? LEFT : RIGHT;
     kid_fall ();
     return;
   }
@@ -1509,6 +1511,7 @@ kid_vjump (void)
       critical_edge = false;
     }
     hang_pos = prel (kids.ptf, 0, dir);
+    hang_pos = pos2view (hang_pos);
     hang = true;
   } else if (i == 0 && can_hang (kid)
              && con (hang_pos)->fg != NO_FLOOR
@@ -1552,6 +1555,7 @@ kid_vjump (void)
   if (i == 13 && hit_ceiling) {
     shake_loose_floor_row (kids.ptb);
     if (kids.ctb == LOOSE_FLOOR) release_loose_floor (kids.ptb);
+    if (kids.ctf == LOOSE_FLOOR) release_loose_floor (kids.ptf);
   }
 
   /* next frame */
@@ -1599,7 +1603,7 @@ kid_run_jump (void)
   }
 
   /* collision */
-  if (is_colliding (kid, coord_tf, pos, 0, false, -dx)) {
+  if (is_colliding (kid, coord_tf, pos, 0, false, -dx + 4)) {
     if (i < 6) kid_stabilize_collision ();
     else kid_couch_collision ();
     i = 0; return;
@@ -1740,7 +1744,7 @@ kid_hang_wall (void)
     kid_vjump ();
     hang_limit = false;
     return;
-  } if (up_key) {
+  } if (up_key && ! hang_limit) {
     kid_climb ();
     reverse = false; i = 4; wait = 0;
     return;
@@ -1791,7 +1795,7 @@ kid_hang_free (void)
       && j > -1) {
     if (kids.cm == NO_FLOOR) {
       reverse = true; i = 4; j = -1; wait = 3;
-      kid.c.x += (kid.dir == LEFT) ? +8 : -8;
+      kid.c.x += (kid.dir == LEFT) ? +6 : -4;
       kid_fall ();
       hang_limit = false;
       return;
@@ -1803,7 +1807,7 @@ kid_hang_free (void)
     hang_limit = false;
     reverse = true; i = 4; j = -1; wait = 3;
     return;
-  } if (up_key) {
+  } if (up_key && ! hang_limit) {
     kid_climb ();
     reverse = true; i = 4; j = -1; wait = 3;
     return;
@@ -1860,7 +1864,6 @@ kid_climb (void)
   if (kid.dir == LEFT && dx != 0 && i % 2) dx += 1;
 
   if (i == 0) {
-    hang_pos = npos (hang_pos);
     kid.frame = climb_frameset[0].frame;
     int dir = (kid.dir == LEFT) ? 0 : 1;
     kid.c.x = PLACE_WIDTH * (hang_pos.place + dir) + 9;
@@ -1884,6 +1887,7 @@ kid_climb (void)
       i = 0;
       int dir = (kid.dir == LEFT) ? -1 : +1;
       hang_pos = prel (hang_pos, -1, dir);
+      hang_pos = pos2view (hang_pos);
       hang_limit = true;
       kid_unclimb ();
       return;
@@ -1919,7 +1923,8 @@ kid_unclimb (void)
        the hanged construction instead of the usual hangable position
        facing it */
     hang_pos =
-      npos (prel (hang_pos, +1, (kid.dir == LEFT) ? +1 : -1));
+      prel (hang_pos, +1, (kid.dir == LEFT) ? +1 : -1);
+    hang_pos = pos2view (hang_pos);
     kid_hang ();
     return;
   }
@@ -1974,6 +1979,14 @@ kid_stabilize (void)
   /* collision */
   if (is_colliding (kid, coord_tf, pos, 0, false, -dx))
     to_collision_edge (&kid, frame, coord_tf, pos, 0, false, -dx);
+
+  /* fall */
+  if (kids.cbf == NO_FLOOR
+      && kids.cmbo == NO_FLOOR
+      && kids.cbb == NO_FLOOR) {
+    kid_fall ();
+    return;
+  }
 
   /* actions */
   if (! turn)
@@ -2063,6 +2076,7 @@ kid_couch (void)
       && ! (kids.ctf == DOOR && kid.dir == LEFT
             && door_at_pos (kids.ptf)->i > DOOR_CLIMB_LIMIT)) {
     hang_pos = kids.pbf;
+    hang_pos = pos2view (hang_pos);
     critical_edge =
       (crel (hang_pos, +1, dir)->fg == NO_FLOOR);
     kid_unclimb ();
@@ -2097,6 +2111,8 @@ kid_couch (void)
   else if (i == 11) update_depressible_floor (&kid, -6, -12);
   else keep_depressible_floor (&kid);
 
+
+ next_frame:
   /* next frame */
   if (i == 12) {
     kid.action = kid_normal;
@@ -2104,8 +2120,10 @@ kid_couch (void)
   } else if (i == 2 && item_pos.room != -1) {
     if (is_potion (item_pos)) kid.action = kid_drink;
     else if (is_sword (item_pos)) kid.action = kid_raise_sword;
-    else error (-1, 0, "%s: unknown item (%i)",
-                __func__, con (item_pos)->ext.item);
+    else {
+      item_pos.room = -1;
+      goto next_frame;
+    }
     i = 0; wait = 1; collision = fall = false;
   } else if (i == 2 && down_key
            && ((kid.dir == LEFT && left_key)
@@ -2181,6 +2199,7 @@ kid_fall (void)
            && abs (kid.c.x - x) < PLACE_WIDTH)
       kid.c.x += dir;
     kid.c.x += -dir * 12;
+    kid.c.y += 6;
   }
 
   /* ensure kid's proximity for hang */
@@ -2195,7 +2214,7 @@ kid_fall (void)
   }
 
   /* hang */
-  if (i > 0 && can_hang (kid) && shift_key && ! hang_limit) {
+  if (i > 2 && can_hang (kid) && shift_key && ! hang_limit) {
     play_sample (hang_on_fall);
     kid_hang ();
     i = 0; force_floor = -2;

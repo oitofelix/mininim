@@ -109,6 +109,41 @@ npos (struct pos p)
 }
 
 struct pos
+pos2view (struct pos p)
+{
+  int room;
+  p = npos (p);
+
+  do {
+    room = p.room;
+
+    if (p.floor == 0
+        && roomd (room_view, BELOW) == p.room
+        && room_view != p.room) {
+      p.floor += FLOORS;
+      p.room = room_view;
+    } else if (p.floor == FLOORS - 1
+               && roomd (room_view, ABOVE) == p.room
+               && room_view != p.room) {
+      p.floor -= FLOORS;
+      p.room = room_view;
+    } else if (p.place == 0
+               && roomd (room_view, RIGHT) == p.room
+               && room_view != p.room) {
+      p.place += PLACES;
+      p.room = room_view;
+    } else if (p.place == PLACES - 1
+               && roomd (room_view, LEFT) == p.room
+               && room_view != p.room) {
+      p.place -= PLACES;
+      p.room = room_view;
+    }
+  } while (room != p.room);
+
+  return p;
+}
+
+struct pos
 pos_gen (struct coord c, int dx, int dy)
 {
   struct pos p;
@@ -179,14 +214,19 @@ nanim (struct anim a)
     ml.x += -3;
     mr.x += +3;
 
-    struct coord nm = ncoord (m);
     struct coord nml = ncoord (ml);
     struct coord nmr = ncoord (mr);
 
-    if (nml.room == nmr.room) {
-      struct coord c = nm;
-      c.x -= d.w / 2;
+    if (nml.room == nmr.room
+        || (a.c.room != nml.room
+            && a.c.room != nmr.room)) {
+      struct coord c = (a.dir == LEFT) ? nml : nmr;
+      int dx = (a.dir == LEFT) ? +3 : -3;
+      c.x -= d.w / 2 - dx;
       c.y -= d.h / 2;
+
+      hang_pos = pos2view (hang_pos);
+
       return c;
     } else return a.c;
   } else {

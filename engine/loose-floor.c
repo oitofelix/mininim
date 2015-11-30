@@ -298,7 +298,7 @@ void
 shake_loose_floor_row (struct pos p)
 {
   struct loose_floor *l;
-  for (p.place = PLACES - 1; p.place >= 0; p.place--)
+  for (p.place = PLACES - 1; p.place >= -1; p.place--)
     if (con (p)->fg == LOOSE_FLOOR) {
       l = loose_floor_at_pos (p);
       if (l->action == NO_LOOSE_FLOOR_ACTION) {
@@ -325,6 +325,22 @@ draw_loose_floor (ALLEGRO_BITMAP *bitmap, struct pos p)
   struct loose_floor *l = loose_floor_at_pos (p);
   if (! l) return;
 
+  if (l->action == FALL_LOOSE_FLOOR) return;
+  else {
+    switch (l->state) {
+    case 0: draw_loose_floor_00 (bitmap, p); break;
+    case 1: draw_loose_floor_01 (bitmap, p); break;
+    case 2: draw_loose_floor_02 (bitmap, p); break;
+    }
+  }
+}
+
+void
+draw_falling_loose_floor (ALLEGRO_BITMAP *bitmap, struct pos p)
+{
+  struct loose_floor *l = loose_floor_at_pos (p);
+  if (! l) return;
+
   struct pos ptr, pbr;
   if (l->action == FALL_LOOSE_FLOOR) {
     ptr = posf (coord_tr (l->a));
@@ -332,13 +348,7 @@ draw_loose_floor (ALLEGRO_BITMAP *bitmap, struct pos p)
     draw_anim (bitmap, l->a);
     draw_con_left (bitmap, ptr);
     draw_con_left (bitmap, pbr);
-  } else {
-    switch (l->state) {
-    case 0: draw_loose_floor_00 (bitmap, p); break;
-    case 1: draw_loose_floor_01 (bitmap, p); break;
-    case 2: draw_loose_floor_02 (bitmap, p); break;
-    }
-  }
+  } else return;
 }
 
 void

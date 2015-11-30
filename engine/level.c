@@ -48,7 +48,7 @@ struct level *level;
 
 static bool no_room_drawing = false;
 
-int room_view = 1;
+int room_view = 13;
 
 void
 play_level (struct level *_level)
@@ -167,10 +167,12 @@ level_anim (void)
         draw_closer_floor (screen, p);
         draw_spikes_floor (screen, p);
         draw_door (screen, p);
+        draw_falling_loose_floor (screen, p);
       }
 
   draw_anim (screen, kid);
   draw_xanim (screen, kid);
+  draw_falling_loose_floor (screen, prel (kids.pml, 0, +1));
   draw_room_anim_fg (kid);
   kid.xframe = NULL;
 

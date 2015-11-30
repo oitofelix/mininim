@@ -400,7 +400,7 @@ bricks_coord_34 (struct pos p)
 {
   struct coord c;
   c.x = PLACE_WIDTH * (p.place + 1);
-  c.y = PLACE_HEIGHT * p.floor + 12;
+  c.y = PLACE_HEIGHT * p.floor + 4;
   c.room = p.room;
   return c;
 }

@@ -26,6 +26,7 @@ int roomd (int room, enum dir dir);
 
 struct coord ncoord (struct coord c);
 struct pos npos (struct pos p);
+struct pos pos2view (struct pos p);
 
 struct pos pos_gen (struct coord c, int dx, int dy);
 struct pos pos (struct coord c);
