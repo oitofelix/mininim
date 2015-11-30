@@ -136,18 +136,6 @@ struct level {
   } event[EVENTS];
 };
 
-struct survey {
-  struct coord m, mt, mbo, ml, mr, mf, mba,
-    tl, tr, tf, tb,
-    bl, br, bf, bb;
-  struct pos pm, pmt, pmbo, pml, pmr, pmf, pmba,
-    ptl, ptr, ptf, ptb,
-    pbl, pbr, pbf, pbb;
-  enum confg cm, cmt, cmbo, cml, cmr, cmf, cmba,
-    ctl, ctr, ctf, ctb,
-    cbl, cbr, cbf, cbb;
-};
-
 /* current video mode */
 extern enum video_mode video_mode;
 

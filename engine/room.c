@@ -440,44 +440,47 @@ window_coord (struct pos p)
 void
 draw_room_anim_fg (struct anim a)
 {
-  draw_room_fg (a, posf (coord_bl (a)));
-  draw_room_fg (a, posf (coord_br (a)));
-  draw_room_fg (a, posf (coord_m (a)));
-  draw_room_fg (a, posf (coord_tl (a)));
-  draw_room_fg (a, posf (coord_tr (a)));
+  draw_room_fg (a, posf (bl (a)));
+  draw_room_fg (a, posf (br (a)));
+  draw_room_fg (a, posf (m (a)));
+  draw_room_fg (a, posf (tl (a)));
+  draw_room_fg (a, posf (tr (a)));
 
-  draw_room_fg (a, pos (coord_bl (a)));
-  draw_room_fg (a, pos (coord_br (a)));
-  draw_room_fg (a, pos (coord_m (a)));
-  draw_room_fg (a, pos (coord_tl (a)));
-  draw_room_fg (a, pos (coord_tr (a)));
+  draw_room_fg (a, pos (bl (a)));
+  draw_room_fg (a, pos (br (a)));
+  draw_room_fg (a, pos (m (a)));
+  draw_room_fg (a, pos (tl (a)));
+  draw_room_fg (a, pos (tr (a)));
 
   if (! a.xframe) return;
 
   struct anim xa = anim_from_xanim (a);
 
-  draw_room_fg (a, posf (coord_bl (xa)));
-  draw_room_fg (a, posf (coord_br (xa)));
-  draw_room_fg (a, posf (coord_m (xa)));
-  draw_room_fg (a, posf (coord_tl (xa)));
-  draw_room_fg (a, posf (coord_tr (xa)));
+  draw_room_fg (a, posf (bl (xa)));
+  draw_room_fg (a, posf (br (xa)));
+  draw_room_fg (a, posf (m (xa)));
+  draw_room_fg (a, posf (tl (xa)));
+  draw_room_fg (a, posf (tr (xa)));
 
-  draw_room_fg (a, pos (coord_bl (xa)));
-  draw_room_fg (a, pos (coord_br (xa)));
-  draw_room_fg (a, pos (coord_m (xa)));
-  draw_room_fg (a, pos (coord_tl (xa)));
-  draw_room_fg (a, pos (coord_tr (xa)));
+  draw_room_fg (a, pos (bl (xa)));
+  draw_room_fg (a, pos (br (xa)));
+  draw_room_fg (a, pos (m (xa)));
+  draw_room_fg (a, pos (tl (xa)));
+  draw_room_fg (a, pos (tr (xa)));
 }
 
 void
 draw_room_fg (struct anim a, struct pos p)
 {
-  struct survey s = survey (a, pos);
-  struct survey sf = survey (a, posf);
+  struct pos ptl = ptl (a), pm = pm (a), ptf = ptf (a),
+    ptr = ptr (a), pmt = pmt (a), pmbo = pmbo (a);
+
+  struct pos fptl = fptl (a), fptr = fptr (a),
+    fpmt = fpmt (a), fpmbo = fpmbo (a);
 
   /* when falling at construct's left */
-  if ((peq (p, prel (s.ptl, 0, +1))
-       || peq (p, prel (s.pm, 0, +1)))
+  if ((peq (p, prel (ptl, 0, +1))
+       || peq (p, prel (pm, 0, +1)))
       && is_kid_fall (a))
     switch (con (p)->fg) {
     case NO_FLOOR: break;
@@ -499,7 +502,7 @@ draw_room_fg (struct anim a, struct pos p)
              __func__, con (p)->fg);
     }
   /* when climbing the construct */
-  else if (peq (s.ptf, p)
+  else if (peq (ptf, p)
            && is_kid_climb (a)
            && a.dir == RIGHT) {
     if (con (p)->fg == PILLAR)
@@ -524,16 +527,16 @@ draw_room_fg (struct anim a, struct pos p)
         draw_floor_corner_02 (screen, p);
     }
     /* when below the construction */
-  } else if ((peq (p, sf.ptl)
-              || peq (p, sf.ptr)
-              || peq (p, sf.pmt)
-              || peq (p, s.ptl)
-              || peq (p, s.ptr)
-              || peq (p, s.pmt))
-             && (peq (p, prel (sf.pmbo, -1, 0))
-                 || peq (p, prel (s.pmbo, -1, 0)))
+  } else if ((peq (p, fptl)
+              || peq (p, fptr)
+              || peq (p, fpmt)
+              || peq (p, ptl)
+              || peq (p, ptr)
+              || peq (p, pmt))
+             && (peq (p, prel (fpmbo, -1, 0))
+                 || peq (p, prel (pmbo, -1, 0)))
              && ! (is_kid_hang_or_climb (a) && a.dir == LEFT)
-             && floor_left_coord (p).y <= s.tl.y) {
+             && floor_left_coord (p).y <= tl (a).y) {
     switch (con (p)->fg) {
     case NO_FLOOR: break;
     case FLOOR: draw_floor (screen, p); break;

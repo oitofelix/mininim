@@ -38,25 +38,88 @@ struct pos prel (struct pos, int floor, int place);
 
 struct coord nanim (struct anim a);
 
-struct coord coord_m (struct anim a);
-struct coord coord_mt (struct anim a);
-struct coord coord_mbo (struct anim a);
-struct coord coord_ml (struct anim a);
-struct coord coord_mr (struct anim a);
-struct coord coord_mf (struct anim a);
-struct coord coord_mba (struct anim a);
+struct coord m (struct anim a);
+struct coord mt (struct anim a);
+struct coord mbo (struct anim a);
+struct coord ml (struct anim a);
+struct coord mr (struct anim a);
+struct coord mf (struct anim a);
+struct coord mba (struct anim a);
 
-struct coord coord_tl (struct anim a);
-struct coord coord_tr (struct anim a);
-struct coord coord_tf (struct anim a);
-struct coord coord_tb (struct anim a);
+struct coord tl (struct anim a);
+struct coord tr (struct anim a);
+struct coord tf (struct anim a);
+struct coord tb (struct anim a);
 
-struct coord coord_bl (struct anim a);
-struct coord coord_br (struct anim a);
-struct coord coord_bf (struct anim a);
-struct coord coord_bb (struct anim a);
+struct coord bl (struct anim a);
+struct coord br (struct anim a);
+struct coord bf (struct anim a);
+struct coord bb (struct anim a);
 
-struct survey survey (struct anim a, struct pos (*pf) (struct coord c));
 double dist_coord (struct coord a, struct coord b);
+
+#define pm(a) (pos (m (a)))
+#define pmt(a) (pos (mt (a)))
+#define pmbo(a) (pos (mbo (a)))
+#define pml(a) (pos (ml (a)))
+#define pmr(a) (pos (mr (a)))
+#define pmf(a) (pos (mf (a)))
+#define pmba(a) (pos (mba (a)))
+#define ptl(a) (pos (tl (a)))
+#define ptr(a) (pos (tr (a)))
+#define ptf(a) (pos (tf (a)))
+#define ptb(a) (pos (tb (a)))
+#define pbl(a) (pos (bl (a)))
+#define pbr(a) (pos (br (a)))
+#define pbf(a) (pos (bf (a)))
+#define pbb(a) (pos (bb (a)))
+
+#define cm(a) (con (pm (a))->fg)
+#define cmt(a) (con (pmt (a))->fg)
+#define cmbo(a) (con (pmbo (a))->fg)
+#define cml(a) (con (pml (a))->fg)
+#define cmr(a) (con (pmr (a))->fg)
+#define cmf(a) (con (pmf (a))->fg)
+#define cmba(a) (con (pmba (a))->fg)
+#define ctl(a) (con (ptl (a))->fg)
+#define ctr(a) (con (ptr (a))->fg)
+#define ctf(a) (con (ptf (a))->fg)
+#define ctb(a) (con (ptb (a))->fg)
+#define cbl(a) (con (pbl (a))->fg)
+#define cbr(a) (con (pbr (a))->fg)
+#define cbf(a) (con (pbf (a))->fg)
+#define cbb(a) (con (pbb (a))->fg)
+
+#define fpm(a) (posf (m (a)))
+#define fpmt(a) (posf (mt (a)))
+#define fpmbo(a) (posf (mbo (a)))
+#define fpml(a) (posf (ml (a)))
+#define fpmr(a) (posf (mr (a)))
+#define fpmf(a) (posf (mf (a)))
+#define fpmba(a) (posf (mba (a)))
+#define fptl(a) (posf (tl (a)))
+#define fptr(a) (posf (tr (a)))
+#define fptf(a) (posf (tf (a)))
+#define fptb(a) (posf (tb (a)))
+#define fpbl(a) (posf (bl (a)))
+#define fpbr(a) (posf (br (a)))
+#define fpbf(a) (posf (bf (a)))
+#define fpbb(a) (posf (bb (a)))
+
+#define fcm(a) (con (fpm (a))->fg)
+#define fcmt(a) (con (fpmt (a))->fg)
+#define fcmbo(a) (con (fpmbo (a))->fg)
+#define fcml(a) (con (fpml (a))->fg)
+#define fcmr(a) (con (fpmr (a))->fg)
+#define fcmf(a) (con (fpmf (a))->fg)
+#define fcmba(a) (con (fpmba (a))->fg)
+#define fctl(a) (con (fptl (a))->fg)
+#define fctr(a) (con (fptr (a))->fg)
+#define fctf(a) (con (fptf (a))->fg)
+#define fctb(a) (con (fptb (a))->fg)
+#define fcbl(a) (con (fpbl (a))->fg)
+#define fcbr(a) (con (fpbr (a))->fg)
+#define fcbf(a) (con (fpbf (a))->fg)
+#define fcbb(a) (con (fpbb (a))->fg)
 
 #endif	/* FREEPOP_POSITION_H */

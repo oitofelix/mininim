@@ -255,9 +255,9 @@ draw_door_fg (ALLEGRO_BITMAP *bitmap, struct pos p, struct anim a)
   if (is_kid_hanging_at_pos (a, p)
       && a.dir == LEFT) return;
 
-  struct pos ptf = pos (coord_tf (a));
-  struct pos pmbo = pos (coord_mbo (a));
-  struct pos pbb = pos (coord_bb (a));
+  struct pos ptf = pos (tf (a));
+  struct pos pmbo = pos (mbo (a));
+  struct pos pbb = pos (bb (a));
 
   if ((a.dir == RIGHT && peq (ptf, p))
       || (a.dir == RIGHT

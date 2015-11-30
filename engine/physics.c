@@ -242,11 +242,11 @@ bool
 can_hang (struct anim a)
 {
   a.c = nanim (a);
-  struct coord tf = coord_tf (a);
+  struct coord _tf = tf (a);
 
-  struct pos pmf = pos (coord_mf (a));
-  struct pos pm = pos (coord_m (a));
-  struct pos pmba = pos (coord_mba (a));
+  struct pos pmf = pos (mf (a));
+  struct pos pm = pos (m (a));
+  struct pos pmba = pos (mba (a));
 
   bool hmf = is_hangable_pos (pmf, a.dir);
   bool hm = is_hangable_pos (pm, a.dir);
@@ -267,10 +267,10 @@ can_hang (struct anim a)
   ch.x = PLACE_WIDTH * (hang_pos.place + dir) + 7 + 8 * dir;
   ch.y = PLACE_HEIGHT * hang_pos.floor - 6;
 
-  printf ("dist_coord = %f\n", dist_coord (tf, ch));
+  printf ("dist_coord = %f\n", dist_coord (_tf, ch));
 
   if (is_kid_fall (a) &&
-      dist_coord (tf, ch) > 19) return false;
+      dist_coord (_tf, ch) > 19) return false;
 
   return true;
 }
@@ -286,11 +286,11 @@ update_depressible_floor (struct anim *a, int dx0, int dx1)
 
   int dir = (a->dir == LEFT) ? -1 : 1;
 
-  c0 = coord_bf (*a);
+  c0 = bf (*a);
   c0.x += dir * dx0;
   p0 = pos (c0);
 
-  c1 = coord_bf (*a);
+  c1 = bf (*a);
   c1.x += dir * dx1;
   p1 = pos (c1);
 

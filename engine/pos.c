@@ -158,13 +158,13 @@ pos_gen (struct coord c, int dx, int dy)
   return p;
 }
 
-struct pos
+inline struct pos
 pos (struct coord c)
 {
   return pos_gen (c, 15, 3);
 }
 
-struct pos
+inline struct pos
 posf (struct coord c)
 {
   return pos_gen (c, 0, 3);
@@ -207,9 +207,9 @@ nanim (struct anim a)
   if (a.id == &kid) {
     struct dim d = dim (a);
 
-    struct coord m = coord_m (a);
-    struct coord ml = m;
-    struct coord mr = m;
+    struct coord _m = m (a);
+    struct coord ml = _m;
+    struct coord mr = _m;
 
     ml.x += -3;
     mr.x += +3;
@@ -242,7 +242,7 @@ nanim (struct anim a)
    000 */
 
 struct coord
-coord_m (struct anim a)
+m (struct anim a)
 {
   struct dim d = dim (a);
   struct coord c;
@@ -258,7 +258,7 @@ coord_m (struct anim a)
    000 */
 
 struct coord
-coord_mt (struct anim a)
+mt (struct anim a)
 {
   struct dim d = dim (a);
   struct coord c;
@@ -274,7 +274,7 @@ coord_mt (struct anim a)
    010 */
 
 struct coord
-coord_mbo (struct anim a)
+mbo (struct anim a)
 {
   struct dim d = dim (a);
   struct coord c;
@@ -290,7 +290,7 @@ coord_mbo (struct anim a)
    000 */
 
 struct coord
-coord_ml (struct anim a)
+ml (struct anim a)
 {
   struct dim d = dim (a);
   struct coord c;
@@ -306,7 +306,7 @@ coord_ml (struct anim a)
    000 */
 
 struct coord
-coord_mr (struct anim a)
+mr (struct anim a)
 {
   struct dim d = dim (a);
   struct coord c;
@@ -322,7 +322,7 @@ coord_mr (struct anim a)
    000 000 */
 
 struct coord
-coord_mf (struct anim a)
+mf (struct anim a)
 {
   struct dim d = dim (a);
   struct coord c;
@@ -338,7 +338,7 @@ coord_mf (struct anim a)
    000 000 */
 
 struct coord
-coord_mba (struct anim a)
+mba (struct anim a)
 {
   struct dim d = dim (a);
   struct coord c;
@@ -354,7 +354,7 @@ coord_mba (struct anim a)
    000 */
 
 struct coord
-coord_tl (struct anim a)
+tl (struct anim a)
 {
   struct dim d = dim (a);
   struct coord c;
@@ -370,7 +370,7 @@ coord_tl (struct anim a)
    000 */
 
 struct coord
-coord_tr (struct anim a)
+tr (struct anim a)
 {
   struct dim d = dim (a);
   struct coord c;
@@ -386,7 +386,7 @@ coord_tr (struct anim a)
    000 000 */
 
 struct coord
-coord_tf (struct anim a)
+tf (struct anim a)
 {
   struct dim d = dim (a);
   struct coord c;
@@ -402,7 +402,7 @@ coord_tf (struct anim a)
    000 000 */
 
 struct coord
-coord_tb (struct anim a)
+tb (struct anim a)
 {
   struct dim d = dim (a);
   struct coord c;
@@ -418,7 +418,7 @@ coord_tb (struct anim a)
    100 */
 
 struct coord
-coord_bl (struct anim a)
+bl (struct anim a)
 {
   struct dim d = dim (a);
   struct coord c;
@@ -434,7 +434,7 @@ coord_bl (struct anim a)
    001 */
 
 struct coord
-coord_br (struct anim a)
+br (struct anim a)
 {
   struct dim d = dim (a);
   struct coord c;
@@ -450,7 +450,7 @@ coord_br (struct anim a)
    100 001 */
 
 struct coord
-coord_bf (struct anim a)
+bf (struct anim a)
 {
   struct dim d = dim (a);
   struct coord c;
@@ -466,7 +466,7 @@ coord_bf (struct anim a)
    001 100 */
 
 struct coord
-coord_bb (struct anim a)
+bb (struct anim a)
 {
   struct dim d = dim (a);
   struct coord c;
@@ -482,66 +482,4 @@ dist_coord (struct coord a, struct coord b)
   int dx = a.x - b.x;
   int dy = a.y - b.y;
   return sqrt (dx * dx + dy * dy);
-}
-
-struct survey
-survey (struct anim a, struct pos (*pf) (struct coord c))
-{
-  struct survey s;
-
-  s.m = coord_m (a);
-  s.mt = coord_mt (a);
-  s.mbo = coord_mbo (a);
-  s.ml = coord_ml (a);
-  s.mr = coord_mr (a);
-  s.mf = coord_mf (a);
-  s.mba = coord_mba (a);
-
-  s.tl = coord_tl (a);
-  s.tr = coord_tr (a);
-  s.tf = coord_tf (a);
-  s.tb = coord_tb (a);
-
-  s.bl = coord_bl (a);
-  s.br = coord_br (a);
-  s.bf = coord_bf (a);
-  s.bb = coord_bb (a);
-
-  s.pm = pf (s.m);
-  s.pmt = pf (s.mt);
-  s.pmbo = pf (s.mbo);
-  s.pml = pf (s.ml);
-  s.pmr = pf (s.mr);
-  s.pmf = pf (s.mf);
-  s.pmba = pf (s.mba);
-
-  s.ptl = pf (s.tl);
-  s.ptr = pf (s.tr);
-  s.ptf = pf (s.tf);
-  s.ptb = pf (s.tb);
-
-  s.pbl = pf (s.bl);
-  s.pbr = pf (s.br);
-  s.pbf = pf (s.bf);
-  s.pbb = pf (s.bb);
-
-  s.cm = con (s.pm)->fg;
-  s.cmt = con (s.pmt)->fg;
-  s.cmbo = con (s.pmbo)->fg;
-  s.cml = con (s.pml)->fg;
-  s.cmr = con (s.pmr)->fg;
-  s.cmf = con (s.pmf)->fg;
-  s.cmba = con (s.pmba)->fg;
-
-  s.ctl = con (s.ptl)->fg;
-  s.ctr = con (s.ptr)->fg;
-  s.ctf = con (s.ptf)->fg;
-  s.ctb = con (s.ptb)->fg;
-
-  s.cbl = con (s.pbl)->fg;
-  s.cbr = con (s.pbr)->fg;
-  s.cbf = con (s.pbf)->fg;
-  s.cbb = con (s.pbb)->fg;
-
-  return s;
 }

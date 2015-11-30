@@ -132,8 +132,6 @@ level_anim (void)
   if (room_view == 0) room_view = prev_room;
 
   /* computation */
-  kids = survey (kid, pos);
-  kidsf = survey (kid, posf);
   prev_room = kid.c.room;
   kid.action ();
   if (prev_room != kid.c.room)  {
@@ -170,10 +168,12 @@ level_anim (void)
         draw_falling_loose_floor (screen, p);
       }
 
+  struct pos pml = pml (kid);
+
   draw_anim (screen, kid);
   draw_xanim (screen, kid);
-  draw_falling_loose_floor (screen, prel (kids.pml, 0, +1));
-  draw_falling_loose_floor (screen, prel (kids.pml, -1, +1));
+  draw_falling_loose_floor (screen, prel (pml, 0, +1));
+  draw_falling_loose_floor (screen, prel (pml, -1, +1));
   draw_room_anim_fg (kid);
   kid.xframe = NULL;
 

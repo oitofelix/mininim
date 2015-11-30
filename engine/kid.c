@@ -35,7 +35,6 @@
 #include "sword.h"
 
 struct anim kid;
-struct survey kids, kidsf;
 static bool hang_limit;
 static bool misstep = false;
 static int inertia = 0;
@@ -911,6 +910,8 @@ kid_normal (void)
   kid.flip = (kid.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
   inertia = 0;
 
+  struct pos pbf = pbf (kid);
+
   bool turn = ((kid.dir == RIGHT) && left_key) || ((kid.dir == LEFT) && right_key);
   bool walk = ((kid.dir == RIGHT) && right_key && shift_key)
     || ((kid.dir == LEFT) && left_key && shift_key);
@@ -920,8 +921,8 @@ kid_normal (void)
     || ((kid.dir == LEFT) && left_key && up_key);
   bool couch = down_key;
   bool vjump = up_key;
-  bool drink = is_potion (kids.pbf) && shift_key;
-  bool raise_sword = is_sword (kids.pbf) && shift_key;
+  bool drink = is_potion (pbf) && shift_key;
+  bool raise_sword = is_sword (pbf) && shift_key;
   bool take_sword = ctrl_key;
 
   ALLEGRO_BITMAP *frame = kid_normal_00;
@@ -929,8 +930,8 @@ kid_normal (void)
   int dy = +0;
 
   /* fall */
-  if (kids.cmbo == NO_FLOOR
-      && kids.cbb == NO_FLOOR) {
+  if (cmbo (kid) == NO_FLOOR
+      && cbb (kid) == NO_FLOOR) {
     kid_fall ();
     return;
   }
@@ -970,19 +971,19 @@ kid_normal (void)
     kid_walk ();
     return;
   } else if (run) {
-    if (dist_collision (kid, coord_tf, pos, 0, false) < 29)
+    if (dist_collision (kid, tf, pos, 0, false) < 29)
       kid_walk ();
     else kid_start_run ();
     return;
   } else if (drink) {
-    item_pos = kids.pbf;
+    item_pos = pbf (kid);
     /* keep this value this way, or the kid might fall if on edge */
     int d = (kid.dir == LEFT) ? +10 : +12;
-    to_next_place_edge (&kid, frame, coord_bf, pos, 0, true, d);
+    to_next_place_edge (&kid, frame, bf, pos, 0, true, d);
     kid_couch ();
     return;
   } else if (raise_sword) {
-    item_pos = kids.pbf;
+    item_pos = pbf (kid);
     kid_couch ();
     return;
   } else if (take_sword) {
@@ -991,7 +992,7 @@ kid_normal (void)
   }
 
   kid = next_anim (kid, frame, dx, dy);
-  kid.c.y = 63 * kids.ptf.floor + 15;
+  kid.c.y = 63 * ptf (kid).floor + 15;
 
   /* depressible floors */
   keep_depressible_floor (&kid);
@@ -1014,10 +1015,10 @@ kid_walk (void)
   int dc, df, dl, dd;
 
   if (i == 0) {
-    dc = dist_collision (kid, coord_tf, pos, +0, false);
-    df = dist_con (kid, coord_bf, pos, -4, false, NO_FLOOR);
-    dl = dist_con (kid, coord_bf, pos, -4, false, LOOSE_FLOOR);
-    dd = dist_con (kid, coord_bf, pos, -4, false, CLOSER_FLOOR);
+    dc = dist_collision (kid, tf, pos, +0, false);
+    df = dist_con (kid, bf, pos, -4, false, NO_FLOOR);
+    dl = dist_con (kid, bf, pos, -4, false, LOOSE_FLOOR);
+    dd = dist_con (kid, bf, pos, -4, false, CLOSER_FLOOR);
 
     if (dc < 4) {
       kid = next_anim (kid, kid_normal_00, +0, 0);
@@ -1060,10 +1061,10 @@ kid_walk (void)
       || (i == 5 && walk_3)
       || (i == 6 && walk_4)) {
     dx = +1;
-    to_collision_edge (&kid, frame, coord_tf, pos, +0, false, 0)
-      || to_con_edge (&kid, frame, coord_bf, pos, -4, false, 0, LOOSE_FLOOR)
-      || to_con_edge (&kid, frame, coord_bf, pos, -4, false, 0, CLOSER_FLOOR)
-      || to_con_edge (&kid, frame, coord_bf, pos, -4, false, 0, NO_FLOOR);
+    to_collision_edge (&kid, frame, tf, pos, +0, false, 0)
+      || to_con_edge (&kid, frame, bf, pos, -4, false, 0, LOOSE_FLOOR)
+      || to_con_edge (&kid, frame, bf, pos, -4, false, 0, CLOSER_FLOOR)
+      || to_con_edge (&kid, frame, bf, pos, -4, false, 0, NO_FLOOR);
   }
 
   if (walk_1) {
@@ -1087,8 +1088,8 @@ kid_walk (void)
   /* fall */
   if (! walk_0 && ! walk_1 && ! walk_2
       && ! walk_3 && ! walk_4
-      && ((i < 6 && kids.cbb == NO_FLOOR)
-          || (i >= 6 && kids.cmbo == NO_FLOOR))) {
+      && ((i < 6 && cbb (kid) == NO_FLOOR)
+          || (i >= 6 && cmbo (kid) == NO_FLOOR))) {
     kid_fall ();
     i =0; return;
   }
@@ -1144,14 +1145,14 @@ kid_start_run (void)
     || ((kid.dir == LEFT) && left_key && up_key);
 
   /* fall */
-  if (kids.cmbo == NO_FLOOR
-      || kids.ctf == NO_FLOOR) {
+  if (cmbo (kid) == NO_FLOOR
+      || ctf (kid) == NO_FLOOR) {
     kid_fall ();
     i = 0; return;
   }
 
   /* collision */
-  if (is_colliding (kid, coord_tf, pos, 0, false, -dx)) {
+  if (is_colliding (kid, tf, pos, 0, false, -dx)) {
     kid_stabilize_collision ();
     i = 0; return;
   }
@@ -1209,13 +1210,13 @@ kid_run (void)
     || ((kid.dir == LEFT) && left_key && up_key);
 
   /* fall */
-  if (kids.ctf == NO_FLOOR) {
+  if (ctf (kid) == NO_FLOOR) {
     kid_fall ();
     i = 0; return;
   }
 
   /* collision */
-  if (is_colliding (kid, coord_tf, pos, 0, false, -dx + 2)) {
+  if (is_colliding (kid, tf, pos, 0, false, -dx + 2)) {
     kid_stabilize_collision ();
     i = 0; return;
   }
@@ -1272,13 +1273,13 @@ kid_stop_run (void)
   bool couch = down_key;
 
   /* fall */
-  if (kids.ctf == NO_FLOOR) {
+  if (ctf (kid) == NO_FLOOR) {
     kid_fall ();
     i = 0; return;
   }
 
   /* collision */
-  if (is_colliding (kid, coord_tf, pos, 0, false, -dx + 2)) {
+  if (is_colliding (kid, tf, pos, 0, false, -dx + 2)) {
     kid_stabilize_collision ();
     i = 0; return;
   }
@@ -1329,7 +1330,7 @@ kid_turn (void)
   if (kid.frame == keep_sword_frameset[9].frame) dx = -2;
 
   /* fall */
-  if (kids.cbf == NO_FLOOR && kids.cbb == NO_FLOOR) {
+  if (cbf (kid) == NO_FLOOR && cbb (kid) == NO_FLOOR) {
     if (i > 0) kid.dir = (kid.dir == RIGHT) ? LEFT : RIGHT;
     kid_fall ();
     return;
@@ -1337,8 +1338,8 @@ kid_turn (void)
 
   /* collision */
   kid.dir = (kid.dir == RIGHT) ? LEFT : RIGHT;
-  if (is_colliding (kid, coord_tf, pos, 0, false, -dx)) {
-    to_collision_edge (&kid, frame, coord_tf, pos, 0, false, 0);
+  if (is_colliding (kid, tf, pos, 0, false, -dx)) {
+    to_collision_edge (&kid, frame, tf, pos, 0, false, 0);
     dx = 0;
   }
   kid.dir = (kid.dir == RIGHT) ? LEFT : RIGHT;
@@ -1362,8 +1363,8 @@ kid_turn (void)
   else if (i == 3) {
     i = 0;
     kid.dir = (kid.dir == RIGHT) ? LEFT : RIGHT;
-    int dc = dist_collision (kid, coord_tf, pos, 0, false);
-    int df = dist_con (kid, coord_bf, pos, -4, false, NO_FLOOR);
+    int dc = dist_collision (kid, tf, pos, 0, false);
+    int df = dist_con (kid, bf, pos, -4, false, NO_FLOOR);
     if (turn) kid.action = kid_turn, turn = false;
     else if (couch) kid.action = kid_couch;
     else if (jump) kid.action = kid_jump;
@@ -1391,14 +1392,14 @@ kid_turn_run (void)
   int dy = turn_run_frameset[i].dy;
 
   /* fall */
-  if (kids.ctf == NO_FLOOR) {
+  if (ctf (kid) == NO_FLOOR) {
     kid_fall ();
     i = 0; return;
   }
 
   /* collision */
-  if (is_colliding (kid, coord_tf, pos, 0, false, -dx))
-    to_collision_edge (&kid, frame, coord_tf, pos, 0, false, -dx);
+  if (is_colliding (kid, tf, pos, 0, false, -dx))
+    to_collision_edge (&kid, frame, tf, pos, 0, false, -dx);
 
   kid = next_anim (kid, frame, dx, dy);
 
@@ -1438,23 +1439,23 @@ kid_jump (void)
   if (kid.frame == stabilize_frameset[3].frame) dx = +0;
 
   /* fall */
-  if ((kids.cbb == NO_FLOOR
-       && kids.cmbo == NO_FLOOR
+  if ((cbb (kid) == NO_FLOOR
+       && cmbo (kid) == NO_FLOOR
        && i < 7)
-      || ( i > 9 && kids.cbf == NO_FLOOR)) {
+      || ( i > 9 && cbf (kid) == NO_FLOOR)) {
     kid_fall ();
     i = 0; return;
   }
 
   /* collision */
-  if (is_colliding (kid, coord_tf, pos, 0, false, -dx)) {
+  if (is_colliding (kid, tf, pos, 0, false, -dx)) {
     if (i < 7 || i > 10) kid_stabilize_collision ();
     else kid_couch_collision ();
     i = 0; return;
   }
 
   if (i == 11 || i == 14) play_sample (step);
-  if (i == 12) shake_loose_floor_row (kids.pmbo);
+  if (i == 12) shake_loose_floor_row (pmbo (kid));
 
   kid = next_anim (kid, frame, dx, dy);
 
@@ -1501,30 +1502,30 @@ kid_vjump (void)
 
   int dir = (kid.dir == LEFT) ? +1 : -1;
   if (i == 0
-      && dist_next_place (kid, coord_tf, pos, 0, true) < 23
-      && is_hangable_pos (prel (kids.ptf, 0, dir), kid.dir)) {
-    to_next_place_edge (&kid, frame, coord_tf, pos, 0, true, 0);
-    if (crel (kids.ptf, 0, dir)->fg == NO_FLOOR) {
+      && dist_next_place (kid, tf, pos, 0, true) < 23
+      && is_hangable_pos (prel (ptf (kid), 0, dir), kid.dir)) {
+    to_next_place_edge (&kid, frame, tf, pos, 0, true, 0);
+    if (crel (ptf (kid), 0, dir)->fg == NO_FLOOR) {
         dx -= 12;
         critical_edge = true;
     } else {
       dx -= 3;
       critical_edge = false;
     }
-    hang_pos = prel (kids.ptf, 0, dir);
+    hang_pos = prel (ptf (kid), 0, dir);
     hang_pos = pos2view (hang_pos);
     hang = true;
   } else if (i == 0 && can_hang (kid)
              && con (hang_pos)->fg != NO_FLOOR
              && (kid.dir == LEFT || con (hang_pos)->fg != DOOR)) {
-    to_next_place_edge (&kid, frame, coord_tf, pos, 0, false, 0);
+    to_next_place_edge (&kid, frame, tf, pos, 0, false, 0);
     dx -= 4; hang = true;
   }
 
   /* fall */
-  if (kids.cm == NO_FLOOR
-      && kids.cmf == NO_FLOOR
-      && kids.cmba == NO_FLOOR) {
+  if (cm (kid) == NO_FLOOR
+      && cmf (kid) == NO_FLOOR
+      && cmba (kid) == NO_FLOOR) {
     kid_fall ();
     i = j = 0; just_hanged = hit_ceiling = hang
                  = critical_edge = false;
@@ -1532,10 +1533,10 @@ kid_vjump (void)
   }
 
   /* collision */
-  if (is_colliding (kid, coord_tf, pos, 0, false, -dx)
+  if (is_colliding (kid, tf, pos, 0, false, -dx)
       && confg_collision == DOOR
       && kid.dir == RIGHT)
-    to_collision_edge (&kid, frame, coord_tf, pos, 0, false, -dx);
+    to_collision_edge (&kid, frame, tf, pos, 0, false, -dx);
 
   kid = next_anim (kid, frame, dx, dy);
 
@@ -1554,9 +1555,9 @@ kid_vjump (void)
 
   /* shake ceiling floor */
   if (i == 13 && hit_ceiling) {
-    shake_loose_floor_row (kids.ptb);
-    if (kids.ctb == LOOSE_FLOOR) release_loose_floor (kids.ptb);
-    if (kids.ctf == LOOSE_FLOOR) release_loose_floor (kids.ptf);
+    shake_loose_floor_row (ptb (kid));
+    if (ctb (kid) == LOOSE_FLOOR) release_loose_floor (ptb (kid));
+    if (ctf (kid) == LOOSE_FLOOR) release_loose_floor (ptf (kid));
   }
 
   /* next frame */
@@ -1567,13 +1568,13 @@ kid_vjump (void)
   }
   /* is kid hitting the ceiling? */
   else if (i == 12 && j == 1
-           && crel (kids.ptb, -1, 0)->fg != NO_FLOOR) {
+           && crel (ptb (kid), -1, 0)->fg != NO_FLOOR) {
     hit_ceiling = true;
     i++;
   } else if (j == 4) j = 0, i++;
   else if (i != 12 && i < 17) i++;
   else if (i == 17) {
-    shake_loose_floor_row (kids.pmbo);
+    shake_loose_floor_row (pmbo (kid));
     kid.action = kid_normal;
     hit_ceiling = hang = critical_edge = false; i = j = 0;
   }
@@ -1597,21 +1598,21 @@ kid_run_jump (void)
   int dy = run_jump_frameset[i].dy;
 
   /* fall */
-  if ((kids.cbf == NO_FLOOR && i < 4)
-      || (kids.cbf == NO_FLOOR && i > 9)) {
+  if ((cbf (kid) == NO_FLOOR && i < 4)
+      || (cbf (kid) == NO_FLOOR && i > 9)) {
     kid_fall ();
     i = 0; return;
   }
 
   /* collision */
-  if (is_colliding (kid, coord_tf, pos, 0, false, -dx + 4)) {
+  if (is_colliding (kid, tf, pos, 0, false, -dx + 4)) {
     if (i < 6) kid_stabilize_collision ();
     else kid_couch_collision ();
     i = 0; return;
   }
 
   if (i == 0 || i == 4) play_sample (step);
-  if (i == 10) shake_loose_floor_row (kids.pmbo);
+  if (i == 10) shake_loose_floor_row (pmbo (kid));
 
   kid = next_anim (kid, frame, dx, dy);
 
@@ -1646,13 +1647,13 @@ kid_misstep (void)
   int dy = misstep_frameset[i].dy;
 
   /* fall */
-  if (kids.cmba == NO_FLOOR) {
+  if (cmba (kid) == NO_FLOOR) {
     kid_fall ();
     i = 0; return;
   }
 
   if (i == 7) play_sample (step);
-  if (i == 8) shake_loose_floor_row (kids.pmbo);
+  if (i == 8) shake_loose_floor_row (pmbo (kid));
 
   kid = next_anim (kid, frame, dx, dy);
 
@@ -1663,8 +1664,8 @@ kid_misstep (void)
   if (i < 10) i++;
   else {
     kid.action = kid_normal;
-    to_con_edge (&kid, kid_normal_00, coord_bf, pos, -4, false, 0, LOOSE_FLOOR)
-      || to_con_edge (&kid, kid_normal_00, coord_bf, pos, -4, false, 0, NO_FLOOR);
+    to_con_edge (&kid, kid_normal_00, bf, pos, -4, false, 0, LOOSE_FLOOR)
+      || to_con_edge (&kid, kid_normal_00, bf, pos, -4, false, 0, NO_FLOOR);
     i = 0;
   }
 }
@@ -1689,8 +1690,8 @@ kid_hang (void)
 
   if (i == 0 && oaction != kid_unclimb)
     kid = next_anim (kid, kid_hang_14, +0, +0);
-  else if (kids.cmf == WALL
-           || (kids.cmf == DOOR
+  else if (cmf (kid) == WALL
+           || (cmf (kid) == DOOR
                && kid.dir == LEFT)) kid_hang_wall ();
   else kid_hang_free ();
 
@@ -1732,16 +1733,16 @@ kid_hang_wall (void)
     play_sample (hit_wall);
 
   if ((! shift_key && (reverse || i > 4))
-      || hang_limit || kids.ctf == NO_FLOOR) {
+      || hang_limit || ctf (kid) == NO_FLOOR) {
     reverse = false; i = 4; wait = 0;
-    if (kids.cbb == NO_FLOOR) {
+    if (cbb (kid) == NO_FLOOR) {
       kid_fall ();
       hang_limit = false;
       return;
     }
     kid.frame = vjump_frameset[13].frame;
     kid.c.x += (kid.dir == LEFT) ? +12 : -12;
-    kid.c.y = PLACE_HEIGHT * kids.pm.floor - 8;
+    kid.c.y = PLACE_HEIGHT * pm (kid).floor - 8;
     kid_vjump ();
     hang_limit = false;
     return;
@@ -1792,9 +1793,9 @@ kid_hang_free (void)
   if (reverse && j == 0 && i == 0 && wait < 3) dy = 0;
   if (kid.frame == kid_hang_14) dx = +0, dy = +1;
 
-  if ((! shift_key || hang_limit || kids.ctf == NO_FLOOR)
+  if ((! shift_key || hang_limit || ctf (kid) == NO_FLOOR)
       && j > -1) {
-    if (kids.cm == NO_FLOOR) {
+    if (cm (kid) == NO_FLOOR) {
       reverse = true; i = 4; j = -1; wait = 3;
       kid.c.x += (kid.dir == LEFT) ? +6 : -4;
       kid_fall ();
@@ -1803,7 +1804,7 @@ kid_hang_free (void)
     }
     kid.frame = vjump_frameset[13].frame;
     kid.c.x += (kid.dir == LEFT) ? +1 : -1;
-    kid.c.y = PLACE_HEIGHT * kids.pm.floor - 8;
+    kid.c.y = PLACE_HEIGHT * pm (kid).floor - 8;
     kid_vjump ();
     hang_limit = false;
     reverse = true; i = 4; j = -1; wait = 3;
@@ -1874,15 +1875,15 @@ kid_climb (void)
   if (i == 3 && wait < DOOR_WAIT_LOOK) dx = 0, dy = 0;
 
   /* fall */
-  if (kids.ctf == NO_FLOOR) {
+  if (ctf (kid) == NO_FLOOR) {
     kid_fall ();
     i = 0; wait = DOOR_WAIT_LOOK;
     return;
   }
 
   /* door collision */
-  if (i == 3 && kids.ctf == DOOR && kid.dir == LEFT
-      && door_at_pos (kids.ptf)->i > DOOR_CLIMB_LIMIT) {
+  if (i == 3 && ctf (kid) == DOOR && kid.dir == LEFT
+      && door_at_pos (ptf (kid))->i > DOOR_CLIMB_LIMIT) {
     if (wait == 0) {
       wait = DOOR_WAIT_LOOK;
       i = 0;
@@ -1941,7 +1942,7 @@ kid_unclimb (void)
   }
 
   /* fall */
-  if (kids.ctf == NO_FLOOR) {
+  if (ctf (kid) == NO_FLOOR) {
     kid_fall ();
     i = 13;
     return;
@@ -1978,12 +1979,12 @@ kid_stabilize (void)
   if (kid.frame == stop_run_frameset[3].frame) dx = -5;
 
   /* collision */
-  if (is_colliding (kid, coord_tf, pos, 0, false, -dx))
-    to_collision_edge (&kid, frame, coord_tf, pos, 0, false, -dx);
+  if (is_colliding (kid, tf, pos, 0, false, -dx))
+    to_collision_edge (&kid, frame, tf, pos, 0, false, -dx);
 
   /* fall */
-  if (kids.cmbo == NO_FLOOR
-      && kids.cbb == NO_FLOOR) {
+  if (cmbo (kid) == NO_FLOOR
+      && cbb (kid) == NO_FLOOR) {
     kid_fall ();
     return;
   }
@@ -2007,8 +2008,8 @@ kid_stabilize (void)
   else keep_depressible_floor (&kid);
 
   /* next frame */
-  int dc = dist_collision (kid, coord_bb, pos, 0, false);
-  int df = dist_con (kid, coord_bb, pos, -4, false, NO_FLOOR);
+  int dc = dist_collision (kid, bb, pos, 0, false);
+  int df = dist_con (kid, bb, pos, -4, false, NO_FLOOR);
 
   if (! collision) {
     if (couch) {
@@ -2071,11 +2072,11 @@ kid_couch (void)
       && oaction != kid_fall
       && i == 0
       && item_pos.room == -1
-      && crel (kids.pbf, 0, dir)->fg == NO_FLOOR
-      && dist_next_place (kid, coord_tf, pos, 0, true) < 22
-      && ! (kids.ctf == DOOR && kid.dir == LEFT
-            && door_at_pos (kids.ptf)->i > DOOR_CLIMB_LIMIT)) {
-    hang_pos = kids.pbf;
+      && crel (pbf (kid), 0, dir)->fg == NO_FLOOR
+      && dist_next_place (kid, tf, pos, 0, true) < 22
+      && ! (ctf (kid) == DOOR && kid.dir == LEFT
+            && door_at_pos (ptf (kid))->i > DOOR_CLIMB_LIMIT)) {
+    hang_pos = pbf (kid);
     hang_pos = pos2view (hang_pos);
     critical_edge =
       (crel (hang_pos, +1, dir)->fg == NO_FLOOR);
@@ -2084,8 +2085,8 @@ kid_couch (void)
   }
 
   /* fall */
-  if (kids.cm == NO_FLOOR && ! (fall && i == 0)) {
-    if (collision) to_collision_edge (&kid, fall_frameset[0].frame, coord_tf, pos, 0, false, 0);
+  if (cm (kid) == NO_FLOOR && ! (fall && i == 0)) {
+    if (collision) to_collision_edge (&kid, fall_frameset[0].frame, tf, pos, 0, false, 0);
     kid_fall ();
     i = 0; collision = false; return;
   }
@@ -2093,12 +2094,12 @@ kid_couch (void)
   /* collision */
 
   /* ensure kid is not colliding */
-  if (con (pos (coord_bf (kid)))->fg == WALL)
-    to_next_place_edge (&kid, frame, coord_bf, pos, 0, true, -1);
+  if (con (pos (bf (kid)))->fg == WALL)
+    to_next_place_edge (&kid, frame, bf, pos, 0, true, -1);
 
   /* wall pushes back */
-  if (is_colliding (kid, coord_tf, pos, 0, false, -dx))
-    to_collision_edge (&kid, frame, coord_tf, pos, 0, false, -dx);
+  if (is_colliding (kid, tf, pos, 0, false, -dx))
+    to_collision_edge (&kid, frame, tf, pos, 0, false, -dx);
 
   kid = next_anim (kid, frame, dx, dy);
 
@@ -2129,7 +2130,7 @@ kid_couch (void)
            && ((kid.dir == LEFT && left_key)
                || (kid.dir == RIGHT && right_key))
              && wait-- == 0) {
-    if (! is_colliding (kid, coord_tf, pos, 0, false, 6))
+    if (! is_colliding (kid, tf, pos, 0, false, 6))
       kid.c.x += (kid.dir == LEFT) ? -6 : +6;
     i = 0; wait = 1; collision = fall = false;
   }
@@ -2144,7 +2145,7 @@ kid_stabilize_collision (void)
   kid.action = kid_stabilize_collision;
 
   play_sample (hit_wall);
-  to_collision_edge (&kid, stabilize_frameset[0].frame, coord_tf, pos, 0, false, 0);
+  to_collision_edge (&kid, stabilize_frameset[0].frame, tf, pos, 0, false, 0);
   if (kid.dir == RIGHT) kid.c.x -= 3;
 
   kid_stabilize ();
@@ -2155,12 +2156,12 @@ kid_couch_collision (void)
 {
   kid.action = kid_couch_collision;
 
-  kid.c.y = PLACE_HEIGHT * kids.pbf.floor + 15;
-  kid.c.x = PLACE_WIDTH * kids.pbf.place + 15;
+  kid.c.y = PLACE_HEIGHT * pbf (kid).floor + 15;
+  kid.c.x = PLACE_WIDTH * pbf (kid).place + 15;
   kid.frame = kid_normal_00;
 
   play_sample (hit_wall);
-  to_collision_edge (&kid, couch_frameset[0].frame, coord_tf, pos, 0, false, 0);
+  to_collision_edge (&kid, couch_frameset[0].frame, tf, pos, 0, false, 0);
   if (kid.dir == RIGHT) kid.c.x -= 12;
 
   kid_couch ();
@@ -2183,12 +2184,12 @@ kid_fall (void)
   int dir = (kid.dir == LEFT) ? -1 : +1;
 
   /* put kid in front of the floor */
-  bool should_move_to_front = con (pos (coord_bf (kid)))->fg == NO_FLOOR
-    && con (pos (coord_bb (kid)))->fg != NO_FLOOR;
-  bool should_move_to_back = con (pos (coord_bf (kid)))->fg != NO_FLOOR
-    && con (pos (coord_bb (kid)))->fg == NO_FLOOR;
+  bool should_move_to_front = con (pos (bf (kid)))->fg == NO_FLOOR
+    && con (pos (bb (kid)))->fg != NO_FLOOR;
+  bool should_move_to_back = con (pos (bf (kid)))->fg != NO_FLOOR
+    && con (pos (bb (kid)))->fg == NO_FLOOR;
   struct coord (*coord_func) (struct anim) = (should_move_to_front)
-    ? coord_bb : coord_bf;
+    ? bb : bf;
 
   if (i == 0 && (should_move_to_front || should_move_to_back)) {
     kid = next_anim (kid, frame, +0, 0);
@@ -2207,11 +2208,11 @@ kid_fall (void)
   }
 
   /* ensure kid's proximity for hang */
-  if (i == 0 && crel (kids.ptf, 0, dir)->fg != NO_FLOOR
-      && crel (kids.ptf, 0, dir)->fg != WALL
+  if (i == 0 && crel (ptf (kid), 0, dir)->fg != NO_FLOOR
+      && crel (ptf (kid), 0, dir)->fg != WALL
       && oaction == kid_walk) {
-    to_next_place_edge (&kid, frame, coord_tf, pos, 0, false, 0);
-  } else if (kids.ctf != NO_FLOOR) inertia = 0;
+    to_next_place_edge (&kid, frame, tf, pos, 0, false, 0);
+  } else if (ctf (kid) != NO_FLOOR) inertia = 0;
   else {
     if (oaction == kid_run_jump) dx = -12, dy= +12;
     if (oaction == kid_jump) dx = -12, dy = +12;
@@ -2236,27 +2237,27 @@ kid_fall (void)
 
   /* land on ground */
   struct pos pmbo =
-    npos (pos (coord_mbo (next_anim (kid, kid.frame, 0, 34))));
+    npos (pos (mbo (next_anim (kid, kid.frame, 0, 34))));
 
   if (i > 0
-      && kids.cmbo != NO_FLOOR
-      && npos (kids.pmbo).floor != pmbo.floor
-      && kids.pmbo.floor != force_floor) {
+      && cmbo (kid) != NO_FLOOR
+      && npos (pmbo (kid)).floor != pmbo.floor
+      && pmbo (kid).floor != force_floor) {
     inertia = 0;
 
-    kid.c.y = 63 * kids.pbf.floor + 15;
+    kid.c.y = 63 * pbf (kid).floor + 15;
     kid.c.x += (kid.dir == LEFT) ? -6 : +6;
     kid.frame = kid_normal_00;
 
     /* ensure kid isn't colliding */
-    if (con (pos (coord_bf (kid)))->fg == WALL
-        || con (pos (coord_bf (kid)))->fg == DOOR)
-      to_next_place_edge (&kid, frame, coord_bf, pos, 0, true, -1);
+    if (con (pos (bf (kid)))->fg == WALL
+        || con (pos (bf (kid)))->fg == DOOR)
+      to_next_place_edge (&kid, frame, bf, pos, 0, true, -1);
 
     kid_couch ();
     if (i > 3) play_sample (hit_ground);
     i = 0; force_floor = -2;
-    shake_loose_floor_row (kids.pbf);
+    shake_loose_floor_row (pbf (kid));
     return;
   }
 
@@ -2269,15 +2270,15 @@ kid_fall (void)
 
   /* collision */
   struct anim a = next_anim (kid, frame, dx, dy);
-  if (con (pos (coord_bf (a)))->fg == WALL
+  if (con (pos (bf (a)))->fg == WALL
       || (a.dir == LEFT &&
-          con (pos (coord_bf (a)))->fg == DOOR)) {
-    to_next_place_edge (&a, frame, coord_bf, pos, 0, true, -1);
+          con (pos (bf (a)))->fg == DOOR)) {
+    to_next_place_edge (&a, frame, bf, pos, 0, true, -1);
     kid = a; dx = 0; dy = 0;
   }
 
-  /* if (is_colliding (kid, coord_bf, pos, 0, false, -dx)) */
-  /*   to_collision_edge (&kid, frame, coord_bf, pos, 0, false, -dx); */
+  /* if (is_colliding (kid, bf, pos, 0, false, -dx)) */
+  /*   to_collision_edge (&kid, frame, bf, pos, 0, false, -dx); */
 
   kid = next_anim (kid, frame, dx, dy);
 
@@ -2443,13 +2444,13 @@ kid_take_sword (void)
   int dy = take_sword_frameset[i].dy;
 
   /* fall */
-  if (kids.ctf == NO_FLOOR) {
+  if (ctf (kid) == NO_FLOOR) {
     kid_fall ();
     i = 0; return;
   }
 
   /* collision */
-  if (is_colliding (kid, coord_tf, pos, 0, false, -dx)) {
+  if (is_colliding (kid, tf, pos, 0, false, -dx)) {
     kid_stabilize_collision ();
     i = 0; return;
   }
@@ -2516,13 +2517,13 @@ kid_sword_normal (void)
   if (kid.frame == sword_walkb_frameset[1].frame) dx = +2;
 
   /* collision */
-  if (is_colliding (kid, coord_tf, pos, 0, false, -dx + w / 2))
-    to_collision_edge (&kid, frame, coord_tf, pos, 0, false, -dx + w / 2);
+  if (is_colliding (kid, tf, pos, 0, false, -dx + w / 2))
+    to_collision_edge (&kid, frame, tf, pos, 0, false, -dx + w / 2);
 
   /* fall */
-  if (kids.cbf == NO_FLOOR
-      || kids.cmbo == NO_FLOOR
-      || kids.cbb == NO_FLOOR) {
+  if (cbf (kid) == NO_FLOOR
+      || cmbo (kid) == NO_FLOOR
+      || cbb (kid) == NO_FLOOR) {
     kid_fall ();
     kid.xframe = NULL;
     return;
@@ -2554,17 +2555,17 @@ kid_sword_walkf (void)
   int dy = sword_walkf_frameset[i].dy;
 
   /* fall */
-  if (kids.cbf == NO_FLOOR
-      || kids.cmbo == NO_FLOOR
-      || kids.cbb == NO_FLOOR) {
+  if (cbf (kid) == NO_FLOOR
+      || cmbo (kid) == NO_FLOOR
+      || cbb (kid) == NO_FLOOR) {
     kid_fall ();
     kid.xframe = NULL;
     return;
   }
 
   /* collision */
-  if (is_colliding (kid, coord_tf, pos, 0, false, -dx + w / 2))
-    to_collision_edge (&kid, frame, coord_tf, pos, 0, false, -dx + w / 2);
+  if (is_colliding (kid, tf, pos, 0, false, -dx + w / 2))
+    to_collision_edge (&kid, frame, tf, pos, 0, false, -dx + w / 2);
 
   kid = next_anim (kid, frame, dx, dy);
 
@@ -2601,17 +2602,17 @@ kid_sword_walkb (void)
   int dy = sword_walkb_frameset[i].dy;
 
   /* fall */
-  if (kids.cbf == NO_FLOOR
-      || kids.cmbo == NO_FLOOR
-      || kids.cbb == NO_FLOOR) {
+  if (cbf (kid) == NO_FLOOR
+      || cmbo (kid) == NO_FLOOR
+      || cbb (kid) == NO_FLOOR) {
     kid_fall ();
     kid.xframe = NULL;
     return;
   }
 
   /* collision */
-  if (is_colliding (kid, coord_bb, pos, 0, true, dx))
-    to_collision_edge (&kid, frame, coord_bb, pos, 0, true, dx + 4);
+  if (is_colliding (kid, bb, pos, 0, true, dx))
+    to_collision_edge (&kid, frame, bb, pos, 0, true, dx + 4);
 
   kid = next_anim (kid, frame, dx, dy);
 
@@ -2685,7 +2686,7 @@ is_kid_climb (struct anim a)
 bool
 is_kid_hanging_at_pos (struct anim a, struct pos p)
 {
-  struct pos pbb = pos (coord_bb (a));
+  struct pos pbb = pos (bb (a));
   int dir = (a.dir == LEFT) ? -1 : +1;
   return (is_kid_hang_or_climb (a)
           && peq (prel (pbb, -1, dir), p));

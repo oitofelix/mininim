@@ -176,8 +176,8 @@ should_spikes_raise_for_pos (struct pos p, struct pos pk)
 bool
 should_spikes_raise (struct pos p)
 {
-  struct pos pkf = pos (coord_mf (kid));
-  struct pos pkb = pos (coord_mba (kid));
+  struct pos pkf = pos (mf (kid));
+  struct pos pkb = pos (mba (kid));
 
   return should_spikes_raise_for_pos (p, pkf)
     || should_spikes_raise_for_pos (p, pkb);

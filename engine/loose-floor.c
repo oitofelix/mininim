@@ -247,40 +247,42 @@ compute_loose_floor_fall (struct loose_floor *l)
   int speed = 3 * ++l->i;
   if (speed > 33) speed = 33;
 
-  struct anim a = next_anim (l->a, l->a.frame, 0, speed);
-  struct survey s = survey (l->a, posf);
-  struct survey t = survey (a, posf);
+  struct anim na = next_anim (l->a, l->a.frame, 0, speed);
+  struct pos fpmbo_a = fpmbo (l->a);
+  enum confg fcmbo_a = fcmbo (l->a);
+  struct pos fpmbo_na = fpmbo (na);
+  enum confg fcmbo_na = fcmbo (na);
   struct pos p;
 
-  if (s.cmbo == NO_FLOOR
-      || peq (s.pmbo, t.pmbo)) {
+  if (fcmbo_a == NO_FLOOR
+      || peq (fpmbo_a, fpmbo_na)) {
     /* the floor hit a rigid structure */
-    if (t.cmbo == WALL
-        || t.cmbo == PILLAR
-        || t.cmbo == DOOR) p = prel (t.pmbo, -1, 0);
+    if (fcmbo_na == WALL
+        || fcmbo_na == PILLAR
+        || fcmbo_na == DOOR) p = prel (fpmbo_na, -1, 0);
     /* the floor continue to fall */
     else {
-      l->a = a;
-      if (t.cmbo == NO_FLOOR) l->p = t.pmbo;
+      l->a = na;
+      if (fcmbo_na == NO_FLOOR) l->p = fpmbo_na;
       return;
     }
     /* the floor hit the ground */
   } else {
     struct loose_floor *m;
-    p = s.pmbo;
-    switch (s.cmbo) {
+    p = fpmbo_a;
+    switch (fcmbo_a) {
     case LOOSE_FLOOR: /* loose floor isn't ground */
-      m = loose_floor_at_pos (s.pmbo);
+      m = loose_floor_at_pos (fpmbo_a);
       m->p.room = -1;
-      l->a = a;
+      l->a = na;
       l->a.frame = broken_floor;
-      l->p = s.pmbo;
-      con (s.pmbo)->fg = NO_FLOOR;
+      l->p = fpmbo_a;
+      con (fpmbo_a)->fg = NO_FLOOR;
       play_sample (broken_floor_sound);
       return;
-    case OPENER_FLOOR: break_opener_floor (s.pmbo); break;
-    case CLOSER_FLOOR: break_closer_floor (s.pmbo); break;
-    case SPIKES_FLOOR: break_spikes_floor (s.pmbo); break;
+    case OPENER_FLOOR: break_opener_floor (fpmbo_a); break;
+    case CLOSER_FLOOR: break_closer_floor (fpmbo_a); break;
+    case SPIKES_FLOOR: break_spikes_floor (fpmbo_a); break;
     default: break;
     }
   }
@@ -343,8 +345,8 @@ draw_falling_loose_floor (ALLEGRO_BITMAP *bitmap, struct pos p)
 
   struct pos ptr, pbr;
   if (l->action == FALL_LOOSE_FLOOR) {
-    ptr = posf (coord_tr (l->a));
-    pbr = posf (coord_br (l->a));
+    ptr = posf (tr (l->a));
+    pbr = posf (br (l->a));
     draw_anim (bitmap, l->a);
     draw_con_left (bitmap, ptr);
     draw_con_left (bitmap, pbr);

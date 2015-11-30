@@ -224,7 +224,6 @@ void kid_vjump (void);
 
 /* variables */
 extern struct anim kid; /* kid animation object */
-extern struct survey kids, kidsf;
 
 extern ALLEGRO_BITMAP *kid_climb_03, *kid_climb_04,
   *kid_climb_05, *kid_climb_06, *kid_climb_07, *kid_climb_08,
