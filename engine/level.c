@@ -173,6 +173,7 @@ level_anim (void)
   draw_anim (screen, kid);
   draw_xanim (screen, kid);
   draw_falling_loose_floor (screen, prel (kids.pml, 0, +1));
+  draw_falling_loose_floor (screen, prel (kids.pml, -1, +1));
   draw_room_anim_fg (kid);
   kid.xframe = NULL;
 

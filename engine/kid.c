@@ -929,7 +929,8 @@ kid_normal (void)
   int dy = +0;
 
   /* fall */
-  if (kids.cmbo == NO_FLOOR) {
+  if (kids.cmbo == NO_FLOOR
+      && kids.cbb == NO_FLOOR) {
     kid_fall ();
     return;
   }
@@ -1981,8 +1982,7 @@ kid_stabilize (void)
     to_collision_edge (&kid, frame, coord_tf, pos, 0, false, -dx);
 
   /* fall */
-  if (kids.cbf == NO_FLOOR
-      && kids.cmbo == NO_FLOOR
+  if (kids.cmbo == NO_FLOOR
       && kids.cbb == NO_FLOOR) {
     kid_fall ();
     return;
@@ -2194,10 +2194,14 @@ kid_fall (void)
     kid = next_anim (kid, frame, +0, 0);
     int dir = (kid.dir == LEFT) ? -1 : +1;
     dir *= (should_move_to_back) ? -1 : +1;
-    int x = kid.c.x;
+    int i = 0;
     while (con (pos (coord_func (kid)))->fg != NO_FLOOR
-           && abs (kid.c.x - x) < PLACE_WIDTH)
+           && abs (i) < PLACE_WIDTH) {
+      i += dir;
       kid.c.x += dir;
+      kid.c = nanim (kid);
+    }
+
     kid.c.x += -dir * 12;
     kid.c.y += 6;
   }
