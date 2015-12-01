@@ -34,7 +34,7 @@ static ALLEGRO_BITMAP *normal_sword, *shiny_sword,
   *sword_22, *sword_23, *sword_24, *sword_25, *sword_26, *sword_27, *sword_28,
   *sword_29, *sword_30, *sword_31, *sword_32, *sword_33, *sword_34;
 
-static struct coord sword_coord (struct pos p);
+static struct coord *sword_coord (struct pos *p, struct coord *c);
 
 void
 load_sword (void)
@@ -144,29 +144,29 @@ init_sword_frameset (void)
 }
 
 void
-draw_sword (ALLEGRO_BITMAP *bitmap, struct pos p, int i)
+draw_sword (ALLEGRO_BITMAP *bitmap, struct pos *p, int i)
 {
+  struct coord c;
   if (! is_sword (p)) return;
   ALLEGRO_BITMAP *sword = i % 60 ? normal_sword : shiny_sword;
   seedp (p);
-  draw_bitmapc (sword, bitmap, sword_coord (p),
+  draw_bitmapc (sword, bitmap, sword_coord (p, &c),
                 prandom (1) ? ALLEGRO_FLIP_HORIZONTAL : 0);
   unseedp ();
 }
 
 bool
-is_sword (struct pos p)
+is_sword (struct pos *p)
 {
   return con (p)->fg == FLOOR
     && con (p)->ext.item == SWORD;
 }
 
-struct coord
-sword_coord (struct pos p)
+struct coord *
+sword_coord (struct pos *p, struct coord *c)
 {
-  struct coord c;
-  c.x = PLACE_WIDTH * p.place;
-  c.y = PLACE_HEIGHT * p.floor + 50;
-  c.room = p.room;
+  c->x = PLACE_WIDTH * p->place;
+  c->y = PLACE_HEIGHT * p->floor + 50;
+  c->room = p->room;
   return c;
 }

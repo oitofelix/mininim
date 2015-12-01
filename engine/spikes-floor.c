@@ -96,11 +96,11 @@ unload_spikes_floor_sounds (void)
 }
 
 void
-register_spikes_floor (struct pos p)
+register_spikes_floor (struct pos *p)
 {
   struct spikes_floor s;
 
-  s.p = p;
+  s.p = *p;
   s.i = 0;
   s.wait = SPIKES_WAIT;
   s.state = 0;
@@ -111,16 +111,16 @@ register_spikes_floor (struct pos p)
 }
 
 struct spikes_floor *
-spikes_floor_at_pos (struct pos p)
+spikes_floor_at_pos (struct pos *p)
 {
   size_t i;
   for (i = 0; i < spikes_floor_nmemb; i++)
-    if (peq (spikes_floor[i].p, p)) return &spikes_floor[i];
+    if (peq (&spikes_floor[i].p, p)) return &spikes_floor[i];
   return NULL;
 }
 
 void
-break_spikes_floor (struct pos p)
+break_spikes_floor (struct pos *p)
 {
   struct spikes_floor *s = spikes_floor_at_pos (p);
   if (! s) return;
@@ -139,7 +139,7 @@ compute_spikes_floors (void)
       continue;
     }
     switch (s->i) {
-    case 0: if (should_spikes_raise (s->p)) {
+    case 0: if (should_spikes_raise (&s->p)) {
         play_sample (spikes_sound);
         s->i++;
         s->wait = 12;
@@ -149,7 +149,7 @@ compute_spikes_floors (void)
     case 1: s->i++; s->state = 2; break;
     case 2: s->i++; s->state = 3; break;
     case 3: s->i++; s->state = 4; break;
-    case 4: if (! should_spikes_raise (s->p)) {
+    case 4: if (! should_spikes_raise (&s->p)) {
         if (s->wait-- == 0) {
           s->i++;
           s->state = 3;
@@ -163,28 +163,33 @@ compute_spikes_floors (void)
 }
 
 bool
-should_spikes_raise_for_pos (struct pos p, struct pos pk)
+should_spikes_raise_for_pos (struct pos *p, struct pos *pk)
 {
+  struct pos pb1, pb2;
+
   return peq (pk, p)
-    || (peq (pk, prel (p, -1, 0))
+    || (peq (pk, prel (p, &pb1, -1, 0))
         && crel (p, -1, 0)->fg == NO_FLOOR)
-    || (peq (pk, prel (p, -2, 0))
+    || (peq (pk, prel (p, &pb2, -2, 0))
         && crel (p, -1, 0)->fg == NO_FLOOR
         && crel (p, -2, 0)->fg == NO_FLOOR);
 }
 
 bool
-should_spikes_raise (struct pos p)
+should_spikes_raise (struct pos *p)
 {
-  struct pos pkf = pos (mf (kid));
-  struct pos pkb = pos (mba (kid));
+  struct coord mf, mba;
+  struct pos pmf, npmf, pmba, npmba;
 
-  return should_spikes_raise_for_pos (p, pkf)
-    || should_spikes_raise_for_pos (p, pkb);
+  survey (_mf, pos, &kid.f, &mf, &pmf, &npmf);
+  survey (_mba, pos, &kid.f, &mba, &pmba, &npmba);
+
+  return should_spikes_raise_for_pos (p, &pmf)
+    || should_spikes_raise_for_pos (p, &pmba);
 }
 
 void
-draw_spikes_floor (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_spikes_floor (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   struct spikes_floor *s = spikes_floor_at_pos (p);
   if (! s) return;
@@ -194,7 +199,7 @@ draw_spikes_floor (ALLEGRO_BITMAP *bitmap, struct pos p)
 }
 
 void
-draw_spikes_floor_base (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_spikes_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   struct spikes_floor *s = spikes_floor_at_pos (p);
   if (! s) return;
@@ -203,7 +208,7 @@ draw_spikes_floor_base (ALLEGRO_BITMAP *bitmap, struct pos p)
 }
 
 void
-draw_spikes_floor_left (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_spikes_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   struct spikes_floor *s = spikes_floor_at_pos (p);
   if (! s) return;
@@ -213,7 +218,7 @@ draw_spikes_floor_left (ALLEGRO_BITMAP *bitmap, struct pos p)
 }
 
 void
-draw_spikes_floor_right (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_spikes_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   struct spikes_floor *s = spikes_floor_at_pos (p);
   if (! s) return;
@@ -223,31 +228,34 @@ draw_spikes_floor_right (ALLEGRO_BITMAP *bitmap, struct pos p)
 }
 
 void
-draw_spikes_floor_floor (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_spikes_floor_floor (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
+  struct coord c; struct pos pr;
   draw_floor_base (bitmap, p);
-  draw_bitmapc (spikes_floor_left, bitmap, floor_left_coord (p), 0);
-  draw_bitmapc (spikes_floor_right, bitmap, floor_right_coord (p), 0);
-  draw_con_left (bitmap, prel (p, 0, +1));
+  draw_bitmapc (spikes_floor_left, bitmap, floor_left_coord (p, &c), 0);
+  draw_bitmapc (spikes_floor_right, bitmap, floor_right_coord (p, &c), 0);
+  draw_con_left (bitmap, prel (p, &pr, 0, +1));
 }
 
 void
-draw_spikes_floor_floor_left (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_spikes_floor_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
+  struct coord c;
   draw_floor_base (bitmap, p);
-  draw_bitmapc (spikes_floor_left, bitmap, floor_left_coord (p), 0);
+  draw_bitmapc (spikes_floor_left, bitmap, floor_left_coord (p, &c), 0);
 }
 
 void
-draw_spikes_floor_floor_right (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_spikes_floor_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
+  struct coord c; struct pos pr;
   draw_floor_base (bitmap, p);
-  draw_bitmapc (spikes_floor_right, bitmap, floor_right_coord (p), 0);
-  draw_con_left (bitmap, prel (p, 0, +1));
+  draw_bitmapc (spikes_floor_right, bitmap, floor_right_coord (p, &c), 0);
+  draw_con_left (bitmap, prel (p, &pr, 0, +1));
 }
 
 void
-draw_spikes (ALLEGRO_BITMAP *bitmap, struct pos p,
+draw_spikes (ALLEGRO_BITMAP *bitmap, struct pos *p,
              struct spikes_floor *s)
 {
   if (bitmap == room_bg) return;
@@ -256,7 +264,7 @@ draw_spikes (ALLEGRO_BITMAP *bitmap, struct pos p,
 }
 
 void
-draw_spikes_left (ALLEGRO_BITMAP *bitmap, struct pos p,
+draw_spikes_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
                   struct spikes_floor *s)
 {
   if (bitmap == room_bg) return;
@@ -271,7 +279,7 @@ draw_spikes_left (ALLEGRO_BITMAP *bitmap, struct pos p,
 }
 
 void
-draw_spikes_right (ALLEGRO_BITMAP *bitmap, struct pos p,
+draw_spikes_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
                    struct spikes_floor *s)
 {
   if (bitmap == room_bg) return;
@@ -286,7 +294,7 @@ draw_spikes_right (ALLEGRO_BITMAP *bitmap, struct pos p,
 }
 
 void
-draw_spikes_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_spikes_fg (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   if (bitmap == room_bg) return;
   struct spikes_floor *s = spikes_floor_at_pos (p);
@@ -303,281 +311,281 @@ draw_spikes_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
 }
 
 void
-draw_spikes_01 (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_spikes_01 (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   draw_spikes_left_01 (bitmap, p);
   draw_spikes_right_01 (bitmap, p);
 }
 
 void
-draw_spikes_left_01 (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_spikes_left_01 (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
-  draw_bitmapc (spikes_left_01, bitmap, spikes_left_01_coord (p), 0);
+  struct coord c;
+  draw_bitmapc (spikes_left_01, bitmap, spikes_left_01_coord (p, &c), 0);
 }
 
 void
-draw_spikes_right_01 (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_spikes_right_01 (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
-  draw_bitmapc (spikes_right_01, bitmap, spikes_right_01_coord (p), 0);
-  draw_con_left (bitmap, prel (p, 0, +1));
+  struct coord c; struct pos pr;
+  draw_bitmapc (spikes_right_01, bitmap, spikes_right_01_coord (p, &c), 0);
+  draw_con_left (bitmap, prel (p, &pr, 0, +1));
 }
 
 void
-draw_spikes_01_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
-{
-  draw_bitmapc (spikes_01_fg, bitmap, spikes_01_fg_coord (p), 0);
-}
-
-struct coord
-spikes_left_01_coord (struct pos p)
+draw_spikes_01_fg (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   struct coord c;
-  c.x = PLACE_WIDTH * p.place;
-  c.y = PLACE_HEIGHT * p.floor + 51;
-  c.room = p.room;
+  draw_bitmapc (spikes_01_fg, bitmap, spikes_01_fg_coord (p, &c), 0);
+}
+
+struct coord *
+spikes_left_01_coord (struct pos *p, struct coord *c)
+{
+  c->x = PLACE_WIDTH * p->place;
+  c->y = PLACE_HEIGHT * p->floor + 51;
+  c->room = p->room;
   return c;
 }
 
-struct coord
-spikes_right_01_coord (struct pos p)
+struct coord *
+spikes_right_01_coord (struct pos *p, struct coord *c)
 {
-  struct coord c;
-  c.x = PLACE_WIDTH * (p.place + 1);
-  c.y = PLACE_HEIGHT * p.floor + 53;
-  c.room = p.room;
+  c->x = PLACE_WIDTH * (p->place + 1);
+  c->y = PLACE_HEIGHT * p->floor + 53;
+  c->room = p->room;
   return c;
 }
 
-struct coord
-spikes_01_fg_coord (struct pos p)
+struct coord *
+spikes_01_fg_coord (struct pos *p, struct coord *c)
 {
-  struct coord c;
-  c.x = PLACE_WIDTH * p.place;
-  c.y = PLACE_HEIGHT * p.floor + 56;
-  c.room = p.room;
+  c->x = PLACE_WIDTH * p->place;
+  c->y = PLACE_HEIGHT * p->floor + 56;
+  c->room = p->room;
   return c;
 }
 
 void
-draw_spikes_02 (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_spikes_02 (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   draw_spikes_left_02 (bitmap, p);
   draw_spikes_right_02 (bitmap, p);
 }
 
 void
-draw_spikes_left_02 (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_spikes_left_02 (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
-  draw_bitmapc (spikes_left_02, bitmap, spikes_left_02_coord (p), 0);
+  struct coord c;
+  draw_bitmapc (spikes_left_02, bitmap, spikes_left_02_coord (p, &c), 0);
 }
 
 void
-draw_spikes_right_02 (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_spikes_right_02 (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
-  draw_bitmapc (spikes_right_02, bitmap, spikes_right_02_coord (p), 0);
-  draw_con_left (bitmap, prel (p, 0, +1));
+  struct coord c; struct pos pr;
+  draw_bitmapc (spikes_right_02, bitmap, spikes_right_02_coord (p, &c), 0);
+  draw_con_left (bitmap, prel (p, &pr, 0, +1));
 }
 
 void
-draw_spikes_02_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
-{
-  draw_bitmapc (spikes_02_fg, bitmap, spikes_02_fg_coord (p), 0);
-}
-
-struct coord
-spikes_left_02_coord (struct pos p)
+draw_spikes_02_fg (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   struct coord c;
-  c.x = PLACE_WIDTH * p.place;
-  c.y = PLACE_HEIGHT * p.floor + 41;
-  c.room = p.room;
+  draw_bitmapc (spikes_02_fg, bitmap, spikes_02_fg_coord (p, &c), 0);
+}
+
+struct coord *
+spikes_left_02_coord (struct pos *p, struct coord *c)
+{
+  c->x = PLACE_WIDTH * p->place;
+  c->y = PLACE_HEIGHT * p->floor + 41;
+  c->room = p->room;
   return c;
 }
 
-struct coord
-spikes_right_02_coord (struct pos p)
+struct coord *
+spikes_right_02_coord (struct pos *p, struct coord *c)
 {
-  struct coord c;
-  c.x = PLACE_WIDTH * (p.place + 1);
-  c.y = PLACE_HEIGHT * p.floor + 41;
-  c.room = p.room;
+  c->x = PLACE_WIDTH * (p->place + 1);
+  c->y = PLACE_HEIGHT * p->floor + 41;
+  c->room = p->room;
   return c;
 }
 
-struct coord
-spikes_02_fg_coord (struct pos p)
+struct coord *
+spikes_02_fg_coord (struct pos *p, struct coord *c)
 {
-  struct coord c;
-  c.x = PLACE_WIDTH * p.place;
-  c.y = PLACE_HEIGHT * p.floor + 48;
-  c.room = p.room;
+  c->x = PLACE_WIDTH * p->place;
+  c->y = PLACE_HEIGHT * p->floor + 48;
+  c->room = p->room;
   return c;
 }
 
 void
-draw_spikes_03 (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_spikes_03 (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   draw_spikes_left_03 (bitmap, p);
   draw_spikes_right_03 (bitmap, p);
 }
 
 void
-draw_spikes_left_03 (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_spikes_left_03 (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
-  draw_bitmapc (spikes_left_03, bitmap, spikes_left_03_coord (p), 0);
+  struct coord c;
+  draw_bitmapc (spikes_left_03, bitmap, spikes_left_03_coord (p, &c), 0);
 }
 
 void
-draw_spikes_right_03 (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_spikes_right_03 (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
-  draw_bitmapc (spikes_right_03, bitmap, spikes_right_03_coord (p), 0);
-  draw_con_left (bitmap, prel (p, 0, +1));
+  struct coord c; struct pos pr;
+  draw_bitmapc (spikes_right_03, bitmap, spikes_right_03_coord (p, &c), 0);
+  draw_con_left (bitmap, prel (p, &pr, 0, +1));
 }
 
 void
-draw_spikes_03_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
-{
-  draw_bitmapc (spikes_03_fg, bitmap, spikes_03_fg_coord (p), 0);
-}
-
-struct coord
-spikes_left_03_coord (struct pos p)
+draw_spikes_03_fg (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   struct coord c;
-  c.x = PLACE_WIDTH * p.place;
-  c.y = PLACE_HEIGHT * p.floor + 34;
-  c.room = p.room;
+  draw_bitmapc (spikes_03_fg, bitmap, spikes_03_fg_coord (p, &c), 0);
+}
+
+struct coord *
+spikes_left_03_coord (struct pos *p, struct coord *c)
+{
+  c->x = PLACE_WIDTH * p->place;
+  c->y = PLACE_HEIGHT * p->floor + 34;
+  c->room = p->room;
   return c;
 }
 
-struct coord
-spikes_right_03_coord (struct pos p)
+struct coord *
+spikes_right_03_coord (struct pos *p, struct coord *c)
 {
-  struct coord c;
-  c.x = PLACE_WIDTH * (p.place + 1);
-  c.y = PLACE_HEIGHT * p.floor + 41;
-  c.room = p.room;
+  c->x = PLACE_WIDTH * (p->place + 1);
+  c->y = PLACE_HEIGHT * p->floor + 41;
+  c->room = p->room;
   return c;
 }
 
-struct coord
-spikes_03_fg_coord (struct pos p)
+struct coord *
+spikes_03_fg_coord (struct pos *p, struct coord *c)
 {
-  struct coord c;
-  c.x = PLACE_WIDTH * p.place;
-  c.y = PLACE_HEIGHT * p.floor + 37;
-  c.room = p.room;
+  c->x = PLACE_WIDTH * p->place;
+  c->y = PLACE_HEIGHT * p->floor + 37;
+  c->room = p->room;
   return c;
 }
 
 void
-draw_spikes_04 (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_spikes_04 (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   draw_spikes_left_04 (bitmap, p);
   draw_spikes_right_04 (bitmap, p);
 }
 
 void
-draw_spikes_left_04 (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_spikes_left_04 (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
-  draw_bitmapc (spikes_left_04, bitmap, spikes_left_04_coord (p), 0);
+  struct coord c;
+  draw_bitmapc (spikes_left_04, bitmap, spikes_left_04_coord (p, &c), 0);
 }
 
 void
-draw_spikes_right_04 (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_spikes_right_04 (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
-  draw_bitmapc (spikes_right_04, bitmap, spikes_right_04_coord (p), 0);
-  draw_con_left (bitmap, prel (p, 0, +1));
+  struct coord c; struct pos pr;
+  draw_bitmapc (spikes_right_04, bitmap, spikes_right_04_coord (p, &c), 0);
+  draw_con_left (bitmap, prel (p, &pr, 0, +1));
 }
 
 void
-draw_spikes_04_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
-{
-  draw_bitmapc (spikes_04_fg, bitmap, spikes_04_fg_coord (p), 0);
-}
-
-struct coord
-spikes_left_04_coord (struct pos p)
+draw_spikes_04_fg (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   struct coord c;
-  c.x = PLACE_WIDTH * p.place;
-  c.y = PLACE_HEIGHT * p.floor + 35;
-  c.room = p.room;
+  draw_bitmapc (spikes_04_fg, bitmap, spikes_04_fg_coord (p, &c), 0);
+}
+
+struct coord *
+spikes_left_04_coord (struct pos *p, struct coord *c)
+{
+  c->x = PLACE_WIDTH * p->place;
+  c->y = PLACE_HEIGHT * p->floor + 35;
+  c->room = p->room;
   return c;
 }
 
-struct coord
-spikes_right_04_coord (struct pos p)
+struct coord *
+spikes_right_04_coord (struct pos *p, struct coord *c)
 {
-  struct coord c;
-  c.x = PLACE_WIDTH * (p.place + 1);
-  c.y = PLACE_HEIGHT * p.floor + 36;
-  c.room = p.room;
+  c->x = PLACE_WIDTH * (p->place + 1);
+  c->y = PLACE_HEIGHT * p->floor + 36;
+  c->room = p->room;
   return c;
 }
 
-struct coord
-spikes_04_fg_coord (struct pos p)
+struct coord *
+spikes_04_fg_coord (struct pos *p, struct coord *c)
 {
-  struct coord c;
-  c.x = PLACE_WIDTH * p.place;
-  c.y = PLACE_HEIGHT * p.floor + 38;
-  c.room = p.room;
+  c->x = PLACE_WIDTH * p->place;
+  c->y = PLACE_HEIGHT * p->floor + 38;
+  c->room = p->room;
   return c;
 }
 
 void
-draw_spikes_05 (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_spikes_05 (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   draw_spikes_left_05 (bitmap, p);
   draw_spikes_right_05 (bitmap, p);
 }
 
 void
-draw_spikes_left_05 (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_spikes_left_05 (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
-  draw_bitmapc (spikes_left_05, bitmap, spikes_left_05_coord (p), 0);
+  struct coord c;
+  draw_bitmapc (spikes_left_05, bitmap, spikes_left_05_coord (p, &c), 0);
 }
 
 void
-draw_spikes_right_05 (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_spikes_right_05 (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
-  draw_bitmapc (spikes_right_05, bitmap, spikes_right_05_coord (p), 0);
-  draw_con_left (bitmap, prel (p, 0, +1));
+  struct coord c; struct pos pr;
+  draw_bitmapc (spikes_right_05, bitmap, spikes_right_05_coord (p, &c), 0);
+  draw_con_left (bitmap, prel (p, &pr, 0, +1));
 }
 
 void
-draw_spikes_05_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
-{
-  draw_bitmapc (spikes_05_fg, bitmap, spikes_05_fg_coord (p), 0);
-}
-
-struct coord
-spikes_left_05_coord (struct pos p)
+draw_spikes_05_fg (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   struct coord c;
-  c.x = PLACE_WIDTH * p.place;
-  c.y = PLACE_HEIGHT * p.floor + 35;
-  c.room = p.room;
+  draw_bitmapc (spikes_05_fg, bitmap, spikes_05_fg_coord (p, &c), 0);
+}
+
+struct coord *
+spikes_left_05_coord (struct pos *p, struct coord *c)
+{
+  c->x = PLACE_WIDTH * p->place;
+  c->y = PLACE_HEIGHT * p->floor + 35;
+  c->room = p->room;
   return c;
 }
 
-struct coord
-spikes_right_05_coord (struct pos p)
+struct coord *
+spikes_right_05_coord (struct pos *p, struct coord *c)
 {
-  struct coord c;
-  c.x = PLACE_WIDTH * (p.place + 1);
-  c.y = PLACE_HEIGHT * p.floor + 37;
-  c.room = p.room;
+  c->x = PLACE_WIDTH * (p->place + 1);
+  c->y = PLACE_HEIGHT * p->floor + 37;
+  c->room = p->room;
   return c;
 }
 
-struct coord
-spikes_05_fg_coord (struct pos p)
+struct coord *
+spikes_05_fg_coord (struct pos *p, struct coord *c)
 {
-  struct coord c;
-  c.x = PLACE_WIDTH * p.place;
-  c.y = PLACE_HEIGHT * p.floor + 40;
-  c.room = p.room;
+  c->x = PLACE_WIDTH * p->place;
+  c->y = PLACE_HEIGHT * p->floor + 40;
+  c->room = p->room;
   return c;
 }

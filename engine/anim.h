@@ -24,16 +24,17 @@
 
 /* functions */
 void play_anim (void (*callback) (void), int freq);
-void draw_anim (ALLEGRO_BITMAP *bitmap, struct anim a);
-void draw_xanim (ALLEGRO_BITMAP *bitmap, struct anim a);
-struct coord xanim_coord (struct anim a);
-struct anim anim_from_xanim (struct anim a);
-struct anim next_anim (struct anim a, ALLEGRO_BITMAP* frame, int dx, int dy);
+void draw_frame (ALLEGRO_BITMAP *bitmap, struct frame *f);
+void draw_xframe (ALLEGRO_BITMAP *bitmap, struct anim *a);
+struct coord *xframe_coord (struct anim *a, struct coord *c);
+struct frame *xframe_frame (struct anim *a, struct frame *f);
+struct frame *next_frame (struct frame *f, struct frame *nf,
+                          ALLEGRO_BITMAP *b, int dx, int dy);
 bool wait_anim (int cycles);
 
 /* variables */
 extern bool quit_anim; /* set to true to quit animation */
-extern bool next_anim_inv; /* invert draw_anim offset interpretation  */
+extern bool next_frame_inv; /* invert draw_anim offset interpretation  */
 extern bool cutscene; /* don't apply physics if set */
 
 /* macros */

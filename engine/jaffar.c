@@ -225,15 +225,15 @@ void
 jaffar_normal (void)
 {
   jaffar.action = jaffar_normal;
-  jaffar.flip = (jaffar.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
+  jaffar.f.flip = (jaffar.f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
   ALLEGRO_BITMAP *frame = jaffar_normal_00;
   int dx = +0;
   int dy = +0;
 
-  if (jaffar.frame == lower_arms_frameset[5].frame) dx = +0, dy = -2;
+  if (jaffar.f.b == lower_arms_frameset[5].frame) dx = -2, dy = +0;
 
-  jaffar = next_anim (jaffar, frame, dy, dx);
+  next_frame (&jaffar.f, &jaffar.f, frame, dx, dy);
 }
 
 void
@@ -241,7 +241,7 @@ jaffar_walk (void)
 {
   void (*oaction) (void) = jaffar.action;
   jaffar.action = jaffar_walk;
-  jaffar.flip = (jaffar.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
+  jaffar.f.flip = (jaffar.f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
   static int i = 0;
   if (oaction != jaffar_walk) i = 0;
@@ -250,13 +250,13 @@ jaffar_walk (void)
   int dx = walk_frameset[i].dx;
   int dy = walk_frameset[i].dy;
 
-  if (jaffar.frame == jaffar_normal_00) dx = -4;
-  if (jaffar.frame == turn_walk_frameset[9].frame)
-    dx = +17, dy = -1, next_anim_inv = true;
+  if (jaffar.f.b == jaffar_normal_00) dx = -4;
+  if (jaffar.f.b == turn_walk_frameset[9].frame)
+    dx = +17, dy = -1, next_frame_inv = true;
 
-  jaffar = next_anim (jaffar, frame, dx, dy);
+  next_frame (&jaffar.f, &jaffar.f, frame, dx, dy);
 
-  if (next_anim_inv) next_anim_inv = false;
+  if (next_frame_inv) next_frame_inv = false;
   if (i < 5) i++;
   else if (jaffar.repeat > 0) i = 0, jaffar.repeat--;
   else if (i < 7) i++;
@@ -268,7 +268,7 @@ jaffar_open_arms (void)
 {
   void (*oaction) (void) = jaffar.action;
   jaffar.action = jaffar_open_arms;
-  jaffar.flip = (jaffar.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
+  jaffar.f.flip = (jaffar.f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
   static int i = 0;
   if (oaction != jaffar_open_arms) i = 0;
@@ -277,9 +277,9 @@ jaffar_open_arms (void)
   int dx = open_arms_frameset[i].dx;
   int dy = open_arms_frameset[i].dy;
 
-  if (i == 1 && jaffar.frame == open_arms_frameset[0].frame) dx = -5;
+  if (i == 1 && jaffar.f.b == open_arms_frameset[0].frame) dx = -5;
 
-  jaffar = next_anim (jaffar, frame, dx, dy);
+  next_frame (&jaffar.f, &jaffar.f, frame, dx, dy);
 
   if (i < 1) i++;
 }
@@ -289,7 +289,7 @@ jaffar_raise_arms (void)
 {
   void (*oaction) (void) = jaffar.action;
   jaffar.action = jaffar_raise_arms;
-  jaffar.flip = (jaffar.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
+  jaffar.f.flip = (jaffar.f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
   static int i = 0;
   if (oaction != jaffar_raise_arms) i = 0;
@@ -298,7 +298,7 @@ jaffar_raise_arms (void)
   int dx = raise_arms_frameset[i].dx;
   int dy = raise_arms_frameset[i].dy;
 
-  jaffar = next_anim (jaffar, frame, dx, dy);
+  next_frame (&jaffar.f, &jaffar.f, frame, dx, dy);
 
   if (i < 10) i++;
 }
@@ -308,7 +308,7 @@ jaffar_lower_arms (void)
 {
   void (*oaction) (void) = jaffar.action;
   jaffar.action = jaffar_lower_arms;
-  jaffar.flip = (jaffar.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
+  jaffar.f.flip = (jaffar.f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
   static int i = 0;
   if (oaction != jaffar_lower_arms) i = 0;
@@ -317,7 +317,7 @@ jaffar_lower_arms (void)
   int dx = lower_arms_frameset[i].dx;
   int dy = lower_arms_frameset[i].dy;
 
-  jaffar = next_anim (jaffar, frame, dx, dy);
+  next_frame (&jaffar.f, &jaffar.f, frame, dx, dy);
 
   if (i < 5) i++;
   else i = 0, jaffar.action = jaffar_normal;
@@ -328,7 +328,7 @@ jaffar_turn_walk (void)
 {
   void (*oaction) (void) = jaffar.action;
   jaffar.action = jaffar_turn_walk;
-  jaffar.flip = (jaffar.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
+  jaffar.f.flip = (jaffar.f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
   static int i = 0;
   if (oaction != jaffar_turn_walk) i = 0;
@@ -337,12 +337,12 @@ jaffar_turn_walk (void)
   int dx = turn_walk_frameset[i].dx;
   int dy = turn_walk_frameset[i].dy;
 
-  jaffar = next_anim (jaffar, frame, dx, dy);
+  next_frame (&jaffar.f, &jaffar.f, frame, dx, dy);
 
   if (i < 9) i++;
   else {
     jaffar.action = jaffar_walk;
-    jaffar.dir = (jaffar.dir == RIGHT) ? LEFT : RIGHT;
+    jaffar.f.dir = (jaffar.f.dir == RIGHT) ? LEFT : RIGHT;
     i = 0;
   }
 }

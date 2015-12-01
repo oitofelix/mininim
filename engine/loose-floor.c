@@ -127,22 +127,22 @@ create_broken_floor_bitmap (void)
 }
 
 void
-register_loose_floor (struct pos p)
+register_loose_floor (struct pos *p)
 {
   struct loose_floor l;
 
-  l.p = p;
+  l.p = *p;
   l.i = 0;
   l.resist = LOOSE_FLOOR_RESISTENCE;
   l.action = NO_LOOSE_FLOOR_ACTION;
   l.state = 0;
 
-  struct coord c = floor_left_coord (p);
-  l.a.frame = loose_floor_02;
-  l.a.c.room = p.room;
-  l.a.c.x = c.x;
-  l.a.c.y = c.y + 3;
-  l.a.flip = 0;
+  struct coord c; floor_left_coord (p, &c);
+  l.f.b = loose_floor_02;
+  l.f.c.room = p->room;
+  l.f.c.x = c.x;
+  l.f.c.y = c.y + 3;
+  l.f.flip = 0;
 
   loose_floor =
     add_to_array (&l, 1, loose_floor, &loose_floor_nmemb,
@@ -150,11 +150,11 @@ register_loose_floor (struct pos p)
 }
 
 struct loose_floor *
-loose_floor_at_pos (struct pos p)
+loose_floor_at_pos (struct pos *p)
 {
   size_t i;
   for (i = 0; i < loose_floor_nmemb; i++)
-    if (peq (loose_floor[i].p, p)) return &loose_floor[i];
+    if (peq (&loose_floor[i].p, p)) return &loose_floor[i];
   return NULL;
 }
 
@@ -166,7 +166,7 @@ remove_loose_floor (struct loose_floor *l)
 }
 
 void
-release_loose_floor (struct pos p)
+release_loose_floor (struct pos *p)
 {
   struct loose_floor *l = loose_floor_at_pos (p);
   if (l->action != RELEASE_LOOSE_FLOOR
@@ -230,11 +230,11 @@ compute_loose_floor_release (struct loose_floor *l)
   case 7: l->state = 2;
     play_sample (loose_floor_sample ()); l->i++; break;
   case 8: l->state = 2; l->i++; break;
-  case 9: l->state = 2; l->i++; con (l->p)->fg = NO_FLOOR; break;
+  case 9: l->state = 2; l->i++; con (&l->p)->fg = NO_FLOOR; break;
   case 10:
     l->state = 2;
     l->i = 0;
-    l->a.id = &l->a;
+    l->f.id = &l->f;
     l->action = FALL_LOOSE_FLOOR;
     l->resist = LOOSE_FLOOR_RESISTENCE;
     break;
@@ -247,62 +247,66 @@ compute_loose_floor_fall (struct loose_floor *l)
   int speed = 3 * ++l->i;
   if (speed > 33) speed = 33;
 
-  struct anim na = next_anim (l->a, l->a.frame, 0, speed);
-  struct pos fpmbo_a = fpmbo (l->a);
-  enum confg fcmbo_a = fcmbo (l->a);
-  struct pos fpmbo_na = fpmbo (na);
-  enum confg fcmbo_na = fcmbo (na);
+  struct frame nf; next_frame (&l->f, &nf, l->f.b, 0, speed);
+  struct coord mbo_f, mbo_nf;
+  struct pos fpmbo_f, nfpmbo_f, fpmbo_nf, nfpmbo_nf;
+  enum confg fcmbo_f, fcmbo_nf;
+  fcmbo_f = survey (_mbo, posf, &l->f, &mbo_f, &fpmbo_f, &nfpmbo_f)->fg;
+  fcmbo_nf = survey (_mbo, posf, &nf, &mbo_nf, &fpmbo_nf, &nfpmbo_nf)->fg;
+
   struct pos p;
 
-  if (fcmbo_a == NO_FLOOR
-      || peq (fpmbo_a, fpmbo_na)) {
+  if (fcmbo_f == NO_FLOOR
+      || peq (&fpmbo_f, &fpmbo_nf)) {
     /* the floor hit a rigid structure */
-    if (fcmbo_na == WALL
-        || fcmbo_na == PILLAR
-        || fcmbo_na == DOOR) p = prel (fpmbo_na, -1, 0);
+    if (fcmbo_nf == WALL
+        || fcmbo_nf == PILLAR
+        || fcmbo_nf == DOOR) prel (&fpmbo_nf, &p, -1, 0);
     /* the floor continue to fall */
     else {
-      l->a = na;
-      if (fcmbo_na == NO_FLOOR) l->p = fpmbo_na;
+      l->f = nf;
+      if (fcmbo_nf == NO_FLOOR) l->p = fpmbo_nf;
       return;
     }
     /* the floor hit the ground */
   } else {
     struct loose_floor *m;
-    p = fpmbo_a;
-    switch (fcmbo_a) {
+    p = fpmbo_f;
+    switch (fcmbo_f) {
     case LOOSE_FLOOR: /* loose floor isn't ground */
-      m = loose_floor_at_pos (fpmbo_a);
+      m = loose_floor_at_pos (&fpmbo_f);
       m->p.room = -1;
-      l->a = na;
-      l->a.frame = broken_floor;
-      l->p = fpmbo_a;
-      con (fpmbo_a)->fg = NO_FLOOR;
+      l->f = nf;
+      l->f.b = broken_floor;
+      l->p = fpmbo_f;
+      con (&fpmbo_f)->fg = NO_FLOOR;
       play_sample (broken_floor_sound);
       return;
-    case OPENER_FLOOR: break_opener_floor (fpmbo_a); break;
-    case CLOSER_FLOOR: break_closer_floor (fpmbo_a); break;
-    case SPIKES_FLOOR: break_spikes_floor (fpmbo_a); break;
+    case OPENER_FLOOR: break_opener_floor (&fpmbo_f); break;
+    case CLOSER_FLOOR: break_closer_floor (&fpmbo_f); break;
+    case SPIKES_FLOOR: break_spikes_floor (&fpmbo_f); break;
     default: break;
     }
   }
 
   /* reach here only if the floor hit a rigid structure or the
      ground */
-  con (p)->fg = BROKEN_FLOOR;
-  shake_loose_floor_row (p);
+  con (&p)->fg = BROKEN_FLOOR;
+  shake_loose_floor_row (&p);
   l->p.room = -1;
   redraw_room = true;
   play_sample (broken_floor_sound);
 }
 
 void
-shake_loose_floor_row (struct pos p)
+shake_loose_floor_row (struct pos *p)
 {
+  struct pos _p = *p;
+
   struct loose_floor *l;
-  for (p.place = PLACES - 1; p.place >= -1; p.place--)
-    if (con (p)->fg == LOOSE_FLOOR) {
-      l = loose_floor_at_pos (p);
+  for (_p.place = PLACES - 1; _p.place >= -1; _p.place--)
+    if (con (&_p)->fg == LOOSE_FLOOR) {
+      l = loose_floor_at_pos (&_p);
       if (l->action == NO_LOOSE_FLOOR_ACTION) {
         l->action = SHAKE_LOOSE_FLOOR;
         l->i = 0;
@@ -322,7 +326,7 @@ loose_floor_sample (void)
 }
 
 void
-draw_loose_floor (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_loose_floor (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   struct loose_floor *l = loose_floor_at_pos (p);
   if (! l) return;
@@ -338,23 +342,24 @@ draw_loose_floor (ALLEGRO_BITMAP *bitmap, struct pos p)
 }
 
 void
-draw_falling_loose_floor (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_falling_loose_floor (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   struct loose_floor *l = loose_floor_at_pos (p);
   if (! l) return;
 
-  struct pos ptr, pbr;
   if (l->action == FALL_LOOSE_FLOOR) {
-    ptr = posf (tr (l->a));
-    pbr = posf (br (l->a));
-    draw_anim (bitmap, l->a);
-    draw_con_left (bitmap, ptr);
-    draw_con_left (bitmap, pbr);
+    struct coord tr, br;
+    struct pos fptr, nfptr, fpbr, nfpbr;
+    survey (_tr, posf, &l->f, &tr, &fptr, &nfptr);
+    survey (_br, posf, &l->f, &br, &fpbr, &nfpbr);
+    draw_frame (bitmap, &l->f);
+    draw_con_left (bitmap, &fptr);
+    draw_con_left (bitmap, &fpbr);
   } else return;
 }
 
 void
-draw_loose_floor_base (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_loose_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   struct loose_floor *l = loose_floor_at_pos (p);
   if (! l) return;
@@ -367,7 +372,7 @@ draw_loose_floor_base (ALLEGRO_BITMAP *bitmap, struct pos p)
 }
 
 void
-draw_loose_floor_left (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_loose_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   struct loose_floor *l = loose_floor_at_pos (p);
   if (! l) return;
@@ -380,7 +385,7 @@ draw_loose_floor_left (ALLEGRO_BITMAP *bitmap, struct pos p)
 }
 
 void
-draw_loose_floor_right (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_loose_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   struct loose_floor *l = loose_floor_at_pos (p);
   if (! l) return;
@@ -393,123 +398,127 @@ draw_loose_floor_right (ALLEGRO_BITMAP *bitmap, struct pos p)
 }
 
 void
-draw_loose_floor_00 (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_loose_floor_00 (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   if (bitmap == room_bg) return;
+  struct pos pr;
   draw_floor (bitmap, p);
-  draw_con_left (bitmap, prel (p, 0, +1));
+  draw_con_left (bitmap, prel (p, &pr, 0, +1));
 }
 
 void
-draw_loose_floor_00_base (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_loose_floor_00_base (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   if (bitmap == room_bg) return;
   draw_floor_base (bitmap, p);
 }
 
 void
-draw_loose_floor_00_left (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_loose_floor_00_left (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   if (bitmap == room_bg) return;
   draw_floor_left (bitmap, p);
 }
 
 void
-draw_loose_floor_00_right (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_loose_floor_00_right (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   if (bitmap == room_bg) return;
+  struct pos pr;
   draw_floor_right (bitmap, p);
-  draw_con_left (bitmap, prel (p, 0, +1));
+  draw_con_left (bitmap, prel (p, &pr, 0, +1));
 }
 
 void
-draw_loose_floor_01 (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_loose_floor_01 (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   if (bitmap == room_bg) return;
-  draw_bitmapc (loose_floor_base_01, bitmap, floor_base_coord (p), 0);
-  draw_bitmapc (loose_floor_left_01, bitmap, loose_floor_left_coord (p), 0);
-  draw_bitmapc (loose_floor_right_01, bitmap, loose_floor_right_coord (p), 0);
-
-  draw_con_left (bitmap, prel (p, 0, +1));
+  struct coord c; struct pos pr;
+  draw_bitmapc (loose_floor_base_01, bitmap, floor_base_coord (p, &c), 0);
+  draw_bitmapc (loose_floor_left_01, bitmap, loose_floor_left_coord (p, &c), 0);
+  draw_bitmapc (loose_floor_right_01, bitmap, loose_floor_right_coord (p, &c), 0);
+  draw_con_left (bitmap, prel (p, &pr, 0, +1));
 }
 
 void
-draw_loose_floor_01_base (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_loose_floor_01_base (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   if (bitmap == room_bg) return;
-  draw_bitmapc (loose_floor_base_01, bitmap, floor_base_coord (p), 0);
-}
-
-void
-draw_loose_floor_01_left (ALLEGRO_BITMAP *bitmap, struct pos p)
-{
-  if (bitmap == room_bg) return;
-  draw_bitmapc (loose_floor_base_01, bitmap, floor_base_coord (p), 0);
-  draw_bitmapc (loose_floor_left_01, bitmap, loose_floor_left_coord (p), 0);
-}
-
-void
-draw_loose_floor_01_right (ALLEGRO_BITMAP *bitmap, struct pos p)
-{
-  if (bitmap == room_bg) return;
-  draw_bitmapc (loose_floor_base_01, bitmap, floor_base_coord (p), 0);
-  draw_bitmapc (loose_floor_right_01, bitmap, loose_floor_right_coord (p), 0);
-
-  draw_con_left (bitmap, prel (p, 0, +1));
-}
-
-void
-draw_loose_floor_02 (ALLEGRO_BITMAP *bitmap, struct pos p)
-{
-  if (bitmap == room_bg) return;
-  draw_bitmapc (loose_floor_base_02, bitmap, floor_base_coord (p), 0);
-  draw_bitmapc (loose_floor_left_02, bitmap, floor_left_coord (p), 0);
-  draw_bitmapc (loose_floor_right_02, bitmap, loose_floor_right_coord (p), 0);
-
-  draw_con_left (bitmap, prel (p, 0, +1));
-}
-
-void
-draw_loose_floor_02_base (ALLEGRO_BITMAP *bitmap, struct pos p)
-{
-  if (bitmap == room_bg) return;
-  draw_bitmapc (loose_floor_base_02, bitmap, floor_base_coord (p), 0);
-}
-
-void
-draw_loose_floor_02_left (ALLEGRO_BITMAP *bitmap, struct pos p)
-{
-  if (bitmap == room_bg) return;
-  draw_bitmapc (loose_floor_base_02, bitmap, floor_base_coord (p), 0);
-  draw_bitmapc (loose_floor_left_02, bitmap, floor_left_coord (p), 0);
-}
-
-void
-draw_loose_floor_02_right (ALLEGRO_BITMAP *bitmap, struct pos p)
-{
-  if (bitmap == room_bg) return;
-  draw_bitmapc (loose_floor_base_02, bitmap, floor_base_coord (p), 0);
-  draw_bitmapc (loose_floor_right_02, bitmap, loose_floor_right_coord (p), 0);
-
-  draw_con_left (bitmap, prel (p, 0, +1));
-}
-
-struct coord
-loose_floor_left_coord (struct pos p)
-{
   struct coord c;
-  c.x = PLACE_WIDTH * p.place;
-  c.y = PLACE_HEIGHT * p.floor + 50 - 1;
-  c.room = p.room;
+  draw_bitmapc (loose_floor_base_01, bitmap, floor_base_coord (p, &c), 0);
+}
+
+void
+draw_loose_floor_01_left (ALLEGRO_BITMAP *bitmap, struct pos *p)
+{
+  if (bitmap == room_bg) return;
+  struct coord c;
+  draw_bitmapc (loose_floor_base_01, bitmap, floor_base_coord (p, &c), 0);
+  draw_bitmapc (loose_floor_left_01, bitmap, loose_floor_left_coord (p, &c), 0);
+}
+
+void
+draw_loose_floor_01_right (ALLEGRO_BITMAP *bitmap, struct pos *p)
+{
+  if (bitmap == room_bg) return;
+  struct coord c; struct pos pr;
+  draw_bitmapc (loose_floor_base_01, bitmap, floor_base_coord (p, &c), 0);
+  draw_bitmapc (loose_floor_right_01, bitmap, loose_floor_right_coord (p, &c), 0);
+  draw_con_left (bitmap, prel (p, &pr, 0, +1));
+}
+
+void
+draw_loose_floor_02 (ALLEGRO_BITMAP *bitmap, struct pos *p)
+{
+  if (bitmap == room_bg) return;
+  struct coord c; struct pos pr;
+  draw_bitmapc (loose_floor_base_02, bitmap, floor_base_coord (p, &c), 0);
+  draw_bitmapc (loose_floor_left_02, bitmap, floor_left_coord (p, &c), 0);
+  draw_bitmapc (loose_floor_right_02, bitmap, loose_floor_right_coord (p, &c), 0);
+  draw_con_left (bitmap, prel (p, &pr, 0, +1));
+}
+
+void
+draw_loose_floor_02_base (ALLEGRO_BITMAP *bitmap, struct pos *p)
+{
+  if (bitmap == room_bg) return;
+  struct coord c;
+  draw_bitmapc (loose_floor_base_02, bitmap, floor_base_coord (p, &c), 0);
+}
+
+void
+draw_loose_floor_02_left (ALLEGRO_BITMAP *bitmap, struct pos *p)
+{
+  if (bitmap == room_bg) return;
+  struct coord c;
+  draw_bitmapc (loose_floor_base_02, bitmap, floor_base_coord (p, &c), 0);
+  draw_bitmapc (loose_floor_left_02, bitmap, floor_left_coord (p, &c), 0);
+}
+
+void
+draw_loose_floor_02_right (ALLEGRO_BITMAP *bitmap, struct pos *p)
+{
+  if (bitmap == room_bg) return;
+  struct coord c; struct pos pr;
+  draw_bitmapc (loose_floor_base_02, bitmap, floor_base_coord (p, &c), 0);
+  draw_bitmapc (loose_floor_right_02, bitmap, loose_floor_right_coord (p, &c), 0);
+  draw_con_left (bitmap, prel (p, &pr, 0, +1));
+}
+
+struct coord *
+loose_floor_left_coord (struct pos *p, struct coord *c)
+{
+  c->x = PLACE_WIDTH * p->place;
+  c->y = PLACE_HEIGHT * p->floor + 50 - 1;
+  c->room = p->room;
   return c;
 }
 
-struct coord
-loose_floor_right_coord (struct pos p)
+struct coord *
+loose_floor_right_coord (struct pos *p, struct coord *c)
 {
-  struct coord c;
-  c.x = PLACE_WIDTH * (p.place + 1);
-  c.y = PLACE_HEIGHT * p.floor + 50 - 1;
-  c.room = p.room;
+  c->x = PLACE_WIDTH * (p->place + 1);
+  c->y = PLACE_HEIGHT * p->floor + 50 - 1;
+  c->room = p->room;
   return c;
 }

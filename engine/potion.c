@@ -29,10 +29,10 @@ static ALLEGRO_BITMAP *small_potion, *big_potion,
   *bubble_01, *bubble_02, *bubble_03, *bubble_04, *bubble_05,
   *bubble_06, *bubble_07;
 
-static struct coord small_potion_coord (struct pos p);
-static struct coord small_potion_bubble_coord (struct pos p);
-static struct coord big_potion_coord (struct pos p);
-static struct coord big_potion_bubble_coord (struct pos p);
+static struct coord *small_potion_coord (struct pos *p, struct coord *c);
+static struct coord *small_potion_bubble_coord (struct pos *p, struct coord *c);
+static struct coord *big_potion_coord (struct pos *p, struct coord *c);
+static struct coord *big_potion_bubble_coord (struct pos *p, struct coord *c);
 ALLEGRO_COLOR life_palette (ALLEGRO_COLOR c);
 
 void
@@ -88,7 +88,7 @@ get_bubble_frame (int i)
 }
 
 void
-draw_potion (ALLEGRO_BITMAP *bitmap, struct pos p, int i)
+draw_potion (ALLEGRO_BITMAP *bitmap, struct pos *p, int i)
 {
   if (! is_potion (p)) return;
 
@@ -101,77 +101,73 @@ draw_potion (ALLEGRO_BITMAP *bitmap, struct pos p, int i)
   switch (item) {
   case SMALL_LIFE_POTION:
     bottle = small_potion;
-    bottle_coord = small_potion_coord (p);
+    small_potion_coord (p, &bottle_coord);
     bubble_palette = life_palette;
-    bubble_coord = small_potion_bubble_coord (p);
+    small_potion_bubble_coord (p, &bubble_coord);
     break;
   case BIG_LIFE_POTION:
     bottle = big_potion;
-    bottle_coord = big_potion_coord (p);
+    big_potion_coord (p, &bottle_coord);
     bubble_palette = life_palette;
-    bubble_coord = big_potion_bubble_coord (p);
+    big_potion_bubble_coord (p, &bubble_coord);
     break;
   default:
     error (-1, 0, "%s (%i): unknown potion type", __func__, item);
     break;
   }
-  draw_bitmapc (bottle, bitmap, bottle_coord,
+  draw_bitmapc (bottle, bitmap, &bottle_coord,
                 prandom (1) ? ALLEGRO_FLIP_HORIZONTAL : 0);
   bubble = get_bubble_frame (i % 7);
   bubble = apply_palette (bubble, bubble_palette);
   int r = prandom (1);
   bubble_coord.x -= r;
-  draw_bitmapc (bubble, bitmap, bubble_coord,
+  draw_bitmapc (bubble, bitmap, &bubble_coord,
                 r ? ALLEGRO_FLIP_HORIZONTAL : 0);
   al_destroy_bitmap (bubble);
   unseedp ();
 }
 
 bool
-is_potion (struct pos p)
+is_potion (struct pos *p)
 {
   return con (p)->fg == FLOOR
     && (con (p)->ext.item == SMALL_LIFE_POTION
         || con (p)->ext.item == BIG_LIFE_POTION);
 }
 
-struct coord
-small_potion_coord (struct pos p)
+struct coord *
+small_potion_coord (struct pos *p, struct coord *c)
 {
-  struct coord c;
-  c.x = PLACE_WIDTH * (p.place + 1) - 10;
-  c.y = PLACE_HEIGHT * p.floor + 49;
-  c.room = p.room;
+  c->x = PLACE_WIDTH * (p->place + 1) - 10;
+  c->y = PLACE_HEIGHT * p->floor + 49;
+  c->room = p->room;
   return c;
 }
 
-struct coord
-small_potion_bubble_coord (struct pos p)
+struct coord *
+small_potion_bubble_coord (struct pos *p, struct coord *c)
 {
-  struct coord c;
-  c.x = PLACE_WIDTH * (p.place + 1) - 7;
-  c.y = PLACE_HEIGHT * p.floor + 40;
-  c.room = p.room;
+  c->x = PLACE_WIDTH * (p->place + 1) - 7;
+  c->y = PLACE_HEIGHT * p->floor + 40;
+  c->room = p->room;
   return c;
 }
 
-struct coord
-big_potion_coord (struct pos p)
+struct coord *
+big_potion_coord (struct pos *p, struct coord *c)
 {
-  struct coord c;
-  c.x = PLACE_WIDTH * (p.place + 1) - 10;
-  c.y = PLACE_HEIGHT * p.floor + 45;
-  c.room = p.room;
+  c->x = PLACE_WIDTH * (p->place + 1) - 10;
+  c->y = PLACE_HEIGHT * p->floor + 45;
+  c->room = p->room;
   return c;
 }
 
-struct coord
-big_potion_bubble_coord (struct pos p)
+struct coord *
+big_potion_bubble_coord (struct pos *p, struct coord *c)
 {
-  struct coord c;
-  c.x = PLACE_WIDTH * (p.place + 1) - 7;
-  c.y = PLACE_HEIGHT * p.floor + 36;
-  c.room = p.room;
+  c->x = PLACE_WIDTH * (p->place + 1) - 7;
+  c->y = PLACE_HEIGHT * p->floor + 36;
+  c->room = p->room;
   return c;
 }
 

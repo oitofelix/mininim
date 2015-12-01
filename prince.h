@@ -71,12 +71,14 @@ enum dir {
 };
 
 struct anim {
-  struct anim *id;
-  struct coord c;
-  ALLEGRO_BITMAP *frame;
-  enum dir dir;
+  struct frame {
+    void *id;
+    struct coord c;
+    ALLEGRO_BITMAP *b;
+    enum dir dir;
+    int flip;
+  } f;
   int repeat;
-  int flip;
   void (*action) (void);
 
   /* depressible floor */

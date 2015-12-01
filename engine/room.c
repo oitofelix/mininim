@@ -120,69 +120,37 @@ unload_room (void)
   al_destroy_bitmap (window);
 }
 
-struct coord
-nbitmap_coord (struct coord c, int w, int h)
-{
-  if (c.room == room_view) return c;
-
-  struct coord tl = c;
-  struct coord tr = c;
-  struct coord bl = c;
-  struct coord br = c;
-
-  tr.x = tl.x + w - 1;
-  bl.y = tl.y + h - 1;
-  br.x = tl.x + w - 1;
-  br.y = tl.y + h - 1;
-
-  struct coord ntl = ncoord (tl);
-  struct coord ntr = ncoord (tr);
-  struct coord nbl = ncoord (bl);
-  struct coord nbr = ncoord (br);
-
-  if (ntl.room == room_view) c = ntl;
-  else if (ntr.room == room_view) {
-    c = ntr;
-    c.x = ntr.x - w + 1;
-  } else if (nbl.room == room_view) {
-    c = nbl;
-    c.y = nbl.y - h + 1;
-  } else if (nbr.room == room_view) {
-    c = nbr;
-    c.x = nbr.x - w + 1;
-    c.y = nbr.y - h + 1;
-  }
-
-  return c;
-}
-
 void
 draw_bitmapc (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
-              struct coord c, int flags)
+              struct coord *c, int flags)
 {
   int w = al_get_bitmap_width (from);
   int h = al_get_bitmap_height (from);
 
+  struct coord nc = *c;
+
   if (! cutscene) {
-    c = nbitmap_coord (c, w, h);
+    nbitmap_coord (c, &nc, w, h);
     if ((to == screen || to == room_bg)
-        && c.room != room_view) return;
+        && nc.room != room_view) return;
   }
 
-  draw_bitmap (from, to, c.x, c.y, flags);
+  draw_bitmap (from, to, nc.x, nc.y, flags);
 }
 
 void
 draw_bitmap_regionc (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to, float sx, float sy,
-                     float sw, float sh, struct coord c, int flags)
+                     float sw, float sh, struct coord *c, int flags)
 {
+  struct coord nc = *c;
+
   if (! cutscene) {
-    c = nbitmap_coord (c, sw, sh);
+    nbitmap_coord (c, &nc, sw, sh);
     if ((to == screen || to == room_bg)
-        && c.room != room_view) return;
+        && nc.room != room_view) return;
   }
 
-  draw_bitmap_region (from, to, sx, sy, sw, sh, c.x, c.y, flags);
+  draw_bitmap_region (from, to, sx, sy, sw, sh, nc.x, nc.y, flags);
 }
 
 void
@@ -208,18 +176,18 @@ draw_room_bg (void)
 
   for (p.floor = FLOORS; p.floor >= -1; p.floor--)
     for (p.place = -1; p.place < PLACES; p.place++)
-      draw_con (room_bg, p);
+      draw_con (room_bg, &p);
 }
 
 void
-draw_con (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_con (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   draw_conbg (bitmap, p);
   draw_confg (bitmap, p);
 }
 
 void
-draw_confg (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_confg (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   switch (con (p)->fg) {
   case NO_FLOOR: break;
@@ -240,7 +208,7 @@ draw_confg (ALLEGRO_BITMAP *bitmap, struct pos p)
 }
 
 void
-draw_conbg (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_conbg (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   enum confg fg = con (p)->fg;
 
@@ -262,7 +230,7 @@ draw_conbg (ALLEGRO_BITMAP *bitmap, struct pos p)
 }
 
 void
-draw_con_left (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_con_left (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   switch (con (p)->fg) {
   case NO_FLOOR: break;
@@ -283,7 +251,7 @@ draw_con_left (ALLEGRO_BITMAP *bitmap, struct pos p)
 }
 
 void
-draw_con_right (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_con_right (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   switch (con (p)->fg) {
   case NO_FLOOR: break;
@@ -304,7 +272,7 @@ draw_con_right (ALLEGRO_BITMAP *bitmap, struct pos p)
 }
 
 void
-draw_con_base (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_con_base (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   switch (con (p)->fg) {
   case NO_FLOOR: break;
@@ -325,9 +293,9 @@ draw_con_base (ALLEGRO_BITMAP *bitmap, struct pos p)
 }
 
 void
-draw_no_floor_base (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_no_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
-  struct coord c = floor_base_coord (p);
+  struct coord c; floor_base_coord (p, &c);
   int w = al_get_bitmap_width (normal_floor_base);
   int h = al_get_bitmap_height (normal_floor_base);
 
@@ -338,9 +306,9 @@ draw_no_floor_base (ALLEGRO_BITMAP *bitmap, struct pos p)
 }
 
 void
-draw_no_floor (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_no_floor (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
-  struct coord c = floor_left_coord (p);
+  struct coord c; floor_left_coord (p, &c);
   c.y--; /* take opener floor into account */
   int wl = al_get_bitmap_width (normal_floor_left);
   int wr = al_get_bitmap_width (normal_floor_right);
@@ -355,133 +323,177 @@ draw_no_floor (ALLEGRO_BITMAP *bitmap, struct pos p)
   al_clear_to_color (BLACK);
   al_reset_clipping_rectangle ();
 
-  draw_con_right (bitmap, prel (p, 0, -1));
-  draw_con_right (bitmap, prel (p, +1, -1));
-  draw_con_left (bitmap, prel (p, +1, 0));
-  draw_con_left (bitmap, prel (p, 0, +1));
+  struct pos pr;
+  draw_con_right (bitmap, prel (p, &pr, 0, -1));
+  draw_con_right (bitmap, prel (p, &pr, +1, -1));
+  draw_con_left (bitmap, prel (p, &pr, +1, 0));
+  draw_con_left (bitmap, prel (p, &pr, 0, +1));
 }
 
 void
-draw_bricks_01 (ALLEGRO_BITMAP *bitmap, struct pos p)
-{
-  draw_bitmapc (bricks_01, bitmap, bricks_coord_12 (p) , 0);
-}
-
-void
-draw_bricks_02 (ALLEGRO_BITMAP *bitmap, struct pos p)
-{
-  draw_bitmapc (bricks_02, bitmap, bricks_coord_12 (p) , 0);
-}
-
-void
-draw_bricks_03 (ALLEGRO_BITMAP *bitmap, struct pos p)
-{
-  draw_bitmapc (bricks_03, bitmap, bricks_coord_34 (p) , 0);
-}
-
-void
-draw_bricks_04 (ALLEGRO_BITMAP *bitmap, struct pos p)
-{
-  draw_bitmapc (bricks_04, bitmap, bricks_coord_34 (p) , 0);
-}
-
-struct coord
-bricks_coord_12 (struct pos p)
+draw_bricks_01 (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   struct coord c;
-  c.x = PLACE_WIDTH * (p.place + 1);
-  c.y = PLACE_HEIGHT * p.floor + 15;
-  c.room = p.room;
+  draw_bitmapc (bricks_01, bitmap, bricks_coord_12 (p, &c) , 0);
+}
+
+void
+draw_bricks_02 (ALLEGRO_BITMAP *bitmap, struct pos *p)
+{
+  struct coord c;
+  draw_bitmapc (bricks_02, bitmap, bricks_coord_12 (p, &c) , 0);
+}
+
+void
+draw_bricks_03 (ALLEGRO_BITMAP *bitmap, struct pos *p)
+{
+  struct coord c;
+  draw_bitmapc (bricks_03, bitmap, bricks_coord_34 (p, &c) , 0);
+}
+
+void
+draw_bricks_04 (ALLEGRO_BITMAP *bitmap, struct pos *p)
+{
+  struct coord c;
+  draw_bitmapc (bricks_04, bitmap, bricks_coord_34 (p, &c) , 0);
+}
+
+struct coord *
+bricks_coord_12 (struct pos *p, struct coord *c)
+{
+  c->x = PLACE_WIDTH * (p->place + 1);
+  c->y = PLACE_HEIGHT * p->floor + 15;
+  c->room = p->room;
   return c;
 }
 
-struct coord
-bricks_coord_34 (struct pos p)
+struct coord *
+bricks_coord_34 (struct pos *p, struct coord *c)
 {
-  struct coord c;
-  c.x = PLACE_WIDTH * (p.place + 1);
-  c.y = PLACE_HEIGHT * p.floor + 4;
-  c.room = p.room;
-  return c;
-}
-
-void
-draw_torch (ALLEGRO_BITMAP *bitmap, struct pos p)
-{
-  draw_bitmapc (torch, bitmap, torch_coord (p), 0);
-}
-
-struct coord
-torch_coord (struct pos p)
-{
-  struct coord c;
-  c.x = PLACE_WIDTH * (p.place + 1);
-  c.y = PLACE_HEIGHT * p.floor + 22;
-  c.room = p.room;
+  c->x = PLACE_WIDTH * (p->place + 1);
+  c->y = PLACE_HEIGHT * p->floor + 4;
+  c->room = p->room;
   return c;
 }
 
 void
-draw_window (ALLEGRO_BITMAP *bitmap, struct pos p)
-{
-  draw_bitmapc (window, bitmap, window_coord (p), 0);
-}
-
-struct coord
-window_coord (struct pos p)
+draw_torch (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   struct coord c;
-  c.x = PLACE_WIDTH * (p.place + 1);
-  c.y = PLACE_HEIGHT * p.floor - 12;
-  c.room = p.room;
+  draw_bitmapc (torch, bitmap, torch_coord (p, &c), 0);
+}
+
+struct coord *
+torch_coord (struct pos *p, struct coord *c)
+{
+  c->x = PLACE_WIDTH * (p->place + 1);
+  c->y = PLACE_HEIGHT * p->floor + 22;
+  c->room = p->room;
   return c;
 }
 
 void
-draw_room_anim_fg (struct anim a)
+draw_window (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
-  draw_room_fg (a, posf (bl (a)));
-  draw_room_fg (a, posf (br (a)));
-  draw_room_fg (a, posf (m (a)));
-  draw_room_fg (a, posf (tl (a)));
-  draw_room_fg (a, posf (tr (a)));
+  struct coord c;
+  draw_bitmapc (window, bitmap, window_coord (p, &c), 0);
+}
 
-  draw_room_fg (a, pos (bl (a)));
-  draw_room_fg (a, pos (br (a)));
-  draw_room_fg (a, pos (m (a)));
-  draw_room_fg (a, pos (tl (a)));
-  draw_room_fg (a, pos (tr (a)));
-
-  if (! a.xframe) return;
-
-  struct anim xa = anim_from_xanim (a);
-
-  draw_room_fg (a, posf (bl (xa)));
-  draw_room_fg (a, posf (br (xa)));
-  draw_room_fg (a, posf (m (xa)));
-  draw_room_fg (a, posf (tl (xa)));
-  draw_room_fg (a, posf (tr (xa)));
-
-  draw_room_fg (a, pos (bl (xa)));
-  draw_room_fg (a, pos (br (xa)));
-  draw_room_fg (a, pos (m (xa)));
-  draw_room_fg (a, pos (tl (xa)));
-  draw_room_fg (a, pos (tr (xa)));
+struct coord *
+window_coord (struct pos *p, struct coord *c)
+{
+  c->x = PLACE_WIDTH * (p->place + 1);
+  c->y = PLACE_HEIGHT * p->floor - 12;
+  c->room = p->room;
+  return c;
 }
 
 void
-draw_room_fg (struct anim a, struct pos p)
+draw_room_anim_fg (struct anim *a)
 {
-  struct pos ptl = ptl (a), pm = pm (a), ptf = ptf (a),
-    ptr = ptr (a), pmt = pmt (a), pmbo = pmbo (a);
+  struct coord bl, br, m, tl, tr;
+  struct pos pbl, npbl, pbr, npbr,
+    pm, npm, ptl, nptl, ptr, nptr;
 
-  struct pos fptl = fptl (a), fptr = fptr (a),
-    fpmt = fpmt (a), fpmbo = fpmbo (a);
+  struct frame *f = &a->f;
+
+  survey (_bl, posf, f, &bl, &pbl, &npbl);
+  survey (_br, posf, f, &br, &pbr, &npbr);
+  survey (_m, posf, f, &m, &pm, &npm);
+  survey (_tl, posf, f, &tl, &ptl, &nptl);
+  survey (_tr, posf, f, &tr, &ptr, &nptr);
+
+  draw_room_fg (f, &pbl);
+  draw_room_fg (f, &pbr);
+  draw_room_fg (f, &pm);
+  draw_room_fg (f, &ptl);
+  draw_room_fg (f, &ptr);
+
+  survey (_bl, pos, f, &bl, &pbl, &npbl);
+  survey (_br, pos, f, &br, &pbr, &npbr);
+  survey (_m, pos, f, &m, &pm, &npm);
+  survey (_tl, pos, f, &tl, &ptl, &nptl);
+  survey (_tr, pos, f, &tr, &ptr, &nptr);
+
+  draw_room_fg (f, &pbl);
+  draw_room_fg (f, &pbr);
+  draw_room_fg (f, &pm);
+  draw_room_fg (f, &ptl);
+  draw_room_fg (f, &ptr);
+
+  if (! a->xframe) return;
+
+  struct frame xf; xframe_frame (a, &xf);
+  f = &xf;
+
+  survey (_bl, posf, f, &bl, &pbl, &npbl);
+  survey (_br, posf, f, &br, &pbr, &npbr);
+  survey (_m, posf, f, &m, &pm, &npm);
+  survey (_tl, posf, f, &tl, &ptl, &nptl);
+  survey (_tr, posf, f, &tr, &ptr, &nptr);
+
+  draw_room_fg (f, &pbl);
+  draw_room_fg (f, &pbr);
+  draw_room_fg (f, &pm);
+  draw_room_fg (f, &ptl);
+  draw_room_fg (f, &ptr);
+
+  survey (_bl, pos, f, &bl, &pbl, &npbl);
+  survey (_br, pos, f, &br, &pbr, &npbr);
+  survey (_m, pos, f, &m, &pm, &npm);
+  survey (_tl, pos, f, &tl, &ptl, &nptl);
+  survey (_tr, pos, f, &tr, &ptr, &nptr);
+
+  draw_room_fg (f, &pbl);
+  draw_room_fg (f, &pbr);
+  draw_room_fg (f, &pm);
+  draw_room_fg (f, &ptl);
+  draw_room_fg (f, &ptr);
+}
+
+void
+draw_room_fg (struct frame *f, struct pos *p)
+{
+  struct coord tl, c;
+  struct pos ptl, pm, ptf, ptr, pmt, pmbo,
+    fptl, fptr, fpmt, fpmbo, np;
+
+  survey (_tl, pos, f, &tl, &ptl, &np);
+  survey (_m, pos, f, &c, &pm, &np);
+  survey (_tf, pos, f, &c, &ptf, &np);
+  survey (_tr, pos, f, &c, &ptr, &np);
+  survey (_mt, pos, f, &c, &pmt, &np);
+  survey (_mbo, pos, f, &c, &pmbo, &np);
+
+  survey (_tl, posf, f, &c, &fptl, &np);
+  survey (_tr, posf, f, &c, &fptr, &np);
+  survey (_mt, posf, f, &c, &fpmt, &np);
+  survey (_mbo, posf, f, &c, &fpmbo, &np);
 
   /* when falling at construct's left */
-  if ((peq (p, prel (ptl, 0, +1))
-       || peq (p, prel (pm, 0, +1)))
-      && is_kid_fall (a))
+  if ((peq (p, prel (&ptl, &np, 0, +1))
+       || peq (p, prel (&pm, &np, 0, +1)))
+      && is_kid_fall (f))
     switch (con (p)->fg) {
     case NO_FLOOR: break;
     case FLOOR: draw_floor (screen, p); break;
@@ -502,41 +514,41 @@ draw_room_fg (struct anim a, struct pos p)
              __func__, con (p)->fg);
     }
   /* when climbing the construct */
-  else if (peq (ptf, p)
-           && is_kid_climb (a)
-           && a.dir == RIGHT) {
+  else if (peq (&ptf, p)
+           && is_kid_climb (f)
+           && f->dir == RIGHT) {
     if (con (p)->fg == PILLAR)
       draw_pillar_fg (screen, p);
     else if (con (p)->fg == BROKEN_FLOOR)
       draw_broken_floor_fg (screen, p);
     else {
       if (con (p)->fg == DOOR)
-        draw_door_fg (screen, p, a);
+        draw_door_fg (screen, p, f);
 
       draw_con_base (screen, p);
-      if (kid.frame == kid_climb_03
-          || kid.frame == kid_climb_09
-          || kid.frame == kid_climb_10)
+      if (f->b == kid_climb_03
+          || f->b == kid_climb_09
+          || f->b == kid_climb_10)
         draw_floor_corner_03 (screen, p);
-      else if (kid.frame == kid_climb_06
-               || kid.frame == kid_climb_07)
+      else if (f->b == kid_climb_06
+               || f->b == kid_climb_07)
         draw_floor_corner_01 (screen, p);
-      else if (kid.frame == kid_climb_04
-               || kid.frame == kid_climb_08
-               || kid.frame == kid_climb_05)
+      else if (f->b == kid_climb_04
+               || f->b == kid_climb_08
+               || f->b == kid_climb_05)
         draw_floor_corner_02 (screen, p);
     }
     /* when below the construction */
-  } else if ((peq (p, fptl)
-              || peq (p, fptr)
-              || peq (p, fpmt)
-              || peq (p, ptl)
-              || peq (p, ptr)
-              || peq (p, pmt))
-             && (peq (p, prel (fpmbo, -1, 0))
-                 || peq (p, prel (pmbo, -1, 0)))
-             && ! (is_kid_hang_or_climb (a) && a.dir == LEFT)
-             && floor_left_coord (p).y <= tl (a).y) {
+  } else if ((peq (p, &fptl)
+              || peq (p, &fptr)
+              || peq (p, &fpmt)
+              || peq (p, &ptl)
+              || peq (p, &ptr)
+              || peq (p, &pmt))
+             && (peq (p, prel (&fpmbo, &np, -1, 0))
+                 || peq (p, prel (&pmbo, &np, -1, 0)))
+             && ! (is_kid_hang_or_climb (f) && f->dir == LEFT)
+             && floor_left_coord (p, &c)->y <= tl.y) {
     switch (con (p)->fg) {
     case NO_FLOOR: break;
     case FLOOR: draw_floor (screen, p); break;
@@ -551,7 +563,7 @@ draw_room_fg (struct anim a, struct pos p)
       break;
     case PILLAR:
       draw_pillar (screen, p);
-      draw_con_right (screen, prel (p, -1, 0));
+      draw_con_right (screen, prel (p, &np, -1, 0));
       break;
     case WALL: draw_wall_right (screen, p); break;
     case DOOR: draw_full_door (screen, p); break;
@@ -570,5 +582,5 @@ draw_room_fg (struct anim a, struct pos p)
   else if (con (p)->fg == WALL)
     draw_wall_fg (screen, p);
   else if (con (p)->fg == DOOR)
-    draw_door_fg (screen, p, a);
+    draw_door_fg (screen, p, f);
 }

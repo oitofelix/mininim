@@ -74,12 +74,12 @@ register_cons (void)
   for (p.room = 0; p.room < ROOMS; p.room++)
     for (p.floor = 0; p.floor < FLOORS; p.floor++)
       for (p.place = 0; p.place < PLACES; p.place++)
-        switch (con (p)->fg) {
-        case LOOSE_FLOOR: register_loose_floor (p); break;
-        case OPENER_FLOOR: register_opener_floor (p); break;
-        case CLOSER_FLOOR: register_closer_floor (p); break;
-        case SPIKES_FLOOR: register_spikes_floor (p); break;
-        case DOOR: register_door (p); break;
+        switch (con (&p)->fg) {
+        case LOOSE_FLOOR: register_loose_floor (&p); break;
+        case OPENER_FLOOR: register_opener_floor (&p); break;
+        case CLOSER_FLOOR: register_closer_floor (&p); break;
+        case SPIKES_FLOOR: register_spikes_floor (&p); break;
+        case DOOR: register_door (&p); break;
         default: break;
         }
 }
@@ -132,10 +132,10 @@ level_anim (void)
   if (room_view == 0) room_view = prev_room;
 
   /* computation */
-  prev_room = kid.c.room;
+  prev_room = kid.f.c.room;
   kid.action ();
-  if (prev_room != kid.c.room)  {
-    room_view = kid.c.room;
+  if (prev_room != kid.f.c.room)  {
+    room_view = kid.f.c.room;
     make_links_locally_consistent (prev_room, room_view);
   }
   compute_loose_floors ();
@@ -152,7 +152,7 @@ level_anim (void)
 
   for (p.floor = FLOORS; p.floor >= -1; p.floor--)
     for (p.place = -1; p.place < PLACES; p.place++) {
-      draw_fire (screen, p, i);
+      draw_fire (screen, &p, i);
     }
 
   if (! no_room_drawing) draw_room (room_view);
@@ -160,27 +160,30 @@ level_anim (void)
   if (! no_room_drawing)
     for (p.floor = FLOORS; p.floor >= -1; p.floor--)
       for (p.place = -1; p.place < PLACES; p.place++) {
-        draw_loose_floor (screen, p);
-        draw_opener_floor (screen, p);
-        draw_closer_floor (screen, p);
-        draw_spikes_floor (screen, p);
-        draw_door (screen, p);
-        draw_falling_loose_floor (screen, p);
+        draw_loose_floor (screen, &p);
+        draw_opener_floor (screen, &p);
+        draw_closer_floor (screen, &p);
+        draw_spikes_floor (screen, &p);
+        draw_door (screen, &p);
+        draw_falling_loose_floor (screen, &p);
       }
 
-  struct pos pml = pml (kid);
+  struct coord ml; struct pos pml, pmlr, pmlra;
+  _ml (&kid.f, &ml); pos (&ml, &pml);
+  prel (&pml, &pmlr, 0, +1);
+  prel (&pml, &pmlra, -1, +1);
 
-  draw_anim (screen, kid);
-  draw_xanim (screen, kid);
-  draw_falling_loose_floor (screen, prel (pml, 0, +1));
-  draw_falling_loose_floor (screen, prel (pml, -1, +1));
-  draw_room_anim_fg (kid);
+  draw_frame (screen, &kid.f);
+  draw_xframe (screen, &kid);
+  draw_falling_loose_floor (screen, &pmlr);
+  draw_falling_loose_floor (screen, &pmlra);
+  draw_room_anim_fg (&kid);
   kid.xframe = NULL;
 
   for (p.floor = FLOORS; p.floor >= -1; p.floor--)
     for (p.place = -1; p.place < PLACES; p.place++) {
-      draw_potion (screen, p, i);
-      draw_sword (screen, p, i);
+      draw_potion (screen, &p, i);
+      draw_sword (screen, &p, i);
     }
 
   unpress_opener_floors ();

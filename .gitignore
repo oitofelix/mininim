@@ -6,3 +6,8 @@
 /GRTAGS
 /GSYMS
 /GTAGS
+*.gcda
+*.gcno
+*.gcov
+gmon.out
+/analysis.txt

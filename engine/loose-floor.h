@@ -53,7 +53,7 @@ struct loose_floor {
     FALL_LOOSE_FLOOR,
   } action;
 
-  struct anim a;
+  struct frame f;
 };
 
 /* functions */
@@ -63,34 +63,34 @@ void load_loose_floor_sounds (void);
 void unload_loose_floor_sounds (void);
 ALLEGRO_BITMAP *create_loose_floor_02_bitmap (void);
 ALLEGRO_BITMAP * create_broken_floor_bitmap (void);
-void register_loose_floor (struct pos p);
-struct loose_floor * loose_floor_at_pos (struct pos p);
+void register_loose_floor (struct pos *p);
+struct loose_floor * loose_floor_at_pos (struct pos *p);
 void remove_loose_floor (struct loose_floor *l);
-void release_loose_floor (struct pos p);
+void release_loose_floor (struct pos *p);
 void compute_loose_floors (void);
 void compute_loose_floor_shake (struct loose_floor *l);
 void compute_loose_floor_release (struct loose_floor *l);
 void compute_loose_floor_fall (struct loose_floor *l);
-void shake_loose_floor_row (struct pos p);
+void shake_loose_floor_row (struct pos *p);
 ALLEGRO_SAMPLE * loose_floor_sample (void);
-void draw_loose_floor (ALLEGRO_BITMAP *bitmap, struct pos p);
-void draw_loose_floor_base (ALLEGRO_BITMAP *bitmap, struct pos p);
-void draw_loose_floor_left (ALLEGRO_BITMAP *bitmap, struct pos p);
-void draw_loose_floor_right (ALLEGRO_BITMAP *bitmap, struct pos p);
-void draw_falling_loose_floor (ALLEGRO_BITMAP *bitmap, struct pos p);
-void draw_loose_floor_00 (ALLEGRO_BITMAP *bitmap, struct pos p);
-void draw_loose_floor_00_base (ALLEGRO_BITMAP *bitmap, struct pos p);
-void draw_loose_floor_00_left (ALLEGRO_BITMAP *bitmap, struct pos p);
-void draw_loose_floor_00_right (ALLEGRO_BITMAP *bitmap, struct pos p);
-void draw_loose_floor_01 (ALLEGRO_BITMAP *bitmap, struct pos p);
-void draw_loose_floor_01_base (ALLEGRO_BITMAP *bitmap, struct pos p);
-void draw_loose_floor_01_left (ALLEGRO_BITMAP *bitmap, struct pos p);
-void draw_loose_floor_01_right (ALLEGRO_BITMAP *bitmap, struct pos p);
-void draw_loose_floor_02 (ALLEGRO_BITMAP *bitmap, struct pos p);
-void draw_loose_floor_02_base (ALLEGRO_BITMAP *bitmap, struct pos p);
-void draw_loose_floor_02_left (ALLEGRO_BITMAP *bitmap, struct pos p);
-void draw_loose_floor_02_right (ALLEGRO_BITMAP *bitmap, struct pos p);
-struct coord loose_floor_left_coord (struct pos p);
-struct coord loose_floor_right_coord (struct pos p);
+void draw_loose_floor (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_loose_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_loose_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_loose_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_falling_loose_floor (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_loose_floor_00 (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_loose_floor_00_base (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_loose_floor_00_left (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_loose_floor_00_right (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_loose_floor_01 (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_loose_floor_01_base (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_loose_floor_01_left (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_loose_floor_01_right (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_loose_floor_02 (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_loose_floor_02_base (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_loose_floor_02_left (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_loose_floor_02_right (ALLEGRO_BITMAP *bitmap, struct pos *p);
+struct coord *loose_floor_left_coord (struct pos *p, struct coord *c);
+struct coord *loose_floor_right_coord (struct pos *p, struct coord *c);
 
 #endif	/* FREEPOP_LOOSE_FLOOR_H */

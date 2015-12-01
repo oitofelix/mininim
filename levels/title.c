@@ -194,16 +194,16 @@ title_anim (void)
     break;
   case 9:
     if (! is_video_effect_started () && ! is_playing_sample ()) {
-      princess.c.x = 142;
-      princess.c.y = 124;
-      princess.frame = princess_normal_00;
-      princess.dir = LEFT;
+      princess.f.c.x = 142;
+      princess.f.c.y = 124;
+      princess.f.b = princess_normal_00;
+      princess.f.dir = LEFT;
       princess.action = princess_normal;
 
-      jaffar.c.x = 321;
-      jaffar.c.y = 119;
-      jaffar.frame = jaffar_normal_00;
-      jaffar.dir = LEFT;
+      jaffar.f.c.x = 321;
+      jaffar.f.c.y = 119;
+      jaffar.f.b = jaffar_normal_00;
+      jaffar.f.dir = LEFT;
       jaffar.action = jaffar_normal;
 
       princess_room_clock = NULL;
@@ -238,21 +238,21 @@ title_anim (void)
     }
     break;
   case 14:
-    if (princess.frame == princess_normal_00) {
+    if (princess.f.b == princess_normal_00) {
       play_sample (jaffar_appearing_3);
       jaffar.action = jaffar_walk;
       i++;
     }
     break;
   case 15:
-    if (get_sample_position () >= 3.0 && jaffar.frame == jaffar_normal_00) {
+    if (get_sample_position () >= 3.0 && jaffar.f.b == jaffar_normal_00) {
       jaffar.repeat = 5;
       jaffar.action = jaffar_walk;
       i++;
     }
     break;
   case 16:
-    if (get_sample_position () >= 12.0 && jaffar.frame == jaffar_normal_00) {
+    if (get_sample_position () >= 12.0 && jaffar.f.b == jaffar_normal_00) {
       jaffar.action = jaffar_open_arms;
       i++;
     }
@@ -262,13 +262,13 @@ title_anim (void)
     i++;
     break;
   case 18:
-    if (princess.frame == princess_step_back_15) {
+    if (princess.f.b == princess_step_back_15) {
       jaffar.action = jaffar_raise_arms;
       i++;
     }
     break;
   case 19:
-    if (jaffar.frame == jaffar_raise_arms_27) {
+    if (jaffar.f.b == jaffar_raise_arms_27) {
       video_effect.color = WHITE;
       start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (1));
       princess_room_clock = clock_01;
@@ -276,13 +276,13 @@ title_anim (void)
     }
     break;
   case 20:
-    if (! is_video_effect_started () && jaffar.frame == jaffar_raise_arms_29) {
+    if (! is_video_effect_started () && jaffar.f.b == jaffar_raise_arms_29) {
       jaffar.action = jaffar_lower_arms;
       i++;
     }
     break;
   case 21:
-    if (jaffar.frame == jaffar_normal_00) {
+    if (jaffar.f.b == jaffar_normal_00) {
       play_sample (story_3);
       i++;
     }
@@ -301,7 +301,7 @@ title_anim (void)
     }
     break;
   case 24:
-    if (jaffar.frame == jaffar_normal_00) {
+    if (jaffar.f.b == jaffar_normal_00) {
       start_video_effect (VIDEO_FADE_OUT, SECS_TO_VCYCLES (1));
       i++;
     }
@@ -359,8 +359,8 @@ draw_princess_room (void)
   draw_bitmap (princess_room_bed, screen, 0, 142, 0);
   draw_princess_room_stars ();
   draw_princess_room_fire ();
-  draw_anim (screen, princess);
-  draw_anim (screen, jaffar);
+  draw_frame (screen, &princess.f);
+  draw_frame (screen, &jaffar.f);
   draw_clock ();
   draw_bitmap (princess_room_pillar, screen, 240, 120, 0);
 }

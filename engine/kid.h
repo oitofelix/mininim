@@ -214,10 +214,12 @@
 /* functions */
 void load_kid (void);
 void unload_kid (void);
-bool is_kid_fall (struct anim a);
-bool is_kid_hang_or_climb (struct anim a);
-bool is_kid_climb (struct anim a);
-bool is_kid_hanging_at_pos (struct anim a, struct pos p);
+bool is_kid_fall (struct frame *f);
+bool is_kid_hang_or_climb (struct frame *f);
+bool is_kid_climb (struct frame *f);
+bool is_kid_vjump (struct frame *f);
+bool is_kid_turn (struct frame *f);
+bool is_kid_hanging_at_pos (struct frame *f, struct pos *p);
 
 void kid_turn (void);
 void kid_vjump (void);

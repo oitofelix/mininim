@@ -44,81 +44,82 @@ unload_pillar (void)
 }
 
 void
-draw_pillar (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_pillar (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
-  draw_bitmapc (normal_floor_base, bitmap, floor_base_coord (p), 0);
-  draw_bitmapc (pillar_left, bitmap, pillar_left_coord (p), 0);
-  draw_bitmapc (pillar_right, bitmap, pillar_right_coord (p), 0);
-  draw_con_left (bitmap, prel (p, 0, +1));
-  draw_bitmapc (pillar_top, bitmap, pillar_top_coord (p), 0);
-  draw_con_left (bitmap, prel (p, -1, +1));
+  struct coord c; struct pos pr, par;
+  draw_bitmapc (normal_floor_base, bitmap, floor_base_coord (p, &c), 0);
+  draw_bitmapc (pillar_left, bitmap, pillar_left_coord (p, &c), 0);
+  draw_bitmapc (pillar_right, bitmap, pillar_right_coord (p, &c), 0);
+  draw_con_left (bitmap, prel (p, &pr, 0, +1));
+  draw_bitmapc (pillar_top, bitmap, pillar_top_coord (p, &c), 0);
+  draw_con_left (bitmap, prel (p, &par, -1, +1));
 }
 
 void
-draw_pillar_base (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_pillar_base (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
-  draw_bitmapc (normal_floor_base, bitmap, floor_base_coord (p), 0);
+  struct coord c;
+  draw_bitmapc (normal_floor_base, bitmap, floor_base_coord (p, &c), 0);
 }
 
 void
-draw_pillar_left (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_pillar_left (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
+  struct coord c;
   draw_pillar_base (bitmap, p);
-  draw_bitmapc (pillar_left, bitmap, pillar_left_coord (p), 0);
+  draw_bitmapc (pillar_left, bitmap, pillar_left_coord (p, &c), 0);
 }
 
 void
-draw_pillar_right (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_pillar_right (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
+  struct coord c; struct pos pr;
   draw_pillar_base (bitmap, p);
-  draw_bitmapc (pillar_right, bitmap, pillar_right_coord (p), 0);
-  draw_con_left (bitmap, prel (p, 0, +1));
+  draw_bitmapc (pillar_right, bitmap, pillar_right_coord (p, &c), 0);
+  draw_con_left (bitmap, prel (p, &pr, 0, +1));
 }
 
 void
-draw_pillar_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_pillar_fg (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
+  struct coord c;
   draw_pillar_base (bitmap, p);
   draw_floor_corner_03 (bitmap, p);
-  draw_bitmapc (pillar, screen, pillar_coord (p), 0);
+  draw_bitmapc (pillar, screen, pillar_coord (p, &c), 0);
 }
 
-struct coord
-pillar_coord (struct pos p)
+struct coord *
+pillar_coord (struct pos *p, struct coord *c)
 {
-  struct coord c;
-  c.x = PLACE_WIDTH * p.place + 8;
-  c.y = PLACE_HEIGHT * p.floor + 3;
-  c.room = p.room;
+  c->x = PLACE_WIDTH * p->place + 8;
+  c->y = PLACE_HEIGHT * p->floor + 3;
+  c->room = p->room;
   return c;
 }
 
-struct coord
-pillar_left_coord (struct pos p)
+struct coord *
+pillar_left_coord (struct pos *p, struct coord *c)
 {
-  struct coord c;
-  c.x = PLACE_WIDTH * p.place;
-  c.y = PLACE_HEIGHT * p.floor + 3;
-  c.room = p.room;
+  c->x = PLACE_WIDTH * p->place;
+  c->y = PLACE_HEIGHT * p->floor + 3;
+  c->room = p->room;
   return c;
 }
 
-struct coord
-pillar_right_coord (struct pos p)
+struct coord *
+pillar_right_coord (struct pos *p, struct coord *c)
 {
-  struct coord c;
-  c.x = PLACE_WIDTH * (p.place + 1);
-  c.y = PLACE_HEIGHT * p.floor + 3;
-  c.room = p.room;
+  c->x = PLACE_WIDTH * (p->place + 1);
+  c->y = PLACE_HEIGHT * p->floor + 3;
+  c->room = p->room;
   return c;
 }
 
-struct coord
-pillar_top_coord (struct pos p)
+struct coord *
+pillar_top_coord (struct pos *p, struct coord *c)
 {
-  struct coord c;
-  c.x = PLACE_WIDTH * (p.place + 1);
-  c.y = PLACE_HEIGHT * p.floor - 4;
-  c.room = p.room;
+  c->x = PLACE_WIDTH * (p->place + 1);
+  c->y = PLACE_HEIGHT * p->floor - 4;
+  c->room = p->room;
   return c;
 }

@@ -80,11 +80,11 @@ unload_door_sounds (void)
 }
 
 void
-register_door (struct pos p)
+register_door (struct pos *p)
 {
   struct door d;
 
-  d.p = p;
+  d.p = *p;
   d.i = DOOR_MAX_STEP;
   d.action = NO_DOOR_ACTION;
   d.wait = DOOR_WAIT;
@@ -95,11 +95,11 @@ register_door (struct pos p)
 }
 
 struct door *
-door_at_pos (struct pos p)
+door_at_pos (struct pos *p)
 {
   size_t i;
   for (i = 0; i < door_nmemb; i++)
-    if (peq (door[i].p, p)) return &door[i];
+    if (peq (&door[i].p, p)) return &door[i];
   return NULL;
 }
 
@@ -169,7 +169,7 @@ void
 open_door (int e)
 {
   do {
-    struct door *d = door_at_pos (level->event[e].p);
+    struct door *d = door_at_pos (&level->event[e].p);
     if (! d) continue;
     d->action = OPEN_DOOR;
     d->wait = DOOR_WAIT;
@@ -180,197 +180,196 @@ void
 close_door (int e)
 {
   do {
-    struct door *d = door_at_pos (level->event[e].p);
+    struct door *d = door_at_pos (&level->event[e].p);
     if (! d) continue;
     d->action = ABRUPTLY_CLOSE_DOOR;
   } while (level->event[e++].next);
 }
 
 int
-door_grid_tip_y (struct pos p)
+door_grid_tip_y (struct pos *p)
 {
+  struct coord c;
   int h = al_get_bitmap_height (door_grid_tip);
-  return door_grid_tip_coord (p, door_at_pos (p)->i).y + h - 1;
+  return door_grid_tip_coord (p, &c, door_at_pos (p)->i)->y + h - 1;
 }
 
 void
-draw_door (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_door (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   struct door *d = door_at_pos (p);
   if (! d) return;
 
+  struct pos par, pr;
+
   draw_door_grid (bitmap, p, d->i);
-  draw_con_left (bitmap, prel (p, -1, +1));
-  draw_con_left (bitmap, prel (p, +0, +1));
+  draw_con_left (bitmap, prel (p, &par, -1, +1));
+  draw_con_left (bitmap, prel (p, &pr, +0, +1));
 }
 
 void
-draw_full_door (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_full_door (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   draw_door_frame (bitmap, p);
   draw_door (bitmap, p);
 }
 
 void
-draw_door_base (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_door_base (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
-  draw_bitmapc (normal_floor_base, bitmap, floor_base_coord (p), 0);
+  struct coord c;
+  draw_bitmapc (normal_floor_base, bitmap, floor_base_coord (p, &c), 0);
 }
 
 void
-draw_door_frame (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_door_frame (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
+  struct coord c; struct pos par, pr;
   draw_door_base (bitmap, p);
-  draw_bitmapc (door_left, bitmap, door_left_coord (p), 0);
-  draw_bitmapc (door_right, bitmap, door_right_coord (p), 0);
-  draw_bitmapc (door_top, bitmap, door_top_coord (p), 0);
-  draw_con_left (screen, prel (p, -1, +1));
-  draw_con_left (screen, prel (p, +0, +1));
+  draw_bitmapc (door_left, bitmap, door_left_coord (p, &c), 0);
+  draw_bitmapc (door_right, bitmap, door_right_coord (p, &c), 0);
+  draw_bitmapc (door_top, bitmap, door_top_coord (p, &c), 0);
+  draw_con_left (screen, prel (p, &par, -1, +1));
+  draw_con_left (screen, prel (p, &pr, +0, +1));
 }
 
 void
-draw_door_frame_left (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_door_frame_left (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
+  struct coord c;
   draw_door_base (bitmap, p);
-  draw_bitmapc (door_left, bitmap, door_left_coord (p), 0);
+  draw_bitmapc (door_left, bitmap, door_left_coord (p, &c), 0);
 }
 
 void
-draw_door_frame_right (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_door_frame_right (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
+  struct coord c; struct pos par, pr;
   draw_door_base (bitmap, p);
-  draw_bitmapc (door_right, bitmap, door_right_coord (p), 0);
-  draw_con_left (screen, prel (p, -1, +1));
-  draw_con_left (screen, prel (p, +0, +1));
+  draw_bitmapc (door_right, bitmap, door_right_coord (p, &c), 0);
+  draw_con_left (screen, prel (p, &par, -1, +1));
+  draw_con_left (screen, prel (p, &pr, +0, +1));
 }
 
 void
-draw_door_fg (ALLEGRO_BITMAP *bitmap, struct pos p, struct anim a)
+draw_door_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f)
 {
+  struct coord c; struct pos par, pr;
+
   draw_door_base (bitmap, p);
-  draw_bitmapc (door_pole, screen, door_pole_coord (p), 0);
+  draw_bitmapc (door_pole, screen, door_pole_coord (p, &c), 0);
 
-  /* draw_door_frame_left (bitmap, p); */
+  if (is_kid_hanging_at_pos (f, p) && f->dir == LEFT) return;
 
-  if (is_kid_hanging_at_pos (a, p)
-      && a.dir == LEFT) return;
+  struct coord tf, mbo, bb;
+  struct pos ptf, nptf, pmbo, npmbo, pbb, npbb;
+  survey (_tf, pos, f, &tf, &ptf, &nptf);
+  survey (_mbo, pos, f, &mbo, &pmbo, &npmbo);
+  survey (_bb, pos, f, &bb, &pbb, &npbb);
 
-  struct pos ptf = pos (tf (a));
-  struct pos pmbo = pos (mbo (a));
-  struct pos pbb = pos (bb (a));
-
-  if ((a.dir == RIGHT && peq (ptf, p))
-      || (a.dir == RIGHT
-          && a.action == kid_vjump
-          && peq (pbb, p))
-      || (a.dir == LEFT
-          && a.action == kid_turn
-          && peq (pmbo, p))
-      || (a.dir == LEFT && peq (pbb, p))) {
+  if ((f->dir == RIGHT && peq (&ptf, p))
+      || (f->dir == RIGHT
+          && is_kid_vjump (f)
+          && peq (&pbb, p))
+      || (f->dir == LEFT
+          && is_kid_turn (f)
+          && peq (&pmbo, p))
+      || (f->dir == LEFT && peq (&pbb, p))) {
     struct door *d = door_at_pos (p);
     draw_door_grid (screen, p, d->i);
-    draw_con_left (screen, prel (p, -1, +1));
-    draw_con_left (screen, prel (p, +0, +1));
+    draw_con_left (screen, prel (p, &par, -1, +1));
+    draw_con_left (screen, prel (p, &pr, +0, +1));
   }
 }
 
 void
-draw_door_grid (ALLEGRO_BITMAP *bitmap, struct pos p, int i)
+draw_door_grid (ALLEGRO_BITMAP *bitmap, struct pos *p, int i)
 {
   int q = i / 8;
   int r = i % 8;
   int w = al_get_bitmap_width (door_grid);
   int j;
 
-  draw_bitmapc (door_grid_top, bitmap, door_grid_top_coord (p), 0);
+  struct coord c;
+  draw_bitmapc (door_grid_top, bitmap, door_grid_top_coord (p, &c), 0);
   draw_bitmap_regionc (door_grid, bitmap, 0, 7 - r, w, r + 1,
-                       door_grid_coord_base (p), 0);
+                       door_grid_coord_base (p, &c), 0);
   for (j = 0; j < q; j++)
-    draw_bitmapc (door_grid, bitmap, door_grid_coord (p, j, i), 0);
-  draw_bitmapc (door_grid_tip, bitmap, door_grid_tip_coord (p, i), 0);
+    draw_bitmapc (door_grid, bitmap, door_grid_coord (p, &c, j, i), 0);
+  draw_bitmapc (door_grid_tip, bitmap, door_grid_tip_coord (p, &c, i), 0);
 }
 
-struct coord
-door_grid_coord_base (struct pos p)
+struct coord *
+door_grid_coord_base (struct pos *p, struct coord *c)
 {
-  struct coord c;
-  c.x = PLACE_WIDTH * (p.place + 1);
-  c.y = PLACE_HEIGHT * p.floor + 2;
-  c.room = p.room;
+  c->x = PLACE_WIDTH * (p->place + 1);
+  c->y = PLACE_HEIGHT * p->floor + 2;
+  c->room = p->room;
   return c;
 }
 
-struct coord
-door_grid_coord (struct pos p, int j, int i)
+struct coord *
+door_grid_coord (struct pos *p, struct coord *c, int j, int i)
 {
   int r = i % 8;
-
-  struct coord c;
-  c.x = PLACE_WIDTH * (p.place + 1);
-  c.y = PLACE_HEIGHT * p.floor + 2 + j * 8 + r + 1;
-  c.room = p.room;
+  c->x = PLACE_WIDTH * (p->place + 1);
+  c->y = PLACE_HEIGHT * p->floor + 2 + j * 8 + r + 1;
+  c->room = p->room;
   return c;
 }
 
-struct coord
-door_grid_tip_coord (struct pos p, int i)
+struct coord *
+door_grid_tip_coord (struct pos *p, struct coord *c, int i)
 {
   int r = i % 8;
   int q = i / 8;
-
-  struct coord c;
-  c.x = PLACE_WIDTH * (p.place + 1);
-  c.y = PLACE_HEIGHT * p.floor + 2 + q * 8 + r + 1;
-  c.room = p.room;
+  c->x = PLACE_WIDTH * (p->place + 1);
+  c->y = PLACE_HEIGHT * p->floor + 2 + q * 8 + r + 1;
+  c->room = p->room;
   return c;
 }
 
-struct coord
-door_grid_top_coord (struct pos p)
+struct coord *
+door_grid_top_coord (struct pos *p, struct coord *c)
 {
-  struct coord c;
-  c.x = PLACE_WIDTH * (p.place + 1);
-  c.y = PLACE_HEIGHT * p.floor - 6;
-  c.room = p.room;
+  c->x = PLACE_WIDTH * (p->place + 1);
+  c->y = PLACE_HEIGHT * p->floor - 6;
+  c->room = p->room;
   return c;
 }
 
-struct coord
-door_pole_coord (struct pos p)
+struct coord *
+door_pole_coord (struct pos *p, struct coord *c)
 {
-  struct coord c;
-  c.x = PLACE_WIDTH * p.place + 24;
-  c.y = PLACE_HEIGHT * p.floor + 3;
-  c.room = p.room;
+  c->x = PLACE_WIDTH * p->place + 24;
+  c->y = PLACE_HEIGHT * p->floor + 3;
+  c->room = p->room;
   return c;
 }
 
-struct coord
-door_left_coord (struct pos p)
+struct coord *
+door_left_coord (struct pos *p, struct coord *c)
 {
-  struct coord c;
-  c.x = PLACE_WIDTH * p.place;
-  c.y = PLACE_HEIGHT * p.floor + 3;
-  c.room = p.room;
+  c->x = PLACE_WIDTH * p->place;
+  c->y = PLACE_HEIGHT * p->floor + 3;
+  c->room = p->room;
   return c;
 }
 
-struct coord
-door_right_coord (struct pos p)
+struct coord *
+door_right_coord (struct pos *p, struct coord *c)
 {
-  struct coord c;
-  c.x = PLACE_WIDTH * (p.place + 1);
-  c.y = PLACE_HEIGHT * p.floor + 3;
-  c.room = p.room;
+  c->x = PLACE_WIDTH * (p->place + 1);
+  c->y = PLACE_HEIGHT * p->floor + 3;
+  c->room = p->room;
   return c;
 }
 
-struct coord
-door_top_coord (struct pos p)
+struct coord *
+door_top_coord (struct pos *p, struct coord *c)
 {
-  struct coord c;
-  c.x = PLACE_WIDTH * (p.place + 1);
-  c.y = PLACE_HEIGHT * p.floor - 10;
-  c.room = p.room;
+  c->x = PLACE_WIDTH * (p->place + 1);
+  c->y = PLACE_HEIGHT * p->floor - 10;
+  c->room = p->room;
   return c;
 }

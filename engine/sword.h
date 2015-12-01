@@ -63,7 +63,7 @@ extern struct frameset sword_frameset[SWORD_FRAMESET_NMEMB];
 
 void load_sword (void);
 void unload_sword (void);
-void draw_sword (ALLEGRO_BITMAP *bitmap, struct pos p, int i);
-bool is_sword (struct pos p);
+void draw_sword (ALLEGRO_BITMAP *bitmap, struct pos *p, int i);
+bool is_sword (struct pos *p);
 
 #endif	/* FREEPOP_SWORD_H */

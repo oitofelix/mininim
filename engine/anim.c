@@ -33,7 +33,7 @@
 bool quit_anim = false;
 bool pause_anim = false;
 bool cutscene = false;
-bool next_anim_inv = false; /* invert next_anim offset interpretation  */
+bool next_frame_inv = false; /* invert next_anim offset interpretation  */
 
 void
 play_anim (void (*callback) (void), int freq)
@@ -61,26 +61,28 @@ play_anim (void (*callback) (void), int freq)
         if (was_key_pressed (ALLEGRO_KEY_P, true))
           pause_anim = false;
 
+        struct coord bf; struct pos pbf, npbf;
+        survey (_bf, pos, &kid.f, &bf, &pbf, &npbf);
+
         /* begin kid hack */
         if (! cutscene) {
-          if (a_key) kid.c.x--;
-          if (d_key) kid.c.x++;
-          if (w_key) kid.c.y--;
-          if (s_key) kid.c.y++;
+          if (a_key) kid.f.c.x--;
+          if (d_key) kid.f.c.x++;
+          if (w_key) kid.f.c.y--;
+          if (s_key) kid.f.c.y++;
           /* int dc = dist_collision (kid); */
           /* int dbc = dist_back_collision (kid); */
           /* int df = dist_fall (kid); */
-          int dn = dist_next_place (kid, bf, pos, 0, false);
-          int dp = dist_next_place (kid, bf, pos, 0, true);
-          int dc = dist_collision (kid, bf, pos, 0, false);
-          int df = dist_con (kid, bf, pos, -4, false, NO_FLOOR);
-          int dl = dist_con (kid, bf, pos, -4, false, LOOSE_FLOOR);
-          int dd = dist_con (kid, bf, pos, -4, false, CLOSER_FLOOR);
+          int dn = dist_next_place (&kid.f, _bf, pos, 0, false);
+          int dp = dist_next_place (&kid.f, _bf, pos, 0, true);
+          int dc = dist_collision (&kid.f, _bf, pos, 0, false);
+          int df = dist_con (&kid.f, _bf, pos, -4, false, NO_FLOOR);
+          int dl = dist_con (&kid.f, _bf, pos, -4, false, LOOSE_FLOOR);
+          int dd = dist_con (&kid.f, _bf, pos, -4, false, CLOSER_FLOOR);
           if (a_key || d_key || w_key || s_key || enter_key)
             printf ("\
 f = %i, p = %i, dn = %i, dp = %i, dc = %i, df = %i, dl = %i, dd = %i\n",
-                    pbf (kid).floor, pbf (kid).place, dn, dp, dc, df, dl, dd);
-            /* printf ("floor = %i, place = %i, dc = %i, dbc = %i, df = %i, dn = %i, dp = %i\n", ptf (kid).floor, ptf (kid).place, dc, dbc, df, dn, dp); */
+                    pbf.floor, pbf.place, dn, dp, dc, df, dl, dd);
         }
         /* end kid hack */
 
@@ -119,60 +121,59 @@ f = %i, p = %i, dn = %i, dp = %i, dc = %i, df = %i, dl = %i, dd = %i\n",
 }
 
 void
-draw_anim (ALLEGRO_BITMAP *bitmap, struct anim a)
+draw_frame (ALLEGRO_BITMAP *bitmap, struct frame *f)
 {
-  if (! a.frame) return;
+  if (! f->b) return;
 
-  draw_bitmapc (a.frame, bitmap, a.c, a.flip);
+  draw_bitmapc (f->b, bitmap, &f->c, f->flip);
 }
 
 void
-draw_xanim (ALLEGRO_BITMAP *bitmap, struct anim a)
+draw_xframe (ALLEGRO_BITMAP *bitmap, struct anim *a)
 {
-  if (! a.xframe) return;
-  draw_bitmapc (a.xframe, bitmap, xanim_coord (a), a.flip);
+  struct coord c;
+
+  if (! a->xframe) return;
+  draw_bitmapc (a->xframe, bitmap, xframe_coord (a, &c), a->f.flip);
 }
 
-struct coord
-xanim_coord (struct anim a)
+struct coord *
+xframe_coord (struct anim *a, struct coord *c)
 {
-  int w = al_get_bitmap_width (a.xframe);
-  struct coord c = tf (a);
-  c.x += (kid.dir == LEFT) ? a.xdx : -a.xdx - w + 1;
-  c.y += a.xdy;
-  c.room = a.c.room;
-
+  int w = al_get_bitmap_width (a->xframe);
+  _tf (&a->f, c);
+  c->x += (a->f.dir == LEFT) ? a->xdx : -a->xdx - w + 1;
+  c->y += a->xdy;
+  c->room = a->f.c.room;
   return c;
 }
 
-struct anim
-anim_from_xanim (struct anim a)
+struct frame *
+xframe_frame (struct anim *a, struct frame *f)
 {
-  struct anim xa = a;
-  xa.frame = a.xframe;
-  xa.c = xanim_coord (a);
-  xa.xframe = NULL;
-  return xa;
+  *f = a->f;
+  f->b = a->xframe;
+  xframe_coord (a, &f->c);
+  return f;
 }
 
-struct anim
-next_anim (struct anim a, ALLEGRO_BITMAP* frame, int dx, int dy)
+struct frame *
+next_frame (struct frame *f, struct frame *nf, ALLEGRO_BITMAP *b, int dx, int dy)
 {
-  struct anim na = a;
+  *nf = *f;
 
-  int ow = al_get_bitmap_width (a.frame);
-  int oh = al_get_bitmap_height (a.frame);
-  int w = al_get_bitmap_width (frame);
-  int h = al_get_bitmap_height (frame);
+  int ow = al_get_bitmap_width (nf->b);
+  int oh = al_get_bitmap_height (nf->b);
+  int w = al_get_bitmap_width (b);
+  int h = al_get_bitmap_height (b);
 
-  if (next_anim_inv) na.c.x += (a.dir == LEFT) ? ow - w - dx : dx;
-  else na.c.x += (a.dir == LEFT) ? dx : ow - w - dx;
-  na.c.y += oh - h + dy;
+  if (next_frame_inv) nf->c.x += (nf->dir == LEFT) ? ow - w - dx : dx;
+  else nf->c.x += (nf->dir == LEFT) ? dx : ow - w - dx;
+  nf->c.y += oh - h + dy;
 
-  na.frame = frame;
-  if (! cutscene) na.c = nanim (na);
-
-  return na;
+  nf->b = b;
+  if (! cutscene) nframe (nf, &nf->c);
+  return nf;
 }
 
 bool

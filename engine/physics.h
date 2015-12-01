@@ -21,66 +21,42 @@
 #define FREEPOP_PHYSICS_H
 
 #include "prince.h"
+#include "pos.h"
 
 /* variables */
 extern struct pos hang_pos;
 extern enum confg confg_collision;
 
 /* functions */
-struct con *con (struct pos pos);
-struct con *crel (struct pos pos, int floor, int place);
-bool is_visible (struct anim a);
-bool is_pos_visible (struct pos p);
-
+struct con *con (struct pos *p);
+struct con *crel (struct pos *p, int floor, int place);
+bool is_frame_visible (struct frame *f);
+bool is_pos_visible (struct pos *p);
 
 
-int
-dist_next_place (struct anim a,
-                 struct coord (*coord_func) (struct anim a),
-                 struct pos (*pos_func) (struct coord c),
-                 int margin, bool reverse);
-void
-to_next_place_edge (struct anim *a, ALLEGRO_BITMAP *frame,
-                    struct coord (*coord_func) (struct anim a),
-                    struct pos (*pos_func) (struct coord c),
-                    int margin, bool reverse, int min_dist);
-
-bool
-is_colliding (struct anim a,
-              struct coord (*coord_func) (struct anim a),
-              struct pos (*pos_func) (struct coord c),
-              int margin, bool reverse, int min_dist);
-bool
-is_on_con (struct anim a,
-           struct coord (*coord_func) (struct anim a),
-           struct pos (*pos_func) (struct coord c),
-           int margin, bool reverse, int min_dist, enum confg ct);
-
-int
-dist_collision (struct anim a,
-                struct coord (*coord_func) (struct anim a),
-                struct pos (*pos_func) (struct coord c),
-                int margin, bool reverse);
-int
-dist_con (struct anim a,
-          struct coord (*coord_func) (struct anim a),
-          struct pos (*pos_func) (struct coord c),
-          int margin, bool reverse, enum confg ct);
-
-bool
-to_collision_edge (struct anim *a, ALLEGRO_BITMAP *frame,
-                   struct coord (*coord_func) (struct anim a),
-                   struct pos (*pos_func) (struct coord c),
+int dist_next_place (struct frame *f, coord_f cf, pos_f pf,
+                     int margin, bool reverse);
+struct frame *to_next_place_edge (struct frame *f, struct frame *nf,
+                                  ALLEGRO_BITMAP *b, coord_f cf, pos_f pf,
+                                  int margin, bool reverse, int min_dist);
+bool is_colliding (struct frame *f, coord_f cf, pos_f pf,
                    int margin, bool reverse, int min_dist);
-bool
-to_con_edge (struct anim *a, ALLEGRO_BITMAP *frame,
-             struct coord (*coord_func) (struct anim a),
-             struct pos (*pos_func) (struct coord c),
-             int margin, bool reverse, int min_dist, enum confg ct);
+bool is_on_con (struct frame *f, coord_f cf, pos_f pf,
+                int margin, bool reverse, int min_dist, enum confg t);
+int dist_collision (struct frame *f, coord_f cf, pos_f pf,
+                    int margin, bool reverse);
+int dist_con (struct frame *f, coord_f cf, pos_f pf,
+              int margin, bool reverse, enum confg t);
+bool to_collision_edge (struct frame *f, ALLEGRO_BITMAP *b,
+                        coord_f cf, pos_f pf, int margin, bool reverse,
+                        int min_dist);
+bool to_con_edge (struct frame *f, ALLEGRO_BITMAP *b,
+                  coord_f cf, pos_f pf, int margin, bool reverse,
+                  int min_dist, enum confg t);
 
 
-bool is_hangable_pos (struct pos p, enum dir d);
-bool can_hang (struct anim a);
+bool is_hangable_pos (struct pos *p, enum dir d);
+bool can_hang (struct frame *f);
 
 
 void update_depressible_floor (struct anim *a, int dx0, int dx1);
@@ -88,6 +64,6 @@ void keep_depressible_floor (struct anim *a);
 void clear_depressible_floor (struct anim *a);
 void save_depressible_floor (struct anim *a);
 void restore_depressible_floor (struct anim *a);
-void press_depressible_floor (struct pos p);
+void press_depressible_floor (struct pos *p);
 
 #endif	/* FREEPOP_PHYSICS_H */

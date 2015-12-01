@@ -31,14 +31,14 @@ extern ALLEGRO_BITMAP *pillar_left, *pillar_right, *pillar_top, *pillar;
 
 void load_vdungeon_pillar (void);
 void unload_pillar (void);
-void draw_pillar (ALLEGRO_BITMAP *bitmap, struct pos pos);
-void draw_pillar_base (ALLEGRO_BITMAP *bitmap, struct pos p);
-void draw_pillar_left (ALLEGRO_BITMAP *bitmap, struct pos p);
-void draw_pillar_right (ALLEGRO_BITMAP *bitmap, struct pos p);
-void draw_pillar_fg (ALLEGRO_BITMAP *bitmap, struct pos pos);
-struct coord pillar_coord (struct pos pos);
-struct coord pillar_left_coord (struct pos pos);
-struct coord pillar_right_coord (struct pos pos);
-struct coord pillar_top_coord (struct pos pos);
+void draw_pillar (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_pillar_base (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_pillar_left (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_pillar_right (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_pillar_fg (ALLEGRO_BITMAP *bitmap, struct pos *p);
+struct coord *pillar_coord (struct pos *p, struct coord *c);
+struct coord *pillar_left_coord (struct pos *p, struct coord *c);
+struct coord *pillar_right_coord (struct pos *p, struct coord *c);
+struct coord *pillar_top_coord (struct pos *p, struct coord *c);
 
 #endif	/* FREEPOP_PILLAR_H */

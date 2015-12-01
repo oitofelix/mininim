@@ -23,103 +23,100 @@
 #include "prince.h"
 
 int roomd (int room, enum dir dir);
+struct coord *ncoord (struct coord *c, struct coord *nc);
+struct pos *npos (struct pos *p, struct pos *np);
+struct pos *pos2view (struct pos *p, struct pos *pv);
+struct pos *pos_gen (struct coord *c, struct pos *p, int dx, int dy);
+inline struct pos *pos (struct coord *c, struct pos *p);
+inline struct pos *posf (struct coord *c, struct pos *p);
+struct pos *prel (struct pos *p, struct pos *pr, int floor, int place);
+bool peq (struct pos *p0, struct pos *p1);
+struct coord *nbitmap_coord (struct coord *c, struct coord *nc, int w, int h);
+struct coord *nframe (struct frame *f, struct coord *c);
+double dist_coord (struct coord *a, struct coord *b);
+struct dim *dim (struct frame *f, struct dim *d);
+struct coord *_m (struct frame *f, struct coord *c);
+struct coord *_mt (struct frame *f, struct coord *c);
+struct coord *_mbo (struct frame *f, struct coord *c);
+struct coord *_ml (struct frame *f, struct coord *c);
+struct coord *_mr (struct frame *f, struct coord *c);
+struct coord *_mf (struct frame *f, struct coord *c);
+struct coord *_mba (struct frame *f, struct coord *c);
+struct coord *_tl (struct frame *f, struct coord *c);
+struct coord *_tr (struct frame *f, struct coord *c);
+struct coord *_tf (struct frame *f, struct coord *c);
+struct coord *_tb (struct frame *f, struct coord *c);
+struct coord *_bl (struct frame *f, struct coord *c);
+struct coord *_br (struct frame *f, struct coord *c);
+struct coord *_bf (struct frame *f, struct coord *c);
+struct coord *_bb (struct frame *f, struct coord *c);
 
-struct coord ncoord (struct coord c);
-struct pos npos (struct pos p);
-struct pos pos2view (struct pos p);
+#define survey(coord_f,pos_f,f,c,p,np) (con (npos ((pos_f) ((coord_f) ((f), (c)), (p)), (np))))
 
-struct pos pos_gen (struct coord c, int dx, int dy);
-struct pos pos (struct coord c);
-struct pos posf (struct coord c);
-struct dim dim (struct anim a);
+typedef struct coord *(*coord_f) (struct frame *, struct coord *);
+typedef struct pos *(*pos_f) (struct coord *, struct pos *);
 
-bool peq (struct pos p0, struct pos p1);
-struct pos prel (struct pos, int floor, int place);
+/* #define pmt(f) (pos (mt (f))) */
+/* #define pmbo(f) (pos (mbo (f))) */
+/* #define pml(f) (pos (ml (f))) */
+/* #define pmr(f) (pos (mr (f))) */
+/* #define pmf(f) (pos (mf (f))) */
+/* #define pmba(f) (pos (mba (f))) */
+/* #define ptl(f) (pos (tl (f))) */
+/* #define ptr(f) (pos (tr (f))) */
+/* #define ptf(f) (pos (tf (f))) */
+/* #define ptb(f) (pos (tb (f))) */
+/* #define pbl(f) (pos (bl (f))) */
+/* #define pbr(f) (pos (br (f))) */
+/* #define pbf(f) (pos (bf (f))) */
+/* #define pbb(f) (pos (bb (f))) */
 
-struct coord nanim (struct anim a);
+/* #define cm(f) (con (pm (f))->fg) */
+/* #define cmt(f) (con (pmt (f))->fg) */
+/* #define cmbo(f) (con (pmbo (f))->fg) */
+/* #define cml(f) (con (pml (f))->fg) */
+/* #define cmr(f) (con (pmr (f))->fg) */
+/* #define cmf(f) (con (pmf (f))->fg) */
+/* #define cmba(f) (con (pmba (f))->fg) */
+/* #define ctl(f) (con (ptl (f))->fg) */
+/* #define ctr(f) (con (ptr (f))->fg) */
+/* #define ctf(f) (con (ptf (f))->fg) */
+/* #define ctb(f) (con (ptb (f))->fg) */
+/* #define cbl(f) (con (pbl (f))->fg) */
+/* #define cbr(f) (con (pbr (f))->fg) */
+/* #define cbf(f) (con (pbf (f))->fg) */
+/* #define cbb(f) (con (pbb (f))->fg) */
 
-struct coord m (struct anim a);
-struct coord mt (struct anim a);
-struct coord mbo (struct anim a);
-struct coord ml (struct anim a);
-struct coord mr (struct anim a);
-struct coord mf (struct anim a);
-struct coord mba (struct anim a);
+/* #define fpm(f) (posf (m (f))) */
+/* #define fpmt(f) (posf (mt (f))) */
+/* #define fpmbo(f) (posf (mbo (f))) */
+/* #define fpml(f) (posf (ml (f))) */
+/* #define fpmr(f) (posf (mr (f))) */
+/* #define fpmf(f) (posf (mf (f))) */
+/* #define fpmba(f) (posf (mba (f))) */
+/* #define fptl(f) (posf (tl (f))) */
+/* #define fptr(f) (posf (tr (f))) */
+/* #define fptf(f) (posf (tf (f))) */
+/* #define fptb(f) (posf (tb (f))) */
+/* #define fpbl(f) (posf (bl (f))) */
+/* #define fpbr(f) (posf (br (f))) */
+/* #define fpbf(f) (posf (bf (f))) */
+/* #define fpbb(f) (posf (bb (f))) */
 
-struct coord tl (struct anim a);
-struct coord tr (struct anim a);
-struct coord tf (struct anim a);
-struct coord tb (struct anim a);
-
-struct coord bl (struct anim a);
-struct coord br (struct anim a);
-struct coord bf (struct anim a);
-struct coord bb (struct anim a);
-
-double dist_coord (struct coord a, struct coord b);
-
-#define pm(a) (pos (m (a)))
-#define pmt(a) (pos (mt (a)))
-#define pmbo(a) (pos (mbo (a)))
-#define pml(a) (pos (ml (a)))
-#define pmr(a) (pos (mr (a)))
-#define pmf(a) (pos (mf (a)))
-#define pmba(a) (pos (mba (a)))
-#define ptl(a) (pos (tl (a)))
-#define ptr(a) (pos (tr (a)))
-#define ptf(a) (pos (tf (a)))
-#define ptb(a) (pos (tb (a)))
-#define pbl(a) (pos (bl (a)))
-#define pbr(a) (pos (br (a)))
-#define pbf(a) (pos (bf (a)))
-#define pbb(a) (pos (bb (a)))
-
-#define cm(a) (con (pm (a))->fg)
-#define cmt(a) (con (pmt (a))->fg)
-#define cmbo(a) (con (pmbo (a))->fg)
-#define cml(a) (con (pml (a))->fg)
-#define cmr(a) (con (pmr (a))->fg)
-#define cmf(a) (con (pmf (a))->fg)
-#define cmba(a) (con (pmba (a))->fg)
-#define ctl(a) (con (ptl (a))->fg)
-#define ctr(a) (con (ptr (a))->fg)
-#define ctf(a) (con (ptf (a))->fg)
-#define ctb(a) (con (ptb (a))->fg)
-#define cbl(a) (con (pbl (a))->fg)
-#define cbr(a) (con (pbr (a))->fg)
-#define cbf(a) (con (pbf (a))->fg)
-#define cbb(a) (con (pbb (a))->fg)
-
-#define fpm(a) (posf (m (a)))
-#define fpmt(a) (posf (mt (a)))
-#define fpmbo(a) (posf (mbo (a)))
-#define fpml(a) (posf (ml (a)))
-#define fpmr(a) (posf (mr (a)))
-#define fpmf(a) (posf (mf (a)))
-#define fpmba(a) (posf (mba (a)))
-#define fptl(a) (posf (tl (a)))
-#define fptr(a) (posf (tr (a)))
-#define fptf(a) (posf (tf (a)))
-#define fptb(a) (posf (tb (a)))
-#define fpbl(a) (posf (bl (a)))
-#define fpbr(a) (posf (br (a)))
-#define fpbf(a) (posf (bf (a)))
-#define fpbb(a) (posf (bb (a)))
-
-#define fcm(a) (con (fpm (a))->fg)
-#define fcmt(a) (con (fpmt (a))->fg)
-#define fcmbo(a) (con (fpmbo (a))->fg)
-#define fcml(a) (con (fpml (a))->fg)
-#define fcmr(a) (con (fpmr (a))->fg)
-#define fcmf(a) (con (fpmf (a))->fg)
-#define fcmba(a) (con (fpmba (a))->fg)
-#define fctl(a) (con (fptl (a))->fg)
-#define fctr(a) (con (fptr (a))->fg)
-#define fctf(a) (con (fptf (a))->fg)
-#define fctb(a) (con (fptb (a))->fg)
-#define fcbl(a) (con (fpbl (a))->fg)
-#define fcbr(a) (con (fpbr (a))->fg)
-#define fcbf(a) (con (fpbf (a))->fg)
-#define fcbb(a) (con (fpbb (a))->fg)
+/* #define fcm(f) (con (fpm (f))->fg) */
+/* #define fcmt(f) (con (fpmt (f))->fg) */
+/* #define fcmbo(f) (con (fpmbo (f))->fg) */
+/* #define fcml(f) (con (fpml (f))->fg) */
+/* #define fcmr(f) (con (fpmr (f))->fg) */
+/* #define fcmf(f) (con (fpmf (f))->fg) */
+/* #define fcmba(f) (con (fpmba (f))->fg) */
+/* #define fctl(f) (con (fptl (f))->fg) */
+/* #define fctr(f) (con (fptr (f))->fg) */
+/* #define fctf(f) (con (fptf (f))->fg) */
+/* #define fctb(f) (con (fptb (f))->fg) */
+/* #define fcbl(f) (con (fpbl (f))->fg) */
+/* #define fcbr(f) (con (fpbr (f))->fg) */
+/* #define fcbf(f) (con (fpbf (f))->fg) */
+/* #define fcbb(f) (con (fpbb (f))->fg) */
 
 #endif	/* FREEPOP_POSITION_H */

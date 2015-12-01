@@ -72,223 +72,224 @@ unload_floor (void)
 }
 
 void
-draw_floor_base (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
-  draw_bitmapc (normal_floor_base, bitmap, floor_base_coord (p), 0);
+  struct coord c;
+  draw_bitmapc (normal_floor_base, bitmap, floor_base_coord (p, &c), 0);
 }
 
 void
-draw_floor (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_floor (ALLEGRO_BITMAP *bitmap, struct pos *p)
+{
+  struct coord c; struct pos pr;
+  draw_floor_base (bitmap, p);
+  draw_bitmapc (normal_floor_left, bitmap, floor_left_coord (p, &c), 0);
+  draw_bitmapc (normal_floor_right, bitmap, floor_right_coord (p, &c), 0);
+  draw_con_left (bitmap, prel (p, &pr, 0, +1));
+}
+
+void
+draw_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p)
+{
+  struct coord c;
+  draw_floor_base (bitmap, p);
+  draw_bitmapc (normal_floor_left, bitmap, floor_left_coord (p, &c), 0);
+}
+
+void
+draw_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p)
+{
+  struct coord c; struct pos pr;
+  draw_floor_base (bitmap, p);
+  draw_bitmapc (normal_floor_right, bitmap, floor_right_coord (p, &c), 0);
+  draw_con_left (bitmap, prel (p, &pr, 0, +1));
+}
+
+void
+draw_broken_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   draw_floor_base (bitmap, p);
-  draw_bitmapc (normal_floor_left, bitmap, floor_left_coord (p), 0);
-  draw_bitmapc (normal_floor_right, bitmap, floor_right_coord (p), 0);
-  draw_con_left (bitmap, prel (p, 0, +1));
 }
 
 void
-draw_floor_left (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_broken_floor (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
-  draw_floor_base (bitmap, p);
-  draw_bitmapc (normal_floor_left, bitmap, floor_left_coord (p), 0);
-}
-
-void
-draw_floor_right (ALLEGRO_BITMAP *bitmap, struct pos p)
-{
-  draw_floor_base (bitmap, p);
-  draw_bitmapc (normal_floor_right, bitmap, floor_right_coord (p), 0);
-  draw_con_left (bitmap, prel (p, 0, +1));
-}
-
-void
-draw_broken_floor_base (ALLEGRO_BITMAP *bitmap, struct pos p)
-{
-  draw_floor_base (bitmap, p);
-}
-
-void
-draw_broken_floor (ALLEGRO_BITMAP *bitmap, struct pos p)
-{
+  struct coord c; struct pos pr;
   draw_broken_floor_base (bitmap, p);
-  draw_bitmapc (broken_floor_left, bitmap, floor_left_coord (p), 0);
-  draw_bitmapc (broken_floor_right, bitmap, broken_floor_right_coord (p), 0);
-  draw_con_left (bitmap, prel (p, 0, +1));
+  draw_bitmapc (broken_floor_left, bitmap, floor_left_coord (p, &c), 0);
+  draw_bitmapc (broken_floor_right, bitmap, broken_floor_right_coord (p, &c), 0);
+  draw_con_left (bitmap, prel (p, &pr, 0, +1));
 }
 
 void
-draw_broken_floor_left (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_broken_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
+  struct coord c;
   draw_broken_floor_base (bitmap, p);
-  draw_bitmapc (broken_floor_left, bitmap, floor_left_coord (p), 0);
+  draw_bitmapc (broken_floor_left, bitmap, floor_left_coord (p, &c), 0);
 }
 
 void
-draw_broken_floor_right (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_broken_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
+  struct coord c; struct pos pr;
   draw_broken_floor_base (bitmap, p);
-  draw_bitmapc (broken_floor_right, bitmap, broken_floor_right_coord (p), 0);
-  draw_con_left (bitmap, prel (p, 0, +1));
+  draw_bitmapc (broken_floor_right, bitmap, broken_floor_right_coord (p, &c), 0);
+  draw_con_left (bitmap, prel (p, &pr, 0, +1));
 }
 
 void
-draw_broken_floor_fg (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_broken_floor_fg (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
+  struct coord c;
   draw_bitmapc (broken_floor_front, bitmap,
-                broken_floor_front_coord (p), 0);
+                broken_floor_front_coord (p, &c), 0);
   draw_broken_floor_base (bitmap, p);
 }
 
 void
-draw_skeleton_floor_base (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_skeleton_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   draw_floor_base (bitmap, p);
 }
 
 void
-draw_skeleton_floor (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_skeleton_floor (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
+  struct coord c; struct pos pr;
   draw_skeleton_floor_base (bitmap, p);
-  draw_bitmapc (skeleton_floor_left, bitmap, skeleton_floor_left_coord (p), 0);
-  draw_bitmapc (skeleton_floor_right, bitmap, skeleton_floor_right_coord (p), 0);
-  draw_con_left (bitmap, prel (p, 0, +1));
+  draw_bitmapc (skeleton_floor_left, bitmap, skeleton_floor_left_coord (p, &c), 0);
+  draw_bitmapc (skeleton_floor_right, bitmap, skeleton_floor_right_coord (p, &c), 0);
+  draw_con_left (bitmap, prel (p, &pr, 0, +1));
 }
 
 void
-draw_skeleton_floor_left (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_skeleton_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
+  struct coord c;
   draw_skeleton_floor_base (bitmap, p);
-  draw_bitmapc (skeleton_floor_left, bitmap, skeleton_floor_left_coord (p), 0);
+  draw_bitmapc (skeleton_floor_left, bitmap, skeleton_floor_left_coord (p, &c), 0);
 }
 
 void
-draw_skeleton_floor_right (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_skeleton_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
+  struct coord c; struct pos pr;
   draw_skeleton_floor_base (bitmap, p);
-  draw_bitmapc (skeleton_floor_right, bitmap, skeleton_floor_right_coord (p), 0);
-  draw_con_left (bitmap, prel (p, 0, +1));
+  draw_bitmapc (skeleton_floor_right, bitmap, skeleton_floor_right_coord (p, &c), 0);
+  draw_con_left (bitmap, prel (p, &pr, 0, +1));
 }
 
 void
-draw_floor_corner_01 (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_floor_corner_01 (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
-  struct coord c = floor_corner_01_coord (p);
+  struct coord c; floor_corner_01_coord (p, &c);
   if (con (p)->fg == CLOSER_FLOOR) c.y += 1;
-  draw_bitmapc (floor_corner_01, bitmap, c, 0);
+  draw_bitmapc (floor_corner_01, bitmap, &c, 0);
 }
 
 void
-draw_floor_corner_02 (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_floor_corner_02 (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
-  struct coord c = floor_corner_02_coord (p);
+  struct coord c; floor_corner_02_coord (p, &c);
   if (con (p)->fg == CLOSER_FLOOR) c.y += 1;
-  draw_bitmapc (floor_corner_02, bitmap, c, 0);
+  draw_bitmapc (floor_corner_02, bitmap, &c, 0);
 }
 
 void
-draw_floor_corner_03 (ALLEGRO_BITMAP *bitmap, struct pos p)
+draw_floor_corner_03 (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
-  struct coord c = floor_corner_03_coord (p);
+  struct coord c; floor_corner_03_coord (p, &c);
   if (con (p)->fg == CLOSER_FLOOR) c.y += 1;
-  draw_bitmapc (floor_corner_03, bitmap, c, 0);
+  draw_bitmapc (floor_corner_03, bitmap, &c, 0);
 }
 
-struct coord
-floor_base_coord (struct pos p)
+struct coord *
+floor_base_coord (struct pos *p, struct coord *c)
 {
-  struct coord c;
-  c.x = PLACE_WIDTH * p.place;
-  c.y = PLACE_HEIGHT * (p.floor + 1);
-  c.room = p.room;
+  c->x = PLACE_WIDTH * p->place;
+  c->y = PLACE_HEIGHT * (p->floor + 1);
+  c->room = p->room;
   return c;
 }
 
-struct coord
-floor_left_coord (struct pos p)
+struct coord *
+floor_left_coord (struct pos *p, struct coord *c)
 {
-  struct coord c;
-  c.x = PLACE_WIDTH * p.place;
-  c.y = PLACE_HEIGHT * p.floor + 50;
-  c.room = p.room;
+  c->x = PLACE_WIDTH * p->place;
+  c->y = PLACE_HEIGHT * p->floor + 50;
+  c->room = p->room;
   return c;
 }
 
-struct coord
-floor_right_coord (struct pos p)
+struct coord *
+floor_right_coord (struct pos *p, struct coord *c)
 {
-  struct coord c;
-  c.x = PLACE_WIDTH * (p.place + 1);
-  c.y = PLACE_HEIGHT * p.floor + 50;
-  c.room = p.room;
+  c->x = PLACE_WIDTH * (p->place + 1);
+  c->y = PLACE_HEIGHT * p->floor + 50;
+  c->room = p->room;
   return c;
 }
 
-struct coord
-broken_floor_right_coord (struct pos p)
+struct coord *
+broken_floor_right_coord (struct pos *p, struct coord *c)
 {
-  struct coord c;
-  c.x = PLACE_WIDTH * (p.place + 1);
-  c.y = PLACE_HEIGHT * p.floor + 49;
-  c.room = p.room;
+  c->x = PLACE_WIDTH * (p->place + 1);
+  c->y = PLACE_HEIGHT * p->floor + 49;
+  c->room = p->room;
   return c;
 }
 
-struct coord
-broken_floor_front_coord (struct pos p)
+struct coord *
+broken_floor_front_coord (struct pos *p, struct coord *c)
 {
-  struct coord c;
-  c.x = PLACE_WIDTH * p.place;
-  c.y = PLACE_HEIGHT * p.floor + 54;
-  c.room = p.room;
+  c->x = PLACE_WIDTH * p->place;
+  c->y = PLACE_HEIGHT * p->floor + 54;
+  c->room = p->room;
   return c;
 }
 
-struct coord
-skeleton_floor_left_coord (struct pos p)
+struct coord *
+skeleton_floor_left_coord (struct pos *p, struct coord *c)
 {
-  struct coord c;
-  c.x = PLACE_WIDTH * p.place;
-  c.y = PLACE_HEIGHT * p.floor + 44;
-  c.room = p.room;
+  c->x = PLACE_WIDTH * p->place;
+  c->y = PLACE_HEIGHT * p->floor + 44;
+  c->room = p->room;
   return c;
 }
 
-struct coord
-skeleton_floor_right_coord (struct pos p)
+struct coord *
+skeleton_floor_right_coord (struct pos *p, struct coord *c)
 {
-  struct coord c;
-  c.x = PLACE_WIDTH * (p.place + 1);
-  c.y = PLACE_HEIGHT * p.floor + 44;
-  c.room = p.room;
+  c->x = PLACE_WIDTH * (p->place + 1);
+  c->y = PLACE_HEIGHT * p->floor + 44;
+  c->room = p->room;
   return c;
 }
 
-struct coord
-floor_corner_01_coord (struct pos p)
+struct coord *
+floor_corner_01_coord (struct pos *p, struct coord *c)
 {
-  struct coord c;
-  c.x = PLACE_WIDTH * p.place;
-  c.y = PLACE_HEIGHT * p.floor + 53;
-  c.room = p.room;
+  c->x = PLACE_WIDTH * p->place;
+  c->y = PLACE_HEIGHT * p->floor + 53;
+  c->room = p->room;
   return c;
 }
 
-struct coord
-floor_corner_02_coord (struct pos p)
+struct coord *
+floor_corner_02_coord (struct pos *p, struct coord *c)
 {
-  struct coord c;
-  c.x = PLACE_WIDTH * p.place;
-  c.y = PLACE_HEIGHT * p.floor + 53;
-  c.room = p.room;
+  c->x = PLACE_WIDTH * p->place;
+  c->y = PLACE_HEIGHT * p->floor + 53;
+  c->room = p->room;
   return c;
 }
 
-struct coord
-floor_corner_03_coord (struct pos p)
+struct coord *
+floor_corner_03_coord (struct pos *p, struct coord *c)
 {
-  struct coord c;
-  c.x = PLACE_WIDTH * p.place;
-  c.y = PLACE_HEIGHT * p.floor + 55;
-  c.room = p.room;
+  c->x = PLACE_WIDTH * p->place;
+  c->y = PLACE_HEIGHT * p->floor + 55;
+  c->room = p->room;
   return c;
 }

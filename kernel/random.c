@@ -58,17 +58,17 @@ prandom_uniq (uint32_t seed, int period, int max)
 }
 
 int
-prandom_pos (struct pos p, int i, int period, int max)
+prandom_pos (struct pos *p, int i, int period, int max)
 {
   return
-    prandom_uniq (p.room + p.floor * PLACES + p.place + i, period, max);
+    prandom_uniq (p->room + p->floor * PLACES + p->place + i, period, max);
 }
 
 void
-seedp (struct pos p)
+seedp (struct pos *p)
 {
   random_seedb = random_seed;
-  random_seed = p.room + p.floor * PLACES + p.place;
+  random_seed = p->room + p->floor * PLACES + p->place;
   /* a null random seed makes the random number generator get a
      non-null seed based on the current time, but we avoid this
      non-deterministic behavior because it affects the position
