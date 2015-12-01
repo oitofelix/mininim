@@ -86,16 +86,16 @@ dist_next_place (struct frame *f, coord_f cf, pos_f pf,
 
   int i = 0;
 
-  struct coord c, _c;
-  struct pos p, np, _p, _np;
+  struct coord nc;
+  struct pos np, _np;
 
-  survey (cf, pf, f, &c, &p, &np);
+  survey (cf, pf, &_f, &nc, &np, &np);
 
   do {
     i += inc;
     _f.c.x += inc;
     nframe (&_f, &_f.c);
-    survey (cf, pf, &_f, &_c, &_p, &_np);
+    survey (cf, pf, &_f, &nc, &_np, &_np);
   } while (np.place == _np.place
            && abs (i) < PLACE_WIDTH);
 
