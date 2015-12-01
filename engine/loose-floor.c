@@ -147,15 +147,32 @@ register_loose_floor (struct pos *p)
   loose_floor =
     add_to_array (&l, 1, loose_floor, &loose_floor_nmemb,
                   loose_floor_nmemb, sizeof (l));
+
+  sort_loose_floors ();
+}
+
+void
+sort_loose_floors (void)
+{
+  qsort (loose_floor, loose_floor_nmemb, sizeof (struct loose_floor),
+         compare_loose_floors);
+}
+
+int
+compare_loose_floors (const void *l0, const void *l1)
+{
+  return cpos (&((struct loose_floor *) l0)->p,
+               &((struct loose_floor *) l1)->p);
 }
 
 struct loose_floor *
 loose_floor_at_pos (struct pos *p)
 {
-  size_t i;
-  for (i = 0; i < loose_floor_nmemb; i++)
-    if (peq (&loose_floor[i].p, p)) return &loose_floor[i];
-  return NULL;
+  struct loose_floor l;
+  l.p = *p;
+
+  return bsearch (&l, loose_floor, loose_floor_nmemb, sizeof (l),
+                  compare_loose_floors);
 }
 
 void
@@ -266,6 +283,7 @@ compute_loose_floor_fall (struct loose_floor *l)
     else {
       l->f = nf;
       if (fcmbo_nf == NO_FLOOR) l->p = fpmbo_nf;
+      sort_loose_floors ();
       return;
     }
     /* the floor hit the ground */
@@ -280,6 +298,7 @@ compute_loose_floor_fall (struct loose_floor *l)
       l->f.b = broken_floor;
       l->p = fpmbo_f;
       con (&fpmbo_f)->fg = NO_FLOOR;
+      sort_loose_floors ();
       play_sample (broken_floor_sound);
       return;
     case OPENER_FLOOR: break_opener_floor (&fpmbo_f); break;
@@ -295,6 +314,7 @@ compute_loose_floor_fall (struct loose_floor *l)
   shake_loose_floor_row (&p);
   l->p.room = -1;
   redraw_room = true;
+  sort_loose_floors ();
   play_sample (broken_floor_sound);
 }
 

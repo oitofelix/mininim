@@ -59,6 +59,7 @@ void unload_door (void);
 void load_door_sounds (void);
 void unload_door_sounds (void);
 void register_door (struct pos *p);
+int compare_doors (const void *d0, const void *d1);
 struct door *door_at_pos (struct pos *p);
 void open_door (int e);
 void close_door (int e);

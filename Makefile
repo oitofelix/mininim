@@ -31,4 +31,4 @@ include .depend
 
 .PHONY: clean
 clean:
-	rm -f prince ${OBJECTS} ${COV_FILES} .depend
+	rm -f prince ${OBJECTS} ${COV_FILES} gmon.out .depend

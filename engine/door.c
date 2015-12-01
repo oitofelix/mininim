@@ -92,15 +92,23 @@ register_door (struct pos *p)
 
   door =
     add_to_array (&d, 1, door, &door_nmemb, door_nmemb, sizeof (d));
+
+  qsort (door, door_nmemb, sizeof (d), compare_doors);
+}
+
+int
+compare_doors (const void *d0, const void *d1)
+{
+  return cpos (&((struct door *) d0)->p, &((struct door *) d1)->p);
 }
 
 struct door *
 door_at_pos (struct pos *p)
 {
-  size_t i;
-  for (i = 0; i < door_nmemb; i++)
-    if (peq (&door[i].p, p)) return &door[i];
-  return NULL;
+  struct door d;
+  d.p = *p;
+
+  return bsearch (&d, door, door_nmemb, sizeof (d), compare_doors);
 }
 
 void

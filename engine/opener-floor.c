@@ -18,6 +18,7 @@
 */
 
 #include <error.h>
+#include <stdlib.h>
 #include "kernel/audio.h"
 #include "kernel/video.h"
 #include "kernel/array.h"
@@ -76,15 +77,26 @@ register_opener_floor (struct pos *p)
   opener_floor =
     add_to_array (&o, 1, opener_floor, &opener_floor_nmemb,
                   opener_floor_nmemb, sizeof (o));
+
+  qsort (opener_floor, opener_floor_nmemb, sizeof (o),
+         compare_opener_floors);
+}
+
+int
+compare_opener_floors (const void *o0, const void *o1)
+{
+  return cpos (&((struct opener_floor *) o0)->p,
+               &((struct opener_floor *) o1)->p);
 }
 
 struct opener_floor *
 opener_floor_at_pos (struct pos *p)
 {
-  size_t i;
-  for (i = 0; i < opener_floor_nmemb; i++)
-    if (peq (&opener_floor[i].p, p)) return &opener_floor[i];
-  return NULL;
+  struct opener_floor o;
+  o.p = *p;
+
+  return bsearch (&o, opener_floor, opener_floor_nmemb, sizeof (o),
+                  compare_opener_floors);
 }
 
 void

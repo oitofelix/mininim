@@ -183,6 +183,22 @@ prel (struct pos *p, struct pos *pr, int floor, int place)
   return pr;
 }
 
+int
+cpos (struct pos *p0, struct pos *p1)
+{
+  struct pos np0, np1;
+  npos (p0, &np0);
+  npos (p1, &np1);
+
+  if (np0.room < np1.room) return -1;
+  else if (np0.room > np1.room) return 1;
+  else if (np0.floor < np1.floor) return -1;
+  else if (np0.floor > np1.floor) return 1;
+  else if (np0.place < np1.place) return -1;
+  else if (np0.place > np1.place) return 1;
+  else return 0;
+}
+
 bool
 peq (struct pos *p0, struct pos *p1)
 {

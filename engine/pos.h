@@ -30,6 +30,7 @@ struct pos *pos_gen (struct coord *c, struct pos *p, int dx, int dy);
 inline struct pos *pos (struct coord *c, struct pos *p);
 inline struct pos *posf (struct coord *c, struct pos *p);
 struct pos *prel (struct pos *p, struct pos *pr, int floor, int place);
+int cpos (struct pos *p0, struct pos *p1);
 bool peq (struct pos *p0, struct pos *p1);
 struct coord *nbitmap_coord (struct coord *c, struct coord *nc, int w, int h);
 struct coord *nframe (struct frame *f, struct coord *c);

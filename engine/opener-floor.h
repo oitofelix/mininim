@@ -43,6 +43,7 @@ void unload_opener_floor (void);
 void load_opener_floor_sounds (void);
 void unload_opener_floor_sounds (void);
 void register_opener_floor (struct pos *p);
+int compare_opener_floors (const void *o0, const void *o1);
 struct opener_floor * opener_floor_at_pos (struct pos *p);
 void press_opener_floor (struct pos *p);
 void break_opener_floor (struct pos *p);

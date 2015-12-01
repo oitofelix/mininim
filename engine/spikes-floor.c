@@ -108,15 +108,32 @@ register_spikes_floor (struct pos *p)
   spikes_floor =
     add_to_array (&s, 1, spikes_floor, &spikes_floor_nmemb,
                   spikes_floor_nmemb, sizeof (s));
+
+  sort_spikes_floors ();
+}
+
+void
+sort_spikes_floors (void)
+{
+  qsort (spikes_floor, spikes_floor_nmemb,
+         sizeof (struct spikes_floor), compare_spikes_floors);
+}
+
+int
+compare_spikes_floors (const void *s0, const void *s1)
+{
+  return cpos (&((struct spikes_floor *) s0)->p,
+               &((struct spikes_floor *) s1)->p);
 }
 
 struct spikes_floor *
 spikes_floor_at_pos (struct pos *p)
 {
-  size_t i;
-  for (i = 0; i < spikes_floor_nmemb; i++)
-    if (peq (&spikes_floor[i].p, p)) return &spikes_floor[i];
-  return NULL;
+  struct spikes_floor s;
+  s.p = *p;
+
+  return bsearch (&s, spikes_floor, spikes_floor_nmemb, sizeof (s),
+                  compare_spikes_floors);
 }
 
 void
@@ -125,6 +142,7 @@ break_spikes_floor (struct pos *p)
   struct spikes_floor *s = spikes_floor_at_pos (p);
   if (! s) return;
   s->p.room = -1;
+  sort_spikes_floors ();
 }
 
 void

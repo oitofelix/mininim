@@ -79,15 +79,26 @@ register_closer_floor (struct pos *p)
   closer_floor =
     add_to_array (&c, 1, closer_floor, &closer_floor_nmemb,
                   closer_floor_nmemb, sizeof (c));
+
+  qsort (closer_floor, closer_floor_nmemb, sizeof (c),
+         compare_closer_floors);
+}
+
+int
+compare_closer_floors (const void *c0, const void *c1)
+{
+  return cpos (&((struct closer_floor *) c0)->p,
+               &((struct closer_floor *) c1)->p);
 }
 
 struct closer_floor *
 closer_floor_at_pos (struct pos *p)
 {
-  size_t i;
-  for (i = 0; i < closer_floor_nmemb; i++)
-    if (peq (&closer_floor[i].p, p)) return &closer_floor[i];
-  return NULL;
+  struct closer_floor c;
+  c.p = *p;
+
+  return bsearch (&c, closer_floor, closer_floor_nmemb, sizeof (c),
+                  compare_closer_floors);
 }
 
 void

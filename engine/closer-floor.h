@@ -44,6 +44,7 @@ void unload_closer_floor (void);
 void load_closer_floor_sounds (void);
 void unload_closer_floor_sounds (void);
 void register_closer_floor (struct pos *p);
+int compare_closer_floors (const void *c0, const void *c1);
 struct closer_floor * closer_floor_at_pos (struct pos *p);
 void press_closer_floor (struct pos *p);
 void break_closer_floor (struct pos *p);
