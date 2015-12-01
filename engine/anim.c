@@ -70,9 +70,6 @@ play_anim (void (*callback) (void), int freq)
           if (d_key) kid.f.c.x++;
           if (w_key) kid.f.c.y--;
           if (s_key) kid.f.c.y++;
-          /* int dc = dist_collision (kid); */
-          /* int dbc = dist_back_collision (kid); */
-          /* int df = dist_fall (kid); */
           int dn = dist_next_place (&kid.f, _bf, pos, 0, false);
           int dp = dist_next_place (&kid.f, _bf, pos, 0, true);
           int dc = dist_collision (&kid.f, _bf, pos, 0, false);

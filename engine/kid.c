@@ -2288,20 +2288,20 @@ kid_fall (void)
 
   if (i == 0 && (should_move_to_front || should_move_to_back)) {
     next_frame (&kid.f, &kid.f, frame, +0, 0);
-    int dir = (kid.f.dir == LEFT) ? -1 : +1;
-    dir *= (should_move_to_back) ? -1 : +1;
+    int dirm = dir;
+    dirm *= (should_move_to_back) ? -1 : +1;
     int i = 0;
 
     enum confg t;
 
     do {
-      i += dir;
-      kid.f.c.x += dir;
+      i += dirm;
+      kid.f.c.x += dirm;
       nframe (&kid.f, &kid.f.c);
       t = survey (cf, pos, &kid.f, &nc, &np, &np)->fg;
     } while (t != NO_FLOOR && abs (i) < PLACE_WIDTH);
 
-    kid.f.c.x += -dir * 12;
+    kid.f.c.x += -dirm * 12;
     kid.f.c.y += 6;
   }
 
@@ -2314,8 +2314,8 @@ kid_fall (void)
     to_next_place_edge (&kid.f, &kid.f, frame, _tf, pos, 0, false, 0);
   } else if (ctf != NO_FLOOR) inertia = 0;
   else {
-    if (oaction == kid_run_jump) dx = -12, dy= +12;
-    if (oaction == kid_jump) dx = -12, dy = +12;
+    if (oaction == kid_run_jump) dx = -16, dy= +12;
+    if (oaction == kid_jump) dx = -16, dy = +12;
   }
 
   /* hang */
