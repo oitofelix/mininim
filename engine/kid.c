@@ -19,6 +19,7 @@
 
 #include <stdio.h>
 #include <error.h>
+#include "prince.h"
 #include "kernel/video.h"
 #include "kernel/audio.h"
 #include "kernel/keyboard.h"
@@ -42,6 +43,8 @@ static bool critical_edge = false;
 static bool turn = false;
 static struct pos item_pos = {.room = -1};
 static bool keep_sword_fast = false;
+static int kid_total_lives = KID_INITIAL_TOTAL_LIVES,
+  kid_current_lives = KID_INITIAL_CURRENT_LIVES;
 
 #define WALK_FRAMESET_NMEMB 12
 #define START_RUN_FRAMESET_NMEMB 6
@@ -115,7 +118,7 @@ static void init_sword_walkb_frameset (void);
 static void init_sword_defense_frameset (void);
 static void init_sword_attack_frameset (void);
 
-ALLEGRO_BITMAP *kid_normal_00,
+ALLEGRO_BITMAP *kid_full_life, *kid_empty_life, *kid_normal_00,
   *kid_start_run_01, *kid_start_run_02, *kid_start_run_03, *kid_start_run_04,
   *kid_start_run_05, *kid_start_run_06, *kid_run_07,
   *kid_run_08, *kid_run_09, *kid_run_10, *kid_run_11,
@@ -178,6 +181,7 @@ bool sample_step, sample_hit_ground, sample_hit_wall,
   sample_take_sword, sample_sword_attack;
 
 static void place_kid (int room, int floor, int place);
+static struct coord *kid_life_coord (int i, struct coord *c);
 
 static void kid_normal (void);
 static void kid_walk (void);
@@ -214,6 +218,8 @@ void
 load_kid (void)
 {
   /* bitmap */
+  kid_full_life = load_bitmap (KID_FULL_LIFE);
+  kid_empty_life = load_bitmap (KID_EMPTY_LIFE);
   kid_normal_00 = load_bitmap (KID_NORMAL_00);
   kid_start_run_01 = load_bitmap (KID_START_RUN_01);
   kid_start_run_02 = load_bitmap (KID_START_RUN_02);
@@ -453,6 +459,8 @@ void
 unload_kid (void)
 {
   /* bitmaps */
+  al_destroy_bitmap (kid_full_life);
+  al_destroy_bitmap (kid_empty_life);
   al_destroy_bitmap (kid_normal_00);
   al_destroy_bitmap (kid_start_run_01);
   al_destroy_bitmap (kid_start_run_02);
@@ -3052,4 +3060,34 @@ is_kid_hanging_at_pos (struct frame *f, struct pos *p)
   int dir = (f->dir == LEFT) ? -1 : +1;
   return (is_kid_hang_or_climb (f)
           && peq (prel (&pbb, &pr, -1, dir), p));
+}
+
+
+
+void
+draw_kid_lives (ALLEGRO_BITMAP *bitmap, int j)
+{
+  int i;
+  struct coord c;
+
+  al_draw_filled_rectangle (0, ORIGINAL_HEIGHT - 8,
+                            7 * kid_total_lives, ORIGINAL_HEIGHT,
+                            al_map_rgba (0, 0, 0, 170));
+
+  for (i = 0; i < kid_total_lives; i++)
+    draw_bitmapc (kid_empty_life, bitmap, kid_life_coord (i, &c), 0);
+
+  if (kid_current_lives <= KID_MINIMUM_LIVES_TO_BLINK && j % 2) return;
+
+  for (i = 0; i < kid_current_lives; i++)
+    draw_bitmapc (kid_full_life, bitmap, kid_life_coord (i, &c), 0);
+}
+
+static struct coord *
+kid_life_coord (int i, struct coord *c)
+{
+  c->x = 7 * i;
+  c->y = 194;
+  c->room = room_view;
+  return c;
 }

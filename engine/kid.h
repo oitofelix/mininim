@@ -21,6 +21,8 @@
 #define FREEPOP_KID_H
 
 /* bitmap resources */
+#define KID_FULL_LIFE "dat/kid/objects/full live.png"
+#define KID_EMPTY_LIFE "dat/kid/objects/empty live.png"
 #define KID_NORMAL_00 "dat/kid/normal.png"
 #define KID_START_RUN_01 "dat/kid/running/frame01.png"
 #define KID_START_RUN_02 "dat/kid/running/frame02.png"
@@ -231,6 +233,7 @@ bool is_kid_climb (struct frame *f);
 bool is_kid_vjump (struct frame *f);
 bool is_kid_turn (struct frame *f);
 bool is_kid_hanging_at_pos (struct frame *f, struct pos *p);
+void draw_kid_lives (ALLEGRO_BITMAP *bitmap, int j);
 
 void kid_turn (void);
 void kid_vjump (void);
