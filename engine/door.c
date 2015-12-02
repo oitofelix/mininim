@@ -31,8 +31,11 @@
 ALLEGRO_BITMAP *door_left, *door_right, *door_pole, *door_top,
   *door_grid, *door_grid_tip, *door_grid_top;
 
-ALLEGRO_SAMPLE *door_open_sound, *door_close_sound, *door_end_sound,
-  *door_abruptly_close_sound;
+ALLEGRO_SAMPLE *door_open_sample, *door_close_sample, *door_end_sample,
+  *door_abruptly_close_sample;
+
+bool sample_door_open, sample_door_close, sample_door_end,
+  sample_door_abruptly_close;
 
 static struct door *door = NULL;
 static size_t door_nmemb = 0;
@@ -62,21 +65,21 @@ unload_door (void)
 }
 
 void
-load_door_sounds (void)
+load_door_samples (void)
 {
-  door_open_sound = load_sample (DOOR_OPEN_SOUND);
-  door_close_sound = load_sample (DOOR_CLOSE_SOUND);
-  door_end_sound = load_sample (DOOR_END_SOUND);
-  door_abruptly_close_sound = load_sample (DOOR_ABRUPTLY_CLOSE_SOUND);
+  door_open_sample = load_sample (DOOR_OPEN_SAMPLE);
+  door_close_sample = load_sample (DOOR_CLOSE_SAMPLE);
+  door_end_sample = load_sample (DOOR_END_SAMPLE);
+  door_abruptly_close_sample = load_sample (DOOR_ABRUPTLY_CLOSE_SAMPLE);
 }
 
 void
-unload_door_sounds (void)
+unload_door_samples (void)
 {
-  al_destroy_sample (door_open_sound);
-  al_destroy_sample (door_close_sound);
-  al_destroy_sample (door_end_sound);
-  al_destroy_sample (door_abruptly_close_sound);
+  al_destroy_sample (door_open_sample);
+  al_destroy_sample (door_close_sample);
+  al_destroy_sample (door_end_sample);
+  al_destroy_sample (door_abruptly_close_sample);
 }
 
 void
@@ -127,14 +130,14 @@ compute_doors (void)
       if (d->i == 0 && d->wait == 0) d->action = CLOSE_DOOR;
       else if (d->i == 0 && d->wait > 0) {
         if (! d->noise) {
-          play_sample (door_end_sound);
+          sample_door_end = true;
           d->noise = true;
         }
 
         d->wait--;
       }
       else if (d->i > 0) {
-        if (d->i % 2 == 0) play_sample (door_open_sound);
+        if (d->i % 2 == 0) sample_door_open = true;
         d->i--;
         d->wait = DOOR_WAIT;
       }
@@ -142,12 +145,12 @@ compute_doors (void)
     case CLOSE_DOOR:
       if (d->i < DOOR_MAX_STEP) {
         if (d->wait++ % 4 == 0) {
-          play_sample (door_close_sound);
+          sample_door_close = true;
           d->i++;
           d->noise = false;
         }
       } else if (d->i == DOOR_MAX_STEP) {
-        play_sample (door_end_sound);
+        sample_door_end = true;;
         d->action = NO_DOOR_ACTION;
         d->wait = DOOR_WAIT;
         d->noise = false;
@@ -159,7 +162,7 @@ compute_doors (void)
         d->i += r ? r : 12;
         if (d->i >= DOOR_MAX_STEP) {
           d->i = DOOR_MAX_STEP;
-          play_sample (door_abruptly_close_sound);
+          sample_door_abruptly_close = true;
         }
       } else {
         d->action = NO_DOOR_ACTION;
@@ -171,6 +174,18 @@ compute_doors (void)
       break;
     }
   }
+}
+
+void
+sample_doors (void)
+{
+  if (sample_door_open) play_sample (door_open_sample);
+  if (sample_door_close) play_sample (door_close_sample);
+  if (sample_door_end) play_sample (door_end_sample);
+  if (sample_door_abruptly_close) play_sample (door_abruptly_close_sample);
+
+  sample_door_open = sample_door_close = sample_door_end =
+    sample_door_abruptly_close = false;
 }
 
 void

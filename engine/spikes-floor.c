@@ -34,7 +34,8 @@ ALLEGRO_BITMAP *spikes_floor_left, *spikes_floor_right,
   *spikes_01_fg, *spikes_02_fg, *spikes_03_fg, *spikes_04_fg,
   *spikes_05_fg;
 
-ALLEGRO_SAMPLE *spikes_sound;
+ALLEGRO_SAMPLE *spikes_sample;
+bool sample_spikes;
 
 static struct spikes_floor *spikes_floor = NULL;
 static size_t spikes_floor_nmemb = 0;
@@ -84,15 +85,15 @@ unload_spikes_floor (void)
 }
 
 void
-load_spikes_floor_sounds (void)
+load_spikes_floor_samples (void)
 {
-  spikes_sound = load_sample (SPIKES_SOUND);
+  spikes_sample = load_sample (SPIKES_SAMPLE);
 }
 
 void
-unload_spikes_floor_sounds (void)
+unload_spikes_floor_samples (void)
 {
-  al_destroy_sample (spikes_sound);
+  al_destroy_sample (spikes_sample);
 }
 
 void
@@ -158,7 +159,7 @@ compute_spikes_floors (void)
     }
     switch (s->i) {
     case 0: if (should_spikes_raise (&s->p)) {
-        play_sample (spikes_sound);
+        sample_spikes = true;
         s->i++;
         s->wait = 12;
         s->state = 1;
@@ -178,6 +179,13 @@ compute_spikes_floors (void)
     case 6: s->i = 0; s->state = 1; break;
     }
   }
+}
+
+void
+sample_spikes_floors (void)
+{
+  if (sample_spikes) play_sample (spikes_sample);
+  sample_spikes = false;
 }
 
 bool

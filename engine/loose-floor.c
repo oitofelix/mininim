@@ -36,8 +36,11 @@ ALLEGRO_BITMAP *loose_floor_left_01, *loose_floor_right_01, *loose_floor_base_01
   *loose_floor_left_02, *loose_floor_right_02, *loose_floor_base_02,
   *loose_floor_02, *broken_floor;
 
-ALLEGRO_SAMPLE *loose_floor_01_sound, *loose_floor_02_sound, *loose_floor_03_sound,
-  *broken_floor_sound;
+ALLEGRO_SAMPLE *loose_floor_01_sample, *loose_floor_02_sample, *loose_floor_03_sample,
+  *broken_floor_sample;
+
+bool sample_loose_floor_01, sample_loose_floor_02, sample_loose_floor_03,
+  sample_broken_floor;
 
 static struct loose_floor *loose_floor = NULL;
 static size_t loose_floor_nmemb = 0;
@@ -69,21 +72,21 @@ unload_loose_floor (void)
 }
 
 void
-load_loose_floor_sounds (void)
+load_loose_floor_samples (void)
 {
-  loose_floor_01_sound = load_sample (LOOSE_FLOOR_01_SOUND);
-  loose_floor_02_sound = load_sample (LOOSE_FLOOR_02_SOUND);
-  loose_floor_03_sound = load_sample (LOOSE_FLOOR_03_SOUND);
-  broken_floor_sound = load_sample (BROKEN_FLOOR_SOUND);
+  loose_floor_01_sample = load_sample (LOOSE_FLOOR_01_SAMPLE);
+  loose_floor_02_sample = load_sample (LOOSE_FLOOR_02_SAMPLE);
+  loose_floor_03_sample = load_sample (LOOSE_FLOOR_03_SAMPLE);
+  broken_floor_sample = load_sample (BROKEN_FLOOR_SAMPLE);
 }
 
 void
-unload_loose_floor_sounds (void)
+unload_loose_floor_samples (void)
 {
-  al_destroy_sample (loose_floor_01_sound);
-  al_destroy_sample (loose_floor_02_sound);
-  al_destroy_sample (loose_floor_03_sound);
-  al_destroy_sample (broken_floor_sound);
+  al_destroy_sample (loose_floor_01_sample);
+  al_destroy_sample (loose_floor_02_sample);
+  al_destroy_sample (loose_floor_03_sample);
+  al_destroy_sample (broken_floor_sample);
 }
 
 ALLEGRO_BITMAP *
@@ -218,10 +221,10 @@ compute_loose_floor_shake (struct loose_floor *l)
 {
   switch (l->i) {
   case 0: l->state = 1;
-    play_sample (loose_floor_sample ()); l->i++; break;
+    sample_random_loose_floor (); l->i++; break;
   case 1: l->state = 0; l->i++; break;
   case 2: l->state = 2;
-    play_sample (loose_floor_sample ()); l->i++; break;
+    sample_random_loose_floor (); l->i++; break;
   case 3: l->state = 0;
     l->action = NO_LOOSE_FLOOR_ACTION; l->i = 0; break;
   }
@@ -236,16 +239,16 @@ compute_loose_floor_release (struct loose_floor *l)
   }
   switch (l->i) {
   case 0: l->state = 1;
-    play_sample (loose_floor_sample ()); l->i++; break;
+    sample_random_loose_floor (); l->i++; break;
   case 1: l->state = 0; l->i++; break;
   case 2: l->state = 2;
-    play_sample (loose_floor_sample ()); l->i++; break;
+    sample_random_loose_floor (); l->i++; break;
   case 3: l->state = 2; l->i++; break;
   case 4: l->state = 0; l->i++; break;
   case 5: l->state = 0; l->i++; break;
   case 6: l->state = 0; l->i++; break;
   case 7: l->state = 2;
-    play_sample (loose_floor_sample ()); l->i++; break;
+    sample_random_loose_floor (); l->i++; break;
   case 8: l->state = 2; l->i++; break;
   case 9: l->state = 2; l->i++; con (&l->p)->fg = NO_FLOOR; break;
   case 10:
@@ -300,7 +303,7 @@ compute_loose_floor_fall (struct loose_floor *l)
       l->i = 0;
       con (&fpmbo_f)->fg = NO_FLOOR;
       sort_loose_floors ();
-      play_sample (broken_floor_sound);
+      sample_broken_floor = true;
       return;
     case OPENER_FLOOR: break_opener_floor (&fpmbo_f); break;
     case CLOSER_FLOOR: break_closer_floor (&fpmbo_f); break;
@@ -316,7 +319,7 @@ compute_loose_floor_fall (struct loose_floor *l)
   l->p.room = -1;
   redraw_room = true;
   sort_loose_floors ();
-  play_sample (broken_floor_sound);
+  sample_broken_floor = true;
 }
 
 void
@@ -335,15 +338,26 @@ shake_loose_floor_row (struct pos *p)
     }
 }
 
-ALLEGRO_SAMPLE *
-loose_floor_sample (void)
+void
+sample_random_loose_floor (void)
 {
   switch (prandom (2)) {
-  case 0: return loose_floor_01_sound;
-  case 1: return loose_floor_02_sound;
-  case 2: return loose_floor_03_sound;
+  case 0: sample_loose_floor_01 = true;
+  case 1: sample_loose_floor_02 = true;
+  case 2: sample_loose_floor_03 = true;
   }
-  return loose_floor_01_sound;
+}
+
+void
+sample_loose_floors (void)
+{
+  if (sample_loose_floor_01) play_sample (loose_floor_01_sample);
+  if (sample_loose_floor_02) play_sample (loose_floor_02_sample);
+  if (sample_loose_floor_03) play_sample (loose_floor_03_sample);
+  if (sample_broken_floor) play_sample (broken_floor_sample);
+
+  sample_loose_floor_01 = sample_loose_floor_02 =
+    sample_loose_floor_03 = sample_broken_floor = false;
 }
 
 void

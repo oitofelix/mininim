@@ -83,11 +83,11 @@ load_room (void)
     error (-1, 0, "%s: unknown level type (%i)", __func__, level->type);
   }
 
-  load_loose_floor_sounds ();
-  load_opener_floor_sounds ();
-  load_closer_floor_sounds ();
-  load_spikes_floor_sounds ();
-  load_door_sounds ();
+  load_loose_floor_samples ();
+  load_opener_floor_samples ();
+  load_closer_floor_samples ();
+  load_spikes_floor_samples ();
+  load_door_samples ();
 }
 
 void
@@ -104,11 +104,11 @@ unload_room (void)
   unload_door ();
 
   /* sounds */
-  unload_loose_floor_sounds ();
-  unload_opener_floor_sounds ();
-  unload_closer_floor_sounds ();
-  unload_spikes_floor_sounds ();
-  unload_door_sounds ();
+  unload_loose_floor_samples ();
+  unload_opener_floor_samples ();
+  unload_closer_floor_samples ();
+  unload_spikes_floor_samples ();
+  unload_door_samples ();
 
   /* bitmaps */
   al_destroy_bitmap (room_bg);

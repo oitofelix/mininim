@@ -24,6 +24,7 @@
 
 /* functions */
 void play_anim (void (*draw_callback) (void),
+                void (*sample_callback) (void),
                 void (*compute_callback) (void),
                 int freq);
 void draw_frame (ALLEGRO_BITMAP *bitmap, struct frame *f);

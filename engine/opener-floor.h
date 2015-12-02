@@ -27,7 +27,7 @@
 #define VDUNGEON_UNPRESSED_OPENER_FLOOR_BASE "dat/vdungeon/floor panels/opener base unpressed.png"
 
 /* sounds */
-#define OPENER_FLOOR_SOUND "dat/digisnd1/door tile pressed 1.ogg"
+#define OPENER_FLOOR_SAMPLE "dat/digisnd1/door tile pressed 1.ogg"
 
 /* types */
 struct opener_floor {
@@ -40,8 +40,8 @@ struct opener_floor {
 
 void load_vdungeon_opener_floor (void);
 void unload_opener_floor (void);
-void load_opener_floor_sounds (void);
-void unload_opener_floor_sounds (void);
+void load_opener_floor_samples (void);
+void unload_opener_floor_samples (void);
 void register_opener_floor (struct pos *p);
 int compare_opener_floors (const void *o0, const void *o1);
 struct opener_floor * opener_floor_at_pos (struct pos *p);
@@ -49,6 +49,7 @@ void press_opener_floor (struct pos *p);
 void break_opener_floor (struct pos *p);
 void unpress_opener_floors (void);
 void compute_opener_floors (void);
+void sample_opener_floors (void);
 void draw_opener_floor (ALLEGRO_BITMAP *bitmap, struct pos *p);
 void draw_opener_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p);
 void draw_opener_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p);

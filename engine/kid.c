@@ -169,8 +169,13 @@ ALLEGRO_BITMAP *kid_normal_00,
   *kid_sword_attack_04, *kid_sword_attack_05, *kid_sword_attack_06,
   *kid_sword_attack_07;
 
-ALLEGRO_SAMPLE *step, *hit_ground, *hit_wall, *hang_on_fall, *drink,
-  *glory, *take_sword, *sword_attack;
+ALLEGRO_SAMPLE *step_sample, *hit_ground_sample, *hit_wall_sample,
+  *hang_on_fall_sample, *drink_sample, *glory_sample,
+  *take_sword_sample, *sword_attack_sample;
+
+bool sample_step, sample_hit_ground, sample_hit_wall,
+  sample_hang_on_fall, sample_drink, sample_glory,
+  sample_take_sword, sample_sword_attack;
 
 static void place_kid (int room, int floor, int place);
 
@@ -400,14 +405,14 @@ load_kid (void)
   kid_sword_attack_07 = load_bitmap (KID_SWORD_ATTACK_07);
 
   /* sound */
-  step = load_sample (STEP);
-  hit_ground = load_sample (HIT_GROUND);
-  hit_wall = load_sample (HIT_WALL);
-  hang_on_fall = load_sample (HANG_ON_FALL);
-  drink = load_sample (DRINK);
-  glory = load_sample (GLORY);
-  take_sword = load_sample (TAKE_SWORD);
-  sword_attack = load_sample (SWORD_ATTACK);
+  step_sample = load_sample (STEP_SAMPLE);
+  hit_ground_sample = load_sample (HIT_GROUND_SAMPLE);
+  hit_wall_sample = load_sample (HIT_WALL_SAMPLE);
+  hang_on_fall_sample = load_sample (HANG_ON_FALL_SAMPLE);
+  drink_sample = load_sample (DRINK_SAMPLE);
+  glory_sample = load_sample (GLORY_SAMPLE);
+  take_sword_sample = load_sample (TAKE_SWORD_SAMPLE);
+  sword_attack_sample = load_sample (SWORD_ATTACK_SAMPLE);
 
   /* framesets */
   init_walk_frameset ();
@@ -639,13 +644,13 @@ unload_kid (void)
   al_destroy_bitmap (kid_sword_attack_07);
 
   /* sounds */
-  al_destroy_sample (step);
-  al_destroy_sample (hit_ground);
-  al_destroy_sample (hit_wall);
-  al_destroy_sample (hang_on_fall);
-  al_destroy_sample (drink);
-  al_destroy_sample (glory);
-  al_destroy_sample (take_sword);
+  al_destroy_sample (step_sample);
+  al_destroy_sample (hit_ground_sample);
+  al_destroy_sample (hit_wall_sample);
+  al_destroy_sample (hang_on_fall_sample);
+  al_destroy_sample (drink_sample);
+  al_destroy_sample (glory_sample);
+  al_destroy_sample (take_sword_sample);
 }
 
 void
@@ -678,6 +683,23 @@ place_kid (int room, int floor, int place)
   kid.f.c.y = PLACE_HEIGHT * p.floor + 15;
 }
 
+
+void
+sample_kid (void)
+{
+  if (sample_step) play_sample (step_sample);
+  if (sample_hit_ground) play_sample (hit_ground_sample);
+  if (sample_hit_wall) play_sample (hit_wall_sample);
+  if (sample_hang_on_fall) play_sample (hang_on_fall_sample);
+  if (sample_drink) play_sample (drink_sample);
+  if (sample_glory) play_sample (glory_sample);
+  if (sample_take_sword) play_sample (take_sword_sample);
+  if (sample_sword_attack) play_sample (sword_attack_sample);
+
+  sample_step = sample_hit_ground = sample_hit_wall =
+    sample_hang_on_fall = sample_drink = sample_glory =
+    sample_take_sword = sample_sword_attack = false;
+}
 
 
 
@@ -1324,8 +1346,8 @@ kid_run (void)
     i = 0; return;
   }
 
-  if (kid.f.b == run_jump_frameset[10].frame) play_sample (step);
-  if (i == 2 || i == 6) play_sample (step);
+  if (kid.f.b == run_jump_frameset[10].frame) sample_step = true;
+  if (i == 2 || i == 6) sample_step = true;
 
   next_frame (&kid.f, &kid.f, frame, dx, dy);
 
@@ -1379,7 +1401,7 @@ kid_stop_run (void)
     return;
   }
 
-  if (i == 1 || i == 3) play_sample (step);
+  if (i == 1 || i == 3) sample_step = true;
 
   next_frame (&kid.f, &kid.f, frame, dx, dy);
 
@@ -1557,7 +1579,7 @@ kid_jump (void)
     i = 0; return;
   }
 
-  if (i == 11 || i == 14) play_sample (step);
+  if (i == 11 || i == 14) sample_step = true;
   if (i == 12) shake_loose_floor_row (&pmbo);
 
   next_frame (&kid.f, &kid.f, frame, dx, dy);
@@ -1726,7 +1748,7 @@ kid_run_jump (void)
     i = 0; return;
   }
 
-  if (i == 0 || i == 4) play_sample (step);
+  if (i == 0 || i == 4) sample_step = true;
   if (i == 10) shake_loose_floor_row (&pmbo);
 
   next_frame (&kid.f, &kid.f, frame, dx, dy);
@@ -1772,7 +1794,7 @@ kid_misstep (void)
     i = 0; return;
   }
 
-  if (i == 7) play_sample (step);
+  if (i == 7) sample_step = true;
   if (i == 8) shake_loose_floor_row (&pmbo);
 
   next_frame (&kid.f, &kid.f, frame, dx, dy);
@@ -1861,7 +1883,7 @@ kid_hang_wall (void)
   }
   if (! reverse && i == 4 && shift_key && ! up_key
       && ! hang_limit)
-    play_sample (hit_wall);
+    sample_hit_wall = true;
 
   if ((! shift_key && (reverse || i > 4))
       || hang_limit || ctf == NO_FLOOR) {
@@ -2307,7 +2329,7 @@ kid_stabilize_collision (void)
 {
   kid.action = kid_stabilize_collision;
 
-  play_sample (hit_wall);
+  sample_hit_wall = true;
   to_collision_edge (&kid.f, stabilize_frameset[0].frame, _tf, pos, 0, false, 0);
   if (kid.f.dir == RIGHT) kid.f.c.x -= 3;
 
@@ -2327,7 +2349,7 @@ kid_couch_collision (void)
   kid.f.c.x = PLACE_WIDTH * pbf.place + 15;
   kid.f.b = kid_normal_00;
 
-  play_sample (hit_wall);
+  sample_hit_wall = true;
   to_collision_edge (&kid.f, couch_frameset[0].frame, _tf, pos, 0, false, 0);
   if (kid.f.dir == RIGHT) kid.f.c.x -= 12;
 
@@ -2395,7 +2417,7 @@ kid_fall (void)
 
   /* hang */
   if (i > 2 && can_hang (&kid.f) && shift_key && ! hang_limit) {
-    play_sample (hang_on_fall);
+    sample_hang_on_fall = true;
     kid_hang ();
     i = 0; force_floor = -2;
     return;
@@ -2441,7 +2463,7 @@ kid_fall (void)
       to_next_place_edge (&kid.f, &kid.f, frame, _bf, pos, 0, true, -1);
 
     kid_couch ();
-    if (i > 3) play_sample (hit_ground);
+    if (i > 3) sample_hit_ground = true;
     i = 0; force_floor = -2;
     shake_loose_floor_row (&pbf);
     return;
@@ -2500,7 +2522,7 @@ kid_drink (void)
   keep_depressible_floor (&kid);
 
   /* sound */
-  if (i == 7 && ! reverse) play_sample (drink);
+  if (i == 7 && ! reverse) sample_drink = true;
 
   /* consume bottle */
   if (i == 0) con (&item_pos)->ext.item = NO_ITEM;
@@ -2544,7 +2566,7 @@ kid_raise_sword (void)
   if (i == 0 && wait == 5) {
     video_effect.color = YELLOW;
     start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.5));
-    play_sample (glory);
+    sample_glory = true;
   }
 
   /* depressible floors */
@@ -2647,7 +2669,7 @@ kid_take_sword (void)
   next_frame (&kid.f, &kid.f, frame, dx, dy);
 
   /* sound */
-  if (i == 0) play_sample (take_sword);
+  if (i == 0) sample_take_sword = true;
 
   /* depressible floors */
   keep_depressible_floor (&kid);
@@ -2934,7 +2956,7 @@ kid_sword_attack (void)
   next_frame (&kid.f, &kid.f, frame, dx, dy);
 
   /* sound */
-  if (i == 3) play_sample (sword_attack);
+  if (i == 3) sample_sword_attack = true;
 
   /* depressible floors */
   if (i == 2) update_depressible_floor (&kid, -8, -40);

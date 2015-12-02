@@ -42,6 +42,7 @@
 static void load_level (void);
 static void unload_level (void);
 static void draw_level (void);
+static void sample_level (void);
 static void compute_level (void);
 
 /* current level */
@@ -63,7 +64,7 @@ play_level (struct level *_level)
   load_level ();
 
   register_cons ();
-  play_anim (draw_level, compute_level, 12);
+  play_anim (draw_level, sample_level, compute_level, 12);
 
   unload_level ();
 }
@@ -119,6 +120,17 @@ compute_level (void)
   compute_closer_floors ();
   compute_spikes_floors ();
   compute_doors ();
+}
+
+static void
+sample_level (void)
+{
+  sample_kid ();
+  sample_loose_floors ();
+  sample_opener_floors ();
+  sample_closer_floors ();
+  sample_spikes_floors ();
+  sample_doors ();
 }
 
 static void

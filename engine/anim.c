@@ -37,6 +37,7 @@ bool next_frame_inv = false; /* invert next_anim offset interpretation  */
 
 void
 play_anim (void (*draw_callback) (void),
+           void (*sample_callback) (void),
            void (*compute_callback) (void),
            int freq)
 {
@@ -88,6 +89,7 @@ f = %i, p = %i, dn = %i, dp = %i, dc = %i, df = %i, dl = %i, dd = %i\n",
             || (pause_anim &&
                 was_key_pressed (ALLEGRO_KEY_ESCAPE, true))) {
           draw_callback ();
+          if (sample_callback) sample_callback ();
           if (compute_callback) compute_callback ();
         }
         if (! is_video_effect_started ()) show ();

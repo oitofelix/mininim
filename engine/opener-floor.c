@@ -32,7 +32,8 @@
 
 ALLEGRO_BITMAP *unpressed_opener_floor_left, *unpressed_opener_floor_base;
 
-ALLEGRO_SAMPLE *opener_floor_sound;
+ALLEGRO_SAMPLE *opener_floor_sample;
+bool sample_opener_floor;
 
 static struct opener_floor *opener_floor = NULL;
 static size_t opener_floor_nmemb = 0;
@@ -52,15 +53,15 @@ unload_opener_floor (void)
 }
 
 void
-load_opener_floor_sounds (void)
+load_opener_floor_samples (void)
 {
-  opener_floor_sound = load_sample (OPENER_FLOOR_SOUND);
+  opener_floor_sample = load_sample (OPENER_FLOOR_SAMPLE);
 }
 
 void
-unload_opener_floor_sounds (void)
+unload_opener_floor_samples (void)
 {
-  al_destroy_sample (opener_floor_sound);
+  al_destroy_sample (opener_floor_sample);
 }
 
 void
@@ -136,12 +137,19 @@ compute_opener_floors (void)
     }
     if (o->pressed || o->broken) {
       if (! o->noise) {
-        play_sample (opener_floor_sound);
+        sample_opener_floor = true;
         o->noise = true;
       }
       open_door (o->event);
     } else o->noise = false;
   }
+}
+
+void
+sample_opener_floors (void)
+{
+  if (sample_opener_floor) play_sample (opener_floor_sample);
+  sample_opener_floor = false;
 }
 
 void

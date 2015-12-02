@@ -38,10 +38,10 @@
 #define VDUNGEON_DOOR_GRID_TOP "dat/vdungeon/door/res00260.png"
 
 /* sounds */
-#define DOOR_OPEN_SOUND "dat/digisnd1/door gate closing slow 1.ogg"
-#define DOOR_CLOSE_SOUND "dat/digisnd1/door gate opening 1.ogg"
-#define DOOR_END_SOUND "dat/digisnd1/drinking potion.ogg"
-#define DOOR_ABRUPTLY_CLOSE_SOUND "dat/digisnd1/door gate closing fast.ogg"
+#define DOOR_OPEN_SAMPLE "dat/digisnd1/door gate closing slow 1.ogg"
+#define DOOR_CLOSE_SAMPLE "dat/digisnd1/door gate opening 1.ogg"
+#define DOOR_END_SAMPLE "dat/digisnd1/drinking potion.ogg"
+#define DOOR_ABRUPTLY_CLOSE_SAMPLE "dat/digisnd1/door gate closing fast.ogg"
 
 /* types */
 struct door {
@@ -56,8 +56,8 @@ struct door {
 
 void load_vdungeon_door (void);
 void unload_door (void);
-void load_door_sounds (void);
-void unload_door_sounds (void);
+void load_door_samples (void);
+void unload_door_samples (void);
 void register_door (struct pos *p);
 int compare_doors (const void *d0, const void *d1);
 struct door *door_at_pos (struct pos *p);
@@ -65,6 +65,7 @@ void open_door (int e);
 void close_door (int e);
 void compute_doors (void);
 int door_grid_tip_y (struct pos *p);
+void sample_doors (void);
 void draw_door (ALLEGRO_BITMAP *bitmap, struct pos *p);
 void draw_full_door (ALLEGRO_BITMAP *bitmap, struct pos *p);
 void draw_door_base (ALLEGRO_BITMAP *bitmap, struct pos *p);

@@ -32,7 +32,8 @@
 ALLEGRO_BITMAP *unpressed_closer_floor_base, *pressed_closer_floor_base,
   *pressed_closer_floor_right;
 
-ALLEGRO_SAMPLE *closer_floor_sound;
+ALLEGRO_SAMPLE *closer_floor_sample;
+bool sample_closer_floor;
 
 static struct closer_floor *closer_floor = NULL;
 static size_t closer_floor_nmemb = 0;
@@ -54,15 +55,15 @@ unload_closer_floor (void)
 }
 
 void
-load_closer_floor_sounds (void)
+load_closer_floor_samples (void)
 {
-  closer_floor_sound = load_sample (CLOSER_FLOOR_SOUND);
+  closer_floor_sample = load_sample (CLOSER_FLOOR_SAMPLE);
 }
 
 void
-unload_closer_floor_sounds (void)
+unload_closer_floor_samples (void)
 {
-  al_destroy_sample (closer_floor_sound);
+  al_destroy_sample (closer_floor_sample);
 }
 
 void
@@ -139,12 +140,19 @@ compute_closer_floors (void)
     }
     if (c->pressed) {
       if (! c->noise) {
-        play_sample (closer_floor_sound);
+        sample_closer_floor = true;
         c->noise = true;
       }
       close_door (c->event);
     } else c->noise = false;
   }
+}
+
+void
+sample_closer_floors (void)
+{
+  if (sample_closer_floor) play_sample (closer_floor_sample);
+  sample_closer_floor = false;
 }
 
 void

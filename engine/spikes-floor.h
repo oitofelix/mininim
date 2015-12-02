@@ -45,7 +45,7 @@
 #define VDUNGEON_SPIKES_05_FG "dat/vdungeon/spikes/frame05.png"
 
 /* sounds */
-#define SPIKES_SOUND "dat/digisnd2/spikes.ogg"
+#define SPIKES_SAMPLE "dat/digisnd2/spikes.ogg"
 
 /* types */
 struct spikes_floor {
@@ -55,14 +55,15 @@ struct spikes_floor {
 
 void load_vdungeon_spikes_floor (void);
 void unload_spikes_floor (void);
-void load_spikes_floor_sounds (void);
-void unload_spikes_floor_sounds (void);
+void load_spikes_floor_samples (void);
+void unload_spikes_floor_samples (void);
 void register_spikes_floor (struct pos *p);
 void sort_spikes_floors (void);
 int compare_spikes_floors (const void *s0, const void *s1);
 struct spikes_floor * spikes_floor_at_pos (struct pos *p);
 void break_spikes_floor (struct pos *p);
 void compute_spikes_floors (void);
+void sample_spikes_floors (void);
 bool should_spikes_raise_for_pos (struct pos *p, struct pos *pk);
 bool should_spikes_raise (struct pos *p);
 void draw_spikes_floor (ALLEGRO_BITMAP *bitmap, struct pos *p);

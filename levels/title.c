@@ -113,7 +113,7 @@ play_title (void)
   cutscene = true;
 
   title_load ();
-  play_anim (title_anim, NULL, 8);
+  play_anim (title_anim, NULL, NULL, 8);
   title_unload ();
 }
 

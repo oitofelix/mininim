@@ -212,18 +212,19 @@
 #define KID_SWORD_ATTACK_07 "dat/kid/sword attacking/frame07.png"
 
 /* sound resources */
-#define STEP "dat/digisnd1/running 2.ogg"
-#define HIT_GROUND "dat/digisnd1/running 1.ogg"
-#define HIT_WALL "dat/digisnd1/touching a wall.ogg"
-#define HANG_ON_FALL "dat/digisnd1/normal falling.ogg"
-#define DRINK "dat/digisnd3/drinking.ogg"
-#define GLORY "dat/midisnd1/guard death 1.ogg"
-#define TAKE_SWORD "dat/digisnd1/taking out the sword.ogg"
-#define SWORD_ATTACK "dat/digisnd1/sword moving.ogg"
+#define STEP_SAMPLE "dat/digisnd1/running 2.ogg"
+#define HIT_GROUND_SAMPLE "dat/digisnd1/running 1.ogg"
+#define HIT_WALL_SAMPLE "dat/digisnd1/touching a wall.ogg"
+#define HANG_ON_FALL_SAMPLE "dat/digisnd1/normal falling.ogg"
+#define DRINK_SAMPLE "dat/digisnd3/drinking.ogg"
+#define GLORY_SAMPLE "dat/midisnd1/guard death 1.ogg"
+#define TAKE_SWORD_SAMPLE "dat/digisnd1/taking out the sword.ogg"
+#define SWORD_ATTACK_SAMPLE "dat/digisnd1/sword moving.ogg"
 
 /* functions */
 void load_kid (void);
 void unload_kid (void);
+void sample_kid (void);
 bool is_kid_fall (struct frame *f);
 bool is_kid_hang_or_climb (struct frame *f);
 bool is_kid_climb (struct frame *f);

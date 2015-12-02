@@ -28,7 +28,7 @@
 #define VDUNGEON_PRESSED_CLOSER_FLOOR_RIGHT "dat/vdungeon/floor panels/closer right pressed.png"
 
 /* sounds */
-#define CLOSER_FLOOR_SOUND "dat/digisnd1/door tile pressed 1.ogg"
+#define CLOSER_FLOOR_SAMPLE "dat/digisnd1/door tile pressed 1.ogg"
 
 /* types */
 struct closer_floor {
@@ -41,8 +41,8 @@ struct closer_floor {
 
 void load_vdungeon_closer_floor (void);
 void unload_closer_floor (void);
-void load_closer_floor_sounds (void);
-void unload_closer_floor_sounds (void);
+void load_closer_floor_samples (void);
+void unload_closer_floor_samples (void);
 void register_closer_floor (struct pos *p);
 int compare_closer_floors (const void *c0, const void *c1);
 struct closer_floor * closer_floor_at_pos (struct pos *p);
@@ -50,6 +50,7 @@ void press_closer_floor (struct pos *p);
 void break_closer_floor (struct pos *p);
 void unpress_closer_floors (void);
 void compute_closer_floors (void);
+void sample_closer_floors (void);
 void draw_closer_floor (ALLEGRO_BITMAP *bitmap, struct pos *p);
 void draw_closer_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p);
 void draw_closer_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p);
