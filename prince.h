@@ -35,6 +35,8 @@
 #define PLACE_WIDTH (ORIGINAL_WIDTH / PLACES)
 #define PLACE_HEIGHT ((ORIGINAL_HEIGHT - 11) / FLOORS)
 
+#define BOTTOM_TEXT_DURATION 3
+
 #define EFFECT_HZ 30
 #define SECS_TO_VCYCLES(x) ((x) * EFFECT_HZ)
 #define TRANSPARENT (al_map_rgba (0, 0, 0, 0))

@@ -17,6 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#define _GNU_SOURCE
+
 #include <stdio.h>
 #include <error.h>
 
@@ -173,14 +175,28 @@ draw_text (ALLEGRO_BITMAP *bitmap, char const *text, float x, float y, int flags
 }
 
 void
-draw_bottom_text (char const *text)
+draw_bottom_text (char *text)
 {
-  al_draw_filled_rectangle (0, ORIGINAL_HEIGHT - 8,
-                            ORIGINAL_WIDTH, ORIGINAL_HEIGHT,
-                            al_map_rgba (0, 0, 0, 192));
-  draw_text (screen, text,
-             ORIGINAL_WIDTH / 2.0, ORIGINAL_HEIGHT - 7,
-             ALLEGRO_ALIGN_CENTRE);
+  static ALLEGRO_TIMER *timer = NULL;
+  static char *current_text = NULL;
+
+  if (! timer) timer = create_timer (1.0);
+
+  if (text) {
+    if (current_text) al_free (current_text);
+    asprintf (&current_text, "%s", text);
+    al_set_timer_count (timer, 0);
+    al_start_timer (timer);
+  } else if (al_get_timer_count (timer) >= BOTTOM_TEXT_DURATION)
+    al_stop_timer (timer);
+  else if (al_get_timer_started (timer)) {
+    al_draw_filled_rectangle (0, ORIGINAL_HEIGHT - 8,
+                              ORIGINAL_WIDTH, ORIGINAL_HEIGHT,
+                              al_map_rgba (0, 0, 0, 192));
+    draw_text (screen, current_text,
+               ORIGINAL_WIDTH / 2.0, ORIGINAL_HEIGHT - 7,
+               ALLEGRO_ALIGN_CENTRE);
+  }
 }
 
 ALLEGRO_BITMAP *

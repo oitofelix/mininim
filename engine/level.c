@@ -17,6 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#define _GNU_SOURCE
+
 #include <error.h>
 #include <stdio.h>
 
@@ -137,11 +139,9 @@ static void
 draw_level (void)
 {
   static int i = 0;
-
-  char text[ORIGINAL_WIDTH / 8 + 1];
+  char *text = NULL;
 
   int prev_room = room_view;
-  static bool show_coordinates = false;
 
   if (was_key_pressed (ALLEGRO_KEY_H, true))
     room_view = level->link[room_view].l;
@@ -154,9 +154,6 @@ draw_level (void)
 
   if (was_key_pressed (ALLEGRO_KEY_B, true))
     no_room_drawing = ! no_room_drawing;
-
-  if (was_key_pressed (ALLEGRO_KEY_C, true))
-    show_coordinates = ! show_coordinates;
 
   if (room_view == 0) room_view = prev_room;
 
@@ -205,7 +202,7 @@ draw_level (void)
   unpress_opener_floors ();
   unpress_closer_floors ();
 
-  if (show_coordinates) {
+  if (was_key_pressed (ALLEGRO_KEY_C, true)) {
     int s = room_view;
     int l = roomd (room_view, LEFT);
     int r = roomd (room_view, RIGHT);
@@ -216,10 +213,19 @@ draw_level (void)
     int bl = roomd (b, LEFT);
     int br = roomd (b, RIGHT);
 
-    sprintf (text, "S%i L%i R%i A%i B%i AL%i AR%i BL%i BR%i",
-             s, l, r, a, b, al, ar, bl, br);
+    asprintf (&text, "S%i L%i R%i A%i B%i AL%i AR%i BL%i BR%i",
+              s, l, r, a, b, al, ar, bl, br);
     draw_bottom_text (text);
+    al_free (text);
   }
+
+  if (was_key_pressed (ALLEGRO_KEY_V, true)) {
+    asprintf (&text, "%s", "MININIM 0.9");
+    draw_bottom_text (text);
+    al_free (text);
+  }
+
+  draw_bottom_text (NULL);
 
   i++;
 }
