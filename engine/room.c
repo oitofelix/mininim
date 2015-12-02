@@ -548,6 +548,7 @@ draw_room_fg (struct frame *f, struct pos *p)
              && (peq (p, prel (&fpmbo, &np, -1, 0))
                  || peq (p, prel (&pmbo, &np, -1, 0)))
              && ! (is_kid_hang_or_climb (f) && f->dir == LEFT)
+             && ! is_kid_fall (f)
              && floor_left_coord (p, &c)->y <= tl.y) {
     switch (con (p)->fg) {
     case NO_FLOOR: break;
