@@ -138,7 +138,7 @@ draw_level (void)
 {
   static int i = 0;
 
-  char bottom_message[ORIGINAL_WIDTH / 8 + 1];
+  char text[ORIGINAL_WIDTH / 8 + 1];
 
   int prev_room = room_view;
   static bool show_coordinates = false;
@@ -216,14 +216,9 @@ draw_level (void)
     int bl = roomd (b, LEFT);
     int br = roomd (b, RIGHT);
 
-    al_draw_filled_rectangle (0, ORIGINAL_HEIGHT - 8,
-                              ORIGINAL_WIDTH, ORIGINAL_HEIGHT,
-                              al_map_rgba (0, 0, 0, 192));
-    sprintf (bottom_message, "S%i L%i R%i A%i B%i AL%i AR%i BL%i BR%i",
+    sprintf (text, "S%i L%i R%i A%i B%i AL%i AR%i BL%i BR%i",
              s, l, r, a, b, al, ar, bl, br);
-    draw_text (screen, bottom_message,
-               ORIGINAL_WIDTH / 2.0, ORIGINAL_HEIGHT - 7,
-               ALLEGRO_ALIGN_CENTRE);
+    draw_bottom_text (text);
   }
 
   i++;

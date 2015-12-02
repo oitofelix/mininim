@@ -169,7 +169,18 @@ void
 draw_text (ALLEGRO_BITMAP *bitmap, char const *text, float x, float y, int flags)
 {
   al_set_target_bitmap (bitmap);
-  al_draw_text (builtin_font, al_map_rgb (255, 255, 255), x, y, flags, text);
+  al_draw_text (builtin_font, WHITE, x, y, flags, text);
+}
+
+void
+draw_bottom_text (char const *text)
+{
+  al_draw_filled_rectangle (0, ORIGINAL_HEIGHT - 8,
+                            ORIGINAL_WIDTH, ORIGINAL_HEIGHT,
+                            al_map_rgba (0, 0, 0, 192));
+  draw_text (screen, text,
+             ORIGINAL_WIDTH / 2.0, ORIGINAL_HEIGHT - 7,
+             ALLEGRO_ALIGN_CENTRE);
 }
 
 ALLEGRO_BITMAP *
