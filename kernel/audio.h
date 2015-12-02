@@ -30,4 +30,7 @@ void play_sample (ALLEGRO_SAMPLE *sample);
 bool is_playing_sample (void);
 double get_sample_position (void);
 
+/* variables */
+extern bool audio_enabled;
+
 #endif	/* FREEPOP_AUDIO_H */

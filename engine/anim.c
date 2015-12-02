@@ -68,10 +68,8 @@ play_anim (void (*draw_callback) (void),
         if (! cutscene) {
           struct coord bf; struct pos pbf, npbf;
           survey (_bf, pos, &kid.f, &bf, &pbf, &npbf);
-          if (a_key) kid.f.c.x--;
-          if (d_key) kid.f.c.x++;
-          if (w_key) kid.f.c.y--;
-          if (s_key) kid.f.c.y++;
+          if (delete_key) kid.f.c.x--;
+          if (page_down_key) kid.f.c.x++;
           int dn = dist_next_place (&kid.f, _bf, pos, 0, false);
           int dp = dist_next_place (&kid.f, _bf, pos, 0, true);
           int dc = dist_collision (&kid.f, _bf, pos, 0, false);

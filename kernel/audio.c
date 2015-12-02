@@ -26,6 +26,7 @@
 #include "audio.h"
 
 static ALLEGRO_SAMPLE_INSTANCE *sample_instance;
+bool audio_enabled = true;
 
 void
 init_audio (void)
@@ -56,6 +57,8 @@ load_sample (char *filename)
 void
 play_sample (ALLEGRO_SAMPLE *sample)
 {
+  if (! audio_enabled) return;
+
   sample_instance = al_create_sample_instance (sample);
   if (! sample_instance)
     error (-1, 0, "%s (%p): cannot create sample instance", __func__, sample);

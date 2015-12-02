@@ -47,11 +47,8 @@ static void draw_level (void);
 static void sample_level (void);
 static void compute_level (void);
 
-/* current level */
 struct level *level;
-
 static bool no_room_drawing = false;
-
 int room_view = 1;
 
 void
@@ -220,7 +217,14 @@ draw_level (void)
   }
 
   if (was_key_pressed (ALLEGRO_KEY_V, true)) {
-    asprintf (&text, "%s", "MININIM 0.9");
+    asprintf (&text, "MININIM 0.9");
+    draw_bottom_text (text);
+    al_free (text);
+  }
+
+  if (was_key_pressed (ALLEGRO_KEY_S, true)) {
+    audio_enabled = ! audio_enabled;
+    asprintf (&text, "SOUND %s", audio_enabled ? "ON" : "OFF");
     draw_bottom_text (text);
     al_free (text);
   }
