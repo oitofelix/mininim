@@ -417,7 +417,7 @@ load_kid (void)
   kid.action = kid_normal;
   update_depressible_floor (&kid, -4, -10);
 
-  place_kid (13, 0, 8);
+place_kid (1, 0, 0);
 }
 
 void
@@ -626,10 +626,20 @@ place_kid (int room, int floor, int place)
         if (con (&p)->fg == FLOOR
             || con (&p)->fg == BROKEN_FLOOR
             || con (&p)->fg == SKELETON_FLOOR
-            || con (&p)->fg == PILLAR
             || con (&p)->fg == DOOR) goto end;
 
+  enum confg tl = crel (&p, 0, -1)->fg;
+  enum confg tr = crel (&p, 0, +1)->fg;
+
  end:
+  if (kid.f.dir == LEFT
+      && tl == WALL
+      && tl == DOOR) kid.f.dir = RIGHT;
+
+  if (kid.f.dir == RIGHT
+      && tr == WALL
+      && tr == DOOR) kid.f.dir = LEFT;
+
   kid.f.c.room = p.room;
   kid.f.c.x = PLACE_WIDTH * p.place + 15;
   kid.f.c.y = PLACE_HEIGHT * p.floor + 15;
@@ -1222,22 +1232,14 @@ kid_run (void)
   int dx = run_frameset[i].dx;
   int dy = run_frameset[i].dy;
 
+  if (kid.f.b == start_run_frameset[5].frame) dx = -6;
+  if (kid.f.b == turn_run_frameset[8].frame) dx = -4;
+  if (kid.f.b == run_jump_frameset[10].frame) dx = -15;
+
   bool stop = ! ((kid.f.dir == RIGHT) ? right_key : left_key);
   bool couch = down_key;
   bool jump = ((kid.f.dir == RIGHT) && right_key && up_key)
     || ((kid.f.dir == LEFT) && left_key && up_key);
-
-  /* fall */
-  if (ctf == NO_FLOOR) {
-    kid_fall ();
-    i = 0; return;
-  }
-
-  /* collision */
-  if (is_colliding (&kid.f, _tf, pos, 0, false, -dx + 2)) {
-    kid_stabilize_collision ();
-    i = 0; return;
-  }
 
   if (couch) {
     kid_couch ();
@@ -1254,9 +1256,19 @@ kid_run (void)
     i = 0; return;
   }
 
-  if (kid.f.b == start_run_frameset[5].frame) dx = -6;
-  if (kid.f.b == turn_run_frameset[8].frame) dx = -4;
-  if (kid.f.b == run_jump_frameset[10].frame) dx = -15, play_sample (step);
+  /* fall */
+  if (ctf == NO_FLOOR) {
+    kid_fall ();
+    i = 0; return;
+  }
+
+  /* collision */
+  if (is_colliding (&kid.f, _tf, pos, 0, false, -dx + 2)) {
+    kid_stabilize_collision ();
+    i = 0; return;
+  }
+
+  if (kid.f.b == run_jump_frameset[10].frame) play_sample (step);
   if (i == 2 || i == 6) play_sample (step);
 
   next_frame (&kid.f, &kid.f, frame, dx, dy);
@@ -2127,11 +2139,11 @@ kid_couch (void)
   kid.f.flip = (kid.f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
   misstep = false;
 
-  struct coord nc; struct pos pbf, ptf, np;
+  struct coord nc; struct pos pbf, ptf, pm, np;
   enum confg ctf, cm, cbf;
   cbf = survey (_bf, pos, &kid.f, &nc, &pbf, &np)->fg;
   ctf = survey (_tf, pos, &kid.f, &nc, &ptf, &np)->fg;
-  cm = survey (_m, pos, &kid.f, &nc, &np, &np)->fg;
+  cm = survey (_m, pos, &kid.f, &nc, &pm, &np)->fg;
 
   static int i = 0;
   static int wait = 1;
@@ -2173,7 +2185,13 @@ kid_couch (void)
   }
 
   /* fall */
-  if (cm == NO_FLOOR && ! (fall && i == 0)) {
+  struct pos pr;
+  struct loose_floor *l =
+    loose_floor_at_pos (prel (&pm, &pr, -1, +0));
+
+  if ((cm == NO_FLOOR
+       || (l && l->action == FALL_LOOSE_FLOOR && cm == LOOSE_FLOOR))
+      && ! (fall && i == 0)) {
     if (collision) to_collision_edge (&kid.f, fall_frameset[0].frame,
                                       _tf, pos, 0, false, 0);
     kid_fall ();
@@ -2267,10 +2285,8 @@ kid_fall (void)
   kid.action = kid_fall;
   kid.f.flip = (kid.f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  struct coord nc; struct pos ptf, pbf, np;
-  enum confg cbf, cbb, ctf;
-  cbf = survey (_bf, pos, &kid.f, &nc, &pbf, &np)->fg;
-  cbb = survey (_bb, pos, &kid.f, &nc, &np, &np)->fg;
+  struct coord nc; struct pos ptf, pbf, pm, np;
+  enum confg cbf, cbb, ctf, cm;
 
   static int i = 0;
   static int force_floor = -2;
@@ -2280,6 +2296,22 @@ kid_fall (void)
   int dy = fall_frameset[i > 4 ? 4 : i].dy;
 
   int dir = (kid.f.dir == LEFT) ? -1 : +1;
+
+  ctf = survey (_tf, pos, &kid.f, &nc, &ptf, &np)->fg;
+
+  /* ensure kid's proximity for hang */
+  if (i == 0 && crel (&ptf, 0, dir)->fg != NO_FLOOR
+      && crel (&ptf, 0, dir)->fg != WALL
+      && oaction == kid_walk) {
+    to_next_place_edge (&kid.f, &kid.f, frame, _tf, pos, 0, false, 0);
+  } else if (ctf != NO_FLOOR) inertia = 0;
+  else {
+    if (oaction == kid_run_jump) dx = -16, dy= +12;
+    if (oaction == kid_jump) dx = -16, dy = +12;
+  }
+
+  cbf = survey (_bf, pos, &kid.f, &nc, &pbf, &np)->fg;
+  cbb = survey (_bb, pos, &kid.f, &nc, &np, &np)->fg;
 
   /* put kid in front of the floor */
   bool should_move_to_front = cbf == NO_FLOOR && cbb != NO_FLOOR;
@@ -2305,19 +2337,6 @@ kid_fall (void)
     kid.f.c.y += 6;
   }
 
-  ctf = survey (_tf, pos, &kid.f, &nc, &ptf, &np)->fg;
-
-  /* ensure kid's proximity for hang */
-  if (i == 0 && crel (&ptf, 0, dir)->fg != NO_FLOOR
-      && crel (&ptf, 0, dir)->fg != WALL
-      && oaction == kid_walk) {
-    to_next_place_edge (&kid.f, &kid.f, frame, _tf, pos, 0, false, 0);
-  } else if (ctf != NO_FLOOR) inertia = 0;
-  else {
-    if (oaction == kid_run_jump) dx = -16, dy= +12;
-    if (oaction == kid_jump) dx = -16, dy = +12;
-  }
-
   /* hang */
   if (i > 2 && can_hang (&kid.f) && shift_key && ! hang_limit) {
     play_sample (hang_on_fall);
@@ -2341,11 +2360,18 @@ kid_fall (void)
   enum confg cmbo;
   survey (_mbo, pos, &nf, &nc, &np, &npmbo_nf);
   cmbo = survey (_mbo, pos, &kid.f, &nc, &pmbo, &npmbo)->fg;
+  cm = survey (_m, pos, &kid.f, &nc, &pm, &np)->fg;
+
+  struct pos pr;
+  struct loose_floor *l =
+    loose_floor_at_pos (prel (&pm, &pr, -1, +0));
 
   if (i > 0
       && cmbo != NO_FLOOR
       && npmbo.floor != npmbo_nf.floor
-      && pmbo.floor != force_floor) {
+      && pmbo.floor != force_floor
+
+      && ! (l && l->action == FALL_LOOSE_FLOOR && cm == LOOSE_FLOOR)) {
     inertia = 0;
 
     kid.f.c.y = 63 * pbf.floor + 15;

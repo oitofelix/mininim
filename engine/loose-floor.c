@@ -297,6 +297,7 @@ compute_loose_floor_fall (struct loose_floor *l)
       l->f = nf;
       l->f.b = broken_floor;
       l->p = fpmbo_f;
+      l->i = 0;
       con (&fpmbo_f)->fg = NO_FLOOR;
       sort_loose_floors ();
       play_sample (broken_floor_sound);
