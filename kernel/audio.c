@@ -27,6 +27,7 @@
 
 static ALLEGRO_SAMPLE_INSTANCE *sample_instance;
 bool audio_enabled = true;
+float volume = 1.0;
 
 void
 init_audio (void)
@@ -55,16 +56,43 @@ load_sample (char *filename)
 }
 
 void
+enable_audio (bool b)
+{
+  ALLEGRO_MIXER *mixer = get_default_mixer ();
+
+  if (b) {
+    audio_enabled = true;
+    set_mixer_gain (mixer, volume);
+  }
+  else {
+    audio_enabled = false;
+    set_mixer_gain (mixer, 0);
+  }
+}
+
+void
+set_mixer_gain (ALLEGRO_MIXER *mixer, float new_gain)
+{
+  if (! al_set_mixer_gain (mixer, new_gain))
+    error (-1, 0, "%s (%p, %f): cannot set mixer gain", __func__, mixer, new_gain);
+}
+
+ALLEGRO_MIXER *
+get_default_mixer (void)
+{
+  ALLEGRO_MIXER *mixer = al_get_default_mixer ();
+  if (! mixer) error (-1, 0, "%s (void): default mixer not set", __func__);
+  return mixer;
+}
+
+void
 play_sample (ALLEGRO_SAMPLE *sample)
 {
-  if (! audio_enabled) return;
-
   sample_instance = al_create_sample_instance (sample);
   if (! sample_instance)
     error (-1, 0, "%s (%p): cannot create sample instance", __func__, sample);
 
-  ALLEGRO_MIXER *mixer = al_get_default_mixer ();
-  if (! mixer) error (-1, 0, "%s (%p): default mixer not set", __func__, sample);
+  ALLEGRO_MIXER *mixer = get_default_mixer ();
 
   if (! al_attach_sample_instance_to_mixer(sample_instance, mixer))
     error (-1, 0, "%s (%p): cannot attach sample instance to mixer (%p)",

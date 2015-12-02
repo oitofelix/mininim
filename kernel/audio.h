@@ -29,8 +29,12 @@ ALLEGRO_SAMPLE *load_sample (char *filename);
 void play_sample (ALLEGRO_SAMPLE *sample);
 bool is_playing_sample (void);
 double get_sample_position (void);
+void enable_audio (bool b);
+void set_mixer_gain (ALLEGRO_MIXER *mixer, float new_gain);
+ALLEGRO_MIXER *get_default_mixer (void);
 
 /* variables */
 extern bool audio_enabled;
+extern float volume;
 
 #endif	/* FREEPOP_AUDIO_H */

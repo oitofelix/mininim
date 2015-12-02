@@ -224,6 +224,7 @@ draw_level (void)
 
   if (was_key_pressed (ALLEGRO_KEY_S, true)) {
     audio_enabled = ! audio_enabled;
+    enable_audio (audio_enabled);
     asprintf (&text, "SOUND %s", audio_enabled ? "ON" : "OFF");
     draw_bottom_text (text);
     al_free (text);
