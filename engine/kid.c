@@ -1821,10 +1821,6 @@ kid_hang (void)
   misstep = false;
   inertia = 0;
 
-  struct coord nc; struct pos np;
-  enum confg cmf;
-  cmf = survey (_mf, pos, &kid.f, &nc, &np, &np)->fg;
-
   static int i = 0;
 
   kid.f.b = kid_hang_14;
@@ -1834,16 +1830,17 @@ kid_hang (void)
 
   critical_edge = (con (&hang_pos)->fg == NO_FLOOR);
 
+  dir = (kid.f.dir == LEFT) ? -1 : +1;
+  enum confg t = crel (&hang_pos, 0, dir)->fg;
+
   if (i == 0 && oaction != kid_unclimb)
     next_frame (&kid.f, &kid.f, kid_hang_14, +0, +0);
-  else if (cmf == WALL
-           || (cmf == DOOR
-               && kid.f.dir == LEFT)) kid_hang_wall ();
+  else if (t == WALL || (t == DOOR && kid.f.dir == LEFT))
+    kid_hang_wall ();
   else kid_hang_free ();
 
   /* depressible floors */
   clear_depressible_floor (&kid);
-  dir = (kid.f.dir == LEFT) ? -1 : +1;
   struct pos hanged_con_pos;
   prel (&hang_pos, &hanged_con_pos, -1, dir);
   press_depressible_floor (&hanged_con_pos);
