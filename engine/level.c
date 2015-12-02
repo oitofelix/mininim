@@ -177,8 +177,8 @@ draw_level (void)
   prel (&pml, &pmlr, 0, +1);
   prel (&pml, &pmlra, -1, +1);
 
-  draw_frame (screen, &kid.f);
   draw_xframe (screen, &kid);
+  draw_frame (screen, &kid.f);
   draw_falling_loose_floor (screen, &pmlr);
   draw_falling_loose_floor (screen, &pmlra);
   draw_room_anim_fg (&kid);

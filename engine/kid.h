@@ -201,6 +201,8 @@
 #define KID_SWORD_WALKF_15 "dat/kid/sword attacking/frame15.png"
 #define KID_SWORD_WALKB_10 "dat/kid/sword attacking/frame10.png"
 #define KID_SWORD_WALKB_07 "dat/kid/sword attacking/frame07.png"
+#define KID_SWORD_DEFENSE_18 "dat/kid/sword attacking/frame18.png"
+#define KID_SWORD_DEFENSE_11 "dat/kid/sword attacking/frame11.png"
 
 /* sound resources */
 #define STEP "dat/digisnd1/running 2.ogg"
