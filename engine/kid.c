@@ -65,6 +65,7 @@ static bool keep_sword_fast = false;
 #define SWORD_WALKF_FRAMESET_NMEMB 2
 #define SWORD_WALKB_FRAMESET_NMEMB 2
 #define SWORD_DEFENSE_FRAMESET_NMEMB 2
+#define SWORD_ATTACK_FRAMESET_NMEMB 7
 
 static struct frameset walk_frameset[WALK_FRAMESET_NMEMB];
 static struct frameset start_run_frameset[START_RUN_FRAMESET_NMEMB];
@@ -88,6 +89,7 @@ static struct frameset take_sword_frameset[TAKE_SWORD_FRAMESET_NMEMB];
 static struct frameset sword_walkf_frameset[SWORD_WALKF_FRAMESET_NMEMB];
 static struct frameset sword_walkb_frameset[SWORD_WALKB_FRAMESET_NMEMB];
 static struct frameset sword_defense_frameset[SWORD_DEFENSE_FRAMESET_NMEMB];
+static struct frameset sword_attack_frameset[SWORD_ATTACK_FRAMESET_NMEMB];
 
 static void init_walk_frameset (void);
 static void init_start_run_frameset (void);
@@ -111,6 +113,7 @@ static void init_take_sword_frameset (void);
 static void init_sword_walkf_frameset (void);
 static void init_sword_walkb_frameset (void);
 static void init_sword_defense_frameset (void);
+static void init_sword_attack_frameset (void);
 
 ALLEGRO_BITMAP *kid_normal_00,
   *kid_start_run_01, *kid_start_run_02, *kid_start_run_03, *kid_start_run_04,
@@ -161,10 +164,13 @@ ALLEGRO_BITMAP *kid_normal_00,
   *kid_sword_normal_08,
   *kid_sword_walkf_14, *kid_sword_walkf_15,
   *kid_sword_walkb_10, *kid_sword_walkb_07,
-  *kid_sword_defense_18, *kid_sword_defense_11;
+  *kid_sword_defense_18, *kid_sword_defense_11,
+  *kid_sword_attack_01, *kid_sword_attack_02, *kid_sword_attack_03,
+  *kid_sword_attack_04, *kid_sword_attack_05, *kid_sword_attack_06,
+  *kid_sword_attack_07;
 
 ALLEGRO_SAMPLE *step, *hit_ground, *hit_wall, *hang_on_fall, *drink,
-  *glory, *take_sword;
+  *glory, *take_sword, *sword_attack;
 
 static void place_kid (int room, int floor, int place);
 
@@ -197,6 +203,7 @@ static void kid_sword_normal (void);
 static void kid_sword_walkf (void);
 static void kid_sword_walkb (void);
 static void kid_sword_defense (void);
+static void kid_sword_attack (void);
 
 void
 load_kid (void)
@@ -384,6 +391,13 @@ load_kid (void)
   kid_sword_walkb_07 = load_bitmap (KID_SWORD_WALKB_07);
   kid_sword_defense_18 = load_bitmap (KID_SWORD_DEFENSE_18);
   kid_sword_defense_11 = load_bitmap (KID_SWORD_DEFENSE_11);
+  kid_sword_attack_01 = load_bitmap (KID_SWORD_ATTACK_01);
+  kid_sword_attack_02 = load_bitmap (KID_SWORD_ATTACK_02);
+  kid_sword_attack_03 = load_bitmap (KID_SWORD_ATTACK_03);
+  kid_sword_attack_04 = load_bitmap (KID_SWORD_ATTACK_04);
+  kid_sword_attack_05 = load_bitmap (KID_SWORD_ATTACK_05);
+  kid_sword_attack_06 = load_bitmap (KID_SWORD_ATTACK_06);
+  kid_sword_attack_07 = load_bitmap (KID_SWORD_ATTACK_07);
 
   /* sound */
   step = load_sample (STEP);
@@ -393,6 +407,7 @@ load_kid (void)
   drink = load_sample (DRINK);
   glory = load_sample (GLORY);
   take_sword = load_sample (TAKE_SWORD);
+  sword_attack = load_sample (SWORD_ATTACK);
 
   /* framesets */
   init_walk_frameset ();
@@ -417,6 +432,7 @@ load_kid (void)
   init_sword_walkf_frameset ();
   init_sword_walkb_frameset ();
   init_sword_defense_frameset ();
+  init_sword_attack_frameset ();
 
   /* kid himself */
   kid.f.id = &kid;
@@ -614,6 +630,13 @@ unload_kid (void)
   al_destroy_bitmap (kid_sword_walkb_07);
   al_destroy_bitmap (kid_sword_defense_18);
   al_destroy_bitmap (kid_sword_defense_11);
+  al_destroy_bitmap (kid_sword_attack_01);
+  al_destroy_bitmap (kid_sword_attack_02);
+  al_destroy_bitmap (kid_sword_attack_03);
+  al_destroy_bitmap (kid_sword_attack_04);
+  al_destroy_bitmap (kid_sword_attack_05);
+  al_destroy_bitmap (kid_sword_attack_06);
+  al_destroy_bitmap (kid_sword_attack_07);
 
   /* sounds */
   al_destroy_sample (step);
@@ -928,6 +951,19 @@ init_sword_defense_frameset (void)
 
   memcpy (&sword_defense_frameset, &frameset,
           SWORD_DEFENSE_FRAMESET_NMEMB * sizeof (struct frameset));
+}
+
+void
+init_sword_attack_frameset (void)
+{
+  struct frameset frameset[SWORD_ATTACK_FRAMESET_NMEMB] =
+    {{kid_sword_attack_01,+1,0},{kid_sword_attack_02,-8,0},
+     {kid_sword_attack_03,-8,0},{kid_sword_attack_04,-9,0},
+     {kid_sword_attack_05,+8,0},{kid_sword_attack_06,+8,0},
+     {kid_sword_attack_07,+8,0}};
+
+  memcpy (&sword_attack_frameset, &frameset,
+          SWORD_ATTACK_FRAMESET_NMEMB * sizeof (struct frameset));
 }
 
 
@@ -2644,6 +2680,7 @@ kid_sword_normal (void)
 
   bool keep_sword = down_key;
   bool defense = up_key;
+  bool attack = shift_key;
   bool walkf = ((kid.f.dir == RIGHT) && right_key)
     || ((kid.f.dir == LEFT) && left_key);
   bool walkb = ((kid.f.dir == RIGHT) && left_key)
@@ -2656,6 +2693,9 @@ kid_sword_normal (void)
       return;
     } else if (defense) {
       kid_sword_defense ();
+      return;
+    } else if (attack) {
+      kid_sword_attack ();
       return;
     } else if (walkf) {
       kid_sword_walkf ();
@@ -2761,6 +2801,7 @@ kid_sword_walkb (void)
 
   static int i = 0, j = 0;
   if (oaction != kid_sword_walkb) i = 0;
+  if (kid.f.b == sword_attack_frameset[5].frame) i = 1;
 
   if (i == 0) j = 10;
   if (i == 1) j = 17;
@@ -2841,6 +2882,69 @@ kid_sword_defense (void)
 
   /* next frame */
   if (i < 1) i++;
+  else {
+    kid.action = kid_sword_normal;
+    i = 0;
+  }
+}
+
+
+void
+kid_sword_attack (void)
+{
+  void (*oaction) (void) = kid.action;
+  kid.action = kid_sword_attack;
+  kid.f.flip = (kid.f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
+
+  struct coord nc; struct pos np;
+  enum confg cbf, cmbo, cbb;
+  cbf = survey (_bf, pos, &kid.f, &nc, &np, &np)->fg;
+  cmbo = survey (_mbo, pos, &kid.f, &nc, &np, &np)->fg;
+  cbb = survey (_bb, pos, &kid.f, &nc, &np, &np)->fg;
+
+  static int i = 0, j = 0;
+  if (oaction != kid_sword_attack) i = 0;
+
+  if (i == 0) j = 1;
+  if (i == 2 || i == 3) j = 19;
+  if (i == 4 || i == 6) j = 17;
+  if (i == 5) j = 7;
+  kid.xframe = sword_frameset[j].frame;
+  kid.xdx = sword_frameset[j].dx;
+  kid.xdy = sword_frameset[j].dy;
+  if (i == 1) kid.xframe = NULL;
+  if (i == 3) kid.xdx = -21, kid.xdy = +7;
+  if (i == 4) kid.xdx = -7, kid.xdy = +17;
+
+  ALLEGRO_BITMAP *frame = sword_attack_frameset[i].frame;
+  int dx = sword_attack_frameset[i].dx;
+  int dy = sword_attack_frameset[i].dy;
+
+  /* fall */
+  if (cbf == NO_FLOOR || cmbo == NO_FLOOR || cbb == NO_FLOOR) {
+    kid_fall ();
+    kid.xframe = NULL;
+    return;
+  }
+
+  /* collision */
+  if (is_colliding (&kid.f, _bb, pos, 0, true, dx))
+    to_collision_edge (&kid.f, frame, _bb, pos, 0, true, dx + 4);
+
+  next_frame (&kid.f, &kid.f, frame, dx, dy);
+
+  /* sound */
+  if (i == 3) play_sample (sword_attack);
+
+  /* depressible floors */
+  if (i == 2) update_depressible_floor (&kid, -8, -40);
+  else if (i == 3) update_depressible_floor (&kid, -11, -47);
+  else if (i == 5) update_depressible_floor (&kid, -4, -33);
+  else if (i == 6) update_depressible_floor (&kid, -1, -24);
+  else keep_depressible_floor (&kid);
+
+  /* next frame */
+  if (i < 6) i++;
   else {
     kid.action = kid_sword_normal;
     i = 0;

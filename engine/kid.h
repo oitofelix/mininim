@@ -203,6 +203,13 @@
 #define KID_SWORD_WALKB_07 "dat/kid/sword attacking/frame07.png"
 #define KID_SWORD_DEFENSE_18 "dat/kid/sword attacking/frame18.png"
 #define KID_SWORD_DEFENSE_11 "dat/kid/sword attacking/frame11.png"
+#define KID_SWORD_ATTACK_01 "dat/kid/sword attacking/frame01.png"
+#define KID_SWORD_ATTACK_02 "dat/kid/sword attacking/frame02.png"
+#define KID_SWORD_ATTACK_03 "dat/kid/sword attacking/frame03.png"
+#define KID_SWORD_ATTACK_04 "dat/kid/sword attacking/frame04.png"
+#define KID_SWORD_ATTACK_05 "dat/kid/sword attacking/frame05.png"
+#define KID_SWORD_ATTACK_06 "dat/kid/sword attacking/frame06.png"
+#define KID_SWORD_ATTACK_07 "dat/kid/sword attacking/frame07.png"
 
 /* sound resources */
 #define STEP "dat/digisnd1/running 2.ogg"
@@ -212,6 +219,7 @@
 #define DRINK "dat/digisnd3/drinking.ogg"
 #define GLORY "dat/midisnd1/guard death 1.ogg"
 #define TAKE_SWORD "dat/digisnd1/taking out the sword.ogg"
+#define SWORD_ATTACK "dat/digisnd1/sword moving.ogg"
 
 /* functions */
 void load_kid (void);
