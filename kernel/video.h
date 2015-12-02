@@ -62,7 +62,7 @@ void draw_bitmap_region (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
                          float sx, float sy, float sw, float sh,
                          float dx, float dy, int flags);
 void draw_text (ALLEGRO_BITMAP *bitmap, char const *text, float x, float y, int flags);
-void draw_bottom_text (char *text);
+void draw_bottom_text (ALLEGRO_BITMAP *bitmap, char *text);
 void acknowledge_resize (void);
 void draw_fade (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to, float factor);
 void draw_roll_right (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
@@ -79,5 +79,6 @@ extern ALLEGRO_BITMAP *screen;
 extern ALLEGRO_TIMER *video_timer;
 extern ALLEGRO_BITMAP *flick_bg_0, *flick_bg_1;
 extern struct video_effect video_effect;
+extern int screen_flags;
 
 #endif	/* FREEPOP_VIDEO_H */

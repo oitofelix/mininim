@@ -212,13 +212,13 @@ draw_level (void)
 
     asprintf (&text, "S%i L%i R%i A%i B%i AL%i AR%i BL%i BR%i",
               s, l, r, a, b, al, ar, bl, br);
-    draw_bottom_text (text);
+    draw_bottom_text (NULL, text);
     al_free (text);
   }
 
   if (was_key_pressed (ALLEGRO_KEY_V, true)) {
     asprintf (&text, "MININIM 0.9");
-    draw_bottom_text (text);
+    draw_bottom_text (NULL, text);
     al_free (text);
   }
 
@@ -226,11 +226,30 @@ draw_level (void)
     audio_enabled = ! audio_enabled;
     enable_audio (audio_enabled);
     asprintf (&text, "SOUND %s", audio_enabled ? "ON" : "OFF");
-    draw_bottom_text (text);
+    draw_bottom_text (NULL, text);
     al_free (text);
   }
 
-  draw_bottom_text (NULL);
+  if (was_key_pressed (ALLEGRO_KEY_I, true)) {
+    char *flip = "NONE";
+    switch (screen_flags) {
+    case 0:
+      screen_flags = ALLEGRO_FLIP_VERTICAL;
+      flip = "VERTICAL"; break;
+    case ALLEGRO_FLIP_VERTICAL:
+      screen_flags = ALLEGRO_FLIP_HORIZONTAL;
+      flip = "HORIZONTAL"; break;
+    case ALLEGRO_FLIP_HORIZONTAL:
+      screen_flags = ALLEGRO_FLIP_VERTICAL | ALLEGRO_FLIP_HORIZONTAL;
+      flip = "VERTICAL + HORIZONTAL"; break;
+    case ALLEGRO_FLIP_VERTICAL | ALLEGRO_FLIP_HORIZONTAL:
+      screen_flags = 0;
+      break;
+    }
+    asprintf (&text, "DISPLAY FLIP: %s", flip);
+    draw_bottom_text (NULL, text);
+    al_free (text);
+  }
 
   i++;
 }

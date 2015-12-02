@@ -30,6 +30,8 @@ ALLEGRO_DISPLAY *display;
 ALLEGRO_BITMAP *screen;
 ALLEGRO_BITMAP *flick_bg_0, *flick_bg_1;
 ALLEGRO_TIMER *video_timer;
+int screen_flags = 0;
+static ALLEGRO_BITMAP *flipped_screen;
 static ALLEGRO_BITMAP *effect_buffer;
 static ALLEGRO_BITMAP *memory_bitmap;
 struct video_effect video_effect = {.type = VIDEO_NO_EFFECT};
@@ -49,6 +51,7 @@ init_video (void)
   if (! display) error (-1, 0, "%s (void): failed to initialize display", __func__);
 
   screen = create_bitmap (ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
+  flipped_screen = create_bitmap (ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
   effect_buffer = create_bitmap (ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
 
   int flags = al_get_new_bitmap_flags ();
@@ -72,6 +75,7 @@ void
 finalize_video (void)
 {
   al_destroy_bitmap (screen);
+  al_destroy_bitmap (flipped_screen);
   al_destroy_bitmap (effect_buffer);
   al_destroy_bitmap (memory_bitmap);
   al_destroy_font (builtin_font);
@@ -175,7 +179,7 @@ draw_text (ALLEGRO_BITMAP *bitmap, char const *text, float x, float y, int flags
 }
 
 void
-draw_bottom_text (char *text)
+draw_bottom_text (ALLEGRO_BITMAP *bitmap, char *text)
 {
   static ALLEGRO_TIMER *timer = NULL;
   static char *current_text = NULL;
@@ -190,10 +194,11 @@ draw_bottom_text (char *text)
   } else if (al_get_timer_count (timer) >= BOTTOM_TEXT_DURATION)
     al_stop_timer (timer);
   else if (al_get_timer_started (timer)) {
+    al_set_target_bitmap (bitmap);
     al_draw_filled_rectangle (0, ORIGINAL_HEIGHT - 8,
                               ORIGINAL_WIDTH, ORIGINAL_HEIGHT,
                               al_map_rgba (0, 0, 0, 192));
-    draw_text (screen, current_text,
+    draw_text (bitmap, current_text,
                ORIGINAL_WIDTH / 2.0, ORIGINAL_HEIGHT - 7,
                ALLEGRO_ALIGN_CENTRE);
   }
@@ -214,8 +219,18 @@ flip_display (ALLEGRO_BITMAP *bitmap)
   int w = al_get_display_width (display);
   int h = al_get_display_height (display);
 
+  ALLEGRO_BITMAP *source = bitmap;
+
+  if (screen_flags) {
+    al_set_target_bitmap (flipped_screen);
+    al_draw_bitmap (source, 0, 0, screen_flags);
+    source = flipped_screen;
+  }
+
+  draw_bottom_text (source, NULL);
+
   al_set_target_backbuffer (display);
-  al_draw_scaled_bitmap (bitmap, 0, 0, ORIGINAL_WIDTH, ORIGINAL_HEIGHT,
+  al_draw_scaled_bitmap (source, 0, 0, ORIGINAL_WIDTH, ORIGINAL_HEIGHT,
                          0, 0, w, h, 0);
   al_flip_display ();
 }
