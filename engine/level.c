@@ -41,7 +41,8 @@
 /* functions */
 static void load_level (void);
 static void unload_level (void);
-static void level_anim (void);
+static void draw_level (void);
+static void compute_level (void);
 
 /* current level */
 struct level *level;
@@ -62,7 +63,7 @@ play_level (struct level *_level)
   load_level ();
 
   register_cons ();
-  play_anim (level_anim, 12);
+  play_anim (draw_level, compute_level, 12);
 
   unload_level ();
 }
@@ -105,7 +106,23 @@ unload_level (void)
 }
 
 static void
-level_anim (void)
+compute_level (void)
+{
+  int prev_room = kid.f.c.room;
+  kid.action ();
+  if (prev_room != kid.f.c.room)  {
+    room_view = kid.f.c.room;
+    make_links_locally_consistent (prev_room, room_view);
+  }
+  compute_loose_floors ();
+  compute_opener_floors ();
+  compute_closer_floors ();
+  compute_spikes_floors ();
+  compute_doors ();
+}
+
+static void
+draw_level (void)
 {
   static int i = 0;
 
@@ -130,19 +147,6 @@ level_anim (void)
     show_coordinates = ! show_coordinates;
 
   if (room_view == 0) room_view = prev_room;
-
-  /* computation */
-  prev_room = kid.f.c.room;
-  kid.action ();
-  if (prev_room != kid.f.c.room)  {
-    room_view = kid.f.c.room;
-    make_links_locally_consistent (prev_room, room_view);
-  }
-  compute_loose_floors ();
-  compute_opener_floors ();
-  compute_closer_floors ();
-  compute_spikes_floors ();
-  compute_doors ();
 
   /* drawing */
   struct pos p;

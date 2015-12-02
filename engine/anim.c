@@ -36,7 +36,9 @@ bool cutscene = false;
 bool next_frame_inv = false; /* invert next_anim offset interpretation  */
 
 void
-play_anim (void (*callback) (void), int freq)
+play_anim (void (*draw_callback) (void),
+           void (*compute_callback) (void),
+           int freq)
 {
   quit_anim = false;
 
@@ -61,11 +63,10 @@ play_anim (void (*callback) (void), int freq)
         if (was_key_pressed (ALLEGRO_KEY_P, true))
           pause_anim = false;
 
-        struct coord bf; struct pos pbf, npbf;
-        survey (_bf, pos, &kid.f, &bf, &pbf, &npbf);
-
         /* begin kid hack */
         if (! cutscene) {
+          struct coord bf; struct pos pbf, npbf;
+          survey (_bf, pos, &kid.f, &bf, &pbf, &npbf);
           if (a_key) kid.f.c.x--;
           if (d_key) kid.f.c.x++;
           if (w_key) kid.f.c.y--;
@@ -85,8 +86,10 @@ f = %i, p = %i, dn = %i, dp = %i, dc = %i, df = %i, dl = %i, dd = %i\n",
 
         if (! pause_anim
             || (pause_anim &&
-                was_key_pressed (ALLEGRO_KEY_ESCAPE, true)))
-          (*callback) ();
+                was_key_pressed (ALLEGRO_KEY_ESCAPE, true))) {
+          draw_callback ();
+          if (compute_callback) compute_callback ();
+        }
         if (! is_video_effect_started ()) show ();
         drop_all_events_from_source
           (event_queue, get_timer_event_source (timer));
