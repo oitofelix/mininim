@@ -24,9 +24,9 @@
 #include "kernel/keyboard.h"
 #include "pos.h"
 #include "physics.h"
-#include "kid.h"
 #include "level.h"
 #include "room.h"
+#include "kid/kid.h"
 #include "anim.h"
 
 /* set to true to quit animation */
@@ -155,6 +155,21 @@ xframe_frame (struct anim *a, struct frame *f)
   f->b = a->xframe;
   xframe_coord (a, &f->c);
   return f;
+}
+
+void
+select_frame (struct anim *a, struct frameset *fs, int i)
+{
+  a->fo.b = fs[i].frame;
+  a->fo.dx += fs[i].dx;
+  a->fo.dy += fs[i].dy;
+  a->i = i;
+}
+
+void
+next_frame_fo (struct frame *f, struct frame *nf, struct frame_offset *fo)
+{
+  next_frame (f, nf, fo->b, fo->dx, fo->dy);
 }
 
 struct frame *

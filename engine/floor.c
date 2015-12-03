@@ -23,7 +23,7 @@
 #include "kernel/audio.h"
 #include "kernel/random.h"
 #include "physics.h"
-#include "kid.h"
+#include "kid/kid.h"
 #include "pillar.h"
 #include "wall.h"
 #include "level.h"

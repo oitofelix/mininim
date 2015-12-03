@@ -24,7 +24,7 @@
 #include "kernel/array.h"
 #include "anim.h"
 #include "physics.h"
-#include "kid.h"
+#include "kid/kid.h"
 #include "room.h"
 #include "floor.h"
 #include "loose-floor.h"

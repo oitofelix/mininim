@@ -24,7 +24,7 @@
 #include "physics.h"
 #include "room.h"
 #include "floor.h"
-#include "kid.h"
+#include "kid/kid.h"
 #include "door.h"
 #include "floor.h"
 #include "closer-floor.h"

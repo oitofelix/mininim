@@ -75,6 +75,8 @@ enum dir {
   LEFT, RIGHT, ABOVE, BELOW
 };
 
+typedef void (*ACTION) (void);
+
 struct anim {
   struct frame {
     void *id;
@@ -83,8 +85,17 @@ struct anim {
     enum dir dir;
     int flip;
   } f;
-  int repeat;
-  void (*action) (void);
+
+  struct frame_offset {
+    ALLEGRO_BITMAP *b;
+    int dx, dy;
+  } fo;
+
+  ACTION oaction;
+  ACTION action;
+  int i, wait, repeat;
+  bool collision, fall;
+  int cinertia;
 
   /* depressible floor */
   struct pos df_pos[2];

@@ -26,7 +26,7 @@
 #include "kernel/random.h"
 #include "physics.h"
 #include "level.h"
-#include "kid.h"
+#include "kid/kid.h"
 #include "floor.h"
 #include "loose-floor.h"
 #include "opener-floor.h"

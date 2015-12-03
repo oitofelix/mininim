@@ -33,6 +33,10 @@ struct coord *xframe_coord (struct anim *a, struct coord *c);
 struct frame *xframe_frame (struct anim *a, struct frame *f);
 struct frame *next_frame (struct frame *f, struct frame *nf,
                           ALLEGRO_BITMAP *b, int dx, int dy);
+void next_frame_fo (struct frame *f, struct frame *nf,
+                    struct frame_offset *fo);
+void select_frame (struct anim *a, struct frameset *fs, int i);
+
 bool wait_anim (int cycles);
 
 /* variables */

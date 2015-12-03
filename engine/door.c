@@ -24,7 +24,7 @@
 #include "anim.h"
 #include "room.h"
 #include "floor.h"
-#include "kid.h"
+#include "kid/kid.h"
 #include "level.h"
 #include "door.h"
 

@@ -31,7 +31,7 @@
 #include "fire.h"
 #include "potion.h"
 #include "sword.h"
-#include "kid.h"
+#include "kid/kid.h"
 #include "loose-floor.h"
 #include "opener-floor.h"
 #include "closer-floor.h"

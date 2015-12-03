@@ -227,6 +227,16 @@
 void load_kid (void);
 void unload_kid (void);
 void sample_kid (void);
+
+void kid_normal (void);
+void kid_climb (void);
+void kid_fall (void);
+void kid_unclimb (void);
+void kid_turn (void);
+void kid_vjump (void);
+void kid_drink (void);
+void kid_raise_sword (void);
+
 bool is_kid_fall (struct frame *f);
 bool is_kid_hang_or_climb (struct frame *f);
 bool is_kid_climb (struct frame *f);
@@ -235,14 +245,75 @@ bool is_kid_turn (struct frame *f);
 bool is_kid_hanging_at_pos (struct frame *f, struct pos *p);
 void draw_kid_lives (ALLEGRO_BITMAP *bitmap, int j);
 
-void kid_turn (void);
-void kid_vjump (void);
-
 /* variables */
 extern struct anim kid; /* kid animation object */
+
+#define FALL_FRAMESET_NMEMB 13
+
+extern struct frameset fall_frameset[FALL_FRAMESET_NMEMB];
 
 extern ALLEGRO_BITMAP *kid_climb_03, *kid_climb_04,
   *kid_climb_05, *kid_climb_06, *kid_climb_07, *kid_climb_08,
   *kid_climb_09, *kid_climb_10;
+
+extern bool misstep, uncouch_slowly, critical_edge;
+
+extern int inertia;
+
+extern struct pos item_pos;
+
+extern ALLEGRO_BITMAP *kid_full_life, *kid_empty_life, *kid_normal_00,
+  *kid_start_run_01, *kid_start_run_02, *kid_start_run_03, *kid_start_run_04,
+  *kid_start_run_05, *kid_start_run_06, *kid_run_07,
+  *kid_run_08, *kid_run_09, *kid_run_10, *kid_run_11,
+  *kid_run_12, *kid_run_13, *kid_run_14,
+  *kid_turn_01, *kid_turn_02, *kid_turn_03, *kid_turn_04,
+  *kid_stabilize_05, *kid_stabilize_06, *kid_stabilize_07, *kid_stabilize_08,
+  *kid_stop_run_01, *kid_stop_run_02, *kid_stop_run_03, *kid_stop_run_04,
+  *kid_turn_run_05, *kid_turn_run_06, *kid_turn_run_07, *kid_turn_run_08,
+  *kid_turn_run_09, *kid_turn_run_10, *kid_turn_run_11, *kid_turn_run_12,
+  *kid_turn_run_13,
+  *kid_walk_01, *kid_walk_02, *kid_walk_03, *kid_walk_04, *kid_walk_05,
+  *kid_walk_06, *kid_walk_07, *kid_walk_08, *kid_walk_09, *kid_walk_10,
+  *kid_walk_11, *kid_walk_12,
+  *kid_jump_01, *kid_jump_02, *kid_jump_03, *kid_jump_04, *kid_jump_05, *kid_jump_06,
+  *kid_jump_07, *kid_jump_08, *kid_jump_09, *kid_jump_10, *kid_jump_11, *kid_jump_12,
+  *kid_jump_13, *kid_jump_14, *kid_jump_15, *kid_jump_16, *kid_jump_17, *kid_jump_18,
+  *kid_fall_13, *kid_fall_14, *kid_fall_15, *kid_fall_16, *kid_fall_17,
+  *kid_vjump_01, *kid_vjump_02, *kid_vjump_03, *kid_vjump_04, *kid_vjump_05,
+  *kid_vjump_06, *kid_vjump_07, *kid_vjump_08, *kid_vjump_09, *kid_vjump_10,
+  *kid_vjump_11, *kid_vjump_12, *kid_vjump_13, *kid_vjump_15, *kid_vjump_16,
+  *kid_vjump_17, *kid_vjump_18, *kid_vjump_19,
+  *kid_hang_00, *kid_hang_01, *kid_hang_02, *kid_hang_03,
+  *kid_hang_04, *kid_hang_05, *kid_hang_06, *kid_hang_07,
+  *kid_hang_08, *kid_hang_09, *kid_hang_10, *kid_hang_11,
+  *kid_hang_12, *kid_hang_14,
+  *kid_climb_01, *kid_climb_02, *kid_climb_03, *kid_climb_04,
+  *kid_climb_05, *kid_climb_06, *kid_climb_07, *kid_climb_08,
+  *kid_climb_09, *kid_climb_10, *kid_climb_11, *kid_climb_12,
+  *kid_climb_13, *kid_climb_14, *kid_climb_15,
+  *kid_run_jump_01, *kid_run_jump_02, *kid_run_jump_03,
+  *kid_run_jump_04, *kid_run_jump_05, *kid_run_jump_06,
+  *kid_run_jump_07, *kid_run_jump_08, *kid_run_jump_09,
+  *kid_run_jump_10, *kid_run_jump_11,
+  *kid_drink_01, *kid_drink_02, *kid_drink_03, *kid_drink_04, *kid_drink_05,
+  *kid_drink_06, *kid_drink_07, *kid_drink_08, *kid_drink_09, *kid_drink_10,
+  *kid_drink_11, *kid_drink_12, *kid_drink_13, *kid_drink_14, *kid_drink_15,
+  *kid_raise_sword_01, *kid_raise_sword_02, *kid_raise_sword_03, *kid_raise_sword_04,
+  *kid_keep_sword_01, *kid_keep_sword_02, *kid_keep_sword_03, *kid_keep_sword_04,
+  *kid_keep_sword_05, *kid_keep_sword_06, *kid_keep_sword_07, *kid_keep_sword_08,
+  *kid_keep_sword_09, *kid_keep_sword_10,
+  *kid_take_sword_01, *kid_take_sword_02, *kid_take_sword_03, *kid_take_sword_04,
+  *kid_sword_normal_08,
+  *kid_sword_walkf_14, *kid_sword_walkf_15,
+  *kid_sword_walkb_10, *kid_sword_walkb_07,
+  *kid_sword_defense_18, *kid_sword_defense_11,
+  *kid_sword_attack_01, *kid_sword_attack_02, *kid_sword_attack_03,
+  *kid_sword_attack_04, *kid_sword_attack_05, *kid_sword_attack_06,
+  *kid_sword_attack_07;
+
+extern bool sample_step, sample_hit_ground, sample_hit_wall,
+  sample_hang_on_fall, sample_drink, sample_glory,
+  sample_take_sword, sample_sword_attack;
 
 #endif	/* FREEPOP_KID_H */

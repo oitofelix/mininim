@@ -23,25 +23,29 @@
 #include "kernel/video.h"
 #include "kernel/audio.h"
 #include "kernel/keyboard.h"
-#include "anim.h"
-#include "physics.h"
-#include "level.h"
-#include "room.h"
-#include "door.h"
+#include "engine/anim.h"
+#include "engine/physics.h"
+#include "engine/level.h"
+#include "engine/room.h"
+#include "engine/door.h"
+#include "engine/loose-floor.h"
+#include "engine/opener-floor.h"
+#include "engine/closer-floor.h"
+#include "engine/potion.h"
+#include "engine/sword.h"
+
 #include "kid.h"
-#include "loose-floor.h"
-#include "opener-floor.h"
-#include "closer-floor.h"
-#include "potion.h"
-#include "sword.h"
+#include "kid-couch.h"
+
+bool misstep = false;
+bool uncouch_slowly = false;
+bool critical_edge = false;
+int inertia = 0;
+struct pos item_pos = {.room = -1};
 
 struct anim kid;
 static bool hang_limit;
-static bool misstep = false;
-static int inertia = 0;
-static bool critical_edge = false;
 static bool turn = false;
-static struct pos item_pos = {.room = -1};
 static bool keep_sword_fast = false;
 static int kid_total_lives = KID_INITIAL_TOTAL_LIVES,
   kid_current_lives = KID_INITIAL_CURRENT_LIVES;
@@ -59,8 +63,6 @@ static int kid_total_lives = KID_INITIAL_TOTAL_LIVES,
 #define HANG_FRAMESET_NMEMB 13
 #define CLIMB_FRAMESET_NMEMB 15
 #define STABILIZE_FRAMESET_NMEMB 4
-#define COUCH_FRAMESET_NMEMB 13
-#define FALL_FRAMESET_NMEMB 13
 #define DRINK_FRAMESET_NMEMB 15
 #define RAISE_SWORD_FRAMESET_NMEMB 4
 #define KEEP_SWORD_FRAMESET_NMEMB 10
@@ -83,8 +85,7 @@ static struct frameset misstep_frameset[MISSTEP_FRAMESET_NMEMB];
 static struct frameset hang_frameset[HANG_FRAMESET_NMEMB];
 static struct frameset climb_frameset[CLIMB_FRAMESET_NMEMB];
 static struct frameset stabilize_frameset[STABILIZE_FRAMESET_NMEMB];
-static struct frameset couch_frameset[COUCH_FRAMESET_NMEMB];
-static struct frameset fall_frameset[FALL_FRAMESET_NMEMB];
+struct frameset fall_frameset[FALL_FRAMESET_NMEMB];
 static struct frameset drink_frameset[DRINK_FRAMESET_NMEMB];
 static struct frameset raise_sword_frameset[RAISE_SWORD_FRAMESET_NMEMB];
 static struct frameset keep_sword_frameset[KEEP_SWORD_FRAMESET_NMEMB];
@@ -107,7 +108,6 @@ static void init_misstep_frameset (void);
 static void init_hang_frameset (void);
 static void init_climb_frameset (void);
 static void init_stabilize_frameset (void);
-static void init_couch_frameset (void);
 static void init_fall_frameset (void);
 static void init_drink_frameset (void);
 static void init_raise_sword_frameset (void);
@@ -136,10 +136,6 @@ ALLEGRO_BITMAP *kid_full_life, *kid_empty_life, *kid_normal_00,
   *kid_jump_07, *kid_jump_08, *kid_jump_09, *kid_jump_10, *kid_jump_11, *kid_jump_12,
   *kid_jump_13, *kid_jump_14, *kid_jump_15, *kid_jump_16, *kid_jump_17, *kid_jump_18,
   *kid_fall_13, *kid_fall_14, *kid_fall_15, *kid_fall_16, *kid_fall_17,
-  *kid_couch_01, *kid_couch_02, *kid_couch_03, *kid_couch_04,
-  *kid_couch_05, *kid_couch_06, *kid_couch_07, *kid_couch_08,
-  *kid_couch_09, *kid_couch_10, *kid_couch_11, *kid_couch_12,
-  *kid_couch_13,
   *kid_vjump_01, *kid_vjump_02, *kid_vjump_03, *kid_vjump_04, *kid_vjump_05,
   *kid_vjump_06, *kid_vjump_07, *kid_vjump_08, *kid_vjump_09, *kid_vjump_10,
   *kid_vjump_11, *kid_vjump_12, *kid_vjump_13, *kid_vjump_15, *kid_vjump_16,
@@ -183,29 +179,19 @@ bool sample_step, sample_hit_ground, sample_hit_wall,
 static void place_kid (int room, int floor, int place);
 static struct coord *kid_life_coord (int i, struct coord *c);
 
-static void kid_normal (void);
 static void kid_walk (void);
 static void kid_start_run (void);
 static void kid_run (void);
 static void kid_stop_run (void);
-void kid_turn (void);
 static void kid_turn_run (void);
 static void kid_jump (void);
-void kid_vjump (void);
 static void kid_run_jump (void);
 static void kid_misstep (void);
 static void kid_hang (void);
 static void kid_hang_wall (void);
 static void kid_hang_free (void);
-static void kid_climb (void);
-static void kid_unclimb (void);
 static void kid_stabilize (void);
-static void kid_couch (void);
 static void kid_stabilize_collision (void);
-static void kid_couch_collision (void);
-static void kid_fall (void);
-static void kid_drink (void);
-static void kid_raise_sword (void);
 static void kid_keep_sword (void);
 static void kid_take_sword (void);
 static void kid_sword_normal (void);
@@ -217,6 +203,8 @@ static void kid_sword_attack (void);
 void
 load_kid (void)
 {
+  load_kid_couch ();
+
   /* bitmap */
   kid_full_life = load_bitmap (KID_FULL_LIFE);
   kid_empty_life = load_bitmap (KID_EMPTY_LIFE);
@@ -291,19 +279,6 @@ load_kid (void)
   kid_fall_15 = load_bitmap (KID_FALL_15);
   kid_fall_16 = load_bitmap (KID_FALL_16);
   kid_fall_17 = load_bitmap (KID_FALL_17);
-  kid_couch_01 = load_bitmap (KID_COUCH_01);
-  kid_couch_02 = load_bitmap (KID_COUCH_02);
-  kid_couch_03 = load_bitmap (KID_COUCH_03);
-  kid_couch_04 = load_bitmap (KID_COUCH_04);
-  kid_couch_05 = load_bitmap (KID_COUCH_05);
-  kid_couch_06 = load_bitmap (KID_COUCH_06);
-  kid_couch_07 = load_bitmap (KID_COUCH_07);
-  kid_couch_08 = load_bitmap (KID_COUCH_08);
-  kid_couch_09 = load_bitmap (KID_COUCH_09);
-  kid_couch_10 = load_bitmap (KID_COUCH_10);
-  kid_couch_11 = load_bitmap (KID_COUCH_11);
-  kid_couch_12 = load_bitmap (KID_COUCH_12);
-  kid_couch_13 = load_bitmap (KID_COUCH_13);
   kid_vjump_01 = load_bitmap (KID_VJUMP_01);
   kid_vjump_02 = load_bitmap (KID_VJUMP_02);
   kid_vjump_03 = load_bitmap (KID_VJUMP_03);
@@ -434,7 +409,6 @@ load_kid (void)
   init_hang_frameset ();
   init_climb_frameset ();
   init_stabilize_frameset ();
-  init_couch_frameset ();
   init_fall_frameset ();
   init_drink_frameset ();
   init_raise_sword_frameset ();
@@ -458,6 +432,8 @@ place_kid (1, 0, 0);
 void
 unload_kid (void)
 {
+  unload_kid_couch ();
+
   /* bitmaps */
   al_destroy_bitmap (kid_full_life);
   al_destroy_bitmap (kid_empty_life);
@@ -532,19 +508,6 @@ unload_kid (void)
   al_destroy_bitmap (kid_fall_15);
   al_destroy_bitmap (kid_fall_16);
   al_destroy_bitmap (kid_fall_17);
-  al_destroy_bitmap (kid_couch_01);
-  al_destroy_bitmap (kid_couch_02);
-  al_destroy_bitmap (kid_couch_03);
-  al_destroy_bitmap (kid_couch_04);
-  al_destroy_bitmap (kid_couch_05);
-  al_destroy_bitmap (kid_couch_06);
-  al_destroy_bitmap (kid_couch_07);
-  al_destroy_bitmap (kid_couch_08);
-  al_destroy_bitmap (kid_couch_09);
-  al_destroy_bitmap (kid_couch_10);
-  al_destroy_bitmap (kid_couch_11);
-  al_destroy_bitmap (kid_couch_12);
-  al_destroy_bitmap (kid_couch_13);
   al_destroy_bitmap (kid_vjump_01);
   al_destroy_bitmap (kid_vjump_02);
   al_destroy_bitmap (kid_vjump_03);
@@ -877,20 +840,6 @@ init_stabilize_frameset (void)
 
   memcpy (&stabilize_frameset, &frameset,
           STABILIZE_FRAMESET_NMEMB * sizeof (struct frameset));
-}
-
-void
-init_couch_frameset (void)
-{
-  struct frameset frameset[COUCH_FRAMESET_NMEMB] =
-    {{kid_couch_01,-3,0},{kid_couch_02,-4,0},{kid_couch_03,+0,0},
-     {kid_couch_04,-4,0},{kid_couch_05,-1,0},{kid_couch_06,-4,0},
-     {kid_couch_07,+1,0},{kid_couch_08,-2,0},{kid_couch_09,-1,0},
-     {kid_couch_10,+0,0},{kid_couch_11,+3,0},{kid_couch_12,+0,0},
-     {kid_couch_13,+4,0}};
-
-  memcpy (&couch_frameset, &frameset,
-          COUCH_FRAMESET_NMEMB * sizeof (struct frameset));
 }
 
 void
@@ -2215,121 +2164,6 @@ kid_stabilize (void)
 }
 
 void
-kid_couch (void)
-{
-  void (*oaction) (void) = kid.action;
-  kid.action = kid_couch;
-  kid.f.flip = (kid.f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
-  misstep = false;
-
-  struct coord nc; struct pos pbf, ptf, pm, np;
-  enum confg ctf, cm, cbf;
-  cbf = survey (_bf, pos, &kid.f, &nc, &pbf, &np)->fg;
-  ctf = survey (_tf, pos, &kid.f, &nc, &ptf, &np)->fg;
-  cm = survey (_m, pos, &kid.f, &nc, &pm, &np)->fg;
-
-  static int i = 0;
-  static int wait = 1;
-  static bool collision = false;
-  static bool fall = false;
-  static int cinertia = 0;
-  if (oaction != kid_couch) i = 0;
-  if (oaction == kid_climb) i = 11, critical_edge = false;
-  if (oaction == kid_couch_collision)
-    collision = true, inertia = 0;
-  if (oaction == kid_fall)
-    fall = true, inertia = 0;
-
-  ALLEGRO_BITMAP *frame = couch_frameset[i].frame;
-  int dx = couch_frameset[i].dx;
-  int dy = couch_frameset[i].dy;
-
-  if (oaction == kid_climb) dx += 7;
-  if (i == 0) cinertia = 2.6 * inertia;
-  if (collision || fall) cinertia = 0;
-  if (i > 0 && i < 3) dx -= cinertia ? cinertia : 0;
-
-  /* unclimb */
-  int dir = (kid.f.dir == LEFT) ? +1 : -1;
-  if (oaction != kid_couch_collision
-      && oaction != kid_fall
-      && i == 0
-      && item_pos.room == -1
-      && crel (&pbf, 0, dir)->fg == NO_FLOOR
-      && dist_next_place (&kid.f, _tf, pos, 0, true) < 22
-      && ! (ctf == DOOR && kid.f.dir == LEFT
-            && door_at_pos (&ptf)->i > DOOR_CLIMB_LIMIT)) {
-    hang_pos = pbf;
-    pos2view (&hang_pos, &hang_pos);
-    critical_edge =
-      (crel (&hang_pos, +1, dir)->fg == NO_FLOOR);
-    kid_unclimb ();
-    return;
-  }
-
-  /* fall */
-  struct pos pr;
-  struct loose_floor *l =
-    loose_floor_at_pos (prel (&pm, &pr, -1, +0));
-
-  if ((cm == NO_FLOOR
-       || (l && l->action == FALL_LOOSE_FLOOR && cm == LOOSE_FLOOR))
-      && ! (fall && i == 0)) {
-    if (collision) to_collision_edge (&kid.f, fall_frameset[0].frame,
-                                      _tf, pos, 0, false, 0);
-    kid_fall ();
-    i = 0; collision = false; return;
-  }
-
-  /* collision */
-
-  /* ensure kid is not colliding */
-  if (cbf == WALL)
-    to_next_place_edge (&kid.f, &kid.f, frame, _bf, pos, 0, true, -1);
-
-  /* wall pushes back */
-  if (is_colliding (&kid.f, _tf, pos, 0, false, -dx))
-    to_collision_edge (&kid.f, frame, _tf, pos, 0, false, -dx);
-
-  next_frame (&kid.f, &kid.f, frame, dx, dy);
-
-  /* depressible floors */
-  if (i == 0) update_depressible_floor (&kid, -7, -9);
-  else if (i == 2) update_depressible_floor (&kid, -1, -13);
-  else if (i == 5) update_depressible_floor (&kid, -19, -20);
-  else if (i == 7) update_depressible_floor (&kid, -12, -22);
-  else if (i == 8) update_depressible_floor (&kid, -9, -10);
-  else if (i == 11) update_depressible_floor (&kid, -6, -12);
-  else keep_depressible_floor (&kid);
-
-
- next_frame:
-  /* next frame */
-  if (i == 12) {
-    kid.action = kid_normal;
-    cinertia = 0; i = 0; collision = fall = false;
-  } else if (i == 2 && item_pos.room != -1) {
-    if (is_potion (&item_pos)) kid.action = kid_drink;
-    else if (is_sword (&item_pos)) kid.action = kid_raise_sword;
-    else {
-      item_pos.room = -1;
-      goto next_frame;
-    }
-    i = 0; wait = 1; collision = fall = false;
-  } else if (i == 2 && down_key
-           && ((kid.f.dir == LEFT && left_key)
-               || (kid.f.dir == RIGHT && right_key))
-             && wait-- == 0) {
-    if (! is_colliding (&kid.f, _tf, pos, 0, false, 6))
-      kid.f.c.x += (kid.f.dir == LEFT) ? -6 : +6;
-    i = 0; wait = 1; collision = fall = false;
-  }
-  else if (i != 2 || ! down_key) i++;
-
-  if (cinertia > 0) cinertia--;
-}
-
-void
 kid_stabilize_collision (void)
 {
   kid.action = kid_stabilize_collision;
@@ -2339,26 +2173,6 @@ kid_stabilize_collision (void)
   if (kid.f.dir == RIGHT) kid.f.c.x -= 3;
 
   kid_stabilize ();
-}
-
-void
-kid_couch_collision (void)
-{
-  kid.action = kid_couch_collision;
-
-  struct coord nc;
-  struct pos pbf, np;
-  survey (_bf, pos, &kid.f, &nc, &pbf, &np);
-
-  kid.f.c.y = PLACE_HEIGHT * pbf.floor + 15;
-  kid.f.c.x = PLACE_WIDTH * pbf.place + 15;
-  kid.f.b = kid_normal_00;
-
-  sample_hit_wall = true;
-  to_collision_edge (&kid.f, couch_frameset[0].frame, _tf, pos, 0, false, 0);
-  if (kid.f.dir == RIGHT) kid.f.c.x -= 12;
-
-  kid_couch ();
 }
 
 void
@@ -2453,7 +2267,6 @@ kid_fall (void)
       && cmbo != NO_FLOOR
       && npmbo.floor != npmbo_nf.floor
       && pmbo.floor != force_floor
-
       && ! (l && l->action == FALL_LOOSE_FLOOR && cm == LOOSE_FLOOR)) {
     inertia = 0;
 
@@ -2467,6 +2280,10 @@ kid_fall (void)
     if (cbf == WALL || cbf == DOOR)
       to_next_place_edge (&kid.f, &kid.f, frame, _bf, pos, 0, true, -1);
 
+    if (i > 6) {
+      kid_current_lives--;
+      uncouch_slowly = true;
+    } else uncouch_slowly = false;
     kid_couch ();
     if (i > 3) sample_hit_ground = true;
     i = 0; force_floor = -2;

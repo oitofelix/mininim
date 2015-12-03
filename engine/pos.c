@@ -21,7 +21,7 @@
 #include <math.h>
 #include "kernel/random.h"
 #include "level.h"
-#include "kid.h"
+#include "kid/kid.h"
 #include "physics.h"
 #include "room.h"
 #include "pos.h"

@@ -23,7 +23,7 @@
 #include "physics.h"
 #include "room.h"
 #include "level.h"
-#include "kid.h"
+#include "kid/kid.h"
 #include "floor.h"
 #include "spikes-floor.h"
 
