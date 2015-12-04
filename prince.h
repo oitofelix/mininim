@@ -93,9 +93,9 @@ struct anim {
 
   ACTION oaction;
   ACTION action;
-  int i, wait, repeat;
-  bool collision, fall;
-  int cinertia;
+  int i, j, wait, repeat, cinertia, walk;
+  bool collision, fall, hit_ceiling,
+    just_hanged, hang;
 
   /* depressible floor */
   struct pos df_pos[2];

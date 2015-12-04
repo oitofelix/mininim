@@ -66,6 +66,17 @@ play_anim (void (*draw_callback) (void),
 
         /* begin kid hack */
         if (! cutscene) {
+          /* static int px = 0; */
+          /* static int py = 0; */
+          /* if (a_key) px--; */
+          /* if (d_key) px++; */
+          /* if (w_key) py--; */
+          /* if (s_key) py++; */
+          /* al_set_target_bitmap (screen); */
+          /* al_put_pixel (px, py, al_map_rgb (0, 255, 255)); */
+
+          /* printf ("x = %i, y = %i, floor = %i, place = %i\n", px, py, (py -3) / 63, (px - 15) / 32); */
+
           struct coord bf; struct pos pbf, npbf;
           survey (_bf, pos, &kid.f, &bf, &pbf, &npbf);
           if (delete_key) kid.f.c.x--;
@@ -161,8 +172,8 @@ void
 select_frame (struct anim *a, struct frameset *fs, int i)
 {
   a->fo.b = fs[i].frame;
-  a->fo.dx += fs[i].dx;
-  a->fo.dy += fs[i].dy;
+  a->fo.dx = fs[i].dx;
+  a->fo.dy = fs[i].dy;
   a->i = i;
 }
 

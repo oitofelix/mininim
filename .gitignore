@@ -11,3 +11,4 @@
 *.gcov
 gmon.out
 /analysis.txt
+/core

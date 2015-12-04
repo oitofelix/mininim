@@ -27,31 +27,31 @@
 #include "engine/sword.h"
 #include "engine/loose-floor.h"
 #include "kid.h"
-#include "kid-couch.h"
 
-struct frameset couch_frameset[COUCH_FRAMESET_NMEMB];
+struct frameset kid_couch_frameset[KID_COUCH_FRAMESET_NMEMB];
 
-ALLEGRO_BITMAP *kid_couch_01, *kid_couch_02, *kid_couch_03, *kid_couch_04,
-  *kid_couch_05, *kid_couch_06, *kid_couch_07, *kid_couch_08,
-  *kid_couch_09, *kid_couch_10, *kid_couch_11, *kid_couch_12,
-  *kid_couch_13;
+ALLEGRO_BITMAP *kid_couch_01, *kid_couch_02, *kid_couch_03,
+  *kid_couch_04, *kid_couch_05, *kid_couch_06, *kid_couch_07,
+  *kid_couch_08, *kid_couch_09, *kid_couch_10, *kid_couch_11,
+  *kid_couch_12, *kid_couch_13;
 
-static void init_couch_frameset (void);
+static void init_kid_couch_frameset (void);
 static bool flow (struct anim *kid);
-static bool physics (struct anim *kid);
+static bool physics_in (struct anim *kid);
+static void physics_out (struct anim *kid);
 
 static void
-init_couch_frameset (void)
+init_kid_couch_frameset (void)
 {
-  struct frameset frameset[COUCH_FRAMESET_NMEMB] =
+  struct frameset frameset[KID_COUCH_FRAMESET_NMEMB] =
     {{kid_couch_01,-3,0},{kid_couch_02,-4,0},{kid_couch_03,+0,0},
      {kid_couch_04,-4,0},{kid_couch_05,-1,0},{kid_couch_06,-4,0},
      {kid_couch_07,+1,0},{kid_couch_08,-2,0},{kid_couch_09,-1,0},
      {kid_couch_10,+0,0},{kid_couch_11,+3,0},{kid_couch_12,+0,0},
      {kid_couch_13,+4,0}};
 
-  memcpy (&couch_frameset, &frameset,
-          COUCH_FRAMESET_NMEMB * sizeof (struct frameset));
+  memcpy (&kid_couch_frameset, &frameset,
+          KID_COUCH_FRAMESET_NMEMB * sizeof (struct frameset));
 }
 
 void
@@ -73,7 +73,7 @@ load_kid_couch (void)
   kid_couch_13 = load_bitmap (KID_COUCH_13);
 
   /* frameset */
-  init_couch_frameset ();
+  init_kid_couch_frameset ();
 }
 
 void
@@ -101,12 +101,11 @@ kid_couch (void)
   kid.oaction = kid.action;
   kid.action = kid_couch;
   kid.f.flip = (kid.f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
-  misstep = false;
 
   if (! flow (&kid)) return;
-  if (! physics (&kid)) return;
-
+  if (! physics_in (&kid)) return;
   next_frame_fo (&kid.f, &kid.f, &kid.fo);
+  physics_out (&kid);
 }
 
 void
@@ -123,7 +122,7 @@ kid_couch_collision (void)
   kid.f.b = kid_normal_00;
 
   sample_hit_wall = true;
-  to_collision_edge (&kid.f, couch_frameset[0].frame, _tf, pos, 0, false, 0);
+  to_collision_edge (&kid.f, kid_couch_frameset[0].frame, _tf, pos, 0, false, 0);
   if (kid.f.dir == RIGHT) kid.f.c.x -= 12;
 
   kid_couch ();
@@ -135,119 +134,83 @@ flow (struct anim *kid)
   struct coord nc; struct pos np, ptf, pbf;
   enum confg ctf;
 
-  if (kid->oaction != kid_couch) kid->i = -1;
-
-  switch (kid->i) {
-
-    /* no frame drawn yet */
-  case -1:
-
-    /* comming from climb */
-    if (kid->oaction == kid_climb) {
-      select_frame (kid, couch_frameset, 11);
-      kid->fo.dx += 7;
-      critical_edge = false;
-      kid->collision = false;
-      kid->fall = false;
-      return true;
-    }
-
-    /* comming from couch collision */
-    if (kid->oaction == kid_couch_collision) {
-      kid->collision = true; inertia = 0;
-      select_frame (kid, couch_frameset, 0);
-      return true;
-    }
-
-    /* comming from fall */
-    if (kid->oaction == kid_fall) {
-      kid->fall = true; inertia = 0;
-      select_frame (kid, couch_frameset, 0);
-      if (uncouch_slowly) kid->wait = 24;
-      return true;
-    }
-
-    /* going to unclimb */
-    int dir = (kid->f.dir == LEFT) ? +1 : -1;
-    ctf = survey (_tf, pos, &kid->f, &nc, &ptf, &np)->fg;
-    survey (_bf, pos, &kid->f, &nc, &pbf, &np);
-    if (item_pos.room == -1
-        && crel (&pbf, 0, dir)->fg == NO_FLOOR
-        && dist_next_place (&kid->f, _tf, pos, 0, true) < 22
-        && ! (ctf == DOOR && kid->f.dir == LEFT
-              && door_at_pos (&ptf)->i > DOOR_CLIMB_LIMIT)) {
-      hang_pos = pbf;
-      pos2view (&hang_pos, &hang_pos);
-      critical_edge =
-        (crel (&hang_pos, +1, dir)->fg == NO_FLOOR);
-      kid_unclimb ();
-      return false;
-    }
-
-    /* comming from any other */
-    kid->cinertia = 2 * inertia;
-    kid->fo.dx = -kid->cinertia;
-    kid->fo.dy = 0;
+  if (kid->oaction != kid_couch) {
+    kid->i = -1; kid->fall = kid->collision = misstep = false;
     kid->wait = 0;
+  }
 
-    kid->collision = false;
-    kid->collision = false;
+  if (kid->oaction == kid_climb)
+    kid->i = 10, critical_edge = false;
 
-    select_frame (kid, couch_frameset, 0);
-    if (kid->cinertia > 0) kid->cinertia--;
-    return true;
+  if (kid->oaction == kid_couch_collision)
+    kid->collision = true, inertia = 0;
 
-    /* fully couched */
-  case 2:
-    if (item_pos.room != -1) {
-      if (is_potion (&item_pos)) kid_drink ();
-      else if (is_sword (&item_pos)) kid_raise_sword ();
-      else {
-        item_pos.room = -1; goto no_item;
-      }
-      return false;
-    }
+  if (kid->oaction == kid_fall) {
+    kid->fall = true; inertia = 0;
+    if (uncouch_slowly) kid->wait = 36;
+  }
 
-  no_item:
-    if (down_key && kid->wait-- <= 0 && kid->cinertia == 0
-        && ((kid->f.dir == LEFT && left_key)
-            || (kid->f.dir == RIGHT && right_key))) {
-      if (! is_colliding (&kid->f, _tf, pos, 0, false, 6))
-        kid->f.c.x += (kid->f.dir == LEFT) ? -6 : +6;
-      select_frame (kid, couch_frameset, 0);
-      return true;
-    }
+  /* unclimb */
+  int dir = (kid->f.dir == LEFT) ? +1 : -1;
+  ctf = survey (_tf, pos, &kid->f, &nc, &ptf, &np)->fg;
+  survey (_bf, pos, &kid->f, &nc, &pbf, &np);
+  if (kid->i == -1
+      && ! kid->collision
+      && ! kid->fall
+      && item_pos.room == -1
+      && crel (&pbf, 0, dir)->fg == NO_FLOOR
+      && dist_next_place (&kid->f, _tf, pos, 0, true) < 22
+      && ! (ctf == DOOR && kid->f.dir == LEFT
+            && door_at_pos (&ptf)->i > DOOR_CLIMB_LIMIT)) {
+    hang_pos = pbf;
+    pos2view (&hang_pos, &hang_pos);
+    critical_edge =
+      (crel (&hang_pos, +1, dir)->fg == NO_FLOOR);
+    kid_unclimb ();
+    return false;
+  }
 
-    if (! down_key && kid->wait-- <= 0) {
-      kid->cinertia = 0;
-      select_frame (kid, couch_frameset, 3);
-      return true;
-    }
-
-    kid->fo.dx = -kid->cinertia;
-    select_frame (kid, couch_frameset, 2);
-    if (kid->cinertia > 0) kid->cinertia--;
-    return true;
-
-    /* end */
-  case 12:
+  if (kid->i == 12) {
     kid_normal ();
     return false;
+  }
 
-    /* simple progression */
-  case 0: case 1: case 3: case 4: case 5: case 6: case 7:
-  case 8: case 9: case 10: case 11:
-    kid->fo.dx = -kid->cinertia;
-    select_frame (kid, couch_frameset, kid->i + 1);
-    if (kid->cinertia > 0) kid->cinertia--;
+  if (kid->i == 2 && item_pos.room != -1) {
+    if (is_potion (&item_pos)) kid_drink ();
+    else if (is_sword (&item_pos)) kid_raise_sword ();
+    else {
+      item_pos.room = -1; goto no_item;
+    }
+    return false;
+  }
+
+ no_item:
+  if (kid->i == 2 && down_key
+      && kid->cinertia == 0
+      && kid->wait-- <= 0
+      && ((kid->f.dir == LEFT && left_key)
+          || (kid->f.dir == RIGHT && right_key))) {
+    if (! is_colliding (&kid->f, _tf, pos, 0, false, 6))
+      kid->f.c.x += (kid->f.dir == LEFT) ? -6 : +6;
+    select_frame (kid, kid_couch_frameset, 0);
     return true;
   }
+
+  if (kid->i != 2 || (! down_key && kid->wait-- <= 0))
+    kid->i++;
+
+  select_frame (kid, kid_couch_frameset, kid->i);
+
+  if (kid->oaction == kid_climb) kid->fo.dx += 7;
+  if (kid->i == 0) kid->cinertia = 2 * inertia;
+  if (kid->i > 0 && kid->i < 3) kid->fo.dx -= kid->cinertia;
+  if (kid->cinertia > 0) kid->cinertia--;
 
   return true;
 }
 
 static bool
-physics (struct anim *kid)
+physics_in (struct anim *kid)
 {
   struct coord nc; struct pos np, pbf, pm;
   enum confg cm, cbf;
@@ -260,7 +223,7 @@ physics (struct anim *kid)
        || (l && l->action == FALL_LOOSE_FLOOR && cm == LOOSE_FLOOR))
       && ! (kid->fall && kid->i == 0)) {
     if (kid->collision)
-      to_collision_edge (&kid->f, fall_frameset[0].frame,
+      to_collision_edge (&kid->f, kid_fall_frameset[0].frame,
                          _tf, pos, 0, false, 0);
     kid_fall ();
     return false;
@@ -275,6 +238,12 @@ physics (struct anim *kid)
   if (is_colliding (&kid->f, _tf, pos, 0, false, -kid->fo.dx))
     to_collision_edge (&kid->f, kid->fo.b, _tf, pos, 0, false, -kid->fo.dx);
 
+  return true;
+}
+
+static void
+physics_out (struct anim *kid)
+{
   /* depressible floors */
   if (kid->i == 0) update_depressible_floor (kid, -7, -9);
   else if (kid->i == 2) update_depressible_floor (kid, -1, -13);
@@ -283,6 +252,4 @@ physics (struct anim *kid)
   else if (kid->i == 8) update_depressible_floor (kid, -9, -10);
   else if (kid->i == 11) update_depressible_floor (kid, -6, -12);
   else keep_depressible_floor (kid);
-
-  return true;
 }
