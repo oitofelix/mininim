@@ -231,10 +231,10 @@ physics_out (struct anim *kid)
 
   /* ceiling loose floor shaking and release */
   if (kid->i == 13 && kid->hit_ceiling) {
-    shake_loose_floor_row (&ptb);
-    ctb = survey (_tb, pos, &kid->f, &nc, &np, &np)->fg;
-    if (ctb == LOOSE_FLOOR) release_loose_floor (&ptb);
+    ctb = survey (_tb, pos, &kid->f, &nc, &ptb, &np)->fg;
     ctf = survey (_tf, pos, &kid->f, &nc, &ptf, &np)->fg;
+    shake_loose_floor_row (&ptb);
+    if (ctb == LOOSE_FLOOR) release_loose_floor (&ptb);
     if (ctf == LOOSE_FLOOR) release_loose_floor (&ptf);
   }
 

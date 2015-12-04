@@ -46,12 +46,9 @@ bool hang_limit;
 bool turn = false;
 bool keep_sword_fast = false;
 
-static int kid_total_lives = KID_INITIAL_TOTAL_LIVES,
+int kid_total_lives = KID_INITIAL_TOTAL_LIVES,
   kid_current_lives = KID_INITIAL_CURRENT_LIVES;
 
-struct frameset kid_hang_frameset[KID_HANG_FRAMESET_NMEMB];
-struct frameset kid_climb_frameset[KID_CLIMB_FRAMESET_NMEMB];
-struct frameset kid_fall_frameset[KID_FALL_FRAMESET_NMEMB];
 struct frameset kid_drink_frameset[KID_DRINK_FRAMESET_NMEMB];
 struct frameset kid_raise_sword_frameset[KID_RAISE_SWORD_FRAMESET_NMEMB];
 struct frameset kid_keep_sword_frameset[KID_KEEP_SWORD_FRAMESET_NMEMB];
@@ -61,9 +58,6 @@ struct frameset kid_sword_walkb_frameset[KID_SWORD_WALKB_FRAMESET_NMEMB];
 struct frameset kid_sword_defense_frameset[KID_SWORD_DEFENSE_FRAMESET_NMEMB];
 struct frameset kid_sword_attack_frameset[KID_SWORD_ATTACK_FRAMESET_NMEMB];
 
-static void init_kid_hang_frameset (void);
-static void init_kid_climb_frameset (void);
-static void init_kid_fall_frameset (void);
 static void init_kid_drink_frameset (void);
 static void init_kid_raise_sword_frameset (void);
 static void init_kid_keep_sword_frameset (void);
@@ -74,15 +68,6 @@ static void init_kid_sword_defense_frameset (void);
 static void init_kid_sword_attack_frameset (void);
 
 ALLEGRO_BITMAP *kid_full_life, *kid_empty_life,
-  *kid_fall_13, *kid_fall_14, *kid_fall_15, *kid_fall_16, *kid_fall_17,
-  *kid_hang_00, *kid_hang_01, *kid_hang_02, *kid_hang_03,
-  *kid_hang_04, *kid_hang_05, *kid_hang_06, *kid_hang_07,
-  *kid_hang_08, *kid_hang_09, *kid_hang_10, *kid_hang_11,
-  *kid_hang_12, *kid_hang_14,
-  *kid_climb_01, *kid_climb_02, *kid_climb_03, *kid_climb_04,
-  *kid_climb_05, *kid_climb_06, *kid_climb_07, *kid_climb_08,
-  *kid_climb_09, *kid_climb_10, *kid_climb_11, *kid_climb_12,
-  *kid_climb_13, *kid_climb_14, *kid_climb_15,
   *kid_drink_01, *kid_drink_02, *kid_drink_03, *kid_drink_04, *kid_drink_05,
   *kid_drink_06, *kid_drink_07, *kid_drink_08, *kid_drink_09, *kid_drink_10,
   *kid_drink_11, *kid_drink_12, *kid_drink_13, *kid_drink_14, *kid_drink_15,
@@ -126,44 +111,16 @@ load_kid (void)
   load_kid_vjump ();
   load_kid_run_jump ();
   load_kid_misstep ();
+  load_kid_hang ();
+  load_kid_hang_wall ();
+  load_kid_hang_free ();
+  load_kid_climb ();
+  load_kid_unclimb ();
+  load_kid_fall ();
 
   /* bitmap */
   kid_full_life = load_bitmap (KID_FULL_LIFE);
   kid_empty_life = load_bitmap (KID_EMPTY_LIFE);
-  kid_fall_13 = load_bitmap (KID_FALL_13);
-  kid_fall_14 = load_bitmap (KID_FALL_14);
-  kid_fall_15 = load_bitmap (KID_FALL_15);
-  kid_fall_16 = load_bitmap (KID_FALL_16);
-  kid_fall_17 = load_bitmap (KID_FALL_17);
-  kid_hang_00 = load_bitmap (KID_HANG_00);
-  kid_hang_01 = load_bitmap (KID_HANG_01);
-  kid_hang_02 = load_bitmap (KID_HANG_02);
-  kid_hang_03 = load_bitmap (KID_HANG_03);
-  kid_hang_04 = load_bitmap (KID_HANG_04);
-  kid_hang_05 = load_bitmap (KID_HANG_05);
-  kid_hang_06 = load_bitmap (KID_HANG_06);
-  kid_hang_07 = load_bitmap (KID_HANG_07);
-  kid_hang_08 = load_bitmap (KID_HANG_08);
-  kid_hang_09 = load_bitmap (KID_HANG_09);
-  kid_hang_10 = load_bitmap (KID_HANG_10);
-  kid_hang_11 = load_bitmap (KID_HANG_11);
-  kid_hang_12 = load_bitmap (KID_HANG_12);
-  kid_hang_14 = load_bitmap (KID_HANG_14);
-  kid_climb_01 = load_bitmap (KID_CLIMB_01);
-  kid_climb_02 = load_bitmap (KID_CLIMB_02);
-  kid_climb_03 = load_bitmap (KID_CLIMB_03);
-  kid_climb_04 = load_bitmap (KID_CLIMB_04);
-  kid_climb_05 = load_bitmap (KID_CLIMB_05);
-  kid_climb_06 = load_bitmap (KID_CLIMB_06);
-  kid_climb_07 = load_bitmap (KID_CLIMB_07);
-  kid_climb_08 = load_bitmap (KID_CLIMB_08);
-  kid_climb_09 = load_bitmap (KID_CLIMB_09);
-  kid_climb_10 = load_bitmap (KID_CLIMB_10);
-  kid_climb_11 = load_bitmap (KID_CLIMB_11);
-  kid_climb_12 = load_bitmap (KID_CLIMB_12);
-  kid_climb_13 = load_bitmap (KID_CLIMB_13);
-  kid_climb_14 = load_bitmap (KID_CLIMB_14);
-  kid_climb_15 = load_bitmap (KID_CLIMB_15);
   kid_drink_01 = load_bitmap (KID_DRINK_01);
   kid_drink_02 = load_bitmap (KID_DRINK_02);
   kid_drink_03 = load_bitmap (KID_DRINK_03);
@@ -223,9 +180,6 @@ load_kid (void)
   sword_attack_sample = load_sample (SWORD_ATTACK_SAMPLE);
 
   /* framesets */
-  init_kid_hang_frameset ();
-  init_kid_climb_frameset ();
-  init_kid_fall_frameset ();
   init_kid_drink_frameset ();
   init_kid_raise_sword_frameset ();
   init_kid_keep_sword_frameset ();
@@ -261,44 +215,15 @@ unload_kid (void)
   unload_kid_vjump ();
   unload_kid_run_jump ();
   unload_kid_misstep ();
+  unload_kid_hang ();
+  unload_kid_hang_wall ();
+  unload_kid_hang_free ();
+  unload_kid_climb ();
+  unload_kid_unclimb ();
 
   /* bitmaps */
   al_destroy_bitmap (kid_full_life);
   al_destroy_bitmap (kid_empty_life);
-  al_destroy_bitmap (kid_fall_13);
-  al_destroy_bitmap (kid_fall_14);
-  al_destroy_bitmap (kid_fall_15);
-  al_destroy_bitmap (kid_fall_16);
-  al_destroy_bitmap (kid_fall_17);
-  al_destroy_bitmap (kid_hang_00);
-  al_destroy_bitmap (kid_hang_01);
-  al_destroy_bitmap (kid_hang_02);
-  al_destroy_bitmap (kid_hang_03);
-  al_destroy_bitmap (kid_hang_04);
-  al_destroy_bitmap (kid_hang_05);
-  al_destroy_bitmap (kid_hang_06);
-  al_destroy_bitmap (kid_hang_07);
-  al_destroy_bitmap (kid_hang_08);
-  al_destroy_bitmap (kid_hang_09);
-  al_destroy_bitmap (kid_hang_10);
-  al_destroy_bitmap (kid_hang_11);
-  al_destroy_bitmap (kid_hang_12);
-  al_destroy_bitmap (kid_hang_14);
-  al_destroy_bitmap (kid_climb_01);
-  al_destroy_bitmap (kid_climb_02);
-  al_destroy_bitmap (kid_climb_03);
-  al_destroy_bitmap (kid_climb_04);
-  al_destroy_bitmap (kid_climb_05);
-  al_destroy_bitmap (kid_climb_06);
-  al_destroy_bitmap (kid_climb_07);
-  al_destroy_bitmap (kid_climb_08);
-  al_destroy_bitmap (kid_climb_09);
-  al_destroy_bitmap (kid_climb_10);
-  al_destroy_bitmap (kid_climb_11);
-  al_destroy_bitmap (kid_climb_12);
-  al_destroy_bitmap (kid_climb_13);
-  al_destroy_bitmap (kid_climb_14);
-  al_destroy_bitmap (kid_climb_15);
   al_destroy_bitmap (kid_drink_01);
   al_destroy_bitmap (kid_drink_02);
   al_destroy_bitmap (kid_drink_03);
@@ -408,45 +333,6 @@ sample_kid (void)
 
 
 void
-init_kid_hang_frameset (void)
-{
-  struct frameset frameset[KID_HANG_FRAMESET_NMEMB] =
-    {{kid_hang_00,+0,+0},{kid_hang_01,+0,+2},{kid_hang_02,+4,+0},
-     {kid_hang_03,+3,+2},{kid_hang_04,+3,+0},{kid_hang_05,+1,+0},
-     {kid_hang_06,+1,-1},{kid_hang_07,+2,+0},{kid_hang_08,+0,-3},
-     {kid_hang_09,+0,+0},{kid_hang_10,+1,-1},{kid_hang_11,+0,+0},
-     {kid_hang_12,-3,+0}};
-
-  memcpy (&kid_hang_frameset, &frameset,
-          KID_HANG_FRAMESET_NMEMB * sizeof (struct frameset));
-}
-
-void
-init_kid_climb_frameset (void)
-{
-  struct frameset frameset[KID_CLIMB_FRAMESET_NMEMB] =
-    {{kid_climb_01,+1,+0},{kid_climb_02,+0,-9},{kid_climb_03,-4,-5},
-     {kid_climb_04,-8,-6},{kid_climb_05,-5,-4},{kid_climb_06,-2,-5},
-     {kid_climb_07,-1,-5},{kid_climb_08,-4,-8},{kid_climb_09,+0,-4},
-     {kid_climb_10,+0,-1},{kid_climb_11,-3,-4},{kid_climb_12,+1,+0},
-     {kid_climb_13,+0,+0},{kid_climb_14,-1,+0},{kid_climb_15,+0,+0}};
-
-  memcpy (&kid_climb_frameset, &frameset,
-          KID_CLIMB_FRAMESET_NMEMB * sizeof (struct frameset));
-}
-
-void
-init_kid_fall_frameset (void)
-{
-  struct frameset frameset[KID_FALL_FRAMESET_NMEMB] =
-    {{kid_fall_13,+0,+0},{kid_fall_14,+0,+5},{kid_fall_15,+0,+10},
-     {kid_fall_16,+0,+11},{kid_fall_17,+0,+20}};
-
-  memcpy (&kid_fall_frameset, &frameset,
-          KID_FALL_FRAMESET_NMEMB * sizeof (struct frameset));
-}
-
-void
 init_kid_drink_frameset (void)
 {
   struct frameset frameset[KID_DRINK_FRAMESET_NMEMB] =
@@ -540,461 +426,6 @@ init_kid_sword_attack_frameset (void)
 
 
 
-void
-kid_hang (void)
-{
-  void (*oaction) (void) = kid.action;
-  kid.action = kid_hang;
-  kid.f.flip = (kid.f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
-  misstep = false;
-  inertia = 0;
-
-  static int i = 0;
-
-  kid.f.b = kid_hang_14;
-  int dir = (kid.f.dir == LEFT) ? 0 : 1;
-  kid.f.c.x = PLACE_WIDTH * (hang_pos.place + dir) + 7;
-  kid.f.c.y = PLACE_HEIGHT * hang_pos.floor - 9;
-
-  critical_edge = (con (&hang_pos)->fg == NO_FLOOR);
-
-  dir = (kid.f.dir == LEFT) ? -1 : +1;
-  enum confg t = crel (&hang_pos, 0, dir)->fg;
-
-  if (i == 0 && oaction != kid_unclimb)
-    next_frame (&kid.f, &kid.f, kid_hang_14, +0, +0);
-  else if (t == WALL || (t == DOOR && kid.f.dir == LEFT))
-    kid_hang_wall ();
-  else kid_hang_free ();
-
-  /* depressible floors */
-  clear_depressible_floor (&kid);
-  struct pos hanged_con_pos;
-  prel (&hang_pos, &hanged_con_pos, -1, dir);
-  press_depressible_floor (&hanged_con_pos);
-
-  /* next frame */
-  if (i < 1) i++;
-  else i = 0;
-}
-
-void
-kid_hang_wall (void)
-{
-  kid.action = kid_hang_wall;
-  kid.f.flip = (kid.f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
-
-  struct coord nc; struct pos pm, np;
-  enum confg ctf, cbb;
-  ctf = survey (_tf, pos, &kid.f, &nc, &np, &np)->fg;
-  cbb = survey (_bb, pos, &kid.f, &nc, &np, &np)->fg;
-  survey (_m, pos, &kid.f, &nc, &pm, &np);
-
-  static bool reverse = false;
-  static int i = 4;
-  static int wait = 0;
-  if (kid.action != kid_hang_wall) {
-    reverse = false; i = 4; wait = 0;
-  }
-
-  ALLEGRO_BITMAP *frame = kid_hang_frameset[i].frame;
-  int dx = (reverse) ? -kid_hang_frameset[i + 1].dx : kid_hang_frameset[i].dx;
-  int dy = (reverse) ? -kid_hang_frameset[i + 1].dy : kid_hang_frameset[i].dy;
-
-  if (kid.f.b == kid_hang_14) dx = +0, dy = +1;
-  if (reverse && wait == 0) {
-    dx = 0;
-    dy = 0;
-  }
-  if (! reverse && i == 4 && shift_key && ! up_key
-      && ! hang_limit)
-    sample_hit_wall = true;
-
-  if ((! shift_key && (reverse || i > 4))
-      || hang_limit || ctf == NO_FLOOR) {
-    reverse = false; i = 4; wait = 0;
-    if (cbb == NO_FLOOR) {
-      kid_fall ();
-      hang_limit = false;
-      return;
-    }
-    kid.f.b = kid_vjump_frameset[13].frame;
-    kid.f.c.x += (kid.f.dir == LEFT) ? +12 : -12;
-    kid.f.c.y = PLACE_HEIGHT * pm.floor - 8;
-    kid_vjump ();
-    hang_limit = false;
-    return;
-  } if (up_key && ! hang_limit) {
-    kid_climb ();
-    reverse = false; i = 4; wait = 0;
-    return;
-  }
-
-  next_frame (&kid.f, &kid.f, frame, dx, dy);
-
-  /* depressible floors */
-  clear_depressible_floor (&kid);
-  int dir = (kid.f.dir == LEFT) ? -1 : +1;
-  struct pos hanged_con_pos;
-  prel (&hang_pos, &hanged_con_pos, -1, dir);
-  press_depressible_floor (&hanged_con_pos);
-
-  /* next frame */
-  if (! reverse && i < 6) i++;
-  else if (! reverse && i == 6) {
-   reverse = true;
-  } else if (reverse && i > 4 && wait == 0) {
-    i--; wait = 1;
-  } else if (reverse && i >= 4 && wait > 0) wait--;
-}
-
-void
-kid_hang_free (void)
-{
-  void (*oaction) (void) = kid.action;
-  kid.action = kid_hang_free;
-  kid.f.flip = (kid.f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
-
-  struct coord nc; struct pos pm, np;
-  enum confg ctf, cm;
-  ctf = survey (_tf, pos, &kid.f, &nc, &np, &np)->fg;
-  cm = survey (_m, pos, &kid.f, &nc, &pm, &np)->fg;
-
-  static bool reverse = true;
-  static int i = 4;
-  static int j = -1;
-  static int wait = 3;
-  if (oaction != kid_hang_free) {
-    reverse = true; i = 4; j = -1; wait = 3;
-  }
-
-  ALLEGRO_BITMAP *frame = kid_hang_frameset[i].frame;
-  int dx = (reverse) ? -kid_hang_frameset[i + 1].dx
-    : kid_hang_frameset[i].dx;
-  int dy = (reverse) ? -kid_hang_frameset[i + 1].dy
-    : kid_hang_frameset[i].dy;
-
-  if (reverse && j == 0 && i == 0 && wait < 3) dy = 0;
-  if (kid.f.b == kid_hang_14) dx = +0, dy = +1;
-
-  if ((! shift_key || hang_limit || ctf == NO_FLOOR)
-      && j > -1) {
-    if (cm == NO_FLOOR) {
-      reverse = true; i = 4; j = -1; wait = 3;
-      kid.f.c.x += (kid.f.dir == LEFT) ? +6 : -4;
-      kid_fall ();
-      hang_limit = false;
-      return;
-    }
-    kid.f.b = kid_vjump_frameset[13].frame;
-    kid.f.c.x += (kid.f.dir == LEFT) ? +1 : -1;
-    kid.f.c.y = PLACE_HEIGHT * pm.floor - 8;
-    kid_vjump ();
-    hang_limit = false;
-    reverse = true; i = 4; j = -1; wait = 3;
-    return;
-  } if (up_key && ! hang_limit) {
-    kid_climb ();
-    reverse = true; i = 4; j = -1; wait = 3;
-    return;
-  }
-
-  next_frame (&kid.f, &kid.f, frame, dx, dy);
-
-  /* depressible floors */
-  clear_depressible_floor (&kid);
-  int dir = (kid.f.dir == LEFT) ? -1 : +1;
-  struct pos hanged_con_pos;
-  prel (&hang_pos, &hanged_con_pos, -1, dir);
-  press_depressible_floor (&hanged_con_pos);
-
-  /* next frame */
-  if (reverse && i > 0) {
-    if (i == 4  && j++ > 0) hang_limit = true;
-    i--;
-  } else if (reverse && i == 0) {
-    if (wait == 0) {
-      reverse = false; i++;
-    } else wait--;
-  } else if (! reverse
-             && ((j == 0 && i < 12)
-                 || (j > 0 && i < 9))) i++;
-  else if (! reverse
-           && ((j == 0 && i == 12)
-               || (j > 0 && i == 9))) {
-    reverse = true; i--;
-  }
-}
-
-void
-kid_climb (void)
-{
-  void (*oaction) (void) = kid.action;
-  kid.action = kid_climb;
-  kid.f.flip = (kid.f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
-
-  struct coord nc; struct pos ptf, np;
-  enum confg ctf;
-  ctf = survey (_tf, pos, &kid.f, &nc, &ptf, &np)->fg;
-
-  static int i = 0;
-  static int wait = DOOR_WAIT_LOOK;
-  if (oaction != kid_climb) i = 0;
-
-  if (i == 15) {
-    kid_couch ();
-    i = 0; wait = DOOR_WAIT_LOOK;
-    return;
-  }
-
-  ALLEGRO_BITMAP *frame = kid_climb_frameset[i].frame;
-  int dx = kid_climb_frameset[i].dx;
-  int dy = kid_climb_frameset[i].dy;
-
-  /* climbing when looking left should let the kid near to the edge */
-  if (kid.f.dir == LEFT && dx != 0 && i % 2) dx += 1;
-
-  if (i == 0) {
-    kid.f.b = kid_climb_frameset[0].frame;
-    int dir = (kid.f.dir == LEFT) ? 0 : 1;
-    kid.f.c.x = PLACE_WIDTH * (hang_pos.place + dir) + 9;
-    kid.f.c.y = PLACE_HEIGHT * hang_pos.floor - 9;
-  }
-
-  if (i == 3 && wait < DOOR_WAIT_LOOK) dx = 0, dy = 0;
-
-  /* fall */
-  if (ctf == NO_FLOOR) {
-    kid_fall ();
-    i = 0; wait = DOOR_WAIT_LOOK;
-    return;
-  }
-
-  /* door collision */
-  if (i == 3 && ctf == DOOR && kid.f.dir == LEFT
-      && door_at_pos (&ptf)->i > DOOR_CLIMB_LIMIT) {
-    if (wait == 0) {
-      wait = DOOR_WAIT_LOOK;
-      i = 0;
-      int dir = (kid.f.dir == LEFT) ? -1 : +1;
-      prel (&hang_pos, &hang_pos, -1, dir);
-      pos2view (&hang_pos, &hang_pos);
-      hang_limit = true;
-      kid_unclimb ();
-      return;
-    } else if (wait > 0) wait--;
-  }
-
-  next_frame (&kid.f, &kid.f, frame, dx, dy);
-
-  /* depressible floors */
-  clear_depressible_floor (&kid);
-  int dir = (kid.f.dir == LEFT) ? -1 : +1;
-  struct pos hanged_con_pos;
-  prel (&hang_pos, &hanged_con_pos, -1, dir);
-  press_depressible_floor (&hanged_con_pos);
-
-  /* next frame */
-  if (wait == DOOR_WAIT_LOOK && i < 15) i++;
-}
-
-void
-kid_unclimb (void)
-{
-  void (*oaction) (void) = kid.action;
-  kid.action = kid_unclimb;
-  kid.f.flip = (kid.f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
-
-  struct coord nc; struct pos np;
-  enum confg ctf;
-  ctf = survey (_tf, pos, &kid.f, &nc, &np, &np)->fg;
-
-  static int i = 13;
-  if (oaction != kid_unclimb) i = 13;
-  if (oaction == kid_climb) i = 2;
-
-  if (i == 0) {
-    i = 13;
-    /* in this function the hang_pos variable holds the position of
-       the hanged construction instead of the usual hangable position
-       facing it */
-    prel (&hang_pos, &hang_pos, +1, (kid.f.dir == LEFT) ? +1 : -1);
-    pos2view (&hang_pos, &hang_pos);
-    kid_hang ();
-    return;
-  }
-
-  ALLEGRO_BITMAP *frame = kid_climb_frameset[i].frame;
-  int dx = -kid_climb_frameset[i + 1].dx;
-  int dy = -kid_climb_frameset[i + 1].dy;
-
-  if (i == 13) {
-    kid.f.b = kid_climb_frameset[13].frame;
-    kid.f.c.x = PLACE_WIDTH * hang_pos.place + 18;
-    kid.f.c.y = PLACE_HEIGHT * hang_pos.floor + 25;
-  }
-
-  /* fall */
-  if (ctf == NO_FLOOR) {
-    kid_fall ();
-    i = 13;
-    return;
-  }
-
-  next_frame (&kid.f, &kid.f, frame, dx, dy);
-
-  /* depressible floors */
-  clear_depressible_floor (&kid);
-  press_depressible_floor (&hang_pos);
-
-  /* next frame */
-  i--;
-}
-
-void
-kid_fall (void)
-{
-  void (*oaction) (void) = kid.action;
-  kid.action = kid_fall;
-  kid.f.flip = (kid.f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
-
-  struct coord nc; struct pos ptf, pbf, pm, np;
-  enum confg cbf, cbb, ctf, cm;
-
-  static int i = 0;
-  static int force_floor = -2;
-
-  ALLEGRO_BITMAP *frame = kid_fall_frameset[i > 4 ? 4 : i].frame;
-  int dx = kid_fall_frameset[i > 4 ? 4 : i].dx;
-  int dy = kid_fall_frameset[i > 4 ? 4 : i].dy;
-
-  int dir = (kid.f.dir == LEFT) ? -1 : +1;
-
-  ctf = survey (_tf, pos, &kid.f, &nc, &ptf, &np)->fg;
-
-  /* ensure kid's proximity for hang */
-  if (i == 0 && crel (&ptf, 0, dir)->fg != NO_FLOOR
-      && crel (&ptf, 0, dir)->fg != WALL
-      && oaction == kid_walk) {
-    to_next_place_edge (&kid.f, &kid.f, frame, _tf, pos, 0, false, 0);
-  } else if (ctf != NO_FLOOR) inertia = 0;
-  else {
-    if (oaction == kid_run_jump) dx = -16, dy= +12;
-    if (oaction == kid_jump) dx = -16, dy = +12;
-  }
-
-  cbf = survey (_bf, pos, &kid.f, &nc, &pbf, &np)->fg;
-  cbb = survey (_bb, pos, &kid.f, &nc, &np, &np)->fg;
-
-  /* put kid in front of the floor */
-  bool should_move_to_front = cbf == NO_FLOOR && cbb != NO_FLOOR;
-  bool should_move_to_back = cbf != NO_FLOOR && cbb == NO_FLOOR;
-  coord_f cf = (should_move_to_front) ? _bb : _bf;
-
-  if (i == 0 && (should_move_to_front || should_move_to_back)) {
-    next_frame (&kid.f, &kid.f, frame, +0, 0);
-    int dirm = dir;
-    dirm *= (should_move_to_back) ? -1 : +1;
-    int i = 0;
-
-    enum confg t;
-
-    do {
-      i += dirm;
-      kid.f.c.x += dirm;
-      nframe (&kid.f, &kid.f.c);
-      t = survey (cf, pos, &kid.f, &nc, &np, &np)->fg;
-    } while (t != NO_FLOOR && abs (i) < PLACE_WIDTH);
-
-    kid.f.c.x += -dirm * 12;
-    kid.f.c.y += 6;
-  }
-
-  /* hang */
-  if (i > 2 && can_hang (&kid.f) && shift_key && ! hang_limit) {
-    sample_hang_on_fall = true;
-    kid_hang ();
-    i = 0; force_floor = -2;
-    return;
-  }
-
-  /* turn run */
-  if (oaction == kid_turn_run) {
-    if (kid.f.b != kid_turn_run_frameset[8].frame)
-      kid.f.dir = (kid.f.dir == LEFT) ? RIGHT : LEFT;
-    kid.f.flip = (kid.f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
-    kid.f.c.x += (kid.f.dir == LEFT) ? +12 : -12;
-    kid.f.c.y += 12;
-  }
-
-  /* land on ground */
-  struct frame nf; next_frame (&kid.f, &nf, kid.f.b, 0, 34);
-  struct pos npmbo, pmbo, npmbo_nf;
-  enum confg cmbo;
-  survey (_mbo, pos, &nf, &nc, &np, &npmbo_nf);
-  cmbo = survey (_mbo, pos, &kid.f, &nc, &pmbo, &npmbo)->fg;
-  cm = survey (_m, pos, &kid.f, &nc, &pm, &np)->fg;
-
-  struct pos pr;
-  struct loose_floor *l =
-    loose_floor_at_pos (prel (&pm, &pr, -1, +0));
-
-  if (i > 0
-      && cmbo != NO_FLOOR
-      && npmbo.floor != npmbo_nf.floor
-      && pmbo.floor != force_floor
-      && ! (l && l->action == FALL_LOOSE_FLOOR && cm == LOOSE_FLOOR)) {
-    inertia = 0;
-
-    kid.f.c.y = 63 * pbf.floor + 15;
-    kid.f.c.x += (kid.f.dir == LEFT) ? -6 : +6;
-    kid.f.b = kid_normal_00;
-
-    cbf = survey (_bf, pos, &kid.f, &nc, &pbf, &np)->fg;
-
-    /* ensure kid isn't colliding */
-    if (cbf == WALL || cbf == DOOR)
-      to_next_place_edge (&kid.f, &kid.f, frame, _bf, pos, 0, true, -1);
-
-    if (i >= 8) {
-      kid_current_lives--;
-      uncouch_slowly = true;
-    } else uncouch_slowly = false;
-    kid_couch ();
-    if (i > 3) sample_hit_ground = true;
-    i = 0; force_floor = -2;
-    shake_loose_floor_row (&pbf);
-    return;
-  }
-
-  if (i == 1) dx = -inertia;
-  if (i > 1) dx = -inertia;
-  if (i > 4) {
-    int speed = +21 + 3 * (i - 5);
-    dy = (speed > 33) ? 33 : speed;
-  }
-
-  /* collision */
-  next_frame (&kid.f, &nf, frame, dx, dy);
-  cbf = survey (_bf, pos, &kid.f, &nc, &pbf, &np)->fg;
-  if (cbf == WALL || (nf.dir == LEFT && cbf == DOOR)) {
-    to_next_place_edge (&nf, &kid.f, frame, _bf, pos, 0, true, -1);
-    dx = 0; dy = 0;
-  }
-
-  /* if (is_colliding (kid, bf, pos, 0, false, -dx)) */
-  /*   to_collision_edge (&kid, frame, bf, pos, 0, false, -dx); */
-
-  next_frame (&kid.f, &kid.f, frame, dx, dy);
-
-  /* depressible floors */
-  clear_depressible_floor (&kid);
-
-  /* next frame */
-  i++;
-  /* if (inertia > 0 && i % 3) inertia--; */
-}
-
 void
 kid_drink (void)
 {

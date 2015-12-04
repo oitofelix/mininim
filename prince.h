@@ -94,7 +94,7 @@ struct anim {
   ACTION oaction;
   ACTION action;
   int i, j, wait, repeat, cinertia, walk;
-  bool collision, fall, hit_ceiling,
+  bool reverse, collision, fall, hit_ceiling,
     just_hanged, hang;
 
   /* depressible floor */

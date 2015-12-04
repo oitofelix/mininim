@@ -33,44 +33,16 @@
 #include "kid-vjump.h"
 #include "kid-run-jump.h"
 #include "kid-misstep.h"
+#include "kid-hang.h"
+#include "kid-hang-wall.h"
+#include "kid-hang-free.h"
+#include "kid-climb.h"
+#include "kid-unclimb.h"
+#include "kid-fall.h"
 
 /* bitmap resources */
 #define KID_FULL_LIFE "dat/kid/objects/full live.png"
 #define KID_EMPTY_LIFE "dat/kid/objects/empty live.png"
-#define KID_FALL_13 "dat/kid/hanging and falling/frame13.png"
-#define KID_FALL_14 "dat/kid/hanging and falling/frame14.png"
-#define KID_FALL_15 "dat/kid/hanging and falling/frame15.png"
-#define KID_FALL_16 "dat/kid/hanging and falling/frame16.png"
-#define KID_FALL_17 "dat/kid/hanging and falling/frame17.png"
-#define KID_HANG_00 "dat/kid/hanging and falling/frame00.png"
-#define KID_HANG_01 "dat/kid/hanging and falling/frame01.png"
-#define KID_HANG_02 "dat/kid/hanging and falling/frame02.png"
-#define KID_HANG_03 "dat/kid/hanging and falling/frame03.png"
-#define KID_HANG_04 "dat/kid/hanging and falling/frame04.png"
-#define KID_HANG_05 "dat/kid/hanging and falling/frame05.png"
-#define KID_HANG_06 "dat/kid/hanging and falling/frame06.png"
-#define KID_HANG_07 "dat/kid/hanging and falling/frame07.png"
-#define KID_HANG_08 "dat/kid/hanging and falling/frame08.png"
-#define KID_HANG_09 "dat/kid/hanging and falling/frame09.png"
-#define KID_HANG_10 "dat/kid/hanging and falling/frame10.png"
-#define KID_HANG_11 "dat/kid/hanging and falling/frame11.png"
-#define KID_HANG_12 "dat/kid/hanging and falling/frame12.png"
-#define KID_HANG_14 "dat/kid/scaling/frame14.png"
-#define KID_CLIMB_01 "dat/kid/clipping/frame01.png"
-#define KID_CLIMB_02 "dat/kid/clipping/frame02.png"
-#define KID_CLIMB_03 "dat/kid/clipping/frame03.png"
-#define KID_CLIMB_04 "dat/kid/clipping/frame04.png"
-#define KID_CLIMB_05 "dat/kid/clipping/frame05.png"
-#define KID_CLIMB_06 "dat/kid/clipping/frame06.png"
-#define KID_CLIMB_07 "dat/kid/clipping/frame07.png"
-#define KID_CLIMB_08 "dat/kid/clipping/frame08.png"
-#define KID_CLIMB_09 "dat/kid/clipping/frame09.png"
-#define KID_CLIMB_10 "dat/kid/clipping/frame10.png"
-#define KID_CLIMB_11 "dat/kid/clipping/frame11.png"
-#define KID_CLIMB_12 "dat/kid/clipping/frame12.png"
-#define KID_CLIMB_13 "dat/kid/clipping/frame13.png"
-#define KID_CLIMB_14 "dat/kid/clipping/frame14.png"
-#define KID_CLIMB_15 "dat/kid/clipping/frame15.png"
 #define KID_DRINK_01 "dat/kid/drinking/frame01.png"
 #define KID_DRINK_02 "dat/kid/drinking/frame02.png"
 #define KID_DRINK_03 "dat/kid/drinking/frame03.png"
@@ -134,14 +106,8 @@ void load_kid (void);
 void unload_kid (void);
 void sample_kid (void);
 
-void kid_climb (void);
-void kid_fall (void);
-void kid_unclimb (void);
 void kid_drink (void);
 void kid_raise_sword (void);
-void kid_hang (void);
-void kid_hang_wall (void);
-void kid_hang_free (void);
 void kid_keep_sword (void);
 void kid_take_sword (void);
 void kid_sword_normal (void);
@@ -161,9 +127,6 @@ void draw_kid_lives (ALLEGRO_BITMAP *bitmap, int j);
 /* variables */
 extern struct anim kid; /* kid animation object */
 
-#define KID_FALL_FRAMESET_NMEMB 13
-#define KID_HANG_FRAMESET_NMEMB 13
-#define KID_CLIMB_FRAMESET_NMEMB 15
 #define KID_DRINK_FRAMESET_NMEMB 15
 #define KID_RAISE_SWORD_FRAMESET_NMEMB 4
 #define KID_KEEP_SWORD_FRAMESET_NMEMB 10
@@ -173,10 +136,6 @@ extern struct anim kid; /* kid animation object */
 #define KID_SWORD_DEFENSE_FRAMESET_NMEMB 2
 #define KID_SWORD_ATTACK_FRAMESET_NMEMB 7
 
-extern struct frameset fall_frameset[KID_FALL_FRAMESET_NMEMB];
-extern struct frameset kid_hang_frameset[KID_HANG_FRAMESET_NMEMB];
-extern struct frameset kid_climb_frameset[KID_CLIMB_FRAMESET_NMEMB];
-extern struct frameset kid_fall_frameset[KID_FALL_FRAMESET_NMEMB];
 extern struct frameset kid_drink_frameset[KID_DRINK_FRAMESET_NMEMB];
 extern struct frameset kid_raise_sword_frameset[KID_RAISE_SWORD_FRAMESET_NMEMB];
 extern struct frameset kid_keep_sword_frameset[KID_KEEP_SWORD_FRAMESET_NMEMB];
@@ -186,29 +145,14 @@ extern struct frameset kid_sword_walkb_frameset[KID_SWORD_WALKB_FRAMESET_NMEMB];
 extern struct frameset kid_sword_defense_frameset[KID_SWORD_DEFENSE_FRAMESET_NMEMB];
 extern struct frameset kid_sword_attack_frameset[KID_SWORD_ATTACK_FRAMESET_NMEMB];
 
-
-
-extern ALLEGRO_BITMAP *kid_climb_03, *kid_climb_04,
-  *kid_climb_05, *kid_climb_06, *kid_climb_07, *kid_climb_08,
-  *kid_climb_09, *kid_climb_10;
-
 extern bool misstep, uncouch_slowly, critical_edge,
   hang_limit, turn, keep_sword_fast;
 
-extern int inertia;
+extern int inertia, kid_total_lives, kid_current_lives;
 
 extern struct pos item_pos;
 
 extern ALLEGRO_BITMAP *kid_full_life, *kid_empty_life,
-  *kid_fall_13, *kid_fall_14, *kid_fall_15, *kid_fall_16, *kid_fall_17,
-  *kid_hang_00, *kid_hang_01, *kid_hang_02, *kid_hang_03,
-  *kid_hang_04, *kid_hang_05, *kid_hang_06, *kid_hang_07,
-  *kid_hang_08, *kid_hang_09, *kid_hang_10, *kid_hang_11,
-  *kid_hang_12, *kid_hang_14,
-  *kid_climb_01, *kid_climb_02, *kid_climb_03, *kid_climb_04,
-  *kid_climb_05, *kid_climb_06, *kid_climb_07, *kid_climb_08,
-  *kid_climb_09, *kid_climb_10, *kid_climb_11, *kid_climb_12,
-  *kid_climb_13, *kid_climb_14, *kid_climb_15,
   *kid_drink_01, *kid_drink_02, *kid_drink_03, *kid_drink_04, *kid_drink_05,
   *kid_drink_06, *kid_drink_07, *kid_drink_08, *kid_drink_09, *kid_drink_10,
   *kid_drink_11, *kid_drink_12, *kid_drink_13, *kid_drink_14, *kid_drink_15,

@@ -42,7 +42,7 @@ static void
 init_kid_run_frameset (void)
 {
   struct frameset frameset[KID_RUN_FRAMESET_NMEMB] =
-    {{kid_run_07,-10,0},{kid_run_08,-7,0},{kid_run_09,-4,0},
+    {{kid_run_07,-10,0},{kid_run_08,-7,0},{kid_run_09,-6,0},
      {kid_run_10,-4,0},{kid_run_11,-8,0},{kid_run_12,-11,0},
      {kid_run_13,-4,0},{kid_run_14,-8,0}};
 

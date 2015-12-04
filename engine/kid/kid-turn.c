@@ -102,7 +102,7 @@ flow (struct anim *kid)
     int dc = dist_collision (&kid->f, _tf, pos, 0, false);
     int df = dist_con (&kid->f, _bf, pos, -4, false, NO_FLOOR);
 
-    if (turn) kid_turn (), turn = false;
+    if (turn) kid->i = -1, turn = false, kid_turn ();
     else if (couch) kid_couch ();
     else if (jump) kid_jump ();
     else if (walk && dc > PLACE_WIDTH && df > PLACE_WIDTH)

@@ -4,7 +4,8 @@ ENGINE_MODULES = anim pos physics level consistency stars floor				\
   room fire potion sword clock princess jaffar
 KID_MODULES = kid kid-normal kid-walk kid-start-run kid-run						\
   kid-stop-run kid-turn-run kid-couch kid-turn kid-stabilize kid-jump	\
-  kid-vjump kid-run-jump kid-misstep
+  kid-vjump kid-run-jump kid-misstep kid-hang kid-hang-wall						\
+  kid-hang-free kid-climb kid-unclimb kid-fall
 LEVEL_MODULES = title level-1 consistency-level
 MAIN_MODULES = prince
 
