@@ -68,19 +68,46 @@ flow (struct anim *kid)
 
   if ((! shift_key || hang_limit || hanged_con == NO_FLOOR)
       && (kid->i < 5 || kid->j > -1)) {
+    if (con (&hang_pos)->fg != NO_FLOOR
+        && kid->i >= 4) {
+      kid->f.b = kid_vjump_frameset[13].frame;
+      kid->f.c.x = (kid->f.dir == LEFT)
+        ? PLACE_WIDTH * hang_pos.place + 7
+        : PLACE_WIDTH * (hang_pos.place + 1) + 9;
+      kid->f.c.y = PLACE_HEIGHT * hang_pos.floor - 8;
+      hang_limit = false;
+      kid_vjump ();
+      return false;
+    }
+    if (crel (&hang_pos, +0, dir)->fg != NO_FLOOR
+        && kid->i <= 4) {
+      kid->f.b = kid_vjump_frameset[13].frame;
+      kid->f.c.x = (kid->f.dir == LEFT)
+        ? PLACE_WIDTH * hang_pos.place + 7
+        : PLACE_WIDTH * (hang_pos.place + 1) + 5;
+      kid->f.c.y = PLACE_HEIGHT * hang_pos.floor - 8;
+      hang_limit = false;
+      kid_vjump ();
+      return false;
+    }
     if (con (&hang_pos)->fg == NO_FLOOR
-        && kid->i > 4) {
-      kid->f.c.x += (kid->f.dir == LEFT) ? +4 : -6;
+        && kid->i >= 4) {
+      kid->f.c.x = (kid->f.dir == LEFT)
+        ? PLACE_WIDTH * hang_pos.place + 16
+        : PLACE_WIDTH * (hang_pos.place + 1) - 16;
       hang_limit = false;
       kid_fall ();
       return false;
     }
-    kid->f.b = kid_vjump_frameset[13].frame;
-    kid->f.c.x += (kid->f.dir == LEFT) ? +0 : -4;
-    kid->f.c.y = PLACE_HEIGHT * hang_pos.floor - 8;
-    hang_limit = false;
-    kid_vjump ();
-    return false;
+    if (crel (&hang_pos, +0, dir)->fg == NO_FLOOR
+        && kid->i <= 4) {
+      kid->f.c.x = (kid->f.dir == LEFT)
+        ? PLACE_WIDTH * hang_pos.place - 16
+        : PLACE_WIDTH * (hang_pos.place + 1) + 16;
+      hang_limit = false;
+      kid_fall ();
+      return false;
+    }
   } if (up_key && ! hang_limit) {
     kid_climb ();
     return false;

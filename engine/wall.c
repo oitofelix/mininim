@@ -351,10 +351,13 @@ draw_wall_left_mark (ALLEGRO_BITMAP *bitmap, struct pos *p, int r)
   if (r > 3) place_offset = r3 - r2 + 6;
   else if (r > 1) place_offset = r1 - r0 + 6;
 
-  draw_bitmap (wall_mark, bitmap,
-               32 * p->place + place_offset +
-               8 * (((r == 2) || (r == 3)) ? 1 : 0),
-               63 * p->floor + 61 - floor_offset[r], 0);
+  struct coord c;
+  c.room = p->room;
+  c.x = 32 * p->place + place_offset +
+    8 * (((r == 2) || (r == 3)) ? 1 : 0);
+  c.y = 63 * p->floor + 61 - floor_offset[r];
+
+  draw_bitmapc (wall_mark, bitmap, &c, 0);
 }
 
 void
@@ -366,10 +369,12 @@ draw_wall_right_mark (ALLEGRO_BITMAP *bitmap, struct pos *p, int r)
   if (r % 2) wall_mark = wall_mark_bottom_right;
   else wall_mark = wall_mark_top_right;
 
-  draw_bitmap (wall_mark, bitmap,
-               32 * p->place + 8 * ((r > 1) ? 1 : 0)
-               + ((r < 2) ? 24 : r1 - 3),
-               63 * p->floor + 56 - floor_offset[r], 0);
+  struct coord c;
+  c.room = p->room;
+  c.x = 32 * p->place + 8 * ((r > 1) ? 1 : 0)
+    + ((r < 2) ? 24 : r1 - 3);
+  c.y = 63 * p->floor + 56 - floor_offset[r];
+  draw_bitmapc (wall_mark, bitmap, &c, 0);
 }
 
 void

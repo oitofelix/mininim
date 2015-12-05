@@ -136,7 +136,7 @@ flow (struct anim *kid)
         kid->walk = 0;
       else if (dc < 16 || df < 16 || dl < 16 || dd < 16)
         kid->walk = 1;
-      else if (dc < 21 || df < 21 || dl < 21 || dd < 21)
+      else if (dc < 22 || df < 22 || dl < 22 || dd < 22)
         kid->walk = 2;
       else if (dc < 24 || df < 24 || dl < 24 || dd < 24)
         kid->walk = 3;
