@@ -91,7 +91,11 @@ flow (struct anim *kid)
 {
   if (kid->oaction != kid_fall) kid->i = -1;
 
-  select_frame (kid, kid_fall_frameset, kid->i == 4 ? kid->i : kid->i + 1);
+  kid->i++;
+
+  kid->fo.b = kid_fall_frameset[kid->i > 4 ? 4 : kid->i].frame;
+  kid->fo.dx = kid_fall_frameset[kid->i > 4 ? 4 : kid->i].dx;
+  kid->fo.dy = kid_fall_frameset[kid->i > 4 ? 4 : kid->i].dy;
 
   return true;
 }
@@ -190,9 +194,9 @@ physics_in (struct anim *kid)
       kid_current_lives--;
       uncouch_slowly = true;
     } else uncouch_slowly = false;
-    kid_couch ();
     if (kid->i > 3) sample_hit_ground = true;
     shake_loose_floor_row (&pbf);
+    kid_couch ();
     return false;
   }
 
