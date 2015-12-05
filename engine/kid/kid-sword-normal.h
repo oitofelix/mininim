@@ -1,5 +1,5 @@
 /*
-  kid-turn.h -- kid module;
+  kid-sword-normal.h -- kid sword normal module;
 
   Copyright (C) 2015, 2016 Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
 
@@ -17,23 +17,16 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_KID_TURN_H
-#define FREEPOP_KID_TURN_H
+#ifndef FREEPOP_KID_SWORD_NORMAL_H
+#define FREEPOP_KID_SWORD_NORMAL_H
 
 /* bitmaps */
-#define KID_TURN_01 "dat/kid/turning/frame01.png"
-#define KID_TURN_02 "dat/kid/turning/frame02.png"
-#define KID_TURN_03 "dat/kid/turning/frame03.png"
-#define KID_TURN_04 "dat/kid/turning/frame04.png"
+#define KID_SWORD_NORMAL_08 "dat/kid/sword attacking/frame08.png"
 
-#define KID_TURN_FRAMESET_NMEMB 4
-extern struct frameset kid_turn_frameset[KID_TURN_FRAMESET_NMEMB];
+void load_kid_sword_normal (void);
+void unload_kid_sword_normal (void);
+void kid_sword_normal (void);
 
-void load_kid_turn (void);
-void unload_kid_turn (void);
-void kid_turn (void);
-bool is_kid_turn (struct frame *f);
+ALLEGRO_BITMAP *kid_sword_normal_08;
 
-extern ALLEGRO_BITMAP *kid_turn_01, *kid_turn_02, *kid_turn_03, *kid_turn_04;
-
-#endif	/* FREEPOP_KID_TURN_H */
+#endif	/* FREEPOP_KID_SWORD_NORMAL_H */

@@ -116,8 +116,8 @@ physics_in (struct anim *kid)
     to_next_place_edge (&kid->f, &kid->f, kid->fo.b, _tf, pos, 0, false, 0);
   } else if (ctf != NO_FLOOR) inertia = 0;
   else {
-    if (kid->oaction == kid_run_jump) kid->fo.dx = -16, kid->fo.dy= +12;
-    if (kid->oaction == kid_jump) kid->fo.dx = -16, kid->fo.dy = +12;
+    if (kid->oaction == kid_run_jump) kid->fo.dx = -16, kid->fo.dy= +6;
+    if (kid->oaction == kid_jump) kid->fo.dx = -16, kid->fo.dy = +6;
   }
 
   /* put kid in front of the floor */
@@ -223,4 +223,14 @@ physics_out (struct anim *kid)
 {
   /* depressible floors */
   clear_depressible_floor (kid);
+}
+
+bool
+is_kid_fall (struct frame *f)
+{
+  return f->b == kid_fall_13
+    || f->b == kid_fall_14
+    || f->b == kid_fall_15
+    || f->b == kid_fall_16
+    || f->b == kid_fall_17;
 }

@@ -181,3 +181,16 @@ physics_out (struct anim *kid)
   prel (&hang_pos, &hanged_con_pos, -1, dir);
   press_depressible_floor (&hanged_con_pos);
 }
+
+bool
+is_kid_climb (struct frame *f)
+{
+  return f->b == kid_climb_03
+    || f->b == kid_climb_04
+    || f->b == kid_climb_05
+    || f->b == kid_climb_06
+    || f->b == kid_climb_07
+    || f->b == kid_climb_08
+    || f->b == kid_climb_09
+    || f->b == kid_climb_10;
+}

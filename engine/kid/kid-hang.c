@@ -160,3 +160,44 @@ physics_out (struct anim *kid)
   prel (&hang_pos, &hanged_con_pos, -1, dir);
   press_depressible_floor (&hanged_con_pos);
 }
+
+bool
+is_kid_hang_or_climb (struct frame *f)
+{
+  return f->b == kid_hang_00
+    || f->b == kid_hang_01
+    || f->b == kid_hang_02
+    || f->b == kid_hang_03
+    || f->b == kid_hang_04
+    || f->b == kid_hang_05
+    || f->b == kid_hang_06
+    || f->b == kid_hang_07
+    || f->b == kid_hang_08
+    || f->b == kid_hang_09
+    || f->b == kid_hang_10
+    || f->b == kid_hang_11
+    || f->b == kid_hang_12
+    || f->b == kid_hang_14
+
+    || f->b == kid_climb_01
+    || f->b == kid_climb_02
+    || f->b == kid_climb_03
+    || f->b == kid_climb_04
+    || f->b == kid_climb_05
+    || f->b == kid_climb_06
+    || f->b == kid_climb_07
+    || f->b == kid_climb_08
+    || f->b == kid_climb_09
+    || f->b == kid_climb_10;
+}
+
+bool
+is_kid_hanging_at_pos (struct frame *f, struct pos *p)
+{
+  struct coord bb; struct pos pbb, npbb, pr;
+  survey (_bb, pos, f, &bb, &pbb, &npbb);
+
+  int dir = (f->dir == LEFT) ? -1 : +1;
+  return (is_kid_hang_or_climb (f)
+          && peq (prel (&pbb, &pr, -1, dir), p));
+}

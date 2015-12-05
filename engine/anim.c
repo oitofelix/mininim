@@ -178,6 +178,15 @@ select_frame (struct anim *a, struct frameset *fs, int i)
 }
 
 void
+select_xframe (struct anim *a, struct frameset *fs, int j)
+{
+  a->xframe = fs[j].frame;
+  a->xdx = fs[j].dx;
+  a->xdy = fs[j].dy;
+  /* a->j = j; */
+}
+
+void
 next_frame_fo (struct frame *f, struct frame *nf, struct frame_offset *fo)
 {
   next_frame (f, nf, fo->b, fo->dx, fo->dy);

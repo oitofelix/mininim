@@ -43,6 +43,7 @@ extern struct frameset kid_climb_frameset[KID_CLIMB_FRAMESET_NMEMB];
 void load_kid_climb (void);
 void unload_kid_climb (void);
 void kid_climb (void);
+bool is_kid_climb (struct frame *f);
 
 extern ALLEGRO_BITMAP *kid_climb_01, *kid_climb_02, *kid_climb_03,
   *kid_climb_04, *kid_climb_05, *kid_climb_06, *kid_climb_07,

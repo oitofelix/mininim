@@ -5,7 +5,9 @@ ENGINE_MODULES = anim pos physics level consistency stars floor				\
 KID_MODULES = kid kid-normal kid-walk kid-start-run kid-run						\
   kid-stop-run kid-turn-run kid-couch kid-turn kid-stabilize kid-jump	\
   kid-vjump kid-run-jump kid-misstep kid-hang kid-hang-wall						\
-  kid-hang-free kid-climb kid-unclimb kid-fall
+  kid-hang-free kid-climb kid-unclimb kid-fall kid-drink							\
+  kid-raise-sword kid-keep-sword kid-take-sword kid-sword-normal			\
+  kid-sword-walkf kid-sword-walkb kid-sword-defense kid-sword-attack
 LEVEL_MODULES = title level-1 consistency-level
 MAIN_MODULES = prince
 

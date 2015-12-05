@@ -114,7 +114,7 @@ flow (struct anim *kid)
     return false;
   }
 
-  if (kid->f.b == kid_keep_sword_frameset[9].frame) kid->i = 3;
+  if (kid->f.b == kid_keep_sword_frameset[9].frame) kid->i = 2;
 
   select_frame (kid, kid_turn_frameset, kid->i + 1);
 
@@ -159,4 +159,13 @@ physics_out (struct anim *kid)
 {
   /* depressible floors */
   keep_depressible_floor (kid);
+}
+
+bool
+is_kid_turn (struct frame *f)
+{
+  int i;
+  for (i = 0; i < KID_TURN_FRAMESET_NMEMB; i ++)
+    if (f->b == kid_turn_frameset[i].frame) return true;
+  return false;
 }

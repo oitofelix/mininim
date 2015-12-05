@@ -42,6 +42,8 @@ extern struct frameset kid_hang_frameset[KID_HANG_FRAMESET_NMEMB];
 void load_kid_hang (void);
 void unload_kid_hang (void);
 void kid_hang (void);
+bool is_kid_hang_or_climb (struct frame *f);
+bool is_kid_hanging_at_pos (struct frame *f, struct pos *p);
 
 extern ALLEGRO_BITMAP *kid_hang_00, *kid_hang_01, *kid_hang_02,
   *kid_hang_03, *kid_hang_04, *kid_hang_05, *kid_hang_06,

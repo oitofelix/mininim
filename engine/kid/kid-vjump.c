@@ -242,3 +242,12 @@ physics_out (struct anim *kid)
   survey (_mbo, pos, &kid->f, &nc, &pmbo, &np);
   if (kid->i == 17) shake_loose_floor_row (&pmbo);
 }
+
+bool
+is_kid_vjump (struct frame *f)
+{
+  int i;
+  for (i = 0; i < KID_VJUMP_FRAMESET_NMEMB; i ++)
+    if (f->b == kid_vjump_frameset[i].frame) return true;
+  return false;
+}
