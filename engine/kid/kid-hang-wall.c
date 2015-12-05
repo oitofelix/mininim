@@ -66,7 +66,7 @@ flow (struct anim *kid)
   int dir = (kid->f.dir == LEFT) ? -1 : +1;
   enum confg hanged_con = crel (&hang_pos, -1, dir)->fg;
 
-  if ((! shift_key && (kid->reverse || kid->i > 4))
+  if ((! shift_key && (kid->reverse || kid->i > 3))
       || hang_limit || hanged_con == NO_FLOOR) {
     if (con (&hang_pos)->fg == NO_FLOOR) {
       kid_fall ();

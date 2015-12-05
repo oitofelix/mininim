@@ -61,7 +61,7 @@ static bool
 flow (struct anim *kid)
 {
   if (kid->oaction != kid_unclimb) kid->i = 14;
-  if (kid->oaction == kid_climb) kid->i = 2;
+  if (kid->oaction == kid_climb) kid->i = 3;
 
   if (kid->i == 0) {
     /* in this function the hang_pos variable holds the position of
@@ -85,6 +85,7 @@ flow (struct anim *kid)
   kid->fo.dx = -kid_climb_frameset[kid->i + 1].dx;
   kid->fo.dy = -kid_climb_frameset[kid->i + 1].dy;
 
+  if (kid->oaction == kid_climb) kid->fo.dx += +2;
   if (kid->i == 1) kid->fo.dx += -3;
 
   return true;
