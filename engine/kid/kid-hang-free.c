@@ -68,14 +68,15 @@ flow (struct anim *kid)
 
   if ((! shift_key || hang_limit || hanged_con == NO_FLOOR)
       && (kid->i < 5 || kid->j > -1)) {
-    if (con (&hang_pos)->fg == NO_FLOOR) {
-      kid->f.c.x += (kid->f.dir == LEFT) ? +6 : -4;
+    if (con (&hang_pos)->fg == NO_FLOOR
+        && kid->i > 4) {
+      kid->f.c.x += (kid->f.dir == LEFT) ? +4 : -6;
       hang_limit = false;
       kid_fall ();
       return false;
     }
     kid->f.b = kid_vjump_frameset[13].frame;
-    kid->f.c.x += (kid->f.dir == LEFT) ? +1 : -1;
+    kid->f.c.x += (kid->f.dir == LEFT) ? +0 : -4;
     kid->f.c.y = PLACE_HEIGHT * hang_pos.floor - 8;
     hang_limit = false;
     kid_vjump ();
