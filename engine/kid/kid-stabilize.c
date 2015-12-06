@@ -90,7 +90,7 @@ kid_stabilize_collision (void)
   kid.action = kid_stabilize_collision;
 
   sample_hit_wall = true;
-  to_collision_edge (&kid.f, kid_stabilize_frameset[0].frame, _tf, pos, 0, false, 0);
+  to_collision_edge (&kid.f, kid_stabilize_frameset[0].frame, _tf, pos, -4, false, 0);
   if (kid.f.dir == RIGHT) kid.f.c.x -= 3;
 
   kid_stabilize ();
@@ -104,15 +104,14 @@ flow (struct anim *kid)
   if (! turn)
     turn = ((kid->f.dir == RIGHT) && left_key)
       || ((kid->f.dir == LEFT) && right_key);
-  bool walk = ((kid->f.dir == RIGHT) && right_key && shift_key)
-                || ((kid->f.dir == LEFT) && left_key && shift_key);
   bool run = (((kid->f.dir == RIGHT) && right_key)
-              || ((kid->f.dir == LEFT) && left_key)) && ! walk;
+              || ((kid->f.dir == LEFT) && left_key))
+    && ! shift_key;
   bool jump = ((kid->f.dir == RIGHT) && right_key && up_key)
     || ((kid->f.dir == LEFT) && left_key && up_key);
   bool couch = down_key;
 
-  int dc = dist_collision (&kid->f, _bb, pos, 0, false);
+  int dc = dist_collision (&kid->f, _tf, pos, -4, false);
   int df = dist_con (&kid->f, _bb, pos, -4, false, NO_FLOOR);
 
   if (kid->i >= 0 && ! kid->collision) {
@@ -125,9 +124,6 @@ flow (struct anim *kid)
     } else if (turn) {
       kid_turn ();
       turn = false;
-      return false;
-    } else if (walk && kid->i == 3) {
-      kid_walk ();
       return false;
     } else if (run && dc > PLACE_WIDTH && df > PLACE_WIDTH) {
       kid_start_run ();
@@ -170,8 +166,8 @@ physics_in (struct anim *kid)
   }
 
   /* collision */
-  if (is_colliding (&kid->f, _tf, pos, 0, false, -kid->fo.dx))
-    to_collision_edge (&kid->f, kid->fo.b, _tf, pos, 0, false, -kid->fo.dx);
+  if (is_colliding (&kid->f, _tf, pos, -4, false, -kid->fo.dx))
+    to_collision_edge (&kid->f, kid->fo.b, _tf, pos, -4, false, -kid->fo.dx);
 
   return true;
 }

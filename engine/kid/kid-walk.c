@@ -107,14 +107,28 @@ kid_walk (void)
 static bool
 flow (struct anim *kid)
 {
-  if (kid->oaction != kid_walk) kid->i = kid->walk = -1;
+  struct coord nc; struct pos np;
 
-  if (kid->i == -1) {
-    int dc = dist_collision (&kid->f, _tf, pos, +0, false);
-    int df = dist_con (&kid->f, _bf, pos, -4, false, NO_FLOOR);
-    int dl = dist_con (&kid->f, _bf, pos, -4, false, LOOSE_FLOOR);
-    int dd = dist_con (&kid->f, _bf, pos, -4, false, CLOSER_FLOOR);
+  if (kid->oaction != kid_walk) {
+    survey (_mbo, pos, &kid->f, &nc, &kid->p, &np);
+    kid->i = kid->walk = -1;
+  }
 
+  confg_collision = NO_FLOOR;
+
+  int dc = dist_collision (&kid->f, _tf, pos, -4, false);
+  int df = dist_con (&kid->f, _bf, pos, -4, false, NO_FLOOR);
+  int dl = dist_con (&kid->f, _bf, pos, -4, false, LOOSE_FLOOR);
+  int dd = dist_con (&kid->f, _bf, pos, -4, false, CLOSER_FLOOR);
+
+  int dcc = 0;
+  if (kid->f.dir == RIGHT && confg_collision == DOOR) {
+    dcc = 9;
+    dc -= dcc;
+  }
+
+
+  if (kid->i == -1 && con (&kid->p)->fg != LOOSE_FLOOR) {
     if (dc < 4) {
       kid_normal ();
       return false;
@@ -132,23 +146,38 @@ flow (struct anim *kid)
         return false;
       }
 
-      if (dc < 9 || df < 9 || dl < 9 || dd < 9)
-        kid->walk = 0;
-      else if (dc < 16 || df < 16 || dl < 16 || dd < 16)
-        kid->walk = 1;
+      int dx = 0;
+      if (dc < 10 || df < 10 || dl < 10 || dd < 10)
+        kid->walk = 0, dx = 5;
+      else if (dc < 15 || df < 15 || dl < 15 || dd < 15)
+        kid->walk = 1, dx = 10;
       else if (dc < 22 || df < 22 || dl < 22 || dd < 22)
-        kid->walk = 2;
-      else if (dc < 24 || df < 24 || dl < 24 || dd < 24)
-        kid->walk = 3;
+        kid->walk = 2, dx = 15;
       else if (dc < 27 || df < 27 || dl < 27 || dd < 27)
-        kid->walk = 4;
+        kid->walk = 3, dx = 22;
+
+      if (kid->walk != -1 ) {
+        kid->f.b = kid_normal_00;
+        kid->f.c.x = (kid->f.dir == LEFT)
+          ? PLACE_WIDTH * kid->p.place + 11 + dx + dcc
+          : PLACE_WIDTH * (kid->p.place + 1) + 7 - dx - dcc;
+        kid->f.c.y = PLACE_HEIGHT * kid->p.floor + 15;
+      }
     }
   } else if (kid->i == 2 && kid->walk == 0) kid->i = 9;
   else if (kid->i == 3 && kid->walk == 1) kid->i = 8;
   else if (kid->i == 4 && kid->walk == 2) kid->i = 6;
   else if (kid->i == 5 && kid->walk == 3) kid->i = 6;
-  else if (kid->i == 6 && kid->walk == 4) kid->i = 6;
   else if (kid->i == 11){
+    if (kid->walk != -1) {
+      pos2view (&kid->p, &kid->p);
+      kid->f.b = kid_normal_00;
+      kid->f.c.x = (kid->f.dir == LEFT)
+        ? PLACE_WIDTH * kid->p.place + 11 + dcc
+        : PLACE_WIDTH * (kid->p.place + 1) + 7 - dcc;
+      kid->f.c.y = PLACE_HEIGHT * kid->p.floor + 15;
+    }
+
     kid_normal ();
     misstep = false;
     return false;
@@ -157,17 +186,17 @@ flow (struct anim *kid)
   select_frame (kid, kid_walk_frameset, kid->i + 1);
 
   if (kid->f.b == kid_turn_frameset[3].frame) kid->fo.dx = +0;
-  if (kid->f.b == kid_stabilize_frameset[0].frame) kid->fo.dx = +2;
-  if (kid->f.b == kid_stabilize_frameset[1].frame) kid->fo.dx = +6;
-  if (kid->f.b == kid_stabilize_frameset[2].frame) kid->fo.dx = +3;
-  if (kid->f.b == kid_stabilize_frameset[3].frame) kid->fo.dx = +0;
+
+  if (kid->walk == 0) {
+    if (dc > 4 && df > 4 && dl > 4 && dd > 4) kid->fo.dx += -1;
+  }
 
   if (kid->walk == 1) {
     if (kid->i == 9) kid->fo.dx = +1;
     if (kid->i == 10) kid->fo.dx = -1;
   }
 
-  if (kid->walk == 2 || kid->walk == 3 || kid->walk == 4) {
+  if (kid->walk == 2 || kid->walk == 3) {
     if (kid->i == 7) kid->fo.dx = +3;
     if (kid->i == 10) kid->fo.dx = -1;
   }
@@ -192,19 +221,6 @@ physics_in (struct anim *kid)
           || (kid->i >= 6 && cmbo == NO_FLOOR))) {
     kid_fall ();
     return false;
-  }
-
-  /* move to edge */
-  if ((kid->i == 10 && kid->walk == 0)
-      || (kid->i == 3 && kid->walk == 1)
-      || (kid->i == 4 && kid->walk == 2)
-      || (kid->i == 5 && kid->walk == 3)
-      || (kid->i == 6 && kid->walk == 4)) {
-    kid->fo.dx = +1;
-    to_collision_edge (&kid->f, kid->fo.b, _tf, pos, +0, false, 0)
-      || to_con_edge (&kid->f, kid->fo.b, _bf, pos, -4, false, 0, LOOSE_FLOOR)
-      || to_con_edge (&kid->f, kid->fo.b, _bf, pos, -4, false, 0, CLOSER_FLOOR)
-      || to_con_edge (&kid->f, kid->fo.b, _bf, pos, -4, false, 0, NO_FLOOR);
   }
 
   return true;

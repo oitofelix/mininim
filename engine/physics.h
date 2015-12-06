@@ -32,6 +32,7 @@ struct con *con (struct pos *p);
 struct con *crel (struct pos *p, int floor, int place);
 bool is_frame_visible (struct frame *f);
 bool is_pos_visible (struct pos *p);
+bool is_strictly_traversable (struct pos *p);
 
 
 int dist_next_place (struct frame *f, coord_f cf, pos_f pf,

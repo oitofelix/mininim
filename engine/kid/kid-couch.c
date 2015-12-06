@@ -122,7 +122,7 @@ kid_couch_collision (void)
   kid.f.b = kid_normal_00;
 
   sample_hit_wall = true;
-  to_collision_edge (&kid.f, kid_couch_frameset[0].frame, _tf, pos, 0, false, 0);
+  to_collision_edge (&kid.f, kid_couch_frameset[0].frame, _tf, pos, -4, false, 0);
   if (kid.f.dir == RIGHT) kid.f.c.x -= 12;
 
   kid_couch ();
@@ -190,7 +190,7 @@ flow (struct anim *kid)
       && kid->wait-- <= 0
       && ((kid->f.dir == LEFT && left_key)
           || (kid->f.dir == RIGHT && right_key))) {
-    if (! is_colliding (&kid->f, _tf, pos, 0, false, 6))
+    if (! is_colliding (&kid->f, _tf, pos, -4, false, 6))
       kid->f.c.x += (kid->f.dir == LEFT) ? -6 : +6;
     select_frame (kid, kid_couch_frameset, 0);
     return true;
@@ -224,7 +224,7 @@ physics_in (struct anim *kid)
       && ! (kid->fall && kid->i == 0)) {
     if (kid->collision)
       to_collision_edge (&kid->f, kid_fall_frameset[0].frame,
-                         _tf, pos, 0, false, 0);
+                         _tf, pos, -4, false, 0);
     kid_fall ();
     return false;
   }
@@ -235,8 +235,11 @@ physics_in (struct anim *kid)
     to_next_place_edge (&kid->f, &kid->f, kid->fo.b, _bf, pos, 0, true, -1);
 
   /* wall pushes back */
-  if (is_colliding (&kid->f, _tf, pos, 0, false, -kid->fo.dx))
-    to_collision_edge (&kid->f, kid->fo.b, _tf, pos, 0, false, -kid->fo.dx);
+  if (is_colliding (&kid->f, _tf, pos, -4, false, -kid->fo.dx)) {
+    int d = (kid->f.dir == RIGHT && confg_collision == DOOR) ? 4 : 0;
+    to_collision_edge (&kid->f, kid->fo.b, _tf, pos, -4, false, -kid->fo.dx + d);
+  }
+
 
   return true;
 }

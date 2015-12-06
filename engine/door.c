@@ -277,31 +277,31 @@ draw_door_frame_right (ALLEGRO_BITMAP *bitmap, struct pos *p)
 void
 draw_door_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f)
 {
-  struct coord c; struct pos par, pr;
+  struct pos par, pr, pl, pa;
+  struct coord nc; struct pos np, ptf, pmt, ptb;
 
   draw_door_base (bitmap, p);
-  draw_bitmapc (door_pole, screen, door_pole_coord (p, &c), 0);
+  draw_bitmapc (door_pole, screen, door_pole_coord (p, &nc), 0);
 
   if (is_kid_hanging_at_pos (f, p) && f->dir == LEFT) return;
 
-  struct coord tf, mbo, bb;
-  struct pos ptf, nptf, pmbo, npmbo, pbb, npbb;
-  survey (_tf, pos, f, &tf, &ptf, &nptf);
-  survey (_mbo, pos, f, &mbo, &pmbo, &npmbo);
-  survey (_bb, pos, f, &bb, &pbb, &npbb);
+  survey (_tf, pos, f, &nc, &ptf, &np);
+  survey (_mt, pos, f, &nc, &pmt, &np);
+  survey (_tb, pos, f, &nc, &ptb, &np);
 
-  if ((f->dir == RIGHT && peq (&ptf, p))
-      || (f->dir == RIGHT
-          && is_kid_vjump (f)
-          && peq (&pbb, p))
-      || (f->dir == LEFT
-          && is_kid_turn (f)
-          && peq (&pmbo, p))
-      || (f->dir == LEFT && peq (&pbb, p))) {
+  prel (p, &pr, +0, +1);
+  prel (p, &pl, +0, -1);
+  prel (p, &pa, -1, +0);
+  prel (p, &par, -1, +1);
+
+  if ((peq (&ptb, p) || peq (&ptb, &pl)
+       || peq (&ptb, &pa))
+      && (peq (&pmt, p) || peq (&pmt, &pl)
+          || peq (&pmt, &pa))) {
     struct door *d = door_at_pos (p);
     draw_door_grid (screen, p, d->i);
-    draw_con_left (screen, prel (p, &par, -1, +1));
-    draw_con_left (screen, prel (p, &pr, +0, +1));
+    draw_con_left (screen, &par);
+    draw_con_left (screen, &pr);
   }
 }
 

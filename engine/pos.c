@@ -531,3 +531,19 @@ _bb (struct frame *f, struct coord *c)
   c->y = d.y + d.h -1;
   return c;
 }
+
+struct con *
+surveyo (coord_f cf, int dx, int dy, pos_f pf, struct frame *f,
+         struct coord *c, struct pos *p, struct pos *np)
+{
+  int dir = (f->dir == LEFT) ? +1 : -1;
+
+  struct coord _c;
+  cf (f, &_c);
+  _c.x += dir * dx;
+  _c.y += dy;
+  *c = _c;
+  pf (c, p);
+  npos (p, np);
+  return con (np);
+}

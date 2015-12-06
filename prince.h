@@ -97,6 +97,8 @@ struct anim {
   bool reverse, collision, fall, hit_ceiling,
     just_hanged, hang;
 
+  struct pos p;
+
   /* depressible floor */
   struct pos df_pos[2];
   struct pos df_posb[2];

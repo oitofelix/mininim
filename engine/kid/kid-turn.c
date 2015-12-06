@@ -145,8 +145,8 @@ physics_in (struct anim *kid)
 
   /* collision */
   kid->f.dir = (kid->f.dir == RIGHT) ? LEFT : RIGHT;
-  if (is_colliding (&kid->f, _tf, pos, 0, false, -kid->fo.dx)) {
-    to_collision_edge (&kid->f, kid->fo.b, _tf, pos, 0, false, 0);
+  if (is_colliding (&kid->f, _tf, pos, -4, false, -kid->fo.dx)) {
+    to_collision_edge (&kid->f, kid->fo.b, _tf, pos, -4, false, 0);
     kid->fo.dx = 0;
   }
   kid->f.dir = (kid->f.dir == RIGHT) ? LEFT : RIGHT;

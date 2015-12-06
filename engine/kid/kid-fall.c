@@ -103,8 +103,8 @@ flow (struct anim *kid)
 static bool
 physics_in (struct anim *kid)
 {
-  struct coord nc; struct pos ptf, pbf, pm, np;
-  enum confg cbf, cbb, ctf, cm;
+  struct coord nc; struct pos ptf, pbf, pbb, pm, np;
+  enum confg cbf, ctf, cm;
 
   int dir = (kid->f.dir == LEFT) ? -1 : +1;
 
@@ -112,6 +112,7 @@ physics_in (struct anim *kid)
   ctf = survey (_tf, pos, &kid->f, &nc, &ptf, &np)->fg;
   if (kid->i == 0 && crel (&ptf, 0, dir)->fg != NO_FLOOR
       && crel (&ptf, 0, dir)->fg != WALL
+      && is_strictly_traversable (&ptf)
       && kid->oaction == kid_walk) {
     to_next_place_edge (&kid->f, &kid->f, kid->fo.b, _tf, pos, 0, false, 0);
   } else if (ctf != NO_FLOOR) inertia = 0;
@@ -121,10 +122,12 @@ physics_in (struct anim *kid)
   }
 
   /* put kid in front of the floor */
-  cbf = survey (_bf, pos, &kid->f, &nc, &pbf, &np)->fg;
-  cbb = survey (_bb, pos, &kid->f, &nc, &np, &np)->fg;
-  bool should_move_to_front = cbf == NO_FLOOR && cbb != NO_FLOOR;
-  bool should_move_to_back = cbf != NO_FLOOR && cbb == NO_FLOOR;
+  survey (_bf, pos, &kid->f, &nc, &pbf, &np);
+  survey (_bb, pos, &kid->f, &nc, &pbb, &np);
+  bool should_move_to_front = is_strictly_traversable (&pbf)
+    && ! is_strictly_traversable (&pbb);
+  bool should_move_to_back = ! is_strictly_traversable (&pbf)
+    && is_strictly_traversable (&pbb);
   coord_f cf = (should_move_to_front) ? _bb : _bf;
 
   if (kid->i == 0 && (should_move_to_front || should_move_to_back)) {
@@ -174,7 +177,7 @@ physics_in (struct anim *kid)
   struct loose_floor *l =
     loose_floor_at_pos (prel (&pm, &pr, -1, +0));
 
-  if (kid->i > 0
+  if (kid->i > 2
       && cmbo != NO_FLOOR
       && npmbo.floor != npmbo_nf.floor
       && ! (l && l->action == FALL_LOOSE_FLOOR && cm == LOOSE_FLOOR)) {

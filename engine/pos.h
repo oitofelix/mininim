@@ -22,6 +22,9 @@
 
 #include "prince.h"
 
+typedef struct coord *(*coord_f) (struct frame *, struct coord *);
+typedef struct pos *(*pos_f) (struct coord *, struct pos *);
+
 int roomd (int room, enum dir dir);
 struct coord *ncoord (struct coord *c, struct coord *nc);
 struct pos *npos (struct pos *p, struct pos *np);
@@ -52,10 +55,11 @@ struct coord *_br (struct frame *f, struct coord *c);
 struct coord *_bf (struct frame *f, struct coord *c);
 struct coord *_bb (struct frame *f, struct coord *c);
 
-#define survey(coord_f,pos_f,f,c,p,np) (con (npos ((pos_f) ((coord_f) ((f), (c)), (p)), (np))))
+struct con *
+surveyo (coord_f cf, int dx, int dy, pos_f pf, struct frame *f,
+         struct coord *c, struct pos *p, struct pos *np);
 
-typedef struct coord *(*coord_f) (struct frame *, struct coord *);
-typedef struct pos *(*pos_f) (struct coord *, struct pos *);
+#define survey(coord_f,pos_f,f,c,p,np) (con (npos ((pos_f) ((coord_f) ((f), (c)), (p)), (np))))
 
 /* #define pmt(f) (pos (mt (f))) */
 /* #define pmbo(f) (pos (mbo (f))) */

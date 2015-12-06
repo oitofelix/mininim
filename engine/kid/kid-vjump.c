@@ -172,10 +172,10 @@ physics_in (struct anim *kid)
   }
 
   /* collision */
-  if (is_colliding (&kid->f, _tf, pos, 0, false, -kid->fo.dx)
+  if (is_colliding (&kid->f, _tf, pos, -4, false, -kid->fo.dx)
       && confg_collision == DOOR
       && kid->f.dir == RIGHT)
-    to_collision_edge (&kid->f, kid->fo.b, _tf, pos, 0, false, -kid->fo.dx);
+    to_collision_edge (&kid->f, kid->fo.b, _tf, pos, -4, false, -kid->fo.dx);
 
   /* ceiling hit */
   survey (_tb, pos, &kid->f, &nc, &ptb, &np);

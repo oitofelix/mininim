@@ -71,6 +71,16 @@ is_pos_visible (struct pos *p)
   return false;
 }
 
+bool
+is_strictly_traversable (struct pos *p)
+{
+  if (con (p)->fg == NO_FLOOR) return true;
+  if (con (p)->fg == LOOSE_FLOOR) {
+    struct loose_floor *l = loose_floor_at_pos (p);
+    if (l->action == FALL_LOOSE_FLOOR) return true;
+  }
+  return false;
+}
 
 
 
@@ -146,6 +156,7 @@ is_colliding (struct frame *f, coord_f cf, pos_f pf,
         && c.y <=
         door_grid_tip_y (&pr) - 10);
 
+  confg_collision = NO_FLOOR;
   if (wall_collision) confg_collision = WALL;
   if (door_collision) confg_collision = DOOR;
 

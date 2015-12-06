@@ -128,8 +128,8 @@ physics_in (struct anim *kid)
   }
 
   /* collision */
-  if (is_colliding (&kid->f, _tf, pos, 0, false, -kid->fo.dx))
-    to_collision_edge (&kid->f, kid->fo.b, _tf, pos, 0, false, -kid->fo.dx);
+  if (is_colliding (&kid->f, _tf, pos, -4, false, -kid->fo.dx))
+    to_collision_edge (&kid->f, kid->fo.b, _tf, pos, -4, false, -kid->fo.dx);
 
   return true;
 }
