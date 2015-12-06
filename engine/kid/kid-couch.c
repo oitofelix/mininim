@@ -162,7 +162,7 @@ flow (struct anim *kid)
       && dist_next_place (&kid->f, _tf, pos, 0, true) < 22
       && ! (ctf == DOOR && kid->f.dir == LEFT
             && door_at_pos (&ptf)->i > DOOR_CLIMB_LIMIT)) {
-    hang_pos = pbf;
+    prel (&pbf, &hang_pos, +1, (kid->f.dir == LEFT) ? +1 : -1);
     pos2view (&hang_pos, &hang_pos);
     critical_edge =
       (crel (&hang_pos, +1, dir)->fg == NO_FLOOR);

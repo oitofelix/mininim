@@ -159,9 +159,6 @@ physics_in (struct anim *kid)
   if (kid->i == 3 && ctf == DOOR && kid->f.dir == LEFT
       && door_at_pos (&ptf)->i > DOOR_CLIMB_LIMIT) {
     if (kid->wait == 0) {
-      int dir = (kid->f.dir == LEFT) ? -1 : +1;
-      prel (&hang_pos, &hang_pos, -1, dir);
-      pos2view (&hang_pos, &hang_pos);
       hang_limit = true;
       kid_unclimb ();
       return false;
@@ -193,4 +190,22 @@ is_kid_climb (struct frame *f)
     || f->b == kid_climb_08
     || f->b == kid_climb_09
     || f->b == kid_climb_10;
+}
+
+bool
+is_kid_successfully_climbing_at_pos (struct frame *f, struct pos *p)
+{
+  struct pos np;
+  int dir = (f->dir == LEFT) ? +1 : -1;
+  return is_kid_successfully_climbing (f)
+    && peq (prel (p, &np, +1, dir), &hang_pos);
+}
+
+bool
+is_kid_successfully_climbing (struct frame *f)
+{
+  int i;
+  for (i = 4; i < KID_CLIMB_FRAMESET_NMEMB; i++)
+    if (f->b == kid_climb_frameset[i].frame) return true;
+  return false;
 }

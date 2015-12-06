@@ -60,23 +60,23 @@ kid_unclimb (void)
 static bool
 flow (struct anim *kid)
 {
+  struct pos hanged_pos;
+
   if (kid->oaction != kid_unclimb) kid->i = 14;
   if (kid->oaction == kid_climb) kid->i = 3;
 
   if (kid->i == 0) {
-    /* in this function the hang_pos variable holds the position of
-       the hanged construction instead of the usual hangable position
-       facing it */
-    prel (&hang_pos, &hang_pos, +1, (kid->f.dir == LEFT) ? +1 : -1);
-    pos2view (&hang_pos, &hang_pos);
     kid_hang ();
     return false;
   }
 
   if (kid->i == 14) {
+    int dir = (kid->f.dir == LEFT) ? -1 : +1;
+    prel (&hang_pos, &hanged_pos, -1, dir);
+
     kid->f.b = kid_climb_frameset[13].frame;
-    kid->f.c.x = PLACE_WIDTH * hang_pos.place + 18;
-    kid->f.c.y = PLACE_HEIGHT * hang_pos.floor + 25;
+    kid->f.c.x = PLACE_WIDTH * hanged_pos.place + 18;
+    kid->f.c.y = PLACE_HEIGHT * hanged_pos.floor + 25;
   }
 
   kid->i--;
@@ -112,5 +112,8 @@ physics_out (struct anim *kid)
 {
   /* depressible floors */
   clear_depressible_floor (kid);
-  press_depressible_floor (&hang_pos);
+  int dir = (kid->f.dir == LEFT) ? -1 : +1;
+  struct pos hanged_pos;
+  prel (&hang_pos, &hanged_pos, -1, dir);
+  press_depressible_floor (&hanged_pos);
 }

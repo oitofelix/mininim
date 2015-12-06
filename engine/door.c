@@ -283,8 +283,6 @@ draw_door_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f)
   draw_door_base (bitmap, p);
   draw_bitmapc (door_pole, screen, door_pole_coord (p, &nc), 0);
 
-  if (is_kid_hanging_at_pos (f, p) && f->dir == LEFT) return;
-
   survey (_tf, pos, f, &nc, &ptf, &np);
   survey (_mt, pos, f, &nc, &pmt, &np);
   survey (_tb, pos, f, &nc, &ptb, &np);
@@ -294,10 +292,11 @@ draw_door_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f)
   prel (p, &pa, -1, +0);
   prel (p, &par, -1, +1);
 
-  if ((peq (&ptb, p) || peq (&ptb, &pl)
-       || peq (&ptb, &pa))
-      && (peq (&pmt, p) || peq (&pmt, &pl)
-          || peq (&pmt, &pa))) {
+  if (((peq (&ptb, p) || peq (&ptb, &pl)
+        || peq (&ptb, &pa))
+       && (peq (&pmt, p) || peq (&pmt, &pl)
+           || peq (&pmt, &pa)))
+      || is_kid_successfully_climbing_at_pos (f, p)) {
     struct door *d = door_at_pos (p);
     draw_door_grid (screen, p, d->i);
     draw_con_left (screen, &par);

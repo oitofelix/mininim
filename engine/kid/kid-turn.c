@@ -91,8 +91,8 @@ flow (struct anim *kid)
   if (! turn)
     turn = ((kid->f.dir == RIGHT) && right_key)
       || ((kid->f.dir == LEFT) && left_key);
-  bool run = (kid->f.dir == RIGHT) ? left_key : right_key;
-  bool walk = run && shift_key;
+  bool run = ((kid->f.dir == RIGHT) ? left_key : right_key)
+    && ! shift_key;
   bool jump = ((kid->f.dir == RIGHT) && left_key && up_key)
     || ((kid->f.dir == LEFT) && right_key && up_key);
   bool couch = down_key;
@@ -105,8 +105,6 @@ flow (struct anim *kid)
     if (turn) kid->i = -1, turn = false, kid_turn ();
     else if (couch) kid_couch ();
     else if (jump) kid_jump ();
-    else if (walk && dc > PLACE_WIDTH && df > PLACE_WIDTH)
-      kid_walk ();
     else if (run && dc > PLACE_WIDTH && df > PLACE_WIDTH)
       kid_start_run ();
     else kid_stabilize ();
@@ -165,7 +163,7 @@ bool
 is_kid_turn (struct frame *f)
 {
   int i;
-  for (i = 0; i < KID_TURN_FRAMESET_NMEMB; i ++)
+  for (i = 0; i < KID_TURN_FRAMESET_NMEMB; i++)
     if (f->b == kid_turn_frameset[i].frame) return true;
   return false;
 }
