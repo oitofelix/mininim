@@ -138,7 +138,7 @@ physics_in (struct anim *kid)
   }
 
   /* collision */
-  if (is_colliding (&kid->f, _tf, pos, -4, false, -kid->fo.dx + 4)) {
+  if (is_colliding (&kid->f, &kid->fo, false)) {
     if (kid->i < 6) kid_stabilize_collision ();
     else kid_couch_collision ();
     return false;

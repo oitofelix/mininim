@@ -112,34 +112,66 @@ npos (struct pos *p, struct pos *np)
   return np;
 }
 
+/* struct pos * */
+/* pos2view (struct pos *p, struct pos *pv) */
+/* { */
+/*   *pv = *p; */
+
+/*   int room; */
+/*   npos (pv, pv); */
+
+/*   do { */
+/*     room = pv->room; */
+
+/*     if (pv->floor == 0 */
+/*         && roomd (room_view, BELOW) == pv->room */
+/*         && room_view != pv->room) { */
+/*       pv->floor += FLOORS; */
+/*       pv->room = room_view; */
+/*     } else if (pv->floor == FLOORS - 1 */
+/*                && roomd (room_view, ABOVE) == pv->room */
+/*                && room_view != pv->room) { */
+/*       pv->floor -= FLOORS; */
+/*       pv->room = room_view; */
+/*     } else if (pv->place == 0 */
+/*                && roomd (room_view, RIGHT) == pv->room */
+/*                && room_view != pv->room) { */
+/*       pv->place += PLACES; */
+/*       pv->room = room_view; */
+/*     } else if (pv->place == PLACES - 1 */
+/*                && roomd (room_view, LEFT) == pv->room */
+/*                && room_view != pv->room) { */
+/*       pv->place -= PLACES; */
+/*       pv->room = room_view; */
+/*     } */
+/*   } while (room != pv->room); */
+
+/*   return pv; */
+/* } */
+
 struct pos *
 pos2view (struct pos *p, struct pos *pv)
 {
   *pv = *p;
 
   int room;
-  npos (pv, pv);
 
   do {
     room = pv->room;
 
-    if (pv->floor == 0
-        && roomd (room_view, BELOW) == pv->room
+    if (roomd (room_view, BELOW) == pv->room
         && room_view != pv->room) {
       pv->floor += FLOORS;
       pv->room = room_view;
-    } else if (pv->floor == FLOORS - 1
-               && roomd (room_view, ABOVE) == pv->room
+    } else if (roomd (room_view, ABOVE) == pv->room
                && room_view != pv->room) {
       pv->floor -= FLOORS;
       pv->room = room_view;
-    } else if (pv->place == 0
-               && roomd (room_view, RIGHT) == pv->room
+    } else if (roomd (room_view, RIGHT) == pv->room
                && room_view != pv->room) {
       pv->place += PLACES;
       pv->room = room_view;
-    } else if (pv->place == PLACES - 1
-               && roomd (room_view, LEFT) == pv->room
+    } else if (roomd (room_view, LEFT) == pv->room
                && room_view != pv->room) {
       pv->place -= PLACES;
       pv->room = room_view;
@@ -214,6 +246,13 @@ peq (struct pos *p0, struct pos *p1)
 
   return np0.room == np1.room && np0.floor == np1.floor
     && np0.place == np1.place;
+}
+
+bool
+peqr (struct pos *p0, struct pos *p1, int floor, int place)
+{
+  struct pos np;
+  return peq (p0, prel (p1, &np, floor, place));
 }
 
 struct coord *

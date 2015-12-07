@@ -73,7 +73,7 @@ flow (struct anim *kid)
   if (kid->i == 14) {
     int dir = (kid->f.dir == LEFT) ? -1 : +1;
     prel (&hang_pos, &hanged_pos, -1, dir);
-
+    pos2view (&hanged_pos, &hanged_pos);
     kid->f.b = kid_climb_frameset[13].frame;
     kid->f.c.x = PLACE_WIDTH * hanged_pos.place + 18;
     kid->f.c.y = PLACE_HEIGHT * hanged_pos.floor + 25;

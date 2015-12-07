@@ -115,11 +115,6 @@ physics_in (struct anim *kid)
   struct coord nc; struct pos np;
   enum confg cbf, cmbo, cbb;
 
-  /* collision */
-  int w = al_get_bitmap_width (kid->xframe);
-  if (is_colliding (&kid->f, _tf, pos, -4, false, -kid->fo.dx + w / 2))
-    to_collision_edge (&kid->f, kid->fo.b, _tf, pos, -4, false, -kid->fo.dx + w / 2);
-
   /* fall */
   cbf = survey (_bf, pos, &kid->f, &nc, &np, &np)->fg;
   cmbo = survey (_mbo, pos, &kid->f, &nc, &np, &np)->fg;

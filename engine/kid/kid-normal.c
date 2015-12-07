@@ -66,7 +66,7 @@ flow (struct anim *kid)
   struct pos np, pbf;
   survey (_bf, pos, &kid->f, &nc, &pbf, &np);
 
-  int dc = dist_collision (&kid->f, _tf, pos, -4, false);
+  int dc = dist_collision (&kid->f, &kid->fo, false);
 
   bool turn = ((kid->f.dir == RIGHT) && left_key)
     || ((kid->f.dir == LEFT) && right_key);
@@ -108,7 +108,7 @@ flow (struct anim *kid)
     }
 
     if (run) {
-      if (dist_collision (&kid->f, _tf, pos, -4, false) < 29)
+      if (dist_collision (&kid->f, &kid->fo, false) < 29)
         kid_walk ();
       else kid_start_run ();
       return false;

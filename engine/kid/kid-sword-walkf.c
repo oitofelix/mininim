@@ -66,6 +66,20 @@ unload_kid_sword_walkf (void)
 }
 
 void
+kid_sword_walkf_collision (void)
+{
+  kid.action = kid_sword_walkf_collision;
+
+  kid.f.c.y = PLACE_HEIGHT * collision_pos.floor + 19;
+  kid.f.c.x = (kid.f.dir == LEFT)
+    ? PLACE_WIDTH * (collision_pos.place - 1) + 18
+    : PLACE_WIDTH * (collision_pos.place + 1) + 2;
+  kid.f.b = kid_sword_walkf_frameset[0].frame;
+
+  kid_sword_walkf ();
+}
+
+void
 kid_sword_walkf (void)
 {
   kid.oaction = kid.action;
@@ -114,9 +128,12 @@ physics_in (struct anim *kid)
   }
 
   /* collision */
-  int w = al_get_bitmap_width (kid->xframe);
-  if (is_colliding (&kid->f, _tf, pos, -4, false, -kid->fo.dx + w / 2))
-    to_collision_edge (&kid->f, kid->fo.b, _tf, pos, -4, false, -kid->fo.dx + w / 2);
+  if (will_collide (&kid->f, &kid->fo, false)
+      && kid->i == 0) {
+    /* sample_action_not_allowed = true; */
+    kid_sword_normal ();
+    return false;
+  }
 
   return true;
 }

@@ -49,7 +49,7 @@ static void compute_level (void);
 
 struct level *level;
 static bool no_room_drawing = false;
-int room_view = 1;
+int room_view = 15;
 
 void
 play_level (struct level *_level)
@@ -110,7 +110,8 @@ compute_level (void)
 {
   int prev_room = kid.f.c.room;
   kid.action ();
-  if (prev_room != kid.f.c.room)  {
+  if (kid.f.c.room != prev_room
+      && kid.f.c.room != 0)  {
     room_view = kid.f.c.room;
     make_links_locally_consistent (prev_room, room_view);
   }

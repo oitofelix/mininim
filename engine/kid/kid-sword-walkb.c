@@ -78,6 +78,20 @@ kid_sword_walkb (void)
   physics_out (&kid);
 }
 
+void
+kid_sword_walkb_collision (void)
+{
+  kid.action = kid_sword_walkb_collision;
+
+  kid.f.c.y = PLACE_HEIGHT * collision_pos.floor + 19;
+  kid.f.c.x = (kid.f.dir == LEFT)
+    ? PLACE_WIDTH * (collision_pos.place + 2) + 8
+    : PLACE_WIDTH * (collision_pos.place - 1) - 8;
+  kid.f.b = kid_sword_walkb_frameset[0].frame;
+
+  kid_sword_walkb ();
+}
+
 static bool
 flow (struct anim *kid)
 {
@@ -116,8 +130,10 @@ physics_in (struct anim *kid)
   }
 
   /* collision */
-  if (is_colliding (&kid->f, _tb, pos, -4, true, kid->fo.dx))
-    to_collision_edge (&kid->f, kid->fo.b, _tb, pos, -4, true, kid->fo.dx + 4);
+  if (is_colliding (&kid->f, &kid->fo, true)) {
+    kid_sword_walkf_collision ();
+    return false;
+  }
 
   return true;
 }

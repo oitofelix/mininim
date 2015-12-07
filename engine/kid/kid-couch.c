@@ -113,19 +113,15 @@ kid_couch_collision (void)
 {
   kid.action = kid_couch_collision;
 
-  struct coord nc;
-  struct pos pbf, np;
-  survey (_bf, pos, &kid.f, &nc, &pbf, &np);
-
-  kid.f.c.y = PLACE_HEIGHT * pbf.floor + 15;
-  kid.f.c.x = PLACE_WIDTH * pbf.place + 15;
-  kid.f.b = kid_normal_00;
-
-  sample_hit_wall = true;
-  to_collision_edge (&kid.f, kid_couch_frameset[0].frame, _tf, pos, -4, false, 0);
-  if (kid.f.dir == RIGHT) kid.f.c.x -= 12;
+  kid.f.c.y = PLACE_HEIGHT * collision_pos.floor + 27;
+  kid.f.c.x = (kid.f.dir == LEFT)
+    ? PLACE_WIDTH * (collision_pos.place + 1) + 24
+    : PLACE_WIDTH * (collision_pos.place - 1) + 18;
+  kid.f.b = kid_couch_frameset[0].frame;
 
   kid_couch ();
+
+  sample_hit_wall = true;
 }
 
 static bool
@@ -159,7 +155,7 @@ flow (struct anim *kid)
       && ! kid->fall
       && item_pos.room == -1
       && crel (&pbf, 0, dir)->fg == NO_FLOOR
-      && dist_next_place (&kid->f, _tf, pos, 0, true) < 22
+      && dist_next_place (&kid->f, _tf, pos, 0, true) < 26
       && ! (ctf == DOOR && kid->f.dir == LEFT
             && door_at_pos (&ptf)->i > DOOR_CLIMB_LIMIT)) {
     prel (&pbf, &hang_pos, +1, (kid->f.dir == LEFT) ? +1 : -1);
@@ -190,7 +186,7 @@ flow (struct anim *kid)
       && kid->wait-- <= 0
       && ((kid->f.dir == LEFT && left_key)
           || (kid->f.dir == RIGHT && right_key))) {
-    if (! is_colliding (&kid->f, _tf, pos, -4, false, 6))
+    if (! is_colliding (&kid->f, &kid->fo, false))
       kid->f.c.x += (kid->f.dir == LEFT) ? -6 : +6;
     select_frame (kid, kid_couch_frameset, 0);
     return true;
@@ -212,34 +208,31 @@ flow (struct anim *kid)
 static bool
 physics_in (struct anim *kid)
 {
-  struct coord nc; struct pos np, pbf, pm;
-  enum confg cm, cbf;
+  struct coord m; struct pos np, pm, pml;
+  enum confg cm, cml;
 
   /* fall */
-  cm = survey (_m, pos, &kid->f, &nc, &pm, &np)->fg;
+  cm = survey (_m, pos, &kid->f, &m, &pm, &np)->fg;
+  prel (&pm, &pml, 0, -1);
+  cml = con (&pml)->fg;
   struct loose_floor *l =
     loose_floor_at_pos (prel (&pm, &np, -1, +0));
   if ((cm == NO_FLOOR
        || (l && l->action == FALL_LOOSE_FLOOR && cm == LOOSE_FLOOR))
-      && ! (kid->fall && kid->i == 0)) {
-    if (kid->collision)
-      to_collision_edge (&kid->f, kid_fall_frameset[0].frame,
-                         _tf, pos, -4, false, 0);
+      && ! (kid->fall && kid->i == 0)
+      && ! (kid->f.dir == RIGHT
+            && cml == DOOR
+            && m.y <= door_grid_tip_y (&pml) - 10)) {
     kid_fall ();
     return false;
   }
 
-  /* ensure kid is not colliding */
-  cbf = survey (_bf, pos, &kid->f, &nc, &pbf, &np)->fg;
-  if (cbf == WALL)
-    to_next_place_edge (&kid->f, &kid->f, kid->fo.b, _bf, pos, 0, true, -1);
-
-  /* wall pushes back */
-  if (is_colliding (&kid->f, _tf, pos, -4, false, -kid->fo.dx)) {
-    int d = (kid->f.dir == RIGHT && confg_collision == DOOR) ? 4 : 0;
-    to_collision_edge (&kid->f, kid->fo.b, _tf, pos, -4, false, -kid->fo.dx + d);
+  /* wall or door pushes back */
+  if ((kid->i == 0 || kid->i > 4)
+      && is_colliding (&kid->f, &kid->fo, false)) {
+    kid_stabilize_collision ();
+    return false;
   }
-
 
   return true;
 }

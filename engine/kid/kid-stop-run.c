@@ -105,6 +105,7 @@ flow (struct anim *kid)
   }
 
   select_frame (kid, kid_stop_run_frameset, kid->i + 1);
+
   return true;
 }
 
@@ -125,10 +126,12 @@ physics_in (struct anim *kid)
   }
 
   /* collision */
-  if (is_colliding (&kid->f, _tf, pos, -4, false, -kid->fo.dx)) {
+  if (kid->f.dir == RIGHT) kid->f.c.x += +6;
+  if (is_colliding (&kid->f, &kid->fo, false)) {
     kid_stabilize_collision ();
     return false;
   }
+  if (kid->f.dir == RIGHT) kid->f.c.x += -6;
 
   return true;
 }

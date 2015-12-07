@@ -89,17 +89,40 @@ kid_stabilize_collision (void)
 {
   kid.action = kid_stabilize_collision;
 
-  sample_hit_wall = true;
-  to_collision_edge (&kid.f, kid_stabilize_frameset[0].frame, _tf, pos, -4, false, 0);
-  if (kid.f.dir == RIGHT) kid.f.c.x -= 3;
+  kid.f.c.y = PLACE_HEIGHT * collision_pos.floor + 17;
+  kid.f.c.x = (kid.f.dir == LEFT)
+    ? PLACE_WIDTH * (collision_pos.place + 1) + 12
+    : PLACE_WIDTH * (collision_pos.place - 1) + 28;
+  kid.f.b = kid_stabilize_frameset[0].frame;
 
   kid_stabilize ();
+  sample_hit_wall = true;
+}
+
+void
+kid_stabilize_back_collision (void)
+{
+  kid.action = kid_stabilize_collision;
+
+  kid.f.c.y = PLACE_HEIGHT * collision_pos.floor + 17;
+  kid.f.c.x = (kid.f.dir == LEFT)
+    ? PLACE_WIDTH * (collision_pos.place - 1) + 28
+    : PLACE_WIDTH * (collision_pos.place + 1) + 12;
+  kid.f.b = kid_stabilize_frameset[0].frame;
+
+  kid_stabilize ();
+  sample_hit_wall = true;
 }
 
 static bool
 flow (struct anim *kid)
 {
-  if (kid->oaction != kid_stabilize) kid->i = -1, misstep = false;
+  if (kid->oaction != kid_stabilize) {
+    kid->i = -1, misstep = false;
+    if (kid->oaction == kid_stabilize_collision) {
+      kid->i = 1; kid->collision = true;
+    } else kid->collision = false;
+  }
 
   if (! turn)
     turn = ((kid->f.dir == RIGHT) && left_key)
@@ -111,7 +134,7 @@ flow (struct anim *kid)
     || ((kid->f.dir == LEFT) && left_key && up_key);
   bool couch = down_key;
 
-  int dc = dist_collision (&kid->f, _tf, pos, -4, false);
+  int dc = dist_collision (&kid->f, &kid->fo, false);
   int df = dist_con (&kid->f, _bb, pos, -4, false, NO_FLOOR);
 
   if (kid->i >= 0 && ! kid->collision) {
@@ -137,10 +160,6 @@ flow (struct anim *kid)
     return false;
   }
 
-  if (kid->oaction == kid_stabilize_collision) {
-    kid->i = 1; kid->collision = true;
-  } else kid->collision = false;
-
   select_frame (kid, kid_stabilize_frameset, kid->i + 1);
 
   if (kid->f.b == kid_stop_run_frameset[3].frame) kid->fo.dx = -5;
@@ -165,10 +184,6 @@ physics_in (struct anim *kid)
     return false;
   }
 
-  /* collision */
-  if (is_colliding (&kid->f, _tf, pos, -4, false, -kid->fo.dx))
-    to_collision_edge (&kid->f, kid->fo.b, _tf, pos, -4, false, -kid->fo.dx);
-
   return true;
 }
 
@@ -176,6 +191,7 @@ static void
 physics_out (struct anim *kid)
 {
   /* depressible floors */
-  if (kid->collision && kid->i == 1) update_depressible_floor (kid, -13, -18);
+  if (kid->collision && kid->i == 1)
+    update_depressible_floor (kid, -13, -18);
   else keep_depressible_floor (kid);
 }

@@ -81,9 +81,10 @@ play_anim (void (*draw_callback) (void),
           survey (_bf, pos, &kid.f, &bf, &pbf, &npbf);
           if (delete_key) kid.f.c.x--;
           if (page_down_key) kid.f.c.x++;
-          int dn = dist_next_place (&kid.f, _bf, pos, 0, false);
+          int dn = dist_next_place (&kid.f, _bf, pos, -4, false);
           int dp = dist_next_place (&kid.f, _bf, pos, 0, true);
-          int dc = dist_collision (&kid.f, _tf, pos, -4, false);
+          int dc = 0;
+          /* int dc = dist_collision (&kid.f, _tf, pos, -4, false); */
           int df = dist_con (&kid.f, _bf, pos, -4, false, NO_FLOOR);
           int dl = dist_con (&kid.f, _bf, pos, -4, false, LOOSE_FLOOR);
           int dd = dist_con (&kid.f, _bf, pos, -4, false, CLOSER_FLOOR);

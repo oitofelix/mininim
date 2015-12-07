@@ -26,6 +26,7 @@
 /* variables */
 extern struct pos hang_pos;
 extern enum confg confg_collision;
+extern struct pos collision_pos;
 
 /* functions */
 struct con *con (struct pos *p);
@@ -40,20 +41,28 @@ int dist_next_place (struct frame *f, coord_f cf, pos_f pf,
 struct frame *to_next_place_edge (struct frame *f, struct frame *nf,
                                   ALLEGRO_BITMAP *b, coord_f cf, pos_f pf,
                                   int margin, bool reverse, int min_dist);
-bool is_colliding (struct frame *f, coord_f cf, pos_f pf,
-                   int margin, bool reverse, int min_dist);
+/* bool is_colliding (struct frame *f, coord_f cf, pos_f pf, */
+/*                    int margin, bool reverse, int min_dist); */
 bool is_on_con (struct frame *f, coord_f cf, pos_f pf,
                 int margin, bool reverse, int min_dist, enum confg t);
-int dist_collision (struct frame *f, coord_f cf, pos_f pf,
-                    int margin, bool reverse);
+/* int dist_collision (struct frame *f, coord_f cf, pos_f pf, */
+/*                     int margin, bool reverse); */
 int dist_con (struct frame *f, coord_f cf, pos_f pf,
               int margin, bool reverse, enum confg t);
-bool to_collision_edge (struct frame *f, ALLEGRO_BITMAP *b,
-                        coord_f cf, pos_f pf, int margin, bool reverse,
-                        int min_dist);
+/* bool to_collision_edge (struct frame *f, ALLEGRO_BITMAP *b, */
+/*                         coord_f cf, pos_f pf, int margin, bool reverse, */
+/*                         int min_dist); */
 bool to_con_edge (struct frame *f, ALLEGRO_BITMAP *b,
                   coord_f cf, pos_f pf, int margin, bool reverse,
                   int min_dist, enum confg t);
+
+bool
+is_colliding (struct frame *f, struct frame_offset *fo, bool reverse);
+bool
+will_collide (struct frame *f, struct frame_offset *fo, bool reverse);
+int
+dist_collision (struct frame *f, struct frame_offset *fo, bool reverse);
+
 
 
 bool is_hangable_pos (struct pos *p, enum dir d);

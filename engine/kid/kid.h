@@ -63,6 +63,7 @@
 #define GLORY_SAMPLE "dat/midisnd1/guard death 1.ogg"
 #define TAKE_SWORD_SAMPLE "dat/digisnd1/taking out the sword.ogg"
 #define SWORD_ATTACK_SAMPLE "dat/digisnd1/sword moving.ogg"
+#define ACTION_NOT_ALLOWED_SAMPLE "dat/digisnd1/drinking potion.ogg"
 
 /* functions */
 void load_kid (void);
@@ -84,6 +85,6 @@ extern ALLEGRO_BITMAP *kid_full_life, *kid_empty_life;
 
 extern bool sample_step, sample_hit_ground, sample_hit_wall,
   sample_hang_on_fall, sample_drink, sample_glory,
-  sample_take_sword, sample_sword_attack;
+  sample_take_sword, sample_sword_attack, sample_action_not_allowed;
 
 #endif	/* FREEPOP_KID_H */

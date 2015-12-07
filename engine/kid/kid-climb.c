@@ -116,6 +116,10 @@ flow (struct anim *kid)
 {
   if (kid->oaction != kid_climb) kid->i = -1, kid->wait = DOOR_WAIT_LOOK;
 
+  int dir = (kid->f.dir == LEFT) ? -1 : +1;
+  struct pos hanged_con_pos;
+  prel (&hang_pos, &hanged_con_pos, -1, dir);
+
   if (kid->i == 14) {
     kid_couch ();
     return false;
@@ -132,9 +136,13 @@ flow (struct anim *kid)
 
   select_frame (kid, kid_climb_frameset, kid->i);
 
-  /* climbing when looking left should let the kid near to the edge */
+  /* climbing when looking left should let the kid near to the edge
+     if it's not a door */
   if (kid->f.dir == LEFT && kid->fo.dx != 0
-      && kid->i % 2) kid->fo.dx += 1;
+      && kid->i % 2
+      && con (&hanged_con_pos)->fg != DOOR)
+    kid->fo.dx += 1;
+
   if (kid->i == 3 && kid->wait < DOOR_WAIT_LOOK)
     kid->fo.dx = 0, kid->fo.dy = 0;
 

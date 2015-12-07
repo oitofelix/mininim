@@ -17,6 +17,7 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "prince.h"
 #include "kernel/video.h"
 #include "kernel/keyboard.h"
@@ -158,7 +159,7 @@ physics_in (struct anim *kid)
   }
 
   /* collision */
-  if (is_colliding (&kid->f, _tf, pos, -4, false, -kid->fo.dx)) {
+  if (is_colliding (&kid->f, &kid->fo, false)) {
     if (kid->i < 7 || kid->i > 10) kid_stabilize_collision ();
     else kid_couch_collision ();
     return false;

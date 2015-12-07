@@ -17,6 +17,7 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "prince.h"
 #include "kernel/video.h"
 #include "kernel/keyboard.h"
@@ -130,6 +131,9 @@ physics_in (struct anim *kid)
     && is_strictly_traversable (&pbb);
   coord_f cf = (should_move_to_front) ? _bb : _bf;
 
+  if (should_move_to_front) printf ("FALL: move to front\n");
+  if (should_move_to_back) printf ("FALL: move to back\n");
+
   if (kid->i == 0 && (should_move_to_front || should_move_to_back)) {
     next_frame (&kid->f, &kid->f, kid->fo.b, +0, 0);
     int dirm = dir;
@@ -211,12 +215,8 @@ physics_in (struct anim *kid)
   }
 
   /* collision */
-  next_frame (&kid->f, &nf, kid->fo.b, kid->fo.dx, kid->fo.dy);
-  cbf = survey (_bf, pos, &kid->f, &nc, &pbf, &np)->fg;
-  if (cbf == WALL || (nf.dir == LEFT && cbf == DOOR)) {
-    to_next_place_edge (&nf, &kid->f, kid->fo.b, _bf, pos, 0, true, -1);
-    kid->fo.dx = 0; kid->fo.dy = 0;
-  }
+  if (is_colliding (&kid->f, &kid->fo, false))
+    kid->fo.dx = 0;
 
   return true;
 }

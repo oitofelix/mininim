@@ -53,11 +53,12 @@ ALLEGRO_BITMAP *kid_full_life, *kid_empty_life;
 
 ALLEGRO_SAMPLE *step_sample, *hit_ground_sample, *hit_wall_sample,
   *hang_on_fall_sample, *drink_sample, *glory_sample,
-  *take_sword_sample, *sword_attack_sample;
+  *take_sword_sample, *sword_attack_sample,
+  *action_not_allowed_sample;
 
 bool sample_step, sample_hit_ground, sample_hit_wall,
   sample_hang_on_fall, sample_drink, sample_glory,
-  sample_take_sword, sample_sword_attack;
+  sample_take_sword, sample_sword_attack, sample_action_not_allowed;
 
 static void place_kid (int room, int floor, int place);
 static struct coord *kid_life_coord (int i, struct coord *c);
@@ -107,15 +108,18 @@ load_kid (void)
   glory_sample = load_sample (GLORY_SAMPLE);
   take_sword_sample = load_sample (TAKE_SWORD_SAMPLE);
   sword_attack_sample = load_sample (SWORD_ATTACK_SAMPLE);
+  action_not_allowed_sample = load_sample (ACTION_NOT_ALLOWED_SAMPLE);
 
   /* kid himself */
   kid.f.id = &kid;
   kid.f.b = kid_normal_00;
   kid.f.dir = LEFT;
+  kid.fo.b = kid_normal_00;
+  kid.fo.dx = kid.fo.dy = +0;
   kid.action = kid_normal;
   update_depressible_floor (&kid, -4, -10);
 
-  place_kid (1, 0, 0);
+  place_kid (15, 1, 2);
 }
 
 void
@@ -162,6 +166,8 @@ unload_kid (void)
   al_destroy_sample (drink_sample);
   al_destroy_sample (glory_sample);
   al_destroy_sample (take_sword_sample);
+  al_destroy_sample (sword_attack_sample);
+  al_destroy_sample (action_not_allowed_sample);
 }
 
 void
@@ -206,10 +212,13 @@ sample_kid (void)
   if (sample_glory) play_sample (glory_sample);
   if (sample_take_sword) play_sample (take_sword_sample);
   if (sample_sword_attack) play_sample (sword_attack_sample);
+  if (sample_action_not_allowed)
+    play_sample (action_not_allowed_sample);
 
   sample_step = sample_hit_ground = sample_hit_wall =
     sample_hang_on_fall = sample_drink = sample_glory =
-    sample_take_sword = sample_sword_attack = false;
+    sample_take_sword = sample_sword_attack =
+    sample_action_not_allowed = false;
 }
 
 void

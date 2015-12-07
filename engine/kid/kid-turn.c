@@ -99,7 +99,7 @@ flow (struct anim *kid)
 
   if (kid->i == 3) {
     kid->f.dir = (kid->f.dir == RIGHT) ? LEFT : RIGHT;
-    int dc = dist_collision (&kid->f, _tf, pos, 0, false);
+    int dc = dist_collision (&kid->f, &kid->fo, false);
     int df = dist_con (&kid->f, _bf, pos, -4, false, NO_FLOOR);
 
     if (turn) kid->i = -1, turn = false, kid_turn ();
@@ -140,14 +140,6 @@ physics_in (struct anim *kid)
     kid_fall ();
     return false;
   }
-
-  /* collision */
-  kid->f.dir = (kid->f.dir == RIGHT) ? LEFT : RIGHT;
-  if (is_colliding (&kid->f, _tf, pos, -4, false, -kid->fo.dx)) {
-    to_collision_edge (&kid->f, kid->fo.b, _tf, pos, -4, false, 0);
-    kid->fo.dx = 0;
-  }
-  kid->f.dir = (kid->f.dir == RIGHT) ? LEFT : RIGHT;
 
   return true;
 }

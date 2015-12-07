@@ -134,6 +134,14 @@ physics_in (struct anim *kid)
     return false;
   }
 
+  /* collision */
+  if (will_collide (&kid->f, &kid->fo, false)
+      && kid->i == 0) {
+    /* sample_action_not_allowed = true; */
+    kid_sword_normal ();
+    return false;
+  }
+
   return true;
 }
 
