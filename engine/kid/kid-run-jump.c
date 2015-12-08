@@ -126,7 +126,7 @@ physics_in (struct anim *kid)
   enum confg cbf;
 
   /* inertia */
-  if (kid->i < 4 || kid->i > 9) inertia = 3;
+  if (kid->i < 6 || kid->i > 10) inertia = 3;
   else inertia = 6;
 
   /* fall */

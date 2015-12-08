@@ -109,6 +109,8 @@ physics_in (struct anim *kid)
   enum confg cmbo;
   struct frame nf;
 
+  printf ("inertia: %i\n", inertia);
+
   if (kid->i == 0) {
     survey (_bf, pos, &kid->f, &nc, &pbf, &np);
     survey (_mbo, pos, &kid->f, &nc, &pmbo, &np);
@@ -116,8 +118,8 @@ physics_in (struct anim *kid)
 
     fall_pos.room = -1;
 
-    if (is_strictly_traversable (&pbf)) fall_pos = pbf;
-    else if (is_strictly_traversable (&pmbo)) fall_pos = pmbo;
+    if (is_strictly_traversable (&pmbo)) fall_pos = pmbo;
+    else if (is_strictly_traversable (&pbf)) fall_pos = pbf;
     else if (is_strictly_traversable (&pbb)) fall_pos = pbb;
 
     if (fall_pos.room != - 1)
@@ -128,8 +130,8 @@ physics_in (struct anim *kid)
   }
 
   /* help kid hang */
-  survey (_bf, pos, &kid->f, &nc, &pbf, &np);
-  if (! is_strictly_traversable (&pbf)) inertia = 0;
+  /* survey (_bf, pos, &kid->f, &nc, &pbf, &np); */
+  /* if (! is_strictly_traversable (&pbf)) inertia = 0; */
 
   /* fall speed */
   if (kid->i > 0) kid->fo.dx = -inertia;
@@ -159,6 +161,7 @@ physics_in (struct anim *kid)
       && npmbo.floor != npmbo_nf.floor) {
     inertia = 0;
 
+    survey (_bf, pos, &kid->f, &nc, &pbf, &np);
     pos2view (&pbf, &pbf);
     kid->f.c.room = pbf.room;
     kid->f.c.x += (kid->f.dir == LEFT) ? -6 : +6;

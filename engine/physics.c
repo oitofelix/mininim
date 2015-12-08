@@ -243,7 +243,7 @@ dist_collision (struct frame *f, struct frame_offset *fo, bool reverse)
   int i = 0;
   int r = reverse ? -1 : 1;
   while (! is_colliding (f, &_fo, reverse)
-         && i < PLACE_WIDTH) {
+         && i < PLACE_WIDTH + 1) {
     _fo.dx -= r * 1;
     i++;
   }
