@@ -95,14 +95,14 @@ f = %i, p = %i, dn = %i, dp = %i, dc = %i, df = %i, dl = %i, dd = %i\n",
         }
         /* end kid hack */
 
+        if (! is_video_effect_started ()) show ();
         if (! pause_anim
             || (pause_anim &&
                 was_key_pressed (ALLEGRO_KEY_ESCAPE, true))) {
+          if (compute_callback) compute_callback ();
           draw_callback ();
           if (sample_callback) sample_callback ();
-          if (compute_callback) compute_callback ();
         }
-        if (! is_video_effect_started ()) show ();
         drop_all_events_from_source
           (event_queue, get_timer_event_source (timer));
         al_set_timer_count (timer, 0);

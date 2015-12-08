@@ -146,7 +146,8 @@ physics_in (struct anim *kid)
   enum confg cbb, cmbo, cbf;
 
   /* inertia */
-  inertia = 4;
+  if (kid->i >= 8 && kid->i <= 10) inertia = 4;
+  else inertia = 0;
 
   /* fall */
   cbb = survey (_bb, pos, &kid->f, &nc, &np, &np)->fg;

@@ -63,58 +63,47 @@ flow (struct anim *kid)
   if (kid->oaction != kid_hang_free)
     kid->i = 5, kid->j = -1, kid->wait = 3, kid->reverse = true;
 
-  int dir = (kid->f.dir == LEFT) ? -1 : +1;
-  enum confg hanged_con = crel (&hang_pos, -1, dir)->fg;
+  /* climb */
+  if ((kid->i < 5 || kid->j > -1
+         || kid->hang_caller != kid_unclimb)
+        && up_key && ! hang_limit) {
+    kid_climb ();
+    return false;
+  }
 
-  if ((! shift_key || hang_limit || hanged_con == NO_FLOOR)
+  /* release */
+  if ((! shift_key || hang_limit || get_hanged_con (&kid->f) == NO_FLOOR)
       && (kid->i < 5 || kid->j > -1)) {
+    int dir = (kid->f.dir == LEFT) ? -1 : +1;
+    hang_limit = false;
     if (con (&hang_pos)->fg != NO_FLOOR
         && kid->i >= 4) {
-      kid->f.b = kid_vjump_frameset[13].frame;
-      kid->f.c.x = (kid->f.dir == LEFT)
-        ? PLACE_WIDTH * hang_pos.place + 7
-        : PLACE_WIDTH * (hang_pos.place + 1) + 9;
-      kid->f.c.y = PLACE_HEIGHT * hang_pos.floor - 8;
-      hang_limit = false;
+      place_frame (&kid->f, &kid->f, kid_vjump_frameset[13].frame,
+                   &hang_pos, (kid->f.dir == LEFT) ? +7 : PLACE_WIDTH + 9, -8);
       kid_vjump ();
       return false;
     }
     if (crel (&hang_pos, +0, dir)->fg != NO_FLOOR
         && kid->i <= 4) {
-      kid->f.b = kid_vjump_frameset[13].frame;
-      kid->f.c.x = (kid->f.dir == LEFT)
-        ? PLACE_WIDTH * hang_pos.place + 7
-        : PLACE_WIDTH * (hang_pos.place + 1) + 5;
-      kid->f.c.y = PLACE_HEIGHT * hang_pos.floor - 8;
-      hang_limit = false;
+      place_frame (&kid->f, &kid->f, kid_vjump_frameset[13].frame,
+                   &hang_pos, (kid->f.dir == LEFT) ? +7 : PLACE_WIDTH + 5, -8);
       kid_vjump ();
       return false;
     }
     if (con (&hang_pos)->fg == NO_FLOOR
         && kid->i >= 4) {
-      kid->f.b = kid_fall_frameset[0].frame;
-      kid->f.c.x = (kid->f.dir == LEFT)
-        ? PLACE_WIDTH * hang_pos.place + 16
-        : PLACE_WIDTH * (hang_pos.place + 1) - 16;
-      kid->f.c.y = PLACE_HEIGHT * hang_pos.floor + 12;
-      hang_limit = false;
+      place_frame (&kid->f, &kid->f, kid_fall_frameset[0].frame,
+                   &hang_pos, (kid->f.dir == LEFT) ? +16 : PLACE_WIDTH - 16, +12);
       kid_fall ();
       return false;
     }
     if (crel (&hang_pos, +0, dir)->fg == NO_FLOOR
         && kid->i <= 4) {
-      kid->f.b = kid_fall_frameset[0].frame;
-      kid->f.c.x = (kid->f.dir == LEFT)
-        ? PLACE_WIDTH * hang_pos.place - 16
-        : PLACE_WIDTH * (hang_pos.place + 1) + 16;
-      kid->f.c.y = PLACE_HEIGHT * hang_pos.floor + 12;
-      hang_limit = false;
+      place_frame (&kid->f, &kid->f, kid_fall_frameset[0].frame,
+                   &hang_pos, (kid->f.dir == LEFT) ? -16 : PLACE_WIDTH + 16, +12);
       kid_fall ();
       return false;
     }
-  } if (up_key && ! hang_limit) {
-    kid_climb ();
-    return false;
   }
 
   if (kid->reverse && kid->i > 0) {
@@ -156,10 +145,10 @@ physics_in (struct anim *kid)
 static void
 physics_out (struct anim *kid)
 {
+  struct pos hanged_pos;
+
   /* depressible floors */
   clear_depressible_floor (kid);
-  int dir = (kid->f.dir == LEFT) ? -1 : +1;
-  struct pos hanged_con_pos;
-  prel (&hang_pos, &hanged_con_pos, -1, dir);
-  press_depressible_floor (&hanged_con_pos);
+  get_hanged_pos (&kid->f, &hanged_pos);
+  press_depressible_floor (&hanged_pos);
 }

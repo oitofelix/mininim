@@ -38,24 +38,10 @@ bool is_strictly_traversable (struct pos *p);
 
 int dist_next_place (struct frame *f, coord_f cf, pos_f pf,
                      int margin, bool reverse);
-struct frame *to_next_place_edge (struct frame *f, struct frame *nf,
-                                  ALLEGRO_BITMAP *b, coord_f cf, pos_f pf,
-                                  int margin, bool reverse, int min_dist);
-/* bool is_colliding (struct frame *f, coord_f cf, pos_f pf, */
-/*                    int margin, bool reverse, int min_dist); */
 bool is_on_con (struct frame *f, coord_f cf, pos_f pf,
                 int margin, bool reverse, int min_dist, enum confg t);
-/* int dist_collision (struct frame *f, coord_f cf, pos_f pf, */
-/*                     int margin, bool reverse); */
 int dist_con (struct frame *f, coord_f cf, pos_f pf,
               int margin, bool reverse, enum confg t);
-/* bool to_collision_edge (struct frame *f, ALLEGRO_BITMAP *b, */
-/*                         coord_f cf, pos_f pf, int margin, bool reverse, */
-/*                         int min_dist); */
-bool to_con_edge (struct frame *f, ALLEGRO_BITMAP *b,
-                  coord_f cf, pos_f pf, int margin, bool reverse,
-                  int min_dist, enum confg t);
-
 bool
 is_colliding (struct frame *f, struct frame_offset *fo, bool reverse);
 bool
@@ -67,6 +53,11 @@ dist_collision (struct frame *f, struct frame_offset *fo, bool reverse);
 
 bool is_hangable_pos (struct pos *p, enum dir d);
 bool can_hang (struct frame *f);
+struct pos *get_hanged_pos (struct frame *f, struct pos *p);
+enum confg get_hanged_con (struct frame *f);
+bool is_hang_pos_critical (struct frame *f);
+bool is_hang_pos_free (struct frame *f);
+
 
 
 void update_depressible_floor (struct anim *a, int dx0, int dx1);

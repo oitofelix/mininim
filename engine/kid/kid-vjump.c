@@ -146,9 +146,11 @@ flow (struct anim *kid)
 
   select_frame (kid, kid_vjump_frameset, kid->i);
 
-  if (critical_edge && kid->oaction == kid_hang_free)
+  if (is_hang_pos_critical (&kid->f)
+      && kid->oaction == kid_hang_free)
     kid->fo.dx -= (kid->f.dir == LEFT) ? 9 : 13;
-  if (critical_edge && kid->i == 11) kid->fo.dx = +7;
+  if (is_hang_pos_critical (&kid->f)
+      && kid->i == 11) kid->fo.dx = +7;
   if (kid->i == 12 && kid->j++ > 0)
     kid->fo.dx = 0, kid->fo.dy += 2 * kid->j + 1;
   if (kid->j == 4) kid->j = 0;
@@ -171,12 +173,6 @@ physics_in (struct anim *kid)
     return false;
   }
 
-  /* collision */
-  /* if (is_colliding (&kid->f, &kid->fo, false) */
-  /*     && confg_collision == DOOR */
-  /*     && kid->f.dir == RIGHT) */
-  /*   uncollide (&kid->f, &kid->fo, false); */
-
   /* ceiling hit */
   survey (_tb, pos, &kid->f, &nc, &ptb, &np);
   if (kid->i == 12 && kid->j == 1
@@ -189,23 +185,19 @@ physics_in (struct anim *kid)
   if (kid->i == 0
       && dist_next_place (&kid->f, _tf, pos, 0, true) < 23
       && is_hangable_pos (prel (&ptf, &np, 0, dir), kid->f.dir)) {
-    to_next_place_edge (&kid->f, &kid->f, kid->fo.b, _tf, pos, 0, true, 0);
-    if (crel (&ptf, 0, dir)->fg == NO_FLOOR) {
-        kid->fo.dx -= 12;
-        critical_edge = true;
-    } else {
-      kid->fo.dx -= 3;
-      critical_edge = false;
-    }
     prel (&ptf, &hang_pos, 0, dir);
     pos2view (&hang_pos, &hang_pos);
+    kid->fo.dx += is_hang_pos_critical (&kid->f) ? -12 : -3;
     kid->hang = true;
   } else if (kid->i == 0 && can_hang (&kid->f)
-             && con (&hang_pos)->fg != NO_FLOOR
+             && ! is_hang_pos_critical (&kid->f)
              && (kid->f.dir == LEFT || con (&hang_pos)->fg != DOOR)) {
-    to_next_place_edge (&kid->f, &kid->f, kid->fo.b, _tf, pos, 0, false, 0);
     kid->fo.dx -= 4; kid->hang = true;
   }
+
+  if (kid->i == 0 && kid->hang)
+    place_frame (&kid->f, &kid->f, kid_vjump_frameset[0].frame,
+                 &hang_pos, (kid->f.dir == LEFT) ? +14 : PLACE_WIDTH + 5, +16);
 
   return true;
 }

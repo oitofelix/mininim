@@ -80,11 +80,8 @@ flow (struct anim *kid)
   if (kid->oaction != kid_misstep) kid->i = -1, misstep = true;;
 
   if (kid->i == 10) {
-    kid->f.b = kid_normal_00;
-    kid->f.c.x = (kid->f.dir == LEFT)
-      ? PLACE_WIDTH * kid->p.place + 11
-      : PLACE_WIDTH * (kid->p.place + 1) + 7;
-    kid->f.c.y = PLACE_HEIGHT * kid->p.floor + 15;
+    place_frame (&kid->f, &kid->f, kid_normal_00, &kid->p,
+                 (kid->f.dir == LEFT) ? +11 : PLACE_WIDTH + 7, 15);
     kid_normal ();
     return false;
   }

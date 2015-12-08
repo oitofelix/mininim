@@ -502,10 +502,7 @@ draw_room_fg (struct frame *f, struct pos *p)
     case LOOSE_FLOOR: draw_loose_floor (screen, p); break;
     case OPENER_FLOOR: draw_opener_floor (screen, p); break;
     case CLOSER_FLOOR: draw_closer_floor (screen, p); break;
-    case SPIKES_FLOOR:
-      draw_spikes_floor_floor (screen, p);
-      draw_spikes_fg (screen, p);
-      break;
+    case SPIKES_FLOOR: draw_spikes_floor (screen, p); break;
     case PILLAR: draw_pillar (screen, p); break;
     case WALL: draw_wall_right (screen, p); break;
     case DOOR: draw_door_frame_left (screen, p); break;

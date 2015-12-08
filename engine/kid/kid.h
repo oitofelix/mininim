@@ -74,8 +74,8 @@ void draw_kid_lives (ALLEGRO_BITMAP *bitmap, int j);
 /* variables */
 extern struct anim kid; /* kid animation object */
 
-extern bool misstep, uncouch_slowly, critical_edge,
-  hang_limit, turn, keep_sword_fast;
+extern bool misstep, uncouch_slowly, hang_limit, turn,
+  keep_sword_fast;
 
 extern int inertia, kid_total_lives, kid_current_lives;
 

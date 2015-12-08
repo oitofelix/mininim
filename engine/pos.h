@@ -39,6 +39,9 @@ bool peqr (struct pos *p0, struct pos *p1, int floor, int place);
 struct coord *nbitmap_coord (struct coord *c, struct coord *nc, int w, int h);
 struct coord *nframe (struct frame *f, struct coord *c);
 double dist_coord (struct coord *a, struct coord *b);
+struct frame *
+place_frame (struct frame *f, struct frame *nf, ALLEGRO_BITMAP *b,
+             struct pos *p, int dx, int dy);
 struct dim *dim (struct frame *f, struct dim *d);
 struct coord *_m (struct frame *f, struct coord *c);
 struct coord *_mt (struct frame *f, struct coord *c);

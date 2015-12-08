@@ -71,12 +71,9 @@ flow (struct anim *kid)
   }
 
   if (kid->i == 14) {
-    int dir = (kid->f.dir == LEFT) ? -1 : +1;
-    prel (&hang_pos, &hanged_pos, -1, dir);
-    pos2view (&hanged_pos, &hanged_pos);
-    kid->f.b = kid_climb_frameset[13].frame;
-    kid->f.c.x = PLACE_WIDTH * hanged_pos.place + 18;
-    kid->f.c.y = PLACE_HEIGHT * hanged_pos.floor + 25;
+    get_hanged_pos (&kid->f, &hanged_pos);
+    place_frame (&kid->f, &kid->f, kid_climb_frameset[13].frame,
+                 &hanged_pos, 18, 25);
   }
 
   kid->i--;
@@ -110,10 +107,10 @@ physics_in (struct anim *kid)
 static void
 physics_out (struct anim *kid)
 {
+  struct pos hanged_pos;
+
   /* depressible floors */
   clear_depressible_floor (kid);
-  int dir = (kid->f.dir == LEFT) ? -1 : +1;
-  struct pos hanged_pos;
-  prel (&hang_pos, &hanged_pos, -1, dir);
+  get_hanged_pos (&kid->f, &hanged_pos);
   press_depressible_floor (&hanged_pos);
 }

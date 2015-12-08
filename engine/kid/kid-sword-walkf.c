@@ -69,13 +69,9 @@ void
 kid_sword_walkf_collision (void)
 {
   kid.action = kid_sword_walkf_collision;
-
-  kid.f.c.y = PLACE_HEIGHT * collision_pos.floor + 19;
-  kid.f.c.x = (kid.f.dir == LEFT)
-    ? PLACE_WIDTH * (collision_pos.place - 1) + 18
-    : PLACE_WIDTH * (collision_pos.place + 1) + 2;
-  kid.f.b = kid_sword_walkf_frameset[0].frame;
-
+  place_frame (&kid.f, &kid.f, kid_sword_walkf_frameset[0].frame,
+               &collision_pos, (kid.f.dir == LEFT)
+               ? -PLACE_WIDTH + 18 : +PLACE_WIDTH + 2, +19);
   kid_sword_walkf ();
 }
 

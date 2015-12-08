@@ -116,9 +116,8 @@ flow (struct anim *kid)
 
     if (drink) {
       item_pos = pbf;
-      /* keep this value this way, or the kid might fall if on edge */
-      int d = (kid->f.dir == LEFT) ? +10 : +12;
-      to_next_place_edge (&kid->f, &kid->f, kid->fo.b, _bf, pos, 0, true, d);
+      place_frame (&kid->f, &kid->f, kid_couch_frameset[0].frame,
+                   &item_pos, (kid->f.dir == LEFT) ? PLACE_WIDTH + 5 : +7, +27);
       kid_couch ();
       return false;
     }

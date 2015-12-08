@@ -156,28 +156,20 @@ flow (struct anim *kid)
       else if (dc < 27 || df < 27 || dl < 27 || dd < 27)
         kid->walk = 3, dx = 22;
 
-      if (kid->walk != -1 ) {
-        kid->f.b = kid_normal_00;
-        kid->f.c.x = (kid->f.dir == LEFT)
-          ? PLACE_WIDTH * kid->p.place + 11 + dx + dcc
-          : PLACE_WIDTH * (kid->p.place + 1) + 7 - dx - dcc;
-        kid->f.c.y = PLACE_HEIGHT * kid->p.floor + 15;
-      }
+      if (kid->walk != -1 )
+        place_frame (&kid->f, &kid->f, kid_normal_00, &kid->p,
+                     (kid->f.dir == LEFT) ? +11 + dx + dcc
+                     : PLACE_WIDTH + 7 - dx - dcc, +15);
     }
   } else if (kid->i == 2 && kid->walk == 0) kid->i = 9;
   else if (kid->i == 3 && kid->walk == 1) kid->i = 8;
   else if (kid->i == 4 && kid->walk == 2) kid->i = 6;
   else if (kid->i == 5 && kid->walk == 3) kid->i = 6;
   else if (kid->i == 11){
-    if (kid->walk != -1) {
-      pos2view (&kid->p, &kid->p);
-      kid->f.b = kid_normal_00;
-      kid->f.c.x = (kid->f.dir == LEFT)
-        ? PLACE_WIDTH * kid->p.place + 11 + dcc
-        : PLACE_WIDTH * (kid->p.place + 1) + 7 - dcc;
-      kid->f.c.y = PLACE_HEIGHT * kid->p.floor + 15;
-    }
-
+    if (kid->walk != -1)
+      place_frame (&kid->f, &kid->f, kid_normal_00, &kid->p,
+                   (kid->f.dir == LEFT) ? +11 + dcc
+                   : PLACE_WIDTH + 7 - dcc, +15);
     kid_normal ();
     misstep = false;
     return false;

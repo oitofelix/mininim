@@ -75,11 +75,16 @@ kid_turn (void)
 {
   kid.oaction = kid.action;
   kid.action = kid_turn;
-  kid.f.flip = (kid.f.dir == RIGHT) ? 0 : ALLEGRO_FLIP_HORIZONTAL;
+
+  if (kid.oaction != kid_turn)
+    kid.f.dir = (kid.f.dir == LEFT) ? RIGHT : LEFT;
+  kid.f.flip = (kid.f.dir == LEFT) ? 0 : ALLEGRO_FLIP_HORIZONTAL;
 
   if (! flow (&kid)) return;
   if (! physics_in (&kid)) return;
+  next_frame_inv = true;
   next_frame_fo (&kid.f, &kid.f, &kid.fo);
+  next_frame_inv = false;
   physics_out (&kid);
 }
 
@@ -89,16 +94,15 @@ flow (struct anim *kid)
   if (kid->oaction != kid_turn) kid->i = -1, misstep = false;
 
   if (! turn)
-    turn = ((kid->f.dir == RIGHT) && right_key)
-      || ((kid->f.dir == LEFT) && left_key);
-  bool run = ((kid->f.dir == RIGHT) ? left_key : right_key)
+    turn = ((kid->f.dir == RIGHT) && left_key)
+      || ((kid->f.dir == LEFT) && right_key);
+  bool run = ((kid->f.dir == RIGHT) ? right_key : left_key)
     && ! shift_key;
-  bool jump = ((kid->f.dir == RIGHT) && left_key && up_key)
-    || ((kid->f.dir == LEFT) && right_key && up_key);
+  bool jump = ((kid->f.dir == RIGHT) && right_key && up_key)
+    || ((kid->f.dir == LEFT) && left_key && up_key);
   bool couch = down_key;
 
   if (kid->i == 3) {
-    kid->f.dir = (kid->f.dir == RIGHT) ? LEFT : RIGHT;
     int dc = dist_collision (&kid->f, &kid->fo, false);
     int df = dist_con (&kid->f, _bf, pos, -4, false, NO_FLOOR);
 
@@ -136,7 +140,6 @@ physics_in (struct anim *kid)
   cbf = survey (_bf, pos, &kid->f, &nc, &np, &np)->fg;
   cbb = survey (_bb, pos, &kid->f, &nc, &np, &np)->fg;
   if (cbf == NO_FLOOR && cbb == NO_FLOOR) {
-    if (kid->i > 0) kid->f.dir = (kid->f.dir == RIGHT) ? LEFT : RIGHT;
     kid_fall ();
     return false;
   }

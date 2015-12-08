@@ -88,13 +88,9 @@ void
 kid_stabilize_collision (void)
 {
   kid.action = kid_stabilize_collision;
-
-  kid.f.c.y = PLACE_HEIGHT * collision_pos.floor + 17;
-  kid.f.c.x = (kid.f.dir == LEFT)
-    ? PLACE_WIDTH * (collision_pos.place + 1) + 12
-    : PLACE_WIDTH * (collision_pos.place - 1) + 28;
-  kid.f.b = kid_stabilize_frameset[0].frame;
-
+  place_frame (&kid.f, &kid.f, kid_stabilize_frameset[0].frame,
+               &collision_pos, (kid.f.dir == LEFT)
+               ? PLACE_WIDTH + 12 : -PLACE_WIDTH + 28, +17);
   kid_stabilize ();
   sample_hit_wall = true;
 }
@@ -102,14 +98,10 @@ kid_stabilize_collision (void)
 void
 kid_stabilize_back_collision (void)
 {
-  kid.action = kid_stabilize_collision;
-
-  kid.f.c.y = PLACE_HEIGHT * collision_pos.floor + 17;
-  kid.f.c.x = (kid.f.dir == LEFT)
-    ? PLACE_WIDTH * (collision_pos.place - 1) + 28
-    : PLACE_WIDTH * (collision_pos.place + 1) + 12;
-  kid.f.b = kid_stabilize_frameset[0].frame;
-
+  kid.action = kid_stabilize_back_collision;
+  place_frame (&kid.f, &kid.f, kid_stabilize_frameset[0].frame,
+               &collision_pos, (kid.f.dir == LEFT)
+               ? -PLACE_WIDTH + 28 : PLACE_WIDTH + 12, +17);
   kid_stabilize ();
   sample_hit_wall = true;
 }

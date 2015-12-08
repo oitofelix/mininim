@@ -104,54 +104,43 @@ flow (struct anim *kid)
 static bool
 physics_in (struct anim *kid)
 {
-  struct coord nc; struct pos ptf, pbf, pbb, pm, np;
-  enum confg cbf, ctf, cm;
+  struct coord nc;
+  struct pos np, pbf, pbb, pmbo, fall_pos, npmbo, npmbo_nf;
+  enum confg cmbo;
+  struct frame nf;
 
-  int dir = (kid->f.dir == LEFT) ? -1 : +1;
+  if (kid->i == 0) {
+    survey (_bf, pos, &kid->f, &nc, &pbf, &np);
+    survey (_mbo, pos, &kid->f, &nc, &pmbo, &np);
+    survey (_bb, pos, &kid->f, &nc, &pbb, &np);
 
-  /* ensure kid's proximity for hang */
-  ctf = survey (_tf, pos, &kid->f, &nc, &ptf, &np)->fg;
-  if (kid->i == 0 && crel (&ptf, 0, dir)->fg != NO_FLOOR
-      && crel (&ptf, 0, dir)->fg != WALL
-      && is_strictly_traversable (&ptf)
-      && kid->oaction == kid_walk) {
-    to_next_place_edge (&kid->f, &kid->f, kid->fo.b, _tf, pos, 0, false, 0);
-  } else if (ctf != NO_FLOOR) inertia = 0;
-  else {
-    if (kid->oaction == kid_run_jump) kid->fo.dx = -16, kid->fo.dy= +6;
-    if (kid->oaction == kid_jump) kid->fo.dx = -16, kid->fo.dy = +6;
+    fall_pos.room = -1;
+
+    if (is_strictly_traversable (&pbf)) fall_pos = pbf;
+    else if (is_strictly_traversable (&pmbo)) fall_pos = pmbo;
+    else if (is_strictly_traversable (&pbb)) fall_pos = pbb;
+
+    if (fall_pos.room != - 1)
+      place_frame (&kid->f, &kid->f, kid_fall_frameset[0].frame,
+                   &fall_pos,
+                   (kid->f.dir == LEFT) ? PLACE_WIDTH - 12 : +16,
+                   (kid->f.dir == LEFT) ? 23 : 27);
   }
 
-  /* put kid in front of the floor */
+  /* help kid hang */
   survey (_bf, pos, &kid->f, &nc, &pbf, &np);
-  survey (_bb, pos, &kid->f, &nc, &pbb, &np);
-  bool should_move_to_front = is_strictly_traversable (&pbf)
-    && ! is_strictly_traversable (&pbb);
-  bool should_move_to_back = ! is_strictly_traversable (&pbf)
-    && is_strictly_traversable (&pbb);
-  coord_f cf = (should_move_to_front) ? _bb : _bf;
+  if (! is_strictly_traversable (&pbf)) inertia = 0;
 
-  if (should_move_to_front) printf ("FALL: move to front\n");
-  if (should_move_to_back) printf ("FALL: move to back\n");
-
-  if (kid->i == 0 && (should_move_to_front || should_move_to_back)) {
-    next_frame (&kid->f, &kid->f, kid->fo.b, +0, 0);
-    int dirm = dir;
-    dirm *= (should_move_to_back) ? -1 : +1;
-    int dx = 0;
-
-    enum confg t;
-
-    do {
-      dx += dirm;
-      kid->f.c.x += dirm;
-      nframe (&kid->f, &kid->f.c);
-      t = survey (cf, pos, &kid->f, &nc, &np, &np)->fg;
-    } while (t != NO_FLOOR && abs (dx) < PLACE_WIDTH);
-
-    kid->f.c.x += -dirm * 12;
-    kid->f.c.y += 6;
+  /* fall speed */
+  if (kid->i > 0) kid->fo.dx = -inertia;
+  if (kid->i > 4) {
+    int speed = +21 + 3 * (kid->i - 5);
+    kid->fo.dy = (speed > 33) ? 33 : speed;
   }
+
+  /* collision */
+  if (is_colliding (&kid->f, &kid->fo, false))
+    kid->fo.dx = 0;
 
   /* hang */
   if (kid->i > 2 && can_hang (&kid->f) && shift_key && ! hang_limit) {
@@ -160,42 +149,21 @@ physics_in (struct anim *kid)
     return false;
   }
 
-  /* turn run */
-  if (kid->oaction == kid_turn_run) {
-    if (kid->f.b != kid_turn_run_frameset[8].frame)
-      kid->f.dir = (kid->f.dir == LEFT) ? RIGHT : LEFT;
-    kid->f.flip = (kid->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
-    kid->f.c.x += (kid->f.dir == LEFT) ? +12 : -12;
-    kid->f.c.y += 12;
-  }
-
   /* land on ground */
-  struct frame nf; next_frame (&kid->f, &nf, kid->f.b, 0, 34);
-  struct pos npmbo, pmbo, npmbo_nf;
-  enum confg cmbo;
+  cmbo = survey (_mbo, pos, &kid->f, &nc, &np, &npmbo)->fg;
+  next_frame (&kid->f, &nf, kid->f.b, 0, 34);
   survey (_mbo, pos, &nf, &nc, &np, &npmbo_nf);
-  cmbo = survey (_mbo, pos, &kid->f, &nc, &pmbo, &npmbo)->fg;
-  cm = survey (_m, pos, &kid->f, &nc, &pm, &np)->fg;
-
-  struct pos pr;
-  struct loose_floor *l =
-    loose_floor_at_pos (prel (&pm, &pr, -1, +0));
 
   if (kid->i > 2
       && cmbo != NO_FLOOR
-      && npmbo.floor != npmbo_nf.floor
-      && ! (l && l->action == FALL_LOOSE_FLOOR && cm == LOOSE_FLOOR)) {
+      && npmbo.floor != npmbo_nf.floor) {
     inertia = 0;
 
-    kid->f.c.y = 63 * pbf.floor + 15;
+    pos2view (&pbf, &pbf);
+    kid->f.c.room = pbf.room;
     kid->f.c.x += (kid->f.dir == LEFT) ? -6 : +6;
+    kid->f.c.y = PLACE_HEIGHT * pbf.floor + 15;
     kid->f.b = kid_normal_00;
-
-    cbf = survey (_bf, pos, &kid->f, &nc, &pbf, &np)->fg;
-
-    /* ensure kid isn't colliding */
-    if (cbf == WALL || cbf == DOOR)
-      to_next_place_edge (&kid->f, &kid->f, kid->fo.b, _bf, pos, 0, true, -1);
 
     if (kid->i >= 8) {
       kid_current_lives--;
@@ -206,17 +174,6 @@ physics_in (struct anim *kid)
     kid_couch ();
     return false;
   }
-
-  if (kid->i == 1) kid->fo.dx = -inertia;
-  if (kid->i > 1) kid->fo.dx = -inertia;
-  if (kid->i > 4) {
-    int speed = +21 + 3 * (kid->i - 5);
-    kid->fo.dy = (speed > 33) ? 33 : speed;
-  }
-
-  /* collision */
-  if (is_colliding (&kid->f, &kid->fo, false))
-    kid->fo.dx = 0;
 
   return true;
 }

@@ -112,15 +112,10 @@ void
 kid_couch_collision (void)
 {
   kid.action = kid_couch_collision;
-
-  kid.f.c.y = PLACE_HEIGHT * collision_pos.floor + 27;
-  kid.f.c.x = (kid.f.dir == LEFT)
-    ? PLACE_WIDTH * (collision_pos.place + 1) + 24
-    : PLACE_WIDTH * (collision_pos.place - 1) + 18;
-  kid.f.b = kid_couch_frameset[0].frame;
-
+  place_frame (&kid.f, &kid.f, kid_couch_frameset[0].frame,
+               &collision_pos, (kid.f.dir == LEFT)
+               ? +PLACE_WIDTH + 24 : -PLACE_WIDTH + 18, +27);
   kid_couch ();
-
   sample_hit_wall = true;
 }
 
@@ -136,7 +131,7 @@ flow (struct anim *kid)
   }
 
   if (kid->oaction == kid_climb)
-    kid->i = 10, critical_edge = false;
+    kid->i = 10;
 
   if (kid->oaction == kid_couch_collision)
     kid->collision = true, inertia = 0;
@@ -160,8 +155,6 @@ flow (struct anim *kid)
             && door_at_pos (&ptf)->i > DOOR_CLIMB_LIMIT)) {
     prel (&pbf, &hang_pos, +1, (kid->f.dir == LEFT) ? +1 : -1);
     pos2view (&hang_pos, &hang_pos);
-    critical_edge =
-      (crel (&hang_pos, +1, dir)->fg == NO_FLOOR);
     kid_unclimb ();
     return false;
   }
@@ -171,7 +164,8 @@ flow (struct anim *kid)
     return false;
   }
 
-  if (kid->i == 2 && item_pos.room != -1) {
+  if (kid->i == 2 && item_pos.room != -1
+      && ! kid->collision && ! kid->fall) {
     if (is_potion (&item_pos)) kid_drink ();
     else if (is_sword (&item_pos)) kid_raise_sword ();
     else {

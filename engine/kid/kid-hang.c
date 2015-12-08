@@ -112,27 +112,22 @@ kid_hang (void)
 static bool
 flow (struct anim *kid)
 {
-  if (kid->oaction != kid_hang) kid->i = -1, misstep = false;
+  if (kid->oaction != kid_hang)
+    kid->i = -1, kid->hang_caller = kid->oaction, misstep = false;
 
-  critical_edge = (con (&hang_pos)->fg == NO_FLOOR);
-
-  int dir = (kid->f.dir == LEFT) ? -1 : +1;
-  enum confg t = crel (&hang_pos, 0, dir)->fg;
-
-  dir = (kid->f.dir == LEFT) ? 0 : 1;
-  kid->f.b = kid_hang_14;
-  kid->f.c.x = PLACE_WIDTH * (hang_pos.place + dir) + 7;
-  kid->f.c.y = PLACE_HEIGHT * hang_pos.floor - 9;
+  int dir = (kid->f.dir == LEFT) ? 0 : 1;
+  place_frame (&kid->f, &kid->f, kid_hang_14,
+               &hang_pos, PLACE_WIDTH * dir + 7, -9);
 
   if (kid->i == -1 && kid->oaction != kid_unclimb) {
     kid->fo.b = kid_hang_14;
     kid->fo.dx = +0;
     kid->fo.dy = +0;
-  } else if (t == WALL || (t == DOOR && kid->f.dir == LEFT)) {
-    kid_hang_wall ();
+  } else if (is_hang_pos_free (&kid->f)) {
+    kid_hang_free ();
     return false;
   } else {
-    kid_hang_free ();
+    kid_hang_wall ();
     return false;
   }
 
@@ -153,12 +148,12 @@ physics_in (struct anim *kid)
 static void
 physics_out (struct anim *kid)
 {
+  struct pos hanged_pos;
+
   /* depressible floors */
-  int dir = (kid->f.dir == LEFT) ? -1 : +1;
   clear_depressible_floor (kid);
-  struct pos hanged_con_pos;
-  prel (&hang_pos, &hanged_con_pos, -1, dir);
-  press_depressible_floor (&hanged_con_pos);
+  get_hanged_pos (&kid->f, &hanged_pos);
+  press_depressible_floor (&hanged_pos);
 }
 
 bool

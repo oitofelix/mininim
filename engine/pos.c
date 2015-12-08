@@ -325,13 +325,26 @@ nframe (struct frame *f, struct coord *c)
   return c;
 }
 
-
 double
 dist_coord (struct coord *a, struct coord *b)
 {
   int dx = a->x - b->x;
   int dy = a->y - b->y;
   return sqrt (dx * dx + dy * dy);
+}
+
+struct frame *
+place_frame (struct frame *f, struct frame *nf, ALLEGRO_BITMAP *b,
+             struct pos *p, int dx, int dy)
+{
+  struct pos pv;
+  *nf = *f;
+  pos2view (p, &pv);
+  nf->b = b;
+  nf->c.room = pv.room;
+  nf->c.x = PLACE_WIDTH * pv.place + dx;
+  nf->c.y = PLACE_HEIGHT * pv.floor + dy;
+  return nf;
 }
 
 struct dim *

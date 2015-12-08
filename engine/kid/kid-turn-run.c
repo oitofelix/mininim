@@ -88,11 +88,16 @@ kid_turn_run (void)
 {
   kid.oaction = kid.action;
   kid.action = kid_turn_run;
-  kid.f.flip = (kid.f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
+
+  if (kid.oaction != kid_turn_run)
+    kid.f.dir = (kid.f.dir == LEFT) ? RIGHT : LEFT;
+  kid.f.flip = (kid.f.dir == RIGHT) ? 0 : ALLEGRO_FLIP_HORIZONTAL;
 
   if (! flow (&kid)) return;
   if (! physics_in (&kid)) return;
+  next_frame_inv = true;
   next_frame_fo (&kid.f, &kid.f, &kid.fo);
+  next_frame_inv = false;
   physics_out (&kid);
 }
 
@@ -102,7 +107,6 @@ flow (struct anim *kid)
   if (kid->oaction != kid_turn_run) kid->i = -1;
 
   if (kid->i == 8) {
-    kid->f.dir = (kid->f.dir == RIGHT) ? LEFT : RIGHT;
     kid_run ();
     return false;
   }
@@ -115,14 +119,14 @@ static bool
 physics_in (struct anim *kid)
 {
   struct coord nc; struct pos np;
-  enum confg ctf;
+  enum confg ctb;
 
   /* inertia */
   inertia = 0;
 
   /* fall */
-  ctf = survey (_tf, pos, &kid->f, &nc, &np, &np)->fg;
-  if (ctf == NO_FLOOR) {
+  ctb = survey (_tb, pos, &kid->f, &nc, &np, &np)->fg;
+  if (ctb == NO_FLOOR) {
     kid_fall ();
     return false;
   }

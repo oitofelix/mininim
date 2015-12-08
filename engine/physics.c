@@ -113,62 +113,6 @@ dist_next_place (struct frame *f, coord_f cf, pos_f pf,
   return abs (i);
 }
 
-struct frame *
-to_next_place_edge (struct frame *f, struct frame *nf,
-                    ALLEGRO_BITMAP *b, coord_f cf, pos_f pf,
-                    int margin, bool reverse, int min_dist)
-{
-  next_frame (f, nf, b, +0, +0);
-  int dn = dist_next_place (nf, cf, pf, margin, reverse);
-
-  int r = reverse ? -1 : 1;
-  int dir = (nf->dir == LEFT) ? r * -1 : r * +1;
-
-  nf->c.x += dir * (dn - 1);
-  nf->c.x += -dir * min_dist;
-
-  return nf;
-}
-
-/* bool */
-/* is_colliding (struct frame *f, coord_f cf, pos_f pf, */
-/*               int margin, bool reverse, int min_dist) */
-/* { */
-/*   struct frame _f = *f; */
-
-/*   int dn = dist_next_place (&_f, cf, pf, margin, reverse); */
-/*   min_dist += (reverse) ? +1 : 0; */
-
-/*   _f.c.x += (_f.dir == LEFT) ? -margin : +margin; */
-/*   int r = reverse ? -1 : 1; */
-/*   int dir = (_f.dir == LEFT) ? r * -1: r * +1; */
-
-/*   struct coord c; struct pos p, np; */
-/*   struct con *t = survey (cf, pf, &_f, &c, &p, &np); */
-/*   struct pos pr; prel (&p, &pr, 0, -1); */
-
-/*   bool wall_collision = (crel (&p, 0, dir)->fg == WALL); */
-/*   bool door_collision = */
-/*     (_f.dir == RIGHT */
-/*      && t->fg == DOOR */
-/*      && c.y <= door_grid_tip_y (&p) - 10) */
-/*     || (_f.dir == LEFT */
-/*         && crel (&p, 0, -1)->fg == DOOR */
-/*         && c.y <= */
-/*         door_grid_tip_y (&pr) - 10); */
-
-/*   confg_collision = NO_FLOOR; */
-/*   if (wall_collision) confg_collision = WALL; */
-/*   if (door_collision) confg_collision = DOOR; */
-
-/*   if (kid.action == kid_jump) { */
-/*     char *ct = wall_collision ? "WALL" : "NON-WALL"; */
-/*     printf ("physics: dn = %i, dx = %i, t = %s\n", dn, min_dist, ct); */
-/*   } */
-
-/*   return dn <= min_dist && (door_collision || wall_collision); */
-/* } */
-
 bool
 is_colliding (struct frame *f, struct frame_offset *fo, bool reverse)
 {
@@ -307,15 +251,6 @@ dist_collision (struct frame *f, struct frame_offset *fo, bool reverse)
   return i;
 }
 
-/* int */
-/* dist_collision (struct frame *f, coord_f cf, pos_f pf, */
-/*                 int margin, bool reverse) */
-/* { */
-/*   int dn = dist_next_place (f, cf, pf, margin, reverse); */
-/*   if (is_colliding (f, cf, pf, margin, reverse, dn)) return dn; */
-/*   else return PLACE_WIDTH + 1; */
-/* } */
-
 int
 dist_con (struct frame *f, coord_f cf, pos_f pf,
           int margin, bool reverse, enum confg t)
@@ -324,29 +259,6 @@ dist_con (struct frame *f, coord_f cf, pos_f pf,
   if (is_on_con (f, cf, pf, margin, reverse, dn, t)) return dn;
   else return PLACE_WIDTH + 1;
 }
-
-/* bool */
-/* to_collision_edge (struct frame *f, ALLEGRO_BITMAP *b, */
-/*                    coord_f cf, pos_f pf, */
-/*                    int margin, bool reverse, int min_dist) */
-/* { */
-/*   int dc = dist_collision (f, cf, pf, margin, reverse); */
-/*   if (dc > PLACE_WIDTH) return false; */
-/*   else to_next_place_edge (f, f, b, cf, pf, margin, reverse, min_dist); */
-/*   return true; */
-/* } */
-
-bool
-to_con_edge (struct frame *f, ALLEGRO_BITMAP *b,
-             coord_f cf, pos_f pf,
-             int margin, bool reverse, int min_dist, enum confg t)
-{
-  int dc = dist_con (f, cf, pf, margin, reverse, t);
-  if (dc > PLACE_WIDTH) return false;
-  else to_next_place_edge (f, f, b, cf, pf, margin, reverse, min_dist);
-  return true;
-}
-
 
 
 
@@ -418,6 +330,35 @@ can_hang (struct frame *f)
   return true;
 }
 
+struct pos *
+get_hanged_pos (struct frame *f, struct pos *p)
+{
+  int dir = (f->dir == LEFT) ? -1 : +1;
+  prel (&hang_pos, p, -1, dir);
+  pos2view (p, p);
+  return p;
+}
+
+enum confg
+get_hanged_con (struct frame *f)
+{
+  struct pos p;
+  return con (get_hanged_pos (f, &p))->fg;
+}
+
+bool
+is_hang_pos_critical (struct frame *f)
+{
+  return (con (&hang_pos)->fg == NO_FLOOR);
+}
+
+bool
+is_hang_pos_free (struct frame *f)
+{
+  int dir = (f->dir == LEFT) ? -1 : +1;
+  enum confg t = crel (&hang_pos, 0, dir)->fg;
+  return ! (t == WALL || (t == DOOR && f->dir == LEFT));
+}
 
 
 
