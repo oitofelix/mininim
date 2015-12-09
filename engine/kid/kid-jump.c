@@ -122,7 +122,25 @@ kid_jump (void)
 static bool
 flow (struct anim *kid)
 {
-  if (kid->oaction != kid_jump) kid->i = -1, misstep = false;
+  struct coord nc; struct pos np, pm;
+
+  if (kid->oaction != kid_jump)
+    kid->i = -1, misstep = kid->hang = false;
+
+  bool hang = ((kid->f.dir == LEFT) ? right_key : left_key)
+    && shift_key;
+
+  /* hang */
+  survey (_m, pos, &kid->f, &nc, &pm, &np);
+  if (hang && kid->i >= 8 && kid->i <= 10
+      && is_hangable_pos (&pm, kid->f.dir)) {
+    hang_pos = pm;
+    pos2view (&hang_pos, &hang_pos);
+    kid->hang = true;
+    sample_hang_on_fall = true;
+    kid_hang ();
+    return false;
+  }
 
   if (kid->i == 17) {
     kid_normal ();
