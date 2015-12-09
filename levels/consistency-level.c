@@ -30,7 +30,7 @@ init_consistency_level (void)
 {
   struct pos p;
 
-  random_seed = 4;
+  random_seed = 3;
   /* random_seed = time (NULL); */
   printf ("LEVEL NUMBER: %u\n", random_seed);
 

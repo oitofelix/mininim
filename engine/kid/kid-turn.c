@@ -91,7 +91,8 @@ kid_turn (void)
 static bool
 flow (struct anim *kid)
 {
-  if (kid->oaction != kid_turn) kid->i = -1, misstep = false;
+  if (kid->oaction != kid_turn)
+    kid->i = -1, misstep = kid->hang = false;
 
   if (! turn)
     turn = ((kid->f.dir == RIGHT) && left_key)
@@ -106,7 +107,8 @@ flow (struct anim *kid)
     int dc = dist_collision (&kid->f, &kid->fo, false);
     int df = dist_con (&kid->f, _bf, pos, -4, false, NO_FLOOR);
 
-    if (turn) {
+    if (kid->hang) kid_hang ();
+    else if (turn) {
       kid->i = -1; turn = false;
       kid->action = kid_normal;
       kid_turn ();
@@ -121,6 +123,19 @@ flow (struct anim *kid)
   }
 
   if (kid->f.b == kid_keep_sword_frameset[9].frame) kid->i = 2;
+  if (kid->oaction == kid_jump
+      || kid->oaction == kid_run_jump) {
+    kid->i = 2, kid->hang = true;
+    int dir = (kid->f.dir == LEFT) ? 0 : 1;
+    place_frame (&kid->f, &kid->f, kid_turn_frameset[2].frame,
+                 &hang_pos, PLACE_WIDTH * dir + 7, +4);
+  }
+  if (kid->oaction == kid_hang_free
+      || kid->oaction == kid_hang_wall) {
+    kid->i = 2, kid->hang = true;
+    place_frame (&kid->f, &kid->f, kid_turn_frameset[2].frame,
+                 &hang_pos, (kid->f.dir == LEFT) ? +14 : +20, +4);
+  }
 
   select_frame (kid, kid_turn_frameset, kid->i + 1);
 
@@ -143,7 +158,7 @@ physics_in (struct anim *kid)
   /* fall */
   cbf = survey (_bf, pos, &kid->f, &nc, &np, &np)->fg;
   cbb = survey (_bb, pos, &kid->f, &nc, &np, &np)->fg;
-  if (cbf == NO_FLOOR && cbb == NO_FLOOR) {
+  if (! kid->hang && cbf == NO_FLOOR && cbb == NO_FLOOR) {
     kid_fall ();
     return false;
   }

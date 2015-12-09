@@ -63,6 +63,19 @@ flow (struct anim *kid)
   if (kid->oaction != kid_hang_wall)
     kid->i = 3, kid->wait = 0, kid->reverse = false;
 
+  bool hang_back = ((kid->f.dir == LEFT) ? right_key : left_key)
+    && ! up_key && shift_key;
+
+  int back_dir = (kid->f.dir == LEFT) ? RIGHT : LEFT;
+
+    /* hang back */
+  if (kid->i == 4 && kid->reverse
+      && hang_back && is_hangable_pos (&hang_pos, back_dir)) {
+    sample_hang_on_fall = true;
+    kid_turn ();
+    return false;
+  }
+
   if ((! shift_key && (kid->reverse || kid->i > 3))
       || hang_limit || get_hanged_con (&kid->f) == NO_FLOOR) {
     if (con (&hang_pos)->fg == NO_FLOOR) {

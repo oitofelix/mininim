@@ -122,23 +122,40 @@ kid_jump (void)
 static bool
 flow (struct anim *kid)
 {
-  struct coord nc; struct pos np, pm;
+  struct coord nc; struct pos np, pm, ptf;
 
   if (kid->oaction != kid_jump)
     kid->i = -1, misstep = kid->hang = false;
 
-  bool hang = ((kid->f.dir == LEFT) ? right_key : left_key)
-    && shift_key;
+  bool hang_front = ((kid->f.dir == LEFT) ? left_key : right_key)
+    && ! up_key && shift_key;
 
-  /* hang */
+  bool hang_back = ((kid->f.dir == LEFT) ? right_key : left_key)
+    && ! up_key && shift_key;
+
+  int back_dir = (kid->f.dir == LEFT) ? RIGHT : LEFT;
+
+  /* hang front */
   survey (_m, pos, &kid->f, &nc, &pm, &np);
-  if (hang && kid->i >= 8 && kid->i <= 10
-      && is_hangable_pos (&pm, kid->f.dir)) {
+  if (kid->i >= 8 && kid->i <= 10
+      && hang_front && is_hangable_pos (&pm, kid->f.dir)) {
     hang_pos = pm;
     pos2view (&hang_pos, &hang_pos);
     kid->hang = true;
     sample_hang_on_fall = true;
     kid_hang ();
+    return false;
+  }
+
+  /* hang back */
+  survey (_tf, pos, &kid->f, &nc, &ptf, &np);
+  if (kid->i >= 8 && kid->i <= 10
+      && hang_back && is_hangable_pos (&ptf, back_dir)) {
+    hang_pos = ptf;
+    pos2view (&hang_pos, &hang_pos);
+    kid->hang = true;
+    sample_hang_on_fall = true;
+    kid_turn ();
     return false;
   }
 
