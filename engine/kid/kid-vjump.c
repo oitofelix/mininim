@@ -188,7 +188,7 @@ physics_in (struct anim *kid)
     pos2view (&hang_pos, &hang_pos);
     kid->fo.dx += is_hang_pos_critical (&kid->f) ? -12 : -3;
     kid->hang = true;
-  } else if (kid->i == 0 && can_hang (&kid->f)
+  } else if (kid->i == 0 && can_hang (&kid->f, false)
              && ! is_hang_pos_critical (&kid->f)
              && (kid->f.dir == LEFT || con (&hang_pos)->fg != DOOR)) {
     kid->fo.dx -= 4; kid->hang = true;

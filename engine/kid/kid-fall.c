@@ -106,10 +106,15 @@ static bool
 physics_in (struct anim *kid)
 {
   struct coord nc;
-  struct pos np, pbf, pmbo, ptf, ptb, pmt, pmtf, pmtb, pbb,
+  struct pos np, pbf, ptf, pmt, pmtf, pmtb, pbb,
     npmbo, npmbo_nf;
   enum confg cmbo;
   struct frame nf;
+
+  bool hang_back = ((kid->f.dir == LEFT) ? right_key : left_key)
+    && ! up_key && shift_key;
+
+  bool hang_front = shift_key && ! hang_back;
 
   int dir = (kid->f.dir == LEFT) ? -1 : +1;
 
@@ -160,10 +165,19 @@ physics_in (struct anim *kid)
   if (is_colliding (&kid->f, &kid->fo, false))
     kid->fo.dx = 0;
 
-  /* hang */
-  if (kid->i > 2 && can_hang (&kid->f) && shift_key && ! hang_limit) {
+  /* hang front */
+  if (kid->i > 2 && can_hang (&kid->f, false)
+      && hang_front && ! hang_limit) {
     sample_hang_on_fall = true;
     kid_hang ();
+    return false;
+  }
+
+  /* hang back */
+  if (kid->i > 2 && can_hang (&kid->f, true)
+      && hang_back && ! hang_limit) {
+    sample_hang_on_fall = true;
+    kid_turn ();
     return false;
   }
 

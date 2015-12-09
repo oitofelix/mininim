@@ -298,9 +298,12 @@ is_hangable_pos (struct pos *p, enum dir d)
 }
 
 bool
-can_hang (struct frame *f)
+can_hang (struct frame *f, bool reverse)
 {
   struct frame _f = *f;
+
+  if (reverse) _f.dir = (_f.dir == LEFT) ? RIGHT : LEFT;
+
   nframe (&_f, &_f.c);
 
   struct coord tf; _tf (&_f, &tf);
@@ -376,19 +379,16 @@ update_depressible_floor (struct anim *a, int dx0, int dx1)
 {
   struct coord c0, c1;
   struct pos p0, p1;
-  struct con *t0, *t1;
 
   int dir = (a->f.dir == LEFT) ? -1 : 1;
 
   _bf (&a->f, &c0);
   c0.x += dir * dx0;
   pos (&c0, &p0);
-  t0 = con (&p0);
 
   _bf (&a->f, &c1);
   c1.x += dir * dx1;
   pos (&c1, &p1);
-  t1 = con (&p1);
 
   press_depressible_floor (&p0);
   a->df_pos[0] = p0;
