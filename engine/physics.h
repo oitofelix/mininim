@@ -51,6 +51,7 @@ dist_collision (struct frame *f, struct frame_offset *fo, bool reverse);
 
 
 
+bool is_hangable_con (struct pos *p);
 bool is_hangable_pos (struct pos *p, enum dir d);
 bool can_hang (struct frame *f);
 struct pos *get_hanged_pos (struct frame *f, struct pos *p);

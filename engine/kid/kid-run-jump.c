@@ -127,7 +127,7 @@ physics_in (struct anim *kid)
 
   /* inertia */
   if (kid->i < 6 || kid->i > 10) inertia = 3;
-  else inertia = 6;
+  else inertia = 5;
 
   /* fall */
   cbf = survey (_bf, pos, &kid->f, &nc, &np, &np)->fg;

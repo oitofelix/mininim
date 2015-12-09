@@ -35,6 +35,7 @@ static void init_kid_fall_frameset (void);
 static bool flow (struct anim *kid);
 static bool physics_in (struct anim *kid);
 static void physics_out (struct anim *kid);
+static void place_in_initial_fall (struct anim *kid);
 
 ALLEGRO_BITMAP *kid_fall_13, *kid_fall_14, *kid_fall_15,
   *kid_fall_16, *kid_fall_17;
@@ -105,40 +106,55 @@ static bool
 physics_in (struct anim *kid)
 {
   struct coord nc;
-  struct pos np, pbf, pbb, pmbo, fall_pos, npmbo, npmbo_nf;
+  struct pos np, pbf, pmbo, ptf, ptb, pmt, pmtf, pmtb, pbb,
+    npmbo, npmbo_nf;
   enum confg cmbo;
   struct frame nf;
 
-  printf ("inertia: %i\n", inertia);
+  int dir = (kid->f.dir == LEFT) ? -1 : +1;
 
-  if (kid->i == 0) {
-    survey (_bf, pos, &kid->f, &nc, &pbf, &np);
-    survey (_mbo, pos, &kid->f, &nc, &pmbo, &np);
-    survey (_bb, pos, &kid->f, &nc, &pbb, &np);
+  if (kid->oaction == kid_jump) {
+    next_frame_fo (&kid->f, &kid->f, &kid->fo);
+    kid->f.c.x += dir * 8;
+    kid->f.c.y += 6;
+  } else if (kid->oaction == kid_run_jump) {
+    next_frame_fo (&kid->f, &kid->f, &kid->fo);
+    kid->f.c.x += dir * 12;
+    kid->f.c.y += 6;
+  }
 
-    fall_pos.room = -1;
+  if (kid->i == 0
+      && kid->oaction != kid_hang_wall
+      && kid->oaction != kid_hang_free) {
+    next_frame_fo (&kid->f, &kid->f, &kid->fo);
 
-    if (is_strictly_traversable (&pmbo)) fall_pos = pmbo;
-    else if (is_strictly_traversable (&pbf)) fall_pos = pbf;
-    else if (is_strictly_traversable (&pbb)) fall_pos = pbb;
+    int dirf = (kid->f.dir == LEFT) ? -1 : +1;
+    int dirb = (kid->f.dir == LEFT) ? +1 : -1;
+    survey (_mt, pos, &kid->f, &nc, &pmt, &np);
+    prel (&pmt, &pmtf, +0, dirf);
+    prel (&pmt, &pmtb, +0, dirb);
 
-    if (fall_pos.room != - 1)
-      place_frame (&kid->f, &kid->f, kid_fall_frameset[0].frame,
-                   &fall_pos,
-                   (kid->f.dir == LEFT) ? PLACE_WIDTH - 12 : +16,
-                   (kid->f.dir == LEFT) ? 23 : 27);
+    if (! is_strictly_traversable (&pmt)
+        || ! is_strictly_traversable (&pmtf)
+        || ! is_strictly_traversable (&pmtb))
+      place_in_initial_fall (kid);
   }
 
   /* help kid hang */
-  /* survey (_bf, pos, &kid->f, &nc, &pbf, &np); */
-  /* if (! is_strictly_traversable (&pbf)) inertia = 0; */
+  survey (_tf, pos, &kid->f, &nc, &ptf, &np);
+  survey (_bb, pos, &kid->f, &nc, &pbb, &np);
+  if (is_hangable_con (&ptf)
+      || is_hangable_pos (&pbb, kid->f.dir)) inertia = 0;
 
   /* fall speed */
-  if (kid->i > 0) kid->fo.dx = -inertia;
+  if (kid->i > 0)
+    kid->fo.dx = -inertia;
   if (kid->i > 4) {
     int speed = +21 + 3 * (kid->i - 5);
     kid->fo.dy = (speed > 33) ? 33 : speed;
   }
+
+  printf ("inertia: %i\n", inertia);
 
   /* collision */
   if (is_colliding (&kid->f, &kid->fo, false))
@@ -196,4 +212,30 @@ is_kid_fall (struct frame *f)
     || f->b == kid_fall_15
     || f->b == kid_fall_16
     || f->b == kid_fall_17;
+}
+
+static void
+place_in_initial_fall (struct anim *kid)
+{
+  struct coord nc;
+  struct pos np, pmt, pmtf, pmtb;
+  struct pos fall_pos;
+
+  int dirf = (kid->f.dir == LEFT) ? -1 : +1;
+  int dirb = (kid->f.dir == LEFT) ? +1 : -1;
+  survey (_mt, pos, &kid->f, &nc, &pmt, &np);
+  prel (&pmt, &pmtf, +0, dirf);
+  prel (&pmt, &pmtb, +0, dirb);
+
+  fall_pos.room = -1;
+
+  if (is_strictly_traversable (&pmt)) fall_pos = pmt;
+  else if (is_strictly_traversable (&pmtf)) fall_pos = pmtf;
+  else if (is_strictly_traversable (&pmtb)) fall_pos = pmtb;
+
+  if (fall_pos.room != - 1)
+    place_frame (&kid->f, &kid->f, kid_fall_frameset[0].frame,
+                 &fall_pos,
+                 (kid->f.dir == LEFT) ? PLACE_WIDTH - 12 : +16,
+                 (kid->f.dir == LEFT) ? 23 : 27);
 }

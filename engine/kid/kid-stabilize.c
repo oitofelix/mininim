@@ -112,7 +112,7 @@ flow (struct anim *kid)
   if (kid->oaction != kid_stabilize) {
     kid->i = -1, misstep = false;
     if (kid->oaction == kid_stabilize_collision) {
-      kid->i = 1; kid->collision = true;
+      kid->i = 0; kid->collision = true;
     } else kid->collision = false;
   }
 

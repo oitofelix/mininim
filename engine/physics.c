@@ -264,24 +264,30 @@ dist_con (struct frame *f, coord_f cf, pos_f pf,
 
 
 bool
+is_hangable_con (struct pos *p)
+{
+  enum confg t = con (p)->fg;
+  return t == FLOOR
+    || t == BROKEN_FLOOR
+    || (t == LOOSE_FLOOR
+        && loose_floor_at_pos (p)->action
+        != RELEASE_LOOSE_FLOOR)
+    || t == SKELETON_FLOOR
+    || t == SPIKES_FLOOR
+    || t == OPENER_FLOOR
+    || t == CLOSER_FLOOR
+    || t == PILLAR || t == DOOR;
+}
+
+bool
 is_hangable_pos (struct pos *p, enum dir d)
 {
   int dir = (d == LEFT) ? -1 : +1;
   struct pos ph; prel (p, &ph, -1, dir);
-  struct con *ch = con (&ph);
   struct pos pa; prel (p, &pa, -1, 0);
   struct con *ca = con (&pa);
 
-  return (ch->fg == FLOOR
-          || ch->fg == BROKEN_FLOOR
-          || (ch->fg == LOOSE_FLOOR
-              && loose_floor_at_pos (&ph)->action
-              != RELEASE_LOOSE_FLOOR)
-          || ch->fg == SKELETON_FLOOR
-          || ch->fg == SPIKES_FLOOR
-          || ch->fg == OPENER_FLOOR
-          || ch->fg == CLOSER_FLOOR
-          || ch->fg == PILLAR || ch->fg == DOOR)
+  return is_hangable_con (&ph)
     && (ca->fg == NO_FLOOR
         || (ca->fg == LOOSE_FLOOR
             && loose_floor_at_pos (&pa)->action
@@ -386,16 +392,6 @@ update_depressible_floor (struct anim *a, int dx0, int dx1)
 
   press_depressible_floor (&p1);
   a->df_pos[1] = p1;
-
-  if (t0->fg != OPENER_FLOOR
-      && t0->fg != CLOSER_FLOOR
-      && t0->fg != LOOSE_FLOOR)
-    a->df_pos[0].room = -1;
-
-  if (t1->fg != OPENER_FLOOR
-      && t1->fg != CLOSER_FLOOR
-      && t1->fg != LOOSE_FLOOR)
-    a->df_pos[1].room = -1;
 }
 
 void
@@ -404,8 +400,8 @@ keep_depressible_floor (struct anim *a)
   struct pos *p0 = &a->df_pos[0];
   struct pos *p1 = &a->df_pos[1];
 
-  if (p0->room != -1) press_depressible_floor (p0);
-  if (p1->room != -1) press_depressible_floor (p1);
+  press_depressible_floor (p0);
+  press_depressible_floor (p1);
 }
 
 void
@@ -432,6 +428,8 @@ restore_depressible_floor (struct anim *a)
 void
 press_depressible_floor (struct pos *p)
 {
+  if (p->room == -1) return;
+
   switch (con (p)->fg) {
   case OPENER_FLOOR: press_opener_floor (p); break;
   case CLOSER_FLOOR: press_closer_floor (p); break;

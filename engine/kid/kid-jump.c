@@ -47,8 +47,8 @@ init_kid_jump_frameset (void)
   struct frameset frameset[KID_JUMP_FRAMESET_NMEMB] =
     {{kid_jump_01,+0,0},{kid_jump_02,-2,0},{kid_jump_03,-3,0},
      {kid_jump_04,-6,0},{kid_jump_05,-2,0},{kid_jump_06,-4,0},
-     {kid_jump_07,-1,0},{kid_jump_08,-12,0},{kid_jump_09,-18,0},
-     {kid_jump_10,-15,-6},{kid_jump_11,-2,+6},{kid_jump_12,-11,0},
+     {kid_jump_07,-1,0},{kid_jump_08,-12,0},{kid_jump_09,-19,0},
+     {kid_jump_10,-16,-6},{kid_jump_11,-2,+6},{kid_jump_12,-11,0},
      {kid_jump_13,+5,0},{kid_jump_14,-13,0},{kid_jump_15,+0,0},
      {kid_jump_16,-1,0},{kid_jump_17,-1,0},{kid_jump_18,+0,0}};
 
@@ -144,17 +144,19 @@ physics_in (struct anim *kid)
 {
   struct coord nc; struct pos np;
   enum confg cbb, cmbo, cbf;
+  struct frame nf;
 
   /* inertia */
-  if (kid->i >= 8 && kid->i <= 10) inertia = 4;
+  if (kid->i >= 8 && kid->i <= 10) inertia = 5;
   else inertia = 0;
 
   /* fall */
-  cbb = survey (_bb, pos, &kid->f, &nc, &np, &np)->fg;
-  cmbo = survey (_mbo, pos, &kid->f, &nc, &np, &np)->fg;
-  cbf = survey (_bf, pos, &kid->f, &nc, &np, &np)->fg;
-  if ((cbb == NO_FLOOR && cmbo == NO_FLOOR && kid->i < 7)
-      || ( kid->i > 9 && cbf == NO_FLOOR)) {
+  next_frame_fo (&kid->f, &nf, &kid->fo);
+  cbb = survey (_bb, pos, &nf, &nc, &np, &np)->fg;
+  cmbo = survey (_mbo, pos, &nf, &nc, &np, &np)->fg;
+  cbf = survey (_bf, pos, &nf, &nc, &np, &np)->fg;
+  if ((cbb == NO_FLOOR && cmbo == NO_FLOOR && kid->i <= 7)
+      || (kid->i >= 10 && cbf == NO_FLOOR)) {
     kid_fall ();
     return false;
   }

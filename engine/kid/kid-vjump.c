@@ -149,7 +149,7 @@ flow (struct anim *kid)
   if (is_hang_pos_critical (&kid->f)
       && kid->oaction == kid_hang_free)
     kid->fo.dx -= (kid->f.dir == LEFT) ? 9 : 13;
-  if (is_hang_pos_critical (&kid->f)
+  if (kid->hang && is_hang_pos_critical (&kid->f)
       && kid->i == 11) kid->fo.dx = +7;
   if (kid->i == 12 && kid->j++ > 0)
     kid->fo.dx = 0, kid->fo.dy += 2 * kid->j + 1;

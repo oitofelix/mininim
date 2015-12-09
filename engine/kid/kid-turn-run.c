@@ -146,7 +146,11 @@ static void
 physics_out (struct anim *kid)
 {
   /* depressible floors */
-  if (kid->i == 0) update_depressible_floor (kid, 0, -23);
-  else if (kid->i == 5) update_depressible_floor (kid, -3, -5);
+  if (kid->i == 0) update_depressible_floor (kid, -4, -27);
+  else if (kid->i == 1) update_depressible_floor (kid, -9, -28);
+  else if (kid->i == 2) update_depressible_floor (kid, -11, -29);
+  else if (kid->i == 3) update_depressible_floor (kid, -6, -27);
+  else if (kid->i == 4) update_depressible_floor (kid, -10, -31);
+  else if (kid->i == 5) update_depressible_floor (kid, -17, -29);
   else keep_depressible_floor (kid);
 }
