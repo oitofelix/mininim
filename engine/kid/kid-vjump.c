@@ -183,7 +183,6 @@ physics_in (struct anim *kid)
   int dir = (kid->f.dir == LEFT) ? +1 : -1;
   survey (_tf, pos, &kid->f, &nc, &ptf, &np);
   if (kid->i == 0
-      && dist_next_place (&kid->f, _tf, pos, 0, true) < 23
       && is_hangable_pos (prel (&ptf, &np, 0, dir), kid->f.dir)) {
     prel (&ptf, &hang_pos, 0, dir);
     pos2view (&hang_pos, &hang_pos);

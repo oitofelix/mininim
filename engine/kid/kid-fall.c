@@ -179,10 +179,17 @@ physics_in (struct anim *kid)
 
     survey (_bf, pos, &kid->f, &nc, &pbf, &np);
     pos2view (&pbf, &pbf);
+    kid->fo.b = kid_couch_frameset[0].frame;
+    kid->fo.dx = kid->fo.dy = 0;
     kid->f.c.room = pbf.room;
     kid->f.c.x += (kid->f.dir == LEFT) ? -6 : +6;
-    kid->f.c.y = PLACE_HEIGHT * pbf.floor + 15;
-    kid->f.b = kid_normal_00;
+    kid->f.c.y = PLACE_HEIGHT * pbf.floor + 27;
+    kid->f.b = kid_couch_frameset[0].frame;
+
+    kid->f.c.x += (kid->f.dir == LEFT) ? -10 : +10;
+    if (is_colliding (&kid->f, &kid->fo, false))
+      kid->f.c.x += (kid->f.dir == LEFT) ? +10 : -10;
+    kid->f.c.x -= (kid->f.dir == LEFT) ? -10 : +10;
 
     if (kid->i >= 8) {
       kid_current_lives--;
