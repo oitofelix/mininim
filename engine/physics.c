@@ -118,19 +118,20 @@ is_colliding (struct frame *f, struct frame_offset *fo, bool reverse)
 {
   struct coord nc, tf; struct pos np, ptf, ptb, pmt, _ptb;
 
-  struct frame nf;
-  next_frame_fo (f, &nf, fo);
+  struct frame _f = *f, nf;
 
-  if (reverse) nf.dir = (nf.dir == LEFT) ? RIGHT : LEFT;
+  if (reverse) _f.dir = (_f.dir == LEFT) ? RIGHT : LEFT;
   int r = (reverse) ? -1 : +1;
-  int dir = (nf.dir == LEFT) ? -1 : +1;
-  nf.c.x += r * dir * -4;
+  int dir = (_f.dir == LEFT) ? -1 : +1;
+  _f.c.x += r * dir * -4;
+
+  next_frame_fo (&_f, &nf, fo);
 
   enum confg ctf = survey (_tf, pos, &nf, &tf, &ptf, &np)->fg;
   enum confg ctb = survey (_tb, pos, &nf, &nc, &ptb, &np)->fg;
   enum confg cmt = survey (_mt, pos, &nf, &nc, &pmt, &np)->fg;
 
-  survey (_tb, pos, f, &nc, &_ptb, &np);
+  survey (_tb, pos, &_f, &nc, &_ptb, &np);
 
   bool wall_collision = false;
   bool door_collision = false;
@@ -147,13 +148,15 @@ is_colliding (struct frame *f, struct frame_offset *fo, bool reverse)
   }
 
   if (nf.dir == RIGHT && ctb == DOOR
-      && ptb.place < ptf.place && _ptb.place < ptf.place
+      && ptb.place < ptf.place
+      && _ptb.place < ptf.place
       && tf.y <= door_grid_tip_y (&ptb) - 10) {
     door_collision = true;
     collision_pos = *prel (&ptb, &np, +0, +1);
   } else if (nf.dir == RIGHT && cmt == DOOR
-             && pmt.place < ptf.place && _ptb.place < ptf.place
-      && tf.y <= door_grid_tip_y (&pmt) - 10) {
+             && pmt.place < ptf.place
+             && _ptb.place < ptf.place
+             && tf.y <= door_grid_tip_y (&pmt) - 10) {
     door_collision = true;
     collision_pos = *prel (&pmt, &np, +0, +1);
   }

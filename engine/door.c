@@ -296,11 +296,13 @@ draw_door_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f)
         || peq (&ptb, &pa))
        && (peq (&pmt, p) || peq (&pmt, &pl)
            || peq (&pmt, &pa)))
-      || is_kid_successfully_climbing_at_pos (f, p)) {
+      || is_kid_successfully_climbing_at_pos (f, p)
+      || (is_kid_turn_run (f)
+          && f->dir == LEFT)) {
     struct door *d = door_at_pos (p);
     draw_door_grid (screen, p, d->i);
     draw_con_left (screen, &par);
-    draw_con_left (screen, &pr);
+    /* draw_con_left (screen, &pr); */
   }
 }
 

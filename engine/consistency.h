@@ -20,7 +20,7 @@
 #ifndef FREEPOP_CONSISTENCY_H
 #define FREEPOP_CONSISTENCY_H
 
-void fix_level (void);
+void fix_level (struct level *lv);
 void make_links_locally_consistent (int prev_room, int current_room);
 
 #endif	/* FREEPOP_CONSISTENCY_H */

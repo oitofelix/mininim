@@ -222,9 +222,7 @@ physics_in (struct anim *kid)
   }
 
   /* wall or door pushes back */
-  if (
-      /* (kid->i == 0 || kid->i > 4) && */
-      is_colliding (&kid->f, &kid->fo, false)) {
+  if (is_colliding (&kid->f, &kid->fo, false)) {
     kid_stabilize_collision ();
     return false;
   }

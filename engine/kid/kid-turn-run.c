@@ -132,12 +132,18 @@ physics_in (struct anim *kid)
   }
 
   /* collision */
-  if (kid->i < 3 && is_colliding (&kid->f, &kid->fo, true)) {
+  is_colliding (&kid->f, &kid->fo, true);
+  if (kid->f.dir == RIGHT
+      || (kid->f.dir == LEFT && confg_collision != DOOR))
+    kid->f.c.x += (kid->f.dir == LEFT) ? -8 : +8;
+  if (is_colliding (&kid->f, &kid->fo, true)) {
     kid->f.dir = (kid->f.dir == LEFT) ? RIGHT : LEFT;
     kid_stabilize_collision ();
     return false;
   }
-
+  if (kid->f.dir == RIGHT
+      || (kid->f.dir == LEFT && confg_collision != DOOR))
+    kid->f.c.x += (kid->f.dir == LEFT) ? +8 : -8;
 
   return true;
 }
@@ -153,4 +159,13 @@ physics_out (struct anim *kid)
   else if (kid->i == 4) update_depressible_floor (kid, -10, -31);
   else if (kid->i == 5) update_depressible_floor (kid, -17, -29);
   else keep_depressible_floor (kid);
+}
+
+bool
+is_kid_turn_run (struct frame *f)
+{
+  int i;
+  for (i = 0; i < KID_TURN_RUN_FRAMESET_NMEMB; i ++)
+    if (f->b == kid_turn_run_frameset[i].frame) return true;
+  return false;
 }

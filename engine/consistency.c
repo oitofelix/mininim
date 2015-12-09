@@ -45,8 +45,11 @@ static bool is_inaccessible (struct pos *p);
 static bool is_loose (struct pos *p);
 
 void
-fix_level ()
+fix_level (struct level *lv)
 {
+  struct level *olevel = level;
+  level = lv;
+
   struct pos p;
 
   for (p.room = 0; p.room < ROOMS; p.room++)
@@ -65,6 +68,8 @@ fix_level ()
         fix_item_on_non_normal_floor (&p);
         fix_sword_at_right_of_wall_or_door (&p);
       }
+
+  level = olevel;
 }
 
 /* Important: the corrections bellow are all made for two perspectives

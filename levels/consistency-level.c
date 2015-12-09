@@ -22,6 +22,7 @@
 #include "kernel/video.h"
 #include "kernel/random.h"
 #include "engine/level.h"
+#include "engine/consistency.h"
 
 static struct level consistency_level;
 
@@ -179,6 +180,8 @@ init_consistency_level (void)
 void
 play_consistency_level (void)
 {
+  int i = 0;
   init_consistency_level ();
+  for (i = 0; i < 2; i++) fix_level (&consistency_level);
   play_level (&consistency_level);
 }

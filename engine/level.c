@@ -54,12 +54,9 @@ int room_view = 1;
 void
 play_level (struct level *_level)
 {
-  int i = 0;
-
   cutscene = false;
 
   level = _level;
-  for (i = 0; i < 2; i++) fix_level ();
   load_level ();
 
   register_cons ();
