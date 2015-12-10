@@ -105,19 +105,18 @@ physics_in (struct anim *kid)
   struct coord tf; struct pos np, ptf;
   enum confg ctf;
 
+  /* collision */
+  if (is_colliding (&kid->f, &kid->fo, +PLACE_WIDTH, false)
+      && kid->i == 0) {
+    /* sample_action_not_allowed = true; */
+    kid_normal ();
+    return false;
+  }
+
   /* fall */
   ctf = survey (_tf, pos, &kid->f, &tf, &ptf, &np)->fg;
   if (ctf == NO_FLOOR) {
     kid_fall ();
-    return false;
-  }
-
-  /* collision */
-  if ((will_collide (&kid->f, &kid->fo, false)
-       || is_colliding (&kid->f, &kid->fo, false))
-      && kid->i == 0) {
-    /* sample_action_not_allowed = true; */
-    kid_normal ();
     return false;
   }
 

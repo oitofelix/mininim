@@ -90,7 +90,7 @@ kid_stabilize_collision (void)
   kid.action = kid_stabilize_collision;
   place_frame (&kid.f, &kid.f, kid_stabilize_frameset[0].frame,
                &collision_pos, (kid.f.dir == LEFT)
-               ? PLACE_WIDTH + 14 : -PLACE_WIDTH + 24, +17);
+               ? PLACE_WIDTH + 18 : -PLACE_WIDTH + 24, +17);
   kid_stabilize ();
   sample_hit_wall = true;
 }
@@ -114,6 +114,7 @@ flow (struct anim *kid)
     if (kid->oaction == kid_stabilize_collision) {
       kid->i = 0; kid->collision = true;
     } else kid->collision = false;
+    if (kid->oaction == kid_turn) kid->collision = true;
   }
 
   if (! turn)
@@ -126,7 +127,7 @@ flow (struct anim *kid)
     || ((kid->f.dir == LEFT) && left_key && up_key);
   bool couch = down_key;
 
-  int dc = dist_collision (&kid->f, &kid->fo, false);
+  int dc = dist_collision (&kid->f, &kid->fo, +0, false);
   int df = dist_con (&kid->f, _bb, pos, -4, false, NO_FLOOR);
 
   if (kid->i >= 0 && ! kid->collision) {
@@ -173,6 +174,13 @@ physics_in (struct anim *kid)
   cbb = survey (_bb, pos, &kid->f, &nc, &np, &np)->fg;
   if (cmbo == NO_FLOOR && cbb == NO_FLOOR) {
     kid_fall ();
+    return false;
+  }
+
+  /* collision */
+  if (is_colliding (&kid->f, &kid->fo, +0, false)
+      && ! kid->collision) {
+    kid_stabilize_collision ();
     return false;
   }
 

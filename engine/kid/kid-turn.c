@@ -104,7 +104,7 @@ flow (struct anim *kid)
   bool couch = down_key;
 
   if (kid->i == 3) {
-    int dc = dist_collision (&kid->f, &kid->fo, false);
+    int dc = dist_collision (&kid->f, &kid->fo, +0, false);
     int df = dist_con (&kid->f, _bf, pos, -4, false, NO_FLOOR);
 
     if (kid->hang) kid_hang ();
@@ -124,29 +124,16 @@ flow (struct anim *kid)
 
   if (kid->f.b == kid_keep_sword_frameset[9].frame) kid->i = 2;
 
-  /* fall inverse hang */
-  if (kid->oaction == kid_fall) {
+  /* hang */
+  if (kid->oaction == kid_fall
+      || kid->oaction == kid_jump
+      || kid->oaction == kid_run_jump
+      || kid->oaction == kid_hang_free
+      || kid->oaction == kid_hang_wall) {
     kid->i = 2, kid->hang = true;
     place_frame (&kid->f, &kid->f, kid_turn_frameset[2].frame,
                  &hang_pos, (kid->f.dir == LEFT)
                  ? 7 : PLACE_WIDTH, +4);
-  }
-
-  /* jump inverse hang */
-  if (kid->oaction == kid_jump
-      || kid->oaction == kid_run_jump) {
-    kid->i = 2, kid->hang = true;
-    place_frame (&kid->f, &kid->f, kid_turn_frameset[2].frame,
-                 &hang_pos, (kid->f.dir == LEFT)
-                 ? 7 : PLACE_WIDTH + 7, +4);
-  }
-
-  /* hang inverse hang */
-  if (kid->oaction == kid_hang_free
-      || kid->oaction == kid_hang_wall) {
-    kid->i = 2, kid->hang = true;
-    place_frame (&kid->f, &kid->f, kid_turn_frameset[2].frame,
-                 &hang_pos, (kid->f.dir == LEFT) ? +14 : +20, +4);
   }
 
   select_frame (kid, kid_turn_frameset, kid->i + 1);

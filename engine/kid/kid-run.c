@@ -134,27 +134,22 @@ flow (struct anim *kid)
 static bool
 physics_in (struct anim *kid)
 {
-  struct coord tf; struct pos np, ptf, ptfl;
-  enum confg ctf, ctfl;
+  struct coord tf; struct pos np;
+  enum confg ctf;
 
   /* inertia */
   inertia = 3;
 
-  /* fall */
-  ctf = survey (_tf, pos, &kid->f, &tf, &ptf, &np)->fg;
-  prel (&ptf, &ptfl, 0, -1);
-  ctfl = con (&ptfl)->fg;
-  if (ctf == NO_FLOOR
-      && ! (kid->f.dir == RIGHT
-            && ctfl == DOOR
-            && tf.y <= door_grid_tip_y (&ptfl) - 10)) {
-    kid_fall ();
+  /* collision */
+  if (is_colliding (&kid->f, &kid->fo, +0, false)) {
+    kid_stabilize_collision ();
     return false;
   }
 
-  /* collision */
-  if (is_colliding (&kid->f, &kid->fo, false)) {
-    kid_stabilize_collision ();
+  /* fall */
+  ctf = survey (_tf, pos, &kid->f, &tf, &np, &np)->fg;
+  if (ctf == NO_FLOOR) {
+    kid_fall ();
     return false;
   }
 

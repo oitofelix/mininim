@@ -164,18 +164,18 @@ physics_in (struct anim *kid)
   if (kid->i < 6 || kid->i > 10) inertia = 3;
   else inertia = 5;
 
+  /* collision */
+  if (is_colliding (&kid->f, &kid->fo, +0, false)) {
+    if (kid->i < 6) kid_stabilize_collision ();
+    else kid_couch_collision ();
+    return false;
+  }
+
   /* fall */
   cbf = survey (_bf, pos, &kid->f, &nc, &np, &np)->fg;
   if ((cbf == NO_FLOOR && kid->i < 4)
       || (cbf == NO_FLOOR && kid->i > 9)) {
     kid_fall ();
-    return false;
-  }
-
-  /* collision */
-  if (is_colliding (&kid->f, &kid->fo, false)) {
-    if (kid->i < 6) kid_stabilize_collision ();
-    else kid_couch_collision ();
     return false;
   }
 

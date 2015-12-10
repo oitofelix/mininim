@@ -118,7 +118,7 @@ load_kid (void)
   kid.action = kid_normal;
   update_depressible_floor (&kid, -4, -10);
 
-  place_kid (1, 0, 0);
+  place_kid (2, 0, 0);
 }
 
 void

@@ -29,6 +29,7 @@ int roomd (int room, enum dir dir);
 struct coord *ncoord (struct coord *c, struct coord *nc);
 struct pos *npos (struct pos *p, struct pos *np);
 struct pos *pos2view (struct pos *p, struct pos *pv);
+int pos_mod (struct pos *p);
 struct pos *pos_gen (struct coord *c, struct pos *p, int dx, int dy);
 inline struct pos *pos (struct coord *c, struct pos *p);
 inline struct pos *posf (struct coord *c, struct pos *p);

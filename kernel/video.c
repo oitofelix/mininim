@@ -86,18 +86,6 @@ finalize_video (void)
   al_shutdown_primitives_addon ();
 }
 
-int
-max (int a, int b)
-{
-  return (a > b) ? a : b;
-}
-
-int
-min (int a, int b)
-{
-  return (a < b) ? a : b;
-}
-
 ALLEGRO_EVENT_SOURCE *
 get_display_event_source (ALLEGRO_DISPLAY *display)
 {

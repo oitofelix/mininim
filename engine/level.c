@@ -138,6 +138,8 @@ draw_level (void)
 
   int prev_room = room_view;
 
+  if (was_key_pressed (ALLEGRO_KEY_HOME, true))
+    room_view = kid.f.c.room;
   if (was_key_pressed (ALLEGRO_KEY_H, true))
     room_view = level->link[room_view].l;
   if (was_key_pressed (ALLEGRO_KEY_J, true))

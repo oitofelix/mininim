@@ -118,20 +118,18 @@ physics_in (struct anim *kid)
   /* inertia */
   inertia = 0;
 
+  /* collision */
+  if (is_colliding (&kid->f, &kid->fo, +0, false)) {
+    kid_stabilize_collision ();
+    return false;
+  }
+
   /* fall */
   ctf = survey (_tf, pos, &kid->f, &nc, &np, &np)->fg;
   if (ctf == NO_FLOOR) {
     kid_fall ();
     return false;
   }
-
-  /* collision */
-  if (kid->f.dir == RIGHT) kid->f.c.x += +6;
-  if (is_colliding (&kid->f, &kid->fo, false)) {
-    kid_stabilize_collision ();
-    return false;
-  }
-  if (kid->f.dir == RIGHT) kid->f.c.x += -6;
 
   return true;
 }

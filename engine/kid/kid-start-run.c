@@ -141,17 +141,17 @@ physics_in (struct anim *kid)
   /* inertia */
   inertia = 1;
 
+  /* collision */
+  if (is_colliding (&kid->f, &kid->fo, +0, false)) {
+    kid_stabilize_collision ();
+    return false;
+  }
+
   /* fall */
   cmbo = survey (_mbo, pos, &kid->f, &nc, &np, &np)->fg;
   ctf = survey (_tf, pos, &kid->f, &nc, &np, &np)->fg;
   if (cmbo == NO_FLOOR || ctf == NO_FLOOR) {
     kid_fall ();
-    return false;
-  }
-
-  /* collision */
-  if (is_colliding (&kid->f, &kid->fo, false)) {
-    kid_stabilize_collision ();
     return false;
   }
 

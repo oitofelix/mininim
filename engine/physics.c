@@ -114,100 +114,68 @@ dist_next_place (struct frame *f, coord_f cf, pos_f pf,
 }
 
 bool
-is_colliding (struct frame *f, struct frame_offset *fo, bool reverse)
+is_colliding (struct frame *f, struct frame_offset *fo, int dx, bool reverse)
 {
-  struct coord nc, tf; struct pos np, ptf, ptb, pmt, _ptb;
+  struct coord nc, tf; struct pos np, ptf, _ptf, p, pl;
 
   struct frame _f = *f, nf;
 
   if (reverse) _f.dir = (_f.dir == LEFT) ? RIGHT : LEFT;
-  int r = (reverse) ? -1 : +1;
-  int dir = (_f.dir == LEFT) ? -1 : +1;
-  _f.c.x += r * dir * -4;
 
   next_frame_fo (&_f, &nf, fo);
 
-  enum confg ctf = survey (_tf, pos, &nf, &tf, &ptf, &np)->fg;
-  enum confg ctb = survey (_tb, pos, &nf, &nc, &ptb, &np)->fg;
-  enum confg cmt = survey (_mt, pos, &nf, &nc, &pmt, &np)->fg;
-
-  survey (_tb, pos, &_f, &nc, &_ptb, &np);
-
-  bool wall_collision = false;
-  bool door_collision = false;
-
-  if (ctf == WALL) {
-    wall_collision = true;
-    collision_pos = ptf;
-  }
-
-  if (nf.dir == LEFT && ctf == DOOR && ptf.place < ptb.place
-      && tf.y <= door_grid_tip_y (&ptf) - 10) {
-    door_collision = true;
-    collision_pos = ptf;
-  }
-
-  if (nf.dir == RIGHT && ctb == DOOR
-      && ptb.place < ptf.place
-      && _ptb.place < ptf.place
-      && tf.y <= door_grid_tip_y (&ptb) - 10) {
-    door_collision = true;
-    collision_pos = *prel (&ptb, &np, +0, +1);
-  } else if (nf.dir == RIGHT && cmt == DOOR
-             && pmt.place < ptf.place
-             && _ptb.place < ptf.place
-             && tf.y <= door_grid_tip_y (&pmt) - 10) {
-    door_collision = true;
-    collision_pos = *prel (&pmt, &np, +0, +1);
-  }
-
-  confg_collision = NO_FLOOR;
-  if (wall_collision) confg_collision = WALL;
-  if (door_collision) confg_collision = DOOR;
-
-  pos2view (&collision_pos, &collision_pos);
-
-  /* if (door_collision) printf ("DOOR COLLISION!\n"); */
-
-  return wall_collision || door_collision;
-}
-
-bool
-will_collide (struct frame *f, struct frame_offset *fo, bool reverse)
-{
-  struct coord tf; struct pos np, ptf, ptff;
-
-  struct frame nf = *f;
-
-  if (reverse) nf.dir = (nf.dir == LEFT) ? RIGHT : LEFT;
-  int r = (reverse) ? -1 : +1;
   int dir = (nf.dir == LEFT) ? -1 : +1;
-  nf.c.x += r * dir * -4;
+  nf.c.x += dir * dx;
 
-  enum confg ctf = survey (_tf, pos, &nf, &tf, &ptf, &np)->fg;
+  survey (_tf, pos, &_f, &nc, &_ptf, &np);
+  survey (_tf, pos, &nf, &tf, &ptf, &np);
 
-  prel (&ptf, &ptff, +0, dir);
-  enum confg ctff = con (&ptff)->fg;
+  pos2view (&_ptf, &_ptf);
+  pos2view (&ptf, &ptf);
 
   bool wall_collision = false;
   bool door_collision = false;
 
-  if (ctff == WALL) {
-    wall_collision = true;
-    collision_pos = ptff;
-  }
+  /* wall */
 
-  if (nf.dir == LEFT && ctff == DOOR
-      && tf.y <= door_grid_tip_y (&ptff) - 10) {
-    door_collision = true;
-    collision_pos = ptff;
-  }
+  if (_f.dir == LEFT && ptf.place <= _ptf.place)
+    for (p = _ptf; p.place >= ptf.place; prel (&p, &p, +0, -1))
+      if (con (&p)->fg == WALL) {
+        wall_collision = true;
+        collision_pos = p;
+        break;
+      }
 
-  if (nf.dir == RIGHT && ctf == DOOR
-      && tf.y <= door_grid_tip_y (&ptf) - 10) {
-    door_collision = true;
-    collision_pos = *prel (&ptf, &np, +0, +1);
-  }
+  if (_f.dir == RIGHT && ptf.place >= _ptf.place)
+    for (p = _ptf; p.place <= ptf.place; prel (&p, &p, +0, +1)) {
+      if (con (&p)->fg == WALL) {
+        wall_collision = true;
+        collision_pos = p;
+        break;
+      }
+    }
+
+  /* door */
+
+  if (_f.dir == LEFT && ptf.place < _ptf.place)
+    for (prel (&_ptf, &p, +0, -1); p.place >= ptf.place; prel (&p, &p, +0, -1))
+      if (con (&p)->fg == DOOR
+          && tf.y <= door_grid_tip_y (&p) - 10) {
+        door_collision = true;
+        collision_pos = p;
+        break;
+      }
+
+  if (_f.dir == RIGHT && ptf.place > _ptf.place)
+    for (prel (&_ptf, &p, +0, +1); p.place <= ptf.place; prel (&p, &p, +0, +1)) {
+      prel (&p, &pl, +0, -1);
+      if (con (&pl)->fg == DOOR
+          && tf.y <= door_grid_tip_y (&pl) - 10) {
+        door_collision = true;
+        collision_pos = p;
+        break;
+      }
+    }
 
   confg_collision = NO_FLOOR;
   if (wall_collision) confg_collision = WALL;
@@ -216,9 +184,9 @@ will_collide (struct frame *f, struct frame_offset *fo, bool reverse)
   pos2view (&collision_pos, &collision_pos);
 
   /* if (door_collision) printf ("DOOR COLLISION!\n"); */
+  /* if (wall_collision) printf ("WALL COLLISION!\n"); */
 
   return wall_collision || door_collision;
-
 }
 
 bool
@@ -239,17 +207,27 @@ is_on_con (struct frame *f, coord_f cf, pos_f pf,
 }
 
 int
-dist_collision (struct frame *f, struct frame_offset *fo, bool reverse)
+dist_collision (struct frame *f, struct frame_offset *fo, int dx, bool reverse)
 {
-  struct frame_offset _fo = *fo;
-
   int i = 0;
-  int r = reverse ? -1 : 1;
-  while (! is_colliding (f, &_fo, reverse)
-         && i < PLACE_WIDTH + 1) {
-    _fo.dx -= r * 1;
-    i++;
-  }
+  struct frame _f = *f;
+
+  if (reverse) _f.dir = (_f.dir == LEFT) ? RIGHT : LEFT;
+
+  int dir = (_f.dir == LEFT) ? -1 : +1;
+
+  if (! is_colliding (&_f, fo, dx, reverse))
+    while (! is_colliding (&_f, fo, dx, reverse)
+           && i < PLACE_WIDTH + 1) {
+      _f.c.x += dir;
+      i++;
+    }
+  else
+    while (is_colliding (&_f, fo, dx, reverse)
+           && -i < PLACE_WIDTH + 1) {
+      _f.c.x -= dir;
+      i--;
+    }
 
   return i;
 }

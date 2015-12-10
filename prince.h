@@ -157,6 +157,10 @@ struct level {
   } event[EVENTS];
 };
 
+/* functions */
+int max (int a, int b);
+int min (int a, int b);
+
 /* current video mode */
 extern enum video_mode video_mode;
 

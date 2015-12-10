@@ -51,3 +51,15 @@ main (int argc, char **argv)
   finalize_keyboard ();
   return 0;
 }
+
+int
+max (int a, int b)
+{
+  return (a > b) ? a : b;
+}
+
+int
+min (int a, int b)
+{
+  return (a < b) ? a : b;
+}

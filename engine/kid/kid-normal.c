@@ -66,8 +66,6 @@ flow (struct anim *kid)
   struct pos np, pbf;
   survey (_bf, pos, &kid->f, &nc, &pbf, &np);
 
-  int dc = dist_collision (&kid->f, &kid->fo, false);
-
   bool turn = ((kid->f.dir == RIGHT) && left_key)
     || ((kid->f.dir == LEFT) && right_key);
   bool walk = ((kid->f.dir == RIGHT) && right_key && shift_key)
@@ -78,8 +76,8 @@ flow (struct anim *kid)
     || ((kid->f.dir == LEFT) && left_key && up_key);
   bool couch = down_key;
   bool vjump = up_key;
-  bool drink = is_potion (&pbf) && shift_key && dc > 16;
-  bool raise_sword = is_sword (&pbf) && shift_key && dc > 16;
+  bool drink = is_potion (&pbf) && shift_key;
+  bool raise_sword = is_sword (&pbf) && shift_key;
   bool take_sword = ctrl_key;
 
   if (kid->oaction == kid_normal) {
@@ -108,7 +106,7 @@ flow (struct anim *kid)
     }
 
     if (run) {
-      if (dist_collision (&kid->f, &kid->fo, false) < 29)
+      if (dist_collision (&kid->f, &kid->fo, +0, false) + 4 < 29)
         kid_walk ();
       else kid_start_run ();
       return false;

@@ -124,6 +124,14 @@ physics_in (struct anim *kid)
   struct coord nc; struct pos np;
   enum confg cbf, cmbo, cbb;
 
+  /* collision */
+  if (is_colliding (&kid->f, &kid->fo, +PLACE_WIDTH, false)
+      && kid->i == 0) {
+    /* sample_action_not_allowed = true; */
+    kid_sword_normal ();
+    return false;
+  }
+
   /* fall */
   cbf = survey (_bf, pos, &kid->f, &nc, &np, &np)->fg;
   cmbo = survey (_mbo, pos, &kid->f, &nc, &np, &np)->fg;
@@ -131,14 +139,6 @@ physics_in (struct anim *kid)
   if (cbf == NO_FLOOR || cmbo == NO_FLOOR || cbb == NO_FLOOR) {
     kid->xframe = NULL;
     kid_fall ();
-    return false;
-  }
-
-  /* collision */
-  if (will_collide (&kid->f, &kid->fo, false)
-      && kid->i == 0) {
-    /* sample_action_not_allowed = true; */
-    kid_sword_normal ();
     return false;
   }
 

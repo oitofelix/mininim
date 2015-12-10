@@ -180,8 +180,7 @@ flow (struct anim *kid)
       && kid->wait-- <= 0
       && ((kid->f.dir == LEFT && left_key)
           || (kid->f.dir == RIGHT && right_key))) {
-    if (! is_colliding (&kid->f, &kid->fo, false))
-      kid->f.c.x += (kid->f.dir == LEFT) ? -6 : +6;
+    kid->i = 0;
     select_frame (kid, kid_couch_frameset, 0);
     return true;
   }
@@ -202,28 +201,23 @@ flow (struct anim *kid)
 static bool
 physics_in (struct anim *kid)
 {
-  struct coord m; struct pos np, pm, pml;
-  enum confg cm, cml;
+  struct coord nc; struct pos np, pm;
+  enum confg cm;
+
+  /* collision */
+  if (is_colliding (&kid->f, &kid->fo, +0, false)) {
+    kid_stabilize_collision ();
+    return false;
+  }
 
   /* fall */
-  cm = survey (_m, pos, &kid->f, &m, &pm, &np)->fg;
-  prel (&pm, &pml, 0, -1);
-  cml = con (&pml)->fg;
+  cm = survey (_m, pos, &kid->f, &nc, &pm, &np)->fg;
   struct loose_floor *l =
     loose_floor_at_pos (prel (&pm, &np, -1, +0));
   if ((cm == NO_FLOOR
        || (l && l->action == FALL_LOOSE_FLOOR && cm == LOOSE_FLOOR))
-      && ! (kid->fall && kid->i == 0)
-      && ! (kid->f.dir == RIGHT
-            && cml == DOOR
-            && m.y <= door_grid_tip_y (&pml) - 10)) {
+      && ! (kid->fall && kid->i == 0)) {
     kid_fall ();
-    return false;
-  }
-
-  /* wall or door pushes back */
-  if (is_colliding (&kid->f, &kid->fo, false)) {
-    kid_stabilize_collision ();
     return false;
   }
 

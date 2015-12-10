@@ -162,7 +162,7 @@ physics_in (struct anim *kid)
   printf ("inertia: %i\n", inertia);
 
   /* collision */
-  if (is_colliding (&kid->f, &kid->fo, false))
+  if (is_colliding (&kid->f, &kid->fo, +0, false))
     kid->fo.dx = 0;
 
   /* hang front */
@@ -200,10 +200,8 @@ physics_in (struct anim *kid)
     kid->f.c.y = PLACE_HEIGHT * pbf.floor + 27;
     kid->f.b = kid_couch_frameset[0].frame;
 
-    kid->f.c.x += (kid->f.dir == LEFT) ? -10 : +10;
-    if (is_colliding (&kid->f, &kid->fo, false))
+    if (is_colliding (&kid->f, &kid->fo, +10, false))
       kid->f.c.x += (kid->f.dir == LEFT) ? +10 : -10;
-    kid->f.c.x -= (kid->f.dir == LEFT) ? -10 : +10;
 
     if (kid->i >= 8) {
       kid_current_lives--;

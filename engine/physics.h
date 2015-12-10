@@ -43,11 +43,9 @@ bool is_on_con (struct frame *f, coord_f cf, pos_f pf,
 int dist_con (struct frame *f, coord_f cf, pos_f pf,
               int margin, bool reverse, enum confg t);
 bool
-is_colliding (struct frame *f, struct frame_offset *fo, bool reverse);
-bool
-will_collide (struct frame *f, struct frame_offset *fo, bool reverse);
+is_colliding (struct frame *f, struct frame_offset *fo, int dx, bool reverse);
 int
-dist_collision (struct frame *f, struct frame_offset *fo, bool reverse);
+dist_collision (struct frame *f, struct frame_offset *fo, int dx, bool reverse);
 
 
 
