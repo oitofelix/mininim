@@ -191,8 +191,8 @@ physics_in (struct anim *kid)
       && npmbo.floor != npmbo_nf.floor) {
     inertia = 0;
 
-    if (is_colliding (&kid->f, &kid->fo, +10, false))
-      kid->f.c.x += (kid->f.dir == LEFT) ? +10 : -10;
+    if (is_colliding (&kid->f, &kid->fo, +16, false))
+      kid->f.c.x += (kid->f.dir == LEFT) ? +16 : -16;
 
     survey (_bf, pos, &kid->f, &nc, &pbf, &np);
     pos2view (&pbf, &pbf);
