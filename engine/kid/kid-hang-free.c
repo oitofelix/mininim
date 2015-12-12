@@ -45,16 +45,16 @@ unload_kid_hang_free (void)
 }
 
 void
-kid_hang_free (void)
+kid_hang_free (struct anim *kid)
 {
-  kid.oaction = kid.action;
-  kid.action = kid_hang_free;
-  kid.f.flip = (kid.f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
+  kid->oaction = kid->action;
+  kid->action = kid_hang_free;
+  kid->f.flip = (kid->f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  if (! flow (&kid)) return;
-  if (! physics_in (&kid)) return;
-  next_frame_fo (&kid.f, &kid.f, &kid.fo);
-  physics_out (&kid);
+  if (! flow (kid)) return;
+  if (! physics_in (kid)) return;
+  next_frame (&kid->f, &kid->f, &kid->fo);
+  physics_out (kid);
 }
 
 static bool
@@ -72,7 +72,7 @@ flow (struct anim *kid)
   if (kid->i >= 7
       && hang_back && is_hangable_pos (&hang_pos, back_dir)) {
     sample_hang_on_fall = true;
-    kid_turn ();
+    kid_turn (kid);
     return false;
   }
 
@@ -80,7 +80,7 @@ flow (struct anim *kid)
   if ((kid->i < 5 || kid->j > -1
          || kid->hang_caller != kid_unclimb)
         && up_key && ! hang_limit) {
-    kid_climb ();
+    kid_climb (kid);
     return false;
   }
 
@@ -93,28 +93,28 @@ flow (struct anim *kid)
         && kid->i >= 4) {
       place_frame (&kid->f, &kid->f, kid_vjump_frameset[13].frame,
                    &hang_pos, (kid->f.dir == LEFT) ? +7 : PLACE_WIDTH + 9, -8);
-      kid_vjump ();
+      kid_vjump (kid);
       return false;
     }
     if (crel (&hang_pos, +0, dir)->fg != NO_FLOOR
         && kid->i <= 4) {
       place_frame (&kid->f, &kid->f, kid_vjump_frameset[13].frame,
                    &hang_pos, (kid->f.dir == LEFT) ? +7 : PLACE_WIDTH + 5, -8);
-      kid_vjump ();
+      kid_vjump (kid);
       return false;
     }
     if (con (&hang_pos)->fg == NO_FLOOR
         && kid->i >= 4) {
       place_frame (&kid->f, &kid->f, kid_fall_frameset[0].frame,
                    &hang_pos, (kid->f.dir == LEFT) ? +16 : PLACE_WIDTH - 16, +12);
-      kid_fall ();
+      kid_fall (kid);
       return false;
     }
     if (crel (&hang_pos, +0, dir)->fg == NO_FLOOR
         && kid->i <= 4) {
       place_frame (&kid->f, &kid->f, kid_fall_frameset[0].frame,
                    &hang_pos, (kid->f.dir == LEFT) ? -16 : PLACE_WIDTH + 16, +12);
-      kid_fall ();
+      kid_fall (kid);
       return false;
     }
   }

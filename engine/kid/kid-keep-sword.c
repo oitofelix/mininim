@@ -88,16 +88,16 @@ unload_kid_keep_sword (void)
 }
 
 void
-kid_keep_sword (void)
+kid_keep_sword (struct anim *kid)
 {
-  kid.oaction = kid.action;
-  kid.action = kid_keep_sword;
-  kid.f.flip = (kid.f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
+  kid->oaction = kid->action;
+  kid->action = kid_keep_sword;
+  kid->f.flip = (kid->f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  if (! flow (&kid)) return;
-  if (! physics_in (&kid)) return;
-  next_frame_fo (&kid.f, &kid.f, &kid.fo);
-  physics_out (&kid);
+  if (! flow (kid)) return;
+  if (! physics_in (kid)) return;
+  next_frame (&kid->f, &kid->f, &kid->fo);
+  physics_out (kid);
 }
 
 static bool
@@ -111,14 +111,14 @@ flow (struct anim *kid)
   else if (kid->i == 9 && kid->wait > 0) kid->wait--;
   else {
     if (keep_sword_fast) {
-      kid_normal ();
+      kid_normal (kid);
       keep_sword_fast = false;
       return false;
     }
     else {
       /* kid turn will invert kid's direction */
       kid->f.dir = (kid->f.dir == RIGHT) ? LEFT : RIGHT;
-      kid_turn ();
+      kid_turn (kid);
       return false;
     }
   }

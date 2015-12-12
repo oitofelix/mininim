@@ -39,7 +39,7 @@ extern struct frameset kid_walk_frameset[KID_WALK_FRAMESET_NMEMB];
 
 void load_kid_walk (void);
 void unload_kid_walk (void);
-void kid_walk (void);
+void kid_walk (struct anim *kid);
 
 extern ALLEGRO_BITMAP *kid_walk_01, *kid_walk_02, *kid_walk_03,
   *kid_walk_04, *kid_walk_05, *kid_walk_06, *kid_walk_07,

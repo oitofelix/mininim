@@ -42,7 +42,7 @@ extern struct frameset kid_drink_frameset[KID_DRINK_FRAMESET_NMEMB];
 
 void load_kid_drink (void);
 void unload_kid_drink (void);
-void kid_drink (void);
+void kid_drink (struct anim *kid);
 
 extern ALLEGRO_BITMAP *kid_drink_01, *kid_drink_02, *kid_drink_03,
   *kid_drink_04, *kid_drink_05, *kid_drink_06, *kid_drink_07,

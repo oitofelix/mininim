@@ -76,16 +76,16 @@ unload_kid_fall (void)
 }
 
 void
-kid_fall (void)
+kid_fall (struct anim *kid)
 {
-  kid.oaction = kid.action;
-  kid.action = kid_fall;
-  kid.f.flip = (kid.f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
+  kid->oaction = kid->action;
+  kid->action = kid_fall;
+  kid->f.flip = (kid->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  if (! flow (&kid)) return;
-  if (! physics_in (&kid)) return;
-  next_frame_fo (&kid.f, &kid.f, &kid.fo);
-  physics_out (&kid);
+  if (! flow (kid)) return;
+  if (! physics_in (kid)) return;
+  next_frame (&kid->f, &kid->f, &kid->fo);
+  physics_out (kid);
 }
 
 static bool
@@ -110,6 +110,7 @@ physics_in (struct anim *kid)
     npmbo, npmbo_nf;
   enum confg cmbo;
   struct frame nf;
+  struct frame_offset fo;
 
   bool hang_back = ((kid->f.dir == LEFT) ? right_key : left_key)
     && ! up_key && shift_key;
@@ -119,11 +120,11 @@ physics_in (struct anim *kid)
   int dir = (kid->f.dir == LEFT) ? -1 : +1;
 
   if (kid->oaction == kid_jump) {
-    next_frame_fo (&kid->f, &kid->f, &kid->fo);
+    next_frame (&kid->f, &kid->f, &kid->fo);
     kid->f.c.x += dir * 8;
     kid->f.c.y += 6;
   } else if (kid->oaction == kid_run_jump) {
-    next_frame_fo (&kid->f, &kid->f, &kid->fo);
+    next_frame (&kid->f, &kid->f, &kid->fo);
     kid->f.c.x += dir * 12;
     kid->f.c.y += 6;
   }
@@ -131,7 +132,7 @@ physics_in (struct anim *kid)
   if (kid->i == 0
       && kid->oaction != kid_hang_wall
       && kid->oaction != kid_hang_free) {
-    next_frame_fo (&kid->f, &kid->f, &kid->fo);
+    next_frame (&kid->f, &kid->f, &kid->fo);
 
     int dirf = (kid->f.dir == LEFT) ? -1 : +1;
     int dirb = (kid->f.dir == LEFT) ? +1 : -1;
@@ -169,7 +170,7 @@ physics_in (struct anim *kid)
   if (kid->i > 2 && can_hang (&kid->f, false)
       && hang_front && ! hang_limit) {
     sample_hang_on_fall = true;
-    kid_hang ();
+    kid_hang (kid);
     return false;
   }
 
@@ -177,13 +178,16 @@ physics_in (struct anim *kid)
   if (kid->i > 2 && can_hang (&kid->f, true)
       && hang_back && ! hang_limit) {
     sample_hang_on_fall = true;
-    kid_turn ();
+    kid_turn (kid);
     return false;
   }
 
   /* land on ground */
   cmbo = survey (_mbo, pos, &kid->f, &nc, &np, &npmbo)->fg;
-  next_frame (&kid->f, &nf, kid->f.b, 0, 34);
+  fo.b = kid->f.b;
+  fo.dx = 0;
+  fo.dy = 34;
+  next_frame (&kid->f, &nf, &fo);
   survey (_mbo, pos, &nf, &nc, &np, &npmbo_nf);
 
   if (kid->i > 2
@@ -209,7 +213,7 @@ physics_in (struct anim *kid)
     } else uncouch_slowly = false;
     if (kid->i > 3) sample_hit_ground = true;
     shake_loose_floor_row (&pbf);
-    kid_couch ();
+    kid_couch (kid);
     return false;
   }
 

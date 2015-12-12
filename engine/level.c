@@ -107,7 +107,7 @@ compute_level (void)
 {
   compute_loose_floors ();
   int prev_room = kid.f.c.room;
-  kid.action ();
+  kid.action (&kid);
   if (kid.f.c.room != prev_room
       && kid.f.c.room != 0)  {
     room_view = kid.f.c.room;

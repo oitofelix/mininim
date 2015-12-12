@@ -106,16 +106,16 @@ unload_kid_vjump (void)
 }
 
 void
-kid_vjump (void)
+kid_vjump (struct anim *kid)
 {
-  kid.oaction = kid.action;
-  kid.action = kid_vjump;
-  kid.f.flip = (kid.f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
+  kid->oaction = kid->action;
+  kid->action = kid_vjump;
+  kid->f.flip = (kid->f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  if (! flow (&kid)) return;
-  if (! physics_in (&kid)) return;
-  next_frame_fo (&kid.f, &kid.f, &kid.fo);
-  physics_out (&kid);
+  if (! flow (kid)) return;
+  if (! physics_in (kid)) return;
+  next_frame (&kid->f, &kid->f, &kid->fo);
+  physics_out (kid);
 }
 
 static bool
@@ -127,12 +127,12 @@ flow (struct anim *kid)
       kid->hang = misstep = false;
 
   if (kid->i == 12 && kid->hang) {
-    kid_hang ();
+    kid_hang (kid);
     return false;
   }
 
   if (kid->i == 17) {
-    kid_normal ();
+    kid_normal (kid);
     return false;
   }
 
@@ -169,7 +169,7 @@ physics_in (struct anim *kid)
   cmf = survey (_mf, pos, &kid->f, &nc, &np, &np)->fg;
   cmba = survey (_mba, pos, &kid->f, &nc, &np, &np)->fg;
   if (cm == NO_FLOOR && cmf == NO_FLOOR && cmba == NO_FLOOR) {
-    kid_fall ();
+    kid_fall (kid);
     return false;
   }
 

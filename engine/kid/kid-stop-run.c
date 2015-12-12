@@ -73,16 +73,16 @@ unload_kid_stop_run (void)
 }
 
 void
-kid_stop_run (void)
+kid_stop_run (struct anim *kid)
 {
-  kid.oaction = kid.action;
-  kid.action = kid_stop_run;
-  kid.f.flip = (kid.f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
+  kid->oaction = kid->action;
+  kid->action = kid_stop_run;
+  kid->f.flip = (kid->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  if (! flow (&kid)) return;
-  if (! physics_in (&kid)) return;
-  next_frame_fo (&kid.f, &kid.f, &kid.fo);
-  physics_out (&kid);
+  if (! flow (kid)) return;
+  if (! physics_in (kid)) return;
+  next_frame (&kid->f, &kid->f, &kid->fo);
+  physics_out (kid);
 }
 
 static bool
@@ -94,13 +94,13 @@ flow (struct anim *kid)
   bool couch = down_key;
 
   if (couch) {
-    kid_couch ();
+    kid_couch (kid);
     return false;
   }
 
   if (kid->i == 3) {
-    if (turn_run) kid_turn_run ();
-    else kid_stabilize ();
+    if (turn_run) kid_turn_run (kid);
+    else kid_stabilize (kid);
     return false;
   }
 
@@ -120,14 +120,14 @@ physics_in (struct anim *kid)
 
   /* collision */
   if (is_colliding (&kid->f, &kid->fo, +0, false)) {
-    kid_stabilize_collision ();
+    kid_stabilize_collision (kid);
     return false;
   }
 
   /* fall */
   ctf = survey (_tf, pos, &kid->f, &nc, &np, &np)->fg;
   if (ctf == NO_FLOOR) {
-    kid_fall ();
+    kid_fall (kid);
     return false;
   }
 

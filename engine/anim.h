@@ -32,9 +32,7 @@ void draw_xframe (ALLEGRO_BITMAP *bitmap, struct anim *a);
 struct coord *xframe_coord (struct anim *a, struct coord *c);
 struct frame *xframe_frame (struct anim *a, struct frame *f);
 struct frame *next_frame (struct frame *f, struct frame *nf,
-                          ALLEGRO_BITMAP *b, int dx, int dy);
-void next_frame_fo (struct frame *f, struct frame *nf,
-                    struct frame_offset *fo);
+                          struct frame_offset *fo);
 void select_frame (struct anim *a, struct frameset *fs, int i);
 void select_xframe (struct anim *a, struct frameset *fs, int j);
 

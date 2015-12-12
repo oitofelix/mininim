@@ -425,6 +425,8 @@ draw_room_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f)
   else if (peq (&ptf, p)
            && is_kid_climb (f)
            && f->dir == RIGHT) {
+    draw_confg_base (screen, p);
+
     if (con (p)->fg == PILLAR)
       draw_pillar_fg (screen, p);
     else if (con (p)->fg == BROKEN_FLOOR)
@@ -433,7 +435,6 @@ draw_room_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f)
       if (con (p)->fg == DOOR)
         draw_door_fg (screen, p, f);
 
-      draw_confg_base (screen, p);
       if (f->b == kid_climb_03
           || f->b == kid_climb_09
           || f->b == kid_climb_10)

@@ -97,16 +97,16 @@ unload_kid_hang (void)
 }
 
 void
-kid_hang (void)
+kid_hang (struct anim *kid)
 {
-  kid.oaction = kid.action;
-  kid.action = kid_hang;
-  kid.f.flip = (kid.f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
+  kid->oaction = kid->action;
+  kid->action = kid_hang;
+  kid->f.flip = (kid->f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  if (! flow (&kid)) return;
-  if (! physics_in (&kid)) return;
-  next_frame_fo (&kid.f, &kid.f, &kid.fo);
-  physics_out (&kid);
+  if (! flow (kid)) return;
+  if (! physics_in (kid)) return;
+  next_frame (&kid->f, &kid->f, &kid->fo);
+  physics_out (kid);
 }
 
 static bool
@@ -124,10 +124,10 @@ flow (struct anim *kid)
     kid->fo.dx = +0;
     kid->fo.dy = +0;
   } else if (is_hang_pos_free (&kid->f)) {
-    kid_hang_free ();
+    kid_hang_free (kid);
     return false;
   } else {
-    kid_hang_wall ();
+    kid_hang_wall (kid);
     return false;
   }
 

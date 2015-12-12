@@ -72,16 +72,16 @@ unload_kid_take_sword (void)
 }
 
 void
-kid_take_sword (void)
+kid_take_sword (struct anim *kid)
 {
-  kid.oaction = kid.action;
-  kid.action = kid_take_sword;
-  kid.f.flip = (kid.f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
+  kid->oaction = kid->action;
+  kid->action = kid_take_sword;
+  kid->f.flip = (kid->f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  if (! flow (&kid)) return;
-  if (! physics_in (&kid)) return;
-  next_frame_fo (&kid.f, &kid.f, &kid.fo);
-  physics_out (&kid);
+  if (! flow (kid)) return;
+  if (! physics_in (kid)) return;
+  next_frame (&kid->f, &kid->f, &kid->fo);
+  physics_out (kid);
 }
 
 static bool
@@ -90,7 +90,7 @@ flow (struct anim *kid)
   if (kid->oaction != kid_take_sword) kid->i = -1;
 
   if (kid->i == 3) {
-    kid_sword_normal ();
+    kid_sword_normal (kid);
     return false;
   }
 
@@ -109,14 +109,14 @@ physics_in (struct anim *kid)
   if (is_colliding (&kid->f, &kid->fo, +PLACE_WIDTH, false)
       && kid->i == 0) {
     /* sample_action_not_allowed = true; */
-    kid_normal ();
+    kid_normal (kid);
     return false;
   }
 
   /* fall */
   ctf = survey (_tf, pos, &kid->f, &tf, &ptf, &np)->fg;
   if (ctf == NO_FLOOR) {
-    kid_fall ();
+    kid_fall (kid);
     return false;
   }
 

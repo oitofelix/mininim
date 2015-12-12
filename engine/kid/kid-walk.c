@@ -92,16 +92,16 @@ unload_kid_walk (void)
 }
 
 void
-kid_walk (void)
+kid_walk (struct anim *kid)
 {
-  kid.oaction = kid.action;
-  kid.action = kid_walk;
-  kid.f.flip = (kid.f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
+  kid->oaction = kid->action;
+  kid->action = kid_walk;
+  kid->f.flip = (kid->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  if (! flow (&kid)) return;
-  if (! physics_in (&kid)) return;
-  next_frame_fo (&kid.f, &kid.f, &kid.fo);
-  physics_out (&kid);
+  if (! flow (kid)) return;
+  if (! physics_in (kid)) return;
+  next_frame (&kid->f, &kid->f, &kid->fo);
+  physics_out (kid);
 }
 
 static bool
@@ -129,19 +129,19 @@ flow (struct anim *kid)
 
   if (kid->i == -1 && con (&kid->p)->fg != LOOSE_FLOOR) {
     if (dc < 4) {
-      kid_normal ();
+      kid_normal (kid);
       return false;
     }
 
     if (! misstep) {
       if (dd < 4) {
-        kid_normal ();
+        kid_normal (kid);
         misstep = true;
         return false;
       }
 
       if (df < 4 || dl < 4) {
-        kid_misstep ();
+        kid_misstep (kid);
         return false;
       }
 
@@ -169,7 +169,7 @@ flow (struct anim *kid)
       place_frame (&kid->f, &kid->f, kid_normal_00, &kid->p,
                    (kid->f.dir == LEFT) ? +11 + dcc
                    : PLACE_WIDTH + 7 - dcc, +15);
-    kid_normal ();
+    kid_normal (kid);
     misstep = false;
     return false;
   }
@@ -210,7 +210,7 @@ physics_in (struct anim *kid)
   if (kid->walk == -1
       && ((kid->i < 6 && cbb == NO_FLOOR)
           || (kid->i >= 6 && cmbo == NO_FLOOR))) {
-    kid_fall ();
+    kid_fall (kid);
     return false;
   }
 

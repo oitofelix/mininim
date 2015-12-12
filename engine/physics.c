@@ -122,7 +122,7 @@ is_colliding (struct frame *f, struct frame_offset *fo, int dx, bool reverse)
 
   if (reverse) _f.dir = (_f.dir == LEFT) ? RIGHT : LEFT;
 
-  next_frame_fo (&_f, &nf, fo);
+  next_frame (&_f, &nf, fo);
 
   int dir = (nf.dir == LEFT) ? -1 : +1;
   nf.c.x += dir * dx;

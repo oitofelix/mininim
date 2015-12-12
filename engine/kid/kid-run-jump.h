@@ -38,7 +38,7 @@ extern struct frameset kid_run_jump_frameset[KID_JUMP_FRAMESET_NMEMB];
 
 void load_kid_run_jump (void);
 void unload_kid_run_jump (void);
-void kid_run_jump (void);
+void kid_run_jump (struct anim *kid);
 
 extern ALLEGRO_BITMAP *kid_run_jump_01, *kid_run_jump_02, *kid_run_jump_03,
   *kid_run_jump_04, *kid_run_jump_05, *kid_run_jump_06,

@@ -62,27 +62,27 @@ unload_kid_misstep (void)
 }
 
 void
-kid_misstep (void)
+kid_misstep (struct anim *kid)
 {
-  kid.oaction = kid.action;
-  kid.action = kid_misstep;
-  kid.f.flip = (kid.f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
+  kid->oaction = kid->action;
+  kid->action = kid_misstep;
+  kid->f.flip = (kid->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  if (! flow (&kid)) return;
-  if (! physics_in (&kid)) return;
-  next_frame_fo (&kid.f, &kid.f, &kid.fo);
-  physics_out (&kid);
+  if (! flow (kid)) return;
+  if (! physics_in (kid)) return;
+  next_frame (&kid->f, &kid->f, &kid->fo);
+  physics_out (kid);
 }
 
 static bool
 flow (struct anim *kid)
 {
-  if (kid->oaction != kid_misstep) kid->i = -1, misstep = true;;
+  if (kid->oaction != kid_misstep) kid->i = -1, misstep = true;
 
   if (kid->i == 10) {
     place_frame (&kid->f, &kid->f, kid_normal_00, &kid->p,
                  (kid->f.dir == LEFT) ? +11 : PLACE_WIDTH + 7, 15);
-    kid_normal ();
+    kid_normal (kid);
     return false;
   }
 
@@ -100,7 +100,7 @@ physics_in (struct anim *kid)
   /* fall */
   cmba = survey (_mba, pos, &kid->f, &nc, &np, &np)->fg;
   if (cmba == NO_FLOOR) {
-    kid_fall ();
+    kid_fall (kid);
     return false;
   }
 

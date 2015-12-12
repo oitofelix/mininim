@@ -47,16 +47,16 @@ unload_kid_normal (void)
 }
 
 void
-kid_normal (void)
+kid_normal (struct anim *kid)
 {
-  kid.oaction = kid.action;
-  kid.action = kid_normal;
-  kid.f.flip = (kid.f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
+  kid->oaction = kid->action;
+  kid->action = kid_normal;
+  kid->f.flip = (kid->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  if (! flow (&kid)) return;
-  if (! physics_in (&kid)) return;
-  next_frame_fo (&kid.f, &kid.f, &kid.fo);
-  physics_out (&kid);
+  if (! flow (kid)) return;
+  if (! physics_in (kid)) return;
+  next_frame (&kid->f, &kid->f, &kid->fo);
+  physics_out (kid);
 }
 
 static bool
@@ -82,33 +82,33 @@ flow (struct anim *kid)
 
   if (kid->oaction == kid_normal) {
     if (couch) {
-      kid_couch ();
+      kid_couch (kid);
       return false;
     }
 
     if (jump) {
-      kid_jump ();
+      kid_jump (kid);
       return false;
     }
 
     if (turn) {
-      kid_turn ();
+      kid_turn (kid);
       return false;
     }
 
     if (vjump) {
-      kid_vjump ();
+      kid_vjump (kid);
       return false;
     }
     if (walk) {
-      kid_walk ();
+      kid_walk (kid);
       return false;
     }
 
     if (run) {
       if (dist_collision (&kid->f, false) + 4 < 29)
-        kid_walk ();
-      else kid_start_run ();
+        kid_walk (kid);
+      else kid_start_run (kid);
       return false;
     }
 
@@ -117,18 +117,18 @@ flow (struct anim *kid)
       place_frame (&kid->f, &kid->f, kid_couch_frameset[0].frame,
                    &item_pos, (kid->f.dir == LEFT)
                    ? PLACE_WIDTH + 3 : +9, +27);
-      kid_couch ();
+      kid_couch (kid);
       return false;
     }
 
     if (raise_sword) {
       item_pos = pbf;
-      kid_couch ();
+      kid_couch (kid);
       return false;
     }
 
     if (take_sword) {
-      kid_take_sword ();
+      kid_take_sword (kid);
       return false;
     }
   }
@@ -160,7 +160,7 @@ physics_in (struct anim *kid)
   cmbo = survey (_mbo, pos, &kid->f, &nc, &np, &np)->fg;
   cbb = survey (_bb, pos, &kid->f, &nc, &np, &np)->fg;
   if (cmbo == NO_FLOOR && cbb == NO_FLOOR) {
-    kid_fall ();
+    kid_fall (kid);
     return false;
   }
 

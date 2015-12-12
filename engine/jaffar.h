@@ -62,12 +62,12 @@
 /* functions */
 void load_jaffar (void);
 void unload_jaffar (void);
-void jaffar_normal (void);
-void jaffar_walk (void);
-void jaffar_open_arms (void);
-void jaffar_raise_arms (void);
-void jaffar_lower_arms (void);
-void jaffar_turn_walk (void);
+void jaffar_normal (struct anim *jaffar);
+void jaffar_walk (struct anim *jaffar);
+void jaffar_open_arms (struct anim *jaffar);
+void jaffar_raise_arms (struct anim *jaffar);
+void jaffar_lower_arms (struct anim *jaffar);
+void jaffar_turn_walk (struct anim *jaffar);
 
 /* variables */
 extern struct anim jaffar; /* animation object */

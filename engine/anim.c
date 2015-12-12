@@ -186,27 +186,21 @@ select_xframe (struct anim *a, struct frameset *fs, int j)
   /* a->j = j; */
 }
 
-void
-next_frame_fo (struct frame *f, struct frame *nf, struct frame_offset *fo)
-{
-  next_frame (f, nf, fo->b, fo->dx, fo->dy);
-}
-
 struct frame *
-next_frame (struct frame *f, struct frame *nf, ALLEGRO_BITMAP *b, int dx, int dy)
+next_frame (struct frame *f, struct frame *nf, struct frame_offset *fo)
 {
   *nf = *f;
 
   int ow = al_get_bitmap_width (nf->b);
   int oh = al_get_bitmap_height (nf->b);
-  int w = al_get_bitmap_width (b);
-  int h = al_get_bitmap_height (b);
+  int w = al_get_bitmap_width (fo->b);
+  int h = al_get_bitmap_height (fo->b);
 
-  if (next_frame_inv) nf->c.x += (nf->dir == LEFT) ? ow - w - dx : dx;
-  else nf->c.x += (nf->dir == LEFT) ? dx : ow - w - dx;
-  nf->c.y += oh - h + dy;
+  if (next_frame_inv) nf->c.x += (nf->dir == LEFT) ? ow - w - fo->dx : fo->dx;
+  else nf->c.x += (nf->dir == LEFT) ? fo->dx : ow - w - fo->dx;
+  nf->c.y += oh - h + fo->dy;
 
-  nf->b = b;
+  nf->b = fo->b;
   if (! cutscene) nframe (nf, &nf->c);
   return nf;
 }

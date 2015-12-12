@@ -30,9 +30,9 @@ extern struct frameset kid_stabilize_frameset[KID_STABILIZE_FRAMESET_NMEMB];
 
 void load_kid_stabilize (void);
 void unload_kid_stabilize (void);
-void kid_stabilize (void);
-void kid_stabilize_collision (void);
-void kid_stabilize_back_collision (void);
+void kid_stabilize (struct anim *kid);
+void kid_stabilize_collision (struct anim *kid);
+void kid_stabilize_back_collision (struct anim *kid);
 
 extern ALLEGRO_BITMAP *kid_stabilize_05, *kid_stabilize_06,
   *kid_stabilize_07, *kid_stabilize_08;

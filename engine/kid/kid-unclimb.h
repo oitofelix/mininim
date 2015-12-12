@@ -22,6 +22,6 @@
 
 void load_kid_unclimb (void);
 void unload_kid_unclimb (void);
-void kid_unclimb (void);
+void kid_unclimb (struct anim *kid);
 
 #endif	/* FREEPOP_KID_UNCLIMB_H */

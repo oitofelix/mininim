@@ -198,13 +198,13 @@ title_anim (void)
       princess.f.c.y = 124;
       princess.f.b = princess_normal_00;
       princess.f.dir = LEFT;
-      princess.action = princess_normal;
+      princess_normal (&princess);
 
       jaffar.f.c.x = 321;
       jaffar.f.c.y = 119;
       jaffar.f.b = jaffar_normal_00;
       jaffar.f.dir = LEFT;
-      jaffar.action = jaffar_normal;
+      jaffar_normal (&jaffar);
 
       princess_room_clock = NULL;
 
@@ -233,41 +233,48 @@ title_anim (void)
     break;
   case 13:
     if (! is_playing_sample ()) {
-      princess.action = princess_turn;
+      princess_turn (&princess);
       i++;
     }
     break;
   case 14:
+    princess.action (&princess);
     if (princess.f.b == princess_normal_00) {
       play_sample (jaffar_appearing_3);
-      jaffar.action = jaffar_walk;
+      jaffar_walk (&jaffar);
       i++;
     }
     break;
   case 15:
+    jaffar.action (&jaffar);
     if (get_sample_position () >= 3.0 && jaffar.f.b == jaffar_normal_00) {
       jaffar.repeat = 5;
-      jaffar.action = jaffar_walk;
+      jaffar_walk (&jaffar);
       i++;
     }
     break;
   case 16:
+    jaffar.action (&jaffar);
     if (get_sample_position () >= 12.0 && jaffar.f.b == jaffar_normal_00) {
-      jaffar.action = jaffar_open_arms;
+      jaffar_open_arms (&jaffar);
       i++;
     }
     break;
   case 17:
-    princess.action = princess_step_back;
+    princess_step_back (&princess);
+    jaffar.action (&jaffar);
     i++;
     break;
   case 18:
+    princess.action (&princess);
+    jaffar.action (&jaffar);
     if (princess.f.b == princess_step_back_15) {
-      jaffar.action = jaffar_raise_arms;
+      jaffar_raise_arms (&jaffar);
       i++;
     }
     break;
   case 19:
+    jaffar.action (&jaffar);
     if (jaffar.f.b == jaffar_raise_arms_27) {
       video_effect.color = WHITE;
       start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (1));
@@ -276,12 +283,14 @@ title_anim (void)
     }
     break;
   case 20:
+    jaffar.action (&jaffar);
     if (! is_video_effect_started () && jaffar.f.b == jaffar_raise_arms_29) {
-      jaffar.action = jaffar_lower_arms;
+      jaffar_lower_arms (&jaffar);
       i++;
     }
     break;
   case 21:
+    jaffar.action (&jaffar);
     if (jaffar.f.b == jaffar_normal_00) {
       play_sample (story_3);
       i++;
@@ -289,18 +298,21 @@ title_anim (void)
     break;
   case 22:
     if (get_sample_position () >= 1.0) {
-      jaffar.action = jaffar_turn_walk;
-      jaffar.repeat = 5;
+      jaffar.repeat = 6;
+      jaffar_turn_walk (&jaffar);
       i++;
     }
     break;
   case 23:
+    jaffar.action (&jaffar);
     if (get_sample_position () >= 4.0) {
-      princess.action = princess_look_down;
+      princess_look_down (&princess);
       i++;
     }
     break;
   case 24:
+    princess.action (&princess);
+    jaffar.action (&jaffar);
     if (jaffar.f.b == jaffar_normal_00) {
       start_video_effect (VIDEO_FADE_OUT, SECS_TO_VCYCLES (1));
       i++;
@@ -349,11 +361,6 @@ title_anim (void)
 static void
 draw_princess_room (void)
 {
-  /* computation */
-  princess.action ();
-  jaffar.action ();
-
-  /* drawing */
   clear_bitmap (screen, BLACK);
   draw_bitmap (princess_room, screen, 0, 0, 0);
   draw_bitmap (princess_room_bed, screen, 0, 142, 0);

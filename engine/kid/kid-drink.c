@@ -99,16 +99,16 @@ unload_kid_drink (void)
 }
 
 void
-kid_drink (void)
+kid_drink (struct anim *kid)
 {
-  kid.oaction = kid.action;
-  kid.action = kid_drink;
-  kid.f.flip = (kid.f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
+  kid->oaction = kid->action;
+  kid->action = kid_drink;
+  kid->f.flip = (kid->f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  if (! flow (&kid)) return;
-  if (! physics_in (&kid)) return;
-  next_frame_fo (&kid.f, &kid.f, &kid.fo);
-  physics_out (&kid);
+  if (! flow (kid)) return;
+  if (! physics_in (kid)) return;
+  next_frame (&kid->f, &kid->f, &kid->fo);
+  physics_out (kid);
 }
 
 static bool
@@ -122,7 +122,7 @@ flow (struct anim *kid)
   else if (kid->i == 14 && kid->wait == 0) kid->reverse = true, kid->i = 10;
   else if (kid->i == 10 && kid->reverse) kid->i = 7;
   else {
-    kid_normal ();
+    kid_normal (kid);
     item_pos.room = -1;
     return false;
   }

@@ -96,26 +96,26 @@ unload_kid_couch (void)
 }
 
 void
-kid_couch (void)
+kid_couch (struct anim *kid)
 {
-  kid.oaction = kid.action;
-  kid.action = kid_couch;
-  kid.f.flip = (kid.f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
+  kid->oaction = kid->action;
+  kid->action = kid_couch;
+  kid->f.flip = (kid->f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  if (! flow (&kid)) return;
-  if (! physics_in (&kid)) return;
-  next_frame_fo (&kid.f, &kid.f, &kid.fo);
-  physics_out (&kid);
+  if (! flow (kid)) return;
+  if (! physics_in (kid)) return;
+  next_frame (&kid->f, &kid->f, &kid->fo);
+  physics_out (kid);
 }
 
 void
-kid_couch_collision (void)
+kid_couch_collision (struct anim *kid)
 {
-  kid.action = kid_couch_collision;
-  place_frame (&kid.f, &kid.f, kid_couch_frameset[0].frame,
-               &collision_pos, (kid.f.dir == LEFT)
+  kid->action = kid_couch_collision;
+  place_frame (&kid->f, &kid->f, kid_couch_frameset[0].frame,
+               &collision_pos, (kid->f.dir == LEFT)
                ? +PLACE_WIDTH + 24 : -PLACE_WIDTH + 18, +27);
-  kid_couch ();
+  kid_couch (kid);
   sample_hit_wall = true;
 }
 
@@ -155,19 +155,19 @@ flow (struct anim *kid)
             && door_at_pos (&ptf)->i > DOOR_CLIMB_LIMIT)) {
     prel (&pbf, &hang_pos, +1, (kid->f.dir == LEFT) ? +1 : -1);
     pos2view (&hang_pos, &hang_pos);
-    kid_unclimb ();
+    kid_unclimb (kid);
     return false;
   }
 
   if (kid->i == 12) {
-    kid_normal ();
+    kid_normal (kid);
     return false;
   }
 
   if (kid->i == 2 && item_pos.room != -1
       && ! kid->collision && ! kid->fall) {
-    if (is_potion (&item_pos)) kid_drink ();
-    else if (is_sword (&item_pos)) kid_raise_sword ();
+    if (is_potion (&item_pos)) kid_drink (kid);
+    else if (is_sword (&item_pos)) kid_raise_sword (kid);
     else {
       item_pos.room = -1; goto no_item;
     }
@@ -206,7 +206,7 @@ physics_in (struct anim *kid)
 
   /* collision */
   if (is_colliding (&kid->f, &kid->fo, +0, false)) {
-    kid_stabilize_collision ();
+    kid_stabilize_collision (kid);
     return false;
   }
 
@@ -217,7 +217,7 @@ physics_in (struct anim *kid)
   if ((cm == NO_FLOOR
        || (l && l->action == FALL_LOOSE_FLOOR && cm == LOOSE_FLOOR))
       && ! (kid->fall && kid->i == 0)) {
-    kid_fall ();
+    kid_fall (kid);
     return false;
   }
 

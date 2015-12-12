@@ -32,7 +32,7 @@ extern struct frameset kid_fall_frameset[KID_FALL_FRAMESET_NMEMB];
 
 void load_kid_fall (void);
 void unload_kid_fall (void);
-void kid_fall (void);
+void kid_fall (struct anim *kid);
 bool is_kid_fall (struct frame *f);
 
 extern ALLEGRO_BITMAP *kid_fall_13, *kid_fall_14, *kid_fall_15,

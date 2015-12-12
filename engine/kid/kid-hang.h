@@ -41,7 +41,7 @@ extern struct frameset kid_hang_frameset[KID_HANG_FRAMESET_NMEMB];
 
 void load_kid_hang (void);
 void unload_kid_hang (void);
-void kid_hang (void);
+void kid_hang (struct anim *kid);
 bool is_kid_hang_or_climb (struct frame *f);
 bool is_kid_hanging_at_pos (struct frame *f, struct pos *p);
 

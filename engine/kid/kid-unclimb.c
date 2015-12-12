@@ -45,16 +45,16 @@ unload_kid_unclimb (void)
 }
 
 void
-kid_unclimb (void)
+kid_unclimb (struct anim *kid)
 {
-  kid.oaction = kid.action;
-  kid.action = kid_unclimb;
-  kid.f.flip = (kid.f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
+  kid->oaction = kid->action;
+  kid->action = kid_unclimb;
+  kid->f.flip = (kid->f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  if (! flow (&kid)) return;
-  if (! physics_in (&kid)) return;
-  next_frame_fo (&kid.f, &kid.f, &kid.fo);
-  physics_out (&kid);
+  if (! flow (kid)) return;
+  if (! physics_in (kid)) return;
+  next_frame (&kid->f, &kid->f, &kid->fo);
+  physics_out (kid);
 }
 
 static bool
@@ -66,7 +66,7 @@ flow (struct anim *kid)
   if (kid->oaction == kid_climb) kid->i = 3;
 
   if (kid->i == 0) {
-    kid_hang ();
+    kid_hang (kid);
     return false;
   }
 
@@ -97,7 +97,7 @@ physics_in (struct anim *kid)
   /* fall */
   ctf = survey (_tf, pos, &kid->f, &nc, &np, &np)->fg;
   if (ctf == NO_FLOOR) {
-    kid_fall ();
+    kid_fall (kid);
     return false;
   }
 

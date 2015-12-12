@@ -25,6 +25,6 @@ extern struct frameset kid_misstep_frameset[KID_MISSTEP_FRAMESET_NMEMB];
 
 void load_kid_misstep (void);
 void unload_kid_misstep (void);
-void kid_misstep (void);
+void kid_misstep (struct anim *kid);
 
 #endif	/* FREEPOP_KID_MISSTEP_H */

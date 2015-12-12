@@ -41,10 +41,10 @@
 /* functions */
 void load_princess (void);
 void unload_princess (void);
-void princess_normal (void);
-void princess_turn (void);
-void princess_step_back (void);
-void princess_look_down (void);
+void princess_normal (struct anim *princess);
+void princess_turn (struct anim *princess);
+void princess_step_back (struct anim *princess);
+void princess_look_down (struct anim *princess);
 
 /* variables */
 extern struct anim princess; /* princess animation object */

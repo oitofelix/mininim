@@ -75,7 +75,10 @@ enum dir {
   LEFT, RIGHT, ABOVE, BELOW
 };
 
-typedef void (*ACTION) (void);
+/* avoid "'struct' declared inside parameter list" error for the
+   ACTION definition */
+struct anim *_action;
+typedef void (*ACTION) (struct anim *a);
 
 struct anim {
   struct frame {

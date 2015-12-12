@@ -268,7 +268,12 @@ compute_loose_floor_fall (struct loose_floor *l)
   int speed = 3 * ++l->i;
   if (speed > 33) speed = 33;
 
-  struct frame nf; next_frame (&l->f, &nf, l->f.b, 0, speed);
+  struct frame nf;
+  struct frame_offset fo;
+  fo.b = l->f.b;
+  fo.dx = 0;
+  fo.dy = speed;
+  next_frame (&l->f, &nf, &fo);
   struct coord mbo_f, mbo_nf;
   struct pos fpmbo_f, nfpmbo_f, fpmbo_nf, nfpmbo_nf;
   enum confg fcmbo_f, fcmbo_nf;

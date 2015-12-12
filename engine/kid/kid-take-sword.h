@@ -31,7 +31,7 @@ extern struct frameset kid_take_sword_frameset[KID_TAKE_SWORD_FRAMESET_NMEMB];
 
 void load_kid_take_sword (void);
 void unload_kid_take_sword (void);
-void kid_take_sword (void);
+void kid_take_sword (struct anim *kid);
 
 extern ALLEGRO_BITMAP *kid_take_sword_01, *kid_take_sword_02,
   *kid_take_sword_03, *kid_take_sword_04;

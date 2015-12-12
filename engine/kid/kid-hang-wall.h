@@ -22,6 +22,6 @@
 
 void load_kid_hang_wall (void);
 void unload_kid_hang_wall (void);
-void kid_hang_wall (void);
+void kid_hang_wall (struct anim *kid);
 
 #endif	/* FREEPOP_KID_HANG_WALL_H */

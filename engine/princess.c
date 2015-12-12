@@ -132,79 +132,75 @@ init_look_down_frameset (void)
 
 
 void
-princess_normal (void)
+princess_normal (struct anim *princess)
 {
-  princess.action = princess_normal;
-  princess.f.flip = (princess.f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
+  princess->oaction = princess->action;
+  princess->action = princess_normal;
+  princess->f.flip = (princess->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  ALLEGRO_BITMAP *frame = princess_normal_00;
-  int dx = +0;
-  int dy = +0;
+  princess->fo.b = princess_normal_00;
+  princess->fo.dx = princess->fo.dy = +0;
 
-  next_frame (&princess.f, &princess.f, frame, dx, dy);
+  next_frame (&princess->f, &princess->f, &princess->fo);
 }
 
 void
-princess_turn (void)
+princess_turn (struct anim *princess)
 {
-  void (*oaction) (void) = princess.action;
-  princess.action = princess_turn;
-  princess.f.flip = (princess.f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
+  princess->oaction = princess->action;
+  princess->action = princess_turn;
 
-  static int i = 0;
-  if (oaction != princess_turn) i = 0;
-
-  ALLEGRO_BITMAP *frame = turn_frameset[i].frame;
-  int dx = turn_frameset[i].dx;
-  int dy = turn_frameset[i].dy;
-
-  next_frame (&princess.f, &princess.f, frame, dx, dy);
-
-  if (i < 7) i++;
-  else {
-    princess.f.dir = (princess.f.dir == RIGHT) ? LEFT : RIGHT;
-    princess.action = princess_normal;
+  if (princess->oaction != princess_turn) {
+    princess->f.dir = (princess->f.dir == RIGHT) ? LEFT : RIGHT;
+    princess->i = -1;
   }
+
+  princess->f.flip = (princess->f.dir == RIGHT) ? 0 : ALLEGRO_FLIP_HORIZONTAL;
+
+  if (princess->i < 7) princess->i++;
+  else {
+    princess_normal (princess);
+    return;
+  }
+
+  select_frame (princess, turn_frameset, princess->i);
+  next_frame_inv = true;
+  next_frame (&princess->f, &princess->f, &princess->fo);
+  next_frame_inv = false;
 }
 
 void
-princess_step_back (void)
+princess_step_back (struct anim *princess)
 {
-  void (*oaction) (void) = princess.action;
-  princess.action = princess_step_back;
-  princess.f.flip = (princess.f.dir == RIGHT) ? 0 : ALLEGRO_FLIP_HORIZONTAL;
+  princess->oaction = princess->action;
+  princess->action = princess_step_back;
+  princess->f.flip = (princess->f.dir == RIGHT) ? 0 : ALLEGRO_FLIP_HORIZONTAL;
 
-  static int i = 0;
-  if (oaction != princess_step_back) i = 0;
+  if (princess->oaction != princess_step_back) princess->i = -1;
 
-  ALLEGRO_BITMAP *frame = step_back_frameset[i].frame;
-  int dx = step_back_frameset[i].dx;
-  int dy = step_back_frameset[i].dy;
+  if (princess->i < 5) princess->i++;
 
-  if (i == 5 && princess.f.b == step_back_frameset[4].frame) dx = +1;
+  select_frame (princess, step_back_frameset, princess->i);
+
+  if (princess->i == 5
+      && princess->f.b == step_back_frameset[4].frame) princess->fo.dx = +1;
 
   next_frame_inv = true;
-  next_frame (&princess.f, &princess.f, frame, dx, dy);
-
+  next_frame (&princess->f, &princess->f, &princess->fo);
   if (next_frame_inv) next_frame_inv = false;
-  if (i < 5) i++;
 }
 
 void
-princess_look_down (void)
+princess_look_down (struct anim *princess)
 {
-  void (*oaction) (void) = princess.action;
-  princess.action = princess_look_down;
-  princess.f.flip = (princess.f.dir == RIGHT) ? 0 : ALLEGRO_FLIP_HORIZONTAL;
+  princess->oaction = princess->action;
+  princess->action = princess_look_down;
+  princess->f.flip = (princess->f.dir == RIGHT) ? 0 : ALLEGRO_FLIP_HORIZONTAL;
 
-  static int i = 0;
-  if (oaction != princess_look_down) i = 0;
+  if (princess->oaction != princess_look_down) princess->i = -1;
 
-  ALLEGRO_BITMAP *frame = look_down_frameset[i].frame;
-  int dx = look_down_frameset[i].dx;
-  int dy = look_down_frameset[i].dy;
+  if (princess->i < 1) princess->i++;
 
-  next_frame (&princess.f, &princess.f, frame, dx, dy);
-
-  if (i < 1) i++;
+  select_frame (princess, look_down_frameset, princess->i);
+  next_frame (&princess->f, &princess->f, &princess->fo);
 }

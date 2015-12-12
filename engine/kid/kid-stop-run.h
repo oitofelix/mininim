@@ -31,7 +31,7 @@ extern struct frameset kid_stop_run_frameset[KID_STOP_RUN_FRAMESET_NMEMB];
 
 void load_kid_stop_run (void);
 void unload_kid_stop_run (void);
-void kid_stop_run (void);
+void kid_stop_run (struct anim *kid);
 
 extern ALLEGRO_BITMAP *kid_stop_run_01, *kid_stop_run_02,
   *kid_stop_run_03, *kid_stop_run_04;
