@@ -110,7 +110,7 @@ flow (struct anim *kid)
   struct coord nc; struct pos np;
 
   if (kid->oaction != kid_walk) {
-    survey (_mbo, pos, &kid->f, &nc, &kid->p, &np);
+    survey (_bf, pos, &kid->f, &nc, &kid->p, &np);
     kid->i = kid->walk = -1;
   }
 
@@ -122,7 +122,7 @@ flow (struct anim *kid)
   int dd = dist_con (&kid->f, _bf, pos, -4, false, CLOSER_FLOOR);
 
   int dcc = 0;
-  if (kid->f.dir == RIGHT && confg_collision == DOOR) {
+  if (confg_collision == DOOR) {
     dcc = 9;
     dc -= dcc;
   }
