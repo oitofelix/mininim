@@ -191,6 +191,9 @@ physics_in (struct anim *kid)
       && npmbo.floor != npmbo_nf.floor) {
     inertia = 0;
 
+    if (is_colliding (&kid->f, &kid->fo, +10, false))
+      kid->f.c.x += (kid->f.dir == LEFT) ? +10 : -10;
+
     survey (_bf, pos, &kid->f, &nc, &pbf, &np);
     pos2view (&pbf, &pbf);
     kid->fo.b = kid_couch_frameset[0].frame;
@@ -199,9 +202,6 @@ physics_in (struct anim *kid)
     kid->f.c.x += (kid->f.dir == LEFT) ? -6 : +6;
     kid->f.c.y = PLACE_HEIGHT * pbf.floor + 27;
     kid->f.b = kid_couch_frameset[0].frame;
-
-    if (is_colliding (&kid->f, &kid->fo, +10, false))
-      kid->f.c.x += (kid->f.dir == LEFT) ? +10 : -10;
 
     if (kid->i >= 8) {
       kid_current_lives--;
