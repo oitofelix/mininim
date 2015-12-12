@@ -55,14 +55,12 @@ void draw_closer_floor (ALLEGRO_BITMAP *bitmap, struct pos *p);
 void draw_closer_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p);
 void draw_closer_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p);
 void draw_closer_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_pressed_closer_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p);
 void draw_pressed_closer_floor (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_pressed_closer_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p);
 void draw_pressed_closer_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p);
 void draw_pressed_closer_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_unpressed_closer_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p);
 void draw_unpressed_closer_floor (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_unpressed_closer_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_unpressed_closer_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_unpressed_closer_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p);
 struct coord *pressed_closer_floor_left_coord (struct pos *p, struct coord *c);
 struct coord *pressed_closer_floor_right_coord (struct pos *p, struct coord *c);
 

@@ -80,16 +80,9 @@ unload_wall (void)
 void
 draw_wall (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
-  switch (wall_correlation (p)) {
-  case SWS: draw_wall_sws (bitmap, p); break;
-  case SWW: draw_wall_sww (bitmap, p); break;
-  case WWS: draw_wall_wws (bitmap, p); break;
-  case WWW: draw_wall_www (bitmap, p); break;
-  default:
-    error (-1, 0, "%s: unknown wall correlation (%i, %i. %i)",
-           __func__, p->room, p->floor, p->place);
-  }
-  draw_wall_randomization (bitmap, p);
+  draw_wall_base (bitmap, p);
+  draw_wall_left (bitmap, p);
+  draw_wall_right (bitmap, p);
 }
 
 void
@@ -110,10 +103,10 @@ void
 draw_wall_left (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   switch (wall_correlation (p)) {
-  case SWS: draw_wall_sws_no_face (bitmap, p); break;
-  case SWW: draw_wall_sww (bitmap, p); break;
-  case WWS: draw_wall_wws_no_face (bitmap, p); break;
-  case WWW: draw_wall_www (bitmap, p); break;
+  case SWS: draw_wall_sws_left (bitmap, p); break;
+  case SWW: draw_wall_sww_left (bitmap, p); break;
+  case WWS: draw_wall_wws_left (bitmap, p); break;
+  case WWW: draw_wall_www_left (bitmap, p); break;
   default:
     error (-1, 0, "%s: unknown wall correlation (%i, %i. %i)",
            __func__, p->room, p->floor, p->place);
@@ -124,19 +117,30 @@ draw_wall_left (ALLEGRO_BITMAP *bitmap, struct pos *p)
 void
 draw_wall_right (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
-  struct pos pr;
-  draw_wall (bitmap, p);
-  draw_con_left (bitmap, prel (p, &pr, 0, +1));
-  draw_con_left (bitmap, prel (p, &pr, -1, +1));
+  switch (wall_correlation (p)) {
+  case SWS: draw_wall_face (bitmap, p); break;
+  case SWW: break;
+  case WWS: draw_wall_face (bitmap, p); break;
+  case WWW: break;
+  default:
+    error (-1, 0, "%s: unknown wall correlation (%i, %i. %i)",
+           __func__, p->room, p->floor, p->place);
+  }
 }
 
 void
-draw_wall_sws (ALLEGRO_BITMAP *bitmap, struct pos *p)
+draw_wall_face (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   struct coord c;
-  draw_wall_sws_no_face (bitmap, p);
   draw_bitmapc (wall_face, bitmap, wall_face_coord (p, &c), 0);
   draw_bitmapc (wall_face_top, bitmap, wall_face_top_coord (p, &c), 0);
+}
+
+void
+draw_wall_sws_left (ALLEGRO_BITMAP *bitmap, struct pos *p)
+{
+  struct coord c;
+  draw_bitmapc (wall_single, bitmap, wall_coord (p, &c), 0);
 }
 
 void
@@ -147,11 +151,10 @@ draw_wall_sws_base (ALLEGRO_BITMAP *bitmap, struct pos *p)
 }
 
 void
-draw_wall_sws_no_face (ALLEGRO_BITMAP *bitmap, struct pos *p)
+draw_wall_sww_left (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   struct coord c;
-  draw_wall_sws_base (bitmap, p);
-  draw_bitmapc (wall_single, bitmap, wall_coord (p, &c), 0);
+  draw_bitmapc (wall_left, bitmap, wall_coord (p, &c), 0);
 }
 
 void
@@ -162,20 +165,10 @@ draw_wall_sww_base (ALLEGRO_BITMAP *bitmap, struct pos *p)
 }
 
 void
-draw_wall_sww (ALLEGRO_BITMAP *bitmap, struct pos *p)
+draw_wall_wws_left (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   struct coord c;
-  draw_wall_sww_base (bitmap, p);
-  draw_bitmapc (wall_left, bitmap, wall_coord (p, &c), 0);
-}
-
-void
-draw_wall_wws (ALLEGRO_BITMAP *bitmap, struct pos *p)
-{
-  struct coord c;
-  draw_wall_wws_no_face (bitmap, p);
-  draw_bitmapc (wall_face, bitmap, wall_face_coord (p, &c), 0);
-  draw_bitmapc (wall_face_top, bitmap, wall_face_top_coord (p, &c), 0);
+  draw_bitmapc (wall_right, bitmap, wall_coord (p, &c), 0);
 }
 
 void
@@ -186,11 +179,10 @@ draw_wall_wws_base (ALLEGRO_BITMAP *bitmap, struct pos *p)
 }
 
 void
-draw_wall_wws_no_face (ALLEGRO_BITMAP *bitmap, struct pos *p)
+draw_wall_www_left (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   struct coord c;
-  draw_wall_wws_base (bitmap, p);
-  draw_bitmapc (wall_right, bitmap, wall_coord (p, &c), 0);
+  draw_bitmapc (wall_center, bitmap, wall_coord (p, &c), 0);
 }
 
 void
@@ -198,20 +190,6 @@ draw_wall_www_base (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   struct coord c;
   draw_bitmapc (wall_center_base, bitmap, wall_base_coord (p, &c), 0);
-}
-
-void
-draw_wall_www (ALLEGRO_BITMAP *bitmap, struct pos *p)
-{
-  struct coord c;
-  draw_wall_www_base (bitmap, p);
-  draw_bitmapc (wall_center, bitmap, wall_coord (p, &c), 0);
-}
-
-void
-draw_wall_fg (ALLEGRO_BITMAP *bitmap, struct pos *p)
-{
-  draw_wall_left (bitmap, p);
 }
 
 struct coord *

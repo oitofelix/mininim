@@ -165,18 +165,12 @@ draw_level (void)
       draw_fire (screen, &p, i);
     }
 
-  if (! no_room_drawing) draw_room (room_view);
+  if (! no_room_drawing) draw_room (screen, room_view);
 
-  if (! no_room_drawing)
-    for (p.floor = FLOORS; p.floor >= -1; p.floor--)
-      for (p.place = -1; p.place < PLACES; p.place++) {
-        draw_loose_floor (screen, &p);
-        draw_opener_floor (screen, &p);
-        draw_closer_floor (screen, &p);
-        draw_spikes_floor (screen, &p);
-        draw_door (screen, &p);
-        draw_falling_loose_floor (screen, &p);
-      }
+  for (p.floor = FLOORS; p.floor >= -1; p.floor--)
+    for (p.place = -1; p.place < PLACES; p.place++) {
+      draw_falling_loose_floor (screen, &p);
+    }
 
   struct coord ml; struct pos pml, pmlr, pmlra;
   _ml (&kid.f, &ml); pos (&ml, &pml);
@@ -187,7 +181,7 @@ draw_level (void)
   draw_frame (screen, &kid.f);
   draw_falling_loose_floor (screen, &pmlr);
   draw_falling_loose_floor (screen, &pmlra);
-  draw_room_anim_fg (&kid);
+  draw_room_anim_fg (screen, &kid);
   kid.xframe = NULL;
 
   for (p.floor = FLOORS; p.floor >= -1; p.floor--)

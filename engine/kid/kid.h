@@ -70,6 +70,7 @@ void load_kid (void);
 void unload_kid (void);
 void sample_kid (void);
 void draw_kid_lives (ALLEGRO_BITMAP *bitmap, int j);
+void draw_kid (ALLEGRO_BITMAP *bitmap, struct pos *p);
 
 /* variables */
 extern struct anim kid; /* kid animation object */

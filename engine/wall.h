@@ -52,15 +52,15 @@ void draw_wall (ALLEGRO_BITMAP *bitmap, struct pos *p);
 void draw_wall_base (ALLEGRO_BITMAP *bitmap, struct pos *p);
 void draw_wall_left (ALLEGRO_BITMAP *bitmap, struct pos *p);
 void draw_wall_right (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_wall_sws (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_wall_face (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_wall_sws_left (ALLEGRO_BITMAP *bitmap, struct pos *p);
 void draw_wall_sws_base (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_wall_sww (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_wall_sww_left (ALLEGRO_BITMAP *bitmap, struct pos *p);
 void draw_wall_sww_base (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_wall_wws (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_wall_wws_left (ALLEGRO_BITMAP *bitmap, struct pos *p);
 void draw_wall_wws_base (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_wall_www (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_wall_www_left (ALLEGRO_BITMAP *bitmap, struct pos *p);
 void draw_wall_www_base (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_wall_fg (ALLEGRO_BITMAP *bitmap, struct pos *p);
 struct coord *wall_base_coord (struct pos *p, struct coord *c);
 struct coord *wall_coord (struct pos *p, struct coord *c);
 struct coord *wall_face_coord (struct pos *p, struct coord *c);
@@ -77,8 +77,6 @@ void draw_wall_divider_00 (ALLEGRO_BITMAP *bitmap, struct pos *p);
 struct coord *wall_divider_00_coord (struct pos *p, struct coord *c);
 void draw_wall_divider_01 (ALLEGRO_BITMAP *bitmap, struct pos *p);
 struct coord *wall_divider_01_coord (struct pos *p, struct coord *c);
-void draw_wall_wws_no_face (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_wall_sws_no_face (ALLEGRO_BITMAP *bitmap, struct pos *p);
 
 enum wall_correlation {
   SWS, SWW, WWS, WWW

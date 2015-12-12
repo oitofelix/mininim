@@ -225,15 +225,6 @@ draw_spikes_floor (ALLEGRO_BITMAP *bitmap, struct pos *p)
 }
 
 void
-draw_spikes_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p)
-{
-  struct spikes_floor *s = spikes_floor_at_pos (p);
-  if (! s) return;
-
-  draw_floor_base (bitmap, p);
-}
-
-void
 draw_spikes_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   struct spikes_floor *s = spikes_floor_at_pos (p);
@@ -256,35 +247,29 @@ draw_spikes_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p)
 void
 draw_spikes_floor_floor (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
-  struct coord c; struct pos pr;
   draw_floor_base (bitmap, p);
-  draw_bitmapc (spikes_floor_left, bitmap, floor_left_coord (p, &c), 0);
-  draw_bitmapc (spikes_floor_right, bitmap, floor_right_coord (p, &c), 0);
-  draw_con_left (bitmap, prel (p, &pr, 0, +1));
+  draw_spikes_floor_floor_left (bitmap, p);
+  draw_spikes_floor_floor_right (bitmap, p);
 }
 
 void
 draw_spikes_floor_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   struct coord c;
-  draw_floor_base (bitmap, p);
   draw_bitmapc (spikes_floor_left, bitmap, floor_left_coord (p, &c), 0);
 }
 
 void
 draw_spikes_floor_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
-  struct coord c; struct pos pr;
-  draw_floor_base (bitmap, p);
+  struct coord c;
   draw_bitmapc (spikes_floor_right, bitmap, floor_right_coord (p, &c), 0);
-  draw_con_left (bitmap, prel (p, &pr, 0, +1));
 }
 
 void
 draw_spikes (ALLEGRO_BITMAP *bitmap, struct pos *p,
              struct spikes_floor *s)
 {
-  if (bitmap == room_bg) return;
   draw_spikes_left (bitmap, p, s);
   draw_spikes_right (bitmap, p, s);
 }
@@ -293,7 +278,6 @@ void
 draw_spikes_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
                   struct spikes_floor *s)
 {
-  if (bitmap == room_bg) return;
   switch (s->state) {
   case 0: break;
   case 1: draw_spikes_left_01 (bitmap, p); break;
@@ -308,7 +292,6 @@ void
 draw_spikes_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
                    struct spikes_floor *s)
 {
-  if (bitmap == room_bg) return;
   switch (s->state) {
   case 0: break;
   case 1: draw_spikes_right_01 (bitmap, p); break;
@@ -322,7 +305,6 @@ draw_spikes_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
 void
 draw_spikes_fg (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
-  if (bitmap == room_bg) return;
   struct spikes_floor *s = spikes_floor_at_pos (p);
   if (! s) return;
 
@@ -353,9 +335,8 @@ draw_spikes_left_01 (ALLEGRO_BITMAP *bitmap, struct pos *p)
 void
 draw_spikes_right_01 (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
-  struct coord c; struct pos pr;
+  struct coord c;
   draw_bitmapc (spikes_right_01, bitmap, spikes_right_01_coord (p, &c), 0);
-  draw_con_left (bitmap, prel (p, &pr, 0, +1));
 }
 
 void
@@ -409,9 +390,8 @@ draw_spikes_left_02 (ALLEGRO_BITMAP *bitmap, struct pos *p)
 void
 draw_spikes_right_02 (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
-  struct coord c; struct pos pr;
+  struct coord c;
   draw_bitmapc (spikes_right_02, bitmap, spikes_right_02_coord (p, &c), 0);
-  draw_con_left (bitmap, prel (p, &pr, 0, +1));
 }
 
 void
@@ -465,9 +445,8 @@ draw_spikes_left_03 (ALLEGRO_BITMAP *bitmap, struct pos *p)
 void
 draw_spikes_right_03 (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
-  struct coord c; struct pos pr;
+  struct coord c;
   draw_bitmapc (spikes_right_03, bitmap, spikes_right_03_coord (p, &c), 0);
-  draw_con_left (bitmap, prel (p, &pr, 0, +1));
 }
 
 void
@@ -521,9 +500,8 @@ draw_spikes_left_04 (ALLEGRO_BITMAP *bitmap, struct pos *p)
 void
 draw_spikes_right_04 (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
-  struct coord c; struct pos pr;
+  struct coord c;
   draw_bitmapc (spikes_right_04, bitmap, spikes_right_04_coord (p, &c), 0);
-  draw_con_left (bitmap, prel (p, &pr, 0, +1));
 }
 
 void
@@ -577,9 +555,8 @@ draw_spikes_left_05 (ALLEGRO_BITMAP *bitmap, struct pos *p)
 void
 draw_spikes_right_05 (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
-  struct coord c; struct pos pr;
+  struct coord c;
   draw_bitmapc (spikes_right_05, bitmap, spikes_right_05_coord (p, &c), 0);
-  draw_con_left (bitmap, prel (p, &pr, 0, +1));
 }
 
 void

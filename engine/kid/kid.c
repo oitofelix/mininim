@@ -169,6 +169,35 @@ unload_kid (void)
   al_destroy_sample (action_not_allowed_sample);
 }
 
+
+void
+draw_kid (ALLEGRO_BITMAP *bitmap, struct pos *p)
+{
+  struct coord nc;
+  struct pos np, pbl, pmbo, pbr, pml, pm, pmr, ptl, pmt, ptr;
+  survey (_bl, pos, &kid.f, &nc, &pbl, &np);
+  survey (_mbo, pos, &kid.f, &nc, &pmbo, &np);
+  survey (_br, pos, &kid.f, &nc, &pbr, &np);
+  survey (_ml, pos, &kid.f, &nc, &pml, &np);
+  survey (_m, pos, &kid.f, &nc, &pm, &np);
+  survey (_mr, pos, &kid.f, &nc, &pmr, &np);
+  survey (_tl, pos, &kid.f, &nc, &ptl, &np);
+  survey (_mt, pos, &kid.f, &nc, &pmt, &np);
+  survey (_tr, pos, &kid.f, &nc, &ptr, &np);
+
+  if (! peq (&pbl, p)
+      && ! peq (&pmbo, p)
+      && ! peq (&pbr, p)
+      && ! peq (&pml, p)
+      && ! peq (&pm, p)
+      && ! peq (&pmr, p)
+      && ! peq (&ptl, p)
+      && ! peq (&pmt, p)
+      && ! peq (&ptr, p)) return;
+
+  draw_frame (bitmap, &kid.f);
+}
+
 void
 place_kid (int room, int floor, int place)
 {
