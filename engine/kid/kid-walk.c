@@ -116,7 +116,7 @@ flow (struct anim *kid)
 
   confg_collision = NO_FLOOR;
 
-  int dc = dist_collision (&kid->f, &kid->fo, +0, false) + 4;
+  int dc = dist_collision (&kid->f, false) + 4;
   int df = dist_con (&kid->f, _bf, pos, -4, false, NO_FLOOR);
   int dl = dist_con (&kid->f, _bf, pos, -4, false, LOOSE_FLOOR);
   int dd = dist_con (&kid->f, _bf, pos, -4, false, CLOSER_FLOOR);
@@ -126,7 +126,6 @@ flow (struct anim *kid)
     dcc = 9;
     dc -= dcc;
   }
-
 
   if (kid->i == -1 && con (&kid->p)->fg != LOOSE_FLOOR) {
     if (dc < 4) {

@@ -24,6 +24,7 @@
 #include "anim.h"
 #include "room.h"
 #include "floor.h"
+#include "loose-floor.h"
 #include "kid/kid.h"
 #include "level.h"
 #include "door.h"
@@ -302,7 +303,8 @@ draw_door_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f)
     struct door *d = door_at_pos (p);
     draw_door_grid (screen, p, d->i);
     draw_con_left (screen, &par);
-    /* draw_con_left (screen, &pr); */
+    draw_con_fg (screen, &pr);
+    draw_falling_loose_floor (screen, &par);
   }
 }
 

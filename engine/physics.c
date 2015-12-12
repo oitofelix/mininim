@@ -207,23 +207,27 @@ is_on_con (struct frame *f, coord_f cf, pos_f pf,
 }
 
 int
-dist_collision (struct frame *f, struct frame_offset *fo, int dx, bool reverse)
+dist_collision (struct frame *f, bool reverse)
 {
-  int i = 0;
+  int i = 0, dx = +1;
   struct frame _f = *f;
+  struct frame_offset _fo;
+
+  _fo.b = _f.b;
+  _fo.dx = _fo.dy = 0;
 
   if (reverse) _f.dir = (_f.dir == LEFT) ? RIGHT : LEFT;
 
   int dir = (_f.dir == LEFT) ? -1 : +1;
 
-  if (! is_colliding (&_f, fo, dx, reverse))
-    while (! is_colliding (&_f, fo, dx, reverse)
+  if (! is_colliding (&_f, &_fo, dx, reverse))
+    while (! is_colliding (&_f, &_fo, dx, reverse)
            && i < PLACE_WIDTH + 1) {
       _f.c.x += dir;
       i++;
     }
   else
-    while (is_colliding (&_f, fo, dx, reverse)
+    while (is_colliding (&_f, &_fo, dx, reverse)
            && -i < PLACE_WIDTH + 1) {
       _f.c.x -= dir;
       i--;

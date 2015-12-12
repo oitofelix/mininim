@@ -127,7 +127,7 @@ flow (struct anim *kid)
     || ((kid->f.dir == LEFT) && left_key && up_key);
   bool couch = down_key;
 
-  int dc = dist_collision (&kid->f, &kid->fo, +0, false);
+  int dc = dist_collision (&kid->f, false);
   int df = dist_con (&kid->f, _bb, pos, -4, false, NO_FLOOR);
 
   if (kid->i >= 0 && ! kid->collision) {

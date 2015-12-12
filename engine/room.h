@@ -46,6 +46,8 @@ void draw_confg (ALLEGRO_BITMAP *bitmap, struct pos *p);
 void draw_conbg (ALLEGRO_BITMAP *bitmap, struct pos *p);
 void draw_con_left (ALLEGRO_BITMAP *bitmap, struct pos *p);
 void draw_con_right (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_con_base (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_con_fg (ALLEGRO_BITMAP *bitmap, struct pos *p);
 void draw_no_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p);
 void draw_no_floor (ALLEGRO_BITMAP *bitmap, struct pos *p);
 void draw_bricks_01 (ALLEGRO_BITMAP *bitmap, struct pos *p);

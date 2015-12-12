@@ -293,6 +293,27 @@ draw_con_base (ALLEGRO_BITMAP *bitmap, struct pos *p)
 }
 
 void
+draw_con_fg (ALLEGRO_BITMAP *bitmap, struct pos *p)
+{
+  switch (con (p)->fg) {
+  case NO_FLOOR: break;
+  case FLOOR: break;
+  case BROKEN_FLOOR: draw_broken_floor_fg (bitmap, p); break;
+  case SKELETON_FLOOR: break;
+  case LOOSE_FLOOR: break;
+  case SPIKES_FLOOR: draw_spikes_fg (bitmap, p); break;
+  case OPENER_FLOOR: break;
+  case CLOSER_FLOOR: break;
+  case PILLAR: draw_pillar_fg (bitmap, p); break;
+  case WALL: draw_wall_fg (bitmap, p); break;
+  case DOOR: break;
+  default:
+    error (-1, 0, "%s: unknown foreground (%i)",
+           __func__, con (p)->fg);
+  }
+}
+
+void
 draw_no_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   struct coord c; floor_base_coord (p, &c);
@@ -505,7 +526,7 @@ draw_room_fg (struct frame *f, struct pos *p)
     case SPIKES_FLOOR: draw_spikes_floor (screen, p); break;
     case PILLAR: draw_pillar (screen, p); break;
     case WALL: draw_wall_right (screen, p); break;
-    case DOOR: draw_door_frame_left (screen, p); break;
+    case DOOR: draw_full_door (screen, p); break;
     default:
       error (-1, 0, "%s: unknown foreground construct type (%i)",
              __func__, con (p)->fg);

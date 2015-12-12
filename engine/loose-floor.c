@@ -250,8 +250,9 @@ compute_loose_floor_release (struct loose_floor *l)
   case 7: l->state = 2;
     sample_random_loose_floor (); l->i++; break;
   case 8: l->state = 2; l->i++; break;
-  case 9: l->state = 2; l->i++; con (&l->p)->fg = NO_FLOOR; break;
+  case 9: l->state = 2; l->i++; break;
   case 10:
+    con (&l->p)->fg = NO_FLOOR;
     l->state = 2;
     l->i = 0;
     l->f.id = &l->f;

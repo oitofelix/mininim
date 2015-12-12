@@ -105,6 +105,7 @@ unload_level (void)
 static void
 compute_level (void)
 {
+  compute_loose_floors ();
   int prev_room = kid.f.c.room;
   kid.action ();
   if (kid.f.c.room != prev_room
@@ -112,7 +113,6 @@ compute_level (void)
     room_view = kid.f.c.room;
     make_links_locally_consistent (prev_room, room_view);
   }
-  compute_loose_floors ();
   compute_opener_floors ();
   compute_closer_floors ();
   compute_spikes_floors ();
