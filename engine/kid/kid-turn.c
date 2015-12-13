@@ -108,14 +108,16 @@ flow (struct anim *kid)
     int df = dist_con (&kid->f, _bf, pos, -4, false, NO_FLOOR);
 
     if (kid->hang) kid_hang (kid);
-    else if (kid->turn) {
+    else if (kid->turn
+             && kid == current_kid) {
       kid->i = -1; kid->turn = false;
       kid->action = kid_normal;
       kid_turn (kid);
     }
-    else if (couch) kid_couch (kid);
-    else if (jump) kid_jump (kid);
-    else if (run && dc > PLACE_WIDTH && df > PLACE_WIDTH)
+    else if (couch && kid == current_kid) kid_couch (kid);
+    else if (jump && kid == current_kid) kid_jump (kid);
+    else if (run && dc > PLACE_WIDTH && df > PLACE_WIDTH
+             && kid == current_kid)
       kid_start_run (kid);
     else kid_stabilize (kid);
 

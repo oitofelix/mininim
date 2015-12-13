@@ -25,7 +25,6 @@
 /* current level */
 extern struct level *level;
 extern int room_view, draw_cycle;
-extern struct anim *current_kid;
 
 void play_level (struct level *level);
 void register_cons (void);

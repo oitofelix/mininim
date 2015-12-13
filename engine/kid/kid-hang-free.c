@@ -70,7 +70,8 @@ flow (struct anim *kid)
 
     /* hang back */
   if (kid->i >= 7
-      && hang_back && is_hangable_pos (&hang_pos, back_dir)) {
+      && hang_back && is_hangable_pos (&hang_pos, back_dir)
+      && kid == current_kid) {
     sample_hang_on_fall = true;
     kid_turn (kid);
     return false;
@@ -78,14 +79,16 @@ flow (struct anim *kid)
 
   /* climb */
   if ((kid->i < 5 || kid->j > -1
-         || kid->hang_caller != kid_unclimb)
-        && up_key && ! kid->hang_limit) {
+       || kid->hang_caller != kid_unclimb)
+      && up_key && ! kid->hang_limit
+      && kid == current_kid) {
     kid_climb (kid);
     return false;
   }
 
   /* release */
-  if ((! shift_key || kid->hang_limit || get_hanged_con (&kid->f) == NO_FLOOR)
+  if ((! shift_key || kid->hang_limit || get_hanged_con (&kid->f) == NO_FLOOR
+       || kid != current_kid)
       && (kid->i < 5 || kid->j > -1)) {
     int dir = (kid->f.dir == LEFT) ? -1 : +1;
     kid->hang_limit = false;

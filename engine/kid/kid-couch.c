@@ -179,13 +179,15 @@ flow (struct anim *kid)
       && kid->cinertia == 0
       && kid->wait-- <= 0
       && ((kid->f.dir == LEFT && left_key)
-          || (kid->f.dir == RIGHT && right_key))) {
+          || (kid->f.dir == RIGHT && right_key))
+      && kid == current_kid) {
     kid->i = 0;
     select_frame (kid, kid_couch_frameset, 0);
     return true;
   }
 
-  if (kid->i != 2 || (! down_key && kid->wait-- <= 0))
+  if (kid->i != 2 || (! down_key && kid->wait-- <= 0)
+      || kid != current_kid)
     kid->i++;
 
   select_frame (kid, kid_couch_frameset, kid->i);

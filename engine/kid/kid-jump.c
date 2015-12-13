@@ -138,7 +138,8 @@ flow (struct anim *kid)
   /* hang front */
   survey (_m, pos, &kid->f, &nc, &pm, &np);
   if (kid->i >= 8 && kid->i <= 10
-      && hang_front && is_hangable_pos (&pm, kid->f.dir)) {
+      && hang_front && is_hangable_pos (&pm, kid->f.dir)
+      && kid == current_kid) {
     hang_pos = pm;
     pos2view (&hang_pos, &hang_pos);
     kid->hang = true;
@@ -150,7 +151,8 @@ flow (struct anim *kid)
   /* hang back */
   survey (_tf, pos, &kid->f, &nc, &ptf, &np);
   if (kid->i >= 8 && kid->i <= 10
-      && hang_back && is_hangable_pos (&ptf, back_dir)) {
+      && hang_back && is_hangable_pos (&ptf, back_dir)
+      && kid == current_kid) {
     hang_pos = ptf;
     pos2view (&hang_pos, &hang_pos);
     kid->hang = true;

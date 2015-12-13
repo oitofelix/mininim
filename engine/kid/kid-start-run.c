@@ -100,23 +100,25 @@ flow (struct anim *kid)
   bool jump = ((kid->f.dir == RIGHT) && right_key && up_key)
     || ((kid->f.dir == LEFT) && left_key && up_key);
 
-  if (couch) {
+  if (couch && kid == current_kid) {
     kid_couch (kid);
     return false;
   }
 
-  if (jump && kid->i < 3) {
+  if (jump && kid->i < 3
+      && kid == current_kid) {
     kid_jump (kid);
     return false;
   }
 
-  if ((kid->i == 3 || kid->i == 4) && turn_run) {
+  if ((kid->i == 3 || kid->i == 4) && turn_run
+      && kid == current_kid) {
     kid_stop_run (kid);
     return false;
   }
 
   if (kid->i == 5) {
-    if (run) kid_run (kid);
+    if (run && kid == current_kid) kid_run (kid);
     else kid_stop_run (kid);
     return false;
   }

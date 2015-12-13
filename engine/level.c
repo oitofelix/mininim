@@ -50,7 +50,6 @@ static void compute_level (void);
 struct level *level;
 static bool no_room_drawing = false;
 int room_view = 1;
-struct anim *current_kid;
 int draw_cycle;
 
 void
@@ -169,8 +168,10 @@ draw_level (void)
   if (was_key_pressed (ALLEGRO_KEY_B, true))
     no_room_drawing = ! no_room_drawing;
 
-  if (was_key_pressed (ALLEGRO_KEY_A, true))
+  if (was_key_pressed (ALLEGRO_KEY_A, true)) {
     current_kid = &kid[(current_kid - kid + 1) % kid_nmemb];
+    room_view = current_kid->f.c.room;
+  }
 
   if (room_view == 0) room_view = prev_room;
 

@@ -93,13 +93,13 @@ flow (struct anim *kid)
   bool turn_run = (kid->f.dir == RIGHT) ? left_key : right_key;
   bool couch = down_key;
 
-  if (couch) {
+  if (couch && kid == current_kid) {
     kid_couch (kid);
     return false;
   }
 
   if (kid->i == 3) {
-    if (turn_run) kid_turn_run (kid);
+    if (turn_run && kid == current_kid) kid_turn_run (kid);
     else kid_stabilize (kid);
     return false;
   }

@@ -70,14 +70,16 @@ flow (struct anim *kid)
 
   /* hang back */
   if (kid->i == 4 && kid->reverse
-      && hang_back && is_hangable_pos (&hang_pos, back_dir)) {
+      && hang_back && is_hangable_pos (&hang_pos, back_dir)
+      && kid == current_kid) {
     sample_hang_on_fall = true;
     kid_turn (kid);
     return false;
   }
 
   if ((! shift_key && (kid->reverse || kid->i > 3))
-      || kid->hang_limit || get_hanged_con (&kid->f) == NO_FLOOR) {
+      || kid->hang_limit || get_hanged_con (&kid->f) == NO_FLOOR
+      || kid != current_kid) {
     if (con (&hang_pos)->fg == NO_FLOOR) {
       place_frame (&kid->f, &kid->f, kid_fall_frameset[0].frame,
                    &hang_pos,
@@ -93,7 +95,7 @@ flow (struct anim *kid)
     kid_vjump (kid);
     kid->hang_limit = false;
     return false;
-  } if (up_key && ! kid->hang_limit) {
+  } if (up_key && ! kid->hang_limit && kid == current_kid) {
     kid_climb (kid);
     return false;
   }
@@ -138,6 +140,6 @@ physics_out (struct anim *kid)
 
   /* sound */
   if (! kid->reverse && kid->i == 4 && shift_key && ! up_key
-      && ! kid->hang_limit)
+      && ! kid->hang_limit && kid == current_kid)
     sample_hit_wall = true;
 }

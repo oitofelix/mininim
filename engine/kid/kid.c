@@ -39,6 +39,7 @@
 
 struct anim *kid;
 size_t kid_nmemb;
+struct anim *current_kid;
 
 ALLEGRO_BITMAP *kid_full_life, *kid_empty_life;
 
@@ -168,6 +169,7 @@ create_kid (void)
   k.misstep = k.hang_limit = k.uncouch_slowly = false;
   k.inertia = 0;
   k.shadow = false;
+  k.xframe = NULL;
 
   place_kid (&k, 1, 0, 0);
   update_depressible_floor (&k, -4, -10);

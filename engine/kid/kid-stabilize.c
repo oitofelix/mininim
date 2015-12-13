@@ -130,7 +130,7 @@ flow (struct anim *kid)
   int dc = dist_collision (&kid->f, false);
   int df = dist_con (&kid->f, _bb, pos, -4, false, NO_FLOOR);
 
-  if (kid->i >= 0 && ! kid->collision) {
+  if (kid->i >= 0 && ! kid->collision && kid == current_kid) {
     if (couch) {
       kid_couch (kid);
       return false;

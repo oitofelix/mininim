@@ -70,7 +70,8 @@ flow (struct anim *kid)
   bool walkb = ((kid->f.dir == RIGHT) && left_key)
     || ((kid->f.dir == LEFT) && right_key);
 
-  if (kid->oaction == kid_sword_normal) {
+  if (kid->oaction == kid_sword_normal
+      && kid == current_kid) {
     if (keep_sword) {
       /* keep_sword_fast = true; */
       kid_keep_sword (kid);
