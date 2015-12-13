@@ -117,8 +117,8 @@ flow (struct anim *kid)
     if (kid->oaction == kid_turn) kid->collision = true;
   }
 
-  if (! turn)
-    turn = ((kid->f.dir == RIGHT) && left_key)
+  if (! kid->turn)
+    kid->turn = ((kid->f.dir == RIGHT) && left_key)
       || ((kid->f.dir == LEFT) && right_key);
   bool run = (((kid->f.dir == RIGHT) && right_key)
               || ((kid->f.dir == LEFT) && left_key))
@@ -137,9 +137,9 @@ flow (struct anim *kid)
     } else if (jump) {
       kid_jump (kid);
       return false;
-    } else if (turn) {
+    } else if (kid->turn) {
       kid_turn (kid);
-      turn = false;
+      kid->turn = false;
       return false;
     } else if (run && dc > PLACE_WIDTH && df > PLACE_WIDTH) {
       kid_start_run (kid);
@@ -149,7 +149,7 @@ flow (struct anim *kid)
 
   if (kid->i == 3) {
     kid_normal (kid);
-    turn = false;
+    kid->turn = false;
     return false;
   }
 

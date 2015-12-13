@@ -38,7 +38,6 @@
 struct anim kid;
 
 struct pos item_pos = {.room = -1};
-bool turn = false;
 
 int kid_total_lives = KID_INITIAL_TOTAL_LIVES,
   kid_current_lives = KID_INITIAL_CURRENT_LIVES;

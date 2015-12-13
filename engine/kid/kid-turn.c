@@ -94,8 +94,8 @@ flow (struct anim *kid)
   if (kid->oaction != kid_turn)
     kid->i = -1, kid->misstep = kid->hang = false;
 
-  if (! turn)
-    turn = ((kid->f.dir == RIGHT) && left_key)
+  if (! kid->turn)
+    kid->turn = ((kid->f.dir == RIGHT) && left_key)
       || ((kid->f.dir == LEFT) && right_key);
   bool run = ((kid->f.dir == RIGHT) ? right_key : left_key)
     && ! shift_key;
@@ -108,8 +108,8 @@ flow (struct anim *kid)
     int df = dist_con (&kid->f, _bf, pos, -4, false, NO_FLOOR);
 
     if (kid->hang) kid_hang (kid);
-    else if (turn) {
-      kid->i = -1; turn = false;
+    else if (kid->turn) {
+      kid->i = -1; kid->turn = false;
       kid->action = kid_normal;
       kid_turn (kid);
     }

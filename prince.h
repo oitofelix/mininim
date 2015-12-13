@@ -100,7 +100,7 @@ struct anim {
   int i, j, wait, repeat, cinertia, inertia, walk;
   bool reverse, collision, fall, hit_ceiling,
     just_hanged, hang, hang_limit, misstep, uncouch_slowly,
-    keep_sword_fast;
+    keep_sword_fast, turn;
 
   struct pos p;
 
