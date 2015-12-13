@@ -193,7 +193,7 @@ draw_level (void)
   unpress_opener_floors ();
   unpress_closer_floors ();
 
-  draw_kid_lives (screen, i);
+  draw_kid_lives (screen, &kid, i);
 
   if (was_key_pressed (ALLEGRO_KEY_C, true)) {
     int s = room_view;

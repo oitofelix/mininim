@@ -209,7 +209,7 @@ physics_in (struct anim *kid)
     kid->f.b = kid_couch_frameset[0].frame;
 
     if (kid->i >= 8) {
-      kid_current_lives--;
+      kid->current_lives--;
       kid->uncouch_slowly = true;
     } else kid->uncouch_slowly = false;
     if (kid->i > 3) sample_hit_ground = true;

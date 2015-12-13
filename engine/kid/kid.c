@@ -37,9 +37,6 @@
 
 struct anim kid;
 
-int kid_total_lives = KID_INITIAL_TOTAL_LIVES,
-  kid_current_lives = KID_INITIAL_CURRENT_LIVES;
-
 ALLEGRO_BITMAP *kid_full_life, *kid_empty_life;
 
 ALLEGRO_SAMPLE *step_sample, *hit_ground_sample, *hit_wall_sample,
@@ -51,7 +48,7 @@ bool sample_step, sample_hit_ground, sample_hit_wall,
   sample_hang_on_fall, sample_drink, sample_glory,
   sample_take_sword, sample_sword_attack, sample_action_not_allowed;
 
-static void place_kid (int room, int floor, int place);
+static void place_kid (struct anim *kid, int room, int floor, int place);
 static struct coord *kid_life_coord (int i, struct coord *c);
 
 void
@@ -109,9 +106,11 @@ load_kid (void)
   kid.fo.dx = kid.fo.dy = +0;
   kid.action = kid_normal;
   kid.item_pos.room = -1;
+  kid.total_lives = KID_INITIAL_TOTAL_LIVES,
+  kid.current_lives = KID_INITIAL_CURRENT_LIVES;
   update_depressible_floor (&kid, -4, -10);
 
-  place_kid (2, 0, 0);
+  place_kid (&kid, 2, 0, 0);
 }
 
 void
@@ -164,19 +163,19 @@ unload_kid (void)
 
 
 void
-draw_kid (ALLEGRO_BITMAP *bitmap, struct pos *p)
+draw_kid (ALLEGRO_BITMAP *bitmap, struct anim *kid, struct pos *p)
 {
   struct coord nc;
   struct pos np, pbl, pmbo, pbr, pml, pm, pmr, ptl, pmt, ptr;
-  survey (_bl, pos, &kid.f, &nc, &pbl, &np);
-  survey (_mbo, pos, &kid.f, &nc, &pmbo, &np);
-  survey (_br, pos, &kid.f, &nc, &pbr, &np);
-  survey (_ml, pos, &kid.f, &nc, &pml, &np);
-  survey (_m, pos, &kid.f, &nc, &pm, &np);
-  survey (_mr, pos, &kid.f, &nc, &pmr, &np);
-  survey (_tl, pos, &kid.f, &nc, &ptl, &np);
-  survey (_mt, pos, &kid.f, &nc, &pmt, &np);
-  survey (_tr, pos, &kid.f, &nc, &ptr, &np);
+  survey (_bl, pos, &kid->f, &nc, &pbl, &np);
+  survey (_mbo, pos, &kid->f, &nc, &pmbo, &np);
+  survey (_br, pos, &kid->f, &nc, &pbr, &np);
+  survey (_ml, pos, &kid->f, &nc, &pml, &np);
+  survey (_m, pos, &kid->f, &nc, &pm, &np);
+  survey (_mr, pos, &kid->f, &nc, &pmr, &np);
+  survey (_tl, pos, &kid->f, &nc, &ptl, &np);
+  survey (_mt, pos, &kid->f, &nc, &pmt, &np);
+  survey (_tr, pos, &kid->f, &nc, &ptr, &np);
 
   if (! peq (&pbl, p)
       && ! peq (&pmbo, p)
@@ -188,11 +187,11 @@ draw_kid (ALLEGRO_BITMAP *bitmap, struct pos *p)
       && ! peq (&pmt, p)
       && ! peq (&ptr, p)) return;
 
-  draw_frame (bitmap, &kid.f);
+  draw_frame (bitmap, &kid->f);
 }
 
 void
-place_kid (int room, int floor, int place)
+place_kid (struct anim *kid, int room, int floor, int place)
 {
   struct pos p;
 
@@ -208,15 +207,15 @@ place_kid (int room, int floor, int place)
   enum confg tr = crel (&p, 0, +1)->fg;
 
  end:
-  if (kid.f.dir == LEFT
+  if (kid->f.dir == LEFT
       && tl == WALL
-      && tl == DOOR) kid.f.dir = RIGHT;
+      && tl == DOOR) kid->f.dir = RIGHT;
 
-  if (kid.f.dir == RIGHT
+  if (kid->f.dir == RIGHT
       && tr == WALL
-      && tr == DOOR) kid.f.dir = LEFT;
+      && tr == DOOR) kid->f.dir = LEFT;
 
-  place_frame (&kid.f, &kid.f, kid_normal_00, &p, +15, +15);
+  place_frame (&kid->f, &kid->f, kid_normal_00, &p, +15, +15);
 }
 
 
@@ -241,21 +240,21 @@ sample_kid (void)
 }
 
 void
-draw_kid_lives (ALLEGRO_BITMAP *bitmap, int j)
+draw_kid_lives (ALLEGRO_BITMAP *bitmap, struct anim *kid, int j)
 {
   int i;
   struct coord c;
 
   al_draw_filled_rectangle (0, ORIGINAL_HEIGHT - 8,
-                            7 * kid_total_lives, ORIGINAL_HEIGHT,
+                            7 * kid->total_lives, ORIGINAL_HEIGHT,
                             al_map_rgba (0, 0, 0, 170));
 
-  for (i = 0; i < kid_total_lives; i++)
+  for (i = 0; i < kid->total_lives; i++)
     draw_bitmapc (kid_empty_life, bitmap, kid_life_coord (i, &c), 0);
 
-  if (kid_current_lives <= KID_MINIMUM_LIVES_TO_BLINK && j % 2) return;
+  if (kid->current_lives <= KID_MINIMUM_LIVES_TO_BLINK && j % 2) return;
 
-  for (i = 0; i < kid_current_lives; i++)
+  for (i = 0; i < kid->current_lives; i++)
     draw_bitmapc (kid_full_life, bitmap, kid_life_coord (i, &c), 0);
 }
 
