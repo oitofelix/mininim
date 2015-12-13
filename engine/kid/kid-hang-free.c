@@ -79,16 +79,16 @@ flow (struct anim *kid)
   /* climb */
   if ((kid->i < 5 || kid->j > -1
          || kid->hang_caller != kid_unclimb)
-        && up_key && ! hang_limit) {
+        && up_key && ! kid->hang_limit) {
     kid_climb (kid);
     return false;
   }
 
   /* release */
-  if ((! shift_key || hang_limit || get_hanged_con (&kid->f) == NO_FLOOR)
+  if ((! shift_key || kid->hang_limit || get_hanged_con (&kid->f) == NO_FLOOR)
       && (kid->i < 5 || kid->j > -1)) {
     int dir = (kid->f.dir == LEFT) ? -1 : +1;
-    hang_limit = false;
+    kid->hang_limit = false;
     if (con (&hang_pos)->fg != NO_FLOOR
         && kid->i >= 4) {
       place_frame (&kid->f, &kid->f, kid_vjump_frameset[13].frame,
@@ -120,7 +120,7 @@ flow (struct anim *kid)
   }
 
   if (kid->reverse && kid->i > 0) {
-    if (kid->i == 4  && kid->j++ > 0) hang_limit = true;
+    if (kid->i == 4  && kid->j++ > 0) kid->hang_limit = true;
     kid->i--;
   } else if (kid->reverse && kid->i == 0) {
     if (kid->wait == 0) {

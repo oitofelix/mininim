@@ -39,7 +39,6 @@ struct anim kid;
 
 bool uncouch_slowly = false;
 struct pos item_pos = {.room = -1};
-bool hang_limit;
 bool turn = false;
 bool keep_sword_fast = false;
 

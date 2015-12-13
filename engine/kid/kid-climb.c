@@ -168,7 +168,7 @@ physics_in (struct anim *kid)
   if (kid->i == 3 && ctf == DOOR && kid->f.dir == LEFT
       && door_at_pos (&ptf)->i > DOOR_CLIMB_LIMIT) {
     if (kid->wait == 0) {
-      hang_limit = true;
+      kid->hang_limit = true;
       kid_unclimb (kid);
       return false;
     } else if (kid->wait > 0) kid->wait--;
