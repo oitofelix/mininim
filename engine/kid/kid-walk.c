@@ -107,10 +107,14 @@ kid_walk (struct anim *kid)
 static bool
 flow (struct anim *kid)
 {
-  struct coord nc; struct pos np;
+  struct coord nc; struct pos np, pbf, pmbo;
 
   if (kid->oaction != kid_walk) {
-    survey (_bf, pos, &kid->f, &nc, &kid->p, &np);
+    survey (_bf, pos, &kid->f, &nc, &pbf, &np);
+    survey (_mbo, pos, &kid->f, &nc, &pmbo, &np);
+    if (con (&pbf)->fg == NO_FLOOR
+        || con (&pbf)->fg == LOOSE_FLOOR) kid->p = pmbo;
+    else kid->p = pbf;
     kid->i = kid->walk = -1;
   }
 
@@ -133,10 +137,10 @@ flow (struct anim *kid)
       return false;
     }
 
-    if (! misstep) {
+    if (! kid->misstep) {
       if (dd < 4) {
         kid_normal (kid);
-        misstep = true;
+        kid->misstep = true;
         return false;
       }
 
@@ -170,7 +174,7 @@ flow (struct anim *kid)
                    (kid->f.dir == LEFT) ? +11 + dcc
                    : PLACE_WIDTH + 7 - dcc, +15);
     kid_normal (kid);
-    misstep = false;
+    kid->misstep = false;
     return false;
   }
 

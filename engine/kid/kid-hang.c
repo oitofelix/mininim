@@ -113,7 +113,7 @@ static bool
 flow (struct anim *kid)
 {
   if (kid->oaction != kid_hang)
-    kid->i = -1, kid->hang_caller = kid->oaction, misstep = false;
+    kid->i = -1, kid->hang_caller = kid->oaction, kid->misstep = false;
 
   int dir = (kid->f.dir == LEFT) ? 0 : 1;
   place_frame (&kid->f, &kid->f, kid_hang_14,

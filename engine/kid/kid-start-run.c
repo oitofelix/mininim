@@ -92,7 +92,7 @@ kid_start_run (struct anim *kid)
 static bool
 flow (struct anim *kid)
 {
-  if (kid->oaction != kid_start_run) kid->i = -1, misstep = false;
+  if (kid->oaction != kid_start_run) kid->i = -1, kid->misstep = false;
 
   bool run = (kid->f.dir == RIGHT) ? right_key : left_key;
   bool turn_run = (kid->f.dir == RIGHT) ? left_key : right_key;

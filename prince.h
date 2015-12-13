@@ -99,7 +99,7 @@ struct anim {
   ACTION hang_caller;
   int i, j, wait, repeat, cinertia, walk;
   bool reverse, collision, fall, hit_ceiling,
-    just_hanged, hang;
+    just_hanged, hang, misstep;
 
   struct pos p;
 

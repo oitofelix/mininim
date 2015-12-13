@@ -125,7 +125,7 @@ flow (struct anim *kid)
   struct coord nc; struct pos np, pm, ptf;
 
   if (kid->oaction != kid_jump)
-    kid->i = -1, misstep = kid->hang = false;
+    kid->i = -1, kid->misstep = kid->hang = false;
 
   bool hang_front = ((kid->f.dir == LEFT) ? left_key : right_key)
     && ! up_key && shift_key;

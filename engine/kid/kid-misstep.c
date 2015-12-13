@@ -77,7 +77,7 @@ kid_misstep (struct anim *kid)
 static bool
 flow (struct anim *kid)
 {
-  if (kid->oaction != kid_misstep) kid->i = -1, misstep = true;
+  if (kid->oaction != kid_misstep) kid->i = -1, kid->misstep = true;
 
   if (kid->i == 10) {
     place_frame (&kid->f, &kid->f, kid_normal_00, &kid->p,

@@ -37,7 +37,6 @@
 
 struct anim kid;
 
-bool misstep = false;
 bool uncouch_slowly = false;
 int inertia = 0;
 struct pos item_pos = {.room = -1};
@@ -116,6 +115,7 @@ load_kid (void)
   kid.fo.b = kid_normal_00;
   kid.fo.dx = kid.fo.dy = +0;
   kid.action = kid_normal;
+  kid.misstep = false;
   update_depressible_floor (&kid, -4, -10);
 
   place_kid (2, 0, 0);

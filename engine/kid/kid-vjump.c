@@ -124,7 +124,7 @@ flow (struct anim *kid)
   if (kid->oaction != kid_vjump)
     kid->i = -1, kid->j = 0,
       kid->just_hanged = kid->hit_ceiling =
-      kid->hang = misstep = false;
+      kid->hang = kid->misstep = false;
 
   if (kid->i == 12 && kid->hang) {
     kid_hang (kid);

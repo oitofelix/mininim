@@ -126,7 +126,7 @@ flow (struct anim *kid)
   enum confg ctf;
 
   if (kid->oaction != kid_couch) {
-    kid->i = -1; kid->fall = kid->collision = misstep = false;
+    kid->i = -1; kid->fall = kid->collision = kid->misstep = false;
     kid->wait = 0;
   }
 

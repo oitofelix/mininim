@@ -92,7 +92,7 @@ static bool
 flow (struct anim *kid)
 {
   if (kid->oaction != kid_turn)
-    kid->i = -1, misstep = kid->hang = false;
+    kid->i = -1, kid->misstep = kid->hang = false;
 
   if (! turn)
     turn = ((kid->f.dir == RIGHT) && left_key)
