@@ -210,8 +210,8 @@ physics_in (struct anim *kid)
 
     if (kid->i >= 8) {
       kid_current_lives--;
-      uncouch_slowly = true;
-    } else uncouch_slowly = false;
+      kid->uncouch_slowly = true;
+    } else kid->uncouch_slowly = false;
     if (kid->i > 3) sample_hit_ground = true;
     shake_loose_floor_row (&pbf);
     kid_couch (kid);

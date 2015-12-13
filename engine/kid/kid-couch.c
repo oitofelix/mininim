@@ -138,7 +138,7 @@ flow (struct anim *kid)
 
   if (kid->oaction == kid_fall) {
     kid->fall = true; kid->inertia = 0;
-    if (uncouch_slowly) kid->wait = 36;
+    if (kid->uncouch_slowly) kid->wait = 36;
   }
 
   /* unclimb */

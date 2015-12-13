@@ -75,7 +75,7 @@ void draw_kid (ALLEGRO_BITMAP *bitmap, struct pos *p);
 /* variables */
 extern struct anim kid; /* kid animation object */
 
-extern bool uncouch_slowly, turn, keep_sword_fast;
+extern bool turn, keep_sword_fast;
 
 extern int kid_total_lives, kid_current_lives;
 
