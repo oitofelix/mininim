@@ -167,7 +167,7 @@ physics_in (struct anim *kid)
   enum confg cmbo, cbb;
 
   /* inertia */
-  inertia = 0;
+  kid->inertia = 0;
 
   /* fall */
   cmbo = survey (_mbo, pos, &kid->f, &nc, &np, &np)->fg;

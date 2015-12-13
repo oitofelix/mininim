@@ -182,8 +182,8 @@ physics_in (struct anim *kid)
   struct frame nf;
 
   /* inertia */
-  if (kid->i >= 8 && kid->i <= 10) inertia = 5;
-  else inertia = 0;
+  if (kid->i >= 8 && kid->i <= 10) kid->inertia = 5;
+  else kid->inertia = 0;
 
   /* collision */
   if (is_colliding (&kid->f, &kid->fo, +0, false)) {

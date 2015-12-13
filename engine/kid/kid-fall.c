@@ -150,17 +150,18 @@ physics_in (struct anim *kid)
   survey (_tf, pos, &kid->f, &nc, &ptf, &np);
   survey (_bb, pos, &kid->f, &nc, &pbb, &np);
   if (is_hangable_con (&ptf)
-      || is_hangable_pos (&pbb, kid->f.dir)) inertia = 0;
+      || is_hangable_pos (&pbb, kid->f.dir))
+    kid->inertia = 0;
 
   /* fall speed */
   if (kid->i > 0)
-    kid->fo.dx = -inertia;
+    kid->fo.dx = -kid->inertia;
   if (kid->i > 4) {
     int speed = +21 + 3 * (kid->i - 5);
     kid->fo.dy = (speed > 33) ? 33 : speed;
   }
 
-  printf ("inertia: %i\n", inertia);
+  printf ("inertia: %i\n", kid->inertia);
 
   /* collision */
   if (is_colliding (&kid->f, &kid->fo, +0, false))
@@ -193,7 +194,7 @@ physics_in (struct anim *kid)
   if (kid->i > 2
       && cmbo != NO_FLOOR
       && npmbo.floor != npmbo_nf.floor) {
-    inertia = 0;
+    kid->inertia = 0;
 
     if (is_colliding (&kid->f, &kid->fo, +16, false))
       kid->f.c.x += (kid->f.dir == LEFT) ? +16 : -16;

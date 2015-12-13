@@ -78,7 +78,7 @@ extern struct anim kid; /* kid animation object */
 extern bool uncouch_slowly, hang_limit, turn,
   keep_sword_fast;
 
-extern int inertia, kid_total_lives, kid_current_lives;
+extern int kid_total_lives, kid_current_lives;
 
 extern struct pos item_pos;
 

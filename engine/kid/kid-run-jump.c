@@ -161,8 +161,8 @@ physics_in (struct anim *kid)
   enum confg cbf;
 
   /* inertia */
-  if (kid->i < 6 || kid->i > 10) inertia = 3;
-  else inertia = 5;
+  if (kid->i < 6 || kid->i > 10) kid->inertia = 3;
+  else kid->inertia = 5;
 
   /* collision */
   if (is_colliding (&kid->f, &kid->fo, +0, false)) {

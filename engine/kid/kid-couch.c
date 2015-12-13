@@ -134,10 +134,10 @@ flow (struct anim *kid)
     kid->i = 10;
 
   if (kid->oaction == kid_couch_collision)
-    kid->collision = true, inertia = 0;
+    kid->collision = true, kid->inertia = 0;
 
   if (kid->oaction == kid_fall) {
-    kid->fall = true; inertia = 0;
+    kid->fall = true; kid->inertia = 0;
     if (uncouch_slowly) kid->wait = 36;
   }
 
@@ -191,7 +191,7 @@ flow (struct anim *kid)
   select_frame (kid, kid_couch_frameset, kid->i);
 
   if (kid->oaction == kid_climb) kid->fo.dx += 7;
-  if (kid->i == 0) kid->cinertia = 2 * inertia;
+  if (kid->i == 0) kid->cinertia = 2 * kid->inertia;
   if (kid->i > 0 && kid->i < 3) kid->fo.dx -= kid->cinertia;
   if (kid->cinertia > 0) kid->cinertia--;
 

@@ -140,7 +140,7 @@ static bool
 physics_in (struct anim *kid)
 {
   /* intertia */
-  inertia = 0;
+  kid->inertia = 0;
 
   return true;
 }

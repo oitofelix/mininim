@@ -139,7 +139,7 @@ physics_in (struct anim *kid)
   enum confg cmbo, ctf;
 
   /* inertia */
-  inertia = 1;
+  kid->inertia = 1;
 
   /* collision */
   if (is_colliding (&kid->f, &kid->fo, +0, false)) {
