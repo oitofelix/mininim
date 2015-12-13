@@ -94,6 +94,8 @@ struct anim {
     int dx, dy;
   } fo;
 
+  struct frame_offset xf;
+
   ACTION oaction;
   ACTION action;
   ACTION hang_caller;
@@ -108,9 +110,6 @@ struct anim {
   /* depressible floor */
   struct pos df_pos[2];
   struct pos df_posb[2];
-
-  ALLEGRO_BITMAP *xframe;
-  int xdx, xdy;
 };
 
 struct level {

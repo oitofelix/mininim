@@ -28,14 +28,16 @@ void play_anim (void (*draw_callback) (void),
                 void (*compute_callback) (void),
                 int freq);
 void draw_frame (ALLEGRO_BITMAP *bitmap, struct frame *f);
-void draw_xframe (ALLEGRO_BITMAP *bitmap, struct anim *a);
-struct coord *xframe_coord (struct anim *a, struct coord *c);
-struct frame *xframe_frame (struct anim *a, struct frame *f);
+void draw_xframe (ALLEGRO_BITMAP *bitmap, struct frame *f,
+                  struct frame_offset *xf);
+struct coord *xframe_coord (struct frame *f, struct frame_offset *xf,
+                            struct coord *c);
+struct frame *xframe_frame (struct frame *f, struct frame_offset *xf,
+                            struct frame *nf);
 struct frame *next_frame (struct frame *f, struct frame *nf,
                           struct frame_offset *fo);
 void select_frame (struct anim *a, struct frameset *fs, int i);
-void select_xframe (struct anim *a, struct frameset *fs, int j);
-
+void select_xframe (struct frame_offset *xf, struct frameset *fs, int j);
 bool wait_anim (int cycles);
 
 /* variables */

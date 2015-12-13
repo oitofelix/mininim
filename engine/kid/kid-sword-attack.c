@@ -109,11 +109,11 @@ flow (struct anim *kid)
   if (kid->i == 4) kid->j = 7;
 
   select_frame (kid, kid_sword_attack_frameset, kid->i + 1);
-  select_xframe (kid, sword_frameset, kid->j);
+  select_xframe (&kid->xf, sword_frameset, kid->j);
 
-  if (kid->i == 1) kid->xframe = NULL;
-  if (kid->i == 3) kid->xdx = -21, kid->xdy = +7;
-  if (kid->i == 4) kid->xdx = -7, kid->xdy = +17;
+  if (kid->i == 1) kid->xf.b = NULL;
+  if (kid->i == 3) kid->xf.dx = -21, kid->xf.dy = +7;
+  if (kid->i == 4) kid->xf.dx = -7, kid->xf.dy = +17;
 
   return true;
 }
@@ -137,7 +137,7 @@ physics_in (struct anim *kid)
   cmbo = survey (_mbo, pos, &kid->f, &nc, &np, &np)->fg;
   cbb = survey (_bb, pos, &kid->f, &nc, &np, &np)->fg;
   if (cbf == NO_FLOOR || cmbo == NO_FLOOR || cbb == NO_FLOOR) {
-    kid->xframe = NULL;
+    kid->xf.b = NULL;
     kid_fall (kid);
     return false;
   }

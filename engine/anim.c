@@ -141,32 +141,31 @@ draw_frame (ALLEGRO_BITMAP *bitmap, struct frame *f)
 }
 
 void
-draw_xframe (ALLEGRO_BITMAP *bitmap, struct anim *a)
+draw_xframe (ALLEGRO_BITMAP *bitmap, struct frame *f, struct frame_offset *xf)
 {
   struct coord c;
-
-  if (! a->xframe) return;
-  draw_bitmapc (a->xframe, bitmap, xframe_coord (a, &c), a->f.flip);
+  if (! xf->b) return;
+  draw_bitmapc (xf->b, bitmap, xframe_coord (f, xf, &c), f->flip);
 }
 
 struct coord *
-xframe_coord (struct anim *a, struct coord *c)
+xframe_coord (struct frame *f, struct frame_offset *xf, struct coord *c)
 {
-  int w = al_get_bitmap_width (a->xframe);
-  _tf (&a->f, c);
-  c->x += (a->f.dir == LEFT) ? a->xdx : -a->xdx - w + 1;
-  c->y += a->xdy;
-  c->room = a->f.c.room;
+  int w = al_get_bitmap_width (xf->b);
+  _tf (f, c);
+  c->x += (f->dir == LEFT) ? xf->dx : -xf->dx - w + 1;
+  c->y += xf->dy;
+  c->room = f->c.room;
   return c;
 }
 
 struct frame *
-xframe_frame (struct anim *a, struct frame *f)
+xframe_frame (struct frame *f, struct frame_offset *xf, struct frame *nf)
 {
-  *f = a->f;
-  f->b = a->xframe;
-  xframe_coord (a, &f->c);
-  return f;
+  *nf = *f;
+  nf->b = xf->b;
+  xframe_coord (f, xf, &nf->c);
+  return nf;
 }
 
 void
@@ -179,11 +178,11 @@ select_frame (struct anim *a, struct frameset *fs, int i)
 }
 
 void
-select_xframe (struct anim *a, struct frameset *fs, int j)
+select_xframe (struct frame_offset *xf, struct frameset *fs, int j)
 {
-  a->xframe = fs[j].frame;
-  a->xdx = fs[j].dx;
-  a->xdy = fs[j].dy;
+  xf->b = fs[j].frame;
+  xf->dx = fs[j].dx;
+  xf->dy = fs[j].dy;
   /* a->j = j; */
 }
 

@@ -129,7 +129,7 @@ flow (struct anim *kid)
 
   select_frame (kid, kid_keep_sword_frameset, kid->i);
   if (kid->i < 4)
-    select_xframe (kid, sword_frameset, kid->j);
+    select_xframe (&kid->xf, sword_frameset, kid->j);
 
   if (kid->i == 8 && kid->wait < 1) kid->fo.dx = 0;
   if (kid->i == 9 && kid->wait < 2) kid->fo.dx = 0;

@@ -169,7 +169,7 @@ create_kid (void)
   k.misstep = k.hang_limit = k.uncouch_slowly = false;
   k.inertia = 0;
   k.shadow = false;
-  k.xframe = NULL;
+  k.xf.b = NULL;
 
   place_kid (&k, 1, 0, 0);
   update_depressible_floor (&k, -4, -10);
@@ -196,12 +196,12 @@ draw_kids (ALLEGRO_BITMAP *bitmap)
     prel (&pml, &pmlra, -1, +1);
 
     draw_kid_frame (bitmap, k);
-    draw_xframe (bitmap, k);
+    draw_xframe (bitmap, &k->f, &k->xf);
 
     draw_falling_loose_floor (bitmap, &pmlr);
     draw_falling_loose_floor (bitmap, &pmlra);
     draw_room_anim_fg (bitmap, k);
-    k->xframe = NULL;
+    k->xf.b = NULL;
   }
 }
 

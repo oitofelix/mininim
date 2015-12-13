@@ -365,9 +365,9 @@ draw_room_anim_fg (ALLEGRO_BITMAP *bitmap, struct anim *a)
   draw_room_fg (bitmap, &ptl, f);
   draw_room_fg (bitmap, &ptr, f);
 
-  if (! a->xframe) return;
+  if (! a->xf.b) return;
 
-  struct frame xf; xframe_frame (a, &xf);
+  struct frame xf; xframe_frame (&a->f, &a->xf, &xf);
   f = &xf;
 
   survey (_bl, posf, f, &bl, &pbl, &npbl);

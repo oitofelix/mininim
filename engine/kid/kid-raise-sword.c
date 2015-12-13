@@ -100,7 +100,7 @@ flow (struct anim *kid)
   kid->j = 20 + kid->i;
 
   select_frame (kid, kid_raise_sword_frameset, kid->i);
-  select_xframe (kid, sword_frameset, kid->j);
+  select_xframe (&kid->xf, sword_frameset, kid->j);
 
   if (kid->i == 0 && kid->wait < 5) kid->fo.dx = 0;
 
