@@ -274,6 +274,7 @@ void
 place_kid (struct anim *kid, int room, int floor, int place)
 {
   struct pos p;
+  enum confg tl, tr;
 
   for (p.room = room; p.room < ROOMS; p.room++)
     for (p.floor = floor; p.floor < FLOORS; p.floor++)
@@ -283,10 +284,10 @@ place_kid (struct anim *kid, int room, int floor, int place)
             || con (&p)->fg == SKELETON_FLOOR
             || con (&p)->fg == DOOR) goto end;
 
-  enum confg tl = crel (&p, 0, -1)->fg;
-  enum confg tr = crel (&p, 0, +1)->fg;
-
  end:
+  tl = crel (&p, 0, -1)->fg;
+  tr = crel (&p, 0, +1)->fg;
+
   if (kid->f.dir == LEFT
       && tl == WALL
       && tl == DOOR) kid->f.dir = RIGHT;
