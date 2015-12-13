@@ -102,7 +102,7 @@ struct anim {
     just_hanged, hang, hang_limit, misstep, uncouch_slowly,
     keep_sword_fast, turn;
 
-  struct pos p;
+  struct pos p, item_pos;
 
   /* depressible floor */
   struct pos df_pos[2];

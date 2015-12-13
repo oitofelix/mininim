@@ -113,16 +113,16 @@ flow (struct anim *kid)
     }
 
     if (drink) {
-      item_pos = pbf;
+      kid->item_pos = pbf;
       place_frame (&kid->f, &kid->f, kid_couch_frameset[0].frame,
-                   &item_pos, (kid->f.dir == LEFT)
+                   &kid->item_pos, (kid->f.dir == LEFT)
                    ? PLACE_WIDTH + 3 : +9, +27);
       kid_couch (kid);
       return false;
     }
 
     if (raise_sword) {
-      item_pos = pbf;
+      kid->item_pos = pbf;
       kid_couch (kid);
       return false;
     }

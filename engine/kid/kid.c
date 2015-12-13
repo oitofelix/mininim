@@ -37,8 +37,6 @@
 
 struct anim kid;
 
-struct pos item_pos = {.room = -1};
-
 int kid_total_lives = KID_INITIAL_TOTAL_LIVES,
   kid_current_lives = KID_INITIAL_CURRENT_LIVES;
 
@@ -110,6 +108,7 @@ load_kid (void)
   kid.fo.b = kid_normal_00;
   kid.fo.dx = kid.fo.dy = +0;
   kid.action = kid_normal;
+  kid.item_pos.room = -1;
   update_depressible_floor (&kid, -4, -10);
 
   place_kid (2, 0, 0);

@@ -148,7 +148,7 @@ flow (struct anim *kid)
   if (kid->i == -1
       && ! kid->collision
       && ! kid->fall
-      && item_pos.room == -1
+      && kid->item_pos.room == -1
       && crel (&pbf, 0, dir)->fg == NO_FLOOR
       && dist_next_place (&kid->f, _tf, pos, 0, true) < 26
       && ! (ctf == DOOR && kid->f.dir == LEFT
@@ -164,12 +164,12 @@ flow (struct anim *kid)
     return false;
   }
 
-  if (kid->i == 2 && item_pos.room != -1
+  if (kid->i == 2 && kid->item_pos.room != -1
       && ! kid->collision && ! kid->fall) {
-    if (is_potion (&item_pos)) kid_drink (kid);
-    else if (is_sword (&item_pos)) kid_raise_sword (kid);
+    if (is_potion (&kid->item_pos)) kid_drink (kid);
+    else if (is_sword (&kid->item_pos)) kid_raise_sword (kid);
     else {
-      item_pos.room = -1; goto no_item;
+      kid->item_pos.room = -1; goto no_item;
     }
     return false;
   }

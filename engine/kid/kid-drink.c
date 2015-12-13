@@ -123,7 +123,7 @@ flow (struct anim *kid)
   else if (kid->i == 10 && kid->reverse) kid->i = 7;
   else {
     kid_normal (kid);
-    item_pos.room = -1;
+    kid->item_pos.room = -1;
     return false;
   }
 
@@ -152,5 +152,5 @@ physics_out (struct anim *kid)
   if (kid->i == 7 && ! kid->reverse) sample_drink = true;
 
   /* consume bottle */
-  if (kid->i == 0) con (&item_pos)->ext.item = NO_ITEM;
+  if (kid->i == 0) con (&kid->item_pos)->ext.item = NO_ITEM;
 }

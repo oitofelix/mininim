@@ -93,7 +93,7 @@ flow (struct anim *kid)
   else if (kid->i < 3) kid->i++;
   else {
     kid_keep_sword (kid);
-    item_pos.room = -1;
+    kid->item_pos.room = -1;
     return false;
   }
 
@@ -127,5 +127,5 @@ physics_out (struct anim *kid)
   }
 
   /* consume sword */
-  if (kid->i == 0) con (&item_pos)->ext.item = NO_ITEM;
+  if (kid->i == 0) con (&kid->item_pos)->ext.item = NO_ITEM;
 }

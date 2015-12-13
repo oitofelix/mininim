@@ -77,8 +77,6 @@ extern struct anim kid; /* kid animation object */
 
 extern int kid_total_lives, kid_current_lives;
 
-extern struct pos item_pos;
-
 extern ALLEGRO_BITMAP *kid_full_life, *kid_empty_life;
 
 extern bool sample_step, sample_hit_ground, sample_hit_wall,
