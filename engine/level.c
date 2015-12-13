@@ -50,6 +50,8 @@ static void compute_level (void);
 struct level *level;
 static bool no_room_drawing = false;
 int room_view = 1;
+struct anim *current_kid;
+int draw_cycle;
 
 void
 play_level (struct level *_level)
@@ -90,6 +92,12 @@ load_level (void)
   load_potion ();
   load_sword ();
   load_kid ();
+
+  create_kid ();
+  create_kid ();
+
+  current_kid = &kid[0];
+  kid[1].shadow = true;
 }
 
 static void
@@ -105,14 +113,24 @@ unload_level (void)
 static void
 compute_level (void)
 {
+  int i;
+  struct anim *k;
+
+  int prev_room = current_kid->f.c.room;
+
   compute_loose_floors ();
-  int prev_room = kid.f.c.room;
-  kid.action (&kid);
-  if (kid.f.c.room != prev_room
-      && kid.f.c.room != 0)  {
-    room_view = kid.f.c.room;
+
+  for (i = 0; i < kid_nmemb; i++) {
+    k = &kid[i];
+    k->action (k);
+  }
+
+  if (current_kid->f.c.room != prev_room
+      && current_kid->f.c.room != 0)  {
+    room_view = current_kid->f.c.room;
     make_links_locally_consistent (prev_room, room_view);
   }
+
   compute_opener_floors ();
   compute_closer_floors ();
   compute_spikes_floors ();
@@ -133,13 +151,12 @@ sample_level (void)
 static void
 draw_level (void)
 {
-  static int i = 0;
   char *text = NULL;
 
   int prev_room = room_view;
 
   if (was_key_pressed (ALLEGRO_KEY_HOME, true))
-    room_view = kid.f.c.room;
+    room_view = current_kid->f.c.room;
   if (was_key_pressed (ALLEGRO_KEY_H, true))
     room_view = level->link[room_view].l;
   if (was_key_pressed (ALLEGRO_KEY_J, true))
@@ -152,6 +169,9 @@ draw_level (void)
   if (was_key_pressed (ALLEGRO_KEY_B, true))
     no_room_drawing = ! no_room_drawing;
 
+  if (was_key_pressed (ALLEGRO_KEY_A, true))
+    current_kid = &kid[(current_kid - kid + 1) % kid_nmemb];
+
   if (room_view == 0) room_view = prev_room;
 
   /* drawing */
@@ -162,7 +182,7 @@ draw_level (void)
 
   for (p.floor = FLOORS; p.floor >= -1; p.floor--)
     for (p.place = -1; p.place < PLACES; p.place++) {
-      draw_fire (screen, &p, i);
+      draw_fire (screen, &p, draw_cycle);
     }
 
   if (! no_room_drawing) draw_room (screen, room_view);
@@ -172,28 +192,18 @@ draw_level (void)
       draw_falling_loose_floor (screen, &p);
     }
 
-  struct coord ml; struct pos pml, pmlr, pmlra;
-  _ml (&kid.f, &ml); pos (&ml, &pml);
-  prel (&pml, &pmlr, 0, +1);
-  prel (&pml, &pmlra, -1, +1);
-
-  draw_xframe (screen, &kid);
-  draw_frame (screen, &kid.f);
-  draw_falling_loose_floor (screen, &pmlr);
-  draw_falling_loose_floor (screen, &pmlra);
-  draw_room_anim_fg (screen, &kid);
-  kid.xframe = NULL;
+  draw_kids (screen);
 
   for (p.floor = FLOORS; p.floor >= -1; p.floor--)
     for (p.place = -1; p.place < PLACES; p.place++) {
-      draw_potion (screen, &p, i);
-      draw_sword (screen, &p, i);
+      draw_potion (screen, &p, draw_cycle);
+      draw_sword (screen, &p, draw_cycle);
     }
 
   unpress_opener_floors ();
   unpress_closer_floors ();
 
-  draw_kid_lives (screen, &kid, i);
+  draw_kid_lives (screen, current_kid, draw_cycle);
 
   if (was_key_pressed (ALLEGRO_KEY_C, true)) {
     int s = room_view;
@@ -247,5 +257,5 @@ draw_level (void)
     al_free (text);
   }
 
-  i++;
+  draw_cycle++;
 }

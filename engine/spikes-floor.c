@@ -204,14 +204,22 @@ should_spikes_raise_for_pos (struct pos *p, struct pos *pk)
 bool
 should_spikes_raise (struct pos *p)
 {
+  int i;
+  struct anim *k;
   struct coord mf, mba;
   struct pos pmf, npmf, pmba, npmba;
 
-  survey (_mf, pos, &kid.f, &mf, &pmf, &npmf);
-  survey (_mba, pos, &kid.f, &mba, &pmba, &npmba);
+  for (i = 0; i < kid_nmemb; i++) {
+    k = &kid[i];
+    survey (_mf, pos, &k->f, &mf, &pmf, &npmf);
+    survey (_mba, pos, &k->f, &mba, &pmba, &npmba);
 
-  return should_spikes_raise_for_pos (p, &pmf)
-    || should_spikes_raise_for_pos (p, &pmba);
+    if (should_spikes_raise_for_pos (p, &pmf)
+        || should_spikes_raise_for_pos (p, &pmba))
+      return true;
+  }
+
+  return false;
 }
 
 void

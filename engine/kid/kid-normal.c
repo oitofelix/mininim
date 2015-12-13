@@ -22,15 +22,16 @@
 #include "kernel/keyboard.h"
 #include "engine/anim.h"
 #include "engine/physics.h"
+#include "engine/level.h"
 #include "engine/door.h"
 #include "engine/potion.h"
 #include "engine/sword.h"
 #include "engine/loose-floor.h"
 #include "kid.h"
 
-static bool flow (struct anim *kid);
-static bool physics_in (struct anim *kid);
-static void physics_out (struct anim *kid);
+static bool flow (struct anim *k);
+static bool physics_in (struct anim *k);
+static void physics_out (struct anim *k);
 
 ALLEGRO_BITMAP *kid_normal_00;
 
@@ -47,120 +48,121 @@ unload_kid_normal (void)
 }
 
 void
-kid_normal (struct anim *kid)
+kid_normal (struct anim *k)
 {
-  kid->oaction = kid->action;
-  kid->action = kid_normal;
-  kid->f.flip = (kid->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
+  k->oaction = k->action;
+  k->action = kid_normal;
+  k->f.flip = (k->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  if (! flow (kid)) return;
-  if (! physics_in (kid)) return;
-  next_frame (&kid->f, &kid->f, &kid->fo);
-  physics_out (kid);
+  if (! flow (k)) return;
+  if (! physics_in (k)) return;
+  next_frame (&k->f, &k->f, &k->fo);
+  physics_out (k);
 }
 
 static bool
-flow (struct anim *kid)
+flow (struct anim *k)
 {
   struct coord nc;
   struct pos np, pbf;
-  survey (_bf, pos, &kid->f, &nc, &pbf, &np);
+  survey (_bf, pos, &k->f, &nc, &pbf, &np);
 
-  bool turn = ((kid->f.dir == RIGHT) && left_key)
-    || ((kid->f.dir == LEFT) && right_key);
-  bool walk = ((kid->f.dir == RIGHT) && right_key && shift_key)
-    || ((kid->f.dir == LEFT) && left_key && shift_key);
-  bool run = (((kid->f.dir == RIGHT) && right_key)
-              || ((kid->f.dir == LEFT) && left_key)) && ! walk;
-  bool jump = ((kid->f.dir == RIGHT) && right_key && up_key)
-    || ((kid->f.dir == LEFT) && left_key && up_key);
+  bool turn = ((k->f.dir == RIGHT) && left_key)
+    || ((k->f.dir == LEFT) && right_key);
+  bool walk = ((k->f.dir == RIGHT) && right_key && shift_key)
+    || ((k->f.dir == LEFT) && left_key && shift_key);
+  bool run = (((k->f.dir == RIGHT) && right_key)
+              || ((k->f.dir == LEFT) && left_key)) && ! walk;
+  bool jump = ((k->f.dir == RIGHT) && right_key && up_key)
+    || ((k->f.dir == LEFT) && left_key && up_key);
   bool couch = down_key;
   bool vjump = up_key;
   bool drink = is_potion (&pbf) && shift_key;
   bool raise_sword = is_sword (&pbf) && shift_key;
   bool take_sword = ctrl_key;
 
-  if (kid->oaction == kid_normal) {
+  if (k->oaction == kid_normal
+      && k == current_kid) {
     if (couch) {
-      kid_couch (kid);
+      kid_couch (k);
       return false;
     }
 
     if (jump) {
-      kid_jump (kid);
+      kid_jump (k);
       return false;
     }
 
     if (turn) {
-      kid_turn (kid);
+      kid_turn (k);
       return false;
     }
 
     if (vjump) {
-      kid_vjump (kid);
+      kid_vjump (k);
       return false;
     }
     if (walk) {
-      kid_walk (kid);
+      kid_walk (k);
       return false;
     }
 
     if (run) {
-      if (dist_collision (&kid->f, false) + 4 < 29)
-        kid_walk (kid);
-      else kid_start_run (kid);
+      if (dist_collision (&k->f, false) + 4 < 29)
+        kid_walk (k);
+      else kid_start_run (k);
       return false;
     }
 
     if (drink) {
-      kid->item_pos = pbf;
-      place_frame (&kid->f, &kid->f, kid_couch_frameset[0].frame,
-                   &kid->item_pos, (kid->f.dir == LEFT)
+      k->item_pos = pbf;
+      place_frame (&k->f, &k->f, kid_couch_frameset[0].frame,
+                   &k->item_pos, (k->f.dir == LEFT)
                    ? PLACE_WIDTH + 3 : +9, +27);
-      kid_couch (kid);
+      kid_couch (k);
       return false;
     }
 
     if (raise_sword) {
-      kid->item_pos = pbf;
-      kid_couch (kid);
+      k->item_pos = pbf;
+      kid_couch (k);
       return false;
     }
 
     if (take_sword) {
-      kid_take_sword (kid);
+      kid_take_sword (k);
       return false;
     }
   }
 
-  kid->fo.b = kid_normal_00;
-  kid->fo.dx = kid->fo.dy = +0;
+  k->fo.b = kid_normal_00;
+  k->fo.dx = k->fo.dy = +0;
 
-  if (kid->f.b == kid_stabilize_frameset[3].frame) kid->fo.dx = +2;
-  if (kid->f.b == kid_walk_frameset[11].frame) kid->fo.dx = -1;
-  if (kid->f.b == kid_jump_frameset[17].frame) kid->fo.dx = -2;
-  if (kid->f.b == kid_couch_frameset[12].frame) kid->fo.dx = -2;
-  if (kid->f.b == kid_vjump_frameset[17].frame) kid->fo.dx = +2;
-  if (kid->f.b == kid_drink_frameset[7].frame) kid->fo.dx = +0;
-  if (kid->f.b == kid_keep_sword_frameset[9].frame) kid->fo.dx = +2;
+  if (k->f.b == kid_stabilize_frameset[3].frame) k->fo.dx = +2;
+  if (k->f.b == kid_walk_frameset[11].frame) k->fo.dx = -1;
+  if (k->f.b == kid_jump_frameset[17].frame) k->fo.dx = -2;
+  if (k->f.b == kid_couch_frameset[12].frame) k->fo.dx = -2;
+  if (k->f.b == kid_vjump_frameset[17].frame) k->fo.dx = +2;
+  if (k->f.b == kid_drink_frameset[7].frame) k->fo.dx = +0;
+  if (k->f.b == kid_keep_sword_frameset[9].frame) k->fo.dx = +2;
 
   return true;
 }
 
 static bool
-physics_in (struct anim *kid)
+physics_in (struct anim *k)
 {
   struct coord nc; struct pos np;
   enum confg cmbo, cbb;
 
   /* inertia */
-  kid->inertia = 0;
+  k->inertia = 0;
 
   /* fall */
-  cmbo = survey (_mbo, pos, &kid->f, &nc, &np, &np)->fg;
-  cbb = survey (_bb, pos, &kid->f, &nc, &np, &np)->fg;
+  cmbo = survey (_mbo, pos, &k->f, &nc, &np, &np)->fg;
+  cbb = survey (_bb, pos, &k->f, &nc, &np, &np)->fg;
   if (cmbo == NO_FLOOR && cbb == NO_FLOOR) {
-    kid_fall (kid);
+    kid_fall (k);
     return false;
   }
 
@@ -168,8 +170,8 @@ physics_in (struct anim *kid)
 }
 
 static void
-physics_out (struct anim *kid)
+physics_out (struct anim *k)
 {
   /* depressible floors */
-  keep_depressible_floor (kid);
+  keep_depressible_floor (k);
 }

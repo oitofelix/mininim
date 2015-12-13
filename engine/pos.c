@@ -355,31 +355,26 @@ nbitmap_coord (struct coord *c, struct coord *nc, int w, int h)
 struct coord *
 nframe (struct frame *f, struct coord *c)
 {
-  if (f->id == &kid) {
-    struct dim d; dim (f, &d);
-    struct coord ml; _m (f, &ml);
-    struct coord mr = ml;
+  struct dim d; dim (f, &d);
+  struct coord ml; _m (f, &ml);
+  struct coord mr = ml;
 
-    ml.x += -3;
-    mr.x += +3;
+  ml.x += -3;
+  mr.x += +3;
 
-    struct coord nml; ncoord (&ml, &nml);
-    struct coord nmr; ncoord (&mr, &nmr);
+  struct coord nml; ncoord (&ml, &nml);
+  struct coord nmr; ncoord (&mr, &nmr);
 
-    if (nml.room == nmr.room
-        || (f->c.room != nml.room
-            && f->c.room != nmr.room)) {
-      *c = (f->dir == LEFT) ? nml : nmr;
-      int dx = (f->dir == LEFT) ? +3 : -3;
-      c->x -= d.w / 2 - dx;
-      c->y -= d.h / 2;
+  if (nml.room == nmr.room
+      || (f->c.room != nml.room
+          && f->c.room != nmr.room)) {
+    *c = (f->dir == LEFT) ? nml : nmr;
+    int dx = (f->dir == LEFT) ? +3 : -3;
+    c->x -= d.w / 2 - dx;
+    c->y -= d.h / 2;
 
-      pos2view (&hang_pos, &hang_pos);
-    } else *c = f->c;
-  } else {
-    struct dim d; dim (f, &d);
-    nbitmap_coord (&f->c, c, d.w, d.h);
-  }
+    pos2view (&hang_pos, &hang_pos);
+  } else *c = f->c;
 
   return c;
 }

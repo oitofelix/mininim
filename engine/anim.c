@@ -22,6 +22,7 @@
 #include "kernel/timer.h"
 #include "kernel/video.h"
 #include "kernel/keyboard.h"
+#include "level.h"
 #include "pos.h"
 #include "physics.h"
 #include "level.h"
@@ -78,15 +79,15 @@ play_anim (void (*draw_callback) (void),
           /* printf ("x = %i, y = %i, floor = %i, place = %i\n", px, py, (py -3) / 63, (px - 15) / 32); */
 
           struct coord bf; struct pos pbf, npbf;
-          survey (_bf, pos, &kid.f, &bf, &pbf, &npbf);
-          if (delete_key) kid.f.c.x--;
-          if (page_down_key) kid.f.c.x++;
-          int dn = dist_next_place (&kid.f, _bf, pos, 0, false);
-          int dp = dist_next_place (&kid.f, _bf, pos, 0, true);
-          int dc = dist_collision (&kid.f, false) + 4;
-          int df = dist_con (&kid.f, _bf, pos, -4, false, NO_FLOOR);
-          int dl = dist_con (&kid.f, _bf, pos, -4, false, LOOSE_FLOOR);
-          int dd = dist_con (&kid.f, _bf, pos, -4, false, CLOSER_FLOOR);
+          survey (_bf, pos, &current_kid->f, &bf, &pbf, &npbf);
+          if (delete_key) current_kid->f.c.x--;
+          if (page_down_key) current_kid->f.c.x++;
+          int dn = dist_next_place (&current_kid->f, _bf, pos, 0, false);
+          int dp = dist_next_place (&current_kid->f, _bf, pos, 0, true);
+          int dc = dist_collision (&current_kid->f, false) + 4;
+          int df = dist_con (&current_kid->f, _bf, pos, -4, false, NO_FLOOR);
+          int dl = dist_con (&current_kid->f, _bf, pos, -4, false, LOOSE_FLOOR);
+          int dd = dist_con (&current_kid->f, _bf, pos, -4, false, CLOSER_FLOOR);
           if (delete_key || page_down_key || enter_key)
             printf ("\
 f = %i, p = %i, dn = %i, dp = %i, dc = %i, df = %i, dl = %i, dd = %i\n",

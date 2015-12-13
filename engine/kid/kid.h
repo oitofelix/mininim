@@ -71,9 +71,15 @@ void unload_kid (void);
 void sample_kid (void);
 void draw_kid_lives (ALLEGRO_BITMAP *bitmap, struct anim *kid, int j);
 void draw_kid (ALLEGRO_BITMAP *bitmap, struct anim *kid, struct pos *p);
+int create_kid (void);
+void draw_kids (ALLEGRO_BITMAP *bitmap);
+void draw_kid_frame (ALLEGRO_BITMAP *bitmap, struct anim *k);
+ALLEGRO_COLOR shadow_palette (ALLEGRO_COLOR c);
+
 
 /* variables */
-extern struct anim kid; /* kid animation object */
+extern struct anim *kid; /* kid animation object */
+extern size_t kid_nmemb;
 
 extern bool sample_step, sample_hit_ground, sample_hit_wall,
   sample_hang_on_fall, sample_drink, sample_glory,

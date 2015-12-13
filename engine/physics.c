@@ -319,7 +319,7 @@ can_hang (struct frame *f, bool reverse)
 
   printf ("dist_coord = %f\n", d);
 
-  if (is_kid_fall (&_f) && d > 19) return false;
+  if (is_kid_fall (&_f) && d > 20) return false;
 
   return true;
 }

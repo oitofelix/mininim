@@ -23,6 +23,8 @@
 #include "kernel/video.h"
 #include "kernel/audio.h"
 #include "kernel/keyboard.h"
+#include "kernel/array.h"
+#include "kernel/random.h"
 #include "engine/anim.h"
 #include "engine/physics.h"
 #include "engine/level.h"
@@ -35,7 +37,8 @@
 #include "engine/sword.h"
 #include "kid.h"
 
-struct anim kid;
+struct anim *kid;
+size_t kid_nmemb;
 
 ALLEGRO_BITMAP *kid_full_life, *kid_empty_life;
 
@@ -97,20 +100,6 @@ load_kid (void)
   take_sword_sample = load_sample (TAKE_SWORD_SAMPLE);
   sword_attack_sample = load_sample (SWORD_ATTACK_SAMPLE);
   action_not_allowed_sample = load_sample (ACTION_NOT_ALLOWED_SAMPLE);
-
-  /* kid himself */
-  kid.f.id = &kid;
-  kid.f.b = kid_normal_00;
-  kid.f.dir = LEFT;
-  kid.fo.b = kid_normal_00;
-  kid.fo.dx = kid.fo.dy = +0;
-  kid.action = kid_normal;
-  kid.item_pos.room = -1;
-  kid.total_lives = KID_INITIAL_TOTAL_LIVES,
-  kid.current_lives = KID_INITIAL_CURRENT_LIVES;
-  update_depressible_floor (&kid, -4, -10);
-
-  place_kid (&kid, 2, 0, 0);
 }
 
 void
@@ -161,6 +150,97 @@ unload_kid (void)
   al_destroy_sample (action_not_allowed_sample);
 }
 
+int
+create_kid (void)
+{
+  struct anim k;
+
+  int i = kid_nmemb;
+
+  k.f.b = kid_normal_00;
+  k.f.dir = LEFT;
+  k.fo.b = kid_normal_00;
+  k.fo.dx = k.fo.dy = +0;
+  k.action = kid_normal;
+  k.item_pos.room = -1;
+  k.total_lives = KID_INITIAL_TOTAL_LIVES,
+  k.current_lives = KID_INITIAL_CURRENT_LIVES;
+  k.misstep = k.hang_limit = k.uncouch_slowly = false;
+  k.inertia = 0;
+  k.shadow = false;
+
+  place_kid (&k, 1, 0, 0);
+  update_depressible_floor (&k, -4, -10);
+
+  kid = add_to_array (&k, 1, kid, &kid_nmemb, i, sizeof (k));
+
+  kid[i].f.id = &kid[i];
+
+  return i;
+}
+
+void
+draw_kids (ALLEGRO_BITMAP *bitmap)
+{
+  struct coord ml; struct pos pml, pmlr, pmlra;
+  struct anim *k;
+
+  size_t i;
+  for (i = 0; i < kid_nmemb; i++) {
+    k = &kid[i];
+
+    _ml (&k->f, &ml); pos (&ml, &pml);
+    prel (&pml, &pmlr, 0, +1);
+    prel (&pml, &pmlra, -1, +1);
+
+    draw_kid_frame (bitmap, k);
+    draw_xframe (bitmap, k);
+
+    draw_falling_loose_floor (bitmap, &pmlr);
+    draw_falling_loose_floor (bitmap, &pmlra);
+    draw_room_anim_fg (bitmap, k);
+    k->xframe = NULL;
+  }
+}
+
+void
+draw_kid_frame (ALLEGRO_BITMAP *bitmap, struct anim *k)
+{
+  ALLEGRO_BITMAP *ob = NULL;
+
+  if (k->shadow) {
+    ob = k->f.b;
+    k->f.b = apply_palette (k->f.b, shadow_palette);
+  }
+
+  draw_frame (bitmap, &k->f);
+
+  if (k->shadow) {
+    al_destroy_bitmap (k->f.b);
+    k->f.b = ob;
+  }
+}
+
+ALLEGRO_COLOR
+shadow_palette (ALLEGRO_COLOR c)
+{
+  unsigned char r, g, b, a;
+  al_unmap_rgba (c, &r, &g, &b, &a);
+  if (a == 0) return c;
+  if (color_eq (c, al_map_rgb (220, 128, 108)))
+    switch (draw_cycle % 3) {
+    case 0: return al_map_rgba (255, 0, 0, 0);
+    case 1: return al_map_rgba (0, 255, 0, 0);
+    case 2: return al_map_rgba (0, 0, 255, 0);
+    }
+
+  switch (prandom (2)) {
+  case 0: return al_map_rgb (prandom (255), 0, 0);
+  case 1: return al_map_rgb (0, prandom (255), 0);
+  case 2: return al_map_rgb (0, 0, prandom (255));
+  }
+  return BLACK;
+}
 
 void
 draw_kid (ALLEGRO_BITMAP *bitmap, struct anim *kid, struct pos *p)

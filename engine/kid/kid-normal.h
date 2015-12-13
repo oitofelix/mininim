@@ -25,7 +25,7 @@
 
 void load_kid_normal (void);
 void unload_kid_normal (void);
-void kid_normal (struct anim *kid);
+void kid_normal (struct anim *k);
 
 ALLEGRO_BITMAP *kid_normal_00;
 
