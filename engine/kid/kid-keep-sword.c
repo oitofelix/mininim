@@ -110,9 +110,9 @@ flow (struct anim *kid)
   else if (kid->i == 8 && kid->wait == 0) kid->i++, kid->wait = 2;
   else if (kid->i == 9 && kid->wait > 0) kid->wait--;
   else {
-    if (keep_sword_fast) {
+    if (kid->keep_sword_fast) {
       kid_normal (kid);
-      keep_sword_fast = false;
+      kid->keep_sword_fast = false;
       return false;
     }
     else {
@@ -123,7 +123,7 @@ flow (struct anim *kid)
     }
   }
 
-  if (keep_sword_fast && kid->i % 2 == 0) kid->i++, kid->wait = 0;
+  if (kid->keep_sword_fast && kid->i % 2 == 0) kid->i++, kid->wait = 0;
 
   kid->j = 24 + kid->i;
 
@@ -133,7 +133,7 @@ flow (struct anim *kid)
 
   if (kid->i == 8 && kid->wait < 1) kid->fo.dx = 0;
   if (kid->i == 9 && kid->wait < 2) kid->fo.dx = 0;
-  if (keep_sword_fast && kid->i % 2)
+  if (kid->keep_sword_fast && kid->i % 2)
     kid->fo.dx += kid_keep_sword_frameset[kid->i - 1].dx;
   if (kid->f.b == kid_sword_normal_08) kid->fo.dx = +8;
 
