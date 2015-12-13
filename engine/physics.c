@@ -31,7 +31,6 @@
 #include "door.h"
 #include "physics.h"
 
-struct pos hang_pos;
 enum confg confg_collision;
 struct pos collision_pos;
 
@@ -280,7 +279,7 @@ is_hangable_pos (struct pos *p, enum dir d)
 }
 
 bool
-can_hang (struct frame *f, bool reverse)
+can_hang (struct frame *f, bool reverse, struct pos *hang_pos)
 {
   struct frame _f = *f;
 
@@ -303,17 +302,17 @@ can_hang (struct frame *f, bool reverse)
   if (! hmf && ! hm && ! hmba)
     return false;
 
-  if (hmf) hang_pos = pmf;
-  if (hm) hang_pos = pm;
-  if (hmba) hang_pos = pmba;
+  if (hmf) *hang_pos = pmf;
+  if (hm) *hang_pos = pm;
+  if (hmba) *hang_pos = pmba;
 
-  pos2view (&hang_pos, &hang_pos);
+  pos2view (hang_pos, hang_pos);
 
   /* for fall */
   struct coord ch;
   int dir = (_f.dir == LEFT) ? 0 : 1;
-  ch.x = PLACE_WIDTH * (hang_pos.place + dir) + 7 + 8 * dir;
-  ch.y = PLACE_HEIGHT * hang_pos.floor - 6;
+  ch.x = PLACE_WIDTH * (hang_pos->place + dir) + 7 + 8 * dir;
+  ch.y = PLACE_HEIGHT * hang_pos->floor - 6;
 
   double d = dist_coord (&tf, &ch);
 
@@ -325,33 +324,33 @@ can_hang (struct frame *f, bool reverse)
 }
 
 struct pos *
-get_hanged_pos (struct frame *f, struct pos *p)
+get_hanged_pos (struct pos *hang_pos, enum dir d, struct pos *p)
 {
-  int dir = (f->dir == LEFT) ? -1 : +1;
-  prel (&hang_pos, p, -1, dir);
+  int dir = (d == LEFT) ? -1 : +1;
+  prel (hang_pos, p, -1, dir);
   pos2view (p, p);
   return p;
 }
 
 enum confg
-get_hanged_con (struct frame *f)
+get_hanged_con (struct pos *hang_pos, enum dir d)
 {
   struct pos p;
-  return con (get_hanged_pos (f, &p))->fg;
+  return con (get_hanged_pos (hang_pos, d, &p))->fg;
 }
 
 bool
-is_hang_pos_critical (struct frame *f)
+is_hang_pos_critical (struct pos *hang_pos)
 {
-  return (con (&hang_pos)->fg == NO_FLOOR);
+  return (con (hang_pos)->fg == NO_FLOOR);
 }
 
 bool
-is_hang_pos_free (struct frame *f)
+is_hang_pos_free (struct pos *hang_pos, enum dir d)
 {
-  int dir = (f->dir == LEFT) ? -1 : +1;
-  enum confg t = crel (&hang_pos, 0, dir)->fg;
-  return ! (t == WALL || (t == DOOR && f->dir == LEFT));
+  int dir = (d == LEFT) ? -1 : +1;
+  enum confg t = crel (hang_pos, 0, dir)->fg;
+  return ! (t == WALL || (t == DOOR && d == LEFT));
 }
 
 

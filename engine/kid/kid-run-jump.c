@@ -125,8 +125,8 @@ flow (struct anim *kid)
   if (hang_front && kid->i >= 6  && kid->i <= 9
       && is_hangable_pos (&pm, kid->f.dir)
       && kid == current_kid) {
-    hang_pos = pm;
-    pos2view (&hang_pos, &hang_pos);
+    kid->hang_pos = pm;
+    pos2view (&kid->hang_pos, &kid->hang_pos);
     kid->hang = true;
     sample_hang_on_fall = true;
     kid_hang (kid);
@@ -138,8 +138,8 @@ flow (struct anim *kid)
   if (kid->i >= 6 && kid->i <= 9
       && hang_back && is_hangable_pos (&ptf, back_dir)
       && kid == current_kid) {
-    hang_pos = ptf;
-    pos2view (&hang_pos, &hang_pos);
+    kid->hang_pos = ptf;
+    pos2view (&kid->hang_pos, &kid->hang_pos);
     kid->hang = true;
     sample_hang_on_fall = true;
     kid_turn (kid);

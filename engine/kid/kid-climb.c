@@ -120,7 +120,7 @@ flow (struct anim *kid)
   }
 
   struct pos hanged_pos;
-  get_hanged_pos (&kid->f, &hanged_pos);
+  get_hanged_pos (&kid->hang_pos, kid->f.dir, &hanged_pos);
 
   if (kid->i == 14) {
     kid_couch (kid);
@@ -130,7 +130,7 @@ flow (struct anim *kid)
   if (kid->i == -1) {
     int dir = (kid->f.dir == LEFT) ? 0 : 1;
     place_frame (&kid->f, &kid->f, kid_climb_frameset[0].frame,
-                 &hang_pos, PLACE_WIDTH * dir + 9, -9);
+                 &kid->hang_pos, PLACE_WIDTH * dir + 9, -9);
   }
 
   if (kid->wait == DOOR_WAIT_LOOK && kid->i < 14) kid->i++;
@@ -184,7 +184,7 @@ physics_out (struct anim *kid)
 
   /* depressible floors */
   clear_depressible_floor (kid);
-  get_hanged_pos (&kid->f, &hanged_pos);
+  get_hanged_pos (&kid->hang_pos, kid->f.dir, &hanged_pos);
   press_depressible_floor (&hanged_pos);
 }
 
@@ -207,7 +207,7 @@ is_kid_successfully_climbing_at_pos (struct frame *f, struct pos *p)
   struct pos np;
   int dir = (f->dir == LEFT) ? +1 : -1;
   return is_kid_successfully_climbing (f)
-    && peq (prel (p, &np, +1, dir), &hang_pos);
+    && peq (prel (p, &np, +1, dir), &kid->hang_pos);
 }
 
 bool

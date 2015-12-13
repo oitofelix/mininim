@@ -117,13 +117,13 @@ flow (struct anim *kid)
 
   int dir = (kid->f.dir == LEFT) ? 0 : 1;
   place_frame (&kid->f, &kid->f, kid_hang_14,
-               &hang_pos, PLACE_WIDTH * dir + 7, -9);
+               &kid->hang_pos, PLACE_WIDTH * dir + 7, -9);
 
   if (kid->i == -1 && kid->oaction != kid_unclimb) {
     kid->fo.b = kid_hang_14;
     kid->fo.dx = +0;
     kid->fo.dy = +0;
-  } else if (is_hang_pos_free (&kid->f)) {
+  } else if (is_hang_pos_free (&kid->hang_pos, kid->f.dir)) {
     kid_hang_free (kid);
     return false;
   } else {
@@ -152,7 +152,7 @@ physics_out (struct anim *kid)
 
   /* depressible floors */
   clear_depressible_floor (kid);
-  get_hanged_pos (&kid->f, &hanged_pos);
+  get_hanged_pos (&kid->hang_pos, kid->f.dir, &hanged_pos);
   press_depressible_floor (&hanged_pos);
 }
 

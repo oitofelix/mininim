@@ -71,7 +71,7 @@ flow (struct anim *kid)
   }
 
   if (kid->i == 14) {
-    get_hanged_pos (&kid->f, &hanged_pos);
+    get_hanged_pos (&kid->hang_pos, kid->f.dir, &hanged_pos);
     place_frame (&kid->f, &kid->f, kid_climb_frameset[13].frame,
                  &hanged_pos, 18, 25);
   }
@@ -111,6 +111,6 @@ physics_out (struct anim *kid)
 
   /* depressible floors */
   clear_depressible_floor (kid);
-  get_hanged_pos (&kid->f, &hanged_pos);
+  get_hanged_pos (&kid->hang_pos, kid->f.dir, &hanged_pos);
   press_depressible_floor (&hanged_pos);
 }

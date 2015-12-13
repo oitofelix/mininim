@@ -168,7 +168,7 @@ physics_in (struct anim *kid)
     kid->fo.dx = 0;
 
   /* hang front */
-  if (kid->i > 2 && can_hang (&kid->f, false)
+  if (kid->i > 2 && can_hang (&kid->f, false, &kid->hang_pos)
       && hang_front && ! kid->hang_limit
       && kid == current_kid) {
     sample_hang_on_fall = true;
@@ -177,7 +177,7 @@ physics_in (struct anim *kid)
   }
 
   /* hang back */
-  if (kid->i > 2 && can_hang (&kid->f, true)
+  if (kid->i > 2 && can_hang (&kid->f, true, &kid->hang_pos)
       && hang_back && ! kid->hang_limit
       && kid == current_kid) {
     sample_hang_on_fall = true;
@@ -202,7 +202,7 @@ physics_in (struct anim *kid)
       kid->f.c.x += (kid->f.dir == LEFT) ? +16 : -16;
 
     survey (_bf, pos, &kid->f, &nc, &pbf, &np);
-    pos2view (&pbf, &pbf);
+    /* pos2view (&pbf, &pbf); */
     kid->fo.b = kid_couch_frameset[0].frame;
     kid->fo.dx = kid->fo.dy = 0;
     kid->f.c.room = pbf.room;

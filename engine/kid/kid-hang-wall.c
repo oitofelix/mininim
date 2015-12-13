@@ -70,7 +70,7 @@ flow (struct anim *kid)
 
   /* hang back */
   if (kid->i == 4 && kid->reverse
-      && hang_back && is_hangable_pos (&hang_pos, back_dir)
+      && hang_back && is_hangable_pos (&kid->hang_pos, back_dir)
       && kid == current_kid) {
     sample_hang_on_fall = true;
     kid_turn (kid);
@@ -78,11 +78,12 @@ flow (struct anim *kid)
   }
 
   if ((! shift_key && (kid->reverse || kid->i > 3))
-      || kid->hang_limit || get_hanged_con (&kid->f) == NO_FLOOR
+      || kid->hang_limit
+      || get_hanged_con (&kid->hang_pos, kid->f.dir) == NO_FLOOR
       || kid != current_kid) {
-    if (con (&hang_pos)->fg == NO_FLOOR) {
+    if (con (&kid->hang_pos)->fg == NO_FLOOR) {
       place_frame (&kid->f, &kid->f, kid_fall_frameset[0].frame,
-                   &hang_pos,
+                   &kid->hang_pos,
                    (kid->f.dir == LEFT) ? PLACE_WIDTH - 12 : +16,
                    (kid->f.dir == LEFT) ? 23 : 27);
       kid_fall (kid);
@@ -90,7 +91,7 @@ flow (struct anim *kid)
       return false;
     }
     place_frame (&kid->f, &kid->f, kid_vjump_frameset[13].frame,
-                 &hang_pos, (kid->f.dir == LEFT)
+                 &kid->hang_pos, (kid->f.dir == LEFT)
                  ? +12 : PLACE_WIDTH + 2, -8);
     kid_vjump (kid);
     kid->hang_limit = false;
@@ -135,7 +136,7 @@ physics_out (struct anim *kid)
 
   /* depressible floors */
   clear_depressible_floor (kid);
-  get_hanged_pos (&kid->f, &hanged_pos);
+  get_hanged_pos (&kid->hang_pos, kid->f.dir, &hanged_pos);
   press_depressible_floor (&hanged_pos);
 
   /* sound */

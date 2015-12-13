@@ -146,10 +146,10 @@ flow (struct anim *kid)
 
   select_frame (kid, kid_vjump_frameset, kid->i);
 
-  if (is_hang_pos_critical (&kid->f)
+  if (is_hang_pos_critical (&kid->hang_pos)
       && kid->oaction == kid_hang_free)
     kid->fo.dx -= (kid->f.dir == LEFT) ? 9 : 13;
-  if (kid->hang && is_hang_pos_critical (&kid->f)
+  if (kid->hang && is_hang_pos_critical (&kid->hang_pos)
       && kid->i == 11) kid->fo.dx = +7;
   if (kid->i == 12 && kid->j++ > 0)
     kid->fo.dx = 0, kid->fo.dy += 2 * kid->j + 1;
@@ -184,19 +184,19 @@ physics_in (struct anim *kid)
   survey (_tf, pos, &kid->f, &nc, &ptf, &np);
   if (kid->i == 0
       && is_hangable_pos (prel (&ptf, &np, 0, dir), kid->f.dir)) {
-    prel (&ptf, &hang_pos, 0, dir);
-    pos2view (&hang_pos, &hang_pos);
-    kid->fo.dx += is_hang_pos_critical (&kid->f) ? -12 : -3;
+    prel (&ptf, &kid->hang_pos, 0, dir);
+    pos2view (&kid->hang_pos, &kid->hang_pos);
+    kid->fo.dx += is_hang_pos_critical (&kid->hang_pos) ? -12 : -3;
     kid->hang = true;
-  } else if (kid->i == 0 && can_hang (&kid->f, false)
-             && ! is_hang_pos_critical (&kid->f)
-             && (kid->f.dir == LEFT || con (&hang_pos)->fg != DOOR)) {
+  } else if (kid->i == 0 && can_hang (&kid->f, false, &kid->hang_pos)
+             && ! is_hang_pos_critical (&kid->hang_pos)
+             && (kid->f.dir == LEFT || con (&kid->hang_pos)->fg != DOOR)) {
     kid->fo.dx -= 4; kid->hang = true;
   }
 
   if (kid->i == 0 && kid->hang)
     place_frame (&kid->f, &kid->f, kid_vjump_frameset[0].frame,
-                 &hang_pos, (kid->f.dir == LEFT) ? +14 : PLACE_WIDTH + 5, +16);
+                 &kid->hang_pos, (kid->f.dir == LEFT) ? +14 : PLACE_WIDTH + 5, +16);
 
   return true;
 }

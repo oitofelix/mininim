@@ -70,7 +70,7 @@ flow (struct anim *kid)
 
     /* hang back */
   if (kid->i >= 7
-      && hang_back && is_hangable_pos (&hang_pos, back_dir)
+      && hang_back && is_hangable_pos (&kid->hang_pos, back_dir)
       && kid == current_kid) {
     sample_hang_on_fall = true;
     kid_turn (kid);
@@ -87,36 +87,37 @@ flow (struct anim *kid)
   }
 
   /* release */
-  if ((! shift_key || kid->hang_limit || get_hanged_con (&kid->f) == NO_FLOOR
+  if ((! shift_key || kid->hang_limit
+       || get_hanged_con (&kid->hang_pos, kid->f.dir) == NO_FLOOR
        || kid != current_kid)
       && (kid->i < 5 || kid->j > -1)) {
     int dir = (kid->f.dir == LEFT) ? -1 : +1;
     kid->hang_limit = false;
-    if (con (&hang_pos)->fg != NO_FLOOR
+    if (con (&kid->hang_pos)->fg != NO_FLOOR
         && kid->i >= 4) {
       place_frame (&kid->f, &kid->f, kid_vjump_frameset[13].frame,
-                   &hang_pos, (kid->f.dir == LEFT) ? +7 : PLACE_WIDTH + 9, -8);
+                   &kid->hang_pos, (kid->f.dir == LEFT) ? +7 : PLACE_WIDTH + 9, -8);
       kid_vjump (kid);
       return false;
     }
-    if (crel (&hang_pos, +0, dir)->fg != NO_FLOOR
+    if (crel (&kid->hang_pos, +0, dir)->fg != NO_FLOOR
         && kid->i <= 4) {
       place_frame (&kid->f, &kid->f, kid_vjump_frameset[13].frame,
-                   &hang_pos, (kid->f.dir == LEFT) ? +7 : PLACE_WIDTH + 5, -8);
+                   &kid->hang_pos, (kid->f.dir == LEFT) ? +7 : PLACE_WIDTH + 5, -8);
       kid_vjump (kid);
       return false;
     }
-    if (con (&hang_pos)->fg == NO_FLOOR
+    if (con (&kid->hang_pos)->fg == NO_FLOOR
         && kid->i >= 4) {
       place_frame (&kid->f, &kid->f, kid_fall_frameset[0].frame,
-                   &hang_pos, (kid->f.dir == LEFT) ? +16 : PLACE_WIDTH - 16, +12);
+                   &kid->hang_pos, (kid->f.dir == LEFT) ? +16 : PLACE_WIDTH - 16, +12);
       kid_fall (kid);
       return false;
     }
-    if (crel (&hang_pos, +0, dir)->fg == NO_FLOOR
+    if (crel (&kid->hang_pos, +0, dir)->fg == NO_FLOOR
         && kid->i <= 4) {
       place_frame (&kid->f, &kid->f, kid_fall_frameset[0].frame,
-                   &hang_pos, (kid->f.dir == LEFT) ? -16 : PLACE_WIDTH + 16, +12);
+                   &kid->hang_pos, (kid->f.dir == LEFT) ? -16 : PLACE_WIDTH + 16, +12);
       kid_fall (kid);
       return false;
     }
@@ -165,6 +166,6 @@ physics_out (struct anim *kid)
 
   /* depressible floors */
   clear_depressible_floor (kid);
-  get_hanged_pos (&kid->f, &hanged_pos);
+  get_hanged_pos (&kid->hang_pos, kid->f.dir, &hanged_pos);
   press_depressible_floor (&hanged_pos);
 }

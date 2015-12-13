@@ -134,7 +134,7 @@ flow (struct anim *kid)
       || kid->oaction == kid_hang_wall) {
     kid->i = 2, kid->hang = true;
     place_frame (&kid->f, &kid->f, kid_turn_frameset[2].frame,
-                 &hang_pos, (kid->f.dir == LEFT)
+                 &kid->hang_pos, (kid->f.dir == LEFT)
                  ? 7 : PLACE_WIDTH, +4);
   }
 

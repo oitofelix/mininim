@@ -24,7 +24,6 @@
 #include "pos.h"
 
 /* variables */
-extern struct pos hang_pos;
 extern enum confg confg_collision;
 extern struct pos collision_pos;
 
@@ -51,11 +50,11 @@ dist_collision (struct frame *f, bool reverse);
 
 bool is_hangable_con (struct pos *p);
 bool is_hangable_pos (struct pos *p, enum dir d);
-bool can_hang (struct frame *f, bool reverse);
-struct pos *get_hanged_pos (struct frame *f, struct pos *p);
-enum confg get_hanged_con (struct frame *f);
-bool is_hang_pos_critical (struct frame *f);
-bool is_hang_pos_free (struct frame *f);
+bool can_hang (struct frame *f, bool reverse, struct pos *hang_pos);
+struct pos *get_hanged_pos (struct pos *hang_pos, enum dir d, struct pos *p);
+enum confg get_hanged_con (struct pos *hang_pos, enum dir d);
+bool is_hang_pos_critical (struct pos *hang_pos);
+bool is_hang_pos_free (struct pos *hang_pos, enum dir d);
 
 
 

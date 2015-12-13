@@ -373,7 +373,7 @@ nframe (struct frame *f, struct coord *c)
     c->x -= d.w / 2 - dx;
     c->y -= d.h / 2;
 
-    pos2view (&hang_pos, &hang_pos);
+    /* pos2view (&hang_pos, &hang_pos); */
   } else *c = f->c;
 
   return c;
