@@ -53,10 +53,12 @@
 /* bitmaps */
 #define KID_FULL_LIFE "dat/kid/objects/full live.png"
 #define KID_EMPTY_LIFE "dat/kid/objects/empty live.png"
+#define KID_SPLASH "dat/kid/objects/splash.png"
 
 /* sounds */
 #define STEP_SAMPLE "dat/digisnd1/running 2.ogg"
 #define HIT_GROUND_SAMPLE "dat/digisnd1/running 1.ogg"
+#define HIT_GROUND_HARM_SAMPLE "dat/digisnd1/loosing a life falling.ogg"
 #define HIT_WALL_SAMPLE "dat/digisnd1/touching a wall.ogg"
 #define HANG_ON_FALL_SAMPLE "dat/digisnd1/normal falling.ogg"
 #define DRINK_SAMPLE "dat/digisnd3/drinking.ogg"
@@ -82,8 +84,8 @@ extern struct anim *kid; /* kid animation object */
 extern size_t kid_nmemb;
 extern struct anim *current_kid;
 
-extern bool sample_step, sample_hit_ground, sample_hit_wall,
-  sample_hang_on_fall, sample_drink, sample_glory,
+extern bool sample_step, sample_hit_ground, sample_hit_ground_harm,
+  sample_hit_wall, sample_hang_on_fall, sample_drink, sample_glory,
   sample_take_sword, sample_sword_attack, sample_action_not_allowed;
 
 #endif	/* FREEPOP_KID_H */

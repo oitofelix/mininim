@@ -213,8 +213,14 @@ physics_in (struct anim *kid)
     if (kid->i >= 8) {
       kid->current_lives--;
       kid->uncouch_slowly = true;
-    } else kid->uncouch_slowly = false;
-    if (kid->i > 3) sample_hit_ground = true;
+      kid->splash = true;
+      sample_hit_ground_harm = true;
+      video_effect.color = RED;
+      start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
+    } else {
+      kid->uncouch_slowly = false;
+      if (kid->i > 3) sample_hit_ground = true;
+    }
     shake_loose_floor_row (&pbf);
     kid_couch (kid);
     return false;

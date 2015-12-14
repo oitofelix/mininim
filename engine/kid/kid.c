@@ -41,20 +41,21 @@ struct anim *kid;
 size_t kid_nmemb;
 struct anim *current_kid;
 
-ALLEGRO_BITMAP *kid_full_life, *kid_empty_life;
+ALLEGRO_BITMAP *kid_full_life, *kid_empty_life, *kid_splash;
 
-ALLEGRO_SAMPLE *step_sample, *hit_ground_sample, *hit_wall_sample,
-  *hang_on_fall_sample, *drink_sample, *glory_sample,
+ALLEGRO_SAMPLE *step_sample, *hit_ground_sample, *hit_ground_harm_sample,
+  *hit_wall_sample, *hang_on_fall_sample, *drink_sample, *glory_sample,
   *take_sword_sample, *sword_attack_sample,
   *action_not_allowed_sample;
 
-bool sample_step, sample_hit_ground, sample_hit_wall,
+bool sample_step, sample_hit_ground, sample_hit_ground_harm, sample_hit_wall,
   sample_hang_on_fall, sample_drink, sample_glory,
   sample_take_sword, sample_sword_attack, sample_action_not_allowed;
 
 static void place_kid (struct anim *kid, int room, int floor, int place);
 static struct coord *kid_life_coord (int i, struct coord *c);
 static int compare_kids (const void *k0, const void *k1);
+static struct coord * splash_coord (struct frame *f, struct coord *c);
 
 void
 load_kid (void)
@@ -91,10 +92,12 @@ load_kid (void)
   /* bitmap */
   kid_full_life = load_bitmap (KID_FULL_LIFE);
   kid_empty_life = load_bitmap (KID_EMPTY_LIFE);
+  kid_splash = load_bitmap (KID_SPLASH);
 
   /* sound */
   step_sample = load_sample (STEP_SAMPLE);
   hit_ground_sample = load_sample (HIT_GROUND_SAMPLE);
+  hit_ground_harm_sample = load_sample (HIT_GROUND_HARM_SAMPLE);
   hit_wall_sample = load_sample (HIT_WALL_SAMPLE);
   hang_on_fall_sample = load_sample (HANG_ON_FALL_SAMPLE);
   drink_sample = load_sample (DRINK_SAMPLE);
@@ -139,10 +142,12 @@ unload_kid (void)
   /* bitmaps */
   al_destroy_bitmap (kid_full_life);
   al_destroy_bitmap (kid_empty_life);
+  al_destroy_bitmap (kid_splash);
 
   /* sounds */
   al_destroy_sample (step_sample);
   al_destroy_sample (hit_ground_sample);
+  al_destroy_sample (hit_ground_harm_sample);
   al_destroy_sample (hit_wall_sample);
   al_destroy_sample (hang_on_fall_sample);
   al_destroy_sample (drink_sample);
@@ -257,6 +262,7 @@ void
 draw_kid_frame (ALLEGRO_BITMAP *bitmap, struct anim *k)
 {
   ALLEGRO_BITMAP *ob = NULL, *obx = NULL;
+  struct coord c;
 
   if (k->shadow) {
     ob = k->f.b;
@@ -267,6 +273,10 @@ draw_kid_frame (ALLEGRO_BITMAP *bitmap, struct anim *k)
 
   draw_frame (bitmap, &k->f);
   draw_xframe (bitmap, &k->f, &k->xf);
+  if (k->splash) {
+    draw_bitmapc (kid_splash, bitmap, splash_coord (&k->f, &c), k->f.flip);
+    k->splash = false;
+  }
 
   if (k->shadow) {
     al_destroy_bitmap (k->f.b);
@@ -376,6 +386,7 @@ sample_kid (void)
 {
   if (sample_step) play_sample (step_sample);
   if (sample_hit_ground) play_sample (hit_ground_sample);
+  if (sample_hit_ground_harm) play_sample (hit_ground_harm_sample);
   if (sample_hit_wall) play_sample (hit_wall_sample);
   if (sample_hang_on_fall) play_sample (hang_on_fall_sample);
   if (sample_drink) play_sample (drink_sample);
@@ -385,9 +396,9 @@ sample_kid (void)
   if (sample_action_not_allowed)
     play_sample (action_not_allowed_sample);
 
-  sample_step = sample_hit_ground = sample_hit_wall =
-    sample_hang_on_fall = sample_drink = sample_glory =
-    sample_take_sword = sample_sword_attack =
+  sample_step = sample_hit_ground = sample_hit_ground_harm =
+    sample_hit_wall = sample_hang_on_fall = sample_drink =
+    sample_glory = sample_take_sword = sample_sword_attack =
     sample_action_not_allowed = false;
 }
 
@@ -416,5 +427,18 @@ kid_life_coord (int i, struct coord *c)
   c->x = 7 * i;
   c->y = 194;
   c->room = room_view;
+  return c;
+}
+
+static struct coord *
+splash_coord (struct frame *f, struct coord *c)
+{
+  int w = al_get_bitmap_width (kid_splash);
+  int h = al_get_bitmap_width (kid_splash);
+  int fw = al_get_bitmap_width (f->b);
+  int fh = al_get_bitmap_width (f->b);
+  c->x = f->c.x + fw / 2 - w / 2;
+  c->y = f->c.y + fh / 2 - h / 2;
+  c->room = f->c.room;
   return c;
 }

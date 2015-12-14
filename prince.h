@@ -56,9 +56,8 @@
 #define KID_CLOTHES_COLOR (al_map_rgb (252, 252, 216))
 #define KID_CLOTHES_COLOR_2 (al_map_rgb (216, 184, 160))
 
-#define KID_SHADOW_CLOTHES_COLOR (al_map_rgb (64, 64 , 64))
-#define KID_SHADOW_CLOTHES_COLOR_2 (al_map_rgb (32, 32, 32))
-
+#define KID_SHADOW_CLOTHES_COLOR (al_map_rgba (64, 64 , 64, 0))
+#define KID_SHADOW_CLOTHES_COLOR_2 (al_map_rgba (32, 32, 32, 0))
 
 #define RRED (al_map_rgb (prandom (255), 0, 0))
 #define RGREEN (al_map_rgb (0, prandom (255), 0))
@@ -176,7 +175,7 @@ struct anim {
     total_lives, current_lives;
   bool reverse, collision, fall, hit_ceiling,
     just_hanged, hang, hang_limit, misstep, uncouch_slowly,
-    keep_sword_fast, turn, shadow, current;
+    keep_sword_fast, turn, shadow, current, splash;
 
   struct pos p, item_pos, hang_pos;
 

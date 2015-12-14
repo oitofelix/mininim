@@ -190,6 +190,9 @@ flow (struct anim *kid)
       || kid != current_kid)
     kid->i++;
 
+  if (kid->i == 1 && kid->fall == true && kid->wait > 0)
+    kid->i = 2;
+
   select_frame (kid, kid_couch_frameset, kid->i);
 
   if (kid->oaction == kid_climb) kid->fo.dx += 7;
