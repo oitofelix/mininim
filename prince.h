@@ -59,6 +59,9 @@
 #define KID_SHADOW_CLOTHES_COLOR (al_map_rgba (64, 64 , 64, 0))
 #define KID_SHADOW_CLOTHES_COLOR_2 (al_map_rgba (32, 32, 32, 0))
 
+#define LIFE_POTION_BUBBLE_COLOR (al_map_rgb (224, 0, 48))
+#define POISON_POTION_BUBBLE_COLOR (al_map_rgb (80, 84, 248))
+
 #define RRED (al_map_rgb (prandom (255), 0, 0))
 #define RGREEN (al_map_rgb (0, prandom (255), 0))
 #define RBLUE (al_map_rgb (0, 0, prandom (255)))
@@ -127,6 +130,8 @@ struct level {
         NO_ITEM,
         SMALL_LIFE_POTION,
         BIG_LIFE_POTION,
+        SMALL_POISON_POTION,
+        BIG_POISON_POTION,
         SWORD,
       } item;
     } ext;
@@ -176,6 +181,8 @@ struct anim {
   bool reverse, collision, fall, hit_ceiling,
     just_hanged, hang, hang_limit, misstep, uncouch_slowly,
     keep_sword_fast, turn, shadow, current, splash;
+
+  enum item item;
 
   struct pos p, item_pos, hang_pos;
 

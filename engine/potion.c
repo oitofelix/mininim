@@ -34,6 +34,7 @@ static struct coord *small_potion_bubble_coord (struct pos *p, struct coord *c);
 static struct coord *big_potion_coord (struct pos *p, struct coord *c);
 static struct coord *big_potion_bubble_coord (struct pos *p, struct coord *c);
 ALLEGRO_COLOR life_palette (ALLEGRO_COLOR c);
+ALLEGRO_COLOR poison_palette (ALLEGRO_COLOR c);
 
 void
 load_potion (void)
@@ -98,23 +99,39 @@ draw_potion (ALLEGRO_BITMAP *bitmap, struct pos *p, int i)
 
   seedp (p);
   enum item item = con (p)->ext.item;
+
   switch (item) {
   case SMALL_LIFE_POTION:
+  case SMALL_POISON_POTION:
     bottle = small_potion;
     small_potion_coord (p, &bottle_coord);
-    bubble_palette = life_palette;
     small_potion_bubble_coord (p, &bubble_coord);
     break;
   case BIG_LIFE_POTION:
+  case BIG_POISON_POTION:
     bottle = big_potion;
     big_potion_coord (p, &bottle_coord);
-    bubble_palette = life_palette;
     big_potion_bubble_coord (p, &bubble_coord);
     break;
   default:
     error (-1, 0, "%s (%i): unknown potion type", __func__, item);
     break;
   }
+
+  switch (item) {
+  case SMALL_LIFE_POTION:
+  case BIG_LIFE_POTION:
+    bubble_palette = life_palette;
+    break;
+  case SMALL_POISON_POTION:
+  case BIG_POISON_POTION:
+    bubble_palette = poison_palette;
+    break;
+  default:
+    error (-1, 0, "%s (%i): unknown potion type", __func__, item);
+    break;
+  }
+
   draw_bitmapc (bottle, bitmap, &bottle_coord,
                 prandom (1) ? ALLEGRO_FLIP_HORIZONTAL : 0);
   bubble = get_bubble_frame (i % 7);
@@ -132,7 +149,9 @@ is_potion (struct pos *p)
 {
   return con (p)->fg == FLOOR
     && (con (p)->ext.item == SMALL_LIFE_POTION
-        || con (p)->ext.item == BIG_LIFE_POTION);
+        || con (p)->ext.item == BIG_LIFE_POTION
+        || con (p)->ext.item == SMALL_POISON_POTION
+        || con (p)->ext.item == BIG_POISON_POTION);
 }
 
 struct coord *
@@ -174,6 +193,13 @@ big_potion_bubble_coord (struct pos *p, struct coord *c)
 ALLEGRO_COLOR
 life_palette (ALLEGRO_COLOR c)
 {
-  if (color_eq (c, WHITE)) return RED;
+  if (color_eq (c, WHITE)) return LIFE_POTION_BUBBLE_COLOR;
+  else return c;
+}
+
+ALLEGRO_COLOR
+poison_palette (ALLEGRO_COLOR c)
+{
+  if (color_eq (c, WHITE)) return POISON_POTION_BUBBLE_COLOR;
   else return c;
 }

@@ -19,6 +19,7 @@
 
 #include <stdio.h>
 #include <error.h>
+#include <string.h>
 #include "prince.h"
 #include "kernel/video.h"
 #include "kernel/audio.h"
@@ -45,12 +46,14 @@ ALLEGRO_BITMAP *kid_full_life, *kid_empty_life, *kid_splash;
 
 ALLEGRO_SAMPLE *step_sample, *hit_ground_sample, *hit_ground_harm_sample,
   *hit_wall_sample, *hang_on_fall_sample, *drink_sample, *glory_sample,
-  *take_sword_sample, *sword_attack_sample,
-  *action_not_allowed_sample;
+  *take_sword_sample, *sword_attack_sample, *harm_sample,
+  *action_not_allowed_sample, *small_life_potion_sample,
+  *big_life_potion_sample;
 
 bool sample_step, sample_hit_ground, sample_hit_ground_harm, sample_hit_wall,
-  sample_hang_on_fall, sample_drink, sample_glory,
-  sample_take_sword, sample_sword_attack, sample_action_not_allowed;
+  sample_hang_on_fall, sample_drink, sample_glory, sample_take_sword,
+  sample_sword_attack, sample_harm, sample_action_not_allowed,
+  sample_small_life_potion, sample_big_life_potion;
 
 static void place_kid (struct anim *kid, int room, int floor, int place);
 static struct coord *kid_life_coord (int i, struct coord *c);
@@ -104,7 +107,10 @@ load_kid (void)
   glory_sample = load_sample (GLORY_SAMPLE);
   take_sword_sample = load_sample (TAKE_SWORD_SAMPLE);
   sword_attack_sample = load_sample (SWORD_ATTACK_SAMPLE);
+  harm_sample = load_sample (HARM_SAMPLE);
   action_not_allowed_sample = load_sample (ACTION_NOT_ALLOWED_SAMPLE);
+  small_life_potion_sample = load_sample (SMALL_LIFE_POTION_SAMPLE);
+  big_life_potion_sample = load_sample (BIG_LIFE_POTION_SAMPLE);
 }
 
 void
@@ -154,7 +160,10 @@ unload_kid (void)
   al_destroy_sample (glory_sample);
   al_destroy_sample (take_sword_sample);
   al_destroy_sample (sword_attack_sample);
+  al_destroy_sample (harm_sample);
   al_destroy_sample (action_not_allowed_sample);
+  al_destroy_sample (small_life_potion_sample);
+  al_destroy_sample (big_life_potion_sample);
 }
 
 int
@@ -164,22 +173,16 @@ create_kid (void)
 
   int i = kid_nmemb;
 
+  memset (&k, 0, sizeof (k));
+
   k.f.b = kid_normal_00;
   k.f.c.room = room_view;
   k.f.dir = LEFT;
   k.fo.b = kid_normal_00;
-  k.fo.dx = k.fo.dy = +0;
   k.action = kid_normal;
   k.item_pos.room = -1;
   k.total_lives = KID_INITIAL_TOTAL_LIVES,
   k.current_lives = KID_INITIAL_CURRENT_LIVES;
-  k.misstep = k.hang_limit = k.uncouch_slowly = false;
-  k.inertia = 0;
-  k.shadow = false;
-  k.xf.b = NULL;
-  k.current = false;
-  k.turn = false;
-  k.keep_sword_fast = false;
 
   place_kid (&k, 1, 0, 0);
   update_depressible_floor (&k, -4, -10);
@@ -393,13 +396,19 @@ sample_kid (void)
   if (sample_glory) play_sample (glory_sample);
   if (sample_take_sword) play_sample (take_sword_sample);
   if (sample_sword_attack) play_sample (sword_attack_sample);
+  if (sample_harm) play_sample (harm_sample);
   if (sample_action_not_allowed)
     play_sample (action_not_allowed_sample);
+  if (sample_small_life_potion)
+    play_sample (small_life_potion_sample);
+  if (sample_big_life_potion)
+    play_sample (big_life_potion_sample);
 
   sample_step = sample_hit_ground = sample_hit_ground_harm =
     sample_hit_wall = sample_hang_on_fall = sample_drink =
     sample_glory = sample_take_sword = sample_sword_attack =
-    sample_action_not_allowed = false;
+    sample_harm = sample_action_not_allowed =
+    sample_small_life_potion = sample_big_life_potion = false;
 }
 
 void

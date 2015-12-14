@@ -65,7 +65,10 @@
 #define GLORY_SAMPLE "dat/midisnd1/guard death 1.ogg"
 #define TAKE_SWORD_SAMPLE "dat/digisnd1/taking out the sword.ogg"
 #define SWORD_ATTACK_SAMPLE "dat/digisnd1/sword moving.ogg"
+#define HARM_SAMPLE "dat/digisnd1/loosing a life from the enemy.ogg"
 #define ACTION_NOT_ALLOWED_SAMPLE "dat/digisnd1/drinking potion.ogg"
+#define SMALL_LIFE_POTION_SAMPLE "dat/midisnd1/potion 2.ogg"
+#define BIG_LIFE_POTION_SAMPLE "dat/midisnd1/potion 1.ogg"
 
 /* functions */
 void load_kid (void);
@@ -86,6 +89,8 @@ extern struct anim *current_kid;
 
 extern bool sample_step, sample_hit_ground, sample_hit_ground_harm,
   sample_hit_wall, sample_hang_on_fall, sample_drink, sample_glory,
-  sample_take_sword, sample_sword_attack, sample_action_not_allowed;
+  sample_take_sword, sample_sword_attack, sample_harm,
+  sample_small_life_potion, sample_big_life_potion,
+  sample_action_not_allowed;
 
 #endif	/* FREEPOP_KID_H */

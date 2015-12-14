@@ -127,6 +127,42 @@ flow (struct anim *kid)
     return false;
   }
 
+  if (kid->i == 14 && kid->wait == 1)
+    switch (kid->item) {
+    case SMALL_LIFE_POTION:
+      if (kid->current_lives < kid->total_lives) {
+        kid->current_lives++;
+        sample_small_life_potion = true;
+        video_effect.color = RED;
+        start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.3));
+      }
+      break;
+    case BIG_LIFE_POTION:
+      if (kid->total_lives < 10) {
+        kid->total_lives++;
+        kid->current_lives = kid->total_lives;
+        sample_big_life_potion = true;
+        video_effect.color = RED;
+        start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.3));
+      }
+      break;
+    case SMALL_POISON_POTION:
+      kid->current_lives--;
+      kid->splash = true;
+      sample_harm = true;
+      video_effect.color = RED;
+      start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
+      break;
+    case BIG_POISON_POTION:
+      kid->current_lives = 0;
+      kid->splash = true;
+      sample_harm = true;
+      video_effect.color = RED;
+      start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
+      break;
+    default: break;
+    }
+
   select_frame (kid, kid_drink_frameset, kid->i);
 
   if (kid->i == 14 && kid->wait < 4) kid->fo.dx = 0;
@@ -152,5 +188,8 @@ physics_out (struct anim *kid)
   if (kid->i == 7 && ! kid->reverse) sample_drink = true;
 
   /* consume bottle */
-  if (kid->i == 0) con (&kid->item_pos)->ext.item = NO_ITEM;
+  if (kid->i == 0) {
+    kid->item = con (&kid->item_pos)->ext.item;
+    con (&kid->item_pos)->ext.item = NO_ITEM;
+  }
 }
