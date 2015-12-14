@@ -49,6 +49,7 @@
 #include "kid-sword-walkb.h"
 #include "kid-sword-defense.h"
 #include "kid-sword-attack.h"
+#include "kid-die.h"
 
 /* bitmaps */
 #define KID_FULL_LIFE "dat/kid/objects/full live.png"
@@ -59,6 +60,7 @@
 #define STEP_SAMPLE "dat/digisnd1/running 2.ogg"
 #define HIT_GROUND_SAMPLE "dat/digisnd1/running 1.ogg"
 #define HIT_GROUND_HARM_SAMPLE "dat/digisnd1/loosing a life falling.ogg"
+#define HIT_GROUND_FATAL_SAMPLE "dat/digisnd1/prince crashing into the floor.ogg"
 #define HIT_WALL_SAMPLE "dat/digisnd1/touching a wall.ogg"
 #define HANG_ON_FALL_SAMPLE "dat/digisnd1/normal falling.ogg"
 #define DRINK_SAMPLE "dat/digisnd3/drinking.ogg"
@@ -69,6 +71,7 @@
 #define ACTION_NOT_ALLOWED_SAMPLE "dat/digisnd1/drinking potion.ogg"
 #define SMALL_LIFE_POTION_SAMPLE "dat/midisnd1/potion 2.ogg"
 #define BIG_LIFE_POTION_SAMPLE "dat/midisnd1/potion 1.ogg"
+#define SCREAM_SAMPLE "dat/digisnd3/falling.ogg"
 
 /* functions */
 void load_kid (void);
@@ -88,9 +91,9 @@ extern size_t kid_nmemb;
 extern struct anim *current_kid;
 
 extern bool sample_step, sample_hit_ground, sample_hit_ground_harm,
-  sample_hit_wall, sample_hang_on_fall, sample_drink, sample_glory,
-  sample_take_sword, sample_sword_attack, sample_harm,
-  sample_small_life_potion, sample_big_life_potion,
-  sample_action_not_allowed;
+  sample_hit_ground_fatal, sample_hit_wall, sample_hang_on_fall,
+  sample_drink, sample_glory, sample_take_sword, sample_sword_attack,
+  sample_harm, sample_small_life_potion, sample_big_life_potion,
+  sample_action_not_allowed, sample_scream;
 
 #endif	/* FREEPOP_KID_H */

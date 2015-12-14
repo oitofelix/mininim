@@ -45,15 +45,16 @@ struct anim *current_kid;
 ALLEGRO_BITMAP *kid_full_life, *kid_empty_life, *kid_splash;
 
 ALLEGRO_SAMPLE *step_sample, *hit_ground_sample, *hit_ground_harm_sample,
-  *hit_wall_sample, *hang_on_fall_sample, *drink_sample, *glory_sample,
-  *take_sword_sample, *sword_attack_sample, *harm_sample,
-  *action_not_allowed_sample, *small_life_potion_sample,
-  *big_life_potion_sample;
+  *hit_ground_fatal_sample, *hit_wall_sample, *hang_on_fall_sample,
+  *drink_sample, *glory_sample, *take_sword_sample, *sword_attack_sample,
+  *harm_sample, *action_not_allowed_sample, *small_life_potion_sample,
+  *big_life_potion_sample, *scream_sample;
 
-bool sample_step, sample_hit_ground, sample_hit_ground_harm, sample_hit_wall,
-  sample_hang_on_fall, sample_drink, sample_glory, sample_take_sword,
-  sample_sword_attack, sample_harm, sample_action_not_allowed,
-  sample_small_life_potion, sample_big_life_potion;
+bool sample_step, sample_hit_ground, sample_hit_ground_harm,
+  sample_hit_ground_fatal, sample_hit_wall, sample_hang_on_fall,
+  sample_drink, sample_glory, sample_take_sword, sample_sword_attack,
+  sample_harm, sample_action_not_allowed, sample_small_life_potion,
+  sample_big_life_potion, sample_scream;
 
 static void place_kid (struct anim *kid, int room, int floor, int place);
 static struct coord *kid_life_coord (int i, struct coord *c);
@@ -91,6 +92,7 @@ load_kid (void)
   load_kid_sword_walkb ();
   load_kid_sword_defense ();
   load_kid_sword_attack ();
+  load_kid_die ();
 
   /* bitmap */
   kid_full_life = load_bitmap (KID_FULL_LIFE);
@@ -101,6 +103,7 @@ load_kid (void)
   step_sample = load_sample (STEP_SAMPLE);
   hit_ground_sample = load_sample (HIT_GROUND_SAMPLE);
   hit_ground_harm_sample = load_sample (HIT_GROUND_HARM_SAMPLE);
+  hit_ground_fatal_sample = load_sample (HIT_GROUND_FATAL_SAMPLE);
   hit_wall_sample = load_sample (HIT_WALL_SAMPLE);
   hang_on_fall_sample = load_sample (HANG_ON_FALL_SAMPLE);
   drink_sample = load_sample (DRINK_SAMPLE);
@@ -111,6 +114,7 @@ load_kid (void)
   action_not_allowed_sample = load_sample (ACTION_NOT_ALLOWED_SAMPLE);
   small_life_potion_sample = load_sample (SMALL_LIFE_POTION_SAMPLE);
   big_life_potion_sample = load_sample (BIG_LIFE_POTION_SAMPLE);
+  scream_sample = load_sample (SCREAM_SAMPLE);
 }
 
 void
@@ -144,6 +148,7 @@ unload_kid (void)
   unload_kid_sword_walkb ();
   unload_kid_sword_defense ();
   unload_kid_sword_attack ();
+  unload_kid_die ();
 
   /* bitmaps */
   al_destroy_bitmap (kid_full_life);
@@ -154,6 +159,7 @@ unload_kid (void)
   al_destroy_sample (step_sample);
   al_destroy_sample (hit_ground_sample);
   al_destroy_sample (hit_ground_harm_sample);
+  al_destroy_sample (hit_ground_fatal_sample);
   al_destroy_sample (hit_wall_sample);
   al_destroy_sample (hang_on_fall_sample);
   al_destroy_sample (drink_sample);
@@ -164,6 +170,7 @@ unload_kid (void)
   al_destroy_sample (action_not_allowed_sample);
   al_destroy_sample (small_life_potion_sample);
   al_destroy_sample (big_life_potion_sample);
+  al_destroy_sample (scream_sample);
 }
 
 int
@@ -390,6 +397,7 @@ sample_kid (void)
   if (sample_step) play_sample (step_sample);
   if (sample_hit_ground) play_sample (hit_ground_sample);
   if (sample_hit_ground_harm) play_sample (hit_ground_harm_sample);
+  if (sample_hit_ground_fatal) play_sample (hit_ground_fatal_sample);
   if (sample_hit_wall) play_sample (hit_wall_sample);
   if (sample_hang_on_fall) play_sample (hang_on_fall_sample);
   if (sample_drink) play_sample (drink_sample);
@@ -403,12 +411,15 @@ sample_kid (void)
     play_sample (small_life_potion_sample);
   if (sample_big_life_potion)
     play_sample (big_life_potion_sample);
+  if (sample_scream)
+    play_sample (scream_sample);
 
   sample_step = sample_hit_ground = sample_hit_ground_harm =
-    sample_hit_wall = sample_hang_on_fall = sample_drink =
-    sample_glory = sample_take_sword = sample_sword_attack =
-    sample_harm = sample_action_not_allowed =
-    sample_small_life_potion = sample_big_life_potion = false;
+    sample_hit_ground_fatal = sample_hit_wall =
+    sample_hang_on_fall = sample_drink = sample_glory =
+    sample_take_sword = sample_sword_attack = sample_harm =
+    sample_action_not_allowed = sample_small_life_potion =
+    sample_big_life_potion = sample_scream = false;
 }
 
 void

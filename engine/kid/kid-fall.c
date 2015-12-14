@@ -210,19 +210,30 @@ physics_in (struct anim *kid)
     kid->f.c.y = PLACE_HEIGHT * pbf.floor + 27;
     kid->f.b = kid_couch_frameset[0].frame;
 
+    shake_loose_floor_row (&pbf);
+
     if (kid->i >= 8) {
-      kid->current_lives--;
-      kid->uncouch_slowly = true;
       kid->splash = true;
-      sample_hit_ground_harm = true;
+      kid->current_lives--;
+
+      if (kid->i >= 10) kid->current_lives = 0;
+
+      if (kid->current_lives <= 0)
+        sample_hit_ground_fatal = true;
+      else {
+        sample_hit_ground_harm = true;
+        kid->uncouch_slowly = true;
+      }
       video_effect.color = RED;
       start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
     } else {
       kid->uncouch_slowly = false;
       if (kid->i > 3) sample_hit_ground = true;
     }
-    shake_loose_floor_row (&pbf);
-    kid_couch (kid);
+
+    if (kid->current_lives <= 0) kid_die (kid);
+    else kid_couch (kid);
+
     return false;
   }
 
@@ -234,6 +245,9 @@ physics_out (struct anim *kid)
 {
   /* depressible floors */
   clear_depressible_floor (kid);
+
+  /* sound */
+  if (kid->i == 10) sample_scream = true;
 }
 
 bool

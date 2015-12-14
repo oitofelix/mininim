@@ -82,6 +82,12 @@ flow (struct anim *k)
   bool take_sword = ctrl_key;
 
   if (k->oaction == kid_normal
+      && k->current_lives <= 0) {
+    kid_die (k);
+    return false;
+  }
+
+  if (k->oaction == kid_normal
       && k == current_kid) {
     if (couch) {
       kid_couch (k);
