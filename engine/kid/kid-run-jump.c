@@ -167,7 +167,7 @@ physics_in (struct anim *kid)
   else kid->inertia = 5;
 
   /* collision */
-  if (is_colliding (&kid->f, &kid->fo, +0, false)) {
+  if (is_colliding (&kid->f, &kid->fo, +0, false, &kid->ci)) {
     if (kid->i < 6) kid_stabilize_collision (kid);
     else kid_couch_collision (kid);
     return false;

@@ -44,7 +44,8 @@ void load_kid_climb (void);
 void unload_kid_climb (void);
 void kid_climb (struct anim *kid);
 bool is_kid_climb (struct frame *f);
-bool is_kid_successfully_climbing_at_pos (struct frame *f, struct pos *p);
+bool is_kid_successfully_climbing_at_pos (struct frame *f, struct pos *hang_pos,
+                                          struct pos *p);
 bool is_kid_successfully_climbing (struct frame *f);
 
 extern ALLEGRO_BITMAP *kid_climb_01, *kid_climb_02, *kid_climb_03,

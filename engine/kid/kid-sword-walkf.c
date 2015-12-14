@@ -104,7 +104,7 @@ physics_in (struct anim *kid)
   enum confg cbf, cmbo, cbb;
 
   /* collision */
-  if (is_colliding (&kid->f, &kid->fo, +PLACE_WIDTH, false)
+  if (is_colliding (&kid->f, &kid->fo, +PLACE_WIDTH, false, &kid->ci)
       && kid->i == 0) {
     /* sample_action_not_allowed = true; */
     kid_sword_normal (kid);

@@ -202,12 +202,13 @@ is_kid_climb (struct frame *f)
 }
 
 bool
-is_kid_successfully_climbing_at_pos (struct frame *f, struct pos *p)
+is_kid_successfully_climbing_at_pos (struct frame *f, struct pos *hang_pos,
+                                     struct pos *p)
 {
   struct pos np;
   int dir = (f->dir == LEFT) ? +1 : -1;
   return is_kid_successfully_climbing (f)
-    && peq (prel (p, &np, +1, dir), &kid->hang_pos);
+    && peq (prel (p, &np, +1, dir), hang_pos);
 }
 
 bool

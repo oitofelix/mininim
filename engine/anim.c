@@ -84,7 +84,7 @@ play_anim (void (*draw_callback) (void),
           if (page_down_key) current_kid->f.c.x++;
           int dn = dist_next_place (&current_kid->f, _bf, pos, 0, false);
           int dp = dist_next_place (&current_kid->f, _bf, pos, 0, true);
-          int dc = dist_collision (&current_kid->f, false) + 4;
+          int dc = dist_collision (&current_kid->f, false, &kid->ci) + 4;
           int df = dist_con (&current_kid->f, _bf, pos, -4, false, NO_FLOOR);
           int dl = dist_con (&current_kid->f, _bf, pos, -4, false, LOOSE_FLOOR);
           int dd = dist_con (&current_kid->f, _bf, pos, -4, false, CLOSER_FLOOR);

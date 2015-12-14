@@ -146,8 +146,8 @@ flow (struct anim *kid)
 
   select_frame (kid, kid_vjump_frameset, kid->i);
 
-  if (is_hang_pos_critical (&kid->hang_pos)
-      && kid->oaction == kid_hang_free)
+  if (kid->oaction == kid_hang_free
+      && is_hang_pos_critical (&kid->hang_pos))
     kid->fo.dx -= (kid->f.dir == LEFT) ? 9 : 13;
   if (kid->hang && is_hang_pos_critical (&kid->hang_pos)
       && kid->i == 11) kid->fo.dx = +7;

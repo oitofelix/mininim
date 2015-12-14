@@ -113,7 +113,7 @@ kid_couch_collision (struct anim *kid)
 {
   kid->action = kid_couch_collision;
   place_frame (&kid->f, &kid->f, kid_couch_frameset[0].frame,
-               &collision_pos, (kid->f.dir == LEFT)
+               &kid->ci.p, (kid->f.dir == LEFT)
                ? +PLACE_WIDTH + 24 : -PLACE_WIDTH + 18, +27);
   kid_couch (kid);
   sample_hit_wall = true;
@@ -207,7 +207,7 @@ physics_in (struct anim *kid)
   enum confg cm;
 
   /* collision */
-  if (is_colliding (&kid->f, &kid->fo, +0, false)) {
+  if (is_colliding (&kid->f, &kid->fo, +0, false, &kid->ci)) {
     kid_stabilize_collision (kid);
     return false;
   }

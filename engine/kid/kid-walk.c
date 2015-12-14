@@ -118,15 +118,15 @@ flow (struct anim *kid)
     kid->i = kid->walk = -1;
   }
 
-  confg_collision = NO_FLOOR;
+  kid->ci.t = NO_FLOOR;
 
-  int dc = dist_collision (&kid->f, false) + 4;
+  int dc = dist_collision (&kid->f, false, &kid->ci) + 4;
   int df = dist_con (&kid->f, _bf, pos, -4, false, NO_FLOOR);
   int dl = dist_con (&kid->f, _bf, pos, -4, false, LOOSE_FLOOR);
   int dd = dist_con (&kid->f, _bf, pos, -4, false, CLOSER_FLOOR);
 
   int dcc = 0;
-  if (confg_collision == DOOR) {
+  if (kid->ci.t == DOOR) {
     dcc = 9;
     dc -= dcc;
   }

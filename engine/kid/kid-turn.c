@@ -104,7 +104,7 @@ flow (struct anim *kid)
   bool couch = down_key;
 
   if (kid->i == 3) {
-    int dc = dist_collision (&kid->f, false);
+    int dc = dist_collision (&kid->f, false, &kid->ci);
     int df = dist_con (&kid->f, _bf, pos, -4, false, NO_FLOOR);
 
     if (kid->hang) kid_hang (kid);

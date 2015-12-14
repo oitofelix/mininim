@@ -164,7 +164,7 @@ physics_in (struct anim *kid)
   printf ("inertia: %i\n", kid->inertia);
 
   /* collision */
-  if (is_colliding (&kid->f, &kid->fo, +0, false))
+  if (is_colliding (&kid->f, &kid->fo, +0, false, &kid->ci))
     kid->fo.dx = 0;
 
   /* hang front */
@@ -198,7 +198,7 @@ physics_in (struct anim *kid)
       && npmbo.floor != npmbo_nf.floor) {
     kid->inertia = 0;
 
-    if (is_colliding (&kid->f, &kid->fo, +16, false))
+    if (is_colliding (&kid->f, &kid->fo, +16, false, &kid->ci))
       kid->f.c.x += (kid->f.dir == LEFT) ? +16 : -16;
 
     survey (_bf, pos, &kid->f, &nc, &pbf, &np);

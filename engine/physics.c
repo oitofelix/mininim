@@ -19,6 +19,7 @@
 
 #include <stdio.h>
 #include <error.h>
+#include "prince.h"
 #include "kernel/random.h"
 #include "level.h"
 #include "kid/kid.h"
@@ -30,9 +31,6 @@
 #include "pos.h"
 #include "door.h"
 #include "physics.h"
-
-enum confg confg_collision;
-struct pos collision_pos;
 
 struct con *
 con (struct pos *p)
@@ -113,7 +111,8 @@ dist_next_place (struct frame *f, coord_f cf, pos_f pf,
 }
 
 bool
-is_colliding (struct frame *f, struct frame_offset *fo, int dx, bool reverse)
+is_colliding (struct frame *f, struct frame_offset *fo, int dx,
+              bool reverse, struct collision_info *ci)
 {
   struct coord nc, tf; struct pos np, ptf, _ptf, p, pl;
 
@@ -141,7 +140,7 @@ is_colliding (struct frame *f, struct frame_offset *fo, int dx, bool reverse)
     for (p = _ptf; p.place >= ptf.place; prel (&p, &p, +0, -1))
       if (con (&p)->fg == WALL) {
         wall_collision = true;
-        collision_pos = p;
+        ci->p = p;
         break;
       }
 
@@ -149,7 +148,7 @@ is_colliding (struct frame *f, struct frame_offset *fo, int dx, bool reverse)
     for (p = _ptf; p.place <= ptf.place; prel (&p, &p, +0, +1)) {
       if (con (&p)->fg == WALL) {
         wall_collision = true;
-        collision_pos = p;
+        ci->p = p;
         break;
       }
     }
@@ -161,7 +160,7 @@ is_colliding (struct frame *f, struct frame_offset *fo, int dx, bool reverse)
       if (con (&p)->fg == DOOR
           && tf.y <= door_grid_tip_y (&p) - 10) {
         door_collision = true;
-        collision_pos = p;
+        ci->p = p;
         break;
       }
 
@@ -171,16 +170,16 @@ is_colliding (struct frame *f, struct frame_offset *fo, int dx, bool reverse)
       if (con (&pl)->fg == DOOR
           && tf.y <= door_grid_tip_y (&pl) - 10) {
         door_collision = true;
-        collision_pos = p;
+        ci->p = p;
         break;
       }
     }
 
-  confg_collision = NO_FLOOR;
-  if (wall_collision) confg_collision = WALL;
-  if (door_collision) confg_collision = DOOR;
+  ci->t = NO_FLOOR;
+  if (wall_collision) ci->t = WALL;
+  if (door_collision) ci->t = DOOR;
 
-  pos2view (&collision_pos, &collision_pos);
+  pos2view (&ci->p, &ci->p);
 
   /* if (door_collision) printf ("DOOR COLLISION!\n"); */
   /* if (wall_collision) printf ("WALL COLLISION!\n"); */
@@ -206,7 +205,8 @@ is_on_con (struct frame *f, coord_f cf, pos_f pf,
 }
 
 int
-dist_collision (struct frame *f, bool reverse)
+dist_collision (struct frame *f, bool reverse,
+                struct collision_info *ci)
 {
   int i = 0, dx = +1;
   struct frame _f = *f;
@@ -219,14 +219,14 @@ dist_collision (struct frame *f, bool reverse)
 
   int dir = (_f.dir == LEFT) ? -1 : +1;
 
-  if (! is_colliding (&_f, &_fo, dx, reverse))
-    while (! is_colliding (&_f, &_fo, dx, reverse)
+  if (! is_colliding (&_f, &_fo, dx, reverse, ci))
+    while (! is_colliding (&_f, &_fo, dx, reverse, ci)
            && i < PLACE_WIDTH + 1) {
       _f.c.x += dir;
       i++;
     }
   else
-    while (is_colliding (&_f, &_fo, dx, reverse)
+    while (is_colliding (&_f, &_fo, dx, reverse, ci)
            && -i < PLACE_WIDTH + 1) {
       _f.c.x -= dir;
       i--;

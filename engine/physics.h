@@ -23,10 +23,6 @@
 #include "prince.h"
 #include "pos.h"
 
-/* variables */
-extern enum confg confg_collision;
-extern struct pos collision_pos;
-
 /* functions */
 struct con *con (struct pos *p);
 struct con *crel (struct pos *p, int floor, int place);
@@ -42,9 +38,11 @@ bool is_on_con (struct frame *f, coord_f cf, pos_f pf,
 int dist_con (struct frame *f, coord_f cf, pos_f pf,
               int margin, bool reverse, enum confg t);
 bool
-is_colliding (struct frame *f, struct frame_offset *fo, int dx, bool reverse);
+is_colliding (struct frame *f, struct frame_offset *fo, int dx,
+              bool reverse, struct collision_info *ci);
 int
-dist_collision (struct frame *f, bool reverse);
+dist_collision (struct frame *f, bool reverse,
+                struct collision_info *ci);
 
 
 

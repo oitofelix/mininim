@@ -75,43 +75,6 @@ enum dir {
   LEFT, RIGHT, ABOVE, BELOW
 };
 
-/* avoid "'struct' declared inside parameter list" error for the
-   ACTION definition */
-struct anim *_action;
-typedef void (*ACTION) (struct anim *a);
-
-struct anim {
-  struct frame {
-    void *id;
-    struct coord c;
-    ALLEGRO_BITMAP *b;
-    enum dir dir;
-    int flip;
-  } f;
-
-  struct frame_offset {
-    ALLEGRO_BITMAP *b;
-    int dx, dy;
-  } fo;
-
-  struct frame_offset xf;
-
-  ACTION oaction;
-  ACTION action;
-  ACTION hang_caller;
-  int i, j, wait, repeat, cinertia, inertia, walk,
-    total_lives, current_lives;
-  bool reverse, collision, fall, hit_ceiling,
-    just_hanged, hang, hang_limit, misstep, uncouch_slowly,
-    keep_sword_fast, turn, shadow;
-
-  struct pos p, item_pos, hang_pos;
-
-  /* depressible floor */
-  struct pos df_pos[2];
-  struct pos df_posb[2];
-};
-
 struct level {
   enum {
     DUNGEON, PALACE,
@@ -159,6 +122,48 @@ struct level {
     struct pos p;
     bool next;
   } event[EVENTS];
+};
+
+/* avoid "'struct' declared inside parameter list" error for the
+   ACTION definition */
+struct anim *_action;
+typedef void (*ACTION) (struct anim *a);
+
+struct anim {
+  struct frame {
+    void *id;
+    struct coord c;
+    ALLEGRO_BITMAP *b;
+    enum dir dir;
+    int flip;
+  } f;
+
+  struct frame_offset {
+    ALLEGRO_BITMAP *b;
+    int dx, dy;
+  } fo;
+
+  struct frame_offset xf;
+
+  struct collision_info {
+    enum confg t;
+    struct pos p;
+  } ci;
+
+  ACTION oaction;
+  ACTION action;
+  ACTION hang_caller;
+  int i, j, wait, repeat, cinertia, inertia, walk,
+    total_lives, current_lives;
+  bool reverse, collision, fall, hit_ceiling,
+    just_hanged, hang, hang_limit, misstep, uncouch_slowly,
+    keep_sword_fast, turn, shadow;
+
+  struct pos p, item_pos, hang_pos;
+
+  /* depressible floor */
+  struct pos df_pos[2];
+  struct pos df_posb[2];
 };
 
 /* functions */
