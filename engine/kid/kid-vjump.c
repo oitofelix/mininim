@@ -185,7 +185,7 @@ physics_in (struct anim *kid)
   if (kid->i == 0
       && is_hangable_pos (prel (&ptf, &np, 0, dir), kid->f.dir)) {
     prel (&ptf, &kid->hang_pos, 0, dir);
-    pos2view (&kid->hang_pos, &kid->hang_pos);
+    pos2room (&kid->hang_pos, kid->f.c.room, &kid->hang_pos);
     kid->fo.dx += is_hang_pos_critical (&kid->hang_pos) ? -12 : -3;
     kid->hang = true;
   } else if (kid->i == 0 && can_hang (&kid->f, false, &kid->hang_pos)

@@ -159,6 +159,7 @@ create_kid (void)
   int i = kid_nmemb;
 
   k.f.b = kid_normal_00;
+  k.f.c.room = room_view;
   k.f.dir = LEFT;
   k.fo.b = kid_normal_00;
   k.fo.dx = k.fo.dy = +0;

@@ -128,8 +128,8 @@ is_colliding (struct frame *f, struct frame_offset *fo, int dx,
   survey (_tf, pos, &_f, &nc, &_ptf, &np);
   survey (_tf, pos, &nf, &tf, &ptf, &np);
 
-  pos2view (&_ptf, &_ptf);
-  pos2view (&ptf, &ptf);
+  pos2room (&_ptf, _f.c.room, &_ptf);
+  pos2room (&ptf, _f.c.room, &ptf);
 
   bool wall_collision = false;
   bool door_collision = false;
@@ -179,7 +179,7 @@ is_colliding (struct frame *f, struct frame_offset *fo, int dx,
   if (wall_collision) ci->t = WALL;
   if (door_collision) ci->t = DOOR;
 
-  pos2view (&ci->p, &ci->p);
+  pos2room (&ci->p, _f.c.room, &ci->p);
 
   /* if (door_collision) printf ("DOOR COLLISION!\n"); */
   /* if (wall_collision) printf ("WALL COLLISION!\n"); */
@@ -306,7 +306,7 @@ can_hang (struct frame *f, bool reverse, struct pos *hang_pos)
   if (hm) *hang_pos = pm;
   if (hmba) *hang_pos = pmba;
 
-  pos2view (hang_pos, hang_pos);
+  pos2room (hang_pos, _f.c.room, hang_pos);
 
   /* for fall */
   struct coord ch;
@@ -328,7 +328,7 @@ get_hanged_pos (struct pos *hang_pos, enum dir d, struct pos *p)
 {
   int dir = (d == LEFT) ? -1 : +1;
   prel (hang_pos, p, -1, dir);
-  pos2view (p, p);
+  pos2room (p, hang_pos->room, p);
   return p;
 }
 

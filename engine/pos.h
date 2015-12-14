@@ -28,7 +28,7 @@ typedef struct pos *(*pos_f) (struct coord *, struct pos *);
 int roomd (int room, enum dir dir);
 struct coord *ncoord (struct coord *c, struct coord *nc);
 struct pos *npos (struct pos *p, struct pos *np);
-struct pos *pos2view (struct pos *p, struct pos *pv);
+struct pos *pos2room (struct pos *p, int room, struct pos *pv);
 int pos_mod (struct pos *p);
 struct pos *pos_gen (struct coord *c, struct pos *p, int dx, int dy);
 inline struct pos *pos (struct coord *c, struct pos *p);

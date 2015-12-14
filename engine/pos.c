@@ -183,12 +183,12 @@ npos (struct pos *p, struct pos *np)
 /* } */
 
 struct pos *
-pos2view (struct pos *p, struct pos *pv)
+pos2room (struct pos *p, int room, struct pos *pv)
 {
   *pv = *p;
   npos (pv, pv);
 
-  if (pv->room == room_view) return pv;
+  if (pv->room == room) return pv;
 
   struct pos pa, pb, pl, pr;
 
@@ -197,27 +197,27 @@ pos2view (struct pos *p, struct pos *pv)
   int mpb, mpa, mpr, mpl;
   mpb = mpa = mpr = mpl = INT_MAX;
 
-  if (roomd (room_view, BELOW) == pv->room) {
+  if (roomd (room, BELOW) == pv->room) {
     pb.floor += FLOORS;
-    pb.room = room_view;
+    pb.room = room;
     mpb = pos_mod (&pb);
   }
 
-  if (roomd (room_view, ABOVE) == pv->room) {
+  if (roomd (room, ABOVE) == pv->room) {
     pa.floor -= FLOORS;
-    pa.room = room_view;
+    pa.room = room;
     mpa = pos_mod (&pa);
   }
 
-  if (roomd (room_view, RIGHT) == pv->room) {
+  if (roomd (room, RIGHT) == pv->room) {
     pr.place += PLACES;
-    pr.room = room_view;
+    pr.room = room;
     mpr = pos_mod (&pr);
   }
 
-  if (roomd (room_view, LEFT) == pv->room) {
+  if (roomd (room, LEFT) == pv->room) {
     pl.place -= PLACES;
-    pl.room = room_view;
+    pl.room = room;
     mpl = pos_mod (&pl);
   }
 
@@ -393,7 +393,7 @@ place_frame (struct frame *f, struct frame *nf, ALLEGRO_BITMAP *b,
 {
   struct pos pv;
   *nf = *f;
-  pos2view (p, &pv);
+  pos2room (p, f->c.room, &pv);
   nf->b = b;
   nf->c.room = pv.room;
   nf->c.x = PLACE_WIDTH * pv.place + dx;

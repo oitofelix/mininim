@@ -154,7 +154,7 @@ flow (struct anim *kid)
       && ! (ctf == DOOR && kid->f.dir == LEFT
             && door_at_pos (&ptf)->i > DOOR_CLIMB_LIMIT)) {
     prel (&pbf, &kid->hang_pos, +1, (kid->f.dir == LEFT) ? +1 : -1);
-    pos2view (&kid->hang_pos, &kid->hang_pos);
+    pos2room (&kid->hang_pos, kid->f.c.room, &kid->hang_pos);
     kid_unclimb (kid);
     return false;
   }

@@ -141,7 +141,7 @@ flow (struct anim *kid)
       && hang_front && is_hangable_pos (&pm, kid->f.dir)
       && kid == current_kid) {
     kid->hang_pos = pm;
-    pos2view (&kid->hang_pos, &kid->hang_pos);
+    pos2room (&kid->hang_pos, kid->f.c.room, &kid->hang_pos);
     kid->hang = true;
     sample_hang_on_fall = true;
     kid_hang (kid);
@@ -154,7 +154,7 @@ flow (struct anim *kid)
       && hang_back && is_hangable_pos (&ptf, back_dir)
       && kid == current_kid) {
     kid->hang_pos = ptf;
-    pos2view (&kid->hang_pos, &kid->hang_pos);
+    pos2room (&kid->hang_pos, kid->f.c.room, &kid->hang_pos);
     kid->hang = true;
     sample_hang_on_fall = true;
     kid_turn (kid);
