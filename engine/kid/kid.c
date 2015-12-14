@@ -217,8 +217,38 @@ draw_kids (ALLEGRO_BITMAP *bitmap)
 int
 compare_kids (const void *k0, const void *k1)
 {
-  return ccoord (&((struct anim *) k0)->f.c,
-                 &((struct anim *) k1)->f.c);
+  struct coord nc;
+  struct pos np, ptl0, ptl1, ptr0, ptr1,
+    pbl0, pbl1, pbr0, pbr1;
+
+  struct anim *_k0 = (struct anim *) k0;
+  struct anim *_k1 = (struct anim *) k1;
+
+  survey (_br, pos, &_k0->f, &nc, &pbr0, &np);
+  survey (_br, pos, &_k1->f, &nc, &pbr1, &np);
+
+  survey (_bl, pos, &_k0->f, &nc, &pbl0, &np);
+  survey (_bl, pos, &_k1->f, &nc, &pbl1, &np);
+
+  survey (_tl, pos, &_k0->f, &nc, &ptl0, &np);
+  survey (_tl, pos, &_k1->f, &nc, &ptl1, &np);
+
+  survey (_tr, pos, &_k0->f, &nc, &ptr0, &np);
+  survey (_tr, pos, &_k1->f, &nc, &ptr1, &np);
+
+  int cpbr = cpos (&pbr0, &pbr1);
+  if (cpbr) return cpbr;
+
+  int cpbl = cpos (&pbl0, &pbl1);
+  if (cpbl) return cpbl;
+
+  int cptr = cpos (&ptr0, &ptr1);
+  if (cptr) return cptr;
+
+  int cptl = cpos (&ptl0, &ptl1);
+  if (cptl) return cptl;
+
+  return 0;
 }
 
 void
