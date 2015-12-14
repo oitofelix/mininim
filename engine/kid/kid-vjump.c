@@ -161,7 +161,7 @@ flow (struct anim *kid)
 static bool
 physics_in (struct anim *kid)
 {
-  struct coord nc; struct pos np, ptf, ptb;
+  struct coord nc, tf; struct pos np, ptf, ptb;
   enum confg cm, cmf, cmba;
 
   /* fall */
@@ -181,9 +181,11 @@ physics_in (struct anim *kid)
 
   /* hang */
   int dir = (kid->f.dir == LEFT) ? +1 : -1;
-  survey (_tf, pos, &kid->f, &nc, &ptf, &np);
+  survey (_tf, pos, &kid->f, &tf, &ptf, &np);
   if (kid->i == 0
-      && is_hangable_pos (prel (&ptf, &np, 0, dir), kid->f.dir)) {
+      && is_hangable_pos (prel (&ptf, &np, 0, dir), kid->f.dir)
+      && ! (con (&ptf)->fg == DOOR
+            && tf.y <= door_grid_tip_y (&ptf) - 10)) {
     prel (&ptf, &kid->hang_pos, 0, dir);
     pos2room (&kid->hang_pos, kid->f.c.room, &kid->hang_pos);
     kid->fo.dx += is_hang_pos_critical (&kid->hang_pos) ? -12 : -3;
