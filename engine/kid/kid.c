@@ -234,29 +234,29 @@ compare_kids (const void *k0, const void *k1)
   struct anim *_k0 = (struct anim *) k0;
   struct anim *_k1 = (struct anim *) k1;
 
-  survey (_br, pos, &_k0->f, &nc, &pbr0, &np);
-  survey (_br, pos, &_k1->f, &nc, &pbr1, &np);
+  survey (_br, pos, &_k0->f, &nc, &np, &pbr0);
+  survey (_br, pos, &_k1->f, &nc, &np, &pbr1);
 
-  survey (_bl, pos, &_k0->f, &nc, &pbl0, &np);
-  survey (_bl, pos, &_k1->f, &nc, &pbl1, &np);
+  survey (_bl, pos, &_k0->f, &nc, &np, &pbl0);
+  survey (_bl, pos, &_k1->f, &nc, &np, &pbl1);
 
-  survey (_tl, pos, &_k0->f, &nc, &ptl0, &np);
-  survey (_tl, pos, &_k1->f, &nc, &ptl1, &np);
+  survey (_tr, pos, &_k0->f, &nc, &np, &ptr0);
+  survey (_tr, pos, &_k1->f, &nc, &np, &ptr1);
 
-  survey (_tr, pos, &_k0->f, &nc, &ptr0, &np);
-  survey (_tr, pos, &_k1->f, &nc, &ptr1, &np);
+  survey (_tl, pos, &_k0->f, &nc, &np, &ptl0);
+  survey (_tl, pos, &_k1->f, &nc, &np, &ptl1);
 
   int cpbr = cpos (&pbr0, &pbr1);
-  if (cpbr) return cpbr;
+  if (cpbr && pbr0.room == pbr1.room) return cpbr;
 
   int cptr = cpos (&ptr0, &ptr1);
-  if (cptr) return cptr;
+  if (cptr && ptr0.room == ptr1.room) return cptr;
 
   int cpbl = cpos (&pbl0, &pbl1);
-  if (cpbl) return cpbl;
+  if (cpbl && pbl0.room == pbl1.room) return cpbl;
 
   int cptl = cpos (&ptl0, &ptl1);
-  if (cptl) return cptl;
+  if (cptl && ptl0.room == ptl1.room) return cptl;
 
   return 0;
 }
