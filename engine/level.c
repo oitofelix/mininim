@@ -96,6 +96,7 @@ load_level (void)
   create_kid ();
 
   current_kid = &kid[0];
+  current_kid->current = true;
   kid[1].shadow = true;
 }
 
@@ -169,7 +170,9 @@ draw_level (void)
     no_room_drawing = ! no_room_drawing;
 
   if (was_key_pressed (ALLEGRO_KEY_A, true)) {
+    current_kid->current = false;
     current_kid = &kid[(current_kid - kid + 1) % kid_nmemb];
+    current_kid->current = true;
     room_view = current_kid->f.c.room;
   }
 

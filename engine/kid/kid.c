@@ -54,6 +54,7 @@ bool sample_step, sample_hit_ground, sample_hit_wall,
 
 static void place_kid (struct anim *kid, int room, int floor, int place);
 static struct coord *kid_life_coord (int i, struct coord *c);
+static int compare_kids (const void *k0, const void *k1);
 
 void
 load_kid (void)
@@ -171,6 +172,8 @@ create_kid (void)
   k.inertia = 0;
   k.shadow = false;
   k.xf.b = NULL;
+  k.current = false;
+  k.turn = false;
 
   place_kid (&k, 1, 0, 0);
   update_depressible_floor (&k, -4, -10);
@@ -188,9 +191,14 @@ draw_kids (ALLEGRO_BITMAP *bitmap)
   struct coord ml; struct pos pml, pmlr, pmlra;
   struct anim *k;
 
+  qsort (kid, kid_nmemb, sizeof (*k), compare_kids);
+
   size_t i;
   for (i = 0; i < kid_nmemb; i++) {
     k = &kid[i];
+
+    k->f.id = k;
+    if (k->current) current_kid = k;
 
     _ml (&k->f, &ml); pos (&ml, &pml);
     prel (&pml, &pmlr, 0, +1);
@@ -204,6 +212,13 @@ draw_kids (ALLEGRO_BITMAP *bitmap)
     draw_room_anim_fg (bitmap, k);
     k->xf.b = NULL;
   }
+}
+
+int
+compare_kids (const void *k0, const void *k1)
+{
+  return ccoord (&((struct anim *) k0)->f.c,
+                 &((struct anim *) k1)->f.c);
 }
 
 void

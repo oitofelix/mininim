@@ -283,10 +283,26 @@ cpos (struct pos *p0, struct pos *p1)
 
   if (np0.room < np1.room) return -1;
   else if (np0.room > np1.room) return 1;
-  else if (np0.floor < np1.floor) return -1;
-  else if (np0.floor > np1.floor) return 1;
+  else if (np0.floor < np1.floor) return 1;
+  else if (np0.floor > np1.floor) return -1;
   else if (np0.place < np1.place) return -1;
   else if (np0.place > np1.place) return 1;
+  else return 0;
+}
+
+int
+ccoord (struct coord *c0, struct coord *c1)
+{
+  struct coord nc0, nc1;
+  ncoord (c0, &nc0);
+  ncoord (c1, &nc1);
+
+  if (nc0.room < nc1.room) return -1;
+  else if (nc0.room > nc1.room) return 1;
+  else if (nc0.y < nc1.y) return 1;
+  else if (nc0.y > nc1.y) return -1;
+  else if (nc0.x < nc1.x) return -1;
+  else if (nc0.x > nc1.x) return 1;
   else return 0;
 }
 

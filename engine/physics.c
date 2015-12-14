@@ -179,7 +179,8 @@ is_colliding (struct frame *f, struct frame_offset *fo, int dx,
   if (wall_collision) ci->t = WALL;
   if (door_collision) ci->t = DOOR;
 
-  pos2room (&ci->p, _f.c.room, &ci->p);
+  if (wall_collision || door_collision)
+    pos2room (&ci->p, _f.c.room, &ci->p);
 
   /* if (door_collision) printf ("DOOR COLLISION!\n"); */
   /* if (wall_collision) printf ("WALL COLLISION!\n"); */

@@ -35,6 +35,7 @@ inline struct pos *pos (struct coord *c, struct pos *p);
 inline struct pos *posf (struct coord *c, struct pos *p);
 struct pos *prel (struct pos *p, struct pos *pr, int floor, int place);
 int cpos (struct pos *p0, struct pos *p1);
+int ccoord (struct coord *c0, struct coord *c1);
 bool peq (struct pos *p0, struct pos *p1);
 bool peqr (struct pos *p0, struct pos *p1, int floor, int place);
 struct coord *nbitmap_coord (struct coord *c, struct coord *nc, int w, int h);
