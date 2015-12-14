@@ -42,13 +42,25 @@
 
 #define EFFECT_HZ 30
 #define SECS_TO_VCYCLES(x) ((x) * EFFECT_HZ)
-#define TRANSPARENT (al_map_rgba (0, 0, 0, 0))
+
+/* colors */
 #define BLACK (al_map_rgb (0, 0, 0))
 #define RED (al_map_rgb (255, 0, 0))
 #define GREEN (al_map_rgb (0, 255, 0))
 #define BLUE (al_map_rgb (0, 0, 255))
 #define YELLOW (al_map_rgb (255, 255, 0))
 #define WHITE (al_map_rgb (255, 255, 255))
+#define KID_SKIN_COLOR (al_map_rgb (220, 128, 108))
+#define KID_NOSE_COLOR (al_map_rgb (176, 112, 96))
+
+#define RRED (al_map_rgb (prandom (255), 0, 0))
+#define RGREEN (al_map_rgb (0, prandom (255), 0))
+#define RBLUE (al_map_rgb (0, 0, prandom (255)))
+
+#define TRANSPARENT (al_map_rgba (0, 0, 0, 0))
+#define TRED (al_map_rgba (255, 0, 0, 0))
+#define TGREEN (al_map_rgba (0, 255, 0, 0))
+#define TBLUE (al_map_rgba (0, 0, 255, 0))
 
 enum video_mode {
   CGA, EGA, VGA,
