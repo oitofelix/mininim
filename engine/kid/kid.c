@@ -174,6 +174,7 @@ create_kid (void)
   k.xf.b = NULL;
   k.current = false;
   k.turn = false;
+  k.keep_sword_fast = false;
 
   place_kid (&k, 1, 0, 0);
   update_depressible_floor (&k, -4, -10);
@@ -197,6 +198,8 @@ draw_kids (ALLEGRO_BITMAP *bitmap)
   for (i = 0; i < kid_nmemb; i++) {
     k = &kid[i];
 
+    if (k->f.c.room != room_view) continue;
+
     k->f.id = k;
     if (k->current) current_kid = k;
 
@@ -205,7 +208,6 @@ draw_kids (ALLEGRO_BITMAP *bitmap)
     prel (&pml, &pmlra, -1, +1);
 
     draw_kid_frame (bitmap, k);
-    draw_xframe (bitmap, &k->f, &k->xf);
 
     draw_falling_loose_floor (bitmap, &pmlr);
     draw_falling_loose_floor (bitmap, &pmlra);
@@ -254,23 +256,28 @@ compare_kids (const void *k0, const void *k1)
 void
 draw_kid_frame (ALLEGRO_BITMAP *bitmap, struct anim *k)
 {
-  ALLEGRO_BITMAP *ob = NULL;
+  ALLEGRO_BITMAP *ob = NULL, *obx = NULL;
 
   if (k->shadow) {
     ob = k->f.b;
-    k->f.b = apply_palette (k->f.b, shadow_palette);
+    k->f.b = apply_palette (k->f.b, phantom_shadow_palette);
+    obx = k->xf.b;
+    if (obx) k->xf.b = apply_palette (k->xf.b, phantom_shadow_palette);
   }
 
   draw_frame (bitmap, &k->f);
+  draw_xframe (bitmap, &k->f, &k->xf);
 
   if (k->shadow) {
     al_destroy_bitmap (k->f.b);
     k->f.b = ob;
+    if (obx) al_destroy_bitmap (k->xf.b);
+    k->xf.b = obx;
   }
 }
 
 ALLEGRO_COLOR
-shadow_palette (ALLEGRO_COLOR c)
+colorful_shadow_palette (ALLEGRO_COLOR c)
 {
   unsigned char r, g, b, a;
   al_unmap_rgba (c, &r, &g, &b, &a);
@@ -291,6 +298,19 @@ shadow_palette (ALLEGRO_COLOR c)
     return TRANSPARENT;
   }
   return BLACK;
+}
+
+ALLEGRO_COLOR
+phantom_shadow_palette (ALLEGRO_COLOR c)
+{
+  unsigned char r, g, b, a;
+  al_unmap_rgba (c, &r, &g, &b, &a);
+  if (a == 0) return c;
+  if (color_eq (c, KID_CLOTHES_COLOR))
+    return KID_SHADOW_CLOTHES_COLOR;
+  if (color_eq (c, KID_CLOTHES_COLOR_2))
+    return KID_SHADOW_CLOTHES_COLOR_2;
+  return al_map_rgba (r, g, b, 0);
 }
 
 void

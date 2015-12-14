@@ -50,8 +50,15 @@
 #define BLUE (al_map_rgb (0, 0, 255))
 #define YELLOW (al_map_rgb (255, 255, 0))
 #define WHITE (al_map_rgb (255, 255, 255))
+
 #define KID_SKIN_COLOR (al_map_rgb (220, 128, 108))
 #define KID_NOSE_COLOR (al_map_rgb (176, 112, 96))
+#define KID_CLOTHES_COLOR (al_map_rgb (252, 252, 216))
+#define KID_CLOTHES_COLOR_2 (al_map_rgb (216, 184, 160))
+
+#define KID_SHADOW_CLOTHES_COLOR (al_map_rgb (64, 64 , 64))
+#define KID_SHADOW_CLOTHES_COLOR_2 (al_map_rgb (32, 32, 32))
+
 
 #define RRED (al_map_rgb (prandom (255), 0, 0))
 #define RGREEN (al_map_rgb (0, prandom (255), 0))
