@@ -30,7 +30,7 @@
 #include "door.h"
 
 ALLEGRO_BITMAP *door_left, *door_right, *door_pole, *door_top,
-  *door_grid, *door_grid_tip, *door_grid_top;
+  *door_grid, *door_grid_tip;
 
 ALLEGRO_SAMPLE *door_open_sample, *door_close_sample, *door_end_sample,
   *door_abruptly_close_sample;
@@ -50,7 +50,6 @@ load_vdungeon_door (void)
   door_top = load_bitmap (VDUNGEON_DOOR_TOP);
   door_grid = load_bitmap (VDUNGEON_DOOR_GRID);
   door_grid_tip = load_bitmap (VDUNGEON_DOOR_GRID_TIP);
-  door_grid_top = load_bitmap (VDUNGEON_DOOR_GRID_TOP);
 }
 
 void
@@ -62,7 +61,6 @@ unload_door (void)
   al_destroy_bitmap (door_top);
   al_destroy_bitmap (door_grid);
   al_destroy_bitmap (door_grid_tip);
-  al_destroy_bitmap (door_grid_top);
 }
 
 void
@@ -262,16 +260,21 @@ draw_door_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f)
   prel (p, &pa, -1, +0);
   prel (p, &par, -1, +1);
 
-  if (((peq (&ptb, p) || peq (&ptb, &pl)
+  struct pos *hang_pos = &((struct anim *)f->id)->hang_pos;
+
+  if ((((peq (&ptb, p) || peq (&ptb, &pl)
         || peq (&ptb, &pa))
        && (peq (&pmt, p) || peq (&pmt, &pl)
            || peq (&pmt, &pa)))
       || is_kid_successfully_climbing_at_pos
-      (f, p, &((struct anim *)f->id)->hang_pos)
+       (f, hang_pos, p)
       || (is_kid_turn_run (f)
-          && f->dir == LEFT)) {
+          && f->dir == LEFT))
+      && ! is_kid_successfully_climbing_at_pos
+      (f, hang_pos, &pa)) {
     struct door *d = door_at_pos (p);
     draw_door_grid (screen, p, d->i);
+    draw_confg_right (bitmap, &pa, true);
   }
 }
 
@@ -284,10 +287,9 @@ draw_door_grid (ALLEGRO_BITMAP *bitmap, struct pos *p, int i)
   int j;
 
   struct coord c;
-  draw_bitmapc (door_grid_top, bitmap, door_grid_top_coord (p, &c), 0);
   draw_bitmap_regionc (door_grid, bitmap, 0, 7 - r, w, r + 1,
                        door_grid_coord_base (p, &c), 0);
-  for (j = 0; j < q; j++)
+  for (j = 0; j <= q; j++)
     draw_bitmapc (door_grid, bitmap, door_grid_coord (p, &c, j, i), 0);
   draw_bitmapc (door_grid_tip, bitmap, door_grid_tip_coord (p, &c, i), 0);
 }
@@ -296,7 +298,7 @@ struct coord *
 door_grid_coord_base (struct pos *p, struct coord *c)
 {
   c->x = PLACE_WIDTH * (p->place + 1);
-  c->y = PLACE_HEIGHT * p->floor + 2;
+  c->y = PLACE_HEIGHT * p->floor - 6;
   c->room = p->room;
   return c;
 }
@@ -306,7 +308,7 @@ door_grid_coord (struct pos *p, struct coord *c, int j, int i)
 {
   int r = i % 8;
   c->x = PLACE_WIDTH * (p->place + 1);
-  c->y = PLACE_HEIGHT * p->floor + 2 + j * 8 + r + 1;
+  c->y = PLACE_HEIGHT * p->floor - 6 + j * 8 + r + 1;
   c->room = p->room;
   return c;
 }
@@ -318,15 +320,6 @@ door_grid_tip_coord (struct pos *p, struct coord *c, int i)
   int q = i / 8;
   c->x = PLACE_WIDTH * (p->place + 1);
   c->y = PLACE_HEIGHT * p->floor + 2 + q * 8 + r + 1;
-  c->room = p->room;
-  return c;
-}
-
-struct coord *
-door_grid_top_coord (struct pos *p, struct coord *c)
-{
-  c->x = PLACE_WIDTH * (p->place + 1);
-  c->y = PLACE_HEIGHT * p->floor - 6;
   c->room = p->room;
   return c;
 }

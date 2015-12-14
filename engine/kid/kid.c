@@ -239,11 +239,11 @@ compare_kids (const void *k0, const void *k1)
   int cpbr = cpos (&pbr0, &pbr1);
   if (cpbr) return cpbr;
 
-  int cpbl = cpos (&pbl0, &pbl1);
-  if (cpbl) return cpbl;
-
   int cptr = cpos (&ptr0, &ptr1);
   if (cptr) return cptr;
+
+  int cpbl = cpos (&pbl0, &pbl1);
+  if (cpbl) return cpbl;
 
   int cptl = cpos (&ptl0, &ptl1);
   if (cptl) return cptl;

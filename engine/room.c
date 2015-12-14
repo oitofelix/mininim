@@ -292,7 +292,7 @@ void
 draw_confg_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
                struct frame *f)
 {
-  struct pos pr, par;
+  struct pos pr, pa, par;
 
   switch (con (p)->fg) {
   case NO_FLOOR: break;
@@ -312,6 +312,7 @@ draw_confg_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
   }
 
   prel (p, &pr, +0, +1);
+  prel (p, &pa, -1, +0);
   prel (p, &par, -1, +1);
 
   /* right */
