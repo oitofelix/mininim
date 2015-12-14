@@ -230,17 +230,20 @@ shadow_palette (ALLEGRO_COLOR c)
   unsigned char r, g, b, a;
   al_unmap_rgba (c, &r, &g, &b, &a);
   if (a == 0) return c;
-  if (color_eq (c, al_map_rgb (220, 128, 108)))
+  if (color_eq (c, al_map_rgb (220, 128, 108))
+      || color_eq (c, al_map_rgb (176, 112, 96)))
     switch (draw_cycle % 3) {
     case 0: return al_map_rgba (255, 0, 0, 0);
     case 1: return al_map_rgba (0, 255, 0, 0);
     case 2: return al_map_rgba (0, 0, 255, 0);
     }
 
-  switch (prandom (2)) {
+  switch (prandom (9)) {
   case 0: return al_map_rgb (prandom (255), 0, 0);
   case 1: return al_map_rgb (0, prandom (255), 0);
   case 2: return al_map_rgb (0, 0, prandom (255));
+  case 3: case 4: case 5: case 6: case 7: case 8: case 9:
+    return al_map_rgba (0, 0, 0, 0);
   }
   return BLACK;
 }
