@@ -72,6 +72,7 @@
 #define SMALL_LIFE_POTION_SAMPLE "dat/midisnd1/potion 2.ogg"
 #define BIG_LIFE_POTION_SAMPLE "dat/midisnd1/potion 1.ogg"
 #define SCREAM_SAMPLE "dat/digisnd3/falling.ogg"
+#define SPIKED_SAMPLE "dat/digisnd2/something spiked.ogg"
 
 /* functions */
 void load_kid (void);
@@ -80,6 +81,7 @@ void sample_kid (void);
 void draw_kid_lives (ALLEGRO_BITMAP *bitmap, struct anim *kid, int j);
 void draw_kid (ALLEGRO_BITMAP *bitmap, struct anim *kid, struct pos *p);
 int create_kid (void);
+struct anim *get_kid_by_id (int id);
 void draw_kids (ALLEGRO_BITMAP *bitmap);
 void draw_kid_frame (ALLEGRO_BITMAP *bitmap, struct anim *k);
 ALLEGRO_COLOR colorful_shadow_palette (ALLEGRO_COLOR c);
@@ -94,6 +96,6 @@ extern bool sample_step, sample_hit_ground, sample_hit_ground_harm,
   sample_hit_ground_fatal, sample_hit_wall, sample_hang_on_fall,
   sample_drink, sample_glory, sample_take_sword, sample_sword_attack,
   sample_harm, sample_small_life_potion, sample_big_life_potion,
-  sample_action_not_allowed, sample_scream;
+  sample_action_not_allowed, sample_scream, sample_spiked;
 
 #endif	/* FREEPOP_KID_H */

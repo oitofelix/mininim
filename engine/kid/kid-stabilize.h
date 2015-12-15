@@ -33,6 +33,7 @@ void unload_kid_stabilize (void);
 void kid_stabilize (struct anim *kid);
 void kid_stabilize_collision (struct anim *kid);
 void kid_stabilize_back_collision (struct anim *kid);
+bool is_kid_stabilize (struct frame *f);
 
 extern ALLEGRO_BITMAP *kid_stabilize_05, *kid_stabilize_06,
   *kid_stabilize_07, *kid_stabilize_08;

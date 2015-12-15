@@ -105,6 +105,8 @@ register_spikes_floor (struct pos *p)
   s.i = 0;
   s.wait = SPIKES_WAIT;
   s.state = 0;
+  s.inactive = false;
+  s.murdered_kid = -1;
 
   spikes_floor =
     add_to_array (&s, 1, spikes_floor, &spikes_floor_nmemb,
@@ -143,16 +145,22 @@ break_spikes_floor (struct pos *p)
   struct spikes_floor *s = spikes_floor_at_pos (p);
   if (! s) return;
   s->p.room = -1;
+  if (s->murdered_kid != -1)
+    kid_die_suddenly (get_kid_by_id (s->murdered_kid));
   sort_spikes_floors ();
 }
 
 void
 compute_spikes_floors (void)
 {
-  size_t i;
+  size_t i, j;
+  struct coord nc; struct pos pm, np;
 
   for (i = 0; i < spikes_floor_nmemb; i++) {
     struct spikes_floor *s = &spikes_floor[i];
+
+    if (s->inactive) continue;
+
     if (s->p.room == -1) {
       /* remove_spikes_floor (s); i--; */
       continue;
@@ -177,6 +185,31 @@ compute_spikes_floors (void)
       break;
     case 5: s->i++; s->state = 2; break;
     case 6: s->i = 0; s->state = 1; break;
+    }
+
+    /* spike kid */
+    for (j = 0; j < kid_nmemb; j++) {
+      struct anim *k = &kid[j];
+      survey (_m, pos, &k->f, &nc, &pm, &np);
+      if (peq (&pm, &s->p)
+          && (((s->state >= 2 && s->state <= 4)
+               && (is_kid_start_run (&k->f)
+                   || is_kid_run (&k->f)
+                   || is_kid_stop_run (&k->f)
+                   || is_kid_run_jump_running (&k->f)))
+              || (is_kid_couch (&k->f) && kid->fall)
+              || is_kid_jump_landing (&k->f)
+              || is_kid_run_jump_landing (&k->f))) {
+        s->inactive = true;
+        s->murdered_kid = k->id;
+        s->state = 5;
+        k->splash = true;
+        k->current_lives = 0;
+        video_effect.color = RED;
+        start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
+        sample_spiked = true;
+        kid_die_spiked (k);
+      }
     }
   }
 }
@@ -206,15 +239,17 @@ should_spikes_raise (struct pos *p)
 {
   int i;
   struct anim *k;
-  struct coord mf, mba;
-  struct pos pmf, npmf, pmba, npmba;
+  struct coord nc;
+  struct pos np, pmf, pm, pmba;
 
   for (i = 0; i < kid_nmemb; i++) {
     k = &kid[i];
-    survey (_mf, pos, &k->f, &mf, &pmf, &npmf);
-    survey (_mba, pos, &k->f, &mba, &pmba, &npmba);
+    survey (_mf, pos, &k->f, &nc, &pmf, &np);
+    survey (_m, pos, &k->f, &nc, &pm, &np);
+    survey (_mba, pos, &k->f, &nc, &pmba, &np);
 
     if (should_spikes_raise_for_pos (p, &pmf)
+        || should_spikes_raise_for_pos (p, &pm)
         || should_spikes_raise_for_pos (p, &pmba))
       return true;
   }

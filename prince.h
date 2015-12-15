@@ -153,6 +153,8 @@ struct anim *_action;
 typedef void (*ACTION) (struct anim *a);
 
 struct anim {
+  int id;
+
   struct frame {
     void *id;
     struct coord c;

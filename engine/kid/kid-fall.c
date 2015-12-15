@@ -231,7 +231,7 @@ physics_in (struct anim *kid)
       if (kid->i > 3) sample_hit_ground = true;
     }
 
-    if (kid->current_lives <= 0) kid_die (kid);
+    if (kid->current_lives <= 0) kid_die_suddenly (kid);
     else kid_couch (kid);
 
     return false;

@@ -51,6 +51,8 @@
 struct spikes_floor {
   struct pos p;
   int i, wait, state;
+  bool inactive;
+  int murdered_kid;
 };
 
 void load_vdungeon_spikes_floor (void);

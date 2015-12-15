@@ -158,7 +158,7 @@ bool
 is_kid_turn_run (struct frame *f)
 {
   int i;
-  for (i = 0; i < KID_TURN_RUN_FRAMESET_NMEMB; i ++)
+  for (i = 0; i < KID_TURN_RUN_FRAMESET_NMEMB; i++)
     if (f->b == kid_turn_run_frameset[i].frame) return true;
   return false;
 }

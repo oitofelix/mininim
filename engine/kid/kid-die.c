@@ -36,7 +36,7 @@ static bool physics_in (struct anim *kid);
 static void physics_out (struct anim *kid);
 
 ALLEGRO_BITMAP *kid_die_01, *kid_die_02, *kid_die_03, *kid_die_04,
-  *kid_die_05, *kid_die_06;
+  *kid_die_05, *kid_die_06, *kid_die_spiked_00;
 
 static void
 init_kid_die_frameset (void)
@@ -59,6 +59,7 @@ load_kid_die (void)
   kid_die_04 = load_bitmap (KID_DIE_04);
   kid_die_05 = load_bitmap (KID_DIE_05);
   kid_die_06 = load_bitmap (KID_DIE_06);
+  kid_die_spiked_00 = load_bitmap (KID_DIE_SPIKED_00);
 
   /* frameset */
   init_kid_die_frameset ();
@@ -73,6 +74,41 @@ unload_kid_die (void)
   al_destroy_bitmap (kid_die_04);
   al_destroy_bitmap (kid_die_05);
   al_destroy_bitmap (kid_die_06);
+  al_destroy_bitmap (kid_die_spiked_00);
+}
+
+void
+kid_die_spiked (struct anim *kid)
+{
+  kid->oaction = kid->action;
+  kid->action = kid_die_spiked;
+  kid->f.flip = (kid->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
+
+  if (kid->oaction != kid_die_spiked) {
+    struct coord nc; struct pos np, pmt;
+    survey (_mt, pos, &kid->f, &nc, &pmt, &np);
+    place_frame (&kid->f, &kid->f, kid_die_spiked_00,
+                 &pmt, (kid->f.dir == LEFT)
+                 ? +8 : +9, (kid->f.dir == LEFT) ? +32 : +31);
+  }
+}
+
+void
+kid_die_suddenly (struct anim *kid)
+{
+  kid->oaction = kid->action;
+  kid->action = kid_die_suddenly;
+  kid->f.flip = (kid->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
+
+  if (kid->oaction != kid_die_suddenly) {
+    struct coord nc; struct pos np, pmt;
+    survey (_mt, pos, &kid->f, &nc, &pmt, &np);
+    place_frame (&kid->f, &kid->f, kid_die_06,
+                 &pmt, (kid->f.dir == LEFT)
+                 ? +9 : +4, +47);
+  }
+
+  kid->hit_by_loose_floor = false;
 }
 
 void
@@ -81,9 +117,6 @@ kid_die (struct anim *kid)
   kid->oaction = kid->action;
   kid->action = kid_die;
   kid->f.flip = (kid->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
-
-  if (kid->oaction != kid->action) {
-  }
 
   if (! flow (kid)) return;
   if (! physics_in (kid)) return;
@@ -94,16 +127,7 @@ kid_die (struct anim *kid)
 static bool
 flow (struct anim *kid)
 {
-  if (kid->oaction == kid_fall
-      || kid->hit_by_loose_floor) {
-    kid->i = 4; kid->j = 1;
-    struct coord nc; struct pos np, pmt;
-    survey (_mt, pos, &kid->f, &nc, &pmt, &np);
-    place_frame (&kid->f, &kid->f, kid_die_frameset[5].frame,
-                 &pmt, (kid->f.dir == LEFT)
-                 ? +9 : +4, +47);
-  }
-  else if (kid->oaction != kid_die) {
+  if (kid->oaction != kid_die) {
     struct coord nc; struct pos np, pmt;
     survey (_mt, pos, &kid->f, &nc, &pmt, &np);
     place_frame (&kid->f, &kid->f, kid_die_frameset[0].frame,
@@ -117,10 +141,7 @@ flow (struct anim *kid)
   select_frame (kid, kid_die_frameset, kid->i);
 
   if (kid->j == 1) kid->fo.dx = kid->fo.dy = 0;
-  if (kid->i == 5) {
-    kid->j = 1;
-    kid->hit_by_loose_floor = false;
-  }
+  if (kid->i == 5) kid->j = 1;
 
   return true;
 }
@@ -150,5 +171,8 @@ is_kid_dead (struct frame *f)
   int i;
   for (i = 0; i < KID_DIE_FRAMESET_NMEMB; i++)
     if (f->b == kid_die_frameset[i].frame) return true;
+
+  if (f->b == kid_die_spiked_00) return true;
+
   return false;
 }

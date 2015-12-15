@@ -167,3 +167,12 @@ physics_out (struct anim *kid)
   if (kid->i == 5) update_depressible_floor (kid, -16, -19);
   else keep_depressible_floor (kid);
 }
+
+bool
+is_kid_start_run (struct frame *f)
+{
+  int i;
+  for (i = 0; i < KID_START_RUN_FRAMESET_NMEMB; i++)
+    if (f->b == kid_start_run_frameset[i].frame) return true;
+  return false;
+}

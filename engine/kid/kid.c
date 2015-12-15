@@ -48,13 +48,13 @@ ALLEGRO_SAMPLE *step_sample, *hit_ground_sample, *hit_ground_harm_sample,
   *hit_ground_fatal_sample, *hit_wall_sample, *hang_on_fall_sample,
   *drink_sample, *glory_sample, *take_sword_sample, *sword_attack_sample,
   *harm_sample, *action_not_allowed_sample, *small_life_potion_sample,
-  *big_life_potion_sample, *scream_sample;
+  *big_life_potion_sample, *scream_sample, *spiked_sample;
 
 bool sample_step, sample_hit_ground, sample_hit_ground_harm,
   sample_hit_ground_fatal, sample_hit_wall, sample_hang_on_fall,
   sample_drink, sample_glory, sample_take_sword, sample_sword_attack,
   sample_harm, sample_action_not_allowed, sample_small_life_potion,
-  sample_big_life_potion, sample_scream;
+  sample_big_life_potion, sample_scream, sample_spiked;
 
 static void place_kid (struct anim *kid, int room, int floor, int place);
 static struct coord *kid_life_coord (int i, struct coord *c);
@@ -115,6 +115,7 @@ load_kid (void)
   small_life_potion_sample = load_sample (SMALL_LIFE_POTION_SAMPLE);
   big_life_potion_sample = load_sample (BIG_LIFE_POTION_SAMPLE);
   scream_sample = load_sample (SCREAM_SAMPLE);
+  spiked_sample = load_sample (SPIKED_SAMPLE);
 }
 
 void
@@ -171,6 +172,7 @@ unload_kid (void)
   al_destroy_sample (small_life_potion_sample);
   al_destroy_sample (big_life_potion_sample);
   al_destroy_sample (scream_sample);
+  al_destroy_sample (spiked_sample);
 }
 
 int
@@ -182,6 +184,7 @@ create_kid (void)
 
   memset (&k, 0, sizeof (k));
 
+  k.id = i;
   k.f.b = kid_normal_00;
   k.f.c.room = room_view;
   k.f.dir = LEFT;
@@ -199,6 +202,15 @@ create_kid (void)
   kid[i].f.id = &kid[i];
 
   return i;
+}
+
+struct anim *
+get_kid_by_id (int id)
+{
+  int i;
+  for (i = 0; i < kid_nmemb; i++)
+    if (kid[i].id == id) return &kid[i];
+  return NULL;
 }
 
 void
@@ -412,15 +424,15 @@ sample_kid (void)
     play_sample (small_life_potion_sample);
   if (sample_big_life_potion)
     play_sample (big_life_potion_sample);
-  if (sample_scream)
-    play_sample (scream_sample);
+  if (sample_scream) play_sample (scream_sample);
+  if (sample_spiked) play_sample (spiked_sample);
 
   sample_step = sample_hit_ground = sample_hit_ground_harm =
     sample_hit_ground_fatal = sample_hit_wall =
     sample_hang_on_fall = sample_drink = sample_glory =
     sample_take_sword = sample_sword_attack = sample_harm =
     sample_action_not_allowed = sample_small_life_potion =
-    sample_big_life_potion = sample_scream = false;
+    sample_big_life_potion = sample_scream = sample_spiked = false;
 }
 
 void

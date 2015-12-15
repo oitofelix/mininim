@@ -145,3 +145,12 @@ physics_out (struct anim *kid)
   /* sound */
   if (kid->i == 1 || kid->i == 3) sample_step = true;
 }
+
+bool
+is_kid_stop_run (struct frame *f)
+{
+  int i;
+  for (i = 0; i < KID_STOP_RUN_FRAMESET_NMEMB; i++)
+    if (f->b == kid_stop_run_frameset[i].frame) return true;
+  return false;
+}

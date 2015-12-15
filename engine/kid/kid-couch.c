@@ -252,3 +252,12 @@ physics_out (struct anim *kid)
   else if (kid->i == 11) update_depressible_floor (kid, -6, -12);
   else keep_depressible_floor (kid);
 }
+
+bool
+is_kid_couch (struct frame *f)
+{
+  int i;
+  for (i = 0; i < KID_COUCH_FRAMESET_NMEMB; i++)
+    if (f->b == kid_couch_frameset[i].frame) return true;
+  return false;
+}

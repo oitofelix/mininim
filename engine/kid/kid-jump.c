@@ -226,3 +226,12 @@ physics_out (struct anim *kid)
   /* sound */
   if (kid->i == 11 || kid->i == 14) sample_step = true;
 }
+
+bool
+is_kid_jump_landing (struct frame *f)
+{
+  int i;
+  for (i = 11; i < KID_JUMP_FRAMESET_NMEMB; i++)
+    if (f->b == kid_jump_frameset[i].frame) return true;
+  return false;
+}

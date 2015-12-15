@@ -195,3 +195,12 @@ physics_out (struct anim *kid)
     update_depressible_floor (kid, -13, -18);
   else keep_depressible_floor (kid);
 }
+
+bool
+is_kid_stabilize (struct frame *f)
+{
+  int i;
+  for (i = 0; i < KID_STABILIZE_FRAMESET_NMEMB; i++)
+    if (f->b == kid_stabilize_frameset[i].frame) return true;
+  return false;
+}

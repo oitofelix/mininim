@@ -170,3 +170,12 @@ physics_out (struct anim *kid)
   if (kid->f.b == kid_run_jump_frameset[10].frame) sample_step = true;
   if (kid->i == 2 || kid->i == 6) sample_step = true;
 }
+
+bool
+is_kid_run (struct frame *f)
+{
+  int i;
+  for (i = 0; i < KID_RUN_FRAMESET_NMEMB; i++)
+    if (f->b == kid_run_frameset[i].frame) return true;
+  return false;
+}
