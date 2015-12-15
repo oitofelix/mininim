@@ -112,13 +112,13 @@ void
 draw_bitmapc (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
               struct coord *c, int flags)
 {
-  int w = al_get_bitmap_width (from);
-  int h = al_get_bitmap_height (from);
-
   struct coord nc = *c;
 
   if (! cutscene) {
-    nbitmap_coord (c, &nc, w, h);
+    struct frame f;
+    f.b = from;
+    f.c = *c;
+    frame2room (&f, room_view, &nc);
     if (to == screen && nc.room != room_view) return;
   }
 
@@ -133,9 +133,11 @@ draw_bitmap_regionc (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
   struct coord nc = *c;
 
   if (! cutscene) {
-    nbitmap_coord (c, &nc, sw, sh);
-    if (to == screen
-        && nc.room != room_view) return;
+    struct frame f;
+    f.b = from;
+    f.c = *c;
+    frame2room (&f, room_view, &nc);
+    if (to == screen && nc.room != room_view) return;
   }
 
   draw_bitmap_region (from, to, sx, sy, sw, sh, nc.x, nc.y, flags);

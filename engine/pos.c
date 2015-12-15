@@ -44,7 +44,7 @@ roomd (int room, enum dir dir)
 struct coord *
 ncoord (struct coord *c, struct coord *nc)
 {
-  *nc = *c;
+  if (nc != c) *nc = *c;
 
   int room;
 
@@ -66,21 +66,21 @@ ncoord (struct coord *c, struct coord *nc)
     }
   } while (room != nc->room);
 
-  do {
-    room = nc->room;
+  /* do { */
+  /*   room = nc->room; */
 
-    if (nc->y < 11 &&
-        roomd (room_view, BELOW) == nc->room
-        && room_view != nc->room) {
-      nc->y += PLACE_HEIGHT * FLOORS;
-      nc->room = room_view;
-    } else if (nc->y >= PLACE_HEIGHT * FLOORS
-               && roomd (room_view, ABOVE) == nc->room
-               && room_view != nc->room) {
-      nc->y -= PLACE_HEIGHT * FLOORS;
-      nc->room = room_view;
-    }
-  } while (room != nc->room);
+  /*   if (nc->y < 11 && */
+  /*       roomd (room_view, BELOW) == nc->room */
+  /*       && room_view != nc->room) { */
+  /*     nc->y += PLACE_HEIGHT * FLOORS; */
+  /*     nc->room = room_view; */
+  /*   } else if (nc->y >= PLACE_HEIGHT * FLOORS */
+  /*              && roomd (room_view, ABOVE) == nc->room */
+  /*              && room_view != nc->room) { */
+  /*     nc->y -= PLACE_HEIGHT * FLOORS; */
+  /*     nc->room = room_view; */
+  /*   } */
+  /* } while (room != nc->room); */
 
   return nc;
 }
@@ -111,6 +111,31 @@ npos (struct pos *p, struct pos *np)
   } while (room != np->room);
 
   return np;
+}
+
+struct coord *
+nframe (struct frame *f, struct coord *c)
+{
+  struct dim d; dim (f, &d);
+  struct coord ml; _m (f, &ml);
+  struct coord mr = ml;
+
+  ml.x += -3;
+  mr.x += +3;
+
+  struct coord nml; ncoord (&ml, &nml);
+  struct coord nmr; ncoord (&mr, &nmr);
+
+  if (nml.room == nmr.room
+      || (f->c.room != nml.room
+          && f->c.room != nmr.room)) {
+    *c = (f->dir == LEFT) ? nml : nmr;
+    int dx = (f->dir == LEFT) ? +3 : -3;
+    c->x -= d.w / 2 - dx;
+    c->y -= d.h / 2;
+  } else *c = f->c;
+
+  return c;
 }
 
 struct pos *
@@ -217,6 +242,48 @@ coord2room (struct coord *c, int room, struct coord *cv)
   return cv;
 }
 
+struct coord *
+frame2room (struct frame *f, int room, struct coord *cv)
+{
+  *cv = f->c;
+  ncoord (cv, cv);
+
+  if (cv->room == room) return cv;
+
+  struct coord tl = *cv;
+  struct coord tr = *cv;
+  struct coord bl = *cv;
+  struct coord br = *cv;
+
+  int w = al_get_bitmap_width (f->b);
+  int h = al_get_bitmap_height (f->b);
+
+  tr.x = tl.x + w - 1;
+  bl.y = tl.y + h - 1;
+  br.x = tl.x + w - 1;
+  br.y = tl.y + h - 1;
+
+  struct coord ntl; coord2room (&tl, room, &ntl);
+  struct coord ntr; coord2room (&tr, room, &ntr);
+  struct coord nbl; coord2room (&bl, room, &nbl);
+  struct coord nbr; coord2room (&br, room, &nbr);
+
+  if (ntl.room == room) *cv = ntl;
+  else if (ntr.room == room) {
+    *cv = ntr;
+    cv->x = ntr.x - w + 1;
+  } else if (nbl.room == room) {
+    *cv = nbl;
+    cv->y = nbl.y - h + 1;
+  } else if (nbr.room == room) {
+    *cv = nbr;
+    cv->x = nbr.x - w + 1;
+    cv->y = nbr.y - h + 1;
+  }
+
+  return cv;
+}
+
 int
 pos_mod (struct pos *p)
 {
@@ -317,71 +384,6 @@ peqr (struct pos *p0, struct pos *p1, int floor, int place)
 {
   struct pos np;
   return peq (p0, prel (p1, &np, floor, place));
-}
-
-struct coord *
-nbitmap_coord (struct coord *c, struct coord *nc, int w, int h)
-{
-  *nc = *c;
-
-  if (nc->room == room_view) return nc;
-
-  struct coord tl = *nc;
-  struct coord tr = *nc;
-  struct coord bl = *nc;
-  struct coord br = *nc;
-
-  tr.x = tl.x + w - 1;
-  bl.y = tl.y + h - 1;
-  br.x = tl.x + w - 1;
-  br.y = tl.y + h - 1;
-
-  struct coord ntl; ncoord (&tl, &ntl);
-  struct coord ntr; ncoord (&tr, &ntr);
-  struct coord nbl; ncoord (&bl, &nbl);
-  struct coord nbr; ncoord (&br, &nbr);
-
-  if (ntl.room == room_view) *nc = ntl;
-  else if (ntr.room == room_view) {
-    *nc = ntr;
-    nc->x = ntr.x - w + 1;
-  } else if (nbl.room == room_view) {
-    *nc = nbl;
-    nc->y = nbl.y - h + 1;
-  } else if (nbr.room == room_view) {
-    *nc = nbr;
-    nc->x = nbr.x - w + 1;
-    nc->y = nbr.y - h + 1;
-  }
-
-  return nc;
-}
-
-struct coord *
-nframe (struct frame *f, struct coord *c)
-{
-  struct dim d; dim (f, &d);
-  struct coord ml; _m (f, &ml);
-  struct coord mr = ml;
-
-  ml.x += -3;
-  mr.x += +3;
-
-  struct coord nml; ncoord (&ml, &nml);
-  struct coord nmr; ncoord (&mr, &nmr);
-
-  if (nml.room == nmr.room
-      || (f->c.room != nml.room
-          && f->c.room != nmr.room)) {
-    *c = (f->dir == LEFT) ? nml : nmr;
-    int dx = (f->dir == LEFT) ? +3 : -3;
-    c->x -= d.w / 2 - dx;
-    c->y -= d.h / 2;
-
-    /* pos2view (&hang_pos, &hang_pos); */
-  } else *c = f->c;
-
-  return c;
 }
 
 double

@@ -28,8 +28,10 @@ typedef struct pos *(*pos_f) (struct coord *, struct pos *);
 int roomd (int room, enum dir dir);
 struct coord *ncoord (struct coord *c, struct coord *nc);
 struct pos *npos (struct pos *p, struct pos *np);
+struct coord *nframe (struct frame *f, struct coord *c);
 struct pos *pos2room (struct pos *p, int room, struct pos *pv);
-struct coord * coord2room (struct coord *c, int room, struct coord *cv);
+struct coord *coord2room (struct coord *c, int room, struct coord *cv);
+struct coord *frame2room (struct frame *f, int room, struct coord *cv);
 int pos_mod (struct pos *p);
 int coord_mod (struct coord *c);
 struct pos *pos_gen (struct coord *c, struct pos *p, int dx, int dy);
@@ -40,12 +42,10 @@ int cpos (struct pos *p0, struct pos *p1);
 int ccoord (struct coord *c0, struct coord *c1);
 bool peq (struct pos *p0, struct pos *p1);
 bool peqr (struct pos *p0, struct pos *p1, int floor, int place);
-struct coord *nbitmap_coord (struct coord *c, struct coord *nc, int w, int h);
-struct coord *nframe (struct frame *f, struct coord *c);
 double dist_coord (struct coord *a, struct coord *b);
-struct frame *
-place_frame (struct frame *f, struct frame *nf, ALLEGRO_BITMAP *b,
-             struct pos *p, int dx, int dy);
+struct frame *place_frame (struct frame *f, struct frame *nf,
+                           ALLEGRO_BITMAP *b, struct pos *p,
+                           int dx, int dy);
 struct dim *dim (struct frame *f, struct dim *d);
 struct coord *_m (struct frame *f, struct coord *c);
 struct coord *_mt (struct frame *f, struct coord *c);

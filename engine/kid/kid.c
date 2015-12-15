@@ -213,8 +213,8 @@ draw_kids (ALLEGRO_BITMAP *bitmap)
   for (i = 0; i < kid_nmemb; i++) {
     k = &kid[i];
 
-    /* coord2room (&k->f.c, room_view, &c); */
-    /* if (c.room != room_view) continue; */
+    frame2room (&k->f, room_view, &c);
+    if (c.room != room_view) continue;
 
     k->f.id = k;
     if (k->current) current_kid = k;
