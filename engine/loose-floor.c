@@ -292,7 +292,8 @@ compute_loose_floor_fall (struct loose_floor *l)
         && mbo_f.y <= kmt.y
         && mbo_nf.y >= kmt.y
         && ! k->hit_by_loose_floor
-        && ! is_kid_dead (&k->f)) {
+        && ! is_kid_dead (&k->f)
+        && ! is_kid_hang_or_climb (&k->f)) {
       k->hit_by_loose_floor = true;
       k->splash = true;
       k->current_lives--;
@@ -301,7 +302,7 @@ compute_loose_floor_fall (struct loose_floor *l)
       video_effect.color = RED;
       start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
       if (k->current_lives <= 0) kid_die_suddenly (k);
-      else kid_couch (k);
+      else kid_couch_suddenly (k);
     }
   }
 

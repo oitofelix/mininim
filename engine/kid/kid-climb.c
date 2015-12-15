@@ -191,14 +191,10 @@ physics_out (struct anim *kid)
 bool
 is_kid_climb (struct frame *f)
 {
-  return f->b == kid_climb_03
-    || f->b == kid_climb_04
-    || f->b == kid_climb_05
-    || f->b == kid_climb_06
-    || f->b == kid_climb_07
-    || f->b == kid_climb_08
-    || f->b == kid_climb_09
-    || f->b == kid_climb_10;
+  int i;
+  for (i = 0; i < 9; i++)
+    if (f->b == kid_climb_frameset[i].frame) return true;
+  return false;
 }
 
 bool

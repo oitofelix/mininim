@@ -119,6 +119,18 @@ kid_couch_collision (struct anim *kid)
   sample_hit_wall = true;
 }
 
+void
+kid_couch_suddenly (struct anim *kid)
+{
+  kid->action = kid_couch_suddenly;
+  struct coord nc; struct pos np, pmt;
+  survey (_mt, pos, &kid->f, &nc, &pmt, &np);
+  place_frame (&kid->f, &kid->f, kid_couch_frameset[0].frame,
+               &pmt, (kid->f.dir == LEFT)
+               ? 24 : 18, +27);
+  kid_couch (kid);
+}
+
 static bool
 flow (struct anim *kid)
 {
