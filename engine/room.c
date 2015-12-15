@@ -273,7 +273,7 @@ draw_confg_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   /* above */
   switch (con (p)->fg) {
-  case PILLAR:
+  case PILLAR: case DOOR:
     draw_confg_right (bitmap, &pa, true);
     break;
   default: break;
