@@ -206,7 +206,7 @@ coord2room (struct coord *c, int room, struct coord *cv)
   mcb = mca = mcr = mcl = INT_MAX;
 
   if (roomd (room, BELOW) == cv->room) {
-    cb.y += PLACE_HEIGHT * FLOORS;;
+    cb.y += PLACE_HEIGHT * FLOORS;
     cb.room = room;
     mcb = coord_mod (&cb);
   }

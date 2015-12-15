@@ -285,12 +285,14 @@ compute_loose_floor_fall (struct loose_floor *l)
   /* hit kid */
   int i;
   for (i = 0; i < kid_nmemb; i++) {
-    struct coord kmt; struct pos np, kpmt;
+    struct coord kmt, kmbo_f, kmbo_nf; struct pos np, kpmt;
     struct anim *k = &kid[i];
     survey (_mt, pos, &k->f, &kmt, &kpmt, &np);
+    coord2room (&mbo_f, kpmt.room, &kmbo_f);
+    coord2room (&mbo_nf, kpmt.room, &kmbo_nf);
     if (peq (&nfpmbo_f, &kpmt)
-        && mbo_f.y <= kmt.y
-        && mbo_nf.y >= kmt.y
+        && kmbo_f.y <= kmt.y
+        && kmbo_nf.y >= kmt.y
         && ! k->hit_by_loose_floor
         && ! is_kid_dead (&k->f)
         && ! is_kid_hang_or_climb (&k->f)) {
