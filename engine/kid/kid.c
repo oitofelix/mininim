@@ -188,7 +188,7 @@ create_kid (void)
   k.fo.b = kid_normal_00;
   k.action = kid_normal;
   k.item_pos.room = -1;
-  k.total_lives = KID_INITIAL_TOTAL_LIVES,
+  k.total_lives = KID_INITIAL_TOTAL_LIVES;
   k.current_lives = KID_INITIAL_CURRENT_LIVES;
 
   place_kid (&k, 1, 0, 0);
@@ -204,7 +204,7 @@ create_kid (void)
 void
 draw_kids (ALLEGRO_BITMAP *bitmap)
 {
-  struct coord ml; struct pos pml, pmlr, pmlra;
+  struct coord ml, c; struct pos pml, pmlr, pmlra;
   struct anim *k;
 
   qsort (kid, kid_nmemb, sizeof (*k), compare_kids);
@@ -213,7 +213,8 @@ draw_kids (ALLEGRO_BITMAP *bitmap)
   for (i = 0; i < kid_nmemb; i++) {
     k = &kid[i];
 
-    if (k->f.c.room != room_view) continue;
+    /* coord2room (&k->f.c, room_view, &c); */
+    /* if (c.room != room_view) continue; */
 
     k->f.id = k;
     if (k->current) current_kid = k;

@@ -123,10 +123,16 @@ draw_broken_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p)
 }
 
 void
-draw_broken_floor_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f)
+draw_broken_floor_fg (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   struct coord c;
-  if (is_kid_dead (f)) return;
+  int i;
+  for (i = 0; i < kid_nmemb; i++) {
+    struct anim *k = &kid[i];
+    struct coord nc; struct pos np, pmt;
+    survey (_mt, pos, &k->f, &nc, &pmt, &np);
+    if (peq (&pmt, p) && is_kid_dead (&k->f)) return;
+  }
   draw_bitmapc (broken_floor_front, bitmap,
                 broken_floor_front_coord (p, &c), 0);
 }

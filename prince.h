@@ -180,7 +180,8 @@ struct anim {
     total_lives, current_lives;
   bool reverse, collision, fall, hit_ceiling,
     just_hanged, hang, hang_limit, misstep, uncouch_slowly,
-    keep_sword_fast, turn, shadow, current, splash;
+    keep_sword_fast, turn, shadow, current, splash,
+    hit_by_loose_floor;
 
   enum item item;
 

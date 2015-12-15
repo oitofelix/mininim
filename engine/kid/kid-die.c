@@ -82,6 +82,9 @@ kid_die (struct anim *kid)
   kid->action = kid_die;
   kid->f.flip = (kid->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
+  if (kid->oaction != kid->action) {
+  }
+
   if (! flow (kid)) return;
   if (! physics_in (kid)) return;
   next_frame (&kid->f, &kid->f, &kid->fo);
@@ -91,18 +94,33 @@ kid_die (struct anim *kid)
 static bool
 flow (struct anim *kid)
 {
-  if (kid->oaction != kid_die) kid->i = -1, kid->j = 0;
-
-  if (kid->oaction == kid_fall) kid->i = 4;
+  if (kid->oaction == kid_fall
+      || kid->hit_by_loose_floor) {
+    kid->i = 4; kid->j = 1;
+    struct coord nc; struct pos np, pmt;
+    survey (_mt, pos, &kid->f, &nc, &pmt, &np);
+    place_frame (&kid->f, &kid->f, kid_die_frameset[5].frame,
+                 &pmt, (kid->f.dir == LEFT)
+                 ? +9 : +4, +47);
+  }
+  else if (kid->oaction != kid_die) {
+    struct coord nc; struct pos np, pmt;
+    survey (_mt, pos, &kid->f, &nc, &pmt, &np);
+    place_frame (&kid->f, &kid->f, kid_die_frameset[0].frame,
+                 &pmt, (kid->f.dir == LEFT)
+                 ? +13 : +21, +18);
+    kid->i = -1, kid->j = 0;
+  }
 
   kid->i = kid->i < 5 ? kid->i + 1 : 5;
 
   select_frame (kid, kid_die_frameset, kid->i);
 
   if (kid->j == 1) kid->fo.dx = kid->fo.dy = 0;
-  if (kid->i == 5) kid->j = 1;
-
-  if (kid->oaction == kid_fall) kid->fo.dy = +7;
+  if (kid->i == 5) {
+    kid->j = 1;
+    kid->hit_by_loose_floor = false;
+  }
 
   return true;
 }

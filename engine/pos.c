@@ -113,75 +113,6 @@ npos (struct pos *p, struct pos *np)
   return np;
 }
 
-/* struct pos * */
-/* pos2view (struct pos *p, struct pos *pv) */
-/* { */
-/*   *pv = *p; */
-
-/*   int room; */
-/*   npos (pv, pv); */
-
-/*   do { */
-/*     room = pv->room; */
-
-/*     if (pv->floor == 0 */
-/*         && roomd (room_view, BELOW) == pv->room */
-/*         && room_view != pv->room) { */
-/*       pv->floor += FLOORS; */
-/*       pv->room = room_view; */
-/*     } else if (pv->floor == FLOORS - 1 */
-/*                && roomd (room_view, ABOVE) == pv->room */
-/*                && room_view != pv->room) { */
-/*       pv->floor -= FLOORS; */
-/*       pv->room = room_view; */
-/*     } else if (pv->place == 0 */
-/*                && roomd (room_view, RIGHT) == pv->room */
-/*                && room_view != pv->room) { */
-/*       pv->place += PLACES; */
-/*       pv->room = room_view; */
-/*     } else if (pv->place == PLACES - 1 */
-/*                && roomd (room_view, LEFT) == pv->room */
-/*                && room_view != pv->room) { */
-/*       pv->place -= PLACES; */
-/*       pv->room = room_view; */
-/*     } */
-/*   } while (room != pv->room); */
-
-/*   return pv; */
-/* } */
-
-/* struct pos * */
-/* pos2view (struct pos *p, struct pos *pv) */
-/* { */
-/*   *pv = *p; */
-
-/*   int room; */
-
-/*   do { */
-/*     room = pv->room; */
-
-/*     if (roomd (room_view, BELOW) == pv->room */
-/*         && room_view != pv->room) { */
-/*       pv->floor += FLOORS; */
-/*       pv->room = room_view; */
-/*     } else if (roomd (room_view, ABOVE) == pv->room */
-/*                && room_view != pv->room) { */
-/*       pv->floor -= FLOORS; */
-/*       pv->room = room_view; */
-/*     } else if (roomd (room_view, RIGHT) == pv->room */
-/*                && room_view != pv->room) { */
-/*       pv->place += PLACES; */
-/*       pv->room = room_view; */
-/*     } else if (roomd (room_view, LEFT) == pv->room */
-/*                && room_view != pv->room) { */
-/*       pv->place -= PLACES; */
-/*       pv->room = room_view; */
-/*     } */
-/*   } while (room != pv->room); */
-
-/*   return pv; */
-/* } */
-
 struct pos *
 pos2room (struct pos *p, int room, struct pos *pv)
 {
@@ -190,9 +121,9 @@ pos2room (struct pos *p, int room, struct pos *pv)
 
   if (pv->room == room) return pv;
 
-  struct pos pa, pb, pl, pr;
+  struct pos pb, pa, pl, pr;
 
-  pa = pb = pl = pr = *pv;
+  pb = pa = pl = pr = *pv;
 
   int mpb, mpa, mpr, mpl;
   mpb = mpa = mpr = mpl = INT_MAX;
@@ -234,10 +165,68 @@ pos2room (struct pos *p, int room, struct pos *pv)
   return pv;
 }
 
+struct coord *
+coord2room (struct coord *c, int room, struct coord *cv)
+{
+  *cv = *c;
+  ncoord (cv, cv);
+
+  if (cv->room == room) return cv;
+
+  struct coord cb, ca, cl, cr;
+
+  cb = ca = cl = cr = *cv;
+
+  int mcb, mca, mcr, mcl;
+  mcb = mca = mcr = mcl = INT_MAX;
+
+  if (roomd (room, BELOW) == cv->room) {
+    cb.y += PLACE_HEIGHT * FLOORS;;
+    cb.room = room;
+    mcb = coord_mod (&cb);
+  }
+
+  if (roomd (room, ABOVE) == cv->room) {
+    ca.y -= PLACE_HEIGHT * FLOORS;
+    ca.room = room;
+    mca = coord_mod (&ca);
+  }
+
+  if (roomd (room, RIGHT) == cv->room) {
+    cr.x += PLACE_WIDTH * PLACES;
+    cr.room = room;
+    mcr = coord_mod (&cr);
+  }
+
+  if (roomd (room, LEFT) == cv->room) {
+    cl.x -= PLACE_WIDTH * PLACES;
+    cl.room = room;
+    mcl = coord_mod (&cl);
+  }
+
+  int lm = mcb;
+  lm = min (lm, mca);
+  lm = min (lm, mcr);
+  lm = min (lm, mcl);
+
+  if (lm == mcb) *cv = cb;
+  else if (lm == mca) *cv = ca;
+  else if (lm == mcr) *cv = cr;
+  else if (lm == mcl) *cv = cl;
+
+  return cv;
+}
+
 int
 pos_mod (struct pos *p)
 {
   return p->floor * p->floor + p->place * p->place;
+}
+
+int
+coord_mod (struct coord *c)
+{
+  return c->y * c->y + c->x * c->x;
 }
 
 struct pos *

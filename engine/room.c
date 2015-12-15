@@ -297,7 +297,7 @@ draw_confg_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
   switch (con (p)->fg) {
   case NO_FLOOR: break;
   case FLOOR: break;
-  case BROKEN_FLOOR: draw_broken_floor_fg (bitmap, p, f); break;
+  case BROKEN_FLOOR: draw_broken_floor_fg (bitmap, p); break;
   case SKELETON_FLOOR: break;
   case LOOSE_FLOOR: break;
   case SPIKES_FLOOR: draw_spikes_fg (bitmap, p); break;
@@ -431,7 +431,7 @@ draw_room_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f)
     if (con (p)->fg == PILLAR)
       draw_pillar_fg (screen, p);
     else if (con (p)->fg == BROKEN_FLOOR)
-      draw_broken_floor_fg (screen, p, f);
+      draw_broken_floor_fg (screen, p);
     else {
       if (con (p)->fg == DOOR)
         draw_door_fg (screen, p, f);
