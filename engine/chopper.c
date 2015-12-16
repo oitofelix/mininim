@@ -153,10 +153,11 @@ compute_choppers (void)
       /* remove_chopper (d); i--; */
       continue;
     }
+
     switch (c->i) {
     case 0:
       if (c->wait-- <= 0 && should_chomp (&c->p)
-          && draw_cycle % CHOPPER_WAIT ==
+          && (draw_cycle % CHOPPER_WAIT) ==
           prandom_pos (&c->p, 0, 1, CHOPPER_WAIT - 1)) c->i++; break;
     case 1: c->i++; sample_chopper = true; break;
     case 2: c->i++; break;

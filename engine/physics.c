@@ -271,13 +271,16 @@ is_hangable_pos (struct pos *p, enum dir d)
   int dir = (d == LEFT) ? -1 : +1;
   struct pos ph; prel (p, &ph, -1, dir);
   struct pos pa; prel (p, &pa, -1, 0);
+  struct pos pr; prel (p, &pr, +0, +1);
   struct con *ca = con (&pa);
+  struct con *cr = con (&pr);
 
   return is_hangable_con (&ph, d)
-    && (ca->fg == NO_FLOOR
-        || (ca->fg == LOOSE_FLOOR
-            && loose_floor_at_pos (&pa)->action
-            == RELEASE_LOOSE_FLOOR));
+    && ((ca->fg == NO_FLOOR
+         || (ca->fg == LOOSE_FLOOR
+             && loose_floor_at_pos (&pa)->action
+             == RELEASE_LOOSE_FLOOR))
+        && ! (d == RIGHT && cr->fg == CHOPPER));
 }
 
 bool

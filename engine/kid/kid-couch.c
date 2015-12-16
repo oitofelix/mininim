@@ -164,17 +164,17 @@ flow (struct anim *kid)
   int dir = (kid->f.dir == LEFT) ? +1 : -1;
   ctf = survey (_tf, pos, &kid->f, &nc, &ptf, &np)->fg;
   survey (_bf, pos, &kid->f, &nc, &pbf, &np);
+  struct pos ph; prel (&pbf, &ph, +1, dir);
   if (kid->i == -1
       && ! kid->collision
       && ! kid->fall
       && ! kid->hit_by_loose_floor
       && kid->item_pos.room == -1
-      && crel (&pbf, 0, dir)->fg == NO_FLOOR
+      && is_hangable_pos (&ph, kid->f.dir)
       && dist_next_place (&kid->f, _tf, pos, 0, true) < 26
       && ! (ctf == DOOR && kid->f.dir == LEFT
             && door_at_pos (&ptf)->i > DOOR_CLIMB_LIMIT)) {
-    prel (&pbf, &kid->hang_pos, +1, (kid->f.dir == LEFT) ? +1 : -1);
-    pos2room (&kid->hang_pos, kid->f.c.room, &kid->hang_pos);
+    pos2room (&ph, kid->f.c.room, &kid->hang_pos);
     kid_unclimb (kid);
     return false;
   }
