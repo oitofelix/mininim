@@ -43,6 +43,8 @@ is_colliding (struct frame *f, struct frame_offset *fo, int dx,
 int
 dist_collision (struct frame *f, bool reverse,
                 struct collision_info *ci);
+int
+dist_chopper (struct frame *f, bool reverse);
 
 
 

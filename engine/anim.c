@@ -88,10 +88,11 @@ play_anim (void (*draw_callback) (void),
           int df = dist_con (&current_kid->f, _bf, pos, -4, false, NO_FLOOR);
           int dl = dist_con (&current_kid->f, _bf, pos, -4, false, LOOSE_FLOOR);
           int dd = dist_con (&current_kid->f, _bf, pos, -4, false, CLOSER_FLOOR);
+          int dch = dist_chopper (&current_kid->f, false);
           if (delete_key || page_down_key || enter_key)
             printf ("\
-f = %i, p = %i, dn = %i, dp = %i, dc = %i, df = %i, dl = %i, dd = %i\n",
-                    pbf.floor, pbf.place, dn, dp, dc, df, dl, dd);
+f = %i, p = %i, dn = %i, dp = %i, dc = %i, df = %i, dl = %i, dd = %i, dch = %i\n",
+                    pbf.floor, pbf.place, dn, dp, dc, df, dl, dd, dch);
         }
         /* end kid hack */
 

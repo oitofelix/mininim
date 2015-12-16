@@ -245,6 +245,25 @@ dist_con (struct frame *f, coord_f cf, pos_f pf,
   else return PLACE_WIDTH + 1;
 }
 
+int
+dist_chopper (struct frame *f, bool reverse)
+{
+  struct coord nc; struct pos np, ptf, ptfr;
+
+  struct frame _f = *f;
+  if (reverse) _f.dir = (_f.dir == LEFT) ? RIGHT : LEFT;
+
+  enum confg ctf = survey (_tf, pos, &_f, &nc, &ptf, &np)->fg;
+  prel (&ptf, &ptfr, +0, +1);
+  enum confg ctfr = con (&ptfr)->fg;
+
+  if (_f.dir == LEFT && ctf == CHOPPER)
+    return dist_next_place (&_f, _tf, pos, -4, false);
+  else if (_f.dir == RIGHT && ctfr == CHOPPER)
+    return dist_next_place (&_f, _tf, pos, -4, false);
+
+  return PLACE_WIDTH + 1;
+}
 
 
 

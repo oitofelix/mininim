@@ -188,6 +188,11 @@ struct anim {
     keep_sword_fast, turn, shadow, current, splash,
     hit_by_loose_floor;
 
+  bool poison_immune, loose_floor_immune, fall_immune,
+    spikes_immune, chopper_immune;
+
+  enum confg confg;
+
   enum item item;
 
   struct pos p, item_pos, hang_pos, death_pos;

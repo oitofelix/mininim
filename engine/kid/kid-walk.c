@@ -124,11 +124,29 @@ flow (struct anim *kid)
   int df = dist_con (&kid->f, _bf, pos, -4, false, NO_FLOOR);
   int dl = dist_con (&kid->f, _bf, pos, -4, false, LOOSE_FLOOR);
   int dd = dist_con (&kid->f, _bf, pos, -4, false, CLOSER_FLOOR);
+  int dch = dist_chopper (&kid->f, false);
 
   int dcc = 0;
+
   if (kid->ci.t == DOOR) {
     dcc = 9;
     dc -= dcc;
+  }
+
+  if (dch <= 6)
+    kid->misstep = true;
+  else if (dch <= PLACE_WIDTH) {
+    dcc = 5;
+    dch -= dcc;
+  }
+
+  if (kid->i == -1) {
+    if (dch <= PLACE_WIDTH) kid->confg = CHOPPER;
+    else if (df <= PLACE_WIDTH) kid->confg = NO_FLOOR;
+    else if (dl <= PLACE_WIDTH) kid->confg = LOOSE_FLOOR;
+    else if (dd <= PLACE_WIDTH) kid->confg = CLOSER_FLOOR;
+    else if (dc <= PLACE_WIDTH) kid->confg = kid->ci.t;
+    else kid->confg = FLOOR;
   }
 
   if (kid->i == -1 && con (&kid->p)->fg != LOOSE_FLOOR) {
@@ -149,14 +167,17 @@ flow (struct anim *kid)
         return false;
       }
 
+      if (dch <= PLACE_WIDTH)
+        kid->misstep = true;
+
       int dx = 0;
-      if (dc < 10 || df < 10 || dl < 10 || dd < 10)
+      if (dc < 10 || df < 10 || dl < 10 || dd < 10 || dch < 10)
         kid->walk = 0, dx = 5;
-      else if (dc < 15 || df < 15 || dl < 15 || dd < 15)
+      else if (dc < 15 || df < 15 || dl < 15 || dd < 15 || dch < 15)
         kid->walk = 1, dx = 10;
-      else if (dc < 22 || df < 22 || dl < 22 || dd < 22)
+      else if (dc < 22 || df < 22 || dl < 22 || dd < 22 || dch < 22)
         kid->walk = 2, dx = 15;
-      else if (dc < 27 || df < 27 || dl < 27 || dd < 27)
+      else if (dc < 27 || df < 27 || dl < 27 || dd < 27 || dch < 27)
         kid->walk = 3, dx = 22;
 
       if (kid->walk != -1 )
@@ -169,10 +190,15 @@ flow (struct anim *kid)
   else if (kid->i == 4 && kid->walk == 2) kid->i = 6;
   else if (kid->i == 5 && kid->walk == 3) kid->i = 6;
   else if (kid->i == 11){
-    if (kid->walk != -1)
-      place_frame (&kid->f, &kid->f, kid_normal_00, &kid->p,
-                   (kid->f.dir == LEFT) ? +11 + dcc
-                   : PLACE_WIDTH + 7 - dcc, +15);
+    if (kid->walk != -1) {
+      if (kid->confg == CHOPPER)
+        place_frame (&kid->f, &kid->f, kid_normal_00, &kid->p,
+                     (kid->f.dir == LEFT) ? +15
+                     : PLACE_WIDTH + 3, +15);
+      else place_frame (&kid->f, &kid->f, kid_normal_00, &kid->p,
+                        (kid->f.dir == LEFT) ? +11 + dcc
+                        : PLACE_WIDTH + 7 - dcc, +15);
+    }
     kid_normal (kid);
     kid->misstep = false;
     return false;
@@ -184,16 +210,17 @@ flow (struct anim *kid)
 
   if (kid->walk == 0) {
     if (dc > 4 && df > 4 && dl > 4 && dd > 4) kid->fo.dx += -1;
+    if (kid->i == 10) kid->fo.dx = +0;
   }
 
   if (kid->walk == 1) {
     if (kid->i == 9) kid->fo.dx = +1;
-    if (kid->i == 10) kid->fo.dx = -1;
+    if (kid->i == 10) kid->fo.dx = +0;
   }
 
   if (kid->walk == 2 || kid->walk == 3) {
     if (kid->i == 7) kid->fo.dx = +3;
-    if (kid->i == 10) kid->fo.dx = -1;
+    if (kid->i == 10) kid->fo.dx = +0;
   }
 
   return true;

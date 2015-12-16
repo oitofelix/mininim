@@ -196,12 +196,13 @@ compute_choppers (void)
     case 4: c->i = 0; c->wait = CHOPPER_WAIT; break;
     }
 
-    if (c->i == 0) continue;
+    if (c->i != 1 && c->i != 2 ) continue;
 
     /* chomp kid */
     for (j = 0; j < kid_nmemb; j++) {
       struct anim *k = &kid[j];
-      if (is_kid_dead (&k->f)) continue;
+      if (is_kid_dead (&k->f)
+          || k->chopper_immune) continue;
       struct coord nc; struct pos np, ptf, ptb;
       survey (_tf, pos, &k->f, &nc, &ptf, &np);
       survey (_tb, pos, &k->f, &nc, &ptb, &np);
