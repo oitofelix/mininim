@@ -114,6 +114,7 @@ struct level {
       PILLAR,
       WALL,
       DOOR,
+      CHOPPER,
     } fg;
     enum conbg {
       NO_BG,

@@ -121,8 +121,8 @@ fix_loose_enclosure (struct pos *p)
   if (is_enclosure (p, is_loose, RIGHT)) fix_enclosure (p, RIGHT);
 }
 
-/* consistency: rigid constructions (pillar, wall, door) must have
-   something non-traversable lying on it */
+/* consistency: rigid constructions (pillar, wall, door, chopper) must
+   have something non-traversable lying on it */
 static void
 fix_rigid_con_no_floor_top (struct pos *p)
 {
@@ -326,7 +326,7 @@ static bool
 is_rigid_con (struct pos *p)
 {
   enum confg fg = con (p)->fg;
-  return fg == PILLAR || fg == WALL || fg == DOOR;
+  return fg == PILLAR || fg == WALL || fg == DOOR || fg == CHOPPER;
 }
 
 void

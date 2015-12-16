@@ -46,41 +46,29 @@ ncoord (struct coord *c, struct coord *nc)
 {
   if (nc != c) *nc = *c;
 
-  int room;
+  bool m;
 
   do {
-    room = nc->room;
+    m = false;
 
     if (nc->y < 0) {
       nc->y += PLACE_HEIGHT * FLOORS;
       nc->room = roomd (nc->room, ABOVE);
+      m = true;
     } else if (nc->y >= PLACE_HEIGHT * FLOORS + 11) {
       nc->y -= PLACE_HEIGHT * FLOORS;
       nc->room = roomd (nc->room, BELOW);
+      m = true;
     } else if (nc->x < 0) {
       nc->x += PLACE_WIDTH * PLACES;
       nc->room = roomd (nc->room, LEFT);
+      m = true;
     } else if (nc->x >= PLACE_WIDTH * PLACES) {
       nc->x -= PLACE_WIDTH * PLACES;
       nc->room = roomd (nc->room, RIGHT);
+      m = true;
     }
-  } while (room != nc->room);
-
-  /* do { */
-  /*   room = nc->room; */
-
-  /*   if (nc->y < 11 && */
-  /*       roomd (room_view, BELOW) == nc->room */
-  /*       && room_view != nc->room) { */
-  /*     nc->y += PLACE_HEIGHT * FLOORS; */
-  /*     nc->room = room_view; */
-  /*   } else if (nc->y >= PLACE_HEIGHT * FLOORS */
-  /*              && roomd (room_view, ABOVE) == nc->room */
-  /*              && room_view != nc->room) { */
-  /*     nc->y -= PLACE_HEIGHT * FLOORS; */
-  /*     nc->room = room_view; */
-  /*   } */
-  /* } while (room != nc->room); */
+  } while (m);
 
   return nc;
 }
@@ -90,25 +78,29 @@ npos (struct pos *p, struct pos *np)
 {
   if (np != p) *np = *p;
 
-  int room;
+  bool m;
 
   do {
-    room = np->room;
+    m = false;
 
     if (np->floor < 0) {
       np->floor += FLOORS;
       np->room = roomd (np->room, ABOVE);
+      m = true;
     } else if (np->floor >= FLOORS) {
       np->floor -= FLOORS;
       np->room = roomd (np->room, BELOW);
+      m = true;
     } else if (np->place < 0) {
       np->place += PLACES;
       np->room = roomd (np->room, LEFT);
+      m = true;
     } else if (np->place >= PLACES) {
       np->place -= PLACES;
       np->room = roomd (np->room, RIGHT);
+      m = true;
     }
-  } while (room != np->room);
+  } while (m);
 
   return np;
 }
@@ -282,6 +274,31 @@ frame2room (struct frame *f, int room, struct coord *cv)
   }
 
   return cv;
+}
+
+bool
+coord4draw (struct coord *c, int room, struct coord *cv)
+{
+  if (cv != c) *cv = *c;
+  ncoord (cv, cv);
+
+  bool m = false;
+
+  if (cv->y < 11 &&
+      roomd (room, BELOW) == cv->room
+      && room != cv->room) {
+    cv->y += PLACE_HEIGHT * FLOORS;
+    cv->room = room;
+    m = true;
+  } else if (cv->y >= PLACE_HEIGHT * FLOORS
+             && roomd (room, ABOVE) == cv->room
+             && room != cv->room) {
+    cv->y -= PLACE_HEIGHT * FLOORS;
+    cv->room = room;
+    m = true;
+  }
+
+  return m;
 }
 
 int

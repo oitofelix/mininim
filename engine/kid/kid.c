@@ -441,6 +441,7 @@ draw_kid_lives (ALLEGRO_BITMAP *bitmap, struct anim *kid, int j)
   int i;
   struct coord c;
 
+  al_set_target_bitmap (screen);
   al_draw_filled_rectangle (0, ORIGINAL_HEIGHT - 8,
                             7 * kid->total_lives, ORIGINAL_HEIGHT,
                             al_map_rgba (0, 0, 0, 170));

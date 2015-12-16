@@ -99,11 +99,11 @@ static struct level level_1 = {
       {WALL}, {WALL}, {WALL}, {WALL}, {WALL}}},
 
     [21] =
-    {{{NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {LOOSE_FLOOR},
+    {{{NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR},
       {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}},
-     {{NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {FLOOR}, {FLOOR,NO_BG,{BIG_POISON_POTION}},
-      {FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}},
-     {{FLOOR}, {FLOOR}, {FLOOR}, {FLOOR}, {FLOOR},
+     {{NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR},
+      {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}},
+     {{FLOOR}, {FLOOR}, {FLOOR}, {FLOOR}, {CHOPPER},
       {FLOOR}, {FLOOR}, {FLOOR}, {FLOOR}, {FLOOR}}},
   },
 

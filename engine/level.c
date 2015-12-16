@@ -37,6 +37,7 @@
 #include "closer-floor.h"
 #include "spikes-floor.h"
 #include "door.h"
+#include "chopper.h"
 #include "consistency.h"
 #include "level.h"
 
@@ -79,6 +80,7 @@ register_cons (void)
         case CLOSER_FLOOR: register_closer_floor (&p); break;
         case SPIKES_FLOOR: register_spikes_floor (&p); break;
         case DOOR: register_door (&p); break;
+        case CHOPPER: register_chopper (&p); break;
         default: break;
         }
 }
@@ -135,6 +137,7 @@ compute_level (void)
   compute_closer_floors ();
   compute_spikes_floors ();
   compute_doors ();
+  compute_choppers ();
 }
 
 static void
@@ -146,6 +149,7 @@ sample_level (void)
   sample_closer_floors ();
   sample_spikes_floors ();
   sample_doors ();
+  sample_choppers ();
 }
 
 static void
