@@ -22,6 +22,8 @@
 
 #include "prince.h"
 
+extern bool coord_wa;
+
 typedef struct coord *(*coord_f) (struct frame *, struct coord *);
 typedef struct pos *(*pos_f) (struct coord *, struct pos *);
 
@@ -69,68 +71,5 @@ surveyo (coord_f cf, int dx, int dy, pos_f pf, struct frame *f,
          struct coord *c, struct pos *p, struct pos *np);
 
 #define survey(coord_f,pos_f,f,c,p,np) (con (npos ((pos_f) ((coord_f) ((f), (c)), (p)), (np))))
-
-/* #define pmt(f) (pos (mt (f))) */
-/* #define pmbo(f) (pos (mbo (f))) */
-/* #define pml(f) (pos (ml (f))) */
-/* #define pmr(f) (pos (mr (f))) */
-/* #define pmf(f) (pos (mf (f))) */
-/* #define pmba(f) (pos (mba (f))) */
-/* #define ptl(f) (pos (tl (f))) */
-/* #define ptr(f) (pos (tr (f))) */
-/* #define ptf(f) (pos (tf (f))) */
-/* #define ptb(f) (pos (tb (f))) */
-/* #define pbl(f) (pos (bl (f))) */
-/* #define pbr(f) (pos (br (f))) */
-/* #define pbf(f) (pos (bf (f))) */
-/* #define pbb(f) (pos (bb (f))) */
-
-/* #define cm(f) (con (pm (f))->fg) */
-/* #define cmt(f) (con (pmt (f))->fg) */
-/* #define cmbo(f) (con (pmbo (f))->fg) */
-/* #define cml(f) (con (pml (f))->fg) */
-/* #define cmr(f) (con (pmr (f))->fg) */
-/* #define cmf(f) (con (pmf (f))->fg) */
-/* #define cmba(f) (con (pmba (f))->fg) */
-/* #define ctl(f) (con (ptl (f))->fg) */
-/* #define ctr(f) (con (ptr (f))->fg) */
-/* #define ctf(f) (con (ptf (f))->fg) */
-/* #define ctb(f) (con (ptb (f))->fg) */
-/* #define cbl(f) (con (pbl (f))->fg) */
-/* #define cbr(f) (con (pbr (f))->fg) */
-/* #define cbf(f) (con (pbf (f))->fg) */
-/* #define cbb(f) (con (pbb (f))->fg) */
-
-/* #define fpm(f) (posf (m (f))) */
-/* #define fpmt(f) (posf (mt (f))) */
-/* #define fpmbo(f) (posf (mbo (f))) */
-/* #define fpml(f) (posf (ml (f))) */
-/* #define fpmr(f) (posf (mr (f))) */
-/* #define fpmf(f) (posf (mf (f))) */
-/* #define fpmba(f) (posf (mba (f))) */
-/* #define fptl(f) (posf (tl (f))) */
-/* #define fptr(f) (posf (tr (f))) */
-/* #define fptf(f) (posf (tf (f))) */
-/* #define fptb(f) (posf (tb (f))) */
-/* #define fpbl(f) (posf (bl (f))) */
-/* #define fpbr(f) (posf (br (f))) */
-/* #define fpbf(f) (posf (bf (f))) */
-/* #define fpbb(f) (posf (bb (f))) */
-
-/* #define fcm(f) (con (fpm (f))->fg) */
-/* #define fcmt(f) (con (fpmt (f))->fg) */
-/* #define fcmbo(f) (con (fpmbo (f))->fg) */
-/* #define fcml(f) (con (fpml (f))->fg) */
-/* #define fcmr(f) (con (fpmr (f))->fg) */
-/* #define fcmf(f) (con (fpmf (f))->fg) */
-/* #define fcmba(f) (con (fpmba (f))->fg) */
-/* #define fctl(f) (con (fptl (f))->fg) */
-/* #define fctr(f) (con (fptr (f))->fg) */
-/* #define fctf(f) (con (fptf (f))->fg) */
-/* #define fctb(f) (con (fptb (f))->fg) */
-/* #define fcbl(f) (con (fpbl (f))->fg) */
-/* #define fcbr(f) (con (fpbr (f))->fg) */
-/* #define fcbf(f) (con (fpbf (f))->fg) */
-/* #define fcbb(f) (con (fpbb (f))->fg) */
 
 #endif	/* FREEPOP_POSITION_H */

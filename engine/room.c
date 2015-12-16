@@ -120,7 +120,7 @@ draw_bitmapc (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
   struct coord nc = *c;
 
   if (! cutscene) {
-    if (! coord4draw (c, room_view, &nc)) nc = *c;
+    coord2room (&nc, room_view, &nc);
     if (to == screen && nc.room != room_view) return;
   }
 
@@ -135,7 +135,7 @@ draw_bitmap_regionc (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
   struct coord nc = *c;
 
   if (! cutscene) {
-    if (! coord4draw (c, room_view, &nc)) nc = *c;
+    coord2room (&nc, room_view, &nc);
     if (to == screen && nc.room != room_view) return;
   }
 

@@ -27,6 +27,8 @@
 #include "room.h"
 #include "pos.h"
 
+bool coord_wa;
+
 int
 roomd (int room, enum dir dir)
 {
@@ -51,21 +53,42 @@ ncoord (struct coord *c, struct coord *nc)
   do {
     m = false;
 
-    if (nc->y < 0) {
+    int ra, rb, rl, rr;
+    int rab, rba, rlr, rrl;
+
+    ra = roomd (nc->room, ABOVE);
+    rb = roomd (nc->room, BELOW);
+    rl = roomd (nc->room, LEFT);
+    rr = roomd (nc->room, RIGHT);
+
+    rab = roomd (ra, BELOW);
+    rba = roomd (rb, ABOVE);
+    rlr = roomd (rl, RIGHT);
+    rrl = roomd (rr, LEFT);
+
+    if (nc->y < 0
+        && (ra != nc->room || coord_wa)
+        && rab == nc->room) {
       nc->y += PLACE_HEIGHT * FLOORS;
-      nc->room = roomd (nc->room, ABOVE);
+      nc->room = ra;
       m = true;
-    } else if (nc->y >= PLACE_HEIGHT * FLOORS + 11) {
+    } else if (nc->y >= PLACE_HEIGHT * FLOORS + 11
+               && (rb != nc->room || coord_wa)
+               && rba == nc->room) {
       nc->y -= PLACE_HEIGHT * FLOORS;
-      nc->room = roomd (nc->room, BELOW);
+      nc->room = rb;
       m = true;
-    } else if (nc->x < 0) {
+    } else if (nc->x < 0
+               && (rl != nc->room || coord_wa)
+               && rlr == nc->room) {
       nc->x += PLACE_WIDTH * PLACES;
-      nc->room = roomd (nc->room, LEFT);
+      nc->room = rl;
       m = true;
-    } else if (nc->x >= PLACE_WIDTH * PLACES) {
+    } else if (nc->x >= PLACE_WIDTH * PLACES
+               && (rr != nc->room || coord_wa)
+               && rrl == nc->room) {
       nc->x -= PLACE_WIDTH * PLACES;
-      nc->room = roomd (nc->room, RIGHT);
+      nc->room = rr;
       m = true;
     }
   } while (m);
@@ -320,8 +343,8 @@ pos_gen (struct coord *c, struct pos *p, int dx, int dy)
   p->place = (c->x - dx) / PLACE_WIDTH;
   p->floor = (c->y - dy) / PLACE_HEIGHT;
 
-  if (c->x < dx) p->place = -1;
-  if (c->y < dy) p->floor = -1;
+  if (c->x < dx) p->place += -1;
+  if (c->y < dy) p->floor += -1;
 
   return p;
 }

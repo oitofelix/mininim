@@ -296,8 +296,11 @@ draw_kid_frame (ALLEGRO_BITMAP *bitmap, struct anim *k)
     if (obx) k->xf.b = apply_palette (k->xf.b, phantom_shadow_palette);
   }
 
+  coord_wa = true;
   draw_frame (bitmap, &k->f);
   draw_xframe (bitmap, &k->f, &k->xf);
+  coord_wa = false;
+
   if (k->splash) {
     draw_bitmapc (kid_splash, bitmap, splash_coord (&k->f, &c), k->f.flip);
     k->splash = false;
