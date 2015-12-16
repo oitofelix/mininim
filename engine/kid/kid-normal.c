@@ -64,7 +64,7 @@ static bool
 flow (struct anim *k)
 {
   struct coord nc;
-  struct pos np, pbf;
+  struct pos np, pbf, pmt;
   survey (_bf, pos, &k->f, &nc, &pbf, &np);
 
   bool turn = ((k->f.dir == RIGHT) && left_key)
@@ -83,6 +83,8 @@ flow (struct anim *k)
 
   if (k->oaction == kid_normal
       && k->current_lives <= 0) {
+    survey (_mt, pos, &kid->f, &nc, &pmt, &np);
+    kid->death_pos = pmt;
     kid_die (k);
     return false;
   }

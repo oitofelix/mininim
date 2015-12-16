@@ -62,6 +62,8 @@
 #define LIFE_POTION_BUBBLE_COLOR (al_map_rgb (224, 0, 48))
 #define POISON_POTION_BUBBLE_COLOR (al_map_rgb (80, 84, 248))
 
+#define BLOOD_COLOR (al_map_rgb (228, 0, 0))
+
 #define RRED (al_map_rgb (prandom (255), 0, 0))
 #define RGREEN (al_map_rgb (0, prandom (255), 0))
 #define RBLUE (al_map_rgb (0, 0, prandom (255)))
@@ -188,7 +190,7 @@ struct anim {
 
   enum item item;
 
-  struct pos p, item_pos, hang_pos;
+  struct pos p, item_pos, hang_pos, death_pos;
 
   /* depressible floor */
   struct pos df_pos[2];

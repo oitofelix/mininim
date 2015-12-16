@@ -28,6 +28,7 @@
 #define KID_DIE_05 "dat/kid/dieing/frame05.png"
 #define KID_DIE_06 "dat/kid/deaths/dead.png"
 #define KID_DIE_SPIKED_00 "dat/kid/deaths/spiked.png"
+#define KID_DIE_CHOPPED_00 "dat/kid/deaths/chopped.png"
 
 #define KID_DIE_FRAMESET_NMEMB 6
 extern struct frameset kid_die_frameset[KID_DIE_FRAMESET_NMEMB];
@@ -36,6 +37,7 @@ void load_kid_die (void);
 void unload_kid_die (void);
 void kid_die (struct anim *kid);
 void kid_die_spiked (struct anim *kid);
+void kid_die_chopped (struct anim *kid);
 void kid_die_suddenly (struct anim *kid);
 bool is_kid_dead (struct frame *f);
 

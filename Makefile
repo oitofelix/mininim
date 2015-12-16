@@ -27,14 +27,14 @@ CFLAGS_COV = ${CFLAGS_DEV} --coverage -pg
 CFLAGS = ${CFLAGS_DEV}
 CPPFLAGS = -I$(shell pwd)
 
-prince : ${OBJECTS} .depend
+prince : ${OBJECTS}
 	${CC} ${OBJECTS} -o $@ ${CPPFLAGS} ${CFLAGS} ${LDFLAGS}
 
-.depend: ${SRCS}
-	rm -f .depend
-	$(CC) ${CPPFLAGS} $(CFLAGS) -MM $^ > .depend
+# .depend: ${SRCS}
+# 	rm -f .depend
+# 	$(CC) ${CPPFLAGS} $(CFLAGS) -MM $^ > .depend
 
-include .depend
+# include .depend
 
 .PHONY: clean
 clean:

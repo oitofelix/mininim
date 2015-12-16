@@ -48,13 +48,13 @@ ALLEGRO_SAMPLE *step_sample, *hit_ground_sample, *hit_ground_harm_sample,
   *hit_ground_fatal_sample, *hit_wall_sample, *hang_on_fall_sample,
   *drink_sample, *glory_sample, *take_sword_sample, *sword_attack_sample,
   *harm_sample, *action_not_allowed_sample, *small_life_potion_sample,
-  *big_life_potion_sample, *scream_sample, *spiked_sample;
+  *big_life_potion_sample, *scream_sample, *spiked_sample, *chopped_sample;
 
 bool sample_step, sample_hit_ground, sample_hit_ground_harm,
   sample_hit_ground_fatal, sample_hit_wall, sample_hang_on_fall,
   sample_drink, sample_glory, sample_take_sword, sample_sword_attack,
   sample_harm, sample_action_not_allowed, sample_small_life_potion,
-  sample_big_life_potion, sample_scream, sample_spiked;
+  sample_big_life_potion, sample_scream, sample_spiked, sample_chopped;
 
 static void place_kid (struct anim *kid, int room, int floor, int place);
 static struct coord *kid_life_coord (int i, struct coord *c);
@@ -116,6 +116,7 @@ load_kid (void)
   big_life_potion_sample = load_sample (BIG_LIFE_POTION_SAMPLE);
   scream_sample = load_sample (SCREAM_SAMPLE);
   spiked_sample = load_sample (SPIKED_SAMPLE);
+  chopped_sample = load_sample (CHOPPED_SAMPLE);
 }
 
 void
@@ -173,6 +174,7 @@ unload_kid (void)
   al_destroy_sample (big_life_potion_sample);
   al_destroy_sample (scream_sample);
   al_destroy_sample (spiked_sample);
+  al_destroy_sample (chopped_sample);
 }
 
 int
@@ -426,13 +428,15 @@ sample_kid (void)
     play_sample (big_life_potion_sample);
   if (sample_scream) play_sample (scream_sample);
   if (sample_spiked) play_sample (spiked_sample);
+  if (sample_chopped) play_sample (chopped_sample);
 
   sample_step = sample_hit_ground = sample_hit_ground_harm =
     sample_hit_ground_fatal = sample_hit_wall =
     sample_hang_on_fall = sample_drink = sample_glory =
     sample_take_sword = sample_sword_attack = sample_harm =
     sample_action_not_allowed = sample_small_life_potion =
-    sample_big_life_potion = sample_scream = sample_spiked = false;
+    sample_big_life_potion = sample_scream = sample_spiked =
+    sample_chopped = false;
 }
 
 void
@@ -468,11 +472,11 @@ static struct coord *
 splash_coord (struct frame *f, struct coord *c)
 {
   int w = al_get_bitmap_width (kid_splash);
-  int h = al_get_bitmap_width (kid_splash);
+  int h = al_get_bitmap_height (kid_splash);
   int fw = al_get_bitmap_width (f->b);
-  int fh = al_get_bitmap_width (f->b);
-  c->x = f->c.x + fw / 2 - w / 2;
-  c->y = f->c.y + fh / 2 - h / 2;
+  int fh = al_get_bitmap_height (f->b);
+  c->x = f->c.x + (fw / 2) - (w / 2);
+  c->y = f->c.y + (fh / 2) - (h / 2);
   c->room = f->c.room;
   return c;
 }
