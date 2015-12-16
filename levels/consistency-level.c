@@ -57,7 +57,7 @@ init_consistency_level (void)
     for (p.floor = 0; p.floor < FLOORS; p.floor++)
       for (p.place = 0; p.place < PLACES; p.place++) {
         struct con *c = &lv->con[p.room][p.floor][p.place];
-        c->fg = prandom (DOOR);
+        c->fg = prandom (CHOPPER);
         c->bg = prandom (WINDOW);
         c->ext.item = prandom (SWORD);
 

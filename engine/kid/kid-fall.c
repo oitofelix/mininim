@@ -149,7 +149,7 @@ physics_in (struct anim *kid)
   /* help kid hang */
   survey (_tf, pos, &kid->f, &nc, &ptf, &np);
   survey (_bb, pos, &kid->f, &nc, &pbb, &np);
-  if (is_hangable_con (&ptf)
+  if (is_hangable_con (&ptf, kid->f.dir)
       || is_hangable_pos (&pbb, kid->f.dir))
     kid->inertia = 0;
 

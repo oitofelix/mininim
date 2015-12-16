@@ -35,6 +35,7 @@ static void fix_item_on_non_normal_floor (struct pos *p);
 static void fix_sword_at_right_of_wall_or_door (struct pos *p);
 static void fix_door_lacking_opener (struct pos *p);
 static void fix_opener_or_closer_lacking_door (struct pos *p);
+static void fix_confg_which_should_not_have_conbg (struct pos *p);
 
 void fix_enclosure (struct pos *p, enum dir dir);
 
@@ -67,6 +68,7 @@ fix_level (struct level *lv)
         fix_adjacent_itens (&p);
         fix_item_on_non_normal_floor (&p);
         fix_sword_at_right_of_wall_or_door (&p);
+        fix_confg_which_should_not_have_conbg (&p);
       }
 
   level = olevel;
@@ -288,6 +290,15 @@ fix_opener_or_closer_lacking_door (struct pos *p)
     c->bg = NO_BG;
     c->ext.item = NO_ITEM;
   }
+}
+
+/* consistency: wall, pillars and doors shouldn't have background */
+void
+fix_confg_which_should_not_have_conbg (struct pos *p)
+{
+  struct con *c = con (p);
+  if (c->fg == WALL || c->fg == PILLAR || c->fg == DOOR)
+    c->bg = NO_BG;
 }
 
 void

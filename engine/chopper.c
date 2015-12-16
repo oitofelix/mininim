@@ -21,6 +21,7 @@
 #include <error.h>
 #include "kernel/audio.h"
 #include "kernel/array.h"
+#include "kernel/random.h"
 #include "anim.h"
 #include "room.h"
 #include "floor.h"
@@ -118,6 +119,29 @@ chopper_at_pos (struct pos *p)
   return bsearch (&c, chopper, chopper_nmemb, sizeof (c), compare_choppers);
 }
 
+bool
+should_chomp (struct pos *p)
+{
+  int i;
+  struct anim *k;
+  struct coord nc;
+  struct pos np, pm, _p;
+
+  for (i = 0; i < kid_nmemb; i++) {
+    k = &kid[i];
+    if (is_kid_dead (&k->f)) continue;
+    survey (_m, pos, &k->f, &nc, &pm, &np);
+    int inc = p->place < pm.place ? +1 : -1;
+    if (p->room == pm.room && p->floor == pm.floor) {
+      for (_p = *p; _p.place != pm.place; _p.place += inc)
+        if (con (&_p)->fg == WALL) return false;
+      return true;
+    }
+  }
+
+  return false;
+}
+
 void
 compute_choppers (void)
 {
@@ -130,7 +154,10 @@ compute_choppers (void)
       continue;
     }
     switch (c->i) {
-    case 0: if (c->wait-- <= 0) c->i++; break;
+    case 0:
+      if (c->wait-- <= 0 && should_chomp (&c->p)
+          && draw_cycle % CHOPPER_WAIT ==
+          prandom_pos (&c->p, 0, 1, CHOPPER_WAIT - 1)) c->i++; break;
     case 1: c->i++; sample_chopper = true; break;
     case 2: c->i++; break;
     case 3: c->i++; break;
@@ -181,14 +208,14 @@ void
 draw_chopper_left_03 (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   struct coord c;
-  draw_bitmapc (chopper_03, bitmap, chopper_coord_03_04 (p, &c), 0);
+  draw_bitmapc (chopper_03, bitmap, chopper_top_coord (p, &c), 0);
 }
 
 void
 draw_chopper_left_04 (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   struct coord c;
-  draw_bitmapc (chopper_04, bitmap, chopper_coord_03_04 (p, &c), 0);
+  draw_bitmapc (chopper_04, bitmap, chopper_top_coord (p, &c), 0);
 }
 
 void
@@ -232,14 +259,14 @@ void
 draw_chopper_fg_03 (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   struct coord c;
-  draw_bitmapc (chopper_fg_03, bitmap, chopper_coord_03_04 (p, &c), 0);
+  draw_bitmapc (chopper_fg_03, bitmap, chopper_top_coord (p, &c), 0);
 }
 
 void
 draw_chopper_fg_04 (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   struct coord c;
-  draw_bitmapc (chopper_fg_04, bitmap, chopper_coord_03_04 (p, &c), 0);
+  draw_bitmapc (chopper_fg_04, bitmap, chopper_top_coord (p, &c), 0);
 }
 
 void
@@ -272,15 +299,6 @@ chopper_bottom_coord_02 (struct pos *p, struct coord *c)
 {
   c->x = PLACE_WIDTH * p->place;
   c->y = PLACE_HEIGHT * p->floor + 33;
-  c->room = p->room;
-  return c;
-}
-
-struct coord *
-chopper_coord_03_04 (struct pos *p, struct coord *c)
-{
-  c->x = PLACE_WIDTH * p->place;
-  c->y = PLACE_HEIGHT * p->floor + 3;
   c->room = p->room;
   return c;
 }

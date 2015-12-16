@@ -56,6 +56,7 @@ void unload_chopper_samples (void);
 void register_chopper (struct pos *p);
 int compare_choppers (const void *d0, const void *d1);
 struct chopper *chopper_at_pos (struct pos *p);
+bool should_chomp (struct pos *p);
 void compute_choppers (void);
 void sample_choppers (void);
 void draw_chopper_left (ALLEGRO_BITMAP *bitmap, struct pos *p);
@@ -75,7 +76,6 @@ void draw_chopper_fg_05 (ALLEGRO_BITMAP *bitmap, struct pos *p);
 struct coord *chopper_top_coord (struct pos *p, struct coord *c);
 struct coord *chopper_bottom_coord_01 (struct pos *p, struct coord *c);
 struct coord *chopper_bottom_coord_02 (struct pos *p, struct coord *c);
-struct coord *chopper_coord_03_04 (struct pos *p, struct coord *c);
 struct coord *chopper_bottom_coord_05 (struct pos *p, struct coord *c);
 
 #endif	/* FREEPOP_CHOPPER_H */

@@ -249,7 +249,7 @@ dist_con (struct frame *f, coord_f cf, pos_f pf,
 
 
 bool
-is_hangable_con (struct pos *p)
+is_hangable_con (struct pos *p, enum dir d)
 {
   enum confg t = con (p)->fg;
   return t == FLOOR
@@ -261,7 +261,8 @@ is_hangable_con (struct pos *p)
     || t == SPIKES_FLOOR
     || t == OPENER_FLOOR
     || t == CLOSER_FLOOR
-    || t == PILLAR || t == DOOR;
+    || t == PILLAR || t == DOOR
+    || (t == CHOPPER && d == LEFT);
 }
 
 bool
@@ -272,7 +273,7 @@ is_hangable_pos (struct pos *p, enum dir d)
   struct pos pa; prel (p, &pa, -1, 0);
   struct con *ca = con (&pa);
 
-  return is_hangable_con (&ph)
+  return is_hangable_con (&ph, d)
     && (ca->fg == NO_FLOOR
         || (ca->fg == LOOSE_FLOOR
             && loose_floor_at_pos (&pa)->action

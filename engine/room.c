@@ -164,11 +164,6 @@ draw_con (ALLEGRO_BITMAP *bitmap, struct pos *p,
 void
 draw_conbg (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
-  enum confg fg = con (p)->fg;
-
-  /* consistency: wall, pillars and doors can't have background */
-  if (fg == WALL || fg == PILLAR || fg == DOOR) return;
-
   switch (con (p)->bg) {
   case NO_BG: break;
   case BRICKS_01: draw_bricks_01 (bitmap, p); break;

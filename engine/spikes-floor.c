@@ -190,6 +190,7 @@ compute_spikes_floors (void)
     /* spike kid */
     for (j = 0; j < kid_nmemb; j++) {
       struct anim *k = &kid[j];
+      if (is_kid_dead (&k->f)) continue;
       survey (_m, pos, &k->f, &nc, &pm, &np);
       if (peq (&pm, &s->p)
           && (((s->state >= 2 && s->state <= 4)
@@ -244,6 +245,7 @@ should_spikes_raise (struct pos *p)
 
   for (i = 0; i < kid_nmemb; i++) {
     k = &kid[i];
+    if (is_kid_dead (&k->f)) continue;
     survey (_mf, pos, &k->f, &nc, &pmf, &np);
     survey (_m, pos, &k->f, &nc, &pm, &np);
     survey (_mba, pos, &k->f, &nc, &pmba, &np);
