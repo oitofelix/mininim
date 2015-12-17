@@ -301,11 +301,13 @@ compute_loose_floor_fall (struct loose_floor *l)
       k->splash = true;
       k->current_lives--;
       k->uncouch_slowly = true;
-      k->death_pos = kpmt;
       sample_hit_wall = true;
       video_effect.color = RED;
       start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
-      if (k->current_lives <= 0) kid_die_suddenly (k);
+      if (k->current_lives <= 0) {
+        k->p = kpmt;
+        kid_die_suddenly (k);
+      }
       else kid_couch (k);
     }
   }

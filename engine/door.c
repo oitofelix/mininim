@@ -314,6 +314,9 @@ draw_door_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f)
     struct door *d = door_at_pos (p);
     draw_door_grid (screen, p, d->i);
     draw_confg_right (bitmap, &pa, true);
+    draw_confg_base (bitmap, &par);
+    draw_confg_left (bitmap, &par, true);
+    draw_confg_fg (bitmap, &pr, f);
   }
 }
 

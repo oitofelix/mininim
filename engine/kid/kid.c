@@ -93,6 +93,7 @@ load_kid (void)
   load_kid_sword_defense ();
   load_kid_sword_attack ();
   load_kid_die ();
+  load_kid_stairs ();
 
   /* bitmap */
   kid_full_life = load_bitmap (KID_FULL_LIFE);
@@ -151,6 +152,7 @@ unload_kid (void)
   unload_kid_sword_defense ();
   unload_kid_sword_attack ();
   unload_kid_die ();
+  unload_kid_stairs ();
 
   /* bitmaps */
   al_destroy_bitmap (kid_full_life);
@@ -229,6 +231,7 @@ draw_kids (ALLEGRO_BITMAP *bitmap)
   for (i = 0; i < kid_nmemb; i++) {
     k = &kid[i];
 
+    if (k->invisible) continue;
     frame2room (&k->f, room_view, &c);
     if (c.room != room_view) continue;
 

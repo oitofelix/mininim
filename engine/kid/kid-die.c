@@ -88,7 +88,7 @@ kid_die_spiked (struct anim *kid)
 
   if (kid->oaction != kid_die_spiked)
     place_frame (&kid->f, &kid->f, kid_die_spiked_00,
-                 &kid->death_pos, (kid->f.dir == LEFT)
+                 &kid->p, (kid->f.dir == LEFT)
                  ? +8 : +9, (kid->f.dir == LEFT) ? +32 : +31);
 }
 
@@ -101,7 +101,7 @@ kid_die_chopped (struct anim *kid)
 
   if (kid->oaction != kid_die_chopped)
     place_frame (&kid->f, &kid->f, kid_die_chopped_00,
-                 &kid->death_pos, (kid->f.dir == LEFT)
+                 &kid->p, (kid->f.dir == LEFT)
                  ? -8 : -7, +47);
 }
 
@@ -114,7 +114,7 @@ kid_die_suddenly (struct anim *kid)
 
   if (kid->oaction != kid_die_suddenly)
     place_frame (&kid->f, &kid->f, kid_die_06,
-                 &kid->death_pos, (kid->f.dir == LEFT)
+                 &kid->p, (kid->f.dir == LEFT)
                  ? +9 : +4, +47);
 
   kid->hit_by_loose_floor = false;
@@ -138,7 +138,7 @@ flow (struct anim *kid)
 {
   if (kid->oaction != kid_die) {
     place_frame (&kid->f, &kid->f, kid_die_frameset[0].frame,
-                 &kid->death_pos, (kid->f.dir == LEFT)
+                 &kid->p, (kid->f.dir == LEFT)
                  ? +13 : +21, +18);
     kid->i = -1, kid->j = 0;
   }

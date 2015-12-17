@@ -27,6 +27,7 @@
 #include "engine/potion.h"
 #include "engine/sword.h"
 #include "engine/loose-floor.h"
+#include "engine/level-door.h"
 #include "kid.h"
 
 static bool flow (struct anim *k);
@@ -81,16 +82,27 @@ flow (struct anim *k)
   bool raise_sword = is_sword (&pbf) && shift_key;
   bool take_sword = ctrl_key;
 
+  survey (_mt, pos, &k->f, &nc, &pmt, &np);
+  bool stairs = up_key && ! left_key && ! right_key
+    && con (&pmt)->fg == LEVEL_DOOR
+    && level_door_at_pos (&pmt)->i == 0;
+
   if (k->oaction == kid_normal
       && k->current_lives <= 0) {
     survey (_mt, pos, &k->f, &nc, &pmt, &np);
-    k->death_pos = pmt;
+    k->p = pmt;
     kid_die (k);
     return false;
   }
 
   if (k->oaction == kid_normal
       && k == current_kid) {
+    if (stairs) {
+      k->p = pmt;
+      kid_stairs (k);
+      return false;
+    }
+
     if (couch) {
       kid_couch (k);
       return false;

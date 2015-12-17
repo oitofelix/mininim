@@ -220,7 +220,7 @@ compute_choppers (void)
         c->blood = true;
         k->splash = true;
         k->current_lives = 0;
-        k->death_pos = c->p;
+        k->p = c->p;
         video_effect.color = RED;
         start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
         sample_chopped = true;

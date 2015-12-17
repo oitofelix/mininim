@@ -50,6 +50,7 @@
 #include "kid-sword-defense.h"
 #include "kid-sword-attack.h"
 #include "kid-die.h"
+#include "kid-stairs.h"
 
 /* bitmaps */
 #define KID_FULL_LIFE "dat/kid/objects/full live.png"

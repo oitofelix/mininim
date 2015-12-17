@@ -58,6 +58,7 @@ void sample_level_doors (void);
 void draw_level_door (ALLEGRO_BITMAP *bitmap, struct pos *p);
 void draw_level_door_right (ALLEGRO_BITMAP *bitmap, struct pos *p);
 void draw_level_door_front (ALLEGRO_BITMAP *bitmap, struct pos *p, int i);
+void draw_level_door_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f);
 struct coord *level_door_front_coord_base (struct pos *p, struct coord *c);
 struct coord *level_door_front_coord (struct pos *p, struct coord *c, int j, int i);
 struct coord *level_door_front_tip_coord (struct pos *p, struct coord *c, int i);

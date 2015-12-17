@@ -233,8 +233,10 @@ physics_in (struct anim *kid)
     } else if (kid->i > 3) sample_hit_ground = true;
 
     survey (_mt, pos, &kid->f, &nc, &pmt, &np);
-    kid->death_pos = pmt;
-    if (kid->current_lives <= 0) kid_die_suddenly (kid);
+    if (kid->current_lives <= 0) {
+      kid->p = pmt;
+      kid_die_suddenly (kid);
+    }
     else kid_couch (kid);
 
     return false;

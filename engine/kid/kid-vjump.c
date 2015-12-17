@@ -212,7 +212,11 @@ physics_out (struct anim *kid)
   enum confg ctf, ctb;
 
  /* depressible floors */
-  if (kid->i == 11) {
+  if (kid->i == 0 && kid->hang
+      && ! peq (&kid->hang_pos, &kid->df_pos[0])
+      && ! peq (&kid->hang_pos, &kid->df_pos[1]))
+    update_depressible_floor (kid, -1, -8);
+  else if (kid->i == 11) {
     save_depressible_floor (kid);
     clear_depressible_floor (kid);
   } else if (kid->i == 14 && ! kid->just_hanged) {
@@ -220,8 +224,6 @@ physics_out (struct anim *kid)
     keep_depressible_floor (kid);
   } else if (kid->i == 14 && kid->just_hanged)
     update_depressible_floor (kid, -5, -7);
-  else if (kid->i == 14 && kid->just_hanged)
-    update_depressible_floor (kid, -5, -12);
   else keep_depressible_floor (kid);
 
   /* ceiling loose floor shaking and release */

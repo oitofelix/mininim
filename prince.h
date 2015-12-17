@@ -189,7 +189,7 @@ struct anim {
   bool reverse, collision, fall, hit_ceiling,
     just_hanged, hang, hang_limit, misstep, uncouch_slowly,
     keep_sword_fast, turn, shadow, current, splash,
-    hit_by_loose_floor;
+    hit_by_loose_floor, invisible;
 
   int dc, df, dl, dcl, dch, dcd;
 
@@ -200,7 +200,7 @@ struct anim {
 
   enum item item;
 
-  struct pos p, item_pos, hang_pos, death_pos;
+  struct pos p, item_pos, hang_pos;
 
   /* depressible floor */
   struct pos df_pos[2];

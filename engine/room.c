@@ -230,8 +230,6 @@ void
 draw_confg_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
                  bool redraw)
 {
-  struct pos pa;
-
   switch (con (p)->fg) {
   case NO_FLOOR: break;
   case FLOOR: draw_floor_left (bitmap, p); break;
@@ -256,17 +254,6 @@ draw_confg_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
   }
 
   if (! redraw) return;
-
-  prel (p, &pa, -1, +0);
-
-  /* above */
-  switch (con (p)->fg) {
-  case LEVEL_DOOR:
-    draw_confg_base (bitmap, &pa);
-    draw_confg_left (bitmap, &pa, true);
-    break;
-  default: break;
-  }
 }
 
 void
@@ -331,8 +318,6 @@ void
 draw_confg_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
                struct frame *f)
 {
-  struct pos pr, pa, par;
-
   switch (con (p)->fg) {
   case NO_FLOOR: break;
   case FLOOR: break;
@@ -349,32 +334,11 @@ draw_confg_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
     draw_big_pillar_top_left (bitmap, p); break;
   case WALL: draw_wall_left (bitmap, p); break;
   case DOOR: draw_door_fg (bitmap, p, f); break;
-  case LEVEL_DOOR: break;
+  case LEVEL_DOOR: draw_level_door_fg (bitmap, p, f); break;
   case CHOPPER: draw_chopper_fg (bitmap, p); break;
   default:
     error (-1, 0, "%s: unknown foreground (%i)",
            __func__, con (p)->fg);
-  }
-
-  prel (p, &pr, +0, +1);
-  prel (p, &pa, -1, +0);
-  prel (p, &par, -1, +1);
-
-  /* right */
-  switch (con (p)->fg) {
-  case DOOR:
-    draw_confg_fg (bitmap, &pr, f);
-    break;
-  default: break;
-  }
-
-  /* above right */
-  switch (con (p)->fg) {
-  case DOOR:
-    draw_confg_base (bitmap, &par);
-    draw_confg_left (bitmap, &par, true);
-    break;
-  default: break;
   }
 }
 
