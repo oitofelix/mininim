@@ -190,6 +190,8 @@ struct anim {
     keep_sword_fast, turn, shadow, current, splash,
     hit_by_loose_floor;
 
+  int dc, df, dl, dcl, dch, dcd;
+
   bool poison_immune, loose_floor_immune, fall_immune,
     spikes_immune, chopper_immune;
 

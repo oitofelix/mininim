@@ -202,6 +202,7 @@ compute_choppers (void)
     for (j = 0; j < kid_nmemb; j++) {
       struct anim *k = &kid[j];
       if (is_kid_dead (&k->f)
+          || is_kid_fall (&k->f)
           || k->chopper_immune) continue;
       struct coord nc; struct pos np, ptf, ptb;
       survey (_tf, pos, &k->f, &nc, &ptf, &np);

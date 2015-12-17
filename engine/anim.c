@@ -87,12 +87,12 @@ play_anim (void (*draw_callback) (void),
           int dc = dist_collision (&current_kid->f, false, &kid->ci) + 4;
           int df = dist_fall (&current_kid->f, false);
           int dl = dist_con (&current_kid->f, _bf, pos, -4, false, LOOSE_FLOOR);
-          int dd = dist_con (&current_kid->f, _bf, pos, -4, false, CLOSER_FLOOR);
+          int dcl = dist_con (&current_kid->f, _bf, pos, -4, false, CLOSER_FLOOR);
           int dch = dist_chopper (&current_kid->f, false);
           if (delete_key || page_down_key || enter_key)
             printf ("\
-f = %i, p = %i, dn = %i, dp = %i, dc = %i, df = %i, dl = %i, dd = %i, dch = %i\n",
-                    pbf.floor, pbf.place, dn, dp, dc, df, dl, dd, dch);
+f = %i, p = %i, dn = %i, dp = %i, dc = %i, df = %i, dl = %i, dcl = %i, dch = %i\n",
+                    pbf.floor, pbf.place, dn, dp, dc, df, dl, dcl, dch);
         }
         /* end kid hack */
 

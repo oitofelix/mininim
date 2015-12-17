@@ -230,10 +230,7 @@ physics_in (struct anim *kid)
       }
       video_effect.color = RED;
       start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
-    } else {
-      kid->uncouch_slowly = false;
-      if (kid->i > 3) sample_hit_ground = true;
-    }
+    } else if (kid->i > 3) sample_hit_ground = true;
 
     survey (_mt, pos, &kid->f, &nc, &pmt, &np);
     kid->death_pos = pmt;

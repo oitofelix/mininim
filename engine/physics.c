@@ -357,9 +357,9 @@ dist_chopper (struct frame *f, bool reverse)
   enum confg ctfr = con (&ptfr)->fg;
 
   if (_f.dir == LEFT && ctf == CHOPPER)
-    return dist_next_place (&_f, _tf, pos, -4, false);
+    return dist_next_place (&_f, _tf, pos, +0, false);
   else if (_f.dir == RIGHT && ctfr == CHOPPER)
-    return dist_next_place (&_f, _tf, pos, -4, false);
+    return dist_next_place (&_f, _tf, pos, +0, false);
 
   return PLACE_WIDTH + 1;
 }
