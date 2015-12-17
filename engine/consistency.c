@@ -36,10 +36,10 @@ static void fix_sword_at_right_of_wall_or_door (struct pos *p);
 static void fix_door_lacking_opener (struct pos *p);
 static void fix_opener_or_closer_lacking_door (struct pos *p);
 static void fix_confg_which_should_not_have_conbg (struct pos *p);
+static void fix_partial_big_pillar (struct pos *p);
 
 void fix_enclosure (struct pos *p, enum dir dir);
 
-static bool is_rigid_con (struct pos *p);
 static bool is_there_event_handler (int e);
 static bool is_enclosure (struct pos *p, bool (*pred) (struct pos *p), enum dir dir);
 static bool is_inaccessible (struct pos *p);
@@ -69,6 +69,7 @@ fix_level (struct level *lv)
         fix_item_on_non_normal_floor (&p);
         fix_sword_at_right_of_wall_or_door (&p);
         fix_confg_which_should_not_have_conbg (&p);
+        fix_partial_big_pillar (&p);
       }
 
   level = olevel;
@@ -123,7 +124,7 @@ fix_loose_enclosure (struct pos *p)
   if (is_enclosure (p, is_loose, RIGHT)) fix_enclosure (p, RIGHT);
 }
 
-/* consistency: rigid constructions (pillar, wall, door, chopper) must
+/* consistency: rigid constructions (pillar, big pillar, wall, door, chopper) must
    have something non-traversable lying on it */
 static void
 fix_rigid_con_no_floor_top (struct pos *p)
@@ -132,14 +133,11 @@ fix_rigid_con_no_floor_top (struct pos *p)
   struct con *ca = con (&pa);
 
   /* rigid construction's perspective */
-  if (is_rigid_con (p) &&
-      (ca->fg == NO_FLOOR
-       || ca->fg == LOOSE_FLOOR)) ca->fg = FLOOR;
+  if (is_rigid_con (p) && is_traversable (&pa)) ca->fg = FLOOR;
 
   /* traversable's perspective */
   struct pos pb; prel (p, &pb, +1, 0);
-  if ((con (p)->fg == NO_FLOOR
-       || con (p)->fg  == LOOSE_FLOOR)
+  if (is_traversable (p)
       && is_rigid_con (&pb)) con (p)->fg = FLOOR;
 }
 
@@ -176,27 +174,28 @@ fix_broken_floor_lacking_no_floor_on_top (struct pos *p)
   if (c->fg != NO_FLOOR && cb->fg == BROKEN_FLOOR) cb->fg = FLOOR;
 }
 
-/* conssitency: skeleton and spikes floors must not have no or loose
-   floor at left, because there is no corner floor sprites to render
-   the perspective when the kid is climbing them */
+/* consistency: skeleton and spikes floors can't be a hangable
+   construction at left because there is no corner floor sprites to
+   render the perspective when the kid is climbing them */
 static void
 fix_skeleton_or_spikes_floor_with_no_or_loose_floor_at_left (struct pos *p)
 {
   struct con *c = con (p);
-  struct con *cl = crel (p, 0, -1);
-  struct con *cr = crel (p, 0, +1);
+  struct pos ph; prel (p, &ph, +1, -1);
+  struct con *cl = crel (p, +0, -1);
+  struct con *ca = crel (p, -1, +0);
 
   /* skeleton and spike's perspective */
   if ((c->fg == SKELETON_FLOOR
        || c->fg == SPIKES_FLOOR)
-      && (cl->fg == NO_FLOOR
-          || cl->fg == LOOSE_FLOOR)) cl->fg = FLOOR;
+      && is_hangable_pos (&ph, RIGHT))
+    cl->fg = FLOOR;
 
-  /* no and loose floor's perspective  */
-  if ((c->fg == NO_FLOOR
-       || c->fg == LOOSE_FLOOR)
-      && (cr->fg == SKELETON_FLOOR
-          || cr->fg == SPIKES_FLOOR)) cr->fg = FLOOR;
+  /* hangable position perspective  */
+  enum confg t = get_hanged_con (p, RIGHT);
+  if (is_hangable_pos (p, RIGHT)
+      && (t == SKELETON_FLOOR || t == SPIKES_FLOOR))
+    ca->fg = FLOOR;
 }
 
 /* consistency: itens can't be adjacent */
@@ -292,13 +291,30 @@ fix_opener_or_closer_lacking_door (struct pos *p)
   }
 }
 
-/* consistency: wall, pillars and doors shouldn't have background */
+/* consistency: wall, pillars, big pillars and doors shouldn't have
+   background */
 void
 fix_confg_which_should_not_have_conbg (struct pos *p)
 {
   struct con *c = con (p);
-  if (c->fg == WALL || c->fg == PILLAR || c->fg == DOOR)
+  if (c->fg == WALL || c->fg == PILLAR
+      || c->fg == BIG_PILLAR_TOP || c->fg == BIG_PILLAR_BOTTOM
+      || c->fg == DOOR)
     c->bg = NO_BG;
+}
+
+/* consistency: big pillar bottom must have big pillar top over it and
+   vice-versa */
+void
+fix_partial_big_pillar (struct pos *p)
+{
+  struct con *c = con (p);
+  struct con *cb = crel (p, +1, +0);
+  struct con *ca = crel (p, -1, +0);
+
+  if ((c->fg == BIG_PILLAR_BOTTOM && ca->fg != BIG_PILLAR_TOP)
+      || (c->fg == BIG_PILLAR_TOP && cb->fg != BIG_PILLAR_BOTTOM))
+    c->fg = FLOOR;
 }
 
 void
@@ -331,13 +347,6 @@ is_there_event_handler (int e)
         }
       }
   return false;
-}
-
-static bool
-is_rigid_con (struct pos *p)
-{
-  enum confg fg = con (p)->fg;
-  return fg == PILLAR || fg == WALL || fg == DOOR || fg == CHOPPER;
 }
 
 void
@@ -377,13 +386,10 @@ is_enclosure (struct pos *p, bool (*pred) (struct pos *p), enum dir dir)
 static bool
 is_inaccessible (struct pos *p)
 {
-  struct con *c = con (p);
-  struct con *ca = crel (p, -1, +0);
+  struct pos pa; prel (p, &pa, -1, +0);
 
-  return c->fg != NO_FLOOR
-    && c->fg != LOOSE_FLOOR
-    && ca->fg != NO_FLOOR
-    && ca->fg != LOOSE_FLOOR;
+  return ! is_traversable (p)
+    && ! is_traversable (&pa);
 }
 
 static bool

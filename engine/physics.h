@@ -29,6 +29,8 @@ struct con *crel (struct pos *p, int floor, int place);
 bool is_frame_visible (struct frame *f);
 bool is_pos_visible (struct pos *p);
 bool is_strictly_traversable (struct pos *p);
+bool is_traversable (struct pos *p);
+bool is_rigid_con (struct pos *p);
 
 
 int dist_next_place (struct frame *f, coord_f cf, pos_f pf,
@@ -45,7 +47,8 @@ dist_collision (struct frame *f, bool reverse,
                 struct collision_info *ci);
 int
 dist_chopper (struct frame *f, bool reverse);
-
+int
+dist_fall (struct frame *f, bool reverse);
 
 
 bool is_hangable_con (struct pos *p, enum dir d);

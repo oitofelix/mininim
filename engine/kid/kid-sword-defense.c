@@ -100,14 +100,15 @@ flow (struct anim *kid)
 static bool
 physics_in (struct anim *kid)
 {
-  struct coord nc; struct pos np;
-  enum confg cbf, cmbo, cbb;
+  struct coord nc; struct pos np, pbf, pmbo, pbb;
 
   /* fall */
-  cbf = survey (_bf, pos, &kid->f, &nc, &np, &np)->fg;
-  cmbo = survey (_mbo, pos, &kid->f, &nc, &np, &np)->fg;
-  cbb = survey (_bb, pos, &kid->f, &nc, &np, &np)->fg;
-  if (cbf == NO_FLOOR || cmbo == NO_FLOOR || cbb == NO_FLOOR) {
+  survey (_bf, pos, &kid->f, &nc, &pbf, &np);
+  survey (_mbo, pos, &kid->f, &nc, &pmbo, &np);
+  survey (_bb, pos, &kid->f, &nc, &pbb, &np);
+  if (is_strictly_traversable (&pbf)
+      || is_strictly_traversable (&pmbo)
+      || is_strictly_traversable (&pbb)) {
     kid->xf.b = NULL;
     kid_fall (kid);
     return false;

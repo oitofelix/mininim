@@ -71,7 +71,7 @@ draw_pillar_fg (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   struct coord c;
   draw_floor_corner_03 (bitmap, p);
-  draw_bitmapc (pillar, screen, pillar_coord (p, &c), 0);
+  draw_bitmapc (pillar, bitmap, pillar_coord (p, &c), 0);
 }
 
 struct coord *

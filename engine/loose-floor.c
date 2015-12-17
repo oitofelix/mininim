@@ -276,9 +276,9 @@ compute_loose_floor_fall (struct loose_floor *l)
   next_frame (&l->f, &nf, &fo);
   struct coord mbo_f, mbo_nf;
   struct pos fpmbo_f, nfpmbo_f, fpmbo_nf, nfpmbo_nf;
-  enum confg fcmbo_f, fcmbo_nf;
+  enum confg fcmbo_f;
   fcmbo_f = survey (_mbo, posf, &l->f, &mbo_f, &fpmbo_f, &nfpmbo_f)->fg;
-  fcmbo_nf = survey (_mbo, posf, &nf, &mbo_nf, &fpmbo_nf, &nfpmbo_nf)->fg;
+  survey (_mbo, posf, &nf, &mbo_nf, &fpmbo_nf, &nfpmbo_nf);
 
   struct pos p;
 
@@ -310,16 +310,14 @@ compute_loose_floor_fall (struct loose_floor *l)
     }
   }
 
-  if (fcmbo_f == NO_FLOOR
+  if (is_strictly_traversable (&fpmbo_f)
       || peq (&fpmbo_f, &fpmbo_nf)) {
     /* the floor hit a rigid structure */
-    if (fcmbo_nf == WALL
-        || fcmbo_nf == PILLAR
-        || fcmbo_nf == DOOR) prel (&fpmbo_nf, &p, -1, 0);
+    if (is_rigid_con (&fpmbo_nf)) prel (&fpmbo_nf, &p, -1, 0);
     /* the floor continue to fall */
     else {
       l->f = nf;
-      if (fcmbo_nf == NO_FLOOR) l->p = fpmbo_nf;
+      if (is_strictly_traversable (&fpmbo_nf)) l->p = fpmbo_nf;
       sort_loose_floors ();
       return;
     }

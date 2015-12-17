@@ -83,8 +83,8 @@ flow (struct anim *k)
 
   if (k->oaction == kid_normal
       && k->current_lives <= 0) {
-    survey (_mt, pos, &kid->f, &nc, &pmt, &np);
-    kid->death_pos = pmt;
+    survey (_mt, pos, &k->f, &nc, &pmt, &np);
+    k->death_pos = pmt;
     kid_die (k);
     return false;
   }
@@ -160,16 +160,16 @@ flow (struct anim *k)
 static bool
 physics_in (struct anim *k)
 {
-  struct coord nc; struct pos np;
-  enum confg cmbo, cbb;
+  struct coord nc; struct pos np, pmbo, pbb;
 
   /* inertia */
   k->inertia = 0;
 
   /* fall */
-  cmbo = survey (_mbo, pos, &k->f, &nc, &np, &np)->fg;
-  cbb = survey (_bb, pos, &k->f, &nc, &np, &np)->fg;
-  if (cmbo == NO_FLOOR && cbb == NO_FLOOR) {
+  survey (_mbo, pos, &k->f, &nc, &pmbo, &np);
+  survey (_bb, pos, &k->f, &nc, &pbb, &np);
+  if (is_strictly_traversable (&pmbo)
+      && is_strictly_traversable (&pbb)) {
     kid_fall (k);
     return false;
   }

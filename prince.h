@@ -114,6 +114,8 @@ struct level {
       OPENER_FLOOR,
       CLOSER_FLOOR,
       PILLAR,
+      BIG_PILLAR_BOTTOM,
+      BIG_PILLAR_TOP,
       WALL,
       DOOR,
       CHOPPER,

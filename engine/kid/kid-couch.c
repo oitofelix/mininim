@@ -242,7 +242,7 @@ physics_in (struct anim *kid)
   cm = survey (_m, pos, &kid->f, &nc, &pm, &np)->fg;
   struct loose_floor *l =
     loose_floor_at_pos (prel (&pm, &np, -1, +0));
-  if ((cm == NO_FLOOR
+  if ((is_strictly_traversable (&pm)
        || (l && l->action == FALL_LOOSE_FLOOR && cm == LOOSE_FLOOR))
       && ! (kid->fall && kid->i == 0)) {
     kid_fall (kid);

@@ -85,7 +85,7 @@ play_anim (void (*draw_callback) (void),
           int dn = dist_next_place (&current_kid->f, _bf, pos, 0, false);
           int dp = dist_next_place (&current_kid->f, _bf, pos, 0, true);
           int dc = dist_collision (&current_kid->f, false, &kid->ci) + 4;
-          int df = dist_con (&current_kid->f, _bf, pos, -4, false, NO_FLOOR);
+          int df = dist_fall (&current_kid->f, false);
           int dl = dist_con (&current_kid->f, _bf, pos, -4, false, LOOSE_FLOOR);
           int dd = dist_con (&current_kid->f, _bf, pos, -4, false, CLOSER_FLOOR);
           int dch = dist_chopper (&current_kid->f, false);

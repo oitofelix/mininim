@@ -225,10 +225,10 @@ draw_pressed_closer_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p)
 void
 draw_pressed_closer_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
-  struct coord c;
+  struct coord c; struct pos np;
   draw_bitmapc (normal_floor_right, bitmap,
                 pressed_closer_floor_right_coord (p, &c), 0);
-  if (crel (p, 0, +1)->fg != NO_FLOOR)
+  if (! is_strictly_traversable (prel (p, &np, 0, +1)))
     draw_bitmapc (pressed_closer_floor_right, bitmap,
                   floor_right_coord (p, &c), 0);
 }

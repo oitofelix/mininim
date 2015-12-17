@@ -221,6 +221,8 @@ draw_kids (ALLEGRO_BITMAP *bitmap)
   struct coord ml, c; struct pos pml, pmlr, pmlra;
   struct anim *k;
 
+  coord_wa = true;
+
   qsort (kid, kid_nmemb, sizeof (*k), compare_kids);
 
   size_t i;
@@ -244,6 +246,8 @@ draw_kids (ALLEGRO_BITMAP *bitmap)
     draw_room_anim_fg (bitmap, k);
     k->xf.b = NULL;
   }
+
+  coord_wa = false;
 }
 
 int
@@ -296,10 +300,8 @@ draw_kid_frame (ALLEGRO_BITMAP *bitmap, struct anim *k)
     if (obx) k->xf.b = apply_palette (k->xf.b, phantom_shadow_palette);
   }
 
-  coord_wa = true;
   draw_frame (bitmap, &k->f);
   draw_xframe (bitmap, &k->f, &k->xf);
-  coord_wa = false;
 
   if (k->splash) {
     draw_bitmapc (kid_splash, bitmap, splash_coord (&k->f, &c), k->f.flip);

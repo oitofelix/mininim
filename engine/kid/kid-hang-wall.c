@@ -81,7 +81,7 @@ flow (struct anim *kid)
       || kid->hang_limit
       || get_hanged_con (&kid->hang_pos, kid->f.dir) == NO_FLOOR
       || kid != current_kid) {
-    if (con (&kid->hang_pos)->fg == NO_FLOOR) {
+    if (is_strictly_traversable (&kid->hang_pos)) {
       place_frame (&kid->f, &kid->f, kid_fall_frameset[0].frame,
                    &kid->hang_pos,
                    (kid->f.dir == LEFT) ? PLACE_WIDTH - 12 : +16,

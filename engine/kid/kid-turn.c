@@ -105,7 +105,7 @@ flow (struct anim *kid)
 
   if (kid->i == 3) {
     int dc = dist_collision (&kid->f, false, &kid->ci);
-    int df = dist_con (&kid->f, _bf, pos, -4, false, NO_FLOOR);
+    int df = dist_fall (&kid->f, false);
 
     if (kid->hang) kid_hang (kid);
     else if (kid->turn
@@ -153,13 +153,14 @@ flow (struct anim *kid)
 static bool
 physics_in (struct anim *kid)
 {
-  struct coord nc; struct pos np;
-  enum confg cbf, cbb;
+  struct coord nc; struct pos np, pbf, pbb;
 
   /* fall */
-  cbf = survey (_bf, pos, &kid->f, &nc, &np, &np)->fg;
-  cbb = survey (_bb, pos, &kid->f, &nc, &np, &np)->fg;
-  if (! kid->hang && cbf == NO_FLOOR && cbb == NO_FLOOR) {
+  survey (_bf, pos, &kid->f, &nc, &pbf, &np);
+  survey (_bb, pos, &kid->f, &nc, &pbb, &np);
+  if (! kid->hang
+      && is_strictly_traversable (&pbf)
+      && is_strictly_traversable (&pbb)) {
     kid_fall (kid);
     return false;
   }

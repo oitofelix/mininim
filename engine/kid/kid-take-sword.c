@@ -103,7 +103,6 @@ static bool
 physics_in (struct anim *kid)
 {
   struct coord tf; struct pos np, ptf;
-  enum confg ctf;
 
   /* collision */
   if (is_colliding (&kid->f, &kid->fo, +PLACE_WIDTH, false, &kid->ci)
@@ -114,8 +113,8 @@ physics_in (struct anim *kid)
   }
 
   /* fall */
-  ctf = survey (_tf, pos, &kid->f, &tf, &ptf, &np)->fg;
-  if (ctf == NO_FLOOR) {
+  survey (_tf, pos, &kid->f, &tf, &ptf, &np);
+  if (is_strictly_traversable (&ptf)) {
     kid_fall (kid);
     return false;
   }

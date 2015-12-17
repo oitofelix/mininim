@@ -106,9 +106,8 @@ static bool
 physics_in (struct anim *kid)
 {
   struct coord nc;
-  struct pos np, pbf, ptf, pmt, pmtf, pmtb, pbb,
+  struct pos np, pbf, ptf, ptb, pmt, pmtf, pmtb, pbb,
     npmbo, npmbo_nf;
-  enum confg cmbo;
   struct frame nf;
   struct frame_offset fo;
 
@@ -148,9 +147,13 @@ physics_in (struct anim *kid)
 
   /* help kid hang */
   survey (_tf, pos, &kid->f, &nc, &ptf, &np);
+  survey (_bf, pos, &kid->f, &nc, &pbf, &np);
+  survey (_tb, pos, &kid->f, &nc, &ptb, &np);
   survey (_bb, pos, &kid->f, &nc, &pbb, &np);
-  if (is_hangable_con (&ptf, kid->f.dir)
-      || is_hangable_pos (&pbb, kid->f.dir))
+  if ((is_hangable_con (&ptf, kid->f.dir)
+       && ! peq (&ptf, &pbf))
+      || (is_hangable_pos (&pbb, kid->f.dir)
+          && ! peq (&pbb, &ptb)))
     kid->inertia = 0;
 
   /* fall speed */
@@ -164,8 +167,9 @@ physics_in (struct anim *kid)
   printf ("inertia: %i\n", kid->inertia);
 
   /* collision */
-  if (is_colliding (&kid->f, &kid->fo, +0, false, &kid->ci))
-    kid->fo.dx = 0;
+  if (is_colliding (&kid->f, &kid->fo, +0, false, &kid->ci)) {
+    kid->inertia = 0; kid->fo.dx = 0;
+  }
 
   /* hang front */
   if (kid->i > 2 && can_hang (&kid->f, false, &kid->hang_pos)
@@ -186,7 +190,7 @@ physics_in (struct anim *kid)
   }
 
   /* land on ground */
-  cmbo = survey (_mbo, pos, &kid->f, &nc, &np, &npmbo)->fg;
+  survey (_mbo, pos, &kid->f, &nc, &np, &npmbo);
   fo.b = kid->f.b;
   fo.dx = 0;
   fo.dy = 34;
@@ -194,7 +198,7 @@ physics_in (struct anim *kid)
   survey (_mbo, pos, &nf, &nc, &np, &npmbo_nf);
 
   if (kid->i > 2
-      && cmbo != NO_FLOOR
+      && ! is_strictly_traversable (&npmbo)
       && npmbo.floor != npmbo_nf.floor) {
     kid->inertia = 0;
 

@@ -33,6 +33,7 @@
 #include "closer-floor.h"
 #include "spikes-floor.h"
 #include "pillar.h"
+#include "big-pillar.h"
 #include "wall.h"
 #include "door.h"
 #include "chopper.h"
@@ -55,6 +56,7 @@ load_room (void)
       load_vdungeon_spikes_floor ();
       load_vdungeon_wall ();
       load_vdungeon_pillar ();
+      load_vdungeon_big_pillar ();
       load_vdungeon_door ();
       load_vdungeon_chopper ();
       bricks_01 = load_bitmap (VDUNGEON_BRICKS_01);
@@ -93,6 +95,7 @@ unload_room (void)
   unload_spikes_floor ();
   unload_wall ();
   unload_pillar ();
+  unload_big_pillar ();
   unload_door ();
   unload_chopper ();
 
@@ -120,7 +123,10 @@ draw_bitmapc (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
   struct coord nc = *c;
 
   if (! cutscene) {
-    coord2room (&nc, room_view, &nc);
+    struct frame f;
+    f.b = from;
+    f.c = *c;
+    frame2room (&f, room_view, &nc);
     if (to == screen && nc.room != room_view) return;
   }
 
@@ -135,7 +141,10 @@ draw_bitmap_regionc (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
   struct coord nc = *c;
 
   if (! cutscene) {
-    coord2room (&nc, room_view, &nc);
+    struct frame f;
+    f.b = from;
+    f.c = *c;
+    frame2room (&f, room_view, &nc);
     if (to == screen && nc.room != room_view) return;
   }
 
@@ -200,6 +209,8 @@ draw_confg_base (ALLEGRO_BITMAP *bitmap, struct pos *p)
   case OPENER_FLOOR: draw_opener_floor_base (bitmap, p); break;
   case CLOSER_FLOOR: draw_closer_floor_base (bitmap, p); break;
   case PILLAR: draw_floor_base (bitmap, p); break;
+  case BIG_PILLAR_BOTTOM: draw_floor_base (bitmap, p); break;
+  case BIG_PILLAR_TOP: break;
   case WALL: draw_wall_base (bitmap, p); break;
   case DOOR: draw_floor_base (bitmap, p); break;
   case CHOPPER: draw_floor_base (bitmap, p); break;
@@ -223,6 +234,10 @@ draw_confg_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case OPENER_FLOOR: draw_opener_floor_left (bitmap, p); break;
   case CLOSER_FLOOR: draw_closer_floor_left (bitmap, p); break;
   case PILLAR: draw_pillar_left (bitmap, p); break;
+  case BIG_PILLAR_BOTTOM:
+    draw_big_pillar_bottom_left (bitmap, p); break;
+  case BIG_PILLAR_TOP:
+    draw_big_pillar_top_left (bitmap, p); break;
   case WALL: draw_wall_left (bitmap, p); break;
   case DOOR: draw_door_left (bitmap, p); break;
   case CHOPPER: draw_chopper_left (bitmap, p); break;
@@ -250,6 +265,10 @@ draw_confg_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case OPENER_FLOOR: draw_opener_floor_right (bitmap, p); break;
   case CLOSER_FLOOR: draw_closer_floor_right (bitmap, p); break;
   case PILLAR: draw_pillar_right (bitmap, p); break;
+  case BIG_PILLAR_BOTTOM:
+    draw_big_pillar_bottom_right (bitmap, p); break;
+  case BIG_PILLAR_TOP:
+    draw_big_pillar_top_right (bitmap, p); break;
   case WALL: draw_wall_right (bitmap, p); break;
   case DOOR: draw_door_right (bitmap, p); break;
   case CHOPPER: draw_floor_right (bitmap, p); break;
@@ -271,6 +290,7 @@ draw_confg_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
   /* above */
   switch (con (p)->fg) {
   case PILLAR: case DOOR:
+  /* case BIG_PILLAR_TOP: */
     draw_confg_right (bitmap, &pa, true);
     break;
   default: break;
@@ -303,6 +323,10 @@ draw_confg_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case OPENER_FLOOR: break;
   case CLOSER_FLOOR: break;
   case PILLAR: draw_pillar_fg (bitmap, p); break;
+  case BIG_PILLAR_BOTTOM:
+    draw_big_pillar_bottom_fg (bitmap, p); break;
+  case BIG_PILLAR_TOP:
+    draw_big_pillar_top_left (bitmap, p); break;
   case WALL: draw_wall_left (bitmap, p); break;
   case DOOR: draw_door_fg (bitmap, p, f); break;
   case CHOPPER: draw_chopper_fg (bitmap, p); break;
@@ -430,6 +454,8 @@ draw_room_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f)
 
     if (con (p)->fg == PILLAR)
       draw_pillar_fg (screen, p);
+    else if (con (p)->fg == BIG_PILLAR_BOTTOM)
+      draw_big_pillar_bottom_fg (screen, p);
     else if (con (p)->fg == BROKEN_FLOOR)
       draw_broken_floor_fg (screen, p);
     else {
@@ -459,7 +485,8 @@ draw_room_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f)
                  || peq (p, prel (&pmbo, &np, -1, 0)))
              && ! (is_kid_hang_or_climb (f) && f->dir == LEFT)
              && ! is_kid_fall (f)
-             && floor_left_coord (p, &c)->y <= tl.y)
+             && floor_left_coord (p, &c)->y <= tl.y
+             && ! is_strictly_traversable (p))
     draw_confg (screen, p, true);
   /* other cases */
   draw_confg_fg (screen, p, f);

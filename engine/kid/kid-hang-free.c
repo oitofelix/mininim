@@ -60,6 +60,8 @@ kid_hang_free (struct anim *kid)
 static bool
 flow (struct anim *kid)
 {
+  struct pos np;
+
   if (kid->oaction != kid_hang_free)
     kid->i = 5, kid->j = -1, kid->wait = 3, kid->reverse = true;
 
@@ -93,28 +95,28 @@ flow (struct anim *kid)
       && (kid->i < 5 || kid->j > -1)) {
     int dir = (kid->f.dir == LEFT) ? -1 : +1;
     kid->hang_limit = false;
-    if (con (&kid->hang_pos)->fg != NO_FLOOR
+    if (! is_strictly_traversable (&kid->hang_pos)
         && kid->i >= 4) {
       place_frame (&kid->f, &kid->f, kid_vjump_frameset[13].frame,
                    &kid->hang_pos, (kid->f.dir == LEFT) ? +7 : PLACE_WIDTH + 9, -8);
       kid_vjump (kid);
       return false;
     }
-    if (crel (&kid->hang_pos, +0, dir)->fg != NO_FLOOR
+    if (! is_strictly_traversable (prel (&kid->hang_pos, &np, +0, dir))
         && kid->i <= 4) {
       place_frame (&kid->f, &kid->f, kid_vjump_frameset[13].frame,
                    &kid->hang_pos, (kid->f.dir == LEFT) ? +7 : PLACE_WIDTH + 5, -8);
       kid_vjump (kid);
       return false;
     }
-    if (con (&kid->hang_pos)->fg == NO_FLOOR
+    if (is_strictly_traversable (&kid->hang_pos)
         && kid->i >= 4) {
       place_frame (&kid->f, &kid->f, kid_fall_frameset[0].frame,
                    &kid->hang_pos, (kid->f.dir == LEFT) ? +16 : PLACE_WIDTH - 16, +12);
       kid_fall (kid);
       return false;
     }
-    if (crel (&kid->hang_pos, +0, dir)->fg == NO_FLOOR
+    if (is_strictly_traversable (prel (&kid->hang_pos, &np, +0, dir))
         && kid->i <= 4) {
       place_frame (&kid->f, &kid->f, kid_fall_frameset[0].frame,
                    &kid->hang_pos, (kid->f.dir == LEFT) ? -16 : PLACE_WIDTH + 16, +12);

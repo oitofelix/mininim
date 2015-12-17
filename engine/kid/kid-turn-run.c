@@ -118,8 +118,7 @@ flow (struct anim *kid)
 static bool
 physics_in (struct anim *kid)
 {
-  struct coord nc; struct pos np;
-  enum confg ctb;
+  struct coord nc; struct pos np, ptb;
 
   /* inertia */
   kid->inertia = 0;
@@ -132,8 +131,8 @@ physics_in (struct anim *kid)
   }
 
   /* fall */
-  ctb = survey (_tb, pos, &kid->f, &nc, &np, &np)->fg;
-  if (ctb == NO_FLOOR) {
+  survey (_tb, pos, &kid->f, &nc, &ptb, &np);
+  if (is_strictly_traversable (&ptb)) {
     kid_fall (kid);
     return false;
   }

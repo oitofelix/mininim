@@ -157,8 +157,8 @@ physics_in (struct anim *kid)
   enum confg ctf;
 
   /* fall */
-  ctf = survey (_tf, pos, &kid->f, &nc, &np, &np)->fg;
-  if (ctf == NO_FLOOR) {
+  ctf = survey (_tf, pos, &kid->f, &nc, &ptf, &np)->fg;
+  if (is_strictly_traversable (&ptf)) {
     kid_fall (kid);
     return false;
   }

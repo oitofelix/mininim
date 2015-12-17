@@ -179,8 +179,7 @@ flow (struct anim *kid)
 static bool
 physics_in (struct anim *kid)
 {
-  struct coord nc; struct pos np;
-  enum confg cbb, cmbo, cbf;
+  struct coord nc; struct pos np, pbb, pmbo, pbf;
   struct frame nf;
 
   /* inertia */
@@ -196,11 +195,13 @@ physics_in (struct anim *kid)
 
   /* fall */
   next_frame (&kid->f, &nf, &kid->fo);
-  cbb = survey (_bb, pos, &nf, &nc, &np, &np)->fg;
-  cmbo = survey (_mbo, pos, &nf, &nc, &np, &np)->fg;
-  cbf = survey (_bf, pos, &nf, &nc, &np, &np)->fg;
-  if ((cbb == NO_FLOOR && cmbo == NO_FLOOR && kid->i <= 7)
-      || (kid->i >= 10 && cbf == NO_FLOOR)) {
+  survey (_bb, pos, &nf, &nc, &pbb, &np);
+  survey (_mbo, pos, &nf, &nc, &pmbo, &np);
+  survey (_bf, pos, &nf, &nc, &pbf, &np);
+  if ((is_strictly_traversable (&pbb)
+       && is_strictly_traversable (&pmbo) && kid->i <= 7)
+      || (kid->i >= 10
+          && is_strictly_traversable (&pbf))) {
     kid_fall (kid);
     return false;
   }

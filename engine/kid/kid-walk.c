@@ -112,8 +112,7 @@ flow (struct anim *kid)
   if (kid->oaction != kid_walk) {
     survey (_bf, pos, &kid->f, &nc, &pbf, &np);
     survey (_mbo, pos, &kid->f, &nc, &pmbo, &np);
-    if (con (&pbf)->fg == NO_FLOOR
-        || con (&pbf)->fg == LOOSE_FLOOR) kid->p = pmbo;
+    if (is_traversable (&pbf)) kid->p = pmbo;
     else kid->p = pbf;
     kid->i = kid->walk = -1;
   }
@@ -121,7 +120,7 @@ flow (struct anim *kid)
   kid->ci.t = NO_FLOOR;
 
   int dc = dist_collision (&kid->f, false, &kid->ci) + 4;
-  int df = dist_con (&kid->f, _bf, pos, -4, false, NO_FLOOR);
+  int df = dist_fall (&kid->f, false);
   int dl = dist_con (&kid->f, _bf, pos, -4, false, LOOSE_FLOOR);
   int dd = dist_con (&kid->f, _bf, pos, -4, false, CLOSER_FLOOR);
   int dch = dist_chopper (&kid->f, false);
@@ -229,18 +228,17 @@ flow (struct anim *kid)
 static bool
 physics_in (struct anim *kid)
 {
-  struct coord nc; struct pos np;
-  enum confg cmbo, cbb;
+  struct coord nc; struct pos np, pmbo, pbb;
 
   /* inertia */
   kid->inertia = 0;
 
   /* fall */
-  cmbo = survey (_mbo, pos, &kid->f, &nc, &np, &np)->fg;
-  cbb = survey (_bb, pos, &kid->f, &nc, &np, &np)->fg;
+  survey (_mbo, pos, &kid->f, &nc, &pmbo, &np);
+  survey (_bb, pos, &kid->f, &nc, &pbb, &np);
   if (kid->walk == -1
-      && ((kid->i < 6 && cbb == NO_FLOOR)
-          || (kid->i >= 6 && cmbo == NO_FLOOR))) {
+      && ((kid->i < 6 && is_strictly_traversable (&pbb))
+          || (kid->i >= 6 && is_strictly_traversable (&pmbo)))) {
     kid_fall (kid);
     return false;
   }

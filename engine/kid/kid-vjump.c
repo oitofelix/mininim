@@ -161,22 +161,24 @@ flow (struct anim *kid)
 static bool
 physics_in (struct anim *kid)
 {
-  struct coord nc, tf; struct pos np, ptf, ptb;
-  enum confg cm, cmf, cmba;
+  struct coord nc, tf; struct pos np, ptf, ptb, pm, pmf, pmba;
 
   /* fall */
-  cm = survey (_m, pos, &kid->f, &nc, &np, &np)->fg;
-  cmf = survey (_mf, pos, &kid->f, &nc, &np, &np)->fg;
-  cmba = survey (_mba, pos, &kid->f, &nc, &np, &np)->fg;
-  if (cm == NO_FLOOR && cmf == NO_FLOOR && cmba == NO_FLOOR) {
+  survey (_m, pos, &kid->f, &nc, &pm, &np);
+  survey (_mf, pos, &kid->f, &nc, &pmf, &np);
+  survey (_mba, pos, &kid->f, &nc, &pmba, &np);
+  if (is_strictly_traversable (&pm)
+      && is_strictly_traversable (&pmf)
+      && is_strictly_traversable (&pmba)) {
     kid_fall (kid);
     return false;
   }
 
   /* ceiling hit */
   survey (_tb, pos, &kid->f, &nc, &ptb, &np);
+  struct pos ptba; prel (&ptb, &ptba, -1, 0);
   if (kid->i == 12 && kid->j == 1
-      && crel (&ptb, -1, 0)->fg != NO_FLOOR)
+      && ! is_strictly_traversable (&ptba))
     kid->hit_ceiling = true;
 
   /* hang */

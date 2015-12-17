@@ -227,14 +227,14 @@ sample_spikes_floors (void)
 bool
 should_spikes_raise_for_pos (struct pos *p, struct pos *pk)
 {
-  struct pos pb1, pb2;
+  struct pos pb1, pb2, np;
 
   return peq (pk, p)
     || (peq (pk, prel (p, &pb1, -1, 0))
-        && crel (p, -1, 0)->fg == NO_FLOOR)
+        && is_strictly_traversable (prel (p, &np, -1, +0)))
     || (peq (pk, prel (p, &pb2, -2, 0))
-        && crel (p, -1, 0)->fg == NO_FLOOR
-        && crel (p, -2, 0)->fg == NO_FLOOR);
+        && is_strictly_traversable (prel (p, &np, -1, +0))
+        && is_strictly_traversable (prel (p, &np, -2, +0)));
 }
 
 bool
