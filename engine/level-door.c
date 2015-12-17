@@ -156,18 +156,8 @@ void
 draw_level_door (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   draw_floor_base (bitmap, p);
-  draw_level_door_left (bitmap, p);
+  draw_floor_left (bitmap, p);
   draw_level_door_right (bitmap, p);
-}
-
-void
-draw_level_door_left (ALLEGRO_BITMAP *bitmap, struct pos *p)
-{
-  struct coord c;
-  draw_bitmapc (level_door_bottom_left, bitmap,
-                level_door_bottom_left_coord (p, &c), 0);
-  draw_bitmapc (level_door_top_left, bitmap,
-                level_door_top_left_coord (p, &c), 0);
 }
 
 void
@@ -176,6 +166,11 @@ draw_level_door_right (ALLEGRO_BITMAP *bitmap, struct pos *p)
   struct coord c;
   struct level_door *d = level_door_at_pos (p);
   if (! d) return;
+  draw_floor_right (bitmap, p);
+  draw_bitmapc (level_door_bottom_left, bitmap,
+                level_door_bottom_left_coord (p, &c), 0);
+  draw_bitmapc (level_door_top_left, bitmap,
+                level_door_top_left_coord (p, &c), 0);
   draw_bitmapc (level_door_floor, bitmap,
                 level_door_floor_coord (p, &c), 0);
   draw_bitmapc (level_door_stairs, bitmap,
@@ -242,7 +237,7 @@ level_door_top_right_coord (struct pos *p, struct coord *c)
 struct coord *
 level_door_bottom_left_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * p->place;
+  c->x = PLACE_WIDTH * p->place + 1;
   c->y = PLACE_HEIGHT * p->floor + 3;
   c->room = p->room;
   return c;
@@ -251,7 +246,7 @@ level_door_bottom_left_coord (struct pos *p, struct coord *c)
 struct coord *
 level_door_bottom_right_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * (p->place + 1);
+  c->x = PLACE_WIDTH * (p->place + 1) + 17;
   c->y = PLACE_HEIGHT * p->floor + 3;
   c->room = p->room;
   return c;

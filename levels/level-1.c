@@ -101,9 +101,9 @@ static struct level level_1 = {
     [21] =
     {{{NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR},
       {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}},
-     {{NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR},
-      {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}},
-     {{FLOOR}, {OPENER_FLOOR,NO_BG,{4}}, {FLOOR}, {FLOOR}, {LEVEL_DOOR},
+     {{NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {LOOSE_FLOOR}, {LEVEL_DOOR},
+      {LOOSE_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}},
+     {{FLOOR}, {OPENER_FLOOR,NO_BG,{4}}, {FLOOR}, {FLOOR}, {FLOOR},
       {FLOOR}, {FLOOR}, {FLOOR}, {CLOSER_FLOOR,NO_BG,{4}}, {FLOOR}}},
   },
 
@@ -123,7 +123,7 @@ static struct level level_1 = {
     [1] = {{7,0,9}, false},
     [2] = {{5,0,5}, false},
     [3] = {{5,0,9}, false},
-    [4] = {{21,2,4}, false},
+    [4] = {{21,1,4}, false},
   }
 };
 

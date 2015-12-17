@@ -396,6 +396,7 @@ is_hangable_con (struct pos *p, enum dir d)
     || t == PILLAR
     || t == BIG_PILLAR_BOTTOM
     || t == DOOR
+    || t == LEVEL_DOOR
     || (t == CHOPPER && d == LEFT);
 }
 

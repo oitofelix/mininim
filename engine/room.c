@@ -248,7 +248,7 @@ draw_confg_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
     draw_big_pillar_top_left (bitmap, p); break;
   case WALL: draw_wall_left (bitmap, p); break;
   case DOOR: draw_door_left (bitmap, p); break;
-  case LEVEL_DOOR: draw_level_door_left (bitmap, p); break;
+  case LEVEL_DOOR: draw_floor_left (bitmap, p); break;
   case CHOPPER: draw_chopper_left (bitmap, p); break;
   default:
     error (-1, 0, "%s: unknown foreground (%i)",

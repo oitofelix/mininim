@@ -27,8 +27,8 @@
 /* bitmaps */
 #define VDUNGEON_LEVEL_DOOR_TOP_LEFT "dat/vdungeon/level door/frame upper left.png"
 #define VDUNGEON_LEVEL_DOOR_TOP_RIGHT "dat/vdungeon/level door/frame upper right.png"
-#define VDUNGEON_LEVEL_DOOR_BOTTOM_LEFT "dat/vdungeon/level door/frame lower left.png"
-#define VDUNGEON_LEVEL_DOOR_BOTTOM_RIGHT "dat/vdungeon/level door/frame lower right.png"
+#define VDUNGEON_LEVEL_DOOR_BOTTOM_LEFT "dat/vdungeon/level door/bottom.png"
+#define VDUNGEON_LEVEL_DOOR_BOTTOM_RIGHT "dat/vdungeon/level door/bottom.png"
 #define VDUNGEON_LEVEL_DOOR_FLOOR "dat/vdungeon/level door/floor.png"
 #define VDUNGEON_LEVEL_DOOR_STAIRS "dat/vdungeon/level door/stairs.png"
 #define VDUNGEON_LEVEL_DOOR_FRONT "dat/vdungeon/level door/door bottom.png"
@@ -56,7 +56,6 @@ struct level_door *level_door_at_pos (struct pos *p);
 void compute_level_doors (void);
 void sample_level_doors (void);
 void draw_level_door (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_level_door_left (ALLEGRO_BITMAP *bitmap, struct pos *p);
 void draw_level_door_right (ALLEGRO_BITMAP *bitmap, struct pos *p);
 void draw_level_door_front (ALLEGRO_BITMAP *bitmap, struct pos *p, int i);
 struct coord *level_door_front_coord_base (struct pos *p, struct coord *c);
