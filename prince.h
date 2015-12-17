@@ -118,6 +118,7 @@ struct level {
       BIG_PILLAR_TOP,
       WALL,
       DOOR,
+      LEVEL_DOOR,
       CHOPPER,
     } fg;
     enum conbg {

@@ -28,6 +28,7 @@
 #include "kid/kid.h"
 #include "level.h"
 #include "door.h"
+#include "level-door.h"
 
 ALLEGRO_BITMAP *door_left, *door_right, *door_pole, *door_top,
   *door_grid, *door_grid_tip;
@@ -149,7 +150,7 @@ compute_doors (void)
           d->noise = false;
         }
       } else if (d->i == DOOR_MAX_STEP) {
-        sample_door_end = true;;
+        sample_door_end = true;
         d->action = NO_DOOR_ACTION;
         d->wait = DOOR_WAIT;
         d->noise = false;
@@ -190,21 +191,59 @@ sample_doors (void)
 void
 open_door (int e)
 {
+  struct pos *p;
+
+  struct door *d;
+  struct level_door *ld;
+
   do {
-    struct door *d = door_at_pos (&level->event[e].p);
-    if (! d) continue;
-    d->action = OPEN_DOOR;
-    d->wait = DOOR_WAIT;
+    p = &level->event[e].p;
+    switch (con (p)->fg) {
+    case DOOR:
+      d = door_at_pos (p);
+      if (! d) continue;
+      d->action = OPEN_DOOR;
+      d->wait = DOOR_WAIT;
+      break;
+    case LEVEL_DOOR:
+      ld = level_door_at_pos (p);
+      if (! ld) continue;
+      ld->action = OPEN_LEVEL_DOOR;
+      break;
+    default:
+      error (-1, 0, "%s: requested to open non-door (%i, %i, %i)",
+             __func__, p->room, p->floor, p->place);
+      break;
+    }
   } while (level->event[e++].next);
 }
 
 void
 close_door (int e)
 {
+  struct pos *p;
+
+  struct door *d;
+  struct level_door *ld;
+
   do {
-    struct door *d = door_at_pos (&level->event[e].p);
-    if (! d) continue;
-    d->action = ABRUPTLY_CLOSE_DOOR;
+    p = &level->event[e].p;
+    switch (con (p)->fg) {
+    case DOOR:
+      d = door_at_pos (p);
+      if (! d) continue;
+      d->action = ABRUPTLY_CLOSE_DOOR;
+      break;
+    case LEVEL_DOOR:
+      ld = level_door_at_pos (p);
+      if (! ld) continue;
+      ld->action = CLOSE_LEVEL_DOOR;
+      break;
+    default:
+      error (-1, 0, "%s: requested to open non-door (%i, %i, %i)",
+             __func__, p->room, p->floor, p->place);
+      break;
+    }
   } while (level->event[e++].next);
 }
 

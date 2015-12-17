@@ -254,7 +254,8 @@ fix_door_lacking_opener (struct pos *p)
   int i;
 
   struct con *c = con (p);
-  if (c->fg == DOOR) {
+  if (c->fg == DOOR
+      || c->fg == LEVEL_DOOR) {
     for (i = 0; i < EVENTS; i++)
       if (peq (&level->event[i].p, p)
           && is_there_event_handler (i)) return;
@@ -278,7 +279,8 @@ fix_opener_or_closer_lacking_door (struct pos *p)
       || c->fg == CLOSER_FLOOR) {
     int i = c->ext.event;
     do {
-      if (con (&level->event[i].p)->fg == DOOR) return;
+      if (con (&level->event[i].p)->fg == DOOR
+          || con (&level->event[i].p)->fg == LEVEL_DOOR) return;
     } while (level->event[i++].next);
 
     fprintf (stderr, "%s: replaced %s (event %i) by %s at pos (%i, %i, %i)\n",
@@ -291,7 +293,7 @@ fix_opener_or_closer_lacking_door (struct pos *p)
   }
 }
 
-/* consistency: wall, pillars, big pillars and doors shouldn't have
+/* consistency: wall, pillars, big pillars, doors and level doors shouldn't have
    background */
 void
 fix_confg_which_should_not_have_conbg (struct pos *p)
@@ -299,7 +301,7 @@ fix_confg_which_should_not_have_conbg (struct pos *p)
   struct con *c = con (p);
   if (c->fg == WALL || c->fg == PILLAR
       || c->fg == BIG_PILLAR_TOP || c->fg == BIG_PILLAR_BOTTOM
-      || c->fg == DOOR)
+      || c->fg == DOOR || c->fg == LEVEL_DOOR)
     c->bg = NO_BG;
 }
 

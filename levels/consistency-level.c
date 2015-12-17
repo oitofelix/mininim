@@ -31,7 +31,7 @@ init_consistency_level (void)
 {
   struct pos p;
 
-  random_seed = 3;
+  random_seed = 1;
   /* random_seed = time (NULL); */
   printf ("LEVEL NUMBER: %u\n", random_seed);
 
@@ -64,7 +64,8 @@ init_consistency_level (void)
         int r = prandom (255);
         if (c->fg == OPENER_FLOOR
             || c->fg == CLOSER_FLOOR) c->ext.event = r;
-        if (c->fg == DOOR) {
+        if (c->fg == DOOR
+            || c->fg == LEVEL_DOOR) {
           lv->event[r].p = p;
           lv->event[r].next = prandom (1);
         }

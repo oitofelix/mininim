@@ -36,6 +36,7 @@
 #include "big-pillar.h"
 #include "wall.h"
 #include "door.h"
+#include "level-door.h"
 #include "chopper.h"
 #include "room.h"
 
@@ -58,6 +59,7 @@ load_room (void)
       load_vdungeon_pillar ();
       load_vdungeon_big_pillar ();
       load_vdungeon_door ();
+      load_vdungeon_level_door ();
       load_vdungeon_chopper ();
       bricks_01 = load_bitmap (VDUNGEON_BRICKS_01);
       bricks_02 = load_bitmap (VDUNGEON_BRICKS_02);
@@ -81,6 +83,7 @@ load_room (void)
   load_closer_floor_samples ();
   load_spikes_floor_samples ();
   load_door_samples ();
+  load_level_door_samples ();
   load_chopper_samples ();
 }
 
@@ -97,6 +100,7 @@ unload_room (void)
   unload_pillar ();
   unload_big_pillar ();
   unload_door ();
+  unload_level_door ();
   unload_chopper ();
 
   /* sounds */
@@ -105,6 +109,7 @@ unload_room (void)
   unload_closer_floor_samples ();
   unload_spikes_floor_samples ();
   unload_door_samples ();
+  unload_level_door_samples ();
   unload_chopper_samples ();
 
   /* bitmaps */
@@ -213,6 +218,7 @@ draw_confg_base (ALLEGRO_BITMAP *bitmap, struct pos *p)
   case BIG_PILLAR_TOP: break;
   case WALL: draw_wall_base (bitmap, p); break;
   case DOOR: draw_floor_base (bitmap, p); break;
+  case LEVEL_DOOR: draw_floor_base (bitmap, p); break;
   case CHOPPER: draw_floor_base (bitmap, p); break;
   default:
     error (-1, 0, "%s: unknown foreground (%i)",
@@ -224,6 +230,8 @@ void
 draw_confg_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
                  bool redraw)
 {
+  struct pos pa;
+
   switch (con (p)->fg) {
   case NO_FLOOR: break;
   case FLOOR: draw_floor_left (bitmap, p); break;
@@ -240,6 +248,7 @@ draw_confg_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
     draw_big_pillar_top_left (bitmap, p); break;
   case WALL: draw_wall_left (bitmap, p); break;
   case DOOR: draw_door_left (bitmap, p); break;
+  case LEVEL_DOOR: draw_level_door_left (bitmap, p); break;
   case CHOPPER: draw_chopper_left (bitmap, p); break;
   default:
     error (-1, 0, "%s: unknown foreground (%i)",
@@ -247,6 +256,17 @@ draw_confg_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
   }
 
   if (! redraw) return;
+
+  prel (p, &pa, -1, +0);
+
+  /* above */
+  switch (con (p)->fg) {
+  case LEVEL_DOOR:
+    draw_confg_base (bitmap, &pa);
+    draw_confg_left (bitmap, &pa, true);
+    break;
+  default: break;
+  }
 }
 
 void
@@ -271,6 +291,7 @@ draw_confg_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
     draw_big_pillar_top_right (bitmap, p); break;
   case WALL: draw_wall_right (bitmap, p); break;
   case DOOR: draw_door_right (bitmap, p); break;
+  case LEVEL_DOOR: draw_level_door_right (bitmap, p); break;
   case CHOPPER: draw_floor_right (bitmap, p); break;
   default:
     error (-1, 0, "%s: unknown foreground (%i)",
@@ -290,7 +311,6 @@ draw_confg_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
   /* above */
   switch (con (p)->fg) {
   case PILLAR: case DOOR:
-  /* case BIG_PILLAR_TOP: */
     draw_confg_right (bitmap, &pa, true);
     break;
   default: break;
@@ -329,6 +349,7 @@ draw_confg_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
     draw_big_pillar_top_left (bitmap, p); break;
   case WALL: draw_wall_left (bitmap, p); break;
   case DOOR: draw_door_fg (bitmap, p, f); break;
+  case LEVEL_DOOR: break;
   case CHOPPER: draw_chopper_fg (bitmap, p); break;
   default:
     error (-1, 0, "%s: unknown foreground (%i)",
