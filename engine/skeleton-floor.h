@@ -24,14 +24,14 @@
 #include "physics.h"
 
 /* dungeon vga */
-#define DV_SKELETON_FLOOR_LEFT "dat/vdungeon/floor panels/skeleton left.png"
-#define DV_SKELETON_FLOOR_RIGHT "dat/vdungeon/floor panels/skeleton right.png"
+#define DV_SKELETON_FLOOR_LEFT "data/skeleton-floor/dv-left.png"
+#define DV_SKELETON_FLOOR_RIGHT "data/skeleton-floor/dv-right.png"
 
 extern ALLEGRO_BITMAP *dv_skeleton_floor_left, *dv_skeleton_floor_right;
 
 /* palace vga */
-#define PV_SKELETON_FLOOR_LEFT "dat/vpalace/floor panels/skeleton left.png"
-#define PV_SKELETON_FLOOR_RIGHT "dat/vpalace/floor panels/skeleton right.png"
+#define PV_SKELETON_FLOOR_LEFT "data/skeleton-floor/pv-left.png"
+#define PV_SKELETON_FLOOR_RIGHT "data/skeleton-floor/pv-right.png"
 
 extern ALLEGRO_BITMAP *pv_skeleton_floor_left, *pv_skeleton_floor_right;
 

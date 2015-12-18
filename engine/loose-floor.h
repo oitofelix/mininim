@@ -26,20 +26,21 @@
 #define LOOSE_FLOOR_RESISTENCE 0
 
 /* dungeon vga */
-#define DV_LOOSE_FLOOR_LEFT_01 "dat/vdungeon/floor panels/loose left01.png"
-#define DV_LOOSE_FLOOR_RIGHT_01 "dat/vdungeon/floor panels/loose right01.png"
-#define DV_LOOSE_FLOOR_BASE_01 "dat/vdungeon/floor panels/loose base01.png"
-#define DV_LOOSE_FLOOR_LEFT_02 "dat/vdungeon/floor panels/loose left02.png"
-#define DV_LOOSE_FLOOR_RIGHT_02 "dat/vdungeon/floor panels/loose right02.png"
-#define DV_LOOSE_FLOOR_BASE_02 "dat/vdungeon/floor panels/loose base02.png"
+#define DV_LOOSE_FLOOR_BASE_01 "data/loose-floor/dv-base-01.png"
+#define DV_LOOSE_FLOOR_LEFT_01 "data/loose-floor/dv-left-01.png"
+#define DV_LOOSE_FLOOR_RIGHT_01 "data/loose-floor/dv-right-01.png"
+#define DV_LOOSE_FLOOR_BASE_02 "data/loose-floor/dv-base-02.png"
+#define DV_LOOSE_FLOOR_LEFT_02 "data/loose-floor/dv-left-02.png"
+#define DV_LOOSE_FLOOR_RIGHT_02 "data/loose-floor/dv-right-02.png"
+
 
 /* palace vga */
-#define PV_LOOSE_FLOOR_LEFT_01 "dat/vpalace/floor panels/loose left01.png"
-#define PV_LOOSE_FLOOR_RIGHT_01 "dat/vpalace/floor panels/loose right01.png"
-#define PV_LOOSE_FLOOR_BASE_01 "dat/vpalace/floor panels/loose base01.png"
-#define PV_LOOSE_FLOOR_LEFT_02 "dat/vpalace/floor panels/loose left02.png"
-#define PV_LOOSE_FLOOR_RIGHT_02 "dat/vpalace/floor panels/loose right02.png"
-#define PV_LOOSE_FLOOR_BASE_02 "dat/vpalace/floor panels/loose base02.png"
+#define PV_LOOSE_FLOOR_BASE_01 "data/loose-floor/pv-base-01.png"
+#define PV_LOOSE_FLOOR_LEFT_01 "data/loose-floor/pv-left-01.png"
+#define PV_LOOSE_FLOOR_RIGHT_01 "data/loose-floor/pv-right-01.png"
+#define PV_LOOSE_FLOOR_BASE_02 "data/loose-floor/pv-base-02.png"
+#define PV_LOOSE_FLOOR_LEFT_02 "data/loose-floor/pv-left-02.png"
+#define PV_LOOSE_FLOOR_RIGHT_02 "data/loose-floor/pv-right-02.png"
 
 /* sounds */
 #define LOOSE_FLOOR_01_SAMPLE "dat/digisnd1/tile moving 1.ogg"

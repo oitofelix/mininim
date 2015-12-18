@@ -24,24 +24,24 @@
 #include "physics.h"
 
 /* dungeon vga */
-#define DV_FLOOR_LEFT "dat/vdungeon/floor panels/normal left.png"
-#define DV_FLOOR_RIGHT "dat/vdungeon/floor panels/normal right.png"
-#define DV_FLOOR_BASE "dat/vdungeon/floor panels/normal base.png"
-#define DV_FLOOR_CORNER_01 "dat/vdungeon/floor panels/normal_closer01.png"
-#define DV_FLOOR_CORNER_02 "dat/vdungeon/floor panels/normal_closer02.png"
-#define DV_FLOOR_CORNER_03 "dat/vdungeon/floor panels/normal_closer03.png"
+#define DV_FLOOR_LEFT "data/floor/dv-left.png"
+#define DV_FLOOR_RIGHT "data/floor/dv-right.png"
+#define DV_FLOOR_BASE "data/floor/dv-base.png"
+#define DV_FLOOR_CORNER_01 "data/floor/dv-corner-01.png"
+#define DV_FLOOR_CORNER_02 "data/floor/dv-corner-02.png"
+#define DV_FLOOR_CORNER_03 "data/floor/dv-corner-03.png"
 
 extern ALLEGRO_BITMAP *dv_floor_base, *dv_floor_left,
   *dv_floor_right, *dv_floor_corner_01,
   *dv_floor_corner_02, *dv_floor_corner_03;
 
 /* palace vga */
-#define PV_FLOOR_LEFT "dat/vpalace/floor panels/normal left.png"
-#define PV_FLOOR_RIGHT "dat/vpalace/floor panels/normal right.png"
-#define PV_FLOOR_BASE "dat/vpalace/floor panels/normal base.png"
-#define PV_FLOOR_CORNER_01 "dat/vpalace/floor panels/normal_closer01.png"
-#define PV_FLOOR_CORNER_02 "dat/vpalace/floor panels/normal_closer02.png"
-#define PV_FLOOR_CORNER_03 "dat/vpalace/floor panels/normal_closer03.png"
+#define PV_FLOOR_LEFT "data/floor/pv-left.png"
+#define PV_FLOOR_RIGHT "data/floor/pv-right.png"
+#define PV_FLOOR_BASE "data/floor/pv-base.png"
+#define PV_FLOOR_CORNER_01 "data/floor/pv-corner-01.png"
+#define PV_FLOOR_CORNER_02 "data/floor/pv-corner-02.png"
+#define PV_FLOOR_CORNER_03 "data/floor/pv-corner-03.png"
 
 extern ALLEGRO_BITMAP *pv_floor_base, *pv_floor_left,
   *pv_floor_right, *pv_floor_corner_01,

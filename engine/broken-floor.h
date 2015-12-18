@@ -24,17 +24,17 @@
 #include "physics.h"
 
 /* dungeon vga */
-#define DV_BROKEN_FLOOR_LEFT "dat/vdungeon/floor panels/broken left.png"
-#define DV_BROKEN_FLOOR_RIGHT "dat/vdungeon/floor panels/broken right.png"
-#define DV_BROKEN_FLOOR_FRONT "dat/vdungeon/floor panels/broken left02.png"
+#define DV_BROKEN_FLOOR_LEFT "data/broken-floor/dv-left.png"
+#define DV_BROKEN_FLOOR_RIGHT "data/broken-floor/dv-right.png"
+#define DV_BROKEN_FLOOR_FRONT "data/broken-floor/dv-front.png"
 
 extern ALLEGRO_BITMAP *dv_broken_floor_left, *dv_broken_floor_right,
   *dv_broken_floor_front;
 
 /* palace vga */
-#define PV_BROKEN_FLOOR_LEFT "dat/vpalace/floor panels/broken left.png"
-#define PV_BROKEN_FLOOR_RIGHT "dat/vpalace/floor panels/broken right.png"
-#define PV_BROKEN_FLOOR_FRONT "dat/vpalace/floor panels/broken left02.png"
+#define PV_BROKEN_FLOOR_LEFT "data/broken-floor/pv-left.png"
+#define PV_BROKEN_FLOOR_RIGHT "data/broken-floor/pv-right.png"
+#define PV_BROKEN_FLOOR_FRONT "data/broken-floor/pv-front.png"
 
 extern ALLEGRO_BITMAP *pv_broken_floor_left, *pv_broken_floor_right,
   *pv_broken_floor_front;
