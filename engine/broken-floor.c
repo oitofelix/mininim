@@ -198,7 +198,8 @@ create_broken_floor_bitmap (enum em em, enum vm vm)
     switch (vm) {
     case CGA: break;
     case EGA: break;
-    case VGA: broken_floor_left = dv_broken_floor_left;
+    case VGA:
+      broken_floor_left = dv_broken_floor_left;
       broken_floor_right = dv_broken_floor_right;
       floor_base = dv_floor_base;
       break;
@@ -208,7 +209,8 @@ create_broken_floor_bitmap (enum em em, enum vm vm)
     switch (vm) {
     case CGA: break;
     case EGA: break;
-    case VGA: broken_floor_left = pv_broken_floor_left;
+    case VGA:
+      broken_floor_left = pv_broken_floor_left;
       broken_floor_right = pv_broken_floor_right;
       floor_base = pv_floor_base;
       break;

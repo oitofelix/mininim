@@ -159,6 +159,9 @@ sample_level (void)
 static void
 draw_level (void)
 {
+  enum em em = level->em;
+  enum vm vm = level->vm;
+
   char *text = NULL;
 
   int prev_room = room_view;
@@ -197,14 +200,14 @@ draw_level (void)
       draw_fire (screen, &p, draw_cycle);
     }
 
-  if (! no_room_drawing) draw_room (screen, room_view, level->em, level->vm);
+  if (! no_room_drawing) draw_room (screen, room_view, em, vm);
 
   for (p.floor = FLOORS; p.floor >= -1; p.floor--)
     for (p.place = -1; p.place < PLACES; p.place++) {
-      draw_falling_loose_floor (screen, &p);
+      draw_falling_loose_floor (screen, &p, em, vm);
     }
 
-  draw_kids (screen, level->em, level->vm);
+  draw_kids (screen, em, vm);
 
   for (p.floor = FLOORS; p.floor >= -1; p.floor--)
     for (p.place = -1; p.place < PLACES; p.place++) {

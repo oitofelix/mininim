@@ -25,13 +25,21 @@
 /* constants */
 #define LOOSE_FLOOR_RESISTENCE 0
 
-/* bitmaps */
-#define VDUNGEON_LOOSE_FLOOR_LEFT_01 "dat/vdungeon/floor panels/loose left01.png"
-#define VDUNGEON_LOOSE_FLOOR_RIGHT_01 "dat/vdungeon/floor panels/loose right01.png"
-#define VDUNGEON_LOOSE_FLOOR_BASE_01 "dat/vdungeon/floor panels/loose base01.png"
-#define VDUNGEON_LOOSE_FLOOR_LEFT_02 "dat/vdungeon/floor panels/loose left02.png"
-#define VDUNGEON_LOOSE_FLOOR_RIGHT_02 "dat/vdungeon/floor panels/loose right02.png"
-#define VDUNGEON_LOOSE_FLOOR_BASE_02 "dat/vdungeon/floor panels/loose base02.png"
+/* dungeon vga */
+#define DV_LOOSE_FLOOR_LEFT_01 "dat/vdungeon/floor panels/loose left01.png"
+#define DV_LOOSE_FLOOR_RIGHT_01 "dat/vdungeon/floor panels/loose right01.png"
+#define DV_LOOSE_FLOOR_BASE_01 "dat/vdungeon/floor panels/loose base01.png"
+#define DV_LOOSE_FLOOR_LEFT_02 "dat/vdungeon/floor panels/loose left02.png"
+#define DV_LOOSE_FLOOR_RIGHT_02 "dat/vdungeon/floor panels/loose right02.png"
+#define DV_LOOSE_FLOOR_BASE_02 "dat/vdungeon/floor panels/loose base02.png"
+
+/* palace vga */
+#define PV_LOOSE_FLOOR_LEFT_01 "dat/vpalace/floor panels/loose left01.png"
+#define PV_LOOSE_FLOOR_RIGHT_01 "dat/vpalace/floor panels/loose right01.png"
+#define PV_LOOSE_FLOOR_BASE_01 "dat/vpalace/floor panels/loose base01.png"
+#define PV_LOOSE_FLOOR_LEFT_02 "dat/vpalace/floor panels/loose left02.png"
+#define PV_LOOSE_FLOOR_RIGHT_02 "dat/vpalace/floor panels/loose right02.png"
+#define PV_LOOSE_FLOOR_BASE_02 "dat/vpalace/floor panels/loose base02.png"
 
 /* sounds */
 #define LOOSE_FLOOR_01_SAMPLE "dat/digisnd1/tile moving 1.ogg"
@@ -57,11 +65,11 @@ struct loose_floor {
 };
 
 /* functions */
-void load_vdungeon_loose_floor (void);
+void load_loose_floor (void);
 void unload_loose_floor (void);
 void load_loose_floor_samples (void);
 void unload_loose_floor_samples (void);
-ALLEGRO_BITMAP *create_loose_floor_02_bitmap (void);
+ALLEGRO_BITMAP *create_loose_floor_02_bitmap (enum em em, enum vm vm);
 void register_loose_floor (struct pos *p);
 void sort_loose_floors (void);
 int compare_loose_floors (const void *l0, const void *l1);
@@ -75,19 +83,33 @@ void compute_loose_floor_fall (struct loose_floor *l);
 void sample_loose_floors (void);
 void shake_loose_floor_row (struct pos *p);
 void sample_random_loose_floor (void);
-void draw_loose_floor (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_loose_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_loose_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_loose_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_falling_loose_floor (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_loose_floor_01 (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_loose_floor_01_base (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_loose_floor_01_left (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_loose_floor_01_right (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_loose_floor_02 (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_loose_floor_02_base (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_loose_floor_02_left (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_loose_floor_02_right (ALLEGRO_BITMAP *bitmap, struct pos *p);
+ALLEGRO_BITMAP *get_correct_falling_loose_floor_bitmap (ALLEGRO_BITMAP *b);
+void draw_loose_floor (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                       enum em em, enum vm vm);
+void draw_loose_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                            enum em em, enum vm vm);
+void draw_loose_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                            enum em em, enum vm vm);
+void draw_loose_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                             enum em em, enum vm vm);
+void draw_falling_loose_floor (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                               enum em em, enum vm vm);
+void draw_loose_floor_01 (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                          enum em em, enum vm vm);
+void draw_loose_floor_01_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                               enum em em, enum vm vm);
+void draw_loose_floor_01_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                               enum em em, enum vm vm);
+void draw_loose_floor_01_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                                enum em em, enum vm vm);
+void draw_loose_floor_02 (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                          enum em em, enum vm vm);
+void draw_loose_floor_02_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                               enum em em, enum vm vm);
+void draw_loose_floor_02_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                               enum em em, enum vm vm);
+void draw_loose_floor_02_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                                enum em em, enum vm vm);
 struct coord *loose_floor_left_coord (struct pos *p, struct coord *c);
 struct coord *loose_floor_right_coord (struct pos *p, struct coord *c);
 

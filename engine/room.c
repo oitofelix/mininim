@@ -51,7 +51,7 @@ load_room (void)
   load_floor ();
   load_broken_floor ();
   load_skeleton_floor ();
-  load_vdungeon_loose_floor ();
+  load_loose_floor ();
   load_vdungeon_opener_floor ();
   load_vdungeon_closer_floor ();
   load_vdungeon_spikes_floor ();
@@ -204,7 +204,7 @@ draw_confg_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case FLOOR: draw_floor_base (bitmap, p, em, vm); break;
   case BROKEN_FLOOR: draw_floor_base (bitmap, p, em, vm); break;
   case SKELETON_FLOOR: draw_floor_base (bitmap, p, em, vm); break;
-  case LOOSE_FLOOR: draw_loose_floor_base (bitmap, p); break;
+  case LOOSE_FLOOR: draw_loose_floor_base (bitmap, p, em, vm); break;
   case SPIKES_FLOOR: draw_floor_base (bitmap, p, em, vm); break;
   case OPENER_FLOOR: draw_opener_floor_base (bitmap, p); break;
   case CLOSER_FLOOR: draw_closer_floor_base (bitmap, p); break;
@@ -230,7 +230,7 @@ draw_confg_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case FLOOR: draw_floor_left (bitmap, p, em, vm); break;
   case BROKEN_FLOOR: draw_broken_floor_left (bitmap, p, em, vm); break;
   case SKELETON_FLOOR: draw_skeleton_floor_left (bitmap, p, em, vm); break;
-  case LOOSE_FLOOR: draw_loose_floor_left (bitmap, p); break;
+  case LOOSE_FLOOR: draw_loose_floor_left (bitmap, p, em, vm); break;
   case SPIKES_FLOOR: draw_spikes_floor_left (bitmap, p); break;
   case OPENER_FLOOR: draw_opener_floor_left (bitmap, p); break;
   case CLOSER_FLOOR: draw_closer_floor_left (bitmap, p); break;
@@ -262,7 +262,7 @@ draw_confg_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case FLOOR: draw_floor_right (bitmap, p, em, vm); break;
   case BROKEN_FLOOR: draw_broken_floor_right (bitmap, p, em, vm); break;
   case SKELETON_FLOOR: draw_skeleton_floor_right (bitmap, p, em, vm); break;
-  case LOOSE_FLOOR: draw_loose_floor_right (bitmap, p); break;
+  case LOOSE_FLOOR: draw_loose_floor_right (bitmap, p, em, vm); break;
   case SPIKES_FLOOR: draw_spikes_floor_right (bitmap, p); break;
   case OPENER_FLOOR: draw_opener_floor_right (bitmap, p); break;
   case CLOSER_FLOOR: draw_closer_floor_right (bitmap, p); break;
@@ -303,7 +303,7 @@ draw_confg_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case WALL: case DOOR:
     draw_confg_base (bitmap, &par, em, vm);
     draw_confg_left (bitmap, &par, em, vm, true);
-    draw_falling_loose_floor (bitmap, &par);
+    draw_falling_loose_floor (bitmap, &par, em, vm);
     break;
   default: break;
   }

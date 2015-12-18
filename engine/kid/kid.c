@@ -245,8 +245,8 @@ draw_kids (ALLEGRO_BITMAP *bitmap,
 
     draw_kid_frame (bitmap, k);
 
-    draw_falling_loose_floor (bitmap, &pmlr);
-    draw_falling_loose_floor (bitmap, &pmlra);
+    draw_falling_loose_floor (bitmap, &pmlr, em, vm);
+    draw_falling_loose_floor (bitmap, &pmlra, em, vm);
     draw_room_anim_fg (bitmap, em, vm, k);
     k->xf.b = NULL;
   }
