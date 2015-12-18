@@ -52,7 +52,7 @@ load_room (void)
   load_broken_floor ();
   load_skeleton_floor ();
   load_loose_floor ();
-  load_vdungeon_opener_floor ();
+  load_opener_floor ();
   load_vdungeon_closer_floor ();
   load_spikes_floor ();
   load_vdungeon_wall ();
@@ -206,7 +206,7 @@ draw_confg_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case SKELETON_FLOOR: draw_floor_base (bitmap, p, em, vm); break;
   case LOOSE_FLOOR: draw_loose_floor_base (bitmap, p, em, vm); break;
   case SPIKES_FLOOR: draw_floor_base (bitmap, p, em, vm); break;
-  case OPENER_FLOOR: draw_opener_floor_base (bitmap, p); break;
+  case OPENER_FLOOR: draw_opener_floor_base (bitmap, p, em, vm); break;
   case CLOSER_FLOOR: draw_closer_floor_base (bitmap, p); break;
   case PILLAR: draw_floor_base (bitmap, p, em, vm); break;
   case BIG_PILLAR_BOTTOM: draw_floor_base (bitmap, p, em, vm); break;
@@ -232,7 +232,7 @@ draw_confg_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case SKELETON_FLOOR: draw_skeleton_floor_left (bitmap, p, em, vm); break;
   case LOOSE_FLOOR: draw_loose_floor_left (bitmap, p, em, vm); break;
   case SPIKES_FLOOR: draw_spikes_floor_left (bitmap, p, em, vm); break;
-  case OPENER_FLOOR: draw_opener_floor_left (bitmap, p); break;
+  case OPENER_FLOOR: draw_opener_floor_left (bitmap, p, em, vm); break;
   case CLOSER_FLOOR: draw_closer_floor_left (bitmap, p); break;
   case PILLAR: draw_pillar_left (bitmap, p, em, vm); break;
   case BIG_PILLAR_BOTTOM:
@@ -264,7 +264,7 @@ draw_confg_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case SKELETON_FLOOR: draw_skeleton_floor_right (bitmap, p, em, vm); break;
   case LOOSE_FLOOR: draw_loose_floor_right (bitmap, p, em, vm); break;
   case SPIKES_FLOOR: draw_spikes_floor_right (bitmap, p, em, vm); break;
-  case OPENER_FLOOR: draw_opener_floor_right (bitmap, p); break;
+  case OPENER_FLOOR: draw_opener_floor_right (bitmap, p, em, vm); break;
   case CLOSER_FLOOR: draw_closer_floor_right (bitmap, p); break;
   case PILLAR: draw_pillar_right (bitmap, p, em, vm); break;
   case BIG_PILLAR_BOTTOM:

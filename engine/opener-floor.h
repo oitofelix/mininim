@@ -22,9 +22,13 @@
 
 #include "pos.h"
 
-/* bitmaps */
-#define VDUNGEON_UNPRESSED_OPENER_FLOOR_LEFT "dat/vdungeon/floor panels/opener left unpressed.png"
-#define VDUNGEON_UNPRESSED_OPENER_FLOOR_BASE "dat/vdungeon/floor panels/opener base unpressed.png"
+/* dungeon vga */
+#define DV_UNPRESSED_OPENER_FLOOR_BASE "data/opener-floor/dv-unpressed-base.png"
+#define DV_UNPRESSED_OPENER_FLOOR_LEFT "data/opener-floor/dv-unpressed-left.png"
+
+/* palace vga */
+#define PV_UNPRESSED_OPENER_FLOOR_BASE "data/opener-floor/pv-unpressed-base.png"
+#define PV_UNPRESSED_OPENER_FLOOR_LEFT "data/opener-floor/pv-unpressed-left.png"
 
 /* sounds */
 #define OPENER_FLOOR_SAMPLE "dat/digisnd1/door tile pressed 1.ogg"
@@ -38,7 +42,7 @@ struct opener_floor {
   bool broken;
 };
 
-void load_vdungeon_opener_floor (void);
+void load_opener_floor (void);
 void unload_opener_floor (void);
 void load_opener_floor_samples (void);
 void unload_opener_floor_samples (void);
@@ -50,14 +54,22 @@ void break_opener_floor (struct pos *p);
 void unpress_opener_floors (void);
 void compute_opener_floors (void);
 void sample_opener_floors (void);
-void draw_opener_floor (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_opener_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_opener_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_opener_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_unpressed_opener_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_unpressed_opener_floor (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_unpressed_opener_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_unpressed_opener_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_opener_floor (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                        enum em em, enum vm vm);
+void draw_opener_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                             enum em em, enum vm vm);
+void draw_opener_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                             enum em em, enum vm vm);
+void draw_opener_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                              enum em em, enum vm vm);
+void draw_unpressed_opener_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                                       enum em em, enum vm vm);
+void draw_unpressed_opener_floor (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                                  enum em em, enum vm vm);
+void draw_unpressed_opener_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                                       enum em em, enum vm vm);
+void draw_unpressed_opener_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                                        enum em em, enum vm vm);
 struct coord *unpressed_opener_floor_left_coord (struct pos *p, struct coord *c);
 struct coord *unpressed_opener_floor_right_coord (struct pos *p, struct coord *c);
 

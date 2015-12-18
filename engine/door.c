@@ -211,8 +211,6 @@ open_door (int e)
       ld->action = OPEN_LEVEL_DOOR;
       break;
     default:
-      /* error (-1, 0, "%s: requested to open non-door (%i, %i, %i)", */
-      /*        __func__, p->room, p->floor, p->place); */
       break;
     }
   } while (level->event[e++].next);
@@ -240,8 +238,6 @@ close_door (int e)
       ld->action = CLOSE_LEVEL_DOOR;
       break;
     default:
-      /* error (-1, 0, "%s: requested to close non-door (%i, %i, %i)", */
-      /*        __func__, p->room, p->floor, p->place); */
       break;
     }
   } while (level->event[e++].next);

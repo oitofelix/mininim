@@ -30,7 +30,13 @@
 #include "floor.h"
 #include "opener-floor.h"
 
-ALLEGRO_BITMAP *unpressed_opener_floor_left, *unpressed_opener_floor_base;
+/* dungeon vga */
+ALLEGRO_BITMAP *dv_unpressed_opener_floor_base,
+  *dv_unpressed_opener_floor_left;
+
+/* palace vga */
+ALLEGRO_BITMAP *pv_unpressed_opener_floor_base,
+  *pv_unpressed_opener_floor_left;
 
 ALLEGRO_SAMPLE *opener_floor_sample;
 bool sample_opener_floor;
@@ -39,17 +45,27 @@ static struct opener_floor *opener_floor = NULL;
 static size_t opener_floor_nmemb = 0;
 
 void
-load_vdungeon_opener_floor (void)
+load_opener_floor (void)
 {
-  unpressed_opener_floor_left = load_bitmap (VDUNGEON_UNPRESSED_OPENER_FLOOR_LEFT);
-  unpressed_opener_floor_base = load_bitmap (VDUNGEON_UNPRESSED_OPENER_FLOOR_BASE);
+  /* dungeon vga */
+  dv_unpressed_opener_floor_base = load_bitmap (DV_UNPRESSED_OPENER_FLOOR_BASE);
+  dv_unpressed_opener_floor_left = load_bitmap (DV_UNPRESSED_OPENER_FLOOR_LEFT);
+
+  /* palace vga */
+  pv_unpressed_opener_floor_base = load_bitmap (PV_UNPRESSED_OPENER_FLOOR_BASE);
+  pv_unpressed_opener_floor_left = load_bitmap (PV_UNPRESSED_OPENER_FLOOR_LEFT);
 }
 
 void
 unload_opener_floor (void)
 {
-  al_destroy_bitmap (unpressed_opener_floor_left);
-  al_destroy_bitmap (unpressed_opener_floor_base);
+  /* dungeon vga */
+  al_destroy_bitmap (dv_unpressed_opener_floor_base);
+  al_destroy_bitmap (dv_unpressed_opener_floor_left);
+
+  /* palace vga */
+  al_destroy_bitmap (pv_unpressed_opener_floor_base);
+  al_destroy_bitmap (pv_unpressed_opener_floor_left);
 }
 
 void
@@ -153,77 +169,142 @@ sample_opener_floors (void)
 }
 
 void
-draw_opener_floor (ALLEGRO_BITMAP *bitmap, struct pos *p)
+draw_opener_floor (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                   enum em em, enum vm vm)
 {
   struct opener_floor *o = opener_floor_at_pos (p);
   if (! o) return;
 
   if (o->broken) return;
-  if (o->pressed) draw_floor (bitmap, p, DUNGEON, VGA);
-  else draw_unpressed_opener_floor (bitmap, p);
+  if (o->pressed) draw_floor (bitmap, p, em, vm);
+  else draw_unpressed_opener_floor (bitmap, p, em, vm);
 }
 
 void
-draw_opener_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p)
+draw_opener_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                        enum em em, enum vm vm)
 {
   struct opener_floor *o = opener_floor_at_pos (p);
   if (! o) return;
 
   if (o->broken) return;
-  if (o->pressed) draw_floor_base (bitmap, p, DUNGEON, VGA);
-  else draw_unpressed_opener_floor_base (bitmap, p);
+  if (o->pressed) draw_floor_base (bitmap, p, em, vm);
+  else draw_unpressed_opener_floor_base (bitmap, p, em, vm);
 }
 
 void
-draw_opener_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p)
+draw_opener_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                        enum em em, enum vm vm)
 {
   struct opener_floor *o = opener_floor_at_pos (p);
   if (! o) return;
 
   if (o->broken) return;
-  if (o->pressed) draw_floor_left (bitmap, p, DUNGEON, VGA);
-  else draw_unpressed_opener_floor_left (bitmap, p);
+  if (o->pressed) draw_floor_left (bitmap, p, em, vm);
+  else draw_unpressed_opener_floor_left (bitmap, p, em, vm);
 }
 
 void
-draw_opener_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p)
+draw_opener_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                         enum em em, enum vm vm)
 {
   struct opener_floor *o = opener_floor_at_pos (p);
   if (! o) return;
 
   if (o->broken) return;
-  if (o->pressed) draw_floor_right (bitmap, p, DUNGEON, VGA);
-  else draw_unpressed_opener_floor_right (bitmap, p);
+  if (o->pressed) draw_floor_right (bitmap, p, em, vm);
+  else draw_unpressed_opener_floor_right (bitmap, p, em, vm);
 }
 
 void
-draw_unpressed_opener_floor (ALLEGRO_BITMAP *bitmap, struct pos *p)
+draw_unpressed_opener_floor (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                             enum em em, enum vm vm)
 {
-  draw_unpressed_opener_floor_base (bitmap, p);
-  draw_unpressed_opener_floor_left (bitmap, p);
-  draw_unpressed_opener_floor_right (bitmap, p);
+  draw_unpressed_opener_floor_base (bitmap, p, em, vm);
+  draw_unpressed_opener_floor_left (bitmap, p, em, vm);
+  draw_unpressed_opener_floor_right (bitmap, p, em, vm);
 }
 
 void
-draw_unpressed_opener_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p)
+draw_unpressed_opener_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                                  enum em em, enum vm vm)
 {
+  ALLEGRO_BITMAP *unpressed_opener_floor_base = NULL;
+
+  switch (em) {
+  case DUNGEON:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA: unpressed_opener_floor_base = dv_unpressed_opener_floor_base; break;
+    }
+    break;
+  case PALACE:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA: unpressed_opener_floor_base = pv_unpressed_opener_floor_base; break;
+    }
+    break;
+  }
+
   struct coord c;
   draw_bitmapc (unpressed_opener_floor_base, bitmap, floor_base_coord (p, &c), 0);
 }
 
 void
-draw_unpressed_opener_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p)
+draw_unpressed_opener_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                                  enum em em, enum vm vm)
 {
+  ALLEGRO_BITMAP *unpressed_opener_floor_left = NULL;
+
+  switch (em) {
+  case DUNGEON:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA: unpressed_opener_floor_left = dv_unpressed_opener_floor_left; break;
+    }
+    break;
+  case PALACE:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA: unpressed_opener_floor_left = pv_unpressed_opener_floor_left; break;
+    }
+    break;
+  }
+
   struct coord c;
   draw_bitmapc (unpressed_opener_floor_left, bitmap,
                 unpressed_opener_floor_left_coord (p, &c), 0);
 }
 
 void
-draw_unpressed_opener_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p)
+draw_unpressed_opener_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                                   enum em em, enum vm vm)
 {
+  ALLEGRO_BITMAP *unpressed_opener_floor_right = NULL;
+
+  switch (em) {
+  case DUNGEON:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA: unpressed_opener_floor_right = dv_floor_right; break;
+    }
+    break;
+  case PALACE:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA: unpressed_opener_floor_right = pv_floor_right; break;
+    }
+    break;
+  }
+
   struct coord c;
-  draw_bitmapc (dv_floor_right, bitmap,
+  draw_bitmapc (unpressed_opener_floor_right, bitmap,
                 unpressed_opener_floor_right_coord (p, &c), 0);
 }
 
