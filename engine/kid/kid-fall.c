@@ -175,6 +175,7 @@ physics_in (struct anim *kid)
   if (kid->i > 2 && can_hang (&kid->f, false, &kid->hang_pos)
       && hang_front && ! kid->hang_limit
       && kid == current_kid) {
+    kid->hit_by_loose_floor = false;
     sample_hang_on_fall = true;
     kid_hang (kid);
     return false;
@@ -184,6 +185,7 @@ physics_in (struct anim *kid)
   if (kid->i > 2 && can_hang (&kid->f, true, &kid->hang_pos)
       && hang_back && ! kid->hang_limit
       && kid == current_kid) {
+    kid->hit_by_loose_floor = false;
     sample_hang_on_fall = true;
     kid_turn (kid);
     return false;
