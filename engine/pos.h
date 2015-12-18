@@ -26,6 +26,7 @@ extern bool coord_wa;
 
 typedef struct coord *(*coord_f) (struct frame *, struct coord *);
 typedef struct pos *(*pos_f) (struct coord *, struct pos *);
+typedef struct coord *(*pos2coord_f) (struct pos *, struct coord *);
 
 int roomd (int room, enum dir dir);
 struct coord *ncoord (struct coord *c, struct coord *nc);

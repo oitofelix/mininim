@@ -25,24 +25,43 @@
 /* constants */
 #define SPIKES_WAIT SECS_TO_SCYCLES (1)
 
-/* bitmaps */
-#define VDUNGEON_SPIKES_FLOOR_LEFT "dat/vdungeon/floor panels/spikes left.png"
-#define VDUNGEON_SPIKES_FLOOR_RIGHT "dat/vdungeon/floor panels/spikes right.png"
-#define VDUNGEON_SPIKES_LEFT_01 "dat/vdungeon/spikes/frame01 left.png"
-#define VDUNGEON_SPIKES_RIGHT_01 "dat/vdungeon/spikes/frame01 right.png"
-#define VDUNGEON_SPIKES_LEFT_02 "dat/vdungeon/spikes/frame02 left.png"
-#define VDUNGEON_SPIKES_RIGHT_02 "dat/vdungeon/spikes/frame02 right.png"
-#define VDUNGEON_SPIKES_LEFT_03 "dat/vdungeon/spikes/frame03 left.png"
-#define VDUNGEON_SPIKES_RIGHT_03 "dat/vdungeon/spikes/frame03 right.png"
-#define VDUNGEON_SPIKES_LEFT_04 "dat/vdungeon/spikes/frame04 left.png"
-#define VDUNGEON_SPIKES_RIGHT_04 "dat/vdungeon/spikes/frame04 right.png"
-#define VDUNGEON_SPIKES_LEFT_05 "dat/vdungeon/spikes/frame05 left.png"
-#define VDUNGEON_SPIKES_RIGHT_05 "dat/vdungeon/spikes/frame05 right.png"
-#define VDUNGEON_SPIKES_01_FG "dat/vdungeon/spikes/frame01.png"
-#define VDUNGEON_SPIKES_02_FG "dat/vdungeon/spikes/frame02.png"
-#define VDUNGEON_SPIKES_03_FG "dat/vdungeon/spikes/frame03.png"
-#define VDUNGEON_SPIKES_04_FG "dat/vdungeon/spikes/frame04.png"
-#define VDUNGEON_SPIKES_05_FG "dat/vdungeon/spikes/frame05.png"
+/* dungeon vga */
+#define DV_SPIKES_FLOOR_LEFT "data/spikes-floor/dv-left.png"
+#define DV_SPIKES_FLOOR_RIGHT "data/spikes-floor/dv-right.png"
+#define DV_SPIKES_LEFT_01 "data/spikes-floor/dv-spikes-left-01.png"
+#define DV_SPIKES_RIGHT_01 "data/spikes-floor/dv-spikes-right-01.png"
+#define DV_SPIKES_FG_01 "data/spikes-floor/dv-spikes-fg-01.png"
+#define DV_SPIKES_LEFT_02 "data/spikes-floor/dv-spikes-left-02.png"
+#define DV_SPIKES_RIGHT_02 "data/spikes-floor/dv-spikes-right-02.png"
+#define DV_SPIKES_FG_02 "data/spikes-floor/dv-spikes-fg-02.png"
+#define DV_SPIKES_LEFT_03 "data/spikes-floor/dv-spikes-left-03.png"
+#define DV_SPIKES_RIGHT_03 "data/spikes-floor/dv-spikes-right-03.png"
+#define DV_SPIKES_FG_03 "data/spikes-floor/dv-spikes-fg-03.png"
+#define DV_SPIKES_LEFT_04 "data/spikes-floor/dv-spikes-left-04.png"
+#define DV_SPIKES_RIGHT_04 "data/spikes-floor/dv-spikes-right-04.png"
+#define DV_SPIKES_FG_04 "data/spikes-floor/dv-spikes-fg-04.png"
+#define DV_SPIKES_LEFT_05 "data/spikes-floor/dv-spikes-left-05.png"
+#define DV_SPIKES_RIGHT_05 "data/spikes-floor/dv-spikes-right-05.png"
+#define DV_SPIKES_FG_05 "data/spikes-floor/dv-spikes-fg-05.png"
+
+/* palace vga */
+#define PV_SPIKES_FLOOR_LEFT "data/spikes-floor/pv-left.png"
+#define PV_SPIKES_FLOOR_RIGHT "data/spikes-floor/pv-right.png"
+#define PV_SPIKES_LEFT_01 "data/spikes-floor/pv-spikes-left-01.png"
+#define PV_SPIKES_RIGHT_01 "data/spikes-floor/pv-spikes-right-01.png"
+#define PV_SPIKES_FG_01 "data/spikes-floor/pv-spikes-fg-01.png"
+#define PV_SPIKES_LEFT_02 "data/spikes-floor/pv-spikes-left-02.png"
+#define PV_SPIKES_RIGHT_02 "data/spikes-floor/pv-spikes-right-02.png"
+#define PV_SPIKES_FG_02 "data/spikes-floor/pv-spikes-fg-02.png"
+#define PV_SPIKES_LEFT_03 "data/spikes-floor/pv-spikes-left-03.png"
+#define PV_SPIKES_RIGHT_03 "data/spikes-floor/pv-spikes-right-03.png"
+#define PV_SPIKES_FG_03 "data/spikes-floor/pv-spikes-fg-03.png"
+#define PV_SPIKES_LEFT_04 "data/spikes-floor/pv-spikes-left-04.png"
+#define PV_SPIKES_RIGHT_04 "data/spikes-floor/pv-spikes-right-04.png"
+#define PV_SPIKES_FG_04 "data/spikes-floor/pv-spikes-fg-04.png"
+#define PV_SPIKES_LEFT_05 "data/spikes-floor/pv-spikes-left-05.png"
+#define PV_SPIKES_RIGHT_05 "data/spikes-floor/pv-spikes-right-05.png"
+#define PV_SPIKES_FG_05 "data/spikes-floor/pv-spikes-fg-05.png"
 
 /* sounds */
 #define SPIKES_SAMPLE "dat/digisnd2/spikes.ogg"
@@ -55,7 +74,7 @@ struct spikes_floor {
   int murdered_kid;
 };
 
-void load_vdungeon_spikes_floor (void);
+void load_spikes_floor (void);
 void unload_spikes_floor (void);
 void load_spikes_floor_samples (void);
 void unload_spikes_floor_samples (void);
@@ -68,53 +87,93 @@ void compute_spikes_floors (void);
 void sample_spikes_floors (void);
 bool should_spikes_raise_for_pos (struct pos *p, struct pos *pk);
 bool should_spikes_raise (struct pos *p);
-void draw_spikes_floor (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_spikes_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_spikes_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_spikes_floor_floor (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_spikes_floor_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_spikes_floor_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_spikes_floor (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                        enum em em, enum vm vm);
+void draw_spikes_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                             enum em em, enum vm vm);
+void draw_spikes_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                              enum em em, enum vm vm);
+void draw_spikes_floor_floor (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                              enum em em, enum vm vm);
+void draw_spikes_floor_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                                   enum em em, enum vm vm);
+void draw_spikes_floor_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                                    enum em em, enum vm vm);
 void draw_spikes (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                  struct spikes_floor *s);
+                  struct spikes_floor *s, enum em em, enum vm vm);
 void draw_spikes_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                       struct spikes_floor *s);
+                       struct spikes_floor *s, enum em em, enum vm vm);
 void draw_spikes_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                        struct spikes_floor *s);
-void draw_spikes_fg (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_spikes_01 (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_spikes_left_01 (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_spikes_right_01 (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_spikes_01_fg (ALLEGRO_BITMAP *bitmap, struct pos *p);
-struct coord *spikes_left_01_coord (struct pos *p, struct coord *c);
-struct coord *spikes_right_01_coord (struct pos *p, struct coord *c);
-struct coord *spikes_01_fg_coord (struct pos *p, struct coord *c);
-void draw_spikes_02 (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_spikes_left_02 (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_spikes_right_02 (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_spikes_02_fg (ALLEGRO_BITMAP *bitmap, struct pos *p);
-struct coord *spikes_left_02_coord (struct pos *p, struct coord *c);
-struct coord *spikes_right_02_coord (struct pos *p, struct coord *c);
-struct coord *spikes_02_fg_coord (struct pos *p, struct coord *c);
-void draw_spikes_03 (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_spikes_left_03 (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_spikes_right_03 (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_spikes_03_fg (ALLEGRO_BITMAP *bitmap, struct pos *p);
-struct coord *spikes_left_03_coord (struct pos *p, struct coord *c);
-struct coord *spikes_right_03_coord (struct pos *p, struct coord *c);
-struct coord *spikes_03_fg_coord (struct pos *p, struct coord *c);
-void draw_spikes_04 (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_spikes_left_04 (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_spikes_right_04 (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_spikes_04_fg (ALLEGRO_BITMAP *bitmap, struct pos *p);
-struct coord *spikes_left_04_coord (struct pos *p, struct coord *c);
-struct coord *spikes_right_04_coord (struct pos *p, struct coord *c);
-struct coord *spikes_04_fg_coord (struct pos *p, struct coord *c);
-void draw_spikes_05 (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_spikes_left_05 (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_spikes_right_05 (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_spikes_05_fg (ALLEGRO_BITMAP *bitmap, struct pos *p);
-struct coord *spikes_left_05_coord (struct pos *p, struct coord *c);
-struct coord *spikes_right_05_coord (struct pos *p, struct coord *c);
-struct coord *spikes_05_fg_coord (struct pos *p, struct coord *c);
+                        struct spikes_floor *s, enum em em, enum vm vm);
+void draw_spikes_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, enum em em, enum vm vm);
+void draw_spikes_01 (ALLEGRO_BITMAP *bitmap, struct pos *p, enum em em, enum vm vm);
+void draw_spikes_left_01 (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                          enum em em, enum vm vm);
+void draw_spikes_right_01 (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                           enum em em, enum vm vm);
+void draw_spikes_fg_01 (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                        enum em em, enum vm vm);
+struct coord *d_spikes_left_01_coord (struct pos *p, struct coord *c);
+struct coord *p_spikes_left_01_coord (struct pos *p, struct coord *c);
+struct coord *d_spikes_right_01_coord (struct pos *p, struct coord *c);
+struct coord *p_spikes_right_01_coord (struct pos *p, struct coord *c);
+struct coord *d_spikes_fg_01_coord (struct pos *p, struct coord *c);
+struct coord *p_spikes_fg_01_coord (struct pos *p, struct coord *c);
+void draw_spikes_02 (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                     enum em em, enum vm vm);
+void draw_spikes_left_02 (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                          enum em em, enum vm vm);
+void draw_spikes_right_02 (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                           enum em em, enum vm vm);
+void draw_spikes_fg_02 (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                        enum em em, enum vm vm);
+struct coord *d_spikes_left_02_coord (struct pos *p, struct coord *c);
+struct coord *p_spikes_left_02_coord (struct pos *p, struct coord *c);
+struct coord *d_spikes_right_02_coord (struct pos *p, struct coord *c);
+struct coord *p_spikes_right_02_coord (struct pos *p, struct coord *c);
+struct coord *d_spikes_fg_02_coord (struct pos *p, struct coord *c);
+struct coord *p_spikes_fg_02_coord (struct pos *p, struct coord *c);
+void draw_spikes_03 (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                     enum em em, enum vm vm);
+void draw_spikes_left_03 (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                          enum em em, enum vm vm);
+void draw_spikes_right_03 (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                           enum em em, enum vm vm);
+void draw_spikes_fg_03 (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                        enum em em, enum vm vm);
+struct coord *d_spikes_left_03_coord (struct pos *p, struct coord *c);
+struct coord *p_spikes_left_03_coord (struct pos *p, struct coord *c);
+struct coord *d_spikes_right_03_coord (struct pos *p, struct coord *c);
+struct coord *p_spikes_right_03_coord (struct pos *p, struct coord *c);
+struct coord *d_spikes_fg_03_coord (struct pos *p, struct coord *c);
+struct coord *p_spikes_fg_03_coord (struct pos *p, struct coord *c);
+void draw_spikes_04 (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                     enum em em, enum vm vm);
+void draw_spikes_left_04 (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                          enum em em, enum vm vm);
+void draw_spikes_right_04 (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                           enum em em, enum vm vm);
+void draw_spikes_fg_04 (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                        enum em em, enum vm vm);
+struct coord *d_spikes_left_04_coord (struct pos *p, struct coord *c);
+struct coord *p_spikes_left_04_coord (struct pos *p, struct coord *c);
+struct coord *d_spikes_right_04_coord (struct pos *p, struct coord *c);
+struct coord *p_spikes_right_04_coord (struct pos *p, struct coord *c);
+struct coord *d_spikes_fg_04_coord (struct pos *p, struct coord *c);
+struct coord *p_spikes_fg_04_coord (struct pos *p, struct coord *c);
+void draw_spikes_05 (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                     enum em em, enum vm vm);
+void draw_spikes_left_05 (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                          enum em em, enum vm vm);
+void draw_spikes_right_05 (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                           enum em em, enum vm vm);
+void draw_spikes_fg_05 (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                        enum em em, enum vm vm);
+struct coord *d_spikes_left_05_coord (struct pos *p, struct coord *c);
+struct coord *p_spikes_left_05_coord (struct pos *p, struct coord *c);
+struct coord *d_spikes_right_05_coord (struct pos *p, struct coord *c);
+struct coord *p_spikes_right_05_coord (struct pos *p, struct coord *c);
+struct coord *d_spikes_fg_05_coord (struct pos *p, struct coord *c);
+struct coord *p_spikes_fg_05_coord (struct pos *p, struct coord *c);
 
 #endif	/* FREEPOP_SPIKES_H */
