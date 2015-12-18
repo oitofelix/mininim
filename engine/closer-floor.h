@@ -22,10 +22,15 @@
 
 #include "pos.h"
 
-/* bitmaps */
-#define VDUNGEON_UNPRESSED_CLOSER_FLOOR_BASE "dat/vdungeon/floor panels/closer base unpressed.png"
-#define VDUNGEON_PRESSED_CLOSER_FLOOR_BASE "dat/vdungeon/floor panels/closer base pressed.png"
-#define VDUNGEON_PRESSED_CLOSER_FLOOR_RIGHT "dat/vdungeon/floor panels/closer right pressed.png"
+/* dungeon vga */
+#define DV_UNPRESSED_CLOSER_FLOOR_BASE "data/closer-floor/dv-unpressed-base.png"
+#define DV_PRESSED_CLOSER_FLOOR_BASE "data/closer-floor/dv-pressed-base.png"
+#define DV_PRESSED_CLOSER_FLOOR_RIGHT "data/closer-floor/dv-pressed-right.png"
+
+/* palace vga */
+#define PV_UNPRESSED_CLOSER_FLOOR_BASE "data/closer-floor/pv-unpressed-base.png"
+#define PV_PRESSED_CLOSER_FLOOR_BASE "data/closer-floor/pv-pressed-base.png"
+#define PV_PRESSED_CLOSER_FLOOR_RIGHT "data/closer-floor/pv-pressed-right.png"
 
 /* sounds */
 #define CLOSER_FLOOR_SAMPLE "dat/digisnd1/door tile pressed 1.ogg"
@@ -39,7 +44,7 @@ struct closer_floor {
   bool broken;
 };
 
-void load_vdungeon_closer_floor (void);
+void load_closer_floor (void);
 void unload_closer_floor (void);
 void load_closer_floor_samples (void);
 void unload_closer_floor_samples (void);
@@ -51,16 +56,26 @@ void break_closer_floor (struct pos *p);
 void unpress_closer_floors (void);
 void compute_closer_floors (void);
 void sample_closer_floors (void);
-void draw_closer_floor (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_closer_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_closer_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_closer_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_pressed_closer_floor (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_pressed_closer_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_pressed_closer_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_pressed_closer_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_unpressed_closer_floor (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_unpressed_closer_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_closer_floor (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                        enum em em, enum vm vm);
+void draw_closer_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                             enum em em, enum vm vm);
+void draw_closer_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                             enum em em, enum vm vm);
+void draw_closer_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                              enum em em, enum vm vm);
+void draw_pressed_closer_floor (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                                enum em em, enum vm vm);
+void draw_pressed_closer_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                                     enum em em, enum vm vm);
+void draw_pressed_closer_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                                     enum em em, enum vm vm);
+void draw_pressed_closer_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                                      enum em em, enum vm vm);
+void draw_unpressed_closer_floor (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                                  enum em em, enum vm vm);
+void draw_unpressed_closer_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                                       enum em em, enum vm vm);
 struct coord *pressed_closer_floor_left_coord (struct pos *p, struct coord *c);
 struct coord *pressed_closer_floor_right_coord (struct pos *p, struct coord *c);
 

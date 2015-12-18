@@ -53,7 +53,7 @@ load_room (void)
   load_skeleton_floor ();
   load_loose_floor ();
   load_opener_floor ();
-  load_vdungeon_closer_floor ();
+  load_closer_floor ();
   load_spikes_floor ();
   load_vdungeon_wall ();
   load_pillar ();
@@ -207,7 +207,7 @@ draw_confg_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case LOOSE_FLOOR: draw_loose_floor_base (bitmap, p, em, vm); break;
   case SPIKES_FLOOR: draw_floor_base (bitmap, p, em, vm); break;
   case OPENER_FLOOR: draw_opener_floor_base (bitmap, p, em, vm); break;
-  case CLOSER_FLOOR: draw_closer_floor_base (bitmap, p); break;
+  case CLOSER_FLOOR: draw_closer_floor_base (bitmap, p, em, vm); break;
   case PILLAR: draw_floor_base (bitmap, p, em, vm); break;
   case BIG_PILLAR_BOTTOM: draw_floor_base (bitmap, p, em, vm); break;
   case BIG_PILLAR_TOP: break;
@@ -233,7 +233,7 @@ draw_confg_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case LOOSE_FLOOR: draw_loose_floor_left (bitmap, p, em, vm); break;
   case SPIKES_FLOOR: draw_spikes_floor_left (bitmap, p, em, vm); break;
   case OPENER_FLOOR: draw_opener_floor_left (bitmap, p, em, vm); break;
-  case CLOSER_FLOOR: draw_closer_floor_left (bitmap, p); break;
+  case CLOSER_FLOOR: draw_closer_floor_left (bitmap, p, em, vm); break;
   case PILLAR: draw_pillar_left (bitmap, p, em, vm); break;
   case BIG_PILLAR_BOTTOM:
     draw_big_pillar_bottom_left (bitmap, p); break;
@@ -265,7 +265,7 @@ draw_confg_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case LOOSE_FLOOR: draw_loose_floor_right (bitmap, p, em, vm); break;
   case SPIKES_FLOOR: draw_spikes_floor_right (bitmap, p, em, vm); break;
   case OPENER_FLOOR: draw_opener_floor_right (bitmap, p, em, vm); break;
-  case CLOSER_FLOOR: draw_closer_floor_right (bitmap, p); break;
+  case CLOSER_FLOOR: draw_closer_floor_right (bitmap, p, em, vm); break;
   case PILLAR: draw_pillar_right (bitmap, p, em, vm); break;
   case BIG_PILLAR_BOTTOM:
     draw_big_pillar_bottom_right (bitmap, p); break;

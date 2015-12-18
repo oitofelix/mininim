@@ -104,7 +104,7 @@ static struct level level_1 = {
       {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}},
      {{NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR},
       {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}},
-     {{FLOOR}, {FLOOR}, {FLOOR}, {FLOOR}, {OPENER_FLOOR},
+     {{FLOOR}, {FLOOR}, {FLOOR}, {FLOOR}, {CLOSER_FLOOR},
       {FLOOR}, {FLOOR}, {FLOOR}, {FLOOR}, {FLOOR}}},
   },
 

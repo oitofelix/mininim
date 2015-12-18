@@ -29,8 +29,13 @@
 #include "floor.h"
 #include "closer-floor.h"
 
-ALLEGRO_BITMAP *unpressed_closer_floor_base, *pressed_closer_floor_base,
-  *pressed_closer_floor_right;
+/* dungeon vga */
+ALLEGRO_BITMAP *dv_unpressed_closer_floor_base, *dv_pressed_closer_floor_base,
+  *dv_pressed_closer_floor_right;
+
+/* palace vga */
+ALLEGRO_BITMAP *pv_unpressed_closer_floor_base, *pv_pressed_closer_floor_base,
+  *pv_pressed_closer_floor_right;
 
 ALLEGRO_SAMPLE *closer_floor_sample;
 bool sample_closer_floor;
@@ -39,19 +44,31 @@ static struct closer_floor *closer_floor = NULL;
 static size_t closer_floor_nmemb = 0;
 
 void
-load_vdungeon_closer_floor (void)
+load_closer_floor (void)
 {
-  unpressed_closer_floor_base = load_bitmap (VDUNGEON_UNPRESSED_CLOSER_FLOOR_BASE);
-  pressed_closer_floor_base = load_bitmap (VDUNGEON_PRESSED_CLOSER_FLOOR_BASE);
-  pressed_closer_floor_right = load_bitmap (VDUNGEON_PRESSED_CLOSER_FLOOR_RIGHT);
+  /* dungeon vga */
+  dv_unpressed_closer_floor_base = load_bitmap (DV_UNPRESSED_CLOSER_FLOOR_BASE);
+  dv_pressed_closer_floor_base = load_bitmap (DV_PRESSED_CLOSER_FLOOR_BASE);
+  dv_pressed_closer_floor_right = load_bitmap (DV_PRESSED_CLOSER_FLOOR_RIGHT);
+
+  /* palace vga */
+  pv_unpressed_closer_floor_base = load_bitmap (PV_UNPRESSED_CLOSER_FLOOR_BASE);
+  pv_pressed_closer_floor_base = load_bitmap (PV_PRESSED_CLOSER_FLOOR_BASE);
+  pv_pressed_closer_floor_right = load_bitmap (PV_PRESSED_CLOSER_FLOOR_RIGHT);
 }
 
 void
 unload_closer_floor (void)
 {
-  al_destroy_bitmap (unpressed_closer_floor_base);
-  al_destroy_bitmap (pressed_closer_floor_base);
-  al_destroy_bitmap (pressed_closer_floor_right);
+  /* dungeon vga */
+  al_destroy_bitmap (dv_unpressed_closer_floor_base);
+  al_destroy_bitmap (dv_pressed_closer_floor_base);
+  al_destroy_bitmap (dv_pressed_closer_floor_right);
+
+  /* palace vga */
+  al_destroy_bitmap (pv_unpressed_closer_floor_base);
+  al_destroy_bitmap (pv_pressed_closer_floor_base);
+  al_destroy_bitmap (pv_pressed_closer_floor_right);
 }
 
 void
@@ -156,77 +173,149 @@ sample_closer_floors (void)
 }
 
 void
-draw_closer_floor (ALLEGRO_BITMAP *bitmap, struct pos *p)
+draw_closer_floor (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                   enum em em, enum vm vm)
 {
   struct closer_floor *c = closer_floor_at_pos (p);
   if (! c) return;
 
   if (c->broken) return;
-  if (c->pressed) draw_pressed_closer_floor (bitmap, p);
-  else draw_unpressed_closer_floor (bitmap, p);
+  if (c->pressed) draw_pressed_closer_floor (bitmap, p, em, vm);
+  else draw_unpressed_closer_floor (bitmap, p, em, vm);
 }
 
 void
-draw_closer_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p)
+draw_closer_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                        enum em em, enum vm vm)
 {
   struct closer_floor *c = closer_floor_at_pos (p);
   if (! c) return;
 
   if (c->broken) return;
-  if (c->pressed) draw_pressed_closer_floor_base (bitmap, p);
-  else draw_unpressed_closer_floor_base (bitmap, p);
+  if (c->pressed) draw_pressed_closer_floor_base (bitmap, p, em, vm);
+  else draw_unpressed_closer_floor_base (bitmap, p, em, vm);
 }
 
 void
-draw_closer_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p)
+draw_closer_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                        enum em em, enum vm vm)
 {
   struct closer_floor *c = closer_floor_at_pos (p);
   if (! c) return;
 
   if (c->broken) return;
-  if (c->pressed) draw_pressed_closer_floor_left (bitmap, p);
-  else draw_floor_left (bitmap, p, DUNGEON, VGA);
+  if (c->pressed) draw_pressed_closer_floor_left (bitmap, p, em, vm);
+  else draw_floor_left (bitmap, p, em, vm);
 }
 
 void
-draw_closer_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p)
+draw_closer_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                         enum em em, enum vm vm)
 {
   struct closer_floor *c = closer_floor_at_pos (p);
   if (! c) return;
 
   if (c->broken) return;
-  if (c->pressed) draw_pressed_closer_floor_right (bitmap, p);
-  else draw_floor_right (bitmap, p, DUNGEON, VGA);
+  if (c->pressed) draw_pressed_closer_floor_right (bitmap, p, em, vm);
+  else draw_floor_right (bitmap, p, em, vm);
 }
 
 void
-draw_pressed_closer_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p)
+draw_pressed_closer_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                                enum em em, enum vm vm)
 {
+  ALLEGRO_BITMAP *pressed_closer_floor_base = NULL;
+
+  switch (em) {
+  case DUNGEON:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA: pressed_closer_floor_base = dv_pressed_closer_floor_base; break;
+    }
+    break;
+  case PALACE:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA: pressed_closer_floor_base = pv_pressed_closer_floor_base; break;
+    }
+    break;
+  }
+
   struct coord c;
   draw_bitmapc (pressed_closer_floor_base, bitmap, floor_base_coord (p, &c), 0);
 }
 
 void
-draw_pressed_closer_floor (ALLEGRO_BITMAP *bitmap, struct pos *p)
+draw_pressed_closer_floor (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                           enum em em, enum vm vm)
 {
-  draw_pressed_closer_floor_base (bitmap, p);
-  draw_pressed_closer_floor_left (bitmap, p);
-  draw_pressed_closer_floor_right (bitmap, p);
+  draw_pressed_closer_floor_base (bitmap, p, em, vm);
+  draw_pressed_closer_floor_left (bitmap, p, em, vm);
+  draw_pressed_closer_floor_right (bitmap, p, em, vm);
 }
 
 void
-draw_pressed_closer_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p)
+draw_pressed_closer_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                                enum em em, enum vm vm)
 {
+  ALLEGRO_BITMAP *pressed_closer_floor_left = NULL;
+
+  switch (em) {
+  case DUNGEON:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA: pressed_closer_floor_left = dv_floor_left; break;
+    }
+    break;
+  case PALACE:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA: pressed_closer_floor_left = pv_floor_left; break;
+    }
+    break;
+  }
+
   struct coord c;
-  draw_bitmapc (dv_floor_left, bitmap,
+  draw_bitmapc (pressed_closer_floor_left, bitmap,
                 pressed_closer_floor_left_coord (p, &c), 0);
 }
 
 void
-draw_pressed_closer_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p)
+draw_pressed_closer_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                                 enum em em, enum vm vm)
 {
+  ALLEGRO_BITMAP *floor_right = NULL,
+    *pressed_closer_floor_right = NULL;
+
+  switch (em) {
+  case DUNGEON:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA:
+      floor_right = dv_floor_right;
+      pressed_closer_floor_right = dv_pressed_closer_floor_right;
+      break;
+    }
+    break;
+  case PALACE:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA:
+      floor_right = pv_floor_right;
+      pressed_closer_floor_right = pv_pressed_closer_floor_right;
+      break;
+    }
+    break;
+  }
+
   struct coord c; struct pos np;
-  draw_bitmapc (dv_floor_right, bitmap,
+  draw_bitmapc (floor_right, bitmap,
                 pressed_closer_floor_right_coord (p, &c), 0);
   if (! is_strictly_traversable (prel (p, &np, 0, +1)))
     draw_bitmapc (pressed_closer_floor_right, bitmap,
@@ -234,16 +323,37 @@ draw_pressed_closer_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p)
 }
 
 void
-draw_unpressed_closer_floor (ALLEGRO_BITMAP *bitmap, struct pos *p)
+draw_unpressed_closer_floor (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                             enum em em, enum vm vm)
 {
-  draw_unpressed_closer_floor_base (bitmap, p);
-  draw_floor_left (bitmap, p, DUNGEON, VGA);
-  draw_floor_right (bitmap, p, DUNGEON, VGA);
+  draw_unpressed_closer_floor_base (bitmap, p, em, vm);
+  draw_floor_left (bitmap, p, em, vm);
+  draw_floor_right (bitmap, p, em, vm);
 }
 
 void
-draw_unpressed_closer_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p)
+draw_unpressed_closer_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                                  enum em em, enum vm vm)
 {
+  ALLEGRO_BITMAP *unpressed_closer_floor_base = NULL;
+
+  switch (em) {
+  case DUNGEON:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA: unpressed_closer_floor_base = dv_unpressed_closer_floor_base; break;
+    }
+    break;
+  case PALACE:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA: unpressed_closer_floor_base = pv_unpressed_closer_floor_base; break;
+    }
+    break;
+  }
+
   struct coord c;
   draw_bitmapc (unpressed_closer_floor_base, bitmap,
                 floor_base_coord (p, &c), 0);
