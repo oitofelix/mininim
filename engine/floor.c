@@ -33,151 +33,225 @@
 #include "spikes-floor.h"
 #include "floor.h"
 
-ALLEGRO_BITMAP *normal_floor_left, *normal_floor_right,
-  *normal_floor_base,
-  *broken_floor_left, *broken_floor_right, *broken_floor_front,
-  *skeleton_floor_left, *skeleton_floor_right,
-  *floor_corner_01, *floor_corner_02, *floor_corner_03;
+/* dungeon vga */
+ALLEGRO_BITMAP *dv_floor_base, *dv_floor_left,
+  *dv_floor_right, *dv_floor_corner_01,
+  *dv_floor_corner_02, *dv_floor_corner_03;
+
+/* palace vga */
+ALLEGRO_BITMAP *pv_floor_base, *pv_floor_left,
+  *pv_floor_right, *pv_floor_corner_01,
+  *pv_floor_corner_02, *pv_floor_corner_03;
 
 void
-load_vdungeon_floor (void)
+load_floor (void)
 {
-  normal_floor_left = load_bitmap (VDUNGEON_NORMAL_FLOOR_LEFT);
-  normal_floor_right = load_bitmap (VDUNGEON_NORMAL_FLOOR_RIGHT);
-  normal_floor_base = load_bitmap (VDUNGEON_NORMAL_FLOOR_BASE);
-  broken_floor_left = load_bitmap (VDUNGEON_BROKEN_FLOOR_LEFT);
-  broken_floor_right = load_bitmap (VDUNGEON_BROKEN_FLOOR_RIGHT);
-  broken_floor_front = load_bitmap (VDUNGEON_BROKEN_FLOOR_FRONT);
-  skeleton_floor_left = load_bitmap (VDUNGEON_SKELETON_FLOOR_LEFT);
-  skeleton_floor_right = load_bitmap (VDUNGEON_SKELETON_FLOOR_RIGHT);
-  floor_corner_01 = load_bitmap (VDUNGEON_FLOOR_CORNER_01);
-  floor_corner_02 = load_bitmap (VDUNGEON_FLOOR_CORNER_02);
-  floor_corner_03 = load_bitmap (VDUNGEON_FLOOR_CORNER_03);
+  /* dungeon vga */
+  dv_floor_base = load_bitmap (DV_FLOOR_BASE);
+  dv_floor_left = load_bitmap (DV_FLOOR_LEFT);
+  dv_floor_right = load_bitmap (DV_FLOOR_RIGHT);
+  dv_floor_corner_01 = load_bitmap (DV_FLOOR_CORNER_01);
+  dv_floor_corner_02 = load_bitmap (DV_FLOOR_CORNER_02);
+  dv_floor_corner_03 = load_bitmap (DV_FLOOR_CORNER_03);
+
+  /* palace vga */
+  pv_floor_base = load_bitmap (PV_FLOOR_BASE);
+  pv_floor_left = load_bitmap (PV_FLOOR_LEFT);
+  pv_floor_right = load_bitmap (PV_FLOOR_RIGHT);
+  pv_floor_corner_01 = load_bitmap (PV_FLOOR_CORNER_01);
+  pv_floor_corner_02 = load_bitmap (PV_FLOOR_CORNER_02);
+  pv_floor_corner_03 = load_bitmap (PV_FLOOR_CORNER_03);
 }
 
 void
 unload_floor (void)
 {
-  al_destroy_bitmap (normal_floor_left);
-  al_destroy_bitmap (normal_floor_right);
-  al_destroy_bitmap (normal_floor_base);
-  al_destroy_bitmap (broken_floor_left);
-  al_destroy_bitmap (broken_floor_right);
-  al_destroy_bitmap (broken_floor_front);
-  al_destroy_bitmap (skeleton_floor_left);
-  al_destroy_bitmap (skeleton_floor_right);
-  al_destroy_bitmap (floor_corner_01);
-  al_destroy_bitmap (floor_corner_02);
-  al_destroy_bitmap (floor_corner_03);
+  /* dungeon vga */
+  al_destroy_bitmap (dv_floor_left);
+  al_destroy_bitmap (dv_floor_right);
+  al_destroy_bitmap (dv_floor_base);
+  al_destroy_bitmap (dv_floor_corner_01);
+  al_destroy_bitmap (dv_floor_corner_02);
+  al_destroy_bitmap (dv_floor_corner_03);
+
+  /* palace vga */
+  al_destroy_bitmap (pv_floor_left);
+  al_destroy_bitmap (pv_floor_right);
+  al_destroy_bitmap (pv_floor_base);
+  al_destroy_bitmap (pv_floor_corner_01);
+  al_destroy_bitmap (pv_floor_corner_02);
+  al_destroy_bitmap (pv_floor_corner_03);
 }
 
 void
-draw_floor (ALLEGRO_BITMAP *bitmap, struct pos *p)
+draw_floor (ALLEGRO_BITMAP *bitmap, struct pos *p,
+            enum em em, enum vm vm)
 {
-  draw_floor_base (bitmap, p);
-  draw_floor_left (bitmap, p);
-  draw_floor_right (bitmap, p);
+  draw_floor_base (bitmap, p, vm, em);
+  draw_floor_left (bitmap, p, vm, em);
+  draw_floor_right (bitmap, p, vm, em);
 }
 
 void
-draw_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p)
+draw_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                 enum em em, enum vm vm)
 {
-  struct coord c;
-  draw_bitmapc (normal_floor_base, bitmap, floor_base_coord (p, &c), 0);
-}
+  ALLEGRO_BITMAP *floor_base = NULL;
 
-void
-draw_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p)
-{
-  struct coord c;
-  draw_bitmapc (normal_floor_left, bitmap, floor_left_coord (p, &c), 0);
-}
-
-void
-draw_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p)
-{
-  struct coord c;
-  draw_bitmapc (normal_floor_right, bitmap, floor_right_coord (p, &c), 0);
-}
-
-void
-draw_broken_floor (ALLEGRO_BITMAP *bitmap, struct pos *p)
-{
-  draw_floor_base (bitmap, p);
-  draw_broken_floor_left (bitmap, p);
-  draw_broken_floor_right (bitmap, p);
-}
-
-void
-draw_broken_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p)
-{
-  struct coord c;
-  draw_bitmapc (broken_floor_left, bitmap, floor_left_coord (p, &c), 0);
-}
-
-void
-draw_broken_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p)
-{
-  struct coord c;
-  draw_bitmapc (broken_floor_right, bitmap, broken_floor_right_coord (p, &c), 0);
-}
-
-void
-draw_broken_floor_fg (ALLEGRO_BITMAP *bitmap, struct pos *p)
-{
-  struct coord c;
-  int i;
-  for (i = 0; i < kid_nmemb; i++) {
-    struct anim *k = &kid[i];
-    struct coord nc; struct pos np, pmt;
-    survey (_mt, pos, &k->f, &nc, &pmt, &np);
-    if (peq (&pmt, p) && is_kid_dead (&k->f)) return;
+  switch (em) {
+  case DUNGEON:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA: floor_base = dv_floor_base; break;
+    }
+    break;
+  case PALACE:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA: floor_base = pv_floor_base; break;
+    }
+    break;
   }
-  draw_bitmapc (broken_floor_front, bitmap,
-                broken_floor_front_coord (p, &c), 0);
-}
 
-void
-draw_skeleton_floor (ALLEGRO_BITMAP *bitmap, struct pos *p)
-{
-  draw_floor_base (bitmap, p);
-  draw_skeleton_floor_left (bitmap, p);
-  draw_skeleton_floor_right (bitmap, p);
-}
-
-void
-draw_skeleton_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p)
-{
   struct coord c;
-  draw_bitmapc (skeleton_floor_left, bitmap, skeleton_floor_left_coord (p, &c), 0);
+  draw_bitmapc (floor_base, bitmap, floor_base_coord (p, &c), 0);
 }
 
 void
-draw_skeleton_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p)
+draw_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                 enum em em, enum vm vm)
 {
+  ALLEGRO_BITMAP *floor_left = NULL;
+
+  switch (em) {
+  case DUNGEON:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA: floor_left = dv_floor_left; break;
+    }
+    break;
+  case PALACE:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA: floor_left = pv_floor_left; break;
+    }
+    break;
+  }
+
   struct coord c;
-  draw_bitmapc (skeleton_floor_right, bitmap, skeleton_floor_right_coord (p, &c), 0);
+  draw_bitmapc (floor_left, bitmap, floor_left_coord (p, &c), 0);
 }
 
 void
-draw_floor_corner_01 (ALLEGRO_BITMAP *bitmap, struct pos *p)
+draw_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                  enum em em, enum vm vm)
 {
+  ALLEGRO_BITMAP *floor_right = NULL;
+
+  switch (em) {
+  case DUNGEON:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA: floor_right = dv_floor_right; break;
+    }
+    break;
+  case PALACE:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA: floor_right = pv_floor_right; break;
+    }
+    break;
+  }
+
+  struct coord c;
+  draw_bitmapc (floor_right, bitmap, floor_right_coord (p, &c), 0);
+}
+
+void
+draw_floor_corner_01 (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                      enum em em, enum vm vm)
+{
+  ALLEGRO_BITMAP *floor_corner_01 = NULL;
+
+  switch (em) {
+  case DUNGEON:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA: floor_corner_01 = dv_floor_corner_01; break;
+    }
+    break;
+  case PALACE:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA: floor_corner_01 = pv_floor_corner_01; break;
+    }
+    break;
+  }
+
   struct coord c; floor_corner_01_coord (p, &c);
   if (con (p)->fg == CLOSER_FLOOR) c.y += 1;
   draw_bitmapc (floor_corner_01, bitmap, &c, 0);
 }
 
 void
-draw_floor_corner_02 (ALLEGRO_BITMAP *bitmap, struct pos *p)
+draw_floor_corner_02 (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                      enum em em, enum vm vm)
 {
+  ALLEGRO_BITMAP *floor_corner_02 = NULL;
+
+  switch (em) {
+  case DUNGEON:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA: floor_corner_02 = dv_floor_corner_02; break;
+    }
+    break;
+  case PALACE:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA: floor_corner_02 = pv_floor_corner_02; break;
+    }
+    break;
+  }
+
   struct coord c; floor_corner_02_coord (p, &c);
   if (con (p)->fg == CLOSER_FLOOR) c.y += 1;
   draw_bitmapc (floor_corner_02, bitmap, &c, 0);
 }
 
 void
-draw_floor_corner_03 (ALLEGRO_BITMAP *bitmap, struct pos *p)
+draw_floor_corner_03 (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                      enum em em, enum vm vm)
 {
+  ALLEGRO_BITMAP *floor_corner_03 = NULL;
+
+  switch (em) {
+  case DUNGEON:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA: floor_corner_03 = dv_floor_corner_03; break;
+    }
+    break;
+  case PALACE:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA: floor_corner_03 = pv_floor_corner_03; break;
+    }
+    break;
+  }
+
   struct coord c; floor_corner_03_coord (p, &c);
   if (con (p)->fg == CLOSER_FLOOR) c.y += 1;
   draw_bitmapc (floor_corner_03, bitmap, &c, 0);
@@ -206,42 +280,6 @@ floor_right_coord (struct pos *p, struct coord *c)
 {
   c->x = PLACE_WIDTH * (p->place + 1);
   c->y = PLACE_HEIGHT * p->floor + 50;
-  c->room = p->room;
-  return c;
-}
-
-struct coord *
-broken_floor_right_coord (struct pos *p, struct coord *c)
-{
-  c->x = PLACE_WIDTH * (p->place + 1);
-  c->y = PLACE_HEIGHT * p->floor + 49;
-  c->room = p->room;
-  return c;
-}
-
-struct coord *
-broken_floor_front_coord (struct pos *p, struct coord *c)
-{
-  c->x = PLACE_WIDTH * p->place;
-  c->y = PLACE_HEIGHT * p->floor + 54;
-  c->room = p->room;
-  return c;
-}
-
-struct coord *
-skeleton_floor_left_coord (struct pos *p, struct coord *c)
-{
-  c->x = PLACE_WIDTH * p->place;
-  c->y = PLACE_HEIGHT * p->floor + 44;
-  c->room = p->room;
-  return c;
-}
-
-struct coord *
-skeleton_floor_right_coord (struct pos *p, struct coord *c)
-{
-  c->x = PLACE_WIDTH * (p->place + 1);
-  c->y = PLACE_HEIGHT * p->floor + 44;
   c->room = p->room;
   return c;
 }

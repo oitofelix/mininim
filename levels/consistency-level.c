@@ -37,7 +37,8 @@ init_consistency_level (void)
 
   struct level *lv = &consistency_level;
 
-  lv->type = DUNGEON;
+  lv->em = DUNGEON;
+  lv->vm = VGA;
 
   /* generate room 0 (delimiter room) */
   p.room = 0;

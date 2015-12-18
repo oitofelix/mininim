@@ -27,6 +27,7 @@
 #include "kid/kid.h"
 #include "room.h"
 #include "floor.h"
+#include "broken-floor.h"
 #include "loose-floor.h"
 #include "opener-floor.h"
 #include "closer-floor.h"
@@ -56,7 +57,7 @@ load_vdungeon_loose_floor (void)
   loose_floor_base_02 = load_bitmap (VDUNGEON_LOOSE_FLOOR_BASE_02);
   /* used for loose floor falling animation */
   loose_floor_02 = create_loose_floor_02_bitmap ();
-  broken_floor = create_broken_floor_bitmap ();
+  broken_floor = create_broken_floor_bitmap (DUNGEON, VGA);
 }
 
 void
@@ -105,26 +106,6 @@ create_loose_floor_02_bitmap (void)
   draw_bitmap (loose_floor_base_02, bitmap, 0, 14, 0);
   draw_bitmap (loose_floor_left_02, bitmap, 0, 1, 0);
   draw_bitmap (loose_floor_right_02, bitmap, 32, 0, 0);
-
-  return bitmap;
-}
-
-ALLEGRO_BITMAP *
-create_broken_floor_bitmap (void)
-{
-  int wl = al_get_bitmap_width (broken_floor_left);
-  int wr = al_get_bitmap_width (broken_floor_right);
-  int w = wl + wr;
-  int hl = al_get_bitmap_height (broken_floor_left);
-  int hr = al_get_bitmap_height (broken_floor_right);
-  int hb = al_get_bitmap_height (normal_floor_base);
-  int h = max (hl, hr) + hb;
-
-  ALLEGRO_BITMAP *bitmap = create_bitmap (w, h);
-  clear_bitmap (bitmap, al_map_rgba (0, 0, 0, 0));
-  draw_bitmap (normal_floor_base, bitmap, 0, 14, 0);
-  draw_bitmap (broken_floor_left, bitmap, 0, 1, 0);
-  draw_bitmap (broken_floor_right, bitmap, 32, 0, 0);
 
   return bitmap;
 }
@@ -405,10 +386,10 @@ draw_falling_loose_floor (ALLEGRO_BITMAP *bitmap, struct pos *p)
     survey (_tr, posf, &l->f, &tr, &fptr, &nfptr);
     survey (_br, posf, &l->f, &br, &fpbr, &nfpbr);
     draw_frame (bitmap, &l->f);
-    draw_confg_base (bitmap, &fptr);
-    draw_confg_left (bitmap, &fptr, true);
-    draw_confg_base (bitmap, &fpbr);
-    draw_confg_left (bitmap, &fpbr, true);
+    draw_confg_base (bitmap, &fptr, DUNGEON, VGA);
+    draw_confg_left (bitmap, &fptr, DUNGEON, VGA, true);
+    draw_confg_base (bitmap, &fpbr, DUNGEON, VGA);
+    draw_confg_left (bitmap, &fpbr, DUNGEON, VGA, true);
   } else return;
 }
 
@@ -421,7 +402,7 @@ draw_loose_floor (ALLEGRO_BITMAP *bitmap, struct pos *p)
   if (l->action == FALL_LOOSE_FLOOR) return;
   else {
     switch (l->state) {
-    case 0: draw_floor (bitmap, p); break;
+    case 0: draw_floor (bitmap, p, DUNGEON, VGA); break;
     case 1: draw_loose_floor_01 (bitmap, p); break;
     case 2: draw_loose_floor_02 (bitmap, p); break;
     }
@@ -435,7 +416,7 @@ draw_loose_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p)
   if (! l) return;
 
   switch (l->state) {
-  case 0: draw_floor_base (bitmap, p); break;
+  case 0: draw_floor_base (bitmap, p, DUNGEON, VGA); break;
   case 1: draw_loose_floor_01_base (bitmap, p); break;
   case 2: draw_loose_floor_02_base (bitmap, p); break;
   }
@@ -448,7 +429,7 @@ draw_loose_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p)
   if (! l) return;
 
   switch (l->state) {
-  case 0: draw_floor_left (bitmap, p); break;
+  case 0: draw_floor_left (bitmap, p, DUNGEON, VGA); break;
   case 1: draw_loose_floor_01_left (bitmap, p); break;
   case 2: draw_loose_floor_02_left (bitmap, p); break;
   }
@@ -461,7 +442,7 @@ draw_loose_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p)
   if (! l) return;
 
   switch (l->state) {
-  case 0: draw_floor_right (bitmap, p); break;
+  case 0: draw_floor_right (bitmap, p, DUNGEON, VGA); break;
   case 1: draw_loose_floor_01_right (bitmap, p); break;
   case 2: draw_loose_floor_02_right (bitmap, p); break;
   }

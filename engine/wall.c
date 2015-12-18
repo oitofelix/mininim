@@ -259,7 +259,7 @@ static ALLEGRO_BITMAP *wall_divider_00, *wall_divider_01;
 void
 draw_wall_randomization (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
-  if (level->type != DUNGEON && video_mode == VGA) return;
+  if (level->em != DUNGEON && level->vm == VGA) return;
 
   struct pos np; npos (p, &np);
   seedp (&np);
@@ -279,7 +279,7 @@ draw_wall_randomization (ALLEGRO_BITMAP *bitmap, struct pos *p)
     if (prandom (4) == 0) draw_wall_gray_block (bitmap, p);
     draw_wall_divider_01 (bitmap, p);
     draw_wall_divider_00 (bitmap, p);
-    if (level->type == DUNGEON) {
+    if (level->em == DUNGEON) {
       if (prandom(4) == 0)
         draw_wall_right_mark (bitmap, p, prandom (3));
       if (prandom(4) == 0)
@@ -287,14 +287,14 @@ draw_wall_randomization (ALLEGRO_BITMAP *bitmap, struct pos *p)
     }
     break;
   case SWS:
-    if (level->type == DUNGEON && prandom (6) == 0)
+    if (level->em == DUNGEON && prandom (6) == 0)
       draw_wall_left_mark (bitmap, p, prandom (1));
     break;
   case SWW:
     if (prandom (4) == 0)
       draw_wall_gray_block (bitmap, p);
     draw_wall_divider_01 (bitmap, p);
-    if (level->type == DUNGEON) {
+    if (level->em == DUNGEON) {
       if (prandom(4) == 0)
         draw_wall_right_mark (bitmap, p, prandom (3));
       if (prandom(4) == 0)
@@ -304,7 +304,7 @@ draw_wall_randomization (ALLEGRO_BITMAP *bitmap, struct pos *p)
   case WWS:
     draw_wall_divider_01 (bitmap, p);
     draw_wall_divider_00 (bitmap, p);
-    if (level->type == DUNGEON) {
+    if (level->em == DUNGEON) {
       if (prandom(4) == 0)
         draw_wall_right_mark (bitmap, p, prandom (1) + 2);
       if (prandom(4) == 0)

@@ -197,14 +197,14 @@ draw_level (void)
       draw_fire (screen, &p, draw_cycle);
     }
 
-  if (! no_room_drawing) draw_room (screen, room_view);
+  if (! no_room_drawing) draw_room (screen, room_view, level->em, level->vm);
 
   for (p.floor = FLOORS; p.floor >= -1; p.floor--)
     for (p.place = -1; p.place < PLACES; p.place++) {
       draw_falling_loose_floor (screen, &p);
     }
 
-  draw_kids (screen);
+  draw_kids (screen, level->em, level->vm);
 
   for (p.floor = FLOORS; p.floor >= -1; p.floor--)
     for (p.place = -1; p.place < PLACES; p.place++) {
@@ -265,6 +265,19 @@ draw_level (void)
       break;
     }
     asprintf (&text, "DISPLAY FLIP: %s", flip);
+    draw_bottom_text (NULL, text);
+    al_free (text);
+  }
+
+  if (was_key_pressed (ALLEGRO_KEY_F11, true)) {
+    char *em = NULL;
+
+    switch (level->em) {
+    case DUNGEON: level->em = PALACE; em = "PALACE"; break;
+    case PALACE: level->em = DUNGEON; em = "DUNGEON"; break;
+    }
+
+    asprintf (&text, "ENVIRONMENT MODE: %s", em);
     draw_bottom_text (NULL, text);
     al_free (text);
   }

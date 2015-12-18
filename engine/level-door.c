@@ -155,8 +155,8 @@ sample_level_doors (void)
 void
 draw_level_door (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
-  draw_floor_base (bitmap, p);
-  draw_floor_left (bitmap, p);
+  draw_floor_base (bitmap, p, DUNGEON, VGA);
+  draw_floor_left (bitmap, p, DUNGEON, VGA);
   draw_level_door_right (bitmap, p);
 }
 
@@ -166,7 +166,7 @@ draw_level_door_right (ALLEGRO_BITMAP *bitmap, struct pos *p)
   struct coord c;
   struct level_door *d = level_door_at_pos (p);
   if (! d) return;
-  draw_floor_right (bitmap, p);
+  draw_floor_right (bitmap, p, DUNGEON, VGA);
   draw_bitmapc (level_door_bottom_left, bitmap,
                 level_door_bottom_left_coord (p, &c), 0);
   draw_bitmapc (level_door_top_left, bitmap,
@@ -195,9 +195,9 @@ draw_level_door_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f)
   draw_bitmapc (level_door_bottom_right, bitmap,
                 level_door_bottom_right_coord (p, &c), 0);
   draw_level_door_front (bitmap, p, 0);
-  draw_confg (bitmap, &pa, true);
-  draw_confg_base (bitmap, &par);
-  draw_confg_left (bitmap, &par, true);
+  draw_confg (bitmap, &pa, DUNGEON, VGA, true);
+  draw_confg_base (bitmap, &par, DUNGEON, VGA);
+  draw_confg_left (bitmap, &par, DUNGEON, VGA, true);
 }
 
 void

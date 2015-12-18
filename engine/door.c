@@ -258,7 +258,7 @@ door_grid_tip_y (struct pos *p)
 void
 draw_door (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
-  draw_floor_base (bitmap, p);
+  draw_floor_base (bitmap, p, DUNGEON, VGA);
   draw_door_left (bitmap, p);
   draw_door_right (bitmap, p);
 }
@@ -287,7 +287,7 @@ draw_door_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f)
   struct pos par, pr, pl, pa;
   struct coord nc; struct pos np, ptf, pmt, ptb;
 
-  draw_floor_base (bitmap, p);
+  draw_floor_base (bitmap, p, DUNGEON, VGA);
   draw_bitmapc (door_pole, screen, door_pole_coord (p, &nc), 0);
 
   survey (_tf, pos, f, &nc, &ptf, &np);
@@ -313,10 +313,10 @@ draw_door_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f)
       (f, hang_pos, &pa)) {
     struct door *d = door_at_pos (p);
     draw_door_grid (screen, p, d->i);
-    draw_confg_right (bitmap, &pa, true);
-    draw_confg_base (bitmap, &par);
-    draw_confg_left (bitmap, &par, true);
-    draw_confg_fg (bitmap, &pr, f);
+    draw_confg_right (bitmap, &pa, DUNGEON, VGA, true);
+    draw_confg_base (bitmap, &par, DUNGEON, VGA);
+    draw_confg_left (bitmap, &par, DUNGEON, VGA, true);
+    draw_confg_fg (bitmap, &pr, DUNGEON, VGA, f);
   }
 }
 

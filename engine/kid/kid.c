@@ -218,7 +218,8 @@ get_kid_by_id (int id)
 }
 
 void
-draw_kids (ALLEGRO_BITMAP *bitmap)
+draw_kids (ALLEGRO_BITMAP *bitmap,
+           enum em em, enum vm vm)
 {
   struct coord ml, c; struct pos pml, pmlr, pmlra;
   struct anim *k;
@@ -246,7 +247,7 @@ draw_kids (ALLEGRO_BITMAP *bitmap)
 
     draw_falling_loose_floor (bitmap, &pmlr);
     draw_falling_loose_floor (bitmap, &pmlra);
-    draw_room_anim_fg (bitmap, k);
+    draw_room_anim_fg (bitmap, em, vm, k);
     k->xf.b = NULL;
   }
 

@@ -73,7 +73,13 @@
 #define TGREEN (al_map_rgba (0, 255, 0, 0))
 #define TBLUE (al_map_rgba (0, 0, 255, 0))
 
-enum video_mode {
+/* environment mode */
+enum em {
+  DUNGEON, PALACE,
+};
+
+/* video mode */
+enum vm {
   CGA, EGA, VGA,
 };
 
@@ -99,9 +105,9 @@ enum dir {
 };
 
 struct level {
-  enum {
-    DUNGEON, PALACE,
-  } type;
+
+  enum em em;
+  enum vm vm;
 
   struct con {
     enum confg {
@@ -210,8 +216,5 @@ struct anim {
 /* functions */
 int max (int a, int b);
 int min (int a, int b);
-
-/* current video mode */
-extern enum video_mode video_mode;
 
 #endif	/* FREEPOP_PRINCE_H */

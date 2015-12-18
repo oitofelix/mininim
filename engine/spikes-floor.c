@@ -294,7 +294,7 @@ draw_spikes_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p)
 void
 draw_spikes_floor_floor (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
-  draw_floor_base (bitmap, p);
+  draw_floor_base (bitmap, p, DUNGEON, VGA);
   draw_spikes_floor_floor_left (bitmap, p);
   draw_spikes_floor_floor_right (bitmap, p);
 }

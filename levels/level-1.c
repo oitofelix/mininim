@@ -22,7 +22,8 @@
 #include "engine/level.h"
 
 static struct level level_1 = {
-  .type = DUNGEON,
+  .em = DUNGEON,
+  .vm = VGA,
 
   .con = {
     [0] =

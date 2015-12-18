@@ -26,9 +26,6 @@
 #include "levels/level-1.h"
 #include "levels/consistency-level.h"
 
-/* current video mode */
-enum video_mode video_mode = VGA;
-
 int
 main (int argc, char **argv)
 {

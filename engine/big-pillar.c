@@ -52,7 +52,7 @@ unload_big_pillar (void)
 void
 draw_big_pillar_bottom (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
-  draw_floor_base (bitmap, p);
+  draw_floor_base (bitmap, p, DUNGEON, VGA);
   draw_big_pillar_bottom_left (bitmap, p);
   draw_big_pillar_bottom_right (bitmap, p);
 }
@@ -77,14 +77,14 @@ void
 draw_big_pillar_bottom_fg (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   struct coord c;
-  draw_floor_corner_03 (bitmap, p);
+  draw_floor_corner_03 (bitmap, p, DUNGEON, VGA);
   draw_bitmapc (big_pillar_bottom_fg, bitmap, big_pillar_bottom_fg_coord (p, &c), 0);
 }
 
 void
 draw_big_pillar_top (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
-  draw_floor_base (bitmap, p);
+  draw_floor_base (bitmap, p, DUNGEON, VGA);
   draw_big_pillar_top_left (bitmap, p);
   draw_big_pillar_top_right (bitmap, p);
 }

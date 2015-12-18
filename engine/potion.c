@@ -39,7 +39,7 @@ ALLEGRO_COLOR poison_palette (ALLEGRO_COLOR c);
 void
 load_potion (void)
 {
-  switch (level->type) {
+  switch (level->em) {
   case DUNGEON:
     small_potion = load_bitmap (VDUNGEON_SMALL_POTION);
     big_potion = load_bitmap (VDUNGEON_BIG_POTION);

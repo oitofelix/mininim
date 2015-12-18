@@ -185,7 +185,7 @@ draw_closer_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p)
 
   if (c->broken) return;
   if (c->pressed) draw_pressed_closer_floor_left (bitmap, p);
-  else draw_floor_left (bitmap, p);
+  else draw_floor_left (bitmap, p, DUNGEON, VGA);
 }
 
 void
@@ -196,7 +196,7 @@ draw_closer_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p)
 
   if (c->broken) return;
   if (c->pressed) draw_pressed_closer_floor_right (bitmap, p);
-  else draw_floor_right (bitmap, p);
+  else draw_floor_right (bitmap, p, DUNGEON, VGA);
 }
 
 void
@@ -218,7 +218,7 @@ void
 draw_pressed_closer_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   struct coord c;
-  draw_bitmapc (normal_floor_left, bitmap,
+  draw_bitmapc (dv_floor_left, bitmap,
                 pressed_closer_floor_left_coord (p, &c), 0);
 }
 
@@ -226,7 +226,7 @@ void
 draw_pressed_closer_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   struct coord c; struct pos np;
-  draw_bitmapc (normal_floor_right, bitmap,
+  draw_bitmapc (dv_floor_right, bitmap,
                 pressed_closer_floor_right_coord (p, &c), 0);
   if (! is_strictly_traversable (prel (p, &np, 0, +1)))
     draw_bitmapc (pressed_closer_floor_right, bitmap,
@@ -237,8 +237,8 @@ void
 draw_unpressed_closer_floor (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   draw_unpressed_closer_floor_base (bitmap, p);
-  draw_floor_left (bitmap, p);
-  draw_floor_right (bitmap, p);
+  draw_floor_left (bitmap, p, DUNGEON, VGA);
+  draw_floor_right (bitmap, p, DUNGEON, VGA);
 }
 
 void

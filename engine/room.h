@@ -39,22 +39,26 @@ void unload_room (void);
 void draw_bitmap_regionc (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
                           float sx, float sy, float sw, float sh,
                           struct coord *c, int flags);
-void draw_room (ALLEGRO_BITMAP *bitmap, int room);
+void draw_room (ALLEGRO_BITMAP *bitmap, int room,
+                enum em em, enum vm vm);
 void draw_con (ALLEGRO_BITMAP *bitmap, struct pos *p,
-               bool redraw);
-void draw_conbg (ALLEGRO_BITMAP *bitmap, struct pos *p);
+               enum em em, enum vm vm, bool redraw);
+void draw_conbg (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                 enum em em, enum vm vm);
 void draw_confg (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                 bool redraw);
-void draw_confg_base (ALLEGRO_BITMAP *bitmap, struct pos *p);
+                 enum em em, enum vm vm, bool redraw);
+void draw_confg_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                      enum em em, enum vm vm);
 void draw_confg_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                      bool redraw);
+                      enum em em, enum vm vm, bool redraw);
 void draw_confg_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                       bool redraw);
+                       enum em em, enum vm vm, bool redraw);
 void draw_confg_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                    struct frame *f);
-void draw_room_anim_fg (ALLEGRO_BITMAP *bitmap, struct anim *a);
+                    enum em em, enum vm vm, struct frame *f);
+void draw_room_anim_fg (ALLEGRO_BITMAP *bitmap,
+                        enum em em, enum vm vm, struct anim *a);
 void draw_room_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                   struct frame *f);
+                   enum em em, enum vm vm, struct frame *f);
 void draw_bricks_01 (ALLEGRO_BITMAP *bitmap, struct pos *p);
 void draw_bricks_02 (ALLEGRO_BITMAP *bitmap, struct pos *p);
 void draw_bricks_03 (ALLEGRO_BITMAP *bitmap, struct pos *p);

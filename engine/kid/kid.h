@@ -84,7 +84,7 @@ void draw_kid_lives (ALLEGRO_BITMAP *bitmap, struct anim *kid, int j);
 void draw_kid (ALLEGRO_BITMAP *bitmap, struct anim *kid, struct pos *p);
 int create_kid (void);
 struct anim *get_kid_by_id (int id);
-void draw_kids (ALLEGRO_BITMAP *bitmap);
+void draw_kids (ALLEGRO_BITMAP *bitmap, enum em em, enum vm vm);
 void draw_kid_frame (ALLEGRO_BITMAP *bitmap, struct anim *k);
 ALLEGRO_COLOR colorful_shadow_palette (ALLEGRO_COLOR c);
 ALLEGRO_COLOR phantom_shadow_palette (ALLEGRO_COLOR c);
