@@ -22,19 +22,28 @@
 
 #include "physics.h"
 
-#define VDUNGEON_PILLAR_LEFT "dat/vdungeon/pillar/pillar left.png"
-#define VDUNGEON_PILLAR_RIGHT "dat/vdungeon/pillar/pillar right main.png"
-#define VDUNGEON_PILLAR_TOP "dat/vdungeon/pillar/pillar right top.png"
-#define VDUNGEON_PILLAR "dat/vdungeon/pillar/pillar.png"
+/* dungeon vga */
+#define DV_PILLAR_LEFT "data/pillar/dv-left.png"
+#define DV_PILLAR_RIGHT "data/pillar/dv-right.png"
+#define DV_PILLAR_TOP "data/pillar/dv-top.png"
+#define DV_PILLAR_FG "data/pillar/dv-fg.png"
 
-extern ALLEGRO_BITMAP *pillar_left, *pillar_right, *pillar_top, *pillar;
+/* palace vga */
+#define PV_PILLAR_LEFT "data/pillar/pv-left.png"
+#define PV_PILLAR_RIGHT "data/pillar/pv-right.png"
+#define PV_PILLAR_TOP "data/pillar/pv-top.png"
+#define PV_PILLAR_FG "data/pillar/pv-fg.png"
 
-void load_vdungeon_pillar (void);
+void load_pillar (void);
 void unload_pillar (void);
-void draw_pillar (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_pillar_left (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_pillar_right (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_pillar_fg (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_pillar (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                  enum em em, enum vm vm);
+void draw_pillar_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                       enum em em, enum vm vm);
+void draw_pillar_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                        enum em em, enum vm vm);
+void draw_pillar_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                     enum em em, enum vm vm);
 struct coord *pillar_coord (struct pos *p, struct coord *c);
 struct coord *pillar_left_coord (struct pos *p, struct coord *c);
 struct coord *pillar_right_coord (struct pos *p, struct coord *c);

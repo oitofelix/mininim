@@ -22,56 +22,141 @@
 #include "room.h"
 #include "pillar.h"
 
-ALLEGRO_BITMAP *pillar_left, *pillar_right, *pillar_top, *pillar;
+/* dungeon vga */
+ALLEGRO_BITMAP *dv_pillar_left, *dv_pillar_right,
+  *dv_pillar_top, *dv_pillar_fg;
+
+/* palace vga */
+ALLEGRO_BITMAP *pv_pillar_left, *pv_pillar_right,
+  *pv_pillar_top, *pv_pillar_fg;
 
 void
-load_vdungeon_pillar (void)
+load_pillar (void)
 {
-  pillar_left = load_bitmap (VDUNGEON_PILLAR_LEFT);
-  pillar_right = load_bitmap (VDUNGEON_PILLAR_RIGHT);
-  pillar_top = load_bitmap (VDUNGEON_PILLAR_TOP);
-  pillar = load_bitmap (VDUNGEON_PILLAR);
+  /* dungeon vga */
+  dv_pillar_left = load_bitmap (DV_PILLAR_LEFT);
+  dv_pillar_right = load_bitmap (DV_PILLAR_RIGHT);
+  dv_pillar_top = load_bitmap (DV_PILLAR_TOP);
+  dv_pillar_fg = load_bitmap (DV_PILLAR_FG);
+
+  /* palace vga */
+  pv_pillar_left = load_bitmap (PV_PILLAR_LEFT);
+  pv_pillar_right = load_bitmap (PV_PILLAR_RIGHT);
+  pv_pillar_top = load_bitmap (PV_PILLAR_TOP);
+  pv_pillar_fg = load_bitmap (PV_PILLAR_FG);
 }
 
 void
 unload_pillar (void)
 {
-  /* bitmaps */
-  al_destroy_bitmap (pillar_left);
-  al_destroy_bitmap (pillar_right);
-  al_destroy_bitmap (pillar_top);
-  al_destroy_bitmap (pillar);
+  /* dungeon vga */
+  al_destroy_bitmap (dv_pillar_left);
+  al_destroy_bitmap (dv_pillar_right);
+  al_destroy_bitmap (dv_pillar_top);
+  al_destroy_bitmap (dv_pillar_fg);
+
+  /* palace vga */
+  al_destroy_bitmap (pv_pillar_left);
+  al_destroy_bitmap (pv_pillar_right);
+  al_destroy_bitmap (pv_pillar_top);
+  al_destroy_bitmap (pv_pillar_fg);
 }
 
 void
-draw_pillar (ALLEGRO_BITMAP *bitmap, struct pos *p)
+draw_pillar (ALLEGRO_BITMAP *bitmap, struct pos *p,
+             enum em em, enum vm vm)
 {
-  draw_floor_base (bitmap, p, DUNGEON, VGA);
-  draw_pillar_left (bitmap, p);
-  draw_pillar_right (bitmap, p);
+  draw_floor_base (bitmap, p, em, vm);
+  draw_pillar_left (bitmap, p, em, vm);
+  draw_pillar_right (bitmap, p, em, vm);
 }
 
 void
-draw_pillar_left (ALLEGRO_BITMAP *bitmap, struct pos *p)
+draw_pillar_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                  enum em em, enum vm vm)
 {
+  ALLEGRO_BITMAP *pillar_left = NULL;
+
+  switch (em) {
+  case DUNGEON:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA: pillar_left = dv_pillar_left; break;
+    }
+    break;
+  case PALACE:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA: pillar_left = pv_pillar_left; break;
+    }
+    break;
+  }
+
   struct coord c;
   draw_bitmapc (pillar_left, bitmap, pillar_left_coord (p, &c), 0);
 }
 
 void
-draw_pillar_right (ALLEGRO_BITMAP *bitmap, struct pos *p)
+draw_pillar_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                   enum em em, enum vm vm)
 {
+  ALLEGRO_BITMAP *pillar_right = NULL, *pillar_top = NULL;
+
+  switch (em) {
+  case DUNGEON:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA:
+      pillar_right = dv_pillar_right;
+      pillar_top = dv_pillar_top;
+      break;
+    }
+    break;
+  case PALACE:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA:
+      pillar_right = pv_pillar_right;
+      pillar_top = pv_pillar_top;
+      break;
+    }
+    break;
+  }
+
   struct coord c;
   draw_bitmapc (pillar_right, bitmap, pillar_right_coord (p, &c), 0);
   draw_bitmapc (pillar_top, bitmap, pillar_top_coord (p, &c), 0);
 }
 
 void
-draw_pillar_fg (ALLEGRO_BITMAP *bitmap, struct pos *p)
+draw_pillar_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                enum em em, enum vm vm)
 {
+  ALLEGRO_BITMAP *pillar_fg = NULL;
+
+  switch (em) {
+  case DUNGEON:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA: pillar_fg = dv_pillar_fg; break;
+    }
+    break;
+  case PALACE:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA: pillar_fg = pv_pillar_fg; break;
+    }
+    break;
+  }
+
   struct coord c;
-  draw_floor_corner_03 (bitmap, p, DUNGEON, VGA);
-  draw_bitmapc (pillar, bitmap, pillar_coord (p, &c), 0);
+  draw_bitmapc (pillar_fg, bitmap, pillar_coord (p, &c), 0);
 }
 
 struct coord *

@@ -56,7 +56,7 @@ load_room (void)
   load_vdungeon_closer_floor ();
   load_vdungeon_spikes_floor ();
   load_vdungeon_wall ();
-  load_vdungeon_pillar ();
+  load_pillar ();
   load_vdungeon_big_pillar ();
   load_vdungeon_door ();
   load_vdungeon_level_door ();
@@ -234,7 +234,7 @@ draw_confg_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case SPIKES_FLOOR: draw_spikes_floor_left (bitmap, p); break;
   case OPENER_FLOOR: draw_opener_floor_left (bitmap, p); break;
   case CLOSER_FLOOR: draw_closer_floor_left (bitmap, p); break;
-  case PILLAR: draw_pillar_left (bitmap, p); break;
+  case PILLAR: draw_pillar_left (bitmap, p, em, vm); break;
   case BIG_PILLAR_BOTTOM:
     draw_big_pillar_bottom_left (bitmap, p); break;
   case BIG_PILLAR_TOP:
@@ -266,7 +266,7 @@ draw_confg_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case SPIKES_FLOOR: draw_spikes_floor_right (bitmap, p); break;
   case OPENER_FLOOR: draw_opener_floor_right (bitmap, p); break;
   case CLOSER_FLOOR: draw_closer_floor_right (bitmap, p); break;
-  case PILLAR: draw_pillar_right (bitmap, p); break;
+  case PILLAR: draw_pillar_right (bitmap, p, em, vm); break;
   case BIG_PILLAR_BOTTOM:
     draw_big_pillar_bottom_right (bitmap, p); break;
   case BIG_PILLAR_TOP:
@@ -322,7 +322,7 @@ draw_confg_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case SPIKES_FLOOR: draw_spikes_fg (bitmap, p); break;
   case OPENER_FLOOR: break;
   case CLOSER_FLOOR: break;
-  case PILLAR: draw_pillar_fg (bitmap, p); break;
+  case PILLAR: draw_pillar_fg (bitmap, p, em, vm); break;
   case BIG_PILLAR_BOTTOM:
     draw_big_pillar_bottom_fg (bitmap, p); break;
   case BIG_PILLAR_TOP:
@@ -434,9 +434,7 @@ draw_room_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
            && f->dir == RIGHT) {
     draw_confg_base (screen, p, em, vm);
 
-    if (con (p)->fg == PILLAR)
-      draw_pillar_fg (screen, p);
-    else if (con (p)->fg == BIG_PILLAR_BOTTOM)
+    if (con (p)->fg == BIG_PILLAR_BOTTOM)
       draw_big_pillar_bottom_fg (screen, p);
     else if (con (p)->fg == BROKEN_FLOOR)
       draw_broken_floor_fg (screen, p, em, vm);
@@ -455,6 +453,9 @@ draw_room_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
                || f->b == kid_climb_08
                || f->b == kid_climb_05)
         draw_floor_corner_02 (screen, p, em, vm);
+
+      if (con (p)->fg == PILLAR)
+        draw_pillar_fg (screen, p, em, vm);
     }
     /* when below the construction */
   } else if ((peq (p, &fptl)
