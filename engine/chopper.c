@@ -30,12 +30,23 @@
 #include "level.h"
 #include "chopper.h"
 
-ALLEGRO_BITMAP *chopper_bottom_01, *chopper_top_01, *chopper_fg_01,
-  *chopper_blood_01,
-  *chopper_bottom_02, *chopper_top_02, *chopper_fg_02, *chopper_blood_02,
-  *chopper_03, *chopper_fg_03, *chopper_blood_03,
-  *chopper_04, *chopper_fg_04, *chopper_blood_04,
-  *chopper_bottom_05, *chopper_top_05, *chopper_fg_05, *chopper_blood_05;
+/* dungeon vga */
+ALLEGRO_BITMAP *dv_chopper_01, *dv_chopper_fg_01,
+  *dv_chopper_02, *dv_chopper_fg_02,
+  *dv_chopper_03, *dv_chopper_fg_03,
+  *dv_chopper_04, *dv_chopper_fg_04,
+  *dv_chopper_05, *dv_chopper_fg_05;
+
+/* palace vga */
+ALLEGRO_BITMAP *pv_chopper_01, *pv_chopper_fg_01,
+  *pv_chopper_02, *pv_chopper_fg_02,
+  *pv_chopper_03, *pv_chopper_fg_03,
+  *pv_chopper_04, *pv_chopper_fg_04,
+  *pv_chopper_05, *pv_chopper_fg_05;
+
+/* palettable */
+ALLEGRO_BITMAP *chopper_blood_01, *chopper_blood_02,
+  *chopper_blood_03, *chopper_blood_04, *chopper_blood_05;
 
 ALLEGRO_SAMPLE *chopper_sample;
 
@@ -45,67 +56,88 @@ static struct chopper *chopper = NULL;
 static size_t chopper_nmemb = 0;
 
 void
-load_vdungeon_chopper (void)
+load_chopper (void)
 {
-  chopper_bottom_01 = load_bitmap (VDUNGEON_CHOPPER_BOTTOM_01);
-  chopper_top_01 = load_bitmap (VDUNGEON_CHOPPER_TOP_01);
-  chopper_fg_01 = load_bitmap (VDUNGEON_CHOPPER_FG_01);
-  chopper_blood_01 = load_bitmap (VDUNGEON_CHOPPER_BLOOD_01);
-  chopper_bottom_02 = load_bitmap (VDUNGEON_CHOPPER_BOTTOM_02);
-  chopper_top_02 = load_bitmap (VDUNGEON_CHOPPER_TOP_02);
-  chopper_fg_02 = load_bitmap (VDUNGEON_CHOPPER_FG_02);
-  chopper_blood_02 = load_bitmap (VDUNGEON_CHOPPER_BLOOD_02);
-  chopper_03 = load_bitmap (VDUNGEON_CHOPPER_03);
-  chopper_fg_03 = load_bitmap (VDUNGEON_CHOPPER_FG_03);
-  chopper_blood_03 = load_bitmap (VDUNGEON_CHOPPER_BLOOD_03);
-  chopper_04 = load_bitmap (VDUNGEON_CHOPPER_04);
-  chopper_fg_04 = load_bitmap (VDUNGEON_CHOPPER_FG_04);
-  chopper_blood_04 = load_bitmap (VDUNGEON_CHOPPER_BLOOD_04);
-  chopper_bottom_05 = load_bitmap (VDUNGEON_CHOPPER_BOTTOM_05);
-  chopper_top_05 = load_bitmap (VDUNGEON_CHOPPER_TOP_05);
-  chopper_fg_05 = load_bitmap (VDUNGEON_CHOPPER_FG_05);
-  chopper_blood_05 = load_bitmap (VDUNGEON_CHOPPER_BLOOD_05);
+  ALLEGRO_BITMAP *chopper_blood_template_01, *chopper_blood_template_02,
+    *chopper_blood_template_03, *chopper_blood_template_04,
+    *chopper_blood_template_05;
+
+  /* dungeon vga */
+  dv_chopper_01 = load_bitmap (DV_CHOPPER_01);
+  dv_chopper_fg_01 = load_bitmap (DV_CHOPPER_FG_01);
+  dv_chopper_02 = load_bitmap (DV_CHOPPER_02);
+  dv_chopper_fg_02 = load_bitmap (DV_CHOPPER_FG_02);
+  dv_chopper_03 = load_bitmap (DV_CHOPPER_03);
+  dv_chopper_fg_03 = load_bitmap (DV_CHOPPER_FG_03);
+  dv_chopper_04 = load_bitmap (DV_CHOPPER_04);
+  dv_chopper_fg_04 = load_bitmap (DV_CHOPPER_FG_04);
+  dv_chopper_05 = load_bitmap (DV_CHOPPER_05);
+  dv_chopper_fg_05 = load_bitmap (DV_CHOPPER_FG_05);
+
+  /* palace vga */
+  pv_chopper_01 = load_bitmap (PV_CHOPPER_01);
+  pv_chopper_fg_01 = load_bitmap (PV_CHOPPER_FG_01);
+  pv_chopper_02 = load_bitmap (PV_CHOPPER_02);
+  pv_chopper_fg_02 = load_bitmap (PV_CHOPPER_FG_02);
+  pv_chopper_03 = load_bitmap (PV_CHOPPER_03);
+  pv_chopper_fg_03 = load_bitmap (PV_CHOPPER_FG_03);
+  pv_chopper_04 = load_bitmap (PV_CHOPPER_04);
+  pv_chopper_fg_04 = load_bitmap (PV_CHOPPER_FG_04);
+  pv_chopper_05 = load_bitmap (PV_CHOPPER_05);
+  pv_chopper_fg_05 = load_bitmap (PV_CHOPPER_FG_05);
+
+  /* palettable */
+  chopper_blood_template_01 = load_bitmap (CHOPPER_BLOOD_01);
+  chopper_blood_template_02 = load_bitmap (CHOPPER_BLOOD_02);
+  chopper_blood_template_03 = load_bitmap (CHOPPER_BLOOD_03);
+  chopper_blood_template_04 = load_bitmap (CHOPPER_BLOOD_04);
+  chopper_blood_template_05 = load_bitmap (CHOPPER_BLOOD_05);
 
   /* apply blood palette */
-  ALLEGRO_BITMAP *blood_01, *blood_02, *blood_03, *blood_04,
-    *blood_05;
-  blood_01 = chopper_blood_01;
-  blood_02 = chopper_blood_02;
-  blood_03 = chopper_blood_03;
-  blood_04 = chopper_blood_04;
-  blood_05 = chopper_blood_05;
-  chopper_blood_01 = apply_palette (chopper_blood_01, blood_palette);
-  chopper_blood_02 = apply_palette (chopper_blood_02, blood_palette);
-  chopper_blood_03 = apply_palette (chopper_blood_03, blood_palette);
-  chopper_blood_04 = apply_palette (chopper_blood_04, blood_palette);
-  chopper_blood_05 = apply_palette (chopper_blood_05, blood_palette);
-  al_destroy_bitmap (blood_01);
-  al_destroy_bitmap (blood_02);
-  al_destroy_bitmap (blood_03);
-  al_destroy_bitmap (blood_04);
-  al_destroy_bitmap (blood_05);
+  chopper_blood_01 = apply_palette (chopper_blood_template_01, blood_palette);
+  chopper_blood_02 = apply_palette (chopper_blood_template_02, blood_palette);
+  chopper_blood_03 = apply_palette (chopper_blood_template_03, blood_palette);
+  chopper_blood_04 = apply_palette (chopper_blood_template_04, blood_palette);
+  chopper_blood_05 = apply_palette (chopper_blood_template_05, blood_palette);
+  al_destroy_bitmap (chopper_blood_template_01);
+  al_destroy_bitmap (chopper_blood_template_02);
+  al_destroy_bitmap (chopper_blood_template_03);
+  al_destroy_bitmap (chopper_blood_template_04);
+  al_destroy_bitmap (chopper_blood_template_05);
 }
 
 void
 unload_chopper (void)
 {
-  al_destroy_bitmap (chopper_bottom_01);
-  al_destroy_bitmap (chopper_top_01);
-  al_destroy_bitmap (chopper_fg_01);
+  /* dungeon vga */
+  al_destroy_bitmap (dv_chopper_01);
+  al_destroy_bitmap (dv_chopper_fg_01);
+  al_destroy_bitmap (dv_chopper_02);
+  al_destroy_bitmap (dv_chopper_fg_02);
+  al_destroy_bitmap (dv_chopper_03);
+  al_destroy_bitmap (dv_chopper_fg_03);
+  al_destroy_bitmap (dv_chopper_04);
+  al_destroy_bitmap (dv_chopper_fg_04);
+  al_destroy_bitmap (dv_chopper_05);
+  al_destroy_bitmap (dv_chopper_fg_05);
+
+  /* palace vga */
+  al_destroy_bitmap (pv_chopper_01);
+  al_destroy_bitmap (pv_chopper_fg_01);
+  al_destroy_bitmap (pv_chopper_02);
+  al_destroy_bitmap (pv_chopper_fg_02);
+  al_destroy_bitmap (pv_chopper_03);
+  al_destroy_bitmap (pv_chopper_fg_03);
+  al_destroy_bitmap (pv_chopper_04);
+  al_destroy_bitmap (pv_chopper_fg_04);
+  al_destroy_bitmap (pv_chopper_05);
+  al_destroy_bitmap (pv_chopper_fg_05);
+
+  /* palettable */
   al_destroy_bitmap (chopper_blood_01);
-  al_destroy_bitmap (chopper_bottom_02);
-  al_destroy_bitmap (chopper_top_02);
-  al_destroy_bitmap (chopper_fg_02);
   al_destroy_bitmap (chopper_blood_02);
-  al_destroy_bitmap (chopper_03);
-  al_destroy_bitmap (chopper_fg_03);
   al_destroy_bitmap (chopper_blood_03);
-  al_destroy_bitmap (chopper_04);
-  al_destroy_bitmap (chopper_fg_04);
   al_destroy_bitmap (chopper_blood_04);
-  al_destroy_bitmap (chopper_bottom_05);
-  al_destroy_bitmap (chopper_top_05);
-  al_destroy_bitmap (chopper_fg_05);
   al_destroy_bitmap (chopper_blood_05);
 }
 
@@ -238,88 +270,207 @@ sample_choppers (void)
 }
 
 void
-draw_chopper_left (ALLEGRO_BITMAP *bitmap, struct pos *p)
+draw_chopper_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                   enum em em, enum vm vm)
 {
   struct chopper *ch = chopper_at_pos (p);
   if (! ch) return;
 
   switch (ch->i) {
-  case 0: draw_chopper_left_01 (bitmap, p, ch); break;
-  case 1: draw_chopper_left_02 (bitmap, p, ch); break;
-  case 2: draw_chopper_left_03 (bitmap, p, ch); break;
-  case 3: draw_chopper_left_04 (bitmap, p, ch); break;
-  case 4: draw_chopper_left_05 (bitmap, p, ch); break;
+  case 0: draw_chopper_left_01 (bitmap, p, ch, em, vm); break;
+  case 1: draw_chopper_left_02 (bitmap, p, ch, em, vm); break;
+  case 2: draw_chopper_left_03 (bitmap, p, ch, em, vm); break;
+  case 3: draw_chopper_left_04 (bitmap, p, ch, em, vm); break;
+  case 4: draw_chopper_left_05 (bitmap, p, ch, em, vm); break;
   }
 }
 
 void
-draw_chopper_left_01 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch)
+draw_chopper_left_01 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
+                      enum em em, enum vm vm)
 {
+  ALLEGRO_BITMAP *chopper_01 = NULL;
+
+  switch (em) {
+  case DUNGEON:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA: chopper_01 = dv_chopper_01; break;
+    }
+    break;
+  case PALACE:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA: chopper_01 = pv_chopper_01; break;
+    }
+    break;
+  }
+
   struct coord c;
-  draw_bitmapc (chopper_bottom_01, bitmap, chopper_bottom_coord_01 (p, &c), 0);
-  draw_bitmapc (chopper_top_01, bitmap, chopper_top_coord (p, &c), 0);
+  draw_bitmapc (chopper_01, bitmap, chopper_coord (p, &c), 0);
   if (ch->blood)
     draw_bitmapc (chopper_blood_01, bitmap, chopper_blood_01_coord (p, &c), 0);
 }
 
 void
-draw_chopper_left_02 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch)
+draw_chopper_left_02 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
+                      enum em em, enum vm vm)
 {
+  ALLEGRO_BITMAP *chopper_02 = NULL;
+
+  switch (em) {
+  case DUNGEON:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA: chopper_02 = dv_chopper_02; break;
+    }
+    break;
+  case PALACE:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA: chopper_02 = pv_chopper_02; break;
+    }
+    break;
+  }
+
   struct coord c;
-  draw_bitmapc (chopper_bottom_02, bitmap, chopper_bottom_coord_02 (p, &c), 0);
-  draw_bitmapc (chopper_top_02, bitmap, chopper_top_coord (p, &c), 0);
+  draw_bitmapc (chopper_02, bitmap, chopper_coord (p, &c), 0);
   if (ch->blood)
     draw_bitmapc (chopper_blood_02, bitmap, chopper_blood_02_coord (p, &c), 0);
 }
 
 void
-draw_chopper_left_03 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch)
+draw_chopper_left_03 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
+                      enum em em, enum vm vm)
 {
+  ALLEGRO_BITMAP *chopper_03 = NULL;
+
+  switch (em) {
+  case DUNGEON:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA: chopper_03 = dv_chopper_03; break;
+    }
+    break;
+  case PALACE:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA: chopper_03 = pv_chopper_03; break;
+    }
+    break;
+  }
+
   struct coord c;
-  draw_bitmapc (chopper_03, bitmap, chopper_top_coord (p, &c), 0);
+  draw_bitmapc (chopper_03, bitmap, chopper_coord (p, &c), 0);
   if (ch->blood)
     draw_bitmapc (chopper_blood_03, bitmap, chopper_blood_03_coord (p, &c), 0);
 }
 
 void
-draw_chopper_left_04 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch)
+draw_chopper_left_04 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
+                      enum em em, enum vm vm)
 {
+  ALLEGRO_BITMAP *chopper_04 = NULL;
+
+  switch (em) {
+  case DUNGEON:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA: chopper_04 = dv_chopper_04; break;
+    }
+    break;
+  case PALACE:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA: chopper_04 = pv_chopper_04; break;
+    }
+    break;
+  }
+
   struct coord c;
-  draw_bitmapc (chopper_04, bitmap, chopper_top_coord (p, &c), 0);
+  draw_bitmapc (chopper_04, bitmap, chopper_coord (p, &c), 0);
   if (ch->blood)
     draw_bitmapc (chopper_blood_04, bitmap, chopper_blood_04_coord (p, &c), 0);
 }
 
 void
-draw_chopper_left_05 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch)
+draw_chopper_left_05 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
+                      enum em em, enum vm vm)
 {
+  ALLEGRO_BITMAP *chopper_05 = NULL;
+
+  switch (em) {
+  case DUNGEON:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA: chopper_05 = dv_chopper_05; break;
+    }
+    break;
+  case PALACE:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA: chopper_05 = pv_chopper_05; break;
+    }
+    break;
+  }
+
   struct coord c;
-  draw_bitmapc (chopper_bottom_05, bitmap, chopper_bottom_coord_05 (p, &c), 0);
-  draw_bitmapc (chopper_top_05, bitmap, chopper_top_coord (p, &c), 0);
+  draw_bitmapc (chopper_05, bitmap, chopper_coord (p, &c), 0);
   if (ch->blood)
     draw_bitmapc (chopper_blood_05, bitmap, chopper_blood_05_coord (p, &c), 0);
 }
 
 void
-draw_chopper_fg (ALLEGRO_BITMAP *bitmap, struct pos *p)
+draw_chopper_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                 enum em em, enum vm vm)
 {
   struct chopper *ch = chopper_at_pos (p);
   if (! ch) return;
 
   switch (ch->i) {
-  case 0: draw_chopper_fg_01 (bitmap, p, ch); break;
-  case 1: draw_chopper_fg_02 (bitmap, p, ch); break;
-  case 2: draw_chopper_fg_03 (bitmap, p, ch); break;
-  case 3: draw_chopper_fg_04 (bitmap, p, ch); break;
-  case 4: draw_chopper_fg_05 (bitmap, p, ch); break;
+  case 0: draw_chopper_fg_01 (bitmap, p, ch, em, vm); break;
+  case 1: draw_chopper_fg_02 (bitmap, p, ch, em, vm); break;
+  case 2: draw_chopper_fg_03 (bitmap, p, ch, em, vm); break;
+  case 3: draw_chopper_fg_04 (bitmap, p, ch, em, vm); break;
+  case 4: draw_chopper_fg_05 (bitmap, p, ch, em, vm); break;
   }
 }
 
 void
-draw_chopper_fg_01 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch)
+draw_chopper_fg_01 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
+                    enum em em, enum vm vm)
 {
+  ALLEGRO_BITMAP *chopper_fg_01 = NULL;
+
+  switch (em) {
+  case DUNGEON:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA: chopper_fg_01 = dv_chopper_fg_01; break;
+    }
+    break;
+  case PALACE:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA: chopper_fg_01 = pv_chopper_fg_01; break;
+    }
+    break;
+  }
+
   struct coord c;
-  draw_bitmapc (chopper_fg_01, bitmap, chopper_top_coord (p, &c), 0);
+  draw_bitmapc (chopper_fg_01, bitmap, chopper_coord (p, &c), 0);
   if (ch->blood) {
     int h = al_get_bitmap_height (chopper_blood_01);
     draw_bitmap_regionc (chopper_blood_01, bitmap, 0, 0, 2, h, chopper_blood_01_coord (p, &c), 0);
@@ -327,10 +478,30 @@ draw_chopper_fg_01 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch)
 }
 
 void
-draw_chopper_fg_02 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch)
+draw_chopper_fg_02 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
+                    enum em em, enum vm vm)
 {
+  ALLEGRO_BITMAP *chopper_fg_02 = NULL;
+
+  switch (em) {
+  case DUNGEON:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA: chopper_fg_02 = dv_chopper_fg_02; break;
+    }
+    break;
+  case PALACE:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA: chopper_fg_02 = pv_chopper_fg_02; break;
+    }
+    break;
+  }
+
   struct coord c;
-  draw_bitmapc (chopper_fg_02, bitmap, chopper_top_coord (p, &c), 0);
+  draw_bitmapc (chopper_fg_02, bitmap, chopper_coord (p, &c), 0);
   if (ch->blood) {
     int h = al_get_bitmap_height (chopper_blood_02);
     draw_bitmap_regionc (chopper_blood_02, bitmap, 0, 0, 2, h, chopper_blood_02_coord (p, &c), 0);
@@ -338,10 +509,30 @@ draw_chopper_fg_02 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch)
 }
 
 void
-draw_chopper_fg_03 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch)
+draw_chopper_fg_03 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
+                    enum em em, enum vm vm)
 {
+  ALLEGRO_BITMAP *chopper_fg_03 = NULL;
+
+  switch (em) {
+  case DUNGEON:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA: chopper_fg_03 = dv_chopper_fg_03; break;
+    }
+    break;
+  case PALACE:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA: chopper_fg_03 = pv_chopper_fg_03; break;
+    }
+    break;
+  }
+
   struct coord c;
-  draw_bitmapc (chopper_fg_03, bitmap, chopper_top_coord (p, &c), 0);
+  draw_bitmapc (chopper_fg_03, bitmap, chopper_coord (p, &c), 0);
   if (ch->blood) {
     int h = al_get_bitmap_height (chopper_blood_03);
     draw_bitmap_regionc (chopper_blood_03, bitmap, 0, 0, 2, h, chopper_blood_03_coord (p, &c), 0);
@@ -349,10 +540,30 @@ draw_chopper_fg_03 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch)
 }
 
 void
-draw_chopper_fg_04 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch)
+draw_chopper_fg_04 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
+                    enum em em, enum vm vm)
 {
+  ALLEGRO_BITMAP *chopper_fg_04 = NULL;
+
+  switch (em) {
+  case DUNGEON:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA: chopper_fg_04 = dv_chopper_fg_04; break;
+    }
+    break;
+  case PALACE:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA: chopper_fg_04 = pv_chopper_fg_04; break;
+    }
+    break;
+  }
+
   struct coord c;
-  draw_bitmapc (chopper_fg_04, bitmap, chopper_top_coord (p, &c), 0);
+  draw_bitmapc (chopper_fg_04, bitmap, chopper_coord (p, &c), 0);
   if (ch->blood) {
     int h = al_get_bitmap_height (chopper_blood_04);
     draw_bitmap_regionc (chopper_blood_04, bitmap, 0, 0, 2, h, chopper_blood_04_coord (p, &c), 0);
@@ -360,10 +571,30 @@ draw_chopper_fg_04 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch)
 }
 
 void
-draw_chopper_fg_05 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch)
+draw_chopper_fg_05 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
+                    enum em em, enum vm vm)
 {
+  ALLEGRO_BITMAP *chopper_fg_05 = NULL;
+
+  switch (em) {
+  case DUNGEON:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA: chopper_fg_05 = dv_chopper_fg_05; break;
+    }
+    break;
+  case PALACE:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA: chopper_fg_05 = pv_chopper_fg_05; break;
+    }
+    break;
+  }
+
   struct coord c;
-  draw_bitmapc (chopper_fg_05, bitmap, chopper_top_coord (p, &c), 0);
+  draw_bitmapc (chopper_fg_05, bitmap, chopper_coord (p, &c), 0);
   if (ch->blood) {
     int h = al_get_bitmap_height (chopper_blood_05);
     draw_bitmap_regionc (chopper_blood_05, bitmap, 0, 0, 2, h, chopper_blood_05_coord (p, &c), 0);
@@ -371,37 +602,10 @@ draw_chopper_fg_05 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch)
 }
 
 struct coord *
-chopper_bottom_coord_01 (struct pos *p, struct coord *c)
-{
-  c->x = PLACE_WIDTH * p->place;
-  c->y = PLACE_HEIGHT * p->floor + 42;
-  c->room = p->room;
-  return c;
-}
-
-struct coord *
-chopper_top_coord (struct pos *p, struct coord *c)
+chopper_coord (struct pos *p, struct coord *c)
 {
   c->x = PLACE_WIDTH * p->place;
   c->y = PLACE_HEIGHT * p->floor + 3;
-  c->room = p->room;
-  return c;
-}
-
-struct coord *
-chopper_bottom_coord_02 (struct pos *p, struct coord *c)
-{
-  c->x = PLACE_WIDTH * p->place;
-  c->y = PLACE_HEIGHT * p->floor + 33;
-  c->room = p->room;
-  return c;
-}
-
-struct coord *
-chopper_bottom_coord_05 (struct pos *p, struct coord *c)
-{
-  c->x = PLACE_WIDTH * p->place;
-  c->y = PLACE_HEIGHT * p->floor + 46;
   c->room = p->room;
   return c;
 }

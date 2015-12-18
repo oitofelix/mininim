@@ -24,25 +24,36 @@
 
 #define CHOPPER_WAIT 10
 
-/* bitmaps */
-#define VDUNGEON_CHOPPER_BOTTOM_01 "dat/vdungeon/chopper/frame01 bottom.png"
-#define VDUNGEON_CHOPPER_TOP_01 "dat/vdungeon/chopper/frame01 top.png"
-#define VDUNGEON_CHOPPER_FG_01 "dat/vdungeon/chopper/behind pillar frame01.png"
-#define VDUNGEON_CHOPPER_BLOOD_01 "dat/vdungeon/chopper/blood/res1317.png"
-#define VDUNGEON_CHOPPER_BOTTOM_02 "dat/vdungeon/chopper/frame02 bottom.png"
-#define VDUNGEON_CHOPPER_TOP_02 "dat/vdungeon/chopper/frame02 top.png"
-#define VDUNGEON_CHOPPER_FG_02 "dat/vdungeon/chopper/behind pillar frame02.png"
-#define VDUNGEON_CHOPPER_BLOOD_02 "dat/vdungeon/chopper/blood/res1316.png"
-#define VDUNGEON_CHOPPER_03 "dat/vdungeon/chopper/chopper frame03.png"
-#define VDUNGEON_CHOPPER_FG_03 "dat/vdungeon/chopper/behind pillar frame03.png"
-#define VDUNGEON_CHOPPER_BLOOD_03 "dat/vdungeon/chopper/blood/res1314.png"
-#define VDUNGEON_CHOPPER_04 "dat/vdungeon/chopper/chopper frame04.png"
-#define VDUNGEON_CHOPPER_FG_04 "dat/vdungeon/chopper/behind pillar frame04.png"
-#define VDUNGEON_CHOPPER_BLOOD_04 "dat/vdungeon/chopper/blood/res1315.png"
-#define VDUNGEON_CHOPPER_BOTTOM_05 "dat/vdungeon/chopper/frame05 bottom.png"
-#define VDUNGEON_CHOPPER_TOP_05 "dat/vdungeon/chopper/frame05 top.png"
-#define VDUNGEON_CHOPPER_FG_05 "dat/vdungeon/chopper/behind pillar frame05.png"
-#define VDUNGEON_CHOPPER_BLOOD_05 "dat/vdungeon/chopper/blood/res1318.png"
+/* dungeon vga */
+#define DV_CHOPPER_01 "data/chopper/dv/01.png"
+#define DV_CHOPPER_FG_01 "data/chopper/dv/fg-01.png"
+#define DV_CHOPPER_02 "data/chopper/dv/02.png"
+#define DV_CHOPPER_FG_02 "data/chopper/dv/fg-02.png"
+#define DV_CHOPPER_03 "data/chopper/dv/03.png"
+#define DV_CHOPPER_FG_03 "data/chopper/dv/fg-03.png"
+#define DV_CHOPPER_04 "data/chopper/dv/04.png"
+#define DV_CHOPPER_FG_04 "data/chopper/dv/fg-04.png"
+#define DV_CHOPPER_05 "data/chopper/dv/05.png"
+#define DV_CHOPPER_FG_05 "data/chopper/dv/fg-05.png"
+
+/* palace vga */
+#define PV_CHOPPER_01 "data/chopper/pv/01.png"
+#define PV_CHOPPER_FG_01 "data/chopper/pv/fg-01.png"
+#define PV_CHOPPER_02 "data/chopper/pv/02.png"
+#define PV_CHOPPER_FG_02 "data/chopper/pv/fg-02.png"
+#define PV_CHOPPER_03 "data/chopper/pv/03.png"
+#define PV_CHOPPER_FG_03 "data/chopper/pv/fg-03.png"
+#define PV_CHOPPER_04 "data/chopper/pv/04.png"
+#define PV_CHOPPER_FG_04 "data/chopper/pv/fg-04.png"
+#define PV_CHOPPER_05 "data/chopper/pv/05.png"
+#define PV_CHOPPER_FG_05 "data/chopper/pv/fg-05.png"
+
+/* palettable */
+#define CHOPPER_BLOOD_01 "data/chopper/blood/01.png"
+#define CHOPPER_BLOOD_02 "data/chopper/blood/02.png"
+#define CHOPPER_BLOOD_03 "data/chopper/blood/03.png"
+#define CHOPPER_BLOOD_04 "data/chopper/blood/04.png"
+#define CHOPPER_BLOOD_05 "data/chopper/blood/05.png"
 
 /* sounds */
 #define CHOPPER_SAMPLE "dat/digisnd2/chopper.ogg"
@@ -55,7 +66,7 @@ struct chopper {
   bool blood;
 };
 
-void load_vdungeon_chopper (void);
+void load_chopper (void);
 void unload_chopper (void);
 void load_chopper_samples (void);
 void unload_chopper_samples (void);
@@ -65,22 +76,31 @@ struct chopper *chopper_at_pos (struct pos *p);
 bool should_chomp (struct pos *p);
 void compute_choppers (void);
 void sample_choppers (void);
-void draw_chopper_left (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_chopper_left_01 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch);
-void draw_chopper_left_02 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch);
-void draw_chopper_left_03 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch);
-void draw_chopper_left_04 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch);
-void draw_chopper_left_05 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch);
-void draw_chopper_fg (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_chopper_fg_01 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch);
-void draw_chopper_fg_02 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch);
-void draw_chopper_fg_03 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch);
-void draw_chopper_fg_04 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch);
-void draw_chopper_fg_05 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch);
-struct coord *chopper_top_coord (struct pos *p, struct coord *c);
-struct coord *chopper_bottom_coord_01 (struct pos *p, struct coord *c);
-struct coord *chopper_bottom_coord_02 (struct pos *p, struct coord *c);
-struct coord *chopper_bottom_coord_05 (struct pos *p, struct coord *c);
+void draw_chopper_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                        enum em em, enum vm vm);
+void draw_chopper_left_01 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
+                           enum em em, enum vm vm);
+void draw_chopper_left_02 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
+                           enum em em, enum vm vm);
+void draw_chopper_left_03 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
+                           enum em em, enum vm vm);
+void draw_chopper_left_04 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
+                           enum em em, enum vm vm);
+void draw_chopper_left_05 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
+                           enum em em, enum vm vm);
+void draw_chopper_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                      enum em em, enum vm vm);
+void draw_chopper_fg_01 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
+                         enum em em, enum vm vm);
+void draw_chopper_fg_02 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
+                         enum em em, enum vm vm);
+void draw_chopper_fg_03 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
+                         enum em em, enum vm vm);
+void draw_chopper_fg_04 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
+                         enum em em, enum vm vm);
+void draw_chopper_fg_05 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
+                         enum em em, enum vm vm);
+struct coord *chopper_coord (struct pos *p, struct coord *c);
 struct coord * chopper_blood_01_coord (struct pos *p, struct coord *c);
 struct coord * chopper_blood_02_coord (struct pos *p, struct coord *c);
 struct coord * chopper_blood_03_coord (struct pos *p, struct coord *c);
