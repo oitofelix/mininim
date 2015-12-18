@@ -22,27 +22,38 @@
 
 #include "physics.h"
 
-#define VDUNGEON_BIG_PILLAR_BOTTOM_LEFT "dat/vdungeon/bigpillar/big pillar left lower.png"
-#define VDUNGEON_BIG_PILLAR_BOTTOM_RIGHT "dat/vdungeon/bigpillar/big pillar right lower.png"
-#define VDUNGEON_BIG_PILLAR_TOP_LEFT "dat/vdungeon/bigpillar/big pillar left upper.png"
-#define VDUNGEON_BIG_PILLAR_TOP_RIGHT "dat/vdungeon/bigpillar/big pillar right upper.png"
-#define VDUNGEON_BIG_PILLAR_TOP_RIGHT_TOP "dat/vdungeon/bigpillar/big pillar right upper top.png"
-#define VDUNGEON_BIG_PILLAR_BOTTOM_FG "dat/vdungeon/bigpillar/big pillar lower02.png"
+/* dungeon vga */
+#define DV_BIG_PILLAR_BOTTOM_LEFT "data/big-pillar/dv-bottom-left.png"
+#define DV_BIG_PILLAR_BOTTOM_RIGHT "data/big-pillar/dv-bottom-right.png"
+#define DV_BIG_PILLAR_TOP_LEFT "data/big-pillar/dv-top-left.png"
+#define DV_BIG_PILLAR_TOP_RIGHT "data/big-pillar/dv-top-right.png"
+#define DV_BIG_PILLAR_TOP_RIGHT_TOP "data/big-pillar/dv-top-right-top.png"
+#define DV_BIG_PILLAR_BOTTOM_FG "data/big-pillar/dv-bottom-fg.png"
 
+/* palace vga */
+#define PV_BIG_PILLAR_BOTTOM_LEFT "data/big-pillar/pv-bottom-left.png"
+#define PV_BIG_PILLAR_BOTTOM_RIGHT "data/big-pillar/pv-bottom-right.png"
+#define PV_BIG_PILLAR_TOP_LEFT "data/big-pillar/pv-top-left.png"
+#define PV_BIG_PILLAR_TOP_RIGHT "data/big-pillar/pv-top-right.png"
+#define PV_BIG_PILLAR_TOP_RIGHT_TOP "data/big-pillar/pv-top-right-top.png"
+#define PV_BIG_PILLAR_BOTTOM_FG "data/big-pillar/pv-bottom-fg.png"
 
-extern ALLEGRO_BITMAP *big_pillar_bottom_left, *big_pillar_bottom_right,
-  *big_pillar_top_left, *big_pillar_top_right, *big_pillar_top_right_top,
-  *big_pillar_bottom_fg;
-
-void load_vdungeon_big_pillar (void);
+void load_big_pillar (void);
 void unload_big_pillar (void);
-void draw_big_pillar_bottom (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_big_pillar_bottom_left (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_big_pillar_bottom_right (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_big_pillar_bottom_fg (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_big_pillar_top (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_big_pillar_top_left (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_big_pillar_top_right (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_big_pillar_bottom (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                             enum em em, enum vm vm);
+void draw_big_pillar_bottom_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                                  enum em em, enum vm vm);
+void draw_big_pillar_bottom_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                                   enum em em, enum vm vm);
+void draw_big_pillar_bottom_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                                enum em em, enum vm vm);
+void draw_big_pillar_top (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                          enum em em, enum vm vm);
+void draw_big_pillar_top_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                               enum em em, enum vm vm);
+void draw_big_pillar_top_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                                enum em em, enum vm vm);
 struct coord *big_pillar_bottom_left_coord (struct pos *p, struct coord *c);
 struct coord *big_pillar_bottom_right_coord (struct pos *p, struct coord *c);
 struct coord *big_pillar_top_left_coord (struct pos *p, struct coord *c);
