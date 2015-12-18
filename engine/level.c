@@ -126,6 +126,7 @@ compute_level (void)
 
   for (i = 0; i < kid_nmemb; i++) {
     k = &kid[i];
+    k->splash = false;
     k->action (k);
   }
 

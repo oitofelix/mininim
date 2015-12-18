@@ -307,10 +307,8 @@ draw_kid_frame (ALLEGRO_BITMAP *bitmap, struct anim *k)
   draw_frame (bitmap, &k->f);
   draw_xframe (bitmap, &k->f, &k->xf);
 
-  if (k->splash) {
+  if (k->splash)
     draw_bitmapc (kid_splash, bitmap, splash_coord (&k->f, &c), k->f.flip);
-    k->splash = false;
-  }
 
   if (k->shadow) {
     al_destroy_bitmap (k->f.b);
