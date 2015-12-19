@@ -59,7 +59,7 @@ load_room (void)
   load_pillar ();
   load_big_pillar ();
   load_vdungeon_door ();
-  load_vdungeon_level_door ();
+  load_level_door ();
   load_chopper ();
   bricks_01 = load_bitmap (VDUNGEON_BRICKS_01);
   bricks_02 = load_bitmap (VDUNGEON_BRICKS_02);
@@ -273,7 +273,7 @@ draw_confg_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
     draw_big_pillar_top_right (bitmap, p, em, vm); break;
   case WALL: draw_wall_right (bitmap, p); break;
   case DOOR: draw_door_right (bitmap, p); break;
-  case LEVEL_DOOR: draw_level_door_right (bitmap, p); break;
+  case LEVEL_DOOR: draw_level_door_right (bitmap, p, em, vm); break;
   case CHOPPER: draw_floor_right (bitmap, p, em, vm); break;
   default:
     error (-1, 0, "%s: unknown foreground (%i)",
@@ -329,7 +329,7 @@ draw_confg_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
     draw_big_pillar_top_left (bitmap, p, em, vm); break;
   case WALL: draw_wall_left (bitmap, p); break;
   case DOOR: draw_door_fg (bitmap, p, f); break;
-  case LEVEL_DOOR: draw_level_door_fg (bitmap, p, f); break;
+  case LEVEL_DOOR: draw_level_door_fg (bitmap, p, f, em, vm); break;
   case CHOPPER: draw_chopper_fg (bitmap, p, em, vm); break;
   default:
     error (-1, 0, "%s: unknown foreground (%i)",

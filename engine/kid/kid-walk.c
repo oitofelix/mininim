@@ -113,7 +113,8 @@ flow (struct anim *kid)
   if (kid->oaction != kid_walk) {
     survey (_bf, pos, &kid->f, &nc, &pbf, &np);
     survey (_mbo, pos, &kid->f, &nc, &pmbo, &np);
-    if (is_traversable (&pbf)) kid->p = pmbo;
+    if (is_traversable (&pbf)
+        || con (&pbf)->fg == CLOSER_FLOOR) kid->p = pmbo;
     else kid->p = pbf;
     kid->i = kid->walk = -1;
 
@@ -152,13 +153,7 @@ flow (struct anim *kid)
     }
 
     if (! kid->misstep) {
-      if (kid->dcl < 4) {
-        kid_normal (kid);
-        kid->misstep = true;
-        return false;
-      }
-
-      if (kid->df < 4 || kid->dl < 4) {
+      if (kid->df < 4 || kid->dl < 4 || kid->dcl < 4) {
         kid_misstep (kid);
         return false;
       }
