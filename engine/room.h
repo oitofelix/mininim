@@ -51,7 +51,5 @@ void draw_room_anim_fg (ALLEGRO_BITMAP *bitmap,
                         enum em em, enum vm vm, struct anim *a);
 void draw_room_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
                    enum em em, enum vm vm, struct frame *f);
-void draw_window (ALLEGRO_BITMAP *bitmap, struct pos *p);
-struct coord *window_coord (struct pos *p, struct coord *c);
 
 #endif	/* FREEPOP_ROOM_H */
