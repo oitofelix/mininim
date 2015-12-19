@@ -28,13 +28,21 @@
 #define DOOR_CLIMB_LIMIT 40
 #define DOOR_WAIT_LOOK 4
 
-/* bitmaps */
-#define VDUNGEON_DOOR_LEFT "dat/vdungeon/door/door frame left.png"
-#define VDUNGEON_DOOR_RIGHT "dat/vdungeon/door/door frame right.png"
-#define VDUNGEON_DOOR_POLE "dat/vdungeon/door/door frame left pole.png"
-#define VDUNGEON_DOOR_TOP "dat/vdungeon/door/door frame right top.png"
-#define VDUNGEON_DOOR_GRID "dat/vdungeon/door/res00252.png"
-#define VDUNGEON_DOOR_GRID_TIP "dat/vdungeon/door/res00251.png"
+/* dungeon vga */
+#define DV_DOOR_LEFT "data/door/dv-left.png"
+#define DV_DOOR_RIGHT "data/door/dv-right.png"
+#define DV_DOOR_POLE "data/door/dv-pole.png"
+#define DV_DOOR_TOP "data/door/dv-top.png"
+#define DV_DOOR_GRID "data/door/dv-grid.png"
+#define DV_DOOR_GRID_TIP "data/door/dv-grid-tip.png"
+
+/* palace vga */
+#define PV_DOOR_LEFT "data/door/pv-left.png"
+#define PV_DOOR_RIGHT "data/door/pv-right.png"
+#define PV_DOOR_POLE "data/door/pv-pole.png"
+#define PV_DOOR_TOP "data/door/pv-top.png"
+#define PV_DOOR_GRID "data/door/pv-grid.png"
+#define PV_DOOR_GRID_TIP "data/door/pv-grid-tip.png"
 
 /* sounds */
 #define DOOR_OPEN_SAMPLE "dat/digisnd1/door gate closing slow 1.ogg"
@@ -53,7 +61,7 @@ struct door {
   bool noise;
 };
 
-void load_vdungeon_door (void);
+void load_door (void);
 void unload_door (void);
 void load_door_samples (void);
 void unload_door_samples (void);
@@ -65,11 +73,16 @@ void close_door (int e);
 void compute_doors (void);
 int door_grid_tip_y (struct pos *p);
 void sample_doors (void);
-void draw_door (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_door_left (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_door_right (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_door_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f);
-void draw_door_grid (ALLEGRO_BITMAP *bitmap, struct pos *p, int i);
+void draw_door (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                enum em em, enum vm vm);
+void draw_door_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                     enum em em, enum vm vm);
+void draw_door_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                      enum em em, enum vm vm);
+void draw_door_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f,
+                   enum em em, enum vm vm);
+void draw_door_grid (ALLEGRO_BITMAP *bitmap, struct pos *p, int i,
+                     enum em em, enum vm vm);
 struct coord *door_grid_coord_base (struct pos *p, struct coord *c);
 struct coord *door_grid_coord (struct pos *p, struct coord *c, int j, int i);
 struct coord *door_grid_tip_coord (struct pos *p, struct coord *c, int i);

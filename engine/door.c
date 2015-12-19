@@ -30,8 +30,13 @@
 #include "door.h"
 #include "level-door.h"
 
-ALLEGRO_BITMAP *door_left, *door_right, *door_pole, *door_top,
-  *door_grid, *door_grid_tip;
+/* dungeon vga */
+ALLEGRO_BITMAP *dv_door_left, *dv_door_right, *dv_door_pole,
+  *dv_door_top, *dv_door_grid, *dv_door_grid_tip;
+
+/* palace vga */
+ALLEGRO_BITMAP *pv_door_left, *pv_door_right, *pv_door_pole,
+  *pv_door_top, *pv_door_grid, *pv_door_grid_tip;
 
 ALLEGRO_SAMPLE *door_open_sample, *door_close_sample, *door_end_sample,
   *door_abruptly_close_sample;
@@ -43,25 +48,43 @@ static struct door *door = NULL;
 static size_t door_nmemb = 0;
 
 void
-load_vdungeon_door (void)
+load_door (void)
 {
-  door_left = load_bitmap (VDUNGEON_DOOR_LEFT);
-  door_right = load_bitmap (VDUNGEON_DOOR_RIGHT);
-  door_pole = load_bitmap (VDUNGEON_DOOR_POLE);
-  door_top = load_bitmap (VDUNGEON_DOOR_TOP);
-  door_grid = load_bitmap (VDUNGEON_DOOR_GRID);
-  door_grid_tip = load_bitmap (VDUNGEON_DOOR_GRID_TIP);
+  /* dungeon vga */
+  dv_door_left = load_bitmap (DV_DOOR_LEFT);
+  dv_door_right = load_bitmap (DV_DOOR_RIGHT);
+  dv_door_pole = load_bitmap (DV_DOOR_POLE);
+  dv_door_top = load_bitmap (DV_DOOR_TOP);
+  dv_door_grid = load_bitmap (DV_DOOR_GRID);
+  dv_door_grid_tip = load_bitmap (DV_DOOR_GRID_TIP);
+
+  /* palace vga */
+  pv_door_left = load_bitmap (PV_DOOR_LEFT);
+  pv_door_right = load_bitmap (PV_DOOR_RIGHT);
+  pv_door_pole = load_bitmap (PV_DOOR_POLE);
+  pv_door_top = load_bitmap (PV_DOOR_TOP);
+  pv_door_grid = load_bitmap (PV_DOOR_GRID);
+  pv_door_grid_tip = load_bitmap (PV_DOOR_GRID_TIP);
 }
 
 void
 unload_door (void)
 {
-  al_destroy_bitmap (door_left);
-  al_destroy_bitmap (door_right);
-  al_destroy_bitmap (door_pole);
-  al_destroy_bitmap (door_top);
-  al_destroy_bitmap (door_grid);
-  al_destroy_bitmap (door_grid_tip);
+  /* dungeon vga */
+  al_destroy_bitmap (dv_door_left);
+  al_destroy_bitmap (dv_door_right);
+  al_destroy_bitmap (dv_door_pole);
+  al_destroy_bitmap (dv_door_top);
+  al_destroy_bitmap (dv_door_grid);
+  al_destroy_bitmap (dv_door_grid_tip);
+
+  /* palace vga */
+  al_destroy_bitmap (pv_door_left);
+  al_destroy_bitmap (pv_door_right);
+  al_destroy_bitmap (pv_door_pole);
+  al_destroy_bitmap (pv_door_top);
+  al_destroy_bitmap (pv_door_grid);
+  al_destroy_bitmap (pv_door_grid_tip);
 }
 
 void
@@ -247,43 +270,112 @@ int
 door_grid_tip_y (struct pos *p)
 {
   struct coord c;
-  int h = al_get_bitmap_height (door_grid_tip);
+  int h = al_get_bitmap_height (dv_door_grid_tip);
   return door_grid_tip_coord (p, &c, door_at_pos (p)->i)->y + h - 1;
 }
 
 void
-draw_door (ALLEGRO_BITMAP *bitmap, struct pos *p)
+draw_door (ALLEGRO_BITMAP *bitmap, struct pos *p,
+           enum em em, enum vm vm)
 {
-  draw_floor_base (bitmap, p, DUNGEON, VGA);
-  draw_door_left (bitmap, p);
-  draw_door_right (bitmap, p);
+  draw_floor_base (bitmap, p, em, vm);
+  draw_door_left (bitmap, p, em, vm);
+  draw_door_right (bitmap, p, em, vm);
 }
 
 void
-draw_door_left (ALLEGRO_BITMAP *bitmap, struct pos *p)
+draw_door_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                enum em em, enum vm vm)
 {
+  ALLEGRO_BITMAP *door_left = NULL;
+
+  switch (em) {
+  case DUNGEON:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA: door_left = dv_door_left; break;
+    }
+    break;
+  case PALACE:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA: door_left = pv_door_left; break;
+    }
+    break;
+  }
+
   struct coord c;
   draw_bitmapc (door_left, bitmap, door_left_coord (p, &c), 0);
 }
 
 void
-draw_door_right (ALLEGRO_BITMAP *bitmap, struct pos *p)
+draw_door_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                 enum em em, enum vm vm)
 {
   struct coord c;
   struct door *d = door_at_pos (p);
   if (! d) return;
+
+  ALLEGRO_BITMAP *door_right = NULL,
+    *door_top = NULL;
+
+  switch (em) {
+  case DUNGEON:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA:
+      door_right = dv_door_right;
+      door_top = dv_door_top;
+      break;
+    }
+    break;
+  case PALACE:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA:
+      door_right = pv_door_right;
+      door_top = pv_door_top;
+      break;
+    }
+    break;
+  }
+
   draw_bitmapc (door_right, bitmap, door_right_coord (p, &c), 0);
   draw_bitmapc (door_top, bitmap, door_top_coord (p, &c), 0);
-  draw_door_grid (bitmap, p, d->i);
+  draw_door_grid (bitmap, p, d->i, em, vm);
 }
 
 void
-draw_door_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f)
+draw_door_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f,
+              enum em em, enum vm vm)
 {
   struct pos par, pr, pl, pa;
   struct coord nc; struct pos np, ptf, pmt, ptb;
 
-  draw_floor_base (bitmap, p, DUNGEON, VGA);
+  ALLEGRO_BITMAP *door_pole = NULL;
+
+  switch (em) {
+  case DUNGEON:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA: door_pole = dv_door_pole; break;
+    }
+    break;
+  case PALACE:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA: door_pole = pv_door_pole; break;
+    }
+    break;
+  }
+
+  draw_floor_base (bitmap, p, em, vm);
   draw_bitmapc (door_pole, screen, door_pole_coord (p, &nc), 0);
 
   survey (_tf, pos, f, &nc, &ptf, &np);
@@ -308,17 +400,44 @@ draw_door_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f)
       && ! is_kid_successfully_climbing_at_pos
       (f, hang_pos, &pa)) {
     struct door *d = door_at_pos (p);
-    draw_door_grid (screen, p, d->i);
-    draw_confg_right (bitmap, &pa, DUNGEON, VGA, true);
-    draw_confg_base (bitmap, &par, DUNGEON, VGA);
-    draw_confg_left (bitmap, &par, DUNGEON, VGA, true);
-    draw_confg_fg (bitmap, &pr, DUNGEON, VGA, f);
+    draw_door_grid (screen, p, d->i, em, vm);
+    draw_confg_right (bitmap, &pa, em, vm, true);
+    draw_confg_base (bitmap, &par, em, vm);
+    draw_confg_left (bitmap, &par, em, vm, true);
+    draw_confg_fg (bitmap, &pr, em, vm, f);
   }
 }
 
 void
-draw_door_grid (ALLEGRO_BITMAP *bitmap, struct pos *p, int i)
+draw_door_grid (ALLEGRO_BITMAP *bitmap, struct pos *p, int i,
+                enum em em, enum vm vm)
 {
+  ALLEGRO_BITMAP *door_grid = NULL,
+    *door_grid_tip = NULL;
+
+  switch (em) {
+  case DUNGEON:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA:
+      door_grid = dv_door_grid;
+      door_grid_tip = dv_door_grid_tip;
+      break;
+    }
+    break;
+  case PALACE:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA:
+      door_grid = pv_door_grid;
+      door_grid_tip = pv_door_grid_tip;
+      break;
+    }
+    break;
+  }
+
   int q = i / 8;
   int r = i % 8;
   int w = al_get_bitmap_width (door_grid);

@@ -58,7 +58,7 @@ load_room (void)
   load_vdungeon_wall ();
   load_pillar ();
   load_big_pillar ();
-  load_vdungeon_door ();
+  load_door ();
   load_level_door ();
   load_chopper ();
   bricks_01 = load_bitmap (VDUNGEON_BRICKS_01);
@@ -240,7 +240,7 @@ draw_confg_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case BIG_PILLAR_TOP:
     draw_big_pillar_top_left (bitmap, p, em, vm); break;
   case WALL: draw_wall_left (bitmap, p); break;
-  case DOOR: draw_door_left (bitmap, p); break;
+  case DOOR: draw_door_left (bitmap, p, em, vm); break;
   case LEVEL_DOOR: draw_floor_left (bitmap, p, em, vm); break;
   case CHOPPER: draw_chopper_left (bitmap, p, em, vm); break;
   default:
@@ -272,7 +272,7 @@ draw_confg_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case BIG_PILLAR_TOP:
     draw_big_pillar_top_right (bitmap, p, em, vm); break;
   case WALL: draw_wall_right (bitmap, p); break;
-  case DOOR: draw_door_right (bitmap, p); break;
+  case DOOR: draw_door_right (bitmap, p, em, vm); break;
   case LEVEL_DOOR: draw_level_door_right (bitmap, p, em, vm); break;
   case CHOPPER: draw_floor_right (bitmap, p, em, vm); break;
   default:
@@ -328,7 +328,7 @@ draw_confg_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case BIG_PILLAR_TOP:
     draw_big_pillar_top_left (bitmap, p, em, vm); break;
   case WALL: draw_wall_left (bitmap, p); break;
-  case DOOR: draw_door_fg (bitmap, p, f); break;
+  case DOOR: draw_door_fg (bitmap, p, f, em, vm); break;
   case LEVEL_DOOR: draw_level_door_fg (bitmap, p, f, em, vm); break;
   case CHOPPER: draw_chopper_fg (bitmap, p, em, vm); break;
   default:
@@ -438,7 +438,7 @@ draw_room_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
       draw_broken_floor_fg (screen, p, em, vm);
     else {
       if (con (p)->fg == DOOR)
-        draw_door_fg (screen, p, f);
+        draw_door_fg (screen, p, f, em, vm);
 
       if (f->b == kid_climb_03
           || f->b == kid_climb_09
