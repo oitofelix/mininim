@@ -79,10 +79,32 @@ get_fire_frame (int i)
 }
 
 void
-draw_fire (ALLEGRO_BITMAP* bitmap, struct pos *p, int i)
+draw_fire (ALLEGRO_BITMAP* bitmap, struct pos *p, int i,
+           enum em em, enum vm vm)
 {
   struct coord c;
   if (con (p)->bg != TORCH) return;
+
+  pos2coord_f fire_coord = NULL;
+
+  switch (em) {
+  case DUNGEON:
+    fire_coord = d_fire_coord;
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA: break;
+    }
+    break;
+  case PALACE:
+    fire_coord = p_fire_coord;
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA: break;
+    }
+    break;
+  }
 
   ALLEGRO_BITMAP *fire = get_fire_frame (prandom_pos_uniq (p, i, 1, 8));
   draw_bitmapc (fire, bitmap, fire_coord (p, &c),
@@ -106,10 +128,19 @@ draw_princess_room_fire (void)
 }
 
 struct coord *
-fire_coord (struct pos *p, struct coord *c)
+d_fire_coord (struct pos *p, struct coord *c)
 {
   c->x = PLACE_WIDTH * (p->place + 1) + 8;
-  c->y = PLACE_HEIGHT * p->floor + 4;
+  c->y = PLACE_HEIGHT * p->floor + 5;
+  c->room = p->room;
+  return c;
+}
+
+struct coord *
+p_fire_coord (struct pos *p, struct coord *c)
+{
+  c->x = PLACE_WIDTH * (p->place + 1) + 7;
+  c->y = PLACE_HEIGHT * p->floor + 5;
   c->room = p->room;
   return c;
 }

@@ -198,7 +198,7 @@ draw_level (void)
 
   for (p.floor = FLOORS; p.floor >= -1; p.floor--)
     for (p.place = -1; p.place < PLACES; p.place++) {
-      draw_fire (screen, &p, draw_cycle);
+      draw_fire (screen, &p, draw_cycle, em, vm);
     }
 
   if (! no_room_drawing) draw_room (screen, room_view, em, vm);

@@ -22,7 +22,6 @@
 
 #include "prince.h"
 
-#define VDUNGEON_TORCH "dat/vdungeon/background/torch.png"
 #define VDUNGEON_WINDOW "dat/vdungeon/background/window.png"
 
 void load_room (void);
@@ -52,8 +51,6 @@ void draw_room_anim_fg (ALLEGRO_BITMAP *bitmap,
                         enum em em, enum vm vm, struct anim *a);
 void draw_room_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
                    enum em em, enum vm vm, struct frame *f);
-void draw_torch (ALLEGRO_BITMAP *bitmap, struct pos *p);
-struct coord *torch_coord (struct pos *p, struct coord *c);
 void draw_window (ALLEGRO_BITMAP *bitmap, struct pos *p);
 struct coord *window_coord (struct pos *p, struct coord *c);
 

@@ -41,9 +41,10 @@
 #include "level-door.h"
 #include "chopper.h"
 #include "bricks.h"
+#include "torch.h"
 #include "room.h"
 
-ALLEGRO_BITMAP *window, *torch;
+ALLEGRO_BITMAP *window;
 
 void
 load_room (void)
@@ -62,7 +63,7 @@ load_room (void)
   load_level_door ();
   load_chopper ();
   load_bricks ();
-  torch = load_bitmap (VDUNGEON_TORCH);
+  load_torch ();
   window = load_bitmap (VDUNGEON_WINDOW);
 
   load_loose_floor_samples ();
@@ -92,6 +93,7 @@ unload_room (void)
   unload_level_door ();
   unload_chopper ();
   unload_bricks ();
+  unload_torch ();
 
   /* sounds */
   unload_loose_floor_samples ();
@@ -103,7 +105,6 @@ unload_room (void)
   unload_chopper_samples ();
 
   /* bitmaps */
-  al_destroy_bitmap (torch);
   al_destroy_bitmap (window);
 }
 
@@ -173,7 +174,7 @@ draw_conbg (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case BRICKS_03: draw_bricks_03 (bitmap, p, em, vm); break;
   case BRICKS_04: draw_bricks_04 (bitmap, p, em, vm); break;
   case BRICKS_05: draw_bricks_05 (bitmap, p, em, vm); break;
-  case TORCH: draw_torch (bitmap, p); break;
+  case TORCH: draw_torch (bitmap, p, em, vm); break;
   case WINDOW: draw_window (bitmap, p); break;
   default:
     error (-1, 0, "%s: unknown background (%i)",
@@ -468,22 +469,6 @@ draw_room_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
     draw_confg (screen, p, em, vm, true);
   /* other cases */
   draw_confg_fg (screen, p, em, vm, f);
-}
-
-void
-draw_torch (ALLEGRO_BITMAP *bitmap, struct pos *p)
-{
-  struct coord c;
-  draw_bitmapc (torch, bitmap, torch_coord (p, &c), 0);
-}
-
-struct coord *
-torch_coord (struct pos *p, struct coord *c)
-{
-  c->x = PLACE_WIDTH * (p->place + 1);
-  c->y = PLACE_HEIGHT * p->floor + 22;
-  c->room = p->room;
-  return c;
 }
 
 void

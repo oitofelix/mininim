@@ -37,8 +37,10 @@
 
 void load_fire (void);
 void unload_fire (void);
-void draw_fire (ALLEGRO_BITMAP* bitmap, struct pos *p, int i);
+void draw_fire (ALLEGRO_BITMAP* bitmap, struct pos *p, int i,
+                enum em em, enum vm vm);
 void draw_princess_room_fire (void);
-struct coord *fire_coord (struct pos *p, struct coord *c);
+struct coord *d_fire_coord (struct pos *p, struct coord *c);
+struct coord *p_fire_coord (struct pos *p, struct coord *c);
 
 #endif	/* FREEPOP_FIRE_H */
