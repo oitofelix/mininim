@@ -40,10 +40,10 @@
 #include "door.h"
 #include "level-door.h"
 #include "chopper.h"
+#include "bricks.h"
 #include "room.h"
 
-ALLEGRO_BITMAP *bricks_01, *bricks_02, *bricks_03, *bricks_04,
-  *window, *torch;
+ALLEGRO_BITMAP *window, *torch;
 
 void
 load_room (void)
@@ -61,10 +61,7 @@ load_room (void)
   load_door ();
   load_level_door ();
   load_chopper ();
-  bricks_01 = load_bitmap (VDUNGEON_BRICKS_01);
-  bricks_02 = load_bitmap (VDUNGEON_BRICKS_02);
-  bricks_03 = load_bitmap (VDUNGEON_BRICKS_03);
-  bricks_04 = load_bitmap (VDUNGEON_BRICKS_04);
+  load_bricks ();
   torch = load_bitmap (VDUNGEON_TORCH);
   window = load_bitmap (VDUNGEON_WINDOW);
 
@@ -94,6 +91,7 @@ unload_room (void)
   unload_door ();
   unload_level_door ();
   unload_chopper ();
+  unload_bricks ();
 
   /* sounds */
   unload_loose_floor_samples ();
@@ -105,10 +103,6 @@ unload_room (void)
   unload_chopper_samples ();
 
   /* bitmaps */
-  al_destroy_bitmap (bricks_01);
-  al_destroy_bitmap (bricks_02);
-  al_destroy_bitmap (bricks_03);
-  al_destroy_bitmap (bricks_04);
   al_destroy_bitmap (torch);
   al_destroy_bitmap (window);
 }
@@ -174,10 +168,11 @@ draw_conbg (ALLEGRO_BITMAP *bitmap, struct pos *p,
 {
   switch (con (p)->bg) {
   case NO_BG: break;
-  case BRICKS_01: draw_bricks_01 (bitmap, p); break;
-  case BRICKS_02: draw_bricks_02 (bitmap, p); break;
-  case BRICKS_03: draw_bricks_03 (bitmap, p); break;
-  case BRICKS_04: draw_bricks_04 (bitmap, p); break;
+  case BRICKS_01: draw_bricks_01 (bitmap, p, em, vm); break;
+  case BRICKS_02: draw_bricks_02 (bitmap, p, em, vm); break;
+  case BRICKS_03: draw_bricks_03 (bitmap, p, em, vm); break;
+  case BRICKS_04: draw_bricks_04 (bitmap, p, em, vm); break;
+  case BRICKS_05: draw_bricks_05 (bitmap, p, em, vm); break;
   case TORCH: draw_torch (bitmap, p); break;
   case WINDOW: draw_window (bitmap, p); break;
   default:
@@ -473,52 +468,6 @@ draw_room_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
     draw_confg (screen, p, em, vm, true);
   /* other cases */
   draw_confg_fg (screen, p, em, vm, f);
-}
-
-void
-draw_bricks_01 (ALLEGRO_BITMAP *bitmap, struct pos *p)
-{
-  struct coord c;
-  draw_bitmapc (bricks_01, bitmap, bricks_coord_12 (p, &c) , 0);
-}
-
-void
-draw_bricks_02 (ALLEGRO_BITMAP *bitmap, struct pos *p)
-{
-  struct coord c;
-  draw_bitmapc (bricks_02, bitmap, bricks_coord_12 (p, &c) , 0);
-}
-
-void
-draw_bricks_03 (ALLEGRO_BITMAP *bitmap, struct pos *p)
-{
-  struct coord c;
-  draw_bitmapc (bricks_03, bitmap, bricks_coord_34 (p, &c) , 0);
-}
-
-void
-draw_bricks_04 (ALLEGRO_BITMAP *bitmap, struct pos *p)
-{
-  struct coord c;
-  draw_bitmapc (bricks_04, bitmap, bricks_coord_34 (p, &c) , 0);
-}
-
-struct coord *
-bricks_coord_12 (struct pos *p, struct coord *c)
-{
-  c->x = PLACE_WIDTH * (p->place + 1);
-  c->y = PLACE_HEIGHT * p->floor + 15;
-  c->room = p->room;
-  return c;
-}
-
-struct coord *
-bricks_coord_34 (struct pos *p, struct coord *c)
-{
-  c->x = PLACE_WIDTH * (p->place + 1);
-  c->y = PLACE_HEIGHT * p->floor + 4;
-  c->room = p->room;
-  return c;
 }
 
 void

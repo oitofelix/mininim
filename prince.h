@@ -133,6 +133,7 @@ struct level {
       BRICKS_02,
       BRICKS_03,
       BRICKS_04,
+      BRICKS_05,
       TORCH,
       WINDOW,
     } bg;

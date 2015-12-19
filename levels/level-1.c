@@ -102,10 +102,10 @@ static struct level level_1 = {
     [21] =
     {{{NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {FLOOR},
       {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}},
-     {{NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {LOOSE_FLOOR}, {DOOR},
-      {LOOSE_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}},
-     {{FLOOR}, {OPENER_FLOOR,NO_BG,{4}}, {FLOOR}, {FLOOR}, {FLOOR},
-      {FLOOR}, {FLOOR}, {FLOOR}, {CLOSER_FLOOR,NO_BG,{4}}, {FLOOR}}},
+     {{NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR},
+      {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}},
+     {{FLOOR}, {PILLAR}, {FLOOR,BRICKS_01}, {FLOOR,BRICKS_02}, {FLOOR,BRICKS_03},
+      {FLOOR,BRICKS_04}, {FLOOR}, {FLOOR}, {FLOOR}, {FLOOR}}},
   },
 
   .link = {[0] = {0, 0, 0, 0},

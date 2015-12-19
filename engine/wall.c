@@ -261,8 +261,7 @@ draw_wall_randomization (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   if (level->em != DUNGEON && level->vm == VGA) return;
 
-  struct pos np; npos (p, &np);
-  seedp (&np);
+  seedp (p);
   prandom (1);
   r0 = prandom(1);
   r1 = prandom(4);

@@ -20,6 +20,7 @@
 #include <stdint.h>
 #include <time.h>
 #include "engine/pos.h"
+#include "random.h"
 
 /* random number generator seed */
 uint32_t random_seed = 0;
@@ -58,17 +59,30 @@ prandom_uniq (uint32_t seed, int period, int max)
 }
 
 int
-prandom_pos (struct pos *p, int i, int period, int max)
+prandom_pos_uniq (struct pos *p, int i, int period, int max)
 {
+  struct pos np; npos (p, &np);
   return
-    prandom_uniq (p->room + p->floor * PLACES + p->place + i, period, max);
+    prandom_uniq (np.room + np.floor * PLACES + np.place + i,
+                  period, max);
+}
+
+int
+prandom_pos (struct pos *p, int max)
+{
+  int r;
+  seedp (p);
+  r = prandom (max);
+  unseedp ();
+  return r;
 }
 
 void
 seedp (struct pos *p)
 {
+  struct pos np; npos (p, &np);
   random_seedb = random_seed;
-  random_seed = p->room + p->floor * PLACES + p->place;
+  random_seed = np.room + np.floor * PLACES + np.place;
   /* a null random seed makes the random number generator get a
      non-null seed based on the current time, but we avoid this
      non-deterministic behavior because it affects the position

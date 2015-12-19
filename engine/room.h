@@ -22,15 +22,8 @@
 
 #include "prince.h"
 
-#define VDUNGEON_BRICKS_01 "dat/vdungeon/background/bricks01.png"
-#define VDUNGEON_BRICKS_02 "dat/vdungeon/background/bricks02.png"
-#define VDUNGEON_BRICKS_03 "dat/vdungeon/background/bricks03.png"
-#define VDUNGEON_BRICKS_04 "dat/vdungeon/background/bricks04.png"
 #define VDUNGEON_TORCH "dat/vdungeon/background/torch.png"
 #define VDUNGEON_WINDOW "dat/vdungeon/background/window.png"
-
-extern ALLEGRO_BITMAP *room_bg;
-extern bool redraw_room;
 
 void load_room (void);
 void draw_bitmapc (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
@@ -59,12 +52,6 @@ void draw_room_anim_fg (ALLEGRO_BITMAP *bitmap,
                         enum em em, enum vm vm, struct anim *a);
 void draw_room_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
                    enum em em, enum vm vm, struct frame *f);
-void draw_bricks_01 (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_bricks_02 (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_bricks_03 (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_bricks_04 (ALLEGRO_BITMAP *bitmap, struct pos *p);
-struct coord *bricks_coord_12 (struct pos *p, struct coord *c);
-struct coord *bricks_coord_34 (struct pos *p, struct coord *c);
 void draw_torch (ALLEGRO_BITMAP *bitmap, struct pos *p);
 struct coord *torch_coord (struct pos *p, struct coord *c);
 void draw_window (ALLEGRO_BITMAP *bitmap, struct pos *p);
