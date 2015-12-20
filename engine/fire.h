@@ -25,15 +25,15 @@
 #define FIRE_RANDOM_SEED_1 501477214
 
 /* bitmap resources */
-#define FIRE_01 "dat/prince/fire/frame1.png"
-#define FIRE_02 "dat/prince/fire/frame2.png"
-#define FIRE_03 "dat/prince/fire/frame3.png"
-#define FIRE_04 "dat/prince/fire/frame4.png"
-#define FIRE_05 "dat/prince/fire/frame5.png"
-#define FIRE_06 "dat/prince/fire/frame6.png"
-#define FIRE_07 "dat/prince/fire/frame7.png"
-#define FIRE_08 "dat/prince/fire/frame8.png"
-#define FIRE_09 "dat/prince/fire/frame9.png"
+#define FIRE_01 "data/fire/01.png"
+#define FIRE_02 "data/fire/02.png"
+#define FIRE_03 "data/fire/03.png"
+#define FIRE_04 "data/fire/04.png"
+#define FIRE_05 "data/fire/05.png"
+#define FIRE_06 "data/fire/06.png"
+#define FIRE_07 "data/fire/07.png"
+#define FIRE_08 "data/fire/08.png"
+#define FIRE_09 "data/fire/09.png"
 
 void load_fire (void);
 void unload_fire (void);
