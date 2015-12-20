@@ -74,6 +74,7 @@ void draw_wall_face (ALLEGRO_BITMAP *bitmap, struct pos *p,
                      enum em, enum vm vm);
 
 ALLEGRO_COLOR palace_wall_color (int i);
+void compute_palace_wall_color_array (int last_room, int room);
 ALLEGRO_COLOR compute_palace_wall_color (struct pos *p, int row, int col);
 void draw_pv_wall_brick (ALLEGRO_BITMAP *bitmap, struct pos *p,
                     int row, int col);

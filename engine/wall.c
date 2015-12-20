@@ -27,6 +27,8 @@
 #include "room.h"
 #include "wall.h"
 
+static ALLEGRO_COLOR palace_wall_color_array[4][3][11];
+
 /* dungeon vga */
 ALLEGRO_BITMAP *dv_wall_left, *dv_wall_center, *dv_wall_right,
   *dv_wall_single, *dv_wall_face, *dv_wall_face_top,
@@ -82,6 +84,9 @@ load_wall (void)
   pv_wall_mark_12 = load_bitmap (PV_WALL_MARK_12);
   pv_wall_mark_13 = load_bitmap (PV_WALL_MARK_13);
   pv_wall_mark_14 = load_bitmap (PV_WALL_MARK_14);
+
+  /* callbacks */
+  register_room_callback (compute_palace_wall_color_array);
 }
 
 void
@@ -124,6 +129,9 @@ unload_wall (void)
   al_destroy_bitmap (pv_wall_mark_12);
   al_destroy_bitmap (pv_wall_mark_13);
   al_destroy_bitmap (pv_wall_mark_14);
+
+  /* callbacks */
+  remove_room_callback (compute_palace_wall_color_array);
 }
 
 void
@@ -280,7 +288,7 @@ draw_pv_wall_brick (ALLEGRO_BITMAP *bitmap, struct pos *p,
   struct frame f0, f1;
   f0.flip = f1.flip = 0;
 
-  ALLEGRO_COLOR c = compute_palace_wall_color (p, row, col);
+  ALLEGRO_COLOR c = palace_wall_color_array[p->floor][row][p->place + col];
   palace_wall_brick_rect (p, row, col, &r);
   draw_filled_rect (bitmap, &r, c);
 
@@ -304,6 +312,36 @@ palace_wall_color (int i)
   case 7: return PALACE_WALL_COLOR_07;
   }
   return PALACE_WALL_COLOR_00;
+}
+
+void
+compute_palace_wall_color_array (int last_room, int room)
+{
+	uint32_t orand_seed;
+	int floor, row, col;
+	int ocolor, bcolor, color;
+
+	orand_seed = random_seed;
+	random_seed = room;
+	prandom(1);
+
+	for (floor = 0; floor < 3; floor++) {
+		for (row = 0; row < 4; row++) {
+			if (row % 2) bcolor = 0;
+			else bcolor = 4;
+			ocolor = -1;
+			for (col = 0; col <= 10; col++) {
+				do {
+					color = bcolor + prandom(3);
+				} while (color == ocolor);
+				palace_wall_color_array[floor][row][col] =
+          palace_wall_color (color);
+				ocolor = color;
+			}
+		}
+	}
+
+	random_seed = orand_seed;
 }
 
 ALLEGRO_COLOR

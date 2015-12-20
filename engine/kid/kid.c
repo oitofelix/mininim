@@ -224,7 +224,7 @@ draw_kids (ALLEGRO_BITMAP *bitmap,
   struct coord ml, c; struct pos pml, pmlr, pmlra;
   struct anim *k;
 
-  coord_wa = true;
+  /* coord_wa = true; */
 
   qsort (kid, kid_nmemb, sizeof (*k), compare_kids);
 
@@ -251,7 +251,7 @@ draw_kids (ALLEGRO_BITMAP *bitmap,
     k->xf.b = NULL;
   }
 
-  coord_wa = false;
+  /* coord_wa = false; */
 }
 
 int

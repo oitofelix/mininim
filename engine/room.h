@@ -22,10 +22,11 @@
 
 #include "prince.h"
 
-#define VDUNGEON_WINDOW "dat/vdungeon/background/window.png"
+typedef void (*room_callback_f) (int, int);
 
 void load_room (void);
 void unload_room (void);
+
 void draw_bitmapc (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
                    struct coord *c, int flags);
 void draw_bitmap_regionc (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
@@ -33,6 +34,11 @@ void draw_bitmap_regionc (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
                           struct coord *c, int flags);
 void draw_filled_rect (ALLEGRO_BITMAP *to, struct rect *r,
                        ALLEGRO_COLOR color);
+
+void register_room_callback (room_callback_f f);
+void remove_room_callback (room_callback_f f);
+void run_room_callbacks (int last_room, int room);
+
 void draw_room (ALLEGRO_BITMAP *bitmap, int room,
                 enum em em, enum vm vm);
 void draw_con (ALLEGRO_BITMAP *bitmap, struct pos *p,

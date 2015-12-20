@@ -114,7 +114,8 @@ flow (struct anim *kid)
     return false;
   }
 
-  if (stop || kid != current_kid) {
+  if ((stop && kid->f.b != kid_run_jump_frameset[10].frame)
+      || kid != current_kid) {
     kid_stop_run (kid);
     return false;
   }
@@ -166,7 +167,7 @@ physics_out (struct anim *kid)
   else keep_depressible_floor (kid);
 
   /* sound */
-  if (kid->f.b == kid_run_jump_frameset[10].frame) sample_step = true;
+  if (kid->oaction == kid_run_jump) sample_step = true;
   if (kid->i == 2 || kid->i == 6) sample_step = true;
 }
 

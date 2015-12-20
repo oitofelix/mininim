@@ -220,25 +220,42 @@ coord2room (struct coord *c, int room, struct coord *cv)
   int mcb, mca, mcr, mcl;
   mcb = mca = mcr = mcl = INT_MAX;
 
-  if (roomd (room, BELOW) == cv->room) {
+  int ra, rb, rl, rr;
+  int rab, rba, rlr, rrl;
+
+  ra = roomd (room, ABOVE);
+  rb = roomd (room, BELOW);
+  rl = roomd (room, LEFT);
+  rr = roomd (room, RIGHT);
+
+  rab = roomd (ra, BELOW);
+  rba = roomd (rb, ABOVE);
+  rlr = roomd (rl, RIGHT);
+  rrl = roomd (rr, LEFT);
+
+  if (rb == cv->room
+      && rba == room) {
     cb.y += PLACE_HEIGHT * FLOORS;
     cb.room = room;
     mcb = coord_mod (&cb);
   }
 
-  if (roomd (room, ABOVE) == cv->room) {
+  if (ra == cv->room
+      && rab == room) {
     ca.y -= PLACE_HEIGHT * FLOORS;
     ca.room = room;
     mca = coord_mod (&ca);
   }
 
-  if (roomd (room, RIGHT) == cv->room) {
+  if (rr == cv->room
+      && rrl == room) {
     cr.x += PLACE_WIDTH * PLACES;
     cr.room = room;
     mcr = coord_mod (&cr);
   }
 
-  if (roomd (room, LEFT) == cv->room) {
+  if (rl == cv->room
+      && rlr == room) {
     cl.x -= PLACE_WIDTH * PLACES;
     cl.room = room;
     mcl = coord_mod (&cl);
