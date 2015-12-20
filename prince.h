@@ -73,6 +73,15 @@
 #define TGREEN (al_map_rgba (0, 255, 0, 0))
 #define TBLUE (al_map_rgba (0, 0, 255, 0))
 
+#define PALACE_WALL_COLOR_00 (al_map_rgb (216, 168, 88)) /* 0x61 */
+#define PALACE_WALL_COLOR_01 (al_map_rgb (224, 164, 92)) /* 0x62 */
+#define PALACE_WALL_COLOR_02 (al_map_rgb (224, 168, 96)) /* 0x63 */
+#define PALACE_WALL_COLOR_03 (al_map_rgb (216, 160, 84)) /* 0x64 */
+#define PALACE_WALL_COLOR_04 (al_map_rgb (224, 164, 92)) /* 0x66 */
+#define PALACE_WALL_COLOR_05 (al_map_rgb (216, 164, 88)) /* 0x67 */
+#define PALACE_WALL_COLOR_06 (al_map_rgb (224, 168, 88)) /* 0x68 */
+#define PALACE_WALL_COLOR_07 (al_map_rgb (216, 168, 96)) /* 0x69 */
+
 /* environment mode */
 enum em {
   DUNGEON, PALACE,
@@ -94,6 +103,11 @@ struct frameset {
 
 struct coord {
   int room, x, y;
+};
+
+struct rect {
+  struct coord c;
+  int w, h;
 };
 
 struct dim {

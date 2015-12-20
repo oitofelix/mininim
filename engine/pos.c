@@ -299,6 +299,45 @@ frame2room (struct frame *f, int room, struct coord *cv)
   return cv;
 }
 
+struct coord *
+rect2room (struct rect *r, int room, struct coord *cv)
+{
+  *cv = r->c;
+  ncoord (cv, cv);
+
+  if (cv->room == room) return cv;
+
+  struct coord tl = *cv;
+  struct coord tr = *cv;
+  struct coord bl = *cv;
+  struct coord br = *cv;
+
+  tr.x = tl.x + r->w - 1;
+  bl.y = tl.y + r->h - 1;
+  br.x = tl.x + r->w - 1;
+  br.y = tl.y + r->h - 1;
+
+  struct coord ntl; coord2room (&tl, room, &ntl);
+  struct coord ntr; coord2room (&tr, room, &ntr);
+  struct coord nbl; coord2room (&bl, room, &nbl);
+  struct coord nbr; coord2room (&br, room, &nbr);
+
+  if (ntl.room == room) *cv = ntl;
+  else if (ntr.room == room) {
+    *cv = ntr;
+    cv->x = ntr.x - r->w + 1;
+  } else if (nbl.room == room) {
+    *cv = nbl;
+    cv->y = nbl.y - r->h + 1;
+  } else if (nbr.room == room) {
+    *cv = nbr;
+    cv->x = nbr.x - r->w + 1;
+    cv->y = nbr.y - r->h + 1;
+  }
+
+  return cv;
+}
+
 bool
 coord4draw (struct coord *c, int room, struct coord *cv)
 {

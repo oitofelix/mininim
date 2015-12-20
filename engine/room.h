@@ -25,12 +25,14 @@
 #define VDUNGEON_WINDOW "dat/vdungeon/background/window.png"
 
 void load_room (void);
+void unload_room (void);
 void draw_bitmapc (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
                    struct coord *c, int flags);
-void unload_room (void);
 void draw_bitmap_regionc (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
                           float sx, float sy, float sw, float sh,
                           struct coord *c, int flags);
+void draw_filled_rect (ALLEGRO_BITMAP *to, struct rect *r,
+                       ALLEGRO_COLOR color);
 void draw_room (ALLEGRO_BITMAP *bitmap, int room,
                 enum em em, enum vm vm);
 void draw_con (ALLEGRO_BITMAP *bitmap, struct pos *p,

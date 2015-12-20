@@ -22,60 +22,94 @@
 
 #include "physics.h"
 
-#define VDUNGEON_WALL_LEFT "dat/vdungeon/walls/left stack main.png"
-#define VDUNGEON_WALL_CENTER "dat/vdungeon/walls/centre stack main.png"
-#define VDUNGEON_WALL_RIGHT "dat/vdungeon/walls/right stack main.png"
-#define VDUNGEON_WALL_SINGLE "dat/vdungeon/walls/single stack main.png"
-#define VDUNGEON_WALL_FACE "dat/vdungeon/walls/face stack main.png"
-#define VDUNGEON_WALL_FACE_TOP "dat/vdungeon/walls/face stack top.png"
-#define VDUNGEON_WALL_LEFT_BASE "dat/vdungeon/walls/left stack base.png"
-#define VDUNGEON_WALL_CENTER_BASE "dat/vdungeon/walls/centre stack base.png"
-#define VDUNGEON_WALL_RIGHT_BASE "dat/vdungeon/walls/right stack base.png"
-#define VDUNGEON_WALL_SINGLE_BASE "dat/vdungeon/walls/single stack base.png"
-#define VDUNGEON_WALL_GRAY_BLOCK "dat/vdungeon/walls/random block.png"
-#define VDUNGEON_WALL_WIDE_DIVIDER "dat/vdungeon/walls/divider01.png"
-#define VDUNGEON_WALL_NARROW_DIVIDER "dat/vdungeon/walls/divider02.png"
-#define VDUNGEON_WALL_MARK_TOP_LEFT "dat/vdungeon/walls/mark01.png"
-#define VDUNGEON_WALL_MARK_TOP_RIGHT "dat/vdungeon/walls/mark03.png"
-#define VDUNGEON_WALL_MARK_BOTTOM_LEFT "dat/vdungeon/walls/mark02.png"
-#define VDUNGEON_WALL_MARK_BOTTOM_RIGHT "dat/vdungeon/walls/mark04.png"
+/* dungeon vga */
+#define DV_WALL_LEFT "data/wall/dv-left.png"
+#define DV_WALL_CENTER "data/wall/dv-center.png"
+#define DV_WALL_RIGHT "data/wall/dv-right.png"
+#define DV_WALL_SINGLE "data/wall/dv-single.png"
+#define DV_WALL_FACE "data/wall/dv-face.png"
+#define DV_WALL_FACE_TOP "data/wall/dv-face-top.png"
+#define DV_WALL_LEFT_BASE "data/wall/dv-left-base.png"
+#define DV_WALL_CENTER_BASE "data/wall/dv-center-base.png"
+#define DV_WALL_RIGHT_BASE "data/wall/dv-right-base.png"
+#define DV_WALL_SINGLE_BASE "data/wall/dv-single-base.png"
+#define DV_WALL_RANDOM_BLOCK "data/wall/dv-random-block.png"
+#define DV_WALL_WIDE_DIVIDER "data/wall/dv-wide-divider.png"
+#define DV_WALL_NARROW_DIVIDER "data/wall/dv-narrow-divider.png"
+#define DV_WALL_MARK_TOP_LEFT "data/wall/dv-mark-top-left.png"
+#define DV_WALL_MARK_TOP_RIGHT "data/wall/dv-mark-top-right.png"
+#define DV_WALL_MARK_BOTTOM_LEFT "data/wall/dv-mark-bottom-left.png"
+#define DV_WALL_MARK_BOTTOM_RIGHT "data/wall/dv-mark-bottom-right.png"
 
-extern ALLEGRO_BITMAP *wall_left, *wall_center, *wall_right, *wall_single, *wall_face,
-  *wall_face_top, *wall_left_base, *wall_center_base, *wall_right_base,
-  *wall_single_base, *wall_gray_block, *wall_wide_divider, *wall_narrow_divider,
-  *wall_mark_top_left, *wall_mark_top_right, *wall_mark_bottom_left,
-  *wall_mark_bottom_right;
+/* palace vga */
+#define PV_WALL_FACE "data/wall/pv-face.png"
+#define PV_WALL_FACE_TOP "data/wall/pv-face-top.png"
+#define PV_WALL_MARK_03 "data/wall/pv-mark-03.png"
+#define PV_WALL_MARK_04 "data/wall/pv-mark-04.png"
+#define PV_WALL_MARK_05 "data/wall/pv-mark-05.png"
+#define PV_WALL_MARK_06 "data/wall/pv-mark-06.png"
+#define PV_WALL_MARK_07 "data/wall/pv-mark-07.png"
+#define PV_WALL_MARK_08 "data/wall/pv-mark-08.png"
+#define PV_WALL_MARK_09 "data/wall/pv-mark-09.png"
+#define PV_WALL_MARK_10 "data/wall/pv-mark-10.png"
+#define PV_WALL_MARK_11 "data/wall/pv-mark-11.png"
+#define PV_WALL_MARK_12 "data/wall/pv-mark-12.png"
+#define PV_WALL_MARK_13 "data/wall/pv-mark-13.png"
+#define PV_WALL_MARK_14 "data/wall/pv-mark-14.png"
+#define PV_WALL_MARK_15 "data/wall/pv-mark-15.png"
+#define PV_WALL_MARK_16 "data/wall/pv-mark-16.png"
+#define PV_WALL_MARK_17 "data/wall/pv-mark-17.png"
 
-void load_vdungeon_wall (void);
+void load_wall (void);
 void unload_wall (void);
-void draw_wall (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_wall_base (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_wall_left (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_wall_right (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_wall_face (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_wall_sws_left (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_wall_sws_base (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_wall_sww_left (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_wall_sww_base (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_wall_wws_left (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_wall_wws_base (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_wall_www_left (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_wall_www_base (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_wall (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                enum em, enum vm vm);
+void draw_wall_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                     enum em em, enum vm vm);
+void draw_wall_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                     enum em em, enum vm vm);
+void draw_wall_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                      enum em em, enum vm vm);
+void draw_wall_face (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                     enum em, enum vm vm);
+
+ALLEGRO_COLOR get_palace_wall_color (int i);
+ALLEGRO_COLOR compute_palace_wall_color (struct pos *p, int row, int col);
+void draw_pv_wall_brick (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                    int row, int col);
+struct rect *palace_wall_brick_rect (struct pos *p, int row, int col,
+                                     struct rect *r);
+
+void draw_pv_wall (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_pv_wall_base (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_pv_wall_left (ALLEGRO_BITMAP *bitmap, struct pos *p);
+
+void draw_dv_wall (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_dv_wall_base (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_dv_wall_left (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_dv_wall_sws_left (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_dv_wall_sws_base (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_dv_wall_sww_left (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_dv_wall_sww_base (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_dv_wall_wws_left (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_dv_wall_wws_base (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_dv_wall_www_left (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_dv_wall_www_base (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_dv_wall_randomization (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_dv_wall_left_mark (ALLEGRO_BITMAP *bitmap, struct pos *p, int r);
+void draw_dv_wall_right_mark (ALLEGRO_BITMAP *bitmap, struct pos *p, int r);
+void draw_dv_wall_random_block (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_dv_wall_divider_00 (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_dv_wall_divider_01 (ALLEGRO_BITMAP *bitmap, struct pos *p);
+
+enum wall_correlation wall_correlation (struct pos *p);
 struct coord *wall_base_coord (struct pos *p, struct coord *c);
 struct coord *wall_coord (struct pos *p, struct coord *c);
 struct coord *wall_face_coord (struct pos *p, struct coord *c);
-struct coord *wall_face_top_coord (struct pos *p, struct coord *c);
-enum wall_correlation wall_correlation (struct pos *p);
-void draw_wall_randomization (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_wall_left_mark (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                          int r);
-void draw_wall_right_mark (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                           int r);
-void draw_wall_gray_block (ALLEGRO_BITMAP *bitmap, struct pos *p);
-struct coord *wall_gray_block_coord (struct pos *p, struct coord *c);
-void draw_wall_divider_00 (ALLEGRO_BITMAP *bitmap, struct pos *p);
+struct coord *d_wall_face_top_coord (struct pos *p, struct coord *c);
+struct coord *p_wall_face_top_coord (struct pos *p, struct coord *c);
+struct coord *wall_random_block_coord (struct pos *p, struct coord *c);
 struct coord *wall_divider_00_coord (struct pos *p, struct coord *c);
-void draw_wall_divider_01 (ALLEGRO_BITMAP *bitmap, struct pos *p);
 struct coord *wall_divider_01_coord (struct pos *p, struct coord *c);
 
 enum wall_correlation {

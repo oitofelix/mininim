@@ -160,6 +160,14 @@ draw_bitmap_region (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to, float sx, float sy
 }
 
 void
+draw_filled_rectangle (ALLEGRO_BITMAP *to, float x1, float y1,
+                       float x2, float y2, ALLEGRO_COLOR color)
+{
+  al_set_target_bitmap (to);
+  al_draw_filled_rectangle (x1, y1, x2 + 1, y2 + 1, color);
+}
+
+void
 draw_text (ALLEGRO_BITMAP *bitmap, char const *text, float x, float y, int flags)
 {
   al_set_target_bitmap (bitmap);

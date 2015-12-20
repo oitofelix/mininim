@@ -95,3 +95,25 @@ unseedp (void)
 {
   random_seed = random_seedb;
 }
+
+int
+prandom_seq (uint32_t seed, int n, int p, int max)
+{
+  uint32_t orand_seed;
+  int i, r0 = -1, r1 = -1;
+
+	orand_seed = random_seed;
+	random_seed = seed;
+  prandom (1);
+
+  for (i = 0; i <= n; i++) {
+    if (i % p == 0) r0 = -1;
+    do {
+      r1 = prandom (max);
+    } while (r1 == r0);
+    r0 = r1;
+  }
+
+  random_seed = orand_seed;
+  return r1;
+}
