@@ -25,8 +25,14 @@
 #include "room.h"
 #include "potion.h"
 
-static ALLEGRO_BITMAP *small_potion, *big_potion,
-  *bubble_01, *bubble_02, *bubble_03, *bubble_04, *bubble_05,
+/* dungeon vga */
+ALLEGRO_BITMAP *dv_small_potion, *dv_big_potion;
+
+/* dungeon vga */
+ALLEGRO_BITMAP *pv_small_potion, *pv_big_potion;
+
+/* palettable */
+ALLEGRO_BITMAP *bubble_01, *bubble_02, *bubble_03, *bubble_04, *bubble_05,
   *bubble_06, *bubble_07;
 
 static struct coord *small_potion_coord (struct pos *p, struct coord *c);
@@ -39,14 +45,15 @@ ALLEGRO_COLOR poison_palette (ALLEGRO_COLOR c);
 void
 load_potion (void)
 {
-  switch (level->em) {
-  case DUNGEON:
-    small_potion = load_bitmap (VDUNGEON_SMALL_POTION);
-    big_potion = load_bitmap (VDUNGEON_BIG_POTION);
-    break;
-  case PALACE: break;
-  }
+  /* dungeon vga */
+  dv_small_potion = load_bitmap (DV_SMALL_POTION);
+  dv_big_potion = load_bitmap (DV_BIG_POTION);
 
+  /* palace vga */
+  pv_small_potion = load_bitmap (PV_SMALL_POTION);
+  pv_big_potion = load_bitmap (PV_BIG_POTION);
+
+  /* palettable */
   bubble_01 = load_bitmap (BUBBLE_01);
   bubble_02 = load_bitmap (BUBBLE_02);
   bubble_03 = load_bitmap (BUBBLE_03);
@@ -59,8 +66,15 @@ load_potion (void)
 void
 unload_potion (void)
 {
-  al_destroy_bitmap (small_potion);
-  al_destroy_bitmap (big_potion);
+  /* dungeon vga */
+  al_destroy_bitmap (dv_small_potion);
+  al_destroy_bitmap (dv_big_potion);
+
+  /* palace vga */
+  al_destroy_bitmap (pv_small_potion);
+  al_destroy_bitmap (pv_big_potion);
+
+  /* palettable */
   al_destroy_bitmap (bubble_01);
   al_destroy_bitmap (bubble_02);
   al_destroy_bitmap (bubble_03);
@@ -89,9 +103,36 @@ get_bubble_frame (int i)
 }
 
 void
-draw_potion (ALLEGRO_BITMAP *bitmap, struct pos *p, int i)
+draw_potion (ALLEGRO_BITMAP *bitmap, struct pos *p, int i,
+             enum em em, enum vm vm)
 {
   if (! is_potion (p)) return;
+
+  ALLEGRO_BITMAP *small_potion = NULL,
+    *big_potion = NULL;
+
+  switch (em) {
+  case DUNGEON:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA:
+      small_potion = dv_small_potion;
+      big_potion = dv_big_potion;
+      break;
+    }
+    break;
+  case PALACE:
+    switch (vm) {
+    case CGA: break;
+    case EGA: break;
+    case VGA:
+      small_potion = pv_small_potion;
+      big_potion = pv_big_potion;
+      break;
+    }
+    break;
+  }
 
   ALLEGRO_BITMAP *bottle, *bubble;
   struct coord bottle_coord, bubble_coord;
@@ -132,8 +173,7 @@ draw_potion (ALLEGRO_BITMAP *bitmap, struct pos *p, int i)
     break;
   }
 
-  draw_bitmapc (bottle, bitmap, &bottle_coord,
-                prandom (1) ? ALLEGRO_FLIP_HORIZONTAL : 0);
+  draw_bitmapc (bottle, bitmap, &bottle_coord, 0);
   bubble = get_bubble_frame (i % 7);
   bubble = apply_palette (bubble, bubble_palette);
   int r = prandom (1);

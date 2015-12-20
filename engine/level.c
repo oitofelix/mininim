@@ -212,7 +212,7 @@ draw_level (void)
 
   for (p.floor = FLOORS; p.floor >= -1; p.floor--)
     for (p.place = -1; p.place < PLACES; p.place++) {
-      draw_potion (screen, &p, draw_cycle);
+      draw_potion (screen, &p, draw_cycle, em, vm);
       draw_sword (screen, &p, draw_cycle);
     }
 
