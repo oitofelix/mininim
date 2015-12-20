@@ -264,7 +264,7 @@ fix_door_lacking_opener (struct pos *p)
              __func__, "DOOR", "FLOOR", p->room, p->floor, p->place);
 
     c->fg = FLOOR;
-    c->bg = BRICKS_05;
+    c->bg = NO_BG;
     c->ext.item = NO_ITEM;
   }
 }
@@ -288,7 +288,7 @@ fix_opener_or_closer_lacking_door (struct pos *p)
              c->ext.event, "FLOOR", p->room, p->floor, p->place);
 
     c->fg = FLOOR;
-    c->bg = BRICKS_05;
+    c->bg = NO_BG;
     c->ext.item = NO_ITEM;
   }
 }
@@ -302,7 +302,7 @@ fix_confg_which_should_not_have_conbg (struct pos *p)
   if (c->fg == WALL || c->fg == PILLAR
       || c->fg == BIG_PILLAR_TOP || c->fg == BIG_PILLAR_BOTTOM
       || c->fg == DOOR || c->fg == LEVEL_DOOR)
-    c->bg = BRICKS_05;
+    c->bg = NO_BG;
 }
 
 /* consistency: big pillar bottom must have big pillar top over it and
@@ -361,7 +361,7 @@ fix_enclosure (struct pos *p, enum dir dir)
   for (i = d, prel (p, &q, 0, i); abs (i) < PLACES; i += d, prel (p, &q, 0, i)) {
     if (con (&q)->fg == WALL) break;
     con (&q)->fg = WALL;
-    con (&q)->bg = BRICKS_05;
+    con (&q)->bg = NO_BG;
     con (&q)->ext.item = NO_ITEM;
   }
 }

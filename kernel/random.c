@@ -117,3 +117,11 @@ prandom_seq (uint32_t seed, int n, int p, int max)
   random_seed = orand_seed;
   return r1;
 }
+
+int
+prandom_seq_pos (struct pos *p, int n, int pr, int max)
+{
+  struct pos np; npos (p, &np);
+  return prandom_seq (np.room + np.floor * PLACES + np.place,
+                      n, pr, max);
+}

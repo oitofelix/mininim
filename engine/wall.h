@@ -44,6 +44,9 @@
 /* palace vga */
 #define PV_WALL_FACE "data/wall/pv-face.png"
 #define PV_WALL_FACE_TOP "data/wall/pv-face-top.png"
+#define PV_WALL_MARK_00 "data/wall/pv-mark-00.png"
+#define PV_WALL_MARK_01 "data/wall/pv-mark-01.png"
+#define PV_WALL_MARK_02 "data/wall/pv-mark-02.png"
 #define PV_WALL_MARK_03 "data/wall/pv-mark-03.png"
 #define PV_WALL_MARK_04 "data/wall/pv-mark-04.png"
 #define PV_WALL_MARK_05 "data/wall/pv-mark-05.png"
@@ -56,9 +59,6 @@
 #define PV_WALL_MARK_12 "data/wall/pv-mark-12.png"
 #define PV_WALL_MARK_13 "data/wall/pv-mark-13.png"
 #define PV_WALL_MARK_14 "data/wall/pv-mark-14.png"
-#define PV_WALL_MARK_15 "data/wall/pv-mark-15.png"
-#define PV_WALL_MARK_16 "data/wall/pv-mark-16.png"
-#define PV_WALL_MARK_17 "data/wall/pv-mark-17.png"
 
 void load_wall (void);
 void unload_wall (void);
@@ -73,12 +73,15 @@ void draw_wall_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
 void draw_wall_face (ALLEGRO_BITMAP *bitmap, struct pos *p,
                      enum em, enum vm vm);
 
-ALLEGRO_COLOR get_palace_wall_color (int i);
+ALLEGRO_COLOR palace_wall_color (int i);
 ALLEGRO_COLOR compute_palace_wall_color (struct pos *p, int row, int col);
 void draw_pv_wall_brick (ALLEGRO_BITMAP *bitmap, struct pos *p,
                     int row, int col);
 struct rect *palace_wall_brick_rect (struct pos *p, int row, int col,
                                      struct rect *r);
+ALLEGRO_BITMAP *palace_wall_mark (int i);
+struct frame *palace_wall_mark_frame (struct pos *p, int i,
+                                      struct frame *f);
 
 void draw_pv_wall (ALLEGRO_BITMAP *bitmap, struct pos *p);
 void draw_pv_wall_base (ALLEGRO_BITMAP *bitmap, struct pos *p);

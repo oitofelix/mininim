@@ -36,7 +36,7 @@ ALLEGRO_BITMAP *dv_bricks_01, *dv_bricks_02,
 
 /* palace vga */
 ALLEGRO_BITMAP *pv_bricks_01, *pv_bricks_02,
-  *pv_bricks_03, *pv_bricks_04, *pv_bricks_05;
+  *pv_bricks_03, *pv_bricks_04;
 
 void
 load_bricks (void)
@@ -52,7 +52,6 @@ load_bricks (void)
   pv_bricks_02 = load_bitmap (PV_BRICKS_02);
   pv_bricks_03 = load_bitmap (PV_BRICKS_03);
   pv_bricks_04 = load_bitmap (PV_BRICKS_04);
-  pv_bricks_05 = load_bitmap (PV_BRICKS_05);
 }
 
 void
@@ -69,7 +68,6 @@ unload_bricks (void)
   al_destroy_bitmap (pv_bricks_02);
   al_destroy_bitmap (pv_bricks_03);
   al_destroy_bitmap (pv_bricks_04);
-  al_destroy_bitmap (pv_bricks_05);
 }
 
 void
@@ -192,24 +190,6 @@ draw_bricks_04 (ALLEGRO_BITMAP *bitmap, struct pos *p,
   draw_bitmapc (bricks_04, bitmap, bricks_coord_04 (p, &c) , 0);
 }
 
-void
-draw_bricks_05 (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                enum em em, enum vm vm)
-{
-  if (em == DUNGEON) return;
-
-  ALLEGRO_BITMAP *bricks_05 = NULL;
-
-  switch (vm) {
-  case CGA: break;
-  case EGA: break;
-  case VGA: bricks_05 = pv_bricks_05; break;
-  }
-
-  struct coord c;
-  draw_bitmapc (bricks_05, bitmap, p_bricks_coord_05 (p, &c) , 0);
-}
-
 struct coord *
 d_bricks_coord_01 (struct pos *p, struct coord *c)
 {
@@ -286,15 +266,6 @@ p_bricks_coord_04 (struct pos *p, struct coord *c)
 {
   c->x = PLACE_WIDTH * (p->place + 1);
   c->y = PLACE_HEIGHT * p->floor + 26;
-  c->room = p->room;
-  return c;
-}
-
-struct coord *
-p_bricks_coord_05 (struct pos *p, struct coord *c)
-{
-  c->x = PLACE_WIDTH * (p->place + 1);
-  c->y = PLACE_HEIGHT * p->floor + 29;
   c->room = p->room;
   return c;
 }

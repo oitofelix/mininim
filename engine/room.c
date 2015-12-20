@@ -180,12 +180,14 @@ draw_conbg (ALLEGRO_BITMAP *bitmap, struct pos *p,
             enum em em, enum vm vm)
 {
   switch (con (p)->bg) {
-  case NO_BG: break;
+  case NO_BG:
+    if (em == PALACE) draw_bricks_01 (bitmap, p, em, vm);
+    break;
   case BRICKS_01: draw_bricks_01 (bitmap, p, em, vm); break;
   case BRICKS_02: draw_bricks_02 (bitmap, p, em, vm); break;
   case BRICKS_03: draw_bricks_03 (bitmap, p, em, vm); break;
   case BRICKS_04: draw_bricks_04 (bitmap, p, em, vm); break;
-  case BRICKS_05: draw_bricks_05 (bitmap, p, em, vm); break;
+  case NO_BRICKS: break;
   case TORCH: draw_torch (bitmap, p, em, vm); break;
   case WINDOW: draw_window (bitmap, p, em, vm); break;
   default:

@@ -34,5 +34,6 @@ int prandom_pos (struct pos *p, int max);
 void seedp (struct pos *p);
 void unseedp (void);
 int prandom_seq (uint32_t seed, int n, int p, int max);
+int prandom_seq_pos (struct pos *p, int n, int pr, int max);
 
 #endif	/* FREEPOP_RANDOM_H */

@@ -37,10 +37,10 @@ ALLEGRO_BITMAP *dv_wall_left, *dv_wall_center, *dv_wall_right,
 
 /* palace vga */
 ALLEGRO_BITMAP *pv_wall_face, *pv_wall_face_top,
+  *pv_wall_mark_00, *pv_wall_mark_01, *pv_wall_mark_02,
   *pv_wall_mark_03, *pv_wall_mark_04, *pv_wall_mark_05, *pv_wall_mark_06,
   *pv_wall_mark_07, *pv_wall_mark_08, *pv_wall_mark_09, *pv_wall_mark_10,
-  *pv_wall_mark_11, *pv_wall_mark_12, *pv_wall_mark_13, *pv_wall_mark_14,
-  *pv_wall_mark_15, *pv_wall_mark_16, *pv_wall_mark_17;
+  *pv_wall_mark_11, *pv_wall_mark_12, *pv_wall_mark_13, *pv_wall_mark_14;
 
 void
 load_wall (void)
@@ -67,6 +67,9 @@ load_wall (void)
   /* palace vga */
   pv_wall_face = load_bitmap (PV_WALL_FACE);
   pv_wall_face_top = load_bitmap (PV_WALL_FACE_TOP);
+  pv_wall_mark_00 = load_bitmap (PV_WALL_MARK_00);
+  pv_wall_mark_01 = load_bitmap (PV_WALL_MARK_01);
+  pv_wall_mark_02 = load_bitmap (PV_WALL_MARK_02);
   pv_wall_mark_03 = load_bitmap (PV_WALL_MARK_03);
   pv_wall_mark_04 = load_bitmap (PV_WALL_MARK_04);
   pv_wall_mark_05 = load_bitmap (PV_WALL_MARK_05);
@@ -79,9 +82,6 @@ load_wall (void)
   pv_wall_mark_12 = load_bitmap (PV_WALL_MARK_12);
   pv_wall_mark_13 = load_bitmap (PV_WALL_MARK_13);
   pv_wall_mark_14 = load_bitmap (PV_WALL_MARK_14);
-  pv_wall_mark_15 = load_bitmap (PV_WALL_MARK_15);
-  pv_wall_mark_16 = load_bitmap (PV_WALL_MARK_16);
-  pv_wall_mark_17 = load_bitmap (PV_WALL_MARK_17);
 }
 
 void
@@ -109,6 +109,9 @@ unload_wall (void)
   /* palace vga */
   al_destroy_bitmap (pv_wall_face);
   al_destroy_bitmap (pv_wall_face_top);
+  al_destroy_bitmap (pv_wall_mark_00);
+  al_destroy_bitmap (pv_wall_mark_01);
+  al_destroy_bitmap (pv_wall_mark_02);
   al_destroy_bitmap (pv_wall_mark_03);
   al_destroy_bitmap (pv_wall_mark_04);
   al_destroy_bitmap (pv_wall_mark_05);
@@ -121,9 +124,6 @@ unload_wall (void)
   al_destroy_bitmap (pv_wall_mark_12);
   al_destroy_bitmap (pv_wall_mark_13);
   al_destroy_bitmap (pv_wall_mark_14);
-  al_destroy_bitmap (pv_wall_mark_15);
-  al_destroy_bitmap (pv_wall_mark_16);
-  al_destroy_bitmap (pv_wall_mark_17);
 }
 
 void
@@ -257,11 +257,41 @@ draw_pv_wall (ALLEGRO_BITMAP *bitmap, struct pos *p)
 void
 draw_pv_wall_base (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
+  draw_pv_wall_brick (bitmap, p, 3, 0);
   return;
 }
 
+void
+draw_pv_wall_left (ALLEGRO_BITMAP *bitmap, struct pos *p)
+{
+  draw_pv_wall_brick (bitmap, p, 0, 0);
+  draw_pv_wall_brick (bitmap, p, 1, 0);
+  draw_pv_wall_brick (bitmap, p, 1, 1);
+  draw_pv_wall_brick (bitmap, p, 2, 0);
+  draw_pv_wall_brick (bitmap, p, 2, 1);
+  return;
+}
+
+void
+draw_pv_wall_brick (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                    int row, int col)
+{
+  struct rect r;
+  struct frame f0, f1;
+  f0.flip = f1.flip = 0;
+
+  ALLEGRO_COLOR c = compute_palace_wall_color (p, row, col);
+  palace_wall_brick_rect (p, row, col, &r);
+  draw_filled_rect (bitmap, &r, c);
+
+  palace_wall_mark_frame (p, row, &f0);
+  palace_wall_mark_frame (p, row + 1, &f1);
+  draw_frame (bitmap, &f0);
+  draw_frame (bitmap, &f1);
+}
+
 ALLEGRO_COLOR
-get_palace_wall_color (int i)
+palace_wall_color (int i)
 {
   switch (i) {
   case 0: return PALACE_WALL_COLOR_00;
@@ -280,36 +310,16 @@ ALLEGRO_COLOR
 compute_palace_wall_color (struct pos *p, int row, int col)
 {
   int r;
-  r = prandom_seq (p->room, p->floor * 4 * 11
+  struct pos np; npos (p, &np);
+  r = prandom_seq (np.room, np.floor * 4 * 11
                    + row * 11
-                   + p->place + col, 11, 3);
-  return get_palace_wall_color ((row % 2 ? 0 : 4) + r);
-}
-
-void
-draw_pv_wall_left (ALLEGRO_BITMAP *bitmap, struct pos *p)
-{
-  draw_pv_wall_brick (bitmap, p, 0, 0);
-  draw_pv_wall_brick (bitmap, p, 1, 0);
-  draw_pv_wall_brick (bitmap, p, 1, 1);
-  draw_pv_wall_brick (bitmap, p, 2, 0);
-  draw_pv_wall_brick (bitmap, p, 2, 1);
-  draw_pv_wall_brick (bitmap, p, 3, 0);
-  return;
-}
-
-void
-draw_pv_wall_brick (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                    int row, int col)
-{
-  struct rect r;
-  ALLEGRO_COLOR c = compute_palace_wall_color (p, row, col);
-  palace_wall_brick_rect (p, row, col, &r);
-  draw_filled_rect (bitmap, &r, c);
+                   + np.place + col, 11, 3);
+  return palace_wall_color ((row % 2 ? 0 : 4) + r);
 }
 
 struct rect *
-palace_wall_brick_rect (struct pos *p, int row, int col, struct rect *r)
+palace_wall_brick_rect (struct pos *p, int row, int col,
+                        struct rect *r)
 {
   r->c.room = p->room;
   r->c.x = PLACE_WIDTH * p->place;
@@ -324,13 +334,13 @@ palace_wall_brick_rect (struct pos *p, int row, int col, struct rect *r)
     r->c.y += 20;
     r->c.x += 16 * (col % 2);
     r->w = 16;
-    r->h = 20;
+    r->h = 21;
     break;
   case 2:
-    r->c.y += 40;
+    r->c.y += 41;
     r->c.x += 8 * (col % 2);
     r->w = (col % 2) ? 24 : 8;
-    r->h = 20;
+    r->h = 19;
     break;
   case 3:
     r->c.y += 60;
@@ -340,6 +350,66 @@ palace_wall_brick_rect (struct pos *p, int row, int col, struct rect *r)
   }
 
   return r;
+}
+
+ALLEGRO_BITMAP *
+palace_wall_mark (int i)
+{
+  switch (i) {
+  case 0: return pv_wall_mark_00;
+  case 1: return pv_wall_mark_01;
+  case 2: return pv_wall_mark_02;
+  case 3: return pv_wall_mark_03;
+  case 4: return pv_wall_mark_04;
+  case 5: return pv_wall_mark_05;
+  case 6: return pv_wall_mark_06;
+  case 7: return pv_wall_mark_07;
+  case 8: return pv_wall_mark_08;
+  case 9: return pv_wall_mark_09;
+  case 10: return pv_wall_mark_10;
+  case 11: return pv_wall_mark_11;
+  case 12: return pv_wall_mark_12;
+  case 13: return pv_wall_mark_13;
+  case 14: return pv_wall_mark_14;
+  }
+  return NULL;
+}
+
+struct frame *
+palace_wall_mark_frame (struct pos *p, int i, struct frame *f)
+{
+  int r = prandom_seq_pos (p, i, 1, 2);
+  f->c.room = p->room;
+
+  switch (i) {
+  case 0:
+    f->b = palace_wall_mark (r);
+    f->c.x = PLACE_WIDTH * (p->place + 1) - 8;
+    f->c.y = PLACE_HEIGHT * p->floor + 3;
+    break;
+  case 1:
+    f->b = palace_wall_mark (r + 3);
+    f->c.x = PLACE_WIDTH * p->place;
+    f->c.y = PLACE_HEIGHT * p->floor + 17;
+    break;
+  case 2:
+    f->b = palace_wall_mark (r + 6);
+    f->c.x = PLACE_WIDTH * p->place;
+    f->c.y = PLACE_HEIGHT * p->floor + 38;
+    break;
+  case 3:
+    f->b = palace_wall_mark (r + 9);
+    f->c.x = PLACE_WIDTH * p->place;
+    f->c.y = PLACE_HEIGHT * p->floor + 58;
+    break;
+  case 4:
+    f->b = palace_wall_mark (r + 12);
+    f->c.x = PLACE_WIDTH * p->place;
+    f->c.y = PLACE_HEIGHT * p->floor + 63;
+    break;
+  }
+
+  return f;
 }
 
 void

@@ -31,7 +31,6 @@
 #define PV_BRICKS_02 "data/bricks/pv-02.png"
 #define PV_BRICKS_03 "data/bricks/pv-03.png"
 #define PV_BRICKS_04 "data/bricks/pv-04.png"
-#define PV_BRICKS_05 "data/bricks/pv-05.png"
 
 void load_bricks (void);
 void unload_bricks (void);
@@ -43,8 +42,6 @@ void draw_bricks_03 (ALLEGRO_BITMAP *bitmap, struct pos *p,
                      enum em em, enum vm vm);
 void draw_bricks_04 (ALLEGRO_BITMAP *bitmap, struct pos *p,
                      enum em em, enum vm vm);
-void draw_bricks_05 (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                     enum em em, enum vm vm);
 struct coord *d_bricks_coord_01 (struct pos *p, struct coord *c);
 struct coord *p_bricks_coord_01 (struct pos *p, struct coord *c);
 struct coord *d_bricks_coord_02 (struct pos *p, struct coord *c);
@@ -53,6 +50,5 @@ struct coord *d_bricks_coord_03 (struct pos *p, struct coord *c);
 struct coord *p_bricks_coord_03 (struct pos *p, struct coord *c);
 struct coord *d_bricks_coord_04 (struct pos *p, struct coord *c);
 struct coord *p_bricks_coord_04 (struct pos *p, struct coord *c);
-struct coord *p_bricks_coord_05 (struct pos *p, struct coord *c);
 
 #endif	/* FREEPOP_BRICKS_H */
