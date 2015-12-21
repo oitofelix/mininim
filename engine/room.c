@@ -112,6 +112,18 @@ unload_room (void)
   unload_chopper_samples ();
 }
 
+struct rect
+new_rect (int room, int x, int y, int w, int h)
+{
+  struct rect r;
+  r.c.room = room;
+  r.c.x = x;
+  r.c.y = y;
+  r.w = w;
+  r.h = h;
+  return r;
+}
+
 void
 draw_filled_rect (ALLEGRO_BITMAP *to, struct rect *r,
                   ALLEGRO_COLOR color)

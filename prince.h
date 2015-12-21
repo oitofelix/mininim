@@ -97,6 +97,8 @@
 #define V_FIRE_COLOR_01 (al_map_rgb (252, 132, 0))
 #define V_FIRE_COLOR_02 (al_map_rgb (252, 252, 0))
 
+#define LIVES_RECT_COLOR (al_map_rgba (0, 0, 0, 170))
+
 /* environment mode */
 enum em {
   DUNGEON, PALACE,

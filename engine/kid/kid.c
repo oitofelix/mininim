@@ -467,11 +467,11 @@ draw_kid_lives (ALLEGRO_BITMAP *bitmap, struct anim *kid, int j)
 {
   int i;
   struct coord c;
+  struct rect r =
+    new_rect (room_view, 0, ORIGINAL_HEIGHT - 8,
+              7 * kid->total_lives, ORIGINAL_HEIGHT - 1);
 
-  al_set_target_bitmap (screen);
-  al_draw_filled_rectangle (0, ORIGINAL_HEIGHT - 8,
-                            7 * kid->total_lives, ORIGINAL_HEIGHT,
-                            al_map_rgba (0, 0, 0, 170));
+  draw_filled_rect (bitmap, &r, LIVES_RECT_COLOR);
 
   for (i = 0; i < kid->total_lives; i++)
     draw_bitmapc (kid_empty_life, bitmap, kid_life_coord (i, &c), 0);
