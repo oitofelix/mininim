@@ -226,17 +226,19 @@ update_wall_cache (int room, enum em em, enum vm vm)
 }
 
 void
-draw_wall_cache (ALLEGRO_BITMAP *bitmap)
-{
-  draw_bitmap (wall_cache, bitmap, 0, 0, 0);
-}
-
-void
 draw_wall_left_cache (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   struct coord c; wall_coord (p, &c);
   draw_bitmap_regionc (wall_cache, bitmap, c.x, c.y,
                        PLACE_WIDTH, PLACE_HEIGHT - 3, &c, 0);
+}
+
+void
+draw_wall_base_cache (ALLEGRO_BITMAP *bitmap, struct pos *p)
+{
+  struct coord c; wall_base_coord (p, &c);
+  draw_bitmap_regionc (wall_cache, bitmap, c.x, c.y,
+                       PLACE_WIDTH, 3, &c, 0);
 }
 
 enum wall_correlation
