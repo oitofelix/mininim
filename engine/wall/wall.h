@@ -45,6 +45,10 @@ void draw_wall_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
 void draw_wall_face (ALLEGRO_BITMAP *bitmap, struct pos *p,
                      enum em, enum vm vm);
 
+void update_wall_cache (int room, enum em em, enum vm vm);
+void draw_wall_cache (ALLEGRO_BITMAP *bitmap);
+void draw_wall_left_cache (ALLEGRO_BITMAP *bitmap, struct pos *p);
+
 enum wall_correlation wall_correlation (struct pos *p);
 struct coord *wall_base_coord (struct pos *p, struct coord *c);
 struct coord *wall_coord (struct pos *p, struct coord *c);

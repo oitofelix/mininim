@@ -28,6 +28,9 @@
 #include "wall-pv.h"
 #include "wall.h"
 
+/* wall cache */
+static ALLEGRO_BITMAP *wall_cache;
+
 /* dungeon ega */
 ALLEGRO_BITMAP *de_wall_face, *de_wall_face_top;
 
@@ -55,6 +58,9 @@ load_wall (void)
   /* modules */
   load_wall_depedv ();
   load_wall_pv ();
+
+  /* wall cache */
+  wall_cache = create_bitmap (ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
 }
 
 void
@@ -75,6 +81,9 @@ unload_wall (void)
   /* modules */
   unload_wall_depedv ();
   unload_wall_pv ();
+
+  /* wall cache */
+  al_destroy_bitmap (wall_cache);
 }
 
 void
@@ -198,6 +207,36 @@ draw_wall_face (ALLEGRO_BITMAP *bitmap, struct pos *p,
   struct coord c;
   draw_bitmapc (wall_face, bitmap, wall_face_coord (p, &c), 0);
   draw_bitmapc (wall_face_top, bitmap, wall_face_top_coord (p, &c), 0);
+}
+
+void
+update_wall_cache (int room, enum em em, enum vm vm)
+{
+  struct pos p;
+  p.room = room;
+
+  clear_bitmap (wall_cache, TRANSPARENT);
+
+  for (p.floor = FLOORS; p.floor >= -1; p.floor--)
+    for (p.place = -1; p.place < PLACES; p.place++)
+      if (con (&p)->fg == WALL) {
+        draw_wall_base (wall_cache, &p, em, vm);
+        draw_wall_left (wall_cache, &p, em, vm);
+      }
+}
+
+void
+draw_wall_cache (ALLEGRO_BITMAP *bitmap)
+{
+  draw_bitmap (wall_cache, bitmap, 0, 0, 0);
+}
+
+void
+draw_wall_left_cache (ALLEGRO_BITMAP *bitmap, struct pos *p)
+{
+  struct coord c; wall_coord (p, &c);
+  draw_bitmap_regionc (wall_cache, bitmap, c.x, c.y,
+                       PLACE_WIDTH, PLACE_HEIGHT - 3, &c, 0);
 }
 
 enum wall_correlation
