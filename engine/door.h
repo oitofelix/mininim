@@ -28,6 +28,14 @@
 #define DOOR_CLIMB_LIMIT 40
 #define DOOR_WAIT_LOOK 4
 
+/* dungeon ega */
+#define DE_DOOR_LEFT "data/door/de-left.png"
+#define DE_DOOR_RIGHT "data/door/de-right.png"
+#define DE_DOOR_POLE "data/door/de-pole.png"
+#define DE_DOOR_TOP "data/door/de-top.png"
+#define DE_DOOR_GRID "data/door/de-grid.png"
+#define DE_DOOR_GRID_TIP "data/door/de-grid-tip.png"
+
 /* dungeon vga */
 #define DV_DOOR_LEFT "data/door/dv-left.png"
 #define DV_DOOR_RIGHT "data/door/dv-right.png"

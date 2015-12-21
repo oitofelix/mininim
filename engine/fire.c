@@ -26,53 +26,97 @@
 #include "room.h"
 #include "fire.h"
 
-static ALLEGRO_BITMAP *fire_01, *fire_02, *fire_03, *fire_04, *fire_05,
-  *fire_06, *fire_07, *fire_08, *fire_09;
+static ALLEGRO_COLOR e_fire_palette (ALLEGRO_COLOR c);
+
+/* vga */
+static ALLEGRO_BITMAP *v_fire_01, *v_fire_02, *v_fire_03, *v_fire_04,
+  *v_fire_05, *v_fire_06, *v_fire_07, *v_fire_08, *v_fire_09;
+
+/* ega */
+static ALLEGRO_BITMAP *e_fire_01, *e_fire_02, *e_fire_03, *e_fire_04,
+  *e_fire_05, *e_fire_06, *e_fire_07, *e_fire_08, *e_fire_09;
 
 void
 load_fire (void)
 {
-  fire_01 = load_bitmap (FIRE_01);
-  fire_02 = load_bitmap (FIRE_02);
-  fire_03 = load_bitmap (FIRE_03);
-  fire_04 = load_bitmap (FIRE_04);
-  fire_05 = load_bitmap (FIRE_05);
-  fire_06 = load_bitmap (FIRE_06);
-  fire_07 = load_bitmap (FIRE_07);
-  fire_08 = load_bitmap (FIRE_08);
-  fire_09 = load_bitmap (FIRE_09);
+  /* vga */
+  v_fire_01 = load_bitmap (V_FIRE_01);
+  v_fire_02 = load_bitmap (V_FIRE_02);
+  v_fire_03 = load_bitmap (V_FIRE_03);
+  v_fire_04 = load_bitmap (V_FIRE_04);
+  v_fire_05 = load_bitmap (V_FIRE_05);
+  v_fire_06 = load_bitmap (V_FIRE_06);
+  v_fire_07 = load_bitmap (V_FIRE_07);
+  v_fire_08 = load_bitmap (V_FIRE_08);
+  v_fire_09 = load_bitmap (V_FIRE_09);
+
+  /* ega */
+  e_fire_01 = apply_palette (v_fire_01, e_fire_palette);
+  e_fire_02 = apply_palette (v_fire_02, e_fire_palette);
+  e_fire_03 = apply_palette (v_fire_03, e_fire_palette);
+  e_fire_04 = apply_palette (v_fire_04, e_fire_palette);
+  e_fire_05 = apply_palette (v_fire_05, e_fire_palette);
+  e_fire_06 = apply_palette (v_fire_06, e_fire_palette);
+  e_fire_07 = apply_palette (v_fire_07, e_fire_palette);
+  e_fire_08 = apply_palette (v_fire_08, e_fire_palette);
+  e_fire_09 = apply_palette (v_fire_09, e_fire_palette);
 }
 
 void
 unload_fire (void)
 {
-  /* bitmaps */
-  al_destroy_bitmap (fire_01);
-  al_destroy_bitmap (fire_02);
-  al_destroy_bitmap (fire_03);
-  al_destroy_bitmap (fire_04);
-  al_destroy_bitmap (fire_05);
-  al_destroy_bitmap (fire_06);
-  al_destroy_bitmap (fire_07);
-  al_destroy_bitmap (fire_08);
-  al_destroy_bitmap (fire_09);
+  /* vga */
+  al_destroy_bitmap (v_fire_01);
+  al_destroy_bitmap (v_fire_02);
+  al_destroy_bitmap (v_fire_03);
+  al_destroy_bitmap (v_fire_04);
+  al_destroy_bitmap (v_fire_05);
+  al_destroy_bitmap (v_fire_06);
+  al_destroy_bitmap (v_fire_07);
+  al_destroy_bitmap (v_fire_08);
+  al_destroy_bitmap (v_fire_09);
+
+  /* ega */
+  al_destroy_bitmap (e_fire_01);
+  al_destroy_bitmap (e_fire_02);
+  al_destroy_bitmap (e_fire_03);
+  al_destroy_bitmap (e_fire_04);
+  al_destroy_bitmap (e_fire_05);
+  al_destroy_bitmap (e_fire_06);
+  al_destroy_bitmap (e_fire_07);
+  al_destroy_bitmap (e_fire_08);
+  al_destroy_bitmap (e_fire_09);
 }
 
 static ALLEGRO_BITMAP *
-get_fire_frame (int i)
+get_fire_frame (int i, enum vm vm)
 {
-  switch (i) {
-  case 0: return fire_01;
-  case 1: return fire_02;
-  case 2: return fire_03;
-  case 3: return fire_04;
-  case 4: return fire_05;
-  case 5: return fire_06;
-  case 6: return fire_07;
-  case 7: return fire_08;
-  case 8: return fire_09;
-  default:
-    error (-1, 0, "%s (%i): unknown fire frame", __func__, i);
+  switch (vm) {
+  case CGA: break;
+  case EGA:
+    switch (i) {
+    case 0: return e_fire_01;
+    case 1: return e_fire_02;
+    case 2: return e_fire_03;
+    case 3: return e_fire_04;
+    case 4: return e_fire_05;
+    case 5: return e_fire_06;
+    case 6: return e_fire_07;
+    case 7: return e_fire_08;
+    case 8: return e_fire_09;
+    }
+  case VGA:
+    switch (i) {
+    case 0: return v_fire_01;
+    case 1: return v_fire_02;
+    case 2: return v_fire_03;
+    case 3: return v_fire_04;
+    case 4: return v_fire_05;
+    case 5: return v_fire_06;
+    case 6: return v_fire_07;
+    case 7: return v_fire_08;
+    case 8: return v_fire_09;
+    }
   }
 
   return NULL;
@@ -80,12 +124,12 @@ get_fire_frame (int i)
 
 void
 draw_fire (ALLEGRO_BITMAP* bitmap, struct pos *p, int i,
-           enum em em, enum vm vm)
+           enum vm vm)
 {
   struct coord c;
   if (con (p)->bg != TORCH) return;
 
-  ALLEGRO_BITMAP *fire = get_fire_frame (prandom_pos_uniq (p, i, 1, 8));
+  ALLEGRO_BITMAP *fire = get_fire_frame (prandom_pos_uniq (p, i, 1, 8), vm);
   int flip = prandom_pos (p, 1);
   fire_coord (p, &c);
   c.x -= flip;
@@ -99,8 +143,8 @@ draw_princess_room_fire (void)
 {
   static int i = 0;
 
-  ALLEGRO_BITMAP *fire_0 = get_fire_frame (prandom_uniq (FIRE_RANDOM_SEED_0 + i, 1, 8));
-  ALLEGRO_BITMAP *fire_1 = get_fire_frame (prandom_uniq (FIRE_RANDOM_SEED_1 + i, 1, 8));
+  ALLEGRO_BITMAP *fire_0 = get_fire_frame (prandom_uniq (FIRE_RANDOM_SEED_0 + i, 1, 8), VGA);
+  ALLEGRO_BITMAP *fire_1 = get_fire_frame (prandom_uniq (FIRE_RANDOM_SEED_1 + i, 1, 8), VGA);
 
   draw_bitmap (fire_0, screen, 92, 99, prandom (1) ? ALLEGRO_FLIP_HORIZONTAL : 0);
   draw_bitmap (fire_1, screen, 210, 99, prandom (1) ? ALLEGRO_FLIP_HORIZONTAL : 0);
@@ -115,4 +159,12 @@ fire_coord (struct pos *p, struct coord *c)
   c->y = PLACE_HEIGHT * p->floor + 5;
   c->room = p->room;
   return c;
+}
+
+static ALLEGRO_COLOR
+e_fire_palette (ALLEGRO_COLOR c)
+{
+  if (color_eq (c, V_FIRE_COLOR_01)) return E_FIRE_COLOR_01;
+  else if (color_eq (c, V_FIRE_COLOR_02)) return E_FIRE_COLOR_02;
+  else return c;
 }

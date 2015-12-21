@@ -1,8 +1,9 @@
 KERNEL_MODULES = event timer video audio memory keyboard random array
 ENGINE_MODULES = anim pos physics level consistency stars floor				\
   broken-floor skeleton-floor loose-floor opener-floor closer-floor		\
-  spikes-floor door level-door pillar big-pillar wall chopper bricks	\
-  torch window room fire potion sword clock princess jaffar
+  spikes-floor door level-door pillar big-pillar chopper bricks torch	\
+  window room fire potion sword clock princess jaffar
+WALL_MODULES = wall wall-depedv wall-pv
 KID_MODULES = kid kid-normal kid-walk kid-start-run kid-run						\
   kid-stop-run kid-turn-run kid-couch kid-turn kid-stabilize kid-jump	\
   kid-vjump kid-run-jump kid-misstep kid-hang kid-hang-wall						\
@@ -13,8 +14,9 @@ KID_MODULES = kid kid-normal kid-walk kid-start-run kid-run						\
 LEVEL_MODULES = title level-1 consistency-level
 MAIN_MODULES = prince
 
-MODULES = ${KERNEL_MODULES:%=kernel/%} ${ENGINE_MODULES:%=engine/%}		\
-	${KID_MODULES:%=engine/kid/%} ${LEVEL_MODULES:%=levels/%} ${MAIN_MODULES}
+MODULES = ${KERNEL_MODULES:%=kernel/%} ${ENGINE_MODULES:%=engine/%}	\
+	${WALL_MODULES:%=engine/wall/%} ${KID_MODULES:%=engine/kid/%}			\
+	${LEVEL_MODULES:%=levels/%} ${MAIN_MODULES}
 
 SRCS = ${MODULES:=.c}
 OBJECTS = ${MODULES:=.o}

@@ -20,6 +20,9 @@
 #ifndef FREEPOP_WINDOW_H
 #define FREEPOP_WINDOW_H
 
+/* dungeon ega */
+#define DE_WINDOW "data/window/de.png"
+
 /* dungeon vga */
 #define DV_WINDOW "data/window/dv.png"
 

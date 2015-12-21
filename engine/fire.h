@@ -24,21 +24,21 @@
 #define FIRE_RANDOM_SEED_0 234423479
 #define FIRE_RANDOM_SEED_1 501477214
 
-/* bitmap resources */
-#define FIRE_01 "data/fire/01.png"
-#define FIRE_02 "data/fire/02.png"
-#define FIRE_03 "data/fire/03.png"
-#define FIRE_04 "data/fire/04.png"
-#define FIRE_05 "data/fire/05.png"
-#define FIRE_06 "data/fire/06.png"
-#define FIRE_07 "data/fire/07.png"
-#define FIRE_08 "data/fire/08.png"
-#define FIRE_09 "data/fire/09.png"
+/* vga */
+#define V_FIRE_01 "data/fire/v-01.png"
+#define V_FIRE_02 "data/fire/v-02.png"
+#define V_FIRE_03 "data/fire/v-03.png"
+#define V_FIRE_04 "data/fire/v-04.png"
+#define V_FIRE_05 "data/fire/v-05.png"
+#define V_FIRE_06 "data/fire/v-06.png"
+#define V_FIRE_07 "data/fire/v-07.png"
+#define V_FIRE_08 "data/fire/v-08.png"
+#define V_FIRE_09 "data/fire/v-09.png"
 
 void load_fire (void);
 void unload_fire (void);
 void draw_fire (ALLEGRO_BITMAP* bitmap, struct pos *p, int i,
-                enum em em, enum vm vm);
+                enum vm vm);
 void draw_princess_room_fire (void);
 struct coord *fire_coord (struct pos *p, struct coord *c);
 

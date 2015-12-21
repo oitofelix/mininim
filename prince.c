@@ -26,8 +26,6 @@
 #include "levels/level-1.h"
 #include "levels/consistency-level.h"
 
-#include "engine/wall.h"
-
 int
 main (int argc, char **argv)
 {

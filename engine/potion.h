@@ -20,6 +20,10 @@
 #ifndef FREEPOP_POTION_H
 #define FREEPOP_POTION_H
 
+/* dungeon ega */
+#define DE_SMALL_POTION "data/potion/de-small.png"
+#define DE_BIG_POTION "data/potion/de-big.png"
+
 /* dungeon vga */
 #define DV_SMALL_POTION "data/potion/dv-small.png"
 #define DV_BIG_POTION "data/potion/dv-big.png"

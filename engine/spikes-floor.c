@@ -27,6 +27,14 @@
 #include "floor.h"
 #include "spikes-floor.h"
 
+/* dungeon ega */
+ALLEGRO_BITMAP *de_spikes_floor_left, *de_spikes_floor_right,
+  *de_spikes_left_01, *de_spikes_right_01, *de_spikes_fg_01,
+  *de_spikes_left_02, *de_spikes_right_02, *de_spikes_fg_02,
+  *de_spikes_left_03, *de_spikes_right_03, *de_spikes_fg_03,
+  *de_spikes_left_04, *de_spikes_right_04, *de_spikes_fg_04,
+  *de_spikes_left_05, *de_spikes_right_05, *de_spikes_fg_05;
+
 /* dungeon vga */
 ALLEGRO_BITMAP *dv_spikes_floor_left, *dv_spikes_floor_right,
   *dv_spikes_left_01, *dv_spikes_right_01, *dv_spikes_fg_01,
@@ -52,6 +60,25 @@ static size_t spikes_floor_nmemb = 0;
 void
 load_spikes_floor (void)
 {
+  /* dungeon ega */
+  de_spikes_floor_left = load_bitmap (DE_SPIKES_FLOOR_LEFT);
+  de_spikes_floor_right = load_bitmap (DE_SPIKES_FLOOR_RIGHT);
+  de_spikes_left_01 = load_bitmap (DE_SPIKES_LEFT_01);
+  de_spikes_right_01 = load_bitmap (DE_SPIKES_RIGHT_01);
+  de_spikes_fg_01 = load_bitmap (DE_SPIKES_FG_01);
+  de_spikes_left_02 = load_bitmap (DE_SPIKES_LEFT_02);
+  de_spikes_right_02 = load_bitmap (DE_SPIKES_RIGHT_02);
+  de_spikes_fg_02 = load_bitmap (DE_SPIKES_FG_02);
+  de_spikes_left_03 = load_bitmap (DE_SPIKES_LEFT_03);
+  de_spikes_right_03 = load_bitmap (DE_SPIKES_RIGHT_03);
+  de_spikes_fg_03 = load_bitmap (DE_SPIKES_FG_03);
+  de_spikes_left_04 = load_bitmap (DE_SPIKES_LEFT_04);
+  de_spikes_right_04 = load_bitmap (DE_SPIKES_RIGHT_04);
+  de_spikes_fg_04 = load_bitmap (DE_SPIKES_FG_04);
+  de_spikes_left_05 = load_bitmap (DE_SPIKES_LEFT_05);
+  de_spikes_right_05 = load_bitmap (DE_SPIKES_RIGHT_05);
+  de_spikes_fg_05 = load_bitmap (DE_SPIKES_FG_05);
+
   /* dungeon vga */
   dv_spikes_floor_left = load_bitmap (DV_SPIKES_FLOOR_LEFT);
   dv_spikes_floor_right = load_bitmap (DV_SPIKES_FLOOR_RIGHT);
@@ -94,6 +121,25 @@ load_spikes_floor (void)
 void
 unload_spikes_floor (void)
 {
+  /* dungeon ega */
+  al_destroy_bitmap (de_spikes_floor_left);
+  al_destroy_bitmap (de_spikes_floor_right);
+  al_destroy_bitmap (de_spikes_left_01);
+  al_destroy_bitmap (de_spikes_right_01);
+  al_destroy_bitmap (de_spikes_fg_01);
+  al_destroy_bitmap (de_spikes_left_02);
+  al_destroy_bitmap (de_spikes_right_02);
+  al_destroy_bitmap (de_spikes_fg_02);
+  al_destroy_bitmap (de_spikes_left_03);
+  al_destroy_bitmap (de_spikes_right_03);
+  al_destroy_bitmap (de_spikes_fg_03);
+  al_destroy_bitmap (de_spikes_left_04);
+  al_destroy_bitmap (de_spikes_right_04);
+  al_destroy_bitmap (de_spikes_fg_04);
+  al_destroy_bitmap (de_spikes_left_05);
+  al_destroy_bitmap (de_spikes_right_05);
+  al_destroy_bitmap (de_spikes_fg_05);
+
   /* dungeon vga */
   al_destroy_bitmap (dv_spikes_floor_left);
   al_destroy_bitmap (dv_spikes_floor_right);
@@ -362,7 +408,7 @@ draw_spikes_floor_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case DUNGEON:
     switch (vm) {
     case CGA: break;
-    case EGA: break;
+    case EGA: spikes_floor_left = de_spikes_floor_left; break;
     case VGA: spikes_floor_left = dv_spikes_floor_left; break;
     }
     break;
@@ -389,7 +435,7 @@ draw_spikes_floor_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case DUNGEON:
     switch (vm) {
     case CGA: break;
-    case EGA: break;
+    case EGA: spikes_floor_right = de_spikes_floor_right; break;
     case VGA: spikes_floor_right = dv_spikes_floor_right; break;
     }
     break;
@@ -479,7 +525,7 @@ draw_spikes_left_01 (ALLEGRO_BITMAP *bitmap, struct pos *p,
     spikes_left_01_coord = d_spikes_left_01_coord;
     switch (vm) {
     case CGA: break;
-    case EGA: break;
+    case EGA: spikes_left_01 = de_spikes_left_01; break;
     case VGA: spikes_left_01 = dv_spikes_left_01; break;
     }
     break;
@@ -509,7 +555,7 @@ draw_spikes_right_01 (ALLEGRO_BITMAP *bitmap, struct pos *p,
     spikes_right_01_coord = d_spikes_right_01_coord;
     switch (vm) {
     case CGA: break;
-    case EGA: break;
+    case EGA: spikes_right_01 = de_spikes_right_01; break;
     case VGA: spikes_right_01 = dv_spikes_right_01; break;
     }
     break;
@@ -539,7 +585,7 @@ draw_spikes_fg_01 (ALLEGRO_BITMAP *bitmap, struct pos *p,
     spikes_fg_01_coord = d_spikes_fg_01_coord;
     switch (vm) {
     case CGA: break;
-    case EGA: break;
+    case EGA: spikes_fg_01 = de_spikes_fg_01; break;
     case VGA: spikes_fg_01 = dv_spikes_fg_01; break;
     }
     break;
@@ -631,7 +677,7 @@ draw_spikes_left_02 (ALLEGRO_BITMAP *bitmap, struct pos *p,
     spikes_left_02_coord = d_spikes_left_02_coord;
     switch (vm) {
     case CGA: break;
-    case EGA: break;
+    case EGA: spikes_left_02 = de_spikes_left_02; break;
     case VGA: spikes_left_02 = dv_spikes_left_02; break;
     }
     break;
@@ -661,7 +707,7 @@ draw_spikes_right_02 (ALLEGRO_BITMAP *bitmap, struct pos *p,
     spikes_right_02_coord = d_spikes_right_02_coord;
     switch (vm) {
     case CGA: break;
-    case EGA: break;
+    case EGA: spikes_right_02 = de_spikes_right_02; break;
     case VGA: spikes_right_02 = dv_spikes_right_02; break;
     }
     break;
@@ -691,7 +737,7 @@ draw_spikes_fg_02 (ALLEGRO_BITMAP *bitmap, struct pos *p,
     spikes_fg_02_coord = d_spikes_fg_02_coord;
     switch (vm) {
     case CGA: break;
-    case EGA: break;
+    case EGA: spikes_fg_02 = de_spikes_fg_02; break;
     case VGA: spikes_fg_02 = dv_spikes_fg_02; break;
     }
     break;
@@ -783,7 +829,7 @@ draw_spikes_left_03 (ALLEGRO_BITMAP *bitmap, struct pos *p,
     spikes_left_03_coord = d_spikes_left_03_coord;
     switch (vm) {
     case CGA: break;
-    case EGA: break;
+    case EGA: spikes_left_03 = de_spikes_left_03; break;
     case VGA: spikes_left_03 = dv_spikes_left_03; break;
     }
     break;
@@ -813,7 +859,7 @@ draw_spikes_right_03 (ALLEGRO_BITMAP *bitmap, struct pos *p,
     spikes_right_03_coord = d_spikes_right_03_coord;
     switch (vm) {
     case CGA: break;
-    case EGA: break;
+    case EGA: spikes_right_03 = de_spikes_right_03; break;
     case VGA: spikes_right_03 = dv_spikes_right_03; break;
     }
     break;
@@ -843,7 +889,7 @@ draw_spikes_fg_03 (ALLEGRO_BITMAP *bitmap, struct pos *p,
     spikes_fg_03_coord = d_spikes_fg_03_coord;
     switch (vm) {
     case CGA: break;
-    case EGA: break;
+    case EGA: spikes_fg_03 = de_spikes_fg_03; break;
     case VGA: spikes_fg_03 = dv_spikes_fg_03; break;
     }
     break;
@@ -935,7 +981,7 @@ draw_spikes_left_04 (ALLEGRO_BITMAP *bitmap, struct pos *p,
     spikes_left_04_coord = d_spikes_left_04_coord;
     switch (vm) {
     case CGA: break;
-    case EGA: break;
+    case EGA: spikes_left_04 = de_spikes_left_04; break;
     case VGA: spikes_left_04 = dv_spikes_left_04; break;
     }
     break;
@@ -965,7 +1011,7 @@ draw_spikes_right_04 (ALLEGRO_BITMAP *bitmap, struct pos *p,
     spikes_right_04_coord = d_spikes_right_04_coord;
     switch (vm) {
     case CGA: break;
-    case EGA: break;
+    case EGA: spikes_right_04 = de_spikes_right_04; break;
     case VGA: spikes_right_04 = dv_spikes_right_04; break;
     }
     break;
@@ -995,7 +1041,7 @@ draw_spikes_fg_04 (ALLEGRO_BITMAP *bitmap, struct pos *p,
     spikes_fg_04_coord = d_spikes_fg_04_coord;
     switch (vm) {
     case CGA: break;
-    case EGA: break;
+    case EGA: spikes_fg_04 = de_spikes_fg_04; break;
     case VGA: spikes_fg_04 = dv_spikes_fg_04; break;
     }
     break;
@@ -1087,7 +1133,7 @@ draw_spikes_left_05 (ALLEGRO_BITMAP *bitmap, struct pos *p,
     spikes_left_05_coord = d_spikes_left_05_coord;
     switch (vm) {
     case CGA: break;
-    case EGA: break;
+    case EGA: spikes_left_05 = de_spikes_left_05; break;
     case VGA: spikes_left_05 = dv_spikes_left_05; break;
     }
     break;
@@ -1117,7 +1163,7 @@ draw_spikes_right_05 (ALLEGRO_BITMAP *bitmap, struct pos *p,
     spikes_right_05_coord = d_spikes_right_05_coord;
     switch (vm) {
     case CGA: break;
-    case EGA: break;
+    case EGA: spikes_right_05 = de_spikes_right_05; break;
     case VGA: spikes_right_05 = dv_spikes_right_05; break;
     }
     break;
@@ -1147,7 +1193,7 @@ draw_spikes_fg_05 (ALLEGRO_BITMAP *bitmap, struct pos *p,
     spikes_fg_05_coord = d_spikes_fg_05_coord;
     switch (vm) {
     case CGA: break;
-    case EGA: break;
+    case EGA: spikes_fg_05 = de_spikes_fg_05; break;
     case VGA: spikes_fg_05 = dv_spikes_fg_05; break;
     }
     break;

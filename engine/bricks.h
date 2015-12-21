@@ -20,6 +20,12 @@
 #ifndef FREEPOP_BRICKS_H
 #define FREEPOP_BRICKS_H
 
+/* dungeon ega */
+#define DE_BRICKS_01 "data/bricks/de-01.png"
+#define DE_BRICKS_02 "data/bricks/de-02.png"
+#define DE_BRICKS_03 "data/bricks/de-03.png"
+#define DE_BRICKS_04 "data/bricks/de-04.png"
+
 /* dungeon vga */
 #define DV_BRICKS_01 "data/bricks/dv-01.png"
 #define DV_BRICKS_02 "data/bricks/dv-02.png"

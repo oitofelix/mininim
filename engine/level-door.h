@@ -24,6 +24,14 @@
 
 #define LEVEL_DOOR_MAX_STEP 43
 
+/* dungeon ega */
+#define DE_LEVEL_DOOR_TOP_LEFT "data/level-door/de-top-left.png"
+#define DE_LEVEL_DOOR_TOP_RIGHT "data/level-door/de-top-right.png"
+#define DE_LEVEL_DOOR_BOTTOM "data/level-door/de-bottom.png"
+#define DE_LEVEL_DOOR_FLOOR "data/level-door/de-floor.png"
+#define DE_LEVEL_DOOR_STAIRS "data/level-door/de-stairs.png"
+#define DE_LEVEL_DOOR_FRONT "data/level-door/de-front.png"
+
 /* dungeon vga */
 #define DV_LEVEL_DOOR_TOP_LEFT "data/level-door/dv-top-left.png"
 #define DV_LEVEL_DOOR_TOP_RIGHT "data/level-door/dv-top-right.png"

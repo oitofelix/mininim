@@ -22,6 +22,14 @@
 
 #include "physics.h"
 
+/* dungeon ega */
+#define DE_BIG_PILLAR_BOTTOM_LEFT "data/big-pillar/de-bottom-left.png"
+#define DE_BIG_PILLAR_BOTTOM_RIGHT "data/big-pillar/de-bottom-right.png"
+#define DE_BIG_PILLAR_TOP_LEFT "data/big-pillar/de-top-left.png"
+#define DE_BIG_PILLAR_TOP_RIGHT "data/big-pillar/de-top-right.png"
+#define DE_BIG_PILLAR_TOP_RIGHT_TOP "data/big-pillar/de-top-right-top.png"
+#define DE_BIG_PILLAR_BOTTOM_FG "data/big-pillar/de-bottom-fg.png"
+
 /* dungeon vga */
 #define DV_BIG_PILLAR_BOTTOM_LEFT "data/big-pillar/dv-bottom-left.png"
 #define DV_BIG_PILLAR_BOTTOM_RIGHT "data/big-pillar/dv-bottom-right.png"

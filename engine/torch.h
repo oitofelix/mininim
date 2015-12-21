@@ -20,6 +20,9 @@
 #ifndef FREEPOP_TORCH_H
 #define FREEPOP_TORCH_H
 
+/* dungeon ega */
+#define DE_TORCH "data/torch/de.png"
+
 /* dungeon vga */
 #define DV_TORCH "data/torch/dv.png"
 

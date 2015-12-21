@@ -25,10 +25,12 @@
 #include "physics.h"
 #include "kid/kid.h"
 #include "pillar.h"
-#include "wall.h"
 #include "level.h"
 #include "room.h"
 #include "torch.h"
+
+/* dungeon ega */
+ALLEGRO_BITMAP *de_torch;
 
 /* dungeon vga */
 ALLEGRO_BITMAP *dv_torch;
@@ -39,6 +41,9 @@ ALLEGRO_BITMAP *pv_torch;
 void
 load_torch (void)
 {
+  /* dungeon ega */
+  de_torch = load_bitmap (DE_TORCH);
+
   /* dungeon vga */
   dv_torch = load_bitmap (DV_TORCH);
 
@@ -49,6 +54,9 @@ load_torch (void)
 void
 unload_torch (void)
 {
+  /* dungeon vga */
+  al_destroy_bitmap (de_torch);
+
   /* dungeon vga */
   al_destroy_bitmap (dv_torch);
 
@@ -66,7 +74,7 @@ draw_torch (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case DUNGEON:
     switch (vm) {
     case CGA: break;
-    case EGA: break;
+    case EGA: torch = de_torch; break;
     case VGA: torch = dv_torch; break;
     }
     break;

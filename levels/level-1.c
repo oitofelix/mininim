@@ -101,7 +101,7 @@ static struct level level_1 = {
 
     [23] =
     {{{WALL}, {WALL}, {WALL}, {WALL}, {FLOOR},
-      {FLOOR,NO_BG,{BIG_LIFE_POTION}}, {FLOOR,TORCH}, {CHOPPER}, {FLOOR}, {DOOR}},
+      {FLOOR,NO_BG,{BIG_LIFE_POTION}}, {FLOOR,TORCH}, {CLOSER_FLOOR}, {FLOOR}, {DOOR}},
      {{WALL}, {WALL}, {WALL}, {WALL}, {WALL},
       {WALL}, {WALL}, {WALL}, {WALL}, {WALL}},
      {{WALL}, {WALL}, {WALL}, {WALL}, {WALL},

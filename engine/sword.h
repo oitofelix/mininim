@@ -23,9 +23,15 @@
 #define SWORD_FRAMESET_NMEMB 34
 extern struct frameset sword_frameset[SWORD_FRAMESET_NMEMB];
 
-/* bitmap resources */
-#define NORMAL_SWORD "data/sword/normal.png"
-#define SHINY_SWORD "data/sword/shiny.png"
+/* ega */
+#define E_NORMAL_SWORD "data/sword/e-normal.png"
+#define E_SHINY_SWORD "data/sword/e-shiny.png"
+
+/* vga */
+#define V_NORMAL_SWORD "data/sword/v-normal.png"
+#define V_SHINY_SWORD "data/sword/v-shiny.png"
+
+/* palettable */
 #define SWORD_01 "data/sword/01.png"
 #define SWORD_02 "data/sword/02.png"
 #define SWORD_03 "data/sword/03.png"
@@ -63,7 +69,7 @@ extern struct frameset sword_frameset[SWORD_FRAMESET_NMEMB];
 
 void load_sword (void);
 void unload_sword (void);
-void draw_sword (ALLEGRO_BITMAP *bitmap, struct pos *p, int i);
+void draw_sword (ALLEGRO_BITMAP *bitmap, struct pos *p, int i, enum vm vm);
 bool is_sword (struct pos *p);
 
 #endif	/* FREEPOP_SWORD_H */

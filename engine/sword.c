@@ -27,11 +27,18 @@
 struct frameset sword_frameset[SWORD_FRAMESET_NMEMB];
 static void init_sword_frameset (void);
 
-static ALLEGRO_BITMAP *normal_sword, *shiny_sword,
-  *sword_01, *sword_02, *sword_03, *sword_04, *sword_05, *sword_06, *sword_07,
-  *sword_08, *sword_09, *sword_10, *sword_11, *sword_12, *sword_13, *sword_14,
-  *sword_15, *sword_16, *sword_17, *sword_18, *sword_19, *sword_20, *sword_21,
-  *sword_22, *sword_23, *sword_24, *sword_25, *sword_26, *sword_27, *sword_28,
+/* ega */
+static ALLEGRO_BITMAP *e_normal_sword, *e_shiny_sword;
+
+/* vga */
+static ALLEGRO_BITMAP *v_normal_sword, *v_shiny_sword;
+
+/* palettable */
+static ALLEGRO_BITMAP *sword_01, *sword_02, *sword_03, *sword_04,
+  *sword_05, *sword_06, *sword_07, *sword_08, *sword_09, *sword_10,
+  *sword_11, *sword_12, *sword_13, *sword_14, *sword_15, *sword_16,
+  *sword_17, *sword_18, *sword_19, *sword_20, *sword_21, *sword_22,
+  *sword_23, *sword_24, *sword_25, *sword_26, *sword_27, *sword_28,
   *sword_29, *sword_30, *sword_31, *sword_32, *sword_33, *sword_34;
 
 static struct coord *sword_coord (struct pos *p, struct coord *c);
@@ -39,9 +46,15 @@ static struct coord *sword_coord (struct pos *p, struct coord *c);
 void
 load_sword (void)
 {
-  /* bitmaps */
-  normal_sword = load_bitmap (NORMAL_SWORD);
-  shiny_sword = load_bitmap (SHINY_SWORD);
+  /* ega */
+  e_normal_sword = load_bitmap (E_NORMAL_SWORD);
+  e_shiny_sword = load_bitmap (E_SHINY_SWORD);
+
+  /* vga */
+  v_normal_sword = load_bitmap (V_NORMAL_SWORD);
+  v_shiny_sword = load_bitmap (V_SHINY_SWORD);
+
+  /* palettable */
   sword_01 = load_bitmap (SWORD_01);
   sword_02 = load_bitmap (SWORD_02);
   sword_03 = load_bitmap (SWORD_03);
@@ -84,8 +97,15 @@ load_sword (void)
 void
 unload_sword (void)
 {
-  al_destroy_bitmap (normal_sword);
-  al_destroy_bitmap (shiny_sword);
+  /* ega */
+  al_destroy_bitmap (e_normal_sword);
+  al_destroy_bitmap (e_shiny_sword);
+
+  /* vga */
+  al_destroy_bitmap (v_normal_sword);
+  al_destroy_bitmap (v_shiny_sword);
+
+  /* palettable */
   al_destroy_bitmap (sword_01);
   al_destroy_bitmap (sword_02);
   al_destroy_bitmap (sword_03);
@@ -144,8 +164,23 @@ init_sword_frameset (void)
 }
 
 void
-draw_sword (ALLEGRO_BITMAP *bitmap, struct pos *p, int i)
+draw_sword (ALLEGRO_BITMAP *bitmap, struct pos *p, int i, enum vm vm)
 {
+  ALLEGRO_BITMAP *normal_sword = NULL,
+    *shiny_sword = NULL;
+
+  switch (vm) {
+  case CGA: break;
+  case EGA:
+    normal_sword = e_normal_sword;
+    shiny_sword = e_shiny_sword;
+    break;
+  case VGA:
+    normal_sword = v_normal_sword;
+    shiny_sword = v_shiny_sword;
+    break;
+  }
+
   struct coord c;
   if (! is_sword (p)) return;
   ALLEGRO_BITMAP *sword = i % 60 ? normal_sword : shiny_sword;

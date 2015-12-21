@@ -22,6 +22,12 @@
 
 #include "physics.h"
 
+/* dungeon ega */
+#define DE_PILLAR_LEFT "data/pillar/de-left.png"
+#define DE_PILLAR_RIGHT "data/pillar/de-right.png"
+#define DE_PILLAR_TOP "data/pillar/de-top.png"
+#define DE_PILLAR_FG "data/pillar/de-fg.png"
+
 /* dungeon vga */
 #define DV_PILLAR_LEFT "data/pillar/dv-left.png"
 #define DV_PILLAR_RIGHT "data/pillar/dv-right.png"

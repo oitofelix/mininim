@@ -73,14 +73,19 @@
 #define TGREEN (al_map_rgba (0, 255, 0, 0))
 #define TBLUE (al_map_rgba (0, 0, 255, 0))
 
-#define PALACE_WALL_COLOR_00 (al_map_rgb (216, 168, 88)) /* 0x61 */
-#define PALACE_WALL_COLOR_01 (al_map_rgb (224, 164, 92)) /* 0x62 */
-#define PALACE_WALL_COLOR_02 (al_map_rgb (224, 168, 96)) /* 0x63 */
-#define PALACE_WALL_COLOR_03 (al_map_rgb (216, 160, 84)) /* 0x64 */
-#define PALACE_WALL_COLOR_04 (al_map_rgb (224, 164, 92)) /* 0x66 */
-#define PALACE_WALL_COLOR_05 (al_map_rgb (216, 164, 88)) /* 0x67 */
-#define PALACE_WALL_COLOR_06 (al_map_rgb (224, 168, 88)) /* 0x68 */
-#define PALACE_WALL_COLOR_07 (al_map_rgb (216, 168, 96)) /* 0x69 */
+#define PALACE_WALL_COLOR_00 (al_map_rgb (216, 168, 88))
+#define PALACE_WALL_COLOR_01 (al_map_rgb (224, 164, 92))
+#define PALACE_WALL_COLOR_02 (al_map_rgb (224, 168, 96))
+#define PALACE_WALL_COLOR_03 (al_map_rgb (216, 160, 84))
+#define PALACE_WALL_COLOR_04 (al_map_rgb (224, 164, 92))
+#define PALACE_WALL_COLOR_05 (al_map_rgb (216, 164, 88))
+#define PALACE_WALL_COLOR_06 (al_map_rgb (224, 168, 88))
+#define PALACE_WALL_COLOR_07 (al_map_rgb (216, 168, 96))
+
+#define E_FIRE_COLOR_01 (al_map_rgb (255, 85, 85))
+#define E_FIRE_COLOR_02 (al_map_rgb (255, 255, 85))
+#define V_FIRE_COLOR_01 (al_map_rgb (252, 132, 0))
+#define V_FIRE_COLOR_02 (al_map_rgb (252, 252, 0))
 
 /* environment mode */
 enum em {

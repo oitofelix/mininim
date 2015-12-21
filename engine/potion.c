@@ -25,6 +25,9 @@
 #include "room.h"
 #include "potion.h"
 
+/* dungeon ega */
+ALLEGRO_BITMAP *de_small_potion, *de_big_potion;
+
 /* dungeon vga */
 ALLEGRO_BITMAP *dv_small_potion, *dv_big_potion;
 
@@ -45,6 +48,10 @@ ALLEGRO_COLOR poison_palette (ALLEGRO_COLOR c);
 void
 load_potion (void)
 {
+  /* dungeon ega */
+  de_small_potion = load_bitmap (DE_SMALL_POTION);
+  de_big_potion = load_bitmap (DE_BIG_POTION);
+
   /* dungeon vga */
   dv_small_potion = load_bitmap (DV_SMALL_POTION);
   dv_big_potion = load_bitmap (DV_BIG_POTION);
@@ -66,6 +73,10 @@ load_potion (void)
 void
 unload_potion (void)
 {
+  /* dungeon ega */
+  al_destroy_bitmap (de_small_potion);
+  al_destroy_bitmap (de_big_potion);
+
   /* dungeon vga */
   al_destroy_bitmap (dv_small_potion);
   al_destroy_bitmap (dv_big_potion);
@@ -115,7 +126,10 @@ draw_potion (ALLEGRO_BITMAP *bitmap, struct pos *p, int i,
   case DUNGEON:
     switch (vm) {
     case CGA: break;
-    case EGA: break;
+    case EGA:
+      small_potion = de_small_potion;
+      big_potion = de_big_potion;
+      break;
     case VGA:
       small_potion = dv_small_potion;
       big_potion = dv_big_potion;

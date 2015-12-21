@@ -25,10 +25,12 @@
 #include "physics.h"
 #include "kid/kid.h"
 #include "pillar.h"
-#include "wall.h"
 #include "level.h"
 #include "room.h"
 #include "window.h"
+
+/* dungeon ega */
+ALLEGRO_BITMAP *de_window;
 
 /* dungeon vga */
 ALLEGRO_BITMAP *dv_window;
@@ -39,6 +41,9 @@ ALLEGRO_BITMAP *pv_window;
 void
 load_window (void)
 {
+  /* dungeon ega */
+  de_window = load_bitmap (DE_WINDOW);
+
   /* dungeon vga */
   dv_window = load_bitmap (DV_WINDOW);
 
@@ -49,6 +54,9 @@ load_window (void)
 void
 unload_window (void)
 {
+  /* dungeon ega */
+  al_destroy_bitmap (de_window);
+
   /* dungeon vga */
   al_destroy_bitmap (dv_window);
 
@@ -66,7 +74,7 @@ draw_window (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case DUNGEON:
     switch (vm) {
     case CGA: break;
-    case EGA: break;
+    case EGA: window = de_window; break;
     case VGA: window = dv_window; break;
     }
     break;

@@ -30,6 +30,13 @@
 #include "level.h"
 #include "chopper.h"
 
+/* dungeon ega */
+ALLEGRO_BITMAP *de_chopper_01, *de_chopper_fg_01,
+  *de_chopper_02, *de_chopper_fg_02,
+  *de_chopper_03, *de_chopper_fg_03,
+  *de_chopper_04, *de_chopper_fg_04,
+  *de_chopper_05, *de_chopper_fg_05;
+
 /* dungeon vga */
 ALLEGRO_BITMAP *dv_chopper_01, *dv_chopper_fg_01,
   *dv_chopper_02, *dv_chopper_fg_02,
@@ -61,6 +68,18 @@ load_chopper (void)
   ALLEGRO_BITMAP *chopper_blood_template_01, *chopper_blood_template_02,
     *chopper_blood_template_03, *chopper_blood_template_04,
     *chopper_blood_template_05;
+
+  /* dungeon ega */
+  de_chopper_01 = load_bitmap (DE_CHOPPER_01);
+  de_chopper_fg_01 = load_bitmap (DE_CHOPPER_FG_01);
+  de_chopper_02 = load_bitmap (DE_CHOPPER_02);
+  de_chopper_fg_02 = load_bitmap (DE_CHOPPER_FG_02);
+  de_chopper_03 = load_bitmap (DE_CHOPPER_03);
+  de_chopper_fg_03 = load_bitmap (DE_CHOPPER_FG_03);
+  de_chopper_04 = load_bitmap (DE_CHOPPER_04);
+  de_chopper_fg_04 = load_bitmap (DE_CHOPPER_FG_04);
+  de_chopper_05 = load_bitmap (DE_CHOPPER_05);
+  de_chopper_fg_05 = load_bitmap (DE_CHOPPER_FG_05);
 
   /* dungeon vga */
   dv_chopper_01 = load_bitmap (DV_CHOPPER_01);
@@ -109,6 +128,18 @@ load_chopper (void)
 void
 unload_chopper (void)
 {
+  /* dungeon ega */
+  al_destroy_bitmap (de_chopper_01);
+  al_destroy_bitmap (de_chopper_fg_01);
+  al_destroy_bitmap (de_chopper_02);
+  al_destroy_bitmap (de_chopper_fg_02);
+  al_destroy_bitmap (de_chopper_03);
+  al_destroy_bitmap (de_chopper_fg_03);
+  al_destroy_bitmap (de_chopper_04);
+  al_destroy_bitmap (de_chopper_fg_04);
+  al_destroy_bitmap (de_chopper_05);
+  al_destroy_bitmap (de_chopper_fg_05);
+
   /* dungeon vga */
   al_destroy_bitmap (dv_chopper_01);
   al_destroy_bitmap (dv_chopper_fg_01);
@@ -295,7 +326,7 @@ draw_chopper_left_01 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
   case DUNGEON:
     switch (vm) {
     case CGA: break;
-    case EGA: break;
+    case EGA: chopper_01 = de_chopper_01; break;
     case VGA: chopper_01 = dv_chopper_01; break;
     }
     break;
@@ -324,7 +355,7 @@ draw_chopper_left_02 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
   case DUNGEON:
     switch (vm) {
     case CGA: break;
-    case EGA: break;
+    case EGA: chopper_02 = de_chopper_02; break;
     case VGA: chopper_02 = dv_chopper_02; break;
     }
     break;
@@ -353,7 +384,7 @@ draw_chopper_left_03 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
   case DUNGEON:
     switch (vm) {
     case CGA: break;
-    case EGA: break;
+    case EGA: chopper_03 = de_chopper_03; break;
     case VGA: chopper_03 = dv_chopper_03; break;
     }
     break;
@@ -382,7 +413,7 @@ draw_chopper_left_04 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
   case DUNGEON:
     switch (vm) {
     case CGA: break;
-    case EGA: break;
+    case EGA: chopper_04 = de_chopper_04; break;
     case VGA: chopper_04 = dv_chopper_04; break;
     }
     break;
@@ -411,7 +442,7 @@ draw_chopper_left_05 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
   case DUNGEON:
     switch (vm) {
     case CGA: break;
-    case EGA: break;
+    case EGA: chopper_05 = de_chopper_05; break;
     case VGA: chopper_05 = dv_chopper_05; break;
     }
     break;
@@ -456,7 +487,7 @@ draw_chopper_fg_01 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
   case DUNGEON:
     switch (vm) {
     case CGA: break;
-    case EGA: break;
+    case EGA: chopper_fg_01 = de_chopper_fg_01; break;
     case VGA: chopper_fg_01 = dv_chopper_fg_01; break;
     }
     break;
@@ -487,7 +518,7 @@ draw_chopper_fg_02 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
   case DUNGEON:
     switch (vm) {
     case CGA: break;
-    case EGA: break;
+    case EGA: chopper_fg_02 = de_chopper_fg_02; break;
     case VGA: chopper_fg_02 = dv_chopper_fg_02; break;
     }
     break;
@@ -518,7 +549,7 @@ draw_chopper_fg_03 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
   case DUNGEON:
     switch (vm) {
     case CGA: break;
-    case EGA: break;
+    case EGA: chopper_fg_03 = de_chopper_fg_03; break;
     case VGA: chopper_fg_03 = dv_chopper_fg_03; break;
     }
     break;
@@ -549,7 +580,7 @@ draw_chopper_fg_04 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
   case DUNGEON:
     switch (vm) {
     case CGA: break;
-    case EGA: break;
+    case EGA: chopper_fg_04 = de_chopper_fg_04; break;
     case VGA: chopper_fg_04 = dv_chopper_fg_04; break;
     }
     break;
@@ -580,7 +611,7 @@ draw_chopper_fg_05 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
   case DUNGEON:
     switch (vm) {
     case CGA: break;
-    case EGA: break;
+    case EGA: chopper_fg_05 = de_chopper_fg_05; break;
     case VGA: chopper_fg_05 = dv_chopper_fg_05; break;
     }
     break;

@@ -25,6 +25,25 @@
 /* constants */
 #define SPIKES_WAIT SECS_TO_SCYCLES (1)
 
+/* dungeon ega */
+#define DE_SPIKES_FLOOR_LEFT "data/spikes-floor/de-left.png"
+#define DE_SPIKES_FLOOR_RIGHT "data/spikes-floor/de-right.png"
+#define DE_SPIKES_LEFT_01 "data/spikes-floor/de-spikes-left-01.png"
+#define DE_SPIKES_RIGHT_01 "data/spikes-floor/de-spikes-right-01.png"
+#define DE_SPIKES_FG_01 "data/spikes-floor/de-spikes-fg-01.png"
+#define DE_SPIKES_LEFT_02 "data/spikes-floor/de-spikes-left-02.png"
+#define DE_SPIKES_RIGHT_02 "data/spikes-floor/de-spikes-right-02.png"
+#define DE_SPIKES_FG_02 "data/spikes-floor/de-spikes-fg-02.png"
+#define DE_SPIKES_LEFT_03 "data/spikes-floor/de-spikes-left-03.png"
+#define DE_SPIKES_RIGHT_03 "data/spikes-floor/de-spikes-right-03.png"
+#define DE_SPIKES_FG_03 "data/spikes-floor/de-spikes-fg-03.png"
+#define DE_SPIKES_LEFT_04 "data/spikes-floor/de-spikes-left-04.png"
+#define DE_SPIKES_RIGHT_04 "data/spikes-floor/de-spikes-right-04.png"
+#define DE_SPIKES_FG_04 "data/spikes-floor/de-spikes-fg-04.png"
+#define DE_SPIKES_LEFT_05 "data/spikes-floor/de-spikes-left-05.png"
+#define DE_SPIKES_RIGHT_05 "data/spikes-floor/de-spikes-right-05.png"
+#define DE_SPIKES_FG_05 "data/spikes-floor/de-spikes-fg-05.png"
+
 /* dungeon vga */
 #define DV_SPIKES_FLOOR_LEFT "data/spikes-floor/dv-left.png"
 #define DV_SPIKES_FLOOR_RIGHT "data/spikes-floor/dv-right.png"

@@ -22,6 +22,10 @@
 #include "room.h"
 #include "pillar.h"
 
+/* dungeon ega */
+ALLEGRO_BITMAP *de_pillar_left, *de_pillar_right,
+  *de_pillar_top, *de_pillar_fg;
+
 /* dungeon vga */
 ALLEGRO_BITMAP *dv_pillar_left, *dv_pillar_right,
   *dv_pillar_top, *dv_pillar_fg;
@@ -33,6 +37,12 @@ ALLEGRO_BITMAP *pv_pillar_left, *pv_pillar_right,
 void
 load_pillar (void)
 {
+  /* dungeon ega */
+  de_pillar_left = load_bitmap (DE_PILLAR_LEFT);
+  de_pillar_right = load_bitmap (DE_PILLAR_RIGHT);
+  de_pillar_top = load_bitmap (DE_PILLAR_TOP);
+  de_pillar_fg = load_bitmap (DE_PILLAR_FG);
+
   /* dungeon vga */
   dv_pillar_left = load_bitmap (DV_PILLAR_LEFT);
   dv_pillar_right = load_bitmap (DV_PILLAR_RIGHT);
@@ -49,6 +59,12 @@ load_pillar (void)
 void
 unload_pillar (void)
 {
+  /* dungeon ega */
+  al_destroy_bitmap (de_pillar_left);
+  al_destroy_bitmap (de_pillar_right);
+  al_destroy_bitmap (de_pillar_top);
+  al_destroy_bitmap (de_pillar_fg);
+
   /* dungeon vga */
   al_destroy_bitmap (dv_pillar_left);
   al_destroy_bitmap (dv_pillar_right);
@@ -81,7 +97,7 @@ draw_pillar_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case DUNGEON:
     switch (vm) {
     case CGA: break;
-    case EGA: break;
+    case EGA: pillar_left = de_pillar_left; break;
     case VGA: pillar_left = dv_pillar_left; break;
     }
     break;
@@ -108,7 +124,10 @@ draw_pillar_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case DUNGEON:
     switch (vm) {
     case CGA: break;
-    case EGA: break;
+    case EGA:
+      pillar_right = de_pillar_right;
+      pillar_top = de_pillar_top;
+      break;
     case VGA:
       pillar_right = dv_pillar_right;
       pillar_top = dv_pillar_top;
@@ -142,7 +161,7 @@ draw_pillar_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case DUNGEON:
     switch (vm) {
     case CGA: break;
-    case EGA: break;
+    case EGA: pillar_fg = de_pillar_fg; break;
     case VGA: pillar_fg = dv_pillar_fg; break;
     }
     break;

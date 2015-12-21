@@ -25,10 +25,13 @@
 #include "physics.h"
 #include "kid/kid.h"
 #include "pillar.h"
-#include "wall.h"
 #include "level.h"
 #include "room.h"
 #include "bricks.h"
+
+/* dungeon ega */
+ALLEGRO_BITMAP *de_bricks_01, *de_bricks_02,
+  *de_bricks_03, *de_bricks_04;
 
 /* dungeon vga */
 ALLEGRO_BITMAP *dv_bricks_01, *dv_bricks_02,
@@ -41,6 +44,12 @@ ALLEGRO_BITMAP *pv_bricks_01, *pv_bricks_02,
 void
 load_bricks (void)
 {
+  /* dungeon ega */
+  de_bricks_01 = load_bitmap (DE_BRICKS_01);
+  de_bricks_02 = load_bitmap (DE_BRICKS_02);
+  de_bricks_03 = load_bitmap (DE_BRICKS_03);
+  de_bricks_04 = load_bitmap (DE_BRICKS_04);
+
   /* dungeon vga */
   dv_bricks_01 = load_bitmap (DV_BRICKS_01);
   dv_bricks_02 = load_bitmap (DV_BRICKS_02);
@@ -57,6 +66,12 @@ load_bricks (void)
 void
 unload_bricks (void)
 {
+  /* dungeon ega */
+  al_destroy_bitmap (de_bricks_01);
+  al_destroy_bitmap (de_bricks_02);
+  al_destroy_bitmap (de_bricks_03);
+  al_destroy_bitmap (de_bricks_04);
+
   /* dungeon vga */
   al_destroy_bitmap (dv_bricks_01);
   al_destroy_bitmap (dv_bricks_02);
@@ -82,7 +97,7 @@ draw_bricks_01 (ALLEGRO_BITMAP *bitmap, struct pos *p,
     bricks_coord_01 = d_bricks_coord_01;
     switch (vm) {
     case CGA: break;
-    case EGA: break;
+    case EGA: bricks_01 = de_bricks_01; break;
     case VGA: bricks_01 = dv_bricks_01; break;
     }
     break;
@@ -112,7 +127,7 @@ draw_bricks_02 (ALLEGRO_BITMAP *bitmap, struct pos *p,
     bricks_coord_02 = d_bricks_coord_02;
     switch (vm) {
     case CGA: break;
-    case EGA: break;
+    case EGA: bricks_02 = de_bricks_02; break;
     case VGA: bricks_02 = dv_bricks_02; break;
     }
     break;
@@ -142,7 +157,7 @@ draw_bricks_03 (ALLEGRO_BITMAP *bitmap, struct pos *p,
     bricks_coord_03 = d_bricks_coord_03;
     switch (vm) {
     case CGA: break;
-    case EGA: break;
+    case EGA: bricks_03 = de_bricks_03; break;
     case VGA: bricks_03 = dv_bricks_03; break;
     }
     break;
@@ -172,7 +187,7 @@ draw_bricks_04 (ALLEGRO_BITMAP *bitmap, struct pos *p,
     bricks_coord_04 = d_bricks_coord_04;
     switch (vm) {
     case CGA: break;
-    case EGA: break;
+    case EGA: bricks_04 = de_bricks_04; break;
     case VGA: bricks_04 = dv_bricks_04; break;
     }
     break;

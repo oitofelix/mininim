@@ -37,7 +37,7 @@
 #include "spikes-floor.h"
 #include "pillar.h"
 #include "big-pillar.h"
-#include "wall.h"
+#include "wall/wall.h"
 #include "door.h"
 #include "level-door.h"
 #include "chopper.h"
@@ -129,6 +129,8 @@ void
 draw_bitmapc (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
               struct coord *c, int flags)
 {
+  if (! from) return;
+
   struct coord nc = *c;
 
   if (! cutscene) {
@@ -147,6 +149,8 @@ draw_bitmap_regionc (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
                      float sx, float sy, float sw, float sh,
                      struct coord *c, int flags)
 {
+  if (! from) return;
+
   struct coord nc = *c;
 
   if (! cutscene) {

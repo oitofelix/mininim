@@ -24,6 +24,18 @@
 
 #define CHOPPER_WAIT 10
 
+/* dungeon ega */
+#define DE_CHOPPER_01 "data/chopper/de-01.png"
+#define DE_CHOPPER_FG_01 "data/chopper/de-fg-01.png"
+#define DE_CHOPPER_02 "data/chopper/de-02.png"
+#define DE_CHOPPER_FG_02 "data/chopper/de-fg-02.png"
+#define DE_CHOPPER_03 "data/chopper/de-03.png"
+#define DE_CHOPPER_FG_03 "data/chopper/de-fg-03.png"
+#define DE_CHOPPER_04 "data/chopper/de-04.png"
+#define DE_CHOPPER_FG_04 "data/chopper/de-fg-04.png"
+#define DE_CHOPPER_05 "data/chopper/de-05.png"
+#define DE_CHOPPER_FG_05 "data/chopper/de-fg-05.png"
+
 /* dungeon vga */
 #define DV_CHOPPER_01 "data/chopper/dv-01.png"
 #define DV_CHOPPER_FG_01 "data/chopper/dv-fg-01.png"
