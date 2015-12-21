@@ -65,10 +65,6 @@ static size_t chopper_nmemb = 0;
 void
 load_chopper (void)
 {
-  ALLEGRO_BITMAP *chopper_blood_template_01, *chopper_blood_template_02,
-    *chopper_blood_template_03, *chopper_blood_template_04,
-    *chopper_blood_template_05;
-
   /* dungeon ega */
   de_chopper_01 = load_bitmap (DE_CHOPPER_01);
   de_chopper_fg_01 = load_bitmap (DE_CHOPPER_FG_01);
@@ -106,23 +102,11 @@ load_chopper (void)
   pv_chopper_fg_05 = load_bitmap (PV_CHOPPER_FG_05);
 
   /* palettable */
-  chopper_blood_template_01 = load_bitmap (CHOPPER_BLOOD_01);
-  chopper_blood_template_02 = load_bitmap (CHOPPER_BLOOD_02);
-  chopper_blood_template_03 = load_bitmap (CHOPPER_BLOOD_03);
-  chopper_blood_template_04 = load_bitmap (CHOPPER_BLOOD_04);
-  chopper_blood_template_05 = load_bitmap (CHOPPER_BLOOD_05);
-
-  /* apply blood palette */
-  chopper_blood_01 = apply_palette (chopper_blood_template_01, blood_palette);
-  chopper_blood_02 = apply_palette (chopper_blood_template_02, blood_palette);
-  chopper_blood_03 = apply_palette (chopper_blood_template_03, blood_palette);
-  chopper_blood_04 = apply_palette (chopper_blood_template_04, blood_palette);
-  chopper_blood_05 = apply_palette (chopper_blood_template_05, blood_palette);
-  al_destroy_bitmap (chopper_blood_template_01);
-  al_destroy_bitmap (chopper_blood_template_02);
-  al_destroy_bitmap (chopper_blood_template_03);
-  al_destroy_bitmap (chopper_blood_template_04);
-  al_destroy_bitmap (chopper_blood_template_05);
+  chopper_blood_01 = load_bitmap (CHOPPER_BLOOD_01);
+  chopper_blood_02 = load_bitmap (CHOPPER_BLOOD_02);
+  chopper_blood_03 = load_bitmap (CHOPPER_BLOOD_03);
+  chopper_blood_04 = load_bitmap (CHOPPER_BLOOD_04);
+  chopper_blood_05 = load_bitmap (CHOPPER_BLOOD_05);
 }
 
 void
@@ -341,8 +325,10 @@ draw_chopper_left_01 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
 
   struct coord c;
   draw_bitmapc (chopper_01, bitmap, chopper_coord (p, &c), 0);
-  if (ch->blood)
-    draw_bitmapc (chopper_blood_01, bitmap, chopper_blood_01_coord (p, &c), 0);
+  if (ch->blood) {
+    ALLEGRO_BITMAP *blood = apply_palette (chopper_blood_01, blood_palette);
+    draw_bitmapc (blood, bitmap, chopper_blood_01_coord (p, &c), 0);
+  }
 }
 
 void
@@ -370,8 +356,10 @@ draw_chopper_left_02 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
 
   struct coord c;
   draw_bitmapc (chopper_02, bitmap, chopper_coord (p, &c), 0);
-  if (ch->blood)
-    draw_bitmapc (chopper_blood_02, bitmap, chopper_blood_02_coord (p, &c), 0);
+  if (ch->blood) {
+    ALLEGRO_BITMAP *blood = apply_palette (chopper_blood_02, blood_palette);
+    draw_bitmapc (blood, bitmap, chopper_blood_02_coord (p, &c), 0);
+  }
 }
 
 void
@@ -399,8 +387,10 @@ draw_chopper_left_03 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
 
   struct coord c;
   draw_bitmapc (chopper_03, bitmap, chopper_coord (p, &c), 0);
-  if (ch->blood)
-    draw_bitmapc (chopper_blood_03, bitmap, chopper_blood_03_coord (p, &c), 0);
+  if (ch->blood) {
+    ALLEGRO_BITMAP *blood = apply_palette (chopper_blood_03, blood_palette);
+    draw_bitmapc (blood, bitmap, chopper_blood_03_coord (p, &c), 0);
+  }
 }
 
 void
@@ -428,8 +418,10 @@ draw_chopper_left_04 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
 
   struct coord c;
   draw_bitmapc (chopper_04, bitmap, chopper_coord (p, &c), 0);
-  if (ch->blood)
-    draw_bitmapc (chopper_blood_04, bitmap, chopper_blood_04_coord (p, &c), 0);
+  if (ch->blood) {
+    ALLEGRO_BITMAP *blood = apply_palette (chopper_blood_04, blood_palette);
+    draw_bitmapc (blood, bitmap, chopper_blood_04_coord (p, &c), 0);
+  }
 }
 
 void
@@ -457,8 +449,10 @@ draw_chopper_left_05 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
 
   struct coord c;
   draw_bitmapc (chopper_05, bitmap, chopper_coord (p, &c), 0);
-  if (ch->blood)
-    draw_bitmapc (chopper_blood_05, bitmap, chopper_blood_05_coord (p, &c), 0);
+  if (ch->blood) {
+    ALLEGRO_BITMAP *blood = apply_palette (chopper_blood_05, blood_palette);
+    draw_bitmapc (blood, bitmap, chopper_blood_05_coord (p, &c), 0);
+  }
 }
 
 void
@@ -504,7 +498,8 @@ draw_chopper_fg_01 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
   draw_bitmapc (chopper_fg_01, bitmap, chopper_coord (p, &c), 0);
   if (ch->blood) {
     int h = al_get_bitmap_height (chopper_blood_01);
-    draw_bitmap_regionc (chopper_blood_01, bitmap, 0, 0, 2, h, chopper_blood_01_coord (p, &c), 0);
+    ALLEGRO_BITMAP *blood = apply_palette (chopper_blood_01, blood_palette);
+    draw_bitmap_regionc (blood, bitmap, 0, 0, 2, h, chopper_blood_01_coord (p, &c), 0);
   }
 }
 
@@ -535,7 +530,8 @@ draw_chopper_fg_02 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
   draw_bitmapc (chopper_fg_02, bitmap, chopper_coord (p, &c), 0);
   if (ch->blood) {
     int h = al_get_bitmap_height (chopper_blood_02);
-    draw_bitmap_regionc (chopper_blood_02, bitmap, 0, 0, 2, h, chopper_blood_02_coord (p, &c), 0);
+    ALLEGRO_BITMAP *blood = apply_palette (chopper_blood_02, blood_palette);
+    draw_bitmap_regionc (blood, bitmap, 0, 0, 2, h, chopper_blood_02_coord (p, &c), 0);
   }
 }
 
@@ -566,7 +562,8 @@ draw_chopper_fg_03 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
   draw_bitmapc (chopper_fg_03, bitmap, chopper_coord (p, &c), 0);
   if (ch->blood) {
     int h = al_get_bitmap_height (chopper_blood_03);
-    draw_bitmap_regionc (chopper_blood_03, bitmap, 0, 0, 2, h, chopper_blood_03_coord (p, &c), 0);
+    ALLEGRO_BITMAP *blood = apply_palette (chopper_blood_03, blood_palette);
+    draw_bitmap_regionc (blood, bitmap, 0, 0, 2, h, chopper_blood_03_coord (p, &c), 0);
   }
 }
 
@@ -597,7 +594,8 @@ draw_chopper_fg_04 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
   draw_bitmapc (chopper_fg_04, bitmap, chopper_coord (p, &c), 0);
   if (ch->blood) {
     int h = al_get_bitmap_height (chopper_blood_04);
-    draw_bitmap_regionc (chopper_blood_04, bitmap, 0, 0, 2, h, chopper_blood_04_coord (p, &c), 0);
+    ALLEGRO_BITMAP *blood = apply_palette (chopper_blood_04, blood_palette);
+    draw_bitmap_regionc (blood, bitmap, 0, 0, 2, h, chopper_blood_04_coord (p, &c), 0);
   }
 }
 
@@ -628,7 +626,8 @@ draw_chopper_fg_05 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
   draw_bitmapc (chopper_fg_05, bitmap, chopper_coord (p, &c), 0);
   if (ch->blood) {
     int h = al_get_bitmap_height (chopper_blood_05);
-    draw_bitmap_regionc (chopper_blood_05, bitmap, 0, 0, 2, h, chopper_blood_05_coord (p, &c), 0);
+    ALLEGRO_BITMAP *blood = apply_palette (chopper_blood_05, blood_palette);
+    draw_bitmap_regionc (blood, bitmap, 0, 0, 2, h, chopper_blood_05_coord (p, &c), 0);
   }
 }
 

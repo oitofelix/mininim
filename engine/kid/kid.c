@@ -243,7 +243,7 @@ draw_kids (ALLEGRO_BITMAP *bitmap,
     prel (&pml, &pmlr, 0, +1);
     prel (&pml, &pmlra, -1, +1);
 
-    draw_kid_frame (bitmap, k);
+    draw_kid_frame (bitmap, k, vm);
 
     draw_falling_loose_floor (bitmap, &pmlr, em, vm);
     draw_falling_loose_floor (bitmap, &pmlra, em, vm);
@@ -292,30 +292,33 @@ compare_kids (const void *k0, const void *k1)
 }
 
 void
-draw_kid_frame (ALLEGRO_BITMAP *bitmap, struct anim *k)
+draw_kid_frame (ALLEGRO_BITMAP *bitmap, struct anim *k,
+                enum vm vm)
 {
-  ALLEGRO_BITMAP *ob = NULL, *obx = NULL;
   struct coord c;
 
+  struct frame f = k->f;
+  struct frame_offset xf = k->xf;
+
   if (k->shadow) {
-    ob = k->f.b;
-    k->f.b = apply_palette (k->f.b, phantom_shadow_palette);
-    obx = k->xf.b;
-    if (obx) k->xf.b = apply_palette (k->xf.b, phantom_shadow_palette);
+    f.b = apply_palette (f.b, phantom_shadow_palette);
+    xf.b = apply_palette (xf.b, phantom_shadow_palette);
   }
 
-  draw_frame (bitmap, &k->f);
-  draw_xframe (bitmap, &k->f, &k->xf);
+  switch (vm) {
+  case CGA: break;
+  case EGA:
+    f.b = apply_palette (f.b, e_palette);
+    xf.b = apply_palette (xf.b, e_palette);
+    break;
+  case VGA: break;
+  }
+
+  draw_frame (bitmap, &f);
+  draw_xframe (bitmap, &f, &xf);
 
   if (k->splash)
     draw_bitmapc (kid_splash, bitmap, splash_coord (&k->f, &c), k->f.flip);
-
-  if (k->shadow) {
-    al_destroy_bitmap (k->f.b);
-    k->f.b = ob;
-    if (obx) al_destroy_bitmap (k->xf.b);
-    k->xf.b = obx;
-  }
 }
 
 ALLEGRO_COLOR
@@ -324,8 +327,8 @@ colorful_shadow_palette (ALLEGRO_COLOR c)
   unsigned char r, g, b, a;
   al_unmap_rgba (c, &r, &g, &b, &a);
   if (a == 0) return c;
-  if (color_eq (c, KID_SKIN_COLOR)
-      || color_eq (c, KID_NOSE_COLOR))
+  if (color_eq (c, V_KID_SKIN_COLOR_01)
+      || color_eq (c, V_KID_NOSE_COLOR))
     switch (draw_cycle % 3) {
     case 0: return TRED;
     case 1: return TGREEN;
@@ -348,11 +351,24 @@ phantom_shadow_palette (ALLEGRO_COLOR c)
   unsigned char r, g, b, a;
   al_unmap_rgba (c, &r, &g, &b, &a);
   if (a == 0) return c;
-  if (color_eq (c, KID_CLOTHES_COLOR))
+  if (color_eq (c, V_KID_CLOTHES_COLOR_01))
     return KID_SHADOW_CLOTHES_COLOR;
-  if (color_eq (c, KID_CLOTHES_COLOR_2))
+  if (color_eq (c, V_KID_CLOTHES_COLOR_02))
     return KID_SHADOW_CLOTHES_COLOR_2;
   return al_map_rgba (r, g, b, 0);
+}
+
+ALLEGRO_COLOR
+e_palette (ALLEGRO_COLOR c)
+{
+  if (color_eq (c, V_KID_HAIR_COLOR_01)
+      || color_eq (c, V_KID_HAIR_COLOR_02)) return E_KID_HAIR_COLOR;
+  if (color_eq (c, V_KID_SKIN_COLOR_01)
+      || color_eq (c, V_KID_SKIN_COLOR_02)) return E_KID_SKIN_COLOR;
+  if (color_eq (c, V_KID_CLOTHES_COLOR_01)) return E_KID_CLOTHES_COLOR_01;
+  if (color_eq (c, V_KID_CLOTHES_COLOR_02)) return E_KID_CLOTHES_COLOR_02;
+  if (color_eq (c, V_KID_EYE_COLOR)) return E_KID_EYE_COLOR;
+  return c;
 }
 
 void

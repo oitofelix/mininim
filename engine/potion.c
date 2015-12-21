@@ -194,7 +194,6 @@ draw_potion (ALLEGRO_BITMAP *bitmap, struct pos *p, int i,
   bubble_coord.x -= r;
   draw_bitmapc (bubble, bitmap, &bubble_coord,
                 r ? ALLEGRO_FLIP_HORIZONTAL : 0);
-  al_destroy_bitmap (bubble);
   unseedp ();
 }
 

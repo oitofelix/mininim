@@ -25,6 +25,7 @@
 #include "video.h"
 #include "event.h"
 #include "timer.h"
+#include "array.h"
 
 ALLEGRO_DISPLAY *display;
 ALLEGRO_BITMAP *screen;
@@ -36,6 +37,12 @@ static ALLEGRO_BITMAP *effect_buffer;
 static ALLEGRO_BITMAP *memory_bitmap;
 struct video_effect video_effect = {.type = VIDEO_NO_EFFECT};
 static ALLEGRO_FONT *builtin_font;
+
+static struct palette_cache {
+  ALLEGRO_BITMAP *ib, *ob;
+  palette pal;
+} *palette_cache = NULL;
+static size_t palette_cache_nmemb = 0;
 
 void
 init_video (void)
@@ -120,8 +127,40 @@ clear_bitmap (ALLEGRO_BITMAP *bitmap, ALLEGRO_COLOR color)
 }
 
 ALLEGRO_BITMAP *
+get_cached_palette (ALLEGRO_BITMAP *bitmap, palette p)
+{
+  struct palette_cache pc, *rpc;
+  pc.ib = bitmap;
+  pc.pal = p;
+
+  rpc = bsearch (&pc, palette_cache, palette_cache_nmemb, sizeof (pc),
+                 compare_palette_caches);
+
+  if (rpc) return rpc->ob;
+  else return NULL;
+}
+
+int
+compare_palette_caches (const void *pc0, const void *pc1)
+{
+  struct palette_cache *p0 = (struct palette_cache *) pc0;
+  struct palette_cache *p1 = (struct palette_cache *) pc1;
+
+  if (p0->ib < p1->ib) return -1;
+  else if (p0->ib > p1->ib) return 1;
+  else if (p0->pal < p1->pal) return -1;
+  else if (p0->pal > p1->pal) return 1;
+  else return 0;
+}
+
+ALLEGRO_BITMAP *
 apply_palette (ALLEGRO_BITMAP *bitmap, palette p)
 {
+  if (! bitmap) return NULL;
+
+  ALLEGRO_BITMAP *cached = get_cached_palette (bitmap, p);
+  if (cached) return cached;
+
   int x, y;
   ALLEGRO_BITMAP *rbitmap = clone_bitmap (bitmap);
   int w = al_get_bitmap_width (bitmap);
@@ -132,6 +171,19 @@ apply_palette (ALLEGRO_BITMAP *bitmap, palette p)
     for (x = 0; x < w; x++)
       al_put_pixel (x, y, p (al_get_pixel (rbitmap, x, y)));
   al_unlock_bitmap (rbitmap);
+
+  struct palette_cache pc;
+  pc.ib = bitmap;
+  pc.pal = p;
+  pc.ob = rbitmap;
+
+  palette_cache =
+    add_to_array (&pc, 1, palette_cache, &palette_cache_nmemb,
+                  palette_cache_nmemb, sizeof (pc));
+
+  qsort (palette_cache, palette_cache_nmemb, sizeof (pc),
+         compare_palette_caches);
+
   return rbitmap;
 }
 

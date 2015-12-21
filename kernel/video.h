@@ -50,8 +50,6 @@ ALLEGRO_EVENT_SOURCE *get_display_event_source (ALLEGRO_DISPLAY *display);
 ALLEGRO_BITMAP *create_bitmap (int w, int h);
 ALLEGRO_BITMAP *clone_bitmap (ALLEGRO_BITMAP *bitmap);
 ALLEGRO_BITMAP *load_bitmap (char *filename);
-ALLEGRO_BITMAP *apply_palette (ALLEGRO_BITMAP *bitmap,
-                               palette p);
 bool color_eq (ALLEGRO_COLOR c0, ALLEGRO_COLOR c1);
 void clear_bitmap (ALLEGRO_BITMAP *bitmap, ALLEGRO_COLOR color);
 void draw_bitmap (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
@@ -72,6 +70,11 @@ void draw_pattern (ALLEGRO_BITMAP *bitmap, int ox, int oy, int w, int h,
 void start_video_effect (enum video_effect_type type, int duration);
 bool is_video_effect_started (void);
 void show (void);
+
+/* palette */
+int compare_palette_caches (const void *pc0, const void *pc1);
+ALLEGRO_BITMAP *apply_palette (ALLEGRO_BITMAP *bitmap, palette p);
+ALLEGRO_BITMAP * get_cached_palette (ALLEGRO_BITMAP *bitmap, palette p);
 
 /* variables */
 extern ALLEGRO_DISPLAY *display;
