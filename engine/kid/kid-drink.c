@@ -129,23 +129,8 @@ flow (struct anim *kid)
 
   if (kid->i == 14 && kid->wait == 1)
     switch (kid->item) {
-    case SMALL_LIFE_POTION:
-      if (kid->current_lives < kid->total_lives) {
-        kid->current_lives++;
-        sample_small_life_potion = true;
-        video_effect.color = RED;
-        start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.3));
-      }
-      break;
-    case BIG_LIFE_POTION:
-      if (kid->total_lives < 10) {
-        kid->total_lives++;
-        kid->current_lives = kid->total_lives;
-        sample_big_life_potion = true;
-        video_effect.color = RED;
-        start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.3));
-      }
-      break;
+    case SMALL_LIFE_POTION: increase_kid_current_lives (kid); break;
+    case BIG_LIFE_POTION: increase_kid_total_lives (kid); break;
     case SMALL_POISON_POTION:
       if (kid->immortal
           || kid->poison_immune) break;

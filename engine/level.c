@@ -200,6 +200,12 @@ draw_level (void)
     al_free (text);
   }
 
+  if (was_key_pressed (ALLEGRO_KEY_S, 0, ALLEGRO_KEYMOD_SHIFT, true))
+    increase_kid_current_lives (current_kid);
+
+  if (was_key_pressed (ALLEGRO_KEY_T, 0, ALLEGRO_KEYMOD_SHIFT, true))
+    increase_kid_total_lives (current_kid);
+
   if (room_view == 0) room_view = prev_room;
 
   /* drawing */
