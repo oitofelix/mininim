@@ -40,9 +40,9 @@ main (int argc, char **argv)
   show ();
   clear_bitmap (screen, BLACK);
 
+  play_title ();
   load_level ();
-  /* play_title (); */
-  /* play_level_1 (); */
+  play_level_1 ();
   play_consistency_level ();
   unload_level ();
 
