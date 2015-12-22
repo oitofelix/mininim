@@ -26,6 +26,10 @@
 #define DE_UNPRESSED_OPENER_FLOOR_BASE "data/opener-floor/de-unpressed-base.png"
 #define DE_UNPRESSED_OPENER_FLOOR_LEFT "data/opener-floor/de-unpressed-left.png"
 
+/* palace ega */
+#define PE_UNPRESSED_OPENER_FLOOR_BASE "data/opener-floor/pe-unpressed-base.png"
+#define PE_UNPRESSED_OPENER_FLOOR_LEFT "data/opener-floor/pe-unpressed-left.png"
+
 /* dungeon vga */
 #define DV_UNPRESSED_OPENER_FLOOR_BASE "data/opener-floor/dv-unpressed-base.png"
 #define DV_UNPRESSED_OPENER_FLOOR_LEFT "data/opener-floor/dv-unpressed-left.png"

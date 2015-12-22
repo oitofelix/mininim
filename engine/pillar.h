@@ -28,6 +28,12 @@
 #define DE_PILLAR_TOP "data/pillar/de-top.png"
 #define DE_PILLAR_FG "data/pillar/de-fg.png"
 
+/* palace ega */
+#define PE_PILLAR_LEFT "data/pillar/pe-left.png"
+#define PE_PILLAR_RIGHT "data/pillar/pe-right.png"
+#define PE_PILLAR_TOP "data/pillar/pe-top.png"
+#define PE_PILLAR_FG "data/pillar/pe-fg.png"
+
 /* dungeon vga */
 #define DV_PILLAR_LEFT "data/pillar/dv-left.png"
 #define DV_PILLAR_RIGHT "data/pillar/dv-right.png"

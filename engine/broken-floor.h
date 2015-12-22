@@ -28,21 +28,20 @@
 #define DE_BROKEN_FLOOR_RIGHT "data/broken-floor/de-right.png"
 #define DE_BROKEN_FLOOR_FRONT "data/broken-floor/de-front.png"
 
+/* palace ega */
+#define PE_BROKEN_FLOOR_LEFT "data/broken-floor/pe-left.png"
+#define PE_BROKEN_FLOOR_RIGHT "data/broken-floor/pe-right.png"
+#define PE_BROKEN_FLOOR_FRONT "data/broken-floor/pe-front.png"
+
 /* dungeon vga */
 #define DV_BROKEN_FLOOR_LEFT "data/broken-floor/dv-left.png"
 #define DV_BROKEN_FLOOR_RIGHT "data/broken-floor/dv-right.png"
 #define DV_BROKEN_FLOOR_FRONT "data/broken-floor/dv-front.png"
 
-extern ALLEGRO_BITMAP *dv_broken_floor_left, *dv_broken_floor_right,
-  *dv_broken_floor_front;
-
 /* palace vga */
 #define PV_BROKEN_FLOOR_LEFT "data/broken-floor/pv-left.png"
 #define PV_BROKEN_FLOOR_RIGHT "data/broken-floor/pv-right.png"
 #define PV_BROKEN_FLOOR_FRONT "data/broken-floor/pv-front.png"
-
-extern ALLEGRO_BITMAP *pv_broken_floor_left, *pv_broken_floor_right,
-  *pv_broken_floor_front;
 
 void load_broken_floor (void);
 void unload_broken_floor (void);

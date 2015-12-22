@@ -23,6 +23,9 @@
 /* dungeon ega */
 #define DE_TORCH "data/torch/de.png"
 
+/* palace ega */
+#define PE_TORCH "data/torch/pe.png"
+
 /* dungeon vga */
 #define DV_TORCH "data/torch/dv.png"
 

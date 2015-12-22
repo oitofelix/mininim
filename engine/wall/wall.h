@@ -24,6 +24,10 @@
 #define DE_WALL_FACE "data/wall/de-face.png"
 #define DE_WALL_FACE_TOP "data/wall/de-face-top.png"
 
+/* palace ega */
+#define PE_WALL_FACE "data/wall/pe-face.png"
+#define PE_WALL_FACE_TOP "data/wall/pe-face-top.png"
+
 /* dungeon vga */
 #define DV_WALL_FACE "data/wall/dv-face.png"
 #define DV_WALL_FACE_TOP "data/wall/dv-face-top.png"

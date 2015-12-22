@@ -39,6 +39,12 @@ ALLEGRO_BITMAP *de_wall_left, *de_wall_center, *de_wall_right,
   *de_wall_wide_divider, *de_wall_narrow_divider, *de_wall_mark_top_left,
   *de_wall_mark_top_right, *de_wall_mark_bottom_left, *de_wall_mark_bottom_right;
 
+/* palace ega */
+ALLEGRO_BITMAP *pe_wall_left, *pe_wall_center, *pe_wall_right,
+  *pe_wall_single, *pe_wall_left_base, *pe_wall_center_base,
+  *pe_wall_right_base, *pe_wall_single_base, *pe_wall_random_block,
+  *pe_wall_wide_divider, *pe_wall_narrow_divider;
+
 /* dungeon vga */
 ALLEGRO_BITMAP *dv_wall_left, *dv_wall_center, *dv_wall_right,
   *dv_wall_single, *dv_wall_left_base, *dv_wall_center_base,
@@ -95,6 +101,19 @@ load_wall_depedv (void)
   de_wall_mark_bottom_left = load_bitmap (DE_WALL_MARK_BOTTOM_LEFT);
   de_wall_mark_bottom_right = load_bitmap (DE_WALL_MARK_BOTTOM_RIGHT);
 
+  /* palace ega */
+  pe_wall_left = load_bitmap (PE_WALL_LEFT);
+  pe_wall_center = load_bitmap (PE_WALL_CENTER);
+  pe_wall_right = load_bitmap (PE_WALL_RIGHT);
+  pe_wall_single = load_bitmap (PE_WALL_SINGLE);
+  pe_wall_left_base = load_bitmap (PE_WALL_LEFT_BASE);
+  pe_wall_center_base = load_bitmap (PE_WALL_CENTER_BASE);
+  pe_wall_right_base = load_bitmap (PE_WALL_RIGHT_BASE);
+  pe_wall_single_base = load_bitmap (PE_WALL_SINGLE_BASE);
+  pe_wall_random_block = load_bitmap (PE_WALL_RANDOM_BLOCK);
+  pe_wall_wide_divider = load_bitmap (PE_WALL_WIDE_DIVIDER);
+  pe_wall_narrow_divider = load_bitmap (PE_WALL_NARROW_DIVIDER);
+
   /* dungeon vga */
   dv_wall_left = load_bitmap (DV_WALL_LEFT);
   dv_wall_center = load_bitmap (DV_WALL_CENTER);
@@ -132,6 +151,19 @@ unload_wall_depedv (void)
   al_destroy_bitmap (de_wall_mark_top_right);
   al_destroy_bitmap (de_wall_mark_bottom_left);
   al_destroy_bitmap (de_wall_mark_bottom_right);
+
+  /* palace ega */
+  al_destroy_bitmap (pe_wall_left);
+  al_destroy_bitmap (pe_wall_center);
+  al_destroy_bitmap (pe_wall_right);
+  al_destroy_bitmap (pe_wall_single);
+  al_destroy_bitmap (pe_wall_left_base);
+  al_destroy_bitmap (pe_wall_center_base);
+  al_destroy_bitmap (pe_wall_right_base);
+  al_destroy_bitmap (pe_wall_single_base);
+  al_destroy_bitmap (pe_wall_random_block);
+  al_destroy_bitmap (pe_wall_wide_divider);
+  al_destroy_bitmap (pe_wall_narrow_divider);
 
   /* dungeon vga */
   al_destroy_bitmap (dv_wall_left);
@@ -199,6 +231,7 @@ draw_sws_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (vm == VGA) wall_single = dv_wall_single;
   else if (em == DUNGEON) wall_single = de_wall_single;
+  else wall_single = pe_wall_single;
 
   struct coord c;
   draw_bitmapc (wall_single, bitmap, wall_coord (p, &c), 0);
@@ -212,6 +245,7 @@ draw_sws_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (vm == VGA) wall_single_base = dv_wall_single_base;
   else if (em == DUNGEON) wall_single_base = de_wall_single_base;
+  else wall_single_base = pe_wall_single_base;
 
   struct coord c;
   draw_bitmapc (wall_single_base, bitmap, wall_base_coord (p, &c), 0);
@@ -225,6 +259,7 @@ draw_sww_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (vm == VGA) wall_left = dv_wall_left;
   else if (em == DUNGEON) wall_left = de_wall_left;
+  else wall_left = pe_wall_left;
 
   struct coord c;
   draw_bitmapc (wall_left, bitmap, wall_coord (p, &c), 0);
@@ -238,6 +273,7 @@ draw_sww_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (vm == VGA) wall_left_base = dv_wall_left_base;
   else if (em == DUNGEON) wall_left_base = de_wall_left_base;
+  else wall_left_base = pe_wall_left_base;
 
   struct coord c;
   draw_bitmapc (wall_left_base, bitmap, wall_base_coord (p, &c), 0);
@@ -251,6 +287,7 @@ draw_wws_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (vm == VGA) wall_right = dv_wall_right;
   else if (em == DUNGEON) wall_right = de_wall_right;
+  else wall_right = pe_wall_right;
 
   struct coord c;
   draw_bitmapc (wall_right, bitmap, wall_coord (p, &c), 0);
@@ -264,6 +301,7 @@ draw_wws_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (vm == VGA) wall_right_base = dv_wall_right_base;
   else if (em == DUNGEON) wall_right_base = de_wall_right_base;
+  else wall_right_base = pe_wall_right_base;
 
   struct coord c;
   draw_bitmapc (wall_right_base, bitmap, wall_base_coord (p, &c), 0);
@@ -277,6 +315,7 @@ draw_www_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (vm == VGA) wall_center = dv_wall_center;
   else if (em == DUNGEON) wall_center = de_wall_center;
+  else  wall_center = pe_wall_center;
 
   struct coord c;
   draw_bitmapc (wall_center, bitmap, wall_coord (p, &c), 0);
@@ -290,6 +329,7 @@ draw_www_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (vm == VGA) wall_center_base = dv_wall_center_base;
   else if (em == DUNGEON) wall_center_base = de_wall_center_base;
+  else wall_center_base = pe_wall_center_base;
 
   struct coord c;
   draw_bitmapc (wall_center_base, bitmap, wall_base_coord (p, &c), 0);
@@ -308,6 +348,9 @@ draw_randomization (ALLEGRO_BITMAP *bitmap, struct pos *p,
   } else if (em == DUNGEON) {
     wall_narrow_divider = de_wall_narrow_divider;
     wall_wide_divider = de_wall_wide_divider;
+  } else {
+    wall_narrow_divider = pe_wall_narrow_divider;
+    wall_wide_divider = pe_wall_wide_divider;
   }
 
   seedp (p);
@@ -374,6 +417,7 @@ draw_random_block (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (vm == VGA) wall_random_block = dv_wall_random_block;
   else if (em == DUNGEON) wall_random_block = de_wall_random_block;
+  else wall_random_block = pe_wall_random_block;
 
   struct coord c;
   draw_bitmapc (wall_random_block, bitmap, wall_random_block_coord (p, &c), 0);

@@ -34,6 +34,11 @@ ALLEGRO_BITMAP *de_level_door_top_left, *de_level_door_top_right,
   *de_level_door_bottom, *de_level_door_floor, *de_level_door_stairs,
   *de_level_door_front;
 
+/* palace ega */
+ALLEGRO_BITMAP *pe_level_door_top_left, *pe_level_door_top_right,
+  *pe_level_door_bottom, *pe_level_door_floor, *pe_level_door_stairs,
+  *pe_level_door_front;
+
 /* dungeon vga */
 ALLEGRO_BITMAP *dv_level_door_top_left, *dv_level_door_top_right,
   *dv_level_door_bottom, *dv_level_door_floor, *dv_level_door_stairs,
@@ -62,6 +67,14 @@ load_level_door (void)
   de_level_door_stairs = load_bitmap (DE_LEVEL_DOOR_STAIRS);
   de_level_door_front = load_bitmap (DE_LEVEL_DOOR_FRONT);
 
+  /* palace ega */
+  pe_level_door_top_left = load_bitmap (PE_LEVEL_DOOR_TOP_LEFT);
+  pe_level_door_top_right = load_bitmap (PE_LEVEL_DOOR_TOP_RIGHT);
+  pe_level_door_bottom = load_bitmap (PE_LEVEL_DOOR_BOTTOM);
+  pe_level_door_floor = load_bitmap (PE_LEVEL_DOOR_FLOOR);
+  pe_level_door_stairs = load_bitmap (PE_LEVEL_DOOR_STAIRS);
+  pe_level_door_front = load_bitmap (PE_LEVEL_DOOR_FRONT);
+
   /* dungeon vga */
   dv_level_door_top_left = load_bitmap (DV_LEVEL_DOOR_TOP_LEFT);
   dv_level_door_top_right = load_bitmap (DV_LEVEL_DOOR_TOP_RIGHT);
@@ -89,6 +102,14 @@ unload_level_door (void)
   al_destroy_bitmap (de_level_door_floor);
   al_destroy_bitmap (de_level_door_stairs);
   al_destroy_bitmap (de_level_door_front);
+
+  /* palace ega */
+  al_destroy_bitmap (pe_level_door_top_left);
+  al_destroy_bitmap (pe_level_door_top_right);
+  al_destroy_bitmap (pe_level_door_bottom);
+  al_destroy_bitmap (pe_level_door_floor);
+  al_destroy_bitmap (pe_level_door_stairs);
+  al_destroy_bitmap (pe_level_door_front);
 
   /* dungeon vga */
   al_destroy_bitmap (dv_level_door_top_left);
@@ -254,7 +275,13 @@ draw_level_door_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
     level_door_bottom_right_coord = p_level_door_bottom_right_coord;
     switch (vm) {
     case CGA: break;
-    case EGA: break;
+    case EGA:
+      level_door_bottom = pe_level_door_bottom;
+      level_door_top_left = pe_level_door_top_left;
+      level_door_floor = pe_level_door_floor;
+      level_door_stairs = pe_level_door_stairs;
+      level_door_top_right = pe_level_door_top_right;
+      break;
     case VGA:
       level_door_bottom = pv_level_door_bottom;
       level_door_top_left = pv_level_door_top_left;
@@ -305,7 +332,7 @@ draw_level_door_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f,
     level_door_bottom_right_coord = p_level_door_bottom_right_coord;
     switch (vm) {
     case CGA: break;
-    case EGA: break;
+    case EGA: level_door_bottom = pe_level_door_bottom; break;
     case VGA: level_door_bottom = pv_level_door_bottom; break;
     }
     break;
@@ -341,7 +368,7 @@ draw_level_door_front (ALLEGRO_BITMAP *bitmap, struct pos *p, int i,
   case PALACE:
     switch (vm) {
     case CGA: break;
-    case EGA: break;
+    case EGA: level_door_front = pe_level_door_front; break;
     case VGA: level_door_front = pv_level_door_front; break;
     }
     break;

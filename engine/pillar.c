@@ -26,6 +26,10 @@
 ALLEGRO_BITMAP *de_pillar_left, *de_pillar_right,
   *de_pillar_top, *de_pillar_fg;
 
+/* palace ega */
+ALLEGRO_BITMAP *pe_pillar_left, *pe_pillar_right,
+  *pe_pillar_top, *pe_pillar_fg;
+
 /* dungeon vga */
 ALLEGRO_BITMAP *dv_pillar_left, *dv_pillar_right,
   *dv_pillar_top, *dv_pillar_fg;
@@ -42,6 +46,12 @@ load_pillar (void)
   de_pillar_right = load_bitmap (DE_PILLAR_RIGHT);
   de_pillar_top = load_bitmap (DE_PILLAR_TOP);
   de_pillar_fg = load_bitmap (DE_PILLAR_FG);
+
+  /* palace ega */
+  pe_pillar_left = load_bitmap (PE_PILLAR_LEFT);
+  pe_pillar_right = load_bitmap (PE_PILLAR_RIGHT);
+  pe_pillar_top = load_bitmap (PE_PILLAR_TOP);
+  pe_pillar_fg = load_bitmap (PE_PILLAR_FG);
 
   /* dungeon vga */
   dv_pillar_left = load_bitmap (DV_PILLAR_LEFT);
@@ -64,6 +74,12 @@ unload_pillar (void)
   al_destroy_bitmap (de_pillar_right);
   al_destroy_bitmap (de_pillar_top);
   al_destroy_bitmap (de_pillar_fg);
+
+  /* palace ega */
+  al_destroy_bitmap (pe_pillar_left);
+  al_destroy_bitmap (pe_pillar_right);
+  al_destroy_bitmap (pe_pillar_top);
+  al_destroy_bitmap (pe_pillar_fg);
 
   /* dungeon vga */
   al_destroy_bitmap (dv_pillar_left);
@@ -104,7 +120,7 @@ draw_pillar_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case PALACE:
     switch (vm) {
     case CGA: break;
-    case EGA: break;
+    case EGA: pillar_left = pe_pillar_left; break;
     case VGA: pillar_left = pv_pillar_left; break;
     }
     break;
@@ -137,7 +153,10 @@ draw_pillar_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case PALACE:
     switch (vm) {
     case CGA: break;
-    case EGA: break;
+    case EGA:
+      pillar_right = pe_pillar_right;
+      pillar_top = pe_pillar_top;
+      break;
     case VGA:
       pillar_right = pv_pillar_right;
       pillar_top = pv_pillar_top;
@@ -168,7 +187,7 @@ draw_pillar_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case PALACE:
     switch (vm) {
     case CGA: break;
-    case EGA: break;
+    case EGA: pillar_fg = pe_pillar_fg; break;
     case VGA: pillar_fg = pv_pillar_fg; break;
     }
     break;

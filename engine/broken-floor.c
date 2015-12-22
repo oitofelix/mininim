@@ -37,6 +37,10 @@
 ALLEGRO_BITMAP *de_broken_floor_left, *de_broken_floor_right,
   *de_broken_floor_front;
 
+/* palace ega */
+ALLEGRO_BITMAP *pe_broken_floor_left, *pe_broken_floor_right,
+  *pe_broken_floor_front;
+
 /* dungeon vga */
 ALLEGRO_BITMAP *dv_broken_floor_left, *dv_broken_floor_right,
   *dv_broken_floor_front;
@@ -52,6 +56,11 @@ load_broken_floor (void)
   de_broken_floor_left = load_bitmap (DE_BROKEN_FLOOR_LEFT);
   de_broken_floor_right = load_bitmap (DE_BROKEN_FLOOR_RIGHT);
   de_broken_floor_front = load_bitmap (DE_BROKEN_FLOOR_FRONT);
+
+  /* palace ega */
+  pe_broken_floor_left = load_bitmap (PE_BROKEN_FLOOR_LEFT);
+  pe_broken_floor_right = load_bitmap (PE_BROKEN_FLOOR_RIGHT);
+  pe_broken_floor_front = load_bitmap (PE_BROKEN_FLOOR_FRONT);
 
   /* dungeon vga */
   dv_broken_floor_left = load_bitmap (DV_BROKEN_FLOOR_LEFT);
@@ -71,6 +80,11 @@ unload_broken_floor (void)
   al_destroy_bitmap (de_broken_floor_left);
   al_destroy_bitmap (de_broken_floor_right);
   al_destroy_bitmap (de_broken_floor_front);
+
+  /* palace ega */
+  al_destroy_bitmap (pe_broken_floor_left);
+  al_destroy_bitmap (pe_broken_floor_right);
+  al_destroy_bitmap (pe_broken_floor_front);
 
   /* dungeon vga */
   al_destroy_bitmap (dv_broken_floor_left);
@@ -109,7 +123,7 @@ draw_broken_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case PALACE:
     switch (vm) {
     case CGA: break;
-    case EGA: break;
+    case EGA: broken_floor_left = pe_broken_floor_left; break;
     case VGA: broken_floor_left = pv_broken_floor_left; break;
     }
     break;
@@ -136,7 +150,7 @@ draw_broken_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case PALACE:
     switch (vm) {
     case CGA: break;
-    case EGA: break;
+    case EGA: broken_floor_right = pe_broken_floor_right; break;
     case VGA: broken_floor_right = pv_broken_floor_right; break;
     }
     break;
@@ -163,7 +177,7 @@ draw_broken_floor_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case PALACE:
     switch (vm) {
     case CGA: break;
-    case EGA: break;
+    case EGA: broken_floor_front = pe_broken_floor_front; break;
     case VGA: broken_floor_front = pv_broken_floor_front; break;
     }
     break;
@@ -225,7 +239,11 @@ create_broken_floor_bitmap (enum em em, enum vm vm)
   case PALACE:
     switch (vm) {
     case CGA: break;
-    case EGA: break;
+    case EGA:
+      broken_floor_left = pe_broken_floor_left;
+      broken_floor_right = pe_broken_floor_right;
+      floor_base = pe_floor_base;
+      break;
     case VGA:
       broken_floor_left = pv_broken_floor_left;
       broken_floor_right = pv_broken_floor_right;

@@ -23,6 +23,9 @@
 /* dungeon ega */
 #define DE_WINDOW "data/window/de.png"
 
+/* palace ega */
+#define PE_WINDOW "data/window/pe.png"
+
 /* dungeon vga */
 #define DV_WINDOW "data/window/dv.png"
 

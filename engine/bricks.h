@@ -26,6 +26,12 @@
 #define DE_BRICKS_03 "data/bricks/de-03.png"
 #define DE_BRICKS_04 "data/bricks/de-04.png"
 
+/* palace ega */
+#define PE_BRICKS_01 "data/bricks/pe-01.png"
+#define PE_BRICKS_02 "data/bricks/pe-02.png"
+#define PE_BRICKS_03 "data/bricks/pe-03.png"
+#define PE_BRICKS_04 "data/bricks/pe-04.png"
+
 /* dungeon vga */
 #define DV_BRICKS_01 "data/bricks/dv-01.png"
 #define DV_BRICKS_02 "data/bricks/dv-02.png"

@@ -36,6 +36,14 @@
 #define DE_DOOR_GRID "data/door/de-grid.png"
 #define DE_DOOR_GRID_TIP "data/door/de-grid-tip.png"
 
+/* palace ega */
+#define PE_DOOR_LEFT "data/door/pe-left.png"
+#define PE_DOOR_RIGHT "data/door/pe-right.png"
+#define PE_DOOR_POLE "data/door/pe-pole.png"
+#define PE_DOOR_TOP "data/door/pe-top.png"
+#define PE_DOOR_GRID "data/door/pe-grid.png"
+#define PE_DOOR_GRID_TIP "data/door/pe-grid-tip.png"
+
 /* dungeon vga */
 #define DV_DOOR_LEFT "data/door/dv-left.png"
 #define DV_DOOR_RIGHT "data/door/dv-right.png"

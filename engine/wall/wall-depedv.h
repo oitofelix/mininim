@@ -37,6 +37,19 @@
 #define DE_WALL_MARK_BOTTOM_LEFT "data/wall/de-mark-bottom-left.png"
 #define DE_WALL_MARK_BOTTOM_RIGHT "data/wall/de-mark-bottom-right.png"
 
+/* palace ega */
+#define PE_WALL_LEFT "data/wall/pe-left.png"
+#define PE_WALL_CENTER "data/wall/pe-center.png"
+#define PE_WALL_RIGHT "data/wall/pe-right.png"
+#define PE_WALL_SINGLE "data/wall/pe-single.png"
+#define PE_WALL_LEFT_BASE "data/wall/pe-left-base.png"
+#define PE_WALL_CENTER_BASE "data/wall/pe-center-base.png"
+#define PE_WALL_RIGHT_BASE "data/wall/pe-right-base.png"
+#define PE_WALL_SINGLE_BASE "data/wall/pe-single-base.png"
+#define PE_WALL_RANDOM_BLOCK "data/wall/pe-random-block.png"
+#define PE_WALL_WIDE_DIVIDER "data/wall/pe-wide-divider.png"
+#define PE_WALL_NARROW_DIVIDER "data/wall/pe-narrow-divider.png"
+
 /* dungeon vga */
 #define DV_WALL_LEFT "data/wall/dv-left.png"
 #define DV_WALL_CENTER "data/wall/dv-center.png"

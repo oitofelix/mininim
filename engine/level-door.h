@@ -32,6 +32,14 @@
 #define DE_LEVEL_DOOR_STAIRS "data/level-door/de-stairs.png"
 #define DE_LEVEL_DOOR_FRONT "data/level-door/de-front.png"
 
+/* palace vga */
+#define PE_LEVEL_DOOR_TOP_LEFT "data/level-door/pe-top-left.png"
+#define PE_LEVEL_DOOR_TOP_RIGHT "data/level-door/pe-top-right.png"
+#define PE_LEVEL_DOOR_BOTTOM "data/level-door/pe-bottom.png"
+#define PE_LEVEL_DOOR_FLOOR "data/level-door/pe-floor.png"
+#define PE_LEVEL_DOOR_STAIRS "data/level-door/pe-stairs.png"
+#define PE_LEVEL_DOOR_FRONT "data/level-door/pe-front.png"
+
 /* dungeon vga */
 #define DV_LEVEL_DOOR_TOP_LEFT "data/level-door/dv-top-left.png"
 #define DV_LEVEL_DOOR_TOP_RIGHT "data/level-door/dv-top-right.png"

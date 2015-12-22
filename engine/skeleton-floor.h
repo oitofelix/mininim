@@ -27,17 +27,17 @@
 #define DE_SKELETON_FLOOR_LEFT "data/skeleton-floor/de-left.png"
 #define DE_SKELETON_FLOOR_RIGHT "data/skeleton-floor/de-right.png"
 
+/* palace ega */
+#define PE_SKELETON_FLOOR_LEFT "data/skeleton-floor/pe-left.png"
+#define PE_SKELETON_FLOOR_RIGHT "data/skeleton-floor/pe-right.png"
+
 /* dungeon vga */
 #define DV_SKELETON_FLOOR_LEFT "data/skeleton-floor/dv-left.png"
 #define DV_SKELETON_FLOOR_RIGHT "data/skeleton-floor/dv-right.png"
 
-extern ALLEGRO_BITMAP *dv_skeleton_floor_left, *dv_skeleton_floor_right;
-
 /* palace vga */
 #define PV_SKELETON_FLOOR_LEFT "data/skeleton-floor/pv-left.png"
 #define PV_SKELETON_FLOOR_RIGHT "data/skeleton-floor/pv-right.png"
-
-extern ALLEGRO_BITMAP *pv_skeleton_floor_left, *pv_skeleton_floor_right;
 
 void load_skeleton_floor (void);
 void unload_skeleton_floor (void);

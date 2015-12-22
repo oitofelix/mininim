@@ -30,6 +30,14 @@
 #define DE_BIG_PILLAR_TOP_RIGHT_TOP "data/big-pillar/de-top-right-top.png"
 #define DE_BIG_PILLAR_BOTTOM_FG "data/big-pillar/de-bottom-fg.png"
 
+/* palace ega */
+#define PE_BIG_PILLAR_BOTTOM_LEFT "data/big-pillar/pe-bottom-left.png"
+#define PE_BIG_PILLAR_BOTTOM_RIGHT "data/big-pillar/pe-bottom-right.png"
+#define PE_BIG_PILLAR_TOP_LEFT "data/big-pillar/pe-top-left.png"
+#define PE_BIG_PILLAR_TOP_RIGHT "data/big-pillar/pe-top-right.png"
+#define PE_BIG_PILLAR_TOP_RIGHT_TOP "data/big-pillar/pe-top-right-top.png"
+#define PE_BIG_PILLAR_BOTTOM_FG "data/big-pillar/pe-bottom-fg.png"
+
 /* dungeon vga */
 #define DV_BIG_PILLAR_BOTTOM_LEFT "data/big-pillar/dv-bottom-left.png"
 #define DV_BIG_PILLAR_BOTTOM_RIGHT "data/big-pillar/dv-bottom-right.png"

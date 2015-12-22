@@ -34,6 +34,9 @@ static ALLEGRO_BITMAP *wall_cache;
 /* dungeon ega */
 ALLEGRO_BITMAP *de_wall_face, *de_wall_face_top;
 
+/* palace ega */
+ALLEGRO_BITMAP *pe_wall_face, *pe_wall_face_top;
+
 /* dungeon vga */
 ALLEGRO_BITMAP *dv_wall_face, *dv_wall_face_top;
 
@@ -46,6 +49,10 @@ load_wall (void)
   /* dungeon ega */
   de_wall_face = load_bitmap (DE_WALL_FACE);
   de_wall_face_top = load_bitmap (DE_WALL_FACE_TOP);
+
+  /* palace ega */
+  pe_wall_face = load_bitmap (PE_WALL_FACE);
+  pe_wall_face_top = load_bitmap (PE_WALL_FACE_TOP);
 
   /* dungeon vga */
   dv_wall_face = load_bitmap (DV_WALL_FACE);
@@ -69,6 +76,10 @@ unload_wall (void)
   /* dungeon ega */
   al_destroy_bitmap (de_wall_face);
   al_destroy_bitmap (de_wall_face_top);
+
+  /* palace vga */
+  al_destroy_bitmap (pe_wall_face);
+  al_destroy_bitmap (pe_wall_face_top);
 
   /* dungeon vga */
   al_destroy_bitmap (dv_wall_face);
@@ -145,7 +156,7 @@ draw_wall_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case PALACE:
     switch (vm) {
     case CGA: break;
-    case EGA: break;
+    case EGA: draw_depedv_wall_left (bitmap, p, em, vm); break;
     case VGA: draw_pv_wall_left (bitmap, p); break;
     }
     break;
@@ -195,7 +206,10 @@ draw_wall_face (ALLEGRO_BITMAP *bitmap, struct pos *p,
     wall_face_top_coord = p_wall_face_top_coord;
     switch (vm) {
     case CGA: break;
-    case EGA: break;
+    case EGA:
+      wall_face = pe_wall_face;
+      wall_face_top = pe_wall_face_top;
+      break;
     case VGA:
       wall_face = pv_wall_face;
       wall_face_top = pv_wall_face_top;

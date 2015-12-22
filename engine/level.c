@@ -276,32 +276,28 @@ draw_level (void)
   if (was_key_pressed (ALLEGRO_KEY_F11, true)) {
     char *em_str = NULL;
 
-    if (! (em == DUNGEON && vm == EGA)) {
-      switch (level->em) {
-      case DUNGEON: level->em = PALACE; em_str = "PALACE"; break;
-      case PALACE: level->em = DUNGEON; em_str = "DUNGEON"; break;
-      }
-
-      asprintf (&text, "ENVIRONMENT MODE: %s", em_str);
-      draw_bottom_text (NULL, text);
-      al_free (text);
+    switch (level->em) {
+    case DUNGEON: level->em = PALACE; em_str = "PALACE"; break;
+    case PALACE: level->em = DUNGEON; em_str = "DUNGEON"; break;
     }
+
+    asprintf (&text, "ENVIRONMENT MODE: %s", em_str);
+    draw_bottom_text (NULL, text);
+    al_free (text);
   }
 
   if (was_key_pressed (ALLEGRO_KEY_F12, true)) {
     char *vm_str = NULL;
 
-    if (! (em == PALACE && vm == VGA)) {
-      switch (level->vm) {
-      case CGA: break;
-      case EGA: level->vm = VGA; vm_str = "VGA"; break;
-      case VGA: level->vm = EGA; vm_str = "EGA"; break;
-      }
-
-      asprintf (&text, "VIDEO MODE: %s", vm_str);
-      draw_bottom_text (NULL, text);
-      al_free (text);
+    switch (level->vm) {
+    case CGA: break;
+    case EGA: level->vm = VGA; vm_str = "VGA"; break;
+    case VGA: level->vm = EGA; vm_str = "EGA"; break;
     }
+
+    asprintf (&text, "VIDEO MODE: %s", vm_str);
+    draw_bottom_text (NULL, text);
+    al_free (text);
   }
 
   draw_cycle++;

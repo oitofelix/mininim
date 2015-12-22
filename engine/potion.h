@@ -24,6 +24,10 @@
 #define DE_SMALL_POTION "data/potion/de-small.png"
 #define DE_BIG_POTION "data/potion/de-big.png"
 
+/* palace ega */
+#define PE_SMALL_POTION "data/potion/pe-small.png"
+#define PE_BIG_POTION "data/potion/pe-big.png"
+
 /* dungeon vga */
 #define DV_SMALL_POTION "data/potion/dv-small.png"
 #define DV_BIG_POTION "data/potion/dv-big.png"

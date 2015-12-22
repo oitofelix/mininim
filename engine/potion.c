@@ -28,10 +28,13 @@
 /* dungeon ega */
 ALLEGRO_BITMAP *de_small_potion, *de_big_potion;
 
+/* palace ega */
+ALLEGRO_BITMAP *pe_small_potion, *pe_big_potion;
+
 /* dungeon vga */
 ALLEGRO_BITMAP *dv_small_potion, *dv_big_potion;
 
-/* dungeon vga */
+/* palace vga */
 ALLEGRO_BITMAP *pv_small_potion, *pv_big_potion;
 
 /* palettable */
@@ -51,6 +54,10 @@ load_potion (void)
   /* dungeon ega */
   de_small_potion = load_bitmap (DE_SMALL_POTION);
   de_big_potion = load_bitmap (DE_BIG_POTION);
+
+  /* palace ega */
+  pe_small_potion = load_bitmap (PE_SMALL_POTION);
+  pe_big_potion = load_bitmap (PE_BIG_POTION);
 
   /* dungeon vga */
   dv_small_potion = load_bitmap (DV_SMALL_POTION);
@@ -76,6 +83,10 @@ unload_potion (void)
   /* dungeon ega */
   al_destroy_bitmap (de_small_potion);
   al_destroy_bitmap (de_big_potion);
+
+  /* palace ega */
+  al_destroy_bitmap (pe_small_potion);
+  al_destroy_bitmap (pe_big_potion);
 
   /* dungeon vga */
   al_destroy_bitmap (dv_small_potion);
@@ -139,7 +150,10 @@ draw_potion (ALLEGRO_BITMAP *bitmap, struct pos *p, int i,
   case PALACE:
     switch (vm) {
     case CGA: break;
-    case EGA: break;
+    case EGA:
+      small_potion = pe_small_potion;
+      big_potion = pe_big_potion;
+      break;
     case VGA:
       small_potion = pv_small_potion;
       big_potion = pv_big_potion;

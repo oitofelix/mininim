@@ -44,6 +44,25 @@
 #define DE_SPIKES_RIGHT_05 "data/spikes-floor/de-spikes-right-05.png"
 #define DE_SPIKES_FG_05 "data/spikes-floor/de-spikes-fg-05.png"
 
+/* palace ega */
+#define PE_SPIKES_FLOOR_LEFT "data/spikes-floor/pe-left.png"
+#define PE_SPIKES_FLOOR_RIGHT "data/spikes-floor/pe-right.png"
+#define PE_SPIKES_LEFT_01 "data/spikes-floor/pe-spikes-left-01.png"
+#define PE_SPIKES_RIGHT_01 "data/spikes-floor/pe-spikes-right-01.png"
+#define PE_SPIKES_FG_01 "data/spikes-floor/pe-spikes-fg-01.png"
+#define PE_SPIKES_LEFT_02 "data/spikes-floor/pe-spikes-left-02.png"
+#define PE_SPIKES_RIGHT_02 "data/spikes-floor/pe-spikes-right-02.png"
+#define PE_SPIKES_FG_02 "data/spikes-floor/pe-spikes-fg-02.png"
+#define PE_SPIKES_LEFT_03 "data/spikes-floor/pe-spikes-left-03.png"
+#define PE_SPIKES_RIGHT_03 "data/spikes-floor/pe-spikes-right-03.png"
+#define PE_SPIKES_FG_03 "data/spikes-floor/pe-spikes-fg-03.png"
+#define PE_SPIKES_LEFT_04 "data/spikes-floor/pe-spikes-left-04.png"
+#define PE_SPIKES_RIGHT_04 "data/spikes-floor/pe-spikes-right-04.png"
+#define PE_SPIKES_FG_04 "data/spikes-floor/pe-spikes-fg-04.png"
+#define PE_SPIKES_LEFT_05 "data/spikes-floor/pe-spikes-left-05.png"
+#define PE_SPIKES_RIGHT_05 "data/spikes-floor/pe-spikes-right-05.png"
+#define PE_SPIKES_FG_05 "data/spikes-floor/pe-spikes-fg-05.png"
+
 /* dungeon vga */
 #define DV_SPIKES_FLOOR_LEFT "data/spikes-floor/dv-left.png"
 #define DV_SPIKES_FLOOR_RIGHT "data/spikes-floor/dv-right.png"
