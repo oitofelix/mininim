@@ -209,7 +209,7 @@ process_keys (void)
   if (was_key_pressed (ALLEGRO_KEY_N, 0, 0, true))
     room_view = level.link[room_view].b;
 
-  /* SHIFT+B: block room drawing */
+  /* SHIFT+B: enable/disable room drawing */
   if (was_key_pressed (ALLEGRO_KEY_B, 0, ALLEGRO_KEYMOD_SHIFT, true))
     no_room_drawing = ! no_room_drawing;
 
@@ -247,11 +247,21 @@ process_keys (void)
   if (was_key_pressed (ALLEGRO_KEY_A, 0, ALLEGRO_KEYMOD_CTRL, true))
     quit_anim = RESTART_LEVEL;
 
-  /* C: show coordinates */
+  /* C: show direct coordinates */
   if (was_key_pressed (ALLEGRO_KEY_C, 0, 0, true)) {
     int s = room_view;
     int l = roomd (room_view, LEFT);
     int r = roomd (room_view, RIGHT);
+    int a = roomd (room_view, ABOVE);
+    int b = roomd (room_view, BELOW);
+
+    xasprintf (&text, "S%i L%i R%i A%i B%i", s, l, r, a, b);
+    draw_bottom_text (NULL, text);
+    al_free (text);
+  }
+
+  /* SHIFT+C: show indirect coordinates */
+  if (was_key_pressed (ALLEGRO_KEY_C, 0, ALLEGRO_KEYMOD_SHIFT, true)) {
     int a = roomd (room_view, ABOVE);
     int b = roomd (room_view, BELOW);
     int al = roomd (a, LEFT);
@@ -259,13 +269,12 @@ process_keys (void)
     int bl = roomd (b, LEFT);
     int br = roomd (b, RIGHT);
 
-    xasprintf (&text, "S%i L%i R%i A%i B%i AL%i AR%i BL%i BR%i",
-               s, l, r, a, b, al, ar, bl, br);
+    xasprintf (&text, "AL%i AR%i BL%i BR%i", al, ar, bl, br);
     draw_bottom_text (NULL, text);
     al_free (text);
   }
 
-  /* CTRL+V: engine name and version */
+  /* CTRL+V: show engine name and version */
   if (was_key_pressed (ALLEGRO_KEY_V, 0, ALLEGRO_KEYMOD_CTRL, true)) {
     xasprintf (&text, "MININIM 0.9");
     draw_bottom_text (NULL, text);
