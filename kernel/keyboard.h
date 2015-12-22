@@ -20,9 +20,13 @@
 #ifndef MININIM_KEYBOARD_H
 #define MININIM_KEYBOARD_H
 
+#define IGNORED_KEYBOARD_MODIFIERS \
+  (ALLEGRO_KEYMOD_SCROLLLOCK | ALLEGRO_KEYMOD_NUMLOCK \
+   | ALLEGRO_KEYMOD_CAPSLOCK)
+
 /* variables */
 extern ALLEGRO_KEYBOARD_STATE keyboard_state;
-extern int key;
+extern ALLEGRO_EVENT key;
 extern bool up_key, down_key, left_key, right_key, shift_key, ctrl_key,
   esc_key, pause_key, enter_key, a_key, w_key, d_key, s_key,
   h_key, j_key, u_key, n_key, c_key, delete_key, page_down_key;
@@ -32,6 +36,7 @@ void init_keyboard (void);
 void finalize_keyboard (void);
 ALLEGRO_EVENT_SOURCE *get_keyboard_event_source (void);
 void get_keyboard_state (void);
-bool was_key_pressed (int dkey, bool consume);
+bool was_key_pressed (int keycode, int unichar, unsigned int modifiers,
+                      bool consume);
 
 #endif	/* MININIM_KEYBOARD_H */

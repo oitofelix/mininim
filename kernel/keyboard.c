@@ -20,10 +20,12 @@
 #include <error.h>
 #include <allegro5/allegro.h>
 
+#include "keyboard.h"
+
 /* keyboard state */
 ALLEGRO_KEYBOARD_STATE keyboard_state;
 
-int key; /* last key pressed */
+ALLEGRO_EVENT key; /* last key pressed */
 
 /* real time keys */
 bool up_key, down_key, left_key, right_key, shift_key, ctrl_key, esc_key,
@@ -81,10 +83,15 @@ get_keyboard_state (void)
 }
 
 bool
-was_key_pressed (int dkey, bool consume)
+was_key_pressed (int keycode, int unichar, unsigned int modifiers,
+                 bool consume)
 {
-  if (key == dkey) {
-    if (consume) key = 0;
+  key.keyboard.modifiers &= ~ IGNORED_KEYBOARD_MODIFIERS;
+
+  if ((((keycode == key.keyboard.keycode && unichar <= 0)
+        || (unichar == key.keyboard.unichar && unichar > 0))
+       && modifiers == key.keyboard.modifiers)) {
+    if (consume) memset (&key, 0, sizeof (key));
     return true;
   } else return false;
 }

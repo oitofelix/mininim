@@ -60,9 +60,9 @@ play_anim (void (*draw_callback) (void),
     case ALLEGRO_EVENT_TIMER:
       if (event.timer.source == timer) {
         get_keyboard_state ();
-        if (was_key_pressed (ALLEGRO_KEY_ESCAPE, false))
+        if (was_key_pressed (ALLEGRO_KEY_ESCAPE, 0, 0, false))
           pause_anim = true;
-        if (was_key_pressed (ALLEGRO_KEY_P, true))
+        if (was_key_pressed (ALLEGRO_KEY_P, 0, 0, true))
           pause_anim = false;
 
         /* begin kid hack */
@@ -99,7 +99,7 @@ f = %i, p = %i, dn = %i, dp = %i, dc = %i, df = %i, dl = %i, dcl = %i, dch = %i\
         if (! is_video_effect_started ()) show ();
         if (! pause_anim
             || (pause_anim &&
-                was_key_pressed (ALLEGRO_KEY_ESCAPE, true))) {
+                was_key_pressed (ALLEGRO_KEY_ESCAPE, 0, 0, true))) {
           if (compute_callback) compute_callback ();
           draw_callback ();
           if (sample_callback) sample_callback ();
@@ -124,8 +124,8 @@ f = %i, p = %i, dn = %i, dp = %i, dc = %i, df = %i, dl = %i, dcl = %i, dch = %i\
     case ALLEGRO_EVENT_DISPLAY_CLOSE:
       exit (0);
       break;
-    case ALLEGRO_EVENT_KEY_DOWN:
-      key = event.keyboard.keycode;
+    case ALLEGRO_EVENT_KEY_CHAR:
+      key = event;
       break;
     }
   }

@@ -167,21 +167,21 @@ draw_level (void)
 
   int prev_room = room_view;
 
-  if (was_key_pressed (ALLEGRO_KEY_HOME, true))
+  if (was_key_pressed (ALLEGRO_KEY_HOME, 0, 0, true))
     room_view = current_kid->f.c.room;
-  if (was_key_pressed (ALLEGRO_KEY_H, true))
+  if (was_key_pressed (ALLEGRO_KEY_H, 0, 0, true))
     room_view = level->link[room_view].l;
-  if (was_key_pressed (ALLEGRO_KEY_J, true))
+  if (was_key_pressed (ALLEGRO_KEY_J, 0, 0, true))
     room_view = level->link[room_view].r;
-  if (was_key_pressed (ALLEGRO_KEY_U, true))
+  if (was_key_pressed (ALLEGRO_KEY_U, 0, 0, true))
     room_view = level->link[room_view].a;
-  if (was_key_pressed (ALLEGRO_KEY_N, true))
+  if (was_key_pressed (ALLEGRO_KEY_N, 0, 0, true))
     room_view = level->link[room_view].b;
 
-  if (was_key_pressed (ALLEGRO_KEY_B, true))
+  if (was_key_pressed (ALLEGRO_KEY_B, 0, ALLEGRO_KEYMOD_SHIFT, true))
     no_room_drawing = ! no_room_drawing;
 
-  if (was_key_pressed (ALLEGRO_KEY_A, true)) {
+  if (was_key_pressed (ALLEGRO_KEY_A, 0, 0, true)) {
     current_kid->current = false;
     current_kid = &kid[(current_kid - kid + 1) % kid_nmemb];
     current_kid->current = true;
@@ -221,7 +221,7 @@ draw_level (void)
 
   draw_kid_lives (screen, current_kid, draw_cycle);
 
-  if (was_key_pressed (ALLEGRO_KEY_C, true)) {
+  if (was_key_pressed (ALLEGRO_KEY_C, 0, 0, true)) {
     int s = room_view;
     int l = roomd (room_view, LEFT);
     int r = roomd (room_view, RIGHT);
@@ -238,13 +238,13 @@ draw_level (void)
     al_free (text);
   }
 
-  if (was_key_pressed (ALLEGRO_KEY_V, true)) {
+  if (was_key_pressed (ALLEGRO_KEY_V, 0, ALLEGRO_KEYMOD_CTRL, true)) {
     xasprintf (&text, "MININIM 0.9");
     draw_bottom_text (NULL, text);
     al_free (text);
   }
 
-  if (was_key_pressed (ALLEGRO_KEY_S, true)) {
+  if (was_key_pressed (ALLEGRO_KEY_S, 0, ALLEGRO_KEYMOD_CTRL, true)) {
     audio_enabled = ! audio_enabled;
     enable_audio (audio_enabled);
     xasprintf (&text, "SOUND %s", audio_enabled ? "ON" : "OFF");
@@ -252,7 +252,7 @@ draw_level (void)
     al_free (text);
   }
 
-  if (was_key_pressed (ALLEGRO_KEY_I, true)) {
+  if (was_key_pressed (ALLEGRO_KEY_I, 0, ALLEGRO_KEYMOD_SHIFT, true)) {
     char *flip = "NONE";
     switch (screen_flags) {
     case 0:
@@ -273,7 +273,7 @@ draw_level (void)
     al_free (text);
   }
 
-  if (was_key_pressed (ALLEGRO_KEY_F11, true)) {
+  if (was_key_pressed (ALLEGRO_KEY_F11, 0, 0, true)) {
     char *em_str = NULL;
 
     switch (level->em) {
@@ -286,7 +286,7 @@ draw_level (void)
     al_free (text);
   }
 
-  if (was_key_pressed (ALLEGRO_KEY_F12, true)) {
+  if (was_key_pressed (ALLEGRO_KEY_F12, 0, 0, true)) {
     char *vm_str = NULL;
 
     switch (level->vm) {
