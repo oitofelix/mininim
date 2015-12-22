@@ -46,11 +46,8 @@ static bool is_inaccessible (struct pos *p);
 static bool is_loose (struct pos *p);
 
 void
-fix_level (struct level *lv)
+fix_level (void)
 {
-  struct level *olevel = level;
-  level = lv;
-
   struct pos p;
 
   for (p.room = 0; p.room < ROOMS; p.room++)
@@ -71,8 +68,6 @@ fix_level (struct level *lv)
         fix_confg_which_should_not_have_conbg (&p);
         fix_partial_big_pillar (&p);
       }
-
-  level = olevel;
 }
 
 /* Important: the corrections bellow are all made for two perspectives
@@ -257,7 +252,7 @@ fix_door_lacking_opener (struct pos *p)
   if (c->fg == DOOR
       || c->fg == LEVEL_DOOR) {
     for (i = 0; i < EVENTS; i++)
-      if (peq (&level->event[i].p, p)
+      if (peq (&level.event[i].p, p)
           && is_there_event_handler (i)) return;
 
     fprintf (stderr, "%s: replaced %s by %s at pos (%i, %i, %i)\n",
@@ -279,9 +274,9 @@ fix_opener_or_closer_lacking_door (struct pos *p)
       || c->fg == CLOSER_FLOOR) {
     int i = c->ext.event;
     do {
-      if (con (&level->event[i].p)->fg == DOOR
-          || con (&level->event[i].p)->fg == LEVEL_DOOR) return;
-    } while (level->event[i++].next);
+      if (con (&level.event[i].p)->fg == DOOR
+          || con (&level.event[i].p)->fg == LEVEL_DOOR) return;
+    } while (level.event[i++].next);
 
     fprintf (stderr, "%s: replaced %s (event %i) by %s at pos (%i, %i, %i)\n",
              __func__, c->fg == OPENER_FLOOR ? "OPENER_FLOOR" : "CLOSER_FLOOR",
@@ -323,13 +318,13 @@ void
 make_links_locally_consistent (int prev_room, int current_room)
 {
   if (roomd (prev_room, LEFT) == current_room)
-    level->link[current_room].r = prev_room;
+    level.link[current_room].r = prev_room;
   else if (roomd (prev_room, RIGHT) == current_room)
-    level->link[current_room].l = prev_room;
+    level.link[current_room].l = prev_room;
   else if (roomd (prev_room, ABOVE) == current_room)
-    level->link[current_room].b = prev_room;
+    level.link[current_room].b = prev_room;
   else if (roomd (prev_room, BELOW) == current_room)
-    level->link[current_room].a = prev_room;
+    level.link[current_room].a = prev_room;
 }
 
 static bool
@@ -345,7 +340,7 @@ is_there_event_handler (int e)
           i = con (&p)->ext.event;
           do {
             if (i == e) return true;
-          } while (level->event[i++].next);
+          } while (level.event[i++].next);
         }
       }
   return false;

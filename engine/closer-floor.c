@@ -48,8 +48,8 @@ ALLEGRO_BITMAP *pv_unpressed_closer_floor_base, *pv_pressed_closer_floor_base,
 ALLEGRO_SAMPLE *closer_floor_sample;
 bool sample_closer_floor;
 
-static struct closer_floor *closer_floor = NULL;
-static size_t closer_floor_nmemb = 0;
+struct closer_floor *closer_floor = NULL;
+size_t closer_floor_nmemb = 0;
 
 void
 load_closer_floor (void)

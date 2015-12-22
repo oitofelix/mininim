@@ -112,6 +112,11 @@ struct spikes_floor {
   int murdered_kid;
 };
 
+/* variables */
+extern struct spikes_floor *spikes_floor;
+extern size_t spikes_floor_nmemb;
+
+/* functions */
 void load_spikes_floor (void);
 void unload_spikes_floor (void);
 void load_spikes_floor_samples (void);

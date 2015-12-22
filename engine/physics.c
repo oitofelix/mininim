@@ -36,7 +36,7 @@ struct con *
 con (struct pos *p)
 {
   struct pos np; npos (p, &np);
-  return &level->con[np.room][np.floor][np.place];
+  return &level.con[np.room][np.floor][np.place];
 }
 
 struct con *

@@ -31,7 +31,7 @@
 #include "anim.h"
 
 /* set to true to quit animation */
-bool quit_anim = false;
+enum quit_anim quit_anim = false;
 bool pause_anim = false;
 bool cutscene = false;
 bool next_frame_inv = false; /* invert next_anim offset interpretation  */
@@ -42,7 +42,7 @@ play_anim (void (*draw_callback) (void),
            void (*compute_callback) (void),
            int freq)
 {
-  quit_anim = false;
+  quit_anim = NO_QUIT;
 
   acknowledge_resize ();
   ALLEGRO_EVENT event;

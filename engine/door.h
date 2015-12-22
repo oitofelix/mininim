@@ -77,6 +77,11 @@ struct door {
   bool noise;
 };
 
+/* variables */
+extern struct door *door;
+extern size_t door_nmemb;
+
+/* functions */
 void load_door (void);
 void unload_door (void);
 void load_door_samples (void);

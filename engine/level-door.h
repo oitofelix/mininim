@@ -69,6 +69,11 @@ struct level_door {
   } action;
 };
 
+/* variables */
+extern struct level_door *level_door;
+extern size_t level_door_nmemb;
+
+/* functions */
 void load_level_door (void);
 void unload_level_door (void);
 void load_level_door_samples (void);

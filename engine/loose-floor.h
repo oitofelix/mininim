@@ -80,6 +80,10 @@ struct loose_floor {
   struct frame f;
 };
 
+/* variables */
+extern struct loose_floor *loose_floor;
+extern size_t loose_floor_nmemb;
+
 /* functions */
 void load_loose_floor (void);
 void unload_loose_floor (void);

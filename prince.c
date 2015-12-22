@@ -22,6 +22,7 @@
 #include "kernel/video.h"
 #include "kernel/audio.h"
 #include "kernel/keyboard.h"
+#include "engine/level.h"
 #include "levels/title.h"
 #include "levels/level-1.h"
 #include "levels/consistency-level.h"
@@ -39,9 +40,11 @@ main (int argc, char **argv)
   show ();
   clear_bitmap (screen, BLACK);
 
+  load_level ();
   /* play_title (); */
   /* play_level_1 (); */
   play_consistency_level ();
+  unload_level ();
 
   finalize_video ();
   finalize_audio ();

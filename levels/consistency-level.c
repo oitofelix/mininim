@@ -186,6 +186,8 @@ play_consistency_level (void)
 {
   int i = 0;
   init_consistency_level ();
-  for (i = 0; i < 2; i++) fix_level (&consistency_level);
+  level = consistency_level;
+  for (i = 0; i < 2; i++) fix_level ();
+  consistency_level = level;
   play_level (&consistency_level);
 }

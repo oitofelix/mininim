@@ -50,6 +50,11 @@ struct opener_floor {
   bool broken;
 };
 
+/* variables */
+extern struct opener_floor *opener_floor;
+extern size_t opener_floor_nmemb;
+
+/* functions */
 void load_opener_floor (void);
 void unload_opener_floor (void);
 void load_opener_floor_samples (void);

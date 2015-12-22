@@ -22,6 +22,11 @@
 
 #include "prince.h"
 
+/* types */
+enum quit_anim {
+  NO_QUIT, RESTART_LEVEL, QUIT_GAME
+};
+
 /* functions */
 void play_anim (void (*draw_callback) (void),
                 void (*sample_callback) (void),
@@ -41,7 +46,7 @@ void select_xframe (struct frame_offset *xf, struct frameset *fs, int j);
 bool wait_anim (int cycles);
 
 /* variables */
-extern bool quit_anim; /* set to true to quit animation */
+extern enum quit_anim quit_anim; /* set to true to quit animation */
 extern bool next_frame_inv; /* invert draw_anim offset interpretation  */
 extern bool cutscene; /* don't apply physics if set */
 

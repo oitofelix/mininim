@@ -90,6 +90,11 @@ struct chopper {
   bool blood;
 };
 
+/* variables */
+extern struct chopper *chopper;
+extern size_t chopper_nmemb;
+
+/* functions */
 void load_chopper (void);
 void unload_chopper (void);
 void load_chopper_samples (void);

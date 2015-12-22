@@ -53,8 +53,8 @@ ALLEGRO_SAMPLE *level_door_open_sample, *level_door_close_sample;
 
 bool sample_level_door_open, sample_level_door_close;
 
-static struct level_door *level_door = NULL;
-static size_t level_door_nmemb = 0;
+struct level_door *level_door = NULL;
+size_t level_door_nmemb = 0;
 
 void
 load_level_door (void)

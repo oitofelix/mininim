@@ -49,8 +49,8 @@ ALLEGRO_BITMAP *pv_unpressed_opener_floor_base,
 ALLEGRO_SAMPLE *opener_floor_sample;
 bool sample_opener_floor;
 
-static struct opener_floor *opener_floor = NULL;
-static size_t opener_floor_nmemb = 0;
+struct opener_floor *opener_floor = NULL;
+size_t opener_floor_nmemb = 0;
 
 void
 load_opener_floor (void)

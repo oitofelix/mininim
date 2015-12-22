@@ -27,6 +27,7 @@ void * add_to_array (void *s_base, size_t s_nmemb,
                      size_t size);
 void * remove_from_array (void *base, size_t *nmemb, size_t index,
                           size_t count, size_t size);
+void destroy_array (void **base, size_t *nmemb);
 
 void xasprintf (char **ptr, const char *template, ...);
 

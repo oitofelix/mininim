@@ -54,6 +54,11 @@ struct closer_floor {
   bool broken;
 };
 
+/* variables */
+extern struct closer_floor *closer_floor;
+extern size_t closer_floor_nmemb;
+
+/* functions */
 void load_closer_floor (void);
 void unload_closer_floor (void);
 void load_closer_floor_samples (void);

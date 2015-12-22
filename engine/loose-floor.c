@@ -60,8 +60,8 @@ ALLEGRO_SAMPLE *loose_floor_01_sample, *loose_floor_02_sample, *loose_floor_03_s
 bool sample_loose_floor_01, sample_loose_floor_02, sample_loose_floor_03,
   sample_broken_floor;
 
-static struct loose_floor *loose_floor = NULL;
-static size_t loose_floor_nmemb = 0;
+struct loose_floor *loose_floor = NULL;
+size_t loose_floor_nmemb = 0;
 
 void
 load_loose_floor (void)
@@ -363,8 +363,8 @@ compute_loose_floor_release (struct loose_floor *l)
 ALLEGRO_BITMAP *
 get_correct_falling_loose_floor_bitmap (ALLEGRO_BITMAP *b)
 {
-  enum em em = level->em;
-  enum vm vm = level->vm;
+  enum em em = level.em;
+  enum vm vm = level.vm;
 
   if (b == de_loose_floor_02
       || b == pe_loose_floor_02

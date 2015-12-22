@@ -52,8 +52,8 @@ ALLEGRO_SAMPLE *door_open_sample, *door_close_sample, *door_end_sample,
 bool sample_door_open, sample_door_close, sample_door_end,
   sample_door_abruptly_close;
 
-static struct door *door = NULL;
-static size_t door_nmemb = 0;
+struct door *door = NULL;
+size_t door_nmemb = 0;
 
 void
 load_door (void)
@@ -260,7 +260,7 @@ open_door (int e)
   struct level_door *ld;
 
   do {
-    p = &level->event[e].p;
+    p = &level.event[e].p;
     switch (con (p)->fg) {
     case DOOR:
       d = door_at_pos (p);
@@ -276,7 +276,7 @@ open_door (int e)
     default:
       break;
     }
-  } while (level->event[e++].next);
+  } while (level.event[e++].next);
 }
 
 void
@@ -288,7 +288,7 @@ close_door (int e)
   struct level_door *ld;
 
   do {
-    p = &level->event[e].p;
+    p = &level.event[e].p;
     switch (con (p)->fg) {
     case DOOR:
       d = door_at_pos (p);
@@ -303,7 +303,7 @@ close_door (int e)
     default:
       break;
     }
-  } while (level->event[e++].next);
+  } while (level.event[e++].next);
 }
 
 int

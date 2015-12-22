@@ -66,8 +66,8 @@ ALLEGRO_SAMPLE *chopper_sample;
 
 bool sample_chopper;
 
-static struct chopper *chopper = NULL;
-static size_t chopper_nmemb = 0;
+struct chopper *chopper = NULL;
+size_t chopper_nmemb = 0;
 
 void
 load_chopper (void)

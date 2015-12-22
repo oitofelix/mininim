@@ -33,10 +33,10 @@ int
 roomd (int room, enum dir dir)
 {
   switch (dir) {
-  case LEFT: return level->link[room].l;
-  case RIGHT: return level->link[room].r;
-  case ABOVE: return level->link[room].a;
-  case BELOW: return level->link[room].b;
+  case LEFT: return level.link[room].l;
+  case RIGHT: return level.link[room].r;
+  case ABOVE: return level.link[room].a;
+  case BELOW: return level.link[room].b;
   default:
     error (-1, 0, "%s: unknown direction (%i)", __func__, dir);
     return room;

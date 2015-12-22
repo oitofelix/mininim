@@ -25,6 +25,7 @@
 #include <stddef.h>
 #include <string.h>
 #include <assert.h>
+#include <allegro5/allegro.h>
 #include "kernel/memory.h"
 #include "array.h"
 
@@ -82,6 +83,14 @@ remove_from_array (void *base, size_t *nmemb, size_t index, size_t count, size_t
 
   /* Return the pointer to the new array */
   return ptr;
+}
+
+void
+destroy_array (void **base, size_t *nmemb)
+{
+  al_free (*base);
+  *base = NULL;
+  *nmemb = 0;
 }
 
 void

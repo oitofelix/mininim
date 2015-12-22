@@ -43,29 +43,46 @@
 #include "level.h"
 
 /* functions */
-static void load_level (void);
-static void unload_level (void);
 static void draw_level (void);
 static void sample_level (void);
 static void compute_level (void);
 
-struct level *level;
+struct level *vanilla_level;
+struct level level;
 static bool no_room_drawing = false;
-int room_view = 1;
+int room_view;
 int draw_cycle;
 
 void
-play_level (struct level *_level)
+play_level (struct level *lv)
 {
+ restart:
   cutscene = false;
 
-  level = _level;
-  load_level ();
+  vanilla_level = lv;
+  level = *lv;
 
   register_cons ();
+
+  create_kid ();
+  create_kid ();
+
+  current_kid = &kid[0];
+  current_kid->current = true;
+  kid[1].shadow = true;
+
+  room_view = 1;
+
   play_anim (draw_level, sample_level, compute_level, 12);
 
-  unload_level ();
+  switch (quit_anim) {
+  case NO_QUIT: break;
+  case RESTART_LEVEL:
+    destroy_array ((void **) &kid, &kid_nmemb);
+    destroy_cons ();
+    goto restart;
+  case QUIT_GAME: break;
+  }
 }
 
 void
@@ -87,7 +104,19 @@ register_cons (void)
         }
 }
 
-static void
+void
+destroy_cons (void)
+{
+  destroy_array ((void **) &loose_floor, &loose_floor_nmemb);
+  destroy_array ((void **) &opener_floor, &opener_floor_nmemb);
+  destroy_array ((void **) &closer_floor, &closer_floor_nmemb);
+  destroy_array ((void **) &spikes_floor, &spikes_floor_nmemb);
+  destroy_array ((void **) &door, &door_nmemb);
+  destroy_array ((void **) &level_door, &level_door_nmemb);
+  destroy_array ((void **) &chopper, &chopper_nmemb);
+}
+
+void
 load_level (void)
 {
   load_room ();
@@ -95,16 +124,9 @@ load_level (void)
   load_potion ();
   load_sword ();
   load_kid ();
-
-  create_kid ();
-  create_kid ();
-
-  current_kid = &kid[0];
-  current_kid->current = true;
-  kid[1].shadow = true;
 }
 
-static void
+void
 unload_level (void)
 {
   unload_room ();
@@ -160,8 +182,8 @@ sample_level (void)
 static void
 draw_level (void)
 {
-  enum em em = level->em;
-  enum vm vm = level->vm;
+  enum em em = level.em;
+  enum vm vm = level.vm;
 
   char *text = NULL;
 
@@ -170,13 +192,13 @@ draw_level (void)
   if (was_key_pressed (ALLEGRO_KEY_HOME, 0, 0, true))
     room_view = current_kid->f.c.room;
   if (was_key_pressed (ALLEGRO_KEY_H, 0, 0, true))
-    room_view = level->link[room_view].l;
+    room_view = level.link[room_view].l;
   if (was_key_pressed (ALLEGRO_KEY_J, 0, 0, true))
-    room_view = level->link[room_view].r;
+    room_view = level.link[room_view].r;
   if (was_key_pressed (ALLEGRO_KEY_U, 0, 0, true))
-    room_view = level->link[room_view].a;
+    room_view = level.link[room_view].a;
   if (was_key_pressed (ALLEGRO_KEY_N, 0, 0, true))
-    room_view = level->link[room_view].b;
+    room_view = level.link[room_view].b;
 
   if (was_key_pressed (ALLEGRO_KEY_B, 0, ALLEGRO_KEYMOD_SHIFT, true))
     no_room_drawing = ! no_room_drawing;
@@ -205,6 +227,9 @@ draw_level (void)
 
   if (was_key_pressed (ALLEGRO_KEY_T, 0, ALLEGRO_KEYMOD_SHIFT, true))
     increase_kid_total_lives (current_kid);
+
+  if (was_key_pressed (ALLEGRO_KEY_A, 0, ALLEGRO_KEYMOD_CTRL, true))
+    quit_anim = RESTART_LEVEL;
 
   if (room_view == 0) room_view = prev_room;
 
@@ -294,9 +319,9 @@ draw_level (void)
   if (was_key_pressed (ALLEGRO_KEY_F11, 0, 0, true)) {
     char *em_str = NULL;
 
-    switch (level->em) {
-    case DUNGEON: level->em = PALACE; em_str = "PALACE"; break;
-    case PALACE: level->em = DUNGEON; em_str = "DUNGEON"; break;
+    switch (level.em) {
+    case DUNGEON: level.em = PALACE; em_str = "PALACE"; break;
+    case PALACE: level.em = DUNGEON; em_str = "DUNGEON"; break;
     }
 
     xasprintf (&text, "ENVIRONMENT MODE: %s", em_str);
@@ -307,10 +332,10 @@ draw_level (void)
   if (was_key_pressed (ALLEGRO_KEY_F12, 0, 0, true)) {
     char *vm_str = NULL;
 
-    switch (level->vm) {
+    switch (level.vm) {
     case CGA: break;
-    case EGA: level->vm = VGA; vm_str = "VGA"; break;
-    case VGA: level->vm = EGA; vm_str = "EGA"; break;
+    case EGA: level.vm = VGA; vm_str = "VGA"; break;
+    case VGA: level.vm = EGA; vm_str = "EGA"; break;
     }
 
     xasprintf (&text, "VIDEO MODE: %s", vm_str);

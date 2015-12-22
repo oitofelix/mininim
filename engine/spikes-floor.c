@@ -62,8 +62,8 @@ ALLEGRO_BITMAP *pv_spikes_floor_left, *pv_spikes_floor_right,
 ALLEGRO_SAMPLE *spikes_sample;
 bool sample_spikes;
 
-static struct spikes_floor *spikes_floor = NULL;
-static size_t spikes_floor_nmemb = 0;
+struct spikes_floor *spikes_floor = NULL;
+size_t spikes_floor_nmemb = 0;
 
 void
 load_spikes_floor (void)

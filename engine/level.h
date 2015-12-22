@@ -23,10 +23,13 @@
 #include "anim.h"
 
 /* current level */
-extern struct level *level;
+extern struct level level;
 extern int room_view, draw_cycle;
 
+void load_level (void);
+void unload_level (void);
 void play_level (struct level *level);
 void register_cons (void);
+void destroy_cons (void);
 
 #endif	/* MININIM_LEVEL_H */

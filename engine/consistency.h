@@ -20,7 +20,7 @@
 #ifndef MININIM_CONSISTENCY_H
 #define MININIM_CONSISTENCY_H
 
-void fix_level (struct level *lv);
+void fix_level (void);
 void make_links_locally_consistent (int prev_room, int current_room);
 
 #endif	/* MININIM_CONSISTENCY_H */
