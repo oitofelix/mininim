@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "prince.h"
-
 #include "kernel/video.h"
 #include "kernel/audio.h"
 #include "kernel/keyboard.h"
@@ -49,6 +49,9 @@ main (int argc, char **argv)
   finalize_video ();
   finalize_audio ();
   finalize_keyboard ();
+
+  fprintf (stderr, "MININIM: Hope you enjoyed it!\n");
+
   return 0;
 }
 

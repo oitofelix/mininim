@@ -122,10 +122,12 @@ f = %i, p = %i, dn = %i, dp = %i, dc = %i, df = %i, dl = %i, dcl = %i, dch = %i\
       show ();
       break;
     case ALLEGRO_EVENT_DISPLAY_CLOSE:
-      exit (0);
+      quit_anim = QUIT_GAME;
       break;
     case ALLEGRO_EVENT_KEY_CHAR:
       key = event;
+      if (was_key_pressed (ALLEGRO_KEY_Q, 0, ALLEGRO_KEYMOD_CTRL, true))
+        quit_anim = QUIT_GAME;
       break;
     }
   }
