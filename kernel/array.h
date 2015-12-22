@@ -28,4 +28,6 @@ void * add_to_array (void *s_base, size_t s_nmemb,
 void * remove_from_array (void *base, size_t *nmemb, size_t index,
                           size_t count, size_t size);
 
+void xasprintf (char **ptr, const char *template, ...);
+
 #endif	/* MININIM_ARRAY_H */

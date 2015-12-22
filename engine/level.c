@@ -24,7 +24,7 @@
 
 #include "kernel/video.h"
 #include "kernel/keyboard.h"
-
+#include "kernel/array.h"
 #include "anim.h"
 #include "physics.h"
 #include "room.h"
@@ -232,14 +232,14 @@ draw_level (void)
     int bl = roomd (b, LEFT);
     int br = roomd (b, RIGHT);
 
-    asprintf (&text, "S%i L%i R%i A%i B%i AL%i AR%i BL%i BR%i",
-              s, l, r, a, b, al, ar, bl, br);
+    xasprintf (&text, "S%i L%i R%i A%i B%i AL%i AR%i BL%i BR%i",
+               s, l, r, a, b, al, ar, bl, br);
     draw_bottom_text (NULL, text);
     al_free (text);
   }
 
   if (was_key_pressed (ALLEGRO_KEY_V, true)) {
-    asprintf (&text, "MININIM 0.9");
+    xasprintf (&text, "MININIM 0.9");
     draw_bottom_text (NULL, text);
     al_free (text);
   }
@@ -247,7 +247,7 @@ draw_level (void)
   if (was_key_pressed (ALLEGRO_KEY_S, true)) {
     audio_enabled = ! audio_enabled;
     enable_audio (audio_enabled);
-    asprintf (&text, "SOUND %s", audio_enabled ? "ON" : "OFF");
+    xasprintf (&text, "SOUND %s", audio_enabled ? "ON" : "OFF");
     draw_bottom_text (NULL, text);
     al_free (text);
   }
@@ -268,7 +268,7 @@ draw_level (void)
       screen_flags = 0;
       break;
     }
-    asprintf (&text, "DISPLAY FLIP: %s", flip);
+    xasprintf (&text, "DISPLAY FLIP: %s", flip);
     draw_bottom_text (NULL, text);
     al_free (text);
   }
@@ -281,7 +281,7 @@ draw_level (void)
     case PALACE: level->em = DUNGEON; em_str = "DUNGEON"; break;
     }
 
-    asprintf (&text, "ENVIRONMENT MODE: %s", em_str);
+    xasprintf (&text, "ENVIRONMENT MODE: %s", em_str);
     draw_bottom_text (NULL, text);
     al_free (text);
   }
@@ -295,7 +295,7 @@ draw_level (void)
     case VGA: level->vm = EGA; vm_str = "EGA"; break;
     }
 
-    asprintf (&text, "VIDEO MODE: %s", vm_str);
+    xasprintf (&text, "VIDEO MODE: %s", vm_str);
     draw_bottom_text (NULL, text);
     al_free (text);
   }

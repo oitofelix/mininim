@@ -17,6 +17,11 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#define _GNU_SOURCE
+
+#include <error.h>
+#include <stdarg.h>
+#include <stdio.h>
 #include <stddef.h>
 #include <string.h>
 #include <assert.h>
@@ -77,4 +82,15 @@ remove_from_array (void *base, size_t *nmemb, size_t index, size_t count, size_t
 
   /* Return the pointer to the new array */
   return ptr;
+}
+
+void
+xasprintf (char **ptr, const char *template, ...)
+{
+  va_list ap;
+  va_start (ap, template);
+  if (vasprintf (ptr, template, ap) < 0)
+    error (-1, 0, "%s (%p, %p): cannot create string",
+           __func__, ptr, template);
+  va_end (ap);
 }
