@@ -46,6 +46,7 @@
 static void draw_level (void);
 static void sample_level (void);
 static void compute_level (void);
+static void process_keys (void);
 
 struct level *vanilla_level;
 struct level level;
@@ -142,6 +143,8 @@ compute_level (void)
   int i;
   struct anim *k;
 
+  process_keys ();
+
   int prev_room = current_kid->f.c.room;
 
   compute_loose_floors ();
@@ -180,29 +183,37 @@ sample_level (void)
 }
 
 static void
-draw_level (void)
+process_keys (void)
 {
-  enum em em = level.em;
-  enum vm vm = level.vm;
-
   char *text = NULL;
 
   int prev_room = room_view;
 
+  /* HOME: camera on kid */
   if (was_key_pressed (ALLEGRO_KEY_HOME, 0, 0, true))
     room_view = current_kid->f.c.room;
+
+  /* H: view room at left */
   if (was_key_pressed (ALLEGRO_KEY_H, 0, 0, true))
     room_view = level.link[room_view].l;
+
+  /* J: view room at right */
   if (was_key_pressed (ALLEGRO_KEY_J, 0, 0, true))
     room_view = level.link[room_view].r;
+
+  /* U: view room above */
   if (was_key_pressed (ALLEGRO_KEY_U, 0, 0, true))
     room_view = level.link[room_view].a;
+
+  /* U: view room below */
   if (was_key_pressed (ALLEGRO_KEY_N, 0, 0, true))
     room_view = level.link[room_view].b;
 
+  /* SHIFT+B: block room drawing */
   if (was_key_pressed (ALLEGRO_KEY_B, 0, ALLEGRO_KEYMOD_SHIFT, true))
     no_room_drawing = ! no_room_drawing;
 
+  /* A: alternate between kid and its shadows */
   if (was_key_pressed (ALLEGRO_KEY_A, 0, 0, true)) {
     current_kid->current = false;
     current_kid = &kid[(current_kid - kid + 1) % kid_nmemb];
@@ -210,10 +221,12 @@ draw_level (void)
     room_view = current_kid->f.c.room;
   }
 
+  /* R: resurrect kid */
   if (was_key_pressed (ALLEGRO_KEY_R, 0, 0, true)
       && is_kid_dead (&current_kid->f))
     kid_resurrect (current_kid);
 
+  /* I: enable/disable immortal mode */
   if (was_key_pressed (ALLEGRO_KEY_I, 0, 0, true)) {
     current_kid->immortal = ! current_kid->immortal;
     xasprintf (&text, "%s MODE", current_kid->immortal
@@ -222,16 +235,111 @@ draw_level (void)
     al_free (text);
   }
 
+  /* SHIFT+S: incremet kid current lives */
   if (was_key_pressed (ALLEGRO_KEY_S, 0, ALLEGRO_KEYMOD_SHIFT, true))
     increase_kid_current_lives (current_kid);
 
+  /* SHIFT+T: incremet kid total lives */
   if (was_key_pressed (ALLEGRO_KEY_T, 0, ALLEGRO_KEYMOD_SHIFT, true))
     increase_kid_total_lives (current_kid);
 
+  /* CTRL+A: restart level */
   if (was_key_pressed (ALLEGRO_KEY_A, 0, ALLEGRO_KEYMOD_CTRL, true))
     quit_anim = RESTART_LEVEL;
 
+  /* C: show coordinates */
+  if (was_key_pressed (ALLEGRO_KEY_C, 0, 0, true)) {
+    int s = room_view;
+    int l = roomd (room_view, LEFT);
+    int r = roomd (room_view, RIGHT);
+    int a = roomd (room_view, ABOVE);
+    int b = roomd (room_view, BELOW);
+    int al = roomd (a, LEFT);
+    int ar = roomd (a, RIGHT);
+    int bl = roomd (b, LEFT);
+    int br = roomd (b, RIGHT);
+
+    xasprintf (&text, "S%i L%i R%i A%i B%i AL%i AR%i BL%i BR%i",
+               s, l, r, a, b, al, ar, bl, br);
+    draw_bottom_text (NULL, text);
+    al_free (text);
+  }
+
+  /* CTRL+V: engine name and version */
+  if (was_key_pressed (ALLEGRO_KEY_V, 0, ALLEGRO_KEYMOD_CTRL, true)) {
+    xasprintf (&text, "MININIM 0.9");
+    draw_bottom_text (NULL, text);
+    al_free (text);
+  }
+
+  /* CTRL+S: enable/disable sound */
+  if (was_key_pressed (ALLEGRO_KEY_S, 0, ALLEGRO_KEYMOD_CTRL, true)) {
+    audio_enabled = ! audio_enabled;
+    enable_audio (audio_enabled);
+    xasprintf (&text, "SOUND %s", audio_enabled ? "ON" : "OFF");
+    draw_bottom_text (NULL, text);
+    al_free (text);
+  }
+
+  /* SHIFT+I: flip screen */
+  if (was_key_pressed (ALLEGRO_KEY_I, 0, ALLEGRO_KEYMOD_SHIFT, true)) {
+    char *flip = "NONE";
+    switch (screen_flags) {
+    case 0:
+      screen_flags = ALLEGRO_FLIP_VERTICAL;
+      flip = "VERTICAL"; break;
+    case ALLEGRO_FLIP_VERTICAL:
+      screen_flags = ALLEGRO_FLIP_HORIZONTAL;
+      flip = "HORIZONTAL"; break;
+    case ALLEGRO_FLIP_HORIZONTAL:
+      screen_flags = ALLEGRO_FLIP_VERTICAL | ALLEGRO_FLIP_HORIZONTAL;
+      flip = "VERTICAL + HORIZONTAL"; break;
+    case ALLEGRO_FLIP_VERTICAL | ALLEGRO_FLIP_HORIZONTAL:
+      screen_flags = 0;
+      break;
+    }
+    xasprintf (&text, "DISPLAY FLIP: %s", flip);
+    draw_bottom_text (NULL, text);
+    al_free (text);
+  }
+
+  /* F11: change environmt mode */
+  if (was_key_pressed (ALLEGRO_KEY_F11, 0, 0, true)) {
+    char *em_str = NULL;
+
+    switch (level.em) {
+    case DUNGEON: level.em = PALACE; em_str = "PALACE"; break;
+    case PALACE: level.em = DUNGEON; em_str = "DUNGEON"; break;
+    }
+
+    xasprintf (&text, "ENVIRONMENT MODE: %s", em_str);
+    draw_bottom_text (NULL, text);
+    al_free (text);
+  }
+
+  /* F12: change video mode */
+  if (was_key_pressed (ALLEGRO_KEY_F12, 0, 0, true)) {
+    char *vm_str = NULL;
+
+    switch (level.vm) {
+    case CGA: break;
+    case EGA: level.vm = VGA; vm_str = "VGA"; break;
+    case VGA: level.vm = EGA; vm_str = "EGA"; break;
+    }
+
+    xasprintf (&text, "VIDEO MODE: %s", vm_str);
+    draw_bottom_text (NULL, text);
+    al_free (text);
+  }
+
   if (room_view == 0) room_view = prev_room;
+}
+
+static void
+draw_level (void)
+{
+  enum em em = level.em;
+  enum vm vm = level.vm;
 
   /* drawing */
   struct pos p;
@@ -263,85 +371,6 @@ draw_level (void)
   unpress_closer_floors ();
 
   draw_kid_lives (screen, current_kid, draw_cycle);
-
-  if (was_key_pressed (ALLEGRO_KEY_C, 0, 0, true)) {
-    int s = room_view;
-    int l = roomd (room_view, LEFT);
-    int r = roomd (room_view, RIGHT);
-    int a = roomd (room_view, ABOVE);
-    int b = roomd (room_view, BELOW);
-    int al = roomd (a, LEFT);
-    int ar = roomd (a, RIGHT);
-    int bl = roomd (b, LEFT);
-    int br = roomd (b, RIGHT);
-
-    xasprintf (&text, "S%i L%i R%i A%i B%i AL%i AR%i BL%i BR%i",
-               s, l, r, a, b, al, ar, bl, br);
-    draw_bottom_text (NULL, text);
-    al_free (text);
-  }
-
-  if (was_key_pressed (ALLEGRO_KEY_V, 0, ALLEGRO_KEYMOD_CTRL, true)) {
-    xasprintf (&text, "MININIM 0.9");
-    draw_bottom_text (NULL, text);
-    al_free (text);
-  }
-
-  if (was_key_pressed (ALLEGRO_KEY_S, 0, ALLEGRO_KEYMOD_CTRL, true)) {
-    audio_enabled = ! audio_enabled;
-    enable_audio (audio_enabled);
-    xasprintf (&text, "SOUND %s", audio_enabled ? "ON" : "OFF");
-    draw_bottom_text (NULL, text);
-    al_free (text);
-  }
-
-  if (was_key_pressed (ALLEGRO_KEY_I, 0, ALLEGRO_KEYMOD_SHIFT, true)) {
-    char *flip = "NONE";
-    switch (screen_flags) {
-    case 0:
-      screen_flags = ALLEGRO_FLIP_VERTICAL;
-      flip = "VERTICAL"; break;
-    case ALLEGRO_FLIP_VERTICAL:
-      screen_flags = ALLEGRO_FLIP_HORIZONTAL;
-      flip = "HORIZONTAL"; break;
-    case ALLEGRO_FLIP_HORIZONTAL:
-      screen_flags = ALLEGRO_FLIP_VERTICAL | ALLEGRO_FLIP_HORIZONTAL;
-      flip = "VERTICAL + HORIZONTAL"; break;
-    case ALLEGRO_FLIP_VERTICAL | ALLEGRO_FLIP_HORIZONTAL:
-      screen_flags = 0;
-      break;
-    }
-    xasprintf (&text, "DISPLAY FLIP: %s", flip);
-    draw_bottom_text (NULL, text);
-    al_free (text);
-  }
-
-  if (was_key_pressed (ALLEGRO_KEY_F11, 0, 0, true)) {
-    char *em_str = NULL;
-
-    switch (level.em) {
-    case DUNGEON: level.em = PALACE; em_str = "PALACE"; break;
-    case PALACE: level.em = DUNGEON; em_str = "DUNGEON"; break;
-    }
-
-    xasprintf (&text, "ENVIRONMENT MODE: %s", em_str);
-    draw_bottom_text (NULL, text);
-    al_free (text);
-  }
-
-  if (was_key_pressed (ALLEGRO_KEY_F12, 0, 0, true)) {
-    char *vm_str = NULL;
-
-    switch (level.vm) {
-    case CGA: break;
-    case EGA: level.vm = VGA; vm_str = "VGA"; break;
-    case VGA: level.vm = EGA; vm_str = "EGA"; break;
-    }
-
-    xasprintf (&text, "VIDEO MODE: %s", vm_str);
-    draw_bottom_text (NULL, text);
-    al_free (text);
-  }
 
   draw_cycle++;
 }
