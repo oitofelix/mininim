@@ -80,6 +80,17 @@ unload_kid_die (void)
 }
 
 void
+kid_resurrect (struct anim *kid)
+{
+  struct coord nc; struct pos np, pm;
+  survey (_m, pos, &kid->f, &nc, &pm, &np);
+  kid->current_lives = kid->total_lives;
+  kid->action = kid_normal;
+  place_frame (&kid->f, &kid->f, kid_normal_00,
+               &pm, kid->f.dir == LEFT ? + PLACE_WIDTH : 0, +15);
+}
+
+void
 kid_die_spiked (struct anim *kid)
 {
   kid->oaction = kid->action;

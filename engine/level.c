@@ -188,6 +188,10 @@ draw_level (void)
     room_view = current_kid->f.c.room;
   }
 
+  if (was_key_pressed (ALLEGRO_KEY_R, 0, 0, true)
+      && is_kid_dead (&current_kid->f))
+    kid_resurrect (current_kid);
+
   if (room_view == 0) room_view = prev_room;
 
   /* drawing */

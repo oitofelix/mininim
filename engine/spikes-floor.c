@@ -300,7 +300,9 @@ compute_spikes_floors (void)
   for (i = 0; i < spikes_floor_nmemb; i++) {
     struct spikes_floor *s = &spikes_floor[i];
 
-    if (s->inactive) continue;
+    if (s->inactive
+        && is_kid_dead (&get_kid_by_id (s->murdered_kid)->f))
+      continue;
 
     if (s->p.room == -1) {
       /* remove_spikes_floor (s); i--; */

@@ -552,6 +552,7 @@ draw_falling_loose_floor (ALLEGRO_BITMAP *bitmap, struct pos *p,
   if (l->action == FALL_LOOSE_FLOOR) {
     struct coord tr, br;
     struct pos fptr, nfptr, fpbr, nfpbr;
+    frame2room (&l->f, room_view, &l->f.c);
     survey (_tr, posf, &l->f, &tr, &fptr, &nfptr);
     survey (_br, posf, &l->f, &br, &fpbr, &nfpbr);
     draw_frame (bitmap, &l->f);

@@ -35,6 +35,7 @@ extern struct frameset kid_die_frameset[KID_DIE_FRAMESET_NMEMB];
 
 void load_kid_die (void);
 void unload_kid_die (void);
+void kid_resurrect (struct anim *kid);
 void kid_die (struct anim *kid);
 void kid_die_spiked (struct anim *kid);
 void kid_die_chopped (struct anim *kid);
