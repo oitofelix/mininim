@@ -334,6 +334,7 @@ compute_spikes_floors (void)
     for (j = 0; j < kid_nmemb; j++) {
       struct anim *k = &kid[j];
       if (is_kid_dead (&k->f)
+          || k->immortal
           || k->spikes_immune) continue;
       survey (_m, pos, &k->f, &nc, &pm, &np);
       if (peq (&pm, &s->p)

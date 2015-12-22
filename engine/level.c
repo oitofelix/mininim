@@ -192,6 +192,14 @@ draw_level (void)
       && is_kid_dead (&current_kid->f))
     kid_resurrect (current_kid);
 
+  if (was_key_pressed (ALLEGRO_KEY_I, 0, 0, true)) {
+    current_kid->immortal = ! current_kid->immortal;
+    xasprintf (&text, "%s MODE", current_kid->immortal
+               ? "IMMORTAL" : "MORTAL");
+    draw_bottom_text (NULL, text);
+    al_free (text);
+  }
+
   if (room_view == 0) room_view = prev_room;
 
   /* drawing */

@@ -436,7 +436,9 @@ compute_loose_floor_fall (struct loose_floor *l)
   for (i = 0; i < kid_nmemb; i++) {
     struct coord kmt, kmbo_f, kmbo_nf; struct pos np, kpmt;
     struct anim *k = &kid[i];
-    if (is_kid_dead (&k->f) || k->loose_floor_immune)
+    if (is_kid_dead (&k->f)
+        || k->immortal
+        || k->loose_floor_immune)
       continue;
     survey (_mt, pos, &k->f, &kmt, &kpmt, &np);
     coord2room (&mbo_f, kpmt.room, &kmbo_f);

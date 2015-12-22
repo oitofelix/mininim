@@ -218,7 +218,8 @@ physics_in (struct anim *kid)
 
     shake_loose_floor_row (&pbf);
 
-    if (kid->i >= 8 && ! kid->fall_immune) {
+    if (kid->i >= 8 && ! kid->immortal
+        && ! kid->fall_immune) {
       kid->splash = true;
       kid->current_lives--;
 

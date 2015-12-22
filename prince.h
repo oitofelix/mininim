@@ -231,7 +231,7 @@ struct anim {
 
   int dc, df, dl, dcl, dch, dcd;
 
-  bool poison_immune, loose_floor_immune, fall_immune,
+  bool immortal, poison_immune, loose_floor_immune, fall_immune,
     spikes_immune, chopper_immune;
 
   enum confg confg;

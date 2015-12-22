@@ -147,7 +147,8 @@ flow (struct anim *kid)
       }
       break;
     case SMALL_POISON_POTION:
-      if (kid->poison_immune) break;
+      if (kid->immortal
+          || kid->poison_immune) break;
       kid->current_lives--;
       kid->splash = true;
       sample_harm = true;
@@ -155,7 +156,8 @@ flow (struct anim *kid)
       start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
       break;
     case BIG_POISON_POTION:
-      if (kid->poison_immune) break;
+      if (kid->immortal
+          || kid->poison_immune) break;
       kid->current_lives = 0;
       kid->splash = true;
       sample_harm = true;
