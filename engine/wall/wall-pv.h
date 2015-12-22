@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_WALL_PV_H
-#define FREEPOP_WALL_PV_H
+#ifndef MININIM_WALL_PV_H
+#define MININIM_WALL_PV_H
 
 /* palace vga */
 #define PV_WALL_MARK_00 "data/wall/pv-mark-00.png"
@@ -54,4 +54,4 @@ ALLEGRO_BITMAP *palace_wall_mark (int i);
 struct frame *palace_wall_mark_frame (struct pos *p, int i,
                                       struct frame *f);
 
-#endif	/* FREEPOP_WALL_PV_H */
+#endif	/* MININIM_WALL_PV_H */

@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_LEVEL_H
-#define FREEPOP_LEVEL_H
+#ifndef MININIM_LEVEL_H
+#define MININIM_LEVEL_H
 
 #include "anim.h"
 
@@ -29,4 +29,4 @@ extern int room_view, draw_cycle;
 void play_level (struct level *level);
 void register_cons (void);
 
-#endif	/* FREEPOP_LEVEL_H */
+#endif	/* MININIM_LEVEL_H */

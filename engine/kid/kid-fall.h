@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_KID_FALL_H
-#define FREEPOP_KID_FALL_H
+#ifndef MININIM_KID_FALL_H
+#define MININIM_KID_FALL_H
 
 /* bitmaps */
 #define KID_FALL_13 "dat/kid/hanging and falling/frame13.png"
@@ -38,4 +38,4 @@ bool is_kid_fall (struct frame *f);
 extern ALLEGRO_BITMAP *kid_fall_13, *kid_fall_14, *kid_fall_15,
   *kid_fall_16, *kid_fall_17;
 
-#endif	/* FREEPOP_KID_FALL_H */
+#endif	/* MININIM_KID_FALL_H */

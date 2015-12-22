@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_EVENT_H
-#define FREEPOP_EVENT_H
+#ifndef MININIM_EVENT_H
+#define MININIM_EVENT_H
 
 #include <allegro5/allegro.h>
 
@@ -28,4 +28,4 @@ void drop_all_events_from_source  (ALLEGRO_EVENT_QUEUE *queue,
                                    ALLEGRO_EVENT_SOURCE *src);
 void emit_user_event (ALLEGRO_EVENT_SOURCE *src, ALLEGRO_EVENT *event);
 
-#endif	/* FREEPOP_EVENT_H */
+#endif	/* MININIM_EVENT_H */

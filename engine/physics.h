@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_PHYSICS_H
-#define FREEPOP_PHYSICS_H
+#ifndef MININIM_PHYSICS_H
+#define MININIM_PHYSICS_H
 
 #include "prince.h"
 #include "pos.h"
@@ -68,4 +68,4 @@ void save_depressible_floor (struct anim *a);
 void restore_depressible_floor (struct anim *a);
 void press_depressible_floor (struct pos *p);
 
-#endif	/* FREEPOP_PHYSICS_H */
+#endif	/* MININIM_PHYSICS_H */

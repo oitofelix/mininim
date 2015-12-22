@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_ROOM_H
-#define FREEPOP_ROOM_H
+#ifndef MININIM_ROOM_H
+#define MININIM_ROOM_H
 
 #include "prince.h"
 
@@ -61,4 +61,4 @@ void draw_room_anim_fg (ALLEGRO_BITMAP *bitmap,
 void draw_room_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
                    enum em em, enum vm vm, struct frame *f);
 
-#endif	/* FREEPOP_ROOM_H */
+#endif	/* MININIM_ROOM_H */

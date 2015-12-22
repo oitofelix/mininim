@@ -17,11 +17,11 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_KID_HANG_WALL_H
-#define FREEPOP_KID_HANG_WALL_H
+#ifndef MININIM_KID_HANG_WALL_H
+#define MININIM_KID_HANG_WALL_H
 
 void load_kid_hang_wall (void);
 void unload_kid_hang_wall (void);
 void kid_hang_wall (struct anim *kid);
 
-#endif	/* FREEPOP_KID_HANG_WALL_H */
+#endif	/* MININIM_KID_HANG_WALL_H */

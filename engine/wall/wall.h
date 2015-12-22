@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_WALL_H
-#define FREEPOP_WALL_H
+#ifndef MININIM_WALL_H
+#define MININIM_WALL_H
 
 /* dungeon ega */
 #define DE_WALL_FACE "data/wall/de-face.png"
@@ -64,4 +64,4 @@ enum wall_correlation {
   SWS, SWW, WWS, WWW
 };
 
-#endif	/* FREEPOP_WALL_H */
+#endif	/* MININIM_WALL_H */

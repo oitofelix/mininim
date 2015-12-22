@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_KID_RUN_JUMP_H
-#define FREEPOP_KID_RUN_JUMP_H
+#ifndef MININIM_KID_RUN_JUMP_H
+#define MININIM_KID_RUN_JUMP_H
 
 /* bitmaps */
 #define KID_RUN_JUMP_01 "dat/kid/running jump/frame01.png"
@@ -47,4 +47,4 @@ extern ALLEGRO_BITMAP *kid_run_jump_01, *kid_run_jump_02, *kid_run_jump_03,
   *kid_run_jump_07, *kid_run_jump_08, *kid_run_jump_09,
   *kid_run_jump_10, *kid_run_jump_11;
 
-#endif	/* FREEPOP_KID_RUN_JUMP_H */
+#endif	/* MININIM_KID_RUN_JUMP_H */

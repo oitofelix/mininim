@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_STARS_H
-#define FREEPOP_STARS_H
+#ifndef MININIM_STARS_H
+#define MININIM_STARS_H
 
 /* macros */
 #define STARS_RANDOM_SEED 78234782
@@ -32,4 +32,4 @@ struct star {
 /* functions */
 void draw_princess_room_stars (void);
 
-#endif	/* FREEPOP_STARS_H */
+#endif	/* MININIM_STARS_H */

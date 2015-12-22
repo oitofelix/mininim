@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_KID_SWORD_ATTACK_H
-#define FREEPOP_KID_SWORD_ATTACK_H
+#ifndef MININIM_KID_SWORD_ATTACK_H
+#define MININIM_KID_SWORD_ATTACK_H
 
 /* bitmaps */
 #define KID_SWORD_ATTACK_01 "dat/kid/sword attacking/frame01.png"
@@ -40,4 +40,4 @@ extern ALLEGRO_BITMAP *kid_sword_attack_01, *kid_sword_attack_02,
   *kid_sword_attack_03, *kid_sword_attack_04, *kid_sword_attack_05,
   *kid_sword_attack_06, *kid_sword_attack_07;
 
-#endif	/* FREEPOP_KID_SWORD_ATTACK_H */
+#endif	/* MININIM_KID_SWORD_ATTACK_H */

@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_KID_STAIRS_H
-#define FREEPOP_KID_STAIRS_H
+#ifndef MININIM_KID_STAIRS_H
+#define MININIM_KID_STAIRS_H
 
 /* bitmaps */
 #define KID_STAIRS_01 "dat/kid/stairs/frame01.png"
@@ -47,4 +47,4 @@ extern ALLEGRO_BITMAP *kid_stairs_01, *kid_stairs_02, *kid_stairs_03,
   *kid_stairs_08, *kid_stairs_09, *kid_stairs_10, *kid_stairs_11,
   *kid_stairs_12;
 
-#endif	/* FREEPOP_KID_STAIRS_H */
+#endif	/* MININIM_KID_STAIRS_H */

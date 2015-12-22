@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_KID_HANG_H
-#define FREEPOP_KID_HANG_H
+#ifndef MININIM_KID_HANG_H
+#define MININIM_KID_HANG_H
 
 /* bitmaps */
 #define KID_HANG_00 "dat/kid/hanging and falling/frame00.png"
@@ -50,4 +50,4 @@ extern ALLEGRO_BITMAP *kid_hang_00, *kid_hang_01, *kid_hang_02,
   *kid_hang_07, *kid_hang_08, *kid_hang_09, *kid_hang_10,
   *kid_hang_11, *kid_hang_12, *kid_hang_14;
 
-#endif	/* FREEPOP_KID_HANG_H */
+#endif	/* MININIM_KID_HANG_H */

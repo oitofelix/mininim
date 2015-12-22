@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_KID_H
-#define FREEPOP_KID_H
+#ifndef MININIM_KID_H
+#define MININIM_KID_H
 
 /* kid actions */
 #include "kid-normal.h"
@@ -102,4 +102,4 @@ extern bool sample_step, sample_hit_ground, sample_hit_ground_harm,
   sample_harm, sample_small_life_potion, sample_big_life_potion,
   sample_action_not_allowed, sample_scream, sample_spiked, sample_chopped;
 
-#endif	/* FREEPOP_KID_H */
+#endif	/* MININIM_KID_H */

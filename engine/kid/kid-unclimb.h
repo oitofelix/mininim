@@ -17,11 +17,11 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_KID_UNCLIMB_H
-#define FREEPOP_KID_UNCLIMB_H
+#ifndef MININIM_KID_UNCLIMB_H
+#define MININIM_KID_UNCLIMB_H
 
 void load_kid_unclimb (void);
 void unload_kid_unclimb (void);
 void kid_unclimb (struct anim *kid);
 
-#endif	/* FREEPOP_KID_UNCLIMB_H */
+#endif	/* MININIM_KID_UNCLIMB_H */

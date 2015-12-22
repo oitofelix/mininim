@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_SWORD_H
-#define FREEPOP_SWORD_H
+#ifndef MININIM_SWORD_H
+#define MININIM_SWORD_H
 
 #define SWORD_FRAMESET_NMEMB 34
 extern struct frameset sword_frameset[SWORD_FRAMESET_NMEMB];
@@ -72,4 +72,4 @@ void unload_sword (void);
 void draw_sword (ALLEGRO_BITMAP *bitmap, struct pos *p, int i, enum vm vm);
 bool is_sword (struct pos *p);
 
-#endif	/* FREEPOP_SWORD_H */
+#endif	/* MININIM_SWORD_H */

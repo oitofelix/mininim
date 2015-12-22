@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_KID_NORMAL_H
-#define FREEPOP_KID_NORMAL_H
+#ifndef MININIM_KID_NORMAL_H
+#define MININIM_KID_NORMAL_H
 
 /* bitmaps */
 #define KID_NORMAL_00 "dat/kid/normal.png"
@@ -29,4 +29,4 @@ void kid_normal (struct anim *k);
 
 ALLEGRO_BITMAP *kid_normal_00;
 
-#endif	/* FREEPOP_KID_NORMAL_H */
+#endif	/* MININIM_KID_NORMAL_H */

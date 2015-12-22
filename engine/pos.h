@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_POSITION_H
-#define FREEPOP_POSITION_H
+#ifndef MININIM_POSITION_H
+#define MININIM_POSITION_H
 
 #include "prince.h"
 
@@ -74,4 +74,4 @@ surveyo (coord_f cf, int dx, int dy, pos_f pf, struct frame *f,
 
 #define survey(coord_f,pos_f,f,c,p,np) (con (npos ((pos_f) ((coord_f) ((f), (c)), (p)), (np))))
 
-#endif	/* FREEPOP_POSITION_H */
+#endif	/* MININIM_POSITION_H */

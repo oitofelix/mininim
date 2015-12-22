@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_OPENER_FLOOR_H
-#define FREEPOP_OPENER_FLOOR_H
+#ifndef MININIM_OPENER_FLOOR_H
+#define MININIM_OPENER_FLOOR_H
 
 #include "pos.h"
 
@@ -81,4 +81,4 @@ void draw_unpressed_opener_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
 struct coord *unpressed_opener_floor_left_coord (struct pos *p, struct coord *c);
 struct coord *unpressed_opener_floor_right_coord (struct pos *p, struct coord *c);
 
-#endif	/* FREEPOP_OPENER_FLOOR_H */
+#endif	/* MININIM_OPENER_FLOOR_H */

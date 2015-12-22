@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_FIRE_H
-#define FREEPOP_FIRE_H
+#ifndef MININIM_FIRE_H
+#define MININIM_FIRE_H
 
 /* macros */
 #define FIRE_RANDOM_SEED_0 234423479
@@ -42,4 +42,4 @@ void draw_fire (ALLEGRO_BITMAP* bitmap, struct pos *p, int i,
 void draw_princess_room_fire (void);
 struct coord *fire_coord (struct pos *p, struct coord *c);
 
-#endif	/* FREEPOP_FIRE_H */
+#endif	/* MININIM_FIRE_H */

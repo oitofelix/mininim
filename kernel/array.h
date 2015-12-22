@@ -19,8 +19,8 @@
 
 #include <stddef.h>
 
-#ifndef FREEPOP_ARRAY_H
-#define FREEPOP_ARRAY_H
+#ifndef MININIM_ARRAY_H
+#define MININIM_ARRAY_H
 
 void * add_to_array (void *s_base, size_t s_nmemb,
                      void *d_base, size_t *d_nmemb, size_t d_index,
@@ -28,4 +28,4 @@ void * add_to_array (void *s_base, size_t s_nmemb,
 void * remove_from_array (void *base, size_t *nmemb, size_t index,
                           size_t count, size_t size);
 
-#endif	/* FREEPOP_ARRAY_H */
+#endif	/* MININIM_ARRAY_H */

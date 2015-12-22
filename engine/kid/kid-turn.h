@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_KID_TURN_H
-#define FREEPOP_KID_TURN_H
+#ifndef MININIM_KID_TURN_H
+#define MININIM_KID_TURN_H
 
 /* bitmaps */
 #define KID_TURN_01 "dat/kid/turning/frame01.png"
@@ -36,4 +36,4 @@ bool is_kid_turn (struct frame *f);
 
 extern ALLEGRO_BITMAP *kid_turn_01, *kid_turn_02, *kid_turn_03, *kid_turn_04;
 
-#endif	/* FREEPOP_KID_TURN_H */
+#endif	/* MININIM_KID_TURN_H */

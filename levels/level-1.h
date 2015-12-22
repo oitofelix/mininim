@@ -17,9 +17,9 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_LEVEL_1_H
-#define FREEPOP_LEVEL_1_H
+#ifndef MININIM_LEVEL_1_H
+#define MININIM_LEVEL_1_H
 
 void play_level_1 (void);
 
-#endif	/* FREEPOP_LEVEL_1_H */
+#endif	/* MININIM_LEVEL_1_H */

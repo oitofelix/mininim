@@ -1,5 +1,5 @@
 /*
-  prince.h -- FreePoP main module;
+  prince.h -- MININIM main module;
 
   Copyright (C) 2015, 2016 Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
 
@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_PRINCE_H
-#define FREEPOP_PRINCE_H
+#ifndef MININIM_PRINCE_H
+#define MININIM_PRINCE_H
 
 #include <allegro5/allegro.h>
 
@@ -249,4 +249,4 @@ struct anim {
 int max (int a, int b);
 int min (int a, int b);
 
-#endif	/* FREEPOP_PRINCE_H */
+#endif	/* MININIM_PRINCE_H */

@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_RANDOM_H
-#define FREEPOP_RANDOM_H
+#ifndef MININIM_RANDOM_H
+#define MININIM_RANDOM_H
 
 #include <stdint.h>
 #include "engine/pos.h"
@@ -36,4 +36,4 @@ void unseedp (void);
 int prandom_seq (uint32_t seed, int n, int p, int max);
 int prandom_seq_pos (struct pos *p, int n, int pr, int max);
 
-#endif	/* FREEPOP_RANDOM_H */
+#endif	/* MININIM_RANDOM_H */

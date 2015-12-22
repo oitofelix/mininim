@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_AUDIO_H
-#define FREEPOP_AUDIO_H
+#ifndef MININIM_AUDIO_H
+#define MININIM_AUDIO_H
 
 #include <allegro5/allegro_audio.h>
 
@@ -37,4 +37,4 @@ ALLEGRO_MIXER *get_default_mixer (void);
 extern bool audio_enabled;
 extern float volume;
 
-#endif	/* FREEPOP_AUDIO_H */
+#endif	/* MININIM_AUDIO_H */

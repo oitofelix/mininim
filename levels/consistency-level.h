@@ -17,9 +17,9 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_CONSISTENCY_LEVEL_H
-#define FREEPOP_CONSISTENCY_LEVEL_H
+#ifndef MININIM_CONSISTENCY_LEVEL_H
+#define MININIM_CONSISTENCY_LEVEL_H
 
 void play_consistency_level (void);
 
-#endif	/* FREEPOP_CONSISTENCY_LEVEL_H */
+#endif	/* MININIM_CONSISTENCY_LEVEL_H */

@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_BROKEN_FLOOR_H
-#define FREEPOP_BROKEN_FLOOR_H
+#ifndef MININIM_BROKEN_FLOOR_H
+#define MININIM_BROKEN_FLOOR_H
 
 #include "kernel/audio.h"
 #include "physics.h"
@@ -57,4 +57,4 @@ struct coord *broken_floor_right_coord (struct pos *p, struct coord *c);
 struct coord *broken_floor_front_coord (struct pos *p, struct coord *c);
 ALLEGRO_BITMAP * create_broken_floor_bitmap (enum em em, enum vm);
 
-#endif	/* FREEPOP_BROKEN_FLOOR_H */
+#endif	/* MININIM_BROKEN_FLOOR_H */

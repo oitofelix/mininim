@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_TIMER_H
-#define FREEPOP_TIMER_H
+#ifndef MININIM_TIMER_H
+#define MININIM_TIMER_H
 
 #include <allegro5/allegro.h>
 
@@ -28,4 +28,4 @@
 ALLEGRO_TIMER *create_timer (double speed_secs);
 ALLEGRO_EVENT_SOURCE *get_timer_event_source (ALLEGRO_TIMER *timer);
 
-#endif	/* FREEPOP_TIMER_H */
+#endif	/* MININIM_TIMER_H */

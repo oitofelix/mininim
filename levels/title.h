@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_TITLE_H
-#define FREEPOP_TITLE_H
+#ifndef MININIM_TITLE_H
+#define MININIM_TITLE_H
 
 /* bitmaps */
 #define MAIN_BACKGROUND "dat/title/main titles/main background.png"
@@ -46,4 +46,4 @@
 /* functions */
 void play_title (void);
 
-#endif	/* FREEPOP_TITLE_H */
+#endif	/* MININIM_TITLE_H */

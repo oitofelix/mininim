@@ -17,10 +17,10 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_CONSISTENCY_H
-#define FREEPOP_CONSISTENCY_H
+#ifndef MININIM_CONSISTENCY_H
+#define MININIM_CONSISTENCY_H
 
 void fix_level (struct level *lv);
 void make_links_locally_consistent (int prev_room, int current_room);
 
-#endif	/* FREEPOP_CONSISTENCY_H */
+#endif	/* MININIM_CONSISTENCY_H */

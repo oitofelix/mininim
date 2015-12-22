@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_SPIKES_H
-#define FREEPOP_SPIKES_H
+#ifndef MININIM_SPIKES_H
+#define MININIM_SPIKES_H
 
 #include "kernel/video.h"
 
@@ -214,4 +214,4 @@ struct coord *p_spikes_right_05_coord (struct pos *p, struct coord *c);
 struct coord *d_spikes_fg_05_coord (struct pos *p, struct coord *c);
 struct coord *p_spikes_fg_05_coord (struct pos *p, struct coord *c);
 
-#endif	/* FREEPOP_SPIKES_H */
+#endif	/* MININIM_SPIKES_H */

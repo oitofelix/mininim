@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_BRICKS_H
-#define FREEPOP_BRICKS_H
+#ifndef MININIM_BRICKS_H
+#define MININIM_BRICKS_H
 
 /* dungeon ega */
 #define DE_BRICKS_01 "data/bricks/de-01.png"
@@ -63,4 +63,4 @@ struct coord *p_bricks_coord_03 (struct pos *p, struct coord *c);
 struct coord *d_bricks_coord_04 (struct pos *p, struct coord *c);
 struct coord *p_bricks_coord_04 (struct pos *p, struct coord *c);
 
-#endif	/* FREEPOP_BRICKS_H */
+#endif	/* MININIM_BRICKS_H */

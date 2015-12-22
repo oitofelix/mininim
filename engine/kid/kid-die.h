@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_KID_DIE_H
-#define FREEPOP_KID_DIE_H
+#ifndef MININIM_KID_DIE_H
+#define MININIM_KID_DIE_H
 
 /* bitmaps */
 #define KID_DIE_01 "dat/kid/dieing/frame01.png"
@@ -44,4 +44,4 @@ bool is_kid_dead (struct frame *f);
 extern ALLEGRO_BITMAP *kid_die_01, *kid_die_02, *kid_die_03,
   *kid_die_04, *kid_die_05, *kid_die_06;
 
-#endif	/* FREEPOP_KID_DIE_H */
+#endif	/* MININIM_KID_DIE_H */

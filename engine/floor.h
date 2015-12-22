@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_FLOOR_H
-#define FREEPOP_FLOOR_H
+#ifndef MININIM_FLOOR_H
+#define MININIM_FLOOR_H
 
 #include "kernel/audio.h"
 #include "physics.h"
@@ -94,4 +94,4 @@ struct coord *floor_corner_01_coord (struct pos *p, struct coord *c);
 struct coord *floor_corner_02_coord (struct pos *p, struct coord *c);
 struct coord *floor_corner_03_coord (struct pos *p, struct coord *c);
 
-#endif	/* FREEPOP_FLOOR_H */
+#endif	/* MININIM_FLOOR_H */

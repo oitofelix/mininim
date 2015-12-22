@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_KID_START_RUN_H
-#define FREEPOP_KID_START_RUN_H
+#ifndef MININIM_KID_START_RUN_H
+#define MININIM_KID_START_RUN_H
 
 /* bitmaps */
 #define KID_START_RUN_01 "dat/kid/running/frame01.png"
@@ -39,4 +39,4 @@ bool is_kid_start_run (struct frame *f);
 extern ALLEGRO_BITMAP *kid_start_run_01, *kid_start_run_02, *kid_start_run_03,
   *kid_start_run_04, *kid_start_run_05, *kid_start_run_06;
 
-#endif	/* FREEPOP_KID_START_RUN_H */
+#endif	/* MININIM_KID_START_RUN_H */

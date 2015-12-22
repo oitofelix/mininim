@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_KID_VJUMP_H
-#define FREEPOP_KID_VJUMP_H
+#ifndef MININIM_KID_VJUMP_H
+#define MININIM_KID_VJUMP_H
 
 /* bitmaps */
 #define KID_VJUMP_01 "dat/kid/scaling/frame01.png"
@@ -54,4 +54,4 @@ ALLEGRO_BITMAP *kid_vjump_01, *kid_vjump_02, *kid_vjump_03,
   *kid_vjump_12, *kid_vjump_13, *kid_vjump_15, *kid_vjump_16,
   *kid_vjump_17, *kid_vjump_18, *kid_vjump_19;
 
-#endif	/* FREEPOP_KID_VJUMP_H */
+#endif	/* MININIM_KID_VJUMP_H */

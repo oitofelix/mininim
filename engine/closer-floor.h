@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_CLOSER_FLOOR_H
-#define FREEPOP_CLOSER_FLOOR_H
+#ifndef MININIM_CLOSER_FLOOR_H
+#define MININIM_CLOSER_FLOOR_H
 
 #include "pos.h"
 
@@ -89,4 +89,4 @@ void draw_unpressed_closer_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
 struct coord *pressed_closer_floor_left_coord (struct pos *p, struct coord *c);
 struct coord *pressed_closer_floor_right_coord (struct pos *p, struct coord *c);
 
-#endif	/* FREEPOP_CLOSER_FLOOR_H */
+#endif	/* MININIM_CLOSER_FLOOR_H */

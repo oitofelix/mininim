@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_CHOPPER_H
-#define FREEPOP_CHOPPER_H
+#ifndef MININIM_CHOPPER_H
+#define MININIM_CHOPPER_H
 
 #include "kernel/video.h"
 
@@ -132,4 +132,4 @@ struct coord * chopper_blood_04_coord (struct pos *p, struct coord *c);
 struct coord * chopper_blood_05_coord (struct pos *p, struct coord *c);
 ALLEGRO_COLOR blood_palette (ALLEGRO_COLOR c);
 
-#endif	/* FREEPOP_CHOPPER_H */
+#endif	/* MININIM_CHOPPER_H */

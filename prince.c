@@ -1,5 +1,5 @@
 /*
-  prince.c -- FreePoP main module;
+  prince.c -- MININIM main module;
 
   Copyright (C) 2015, 2016 Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
 

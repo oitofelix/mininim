@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_KID_KEEP_SWORD_H
-#define FREEPOP_KID_KEEP_SWORD_H
+#ifndef MININIM_KID_KEEP_SWORD_H
+#define MININIM_KID_KEEP_SWORD_H
 
 /* bitmaps */
 #define KID_KEEP_SWORD_01 "dat/kid/got sword/frame05.png"
@@ -44,4 +44,4 @@ extern ALLEGRO_BITMAP *kid_keep_sword_01, *kid_keep_sword_02,
   *kid_keep_sword_06, *kid_keep_sword_07, *kid_keep_sword_08,
   *kid_keep_sword_09, *kid_keep_sword_10;
 
-#endif	/* FREEPOP_KID_KEEP_SWORD_H */
+#endif	/* MININIM_KID_KEEP_SWORD_H */

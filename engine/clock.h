@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_CLOCK_H
-#define FREEPOP_CLOCK_H
+#ifndef MININIM_CLOCK_H
+#define MININIM_CLOCK_H
 
 #define CLOCK_01 "dat/pv/objects/clock01.png"
 #define CLOCK_02 "dat/pv/objects/clock02.png"
@@ -42,4 +42,4 @@ extern ALLEGRO_BITMAP *princess_room_clock;
 extern ALLEGRO_BITMAP *clock_01, *clock_02, *clock_03, *clock_04, *clock_05, *clock_06,
   *clock_07, *clock_sand_01, *clock_sand_02, *clock_sand_03;
 
-#endif	/* FREEPOP_CLOCK_H */
+#endif	/* MININIM_CLOCK_H */

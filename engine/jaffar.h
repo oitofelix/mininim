@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_JAFFAR_H
-#define FREEPOP_JAFFAR_H
+#ifndef MININIM_JAFFAR_H
+#define MININIM_JAFFAR_H
 
 #define JAFFAR_NORMAL_00 "dat/pv/jaffar/walking/frame07.png"
 #define JAFFAR_WALK_01 "dat/pv/jaffar/walking/frame01.png"
@@ -87,4 +87,4 @@ extern ALLEGRO_BITMAP *jaffar_normal_00,
   *jaffar_lower_arms_30, *jaffar_lower_arms_31, *jaffar_lower_arms_32,
   *jaffar_lower_arms_33, *jaffar_lower_arms_34, *jaffar_lower_arms_35;
 
-#endif	/* FREEPOP_JAFFAR_H */
+#endif	/* MININIM_JAFFAR_H */

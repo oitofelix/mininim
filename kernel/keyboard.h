@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_KEYBOARD_H
-#define FREEPOP_KEYBOARD_H
+#ifndef MININIM_KEYBOARD_H
+#define MININIM_KEYBOARD_H
 
 /* variables */
 extern ALLEGRO_KEYBOARD_STATE keyboard_state;
@@ -34,4 +34,4 @@ ALLEGRO_EVENT_SOURCE *get_keyboard_event_source (void);
 void get_keyboard_state (void);
 bool was_key_pressed (int dkey, bool consume);
 
-#endif	/* FREEPOP_KEYBOARD_H */
+#endif	/* MININIM_KEYBOARD_H */

@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_PRINCESS_H
-#define FREEPOP_PRINCESS_H
+#ifndef MININIM_PRINCESS_H
+#define MININIM_PRINCESS_H
 
 #define PRINCESS_NORMAL_00 "dat/pv/princess/in story/frame01.png"
 #define PRINCESS_TURN_02 "dat/pv/princess/in story/frame02.png"
@@ -56,4 +56,4 @@ extern ALLEGRO_BITMAP *princess_normal_00,
   *princess_step_back_13, *princess_step_back_14, *princess_step_back_15,
   *princess_look_down_16, *princess_look_down_17;
 
-#endif	/* FREEPOP_PRINCESS_H */
+#endif	/* MININIM_PRINCESS_H */

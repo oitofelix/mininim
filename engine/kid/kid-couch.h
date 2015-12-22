@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_KID_COUCH_H
-#define FREEPOP_KID_COUCH_H
+#ifndef MININIM_KID_COUCH_H
+#define MININIM_KID_COUCH_H
 
 /* bitmaps */
 #define KID_COUCH_01 "dat/kid/couching/frame01.png"
@@ -50,4 +50,4 @@ extern ALLEGRO_BITMAP *kid_couch_01, *kid_couch_02, *kid_couch_03, *kid_couch_04
   *kid_couch_09, *kid_couch_10, *kid_couch_11, *kid_couch_12,
   *kid_couch_13;
 
-#endif	/* FREEPOP_KID_COUCH_H */
+#endif	/* MININIM_KID_COUCH_H */

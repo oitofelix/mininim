@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_TORCH_H
-#define FREEPOP_TORCH_H
+#ifndef MININIM_TORCH_H
+#define MININIM_TORCH_H
 
 /* dungeon ega */
 #define DE_TORCH "data/torch/de.png"
@@ -38,4 +38,4 @@ void draw_torch (ALLEGRO_BITMAP *bitmap, struct pos *p,
                  enum em em, enum vm vm);
 struct coord *torch_coord (struct pos *p, struct coord *c);
 
-#endif	/* FREEPOP_TORCH_H */
+#endif	/* MININIM_TORCH_H */

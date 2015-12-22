@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_ANIM_H
-#define FREEPOP_ANIM_H
+#ifndef MININIM_ANIM_H
+#define MININIM_ANIM_H
 
 #include "prince.h"
 
@@ -50,4 +50,4 @@ extern bool cutscene; /* don't apply physics if set */
 #define CYCLE_TO_EFFECT_DURATION(x) ((x) * (EFFECT_HZ / SCRIPT_HZ))
 #define SECS_TO_SCYCLES(x) ((x) * SCRIPT_HZ)
 
-#endif	/* FREEPOP_ANIM_H */
+#endif	/* MININIM_ANIM_H */

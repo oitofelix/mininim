@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_LEVEL_DOOR_H
-#define FREEPOP_LEVEL_DOOR_H
+#ifndef MININIM_LEVEL_DOOR_H
+#define MININIM_LEVEL_DOOR_H
 
 #include "kernel/video.h"
 
@@ -99,4 +99,4 @@ struct coord *p_level_door_bottom_right_coord (struct pos *p, struct coord *c);
 struct coord *level_door_stairs_coord (struct pos *p, struct coord *c);
 struct coord *level_door_floor_coord (struct pos *p, struct coord *c);
 
-#endif	/* FREEPOP_LEVEL_DOOR_H */
+#endif	/* MININIM_LEVEL_DOOR_H */

@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_LOOSE_FLOOR_H
-#define FREEPOP_LOOSE_FLOOR_H
+#ifndef MININIM_LOOSE_FLOOR_H
+#define MININIM_LOOSE_FLOOR_H
 
 #include "kernel/audio.h"
 
@@ -129,4 +129,4 @@ void draw_loose_floor_02_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
 struct coord *loose_floor_left_coord (struct pos *p, struct coord *c);
 struct coord *loose_floor_right_coord (struct pos *p, struct coord *c);
 
-#endif	/* FREEPOP_LOOSE_FLOOR_H */
+#endif	/* MININIM_LOOSE_FLOOR_H */

@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_KID_DRINK_H
-#define FREEPOP_KID_DRINK_H
+#ifndef MININIM_KID_DRINK_H
+#define MININIM_KID_DRINK_H
 
 /* bitmaps */
 #define KID_DRINK_01 "dat/kid/drinking/frame01.png"
@@ -49,4 +49,4 @@ extern ALLEGRO_BITMAP *kid_drink_01, *kid_drink_02, *kid_drink_03,
   *kid_drink_08, *kid_drink_09, *kid_drink_10, *kid_drink_11,
   *kid_drink_12, *kid_drink_13, *kid_drink_14, *kid_drink_15;
 
-#endif	/* FREEPOP_KID_DRINK_H */
+#endif	/* MININIM_KID_DRINK_H */

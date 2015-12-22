@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_GRAPHICS_H
-#define FREEPOP_GRAPHICS_H
+#ifndef MININIM_GRAPHICS_H
+#define MININIM_GRAPHICS_H
 
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_font.h>
@@ -84,4 +84,4 @@ extern ALLEGRO_BITMAP *flick_bg_0, *flick_bg_1;
 extern struct video_effect video_effect;
 extern int screen_flags;
 
-#endif	/* FREEPOP_VIDEO_H */
+#endif	/* MININIM_VIDEO_H */

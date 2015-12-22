@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_KID_MISSTEP_H
-#define FREEPOP_KID_MISSTEP_H
+#ifndef MININIM_KID_MISSTEP_H
+#define MININIM_KID_MISSTEP_H
 
 #define KID_MISSTEP_FRAMESET_NMEMB 11
 extern struct frameset kid_misstep_frameset[KID_MISSTEP_FRAMESET_NMEMB];
@@ -27,4 +27,4 @@ void load_kid_misstep (void);
 void unload_kid_misstep (void);
 void kid_misstep (struct anim *kid);
 
-#endif	/* FREEPOP_KID_MISSTEP_H */
+#endif	/* MININIM_KID_MISSTEP_H */

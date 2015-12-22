@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_POTION_H
-#define FREEPOP_POTION_H
+#ifndef MININIM_POTION_H
+#define MININIM_POTION_H
 
 /* dungeon ega */
 #define DE_SMALL_POTION "data/potion/de-small.png"
@@ -51,4 +51,4 @@ void draw_potion (ALLEGRO_BITMAP *bitmap, struct pos *p, int i,
                   enum em em, enum vm vm);
 bool is_potion (struct pos *p);
 
-#endif	/* FREEPOP_POTION_H */
+#endif	/* MININIM_POTION_H */

@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_WINDOW_H
-#define FREEPOP_WINDOW_H
+#ifndef MININIM_WINDOW_H
+#define MININIM_WINDOW_H
 
 /* dungeon ega */
 #define DE_WINDOW "data/window/de.png"
@@ -38,4 +38,4 @@ void draw_window (ALLEGRO_BITMAP *bitmap, struct pos *p,
                  enum em em, enum vm vm);
 struct coord *window_coord (struct pos *p, struct coord *c);
 
-#endif	/* FREEPOP_WINDOW_H */
+#endif	/* MININIM_WINDOW_H */

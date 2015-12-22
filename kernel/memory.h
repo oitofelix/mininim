@@ -17,12 +17,12 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_MEMORY_H
-#define FREEPOP_MEMORY_H
+#ifndef MININIM_MEMORY_H
+#define MININIM_MEMORY_H
 
 /* functions */
 void *xmalloc (size_t n);
 void *xrealloc (void *ptr, size_t n);
 void *xcalloc (size_t count, size_t n);
 
-#endif	/* FREEPOP_MEMORY_H */
+#endif	/* MININIM_MEMORY_H */

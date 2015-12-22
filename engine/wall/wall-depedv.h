@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_WALL_DEPEDV_H
-#define FREEPOP_WALL_DEPEDV_H
+#ifndef MININIM_WALL_DEPEDV_H
+#define MININIM_WALL_DEPEDV_H
 
 /* dungeon ega */
 #define DE_WALL_LEFT "data/wall/de-left.png"
@@ -80,4 +80,4 @@ struct coord *wall_random_block_coord (struct pos *p, struct coord *c);
 struct coord *wall_divider_00_coord (struct pos *p, struct coord *c);
 struct coord *wall_divider_01_coord (struct pos *p, struct coord *c);
 
-#endif	/* FREEPOP_WALL_DEPEDV_H */
+#endif	/* MININIM_WALL_DEPEDV_H */

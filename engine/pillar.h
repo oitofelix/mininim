@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_PILLAR_H
-#define FREEPOP_PILLAR_H
+#ifndef MININIM_PILLAR_H
+#define MININIM_PILLAR_H
 
 #include "physics.h"
 
@@ -61,4 +61,4 @@ struct coord *pillar_left_coord (struct pos *p, struct coord *c);
 struct coord *pillar_right_coord (struct pos *p, struct coord *c);
 struct coord *pillar_top_coord (struct pos *p, struct coord *c);
 
-#endif	/* FREEPOP_PILLAR_H */
+#endif	/* MININIM_PILLAR_H */

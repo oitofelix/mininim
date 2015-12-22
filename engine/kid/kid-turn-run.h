@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_KID_TURN_RUN_H
-#define FREEPOP_KID_TURN_RUN_H
+#ifndef MININIM_KID_TURN_RUN_H
+#define MININIM_KID_TURN_RUN_H
 
 /* bitmaps */
 #define KID_TURN_RUN_05 "dat/kid/turn running/frame05.png"
@@ -43,4 +43,4 @@ extern ALLEGRO_BITMAP *kid_turn_run_05, *kid_turn_run_06, *kid_turn_run_07,
   *kid_turn_run_08, *kid_turn_run_09, *kid_turn_run_10, *kid_turn_run_11,
   *kid_turn_run_12, *kid_turn_run_13;
 
-#endif	/* FREEPOP_KID_TURN_RUN_H */
+#endif	/* MININIM_KID_TURN_RUN_H */

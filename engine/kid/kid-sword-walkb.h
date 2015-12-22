@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_KID_SWORD_WALKB_H
-#define FREEPOP_KID_SWORD_WALKB_H
+#ifndef MININIM_KID_SWORD_WALKB_H
+#define MININIM_KID_SWORD_WALKB_H
 
 /* bitmaps */
 #define KID_SWORD_WALKB_10 "dat/kid/sword attacking/frame10.png"
@@ -33,4 +33,4 @@ void kid_sword_walkb (struct anim *kid);
 
 ALLEGRO_BITMAP *kid_sword_walkb_10, *kid_sword_walkb_07;
 
-#endif	/* FREEPOP_KID_SWORD_WALKB_H */
+#endif	/* MININIM_KID_SWORD_WALKB_H */

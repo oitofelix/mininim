@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_KID_STABILIZE_H
-#define FREEPOP_KID_STABILIZE_H
+#ifndef MININIM_KID_STABILIZE_H
+#define MININIM_KID_STABILIZE_H
 
 #define KID_STABILIZE_05 "dat/kid/turning/frame05.png"
 #define KID_STABILIZE_06 "dat/kid/turning/frame06.png"
@@ -38,4 +38,4 @@ bool is_kid_stabilize (struct frame *f);
 extern ALLEGRO_BITMAP *kid_stabilize_05, *kid_stabilize_06,
   *kid_stabilize_07, *kid_stabilize_08;
 
-#endif	/* FREEPOP_KID_STABILIZE_H */
+#endif	/* MININIM_KID_STABILIZE_H */

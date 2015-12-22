@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FREEPOP_SKELETON_FLOOR_H
-#define FREEPOP_SKELETON_FLOOR_H
+#ifndef MININIM_SKELETON_FLOOR_H
+#define MININIM_SKELETON_FLOOR_H
 
 #include "kernel/audio.h"
 #include "physics.h"
@@ -50,4 +50,4 @@ void draw_skeleton_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
 struct coord *skeleton_floor_left_coord (struct pos *p, struct coord *c);
 struct coord *skeleton_floor_right_coord (struct pos *p, struct coord *c);
 
-#endif	/* FREEPOP_SKELETON_FLOOR_H */
+#endif	/* MININIM_SKELETON_FLOOR_H */
