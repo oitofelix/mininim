@@ -52,6 +52,7 @@ void display_remaining_time (void);
 struct level *vanilla_level;
 struct level level;
 static bool no_room_drawing = false;
+static int last_auto_show_time;
 int room_view;
 int draw_cycle;
 
@@ -401,6 +402,13 @@ draw_level (void)
   unpress_closer_floors ();
 
   draw_kid_lives (screen, current_kid, draw_cycle);
+
+  int rem_time = 60 - al_get_timer_count (play_time);
+  if (rem_time % 5 == 0
+      && last_auto_show_time != rem_time) {
+    display_remaining_time ();
+    last_auto_show_time = rem_time;
+  }
 
   draw_cycle++;
 }
