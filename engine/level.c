@@ -47,6 +47,7 @@ static void draw_level (void);
 static void sample_level (void);
 static void compute_level (void);
 static void process_keys (void);
+void display_remaining_time (void);
 
 struct level *vanilla_level;
 struct level level;
@@ -278,6 +279,22 @@ process_keys (void)
     al_free (text);
   }
 
+  /* SPACE: display remaining time */
+  if (was_key_pressed (ALLEGRO_KEY_SPACE, 0, 0, true))
+    display_remaining_time ();
+
+  /* +: increment and display remaining time */
+  if (was_key_pressed (ALLEGRO_KEY_EQUALS, 0, ALLEGRO_KEYMOD_SHIFT, true)) {
+    al_add_timer_count (play_time, -1);
+    display_remaining_time ();
+  }
+
+  /* -: decrement and display remaining time */
+  if (was_key_pressed (ALLEGRO_KEY_MINUS, 0, 0, true)) {
+    al_add_timer_count (play_time, +1);
+    display_remaining_time ();
+  }
+
   /* CTRL+V: show engine name and version */
   if (was_key_pressed (ALLEGRO_KEY_V, 0, ALLEGRO_KEYMOD_CTRL, true)) {
     xasprintf (&text, "MININIM 0.9");
@@ -386,4 +403,13 @@ draw_level (void)
   draw_kid_lives (screen, current_kid, draw_cycle);
 
   draw_cycle++;
+}
+
+void
+display_remaining_time (void)
+{
+  char *text;
+  xasprintf (&text, "%i MINUTES LEFT", 60 - al_get_timer_count (play_time));
+  draw_bottom_text (NULL, text);
+  al_free (text);
 }

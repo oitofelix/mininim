@@ -255,4 +255,7 @@ struct anim {
 int max (int a, int b);
 int min (int a, int b);
 
+/* variables */
+extern ALLEGRO_TIMER *play_time;
+
 #endif	/* MININIM_PRINCE_H */

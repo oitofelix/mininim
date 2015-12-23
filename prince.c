@@ -22,10 +22,13 @@
 #include "kernel/video.h"
 #include "kernel/audio.h"
 #include "kernel/keyboard.h"
+#include "kernel/timer.h"
 #include "engine/level.h"
 #include "levels/title.h"
 #include "levels/level-1.h"
 #include "levels/consistency-level.h"
+
+ALLEGRO_TIMER *play_time;
 
 int
 main (int argc, char **argv)
@@ -41,7 +44,11 @@ main (int argc, char **argv)
   clear_bitmap (screen, BLACK);
 
   /* play_title (); */
+
   load_level ();
+  play_time = create_timer (60.0);
+  al_start_timer (play_time);
+
   /* play_level_1 (); */
   play_consistency_level ();
   unload_level ();
