@@ -483,7 +483,7 @@ get_hanged_con (struct pos *hang_pos, enum dir d)
 bool
 is_hang_pos_critical (struct pos *hang_pos)
 {
-  return (is_strictly_traversable (hang_pos));
+  return (is_traversable (hang_pos));
 }
 
 bool

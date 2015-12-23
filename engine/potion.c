@@ -45,8 +45,9 @@ static struct coord *small_potion_coord (struct pos *p, struct coord *c);
 static struct coord *small_potion_bubble_coord (struct pos *p, struct coord *c);
 static struct coord *big_potion_coord (struct pos *p, struct coord *c);
 static struct coord *big_potion_bubble_coord (struct pos *p, struct coord *c);
-ALLEGRO_COLOR life_palette (ALLEGRO_COLOR c);
-ALLEGRO_COLOR poison_palette (ALLEGRO_COLOR c);
+static ALLEGRO_COLOR life_palette (ALLEGRO_COLOR c);
+static ALLEGRO_COLOR poison_palette (ALLEGRO_COLOR c);
+static ALLEGRO_COLOR float_palette (ALLEGRO_COLOR c);
 
 void
 load_potion (void)
@@ -178,6 +179,7 @@ draw_potion (ALLEGRO_BITMAP *bitmap, struct pos *p, int i,
     break;
   case BIG_LIFE_POTION:
   case BIG_POISON_POTION:
+  case FLOAT_POTION:
     bottle = big_potion;
     big_potion_coord (p, &bottle_coord);
     big_potion_bubble_coord (p, &bubble_coord);
@@ -195,6 +197,9 @@ draw_potion (ALLEGRO_BITMAP *bitmap, struct pos *p, int i,
   case SMALL_POISON_POTION:
   case BIG_POISON_POTION:
     bubble_palette = poison_palette;
+    break;
+  case FLOAT_POTION:
+    bubble_palette = float_palette;
     break;
   default:
     error (-1, 0, "%s (%i): unknown potion type", __func__, item);
@@ -218,7 +223,8 @@ is_potion (struct pos *p)
     && (con (p)->ext.item == SMALL_LIFE_POTION
         || con (p)->ext.item == BIG_LIFE_POTION
         || con (p)->ext.item == SMALL_POISON_POTION
-        || con (p)->ext.item == BIG_POISON_POTION);
+        || con (p)->ext.item == BIG_POISON_POTION
+        || con (p)->ext.item == FLOAT_POTION);
 }
 
 struct coord *
@@ -268,5 +274,12 @@ ALLEGRO_COLOR
 poison_palette (ALLEGRO_COLOR c)
 {
   if (color_eq (c, WHITE)) return POISON_POTION_BUBBLE_COLOR;
+  else return c;
+}
+
+ALLEGRO_COLOR
+float_palette (ALLEGRO_COLOR c)
+{
+  if (color_eq (c, WHITE)) return FLOAT_POTION_BUBBLE_COLOR;
   else return c;
 }

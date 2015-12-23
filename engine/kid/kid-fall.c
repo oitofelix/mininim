@@ -164,6 +164,18 @@ physics_in (struct anim *kid)
     kid->fo.dy = (speed > 33) ? 33 : speed;
   }
 
+  /* floating */
+  if (al_get_timer_started (kid->floating)) {
+    if (al_get_timer_count (kid->floating) < 16) {
+      kid->fo.dx = -1;
+      kid->fo.dy = +3;
+    }
+    else {
+      al_stop_timer (kid->floating);
+      kid->i = (kid->i > 4) ? 4 : kid->i;
+    }
+  }
+
   printf ("inertia: %i\n", kid->inertia);
 
   /* collision */
@@ -195,7 +207,7 @@ physics_in (struct anim *kid)
   survey (_mbo, pos, &kid->f, &nc, &np, &npmbo);
   fo.b = kid->f.b;
   fo.dx = 0;
-  fo.dy = 34;
+  fo.dy = al_get_timer_started (kid->floating) ? 14 : 34;
   next_frame (&kid->f, &nf, &fo);
   survey (_mbo, pos, &nf, &nc, &np, &npmbo_nf);
 
@@ -219,7 +231,8 @@ physics_in (struct anim *kid)
     shake_loose_floor_row (&pbf);
 
     if (kid->i >= 8 && ! kid->immortal
-        && ! kid->fall_immune) {
+        && ! kid->fall_immune
+        && ! al_get_timer_started (kid->floating)) {
       kid->splash = true;
       kid->current_lives--;
 
@@ -233,7 +246,9 @@ physics_in (struct anim *kid)
       }
       video_effect.color = RED;
       start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
-    } else if (kid->i > 3) sample_hit_ground = true;
+    } else if (kid->i > 3
+               && ! al_get_timer_started (kid->floating))
+      sample_hit_ground = true;
 
     survey (_mt, pos, &kid->f, &nc, &pmt, &np);
     if (kid->current_lives <= 0) {
@@ -255,7 +270,9 @@ physics_out (struct anim *kid)
   clear_depressible_floor (kid);
 
   /* sound */
-  if (kid->i == 10) sample_scream = true;
+  if (kid->i == 10
+      && ! al_get_timer_started (kid->floating))
+    sample_scream = true;
 }
 
 bool

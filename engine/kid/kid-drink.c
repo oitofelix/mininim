@@ -149,6 +149,7 @@ flow (struct anim *kid)
       video_effect.color = RED;
       start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
       break;
+    case FLOAT_POTION: float_kid (kid); break;
     default: break;
     }
 

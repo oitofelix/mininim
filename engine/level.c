@@ -147,13 +147,13 @@ compute_level (void)
 
   int prev_room = current_kid->f.c.room;
 
-  compute_loose_floors ();
-
   for (i = 0; i < kid_nmemb; i++) {
     k = &kid[i];
     k->splash = false;
     k->action (k);
   }
+
+  compute_loose_floors ();
 
   if (current_kid->f.c.room != prev_room
       && current_kid->f.c.room != 0)  {
@@ -242,6 +242,10 @@ process_keys (void)
   /* SHIFT+T: incremet kid total lives */
   if (was_key_pressed (ALLEGRO_KEY_T, 0, ALLEGRO_KEYMOD_SHIFT, true))
     increase_kid_total_lives (current_kid);
+
+  /* SHIFT+W: float kid */
+  if (was_key_pressed (ALLEGRO_KEY_W, 0, ALLEGRO_KEYMOD_SHIFT, true))
+    float_kid (current_kid);
 
   /* CTRL+A: restart level */
   if (was_key_pressed (ALLEGRO_KEY_A, 0, ALLEGRO_KEYMOD_CTRL, true))

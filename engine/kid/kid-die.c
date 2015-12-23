@@ -87,7 +87,7 @@ kid_resurrect (struct anim *kid)
   kid->current_lives = kid->total_lives;
   kid->action = kid_normal;
   place_frame (&kid->f, &kid->f, kid_normal_00,
-               &pm, kid->f.dir == LEFT ? + PLACE_WIDTH : 0, +15);
+               &pm, kid->f.dir == LEFT ? +16 : +16, +15);
 }
 
 void

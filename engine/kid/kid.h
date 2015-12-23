@@ -75,6 +75,7 @@
 #define SCREAM_SAMPLE "dat/digisnd3/falling.ogg"
 #define SPIKED_SAMPLE "dat/digisnd2/something spiked.ogg"
 #define CHOPPED_SAMPLE "dat/digisnd2/something chopped.ogg"
+#define FLOATING_SAMPLE "dat/midisnd1/floating.ogg"
 
 /* functions */
 void load_kid (void);
@@ -92,6 +93,7 @@ ALLEGRO_COLOR phantom_shadow_palette (ALLEGRO_COLOR c);
 ALLEGRO_COLOR e_palette (ALLEGRO_COLOR c);
 void increase_kid_current_lives (struct anim *k);
 void increase_kid_total_lives (struct anim *k);
+void float_kid (struct anim *k);
 
 /* variables */
 extern struct anim *kid; /* kid animation object */
@@ -102,6 +104,7 @@ extern bool sample_step, sample_hit_ground, sample_hit_ground_harm,
   sample_hit_ground_fatal, sample_hit_wall, sample_hang_on_fall,
   sample_drink, sample_glory, sample_take_sword, sample_sword_attack,
   sample_harm, sample_small_life_potion, sample_big_life_potion,
-  sample_action_not_allowed, sample_scream, sample_spiked, sample_chopped;
+  sample_action_not_allowed, sample_scream, sample_spiked, sample_chopped,
+  sample_floating;
 
 #endif	/* MININIM_KID_H */

@@ -26,6 +26,7 @@
 #include "kernel/keyboard.h"
 #include "kernel/array.h"
 #include "kernel/random.h"
+#include "kernel/timer.h"
 #include "engine/anim.h"
 #include "engine/physics.h"
 #include "engine/level.h"
@@ -48,13 +49,15 @@ ALLEGRO_SAMPLE *step_sample, *hit_ground_sample, *hit_ground_harm_sample,
   *hit_ground_fatal_sample, *hit_wall_sample, *hang_on_fall_sample,
   *drink_sample, *glory_sample, *take_sword_sample, *sword_attack_sample,
   *harm_sample, *action_not_allowed_sample, *small_life_potion_sample,
-  *big_life_potion_sample, *scream_sample, *spiked_sample, *chopped_sample;
+  *big_life_potion_sample, *scream_sample, *spiked_sample, *chopped_sample,
+  *floating_sample;
 
 bool sample_step, sample_hit_ground, sample_hit_ground_harm,
   sample_hit_ground_fatal, sample_hit_wall, sample_hang_on_fall,
   sample_drink, sample_glory, sample_take_sword, sample_sword_attack,
   sample_harm, sample_action_not_allowed, sample_small_life_potion,
-  sample_big_life_potion, sample_scream, sample_spiked, sample_chopped;
+  sample_big_life_potion, sample_scream, sample_spiked, sample_chopped,
+  sample_floating;
 
 static void place_kid (struct anim *kid, int room, int floor, int place);
 static struct coord *kid_life_coord (int i, struct coord *c);
@@ -118,6 +121,7 @@ load_kid (void)
   scream_sample = load_sample (SCREAM_SAMPLE);
   spiked_sample = load_sample (SPIKED_SAMPLE);
   chopped_sample = load_sample (CHOPPED_SAMPLE);
+  floating_sample = load_sample (FLOATING_SAMPLE);
 }
 
 void
@@ -177,6 +181,7 @@ unload_kid (void)
   al_destroy_sample (scream_sample);
   al_destroy_sample (spiked_sample);
   al_destroy_sample (chopped_sample);
+  al_destroy_sample (floating_sample);
 }
 
 int
@@ -197,6 +202,7 @@ create_kid (void)
   k.item_pos.room = -1;
   k.total_lives = KID_INITIAL_TOTAL_LIVES;
   k.current_lives = KID_INITIAL_CURRENT_LIVES;
+  k.floating = create_timer (1.0);
 
   place_kid (&k, 1, 0, 0);
   update_depressible_floor (&k, -4, -10);
@@ -221,7 +227,7 @@ void
 draw_kids (ALLEGRO_BITMAP *bitmap,
            enum em em, enum vm vm)
 {
-  struct coord ml, c; struct pos pml, pmlr, pmlra;
+  struct coord ml; struct pos pml, pmlr, pmlra;
   struct anim *k;
 
   /* coord_wa = true; */
@@ -233,8 +239,6 @@ draw_kids (ALLEGRO_BITMAP *bitmap,
     k = &kid[i];
 
     if (k->invisible) continue;
-    frame2room (&k->f, room_view, &c);
-    if (c.room != room_view) continue;
 
     k->f.id = k;
     if (k->current) current_kid = k;
@@ -452,6 +456,7 @@ sample_kid (void)
   if (sample_scream) play_sample (scream_sample);
   if (sample_spiked) play_sample (spiked_sample);
   if (sample_chopped) play_sample (chopped_sample);
+  if (sample_floating) play_sample (floating_sample);
 
   sample_step = sample_hit_ground = sample_hit_ground_harm =
     sample_hit_ground_fatal = sample_hit_wall =
@@ -459,7 +464,7 @@ sample_kid (void)
     sample_take_sword = sample_sword_attack = sample_harm =
     sample_action_not_allowed = sample_small_life_potion =
     sample_big_life_potion = sample_scream = sample_spiked =
-    sample_chopped = false;
+    sample_chopped = sample_floating = false;
 }
 
 void
@@ -525,4 +530,14 @@ increase_kid_total_lives (struct anim *k)
     video_effect.color = RED;
     start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.3));
   }
+}
+
+void
+float_kid (struct anim *k)
+{
+  al_set_timer_count (k->floating, 0);
+  al_start_timer (k->floating);
+  sample_floating = true;
+  video_effect.color = GREEN;
+  start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.3));
 }
