@@ -220,15 +220,6 @@ void
 draw_level_door (ALLEGRO_BITMAP *bitmap, struct pos *p,
                  enum em em, enum vm vm)
 {
-  draw_floor_base (bitmap, p, em, vm);
-  draw_floor_left (bitmap, p, em, vm);
-  draw_level_door_right (bitmap, p, em, vm);
-}
-
-void
-draw_level_door_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                       enum em em, enum vm vm)
-{
   struct coord c;
   struct level_door *d = level_door_at_pos (p);
   if (! d) return;
@@ -293,7 +284,6 @@ draw_level_door_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
-  draw_floor_right (bitmap, p, em, vm);
   draw_bitmapc (level_door_bottom, bitmap,
                 level_door_bottom_left_coord (p, &c), 0);
   draw_bitmapc (level_door_top_left, bitmap,
@@ -313,7 +303,7 @@ void
 draw_level_door_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f,
                     enum em em, enum vm vm)
 {
-  struct pos pa, par;
+  struct pos pl, pr, pa, par;
 
   pos2coord_f level_door_bottom_right_coord = NULL;
 
@@ -339,6 +329,8 @@ draw_level_door_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f,
   }
 
   if (! is_kid_stairs (f)) return;
+  prel (p, &pl, +0, -1);
+  prel (p, &pr, +0, +1);
   prel (p, &pa, -1, +0);
   prel (p, &par, -1, +1);
 
@@ -346,6 +338,8 @@ draw_level_door_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f,
   draw_bitmapc (level_door_bottom, bitmap,
                 level_door_bottom_right_coord (p, &c), 0);
   draw_level_door_front (bitmap, p, 0, em, vm);
+  draw_confg (bitmap, &pl, em, vm, true);
+  draw_confg (bitmap, &pr, em, vm, true);
   draw_confg (bitmap, &pa, em, vm, true);
   draw_confg_base (bitmap, &par, em, vm);
   draw_confg_left (bitmap, &par, em, vm, true);

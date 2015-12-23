@@ -255,8 +255,8 @@ fix_door_lacking_opener (struct pos *p)
       if (peq (&level.event[i].p, p)
           && is_there_event_handler (i)) return;
 
-    fprintf (stderr, "%s: replaced %s by %s at pos (%i, %i, %i)\n",
-             __func__, "DOOR", "FLOOR", p->room, p->floor, p->place);
+    /* fprintf (stderr, "%s: replaced %s by %s at pos (%i, %i, %i)\n", */
+    /*          __func__, "DOOR", "FLOOR", p->room, p->floor, p->place); */
 
     c->fg = FLOOR;
     c->bg = NO_BG;
@@ -276,11 +276,11 @@ fix_opener_or_closer_lacking_door (struct pos *p)
     do {
       if (con (&level.event[i].p)->fg == DOOR
           || con (&level.event[i].p)->fg == LEVEL_DOOR) return;
-    } while (level.event[i++].next);
+    } while (level.event[i++].next && i < EVENTS);
 
-    fprintf (stderr, "%s: replaced %s (event %i) by %s at pos (%i, %i, %i)\n",
-             __func__, c->fg == OPENER_FLOOR ? "OPENER_FLOOR" : "CLOSER_FLOOR",
-             c->ext.event, "FLOOR", p->room, p->floor, p->place);
+    /* fprintf (stderr, "%s: replaced %s (event %i) by %s at pos (%i, %i, %i)\n", */
+    /*          __func__, c->fg == OPENER_FLOOR ? "OPENER_FLOOR" : "CLOSER_FLOOR", */
+    /*          c->ext.event, "FLOOR", p->room, p->floor, p->place); */
 
     c->fg = FLOOR;
     c->bg = NO_BG;
@@ -340,7 +340,7 @@ is_there_event_handler (int e)
           i = con (&p)->ext.event;
           do {
             if (i == e) return true;
-          } while (level.event[i++].next);
+          } while (level.event[i++].next && i < EVENTS);
         }
       }
   return false;

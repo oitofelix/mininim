@@ -116,7 +116,8 @@ flow (struct anim *kid)
     kid->i = kid->j = -1;
   }
 
-  if (kid->i >= 11 && kid->j < 17) {
+  if (kid->i == 11 && kid->j == 17) quit_anim = NEXT_LEVEL;
+  else if (kid->i >= 11 && kid->j < 17) {
     kid->invisible = true;
     kid->j++;
   } else if (kid->i < 11) kid->j = kid->i + 1;

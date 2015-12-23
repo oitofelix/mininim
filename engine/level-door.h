@@ -85,8 +85,6 @@ void compute_level_doors (void);
 void sample_level_doors (void);
 void draw_level_door (ALLEGRO_BITMAP *bitmap, struct pos *p,
                       enum em em, enum vm vm);
-void draw_level_door_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                            enum em em, enum vm vm);
 void draw_level_door_front (ALLEGRO_BITMAP *bitmap, struct pos *p, int i,
                             enum em em, enum vm vm);
 void draw_level_door_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f,

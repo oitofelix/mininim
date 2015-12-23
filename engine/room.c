@@ -46,6 +46,7 @@
 #include "window.h"
 #include "room.h"
 
+static int last_level;
 static int last_room;
 static enum em last_em;
 static enum vm last_vm;
@@ -214,26 +215,24 @@ draw_room (ALLEGRO_BITMAP *bitmap, int room,
 
   if (room != last_room
       || em != last_em
-      || vm != last_vm) {
+      || vm != last_vm
+      || level.number != last_level) {
     if (room != last_room)
       run_room_callbacks (last_room, room);
     update_wall_cache (room, em, vm);
     last_em = em;
     last_vm = vm;
     last_room = room;
+    last_level = level.number;
   }
 
   for (p.floor = FLOORS; p.floor >= -1; p.floor--)
     for (p.place = -1; p.place < PLACES; p.place++)
-      draw_con (bitmap, &p, em, vm, false);
-}
+      draw_conbg (bitmap, &p, em, vm);
 
-void
-draw_con (ALLEGRO_BITMAP *bitmap, struct pos *p,
-          enum em em, enum vm vm, bool redraw)
-{
-  draw_conbg (bitmap, p, em, vm);
-  draw_confg (bitmap, p, em, vm, redraw);
+  for (p.floor = FLOORS; p.floor >= -1; p.floor--)
+    for (p.place = -1; p.place < PLACES; p.place++)
+      draw_confg (bitmap, &p, em, vm, false);
 }
 
 void
@@ -255,6 +254,9 @@ draw_conbg (ALLEGRO_BITMAP *bitmap, struct pos *p,
     error (-1, 0, "%s: unknown background (%i)",
            __func__, con (p)->bg);
   }
+
+  if (con (p)->fg == LEVEL_DOOR)
+    draw_level_door (bitmap, p, em, vm);
 }
 
 void
@@ -344,7 +346,7 @@ draw_confg_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
     draw_big_pillar_top_right (bitmap, p, em, vm); break;
   case WALL: draw_wall_right (bitmap, p, em, vm); break;
   case DOOR: draw_door_right (bitmap, p, em, vm); break;
-  case LEVEL_DOOR: draw_level_door_right (bitmap, p, em, vm); break;
+  case LEVEL_DOOR: draw_floor_right (bitmap, p, em, vm); break;
   case CHOPPER: draw_floor_right (bitmap, p, em, vm); break;
   default:
     error (-1, 0, "%s: unknown foreground (%i)",

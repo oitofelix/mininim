@@ -25,6 +25,7 @@
 #include "kernel/video.h"
 #include "kernel/keyboard.h"
 #include "kernel/array.h"
+#include "kernel/timer.h"
 #include "anim.h"
 #include "physics.h"
 #include "room.h"
@@ -53,28 +54,37 @@ struct level *vanilla_level;
 struct level level;
 static bool no_room_drawing = false;
 static int last_auto_show_time;
+static ALLEGRO_TIMER *death_timer;
+
 int room_view;
 int draw_cycle;
 
 void
 play_level (struct level *lv)
 {
- restart:
+  char *text;
   cutscene = false;
-
   vanilla_level = lv;
-  level = *lv;
+  death_timer = create_timer (1.0 / 12);
 
+ start:
+  level = *lv;
   register_cons ();
 
-  create_kid ();
-  create_kid ();
-
-  current_kid = &kid[0];
-  current_kid->current = true;
-  kid[1].shadow = true;
+  if (level.start) level.start ();
 
   room_view = 1;
+  draw_cycle = 0;
+  last_auto_show_time = -1;
+  current_kid = &kid[0];
+  current_kid->current = true;
+
+  xasprintf (&text, "LEVEL %i", level.number);
+  draw_bottom_text (NULL, text);
+  al_free (text);
+
+  al_stop_timer (death_timer);
+  al_set_timer_count (death_timer, 0);
 
   play_anim (draw_level, sample_level, compute_level, 12);
 
@@ -83,7 +93,13 @@ play_level (struct level *lv)
   case RESTART_LEVEL:
     destroy_array ((void **) &kid, &kid_nmemb);
     destroy_cons ();
-    goto restart;
+    goto start;
+  case NEXT_LEVEL:
+    destroy_array ((void **) &kid, &kid_nmemb);
+    destroy_cons ();
+    struct anim *k = get_kid_by_id (0);
+    if (level.next_level) level.next_level (level.number + 1, &k->p);
+    goto start;
   case QUIT_GAME: break;
   }
 }
@@ -188,6 +204,36 @@ process_keys (void)
 
   int prev_room = room_view;
 
+  /* R: resurrect kid */
+  if (was_key_pressed (ALLEGRO_KEY_R, 0, 0, true)
+      && is_kid_dead (&current_kid->f))
+    kid_resurrect (current_kid);
+
+  /* Restart level after death */
+  if (is_kid_dead (&get_kid_by_id (0)->f)) {
+    al_start_timer (death_timer);
+
+    int64_t t = al_get_timer_count (death_timer);
+
+    if (t == 12) sample_death = true;
+
+    if (t >= 60) {
+      if (t == 60) key.keyboard.keycode = 0;
+      if (t < 240 || t % 12 < 8) {
+        if (t >= 252 && t % 12 == 0) sample_press_key = true;
+        xasprintf (&text, "Press Button to Continue");
+        draw_bottom_text (NULL, text);
+        al_free (text);
+      } else draw_bottom_text (NULL, "");
+
+      if (key.keyboard.keycode) quit_anim = RESTART_LEVEL;
+    }
+  } else if (al_get_timer_started (death_timer)) {
+    al_stop_timer (death_timer);
+    al_set_timer_count (death_timer, 0);
+    draw_bottom_text (NULL, NULL);
+  }
+
   /* HOME: camera on kid */
   if (was_key_pressed (ALLEGRO_KEY_HOME, 0, 0, true))
     room_view = current_kid->f.c.room;
@@ -220,11 +266,6 @@ process_keys (void)
     room_view = current_kid->f.c.room;
   }
 
-  /* R: resurrect kid */
-  if (was_key_pressed (ALLEGRO_KEY_R, 0, 0, true)
-      && is_kid_dead (&current_kid->f))
-    kid_resurrect (current_kid);
-
   /* I: enable/disable immortal mode */
   if (was_key_pressed (ALLEGRO_KEY_I, 0, 0, true)) {
     current_kid->immortal = ! current_kid->immortal;
@@ -249,6 +290,10 @@ process_keys (void)
   /* CTRL+A: restart level */
   if (was_key_pressed (ALLEGRO_KEY_A, 0, ALLEGRO_KEYMOD_CTRL, true))
     quit_anim = RESTART_LEVEL;
+
+  /* SHIFT+L: warp to next level */
+  if (was_key_pressed (ALLEGRO_KEY_L, 0, ALLEGRO_KEYMOD_SHIFT, true))
+    quit_anim = NEXT_LEVEL;
 
   /* C: show direct coordinates */
   if (was_key_pressed (ALLEGRO_KEY_C, 0, 0, true)) {
@@ -335,9 +380,9 @@ process_keys (void)
   if (was_key_pressed (ALLEGRO_KEY_F11, 0, 0, true)) {
     char *em_str = NULL;
 
-    switch (level.em) {
-    case DUNGEON: level.em = PALACE; em_str = "PALACE"; break;
-    case PALACE: level.em = DUNGEON; em_str = "DUNGEON"; break;
+    switch (em) {
+    case DUNGEON: em = PALACE; em_str = "PALACE"; break;
+    case PALACE: em = DUNGEON; em_str = "DUNGEON"; break;
     }
 
     xasprintf (&text, "ENVIRONMENT MODE: %s", em_str);
@@ -349,10 +394,10 @@ process_keys (void)
   if (was_key_pressed (ALLEGRO_KEY_F12, 0, 0, true)) {
     char *vm_str = NULL;
 
-    switch (level.vm) {
+    switch (vm) {
     case CGA: break;
-    case EGA: level.vm = VGA; vm_str = "VGA"; break;
-    case VGA: level.vm = EGA; vm_str = "EGA"; break;
+    case EGA: vm = VGA; vm_str = "VGA"; break;
+    case VGA: vm = EGA; vm_str = "EGA"; break;
     }
 
     xasprintf (&text, "VIDEO MODE: %s", vm_str);
@@ -366,9 +411,6 @@ process_keys (void)
 static void
 draw_level (void)
 {
-  enum em em = level.em;
-  enum vm vm = level.vm;
-
   /* drawing */
   struct pos p;
   p.room = room_view;
@@ -400,9 +442,12 @@ draw_level (void)
 
   draw_kid_lives (screen, current_kid, draw_cycle);
 
+  /* automatic remaining time display */
   int rem_time = 60 - al_get_timer_count (play_time);
-  if (rem_time % 5 == 0
-      && last_auto_show_time != rem_time) {
+  if ((rem_time % 5 == 0
+       && last_auto_show_time != rem_time
+       && draw_cycle > 24)
+      || draw_cycle == 24) {
     display_remaining_time ();
     last_auto_show_time = rem_time;
   }

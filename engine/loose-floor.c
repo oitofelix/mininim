@@ -363,9 +363,6 @@ compute_loose_floor_release (struct loose_floor *l)
 ALLEGRO_BITMAP *
 get_correct_falling_loose_floor_bitmap (ALLEGRO_BITMAP *b)
 {
-  enum em em = level.em;
-  enum vm vm = level.vm;
-
   if (b == de_loose_floor_02
       || b == pe_loose_floor_02
       || b == dv_loose_floor_02

@@ -29,6 +29,8 @@
 #include "levels/consistency-level.h"
 
 ALLEGRO_TIMER *play_time;
+enum em em = DUNGEON;
+enum vm vm = VGA;
 
 int
 main (int argc, char **argv)

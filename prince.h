@@ -138,9 +138,10 @@ enum dir {
 };
 
 struct level {
-
-  enum em em;
-  enum vm vm;
+  void (*start) (void);
+  void (*special_events) (void);
+  void (*next_level) (int, struct pos *);
+  int number;
 
   struct con {
     enum confg {
@@ -202,6 +203,7 @@ typedef void (*ACTION) (struct anim *a);
 
 struct anim {
   int id;
+  int shadow_of;
 
   struct frame {
     void *id;
@@ -257,5 +259,7 @@ int min (int a, int b);
 
 /* variables */
 extern ALLEGRO_TIMER *play_time;
+extern enum em em;
+extern enum vm vm;
 
 #endif	/* MININIM_PRINCE_H */

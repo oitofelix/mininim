@@ -76,6 +76,8 @@
 #define SPIKED_SAMPLE "dat/digisnd2/something spiked.ogg"
 #define CHOPPED_SAMPLE "dat/digisnd2/something chopped.ogg"
 #define FLOATING_SAMPLE "dat/midisnd1/floating.ogg"
+#define DEATH_SAMPLE "dat/midisnd1/death.ogg"
+#define PRESS_KEY_SAMPLE "dat/digisnd1/press-key.ogg"
 
 /* functions */
 void load_kid (void);
@@ -83,7 +85,7 @@ void unload_kid (void);
 void sample_kid (void);
 void draw_kid_lives (ALLEGRO_BITMAP *bitmap, struct anim *kid, int j);
 void draw_kid (ALLEGRO_BITMAP *bitmap, struct anim *kid, struct pos *p);
-int create_kid (void);
+int create_kid (struct anim *k);
 struct anim *get_kid_by_id (int id);
 void draw_kids (ALLEGRO_BITMAP *bitmap, enum em em, enum vm vm);
 void draw_kid_frame (ALLEGRO_BITMAP *bitmap, struct anim *k,
@@ -105,6 +107,6 @@ extern bool sample_step, sample_hit_ground, sample_hit_ground_harm,
   sample_drink, sample_glory, sample_take_sword, sample_sword_attack,
   sample_harm, sample_small_life_potion, sample_big_life_potion,
   sample_action_not_allowed, sample_scream, sample_spiked, sample_chopped,
-  sample_floating;
+  sample_floating, sample_death, sample_press_key;
 
 #endif	/* MININIM_KID_H */

@@ -42,8 +42,6 @@ void run_room_callbacks (int last_room, int room);
 
 void draw_room (ALLEGRO_BITMAP *bitmap, int room,
                 enum em em, enum vm vm);
-void draw_con (ALLEGRO_BITMAP *bitmap, struct pos *p,
-               enum em em, enum vm vm, bool redraw);
 void draw_conbg (ALLEGRO_BITMAP *bitmap, struct pos *p,
                  enum em em, enum vm vm);
 void draw_confg (ALLEGRO_BITMAP *bitmap, struct pos *p,

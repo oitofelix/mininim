@@ -50,14 +50,14 @@ ALLEGRO_SAMPLE *step_sample, *hit_ground_sample, *hit_ground_harm_sample,
   *drink_sample, *glory_sample, *take_sword_sample, *sword_attack_sample,
   *harm_sample, *action_not_allowed_sample, *small_life_potion_sample,
   *big_life_potion_sample, *scream_sample, *spiked_sample, *chopped_sample,
-  *floating_sample;
+  *floating_sample, *death_sample, *press_key_sample;
 
 bool sample_step, sample_hit_ground, sample_hit_ground_harm,
   sample_hit_ground_fatal, sample_hit_wall, sample_hang_on_fall,
   sample_drink, sample_glory, sample_take_sword, sample_sword_attack,
   sample_harm, sample_action_not_allowed, sample_small_life_potion,
   sample_big_life_potion, sample_scream, sample_spiked, sample_chopped,
-  sample_floating;
+  sample_floating, sample_death, sample_press_key;
 
 static void place_kid (struct anim *kid, int room, int floor, int place);
 static struct coord *kid_life_coord (int i, struct coord *c);
@@ -122,6 +122,8 @@ load_kid (void)
   spiked_sample = load_sample (SPIKED_SAMPLE);
   chopped_sample = load_sample (CHOPPED_SAMPLE);
   floating_sample = load_sample (FLOATING_SAMPLE);
+  death_sample = load_sample (DEATH_SAMPLE);
+  press_key_sample = load_sample (PRESS_KEY_SAMPLE);
 }
 
 void
@@ -182,10 +184,12 @@ unload_kid (void)
   al_destroy_sample (spiked_sample);
   al_destroy_sample (chopped_sample);
   al_destroy_sample (floating_sample);
+  al_destroy_sample (death_sample);
+  al_destroy_sample (press_key_sample);
 }
 
 int
-create_kid (void)
+create_kid (struct anim *_k)
 {
   struct anim k;
 
@@ -193,19 +197,28 @@ create_kid (void)
 
   memset (&k, 0, sizeof (k));
 
-  k.id = i;
-  k.f.b = kid_normal_00;
-  k.f.c.room = room_view;
-  k.f.dir = LEFT;
-  k.fo.b = kid_normal_00;
-  k.action = kid_normal;
-  k.item_pos.room = -1;
-  k.total_lives = KID_INITIAL_TOTAL_LIVES;
-  k.current_lives = KID_INITIAL_CURRENT_LIVES;
-  k.floating = create_timer (1.0);
+  if (_k) {
+    k = *_k;
+    k.id = i;
+    k.shadow_of = _k->id;
+    k.shadow = true;
+    k.floating = create_timer (1.0);
+  } else {
+    k.id = i;
+    k.shadow_of = -1;
+    k.f.b = kid_normal_00;
+    k.f.c.room = room_view;
+    k.f.dir = LEFT;
+    k.fo.b = kid_normal_00;
+    k.action = kid_normal;
+    k.item_pos.room = -1;
+    k.total_lives = KID_INITIAL_TOTAL_LIVES;
+    k.current_lives = KID_INITIAL_CURRENT_LIVES;
+    k.floating = create_timer (1.0);
 
-  place_kid (&k, 1, 0, 0);
-  update_depressible_floor (&k, -4, -10);
+    place_kid (&k, 1, 0, 0);
+    update_depressible_floor (&k, -4, -10);
+  }
 
   kid = add_to_array (&k, 1, kid, &kid_nmemb, i, sizeof (k));
 
@@ -457,6 +470,8 @@ sample_kid (void)
   if (sample_spiked) play_sample (spiked_sample);
   if (sample_chopped) play_sample (chopped_sample);
   if (sample_floating) play_sample (floating_sample);
+  if (sample_death) play_sample (death_sample);
+  if (sample_press_key) play_sample (press_key_sample);
 
   sample_step = sample_hit_ground = sample_hit_ground_harm =
     sample_hit_ground_fatal = sample_hit_wall =
@@ -464,7 +479,8 @@ sample_kid (void)
     sample_take_sword = sample_sword_attack = sample_harm =
     sample_action_not_allowed = sample_small_life_potion =
     sample_big_life_potion = sample_scream = sample_spiked =
-    sample_chopped = sample_floating = false;
+    sample_chopped = sample_floating = sample_death =
+    sample_press_key = false;
 }
 
 void

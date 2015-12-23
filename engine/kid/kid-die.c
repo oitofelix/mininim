@@ -97,10 +97,14 @@ kid_die_spiked (struct anim *kid)
   kid->action = kid_die_spiked;
   kid->f.flip = (kid->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  if (kid->oaction != kid_die_spiked)
+  kid->current_lives = 0;
+
+  if (kid->oaction != kid_die_spiked) {
     place_frame (&kid->f, &kid->f, kid_die_spiked_00,
                  &kid->p, (kid->f.dir == LEFT)
                  ? +8 : +9, (kid->f.dir == LEFT) ? +32 : +31);
+    kill_kid_shadows (kid);
+  }
 }
 
 void
@@ -110,10 +114,14 @@ kid_die_chopped (struct anim *kid)
   kid->action = kid_die_chopped;
   kid->f.flip = (kid->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  if (kid->oaction != kid_die_chopped)
+  kid->current_lives = 0;
+
+  if (kid->oaction != kid_die_chopped) {
     place_frame (&kid->f, &kid->f, kid_die_chopped_00,
                  &kid->p, (kid->f.dir == LEFT)
                  ? -8 : -7, +47);
+    kill_kid_shadows (kid);
+  }
 }
 
 void
@@ -123,10 +131,15 @@ kid_die_suddenly (struct anim *kid)
   kid->action = kid_die_suddenly;
   kid->f.flip = (kid->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  if (kid->oaction != kid_die_suddenly)
+  kid->current_lives = 0;
+
+  if (kid->oaction != kid_die_suddenly) {
     place_frame (&kid->f, &kid->f, kid_die_06,
                  &kid->p, (kid->f.dir == LEFT)
                  ? +9 : +4, +47);
+
+    kill_kid_shadows (kid);
+  }
 
   kid->hit_by_loose_floor = false;
 }
@@ -154,12 +167,18 @@ flow (struct anim *kid)
     kid->i = -1, kid->j = 0;
   }
 
+  kid->current_lives = 0;
+
   kid->i = kid->i < 5 ? kid->i + 1 : 5;
 
   select_frame (kid, kid_die_frameset, kid->i);
 
-  if (kid->j == 1) kid->fo.dx = kid->fo.dy = 0;
+  if (kid->j >= 1) kid->fo.dx = kid->fo.dy = 0;
   if (kid->i == 5) kid->j = 1;
+  if (kid->j == 1) {
+    kid->j++;
+    kill_kid_shadows (kid);
+  }
 
   return true;
 }
@@ -194,4 +213,22 @@ is_kid_dead (struct frame *f)
   if (f->b == kid_die_chopped_00) return true;
 
   return false;
+}
+
+void
+kill_kid_shadows (struct anim *k)
+{
+  struct coord nc; struct pos np, pmt;
+
+  int i;
+  for (i = 0; i < kid_nmemb; i++) {
+    struct anim *ks = &kid[i];
+
+    if (ks->shadow_of == k->id
+        && ! is_kid_dead (&ks->f)) {
+      survey (_mt, pos, &ks->f, &nc, &pmt, &np);
+      ks->p = pmt;
+      kid_die (ks);
+    }
+  }
 }

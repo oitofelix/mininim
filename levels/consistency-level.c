@@ -23,22 +23,39 @@
 #include "kernel/random.h"
 #include "engine/level.h"
 #include "engine/consistency.h"
+#include "engine/kid/kid.h"
 
 static struct level consistency_level;
+static void next_level (int lv, struct pos *exit_door_pos);
+static void start (void);
+
+void
+play_consistency_level (void)
+{
+  next_level (1, NULL);
+  play_level (&consistency_level);
+}
 
 static void
-init_consistency_level (void)
+start (void)
 {
+  create_kid (NULL);
+  create_kid (&kid[0]);
+}
+
+static void
+next_level (int number, struct pos *exit_door_pos)
+{
+  int i;
   struct pos p;
 
-  random_seed = 1;
+  random_seed = number;
   /* random_seed = time (NULL); */
   printf ("LEVEL NUMBER: %u\n", random_seed);
 
   struct level *lv = &consistency_level;
 
-  lv->em = DUNGEON;
-  lv->vm = VGA;
+  memset (lv, 0, sizeof (*lv));
 
   /* generate room 0 (delimiter room) */
   p.room = 0;
@@ -179,15 +196,13 @@ init_consistency_level (void)
       }
     }
   }
-}
 
-void
-play_consistency_level (void)
-{
-  int i = 0;
-  init_consistency_level ();
+  /* fix level */
   level = consistency_level;
   for (i = 0; i < 2; i++) fix_level ();
   consistency_level = level;
-  play_level (&consistency_level);
+
+  consistency_level.number = number;
+  consistency_level.start = start;
+  consistency_level.next_level = next_level;
 }
