@@ -20,6 +20,7 @@
 #include "prince.h"
 #include "kernel/video.h"
 #include "kernel/keyboard.h"
+#include "kernel/random.h"
 #include "engine/anim.h"
 #include "engine/physics.h"
 #include "engine/door.h"
@@ -150,6 +151,16 @@ flow (struct anim *kid)
       start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
       break;
     case FLOAT_POTION: float_kid (kid); break;
+    case FLIP_POTION:
+      if (screen_flags) screen_flags = 0;
+      else {
+        switch (prandom_pos (&kid->item_pos, 2)) {
+        case 0: screen_flags = ALLEGRO_FLIP_VERTICAL;
+        case 1: screen_flags = ALLEGRO_FLIP_HORIZONTAL;
+        case 2: screen_flags = ALLEGRO_FLIP_VERTICAL | ALLEGRO_FLIP_HORIZONTAL;
+        }
+      }
+      break;
     default: break;
     }
 

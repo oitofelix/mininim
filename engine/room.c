@@ -497,9 +497,6 @@ draw_room_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
   if ((peq (p, prel (&pbl, &np, -1, +1))
        || (peq (p, prel (&pbl, &np, +0, +1))
            && bl.y >= (p->floor + 1) * PLACE_HEIGHT - 6))
-      /* (peq (p, prel (&ptl, &np, 0, +1)) */
-      /*  || peq (p, prel (&pm, &np, 0, +1)) */
-
       && is_kid_fall (f)) {
     draw_confg_base (bitmap, p, em, vm);
     draw_confg_left (bitmap, p, em, vm, true);

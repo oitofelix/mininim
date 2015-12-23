@@ -72,6 +72,7 @@
 #define LIFE_POTION_BUBBLE_COLOR (al_map_rgb (224, 0, 48))
 #define POISON_POTION_BUBBLE_COLOR (al_map_rgb (80, 84, 248))
 #define FLOAT_POTION_BUBBLE_COLOR (al_map_rgb (84, 252, 84))
+#define FLIP_POTION_BUBBLE_COLOR (al_map_rgb (255, 255, 0))
 
 #define BLOOD_COLOR (al_map_rgb (228, 0, 0))
 
@@ -178,6 +179,7 @@ struct level {
         SMALL_POISON_POTION,
         BIG_POISON_POTION,
         FLOAT_POTION,
+        FLIP_POTION,
         SWORD,
       } item;
     } ext;
