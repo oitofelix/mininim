@@ -143,19 +143,16 @@ static void
 compute_level (void)
 {
   int i;
-  struct anim *k;
 
   process_keys ();
 
   int prev_room = current_kid->f.c.room;
 
-  for (i = 0; i < kid_nmemb; i++) {
-    k = &kid[i];
-    k->splash = false;
-    k->action (k);
-  }
+  for (i = 0; i < kid_nmemb; i++) kid[i].splash = false;
 
   compute_loose_floors ();
+
+  for (i = 0; i < kid_nmemb; i++) kid[i].action (&kid[i]);
 
   if (current_kid->f.c.room != prev_room
       && current_kid->f.c.room != 0)  {
