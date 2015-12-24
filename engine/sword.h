@@ -23,6 +23,10 @@
 #define SWORD_FRAMESET_NMEMB 34
 extern struct frameset sword_frameset[SWORD_FRAMESET_NMEMB];
 
+/* cga */
+#define C_NORMAL_SWORD "data/sword/c-normal.png"
+#define C_SHINY_SWORD "data/sword/c-shiny.png"
+
 /* ega */
 #define E_NORMAL_SWORD "data/sword/e-normal.png"
 #define E_SHINY_SWORD "data/sword/e-shiny.png"

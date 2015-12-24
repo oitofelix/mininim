@@ -446,7 +446,7 @@ draw_level (void)
   unpress_opener_floors ();
   unpress_closer_floors ();
 
-  draw_kid_lives (screen, current_kid, draw_cycle);
+  draw_kid_lives (screen, current_kid, draw_cycle, vm);
 
   /* automatic remaining time display */
   int rem_time = 60 - al_get_timer_count (play_time);

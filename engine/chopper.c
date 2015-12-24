@@ -823,7 +823,7 @@ v_blood_palette (ALLEGRO_COLOR c)
 ALLEGRO_COLOR
 e_blood_palette (ALLEGRO_COLOR c)
 {
-  if (color_eq (c, WHITE)) return E_BLOOD_COLOR;
+  if (color_eq (c, WHITE)) return E_BLOOD_COLOR_01;
   else return c;
 }
 

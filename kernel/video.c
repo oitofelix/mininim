@@ -243,10 +243,18 @@ draw_bottom_text (ALLEGRO_BITMAP *bitmap, char *text)
              || ! bitmap)
     al_stop_timer (timer);
   else if (al_get_timer_started (timer)) {
+    ALLEGRO_COLOR bg_color;
+
+    switch (vm) {
+    case CGA: bg_color = C_MSG_LINE_COLOR; break;
+    case EGA: bg_color = E_MSG_LINE_COLOR; break;
+    case VGA: bg_color = V_MSG_LINE_COLOR; break;
+    }
+
     al_set_target_bitmap (bitmap);
     al_draw_filled_rectangle (0, ORIGINAL_HEIGHT - 8,
                               ORIGINAL_WIDTH, ORIGINAL_HEIGHT,
-                              al_map_rgba (0, 0, 0, 192));
+                              bg_color);
     draw_text (bitmap, current_text,
                ORIGINAL_WIDTH / 2.0, ORIGINAL_HEIGHT - 7,
                ALLEGRO_ALIGN_CENTRE);

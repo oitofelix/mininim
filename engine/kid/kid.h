@@ -53,9 +53,9 @@
 #include "kid-stairs.h"
 
 /* bitmaps */
-#define KID_FULL_LIFE "dat/kid/objects/full live.png"
-#define KID_EMPTY_LIFE "dat/kid/objects/empty live.png"
-#define KID_SPLASH "dat/kid/objects/splash.png"
+#define V_KID_FULL_LIFE "data/life/v-kid-full.png"
+#define V_KID_EMPTY_LIFE "data/life/v-kid-empty.png"
+#define V_KID_SPLASH "data/splash/v-kid.png"
 
 /* sounds */
 #define STEP_SAMPLE "dat/digisnd1/running 2.ogg"
@@ -83,7 +83,8 @@
 void load_kid (void);
 void unload_kid (void);
 void sample_kid (void);
-void draw_kid_lives (ALLEGRO_BITMAP *bitmap, struct anim *kid, int j);
+void draw_kid_lives (ALLEGRO_BITMAP *bitmap, struct anim *kid, int j,
+                     enum vm vm);
 void draw_kid (ALLEGRO_BITMAP *bitmap, struct anim *kid, struct pos *p);
 int create_kid (struct anim *k);
 struct anim *get_kid_by_id (int id);
@@ -91,7 +92,10 @@ void draw_kids (ALLEGRO_BITMAP *bitmap, enum em em, enum vm vm);
 void draw_kid_frame (ALLEGRO_BITMAP *bitmap, struct anim *k,
                      enum vm);
 ALLEGRO_COLOR colorful_shadow_palette (ALLEGRO_COLOR c);
-ALLEGRO_COLOR phantom_shadow_palette (ALLEGRO_COLOR c);
+ALLEGRO_COLOR v_phantom_shadow_palette (ALLEGRO_COLOR c);
+ALLEGRO_COLOR e_phantom_shadow_palette (ALLEGRO_COLOR c);
+ALLEGRO_COLOR c_phantom_shadow_palette (ALLEGRO_COLOR c);
+ALLEGRO_COLOR v_palette (ALLEGRO_COLOR c);
 ALLEGRO_COLOR e_palette (ALLEGRO_COLOR c);
 ALLEGRO_COLOR c_palette (ALLEGRO_COLOR c);
 void increase_kid_current_lives (struct anim *k);

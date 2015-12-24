@@ -73,8 +73,19 @@
 #define C_KID_CLOTHES_COLOR_01 (al_map_rgb (255, 255, 255))
 #define C_KID_CLOTHES_COLOR_02 (al_map_rgb (85, 255, 255))
 
-#define KID_SHADOW_CLOTHES_COLOR (al_map_rgba (64, 64 , 64, 0))
-#define KID_SHADOW_CLOTHES_COLOR_2 (al_map_rgba (32, 32, 32, 0))
+#define V_KID_SHADOW_CLOTHES_COLOR_01 (al_map_rgba (64, 64 , 64, 0))
+#define V_KID_SHADOW_CLOTHES_COLOR_02 (al_map_rgba (32, 32, 32, 0))
+
+#define E_KID_SHADOW_CLOTHES_COLOR_01 (al_map_rgb (170, 170 , 170))
+#define E_KID_SHADOW_CLOTHES_COLOR_02 (al_map_rgb (85, 85, 85))
+#define E_KID_SHADOW_SKIN_COLOR (al_map_rgb (255, 255, 255))
+#define E_KID_SHADOW_HAIR_COLOR (al_map_rgb (85, 85, 85))
+#define E_KID_SHADOW_EYE_COLOR (al_map_rgb (170, 0, 0))
+
+#define C_KID_SHADOW_CLOTHES_COLOR_01 (al_map_rgb (85, 255, 255))
+#define C_KID_SHADOW_CLOTHES_COLOR_02 (al_map_rgb (0, 0, 0))
+#define C_KID_SHADOW_SKIN_COLOR (al_map_rgb (255, 255, 255))
+#define C_KID_SHADOW_EYE_COLOR (al_map_rgb (255, 85, 255))
 
 #define LIFE_POTION_BUBBLE_COLOR (al_map_rgb (224, 0, 48))
 #define POISON_POTION_BUBBLE_COLOR (al_map_rgb (80, 84, 248))
@@ -82,7 +93,8 @@
 #define FLIP_POTION_BUBBLE_COLOR (al_map_rgb (255, 255, 0))
 
 #define C_BLOOD_COLOR (al_map_rgb (255, 85, 255))
-#define E_BLOOD_COLOR (al_map_rgb (255, 85, 85))
+#define E_BLOOD_COLOR_01 (al_map_rgb (255, 85, 85))
+#define E_BLOOD_COLOR_02 (al_map_rgb (170, 0, 0))
 #define V_BLOOD_COLOR_01 (al_map_rgb (228, 0, 0))
 #define V_BLOOD_COLOR_02 (al_map_rgb (184, 0, 0))
 
@@ -111,8 +123,6 @@
 #define V_FIRE_COLOR_01 (al_map_rgb (252, 132, 0))
 #define V_FIRE_COLOR_02 (al_map_rgb (252, 252, 0))
 
-#define LIVES_RECT_COLOR (al_map_rgba (0, 0, 0, 170))
-
 #define DV_BRICKS_COLOR (al_map_rgb (48, 68, 88))
 #define DE_BRICKS_COLOR (al_map_rgb (80, 80, 80))
 #define DC_BRICKS_COLOR (al_map_rgb (85, 255, 255))
@@ -120,6 +130,23 @@
 #define PV_BRICKS_COLOR (al_map_rgb (12, 56, 88))
 #define PE_BRICKS_COLOR (al_map_rgb (0, 0, 160))
 #define PC_BRICKS_COLOR (al_map_rgb (85, 255, 255))
+
+#define C_LIVE_COLOR (al_map_rgb (255, 85, 255))
+#define E_LIVE_COLOR_01 (al_map_rgb (255, 85, 85))
+#define E_LIVE_COLOR_02 (al_map_rgb (170, 0, 0))
+#define V_LIVE_COLOR_01 (al_map_rgb (228, 0, 0))
+#define V_LIVE_COLOR_02 (al_map_rgb (184, 0, 0))
+
+#define C_TEXT_LINE_COLOR (al_map_rgb (0, 0, 0))
+#define V_TEXT_LINE_COLOR (al_map_rgb (0, 0, 0))
+
+#define V_LIVES_RECT_COLOR (al_map_rgba (0, 0, 0, 170))
+#define C_LIVES_RECT_COLOR (al_map_rgb (0, 0, 0))
+#define E_LIVES_RECT_COLOR (al_map_rgb (0, 0, 0))
+
+#define V_MSG_LINE_COLOR (al_map_rgba (0, 0, 0, 192))
+#define E_MSG_LINE_COLOR (al_map_rgb (0, 0, 0))
+#define C_MSG_LINE_COLOR (al_map_rgb (0, 0, 0))
 
 /* environment mode */
 enum em {

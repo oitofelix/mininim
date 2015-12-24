@@ -264,11 +264,11 @@ draw_level_door (ALLEGRO_BITMAP *bitmap, struct pos *p,
     level_door_bottom_right_coord = d_level_door_bottom_right_coord;
     switch (vm) {
     case CGA:
-      level_door_bottom = de_level_door_bottom;
-      level_door_top_left = de_level_door_top_left;
-      level_door_floor = de_level_door_floor;
-      level_door_stairs = de_level_door_stairs;
-      level_door_top_right = de_level_door_top_right;
+      level_door_bottom = dc_level_door_bottom;
+      level_door_top_left = dc_level_door_top_left;
+      level_door_floor = dc_level_door_floor;
+      level_door_stairs = dc_level_door_stairs;
+      level_door_top_right = dc_level_door_top_right;
       break;
     case EGA:
       level_door_bottom = de_level_door_bottom;

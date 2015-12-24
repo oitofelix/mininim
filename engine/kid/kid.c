@@ -43,7 +43,7 @@ struct anim *kid;
 size_t kid_nmemb;
 struct anim *current_kid;
 
-ALLEGRO_BITMAP *kid_full_life, *kid_empty_life, *kid_splash;
+ALLEGRO_BITMAP *v_kid_full_life, *v_kid_empty_life, *v_kid_splash;
 
 ALLEGRO_SAMPLE *step_sample, *hit_ground_sample, *hit_ground_harm_sample,
   *hit_ground_fatal_sample, *hit_wall_sample, *hang_on_fall_sample,
@@ -63,6 +63,7 @@ static void place_kid (struct anim *kid, int room, int floor, int place);
 static struct coord *kid_life_coord (int i, struct coord *c);
 static int compare_kids (const void *k0, const void *k1);
 static struct coord * splash_coord (struct frame *f, struct coord *c);
+static palette get_palette (enum vm vm);
 
 void
 load_kid (void)
@@ -99,9 +100,9 @@ load_kid (void)
   load_kid_stairs ();
 
   /* bitmap */
-  kid_full_life = load_bitmap (KID_FULL_LIFE);
-  kid_empty_life = load_bitmap (KID_EMPTY_LIFE);
-  kid_splash = load_bitmap (KID_SPLASH);
+  v_kid_full_life = load_bitmap (V_KID_FULL_LIFE);
+  v_kid_empty_life = load_bitmap (V_KID_EMPTY_LIFE);
+  v_kid_splash = load_bitmap (V_KID_SPLASH);
 
   /* sound */
   step_sample = load_sample (STEP_SAMPLE);
@@ -161,9 +162,9 @@ unload_kid (void)
   unload_kid_stairs ();
 
   /* bitmaps */
-  al_destroy_bitmap (kid_full_life);
-  al_destroy_bitmap (kid_empty_life);
-  al_destroy_bitmap (kid_splash);
+  al_destroy_bitmap (v_kid_full_life);
+  al_destroy_bitmap (v_kid_empty_life);
+  al_destroy_bitmap (v_kid_splash);
 
   /* sounds */
   al_destroy_sample (step_sample);
@@ -308,6 +309,28 @@ compare_kids (const void *k0, const void *k1)
   return 0;
 }
 
+static palette
+get_palette (enum vm vm)
+{
+  switch (vm) {
+  case CGA: return c_palette;
+  case EGA: return e_palette;
+  case VGA: return v_palette;
+  }
+  return NULL;
+}
+
+static palette
+get_shadow_palette (enum vm vm)
+{
+  switch (vm) {
+  case CGA: return c_phantom_shadow_palette;
+  case EGA: return e_phantom_shadow_palette;
+  case VGA: return v_phantom_shadow_palette;
+  }
+  return NULL;
+}
+
 void
 draw_kid_frame (ALLEGRO_BITMAP *bitmap, struct anim *k,
                 enum vm vm)
@@ -317,28 +340,24 @@ draw_kid_frame (ALLEGRO_BITMAP *bitmap, struct anim *k,
   struct frame f = k->f;
   struct frame_offset xf = k->xf;
 
-  if (k->shadow) {
-    f.b = apply_palette (f.b, phantom_shadow_palette);
-    xf.b = apply_palette (xf.b, phantom_shadow_palette);
-  }
+  palette pal = get_palette (vm);
+  f.b = apply_palette (f.b, pal);
+  xf.b = apply_palette (xf.b, pal);
 
-  switch (vm) {
-  case CGA:
-    f.b = apply_palette (f.b, c_palette);
-    xf.b = apply_palette (xf.b, c_palette);
-    break;
-  case EGA:
-    f.b = apply_palette (f.b, e_palette);
-    xf.b = apply_palette (xf.b, e_palette);
-    break;
-  case VGA: break;
+  if (k->shadow) {
+    palette pals = get_shadow_palette (vm);
+    f.b = apply_palette (f.b, pals);
+    xf.b = apply_palette (xf.b, pals);
   }
 
   draw_frame (bitmap, &f);
   draw_xframe (bitmap, &f, &xf);
 
-  if (k->splash)
-    draw_bitmapc (kid_splash, bitmap, splash_coord (&k->f, &c), k->f.flip);
+  if (k->splash) {
+    ALLEGRO_BITMAP *splash = apply_palette (v_kid_splash, pal);
+    draw_bitmapc (splash, bitmap, splash_coord (&k->f, &c), k->f.flip);
+  }
+
 }
 
 ALLEGRO_COLOR
@@ -366,16 +385,58 @@ colorful_shadow_palette (ALLEGRO_COLOR c)
 }
 
 ALLEGRO_COLOR
-phantom_shadow_palette (ALLEGRO_COLOR c)
+v_phantom_shadow_palette (ALLEGRO_COLOR c)
 {
   unsigned char r, g, b, a;
   al_unmap_rgba (c, &r, &g, &b, &a);
   if (a == 0) return c;
   if (color_eq (c, V_KID_CLOTHES_COLOR_01))
-    return KID_SHADOW_CLOTHES_COLOR;
+    return V_KID_SHADOW_CLOTHES_COLOR_01;
   if (color_eq (c, V_KID_CLOTHES_COLOR_02))
-    return KID_SHADOW_CLOTHES_COLOR_2;
+    return V_KID_SHADOW_CLOTHES_COLOR_02;
   return al_map_rgba (r, g, b, 0);
+}
+
+ALLEGRO_COLOR
+e_phantom_shadow_palette (ALLEGRO_COLOR c)
+{
+  unsigned char r, g, b, a;
+  al_unmap_rgba (c, &r, &g, &b, &a);
+  if (a == 0) return c;
+  if (color_eq (c, E_KID_CLOTHES_COLOR_01))
+    return E_KID_SHADOW_CLOTHES_COLOR_01;
+  if (color_eq (c, E_KID_CLOTHES_COLOR_02))
+    return E_KID_SHADOW_CLOTHES_COLOR_02;
+  if (color_eq (c, E_KID_SKIN_COLOR))
+    return E_KID_SHADOW_SKIN_COLOR;
+  if (color_eq (c, E_KID_HAIR_COLOR))
+    return E_KID_SHADOW_HAIR_COLOR;
+  if (color_eq (c, E_KID_EYE_COLOR))
+    return E_KID_SHADOW_EYE_COLOR;
+  return c;
+}
+
+ALLEGRO_COLOR
+c_phantom_shadow_palette (ALLEGRO_COLOR c)
+{
+  unsigned char r, g, b, a;
+  al_unmap_rgba (c, &r, &g, &b, &a);
+  if (a == 0) return c;
+  if (color_eq (c, C_KID_CLOTHES_COLOR_01))
+    return C_KID_SHADOW_CLOTHES_COLOR_01;
+  if (color_eq (c, C_KID_CLOTHES_COLOR_02))
+    return C_KID_SHADOW_CLOTHES_COLOR_02;
+  if (color_eq (c, C_KID_SKIN_COLOR))
+    return C_KID_SHADOW_SKIN_COLOR;;
+  if (color_eq (c, C_KID_EYE_COLOR))
+    return C_KID_SHADOW_EYE_COLOR;;
+  return c;
+}
+
+ALLEGRO_COLOR
+v_palette (ALLEGRO_COLOR c)
+{
+  return c;
 }
 
 ALLEGRO_COLOR
@@ -388,8 +449,8 @@ e_palette (ALLEGRO_COLOR c)
   if (color_eq (c, V_KID_CLOTHES_COLOR_01)) return E_KID_CLOTHES_COLOR_01;
   if (color_eq (c, V_KID_CLOTHES_COLOR_02)) return E_KID_CLOTHES_COLOR_02;
   if (color_eq (c, V_KID_EYE_COLOR)) return E_KID_EYE_COLOR;
-  if (color_eq (c, V_BLOOD_COLOR_01)
-      || color_eq (c, V_BLOOD_COLOR_02)) return E_BLOOD_COLOR;
+  if (color_eq (c, V_BLOOD_COLOR_01)) return E_BLOOD_COLOR_01;
+  if (color_eq (c, V_BLOOD_COLOR_02)) return E_BLOOD_COLOR_02;
   return c;
 }
 
@@ -504,7 +565,8 @@ sample_kid (void)
 }
 
 void
-draw_kid_lives (ALLEGRO_BITMAP *bitmap, struct anim *kid, int j)
+draw_kid_lives (ALLEGRO_BITMAP *bitmap, struct anim *kid, int j,
+                enum vm vm)
 {
   int i;
   struct coord c;
@@ -512,15 +574,29 @@ draw_kid_lives (ALLEGRO_BITMAP *bitmap, struct anim *kid, int j)
     new_rect (room_view, 0, ORIGINAL_HEIGHT - 8,
               7 * kid->total_lives, ORIGINAL_HEIGHT - 1);
 
-  draw_filled_rect (bitmap, &r, LIVES_RECT_COLOR);
+  ALLEGRO_COLOR bg_color;
+
+  switch (vm) {
+  case CGA: bg_color = C_LIVES_RECT_COLOR; break;
+  case EGA: bg_color = E_LIVES_RECT_COLOR; break;
+  case VGA: bg_color = V_LIVES_RECT_COLOR; break;
+  }
+
+  draw_filled_rect (bitmap, &r, bg_color);
+
+  ALLEGRO_BITMAP *empty = NULL,
+    *full = NULL;
+  palette pal = get_palette (vm);
+  empty = apply_palette (v_kid_empty_life, pal);
+  full = apply_palette (v_kid_full_life, pal);
 
   for (i = 0; i < kid->total_lives; i++)
-    draw_bitmapc (kid_empty_life, bitmap, kid_life_coord (i, &c), 0);
+    draw_bitmapc (empty, bitmap, kid_life_coord (i, &c), 0);
 
   if (kid->current_lives <= KID_MINIMUM_LIVES_TO_BLINK && j % 2) return;
 
   for (i = 0; i < kid->current_lives; i++)
-    draw_bitmapc (kid_full_life, bitmap, kid_life_coord (i, &c), 0);
+    draw_bitmapc (full, bitmap, kid_life_coord (i, &c), 0);
 }
 
 static struct coord *
@@ -535,8 +611,8 @@ kid_life_coord (int i, struct coord *c)
 static struct coord *
 splash_coord (struct frame *f, struct coord *c)
 {
-  int w = al_get_bitmap_width (kid_splash);
-  int h = al_get_bitmap_height (kid_splash);
+  int w = al_get_bitmap_width (v_kid_splash);
+  int h = al_get_bitmap_height (v_kid_splash);
   int fw = al_get_bitmap_width (f->b);
   int fh = al_get_bitmap_height (f->b);
   c->x = f->c.x + (fw / 2) - (w / 2);
