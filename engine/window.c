@@ -32,6 +32,9 @@
 /* dungeon cga */
 ALLEGRO_BITMAP *dc_window;
 
+/* palace cga */
+ALLEGRO_BITMAP *pc_window;
+
 /* dungeon ega */
 ALLEGRO_BITMAP *de_window;
 
@@ -49,6 +52,9 @@ load_window (void)
 {
   /* dungeon cga */
   dc_window = load_bitmap (DC_WINDOW);
+
+  /* palace cga */
+  pc_window = load_bitmap (PC_WINDOW);
 
   /* dungeon ega */
   de_window = load_bitmap (DE_WINDOW);
@@ -68,6 +74,9 @@ unload_window (void)
 {
   /* dungeon cga */
   al_destroy_bitmap (dc_window);
+
+  /* palace cga */
+  al_destroy_bitmap (pc_window);
 
   /* dungeon ega */
   al_destroy_bitmap (de_window);
@@ -98,7 +107,7 @@ draw_window (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   case PALACE:
     switch (vm) {
-    case CGA: break;
+    case CGA: window = pc_window; break;
     case EGA: window = pe_window; break;
     case VGA: window = pv_window; break;
     }

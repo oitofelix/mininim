@@ -23,6 +23,9 @@
 /* dungeon cga */
 #define DC_WINDOW "data/window/dc.png"
 
+/* palace cga */
+#define PC_WINDOW "data/window/pc.png"
+
 /* dungeon ega */
 #define DE_WINDOW "data/window/de.png"
 

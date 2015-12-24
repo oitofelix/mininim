@@ -28,6 +28,11 @@
 #define DC_BROKEN_FLOOR_RIGHT "data/broken-floor/dc-right.png"
 #define DC_BROKEN_FLOOR_FRONT "data/broken-floor/dc-front.png"
 
+/* palace cga */
+#define PC_BROKEN_FLOOR_LEFT "data/broken-floor/pc-left.png"
+#define PC_BROKEN_FLOOR_RIGHT "data/broken-floor/pc-right.png"
+#define PC_BROKEN_FLOOR_FRONT "data/broken-floor/pc-front.png"
+
 /* dungeon ega */
 #define DE_BROKEN_FLOOR_LEFT "data/broken-floor/de-left.png"
 #define DE_BROKEN_FLOOR_RIGHT "data/broken-floor/de-right.png"

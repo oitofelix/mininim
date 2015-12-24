@@ -32,6 +32,9 @@
 /* dungeon cga */
 ALLEGRO_BITMAP *dc_torch;
 
+/* palace cga */
+ALLEGRO_BITMAP *pc_torch;
+
 /* dungeon ega */
 ALLEGRO_BITMAP *de_torch;
 
@@ -49,6 +52,9 @@ load_torch (void)
 {
   /* dungeon cga */
   dc_torch = load_bitmap (DC_TORCH);
+
+  /* palace cga */
+  pc_torch = load_bitmap (PC_TORCH);
 
   /* dungeon ega */
   de_torch = load_bitmap (DE_TORCH);
@@ -68,6 +74,9 @@ unload_torch (void)
 {
   /* dungeon cga */
   al_destroy_bitmap (dc_torch);
+
+  /* palace cga */
+  al_destroy_bitmap (pc_torch);
 
   /* dungeon vga */
   al_destroy_bitmap (de_torch);
@@ -98,7 +107,7 @@ draw_torch (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   case PALACE:
     switch (vm) {
-    case CGA: break;
+    case CGA: torch = pc_torch; break;
     case EGA: torch = pe_torch; break;
     case VGA: torch = pv_torch; break;
     }

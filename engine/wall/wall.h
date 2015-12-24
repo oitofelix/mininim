@@ -24,6 +24,10 @@
 #define DC_WALL_FACE "data/wall/dc-face.png"
 #define DC_WALL_FACE_TOP "data/wall/dc-face-top.png"
 
+/* palace cga */
+#define PC_WALL_FACE "data/wall/pc-face.png"
+#define PC_WALL_FACE_TOP "data/wall/pc-face-top.png"
+
 /* dungeon ega */
 #define DE_WALL_FACE "data/wall/de-face.png"
 #define DE_WALL_FACE_TOP "data/wall/de-face-top.png"

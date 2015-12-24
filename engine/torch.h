@@ -23,6 +23,9 @@
 /* dungeon cga */
 #define DC_TORCH "data/torch/dc.png"
 
+/* palace cga */
+#define PC_TORCH "data/torch/pc.png"
+
 /* dungeon ega */
 #define DE_TORCH "data/torch/de.png"
 

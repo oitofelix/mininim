@@ -381,13 +381,10 @@ process_keys (void)
   if (was_key_pressed (ALLEGRO_KEY_F11, 0, 0, true)) {
     char *em_str = NULL;
 
-  next_em:
     switch (em) {
     case DUNGEON: em = PALACE; em_str = "PALACE"; break;
     case PALACE: em = DUNGEON; em_str = "DUNGEON"; break;
     }
-
-    if (vm == CGA && em == PALACE) goto next_em;
 
     xasprintf (&text, "ENVIRONMENT MODE: %s", em_str);
     draw_bottom_text (NULL, text);
@@ -398,14 +395,11 @@ process_keys (void)
   if (was_key_pressed (ALLEGRO_KEY_F12, 0, 0, true)) {
     char *vm_str = NULL;
 
-  next_vm:
     switch (vm) {
     case CGA: vm = VGA; vm_str = "VGA"; break;
     case EGA: vm = CGA; vm_str = "CGA"; break;
     case VGA: vm = EGA; vm_str = "EGA"; break;
     }
-
-    if (vm == CGA && em == PALACE) goto next_vm;
 
     xasprintf (&text, "VIDEO MODE: %s", vm_str);
     draw_bottom_text (NULL, text);

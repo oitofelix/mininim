@@ -37,6 +37,11 @@ ALLEGRO_BITMAP *dc_floor_base, *dc_floor_left,
   *dc_floor_right, *dc_floor_corner_01,
   *dc_floor_corner_02, *dc_floor_corner_03;
 
+/* palace cga */
+ALLEGRO_BITMAP *pc_floor_base, *pc_floor_left,
+  *pc_floor_right, *pc_floor_corner_01,
+  *pc_floor_corner_02, *pc_floor_corner_03;
+
 /* dungeon ega */
 ALLEGRO_BITMAP *de_floor_base, *de_floor_left,
   *de_floor_right, *de_floor_corner_01,
@@ -67,6 +72,14 @@ load_floor (void)
   dc_floor_corner_01 = load_bitmap (DC_FLOOR_CORNER_01);
   dc_floor_corner_02 = load_bitmap (DC_FLOOR_CORNER_02);
   dc_floor_corner_03 = load_bitmap (DC_FLOOR_CORNER_03);
+
+  /* palace cga */
+  pc_floor_base = load_bitmap (PC_FLOOR_BASE);
+  pc_floor_left = load_bitmap (PC_FLOOR_LEFT);
+  pc_floor_right = load_bitmap (PC_FLOOR_RIGHT);
+  pc_floor_corner_01 = load_bitmap (PC_FLOOR_CORNER_01);
+  pc_floor_corner_02 = load_bitmap (PC_FLOOR_CORNER_02);
+  pc_floor_corner_03 = load_bitmap (PC_FLOOR_CORNER_03);
 
   /* dungeon ega */
   de_floor_base = load_bitmap (DE_FLOOR_BASE);
@@ -111,6 +124,14 @@ unload_floor (void)
   al_destroy_bitmap (dc_floor_corner_01);
   al_destroy_bitmap (dc_floor_corner_02);
   al_destroy_bitmap (dc_floor_corner_03);
+
+  /* palace cga */
+  al_destroy_bitmap (pc_floor_left);
+  al_destroy_bitmap (pc_floor_right);
+  al_destroy_bitmap (pc_floor_base);
+  al_destroy_bitmap (pc_floor_corner_01);
+  al_destroy_bitmap (pc_floor_corner_02);
+  al_destroy_bitmap (pc_floor_corner_03);
 
   /* dungeon ega */
   al_destroy_bitmap (de_floor_left);
@@ -170,7 +191,7 @@ draw_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   case PALACE:
     switch (vm) {
-    case CGA: break;
+    case CGA: floor_base = pc_floor_base; break;
     case EGA: floor_base = pe_floor_base; break;
     case VGA: floor_base = pv_floor_base; break;
     }
@@ -197,7 +218,7 @@ draw_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   case PALACE:
     switch (vm) {
-    case CGA: break;
+    case CGA: floor_left = pc_floor_left; break;
     case EGA: floor_left = pe_floor_left; break;
     case VGA: floor_left = pv_floor_left; break;
     }
@@ -224,7 +245,7 @@ draw_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   case PALACE:
     switch (vm) {
-    case CGA: break;
+    case CGA: floor_right = pc_floor_right; break;
     case EGA: floor_right = pe_floor_right; break;
     case VGA: floor_right = pv_floor_right; break;
     }
@@ -251,7 +272,7 @@ draw_floor_corner_01 (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   case PALACE:
     switch (vm) {
-    case CGA: break;
+    case CGA: floor_corner_01 = pc_floor_corner_01; break;
     case EGA: floor_corner_01 = pe_floor_corner_01; break;
     case VGA: floor_corner_01 = pv_floor_corner_01; break;
     }
@@ -279,7 +300,7 @@ draw_floor_corner_02 (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   case PALACE:
     switch (vm) {
-    case CGA: break;
+    case CGA: floor_corner_02 = pc_floor_corner_02; break;
     case EGA: floor_corner_02 = pe_floor_corner_02; break;
     case VGA: floor_corner_02 = pv_floor_corner_02; break;
     }
@@ -307,7 +328,7 @@ draw_floor_corner_03 (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   case PALACE:
     switch (vm) {
-    case CGA: break;
+    case CGA: floor_corner_03 = pc_floor_corner_03; break;
     case EGA: floor_corner_03 = pe_floor_corner_03; break;
     case VGA: floor_corner_03 = pv_floor_corner_03; break;
     }

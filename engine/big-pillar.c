@@ -27,6 +27,11 @@ ALLEGRO_BITMAP *dc_big_pillar_bottom_left, *dc_big_pillar_bottom_right,
   *dc_big_pillar_top_left, *dc_big_pillar_top_right, *dc_big_pillar_top_right_top,
   *dc_big_pillar_bottom_fg;
 
+/* palace cga */
+ALLEGRO_BITMAP *pc_big_pillar_bottom_left, *pc_big_pillar_bottom_right,
+  *pc_big_pillar_top_left, *pc_big_pillar_top_right, *pc_big_pillar_top_right_top,
+  *pc_big_pillar_bottom_fg;
+
 /* dungeon ega */
 ALLEGRO_BITMAP *de_big_pillar_bottom_left, *de_big_pillar_bottom_right,
   *de_big_pillar_top_left, *de_big_pillar_top_right, *de_big_pillar_top_right_top,
@@ -57,6 +62,14 @@ load_big_pillar (void)
   dc_big_pillar_top_right = load_bitmap (DC_BIG_PILLAR_TOP_RIGHT);
   dc_big_pillar_top_right_top = load_bitmap (DC_BIG_PILLAR_TOP_RIGHT_TOP);
   dc_big_pillar_bottom_fg = load_bitmap (DC_BIG_PILLAR_BOTTOM_FG);
+
+  /* palace cga */
+  pc_big_pillar_bottom_left = load_bitmap (PC_BIG_PILLAR_BOTTOM_LEFT);
+  pc_big_pillar_bottom_right = load_bitmap (PC_BIG_PILLAR_BOTTOM_RIGHT);
+  pc_big_pillar_top_left = load_bitmap (PC_BIG_PILLAR_TOP_LEFT);
+  pc_big_pillar_top_right = load_bitmap (PC_BIG_PILLAR_TOP_RIGHT);
+  pc_big_pillar_top_right_top = load_bitmap (PC_BIG_PILLAR_TOP_RIGHT_TOP);
+  pc_big_pillar_bottom_fg = load_bitmap (PC_BIG_PILLAR_BOTTOM_FG);
 
   /* dungeon ega */
   de_big_pillar_bottom_left = load_bitmap (DE_BIG_PILLAR_BOTTOM_LEFT);
@@ -101,6 +114,14 @@ unload_big_pillar (void)
   al_destroy_bitmap (dc_big_pillar_top_right);
   al_destroy_bitmap (dc_big_pillar_top_right_top);
   al_destroy_bitmap (dc_big_pillar_bottom_fg);
+
+  /* palace cga */
+  al_destroy_bitmap (pc_big_pillar_bottom_left);
+  al_destroy_bitmap (pc_big_pillar_bottom_right);
+  al_destroy_bitmap (pc_big_pillar_top_left);
+  al_destroy_bitmap (pc_big_pillar_top_right);
+  al_destroy_bitmap (pc_big_pillar_top_right_top);
+  al_destroy_bitmap (pc_big_pillar_bottom_fg);
 
   /* dungeon ega */
   al_destroy_bitmap (de_big_pillar_bottom_left);
@@ -160,7 +181,7 @@ draw_big_pillar_bottom_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   case PALACE:
     switch (vm) {
-    case CGA: break;
+    case CGA: big_pillar_bottom_left = pc_big_pillar_bottom_left; break;
     case EGA: big_pillar_bottom_left = pe_big_pillar_bottom_left; break;
     case VGA: big_pillar_bottom_left = pv_big_pillar_bottom_left; break;
     }
@@ -188,7 +209,7 @@ draw_big_pillar_bottom_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   case PALACE:
     switch (vm) {
-    case CGA: break;
+    case CGA: big_pillar_bottom_right = pc_big_pillar_bottom_right; break;
     case EGA: big_pillar_bottom_right = pe_big_pillar_bottom_right; break;
     case VGA: big_pillar_bottom_right = pv_big_pillar_bottom_right; break;
     }
@@ -216,7 +237,7 @@ draw_big_pillar_bottom_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   case PALACE:
     switch (vm) {
-    case CGA: break;
+    case CGA: big_pillar_bottom_fg = pc_big_pillar_bottom_fg; break;
     case EGA: big_pillar_bottom_fg = pe_big_pillar_bottom_fg; break;
     case VGA: big_pillar_bottom_fg = pv_big_pillar_bottom_fg; break;
     }
@@ -252,7 +273,7 @@ draw_big_pillar_top_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   case PALACE:
     switch (vm) {
-    case CGA: break;
+    case CGA: big_pillar_top_left = pc_big_pillar_top_left; break;
     case EGA: big_pillar_top_left = pe_big_pillar_top_left; break;
     case VGA: big_pillar_top_left = pv_big_pillar_top_left; break;
     }
@@ -290,7 +311,10 @@ draw_big_pillar_top_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   case PALACE:
     switch (vm) {
-    case CGA: break;
+    case CGA:
+      big_pillar_top_right = pc_big_pillar_top_right;
+      big_pillar_top_right_top = pc_big_pillar_top_right_top;
+      break;
     case EGA:
       big_pillar_top_right = pe_big_pillar_top_right;
       big_pillar_top_right_top = pe_big_pillar_top_right_top;

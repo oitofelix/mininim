@@ -29,7 +29,6 @@
 
 ALLEGRO_DISPLAY *display;
 ALLEGRO_BITMAP *screen, *uscreen;
-ALLEGRO_BITMAP *flick_bg_0, *flick_bg_1;
 ALLEGRO_TIMER *video_timer;
 int screen_flags = 0;
 static ALLEGRO_BITMAP *effect_buffer;

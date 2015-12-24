@@ -36,6 +36,18 @@
 #define DC_CHOPPER_05 "data/chopper/dc-05.png"
 #define DC_CHOPPER_FG_05 "data/chopper/dc-fg-05.png"
 
+/* palace cga */
+#define PC_CHOPPER_01 "data/chopper/pc-01.png"
+#define PC_CHOPPER_FG_01 "data/chopper/pc-fg-01.png"
+#define PC_CHOPPER_02 "data/chopper/pc-02.png"
+#define PC_CHOPPER_FG_02 "data/chopper/pc-fg-02.png"
+#define PC_CHOPPER_03 "data/chopper/pc-03.png"
+#define PC_CHOPPER_FG_03 "data/chopper/pc-fg-03.png"
+#define PC_CHOPPER_04 "data/chopper/pc-04.png"
+#define PC_CHOPPER_FG_04 "data/chopper/pc-fg-04.png"
+#define PC_CHOPPER_05 "data/chopper/pc-05.png"
+#define PC_CHOPPER_FG_05 "data/chopper/pc-fg-05.png"
+
 /* dungeon ega */
 #define DE_CHOPPER_01 "data/chopper/de-01.png"
 #define DE_CHOPPER_FG_01 "data/chopper/de-fg-01.png"

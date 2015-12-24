@@ -36,6 +36,14 @@
 #define DC_DOOR_GRID "data/door/dc-grid.png"
 #define DC_DOOR_GRID_TIP "data/door/dc-grid-tip.png"
 
+/* palace cga */
+#define PC_DOOR_LEFT "data/door/pc-left.png"
+#define PC_DOOR_RIGHT "data/door/pc-right.png"
+#define PC_DOOR_POLE "data/door/pc-pole.png"
+#define PC_DOOR_TOP "data/door/pc-top.png"
+#define PC_DOOR_GRID "data/door/pc-grid.png"
+#define PC_DOOR_GRID_TIP "data/door/pc-grid-tip.png"
+
 /* dungeon ega */
 #define DE_DOOR_LEFT "data/door/de-left.png"
 #define DE_DOOR_RIGHT "data/door/de-right.png"

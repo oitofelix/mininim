@@ -35,6 +35,14 @@ ALLEGRO_BITMAP *dc_spikes_floor_left, *dc_spikes_floor_right,
   *dc_spikes_left_04, *dc_spikes_right_04, *dc_spikes_fg_04,
   *dc_spikes_left_05, *dc_spikes_right_05, *dc_spikes_fg_05;
 
+/* palace cga */
+ALLEGRO_BITMAP *pc_spikes_floor_left, *pc_spikes_floor_right,
+  *pc_spikes_left_01, *pc_spikes_right_01, *pc_spikes_fg_01,
+  *pc_spikes_left_02, *pc_spikes_right_02, *pc_spikes_fg_02,
+  *pc_spikes_left_03, *pc_spikes_right_03, *pc_spikes_fg_03,
+  *pc_spikes_left_04, *pc_spikes_right_04, *pc_spikes_fg_04,
+  *pc_spikes_left_05, *pc_spikes_right_05, *pc_spikes_fg_05;
+
 /* dungeon ega */
 ALLEGRO_BITMAP *de_spikes_floor_left, *de_spikes_floor_right,
   *de_spikes_left_01, *de_spikes_right_01, *de_spikes_fg_01,
@@ -94,6 +102,25 @@ load_spikes_floor (void)
   dc_spikes_left_05 = load_bitmap (DC_SPIKES_LEFT_05);
   dc_spikes_right_05 = load_bitmap (DC_SPIKES_RIGHT_05);
   dc_spikes_fg_05 = load_bitmap (DC_SPIKES_FG_05);
+
+  /* palace cga */
+  pc_spikes_floor_left = load_bitmap (PC_SPIKES_FLOOR_LEFT);
+  pc_spikes_floor_right = load_bitmap (PC_SPIKES_FLOOR_RIGHT);
+  pc_spikes_left_01 = load_bitmap (PC_SPIKES_LEFT_01);
+  pc_spikes_right_01 = load_bitmap (PC_SPIKES_RIGHT_01);
+  pc_spikes_fg_01 = load_bitmap (PC_SPIKES_FG_01);
+  pc_spikes_left_02 = load_bitmap (PC_SPIKES_LEFT_02);
+  pc_spikes_right_02 = load_bitmap (PC_SPIKES_RIGHT_02);
+  pc_spikes_fg_02 = load_bitmap (PC_SPIKES_FG_02);
+  pc_spikes_left_03 = load_bitmap (PC_SPIKES_LEFT_03);
+  pc_spikes_right_03 = load_bitmap (PC_SPIKES_RIGHT_03);
+  pc_spikes_fg_03 = load_bitmap (PC_SPIKES_FG_03);
+  pc_spikes_left_04 = load_bitmap (PC_SPIKES_LEFT_04);
+  pc_spikes_right_04 = load_bitmap (PC_SPIKES_RIGHT_04);
+  pc_spikes_fg_04 = load_bitmap (PC_SPIKES_FG_04);
+  pc_spikes_left_05 = load_bitmap (PC_SPIKES_LEFT_05);
+  pc_spikes_right_05 = load_bitmap (PC_SPIKES_RIGHT_05);
+  pc_spikes_fg_05 = load_bitmap (PC_SPIKES_FG_05);
 
   /* dungeon ega */
   de_spikes_floor_left = load_bitmap (DE_SPIKES_FLOOR_LEFT);
@@ -193,6 +220,25 @@ unload_spikes_floor (void)
   al_destroy_bitmap (dc_spikes_left_05);
   al_destroy_bitmap (dc_spikes_right_05);
   al_destroy_bitmap (dc_spikes_fg_05);
+
+  /* palace cga */
+  al_destroy_bitmap (pc_spikes_floor_left);
+  al_destroy_bitmap (pc_spikes_floor_right);
+  al_destroy_bitmap (pc_spikes_left_01);
+  al_destroy_bitmap (pc_spikes_right_01);
+  al_destroy_bitmap (pc_spikes_fg_01);
+  al_destroy_bitmap (pc_spikes_left_02);
+  al_destroy_bitmap (pc_spikes_right_02);
+  al_destroy_bitmap (pc_spikes_fg_02);
+  al_destroy_bitmap (pc_spikes_left_03);
+  al_destroy_bitmap (pc_spikes_right_03);
+  al_destroy_bitmap (pc_spikes_fg_03);
+  al_destroy_bitmap (pc_spikes_left_04);
+  al_destroy_bitmap (pc_spikes_right_04);
+  al_destroy_bitmap (pc_spikes_fg_04);
+  al_destroy_bitmap (pc_spikes_left_05);
+  al_destroy_bitmap (pc_spikes_right_05);
+  al_destroy_bitmap (pc_spikes_fg_05);
 
   /* dungeon ega */
   al_destroy_bitmap (de_spikes_floor_left);
@@ -520,7 +566,7 @@ draw_spikes_floor_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   case PALACE:
     switch (vm) {
-    case CGA: break;
+    case CGA: spikes_floor_left = pc_spikes_floor_left; break;
     case EGA: spikes_floor_left = pe_spikes_floor_left; break;
     case VGA: spikes_floor_left = pv_spikes_floor_left; break;
     }
@@ -547,7 +593,7 @@ draw_spikes_floor_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   case PALACE:
     switch (vm) {
-    case CGA: break;
+    case CGA: spikes_floor_right = pc_spikes_floor_right; break;
     case EGA: spikes_floor_right = pe_spikes_floor_right; break;
     case VGA: spikes_floor_right = pv_spikes_floor_right; break;
     }
@@ -638,7 +684,7 @@ draw_spikes_left_01 (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case PALACE:
     spikes_left_01_coord = p_spikes_left_01_coord;
     switch (vm) {
-    case CGA: break;
+    case CGA: spikes_left_01 = pc_spikes_left_01; break;
     case EGA: spikes_left_01 = pe_spikes_left_01; break;
     case VGA: spikes_left_01 = pv_spikes_left_01; break;
     }
@@ -668,7 +714,7 @@ draw_spikes_right_01 (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case PALACE:
     spikes_right_01_coord = p_spikes_right_01_coord;
     switch (vm) {
-    case CGA: break;
+    case CGA: spikes_right_01 = pc_spikes_right_01; break;
     case EGA: spikes_right_01 = pe_spikes_right_01; break;
     case VGA: spikes_right_01 = pv_spikes_right_01; break;
     }
@@ -698,7 +744,7 @@ draw_spikes_fg_01 (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case PALACE:
     spikes_fg_01_coord = p_spikes_fg_01_coord;
     switch (vm) {
-    case CGA: break;
+    case CGA: spikes_fg_01 = pc_spikes_fg_01; break;
     case EGA: spikes_fg_01 = pe_spikes_fg_01; break;
     case VGA: spikes_fg_01 = pv_spikes_fg_01; break;
     }
@@ -790,7 +836,7 @@ draw_spikes_left_02 (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case PALACE:
     spikes_left_02_coord = p_spikes_left_02_coord;
     switch (vm) {
-    case CGA: break;
+    case CGA: spikes_left_02 = pc_spikes_left_02; break;
     case EGA: spikes_left_02 = pe_spikes_left_02; break;
     case VGA: spikes_left_02 = pv_spikes_left_02; break;
     }
@@ -820,7 +866,7 @@ draw_spikes_right_02 (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case PALACE:
     spikes_right_02_coord = p_spikes_right_02_coord;
     switch (vm) {
-    case CGA: break;
+    case CGA: spikes_right_02 = pc_spikes_right_02; break;
     case EGA: spikes_right_02 = pe_spikes_right_02; break;
     case VGA: spikes_right_02 = pv_spikes_right_02; break;
     }
@@ -850,7 +896,7 @@ draw_spikes_fg_02 (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case PALACE:
     spikes_fg_02_coord = p_spikes_fg_02_coord;
     switch (vm) {
-    case CGA: break;
+    case CGA: spikes_fg_02 = pc_spikes_fg_02; break;
     case EGA: spikes_fg_02 = pe_spikes_fg_02; break;
     case VGA: spikes_fg_02 = pv_spikes_fg_02; break;
     }
@@ -942,7 +988,7 @@ draw_spikes_left_03 (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case PALACE:
     spikes_left_03_coord = p_spikes_left_03_coord;
     switch (vm) {
-    case CGA: break;
+    case CGA: spikes_left_03 = pc_spikes_left_03; break;
     case EGA: spikes_left_03 = pe_spikes_left_03; break;
     case VGA: spikes_left_03 = pv_spikes_left_03; break;
     }
@@ -972,7 +1018,7 @@ draw_spikes_right_03 (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case PALACE:
     spikes_right_03_coord = p_spikes_right_03_coord;
     switch (vm) {
-    case CGA: break;
+    case CGA: spikes_right_03 = pc_spikes_right_03; break;
     case EGA: spikes_right_03 = pe_spikes_right_03; break;
     case VGA: spikes_right_03 = pv_spikes_right_03; break;
     }
@@ -1002,7 +1048,7 @@ draw_spikes_fg_03 (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case PALACE:
     spikes_fg_03_coord = p_spikes_fg_03_coord;
     switch (vm) {
-    case CGA: break;
+    case CGA: spikes_fg_03 = pc_spikes_fg_03; break;
     case EGA: spikes_fg_03 = pe_spikes_fg_03; break;
     case VGA: spikes_fg_03 = pv_spikes_fg_03; break;
     }
@@ -1094,7 +1140,7 @@ draw_spikes_left_04 (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case PALACE:
     spikes_left_04_coord = p_spikes_left_04_coord;
     switch (vm) {
-    case CGA: break;
+    case CGA: spikes_left_04 = pc_spikes_left_04; break;
     case EGA: spikes_left_04 = pe_spikes_left_04; break;
     case VGA: spikes_left_04 = pv_spikes_left_04; break;
     }
@@ -1124,7 +1170,7 @@ draw_spikes_right_04 (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case PALACE:
     spikes_right_04_coord = p_spikes_right_04_coord;
     switch (vm) {
-    case CGA: break;
+    case CGA: spikes_right_04 = pc_spikes_right_04; break;
     case EGA: spikes_right_04 = pe_spikes_right_04; break;
     case VGA: spikes_right_04 = pv_spikes_right_04; break;
     }
@@ -1154,7 +1200,7 @@ draw_spikes_fg_04 (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case PALACE:
     spikes_fg_04_coord = p_spikes_fg_04_coord;
     switch (vm) {
-    case CGA: break;
+    case CGA: spikes_fg_04 = pc_spikes_fg_04; break;
     case EGA: spikes_fg_04 = pe_spikes_fg_04; break;
     case VGA: spikes_fg_04 = pv_spikes_fg_04; break;
     }
@@ -1246,7 +1292,7 @@ draw_spikes_left_05 (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case PALACE:
     spikes_left_05_coord = p_spikes_left_05_coord;
     switch (vm) {
-    case CGA: break;
+    case CGA: spikes_left_05 = pc_spikes_left_05; break;
     case EGA: spikes_left_05 = pe_spikes_left_05; break;
     case VGA: spikes_left_05 = pv_spikes_left_05; break;
     }
@@ -1276,7 +1322,7 @@ draw_spikes_right_05 (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case PALACE:
     spikes_right_05_coord = p_spikes_right_05_coord;
     switch (vm) {
-    case CGA: break;
+    case CGA: spikes_right_05 = pc_spikes_right_05; break;
     case EGA: spikes_right_05 = pe_spikes_right_05; break;
     case VGA: spikes_right_05 = pv_spikes_right_05; break;
     }
@@ -1306,7 +1352,7 @@ draw_spikes_fg_05 (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case PALACE:
     spikes_fg_05_coord = p_spikes_fg_05_coord;
     switch (vm) {
-    case CGA: break;
+    case CGA: spikes_fg_05 = pc_spikes_fg_05; break;
     case EGA: spikes_fg_05 = pe_spikes_fg_05; break;
     case VGA: spikes_fg_05 = pv_spikes_fg_05; break;
     }

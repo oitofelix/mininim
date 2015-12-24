@@ -30,6 +30,14 @@
 #define DC_BIG_PILLAR_TOP_RIGHT_TOP "data/big-pillar/dc-top-right-top.png"
 #define DC_BIG_PILLAR_BOTTOM_FG "data/big-pillar/dc-bottom-fg.png"
 
+/* palace cga */
+#define PC_BIG_PILLAR_BOTTOM_LEFT "data/big-pillar/pc-bottom-left.png"
+#define PC_BIG_PILLAR_BOTTOM_RIGHT "data/big-pillar/pc-bottom-right.png"
+#define PC_BIG_PILLAR_TOP_LEFT "data/big-pillar/pc-top-left.png"
+#define PC_BIG_PILLAR_TOP_RIGHT "data/big-pillar/pc-top-right.png"
+#define PC_BIG_PILLAR_TOP_RIGHT_TOP "data/big-pillar/pc-top-right-top.png"
+#define PC_BIG_PILLAR_BOTTOM_FG "data/big-pillar/pc-bottom-fg.png"
+
 /* dungeon ega */
 #define DE_BIG_PILLAR_BOTTOM_LEFT "data/big-pillar/de-bottom-left.png"
 #define DE_BIG_PILLAR_BOTTOM_RIGHT "data/big-pillar/de-bottom-right.png"

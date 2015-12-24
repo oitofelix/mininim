@@ -27,6 +27,10 @@
 #define DC_SKELETON_FLOOR_LEFT "data/skeleton-floor/dc-left.png"
 #define DC_SKELETON_FLOOR_RIGHT "data/skeleton-floor/dc-right.png"
 
+/* palace cga */
+#define PC_SKELETON_FLOOR_LEFT "data/skeleton-floor/pc-left.png"
+#define PC_SKELETON_FLOOR_RIGHT "data/skeleton-floor/pc-right.png"
+
 /* dungeon ega */
 #define DE_SKELETON_FLOOR_LEFT "data/skeleton-floor/de-left.png"
 #define DE_SKELETON_FLOOR_RIGHT "data/skeleton-floor/de-right.png"

@@ -36,6 +36,9 @@
 /* dungeon cga */
 ALLEGRO_BITMAP *dc_skeleton_floor_left, *dc_skeleton_floor_right;
 
+/* palace cga */
+ALLEGRO_BITMAP *pc_skeleton_floor_left, *pc_skeleton_floor_right;
+
 /* dungeon ega */
 ALLEGRO_BITMAP *de_skeleton_floor_left, *de_skeleton_floor_right;
 
@@ -54,6 +57,10 @@ load_skeleton_floor (void)
   /* dungeon cga */
   dc_skeleton_floor_left = load_bitmap (DC_SKELETON_FLOOR_LEFT);
   dc_skeleton_floor_right = load_bitmap (DC_SKELETON_FLOOR_RIGHT);
+
+  /* palace cga */
+  pc_skeleton_floor_left = load_bitmap (PC_SKELETON_FLOOR_LEFT);
+  pc_skeleton_floor_right = load_bitmap (PC_SKELETON_FLOOR_RIGHT);
 
   /* dungeon ega */
   de_skeleton_floor_left = load_bitmap (DE_SKELETON_FLOOR_LEFT);
@@ -78,6 +85,10 @@ unload_skeleton_floor (void)
   /* dungeon cga */
   al_destroy_bitmap (dc_skeleton_floor_left);
   al_destroy_bitmap (dc_skeleton_floor_right);
+
+  /* palace cga */
+  al_destroy_bitmap (pc_skeleton_floor_left);
+  al_destroy_bitmap (pc_skeleton_floor_right);
 
   /* dungeon ega */
   al_destroy_bitmap (de_skeleton_floor_left);
@@ -121,7 +132,7 @@ draw_skeleton_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   case PALACE:
     switch (vm) {
-    case CGA: break;
+    case CGA: skeleton_floor_left = pc_skeleton_floor_left; break;
     case EGA: skeleton_floor_left = pe_skeleton_floor_left; break;
     case VGA: skeleton_floor_left = pv_skeleton_floor_left; break;
     }
@@ -148,7 +159,7 @@ draw_skeleton_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   case PALACE:
     switch (vm) {
-    case CGA: break;
+    case CGA: skeleton_floor_right = pc_skeleton_floor_right; break;
     case EGA: skeleton_floor_right = pe_skeleton_floor_right; break;
     case VGA: skeleton_floor_right = pv_skeleton_floor_right; break;
     }

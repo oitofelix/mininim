@@ -24,6 +24,10 @@
 #define DC_WALL_BASE "data/wall/dc-base.png"
 #define DC_WALL_LEFT "data/wall/dc-left.png"
 
+/* palace cga */
+#define PC_WALL_BASE "data/wall/pc-base.png"
+#define PC_WALL_LEFT "data/wall/pc-left.png"
+
 void load_wall_dcpc (void);
 void unload_wall_dcpc (void);
 void draw_wall_dcpc (ALLEGRO_BITMAP *bitmap, struct pos *p,

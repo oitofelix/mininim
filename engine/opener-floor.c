@@ -34,6 +34,10 @@
 ALLEGRO_BITMAP *dc_unpressed_opener_floor_base,
   *dc_unpressed_opener_floor_left;
 
+/* palace cga */
+ALLEGRO_BITMAP *pc_unpressed_opener_floor_base,
+  *pc_unpressed_opener_floor_left;
+
 /* dungeon ega */
 ALLEGRO_BITMAP *de_unpressed_opener_floor_base,
   *de_unpressed_opener_floor_left;
@@ -63,6 +67,10 @@ load_opener_floor (void)
   dc_unpressed_opener_floor_base = load_bitmap (DC_UNPRESSED_OPENER_FLOOR_BASE);
   dc_unpressed_opener_floor_left = load_bitmap (DC_UNPRESSED_OPENER_FLOOR_LEFT);
 
+  /* palace cga */
+  pc_unpressed_opener_floor_base = load_bitmap (PC_UNPRESSED_OPENER_FLOOR_BASE);
+  pc_unpressed_opener_floor_left = load_bitmap (PC_UNPRESSED_OPENER_FLOOR_LEFT);
+
   /* dungeon ega */
   de_unpressed_opener_floor_base = load_bitmap (DE_UNPRESSED_OPENER_FLOOR_BASE);
   de_unpressed_opener_floor_left = load_bitmap (DE_UNPRESSED_OPENER_FLOOR_LEFT);
@@ -86,6 +94,10 @@ unload_opener_floor (void)
   /* dungeon cga */
   al_destroy_bitmap (dc_unpressed_opener_floor_base);
   al_destroy_bitmap (dc_unpressed_opener_floor_left);
+
+  /* palace cga */
+  al_destroy_bitmap (pc_unpressed_opener_floor_base);
+  al_destroy_bitmap (pc_unpressed_opener_floor_left);
 
   /* dungeon ega */
   al_destroy_bitmap (de_unpressed_opener_floor_base);
@@ -277,7 +289,7 @@ draw_unpressed_opener_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   case PALACE:
     switch (vm) {
-    case CGA: break;
+    case CGA: unpressed_opener_floor_base = pc_unpressed_opener_floor_base; break;
     case EGA: unpressed_opener_floor_base = pe_unpressed_opener_floor_base; break;
     case VGA: unpressed_opener_floor_base = pv_unpressed_opener_floor_base; break;
     }
@@ -304,7 +316,7 @@ draw_unpressed_opener_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   case PALACE:
     switch (vm) {
-    case CGA: break;
+    case CGA: unpressed_opener_floor_left = pc_unpressed_opener_floor_left; break;
     case EGA: unpressed_opener_floor_left = pe_unpressed_opener_floor_left; break;
     case VGA: unpressed_opener_floor_left = pv_unpressed_opener_floor_left; break;
     }
@@ -332,7 +344,7 @@ draw_unpressed_opener_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   case PALACE:
     switch (vm) {
-    case CGA: break;
+    case CGA: unpressed_opener_floor_right = pc_floor_right; break;
     case EGA: unpressed_opener_floor_right = pe_floor_right; break;
     case VGA: unpressed_opener_floor_right = pv_floor_right; break;
     }

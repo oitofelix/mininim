@@ -80,7 +80,6 @@ ALLEGRO_BITMAP * get_cached_palette (ALLEGRO_BITMAP *bitmap, palette p);
 extern ALLEGRO_DISPLAY *display;
 extern ALLEGRO_BITMAP *screen, *uscreen;
 extern ALLEGRO_TIMER *video_timer;
-extern ALLEGRO_BITMAP *flick_bg_0, *flick_bg_1;
 extern struct video_effect video_effect;
 extern int screen_flags;
 

@@ -32,6 +32,14 @@
 #define DC_LEVEL_DOOR_STAIRS "data/level-door/dc-stairs.png"
 #define DC_LEVEL_DOOR_FRONT "data/level-door/dc-front.png"
 
+/* palace cga */
+#define PC_LEVEL_DOOR_TOP_LEFT "data/level-door/pc-top-left.png"
+#define PC_LEVEL_DOOR_TOP_RIGHT "data/level-door/pc-top-right.png"
+#define PC_LEVEL_DOOR_BOTTOM "data/level-door/pc-bottom.png"
+#define PC_LEVEL_DOOR_FLOOR "data/level-door/pc-floor.png"
+#define PC_LEVEL_DOOR_STAIRS "data/level-door/pc-stairs.png"
+#define PC_LEVEL_DOOR_FRONT "data/level-door/pc-front.png"
+
 /* dungeon ega */
 #define DE_LEVEL_DOOR_TOP_LEFT "data/level-door/de-top-left.png"
 #define DE_LEVEL_DOOR_TOP_RIGHT "data/level-door/de-top-right.png"

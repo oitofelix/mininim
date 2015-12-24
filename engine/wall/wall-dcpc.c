@@ -29,12 +29,19 @@
 /* dungeon cga */
 ALLEGRO_BITMAP *dc_wall_base, *dc_wall_left;
 
+/* palace cga */
+ALLEGRO_BITMAP *pc_wall_base, *pc_wall_left;
+
 void
 load_wall_dcpc (void)
 {
   /* dungeon cga */
   dc_wall_base = load_bitmap (DC_WALL_BASE);
   dc_wall_left = load_bitmap (DC_WALL_LEFT);
+
+  /* palace cga */
+  pc_wall_base = load_bitmap (PC_WALL_BASE);
+  pc_wall_left = load_bitmap (PC_WALL_LEFT);
 }
 
 void
@@ -43,6 +50,10 @@ unload_wall_dcpc (void)
   /* dungeon cga */
   al_destroy_bitmap (dc_wall_base);
   al_destroy_bitmap (dc_wall_left);
+
+  /* palace cga */
+  al_destroy_bitmap (pc_wall_base);
+  al_destroy_bitmap (pc_wall_left);
 }
 
 void
@@ -61,6 +72,7 @@ draw_wall_base_dcpc (ALLEGRO_BITMAP *bitmap, struct pos *p,
   ALLEGRO_BITMAP *wall_base = NULL;
 
   if (em == DUNGEON) wall_base = dc_wall_base;
+  else wall_base = pc_wall_base;
 
   struct coord c;
   draw_bitmapc (wall_base, bitmap, wall_base_coord (p, &c), 0);
@@ -73,6 +85,7 @@ draw_wall_left_dcpc (ALLEGRO_BITMAP *bitmap, struct pos *p,
   ALLEGRO_BITMAP *wall_left = NULL;
 
   if (em == DUNGEON) wall_left = dc_wall_left;
+  else wall_left = pc_wall_left;
 
   struct coord c;
   draw_bitmapc (wall_left, bitmap, wall_coord (p, &c), 0);

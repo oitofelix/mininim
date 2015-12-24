@@ -33,6 +33,14 @@
 #define DC_LOOSE_FLOOR_LEFT_02 "data/loose-floor/dc-left-02.png"
 #define DC_LOOSE_FLOOR_RIGHT_02 "data/loose-floor/dc-right-02.png"
 
+/* palace cga */
+#define PC_LOOSE_FLOOR_BASE_01 "data/loose-floor/pc-base-01.png"
+#define PC_LOOSE_FLOOR_LEFT_01 "data/loose-floor/pc-left-01.png"
+#define PC_LOOSE_FLOOR_RIGHT_01 "data/loose-floor/pc-right-01.png"
+#define PC_LOOSE_FLOOR_BASE_02 "data/loose-floor/pc-base-02.png"
+#define PC_LOOSE_FLOOR_LEFT_02 "data/loose-floor/pc-left-02.png"
+#define PC_LOOSE_FLOOR_RIGHT_02 "data/loose-floor/pc-right-02.png"
+
 /* dungeon ega */
 #define DE_LOOSE_FLOOR_BASE_01 "data/loose-floor/de-base-01.png"
 #define DE_LOOSE_FLOOR_LEFT_01 "data/loose-floor/de-left-01.png"

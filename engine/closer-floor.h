@@ -27,12 +27,17 @@
 #define DC_PRESSED_CLOSER_FLOOR_BASE "data/closer-floor/dc-pressed-base.png"
 #define DC_PRESSED_CLOSER_FLOOR_RIGHT "data/closer-floor/dc-pressed-right.png"
 
+/* palace cga */
+#define PC_UNPRESSED_CLOSER_FLOOR_BASE "data/closer-floor/pc-unpressed-base.png"
+#define PC_PRESSED_CLOSER_FLOOR_BASE "data/closer-floor/pc-pressed-base.png"
+#define PC_PRESSED_CLOSER_FLOOR_RIGHT "data/closer-floor/pc-pressed-right.png"
+
 /* dungeon ega */
 #define DE_UNPRESSED_CLOSER_FLOOR_BASE "data/closer-floor/de-unpressed-base.png"
 #define DE_PRESSED_CLOSER_FLOOR_BASE "data/closer-floor/de-pressed-base.png"
 #define DE_PRESSED_CLOSER_FLOOR_RIGHT "data/closer-floor/de-pressed-right.png"
 
-/* palace vga */
+/* palace ega */
 #define PE_UNPRESSED_CLOSER_FLOOR_BASE "data/closer-floor/pe-unpressed-base.png"
 #define PE_PRESSED_CLOSER_FLOOR_BASE "data/closer-floor/pe-pressed-base.png"
 #define PE_PRESSED_CLOSER_FLOOR_RIGHT "data/closer-floor/pe-pressed-right.png"

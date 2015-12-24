@@ -28,6 +28,12 @@
 #define DC_PILLAR_TOP "data/pillar/dc-top.png"
 #define DC_PILLAR_FG "data/pillar/dc-fg.png"
 
+/* palace cga */
+#define PC_PILLAR_LEFT "data/pillar/pc-left.png"
+#define PC_PILLAR_RIGHT "data/pillar/pc-right.png"
+#define PC_PILLAR_TOP "data/pillar/pc-top.png"
+#define PC_PILLAR_FG "data/pillar/pc-fg.png"
+
 /* dungeon ega */
 #define DE_PILLAR_LEFT "data/pillar/de-left.png"
 #define DE_PILLAR_RIGHT "data/pillar/de-right.png"

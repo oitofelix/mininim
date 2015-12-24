@@ -35,6 +35,18 @@ extern ALLEGRO_BITMAP *dc_floor_base, *dc_floor_left,
   *dc_floor_right, *dc_floor_corner_01,
   *dc_floor_corner_02, *dc_floor_corner_03;
 
+/* palace cga */
+#define PC_FLOOR_LEFT "data/floor/pc-left.png"
+#define PC_FLOOR_RIGHT "data/floor/pc-right.png"
+#define PC_FLOOR_BASE "data/floor/pc-base.png"
+#define PC_FLOOR_CORNER_01 "data/floor/pc-corner-01.png"
+#define PC_FLOOR_CORNER_02 "data/floor/pc-corner-02.png"
+#define PC_FLOOR_CORNER_03 "data/floor/pc-corner-03.png"
+
+extern ALLEGRO_BITMAP *pc_floor_base, *pc_floor_left,
+  *pc_floor_right, *pc_floor_corner_01,
+  *pc_floor_corner_02, *pc_floor_corner_03;
+
 /* dungeon ega */
 #define DE_FLOOR_LEFT "data/floor/de-left.png"
 #define DE_FLOOR_RIGHT "data/floor/de-right.png"

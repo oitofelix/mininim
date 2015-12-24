@@ -33,6 +33,10 @@
 ALLEGRO_BITMAP *dc_unpressed_closer_floor_base, *dc_pressed_closer_floor_base,
   *dc_pressed_closer_floor_right;
 
+/* palace cga */
+ALLEGRO_BITMAP *pc_unpressed_closer_floor_base, *pc_pressed_closer_floor_base,
+  *pc_pressed_closer_floor_right;
+
 /* dungeon ega */
 ALLEGRO_BITMAP *de_unpressed_closer_floor_base, *de_pressed_closer_floor_base,
   *de_pressed_closer_floor_right;
@@ -63,6 +67,11 @@ load_closer_floor (void)
   dc_pressed_closer_floor_base = load_bitmap (DC_PRESSED_CLOSER_FLOOR_BASE);
   dc_pressed_closer_floor_right = load_bitmap (DC_PRESSED_CLOSER_FLOOR_RIGHT);
 
+  /* palace cga */
+  pc_unpressed_closer_floor_base = load_bitmap (PC_UNPRESSED_CLOSER_FLOOR_BASE);
+  pc_pressed_closer_floor_base = load_bitmap (PC_PRESSED_CLOSER_FLOOR_BASE);
+  pc_pressed_closer_floor_right = load_bitmap (PC_PRESSED_CLOSER_FLOOR_RIGHT);
+
   /* dungeon ega */
   de_unpressed_closer_floor_base = load_bitmap (DE_UNPRESSED_CLOSER_FLOOR_BASE);
   de_pressed_closer_floor_base = load_bitmap (DE_PRESSED_CLOSER_FLOOR_BASE);
@@ -91,6 +100,11 @@ unload_closer_floor (void)
   al_destroy_bitmap (dc_unpressed_closer_floor_base);
   al_destroy_bitmap (dc_pressed_closer_floor_base);
   al_destroy_bitmap (dc_pressed_closer_floor_right);
+
+  /* palace cga */
+  al_destroy_bitmap (pc_unpressed_closer_floor_base);
+  al_destroy_bitmap (pc_pressed_closer_floor_base);
+  al_destroy_bitmap (pc_pressed_closer_floor_right);
 
   /* dungeon ega */
   al_destroy_bitmap (de_unpressed_closer_floor_base);
@@ -278,7 +292,7 @@ draw_pressed_closer_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   case PALACE:
     switch (vm) {
-    case CGA: break;
+    case CGA: pressed_closer_floor_base = pc_pressed_closer_floor_base; break;
     case EGA: pressed_closer_floor_base = pe_pressed_closer_floor_base; break;
     case VGA: pressed_closer_floor_base = pv_pressed_closer_floor_base; break;
     }
@@ -314,7 +328,7 @@ draw_pressed_closer_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   case PALACE:
     switch (vm) {
-    case CGA: break;
+    case CGA: pressed_closer_floor_left = pc_floor_left; break;
     case EGA: pressed_closer_floor_left = pe_floor_left; break;
     case VGA: pressed_closer_floor_left = pv_floor_left; break;
     }
@@ -352,7 +366,10 @@ draw_pressed_closer_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   case PALACE:
     switch (vm) {
-    case CGA: break;
+    case CGA:
+      floor_right = pc_floor_right;
+      pressed_closer_floor_right = pc_pressed_closer_floor_right;
+      break;
     case EGA:
       floor_right = pe_floor_right;
       pressed_closer_floor_right = pe_pressed_closer_floor_right;
@@ -398,7 +415,7 @@ draw_unpressed_closer_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   case PALACE:
     switch (vm) {
-    case CGA: break;
+    case CGA: unpressed_closer_floor_base = pc_unpressed_closer_floor_base; break;
     case EGA: unpressed_closer_floor_base = pe_unpressed_closer_floor_base; break;
     case VGA: unpressed_closer_floor_base = pv_unpressed_closer_floor_base; break;
     }
