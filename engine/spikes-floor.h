@@ -145,6 +145,7 @@ void sort_spikes_floors (void);
 int compare_spikes_floors (const void *s0, const void *s1);
 struct spikes_floor * spikes_floor_at_pos (struct pos *p);
 void break_spikes_floor (struct pos *p);
+void reset_murder_spikes_floor (int id);
 void compute_spikes_floors (void);
 void sample_spikes_floors (void);
 bool should_spikes_raise_for_pos (struct pos *p, struct pos *pk);

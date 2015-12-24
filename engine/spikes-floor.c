@@ -338,6 +338,18 @@ break_spikes_floor (struct pos *p)
 }
 
 void
+reset_murder_spikes_floor (int id) {
+  int i = 0;
+  for (i = 0; i < spikes_floor_nmemb; i++) {
+    struct spikes_floor *s = &spikes_floor[i];
+    if (s->murdered_kid == id) {
+      s->murdered_kid = -1;
+      s->inactive = false;
+    }
+  }
+}
+
+void
 compute_spikes_floors (void)
 {
   size_t i, j;
@@ -346,9 +358,7 @@ compute_spikes_floors (void)
   for (i = 0; i < spikes_floor_nmemb; i++) {
     struct spikes_floor *s = &spikes_floor[i];
 
-    if (s->inactive
-        && is_kid_dead (&get_kid_by_id (s->murdered_kid)->f))
-      continue;
+    if (s->inactive) continue;
 
     if (s->p.room == -1) {
       /* remove_spikes_floor (s); i--; */

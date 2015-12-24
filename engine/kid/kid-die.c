@@ -26,6 +26,7 @@
 #include "engine/potion.h"
 #include "engine/sword.h"
 #include "engine/loose-floor.h"
+#include "engine/spikes-floor.h"
 #include "kid.h"
 
 struct frameset kid_die_frameset[KID_DIE_FRAMESET_NMEMB];
@@ -88,6 +89,7 @@ kid_resurrect (struct anim *kid)
   kid->action = kid_normal;
   place_frame (&kid->f, &kid->f, kid_normal_00,
                &pm, kid->f.dir == LEFT ? +16 : +16, +15);
+  reset_murder_spikes_floor (kid->id);
 }
 
 void
