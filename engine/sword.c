@@ -175,7 +175,7 @@ init_sword_frameset (void)
 }
 
 void
-draw_sword (ALLEGRO_BITMAP *bitmap, struct pos *p, int i, enum vm vm)
+draw_sword (ALLEGRO_BITMAP *bitmap, struct pos *p, enum vm vm)
 {
   ALLEGRO_BITMAP *normal_sword = NULL,
     *shiny_sword = NULL;
@@ -198,7 +198,7 @@ draw_sword (ALLEGRO_BITMAP *bitmap, struct pos *p, int i, enum vm vm)
 
   struct coord c;
   if (! is_sword (p)) return;
-  ALLEGRO_BITMAP *sword = i % 60 ? normal_sword : shiny_sword;
+  ALLEGRO_BITMAP *sword = anim_cycle % 60 ? normal_sword : shiny_sword;
   seedp (p);
   draw_bitmapc (sword, bitmap, sword_coord (p, &c),
                 prandom (1) ? ALLEGRO_FLIP_HORIZONTAL : 0);

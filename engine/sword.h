@@ -73,7 +73,7 @@ extern struct frameset sword_frameset[SWORD_FRAMESET_NMEMB];
 
 void load_sword (void);
 void unload_sword (void);
-void draw_sword (ALLEGRO_BITMAP *bitmap, struct pos *p, int i, enum vm vm);
+void draw_sword (ALLEGRO_BITMAP *bitmap, struct pos *p, enum vm vm);
 bool is_sword (struct pos *p);
 
 #endif	/* MININIM_SWORD_H */

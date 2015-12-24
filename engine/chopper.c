@@ -340,7 +340,7 @@ compute_choppers (void)
     switch (c->i) {
     case 0:
       if (c->wait-- <= 0 && should_chomp (&c->p)
-          && (draw_cycle % CHOPPER_WAIT) ==
+          && (anim_cycle % CHOPPER_WAIT) ==
           prandom_pos (&c->p, CHOPPER_WAIT - 1)) c->i++; break;
     case 1: c->i++; sample_chopper = true; break;
     case 2: c->i++; break;

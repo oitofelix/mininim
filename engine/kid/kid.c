@@ -368,7 +368,7 @@ colorful_shadow_palette (ALLEGRO_COLOR c)
   if (a == 0) return c;
   if (color_eq (c, V_KID_SKIN_COLOR_01)
       || color_eq (c, V_KID_NOSE_COLOR))
-    switch (draw_cycle % 3) {
+    switch (anim_cycle % 3) {
     case 0: return TRED;
     case 1: return TGREEN;
     case 2: return TBLUE;
@@ -567,7 +567,7 @@ sample_kid (void)
 }
 
 void
-draw_kid_lives (ALLEGRO_BITMAP *bitmap, struct anim *kid, int j,
+draw_kid_lives (ALLEGRO_BITMAP *bitmap, struct anim *kid,
                 enum vm vm)
 {
   int i;
@@ -595,7 +595,7 @@ draw_kid_lives (ALLEGRO_BITMAP *bitmap, struct anim *kid, int j,
   for (i = 0; i < kid->total_lives; i++)
     draw_bitmapc (empty, bitmap, kid_life_coord (i, &c), 0);
 
-  if (kid->current_lives <= KID_MINIMUM_LIVES_TO_BLINK && j % 2) return;
+  if (kid->current_lives <= KID_MINIMUM_LIVES_TO_BLINK && anim_cycle % 2) return;
 
   for (i = 0; i < kid->current_lives; i++)
     draw_bitmapc (full, bitmap, kid_life_coord (i, &c), 0);
@@ -654,4 +654,39 @@ float_kid (struct anim *k)
   sample_floating = true;
   video_effect.color = GREEN;
   start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.3));
+}
+
+void
+kid_debug (void)
+{
+  /* begin kid hack */
+  if (! cutscene) {
+    /* static int px = 0; */
+    /* static int py = 0; */
+    /* if (a_key) px--; */
+    /* if (d_key) px++; */
+    /* if (w_key) py--; */
+    /* if (s_key) py++; */
+    /* al_set_target_bitmap (screen); */
+    /* al_put_pixel (px, py, al_map_rgb (0, 255, 255)); */
+
+    /* printf ("x = %i, y = %i, floor = %i, place = %i\n", px, py, (py -3) / 63, (px - 15) / 32); */
+
+    struct coord bf; struct pos pbf, npbf;
+    survey (_bf, pos, &current_kid->f, &bf, &pbf, &npbf);
+    if (delete_key) current_kid->f.c.x--;
+    if (page_down_key) current_kid->f.c.x++;
+    int dn = dist_next_place (&current_kid->f, _bf, pos, 0, false);
+    int dp = dist_next_place (&current_kid->f, _bf, pos, 0, true);
+    int dc = dist_collision (&current_kid->f, false, &kid->ci) + 4;
+    int df = dist_fall (&current_kid->f, false);
+    int dl = dist_con (&current_kid->f, _bf, pos, -4, false, LOOSE_FLOOR);
+    int dcl = dist_con (&current_kid->f, _bf, pos, -4, false, CLOSER_FLOOR);
+    int dch = dist_chopper (&current_kid->f, false);
+    if (delete_key || page_down_key || enter_key)
+      printf ("\
+f = %i, p = %i, dn = %i, dp = %i, dc = %i, df = %i, dl = %i, dcl = %i, dch = %i\n",
+              pbf.floor, pbf.place, dn, dp, dc, df, dl, dcl, dch);
+  }
+  /* end kid hack */
 }

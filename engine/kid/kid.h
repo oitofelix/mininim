@@ -83,7 +83,7 @@
 void load_kid (void);
 void unload_kid (void);
 void sample_kid (void);
-void draw_kid_lives (ALLEGRO_BITMAP *bitmap, struct anim *kid, int j,
+void draw_kid_lives (ALLEGRO_BITMAP *bitmap, struct anim *kid,
                      enum vm vm);
 void draw_kid (ALLEGRO_BITMAP *bitmap, struct anim *kid, struct pos *p);
 int create_kid (struct anim *k);
@@ -101,6 +101,7 @@ ALLEGRO_COLOR c_palette (ALLEGRO_COLOR c);
 void increase_kid_current_lives (struct anim *k);
 void increase_kid_total_lives (struct anim *k);
 void float_kid (struct anim *k);
+void kid_debug (void);
 
 /* variables */
 extern struct anim *kid; /* kid animation object */

@@ -90,19 +90,16 @@ get_fire_frame (int i, enum vm vm)
 }
 
 void
-draw_fire (ALLEGRO_BITMAP* bitmap, struct pos *p, int i,
-           enum vm vm)
+draw_fire (ALLEGRO_BITMAP* bitmap, struct pos *p, enum vm vm)
 {
   struct coord c;
   if (con (p)->bg != TORCH) return;
 
-  ALLEGRO_BITMAP *fire = get_fire_frame (prandom_pos_uniq (p, i, 1, 8), vm);
+  ALLEGRO_BITMAP *fire = get_fire_frame (prandom_pos_uniq (p, anim_cycle, 1, 8), vm);
   int flip = prandom_pos (p, 1);
   fire_coord (p, &c);
   c.x -= flip;
   draw_bitmapc (fire, bitmap, &c, flip ? ALLEGRO_FLIP_HORIZONTAL : 0);
-
-  i++;
 }
 
 void

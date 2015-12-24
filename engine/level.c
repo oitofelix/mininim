@@ -55,9 +55,9 @@ struct level level;
 static bool no_room_drawing = false;
 static int last_auto_show_time;
 static ALLEGRO_TIMER *death_timer;
+static bool pause_game, step_one_cycle;
 
 int room_view;
-int draw_cycle;
 
 void
 play_level (struct level *lv)
@@ -73,8 +73,9 @@ play_level (struct level *lv)
 
   if (level.start) level.start ();
 
+  screen_flags = 0;
   room_view = 1;
-  draw_cycle = 0;
+  anim_cycle = 0;
   last_auto_show_time = -1;
   current_kid = &kid[0];
   current_kid->current = true;
@@ -162,6 +163,8 @@ compute_level (void)
 
   process_keys ();
 
+  if (pause_game) return;
+
   int prev_room = current_kid->f.c.room;
 
   for (i = 0; i < kid_nmemb; i++) kid[i].splash = false;
@@ -203,6 +206,29 @@ process_keys (void)
   char *text = NULL;
 
   int prev_room = room_view;
+
+  /* ESC: pause game */
+  if (step_one_cycle) {
+    step_one_cycle = false;
+    pause_game = true;
+    al_stop_timer (play_time);
+  }
+
+  if (was_key_pressed (ALLEGRO_KEY_ESCAPE, 0, 0, true)) {
+    if (pause_game) {
+      step_one_cycle = true;
+      pause_game = false;
+      al_start_timer (play_time);
+    } else {
+      pause_game = true;
+      al_stop_timer (play_time);
+    }
+  } else if (pause_game && key.keyboard.keycode) {
+    pause_game = false;
+    draw_bottom_text (NULL, NULL);
+    memset (&key, 0, sizeof (key));
+    al_start_timer (play_time);
+  }
 
   /* R: resurrect kid */
   if (was_key_pressed (ALLEGRO_KEY_R, 0, 0, true)
@@ -387,7 +413,8 @@ process_keys (void)
   }
 
   /* Restart level after death */
-  if (is_kid_dead (&get_kid_by_id (0)->f)) {
+  if (is_kid_dead (&get_kid_by_id (0)->f)
+      && ! pause_game) {
     al_start_timer (death_timer);
 
     int64_t t = al_get_timer_count (death_timer);
@@ -397,7 +424,8 @@ process_keys (void)
     if (t >= 60) {
       if (t == 60) key.keyboard.keycode = 0;
       if (t < 240 || t % 12 < 8) {
-        if (t >= 252 && t % 12 == 0) sample_press_key = true;
+        if (t >= 252 && t % 12 == 0)
+          sample_press_key = true;
         xasprintf (&text, "Press Button to Continue");
         draw_bottom_text (NULL, text);
         al_free (text);
@@ -405,7 +433,8 @@ process_keys (void)
 
       if (key.keyboard.keycode) quit_anim = RESTART_LEVEL;
     }
-  } else if (al_get_timer_started (death_timer)) {
+  } else if (al_get_timer_started (death_timer)
+             && ! pause_game) {
     al_stop_timer (death_timer);
     al_set_timer_count (death_timer, 0);
     draw_bottom_text (NULL, NULL);
@@ -417,15 +446,24 @@ process_keys (void)
 static void
 draw_level (void)
 {
+  if (pause_game) {
+    draw_bottom_text (NULL, "GAME PAUSED");
+    clear_bitmap (uscreen, TRANSPARENT);
+    draw_kid_lives (uscreen, current_kid, vm);
+    draw_bottom_text (uscreen, NULL);
+    return;
+  }
+
   /* drawing */
+  clear_bitmap (screen, BLACK);
+  clear_bitmap (uscreen, TRANSPARENT);
+
   struct pos p;
   p.room = room_view;
 
-  clear_bitmap (screen, BLACK);
-
   for (p.floor = FLOORS; p.floor >= -1; p.floor--)
     for (p.place = -1; p.place < PLACES; p.place++) {
-      draw_fire (screen, &p, draw_cycle, vm);
+      draw_fire (screen, &p, vm);
     }
 
   if (! no_room_drawing) draw_room (screen, room_view, em, vm);
@@ -439,26 +477,26 @@ draw_level (void)
 
   for (p.floor = FLOORS; p.floor >= -1; p.floor--)
     for (p.place = -1; p.place < PLACES; p.place++) {
-      draw_potion (screen, &p, draw_cycle, em, vm);
-      draw_sword (screen, &p, draw_cycle, vm);
+      draw_potion (screen, &p, em, vm);
+      draw_sword (screen, &p, vm);
     }
 
   unpress_opener_floors ();
   unpress_closer_floors ();
 
-  draw_kid_lives (screen, current_kid, draw_cycle, vm);
+  draw_kid_lives (uscreen, current_kid, vm);
 
   /* automatic remaining time display */
   int rem_time = 60 - al_get_timer_count (play_time);
   if ((rem_time % 5 == 0
        && last_auto_show_time != rem_time
-       && draw_cycle > 24)
-      || draw_cycle == 24) {
+       && anim_cycle > 24)
+      || anim_cycle == 24) {
     display_remaining_time ();
     last_auto_show_time = rem_time;
   }
 
-  draw_cycle++;
+  draw_bottom_text (uscreen, NULL);
 }
 
 void

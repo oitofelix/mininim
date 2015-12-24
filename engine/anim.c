@@ -31,10 +31,11 @@
 #include "anim.h"
 
 /* set to true to quit animation */
-enum quit_anim quit_anim = false;
-bool pause_anim = false;
-bool cutscene = false;
-bool next_frame_inv = false; /* invert next_anim offset interpretation  */
+enum quit_anim quit_anim;
+bool pause_anim;
+bool cutscene;
+bool next_frame_inv;
+int anim_cycle;
 
 void
 play_anim (void (*draw_callback) (void),
@@ -60,49 +61,21 @@ play_anim (void (*draw_callback) (void),
     case ALLEGRO_EVENT_TIMER:
       if (event.timer.source == timer) {
         get_keyboard_state ();
-        if (was_key_pressed (ALLEGRO_KEY_ESCAPE, 0, 0, false))
+        if (was_key_pressed (ALLEGRO_KEY_ESCAPE, 0, ALLEGRO_KEYMOD_SHIFT, false))
           pause_anim = true;
-        if (was_key_pressed (ALLEGRO_KEY_P, 0, 0, true))
+        if (was_key_pressed (ALLEGRO_KEY_ESCAPE, 0, ALLEGRO_KEYMOD_CTRL, true))
           pause_anim = false;
 
-        /* begin kid hack */
-        if (! cutscene) {
-          /* static int px = 0; */
-          /* static int py = 0; */
-          /* if (a_key) px--; */
-          /* if (d_key) px++; */
-          /* if (w_key) py--; */
-          /* if (s_key) py++; */
-          /* al_set_target_bitmap (screen); */
-          /* al_put_pixel (px, py, al_map_rgb (0, 255, 255)); */
-
-          /* printf ("x = %i, y = %i, floor = %i, place = %i\n", px, py, (py -3) / 63, (px - 15) / 32); */
-
-          struct coord bf; struct pos pbf, npbf;
-          survey (_bf, pos, &current_kid->f, &bf, &pbf, &npbf);
-          if (delete_key) current_kid->f.c.x--;
-          if (page_down_key) current_kid->f.c.x++;
-          int dn = dist_next_place (&current_kid->f, _bf, pos, 0, false);
-          int dp = dist_next_place (&current_kid->f, _bf, pos, 0, true);
-          int dc = dist_collision (&current_kid->f, false, &kid->ci) + 4;
-          int df = dist_fall (&current_kid->f, false);
-          int dl = dist_con (&current_kid->f, _bf, pos, -4, false, LOOSE_FLOOR);
-          int dcl = dist_con (&current_kid->f, _bf, pos, -4, false, CLOSER_FLOOR);
-          int dch = dist_chopper (&current_kid->f, false);
-          if (delete_key || page_down_key || enter_key)
-            printf ("\
-f = %i, p = %i, dn = %i, dp = %i, dc = %i, df = %i, dl = %i, dcl = %i, dch = %i\n",
-                    pbf.floor, pbf.place, dn, dp, dc, df, dl, dcl, dch);
-        }
-        /* end kid hack */
+        kid_debug ();
 
         if (! is_video_effect_started ()) show ();
         if (! pause_anim
-            || (pause_anim &&
-                was_key_pressed (ALLEGRO_KEY_ESCAPE, 0, 0, true))) {
+            || was_key_pressed (ALLEGRO_KEY_ESCAPE, 0,
+                                ALLEGRO_KEYMOD_SHIFT, true)) {
           if (compute_callback) compute_callback ();
           draw_callback ();
           if (sample_callback) sample_callback ();
+          anim_cycle++;
         }
         drop_all_events_from_source
           (event_queue, get_timer_event_source (timer));

@@ -24,7 +24,7 @@
 
 /* current level */
 extern struct level level;
-extern int room_view, draw_cycle;
+extern int room_view;
 
 void load_level (void);
 void unload_level (void);

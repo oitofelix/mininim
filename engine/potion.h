@@ -55,7 +55,7 @@
 
 void load_potion (void);
 void unload_potion (void);
-void draw_potion (ALLEGRO_BITMAP *bitmap, struct pos *p, int i,
+void draw_potion (ALLEGRO_BITMAP *bitmap, struct pos *p,
                   enum em em, enum vm vm);
 bool is_potion (struct pos *p);
 

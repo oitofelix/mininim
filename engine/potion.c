@@ -149,7 +149,7 @@ get_bubble_frame (int i)
 }
 
 void
-draw_potion (ALLEGRO_BITMAP *bitmap, struct pos *p, int i,
+draw_potion (ALLEGRO_BITMAP *bitmap, struct pos *p,
              enum em em, enum vm vm)
 {
   if (! is_potion (p)) return;
@@ -240,7 +240,7 @@ draw_potion (ALLEGRO_BITMAP *bitmap, struct pos *p, int i,
   }
 
   draw_bitmapc (bottle, bitmap, &bottle_coord, 0);
-  bubble = get_bubble_frame (i % 7);
+  bubble = get_bubble_frame (anim_cycle % 7);
   bubble = apply_palette (bubble, bubble_palette);
   int r = prandom (1);
   bubble_coord.x -= r;
