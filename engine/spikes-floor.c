@@ -391,9 +391,7 @@ compute_spikes_floors (void)
       struct anim *k = &kid[j];
       if (is_kid_dead (&k->f)
           || k->immortal
-          || k->spikes_immune
-          || (al_get_timer_started (k->floating)
-              && is_kid_fall (&k->f))) continue;
+          || k->spikes_immune) continue;
       survey (_m, pos, &k->f, &nc, &pm, &np);
       if (peq (&pm, &s->p)
           && (((s->state >= 2 && s->state <= 4)
@@ -401,7 +399,8 @@ compute_spikes_floors (void)
                    || is_kid_run (&k->f)
                    || is_kid_stop_run (&k->f)
                    || is_kid_run_jump_running (&k->f)))
-              || (is_kid_couch (&k->f) && kid->fall)
+              || (is_kid_couch (&k->f) && kid->fall
+                  && ! al_get_timer_started (k->floating))
               || is_kid_jump_landing (&k->f)
               || is_kid_run_jump_landing (&k->f))) {
         s->inactive = true;

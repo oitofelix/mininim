@@ -429,9 +429,9 @@ c_phantom_shadow_palette (ALLEGRO_COLOR c)
   if (color_eq (c, C_KID_CLOTHES_COLOR_02))
     return C_KID_SHADOW_CLOTHES_COLOR_02;
   if (color_eq (c, C_KID_SKIN_COLOR))
-    return C_KID_SHADOW_SKIN_COLOR;;
+    return C_KID_SHADOW_SKIN_COLOR;
   if (color_eq (c, C_KID_EYE_COLOR))
-    return C_KID_SHADOW_EYE_COLOR;;
+    return C_KID_SHADOW_EYE_COLOR;
   return c;
 }
 

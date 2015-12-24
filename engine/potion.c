@@ -51,10 +51,18 @@ static struct coord *small_potion_coord (struct pos *p, struct coord *c);
 static struct coord *small_potion_bubble_coord (struct pos *p, struct coord *c);
 static struct coord *big_potion_coord (struct pos *p, struct coord *c);
 static struct coord *big_potion_bubble_coord (struct pos *p, struct coord *c);
-static ALLEGRO_COLOR life_palette (ALLEGRO_COLOR c);
-static ALLEGRO_COLOR poison_palette (ALLEGRO_COLOR c);
-static ALLEGRO_COLOR float_palette (ALLEGRO_COLOR c);
-static ALLEGRO_COLOR flip_palette (ALLEGRO_COLOR c);
+static ALLEGRO_COLOR v_life_palette (ALLEGRO_COLOR c);
+static ALLEGRO_COLOR v_poison_palette (ALLEGRO_COLOR c);
+static ALLEGRO_COLOR v_float_palette (ALLEGRO_COLOR c);
+static ALLEGRO_COLOR v_flip_palette (ALLEGRO_COLOR c);
+static ALLEGRO_COLOR e_life_palette (ALLEGRO_COLOR c);
+static ALLEGRO_COLOR e_poison_palette (ALLEGRO_COLOR c);
+static ALLEGRO_COLOR e_float_palette (ALLEGRO_COLOR c);
+static ALLEGRO_COLOR e_flip_palette (ALLEGRO_COLOR c);
+static ALLEGRO_COLOR c_life_palette (ALLEGRO_COLOR c);
+static ALLEGRO_COLOR c_poison_palette (ALLEGRO_COLOR c);
+static ALLEGRO_COLOR c_float_palette (ALLEGRO_COLOR c);
+static ALLEGRO_COLOR c_flip_palette (ALLEGRO_COLOR c);
 
 void
 load_potion (void)
@@ -219,6 +227,30 @@ draw_potion (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  palette life_palette = NULL, poison_palette = NULL,
+    float_palette = NULL, flip_palette = NULL;
+
+  switch (vm) {
+  case CGA:
+    life_palette = c_life_palette;
+    poison_palette = c_poison_palette;
+    float_palette = c_float_palette;
+    flip_palette = c_flip_palette;
+    break;
+  case EGA:
+    life_palette = e_life_palette;
+    poison_palette = e_poison_palette;
+    float_palette = e_float_palette;
+    flip_palette = e_flip_palette;
+    break;
+  case VGA:
+    life_palette = v_life_palette;
+    poison_palette = v_poison_palette;
+    float_palette = v_float_palette;
+    flip_palette = v_flip_palette;
+    break;
+  }
+
   switch (item) {
   case SMALL_LIFE_POTION:
   case BIG_LIFE_POTION:
@@ -298,29 +330,97 @@ big_potion_bubble_coord (struct pos *p, struct coord *c)
 }
 
 ALLEGRO_COLOR
-life_palette (ALLEGRO_COLOR c)
+v_life_palette (ALLEGRO_COLOR c)
 {
-  if (color_eq (c, WHITE)) return LIFE_POTION_BUBBLE_COLOR;
+  if (color_eq (c, WHITE)) return V_LIFE_POTION_BUBBLE_COLOR;
   else return c;
 }
 
 ALLEGRO_COLOR
-poison_palette (ALLEGRO_COLOR c)
+v_poison_palette (ALLEGRO_COLOR c)
 {
-  if (color_eq (c, WHITE)) return POISON_POTION_BUBBLE_COLOR;
+  if (color_eq (c, WHITE)) return V_POISON_POTION_BUBBLE_COLOR;
   else return c;
 }
 
 ALLEGRO_COLOR
-float_palette (ALLEGRO_COLOR c)
+v_float_palette (ALLEGRO_COLOR c)
 {
-  if (color_eq (c, WHITE)) return FLOAT_POTION_BUBBLE_COLOR;
+  if (color_eq (c, WHITE)) return V_FLOAT_POTION_BUBBLE_COLOR;
   else return c;
 }
 
 ALLEGRO_COLOR
-flip_palette (ALLEGRO_COLOR c)
+v_flip_palette (ALLEGRO_COLOR c)
 {
-  if (color_eq (c, WHITE)) return FLIP_POTION_BUBBLE_COLOR;
+  if (color_eq (c, WHITE)) return V_FLIP_POTION_BUBBLE_COLOR;
   else return c;
+}
+
+ALLEGRO_COLOR
+e_life_palette (ALLEGRO_COLOR c)
+{
+  if (color_eq (c, WHITE)) return E_LIFE_POTION_BUBBLE_COLOR;
+  else return c;
+}
+
+ALLEGRO_COLOR
+e_poison_palette (ALLEGRO_COLOR c)
+{
+  if (color_eq (c, WHITE)) return E_POISON_POTION_BUBBLE_COLOR;
+  else return c;
+}
+
+ALLEGRO_COLOR
+e_float_palette (ALLEGRO_COLOR c)
+{
+  if (color_eq (c, WHITE)) return E_FLOAT_POTION_BUBBLE_COLOR;
+  else return c;
+}
+
+ALLEGRO_COLOR
+e_flip_palette (ALLEGRO_COLOR c)
+{
+  if (color_eq (c, WHITE)) return E_FLIP_POTION_BUBBLE_COLOR;
+  else return c;
+}
+
+ALLEGRO_COLOR
+c_life_palette (ALLEGRO_COLOR c)
+{
+  if (color_eq (c, WHITE)) return C_LIFE_POTION_BUBBLE_COLOR;
+  else return c;
+}
+
+ALLEGRO_COLOR
+c_poison_palette (ALLEGRO_COLOR c)
+{
+  if (color_eq (c, WHITE)) return C_POISON_POTION_BUBBLE_COLOR;
+  else return c;
+}
+
+ALLEGRO_COLOR
+c_float_palette (ALLEGRO_COLOR c)
+{
+  static int i = 0;
+
+  if (color_eq (c, WHITE)) {
+    i++;
+    return i % 2
+      ? C_FLOAT_POTION_BUBBLE_COLOR_01
+      : C_FLOAT_POTION_BUBBLE_COLOR_02;
+  } else return c;
+}
+
+ALLEGRO_COLOR
+c_flip_palette (ALLEGRO_COLOR c)
+{
+  static int i = 0;
+
+  if (color_eq (c, WHITE)) {
+    i++;
+    return i % 2
+      ? C_FLIP_POTION_BUBBLE_COLOR_01
+      : C_FLIP_POTION_BUBBLE_COLOR_02;
+  } else return c;
 }

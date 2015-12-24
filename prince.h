@@ -88,10 +88,22 @@
 #define C_KID_SHADOW_SKIN_COLOR (al_map_rgb (255, 255, 255))
 #define C_KID_SHADOW_EYE_COLOR (al_map_rgb (255, 85, 255))
 
-#define LIFE_POTION_BUBBLE_COLOR (al_map_rgb (224, 0, 48))
-#define POISON_POTION_BUBBLE_COLOR (al_map_rgb (80, 84, 248))
-#define FLOAT_POTION_BUBBLE_COLOR (al_map_rgb (84, 252, 84))
-#define FLIP_POTION_BUBBLE_COLOR (al_map_rgb (255, 255, 0))
+#define V_LIFE_POTION_BUBBLE_COLOR (al_map_rgb (224, 0, 48))
+#define V_POISON_POTION_BUBBLE_COLOR (al_map_rgb (80, 84, 248))
+#define V_FLOAT_POTION_BUBBLE_COLOR (al_map_rgb (84, 252, 84))
+#define V_FLIP_POTION_BUBBLE_COLOR (al_map_rgb (255, 255, 0))
+
+#define E_LIFE_POTION_BUBBLE_COLOR (al_map_rgb (255, 85, 85))
+#define E_POISON_POTION_BUBBLE_COLOR (al_map_rgb (85, 85, 255))
+#define E_FLOAT_POTION_BUBBLE_COLOR (al_map_rgb (85, 255, 85))
+#define E_FLIP_POTION_BUBBLE_COLOR (al_map_rgb (255, 255, 85))
+
+#define C_LIFE_POTION_BUBBLE_COLOR (al_map_rgb (255, 85, 255))
+#define C_POISON_POTION_BUBBLE_COLOR (al_map_rgb (85, 255, 255))
+#define C_FLOAT_POTION_BUBBLE_COLOR_01 (al_map_rgb (255, 255, 255))
+#define C_FLOAT_POTION_BUBBLE_COLOR_02 (al_map_rgb (255, 85, 255))
+#define C_FLIP_POTION_BUBBLE_COLOR_01 (al_map_rgb (255, 255, 255))
+#define C_FLIP_POTION_BUBBLE_COLOR_02 (al_map_rgb (85, 255, 255))
 
 #define C_BLOOD_COLOR (al_map_rgb (255, 85, 255))
 #define E_BLOOD_COLOR_01 (al_map_rgb (255, 85, 85))
