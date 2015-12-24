@@ -75,6 +75,7 @@
 
 #define V_KID_SHADOW_CLOTHES_COLOR_01 (al_map_rgba (64, 64 , 64, 0))
 #define V_KID_SHADOW_CLOTHES_COLOR_02 (al_map_rgba (32, 32, 32, 0))
+#define V_KID_SHADOW_EYE_COLOR (al_map_rgba (184, 0, 0, 0))
 
 #define E_KID_SHADOW_CLOTHES_COLOR_01 (al_map_rgb (170, 170 , 170))
 #define E_KID_SHADOW_CLOTHES_COLOR_02 (al_map_rgb (85, 85, 85))

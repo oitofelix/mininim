@@ -357,19 +357,19 @@ compute_choppers (void)
           || is_kid_fall (&k->f)
           || k->immortal
           || k->chopper_immune) continue;
-      struct coord nc; struct pos np, ptf, ptb;
-      survey (_tf, pos, &k->f, &nc, &ptf, &np);
-      survey (_tb, pos, &k->f, &nc, &ptb, &np);
-      pos2room (&ptf, c->p.room, &ptf);
-      pos2room (&ptb, c->p.room, &ptb);
-      if (((ptf.room == c->p.room
-            && ptf.floor == c->p.floor)
-           || (ptb.room == c->p.room
-               && ptb.floor == c->p.floor))
-          && ((k->f.dir == LEFT && ptf.place < c->p.place
-               && ptb.place >= c->p.place)
-              || (k->f.dir == RIGHT && ptf.place >= c->p.place
-                  && ptb.place < c->p.place))) {
+      struct coord nc; struct pos np, pbf, pbb;
+      survey (_bf, pos, &k->f, &nc, &pbf, &np);
+      survey (_bb, pos, &k->f, &nc, &pbb, &np);
+      pos2room (&pbf, c->p.room, &pbf);
+      pos2room (&pbb, c->p.room, &pbb);
+      if (((pbf.room == c->p.room
+            && pbf.floor == c->p.floor)
+           || (pbb.room == c->p.room
+               && pbb.floor == c->p.floor))
+          && ((k->f.dir == LEFT && pbf.place < c->p.place
+               && pbb.place >= c->p.place)
+              || (k->f.dir == RIGHT && pbf.place >= c->p.place
+                  && pbb.place < c->p.place))) {
         c->blood = true;
         k->splash = true;
         k->current_lives = 0;

@@ -394,6 +394,8 @@ v_phantom_shadow_palette (ALLEGRO_COLOR c)
     return V_KID_SHADOW_CLOTHES_COLOR_01;
   if (color_eq (c, V_KID_CLOTHES_COLOR_02))
     return V_KID_SHADOW_CLOTHES_COLOR_02;
+  if (color_eq (c, V_KID_EYE_COLOR))
+    return V_KID_SHADOW_EYE_COLOR;
   return al_map_rgba (r, g, b, 0);
 }
 
