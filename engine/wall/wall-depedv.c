@@ -184,16 +184,16 @@ unload_wall_depedv (void)
 }
 
 void
-draw_depedv_wall (ALLEGRO_BITMAP *bitmap, struct pos *p,
+draw_wall_depedv (ALLEGRO_BITMAP *bitmap, struct pos *p,
                   enum em em, enum vm vm)
 {
-  draw_depedv_wall_base (bitmap, p, em, vm);
-  draw_depedv_wall_left (bitmap, p, em, vm);
+  draw_wall_base_depedv (bitmap, p, em, vm);
+  draw_wall_left_depedv (bitmap, p, em, vm);
   draw_wall_right (bitmap, p, em, vm);
 }
 
 void
-draw_depedv_wall_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
+draw_wall_base_depedv (ALLEGRO_BITMAP *bitmap, struct pos *p,
                        enum em em, enum vm vm)
 {
   switch (wall_correlation (p)) {
@@ -208,7 +208,7 @@ draw_depedv_wall_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
 }
 
 void
-draw_depedv_wall_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
+draw_wall_left_depedv (ALLEGRO_BITMAP *bitmap, struct pos *p,
                        enum em em, enum vm vm)
 {
   switch (wall_correlation (p)) {

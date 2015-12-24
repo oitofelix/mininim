@@ -25,6 +25,14 @@
 /* constants */
 #define LOOSE_FLOOR_RESISTENCE 0
 
+/* dungeon cga */
+#define DC_LOOSE_FLOOR_BASE_01 "data/loose-floor/dc-base-01.png"
+#define DC_LOOSE_FLOOR_LEFT_01 "data/loose-floor/dc-left-01.png"
+#define DC_LOOSE_FLOOR_RIGHT_01 "data/loose-floor/dc-right-01.png"
+#define DC_LOOSE_FLOOR_BASE_02 "data/loose-floor/dc-base-02.png"
+#define DC_LOOSE_FLOOR_LEFT_02 "data/loose-floor/dc-left-02.png"
+#define DC_LOOSE_FLOOR_RIGHT_02 "data/loose-floor/dc-right-02.png"
+
 /* dungeon ega */
 #define DE_LOOSE_FLOOR_BASE_01 "data/loose-floor/de-base-01.png"
 #define DE_LOOSE_FLOOR_LEFT_01 "data/loose-floor/de-left-01.png"

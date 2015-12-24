@@ -20,6 +20,9 @@
 #ifndef MININIM_WINDOW_H
 #define MININIM_WINDOW_H
 
+/* dungeon cga */
+#define DC_WINDOW "data/window/dc.png"
+
 /* dungeon ega */
 #define DE_WINDOW "data/window/de.png"
 

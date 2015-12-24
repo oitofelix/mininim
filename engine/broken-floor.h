@@ -23,6 +23,11 @@
 #include "kernel/audio.h"
 #include "physics.h"
 
+/* dungeon cga */
+#define DC_BROKEN_FLOOR_LEFT "data/broken-floor/dc-left.png"
+#define DC_BROKEN_FLOOR_RIGHT "data/broken-floor/dc-right.png"
+#define DC_BROKEN_FLOOR_FRONT "data/broken-floor/dc-front.png"
+
 /* dungeon ega */
 #define DE_BROKEN_FLOOR_LEFT "data/broken-floor/de-left.png"
 #define DE_BROKEN_FLOOR_RIGHT "data/broken-floor/de-right.png"

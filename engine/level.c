@@ -209,31 +209,6 @@ process_keys (void)
       && is_kid_dead (&current_kid->f))
     kid_resurrect (current_kid);
 
-  /* Restart level after death */
-  if (is_kid_dead (&get_kid_by_id (0)->f)) {
-    al_start_timer (death_timer);
-
-    int64_t t = al_get_timer_count (death_timer);
-
-    if (t == 12) sample_death = true;
-
-    if (t >= 60) {
-      if (t == 60) key.keyboard.keycode = 0;
-      if (t < 240 || t % 12 < 8) {
-        if (t >= 252 && t % 12 == 0) sample_press_key = true;
-        xasprintf (&text, "Press Button to Continue");
-        draw_bottom_text (NULL, text);
-        al_free (text);
-      } else draw_bottom_text (NULL, "");
-
-      if (key.keyboard.keycode) quit_anim = RESTART_LEVEL;
-    }
-  } else if (al_get_timer_started (death_timer)) {
-    al_stop_timer (death_timer);
-    al_set_timer_count (death_timer, 0);
-    draw_bottom_text (NULL, NULL);
-  }
-
   /* HOME: camera on kid */
   if (was_key_pressed (ALLEGRO_KEY_HOME, 0, 0, true))
     room_view = current_kid->f.c.room;
@@ -380,10 +355,13 @@ process_keys (void)
   if (was_key_pressed (ALLEGRO_KEY_F11, 0, 0, true)) {
     char *em_str = NULL;
 
+  next_em:
     switch (em) {
     case DUNGEON: em = PALACE; em_str = "PALACE"; break;
     case PALACE: em = DUNGEON; em_str = "DUNGEON"; break;
     }
+
+    if (vm == CGA && em == PALACE) goto next_em;
 
     xasprintf (&text, "ENVIRONMENT MODE: %s", em_str);
     draw_bottom_text (NULL, text);
@@ -394,15 +372,43 @@ process_keys (void)
   if (was_key_pressed (ALLEGRO_KEY_F12, 0, 0, true)) {
     char *vm_str = NULL;
 
+  next_vm:
     switch (vm) {
-    case CGA: break;
-    case EGA: vm = VGA; vm_str = "VGA"; break;
+    case CGA: vm = VGA; vm_str = "VGA"; break;
+    case EGA: vm = CGA; vm_str = "CGA"; break;
     case VGA: vm = EGA; vm_str = "EGA"; break;
     }
+
+    if (vm == CGA && em == PALACE) goto next_vm;
 
     xasprintf (&text, "VIDEO MODE: %s", vm_str);
     draw_bottom_text (NULL, text);
     al_free (text);
+  }
+
+  /* Restart level after death */
+  if (is_kid_dead (&get_kid_by_id (0)->f)) {
+    al_start_timer (death_timer);
+
+    int64_t t = al_get_timer_count (death_timer);
+
+    if (t == 12) sample_death = true;
+
+    if (t >= 60) {
+      if (t == 60) key.keyboard.keycode = 0;
+      if (t < 240 || t % 12 < 8) {
+        if (t >= 252 && t % 12 == 0) sample_press_key = true;
+        xasprintf (&text, "Press Button to Continue");
+        draw_bottom_text (NULL, text);
+        al_free (text);
+      } else draw_bottom_text (NULL, "");
+
+      if (key.keyboard.keycode) quit_anim = RESTART_LEVEL;
+    }
+  } else if (al_get_timer_started (death_timer)) {
+    al_stop_timer (death_timer);
+    al_set_timer_count (death_timer, 0);
+    draw_bottom_text (NULL, NULL);
   }
 
   if (room_view == 0) room_view = prev_room;

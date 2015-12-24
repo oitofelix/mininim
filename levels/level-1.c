@@ -20,8 +20,37 @@
 #include "kernel/video.h"
 #include "engine/physics.h"
 #include "engine/level.h"
+#include "engine/kid/kid.h"
+
+static void next_level (int lv, struct pos *exit_door_pos);
+static void start (void);
+static struct level level_1;
+
+void
+play_level_1 (void)
+{
+  next_level (1, NULL);
+  play_level (&level_1);
+}
+
+static void
+start (void)
+{
+  create_kid (NULL);
+  create_kid (&kid[0]);
+}
+
+static void
+next_level (int number, struct pos *exit_door_pos)
+{
+  return;
+}
 
 static struct level level_1 = {
+  .next_level = next_level,
+  .start = start,
+  .number = 1,
+
   .con = {
     [0] =
     {{{WALL}, {WALL}, {WALL}, {WALL}, {WALL},
@@ -124,9 +153,3 @@ static struct level level_1 = {
     [4] = {{23,1,4}, false},
   }
 };
-
-void
-play_level_1 (void)
-{
-  play_level (&level_1);
-}

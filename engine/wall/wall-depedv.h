@@ -69,11 +69,11 @@
 
 void load_wall_depedv (void);
 void unload_wall_depedv (void);
-void draw_depedv_wall (ALLEGRO_BITMAP *bitmap, struct pos *p,
+void draw_wall_depedv (ALLEGRO_BITMAP *bitmap, struct pos *p,
                          enum em em, enum vm vm);
-void draw_depedv_wall_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
+void draw_wall_base_depedv (ALLEGRO_BITMAP *bitmap, struct pos *p,
                               enum em em, enum vm vm);
-void draw_depedv_wall_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
+void draw_wall_left_depedv (ALLEGRO_BITMAP *bitmap, struct pos *p,
                               enum em em, enum vm vm);
 
 struct coord *wall_random_block_coord (struct pos *p, struct coord *c);

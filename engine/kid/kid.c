@@ -323,7 +323,10 @@ draw_kid_frame (ALLEGRO_BITMAP *bitmap, struct anim *k,
   }
 
   switch (vm) {
-  case CGA: break;
+  case CGA:
+    f.b = apply_palette (f.b, c_palette);
+    xf.b = apply_palette (xf.b, c_palette);
+    break;
   case EGA:
     f.b = apply_palette (f.b, e_palette);
     xf.b = apply_palette (xf.b, e_palette);
@@ -385,6 +388,23 @@ e_palette (ALLEGRO_COLOR c)
   if (color_eq (c, V_KID_CLOTHES_COLOR_01)) return E_KID_CLOTHES_COLOR_01;
   if (color_eq (c, V_KID_CLOTHES_COLOR_02)) return E_KID_CLOTHES_COLOR_02;
   if (color_eq (c, V_KID_EYE_COLOR)) return E_KID_EYE_COLOR;
+  if (color_eq (c, V_BLOOD_COLOR_01)
+      || color_eq (c, V_BLOOD_COLOR_02)) return E_BLOOD_COLOR;
+  return c;
+}
+
+ALLEGRO_COLOR
+c_palette (ALLEGRO_COLOR c)
+{
+  if (color_eq (c, V_KID_HAIR_COLOR_01)) return C_KID_HAIR_COLOR_01;
+  if (color_eq (c, V_KID_HAIR_COLOR_02)) return C_KID_HAIR_COLOR_02;
+  if (color_eq (c, V_KID_SKIN_COLOR_01)
+      || color_eq (c, V_KID_SKIN_COLOR_02)) return C_KID_SKIN_COLOR;
+  if (color_eq (c, V_KID_CLOTHES_COLOR_01)) return C_KID_CLOTHES_COLOR_01;
+  if (color_eq (c, V_KID_CLOTHES_COLOR_02)) return C_KID_CLOTHES_COLOR_02;
+  if (color_eq (c, V_KID_EYE_COLOR)) return C_KID_EYE_COLOR;
+  if (color_eq (c, V_BLOOD_COLOR_01)
+      || color_eq (c, V_BLOOD_COLOR_02)) return C_BLOOD_COLOR;
   return c;
 }
 

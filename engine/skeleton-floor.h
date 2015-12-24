@@ -23,6 +23,10 @@
 #include "kernel/audio.h"
 #include "physics.h"
 
+/* dungeon cga */
+#define DC_SKELETON_FLOOR_LEFT "data/skeleton-floor/dc-left.png"
+#define DC_SKELETON_FLOOR_RIGHT "data/skeleton-floor/dc-right.png"
+
 /* dungeon ega */
 #define DE_SKELETON_FLOOR_LEFT "data/skeleton-floor/de-left.png"
 #define DE_SKELETON_FLOOR_RIGHT "data/skeleton-floor/de-right.png"

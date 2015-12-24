@@ -30,6 +30,10 @@
 #include "door.h"
 #include "level-door.h"
 
+/* dungeon cga */
+ALLEGRO_BITMAP *dc_door_left, *dc_door_right, *dc_door_pole,
+  *dc_door_top, *dc_door_grid, *dc_door_grid_tip;
+
 /* dungeon ega */
 ALLEGRO_BITMAP *de_door_left, *de_door_right, *de_door_pole,
   *de_door_top, *de_door_grid, *de_door_grid_tip;
@@ -58,6 +62,14 @@ size_t door_nmemb = 0;
 void
 load_door (void)
 {
+  /* dungeon cga */
+  dc_door_left = load_bitmap (DC_DOOR_LEFT);
+  dc_door_right = load_bitmap (DC_DOOR_RIGHT);
+  dc_door_pole = load_bitmap (DC_DOOR_POLE);
+  dc_door_top = load_bitmap (DC_DOOR_TOP);
+  dc_door_grid = load_bitmap (DC_DOOR_GRID);
+  dc_door_grid_tip = load_bitmap (DC_DOOR_GRID_TIP);
+
   /* dungeon ega */
   de_door_left = load_bitmap (DE_DOOR_LEFT);
   de_door_right = load_bitmap (DE_DOOR_RIGHT);
@@ -94,6 +106,14 @@ load_door (void)
 void
 unload_door (void)
 {
+  /* dungeon cga */
+  al_destroy_bitmap (dc_door_left);
+  al_destroy_bitmap (dc_door_right);
+  al_destroy_bitmap (dc_door_pole);
+  al_destroy_bitmap (dc_door_top);
+  al_destroy_bitmap (dc_door_grid);
+  al_destroy_bitmap (dc_door_grid_tip);
+
   /* dungeon ega */
   al_destroy_bitmap (de_door_left);
   al_destroy_bitmap (de_door_right);
@@ -332,7 +352,7 @@ draw_door_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
   switch (em) {
   case DUNGEON:
     switch (vm) {
-    case CGA: break;
+    case CGA: door_left = dc_door_left; break;
     case EGA: door_left = de_door_left; break;
     case VGA: door_left = dv_door_left; break;
     }
@@ -364,7 +384,10 @@ draw_door_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
   switch (em) {
   case DUNGEON:
     switch (vm) {
-    case CGA: break;
+    case CGA:
+      door_right = dc_door_right;
+      door_top = dc_door_top;
+      break;
     case EGA:
       door_right = de_door_right;
       door_top = de_door_top;
@@ -407,7 +430,7 @@ draw_door_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f,
   switch (em) {
   case DUNGEON:
     switch (vm) {
-    case CGA: break;
+    case CGA: door_pole = dc_door_pole; break;
     case EGA: door_pole = de_door_pole; break;
     case VGA: door_pole = dv_door_pole; break;
     }
@@ -464,7 +487,10 @@ draw_door_grid (ALLEGRO_BITMAP *bitmap, struct pos *p, int i,
   switch (em) {
   case DUNGEON:
     switch (vm) {
-    case CGA: break;
+    case CGA:
+      door_grid = dc_door_grid;
+      door_grid_tip = dc_door_grid_tip;
+      break;
     case EGA:
       door_grid = de_door_grid;
       door_grid_tip = de_door_grid_tip;

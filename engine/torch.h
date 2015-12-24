@@ -20,6 +20,9 @@
 #ifndef MININIM_TORCH_H
 #define MININIM_TORCH_H
 
+/* dungeon cga */
+#define DC_TORCH "data/torch/dc.png"
+
 /* dungeon ega */
 #define DE_TORCH "data/torch/de.png"
 

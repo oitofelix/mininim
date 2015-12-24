@@ -24,6 +24,18 @@
 
 #define CHOPPER_WAIT 10
 
+/* dungeon cga */
+#define DC_CHOPPER_01 "data/chopper/dc-01.png"
+#define DC_CHOPPER_FG_01 "data/chopper/dc-fg-01.png"
+#define DC_CHOPPER_02 "data/chopper/dc-02.png"
+#define DC_CHOPPER_FG_02 "data/chopper/dc-fg-02.png"
+#define DC_CHOPPER_03 "data/chopper/dc-03.png"
+#define DC_CHOPPER_FG_03 "data/chopper/dc-fg-03.png"
+#define DC_CHOPPER_04 "data/chopper/dc-04.png"
+#define DC_CHOPPER_FG_04 "data/chopper/dc-fg-04.png"
+#define DC_CHOPPER_05 "data/chopper/dc-05.png"
+#define DC_CHOPPER_FG_05 "data/chopper/dc-fg-05.png"
+
 /* dungeon ega */
 #define DE_CHOPPER_01 "data/chopper/de-01.png"
 #define DE_CHOPPER_FG_01 "data/chopper/de-fg-01.png"
@@ -107,34 +119,7 @@ void compute_choppers (void);
 void sample_choppers (void);
 void draw_chopper_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
                         enum em em, enum vm vm);
-void draw_chopper_left_01 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
-                           enum em em, enum vm vm);
-void draw_chopper_left_02 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
-                           enum em em, enum vm vm);
-void draw_chopper_left_03 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
-                           enum em em, enum vm vm);
-void draw_chopper_left_04 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
-                           enum em em, enum vm vm);
-void draw_chopper_left_05 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
-                           enum em em, enum vm vm);
 void draw_chopper_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
                       enum em em, enum vm vm);
-void draw_chopper_fg_01 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
-                         enum em em, enum vm vm);
-void draw_chopper_fg_02 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
-                         enum em em, enum vm vm);
-void draw_chopper_fg_03 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
-                         enum em em, enum vm vm);
-void draw_chopper_fg_04 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
-                         enum em em, enum vm vm);
-void draw_chopper_fg_05 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
-                         enum em em, enum vm vm);
-struct coord *chopper_coord (struct pos *p, struct coord *c);
-struct coord * chopper_blood_01_coord (struct pos *p, struct coord *c);
-struct coord * chopper_blood_02_coord (struct pos *p, struct coord *c);
-struct coord * chopper_blood_03_coord (struct pos *p, struct coord *c);
-struct coord * chopper_blood_04_coord (struct pos *p, struct coord *c);
-struct coord * chopper_blood_05_coord (struct pos *p, struct coord *c);
-ALLEGRO_COLOR blood_palette (ALLEGRO_COLOR c);
 
 #endif	/* MININIM_CHOPPER_H */

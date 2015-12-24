@@ -33,6 +33,10 @@
 #include "spikes-floor.h"
 #include "broken-floor.h"
 
+/* dungeon cga */
+ALLEGRO_BITMAP *dc_broken_floor_left, *dc_broken_floor_right,
+  *dc_broken_floor_front;
+
 /* dungeon ega */
 ALLEGRO_BITMAP *de_broken_floor_left, *de_broken_floor_right,
   *de_broken_floor_front;
@@ -52,6 +56,11 @@ ALLEGRO_BITMAP *pv_broken_floor_left, *pv_broken_floor_right,
 void
 load_broken_floor (void)
 {
+  /* dungeon cga */
+  dc_broken_floor_left = load_bitmap (DC_BROKEN_FLOOR_LEFT);
+  dc_broken_floor_right = load_bitmap (DC_BROKEN_FLOOR_RIGHT);
+  dc_broken_floor_front = load_bitmap (DC_BROKEN_FLOOR_FRONT);
+
   /* dungeon ega */
   de_broken_floor_left = load_bitmap (DE_BROKEN_FLOOR_LEFT);
   de_broken_floor_right = load_bitmap (DE_BROKEN_FLOOR_RIGHT);
@@ -76,6 +85,11 @@ load_broken_floor (void)
 void
 unload_broken_floor (void)
 {
+  /* dungeon cga */
+  al_destroy_bitmap (dc_broken_floor_left);
+  al_destroy_bitmap (dc_broken_floor_right);
+  al_destroy_bitmap (dc_broken_floor_front);
+
   /* dungeon ega */
   al_destroy_bitmap (de_broken_floor_left);
   al_destroy_bitmap (de_broken_floor_right);
@@ -115,7 +129,7 @@ draw_broken_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
   switch (em) {
   case DUNGEON:
     switch (vm) {
-    case CGA: break;
+    case CGA: broken_floor_left = dc_broken_floor_left; break;
     case EGA: broken_floor_left = de_broken_floor_left; break;
     case VGA: broken_floor_left = dv_broken_floor_left; break;
     }
@@ -142,7 +156,7 @@ draw_broken_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
   switch (em) {
   case DUNGEON:
     switch (vm) {
-    case CGA: break;
+    case CGA: broken_floor_right = dc_broken_floor_right; break;
     case EGA: broken_floor_right = de_broken_floor_right; break;
     case VGA: broken_floor_right = dv_broken_floor_right; break;
     }
@@ -169,7 +183,7 @@ draw_broken_floor_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
   switch (em) {
   case DUNGEON:
     switch (vm) {
-    case CGA: break;
+    case CGA: broken_floor_front = dc_broken_floor_front; break;
     case EGA: broken_floor_front = de_broken_floor_front; break;
     case VGA: broken_floor_front = dv_broken_floor_front; break;
     }
@@ -223,7 +237,11 @@ create_broken_floor_bitmap (enum em em, enum vm vm)
   switch (em) {
   case DUNGEON:
     switch (vm) {
-    case CGA: break;
+    case CGA:
+      broken_floor_left = dc_broken_floor_left;
+      broken_floor_right = dc_broken_floor_right;
+      floor_base = dc_floor_base;
+      break;
     case EGA:
       broken_floor_left = de_broken_floor_left;
       broken_floor_right = de_broken_floor_right;

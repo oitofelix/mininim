@@ -29,6 +29,9 @@
 #include "room.h"
 #include "torch.h"
 
+/* dungeon cga */
+ALLEGRO_BITMAP *dc_torch;
+
 /* dungeon ega */
 ALLEGRO_BITMAP *de_torch;
 
@@ -44,6 +47,9 @@ ALLEGRO_BITMAP *pv_torch;
 void
 load_torch (void)
 {
+  /* dungeon cga */
+  dc_torch = load_bitmap (DC_TORCH);
+
   /* dungeon ega */
   de_torch = load_bitmap (DE_TORCH);
 
@@ -60,6 +66,9 @@ load_torch (void)
 void
 unload_torch (void)
 {
+  /* dungeon cga */
+  al_destroy_bitmap (dc_torch);
+
   /* dungeon vga */
   al_destroy_bitmap (de_torch);
 
@@ -82,7 +91,7 @@ draw_torch (ALLEGRO_BITMAP *bitmap, struct pos *p,
   switch (em) {
   case DUNGEON:
     switch (vm) {
-    case CGA: break;
+    case CGA: torch = dc_torch; break;
     case EGA: torch = de_torch; break;
     case VGA: torch = dv_torch; break;
     }

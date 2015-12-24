@@ -20,6 +20,14 @@
 #ifndef MININIM_POTION_H
 #define MININIM_POTION_H
 
+/* dungeon cga */
+#define DC_SMALL_POTION "data/potion/dc-small.png"
+#define DC_BIG_POTION "data/potion/dc-big.png"
+
+/* palace cga */
+#define PC_SMALL_POTION "data/potion/pc-small.png"
+#define PC_BIG_POTION "data/potion/pc-big.png"
+
 /* dungeon ega */
 #define DE_SMALL_POTION "data/potion/de-small.png"
 #define DE_BIG_POTION "data/potion/de-big.png"

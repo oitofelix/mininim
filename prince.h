@@ -66,6 +66,13 @@
 #define E_KID_CLOTHES_COLOR_01 (al_map_rgb (255, 255, 255))
 #define E_KID_CLOTHES_COLOR_02 (al_map_rgb (170, 170, 170))
 
+#define C_KID_HAIR_COLOR_01 (al_map_rgb (255, 255, 255))
+#define C_KID_HAIR_COLOR_02 (al_map_rgb (85, 255, 255))
+#define C_KID_SKIN_COLOR (al_map_rgb (255, 85, 255))
+#define C_KID_EYE_COLOR (al_map_rgb (0, 0, 0))
+#define C_KID_CLOTHES_COLOR_01 (al_map_rgb (255, 255, 255))
+#define C_KID_CLOTHES_COLOR_02 (al_map_rgb (85, 255, 255))
+
 #define KID_SHADOW_CLOTHES_COLOR (al_map_rgba (64, 64 , 64, 0))
 #define KID_SHADOW_CLOTHES_COLOR_2 (al_map_rgba (32, 32, 32, 0))
 
@@ -74,7 +81,10 @@
 #define FLOAT_POTION_BUBBLE_COLOR (al_map_rgb (84, 252, 84))
 #define FLIP_POTION_BUBBLE_COLOR (al_map_rgb (255, 255, 0))
 
-#define BLOOD_COLOR (al_map_rgb (228, 0, 0))
+#define C_BLOOD_COLOR (al_map_rgb (255, 85, 255))
+#define E_BLOOD_COLOR (al_map_rgb (255, 85, 85))
+#define V_BLOOD_COLOR_01 (al_map_rgb (228, 0, 0))
+#define V_BLOOD_COLOR_02 (al_map_rgb (184, 0, 0))
 
 #define RRED (al_map_rgb (prandom (255), 0, 0))
 #define RGREEN (al_map_rgb (0, prandom (255), 0))
@@ -94,12 +104,22 @@
 #define PALACE_WALL_COLOR_06 (al_map_rgb (224, 168, 88))
 #define PALACE_WALL_COLOR_07 (al_map_rgb (216, 168, 96))
 
+#define C_FIRE_COLOR_01 (al_map_rgb (255, 85, 255))
+#define C_FIRE_COLOR_02 (al_map_rgb (255, 255, 255))
 #define E_FIRE_COLOR_01 (al_map_rgb (255, 85, 85))
 #define E_FIRE_COLOR_02 (al_map_rgb (255, 255, 85))
 #define V_FIRE_COLOR_01 (al_map_rgb (252, 132, 0))
 #define V_FIRE_COLOR_02 (al_map_rgb (252, 252, 0))
 
 #define LIVES_RECT_COLOR (al_map_rgba (0, 0, 0, 170))
+
+#define DV_BRICKS_COLOR (al_map_rgb (48, 68, 88))
+#define DE_BRICKS_COLOR (al_map_rgb (80, 80, 80))
+#define DC_BRICKS_COLOR (al_map_rgb (85, 255, 255))
+
+#define PV_BRICKS_COLOR (al_map_rgb (12, 56, 88))
+#define PE_BRICKS_COLOR (al_map_rgb (0, 0, 160))
+#define PC_BRICKS_COLOR (al_map_rgb (85, 255, 255))
 
 /* environment mode */
 enum em {

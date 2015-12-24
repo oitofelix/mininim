@@ -26,10 +26,14 @@
 #include "engine/room.h"
 #include "wall-depedv.h"
 #include "wall-pv.h"
+#include "wall-dcpc.h"
 #include "wall.h"
 
 /* wall cache */
 static ALLEGRO_BITMAP *wall_cache;
+
+/* dungeon cga */
+ALLEGRO_BITMAP *dc_wall_face, *dc_wall_face_top;
 
 /* dungeon ega */
 ALLEGRO_BITMAP *de_wall_face, *de_wall_face_top;
@@ -46,6 +50,10 @@ ALLEGRO_BITMAP *pv_wall_face, *pv_wall_face_top;
 void
 load_wall (void)
 {
+  /* dungeon cga */
+  dc_wall_face = load_bitmap (DC_WALL_FACE);
+  dc_wall_face_top = load_bitmap (DC_WALL_FACE_TOP);
+
   /* dungeon ega */
   de_wall_face = load_bitmap (DE_WALL_FACE);
   de_wall_face_top = load_bitmap (DE_WALL_FACE_TOP);
@@ -63,6 +71,7 @@ load_wall (void)
   pv_wall_face_top = load_bitmap (PV_WALL_FACE_TOP);
 
   /* modules */
+  load_wall_dcpc ();
   load_wall_depedv ();
   load_wall_pv ();
 
@@ -73,6 +82,10 @@ load_wall (void)
 void
 unload_wall (void)
 {
+  /* dungeon cga */
+  al_destroy_bitmap (dc_wall_face);
+  al_destroy_bitmap (dc_wall_face_top);
+
   /* dungeon ega */
   al_destroy_bitmap (de_wall_face);
   al_destroy_bitmap (de_wall_face_top);
@@ -90,6 +103,7 @@ unload_wall (void)
   al_destroy_bitmap (pv_wall_face_top);
 
   /* modules */
+  unload_wall_dcpc ();
   unload_wall_depedv ();
   unload_wall_pv ();
 
@@ -104,16 +118,16 @@ draw_wall (ALLEGRO_BITMAP *bitmap, struct pos *p,
   switch (em) {
   case DUNGEON:
     switch (vm) {
-    case CGA: break;
+    case CGA: draw_wall_dcpc (bitmap, p, em); break;
     case EGA: case VGA:
-      draw_depedv_wall (bitmap, p, em, vm); break;
+      draw_wall_depedv (bitmap, p, em, vm); break;
     }
     break;
   case PALACE:
     switch (vm) {
     case CGA: break;
-    case EGA: draw_depedv_wall (bitmap, p, em, vm); break;
-    case VGA: draw_pv_wall (bitmap, p); break;
+    case EGA: draw_wall_depedv (bitmap, p, em, vm); break;
+    case VGA: draw_wall_pv (bitmap, p); break;
     }
     break;
   }
@@ -126,16 +140,16 @@ draw_wall_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
   switch (em) {
   case DUNGEON:
     switch (vm) {
-    case CGA: break;
+    case CGA: draw_wall_base_dcpc (bitmap, p, em); break;
     case EGA: case VGA:
-      draw_depedv_wall_base (bitmap, p, em, vm); break;
+      draw_wall_base_depedv (bitmap, p, em, vm); break;
     }
     break;
   case PALACE:
     switch (vm) {
     case CGA: break;
-    case EGA: draw_depedv_wall_base (bitmap, p, em, vm); break;
-    case VGA: draw_pv_wall_base (bitmap, p); break;
+    case EGA: draw_wall_base_depedv (bitmap, p, em, vm); break;
+    case VGA: draw_wall_base_pv (bitmap, p); break;
     }
     break;
   }
@@ -148,16 +162,16 @@ draw_wall_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
   switch (em) {
   case DUNGEON:
     switch (vm) {
-    case CGA: break;
+    case CGA: draw_wall_left_dcpc (bitmap, p, em); break;
     case EGA: case VGA:
-      draw_depedv_wall_left (bitmap, p, em, vm); break;
+      draw_wall_left_depedv (bitmap, p, em, vm); break;
     }
     break;
   case PALACE:
     switch (vm) {
     case CGA: break;
-    case EGA: draw_depedv_wall_left (bitmap, p, em, vm); break;
-    case VGA: draw_pv_wall_left (bitmap, p); break;
+    case EGA: draw_wall_left_depedv (bitmap, p, em, vm); break;
+    case VGA: draw_wall_left_pv (bitmap, p); break;
     }
     break;
   }
@@ -191,7 +205,11 @@ draw_wall_face (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case DUNGEON:
     wall_face_top_coord = d_wall_face_top_coord;
     switch (vm) {
-    case CGA: break;
+    case CGA:
+      wall_face_top_coord = dc_wall_face_top_coord;
+      wall_face = dc_wall_face;
+      wall_face_top = dc_wall_face_top;
+      break;
     case EGA:
       wall_face = de_wall_face;
       wall_face_top = de_wall_face_top;
@@ -300,6 +318,15 @@ wall_face_coord (struct pos *p, struct coord *c)
 {
   c->x = PLACE_WIDTH * (p->place + 1);
   c->y = PLACE_HEIGHT * p->floor + 3;
+  c->room = p->room;
+  return c;
+}
+
+struct coord *
+dc_wall_face_top_coord (struct pos *p, struct coord *c)
+{
+  c->x = PLACE_WIDTH * (p->place + 1);
+  c->y = PLACE_HEIGHT * p->floor - 10;
   c->room = p->room;
   return c;
 }

@@ -29,6 +29,10 @@
 #include "floor.h"
 #include "closer-floor.h"
 
+/* dungeon cga */
+ALLEGRO_BITMAP *dc_unpressed_closer_floor_base, *dc_pressed_closer_floor_base,
+  *dc_pressed_closer_floor_right;
+
 /* dungeon ega */
 ALLEGRO_BITMAP *de_unpressed_closer_floor_base, *de_pressed_closer_floor_base,
   *de_pressed_closer_floor_right;
@@ -54,6 +58,11 @@ size_t closer_floor_nmemb = 0;
 void
 load_closer_floor (void)
 {
+  /* dungeon cga */
+  dc_unpressed_closer_floor_base = load_bitmap (DC_UNPRESSED_CLOSER_FLOOR_BASE);
+  dc_pressed_closer_floor_base = load_bitmap (DC_PRESSED_CLOSER_FLOOR_BASE);
+  dc_pressed_closer_floor_right = load_bitmap (DC_PRESSED_CLOSER_FLOOR_RIGHT);
+
   /* dungeon ega */
   de_unpressed_closer_floor_base = load_bitmap (DE_UNPRESSED_CLOSER_FLOOR_BASE);
   de_pressed_closer_floor_base = load_bitmap (DE_PRESSED_CLOSER_FLOOR_BASE);
@@ -78,6 +87,11 @@ load_closer_floor (void)
 void
 unload_closer_floor (void)
 {
+  /* dungeon cga */
+  al_destroy_bitmap (dc_unpressed_closer_floor_base);
+  al_destroy_bitmap (dc_pressed_closer_floor_base);
+  al_destroy_bitmap (dc_pressed_closer_floor_right);
+
   /* dungeon ega */
   al_destroy_bitmap (de_unpressed_closer_floor_base);
   al_destroy_bitmap (de_pressed_closer_floor_base);
@@ -257,7 +271,7 @@ draw_pressed_closer_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
   switch (em) {
   case DUNGEON:
     switch (vm) {
-    case CGA: break;
+    case CGA: pressed_closer_floor_base = dc_pressed_closer_floor_base; break;
     case EGA: pressed_closer_floor_base = de_pressed_closer_floor_base; break;
     case VGA: pressed_closer_floor_base = dv_pressed_closer_floor_base; break;
     }
@@ -293,7 +307,7 @@ draw_pressed_closer_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
   switch (em) {
   case DUNGEON:
     switch (vm) {
-    case CGA: break;
+    case CGA: pressed_closer_floor_left = dc_floor_left; break;
     case EGA: pressed_closer_floor_left = de_floor_left; break;
     case VGA: pressed_closer_floor_left = dv_floor_left; break;
     }
@@ -322,7 +336,10 @@ draw_pressed_closer_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
   switch (em) {
   case DUNGEON:
     switch (vm) {
-    case CGA: break;
+    case CGA:
+      floor_right = dc_floor_right;
+      pressed_closer_floor_right = dc_pressed_closer_floor_right;
+      break;
     case EGA:
       floor_right = de_floor_right;
       pressed_closer_floor_right = de_pressed_closer_floor_right;
@@ -374,7 +391,7 @@ draw_unpressed_closer_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
   switch (em) {
   case DUNGEON:
     switch (vm) {
-    case CGA: break;
+    case CGA: unpressed_closer_floor_base = dc_unpressed_closer_floor_base; break;
     case EGA: unpressed_closer_floor_base = de_unpressed_closer_floor_base; break;
     case VGA: unpressed_closer_floor_base = dv_unpressed_closer_floor_base; break;
     }

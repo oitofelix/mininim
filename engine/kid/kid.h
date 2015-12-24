@@ -93,6 +93,7 @@ void draw_kid_frame (ALLEGRO_BITMAP *bitmap, struct anim *k,
 ALLEGRO_COLOR colorful_shadow_palette (ALLEGRO_COLOR c);
 ALLEGRO_COLOR phantom_shadow_palette (ALLEGRO_COLOR c);
 ALLEGRO_COLOR e_palette (ALLEGRO_COLOR c);
+ALLEGRO_COLOR c_palette (ALLEGRO_COLOR c);
 void increase_kid_current_lives (struct anim *k);
 void increase_kid_total_lives (struct anim *k);
 void float_kid (struct anim *k);

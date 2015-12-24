@@ -27,6 +27,7 @@
 #include "fire.h"
 
 static ALLEGRO_COLOR e_fire_palette (ALLEGRO_COLOR c);
+static ALLEGRO_COLOR c_fire_palette (ALLEGRO_COLOR c);
 
 /* vga */
 static ALLEGRO_BITMAP *v_fire_01, *v_fire_02, *v_fire_03, *v_fire_04,
@@ -80,7 +81,7 @@ get_fire_frame (int i, enum vm vm)
   }
 
   switch (vm) {
-  case CGA: break;
+  case CGA: fire = apply_palette (fire, c_fire_palette); break;
   case EGA: fire = apply_palette (fire, e_fire_palette); break;
   case VGA: break;
   }
@@ -132,5 +133,13 @@ e_fire_palette (ALLEGRO_COLOR c)
 {
   if (color_eq (c, V_FIRE_COLOR_01)) return E_FIRE_COLOR_01;
   else if (color_eq (c, V_FIRE_COLOR_02)) return E_FIRE_COLOR_02;
+  else return c;
+}
+
+static ALLEGRO_COLOR
+c_fire_palette (ALLEGRO_COLOR c)
+{
+  if (color_eq (c, V_FIRE_COLOR_01)) return C_FIRE_COLOR_01;
+  else if (color_eq (c, V_FIRE_COLOR_02)) return C_FIRE_COLOR_02;
   else return c;
 }

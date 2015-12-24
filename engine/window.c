@@ -29,6 +29,9 @@
 #include "room.h"
 #include "window.h"
 
+/* dungeon cga */
+ALLEGRO_BITMAP *dc_window;
+
 /* dungeon ega */
 ALLEGRO_BITMAP *de_window;
 
@@ -44,6 +47,9 @@ ALLEGRO_BITMAP *pv_window;
 void
 load_window (void)
 {
+  /* dungeon cga */
+  dc_window = load_bitmap (DC_WINDOW);
+
   /* dungeon ega */
   de_window = load_bitmap (DE_WINDOW);
 
@@ -60,6 +66,9 @@ load_window (void)
 void
 unload_window (void)
 {
+  /* dungeon cga */
+  al_destroy_bitmap (dc_window);
+
   /* dungeon ega */
   al_destroy_bitmap (de_window);
 
@@ -82,7 +91,7 @@ draw_window (ALLEGRO_BITMAP *bitmap, struct pos *p,
   switch (em) {
   case DUNGEON:
     switch (vm) {
-    case CGA: break;
+    case CGA: window = dc_window; break;
     case EGA: window = de_window; break;
     case VGA: window = dv_window; break;
     }

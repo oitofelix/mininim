@@ -20,6 +20,10 @@
 #ifndef MININIM_WALL_H
 #define MININIM_WALL_H
 
+/* dungeon cga */
+#define DC_WALL_FACE "data/wall/dc-face.png"
+#define DC_WALL_FACE_TOP "data/wall/dc-face-top.png"
+
 /* dungeon ega */
 #define DE_WALL_FACE "data/wall/de-face.png"
 #define DE_WALL_FACE_TOP "data/wall/de-face-top.png"
@@ -57,6 +61,7 @@ enum wall_correlation wall_correlation (struct pos *p);
 struct coord *wall_base_coord (struct pos *p, struct coord *c);
 struct coord *wall_coord (struct pos *p, struct coord *c);
 struct coord *wall_face_coord (struct pos *p, struct coord *c);
+struct coord *dc_wall_face_top_coord (struct pos *p, struct coord *c);
 struct coord *d_wall_face_top_coord (struct pos *p, struct coord *c);
 struct coord *p_wall_face_top_coord (struct pos *p, struct coord *c);
 

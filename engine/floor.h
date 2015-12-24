@@ -23,6 +23,18 @@
 #include "kernel/audio.h"
 #include "physics.h"
 
+/* dungeon cga */
+#define DC_FLOOR_LEFT "data/floor/dc-left.png"
+#define DC_FLOOR_RIGHT "data/floor/dc-right.png"
+#define DC_FLOOR_BASE "data/floor/dc-base.png"
+#define DC_FLOOR_CORNER_01 "data/floor/dc-corner-01.png"
+#define DC_FLOOR_CORNER_02 "data/floor/dc-corner-02.png"
+#define DC_FLOOR_CORNER_03 "data/floor/dc-corner-03.png"
+
+extern ALLEGRO_BITMAP *dc_floor_base, *dc_floor_left,
+  *dc_floor_right, *dc_floor_corner_01,
+  *dc_floor_corner_02, *dc_floor_corner_03;
+
 /* dungeon ega */
 #define DE_FLOOR_LEFT "data/floor/de-left.png"
 #define DE_FLOOR_RIGHT "data/floor/de-right.png"

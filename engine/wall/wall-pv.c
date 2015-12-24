@@ -27,7 +27,19 @@
 #include "wall.h"
 #include "wall-pv.h"
 
-static ALLEGRO_COLOR palace_wall_color_array[4][3][11];
+static ALLEGRO_COLOR wall_color_array[4][3][11];
+
+static ALLEGRO_COLOR wall_color (int i);
+static void compute_wall_color_array (int last_room, int room);
+static ALLEGRO_COLOR compute_wall_color (struct pos *p, int row, int col);
+static void draw_wall_brick (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                                int row, int col);
+static struct rect *wall_brick_rect (struct pos *p, int row, int col,
+                                            struct rect *r);
+static ALLEGRO_BITMAP *wall_mark (int i);
+static struct frame *wall_mark_frame (struct pos *p, int i,
+                                             struct frame *f);
+
 
 /* palace vga */
 ALLEGRO_BITMAP *pv_wall_mark_00, *pv_wall_mark_01, *pv_wall_mark_02,
@@ -56,7 +68,7 @@ load_wall_pv (void)
   pv_wall_mark_14 = load_bitmap (PV_WALL_MARK_14);
 
   /* callbacks */
-  register_room_callback (compute_palace_wall_color_array);
+  register_room_callback (compute_wall_color_array);
 }
 
 void
@@ -80,55 +92,55 @@ unload_wall_pv (void)
   al_destroy_bitmap (pv_wall_mark_14);
 
   /* callbacks */
-  remove_room_callback (compute_palace_wall_color_array);
+  remove_room_callback (compute_wall_color_array);
 }
 
 void
-draw_pv_wall (ALLEGRO_BITMAP *bitmap, struct pos *p)
+draw_wall_pv (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
-  draw_pv_wall_base (bitmap, p);
-  draw_pv_wall_left (bitmap, p);
+  draw_wall_base_pv (bitmap, p);
+  draw_wall_left_pv (bitmap, p);
   draw_wall_right (bitmap, p, PALACE, VGA);
 }
 
 void
-draw_pv_wall_base (ALLEGRO_BITMAP *bitmap, struct pos *p)
+draw_wall_base_pv (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
-  draw_pv_wall_brick (bitmap, p, 3, 0);
+  draw_wall_brick (bitmap, p, 3, 0);
   return;
 }
 
 void
-draw_pv_wall_left (ALLEGRO_BITMAP *bitmap, struct pos *p)
+draw_wall_left_pv (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
-  draw_pv_wall_brick (bitmap, p, 0, 0);
-  draw_pv_wall_brick (bitmap, p, 1, 0);
-  draw_pv_wall_brick (bitmap, p, 1, 1);
-  draw_pv_wall_brick (bitmap, p, 2, 0);
-  draw_pv_wall_brick (bitmap, p, 2, 1);
+  draw_wall_brick (bitmap, p, 0, 0);
+  draw_wall_brick (bitmap, p, 1, 0);
+  draw_wall_brick (bitmap, p, 1, 1);
+  draw_wall_brick (bitmap, p, 2, 0);
+  draw_wall_brick (bitmap, p, 2, 1);
   return;
 }
 
 void
-draw_pv_wall_brick (ALLEGRO_BITMAP *bitmap, struct pos *p,
+draw_wall_brick (ALLEGRO_BITMAP *bitmap, struct pos *p,
                     int row, int col)
 {
   struct rect r;
   struct frame f0, f1;
   f0.flip = f1.flip = 0;
 
-  ALLEGRO_COLOR c = palace_wall_color_array[p->floor][row][p->place + col];
-  palace_wall_brick_rect (p, row, col, &r);
+  ALLEGRO_COLOR c = wall_color_array[p->floor][row][p->place + col];
+  wall_brick_rect (p, row, col, &r);
   draw_filled_rect (bitmap, &r, c);
 
-  palace_wall_mark_frame (p, row, &f0);
-  palace_wall_mark_frame (p, row + 1, &f1);
+  wall_mark_frame (p, row, &f0);
+  wall_mark_frame (p, row + 1, &f1);
   draw_frame (bitmap, &f0);
   draw_frame (bitmap, &f1);
 }
 
 ALLEGRO_COLOR
-palace_wall_color (int i)
+wall_color (int i)
 {
   switch (i) {
   case 0: return PALACE_WALL_COLOR_00;
@@ -144,7 +156,7 @@ palace_wall_color (int i)
 }
 
 void
-compute_palace_wall_color_array (int last_room, int room)
+compute_wall_color_array (int last_room, int room)
 {
 	uint32_t orand_seed;
 	int floor, row, col;
@@ -163,8 +175,8 @@ compute_palace_wall_color_array (int last_room, int room)
 				do {
 					color = bcolor + prandom(3);
 				} while (color == ocolor);
-				palace_wall_color_array[floor][row][col] =
-          palace_wall_color (color);
+				wall_color_array[floor][row][col] =
+          wall_color (color);
 				ocolor = color;
 			}
 		}
@@ -174,18 +186,18 @@ compute_palace_wall_color_array (int last_room, int room)
 }
 
 ALLEGRO_COLOR
-compute_palace_wall_color (struct pos *p, int row, int col)
+compute_wall_color (struct pos *p, int row, int col)
 {
   int r;
   struct pos np; npos (p, &np);
   r = prandom_seq (np.room, np.floor * 4 * 11
                    + row * 11
                    + np.place + col, 11, 3);
-  return palace_wall_color ((row % 2 ? 0 : 4) + r);
+  return wall_color ((row % 2 ? 0 : 4) + r);
 }
 
 struct rect *
-palace_wall_brick_rect (struct pos *p, int row, int col,
+wall_brick_rect (struct pos *p, int row, int col,
                         struct rect *r)
 {
   r->c.room = p->room;
@@ -220,7 +232,7 @@ palace_wall_brick_rect (struct pos *p, int row, int col,
 }
 
 ALLEGRO_BITMAP *
-palace_wall_mark (int i)
+wall_mark (int i)
 {
   switch (i) {
   case 0: return pv_wall_mark_00;
@@ -243,34 +255,34 @@ palace_wall_mark (int i)
 }
 
 struct frame *
-palace_wall_mark_frame (struct pos *p, int i, struct frame *f)
+wall_mark_frame (struct pos *p, int i, struct frame *f)
 {
   int r = prandom_seq_pos (p, i, 1, 2);
   f->c.room = p->room;
 
   switch (i) {
   case 0:
-    f->b = palace_wall_mark (r);
+    f->b = wall_mark (r);
     f->c.x = PLACE_WIDTH * (p->place + 1) - 8;
     f->c.y = PLACE_HEIGHT * p->floor + 3;
     break;
   case 1:
-    f->b = palace_wall_mark (r + 3);
+    f->b = wall_mark (r + 3);
     f->c.x = PLACE_WIDTH * p->place;
     f->c.y = PLACE_HEIGHT * p->floor + 17;
     break;
   case 2:
-    f->b = palace_wall_mark (r + 6);
+    f->b = wall_mark (r + 6);
     f->c.x = PLACE_WIDTH * p->place;
     f->c.y = PLACE_HEIGHT * p->floor + 38;
     break;
   case 3:
-    f->b = palace_wall_mark (r + 9);
+    f->b = wall_mark (r + 9);
     f->c.x = PLACE_WIDTH * p->place;
     f->c.y = PLACE_HEIGHT * p->floor + 58;
     break;
   case 4:
-    f->b = palace_wall_mark (r + 12);
+    f->b = wall_mark (r + 12);
     f->c.x = PLACE_WIDTH * p->place;
     f->c.y = PLACE_HEIGHT * p->floor + 63;
     break;

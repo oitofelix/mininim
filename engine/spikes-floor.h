@@ -25,6 +25,25 @@
 /* constants */
 #define SPIKES_WAIT SECS_TO_SCYCLES (1)
 
+/* dungeon cga */
+#define DC_SPIKES_FLOOR_LEFT "data/spikes-floor/dc-left.png"
+#define DC_SPIKES_FLOOR_RIGHT "data/spikes-floor/dc-right.png"
+#define DC_SPIKES_LEFT_01 "data/spikes-floor/dc-spikes-left-01.png"
+#define DC_SPIKES_RIGHT_01 "data/spikes-floor/dc-spikes-right-01.png"
+#define DC_SPIKES_FG_01 "data/spikes-floor/dc-spikes-fg-01.png"
+#define DC_SPIKES_LEFT_02 "data/spikes-floor/dc-spikes-left-02.png"
+#define DC_SPIKES_RIGHT_02 "data/spikes-floor/dc-spikes-right-02.png"
+#define DC_SPIKES_FG_02 "data/spikes-floor/dc-spikes-fg-02.png"
+#define DC_SPIKES_LEFT_03 "data/spikes-floor/dc-spikes-left-03.png"
+#define DC_SPIKES_RIGHT_03 "data/spikes-floor/dc-spikes-right-03.png"
+#define DC_SPIKES_FG_03 "data/spikes-floor/dc-spikes-fg-03.png"
+#define DC_SPIKES_LEFT_04 "data/spikes-floor/dc-spikes-left-04.png"
+#define DC_SPIKES_RIGHT_04 "data/spikes-floor/dc-spikes-right-04.png"
+#define DC_SPIKES_FG_04 "data/spikes-floor/dc-spikes-fg-04.png"
+#define DC_SPIKES_LEFT_05 "data/spikes-floor/dc-spikes-left-05.png"
+#define DC_SPIKES_RIGHT_05 "data/spikes-floor/dc-spikes-right-05.png"
+#define DC_SPIKES_FG_05 "data/spikes-floor/dc-spikes-fg-05.png"
+
 /* dungeon ega */
 #define DE_SPIKES_FLOOR_LEFT "data/spikes-floor/de-left.png"
 #define DE_SPIKES_FLOOR_RIGHT "data/spikes-floor/de-right.png"

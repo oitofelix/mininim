@@ -22,6 +22,11 @@
 
 #include "pos.h"
 
+/* dungeon cga */
+#define DC_UNPRESSED_CLOSER_FLOOR_BASE "data/closer-floor/dc-unpressed-base.png"
+#define DC_PRESSED_CLOSER_FLOOR_BASE "data/closer-floor/dc-pressed-base.png"
+#define DC_PRESSED_CLOSER_FLOOR_RIGHT "data/closer-floor/dc-pressed-right.png"
+
 /* dungeon ega */
 #define DE_UNPRESSED_CLOSER_FLOOR_BASE "data/closer-floor/de-unpressed-base.png"
 #define DE_PRESSED_CLOSER_FLOOR_BASE "data/closer-floor/de-pressed-base.png"

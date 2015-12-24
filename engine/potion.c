@@ -25,6 +25,12 @@
 #include "room.h"
 #include "potion.h"
 
+/* dungeon cga */
+ALLEGRO_BITMAP *dc_small_potion, *dc_big_potion;
+
+/* palace cga */
+ALLEGRO_BITMAP *pc_small_potion, *pc_big_potion;
+
 /* dungeon ega */
 ALLEGRO_BITMAP *de_small_potion, *de_big_potion;
 
@@ -53,6 +59,14 @@ static ALLEGRO_COLOR flip_palette (ALLEGRO_COLOR c);
 void
 load_potion (void)
 {
+  /* dungeon cga */
+  dc_small_potion = load_bitmap (DC_SMALL_POTION);
+  dc_big_potion = load_bitmap (DC_BIG_POTION);
+
+  /* palace cga */
+  pc_small_potion = load_bitmap (PC_SMALL_POTION);
+  pc_big_potion = load_bitmap (PC_BIG_POTION);
+
   /* dungeon ega */
   de_small_potion = load_bitmap (DE_SMALL_POTION);
   de_big_potion = load_bitmap (DE_BIG_POTION);
@@ -82,6 +96,14 @@ load_potion (void)
 void
 unload_potion (void)
 {
+  /* dungeon cga */
+  al_destroy_bitmap (dc_small_potion);
+  al_destroy_bitmap (dc_big_potion);
+
+  /* palace cga */
+  al_destroy_bitmap (pc_small_potion);
+  al_destroy_bitmap (pc_big_potion);
+
   /* dungeon ega */
   al_destroy_bitmap (de_small_potion);
   al_destroy_bitmap (de_big_potion);
@@ -138,7 +160,10 @@ draw_potion (ALLEGRO_BITMAP *bitmap, struct pos *p, int i,
   switch (em) {
   case DUNGEON:
     switch (vm) {
-    case CGA: break;
+    case CGA:
+      small_potion = dc_small_potion;
+      big_potion = dc_big_potion;
+      break;
     case EGA:
       small_potion = de_small_potion;
       big_potion = de_big_potion;
@@ -151,7 +176,10 @@ draw_potion (ALLEGRO_BITMAP *bitmap, struct pos *p, int i,
     break;
   case PALACE:
     switch (vm) {
-    case CGA: break;
+    case CGA:
+      small_potion = pc_small_potion;
+      big_potion = pc_big_potion;
+      break;
     case EGA:
       small_potion = pe_small_potion;
       big_potion = pe_big_potion;

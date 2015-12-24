@@ -39,19 +39,8 @@
 
 void load_wall_pv (void);
 void unload_wall_pv (void);
-void draw_pv_wall (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_pv_wall_base (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_pv_wall_left (ALLEGRO_BITMAP *bitmap, struct pos *p);
-
-ALLEGRO_COLOR palace_wall_color (int i);
-void compute_palace_wall_color_array (int last_room, int room);
-ALLEGRO_COLOR compute_palace_wall_color (struct pos *p, int row, int col);
-void draw_pv_wall_brick (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                    int row, int col);
-struct rect *palace_wall_brick_rect (struct pos *p, int row, int col,
-                                     struct rect *r);
-ALLEGRO_BITMAP *palace_wall_mark (int i);
-struct frame *palace_wall_mark_frame (struct pos *p, int i,
-                                      struct frame *f);
+void draw_wall_pv (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_wall_base_pv (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_wall_left_pv (ALLEGRO_BITMAP *bitmap, struct pos *p);
 
 #endif	/* MININIM_WALL_PV_H */

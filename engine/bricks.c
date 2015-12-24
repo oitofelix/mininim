@@ -29,37 +29,30 @@
 #include "room.h"
 #include "bricks.h"
 
-/* dungeon ega */
-ALLEGRO_BITMAP *de_bricks_01, *de_bricks_02,
-  *de_bricks_03, *de_bricks_04;
-
-/* palace ega */
-ALLEGRO_BITMAP *pe_bricks_01, *pe_bricks_02,
-  *pe_bricks_03, *pe_bricks_04;
-
 /* dungeon vga */
 ALLEGRO_BITMAP *dv_bricks_01, *dv_bricks_02,
   *dv_bricks_03, *dv_bricks_04;
 
 /* palace vga */
-ALLEGRO_BITMAP *pv_bricks_01, *pv_bricks_02,
-  *pv_bricks_03, *pv_bricks_04;
+ALLEGRO_BITMAP *pv_bricks_01, *pv_bricks_02;
+
+static struct coord *d_bricks_coord_01 (struct pos *p, struct coord *c);
+static struct coord *p_bricks_coord_01 (struct pos *p, struct coord *c);
+static struct coord *d_bricks_coord_02 (struct pos *p, struct coord *c);
+static struct coord *p_bricks_coord_02 (struct pos *p, struct coord *c);
+static struct coord *d_bricks_coord_03 (struct pos *p, struct coord *c);
+static struct coord *d_bricks_coord_04 (struct pos *p, struct coord *c);
+
+static ALLEGRO_COLOR dv_palette (ALLEGRO_COLOR c);
+static ALLEGRO_COLOR de_palette (ALLEGRO_COLOR c);
+static ALLEGRO_COLOR dc_palette (ALLEGRO_COLOR c);
+static ALLEGRO_COLOR pv_palette (ALLEGRO_COLOR c);
+static ALLEGRO_COLOR pe_palette (ALLEGRO_COLOR c);
+static ALLEGRO_COLOR pc_palette (ALLEGRO_COLOR c);
 
 void
 load_bricks (void)
 {
-  /* dungeon ega */
-  de_bricks_01 = load_bitmap (DE_BRICKS_01);
-  de_bricks_02 = load_bitmap (DE_BRICKS_02);
-  de_bricks_03 = load_bitmap (DE_BRICKS_03);
-  de_bricks_04 = load_bitmap (DE_BRICKS_04);
-
-  /* palace ega */
-  pe_bricks_01 = load_bitmap (PE_BRICKS_01);
-  pe_bricks_02 = load_bitmap (PE_BRICKS_02);
-  pe_bricks_03 = load_bitmap (PE_BRICKS_03);
-  pe_bricks_04 = load_bitmap (PE_BRICKS_04);
-
   /* dungeon vga */
   dv_bricks_01 = load_bitmap (DV_BRICKS_01);
   dv_bricks_02 = load_bitmap (DV_BRICKS_02);
@@ -69,25 +62,11 @@ load_bricks (void)
   /* palace vga */
   pv_bricks_01 = load_bitmap (PV_BRICKS_01);
   pv_bricks_02 = load_bitmap (PV_BRICKS_02);
-  pv_bricks_03 = load_bitmap (PV_BRICKS_03);
-  pv_bricks_04 = load_bitmap (PV_BRICKS_04);
 }
 
 void
 unload_bricks (void)
 {
-  /* dungeon ega */
-  al_destroy_bitmap (de_bricks_01);
-  al_destroy_bitmap (de_bricks_02);
-  al_destroy_bitmap (de_bricks_03);
-  al_destroy_bitmap (de_bricks_04);
-
-  /* palace ega */
-  al_destroy_bitmap (pe_bricks_01);
-  al_destroy_bitmap (pe_bricks_02);
-  al_destroy_bitmap (pe_bricks_03);
-  al_destroy_bitmap (pe_bricks_04);
-
   /* dungeon vga */
   al_destroy_bitmap (dv_bricks_01);
   al_destroy_bitmap (dv_bricks_02);
@@ -97,128 +76,116 @@ unload_bricks (void)
   /* palace vga */
   al_destroy_bitmap (pv_bricks_01);
   al_destroy_bitmap (pv_bricks_02);
-  al_destroy_bitmap (pv_bricks_03);
-  al_destroy_bitmap (pv_bricks_04);
+}
+
+palette
+get_palette (enum em em, enum vm vm)
+{
+  switch (em) {
+  case DUNGEON:
+    switch (vm) {
+    case CGA: return dc_palette;
+    case EGA: return de_palette;
+    case VGA: return dv_palette;
+    }
+    break;
+  case PALACE:
+    switch (vm) {
+    case CGA: return pc_palette;
+    case EGA: return pe_palette;
+    case VGA: return pv_palette;
+    }
+    break;
+  }
+  return NULL;
 }
 
 void
 draw_bricks_01 (ALLEGRO_BITMAP *bitmap, struct pos *p,
                 enum em em, enum vm vm)
 {
-  pos2coord_f bricks_coord_01 = NULL;
-  ALLEGRO_BITMAP *bricks_01 = NULL;
+  pos2coord_f bricks_coord = NULL;
+  ALLEGRO_BITMAP *bricks = NULL;
 
-  switch (em) {
-  case DUNGEON:
-    bricks_coord_01 = d_bricks_coord_01;
-    switch (vm) {
-    case CGA: break;
-    case EGA: bricks_01 = de_bricks_01; break;
-    case VGA: bricks_01 = dv_bricks_01; break;
-    }
-    break;
-  case PALACE:
-    bricks_coord_01 = p_bricks_coord_01;
-    switch (vm) {
-    case CGA: break;
-    case EGA: bricks_01 = pe_bricks_01; break;
-    case VGA: bricks_01 = pv_bricks_01; break;
-    }
-    break;
+  if (em == DUNGEON) {
+    bricks_coord = d_bricks_coord_01;
+    bricks = dv_bricks_01;
+  } else {
+    bricks_coord = p_bricks_coord_01;
+    bricks = pv_bricks_01;
   }
 
+  palette pal = get_palette (em, vm);
+  bricks = apply_palette (bricks, pal);
+
   struct coord c;
-  draw_bitmapc (bricks_01, bitmap, bricks_coord_01 (p, &c) , 0);
+  draw_bitmapc (bricks, bitmap, bricks_coord (p, &c) , 0);
 }
 
 void
 draw_bricks_02 (ALLEGRO_BITMAP *bitmap, struct pos *p,
                 enum em em, enum vm vm)
 {
-  pos2coord_f bricks_coord_02 = NULL;
-  ALLEGRO_BITMAP *bricks_02 = NULL;
+  pos2coord_f bricks_coord = NULL;
+  ALLEGRO_BITMAP *bricks = NULL;
 
-  switch (em) {
-  case DUNGEON:
-    bricks_coord_02 = d_bricks_coord_02;
-    switch (vm) {
-    case CGA: break;
-    case EGA: bricks_02 = de_bricks_02; break;
-    case VGA: bricks_02 = dv_bricks_02; break;
-    }
-    break;
-  case PALACE:
-    bricks_coord_02 = p_bricks_coord_02;
-    switch (vm) {
-    case CGA: break;
-    case EGA: bricks_02 = pe_bricks_02; break;
-    case VGA: bricks_02 = pv_bricks_02; break;
-    }
-    break;
+  if (em == DUNGEON) {
+    bricks_coord = d_bricks_coord_02;
+    bricks = dv_bricks_02;
+  } else {
+    bricks_coord = p_bricks_coord_02;
+    bricks = pv_bricks_02;
   }
 
+  palette pal = get_palette (em, vm);
+  bricks = apply_palette (bricks, pal);
+
   struct coord c;
-  draw_bitmapc (bricks_02, bitmap, bricks_coord_02 (p, &c) , 0);
+  draw_bitmapc (bricks, bitmap, bricks_coord (p, &c) , 0);
 }
 
 void
 draw_bricks_03 (ALLEGRO_BITMAP *bitmap, struct pos *p,
                 enum em em, enum vm vm)
 {
-  pos2coord_f bricks_coord_03 = NULL;
-  ALLEGRO_BITMAP *bricks_03 = NULL;
+  pos2coord_f bricks_coord = NULL;
+  ALLEGRO_BITMAP *bricks = NULL;
 
-  switch (em) {
-  case DUNGEON:
-    bricks_coord_03 = d_bricks_coord_03;
-    switch (vm) {
-    case CGA: break;
-    case EGA: bricks_03 = de_bricks_03; break;
-    case VGA: bricks_03 = dv_bricks_03; break;
-    }
-    break;
-  case PALACE:
-    bricks_coord_03 = p_bricks_coord_03;
-    switch (vm) {
-    case CGA: break;
-    case EGA: bricks_03 = pe_bricks_03; break;
-    case VGA: bricks_03 = pv_bricks_03; break;
-    }
-    break;
+  if (em == DUNGEON) {
+    bricks_coord = d_bricks_coord_03;
+    bricks = dv_bricks_03;
+  } else {
+    bricks_coord = p_bricks_coord_01;
+    bricks = pv_bricks_01;
   }
 
+  palette pal = get_palette (em, vm);
+  bricks = apply_palette (bricks, pal);
+
   struct coord c;
-  draw_bitmapc (bricks_03, bitmap, bricks_coord_03 (p, &c) , 0);
+  draw_bitmapc (bricks, bitmap, bricks_coord (p, &c) , 0);
 }
 
 void
 draw_bricks_04 (ALLEGRO_BITMAP *bitmap, struct pos *p,
                 enum em em, enum vm vm)
 {
-  pos2coord_f bricks_coord_04 = NULL;
-  ALLEGRO_BITMAP *bricks_04 = NULL;
+  pos2coord_f bricks_coord = NULL;
+  ALLEGRO_BITMAP *bricks = NULL;
 
-  switch (em) {
-  case DUNGEON:
-    bricks_coord_04 = d_bricks_coord_04;
-    switch (vm) {
-    case CGA: break;
-    case EGA: bricks_04 = de_bricks_04; break;
-    case VGA: bricks_04 = dv_bricks_04; break;
-    }
-    break;
-  case PALACE:
-    bricks_coord_04 = p_bricks_coord_04;
-    switch (vm) {
-    case CGA: break;
-    case EGA: bricks_04 = pe_bricks_04; break;
-    case VGA: bricks_04 = pv_bricks_04; break;
-    }
-    break;
+  if (em == DUNGEON) {
+    bricks_coord = d_bricks_coord_04;
+    bricks = dv_bricks_04;
+  } else {
+    bricks_coord = p_bricks_coord_02;
+    bricks = pv_bricks_02;
   }
 
+  palette pal = get_palette (em, vm);
+  bricks = apply_palette (bricks, pal);
+
   struct coord c;
-  draw_bitmapc (bricks_04, bitmap, bricks_coord_04 (p, &c) , 0);
+  draw_bitmapc (bricks, bitmap, bricks_coord (p, &c) , 0);
 }
 
 struct coord *
@@ -273,15 +240,6 @@ d_bricks_coord_03 (struct pos *p, struct coord *c)
 }
 
 struct coord *
-p_bricks_coord_03 (struct pos *p, struct coord *c)
-{
-  c->x = PLACE_WIDTH * (p->place + 1);
-  c->y = PLACE_HEIGHT * p->floor + 29;
-  c->room = p->room;
-  return c;
-}
-
-struct coord *
 d_bricks_coord_04 (struct pos *p, struct coord *c)
 {
   int h = al_get_bitmap_height (dv_bricks_04);
@@ -292,11 +250,44 @@ d_bricks_coord_04 (struct pos *p, struct coord *c)
   return c;
 }
 
-struct coord *
-p_bricks_coord_04 (struct pos *p, struct coord *c)
+static ALLEGRO_COLOR
+dv_palette (ALLEGRO_COLOR c)
 {
-  c->x = PLACE_WIDTH * (p->place + 1);
-  c->y = PLACE_HEIGHT * p->floor + 26;
-  c->room = p->room;
-  return c;
+  if (color_eq (c, DV_BRICKS_COLOR)) return DV_BRICKS_COLOR;
+  else return c;
+}
+
+static ALLEGRO_COLOR
+de_palette (ALLEGRO_COLOR c)
+{
+  if (color_eq (c, DV_BRICKS_COLOR)) return DE_BRICKS_COLOR;
+  else return c;
+}
+
+static ALLEGRO_COLOR
+dc_palette (ALLEGRO_COLOR c)
+{
+  if (color_eq (c, DV_BRICKS_COLOR)) return DC_BRICKS_COLOR;
+  else return c;
+}
+
+static ALLEGRO_COLOR
+pv_palette (ALLEGRO_COLOR c)
+{
+  if (color_eq (c, PV_BRICKS_COLOR)) return PV_BRICKS_COLOR;
+  else return c;
+}
+
+static ALLEGRO_COLOR
+pe_palette (ALLEGRO_COLOR c)
+{
+  if (color_eq (c, PV_BRICKS_COLOR)) return PE_BRICKS_COLOR;
+  else return c;
+}
+
+static ALLEGRO_COLOR
+pc_palette (ALLEGRO_COLOR c)
+{
+  if (color_eq (c, PV_BRICKS_COLOR)) return PC_BRICKS_COLOR;
+  else return c;
 }
