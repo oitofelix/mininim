@@ -250,6 +250,11 @@ draw_wall_face (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (hgc) {
+    wall_face = apply_palette (wall_face, hgc_palette);
+    wall_face_top = apply_palette (wall_face_top, hgc_palette);
+  }
+
   struct coord c;
   draw_bitmapc (wall_face, bitmap, wall_face_coord (p, &c), 0);
   draw_bitmapc (wall_face_top, bitmap, wall_face_top_coord (p, &c), 0);

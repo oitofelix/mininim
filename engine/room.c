@@ -50,6 +50,7 @@ static int last_level;
 static int last_room;
 static enum em last_em;
 static enum vm last_vm;
+static int last_hgc;
 static room_callback_f *room_callback;
 static size_t room_callback_nmemb;
 
@@ -216,12 +217,14 @@ draw_room (ALLEGRO_BITMAP *bitmap, int room,
   if (room != last_room
       || em != last_em
       || vm != last_vm
+      || hgc != last_hgc
       || level.number != last_level) {
     if (room != last_room)
       run_room_callbacks (last_room, room);
     update_wall_cache (room, em, vm);
     last_em = em;
     last_vm = vm;
+    last_hgc = hgc;
     last_room = room;
     last_level = level.number;
   }

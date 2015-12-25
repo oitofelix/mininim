@@ -400,7 +400,7 @@ process_keys (void)
       if (hgc) {
         hgc = false; vm = VGA; vm_str = "VGA";
       } else {
-        hgc = true; vm = CGA; vm_str = "HCG";
+        hgc = true; vm = CGA; vm_str = "HGC";
       }
       break;
     case EGA: vm = CGA; vm_str = "CGA"; break;

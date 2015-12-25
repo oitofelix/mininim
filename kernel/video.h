@@ -75,6 +75,7 @@ void show (void);
 int compare_palette_caches (const void *pc0, const void *pc1);
 ALLEGRO_BITMAP *apply_palette (ALLEGRO_BITMAP *bitmap, palette p);
 ALLEGRO_BITMAP * get_cached_palette (ALLEGRO_BITMAP *bitmap, palette p);
+ALLEGRO_COLOR hgc_palette (ALLEGRO_COLOR c);
 
 /* variables */
 extern ALLEGRO_DISPLAY *display;

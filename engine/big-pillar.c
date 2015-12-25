@@ -188,6 +188,8 @@ draw_big_pillar_bottom_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (hgc) big_pillar_bottom_left = apply_palette (big_pillar_bottom_left, hgc_palette);
+
   struct coord c;
   draw_bitmapc (big_pillar_bottom_left, bitmap,
                 big_pillar_bottom_left_coord (p, &c), 0);
@@ -216,6 +218,8 @@ draw_big_pillar_bottom_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (hgc) big_pillar_bottom_right = apply_palette (big_pillar_bottom_right, hgc_palette);
+
   struct coord c;
   draw_bitmapc (big_pillar_bottom_right, bitmap,
                 big_pillar_bottom_right_coord (p, &c), 0);
@@ -243,6 +247,8 @@ draw_big_pillar_bottom_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
     }
     break;
   }
+
+  if (hgc) big_pillar_bottom_fg = apply_palette (big_pillar_bottom_fg, hgc_palette);
 
   struct coord c;
   draw_bitmapc (big_pillar_bottom_fg, bitmap, big_pillar_bottom_fg_coord (p, &c), 0);
@@ -279,6 +285,8 @@ draw_big_pillar_top_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
     }
     break;
   }
+
+  if (hgc) big_pillar_top_left = apply_palette (big_pillar_top_left, hgc_palette);
 
   struct coord c;
   draw_bitmapc (big_pillar_top_left, bitmap,
@@ -325,6 +333,11 @@ draw_big_pillar_top_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
       break;
     }
     break;
+  }
+
+  if (hgc) {
+    big_pillar_top_right = apply_palette (big_pillar_top_right, hgc_palette);
+    big_pillar_top_right_top = apply_palette (big_pillar_top_right_top, hgc_palette);
   }
 
   struct coord c;
