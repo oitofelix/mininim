@@ -31,6 +31,7 @@ ALLEGRO_DISPLAY *display;
 ALLEGRO_BITMAP *screen, *uscreen;
 ALLEGRO_TIMER *video_timer;
 int screen_flags = 0;
+bool hgc;
 static ALLEGRO_BITMAP *effect_buffer;
 static ALLEGRO_BITMAP *memory_bitmap;
 struct video_effect video_effect = {.type = VIDEO_NO_EFFECT};
@@ -268,11 +269,49 @@ load_bitmap (char *filename)
   return bitmap;
 }
 
+void
+apply_hgc (ALLEGRO_BITMAP *bitmap)
+{
+  int x, y;
+  int w = al_get_bitmap_width (bitmap);
+  int h = al_get_bitmap_height (bitmap);
+  al_lock_bitmap (bitmap, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READWRITE);
+  al_set_target_bitmap (bitmap);
+  for (y = 0; y < h; y++)
+    for (x = 0; x < w; x++) {
+      ALLEGRO_COLOR ic = al_get_pixel (bitmap, x, y), oc;
+
+      if (color_eq (ic, al_map_rgb (255, 255, 255))) oc = ic;
+      if (color_eq (ic, al_map_rgb (0, 0, 0))) oc = ic;
+      if (color_eq (ic, al_map_rgb (85, 255, 255))) {
+        if (em == DUNGEON) oc = al_map_rgb (255, 255, 255);
+        else {
+          if (x % 2 == y % 2) oc = al_map_rgb (0, 0, 0);
+          else oc = al_map_rgb (255, 255, 255);
+        }
+      }
+      if (color_eq (ic, al_map_rgb (255, 85, 255))) {
+        if (em == DUNGEON) {
+          if (x % 2 == y % 2) oc = al_map_rgb (0, 0, 0);
+          else oc = al_map_rgb (255, 255, 255);
+        } else oc = al_map_rgb (255, 255, 255);
+      }
+
+      al_put_pixel (x, y, oc);
+    }
+  al_unlock_bitmap (bitmap);
+}
+
 static void
 flip_display (ALLEGRO_BITMAP *bitmap)
 {
   int w = al_get_display_width (display);
   int h = al_get_display_height (display);
+
+  if (hgc) {
+    apply_hgc (bitmap);
+    apply_hgc (uscreen);
+  }
 
   al_set_target_backbuffer (display);
   al_draw_scaled_bitmap (bitmap, 0, 0, ORIGINAL_WIDTH, ORIGINAL_HEIGHT,

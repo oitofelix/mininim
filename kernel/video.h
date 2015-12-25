@@ -82,5 +82,6 @@ extern ALLEGRO_BITMAP *screen, *uscreen;
 extern ALLEGRO_TIMER *video_timer;
 extern struct video_effect video_effect;
 extern int screen_flags;
+extern bool hgc;
 
 #endif	/* MININIM_VIDEO_H */
