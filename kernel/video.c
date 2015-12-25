@@ -283,19 +283,10 @@ apply_hgc (ALLEGRO_BITMAP *bitmap)
 
       if (color_eq (ic, al_map_rgb (255, 255, 255))) oc = ic;
       if (color_eq (ic, al_map_rgb (0, 0, 0))) oc = ic;
-      if (color_eq (ic, al_map_rgb (85, 255, 255))) {
-        if (em == DUNGEON) oc = al_map_rgb (255, 255, 255);
-        else {
-          if (x % 2 == y % 2) oc = al_map_rgb (0, 0, 0);
-          else oc = al_map_rgb (255, 255, 255);
-        }
-      }
-      if (color_eq (ic, al_map_rgb (255, 85, 255))) {
-        if (em == DUNGEON) {
-          if (x % 2 == y % 2) oc = al_map_rgb (0, 0, 0);
-          else oc = al_map_rgb (255, 255, 255);
-        } else oc = al_map_rgb (255, 255, 255);
-      }
+      if (color_eq (ic, al_map_rgb (85, 255, 255)))
+        oc = al_map_rgb (170, 170, 170);
+      if (color_eq (ic, al_map_rgb (255, 85, 255)))
+        oc = al_map_rgb (85, 85, 85);
 
       al_put_pixel (x, y, oc);
     }
