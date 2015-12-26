@@ -138,7 +138,7 @@ flow (struct anim *kid)
       kid->current_lives--;
       kid->splash = true;
       sample_harm = true;
-      video_effect.color = RED;
+      video_effect.color = get_flicker_blood_color ();
       start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
       break;
     case BIG_POISON_POTION:
@@ -147,7 +147,7 @@ flow (struct anim *kid)
       kid->current_lives = 0;
       kid->splash = true;
       sample_harm = true;
-      video_effect.color = RED;
+      video_effect.color = get_flicker_blood_color ();
       start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
       break;
     case FLOAT_POTION: float_kid (kid); break;

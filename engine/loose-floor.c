@@ -512,7 +512,7 @@ compute_loose_floor_fall (struct loose_floor *l)
       k->current_lives--;
       k->uncouch_slowly = true;
       sample_hit_wall = true;
-      video_effect.color = RED;
+      video_effect.color = get_flicker_blood_color ();
       start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
       if (k->current_lives <= 0) {
         k->p = kpmt;

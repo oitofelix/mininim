@@ -121,7 +121,7 @@ physics_out (struct anim *kid)
 
   /* sound */
   if (kid->i == 0 && kid->wait == 5) {
-    video_effect.color = YELLOW;
+    video_effect.color = get_flicker_raise_sword_color ();
     start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.5));
     sample_glory = true;
   }

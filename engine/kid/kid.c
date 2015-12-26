@@ -640,7 +640,7 @@ increase_kid_current_lives (struct anim *k)
   if (k->current_lives < k->total_lives) {
     k->current_lives++;
     sample_small_life_potion = true;
-    video_effect.color = RED;
+    video_effect.color = get_flicker_blood_color ();
     start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.3));
   }
 }
@@ -652,7 +652,7 @@ increase_kid_total_lives (struct anim *k)
     k->total_lives++;
     k->current_lives = k->total_lives;
     sample_big_life_potion = true;
-    video_effect.color = RED;
+    video_effect.color = get_flicker_blood_color ();
     start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.3));
   }
 }
@@ -663,8 +663,47 @@ float_kid (struct anim *k)
   al_set_timer_count (k->floating, 0);
   al_start_timer (k->floating);
   sample_floating = true;
-  video_effect.color = GREEN;
+  video_effect.color = get_flicker_float_color ();
   start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.3));
+}
+
+ALLEGRO_COLOR
+get_flicker_blood_color (void)
+{
+  switch (vm) {
+  case CGA:
+    if (hgc) return H_BLOOD_COLOR;
+    else return C_BLOOD_COLOR;
+  case EGA: return E_BLOOD_COLOR_01;
+  case VGA: return V_BLOOD_COLOR_01;
+  }
+  return V_BLOOD_COLOR_01;
+}
+
+ALLEGRO_COLOR
+get_flicker_raise_sword_color (void)
+{
+  switch (vm) {
+  case CGA:
+    if (hgc) return H_FLICKER_RAISE_SWORD_COLOR;
+    else return C_FLICKER_RAISE_SWORD_COLOR;
+  case EGA: return E_FLICKER_RAISE_SWORD_COLOR;
+  case VGA: return V_FLICKER_RAISE_SWORD_COLOR;
+  }
+  return V_FLICKER_RAISE_SWORD_COLOR;
+}
+
+ALLEGRO_COLOR
+get_flicker_float_color (void)
+{
+  switch (vm) {
+  case CGA:
+    if (hgc) return H_FLICKER_FLOAT_COLOR;
+    else return C_FLICKER_FLOAT_COLOR;
+  case EGA: return E_FLICKER_FLOAT_COLOR;
+  case VGA: return V_FLICKER_FLOAT_COLOR;
+  }
+  return V_FLICKER_FLOAT_COLOR;
 }
 
 void

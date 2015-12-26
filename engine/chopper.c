@@ -405,7 +405,7 @@ compute_choppers (void)
         k->splash = true;
         k->current_lives = 0;
         k->p = c->p;
-        video_effect.color = RED;
+        video_effect.color = get_flicker_blood_color ();
         start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
         sample_chopped = true;
         kid_die_chopped (k);

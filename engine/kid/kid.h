@@ -101,6 +101,9 @@ ALLEGRO_COLOR c_palette (ALLEGRO_COLOR c);
 void increase_kid_current_lives (struct anim *k);
 void increase_kid_total_lives (struct anim *k);
 void float_kid (struct anim *k);
+ALLEGRO_COLOR get_flicker_blood_color (void);
+ALLEGRO_COLOR get_flicker_raise_sword_color (void);
+ALLEGRO_COLOR get_flicker_float_color (void);
 void kid_debug (void);
 
 /* variables */

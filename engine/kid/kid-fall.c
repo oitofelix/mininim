@@ -244,7 +244,7 @@ physics_in (struct anim *kid)
         sample_hit_ground_harm = true;
         kid->uncouch_slowly = true;
       }
-      video_effect.color = RED;
+      video_effect.color = get_flicker_blood_color ();
       start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
     } else if (kid->i > 3
                && ! al_get_timer_started (kid->floating))
