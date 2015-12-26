@@ -114,6 +114,8 @@ draw_window (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (hgc) window = apply_palette (window, hgc_palette);
+
   struct coord c;
   draw_bitmapc (window, bitmap, window_coord (p, &c), 0);
 }

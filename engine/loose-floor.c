@@ -616,7 +616,10 @@ draw_falling_loose_floor (ALLEGRO_BITMAP *bitmap, struct pos *p,
     frame2room (&l->f, room_view, &l->f.c);
     survey (_tr, posf, &l->f, &tr, &fptr, &nfptr);
     survey (_br, posf, &l->f, &br, &fpbr, &nfpbr);
-    draw_frame (bitmap, &l->f);
+    l->f.b = get_correct_falling_loose_floor_bitmap (l->f.b);
+    struct frame f = l->f;
+    if (hgc) f.b = apply_palette (f.b, hgc_palette);
+    draw_frame (bitmap, &f);
     draw_confg_base (bitmap, &fptr, em, vm);
     draw_confg_left (bitmap, &fptr, em, vm, true);
     draw_confg_base (bitmap, &fpbr, em, vm);
@@ -715,6 +718,8 @@ draw_loose_floor_01_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (hgc) loose_floor_base_01 = apply_palette (loose_floor_base_01, hgc_palette);
+
   struct coord c;
   draw_bitmapc (loose_floor_base_01, bitmap, floor_base_coord (p, &c), 0);
 }
@@ -742,6 +747,8 @@ draw_loose_floor_01_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (hgc) loose_floor_left_01 = apply_palette (loose_floor_left_01, hgc_palette);
+
   struct coord c;
   draw_bitmapc (loose_floor_left_01, bitmap, loose_floor_left_coord (p, &c), 0);
 }
@@ -768,6 +775,8 @@ draw_loose_floor_01_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
     }
     break;
   }
+
+  if (hgc) loose_floor_right_01 = apply_palette (loose_floor_right_01, hgc_palette);
 
   struct coord c;
   draw_bitmapc (loose_floor_right_01, bitmap, loose_floor_right_coord (p, &c), 0);
@@ -805,6 +814,8 @@ draw_loose_floor_02_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (hgc) loose_floor_base_02 = apply_palette (loose_floor_base_02, hgc_palette);
+
   struct coord c;
   draw_bitmapc (loose_floor_base_02, bitmap, floor_base_coord (p, &c), 0);
 }
@@ -832,6 +843,8 @@ draw_loose_floor_02_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (hgc) loose_floor_left_02 = apply_palette (loose_floor_left_02, hgc_palette);
+
   struct coord c;
   draw_bitmapc (loose_floor_left_02, bitmap, floor_left_coord (p, &c), 0);
 }
@@ -858,6 +871,8 @@ draw_loose_floor_02_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
     }
     break;
   }
+
+  if (hgc) loose_floor_right_02 = apply_palette (loose_floor_right_02, hgc_palette);
 
   struct coord c;
   draw_bitmapc (loose_floor_right_02, bitmap, loose_floor_right_coord (p, &c), 0);

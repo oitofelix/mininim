@@ -196,6 +196,11 @@ draw_sword (ALLEGRO_BITMAP *bitmap, struct pos *p, enum vm vm)
     break;
   }
 
+  if (hgc) {
+    normal_sword = apply_palette (normal_sword, hgc_palette);
+    shiny_sword = apply_palette (shiny_sword, hgc_palette);
+  }
+
   struct coord c;
   if (! is_sword (p)) return;
   ALLEGRO_BITMAP *sword = anim_cycle % 60 ? normal_sword : shiny_sword;

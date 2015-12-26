@@ -350,11 +350,17 @@ draw_kid_frame (ALLEGRO_BITMAP *bitmap, struct anim *k,
     xf.b = apply_palette (xf.b, pals);
   }
 
+  if (hgc) {
+    f.b = apply_palette (f.b, hgc_palette);
+    xf.b = apply_palette (xf.b, hgc_palette);
+  }
+
   draw_frame (bitmap, &f);
   draw_xframe (bitmap, &f, &xf);
 
   if (k->splash) {
     ALLEGRO_BITMAP *splash = apply_palette (v_kid_splash, pal);
+    if (hgc) splash = apply_palette (splash, hgc_palette);
     draw_bitmapc (splash, bitmap, splash_coord (&k->f, &c), k->f.flip);
   }
 
@@ -591,6 +597,11 @@ draw_kid_lives (ALLEGRO_BITMAP *bitmap, struct anim *kid,
   palette pal = get_palette (vm);
   empty = apply_palette (v_kid_empty_life, pal);
   full = apply_palette (v_kid_full_life, pal);
+
+  if (hgc) {
+    empty = apply_palette (empty, hgc_palette);
+    full = apply_palette (full, hgc_palette);
+  }
 
   for (i = 0; i < kid->total_lives; i++)
     draw_bitmapc (empty, bitmap, kid_life_coord (i, &c), 0);

@@ -198,6 +198,8 @@ draw_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (hgc) floor_base = apply_palette (floor_base, hgc_palette);
+
   struct coord c;
   draw_bitmapc (floor_base, bitmap, floor_base_coord (p, &c), 0);
 }
@@ -224,6 +226,8 @@ draw_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
     }
     break;
   }
+
+  if (hgc) floor_left = apply_palette (floor_left, hgc_palette);
 
   struct coord c;
   draw_bitmapc (floor_left, bitmap, floor_left_coord (p, &c), 0);
@@ -252,6 +256,8 @@ draw_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (hgc) floor_right = apply_palette (floor_right, hgc_palette);
+
   struct coord c;
   draw_bitmapc (floor_right, bitmap, floor_right_coord (p, &c), 0);
 }
@@ -278,6 +284,8 @@ draw_floor_corner_01 (ALLEGRO_BITMAP *bitmap, struct pos *p,
     }
     break;
   }
+
+  if (hgc) floor_corner_01 = apply_palette (floor_corner_01, hgc_palette);
 
   struct coord c; floor_corner_01_coord (p, &c);
   if (con (p)->fg == CLOSER_FLOOR) c.y += 1;
@@ -307,6 +315,8 @@ draw_floor_corner_02 (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (hgc) floor_corner_02 = apply_palette (floor_corner_02, hgc_palette);
+
   struct coord c; floor_corner_02_coord (p, &c);
   if (con (p)->fg == CLOSER_FLOOR) c.y += 1;
   draw_bitmapc (floor_corner_02, bitmap, &c, 0);
@@ -334,6 +344,8 @@ draw_floor_corner_03 (ALLEGRO_BITMAP *bitmap, struct pos *p,
     }
     break;
   }
+
+  if (hgc) floor_corner_03 = apply_palette (floor_corner_03, hgc_palette);
 
   struct coord c; floor_corner_03_coord (p, &c);
   if (con (p)->fg == CLOSER_FLOOR) c.y += 1;

@@ -338,6 +338,14 @@ draw_level_door (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (hgc) {
+    level_door_bottom = apply_palette (level_door_bottom, hgc_palette);
+    level_door_top_left = apply_palette (level_door_top_left, hgc_palette);
+    level_door_floor = apply_palette (level_door_floor, hgc_palette);
+    level_door_stairs = apply_palette (level_door_stairs, hgc_palette);
+    level_door_top_right = apply_palette (level_door_top_right, hgc_palette);
+  }
+
   draw_bitmapc (level_door_bottom, bitmap,
                 level_door_bottom_left_coord (p, &c), 0);
   draw_bitmapc (level_door_top_left, bitmap,
@@ -382,6 +390,8 @@ draw_level_door_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f,
     break;
   }
 
+  if (hgc) level_door_bottom = apply_palette (level_door_bottom, hgc_palette);
+
   if (! is_kid_stairs (f)) return;
   prel (p, &pl, +0, -1);
   prel (p, &pr, +0, +1);
@@ -421,6 +431,8 @@ draw_level_door_front (ALLEGRO_BITMAP *bitmap, struct pos *p, int i,
     }
     break;
   }
+
+  if (hgc) level_door_front = apply_palette (level_door_front, hgc_palette);
 
   int q = (i + 1) / 4;
   int r = (i + 1) % 4;

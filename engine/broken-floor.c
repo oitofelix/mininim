@@ -157,6 +157,8 @@ draw_broken_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (hgc) broken_floor_left = apply_palette (broken_floor_left, hgc_palette);
+
   struct coord c;
   draw_bitmapc (broken_floor_left, bitmap, floor_left_coord (p, &c), 0);
 }
@@ -184,6 +186,8 @@ draw_broken_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (hgc) broken_floor_right = apply_palette (broken_floor_right, hgc_palette);
+
   struct coord c;
   draw_bitmapc (broken_floor_right, bitmap, broken_floor_right_coord (p, &c), 0);
 }
@@ -192,6 +196,15 @@ void
 draw_broken_floor_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
                       enum em em, enum vm vm)
 {
+  struct coord c;
+  int i;
+  for (i = 0; i < kid_nmemb; i++) {
+    struct anim *k = &kid[i];
+    struct coord nc; struct pos np, pmt;
+    survey (_mt, pos, &k->f, &nc, &pmt, &np);
+    if (peq (&pmt, p) && is_kid_dead (&k->f)) return;
+  }
+
   ALLEGRO_BITMAP *broken_floor_front = NULL;
 
   switch (em) {
@@ -211,14 +224,8 @@ draw_broken_floor_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
-  struct coord c;
-  int i;
-  for (i = 0; i < kid_nmemb; i++) {
-    struct anim *k = &kid[i];
-    struct coord nc; struct pos np, pmt;
-    survey (_mt, pos, &k->f, &nc, &pmt, &np);
-    if (peq (&pmt, p) && is_kid_dead (&k->f)) return;
-  }
+  if (hgc) broken_floor_front = apply_palette (broken_floor_front, hgc_palette);
+
   draw_bitmapc (broken_floor_front, bitmap,
                 broken_floor_front_coord (p, &c), 0);
 }

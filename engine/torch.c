@@ -114,6 +114,8 @@ draw_torch (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (hgc) torch = apply_palette (torch, hgc_palette);
+
   struct coord c;
   draw_bitmapc (torch, bitmap, torch_coord (p, &c), 0);
 }

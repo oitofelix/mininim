@@ -86,6 +86,8 @@ get_fire_frame (int i, enum vm vm)
   case VGA: break;
   }
 
+  if (hgc) fire = apply_palette (fire, hgc_palette);
+
   return fire;
 }
 

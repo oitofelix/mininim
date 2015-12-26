@@ -472,11 +472,14 @@ draw_left_01 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
     break;
   }
 
+  if (hgc) chopper = apply_palette (chopper, hgc_palette);
+
   struct coord c;
   draw_bitmapc (chopper, bitmap, chopper_coord (p, &c), 0);
   if (ch->blood) {
     blood_palette = get_blood_palette (vm);
     ALLEGRO_BITMAP *blood = apply_palette (chopper_blood_01, blood_palette);
+    if (hgc) blood = apply_palette (blood, hgc_palette);
     draw_bitmapc (blood, bitmap, blood_01_coord (p, &c), 0);
   }
 }
@@ -504,11 +507,14 @@ draw_left_02 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
     break;
   }
 
+  if (hgc) chopper = apply_palette (chopper, hgc_palette);
+
   struct coord c;
   draw_bitmapc (chopper, bitmap, chopper_coord (p, &c), 0);
   if (ch->blood) {
     palette blood_palette = get_blood_palette (vm);
     ALLEGRO_BITMAP *blood = apply_palette (chopper_blood_02, blood_palette);
+    if (hgc) blood = apply_palette (blood, hgc_palette);
     draw_bitmapc (blood, bitmap, blood_02_coord (p, &c), 0);
   }
 }
@@ -536,11 +542,14 @@ draw_left_03 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
     break;
   }
 
+  if (hgc) chopper = apply_palette (chopper, hgc_palette);
+
   struct coord c;
   draw_bitmapc (chopper, bitmap, chopper_coord (p, &c), 0);
   if (ch->blood) {
     palette blood_palette = get_blood_palette (vm);
     ALLEGRO_BITMAP *blood = apply_palette (chopper_blood_03, blood_palette);
+    if (hgc) blood = apply_palette (blood, hgc_palette);
     draw_bitmapc (blood, bitmap, blood_03_coord (p, &c), 0);
   }
 }
@@ -568,11 +577,14 @@ draw_left_04 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
     break;
   }
 
+  if (hgc) chopper = apply_palette (chopper, hgc_palette);
+
   struct coord c;
   draw_bitmapc (chopper, bitmap, chopper_coord (p, &c), 0);
   if (ch->blood) {
     palette blood_palette = get_blood_palette (vm);
     ALLEGRO_BITMAP *blood = apply_palette (chopper_blood_04, blood_palette);
+    if (hgc) blood = apply_palette (blood, hgc_palette);
     draw_bitmapc (blood, bitmap, blood_04_coord (p, &c), 0);
   }
 }
@@ -600,11 +612,14 @@ draw_left_05 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
     break;
   }
 
+  if (hgc) chopper = apply_palette (chopper, hgc_palette);
+
   struct coord c;
   draw_bitmapc (chopper, bitmap, chopper_coord (p, &c), 0);
   if (ch->blood) {
     palette blood_palette = get_blood_palette (vm);
     ALLEGRO_BITMAP *blood = apply_palette (chopper_blood_05, blood_palette);
+    if (hgc) blood = apply_palette (blood, hgc_palette);
     draw_bitmapc (blood, bitmap, blood_05_coord (p, &c), 0);
   }
 }
@@ -648,12 +663,15 @@ draw_fg_01 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
     break;
   }
 
+  if (hgc) fg = apply_palette (fg, hgc_palette);
+
   struct coord c;
   draw_bitmapc (fg, bitmap, chopper_coord (p, &c), 0);
   if (ch->blood) {
     int h = al_get_bitmap_height (chopper_blood_01);
     palette blood_palette = get_blood_palette (vm);
     ALLEGRO_BITMAP *blood = apply_palette (chopper_blood_01, blood_palette);
+    if (hgc) blood = apply_palette (blood, hgc_palette);
     draw_bitmap_regionc (blood, bitmap, 0, 0, 2, h, blood_01_coord (p, &c), 0);
   }
 }
@@ -681,12 +699,15 @@ draw_fg_02 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
     break;
   }
 
+  if (hgc) fg = apply_palette (fg, hgc_palette);
+
   struct coord c;
   draw_bitmapc (fg, bitmap, chopper_coord (p, &c), 0);
   if (ch->blood) {
     int h = al_get_bitmap_height (chopper_blood_02);
     palette blood_palette = get_blood_palette (vm);
     ALLEGRO_BITMAP *blood = apply_palette (chopper_blood_02, blood_palette);
+    if (hgc) blood = apply_palette (blood, hgc_palette);
     draw_bitmap_regionc (blood, bitmap, 0, 0, 2, h, blood_02_coord (p, &c), 0);
   }
 }
@@ -714,12 +735,15 @@ draw_fg_03 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
     break;
   }
 
+  if (hgc) fg = apply_palette (fg, hgc_palette);
+
   struct coord c;
   draw_bitmapc (fg, bitmap, chopper_coord (p, &c), 0);
   if (ch->blood) {
     int h = al_get_bitmap_height (chopper_blood_03);
     palette blood_palette = get_blood_palette (vm);
     ALLEGRO_BITMAP *blood = apply_palette (chopper_blood_03, blood_palette);
+    if (hgc) blood = apply_palette (blood, hgc_palette);
     draw_bitmap_regionc (blood, bitmap, 0, 0, 2, h, blood_03_coord (p, &c), 0);
   }
 }
@@ -747,12 +771,15 @@ draw_fg_04 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
     break;
   }
 
+  if (hgc) fg = apply_palette (fg, hgc_palette);
+
   struct coord c;
   draw_bitmapc (fg, bitmap, chopper_coord (p, &c), 0);
   if (ch->blood) {
     int h = al_get_bitmap_height (chopper_blood_04);
     palette blood_palette = get_blood_palette (vm);
     ALLEGRO_BITMAP *blood = apply_palette (chopper_blood_04, blood_palette);
+    if (hgc) blood = apply_palette (blood, hgc_palette);
     draw_bitmap_regionc (blood, bitmap, 0, 0, 2, h, blood_04_coord (p, &c), 0);
   }
 }
@@ -780,12 +807,15 @@ draw_fg_05 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
     break;
   }
 
+  if (hgc) fg = apply_palette (fg, hgc_palette);
+
   struct coord c;
   draw_bitmapc (fg, bitmap, chopper_coord (p, &c), 0);
   if (ch->blood) {
     int h = al_get_bitmap_height (chopper_blood_05);
     palette blood_palette = get_blood_palette (vm);
     ALLEGRO_BITMAP *blood = apply_palette (chopper_blood_05, blood_palette);
+    if (hgc) blood = apply_palette (blood, hgc_palette);
     draw_bitmap_regionc (blood, bitmap, 0, 0, 2, h, blood_05_coord (p, &c), 0);
   }
 }

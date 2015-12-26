@@ -299,6 +299,8 @@ draw_pressed_closer_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (hgc) pressed_closer_floor_base = apply_palette (pressed_closer_floor_base, hgc_palette);
+
   struct coord c;
   draw_bitmapc (pressed_closer_floor_base, bitmap, floor_base_coord (p, &c), 0);
 }
@@ -334,6 +336,8 @@ draw_pressed_closer_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
     }
     break;
   }
+
+  if (hgc) pressed_closer_floor_left = apply_palette (pressed_closer_floor_left, hgc_palette);
 
   struct coord c;
   draw_bitmapc (pressed_closer_floor_left, bitmap,
@@ -382,6 +386,11 @@ draw_pressed_closer_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (hgc) {
+    floor_right = apply_palette (floor_right, hgc_palette);
+    pressed_closer_floor_right = apply_palette (pressed_closer_floor_right, hgc_palette);
+  }
+
   struct coord c; struct pos np;
   draw_bitmapc (floor_right, bitmap,
                 pressed_closer_floor_right_coord (p, &c), 0);
@@ -421,6 +430,8 @@ draw_unpressed_closer_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
     }
     break;
   }
+
+  if (hgc) unpressed_closer_floor_base = apply_palette (unpressed_closer_floor_base, hgc_palette);
 
   struct coord c;
   draw_bitmapc (unpressed_closer_floor_base, bitmap,

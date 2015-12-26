@@ -296,6 +296,8 @@ draw_unpressed_opener_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (hgc) unpressed_opener_floor_base = apply_palette (unpressed_opener_floor_base, hgc_palette);
+
   struct coord c;
   draw_bitmapc (unpressed_opener_floor_base, bitmap, floor_base_coord (p, &c), 0);
 }
@@ -322,6 +324,8 @@ draw_unpressed_opener_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
     }
     break;
   }
+
+  if (hgc) unpressed_opener_floor_left = apply_palette (unpressed_opener_floor_left, hgc_palette);
 
   struct coord c;
   draw_bitmapc (unpressed_opener_floor_left, bitmap,
@@ -350,6 +354,8 @@ draw_unpressed_opener_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
     }
     break;
   }
+
+  if (hgc) unpressed_opener_floor_right = apply_palette (unpressed_opener_floor_right, hgc_palette);
 
   struct coord c;
   draw_bitmapc (unpressed_opener_floor_right, bitmap,

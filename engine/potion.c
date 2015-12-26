@@ -271,9 +271,11 @@ draw_potion (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (hgc) bottle = apply_palette (bottle, hgc_palette);
   draw_bitmapc (bottle, bitmap, &bottle_coord, 0);
   bubble = get_bubble_frame (anim_cycle % 7);
   bubble = apply_palette (bubble, bubble_palette);
+  if (hgc) bubble = apply_palette (bubble, hgc_palette);
   int r = prandom (1);
   bubble_coord.x -= r;
   draw_bitmapc (bubble, bitmap, &bubble_coord,
