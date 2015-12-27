@@ -2,7 +2,7 @@ KERNEL_MODULES = event timer video audio memory keyboard random array
 ENGINE_MODULES = anim pos physics level consistency stars floor				\
   broken-floor skeleton-floor loose-floor opener-floor closer-floor		\
   spikes-floor door level-door pillar big-pillar chopper bricks torch	\
-  window room fire potion sword clock princess jaffar
+  window balcony room fire potion sword clock princess jaffar
 WALL_MODULES = wall wall-depedv wall-pv wall-dcpc
 KID_MODULES = kid kid-normal kid-walk kid-start-run kid-run						\
   kid-stop-run kid-turn-run kid-couch kid-turn kid-stabilize kid-jump	\

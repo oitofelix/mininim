@@ -31,5 +31,7 @@ struct star {
 
 /* functions */
 void draw_princess_room_stars (void);
+void draw_balcony_stars (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                         enum vm vm);
 
 #endif	/* MININIM_STARS_H */

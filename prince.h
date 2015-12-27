@@ -172,6 +172,16 @@
 #define E_FLICKER_FLOAT_COLOR (al_map_rgb (85, 255, 85))
 #define V_FLICKER_FLOAT_COLOR (al_map_rgb (84, 252, 84))
 
+#define C_STAR_COLOR_01 (al_map_rgb (255, 255, 255))
+#define C_STAR_COLOR_02 (al_map_rgb (255, 255, 255))
+#define C_STAR_COLOR_03 (al_map_rgb (255, 255, 255))
+#define E_STAR_COLOR_01 (al_map_rgb (80, 84, 80))
+#define E_STAR_COLOR_02 (al_map_rgb (168, 168, 168))
+#define E_STAR_COLOR_03 (al_map_rgb (248, 252, 248))
+#define V_STAR_COLOR_01 (al_map_rgb (80, 84, 80))
+#define V_STAR_COLOR_02 (al_map_rgb (168, 168, 168))
+#define V_STAR_COLOR_03 (al_map_rgb (248, 252, 248))
+
 /* environment mode */
 enum em {
   DUNGEON, PALACE,
@@ -241,6 +251,7 @@ struct level {
       NO_BRICKS,
       TORCH,
       WINDOW,
+      BALCONY,
     } bg;
     union conext {
       int event;

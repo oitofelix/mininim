@@ -44,6 +44,7 @@
 #include "bricks.h"
 #include "torch.h"
 #include "window.h"
+#include "balcony.h"
 #include "room.h"
 
 static int last_level;
@@ -73,6 +74,7 @@ load_room (void)
   load_bricks ();
   load_torch ();
   load_window ();
+  load_balcony ();
 
   load_loose_floor_samples ();
   load_opener_floor_samples ();
@@ -103,6 +105,7 @@ unload_room (void)
   unload_bricks ();
   unload_torch ();
   unload_window ();
+  unload_balcony ();
 
   /* sounds */
   unload_loose_floor_samples ();
@@ -244,8 +247,7 @@ draw_conbg (ALLEGRO_BITMAP *bitmap, struct pos *p,
 {
   switch (con (p)->bg) {
   case NO_BG:
-    if (em == PALACE) draw_bricks_01 (bitmap, p, em, vm);
-    break;
+    if (em == PALACE) draw_bricks_01 (bitmap, p, em, vm); break;
   case BRICKS_01: draw_bricks_01 (bitmap, p, em, vm); break;
   case BRICKS_02: draw_bricks_02 (bitmap, p, em, vm); break;
   case BRICKS_03: draw_bricks_03 (bitmap, p, em, vm); break;
@@ -253,6 +255,7 @@ draw_conbg (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case NO_BRICKS: break;
   case TORCH: draw_torch (bitmap, p, em, vm); break;
   case WINDOW: draw_window (bitmap, p, em, vm); break;
+  case BALCONY: draw_balcony (bitmap, p, em, vm); break;
   default:
     error (-1, 0, "%s: unknown background (%i)",
            __func__, con (p)->bg);

@@ -126,12 +126,20 @@ static struct level level_1 = {
       {WALL}, {WALL}, {WALL}, {WALL}, {WALL}}},
 
     [23] =
-    {{{WALL}, {WALL}, {WALL}, {WALL}, {FLOOR},
-      {FLOOR,NO_BG,{BIG_LIFE_POTION}}, {FLOOR,TORCH}, {OPENER_FLOOR}, {FLOOR}, {DOOR}},
-     {{WALL}, {WALL}, {WALL}, {WALL}, {WALL},
-      {WALL}, {WALL}, {WALL}, {WALL}, {WALL}},
-     {{WALL}, {WALL}, {WALL}, {WALL}, {WALL},
-      {WALL}, {WALL}, {WALL}, {WALL}, {WALL}}},
+    {{{NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR},
+      {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}},
+     {{NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR},
+      {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}},
+     {{FLOOR}, {FLOOR}, {FLOOR}, {FLOOR}, {FLOOR},
+      {FLOOR}, {FLOOR,BALCONY}, {FLOOR}, {FLOOR}, {FLOOR}}},
+
+    [24] =
+    {{{NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR},
+      {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}},
+     {{NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR},
+      {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}},
+     {{FLOOR}, {FLOOR}, {FLOOR}, {FLOOR}, {FLOOR},
+      {FLOOR}, {FLOOR,BALCONY}, {FLOOR}, {FLOOR}, {FLOOR}}},
   },
 
   .link = {[0] = {0, 0, 0, 0},
@@ -143,7 +151,8 @@ static struct level level_1 = {
            [7] = {0, 8, 23, 0},
            [8] = {7, 6, 0, 0},
            [9] = {3, 0, 0, 0},
-           [23] = {23, 23, 0, 7}},
+           [23] = {24, 24, 0, 7},
+           [24] = {23, 23, 0, 7}},
 
   .event = {
     [0] = {{8,0,9}, false},

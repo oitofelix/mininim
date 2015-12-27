@@ -20,48 +20,101 @@
 #include <stddef.h>
 #include "kernel/video.h"
 #include "kernel/random.h"
+#include "physics.h"
 #include "stars.h"
 
 /* functions */
-static void draw_stars (struct star stars[], size_t count);
+static void draw_stars (ALLEGRO_BITMAP *bitmap, struct star star[], size_t count,
+                        enum vm vm);
+static ALLEGRO_COLOR get_star_color (int i, enum vm vm);
+
+static ALLEGRO_COLOR
+get_star_color (int i, enum vm vm)
+{
+  switch (vm) {
+  case CGA:
+    switch (i) {
+    case 0: return C_STAR_COLOR_01;
+    case 1: return C_STAR_COLOR_02;
+    case 2: return C_STAR_COLOR_03;
+    }
+  case EGA:
+    switch (i) {
+    case 0: return E_STAR_COLOR_01;
+    case 1: return E_STAR_COLOR_02;
+    case 2: return E_STAR_COLOR_03;
+    }
+  case VGA:
+    switch (i) {
+    case 0: return V_STAR_COLOR_01;
+    case 1: return V_STAR_COLOR_02;
+    case 2: return V_STAR_COLOR_03;
+    }
+  }
+  return V_STAR_COLOR_03;
+}
 
 static void
-draw_stars (struct star stars[], size_t count)
+draw_stars (ALLEGRO_BITMAP *bitmap, struct star star[], size_t count,
+            enum vm vm)
 {
-  static int i = 0;
+  int i;
 
-  if (! count) return;
+  for (i = 0; i < count; i++) {
+    if (star[i].color >= 0 && star[i].color <= 2
+        && prandom (12)) continue;
 
-  int random = prandom_uniq (STARS_RANDOM_SEED + i, 1, count - 1);
-  struct star *star = &stars[random];
-
-  switch (star->color)
-    {
-    case 1:
-    case 3:
-      star->color = 2;
-      break;
-    case 2:
-    default:
-      star->color = prandom (2) + 1;
-    }
-
-  size_t j;
-  al_set_target_bitmap (screen);
-  for (j = 0; j < count; j++) {
-      unsigned char rgb = (stars[j].color * 255) / 3;
-      al_put_pixel (stars[j].x, stars[j].y, al_map_rgb (rgb, rgb, rgb));
+    switch (star[i].color)
+      {
+      case 0: case 2: star[i].color = 1; break;
+      case 1: default: star[i].color = prandom (1) ? 0 : 2;
+      }
   }
 
-  i++;
+  al_set_target_bitmap (bitmap);
+  for (i = 0; i < count; i++)
+    al_put_pixel (star[i].x, star[i].y,
+                  get_star_color (star[i].color, vm));
 }
 
 void
 draw_princess_room_stars (void)
 {
-  static struct star stars[6] = {
+  static struct star star[6] = {
     {20,97,1}, {16,104,2}, {23,110,1},
     {17,116,2}, {24,120,3}, {18,128,3}};
 
-  draw_stars (stars, 6);
+  draw_stars (screen, star, 6, vm);
+}
+
+void
+draw_balcony_stars (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                    enum vm vm)
+{
+  static struct star star[FLOORS + 2][PLACES + 1][5];
+  struct star *s;
+
+  if (con (p)->bg != BALCONY) return;
+
+  s = &star[p->floor + 1][p->place + 1][0];
+  s->x = PLACE_WIDTH * p->place + 21;
+  s->y = PLACE_HEIGHT * p->floor - 2;
+
+  s = &star[p->floor + 1][p->place + 1][1];
+  s->x = PLACE_WIDTH * (p->place + 1) + 8;
+  s->y = PLACE_HEIGHT * p->floor - 2;
+
+  s = &star[p->floor + 1][p->place + 1][2];
+  s->x = PLACE_WIDTH * p->place + 23;
+  s->y = PLACE_HEIGHT * p->floor + 4;
+
+  s = &star[p->floor + 1][p->place + 1][3];
+  s->x = PLACE_WIDTH * p->place + 24;
+  s->y = PLACE_HEIGHT * p->floor + 17;
+
+  s = &star[p->floor + 1][p->place + 1][4];
+  s->x = PLACE_WIDTH * (p->place + 1) + 7;
+  s->y = PLACE_HEIGHT * p->floor + 10;
+
+  draw_stars (bitmap, star[p->floor + 1][p->place + 1], 5, vm);
 }
