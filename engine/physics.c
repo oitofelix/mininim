@@ -76,6 +76,12 @@ is_strictly_traversable (struct pos *p)
 
   if (t == NO_FLOOR) return true;
   if (t == BIG_PILLAR_TOP) return true;
+  if (t == ARCH_TOP_MID) return true;
+  if (t == ARCH_TOP_SMALL) return true;
+  if (t == ARCH_TOP_LEFT) return true;
+  if (t == ARCH_TOP_RIGHT) return true;
+  if (t == ARCH_TOP_LEFT_END) return true;
+  if (t == ARCH_TOP_RIGHT_END) return true;
   /* if (t == LOOSE_FLOOR) { */
   /*   struct loose_floor *l = loose_floor_at_pos (p); */
   /*   if (l->action == FALL_LOOSE_FLOOR) return true; */
@@ -96,8 +102,14 @@ bool
 is_rigid_con (struct pos *p)
 {
   enum confg fg = con (p)->fg;
-  return fg == PILLAR || fg == BIG_PILLAR_TOP ||
-    fg == WALL || fg == DOOR || fg == CHOPPER;
+  return fg == PILLAR || fg == BIG_PILLAR_TOP
+    || fg == WALL || fg == DOOR || fg == CHOPPER
+    || fg == ARCH_TOP_MID
+    || fg == ARCH_TOP_SMALL
+    || fg == ARCH_TOP_LEFT
+    || fg == ARCH_TOP_RIGHT
+    || fg == ARCH_TOP_LEFT_END
+    || fg == ARCH_TOP_RIGHT_END;
 }
 
 
@@ -232,6 +244,7 @@ is_colliding (struct frame *f, struct frame_offset *fo, int dx,
 
   bool wall_collision = false;
   bool door_collision = false;
+  bool arch_collision = false;
 
   /* wall */
 
@@ -274,17 +287,29 @@ is_colliding (struct frame *f, struct frame_offset *fo, int dx,
       }
     }
 
+  /* arch top left end */
+
+  if (_f.dir == RIGHT && pbf.place > _pbf.place)
+    for (prel (&_pbf, &p, +0, +1); p.place <= pbf.place; prel (&p, &p, +0, +1)) {
+      if (con (&p)->fg == ARCH_TOP_LEFT_END) {
+        arch_collision = true;
+        ci->p = p;
+        break;
+      }
+    }
+
   ci->t = NO_FLOOR;
   if (wall_collision) ci->t = WALL;
   if (door_collision) ci->t = DOOR;
+  if (arch_collision) ci->t = ARCH_TOP_LEFT_END;
 
-  if (wall_collision || door_collision)
+  if (wall_collision || door_collision || arch_collision)
     pos2room (&ci->p, _f.c.room, &ci->p);
 
   /* if (door_collision) printf ("DOOR COLLISION!\n"); */
   /* if (wall_collision) printf ("WALL COLLISION!\n"); */
 
-  return wall_collision || door_collision;
+  return wall_collision || door_collision || arch_collision;
 }
 
 bool
@@ -367,13 +392,25 @@ dist_chopper (struct frame *f, bool reverse)
 int
 dist_fall (struct frame *f, bool reverse)
 {
-  int dnf, dbpt;
+  int dnf, dbpt, datm, dats, datl, datr, datle, datre;
 
   dnf = dist_con (f, _bf, pos, -4, reverse, NO_FLOOR);
   dbpt = dist_con (f, _bf, pos, -4, reverse, BIG_PILLAR_TOP);
+  datm = dist_con (f, _bf, pos, -4, reverse, ARCH_TOP_MID);
+  dats = dist_con (f, _bf, pos, -4, reverse, ARCH_TOP_SMALL);
+  datl = dist_con (f, _bf, pos, -4, reverse, ARCH_TOP_LEFT);
+  datr = dist_con (f, _bf, pos, -4, reverse, ARCH_TOP_RIGHT);
+  datle = dist_con (f, _bf, pos, -4, reverse, ARCH_TOP_LEFT_END);
+  datre = dist_con (f, _bf, pos, -4, reverse, ARCH_TOP_RIGHT_END);
 
   if (dnf <= PLACE_WIDTH) return dnf;
   if (dbpt <= PLACE_WIDTH) return dbpt;
+  if (datm <= PLACE_WIDTH) return datm;
+  if (dats <= PLACE_WIDTH) return dats;
+  if (datl <= PLACE_WIDTH) return datl;
+  if (datr <= PLACE_WIDTH) return datr;
+  if (datle <= PLACE_WIDTH) return datle;
+  if (datre <= PLACE_WIDTH) return datre;
   return PLACE_WIDTH + 1;
 }
 
@@ -397,7 +434,8 @@ is_hangable_con (struct pos *p, enum dir d)
     || t == BIG_PILLAR_BOTTOM
     || t == DOOR
     || t == LEVEL_DOOR
-    || (t == CHOPPER && d == LEFT);
+    || (t == CHOPPER && d == LEFT)
+    || t == ARCH_BOTTOM;
 }
 
 bool

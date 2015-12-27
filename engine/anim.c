@@ -61,7 +61,7 @@ play_anim (void (*draw_callback) (void),
     case ALLEGRO_EVENT_TIMER:
       if (event.timer.source == timer) {
         get_keyboard_state ();
-        if (was_key_pressed (ALLEGRO_KEY_ESCAPE, 0, ALLEGRO_KEYMOD_SHIFT, false))
+        if (was_key_pressed (ALLEGRO_KEY_ESCAPE, 0, ALLEGRO_KEYMOD_ALT, false))
           pause_anim = true;
         if (was_key_pressed (ALLEGRO_KEY_ESCAPE, 0, ALLEGRO_KEYMOD_CTRL, true))
           pause_anim = false;
@@ -71,7 +71,7 @@ play_anim (void (*draw_callback) (void),
         if (! is_video_effect_started ()) show ();
         if (! pause_anim
             || was_key_pressed (ALLEGRO_KEY_ESCAPE, 0,
-                                ALLEGRO_KEYMOD_SHIFT, true)) {
+                                ALLEGRO_KEYMOD_ALT, true)) {
           if (compute_callback) compute_callback ();
           draw_callback ();
           if (sample_callback) sample_callback ();

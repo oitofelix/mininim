@@ -126,7 +126,7 @@ flow (struct anim *kid)
 
     kid->dcd = 0;
 
-    if (kid->dc <= PLACE_WIDTH + 4 && kid->ci.t == DOOR) {
+    if (kid->dc <= PLACE_WIDTH + 4 && kid->ci.t != WALL) {
       kid->dcd = 9;
       kid->dc -= kid->dcd;
     }

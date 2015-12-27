@@ -45,6 +45,7 @@
 #include "torch.h"
 #include "window.h"
 #include "balcony.h"
+#include "arch.h"
 #include "room.h"
 
 static int last_level;
@@ -75,6 +76,7 @@ load_room (void)
   load_torch ();
   load_window ();
   load_balcony ();
+  load_arch ();
 
   load_loose_floor_samples ();
   load_opener_floor_samples ();
@@ -106,6 +108,7 @@ unload_room (void)
   unload_torch ();
   unload_window ();
   unload_balcony ();
+  unload_arch ();
 
   /* sounds */
   unload_loose_floor_samples ();
@@ -294,6 +297,13 @@ draw_confg_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case DOOR: draw_floor_base (bitmap, p, em, vm); break;
   case LEVEL_DOOR: draw_floor_base (bitmap, p, em, vm); break;
   case CHOPPER: draw_floor_base (bitmap, p, em, vm); break;
+  case ARCH_BOTTOM: draw_floor_base (bitmap, p, em, vm); break;
+  case ARCH_TOP_MID: break;
+  case ARCH_TOP_SMALL: break;
+  case ARCH_TOP_LEFT: break;
+  case ARCH_TOP_RIGHT: break;
+  case ARCH_TOP_LEFT_END: break;
+  case ARCH_TOP_RIGHT_END: break;
   default:
     error (-1, 0, "%s: unknown foreground (%i)",
            __func__, con (p)->fg);
@@ -322,6 +332,15 @@ draw_confg_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case DOOR: draw_door_left (bitmap, p, em, vm); break;
   case LEVEL_DOOR: draw_floor_left (bitmap, p, em, vm); break;
   case CHOPPER: draw_chopper_left (bitmap, p, em, vm); break;
+  case ARCH_BOTTOM:
+    draw_floor_left (bitmap, p, em, vm);
+    draw_arch_bottom (bitmap, p, em, vm); break;
+  case ARCH_TOP_MID: draw_arch_top_mid (bitmap, p, em, vm); break;
+  case ARCH_TOP_SMALL: draw_arch_top_small (bitmap, p, em, vm); break;
+  case ARCH_TOP_LEFT: draw_arch_top_left (bitmap, p, em, vm); break;
+  case ARCH_TOP_RIGHT: draw_arch_top_right (bitmap, p, em, vm); break;
+  case ARCH_TOP_LEFT_END: draw_arch_top_left_end (bitmap, p, em, vm); break;
+  case ARCH_TOP_RIGHT_END: draw_arch_top_right_end (bitmap, p, em, vm); break;
   default:
     error (-1, 0, "%s: unknown foreground (%i)",
            __func__, con (p)->fg);
@@ -354,6 +373,13 @@ draw_confg_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case DOOR: draw_door_right (bitmap, p, em, vm); break;
   case LEVEL_DOOR: draw_floor_right (bitmap, p, em, vm); break;
   case CHOPPER: draw_floor_right (bitmap, p, em, vm); break;
+  case ARCH_BOTTOM: draw_floor_right (bitmap, p, em, vm); break;
+  case ARCH_TOP_MID: break;
+  case ARCH_TOP_SMALL: break;
+  case ARCH_TOP_LEFT: break;
+  case ARCH_TOP_RIGHT: break;
+  case ARCH_TOP_LEFT_END: break;
+  case ARCH_TOP_RIGHT_END: break;
   default:
     error (-1, 0, "%s: unknown foreground (%i)",
            __func__, con (p)->fg);
@@ -410,6 +436,13 @@ draw_confg_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case DOOR: draw_door_fg (bitmap, p, f, em, vm); break;
   case LEVEL_DOOR: draw_level_door_fg (bitmap, p, f, em, vm); break;
   case CHOPPER: draw_chopper_fg (bitmap, p, em, vm); break;
+  case ARCH_BOTTOM: draw_arch_bottom (bitmap, p, em, vm); break;
+  case ARCH_TOP_MID: draw_arch_top_mid (bitmap, p, em, vm); break;
+  case ARCH_TOP_SMALL: draw_arch_top_small (bitmap, p, em, vm); break;
+  case ARCH_TOP_LEFT: draw_arch_top_left (bitmap, p, em, vm); break;
+  case ARCH_TOP_RIGHT: draw_arch_top_right (bitmap, p, em, vm); break;
+  case ARCH_TOP_LEFT_END: draw_arch_top_left_end (bitmap, p, em, vm); break;
+  case ARCH_TOP_RIGHT_END: draw_arch_top_right_end (bitmap, p, em, vm); break;
   default:
     error (-1, 0, "%s: unknown foreground (%i)",
            __func__, con (p)->fg);
@@ -484,12 +517,13 @@ void
 draw_room_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
               enum em em, enum vm vm, struct frame *f)
 {
-  struct coord tl, bl, c;
+  struct coord tl, bl, br, c;
   struct pos ptl, pbl, pm, ptf, ptr, pmt, pmbo,
     fptl, fptr, fpmt, fpmbo, np;
 
   survey (_tl, pos, f, &tl, &ptl, &np);
   survey (_bl, pos, f, &bl, &pbl, &np);
+  survey (_br, pos, f, &br, &np, &np);
   survey (_m, pos, f, &c, &pm, &np);
   survey (_tf, pos, f, &c, &ptf, &np);
   survey (_tr, pos, f, &c, &ptr, &np);
@@ -502,9 +536,8 @@ draw_room_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
   survey (_mbo, posf, f, &c, &fpmbo, &np);
 
   /* when falling at construct's left */
-  if ((peq (p, prel (&pbl, &np, -1, +1))
-       || (peq (p, prel (&pbl, &np, +0, +1))
-           && bl.y >= (p->floor + 1) * PLACE_HEIGHT - 6))
+  if (br.y >= (p->floor + 1) * PLACE_HEIGHT - 6
+      && br.x >= p->place * PLACE_WIDTH
       && is_kid_fall (f)) {
     draw_confg_base (bitmap, p, em, vm);
     draw_confg_left (bitmap, p, em, vm, true);
@@ -537,6 +570,8 @@ draw_room_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
         draw_pillar_fg (bitmap, p, em, vm);
       else if (con (p)->fg == BIG_PILLAR_BOTTOM)
         draw_big_pillar_bottom_fg (bitmap, p, em, vm);
+      else if (con (p)->fg == ARCH_BOTTOM)
+        draw_arch_bottom (bitmap, p, em, vm);
     }
     /* when below the construction */
   } else if ((peq (p, &fptl)

@@ -27,6 +27,7 @@
 static void draw_stars (ALLEGRO_BITMAP *bitmap, struct star star[], size_t count,
                         enum vm vm);
 static ALLEGRO_COLOR get_star_color (int i, enum vm vm);
+static struct star *star_coord (struct pos *p, int i, struct star *s);
 
 static ALLEGRO_COLOR
 get_star_color (int i, enum vm vm)
@@ -92,29 +93,22 @@ draw_balcony_stars (ALLEGRO_BITMAP *bitmap, struct pos *p,
                     enum vm vm)
 {
   static struct star star[FLOORS + 2][PLACES + 1][5];
-  struct star *s;
 
   if (con (p)->bg != BALCONY) return;
 
-  s = &star[p->floor + 1][p->place + 1][0];
-  s->x = PLACE_WIDTH * p->place + 21;
-  s->y = PLACE_HEIGHT * p->floor - 2;
-
-  s = &star[p->floor + 1][p->place + 1][1];
-  s->x = PLACE_WIDTH * (p->place + 1) + 8;
-  s->y = PLACE_HEIGHT * p->floor - 2;
-
-  s = &star[p->floor + 1][p->place + 1][2];
-  s->x = PLACE_WIDTH * p->place + 23;
-  s->y = PLACE_HEIGHT * p->floor + 4;
-
-  s = &star[p->floor + 1][p->place + 1][3];
-  s->x = PLACE_WIDTH * p->place + 24;
-  s->y = PLACE_HEIGHT * p->floor + 17;
-
-  s = &star[p->floor + 1][p->place + 1][4];
-  s->x = PLACE_WIDTH * (p->place + 1) + 7;
-  s->y = PLACE_HEIGHT * p->floor + 10;
+  star_coord (p, 0, &star[p->floor + 1][p->place + 1][0]);
+  star_coord (p, 1, &star[p->floor + 1][p->place + 1][1]);
+  star_coord (p, 2, &star[p->floor + 1][p->place + 1][2]);
+  star_coord (p, 3, &star[p->floor + 1][p->place + 1][3]);
+  star_coord (p, 4, &star[p->floor + 1][p->place + 1][4]);
 
   draw_stars (bitmap, star[p->floor + 1][p->place + 1], 5, vm);
+}
+
+static struct star *
+star_coord (struct pos *p, int i, struct star *s)
+{
+  s->x = PLACE_WIDTH * p->place + 16 + prandom_pos_uniq (p, 2 * i, 1, 28);
+  s->y = PLACE_HEIGHT * p->floor - 3 + prandom_pos_uniq (p, 2 * i + 1, 1, 21);
+  return s;
 }
