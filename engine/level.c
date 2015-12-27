@@ -231,6 +231,8 @@ process_keys (void)
     al_start_timer (play_time);
   }
 
+  if (pause_game) anim_cycle--;
+
   /* R: resurrect kid */
   if (was_key_pressed (ALLEGRO_KEY_R, 0, 0, true)
       && is_kid_dead (&current_kid->f))
