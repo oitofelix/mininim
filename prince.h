@@ -249,6 +249,8 @@ struct level {
       ARCH_TOP_MID,
       ARCH_TOP_SMALL,
       ARCH_TOP_TOP,
+      CARPET_01,
+      CARPET_02,
     } fg;
     enum conbg {
       NO_BG,

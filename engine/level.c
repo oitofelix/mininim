@@ -464,6 +464,8 @@ draw_level (void)
   struct pos p;
   p.room = room_view;
 
+  run_room_callbacks (p.room);
+
   for (p.floor = FLOORS; p.floor >= -1; p.floor--)
     for (p.place = -1; p.place < PLACES; p.place++) {
       draw_fire (screen, &p, vm);

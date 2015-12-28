@@ -31,6 +31,9 @@ bool is_pos_visible (struct pos *p);
 bool is_strictly_traversable (struct pos *p);
 bool is_traversable (struct pos *p);
 bool is_rigid_con (struct pos *p);
+bool is_carpet (struct pos *p);
+bool is_arch_top (struct pos *p);
+
 
 
 int dist_next_place (struct frame *f, coord_f cf, pos_f pf,

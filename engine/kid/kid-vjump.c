@@ -187,6 +187,7 @@ physics_in (struct anim *kid)
   if (kid->i == 0
       && is_hangable_pos (prel (&ptf, &np, 0, dir), kid->f.dir)
       && ! (con (&ptf)->fg == DOOR
+            && kid->f.dir == LEFT
             && tf.y <= door_grid_tip_y (&ptf) - 10)) {
     prel (&ptf, &kid->hang_pos, 0, dir);
     pos2room (&kid->hang_pos, kid->f.c.room, &kid->hang_pos);

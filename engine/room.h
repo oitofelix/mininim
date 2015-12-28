@@ -38,7 +38,7 @@ void draw_filled_rect (ALLEGRO_BITMAP *to, struct rect *r,
 
 void register_room_callback (room_callback_f f);
 void remove_room_callback (room_callback_f f);
-void run_room_callbacks (int last_room, int room);
+void run_room_callbacks (int room);
 
 void draw_room (ALLEGRO_BITMAP *bitmap, int room,
                 enum em em, enum vm vm);

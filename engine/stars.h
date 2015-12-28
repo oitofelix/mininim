@@ -22,6 +22,7 @@
 
 /* macros */
 #define STARS_RANDOM_SEED 78234782
+#define STARS 7
 
 /* types */
 struct star {
@@ -30,6 +31,8 @@ struct star {
 };
 
 /* functions */
+void load_stars (void);
+void unload_stars (void);
 void draw_princess_room_stars (void);
 void draw_balcony_stars (ALLEGRO_BITMAP *bitmap, struct pos *p,
                          enum vm vm);

@@ -46,6 +46,8 @@
 #include "window.h"
 #include "balcony.h"
 #include "arch.h"
+#include "carpet.h"
+#include "stars.h"
 #include "room.h"
 
 static int last_level;
@@ -77,6 +79,8 @@ load_room (void)
   load_window ();
   load_balcony ();
   load_arch ();
+  load_carpet ();
+  load_stars ();
 
   load_loose_floor_samples ();
   load_opener_floor_samples ();
@@ -109,6 +113,8 @@ unload_room (void)
   unload_window ();
   unload_balcony ();
   unload_arch ();
+  unload_carpet ();
+  unload_stars ();
 
   /* sounds */
   unload_loose_floor_samples ();
@@ -206,8 +212,9 @@ remove_room_callback (room_callback_f f)
 }
 
 void
-run_room_callbacks (int last_room, int room)
+run_room_callbacks (int room)
 {
+  if (room == last_room) return;
   size_t i;
   for (i = 0; i < room_callback_nmemb; i++)
     room_callback[i] (last_room, room);
@@ -225,8 +232,6 @@ draw_room (ALLEGRO_BITMAP *bitmap, int room,
       || vm != last_vm
       || hgc != last_hgc
       || level.number != last_level) {
-    if (room != last_room)
-      run_room_callbacks (last_room, room);
     update_wall_cache (room, em, vm);
     last_em = em;
     last_vm = vm;
@@ -304,6 +309,8 @@ draw_confg_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case ARCH_TOP_RIGHT: break;
   case ARCH_TOP_LEFT_END: break;
   case ARCH_TOP_RIGHT_END: break;
+  case CARPET_01: break;
+  case CARPET_02: break;
   default:
     error (-1, 0, "%s: unknown foreground (%i)",
            __func__, con (p)->fg);
@@ -341,12 +348,24 @@ draw_confg_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case ARCH_TOP_RIGHT: draw_arch_top_right (bitmap, p, em, vm); break;
   case ARCH_TOP_LEFT_END: draw_arch_top_left_end (bitmap, p, em, vm); break;
   case ARCH_TOP_RIGHT_END: draw_arch_top_right_end (bitmap, p, em, vm); break;
+  case CARPET_01: draw_carpet_01 (bitmap, p, em, vm); break;
+  case CARPET_02: draw_carpet_02 (bitmap, p, em, vm); break;
   default:
     error (-1, 0, "%s: unknown foreground (%i)",
            __func__, con (p)->fg);
   }
 
   if (! redraw) return;
+
+  /* above */
+ struct pos pa; prel (p, &pa, -1, +0);
+  switch (con (p)->fg) {
+  case CARPET_01: case CARPET_02:
+    draw_confg_base (bitmap, &pa, em, vm);
+    draw_confg_left (bitmap, &pa, em, vm, true);
+    break;
+  default: break;
+  }
 }
 
 void
@@ -380,6 +399,8 @@ draw_confg_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case ARCH_TOP_RIGHT: break;
   case ARCH_TOP_LEFT_END: break;
   case ARCH_TOP_RIGHT_END: break;
+  case CARPET_01: break;
+  case CARPET_02: break;
   default:
     error (-1, 0, "%s: unknown foreground (%i)",
            __func__, con (p)->fg);
@@ -443,10 +464,15 @@ draw_confg_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case ARCH_TOP_RIGHT: draw_arch_top_right (bitmap, p, em, vm); break;
   case ARCH_TOP_LEFT_END: draw_arch_top_left_end (bitmap, p, em, vm); break;
   case ARCH_TOP_RIGHT_END: draw_arch_top_right_end (bitmap, p, em, vm); break;
+  case CARPET_01: draw_carpet_fg_01 (bitmap, p, f, em, vm); break;
+  case CARPET_02: draw_carpet_fg_02 (bitmap, p, f, em, vm); break;
   default:
     error (-1, 0, "%s: unknown foreground (%i)",
            __func__, con (p)->fg);
   }
+
+  struct pos pr; prel (p, &pr, +0, +1);
+  if (is_carpet (&pr)) draw_confg_fg (bitmap, &pr, em, vm, f);
 }
 
 void
@@ -519,7 +545,7 @@ draw_room_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
 {
   struct coord tl, bl, br, c;
   struct pos ptl, pbl, pm, ptf, ptr, pmt, pmbo,
-    fptl, fptr, fpmt, fpmbo, np;
+    fptl, fptr, fpmt, fpmbo, fptf, np;
 
   survey (_tl, pos, f, &tl, &ptl, &np);
   survey (_bl, pos, f, &bl, &pbl, &np);
@@ -534,19 +560,31 @@ draw_room_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
   survey (_tr, posf, f, &c, &fptr, &np);
   survey (_mt, posf, f, &c, &fpmt, &np);
   survey (_mbo, posf, f, &c, &fpmbo, &np);
+  survey (_tf, posf, f, &c, &fptf, &np);
+
+  struct pos pr; prel (p, &pr, +0, +1);
+  struct pos pb; prel (p, &pb, +1, +0);
+  struct pos pa; prel (p, &pa, -1, +0);
 
   /* when falling at construct's left */
   if (br.y >= (p->floor + 1) * PLACE_HEIGHT - 6
       && br.x >= p->place * PLACE_WIDTH
-      && is_kid_fall (f)) {
+      && is_kid_fall (f)
+      && ! is_carpet (p)) {
     draw_confg_base (bitmap, p, em, vm);
     draw_confg_left (bitmap, p, em, vm, true);
   }
   /* when climbing the construct */
-  else if (peq (&ptf, p)
-           && is_kid_climb (f)
+  else if (((peq (&ptf, p)
+             && is_kid_climb (f))
+            || (peq (&fptf, p)
+                && is_kid_vjump (f)
+                && is_carpet (&pb)))
            && f->dir == RIGHT) {
     draw_confg_base (bitmap, p, em, vm);
+
+    if (is_carpet (&pr))
+      draw_confg_left (bitmap, &pr, em, vm, true);
 
     if (con (p)->fg == BROKEN_FLOOR)
       draw_broken_floor_fg (bitmap, p, em, vm);
@@ -565,6 +603,7 @@ draw_room_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
                || f->b == kid_climb_08
                || f->b == kid_climb_05)
         draw_floor_corner_02 (bitmap, p, em, vm);
+      else draw_confg_left (bitmap, p, em, vm, true);
 
       if (con (p)->fg == PILLAR)
         draw_pillar_fg (bitmap, p, em, vm);
@@ -587,6 +626,11 @@ draw_room_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
              && floor_left_coord (p, &c)->y <= tl.y
              && ! is_strictly_traversable (p))
     draw_confg (bitmap, p, em, vm, true);
+  /* hanging */
+  else if ((is_kid_hanging_at_pos (f, &pa)
+            && is_carpet (&pr)
+            && f->dir == RIGHT))
+    draw_confg_left (bitmap, &pr, em, vm, true);
   /* other cases */
   draw_confg_fg (bitmap, p, em, vm, f);
 }
