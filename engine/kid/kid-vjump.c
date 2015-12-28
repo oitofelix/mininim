@@ -163,6 +163,11 @@ physics_in (struct anim *kid)
 {
   struct coord nc, tf; struct pos np, ptf, ptb, pm, pmf, pmba;
 
+  /* collision */
+  if (is_colliding (&kid->f, &kid->fo, +0, false, &kid->ci)
+      && kid->ci.t == MIRROR)
+    kid->f.c.x += (kid->f.dir == LEFT) ? +4 : -4;
+
   /* fall */
   survey (_m, pos, &kid->f, &nc, &pm, &np);
   survey (_mf, pos, &kid->f, &nc, &pmf, &np);

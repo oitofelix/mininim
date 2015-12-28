@@ -69,6 +69,12 @@ compute_stars_position (int last_room, int room)
 
   for (p.floor = FLOORS; p.floor >= -1; p.floor--)
     for (p.place = -1; p.place < PLACES; p.place++) {
+      struct stars_bitmap *sb =
+        &stars_bitmap[p.floor + 1][p.place + 1];
+      if (sb->b) {
+        al_destroy_bitmap (sb->b);
+        sb->b = NULL;
+      }
       if (con (&p)->bg != BALCONY) continue;
 
       for (i = 0; i < STARS; i++) {
@@ -81,10 +87,6 @@ compute_stars_position (int last_room, int room)
         s->color = next_color (s->color);
       }
 
-      struct stars_bitmap *sb =
-        &stars_bitmap [p.floor + 1][p.place + 1];
-
-      if (sb->b) al_destroy_bitmap (sb->b);
       sb->b = create_bitmap (max_x - min_x + 1, max_y - min_y + 1);
       clear_bitmap (sb->b, TRANSPARENT);
       sb->c.room = room;

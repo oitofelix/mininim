@@ -251,6 +251,7 @@ struct level {
       ARCH_TOP_TOP,
       CARPET_01,
       CARPET_02,
+      MIRROR,
     } fg;
     enum conbg {
       NO_BG,

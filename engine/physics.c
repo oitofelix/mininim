@@ -102,7 +102,8 @@ is_rigid_con (struct pos *p)
   enum confg fg = con (p)->fg;
   return fg == PILLAR || fg == BIG_PILLAR_TOP
     || fg == WALL || fg == DOOR || fg == CHOPPER
-    || is_arch_top (p) || is_carpet (p);
+    || is_arch_top (p) || is_carpet (p)
+    || fg == MIRROR;
 }
 
 bool
@@ -258,6 +259,7 @@ is_colliding (struct frame *f, struct frame_offset *fo, int dx,
   bool wall_collision = false;
   bool door_collision = false;
   bool carpet_collision = false;
+  bool mirror_collision = false;
 
   /* wall */
 
@@ -321,18 +323,40 @@ is_colliding (struct frame *f, struct frame_offset *fo, int dx,
       }
     }
 
+  /* mirror */
+
+  if (_f.dir == LEFT && pbf.place < _pbf.place)
+    for (prel (&_pbf, &p, +0, -1); p.place >= pbf.place; prel (&p, &p, +0, -1)) {
+      prel (&p, &pr, +0, +1);
+      if (con (&pr)->fg == MIRROR) {
+        mirror_collision = true;
+        ci->p = p;
+        break;
+      }
+    }
+
+  if (_f.dir == RIGHT && pbf.place > _pbf.place)
+    for (prel (&_pbf, &p, +0, +1); p.place <= pbf.place; prel (&p, &p, +0, +1)) {
+      if (con (&p)->fg == MIRROR) {
+        mirror_collision = true;
+        ci->p = p;
+        break;
+      }
+    }
+
   ci->t = NO_FLOOR;
   if (wall_collision) ci->t = WALL;
   if (door_collision) ci->t = DOOR;
   if (carpet_collision) ci->t = CARPET_01;
+  if (mirror_collision) ci->t = MIRROR;
 
-  if (wall_collision || door_collision || carpet_collision)
+  if (wall_collision || door_collision || carpet_collision || mirror_collision)
     pos2room (&ci->p, _f.c.room, &ci->p);
 
   /* if (door_collision) printf ("DOOR COLLISION!\n"); */
   /* if (wall_collision) printf ("WALL COLLISION!\n"); */
 
-  return wall_collision || door_collision || carpet_collision;
+  return wall_collision || door_collision || carpet_collision || mirror_collision;
 }
 
 bool
@@ -463,7 +487,8 @@ is_hangable_con (struct pos *p, enum dir d)
     || t == DOOR
     || t == LEVEL_DOOR
     || (t == CHOPPER && d == LEFT)
-    || t == ARCH_BOTTOM;
+    || t == ARCH_BOTTOM
+    || (t == MIRROR && d == LEFT);
 }
 
 bool
@@ -480,7 +505,8 @@ is_hangable_pos (struct pos *p, enum dir d)
     && is_strictly_traversable (&pa)
     && ! (d == RIGHT && cr->fg == CHOPPER)
     && ! (d == LEFT && is_carpet (&pa))
-    && ! (d == RIGHT && is_carpet (&pr));
+    && ! (d == RIGHT && is_carpet (&pr))
+    && ! (d == RIGHT && con (&pr)->fg == MIRROR);
 }
 
 bool

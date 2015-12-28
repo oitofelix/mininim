@@ -233,10 +233,20 @@ physics_in (struct anim *kid)
   enum confg cm;
 
   /* collision */
-  if (is_colliding (&kid->f, &kid->fo, +0, false, &kid->ci)) {
+  if (is_colliding (&kid->f, &kid->fo, +0, false, &kid->ci)
+      && kid->ci.t != MIRROR) {
     kid_stabilize_collision (kid);
     return false;
+  } else if (is_colliding (&kid->f, &kid->fo, +2, false, &kid->ci)
+             && kid->ci.t == MIRROR) {
+    if (kid->i <= 2)
+      kid->f.c.x += (kid->f.dir == LEFT) ? +4 : -4;
+    else {
+      kid_stabilize_collision (kid);
+      return false;
+    }
   }
+
 
   /* fall */
   cm = survey (_m, pos, &kid->f, &nc, &pm, &np)->fg;

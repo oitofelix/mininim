@@ -48,6 +48,7 @@
 #include "arch.h"
 #include "carpet.h"
 #include "stars.h"
+#include "mirror.h"
 #include "room.h"
 
 static int last_level;
@@ -81,6 +82,7 @@ load_room (void)
   load_arch ();
   load_carpet ();
   load_stars ();
+  load_mirror ();
 
   load_loose_floor_samples ();
   load_opener_floor_samples ();
@@ -115,6 +117,7 @@ unload_room (void)
   unload_arch ();
   unload_carpet ();
   unload_stars ();
+  unload_mirror ();
 
   /* sounds */
   unload_loose_floor_samples ();
@@ -311,6 +314,7 @@ draw_confg_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case ARCH_TOP_RIGHT_END: break;
   case CARPET_01: break;
   case CARPET_02: break;
+  case MIRROR: draw_floor_base (bitmap, p, em, vm); break;
   default:
     error (-1, 0, "%s: unknown foreground (%i)",
            __func__, con (p)->fg);
@@ -350,6 +354,9 @@ draw_confg_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case ARCH_TOP_RIGHT_END: draw_arch_top_right_end (bitmap, p, em, vm); break;
   case CARPET_01: draw_carpet_01 (bitmap, p, em, vm); break;
   case CARPET_02: draw_carpet_02 (bitmap, p, em, vm); break;
+  case MIRROR:
+    draw_floor_left (bitmap, p, em, vm);
+    draw_mirror (bitmap, p, em, vm); break;
   default:
     error (-1, 0, "%s: unknown foreground (%i)",
            __func__, con (p)->fg);
@@ -401,6 +408,7 @@ draw_confg_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case ARCH_TOP_RIGHT_END: break;
   case CARPET_01: break;
   case CARPET_02: break;
+  case MIRROR: draw_floor_right (bitmap, p, em, vm); break;
   default:
     error (-1, 0, "%s: unknown foreground (%i)",
            __func__, con (p)->fg);
@@ -466,6 +474,7 @@ draw_confg_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case ARCH_TOP_RIGHT_END: draw_arch_top_right_end (bitmap, p, em, vm); break;
   case CARPET_01: draw_carpet_fg_01 (bitmap, p, f, em, vm); break;
   case CARPET_02: draw_carpet_fg_02 (bitmap, p, f, em, vm); break;
+  case MIRROR: draw_mirror_fg (bitmap, p, em, vm); break;
   default:
     error (-1, 0, "%s: unknown foreground (%i)",
            __func__, con (p)->fg);
@@ -579,7 +588,8 @@ draw_room_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
              && is_kid_climb (f))
             || (peq (&fptf, p)
                 && is_kid_vjump (f)
-                && is_carpet (&pb)))
+                && (is_carpet (&pb)
+                    || con (&pb)->fg == MIRROR)))
            && f->dir == RIGHT) {
     draw_confg_base (bitmap, p, em, vm);
 

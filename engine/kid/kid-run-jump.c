@@ -166,11 +166,17 @@ physics_in (struct anim *kid)
   else kid->inertia = 5;
 
   /* collision */
-  if (is_colliding (&kid->f, &kid->fo, +0, false, &kid->ci)) {
+  bool colliding =
+    is_colliding (&kid->f, &kid->fo, +0, false, &kid->ci);
+  bool cross_mirror =
+    kid->ci.t == MIRROR && kid->f.dir == LEFT
+    && kid->i >= 6 && kid->i <= 8;
+
+  if (colliding && ! cross_mirror) {
     if (kid->i < 6) kid_stabilize_collision (kid);
     else kid_couch_collision (kid);
     return false;
-  }
+  } else if (cross_mirror) sample_mirror = true;
 
   /* fall */
   survey (_bf, pos, &kid->f, &nc, &pbf, &np);
