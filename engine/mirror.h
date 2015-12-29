@@ -23,11 +23,27 @@
 #define MIRROR_BITMAP_W 16
 #define MIRROR_BITMAP_H 50
 
+/* dungeon cga */
+#define DC_MIRROR "data/mirror/dc.png"
+
+/* palace cga */
+#define PC_MIRROR "data/mirror/pc.png"
+
+/* dungeon ega */
+#define DE_MIRROR "data/mirror/de.png"
+
+/* palace ega */
+#define PE_MIRROR "data/mirror/pe.png"
+
+/* dungeon vga */
+#define DV_MIRROR "data/mirror/dv.png"
+
 /* palace vga */
 #define PV_MIRROR "data/mirror/pv.png"
 
 void load_mirror (void);
 void unload_mirror (void);
+void update_mirror_bitmap (ALLEGRO_BITMAP *bitmap, struct pos *p);
 void draw_mirror (ALLEGRO_BITMAP *bitmap, struct pos *p,
                   enum em em, enum vm vm);
 void draw_mirror_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,

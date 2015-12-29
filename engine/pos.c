@@ -171,25 +171,25 @@ pos2room (struct pos *p, int room, struct pos *pv)
   if (roomd (room, BELOW) == pv->room) {
     pb.floor += FLOORS;
     pb.room = room;
-    mpb = pos_mod (&pb);
+    mpb = pos_mod (&pb, p);
   }
 
   if (roomd (room, ABOVE) == pv->room) {
     pa.floor -= FLOORS;
     pa.room = room;
-    mpa = pos_mod (&pa);
+    mpa = pos_mod (&pa, p);
   }
 
   if (roomd (room, RIGHT) == pv->room) {
     pr.place += PLACES;
     pr.room = room;
-    mpr = pos_mod (&pr);
+    mpr = pos_mod (&pr, p);
   }
 
   if (roomd (room, LEFT) == pv->room) {
     pl.place -= PLACES;
     pl.room = room;
-    mpl = pos_mod (&pl);
+    mpl = pos_mod (&pl, p);
   }
 
   int lm = mpb;
@@ -237,28 +237,28 @@ coord2room (struct coord *c, int room, struct coord *cv)
       && rba == room) {
     cb.y += PLACE_HEIGHT * FLOORS;
     cb.room = room;
-    mcb = coord_mod (&cb);
+    mcb = coord_mod (&cb, c);
   }
 
   if (ra == cv->room
       && rab == room) {
     ca.y -= PLACE_HEIGHT * FLOORS;
     ca.room = room;
-    mca = coord_mod (&ca);
+    mca = coord_mod (&ca, c);
   }
 
   if (rr == cv->room
       && rrl == room) {
     cr.x += PLACE_WIDTH * PLACES;
     cr.room = room;
-    mcr = coord_mod (&cr);
+    mcr = coord_mod (&cr, c);
   }
 
   if (rl == cv->room
       && rlr == room) {
     cl.x -= PLACE_WIDTH * PLACES;
     cl.room = room;
-    mcl = coord_mod (&cl);
+    mcl = coord_mod (&cl, c);
   }
 
   int lm = mcb;
@@ -381,15 +381,17 @@ coord4draw (struct coord *c, int room, struct coord *cv)
 }
 
 int
-pos_mod (struct pos *p)
+pos_mod (struct pos *p0, struct pos *p1)
 {
-  return p->floor * p->floor + p->place * p->place;
+  return (p0->floor - p1->floor) * (p0->floor - p1->floor)
+    + (p0->place - p1->place) * (p0->place - p1->place);
 }
 
 int
-coord_mod (struct coord *c)
+coord_mod (struct coord *c0, struct coord *c1)
 {
-  return c->y * c->y + c->x * c->x;
+  return (c0->y - c1->y) * (c0->y - c1->y)
+    + (c0->x - c1->x) * (c0->x - c1->x);
 }
 
 struct pos *

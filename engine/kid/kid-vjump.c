@@ -161,7 +161,7 @@ flow (struct anim *kid)
 static bool
 physics_in (struct anim *kid)
 {
-  struct coord nc, tf; struct pos np, ptf, ptb, pm, pmf, pmba;
+  struct coord nc, tf; struct pos np, ptf, ptr, pmt, pm, pmf, pmba;
 
   /* collision */
   if (is_colliding (&kid->f, &kid->fo, +0, false, &kid->ci)
@@ -180,10 +180,13 @@ physics_in (struct anim *kid)
   }
 
   /* ceiling hit */
-  survey (_tb, pos, &kid->f, &nc, &ptb, &np);
-  struct pos ptba; prel (&ptb, &ptba, -1, 0);
+  survey (_tr, pos, &kid->f, &nc, &ptr, &np);
+  survey (_mt, pos, &kid->f, &nc, &pmt, &np);
+  struct pos ptra; prel (&ptr, &ptra, -1, 0);
+  struct pos pmta; prel (&pmt, &pmta, -1, 0);
   if (kid->i == 12 && kid->j == 1
-      && ! is_strictly_traversable (&ptba))
+      && (! is_strictly_traversable (&ptra)
+          || ! is_strictly_traversable (&pmta)))
     kid->hit_ceiling = true;
 
   /* hang */

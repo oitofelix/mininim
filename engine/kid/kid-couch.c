@@ -157,8 +157,8 @@ flow (struct anim *kid)
     kid->fall = true; kid->inertia = 0;
   }
 
-  if (kid->i > 2 && kid->hit_by_loose_floor)
-    kid->i = -1;
+  /* if (kid->i > 2 && kid->hit_by_loose_floor) */
+  /*   kid->i = -1; */
 
   /* unclimb */
   int dir = (kid->f.dir == LEFT) ? +1 : -1;
@@ -180,6 +180,7 @@ flow (struct anim *kid)
   }
 
   if (kid->i == 12) {
+    kid->hit_by_loose_floor = false;
     kid_normal (kid);
     return false;
   }
@@ -207,7 +208,7 @@ flow (struct anim *kid)
   }
 
   if (kid->i != 2 || (! down_key && kid->wait-- <= 0)
-      || kid != current_kid)
+      || (kid != current_kid && kid->wait-- <= 0))
     kid->i++;
 
   if (kid->i == 1 && kid->wait > 0 &&
@@ -215,8 +216,6 @@ flow (struct anim *kid)
     kid->i = 2;
 
   select_frame (kid, kid_couch_frameset, kid->i);
-
-  if (kid->i > 2) kid->hit_by_loose_floor = false;
 
   if (kid->oaction == kid_climb) kid->fo.dx += 7;
   if (kid->i == 0) kid->cinertia = 2 * kid->inertia;

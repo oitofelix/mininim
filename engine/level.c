@@ -42,6 +42,7 @@
 #include "chopper.h"
 #include "consistency.h"
 #include "stars.h"
+#include "mirror.h"
 #include "level.h"
 
 /* functions */
@@ -473,6 +474,12 @@ draw_level (void)
     }
 
   if (! no_room_drawing) draw_room (screen, room_view, em, vm);
+
+  for (p.floor = FLOORS; p.floor >= -1; p.floor--)
+    for (p.place = -1; p.place < PLACES; p.place++) {
+      update_mirror_bitmap (screen, &p);
+      if (! no_room_drawing) draw_mirror (screen, &p, em, vm);
+    }
 
   for (p.floor = FLOORS; p.floor >= -1; p.floor--)
     for (p.place = -1; p.place < PLACES; p.place++) {

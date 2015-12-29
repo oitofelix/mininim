@@ -241,6 +241,9 @@ struct level {
       DOOR,
       LEVEL_DOOR,
       CHOPPER,
+      MIRROR,
+      CARPET_01,
+      CARPET_02,
       ARCH_BOTTOM,
       ARCH_TOP_LEFT,
       ARCH_TOP_LEFT_END,
@@ -248,10 +251,6 @@ struct level {
       ARCH_TOP_RIGHT_END,
       ARCH_TOP_MID,
       ARCH_TOP_SMALL,
-      ARCH_TOP_TOP,
-      CARPET_01,
-      CARPET_02,
-      MIRROR,
     } fg;
     enum conbg {
       NO_BG,

@@ -339,6 +339,8 @@ draw_kid_frame (ALLEGRO_BITMAP *bitmap, struct anim *k,
 {
   struct coord c;
 
+  if (k->invisible) return;
+
   struct frame f = k->f;
   struct frame_offset xf = k->xf;
 

@@ -75,7 +75,7 @@ next_level (int number, struct pos *exit_door_pos)
     for (p.floor = 0; p.floor < FLOORS; p.floor++)
       for (p.place = 0; p.place < PLACES; p.place++) {
         struct con *c = &lv->con[p.room][p.floor][p.place];
-        c->fg = prandom (CHOPPER);
+        c->fg = prandom (CARPET_02);
         do {
           c->bg = prandom (WINDOW);
         } while (c->bg == NO_BRICKS);

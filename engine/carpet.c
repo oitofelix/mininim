@@ -28,6 +28,7 @@
 #include "loose-floor.h"
 #include "kid/kid.h"
 #include "level.h"
+#include "arch.h"
 #include "carpet.h"
 
 /* dungeon cga */
@@ -245,6 +246,14 @@ draw_carpet_fg_01 (ALLEGRO_BITMAP *bitmap, struct pos *p,
   draw_bitmap_regionc (carpet, bitmap, 0, 0, 27, h, carpet_coord (p, &c), 0);
   h = al_get_bitmap_height (carpet_top);
   draw_bitmap_regionc (carpet_top, bitmap, 0, 0, 18, h, carpet_top_coord (p, &c), 0);
+
+  struct pos pa; prel (p, &pa, -1, +0);
+  draw_confg_base (bitmap, &pa, em, vm);
+  draw_confg_left (bitmap, &pa, em, vm, true);
+
+  struct pos pl; prel (p, &pl, +0, -1);
+  if (con (&pl)->fg == ARCH_TOP_RIGHT_END)
+    draw_arch_top_top (bitmap, &pl, em, vm);
 }
 
 void
@@ -358,6 +367,14 @@ draw_carpet_fg_02 (ALLEGRO_BITMAP *bitmap, struct pos *p,
   draw_bitmap_regionc (carpet, bitmap, 0, 0, 27, h, carpet_coord (p, &c), 0);
   h = al_get_bitmap_height (carpet_top);
   draw_bitmap_regionc (carpet_top, bitmap, 0, 0, 18, h, carpet_top_coord (p, &c), 0);
+
+  struct pos pa; prel (p, &pa, -1, +0);
+  draw_confg_base (bitmap, &pa, em, vm);
+  draw_confg_left (bitmap, &pa, em, vm, true);
+
+  struct pos pl; prel (p, &pl, +0, -1);
+  if (con (&pl)->fg == ARCH_TOP_RIGHT_END)
+    draw_arch_top_top (bitmap, &pl, em, vm);
 }
 
 struct coord *

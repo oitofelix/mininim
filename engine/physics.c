@@ -157,84 +157,6 @@ dist_next_place (struct frame *f, coord_f cf, pos_f pf,
   return abs (i);
 }
 
-/* bool */
-/* is_colliding (struct frame *f, struct frame_offset *fo, int dx, */
-/*               bool reverse, struct collision_info *ci) */
-/* { */
-/*   struct coord nc, tf; struct pos np, ptf, _ptf, p, pl; */
-
-/*   struct frame _f = *f, nf; */
-
-/*   if (reverse) _f.dir = (_f.dir == LEFT) ? RIGHT : LEFT; */
-
-/*   next_frame (&_f, &nf, fo); */
-
-/*   int dir = (nf.dir == LEFT) ? -1 : +1; */
-/*   nf.c.x += dir * dx; */
-
-/*   survey (_tf, pos, &_f, &nc, &_ptf, &np); */
-/*   survey (_tf, pos, &nf, &tf, &ptf, &np); */
-
-/*   pos2room (&_ptf, _f.c.room, &_ptf); */
-/*   pos2room (&ptf, _f.c.room, &ptf); */
-
-/*   bool wall_collision = false; */
-/*   bool door_collision = false; */
-
-/*   /\* wall *\/ */
-
-/*   if (_f.dir == LEFT && ptf.place <= _ptf.place) */
-/*     for (p = _ptf; p.place >= ptf.place; prel (&p, &p, +0, -1)) */
-/*       if (con (&p)->fg == WALL) { */
-/*         wall_collision = true; */
-/*         ci->p = p; */
-/*         break; */
-/*       } */
-
-/*   if (_f.dir == RIGHT && ptf.place >= _ptf.place) */
-/*     for (p = _ptf; p.place <= ptf.place; prel (&p, &p, +0, +1)) { */
-/*       if (con (&p)->fg == WALL) { */
-/*         wall_collision = true; */
-/*         ci->p = p; */
-/*         break; */
-/*       } */
-/*     } */
-
-/*   /\* door *\/ */
-
-/*   if (_f.dir == LEFT && ptf.place < _ptf.place) */
-/*     for (prel (&_ptf, &p, +0, -1); p.place >= ptf.place; prel (&p, &p, +0, -1)) */
-/*       if (con (&p)->fg == DOOR */
-/*           && tf.y <= door_grid_tip_y (&p) - 10) { */
-/*         door_collision = true; */
-/*         ci->p = p; */
-/*         break; */
-/*       } */
-
-/*   if (_f.dir == RIGHT && ptf.place > _ptf.place) */
-/*     for (prel (&_ptf, &p, +0, +1); p.place <= ptf.place; prel (&p, &p, +0, +1)) { */
-/*       prel (&p, &pl, +0, -1); */
-/*       if (con (&pl)->fg == DOOR */
-/*           && tf.y <= door_grid_tip_y (&pl) - 10) { */
-/*         door_collision = true; */
-/*         ci->p = p; */
-/*         break; */
-/*       } */
-/*     } */
-
-/*   ci->t = NO_FLOOR; */
-/*   if (wall_collision) ci->t = WALL; */
-/*   if (door_collision) ci->t = DOOR; */
-
-/*   if (wall_collision || door_collision) */
-/*     pos2room (&ci->p, _f.c.room, &ci->p); */
-
-/*   /\* if (door_collision) printf ("DOOR COLLISION!\n"); *\/ */
-/*   /\* if (wall_collision) printf ("WALL COLLISION!\n"); *\/ */
-
-/*   return wall_collision || door_collision; */
-/* } */
-
 bool
 is_colliding (struct frame *f, struct frame_offset *fo, int dx,
               bool reverse, struct collision_info *ci)
@@ -242,6 +164,8 @@ is_colliding (struct frame *f, struct frame_offset *fo, int dx,
   struct coord nc, tf; struct pos np, pbf, _pbf, p, pl, pr;
 
   struct frame _f = *f, nf;
+
+  nframe (&_f, &_f.c);
 
   if (reverse) _f.dir = (_f.dir == LEFT) ? RIGHT : LEFT;
 
@@ -350,8 +274,8 @@ is_colliding (struct frame *f, struct frame_offset *fo, int dx,
   if (carpet_collision) ci->t = CARPET_01;
   if (mirror_collision) ci->t = MIRROR;
 
-  if (wall_collision || door_collision || carpet_collision || mirror_collision)
-    pos2room (&ci->p, _f.c.room, &ci->p);
+  /* if (wall_collision || door_collision || carpet_collision || mirror_collision) */
+  /*   pos2room (&ci->p, _f.c.room, &ci->p); */
 
   /* if (door_collision) printf ("DOOR COLLISION!\n"); */
   /* if (wall_collision) printf ("WALL COLLISION!\n"); */

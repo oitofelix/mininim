@@ -169,8 +169,7 @@ physics_in (struct anim *kid)
   bool colliding =
     is_colliding (&kid->f, &kid->fo, +0, false, &kid->ci);
   bool cross_mirror =
-    kid->ci.t == MIRROR && kid->f.dir == LEFT
-    && kid->i >= 6 && kid->i <= 8;
+    kid->ci.t == MIRROR && kid->i >= 5 && kid->i <= 8;
 
   if (colliding && ! cross_mirror) {
     if (kid->i < 6) kid_stabilize_collision (kid);

@@ -289,6 +289,10 @@ void
 draw_confg_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
                  enum em em, enum vm vm)
 {
+  struct pos pv; pos2room (p, room_view, &pv);
+  if (pv.floor < -1 || pv.floor >= FLOORS
+      || pv.place < 0 || pv.place >= PLACES) return;
+
   switch (con (p)->fg) {
   case NO_FLOOR: break;
   case FLOOR: draw_floor_base (bitmap, p, em, vm); break;
@@ -325,6 +329,10 @@ void
 draw_confg_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
                  enum em em, enum vm vm, bool redraw)
 {
+  struct pos pv; pos2room (p, room_view, &pv);
+  if (pv.floor < 0 || pv.floor > FLOORS
+      || pv.place < 0 || pv.place >= PLACES) return;
+
   switch (con (p)->fg) {
   case NO_FLOOR: break;
   case FLOOR: draw_floor_left (bitmap, p, em, vm); break;
@@ -354,9 +362,7 @@ draw_confg_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case ARCH_TOP_RIGHT_END: draw_arch_top_right_end (bitmap, p, em, vm); break;
   case CARPET_01: draw_carpet_01 (bitmap, p, em, vm); break;
   case CARPET_02: draw_carpet_02 (bitmap, p, em, vm); break;
-  case MIRROR:
-    draw_floor_left (bitmap, p, em, vm);
-    draw_mirror (bitmap, p, em, vm); break;
+  case MIRROR: draw_floor_left (bitmap, p, em, vm); break;
   default:
     error (-1, 0, "%s: unknown foreground (%i)",
            __func__, con (p)->fg);
@@ -373,12 +379,27 @@ draw_confg_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   default: break;
   }
+
+  struct pos pl; prel (p, &pl, +0, -1);
+  if (is_carpet (p)
+      && con (&pl)->fg == ARCH_TOP_RIGHT_END)
+    draw_arch_top_top (bitmap, &pl, em, vm);
+
+  struct pos pr; prel (p, &pr, +0, +1);
+  if (is_carpet (&pr)) draw_confg_left (bitmap, &pr, em, vm, true);
+
+  if (con (p)->fg == MIRROR)
+    draw_mirror (bitmap, p, em, vm);
 }
 
 void
 draw_confg_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
                   enum em em, enum vm vm, bool redraw)
 {
+  struct pos pv; pos2room (p, room_view, &pv);
+  if (pv.floor < 0 || pv.floor > FLOORS
+      || pv.place < -1 || pv.place >= PLACES - 1) return;
+
   struct pos pr, pa, par;
 
   switch (con (p)->fg) {
@@ -427,6 +448,7 @@ draw_confg_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
   /* above */
   switch (con (p)->fg) {
   case PILLAR: case DOOR:
+    draw_confg_base (bitmap, &pa, em, vm);
     draw_confg_right (bitmap, &pa, em, vm, true);
     break;
   default: break;
@@ -434,7 +456,7 @@ draw_confg_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   /* above right */
   switch (con (p)->fg) {
-  case WALL: case DOOR:
+  case WALL: case DOOR: case PILLAR:
     draw_confg_base (bitmap, &par, em, vm);
     draw_confg_left (bitmap, &par, em, vm, true);
     draw_falling_loose_floor (bitmap, &par, em, vm);
@@ -447,6 +469,10 @@ void
 draw_confg_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
                enum em em, enum vm vm, struct frame *f)
 {
+  struct pos pv; pos2room (p, room_view, &pv);
+  if (pv.floor < 0 || pv.floor > FLOORS
+      || pv.place < -1 || pv.place >= PLACES) return;
+
   switch (con (p)->fg) {
   case NO_FLOOR: break;
   case FLOOR: break;
@@ -552,24 +578,24 @@ void
 draw_room_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
               enum em em, enum vm vm, struct frame *f)
 {
-  struct coord tl, bl, br, c;
+  struct coord tl, bl, br, nc;
   struct pos ptl, pbl, pm, ptf, ptr, pmt, pmbo,
     fptl, fptr, fpmt, fpmbo, fptf, np;
 
   survey (_tl, pos, f, &tl, &ptl, &np);
   survey (_bl, pos, f, &bl, &pbl, &np);
   survey (_br, pos, f, &br, &np, &np);
-  survey (_m, pos, f, &c, &pm, &np);
-  survey (_tf, pos, f, &c, &ptf, &np);
-  survey (_tr, pos, f, &c, &ptr, &np);
-  survey (_mt, pos, f, &c, &pmt, &np);
-  survey (_mbo, pos, f, &c, &pmbo, &np);
+  survey (_m, pos, f, &nc, &pm, &np);
+  survey (_tf, pos, f, &nc, &ptf, &np);
+  survey (_tr, pos, f, &nc, &ptr, &np);
+  survey (_mt, pos, f, &nc, &pmt, &np);
+  survey (_mbo, pos, f, &nc, &pmbo, &np);
 
-  survey (_tl, posf, f, &c, &fptl, &np);
-  survey (_tr, posf, f, &c, &fptr, &np);
-  survey (_mt, posf, f, &c, &fpmt, &np);
-  survey (_mbo, posf, f, &c, &fpmbo, &np);
-  survey (_tf, posf, f, &c, &fptf, &np);
+  survey (_tl, posf, f, &nc, &fptl, &np);
+  survey (_tr, posf, f, &nc, &fptr, &np);
+  survey (_mt, posf, f, &nc, &fpmt, &np);
+  survey (_mbo, posf, f, &nc, &fpmbo, &np);
+  survey (_tf, posf, f, &nc, &fptf, &np);
 
   struct pos pr; prel (p, &pr, +0, +1);
   struct pos pb; prel (p, &pb, +1, +0);
@@ -584,12 +610,8 @@ draw_room_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
     draw_confg_left (bitmap, p, em, vm, true);
   }
   /* when climbing the construct */
-  else if (((peq (&ptf, p)
-             && is_kid_climb (f))
-            || (peq (&fptf, p)
-                && is_kid_vjump (f)
-                && (is_carpet (&pb)
-                    || con (&pb)->fg == MIRROR)))
+  else if (peq (&ptf, p)
+           && is_kid_climb (f)
            && f->dir == RIGHT) {
     draw_confg_base (bitmap, p, em, vm);
 
@@ -613,7 +635,6 @@ draw_room_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
                || f->b == kid_climb_08
                || f->b == kid_climb_05)
         draw_floor_corner_02 (bitmap, p, em, vm);
-      else draw_confg_left (bitmap, p, em, vm, true);
 
       if (con (p)->fg == PILLAR)
         draw_pillar_fg (bitmap, p, em, vm);
@@ -623,19 +644,28 @@ draw_room_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
         draw_arch_bottom (bitmap, p, em, vm);
     }
     /* when below the construction */
-  } else if ((peq (p, &fptl)
-              || peq (p, &fptr)
-              || peq (p, &fpmt)
-              || peq (p, &ptl)
-              || peq (p, &ptr)
-              || peq (p, &pmt))
-             && (peq (p, prel (&fpmbo, &np, -1, 0))
-                 || peq (p, prel (&pmbo, &np, -1, 0)))
-             && ! (is_kid_hang_or_climb (f) && f->dir == LEFT)
+  } else if (
+             /* (peq (p, &fptl) */
+             /*  || peq (p, &fptr) */
+             /*  || peq (p, &fpmt) */
+             /*  || peq (p, &ptl) */
+             /*  || peq (p, &ptr) */
+             /*  || peq (p, &pmt)) */
+             /* && (peq (p, prel (&fpmbo, &np, -1, 0)) */
+             /*     || peq (p, prel (&pmbo, &np, -1, 0))) */
+             ! (is_kid_hang_or_climb (f) && f->dir == LEFT)
              && ! is_kid_fall (f)
-             && floor_left_coord (p, &c)->y <= tl.y
-             && ! is_strictly_traversable (p))
+             && ! is_strictly_traversable (p)
+             && tl.y <= (p->floor + 1) * PLACE_HEIGHT + 3
+             && bl.y >= (p->floor + 1) * PLACE_HEIGHT + 3)
     draw_confg (bitmap, p, em, vm, true);
+  /* when vjumping at the left of a non-hangable construct */
+  else if (peq (&fptr, p)
+           && is_kid_vjump (f)
+           && ! is_hangable_con (p, RIGHT)) {
+    draw_confg_base (bitmap, p, em, vm);
+    draw_confg_left (bitmap, p, em, vm, true);
+  }
   /* hanging */
   else if ((is_kid_hanging_at_pos (f, &pa)
             && is_carpet (&pr)

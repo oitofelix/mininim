@@ -34,12 +34,42 @@ static void create_mirror_bitmaps (int last_room, int room);
 
 static ALLEGRO_BITMAP *mirror_bitmap[FLOORS + 2][PLACES + 1];
 
+/* dungeon cga */
+ALLEGRO_BITMAP *dc_mirror;
+
+/* palace cga */
+ALLEGRO_BITMAP *pc_mirror;
+
+/* dungeon ega */
+ALLEGRO_BITMAP *de_mirror;
+
+/* palace ega */
+ALLEGRO_BITMAP *pe_mirror;
+
+/* dungeon vga */
+ALLEGRO_BITMAP *dv_mirror;
+
 /* palace vga */
 ALLEGRO_BITMAP *pv_mirror;
 
 void
 load_mirror (void)
 {
+  /* dungeon cga */
+  dc_mirror = load_bitmap (DC_MIRROR);
+
+  /* palace cga */
+  pc_mirror = load_bitmap (PC_MIRROR);
+
+  /* dungeon ega */
+  de_mirror = load_bitmap (DE_MIRROR);
+
+  /* palace ega */
+  pe_mirror = load_bitmap (PE_MIRROR);
+
+  /* dungeon vga */
+  dv_mirror = load_bitmap (DV_MIRROR);
+
   /* palace vga */
   pv_mirror = load_bitmap (PV_MIRROR);
 
@@ -50,6 +80,21 @@ load_mirror (void)
 void
 unload_mirror (void)
 {
+  /* dungeon cga */
+  al_destroy_bitmap (dc_mirror);
+
+  /* palace cga */
+  al_destroy_bitmap (pc_mirror);
+
+  /* dungeon ega */
+  al_destroy_bitmap (de_mirror);
+
+  /* palace ega */
+  al_destroy_bitmap (pe_mirror);
+
+  /* dungeon vga */
+  al_destroy_bitmap (dv_mirror);
+
   /* palace vga */
   al_destroy_bitmap (pv_mirror);
 
@@ -81,9 +126,29 @@ create_mirror_bitmaps (int last_room, int room)
 }
 
 void
+update_mirror_bitmap (ALLEGRO_BITMAP *bitmap, struct pos *p)
+{
+  struct coord c;
+
+  ALLEGRO_BITMAP *b = mirror_bitmap[p->floor + 1][p->place + 1];
+  if (! b) return;
+
+  int i;
+  for (i = 0; i < kid_nmemb; i++)
+    draw_kid_if_at_pos (bitmap, &kid[i], p, vm);
+
+  mirror_coord (p, &c);
+  draw_bitmap_region (bitmap, b, c.x + 22, c.y + 3,
+                      MIRROR_BITMAP_W, MIRROR_BITMAP_H, 0, 0,
+                      ALLEGRO_FLIP_HORIZONTAL);
+}
+
+void
 draw_mirror (ALLEGRO_BITMAP *bitmap, struct pos *p,
                  enum em em, enum vm vm)
 {
+  if (con (p)->fg != MIRROR) return;
+
   struct coord c;
 
   ALLEGRO_BITMAP *mirror = NULL;
@@ -91,15 +156,15 @@ draw_mirror (ALLEGRO_BITMAP *bitmap, struct pos *p,
   switch (em) {
   case DUNGEON:
     switch (vm) {
-    case CGA: break;
-    case EGA: break;
-    case VGA: break;
+    case CGA: mirror = dc_mirror; break;
+    case EGA: mirror = de_mirror; break;
+    case VGA: mirror = dv_mirror; break;
     }
     break;
   case PALACE:
     switch (vm) {
-    case CGA: break;
-    case EGA: break;
+    case CGA: mirror = pc_mirror; break;
+    case EGA: mirror = pe_mirror; break;
     case VGA: mirror = pv_mirror; break;
     }
     break;
@@ -107,15 +172,8 @@ draw_mirror (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (hgc) mirror = apply_palette (mirror, hgc_palette);
 
-  int i;
-  for (i = 0; i < kid_nmemb; i++)
-    draw_kid_if_at_pos (bitmap, &kid[i], p, vm);
-
   ALLEGRO_BITMAP *b = mirror_bitmap[p->floor + 1][p->place + 1];
-  mirror_coord (p, &c);
-  draw_bitmap_region (bitmap, b, c.x + 22, c.y + 3,
-                      MIRROR_BITMAP_W, MIRROR_BITMAP_H, 0, 0, 0);
-  draw_bitmapc (b, bitmap, mirror_reflex_coord (p, &c), ALLEGRO_FLIP_HORIZONTAL);
+  if (b) draw_bitmapc (b, bitmap, mirror_reflex_coord (p, &c), 0);
   draw_bitmapc (mirror, bitmap, mirror_coord (p, &c), 0);
 }
 
@@ -130,15 +188,15 @@ draw_mirror_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
   switch (em) {
   case DUNGEON:
     switch (vm) {
-    case CGA: break;
-    case EGA: break;
-    case VGA: break;
+    case CGA: mirror = dc_mirror; break;
+    case EGA: mirror = de_mirror; break;
+    case VGA: mirror = dv_mirror; break;
     }
     break;
   case PALACE:
     switch (vm) {
-    case CGA: break;
-    case EGA: break;
+    case CGA: mirror = pc_mirror; break;
+    case EGA: mirror = pe_mirror; break;
     case VGA: mirror = pv_mirror; break;
     }
     break;
@@ -147,7 +205,8 @@ draw_mirror_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
   if (hgc) mirror = apply_palette (mirror, hgc_palette);
 
   ALLEGRO_BITMAP *b = mirror_bitmap[p->floor + 1][p->place + 1];
-  draw_bitmapc (b, bitmap, mirror_reflex_coord (p, &c), ALLEGRO_FLIP_HORIZONTAL);
+  if (b) draw_bitmapc (b, bitmap, mirror_reflex_coord (p, &c), 0);
+
   int h = al_get_bitmap_height (mirror);
   draw_bitmap_regionc (mirror, bitmap, 0, 0, 22, h, mirror_coord (p, &c), 0);
 }
