@@ -27,6 +27,7 @@
 #include "levels/title.h"
 #include "levels/level-1.h"
 #include "levels/consistency-level.h"
+#include "levels/legacy-level.h"
 
 ALLEGRO_TIMER *play_time;
 enum em em = DUNGEON;
@@ -53,6 +54,7 @@ main (int argc, char **argv)
 
   /* play_level_1 (); */
   play_consistency_level ();
+  /* play_legacy_level (); */
   unload_level ();
 
   finalize_video ();

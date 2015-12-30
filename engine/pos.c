@@ -168,25 +168,32 @@ pos2room (struct pos *p, int room, struct pos *pv)
   int mpb, mpa, mpr, mpl;
   mpb = mpa = mpr = mpl = INT_MAX;
 
-  if (roomd (room, BELOW) == pv->room) {
+  int ra, rb, rl, rr;
+
+  ra = roomd (room, ABOVE);
+  rb = roomd (room, BELOW);
+  rl = roomd (room, LEFT);
+  rr = roomd (room, RIGHT);
+
+  if (rb == pv->room) {
     pb.floor += FLOORS;
     pb.room = room;
     mpb = pos_mod (&pb, p);
   }
 
-  if (roomd (room, ABOVE) == pv->room) {
+  if (ra == pv->room) {
     pa.floor -= FLOORS;
     pa.room = room;
     mpa = pos_mod (&pa, p);
   }
 
-  if (roomd (room, RIGHT) == pv->room) {
+  if (rr == pv->room) {
     pr.place += PLACES;
     pr.room = room;
     mpr = pos_mod (&pr, p);
   }
 
-  if (roomd (room, LEFT) == pv->room) {
+  if (rl == pv->room) {
     pl.place -= PLACES;
     pl.room = room;
     mpl = pos_mod (&pl, p);

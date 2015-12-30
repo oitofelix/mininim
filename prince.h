@@ -282,7 +282,7 @@ struct level {
     int l, r, a, b;
   } link[ROOMS];
 
-  struct {
+  struct level_event {
     struct pos p;
     bool next;
   } event[EVENTS];

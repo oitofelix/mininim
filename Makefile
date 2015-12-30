@@ -12,7 +12,7 @@ KID_MODULES = kid kid-normal kid-walk kid-start-run kid-run						\
   kid-raise-sword kid-keep-sword kid-take-sword kid-sword-normal			\
   kid-sword-walkf kid-sword-walkb kid-sword-defense kid-sword-attack	\
   kid-die kid-stairs
-LEVEL_MODULES = title level-1 consistency-level
+LEVEL_MODULES = title level-1 consistency-level legacy-level
 MAIN_MODULES = prince
 
 MODULES = ${KERNEL_MODULES:%=kernel/%} ${ENGINE_MODULES:%=engine/%}	\

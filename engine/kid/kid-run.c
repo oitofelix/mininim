@@ -139,7 +139,7 @@ physics_in (struct anim *kid)
   struct coord nc; struct pos np, ptf;
 
   /* inertia */
-  kid->inertia = 3;
+  kid->inertia = 0;
 
   /* collision */
   if (is_colliding (&kid->f, &kid->fo, +0, false, &kid->ci)) {

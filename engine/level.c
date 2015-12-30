@@ -322,7 +322,8 @@ process_keys (void)
     int bl = roomd (b, LEFT);
     int br = roomd (b, RIGHT);
 
-    xasprintf (&text, "AL%i AR%i BL%i BR%i", al, ar, bl, br);
+    xasprintf (&text, "LV%i AL%i AR%i BL%i BR%i",
+               level.number, al, ar, bl, br);
     draw_bottom_text (NULL, text);
     al_free (text);
   }

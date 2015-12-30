@@ -1,5 +1,5 @@
 /*
-  level-1.h -- consistency level module;
+  consistency-level.h -- consistency level module;
 
   Copyright (C) 2015, 2016 Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
 
