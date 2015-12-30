@@ -230,7 +230,7 @@ physics_in (struct anim *kid)
   struct coord nc; struct pos np, pmbo, pbb;
 
   /* inertia */
-  kid->inertia = 0;
+  kid->inertia = kid->cinertia = 0;
 
   /* fall */
   survey (_mbo, pos, &kid->f, &nc, &pmbo, &np);

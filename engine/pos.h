@@ -38,7 +38,7 @@ struct coord *frame2room (struct frame *f, int room, struct coord *cv);
 struct coord *rect2room (struct rect *r, int room, struct coord *cv);
 bool coord4draw (struct coord *c, int room, struct coord *cv);
 int pos_mod (struct pos *p0, struct pos *p1);
-int coord_mod (struct coord *c0, struct coord *c1);
+int coord_mod (struct coord *c);
 struct pos *pos_gen (struct coord *c, struct pos *p, int dx, int dy);
 inline struct pos *pos (struct coord *c, struct pos *p);
 inline struct pos *posf (struct coord *c, struct pos *p);

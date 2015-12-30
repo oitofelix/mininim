@@ -244,28 +244,28 @@ coord2room (struct coord *c, int room, struct coord *cv)
       && rba == room) {
     cb.y += PLACE_HEIGHT * FLOORS;
     cb.room = room;
-    mcb = coord_mod (&cb, c);
+    mcb = coord_mod (&cb);
   }
 
   if (ra == cv->room
       && rab == room) {
     ca.y -= PLACE_HEIGHT * FLOORS;
     ca.room = room;
-    mca = coord_mod (&ca, c);
+    mca = coord_mod (&ca);
   }
 
   if (rr == cv->room
       && rrl == room) {
     cr.x += PLACE_WIDTH * PLACES;
     cr.room = room;
-    mcr = coord_mod (&cr, c);
+    mcr = coord_mod (&cr);
   }
 
   if (rl == cv->room
       && rlr == room) {
     cl.x -= PLACE_WIDTH * PLACES;
     cl.room = room;
-    mcl = coord_mod (&cl, c);
+    mcl = coord_mod (&cl);
   }
 
   int lm = mcb;
@@ -395,10 +395,9 @@ pos_mod (struct pos *p0, struct pos *p1)
 }
 
 int
-coord_mod (struct coord *c0, struct coord *c1)
+coord_mod (struct coord *c)
 {
-  return (c0->y - c1->y) * (c0->y - c1->y)
-    + (c0->x - c1->x) * (c0->x - c1->x);
+  return c->y * c->y + c->x * c->x;
 }
 
 struct pos *

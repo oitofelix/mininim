@@ -25,26 +25,32 @@
 /* dungeon cga */
 #define DC_UNPRESSED_OPENER_FLOOR_BASE "data/opener-floor/dc-unpressed-base.png"
 #define DC_UNPRESSED_OPENER_FLOOR_LEFT "data/opener-floor/dc-unpressed-left.png"
+#define DC_UNPRESSED_OPENER_FLOOR_RIGHT "data/opener-floor/dc-unpressed-right.png"
 
 /* palace cga */
 #define PC_UNPRESSED_OPENER_FLOOR_BASE "data/opener-floor/pc-unpressed-base.png"
 #define PC_UNPRESSED_OPENER_FLOOR_LEFT "data/opener-floor/pc-unpressed-left.png"
+#define PC_UNPRESSED_OPENER_FLOOR_RIGHT "data/opener-floor/pc-unpressed-right.png"
 
 /* dungeon ega */
 #define DE_UNPRESSED_OPENER_FLOOR_BASE "data/opener-floor/de-unpressed-base.png"
 #define DE_UNPRESSED_OPENER_FLOOR_LEFT "data/opener-floor/de-unpressed-left.png"
+#define DE_UNPRESSED_OPENER_FLOOR_RIGHT "data/opener-floor/de-unpressed-right.png"
 
 /* palace ega */
 #define PE_UNPRESSED_OPENER_FLOOR_BASE "data/opener-floor/pe-unpressed-base.png"
 #define PE_UNPRESSED_OPENER_FLOOR_LEFT "data/opener-floor/pe-unpressed-left.png"
+#define PE_UNPRESSED_OPENER_FLOOR_RIGHT "data/opener-floor/pe-unpressed-right.png"
 
 /* dungeon vga */
 #define DV_UNPRESSED_OPENER_FLOOR_BASE "data/opener-floor/dv-unpressed-base.png"
 #define DV_UNPRESSED_OPENER_FLOOR_LEFT "data/opener-floor/dv-unpressed-left.png"
+#define DV_UNPRESSED_OPENER_FLOOR_RIGHT "data/opener-floor/dv-unpressed-right.png"
 
 /* palace vga */
 #define PV_UNPRESSED_OPENER_FLOOR_BASE "data/opener-floor/pv-unpressed-base.png"
 #define PV_UNPRESSED_OPENER_FLOOR_LEFT "data/opener-floor/pv-unpressed-left.png"
+#define PV_UNPRESSED_OPENER_FLOOR_RIGHT "data/opener-floor/pv-unpressed-right.png"
 
 /* sounds */
 #define OPENER_FLOOR_SAMPLE "dat/digisnd1/door tile pressed 1.ogg"

@@ -155,6 +155,9 @@ physics_in (struct anim *kid)
 {
   struct coord nc; struct pos np, pbf, pbb;
 
+  /* collision */
+  if (kid_door_split_collision (kid)) return false;
+
   /* fall */
   survey (_bf, pos, &kid->f, &nc, &pbf, &np);
   survey (_bb, pos, &kid->f, &nc, &pbb, &np);

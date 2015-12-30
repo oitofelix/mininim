@@ -125,6 +125,14 @@ static struct level level_1 = {
      {{WALL}, {WALL}, {WALL}, {WALL}, {WALL},
       {WALL}, {WALL}, {WALL}, {WALL}, {WALL}}},
 
+    [22] =
+    {{{NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR},
+      {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}},
+     {{NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR},
+      {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}},
+     {{FLOOR}, {FLOOR}, {FLOOR}, {FLOOR}, {FLOOR},
+      {FLOOR}, {FLOOR}, {FLOOR}, {FLOOR}, {FLOOR}}},
+
     [23] =
     {{{ARCH_TOP_LEFT_END}, {ARCH_TOP_MID}, {ARCH_TOP_LEFT}, {ARCH_TOP_RIGHT}, {ARCH_TOP_MID},
       {ARCH_TOP_SMALL}, {ARCH_TOP_MID}, {ARCH_TOP_SMALL}, {ARCH_TOP_MID}, {ARCH_TOP_RIGHT_END}},
@@ -137,7 +145,7 @@ static struct level level_1 = {
     {{{CARPET_02}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR},
       {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {FLOOR}},
      {{NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR},
-      {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {DOOR}},
+      {CARPET_01}, {NO_FLOOR}, {NO_FLOOR}, {NO_FLOOR}, {DOOR}},
      {{FLOOR}, {OPENER_FLOOR,NO_BG,{4}}, {FLOOR}, {FLOOR}, {DOOR},
       {FLOOR}, {FLOOR,BALCONY}, {FLOOR}, {CLOSER_FLOOR,NO_BG,{4}}, {FLOOR}}},
   },
@@ -151,6 +159,7 @@ static struct level level_1 = {
            [7] = {0, 8, 23, 0},
            [8] = {7, 6, 0, 0},
            [9] = {3, 0, 0, 0},
+           [22] = {24, 23, 0, 7},
            [23] = {24, 24, 0, 7},
            [24] = {23, 23, 0, 7}},
 

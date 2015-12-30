@@ -732,7 +732,7 @@ kid_debug (void)
     survey (_bf, pos, &current_kid->f, &bf, &pbf, &npbf);
     if (delete_key) current_kid->f.c.x--;
     if (page_down_key) current_kid->f.c.x++;
-    int dn = dist_next_place (&current_kid->f, _bf, pos, 0, false);
+    int dn = dist_next_place (&current_kid->f, _bb, pos, 0, false);
     int dp = dist_next_place (&current_kid->f, _bf, pos, 0, true);
     int dc = dist_collision (&current_kid->f, false, &kid->ci) + 4;
     int df = dist_fall (&current_kid->f, false);
@@ -745,4 +745,54 @@ f = %i, p = %i, dn = %i, dp = %i, dc = %i, df = %i, dl = %i, dcl = %i, dch = %i\
               pbf.floor, pbf.place, dn, dp, dc, df, dl, dcl, dch);
   }
   /* end kid hack */
+}
+
+bool
+kid_door_split_collision (struct anim *k)
+{
+  struct coord nc, tf; struct pos np, ptb, ptf;
+
+  survey (_tb, pos, &k->f, &nc, &ptb, &np);
+  survey (_tf, pos, &k->f, &tf, &ptf, &np);
+
+  int dntb = dist_next_place (&k->f, _tb, pos, +0, false);
+  int dptf = dist_next_place (&k->f, _tf, pos, +0, true);
+
+  if (k->f.dir == RIGHT
+      && con (&ptb)->fg == DOOR
+      && tf.y <= door_grid_tip_y (&ptb) - 10
+      && dntb >= 7 && dntb <= 16) {
+    prel (&ptb, &k->ci.p, +0, +1);
+    kid_stabilize_collision (k);
+    return true;
+  }
+
+  if (k->f.dir == RIGHT
+      && con (&ptb)->fg == DOOR
+      && tf.y <= door_grid_tip_y (&ptb) - 10
+      && dntb <= 6) {
+    k->ci.p = ptb;
+    kid_stabilize_back_collision (k);
+    return true;
+  }
+
+  if (k->f.dir == LEFT
+      && con (&ptf)->fg == DOOR
+      && tf.y <= door_grid_tip_y (&ptf) - 10
+      && dptf <= 11 && dptf >= 6) {
+    k->ci.p = ptf;
+    kid_stabilize_collision (k);
+    return true;
+  }
+
+  if (k->f.dir == LEFT
+      && con (&ptf)->fg == DOOR
+      && tf.y <= door_grid_tip_y (&ptf) - 10
+      && dptf >= 12 && dptf <= 18) {
+    prel (&ptf, &k->ci.p, +0, +1);
+    kid_stabilize_back_collision (k);
+    return true;
+  }
+
+  return false;
 }

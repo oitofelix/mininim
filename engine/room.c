@@ -293,7 +293,7 @@ draw_confg_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
   if (pv.floor < -1 || pv.floor > FLOORS
       || pv.place < -1 || pv.place >= PLACES) return;
 
-  pv = *p;
+  if (con (p)->fg != WALL) pv = *p;
 
   switch (con (&pv)->fg) {
   case NO_FLOOR: break;
@@ -335,7 +335,7 @@ draw_confg_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
   if (pv.floor < -1 || pv.floor > FLOORS
       || pv.place < -1 || pv.place >= PLACES) return;
 
-  pv = *p;
+  if (con (p)->fg != WALL) pv = *p;
 
   switch (con (&pv)->fg) {
   case NO_FLOOR: break;
@@ -479,7 +479,7 @@ draw_confg_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
   if (pv.floor < -1 || pv.floor > FLOORS
       || pv.place < -1 || pv.place >= PLACES) return;
 
-  pv = *p;
+  if (con (p)->fg != WALL) pv = *p;
 
   switch (con (&pv)->fg) {
   case NO_FLOOR: break;
@@ -610,6 +610,7 @@ draw_room_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
   struct pos pa; prel (p, &pa, -1, +0);
 
   struct pos pv; pos2room (p, room_view, &pv);
+  pv = *p;
 
   /* when falling at construct's left */
   if (br.y >= (pv.floor + 1) * PLACE_HEIGHT - 6
@@ -667,7 +668,9 @@ draw_room_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
              && ! is_kid_fall (f)
              && ! is_strictly_traversable (&pv)
              && tl.y <= (pv.floor + 1) * PLACE_HEIGHT + 3
-             && bl.y >= (pv.floor + 1) * PLACE_HEIGHT + 3)
+             && bl.y >= (pv.floor + 1) * PLACE_HEIGHT + 3
+             && ! (is_kid_vjump (f) && kid->hang
+                   && kid->f.dir == LEFT))
     draw_confg (bitmap, &pv, em, vm, true);
   /* when vjumping at the left of a non-hangable construct */
   else if (peq (&fptr, &pv)

@@ -53,8 +53,8 @@ main (int argc, char **argv)
   al_start_timer (play_time);
 
   /* play_level_1 (); */
-  play_consistency_level ();
-  /* play_legacy_level (); */
+  /* play_consistency_level (); */
+  play_legacy_level ();
   unload_level ();
 
   finalize_video ();

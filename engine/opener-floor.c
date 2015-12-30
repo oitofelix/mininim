@@ -32,27 +32,27 @@
 
 /* dungeon cga */
 ALLEGRO_BITMAP *dc_unpressed_opener_floor_base,
-  *dc_unpressed_opener_floor_left;
+  *dc_unpressed_opener_floor_left, *dc_unpressed_opener_floor_right;
 
 /* palace cga */
 ALLEGRO_BITMAP *pc_unpressed_opener_floor_base,
-  *pc_unpressed_opener_floor_left;
+  *pc_unpressed_opener_floor_left, *pc_unpressed_opener_floor_right;
 
 /* dungeon ega */
 ALLEGRO_BITMAP *de_unpressed_opener_floor_base,
-  *de_unpressed_opener_floor_left;
+  *de_unpressed_opener_floor_left, *de_unpressed_opener_floor_right;
 
 /* palace ega */
 ALLEGRO_BITMAP *pe_unpressed_opener_floor_base,
-  *pe_unpressed_opener_floor_left;
+  *pe_unpressed_opener_floor_left, *pe_unpressed_opener_floor_right;
 
 /* dungeon vga */
 ALLEGRO_BITMAP *dv_unpressed_opener_floor_base,
-  *dv_unpressed_opener_floor_left;
+  *dv_unpressed_opener_floor_left, *dv_unpressed_opener_floor_right;
 
 /* palace vga */
 ALLEGRO_BITMAP *pv_unpressed_opener_floor_base,
-  *pv_unpressed_opener_floor_left;
+  *pv_unpressed_opener_floor_left, *pv_unpressed_opener_floor_right;
 
 ALLEGRO_SAMPLE *opener_floor_sample;
 bool sample_opener_floor;
@@ -66,26 +66,32 @@ load_opener_floor (void)
   /* dungeon cga */
   dc_unpressed_opener_floor_base = load_bitmap (DC_UNPRESSED_OPENER_FLOOR_BASE);
   dc_unpressed_opener_floor_left = load_bitmap (DC_UNPRESSED_OPENER_FLOOR_LEFT);
+  dc_unpressed_opener_floor_right = load_bitmap (DC_UNPRESSED_OPENER_FLOOR_RIGHT);
 
   /* palace cga */
   pc_unpressed_opener_floor_base = load_bitmap (PC_UNPRESSED_OPENER_FLOOR_BASE);
   pc_unpressed_opener_floor_left = load_bitmap (PC_UNPRESSED_OPENER_FLOOR_LEFT);
+  pc_unpressed_opener_floor_right = load_bitmap (PC_UNPRESSED_OPENER_FLOOR_RIGHT);
 
   /* dungeon ega */
   de_unpressed_opener_floor_base = load_bitmap (DE_UNPRESSED_OPENER_FLOOR_BASE);
   de_unpressed_opener_floor_left = load_bitmap (DE_UNPRESSED_OPENER_FLOOR_LEFT);
+  de_unpressed_opener_floor_right = load_bitmap (DE_UNPRESSED_OPENER_FLOOR_RIGHT);
 
   /* palace ega */
   pe_unpressed_opener_floor_base = load_bitmap (PE_UNPRESSED_OPENER_FLOOR_BASE);
   pe_unpressed_opener_floor_left = load_bitmap (PE_UNPRESSED_OPENER_FLOOR_LEFT);
+  pe_unpressed_opener_floor_right = load_bitmap (PE_UNPRESSED_OPENER_FLOOR_RIGHT);
 
   /* dungeon vga */
   dv_unpressed_opener_floor_base = load_bitmap (DV_UNPRESSED_OPENER_FLOOR_BASE);
   dv_unpressed_opener_floor_left = load_bitmap (DV_UNPRESSED_OPENER_FLOOR_LEFT);
+  dv_unpressed_opener_floor_right = load_bitmap (DV_UNPRESSED_OPENER_FLOOR_RIGHT);
 
   /* palace vga */
   pv_unpressed_opener_floor_base = load_bitmap (PV_UNPRESSED_OPENER_FLOOR_BASE);
   pv_unpressed_opener_floor_left = load_bitmap (PV_UNPRESSED_OPENER_FLOOR_LEFT);
+  pv_unpressed_opener_floor_right = load_bitmap (PV_UNPRESSED_OPENER_FLOOR_RIGHT);
 }
 
 void
@@ -94,26 +100,32 @@ unload_opener_floor (void)
   /* dungeon cga */
   al_destroy_bitmap (dc_unpressed_opener_floor_base);
   al_destroy_bitmap (dc_unpressed_opener_floor_left);
+  al_destroy_bitmap (dc_unpressed_opener_floor_right);
 
   /* palace cga */
   al_destroy_bitmap (pc_unpressed_opener_floor_base);
   al_destroy_bitmap (pc_unpressed_opener_floor_left);
+  al_destroy_bitmap (pc_unpressed_opener_floor_right);
 
   /* dungeon ega */
   al_destroy_bitmap (de_unpressed_opener_floor_base);
   al_destroy_bitmap (de_unpressed_opener_floor_left);
+  al_destroy_bitmap (de_unpressed_opener_floor_right);
 
   /* palace ega */
   al_destroy_bitmap (pe_unpressed_opener_floor_base);
   al_destroy_bitmap (pe_unpressed_opener_floor_left);
+  al_destroy_bitmap (pe_unpressed_opener_floor_right);
 
   /* dungeon vga */
   al_destroy_bitmap (dv_unpressed_opener_floor_base);
   al_destroy_bitmap (dv_unpressed_opener_floor_left);
+  al_destroy_bitmap (dv_unpressed_opener_floor_right);
 
   /* palace vga */
   al_destroy_bitmap (pv_unpressed_opener_floor_base);
   al_destroy_bitmap (pv_unpressed_opener_floor_left);
+  al_destroy_bitmap (pv_unpressed_opener_floor_right);
 }
 
 void
@@ -341,16 +353,16 @@ draw_unpressed_opener_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
   switch (em) {
   case DUNGEON:
     switch (vm) {
-    case CGA: unpressed_opener_floor_right = dc_floor_right; break;
-    case EGA: unpressed_opener_floor_right = de_floor_right; break;
-    case VGA: unpressed_opener_floor_right = dv_floor_right; break;
+    case CGA: unpressed_opener_floor_right = dc_unpressed_opener_floor_right; break;
+    case EGA: unpressed_opener_floor_right = de_unpressed_opener_floor_right; break;
+    case VGA: unpressed_opener_floor_right = dv_unpressed_opener_floor_right; break;
     }
     break;
   case PALACE:
     switch (vm) {
-    case CGA: unpressed_opener_floor_right = pc_floor_right; break;
-    case EGA: unpressed_opener_floor_right = pe_floor_right; break;
-    case VGA: unpressed_opener_floor_right = pv_floor_right; break;
+    case CGA: unpressed_opener_floor_right = pc_unpressed_opener_floor_right; break;
+    case EGA: unpressed_opener_floor_right = pe_unpressed_opener_floor_right; break;
+    case VGA: unpressed_opener_floor_right = pv_unpressed_opener_floor_right; break;
     }
     break;
   }

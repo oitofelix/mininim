@@ -214,7 +214,7 @@ physics_in (struct anim *kid)
   if (kid->i > 2
       && ! is_strictly_traversable (&npmbo)
       && npmbo.floor != npmbo_nf.floor) {
-    kid->inertia = 0;
+    kid->inertia = kid->cinertia = 0;
 
     if (is_colliding (&kid->f, &kid->fo, +16, false, &kid->ci))
       kid->f.c.x += (kid->f.dir == LEFT) ? +16 : -16;

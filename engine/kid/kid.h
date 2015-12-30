@@ -107,6 +107,7 @@ ALLEGRO_COLOR get_flicker_blood_color (void);
 ALLEGRO_COLOR get_flicker_raise_sword_color (void);
 ALLEGRO_COLOR get_flicker_float_color (void);
 void kid_debug (void);
+bool kid_door_split_collision (struct anim *k);
 
 /* variables */
 extern struct anim *kid; /* kid animation object */

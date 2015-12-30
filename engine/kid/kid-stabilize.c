@@ -101,7 +101,7 @@ kid_stabilize_back_collision (struct anim *kid)
   kid->action = kid_stabilize_back_collision;
   place_frame (&kid->f, &kid->f, kid_stabilize_frameset[0].frame,
                &kid->ci.p, (kid->f.dir == LEFT)
-               ? -PLACE_WIDTH + 24 : PLACE_WIDTH + 14, +17);
+               ? -PLACE_WIDTH + 24 : PLACE_WIDTH + 18, +17);
   kid_stabilize (kid);
   sample_hit_wall = true;
 }
@@ -166,7 +166,7 @@ physics_in (struct anim *kid)
   struct coord nc; struct pos np, pmbo, pbb;
 
   /* inertia */
-  kid->inertia = 0;
+  kid->inertia = kid->cinertia = 0;
 
   /* fall */
   survey (_mbo, pos, &kid->f, &nc, &pmbo, &np);

@@ -176,7 +176,10 @@ physics_in (struct anim *k)
   struct coord nc; struct pos np, pmbo, pbb;
 
   /* inertia */
-  k->inertia = 0;
+  k->inertia = k->cinertia = 0;
+
+  /* collision */
+  if (kid_door_split_collision (k)) return false;
 
   /* fall */
   survey (_mbo, pos, &k->f, &nc, &pmbo, &np);

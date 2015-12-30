@@ -151,6 +151,11 @@ flow (struct anim *kid)
     kid->fo.dx -= (kid->f.dir == LEFT) ? 9 : 13;
   if (kid->hang && is_hang_pos_critical (&kid->hang_pos)
       && kid->i == 11) kid->fo.dx = +7;
+  if (kid->hang && ! is_hang_pos_critical (&kid->hang_pos)
+      && (kid->i == 11 || kid->i == 12)) {
+    kid->fo.dx += -1;
+    kid->fo.dy += -1;
+  }
   if (kid->i == 12 && kid->j++ > 0)
     kid->fo.dx = 0, kid->fo.dy += 2 * kid->j + 1;
   if (kid->j == 4) kid->j = 0;
@@ -204,7 +209,7 @@ physics_in (struct anim *kid)
   } else if (kid->i == 0 && can_hang (&kid->f, false, &kid->hang_pos)
              && ! is_hang_pos_critical (&kid->hang_pos)
              && (kid->f.dir == LEFT || con (&kid->hang_pos)->fg != DOOR)) {
-    kid->fo.dx -= 4; kid->hang = true;
+    kid->fo.dx -= 0; kid->hang = true;
   }
 
   if (kid->i == 0 && kid->hang)
