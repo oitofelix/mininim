@@ -148,6 +148,7 @@ struct spikes_floor {
   int i, wait, state;
   bool inactive;
   int murdered_kid;
+  bool activate;
 };
 
 /* variables */

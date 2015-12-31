@@ -25,6 +25,7 @@
 /* current level */
 extern struct level level;
 extern int room_view;
+extern int retry_level;
 
 void load_level (void);
 void unload_level (void);

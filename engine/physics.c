@@ -28,6 +28,9 @@
 #include "loose-floor.h"
 #include "opener-floor.h"
 #include "closer-floor.h"
+#include "spikes-floor.h"
+#include "chopper.h"
+#include "level-door.h"
 #include "pos.h"
 #include "door.h"
 #include "physics.h"
@@ -584,6 +587,31 @@ press_depressible_floor (struct pos *p)
   case OPENER_FLOOR: press_opener_floor (p); break;
   case CLOSER_FLOOR: press_closer_floor (p); break;
   case LOOSE_FLOOR: release_loose_floor (p); break;
+  default: break;
+  }
+}
+
+
+
+
+void
+activate_con (struct pos *p)
+{
+  struct door *d;
+
+  switch (con (p)->fg) {
+  case SPIKES_FLOOR:
+    spikes_floor_at_pos (p)->activate = true; break;
+  case DOOR:
+    d = door_at_pos (p);
+    d->action = (d->i) ? OPEN_DOOR : CLOSE_DOOR;
+    break;
+  case OPENER_FLOOR: press_opener_floor (p); break;
+  case CLOSER_FLOOR: press_closer_floor (p); break;
+  case LOOSE_FLOOR: release_loose_floor (p); break;
+  case CHOPPER: chopper_at_pos (p)->activate = true; break;
+  case LEVEL_DOOR: level_door_at_pos (p)->action = OPEN_LEVEL_DOOR;
+    break;
   default: break;
   }
 }

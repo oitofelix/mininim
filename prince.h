@@ -231,6 +231,7 @@ struct level {
   void (*special_events) (void);
   void (*next_level) (int, struct pos *);
   int number;
+  int nominal_number;
 
   struct con {
     enum confg {
@@ -336,7 +337,7 @@ struct anim {
   bool reverse, collision, fall, hit_ceiling,
     just_hanged, hang, hang_limit, misstep, uncouch_slowly,
     keep_sword_fast, turn, shadow, current, splash,
-    hit_by_loose_floor, invisible;
+    hit_by_loose_floor, invisible, has_sword, hurt;
 
   ALLEGRO_TIMER *floating;
 

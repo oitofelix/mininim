@@ -28,7 +28,7 @@
 #include "engine/door.h"
 #include "engine/level-door.h"
 #include "engine/physics.h"
-#include "engine/kid/kid.h"
+#include "engine/anim.h"
 #include "legacy-level.h"
 
 static struct level legacy_level;
@@ -67,6 +67,7 @@ static enum lgroup get_group (enum ltile t);
 
 static void next_level (int lv, struct pos *exit_door_pos);
 static void start (void);
+static void special_events (void);
 
 void
 play_legacy_level (void)
@@ -78,30 +79,61 @@ play_legacy_level (void)
 static void
 start (void)
 {
+  /* create kid */
   int id = create_kid (NULL);
-
   struct anim *k = &kid[id];
 
-  struct pos p;
-  p.room = k->f.c.room;
-  for (p.floor = 0; p.floor < FLOORS; p.floor++)
-    for (p.place = -1; p.place < PLACES; p.place++)
-      if (con (&p)->fg == LEVEL_DOOR) {
-        struct level_door *ld = level_door_at_pos (&p);
-        ld->i = 0;
-        ld->action = CLOSE_LEVEL_DOOR;
-      }
-
+  /* make the kid turn as appropriate */
   switch (level.number) {
-  case 1: k->f.dir = (k->f.dir == LEFT) ? RIGHT : LEFT;
-  default: k->action = kid_turn; break;
+  case 1: k->f.dir = (k->f.dir == LEFT) ? RIGHT : LEFT; break;
+  default:
+    k->i = -1;
+    k->action = kid_turn; break;
   }
 
+  /* define the enviroment mode based on the level */
   switch (level.number) {
   case 4: case 5: case 6: case 10: case 11: case 14:
     em = PALACE; break;
   default: em = DUNGEON; break;
   }
+
+  /* give the sword to kid if it's not in the starting level */
+  if (level.number > 1) k->has_sword = true;
+
+  /* in the first level */
+  if (level.number == 1) {
+    /* activate tile, usually to close the opened door in the starting
+       room */
+    struct pos p = {5,0,2};
+    activate_con (&p);
+    /* if it's the first try make kid wait before uncouching */
+    if (retry_level != 1) kid->uncouch_slowly = true;
+  }
+}
+
+static void
+special_events (void)
+{
+  struct anim *k = current_kid;
+
+  /* in the first animation cycle */
+  if (anim_cycle == 0) {
+    /* close any level door in the starting room */
+    struct pos p;
+    p.room = current_kid->f.c.room;
+    for (p.floor = 0; p.floor < FLOORS; p.floor++)
+      for (p.place = -1; p.place < PLACES; p.place++)
+        if (con (&p)->fg == LEVEL_DOOR) {
+          struct level_door *ld = level_door_at_pos (&p);
+          ld->i = 0;
+          ld->action = CLOSE_LEVEL_DOOR;
+        }
+  }
+
+  /* in the first level, first try, play the suspense sound */
+  if (level.number == 1 && anim_cycle == 12 && retry_level != 1)
+    sample_suspense = true;
 }
 
 static void
@@ -123,8 +155,13 @@ next_level (int number, struct pos *exit_door_pos)
   struct pos p;
 
   memset (&legacy_level, 0, sizeof (legacy_level));
-  legacy_level.start = start;
   legacy_level.number = number;
+  if (number == 12 || number == 13)
+    legacy_level.nominal_number = 12;
+  else if (number == 14) legacy_level.nominal_number = -1;
+  else legacy_level.nominal_number = number;
+  legacy_level.start = start;
+  legacy_level.special_events = special_events;
   legacy_level.next_level = next_level;
   memcpy (&legacy_level.con[0], &room_0, sizeof (room_0));
 

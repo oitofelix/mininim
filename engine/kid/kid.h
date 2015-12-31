@@ -79,6 +79,7 @@
 #define DEATH_SAMPLE "dat/midisnd1/death.ogg"
 #define PRESS_KEY_SAMPLE "dat/digisnd1/press-key.ogg"
 #define MIRROR_SAMPLE "dat/digisnd2/mirror.ogg"
+#define SUSPENSE_SAMPLE "dat/midisnd1/suspense.ogg"
 
 /* functions */
 void load_kid (void);
@@ -119,6 +120,7 @@ extern bool sample_step, sample_hit_ground, sample_hit_ground_harm,
   sample_drink, sample_glory, sample_take_sword, sample_sword_attack,
   sample_harm, sample_small_life_potion, sample_big_life_potion,
   sample_action_not_allowed, sample_scream, sample_spiked, sample_chopped,
-  sample_floating, sample_death, sample_press_key, sample_mirror;
+  sample_floating, sample_death, sample_press_key, sample_mirror,
+  sample_suspense;
 
 #endif	/* MININIM_KID_H */

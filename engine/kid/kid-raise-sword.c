@@ -94,6 +94,7 @@ flow (struct anim *kid)
   else {
     kid_keep_sword (kid);
     kid->item_pos.room = -1;
+    kid->has_sword = true;
     return false;
   }
 

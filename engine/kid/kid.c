@@ -50,14 +50,16 @@ ALLEGRO_SAMPLE *step_sample, *hit_ground_sample, *hit_ground_harm_sample,
   *drink_sample, *glory_sample, *take_sword_sample, *sword_attack_sample,
   *harm_sample, *action_not_allowed_sample, *small_life_potion_sample,
   *big_life_potion_sample, *scream_sample, *spiked_sample, *chopped_sample,
-  *floating_sample, *death_sample, *press_key_sample, *mirror_sample;
+  *floating_sample, *death_sample, *press_key_sample, *mirror_sample,
+  *suspense_sample;
 
 bool sample_step, sample_hit_ground, sample_hit_ground_harm,
   sample_hit_ground_fatal, sample_hit_wall, sample_hang_on_fall,
   sample_drink, sample_glory, sample_take_sword, sample_sword_attack,
   sample_harm, sample_action_not_allowed, sample_small_life_potion,
   sample_big_life_potion, sample_scream, sample_spiked, sample_chopped,
-  sample_floating, sample_death, sample_press_key, sample_mirror;
+  sample_floating, sample_death, sample_press_key, sample_mirror,
+  sample_suspense;
 
 static void place_kid (struct anim *kid, int room, int floor, int place);
 static struct coord *kid_life_coord (int i, struct coord *c);
@@ -126,6 +128,7 @@ load_kid (void)
   death_sample = load_sample (DEATH_SAMPLE);
   press_key_sample = load_sample (PRESS_KEY_SAMPLE);
   mirror_sample = load_sample (MIRROR_SAMPLE);
+  suspense_sample = load_sample (SUSPENSE_SAMPLE);
 }
 
 void
@@ -189,6 +192,7 @@ unload_kid (void)
   al_destroy_sample (death_sample);
   al_destroy_sample (press_key_sample);
   al_destroy_sample (mirror_sample);
+  al_destroy_sample (suspense_sample);
 }
 
 int
@@ -569,6 +573,7 @@ sample_kid (void)
   if (sample_death) play_sample (death_sample);
   if (sample_press_key) play_sample (press_key_sample);
   if (sample_mirror) play_sample (mirror_sample);
+  if (sample_suspense) play_sample (suspense_sample);
 
   sample_step = sample_hit_ground = sample_hit_ground_harm =
     sample_hit_ground_fatal = sample_hit_wall =
@@ -577,7 +582,7 @@ sample_kid (void)
     sample_action_not_allowed = sample_small_life_potion =
     sample_big_life_potion = sample_scream = sample_spiked =
     sample_chopped = sample_floating = sample_death =
-    sample_press_key = false, sample_mirror = false;
+    sample_press_key = sample_mirror = sample_suspense = false;
 }
 
 void

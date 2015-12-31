@@ -60,6 +60,7 @@ static ALLEGRO_TIMER *death_timer;
 static bool pause_game, step_one_cycle;
 
 int room_view;
+int retry_level = -1;
 
 void
 play_level (struct level *lv)
@@ -82,9 +83,11 @@ play_level (struct level *lv)
   current_kid->current = true;
   room_view = current_kid->f.c.room;
 
-  xasprintf (&text, "LEVEL %i", level.number);
-  draw_bottom_text (NULL, text);
-  al_free (text);
+  if (level.nominal_number >= 0) {
+    xasprintf (&text, "LEVEL %i", level.nominal_number);
+    draw_bottom_text (NULL, text);
+    al_free (text);
+  }
 
   al_stop_timer (death_timer);
   al_set_timer_count (death_timer, 0);
@@ -94,6 +97,7 @@ play_level (struct level *lv)
   switch (quit_anim) {
   case NO_QUIT: break;
   case RESTART_LEVEL:
+    retry_level = level.number;
     destroy_array ((void **) &kid, &kid_nmemb);
     destroy_cons ();
     goto start;
@@ -181,12 +185,14 @@ compute_level (void)
     make_links_locally_consistent (prev_room, room_view);
   }
 
-  compute_opener_floors ();
   compute_closer_floors ();
+  compute_opener_floors ();
   compute_spikes_floors ();
   compute_doors ();
   compute_level_doors ();
   compute_choppers ();
+
+  level.special_events ();
 }
 
 static void

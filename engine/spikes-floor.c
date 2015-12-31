@@ -340,6 +340,7 @@ register_spikes_floor (struct pos *p)
   s.state = 0;
   s.inactive = false;
   s.murdered_kid = -1;
+  s.activate = false;
 
   spikes_floor =
     add_to_array (&s, 1, spikes_floor, &spikes_floor_nmemb,
@@ -411,7 +412,7 @@ compute_spikes_floors (void)
       continue;
     }
     switch (s->i) {
-    case 0: if (should_spikes_raise (&s->p)) {
+    case 0: if (should_spikes_raise (&s->p) || s->activate) {
         sample_spikes = true;
         s->i++;
         s->wait = 12;
@@ -429,7 +430,7 @@ compute_spikes_floors (void)
       } else s->state = 5;
       break;
     case 5: s->i++; s->state = 2; break;
-    case 6: s->i = 0; s->state = 1; break;
+    case 6: s->i = 0; s->state = 1; s->activate = false; break;
     }
 
     /* spike kid */

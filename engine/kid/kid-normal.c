@@ -80,7 +80,7 @@ flow (struct anim *k)
   bool vjump = up_key;
   bool drink = is_potion (&pbf) && shift_key;
   bool raise_sword = is_sword (&pbf) && shift_key;
-  bool take_sword = enter_key;
+  bool take_sword = enter_key && k->has_sword;
 
   survey (_mt, pos, &k->f, &nc, &pmt, &np);
   bool stairs = up_key && ! left_key && ! right_key

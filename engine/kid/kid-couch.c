@@ -212,7 +212,8 @@ flow (struct anim *kid)
     kid->i++;
 
   if (kid->i == 1 && kid->wait > 0 &&
-      (kid->fall == true || kid->hit_by_loose_floor))
+      ((kid->fall == true && kid->hurt)
+       || kid->hit_by_loose_floor))
     kid->i = 2;
 
   select_frame (kid, kid_couch_frameset, kid->i);

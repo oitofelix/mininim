@@ -71,4 +71,8 @@ void save_depressible_floor (struct anim *a);
 void restore_depressible_floor (struct anim *a);
 void press_depressible_floor (struct pos *p);
 
+
+
+void activate_con (struct pos *p);
+
 #endif	/* MININIM_PHYSICS_H */

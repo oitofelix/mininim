@@ -370,13 +370,15 @@ compute_choppers (void)
     }
     switch (c->i) {
     case 0:
-      if (c->wait-- <= 0 && should_chomp (&c->p)
-          && (anim_cycle % CHOPPER_WAIT) ==
-          prandom_pos (&c->p, CHOPPER_WAIT - 1)) c->i++; break;
+      if ((c->wait-- <= 0 && should_chomp (&c->p)
+           && (anim_cycle % CHOPPER_WAIT) ==
+           prandom_pos (&c->p, CHOPPER_WAIT - 1))
+          || c->activate) c->i++; break;
     case 1: c->i++; sample_chopper = true; break;
     case 2: c->i++; break;
     case 3: c->i++; break;
-    case 4: c->i = 0; c->wait = CHOPPER_WAIT; break;
+    case 4: c->i = 0; c->wait = CHOPPER_WAIT; c->activate = false;
+      break;
     }
 
     if (c->i != 1 && c->i != 2 ) continue;

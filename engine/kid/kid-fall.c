@@ -233,6 +233,7 @@ physics_in (struct anim *kid)
     if (kid->i >= 8 && ! kid->immortal
         && ! kid->fall_immune
         && ! al_get_timer_started (kid->floating)) {
+      kid->hurt = true;
       kid->splash = true;
       kid->current_lives--;
 
@@ -247,8 +248,10 @@ physics_in (struct anim *kid)
       video_effect.color = get_flicker_blood_color ();
       start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
     } else if (kid->i > 3
-               && ! al_get_timer_started (kid->floating))
+               && ! al_get_timer_started (kid->floating)) {
       sample_hit_ground = true;
+      kid->hurt = false;
+    } else kid->hurt = false;
 
     survey (_mt, pos, &kid->f, &nc, &pmt, &np);
     if (kid->current_lives <= 0) {
