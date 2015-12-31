@@ -51,6 +51,9 @@ enum lm_free {
   LM_FREE_SPOT3_DUNGEON_BLUE_LINE_PALACE = 0xFF,
 };
 
+enum lm_gate {
+  LM_GATE_CLOSED, LM_GATE_OPEN,
+};
 
 enum lm_potion {
   LM_POTION_EMPTY, LM_POTION_HEALTH_POINT, LM_POTION_LIFE,

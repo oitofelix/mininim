@@ -272,6 +272,7 @@ struct level {
     union conext {
       int event;
       int design;
+      int door_step;
       enum item {
         NO_ITEM,
         SMALL_LIFE_POTION,
@@ -293,6 +294,9 @@ struct level {
     struct pos p;
     bool next;
   } event[EVENTS];
+
+  struct pos start_pos;
+  enum dir start_dir;
 };
 
 /* avoid "'struct' declared inside parameter list" error for the

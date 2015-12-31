@@ -46,7 +46,7 @@ main (int argc, char **argv)
   show ();
   clear_bitmap (screen, BLACK);
 
-  play_title ();
+  /* play_title (); */
 
   load_level ();
   play_time = create_timer (60.0);

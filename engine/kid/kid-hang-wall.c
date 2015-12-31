@@ -96,7 +96,8 @@ flow (struct anim *kid)
     kid_vjump (kid);
     kid->hang_limit = false;
     return false;
-  } if (up_key && ! kid->hang_limit && kid == current_kid) {
+  } if (up_key && ! left_key && ! right_key
+        && ! kid->hang_limit && kid == current_kid) {
     kid_climb (kid);
     return false;
   }

@@ -176,7 +176,7 @@ physics_in (struct anim *kid)
     }
   }
 
-  printf ("inertia: %i\n", kid->inertia);
+  /* printf ("inertia: %i\n", kid->inertia); */
 
   /* collision */
   if (is_colliding (&kid->f, &kid->fo, +0, false, &kid->ci)) {

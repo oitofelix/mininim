@@ -22,9 +22,14 @@
 #include <time.h>
 #include "kernel/video.h"
 #include "kernel/random.h"
+#include "kernel/array.h"
 #include "engine/level.h"
 #include "engine/kid/kid.h"
-#include "levels/legacy-level.h"
+#include "engine/door.h"
+#include "engine/level-door.h"
+#include "engine/physics.h"
+#include "engine/kid/kid.h"
+#include "legacy-level.h"
 
 static struct level legacy_level;
 
@@ -73,25 +78,57 @@ play_legacy_level (void)
 static void
 start (void)
 {
-  create_kid (NULL);
-  /* create_kid (&kid[0]); */
+  int id = create_kid (NULL);
+
+  struct anim *k = &kid[id];
+
+  struct pos p;
+  p.room = k->f.c.room;
+  for (p.floor = 0; p.floor < FLOORS; p.floor++)
+    for (p.place = -1; p.place < PLACES; p.place++)
+      if (con (&p)->fg == LEVEL_DOOR) {
+        struct level_door *ld = level_door_at_pos (&p);
+        ld->i = 0;
+        ld->action = CLOSE_LEVEL_DOOR;
+      }
+
+  switch (level.number) {
+  case 1: k->f.dir = (k->f.dir == LEFT) ? RIGHT : LEFT;
+  default: k->action = kid_turn; break;
+  }
+
+  switch (level.number) {
+  case 4: case 5: case 6: case 10: case 11: case 14:
+    em = PALACE; break;
+  default: em = DUNGEON; break;
+  }
 }
 
 static void
 next_level (int number, struct pos *exit_door_pos)
 {
+  if (number > 14) number = 1;
+
+  char *lvfn;
+  xasprintf (&lvfn, "data/legacy-levels/%02d", number);
+
   FILE *lvf;
-  lvf = fopen ("data/legacy-levels/02", "r");
+  lvf = fopen (lvfn, "r");
+  if (! lvf) error (-1, 0, "cannot read legacy level file %s", lvfn);
   fread (&lv, sizeof (lv), 1, lvf);
   fclose (lvf);
+
+  al_free (lvfn);
 
   struct pos p;
 
   memset (&legacy_level, 0, sizeof (legacy_level));
   legacy_level.start = start;
   legacy_level.number = number;
+  legacy_level.next_level = next_level;
   memcpy (&legacy_level.con[0], &room_0, sizeof (room_0));
 
+  /* LINKS: ok */
   for (p.room = 1; p.room <= LROOMS; p.room++) {
     legacy_level.link[p.room].l = lv.link[p.room - 1][LD_LEFT];
     legacy_level.link[p.room].r = lv.link[p.room - 1][LD_RIGHT];
@@ -149,10 +186,7 @@ next_level (int number, struct pos *exit_door_pos)
         case LT_LATTICE_LEFT: c->fg = ARCH_TOP_LEFT; c->bg = NO_BRICKS; break;
         case LT_LATTICE_RIGHT: c->fg = ARCH_TOP_RIGHT; c->bg = NO_BRICKS; break;
         case LT_TORCH_WITH_DEBRIS: c->fg = BROKEN_FLOOR; c->bg = TORCH; break;
-        case LT_NULL:
-          printf ("(%i, %i, %i, %i): LT_NULL\n",
-                  number, p.room, p.floor, p.place);
-          break;
+        case LT_NULL: break;
         default:
           error (-1, 0, "%s: unknown tile group (%i) at position (%i, %i, %i, %i)",
                  __func__, t, number, p.room, p.floor, p.place);
@@ -164,8 +198,8 @@ next_level (int number, struct pos *exit_door_pos)
         struct pos pl; prel (&p, &pl, +0, -1);
 
         switch (g) {
-        case LG_NONE: break;
-        case LG_FREE:
+        case LG_NONE: break;    /* ok */
+        case LG_FREE:           /* ok */
           switch (b) {
           case LM_FREE_NOTHING_DUNGEON_BLUE_LINE_PALACE: /* ok */
             c->bg = (t == LT_EMPTY) ? NO_BRICKS : NO_BG; break;
@@ -178,8 +212,13 @@ next_level (int number, struct pos *exit_door_pos)
             c->bg = (t == LT_EMPTY) ? NO_BRICKS : NO_BG; break;
           }
         case LG_SPIKE: break;
-        case LG_GATE: break;
-        case LG_TAPEST:
+        case LG_GATE:           /* ok */
+          switch (b) {
+          case LM_GATE_CLOSED: default: c->ext.door_step = DOOR_MAX_STEP; break;
+          case LM_GATE_OPEN: c->ext.door_step = 0; break;
+          }
+          break;
+        case LG_TAPEST:         /* ok */
           switch (b) {
           case LM_TAPEST_WITH_LATTICE: c->ext.design = ARCH_CARPET_LEFT; break;
           case LM_TAPEST_ALTERNATIVE_DESIGN: c->ext.design = CARPET_01; break;
@@ -198,7 +237,7 @@ next_level (int number, struct pos *exit_door_pos)
           case LM_POTION_OPEN: break;
           }
           break;
-        case LG_TTOP:
+        case LG_TTOP:           /* ok */
           switch (b) {
           case LM_TTOP_WITH_LATTICE: c->ext.design = ARCH_CARPET_LEFT; break;
           case LM_TTOP_ALTERNATIVE_DESIGN:
@@ -218,17 +257,14 @@ next_level (int number, struct pos *exit_door_pos)
         case LG_CHOMP: break;
         case LG_WALL: break;
         case LG_EXIT: break;
-        case LG_EVENT:
-          c->ext.event = b;
-          printf ("event floor (%i, %i, %i, %i)\n",
-                  p.room, p.floor, p.place, b);
-          break;
+        case LG_EVENT: c->ext.event = b; break; /* ok */
         default:
           error (-1, 0, "%s: unknown tile group (%i) at position (%i, %i, %i, %i)",
                  __func__, g, number, p.room, p.floor, p.place);
         }
       }
 
+  /* EVENTS: ok */
   int i;
   for (i = 0; i < LEVENTS; i++) {
     struct level_event *e = &legacy_level.event[i];
@@ -239,6 +275,16 @@ next_level (int number, struct pos *exit_door_pos)
     if (get_tile (&e->p) == LT_EXIT_LEFT) e->p.place++;
     e->next = lv.door_1[i] & 0x80 ? false : true;
   }
+
+  /* START POSITION: ok */
+  struct pos *sp = &legacy_level.start_pos;
+  sp->room = lv.start_position[0];
+  sp->floor = lv.start_position[1] / PLACES;
+  sp->place = lv.start_position[1] % PLACES;
+
+  /* START DIRECTION: ok */
+  enum dir *sd = &legacy_level.start_dir;
+  *sd = lv.start_position[2] ? LEFT : RIGHT;
 }
 
 static enum ltile

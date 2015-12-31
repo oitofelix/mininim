@@ -76,11 +76,11 @@ play_level (struct level *lv)
   if (level.start) level.start ();
 
   screen_flags = 0;
-  room_view = 1;
   anim_cycle = 0;
   last_auto_show_time = -1;
   current_kid = &kid[0];
   current_kid->current = true;
+  room_view = current_kid->f.c.room;
 
   xasprintf (&text, "LEVEL %i", level.number);
   draw_bottom_text (NULL, text);

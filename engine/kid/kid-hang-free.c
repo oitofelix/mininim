@@ -82,7 +82,8 @@ flow (struct anim *kid)
   /* climb */
   if ((kid->i < 5 || kid->j > -1
        || kid->hang_caller != kid_unclimb)
-      && up_key && ! kid->hang_limit
+      && up_key && ! left_key && ! right_key
+      && ! kid->hang_limit
       && kid == current_kid) {
     kid_climb (kid);
     return false;

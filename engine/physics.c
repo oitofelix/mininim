@@ -480,7 +480,7 @@ can_hang (struct frame *f, bool reverse, struct pos *hang_pos)
 
   double d = dist_coord (&tf, &ch);
 
-  printf ("dist_coord = %f\n", d);
+  /* printf ("dist_coord = %f\n", d); */
 
   if (is_kid_fall (&_f) && d > 20) return false;
 
