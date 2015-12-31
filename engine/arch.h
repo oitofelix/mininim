@@ -102,5 +102,6 @@ void draw_arch_top_right_end (ALLEGRO_BITMAP *bitmap, struct pos *p,
 struct coord *arch_bottom_coord (struct pos *p, struct coord *c);
 struct coord *arch_top_coord (struct pos *p, struct coord *c);
 struct coord *arch_top_top_coord (struct pos *p, struct coord *c);
+struct coord *arch_top_left_end_coord (struct pos *p, struct coord *c);
 
 #endif	/* MININIM_ARCH_H */

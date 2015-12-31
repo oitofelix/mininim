@@ -300,8 +300,11 @@ draw_big_pillar_top_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
   ALLEGRO_BITMAP *big_pillar_top_right = NULL,
     *big_pillar_top_right_top = NULL;
 
+  pos2coord_f big_pillar_top_right_top_coord = NULL;
+
   switch (em) {
   case DUNGEON:
+    big_pillar_top_right_top_coord = d_big_pillar_top_right_top_coord;
     switch (vm) {
     case CGA:
       big_pillar_top_right = dc_big_pillar_top_right;
@@ -318,6 +321,7 @@ draw_big_pillar_top_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
     }
     break;
   case PALACE:
+    big_pillar_top_right_top_coord = p_big_pillar_top_right_top_coord;
     switch (vm) {
     case CGA:
       big_pillar_top_right = pc_big_pillar_top_right;
@@ -384,10 +388,19 @@ big_pillar_top_right_coord (struct pos *p, struct coord *c)
 }
 
 struct coord *
-big_pillar_top_right_top_coord (struct pos *p, struct coord *c)
+d_big_pillar_top_right_top_coord (struct pos *p, struct coord *c)
 {
   c->x = PLACE_WIDTH * (p->place + 1);
   c->y = PLACE_HEIGHT * p->floor - 3;
+  c->room = p->room;
+  return c;
+}
+
+struct coord *
+p_big_pillar_top_right_top_coord (struct pos *p, struct coord *c)
+{
+  c->x = PLACE_WIDTH * (p->place + 1);
+  c->y = PLACE_HEIGHT * p->floor - 6;
   c->room = p->room;
   return c;
 }

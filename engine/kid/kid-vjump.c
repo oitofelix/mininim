@@ -170,7 +170,8 @@ physics_in (struct anim *kid)
 
   /* collision */
   if (is_colliding (&kid->f, &kid->fo, +0, false, &kid->ci)
-      && kid->ci.t == MIRROR)
+      && (kid->ci.t == MIRROR
+          || (kid->ci.t == CARPET && kid->f.dir == RIGHT)))
     kid->f.c.x += (kid->f.dir == LEFT) ? +4 : -4;
 
   /* fall */

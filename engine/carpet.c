@@ -29,7 +29,13 @@
 #include "kid/kid.h"
 #include "level.h"
 #include "arch.h"
+#include "door.h"
 #include "carpet.h"
+
+static void get_carpet_bitmaps (struct pos *p, enum em em,
+                                enum vm vm,
+                                ALLEGRO_BITMAP **carpet,
+                                ALLEGRO_BITMAP **carpet_top);
 
 /* dungeon cga */
 ALLEGRO_BITMAP *dc_carpet_01, *dc_carpet_top_01,
@@ -135,252 +141,144 @@ unload_carpet (void)
   al_destroy_bitmap (pv_carpet_top_02);
 }
 
-void
-draw_carpet_01 (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                enum em em, enum vm vm)
+static void
+get_carpet_bitmaps (struct pos *p, enum em em, enum vm vm,
+                    ALLEGRO_BITMAP **carpet,
+                    ALLEGRO_BITMAP **carpet_top)
 {
-  struct coord c;
-
-  ALLEGRO_BITMAP *carpet = NULL,
-    *carpet_top = NULL;
+  ALLEGRO_BITMAP *carpet_01 = NULL,
+    *carpet_top_01 = NULL,
+    *carpet_02 = NULL,
+    *carpet_top_02 = NULL;
 
   switch (em) {
   case DUNGEON:
     switch (vm) {
     case CGA:
-      carpet = dc_carpet_01;
-      carpet_top = dc_carpet_top_01;
+      carpet_01 = dc_carpet_01;
+      carpet_top_01 = dc_carpet_top_01;
+      carpet_02 = dc_carpet_02;
+      carpet_top_02 = dc_carpet_top_02;
       break;
     case EGA:
-      carpet = de_carpet_01;
-      carpet_top = de_carpet_top_01;
+      carpet_01 = de_carpet_01;
+      carpet_top_01 = de_carpet_top_01;
+      carpet_02 = de_carpet_02;
+      carpet_top_02 = de_carpet_top_02;
       break;
     case VGA:
-      carpet = dv_carpet_01;
-      carpet_top = dv_carpet_top_01;
+      carpet_01 = dv_carpet_01;
+      carpet_top_01 = dv_carpet_top_01;
+      carpet_02 = dv_carpet_02;
+      carpet_top_02 = dv_carpet_top_02;
       break;
     }
     break;
   case PALACE:
     switch (vm) {
     case CGA:
-      carpet = pc_carpet_01;
-      carpet_top = pc_carpet_top_01;
+      carpet_01 = pc_carpet_01;
+      carpet_top_01 = pc_carpet_top_01;
+      carpet_02 = pc_carpet_02;
+      carpet_top_02 = pc_carpet_top_02;
       break;
     case EGA:
-      carpet = pe_carpet_01;
-      carpet_top = pe_carpet_top_01;
+      carpet_01 = pe_carpet_01;
+      carpet_top_01 = pe_carpet_top_01;
+      carpet_02 = pe_carpet_02;
+      carpet_top_02 = pe_carpet_top_02;
       break;
     case VGA:
-      carpet = pv_carpet_01;
-      carpet_top = pv_carpet_top_01;
+      carpet_01 = pv_carpet_01;
+      carpet_top_01 = pv_carpet_top_01;
+      carpet_02 = pv_carpet_02;
+      carpet_top_02 = pv_carpet_top_02;
       break;
     }
     break;
   }
 
-  if (hgc) {
-    carpet = apply_palette (carpet, hgc_palette);
-    carpet_top = apply_palette (carpet_top, hgc_palette);
+  switch (con (p)->ext.design) {
+  case CARPET_01:
+    *carpet = carpet_01;
+    *carpet_top = carpet_top_01;
+    break;
+  case CARPET_02:
+    *carpet = carpet_02;
+    *carpet_top = carpet_top_02;
+    break;
+  case ARCH_CARPET_LEFT:
+    *carpet = NULL;
+    *carpet_top = NULL;
+    break;
+  case ARCH_CARPET_RIGHT_01:
+    *carpet = carpet_01;
+    *carpet_top = carpet_top_01;
+    break;
+  case ARCH_CARPET_RIGHT_02:
+    *carpet = carpet_02;
+    *carpet_top = carpet_top_02;
+    break;
   }
-
-  draw_bitmapc (carpet, bitmap,
-                carpet_coord (p, &c), 0);
-  draw_bitmapc (carpet_top, bitmap,
-                carpet_top_coord (p, &c), 0);
 }
 
 void
-draw_carpet_fg_01 (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                   struct frame *f, enum em em, enum vm vm)
+draw_carpet_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                  enum em em, enum vm vm)
 {
-  struct pos ph; prel (p, &ph, -1, -1);
-  if (is_kid_hanging_at_pos (f, &ph)) return;
-
   struct coord c;
 
-  ALLEGRO_BITMAP *carpet = NULL,
-    *carpet_top = NULL;
+  ALLEGRO_BITMAP *carpet = NULL, *carpet_top = NULL;
 
-  switch (em) {
-  case DUNGEON:
-    switch (vm) {
-    case CGA:
-      carpet = dc_carpet_01;
-      carpet_top = dc_carpet_top_01;
-      break;
-    case EGA:
-      carpet = de_carpet_01;
-      carpet_top = de_carpet_top_01;
-      break;
-    case VGA:
-      carpet = dv_carpet_01;
-      carpet_top = dv_carpet_top_01;
-      break;
+  if (con (p)->ext.design == ARCH_CARPET_LEFT)
+    draw_arch_top_left_end (bitmap, p, em, vm);
+  else {
+    get_carpet_bitmaps (p, em, vm, &carpet, &carpet_top);
+
+    if (hgc) {
+      carpet = apply_palette (carpet, hgc_palette);
+      carpet_top = apply_palette (carpet_top, hgc_palette);
     }
-    break;
-  case PALACE:
-    switch (vm) {
-    case CGA:
-      carpet = pc_carpet_01;
-      carpet_top = pc_carpet_top_01;
-      break;
-    case EGA:
-      carpet = pe_carpet_01;
-      carpet_top = pe_carpet_top_01;
-      break;
-    case VGA:
-      carpet = pv_carpet_01;
-      carpet_top = pv_carpet_top_01;
-      break;
-    }
-    break;
+
+    draw_bitmapc (carpet, bitmap, carpet_coord (p, &c), 0);
+    draw_bitmapc (carpet_top, bitmap, carpet_top_coord (p, &c), 0);
   }
-
-  if (hgc) {
-    carpet = apply_palette (carpet, hgc_palette);
-    carpet_top = apply_palette (carpet_top, hgc_palette);
-  }
-
-  int h = al_get_bitmap_height (carpet);
-  draw_bitmap_regionc (carpet, bitmap, 0, 0, 27, h, carpet_coord (p, &c), 0);
-  h = al_get_bitmap_height (carpet_top);
-  draw_bitmap_regionc (carpet_top, bitmap, 0, 0, 18, h, carpet_top_coord (p, &c), 0);
-
-  struct pos pa; prel (p, &pa, -1, +0);
-  draw_confg_base (bitmap, &pa, em, vm);
-  draw_confg_left (bitmap, &pa, em, vm, true);
-
-  struct pos pl; prel (p, &pl, +0, -1);
-  if (con (&pl)->fg == ARCH_TOP_RIGHT_END)
-    draw_arch_top_top (bitmap, &pl, em, vm);
 }
 
 void
-draw_carpet_02 (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                enum em em, enum vm vm)
+draw_carpet_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                struct frame *f, enum em em, enum vm vm)
 {
   struct coord c;
 
-  ALLEGRO_BITMAP *carpet = NULL,
-    *carpet_top = NULL;
+  ALLEGRO_BITMAP *carpet = NULL, *carpet_top = NULL;
 
-  switch (em) {
-  case DUNGEON:
-    switch (vm) {
-    case CGA:
-      carpet = dc_carpet_02;
-      carpet_top = dc_carpet_top_02;
-      break;
-    case EGA:
-      carpet = de_carpet_02;
-      carpet_top = de_carpet_top_02;
-      break;
-    case VGA:
-      carpet = dv_carpet_02;
-      carpet_top = dv_carpet_top_02;
-      break;
+  draw_door_pole (bitmap, p, em, vm);
+
+  if (con (p)->ext.design == ARCH_CARPET_LEFT)
+    draw_arch_top_left_end (bitmap, p, em, vm);
+  else {
+    get_carpet_bitmaps (p, em, vm, &carpet, &carpet_top);
+
+    if (hgc) {
+      carpet = apply_palette (carpet, hgc_palette);
+      carpet_top = apply_palette (carpet_top, hgc_palette);
     }
-    break;
-  case PALACE:
-    switch (vm) {
-    case CGA:
-      carpet = pc_carpet_02;
-      carpet_top = pc_carpet_top_02;
-      break;
-    case EGA:
-      carpet = pe_carpet_02;
-      carpet_top = pe_carpet_top_02;
-      break;
-    case VGA:
-      carpet = pv_carpet_02;
-      carpet_top = pv_carpet_top_02;
-      break;
-    }
-    break;
+
+    if (! should_draw_door_grid (p, f)) return;
+
+    draw_bitmapc (carpet, bitmap, carpet_coord (p, &c), 0);
+
+    struct pos pr; prel (p, &pr, +0, +1);
+    draw_confg_base (bitmap, &pr, em, vm);
+    draw_confg_left (bitmap, &pr, em, vm, true);
   }
-
-  if (hgc) {
-    carpet = apply_palette (carpet, hgc_palette);
-    carpet_top = apply_palette (carpet_top, hgc_palette);
-  }
-
-  draw_bitmapc (carpet, bitmap,
-                carpet_coord (p, &c), 0);
-  draw_bitmapc (carpet_top, bitmap,
-                carpet_top_coord (p, &c), 0);
-}
-
-void
-draw_carpet_fg_02 (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                   struct frame *f, enum em em, enum vm vm)
-{
-  struct pos ph; prel (p, &ph, -1, -1);
-  if (is_kid_hanging_at_pos (f, &ph)) return;
-
-  struct coord c;
-
-  ALLEGRO_BITMAP *carpet = NULL,
-    *carpet_top = NULL;
-
-  switch (em) {
-  case DUNGEON:
-    switch (vm) {
-    case CGA:
-      carpet = dc_carpet_02;
-      carpet_top = dc_carpet_top_02;
-      break;
-    case EGA:
-      carpet = de_carpet_02;
-      carpet_top = de_carpet_top_02;
-      break;
-    case VGA:
-      carpet = dv_carpet_02;
-      carpet_top = dv_carpet_top_02;
-      break;
-    }
-    break;
-  case PALACE:
-    switch (vm) {
-    case CGA:
-      carpet = pc_carpet_02;
-      carpet_top = pc_carpet_top_02;
-      break;
-    case EGA:
-      carpet = pe_carpet_02;
-      carpet_top = pe_carpet_top_02;
-      break;
-    case VGA:
-      carpet = pv_carpet_02;
-      carpet_top = pv_carpet_top_02;
-      break;
-    }
-    break;
-  }
-
-  if (hgc) {
-    carpet = apply_palette (carpet, hgc_palette);
-    carpet_top = apply_palette (carpet_top, hgc_palette);
-  }
-
-  int h = al_get_bitmap_height (carpet);
-  draw_bitmap_regionc (carpet, bitmap, 0, 0, 27, h, carpet_coord (p, &c), 0);
-  h = al_get_bitmap_height (carpet_top);
-  draw_bitmap_regionc (carpet_top, bitmap, 0, 0, 18, h, carpet_top_coord (p, &c), 0);
-
-  struct pos pa; prel (p, &pa, -1, +0);
-  draw_confg_base (bitmap, &pa, em, vm);
-  draw_confg_left (bitmap, &pa, em, vm, true);
-
-  struct pos pl; prel (p, &pl, +0, -1);
-  if (con (&pl)->fg == ARCH_TOP_RIGHT_END)
-    draw_arch_top_top (bitmap, &pl, em, vm);
 }
 
 struct coord *
 carpet_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * p->place - 8;
+  c->x = PLACE_WIDTH * (p->place + 1);
   c->y = PLACE_HEIGHT * p->floor + 3;
   c->room = p->room;
   return c;
@@ -389,7 +287,7 @@ carpet_coord (struct pos *p, struct coord *c)
 struct coord *
 carpet_top_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * p->place;
+  c->x = PLACE_WIDTH * (p->place + 1);
   c->y = PLACE_HEIGHT * p->floor - 9;
   c->room = p->room;
   return c;

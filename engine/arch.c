@@ -28,6 +28,7 @@
 #include "loose-floor.h"
 #include "kid/kid.h"
 #include "level.h"
+#include "carpet.h"
 #include "arch.h"
 
 /* dungeon cga */
@@ -339,7 +340,7 @@ draw_arch_top_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
 void
 draw_arch_top_left_end (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                    enum em em, enum vm vm)
+                        enum em em, enum vm vm)
 {
   ALLEGRO_BITMAP *arch_top_left_end = NULL;
 
@@ -363,8 +364,7 @@ draw_arch_top_left_end (ALLEGRO_BITMAP *bitmap, struct pos *p,
   if (hgc) arch_top_left_end = apply_palette (arch_top_left_end, hgc_palette);
 
   struct coord c;
-  draw_bitmapc (arch_top_left_end, bitmap, arch_top_top_coord (p, &c), 0);
-  draw_arch_top_top (bitmap, p, em, vm);
+  draw_bitmapc (arch_top_left_end, bitmap, arch_top_left_end_coord (p, &c), 0);
 }
 
 void
@@ -394,7 +394,6 @@ draw_arch_top_right_end (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   struct coord c;
   draw_bitmapc (arch_top_right_end, bitmap, arch_top_top_coord (p, &c), 0);
-  draw_arch_top_top (bitmap, p, em, vm);
 }
 
 void
@@ -448,6 +447,15 @@ struct coord *
 arch_top_top_coord (struct pos *p, struct coord *c)
 {
   c->x = PLACE_WIDTH * p->place;
+  c->y = PLACE_HEIGHT * p->floor + 3;
+  c->room = p->room;
+  return c;
+}
+
+struct coord *
+arch_top_left_end_coord (struct pos *p, struct coord *c)
+{
+  c->x = PLACE_WIDTH * (p->place + 1);
   c->y = PLACE_HEIGHT * p->floor + 3;
   c->room = p->room;
   return c;

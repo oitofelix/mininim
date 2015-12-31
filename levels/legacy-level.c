@@ -92,6 +92,16 @@ next_level (int number, struct pos *exit_door_pos)
   legacy_level.number = number;
   memcpy (&legacy_level.con[0], &room_0, sizeof (room_0));
 
+  for (p.room = 1; p.room <= LROOMS; p.room++) {
+    legacy_level.link[p.room].l = lv.link[p.room - 1][LD_LEFT];
+    legacy_level.link[p.room].r = lv.link[p.room - 1][LD_RIGHT];
+    legacy_level.link[p.room].a = lv.link[p.room - 1][LD_ABOVE];
+    legacy_level.link[p.room].b = lv.link[p.room - 1][LD_BELOW];
+  }
+
+  /* enable npos to be used from now on */
+  memcpy (&level.link, &legacy_level.link, sizeof (level.link));
+
   for (p.room = 1; p.room <= LROOMS; p.room++)
     for (p.floor = 0; p.floor < FLOORS; p.floor++)
       for (p.place = 0; p.place < PLACES; p.place++) {
@@ -109,24 +119,18 @@ next_level (int number, struct pos *exit_door_pos)
         case LT_FLOOR: c->fg = FLOOR; break;
         case LT_SPIKES: c->fg = SPIKES_FLOOR; break;
         case LT_PILLAR: c->fg = PILLAR; break;
-        case LT_GATE: c->fg = DOOR; break;
+        case LT_GATE: c->fg = DOOR; c->bg = NO_BRICKS; break;
         case LT_STUCK_BUTTON:
           printf ("(%i, %i, %i, %i): LT_STUCK_BUTTON\n",
                   number, p.room, p.floor, p.place);
           break;
         case LT_DROP_BUTTON: c->fg = CLOSER_FLOOR; break;
-        case LT_TAPESTRY:
-          printf ("(%i, %i, %i, %i): LT_TAPESTRY\n",
-                  number, p.room, p.floor, p.place);
-          break;
+        case LT_TAPESTRY: c->fg = CARPET; break;
         case LT_BOTTOM_BIG_PILLAR: c->fg = BIG_PILLAR_BOTTOM; break;
-        case LT_TOP_BIG_PILLAR: c->fg = BIG_PILLAR_TOP; break;
+        case LT_TOP_BIG_PILLAR: c->fg = BIG_PILLAR_TOP; c->bg = NO_BRICKS; break;
         case LT_POTION: c->fg = FLOOR; break;
         case LT_LOOSE_BOARD: c->fg = LOOSE_FLOOR; break;
-        case LT_TAPESTRY_TOP:
-          printf ("(%i, %i, %i, %i): LT_TAPESTRY_TOP\n",
-                  number, p.room, p.floor, p.place);
-          break;
+        case LT_TAPESTRY_TOP: c->fg = TCARPET; c->bg = NO_BRICKS; break;
         case LT_MIRROR: c->fg = MIRROR; break;
         case LT_DEBRIS: c->fg = BROKEN_FLOOR; break;
         case LT_RAISE_BUTTON: c->fg = OPENER_FLOOR; break;
@@ -137,19 +141,13 @@ next_level (int number, struct pos *exit_door_pos)
         case LT_WALL: c->fg = WALL; break;
         case LT_SKELETON: c->fg = SKELETON_FLOOR; break;
         case LT_SWORD: c->fg = FLOOR; c->ext.item = SWORD; break;
-        case LT_BALCONY_LEFT:
-          printf ("(%i, %i, %i, %i): LT_BALCONY_LEFT\n",
-                  number, p.room, p.floor, p.place);
-          break;
-        case LT_BALCONY_RIGHT:
-          printf ("(%i, %i, %i, %i): LT_BALCONY_RIGHT\n",
-                  number, p.room, p.floor, p.place);
-          break;
+        case LT_BALCONY_LEFT: c->fg = FLOOR; c->bg = NO_BRICKS; break;
+        case LT_BALCONY_RIGHT: c->fg = FLOOR; c->bg = BALCONY; break;
         case LT_LATTICE_PILLAR: c->fg = ARCH_BOTTOM; break;
-        case LT_LATTICE_SUPPORT: c->fg = ARCH_TOP_MID; break;
-        case LT_SMALL_LATTICE: c->fg = ARCH_TOP_SMALL; break;
-        case LT_LATTICE_LEFT: c->fg = ARCH_TOP_LEFT; break;
-        case LT_LATTICE_RIGHT: c->fg = ARCH_TOP_RIGHT; break;
+        case LT_LATTICE_SUPPORT: c->fg = ARCH_TOP_MID; c->bg = NO_BRICKS; break;
+        case LT_SMALL_LATTICE: c->fg = ARCH_TOP_SMALL; c->bg = NO_BRICKS; break;
+        case LT_LATTICE_LEFT: c->fg = ARCH_TOP_LEFT; c->bg = NO_BRICKS; break;
+        case LT_LATTICE_RIGHT: c->fg = ARCH_TOP_RIGHT; c->bg = NO_BRICKS; break;
         case LT_TORCH_WITH_DEBRIS: c->fg = BROKEN_FLOOR; c->bg = TORCH; break;
         case LT_NULL:
           printf ("(%i, %i, %i, %i): LT_NULL\n",
@@ -160,14 +158,63 @@ next_level (int number, struct pos *exit_door_pos)
                  __func__, t, number, p.room, p.floor, p.place);
         }
 
+        /* printf ("(%i, %i, %i): TILE!!!\n", */
+        /*         p.room, p.floor, p.place); */
+
+        struct pos pl; prel (&p, &pl, +0, -1);
+
         switch (g) {
         case LG_NONE: break;
-        case LG_FREE: break;
+        case LG_FREE:
+          switch (b) {
+          case LM_FREE_NOTHING_DUNGEON_BLUE_LINE_PALACE: /* ok */
+            c->bg = (t == LT_EMPTY) ? NO_BRICKS : NO_BG; break;
+          case LM_FREE_SPOT1_DUNGEON_NO_BLUE_LINE_PALACE: /* ok */
+            c->bg = (t == LT_EMPTY) ? BRICKS_03 : BRICKS_01; break;
+          case LM_FREE_SPOT2_DUNGEON_BLUE_LINE2_PALACE: /* ok */
+            c->bg = (t == LT_EMPTY) ? BRICKS_04 : BRICKS_02; break;
+          case LM_FREE_WINDOW: c->bg = WINDOW; break;
+          case LM_FREE_SPOT3_DUNGEON_BLUE_LINE_PALACE: /* ok */
+            c->bg = (t == LT_EMPTY) ? NO_BRICKS : NO_BG; break;
+          }
         case LG_SPIKE: break;
         case LG_GATE: break;
-        case LG_TAPEST: break;
-        case LG_POTION: break;
-        case LG_TTOP: break;
+        case LG_TAPEST:
+          switch (b) {
+          case LM_TAPEST_WITH_LATTICE: c->ext.design = ARCH_CARPET_LEFT; break;
+          case LM_TAPEST_ALTERNATIVE_DESIGN: c->ext.design = CARPET_01; break;
+          case LM_TAPEST_NORMAL: c->ext.design = CARPET_02; break;
+          case LM_TAPEST_BLACK: break; /* needless */
+          }
+          break;
+        case LG_POTION:
+          switch (b) {
+          case LM_POTION_EMPTY: break;
+          case LM_POTION_HEALTH_POINT: c->ext.item = SMALL_LIFE_POTION; break;
+          case LM_POTION_LIFE: c->ext.item = BIG_LIFE_POTION; break;
+          case LM_POTION_FEATHER_FALL: c->ext.item = FLOAT_POTION; break;
+          case LM_POTION_INVERT: c->ext.item = FLIP_POTION; break;
+          case LM_POTION_POISON: c->ext.item = SMALL_POISON_POTION; break;
+          case LM_POTION_OPEN: break;
+          }
+          break;
+        case LG_TTOP:
+          switch (b) {
+          case LM_TTOP_WITH_LATTICE: c->ext.design = ARCH_CARPET_LEFT; break;
+          case LM_TTOP_ALTERNATIVE_DESIGN:
+            c->ext.design = get_tile (&pl) == LT_LATTICE_SUPPORT ?
+              ARCH_CARPET_RIGHT_01 : CARPET_01; break;
+          case LM_TTOP_NORMAL:
+            c->ext.design = get_tile (&pl) == LT_LATTICE_SUPPORT ?
+              ARCH_CARPET_RIGHT_02 : CARPET_02; break;
+            /* needless */
+          case LM_TTOP_BLACK_01: break;
+          case LM_TTOP_BLACK_02: break;
+          case LM_TTOP_WITH_ALTERNATIVE_DESIGN_AND_BOTTOM: break;
+          case LM_TTOP_WITH_BOTTOM: break;
+          case LM_TTOP_WITH_WINDOW: break;
+          }
+          break;
         case LG_CHOMP: break;
         case LG_WALL: break;
         case LG_EXIT: break;
@@ -192,21 +239,13 @@ next_level (int number, struct pos *exit_door_pos)
     if (get_tile (&e->p) == LT_EXIT_LEFT) e->p.place++;
     e->next = lv.door_1[i] & 0x80 ? false : true;
   }
-
-  for (p.room = 1; p.room <= LROOMS; p.room++) {
-    legacy_level.link[p.room].l = lv.link[p.room - 1][LD_LEFT];
-    legacy_level.link[p.room].r = lv.link[p.room - 1][LD_RIGHT];
-    legacy_level.link[p.room].a = lv.link[p.room - 1][LD_ABOVE];
-    legacy_level.link[p.room].b = lv.link[p.room - 1][LD_BELOW];
-  }
-
-
 }
 
 static enum ltile
 get_tile (struct pos *p)
 {
-  return lv.foretable[p->room - 1][p->floor][p->place] & 0x1F;
+  struct pos np; npos (p, &np);
+  return lv.foretable[np.room - 1][np.floor][np.place] & 0x1F;
 }
 
 static enum lgroup

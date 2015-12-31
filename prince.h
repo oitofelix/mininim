@@ -218,6 +218,14 @@ enum dir {
   LEFT, RIGHT, ABOVE, BELOW
 };
 
+enum carpet_design {
+  CARPET_01,
+  CARPET_02,
+  ARCH_CARPET_LEFT,
+  ARCH_CARPET_RIGHT_01,
+  ARCH_CARPET_RIGHT_02,
+};
+
 struct level {
   void (*start) (void);
   void (*special_events) (void);
@@ -242,13 +250,11 @@ struct level {
       LEVEL_DOOR,
       CHOPPER,
       MIRROR,
-      CARPET_01,
-      CARPET_02,
+      CARPET,
+      TCARPET,
       ARCH_BOTTOM,
       ARCH_TOP_LEFT,
-      ARCH_TOP_LEFT_END,
       ARCH_TOP_RIGHT,
-      ARCH_TOP_RIGHT_END,
       ARCH_TOP_MID,
       ARCH_TOP_SMALL,
     } fg;
@@ -265,6 +271,7 @@ struct level {
     } bg;
     union conext {
       int event;
+      int design;
       enum item {
         NO_ITEM,
         SMALL_LIFE_POTION,

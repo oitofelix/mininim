@@ -124,7 +124,7 @@ struct coord *
 window_coord (struct pos *p, struct coord *c)
 {
   c->x = PLACE_WIDTH * (p->place + 1);
-  c->y = PLACE_HEIGHT * p->floor - 4;
+  c->y = PLACE_HEIGHT * p->floor + 13;
   c->room = p->room;
   return c;
 }

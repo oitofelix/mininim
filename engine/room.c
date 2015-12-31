@@ -248,7 +248,7 @@ draw_room (ALLEGRO_BITMAP *bitmap, int room,
       draw_conbg (bitmap, &p, em, vm);
 
   for (p.floor = FLOORS; p.floor >= -1; p.floor--)
-    for (p.place = -1; p.place < PLACES; p.place++)
+    for (p.place = -1; p.place <= PLACES; p.place++)
       draw_confg (bitmap, &p, em, vm, false);
 }
 
@@ -258,7 +258,7 @@ draw_conbg (ALLEGRO_BITMAP *bitmap, struct pos *p,
 {
   switch (con (p)->bg) {
   case NO_BG:
-    if (em == PALACE) draw_bricks_01 (bitmap, p, em, vm); break;
+    if (em == PALACE) draw_bricks_03 (bitmap, p, em, vm); break;
   case BRICKS_01: draw_bricks_01 (bitmap, p, em, vm); break;
   case BRICKS_02: draw_bricks_02 (bitmap, p, em, vm); break;
   case BRICKS_03: draw_bricks_03 (bitmap, p, em, vm); break;
@@ -291,7 +291,7 @@ draw_confg_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
 {
   struct pos pv; pos2room (p, room_view, &pv);
   if (pv.floor < -1 || pv.floor > FLOORS
-      || pv.place < -1 || pv.place >= PLACES) return;
+      || pv.place < -1 || pv.place > PLACES) return;
 
   if (con (p)->fg != WALL) pv = *p;
 
@@ -316,10 +316,8 @@ draw_confg_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case ARCH_TOP_SMALL: break;
   case ARCH_TOP_LEFT: break;
   case ARCH_TOP_RIGHT: break;
-  case ARCH_TOP_LEFT_END: break;
-  case ARCH_TOP_RIGHT_END: break;
-  case CARPET_01: break;
-  case CARPET_02: break;
+  case CARPET: draw_floor_base (bitmap, &pv, em, vm); break;
+  case TCARPET: draw_door_pole_base (bitmap, &pv, em, vm); break;
   case MIRROR: draw_floor_base (bitmap, &pv, em, vm); break;
   default:
     error (-1, 0, "%s: unknown foreground (%i)",
@@ -333,9 +331,11 @@ draw_confg_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
 {
   struct pos pv; pos2room (p, room_view, &pv);
   if (pv.floor < -1 || pv.floor > FLOORS
-      || pv.place < -1 || pv.place >= PLACES) return;
+      || pv.place < -1 || pv.place > PLACES) return;
 
   if (con (p)->fg != WALL) pv = *p;
+
+  struct pos pl; prel (&pv, &pl, +0, -1);
 
   switch (con (&pv)->fg) {
   case NO_FLOOR: break;
@@ -362,10 +362,19 @@ draw_confg_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case ARCH_TOP_SMALL: draw_arch_top_small (bitmap, &pv, em, vm); break;
   case ARCH_TOP_LEFT: draw_arch_top_left (bitmap, &pv, em, vm); break;
   case ARCH_TOP_RIGHT: draw_arch_top_right (bitmap, &pv, em, vm); break;
-  case ARCH_TOP_LEFT_END: draw_arch_top_left_end (bitmap, &pv, em, vm); break;
-  case ARCH_TOP_RIGHT_END: draw_arch_top_right_end (bitmap, &pv, em, vm); break;
-  case CARPET_01: draw_carpet_01 (bitmap, &pv, em, vm); break;
-  case CARPET_02: draw_carpet_02 (bitmap, &pv, em, vm); break;
+  case CARPET:
+    draw_floor_left (bitmap, &pv, em, vm);
+    draw_door_pole (bitmap, &pv, em, vm);
+    break;
+  case TCARPET:
+    if (con (p)->ext.design == ARCH_CARPET_RIGHT_01
+        || con (p)->ext.design == ARCH_CARPET_RIGHT_02)
+      draw_arch_top_right_end (bitmap, p, em, vm);
+    else {
+      draw_door_pole (bitmap, &pv, em, vm);
+      draw_door_pole_base (bitmap, &pv, em, vm);
+    }
+    break;
   case MIRROR: draw_floor_left (bitmap, &pv, em, vm); break;
   default:
     error (-1, 0, "%s: unknown foreground (%i)",
@@ -373,24 +382,6 @@ draw_confg_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
   }
 
   if (! redraw) return;
-
-  /* above */
- struct pos pa; prel (&pv, &pa, -1, +0);
-  switch (con (&pv)->fg) {
-  case CARPET_01: case CARPET_02:
-    draw_confg_base (bitmap, &pa, em, vm);
-    draw_confg_left (bitmap, &pa, em, vm, true);
-    break;
-  default: break;
-  }
-
-  struct pos pl; prel (&pv, &pl, +0, -1);
-  if (is_carpet (&pv)
-      && con (&pl)->fg == ARCH_TOP_RIGHT_END)
-    draw_arch_top_top (bitmap, &pl, em, vm);
-
-  struct pos pr; prel (&pv, &pr, +0, +1);
-  if (is_carpet (&pr)) draw_confg_left (bitmap, &pr, em, vm, true);
 
   if (con (&pv)->fg == MIRROR)
     draw_mirror (bitmap, &pv, em, vm);
@@ -431,10 +422,8 @@ draw_confg_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case ARCH_TOP_SMALL: break;
   case ARCH_TOP_LEFT: break;
   case ARCH_TOP_RIGHT: break;
-  case ARCH_TOP_LEFT_END: break;
-  case ARCH_TOP_RIGHT_END: break;
-  case CARPET_01: break;
-  case CARPET_02: break;
+  case CARPET: draw_carpet_right (bitmap, &pv, em, vm); break;
+  case TCARPET: draw_carpet_right (bitmap, &pv, em, vm); break;
   case MIRROR: draw_floor_right (bitmap, &pv, em, vm); break;
   default:
     error (-1, 0, "%s: unknown foreground (%i)",
@@ -463,6 +452,7 @@ draw_confg_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
   /* above right */
   switch (con (&pv)->fg) {
   case WALL: case DOOR: case PILLAR:
+  case CARPET: case TCARPET:
     draw_confg_base (bitmap, &par, em, vm);
     draw_confg_left (bitmap, &par, em, vm, true);
     draw_falling_loose_floor (bitmap, &par, em, vm);
@@ -477,9 +467,11 @@ draw_confg_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
 {
   struct pos pv; pos2room (p, room_view, &pv);
   if (pv.floor < -1 || pv.floor > FLOORS
-      || pv.place < -1 || pv.place >= PLACES) return;
+      || pv.place < -1 || pv.place > PLACES) return;
 
   if (con (p)->fg != WALL) pv = *p;
+
+  struct pos pl; prel (&pv, &pl, +0, -1);
 
   switch (con (&pv)->fg) {
   case NO_FLOOR: break;
@@ -504,18 +496,15 @@ draw_confg_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case ARCH_TOP_SMALL: draw_arch_top_small (bitmap, &pv, em, vm); break;
   case ARCH_TOP_LEFT: draw_arch_top_left (bitmap, &pv, em, vm); break;
   case ARCH_TOP_RIGHT: draw_arch_top_right (bitmap, &pv, em, vm); break;
-  case ARCH_TOP_LEFT_END: draw_arch_top_left_end (bitmap, &pv, em, vm); break;
-  case ARCH_TOP_RIGHT_END: draw_arch_top_right_end (bitmap, &pv, em, vm); break;
-  case CARPET_01: draw_carpet_fg_01 (bitmap, &pv, f, em, vm); break;
-  case CARPET_02: draw_carpet_fg_02 (bitmap, &pv, f, em, vm); break;
+  case CARPET: draw_carpet_fg (bitmap, &pv, f, em, vm); break;
+  case TCARPET:
+    draw_door_pole_base (bitmap, p, em, vm);
+    draw_carpet_fg (bitmap, &pv, f, em, vm); break;
   case MIRROR: draw_mirror_fg (bitmap, &pv, em, vm); break;
   default:
     error (-1, 0, "%s: unknown foreground (%i)",
            __func__, con (&pv)->fg);
   }
-
-  struct pos pr; prel (&pv, &pr, +0, +1);
-  if (is_carpet (&pr)) draw_confg_fg (bitmap, &pr, em, vm, f);
 }
 
 void
@@ -615,8 +604,7 @@ draw_room_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
   /* when falling at construct's left */
   if (br.y >= (pv.floor + 1) * PLACE_HEIGHT - 6
       && br.x >= pv.place * PLACE_WIDTH
-      && is_kid_fall (f)
-      && ! is_carpet (&pv)) {
+      && is_kid_fall (f)) {
     draw_confg_base (bitmap, &pv, em, vm);
     draw_confg_left (bitmap, &pv, em, vm, true);
   }
@@ -626,8 +614,10 @@ draw_room_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
            && f->dir == RIGHT) {
     draw_confg_base (bitmap, &pv, em, vm);
 
-    if (is_carpet (&pr))
-      draw_confg_left (bitmap, &pr, em, vm, true);
+    if (is_carpet (&pv)) {
+      draw_door_pole (bitmap, &pv, em, vm);
+      draw_confg_right (bitmap, &pv, em, vm, true);
+    }
 
     if (con (&pv)->fg == BROKEN_FLOOR)
       draw_broken_floor_fg (bitmap, &pv, em, vm);
@@ -679,11 +669,6 @@ draw_room_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
     draw_confg_base (bitmap, &pv, em, vm);
     draw_confg_left (bitmap, &pv, em, vm, true);
   }
-  /* hanging */
-  else if ((is_kid_hanging_at_pos (f, &pa)
-            && is_carpet (&pr)
-            && f->dir == RIGHT))
-    draw_confg_left (bitmap, &pr, em, vm, true);
   /* other cases */
   else draw_confg_fg (bitmap, &pv, em, vm, f);
 }

@@ -90,7 +90,8 @@ struct coord *big_pillar_bottom_left_coord (struct pos *p, struct coord *c);
 struct coord *big_pillar_bottom_right_coord (struct pos *p, struct coord *c);
 struct coord *big_pillar_top_left_coord (struct pos *p, struct coord *c);
 struct coord *big_pillar_top_right_coord (struct pos *p, struct coord *c);
-struct coord *big_pillar_top_right_top_coord (struct pos *p, struct coord *c);
+struct coord *d_big_pillar_top_right_top_coord (struct pos *p, struct coord *c);
+struct coord *p_big_pillar_top_right_top_coord (struct pos *p, struct coord *c);
 struct coord *big_pillar_bottom_fg_coord (struct pos *p, struct coord *c);
 
 #endif	/* MININIM_BIG_PILLAR_H */

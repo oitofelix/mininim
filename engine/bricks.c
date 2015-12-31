@@ -110,10 +110,7 @@ draw_bricks_01 (ALLEGRO_BITMAP *bitmap, struct pos *p,
   if (em == DUNGEON) {
     bricks_coord = d_bricks_coord_01;
     bricks = dv_bricks_01;
-  } else {
-    bricks_coord = p_bricks_coord_01;
-    bricks = pv_bricks_01;
-  }
+  } else return;
 
   palette pal = get_palette (em, vm);
   bricks = apply_palette (bricks, pal);
@@ -199,10 +196,8 @@ draw_bricks_04 (ALLEGRO_BITMAP *bitmap, struct pos *p,
 struct coord *
 d_bricks_coord_01 (struct pos *p, struct coord *c)
 {
-  int h = al_get_bitmap_height (dv_bricks_01);
-  int dy = prandom_pos (p, 49 - h);
-  c->x = PLACE_WIDTH * (p->place + 1);
-  c->y = PLACE_HEIGHT * p->floor + dy;
+  c->x = PLACE_WIDTH * (p->place + 1) + 1;
+  c->y = PLACE_HEIGHT * p->floor + 16;
   c->room = p->room;
   return c;
 }
@@ -219,10 +214,8 @@ p_bricks_coord_01 (struct pos *p, struct coord *c)
 struct coord *
 d_bricks_coord_02 (struct pos *p, struct coord *c)
 {
-  int h = al_get_bitmap_height (dv_bricks_02);
-  int dy = prandom_pos (p, 49 - h);
-  c->x = PLACE_WIDTH * (p->place + 1);
-  c->y = PLACE_HEIGHT * p->floor + dy;
+  c->x = PLACE_WIDTH * (p->place + 1) + 2;
+  c->y = PLACE_HEIGHT * p->floor + 21;
   c->room = p->room;
   return c;
 }
@@ -239,10 +232,8 @@ p_bricks_coord_02 (struct pos *p, struct coord *c)
 struct coord *
 d_bricks_coord_03 (struct pos *p, struct coord *c)
 {
-  int h = al_get_bitmap_height (dv_bricks_03);
-  int dy = prandom_pos (p, 49 - h);
-  c->x = PLACE_WIDTH * (p->place + 1);
-  c->y = PLACE_HEIGHT * p->floor + dy;
+  c->x = PLACE_WIDTH * (p->place + 1) + 4;
+  c->y = PLACE_HEIGHT * p->floor + 11;
   c->room = p->room;
   return c;
 }
@@ -250,10 +241,8 @@ d_bricks_coord_03 (struct pos *p, struct coord *c)
 struct coord *
 d_bricks_coord_04 (struct pos *p, struct coord *c)
 {
-  int h = al_get_bitmap_height (dv_bricks_04);
-  int dy = prandom_pos (p, 49 - h);
-  c->x = PLACE_WIDTH * (p->place + 1);
-  c->y = PLACE_HEIGHT * p->floor + dy;
+  c->x = PLACE_WIDTH * (p->place + 1) + 4;
+  c->y = PLACE_HEIGHT * p->floor + 10;
   c->room = p->room;
   return c;
 }

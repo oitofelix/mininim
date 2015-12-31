@@ -171,7 +171,7 @@ flow (struct anim *kid)
       && ! kid->hit_by_loose_floor
       && kid->item_pos.room == -1
       && is_hangable_pos (&ph, kid->f.dir)
-      && dist_next_place (&kid->f, _tf, pos, 0, true) < 26
+      && dist_next_place (&kid->f, _tf, pos, 0, true) <= 27
       && ! (ctf == DOOR && kid->f.dir == LEFT
             && door_at_pos (&ptf)->i > DOOR_CLIMB_LIMIT)) {
     pos2room (&ph, kid->f.c.room, &kid->hang_pos);

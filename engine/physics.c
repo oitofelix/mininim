@@ -76,9 +76,8 @@ is_strictly_traversable (struct pos *p)
 
   if (t == NO_FLOOR) return true;
   if (t == BIG_PILLAR_TOP) return true;
-
+  if (t == TCARPET) return true;
   if (is_arch_top (p)) return true;
-  if (is_carpet (p)) return true;
 
   /* if (t == LOOSE_FLOOR) { */
   /*   struct loose_floor *l = loose_floor_at_pos (p); */
@@ -110,9 +109,8 @@ bool
 is_carpet (struct pos *p)
 {
   enum confg t = con (p)->fg;
-  return t == CARPET_01
-    || t == CARPET_02
-    || t == ARCH_TOP_LEFT_END;
+  return t == CARPET
+    || t == TCARPET;
 }
 
 bool
@@ -122,9 +120,7 @@ is_arch_top (struct pos *p)
   return t == ARCH_TOP_MID
     || t == ARCH_TOP_SMALL
     || t == ARCH_TOP_LEFT
-    || t == ARCH_TOP_RIGHT
-    || t == ARCH_TOP_LEFT_END
-    || t == ARCH_TOP_RIGHT_END;
+    || t == ARCH_TOP_RIGHT;
 }
 
 
@@ -226,21 +222,40 @@ is_colliding (struct frame *f, struct frame_offset *fo, int dx,
       }
     }
 
+  /* /\* arch top left end *\/ */
+  /* if (_f.dir == LEFT && pbf.place < _pbf.place) */
+  /*   for (prel (&_pbf, &p, +0, -1); p.place >= pbf.place; prel (&p, &p, +0, -1)) { */
+  /*     prel (&p, &pr, +0, +1); */
+  /*     if (con (&pr)->fg == ARCH_TOP_LEFT_END) { */
+  /*       carpet_collision = true; */
+  /*       ci->p = p; */
+  /*       break; */
+  /*     } */
+  /*   } */
+
+  /* if (_f.dir == RIGHT && pbf.place > _pbf.place) */
+  /*   for (prel (&_pbf, &p, +0, +1); p.place <= pbf.place; prel (&p, &p, +0, +1)) { */
+  /*     if (con (&p)->fg == ARCH_TOP_LEFT_END) { */
+  /*       carpet_collision = true; */
+  /*       ci->p = p; */
+  /*       break; */
+  /*     } */
+  /*   } */
+
   /* carpet */
 
   if (_f.dir == LEFT && pbf.place < _pbf.place)
-    for (prel (&_pbf, &p, +0, -1); p.place >= pbf.place; prel (&p, &p, +0, -1)) {
-      prel (&p, &pr, +0, +1);
-      if (is_carpet (&pr)) {
+    for (prel (&_pbf, &p, +0, -1); p.place >= pbf.place; prel (&p, &p, +0, -1))
+      if (is_carpet (&p)) {
         carpet_collision = true;
         ci->p = p;
         break;
       }
-    }
 
   if (_f.dir == RIGHT && pbf.place > _pbf.place)
     for (prel (&_pbf, &p, +0, +1); p.place <= pbf.place; prel (&p, &p, +0, +1)) {
-      if (is_carpet (&p)) {
+      prel (&p, &pl, +0, -1);
+      if (is_carpet (&pl)) {
         carpet_collision = true;
         ci->p = p;
         break;
@@ -271,7 +286,7 @@ is_colliding (struct frame *f, struct frame_offset *fo, int dx,
   ci->t = NO_FLOOR;
   if (wall_collision) ci->t = WALL;
   if (door_collision) ci->t = DOOR;
-  if (carpet_collision) ci->t = CARPET_01;
+  if (carpet_collision) ci->t = CARPET;
   if (mirror_collision) ci->t = MIRROR;
 
   /* if (wall_collision || door_collision || carpet_collision || mirror_collision) */
@@ -363,7 +378,7 @@ dist_chopper (struct frame *f, bool reverse)
 int
 dist_fall (struct frame *f, bool reverse)
 {
-  int dnf, dbpt, datm, dats, datl, datr, datle, datre, dc1, dc2;
+  int dnf, dbpt, datm, dats, datl, datr, dtc;
 
   dnf = dist_con (f, _bf, pos, -4, reverse, NO_FLOOR);
   dbpt = dist_con (f, _bf, pos, -4, reverse, BIG_PILLAR_TOP);
@@ -371,10 +386,7 @@ dist_fall (struct frame *f, bool reverse)
   dats = dist_con (f, _bf, pos, -4, reverse, ARCH_TOP_SMALL);
   datl = dist_con (f, _bf, pos, -4, reverse, ARCH_TOP_LEFT);
   datr = dist_con (f, _bf, pos, -4, reverse, ARCH_TOP_RIGHT);
-  datle = dist_con (f, _bf, pos, -4, reverse, ARCH_TOP_LEFT_END);
-  datre = dist_con (f, _bf, pos, -4, reverse, ARCH_TOP_RIGHT_END);
-  dc1 = dist_con (f, _bf, pos, -4, reverse, CARPET_01);
-  dc2 = dist_con (f, _bf, pos, -4, reverse, CARPET_02);
+  dtc = dist_con (f, _bf, pos, -4, reverse, TCARPET);
 
   if (dnf <= PLACE_WIDTH) return dnf;
   if (dbpt <= PLACE_WIDTH) return dbpt;
@@ -382,10 +394,7 @@ dist_fall (struct frame *f, bool reverse)
   if (dats <= PLACE_WIDTH) return dats;
   if (datl <= PLACE_WIDTH) return datl;
   if (datr <= PLACE_WIDTH) return datr;
-  if (datle <= PLACE_WIDTH) return datle;
-  if (datre <= PLACE_WIDTH) return datre;
-  if (dc1 <= PLACE_WIDTH) return dc1;
-  if (dc2 <= PLACE_WIDTH) return dc2;
+  if (dtc <= PLACE_WIDTH) return dtc;
 
   return PLACE_WIDTH + 1;
 }
@@ -412,6 +421,7 @@ is_hangable_con (struct pos *p, enum dir d)
     || t == LEVEL_DOOR
     || (t == CHOPPER && d == LEFT)
     || t == ARCH_BOTTOM
+    || (t == CARPET && d == RIGHT)
     || (t == MIRROR && d == LEFT);
 }
 
@@ -428,9 +438,8 @@ is_hangable_pos (struct pos *p, enum dir d)
   return is_hangable_con (&ph, d)
     && is_strictly_traversable (&pa)
     && ! (d == RIGHT && cr->fg == CHOPPER)
-    && ! (d == LEFT && is_carpet (&pa))
-    && ! (d == RIGHT && is_carpet (&pr))
-    && ! (d == RIGHT && con (&pr)->fg == MIRROR);
+    && ! (d == RIGHT && con (&pr)->fg == MIRROR)
+    && ! (d == RIGHT && is_carpet (p));
 }
 
 bool
@@ -504,9 +513,10 @@ bool
 is_hang_pos_free (struct pos *hang_pos, enum dir d)
 {
   int dir = (d == LEFT) ? -1 : +1;
-  enum confg ctf = crel (hang_pos, 0, dir)->fg;
+  struct pos ptf; prel (hang_pos, &ptf, 0, dir);
+  enum confg ctf = con (&ptf)->fg;
   return ! (ctf == WALL || (ctf == DOOR && d == LEFT)
-            || (is_carpet (hang_pos) && d == LEFT));
+            || (is_carpet (&ptf) && d == LEFT));
 }
 
 

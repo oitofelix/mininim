@@ -732,7 +732,7 @@ kid_debug (void)
     survey (_bf, pos, &current_kid->f, &bf, &pbf, &npbf);
     if (delete_key) current_kid->f.c.x--;
     if (page_down_key) current_kid->f.c.x++;
-    int dn = dist_next_place (&current_kid->f, _bb, pos, 0, false);
+    int dn = dist_next_place (&current_kid->f, _bf, pos, 0, false);
     int dp = dist_next_place (&current_kid->f, _bf, pos, 0, true);
     int dc = dist_collision (&current_kid->f, false, &kid->ci) + 4;
     int df = dist_fall (&current_kid->f, false);

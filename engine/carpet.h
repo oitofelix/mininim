@@ -58,16 +58,11 @@
 
 void load_carpet (void);
 void unload_carpet (void);
-void draw_carpet_01 (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                     enum em em, enum vm vm);
-void draw_carpet_fg_01 (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                        struct frame *f, enum em em, enum vm vm);
-void draw_carpet_02 (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                     enum em em, enum vm vm);
-void draw_carpet_fg_02 (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                        struct frame *f, enum em em, enum vm vm);
+void draw_carpet_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                        enum em em, enum vm vm);
+void draw_carpet_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                     struct frame *f, enum em em, enum vm vm);
 struct coord *carpet_coord (struct pos *p, struct coord *c);
 struct coord *carpet_top_coord (struct pos *p, struct coord *c);
-
 
 #endif	/* MININIM_CARPET_H */

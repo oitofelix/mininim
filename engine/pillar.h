@@ -71,6 +71,7 @@ void draw_pillar_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
 struct coord *pillar_coord (struct pos *p, struct coord *c);
 struct coord *pillar_left_coord (struct pos *p, struct coord *c);
 struct coord *pillar_right_coord (struct pos *p, struct coord *c);
-struct coord *pillar_top_coord (struct pos *p, struct coord *c);
+struct coord *d_pillar_top_coord (struct pos *p, struct coord *c);
+struct coord *p_pillar_top_coord (struct pos *p, struct coord *c);
 
 #endif	/* MININIM_PILLAR_H */

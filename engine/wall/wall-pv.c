@@ -27,7 +27,7 @@
 #include "wall.h"
 #include "wall-pv.h"
 
-static ALLEGRO_COLOR wall_color_array[4][3][11];
+static ALLEGRO_COLOR wall_color_array[3][4][11];
 
 static ALLEGRO_COLOR wall_color (int i);
 static void compute_wall_color_array (int last_room, int room);
@@ -123,13 +123,15 @@ draw_wall_left_pv (ALLEGRO_BITMAP *bitmap, struct pos *p)
 
 void
 draw_wall_brick (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                    int row, int col)
+                 int row, int col)
 {
   struct rect r;
   struct frame f0, f1;
   f0.flip = f1.flip = 0;
 
-  ALLEGRO_COLOR c = wall_color_array[p->floor][row][p->place + col];
+  struct pos np; npos (p, &np);
+  ALLEGRO_COLOR c = wall_color_array[np.floor][row][np.place + col];
+  /* c = compute_wall_color (p, row, col); */
   wall_brick_rect (p, row, col, &r);
   draw_filled_rect (bitmap, &r, c);
 
@@ -173,7 +175,7 @@ compute_wall_color_array (int last_room, int room)
 			ocolor = -1;
 			for (col = 0; col <= 10; col++) {
 				do {
-					color = bcolor + prandom(3);
+					color = bcolor + prandom (3);
 				} while (color == ocolor);
 				wall_color_array[floor][row][col] =
           wall_color (color);
@@ -198,7 +200,7 @@ compute_wall_color (struct pos *p, int row, int col)
 
 struct rect *
 wall_brick_rect (struct pos *p, int row, int col,
-                        struct rect *r)
+                 struct rect *r)
 {
   r->c.room = p->room;
   r->c.x = PLACE_WIDTH * p->place;

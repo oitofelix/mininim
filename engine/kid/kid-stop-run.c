@@ -118,12 +118,10 @@ physics_in (struct anim *kid)
   kid->inertia = kid->cinertia = 0;
 
   /* collision */
-  kid->f.c.x += (kid->f.dir == LEFT) ? +4 : -4;
   if (is_colliding (&kid->f, &kid->fo, +0, false, &kid->ci)) {
     kid_stabilize_collision (kid);
     return false;
   }
-  kid->f.c.x += (kid->f.dir == LEFT) ? -4 : +4;
 
   /* fall */
   survey (_tf, pos, &kid->f, &nc, &ptf, &np);

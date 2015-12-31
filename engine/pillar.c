@@ -170,8 +170,11 @@ draw_pillar_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
 {
   ALLEGRO_BITMAP *pillar_right = NULL, *pillar_top = NULL;
 
+  pos2coord_f pillar_top_coord = NULL;
+
   switch (em) {
   case DUNGEON:
+    pillar_top_coord = d_pillar_top_coord;
     switch (vm) {
     case CGA:
       pillar_right = dc_pillar_right;
@@ -188,6 +191,7 @@ draw_pillar_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
     }
     break;
   case PALACE:
+    pillar_top_coord = p_pillar_top_coord;
     switch (vm) {
     case CGA:
       pillar_right = pc_pillar_right;
@@ -272,10 +276,19 @@ pillar_right_coord (struct pos *p, struct coord *c)
 }
 
 struct coord *
-pillar_top_coord (struct pos *p, struct coord *c)
+d_pillar_top_coord (struct pos *p, struct coord *c)
 {
   c->x = PLACE_WIDTH * (p->place + 1);
   c->y = PLACE_HEIGHT * p->floor - 4;
+  c->room = p->room;
+  return c;
+}
+
+struct coord *
+p_pillar_top_coord (struct pos *p, struct coord *c)
+{
+  c->x = PLACE_WIDTH * (p->place + 1);
+  c->y = PLACE_HEIGHT * p->floor - 7;
   c->room = p->room;
   return c;
 }
