@@ -607,6 +607,9 @@ draw_room_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
       && is_kid_fall (f)) {
     draw_confg_base (bitmap, &pv, em, vm);
     draw_confg_left (bitmap, &pv, em, vm, true);
+
+    if (con (p)->fg == TCARPET)
+      draw_confg_right (bitmap, &pv, em, vm, true);
   }
   /* when climbing the construct */
   else if (peq (&ptf, &pv)
