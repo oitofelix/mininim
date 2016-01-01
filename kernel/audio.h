@@ -27,6 +27,7 @@ void init_audio (void);
 void finalize_audio (void);
 ALLEGRO_SAMPLE *load_sample (char *filename);
 void play_sample (ALLEGRO_SAMPLE *sample);
+void stop_sample (void);
 bool is_playing_sample (void);
 double get_sample_position (void);
 void enable_audio (bool b);

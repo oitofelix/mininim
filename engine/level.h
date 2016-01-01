@@ -26,6 +26,7 @@
 extern struct level level;
 extern int room_view;
 extern int retry_level;
+extern int camera_follow_kid;
 
 void load_level (void);
 void unload_level (void);

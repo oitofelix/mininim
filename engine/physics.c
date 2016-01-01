@@ -598,6 +598,8 @@ void
 activate_con (struct pos *p)
 {
   struct door *d;
+  struct closer_floor *c;
+  struct opener_floor *o;
 
   switch (con (p)->fg) {
   case SPIKES_FLOOR:
@@ -606,8 +608,14 @@ activate_con (struct pos *p)
     d = door_at_pos (p);
     d->action = (d->i) ? OPEN_DOOR : CLOSE_DOOR;
     break;
-  case OPENER_FLOOR: press_opener_floor (p); break;
-  case CLOSER_FLOOR: press_closer_floor (p); break;
+  case OPENER_FLOOR:
+    o = opener_floor_at_pos (p);
+    o->noise = true;
+    press_opener_floor (p); break;
+  case CLOSER_FLOOR:
+    c = closer_floor_at_pos (p);
+    c->noise = true;
+    press_closer_floor (p); break;
   case LOOSE_FLOOR: release_loose_floor (p); break;
   case CHOPPER: chopper_at_pos (p)->activate = true; break;
   case LEVEL_DOOR: level_door_at_pos (p)->action = OPEN_LEVEL_DOOR;

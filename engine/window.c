@@ -97,8 +97,11 @@ draw_window (ALLEGRO_BITMAP *bitmap, struct pos *p,
 {
   ALLEGRO_BITMAP *window = NULL;
 
+  pos2coord_f window_coord = NULL;
+
   switch (em) {
   case DUNGEON:
+    window_coord = d_window_coord;
     switch (vm) {
     case CGA: window = dc_window; break;
     case EGA: window = de_window; break;
@@ -106,6 +109,7 @@ draw_window (ALLEGRO_BITMAP *bitmap, struct pos *p,
     }
     break;
   case PALACE:
+    window_coord = p_window_coord;
     switch (vm) {
     case CGA: window = pc_window; break;
     case EGA: window = pe_window; break;
@@ -121,7 +125,16 @@ draw_window (ALLEGRO_BITMAP *bitmap, struct pos *p,
 }
 
 struct coord *
-window_coord (struct pos *p, struct coord *c)
+d_window_coord (struct pos *p, struct coord *c)
+{
+  c->x = PLACE_WIDTH * (p->place + 1) + 6;
+  c->y = PLACE_HEIGHT * p->floor + 11;
+  c->room = p->room;
+  return c;
+}
+
+struct coord *
+p_window_coord (struct pos *p, struct coord *c)
 {
   c->x = PLACE_WIDTH * (p->place + 1);
   c->y = PLACE_HEIGHT * p->floor + 13;

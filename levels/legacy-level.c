@@ -86,9 +86,22 @@ start (void)
   /* make the kid turn as appropriate */
   switch (level.number) {
   case 1: k->f.dir = (k->f.dir == LEFT) ? RIGHT : LEFT; break;
-  default:
-    k->i = -1;
-    k->action = kid_turn; break;
+  case 13:
+    k->f.dir = (k->f.dir == LEFT) ? RIGHT : LEFT;
+    k->i = -1; k->action = kid_stop_run; break;
+  default: k->i = -1; k->action = kid_turn; break;
+  }
+
+  /* define camera's starting room */
+  if (level.number == 7) {
+    room_view = 1;
+    camera_follow_kid = -1;
+  } else if (level.number == 13) {
+    room_view = 23;
+    camera_follow_kid = -1;
+  } else {
+    room_view = k->f.c.room;
+    camera_follow_kid = k->id;
   }
 
   /* define the enviroment mode based on the level */

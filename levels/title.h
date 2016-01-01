@@ -45,5 +45,10 @@
 
 /* functions */
 void play_title (void);
+void load_title (void);
+void unload_title (void);
+
+/* variables */
+extern bool title_started;
 
 #endif	/* MININIM_TITLE_H */

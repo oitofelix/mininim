@@ -214,7 +214,7 @@ create_kid (struct anim *_k)
     k.id = i;
     k.shadow_of = -1;
     k.f.b = kid_normal_00;
-    k.f.c.room = room_view;
+    k.f.c.room = level.start_pos.room;
     k.f.dir = level.start_dir;
     k.fo.b = kid_normal_00;
     k.action = kid_normal;
@@ -224,7 +224,8 @@ create_kid (struct anim *_k)
     k.floating = create_timer (1.0);
 
     struct pos *p = &level.start_pos;
-    place_frame (&k.f, &k.f, kid_normal_00, p, +15, +15);
+    place_frame (&k.f, &k.f, kid_normal_00, p,
+                 k.f.dir == LEFT ? +22 : +31, +15);
     /* place_kid (&k, p->room, p->floor, p->place); */
     update_depressible_floor (&k, -4, -10);
   }

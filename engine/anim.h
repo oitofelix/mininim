@@ -24,7 +24,7 @@
 
 /* types */
 enum quit_anim {
-  NO_QUIT, RESTART_LEVEL, NEXT_LEVEL, QUIT_GAME
+  NO_QUIT, RESTART_LEVEL, NEXT_LEVEL, RESTART_GAME, QUIT_GAME
 };
 
 /* functions */

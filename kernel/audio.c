@@ -103,6 +103,12 @@ play_sample (ALLEGRO_SAMPLE *sample)
            __func__, sample, sample_instance);
 }
 
+void
+stop_sample (void)
+{
+  if (sample_instance) al_stop_sample_instance (sample_instance);
+}
+
 bool
 is_playing_sample (void)
 {

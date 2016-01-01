@@ -61,6 +61,7 @@ static bool pause_game, step_one_cycle;
 
 int room_view;
 int retry_level = -1;
+int camera_follow_kid;
 
 void
 play_level (struct level *lv)
@@ -81,7 +82,6 @@ play_level (struct level *lv)
   last_auto_show_time = -1;
   current_kid = &kid[0];
   current_kid->current = true;
-  room_view = current_kid->f.c.room;
 
   if (level.nominal_number >= 0) {
     xasprintf (&text, "LEVEL %i", level.nominal_number);
@@ -100,13 +100,21 @@ play_level (struct level *lv)
     retry_level = level.number;
     destroy_array ((void **) &kid, &kid_nmemb);
     destroy_cons ();
-    goto start;
+    draw_bottom_text (NULL, NULL);
+   goto start;
   case NEXT_LEVEL:
     destroy_array ((void **) &kid, &kid_nmemb);
     destroy_cons ();
     struct anim *k = get_kid_by_id (0);
     if (level.next_level) level.next_level (level.number + 1, &k->p);
+    draw_bottom_text (NULL, NULL);
     goto start;
+  case RESTART_GAME:
+    retry_level = -1;
+    destroy_array ((void **) &kid, &kid_nmemb);
+    destroy_cons ();
+    draw_bottom_text (NULL, NULL);
+    break;
   case QUIT_GAME: break;
   }
 }
@@ -181,7 +189,10 @@ compute_level (void)
 
   if (current_kid->f.c.room != prev_room
       && current_kid->f.c.room != 0)  {
-    room_view = current_kid->f.c.room;
+    if (camera_follow_kid == current_kid->id)
+      room_view = current_kid->f.c.room;
+    else if (room_view == current_kid->f.c.room)
+      camera_follow_kid = current_kid->id;
     make_links_locally_consistent (prev_room, room_view);
   }
 
@@ -246,24 +257,38 @@ process_keys (void)
     kid_resurrect (current_kid);
 
   /* HOME: camera on kid */
-  if (was_key_pressed (ALLEGRO_KEY_HOME, 0, 0, true))
+  if (was_key_pressed (ALLEGRO_KEY_HOME, 0, 0, true)) {
     room_view = current_kid->f.c.room;
+    camera_follow_kid = current_kid->id;
+  }
 
   /* H: view room at left */
-  if (was_key_pressed (ALLEGRO_KEY_H, 0, 0, true))
+  if (was_key_pressed (ALLEGRO_KEY_H, 0, 0, true)) {
     room_view = level.link[room_view].l;
+    camera_follow_kid = (current_kid->f.c.room == room_view)
+      ? current_kid->id : -1;
+  }
 
   /* J: view room at right */
-  if (was_key_pressed (ALLEGRO_KEY_J, 0, 0, true))
+  if (was_key_pressed (ALLEGRO_KEY_J, 0, 0, true)) {
     room_view = level.link[room_view].r;
+    camera_follow_kid = (current_kid->f.c.room == room_view)
+      ? current_kid->id : -1;
+  }
 
   /* U: view room above */
-  if (was_key_pressed (ALLEGRO_KEY_U, 0, 0, true))
+  if (was_key_pressed (ALLEGRO_KEY_U, 0, 0, true)) {
     room_view = level.link[room_view].a;
+    camera_follow_kid = (current_kid->f.c.room == room_view)
+      ? current_kid->id : -1;
+  }
 
-  /* U: view room below */
-  if (was_key_pressed (ALLEGRO_KEY_N, 0, 0, true))
+  /* N: view room below */
+  if (was_key_pressed (ALLEGRO_KEY_N, 0, 0, true)) {
     room_view = level.link[room_view].b;
+    camera_follow_kid = (current_kid->f.c.room == room_view)
+      ? current_kid->id : -1;
+  }
 
   /* SHIFT+B: enable/disable room drawing */
   if (was_key_pressed (ALLEGRO_KEY_B, 0, ALLEGRO_KEYMOD_SHIFT, true))
@@ -275,6 +300,7 @@ process_keys (void)
     current_kid = &kid[(current_kid - kid + 1) % kid_nmemb];
     current_kid->current = true;
     room_view = current_kid->f.c.room;
+    camera_follow_kid = current_kid->id;
   }
 
   /* I: enable/disable immortal mode */
@@ -301,6 +327,10 @@ process_keys (void)
   /* CTRL+A: restart level */
   if (was_key_pressed (ALLEGRO_KEY_A, 0, ALLEGRO_KEYMOD_CTRL, true))
     quit_anim = RESTART_LEVEL;
+
+  /* CTRL+R: restart game */
+  if (was_key_pressed (ALLEGRO_KEY_R, 0, ALLEGRO_KEYMOD_CTRL, true))
+    quit_anim = RESTART_GAME;
 
   /* SHIFT+L: warp to next level */
   if (was_key_pressed (ALLEGRO_KEY_L, 0, ALLEGRO_KEYMOD_SHIFT, true))

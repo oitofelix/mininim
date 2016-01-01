@@ -44,18 +44,29 @@ main (int argc, char **argv)
   draw_text (screen, "Loading....", ORIGINAL_WIDTH / 2.0, ORIGINAL_HEIGHT / 2.0,
              ALLEGRO_ALIGN_CENTRE);
   show ();
-  clear_bitmap (screen, BLACK);
-
-  /* play_title (); */
 
   load_level ();
-  play_time = create_timer (60.0);
+  load_title ();
+
+ restart_game:
+  clear_bitmap (screen, BLACK);
+  clear_bitmap (uscreen, TRANSPARENT);
+  title_started = false;
+  stop_sample ();
+  play_title ();
+  stop_sample ();
+
+  if (! play_time) play_time = create_timer (60.0);
+  al_set_timer_count (play_time, 0);
   al_start_timer (play_time);
 
   /* play_level_1 (); */
   /* play_consistency_level (); */
   play_legacy_level ();
+  if (quit_anim == RESTART_GAME) goto restart_game;
+
   unload_level ();
+  unload_title ();
 
   finalize_video ();
   finalize_audio ();

@@ -41,8 +41,10 @@ static ALLEGRO_BITMAP *main_background, *presents, *author, *game_name, *copyrig
 static ALLEGRO_SAMPLE *main_theme, *story_1, *princess_waiting_3,
   *jaffar_appearing_3, *story_3, *door_opening, *door_gate_opening_1;
 
-static void
-title_load (void)
+bool title_started;
+
+void
+load_title (void)
 {
   /* bitmaps */
   main_background = load_bitmap (MAIN_BACKGROUND);
@@ -68,14 +70,13 @@ title_load (void)
   door_gate_opening_1 = load_sample (DOOR_GATE_OPENING_1);
 
   /* modules */
-  load_fire ();
   load_princess ();
   load_jaffar ();
   load_clock ();
 }
 
-static void
-title_unload (void)
+void
+unload_title (void)
 {
   /* bitmap */
   al_destroy_bitmap (main_background);
@@ -101,7 +102,6 @@ title_unload (void)
   al_destroy_sample (door_gate_opening_1);
 
   /* modules */
-  unload_fire ();
   unload_princess ();
   unload_jaffar ();
   unload_clock ();
@@ -111,16 +111,17 @@ void
 play_title (void)
 {
   cutscene = true;
-
-  title_load ();
   play_anim (title_anim, NULL, NULL, 8);
-  title_unload ();
 }
 
 static void
 title_anim (void)
 {
-  static int i = 0;
+  static int i;
+
+  if (! title_started) {
+    i = 0; title_started = true;
+  }
 
   if (enter_key) {
     quit_anim = true;

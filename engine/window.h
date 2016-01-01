@@ -42,6 +42,7 @@ void load_window (void);
 void unload_window (void);
 void draw_window (ALLEGRO_BITMAP *bitmap, struct pos *p,
                  enum em em, enum vm vm);
-struct coord *window_coord (struct pos *p, struct coord *c);
+struct coord *d_window_coord (struct pos *p, struct coord *c);
+struct coord *p_window_coord (struct pos *p, struct coord *c);
 
 #endif	/* MININIM_WINDOW_H */
