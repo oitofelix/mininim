@@ -243,6 +243,7 @@ struct level {
       SPIKES_FLOOR,
       OPENER_FLOOR,
       CLOSER_FLOOR,
+      STUCK_FLOOR,
       PILLAR,
       BIG_PILLAR_BOTTOM,
       BIG_PILLAR_TOP,

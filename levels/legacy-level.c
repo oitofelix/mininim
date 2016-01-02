@@ -207,10 +207,7 @@ next_level (int number, struct pos *exit_door_pos)
         case LT_SPIKES: c->fg = SPIKES_FLOOR; break;
         case LT_PILLAR: c->fg = PILLAR; break;
         case LT_GATE: c->fg = DOOR; c->bg = NO_BRICKS; break;
-        case LT_STUCK_BUTTON:
-          printf ("(%i, %i, %i, %i): LT_STUCK_BUTTON\n",
-                  number, p.room, p.floor, p.place);
-          break;
+        case LT_STUCK_BUTTON: c->fg = STUCK_FLOOR; break;
         case LT_DROP_BUTTON: c->fg = CLOSER_FLOOR; break;
         case LT_TAPESTRY: c->fg = CARPET; break;
         case LT_BOTTOM_BIG_PILLAR: c->fg = BIG_PILLAR_BOTTOM; break;
@@ -274,6 +271,10 @@ next_level (int number, struct pos *exit_door_pos)
           case LM_SPIKE_HALF_OUT_2: c->ext.step = 7; break;
           case LM_SPIKE_BARELY_OUT_2: c->ext.step = 8; break;
           case LM_SPIKE_DISABLED: c->ext.step = 9; break;
+            /* needless */
+          case LM_SPIKE_WEIRD_1: break;
+          case LM_SPIKE_WEIRD_2: break;
+          case LM_SPIKE_WEIRD_3: break;
           }
           break;
         case LG_GATE:           /* ok */
@@ -288,6 +289,14 @@ next_level (int number, struct pos *exit_door_pos)
           case LM_TAPEST_ALTERNATIVE_DESIGN: c->ext.design = CARPET_01; break;
           case LM_TAPEST_NORMAL: c->ext.design = CARPET_02; break;
           case LM_TAPEST_BLACK: break; /* needless */
+            /* needless */
+          case LM_TAPEST_WEIRD_1: break;
+          case LM_TAPEST_WEIRD_2: break;
+          case LM_TAPEST_WEIRD_3: break;
+          case LM_TAPEST_WEIRD_4: break;
+          case LM_TAPEST_WEIRD_5: break;
+          case LM_TAPEST_WEIRD_6: break;
+          case LM_TAPEST_WEIRD_7: break;
           }
           break;
         case LG_POTION:         /* ok */
@@ -316,6 +325,13 @@ next_level (int number, struct pos *exit_door_pos)
           case LM_TTOP_WITH_ALTERNATIVE_DESIGN_AND_BOTTOM: break;
           case LM_TTOP_WITH_BOTTOM: break;
           case LM_TTOP_WITH_WINDOW: break;
+          case LM_TTOP_WEIRD_1: break;
+          case LM_TTOP_WEIRD_2: break;
+          case LM_TTOP_WEIRD_3: break;
+          case LM_TTOP_WEIRD_4: break;
+          case LM_TTOP_WEIRD_5: break;
+          case LM_TTOP_WEIRD_6: break;
+          case LM_TTOP_WEIRD_7: break;
           }
           break;
         case LG_CHOMP:          /* ok */
@@ -335,7 +351,21 @@ next_level (int number, struct pos *exit_door_pos)
           case LM_WALL_NO_MARK: c->bg = NO_BRICKS; break;
           }
           break;
-        case LG_EXIT: break;
+        case LG_EXIT:           /* ok */
+          c->ext.step = LEVEL_DOOR_MAX_STEP;
+          switch (b) {
+          case LM_EXIT_HALF_OPEN: c->ext.step = 43; break;
+            /* needless */
+          case LM_EXIT_MORE_OPEN_1:
+          case LM_EXIT_MORE_OPEN_2:
+          case LM_EXIT_MORE_OPEN_3:
+          case LM_EXIT_MORE_OPEN_4:
+          case LM_EXIT_MORE_OPEN_5:
+          case LM_EXIT_MORE_OPEN_6: break;
+          case LM_EXIT_EVEN_MORE_OPEN: break;
+          case LM_EXIT_MOST_OPEN: break;
+          }
+          break;
         case LG_EVENT: c->ext.event = b; break; /* ok */
         default:
           xerror (-1, 0, "%s: unknown tile group (%i) at position (%i, %i, %i, %i)",

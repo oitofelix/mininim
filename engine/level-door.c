@@ -189,7 +189,7 @@ register_level_door (struct pos *p)
   struct level_door d;
 
   d.p = *p;
-  d.i = LEVEL_DOOR_MAX_STEP;
+  d.i = con (p)->ext.step;
   d.action = NO_LEVEL_DOOR_ACTION;
 
   level_door =
