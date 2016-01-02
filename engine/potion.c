@@ -331,7 +331,7 @@ big_potion_bubble_coord (struct pos *p, struct coord *c)
 ALLEGRO_COLOR
 empty_palette (ALLEGRO_COLOR c)
 {
-  if (color_eq (c, WHITE)) return TRANSPARENT;
+  if (color_eq (c, WHITE)) return TRANSPARENT_COLOR;
   else return c;
 }
 

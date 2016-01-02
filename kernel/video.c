@@ -264,7 +264,15 @@ load_bitmap (char *filename)
 {
   ALLEGRO_BITMAP *bitmap = al_load_bitmap (filename);
   if (! bitmap)
-    xerror (-1, 0, "%s: cannot load bitmap file '%s'", __func__, filename);
+    xerror (-1, 0, "%s: cannot load bitmap file '%s'",
+            __func__, filename);
+
+  /* work around a bug (MinGW target), where bitmaps are loaded as
+     black/transparent images */
+  al_lock_bitmap(bitmap, al_get_bitmap_format(bitmap),
+                 ALLEGRO_LOCK_READWRITE);
+  al_unlock_bitmap(bitmap);
+
   return bitmap;
 }
 

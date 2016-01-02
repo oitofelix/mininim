@@ -112,14 +112,14 @@
 #define V_BLOOD_COLOR_01 (al_map_rgb (228, 0, 0))
 #define V_BLOOD_COLOR_02 (al_map_rgb (184, 0, 0))
 
-#define RRED (al_map_rgb (prandom (255), 0, 0))
-#define RGREEN (al_map_rgb (0, prandom (255), 0))
-#define RBLUE (al_map_rgb (0, 0, prandom (255)))
+#define RRED_COLOR (al_map_rgb (prandom (255), 0, 0))
+#define RGREEN_COLOR (al_map_rgb (0, prandom (255), 0))
+#define RBLUE_COLOR (al_map_rgb (0, 0, prandom (255)))
 
-#define TRANSPARENT (al_map_rgba (0, 0, 0, 0))
-#define TRED (al_map_rgba (255, 0, 0, 0))
-#define TGREEN (al_map_rgba (0, 255, 0, 0))
-#define TBLUE (al_map_rgba (0, 0, 255, 0))
+#define TRANSPARENT_COLOR (al_map_rgba (0, 0, 0, 0))
+#define TRED_COLOR (al_map_rgba (255, 0, 0, 0))
+#define TGREEN_COLOR (al_map_rgba (0, 255, 0, 0))
+#define TBLUE_COLOR (al_map_rgba (0, 0, 255, 0))
 
 #define PALACE_WALL_COLOR_00 (al_map_rgb (216, 168, 88))
 #define PALACE_WALL_COLOR_01 (al_map_rgb (224, 164, 92))
@@ -362,8 +362,8 @@ struct anim {
 };
 
 /* functions */
-int max (int a, int b);
-int min (int a, int b);
+int max_int (int a, int b);
+int min_int (int a, int b);
 
 /* variables */
 extern ALLEGRO_TIMER *play_time;

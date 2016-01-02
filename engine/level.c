@@ -487,7 +487,7 @@ draw_level (void)
 {
   if (pause_game) {
     draw_bottom_text (NULL, "GAME PAUSED");
-    clear_bitmap (uscreen, TRANSPARENT);
+    clear_bitmap (uscreen, TRANSPARENT_COLOR);
     draw_kid_lives (uscreen, current_kid, vm);
     draw_bottom_text (uscreen, NULL);
     return;
@@ -495,7 +495,7 @@ draw_level (void)
 
   /* drawing */
   clear_bitmap (screen, BLACK);
-  clear_bitmap (uscreen, TRANSPARENT);
+  clear_bitmap (uscreen, TRANSPARENT_COLOR);
 
   struct pos p;
   p.room = room_view;

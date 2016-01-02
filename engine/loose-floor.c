@@ -272,7 +272,7 @@ create_loose_floor_02_bitmap (enum em em, enum vm vm)
   int hl = al_get_bitmap_height (loose_floor_left_02);
   int hr = al_get_bitmap_height (loose_floor_right_02);
   int hb = al_get_bitmap_height (loose_floor_base_02);
-  int h = max (hl, hr) + hb;
+  int h = max_int (hl, hr) + hb;
 
   ALLEGRO_BITMAP *bitmap = create_bitmap (w, h);
   clear_bitmap (bitmap, al_map_rgba (0, 0, 0, 0));

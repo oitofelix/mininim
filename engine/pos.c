@@ -200,9 +200,9 @@ pos2room (struct pos *p, int room, struct pos *pv)
   }
 
   int lm = mpb;
-  lm = min (lm, mpa);
-  lm = min (lm, mpr);
-  lm = min (lm, mpl);
+  lm = min_int (lm, mpa);
+  lm = min_int (lm, mpr);
+  lm = min_int (lm, mpl);
 
   if (lm == mpb) *pv = pb;
   else if (lm == mpa) *pv = pa;
@@ -269,9 +269,9 @@ coord2room (struct coord *c, int room, struct coord *cv)
   }
 
   int lm = mcb;
-  lm = min (lm, mca);
-  lm = min (lm, mcr);
-  lm = min (lm, mcl);
+  lm = min_int (lm, mca);
+  lm = min_int (lm, mcr);
+  lm = min_int (lm, mcl);
 
   if (lm == mcb) *cv = cb;
   else if (lm == mca) *cv = ca;
@@ -413,13 +413,13 @@ pos_gen (struct coord *c, struct pos *p, int dx, int dy)
   return p;
 }
 
-inline struct pos *
+struct pos *
 pos (struct coord *c, struct pos *p)
 {
   return pos_gen (c, p, 15, 3);
 }
 
-inline struct pos *
+struct pos *
 posf (struct coord *c, struct pos *p)
 {
   return pos_gen (c, p, 0, 3);

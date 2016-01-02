@@ -385,17 +385,17 @@ colorful_shadow_palette (ALLEGRO_COLOR c)
   if (color_eq (c, V_KID_SKIN_COLOR_01)
       || color_eq (c, V_KID_NOSE_COLOR))
     switch (anim_cycle % 3) {
-    case 0: return TRED;
-    case 1: return TGREEN;
-    case 2: return TBLUE;
+    case 0: return TRED_COLOR;
+    case 1: return TGREEN_COLOR;
+    case 2: return TBLUE_COLOR;
     }
 
   switch (prandom (9)) {
-  case 0: return RRED;
-  case 1: return RGREEN;
-  case 2: return RBLUE;
+  case 0: return RRED_COLOR;
+  case 1: return RGREEN_COLOR;
+  case 2: return RBLUE_COLOR;
   case 3: case 4: case 5: case 6: case 7: case 8: case 9:
-    return TRANSPARENT;
+    return TRANSPARENT_COLOR;
   }
   return BLACK;
 }

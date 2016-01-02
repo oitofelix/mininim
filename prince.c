@@ -58,7 +58,7 @@ main (int argc, char **argv)
 
  restart_game:
   clear_bitmap (screen, BLACK);
-  clear_bitmap (uscreen, TRANSPARENT);
+  clear_bitmap (uscreen, TRANSPARENT_COLOR);
   title_started = false;
   stop_sample ();
   play_title ();
@@ -86,13 +86,13 @@ main (int argc, char **argv)
 }
 
 int
-max (int a, int b)
+max_int (int a, int b)
 {
   return (a > b) ? a : b;
 }
 
 int
-min (int a, int b)
+min_int (int a, int b)
 {
   return (a < b) ? a : b;
 }

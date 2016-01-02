@@ -120,7 +120,7 @@ create_mirror_bitmaps (int last_room, int room)
       mirror_coord (&p, &c);
 
       *b = create_bitmap (MIRROR_BITMAP_W, MIRROR_BITMAP_H);
-      clear_bitmap (*b, TRANSPARENT);
+      clear_bitmap (*b, TRANSPARENT_COLOR);
     }
 }
 

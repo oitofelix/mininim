@@ -301,7 +301,7 @@ create_broken_floor_bitmap (enum em em, enum vm vm)
   int hl = al_get_bitmap_height (broken_floor_left);
   int hr = al_get_bitmap_height (broken_floor_right);
   int hb = al_get_bitmap_height (floor_base);
-  int h = max (hl, hr) + hb;
+  int h = max_int (hl, hr) + hb;
 
   ALLEGRO_BITMAP *bitmap = create_bitmap (w, h);
   clear_bitmap (bitmap, al_map_rgba (0, 0, 0, 0));

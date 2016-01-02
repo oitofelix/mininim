@@ -266,7 +266,7 @@ update_wall_cache (int room, enum em em, enum vm vm)
   struct pos p;
   p.room = room;
 
-  clear_bitmap (wall_cache, TRANSPARENT);
+  clear_bitmap (wall_cache, TRANSPARENT_COLOR);
 
   for (p.floor = FLOORS; p.floor >= -1; p.floor--)
     for (p.place = -1; p.place < PLACES; p.place++)

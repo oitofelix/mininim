@@ -80,15 +80,15 @@ compute_stars_position (int last_room, int room)
       for (i = 0; i < STARS; i++) {
         struct star *s = &star[p.floor + 1][p.place + 1][i];
         star_coord (&p, i, s);
-        min_x = min (min_x, s->x);
-        min_y = min (min_y, s->y);
-        max_x = max (max_x, s->x);
-        max_y = max (max_y, s->y);
+        min_x = min_int (min_x, s->x);
+        min_y = min_int (min_y, s->y);
+        max_x = max_int (max_x, s->x);
+        max_y = max_int (max_y, s->y);
         s->color = next_color (s->color);
       }
 
       sb->b = create_bitmap (max_x - min_x + 1, max_y - min_y + 1);
-      clear_bitmap (sb->b, TRANSPARENT);
+      clear_bitmap (sb->b, TRANSPARENT_COLOR);
       sb->c.room = room;
       sb->c.x = min_x;
       sb->c.y = min_y;
@@ -179,14 +179,14 @@ draw_princess_room_stars (void)
 
   if (! sb.b) {
     for (i = 0; i < 6; i++) {
-      min_x = min (min_x, s[i].x);
-      min_y = min (min_y, s[i].y);
-      max_x = max (max_x, s[i].x);
-      max_y = max (max_y, s[i].y);
+      min_x = min_int (min_x, s[i].x);
+      min_y = min_int (min_y, s[i].y);
+      max_x = max_int (max_x, s[i].x);
+      max_y = max_int (max_y, s[i].y);
     }
 
     sb.b = create_bitmap (max_x - min_x + 1, max_y - min_y + 1);
-    clear_bitmap (sb.b, TRANSPARENT);
+    clear_bitmap (sb.b, TRANSPARENT_COLOR);
     sb.c.x = min_x;
     sb.c.y = min_y;
 
