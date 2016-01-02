@@ -274,6 +274,7 @@ struct level {
       int event;
       int design;
       int door_step;
+      bool cant_fall;
       enum item {
         NO_ITEM,
         SMALL_LIFE_POTION,

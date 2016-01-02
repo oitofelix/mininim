@@ -294,6 +294,7 @@ register_loose_floor (struct pos *p)
   l.resist = LOOSE_FLOOR_RESISTENCE;
   l.action = NO_LOOSE_FLOOR_ACTION;
   l.state = 0;
+  l.cant_fall = con (p)->ext.cant_fall;
 
   struct coord c; floor_left_coord (p, &c);
   l.f.b = get_correct_falling_loose_floor_bitmap (dv_loose_floor_02);
@@ -345,7 +346,8 @@ release_loose_floor (struct pos *p)
 {
   struct loose_floor *l = loose_floor_at_pos (p);
   if (l->action != RELEASE_LOOSE_FLOOR
-      && l->action != FALL_LOOSE_FLOOR) {
+      && l->action != FALL_LOOSE_FLOOR
+      && ! l->cant_fall) {
     l->action = RELEASE_LOOSE_FLOOR;
     l->i = 0;
   }

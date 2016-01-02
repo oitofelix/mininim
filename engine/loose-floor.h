@@ -85,6 +85,7 @@ struct loose_floor {
   int i;
   int resist;
   int state;
+  bool cant_fall;
 
   enum {
     NO_LOOSE_FLOOR_ACTION,

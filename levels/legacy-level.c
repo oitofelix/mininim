@@ -216,7 +216,7 @@ next_level (int number, struct pos *exit_door_pos)
         case LT_BOTTOM_BIG_PILLAR: c->fg = BIG_PILLAR_BOTTOM; break;
         case LT_TOP_BIG_PILLAR: c->fg = BIG_PILLAR_TOP; c->bg = NO_BRICKS; break;
         case LT_POTION: c->fg = FLOOR; break;
-        case LT_LOOSE_BOARD: c->fg = LOOSE_FLOOR; break;
+        case LT_LOOSE_BOARD: c->fg = LOOSE_FLOOR; c->ext.cant_fall = mlf; break;
         case LT_TAPESTRY_TOP: c->fg = TCARPET; c->bg = NO_BRICKS; break;
         case LT_MIRROR: c->fg = MIRROR; break;
         case LT_DEBRIS: c->fg = BROKEN_FLOOR; break;
