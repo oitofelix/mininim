@@ -18,10 +18,10 @@
 */
 
 #include <stdio.h>
-#include <error.h>
 #include "prince.h"
 #include "kernel/video.h"
 #include "kernel/random.h"
+#include "kernel/xerror.h"
 #include "engine/physics.h"
 #include "engine/room.h"
 #include "wall-depedv.h"
@@ -198,7 +198,7 @@ draw_wall_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case WWS: draw_wall_face (bitmap, p, em, vm); break;
   case WWW: break;
   default:
-    error (-1, 0, "%s: unknown wall correlation (%i, %i. %i)",
+    xerror (-1, 0, "%s: unknown wall correlation (%i, %i. %i)",
            __func__, p->room, p->floor, p->place);
   }
 }
@@ -296,7 +296,7 @@ enum wall_correlation
 wall_correlation (struct pos *p)
 {
   if (con (p)->fg != WALL)
-    error (-1, 0, "%s: requested wall correlation on non-wall (%i, %i, %i)",
+    xerror (-1, 0, "%s: requested wall correlation on non-wall (%i, %i, %i)",
            __func__, p->room, p->floor, p->place);
 
   if (crel (p, 0, -1)->fg != WALL
@@ -308,7 +308,7 @@ wall_correlation (struct pos *p)
   else if (crel (p, 0, -1)->fg == WALL
            && crel (p, 0, +1)->fg == WALL) return WWW;
   else
-    error (-1, 0, "%s: unknown wall correlation (%i, %i. %i)",
+    xerror (-1, 0, "%s: unknown wall correlation (%i, %i. %i)",
            __func__, p->room, p->floor, p->place);
 
   return -1;

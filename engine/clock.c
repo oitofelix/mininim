@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <error.h>
 #include "kernel/video.h"
+#include "kernel/xerror.h"
 #include "anim.h"
 #include "clock.h"
 
@@ -62,7 +62,7 @@ void
 draw_clock (void)
 {
   static int i = 0;
-  ALLEGRO_BITMAP *sand;
+  ALLEGRO_BITMAP *sand = NULL;
 
   if (! princess_room_clock) return;
 
@@ -71,7 +71,7 @@ draw_clock (void)
   case 1: sand = clock_sand_02; break;
   case 2: sand = clock_sand_03; break;
   default:
-    error (-1, 0, "%s: arithmetic error", __func__);
+    xerror (-1, 0, "%s: arithmetic error", __func__);
   }
 
   draw_bitmap (princess_room_clock, screen, 153, 141, 0);

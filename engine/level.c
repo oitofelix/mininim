@@ -19,9 +19,7 @@
 
 #define _GNU_SOURCE
 
-#include <error.h>
 #include <stdio.h>
-
 #include "kernel/video.h"
 #include "kernel/keyboard.h"
 #include "kernel/array.h"

@@ -17,7 +17,6 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <error.h>
 #include "prince.h"
 #include "kernel/video.h"
 #include "kernel/random.h"

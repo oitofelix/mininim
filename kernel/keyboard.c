@@ -17,9 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <error.h>
 #include <allegro5/allegro.h>
-
+#include "xerror.h"
 #include "keyboard.h"
 
 /* keyboard state */
@@ -36,7 +35,7 @@ void
 init_keyboard (void)
 {
   if (! al_install_keyboard ())
-    error (-1, 0, "%s (void): cannot install keyboard", __func__);
+    xerror (-1, 0, "%s (void): cannot install keyboard", __func__);
 }
 
 void
@@ -50,7 +49,7 @@ get_keyboard_event_source (void)
 {
   ALLEGRO_EVENT_SOURCE *event_source = al_get_keyboard_event_source ();
   if (! event_source)
-    error (-1, 0, "%s: failed to get keyboard event source", __func__);
+    xerror (-1, 0, "%s: failed to get keyboard event source", __func__);
   return event_source;
 }
 

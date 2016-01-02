@@ -17,12 +17,12 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <error.h>
 #include <stdio.h>
 #include <time.h>
 #include "kernel/video.h"
 #include "kernel/random.h"
 #include "kernel/array.h"
+#include "kernel/xerror.h"
 #include "engine/level.h"
 #include "engine/kid/kid.h"
 #include "engine/door.h"
@@ -159,7 +159,7 @@ next_level (int number, struct pos *exit_door_pos)
 
   FILE *lvf;
   lvf = fopen (lvfn, "r");
-  if (! lvf) error (-1, 0, "cannot read legacy level file %s", lvfn);
+  if (! lvf) xerror (-1, 0, "cannot read legacy level file %s", lvfn);
   fread (&lv, sizeof (lv), 1, lvf);
   fclose (lvf);
 
@@ -238,7 +238,7 @@ next_level (int number, struct pos *exit_door_pos)
         case LT_TORCH_WITH_DEBRIS: c->fg = BROKEN_FLOOR; c->bg = TORCH; break;
         case LT_NULL: break;    /* needless */
         default:
-          error (-1, 0, "%s: unknown tile group (%i) at position (%i, %i, %i, %i)",
+          xerror (-1, 0, "%s: unknown tile group (%i) at position (%i, %i, %i, %i)",
                  __func__, t, number, p.room, p.floor, p.place);
         }
 
@@ -338,7 +338,7 @@ next_level (int number, struct pos *exit_door_pos)
         case LG_EXIT: break;
         case LG_EVENT: c->ext.event = b; break; /* ok */
         default:
-          error (-1, 0, "%s: unknown tile group (%i) at position (%i, %i, %i, %i)",
+          xerror (-1, 0, "%s: unknown tile group (%i) at position (%i, %i, %i, %i)",
                  __func__, g, number, p.room, p.floor, p.place);
         }
       }
@@ -395,7 +395,7 @@ get_group (enum ltile t)
   case LT_EXIT_LEFT: case LT_EXIT_RIGHT: return LG_EXIT;
   case LT_DROP_BUTTON: case LT_RAISE_BUTTON: return LG_EVENT;
   default:
-    error (-1, 0, "%s: unknown tile (%i)", __func__, t);
+    xerror (-1, 0, "%s: unknown tile (%i)", __func__, t);
   }
   return LG_NONE;
 }

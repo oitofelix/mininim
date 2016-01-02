@@ -18,7 +18,6 @@
 */
 
 #include <stdio.h>
-#include <error.h>
 #include "kernel/audio.h"
 #include "kernel/array.h"
 #include "anim.h"

@@ -1,5 +1,5 @@
 /*
-  memory.c -- memory module;
+  xerror.c -- error module;
 
   Copyright (C) 2015, 2016 Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
 
@@ -17,42 +17,36 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#define _GNU_SOURCE
+
+#include <stdarg.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 #include <allegro5/allegro.h>
-#include "xerror.h"
+#include "array.h"
 
-void *
-xmalloc (size_t n)
+extern char *program_name;
+
+void
+xerror (int status, int errnum, const char *format, ...)
 {
-  if (n == 0) return NULL;
+  va_list ap;
+  va_start (ap, format);
 
-  void *ptr = al_malloc (n);
-  if (! ptr)
-    xerror (-1, 0, "%s (%zu): cannot allocate memory", __func__, n);
-  return ptr;
-}
+  char *_format;
 
-void *
-xrealloc (void *ptr, size_t n)
-{
-  if (ptr == NULL) return xmalloc (n);
-  if (n == 0) {
-    al_free (ptr);
-    return NULL;
-  }
+  if (errnum)
+    xasprintf (&_format, "%s: %s: %s\n", program_name, format,
+               strerror (errnum));
+  else
+    xasprintf (&_format, "%s: %s\n", program_name, format);
 
-  void *_ptr = al_realloc (ptr, n);
-  if (! _ptr)
-    xerror (-1, 0, "%s (%p, %zu): cannot reallocate memory", __func__, ptr, n);
-  return _ptr;
-}
+  vfprintf (stderr, _format, ap);
 
-void *
-xcalloc (size_t count, size_t n)
-{
-  if (n * count == 0) return NULL;
+  va_end (ap);
 
-  void *ptr = al_calloc (count, n);
-  if (! ptr)
-    xerror (-1, 0, "%s (%zu, %zu): cannot allocat memory", __func__, count, n);
-  return ptr;
+  al_free (_format);
+
+  if (status) exit (status);
 }

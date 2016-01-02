@@ -1,4 +1,5 @@
-KERNEL_MODULES = event timer video audio memory keyboard random array
+KERNEL_MODULES = event timer video audio memory keyboard random array	\
+xerror
 ENGINE_MODULES = anim pos physics level consistency stars floor				\
   broken-floor skeleton-floor loose-floor opener-floor closer-floor		\
   spikes-floor door level-door pillar big-pillar chopper bricks torch	\

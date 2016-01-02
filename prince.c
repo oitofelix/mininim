@@ -17,12 +17,16 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#define _GNU_SOURCE
+
 #include <stdio.h>
+#include <string.h>
 #include "prince.h"
 #include "kernel/video.h"
 #include "kernel/audio.h"
 #include "kernel/keyboard.h"
 #include "kernel/timer.h"
+#include "kernel/xerror.h"
 #include "engine/level.h"
 #include "levels/title.h"
 #include "levels/level-1.h"
@@ -33,9 +37,13 @@ ALLEGRO_TIMER *play_time;
 enum em em = DUNGEON;
 enum vm vm = VGA;
 
+char *program_name;
+
 int
 main (int argc, char **argv)
 {
+  program_name = basename (argv [0]);
+
   al_init ();
   init_video ();
   init_audio ();

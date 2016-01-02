@@ -18,13 +18,12 @@
 */
 
 #include <stdio.h>
-#include <error.h>
 #include <allegro5/allegro.h>
-
 #include "prince.h"
 #include "kernel/video.h"
 #include "kernel/random.h"
 #include "kernel/array.h"
+#include "kernel/xerror.h"
 #include "physics.h"
 #include "level.h"
 #include "kid/kid.h"
@@ -268,7 +267,7 @@ draw_conbg (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case WINDOW: draw_window (bitmap, p, em, vm); break;
   case BALCONY: draw_balcony (bitmap, p, em, vm); break;
   default:
-    error (-1, 0, "%s: unknown background (%i)",
+    xerror (-1, 0, "%s: unknown background (%i)",
            __func__, con (p)->bg);
   }
 
@@ -320,7 +319,7 @@ draw_confg_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case TCARPET: draw_door_pole_base (bitmap, &pv, em, vm); break;
   case MIRROR: draw_floor_base (bitmap, &pv, em, vm); break;
   default:
-    error (-1, 0, "%s: unknown foreground (%i)",
+    xerror (-1, 0, "%s: unknown foreground (%i)",
            __func__, con (&pv)->fg);
   }
 }
@@ -377,7 +376,7 @@ draw_confg_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   case MIRROR: draw_floor_left (bitmap, &pv, em, vm); break;
   default:
-    error (-1, 0, "%s: unknown foreground (%i)",
+    xerror (-1, 0, "%s: unknown foreground (%i)",
            __func__, con (&pv)->fg);
   }
 
@@ -426,7 +425,7 @@ draw_confg_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case TCARPET: draw_carpet_right (bitmap, &pv, em, vm); break;
   case MIRROR: draw_floor_right (bitmap, &pv, em, vm); break;
   default:
-    error (-1, 0, "%s: unknown foreground (%i)",
+    xerror (-1, 0, "%s: unknown foreground (%i)",
            __func__, con (&pv)->fg);
   }
 
@@ -502,7 +501,7 @@ draw_confg_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
     draw_carpet_fg (bitmap, &pv, f, em, vm); break;
   case MIRROR: draw_mirror_fg (bitmap, &pv, em, vm); break;
   default:
-    error (-1, 0, "%s: unknown foreground (%i)",
+    xerror (-1, 0, "%s: unknown foreground (%i)",
            __func__, con (&pv)->fg);
   }
 }

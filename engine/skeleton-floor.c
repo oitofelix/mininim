@@ -18,7 +18,6 @@
 */
 
 #include <stdio.h>
-#include <error.h>
 #include "kernel/video.h"
 #include "kernel/audio.h"
 #include "kernel/random.h"

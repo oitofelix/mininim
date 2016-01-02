@@ -18,7 +18,6 @@
 */
 
 #include <stdio.h>
-#include <error.h>
 #include <string.h>
 #include "prince.h"
 #include "kernel/video.h"

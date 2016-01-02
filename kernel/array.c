@@ -19,14 +19,14 @@
 
 #define _GNU_SOURCE
 
-#include <error.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stddef.h>
 #include <string.h>
 #include <assert.h>
 #include <allegro5/allegro.h>
-#include "kernel/memory.h"
+#include "memory.h"
+#include "xerror.h"
 #include "array.h"
 
 void *
@@ -99,7 +99,7 @@ xasprintf (char **ptr, const char *template, ...)
   va_list ap;
   va_start (ap, template);
   if (vasprintf (ptr, template, ap) < 0)
-    error (-1, 0, "%s (%p, %p): cannot create string",
-           __func__, ptr, template);
+    xerror (-1, 0, "%s (%p, %p): cannot create string",
+            __func__, ptr, template);
   va_end (ap);
 }

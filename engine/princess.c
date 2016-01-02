@@ -17,7 +17,6 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <error.h>
 #include "kernel/video.h"
 #include "anim.h"
 #include "princess.h"

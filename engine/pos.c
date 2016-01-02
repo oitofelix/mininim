@@ -17,10 +17,10 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <error.h>
 #include <math.h>
 #include <stdlib.h>
 #include "kernel/random.h"
+#include "kernel/xerror.h"
 #include "level.h"
 #include "kid/kid.h"
 #include "physics.h"
@@ -38,7 +38,7 @@ roomd (int room, enum dir dir)
   case ABOVE: return level.link[room].a;
   case BELOW: return level.link[room].b;
   default:
-    error (-1, 0, "%s: unknown direction (%i)", __func__, dir);
+    xerror (-1, 0, "%s: unknown direction (%i)", __func__, dir);
     return room;
   }
 }

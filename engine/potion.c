@@ -17,9 +17,9 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <error.h>
 #include "kernel/video.h"
 #include "kernel/random.h"
+#include "kernel/xerror.h"
 #include "level.h"
 #include "physics.h"
 #include "room.h"
@@ -151,7 +151,7 @@ get_bubble_frame (int i)
   case 5: return bubble_06;
   case 6: return bubble_07;
   default:
-    error (-1, 0, "%s (%i): unknown bubble frame", __func__, i);
+    xerror (-1, 0, "%s (%i): unknown bubble frame", __func__, i);
   }
 
   return NULL;
@@ -201,9 +201,9 @@ draw_potion (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
-  ALLEGRO_BITMAP *bottle, *bubble;
+  ALLEGRO_BITMAP *bottle = NULL, *bubble = NULL;
   struct coord bottle_coord, bubble_coord;
-  palette bubble_palette;
+  palette bubble_palette = NULL;
 
   seedp (p);
   enum item item = con (p)->ext.item;
@@ -224,7 +224,7 @@ draw_potion (ALLEGRO_BITMAP *bitmap, struct pos *p,
     big_potion_bubble_coord (p, &bubble_coord);
     break;
   default:
-    error (-1, 0, "%s (%i): unknown potion type", __func__, item);
+    xerror (-1, 0, "%s (%i): unknown potion type", __func__, item);
     break;
   }
 
@@ -262,7 +262,7 @@ draw_potion (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case FLIP_POTION: bubble_palette = flip_palette; break;
   case ACTIVATION_POTION: bubble_palette = poison_palette; break;
   default:
-    error (-1, 0, "%s (%i): unknown potion type", __func__, item);
+    xerror (-1, 0, "%s (%i): unknown potion type", __func__, item);
     break;
   }
 

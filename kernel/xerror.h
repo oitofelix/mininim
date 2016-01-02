@@ -1,5 +1,5 @@
 /*
-  timer.c -- timer handling routines;
+  xerror.h -- error module;
 
   Copyright (C) 2015, 2016 Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
 
@@ -17,23 +17,9 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <allegro5/allegro.h>
-#include "xerror.h"
-#include "timer.h"
+#ifndef MININIM_XERROR_H
+#define MININIM_XERROR_H
 
-ALLEGRO_TIMER *
-create_timer (double speed_secs)
-{
-  ALLEGRO_TIMER *timer =  al_create_timer (speed_secs);
-  if (! timer) xerror (-1, 0, "%s: failed to create timer (%f)", __func__, speed_secs);
-  return timer;
-}
+void xerror (int status, int errnum, const char *format, ...);
 
-ALLEGRO_EVENT_SOURCE *
-get_timer_event_source (ALLEGRO_TIMER *timer)
-{
-  ALLEGRO_EVENT_SOURCE *event_source = al_get_timer_event_source (timer);
-  if (! event_source)
-    xerror (-1, 0, "%s: failed to get timer event source (%p)", __func__,  timer);
-  return event_source;
-}
+#endif	/* MININIM_XERROR_H */

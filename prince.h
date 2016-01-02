@@ -369,5 +369,6 @@ int min (int a, int b);
 extern ALLEGRO_TIMER *play_time;
 extern enum em em;
 extern enum vm vm;
+extern char *program_name;
 
 #endif	/* MININIM_PRINCE_H */
