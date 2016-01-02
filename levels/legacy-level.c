@@ -262,7 +262,7 @@ next_level (int number, struct pos *exit_door_pos)
             c->bg = (t == LT_EMPTY) ? NO_BRICKS : NO_BG; break;
           }
           break;
-        case LG_SPIKE:
+        case LG_SPIKE:          /* ok */
           switch (b) {
           case LM_SPIKE_NORMAL: c->ext.step = 0; break;
           case LM_SPIKE_BARELY_OUT_1: c->ext.step = 1; break;
@@ -292,13 +292,13 @@ next_level (int number, struct pos *exit_door_pos)
           break;
         case LG_POTION:
           switch (b) {
-          case LM_POTION_EMPTY: break;
+          case LM_POTION_EMPTY: c->ext.item = EMPTY_POTION; break;
           case LM_POTION_HEALTH_POINT: c->ext.item = SMALL_LIFE_POTION; break;
           case LM_POTION_LIFE: c->ext.item = BIG_LIFE_POTION; break;
           case LM_POTION_FEATHER_FALL: c->ext.item = FLOAT_POTION; break;
           case LM_POTION_INVERT: c->ext.item = FLIP_POTION; break;
           case LM_POTION_POISON: c->ext.item = SMALL_POISON_POTION; break;
-          case LM_POTION_OPEN: break;
+          case LM_POTION_OPEN: c->ext.item = ACTIVATION_POTION; break;
           }
           break;
         case LG_TTOP:           /* ok */

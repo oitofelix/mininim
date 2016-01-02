@@ -277,12 +277,14 @@ struct level {
       bool cant_fall;
       enum item {
         NO_ITEM,
+        EMPTY_POTION,
         SMALL_LIFE_POTION,
         BIG_LIFE_POTION,
         SMALL_POISON_POTION,
         BIG_POISON_POTION,
         FLOAT_POTION,
         FLIP_POTION,
+        ACTIVATION_POTION,
         SWORD,
       } item;
     } ext;

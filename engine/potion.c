@@ -51,6 +51,7 @@ static struct coord *small_potion_coord (struct pos *p, struct coord *c);
 static struct coord *small_potion_bubble_coord (struct pos *p, struct coord *c);
 static struct coord *big_potion_coord (struct pos *p, struct coord *c);
 static struct coord *big_potion_bubble_coord (struct pos *p, struct coord *c);
+static ALLEGRO_COLOR empty_palette (ALLEGRO_COLOR c);
 static ALLEGRO_COLOR v_life_palette (ALLEGRO_COLOR c);
 static ALLEGRO_COLOR v_poison_palette (ALLEGRO_COLOR c);
 static ALLEGRO_COLOR v_float_palette (ALLEGRO_COLOR c);
@@ -252,20 +253,14 @@ draw_potion (ALLEGRO_BITMAP *bitmap, struct pos *p,
   }
 
   switch (item) {
+  case EMPTY_POTION: bubble_palette = empty_palette; break;
   case SMALL_LIFE_POTION:
-  case BIG_LIFE_POTION:
-    bubble_palette = life_palette;
-    break;
+  case BIG_LIFE_POTION: bubble_palette = life_palette; break;
   case SMALL_POISON_POTION:
-  case BIG_POISON_POTION:
-    bubble_palette = poison_palette;
-    break;
-  case FLOAT_POTION:
-    bubble_palette = float_palette;
-    break;
-  case FLIP_POTION:
-    bubble_palette = flip_palette;
-    break;
+  case BIG_POISON_POTION: bubble_palette = poison_palette; break;
+  case FLOAT_POTION: bubble_palette = float_palette; break;
+  case FLIP_POTION: bubble_palette = flip_palette; break;
+  case ACTIVATION_POTION: bubble_palette = poison_palette; break;
   default:
     error (-1, 0, "%s (%i): unknown potion type", __func__, item);
     break;
@@ -287,12 +282,14 @@ bool
 is_potion (struct pos *p)
 {
   return con (p)->fg == FLOOR
-    && (con (p)->ext.item == SMALL_LIFE_POTION
+    && (con (p)->ext.item == EMPTY_POTION
+        || con (p)->ext.item == SMALL_LIFE_POTION
         || con (p)->ext.item == BIG_LIFE_POTION
         || con (p)->ext.item == SMALL_POISON_POTION
         || con (p)->ext.item == BIG_POISON_POTION
         || con (p)->ext.item == FLOAT_POTION
-        || con (p)->ext.item == FLIP_POTION);
+        || con (p)->ext.item == FLIP_POTION
+        || con (p)->ext.item == ACTIVATION_POTION);
 }
 
 struct coord *
@@ -329,6 +326,13 @@ big_potion_bubble_coord (struct pos *p, struct coord *c)
   c->y = PLACE_HEIGHT * p->floor + 36;
   c->room = p->room;
   return c;
+}
+
+ALLEGRO_COLOR
+empty_palette (ALLEGRO_COLOR c)
+{
+  if (color_eq (c, WHITE)) return TRANSPARENT;
+  else return c;
 }
 
 ALLEGRO_COLOR

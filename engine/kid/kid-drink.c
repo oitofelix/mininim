@@ -115,6 +115,8 @@ kid_drink (struct anim *kid)
 static bool
 flow (struct anim *kid)
 {
+  struct pos p;
+
   if (kid->oaction != kid_drink)
     kid->i = -1, kid->wait = 4, kid->reverse = false;
 
@@ -130,6 +132,7 @@ flow (struct anim *kid)
 
   if (kid->i == 14 && kid->wait == 1)
     switch (kid->item) {
+    case EMPTY_POTION: break;
     case SMALL_LIFE_POTION: increase_kid_current_lives (kid); break;
     case BIG_LIFE_POTION: increase_kid_total_lives (kid); break;
     case SMALL_POISON_POTION:
@@ -161,6 +164,8 @@ flow (struct anim *kid)
         }
       }
       break;
+    case ACTIVATION_POTION: p.room = 8, p.floor = p.place = 0;
+      activate_con (&p); break;
     default: break;
     }
 
