@@ -203,7 +203,7 @@ register_door (struct pos *p)
   struct door d;
 
   d.p = *p;
-  d.i = con (p)->ext.door_step;
+  d.i = con (p)->ext.step;
   d.action = NO_DOOR_ACTION;
   d.wait = DOOR_WAIT;
   d.noise = false;

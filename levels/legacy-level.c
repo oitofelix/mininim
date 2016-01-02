@@ -261,11 +261,25 @@ next_level (int number, struct pos *exit_door_pos)
           case LM_FREE_SPOT3_DUNGEON_BLUE_LINE_PALACE: /* ok */
             c->bg = (t == LT_EMPTY) ? NO_BRICKS : NO_BG; break;
           }
-        case LG_SPIKE: break;
+          break;
+        case LG_SPIKE:
+          switch (b) {
+          case LM_SPIKE_NORMAL: c->ext.step = 0; break;
+          case LM_SPIKE_BARELY_OUT_1: c->ext.step = 1; break;
+          case LM_SPIKE_HALF_OUT_1: c->ext.step = 2; break;
+          case LM_SPIKE_FULLY_OUT_1: c->ext.step = 3; break;
+          case LM_SPIKE_FULLY_OUT_2: c->ext.step = 4; break;
+          case LM_SPIKE_OUT_1: c->ext.step = 5; break;
+          case LM_SPIKE_OUT_2: c->ext.step = 6; break;
+          case LM_SPIKE_HALF_OUT_2: c->ext.step = 7; break;
+          case LM_SPIKE_BARELY_OUT_2: c->ext.step = 8; break;
+          case LM_SPIKE_DISABLED: c->ext.step = 9; break;
+          }
+          break;
         case LG_GATE:           /* ok */
           switch (b) {
-          case LM_GATE_CLOSED: default: c->ext.door_step = DOOR_MAX_STEP; break;
-          case LM_GATE_OPEN: c->ext.door_step = 0; break;
+          case LM_GATE_CLOSED: default: c->ext.step = DOOR_MAX_STEP; break;
+          case LM_GATE_OPEN: c->ext.step = 0; break;
           }
           break;
         case LG_TAPEST:         /* ok */

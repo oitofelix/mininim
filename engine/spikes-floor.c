@@ -335,12 +335,24 @@ register_spikes_floor (struct pos *p)
   struct spikes_floor s;
 
   s.p = *p;
-  s.i = 0;
   s.wait = SPIKES_WAIT;
-  s.state = 0;
-  s.inactive = false;
   s.murdered_kid = -1;
   s.activate = false;
+
+  switch (con (p)->ext.step) {
+  case 0: s.i = 0; s.state = 0; break;
+  case 1: s.i = 1; s.state = 1; break;
+  case 2: s.i = 2; s.state = 2; break;
+  case 3: s.i = 3; s.state = 3; break;
+  case 4: s.i = 4; s.state = 4; break;
+  case 5: s.i = 4; s.state = 5; break;
+  case 6: s.i = 5; s.state = 3; break;
+  case 7: s.i = 6; s.state = 2; break;
+  case 8: s.i = 0; s.state = 1; break;
+  case 9: s.i = 0; s.state = 0; break;
+  }
+
+  s.inactive = (con (p)->ext.step != 0);
 
   spikes_floor =
     add_to_array (&s, 1, spikes_floor, &spikes_floor_nmemb,

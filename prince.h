@@ -273,7 +273,7 @@ struct level {
     union conext {
       int event;
       int design;
-      int door_step;
+      int step;
       bool cant_fall;
       enum item {
         NO_ITEM,
