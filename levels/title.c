@@ -120,10 +120,10 @@ title_anim (void)
   static int i;
 
   if (! title_started) {
-    i = 0; title_started = true;
+    i = 0; key.keyboard.keycode = 0; title_started = true;
   }
 
-  if (enter_key) {
+  if (key.keyboard.keycode) {
     quit_anim = true;
     return;
   }

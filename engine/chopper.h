@@ -113,6 +113,7 @@ struct chopper {
   int wait;
   bool blood;
   bool activate;
+  bool inactive;
 };
 
 /* variables */

@@ -274,6 +274,7 @@ struct level {
       int event;
       int design;
       int step;
+      bool bloody;
       bool cant_fall;
       enum item {
         NO_ITEM,

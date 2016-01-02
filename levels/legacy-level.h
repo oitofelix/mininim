@@ -80,6 +80,11 @@ enum lm_ttop {
   LM_TTOP_WITH_BOTTOM, LM_TTOP_WITH_WINDOW
 };
 
+enum lm_chomp {
+  LM_CHOMP_NORMAL, LM_CHOMP_HALF_OPEN, LM_CHOMP_CLOSED,
+  LM_CHOMP_PARTIALLY_OPEN, LM_CHOMP_EXTRA_OPEN, LM_STUCK_OPEN
+};
+
 void play_legacy_level (void);
 
 #endif	/* MININIM_LEGACY_LEVEL_H */

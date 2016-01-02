@@ -290,7 +290,7 @@ next_level (int number, struct pos *exit_door_pos)
           case LM_TAPEST_BLACK: break; /* needless */
           }
           break;
-        case LG_POTION:
+        case LG_POTION:         /* ok */
           switch (b) {
           case LM_POTION_EMPTY: c->ext.item = EMPTY_POTION; break;
           case LM_POTION_HEALTH_POINT: c->ext.item = SMALL_LIFE_POTION; break;
@@ -318,7 +318,17 @@ next_level (int number, struct pos *exit_door_pos)
           case LM_TTOP_WITH_WINDOW: break;
           }
           break;
-        case LG_CHOMP: break;
+        case LG_CHOMP:          /* ok */
+          switch (b & 0x7F) {
+          case LM_CHOMP_NORMAL: c->ext.step = 0; break;
+          case LM_CHOMP_HALF_OPEN: c->ext.step = 1; break;
+          case LM_CHOMP_CLOSED: c->ext.step = 2; break;
+          case LM_CHOMP_PARTIALLY_OPEN: c->ext.step = 3; break;
+          case LM_CHOMP_EXTRA_OPEN: c->ext.step = 4; break;
+          case LM_STUCK_OPEN: c->ext.step = 5; break;
+          }
+          c->ext.step |= (b & 0x80); /* bloody status */
+          break;
         case LG_WALL: break;
         case LG_EXIT: break;
         case LG_EVENT: c->ext.event = b; break; /* ok */

@@ -309,10 +309,13 @@ register_chopper (struct pos *p)
 {
   struct chopper c;
 
+  int step = con (p)->ext.step & 0x7F;
+
   c.p = *p;
-  c.i = 0;
+  c.i = step < 5 ? step : 0;
   c.wait = CHOPPER_WAIT;
-  c.blood = false;
+  c.blood = con (p)->ext.step & 0x80;
+  c.inactive = (step >= 5);
 
   chopper =
     add_to_array (&c, 1, chopper, &chopper_nmemb, chopper_nmemb, sizeof (c));
@@ -364,6 +367,9 @@ compute_choppers (void)
 
   for (i = 0; i < chopper_nmemb; i++) {
     struct chopper *c = &chopper[i];
+
+    if (c->inactive) continue;
+
     if (c->p.room == -1) {
       /* remove_chopper (d); i--; */
       continue;
