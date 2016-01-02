@@ -42,7 +42,7 @@ char *program_name;
 int
 main (int argc, char **argv)
 {
-  program_name = basename (argv [0]);
+  program_name = "MININIM";
 
   al_init ();
   init_video ();

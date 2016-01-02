@@ -17,8 +17,6 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#define _GNU_SOURCE
-
 #include <stdarg.h>
 #include <stdio.h>
 #include <stddef.h>
@@ -98,7 +96,10 @@ xasprintf (char **ptr, const char *template, ...)
 {
   va_list ap;
   va_start (ap, template);
-  if (vasprintf (ptr, template, ap) < 0)
+
+  *ptr = xmalloc (256);
+
+  if (vsnprintf (*ptr, 256, template, ap) < 0)
     xerror (-1, 0, "%s (%p, %p): cannot create string",
             __func__, ptr, template);
   va_end (ap);
