@@ -85,6 +85,10 @@ enum lm_chomp {
   LM_CHOMP_PARTIALLY_OPEN, LM_CHOMP_EXTRA_OPEN, LM_STUCK_OPEN
 };
 
+enum lm_wall {
+  LM_WALL_MARK, LM_WALL_NO_MARK
+};
+
 void play_legacy_level (void);
 
 #endif	/* MININIM_LEGACY_LEVEL_H */

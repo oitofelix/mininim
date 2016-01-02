@@ -236,7 +236,7 @@ next_level (int number, struct pos *exit_door_pos)
         case LT_LATTICE_LEFT: c->fg = ARCH_TOP_LEFT; c->bg = NO_BRICKS; break;
         case LT_LATTICE_RIGHT: c->fg = ARCH_TOP_RIGHT; c->bg = NO_BRICKS; break;
         case LT_TORCH_WITH_DEBRIS: c->fg = BROKEN_FLOOR; c->bg = TORCH; break;
-        case LT_NULL: break;
+        case LT_NULL: break;    /* needless */
         default:
           error (-1, 0, "%s: unknown tile group (%i) at position (%i, %i, %i, %i)",
                  __func__, t, number, p.room, p.floor, p.place);
@@ -329,7 +329,12 @@ next_level (int number, struct pos *exit_door_pos)
           }
           c->ext.step |= (b & 0x80); /* bloody status */
           break;
-        case LG_WALL: break;
+        case LG_WALL:           /* ok */
+          switch (b) {
+          case LM_WALL_MARK: c->bg = NO_BG; break;
+          case LM_WALL_NO_MARK: c->bg = NO_BRICKS; break;
+          }
+          break;
         case LG_EXIT: break;
         case LG_EVENT: c->ext.event = b; break; /* ok */
         default:
