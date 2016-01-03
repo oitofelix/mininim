@@ -80,7 +80,6 @@ void press_opener_floor (struct pos *p);
 void break_opener_floor (struct pos *p);
 void unpress_opener_floors (void);
 void compute_opener_floors (void);
-void sample_opener_floors (void);
 void draw_opener_floor (ALLEGRO_BITMAP *bitmap, struct pos *p,
                         enum em em, enum vm vm);
 void draw_opener_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p,

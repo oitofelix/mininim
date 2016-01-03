@@ -115,7 +115,6 @@ void open_door (int e);
 void close_door (int e);
 void compute_doors (void);
 int door_grid_tip_y (struct pos *p);
-void sample_doors (void);
 void draw_door (ALLEGRO_BITMAP *bitmap, struct pos *p,
                 enum em em, enum vm vm);
 void draw_door_left (ALLEGRO_BITMAP *bitmap, struct pos *p,

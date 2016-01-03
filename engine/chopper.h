@@ -130,7 +130,6 @@ int compare_choppers (const void *d0, const void *d1);
 struct chopper *chopper_at_pos (struct pos *p);
 bool should_chomp (struct pos *p);
 void compute_choppers (void);
-void sample_choppers (void);
 void draw_chopper_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
                         enum em em, enum vm vm);
 void draw_chopper_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,

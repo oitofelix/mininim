@@ -21,10 +21,15 @@
 #include <stdio.h>
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_acodec.h>
+#include "kernel/array.h"
+#include "engine/anim.h"
 #include "xerror.h"
 #include "audio.h"
 
-static ALLEGRO_SAMPLE_INSTANCE *sample_instance;
+static struct audio_sample *audio_sample;
+
+static size_t audio_sample_nmemb;
+
 bool audio_enabled = true;
 float volume = 1.0;
 
@@ -84,40 +89,133 @@ get_default_mixer (void)
   return mixer;
 }
 
-void
+ALLEGRO_SAMPLE_INSTANCE *
 play_sample (ALLEGRO_SAMPLE *sample)
 {
-  sample_instance = al_create_sample_instance (sample);
-  if (! sample_instance)
+  size_t i;
+
+  /* do nothing if the same sample has been played with less than a
+     drawing cycle of difference */
+  for (i = 0; i < audio_sample_nmemb; i++) {
+    struct audio_sample *as = &audio_sample[i];
+    if (as->sample == sample && as->anim_cycle == anim_cycle)
+      return as->instance;
+  }
+
+  struct audio_sample as;
+  as.played = false;
+  as.sample = sample;
+  as.instance = al_create_sample_instance (sample);
+  as.anim_cycle = anim_cycle;
+
+  if (! as.instance)
     xerror (-1, 0, "%s (%p): cannot create sample instance", __func__, sample);
 
-  ALLEGRO_MIXER *mixer = get_default_mixer ();
+  audio_sample =
+    add_to_array (&as, 1, audio_sample, &audio_sample_nmemb,
+                  audio_sample_nmemb, sizeof (as));
 
-  if (! al_attach_sample_instance_to_mixer(sample_instance, mixer))
-    xerror (-1, 0, "%s (%p): cannot attach sample instance to mixer (%p)",
-           __func__, sample, sample_instance);
-
-  if (! al_play_sample_instance (sample_instance))
-    xerror (-1, 0, "%s (%p): cannot play sample instance (%p)",
-           __func__, sample, sample_instance);
+  qsort (audio_sample, audio_sample_nmemb, sizeof (as), compare_samples);
+  return as.instance;
 }
 
 void
-stop_sample (void)
+play_samples (void)
 {
-  if (sample_instance) al_stop_sample_instance (sample_instance);
+  clear_played_samples ();
+
+  size_t i;
+  for (i = 0; i < audio_sample_nmemb; i++) {
+    struct audio_sample *as = &audio_sample[i];
+    if (! as->played) {
+      ALLEGRO_MIXER *mixer = get_default_mixer ();
+
+      if (! al_attach_sample_instance_to_mixer(as->instance, mixer))
+        xerror (-1, 0, "%s: cannot attach sample instance to mixer (%p, %p)",
+                __func__, as->sample, as->instance);
+
+      if (! al_play_sample_instance (as->instance))
+        xerror (-1, 0, "%s: cannot play sample instance (%p, %p)",
+                __func__, as->sample, as->instance);
+
+      as->played = true;
+    }
+  }
 }
 
-bool
-is_playing_sample (void)
+int
+compare_samples (const void *s0, const void *s1)
 {
-  return al_get_sample_instance_playing (sample_instance);
+  struct audio_sample *_s0 = (struct audio_sample *) s0;
+  struct audio_sample *_s1 = (struct audio_sample *) s1;
+
+  if (_s0->instance < _s1->instance) return -1;
+  else if (_s0->instance > _s1->instance) return 1;
+  else return 0;
+}
+
+struct audio_sample *
+get_audio_sample (ALLEGRO_SAMPLE_INSTANCE *si)
+{
+  struct audio_sample as;
+  as.instance = si;
+  return bsearch (&as, audio_sample, audio_sample_nmemb, sizeof (as),
+                  compare_samples);
 }
 
 double
-get_sample_position (void)
+get_sample_position (ALLEGRO_SAMPLE_INSTANCE *si)
 {
-  if (! is_playing_sample ()) return INFINITY;
-  return (double) al_get_sample_instance_position (sample_instance) /
-    (double) al_get_sample_instance_frequency (sample_instance);
+  struct audio_sample *as = get_audio_sample (si);
+  if (! as) return INFINITY;
+  else if (! as->played) return 0;
+  else if (! al_get_sample_instance_playing (si)) return INFINITY;
+  else return (double) al_get_sample_instance_position (si) /
+         (double) al_get_sample_instance_frequency (si);
+}
+
+bool
+is_playing_sample (struct ALLEGRO_SAMPLE_INSTANCE *si)
+{
+  if (isfinite (get_sample_position (si))) return true;
+  else return false;
+}
+
+void
+remove_sample (struct audio_sample *s)
+{
+  al_destroy_sample_instance (s->instance);
+  size_t i =  s - audio_sample;
+  remove_from_array (audio_sample, &audio_sample_nmemb, i, 1, sizeof (*s));
+  if (audio_sample_nmemb == 0) audio_sample = NULL;
+}
+
+void
+clear_played_samples (void)
+{
+  size_t i;
+  for (i = 0; i < audio_sample_nmemb; i++) {
+    struct audio_sample *as = &audio_sample[i];
+    if (as->played
+        && ! al_get_sample_instance_playing (as->instance))
+      remove_sample (as);
+  }
+}
+
+void
+stop_all_samples (void)
+{
+  size_t i;
+  for (i = 0; i < audio_sample_nmemb; i++) {
+    struct audio_sample *as = &audio_sample[i];
+    remove_sample (as);
+  }
+}
+
+void
+stop_sample (ALLEGRO_SAMPLE_INSTANCE *si)
+{
+  struct audio_sample *as = get_audio_sample (si);
+  if (! as) return;
+  remove_sample (as);
 }

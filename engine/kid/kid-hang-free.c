@@ -73,7 +73,7 @@ flow (struct anim *kid)
     /* hang back */
   if (kid->i >= 7
       && hang_back && is_hangable_pos (&kid->hang_pos, back_dir)) {
-    sample_hang_on_fall = true;
+    play_sample (hang_on_fall_sample);
     kid_turn (kid);
     return false;
   }

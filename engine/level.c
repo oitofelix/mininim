@@ -45,7 +45,6 @@
 
 /* functions */
 static void draw_level (void);
-static void sample_level (void);
 static void compute_level (void);
 static void process_keys (void);
 void display_remaining_time (void);
@@ -90,7 +89,7 @@ play_level (struct level *lv)
   al_stop_timer (death_timer);
   al_set_timer_count (death_timer, 0);
 
-  play_anim (draw_level, sample_level, compute_level, 12);
+  play_anim (draw_level, compute_level, 12);
 
   switch (quit_anim) {
   case NO_QUIT: break;
@@ -205,19 +204,6 @@ compute_level (void)
   compute_choppers ();
 
   level.special_events ();
-}
-
-static void
-sample_level (void)
-{
-  sample_kid ();
-  sample_loose_floors ();
-  sample_opener_floors ();
-  sample_closer_floors ();
-  sample_spikes_floors ();
-  sample_doors ();
-  sample_level_doors ();
-  sample_choppers ();
 }
 
 static void
@@ -463,13 +449,13 @@ process_keys (void)
 
     int64_t t = al_get_timer_count (death_timer);
 
-    if (t == 12) sample_death = true;
+    if (t == 12) play_sample (death_sample);
 
     if (t >= 60) {
       if (t == 60) key.keyboard.keycode = 0;
       if (t < 240 || t % 12 < 8) {
         if (t >= 252 && t % 12 == 0)
-          sample_press_key = true;
+          play_sample (press_key_sample);
         xasprintf (&text, "Press Button to Continue");
         draw_bottom_text (NULL, text);
         al_free (text);

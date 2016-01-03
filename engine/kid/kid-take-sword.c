@@ -126,7 +126,7 @@ static void
 physics_out (struct anim *kid)
 {
   /* sound */
-  if (kid->i == 0) sample_take_sword = true;
+  if (kid->i == 0) play_sample (take_sword_sample);
 
   /* depressible floors */
   if (kid->i == 3) update_depressible_floor (kid, -4, -23);

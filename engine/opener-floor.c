@@ -54,7 +54,6 @@ ALLEGRO_BITMAP *pv_unpressed_opener_floor_base,
   *pv_unpressed_opener_floor_left, *pv_unpressed_opener_floor_right;
 
 ALLEGRO_SAMPLE *opener_floor_sample;
-bool sample_opener_floor;
 
 struct opener_floor *opener_floor = NULL;
 size_t opener_floor_nmemb = 0;
@@ -212,19 +211,12 @@ compute_opener_floors (void)
     }
     if (o->pressed || o->broken) {
       if (! o->noise) {
-        sample_opener_floor = true;
+        play_sample (opener_floor_sample);
         o->noise = true;
       }
       open_door (o->event);
     } else o->noise = false;
   }
-}
-
-void
-sample_opener_floors (void)
-{
-  if (sample_opener_floor) play_sample (opener_floor_sample);
-  sample_opener_floor = false;
 }
 
 void

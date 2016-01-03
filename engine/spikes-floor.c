@@ -75,7 +75,6 @@ ALLEGRO_BITMAP *pv_spikes_floor_left, *pv_spikes_floor_right,
   *pv_spikes_left_05, *pv_spikes_right_05, *pv_spikes_fg_05;
 
 ALLEGRO_SAMPLE *spikes_sample;
-bool sample_spikes;
 
 struct spikes_floor *spikes_floor = NULL;
 size_t spikes_floor_nmemb = 0;
@@ -424,7 +423,7 @@ compute_spikes_floors (void)
     }
     switch (s->i) {
     case 0: if (should_spikes_raise (&s->p) || s->activate) {
-        sample_spikes = true;
+        play_sample (spikes_sample);
         s->i++;
         s->wait = 12;
         s->state = 1;
@@ -466,13 +465,6 @@ compute_spikes_floors (void)
       }
     }
   }
-}
-
-void
-sample_spikes_floors (void)
-{
-  if (sample_spikes) play_sample (spikes_sample);
-  sample_spikes = false;
 }
 
 bool

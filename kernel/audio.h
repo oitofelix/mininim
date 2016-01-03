@@ -22,17 +22,31 @@
 
 #include <allegro5/allegro_audio.h>
 
+/* types */
+struct audio_sample {
+  ALLEGRO_SAMPLE *sample;
+  ALLEGRO_SAMPLE_INSTANCE *instance;
+  bool played;
+  uint64_t anim_cycle;
+};
+
 /* functions */
 void init_audio (void);
 void finalize_audio (void);
 ALLEGRO_SAMPLE *load_sample (char *filename);
-void play_sample (ALLEGRO_SAMPLE *sample);
-void stop_sample (void);
-bool is_playing_sample (void);
-double get_sample_position (void);
 void enable_audio (bool b);
 void set_mixer_gain (ALLEGRO_MIXER *mixer, float new_gain);
 ALLEGRO_MIXER *get_default_mixer (void);
+ALLEGRO_SAMPLE_INSTANCE *play_sample (ALLEGRO_SAMPLE *sample);
+void play_samples (void);
+int compare_samples (const void *s0, const void *s1);
+struct audio_sample *get_audio_sample (ALLEGRO_SAMPLE_INSTANCE *si);
+double get_sample_position (ALLEGRO_SAMPLE_INSTANCE *si);
+bool is_playing_sample (struct ALLEGRO_SAMPLE_INSTANCE *si);
+void remove_sample (struct audio_sample *s);
+void clear_played_samples (void);
+void stop_sample (ALLEGRO_SAMPLE_INSTANCE *si);
+void stop_all_samples (void);
 
 /* variables */
 extern bool audio_enabled;

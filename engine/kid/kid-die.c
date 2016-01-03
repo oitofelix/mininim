@@ -110,7 +110,7 @@ kid_die_spiked (struct anim *kid)
 
     video_effect.color = get_flicker_blood_color ();
     start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
-    sample_spiked = true;
+    play_sample (spiked_sample);
   }
 
   if (kid->oaction != kid_die_spiked) {

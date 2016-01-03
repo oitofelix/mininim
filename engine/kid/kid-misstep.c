@@ -119,5 +119,5 @@ physics_out (struct anim *kid)
   if (kid->i == 8) shake_loose_floor_row (&pmbo);
 
   /* sound */
-  if (kid->i == 7) sample_step = true;
+  if (kid->i == 7) play_sample (step_sample);
 }

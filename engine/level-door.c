@@ -60,8 +60,6 @@ ALLEGRO_BITMAP *pv_level_door_top_left, *pv_level_door_top_right,
 
 ALLEGRO_SAMPLE *level_door_open_sample, *level_door_close_sample;
 
-bool sample_level_door_open, sample_level_door_close;
-
 struct level_door *level_door = NULL;
 size_t level_door_nmemb = 0;
 
@@ -226,19 +224,19 @@ compute_level_doors (void)
     }
     switch (d->action) {
     case OPEN_LEVEL_DOOR:
-      if (d->i % 5 == 2 && d->i > 2) sample_level_door_open = true;
+      if (d->i % 5 == 2 && d->i > 2) play_sample (level_door_open_sample);
       if (d->i > 0) d->i--;
       else d->action = NO_LEVEL_DOOR_ACTION;
       break;
     case CLOSE_LEVEL_DOOR:
-      if (d->i == 0) sample_level_door_open = true;
+      if (d->i == 0) play_sample (level_door_open_sample);
       if (d->i < LEVEL_DOOR_MAX_STEP) {
         int r = 14 - (d->i % 15);
         d->i += r ? r : 15;
         if (d->i >= LEVEL_DOOR_MAX_STEP) {
           d->i = LEVEL_DOOR_MAX_STEP;
           d->action = NO_LEVEL_DOOR_ACTION;
-          sample_level_door_close = true;
+          play_sample (level_door_close_sample);
         }
       }
       break;
@@ -246,15 +244,6 @@ compute_level_doors (void)
       break;
     }
   }
-}
-
-void
-sample_level_doors (void)
-{
-  if (sample_level_door_open) play_sample (level_door_open_sample);
-  if (sample_level_door_close) play_sample (level_door_close_sample);
-
-  sample_level_door_open = sample_level_door_close = false;
 }
 
 void

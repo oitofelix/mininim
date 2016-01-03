@@ -20,6 +20,8 @@
 #ifndef MININIM_KID_H
 #define MININIM_KID_H
 
+#include "kernel/audio.h"
+
 /* kid actions */
 #include "kid-normal.h"
 #include "kid-walk.h"
@@ -85,7 +87,6 @@
 /* functions */
 void load_kid (void);
 void unload_kid (void);
-void sample_kid (void);
 void draw_kid_lives (ALLEGRO_BITMAP *bitmap, struct anim *kid,
                      enum vm vm);
 void draw_kid_if_at_pos (ALLEGRO_BITMAP *bitmap, struct anim *kid, struct pos *p,
@@ -119,12 +120,12 @@ extern struct anim *kid; /* kid animation object */
 extern size_t kid_nmemb;
 extern struct anim *current_kid;
 
-extern bool sample_step, sample_hit_ground, sample_hit_ground_harm,
-  sample_hit_ground_fatal, sample_hit_wall, sample_hang_on_fall,
-  sample_drink, sample_glory, sample_take_sword, sample_sword_attack,
-  sample_harm, sample_small_life_potion, sample_big_life_potion,
-  sample_action_not_allowed, sample_scream, sample_spiked, sample_chopped,
-  sample_floating, sample_death, sample_press_key, sample_mirror,
-  sample_suspense, sample_success;
+extern ALLEGRO_SAMPLE *step_sample, *hit_ground_sample, *hit_ground_harm_sample,
+  *hit_ground_fatal_sample, *hit_wall_sample, *hang_on_fall_sample,
+  *drink_sample, *glory_sample, *take_sword_sample, *sword_attack_sample,
+  *harm_sample, *action_not_allowed_sample, *small_life_potion_sample,
+  *big_life_potion_sample, *scream_sample, *spiked_sample, *chopped_sample,
+  *floating_sample, *death_sample, *press_key_sample, *mirror_sample,
+  *suspense_sample, *success_sample;
 
 #endif	/* MININIM_KID_H */

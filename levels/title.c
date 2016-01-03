@@ -111,13 +111,14 @@ void
 play_title (void)
 {
   cutscene = true;
-  play_anim (title_anim, NULL, NULL, 8);
+  play_anim (title_anim, NULL, 8);
 }
 
 static void
 title_anim (void)
 {
   static int i;
+  static ALLEGRO_SAMPLE_INSTANCE *si = NULL;
 
   if (! title_started) {
     i = 0; key.keyboard.keycode = 0; title_started = true;
@@ -139,62 +140,62 @@ title_anim (void)
     break;
   case 1:
     if (! is_video_effect_started ()) {
-      play_sample (main_theme);
+      si = play_sample (main_theme);
       i++;
     }
     break;
   case 2:
-    if (get_sample_position () >= 2.2) {
+    if (get_sample_position (si) >= 2.2) {
       draw_bitmap (presents, screen, 96, 106, 0);
       i++;
     }
     break;
   case 3:
-    if (get_sample_position () >= 5.4) {
+    if (get_sample_position (si) >= 5.4) {
       clear_bitmap (screen, BLACK);
       draw_bitmap (main_background, screen, 0, 0, 0);
       i++;
     }
     break;
   case 4:
-    if (get_sample_position () >= 6.8) {
+    if (get_sample_position (si) >= 6.8) {
       draw_bitmap (author, screen, 96, 122, 0);
       i++;
     }
     break;
   case 5:
-    if (get_sample_position () >= 11.0) {
+    if (get_sample_position (si) >= 11.0) {
       clear_bitmap (screen, BLACK);
       draw_bitmap (main_background, screen, 0, 0, 0);
       i++;
     }
     break;
   case 6:
-    if (get_sample_position () >= 15.2) {
+    if (get_sample_position (si) >= 15.2) {
       draw_bitmap (game_name, screen, 24, 107, 0);
       draw_bitmap (copyright, screen, 48, 184, 0);
       i++;
     }
     break;
   case 7:
-    if (! is_playing_sample ()) {
+    if (! is_playing_sample (si)) {
       start_video_effect (VIDEO_ROLL_RIGHT, SECS_TO_VCYCLES (0.5));
       draw_bitmap (text_background, screen, 0, 0, 0);
       draw_pattern (screen, 17, 16, 286, 157, al_map_rgb (16, 0, 97),
                     al_map_rgb (0, 0, 0));
       draw_bitmap (in_the_absence, screen, 24, 25, 0);
-      play_sample (story_1);
+      si = play_sample (story_1);
       i++;
     }
     break;
   case 8:
-    if (get_sample_position () >= 11.0) {
+    if (get_sample_position (si) >= 11.0) {
       start_video_effect (VIDEO_FADE_OUT, SECS_TO_VCYCLES (1));
       i++;
     }
     break;
   case 9:
-    if (! is_video_effect_started () && ! is_playing_sample ()) {
+    if (! is_video_effect_started () && ! is_playing_sample (si)) {
       princess.f.c.x = 142;
       princess.f.c.y = 124;
       princess.f.b = princess_normal_00;
@@ -216,24 +217,24 @@ title_anim (void)
     break;
   case 10:
     if (! is_video_effect_started ()) {
-      play_sample (princess_waiting_3);
+      si = play_sample (princess_waiting_3);
       i++;
     }
     break;
   case 11:
-    if (! is_playing_sample ()) {
-      play_sample (door_gate_opening_1);
+    if (! is_playing_sample (si)) {
+      si = play_sample (door_gate_opening_1);
       i++;
     }
     break;
   case 12:
-    if (! is_playing_sample ()) {
-      play_sample (door_opening);
+    if (! is_playing_sample (si)) {
+      si = play_sample (door_opening);
       i++;
     }
     break;
   case 13:
-    if (! is_playing_sample ()) {
+    if (! is_playing_sample (si)) {
       princess_turn (&princess);
       i++;
     }
@@ -241,14 +242,14 @@ title_anim (void)
   case 14:
     princess.action (&princess);
     if (princess.f.b == princess_normal_00) {
-      play_sample (jaffar_appearing_3);
+      si = play_sample (jaffar_appearing_3);
       jaffar_walk (&jaffar);
       i++;
     }
     break;
   case 15:
     jaffar.action (&jaffar);
-    if (get_sample_position () >= 3.0 && jaffar.f.b == jaffar_normal_00) {
+    if (get_sample_position (si) >= 3.0 && jaffar.f.b == jaffar_normal_00) {
       jaffar.repeat = 5;
       jaffar_walk (&jaffar);
       i++;
@@ -256,7 +257,7 @@ title_anim (void)
     break;
   case 16:
     jaffar.action (&jaffar);
-    if (get_sample_position () >= 12.0 && jaffar.f.b == jaffar_normal_00) {
+    if (get_sample_position (si) >= 12.0 && jaffar.f.b == jaffar_normal_00) {
       jaffar_open_arms (&jaffar);
       i++;
     }
@@ -293,12 +294,12 @@ title_anim (void)
   case 21:
     jaffar.action (&jaffar);
     if (jaffar.f.b == jaffar_normal_00) {
-      play_sample (story_3);
+      si = play_sample (story_3);
       i++;
     }
     break;
   case 22:
-    if (get_sample_position () >= 1.0) {
+    if (get_sample_position (si) >= 1.0) {
       jaffar.repeat = 6;
       jaffar_turn_walk (&jaffar);
       i++;
@@ -306,7 +307,7 @@ title_anim (void)
     break;
   case 23:
     jaffar.action (&jaffar);
-    if (get_sample_position () >= 4.0) {
+    if (get_sample_position (si) >= 4.0) {
       princess_look_down (&princess);
       i++;
     }
@@ -330,7 +331,7 @@ title_anim (void)
     }
     break;
   case 26:
-    if (! is_playing_sample ()) {
+    if (! is_playing_sample (si)) {
       start_video_effect (VIDEO_ROLL_RIGHT, SECS_TO_VCYCLES (0.5));
       draw_bitmap (main_background, screen, 0, 0, 0);
       draw_bitmap (game_name, screen, 24, 107, 0);

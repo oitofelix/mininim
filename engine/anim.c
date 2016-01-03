@@ -21,6 +21,7 @@
 #include "kernel/event.h"
 #include "kernel/timer.h"
 #include "kernel/video.h"
+#include "kernel/audio.h"
 #include "kernel/keyboard.h"
 #include "level.h"
 #include "pos.h"
@@ -35,11 +36,10 @@ enum quit_anim quit_anim;
 bool pause_anim;
 bool cutscene;
 bool next_frame_inv;
-int anim_cycle;
+uint64_t anim_cycle;
 
 void
 play_anim (void (*draw_callback) (void),
-           void (*sample_callback) (void),
            void (*compute_callback) (void),
            int freq)
 {
@@ -73,7 +73,7 @@ play_anim (void (*draw_callback) (void),
                                 ALLEGRO_KEYMOD_ALT, true)) {
           if (compute_callback) compute_callback ();
           draw_callback ();
-          if (sample_callback) sample_callback ();
+          play_samples ();
           anim_cycle++;
         }
         drop_all_events_from_source

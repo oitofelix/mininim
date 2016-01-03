@@ -56,9 +56,6 @@ ALLEGRO_BITMAP *pv_door_left, *pv_door_right, *pv_door_pole, *pv_door_pole_base,
 ALLEGRO_SAMPLE *door_open_sample, *door_close_sample, *door_end_sample,
   *door_abruptly_close_sample;
 
-bool sample_door_open, sample_door_close, sample_door_end,
-  sample_door_abruptly_close;
-
 struct door *door = NULL;
 size_t door_nmemb = 0;
 
@@ -244,14 +241,14 @@ compute_doors (void)
       if (d->i == 0 && d->wait == 0) d->action = CLOSE_DOOR;
       else if (d->i == 0 && d->wait > 0) {
         if (! d->noise) {
-          sample_door_end = true;
+          play_sample (door_end_sample);
           d->noise = true;
         }
 
         d->wait--;
       }
       else if (d->i > 0) {
-        if (d->i % 2 == 0) sample_door_open = true;
+        if (d->i % 2 == 0) play_sample (door_open_sample);
         d->i--;
         d->wait = DOOR_WAIT;
       }
@@ -259,12 +256,12 @@ compute_doors (void)
     case CLOSE_DOOR:
       if (d->i < DOOR_MAX_STEP) {
         if (d->wait++ % 4 == 0) {
-          sample_door_close = true;
+          play_sample (door_close_sample);
           d->i++;
           d->noise = false;
         }
       } else if (d->i == DOOR_MAX_STEP) {
-        sample_door_end = true;
+        play_sample (door_end_sample);
         d->action = NO_DOOR_ACTION;
         d->wait = DOOR_WAIT;
         d->noise = false;
@@ -276,7 +273,7 @@ compute_doors (void)
         d->i += r ? r : 12;
         if (d->i >= DOOR_MAX_STEP) {
           d->i = DOOR_MAX_STEP;
-          sample_door_abruptly_close = true;
+          play_sample (door_abruptly_close_sample);
         }
       } else {
         d->action = NO_DOOR_ACTION;
@@ -288,18 +285,6 @@ compute_doors (void)
       break;
     }
   }
-}
-
-void
-sample_doors (void)
-{
-  if (sample_door_open) play_sample (door_open_sample);
-  if (sample_door_close) play_sample (door_close_sample);
-  if (sample_door_end) play_sample (door_end_sample);
-  if (sample_door_abruptly_close) play_sample (door_abruptly_close_sample);
-
-  sample_door_open = sample_door_close = sample_door_end =
-    sample_door_abruptly_close = false;
 }
 
 void

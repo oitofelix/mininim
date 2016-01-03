@@ -52,14 +52,6 @@ ALLEGRO_SAMPLE *step_sample, *hit_ground_sample, *hit_ground_harm_sample,
   *floating_sample, *death_sample, *press_key_sample, *mirror_sample,
   *suspense_sample, *success_sample;
 
-bool sample_step, sample_hit_ground, sample_hit_ground_harm,
-  sample_hit_ground_fatal, sample_hit_wall, sample_hang_on_fall,
-  sample_drink, sample_glory, sample_take_sword, sample_sword_attack,
-  sample_harm, sample_action_not_allowed, sample_small_life_potion,
-  sample_big_life_potion, sample_scream, sample_spiked, sample_chopped,
-  sample_floating, sample_death, sample_press_key, sample_mirror,
-  sample_suspense, sample_success;
-
 static void place_kid (struct anim *kid, int room, int floor, int place);
 static struct coord *kid_life_coord (int i, struct coord *c);
 static int compare_kids (const void *k0, const void *k1);
@@ -580,47 +572,6 @@ place_kid (struct anim *kid, int room, int floor, int place)
 
 
 void
-sample_kid (void)
-{
-  if (sample_step) play_sample (step_sample);
-  if (sample_hit_ground) play_sample (hit_ground_sample);
-  if (sample_hit_ground_harm) play_sample (hit_ground_harm_sample);
-  if (sample_hit_ground_fatal) play_sample (hit_ground_fatal_sample);
-  if (sample_hit_wall) play_sample (hit_wall_sample);
-  if (sample_hang_on_fall) play_sample (hang_on_fall_sample);
-  if (sample_drink) play_sample (drink_sample);
-  if (sample_glory) play_sample (glory_sample);
-  if (sample_take_sword) play_sample (take_sword_sample);
-  if (sample_sword_attack) play_sample (sword_attack_sample);
-  if (sample_harm) play_sample (harm_sample);
-  if (sample_action_not_allowed)
-    play_sample (action_not_allowed_sample);
-  if (sample_small_life_potion)
-    play_sample (small_life_potion_sample);
-  if (sample_big_life_potion)
-    play_sample (big_life_potion_sample);
-  if (sample_scream) play_sample (scream_sample);
-  if (sample_spiked) play_sample (spiked_sample);
-  if (sample_chopped) play_sample (chopped_sample);
-  if (sample_floating) play_sample (floating_sample);
-  if (sample_death) play_sample (death_sample);
-  if (sample_press_key) play_sample (press_key_sample);
-  if (sample_mirror) play_sample (mirror_sample);
-  if (sample_suspense) play_sample (suspense_sample);
-  if (sample_success) play_sample (success_sample);
-
-  sample_step = sample_hit_ground = sample_hit_ground_harm =
-    sample_hit_ground_fatal = sample_hit_wall =
-    sample_hang_on_fall = sample_drink = sample_glory =
-    sample_take_sword = sample_sword_attack = sample_harm =
-    sample_action_not_allowed = sample_small_life_potion =
-    sample_big_life_potion = sample_scream = sample_spiked =
-    sample_chopped = sample_floating = sample_death =
-    sample_press_key = sample_mirror = sample_suspense =
-    sample_success = false;
-}
-
-void
 draw_kid_lives (ALLEGRO_BITMAP *bitmap, struct anim *kid,
                 enum vm vm)
 {
@@ -687,7 +638,7 @@ increase_kid_current_lives (struct anim *k)
 {
   if (k->current_lives < k->total_lives) {
     k->current_lives++;
-    sample_small_life_potion = true;
+    play_sample (small_life_potion_sample);
     video_effect.color = get_flicker_blood_color ();
     start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.3));
   }
@@ -699,7 +650,7 @@ increase_kid_total_lives (struct anim *k)
   if (k->total_lives < 10) {
     k->total_lives++;
     k->current_lives = k->total_lives;
-    sample_big_life_potion = true;
+    play_sample (big_life_potion_sample);
     video_effect.color = get_flicker_blood_color ();
     start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.3));
   }
@@ -710,7 +661,7 @@ float_kid (struct anim *k)
 {
   al_set_timer_count (k->floating, 0);
   al_start_timer (k->floating);
-  sample_floating = true;
+  play_sample (floating_sample);
   video_effect.color = get_flicker_float_color ();
   start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.3));
 }

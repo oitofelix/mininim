@@ -29,7 +29,6 @@ enum quit_anim {
 
 /* functions */
 void play_anim (void (*draw_callback) (void),
-                void (*sample_callback) (void),
                 void (*compute_callback) (void),
                 int freq);
 void draw_frame (ALLEGRO_BITMAP *bitmap, struct frame *f);
@@ -49,7 +48,7 @@ bool wait_anim (int cycles);
 extern enum quit_anim quit_anim; /* set to true to quit animation */
 extern bool next_frame_inv; /* invert draw_anim offset interpretation  */
 extern bool cutscene; /* don't apply physics if set */
-extern int anim_cycle;
+extern uint64_t anim_cycle;
 
 /* macros */
 #define SCRIPT_HZ 12

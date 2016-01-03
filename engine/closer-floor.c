@@ -53,7 +53,6 @@ ALLEGRO_BITMAP *pv_unpressed_closer_floor_base, *pv_pressed_closer_floor_base,
   *pv_pressed_closer_floor_right;
 
 ALLEGRO_SAMPLE *closer_floor_sample;
-bool sample_closer_floor;
 
 struct closer_floor *closer_floor = NULL;
 size_t closer_floor_nmemb = 0;
@@ -212,19 +211,12 @@ compute_closer_floors (void)
     }
     if (c->pressed) {
       if (! c->noise) {
-        sample_closer_floor = true;
+        play_sample (closer_floor_sample);
         c->noise = true;
       }
       close_door (c->event);
     } else c->noise = false;
   }
-}
-
-void
-sample_closer_floors (void)
-{
-  if (sample_closer_floor) play_sample (closer_floor_sample);
-  sample_closer_floor = false;
 }
 
 void

@@ -77,8 +77,6 @@ ALLEGRO_BITMAP *chopper_blood_01, *chopper_blood_02,
 
 ALLEGRO_SAMPLE *chopper_sample;
 
-bool sample_chopper;
-
 struct chopper *chopper = NULL;
 size_t chopper_nmemb = 0;
 
@@ -379,7 +377,7 @@ compute_choppers (void)
            && (anim_cycle % CHOPPER_WAIT) ==
            prandom_pos (&c->p, CHOPPER_WAIT - 1))
           || c->activate) c->i++; break;
-    case 1: c->i++; sample_chopper = true; break;
+    case 1: c->i++; play_sample (chopper_sample); break;
     case 2: c->i++; break;
     case 3: c->i++; break;
     case 4: c->i = 0; c->wait = CHOPPER_WAIT; c->activate = false;
@@ -414,18 +412,11 @@ compute_choppers (void)
         k->p = c->p;
         video_effect.color = get_flicker_blood_color ();
         start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
-        sample_chopped = true;
+        play_sample (chopped_sample);
         kid_die_chopped (k);
       }
     }
   }
-}
-
-void
-sample_choppers (void)
-{
-  if (sample_chopper) play_sample (chopper_sample);
-  sample_chopper = false;
 }
 
 void
