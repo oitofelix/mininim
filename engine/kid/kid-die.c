@@ -99,7 +99,19 @@ kid_die_spiked (struct anim *kid)
   kid->action = kid_die_spiked;
   kid->f.flip = (kid->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  kid->current_lives = 0;
+  if (kid->oaction != kid_die_spiked) {
+    kid->current_lives = 0;
+    kid->splash = true;
+
+    struct spikes_floor *s = spikes_floor_at_pos (&kid->p);
+    s->state = 5;
+    s->inactive = true;
+    s->murdered_kid = kid->id;
+
+    video_effect.color = get_flicker_blood_color ();
+    start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
+    sample_spiked = true;
+  }
 
   if (kid->oaction != kid_die_spiked) {
     place_frame (&kid->f, &kid->f, kid_die_spiked_00,

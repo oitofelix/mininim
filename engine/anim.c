@@ -60,7 +60,6 @@ play_anim (void (*draw_callback) (void),
     switch (event.type) {
     case ALLEGRO_EVENT_TIMER:
       if (event.timer.source == timer) {
-        get_keyboard_state ();
         if (was_key_pressed (ALLEGRO_KEY_ESCAPE, 0, ALLEGRO_KEYMOD_ALT, false))
           pause_anim = true;
         if (was_key_pressed (ALLEGRO_KEY_ESCAPE, 0, ALLEGRO_KEYMOD_CTRL, true))

@@ -26,6 +26,7 @@
 #include "engine/potion.h"
 #include "engine/sword.h"
 #include "engine/loose-floor.h"
+#include "engine/level.h"
 #include "kid.h"
 
 struct frameset kid_stairs_frameset[KID_STAIRS_FRAMESET_NMEMB];
@@ -116,8 +117,9 @@ flow (struct anim *kid)
     kid->i = kid->j = -1;
   }
 
-  if (kid->i == 11 && kid->j == 17) quit_anim = NEXT_LEVEL;
-  else if (kid->i >= 11 && kid->j < 17) {
+  if (kid->i == 11) level.end ();
+
+  if (kid->i >= 11 && kid->j < 17) {
     kid->invisible = true;
     kid->j++;
   } else if (kid->i < 11) kid->j = kid->i + 1;

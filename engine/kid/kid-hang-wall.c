@@ -63,24 +63,22 @@ flow (struct anim *kid)
   if (kid->oaction != kid_hang_wall)
     kid->i = 3, kid->wait = 0, kid->reverse = false;
 
-  bool hang_back = ((kid->f.dir == LEFT) ? right_key : left_key)
-    && ! up_key && shift_key;
+  bool hang_back = ((kid->f.dir == LEFT) ? kid->key.right : kid->key.left)
+    && ! kid->key.up && kid->key.shift;
 
   int back_dir = (kid->f.dir == LEFT) ? RIGHT : LEFT;
 
   /* hang back */
   if (kid->i == 4 && kid->reverse
-      && hang_back && is_hangable_pos (&kid->hang_pos, back_dir)
-      && kid == current_kid) {
+      && hang_back && is_hangable_pos (&kid->hang_pos, back_dir)) {
     sample_hang_on_fall = true;
     kid_turn (kid);
     return false;
   }
 
-  if ((! shift_key && (kid->reverse || kid->i > 3))
+  if ((! kid->key.shift && (kid->reverse || kid->i > 3))
       || kid->hang_limit
-      || get_hanged_con (&kid->hang_pos, kid->f.dir) == NO_FLOOR
-      || kid != current_kid) {
+      || get_hanged_con (&kid->hang_pos, kid->f.dir) == NO_FLOOR) {
     if (is_strictly_traversable (&kid->hang_pos)) {
       place_frame (&kid->f, &kid->f, kid_fall_frameset[0].frame,
                    &kid->hang_pos,
@@ -96,8 +94,8 @@ flow (struct anim *kid)
     kid_vjump (kid);
     kid->hang_limit = false;
     return false;
-  } if (up_key && ! left_key && ! right_key
-        && ! kid->hang_limit && kid == current_kid) {
+  } if (kid->key.up && ! kid->key.left && ! kid->key.right
+        && ! kid->hang_limit) {
     kid_climb (kid);
     return false;
   }
@@ -141,7 +139,7 @@ physics_out (struct anim *kid)
   press_depressible_floor (&hanged_pos);
 
   /* sound */
-  if (! kid->reverse && kid->i == 4 && shift_key && ! up_key
-      && ! kid->hang_limit && kid == current_kid)
+  if (! kid->reverse && kid->i == 4 && kid->key.shift && ! kid->key.up
+      && ! kid->hang_limit)
     sample_hit_wall = true;
 }

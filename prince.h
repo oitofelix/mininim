@@ -21,6 +21,7 @@
 #define MININIM_PRINCE_H
 
 #include <allegro5/allegro.h>
+#include "kernel/keyboard.h"
 
 #define ROOMS 25
 #define FLOORS 3
@@ -229,6 +230,7 @@ enum carpet_design {
 struct level {
   void (*start) (void);
   void (*special_events) (void);
+  void (*end) (void);
   void (*next_level) (int, struct pos *);
   int number;
   int nominal_number;
@@ -333,6 +335,8 @@ struct anim {
     enum confg t;
     struct pos p;
   } ci;
+
+  struct keyboard_state key;
 
   ACTION oaction;
   ACTION action;

@@ -184,7 +184,9 @@ compute_level (void)
 
   compute_loose_floors ();
 
+  get_keyboard_state (&current_kid->key);
   for (i = 0; i < kid_nmemb; i++) kid[i].action (&kid[i]);
+  clear_kids_keyboard_state ();
 
   if (current_kid->f.c.room != prev_room
       && current_kid->f.c.room != 0)  {

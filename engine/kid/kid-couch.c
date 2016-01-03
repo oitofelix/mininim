@@ -196,19 +196,17 @@ flow (struct anim *kid)
   }
 
  no_item:
-  if (kid->i == 2 && down_key
+  if (kid->i == 2 && kid->key.down
       && kid->cinertia == 0
       && kid->wait-- <= 0
-      && ((kid->f.dir == LEFT && left_key)
-          || (kid->f.dir == RIGHT && right_key))
-      && kid == current_kid) {
+      && ((kid->f.dir == LEFT && kid->key.left)
+          || (kid->f.dir == RIGHT && kid->key.right))) {
     kid->i = 0;
     select_frame (kid, kid_couch_frameset, 0);
     return true;
   }
 
-  if (kid->i != 2 || (! down_key && kid->wait-- <= 0)
-      || (kid != current_kid && kid->wait-- <= 0))
+  if (kid->i != 2 || (! kid->key.down && kid->wait-- <= 0))
     kid->i++;
 
   if (kid->i == 1 && kid->wait > 0 &&

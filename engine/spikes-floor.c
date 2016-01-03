@@ -461,15 +461,7 @@ compute_spikes_floors (void)
                   && ! al_get_timer_started (k->floating))
               || is_kid_jump_landing (&k->f)
               || is_kid_run_jump_landing (&k->f))) {
-        s->inactive = true;
-        s->murdered_kid = k->id;
-        s->state = 5;
-        k->splash = true;
-        k->current_lives = 0;
         k->p = s->p;
-        video_effect.color = get_flicker_blood_color ();
-        start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
-        sample_spiked = true;
         kid_die_spiked (k);
       }
     }

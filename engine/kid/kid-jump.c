@@ -127,19 +127,18 @@ flow (struct anim *kid)
   if (kid->oaction != kid_jump)
     kid->i = -1, kid->misstep = kid->hang = false;
 
-  bool hang_front = ((kid->f.dir == LEFT) ? left_key : right_key)
-    && ! up_key && shift_key;
+  bool hang_front = ((kid->f.dir == LEFT) ? kid->key.left : kid->key.right)
+    && ! kid->key.up && kid->key.shift;
 
-  bool hang_back = ((kid->f.dir == LEFT) ? right_key : left_key)
-    && ! up_key && shift_key;
+  bool hang_back = ((kid->f.dir == LEFT) ? kid->key.right : kid->key.left)
+    && ! kid->key.up && kid->key.shift;
 
   int back_dir = (kid->f.dir == LEFT) ? RIGHT : LEFT;
 
   /* hang front */
   survey (_m, pos, &kid->f, &nc, &pm, &np);
   if (kid->i >= 8 && kid->i <= 10
-      && hang_front && is_hangable_pos (&pm, kid->f.dir)
-      && kid == current_kid) {
+      && hang_front && is_hangable_pos (&pm, kid->f.dir)) {
     kid->hang_pos = pm;
     pos2room (&kid->hang_pos, kid->f.c.room, &kid->hang_pos);
     kid->hang = true;
@@ -151,8 +150,7 @@ flow (struct anim *kid)
   /* hang back */
   survey (_tf, pos, &kid->f, &nc, &ptf, &np);
   if (kid->i >= 8 && kid->i <= 10
-      && hang_back && is_hangable_pos (&ptf, back_dir)
-      && kid == current_kid) {
+      && hang_back && is_hangable_pos (&ptf, back_dir)) {
     kid->hang_pos = ptf;
     pos2room (&kid->hang_pos, kid->f.c.room, &kid->hang_pos);
     kid->hang = true;

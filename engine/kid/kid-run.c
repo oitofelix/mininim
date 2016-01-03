@@ -98,24 +98,22 @@ flow (struct anim *kid)
 {
   if (kid->oaction != kid_run) kid->i = -1;
 
-  bool stop = ! ((kid->f.dir == RIGHT) ? right_key : left_key);
-  bool couch = down_key;
-  bool jump = ((kid->f.dir == RIGHT) && right_key && up_key)
-    || ((kid->f.dir == LEFT) && left_key && up_key);
+  bool stop = ! ((kid->f.dir == RIGHT) ? kid->key.right : kid->key.left);
+  bool couch = kid->key.down;
+  bool jump = ((kid->f.dir == RIGHT) && kid->key.right && kid->key.up)
+    || ((kid->f.dir == LEFT) && kid->key.left && kid->key.up);
 
-  if (couch && kid == current_kid) {
+  if (couch) {
     kid_couch (kid);
     return false;
   }
 
-  if (jump && kid->f.b != kid_run_jump_frameset[10].frame
-      && kid == current_kid) {
+  if (jump && kid->f.b != kid_run_jump_frameset[10].frame) {
     kid_run_jump (kid);
     return false;
   }
 
-  if ((stop && kid->f.b != kid_run_jump_frameset[10].frame)
-      || kid != current_kid) {
+  if ((stop && kid->f.b != kid_run_jump_frameset[10].frame)) {
     kid_stop_run (kid);
     return false;
   }

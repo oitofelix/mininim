@@ -111,10 +111,10 @@ physics_in (struct anim *kid)
   struct frame nf;
   struct frame_offset fo;
 
-  bool hang_back = ((kid->f.dir == LEFT) ? right_key : left_key)
-    && ! up_key && shift_key;
+  bool hang_back = ((kid->f.dir == LEFT) ? kid->key.right : kid->key.left)
+    && ! kid->key.up && kid->key.shift;
 
-  bool hang_front = shift_key && ! hang_back;
+  bool hang_front = kid->key.shift && ! hang_back;
 
   int dir = (kid->f.dir == LEFT) ? -1 : +1;
 
@@ -185,8 +185,7 @@ physics_in (struct anim *kid)
 
   /* hang front */
   if (kid->i > 2 && can_hang (&kid->f, false, &kid->hang_pos)
-      && hang_front && ! kid->hang_limit
-      && kid == current_kid) {
+      && hang_front && ! kid->hang_limit) {
     kid->hit_by_loose_floor = false;
     sample_hang_on_fall = true;
     kid_hang (kid);
@@ -195,8 +194,7 @@ physics_in (struct anim *kid)
 
   /* hang back */
   if (kid->i > 2 && can_hang (&kid->f, true, &kid->hang_pos)
-      && hang_back && ! kid->hang_limit
-      && kid == current_kid) {
+      && hang_back && ! kid->hang_limit) {
     kid->hit_by_loose_floor = false;
     sample_hang_on_fall = true;
     kid_turn (kid);
@@ -256,7 +254,8 @@ physics_in (struct anim *kid)
     survey (_mt, pos, &kid->f, &nc, &pmt, &np);
     if (kid->current_lives <= 0) {
       kid->p = pmt;
-      kid_die_suddenly (kid);
+      if (con (&pmt)->fg == SPIKES_FLOOR) kid_die_spiked (kid);
+      else kid_die_suddenly (kid);
     }
     else kid_couch (kid);
 

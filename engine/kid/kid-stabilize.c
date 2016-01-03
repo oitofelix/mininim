@@ -118,19 +118,19 @@ flow (struct anim *kid)
   }
 
   if (! kid->turn)
-    kid->turn = ((kid->f.dir == RIGHT) && left_key)
-      || ((kid->f.dir == LEFT) && right_key);
-  bool run = (((kid->f.dir == RIGHT) && right_key)
-              || ((kid->f.dir == LEFT) && left_key))
-    && ! shift_key;
-  bool jump = ((kid->f.dir == RIGHT) && right_key && up_key)
-    || ((kid->f.dir == LEFT) && left_key && up_key);
-  bool couch = down_key;
+    kid->turn = ((kid->f.dir == RIGHT) && kid->key.left)
+      || ((kid->f.dir == LEFT) && kid->key.right);
+  bool run = (((kid->f.dir == RIGHT) && kid->key.right)
+              || ((kid->f.dir == LEFT) && kid->key.left))
+    && ! kid->key.shift;
+  bool jump = ((kid->f.dir == RIGHT) && kid->key.right && kid->key.up)
+    || ((kid->f.dir == LEFT) && kid->key.left && kid->key.up);
+  bool couch = kid->key.down;
 
   int dc = dist_collision (&kid->f, false, &kid->ci);
   int df = dist_fall (&kid->f, false);
 
-  if (kid->i >= 0 && ! kid->collision && kid == current_kid) {
+  if (kid->i >= 0 && ! kid->collision) {
     if (couch) {
       kid_couch (kid);
       return false;

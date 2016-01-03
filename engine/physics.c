@@ -51,8 +51,23 @@ crel (struct pos *p, int floor, int place)
 bool
 is_frame_visible (struct frame *f)
 {
-  struct coord c; nframe (f, &c);
-  return c.room == room_view;
+  struct coord tl, tr, bl, br;
+
+  struct frame nf;
+  nf = *f;
+
+  frame2room (&nf, room_view, &nf.c);
+
+  _tl (&nf, &tl);
+  _tr (&nf, &tr);
+  _bl (&nf, &bl);
+  _br (&nf, &br);
+
+  if (tl.x >= ORIGINAL_WIDTH || tl.y >= ORIGINAL_HEIGHT
+      || tr.x < 0 || tr.y >= ORIGINAL_HEIGHT
+      || bl.x >= ORIGINAL_WIDTH || bl.y < 0
+      || br.x < 0 || br.y < 0) return false;
+  else return true;
 }
 
 bool

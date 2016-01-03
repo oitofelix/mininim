@@ -80,6 +80,7 @@
 #define PRESS_KEY_SAMPLE "dat/digisnd1/press-key.ogg"
 #define MIRROR_SAMPLE "dat/digisnd2/mirror.ogg"
 #define SUSPENSE_SAMPLE "dat/midisnd1/suspense.ogg"
+#define SUCCESS_SAMPLE "dat/midisnd1/success.ogg"
 
 /* functions */
 void load_kid (void);
@@ -93,6 +94,7 @@ int create_kid (struct anim *k);
 void destroy_kid (struct anim *k);
 void destroy_kids (void);
 struct anim *get_kid_by_id (int id);
+void clear_kids_keyboard_state (void);
 void draw_kids (ALLEGRO_BITMAP *bitmap, enum em em, enum vm vm);
 void draw_kid_frame (ALLEGRO_BITMAP *bitmap, struct anim *k,
                      enum vm);
@@ -123,6 +125,6 @@ extern bool sample_step, sample_hit_ground, sample_hit_ground_harm,
   sample_harm, sample_small_life_potion, sample_big_life_potion,
   sample_action_not_allowed, sample_scream, sample_spiked, sample_chopped,
   sample_floating, sample_death, sample_press_key, sample_mirror,
-  sample_suspense;
+  sample_suspense, sample_success;
 
 #endif	/* MININIM_KID_H */

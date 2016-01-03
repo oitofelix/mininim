@@ -26,11 +26,6 @@ ALLEGRO_KEYBOARD_STATE keyboard_state;
 
 ALLEGRO_EVENT key; /* last key pressed */
 
-/* real time keys */
-bool up_key, down_key, left_key, right_key, shift_key, ctrl_key, esc_key,
-  pause_key, enter_key, a_key, w_key, d_key, s_key, h_key, j_key,
-  u_key, n_key, c_key, delete_key, page_down_key;
-
 void
 init_keyboard (void)
 {
@@ -53,32 +48,18 @@ get_keyboard_event_source (void)
   return event_source;
 }
 
-void
-get_keyboard_state (void)
+struct keyboard_state *
+get_keyboard_state (struct keyboard_state *k)
 {
   al_get_keyboard_state (&keyboard_state);
-  up_key = al_key_down (&keyboard_state, ALLEGRO_KEY_UP);
-  down_key = al_key_down (&keyboard_state, ALLEGRO_KEY_DOWN);
-  left_key = al_key_down (&keyboard_state, ALLEGRO_KEY_LEFT);
-  right_key = al_key_down (&keyboard_state, ALLEGRO_KEY_RIGHT);
-  shift_key = al_key_down (&keyboard_state, ALLEGRO_KEY_LSHIFT)
+  k->up = al_key_down (&keyboard_state, ALLEGRO_KEY_UP);
+  k->down = al_key_down (&keyboard_state, ALLEGRO_KEY_DOWN);
+  k->left = al_key_down (&keyboard_state, ALLEGRO_KEY_LEFT);
+  k->right = al_key_down (&keyboard_state, ALLEGRO_KEY_RIGHT);
+  k->shift = al_key_down (&keyboard_state, ALLEGRO_KEY_LSHIFT)
     || al_key_down (&keyboard_state, ALLEGRO_KEY_RSHIFT);
-  ctrl_key = al_key_down (&keyboard_state, ALLEGRO_KEY_LCTRL)
-    || al_key_down (&keyboard_state, ALLEGRO_KEY_RCTRL);
-  esc_key = al_key_down (&keyboard_state, ALLEGRO_KEY_ESCAPE);
-  pause_key = al_key_down (&keyboard_state, ALLEGRO_KEY_PAUSE);
-  enter_key = al_key_down (&keyboard_state, ALLEGRO_KEY_ENTER);
-  a_key = al_key_down (&keyboard_state, ALLEGRO_KEY_A);
-  w_key = al_key_down (&keyboard_state, ALLEGRO_KEY_W);
-  d_key = al_key_down (&keyboard_state, ALLEGRO_KEY_D);
-  s_key = al_key_down (&keyboard_state, ALLEGRO_KEY_S);
-  h_key = al_key_down (&keyboard_state, ALLEGRO_KEY_H);
-  j_key = al_key_down (&keyboard_state, ALLEGRO_KEY_J);
-  u_key = al_key_down (&keyboard_state, ALLEGRO_KEY_U);
-  n_key = al_key_down (&keyboard_state, ALLEGRO_KEY_N);
-  c_key = al_key_down (&keyboard_state, ALLEGRO_KEY_C);
-  delete_key = al_key_down (&keyboard_state, ALLEGRO_KEY_DELETE);
-  page_down_key = al_key_down (&keyboard_state, ALLEGRO_KEY_PGDN);
+  k->enter = al_key_down (&keyboard_state, ALLEGRO_KEY_ENTER);
+  return k;
 }
 
 bool

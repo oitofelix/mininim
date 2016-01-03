@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <time.h>
 #include "kernel/video.h"
+#include "kernel/audio.h"
 #include "kernel/random.h"
 #include "kernel/array.h"
 #include "kernel/xerror.h"
@@ -35,6 +36,7 @@
 static struct level legacy_level;
 static int level_3_checkpoint;
 static int shadow_id;
+static bool played_end_sample;
 
 static struct con room_0[FLOORS][PLACES] =
   {{{WALL}, {WALL}, {WALL}, {WALL}, {WALL},
@@ -69,8 +71,10 @@ static enum ltile get_tile (struct pos *p);
 static enum lgroup get_group (enum ltile t);
 
 static void next_level (int lv, struct pos *exit_door_pos);
+static void load_legacy_level (int number);
 static void start (void);
 static void special_events (void);
+static void end (void);
 
 void
 play_legacy_level (void)
@@ -82,6 +86,8 @@ play_legacy_level (void)
 static void
 start (void)
 {
+  played_end_sample = false;
+
   /* create kid */
   int id = create_kid (NULL);
   struct anim *k = &kid[id];
@@ -125,7 +131,7 @@ start (void)
     struct pos p = {5,0,2};
     activate_con (&p);
     /* if it's the first try make kid wait before uncouching */
-    if (retry_level != 1) kid->uncouch_slowly = true;
+    if (retry_level != 1) k->uncouch_slowly = true;
   }
 
   /* in the third level */
@@ -147,19 +153,19 @@ start (void)
 
   /* in the fourth level */
   if (level.number == 4) {
+   shadow_id = -1;
 
-    shadow_id = -1;
-
-  /* tmp */
-    /* struct pos p = {4,1,6}; */
-    /* place_frame (&k->f, &k->f, kid_normal_00, &p, */
-    /*              k->f.dir == LEFT ? +22 : +31, +15); */
+  /* struct pos p = {4,1,6}; */
+  /* place_frame (&k->f, &k->f, kid_normal_00, &p, */
+  /*              k->f.dir == LEFT ? +22 : +31, +15); */
   }
 }
 
 static void
 special_events (void)
 {
+  struct pos np, p, pm;
+  struct coord nc;
   struct anim *k = current_kid;
 
   /* in the first animation cycle */
@@ -182,25 +188,32 @@ special_events (void)
 
   /* level 3 checkpoint */
   if (level.number == 3) {
-    struct coord nc;
-    struct pos p = {2,0,8}, pm, np;
-    survey (_m, pos, &kid->f, &nc, &pm, &np);
+    p = (struct pos) {2,0,8};
+    survey (_m, pos, &k->f, &nc, &pm, &np);
     if (peq (&pm, &p)) level_3_checkpoint = true;
   }
 
+  /* in the fourth level */
   if (level.number == 4) {
       struct pos pld = {24,1,3};
       struct pos pmirror = {4,0,4};
       struct level_door *ld = level_door_at_pos (&pld);
-      if (ld->i == 1) {
+
+      /* if the level door is open and the camera is on room 4, make
+         the mirror appear */
+      if (ld->i == 0
+          && room_view == 4
+          && con (&pmirror)->fg != MIRROR) {
         con (&pmirror)->fg = MIRROR;
         register_mirror (&pmirror);
         sample_suspense = true;
       }
 
+      /* if the kid is crossing the mirror, make his shadow appear */
       if (con (&pmirror)->fg == MIRROR) {
         struct mirror *m = mirror_at_pos (&pmirror);
         if (m->kid_crossing == k->id) {
+          k->current_lives = 1;
           int id = create_kid (k);
           kid[id].shadow = true;
           kid[id].f.dir = (kid[id].f.dir == LEFT) ? RIGHT : LEFT;
@@ -209,18 +222,45 @@ special_events (void)
         }
       }
 
-      /* if (shadow_id != -1) { */
-      /*   struct anim *ks = &kid[shadow_id]; */
-      /*   ks->right_key = true; */
-      /* } */
+      /* make the kid's shadow run to the right until it disappears
+         from view */
+      if (shadow_id != -1) {
+        struct anim *ks = &kid[shadow_id];
+        p = (struct pos) {11,0,2};
+        survey (_m, pos, &ks->f, &nc, &pm, &np);
+        if (! peq (&pm, &p)) ks->key.right = true;
+        else {
+          destroy_kid (ks);
+          shadow_id = -1;
+        }
+      }
   }
+}
+
+static void
+end (void)
+{
+  if (! played_end_sample) {
+    switch (level.number) {
+    case 1: case 2: sample_success = true; break;
+    default: break;
+    }
+    played_end_sample = true;
+  }
+
+  if (! is_playing_sample ()) quit_anim = NEXT_LEVEL;
 }
 
 static void
 next_level (int number, struct pos *exit_door_pos)
 {
   if (number > 14) number = 1;
+  load_legacy_level (number);
+}
 
+static void
+load_legacy_level (int number)
+{
   char *lvfn;
   xasprintf (&lvfn, "data/legacy-levels/%02d", number);
 
@@ -242,6 +282,7 @@ next_level (int number, struct pos *exit_door_pos)
   else legacy_level.nominal_number = number;
   legacy_level.start = start;
   legacy_level.special_events = special_events;
+  legacy_level.end = end;
   legacy_level.next_level = next_level;
   memcpy (&legacy_level.con[0], &room_0, sizeof (room_0));
 

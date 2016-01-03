@@ -50,7 +50,7 @@ ALLEGRO_SAMPLE *step_sample, *hit_ground_sample, *hit_ground_harm_sample,
   *harm_sample, *action_not_allowed_sample, *small_life_potion_sample,
   *big_life_potion_sample, *scream_sample, *spiked_sample, *chopped_sample,
   *floating_sample, *death_sample, *press_key_sample, *mirror_sample,
-  *suspense_sample;
+  *suspense_sample, *success_sample;
 
 bool sample_step, sample_hit_ground, sample_hit_ground_harm,
   sample_hit_ground_fatal, sample_hit_wall, sample_hang_on_fall,
@@ -58,7 +58,7 @@ bool sample_step, sample_hit_ground, sample_hit_ground_harm,
   sample_harm, sample_action_not_allowed, sample_small_life_potion,
   sample_big_life_potion, sample_scream, sample_spiked, sample_chopped,
   sample_floating, sample_death, sample_press_key, sample_mirror,
-  sample_suspense;
+  sample_suspense, sample_success;
 
 static void place_kid (struct anim *kid, int room, int floor, int place);
 static struct coord *kid_life_coord (int i, struct coord *c);
@@ -128,6 +128,7 @@ load_kid (void)
   press_key_sample = load_sample (PRESS_KEY_SAMPLE);
   mirror_sample = load_sample (MIRROR_SAMPLE);
   suspense_sample = load_sample (SUSPENSE_SAMPLE);
+  success_sample = load_sample (SUCCESS_SAMPLE);
 }
 
 void
@@ -192,6 +193,7 @@ unload_kid (void)
   al_destroy_sample (press_key_sample);
   al_destroy_sample (mirror_sample);
   al_destroy_sample (suspense_sample);
+  al_destroy_sample (success_sample);
 }
 
 int
@@ -257,6 +259,14 @@ destroy_kids (void)
   for (i = 0; i < kid_nmemb; i++) destroy_kid (&kid[i]);
   kid = NULL;
   kid_nmemb = 0;
+}
+
+void
+clear_kids_keyboard_state (void)
+{
+  int i;
+  for (i = 0; i < kid_nmemb; i++)
+    memset (&kid[i].key, 0, sizeof (kid[i].key));
 }
 
 struct anim *
@@ -597,6 +607,7 @@ sample_kid (void)
   if (sample_press_key) play_sample (press_key_sample);
   if (sample_mirror) play_sample (mirror_sample);
   if (sample_suspense) play_sample (suspense_sample);
+  if (sample_success) play_sample (success_sample);
 
   sample_step = sample_hit_ground = sample_hit_ground_harm =
     sample_hit_ground_fatal = sample_hit_wall =
@@ -605,7 +616,8 @@ sample_kid (void)
     sample_action_not_allowed = sample_small_life_potion =
     sample_big_life_potion = sample_scream = sample_spiked =
     sample_chopped = sample_floating = sample_death =
-    sample_press_key = sample_mirror = sample_suspense = false;
+    sample_press_key = sample_mirror = sample_suspense =
+    sample_success = false;
 }
 
 void
@@ -760,8 +772,8 @@ kid_debug (void)
 
     struct coord bf; struct pos pbf, npbf;
     survey (_bf, pos, &current_kid->f, &bf, &pbf, &npbf);
-    if (delete_key) current_kid->f.c.x--;
-    if (page_down_key) current_kid->f.c.x++;
+    if (was_key_pressed (ALLEGRO_KEY_DELETE, 0, 0, true)) current_kid->f.c.x--;
+    if (was_key_pressed (ALLEGRO_KEY_PGDN, 0, 0, true)) current_kid->f.c.x++;
     int dn = dist_next_place (&current_kid->f, _bf, pos, 0, false);
     int dp = dist_next_place (&current_kid->f, _bf, pos, 0, true);
     int dc = dist_collision (&current_kid->f, false, &kid->ci) + 4;
@@ -769,7 +781,7 @@ kid_debug (void)
     int dl = dist_con (&current_kid->f, _bf, pos, -4, false, LOOSE_FLOOR);
     int dcl = dist_con (&current_kid->f, _bf, pos, -4, false, CLOSER_FLOOR);
     int dch = dist_chopper (&current_kid->f, false);
-    if (delete_key || page_down_key || enter_key)
+    if (was_key_pressed (ALLEGRO_KEY_F1, 0, 0, true))
       printf ("\
 f = %i, p = %i, dn = %i, dp = %i, dc = %i, df = %i, dl = %i, dcl = %i, dch = %i\n",
               pbf.floor, pbf.place, dn, dp, dc, df, dl, dcl, dch);

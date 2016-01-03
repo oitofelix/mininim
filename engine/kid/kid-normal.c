@@ -68,22 +68,22 @@ flow (struct anim *k)
   struct pos np, pbf, pmt;
   survey (_bf, pos, &k->f, &nc, &pbf, &np);
 
-  bool turn = ((k->f.dir == RIGHT) && left_key)
-    || ((k->f.dir == LEFT) && right_key);
-  bool walk = ((k->f.dir == RIGHT) && right_key && shift_key)
-    || ((k->f.dir == LEFT) && left_key && shift_key);
-  bool run = (((k->f.dir == RIGHT) && right_key)
-              || ((k->f.dir == LEFT) && left_key)) && ! walk;
-  bool jump = ((k->f.dir == RIGHT) && right_key && up_key)
-    || ((k->f.dir == LEFT) && left_key && up_key);
-  bool couch = down_key;
-  bool vjump = up_key;
-  bool drink = is_potion (&pbf) && shift_key;
-  bool raise_sword = is_sword (&pbf) && shift_key;
-  bool take_sword = enter_key && k->has_sword;
+  bool turn = ((k->f.dir == RIGHT) && k->key.left)
+    || ((k->f.dir == LEFT) && k->key.right);
+  bool walk = ((k->f.dir == RIGHT) && k->key.right && k->key.shift)
+    || ((k->f.dir == LEFT) && k->key.left && k->key.shift);
+  bool run = (((k->f.dir == RIGHT) && k->key.right)
+              || ((k->f.dir == LEFT) && k->key.left)) && ! walk;
+  bool jump = ((k->f.dir == RIGHT) && k->key.right && k->key.up)
+    || ((k->f.dir == LEFT) && k->key.left && k->key.up);
+  bool couch = k->key.down;
+  bool vjump = k->key.up;
+  bool drink = is_potion (&pbf) && k->key.shift;
+  bool raise_sword = is_sword (&pbf) && k->key.shift;
+  bool take_sword = k->key.enter && k->has_sword;
 
   survey (_mt, pos, &k->f, &nc, &pmt, &np);
-  bool stairs = up_key && ! left_key && ! right_key
+  bool stairs = k->key.up && ! k->key.left && ! k->key.right
     && con (&pmt)->fg == LEVEL_DOOR
     && level_door_at_pos (&pmt)->i == 0
     && k == get_kid_by_id (0);
@@ -96,8 +96,7 @@ flow (struct anim *k)
     return false;
   }
 
-  if (k->oaction == kid_normal
-      && k == current_kid) {
+  if (k->oaction == kid_normal) {
     if (stairs) {
       k->p = pmt;
       kid_stairs (k);

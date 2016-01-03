@@ -62,16 +62,15 @@ kid_sword_normal (struct anim *kid)
 static bool
 flow (struct anim *kid)
 {
-  bool keep_sword = down_key;
-  bool defense = up_key;
-  bool attack = shift_key;
-  bool walkf = ((kid->f.dir == RIGHT) && right_key)
-    || ((kid->f.dir == LEFT) && left_key);
-  bool walkb = ((kid->f.dir == RIGHT) && left_key)
-    || ((kid->f.dir == LEFT) && right_key);
+  bool keep_sword = kid->key.down;
+  bool defense = kid->key.up;
+  bool attack = kid->key.shift;
+  bool walkf = ((kid->f.dir == RIGHT) && kid->key.right)
+    || ((kid->f.dir == LEFT) && kid->key.left);
+  bool walkb = ((kid->f.dir == RIGHT) && kid->key.left)
+    || ((kid->f.dir == LEFT) && kid->key.right);
 
-  if (kid->oaction == kid_sword_normal
-      && kid == current_kid) {
+  if (kid->oaction == kid_sword_normal) {
     if (keep_sword) {
       /* keep_sword_fast = true; */
       kid_keep_sword (kid);
