@@ -96,12 +96,12 @@ play_level (struct level *lv)
   case NO_QUIT: break;
   case RESTART_LEVEL:
     retry_level = level.number;
-    destroy_array ((void **) &kid, &kid_nmemb);
+    destroy_kids ();
     destroy_cons ();
     draw_bottom_text (NULL, NULL);
    goto start;
   case NEXT_LEVEL:
-    destroy_array ((void **) &kid, &kid_nmemb);
+    destroy_kids ();
     destroy_cons ();
     struct anim *k = get_kid_by_id (0);
     if (level.next_level) level.next_level (level.number + 1, &k->p);
@@ -109,7 +109,7 @@ play_level (struct level *lv)
     goto start;
   case RESTART_GAME:
     retry_level = -1;
-    destroy_array ((void **) &kid, &kid_nmemb);
+    destroy_kids ();
     destroy_cons ();
     draw_bottom_text (NULL, NULL);
     break;
@@ -132,6 +132,7 @@ register_cons (void)
         case DOOR: register_door (&p); break;
         case LEVEL_DOOR: register_level_door (&p); break;
         case CHOPPER: register_chopper (&p); break;
+        case MIRROR: register_mirror (&p); break;
         default: break;
         }
 }
@@ -295,7 +296,9 @@ process_keys (void)
   /* A: alternate between kid and its shadows */
   if (was_key_pressed (ALLEGRO_KEY_A, 0, 0, true)) {
     current_kid->current = false;
-    current_kid = &kid[(current_kid - kid + 1) % kid_nmemb];
+    do {
+      current_kid = &kid[(current_kid - kid + 1) % kid_nmemb];
+    } while (! current_kid->controllable);
     current_kid->current = true;
     room_view = current_kid->f.c.room;
     camera_follow_kid = current_kid->id;
@@ -531,6 +534,7 @@ draw_level (void)
 
   unpress_opener_floors ();
   unpress_closer_floors ();
+  uncross_mirrors ();
 
   draw_kid_lives (uscreen, current_kid, vm);
 

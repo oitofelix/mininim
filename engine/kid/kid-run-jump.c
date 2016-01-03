@@ -26,6 +26,7 @@
 #include "engine/potion.h"
 #include "engine/sword.h"
 #include "engine/loose-floor.h"
+#include "engine/mirror.h"
 #include "kid.h"
 
 struct frameset kid_run_jump_frameset[KID_JUMP_FRAMESET_NMEMB];
@@ -175,7 +176,12 @@ physics_in (struct anim *kid)
     if (kid->i < 6) kid_stabilize_collision (kid);
     else kid_couch_collision (kid);
     return false;
-  } else if (cross_mirror) sample_mirror = true;
+  } else if (cross_mirror) {
+    sample_mirror = true;
+    struct pos p; prel (&kid->ci.p, &p, +0, kid->f.dir == LEFT
+                        ? +1 : +0);
+    mirror_at_pos (&p)->kid_crossing = kid->id;
+  }
 
   /* fall */
   survey (_bf, pos, &kid->f, &nc, &pbf, &np);

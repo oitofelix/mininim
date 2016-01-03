@@ -29,9 +29,12 @@
 #include "engine/level-door.h"
 #include "engine/physics.h"
 #include "engine/anim.h"
+#include "engine/mirror.h"
 #include "legacy-level.h"
 
 static struct level legacy_level;
+static int level_3_checkpoint;
+static int shadow_id;
 
 static struct con room_0[FLOORS][PLACES] =
   {{{WALL}, {WALL}, {WALL}, {WALL}, {WALL},
@@ -105,11 +108,12 @@ start (void)
   }
 
   /* define the enviroment mode based on the level */
-  switch (level.number) {
-  case 4: case 5: case 6: case 10: case 11: case 14:
-    em = PALACE; break;
-  default: em = DUNGEON; break;
-  }
+  if (retry_level != level.number)
+    switch (level.number) {
+    case 4: case 5: case 6: case 10: case 11: case 14:
+      em = PALACE; break;
+    default: em = DUNGEON; break;
+    }
 
   /* give the sword to kid if it's not in the starting level */
   if (level.number > 1) k->has_sword = true;
@@ -122,6 +126,34 @@ start (void)
     activate_con (&p);
     /* if it's the first try make kid wait before uncouching */
     if (retry_level != 1) kid->uncouch_slowly = true;
+  }
+
+  /* in the third level */
+  if (level.number == 3) {
+    /* if it's the first time playing the checkpoint hasn't been
+       reached yet */
+    if (retry_level != 3) level_3_checkpoint = false;
+    /* if the checkpoint has been reached, respawn there */
+    struct pos p = {2,0,6};
+    if (level_3_checkpoint) {
+      struct pos plf = {7,0,4};
+      con (&plf)->fg = NO_FLOOR;
+      k->f.dir = (k->f.dir == LEFT) ? RIGHT : LEFT;
+      place_frame (&k->f, &k->f, kid_normal_00, &p,
+                   k->f.dir == LEFT ? +22 : +31, +15);
+      room_view = 2;
+    }
+  }
+
+  /* in the fourth level */
+  if (level.number == 4) {
+
+    shadow_id = -1;
+
+  /* tmp */
+    /* struct pos p = {4,1,6}; */
+    /* place_frame (&k->f, &k->f, kid_normal_00, &p, */
+    /*              k->f.dir == LEFT ? +22 : +31, +15); */
   }
 }
 
@@ -147,6 +179,41 @@ special_events (void)
   /* in the first level, first try, play the suspense sound */
   if (level.number == 1 && anim_cycle == 12 && retry_level != 1)
     sample_suspense = true;
+
+  /* level 3 checkpoint */
+  if (level.number == 3) {
+    struct coord nc;
+    struct pos p = {2,0,8}, pm, np;
+    survey (_m, pos, &kid->f, &nc, &pm, &np);
+    if (peq (&pm, &p)) level_3_checkpoint = true;
+  }
+
+  if (level.number == 4) {
+      struct pos pld = {24,1,3};
+      struct pos pmirror = {4,0,4};
+      struct level_door *ld = level_door_at_pos (&pld);
+      if (ld->i == 1) {
+        con (&pmirror)->fg = MIRROR;
+        register_mirror (&pmirror);
+        sample_suspense = true;
+      }
+
+      if (con (&pmirror)->fg == MIRROR) {
+        struct mirror *m = mirror_at_pos (&pmirror);
+        if (m->kid_crossing == k->id) {
+          int id = create_kid (k);
+          kid[id].shadow = true;
+          kid[id].f.dir = (kid[id].f.dir == LEFT) ? RIGHT : LEFT;
+          kid[id].controllable = false;
+          shadow_id = id;
+        }
+      }
+
+      /* if (shadow_id != -1) { */
+      /*   struct anim *ks = &kid[shadow_id]; */
+      /*   ks->right_key = true; */
+      /* } */
+  }
 }
 
 static void

@@ -475,7 +475,7 @@ void
 compute_loose_floor_fall (struct loose_floor *l)
 {
   int speed = 3 * ++l->i;
-  if (speed > 33) speed = 33;
+  if (speed > 29) speed = 29;
 
   struct frame nf;
   struct frame_offset fo;
@@ -507,7 +507,8 @@ compute_loose_floor_fall (struct loose_floor *l)
         && kmbo_f.y <= kmt.y
         && kmbo_nf.y >= kmt.y
         && ! k->hit_by_loose_floor
-        && ! is_kid_hang_or_climb (&k->f)) {
+        && ! is_kid_hang_or_climb (&k->f)
+        && ! is_kid_fall (&k->f)) {
       k->hit_by_loose_floor = true;
       k->splash = true;
       k->current_lives--;
@@ -620,6 +621,10 @@ draw_falling_loose_floor (ALLEGRO_BITMAP *bitmap, struct pos *p,
     l->f.b = get_correct_falling_loose_floor_bitmap (l->f.b);
     struct frame f = l->f;
     if (hgc) f.b = apply_palette (f.b, hgc_palette);
+
+    /* aid perception of continuity across rooms */
+    if (f.c.y >= 200 && f.c.y <= 220) f.c.y -= 20;
+
     draw_frame (bitmap, &f);
     draw_confg_base (bitmap, &fptr, em, vm);
     draw_confg_left (bitmap, &fptr, em, vm, true);

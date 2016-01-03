@@ -342,7 +342,8 @@ struct anim {
   bool reverse, collision, fall, hit_ceiling,
     just_hanged, hang, hang_limit, misstep, uncouch_slowly,
     keep_sword_fast, turn, shadow, current, splash,
-    hit_by_loose_floor, invisible, has_sword, hurt;
+    hit_by_loose_floor, invisible, has_sword, hurt,
+    controllable;
 
   ALLEGRO_TIMER *floating;
 

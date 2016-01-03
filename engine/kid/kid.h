@@ -90,6 +90,8 @@ void draw_kid_lives (ALLEGRO_BITMAP *bitmap, struct anim *kid,
 void draw_kid_if_at_pos (ALLEGRO_BITMAP *bitmap, struct anim *kid, struct pos *p,
                          enum vm vm);
 int create_kid (struct anim *k);
+void destroy_kid (struct anim *k);
+void destroy_kids (void);
 struct anim *get_kid_by_id (int id);
 void draw_kids (ALLEGRO_BITMAP *bitmap, enum em em, enum vm vm);
 void draw_kid_frame (ALLEGRO_BITMAP *bitmap, struct anim *k,

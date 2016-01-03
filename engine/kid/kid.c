@@ -209,6 +209,7 @@ create_kid (struct anim *_k)
     k.shadow_of = _k->id;
     k.shadow = true;
     k.floating = create_timer (1.0);
+    k.current = false;
   } else {
     k.id = i;
     k.shadow_of = -1;
@@ -221,6 +222,7 @@ create_kid (struct anim *_k)
     k.total_lives = KID_INITIAL_TOTAL_LIVES;
     k.current_lives = KID_INITIAL_CURRENT_LIVES;
     k.floating = create_timer (1.0);
+    k.controllable = true;
 
     struct pos *p = &level.start_pos;
     place_frame (&k.f, &k.f, kid_normal_00, p,
@@ -234,6 +236,27 @@ create_kid (struct anim *_k)
   kid[i].f.id = &kid[i];
 
   return i;
+}
+
+void
+destroy_kid (struct anim *k)
+{
+  if (current_kid == k) {
+    current_kid = &kid[0];
+    kid[0].current = true;
+  }
+  al_destroy_timer (k->floating);
+  size_t i =  k - kid;
+  remove_from_array (kid, &kid_nmemb, i, 1, sizeof (*k));
+}
+
+void
+destroy_kids (void)
+{
+  int i;
+  for (i = 0; i < kid_nmemb; i++) destroy_kid (&kid[i]);
+  kid = NULL;
+  kid_nmemb = 0;
 }
 
 struct anim *

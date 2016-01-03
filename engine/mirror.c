@@ -51,6 +51,9 @@ ALLEGRO_BITMAP *dv_mirror;
 /* palace vga */
 ALLEGRO_BITMAP *pv_mirror;
 
+struct mirror *mirror = NULL;
+size_t mirror_nmemb = 0;
+
 void
 load_mirror (void)
 {
@@ -99,6 +102,47 @@ unload_mirror (void)
 
   /* callbacks */
   remove_room_callback (create_mirror_bitmaps);
+}
+
+void
+register_mirror (struct pos *p)
+{
+  struct mirror m;
+
+  m.p = *p;
+  m.kid_crossing = -1;
+
+  mirror =
+    add_to_array (&m, 1, mirror, &mirror_nmemb,
+                  mirror_nmemb, sizeof (m));
+
+  qsort (mirror, mirror_nmemb, sizeof (m),
+         compare_mirrors);
+}
+
+int
+compare_mirrors (const void *o0, const void *o1)
+{
+  return cpos (&((struct mirror *) o0)->p,
+               &((struct mirror *) o1)->p);
+}
+
+struct mirror *
+mirror_at_pos (struct pos *p)
+{
+  struct mirror m;
+  m.p = *p;
+
+  return bsearch (&m, mirror, mirror_nmemb, sizeof (m),
+                  compare_mirrors);
+}
+
+void
+uncross_mirrors (void)
+{
+  size_t i;
+  for (i = 0; i < mirror_nmemb; i++)
+    mirror[i].kid_crossing = -1;
 }
 
 static void
