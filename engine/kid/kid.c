@@ -38,8 +38,8 @@
 #include "engine/sword.h"
 #include "kid.h"
 
-struct anim *kid;
-size_t kid_nmemb;
+struct anim *kida;
+size_t kida_nmemb;
 struct anim *current_kid;
 
 ALLEGRO_BITMAP *v_kid_full_life, *v_kid_empty_life, *v_kid_splash;
@@ -193,7 +193,7 @@ create_kid (struct anim *_k)
 {
   struct anim k;
 
-  int i = kid_nmemb;
+  int i = kida_nmemb;
 
   memset (&k, 0, sizeof (k));
 
@@ -225,9 +225,9 @@ create_kid (struct anim *_k)
     update_depressible_floor (&k, -4, -10);
   }
 
-  kid = add_to_array (&k, 1, kid, &kid_nmemb, i, sizeof (k));
+  kida = add_to_array (&k, 1, kida, &kida_nmemb, i, sizeof (k));
 
-  kid[i].f.id = &kid[i];
+  kida[i].f.id = &kida[i];
 
   return i;
 }
@@ -236,37 +236,37 @@ void
 destroy_kid (struct anim *k)
 {
   if (current_kid == k) {
-    current_kid = &kid[0];
-    kid[0].current = true;
+    current_kid = &kida[0];
+    kida[0].current = true;
   }
   al_destroy_timer (k->floating);
-  size_t i =  k - kid;
-  remove_from_array (kid, &kid_nmemb, i, 1, sizeof (*k));
+  size_t i =  k - kida;
+  remove_from_array (kida, &kida_nmemb, i, 1, sizeof (*k));
 }
 
 void
 destroy_kids (void)
 {
   int i;
-  for (i = 0; i < kid_nmemb; i++) destroy_kid (&kid[i]);
-  kid = NULL;
-  kid_nmemb = 0;
+  for (i = 0; i < kida_nmemb; i++) destroy_kid (&kida[i]);
+  kida = NULL;
+  kida_nmemb = 0;
 }
 
 void
 clear_kids_keyboard_state (void)
 {
   int i;
-  for (i = 0; i < kid_nmemb; i++)
-    memset (&kid[i].key, 0, sizeof (kid[i].key));
+  for (i = 0; i < kida_nmemb; i++)
+    memset (&kida[i].key, 0, sizeof (kida[i].key));
 }
 
 struct anim *
 get_kid_by_id (int id)
 {
   int i;
-  for (i = 0; i < kid_nmemb; i++)
-    if (kid[i].id == id) return &kid[i];
+  for (i = 0; i < kida_nmemb; i++)
+    if (kida[i].id == id) return &kida[i];
   return NULL;
 }
 
@@ -279,11 +279,11 @@ draw_kids (ALLEGRO_BITMAP *bitmap,
 
   /* coord_wa = true; */
 
-  qsort (kid, kid_nmemb, sizeof (*k), compare_kids);
+  qsort (kida, kida_nmemb, sizeof (*k), compare_kids);
 
   size_t i;
-  for (i = 0; i < kid_nmemb; i++) {
-    k = &kid[i];
+  for (i = 0; i < kida_nmemb; i++) {
+    k = &kida[i];
 
     if (k->invisible) continue;
 
@@ -727,7 +727,7 @@ kid_debug (void)
     if (was_key_pressed (ALLEGRO_KEY_PGDN, 0, 0, true)) current_kid->f.c.x++;
     int dn = dist_next_place (&current_kid->f, _bf, pos, 0, false);
     int dp = dist_next_place (&current_kid->f, _bf, pos, 0, true);
-    int dc = dist_collision (&current_kid->f, false, &kid->ci) + 4;
+    int dc = dist_collision (&current_kid->f, false, &current_kid->ci) + 4;
     int df = dist_fall (&current_kid->f, false);
     int dl = dist_con (&current_kid->f, _bf, pos, -4, false, LOOSE_FLOOR);
     int dcl = dist_con (&current_kid->f, _bf, pos, -4, false, CLOSER_FLOOR);

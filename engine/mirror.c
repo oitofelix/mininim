@@ -177,8 +177,8 @@ update_mirror_bitmap (ALLEGRO_BITMAP *bitmap, struct pos *p)
   if (! b) return;
 
   int i;
-  for (i = 0; i < kid_nmemb; i++)
-    draw_kid_if_at_pos (bitmap, &kid[i], p, vm);
+  for (i = 0; i < kida_nmemb; i++)
+    draw_kid_if_at_pos (bitmap, &kida[i], p, vm);
 
   mirror_coord (p, &c);
   draw_bitmap_region (bitmap, b, c.x + 22, c.y + 3,

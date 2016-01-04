@@ -91,7 +91,7 @@ start (void)
 
   /* create kid */
   int id = create_kid (NULL);
-  struct anim *k = &kid[id];
+  struct anim *k = &kida[id];
 
   /* make the kid turn as appropriate */
   switch (level.number) {
@@ -216,9 +216,9 @@ special_events (void)
         if (m->kid_crossing == k->id) {
           k->current_lives = 1;
           int id = create_kid (k);
-          kid[id].shadow = true;
-          kid[id].f.dir = (kid[id].f.dir == LEFT) ? RIGHT : LEFT;
-          kid[id].controllable = false;
+          kida[id].shadow = true;
+          kida[id].f.dir = (kida[id].f.dir == LEFT) ? RIGHT : LEFT;
+          kida[id].controllable = false;
           shadow_id = id;
         }
       }
@@ -226,7 +226,7 @@ special_events (void)
       /* make the kid's shadow run to the right until it disappears
          from view */
       if (shadow_id != -1) {
-        struct anim *ks = &kid[shadow_id];
+        struct anim *ks = &kida[shadow_id];
         p = (struct pos) {11,0,2};
         survey (_m, pos, &ks->f, &nc, &pm, &np);
         if (! peq (&pm, &p)) ks->key.right = true;

@@ -235,8 +235,8 @@ kill_kid_shadows (struct anim *k)
   struct coord nc; struct pos np, pmt;
 
   int i;
-  for (i = 0; i < kid_nmemb; i++) {
-    struct anim *ks = &kid[i];
+  for (i = 0; i < kida_nmemb; i++) {
+    struct anim *ks = &kida[i];
 
     if (ks->shadow_of == k->id
         && ! is_kid_dead (&ks->f)) {

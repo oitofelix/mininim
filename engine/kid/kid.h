@@ -116,8 +116,8 @@ void kid_debug (void);
 bool kid_door_split_collision (struct anim *k);
 
 /* variables */
-extern struct anim *kid; /* kid animation object */
-extern size_t kid_nmemb;
+extern struct anim *kida;
+extern size_t kida_nmemb;
 extern struct anim *current_kid;
 
 extern ALLEGRO_SAMPLE *step_sample, *hit_ground_sample, *hit_ground_harm_sample,

@@ -40,7 +40,7 @@ static void
 start (void)
 {
   create_kid (NULL);
-  create_kid (&kid[0]);
+  create_kid (&kida[0]);
 }
 
 static void

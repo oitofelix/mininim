@@ -77,7 +77,7 @@ play_level (struct level *lv)
   screen_flags = 0;
   anim_cycle = 0;
   last_auto_show_time = -1;
-  current_kid = &kid[0];
+  current_kid = &kida[0];
   current_kid->current = true;
 
   if (level.nominal_number >= 0) {
@@ -179,12 +179,12 @@ compute_level (void)
 
   int prev_room = current_kid->f.c.room;
 
-  for (i = 0; i < kid_nmemb; i++) kid[i].splash = false;
+  for (i = 0; i < kida_nmemb; i++) kida[i].splash = false;
 
   compute_loose_floors ();
 
   get_keyboard_state (&current_kid->key);
-  for (i = 0; i < kid_nmemb; i++) kid[i].action (&kid[i]);
+  for (i = 0; i < kida_nmemb; i++) kida[i].action (&kida[i]);
   clear_kids_keyboard_state ();
 
   if (current_kid->f.c.room != prev_room
@@ -285,7 +285,7 @@ process_keys (void)
   if (was_key_pressed (ALLEGRO_KEY_A, 0, 0, true)) {
     current_kid->current = false;
     do {
-      current_kid = &kid[(current_kid - kid + 1) % kid_nmemb];
+      current_kid = &kida[(current_kid - kida + 1) % kida_nmemb];
     } while (! current_kid->controllable);
     current_kid->current = true;
     room_view = current_kid->f.c.room;

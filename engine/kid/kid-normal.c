@@ -128,7 +128,7 @@ flow (struct anim *k)
     }
 
     if (run) {
-      if (dist_collision (&k->f, false, &kid->ci) + 4 < 29)
+      if (dist_collision (&k->f, false, &k->ci) + 4 < 29)
         kid_walk (k);
       else kid_start_run (k);
       return false;

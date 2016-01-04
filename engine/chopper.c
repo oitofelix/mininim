@@ -342,8 +342,8 @@ should_chomp (struct pos *p)
   struct coord nc;
   struct pos np, pm, _p;
 
-  for (i = 0; i < kid_nmemb; i++) {
-    k = &kid[i];
+  for (i = 0; i < kida_nmemb; i++) {
+    k = &kida[i];
     if (is_kid_dead (&k->f) && ! k->id == 0) continue;
     survey (_m, pos, &k->f, &nc, &pm, &np);
     int inc = p->place < pm.place ? +1 : -1;
@@ -387,8 +387,8 @@ compute_choppers (void)
     if (c->i != 1 && c->i != 2 ) continue;
 
     /* chomp kid */
-    for (j = 0; j < kid_nmemb; j++) {
-      struct anim *k = &kid[j];
+    for (j = 0; j < kida_nmemb; j++) {
+      struct anim *k = &kida[j];
       if (is_kid_dead (&k->f)
           || is_kid_fall (&k->f)
           || k->immortal

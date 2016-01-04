@@ -665,8 +665,8 @@ draw_room_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
              && ! is_strictly_traversable (&pv)
              && tl.y <= (pv.floor + 1) * PLACE_HEIGHT + 3
              && bl.y >= (pv.floor + 1) * PLACE_HEIGHT + 3
-             && ! (is_kid_vjump (f) && kid->hang
-                   && kid->f.dir == LEFT))
+             && ! (is_kid_vjump (f) && ((struct anim *) f->id)->hang
+                   && f->dir == LEFT))
     draw_confg (bitmap, &pv, em, vm, true);
   /* when vjumping at the left of a non-hangable construct */
   else if (peq (&fptr, &pv)

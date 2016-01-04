@@ -444,8 +444,8 @@ compute_spikes_floors (void)
     }
 
     /* spike kid */
-    for (j = 0; j < kid_nmemb; j++) {
-      struct anim *k = &kid[j];
+    for (j = 0; j < kida_nmemb; j++) {
+      struct anim *k = &kida[j];
       if (is_kid_dead (&k->f)
           || k->immortal
           || k->spikes_immune) continue;
@@ -456,7 +456,7 @@ compute_spikes_floors (void)
                    || is_kid_run (&k->f)
                    || is_kid_stop_run (&k->f)
                    || is_kid_run_jump_running (&k->f)))
-              || (is_kid_couch (&k->f) && kid->fall
+              || (is_kid_couch (&k->f) && k->fall
                   && ! al_get_timer_started (k->floating))
               || is_kid_jump_landing (&k->f)
               || is_kid_run_jump_landing (&k->f))) {
@@ -488,8 +488,8 @@ should_spikes_raise (struct pos *p)
   struct coord nc;
   struct pos np, pmf, pm, pmba;
 
-  for (i = 0; i < kid_nmemb; i++) {
-    k = &kid[i];
+  for (i = 0; i < kida_nmemb; i++) {
+    k = &kida[i];
     if (is_kid_dead (&k->f)) continue;
     survey (_mf, pos, &k->f, &nc, &pmf, &np);
     survey (_m, pos, &k->f, &nc, &pm, &np);
