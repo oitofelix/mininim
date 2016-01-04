@@ -189,6 +189,7 @@ register_level_door (struct pos *p)
   d.p = *p;
   d.i = con (p)->ext.step;
   d.action = NO_LEVEL_DOOR_ACTION;
+  d.no_stairs = peq (p, &level.start_pos);
 
   level_door =
     add_to_array (&d, 1, level_door, &level_door_nmemb, level_door_nmemb, sizeof (d));
@@ -340,8 +341,9 @@ draw_level_door (ALLEGRO_BITMAP *bitmap, struct pos *p,
                 level_door_top_left_coord (p, &c), 0);
   draw_bitmapc (level_door_floor, bitmap,
                 level_door_floor_coord (p, &c), 0);
-  draw_bitmapc (level_door_stairs, bitmap,
-                level_door_stairs_coord (p, &c), 0);
+  if (! d->no_stairs)
+    draw_bitmapc (level_door_stairs, bitmap,
+                  level_door_stairs_coord (p, &c), 0);
   draw_bitmapc (level_door_bottom, bitmap,
                 level_door_bottom_right_coord (p, &c), 0);
   draw_bitmapc (level_door_top_right, bitmap,

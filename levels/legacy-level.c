@@ -315,6 +315,7 @@ load_legacy_level (int number)
   /* enable npos to be used from now on */
   memcpy (&level.link, &legacy_level.link, sizeof (level.link));
 
+  /* FORETABLE and BACKTABLE: ok */
   for (p.room = 1; p.room <= LROOMS; p.room++)
     for (p.floor = 0; p.floor < FLOORS; p.floor++)
       for (p.place = 0; p.place < PLACES; p.place++) {

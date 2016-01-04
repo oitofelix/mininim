@@ -83,6 +83,7 @@ struct level_door {
   enum {
     NO_LEVEL_DOOR_ACTION, OPEN_LEVEL_DOOR, CLOSE_LEVEL_DOOR,
   } action;
+  bool no_stairs;
 };
 
 /* variables */
