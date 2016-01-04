@@ -26,13 +26,13 @@
 #include "engine/kid/kid.h"
 
 static struct level consistency_level;
-static void next_level (int lv, struct pos *exit_door_pos);
+static void next_level (int lv);
 static void start (void);
 
 void
 play_consistency_level (void)
 {
-  next_level (1, NULL);
+  next_level (1);
   play_level (&consistency_level);
 }
 
@@ -44,7 +44,7 @@ start (void)
 }
 
 static void
-next_level (int number, struct pos *exit_door_pos)
+next_level (int number)
 {
   int i;
   struct pos p;

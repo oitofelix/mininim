@@ -83,6 +83,7 @@
 #define MIRROR_SAMPLE "dat/digisnd2/mirror.ogg"
 #define SUSPENSE_SAMPLE "dat/midisnd1/suspense.ogg"
 #define SUCCESS_SAMPLE "dat/midisnd1/success.ogg"
+#define SUCCESS_SUSPENSE_SAMPLE "dat/midisnd1/success-suspense.ogg"
 
 /* functions */
 void load_kid (void);
@@ -126,6 +127,6 @@ extern ALLEGRO_SAMPLE *step_sample, *hit_ground_sample, *hit_ground_harm_sample,
   *harm_sample, *action_not_allowed_sample, *small_life_potion_sample,
   *big_life_potion_sample, *scream_sample, *spiked_sample, *chopped_sample,
   *floating_sample, *death_sample, *press_key_sample, *mirror_sample,
-  *suspense_sample, *success_sample;
+  *suspense_sample, *success_sample, *success_suspense_sample;
 
 #endif	/* MININIM_KID_H */

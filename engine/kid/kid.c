@@ -50,7 +50,7 @@ ALLEGRO_SAMPLE *step_sample, *hit_ground_sample, *hit_ground_harm_sample,
   *harm_sample, *action_not_allowed_sample, *small_life_potion_sample,
   *big_life_potion_sample, *scream_sample, *spiked_sample, *chopped_sample,
   *floating_sample, *death_sample, *press_key_sample, *mirror_sample,
-  *suspense_sample, *success_sample;
+  *suspense_sample, *success_sample, *success_suspense_sample;
 
 static void place_kid (struct anim *k, int room, int floor, int place);
 static struct coord *kid_life_coord (int i, struct coord *c);
@@ -121,6 +121,7 @@ load_kid (void)
   mirror_sample = load_sample (MIRROR_SAMPLE);
   suspense_sample = load_sample (SUSPENSE_SAMPLE);
   success_sample = load_sample (SUCCESS_SAMPLE);
+  success_suspense_sample = load_sample (SUCCESS_SUSPENSE_SAMPLE);
 }
 
 void
@@ -186,6 +187,7 @@ unload_kid (void)
   al_destroy_sample (mirror_sample);
   al_destroy_sample (suspense_sample);
   al_destroy_sample (success_sample);
+  al_destroy_sample (success_suspense_sample);
 }
 
 int

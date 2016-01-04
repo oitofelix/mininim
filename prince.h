@@ -231,8 +231,8 @@ enum carpet_design {
 struct level {
   void (*start) (void);
   void (*special_events) (void);
-  void (*end) (void);
-  void (*next_level) (int, struct pos *);
+  void (*end) (struct pos *p);
+  void (*next_level) (int);
   int number;
   int nominal_number;
 

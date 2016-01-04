@@ -22,14 +22,14 @@
 #include "engine/level.h"
 #include "engine/kid/kid.h"
 
-static void next_level (int lv, struct pos *exit_door_pos);
+static void next_level (int lv);
 static void start (void);
 static struct level level_1;
 
 void
 play_level_1 (void)
 {
-  next_level (1, NULL);
+  next_level (1);
   play_level (&level_1);
 }
 
@@ -41,7 +41,7 @@ start (void)
 }
 
 static void
-next_level (int number, struct pos *exit_door_pos)
+next_level (int number)
 {
   return;
 }

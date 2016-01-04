@@ -117,7 +117,7 @@ flow (struct anim *k)
     k->i = k->j = -1;
   }
 
-  if (k->i == 11) level.end ();
+  if (k->i >= 9) level.end (&k->p);
 
   if (k->i == 11 && k->j < 17) {
     k->invisible = true;

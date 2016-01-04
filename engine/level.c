@@ -102,8 +102,7 @@ play_level (struct level *lv)
   case NEXT_LEVEL:
     destroy_kids ();
     destroy_cons ();
-    struct anim *k = get_kid_by_id (0);
-    if (level.next_level) level.next_level (level.number + 1, &k->p);
+    if (level.next_level) level.next_level (level.number + 1);
     draw_bottom_text (NULL, NULL);
     goto start;
   case RESTART_GAME:

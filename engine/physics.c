@@ -298,10 +298,10 @@ is_colliding_cf (struct frame *f, struct frame_offset *fo, int dx,
   /* if (wall_collision || door_collision || carpet_collision || mirror_collision) */
   /*   pos2room (&ci->p, _f.c.room, &ci->p); */
 
-  if (door_collision) printf ("DOOR COLLISION!\n");
-  if (wall_collision) printf ("WALL COLLISION!\n");
-  if (carpet_collision) printf ("CARPET COLLISION!\n");
-  if (mirror_collision) printf ("MIRROR COLLISION!\n");
+  /* if (door_collision) printf ("DOOR COLLISION!\n"); */
+  /* if (wall_collision) printf ("WALL COLLISION!\n"); */
+  /* if (carpet_collision) printf ("CARPET COLLISION!\n"); */
+  /* if (mirror_collision) printf ("MIRROR COLLISION!\n"); */
 
   return wall_collision || door_collision || carpet_collision || mirror_collision;
 }

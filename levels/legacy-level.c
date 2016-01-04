@@ -70,16 +70,16 @@ static struct {
 static enum ltile get_tile (struct pos *p);
 static enum lgroup get_group (enum ltile t);
 
-static void next_level (int lv, struct pos *exit_door_pos);
+static void next_level (int lv);
 static void load_legacy_level (int number);
 static void start (void);
 static void special_events (void);
-static void end (void);
+static void end (struct pos *p);
 
 void
 play_legacy_level (void)
 {
-  next_level (1, NULL);
+  next_level (1);
   play_level (&legacy_level);
 }
 
@@ -242,14 +242,18 @@ special_events (void)
 }
 
 static void
-end (void)
+end (struct pos *p)
 {
   static ALLEGRO_SAMPLE_INSTANCE *si = NULL;
 
   if (! played_end_sample) {
     switch (level.number) {
-    case 1: case 2: si = play_sample (success_sample, -1); break;
-    default: break;
+    case 1: case 2: case 3: case 5: case 7:
+    case 8: case 9: case 10: case 11:
+      si = play_sample (success_sample, p->room); break;
+    case 4:
+      si = play_sample (success_suspense_sample, p->room); break;
+    case 6: case 12: case 13: break;
     }
     played_end_sample = true;
   }
@@ -258,7 +262,7 @@ end (void)
 }
 
 static void
-next_level (int number, struct pos *exit_door_pos)
+next_level (int number)
 {
   if (number > 14) number = 1;
   load_legacy_level (number);
