@@ -447,13 +447,16 @@ process_keys (void)
   if (is_kid_dead (&k->f)
       && ! pause_game) {
     al_start_timer (death_timer);
-
     int64_t t = al_get_timer_count (death_timer);
 
-    if (t == 12) play_sample (death_sample, k->p.room);
+    if (t < 12) k->sample = NULL;
+
+    if (t >= 12 && ! k->sample)
+      k->sample = play_sample (death_sample, k->f.c.room);
+
+    if (t < 60) key.keyboard.keycode = 0;
 
     if (t >= 60) {
-      if (t == 60) key.keyboard.keycode = 0;
       if (t < 240 || t % 12 < 8) {
         if (t >= 252 && t % 12 == 0)
           play_sample (press_key_sample, -1);

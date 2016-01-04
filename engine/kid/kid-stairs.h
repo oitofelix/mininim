@@ -39,7 +39,7 @@ extern struct frameset kid_stairs_frameset[KID_STAIRS_FRAMESET_NMEMB];
 
 void load_kid_stairs (void);
 void unload_kid_stairs (void);
-void kid_stairs (struct anim *kid);
+void kid_stairs (struct anim *k);
 bool is_kid_stairs (struct frame *f);
 
 extern ALLEGRO_BITMAP *kid_stairs_01, *kid_stairs_02, *kid_stairs_03,

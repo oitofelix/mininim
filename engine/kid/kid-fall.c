@@ -32,10 +32,10 @@
 struct frameset kid_fall_frameset[KID_FALL_FRAMESET_NMEMB];
 
 static void init_kid_fall_frameset (void);
-static bool flow (struct anim *kid);
-static bool physics_in (struct anim *kid);
-static void physics_out (struct anim *kid);
-static void place_in_initial_fall (struct anim *kid);
+static bool flow (struct anim *k);
+static bool physics_in (struct anim *k);
+static void physics_out (struct anim *k);
+static void place_in_initial_fall (struct anim *k);
 
 ALLEGRO_BITMAP *kid_fall_13, *kid_fall_14, *kid_fall_15,
   *kid_fall_16, *kid_fall_17;
@@ -76,34 +76,34 @@ unload_kid_fall (void)
 }
 
 void
-kid_fall (struct anim *kid)
+kid_fall (struct anim *k)
 {
-  kid->oaction = kid->action;
-  kid->action = kid_fall;
-  kid->f.flip = (kid->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
+  k->oaction = k->action;
+  k->action = kid_fall;
+  k->f.flip = (k->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  if (! flow (kid)) return;
-  if (! physics_in (kid)) return;
-  next_frame (&kid->f, &kid->f, &kid->fo);
-  physics_out (kid);
+  if (! flow (k)) return;
+  if (! physics_in (k)) return;
+  next_frame (&k->f, &k->f, &k->fo);
+  physics_out (k);
 }
 
 static bool
-flow (struct anim *kid)
+flow (struct anim *k)
 {
-  if (kid->oaction != kid_fall) kid->i = -1;
+  if (k->oaction != kid_fall) k->i = -1;
 
-  kid->i++;
+  k->i++;
 
-  kid->fo.b = kid_fall_frameset[kid->i > 4 ? 4 : kid->i].frame;
-  kid->fo.dx = kid_fall_frameset[kid->i > 4 ? 4 : kid->i].dx;
-  kid->fo.dy = kid_fall_frameset[kid->i > 4 ? 4 : kid->i].dy;
+  k->fo.b = kid_fall_frameset[k->i > 4 ? 4 : k->i].frame;
+  k->fo.dx = kid_fall_frameset[k->i > 4 ? 4 : k->i].dx;
+  k->fo.dy = kid_fall_frameset[k->i > 4 ? 4 : k->i].dy;
 
   return true;
 }
 
 static bool
-physics_in (struct anim *kid)
+physics_in (struct anim *k)
 {
   struct coord nc;
   struct pos np, pbf, ptf, ptb, pmt, pmtf, pmtb, pbb,
@@ -111,154 +111,154 @@ physics_in (struct anim *kid)
   struct frame nf;
   struct frame_offset fo;
 
-  bool hang_back = ((kid->f.dir == LEFT) ? kid->key.right : kid->key.left)
-    && ! kid->key.up && kid->key.shift;
+  bool hang_back = ((k->f.dir == LEFT) ? k->key.right : k->key.left)
+    && ! k->key.up && k->key.shift;
 
-  bool hang_front = kid->key.shift && ! hang_back;
+  bool hang_front = k->key.shift && ! hang_back;
 
-  int dir = (kid->f.dir == LEFT) ? -1 : +1;
+  int dir = (k->f.dir == LEFT) ? -1 : +1;
 
-  if (kid->oaction == kid_jump) {
-    next_frame (&kid->f, &kid->f, &kid->fo);
-    kid->f.c.x += dir * 8;
-    kid->f.c.y += 6;
-  } else if (kid->oaction == kid_run_jump) {
-    next_frame (&kid->f, &kid->f, &kid->fo);
-    kid->f.c.x += dir * 12;
-    kid->f.c.y += 6;
+  if (k->oaction == kid_jump) {
+    next_frame (&k->f, &k->f, &k->fo);
+    k->f.c.x += dir * 8;
+    k->f.c.y += 6;
+  } else if (k->oaction == kid_run_jump) {
+    next_frame (&k->f, &k->f, &k->fo);
+    k->f.c.x += dir * 12;
+    k->f.c.y += 6;
   }
 
-  if (kid->i == 0
-      && kid->oaction != kid_hang_wall
-      && kid->oaction != kid_hang_free) {
-    next_frame (&kid->f, &kid->f, &kid->fo);
+  if (k->i == 0
+      && k->oaction != kid_hang_wall
+      && k->oaction != kid_hang_free) {
+    next_frame (&k->f, &k->f, &k->fo);
 
-    int dirf = (kid->f.dir == LEFT) ? -1 : +1;
-    int dirb = (kid->f.dir == LEFT) ? +1 : -1;
-    survey (_mt, pos, &kid->f, &nc, &pmt, &np);
+    int dirf = (k->f.dir == LEFT) ? -1 : +1;
+    int dirb = (k->f.dir == LEFT) ? +1 : -1;
+    survey (_mt, pos, &k->f, &nc, &pmt, &np);
     prel (&pmt, &pmtf, +0, dirf);
     prel (&pmt, &pmtb, +0, dirb);
 
     if (! is_strictly_traversable (&pmt)
         || ! is_strictly_traversable (&pmtf)
         || ! is_strictly_traversable (&pmtb))
-      place_in_initial_fall (kid);
+      place_in_initial_fall (k);
   }
 
   /* help kid hang */
-  survey (_tf, pos, &kid->f, &nc, &ptf, &np);
-  survey (_bf, pos, &kid->f, &nc, &pbf, &np);
-  survey (_tb, pos, &kid->f, &nc, &ptb, &np);
-  survey (_bb, pos, &kid->f, &nc, &pbb, &np);
-  if ((is_hangable_con (&ptf, kid->f.dir)
+  survey (_tf, pos, &k->f, &nc, &ptf, &np);
+  survey (_bf, pos, &k->f, &nc, &pbf, &np);
+  survey (_tb, pos, &k->f, &nc, &ptb, &np);
+  survey (_bb, pos, &k->f, &nc, &pbb, &np);
+  if ((is_hangable_con (&ptf, k->f.dir)
        && ! peq (&ptf, &pbf))
-      || (is_hangable_pos (&pbb, kid->f.dir)
+      || (is_hangable_pos (&pbb, k->f.dir)
           && ! peq (&pbb, &ptb)))
-    kid->inertia = 0;
+    k->inertia = 0;
 
   /* fall speed */
-  if (kid->i > 0)
-    kid->fo.dx = -kid->inertia;
-  if (kid->i > 4) {
-    int speed = +21 + 3 * (kid->i - 5);
-    kid->fo.dy = (speed > 33) ? 33 : speed;
+  if (k->i > 0)
+    k->fo.dx = -k->inertia;
+  if (k->i > 4) {
+    int speed = +21 + 3 * (k->i - 5);
+    k->fo.dy = (speed > 33) ? 33 : speed;
   }
 
   /* floating */
-  if (al_get_timer_started (kid->floating)) {
-    if (al_get_timer_count (kid->floating) < 16) {
-      kid->fo.dx = -1;
-      kid->fo.dy = +3;
+  if (al_get_timer_started (k->floating)) {
+    if (al_get_timer_count (k->floating) < 16) {
+      k->fo.dx = -1;
+      k->fo.dy = +3;
     }
     else {
-      al_stop_timer (kid->floating);
-      kid->i = (kid->i > 4) ? 4 : kid->i;
+      al_stop_timer (k->floating);
+      k->i = (k->i > 4) ? 4 : k->i;
     }
   }
 
-  /* printf ("inertia: %i\n", kid->inertia); */
+  /* printf ("inertia: %i\n", k->inertia); */
 
   /* collision */
-  if (is_colliding (&kid->f, &kid->fo, +0, false, &kid->ci)) {
-    kid->inertia = 0; kid->fo.dx = 0;
+  if (is_colliding (&k->f, &k->fo, +0, false, &k->ci)) {
+    k->inertia = 0; k->fo.dx = 0;
   }
 
   /* hang front */
-  if (kid->i > 2 && can_hang (&kid->f, false, &kid->hang_pos)
-      && hang_front && ! kid->hang_limit) {
-    kid->hit_by_loose_floor = false;
-    play_sample (hang_on_fall_sample, kid->f.c.room);
-    kid_hang (kid);
+  if (k->i > 2 && can_hang (&k->f, false, &k->hang_pos)
+      && hang_front && ! k->hang_limit) {
+    k->hit_by_loose_floor = false;
+    play_sample (hang_on_fall_sample, k->f.c.room);
+    kid_hang (k);
     return false;
   }
 
   /* hang back */
-  if (kid->i > 2 && can_hang (&kid->f, true, &kid->hang_pos)
-      && hang_back && ! kid->hang_limit) {
-    kid->hit_by_loose_floor = false;
-    play_sample (hang_on_fall_sample, kid->f.c.room);
-    kid_turn (kid);
+  if (k->i > 2 && can_hang (&k->f, true, &k->hang_pos)
+      && hang_back && ! k->hang_limit) {
+    k->hit_by_loose_floor = false;
+    play_sample (hang_on_fall_sample, k->f.c.room);
+    kid_turn (k);
     return false;
   }
 
   /* land on ground */
-  survey (_mbo, pos, &kid->f, &nc, &np, &npmbo);
-  fo.b = kid->f.b;
+  survey (_mbo, pos, &k->f, &nc, &np, &npmbo);
+  fo.b = k->f.b;
   fo.dx = 0;
-  fo.dy = al_get_timer_started (kid->floating) ? 14 : 34;
-  next_frame (&kid->f, &nf, &fo);
+  fo.dy = al_get_timer_started (k->floating) ? 14 : 34;
+  next_frame (&k->f, &nf, &fo);
   survey (_mbo, pos, &nf, &nc, &np, &npmbo_nf);
 
-  if (kid->i > 2
+  if (k->i > 2
       && ! is_strictly_traversable (&npmbo)
       && npmbo.floor != npmbo_nf.floor) {
-    kid->inertia = kid->cinertia = 0;
+    k->inertia = k->cinertia = 0;
 
-    if (is_colliding (&kid->f, &kid->fo, +16, false, &kid->ci))
-      kid->f.c.x += (kid->f.dir == LEFT) ? +16 : -16;
+    if (is_colliding (&k->f, &k->fo, +16, false, &k->ci))
+      k->f.c.x += (k->f.dir == LEFT) ? +16 : -16;
 
-    survey (_bf, pos, &kid->f, &nc, &pbf, &np);
+    survey (_bf, pos, &k->f, &nc, &pbf, &np);
     /* pos2view (&pbf, &pbf); */
-    kid->fo.b = kid_couch_frameset[0].frame;
-    kid->fo.dx = kid->fo.dy = 0;
-    kid->f.c.room = pbf.room;
-    kid->f.c.x += (kid->f.dir == LEFT) ? -6 : +6;
-    kid->f.c.y = PLACE_HEIGHT * pbf.floor + 27;
-    kid->f.b = kid_couch_frameset[0].frame;
+    k->fo.b = kid_couch_frameset[0].frame;
+    k->fo.dx = k->fo.dy = 0;
+    k->f.c.room = pbf.room;
+    k->f.c.x += (k->f.dir == LEFT) ? -6 : +6;
+    k->f.c.y = PLACE_HEIGHT * pbf.floor + 27;
+    k->f.b = kid_couch_frameset[0].frame;
 
     shake_loose_floor_row (&pbf);
 
-    if (kid->i >= 8 && ! kid->immortal
-        && ! kid->fall_immune
-        && ! al_get_timer_started (kid->floating)) {
-      kid->hurt = true;
-      kid->splash = true;
-      kid->current_lives--;
+    if (k->i >= 8 && ! k->immortal
+        && ! k->fall_immune
+        && ! al_get_timer_started (k->floating)) {
+      k->hurt = true;
+      k->splash = true;
+      k->current_lives--;
 
-      if (kid->i >= 10) kid->current_lives = 0;
+      if (k->i >= 10) k->current_lives = 0;
 
-      if (kid->current_lives <= 0)
-        play_sample (hit_ground_fatal_sample, kid->f.c.room);
+      if (k->current_lives <= 0)
+        play_sample (hit_ground_fatal_sample, k->f.c.room);
       else {
-        play_sample (hit_ground_harm_sample, kid->f.c.room);
-        kid->uncouch_slowly = true;
+        play_sample (hit_ground_harm_sample, k->f.c.room);
+        k->uncouch_slowly = true;
       }
       video_effect.color = get_flicker_blood_color ();
       start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
-    } else if (kid->i > 3
-               && ! al_get_timer_started (kid->floating)) {
-      play_sample (hit_ground_sample, kid->f.c.room);
-      kid->hurt = false;
-    } else kid->hurt = false;
+    } else if (k->i > 3
+               && ! al_get_timer_started (k->floating)) {
+      play_sample (hit_ground_sample, k->f.c.room);
+      k->hurt = false;
+    } else k->hurt = false;
 
-    survey (_mt, pos, &kid->f, &nc, &pmt, &np);
-    if (kid->current_lives <= 0) {
-      stop_sample (kid->sample);
-      kid->p = pmt;
-      if (con (&pmt)->fg == SPIKES_FLOOR) kid_die_spiked (kid);
-      else kid_die_suddenly (kid);
+    survey (_mt, pos, &k->f, &nc, &pmt, &np);
+    if (k->current_lives <= 0) {
+      stop_sample (k->sample);
+      k->p = pmt;
+      if (con (&pmt)->fg == SPIKES_FLOOR) kid_die_spiked (k);
+      else kid_die_suddenly (k);
     }
-    else kid_couch (kid);
+    else kid_couch (k);
 
     return false;
   }
@@ -267,15 +267,15 @@ physics_in (struct anim *kid)
 }
 
 static void
-physics_out (struct anim *kid)
+physics_out (struct anim *k)
 {
   /* depressible floors */
-  clear_depressible_floor (kid);
+  clear_depressible_floor (k);
 
   /* sound */
-  if (kid->i == 10
-      && ! al_get_timer_started (kid->floating))
-    kid->sample = play_sample (scream_sample, kid->f.c.room);
+  if (k->i == 10
+      && ! al_get_timer_started (k->floating))
+    k->sample = play_sample (scream_sample, k->f.c.room);
 }
 
 bool
@@ -289,15 +289,15 @@ is_kid_fall (struct frame *f)
 }
 
 static void
-place_in_initial_fall (struct anim *kid)
+place_in_initial_fall (struct anim *k)
 {
   struct coord nc;
   struct pos np, pmt, pmtf, pmtb;
   struct pos fall_pos;
 
-  int dirf = (kid->f.dir == LEFT) ? -1 : +1;
-  int dirb = (kid->f.dir == LEFT) ? +1 : -1;
-  survey (_mt, pos, &kid->f, &nc, &pmt, &np);
+  int dirf = (k->f.dir == LEFT) ? -1 : +1;
+  int dirb = (k->f.dir == LEFT) ? +1 : -1;
+  survey (_mt, pos, &k->f, &nc, &pmt, &np);
   prel (&pmt, &pmtf, +0, dirf);
   prel (&pmt, &pmtb, +0, dirb);
 
@@ -308,8 +308,8 @@ place_in_initial_fall (struct anim *kid)
   else if (is_strictly_traversable (&pmtb)) fall_pos = pmtb;
 
   if (fall_pos.room != - 1)
-    place_frame (&kid->f, &kid->f, kid_fall_frameset[0].frame,
+    place_frame (&k->f, &k->f, kid_fall_frameset[0].frame,
                  &fall_pos,
-                 (kid->f.dir == LEFT) ? PLACE_WIDTH - 12 : +16,
-                 (kid->f.dir == LEFT) ? 23 : 27);
+                 (k->f.dir == LEFT) ? PLACE_WIDTH - 12 : +16,
+                 (k->f.dir == LEFT) ? 23 : 27);
 }

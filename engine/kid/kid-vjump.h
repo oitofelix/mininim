@@ -45,7 +45,7 @@ extern struct frameset kid_vjump_frameset[KID_VJUMP_FRAMESET_NMEMB];
 
 void load_kid_vjump (void);
 void unload_kid_vjump (void);
-void kid_vjump (struct anim *kid);
+void kid_vjump (struct anim *k);
 bool is_kid_vjump (struct frame *f);
 
 ALLEGRO_BITMAP *kid_vjump_01, *kid_vjump_02, *kid_vjump_03,

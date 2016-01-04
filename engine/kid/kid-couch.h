@@ -40,9 +40,9 @@ extern struct frameset kid_couch_frameset[KID_COUCH_FRAMESET_NMEMB];
 
 void load_kid_couch (void);
 void unload_kid_couch (void);
-void kid_couch (struct anim *kid);
-void kid_couch_collision (struct anim *kid);
-void kid_couch_suddenly (struct anim *kid);
+void kid_couch (struct anim *k);
+void kid_couch_collision (struct anim *k);
+void kid_couch_suddenly (struct anim *k);
 bool is_kid_couch (struct frame *f);
 
 extern ALLEGRO_BITMAP *kid_couch_01, *kid_couch_02, *kid_couch_03, *kid_couch_04,

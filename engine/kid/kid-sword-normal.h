@@ -25,7 +25,7 @@
 
 void load_kid_sword_normal (void);
 void unload_kid_sword_normal (void);
-void kid_sword_normal (struct anim *kid);
+void kid_sword_normal (struct anim *k);
 
 ALLEGRO_BITMAP *kid_sword_normal_08;
 

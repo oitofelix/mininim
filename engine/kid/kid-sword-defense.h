@@ -29,7 +29,7 @@ extern struct frameset kid_sword_defense_frameset[KID_SWORD_DEFENSE_FRAMESET_NME
 
 void load_kid_sword_defense (void);
 void unload_kid_sword_defense (void);
-void kid_sword_defense (struct anim *kid);
+void kid_sword_defense (struct anim *k);
 
 extern ALLEGRO_BITMAP *kid_sword_defense_18, *kid_sword_defense_11;
 

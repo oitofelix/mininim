@@ -87,9 +87,9 @@
 /* functions */
 void load_kid (void);
 void unload_kid (void);
-void draw_kid_lives (ALLEGRO_BITMAP *bitmap, struct anim *kid,
+void draw_kid_lives (ALLEGRO_BITMAP *bitmap, struct anim *k,
                      enum vm vm);
-void draw_kid_if_at_pos (ALLEGRO_BITMAP *bitmap, struct anim *kid, struct pos *p,
+void draw_kid_if_at_pos (ALLEGRO_BITMAP *bitmap, struct anim *k, struct pos *p,
                          enum vm vm);
 int create_kid (struct anim *k);
 void destroy_kid (struct anim *k);

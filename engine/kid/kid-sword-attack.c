@@ -31,9 +31,9 @@
 struct frameset kid_sword_attack_frameset[KID_SWORD_ATTACK_FRAMESET_NMEMB];
 
 static void init_kid_sword_attack_frameset (void);
-static bool flow (struct anim *kid);
-static bool physics_in (struct anim *kid);
-static void physics_out (struct anim *kid);
+static bool flow (struct anim *k);
+static bool physics_in (struct anim *k);
+static void physics_out (struct anim *k);
 
 ALLEGRO_BITMAP *kid_sword_attack_01, *kid_sword_attack_02,
   *kid_sword_attack_03, *kid_sword_attack_04, *kid_sword_attack_05,
@@ -81,65 +81,65 @@ unload_kid_sword_attack (void)
 }
 
 void
-kid_sword_attack (struct anim *kid)
+kid_sword_attack (struct anim *k)
 {
-  kid->oaction = kid->action;
-  kid->action = kid_sword_attack;
-  kid->f.flip = (kid->f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
+  k->oaction = k->action;
+  k->action = kid_sword_attack;
+  k->f.flip = (k->f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  if (! flow (kid)) return;
-  if (! physics_in (kid)) return;
-  next_frame (&kid->f, &kid->f, &kid->fo);
-  physics_out (kid);
+  if (! flow (k)) return;
+  if (! physics_in (k)) return;
+  next_frame (&k->f, &k->f, &k->fo);
+  physics_out (k);
 }
 
 static bool
-flow (struct anim *kid)
+flow (struct anim *k)
 {
-  if (kid->oaction != kid_sword_attack) kid->i = -1;
+  if (k->oaction != kid_sword_attack) k->i = -1;
 
-  if (kid->i == 6) {
-    kid_sword_normal (kid);
+  if (k->i == 6) {
+    kid_sword_normal (k);
     return false;
   }
 
-  if (kid->i == -1) kid->j = 1;
-  if (kid->i == 1 || kid->i == 2) kid->j = 19;
-  if (kid->i == 3 || kid->i == 5) kid->j = 17;
-  if (kid->i == 4) kid->j = 7;
+  if (k->i == -1) k->j = 1;
+  if (k->i == 1 || k->i == 2) k->j = 19;
+  if (k->i == 3 || k->i == 5) k->j = 17;
+  if (k->i == 4) k->j = 7;
 
-  select_frame (kid, kid_sword_attack_frameset, kid->i + 1);
-  select_xframe (&kid->xf, sword_frameset, kid->j);
+  select_frame (k, kid_sword_attack_frameset, k->i + 1);
+  select_xframe (&k->xf, sword_frameset, k->j);
 
-  if (kid->i == 1) kid->xf.b = NULL;
-  if (kid->i == 3) kid->xf.dx = -21, kid->xf.dy = +7;
-  if (kid->i == 4) kid->xf.dx = -7, kid->xf.dy = +17;
+  if (k->i == 1) k->xf.b = NULL;
+  if (k->i == 3) k->xf.dx = -21, k->xf.dy = +7;
+  if (k->i == 4) k->xf.dx = -7, k->xf.dy = +17;
 
   return true;
 }
 
 static bool
-physics_in (struct anim *kid)
+physics_in (struct anim *k)
 {
   struct coord nc; struct pos np, pbf, pmbo, pbb;
 
   /* collision */
-  if (is_colliding (&kid->f, &kid->fo, +PLACE_WIDTH, false, &kid->ci)
-      && kid->i == 0) {
+  if (is_colliding (&k->f, &k->fo, +PLACE_WIDTH, false, &k->ci)
+      && k->i == 0) {
     /* sample_action_not_allowed = true; */
-    kid_sword_normal (kid);
+    kid_sword_normal (k);
     return false;
   }
 
   /* fall */
-  survey (_bf, pos, &kid->f, &nc, &pbf, &np);
-  survey (_mbo, pos, &kid->f, &nc, &pmbo, &np);
-  survey (_bb, pos, &kid->f, &nc, &pbb, &np);
+  survey (_bf, pos, &k->f, &nc, &pbf, &np);
+  survey (_mbo, pos, &k->f, &nc, &pmbo, &np);
+  survey (_bb, pos, &k->f, &nc, &pbb, &np);
   if (is_strictly_traversable (&pbf)
       || is_strictly_traversable (&pmbo)
       || is_strictly_traversable (&pbb)) {
-    kid->xf.b = NULL;
-    kid_fall (kid);
+    k->xf.b = NULL;
+    kid_fall (k);
     return false;
   }
 
@@ -147,15 +147,15 @@ physics_in (struct anim *kid)
 }
 
 static void
-physics_out (struct anim *kid)
+physics_out (struct anim *k)
 {
   /* sound */
-  if (kid->i == 3) play_sample (sword_attack_sample, kid->f.c.room);
+  if (k->i == 3) play_sample (sword_attack_sample, k->f.c.room);
 
   /* depressible floors */
-  if (kid->i == 2) update_depressible_floor (kid, -8, -40);
-  else if (kid->i == 3) update_depressible_floor (kid, -11, -47);
-  else if (kid->i == 5) update_depressible_floor (kid, -4, -33);
-  else if (kid->i == 6) update_depressible_floor (kid, -1, -24);
-  else keep_depressible_floor (kid);
+  if (k->i == 2) update_depressible_floor (k, -8, -40);
+  else if (k->i == 3) update_depressible_floor (k, -11, -47);
+  else if (k->i == 5) update_depressible_floor (k, -4, -33);
+  else if (k->i == 6) update_depressible_floor (k, -1, -24);
+  else keep_depressible_floor (k);
 }

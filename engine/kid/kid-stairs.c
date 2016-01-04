@@ -32,9 +32,9 @@
 struct frameset kid_stairs_frameset[KID_STAIRS_FRAMESET_NMEMB];
 
 static void init_kid_stairs_frameset (void);
-static bool flow (struct anim *kid);
-static bool physics_in (struct anim *kid);
-static void physics_out (struct anim *kid);
+static bool flow (struct anim *k);
+static bool physics_in (struct anim *k);
+static void physics_out (struct anim *k);
 
 ALLEGRO_BITMAP *kid_stairs_01, *kid_stairs_02, *kid_stairs_03,
   *kid_stairs_04, *kid_stairs_05, *kid_stairs_06, *kid_stairs_07,
@@ -93,59 +93,61 @@ unload_kid_stairs (void)
 }
 
 void
-kid_stairs (struct anim *kid)
+kid_stairs (struct anim *k)
 {
-  kid->oaction = kid->action;
-  kid->action = kid_stairs;
-  kid->f.dir = RIGHT;
-  kid->f.flip = 0;
+  k->oaction = k->action;
+  k->action = kid_stairs;
+  k->f.dir = RIGHT;
+  k->f.flip = 0;
 
-  if (! flow (kid)) return;
-  if (! physics_in (kid)) return;
+  if (! flow (k)) return;
+  if (! physics_in (k)) return;
   next_frame_inv = true;
-  next_frame (&kid->f, &kid->f, &kid->fo);
+  next_frame (&k->f, &k->f, &k->fo);
   next_frame_inv = false;
-  physics_out (kid);
+  physics_out (k);
 }
 
 static bool
-flow (struct anim *kid)
+flow (struct anim *k)
 {
-  if (kid->oaction != kid_stairs) {
-    place_frame (&kid->f, &kid->f, kid_stairs_frameset[0].frame,
-                 &kid->p, +3, +16);
-    kid->i = kid->j = -1;
+  if (k->oaction != kid_stairs) {
+    place_frame (&k->f, &k->f, kid_stairs_frameset[0].frame,
+                 &k->p, +3, +16);
+    k->i = k->j = -1;
   }
 
-  if (kid->i == 11) level.end ();
+  if (k->i == 11) level.end ();
 
-  if (kid->i >= 11 && kid->j < 17) {
-    kid->invisible = true;
-    kid->j++;
-  } else if (kid->i < 11) kid->j = kid->i + 1;
+  if (k->i == 11 && k->j < 17) {
+    k->invisible = true;
+    k->j++;
+  } else if (k->i < 11) k->j = k->i + 1;
 
-  int i = kid->i <= 10 ? kid->i + 1: 11;
+  int i = k->i <= 10 ? k->i + 1: 11;
 
-  select_frame (kid, kid_stairs_frameset, i);
+  select_frame (k, kid_stairs_frameset, i);
+
+  if (k->j > 11) k->fo.dx = k->fo.dy = 0;
 
   return true;
 }
 
 static bool
-physics_in (struct anim *kid)
+physics_in (struct anim *k)
 {
   return true;
 }
 
 static void
-physics_out (struct anim *kid)
+physics_out (struct anim *k)
 {
   /* depressible floors */
-  if (kid->i > 4) clear_depressible_floor (kid);
-  else keep_depressible_floor (kid);
+  if (k->i > 4) clear_depressible_floor (k);
+  else keep_depressible_floor (k);
 
   /* sound */
-  if (kid->j % 4 == 0) play_sample (step_sample, kid->f.c.room);
+  if (k->j % 4 == 0) play_sample (step_sample, k->f.c.room);
 }
 
 bool

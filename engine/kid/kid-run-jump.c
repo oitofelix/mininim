@@ -32,9 +32,9 @@
 struct frameset kid_run_jump_frameset[KID_JUMP_FRAMESET_NMEMB];
 
 static void init_kid_run_jump_frameset (void);
-static bool flow (struct anim *kid);
-static bool physics_in (struct anim *kid);
-static void physics_out (struct anim *kid);
+static bool flow (struct anim *k);
+static bool physics_in (struct anim *k);
+static void physics_out (struct anim *k);
 
 ALLEGRO_BITMAP *kid_run_jump_01, *kid_run_jump_02, *kid_run_jump_03,
   *kid_run_jump_04, *kid_run_jump_05, *kid_run_jump_06,
@@ -93,99 +93,99 @@ unload_kid_run_jump (void)
 }
 
 void
-kid_run_jump (struct anim *kid)
+kid_run_jump (struct anim *k)
 {
-  kid->oaction = kid->action;
-  kid->action = kid_run_jump;
-  kid->f.flip = (kid->f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
+  k->oaction = k->action;
+  k->action = kid_run_jump;
+  k->f.flip = (k->f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  if (! flow (kid)) return;
-  if (! physics_in (kid)) return;
-  next_frame (&kid->f, &kid->f, &kid->fo);
-  physics_out (kid);
+  if (! flow (k)) return;
+  if (! physics_in (k)) return;
+  next_frame (&k->f, &k->f, &k->fo);
+  physics_out (k);
 }
 
 static bool
-flow (struct anim *kid)
+flow (struct anim *k)
 {
   struct coord nc; struct pos np, pm, ptf;
 
-  if (kid->oaction != kid_run_jump)
-    kid->i = -1, kid->hang = false;
+  if (k->oaction != kid_run_jump)
+    k->i = -1, k->hang = false;
 
-  bool hang_front = ((kid->f.dir == LEFT) ? kid->key.left : kid->key.right)
-    && ! kid->key.up && kid->key.shift;
+  bool hang_front = ((k->f.dir == LEFT) ? k->key.left : k->key.right)
+    && ! k->key.up && k->key.shift;
 
-  bool hang_back = ((kid->f.dir == LEFT) ? kid->key.right : kid->key.left)
-    && ! kid->key.up && kid->key.shift;
+  bool hang_back = ((k->f.dir == LEFT) ? k->key.right : k->key.left)
+    && ! k->key.up && k->key.shift;
 
-  int back_dir = (kid->f.dir == LEFT) ? RIGHT : LEFT;
+  int back_dir = (k->f.dir == LEFT) ? RIGHT : LEFT;
 
   /* hang front */
-  survey (_m, pos, &kid->f, &nc, &pm, &np);
-  if (hang_front && kid->i >= 6  && kid->i <= 9
-      && is_hangable_pos (&pm, kid->f.dir)) {
-    kid->hang_pos = pm;
-    pos2room (&kid->hang_pos, kid->f.c.room, &kid->hang_pos);
-    kid->hang = true;
-    play_sample (hang_on_fall_sample, kid->f.c.room);
-    kid_hang (kid);
+  survey (_m, pos, &k->f, &nc, &pm, &np);
+  if (hang_front && k->i >= 6  && k->i <= 9
+      && is_hangable_pos (&pm, k->f.dir)) {
+    k->hang_pos = pm;
+    pos2room (&k->hang_pos, k->f.c.room, &k->hang_pos);
+    k->hang = true;
+    play_sample (hang_on_fall_sample, k->f.c.room);
+    kid_hang (k);
     return false;
   }
 
   /* hang back */
-  survey (_tf, pos, &kid->f, &nc, &ptf, &np);
-  if (kid->i >= 6 && kid->i <= 9
+  survey (_tf, pos, &k->f, &nc, &ptf, &np);
+  if (k->i >= 6 && k->i <= 9
       && hang_back && is_hangable_pos (&ptf, back_dir)) {
-    kid->hang_pos = ptf;
-    pos2room (&kid->hang_pos, kid->f.c.room, &kid->hang_pos);
-    kid->hang = true;
-    play_sample (hang_on_fall_sample, kid->f.c.room);
-    kid_turn (kid);
+    k->hang_pos = ptf;
+    pos2room (&k->hang_pos, k->f.c.room, &k->hang_pos);
+    k->hang = true;
+    play_sample (hang_on_fall_sample, k->f.c.room);
+    kid_turn (k);
     return false;
   }
 
-  if (kid->i == 10) {
-    kid_run (kid);
+  if (k->i == 10) {
+    kid_run (k);
     return false;
   }
 
-  select_frame (kid, kid_run_jump_frameset, kid->i + 1);
+  select_frame (k, kid_run_jump_frameset, k->i + 1);
 
   return true;
 }
 
 static bool
-physics_in (struct anim *kid)
+physics_in (struct anim *k)
 {
   struct coord nc; struct pos np, pbf;
 
   /* inertia */
-  if (kid->i < 6 || kid->i > 10) kid->inertia = 3;
-  else kid->inertia = 5;
+  if (k->i < 6 || k->i > 10) k->inertia = 3;
+  else k->inertia = 5;
 
   /* collision */
   bool colliding =
-    is_colliding (&kid->f, &kid->fo, +0, false, &kid->ci);
+    is_colliding (&k->f, &k->fo, +0, false, &k->ci);
   bool cross_mirror =
-    kid->ci.t == MIRROR && kid->i >= 5 && kid->i <= 8;
+    k->ci.t == MIRROR && k->i >= 5 && k->i <= 8;
 
   if (colliding && ! cross_mirror) {
-    if (kid->i < 6) kid_stabilize_collision (kid);
-    else kid_couch_collision (kid);
+    if (k->i < 6) kid_stabilize_collision (k);
+    else kid_couch_collision (k);
     return false;
   } else if (cross_mirror) {
-    play_sample (mirror_sample, kid->f.c.room);
-    struct pos p; prel (&kid->ci.p, &p, +0, kid->f.dir == LEFT
+    play_sample (mirror_sample, k->f.c.room);
+    struct pos p; prel (&k->ci.p, &p, +0, k->f.dir == LEFT
                         ? +1 : +0);
-    mirror_at_pos (&p)->kid_crossing = kid->id;
+    mirror_at_pos (&p)->kid_crossing = k->id;
   }
 
   /* fall */
-  survey (_bf, pos, &kid->f, &nc, &pbf, &np);
-  if ((is_strictly_traversable (&pbf) && kid->i < 4)
-      || (is_strictly_traversable (&pbf) && kid->i > 9)) {
-    kid_fall (kid);
+  survey (_bf, pos, &k->f, &nc, &pbf, &np);
+  if ((is_strictly_traversable (&pbf) && k->i < 4)
+      || (is_strictly_traversable (&pbf) && k->i > 9)) {
+    kid_fall (k);
     return false;
   }
 
@@ -193,23 +193,23 @@ physics_in (struct anim *kid)
 }
 
 static void
-physics_out (struct anim *kid)
+physics_out (struct anim *k)
 {
   struct coord nc; struct pos pmbo, np;
 
   /* depressible floors */
-  if (kid->i == 0) update_depressible_floor (kid, -4, -10);
-  else if (kid->i == 3) update_depressible_floor (kid, -1, -4);
-  else if (kid->i == 6) clear_depressible_floor (kid);
-  else if (kid->i == 10) update_depressible_floor (kid, -9, -10);
-  else keep_depressible_floor (kid);
+  if (k->i == 0) update_depressible_floor (k, -4, -10);
+  else if (k->i == 3) update_depressible_floor (k, -1, -4);
+  else if (k->i == 6) clear_depressible_floor (k);
+  else if (k->i == 10) update_depressible_floor (k, -9, -10);
+  else keep_depressible_floor (k);
 
   /* loose floor shaking */
-  survey (_mbo, pos, &kid->f, &nc, &pmbo, &np);
-  if (kid->i == 10) shake_loose_floor_row (&pmbo);
+  survey (_mbo, pos, &k->f, &nc, &pmbo, &np);
+  if (k->i == 10) shake_loose_floor_row (&pmbo);
 
   /* sound */
-  if (kid->i == 0 || kid->i == 4) play_sample (step_sample, kid->f.c.room);
+  if (k->i == 0 || k->i == 4) play_sample (step_sample, k->f.c.room);
 }
 
 bool

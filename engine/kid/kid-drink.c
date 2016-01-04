@@ -32,9 +32,9 @@
 struct frameset kid_drink_frameset[KID_DRINK_FRAMESET_NMEMB];
 
 static void init_kid_drink_frameset (void);
-static bool flow (struct anim *kid);
-static bool physics_in (struct anim *kid);
-static void physics_out (struct anim *kid);
+static bool flow (struct anim *k);
+static bool physics_in (struct anim *k);
+static void physics_out (struct anim *k);
 
 ALLEGRO_BITMAP *kid_drink_01, *kid_drink_02, *kid_drink_03,
   *kid_drink_04, *kid_drink_05, *kid_drink_06, *kid_drink_07,
@@ -100,64 +100,64 @@ unload_kid_drink (void)
 }
 
 void
-kid_drink (struct anim *kid)
+kid_drink (struct anim *k)
 {
-  kid->oaction = kid->action;
-  kid->action = kid_drink;
-  kid->f.flip = (kid->f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
+  k->oaction = k->action;
+  k->action = kid_drink;
+  k->f.flip = (k->f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  if (! flow (kid)) return;
-  if (! physics_in (kid)) return;
-  next_frame (&kid->f, &kid->f, &kid->fo);
-  physics_out (kid);
+  if (! flow (k)) return;
+  if (! physics_in (k)) return;
+  next_frame (&k->f, &k->f, &k->fo);
+  physics_out (k);
 }
 
 static bool
-flow (struct anim *kid)
+flow (struct anim *k)
 {
   struct pos p;
 
-  if (kid->oaction != kid_drink)
-    kid->i = -1, kid->wait = 4, kid->reverse = false;
+  if (k->oaction != kid_drink)
+    k->i = -1, k->wait = 4, k->reverse = false;
 
-  if (kid->i < 14 && ! kid->reverse) kid->i++;
-  else if (kid->wait > 0) kid->wait--;
-  else if (kid->i == 14 && kid->wait == 0) kid->reverse = true, kid->i = 10;
-  else if (kid->i == 10 && kid->reverse) kid->i = 7;
+  if (k->i < 14 && ! k->reverse) k->i++;
+  else if (k->wait > 0) k->wait--;
+  else if (k->i == 14 && k->wait == 0) k->reverse = true, k->i = 10;
+  else if (k->i == 10 && k->reverse) k->i = 7;
   else {
-    kid_normal (kid);
-    kid->item_pos.room = -1;
+    kid_normal (k);
+    k->item_pos.room = -1;
     return false;
   }
 
-  if (kid->i == 14 && kid->wait == 1)
-    switch (kid->item) {
+  if (k->i == 14 && k->wait == 1)
+    switch (k->item) {
     case EMPTY_POTION: break;
-    case SMALL_LIFE_POTION: increase_kid_current_lives (kid); break;
-    case BIG_LIFE_POTION: increase_kid_total_lives (kid); break;
+    case SMALL_LIFE_POTION: increase_kid_current_lives (k); break;
+    case BIG_LIFE_POTION: increase_kid_total_lives (k); break;
     case SMALL_POISON_POTION:
-      if (kid->immortal
-          || kid->poison_immune) break;
-      kid->current_lives--;
-      kid->splash = true;
-      play_sample (harm_sample, kid->f.c.room);
+      if (k->immortal
+          || k->poison_immune) break;
+      k->current_lives--;
+      k->splash = true;
+      play_sample (harm_sample, k->f.c.room);
       video_effect.color = get_flicker_blood_color ();
       start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
       break;
     case BIG_POISON_POTION:
-      if (kid->immortal
-          || kid->poison_immune) break;
-      kid->current_lives = 0;
-      kid->splash = true;
-      play_sample (harm_sample, kid->f.c.room);
+      if (k->immortal
+          || k->poison_immune) break;
+      k->current_lives = 0;
+      k->splash = true;
+      play_sample (harm_sample, k->f.c.room);
       video_effect.color = get_flicker_blood_color ();
       start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
       break;
-    case FLOAT_POTION: float_kid (kid); break;
+    case FLOAT_POTION: float_kid (k); break;
     case FLIP_POTION:
       if (screen_flags) screen_flags = 0;
       else {
-        switch (prandom_pos (&kid->item_pos, 2)) {
+        switch (prandom_pos (&k->item_pos, 2)) {
         case 0: screen_flags = ALLEGRO_FLIP_VERTICAL; break;
         case 1: screen_flags = ALLEGRO_FLIP_HORIZONTAL; break;
         case 2: screen_flags = ALLEGRO_FLIP_VERTICAL | ALLEGRO_FLIP_HORIZONTAL; break;
@@ -169,33 +169,33 @@ flow (struct anim *kid)
     default: break;
     }
 
-  select_frame (kid, kid_drink_frameset, kid->i);
+  select_frame (k, kid_drink_frameset, k->i);
 
-  if (kid->i == 14 && kid->wait < 4) kid->fo.dx = 0;
-  if (kid->i == 10 && kid->reverse) kid->fo.dx = -2, kid->fo.dy = +1;
-  if (kid->i == 7 && kid->reverse) kid->fo.dx = +1;
+  if (k->i == 14 && k->wait < 4) k->fo.dx = 0;
+  if (k->i == 10 && k->reverse) k->fo.dx = -2, k->fo.dy = +1;
+  if (k->i == 7 && k->reverse) k->fo.dx = +1;
 
   return true;
 }
 
 static bool
-physics_in (struct anim *kid)
+physics_in (struct anim *k)
 {
   return true;
 }
 
 static void
-physics_out (struct anim *kid)
+physics_out (struct anim *k)
 {
   /* depressible floors */
-  keep_depressible_floor (kid);
+  keep_depressible_floor (k);
 
   /* sound */
-  if (kid->i == 7 && ! kid->reverse) play_sample (drink_sample, kid->f.c.room);
+  if (k->i == 7 && ! k->reverse) play_sample (drink_sample, k->f.c.room);
 
   /* consume bottle */
-  if (kid->i == 0) {
-    kid->item = con (&kid->item_pos)->ext.item;
-    con (&kid->item_pos)->ext.item = NO_ITEM;
+  if (k->i == 0) {
+    k->item = con (&k->item_pos)->ext.item;
+    con (&k->item_pos)->ext.item = NO_ITEM;
   }
 }

@@ -32,9 +32,9 @@
 struct frameset kid_die_frameset[KID_DIE_FRAMESET_NMEMB];
 
 static void init_kid_die_frameset (void);
-static bool flow (struct anim *kid);
-static bool physics_in (struct anim *kid);
-static void physics_out (struct anim *kid);
+static bool flow (struct anim *k);
+static bool physics_in (struct anim *k);
+static void physics_out (struct anim *k);
 
 ALLEGRO_BITMAP *kid_die_01, *kid_die_02, *kid_die_03, *kid_die_04,
   *kid_die_05, *kid_die_06, *kid_die_spiked_00, *kid_die_chopped_00;
@@ -81,139 +81,140 @@ unload_kid_die (void)
 }
 
 void
-kid_resurrect (struct anim *kid)
+kid_resurrect (struct anim *k)
 {
   struct coord nc; struct pos np, pm;
-  survey (_m, pos, &kid->f, &nc, &pm, &np);
-  kid->current_lives = kid->total_lives;
-  kid->action = kid_normal;
-  place_frame (&kid->f, &kid->f, kid_normal_00,
-               &pm, kid->f.dir == LEFT ? +16 : +16, +15);
-  reset_murder_spikes_floor (kid->id);
+  survey (_m, pos, &k->f, &nc, &pm, &np);
+  k->current_lives = k->total_lives;
+  k->action = kid_normal;
+  place_frame (&k->f, &k->f, kid_normal_00,
+               &pm, k->f.dir == LEFT ? +16 : +16, +15);
+  reset_murder_spikes_floor (k->id);
+  stop_sample (k->sample);
 }
 
 void
-kid_die_spiked (struct anim *kid)
+kid_die_spiked (struct anim *k)
 {
-  kid->oaction = kid->action;
-  kid->action = kid_die_spiked;
-  kid->f.flip = (kid->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
+  k->oaction = k->action;
+  k->action = kid_die_spiked;
+  k->f.flip = (k->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  if (kid->oaction != kid_die_spiked) {
-    kid->current_lives = 0;
-    kid->splash = true;
+  if (k->oaction != kid_die_spiked) {
+    k->current_lives = 0;
+    k->splash = true;
 
-    struct spikes_floor *s = spikes_floor_at_pos (&kid->p);
+    struct spikes_floor *s = spikes_floor_at_pos (&k->p);
     s->state = 5;
     s->inactive = true;
-    s->murdered_kid = kid->id;
+    s->murdered_kid = k->id;
 
     video_effect.color = get_flicker_blood_color ();
     start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
-    play_sample (spiked_sample, kid->f.c.room);
+    play_sample (spiked_sample, k->f.c.room);
   }
 
-  if (kid->oaction != kid_die_spiked) {
-    place_frame (&kid->f, &kid->f, kid_die_spiked_00,
-                 &kid->p, (kid->f.dir == LEFT)
-                 ? +8 : +9, (kid->f.dir == LEFT) ? +32 : +31);
-    kill_kid_shadows (kid);
+  if (k->oaction != kid_die_spiked) {
+    place_frame (&k->f, &k->f, kid_die_spiked_00,
+                 &k->p, (k->f.dir == LEFT)
+                 ? +8 : +9, (k->f.dir == LEFT) ? +32 : +31);
+    kill_kid_shadows (k);
   }
 }
 
 void
-kid_die_chopped (struct anim *kid)
+kid_die_chopped (struct anim *k)
 {
-  kid->oaction = kid->action;
-  kid->action = kid_die_chopped;
-  kid->f.flip = (kid->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
+  k->oaction = k->action;
+  k->action = kid_die_chopped;
+  k->f.flip = (k->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  kid->current_lives = 0;
+  k->current_lives = 0;
 
-  if (kid->oaction != kid_die_chopped) {
-    place_frame (&kid->f, &kid->f, kid_die_chopped_00,
-                 &kid->p, (kid->f.dir == LEFT)
+  if (k->oaction != kid_die_chopped) {
+    place_frame (&k->f, &k->f, kid_die_chopped_00,
+                 &k->p, (k->f.dir == LEFT)
                  ? -8 : -7, +47);
-    kill_kid_shadows (kid);
+    kill_kid_shadows (k);
   }
 }
 
 void
-kid_die_suddenly (struct anim *kid)
+kid_die_suddenly (struct anim *k)
 {
-  kid->oaction = kid->action;
-  kid->action = kid_die_suddenly;
-  kid->f.flip = (kid->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
+  k->oaction = k->action;
+  k->action = kid_die_suddenly;
+  k->f.flip = (k->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  kid->current_lives = 0;
+  k->current_lives = 0;
 
-  if (kid->oaction != kid_die_suddenly) {
-    place_frame (&kid->f, &kid->f, kid_die_06,
-                 &kid->p, (kid->f.dir == LEFT)
+  if (k->oaction != kid_die_suddenly) {
+    place_frame (&k->f, &k->f, kid_die_06,
+                 &k->p, (k->f.dir == LEFT)
                  ? +9 : +4, +47);
 
-    kill_kid_shadows (kid);
+    kill_kid_shadows (k);
   }
 
-  kid->hit_by_loose_floor = false;
+  k->hit_by_loose_floor = false;
 }
 
 void
-kid_die (struct anim *kid)
+kid_die (struct anim *k)
 {
-  kid->oaction = kid->action;
-  kid->action = kid_die;
-  kid->f.flip = (kid->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
+  k->oaction = k->action;
+  k->action = kid_die;
+  k->f.flip = (k->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  if (! flow (kid)) return;
-  if (! physics_in (kid)) return;
-  next_frame (&kid->f, &kid->f, &kid->fo);
-  physics_out (kid);
+  if (! flow (k)) return;
+  if (! physics_in (k)) return;
+  next_frame (&k->f, &k->f, &k->fo);
+  physics_out (k);
 }
 
 static bool
-flow (struct anim *kid)
+flow (struct anim *k)
 {
-  if (kid->oaction != kid_die) {
-    place_frame (&kid->f, &kid->f, kid_die_frameset[0].frame,
-                 &kid->p, (kid->f.dir == LEFT)
+  if (k->oaction != kid_die) {
+    place_frame (&k->f, &k->f, kid_die_frameset[0].frame,
+                 &k->p, (k->f.dir == LEFT)
                  ? +13 : +21, +18);
-    kid->i = -1, kid->j = 0;
+    k->i = -1, k->j = 0;
   }
 
-  kid->current_lives = 0;
+  k->current_lives = 0;
 
-  kid->i = kid->i < 5 ? kid->i + 1 : 5;
+  k->i = k->i < 5 ? k->i + 1 : 5;
 
-  select_frame (kid, kid_die_frameset, kid->i);
+  select_frame (k, kid_die_frameset, k->i);
 
-  if (kid->j >= 1) kid->fo.dx = kid->fo.dy = 0;
-  if (kid->i == 5) kid->j = 1;
-  if (kid->j == 1) {
-    kid->j++;
-    kill_kid_shadows (kid);
+  if (k->j >= 1) k->fo.dx = k->fo.dy = 0;
+  if (k->i == 5) k->j = 1;
+  if (k->j == 1) {
+    k->j++;
+    kill_kid_shadows (k);
   }
 
   return true;
 }
 
 static bool
-physics_in (struct anim *kid)
+physics_in (struct anim *k)
 {
   return true;
 }
 
 static void
-physics_out (struct anim *kid)
+physics_out (struct anim *k)
 {
   /* depressible floors */
-  if (kid->i == 0) update_depressible_floor (kid, -5, -11);
-  else if (kid->i == 1) update_depressible_floor (kid, -4, -11);
-  else if (kid->i == 2) update_depressible_floor (kid, -3, -14);
-  else if (kid->i == 3) update_depressible_floor (kid, -4, -15);
-  else if (kid->i == 4) update_depressible_floor (kid, -3, -21);
-  else if (kid->i == 5) update_depressible_floor (kid, -1, -33);
-  else keep_depressible_floor (kid);
+  if (k->i == 0) update_depressible_floor (k, -5, -11);
+  else if (k->i == 1) update_depressible_floor (k, -4, -11);
+  else if (k->i == 2) update_depressible_floor (k, -3, -14);
+  else if (k->i == 3) update_depressible_floor (k, -4, -15);
+  else if (k->i == 4) update_depressible_floor (k, -3, -21);
+  else if (k->i == 5) update_depressible_floor (k, -1, -33);
+  else keep_depressible_floor (k);
 }
 
 bool

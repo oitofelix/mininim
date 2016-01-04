@@ -31,9 +31,9 @@
 struct frameset kid_vjump_frameset[KID_VJUMP_FRAMESET_NMEMB];
 
 static void init_kid_vjump_frameset (void);
-static bool flow (struct anim *kid);
-static bool physics_in (struct anim *kid);
-static void physics_out (struct anim *kid);
+static bool flow (struct anim *k);
+static bool physics_in (struct anim *k);
+static void physics_out (struct anim *k);
 
 ALLEGRO_BITMAP *kid_vjump_01, *kid_vjump_02, *kid_vjump_03, *kid_vjump_04,
   *kid_vjump_05, *kid_vjump_06, *kid_vjump_07, *kid_vjump_08, *kid_vjump_09,
@@ -106,153 +106,153 @@ unload_kid_vjump (void)
 }
 
 void
-kid_vjump (struct anim *kid)
+kid_vjump (struct anim *k)
 {
-  kid->oaction = kid->action;
-  kid->action = kid_vjump;
-  kid->f.flip = (kid->f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
+  k->oaction = k->action;
+  k->action = kid_vjump;
+  k->f.flip = (k->f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  if (! flow (kid)) return;
-  if (! physics_in (kid)) return;
-  next_frame (&kid->f, &kid->f, &kid->fo);
-  physics_out (kid);
+  if (! flow (k)) return;
+  if (! physics_in (k)) return;
+  next_frame (&k->f, &k->f, &k->fo);
+  physics_out (k);
 }
 
 static bool
-flow (struct anim *kid)
+flow (struct anim *k)
 {
-  if (kid->oaction != kid_vjump)
-    kid->i = -1, kid->j = 0,
-      kid->just_hanged = kid->hit_ceiling =
-      kid->hang = kid->misstep = false;
+  if (k->oaction != kid_vjump)
+    k->i = -1, k->j = 0,
+      k->just_hanged = k->hit_ceiling =
+      k->hang = k->misstep = false;
 
-  if (kid->i == 12 && kid->hang) {
-    kid_hang (kid);
+  if (k->i == 12 && k->hang) {
+    kid_hang (k);
     return false;
   }
 
-  if (kid->i == 17) {
-    kid_normal (kid);
+  if (k->i == 17) {
+    kid_normal (k);
     return false;
   }
 
-  if (kid->oaction == kid_hang_wall
-      || kid->oaction == kid_hang_free) {
-    kid->just_hanged = true;
-    kid->i = 13;
-  } else if (kid->i == 12 && kid->j > 0
-             && ! kid->hit_ceiling) kid->i = 12;
-  else kid->i++;
+  if (k->oaction == kid_hang_wall
+      || k->oaction == kid_hang_free) {
+    k->just_hanged = true;
+    k->i = 13;
+  } else if (k->i == 12 && k->j > 0
+             && ! k->hit_ceiling) k->i = 12;
+  else k->i++;
 
-  select_frame (kid, kid_vjump_frameset, kid->i);
+  select_frame (k, kid_vjump_frameset, k->i);
 
-  if (kid->oaction == kid_hang_free
-      && is_hang_pos_critical (&kid->hang_pos))
-    kid->fo.dx -= (kid->f.dir == LEFT) ? 9 : 13;
-  if (kid->hang && is_hang_pos_critical (&kid->hang_pos)
-      && kid->i == 11) kid->fo.dx = +7;
-  if (kid->hang && ! is_hang_pos_critical (&kid->hang_pos)
-      && (kid->i == 11 || kid->i == 12)) {
-    kid->fo.dx += -1;
-    kid->fo.dy += -1;
+  if (k->oaction == kid_hang_free
+      && is_hang_pos_critical (&k->hang_pos))
+    k->fo.dx -= (k->f.dir == LEFT) ? 9 : 13;
+  if (k->hang && is_hang_pos_critical (&k->hang_pos)
+      && k->i == 11) k->fo.dx = +7;
+  if (k->hang && ! is_hang_pos_critical (&k->hang_pos)
+      && (k->i == 11 || k->i == 12)) {
+    k->fo.dx += -1;
+    k->fo.dy += -1;
   }
-  if (kid->i == 12 && kid->j++ > 0)
-    kid->fo.dx = 0, kid->fo.dy += 2 * kid->j + 1;
-  if (kid->j == 4) kid->j = 0;
+  if (k->i == 12 && k->j++ > 0)
+    k->fo.dx = 0, k->fo.dy += 2 * k->j + 1;
+  if (k->j == 4) k->j = 0;
 
   return true;
 }
 
 static bool
-physics_in (struct anim *kid)
+physics_in (struct anim *k)
 {
   struct coord nc, tf; struct pos np, ptf, ptr, pmt, pm, pmf, pmba;
 
   /* collision */
-  if (is_colliding (&kid->f, &kid->fo, +0, false, &kid->ci)
-      && (kid->ci.t == MIRROR
-          || (kid->ci.t == CARPET && kid->f.dir == RIGHT)))
-    kid->f.c.x += (kid->f.dir == LEFT) ? +4 : -4;
+  if (is_colliding (&k->f, &k->fo, +0, false, &k->ci)
+      && (k->ci.t == MIRROR
+          || (k->ci.t == CARPET && k->f.dir == RIGHT)))
+    k->f.c.x += (k->f.dir == LEFT) ? +4 : -4;
 
   /* fall */
-  survey (_m, pos, &kid->f, &nc, &pm, &np);
-  survey (_mf, pos, &kid->f, &nc, &pmf, &np);
-  survey (_mba, pos, &kid->f, &nc, &pmba, &np);
+  survey (_m, pos, &k->f, &nc, &pm, &np);
+  survey (_mf, pos, &k->f, &nc, &pmf, &np);
+  survey (_mba, pos, &k->f, &nc, &pmba, &np);
   if (is_strictly_traversable (&pm)
       && is_strictly_traversable (&pmf)
       && is_strictly_traversable (&pmba)) {
-    kid_fall (kid);
+    kid_fall (k);
     return false;
   }
 
   /* ceiling hit */
-  survey (_tr, pos, &kid->f, &nc, &ptr, &np);
-  survey (_mt, pos, &kid->f, &nc, &pmt, &np);
+  survey (_tr, pos, &k->f, &nc, &ptr, &np);
+  survey (_mt, pos, &k->f, &nc, &pmt, &np);
   struct pos ptra; prel (&ptr, &ptra, -1, 0);
   struct pos pmta; prel (&pmt, &pmta, -1, 0);
-  if (kid->i == 12 && kid->j == 1
+  if (k->i == 12 && k->j == 1
       && (! is_strictly_traversable (&ptra)
           || ! is_strictly_traversable (&pmta)))
-    kid->hit_ceiling = true;
+    k->hit_ceiling = true;
 
   /* hang */
-  int dir = (kid->f.dir == LEFT) ? +1 : -1;
-  survey (_tf, pos, &kid->f, &tf, &ptf, &np);
-  if (kid->i == 0
-      && is_hangable_pos (prel (&ptf, &np, 0, dir), kid->f.dir)
+  int dir = (k->f.dir == LEFT) ? +1 : -1;
+  survey (_tf, pos, &k->f, &tf, &ptf, &np);
+  if (k->i == 0
+      && is_hangable_pos (prel (&ptf, &np, 0, dir), k->f.dir)
       && ! (con (&ptf)->fg == DOOR
-            && kid->f.dir == LEFT
+            && k->f.dir == LEFT
             && tf.y <= door_grid_tip_y (&ptf) - 10)) {
-    prel (&ptf, &kid->hang_pos, 0, dir);
-    pos2room (&kid->hang_pos, kid->f.c.room, &kid->hang_pos);
-    kid->fo.dx += is_hang_pos_critical (&kid->hang_pos) ? -12 : -3;
-    kid->hang = true;
-  } else if (kid->i == 0 && can_hang (&kid->f, false, &kid->hang_pos)
-             && ! is_hang_pos_critical (&kid->hang_pos)
-             && (kid->f.dir == LEFT || con (&kid->hang_pos)->fg != DOOR)) {
-    kid->fo.dx -= 0; kid->hang = true;
+    prel (&ptf, &k->hang_pos, 0, dir);
+    pos2room (&k->hang_pos, k->f.c.room, &k->hang_pos);
+    k->fo.dx += is_hang_pos_critical (&k->hang_pos) ? -12 : -3;
+    k->hang = true;
+  } else if (k->i == 0 && can_hang (&k->f, false, &k->hang_pos)
+             && ! is_hang_pos_critical (&k->hang_pos)
+             && (k->f.dir == LEFT || con (&k->hang_pos)->fg != DOOR)) {
+    k->fo.dx -= 0; k->hang = true;
   }
 
-  if (kid->i == 0 && kid->hang)
-    place_frame (&kid->f, &kid->f, kid_vjump_frameset[0].frame,
-                 &kid->hang_pos, (kid->f.dir == LEFT) ? +14 : PLACE_WIDTH + 5, +16);
+  if (k->i == 0 && k->hang)
+    place_frame (&k->f, &k->f, kid_vjump_frameset[0].frame,
+                 &k->hang_pos, (k->f.dir == LEFT) ? +14 : PLACE_WIDTH + 5, +16);
 
   return true;
 }
 
 static void
-physics_out (struct anim *kid)
+physics_out (struct anim *k)
 {
   struct coord nc; struct pos np, ptf, ptb, pmbo;
   enum confg ctf, ctb;
 
  /* depressible floors */
-  if (kid->i == 0 && kid->hang
-      && ! peq (&kid->hang_pos, &kid->df_pos[0])
-      && ! peq (&kid->hang_pos, &kid->df_pos[1]))
-    update_depressible_floor (kid, -1, -8);
-  else if (kid->i == 11) {
-    save_depressible_floor (kid);
-    clear_depressible_floor (kid);
-  } else if (kid->i == 14 && ! kid->just_hanged) {
-    restore_depressible_floor (kid);
-    keep_depressible_floor (kid);
-  } else if (kid->i == 14 && kid->just_hanged)
-    update_depressible_floor (kid, -5, -7);
-  else keep_depressible_floor (kid);
+  if (k->i == 0 && k->hang
+      && ! peq (&k->hang_pos, &k->df_pos[0])
+      && ! peq (&k->hang_pos, &k->df_pos[1]))
+    update_depressible_floor (k, -1, -8);
+  else if (k->i == 11) {
+    save_depressible_floor (k);
+    clear_depressible_floor (k);
+  } else if (k->i == 14 && ! k->just_hanged) {
+    restore_depressible_floor (k);
+    keep_depressible_floor (k);
+  } else if (k->i == 14 && k->just_hanged)
+    update_depressible_floor (k, -5, -7);
+  else keep_depressible_floor (k);
 
   /* ceiling loose floor shaking and release */
-  if (kid->i == 13 && kid->hit_ceiling) {
-    ctb = survey (_tb, pos, &kid->f, &nc, &ptb, &np)->fg;
-    ctf = survey (_tf, pos, &kid->f, &nc, &ptf, &np)->fg;
+  if (k->i == 13 && k->hit_ceiling) {
+    ctb = survey (_tb, pos, &k->f, &nc, &ptb, &np)->fg;
+    ctf = survey (_tf, pos, &k->f, &nc, &ptf, &np)->fg;
     shake_loose_floor_row (&ptb);
     if (ctb == LOOSE_FLOOR) release_loose_floor (&ptb);
     if (ctf == LOOSE_FLOOR) release_loose_floor (&ptf);
   }
 
   /* loose floor shaking */
-  survey (_mbo, pos, &kid->f, &nc, &pmbo, &np);
-  if (kid->i == 17) shake_loose_floor_row (&pmbo);
+  survey (_mbo, pos, &k->f, &nc, &pmbo, &np);
+  if (k->i == 17) shake_loose_floor_row (&pmbo);
 }
 
 bool

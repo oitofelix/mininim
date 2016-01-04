@@ -36,7 +36,7 @@ extern struct frameset kid_turn_run_frameset[KID_TURN_RUN_FRAMESET_NMEMB];
 
 void load_kid_turn_run (void);
 void unload_kid_turn_run (void);
-void kid_turn_run (struct anim *kid);
+void kid_turn_run (struct anim *k);
 bool is_kid_turn_run (struct frame *f);
 
 extern ALLEGRO_BITMAP *kid_turn_run_05, *kid_turn_run_06, *kid_turn_run_07,

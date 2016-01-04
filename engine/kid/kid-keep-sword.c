@@ -31,9 +31,9 @@
 struct frameset kid_keep_sword_frameset[KID_KEEP_SWORD_FRAMESET_NMEMB];
 
 static void init_kid_keep_sword_frameset (void);
-static bool flow (struct anim *kid);
-static bool physics_in (struct anim *kid);
-static void physics_out (struct anim *kid);
+static bool flow (struct anim *k);
+static bool physics_in (struct anim *k);
+static void physics_out (struct anim *k);
 
 ALLEGRO_BITMAP *kid_keep_sword_01, *kid_keep_sword_02,
   *kid_keep_sword_03, *kid_keep_sword_04, *kid_keep_sword_05,
@@ -88,67 +88,67 @@ unload_kid_keep_sword (void)
 }
 
 void
-kid_keep_sword (struct anim *kid)
+kid_keep_sword (struct anim *k)
 {
-  kid->oaction = kid->action;
-  kid->action = kid_keep_sword;
-  kid->f.flip = (kid->f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
+  k->oaction = k->action;
+  k->action = kid_keep_sword;
+  k->f.flip = (k->f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  if (! flow (kid)) return;
-  if (! physics_in (kid)) return;
-  next_frame (&kid->f, &kid->f, &kid->fo);
-  physics_out (kid);
+  if (! flow (k)) return;
+  if (! physics_in (k)) return;
+  next_frame (&k->f, &k->f, &k->fo);
+  physics_out (k);
 }
 
 static bool
-flow (struct anim *kid)
+flow (struct anim *k)
 {
-  if (kid->oaction != kid_keep_sword) kid->i = -1, kid->wait = 1;
+  if (k->oaction != kid_keep_sword) k->i = -1, k->wait = 1;
 
-  if (kid->i < 8) kid->i++;
-  else if (kid->i == 8 && kid->wait > 0) kid->wait--;
-  else if (kid->i == 8 && kid->wait == 0) kid->i++, kid->wait = 2;
-  else if (kid->i == 9 && kid->wait > 0) kid->wait--;
+  if (k->i < 8) k->i++;
+  else if (k->i == 8 && k->wait > 0) k->wait--;
+  else if (k->i == 8 && k->wait == 0) k->i++, k->wait = 2;
+  else if (k->i == 9 && k->wait > 0) k->wait--;
   else {
-    if (kid->keep_sword_fast) {
-      kid_normal (kid);
-      kid->keep_sword_fast = false;
+    if (k->keep_sword_fast) {
+      kid_normal (k);
+      k->keep_sword_fast = false;
       return false;
     }
     else {
       /* kid turn will invert kid's direction */
-      kid->f.dir = (kid->f.dir == RIGHT) ? LEFT : RIGHT;
-      kid_turn (kid);
+      k->f.dir = (k->f.dir == RIGHT) ? LEFT : RIGHT;
+      kid_turn (k);
       return false;
     }
   }
 
-  if (kid->keep_sword_fast && kid->i % 2 == 0) kid->i++, kid->wait = 0;
+  if (k->keep_sword_fast && k->i % 2 == 0) k->i++, k->wait = 0;
 
-  kid->j = 24 + kid->i;
+  k->j = 24 + k->i;
 
-  select_frame (kid, kid_keep_sword_frameset, kid->i);
-  if (kid->i < 4)
-    select_xframe (&kid->xf, sword_frameset, kid->j);
+  select_frame (k, kid_keep_sword_frameset, k->i);
+  if (k->i < 4)
+    select_xframe (&k->xf, sword_frameset, k->j);
 
-  if (kid->i == 8 && kid->wait < 1) kid->fo.dx = 0;
-  if (kid->i == 9 && kid->wait < 2) kid->fo.dx = 0;
-  if (kid->keep_sword_fast && kid->i % 2)
-    kid->fo.dx += kid_keep_sword_frameset[kid->i - 1].dx;
-  if (kid->f.b == kid_sword_normal_08) kid->fo.dx = +8;
+  if (k->i == 8 && k->wait < 1) k->fo.dx = 0;
+  if (k->i == 9 && k->wait < 2) k->fo.dx = 0;
+  if (k->keep_sword_fast && k->i % 2)
+    k->fo.dx += kid_keep_sword_frameset[k->i - 1].dx;
+  if (k->f.b == kid_sword_normal_08) k->fo.dx = +8;
 
   return true;
 }
 
 static bool
-physics_in (struct anim *kid)
+physics_in (struct anim *k)
 {
   return true;
 }
 
 static void
-physics_out (struct anim *kid)
+physics_out (struct anim *k)
 {
   /* depressible floors */
-  keep_depressible_floor (kid);
+  keep_depressible_floor (k);
 }

@@ -31,9 +31,9 @@
 struct frameset kid_turn_frameset[KID_TURN_FRAMESET_NMEMB];
 
 static void init_kid_turn_frameset (void);
-static bool flow (struct anim *kid);
-static bool physics_in (struct anim *kid);
-static void physics_out (struct anim *kid);
+static bool flow (struct anim *k);
+static bool physics_in (struct anim *k);
+static void physics_out (struct anim *k);
 
 ALLEGRO_BITMAP *kid_turn_01, *kid_turn_02, *kid_turn_03, *kid_turn_04;
 
@@ -71,98 +71,98 @@ unload_kid_turn (void)
 }
 
 void
-kid_turn (struct anim *kid)
+kid_turn (struct anim *k)
 {
-  kid->oaction = kid->action;
-  kid->action = kid_turn;
+  k->oaction = k->action;
+  k->action = kid_turn;
 
-  if (kid->oaction != kid_turn)
-    kid->f.dir = (kid->f.dir == LEFT) ? RIGHT : LEFT;
-  kid->f.flip = (kid->f.dir == LEFT) ? 0 : ALLEGRO_FLIP_HORIZONTAL;
+  if (k->oaction != kid_turn)
+    k->f.dir = (k->f.dir == LEFT) ? RIGHT : LEFT;
+  k->f.flip = (k->f.dir == LEFT) ? 0 : ALLEGRO_FLIP_HORIZONTAL;
 
-  if (! flow (kid)) return;
-  if (! physics_in (kid)) return;
+  if (! flow (k)) return;
+  if (! physics_in (k)) return;
   next_frame_inv = true;
-  next_frame (&kid->f, &kid->f, &kid->fo);
+  next_frame (&k->f, &k->f, &k->fo);
   next_frame_inv = false;
-  physics_out (kid);
+  physics_out (k);
 }
 
 static bool
-flow (struct anim *kid)
+flow (struct anim *k)
 {
-  if (kid->oaction != kid_turn)
-    kid->i = -1, kid->misstep = kid->hang = false;
+  if (k->oaction != kid_turn)
+    k->i = -1, k->misstep = k->hang = false;
 
-  if (! kid->turn)
-    kid->turn = ((kid->f.dir == RIGHT) && kid->key.left)
-      || ((kid->f.dir == LEFT) && kid->key.right);
-  bool run = ((kid->f.dir == RIGHT) ? kid->key.right : kid->key.left)
-    && ! kid->key.shift;
-  bool jump = ((kid->f.dir == RIGHT) && kid->key.right && kid->key.up)
-    || ((kid->f.dir == LEFT) && kid->key.left && kid->key.up);
-  bool couch = kid->key.down;
+  if (! k->turn)
+    k->turn = ((k->f.dir == RIGHT) && k->key.left)
+      || ((k->f.dir == LEFT) && k->key.right);
+  bool run = ((k->f.dir == RIGHT) ? k->key.right : k->key.left)
+    && ! k->key.shift;
+  bool jump = ((k->f.dir == RIGHT) && k->key.right && k->key.up)
+    || ((k->f.dir == LEFT) && k->key.left && k->key.up);
+  bool couch = k->key.down;
 
-  if (kid->i == 3) {
-    int dc = dist_collision (&kid->f, false, &kid->ci);
-    int df = dist_fall (&kid->f, false);
+  if (k->i == 3) {
+    int dc = dist_collision (&k->f, false, &k->ci);
+    int df = dist_fall (&k->f, false);
 
-    if (kid->hang) kid_hang (kid);
-    else if (kid->turn) {
-      kid->i = -1; kid->turn = false;
-      kid->action = kid_normal;
-      kid_turn (kid);
+    if (k->hang) kid_hang (k);
+    else if (k->turn) {
+      k->i = -1; k->turn = false;
+      k->action = kid_normal;
+      kid_turn (k);
     }
-    else if (couch) kid_couch (kid);
-    else if (jump) kid_jump (kid);
+    else if (couch) kid_couch (k);
+    else if (jump) kid_jump (k);
     else if (run && dc > PLACE_WIDTH && df > PLACE_WIDTH)
-      kid_start_run (kid);
-    else kid_stabilize (kid);
+      kid_start_run (k);
+    else kid_stabilize (k);
 
     return false;
   }
 
-  if (kid->f.b == kid_keep_sword_frameset[9].frame) kid->i = 2;
+  if (k->f.b == kid_keep_sword_frameset[9].frame) k->i = 2;
 
   /* hang */
-  if (kid->oaction == kid_fall
-      || kid->oaction == kid_jump
-      || kid->oaction == kid_run_jump
-      || kid->oaction == kid_hang_free
-      || kid->oaction == kid_hang_wall) {
-    kid->i = 2, kid->hang = true;
-    place_frame (&kid->f, &kid->f, kid_turn_frameset[2].frame,
-                 &kid->hang_pos, (kid->f.dir == LEFT)
+  if (k->oaction == kid_fall
+      || k->oaction == kid_jump
+      || k->oaction == kid_run_jump
+      || k->oaction == kid_hang_free
+      || k->oaction == kid_hang_wall) {
+    k->i = 2, k->hang = true;
+    place_frame (&k->f, &k->f, kid_turn_frameset[2].frame,
+                 &k->hang_pos, (k->f.dir == LEFT)
                  ? 7 : PLACE_WIDTH, +4);
   }
 
-  select_frame (kid, kid_turn_frameset, kid->i + 1);
+  select_frame (k, kid_turn_frameset, k->i + 1);
 
-  if (kid->f.b == kid_stabilize_frameset[0].frame) kid->fo.dx = +6;
-  if (kid->f.b == kid_stabilize_frameset[1].frame) kid->fo.dx = +10;
-  if (kid->f.b == kid_stabilize_frameset[2].frame) kid->fo.dx = +8;
-  if (kid->f.b == kid_stabilize_frameset[3].frame) kid->fo.dx = +4;
-  if (kid->f.b == kid_turn_frameset[3].frame) kid->fo.dx = +3;
-  if (kid->f.b == kid_keep_sword_frameset[9].frame) kid->fo.dx = -2;
+  if (k->f.b == kid_stabilize_frameset[0].frame) k->fo.dx = +6;
+  if (k->f.b == kid_stabilize_frameset[1].frame) k->fo.dx = +10;
+  if (k->f.b == kid_stabilize_frameset[2].frame) k->fo.dx = +8;
+  if (k->f.b == kid_stabilize_frameset[3].frame) k->fo.dx = +4;
+  if (k->f.b == kid_turn_frameset[3].frame) k->fo.dx = +3;
+  if (k->f.b == kid_keep_sword_frameset[9].frame) k->fo.dx = -2;
 
   return true;
 }
 
 static bool
-physics_in (struct anim *kid)
+physics_in (struct anim *k)
 {
   struct coord nc; struct pos np, pbf, pbb;
 
   /* collision */
-  if (kid_door_split_collision (kid)) return false;
+  if (kid_door_split_collision (k)) return false;
 
   /* fall */
-  survey (_bf, pos, &kid->f, &nc, &pbf, &np);
-  survey (_bb, pos, &kid->f, &nc, &pbb, &np);
-  if (! kid->hang
+  survey (_bf, pos, &k->f, &nc, &pbf, &np);
+  survey (_bb, pos, &k->f, &nc, &pbb, &np);
+  if (! k->hang
       && is_strictly_traversable (&pbf)
       && is_strictly_traversable (&pbb)) {
-    kid_fall (kid);
+    kid_fall (k);
     return false;
   }
 
@@ -170,10 +170,10 @@ physics_in (struct anim *kid)
 }
 
 static void
-physics_out (struct anim *kid)
+physics_out (struct anim *k)
 {
   /* depressible floors */
-  keep_depressible_floor (kid);
+  keep_depressible_floor (k);
 }
 
 bool

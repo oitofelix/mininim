@@ -32,9 +32,9 @@
 struct frameset kid_jump_frameset[KID_JUMP_FRAMESET_NMEMB];
 
 static void init_kid_jump_frameset (void);
-static bool flow (struct anim *kid);
-static bool physics_in (struct anim *kid);
-static void physics_out (struct anim *kid);
+static bool flow (struct anim *k);
+static bool physics_in (struct anim *k);
+static void physics_out (struct anim *k);
 
 ALLEGRO_BITMAP *kid_jump_01, *kid_jump_02, *kid_jump_03, *kid_jump_04,
   *kid_jump_05, *kid_jump_06, *kid_jump_07, *kid_jump_08, *kid_jump_09,
@@ -107,100 +107,100 @@ unload_kid_jump (void)
 }
 
 void
-kid_jump (struct anim *kid)
+kid_jump (struct anim *k)
 {
-  kid->oaction = kid->action;
-  kid->action = kid_jump;
-  kid->f.flip = (kid->f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
+  k->oaction = k->action;
+  k->action = kid_jump;
+  k->f.flip = (k->f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  if (! flow (kid)) return;
-  if (! physics_in (kid)) return;
-  next_frame (&kid->f, &kid->f, &kid->fo);
-  physics_out (kid);
+  if (! flow (k)) return;
+  if (! physics_in (k)) return;
+  next_frame (&k->f, &k->f, &k->fo);
+  physics_out (k);
 }
 
 static bool
-flow (struct anim *kid)
+flow (struct anim *k)
 {
   struct coord nc; struct pos np, pm, ptf;
 
-  if (kid->oaction != kid_jump)
-    kid->i = -1, kid->misstep = kid->hang = false;
+  if (k->oaction != kid_jump)
+    k->i = -1, k->misstep = k->hang = false;
 
-  bool hang_front = ((kid->f.dir == LEFT) ? kid->key.left : kid->key.right)
-    && ! kid->key.up && kid->key.shift;
+  bool hang_front = ((k->f.dir == LEFT) ? k->key.left : k->key.right)
+    && ! k->key.up && k->key.shift;
 
-  bool hang_back = ((kid->f.dir == LEFT) ? kid->key.right : kid->key.left)
-    && ! kid->key.up && kid->key.shift;
+  bool hang_back = ((k->f.dir == LEFT) ? k->key.right : k->key.left)
+    && ! k->key.up && k->key.shift;
 
-  int back_dir = (kid->f.dir == LEFT) ? RIGHT : LEFT;
+  int back_dir = (k->f.dir == LEFT) ? RIGHT : LEFT;
 
   /* hang front */
-  survey (_m, pos, &kid->f, &nc, &pm, &np);
-  if (kid->i >= 8 && kid->i <= 10
-      && hang_front && is_hangable_pos (&pm, kid->f.dir)) {
-    kid->hang_pos = pm;
-    pos2room (&kid->hang_pos, kid->f.c.room, &kid->hang_pos);
-    kid->hang = true;
-    play_sample (hang_on_fall_sample, kid->f.c.room);
-    kid_hang (kid);
+  survey (_m, pos, &k->f, &nc, &pm, &np);
+  if (k->i >= 8 && k->i <= 10
+      && hang_front && is_hangable_pos (&pm, k->f.dir)) {
+    k->hang_pos = pm;
+    pos2room (&k->hang_pos, k->f.c.room, &k->hang_pos);
+    k->hang = true;
+    play_sample (hang_on_fall_sample, k->f.c.room);
+    kid_hang (k);
     return false;
   }
 
   /* hang back */
-  survey (_tf, pos, &kid->f, &nc, &ptf, &np);
-  if (kid->i >= 8 && kid->i <= 10
+  survey (_tf, pos, &k->f, &nc, &ptf, &np);
+  if (k->i >= 8 && k->i <= 10
       && hang_back && is_hangable_pos (&ptf, back_dir)) {
-    kid->hang_pos = ptf;
-    pos2room (&kid->hang_pos, kid->f.c.room, &kid->hang_pos);
-    kid->hang = true;
-    play_sample (hang_on_fall_sample, kid->f.c.room);
-    kid_turn (kid);
+    k->hang_pos = ptf;
+    pos2room (&k->hang_pos, k->f.c.room, &k->hang_pos);
+    k->hang = true;
+    play_sample (hang_on_fall_sample, k->f.c.room);
+    kid_turn (k);
     return false;
   }
 
-  if (kid->i == 17) {
-    kid_normal (kid);
+  if (k->i == 17) {
+    kid_normal (k);
     return false;
   }
 
-  select_frame (kid, kid_jump_frameset, kid->i + 1);
+  select_frame (k, kid_jump_frameset, k->i + 1);
 
-  if (kid->f.b == kid_stabilize_frameset[0].frame) kid->fo.dx = +2;
-  if (kid->f.b == kid_stabilize_frameset[1].frame) kid->fo.dx = +6;
-  if (kid->f.b == kid_stabilize_frameset[2].frame) kid->fo.dx = +4;
-  if (kid->f.b == kid_stabilize_frameset[3].frame) kid->fo.dx = +0;
+  if (k->f.b == kid_stabilize_frameset[0].frame) k->fo.dx = +2;
+  if (k->f.b == kid_stabilize_frameset[1].frame) k->fo.dx = +6;
+  if (k->f.b == kid_stabilize_frameset[2].frame) k->fo.dx = +4;
+  if (k->f.b == kid_stabilize_frameset[3].frame) k->fo.dx = +0;
 
   return true;
 }
 
 static bool
-physics_in (struct anim *kid)
+physics_in (struct anim *k)
 {
   struct coord nc; struct pos np, pbb, pmbo, pbf;
   struct frame nf;
 
   /* inertia */
-  if (kid->i >= 8 && kid->i <= 10) kid->inertia = 5;
-  else kid->inertia = 0;
+  if (k->i >= 8 && k->i <= 10) k->inertia = 5;
+  else k->inertia = 0;
 
   /* collision */
-  if (is_colliding (&kid->f, &kid->fo, +0, false, &kid->ci)) {
-    if (kid->i < 7 || kid->i > 10) kid_stabilize_collision (kid);
-    else kid_couch_collision (kid);
+  if (is_colliding (&k->f, &k->fo, +0, false, &k->ci)) {
+    if (k->i < 7 || k->i > 10) kid_stabilize_collision (k);
+    else kid_couch_collision (k);
     return false;
   }
 
   /* fall */
-  next_frame (&kid->f, &nf, &kid->fo);
+  next_frame (&k->f, &nf, &k->fo);
   survey (_bb, pos, &nf, &nc, &pbb, &np);
   survey (_mbo, pos, &nf, &nc, &pmbo, &np);
   survey (_bf, pos, &nf, &nc, &pbf, &np);
   if ((is_strictly_traversable (&pbb)
-       && is_strictly_traversable (&pmbo) && kid->i <= 7)
-      || (kid->i >= 10
+       && is_strictly_traversable (&pmbo) && k->i <= 7)
+      || (k->i >= 10
           && is_strictly_traversable (&pbf))) {
-    kid_fall (kid);
+    kid_fall (k);
     return false;
   }
 
@@ -208,22 +208,22 @@ physics_in (struct anim *kid)
 }
 
 static void
-physics_out (struct anim *kid)
+physics_out (struct anim *k)
 {
   struct coord nc; struct pos np, pmbo;
 
   /* depressible floors */
-  if (kid->i == 8) clear_depressible_floor (kid);
-  else if (kid->i == 11) update_depressible_floor (kid, -11, -15);
-  else if (kid->i == 14) update_depressible_floor (kid, 0, -6);
-  else keep_depressible_floor (kid);
+  if (k->i == 8) clear_depressible_floor (k);
+  else if (k->i == 11) update_depressible_floor (k, -11, -15);
+  else if (k->i == 14) update_depressible_floor (k, 0, -6);
+  else keep_depressible_floor (k);
 
   /* loose floor shaking */
-  survey (_mbo, pos, &kid->f, &nc, &pmbo, &np);
-  if (kid->i == 12) shake_loose_floor_row (&pmbo);
+  survey (_mbo, pos, &k->f, &nc, &pmbo, &np);
+  if (k->i == 12) shake_loose_floor_row (&pmbo);
 
   /* sound */
-  if (kid->i == 11 || kid->i == 14) play_sample (step_sample, kid->f.c.room);
+  if (k->i == 11 || k->i == 14) play_sample (step_sample, k->f.c.room);
 }
 
 bool

@@ -95,7 +95,10 @@ start (void)
 
   /* make the kid turn as appropriate */
   switch (level.number) {
-  case 1: k->f.dir = (k->f.dir == LEFT) ? RIGHT : LEFT; break;
+  case 1:
+    k->f.dir = (k->f.dir == LEFT) ? RIGHT : LEFT;
+    k->i = -1; k->action = kid_fall;
+    break;
   case 13:
     k->f.dir = (k->f.dir == LEFT) ? RIGHT : LEFT;
     k->i = -1; k->action = kid_stop_run; break;

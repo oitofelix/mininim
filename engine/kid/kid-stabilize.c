@@ -31,9 +31,9 @@
 struct frameset kid_stabilize_frameset[KID_STABILIZE_FRAMESET_NMEMB];
 
 static void init_kid_stabilize_frameset (void);
-static bool flow (struct anim *kid);
-static bool physics_in (struct anim *kid);
-static void physics_out (struct anim *kid);
+static bool flow (struct anim *k);
+static bool physics_in (struct anim *k);
+static void physics_out (struct anim *k);
 
 ALLEGRO_BITMAP *kid_stabilize_05, *kid_stabilize_06, *kid_stabilize_07,
   *kid_stabilize_08;
@@ -72,115 +72,115 @@ unload_kid_stabilize (void)
 }
 
 void
-kid_stabilize (struct anim *kid)
+kid_stabilize (struct anim *k)
 {
-  kid->oaction = kid->action;
-  kid->action = kid_stabilize;
-  kid->f.flip = (kid->f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
+  k->oaction = k->action;
+  k->action = kid_stabilize;
+  k->f.flip = (k->f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  if (! flow (kid)) return;
-  if (! physics_in (kid)) return;
-  next_frame (&kid->f, &kid->f, &kid->fo);
-  physics_out (kid);
+  if (! flow (k)) return;
+  if (! physics_in (k)) return;
+  next_frame (&k->f, &k->f, &k->fo);
+  physics_out (k);
 }
 
 void
-kid_stabilize_collision (struct anim *kid)
+kid_stabilize_collision (struct anim *k)
 {
-  kid->action = kid_stabilize_collision;
-  place_frame (&kid->f, &kid->f, kid_stabilize_frameset[0].frame,
-               &kid->ci.p, (kid->f.dir == LEFT)
+  k->action = kid_stabilize_collision;
+  place_frame (&k->f, &k->f, kid_stabilize_frameset[0].frame,
+               &k->ci.p, (k->f.dir == LEFT)
                ? PLACE_WIDTH + 18 : -PLACE_WIDTH + 24, +17);
-  kid_stabilize (kid);
-  play_sample (hit_wall_sample, kid->f.c.room);
+  kid_stabilize (k);
+  play_sample (hit_wall_sample, k->f.c.room);
 }
 
 void
-kid_stabilize_back_collision (struct anim *kid)
+kid_stabilize_back_collision (struct anim *k)
 {
-  kid->action = kid_stabilize_back_collision;
-  place_frame (&kid->f, &kid->f, kid_stabilize_frameset[0].frame,
-               &kid->ci.p, (kid->f.dir == LEFT)
+  k->action = kid_stabilize_back_collision;
+  place_frame (&k->f, &k->f, kid_stabilize_frameset[0].frame,
+               &k->ci.p, (k->f.dir == LEFT)
                ? -PLACE_WIDTH + 24 : PLACE_WIDTH + 18, +17);
-  kid_stabilize (kid);
-  play_sample (hit_wall_sample, kid->f.c.room);
+  kid_stabilize (k);
+  play_sample (hit_wall_sample, k->f.c.room);
 }
 
 static bool
-flow (struct anim *kid)
+flow (struct anim *k)
 {
-  if (kid->oaction != kid_stabilize) {
-    kid->i = -1, kid->misstep = false;
-    if (kid->oaction == kid_stabilize_collision) {
-      kid->i = 0; kid->collision = true;
-    } else kid->collision = false;
-    if (kid->oaction == kid_turn) kid->collision = true;
+  if (k->oaction != kid_stabilize) {
+    k->i = -1, k->misstep = false;
+    if (k->oaction == kid_stabilize_collision) {
+      k->i = 0; k->collision = true;
+    } else k->collision = false;
+    if (k->oaction == kid_turn) k->collision = true;
   }
 
-  if (! kid->turn)
-    kid->turn = ((kid->f.dir == RIGHT) && kid->key.left)
-      || ((kid->f.dir == LEFT) && kid->key.right);
-  bool run = (((kid->f.dir == RIGHT) && kid->key.right)
-              || ((kid->f.dir == LEFT) && kid->key.left))
-    && ! kid->key.shift;
-  bool jump = ((kid->f.dir == RIGHT) && kid->key.right && kid->key.up)
-    || ((kid->f.dir == LEFT) && kid->key.left && kid->key.up);
-  bool couch = kid->key.down;
+  if (! k->turn)
+    k->turn = ((k->f.dir == RIGHT) && k->key.left)
+      || ((k->f.dir == LEFT) && k->key.right);
+  bool run = (((k->f.dir == RIGHT) && k->key.right)
+              || ((k->f.dir == LEFT) && k->key.left))
+    && ! k->key.shift;
+  bool jump = ((k->f.dir == RIGHT) && k->key.right && k->key.up)
+    || ((k->f.dir == LEFT) && k->key.left && k->key.up);
+  bool couch = k->key.down;
 
-  int dc = dist_collision (&kid->f, false, &kid->ci);
-  int df = dist_fall (&kid->f, false);
+  int dc = dist_collision (&k->f, false, &k->ci);
+  int df = dist_fall (&k->f, false);
 
-  if (kid->i >= 0 && ! kid->collision) {
+  if (k->i >= 0 && ! k->collision) {
     if (couch) {
-      kid_couch (kid);
+      kid_couch (k);
       return false;
     } else if (jump) {
-      kid_jump (kid);
+      kid_jump (k);
       return false;
-    } else if (kid->turn) {
-      kid_turn (kid);
-      kid->turn = false;
+    } else if (k->turn) {
+      kid_turn (k);
+      k->turn = false;
       return false;
     } else if (run && dc > PLACE_WIDTH && df > PLACE_WIDTH) {
-      kid_start_run (kid);
+      kid_start_run (k);
       return false;
     }
   }
 
-  if (kid->i == 3) {
-    kid_normal (kid);
-    kid->turn = false;
+  if (k->i == 3) {
+    kid_normal (k);
+    k->turn = false;
     return false;
   }
 
-  select_frame (kid, kid_stabilize_frameset, kid->i + 1);
+  select_frame (k, kid_stabilize_frameset, k->i + 1);
 
-  if (kid->f.b == kid_stop_run_frameset[3].frame) kid->fo.dx = -5;
+  if (k->f.b == kid_stop_run_frameset[3].frame) k->fo.dx = -5;
 
   return true;
 }
 
 static bool
-physics_in (struct anim *kid)
+physics_in (struct anim *k)
 {
   struct coord nc; struct pos np, pmbo, pbb;
 
   /* inertia */
-  kid->inertia = kid->cinertia = 0;
+  k->inertia = k->cinertia = 0;
 
   /* fall */
-  survey (_mbo, pos, &kid->f, &nc, &pmbo, &np);
-  survey (_bb, pos, &kid->f, &nc, &pbb, &np);
+  survey (_mbo, pos, &k->f, &nc, &pmbo, &np);
+  survey (_bb, pos, &k->f, &nc, &pbb, &np);
   if (is_strictly_traversable (&pmbo)
       && is_strictly_traversable (&pbb)) {
-    kid_fall (kid);
+    kid_fall (k);
     return false;
   }
 
   /* collision */
-  if (is_colliding (&kid->f, &kid->fo, +0, false, &kid->ci)
-      && ! kid->collision) {
-    kid_stabilize_collision (kid);
+  if (is_colliding (&k->f, &k->fo, +0, false, &k->ci)
+      && ! k->collision) {
+    kid_stabilize_collision (k);
     return false;
   }
 
@@ -188,12 +188,12 @@ physics_in (struct anim *kid)
 }
 
 static void
-physics_out (struct anim *kid)
+physics_out (struct anim *k)
 {
   /* depressible floors */
-  if (kid->collision && kid->i == 1)
-    update_depressible_floor (kid, -13, -18);
-  else keep_depressible_floor (kid);
+  if (k->collision && k->i == 1)
+    update_depressible_floor (k, -13, -18);
+  else keep_depressible_floor (k);
 }
 
 bool

@@ -31,9 +31,9 @@
 struct frameset kid_climb_frameset[KID_CLIMB_FRAMESET_NMEMB];
 
 static void init_kid_climb_frameset (void);
-static bool flow (struct anim *kid);
-static bool physics_in (struct anim *kid);
-static void physics_out (struct anim *kid);
+static bool flow (struct anim *k);
+static bool physics_in (struct anim *k);
+static void physics_out (struct anim *k);
 
 ALLEGRO_BITMAP *kid_climb_01, *kid_climb_02, *kid_climb_03,
   *kid_climb_04, *kid_climb_05, *kid_climb_06, *kid_climb_07,
@@ -99,92 +99,92 @@ unload_kid_climb (void)
 }
 
 void
-kid_climb (struct anim *kid)
+kid_climb (struct anim *k)
 {
-  kid->oaction = kid->action;
-  kid->action = kid_climb;
-  kid->f.flip = (kid->f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
+  k->oaction = k->action;
+  k->action = kid_climb;
+  k->f.flip = (k->f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  if (! flow (kid)) return;
-  if (! physics_in (kid)) return;
-  next_frame (&kid->f, &kid->f, &kid->fo);
-  physics_out (kid);
+  if (! flow (k)) return;
+  if (! physics_in (k)) return;
+  next_frame (&k->f, &k->f, &k->fo);
+  physics_out (k);
 }
 
 static bool
-flow (struct anim *kid)
+flow (struct anim *k)
 {
-  if (kid->oaction != kid_climb) {
-    kid->i = -1;
-    kid->wait = DOOR_WAIT_LOOK;
+  if (k->oaction != kid_climb) {
+    k->i = -1;
+    k->wait = DOOR_WAIT_LOOK;
   }
 
   struct pos hanged_pos;
-  get_hanged_pos (&kid->hang_pos, kid->f.dir, &hanged_pos);
+  get_hanged_pos (&k->hang_pos, k->f.dir, &hanged_pos);
 
-  if (kid->i == 14) {
-    kid_couch (kid);
+  if (k->i == 14) {
+    kid_couch (k);
     return false;
   }
 
-  if (kid->i == -1) {
-    int dir = (kid->f.dir == LEFT) ? 0 : 1;
-    place_frame (&kid->f, &kid->f, kid_climb_frameset[0].frame,
-                 &kid->hang_pos, PLACE_WIDTH * dir + 9, -9);
+  if (k->i == -1) {
+    int dir = (k->f.dir == LEFT) ? 0 : 1;
+    place_frame (&k->f, &k->f, kid_climb_frameset[0].frame,
+                 &k->hang_pos, PLACE_WIDTH * dir + 9, -9);
   }
 
-  if (kid->wait == DOOR_WAIT_LOOK && kid->i < 14) kid->i++;
+  if (k->wait == DOOR_WAIT_LOOK && k->i < 14) k->i++;
 
-  select_frame (kid, kid_climb_frameset, kid->i);
+  select_frame (k, kid_climb_frameset, k->i);
 
   /* climbing when looking left should let the kid near to the edge
      if it's not a door */
-  if (kid->f.dir == LEFT && kid->fo.dx != 0
-      && kid->i % 2
+  if (k->f.dir == LEFT && k->fo.dx != 0
+      && k->i % 2
       && con (&hanged_pos)->fg != DOOR)
-    kid->fo.dx += 1;
+    k->fo.dx += 1;
 
-  if (kid->i == 3 && kid->wait < DOOR_WAIT_LOOK)
-    kid->fo.dx = 0, kid->fo.dy = 0;
+  if (k->i == 3 && k->wait < DOOR_WAIT_LOOK)
+    k->fo.dx = 0, k->fo.dy = 0;
 
   return true;
 }
 
 static bool
-physics_in (struct anim *kid)
+physics_in (struct anim *k)
 {
   struct coord nc; struct pos np, ptf;
   enum confg ctf;
 
   /* fall */
-  ctf = survey (_tf, pos, &kid->f, &nc, &ptf, &np)->fg;
+  survey (_tf, pos, &k->f, &nc, &ptf, &np);
   if (is_strictly_traversable (&ptf)) {
-    kid_fall (kid);
+    kid_fall (k);
     return false;
   }
 
   /* door collision */
-  survey (_tf, pos, &kid->f, &nc, &ptf, &np);
-  if (kid->i == 3 && ctf == DOOR && kid->f.dir == LEFT
+  ctf = survey (_tf, pos, &k->f, &nc, &ptf, &np)->fg;
+  if (k->i == 3 && ctf == DOOR && k->f.dir == LEFT
       && door_at_pos (&ptf)->i > DOOR_CLIMB_LIMIT) {
-    if (kid->wait == 0) {
-      kid->hang_limit = true;
-      kid_unclimb (kid);
+    if (k->wait == 0) {
+      k->hang_limit = true;
+      kid_unclimb (k);
       return false;
-    } else if (kid->wait > 0) kid->wait--;
+    } else if (k->wait > 0) k->wait--;
   }
 
   return true;
 }
 
 static void
-physics_out (struct anim *kid)
+physics_out (struct anim *k)
 {
   struct pos hanged_pos;
 
   /* depressible floors */
-  clear_depressible_floor (kid);
-  get_hanged_pos (&kid->hang_pos, kid->f.dir, &hanged_pos);
+  clear_depressible_floor (k);
+  get_hanged_pos (&k->hang_pos, k->f.dir, &hanged_pos);
   press_depressible_floor (&hanged_pos);
 }
 

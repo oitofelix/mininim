@@ -28,9 +28,9 @@
 #include "engine/loose-floor.h"
 #include "kid.h"
 
-static bool flow (struct anim *kid);
-static bool physics_in (struct anim *kid);
-static void physics_out (struct anim *kid);
+static bool flow (struct anim *k);
+static bool physics_in (struct anim *k);
+static void physics_out (struct anim *k);
 
 ALLEGRO_BITMAP *kid_sword_normal_08;
 
@@ -47,82 +47,82 @@ unload_kid_sword_normal (void)
 }
 
 void
-kid_sword_normal (struct anim *kid)
+kid_sword_normal (struct anim *k)
 {
-  kid->oaction = kid->action;
-  kid->action = kid_sword_normal;
-  kid->f.flip = (kid->f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
+  k->oaction = k->action;
+  k->action = kid_sword_normal;
+  k->f.flip = (k->f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  if (! flow (kid)) return;
-  if (! physics_in (kid)) return;
-  next_frame (&kid->f, &kid->f, &kid->fo);
-  physics_out (kid);
+  if (! flow (k)) return;
+  if (! physics_in (k)) return;
+  next_frame (&k->f, &k->f, &k->fo);
+  physics_out (k);
 }
 
 static bool
-flow (struct anim *kid)
+flow (struct anim *k)
 {
-  bool keep_sword = kid->key.down;
-  bool defense = kid->key.up;
-  bool attack = kid->key.shift;
-  bool walkf = ((kid->f.dir == RIGHT) && kid->key.right)
-    || ((kid->f.dir == LEFT) && kid->key.left);
-  bool walkb = ((kid->f.dir == RIGHT) && kid->key.left)
-    || ((kid->f.dir == LEFT) && kid->key.right);
+  bool keep_sword = k->key.down;
+  bool defense = k->key.up;
+  bool attack = k->key.shift;
+  bool walkf = ((k->f.dir == RIGHT) && k->key.right)
+    || ((k->f.dir == LEFT) && k->key.left);
+  bool walkb = ((k->f.dir == RIGHT) && k->key.left)
+    || ((k->f.dir == LEFT) && k->key.right);
 
-  if (kid->oaction == kid_sword_normal) {
+  if (k->oaction == kid_sword_normal) {
     if (keep_sword) {
       /* keep_sword_fast = true; */
-      kid_keep_sword (kid);
+      kid_keep_sword (k);
       return false;
     }
 
     if (defense) {
-      kid_sword_defense (kid);
+      kid_sword_defense (k);
       return false;
     }
 
     if (attack) {
-      kid_sword_attack (kid);
+      kid_sword_attack (k);
       return false;
     }
 
     if (walkf) {
-      kid_sword_walkf (kid);
+      kid_sword_walkf (k);
       return false;
     }
 
     if (walkb) {
-      kid_sword_walkb (kid);
+      kid_sword_walkb (k);
       return false;
     }
   }
 
-  kid->fo.b = kid_sword_normal_08;
-  kid->fo.dx = kid->fo.dy = +0;
-  select_xframe (&kid->xf, sword_frameset, 13);
+  k->fo.b = kid_sword_normal_08;
+  k->fo.dx = k->fo.dy = +0;
+  select_xframe (&k->xf, sword_frameset, 13);
 
-  if (kid->f.b == kid_take_sword_frameset[3].frame) kid->fo.dx = -4;
-  if (kid->f.b == kid_sword_walkf_frameset[1].frame) kid->fo.dx = +5;
-  if (kid->f.b == kid_sword_walkb_frameset[1].frame) kid->fo.dx = +2;
+  if (k->f.b == kid_take_sword_frameset[3].frame) k->fo.dx = -4;
+  if (k->f.b == kid_sword_walkf_frameset[1].frame) k->fo.dx = +5;
+  if (k->f.b == kid_sword_walkb_frameset[1].frame) k->fo.dx = +2;
 
   return true;
 }
 
 static bool
-physics_in (struct anim *kid)
+physics_in (struct anim *k)
 {
   struct coord nc; struct pos np, pbf, pmbo, pbb;
 
   /* fall */
-  survey (_bf, pos, &kid->f, &nc, &pbf, &np);
-  survey (_mbo, pos, &kid->f, &nc, &pmbo, &np);
-  survey (_bb, pos, &kid->f, &nc, &pbb, &np);
+  survey (_bf, pos, &k->f, &nc, &pbf, &np);
+  survey (_mbo, pos, &k->f, &nc, &pmbo, &np);
+  survey (_bb, pos, &k->f, &nc, &pbb, &np);
   if (is_strictly_traversable (&pbf)
       || is_strictly_traversable (&pmbo)
       || is_strictly_traversable (&pbb)) {
-    kid->xf.b = NULL;
-    kid_fall (kid);
+    k->xf.b = NULL;
+    kid_fall (k);
     return false;
   }
 
@@ -130,10 +130,10 @@ physics_in (struct anim *kid)
 }
 
 static void
-physics_out (struct anim *kid)
+physics_out (struct anim *k)
 {
   /* depressible floors */
-  if (kid->f.b == kid_take_sword_frameset[3].frame)
-    update_depressible_floor (kid, -2, -27);
-  else keep_depressible_floor (kid);
+  if (k->f.b == kid_take_sword_frameset[3].frame)
+    update_depressible_floor (k, -2, -27);
+  else keep_depressible_floor (k);
 }

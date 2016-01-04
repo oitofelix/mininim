@@ -31,9 +31,9 @@
 struct frameset kid_start_run_frameset[KID_START_RUN_FRAMESET_NMEMB];
 
 static void init_kid_start_run_frameset (void);
-static bool flow (struct anim *kid);
-static bool physics_in (struct anim *kid);
-static void physics_out (struct anim *kid);
+static bool flow (struct anim *k);
+static bool physics_in (struct anim *k);
+static void physics_out (struct anim *k);
 
 ALLEGRO_BITMAP *kid_start_run_01, *kid_start_run_02, *kid_start_run_03,
   *kid_start_run_04, *kid_start_run_05, *kid_start_run_06;
@@ -77,82 +77,82 @@ unload_kid_start_run (void)
 }
 
 void
-kid_start_run (struct anim *kid)
+kid_start_run (struct anim *k)
 {
-  kid->oaction = kid->action;
-  kid->action = kid_start_run;
-  kid->f.flip = (kid->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
+  k->oaction = k->action;
+  k->action = kid_start_run;
+  k->f.flip = (k->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  if (! flow (kid)) return;
-  if (! physics_in (kid)) return;
-  next_frame (&kid->f, &kid->f, &kid->fo);
-  physics_out (kid);
+  if (! flow (k)) return;
+  if (! physics_in (k)) return;
+  next_frame (&k->f, &k->f, &k->fo);
+  physics_out (k);
 }
 
 static bool
-flow (struct anim *kid)
+flow (struct anim *k)
 {
-  if (kid->oaction != kid_start_run) kid->i = -1, kid->misstep = false;
+  if (k->oaction != kid_start_run) k->i = -1, k->misstep = false;
 
-  bool run = (kid->f.dir == RIGHT) ? kid->key.right : kid->key.left;
-  bool turn_run = (kid->f.dir == RIGHT) ? kid->key.left : kid->key.right;
-  bool couch = kid->key.down;
-  bool jump = ((kid->f.dir == RIGHT) && kid->key.right && kid->key.up)
-    || ((kid->f.dir == LEFT) && kid->key.left && kid->key.up);
+  bool run = (k->f.dir == RIGHT) ? k->key.right : k->key.left;
+  bool turn_run = (k->f.dir == RIGHT) ? k->key.left : k->key.right;
+  bool couch = k->key.down;
+  bool jump = ((k->f.dir == RIGHT) && k->key.right && k->key.up)
+    || ((k->f.dir == LEFT) && k->key.left && k->key.up);
 
   if (couch) {
-    kid_couch (kid);
+    kid_couch (k);
     return false;
   }
 
-  if (jump && kid->i < 3) {
-    kid_jump (kid);
+  if (jump && k->i < 3) {
+    kid_jump (k);
     return false;
   }
 
-  if ((kid->i == 3 || kid->i == 4) && turn_run) {
-    kid_stop_run (kid);
+  if ((k->i == 3 || k->i == 4) && turn_run) {
+    kid_stop_run (k);
     return false;
   }
 
-  if (kid->i == 5) {
-    if (run) kid_run (kid);
-    else kid_stop_run (kid);
+  if (k->i == 5) {
+    if (run) kid_run (k);
+    else kid_stop_run (k);
     return false;
   }
 
-  select_frame (kid, kid_start_run_frameset, kid->i + 1);
+  select_frame (k, kid_start_run_frameset, k->i + 1);
 
-  if (kid->f.b == kid_turn_frameset[3].frame) kid->fo.dx = +0;
-  if (kid->f.b == kid_stabilize_frameset[0].frame) kid->fo.dx = +2;
-  if (kid->f.b == kid_stabilize_frameset[1].frame) kid->fo.dx = +6;
-  if (kid->f.b == kid_stabilize_frameset[2].frame) kid->fo.dx = +4;
-  if (kid->f.b == kid_stabilize_frameset[3].frame) kid->fo.dx = +0;
+  if (k->f.b == kid_turn_frameset[3].frame) k->fo.dx = +0;
+  if (k->f.b == kid_stabilize_frameset[0].frame) k->fo.dx = +2;
+  if (k->f.b == kid_stabilize_frameset[1].frame) k->fo.dx = +6;
+  if (k->f.b == kid_stabilize_frameset[2].frame) k->fo.dx = +4;
+  if (k->f.b == kid_stabilize_frameset[3].frame) k->fo.dx = +0;
 
   return true;
 }
 
 static bool
-physics_in (struct anim *kid)
+physics_in (struct anim *k)
 {
   struct coord nc; struct pos np, pmbo, ptf;
 
   /* inertia */
-  kid->inertia = 0;
-  kid->cinertia = 2;
+  k->inertia = 0;
+  k->cinertia = 2;
 
   /* collision */
-  if (is_colliding (&kid->f, &kid->fo, +0, false, &kid->ci)) {
-    kid_stabilize_collision (kid);
+  if (is_colliding (&k->f, &k->fo, +0, false, &k->ci)) {
+    kid_stabilize_collision (k);
     return false;
   }
 
   /* fall */
-  survey (_mbo, pos, &kid->f, &nc, &pmbo, &np);
-  survey (_tf, pos, &kid->f, &nc, &ptf, &np);
+  survey (_mbo, pos, &k->f, &nc, &pmbo, &np);
+  survey (_tf, pos, &k->f, &nc, &ptf, &np);
   if (is_strictly_traversable (&pmbo)
       || is_strictly_traversable (&ptf)) {
-    kid_fall (kid);
+    kid_fall (k);
     return false;
   }
 
@@ -160,11 +160,11 @@ physics_in (struct anim *kid)
 }
 
 static void
-physics_out (struct anim *kid)
+physics_out (struct anim *k)
 {
   /* depressible floors */
-  if (kid->i == 5) update_depressible_floor (kid, -16, -19);
-  else keep_depressible_floor (kid);
+  if (k->i == 5) update_depressible_floor (k, -16, -19);
+  else keep_depressible_floor (k);
 }
 
 bool

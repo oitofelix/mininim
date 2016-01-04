@@ -22,6 +22,6 @@
 
 void load_kid_hang_free (void);
 void unload_kid_hang_free (void);
-void kid_hang_free (struct anim *kid);
+void kid_hang_free (struct anim *k);
 
 #endif	/* MININIM_KID_HANG_FREE_H */

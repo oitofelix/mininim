@@ -472,8 +472,8 @@ pos_gen (struct coord *c, struct pos *p, int dx, int dy)
   p->place = (c->x - dx) / PLACE_WIDTH;
   p->floor = (c->y - dy) / PLACE_HEIGHT;
 
-  if (c->x < dx) p->place += -1;
-  if (c->y < dy) p->floor += -1;
+  if (c->x < dx) p->place = -1;
+  if (c->y < dy) p->floor = -1;
 
   return p;
 }

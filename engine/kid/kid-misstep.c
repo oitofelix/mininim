@@ -31,9 +31,9 @@
 struct frameset kid_misstep_frameset[KID_MISSTEP_FRAMESET_NMEMB];
 
 static void init_kid_misstep_frameset (void);
-static bool flow (struct anim *kid);
-static bool physics_in (struct anim *kid);
-static void physics_out (struct anim *kid);
+static bool flow (struct anim *k);
+static bool physics_in (struct anim *k);
+static void physics_out (struct anim *k);
 
 static void
 init_kid_misstep_frameset (void)
@@ -62,44 +62,44 @@ unload_kid_misstep (void)
 }
 
 void
-kid_misstep (struct anim *kid)
+kid_misstep (struct anim *k)
 {
-  kid->oaction = kid->action;
-  kid->action = kid_misstep;
-  kid->f.flip = (kid->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
+  k->oaction = k->action;
+  k->action = kid_misstep;
+  k->f.flip = (k->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  if (! flow (kid)) return;
-  if (! physics_in (kid)) return;
-  next_frame (&kid->f, &kid->f, &kid->fo);
-  physics_out (kid);
+  if (! flow (k)) return;
+  if (! physics_in (k)) return;
+  next_frame (&k->f, &k->f, &k->fo);
+  physics_out (k);
 }
 
 static bool
-flow (struct anim *kid)
+flow (struct anim *k)
 {
-  if (kid->oaction != kid_misstep) kid->i = -1, kid->misstep = true;
+  if (k->oaction != kid_misstep) k->i = -1, k->misstep = true;
 
-  if (kid->i == 10) {
-    place_frame (&kid->f, &kid->f, kid_normal_00, &kid->p,
-                 (kid->f.dir == LEFT) ? +11 : PLACE_WIDTH + 7, 15);
-    kid_normal (kid);
+  if (k->i == 10) {
+    place_frame (&k->f, &k->f, kid_normal_00, &k->p,
+                 (k->f.dir == LEFT) ? +11 : PLACE_WIDTH + 7, 15);
+    kid_normal (k);
     return false;
   }
 
-  select_frame (kid, kid_misstep_frameset, kid->i + 1);
+  select_frame (k, kid_misstep_frameset, k->i + 1);
 
   return true;
 }
 
 static bool
-physics_in (struct anim *kid)
+physics_in (struct anim *k)
 {
   struct coord nc; struct pos np, pmba;
 
   /* fall */
-  survey (_mba, pos, &kid->f, &nc, &pmba, &np);
+  survey (_mba, pos, &k->f, &nc, &pmba, &np);
   if (is_strictly_traversable (&pmba)) {
-    kid_fall (kid);
+    kid_fall (k);
     return false;
   }
 
@@ -107,17 +107,17 @@ physics_in (struct anim *kid)
 }
 
 static void
-physics_out (struct anim *kid)
+physics_out (struct anim *k)
 {
   struct coord nc; struct pos pmbo, np;
 
   /* depressible floors */
-  keep_depressible_floor (kid);
+  keep_depressible_floor (k);
 
   /* loose floor shaking */
-  survey (_mbo, pos, &kid->f, &nc, &pmbo, &np);
-  if (kid->i == 8) shake_loose_floor_row (&pmbo);
+  survey (_mbo, pos, &k->f, &nc, &pmbo, &np);
+  if (k->i == 8) shake_loose_floor_row (&pmbo);
 
   /* sound */
-  if (kid->i == 7) play_sample (step_sample, kid->f.c.room);
+  if (k->i == 7) play_sample (step_sample, k->f.c.room);
 }

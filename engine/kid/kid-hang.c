@@ -31,9 +31,9 @@
 struct frameset kid_hang_frameset[KID_HANG_FRAMESET_NMEMB];
 
 static void init_kid_hang_frameset (void);
-static bool flow (struct anim *kid);
-static bool physics_in (struct anim *kid);
-static void physics_out (struct anim *kid);
+static bool flow (struct anim *k);
+static bool physics_in (struct anim *k);
+static void physics_out (struct anim *k);
 
 ALLEGRO_BITMAP *kid_hang_00, *kid_hang_01, *kid_hang_02,
   *kid_hang_03, *kid_hang_04, *kid_hang_05, *kid_hang_06,
@@ -97,62 +97,62 @@ unload_kid_hang (void)
 }
 
 void
-kid_hang (struct anim *kid)
+kid_hang (struct anim *k)
 {
-  kid->oaction = kid->action;
-  kid->action = kid_hang;
-  kid->f.flip = (kid->f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
+  k->oaction = k->action;
+  k->action = kid_hang;
+  k->f.flip = (k->f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  if (! flow (kid)) return;
-  if (! physics_in (kid)) return;
-  next_frame (&kid->f, &kid->f, &kid->fo);
-  physics_out (kid);
+  if (! flow (k)) return;
+  if (! physics_in (k)) return;
+  next_frame (&k->f, &k->f, &k->fo);
+  physics_out (k);
 }
 
 static bool
-flow (struct anim *kid)
+flow (struct anim *k)
 {
-  if (kid->oaction != kid_hang)
-    kid->i = -1, kid->hang_caller = kid->oaction, kid->misstep = false;
+  if (k->oaction != kid_hang)
+    k->i = -1, k->hang_caller = k->oaction, k->misstep = false;
 
-  int dir = (kid->f.dir == LEFT) ? 0 : 1;
-  place_frame (&kid->f, &kid->f, kid_hang_14,
-               &kid->hang_pos, PLACE_WIDTH * dir + 7, -9);
+  int dir = (k->f.dir == LEFT) ? 0 : 1;
+  place_frame (&k->f, &k->f, kid_hang_14,
+               &k->hang_pos, PLACE_WIDTH * dir + 7, -9);
 
-  if (kid->i == -1 && kid->oaction != kid_unclimb) {
-    kid->fo.b = kid_hang_14;
-    kid->fo.dx = +0;
-    kid->fo.dy = +0;
-  } else if (is_hang_pos_free (&kid->hang_pos, kid->f.dir)) {
-    kid_hang_free (kid);
+  if (k->i == -1 && k->oaction != kid_unclimb) {
+    k->fo.b = kid_hang_14;
+    k->fo.dx = +0;
+    k->fo.dy = +0;
+  } else if (is_hang_pos_free (&k->hang_pos, k->f.dir)) {
+    kid_hang_free (k);
     return false;
   } else {
-    kid_hang_wall (kid);
+    kid_hang_wall (k);
     return false;
   }
 
-  kid->i++;
+  k->i++;
 
   return true;
 }
 
 static bool
-physics_in (struct anim *kid)
+physics_in (struct anim *k)
 {
   /* intertia */
-  kid->inertia = kid->cinertia = 0;
+  k->inertia = k->cinertia = 0;
 
   return true;
 }
 
 static void
-physics_out (struct anim *kid)
+physics_out (struct anim *k)
 {
   struct pos hanged_pos;
 
   /* depressible floors */
-  clear_depressible_floor (kid);
-  get_hanged_pos (&kid->hang_pos, kid->f.dir, &hanged_pos);
+  clear_depressible_floor (k);
+  get_hanged_pos (&k->hang_pos, k->f.dir, &hanged_pos);
   press_depressible_floor (&hanged_pos);
 }
 

@@ -29,7 +29,7 @@ extern struct frameset kid_sword_walkb_frameset[KID_SWORD_WALKB_FRAMESET_NMEMB];
 
 void load_kid_sword_walkb (void);
 void unload_kid_sword_walkb (void);
-void kid_sword_walkb (struct anim *kid);
+void kid_sword_walkb (struct anim *k);
 
 ALLEGRO_BITMAP *kid_sword_walkb_10, *kid_sword_walkb_07;
 

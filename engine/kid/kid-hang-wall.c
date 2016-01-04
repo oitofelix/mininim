@@ -28,9 +28,9 @@
 #include "engine/loose-floor.h"
 #include "kid.h"
 
-static bool flow (struct anim *kid);
-static bool physics_in (struct anim *kid);
-static void physics_out (struct anim *kid);
+static bool flow (struct anim *k);
+static bool physics_in (struct anim *k);
+static void physics_out (struct anim *k);
 
 void
 load_kid_hang_wall (void)
@@ -45,101 +45,103 @@ unload_kid_hang_wall (void)
 }
 
 void
-kid_hang_wall (struct anim *kid)
+kid_hang_wall (struct anim *k)
 {
-  kid->oaction = kid->action;
-  kid->action = kid_hang_wall;
-  kid->f.flip = (kid->f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
+  k->oaction = k->action;
+  k->action = kid_hang_wall;
+  k->f.flip = (k->f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  if (! flow (kid)) return;
-  if (! physics_in (kid)) return;
-  next_frame (&kid->f, &kid->f, &kid->fo);
-  physics_out (kid);
+  if (! flow (k)) return;
+  if (! physics_in (k)) return;
+  next_frame (&k->f, &k->f, &k->fo);
+  physics_out (k);
 }
 
 static bool
-flow (struct anim *kid)
+flow (struct anim *k)
 {
-  if (kid->oaction != kid_hang_wall)
-    kid->i = 3, kid->wait = 0, kid->reverse = false;
+  if (k->oaction != kid_hang_wall)
+    k->i = 3, k->wait = 0, k->reverse = false;
 
-  bool hang_back = ((kid->f.dir == LEFT) ? kid->key.right : kid->key.left)
-    && ! kid->key.up && kid->key.shift;
+  bool hang_back = ((k->f.dir == LEFT) ? k->key.right : k->key.left)
+    && ! k->key.up && k->key.shift;
 
-  int back_dir = (kid->f.dir == LEFT) ? RIGHT : LEFT;
+  int back_dir = (k->f.dir == LEFT) ? RIGHT : LEFT;
 
   /* hang back */
-  if (kid->i == 4 && kid->reverse
-      && hang_back && is_hangable_pos (&kid->hang_pos, back_dir)) {
-    play_sample (hang_on_fall_sample, kid->f.c.room);
-    kid_turn (kid);
+  if (k->i == 4 && k->reverse
+      && hang_back && is_hangable_pos (&k->hang_pos, back_dir)) {
+    play_sample (hang_on_fall_sample, k->f.c.room);
+    kid_turn (k);
     return false;
   }
 
-  if ((! kid->key.shift && (kid->reverse || kid->i > 3))
-      || kid->hang_limit
-      || get_hanged_con (&kid->hang_pos, kid->f.dir) == NO_FLOOR) {
-    if (is_strictly_traversable (&kid->hang_pos)) {
-      place_frame (&kid->f, &kid->f, kid_fall_frameset[0].frame,
-                   &kid->hang_pos,
-                   (kid->f.dir == LEFT) ? PLACE_WIDTH - 12 : +16,
-                   (kid->f.dir == LEFT) ? 23 : 27);
-      kid_fall (kid);
-      kid->hang_limit = false;
+  if ((! k->key.shift && (k->reverse || k->i > 3))
+      || k->hang_limit
+      || get_hanged_con (&k->hang_pos, k->f.dir) == NO_FLOOR) {
+    if (is_strictly_traversable (&k->hang_pos)) {
+      place_frame (&k->f, &k->f, kid_fall_frameset[0].frame,
+                   &k->hang_pos,
+                   (k->f.dir == LEFT) ? PLACE_WIDTH - 12 : +16,
+                   (k->f.dir == LEFT) ? 23 : 27);
+      kid_fall (k);
+      k->hang_limit = false;
       return false;
     }
-    place_frame (&kid->f, &kid->f, kid_vjump_frameset[13].frame,
-                 &kid->hang_pos, (kid->f.dir == LEFT)
+    place_frame (&k->f, &k->f, kid_vjump_frameset[13].frame,
+                 &k->hang_pos, (k->f.dir == LEFT)
                  ? +12 : PLACE_WIDTH + 2, -8);
-    kid_vjump (kid);
-    kid->hang_limit = false;
+    kid_vjump (k);
+    k->hang_limit = false;
     return false;
-  } if (kid->key.up && ! kid->key.left && ! kid->key.right
-        && ! kid->hang_limit) {
-    kid_climb (kid);
+  } if (k->key.up
+        && ! ((k->key.left || k->key.right)
+              && k->hang_caller == kid_unclimb)
+        && ! k->hang_limit) {
+    kid_climb (k);
     return false;
   }
 
-  if (! kid->reverse && kid->i < 6) kid->i++;
-  else if (! kid->reverse && kid->i == 6) kid->reverse = true;
-  else if (kid->reverse && kid->i > 4 && kid->wait == 0)
-    kid->i--, kid->wait = 1;
-  else if (kid->reverse && kid->i >= 4 && kid->wait > 0) kid->wait--;
+  if (! k->reverse && k->i < 6) k->i++;
+  else if (! k->reverse && k->i == 6) k->reverse = true;
+  else if (k->reverse && k->i > 4 && k->wait == 0)
+    k->i--, k->wait = 1;
+  else if (k->reverse && k->i >= 4 && k->wait > 0) k->wait--;
 
-  kid->fo.b = kid_hang_frameset[kid->i].frame;
-  kid->fo.dx = (kid->reverse) ? -kid_hang_frameset[kid->i + 1].dx
-    : kid_hang_frameset[kid->i].dx;
-  kid->fo.dy = (kid->reverse) ? -kid_hang_frameset[kid->i + 1].dy
-    : kid_hang_frameset[kid->i].dy;
+  k->fo.b = kid_hang_frameset[k->i].frame;
+  k->fo.dx = (k->reverse) ? -kid_hang_frameset[k->i + 1].dx
+    : kid_hang_frameset[k->i].dx;
+  k->fo.dy = (k->reverse) ? -kid_hang_frameset[k->i + 1].dy
+    : kid_hang_frameset[k->i].dy;
 
-  if (kid->f.b == kid_hang_14) kid->fo.dx = +0, kid->fo.dy = +1;
+  if (k->f.b == kid_hang_14) k->fo.dx = +0, k->fo.dy = +1;
 
-  if (kid->reverse && kid->wait == 0) {
-    kid->fo.dx = 0;
-    kid->fo.dy = 0;
+  if (k->reverse && k->wait == 0) {
+    k->fo.dx = 0;
+    k->fo.dy = 0;
   }
 
   return true;
 }
 
 static bool
-physics_in (struct anim *kid)
+physics_in (struct anim *k)
 {
   return true;
 }
 
 static void
-physics_out (struct anim *kid)
+physics_out (struct anim *k)
 {
   struct pos hanged_pos;
 
   /* depressible floors */
-  clear_depressible_floor (kid);
-  get_hanged_pos (&kid->hang_pos, kid->f.dir, &hanged_pos);
+  clear_depressible_floor (k);
+  get_hanged_pos (&k->hang_pos, k->f.dir, &hanged_pos);
   press_depressible_floor (&hanged_pos);
 
   /* sound */
-  if (! kid->reverse && kid->i == 4 && kid->key.shift && ! kid->key.up
-      && ! kid->hang_limit)
-    play_sample (hit_wall_sample, kid->f.c.room);
+  if (! k->reverse && k->i == 4 && k->key.shift && ! k->key.up
+      && ! k->hang_limit)
+    play_sample (hit_wall_sample, k->f.c.room);
 }
