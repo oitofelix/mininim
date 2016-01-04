@@ -774,7 +774,7 @@ kid_door_split_collision (struct anim *k)
   if (k->f.dir == LEFT
       && con (&ptf)->fg == DOOR
       && tf.y <= door_grid_tip_y (&ptf) - 10
-      && dptf <= 11 && dptf >= 6) {
+      && dptf <= 11) {
     k->ci.p = ptf;
     kid_stabilize_collision (k);
     return true;

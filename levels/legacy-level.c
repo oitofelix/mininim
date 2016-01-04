@@ -31,6 +31,7 @@
 #include "engine/physics.h"
 #include "engine/anim.h"
 #include "engine/mirror.h"
+#include "engine/potion.h"
 #include "legacy-level.h"
 
 static struct level legacy_level;
@@ -88,6 +89,7 @@ static void
 start (void)
 {
   played_end_sample = false;
+  shadow_id = -1;
   stop_all_samples ();
 
   /* start the game with only 3 lives */
@@ -161,14 +163,12 @@ start (void)
     }
   }
 
-  /* in the fourth level */
-  if (level.number == 4) {
-   shadow_id = -1;
-
-  /* struct pos p = {4,1,6}; */
-  /* place_frame (&k->f, &k->f, kid_normal_00, &p, */
-  /*              k->f.dir == LEFT ? +22 : +31, +15); */
-  }
+  /* temporary placement for test */
+  /* if (level.number == 5) { */
+  /*   struct pos p = {24,1,8}; */
+  /*   place_frame (&k->f, &k->f, kid_normal_00, &p, */
+  /*                k->f.dir == LEFT ? +22 : +31, +15); */
+  /* } */
 }
 
 static void
@@ -225,25 +225,68 @@ special_events (void)
         if (m->kid_crossing == k->id) {
           k->current_lives = 1;
           int id = create_kid (k);
-          kida[id].shadow = true;
-          kida[id].f.dir = (kida[id].f.dir == LEFT) ? RIGHT : LEFT;
-          kida[id].controllable = false;
+          struct anim *ks = &kida[id];
+          ks->shadow = true;
+          ks->f.dir = (ks->f.dir == LEFT) ? RIGHT : LEFT;
+          ks->controllable = false;
           shadow_id = id;
         }
       }
 
-      /* make the kid's shadow run to the right until it disappears
+      /* make the kid's shadow run to the right until he disappears
          from view */
       if (shadow_id != -1) {
-        struct anim *ks = &kida[shadow_id];
-        p = (struct pos) {11,0,2};
-        survey (_m, pos, &ks->f, &nc, &pm, &np);
-        if (! peq (&pm, &p)) ks->key.right = true;
+        struct anim *ks = get_kid_by_id (shadow_id);
+        if (is_frame_visible (&ks->f)) ks->key.right = true;
         else {
           destroy_kid (ks);
           shadow_id = -1;
         }
       }
+  }
+
+  /* in the fifth level */
+  if (level.number == 5) {
+    struct pos door_pos = (struct pos) {24,0,1};
+    struct pos potion_pos = (struct pos) {24,0,3};
+    struct pos shadow_pos = (struct pos) {24,0,-1};
+
+    /* if there is a door sufficiently open, and a potion in room 24,
+       and the camera is there, create a kid's shadow to drink the
+       potion */
+    if (room_view == 24
+        && shadow_id == -1
+        && con (&door_pos)->fg == DOOR
+        && is_potion (&potion_pos)
+        && door_at_pos (&door_pos)->i <= 25) {
+      int id = create_kid (k);
+      struct anim *ks = &kida[id];
+      ks->shadow = true;
+      ks->f.dir = RIGHT;
+      ks->controllable = false;
+      ks->action = kid_run;
+      ks->i = -1;
+      place_frame (&ks->f, &ks->f, kid_normal_00, &shadow_pos,
+                   +0, +15);
+      shadow_id = id;
+    }
+
+    /* if the kid's shadow has been created, make him run until he
+       reaches the potion, and then drink it.  Make him turn back
+       running until he gets out of view */
+    if (shadow_id != -1) {
+      struct anim *ks = get_kid_by_id (shadow_id);
+      if (is_potion (&potion_pos)) {
+        survey (_m, pos, &ks->f, &nc, &pm, &np);
+        pos2room (&pm, 24, &pm);
+        if (pm.place < potion_pos.place - 1) ks->key.right = true;
+        else ks->key.shift = true;
+      } else if (is_frame_visible (&ks->f)) ks->key.left = true;
+      else {
+        destroy_kid (ks);
+        shadow_id = -1;
+      }
+    }
   }
 }
 
@@ -252,6 +295,7 @@ end (struct pos *p)
 {
   static ALLEGRO_SAMPLE_INSTANCE *si = NULL;
 
+  /* end music samples to play per level */
   if (! played_end_sample) {
     switch (level.number) {
     case 1: case 2: case 3: case 5: case 7:
@@ -264,6 +308,7 @@ end (struct pos *p)
     played_end_sample = true;
   }
 
+  /* the kid must keep the total lives obtained for the next level */
   total_lives = current_kid->total_lives;
 
   if (! is_playing_sample (si)) quit_anim = NEXT_LEVEL;
