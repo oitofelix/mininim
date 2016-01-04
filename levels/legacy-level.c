@@ -37,6 +37,7 @@ static struct level legacy_level;
 static int level_3_checkpoint;
 static int shadow_id;
 static bool played_end_sample;
+static int total_lives;
 
 static struct con room_0[FLOORS][PLACES] =
   {{{WALL}, {WALL}, {WALL}, {WALL}, {WALL},
@@ -89,9 +90,14 @@ start (void)
   played_end_sample = false;
   stop_all_samples ();
 
+  /* start the game with only 3 lives */
+  if (level.number == 1) total_lives = 3;
+
   /* create kid */
   int id = create_kid (NULL);
   struct anim *k = &kida[id];
+  k->total_lives = total_lives;
+  k->current_lives = total_lives;
 
   /* make the kid turn as appropriate */
   switch (level.number) {
@@ -257,6 +263,8 @@ end (struct pos *p)
     }
     played_end_sample = true;
   }
+
+  total_lives = current_kid->total_lives;
 
   if (! is_playing_sample (si)) quit_anim = NEXT_LEVEL;
 }
@@ -472,7 +480,7 @@ load_legacy_level (int number)
         case LG_EXIT:           /* ok */
           c->ext.step = LEVEL_DOOR_MAX_STEP;
           switch (b) {
-          case LM_EXIT_HALF_OPEN: c->ext.step = 43; break;
+          case LM_EXIT_HALF_OPEN: c->ext.step = 20; break;
             /* needless */
           case LM_EXIT_MORE_OPEN_1:
           case LM_EXIT_MORE_OPEN_2:
