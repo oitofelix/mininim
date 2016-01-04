@@ -187,7 +187,7 @@ physics_in (struct anim *kid)
   if (kid->i > 2 && can_hang (&kid->f, false, &kid->hang_pos)
       && hang_front && ! kid->hang_limit) {
     kid->hit_by_loose_floor = false;
-    play_sample (hang_on_fall_sample);
+    play_sample (hang_on_fall_sample, kid->f.c.room);
     kid_hang (kid);
     return false;
   }
@@ -196,7 +196,7 @@ physics_in (struct anim *kid)
   if (kid->i > 2 && can_hang (&kid->f, true, &kid->hang_pos)
       && hang_back && ! kid->hang_limit) {
     kid->hit_by_loose_floor = false;
-    play_sample (hang_on_fall_sample);
+    play_sample (hang_on_fall_sample, kid->f.c.room);
     kid_turn (kid);
     return false;
   }
@@ -238,21 +238,22 @@ physics_in (struct anim *kid)
       if (kid->i >= 10) kid->current_lives = 0;
 
       if (kid->current_lives <= 0)
-        play_sample (hit_ground_fatal_sample);
+        play_sample (hit_ground_fatal_sample, kid->f.c.room);
       else {
-        play_sample (hit_ground_harm_sample);
+        play_sample (hit_ground_harm_sample, kid->f.c.room);
         kid->uncouch_slowly = true;
       }
       video_effect.color = get_flicker_blood_color ();
       start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
     } else if (kid->i > 3
                && ! al_get_timer_started (kid->floating)) {
-      play_sample (hit_ground_sample);
+      play_sample (hit_ground_sample, kid->f.c.room);
       kid->hurt = false;
     } else kid->hurt = false;
 
     survey (_mt, pos, &kid->f, &nc, &pmt, &np);
     if (kid->current_lives <= 0) {
+      stop_sample (kid->sample);
       kid->p = pmt;
       if (con (&pmt)->fg == SPIKES_FLOOR) kid_die_spiked (kid);
       else kid_die_suddenly (kid);
@@ -274,7 +275,7 @@ physics_out (struct anim *kid)
   /* sound */
   if (kid->i == 10
       && ! al_get_timer_started (kid->floating))
-    play_sample (scream_sample);
+    kid->sample = play_sample (scream_sample, kid->f.c.room);
 }
 
 bool

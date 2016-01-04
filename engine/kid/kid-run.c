@@ -166,8 +166,8 @@ physics_out (struct anim *kid)
   else keep_depressible_floor (kid);
 
   /* sound */
-  if (kid->oaction == kid_run_jump) play_sample (step_sample);
-  if (kid->i == 2 || kid->i == 6) play_sample (step_sample);
+  if (kid->oaction == kid_run_jump) play_sample (step_sample, kid->f.c.room);
+  if (kid->i == 2 || kid->i == 6) play_sample (step_sample, kid->f.c.room);
 }
 
 bool

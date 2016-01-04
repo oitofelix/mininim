@@ -22,6 +22,7 @@
 
 #include <allegro5/allegro.h>
 #include "kernel/keyboard.h"
+#include "kernel/audio.h"
 
 #define ROOMS 25
 #define FLOORS 3
@@ -350,6 +351,7 @@ struct anim {
     controllable;
 
   ALLEGRO_TIMER *floating;
+  ALLEGRO_SAMPLE_INSTANCE *sample;
 
   int dc, df, dl, dcl, dch, dcd;
 

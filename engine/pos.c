@@ -43,6 +43,71 @@ roomd (int room, enum dir dir)
   }
 }
 
+int
+room_dist (int r0, int r1, int max)
+{
+  struct room_dist room[ROOMS];
+
+  /* begin optimization block */
+  if (r0 == r1) return 0;
+
+  if (roomd (r0, LEFT) == r1
+      || roomd (r0, RIGHT) == r1
+      || roomd (r0, BELOW) == r1
+      || roomd (r0, ABOVE) == r1)
+    return 1;
+  /* end optimization block */
+
+  int i;
+  for (i = 0; i < ROOMS; i++) {
+    room[i].dist = INT_MAX;
+    room[i].visited = false;
+  }
+
+  room[r0].dist = 0;
+  int dmax = 0;
+
+  int u;
+  while ((u = min_room_dist (room, &dmax)) != -1
+         && dmax <= max) {
+    if (u == r1) break;
+    room[u].visited = true;
+
+    int l = roomd (u, LEFT);
+    int r = roomd (u, RIGHT);
+    int b = roomd (u, BELOW);
+    int a = roomd (u, ABOVE);
+
+    room[l].dist = min_int (room[l].dist, room[u].dist + 1);
+    room[r].dist = min_int (room[r].dist, room[u].dist + 1);
+    room[b].dist = min_int (room[b].dist, room[u].dist + 1);
+    room[a].dist = min_int (room[a].dist, room[u].dist + 1);
+  }
+
+  return room[r1].dist;
+}
+
+int
+min_room_dist (struct room_dist room[], int *dmax)
+{
+  int r = -1;
+  int d = INT_MAX;
+
+  int i;
+  for (i = 0; i < ROOMS; i++)
+    if (! room[i].visited) {
+      if (room[i].dist < d) {
+        d = room[i].dist;
+        r = i;
+      }
+      if (room[i].dist > *dmax
+          && room[i].dist < INT_MAX)
+        *dmax = room[i].dist;
+    }
+
+  return r;
+}
+
 struct coord *
 ncoord (struct coord *c, struct coord *nc)
 {

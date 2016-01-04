@@ -87,6 +87,7 @@ static void
 start (void)
 {
   played_end_sample = false;
+  stop_all_samples ();
 
   /* create kid */
   int id = create_kid (NULL);
@@ -184,7 +185,7 @@ special_events (void)
 
   /* in the first level, first try, play the suspense sound */
   if (level.number == 1 && anim_cycle == 12 && retry_level != 1)
-    play_sample (suspense_sample);
+    play_sample (suspense_sample, k->f.c.room);
 
   /* level 3 checkpoint */
   if (level.number == 3) {
@@ -206,7 +207,7 @@ special_events (void)
           && con (&pmirror)->fg != MIRROR) {
         con (&pmirror)->fg = MIRROR;
         register_mirror (&pmirror);
-        play_sample (suspense_sample);
+        play_sample (suspense_sample, 4);
       }
 
       /* if the kid is crossing the mirror, make his shadow appear */
@@ -244,7 +245,7 @@ end (void)
 
   if (! played_end_sample) {
     switch (level.number) {
-    case 1: case 2: si = play_sample (success_sample); break;
+    case 1: case 2: si = play_sample (success_sample, -1); break;
     default: break;
     }
     played_end_sample = true;

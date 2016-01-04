@@ -140,7 +140,7 @@ flow (struct anim *kid)
           || kid->poison_immune) break;
       kid->current_lives--;
       kid->splash = true;
-      play_sample (harm_sample);
+      play_sample (harm_sample, kid->f.c.room);
       video_effect.color = get_flicker_blood_color ();
       start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
       break;
@@ -149,7 +149,7 @@ flow (struct anim *kid)
           || kid->poison_immune) break;
       kid->current_lives = 0;
       kid->splash = true;
-      play_sample (harm_sample);
+      play_sample (harm_sample, kid->f.c.room);
       video_effect.color = get_flicker_blood_color ();
       start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
       break;
@@ -191,7 +191,7 @@ physics_out (struct anim *kid)
   keep_depressible_floor (kid);
 
   /* sound */
-  if (kid->i == 7 && ! kid->reverse) play_sample (drink_sample);
+  if (kid->i == 7 && ! kid->reverse) play_sample (drink_sample, kid->f.c.room);
 
   /* consume bottle */
   if (kid->i == 0) {

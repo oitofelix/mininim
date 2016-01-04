@@ -142,7 +142,7 @@ flow (struct anim *kid)
     kid->hang_pos = pm;
     pos2room (&kid->hang_pos, kid->f.c.room, &kid->hang_pos);
     kid->hang = true;
-    play_sample (hang_on_fall_sample);
+    play_sample (hang_on_fall_sample, kid->f.c.room);
     kid_hang (kid);
     return false;
   }
@@ -154,7 +154,7 @@ flow (struct anim *kid)
     kid->hang_pos = ptf;
     pos2room (&kid->hang_pos, kid->f.c.room, &kid->hang_pos);
     kid->hang = true;
-    play_sample (hang_on_fall_sample);
+    play_sample (hang_on_fall_sample, kid->f.c.room);
     kid_turn (kid);
     return false;
   }
@@ -223,7 +223,7 @@ physics_out (struct anim *kid)
   if (kid->i == 12) shake_loose_floor_row (&pmbo);
 
   /* sound */
-  if (kid->i == 11 || kid->i == 14) play_sample (step_sample);
+  if (kid->i == 11 || kid->i == 14) play_sample (step_sample, kid->f.c.room);
 }
 
 bool

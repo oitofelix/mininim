@@ -23,12 +23,14 @@
 #include <allegro5/allegro_acodec.h>
 #include "kernel/array.h"
 #include "engine/anim.h"
+#include "engine/pos.h"
+#include "engine/level.h"
 #include "xerror.h"
 #include "audio.h"
 
 static struct audio_sample *audio_sample;
-
 static size_t audio_sample_nmemb;
+static int last_room_view;
 
 bool audio_enabled = true;
 float volume = 1.0;
@@ -90,7 +92,7 @@ get_default_mixer (void)
 }
 
 ALLEGRO_SAMPLE_INSTANCE *
-play_sample (ALLEGRO_SAMPLE *sample)
+play_sample (ALLEGRO_SAMPLE *sample, int room)
 {
   size_t i;
 
@@ -107,6 +109,8 @@ play_sample (ALLEGRO_SAMPLE *sample)
   as.sample = sample;
   as.instance = al_create_sample_instance (sample);
   as.anim_cycle = anim_cycle;
+  as.room = room;
+  as.volume = -1;
 
   if (! as.instance)
     xerror (-1, 0, "%s (%p): cannot create sample instance", __func__, sample);
@@ -123,6 +127,7 @@ void
 play_samples (void)
 {
   clear_played_samples ();
+  adjust_samples_volume ();
 
   size_t i;
   for (i = 0; i < audio_sample_nmemb; i++) {
@@ -134,12 +139,15 @@ play_samples (void)
         xerror (-1, 0, "%s: cannot attach sample instance to mixer (%p, %p)",
                 __func__, as->sample, as->instance);
 
+      as->volume = get_adjusted_sample_volume (as);
+      al_set_sample_instance_gain (as->instance, as->volume);
+
       if (! al_play_sample_instance (as->instance))
         xerror (-1, 0, "%s: cannot play sample instance (%p, %p)",
                 __func__, as->sample, as->instance);
 
       as->played = true;
-    }
+    } else al_set_sample_instance_gain (as->instance, as->volume);
   }
 }
 
@@ -200,6 +208,30 @@ clear_played_samples (void)
         && ! al_get_sample_instance_playing (as->instance))
       remove_sample (as);
   }
+}
+
+void
+adjust_samples_volume (void)
+{
+  size_t i;
+  for (i = 0; i < audio_sample_nmemb; i++) {
+    struct audio_sample *as = &audio_sample[i];
+    as->volume = get_adjusted_sample_volume (as);
+  }
+  last_room_view = room_view;
+}
+
+float
+get_adjusted_sample_volume (struct audio_sample *as)
+{
+  if (as->volume >= 0 && last_room_view == room_view)
+    return as->volume;
+
+  if (as->room < 0) return 1.0;
+  int d = room_dist (room_view, as->room, 10);
+  if (d == 0) d = 1;
+  if (d <= 10) return 1.0 / d;
+  else return 0;
 }
 
 void

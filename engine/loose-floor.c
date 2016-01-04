@@ -374,10 +374,10 @@ compute_loose_floor_shake (struct loose_floor *l)
 {
   switch (l->i) {
   case 0: l->state = 1;
-    sample_random_loose_floor (); l->i++; break;
+    sample_random_loose_floor (l->p.room); l->i++; break;
   case 1: l->state = 0; l->i++; break;
   case 2: l->state = 2;
-    sample_random_loose_floor (); l->i++; break;
+    sample_random_loose_floor (l->p.room); l->i++; break;
   case 3: l->state = 0;
     l->action = NO_LOOSE_FLOOR_ACTION; l->i = 0; break;
   }
@@ -392,16 +392,16 @@ compute_loose_floor_release (struct loose_floor *l)
   }
   switch (l->i) {
   case 0: l->state = 1;
-    sample_random_loose_floor (); l->i++; break;
+    sample_random_loose_floor (l->p.room); l->i++; break;
   case 1: l->state = 0; l->i++; break;
   case 2: l->state = 2;
-    sample_random_loose_floor (); l->i++; break;
+    sample_random_loose_floor (l->p.room); l->i++; break;
   case 3: l->state = 2; l->i++; break;
   case 4: l->state = 0; l->i++; break;
   case 5: l->state = 0; l->i++; break;
   case 6: l->state = 0; l->i++; break;
   case 7: l->state = 2;
-    sample_random_loose_floor (); l->i++; break;
+    sample_random_loose_floor (l->p.room); l->i++; break;
   case 8: l->state = 2; l->i++; break;
   case 9: l->state = 2; l->i++; break;
   case 10:
@@ -510,7 +510,7 @@ compute_loose_floor_fall (struct loose_floor *l)
       k->splash = true;
       k->current_lives--;
       k->uncouch_slowly = true;
-      play_sample (hit_wall_sample);
+      play_sample (hit_wall_sample, kpmt.room);
       video_effect.color = get_flicker_blood_color ();
       start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
       if (k->current_lives <= 0) {
@@ -546,7 +546,7 @@ compute_loose_floor_fall (struct loose_floor *l)
       l->i = 0;
       con (&fpmbo_f)->fg = NO_FLOOR;
       sort_loose_floors ();
-      play_sample (broken_floor_sample);
+      play_sample (broken_floor_sample, p.room);
       return;
     case OPENER_FLOOR: break_opener_floor (&fpmbo_f); break;
     case CLOSER_FLOOR: break_closer_floor (&fpmbo_f); break;
@@ -561,7 +561,7 @@ compute_loose_floor_fall (struct loose_floor *l)
   shake_loose_floor_row (&p);
   l->p.room = -1;
   sort_loose_floors ();
-  play_sample (broken_floor_sample);
+  play_sample (broken_floor_sample, p.room);
 }
 
 void
@@ -581,12 +581,12 @@ shake_loose_floor_row (struct pos *p)
 }
 
 void
-sample_random_loose_floor (void)
+sample_random_loose_floor (int room)
 {
   switch (prandom (2)) {
-  case 0: play_sample (loose_floor_01_sample);
-  case 1: play_sample (loose_floor_02_sample);
-  case 2: play_sample (loose_floor_03_sample);
+  case 0: play_sample (loose_floor_01_sample, room);
+  case 1: play_sample (loose_floor_02_sample, room);
+  case 2: play_sample (loose_floor_03_sample, room);
   }
 }
 
@@ -606,10 +606,6 @@ draw_falling_loose_floor (ALLEGRO_BITMAP *bitmap, struct pos *p,
     l->f.b = get_correct_falling_loose_floor_bitmap (l->f.b);
     struct frame f = l->f;
     if (hgc) f.b = apply_palette (f.b, hgc_palette);
-
-    /* aid perception of continuity across rooms */
-    if (f.c.y >= 200 && f.c.y <= 220) f.c.y -= 20;
-
     draw_frame (bitmap, &f);
     draw_confg_base (bitmap, &fptr, em, vm);
     draw_confg_left (bitmap, &fptr, em, vm, true);

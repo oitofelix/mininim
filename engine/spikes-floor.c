@@ -423,7 +423,7 @@ compute_spikes_floors (void)
     }
     switch (s->i) {
     case 0: if (should_spikes_raise (&s->p) || s->activate) {
-        play_sample (spikes_sample);
+        play_sample (spikes_sample, s->p.room);
         s->i++;
         s->wait = 12;
         s->state = 1;

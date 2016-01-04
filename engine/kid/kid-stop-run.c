@@ -142,7 +142,7 @@ physics_out (struct anim *kid)
   else keep_depressible_floor (kid);
 
   /* sound */
-  if (kid->i == 1 || kid->i == 3) play_sample (step_sample);
+  if (kid->i == 1 || kid->i == 3) play_sample (step_sample, kid->f.c.room);
 }
 
 bool

@@ -224,19 +224,19 @@ compute_level_doors (void)
     }
     switch (d->action) {
     case OPEN_LEVEL_DOOR:
-      if (d->i % 5 == 2 && d->i > 2) play_sample (level_door_open_sample);
+      if (d->i % 5 == 2 && d->i > 2) play_sample (level_door_open_sample, d->p.room);
       if (d->i > 0) d->i--;
       else d->action = NO_LEVEL_DOOR_ACTION;
       break;
     case CLOSE_LEVEL_DOOR:
-      if (d->i == 0) play_sample (level_door_open_sample);
+      if (d->i == 0) play_sample (level_door_open_sample, d->p.room);
       if (d->i < LEVEL_DOOR_MAX_STEP) {
         int r = 14 - (d->i % 15);
         d->i += r ? r : 15;
         if (d->i >= LEVEL_DOOR_MAX_STEP) {
           d->i = LEVEL_DOOR_MAX_STEP;
           d->action = NO_LEVEL_DOOR_ACTION;
-          play_sample (level_door_close_sample);
+          play_sample (level_door_close_sample, d->p.room);
         }
       }
       break;

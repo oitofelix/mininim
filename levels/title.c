@@ -140,7 +140,7 @@ title_anim (void)
     break;
   case 1:
     if (! is_video_effect_started ()) {
-      si = play_sample (main_theme);
+      si = play_sample (main_theme, -1);
       i++;
     }
     break;
@@ -184,7 +184,7 @@ title_anim (void)
       draw_pattern (screen, 17, 16, 286, 157, al_map_rgb (16, 0, 97),
                     al_map_rgb (0, 0, 0));
       draw_bitmap (in_the_absence, screen, 24, 25, 0);
-      si = play_sample (story_1);
+      si = play_sample (story_1, -1);
       i++;
     }
     break;
@@ -217,19 +217,19 @@ title_anim (void)
     break;
   case 10:
     if (! is_video_effect_started ()) {
-      si = play_sample (princess_waiting_3);
+      si = play_sample (princess_waiting_3, -1);
       i++;
     }
     break;
   case 11:
     if (! is_playing_sample (si)) {
-      si = play_sample (door_gate_opening_1);
+      si = play_sample (door_gate_opening_1, -1);
       i++;
     }
     break;
   case 12:
     if (! is_playing_sample (si)) {
-      si = play_sample (door_opening);
+      si = play_sample (door_opening, -1);
       i++;
     }
     break;
@@ -242,7 +242,7 @@ title_anim (void)
   case 14:
     princess.action (&princess);
     if (princess.f.b == princess_normal_00) {
-      si = play_sample (jaffar_appearing_3);
+      si = play_sample (jaffar_appearing_3, -1);
       jaffar_walk (&jaffar);
       i++;
     }
@@ -294,7 +294,7 @@ title_anim (void)
   case 21:
     jaffar.action (&jaffar);
     if (jaffar.f.b == jaffar_normal_00) {
-      si = play_sample (story_3);
+      si = play_sample (story_3, -1);
       i++;
     }
     break;

@@ -377,7 +377,7 @@ compute_choppers (void)
            && (anim_cycle % CHOPPER_WAIT) ==
            prandom_pos (&c->p, CHOPPER_WAIT - 1))
           || c->activate) c->i++; break;
-    case 1: c->i++; play_sample (chopper_sample); break;
+    case 1: c->i++; play_sample (chopper_sample, c->p.room); break;
     case 2: c->i++; break;
     case 3: c->i++; break;
     case 4: c->i = 0; c->wait = CHOPPER_WAIT; c->activate = false;
@@ -412,7 +412,7 @@ compute_choppers (void)
         k->p = c->p;
         video_effect.color = get_flicker_blood_color ();
         start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
-        play_sample (chopped_sample);
+        play_sample (chopped_sample, c->p.room);
         kid_die_chopped (k);
       }
     }

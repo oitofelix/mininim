@@ -116,7 +116,7 @@ kid_couch_collision (struct anim *kid)
                &kid->ci.p, (kid->f.dir == LEFT)
                ? +PLACE_WIDTH + 24 : -PLACE_WIDTH + 18, +27);
   kid_couch (kid);
-  play_sample (hit_wall_sample);
+  play_sample (hit_wall_sample, kid->f.c.room);
 }
 
 void

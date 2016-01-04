@@ -92,7 +92,7 @@ kid_stabilize_collision (struct anim *kid)
                &kid->ci.p, (kid->f.dir == LEFT)
                ? PLACE_WIDTH + 18 : -PLACE_WIDTH + 24, +17);
   kid_stabilize (kid);
-  play_sample (hit_wall_sample);
+  play_sample (hit_wall_sample, kid->f.c.room);
 }
 
 void
@@ -103,7 +103,7 @@ kid_stabilize_back_collision (struct anim *kid)
                &kid->ci.p, (kid->f.dir == LEFT)
                ? -PLACE_WIDTH + 24 : PLACE_WIDTH + 18, +17);
   kid_stabilize (kid);
-  play_sample (hit_wall_sample);
+  play_sample (hit_wall_sample, kid->f.c.room);
 }
 
 static bool
