@@ -191,8 +191,6 @@ compute_level (void)
       && current_kid->f.c.room != 0)  {
     if (camera_follow_kid == current_kid->id)
       room_view = current_kid->f.c.room;
-    else if (room_view == current_kid->f.c.room)
-      camera_follow_kid = current_kid->id;
     make_links_locally_consistent (prev_room, room_view);
   }
 
@@ -244,38 +242,24 @@ process_keys (void)
     kid_resurrect (current_kid);
 
   /* HOME: camera on kid */
-  if (was_key_pressed (ALLEGRO_KEY_HOME, 0, 0, true)) {
+  if (was_key_pressed (ALLEGRO_KEY_HOME, 0, 0, true))
     room_view = current_kid->f.c.room;
-    camera_follow_kid = current_kid->id;
-  }
 
   /* H: view room at left */
-  if (was_key_pressed (ALLEGRO_KEY_H, 0, 0, true)) {
+  if (was_key_pressed (ALLEGRO_KEY_H, 0, 0, true))
     room_view = level.link[room_view].l;
-    camera_follow_kid = (current_kid->f.c.room == room_view)
-      ? current_kid->id : -1;
-  }
 
   /* J: view room at right */
-  if (was_key_pressed (ALLEGRO_KEY_J, 0, 0, true)) {
+  if (was_key_pressed (ALLEGRO_KEY_J, 0, 0, true))
     room_view = level.link[room_view].r;
-    camera_follow_kid = (current_kid->f.c.room == room_view)
-      ? current_kid->id : -1;
-  }
 
   /* U: view room above */
-  if (was_key_pressed (ALLEGRO_KEY_U, 0, 0, true)) {
+  if (was_key_pressed (ALLEGRO_KEY_U, 0, 0, true))
     room_view = level.link[room_view].a;
-    camera_follow_kid = (current_kid->f.c.room == room_view)
-      ? current_kid->id : -1;
-  }
 
   /* N: view room below */
-  if (was_key_pressed (ALLEGRO_KEY_N, 0, 0, true)) {
+  if (was_key_pressed (ALLEGRO_KEY_N, 0, 0, true))
     room_view = level.link[room_view].b;
-    camera_follow_kid = (current_kid->f.c.room == room_view)
-      ? current_kid->id : -1;
-  }
 
   /* SHIFT+B: enable/disable room drawing */
   if (was_key_pressed (ALLEGRO_KEY_B, 0, ALLEGRO_KEYMOD_SHIFT, true))
@@ -289,7 +273,6 @@ process_keys (void)
     } while (! current_kid->controllable);
     current_kid->current = true;
     room_view = current_kid->f.c.room;
-    camera_follow_kid = current_kid->id;
   }
 
   /* I: enable/disable immortal mode */
@@ -475,6 +458,8 @@ process_keys (void)
   }
 
   if (room_view == 0) room_view = prev_room;
+  camera_follow_kid = (current_kid->f.c.room == room_view)
+    ? current_kid->id : -1;
 }
 
 static void

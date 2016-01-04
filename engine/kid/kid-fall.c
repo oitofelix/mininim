@@ -118,11 +118,13 @@ physics_in (struct anim *k)
 
   int dir = (k->f.dir == LEFT) ? -1 : +1;
 
-  if (k->oaction == kid_jump) {
+  if (k->oaction == kid_jump
+      && ! is_colliding (&k->f, &k->fo, +8, false, &k->ci)) {
     next_frame (&k->f, &k->f, &k->fo);
     k->f.c.x += dir * 8;
     k->f.c.y += 6;
-  } else if (k->oaction == kid_run_jump) {
+  } else if (k->oaction == kid_run_jump
+             && ! is_colliding (&k->f, &k->fo, +12, false, &k->ci)) {
     next_frame (&k->f, &k->f, &k->fo);
     k->f.c.x += dir * 12;
     k->f.c.y += 6;

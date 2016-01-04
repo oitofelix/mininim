@@ -45,6 +45,10 @@ int dist_con (struct frame *f, coord_f cf, pos_f pf,
 bool
 is_colliding (struct frame *f, struct frame_offset *fo, int dx,
               bool reverse, struct collision_info *ci);
+bool
+is_colliding_cf (struct frame *f, struct frame_offset *fo, int dx,
+                 bool reverse, struct collision_info *ci,
+                 coord_f cf);
 int
 dist_collision (struct frame *f, bool reverse,
                 struct collision_info *ci);
