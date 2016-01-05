@@ -184,6 +184,19 @@
 #define V_STAR_COLOR_02 (al_map_rgb (168, 168, 168))
 #define V_STAR_COLOR_03 (al_map_rgb (248, 252, 248))
 
+#define C_MOUSE_FUR_COLOR (al_map_rgb (255, 255, 255))
+#define C_MOUSE_SKIN_COLOR_01 (al_map_rgb (255, 255, 255))
+#define C_MOUSE_SKIN_COLOR_02 (al_map_rgb (85, 255, 255))
+#define C_MOUSE_SKIN_COLOR_03 (al_map_rgb (85, 255, 255))
+#define E_MOUSE_FUR_COLOR (al_map_rgb (248, 252, 248))
+#define E_MOUSE_SKIN_COLOR_01 (al_map_rgb (248, 252, 248))
+#define E_MOUSE_SKIN_COLOR_02 (al_map_rgb (168, 168, 168))
+#define E_MOUSE_SKIN_COLOR_03 (al_map_rgb (168, 0, 0))
+#define V_MOUSE_FUR_COLOR (al_map_rgb (252, 252, 216))
+#define V_MOUSE_SKIN_COLOR_01 (al_map_rgb (252, 200, 184))
+#define V_MOUSE_SKIN_COLOR_02 (al_map_rgb (216, 184, 160))
+#define V_MOUSE_SKIN_COLOR_03 (al_map_rgb (120, 92, 56))
+
 /* environment mode */
 enum em {
   DUNGEON, PALACE,

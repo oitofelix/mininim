@@ -254,9 +254,14 @@ draw_carpet_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   draw_door_pole (bitmap, p, em, vm);
 
-  if (con (p)->ext.design == ARCH_CARPET_LEFT)
+  struct pos pr; prel (p, &pr, +0, +1);
+
+  if (con (p)->ext.design == ARCH_CARPET_LEFT) {
     draw_arch_top_left_end (bitmap, p, em, vm);
-  else {
+
+    draw_confg_base (bitmap, &pr, em, vm);
+    draw_confg_left (bitmap, &pr, em, vm, true);
+  } else {
     get_carpet_bitmaps (p, em, vm, &carpet, &carpet_top);
 
     if (hgc) {
@@ -268,7 +273,6 @@ draw_carpet_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
     draw_bitmapc (carpet, bitmap, carpet_coord (p, &c), 0);
 
-    struct pos pr; prel (p, &pr, +0, +1);
     draw_confg_base (bitmap, &pr, em, vm);
     draw_confg_left (bitmap, &pr, em, vm, true);
   }

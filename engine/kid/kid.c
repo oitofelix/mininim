@@ -57,6 +57,9 @@ static struct coord *kid_life_coord (int i, struct coord *c);
 static int compare_kids (const void *k0, const void *k1);
 static struct coord * splash_coord (struct frame *f, struct coord *c);
 static palette get_palette (enum vm vm);
+static ALLEGRO_COLOR v_palette (ALLEGRO_COLOR c);
+static ALLEGRO_COLOR e_palette (ALLEGRO_COLOR c);
+static ALLEGRO_COLOR c_palette (ALLEGRO_COLOR c);
 
 void
 load_kid (void)
@@ -478,13 +481,13 @@ c_phantom_shadow_palette (ALLEGRO_COLOR c)
   return c;
 }
 
-ALLEGRO_COLOR
+static ALLEGRO_COLOR
 v_palette (ALLEGRO_COLOR c)
 {
   return c;
 }
 
-ALLEGRO_COLOR
+static ALLEGRO_COLOR
 e_palette (ALLEGRO_COLOR c)
 {
   if (color_eq (c, V_KID_HAIR_COLOR_01)
@@ -499,7 +502,7 @@ e_palette (ALLEGRO_COLOR c)
   return c;
 }
 
-ALLEGRO_COLOR
+static ALLEGRO_COLOR
 c_palette (ALLEGRO_COLOR c)
 {
   if (color_eq (c, V_KID_HAIR_COLOR_01)) return C_KID_HAIR_COLOR_01;

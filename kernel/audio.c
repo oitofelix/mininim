@@ -97,10 +97,12 @@ play_sample (ALLEGRO_SAMPLE *sample, int room)
   size_t i;
 
   /* do nothing if the same sample has been played with less than a
-     drawing cycle of difference */
+     drawing cycle of difference in the same room */
   for (i = 0; i < audio_sample_nmemb; i++) {
     struct audio_sample *as = &audio_sample[i];
-    if (as->sample == sample && as->anim_cycle == anim_cycle)
+    if (as->sample == sample
+        && as->anim_cycle == anim_cycle
+        && as->room == room)
       return as->instance;
   }
 

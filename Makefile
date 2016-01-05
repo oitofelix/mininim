@@ -4,7 +4,7 @@ ENGINE_MODULES = anim pos physics level consistency stars floor				\
   broken-floor skeleton-floor loose-floor opener-floor closer-floor		\
   spikes-floor door level-door pillar big-pillar chopper bricks torch	\
   window balcony arch carpet mirror room fire potion sword clock			\
-  princess jaffar
+  princess jaffar mouse
 WALL_MODULES = wall wall-depedv wall-pv wall-dcpc
 KID_MODULES = kid kid-normal kid-walk kid-start-run kid-run						\
   kid-stop-run kid-turn-run kid-couch kid-turn kid-stabilize kid-jump	\

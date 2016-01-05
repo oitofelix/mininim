@@ -247,6 +247,19 @@ compute_level_doors (void)
   }
 }
 
+struct level_door *
+get_exit_level_door (int n)
+{
+  int i;
+  for (i = 0; i < level_door_nmemb; i++) {
+    struct level_door *d = &level_door[i];
+    if (! peq (&d->p, &level.start_pos)
+        && n-- == 0) return d;
+  }
+
+  return NULL;
+}
+
 void
 draw_level_door (ALLEGRO_BITMAP *bitmap, struct pos *p,
                  enum em em, enum vm vm)

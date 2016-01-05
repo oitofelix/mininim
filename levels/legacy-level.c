@@ -24,6 +24,7 @@
 #include "kernel/random.h"
 #include "kernel/array.h"
 #include "kernel/xerror.h"
+#include "kernel/timer.h"
 #include "engine/level.h"
 #include "engine/kid/kid.h"
 #include "engine/door.h"
@@ -32,6 +33,7 @@
 #include "engine/anim.h"
 #include "engine/mirror.h"
 #include "engine/potion.h"
+#include "engine/mouse.h"
 #include "legacy-level.h"
 
 static struct level legacy_level;
@@ -39,6 +41,9 @@ static int level_3_checkpoint;
 static int shadow_id;
 static bool played_sample;
 static int total_lives;
+static struct level_door *exit_level_door;
+static ALLEGRO_TIMER *mouse_timer;
+static int mouse_id;
 
 static struct con room_0[FLOORS][PLACES] =
   {{{WALL}, {WALL}, {WALL}, {WALL}, {WALL},
@@ -89,11 +94,15 @@ static void
 start (void)
 {
   played_sample = false;
-  shadow_id = -1;
+  shadow_id = mouse_id = -1;
   stop_all_samples ();
+  al_destroy_timer (mouse_timer);
+  mouse_timer = NULL;
+  exit_level_door = get_exit_level_door (0);
 
   /* start the game with only 3 lives */
   if (level.number == 1) total_lives = 3;
+  if (total_lives < 3) total_lives = 3;
 
   /* create kid */
   int id = create_kid (NULL);
@@ -163,11 +172,15 @@ start (void)
     }
   }
 
+  /* in the eighth level */
+  if (level.number == 8) mouse_timer = create_timer (1.0 / 12);
+
   /* temporary placement for test */
-  /* if (level.number == 6) { */
-  /*   struct pos p = {1,1,9}; */
+  /* if (level.number == 8) { */
+  /*   struct pos p = {16,0,3}; */
   /*   place_frame (&k->f, &k->f, kid_normal_00, &p, */
   /*                k->f.dir == LEFT ? +22 : +31, +15); */
+  /*   room_view = 16; */
   /* } */
 }
 
@@ -205,44 +218,43 @@ special_events (void)
 
   /* in the fourth level */
   if (level.number == 4) {
-      struct pos pld = {24,1,3};
-      struct pos pmirror = {4,0,4};
-      struct level_door *ld = level_door_at_pos (&pld);
+    struct pos mirror_pos = {4,0,4};
 
-      /* if the level door is open and the camera is on room 4, make
-         the mirror appear */
-      if (ld->i == 0
-          && room_view == 4
-          && con (&pmirror)->fg != MIRROR) {
-        con (&pmirror)->fg = MIRROR;
-        register_mirror (&pmirror);
-        play_sample (suspense_sample, 4);
-      }
+    /* if the level door is open and the camera is on room 4, make
+       the mirror appear */
+    if (exit_level_door
+        && exit_level_door->i == 0
+        && room_view == 4
+        && con (&mirror_pos)->fg != MIRROR) {
+      con (&mirror_pos)->fg = MIRROR;
+      register_mirror (&mirror_pos);
+      play_sample (suspense_sample, 4);
+    }
 
-      /* if the kid is crossing the mirror, make his shadow appear */
-      if (con (&pmirror)->fg == MIRROR) {
-        struct mirror *m = mirror_at_pos (&pmirror);
-        if (m->kid_crossing == k->id) {
-          k->current_lives = 1;
-          int id = create_kid (k);
-          struct anim *ks = &kida[id];
-          ks->shadow = true;
-          ks->f.dir = (ks->f.dir == LEFT) ? RIGHT : LEFT;
-          ks->controllable = false;
-          shadow_id = id;
-        }
+    /* if the kid is crossing the mirror, make his shadow appear */
+    if (con (&mirror_pos)->fg == MIRROR) {
+      struct mirror *m = mirror_at_pos (&mirror_pos);
+      if (m->kid_crossing == k->id) {
+        k->current_lives = 1;
+        int id = create_kid (k);
+        struct anim *ks = &kida[id];
+        ks->shadow = true;
+        ks->f.dir = (ks->f.dir == LEFT) ? RIGHT : LEFT;
+        ks->controllable = false;
+        shadow_id = id;
       }
+    }
 
-      /* make the kid's shadow run to the right until he disappears
-         from view */
-      if (shadow_id != -1) {
-        struct anim *ks = get_kid_by_id (shadow_id);
-        if (is_frame_visible (&ks->f)) ks->key.right = true;
-        else {
-          destroy_kid (ks);
-          shadow_id = -1;
-        }
+    /* make the kid's shadow run to the right until he disappears
+       from view */
+    if (shadow_id != -1) {
+      struct anim *ks = get_kid_by_id (shadow_id);
+      if (is_frame_visible (&ks->f)) ks->key.right = true;
+      else {
+        destroy_kid (ks);
+        shadow_id = -1;
       }
+    }
   }
 
   /* in the fifth level */
@@ -334,6 +346,44 @@ special_events (void)
         && m.room == 1
         && m.y >= 191)
       quit_anim = NEXT_LEVEL;
+  }
+
+  /* in the eighth level */
+  if (level.number == 8) {
+    struct pos mouse_pos = {16,0,12};
+    struct anim *m = NULL;
+
+    if (mouse_id != -1) m = &mousea[mouse_id];
+
+    if (mouse_timer) {
+      /* if the exit level door is open and the kid is at room 16,
+         start couting (or continue if started already) for the mouse
+         arrival */
+      if (exit_level_door && exit_level_door->i == 0 &&
+          k->f.c.room == 16) al_start_timer (mouse_timer);
+      else al_stop_timer (mouse_timer);
+
+      /* if enough cycles have passed since the start of the countdown
+         and the camera is at room 16, make the mouse appear */
+      if (al_get_timer_count (mouse_timer) >= 138
+          && room_view == 16) {
+        al_destroy_timer (mouse_timer);
+        mouse_timer = NULL;
+        mouse_id = create_mouse (NULL);
+        struct anim *m = &mousea[mouse_id];
+        m->f.dir = RIGHT;
+        m->f.flip = ALLEGRO_FLIP_HORIZONTAL;
+        place_frame (&m->f, &m->f, mouse_normal_00,
+                     &mouse_pos, +0, +48);
+      }
+    }
+
+    /* make the mouse disapear as soon as it goes out of view */
+    if (m && m->action == mouse_run && m->f.dir == RIGHT
+        && ! is_frame_visible (&m->f)) {
+        destroy_mouse (m);
+        mouse_id = -1;
+    }
   }
 }
 

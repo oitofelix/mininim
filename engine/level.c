@@ -41,6 +41,7 @@
 #include "consistency.h"
 #include "stars.h"
 #include "mirror.h"
+#include "mouse.h"
 #include "level.h"
 
 /* functions */
@@ -96,11 +97,13 @@ play_level (struct level *lv)
   case RESTART_LEVEL:
     retry_level = level.number;
     destroy_kids ();
+    destroy_mice ();
     destroy_cons ();
     draw_bottom_text (NULL, NULL);
    goto start;
   case NEXT_LEVEL:
     destroy_kids ();
+    destroy_mice ();
     destroy_cons ();
     if (level.next_level) level.next_level (level.number + 1);
     draw_bottom_text (NULL, NULL);
@@ -108,6 +111,7 @@ play_level (struct level *lv)
   case RESTART_GAME:
     retry_level = -1;
     destroy_kids ();
+    destroy_mice ();
     destroy_cons ();
     draw_bottom_text (NULL, NULL);
     break;
@@ -155,6 +159,7 @@ load_level (void)
   load_potion ();
   load_sword ();
   load_kid ();
+  load_mouse ();
 }
 
 void
@@ -165,6 +170,7 @@ unload_level (void)
   unload_potion ();
   unload_sword ();
   unload_kid ();
+  unload_mouse ();
 }
 
 static void
@@ -181,6 +187,8 @@ compute_level (void)
   for (i = 0; i < kida_nmemb; i++) kida[i].splash = false;
 
   compute_loose_floors ();
+
+  for (i = 0; i < mousea_nmemb; i++) mousea[i].action (&mousea[i]);
 
   get_keyboard_state (&current_kid->key);
   for (i = 0; i < kida_nmemb; i++) kida[i].action (&kida[i]);
@@ -500,6 +508,7 @@ draw_level (void)
       draw_falling_loose_floor (screen, &p, em, vm);
     }
 
+  draw_mice (screen, em, vm);
   draw_kids (screen, em, vm);
 
   for (p.floor = FLOORS; p.floor >= -1; p.floor--)
