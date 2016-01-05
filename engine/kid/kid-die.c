@@ -105,6 +105,7 @@ kid_die_spiked (struct anim *k)
     k->splash = true;
 
     struct spikes_floor *s = spikes_floor_at_pos (&k->p);
+    s->i = 4;
     s->state = 5;
     s->inactive = true;
     s->murdered_kid = k->id;
@@ -240,6 +241,7 @@ kill_kid_shadows (struct anim *k)
     struct anim *ks = &kida[i];
 
     if (ks->shadow_of == k->id
+        && ks->controllable
         && ! is_kid_dead (&ks->f)) {
       survey (_mt, pos, &ks->f, &nc, &pmt, &np);
       ks->p = pmt;

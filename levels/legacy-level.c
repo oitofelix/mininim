@@ -37,7 +37,7 @@
 static struct level legacy_level;
 static int level_3_checkpoint;
 static int shadow_id;
-static bool played_end_sample;
+static bool played_sample;
 static int total_lives;
 
 static struct con room_0[FLOORS][PLACES] =
@@ -88,7 +88,7 @@ play_legacy_level (void)
 static void
 start (void)
 {
-  played_end_sample = false;
+  played_sample = false;
   shadow_id = -1;
   stop_all_samples ();
 
@@ -164,8 +164,8 @@ start (void)
   }
 
   /* temporary placement for test */
-  /* if (level.number == 5) { */
-  /*   struct pos p = {24,1,8}; */
+  /* if (level.number == 6) { */
+  /*   struct pos p = {1,1,9}; */
   /*   place_frame (&k->f, &k->f, kid_normal_00, &p, */
   /*                k->f.dir == LEFT ? +22 : +31, +15); */
   /* } */
@@ -175,14 +175,14 @@ static void
 special_events (void)
 {
   struct pos np, p, pm;
-  struct coord nc;
+  struct coord nc, m;
   struct anim *k = current_kid;
 
   /* in the first animation cycle */
   if (anim_cycle == 0) {
     /* close any level door in the starting room */
     struct pos p;
-    p.room = current_kid->f.c.room;
+    p.room = k->f.c.room;
     for (p.floor = 0; p.floor < FLOORS; p.floor++)
       for (p.place = -1; p.place < PLACES; p.place++)
         if (con (&p)->fg == LEVEL_DOOR) {
@@ -288,15 +288,63 @@ special_events (void)
       }
     }
   }
+
+  /* in the sixth level */
+  if (level.number == 6) {
+    struct anim *ks;
+
+    /* create kid's shadow to wait for kid at room 1 */
+    if (shadow_id == -1) {
+      struct pos shadow_pos = (struct pos) {1,1,1};
+      int id = create_kid (k);
+      ks = &kida[id];
+      ks->shadow = true;
+      ks->f.dir = RIGHT;
+      ks->controllable = false;
+      ks->action = kid_normal;
+      place_frame (&ks->f, &ks->f, kid_normal_00, &shadow_pos,
+                   +9, +15);
+      shadow_id = id;
+    } else ks = get_kid_by_id (shadow_id);
+
+    /* when kid enters room 1, play the suspense sound */
+    if (k->f.c.room == 1
+        && ! played_sample) {
+      play_sample (suspense_sample, 1);
+      played_sample = true;
+    }
+
+    /* if kid opens the door and jumps to reach the other side of room
+       1, make his shadow step over the closer floor */
+    struct pos door_pos = (struct pos) {1,1,2};
+    if (k->f.c.room == 1
+        && k->action == kid_run_jump
+        && k->i == 8
+        && con (&door_pos)->fg == DOOR
+        && door_at_pos (&door_pos)->i < DOOR_MAX_STEP) {
+      ks->key.right = true;
+      ks->key.shift = true;
+    }
+
+    /* when kid falls from room 1 to the room below it, quit to the
+       next level */
+    survey (_m, pos, &k->f, &m, &np, &np);
+    coord2room (&m, 1, &m);
+    if (is_kid_fall (&k->f)
+        && m.room == 1
+        && m.y >= 191)
+      quit_anim = NEXT_LEVEL;
+  }
 }
 
 static void
 end (struct pos *p)
 {
+  struct anim *k = current_kid;
   static ALLEGRO_SAMPLE_INSTANCE *si = NULL;
 
   /* end music samples to play per level */
-  if (! played_end_sample) {
+  if (! played_sample) {
     switch (level.number) {
     case 1: case 2: case 3: case 5: case 7:
     case 8: case 9: case 10: case 11:
@@ -305,11 +353,11 @@ end (struct pos *p)
       si = play_sample (success_suspense_sample, p->room); break;
     case 6: case 12: case 13: break;
     }
-    played_end_sample = true;
+    played_sample = true;
   }
 
   /* the kid must keep the total lives obtained for the next level */
-  total_lives = current_kid->total_lives;
+  total_lives = k->total_lives;
 
   if (! is_playing_sample (si)) quit_anim = NEXT_LEVEL;
 }

@@ -62,6 +62,7 @@ main (int argc, char **argv)
   title_started = false;
   stop_all_samples ();
   play_title ();
+  if (quit_anim == QUIT_GAME) goto quit_game;
   stop_all_samples ();
 
   if (! play_time) play_time = create_timer (60.0);
@@ -73,6 +74,7 @@ main (int argc, char **argv)
   play_legacy_level ();
   if (quit_anim == RESTART_GAME) goto restart_game;
 
+ quit_game:
   unload_level ();
   unload_title ();
 

@@ -329,17 +329,17 @@ compare_kids (const void *k0, const void *k1)
   survey (_tl, pos, &_k0->f, &nc, &np, &ptl0);
   survey (_tl, pos, &_k1->f, &nc, &np, &ptl1);
 
-  int cpbr = cpos (&pbr0, &pbr1);
-  if (cpbr && pbr0.room == pbr1.room) return cpbr;
-
   int cptr = cpos (&ptr0, &ptr1);
   if (cptr && ptr0.room == ptr1.room) return cptr;
 
-  int cpbl = cpos (&pbl0, &pbl1);
-  if (cpbl && pbl0.room == pbl1.room) return cpbl;
+  int cpbr = cpos (&pbr0, &pbr1);
+  if (cpbr && pbr0.room == pbr1.room) return cpbr;
 
   int cptl = cpos (&ptl0, &ptl1);
   if (cptl && ptl0.room == ptl1.room) return cptl;
+
+  int cpbl = cpos (&pbl0, &pbl1);
+  if (cpbl && pbl0.room == pbl1.room) return cpbl;
 
   return 0;
 }
