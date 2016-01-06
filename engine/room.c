@@ -304,6 +304,7 @@ draw_confg_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case OPENER_FLOOR: draw_opener_floor_base (bitmap, &pv, em, vm); break;
   case CLOSER_FLOOR: draw_closer_floor_base (bitmap, &pv, em, vm); break;
   case STUCK_FLOOR: draw_pressed_closer_floor_base (bitmap, &pv, em, vm); break;
+  case HIDDEN_FLOOR: break;
   case PILLAR: draw_floor_base (bitmap, &pv, em, vm); break;
   case BIG_PILLAR_BOTTOM: draw_floor_base (bitmap, &pv, em, vm); break;
   case BIG_PILLAR_TOP: break;
@@ -347,6 +348,7 @@ draw_confg_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case OPENER_FLOOR: draw_opener_floor_left (bitmap, &pv, em, vm); break;
   case CLOSER_FLOOR: draw_closer_floor_left (bitmap, &pv, em, vm); break;
   case STUCK_FLOOR: draw_pressed_closer_floor_left (bitmap, &pv, em, vm); break;
+  case HIDDEN_FLOOR: break;
   case PILLAR: draw_pillar_left (bitmap, &pv, em, vm); break;
   case BIG_PILLAR_BOTTOM:
     draw_big_pillar_bottom_left (bitmap, &pv, em, vm); break;
@@ -410,6 +412,7 @@ draw_confg_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case OPENER_FLOOR: draw_opener_floor_right (bitmap, &pv, em, vm); break;
   case CLOSER_FLOOR: draw_closer_floor_right (bitmap, &pv, em, vm); break;
   case STUCK_FLOOR: draw_pressed_closer_floor_right (bitmap, &pv, em, vm); break;
+  case HIDDEN_FLOOR: break;
   case PILLAR: draw_pillar_right (bitmap, &pv, em, vm); break;
   case BIG_PILLAR_BOTTOM:
     draw_big_pillar_bottom_right (bitmap, &pv, em, vm); break;
@@ -485,6 +488,7 @@ draw_confg_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case OPENER_FLOOR: break;
   case CLOSER_FLOOR: break;
   case STUCK_FLOOR: break;
+  case HIDDEN_FLOOR: break;
   case PILLAR: draw_pillar_fg (bitmap, &pv, em, vm); break;
   case BIG_PILLAR_BOTTOM:
     draw_big_pillar_bottom_fg (bitmap, &pv, em, vm); break;

@@ -423,6 +423,8 @@ is_hangable_con (struct pos *p, enum dir d)
     || t == SPIKES_FLOOR
     || t == OPENER_FLOOR
     || t == CLOSER_FLOOR
+    || t == STUCK_FLOOR
+    || t == HIDDEN_FLOOR
     || t == PILLAR
     || t == BIG_PILLAR_BOTTOM
     || t == DOOR
@@ -593,8 +595,16 @@ press_depressible_floor (struct pos *p)
   case OPENER_FLOOR: press_opener_floor (p); break;
   case CLOSER_FLOOR: press_closer_floor (p); break;
   case LOOSE_FLOOR: release_loose_floor (p); break;
+  case HIDDEN_FLOOR: unhide_hidden_floor (p); break;
   default: break;
   }
+}
+
+void
+unhide_hidden_floor (struct pos *p)
+{
+  if (con (p)->fg != HIDDEN_FLOOR) return;
+  else con (p)->fg = FLOOR;
 }
 
 
@@ -622,6 +632,7 @@ activate_con (struct pos *p)
     c = closer_floor_at_pos (p);
     c->noise = true;
     press_closer_floor (p); break;
+  case HIDDEN_FLOOR: unhide_hidden_floor (p); break;
   case LOOSE_FLOOR: release_loose_floor (p); break;
   case CHOPPER: chopper_at_pos (p)->activate = true; break;
   case LEVEL_DOOR: level_door_at_pos (p)->action = OPEN_LEVEL_DOOR;

@@ -186,7 +186,7 @@ flow (struct anim *k)
   else if (k->i == 5 && k->walk == 3) k->i = 6;
   else if (k->i == 11){
     if (k->walk != -1) {
-      printf ("dcd: %i\n", k->dcd);
+      /* printf ("dcd: %i\n", k->dcd); */
 
       if (k->confg == CHOPPER)
         place_frame (&k->f, &k->f, kid_normal_00, &k->p,

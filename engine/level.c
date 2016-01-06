@@ -59,7 +59,9 @@ static bool pause_game, step_one_cycle;
 
 int room_view;
 int retry_level = -1;
+int anti_camera_room;
 int camera_follow_kid;
+int auto_rem_time_1st_cycle = 24;
 
 void
 play_level (struct level *lv)
@@ -195,7 +197,8 @@ compute_level (void)
   clear_kids_keyboard_state ();
 
   if (current_kid->f.c.room != prev_room
-      && current_kid->f.c.room != 0)  {
+      && current_kid->f.c.room != 0
+      && current_kid->f.c.room != anti_camera_room)  {
     if (camera_follow_kid == current_kid->id)
       room_view = current_kid->f.c.room;
     make_links_locally_consistent (prev_room, room_view);
@@ -503,6 +506,8 @@ draw_level (void)
       if (! no_room_drawing) draw_mirror (screen, &p, em, vm);
     }
 
+  /* loose_floor_fall_debug (); */
+
   for (p.floor = FLOORS; p.floor >= -1; p.floor--)
     for (p.place = -1; p.place < PLACES; p.place++) {
       draw_falling_loose_floor (screen, &p, em, vm);
@@ -527,8 +532,11 @@ draw_level (void)
   int rem_time = 60 - al_get_timer_count (play_time);
   if ((rem_time % 5 == 0
        && last_auto_show_time != rem_time
-       && anim_cycle > 24)
-      || anim_cycle == 24) {
+       && anim_cycle > 720)
+      || (auto_rem_time_1st_cycle >= 0
+          && last_auto_show_time != rem_time
+          && anim_cycle >= auto_rem_time_1st_cycle
+          && anim_cycle <= auto_rem_time_1st_cycle + 6)) {
     display_remaining_time ();
     last_auto_show_time = rem_time;
   }

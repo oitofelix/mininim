@@ -260,6 +260,7 @@ struct level {
       OPENER_FLOOR,
       CLOSER_FLOOR,
       STUCK_FLOOR,
+      HIDDEN_FLOOR,
       PILLAR,
       BIG_PILLAR_BOTTOM,
       BIG_PILLAR_TOP,

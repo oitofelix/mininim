@@ -17,6 +17,7 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "prince.h"
 #include "kernel/video.h"
 #include "kernel/random.h"
@@ -68,6 +69,7 @@ ALLEGRO_SAMPLE *loose_floor_01_sample, *loose_floor_02_sample, *loose_floor_03_s
 
 struct loose_floor *loose_floor = NULL;
 size_t loose_floor_nmemb = 0;
+static bool must_sort, must_remove;
 
 void
 load_loose_floor (void)
@@ -354,17 +356,27 @@ compute_loose_floors (void)
 {
   size_t i;
 
+  must_sort = false;
+  must_remove = false;
+
   for (i = 0; i < loose_floor_nmemb; i++) {
     struct loose_floor *l = &loose_floor[i];
-    if (l->p.room == -1) {
-      remove_loose_floor (l); i--;
-      continue;
-    }
     switch (l->action) {
     case SHAKE_LOOSE_FLOOR: compute_loose_floor_shake (l); break;
     case RELEASE_LOOSE_FLOOR: compute_loose_floor_release (l); break;
     case FALL_LOOSE_FLOOR: compute_loose_floor_fall (l); break;
     default: break;
+    }
+  }
+
+  if (must_sort) sort_loose_floors ();
+
+  if (must_remove) {
+    if (! must_sort) sort_loose_floors ();
+    for (i = 0; i < loose_floor_nmemb; i++) {
+      struct loose_floor *l = &loose_floor[i];
+      if (l->p.room == -1) remove_loose_floor (l);
+      else break;
     }
   }
 }
@@ -510,6 +522,9 @@ compute_loose_floor_fall (struct loose_floor *l)
       k->splash = true;
       k->current_lives--;
       k->uncouch_slowly = true;
+      /* ensure kid doesn't couch in thin air (might occur when hit
+         while jumping, for example) */
+      place_frame_on_the_ground (&k->f, &k->f.c);
       play_sample (hit_wall_sample, kpmt.room);
       video_effect.color = get_flicker_blood_color ();
       start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
@@ -521,6 +536,7 @@ compute_loose_floor_fall (struct loose_floor *l)
     }
   }
 
+  /* fall */
   if (is_strictly_traversable (&fpmbo_f)
       || peq (&fpmbo_f, &fpmbo_nf)) {
     /* the floor hit a rigid structure */
@@ -529,7 +545,7 @@ compute_loose_floor_fall (struct loose_floor *l)
     else {
       l->f = nf;
       if (is_strictly_traversable (&fpmbo_nf)) l->p = fpmbo_nf;
-      sort_loose_floors ();
+      must_sort = true;
       return;
     }
     /* the floor hit the ground */
@@ -540,12 +556,13 @@ compute_loose_floor_fall (struct loose_floor *l)
     case LOOSE_FLOOR: /* loose floor isn't ground */
       m = loose_floor_at_pos (&fpmbo_f);
       m->p.room = -1;
+      must_remove = true;
       l->f = nf;
       l->f.b = get_correct_falling_loose_floor_bitmap (dv_broken_floor);
       l->p = fpmbo_f;
       l->i = 0;
       con (&fpmbo_f)->fg = NO_FLOOR;
-      sort_loose_floors ();
+      must_sort = true;
       play_sample (broken_floor_sample, p.room);
       return;
     case OPENER_FLOOR: break_opener_floor (&fpmbo_f); break;
@@ -560,7 +577,8 @@ compute_loose_floor_fall (struct loose_floor *l)
   con (&p)->fg = BROKEN_FLOOR;
   shake_loose_floor_row (&p);
   l->p.room = -1;
-  sort_loose_floors ();
+  must_remove = true;
+  must_sort = true;
   play_sample (broken_floor_sample, p.room);
 }
 
@@ -881,4 +899,24 @@ loose_floor_right_coord (struct pos *p, struct coord *c)
   c->y = PLACE_HEIGHT * p->floor + 50 - 1;
   c->room = p->room;
   return c;
+}
+
+void
+loose_floor_fall_debug (void)
+{
+  int i;
+  for (i = 0; i < loose_floor_nmemb; i++) {
+    struct loose_floor *l = &loose_floor[i];
+    if (l->action != FALL_LOOSE_FLOOR) continue;
+    struct pos pv; pos2room (&l->p, room_view, &pv);
+    struct coord cv; coord2room (&l->f.c, room_view, &cv);
+    printf ("(%i,%i,%i) == (%i,%i,%i) <%i,%i,%i> <%i,%i,%i> ? %i ? %i\n",
+            l->p.room, l->p.floor, l->p.place,
+            pv.room, pv.floor, pv.place,
+            l->f.c.room, l->f.c.x, l->f.c.y,
+            cv.room, cv.x, cv.y,
+            peq (&l->p, &pv),
+            cpos (&l->p, &pv));
+    draw_falling_loose_floor (screen, &loose_floor[i].p, em, vm);
+  }
 }

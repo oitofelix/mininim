@@ -90,7 +90,7 @@ kid_resurrect (struct anim *k)
   place_frame (&k->f, &k->f, kid_normal_00,
                &pm, k->f.dir == LEFT ? +16 : +16, +15);
   reset_murder_spikes_floor (k->id);
-  stop_sample (k->sample);
+  stop_sample (k->sample, death_sample);
 }
 
 void
@@ -158,6 +158,15 @@ kid_die_suddenly (struct anim *k)
   }
 
   k->hit_by_loose_floor = false;
+
+  /* fall */
+  struct coord nc;
+  struct pos np, pm;
+  survey (_m, pos, &k->f, &nc, &pm, &np);
+  if (is_strictly_traversable (&pm)) {
+    kid_fall (k);
+    return;
+  }
 }
 
 void

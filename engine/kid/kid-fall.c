@@ -112,9 +112,11 @@ physics_in (struct anim *k)
   struct frame_offset fo;
 
   bool hang_back = ((k->f.dir == LEFT) ? k->key.right : k->key.left)
-    && ! k->key.up && k->key.shift;
+    && ! k->key.up && k->key.shift && k->i < 10
+    && k->current_lives > 0;
 
-  bool hang_front = k->key.shift && ! hang_back;
+  bool hang_front = k->key.shift && ! hang_back
+    && k->i < 10 && k->current_lives > 0;
 
   int dir = (k->f.dir == LEFT) ? -1 : +1;
 
@@ -189,6 +191,7 @@ physics_in (struct anim *k)
   if (k->i > 2 && can_hang (&k->f, false, &k->hang_pos)
       && hang_front && ! k->hang_limit) {
     k->hit_by_loose_floor = false;
+    stop_sample (k->sample, scream_sample);
     play_sample (hang_on_fall_sample, k->f.c.room);
     kid_hang (k);
     return false;
@@ -198,6 +201,7 @@ physics_in (struct anim *k)
   if (k->i > 2 && can_hang (&k->f, true, &k->hang_pos)
       && hang_back && ! k->hang_limit) {
     k->hit_by_loose_floor = false;
+    stop_sample (k->sample, scream_sample);
     play_sample (hang_on_fall_sample, k->f.c.room);
     kid_turn (k);
     return false;
@@ -216,7 +220,8 @@ physics_in (struct anim *k)
       && npmbo.floor != npmbo_nf.floor) {
     k->inertia = k->cinertia = 0;
 
-    if (is_colliding (&k->f, &k->fo, +16, false, &k->ci))
+    if (is_colliding (&k->f, &k->fo, +16, false, &k->ci)
+        && k->ci.t != WALL)
       k->f.c.x += (k->f.dir == LEFT) ? +16 : -16;
 
     survey (_bf, pos, &k->f, &nc, &pbf, &np);
@@ -239,9 +244,7 @@ physics_in (struct anim *k)
 
       if (k->i >= 10) k->current_lives = 0;
 
-      if (k->current_lives <= 0)
-        play_sample (hit_ground_fatal_sample, k->f.c.room);
-      else {
+      if (k->current_lives > 0) {
         play_sample (hit_ground_harm_sample, k->f.c.room);
         k->uncouch_slowly = true;
       }
@@ -255,12 +258,18 @@ physics_in (struct anim *k)
 
     survey (_mt, pos, &k->f, &nc, &pmt, &np);
     if (k->current_lives <= 0) {
-      stop_sample (k->sample);
+      stop_sample (k->sample, scream_sample);
       k->p = pmt;
       if (con (&pmt)->fg == SPIKES_FLOOR) kid_die_spiked (k);
-      else kid_die_suddenly (k);
+      else {
+        play_sample (hit_ground_fatal_sample, k->f.c.room);
+        kid_die_suddenly (k);
+      }
     }
-    else kid_couch (k);
+    else {
+      stop_sample (k->sample, scream_sample);
+      kid_couch (k);
+    }
 
     return false;
   }
@@ -276,7 +285,8 @@ physics_out (struct anim *k)
 
   /* sound */
   if (k->i == 10
-      && ! al_get_timer_started (k->floating))
+      && ! al_get_timer_started (k->floating)
+      && k->current_lives > 0)
     k->sample = play_sample (scream_sample, k->f.c.room);
 }
 

@@ -74,6 +74,7 @@ void clear_depressible_floor (struct anim *a);
 void save_depressible_floor (struct anim *a);
 void restore_depressible_floor (struct anim *a);
 void press_depressible_floor (struct pos *p);
+void unhide_hidden_floor (struct pos *p);
 
 
 

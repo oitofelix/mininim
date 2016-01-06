@@ -41,9 +41,11 @@ static int level_3_checkpoint;
 static int shadow_id;
 static bool played_sample;
 static int total_lives;
+static int current_lives;
 static struct level_door *exit_level_door;
 static ALLEGRO_TIMER *mouse_timer;
 static int mouse_id;
+static bool coming_from_12;
 
 static struct con room_0[FLOORS][PLACES] =
   {{{WALL}, {WALL}, {WALL}, {WALL}, {WALL},
@@ -93,12 +95,17 @@ play_legacy_level (void)
 static void
 start (void)
 {
+  /* initialize some state */
   played_sample = false;
   shadow_id = mouse_id = -1;
   stop_all_samples ();
   al_destroy_timer (mouse_timer);
   mouse_timer = NULL;
   exit_level_door = get_exit_level_door (0);
+  anti_camera_room = -1;
+
+  if (coming_from_12) auto_rem_time_1st_cycle = -1;
+  else auto_rem_time_1st_cycle = 24;
 
   /* start the game with only 3 lives */
   if (level.number == 1) total_lives = 3;
@@ -108,7 +115,8 @@ start (void)
   int id = create_kid (NULL);
   struct anim *k = &kida[id];
   k->total_lives = total_lives;
-  k->current_lives = total_lives;
+  if (coming_from_12) k->current_lives = current_lives;
+  else k->current_lives = total_lives;
 
   /* make the kid turn as appropriate */
   switch (level.number) {
@@ -118,7 +126,9 @@ start (void)
     break;
   case 13:
     k->f.dir = (k->f.dir == LEFT) ? RIGHT : LEFT;
-    k->i = -1; k->action = kid_stop_run; break;
+    k->i = -1; k->action = kid_run;
+    frame2room (&k->f, roomd (23, RIGHT), &k->f.c);
+    break;
   default: k->i = -1; k->action = kid_turn; break;
   }
 
@@ -175,12 +185,17 @@ start (void)
   /* in the eighth level */
   if (level.number == 8) mouse_timer = create_timer (1.0 / 12);
 
+  /* level 13 adjustements */
+  coming_from_12 = false;
+  if (level.number == 13 && retry_level == 13)
+    level.nominal_number = 12;
+
   /* temporary placement for test */
-  /* if (level.number == 8) { */
-  /*   struct pos p = {16,0,3}; */
+  /* if (level.number == 9) { */
+  /*   struct pos p = {7,1,7}; */
   /*   place_frame (&k->f, &k->f, kid_normal_00, &p, */
   /*                k->f.dir == LEFT ? +22 : +31, +15); */
-  /*   room_view = 16; */
+  /*   room_view = 9; */
   /* } */
 }
 
@@ -188,7 +203,7 @@ static void
 special_events (void)
 {
   struct pos np, p, pm;
-  struct coord nc, m;
+  struct coord nc;
   struct anim *k = current_kid;
 
   /* in the first animation cycle */
@@ -304,6 +319,7 @@ special_events (void)
   /* in the sixth level */
   if (level.number == 6) {
     struct anim *ks;
+    anti_camera_room = roomd (1, BELOW);
 
     /* create kid's shadow to wait for kid at room 1 */
     if (shadow_id == -1) {
@@ -340,12 +356,11 @@ special_events (void)
 
     /* when kid falls from room 1 to the room below it, quit to the
        next level */
-    survey (_m, pos, &k->f, &m, &np, &np);
-    coord2room (&m, 1, &m);
-    if (is_kid_fall (&k->f)
-        && m.room == 1
-        && m.y >= 191)
+    if (k->f.c.room == roomd (1, BELOW)) {
+      total_lives = k->total_lives;
+      current_lives = k->current_lives;
       quit_anim = NEXT_LEVEL;
+    }
   }
 
   /* in the eighth level */
@@ -357,7 +372,7 @@ special_events (void)
 
     if (mouse_timer) {
       /* if the exit level door is open and the kid is at room 16,
-         start couting (or continue if started already) for the mouse
+         start counting (or continue if started already) for the mouse
          arrival */
       if (exit_level_door && exit_level_door->i == 0 &&
           k->f.c.room == 16) al_start_timer (mouse_timer);
@@ -385,6 +400,45 @@ special_events (void)
         mouse_id = -1;
     }
   }
+
+  /* in the twelfth level */
+  if (level.number == 12) {
+    struct pos sword_pos = {15,0,1};
+    struct pos first_hidden_floor_pos = {2,0,7};
+    anti_camera_room = 23;
+
+    /* make the sword in room 15 disappear (kid's shadow has it) when
+       the kid leaves room 18 to the right */
+    if (k->f.c.room == roomd (18, RIGHT)
+        && con (&sword_pos)->ext.item == SWORD)
+      con (&sword_pos)->ext.item = NO_ITEM;
+
+    /* (temporary condition for test until fighting the kid's shadow
+       is implemented) transform the empty space in hidden floors */
+    if (k->f.c.room == 2
+        && con (&first_hidden_floor_pos)->fg == NO_FLOOR)
+      for (p = (struct pos) {2,0,-4}; p.place < PLACES;
+           prel (&p, &p, +0, +1))
+        if (con (&p)->fg == NO_FLOOR) con (&p)->fg = HIDDEN_FLOOR;
+
+    /* when the kid enters the room 23, go to the next level */
+    if (k->f.c.room == 23) {
+      coming_from_12 = true;
+      total_lives = k->total_lives;
+      current_lives = k->current_lives;
+      quit_anim = NEXT_LEVEL;
+    }
+  }
+
+  /* in the thirteenth level */
+  if (level.number == 13) {
+
+    if (k->f.c.room == 16 || k->f.c.room == 23) {
+      struct pos p = (struct pos) {k->f.c.room,-1,0};
+      p.place = prandom (9);
+      activate_con (&p);
+    }
+  }
 }
 
 static void
@@ -396,18 +450,19 @@ end (struct pos *p)
   /* end music samples to play per level */
   if (! played_sample) {
     switch (level.number) {
-    case 1: case 2: case 3: case 5: case 7:
-    case 8: case 9: case 10: case 11:
+    case 1: case 2: case 3: case 5: case 6: case 7:
+    case 8: case 9: case 10: case 11: case 12:
       si = play_sample (success_sample, p->room); break;
     case 4:
       si = play_sample (success_suspense_sample, p->room); break;
-    case 6: case 12: case 13: break;
+    case 13: break;
     }
     played_sample = true;
   }
 
   /* the kid must keep the total lives obtained for the next level */
   total_lives = k->total_lives;
+  current_lives = k->current_lives;
 
   if (! is_playing_sample (si)) quit_anim = NEXT_LEVEL;
 }
@@ -437,9 +492,10 @@ load_legacy_level (int number)
 
   memset (&legacy_level, 0, sizeof (legacy_level));
   legacy_level.number = number;
-  if (number == 12 || number == 13)
-    legacy_level.nominal_number = 12;
-  else if (number == 14) legacy_level.nominal_number = -1;
+  if (number == 12 || number == 13) {
+    if (coming_from_12) legacy_level.nominal_number = -1;
+    else legacy_level.nominal_number = 12;
+  } else if (number == 14) legacy_level.nominal_number = -1;
   else legacy_level.nominal_number = number;
   legacy_level.start = start;
   legacy_level.special_events = special_events;

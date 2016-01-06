@@ -42,6 +42,7 @@ struct frame *next_frame (struct frame *f, struct frame *nf,
                           struct frame_offset *fo);
 void select_frame (struct anim *a, struct frameset *fs, int i);
 void select_xframe (struct frame_offset *xf, struct frameset *fs, int j);
+struct coord *place_frame_on_the_ground (struct frame *f, struct coord *c);
 bool wait_anim (int cycles);
 
 /* variables */

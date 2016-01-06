@@ -180,6 +180,16 @@ next_frame (struct frame *f, struct frame *nf, struct frame_offset *fo)
   return nf;
 }
 
+struct coord *
+place_frame_on_the_ground (struct frame *f, struct coord *c)
+{
+  struct coord mbo; struct pos np, pmbo;
+  *c = f->c;
+  survey (_mbo, pos, f, &mbo, &pmbo, &np);
+  f->c.y += (PLACE_HEIGHT * pmbo.floor + 55) - mbo.y;
+  return c;
+}
+
 bool
 wait_anim (int cycles)
 {

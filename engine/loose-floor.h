@@ -148,5 +148,6 @@ void draw_loose_floor_02_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
                                 enum em em, enum vm vm);
 struct coord *loose_floor_left_coord (struct pos *p, struct coord *c);
 struct coord *loose_floor_right_coord (struct pos *p, struct coord *c);
+void loose_floor_fall_debug (void);
 
 #endif	/* MININIM_LOOSE_FLOOR_H */

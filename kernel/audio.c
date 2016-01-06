@@ -247,9 +247,13 @@ stop_all_samples (void)
 }
 
 void
-stop_sample (ALLEGRO_SAMPLE_INSTANCE *si)
+stop_sample (ALLEGRO_SAMPLE_INSTANCE *si,
+             ALLEGRO_SAMPLE *s)
 {
   struct audio_sample *as = get_audio_sample (si);
   if (! as) return;
+
+  if (s && as->sample != s) return;
+
   remove_sample (as);
 }
