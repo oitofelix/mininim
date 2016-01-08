@@ -829,3 +829,46 @@ surveyo (coord_f cf, int dx, int dy, pos_f pf, struct frame *f,
   npos (p, np);
   return con (np);
 }
+
+struct coord *
+place_on_the_ground (struct frame *f, struct coord *c)
+{
+  struct coord mbo; struct pos np, pmbo;
+  *c = f->c;
+  survey (_mbo, pos, f, &mbo, &pmbo, &np);
+  f->c.y += (PLACE_HEIGHT * pmbo.floor + 55) - mbo.y;
+  return c;
+}
+
+struct coord *
+place_at_distance (struct frame *f0, coord_f cf0,
+                   struct frame *f1, coord_f cf1,
+                   int d, enum dir dir, struct coord *c)
+{
+  struct coord c0; cf0 (f0, &c0);
+  struct coord c1; cf1 (f1, &c1);
+  struct coord tl; _tl (f1, &tl);
+
+  *c = c1;
+  coord2room (c, c0.room, c);
+
+  c->x = (c0.x - c1.x) + ((dir == RIGHT) ? d : -d) + tl.x;
+
+  return c;
+}
+
+struct coord *
+place_at_pos (struct frame *f, coord_f cf, struct pos *p, struct coord *c)
+{
+  struct coord _c; cf (f, &_c);
+  struct coord tl; _tl (f, &tl);
+
+  int dx = _c.x - tl.x;
+  int dy = _c.y - tl.y;
+
+  c->room = p->room;
+  c->x = PLACE_WIDTH * p->place + 30 - dx;
+  c->y = PLACE_HEIGHT * p->floor + 34 - dy;
+
+  return c;
+}

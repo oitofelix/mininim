@@ -65,7 +65,7 @@ play_anim (void (*draw_callback) (void),
         if (was_key_pressed (ALLEGRO_KEY_ESCAPE, 0, ALLEGRO_KEYMOD_CTRL, true))
           pause_anim = false;
 
-        kid_debug ();
+        /* kid_debug (); */
 
         if (! is_video_effect_started ()) show ();
         if (! pause_anim
@@ -166,6 +166,9 @@ next_frame (struct frame *f, struct frame *nf, struct frame_offset *fo)
 {
   *nf = *f;
 
+  nf->oc = f->c;
+  nf->ob = f->b;
+
   int ow = al_get_bitmap_width (nf->b);
   int oh = al_get_bitmap_height (nf->b);
   int w = al_get_bitmap_width (fo->b);
@@ -180,14 +183,13 @@ next_frame (struct frame *f, struct frame *nf, struct frame_offset *fo)
   return nf;
 }
 
-struct coord *
-place_frame_on_the_ground (struct frame *f, struct coord *c)
+struct frame *
+prev_frame (struct frame *f, struct frame *pf)
 {
-  struct coord mbo; struct pos np, pmbo;
-  *c = f->c;
-  survey (_mbo, pos, f, &mbo, &pmbo, &np);
-  f->c.y += (PLACE_HEIGHT * pmbo.floor + 55) - mbo.y;
-  return c;
+  *pf = *f;
+  pf->c = f->oc;
+  pf->b = f->ob;
+  return pf;
 }
 
 bool

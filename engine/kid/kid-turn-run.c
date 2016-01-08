@@ -124,7 +124,7 @@ physics_in (struct anim *k)
   k->inertia = k->cinertia = 0;
 
   /* collision */
-  if (is_colliding (&k->f, &k->fo, +0, true, &k->ci)) {
+  if (is_colliding (&k->f, &k->fo, +0, 2, &k->ci)) {
     k->f.dir = (k->f.dir == LEFT) ? RIGHT : LEFT;
     kid_stabilize_collision (k);
     return false;

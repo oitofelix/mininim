@@ -1,5 +1,5 @@
 /*
-  kid-sword-defense.c -- kid sword defense module;
+  kid-sword-hit.c -- kid sword walk forward module;
 
   Copyright (C) 2015, 2016 Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
 
@@ -17,7 +17,6 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
 #include "prince.h"
 #include "kernel/video.h"
 #include "kernel/keyboard.h"
@@ -27,55 +26,59 @@
 #include "engine/potion.h"
 #include "engine/sword.h"
 #include "engine/loose-floor.h"
-#include "engine/fight.h"
 #include "kid.h"
 
-struct frameset kid_sword_defense_frameset[KID_SWORD_DEFENSE_FRAMESET_NMEMB];
+struct frameset kid_sword_hit_frameset[KID_SWORD_HIT_FRAMESET_NMEMB];
 
-static void init_kid_sword_defense_frameset (void);
+static void init_kid_sword_hit_frameset (void);
 static bool flow (struct anim *k);
 static bool physics_in (struct anim *k);
 static void physics_out (struct anim *k);
 
-ALLEGRO_BITMAP *kid_sword_defense_18, *kid_sword_defense_11,
-  *kid_sword_defense_12;
+ALLEGRO_BITMAP *kid_sword_hit_01, *kid_sword_hit_02,
+  *kid_sword_hit_03, *kid_sword_hit_04, *kid_sword_hit_05;
 
 static void
-init_kid_sword_defense_frameset (void)
+init_kid_sword_hit_frameset (void)
 {
-  struct frameset frameset[KID_SWORD_DEFENSE_FRAMESET_NMEMB] =
-    {{kid_sword_defense_18,+0,0},{kid_sword_defense_11,+0,0},
-     {kid_sword_defense_12,+0,0}};
+  struct frameset frameset[KID_SWORD_HIT_FRAMESET_NMEMB] =
+    {{kid_sword_hit_01,+0,0},{kid_sword_hit_02,+0,0},
+     {kid_sword_hit_03,+4,0},{kid_sword_hit_04,+8,0},
+     {kid_sword_hit_05,+8,0}};
 
-  memcpy (&kid_sword_defense_frameset, &frameset,
-          KID_SWORD_DEFENSE_FRAMESET_NMEMB * sizeof (struct frameset));
+  memcpy (&kid_sword_hit_frameset, &frameset,
+          KID_SWORD_HIT_FRAMESET_NMEMB * sizeof (struct frameset));
 }
 
 void
-load_kid_sword_defense (void)
+load_kid_sword_hit (void)
 {
   /* bitmaps */
-  kid_sword_defense_18 = load_bitmap (KID_SWORD_DEFENSE_18);
-  kid_sword_defense_11 = load_bitmap (KID_SWORD_DEFENSE_11);
-  kid_sword_defense_12 = load_bitmap (KID_SWORD_DEFENSE_12);
+  kid_sword_hit_01 = load_bitmap (KID_SWORD_HIT_01);
+  kid_sword_hit_02 = load_bitmap (KID_SWORD_HIT_02);
+  kid_sword_hit_03 = load_bitmap (KID_SWORD_HIT_03);
+  kid_sword_hit_04 = load_bitmap (KID_SWORD_HIT_04);
+  kid_sword_hit_05 = load_bitmap (KID_SWORD_HIT_05);
 
   /* frameset */
-  init_kid_sword_defense_frameset ();
+  init_kid_sword_hit_frameset ();
 }
 
 void
-unload_kid_sword_defense (void)
+unload_kid_sword_hit (void)
 {
-  al_destroy_bitmap (kid_sword_defense_18);
-  al_destroy_bitmap (kid_sword_defense_11);
-  al_destroy_bitmap (kid_sword_defense_12);
+  al_destroy_bitmap (kid_sword_hit_01);
+  al_destroy_bitmap (kid_sword_hit_02);
+  al_destroy_bitmap (kid_sword_hit_03);
+  al_destroy_bitmap (kid_sword_hit_04);
+  al_destroy_bitmap (kid_sword_hit_05);
 }
 
 void
-kid_sword_defense (struct anim *k)
+kid_sword_hit (struct anim *k)
 {
   k->oaction = k->action;
-  k->action = kid_sword_defense;
+  k->action = kid_sword_hit;
   k->f.flip = (k->f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
   if (! flow (k)) return;
@@ -87,34 +90,25 @@ kid_sword_defense (struct anim *k)
 static bool
 flow (struct anim *k)
 {
-  if (k->oaction != kid_sword_defense)
+  if (k->oaction != kid_sword_hit) {
     k->i = -1;
+    k->j = 0;
+  }
 
-  struct anim *ke = get_enemy (k);
-  if (k->i == 2) {
-    kid_sword_attack (k);
-    return false;
-  } else if (k->i == 1 && ke && ke->attack_defended == 2
-           && ke->counter_attacked != 2) {
-    kid_sword_walkb (k);
-    return false;
-  } else if (k->i == 1 && ! (ke && ke->attack_defended == 2)) {
+  if (k->i == 4) {
     kid_sword_normal (k);
     return false;
   }
 
-  if (k->i == -1) k->j = 28;
-  if (k->i == 0) k->j = 14;
-  if (k->i == 1) k->j = 15;
+  select_frame (k, kid_sword_hit_frameset, k->i + 1);
 
-  select_frame (k, kid_sword_defense_frameset, k->i + 1);
+  if (k->i == 2) k->j = 29;
+  if (k->i == 3) k->j = 7;
+  if (k->i == 4) k->j = 17;
+
   select_xframe (&k->xf, sword_frameset, k->j);
 
-  if (k->oaction == kid_sword_attack) k->fo.dx += +8;
-
-  /* if (k->id == 0) */
-  /*   printf ("kid_sword_defense: k->i = %i, k->fo.dx = %i\n", */
-  /*           k->i, k->fo.dx); */
+  if (k->i <= 1) k->xf.b = NULL;
 
   return true;
 }
@@ -123,6 +117,9 @@ static bool
 physics_in (struct anim *k)
 {
   struct coord nc; struct pos np, pbf, pmbo, pbb;
+
+  /* collision */
+  uncollide (&k->f, &k->fo, &k->fo, +0, true, &k->ci);
 
   /* fall */
   survey (_bf, pos, &k->f, &nc, &pbf, &np);
@@ -143,5 +140,7 @@ static void
 physics_out (struct anim *k)
 {
   /* depressible floors */
-  keep_depressible_floor (k);
+  if (k->i == 3) update_depressible_floor (k, -4, -33);
+  else if (k->i == 4) update_depressible_floor (k, -1, -24);
+  else keep_depressible_floor (k);
 }

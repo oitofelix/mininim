@@ -172,7 +172,7 @@ dist_next_place (struct frame *f, coord_f cf, pos_f pf,
 
 bool
 is_colliding (struct frame *f, struct frame_offset *fo, int dx,
-              bool reverse, struct collision_info *ci)
+              int reverse, struct collision_info *ci)
 {
   return is_colliding_cf (f, fo, dx, reverse, ci, _bf)
     || is_colliding_cf (f, fo, dx, reverse, ci, _tf);
@@ -180,7 +180,7 @@ is_colliding (struct frame *f, struct frame_offset *fo, int dx,
 
 bool
 is_colliding_cf (struct frame *f, struct frame_offset *fo, int dx,
-                 bool reverse, struct collision_info *ci,
+                 int reverse, struct collision_info *ci,
                  coord_f cf)
 {
   struct coord nc, tf; struct pos np, pcf, _pcf, p, pl, pr;
@@ -191,7 +191,9 @@ is_colliding_cf (struct frame *f, struct frame_offset *fo, int dx,
 
   if (reverse) _f.dir = (_f.dir == LEFT) ? RIGHT : LEFT;
 
+  next_frame_inv = (reverse == true);
   next_frame (&_f, &nf, fo);
+  next_frame_inv = false;
 
   int dir = (nf.dir == LEFT) ? -1 : +1;
   nf.c.x += dir * dx;
@@ -206,6 +208,10 @@ is_colliding_cf (struct frame *f, struct frame_offset *fo, int dx,
   bool door_collision = false;
   bool carpet_collision = false;
   bool mirror_collision = false;
+
+  /* printf ("_pcf: (%i,%i,%i); pcf: (%i,%i,%i)\n", */
+  /*         _pcf.room, _pcf.floor, _pcf.place, */
+  /*         pcf.room, pcf.floor, pcf.place); */
 
   /* wall */
 
@@ -306,6 +312,25 @@ is_colliding_cf (struct frame *f, struct frame_offset *fo, int dx,
   return wall_collision || door_collision || carpet_collision || mirror_collision;
 }
 
+struct frame_offset *
+uncollide (struct frame *f, struct frame_offset *fo,
+           struct frame_offset *_fo, int dx,
+           int reverse, struct collision_info *ci)
+{
+  int ow = al_get_bitmap_width (f->b);
+  int w = al_get_bitmap_width (fo->b);
+
+  *_fo = *fo;
+
+  int inc = reverse ? -1 : +1;
+
+  while (is_colliding (f, _fo, dx, reverse, ci)
+         && abs (_fo->dx) <= abs (ow - w + 1))
+    _fo->dx += inc;
+
+  return _fo;
+}
+
 bool
 is_on_con (struct frame *f, coord_f cf, pos_f pf,
            int margin, bool reverse, int min_dist, enum confg t)
@@ -324,7 +349,7 @@ is_on_con (struct frame *f, coord_f cf, pos_f pf,
 }
 
 int
-dist_collision (struct frame *f, bool reverse,
+dist_collision (struct frame *f, int reverse,
                 struct collision_info *ci)
 {
   int i = 0, dx = +1;

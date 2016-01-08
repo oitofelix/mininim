@@ -28,8 +28,10 @@
 #define KID_SWORD_ATTACK_05 "dat/kid/sword attacking/frame05.png"
 #define KID_SWORD_ATTACK_06 "dat/kid/sword attacking/frame06.png"
 #define KID_SWORD_ATTACK_07 "dat/kid/sword attacking/frame07.png"
+#define KID_SWORD_ATTACK_09 "dat/kid/sword attacking/frame09.png"
+#define KID_SWORD_ATTACK_16 "dat/kid/sword attacking/frame16.png"
 
-#define KID_SWORD_ATTACK_FRAMESET_NMEMB 7
+#define KID_SWORD_ATTACK_FRAMESET_NMEMB 8
 extern struct frameset kid_sword_attack_frameset[KID_SWORD_ATTACK_FRAMESET_NMEMB];
 
 void load_kid_sword_attack (void);
@@ -38,6 +40,7 @@ void kid_sword_attack (struct anim *k);
 
 extern ALLEGRO_BITMAP *kid_sword_attack_01, *kid_sword_attack_02,
   *kid_sword_attack_03, *kid_sword_attack_04, *kid_sword_attack_05,
-  *kid_sword_attack_06, *kid_sword_attack_07;
+  *kid_sword_attack_06, *kid_sword_attack_07, *kid_sword_attack_09,
+  *kid_sword_attack_16;
 
 #endif	/* MININIM_KID_SWORD_ATTACK_H */

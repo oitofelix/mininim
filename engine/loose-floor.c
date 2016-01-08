@@ -524,7 +524,7 @@ compute_loose_floor_fall (struct loose_floor *l)
       k->uncouch_slowly = true;
       /* ensure kid doesn't couch in thin air (might occur when hit
          while jumping, for example) */
-      place_frame_on_the_ground (&k->f, &k->f.c);
+      place_on_the_ground (&k->f, &k->f.c);
       play_sample (hit_wall_sample, kpmt.room);
       video_effect.color = get_flicker_blood_color ();
       start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));

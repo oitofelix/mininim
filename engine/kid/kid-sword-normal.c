@@ -62,13 +62,26 @@ kid_sword_normal (struct anim *k)
 static bool
 flow (struct anim *k)
 {
+  struct coord nc;
+  struct pos np, pmt;
+
   bool keep_sword = k->key.down;
-  bool defense = k->key.up;
-  bool attack = k->key.shift;
+  bool defense = k->key.up && ! k->key.shift
+    && ! k->key.left && ! k->key.right;
+  bool attack = k->key.shift && ! k->key.up
+    && ! k->key.left && ! k->key.right;
   bool walkf = ((k->f.dir == RIGHT) && k->key.right)
     || ((k->f.dir == LEFT) && k->key.left);
   bool walkb = ((k->f.dir == RIGHT) && k->key.left)
     || ((k->f.dir == LEFT) && k->key.right);
+
+  if (k->oaction == kid_sword_normal
+      && k->current_lives <= 0) {
+    survey (_mt, pos, &k->f, &nc, &pmt, &np);
+    k->p = pmt;
+    kid_die (k);
+    return false;
+  }
 
   if (k->oaction == kid_sword_normal) {
     if (keep_sword) {

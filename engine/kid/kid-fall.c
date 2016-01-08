@@ -208,10 +208,21 @@ physics_in (struct anim *k)
   }
 
   /* land on ground */
+  fo.b = kid_fall_frameset[k->i > 4 ? 4 : k->i].frame;
+  fo.dx = kid_fall_frameset[k->i > 4 ? 4 : k->i].dx;
+  fo.dy = kid_fall_frameset[k->i > 4 ? 4 : k->i].dy;
+
+  if (al_get_timer_started (k->floating)) fo.dy = 14;
+  else {
+    if (k->i > 0) k->fo.dx = -k->inertia;
+    if (k->i > 4) {
+      int speed = +21 + 3 * (k->i - 5);
+      fo.dy = (speed > 33) ? 33 : speed;
+    }
+    fo.dy += 6;
+  }
+
   survey (_mbo, pos, &k->f, &nc, &np, &npmbo);
-  fo.b = k->f.b;
-  fo.dx = 0;
-  fo.dy = al_get_timer_started (k->floating) ? 14 : 34;
   next_frame (&k->f, &nf, &fo);
   survey (_mbo, pos, &nf, &nc, &np, &npmbo_nf);
 
@@ -220,9 +231,12 @@ physics_in (struct anim *k)
       && npmbo.floor != npmbo_nf.floor) {
     k->inertia = k->cinertia = 0;
 
-    if (is_colliding (&k->f, &k->fo, +16, false, &k->ci)
-        && k->ci.t != WALL)
-      k->f.c.x += (k->f.dir == LEFT) ? +16 : -16;
+    if (is_colliding (&k->f, &k->fo, +16, false, &k->ci)) {
+      if (k->ci.t != WALL)
+        k->f.c.x += (k->f.dir == LEFT) ? +16 : -16;
+      else
+        k->f.c.x += (k->f.dir == LEFT) ? +8 : -8;
+    }
 
     survey (_bf, pos, &k->f, &nc, &pbf, &np);
     /* pos2view (&pbf, &pbf); */

@@ -72,6 +72,7 @@ create_mouse (struct anim *_m)
   if (_m) m = *_m;
   else {
     m.id = i;
+    m.type = MOUSE;
     m.f.b = mouse_normal_00;
     m.f.c.room = level.start_pos.room;
     m.f.dir = LEFT;
@@ -105,6 +106,15 @@ destroy_mice (void)
   for (i = 0; i < mousea_nmemb; i++) destroy_mouse (&mousea[i]);
   mousea = NULL;
   mousea_nmemb = 0;
+}
+
+struct anim *
+get_mouse_by_id (int id)
+{
+  int i;
+  for (i = 0; i < mousea_nmemb; i++)
+    if (mousea[i].id == id) return &mousea[i];
+  return NULL;
 }
 
 static ALLEGRO_COLOR

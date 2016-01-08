@@ -34,6 +34,7 @@
 #include "engine/mirror.h"
 #include "engine/potion.h"
 #include "engine/mouse.h"
+#include "engine/fight.h"
 #include "legacy-level.h"
 
 static struct level legacy_level;
@@ -122,7 +123,7 @@ start (void)
   switch (level.number) {
   case 1:
     k->f.dir = (k->f.dir == LEFT) ? RIGHT : LEFT;
-    k->i = -1; k->action = kid_fall;
+    k->i = -1; k->action = kid_normal;
     break;
   case 13:
     k->f.dir = (k->f.dir == LEFT) ? RIGHT : LEFT;
@@ -191,11 +192,33 @@ start (void)
     level.nominal_number = 12;
 
   /* temporary placement for test */
-  /* if (level.number == 9) { */
-  /*   struct pos p = {7,1,7}; */
+  /* if (level.number == 1) { */
+  /*   /\* kid *\/ */
+  /*   struct pos p = {6,0,9}; */
+  /*   k->f.dir = LEFT; */
   /*   place_frame (&k->f, &k->f, kid_normal_00, &p, */
   /*                k->f.dir == LEFT ? +22 : +31, +15); */
-  /*   room_view = 9; */
+  /*   k->action = kid_normal; */
+  /*   room_view = 6; */
+  /*   k->has_sword = true; */
+  /*   k->fp.counter_attack_prob = 50; */
+  /*   k->fp.counter_defense_prob = 80; */
+
+  /*   /\* shadow *\/ */
+  /*   int id = create_kid (NULL); */
+  /*   struct anim *ks = &kida[id]; */
+  /*   p = (struct pos) {6,0,5}; */
+  /*   ks->f.dir = RIGHT; */
+  /*   ks->f.c.room = 6; */
+  /*   place_frame (&ks->f, &ks->f, kid_normal_00, &p, */
+  /*                +0, +15); */
+  /*   ks->has_sword = true; */
+  /*   ks->shadow = true; */
+  /*   /\* get_perfect_fighter_profile (&ks->fp); *\/ */
+  /*   /\* ks->fp.attack_prob = -1; *\/ */
+  /*   /\* ks->fp.return_prob = -1; *\/ */
+  /*   get_median_fighter_profile (&ks->fp); */
+  /*   ks->current_lives = 3; */
   /* } */
 }
 

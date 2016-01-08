@@ -36,6 +36,7 @@
 #include "engine/closer-floor.h"
 #include "engine/potion.h"
 #include "engine/sword.h"
+#include "engine/fight.h"
 #include "kid.h"
 
 struct anim *kida;
@@ -50,7 +51,8 @@ ALLEGRO_SAMPLE *step_sample, *hit_ground_sample, *hit_ground_harm_sample,
   *harm_sample, *action_not_allowed_sample, *small_life_potion_sample,
   *big_life_potion_sample, *scream_sample, *spiked_sample, *chopped_sample,
   *floating_sample, *death_sample, *press_key_sample, *mirror_sample,
-  *suspense_sample, *success_sample, *success_suspense_sample;
+  *suspense_sample, *success_sample, *success_suspense_sample,
+  *sword_defense_sample, *sword_hit_sample;
 
 static void place_kid (struct anim *k, int room, int floor, int place);
 static struct coord *kid_life_coord (int i, struct coord *c);
@@ -92,6 +94,7 @@ load_kid (void)
   load_kid_sword_walkb ();
   load_kid_sword_defense ();
   load_kid_sword_attack ();
+  load_kid_sword_hit ();
   load_kid_die ();
   load_kid_stairs ();
 
@@ -125,6 +128,8 @@ load_kid (void)
   suspense_sample = load_sample (SUSPENSE_SAMPLE);
   success_sample = load_sample (SUCCESS_SAMPLE);
   success_suspense_sample = load_sample (SUCCESS_SUSPENSE_SAMPLE);
+  sword_defense_sample = load_sample (SWORD_DEFENSE_SAMPLE);
+  sword_hit_sample = load_sample (SWORD_HIT_SAMPLE);
 }
 
 void
@@ -158,6 +163,7 @@ unload_kid (void)
   unload_kid_sword_walkb ();
   unload_kid_sword_defense ();
   unload_kid_sword_attack ();
+  unload_kid_sword_hit ();
   unload_kid_die ();
   unload_kid_stairs ();
 
@@ -191,6 +197,8 @@ unload_kid (void)
   al_destroy_sample (suspense_sample);
   al_destroy_sample (success_sample);
   al_destroy_sample (success_suspense_sample);
+  al_destroy_sample (sword_defense_sample);
+  al_destroy_sample (sword_hit_sample);
 }
 
 int
@@ -212,6 +220,7 @@ create_kid (struct anim *_k)
   } else {
     k.id = i;
     k.shadow_of = -1;
+    k.type = KID;
     k.f.b = kid_normal_00;
     k.f.c.room = level.start_pos.room;
     k.f.dir = level.start_dir;
@@ -222,6 +231,10 @@ create_kid (struct anim *_k)
     k.current_lives = KID_INITIAL_CURRENT_LIVES;
     k.floating = create_timer (1.0);
     k.controllable = true;
+    k.enemy_type = -1;
+    k.enemy_id = -1;
+    k.fp.counter_attack_prob = 50;
+    k.fp.counter_defense_prob = 50;
 
     struct pos *p = &level.start_pos;
     place_frame (&k.f, &k.f, kid_normal_00, p,
@@ -737,10 +750,11 @@ kid_debug (void)
     int dl = dist_con (&current_kid->f, _bf, pos, -4, false, LOOSE_FLOOR);
     int dcl = dist_con (&current_kid->f, _bf, pos, -4, false, CLOSER_FLOOR);
     int dch = dist_chopper (&current_kid->f, false);
+    int de = dist_enemy (current_kid);
     if (was_key_pressed (ALLEGRO_KEY_F1, 0, 0, true))
       printf ("\
-f = %i, p = %i, dn = %i, dp = %i, dc = %i, df = %i, dl = %i, dcl = %i, dch = %i\n",
-              pbf.floor, pbf.place, dn, dp, dc, df, dl, dcl, dch);
+f = %i, p = %i, dn = %i, dp = %i, dc = %i, df = %i, dl = %i, dcl = %i, dch = %i, de = %i\n",
+              pbf.floor, pbf.place, dn, dp, dc, df, dl, dcl, dch, de);
   }
   /* end kid hack */
 }

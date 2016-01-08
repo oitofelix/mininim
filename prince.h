@@ -328,6 +328,10 @@ struct anim *_action;
 typedef void (*ACTION) (struct anim *a);
 
 struct anim {
+  enum anim_type {
+    KID, GUARD, SKELETON, VIZIER, PRINCESS, MOUSE
+  } type;
+
   int id;
   int shadow_of;
 
@@ -335,9 +339,13 @@ struct anim {
     void *id;
     struct coord c;
     ALLEGRO_BITMAP *b;
+    struct coord oc;
+    ALLEGRO_BITMAP *ob;
     enum dir dir;
     int flip;
   } f;
+
+  struct frame of;
 
   struct frame_offset {
     ALLEGRO_BITMAP *b;
@@ -364,13 +372,28 @@ struct anim {
     hit_by_loose_floor, invisible, has_sword, hurt,
     controllable;
 
+  int attack_defended, counter_attacked, counter_defense;
+  bool hurt_enemy_in_counter_attack;
+
+  struct fighter_profile {
+    int attack_prob;
+    int defense_prob;
+    int counter_attack_prob;
+    int counter_defense_prob;
+    int advance_prob;
+    int return_prob;
+  } fp;
+
   ALLEGRO_TIMER *floating;
   ALLEGRO_SAMPLE_INSTANCE *sample;
 
   int dc, df, dl, dcl, dch, dcd;
 
   bool immortal, poison_immune, loose_floor_immune, fall_immune,
-    spikes_immune, chopper_immune;
+    spikes_immune, chopper_immune, sword_immune;
+
+  enum anim_type enemy_type;
+  int enemy_id;
 
   enum confg confg;
 

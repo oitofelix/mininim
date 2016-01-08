@@ -51,6 +51,7 @@
 #include "kid-sword-walkb.h"
 #include "kid-sword-defense.h"
 #include "kid-sword-attack.h"
+#include "kid-sword-hit.h"
 #include "kid-die.h"
 #include "kid-stairs.h"
 
@@ -84,6 +85,8 @@
 #define SUSPENSE_SAMPLE "dat/midisnd1/suspense.ogg"
 #define SUCCESS_SAMPLE "dat/midisnd1/success.ogg"
 #define SUCCESS_SUSPENSE_SAMPLE "dat/midisnd1/success-suspense.ogg"
+#define SWORD_DEFENSE_SAMPLE "dat/digisnd1/sword vs sword.ogg"
+#define SWORD_HIT_SAMPLE "dat/digisnd1/loosing a life from the enemy.ogg"
 
 /* functions */
 void load_kid (void);
@@ -124,6 +127,7 @@ extern ALLEGRO_SAMPLE *step_sample, *hit_ground_sample, *hit_ground_harm_sample,
   *harm_sample, *action_not_allowed_sample, *small_life_potion_sample,
   *big_life_potion_sample, *scream_sample, *spiked_sample, *chopped_sample,
   *floating_sample, *death_sample, *press_key_sample, *mirror_sample,
-  *suspense_sample, *success_sample, *success_suspense_sample;
+  *suspense_sample, *success_sample, *success_suspense_sample,
+  *sword_defense_sample, *sword_hit_sample;
 
 #endif	/* MININIM_KID_H */

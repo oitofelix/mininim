@@ -232,7 +232,9 @@ physics_in (struct anim *k)
   /* collision */
   if (is_colliding (&k->f, &k->fo, +0, false, &k->ci)
       && k->ci.t != MIRROR) {
-    kid_stabilize_collision (k);
+    if (k->i <= 2 && k->fall)
+      uncollide (&k->f, &k->fo, &k->fo, +0, false, &k->ci);
+    else kid_stabilize_collision (k);
     return false;
   } else if (is_colliding (&k->f, &k->fo, +2, false, &k->ci)
              && k->ci.t == MIRROR) {

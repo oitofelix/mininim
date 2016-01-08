@@ -23,8 +23,9 @@
 /* bitmaps */
 #define KID_SWORD_DEFENSE_18 "dat/kid/sword attacking/frame18.png"
 #define KID_SWORD_DEFENSE_11 "dat/kid/sword attacking/frame11.png"
+#define KID_SWORD_DEFENSE_12 "dat/kid/sword attacking/frame12.png"
 
-#define KID_SWORD_DEFENSE_FRAMESET_NMEMB 2
+#define KID_SWORD_DEFENSE_FRAMESET_NMEMB 3
 extern struct frameset kid_sword_defense_frameset[KID_SWORD_DEFENSE_FRAMESET_NMEMB];
 
 void load_kid_sword_defense (void);

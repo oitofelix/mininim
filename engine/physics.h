@@ -44,18 +44,22 @@ int dist_con (struct frame *f, coord_f cf, pos_f pf,
               int margin, bool reverse, enum confg t);
 bool
 is_colliding (struct frame *f, struct frame_offset *fo, int dx,
-              bool reverse, struct collision_info *ci);
+              int reverse, struct collision_info *ci);
 bool
 is_colliding_cf (struct frame *f, struct frame_offset *fo, int dx,
-                 bool reverse, struct collision_info *ci,
+                 int reverse, struct collision_info *ci,
                  coord_f cf);
 int
-dist_collision (struct frame *f, bool reverse,
+dist_collision (struct frame *f, int reverse,
                 struct collision_info *ci);
 int
 dist_chopper (struct frame *f, bool reverse);
 int
 dist_fall (struct frame *f, bool reverse);
+struct frame_offset *
+uncollide (struct frame *f, struct frame_offset *fo,
+           struct frame_offset *_fo, int dx,
+           int reverse, struct collision_info *ci);
 
 
 bool is_hangable_con (struct pos *p, enum dir d);

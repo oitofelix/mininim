@@ -17,6 +17,7 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "prince.h"
 #include "kernel/video.h"
 #include "kernel/keyboard.h"
@@ -211,6 +212,15 @@ flow (struct anim *k)
 static bool
 physics_in (struct anim *k)
 {
+  /* fall */
+  struct coord nc;
+  struct pos np, pm;
+  survey (_m, pos, &k->f, &nc, &pm, &np);
+  if (is_strictly_traversable (&pm)) {
+    kid_fall (k);
+    return false;
+  }
+
   return true;
 }
 

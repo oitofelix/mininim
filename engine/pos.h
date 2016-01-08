@@ -78,6 +78,12 @@ struct coord *_bb (struct frame *f, struct coord *c);
 struct con *
 surveyo (coord_f cf, int dx, int dy, pos_f pf, struct frame *f,
          struct coord *c, struct pos *p, struct pos *np);
+struct coord *place_on_the_ground (struct frame *f, struct coord *c);
+struct coord *place_at_distance (struct frame *f0, coord_f cf0,
+                                 struct frame *f1, coord_f cf1,
+                                 int d, enum dir dir, struct coord *c);
+struct coord *
+place_at_pos (struct frame *f, coord_f cf, struct pos *p, struct coord *c);
 
 #define survey(coord_f,pos_f,f,c,p,np) (con (npos ((pos_f) ((coord_f) ((f), (c)), (p)), (np))))
 

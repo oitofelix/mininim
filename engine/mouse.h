@@ -30,6 +30,7 @@ void unload_mouse (void);
 int create_mouse (struct anim *_m);
 void destroy_mouse (struct anim *m);
 void destroy_mice (void);
+struct anim * get_mouse_by_id (int id);
 void draw_mice (ALLEGRO_BITMAP *bitmap, enum em em, enum vm vm);
 void mouse_normal (struct anim *mouse);
 void mouse_run (struct anim *mouse);

@@ -24,6 +24,7 @@
 #include "kernel/keyboard.h"
 #include "kernel/array.h"
 #include "kernel/timer.h"
+#include "kernel/random.h"
 #include "anim.h"
 #include "physics.h"
 #include "room.h"
@@ -42,6 +43,8 @@
 #include "stars.h"
 #include "mirror.h"
 #include "mouse.h"
+#include "fight.h"
+#include "kid/kid-sword-hit.h"
 #include "level.h"
 
 /* functions */
@@ -193,7 +196,11 @@ compute_level (void)
   for (i = 0; i < mousea_nmemb; i++) mousea[i].action (&mousea[i]);
 
   get_keyboard_state (&current_kid->key);
+
+  for (i = 1; i < kida_nmemb; i++) fight_ai (get_kid_by_id (i), get_kid_by_id (0));
   for (i = 0; i < kida_nmemb; i++) kida[i].action (&kida[i]);
+  for (i = 0; i < kida_nmemb; i++) fight_mechanics (&kida[i]);
+
   clear_kids_keyboard_state ();
 
   if (current_kid->f.c.room != prev_room
@@ -283,6 +290,12 @@ process_keys (void)
     } while (! current_kid->controllable);
     current_kid->current = true;
     room_view = current_kid->f.c.room;
+  }
+
+  /* K: kill enemy */
+  if (was_key_pressed (ALLEGRO_KEY_K, 0, 0, true)) {
+    struct anim *ke = get_enemy (current_kid);
+    if (ke) ke->current_lives = 0;
   }
 
   /* I: enable/disable immortal mode */
