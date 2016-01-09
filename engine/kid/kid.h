@@ -95,7 +95,7 @@ void draw_kid_lives (ALLEGRO_BITMAP *bitmap, struct anim *k,
                      enum vm vm);
 void draw_kid_if_at_pos (ALLEGRO_BITMAP *bitmap, struct anim *k, struct pos *p,
                          enum vm vm);
-int create_kid (struct anim *k);
+int create_kid (struct anim *_k, struct pos *p, enum dir dir);
 void destroy_kid (struct anim *k);
 void destroy_kids (void);
 struct anim *get_kid_by_id (int id);

@@ -85,6 +85,8 @@ static void load_legacy_level (int number);
 static void start (void);
 static void special_events (void);
 static void end (struct pos *p);
+static struct skill *get_legacy_skill (int i, struct skill *skill);
+static int get_legacy_guard_total_lives (int i);
 
 void
 play_legacy_level (void)
@@ -113,11 +115,35 @@ start (void)
   if (total_lives < 3) total_lives = 3;
 
   /* create kid */
-  int id = create_kid (NULL);
+  int id = create_kid (NULL, &level.start_pos, level.start_dir);
   struct anim *k = &kida[id];
   k->total_lives = total_lives;
   if (coming_from_12) k->current_lives = current_lives;
   else k->current_lives = total_lives;
+  k->controllable = true;
+
+  /* create guards */
+  int i;
+  for (i = 1; i < GUARDS; i++) {
+    struct guard *g = &level.guard[i];
+    struct anim *a;
+    int id;
+    switch (g->type) {
+    case NO_ANIM: continue;
+    case KID: default:
+      id = create_kid (NULL, &g->p, g->dir);
+      a = &kida[id];
+      break;
+    }
+    a->shadow = true;
+    a->has_sword = true;
+    a->skill = g->skill;
+    a->total_lives = g->total_lives;
+    a->current_lives = g->total_lives;
+    /* todo: handle style */
+  }
+
+  k = get_kid_by_id (0);
 
   /* make the kid turn as appropriate */
   switch (level.number) {
@@ -274,7 +300,7 @@ special_events (void)
       struct mirror *m = mirror_at_pos (&mirror_pos);
       if (m->kid_crossing == k->id) {
         k->current_lives = 1;
-        int id = create_kid (k);
+        int id = create_kid (k, NULL, 0);
         struct anim *ks = &kida[id];
         ks->shadow = true;
         ks->f.dir = (ks->f.dir == LEFT) ? RIGHT : LEFT;
@@ -309,7 +335,7 @@ special_events (void)
         && con (&door_pos)->fg == DOOR
         && is_potion (&potion_pos)
         && door_at_pos (&door_pos)->i <= 25) {
-      int id = create_kid (k);
+      int id = create_kid (k, NULL, 0);
       struct anim *ks = &kida[id];
       ks->shadow = true;
       ks->f.dir = RIGHT;
@@ -347,7 +373,7 @@ special_events (void)
     /* create kid's shadow to wait for kid at room 1 */
     if (shadow_id == -1) {
       struct pos shadow_pos = (struct pos) {1,1,1};
-      int id = create_kid (k);
+      int id = create_kid (k, NULL, 0);
       ks = &kida[id];
       ks->shadow = true;
       ks->f.dir = RIGHT;
@@ -743,6 +769,60 @@ load_legacy_level (int number)
   /* START DIRECTION: ok */
   enum dir *sd = &legacy_level.start_dir;
   *sd = lv.start_position[2] ? LEFT : RIGHT;
+
+  /* GUARD LOCATION, DIRECTION, SKILL and COLOR: ok */
+  for (i = 0; i < LROOMS; i++) {
+    struct guard *g = &legacy_level.guard[i + 1];
+
+    if (lv.guard_location[i] > 29) {
+      g->type = NO_ANIM;
+      continue;
+    }
+
+    /* guard type */
+    switch (number) {
+    case 3: g->type = SKELETON; break;
+    case 6: g->type = FAT_GUARD; break;
+    case 12: g->type = KID; break;
+    case 13: g->type = VIZIER; break;
+    default: g->type = GUARD; break;
+    }
+
+    /* LOCATION: ok */
+    g->p.room = i + 1;
+    g->p.floor = lv.guard_location[i] / PLACES;
+    g->p.place = lv.guard_location[i] % PLACES;
+
+    /* DIRECTION: ok */
+    g->dir = lv.guard_direction[i] ? LEFT : RIGHT;
+
+    /* SKILL: ok */
+    get_legacy_skill (lv.guard_skill[i], &g->skill);
+    g->total_lives = get_legacy_guard_total_lives (lv.guard_skill[i]);
+
+    /* STYLE: ok */
+    g->style = lv.guard_color[i];
+  }
+}
+
+static struct skill *
+get_legacy_skill (int i, struct skill *skill)
+{
+  /* improve this */
+  skill->attack_prob = 2 * i;
+  skill->defense_prob = 10 * i;
+  skill->counter_attack_prob = 10 * i;
+  skill->counter_defense_prob = 10 * i;
+  skill->advance_prob = 2 * i;
+  skill->return_prob = -1;
+  return skill;
+}
+
+static int
+get_legacy_guard_total_lives (int i)
+{
+  /* improve this */
+  return (i < 3) ? 3 : i;
 }
 
 static enum ltile

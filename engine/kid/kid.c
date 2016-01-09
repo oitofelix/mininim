@@ -202,7 +202,7 @@ unload_kid (void)
 }
 
 int
-create_kid (struct anim *_k)
+create_kid (struct anim *_k, struct pos *p, enum dir dir)
 {
   struct anim k;
 
@@ -222,21 +222,20 @@ create_kid (struct anim *_k)
     k.shadow_of = -1;
     k.type = KID;
     k.f.b = kid_normal_00;
-    k.f.c.room = level.start_pos.room;
-    k.f.dir = level.start_dir;
     k.fo.b = kid_normal_00;
     k.action = kid_normal;
     k.item_pos.room = -1;
     k.total_lives = KID_INITIAL_TOTAL_LIVES;
     k.current_lives = KID_INITIAL_CURRENT_LIVES;
     k.floating = create_timer (1.0);
-    k.controllable = true;
     k.enemy_type = -1;
     k.enemy_id = -1;
-    k.fp.counter_attack_prob = 50;
-    k.fp.counter_defense_prob = 50;
+    k.skill.counter_attack_prob = 70;
+    k.skill.counter_defense_prob = 80;
 
-    struct pos *p = &level.start_pos;
+    k.f.dir = dir;
+    k.f.c.room = p->room;
+    k.controllable = false;
     place_frame (&k.f, &k.f, kid_normal_00, p,
                  k.f.dir == LEFT ? +22 : +31, +15);
     /* place_kid (&k, p->room, p->floor, p->place); */

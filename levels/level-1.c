@@ -36,8 +36,9 @@ play_level_1 (void)
 static void
 start (void)
 {
-  create_kid (NULL);
-  create_kid (&kida[0]);
+  struct pos p = {1,0,0};
+  create_kid (NULL, &p, RIGHT);
+  create_kid (&kida[0], NULL, 0);
 }
 
 static void

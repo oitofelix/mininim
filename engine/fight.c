@@ -40,7 +40,7 @@ fight_ai (struct anim *k0, struct anim *k1)
       && ! is_on_back (k0, k1)
       && is_in_range (k0, k1, ATTACK_RANGE)
       && (is_attacking (k1) && k1->i == 0)
-      && prandom (99) <= k0->fp.defense_prob)
+      && prandom (99) <= k0->skill.defense_prob)
     fight_command_defense (k0);
   /* if defending, counter attack
      (with probability handled elsewhere) */
@@ -67,7 +67,7 @@ fight_ai (struct anim *k0, struct anim *k1)
            && ! is_on_back (k0, k1)
            && ! is_attacking (k1)
            && is_in_range (k0, k1, ATTACK_RANGE)
-           && (prandom (99) <= k0->fp.attack_prob
+           && (prandom (99) <= k0->skill.attack_prob
                || ! is_in_fight_mode (k1))) {
     if (is_safe_to_attack (k0)) fight_command_attack (k0);
     else if (is_safe_to_walkb (k0)) fight_command_walkb (k0);
@@ -79,7 +79,7 @@ fight_ai (struct anim *k0, struct anim *k1)
            && ! is_attacking (k1)
            && is_in_range (k0, k1, ATTACK_RANGE)
            && is_safe_to_walkb (k0)
-           && prandom (99) <= k0->fp.return_prob)
+           && prandom (99) <= k0->skill.return_prob)
     fight_command_walkb (k0);
   /* in fight range, go towards attack range
      (with probability) */
@@ -89,7 +89,7 @@ fight_ai (struct anim *k0, struct anim *k1)
            && is_in_range (k0, k1, FIGHT_RANGE)
            && ! is_in_range (k0, k1, ATTACK_RANGE)
            && is_safe_to_walkf (k0)
-           && prandom (99) <= k0->fp.advance_prob)
+           && prandom (99) <= k0->skill.advance_prob)
     fight_command_walkf (k0);
   /* in follow range, stays at least in the fight range */
   else if (is_in_fight_mode (k0)
@@ -149,12 +149,12 @@ fight_mechanics (struct anim *k)
   if (! ke->counter_attacked)
     ke->counter_attacked =
       (ke->attack_defended && k->key.shift
-       && prandom (99) <= k->fp.counter_attack_prob);
+       && prandom (99) <= k->skill.counter_attack_prob);
 
   if (! ke->counter_defense)
     ke->counter_defense =
       (ke->counter_attacked && ke->key.up
-       && prandom (99) <= ke->fp.counter_defense_prob);
+       && prandom (99) <= ke->skill.counter_defense_prob);
 
   if (! k->hurt_enemy_in_counter_attack)
     k->hurt_enemy_in_counter_attack = ke->counter_attacked && ! ke->counter_defense;
@@ -243,8 +243,10 @@ struct anim *
 get_enemy (struct anim *k)
 {
   switch (k->enemy_type) {
+  case NO_ANIM: return NULL;
   case KID: return get_kid_by_id (k->enemy_id);
   case GUARD: return NULL;
+  case FAT_GUARD: return NULL;
   case SKELETON: return NULL;
   case VIZIER: return NULL;
   case PRINCESS: return NULL;
@@ -583,26 +585,26 @@ fight_fall (struct anim *k)
   kid_fall (k);
 }
 
-struct fighter_profile *
-get_perfect_fighter_profile (struct fighter_profile *fp)
+struct skill *
+get_perfect_skill (struct skill *skill)
 {
-  fp->attack_prob = 80;
-  fp->defense_prob = 99;
-  fp->counter_attack_prob = 99;
-  fp->counter_defense_prob = 99;
-  fp->advance_prob = -1;
-  fp->return_prob = 99;
-  return fp;
+  skill->attack_prob = 80;
+  skill->defense_prob = 99;
+  skill->counter_attack_prob = 99;
+  skill->counter_defense_prob = 99;
+  skill->advance_prob = -1;
+  skill->return_prob = 99;
+  return skill;
 }
 
-struct fighter_profile *
-get_median_fighter_profile (struct fighter_profile *fp)
+struct skill *
+get_median_skill (struct skill *skill)
 {
-  fp->attack_prob = 5;
-  fp->defense_prob = 50;
-  fp->counter_attack_prob = 50;
-  fp->counter_defense_prob = 50;
-  fp->advance_prob = 5;
-  fp->return_prob = -1;
-  return fp;
+  skill->attack_prob = 5;
+  skill->defense_prob = 50;
+  skill->counter_attack_prob = 50;
+  skill->counter_defense_prob = 50;
+  skill->advance_prob = 5;
+  skill->return_prob = -1;
+  return skill;
 }

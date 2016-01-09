@@ -28,6 +28,7 @@
 #define FLOORS 3
 #define PLACES 10
 #define EVENTS 256
+#define GUARDS 25
 
 #define DISPLAY_WIDTH 640
 #define DISPLAY_HEIGHT 400
@@ -241,6 +242,19 @@ enum carpet_design {
   ARCH_CARPET_RIGHT_02,
 };
 
+enum anim_type {
+  NO_ANIM, KID, GUARD, FAT_GUARD, SKELETON, VIZIER, PRINCESS, MOUSE
+};
+
+struct skill {
+    int attack_prob;
+    int defense_prob;
+    int counter_attack_prob;
+    int counter_defense_prob;
+    int advance_prob;
+    int return_prob;
+};
+
 struct level {
   void (*start) (void);
   void (*special_events) (void);
@@ -320,6 +334,15 @@ struct level {
 
   struct pos start_pos;
   enum dir start_dir;
+
+  struct guard {
+    enum anim_type type;
+    struct pos p;
+    enum dir dir;
+    struct skill skill;
+    int total_lives;
+    int style;
+  } guard[GUARDS];
 };
 
 /* avoid "'struct' declared inside parameter list" error for the
@@ -328,9 +351,7 @@ struct anim *_action;
 typedef void (*ACTION) (struct anim *a);
 
 struct anim {
-  enum anim_type {
-    KID, GUARD, SKELETON, VIZIER, PRINCESS, MOUSE
-  } type;
+  enum anim_type type;
 
   int id;
   int shadow_of;
@@ -375,14 +396,7 @@ struct anim {
   int attack_defended, counter_attacked, counter_defense;
   bool hurt_enemy_in_counter_attack;
 
-  struct fighter_profile {
-    int attack_prob;
-    int defense_prob;
-    int counter_attack_prob;
-    int counter_defense_prob;
-    int advance_prob;
-    int return_prob;
-  } fp;
+  struct skill skill;
 
   ALLEGRO_TIMER *floating;
   ALLEGRO_SAMPLE_INSTANCE *sample;

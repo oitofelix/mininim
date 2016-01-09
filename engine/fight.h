@@ -68,9 +68,9 @@ void fight_hit (struct anim *k, struct anim *ke);
 void fight_die (struct anim *k);
 void fight_fall (struct anim *k);
 
-struct fighter_profile *
-get_perfect_fighter_profile (struct fighter_profile *fp);
-struct fighter_profile *
-get_median_fighter_profile (struct fighter_profile *fp);
+struct skill *
+get_perfect_skill (struct skill *fp);
+struct skill *
+get_median_skill (struct skill *fp);
 
 #endif	/* MININIM_FIGHT_H */

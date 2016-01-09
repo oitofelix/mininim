@@ -25,7 +25,7 @@ OBJECTS = ${MODULES:=.o}
 COV_FILES = ${MODULES:=.gcda} ${MODULES:=.gcno}
 LDFLAGS = -lm -lallegro -lallegro_image -lallegro_audio	\
   -lallegro_acodec -lallegro_font -lallegro_primitives
-CFLAGS_DEV = -Wall -Og -ggdb3 -Werror -Wno-error=unused-function \
+CFLAGS_DEV = -Wall -ggdb3 -Werror -Wno-error=unused-function \
   -Wno-error=unused-variable -Wno-error=unused-but-set-variable
 CFLAGS_REL = -O3 -march=native
 CFLAGS_COV = ${CFLAGS_DEV} --coverage -pg
