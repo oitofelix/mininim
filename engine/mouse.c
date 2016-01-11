@@ -25,9 +25,6 @@
 #include "physics.h"
 #include "mouse.h"
 
-struct anim *mousea;
-size_t mousea_nmemb;
-
 #define RUN_FRAMESET_NMEMB 2
 static struct frameset run_frameset[RUN_FRAMESET_NMEMB];
 static void init_run_frameset (void);
@@ -60,61 +57,19 @@ unload_mouse (void)
 
 
 
-int
-create_mouse (struct anim *_m)
+struct anim *
+create_mouse (struct anim *m0, struct anim *m1, struct pos *p, enum dir dir)
 {
-  struct anim m;
+  if (! m0) {
+    m1->f.b = mouse_normal_00;
+    m1->fo.b = mouse_normal_00;
+    m1->action = mouse_normal;
 
-  int i = mousea_nmemb;
-
-  memset (&m, 0, sizeof (m));
-
-  if (_m) m = *_m;
-  else {
-    m.id = i;
-    m.type = MOUSE;
-    m.f.b = mouse_normal_00;
-    m.f.c.room = level.start_pos.room;
-    m.f.dir = LEFT;
-    m.fo.b = mouse_normal_00;
-    m.action = mouse_normal;
-
-    struct pos *p = &level.start_pos;
-    place_frame (&m.f, &m.f, mouse_normal_00, p,
-                 m.f.dir == LEFT ? +22 : +31, +15);
+    place_frame (&m1->f, &m1->f, mouse_normal_00, p,
+                 m1->f.dir == LEFT ? +22 : +31, +15);
   }
 
-  mousea = add_to_array (&m, 1, mousea, &mousea_nmemb, i,
-                         sizeof (m));
-
-  mousea[i].f.id = &mousea[i];
-
-  return i;
-}
-
-void
-destroy_mouse (struct anim *m)
-{
-  size_t i =  m - mousea;
-  remove_from_array (mousea, &mousea_nmemb, i, 1, sizeof (*m));
-}
-
-void
-destroy_mice (void)
-{
-  int i;
-  for (i = 0; i < mousea_nmemb; i++) destroy_mouse (&mousea[i]);
-  mousea = NULL;
-  mousea_nmemb = 0;
-}
-
-struct anim *
-get_mouse_by_id (int id)
-{
-  int i;
-  for (i = 0; i < mousea_nmemb; i++)
-    if (mousea[i].id == id) return &mousea[i];
-  return NULL;
+  return m1;
 }
 
 static ALLEGRO_COLOR
@@ -155,24 +110,14 @@ get_palette (enum vm vm)
 }
 
 void
-draw_mice (ALLEGRO_BITMAP *bitmap, enum em em, enum vm vm)
+draw_mouse_frame (ALLEGRO_BITMAP *bitmap, struct anim *m, enum vm vm)
 {
-  int i;
-  for (i = 0; i < mousea_nmemb; i++) {
-    struct anim *m = &mousea[i];
-
-    if (m->invisible) return;
-
-    struct frame f = m->f;
-
-    palette pal = get_palette (vm);
-    f.b = apply_palette (f.b, pal);
-
-    if (hgc) f.b = apply_palette (f.b, hgc_palette);
-
-    draw_frame (bitmap, &f);
-    draw_room_anim_fg (bitmap, em, vm, m);
-  }
+  if (m->invisible) return;
+  struct frame f = m->f;
+  palette pal = get_palette (vm);
+  f.b = apply_palette (f.b, pal);
+  if (hgc) f.b = apply_palette (f.b, hgc_palette);
+  draw_frame (bitmap, &f);
 }
 
 

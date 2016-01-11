@@ -389,9 +389,8 @@ struct anim {
     total_lives, current_lives;
   bool reverse, collision, fall, hit_ceiling,
     just_hanged, hang, hang_limit, misstep, uncouch_slowly,
-    keep_sword_fast, turn, shadow, current, splash,
-    hit_by_loose_floor, invisible, has_sword, hurt,
-    controllable;
+    keep_sword_fast, turn, shadow, splash, hit_by_loose_floor,
+    invisible, has_sword, hurt, controllable;
 
   int attack_defended, counter_attacked, counter_defense;
   bool hurt_enemy_in_counter_attack;
@@ -406,7 +405,6 @@ struct anim {
   bool immortal, poison_immune, loose_floor_immune, fall_immune,
     spikes_immune, chopper_immune, sword_immune;
 
-  enum anim_type enemy_type;
   int enemy_id;
 
   enum confg confg;

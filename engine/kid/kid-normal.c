@@ -86,7 +86,7 @@ flow (struct anim *k)
   bool stairs = k->key.up && ! k->key.left && ! k->key.right
     && con (&pmt)->fg == LEVEL_DOOR
     && level_door_at_pos (&pmt)->i == 0
-    && k == get_kid_by_id (0);
+    && k == get_anim_by_id (0);
 
   if (k->oaction == kid_normal
       && k->current_lives <= 0) {

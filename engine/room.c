@@ -208,7 +208,9 @@ remove_room_callback (room_callback_f f)
   size_t i;
   for (i = 0; i < room_callback_nmemb; i++)
     if (room_callback[i] == f) {
-      remove_from_array (room_callback, &room_callback_nmemb, i, 1, sizeof (*f));
+      room_callback =
+        remove_from_array (room_callback, &room_callback_nmemb, i, 1, sizeof (*f));
+      if (i > 0) i--;
       break;
     }
 }

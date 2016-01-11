@@ -90,7 +90,7 @@ flow (struct anim *k)
   if (k->oaction != kid_sword_defense)
     k->i = -1;
 
-  struct anim *ke = get_enemy (k);
+  struct anim *ke = get_anim_by_id (k->enemy_id);
   if (k->i == 2) {
     kid_sword_attack (k);
     return false;

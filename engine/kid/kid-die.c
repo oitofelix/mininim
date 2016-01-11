@@ -109,7 +109,7 @@ kid_die_spiked (struct anim *k)
     s->i = 4;
     s->state = 5;
     s->inactive = true;
-    s->murdered_kid = k->id;
+    s->murdered_anim = k->id;
 
     video_effect.color = get_flicker_blood_color ();
     start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
@@ -168,6 +168,9 @@ kid_die_suddenly (struct anim *k)
     kid_fall (k);
     return;
   }
+
+  /* depressible floors */
+  update_depressible_floor (k, -1, -33);
 }
 
 void
@@ -256,10 +259,11 @@ kill_kid_shadows (struct anim *k)
   struct coord nc; struct pos np, pmt;
 
   int i;
-  for (i = 0; i < kida_nmemb; i++) {
-    struct anim *ks = &kida[i];
+  for (i = 0; i < anima_nmemb; i++) {
+    struct anim *ks = &anima[i];
 
-    if (ks->shadow_of == k->id
+    if (ks->type == KID
+        && ks->shadow_of == k->id
         && ks->controllable
         && ! is_kid_dead (&ks->f)) {
       survey (_mt, pos, &ks->f, &nc, &pmt, &np);

@@ -27,6 +27,7 @@
 #include "kernel/timer.h"
 #include "engine/level.h"
 #include "engine/kid/kid.h"
+#include "engine/guard/guard.h"
 #include "engine/door.h"
 #include "engine/level-door.h"
 #include "engine/physics.h"
@@ -115,12 +116,16 @@ start (void)
   if (total_lives < 3) total_lives = 3;
 
   /* create kid */
-  int id = create_kid (NULL, &level.start_pos, level.start_dir);
-  struct anim *k = &kida[id];
+  int id = create_anim (NULL, KID, &level.start_pos, level.start_dir);
+  struct anim *k = &anima[id];
   k->total_lives = total_lives;
   if (coming_from_12) k->current_lives = current_lives;
   else k->current_lives = total_lives;
   k->controllable = true;
+
+  /*** start remove me ***/
+  k->has_sword = true;
+  /*** end remove me  ***/
 
   /* create guards */
   int i;
@@ -130,12 +135,16 @@ start (void)
     int id;
     switch (g->type) {
     case NO_ANIM: continue;
-    case KID: default:
-      id = create_kid (NULL, &g->p, g->dir);
-      a = &kida[id];
+    case KID:
+      id = create_anim (NULL, KID, &g->p, g->dir);
+      a = &anima[id];
+      a->shadow = true;
+      break;
+    case GUARD: default:
+      id = create_anim (NULL, GUARD, &g->p, g->dir);
+      a = &anima[id];
       break;
     }
-    a->shadow = true;
     a->has_sword = true;
     a->skill = g->skill;
     a->total_lives = g->total_lives;
@@ -143,7 +152,9 @@ start (void)
     /* todo: handle style */
   }
 
-  k = get_kid_by_id (0);
+  /* after kid creation k must be updated to point to the correct
+     array element */
+  k = get_anim_by_id (0);
 
   /* make the kid turn as appropriate */
   switch (level.number) {
@@ -253,7 +264,7 @@ special_events (void)
 {
   struct pos np, p, pm;
   struct coord nc;
-  struct anim *k = current_kid;
+  struct anim *k = get_anim_by_id (current_kid_id);
 
   /* in the first animation cycle */
   if (anim_cycle == 0) {
@@ -300,8 +311,8 @@ special_events (void)
       struct mirror *m = mirror_at_pos (&mirror_pos);
       if (m->kid_crossing == k->id) {
         k->current_lives = 1;
-        int id = create_kid (k, NULL, 0);
-        struct anim *ks = &kida[id];
+        int id = create_anim (k, 0, NULL, 0);
+        struct anim *ks = &anima[id];
         ks->shadow = true;
         ks->f.dir = (ks->f.dir == LEFT) ? RIGHT : LEFT;
         ks->controllable = false;
@@ -312,10 +323,10 @@ special_events (void)
     /* make the kid's shadow run to the right until he disappears
        from view */
     if (shadow_id != -1) {
-      struct anim *ks = get_kid_by_id (shadow_id);
+      struct anim *ks = get_anim_by_id (shadow_id);
       if (is_frame_visible (&ks->f)) ks->key.right = true;
       else {
-        destroy_kid (ks);
+        destroy_anim (ks);
         shadow_id = -1;
       }
     }
@@ -335,8 +346,8 @@ special_events (void)
         && con (&door_pos)->fg == DOOR
         && is_potion (&potion_pos)
         && door_at_pos (&door_pos)->i <= 25) {
-      int id = create_kid (k, NULL, 0);
-      struct anim *ks = &kida[id];
+      int id = create_anim (k, 0, NULL, 0);
+      struct anim *ks = &anima[id];
       ks->shadow = true;
       ks->f.dir = RIGHT;
       ks->controllable = false;
@@ -351,7 +362,7 @@ special_events (void)
        reaches the potion, and then drink it.  Make him turn back
        running until he gets out of view */
     if (shadow_id != -1) {
-      struct anim *ks = get_kid_by_id (shadow_id);
+      struct anim *ks = get_anim_by_id (shadow_id);
       if (is_potion (&potion_pos)) {
         survey (_m, pos, &ks->f, &nc, &pm, &np);
         pos2room (&pm, 24, &pm);
@@ -359,7 +370,7 @@ special_events (void)
         else ks->key.shift = true;
       } else if (is_frame_visible (&ks->f)) ks->key.left = true;
       else {
-        destroy_kid (ks);
+        destroy_anim (ks);
         shadow_id = -1;
       }
     }
@@ -373,8 +384,8 @@ special_events (void)
     /* create kid's shadow to wait for kid at room 1 */
     if (shadow_id == -1) {
       struct pos shadow_pos = (struct pos) {1,1,1};
-      int id = create_kid (k, NULL, 0);
-      ks = &kida[id];
+      int id = create_anim (k, 0, NULL, 0);
+      ks = &anima[id];
       ks->shadow = true;
       ks->f.dir = RIGHT;
       ks->controllable = false;
@@ -382,7 +393,7 @@ special_events (void)
       place_frame (&ks->f, &ks->f, kid_normal_00, &shadow_pos,
                    +9, +15);
       shadow_id = id;
-    } else ks = get_kid_by_id (shadow_id);
+    } else ks = get_anim_by_id (shadow_id);
 
     /* when kid enters room 1, play the suspense sound */
     if (k->f.c.room == 1
@@ -417,7 +428,7 @@ special_events (void)
     struct pos mouse_pos = {16,0,12};
     struct anim *m = NULL;
 
-    if (mouse_id != -1) m = &mousea[mouse_id];
+    if (mouse_id != -1) m = &anima[mouse_id];
 
     if (mouse_timer) {
       /* if the exit level door is open and the kid is at room 16,
@@ -433,19 +444,16 @@ special_events (void)
           && room_view == 16) {
         al_destroy_timer (mouse_timer);
         mouse_timer = NULL;
-        mouse_id = create_mouse (NULL);
-        struct anim *m = &mousea[mouse_id];
-        m->f.dir = RIGHT;
+        mouse_id = create_anim (NULL, MOUSE, &mouse_pos, RIGHT);
         m->f.flip = ALLEGRO_FLIP_HORIZONTAL;
-        place_frame (&m->f, &m->f, mouse_normal_00,
-                     &mouse_pos, +0, +48);
+        m = &anima[mouse_id];
       }
     }
 
     /* make the mouse disapear as soon as it goes out of view */
     if (m && m->action == mouse_run && m->f.dir == RIGHT
         && ! is_frame_visible (&m->f)) {
-        destroy_mouse (m);
+        destroy_anim (m);
         mouse_id = -1;
     }
   }
@@ -493,7 +501,7 @@ special_events (void)
 static void
 end (struct pos *p)
 {
-  struct anim *k = current_kid;
+  struct anim *k = get_anim_by_id (current_kid_id);
   static ALLEGRO_SAMPLE_INSTANCE *si = NULL;
 
   /* end music samples to play per level */
@@ -809,12 +817,20 @@ static struct skill *
 get_legacy_skill (int i, struct skill *skill)
 {
   /* improve this */
-  skill->attack_prob = 2 * i;
-  skill->defense_prob = 10 * i;
-  skill->counter_attack_prob = 10 * i;
-  skill->counter_defense_prob = 10 * i;
-  skill->advance_prob = 2 * i;
+  skill->attack_prob = ((i + 1)/ 9.0) * 20;
+  skill->defense_prob = (i + 1) * 10;
+  skill->counter_attack_prob = (i + 1) * 10;
+  skill->counter_defense_prob = (i + 1) * 10;
+  skill->advance_prob = (9.0 / (i + 1)) * 10;
   skill->return_prob = -1;
+
+  if (i == 7) skill->advance_prob = -1;
+
+  if (i == 9) {
+    skill->defense_prob = 95;
+    skill->counter_defense_prob = 95;
+  }
+
   return skill;
 }
 

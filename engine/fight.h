@@ -31,10 +31,8 @@
 void fight_ai (struct anim *k0, struct anim *k1);
 void fight_mechanics (struct anim *k);
 void fight_inversion_mechanics (struct anim *k, struct anim *ke);
-bool is_enemy (struct anim *k0, struct anim *k1);
 void consider_enemy (struct anim *k0, struct anim *k1);
 void forget_enemy (struct anim *k);
-struct anim *get_enemy (struct anim *k);
 void enter_fight_mode (struct anim *k);
 void leave_fight_mode (struct anim *k);
 bool is_in_range (struct anim *k0, struct anim *k1, int r);

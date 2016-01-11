@@ -338,14 +338,13 @@ bool
 should_chomp (struct pos *p)
 {
   int i;
-  struct anim *k;
   struct coord nc;
   struct pos np, pm, _p;
 
-  for (i = 0; i < kida_nmemb; i++) {
-    k = &kida[i];
-    if (is_kid_dead (&k->f) && ! k->id == 0) continue;
-    survey (_m, pos, &k->f, &nc, &pm, &np);
+  for (i = 0; i < anima_nmemb; i++) {
+    struct anim *a = &anima[i];
+    if (is_anim_dead (a) && ! a->id == 0) continue;
+    survey (_m, pos, &a->f, &nc, &pm, &np);
     int inc = p->place < pm.place ? +1 : -1;
     if (p->room == pm.room && p->floor == pm.floor) {
       for (_p = *p; _p.place != pm.place; _p.place += inc)
@@ -387,33 +386,33 @@ compute_choppers (void)
     if (c->i != 1 && c->i != 2 ) continue;
 
     /* chomp kid */
-    for (j = 0; j < kida_nmemb; j++) {
-      struct anim *k = &kida[j];
-      if (is_kid_dead (&k->f)
-          || is_kid_fall (&k->f)
-          || k->immortal
-          || k->chopper_immune) continue;
+    for (j = 0; j < anima_nmemb; j++) {
+      struct anim *a = &anima[j];
+      if (is_anim_dead (a)
+          || is_anim_fall (a)
+          || a->immortal
+          || a->chopper_immune) continue;
       struct coord nc; struct pos np, pbf, pbb;
-      survey (_bf, pos, &k->f, &nc, &pbf, &np);
-      survey (_bb, pos, &k->f, &nc, &pbb, &np);
+      survey (_bf, pos, &a->f, &nc, &pbf, &np);
+      survey (_bb, pos, &a->f, &nc, &pbb, &np);
       pos2room (&pbf, c->p.room, &pbf);
       pos2room (&pbb, c->p.room, &pbb);
       if (((pbf.room == c->p.room
             && pbf.floor == c->p.floor)
            || (pbb.room == c->p.room
                && pbb.floor == c->p.floor))
-          && ((k->f.dir == LEFT && pbf.place < c->p.place
+          && ((a->f.dir == LEFT && pbf.place < c->p.place
                && pbb.place >= c->p.place)
-              || (k->f.dir == RIGHT && pbf.place >= c->p.place
+              || (a->f.dir == RIGHT && pbf.place >= c->p.place
                   && pbb.place < c->p.place))) {
         c->blood = true;
-        k->splash = true;
-        k->current_lives = 0;
-        k->p = c->p;
+        a->splash = true;
+        a->current_lives = 0;
+        a->p = c->p;
         video_effect.color = get_flicker_blood_color ();
         start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
         play_sample (chopped_sample, c->p.room);
-        kid_die_chopped (k);
+        anim_die_chopped (a);
       }
     }
   }

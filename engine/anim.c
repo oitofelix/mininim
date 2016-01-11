@@ -23,12 +23,16 @@
 #include "kernel/video.h"
 #include "kernel/audio.h"
 #include "kernel/keyboard.h"
+#include "kernel/array.h"
 #include "level.h"
 #include "pos.h"
 #include "physics.h"
 #include "level.h"
 #include "room.h"
+#include "loose-floor.h"
 #include "kid/kid.h"
+#include "guard/guard.h"
+#include "mouse.h"
 #include "anim.h"
 
 /* set to true to quit animation */
@@ -37,6 +41,9 @@ bool pause_anim;
 bool cutscene;
 bool next_frame_inv;
 uint64_t anim_cycle;
+
+struct anim *anima;
+size_t anima_nmemb;
 
 void
 play_anim (void (*draw_callback) (void),
@@ -107,6 +114,227 @@ play_anim (void (*draw_callback) (void),
   al_stop_timer (timer);
 }
 
+
+
+
+int
+create_anim (struct anim *a0, enum anim_type t, struct pos *p, enum dir dir)
+{
+  struct anim a;
+  int i = anima_nmemb;
+  memset (&a, 0, sizeof (a));
+
+  if (a0) a = *a0;
+  else {
+    a.type = t;
+    a.f.dir = dir;
+    a.f.c.room = p->room;
+    a.controllable = false;
+  }
+
+  a.id = i;
+
+  switch (a.type) {
+  case NO_ANIM: default: break;
+  case KID: create_kid (a0, &a, p, dir); break;
+  case GUARD: create_guard (a0, &a, p, dir); break;
+  case MOUSE: create_mouse (a0, &a, p, dir); break;
+  }
+
+  anima = add_to_array (&a, 1, anima, &anima_nmemb, i, sizeof (a));
+  anima[i].f.id = &anima[i];
+  return i;
+}
+
+void
+destroy_anim (struct anim *a)
+{
+  if (a->type == KID) destroy_kid (a);
+
+  size_t i =  a - anima;
+  anima = remove_from_array (anima, &anima_nmemb, i, 1, sizeof (*a));
+}
+
+void
+destroy_anims (void)
+{
+  while (anima_nmemb) destroy_anim (&anima[0]);
+  anima = NULL;
+  anima_nmemb = 0;
+}
+
+struct anim *
+get_anim_by_id (int id)
+{
+  int i;
+  for (i = 0; i < anima_nmemb; i++)
+    if (anima[i].id == id) return &anima[i];
+  return NULL;
+}
+
+void
+draw_anim_frame (ALLEGRO_BITMAP *bitmap, struct anim *a, enum vm vm)
+{
+  switch (a->type) {
+  case NO_ANIM: default: break;
+  case KID: draw_kid_frame (bitmap, a, vm); break;
+  case GUARD: draw_guard_frame (bitmap, a, vm); break;
+  case MOUSE: draw_mouse_frame (bitmap, a, vm); break;
+  }
+}
+
+void
+draw_anims (ALLEGRO_BITMAP *bitmap, enum em em, enum vm vm)
+{
+  struct coord ml; struct pos pml, pmlr, pmlra;
+  struct anim *a;
+
+  /* coord_wa = true; */
+
+  qsort (anima, anima_nmemb, sizeof (*a), compare_anims);
+
+  size_t i;
+  for (i = 0; i < anima_nmemb; i++) {
+    a = &anima[i];
+    if (a->invisible) continue;
+    a->f.id = a;
+
+    _ml (&a->f, &ml); pos (&ml, &pml);
+    prel (&pml, &pmlr, 0, +1);
+    prel (&pml, &pmlra, -1, +1);
+
+    draw_anim_frame (bitmap, a, vm);
+
+    draw_falling_loose_floor (bitmap, &pmlr, em, vm);
+    draw_falling_loose_floor (bitmap, &pmlra, em, vm);
+    draw_room_anim_fg (bitmap, em, vm, a);
+    a->xf.b = NULL;
+  }
+
+  /* coord_wa = false; */
+}
+
+int
+compare_anims (const void *a0, const void *a1)
+{
+  struct coord nc;
+  struct pos np, ptl0, ptl1, ptr0, ptr1,
+    pbl0, pbl1, pbr0, pbr1;
+
+  struct anim *_a0 = (struct anim *) a0;
+  struct anim *_a1 = (struct anim *) a1;
+
+  survey (_br, pos, &_a0->f, &nc, &np, &pbr0);
+  survey (_br, pos, &_a1->f, &nc, &np, &pbr1);
+
+  survey (_bl, pos, &_a0->f, &nc, &np, &pbl0);
+  survey (_bl, pos, &_a1->f, &nc, &np, &pbl1);
+
+  survey (_tr, pos, &_a0->f, &nc, &np, &ptr0);
+  survey (_tr, pos, &_a1->f, &nc, &np, &ptr1);
+
+  survey (_tl, pos, &_a0->f, &nc, &np, &ptl0);
+  survey (_tl, pos, &_a1->f, &nc, &np, &ptl1);
+
+  int cptr = cpos (&ptr0, &ptr1);
+  if (cptr && ptr0.room == ptr1.room) return cptr;
+
+  int cpbr = cpos (&pbr0, &pbr1);
+  if (cpbr && pbr0.room == pbr1.room) return cpbr;
+
+  int cptl = cpos (&ptl0, &ptl1);
+  if (cptl && ptl0.room == ptl1.room) return cptl;
+
+  int cpbl = cpos (&pbl0, &pbl1);
+  if (cpbl && pbl0.room == pbl1.room) return cpbl;
+
+  return 0;
+}
+
+void
+draw_anim_if_at_pos (ALLEGRO_BITMAP *bitmap, struct anim *a, struct pos *p,
+                     enum vm vm)
+{
+  struct coord nc;
+  struct pos np, pbl, pmbo, pbr, pml, pm, pmr, ptl, pmt, ptr;
+  survey (_bl, pos, &a->f, &nc, &pbl, &np);
+  survey (_mbo, pos, &a->f, &nc, &pmbo, &np);
+  survey (_br, pos, &a->f, &nc, &pbr, &np);
+  survey (_ml, pos, &a->f, &nc, &pml, &np);
+  survey (_m, pos, &a->f, &nc, &pm, &np);
+  survey (_mr, pos, &a->f, &nc, &pmr, &np);
+  survey (_tl, pos, &a->f, &nc, &ptl, &np);
+  survey (_mt, pos, &a->f, &nc, &pmt, &np);
+  survey (_tr, pos, &a->f, &nc, &ptr, &np);
+
+  if (! peq (&pbl, p)
+      && ! peq (&pmbo, p)
+      && ! peq (&pbr, p)
+      && ! peq (&pml, p)
+      && ! peq (&pm, p)
+      && ! peq (&pmr, p)
+      && ! peq (&ptl, p)
+      && ! peq (&pmt, p)
+      && ! peq (&ptr, p)) return;
+
+  draw_anim_frame (bitmap, a, vm);
+}
+
+void
+clear_anims_keyboard_state (void)
+{
+  int i;
+  for (i = 0; i < anima_nmemb; i++)
+    memset (&anima[i].key, 0, sizeof (anima[i].key));
+}
+
+bool
+is_anim_dead (struct anim *a)
+{
+  switch (a->type) {
+  case NO_ANIM: default: return false;
+  case KID: return is_kid_dead (&a->f);
+  }
+}
+
+bool
+is_anim_fall (struct anim *a)
+{
+  switch (a->type) {
+  case NO_ANIM: default: return false;
+  case KID: return is_kid_fall (&a->f);
+  }
+}
+
+void
+anim_die_suddenly (struct anim *a)
+{
+  switch (a->type) {
+  case NO_ANIM: default: break;
+  case KID: kid_die_suddenly (a); break;
+  }
+}
+
+void
+anim_die_spiked (struct anim *a)
+{
+  switch (a->type) {
+  case NO_ANIM: default: break;
+  case KID: kid_die_spiked (a); break;
+  }
+}
+
+void
+anim_die_chopped (struct anim *a)
+{
+  switch (a->type) {
+  case NO_ANIM: default: break;
+  case KID: kid_die_chopped (a); break;
+  }
+}
+
+
+
 void
 draw_frame (ALLEGRO_BITMAP *bitmap, struct frame *f)
 {

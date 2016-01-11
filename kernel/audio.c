@@ -196,7 +196,8 @@ remove_sample (struct audio_sample *s)
 {
   al_destroy_sample_instance (s->instance);
   size_t i =  s - audio_sample;
-  remove_from_array (audio_sample, &audio_sample_nmemb, i, 1, sizeof (*s));
+  audio_sample =
+    remove_from_array (audio_sample, &audio_sample_nmemb, i, 1, sizeof (*s));
   if (audio_sample_nmemb == 0) audio_sample = NULL;
 }
 
@@ -207,8 +208,10 @@ clear_played_samples (void)
   for (i = 0; i < audio_sample_nmemb; i++) {
     struct audio_sample *as = &audio_sample[i];
     if (as->played
-        && ! al_get_sample_instance_playing (as->instance))
+        && ! al_get_sample_instance_playing (as->instance)) {
       remove_sample (as);
+      if (i > 0) i--;
+    }
   }
 }
 
@@ -239,11 +242,8 @@ get_adjusted_sample_volume (struct audio_sample *as)
 void
 stop_all_samples (void)
 {
-  size_t i;
-  for (i = 0; i < audio_sample_nmemb; i++) {
-    struct audio_sample *as = &audio_sample[i];
-    remove_sample (as);
-  }
+  while (audio_sample_nmemb)
+    remove_sample (&audio_sample[0]);
 }
 
 void

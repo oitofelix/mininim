@@ -31,6 +31,27 @@ enum quit_anim {
 void play_anim (void (*draw_callback) (void),
                 void (*compute_callback) (void),
                 int freq);
+
+
+int create_anim (struct anim *a0, enum anim_type t,
+                 struct pos *p, enum dir dir);
+void destroy_anim (struct anim *a);
+void destroy_anims (void);
+struct anim *get_anim_by_id (int id);
+void draw_anim_frame (ALLEGRO_BITMAP *bitmap, struct anim *a, enum vm vm);
+void draw_anims (ALLEGRO_BITMAP *bitmap, enum em em, enum vm vm);
+int compare_anims (const void *a0, const void *a1);
+void draw_anim_if_at_pos (ALLEGRO_BITMAP *bitmap, struct anim *a,
+                          struct pos *p, enum vm vm);
+void clear_anims_keyboard_state (void);
+bool is_anim_dead (struct anim *a);
+bool is_anim_fall (struct anim *a);
+void anim_die_suddenly (struct anim *a);
+void anim_die_spiked (struct anim *a);
+void anim_die_chopped (struct anim *a);
+
+
+
 void draw_frame (ALLEGRO_BITMAP *bitmap, struct frame *f);
 void draw_xframe (ALLEGRO_BITMAP *bitmap, struct frame *f,
                   struct frame_offset *xf);
@@ -46,6 +67,8 @@ void select_xframe (struct frame_offset *xf, struct frameset *fs, int j);
 bool wait_anim (int cycles);
 
 /* variables */
+extern struct anim *anima;
+extern size_t anima_nmemb;
 extern enum quit_anim quit_anim; /* set to true to quit animation */
 extern bool next_frame_inv; /* invert draw_anim offset interpretation  */
 extern bool cutscene; /* don't apply physics if set */

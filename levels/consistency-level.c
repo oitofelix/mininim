@@ -40,8 +40,8 @@ static void
 start (void)
 {
   struct pos p = {1,0,0};
-  create_kid (NULL, &p, RIGHT);
-  create_kid (&kida[0], NULL, 0);
+  create_anim (NULL, KID, &p, RIGHT);
+  create_anim (&anima[0], 0, NULL, 0);
 }
 
 static void

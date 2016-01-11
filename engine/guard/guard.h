@@ -1,5 +1,5 @@
 /*
-  mouse.h -- mouse module;
+  guard.h -- guard module;
 
   Copyright (C) 2015, 2016 Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
 
@@ -17,23 +17,33 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MININIM_MOUSE_H
-#define MININIM_MOUSE_H
+#ifndef MININIM_GUARD_H
+#define MININIM_GUARD_H
 
-#define MOUSE_NORMAL_00 "dat/kid/mouse/frame03.png"
-#define MOUSE_RUN_01 "dat/kid/mouse/frame01.png"
-#define MOUSE_RUN_02 "dat/kid/mouse/frame02.png"
+#include "kernel/audio.h"
+
+/* kid actions */
+#include "guard-normal.h"
+
+/* bitmaps */
+#define GUARD_LIFE "data/life/guard.png"
+#define GUARD_SPLASH "data/splash/guard.png"
+
+/* sounds */
+#define GUARD_HIT_SAMPLE "dat/digisnd1/taking a life to the enemy.ogg"
 
 /* functions */
-void load_mouse (void);
-void unload_mouse (void);
-struct anim *create_mouse (struct anim *m0, struct anim *m1,
+void load_guard (void);
+void unload_guard (void);
+struct anim *create_guard (struct anim *g0, struct anim *g1,
                            struct pos *p, enum dir dir);
-void draw_mouse_frame (ALLEGRO_BITMAP *bitmap, struct anim *m, enum vm vm);
-void mouse_normal (struct anim *mouse);
-void mouse_run (struct anim *mouse);
+void draw_guard_frame (ALLEGRO_BITMAP *bitmap, struct anim *g,
+                       enum vm);
 
 /* variables */
-extern ALLEGRO_BITMAP *mouse_normal_00, *mouse_run_01, *mouse_run_02;
+extern struct anim *guarda;
+extern size_t guarda_nmemb;
 
-#endif	/* MININIM_MOUSE_H */
+extern ALLEGRO_SAMPLE *guard_hit_sample;
+
+#endif	/* MININIM_GUARD_H */

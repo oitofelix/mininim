@@ -91,18 +91,15 @@
 /* functions */
 void load_kid (void);
 void unload_kid (void);
+struct anim *create_kid (struct anim *k0, struct anim *k1,
+                         struct pos *p, enum dir dir);
+void destroy_kid (struct anim *k);
+void draw_kid_frame (ALLEGRO_BITMAP *bitmap, struct anim *k,
+                     enum vm);
 void draw_kid_lives (ALLEGRO_BITMAP *bitmap, struct anim *k,
                      enum vm vm);
 void draw_kid_if_at_pos (ALLEGRO_BITMAP *bitmap, struct anim *k, struct pos *p,
                          enum vm vm);
-int create_kid (struct anim *_k, struct pos *p, enum dir dir);
-void destroy_kid (struct anim *k);
-void destroy_kids (void);
-struct anim *get_kid_by_id (int id);
-void clear_kids_keyboard_state (void);
-void draw_kids (ALLEGRO_BITMAP *bitmap, enum em em, enum vm vm);
-void draw_kid_frame (ALLEGRO_BITMAP *bitmap, struct anim *k,
-                     enum vm);
 ALLEGRO_COLOR colorful_shadow_palette (ALLEGRO_COLOR c);
 ALLEGRO_COLOR v_phantom_shadow_palette (ALLEGRO_COLOR c);
 ALLEGRO_COLOR e_phantom_shadow_palette (ALLEGRO_COLOR c);
@@ -117,9 +114,7 @@ void kid_debug (void);
 bool kid_door_split_collision (struct anim *k);
 
 /* variables */
-extern struct anim *kida;
-extern size_t kida_nmemb;
-extern struct anim *current_kid;
+extern int current_kid_id;
 
 extern ALLEGRO_SAMPLE *step_sample, *hit_ground_sample, *hit_ground_harm_sample,
   *hit_ground_fatal_sample, *hit_wall_sample, *hang_on_fall_sample,

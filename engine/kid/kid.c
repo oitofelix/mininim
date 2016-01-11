@@ -39,9 +39,7 @@
 #include "engine/fight.h"
 #include "kid.h"
 
-struct anim *kida;
-size_t kida_nmemb;
-struct anim *current_kid;
+int current_kid_id;
 
 ALLEGRO_BITMAP *v_kid_full_life, *v_kid_empty_life, *v_kid_splash;
 
@@ -56,7 +54,6 @@ ALLEGRO_SAMPLE *step_sample, *hit_ground_sample, *hit_ground_harm_sample,
 
 static void place_kid (struct anim *k, int room, int floor, int place);
 static struct coord *kid_life_coord (int i, struct coord *c);
-static int compare_kids (const void *k0, const void *k1);
 static struct coord * splash_coord (struct frame *f, struct coord *c);
 static palette get_palette (enum vm vm);
 static ALLEGRO_COLOR v_palette (ALLEGRO_COLOR c);
@@ -201,162 +198,46 @@ unload_kid (void)
   al_destroy_sample (sword_hit_sample);
 }
 
-int
-create_kid (struct anim *_k, struct pos *p, enum dir dir)
+struct anim *
+create_kid (struct anim *k0, struct anim *k1, struct pos *p, enum dir dir)
 {
-  struct anim k;
-
-  int i = kida_nmemb;
-
-  memset (&k, 0, sizeof (k));
-
-  if (_k) {
-    k = *_k;
-    k.id = i;
-    k.shadow_of = _k->id;
-    k.shadow = true;
-    k.floating = create_timer (1.0);
-    k.current = false;
+  if (k0) {
+    k1->shadow_of = k0->id;
+    k1->shadow = true;
+    k1->floating = create_timer (1.0);
   } else {
-    k.id = i;
-    k.shadow_of = -1;
-    k.type = KID;
-    k.f.b = kid_normal_00;
-    k.fo.b = kid_normal_00;
-    k.action = kid_normal;
-    k.item_pos.room = -1;
-    k.total_lives = KID_INITIAL_TOTAL_LIVES;
-    k.current_lives = KID_INITIAL_CURRENT_LIVES;
-    k.floating = create_timer (1.0);
-    k.enemy_type = -1;
-    k.enemy_id = -1;
-    k.skill.counter_attack_prob = 70;
-    k.skill.counter_defense_prob = 80;
+    k1->shadow_of = -1;
+    k1->f.b = kid_normal_00;
+    k1->fo.b = kid_normal_00;
+    k1->action = kid_normal;
+    k1->item_pos.room = -1;
+    k1->total_lives = KID_INITIAL_TOTAL_LIVES;
+    k1->current_lives = KID_INITIAL_CURRENT_LIVES;
+    k1->floating = create_timer (1.0);
+    k1->enemy_id = -1;
+    k1->skill.defense_prob = 70;
+    k1->skill.counter_attack_prob = 70;
+    k1->skill.counter_defense_prob = 70;
 
-    k.f.dir = dir;
-    k.f.c.room = p->room;
-    k.controllable = false;
-    place_frame (&k.f, &k.f, kid_normal_00, p,
-                 k.f.dir == LEFT ? +22 : +31, +15);
-    /* place_kid (&k, p->room, p->floor, p->place); */
-    update_depressible_floor (&k, -4, -10);
+    place_frame (&k1->f, &k1->f, kid_normal_00, p,
+                 k1->f.dir == LEFT ? +22 : +31, +15);
+    update_depressible_floor (k1, -4, -10);
   }
 
-  kida = add_to_array (&k, 1, kida, &kida_nmemb, i, sizeof (k));
-
-  kida[i].f.id = &kida[i];
-
-  return i;
+  return k1;
 }
 
 void
 destroy_kid (struct anim *k)
 {
-  if (current_kid == k) {
-    current_kid = &kida[0];
-    kida[0].current = true;
-  }
+  int i;
+  if (current_kid_id == k->id)
+    for (i = 0; i < anima_nmemb; i++) {
+      struct anim *a = &anima[i];
+      if (a->type == KID && a->controllable)
+        current_kid_id = a->id;
+    }
   al_destroy_timer (k->floating);
-  size_t i =  k - kida;
-  remove_from_array (kida, &kida_nmemb, i, 1, sizeof (*k));
-}
-
-void
-destroy_kids (void)
-{
-  int i;
-  for (i = 0; i < kida_nmemb; i++) destroy_kid (&kida[i]);
-  kida = NULL;
-  kida_nmemb = 0;
-}
-
-void
-clear_kids_keyboard_state (void)
-{
-  int i;
-  for (i = 0; i < kida_nmemb; i++)
-    memset (&kida[i].key, 0, sizeof (kida[i].key));
-}
-
-struct anim *
-get_kid_by_id (int id)
-{
-  int i;
-  for (i = 0; i < kida_nmemb; i++)
-    if (kida[i].id == id) return &kida[i];
-  return NULL;
-}
-
-void
-draw_kids (ALLEGRO_BITMAP *bitmap,
-           enum em em, enum vm vm)
-{
-  struct coord ml; struct pos pml, pmlr, pmlra;
-  struct anim *k;
-
-  /* coord_wa = true; */
-
-  qsort (kida, kida_nmemb, sizeof (*k), compare_kids);
-
-  size_t i;
-  for (i = 0; i < kida_nmemb; i++) {
-    k = &kida[i];
-
-    if (k->invisible) continue;
-
-    k->f.id = k;
-    if (k->current) current_kid = k;
-
-    _ml (&k->f, &ml); pos (&ml, &pml);
-    prel (&pml, &pmlr, 0, +1);
-    prel (&pml, &pmlra, -1, +1);
-
-    draw_kid_frame (bitmap, k, vm);
-
-    draw_falling_loose_floor (bitmap, &pmlr, em, vm);
-    draw_falling_loose_floor (bitmap, &pmlra, em, vm);
-    draw_room_anim_fg (bitmap, em, vm, k);
-    k->xf.b = NULL;
-  }
-
-  /* coord_wa = false; */
-}
-
-int
-compare_kids (const void *k0, const void *k1)
-{
-  struct coord nc;
-  struct pos np, ptl0, ptl1, ptr0, ptr1,
-    pbl0, pbl1, pbr0, pbr1;
-
-  struct anim *_k0 = (struct anim *) k0;
-  struct anim *_k1 = (struct anim *) k1;
-
-  survey (_br, pos, &_k0->f, &nc, &np, &pbr0);
-  survey (_br, pos, &_k1->f, &nc, &np, &pbr1);
-
-  survey (_bl, pos, &_k0->f, &nc, &np, &pbl0);
-  survey (_bl, pos, &_k1->f, &nc, &np, &pbl1);
-
-  survey (_tr, pos, &_k0->f, &nc, &np, &ptr0);
-  survey (_tr, pos, &_k1->f, &nc, &np, &ptr1);
-
-  survey (_tl, pos, &_k0->f, &nc, &np, &ptl0);
-  survey (_tl, pos, &_k1->f, &nc, &np, &ptl1);
-
-  int cptr = cpos (&ptr0, &ptr1);
-  if (cptr && ptr0.room == ptr1.room) return cptr;
-
-  int cpbr = cpos (&pbr0, &pbr1);
-  if (cpbr && pbr0.room == pbr1.room) return cpbr;
-
-  int cptl = cpos (&ptl0, &ptl1);
-  if (cptl && ptl0.room == ptl1.room) return cptl;
-
-  int cpbl = cpos (&pbl0, &pbl1);
-  if (cpbl && pbl0.room == pbl1.room) return cpbl;
-
-  return 0;
 }
 
 static palette
@@ -527,35 +408,6 @@ c_palette (ALLEGRO_COLOR c)
   if (color_eq (c, V_BLOOD_COLOR_01)
       || color_eq (c, V_BLOOD_COLOR_02)) return C_BLOOD_COLOR;
   return c;
-}
-
-void
-draw_kid_if_at_pos (ALLEGRO_BITMAP *bitmap, struct anim *k, struct pos *p,
-                    enum vm vm)
-{
-  struct coord nc;
-  struct pos np, pbl, pmbo, pbr, pml, pm, pmr, ptl, pmt, ptr;
-  survey (_bl, pos, &k->f, &nc, &pbl, &np);
-  survey (_mbo, pos, &k->f, &nc, &pmbo, &np);
-  survey (_br, pos, &k->f, &nc, &pbr, &np);
-  survey (_ml, pos, &k->f, &nc, &pml, &np);
-  survey (_m, pos, &k->f, &nc, &pm, &np);
-  survey (_mr, pos, &k->f, &nc, &pmr, &np);
-  survey (_tl, pos, &k->f, &nc, &ptl, &np);
-  survey (_mt, pos, &k->f, &nc, &pmt, &np);
-  survey (_tr, pos, &k->f, &nc, &ptr, &np);
-
-  if (! peq (&pbl, p)
-      && ! peq (&pmbo, p)
-      && ! peq (&pbr, p)
-      && ! peq (&pml, p)
-      && ! peq (&pm, p)
-      && ! peq (&pmr, p)
-      && ! peq (&ptl, p)
-      && ! peq (&pmt, p)
-      && ! peq (&ptr, p)) return;
-
-  draw_kid_frame (bitmap, k, vm);
 }
 
 void
@@ -737,6 +589,8 @@ kid_debug (void)
     /* al_put_pixel (px, py, al_map_rgb (0, 255, 255)); */
 
     /* printf ("x = %i, y = %i, floor = %i, place = %i\n", px, py, (py -3) / 63, (px - 15) / 32); */
+
+    struct anim *current_kid = get_anim_by_id (current_kid_id);
 
     struct coord bf; struct pos pbf, npbf;
     survey (_bf, pos, &current_kid->f, &bf, &pbf, &npbf);

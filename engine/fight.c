@@ -36,7 +36,7 @@ fight_ai (struct anim *k0, struct anim *k1)
   /* in attack range, if being attacked, defend yourself
      (with probability) */
   if (is_in_fight_mode (k0)
-      && is_enemy (k0, k1)
+      && k0->enemy_id == k1->id
       && ! is_on_back (k0, k1)
       && is_in_range (k0, k1, ATTACK_RANGE)
       && (is_attacking (k1) && k1->i == 0)
@@ -45,7 +45,7 @@ fight_ai (struct anim *k0, struct anim *k1)
   /* if defending, counter attack
      (with probability handled elsewhere) */
   else if (is_in_fight_mode (k0)
-           && is_enemy (k0, k1)
+           && k0->enemy_id == k1->id
            && ! is_on_back (k0, k1)
            && is_in_range (k0, k1, ATTACK_RANGE)
            && is_defending (k0)) {
@@ -55,7 +55,7 @@ fight_ai (struct anim *k0, struct anim *k1)
   /* if attacking, counter defend
      (with probability handled elsewhere) */
   else if (is_in_fight_mode (k0)
-           && is_enemy (k0, k1)
+           && k0->enemy_id == k1->id
            && ! is_on_back (k0, k1)
            && is_in_range (k0, k1, ATTACK_RANGE)
            && is_attacking (k0))
@@ -63,7 +63,7 @@ fight_ai (struct anim *k0, struct anim *k1)
   /* in attack range, if not being attacked, attack (with probability,
      unless the enemy is not in fight mode, then attack immediately) */
   else if (is_in_fight_mode (k0)
-           && is_enemy (k0, k1)
+           && k0->enemy_id == k1->id
            && ! is_on_back (k0, k1)
            && ! is_attacking (k1)
            && is_in_range (k0, k1, ATTACK_RANGE)
@@ -75,7 +75,7 @@ fight_ai (struct anim *k0, struct anim *k1)
    /* in attack range, back off to fight range
       (with probability) */
   else if (is_in_fight_mode (k0)
-           && is_enemy (k0, k1)
+           && k0->enemy_id == k1->id
            && ! is_attacking (k1)
            && is_in_range (k0, k1, ATTACK_RANGE)
            && is_safe_to_walkb (k0)
@@ -84,7 +84,7 @@ fight_ai (struct anim *k0, struct anim *k1)
   /* in fight range, go towards attack range
      (with probability) */
   else if (is_in_fight_mode (k0)
-           && is_enemy (k0, k1)
+           && k0->enemy_id == k1->id
            && ! is_attacking (k1)
            && is_in_range (k0, k1, FIGHT_RANGE)
            && ! is_in_range (k0, k1, ATTACK_RANGE)
@@ -93,7 +93,7 @@ fight_ai (struct anim *k0, struct anim *k1)
     fight_command_walkf (k0);
   /* in follow range, stays at least in the fight range */
   else if (is_in_fight_mode (k0)
-           && is_enemy (k0, k1)
+           && k0->enemy_id == k1->id
            && ! is_in_range (k0, k1, FIGHT_RANGE)
            && is_in_range (k0, k1, FOLLOW_RANGE)
            && ! is_on_back (k0, k1)
@@ -101,13 +101,13 @@ fight_ai (struct anim *k0, struct anim *k1)
     fight_command_walkf (k0);
   /* in follow range, but enemy on back, turn if safe*/
   else if (is_in_fight_mode (k0)
-           && is_enemy (k0, k1)
+           && k0->enemy_id == k1->id
            && is_in_range (k0, k1, FOLLOW_RANGE)
            && is_on_back (k0, k1)) {
     if (is_safe_to_turn (k0)) fight_turn (k0);
     else if (is_safe_to_walkb (k0)) fight_command_walkb (k0);
   } else if (is_seeing (k0, k1)) {
-    if (! is_enemy (k0, k1)
+    if (k0->enemy_id != k1->id
         && k1->current_lives > 0)
       consider_enemy (k0, k1);
     if (k0->has_sword
@@ -116,11 +116,11 @@ fight_ai (struct anim *k0, struct anim *k1)
   } else if ((is_hearing (k0, k1)
               || is_near (k0, k1))
              && is_on_back (k0, k1)
-             && ! is_enemy (k0, k1)) {
+             && k0->enemy_id != k1->id) {
     consider_enemy (k0, k1);
     fight_turn (k0);
   } else if (is_in_fight_mode (k0)
-             && ! (is_enemy (k0, k1)
+             && ! (k0->enemy_id == k1->id
                    && is_in_range (k0, k1, FIGHT_RANGE))) {
     forget_enemy (k0);
     leave_fight_mode (k0);
@@ -131,7 +131,7 @@ fight_ai (struct anim *k0, struct anim *k1)
 void
 fight_mechanics (struct anim *k)
 {
-  struct anim *ke = get_enemy (k);
+  struct anim *ke = get_anim_by_id (k->enemy_id);
 
   if (! ke) return;
 
@@ -209,50 +209,19 @@ fight_inversion_mechanics (struct anim *k, struct anim *ke)
   }
 }
 
-bool
-is_enemy (struct anim *k0, struct anim *k1)
-{
-  return k0->enemy_type == k1->type
-    && k0->enemy_id == k1->id;
-}
-
 void
 consider_enemy (struct anim *k0, struct anim *k1)
 {
-  k0->enemy_type = k1->type;
   k0->enemy_id = k1->id;
-  k1->enemy_type = k0->type;
   k1->enemy_id = k0->id;
 }
 
 void
 forget_enemy (struct anim *k)
 {
-  struct anim *ke = get_enemy (k);
-
-  if (ke) {
-    ke->enemy_type = -1;
-    ke->enemy_id = -1;
-  }
-
-  k->enemy_type = -1;
+  struct anim *ke = get_anim_by_id (k->enemy_id);
+  if (ke) ke->enemy_id = -1;
   k->enemy_id = -1;
-}
-
-struct anim *
-get_enemy (struct anim *k)
-{
-  switch (k->enemy_type) {
-  case NO_ANIM: return NULL;
-  case KID: return get_kid_by_id (k->enemy_id);
-  case GUARD: return NULL;
-  case FAT_GUARD: return NULL;
-  case SKELETON: return NULL;
-  case VIZIER: return NULL;
-  case PRINCESS: return NULL;
-  case MOUSE: return get_mouse_by_id (k->enemy_id);
-  }
-  return NULL;
 }
 
 void
@@ -285,7 +254,7 @@ is_in_range (struct anim *k0, struct anim *k1, int r)
 int
 dist_enemy (struct anim *k)
 {
-  struct anim *k1 = get_enemy (k);
+  struct anim *k1 = get_anim_by_id (k->enemy_id);
 
   if (! k1) return INT_MAX;
 

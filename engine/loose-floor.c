@@ -336,7 +336,8 @@ void
 remove_loose_floor (struct loose_floor *l)
 {
   size_t i =  l - loose_floor;
-  remove_from_array (loose_floor, &loose_floor_nmemb, i, 1, sizeof (*l));
+  loose_floor =
+    remove_from_array (loose_floor, &loose_floor_nmemb, i, 1, sizeof (*l));
 }
 
 void
@@ -375,7 +376,10 @@ compute_loose_floors (void)
     if (! must_sort) sort_loose_floors ();
     for (i = 0; i < loose_floor_nmemb; i++) {
       struct loose_floor *l = &loose_floor[i];
-      if (l->p.room == -1) remove_loose_floor (l);
+      if (l->p.room == -1) {
+        remove_loose_floor (l);
+        if (i > 0) i--;
+      }
       else break;
     }
   }
@@ -502,37 +506,37 @@ compute_loose_floor_fall (struct loose_floor *l)
 
   /* hit kid */
   int i;
-  for (i = 0; i < kida_nmemb; i++) {
-    struct coord kmt, kmbo_f, kmbo_nf; struct pos np, kpmt;
-    struct anim *k = &kida[i];
-    if (is_kid_dead (&k->f)
-        || k->immortal
-        || k->loose_floor_immune)
+  for (i = 0; i < anima_nmemb; i++) {
+    struct coord kmt, ambo_f, ambo_nf; struct pos np, kpmt;
+    struct anim *a = &anima[i];
+    if (is_anim_dead (a)
+        || a->immortal
+        || a->loose_floor_immune)
       continue;
-    survey (_mt, pos, &k->f, &kmt, &kpmt, &np);
-    coord2room (&mbo_f, kpmt.room, &kmbo_f);
-    coord2room (&mbo_nf, kpmt.room, &kmbo_nf);
+    survey (_mt, pos, &a->f, &kmt, &kpmt, &np);
+    coord2room (&mbo_f, kpmt.room, &ambo_f);
+    coord2room (&mbo_nf, kpmt.room, &ambo_nf);
     if (peq (&nfpmbo_f, &kpmt)
-        && kmbo_f.y <= kmt.y
-        && kmbo_nf.y >= kmt.y
-        && ! k->hit_by_loose_floor
-        && ! is_kid_hang_or_climb (&k->f)
-        && ! is_kid_fall (&k->f)) {
-      k->hit_by_loose_floor = true;
-      k->splash = true;
-      k->current_lives--;
-      k->uncouch_slowly = true;
+        && ambo_f.y <= kmt.y
+        && ambo_nf.y >= kmt.y
+        && ! a->hit_by_loose_floor
+        && ! is_kid_hang_or_climb (&a->f)
+        && ! is_kid_fall (&a->f)) {
+      a->hit_by_loose_floor = true;
+      a->splash = true;
+      a->current_lives--;
+      a->uncouch_slowly = true;
       /* ensure kid doesn't couch in thin air (might occur when hit
          while jumping, for example) */
-      place_on_the_ground (&k->f, &k->f.c);
+      place_on_the_ground (&a->f, &a->f.c);
       play_sample (hit_wall_sample, kpmt.room);
       video_effect.color = get_flicker_blood_color ();
       start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
-      if (k->current_lives <= 0) {
-        k->p = kpmt;
-        kid_die_suddenly (k);
+      if (a->current_lives <= 0) {
+        a->p = kpmt;
+        anim_die_suddenly (a);
       }
-      else kid_couch (k);
+      else if (a->type == KID) kid_couch (a);
     }
   }
 

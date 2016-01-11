@@ -32,6 +32,7 @@
 #include "potion.h"
 #include "sword.h"
 #include "kid/kid.h"
+#include "guard/guard.h"
 #include "loose-floor.h"
 #include "opener-floor.h"
 #include "closer-floor.h"
@@ -83,8 +84,7 @@ play_level (struct level *lv)
   screen_flags = 0;
   anim_cycle = 0;
   last_auto_show_time = -1;
-  current_kid = &kida[0];
-  current_kid->current = true;
+  current_kid_id = 0;
 
   if (level.nominal_number >= 0) {
     xasprintf (&text, "LEVEL %i", level.nominal_number);
@@ -101,22 +101,19 @@ play_level (struct level *lv)
   case NO_QUIT: break;
   case RESTART_LEVEL:
     retry_level = level.number;
-    destroy_kids ();
-    destroy_mice ();
+    destroy_anims ();
     destroy_cons ();
     draw_bottom_text (NULL, NULL);
    goto start;
   case NEXT_LEVEL:
-    destroy_kids ();
-    destroy_mice ();
+    destroy_anims ();
     destroy_cons ();
     if (level.next_level) level.next_level (level.number + 1);
     draw_bottom_text (NULL, NULL);
     goto start;
   case RESTART_GAME:
     retry_level = -1;
-    destroy_kids ();
-    destroy_mice ();
+    destroy_anims ();
     destroy_cons ();
     draw_bottom_text (NULL, NULL);
     break;
@@ -164,6 +161,7 @@ load_level (void)
   load_potion ();
   load_sword ();
   load_kid ();
+  load_guard ();
   load_mouse ();
 }
 
@@ -175,33 +173,41 @@ unload_level (void)
   unload_potion ();
   unload_sword ();
   unload_kid ();
+  unload_guard ();
   unload_mouse ();
 }
 
 static void
 compute_level (void)
 {
-  int i;
+  size_t i;
 
   process_keys ();
 
   if (pause_game) return;
 
+  struct anim *current_kid = get_anim_by_id (current_kid_id);
+
   int prev_room = current_kid->f.c.room;
 
-  for (i = 0; i < kida_nmemb; i++) kida[i].splash = false;
+  for (i = 0; i < anima_nmemb; i++) anima[i].splash = false;
 
   compute_loose_floors ();
 
-  for (i = 0; i < mousea_nmemb; i++) mousea[i].action (&mousea[i]);
-
   get_keyboard_state (&current_kid->key);
 
-  for (i = 1; i < kida_nmemb; i++) fight_ai (get_kid_by_id (i), get_kid_by_id (0));
-  for (i = 0; i < kida_nmemb; i++) kida[i].action (&kida[i]);
-  for (i = 0; i < kida_nmemb; i++) fight_mechanics (&kida[i]);
+  struct anim *k = get_anim_by_id (0);
 
-  clear_kids_keyboard_state ();
+  for (i = 0; i < anima_nmemb; i++) {
+    struct anim *a = &anima[i];
+    if (a->type == GUARD
+        || (a->type == KID && a->shadow_of == 0 && ! a->controllable))
+      fight_ai (a, k);
+    a->action (a);
+    if (a->type != MOUSE) fight_mechanics (a);
+  }
+
+  clear_anims_keyboard_state ();
 
   if (current_kid->f.c.room != prev_room
       && current_kid->f.c.room != 0
@@ -225,6 +231,8 @@ static void
 process_keys (void)
 {
   char *text = NULL;
+
+  struct anim *current_kid = get_anim_by_id (current_kid_id);
 
   int prev_room = room_view;
 
@@ -284,17 +292,16 @@ process_keys (void)
 
   /* A: alternate between kid and its shadows */
   if (was_key_pressed (ALLEGRO_KEY_A, 0, 0, true)) {
-    current_kid->current = false;
     do {
-      current_kid = &kida[(current_kid - kida + 1) % kida_nmemb];
-    } while (! current_kid->controllable);
-    current_kid->current = true;
+      current_kid = &anima[(current_kid - anima + 1) % anima_nmemb];
+    } while (current_kid->type != KID || ! current_kid->controllable);
+    current_kid_id = current_kid->id;
     room_view = current_kid->f.c.room;
   }
 
   /* K: kill enemy */
   if (was_key_pressed (ALLEGRO_KEY_K, 0, 0, true)) {
-    struct anim *ke = get_enemy (current_kid);
+    struct anim *ke = get_anim_by_id (current_kid->enemy_id);
     if (ke) ke->current_lives = 0;
   }
 
@@ -449,7 +456,7 @@ process_keys (void)
   }
 
   /* Restart level after death */
-  struct anim *k = get_kid_by_id (0);
+  struct anim *k = get_anim_by_id (0);
   if (is_kid_dead (&k->f)
       && ! pause_game) {
     al_start_timer (death_timer);
@@ -488,6 +495,8 @@ process_keys (void)
 static void
 draw_level (void)
 {
+  struct anim *current_kid = get_anim_by_id (current_kid_id);
+
   if (pause_game) {
     draw_bottom_text (NULL, "GAME PAUSED");
     clear_bitmap (uscreen, TRANSPARENT_COLOR);
@@ -526,8 +535,7 @@ draw_level (void)
       draw_falling_loose_floor (screen, &p, em, vm);
     }
 
-  draw_mice (screen, em, vm);
-  draw_kids (screen, em, vm);
+  draw_anims (screen, em, vm);
 
   for (p.floor = FLOORS; p.floor >= -1; p.floor--)
     for (p.place = -1; p.place < PLACES; p.place++) {
