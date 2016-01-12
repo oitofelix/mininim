@@ -88,25 +88,42 @@ flow (struct anim *g)
   struct coord nc;
   struct pos np, pmt;
 
+  bool walkf = ((g->f.dir == RIGHT) && g->key.right)
+    || ((g->f.dir == LEFT) && g->key.left);
+  bool walkb = ((g->f.dir == RIGHT) && g->key.left)
+    || ((g->f.dir == LEFT) && g->key.right);
   bool normal = g->key.down;
 
   if (g->oaction != guard_vigilant) g->i = -1;
 
-  if (g->oaction == guard_vigilant
-      && g->current_lives <= 0) {
-    survey (_mt, pos, &g->f, &nc, &pmt, &np);
-    g->p = pmt;
-    guard_die (g);
-    return false;
+  if (g->oaction == guard_vigilant) {
+    /* death */
+    if (g->current_lives <= 0) {
+      survey (_mt, pos, &g->f, &nc, &pmt, &np);
+      g->p = pmt;
+      guard_die (g);
+      return false;
+    }
+
+    if (walkf) {
+      guard_walkf (g);
+      return false;
+    }
+
+    /* normal */
+    if (g->i == 2 && normal) {
+      guard_normal (g);
+      return false;
+    }
+
   }
 
-  if (g->i == 2 && normal) {
-    guard_normal (g);
-    return false;
-  }
-
-  select_frame (g, guard_vigilant_frameset, g->i == 2 ? g->i : g->i + 1);
+  select_frame (g, guard_vigilant_frameset,
+                g->i == 2 ? g->i : g->i + 1);
   select_xframe (&g->xf, sword_frameset, 4);
+
+  if (g->oaction == guard_normal) g->fo.dx += -1;
+  if (g->oaction == guard_walkf) g->fo.dx += +2;
 
   return true;
 }

@@ -374,7 +374,7 @@ anim_walkf (struct anim *a)
   switch (a->type) {
   case NO_ANIM: default: break;
   case KID: kid_sword_walkf (a); break;
-  /* case GUARD: guard_walkf (a); break; */
+  case GUARD: guard_walkf (a); break;
   }
 }
 
