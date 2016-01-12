@@ -167,7 +167,7 @@ init_sword_frameset (void)
      {sword_22,-14,-11},{sword_23,-14,-11},{sword_24,-14,-5},
      {sword_25,-28,+3},{sword_26,-28,+8},{sword_27,-21,+7},
      {sword_28,-14,+5},{sword_29,-14,+2},{sword_30,+0,+12},
-     {sword_31,+0,+0},{sword_32,+0,+0},{sword_33,+0,+0},
+     {sword_31,-12,+23},{sword_32,+0,+0},{sword_33,+0,+0},
      {sword_34,+0,+0}};
 
   memcpy (&sword_frameset, &frameset,

@@ -333,6 +333,20 @@ anim_die_chopped (struct anim *a)
   }
 }
 
+struct coord *
+splash_coord (struct frame *f, struct coord *c)
+{
+  int w = al_get_bitmap_width (v_kid_splash);
+  int h = al_get_bitmap_height (v_kid_splash);
+  int fw = al_get_bitmap_width (f->b);
+  int fh = al_get_bitmap_height (f->b);
+  c->x = f->c.x + (fw / 2) - (w / 2);
+  c->y = f->c.y + (fh / 2) - (h / 2);
+  c->room = f->c.room;
+  return c;
+}
+
+
 
 
 void

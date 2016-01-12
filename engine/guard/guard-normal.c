@@ -78,6 +78,8 @@ flow (struct anim *g)
   g->fo.b = guard_normal_00;
   g->fo.dx = g->fo.dy = +0;
 
+  select_xframe (&g->xf, sword_frameset, 30);
+
   return true;
 }
 

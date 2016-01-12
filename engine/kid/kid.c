@@ -54,7 +54,6 @@ ALLEGRO_SAMPLE *step_sample, *hit_ground_sample, *hit_ground_harm_sample,
 
 static void place_kid (struct anim *k, int room, int floor, int place);
 static struct coord *kid_life_coord (int i, struct coord *c);
-static struct coord * splash_coord (struct frame *f, struct coord *c);
 static palette get_palette (enum vm vm);
 static ALLEGRO_COLOR v_palette (ALLEGRO_COLOR c);
 static ALLEGRO_COLOR e_palette (ALLEGRO_COLOR c);
@@ -486,19 +485,6 @@ kid_life_coord (int i, struct coord *c)
   c->x = 7 * i;
   c->y = 194;
   c->room = room_view;
-  return c;
-}
-
-static struct coord *
-splash_coord (struct frame *f, struct coord *c)
-{
-  int w = al_get_bitmap_width (v_kid_splash);
-  int h = al_get_bitmap_height (v_kid_splash);
-  int fw = al_get_bitmap_width (f->b);
-  int fh = al_get_bitmap_height (f->b);
-  c->x = f->c.x + (fw / 2) - (w / 2);
-  c->y = f->c.y + (fh / 2) - (h / 2);
-  c->room = f->c.room;
   return c;
 }
 

@@ -149,7 +149,7 @@ start (void)
     a->skill = g->skill;
     a->total_lives = g->total_lives;
     a->current_lives = g->total_lives;
-    /* todo: handle style */
+    a->style = g->style;
   }
 
   /* after kid creation k must be updated to point to the correct
@@ -810,6 +810,9 @@ load_legacy_level (int number)
 
     /* STYLE: ok */
     g->style = lv.guard_color[i];
+
+    /* printf ("(%i, %i, %i), style: %i\n", */
+    /*         g->p.room, g->p.floor, g->p.place, g->style); */
   }
 }
 

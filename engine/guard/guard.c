@@ -85,11 +85,249 @@ create_guard (struct anim *g0, struct anim *g1, struct pos *p, enum dir dir)
     g1->skill.counter_defense_prob = 70;
 
     place_frame (&g1->f, &g1->f, guard_normal_00, p,
-                 g1->f.dir == LEFT ? +22 : +31, +15);
+                 g1->f.dir == LEFT ? +PLACE_WIDTH + 2 : +3, +15);
     update_depressible_floor (g1, -4, -10);
   }
 
   return g1;
+}
+
+static ALLEGRO_COLOR
+v_light_blue_palette (ALLEGRO_COLOR c)
+{
+  if (color_eq (c, GUARD_SHOES_COLOR)) return V_LIGHT_BLUE_GUARD_SHOES_COLOR;
+  if (color_eq (c, GUARD_PANTS_COLOR_01)) return V_LIGHT_BLUE_GUARD_PANTS_COLOR_01;
+  if (color_eq (c, GUARD_PANTS_COLOR_02)) return V_LIGHT_BLUE_GUARD_PANTS_COLOR_02;
+  if (color_eq (c, GUARD_CAPE_COLOR_01)) return V_LIGHT_BLUE_GUARD_CAPE_COLOR_01;
+  if (color_eq (c, GUARD_CAPE_COLOR_02)) return V_LIGHT_BLUE_GUARD_CAPE_COLOR_02;
+  if (color_eq (c, GUARD_CAPE_COLOR_03)) return V_LIGHT_BLUE_GUARD_CAPE_COLOR_03;
+  if (color_eq (c, GUARD_BELT_COLOR)) return V_LIGHT_BLUE_GUARD_BELT_COLOR;
+  if (color_eq (c, GUARD_HAT_COLOR_01)) return V_LIGHT_BLUE_GUARD_HAT_COLOR_01;
+  if (color_eq (c, GUARD_HAT_COLOR_02)) return V_LIGHT_BLUE_GUARD_HAT_COLOR_02;
+  if (color_eq (c, GUARD_SKIN_COLOR_01)) return V_LIGHT_BLUE_GUARD_SKIN_COLOR_01;
+  if (color_eq (c, GUARD_SKIN_COLOR_02)) return V_LIGHT_BLUE_GUARD_SKIN_COLOR_02;
+  if (color_eq (c, GUARD_EYES_COLOR)) return V_LIGHT_BLUE_GUARD_EYES_COLOR;
+  if (color_eq (c, GUARD_BLOOD_COLOR)) return V_LIGHT_BLUE_GUARD_BLOOD_COLOR;
+  if (color_eq (c, GUARD_SPLASH_COLOR)) return V_LIGHT_BLUE_GUARD_SPLASH_COLOR;
+  return c;
+}
+
+static ALLEGRO_COLOR
+v_red_palette (ALLEGRO_COLOR c)
+{
+  if (color_eq (c, GUARD_SHOES_COLOR)) return V_RED_GUARD_SHOES_COLOR;
+  if (color_eq (c, GUARD_PANTS_COLOR_01)) return V_RED_GUARD_PANTS_COLOR_01;
+  if (color_eq (c, GUARD_PANTS_COLOR_02)) return V_RED_GUARD_PANTS_COLOR_02;
+  if (color_eq (c, GUARD_CAPE_COLOR_01)) return V_RED_GUARD_CAPE_COLOR_01;
+  if (color_eq (c, GUARD_CAPE_COLOR_02)) return V_RED_GUARD_CAPE_COLOR_02;
+  if (color_eq (c, GUARD_CAPE_COLOR_03)) return V_RED_GUARD_CAPE_COLOR_03;
+  if (color_eq (c, GUARD_BELT_COLOR)) return V_RED_GUARD_BELT_COLOR;
+  if (color_eq (c, GUARD_HAT_COLOR_01)) return V_RED_GUARD_HAT_COLOR_01;
+  if (color_eq (c, GUARD_HAT_COLOR_02)) return V_RED_GUARD_HAT_COLOR_02;
+  if (color_eq (c, GUARD_SKIN_COLOR_01)) return V_RED_GUARD_SKIN_COLOR_01;
+  if (color_eq (c, GUARD_SKIN_COLOR_02)) return V_RED_GUARD_SKIN_COLOR_02;
+  if (color_eq (c, GUARD_EYES_COLOR)) return V_RED_GUARD_EYES_COLOR;
+  if (color_eq (c, GUARD_BLOOD_COLOR)) return V_RED_GUARD_BLOOD_COLOR;
+  if (color_eq (c, GUARD_SPLASH_COLOR)) return V_RED_GUARD_SPLASH_COLOR;
+  return c;
+}
+
+static ALLEGRO_COLOR
+v_orange_palette (ALLEGRO_COLOR c)
+{
+  if (color_eq (c, GUARD_SHOES_COLOR)) return V_ORANGE_GUARD_SHOES_COLOR;
+  if (color_eq (c, GUARD_PANTS_COLOR_01)) return V_ORANGE_GUARD_PANTS_COLOR_01;
+  if (color_eq (c, GUARD_PANTS_COLOR_02)) return V_ORANGE_GUARD_PANTS_COLOR_02;
+  if (color_eq (c, GUARD_CAPE_COLOR_01)) return V_ORANGE_GUARD_CAPE_COLOR_01;
+  if (color_eq (c, GUARD_CAPE_COLOR_02)) return V_ORANGE_GUARD_CAPE_COLOR_02;
+  if (color_eq (c, GUARD_CAPE_COLOR_03)) return V_ORANGE_GUARD_CAPE_COLOR_03;
+  if (color_eq (c, GUARD_BELT_COLOR)) return V_ORANGE_GUARD_BELT_COLOR;
+  if (color_eq (c, GUARD_HAT_COLOR_01)) return V_ORANGE_GUARD_HAT_COLOR_01;
+  if (color_eq (c, GUARD_HAT_COLOR_02)) return V_ORANGE_GUARD_HAT_COLOR_02;
+  if (color_eq (c, GUARD_SKIN_COLOR_01)) return V_ORANGE_GUARD_SKIN_COLOR_01;
+  if (color_eq (c, GUARD_SKIN_COLOR_02)) return V_ORANGE_GUARD_SKIN_COLOR_02;
+  if (color_eq (c, GUARD_EYES_COLOR)) return V_ORANGE_GUARD_EYES_COLOR;
+  if (color_eq (c, GUARD_BLOOD_COLOR)) return V_ORANGE_GUARD_BLOOD_COLOR;
+  if (color_eq (c, GUARD_SPLASH_COLOR)) return V_ORANGE_GUARD_SPLASH_COLOR;
+  return c;
+}
+
+static ALLEGRO_COLOR
+v_green_palette (ALLEGRO_COLOR c)
+{
+  if (color_eq (c, GUARD_SHOES_COLOR)) return V_GREEN_GUARD_SHOES_COLOR;
+  if (color_eq (c, GUARD_PANTS_COLOR_01)) return V_GREEN_GUARD_PANTS_COLOR_01;
+  if (color_eq (c, GUARD_PANTS_COLOR_02)) return V_GREEN_GUARD_PANTS_COLOR_02;
+  if (color_eq (c, GUARD_CAPE_COLOR_01)) return V_GREEN_GUARD_CAPE_COLOR_01;
+  if (color_eq (c, GUARD_CAPE_COLOR_02)) return V_GREEN_GUARD_CAPE_COLOR_02;
+  if (color_eq (c, GUARD_CAPE_COLOR_03)) return V_GREEN_GUARD_CAPE_COLOR_03;
+  if (color_eq (c, GUARD_BELT_COLOR)) return V_GREEN_GUARD_BELT_COLOR;
+  if (color_eq (c, GUARD_HAT_COLOR_01)) return V_GREEN_GUARD_HAT_COLOR_01;
+  if (color_eq (c, GUARD_HAT_COLOR_02)) return V_GREEN_GUARD_HAT_COLOR_02;
+  if (color_eq (c, GUARD_SKIN_COLOR_01)) return V_GREEN_GUARD_SKIN_COLOR_01;
+  if (color_eq (c, GUARD_SKIN_COLOR_02)) return V_GREEN_GUARD_SKIN_COLOR_02;
+  if (color_eq (c, GUARD_EYES_COLOR)) return V_GREEN_GUARD_EYES_COLOR;
+  if (color_eq (c, GUARD_BLOOD_COLOR)) return V_GREEN_GUARD_BLOOD_COLOR;
+  if (color_eq (c, GUARD_SPLASH_COLOR)) return V_GREEN_GUARD_SPLASH_COLOR;
+  return c;
+}
+
+static ALLEGRO_COLOR
+v_dark_blue_palette (ALLEGRO_COLOR c)
+{
+  if (color_eq (c, GUARD_SHOES_COLOR)) return V_DARK_BLUE_GUARD_SHOES_COLOR;
+  if (color_eq (c, GUARD_PANTS_COLOR_01)) return V_DARK_BLUE_GUARD_PANTS_COLOR_01;
+  if (color_eq (c, GUARD_PANTS_COLOR_02)) return V_DARK_BLUE_GUARD_PANTS_COLOR_02;
+  if (color_eq (c, GUARD_CAPE_COLOR_01)) return V_DARK_BLUE_GUARD_CAPE_COLOR_01;
+  if (color_eq (c, GUARD_CAPE_COLOR_02)) return V_DARK_BLUE_GUARD_CAPE_COLOR_02;
+  if (color_eq (c, GUARD_CAPE_COLOR_03)) return V_DARK_BLUE_GUARD_CAPE_COLOR_03;
+  if (color_eq (c, GUARD_BELT_COLOR)) return V_DARK_BLUE_GUARD_BELT_COLOR;
+  if (color_eq (c, GUARD_HAT_COLOR_01)) return V_DARK_BLUE_GUARD_HAT_COLOR_01;
+  if (color_eq (c, GUARD_HAT_COLOR_02)) return V_DARK_BLUE_GUARD_HAT_COLOR_02;
+  if (color_eq (c, GUARD_SKIN_COLOR_01)) return V_DARK_BLUE_GUARD_SKIN_COLOR_01;
+  if (color_eq (c, GUARD_SKIN_COLOR_02)) return V_DARK_BLUE_GUARD_SKIN_COLOR_02;
+  if (color_eq (c, GUARD_EYES_COLOR)) return V_DARK_BLUE_GUARD_EYES_COLOR;
+  if (color_eq (c, GUARD_BLOOD_COLOR)) return V_DARK_BLUE_GUARD_BLOOD_COLOR;
+  if (color_eq (c, GUARD_SPLASH_COLOR)) return V_DARK_BLUE_GUARD_SPLASH_COLOR;
+  return c;
+}
+
+static ALLEGRO_COLOR
+v_purple_palette (ALLEGRO_COLOR c)
+{
+  if (color_eq (c, GUARD_SHOES_COLOR)) return V_PURPLE_GUARD_SHOES_COLOR;
+  if (color_eq (c, GUARD_PANTS_COLOR_01)) return V_PURPLE_GUARD_PANTS_COLOR_01;
+  if (color_eq (c, GUARD_PANTS_COLOR_02)) return V_PURPLE_GUARD_PANTS_COLOR_02;
+  if (color_eq (c, GUARD_CAPE_COLOR_01)) return V_PURPLE_GUARD_CAPE_COLOR_01;
+  if (color_eq (c, GUARD_CAPE_COLOR_02)) return V_PURPLE_GUARD_CAPE_COLOR_02;
+  if (color_eq (c, GUARD_CAPE_COLOR_03)) return V_PURPLE_GUARD_CAPE_COLOR_03;
+  if (color_eq (c, GUARD_BELT_COLOR)) return V_PURPLE_GUARD_BELT_COLOR;
+  if (color_eq (c, GUARD_HAT_COLOR_01)) return V_PURPLE_GUARD_HAT_COLOR_01;
+  if (color_eq (c, GUARD_HAT_COLOR_02)) return V_PURPLE_GUARD_HAT_COLOR_02;
+  if (color_eq (c, GUARD_SKIN_COLOR_01)) return V_PURPLE_GUARD_SKIN_COLOR_01;
+  if (color_eq (c, GUARD_SKIN_COLOR_02)) return V_PURPLE_GUARD_SKIN_COLOR_02;
+  if (color_eq (c, GUARD_EYES_COLOR)) return V_PURPLE_GUARD_EYES_COLOR;
+  if (color_eq (c, GUARD_BLOOD_COLOR)) return V_PURPLE_GUARD_BLOOD_COLOR;
+  if (color_eq (c, GUARD_SPLASH_COLOR)) return V_PURPLE_GUARD_SPLASH_COLOR;
+  return c;
+}
+
+static ALLEGRO_COLOR
+v_yellow_palette (ALLEGRO_COLOR c)
+{
+  if (color_eq (c, GUARD_SHOES_COLOR)) return V_YELLOW_GUARD_SHOES_COLOR;
+  if (color_eq (c, GUARD_PANTS_COLOR_01)) return V_YELLOW_GUARD_PANTS_COLOR_01;
+  if (color_eq (c, GUARD_PANTS_COLOR_02)) return V_YELLOW_GUARD_PANTS_COLOR_02;
+  if (color_eq (c, GUARD_CAPE_COLOR_01)) return V_YELLOW_GUARD_CAPE_COLOR_01;
+  if (color_eq (c, GUARD_CAPE_COLOR_02)) return V_YELLOW_GUARD_CAPE_COLOR_02;
+  if (color_eq (c, GUARD_CAPE_COLOR_03)) return V_YELLOW_GUARD_CAPE_COLOR_03;
+  if (color_eq (c, GUARD_BELT_COLOR)) return V_YELLOW_GUARD_BELT_COLOR;
+  if (color_eq (c, GUARD_HAT_COLOR_01)) return V_YELLOW_GUARD_HAT_COLOR_01;
+  if (color_eq (c, GUARD_HAT_COLOR_02)) return V_YELLOW_GUARD_HAT_COLOR_02;
+  if (color_eq (c, GUARD_SKIN_COLOR_01)) return V_YELLOW_GUARD_SKIN_COLOR_01;
+  if (color_eq (c, GUARD_SKIN_COLOR_02)) return V_YELLOW_GUARD_SKIN_COLOR_02;
+  if (color_eq (c, GUARD_EYES_COLOR)) return V_YELLOW_GUARD_EYES_COLOR;
+  if (color_eq (c, GUARD_BLOOD_COLOR)) return V_YELLOW_GUARD_BLOOD_COLOR;
+  if (color_eq (c, GUARD_SPLASH_COLOR)) return V_YELLOW_GUARD_SPLASH_COLOR;
+  return c;
+}
+
+static ALLEGRO_COLOR
+e_red_palette (ALLEGRO_COLOR c)
+{
+  if (color_eq (c, GUARD_SHOES_COLOR)) return E_RED_GUARD_SHOES_COLOR;
+  if (color_eq (c, GUARD_PANTS_COLOR_01)) return E_RED_GUARD_PANTS_COLOR_01;
+  if (color_eq (c, GUARD_PANTS_COLOR_02)) return E_RED_GUARD_PANTS_COLOR_02;
+  if (color_eq (c, GUARD_CAPE_COLOR_01)) return E_RED_GUARD_CAPE_COLOR_01;
+  if (color_eq (c, GUARD_CAPE_COLOR_02)) return E_RED_GUARD_CAPE_COLOR_02;
+  if (color_eq (c, GUARD_CAPE_COLOR_03)) return E_RED_GUARD_CAPE_COLOR_03;
+  if (color_eq (c, GUARD_BELT_COLOR)) return E_RED_GUARD_BELT_COLOR;
+  if (color_eq (c, GUARD_HAT_COLOR_01)) return E_RED_GUARD_HAT_COLOR_01;
+  if (color_eq (c, GUARD_HAT_COLOR_02)) return E_RED_GUARD_HAT_COLOR_02;
+  if (color_eq (c, GUARD_SKIN_COLOR_01)) return E_RED_GUARD_SKIN_COLOR_01;
+  if (color_eq (c, GUARD_SKIN_COLOR_02)) return E_RED_GUARD_SKIN_COLOR_02;
+  if (color_eq (c, GUARD_EYES_COLOR)) return E_RED_GUARD_EYES_COLOR;
+  if (color_eq (c, GUARD_BLOOD_COLOR)) return E_RED_GUARD_BLOOD_COLOR;
+  if (color_eq (c, GUARD_SPLASH_COLOR)) return E_RED_GUARD_SPLASH_COLOR;
+  return c;
+}
+
+static ALLEGRO_COLOR
+e_green_palette (ALLEGRO_COLOR c)
+{
+  if (color_eq (c, GUARD_SHOES_COLOR)) return E_GREEN_GUARD_SHOES_COLOR;
+  if (color_eq (c, GUARD_PANTS_COLOR_01)) return E_GREEN_GUARD_PANTS_COLOR_01;
+  if (color_eq (c, GUARD_PANTS_COLOR_02)) return E_GREEN_GUARD_PANTS_COLOR_02;
+  if (color_eq (c, GUARD_CAPE_COLOR_01)) return E_GREEN_GUARD_CAPE_COLOR_01;
+  if (color_eq (c, GUARD_CAPE_COLOR_02)) return E_GREEN_GUARD_CAPE_COLOR_02;
+  if (color_eq (c, GUARD_CAPE_COLOR_03)) return E_GREEN_GUARD_CAPE_COLOR_03;
+  if (color_eq (c, GUARD_BELT_COLOR)) return E_GREEN_GUARD_BELT_COLOR;
+  if (color_eq (c, GUARD_HAT_COLOR_01)) return E_GREEN_GUARD_HAT_COLOR_01;
+  if (color_eq (c, GUARD_HAT_COLOR_02)) return E_GREEN_GUARD_HAT_COLOR_02;
+  if (color_eq (c, GUARD_SKIN_COLOR_01)) return E_GREEN_GUARD_SKIN_COLOR_01;
+  if (color_eq (c, GUARD_SKIN_COLOR_02)) return E_GREEN_GUARD_SKIN_COLOR_02;
+  if (color_eq (c, GUARD_EYES_COLOR)) return E_GREEN_GUARD_EYES_COLOR;
+  if (color_eq (c, GUARD_BLOOD_COLOR)) return E_GREEN_GUARD_BLOOD_COLOR;
+  if (color_eq (c, GUARD_SPLASH_COLOR)) return E_GREEN_GUARD_SPLASH_COLOR;
+  return c;
+}
+
+static ALLEGRO_COLOR
+c_red_palette (ALLEGRO_COLOR c)
+{
+  if (color_eq (c, GUARD_SHOES_COLOR)) return C_RED_GUARD_SHOES_COLOR;
+  if (color_eq (c, GUARD_PANTS_COLOR_01)) return C_RED_GUARD_PANTS_COLOR_01;
+  if (color_eq (c, GUARD_PANTS_COLOR_02)) return C_RED_GUARD_PANTS_COLOR_02;
+  if (color_eq (c, GUARD_CAPE_COLOR_01)) return C_RED_GUARD_CAPE_COLOR_01;
+  if (color_eq (c, GUARD_CAPE_COLOR_02)) return C_RED_GUARD_CAPE_COLOR_02;
+  if (color_eq (c, GUARD_CAPE_COLOR_03)) return C_RED_GUARD_CAPE_COLOR_03;
+  if (color_eq (c, GUARD_BELT_COLOR)) return C_RED_GUARD_BELT_COLOR;
+  if (color_eq (c, GUARD_HAT_COLOR_01)) return C_RED_GUARD_HAT_COLOR_01;
+  if (color_eq (c, GUARD_HAT_COLOR_02)) return C_RED_GUARD_HAT_COLOR_02;
+  if (color_eq (c, GUARD_SKIN_COLOR_01)) return C_RED_GUARD_SKIN_COLOR_01;
+  if (color_eq (c, GUARD_SKIN_COLOR_02)) return C_RED_GUARD_SKIN_COLOR_02;
+  if (color_eq (c, GUARD_EYES_COLOR)) return C_RED_GUARD_EYES_COLOR;
+  if (color_eq (c, GUARD_BLOOD_COLOR)) return C_RED_GUARD_BLOOD_COLOR;
+  if (color_eq (c, GUARD_SPLASH_COLOR)) return C_RED_GUARD_SPLASH_COLOR;
+  return c;
+}
+
+static palette
+get_palette (int style, enum vm vm)
+{
+  switch (vm) {
+  case CGA:
+    switch (style) {
+    case 1: default: return c_red_palette;
+    case 2: return c_red_palette;
+    case 3: return c_red_palette;
+    case 4: return c_red_palette;
+    case 5: return c_red_palette;
+    case 6: return c_red_palette;
+    case 7: return c_red_palette;
+    }
+  case EGA:
+    switch (style) {
+    case 1: default: return e_red_palette;
+    case 2: return e_red_palette;
+    case 3: return e_red_palette;
+    case 4: return e_green_palette;
+    case 5: return e_red_palette;
+    case 6: return e_green_palette;
+    case 7: return e_green_palette;
+    }
+  case VGA:
+    switch (style) {
+    case 1: default: return v_light_blue_palette;
+    case 2: return v_red_palette;
+    case 3: return v_orange_palette;
+    case 4: return v_green_palette;
+    case 5: return v_dark_blue_palette;
+    case 6: return v_purple_palette;
+    case 7: return v_yellow_palette;
+    }
+  }
+  return NULL;
 }
 
 void
@@ -102,21 +340,21 @@ draw_guard_frame (ALLEGRO_BITMAP *bitmap, struct anim *g, enum vm vm)
   struct frame f = g->f;
   struct frame_offset xf = g->xf;
 
-  /* palette pal = get_palette (vm); */
-  /* f.b = apply_palette (f.b, pal); */
-  /* xf.b = apply_palette (xf.b, pal); */
+  palette pal = get_palette (g->style, vm);
+  f.b = apply_palette (f.b, pal);
+  xf.b = apply_palette (xf.b, pal);
 
-  /* if (hgc) { */
-  /*   f.b = apply_palette (f.b, hgc_palette); */
-  /*   xf.b = apply_palette (xf.b, hgc_palette); */
-  /* } */
+  if (hgc) {
+    f.b = apply_palette (f.b, hgc_palette);
+    xf.b = apply_palette (xf.b, hgc_palette);
+  }
 
-  draw_frame (bitmap, &f);
   draw_xframe (bitmap, &f, &xf);
+  draw_frame (bitmap, &f);
 
-  /* if (g->splash) { */
-  /*   ALLEGRO_BITMAP *splash = apply_palette (v_guard_splash, pal); */
-  /*   if (hgc) splash = apply_palette (splash, hgc_palette); */
-  /*   draw_bitmapc (splash, bitmap, splash_coord (&g->f, &c), g->f.flip); */
-  /* } */
+  if (g->splash) {
+    ALLEGRO_BITMAP *splash = apply_palette (guard_splash, pal);
+    if (hgc) splash = apply_palette (splash, hgc_palette);
+    draw_bitmapc (splash, bitmap, splash_coord (&g->f, &c), g->f.flip);
+  }
 }

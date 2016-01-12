@@ -116,6 +116,8 @@ bool kid_door_split_collision (struct anim *k);
 /* variables */
 extern int current_kid_id;
 
+extern ALLEGRO_BITMAP *v_kid_full_life, *v_kid_empty_life, *v_kid_splash;
+
 extern ALLEGRO_SAMPLE *step_sample, *hit_ground_sample, *hit_ground_harm_sample,
   *hit_ground_fatal_sample, *hit_wall_sample, *hang_on_fall_sample,
   *drink_sample, *glory_sample, *take_sword_sample, *sword_attack_sample,
