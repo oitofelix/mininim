@@ -213,6 +213,7 @@ create_kid (struct anim *k0, struct anim *k1, struct pos *p, enum dir dir)
     k1->total_lives = KID_INITIAL_TOTAL_LIVES;
     k1->current_lives = KID_INITIAL_CURRENT_LIVES;
     k1->floating = create_timer (1.0);
+    k1->fight = true;
     k1->enemy_id = -1;
     k1->skill.defense_prob = 70;
     k1->skill.counter_attack_prob = 70;

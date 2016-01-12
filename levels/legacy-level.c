@@ -314,6 +314,7 @@ special_events (void)
         int id = create_anim (k, 0, NULL, 0);
         struct anim *ks = &anima[id];
         ks->shadow = true;
+        ks->fight = false;
         ks->f.dir = (ks->f.dir == LEFT) ? RIGHT : LEFT;
         ks->controllable = false;
         shadow_id = id;
@@ -349,6 +350,7 @@ special_events (void)
       int id = create_anim (k, 0, NULL, 0);
       struct anim *ks = &anima[id];
       ks->shadow = true;
+      ks->fight = false;
       ks->f.dir = RIGHT;
       ks->controllable = false;
       ks->action = kid_run;
@@ -386,6 +388,7 @@ special_events (void)
       struct pos shadow_pos = (struct pos) {1,1,1};
       int id = create_anim (k, 0, NULL, 0);
       ks = &anima[id];
+      ks->fight = false;
       ks->shadow = true;
       ks->f.dir = RIGHT;
       ks->controllable = false;

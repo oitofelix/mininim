@@ -122,6 +122,8 @@ kid_die_spiked (struct anim *k)
                  ? +8 : +9, (k->f.dir == LEFT) ? +32 : +31);
     kill_kid_shadows (k);
   }
+
+  k->xf.b = NULL;
 }
 
 void
@@ -139,6 +141,8 @@ kid_die_chopped (struct anim *k)
                  ? -8 : -7, +47);
     kill_kid_shadows (k);
   }
+
+  k->xf.b = NULL;
 }
 
 void
@@ -157,6 +161,8 @@ kid_die_suddenly (struct anim *k)
 
     kill_kid_shadows (k);
   }
+
+  k->xf.b = NULL;
 
   k->hit_by_loose_floor = false;
 

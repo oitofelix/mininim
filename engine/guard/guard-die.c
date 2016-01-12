@@ -106,6 +106,8 @@ guard_die_spiked (struct anim *g)
     place_frame (&g->f, &g->f, guard_die_spiked_00,
                  &g->p, (g->f.dir == LEFT)
                  ? +8 : +9, (g->f.dir == LEFT) ? +32 : +31);
+
+  g->xf.b = NULL;
 }
 
 void
@@ -120,7 +122,9 @@ guard_die_chopped (struct anim *g)
   if (g->oaction != guard_die_chopped)
     place_frame (&g->f, &g->f, guard_die_chopped_00,
                  &g->p, (g->f.dir == LEFT)
-                 ? -8 : -7, +47);
+                 ? -10 : -7, +43);
+
+  g->xf.b = NULL;
 }
 
 void
@@ -137,6 +141,8 @@ guard_die_suddenly (struct anim *g)
                  &g->p, (g->f.dir == LEFT)
                  ? +9 : +4, +47);
 
+  g->xf.b = NULL;
+
   g->hit_by_loose_floor = false;
 
   /* fall */
@@ -144,7 +150,7 @@ guard_die_suddenly (struct anim *g)
   struct pos np, pm;
   survey (_m, pos, &g->f, &nc, &pm, &np);
   if (is_strictly_traversable (&pm)) {
-    /* guard_fall (g); */
+    guard_fall (g);
     return;
   }
 
@@ -196,7 +202,7 @@ physics_in (struct anim *g)
   struct pos np, pm;
   survey (_m, pos, &g->f, &nc, &pm, &np);
   if (is_strictly_traversable (&pm)) {
-    /* guard_fall (g); */
+    guard_fall (g);
     return false;
   }
 

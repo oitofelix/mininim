@@ -51,6 +51,7 @@ load_guard (void)
   load_guard_vigilant ();
   load_guard_hit ();
   load_guard_die ();
+  load_guard_fall ();
 
   /* bitmaps */
   guard_life = load_bitmap (GUARD_LIFE);
@@ -67,6 +68,7 @@ unload_guard (void)
   unload_guard_vigilant ();
   unload_guard_hit ();
   unload_guard_die ();
+  unload_guard_fall ();
 
   /* bitmaps */
   al_destroy_bitmap (guard_life);
@@ -86,6 +88,7 @@ create_guard (struct anim *g0, struct anim *g1, struct pos *p, enum dir dir)
     g1->total_lives = 3;
     g1->current_lives = 3;
     g1->enemy_id = -1;
+    g1->fight = true;
     g1->skill.defense_prob = 70;
     g1->skill.counter_attack_prob = 70;
     g1->skill.counter_defense_prob = 70;

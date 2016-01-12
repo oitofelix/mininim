@@ -132,7 +132,7 @@ physics_in (struct anim *g)
       || is_strictly_traversable (&pmbo)
       || is_strictly_traversable (&pbb)) {
     g->xf.b = NULL;
-    /* guard_fall (g); */
+    guard_fall (g);
     return false;
   }
 

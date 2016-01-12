@@ -85,9 +85,20 @@ guard_vigilant (struct anim *g)
 static bool
 flow (struct anim *g)
 {
+  struct coord nc;
+  struct pos np, pmt;
+
   bool normal = g->key.down;
 
   if (g->oaction != guard_vigilant) g->i = -1;
+
+  if (g->oaction == guard_vigilant
+      && g->current_lives <= 0) {
+    survey (_mt, pos, &g->f, &nc, &pmt, &np);
+    g->p = pmt;
+    guard_die (g);
+    return false;
+  }
 
   if (g->i == 2 && normal) {
     guard_normal (g);
@@ -115,7 +126,7 @@ physics_in (struct anim *g)
   /* fall */
   survey (_tf, pos, &g->f, &tf, &ptf, &np);
   if (is_strictly_traversable (&ptf)) {
-    /* guard_fall (kid); */
+    guard_fall (g);
     return false;
   }
 
@@ -126,6 +137,6 @@ static void
 physics_out (struct anim *g)
 {
   /* depressible floors */
-  if (g->i == 3) update_depressible_floor (g, -1, -27);
+  if (g->i == 0) update_depressible_floor (g, -1, -27);
   else keep_depressible_floor (g);
 }

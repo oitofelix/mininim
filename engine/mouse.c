@@ -63,6 +63,7 @@ create_mouse (struct anim *m0, struct anim *m1, struct pos *p, enum dir dir)
   if (! m0) {
     m1->f.b = mouse_normal_00;
     m1->fo.b = mouse_normal_00;
+    m1->fight = false;
     m1->action = mouse_normal;
 
     place_frame (&m1->f, &m1->f, mouse_normal_00, p,

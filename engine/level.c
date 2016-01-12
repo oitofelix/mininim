@@ -200,15 +200,16 @@ compute_level (void)
 
   for (i = 0; i < anima_nmemb; i++) {
     struct anim *a = &anima[i];
-    if (a->type == GUARD
-        || (a->type == KID && a->shadow_of == 0 && ! a->controllable))
+    if ((a->type == GUARD
+         || (a->type == KID && a->shadow_of == 0 && ! a->controllable))
+        && a->fight)
       fight_ai (a, k);
   }
 
   for (i = 0; i < anima_nmemb; i++) anima[i].action (&anima[i]);
 
   for (i = 0; i < anima_nmemb; i++)
-    if (anima[i].type != MOUSE) fight_mechanics (&anima[i]);
+    if (anima[i].fight) fight_mechanics (&anima[i]);
 
   clear_anims_keyboard_state ();
 

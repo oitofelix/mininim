@@ -73,7 +73,7 @@ flow (struct anim *g)
       && g->current_lives <= 0) {
     survey (_mt, pos, &g->f, &nc, &pmt, &np);
     g->p = pmt;
-    /* guard_die (g); */
+    guard_die (g);
     return false;
   }
 
@@ -107,7 +107,7 @@ physics_in (struct anim *g)
   survey (_bb, pos, &g->f, &nc, &pbb, &np);
   if (is_strictly_traversable (&pmbo)
       && is_strictly_traversable (&pbb)) {
-    /* guard_fall (g); */
+    guard_fall (g);
     return false;
   }
 
@@ -118,5 +118,5 @@ static void
 physics_out (struct anim *g)
 {
   /* depressible floors */
-  keep_depressible_floor (g);
+  update_depressible_floor (g, -7, -26);
 }
