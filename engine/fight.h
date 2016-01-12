@@ -56,15 +56,11 @@ bool is_safe_to_walkb (struct anim *k);
 bool is_safe_to_attack (struct anim *k);
 bool is_safe_to_turn (struct anim *k);
 void fight_turn (struct anim *k);
-void fight_command_defense (struct anim *k);
-void fight_command_attack (struct anim *k);
-void fight_command_walkf (struct anim *k);
-void fight_command_walkb (struct anim *k);
+void fight_defense (struct anim *k);
+void fight_attack (struct anim *k);
 void fight_walkf (struct anim *k);
 void fight_walkb (struct anim *k);
 void fight_hit (struct anim *k, struct anim *ke);
-void fight_die (struct anim *k);
-void fight_fall (struct anim *k);
 
 struct skill *
 get_perfect_skill (struct skill *fp);

@@ -158,7 +158,7 @@ init_sword_frameset (void)
 {
   struct frameset frameset[SWORD_FRAMESET_NMEMB] =
     {{sword_01,+0,+0},{sword_02,-7,+5},{sword_03,+0,+0},
-     {sword_04,+0,+0},{sword_05,+0,+0},{sword_06,+0,+0},
+     {sword_04,-18,+20},{sword_05,-16,+13},{sword_06,+0,+0},
      {sword_07,+0,+0},{sword_08,+0,+17},{sword_09,+0,+0},
      {sword_10,+0,+0},{sword_11,-11,+13},{sword_12,+0,+0},
      {sword_13,+0,+0},{sword_14,-28,+10},{sword_15,-13,-5},
@@ -167,8 +167,8 @@ init_sword_frameset (void)
      {sword_22,-14,-11},{sword_23,-14,-11},{sword_24,-14,-5},
      {sword_25,-28,+3},{sword_26,-28,+8},{sword_27,-21,+7},
      {sword_28,-14,+5},{sword_29,-14,+2},{sword_30,+0,+12},
-     {sword_31,-12,+23},{sword_32,+0,+0},{sword_33,+0,+0},
-     {sword_34,+0,+0}};
+     {sword_31,-12,+23},{sword_32,+0,+0},{sword_33,-14,+9},
+     {sword_34,-5,+12}};
 
   memcpy (&sword_frameset, &frameset,
           SWORD_FRAMESET_NMEMB * sizeof (struct frameset));

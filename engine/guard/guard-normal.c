@@ -67,11 +67,19 @@ flow (struct anim *g)
   struct coord nc;
   struct pos np, pmt;
 
+  bool vigilant = g->key.enter;
+
   if (g->oaction == guard_normal
       && g->current_lives <= 0) {
     survey (_mt, pos, &g->f, &nc, &pmt, &np);
     g->p = pmt;
     /* guard_die (g); */
+    return false;
+  }
+
+  if (g->oaction == guard_normal
+      && vigilant) {
+    guard_vigilant (g);
     return false;
   }
 

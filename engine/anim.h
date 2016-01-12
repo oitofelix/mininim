@@ -49,6 +49,11 @@ bool is_anim_fall (struct anim *a);
 void anim_die_suddenly (struct anim *a);
 void anim_die_spiked (struct anim *a);
 void anim_die_chopped (struct anim *a);
+void anim_die (struct anim *a);
+void anim_sword_hit (struct anim *a);
+void anim_fall (struct anim *a);
+void anim_walkf (struct anim *a);
+void anim_walkb (struct anim *a);
 struct coord *splash_coord (struct frame *f, struct coord *c);
 
 

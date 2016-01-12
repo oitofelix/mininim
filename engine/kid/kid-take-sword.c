@@ -130,5 +130,5 @@ physics_out (struct anim *k)
 
   /* depressible floors */
   if (k->i == 3) update_depressible_floor (k, -4, -23);
-  keep_depressible_floor (k);
+  else keep_depressible_floor (k);
 }

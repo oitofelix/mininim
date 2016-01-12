@@ -24,6 +24,9 @@
 
 /* kid actions */
 #include "guard-normal.h"
+#include "guard-vigilant.h"
+#include "guard-hit.h"
+#include "guard-die.h"
 
 /* bitmaps */
 #define GUARD_LIFE "data/life/guard.png"

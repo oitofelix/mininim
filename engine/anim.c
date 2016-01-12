@@ -333,6 +333,56 @@ anim_die_chopped (struct anim *a)
   }
 }
 
+void
+anim_die (struct anim *a)
+{
+  switch (a->type) {
+  case NO_ANIM: default: break;
+  case KID: kid_die (a); break;
+  case GUARD: guard_die (a); break;
+  }
+}
+
+void
+anim_sword_hit (struct anim *a)
+{
+  switch (a->type) {
+  case NO_ANIM: default: break;
+  case KID: kid_sword_hit (a); break;
+  case GUARD: guard_hit (a); break;
+  }
+}
+
+void
+anim_fall (struct anim *a)
+{
+  switch (a->type) {
+  case NO_ANIM: default: break;
+  case KID: kid_fall (a); break;
+  /* case GUARD: guard_fall (a); break; */
+  }
+}
+
+void
+anim_walkf (struct anim *a)
+{
+  switch (a->type) {
+  case NO_ANIM: default: break;
+  case KID: kid_sword_walkf (a); break;
+  /* case GUARD: guard_walkf (a); break; */
+  }
+}
+
+void
+anim_walkb (struct anim *a)
+{
+  switch (a->type) {
+  case NO_ANIM: default: break;
+  case KID: kid_sword_walkb (a); break;
+    /* case GUARD: guard_walkb (a); break; */
+  }
+}
+
 struct coord *
 splash_coord (struct frame *f, struct coord *c)
 {

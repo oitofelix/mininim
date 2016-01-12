@@ -48,6 +48,9 @@ void
 load_guard (void)
 {
   load_guard_normal ();
+  load_guard_vigilant ();
+  load_guard_hit ();
+  load_guard_die ();
 
   /* bitmaps */
   guard_life = load_bitmap (GUARD_LIFE);
@@ -61,6 +64,9 @@ void
 unload_guard (void)
 {
   unload_guard_normal ();
+  unload_guard_vigilant ();
+  unload_guard_hit ();
+  unload_guard_die ();
 
   /* bitmaps */
   al_destroy_bitmap (guard_life);
@@ -107,6 +113,8 @@ v_light_blue_palette (ALLEGRO_COLOR c)
   if (color_eq (c, GUARD_SKIN_COLOR_01)) return V_LIGHT_BLUE_GUARD_SKIN_COLOR_01;
   if (color_eq (c, GUARD_SKIN_COLOR_02)) return V_LIGHT_BLUE_GUARD_SKIN_COLOR_02;
   if (color_eq (c, GUARD_EYES_COLOR)) return V_LIGHT_BLUE_GUARD_EYES_COLOR;
+  if (color_eq (c, GUARD_CLOSED_EYES_COLOR))
+    return V_LIGHT_BLUE_GUARD_CLOSED_EYES_COLOR;
   if (color_eq (c, GUARD_BLOOD_COLOR)) return V_LIGHT_BLUE_GUARD_BLOOD_COLOR;
   if (color_eq (c, GUARD_SPLASH_COLOR)) return V_LIGHT_BLUE_GUARD_SPLASH_COLOR;
   return c;
@@ -127,6 +135,7 @@ v_red_palette (ALLEGRO_COLOR c)
   if (color_eq (c, GUARD_SKIN_COLOR_01)) return V_RED_GUARD_SKIN_COLOR_01;
   if (color_eq (c, GUARD_SKIN_COLOR_02)) return V_RED_GUARD_SKIN_COLOR_02;
   if (color_eq (c, GUARD_EYES_COLOR)) return V_RED_GUARD_EYES_COLOR;
+  if (color_eq (c, GUARD_CLOSED_EYES_COLOR)) return V_RED_GUARD_CLOSED_EYES_COLOR;
   if (color_eq (c, GUARD_BLOOD_COLOR)) return V_RED_GUARD_BLOOD_COLOR;
   if (color_eq (c, GUARD_SPLASH_COLOR)) return V_RED_GUARD_SPLASH_COLOR;
   return c;
@@ -147,6 +156,7 @@ v_orange_palette (ALLEGRO_COLOR c)
   if (color_eq (c, GUARD_SKIN_COLOR_01)) return V_ORANGE_GUARD_SKIN_COLOR_01;
   if (color_eq (c, GUARD_SKIN_COLOR_02)) return V_ORANGE_GUARD_SKIN_COLOR_02;
   if (color_eq (c, GUARD_EYES_COLOR)) return V_ORANGE_GUARD_EYES_COLOR;
+  if (color_eq (c, GUARD_CLOSED_EYES_COLOR)) return V_ORANGE_GUARD_CLOSED_EYES_COLOR;
   if (color_eq (c, GUARD_BLOOD_COLOR)) return V_ORANGE_GUARD_BLOOD_COLOR;
   if (color_eq (c, GUARD_SPLASH_COLOR)) return V_ORANGE_GUARD_SPLASH_COLOR;
   return c;
@@ -167,6 +177,7 @@ v_green_palette (ALLEGRO_COLOR c)
   if (color_eq (c, GUARD_SKIN_COLOR_01)) return V_GREEN_GUARD_SKIN_COLOR_01;
   if (color_eq (c, GUARD_SKIN_COLOR_02)) return V_GREEN_GUARD_SKIN_COLOR_02;
   if (color_eq (c, GUARD_EYES_COLOR)) return V_GREEN_GUARD_EYES_COLOR;
+  if (color_eq (c, GUARD_CLOSED_EYES_COLOR)) return V_GREEN_GUARD_CLOSED_EYES_COLOR;
   if (color_eq (c, GUARD_BLOOD_COLOR)) return V_GREEN_GUARD_BLOOD_COLOR;
   if (color_eq (c, GUARD_SPLASH_COLOR)) return V_GREEN_GUARD_SPLASH_COLOR;
   return c;
@@ -187,6 +198,8 @@ v_dark_blue_palette (ALLEGRO_COLOR c)
   if (color_eq (c, GUARD_SKIN_COLOR_01)) return V_DARK_BLUE_GUARD_SKIN_COLOR_01;
   if (color_eq (c, GUARD_SKIN_COLOR_02)) return V_DARK_BLUE_GUARD_SKIN_COLOR_02;
   if (color_eq (c, GUARD_EYES_COLOR)) return V_DARK_BLUE_GUARD_EYES_COLOR;
+  if (color_eq (c, GUARD_CLOSED_EYES_COLOR))
+    return V_DARK_BLUE_GUARD_CLOSED_EYES_COLOR;
   if (color_eq (c, GUARD_BLOOD_COLOR)) return V_DARK_BLUE_GUARD_BLOOD_COLOR;
   if (color_eq (c, GUARD_SPLASH_COLOR)) return V_DARK_BLUE_GUARD_SPLASH_COLOR;
   return c;
@@ -207,6 +220,7 @@ v_purple_palette (ALLEGRO_COLOR c)
   if (color_eq (c, GUARD_SKIN_COLOR_01)) return V_PURPLE_GUARD_SKIN_COLOR_01;
   if (color_eq (c, GUARD_SKIN_COLOR_02)) return V_PURPLE_GUARD_SKIN_COLOR_02;
   if (color_eq (c, GUARD_EYES_COLOR)) return V_PURPLE_GUARD_EYES_COLOR;
+  if (color_eq (c, GUARD_CLOSED_EYES_COLOR)) return V_PURPLE_GUARD_CLOSED_EYES_COLOR;
   if (color_eq (c, GUARD_BLOOD_COLOR)) return V_PURPLE_GUARD_BLOOD_COLOR;
   if (color_eq (c, GUARD_SPLASH_COLOR)) return V_PURPLE_GUARD_SPLASH_COLOR;
   return c;
@@ -227,6 +241,7 @@ v_yellow_palette (ALLEGRO_COLOR c)
   if (color_eq (c, GUARD_SKIN_COLOR_01)) return V_YELLOW_GUARD_SKIN_COLOR_01;
   if (color_eq (c, GUARD_SKIN_COLOR_02)) return V_YELLOW_GUARD_SKIN_COLOR_02;
   if (color_eq (c, GUARD_EYES_COLOR)) return V_YELLOW_GUARD_EYES_COLOR;
+  if (color_eq (c, GUARD_CLOSED_EYES_COLOR)) return V_YELLOW_GUARD_CLOSED_EYES_COLOR;
   if (color_eq (c, GUARD_BLOOD_COLOR)) return V_YELLOW_GUARD_BLOOD_COLOR;
   if (color_eq (c, GUARD_SPLASH_COLOR)) return V_YELLOW_GUARD_SPLASH_COLOR;
   return c;
@@ -247,6 +262,7 @@ e_red_palette (ALLEGRO_COLOR c)
   if (color_eq (c, GUARD_SKIN_COLOR_01)) return E_RED_GUARD_SKIN_COLOR_01;
   if (color_eq (c, GUARD_SKIN_COLOR_02)) return E_RED_GUARD_SKIN_COLOR_02;
   if (color_eq (c, GUARD_EYES_COLOR)) return E_RED_GUARD_EYES_COLOR;
+  if (color_eq (c, GUARD_CLOSED_EYES_COLOR)) return E_RED_GUARD_CLOSED_EYES_COLOR;
   if (color_eq (c, GUARD_BLOOD_COLOR)) return E_RED_GUARD_BLOOD_COLOR;
   if (color_eq (c, GUARD_SPLASH_COLOR)) return E_RED_GUARD_SPLASH_COLOR;
   return c;
@@ -267,6 +283,7 @@ e_green_palette (ALLEGRO_COLOR c)
   if (color_eq (c, GUARD_SKIN_COLOR_01)) return E_GREEN_GUARD_SKIN_COLOR_01;
   if (color_eq (c, GUARD_SKIN_COLOR_02)) return E_GREEN_GUARD_SKIN_COLOR_02;
   if (color_eq (c, GUARD_EYES_COLOR)) return E_GREEN_GUARD_EYES_COLOR;
+  if (color_eq (c, GUARD_CLOSED_EYES_COLOR)) return E_GREEN_GUARD_CLOSED_EYES_COLOR;
   if (color_eq (c, GUARD_BLOOD_COLOR)) return E_GREEN_GUARD_BLOOD_COLOR;
   if (color_eq (c, GUARD_SPLASH_COLOR)) return E_GREEN_GUARD_SPLASH_COLOR;
   return c;
@@ -287,6 +304,7 @@ c_red_palette (ALLEGRO_COLOR c)
   if (color_eq (c, GUARD_SKIN_COLOR_01)) return C_RED_GUARD_SKIN_COLOR_01;
   if (color_eq (c, GUARD_SKIN_COLOR_02)) return C_RED_GUARD_SKIN_COLOR_02;
   if (color_eq (c, GUARD_EYES_COLOR)) return C_RED_GUARD_EYES_COLOR;
+  if (color_eq (c, GUARD_CLOSED_EYES_COLOR)) return C_RED_GUARD_CLOSED_EYES_COLOR;
   if (color_eq (c, GUARD_BLOOD_COLOR)) return C_RED_GUARD_BLOOD_COLOR;
   if (color_eq (c, GUARD_SPLASH_COLOR)) return C_RED_GUARD_SPLASH_COLOR;
   return c;

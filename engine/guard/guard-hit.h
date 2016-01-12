@@ -1,5 +1,5 @@
 /*
-  guard-normal.h -- guard normal module;
+  guard-hit.h -- guard hit module;
 
   Copyright (C) 2015, 2016 Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
 
@@ -17,16 +17,24 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MININIM_GUARD_NORMAL_H
-#define MININIM_GUARD_NORMAL_H
+#ifndef MININIM_GUARD_HIT_H
+#define MININIM_GUARD_HIT_H
 
 /* bitmaps */
-#define GUARD_NORMAL_00 "data/guard/normal/00.png"
+#define GUARD_HIT_01 "data/guard/hit/01.png"
+#define GUARD_HIT_02 "data/guard/hit/02.png"
+#define GUARD_HIT_03 "data/guard/hit/03.png"
+#define GUARD_HIT_04 "data/guard/hit/04.png"
+#define GUARD_HIT_05 "data/guard/hit/05.png"
 
-void load_guard_normal (void);
-void unload_guard_normal (void);
-void guard_normal (struct anim *g);
+#define GUARD_HIT_FRAMESET_NMEMB 5
+extern struct frameset guard_hit_frameset[GUARD_HIT_FRAMESET_NMEMB];
 
-ALLEGRO_BITMAP *guard_normal_00;
+void load_guard_hit (void);
+void unload_guard_hit (void);
+void guard_hit (struct anim *k);
 
-#endif	/* MININIM_GUARD_NORMAL_H */
+extern ALLEGRO_BITMAP *guard_hit_01, *guard_hit_02,
+  *guard_hit_03, *guard_hit_04, *guard_hit_05;
+
+#endif	/* MININIM_GUARD_HIT_H */

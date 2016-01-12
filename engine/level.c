@@ -203,9 +203,12 @@ compute_level (void)
     if (a->type == GUARD
         || (a->type == KID && a->shadow_of == 0 && ! a->controllable))
       fight_ai (a, k);
-    a->action (a);
-    if (a->type != MOUSE) fight_mechanics (a);
   }
+
+  for (i = 0; i < anima_nmemb; i++) anima[i].action (&anima[i]);
+
+  for (i = 0; i < anima_nmemb; i++)
+    if (anima[i].type != MOUSE) fight_mechanics (&anima[i]);
 
   clear_anims_keyboard_state ();
 
@@ -495,12 +498,10 @@ process_keys (void)
 static void
 draw_level (void)
 {
-  struct anim *current_kid = get_anim_by_id (current_kid_id);
-
   if (pause_game) {
     draw_bottom_text (NULL, "GAME PAUSED");
     clear_bitmap (uscreen, TRANSPARENT_COLOR);
-    draw_kid_lives (uscreen, current_kid, vm);
+    draw_kid_lives (uscreen, get_anim_by_id (current_kid_id), vm);
     draw_bottom_text (uscreen, NULL);
     return;
   }
@@ -547,7 +548,7 @@ draw_level (void)
   unpress_closer_floors ();
   uncross_mirrors ();
 
-  draw_kid_lives (uscreen, current_kid, vm);
+  draw_kid_lives (uscreen, get_anim_by_id (current_kid_id), vm);
 
   /* automatic remaining time display */
   int rem_time = 60 - al_get_timer_count (play_time);

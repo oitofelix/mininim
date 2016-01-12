@@ -1,5 +1,5 @@
 /*
-  guard-normal.h -- guard normal module;
+  guard-vigilant.h -- guard vigilant module;
 
   Copyright (C) 2015, 2016 Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
 
@@ -17,16 +17,22 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MININIM_GUARD_NORMAL_H
-#define MININIM_GUARD_NORMAL_H
+#ifndef MININIM_GUARD_VIGILANT_H
+#define MININIM_GUARD_VIGILANT_H
 
 /* bitmaps */
-#define GUARD_NORMAL_00 "data/guard/normal/00.png"
+#define GUARD_VIGILANT_01 "data/guard/vigilant/01.png"
+#define GUARD_VIGILANT_02 "data/guard/vigilant/02.png"
+#define GUARD_VIGILANT_03 "data/guard/vigilant/03.png"
 
-void load_guard_normal (void);
-void unload_guard_normal (void);
-void guard_normal (struct anim *g);
+#define GUARD_VIGILANT_FRAMESET_NMEMB 3
+extern struct frameset guard_vigilant_frameset[GUARD_VIGILANT_FRAMESET_NMEMB];
 
-ALLEGRO_BITMAP *guard_normal_00;
+void load_guard_vigilant (void);
+void unload_guard_vigilant (void);
+void guard_vigilant (struct anim *k);
 
-#endif	/* MININIM_GUARD_NORMAL_H */
+extern ALLEGRO_BITMAP *guard_vigilant_01, *guard_vigilant_02,
+  *guard_vigilant_03;
+
+#endif	/* MININIM_GUARD_VIGILANT_H */

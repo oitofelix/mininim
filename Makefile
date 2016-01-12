@@ -13,7 +13,7 @@ KID_MODULES = kid kid-normal kid-walk kid-start-run kid-run						\
   kid-raise-sword kid-keep-sword kid-take-sword kid-sword-normal			\
   kid-sword-walkf kid-sword-walkb kid-sword-defense kid-sword-attack	\
   kid-sword-hit kid-die kid-stairs
-GUARD_MODULES = guard guard-normal
+GUARD_MODULES = guard guard-normal guard-vigilant guard-hit guard-die
 LEVEL_MODULES = title level-1 consistency-level legacy-level
 MAIN_MODULES = prince
 
