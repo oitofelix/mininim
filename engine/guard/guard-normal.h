@@ -20,13 +20,17 @@
 #ifndef MININIM_GUARD_NORMAL_H
 #define MININIM_GUARD_NORMAL_H
 
-/* bitmaps */
+/* guard */
 #define GUARD_NORMAL_00 "data/guard/normal/00.png"
+
+/* fat guard */
+#define FAT_GUARD_NORMAL_00 "data/fat-guard/normal/00.png"
 
 void load_guard_normal (void);
 void unload_guard_normal (void);
 void guard_normal (struct anim *g);
+ALLEGRO_BITMAP *get_guard_normal_bitmap (enum anim_type t);
 
-ALLEGRO_BITMAP *guard_normal_00;
+ALLEGRO_BITMAP *guard_normal_00, *fat_guard_normal_00;
 
 #endif	/* MININIM_GUARD_NORMAL_H */

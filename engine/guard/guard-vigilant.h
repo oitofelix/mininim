@@ -20,19 +20,29 @@
 #ifndef MININIM_GUARD_VIGILANT_H
 #define MININIM_GUARD_VIGILANT_H
 
-/* bitmaps */
+/* guard */
 #define GUARD_VIGILANT_01 "data/guard/vigilant/01.png"
 #define GUARD_VIGILANT_02 "data/guard/vigilant/02.png"
 #define GUARD_VIGILANT_03 "data/guard/vigilant/03.png"
 
+/* fat guard */
+#define FAT_GUARD_VIGILANT_01 "data/fat-guard/vigilant/01.png"
+#define FAT_GUARD_VIGILANT_02 "data/fat-guard/vigilant/02.png"
+#define FAT_GUARD_VIGILANT_03 "data/fat-guard/vigilant/03.png"
+
 #define GUARD_VIGILANT_FRAMESET_NMEMB 3
 extern struct frameset guard_vigilant_frameset[GUARD_VIGILANT_FRAMESET_NMEMB];
+extern struct frameset fat_guard_vigilant_frameset[GUARD_VIGILANT_FRAMESET_NMEMB];
 
 void load_guard_vigilant (void);
 void unload_guard_vigilant (void);
 void guard_vigilant (struct anim *k);
+struct frameset *get_guard_vigilant_frameset (enum anim_type t);
 
 extern ALLEGRO_BITMAP *guard_vigilant_01, *guard_vigilant_02,
   *guard_vigilant_03;
+
+extern ALLEGRO_BITMAP *fat_guard_vigilant_01, *fat_guard_vigilant_02,
+  *fat_guard_vigilant_03;
 
 #endif	/* MININIM_GUARD_VIGILANT_H */

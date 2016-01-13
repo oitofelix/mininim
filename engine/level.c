@@ -200,7 +200,7 @@ compute_level (void)
 
   for (i = 0; i < anima_nmemb; i++) {
     struct anim *a = &anima[i];
-    if ((a->type == GUARD
+    if ((is_guard (a)
          || (a->type == KID && ! a->controllable))
         && a->fight)
       fight_ai (a, k);

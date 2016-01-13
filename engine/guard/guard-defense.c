@@ -31,13 +31,19 @@
 #include "guard.h"
 
 struct frameset guard_defense_frameset[GUARD_DEFENSE_FRAMESET_NMEMB];
+struct frameset fat_guard_defense_frameset[GUARD_DEFENSE_FRAMESET_NMEMB];
 
 static void init_guard_defense_frameset (void);
+static void init_fat_guard_defense_frameset (void);
 static bool flow (struct anim *g);
 static bool physics_in (struct anim *g);
 static void physics_out (struct anim *g);
 
+/* guard */
 ALLEGRO_BITMAP *guard_defense_01, *guard_defense_counter_attack;
+
+/* fat guard */
+ALLEGRO_BITMAP *fat_guard_defense_01, *fat_guard_defense_counter_attack;
 
 static void
 init_guard_defense_frameset (void)
@@ -49,22 +55,51 @@ init_guard_defense_frameset (void)
           GUARD_DEFENSE_FRAMESET_NMEMB * sizeof (struct frameset));
 }
 
+static void
+init_fat_guard_defense_frameset (void)
+{
+  struct frameset frameset[GUARD_DEFENSE_FRAMESET_NMEMB] =
+    {{fat_guard_defense_01,+0,0},{fat_guard_defense_counter_attack,+0,0}};
+
+  memcpy (&fat_guard_defense_frameset, &frameset,
+          GUARD_DEFENSE_FRAMESET_NMEMB * sizeof (struct frameset));
+}
+
+struct frameset *
+get_guard_defense_frameset (enum anim_type t)
+{
+  switch (t) {
+  case GUARD: default: return guard_defense_frameset;
+  case FAT_GUARD: return fat_guard_defense_frameset;
+  }
+}
+
 void
 load_guard_defense (void)
 {
-  /* bitmaps */
+  /* guard */
   guard_defense_01 = load_bitmap (GUARD_DEFENSE_01);
   guard_defense_counter_attack = load_bitmap (GUARD_DEFENSE_COUNTER_ATTACK);
 
+  /* fat guard */
+  fat_guard_defense_01 = load_bitmap (FAT_GUARD_DEFENSE_01);
+  fat_guard_defense_counter_attack = load_bitmap (FAT_GUARD_DEFENSE_COUNTER_ATTACK);
+
   /* frameset */
   init_guard_defense_frameset ();
+  init_fat_guard_defense_frameset ();
 }
 
 void
 unload_guard_defense (void)
 {
+  /* guard */
   al_destroy_bitmap (guard_defense_01);
   al_destroy_bitmap (guard_defense_counter_attack);
+
+  /* fat_guard */
+  al_destroy_bitmap (fat_guard_defense_01);
+  al_destroy_bitmap (fat_guard_defense_counter_attack);
 }
 
 void
@@ -98,7 +133,8 @@ flow (struct anim *g)
     return false;
   }
 
-  select_frame (g, guard_defense_frameset, g->i + 1);
+  struct frameset *frameset = get_guard_defense_frameset (g->type);
+  select_frame (g, frameset, g->i + 1);
 
   if (g->i == 0) g->j = 11;
 

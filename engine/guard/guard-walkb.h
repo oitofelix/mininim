@@ -20,17 +20,27 @@
 #ifndef MININIM_GUARD_WALKB_H
 #define MININIM_GUARD_WALKB_H
 
-/* bitmaps */
+/* guard */
 #define GUARD_WALKB_01 "data/guard/walkb/01.png"
 #define GUARD_WALKB_02 "data/guard/walkb/02.png"
 
+/* fat guard */
+#define FAT_GUARD_WALKB_01 "data/fat-guard/walkb/01.png"
+#define FAT_GUARD_WALKB_02 "data/fat-guard/walkb/02.png"
+
 #define GUARD_WALKB_FRAMESET_NMEMB 2
 extern struct frameset guard_walkb_frameset[GUARD_WALKB_FRAMESET_NMEMB];
+extern struct frameset fat_guard_walkb_frameset[GUARD_WALKB_FRAMESET_NMEMB];
 
 void load_guard_walkb (void);
 void unload_guard_walkb (void);
 void guard_walkb (struct anim *k);
+struct frameset *get_guard_walkb_frameset (enum anim_type t);
 
+/* guard */
 ALLEGRO_BITMAP *guard_walkb_01, *guard_walkb_02;
+
+/* fat guard */
+ALLEGRO_BITMAP *fat_guard_walkb_01, *fat_guard_walkb_02;
 
 #endif	/* MININIM_GUARD_WALKB_H */

@@ -133,14 +133,16 @@ start (void)
     case NO_ANIM: continue;
     case KID:
       id = create_anim (NULL, KID, &g->p, g->dir);
-      a = &anima[id];
-      a->shadow = true;
+      anima[id].shadow = true;
       break;
-    case GUARD: default:
-      id = create_anim (NULL, GUARD, &g->p, g->dir);
-      a = &anima[id];
+    /* case GUARD: default: */
+    /*   id = create_anim (NULL, GUARD, &g->p, g->dir); */
+    /*   break; */
+    case FAT_GUARD: default:
+      id = create_anim (NULL, FAT_GUARD, &g->p, g->dir);
       break;
     }
+    a = &anima[id];
     a->has_sword = true;
     a->skill = g->skill;
     a->total_lives = g->total_lives;
@@ -444,8 +446,8 @@ special_events (void)
         al_destroy_timer (mouse_timer);
         mouse_timer = NULL;
         mouse_id = create_anim (NULL, MOUSE, &mouse_pos, RIGHT);
-        m->f.flip = ALLEGRO_FLIP_HORIZONTAL;
         m = &anima[mouse_id];
+        m->f.flip = ALLEGRO_FLIP_HORIZONTAL;
       }
     }
 

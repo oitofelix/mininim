@@ -34,18 +34,29 @@ static bool flow (struct anim *g);
 static bool physics_in (struct anim *g);
 static void physics_out (struct anim *g);
 
-ALLEGRO_BITMAP *guard_normal_00;
+ALLEGRO_BITMAP *guard_normal_00, *fat_guard_normal_00;
+
+ALLEGRO_BITMAP *
+get_guard_normal_bitmap (enum anim_type t)
+{
+  switch (t) {
+  case GUARD: default: return guard_normal_00;
+  case FAT_GUARD: return fat_guard_normal_00;
+  }
+}
 
 void
 load_guard_normal (void)
 {
   guard_normal_00 = load_bitmap (GUARD_NORMAL_00);
+  fat_guard_normal_00 = load_bitmap (FAT_GUARD_NORMAL_00);
 }
 
 void
 unload_guard_normal (void)
 {
   al_destroy_bitmap (guard_normal_00);
+  al_destroy_bitmap (fat_guard_normal_00);
 }
 
 void
@@ -83,7 +94,7 @@ flow (struct anim *g)
     return false;
   }
 
-  g->fo.b = guard_normal_00;
+  g->fo.b = get_guard_normal_bitmap (g->type);
   g->fo.dx = g->fo.dy = +0;
 
   select_xframe (&g->xf, sword_frameset, 30);

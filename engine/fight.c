@@ -356,19 +356,23 @@ is_at_defendable_attack_frame (struct anim *k)
   return k->fo.b == kid_sword_attack_03
     || k->fo.b == kid_sword_attack_04
     || k->fo.b == guard_attack_04
-    || k->fo.b == guard_attack_05;
+    || k->fo.b == guard_attack_05
+    || k->fo.b == fat_guard_attack_04
+    || k->fo.b == fat_guard_attack_05;
 }
 
 bool
 is_at_hit_frame (struct anim *k)
 {
   return k->fo.b == kid_sword_attack_04
-    || k->fo.b == guard_attack_05;
+    || k->fo.b == guard_attack_05
+    || k->fo.b == fat_guard_attack_05;
 }
 
 void
 put_at_defense_frame (struct anim *k)
 {
+  struct frameset *frameset;
   play_sample (sword_defense_sample, k->f.c.room);
 
   switch (k->type) {
@@ -390,7 +394,9 @@ put_at_defense_frame (struct anim *k)
     next_frame (&k->f, &k->f, &k->fo);
     break;
   case GUARD:
-    select_frame (k, guard_defense_frameset, 0);
+  case FAT_GUARD:
+    frameset = get_guard_defense_frameset (k->type);
+    select_frame (k, frameset, 0);
     select_xframe (&k->xf, sword_frameset, 11);
     k->action = guard_defense;
     next_frame (&k->f, &k->f, &k->fo);
@@ -428,16 +434,8 @@ put_at_attack_frame (struct anim *k)
     next_frame (&k->f, &k->f, &k->fo);
     break;
   case GUARD:
-    /* k->f = k->of; */
-    /* select_frame (k, guard_attack_frameset, 0); */
-    /* next_frame (&k->f, &k->f, &k->fo); */
-    /* select_frame (k, guard_attack_frameset, 1); */
-    /* next_frame (&k->f, &k->f, &k->fo); */
-    /* select_frame (k, guard_attack_frameset, 2); */
-    /* next_frame (&k->f, &k->f, &k->fo); */
-    /* select_frame (k, guard_attack_frameset, 3); */
-
-    k->fo.b = guard_attack_defended;
+  case FAT_GUARD:
+    k->fo.b = get_guard_attack_defended_bitmap (k->type);
     k->fo.dx = +1;
     k->fo.dy = 0;
 

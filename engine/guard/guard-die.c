@@ -32,14 +32,21 @@
 #include "guard.h"
 
 struct frameset guard_die_frameset[GUARD_DIE_FRAMESET_NMEMB];
+struct frameset fat_guard_die_frameset[GUARD_DIE_FRAMESET_NMEMB];
 
 static void init_guard_die_frameset (void);
+static void init_fat_guard_die_frameset (void);
 static bool flow (struct anim *g);
 static bool physics_in (struct anim *g);
 static void physics_out (struct anim *g);
 
+/* guard */
 ALLEGRO_BITMAP *guard_die_01, *guard_die_02, *guard_die_03, *guard_die_04,
   *guard_die_05, *guard_die_06, *guard_die_spiked_00, *guard_die_chopped_00;
+
+/* fat guard */
+ALLEGRO_BITMAP *fat_guard_die_01, *fat_guard_die_02, *fat_guard_die_03,
+  *fat_guard_die_04, *fat_guard_die_05, *fat_guard_die_06;
 
 static void
 init_guard_die_frameset (void)
@@ -52,10 +59,30 @@ init_guard_die_frameset (void)
           GUARD_DIE_FRAMESET_NMEMB * sizeof (struct frameset));
 }
 
+static void
+init_fat_guard_die_frameset (void)
+{
+  struct frameset frameset[GUARD_DIE_FRAMESET_NMEMB] =
+    {{fat_guard_die_01,-1,0},{fat_guard_die_02,+0,0},{fat_guard_die_03,-3,+1},
+     {fat_guard_die_04,-2,+2},{fat_guard_die_05,+0,+0},{fat_guard_die_06,+0,+0}};
+
+  memcpy (&fat_guard_die_frameset, &frameset,
+          GUARD_DIE_FRAMESET_NMEMB * sizeof (struct frameset));
+}
+
+struct frameset *
+get_guard_die_frameset (enum anim_type t)
+{
+  switch (t) {
+  case GUARD: default: return guard_die_frameset;
+  case FAT_GUARD: return fat_guard_die_frameset;
+  }
+}
+
 void
 load_guard_die (void)
 {
-  /* bitmaps */
+  /* guard */
   guard_die_01 = load_bitmap (GUARD_DIE_01);
   guard_die_02 = load_bitmap (GUARD_DIE_02);
   guard_die_03 = load_bitmap (GUARD_DIE_03);
@@ -65,13 +92,23 @@ load_guard_die (void)
   guard_die_spiked_00 = load_bitmap (GUARD_DIE_SPIKED_00);
   guard_die_chopped_00 = load_bitmap (GUARD_DIE_CHOPPED_00);
 
+  /* fat guard */
+  fat_guard_die_01 = load_bitmap (FAT_GUARD_DIE_01);
+  fat_guard_die_02 = load_bitmap (FAT_GUARD_DIE_02);
+  fat_guard_die_03 = load_bitmap (FAT_GUARD_DIE_03);
+  fat_guard_die_04 = load_bitmap (FAT_GUARD_DIE_04);
+  fat_guard_die_05 = load_bitmap (FAT_GUARD_DIE_05);
+  fat_guard_die_06 = load_bitmap (FAT_GUARD_DIE_06);
+
   /* frameset */
   init_guard_die_frameset ();
+  init_fat_guard_die_frameset ();
 }
 
 void
 unload_guard_die (void)
 {
+  /* guard */
   al_destroy_bitmap (guard_die_01);
   al_destroy_bitmap (guard_die_02);
   al_destroy_bitmap (guard_die_03);
@@ -80,6 +117,14 @@ unload_guard_die (void)
   al_destroy_bitmap (guard_die_06);
   al_destroy_bitmap (guard_die_spiked_00);
   al_destroy_bitmap (guard_die_chopped_00);
+
+  /* fat guard */
+  al_destroy_bitmap (fat_guard_die_01);
+  al_destroy_bitmap (fat_guard_die_02);
+  al_destroy_bitmap (fat_guard_die_03);
+  al_destroy_bitmap (fat_guard_die_04);
+  al_destroy_bitmap (fat_guard_die_05);
+  al_destroy_bitmap (fat_guard_die_06);
 }
 
 void
@@ -136,8 +181,10 @@ guard_die_suddenly (struct anim *g)
 
   g->current_lives = 0;
 
+  struct frameset *frameset = get_guard_die_frameset (g->type);
+
   if (g->oaction != guard_die_suddenly)
-    place_frame (&g->f, &g->f, guard_die_06,
+    place_frame (&g->f, &g->f, frameset[5].frame,
                  &g->p, (g->f.dir == LEFT)
                  ? +9 : +4, +47);
 
@@ -185,7 +232,8 @@ flow (struct anim *g)
 
   g->i = g->i < 5 ? g->i + 1 : 5;
 
-  select_frame (g, guard_die_frameset, g->i);
+  struct frameset *frameset = get_guard_die_frameset (g->type);
+  select_frame (g, frameset, g->i);
 
   if (g->j >= 1) g->fo.dx = g->fo.dy = 0;
   if (g->i == 5) g->j = 1;
@@ -226,11 +274,17 @@ bool
 is_guard_dead (struct frame *f)
 {
   int i;
+
+  /* guard */
   for (i = 0; i < GUARD_DIE_FRAMESET_NMEMB; i++)
     if (f->b == guard_die_frameset[i].frame) return true;
 
   if (f->b == guard_die_spiked_00) return true;
   if (f->b == guard_die_chopped_00) return true;
+
+  /* fat guard */
+  for (i = 0; i < GUARD_DIE_FRAMESET_NMEMB; i++)
+    if (f->b == fat_guard_die_frameset[i].frame) return true;
 
   return false;
 }

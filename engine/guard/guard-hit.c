@@ -29,14 +29,21 @@
 #include "guard.h"
 
 struct frameset guard_hit_frameset[GUARD_HIT_FRAMESET_NMEMB];
+struct frameset fat_guard_hit_frameset[GUARD_HIT_FRAMESET_NMEMB];
 
 static void init_guard_hit_frameset (void);
+static void init_fat_guard_hit_frameset (void);
 static bool flow (struct anim *g);
 static bool physics_in (struct anim *g);
 static void physics_out (struct anim *g);
 
+/* guard */
 ALLEGRO_BITMAP *guard_hit_01, *guard_hit_02,
   *guard_hit_03, *guard_hit_04, *guard_hit_05;
+
+/* fat guard */
+ALLEGRO_BITMAP *fat_guard_hit_01, *fat_guard_hit_02,
+  *fat_guard_hit_03, *fat_guard_hit_04, *fat_guard_hit_05;
 
 static void
 init_guard_hit_frameset (void)
@@ -50,28 +57,65 @@ init_guard_hit_frameset (void)
           GUARD_HIT_FRAMESET_NMEMB * sizeof (struct frameset));
 }
 
+static void
+init_fat_guard_hit_frameset (void)
+{
+  struct frameset frameset[GUARD_HIT_FRAMESET_NMEMB] =
+    {{fat_guard_hit_01,+0,0},{fat_guard_hit_02,+0,0},
+     {fat_guard_hit_03,+4,0},{fat_guard_hit_04,+8,0},
+     {fat_guard_hit_05,+8,0}};
+
+  memcpy (&fat_guard_hit_frameset, &frameset,
+          GUARD_HIT_FRAMESET_NMEMB * sizeof (struct frameset));
+}
+
+struct frameset *
+get_guard_hit_frameset (enum anim_type t)
+{
+  switch (t) {
+  case GUARD: default: return guard_hit_frameset;
+  case FAT_GUARD: return fat_guard_hit_frameset;
+  }
+}
+
 void
 load_guard_hit (void)
 {
-  /* bitmaps */
+  /* guard */
   guard_hit_01 = load_bitmap (GUARD_HIT_01);
   guard_hit_02 = load_bitmap (GUARD_HIT_02);
   guard_hit_03 = load_bitmap (GUARD_HIT_03);
   guard_hit_04 = load_bitmap (GUARD_HIT_04);
   guard_hit_05 = load_bitmap (GUARD_HIT_05);
 
+  /* fat guard */
+  fat_guard_hit_01 = load_bitmap (FAT_GUARD_HIT_01);
+  fat_guard_hit_02 = load_bitmap (FAT_GUARD_HIT_02);
+  fat_guard_hit_03 = load_bitmap (FAT_GUARD_HIT_03);
+  fat_guard_hit_04 = load_bitmap (FAT_GUARD_HIT_04);
+  fat_guard_hit_05 = load_bitmap (FAT_GUARD_HIT_05);
+
   /* frameset */
   init_guard_hit_frameset ();
+  init_fat_guard_hit_frameset ();
 }
 
 void
 unload_guard_hit (void)
 {
+  /* guard */
   al_destroy_bitmap (guard_hit_01);
   al_destroy_bitmap (guard_hit_02);
   al_destroy_bitmap (guard_hit_03);
   al_destroy_bitmap (guard_hit_04);
   al_destroy_bitmap (guard_hit_05);
+
+  /* fat guard */
+  al_destroy_bitmap (fat_guard_hit_01);
+  al_destroy_bitmap (fat_guard_hit_02);
+  al_destroy_bitmap (fat_guard_hit_03);
+  al_destroy_bitmap (fat_guard_hit_04);
+  al_destroy_bitmap (fat_guard_hit_05);
 }
 
 void
@@ -100,7 +144,8 @@ flow (struct anim *g)
     return false;
   }
 
-  select_frame (g, guard_hit_frameset, g->i + 1);
+  struct frameset *frameset = get_guard_hit_frameset (g->type);
+  select_frame (g, frameset, g->i + 1);
 
   if (g->i == 0) g->j = 28;
   if (g->i == 1) g->j = 32;

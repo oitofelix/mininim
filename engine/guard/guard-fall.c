@@ -31,14 +31,20 @@
 #include "guard.h"
 
 struct frameset guard_fall_frameset[GUARD_FALL_FRAMESET_NMEMB];
+struct frameset fat_guard_fall_frameset[GUARD_FALL_FRAMESET_NMEMB];
 
 static void init_guard_fall_frameset (void);
+static void init_fat_guard_fall_frameset (void);
 static bool flow (struct anim *g);
 static bool physics_in (struct anim *g);
 static void physics_out (struct anim *g);
 static void place_in_initial_fall (struct anim *g);
 
+/* guard */
 ALLEGRO_BITMAP *guard_fall_01, *guard_fall_02, *guard_fall_03;
+
+/* fat guard */
+ALLEGRO_BITMAP *fat_guard_fall_01, *fat_guard_fall_02, *fat_guard_fall_03;
 
 static void
 init_guard_fall_frameset (void)
@@ -50,24 +56,55 @@ init_guard_fall_frameset (void)
           GUARD_FALL_FRAMESET_NMEMB * sizeof (struct frameset));
 }
 
+static void
+init_fat_guard_fall_frameset (void)
+{
+  struct frameset frameset[GUARD_FALL_FRAMESET_NMEMB] =
+    {{fat_guard_fall_01,+0,+0},{fat_guard_fall_02,+0,+5},{fat_guard_fall_03,+0,+10}};
+
+  memcpy (&fat_guard_fall_frameset, &frameset,
+          GUARD_FALL_FRAMESET_NMEMB * sizeof (struct frameset));
+}
+
+struct frameset *
+get_guard_fall_frameset (enum anim_type t)
+{
+  switch (t) {
+  case GUARD: default: return guard_fall_frameset;
+  case FAT_GUARD: return fat_guard_fall_frameset;
+  }
+}
+
 void
 load_guard_fall (void)
 {
-  /* bitmaps */
+  /* guard */
   guard_fall_01 = load_bitmap (GUARD_FALL_01);
   guard_fall_02 = load_bitmap (GUARD_FALL_02);
   guard_fall_03 = load_bitmap (GUARD_FALL_03);
 
+  /* fat guard */
+  fat_guard_fall_01 = load_bitmap (FAT_GUARD_FALL_01);
+  fat_guard_fall_02 = load_bitmap (FAT_GUARD_FALL_02);
+  fat_guard_fall_03 = load_bitmap (FAT_GUARD_FALL_03);
+
   /* frameset */
   init_guard_fall_frameset ();
+  init_fat_guard_fall_frameset ();
 }
 
 void
 unload_guard_fall (void)
 {
+  /* guard */
   al_destroy_bitmap (guard_fall_01);
   al_destroy_bitmap (guard_fall_02);
   al_destroy_bitmap (guard_fall_03);
+
+  /* fat guard */
+  al_destroy_bitmap (fat_guard_fall_01);
+  al_destroy_bitmap (fat_guard_fall_02);
+  al_destroy_bitmap (fat_guard_fall_03);
 }
 
 void
@@ -90,9 +127,11 @@ flow (struct anim *g)
 
   g->i++;
 
-  g->fo.b = guard_fall_frameset[g->i > 2 ? 2 : g->i].frame;
-  g->fo.dx = guard_fall_frameset[g->i > 2 ? 2 : g->i].dx;
-  g->fo.dy = guard_fall_frameset[g->i > 2 ? 2 : g->i].dy;
+  struct frameset *frameset = get_guard_fall_frameset (g->type);
+
+  g->fo.b = frameset[g->i > 2 ? 2 : g->i].frame;
+  g->fo.dx = frameset[g->i > 2 ? 2 : g->i].dx;
+  g->fo.dy = frameset[g->i > 2 ? 2 : g->i].dy;
 
   if (g->i == 0) g->j = 28;
   if (g->i == 1) g->j = 32;
@@ -138,9 +177,10 @@ physics_in (struct anim *g)
   }
 
   /* land on ground */
-  fo.b = guard_fall_frameset[g->i > 2 ? 2 : g->i].frame;
-  fo.dx = guard_fall_frameset[g->i > 2 ? 2 : g->i].dx;
-  fo.dy = guard_fall_frameset[g->i > 2 ? 2 : g->i].dy;
+  struct frameset *frameset = get_guard_fall_frameset (g->type);
+  fo.b = frameset[g->i > 2 ? 2 : g->i].frame;
+  fo.dx = frameset[g->i > 2 ? 2 : g->i].dx;
+  fo.dy = frameset[g->i > 2 ? 2 : g->i].dy;
 
   if (g->i > 0) g->fo.dx = -g->inertia;
   if (g->i > 2) {
@@ -167,12 +207,13 @@ physics_in (struct anim *g)
 
     survey (_bf, pos, &g->f, &nc, &pbf, &np);
     /* pos2view (&pbf, &pbf); */
-    g->fo.b = guard_vigilant_frameset[0].frame;
+    frameset = get_guard_vigilant_frameset (g->type);
+    g->fo.b = frameset[0].frame;
     g->fo.dx = g->fo.dy = 0;
     g->f.c.room = pbf.room;
     g->f.c.x += (g->f.dir == LEFT) ? -6 : +6;
     g->f.c.y = PLACE_HEIGHT * pbf.floor + 27;
-    g->f.b = guard_vigilant_frameset[0].frame;
+    g->f.b = frameset[0].frame;
 
     shake_loose_floor_row (&pbf);
 
@@ -227,9 +268,17 @@ physics_out (struct anim *g)
 bool
 is_guard_fall (struct frame *f)
 {
-  return f->b == guard_fall_01
-    || f->b == guard_fall_02
-    || f->b == guard_fall_03;
+  int i;
+
+  /* guard */
+  for (i = 0; i < GUARD_FALL_FRAMESET_NMEMB; i++)
+    if (f->b == guard_fall_frameset[i].frame) return true;
+
+  /* fat guard */
+  for (i = 0; i < GUARD_FALL_FRAMESET_NMEMB; i++)
+    if (f->b == fat_guard_fall_frameset[i].frame) return true;
+
+  return false;
 }
 
 static void
@@ -251,8 +300,10 @@ place_in_initial_fall (struct anim *g)
   else if (is_strictly_traversable (&pmtf)) fall_pos = pmtf;
   else if (is_strictly_traversable (&pmtb)) fall_pos = pmtb;
 
+  struct frameset *frameset = get_guard_fall_frameset (g->type);
+
   if (fall_pos.room != - 1)
-    place_frame (&g->f, &g->f, guard_fall_frameset[0].frame,
+    place_frame (&g->f, &g->f, frameset[0].frame,
                  &fall_pos,
                  (g->f.dir == LEFT) ? PLACE_WIDTH - 12 : +6,
                  (g->f.dir == LEFT) ? 23 : 27);

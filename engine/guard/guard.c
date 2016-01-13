@@ -90,8 +90,17 @@ struct anim *
 create_guard (struct anim *g0, struct anim *g1, struct pos *p, enum dir dir)
 {
   if (! g0) {
-    g1->f.b = guard_normal_00;
-    g1->fo.b = guard_normal_00;
+    switch (g1->type) {
+    case GUARD: default:
+      g1->f.b = guard_normal_00;
+      g1->fo.b = guard_normal_00;
+      break;
+    case FAT_GUARD:
+      g1->f.b = fat_guard_normal_00;
+      g1->fo.b = fat_guard_normal_00;
+      break;
+    }
+
     g1->action = guard_normal;
     g1->total_lives = 3;
     g1->current_lives = 3;
@@ -386,4 +395,13 @@ draw_guard_frame (ALLEGRO_BITMAP *bitmap, struct anim *g, enum vm vm)
     if (hgc) splash = apply_palette (splash, hgc_palette);
     draw_bitmapc (splash, bitmap, splash_coord (&g->f, &c), g->f.flip);
   }
+}
+
+bool
+is_guard (struct anim *a)
+{
+  return a->type == GUARD
+    || a->type == FAT_GUARD
+    || a->type == VIZIER
+    || a->type == SKELETON;
 }

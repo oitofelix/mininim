@@ -20,17 +20,27 @@
 #ifndef MININIM_GUARD_DEFENSE_H
 #define MININIM_GUARD_DEFENSE_H
 
-/* bitmaps */
+/* guard */
 #define GUARD_DEFENSE_01 "data/guard/defense/01.png"
 #define GUARD_DEFENSE_COUNTER_ATTACK "data/guard/defense/counter-attack.png"
 
+/* fat guard */
+#define FAT_GUARD_DEFENSE_01 "data/fat-guard/defense/01.png"
+#define FAT_GUARD_DEFENSE_COUNTER_ATTACK "data/fat-guard/defense/counter-attack.png"
+
 #define GUARD_DEFENSE_FRAMESET_NMEMB 2
 extern struct frameset guard_defense_frameset[GUARD_DEFENSE_FRAMESET_NMEMB];
+extern struct frameset fat_guard_defense_frameset[GUARD_DEFENSE_FRAMESET_NMEMB];
 
 void load_guard_defense (void);
 void unload_guard_defense (void);
 void guard_defense (struct anim *g);
+struct frameset *get_guard_defense_frameset (enum anim_type t);
 
+/* guard */
 extern ALLEGRO_BITMAP *guard_defense_01, *guard_defense_counter_attack;
+
+/* fat guard */
+extern ALLEGRO_BITMAP *fat_guard_defense_01, *fat_guard_defense_counter_attack;
 
 #endif	/* MININIM_GUARD_DEFENSE_H */

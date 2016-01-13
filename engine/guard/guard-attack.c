@@ -32,17 +32,27 @@
 #include "guard.h"
 
 struct frameset guard_attack_frameset[GUARD_ATTACK_FRAMESET_NMEMB];
+struct frameset fat_guard_attack_frameset[GUARD_ATTACK_FRAMESET_NMEMB];
 
 static void init_guard_attack_frameset (void);
+static void init_fat_guard_attack_frameset (void);
 static bool flow (struct anim *g);
 static bool physics_in (struct anim *g);
 static void physics_out (struct anim *g);
 
+/* guard */
 ALLEGRO_BITMAP *guard_attack_01, *guard_attack_02,
   *guard_attack_03, *guard_attack_04, *guard_attack_05,
   *guard_attack_06, *guard_attack_07, *guard_attack_08,
   *guard_attack_counter_defense_01, *guard_attack_counter_defense_02,
   *guard_attack_defended;
+
+/* fat guard */
+ALLEGRO_BITMAP *fat_guard_attack_01, *fat_guard_attack_02,
+  *fat_guard_attack_03, *fat_guard_attack_04, *fat_guard_attack_05,
+  *fat_guard_attack_06, *fat_guard_attack_07, *fat_guard_attack_08,
+  *fat_guard_attack_counter_defense_01, *fat_guard_attack_counter_defense_02,
+  *fat_guard_attack_defended;
 
 static void
 init_guard_attack_frameset (void)
@@ -59,10 +69,43 @@ init_guard_attack_frameset (void)
           GUARD_ATTACK_FRAMESET_NMEMB * sizeof (struct frameset));
 }
 
+static void
+init_fat_guard_attack_frameset (void)
+{
+  struct frameset frameset[GUARD_ATTACK_FRAMESET_NMEMB] =
+    {{fat_guard_attack_01,-6,0},{fat_guard_attack_02,+0,0},
+     {fat_guard_attack_03,-3,0},{fat_guard_attack_04,-6,0},
+     {fat_guard_attack_05,-7,0},{fat_guard_attack_06,+6,0},
+     {fat_guard_attack_07,+9,0},{fat_guard_attack_08,+7,0},
+     {fat_guard_attack_counter_defense_01,+0,0},
+     {fat_guard_attack_counter_defense_02,+6,0}};
+
+  memcpy (&fat_guard_attack_frameset, &frameset,
+          GUARD_ATTACK_FRAMESET_NMEMB * sizeof (struct frameset));
+}
+
+struct frameset *
+get_guard_attack_frameset (enum anim_type t)
+{
+  switch (t) {
+  case GUARD: default: return guard_attack_frameset;
+  case FAT_GUARD: return fat_guard_attack_frameset;
+  }
+}
+
+ALLEGRO_BITMAP *
+get_guard_attack_defended_bitmap (enum anim_type t)
+{
+  switch (t) {
+  case GUARD: default: return guard_attack_defended;
+  case FAT_GUARD: return fat_guard_attack_defended;
+  }
+}
+
 void
 load_guard_attack (void)
 {
-  /* bitmaps */
+  /* guard */
   guard_attack_01 = load_bitmap (GUARD_ATTACK_01);
   guard_attack_02 = load_bitmap (GUARD_ATTACK_02);
   guard_attack_03 = load_bitmap (GUARD_ATTACK_03);
@@ -73,16 +116,30 @@ load_guard_attack (void)
   guard_attack_08 = load_bitmap (GUARD_ATTACK_08);
   guard_attack_counter_defense_01 = load_bitmap (GUARD_ATTACK_COUNTER_DEFENSE_01);
   guard_attack_counter_defense_02 = load_bitmap (GUARD_ATTACK_COUNTER_DEFENSE_02);
-
   guard_attack_defended = load_bitmap (GUARD_ATTACK_DEFENDED);
+
+  /* fat guard */
+  fat_guard_attack_01 = load_bitmap (FAT_GUARD_ATTACK_01);
+  fat_guard_attack_02 = load_bitmap (FAT_GUARD_ATTACK_02);
+  fat_guard_attack_03 = load_bitmap (FAT_GUARD_ATTACK_03);
+  fat_guard_attack_04 = load_bitmap (FAT_GUARD_ATTACK_04);
+  fat_guard_attack_05 = load_bitmap (FAT_GUARD_ATTACK_05);
+  fat_guard_attack_06 = load_bitmap (FAT_GUARD_ATTACK_06);
+  fat_guard_attack_07 = load_bitmap (FAT_GUARD_ATTACK_07);
+  fat_guard_attack_08 = load_bitmap (FAT_GUARD_ATTACK_08);
+  fat_guard_attack_counter_defense_01 = load_bitmap (FAT_GUARD_ATTACK_COUNTER_DEFENSE_01);
+  fat_guard_attack_counter_defense_02 = load_bitmap (FAT_GUARD_ATTACK_COUNTER_DEFENSE_02);
+  fat_guard_attack_defended = load_bitmap (FAT_GUARD_ATTACK_DEFENDED);
 
   /* frameset */
   init_guard_attack_frameset ();
+  init_fat_guard_attack_frameset ();
 }
 
 void
 unload_guard_attack (void)
 {
+  /* guard */
   al_destroy_bitmap (guard_attack_01);
   al_destroy_bitmap (guard_attack_02);
   al_destroy_bitmap (guard_attack_03);
@@ -93,8 +150,20 @@ unload_guard_attack (void)
   al_destroy_bitmap (guard_attack_08);
   al_destroy_bitmap (guard_attack_counter_defense_01);
   al_destroy_bitmap (guard_attack_counter_defense_02);
-
   al_destroy_bitmap (guard_attack_defended);
+
+  /* fat guard */
+  al_destroy_bitmap (fat_guard_attack_01);
+  al_destroy_bitmap (fat_guard_attack_02);
+  al_destroy_bitmap (fat_guard_attack_03);
+  al_destroy_bitmap (fat_guard_attack_04);
+  al_destroy_bitmap (fat_guard_attack_05);
+  al_destroy_bitmap (fat_guard_attack_06);
+  al_destroy_bitmap (fat_guard_attack_07);
+  al_destroy_bitmap (fat_guard_attack_08);
+  al_destroy_bitmap (fat_guard_attack_counter_defense_01);
+  al_destroy_bitmap (fat_guard_attack_counter_defense_02);
+  al_destroy_bitmap (fat_guard_attack_defended);
 }
 
 void
@@ -155,7 +224,8 @@ flow (struct anim *g)
   if (g->i == 3 && g->attack_defended)
     g->i = 4;
 
-  select_frame (g, guard_attack_frameset, g->i + 1);
+  struct frameset *frameset = get_guard_attack_frameset (g->type);
+  select_frame (g, frameset, g->i + 1);
 
   if (g->i == 0) g->j = 12;
   if (g->i == 1) g->j = 0;
