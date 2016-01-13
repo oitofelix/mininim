@@ -53,6 +53,9 @@ load_guard (void)
   load_guard_die ();
   load_guard_fall ();
   load_guard_walkf ();
+  load_guard_walkb ();
+  load_guard_attack ();
+  load_guard_defense ();
 
   /* bitmaps */
   guard_life = load_bitmap (GUARD_LIFE);
@@ -71,6 +74,9 @@ unload_guard (void)
   unload_guard_die ();
   unload_guard_fall ();
   unload_guard_walkf ();
+  unload_guard_walkb ();
+  unload_guard_attack ();
+  unload_guard_defense ();
 
   /* bitmaps */
   al_destroy_bitmap (guard_life);

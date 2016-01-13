@@ -26,7 +26,7 @@
 #define ATTACK_RANGE 61
 #define FIGHT_RANGE 75
 #define FOLLOW_RANGE (2 * ORIGINAL_WIDTH)
-#define HIT_RANGE 48
+#define HIT_RANGE 50
 
 void fight_ai (struct anim *k0, struct anim *k1);
 void fight_mechanics (struct anim *k);

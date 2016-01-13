@@ -157,11 +157,11 @@ void
 init_sword_frameset (void)
 {
   struct frameset frameset[SWORD_FRAMESET_NMEMB] =
-    {{sword_01,+0,+0},{sword_02,-7,+5},{sword_03,+0,+0},
-     {sword_04,-18,+20},{sword_05,-16,+13},{sword_06,+0,+0},
-     {sword_07,+0,+0},{sword_08,+0,+17},{sword_09,-7,-4},
-     {sword_10,+0,+0},{sword_11,-11,+13},{sword_12,+0,+0},
-     {sword_13,+0,+0},{sword_14,-28,+10},{sword_15,-13,-5},
+    {{sword_01,+0,+18},{sword_02,-7,+5},{sword_03,-17,+4},
+     {sword_04,-18,+20},{sword_05,-16,+13},{sword_06,+9,+1},
+     {sword_07,-7,+18},{sword_08,+0,+17},{sword_09,-7,-4},
+     {sword_10,-7,-8},{sword_11,-11,+13},{sword_12,-10,+14},
+     {sword_13,-22,+12},{sword_14,-28,+10},{sword_15,-13,-5},
      {sword_16,-1,-11},{sword_17,+0,+0},{sword_18,-15,+15},
      {sword_19,-14,+4},{sword_20,-22,+10},{sword_21,-7,-11},
      {sword_22,-14,-11},{sword_23,-14,-11},{sword_24,-14,-5},

@@ -88,11 +88,15 @@ flow (struct anim *g)
   struct coord nc;
   struct pos np, pmt;
 
+  bool normal = g->key.down;
   bool walkf = ((g->f.dir == RIGHT) && g->key.right)
     || ((g->f.dir == LEFT) && g->key.left);
   bool walkb = ((g->f.dir == RIGHT) && g->key.left)
     || ((g->f.dir == LEFT) && g->key.right);
-  bool normal = g->key.down;
+  bool defense = g->key.up && ! g->key.shift
+    && ! g->key.left && ! g->key.right;
+  bool attack = g->key.shift && ! g->key.up
+    && ! g->key.left && ! g->key.right;
 
   if (g->oaction != guard_vigilant) g->i = -1;
 
@@ -105,17 +109,35 @@ flow (struct anim *g)
       return false;
     }
 
-    if (walkf) {
-      guard_walkf (g);
-      return false;
-    }
-
     /* normal */
     if (g->i == 2 && normal) {
       guard_normal (g);
       return false;
     }
 
+    /* walkf */
+    if (walkf) {
+      guard_walkf (g);
+      return false;
+    }
+
+    /* walkb */
+    if (walkb) {
+      guard_walkb (g);
+      return false;
+    }
+
+    /* attack */
+    if (attack) {
+      guard_attack (g);
+      return false;
+    }
+
+    /* defense */
+    if (defense) {
+      guard_defense (g);
+      return false;
+    }
   }
 
   select_frame (g, guard_vigilant_frameset,

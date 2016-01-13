@@ -61,7 +61,7 @@ main (int argc, char **argv)
   clear_bitmap (uscreen, TRANSPARENT_COLOR);
   title_started = false;
   stop_all_samples ();
-  /* play_title (); */
+  play_title ();
   if (quit_anim == QUIT_GAME) goto quit_game;
   stop_all_samples ();
 

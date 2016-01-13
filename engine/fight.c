@@ -34,26 +34,31 @@ fight_ai (struct anim *k0, struct anim *k1)
 {
   if (k0->current_lives <= 0) return;
 
-  /* in attack range, if being attacked, defend yourself
-     (with probability) */
+  /* in attack range, if being attacked, defend yourself (with
+     probability) and counter attack (with probability handled
+     elsewhere)*/
   if (is_in_fight_mode (k0)
       && k0->enemy_id == k1->id
       && ! is_on_back (k0, k1)
       && is_in_range (k0, k1, ATTACK_RANGE)
-      && (is_attacking (k1) && k1->i == 0)
-      && prandom (99) <= k0->skill.defense_prob)
-    ;
-    /* fight_defense (k0); */
-  /* if defending, counter attack
-     (with probability handled elsewhere) */
-  else if (is_in_fight_mode (k0)
-           && k0->enemy_id == k1->id
-           && ! is_on_back (k0, k1)
-           && is_in_range (k0, k1, ATTACK_RANGE)
-           && is_defending (k0)) {
+      && (is_attacking (k1)
+          && (k0->type != KID || k1->i == 0)
+          && (k0->type == KID || k1->i == 1))
+      && prandom (99) <= k0->skill.defense_prob) {
+    fight_defense (k0);
     if (is_safe_to_attack (k0)) fight_attack (k0);
     else if (is_safe_to_walkb (k0)) fight_walkb (k0);
   }
+  /* if defending, counter attack
+     (with probability handled elsewhere) */
+  /* else if (is_in_fight_mode (k0) */
+  /*          && k0->enemy_id == k1->id */
+  /*          && ! is_on_back (k0, k1) */
+  /*          && is_in_range (k0, k1, ATTACK_RANGE) */
+  /*          && is_defending (k0)) { */
+  /*   if (is_safe_to_attack (k0)) fight_attack (k0); */
+  /*   else if (is_safe_to_walkb (k0)) fight_walkb (k0); */
+  /* } */
   /* if attacking, counter defend
      (with probability handled elsewhere) */
   else if (is_in_fight_mode (k0)
@@ -304,21 +309,27 @@ is_in_fight_mode (struct anim *k)
     || k->action == kid_sword_defense
     || k->action == kid_take_sword
 
-    || k->action == guard_vigilant;
+    || k->action == guard_vigilant
+    || k->action == guard_walkf
+    || k->action == guard_walkb
+    || k->action == guard_attack
+    || k->action == guard_defense;
 }
 
 bool
 is_attacking (struct anim *k)
 {
   if (! k) return false;
-  else return k->action == kid_sword_attack;
+  else return k->action == kid_sword_attack
+         || k->action == guard_attack;
 }
 
 bool
 is_defending (struct anim *k)
 {
   if (! k) return false;
-  else return k->action == kid_sword_defense;
+  else return k->action == kid_sword_defense
+         || k->action == guard_defense;
 }
 
 bool
@@ -326,42 +337,65 @@ is_walking (struct anim *k)
 {
   if (! k) return false;
   else return k->action == kid_sword_walkf
-  || k->action == kid_sword_walkb;
+         || k->action == kid_sword_walkb
+         || k->action == guard_walkf
+         || k->action == guard_walkb;
 }
 
 bool
 is_sword_hit (struct anim *k)
 {
   if (! k) return false;
-  else return k->action == kid_sword_hit;
+  else return k->action == kid_sword_hit
+         || k->action == guard_hit;
 }
 
 bool
 is_at_defendable_attack_frame (struct anim *k)
 {
   return k->fo.b == kid_sword_attack_03
-    || k->fo.b == kid_sword_attack_04;
+    || k->fo.b == kid_sword_attack_04
+    || k->fo.b == guard_attack_04
+    || k->fo.b == guard_attack_05;
 }
 
 bool
 is_at_hit_frame (struct anim *k)
 {
-  return k->fo.b == kid_sword_attack_04;
+  return k->fo.b == kid_sword_attack_04
+    || k->fo.b == guard_attack_05;
 }
 
 void
 put_at_defense_frame (struct anim *k)
 {
-  select_frame (k, kid_sword_defense_frameset, 0);
-  next_frame (&k->f, &k->f, &k->fo);
-
   play_sample (sword_defense_sample, k->f.c.room);
-  select_frame (k, kid_sword_defense_frameset, 1);
-  select_xframe (&k->xf, sword_frameset, 11);
-  k->xf.dx = -13;
-  k->xf.dy = +5;
-  k->action = kid_sword_defense;
-  next_frame (&k->f, &k->f, &k->fo);
+
+  switch (k->type) {
+  case NO_ANIM: default: break;
+  case KID:
+    select_frame (k, kid_sword_defense_frameset, 0);
+    next_frame (&k->f, &k->f, &k->fo);
+
+    select_frame (k, kid_sword_defense_frameset, 1);
+
+    struct anim *ke = get_anim_by_id (k->enemy_id);
+    if (ke->type == KID) {
+      select_xframe (&k->xf, sword_frameset, 11);
+      k->xf.dx = -13;
+      k->xf.dy = +5;
+    } else select_xframe (&k->xf, sword_frameset, 14);
+
+    k->action = kid_sword_defense;
+    next_frame (&k->f, &k->f, &k->fo);
+    break;
+  case GUARD:
+    select_frame (k, guard_defense_frameset, 0);
+    select_xframe (&k->xf, sword_frameset, 11);
+    k->action = guard_defense;
+    next_frame (&k->f, &k->f, &k->fo);
+    break;
+  }
 
   /* if (k->id == 0) */
   /*   printf ("%s: k->i = %i, k->fo.dx = %i\n", */
@@ -375,20 +409,45 @@ put_at_attack_frame (struct anim *k)
   k->counter_attacked = k->counter_attacked ? 2 : 0;
   k->counter_defense = k->counter_defense ? 2 : 0;
 
-  if (k->i == 3) return;
+  switch (k->type) {
+  case NO_ANIM: default: break;
+  case KID:
+    if (k->i == 3) return;
 
-  k->f = k->of;
-  select_frame (k, kid_sword_attack_frameset, 0);
-  next_frame (&k->f, &k->f, &k->fo);
-  select_frame (k, kid_sword_attack_frameset, 1);
-  next_frame (&k->f, &k->f, &k->fo);
-  select_frame (k, kid_sword_attack_frameset, 2);
+    k->f = k->of;
+    select_frame (k, kid_sword_attack_frameset, 0);
+    next_frame (&k->f, &k->f, &k->fo);
+    select_frame (k, kid_sword_attack_frameset, 1);
+    next_frame (&k->f, &k->f, &k->fo);
+    select_frame (k, kid_sword_attack_frameset, 2);
 
-  k->fo.b = kid_sword_attack_16;
-  select_xframe (&k->xf, sword_frameset, 17);
-  k->xf.dx = -21;
-  k->xf.dy = +8;
-  next_frame (&k->f, &k->f, &k->fo);
+    k->fo.b = kid_sword_attack_16;
+    select_xframe (&k->xf, sword_frameset, 17);
+    k->xf.dx = -21;
+    k->xf.dy = +11;
+    next_frame (&k->f, &k->f, &k->fo);
+    break;
+  case GUARD:
+    /* k->f = k->of; */
+    /* select_frame (k, guard_attack_frameset, 0); */
+    /* next_frame (&k->f, &k->f, &k->fo); */
+    /* select_frame (k, guard_attack_frameset, 1); */
+    /* next_frame (&k->f, &k->f, &k->fo); */
+    /* select_frame (k, guard_attack_frameset, 2); */
+    /* next_frame (&k->f, &k->f, &k->fo); */
+    /* select_frame (k, guard_attack_frameset, 3); */
+
+    k->fo.b = guard_attack_defended;
+    k->fo.dx = +1;
+    k->fo.dy = 0;
+
+    select_xframe (&k->xf, sword_frameset, 8);
+    k->xf.dx = -13;
+    k->xf.dy = -14;
+    next_frame (&k->f, &k->f, &k->fo);
+    break;
+  }
+
 }
 
 bool

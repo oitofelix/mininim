@@ -29,6 +29,9 @@
 #include "guard-die.h"
 #include "guard-fall.h"
 #include "guard-walkf.h"
+#include "guard-walkb.h"
+#include "guard-attack.h"
+#include "guard-defense.h"
 
 /* bitmaps */
 #define GUARD_LIFE "data/life/guard.png"

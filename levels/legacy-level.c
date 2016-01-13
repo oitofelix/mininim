@@ -123,10 +123,6 @@ start (void)
   else k->current_lives = total_lives;
   k->controllable = true;
 
-  /*** start remove me ***/
-  k->has_sword = true;
-  /*** end remove me  ***/
-
   /* create guards */
   int i;
   for (i = 1; i < GUARDS; i++) {
@@ -823,7 +819,7 @@ static struct skill *
 get_legacy_skill (int i, struct skill *skill)
 {
   /* improve this */
-  skill->attack_prob = ((i + 1)/ 9.0) * 20;
+  skill->attack_prob = (i + 1) * 10;
   skill->defense_prob = (i + 1) * 10;
   skill->counter_attack_prob = (i + 1) * 10;
   skill->counter_defense_prob = (i + 1) * 10;

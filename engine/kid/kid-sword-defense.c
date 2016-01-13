@@ -87,8 +87,7 @@ kid_sword_defense (struct anim *k)
 static bool
 flow (struct anim *k)
 {
-  if (k->oaction != kid_sword_defense)
-    k->i = -1;
+  if (k->oaction != kid_sword_defense) k->i = -1;
 
   struct anim *ke = get_anim_by_id (k->enemy_id);
   if (k->i == 2) {
@@ -103,14 +102,24 @@ flow (struct anim *k)
     return false;
   }
 
-  if (k->i == -1) k->j = 28;
-  if (k->i == 0) k->j = 14;
-  if (k->i == 1) k->j = 15;
+  if (k->oaction == kid_sword_attack) {
+    select_frame (k, kid_sword_walkb_frameset, 0);
+    k->j = 10;
+  } else if (k->f.b == kid_sword_walkb_frameset[0].frame) {
+    select_frame (k, kid_sword_defense_frameset, 1);
+    k->fo.dx += 7;
+    k->j = 14;
+  } else {
+    select_frame (k, kid_sword_defense_frameset, k->i + 1);
 
-  select_frame (k, kid_sword_defense_frameset, k->i + 1);
+    if (k->i == 0) k->j = 28;
+    if (k->i == 1) k->j = 14;
+    if (k->i == 2) k->j = 15;
+  }
+
   select_xframe (&k->xf, sword_frameset, k->j);
 
-  if (k->oaction == kid_sword_attack) k->fo.dx += +8;
+  if (k->oaction == kid_sword_attack) k->fo.dx += +2;
 
   /* if (k->id == 0) */
   /*   printf ("kid_sword_defense: k->i = %i, k->fo.dx = %i\n", */
