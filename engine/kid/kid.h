@@ -20,6 +20,7 @@
 #ifndef MININIM_KID_H
 #define MININIM_KID_H
 
+#include "kernel/video.h"
 #include "kernel/audio.h"
 
 /* kid actions */
