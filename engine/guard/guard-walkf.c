@@ -30,9 +30,11 @@
 
 struct frameset guard_walkf_frameset[GUARD_WALKF_FRAMESET_NMEMB];
 struct frameset fat_guard_walkf_frameset[GUARD_WALKF_FRAMESET_NMEMB];
+struct frameset vizier_walkf_frameset[GUARD_WALKF_FRAMESET_NMEMB];
 
 static void init_guard_walkf_frameset (void);
 static void init_fat_guard_walkf_frameset (void);
+static void init_vizier_walkf_frameset (void);
 static bool flow (struct anim *g);
 static bool physics_in (struct anim *g);
 static void physics_out (struct anim *g);
@@ -42,6 +44,9 @@ ALLEGRO_BITMAP *guard_walkf_01, *guard_walkf_02, *guard_walkf_03;
 
 /* fat guard */
 ALLEGRO_BITMAP *fat_guard_walkf_01, *fat_guard_walkf_02, *fat_guard_walkf_03;
+
+/* vizier */
+ALLEGRO_BITMAP *vizier_walkf_01, *vizier_walkf_02, *vizier_walkf_03;
 
 static void
 init_guard_walkf_frameset (void)
@@ -65,12 +70,24 @@ init_fat_guard_walkf_frameset (void)
           GUARD_WALKF_FRAMESET_NMEMB * sizeof (struct frameset));
 }
 
+static void
+init_vizier_walkf_frameset (void)
+{
+  struct frameset frameset[GUARD_WALKF_FRAMESET_NMEMB] =
+    {{vizier_walkf_01,-7,0},{vizier_walkf_02,-8,0},
+     {vizier_walkf_03,-1,0}};
+
+  memcpy (&vizier_walkf_frameset, &frameset,
+          GUARD_WALKF_FRAMESET_NMEMB * sizeof (struct frameset));
+}
+
 struct frameset *
 get_guard_walkf_frameset (enum anim_type t)
 {
   switch (t) {
   case GUARD: default: return guard_walkf_frameset;
   case FAT_GUARD: return fat_guard_walkf_frameset;
+  case VIZIER: return vizier_walkf_frameset;
   }
 }
 
@@ -87,9 +104,15 @@ load_guard_walkf (void)
   fat_guard_walkf_02 = load_bitmap (FAT_GUARD_WALKF_02);
   fat_guard_walkf_03 = load_bitmap (FAT_GUARD_WALKF_03);
 
+  /* vizier */
+  vizier_walkf_01 = load_bitmap (VIZIER_WALKF_01);
+  vizier_walkf_02 = load_bitmap (VIZIER_WALKF_02);
+  vizier_walkf_03 = load_bitmap (VIZIER_WALKF_03);
+
   /* frameset */
   init_guard_walkf_frameset ();
   init_fat_guard_walkf_frameset ();
+  init_vizier_walkf_frameset ();
 }
 
 void
@@ -104,6 +127,11 @@ unload_guard_walkf (void)
   al_destroy_bitmap (fat_guard_walkf_01);
   al_destroy_bitmap (fat_guard_walkf_02);
   al_destroy_bitmap (fat_guard_walkf_03);
+
+  /* vizier */
+  al_destroy_bitmap (vizier_walkf_01);
+  al_destroy_bitmap (vizier_walkf_02);
+  al_destroy_bitmap (vizier_walkf_03);
 }
 
 void

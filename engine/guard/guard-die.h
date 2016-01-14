@@ -38,9 +38,18 @@
 #define FAT_GUARD_DIE_05 "data/fat-guard/die/05.png"
 #define FAT_GUARD_DIE_06 "data/fat-guard/die/06.png"
 
+/* vizier */
+#define VIZIER_DIE_01 "data/vizier/die/01.png"
+#define VIZIER_DIE_02 "data/vizier/die/02.png"
+#define VIZIER_DIE_03 "data/vizier/die/03.png"
+#define VIZIER_DIE_04 "data/vizier/die/04.png"
+#define VIZIER_DIE_05 "data/vizier/die/05.png"
+#define VIZIER_DIE_06 "data/vizier/die/06.png"
+
 #define GUARD_DIE_FRAMESET_NMEMB 6
 extern struct frameset guard_die_frameset[GUARD_DIE_FRAMESET_NMEMB];
 extern struct frameset fat_guard_die_frameset[GUARD_DIE_FRAMESET_NMEMB];
+extern struct frameset vizier_die_frameset[GUARD_DIE_FRAMESET_NMEMB];
 
 void load_guard_die (void);
 void unload_guard_die (void);
@@ -58,5 +67,9 @@ extern ALLEGRO_BITMAP *guard_die_01, *guard_die_02, *guard_die_03,
 /* fat guard */
 extern ALLEGRO_BITMAP *fat_guard_die_01, *fat_guard_die_02, *fat_guard_die_03,
   *fat_guard_die_04, *fat_guard_die_05, *fat_guard_die_06;
+
+/* vizier */
+extern ALLEGRO_BITMAP *vizier_die_01, *vizier_die_02, *vizier_die_03,
+  *vizier_die_04, *vizier_die_05, *vizier_die_06;
 
 #endif	/* MININIM_GUARD_DIE_H */

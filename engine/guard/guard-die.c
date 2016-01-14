@@ -33,9 +33,11 @@
 
 struct frameset guard_die_frameset[GUARD_DIE_FRAMESET_NMEMB];
 struct frameset fat_guard_die_frameset[GUARD_DIE_FRAMESET_NMEMB];
+struct frameset vizier_die_frameset[GUARD_DIE_FRAMESET_NMEMB];
 
 static void init_guard_die_frameset (void);
 static void init_fat_guard_die_frameset (void);
+static void init_vizier_die_frameset (void);
 static bool flow (struct anim *g);
 static bool physics_in (struct anim *g);
 static void physics_out (struct anim *g);
@@ -47,6 +49,10 @@ ALLEGRO_BITMAP *guard_die_01, *guard_die_02, *guard_die_03, *guard_die_04,
 /* fat guard */
 ALLEGRO_BITMAP *fat_guard_die_01, *fat_guard_die_02, *fat_guard_die_03,
   *fat_guard_die_04, *fat_guard_die_05, *fat_guard_die_06;
+
+/* vizier */
+ALLEGRO_BITMAP *vizier_die_01, *vizier_die_02, *vizier_die_03, *vizier_die_04,
+  *vizier_die_05, *vizier_die_06;
 
 static void
 init_guard_die_frameset (void)
@@ -70,12 +76,24 @@ init_fat_guard_die_frameset (void)
           GUARD_DIE_FRAMESET_NMEMB * sizeof (struct frameset));
 }
 
+static void
+init_vizier_die_frameset (void)
+{
+  struct frameset frameset[GUARD_DIE_FRAMESET_NMEMB] =
+    {{vizier_die_01,-1,0},{vizier_die_02,+0,0},{vizier_die_03,-3,+1},
+     {vizier_die_04,-2,+2},{vizier_die_05,+0,+0},{vizier_die_06,-2,+0}};
+
+  memcpy (&vizier_die_frameset, &frameset,
+          GUARD_DIE_FRAMESET_NMEMB * sizeof (struct frameset));
+}
+
 struct frameset *
 get_guard_die_frameset (enum anim_type t)
 {
   switch (t) {
   case GUARD: default: return guard_die_frameset;
   case FAT_GUARD: return fat_guard_die_frameset;
+  case VIZIER: return vizier_die_frameset;
   }
 }
 
@@ -100,9 +118,18 @@ load_guard_die (void)
   fat_guard_die_05 = load_bitmap (FAT_GUARD_DIE_05);
   fat_guard_die_06 = load_bitmap (FAT_GUARD_DIE_06);
 
+  /* vizier */
+  vizier_die_01 = load_bitmap (VIZIER_DIE_01);
+  vizier_die_02 = load_bitmap (VIZIER_DIE_02);
+  vizier_die_03 = load_bitmap (VIZIER_DIE_03);
+  vizier_die_04 = load_bitmap (VIZIER_DIE_04);
+  vizier_die_05 = load_bitmap (VIZIER_DIE_05);
+  vizier_die_06 = load_bitmap (VIZIER_DIE_06);
+
   /* frameset */
   init_guard_die_frameset ();
   init_fat_guard_die_frameset ();
+  init_vizier_die_frameset ();
 }
 
 void
@@ -125,6 +152,14 @@ unload_guard_die (void)
   al_destroy_bitmap (fat_guard_die_04);
   al_destroy_bitmap (fat_guard_die_05);
   al_destroy_bitmap (fat_guard_die_06);
+
+  /* vizier */
+  al_destroy_bitmap (vizier_die_01);
+  al_destroy_bitmap (vizier_die_02);
+  al_destroy_bitmap (vizier_die_03);
+  al_destroy_bitmap (vizier_die_04);
+  al_destroy_bitmap (vizier_die_05);
+  al_destroy_bitmap (vizier_die_06);
 }
 
 void
@@ -285,6 +320,10 @@ is_guard_dead (struct frame *f)
   /* fat guard */
   for (i = 0; i < GUARD_DIE_FRAMESET_NMEMB; i++)
     if (f->b == fat_guard_die_frameset[i].frame) return true;
+
+  /* vizier */
+  for (i = 0; i < GUARD_DIE_FRAMESET_NMEMB; i++)
+    if (f->b == vizier_die_frameset[i].frame) return true;
 
   return false;
 }

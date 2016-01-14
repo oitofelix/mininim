@@ -34,7 +34,14 @@ static bool flow (struct anim *g);
 static bool physics_in (struct anim *g);
 static void physics_out (struct anim *g);
 
-ALLEGRO_BITMAP *guard_normal_00, *fat_guard_normal_00;
+/* guard */
+ALLEGRO_BITMAP *guard_normal_00;
+
+/* fat guard */
+ALLEGRO_BITMAP *fat_guard_normal_00;
+
+/* vizier */
+ALLEGRO_BITMAP *vizier_normal_00;
 
 ALLEGRO_BITMAP *
 get_guard_normal_bitmap (enum anim_type t)
@@ -42,21 +49,34 @@ get_guard_normal_bitmap (enum anim_type t)
   switch (t) {
   case GUARD: default: return guard_normal_00;
   case FAT_GUARD: return fat_guard_normal_00;
+  case VIZIER: return vizier_normal_00;
   }
 }
 
 void
 load_guard_normal (void)
 {
+  /* guard */
   guard_normal_00 = load_bitmap (GUARD_NORMAL_00);
+
+  /* fat guard */
   fat_guard_normal_00 = load_bitmap (FAT_GUARD_NORMAL_00);
+
+  /* vizier */
+  vizier_normal_00 = load_bitmap (VIZIER_NORMAL_00);
 }
 
 void
 unload_guard_normal (void)
 {
+  /* guard */
   al_destroy_bitmap (guard_normal_00);
+
+  /* fat guard */
   al_destroy_bitmap (fat_guard_normal_00);
+
+  /* vizier */
+  al_destroy_bitmap (vizier_normal_00);
 }
 
 void
@@ -98,6 +118,8 @@ flow (struct anim *g)
   g->fo.dx = g->fo.dy = +0;
 
   select_xframe (&g->xf, sword_frameset, 30);
+
+  if (g->type == VIZIER) g->xf.dy += 4;
 
   return true;
 }

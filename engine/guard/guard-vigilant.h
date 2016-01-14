@@ -30,19 +30,31 @@
 #define FAT_GUARD_VIGILANT_02 "data/fat-guard/vigilant/02.png"
 #define FAT_GUARD_VIGILANT_03 "data/fat-guard/vigilant/03.png"
 
+/* vizier */
+#define VIZIER_VIGILANT_01 "data/vizier/vigilant/01.png"
+#define VIZIER_VIGILANT_02 "data/vizier/vigilant/02.png"
+#define VIZIER_VIGILANT_03 "data/vizier/vigilant/03.png"
+
 #define GUARD_VIGILANT_FRAMESET_NMEMB 3
 extern struct frameset guard_vigilant_frameset[GUARD_VIGILANT_FRAMESET_NMEMB];
 extern struct frameset fat_guard_vigilant_frameset[GUARD_VIGILANT_FRAMESET_NMEMB];
+extern struct frameset vizier_vigilant_frameset[GUARD_VIGILANT_FRAMESET_NMEMB];
 
 void load_guard_vigilant (void);
 void unload_guard_vigilant (void);
 void guard_vigilant (struct anim *k);
 struct frameset *get_guard_vigilant_frameset (enum anim_type t);
 
+/* guard */
 extern ALLEGRO_BITMAP *guard_vigilant_01, *guard_vigilant_02,
   *guard_vigilant_03;
 
+/* fat guard */
 extern ALLEGRO_BITMAP *fat_guard_vigilant_01, *fat_guard_vigilant_02,
   *fat_guard_vigilant_03;
+
+/* vizier */
+extern ALLEGRO_BITMAP *vizier_vigilant_01, *vizier_vigilant_02,
+  *vizier_vigilant_03;
 
 #endif	/* MININIM_GUARD_VIGILANT_H */

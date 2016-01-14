@@ -30,9 +30,11 @@
 
 struct frameset guard_walkb_frameset[GUARD_WALKB_FRAMESET_NMEMB];
 struct frameset fat_guard_walkb_frameset[GUARD_WALKB_FRAMESET_NMEMB];
+struct frameset vizier_walkb_frameset[GUARD_WALKB_FRAMESET_NMEMB];
 
 static void init_guard_walkb_frameset (void);
 static void init_fat_guard_walkb_frameset (void);
+static void init_vizier_walkb_frameset (void);
 static bool flow (struct anim *g);
 static bool physics_in (struct anim *g);
 static void physics_out (struct anim *g);
@@ -42,6 +44,9 @@ ALLEGRO_BITMAP *guard_walkb_01, *guard_walkb_02;
 
 /* fat guard */
 ALLEGRO_BITMAP *fat_guard_walkb_01, *fat_guard_walkb_02;
+
+/* vizier */
+ALLEGRO_BITMAP *vizier_walkb_01, *vizier_walkb_02;
 
 static void
 init_guard_walkb_frameset (void)
@@ -63,12 +68,23 @@ init_fat_guard_walkb_frameset (void)
           GUARD_WALKB_FRAMESET_NMEMB * sizeof (struct frameset));
 }
 
+static void
+init_vizier_walkb_frameset (void)
+{
+  struct frameset frameset[GUARD_WALKB_FRAMESET_NMEMB] =
+    {{vizier_walkb_01,+2,0},{vizier_walkb_02,+10,0}};
+
+  memcpy (&vizier_walkb_frameset, &frameset,
+          GUARD_WALKB_FRAMESET_NMEMB * sizeof (struct frameset));
+}
+
 struct frameset *
 get_guard_walkb_frameset (enum anim_type t)
 {
   switch (t) {
   case GUARD: default: return guard_walkb_frameset;
   case FAT_GUARD: return fat_guard_walkb_frameset;
+  case VIZIER: return vizier_walkb_frameset;
   }
 }
 
@@ -83,9 +99,14 @@ load_guard_walkb (void)
   fat_guard_walkb_01 = load_bitmap (FAT_GUARD_WALKB_01);
   fat_guard_walkb_02 = load_bitmap (FAT_GUARD_WALKB_02);
 
+  /* vizier */
+  vizier_walkb_01 = load_bitmap (VIZIER_WALKB_01);
+  vizier_walkb_02 = load_bitmap (VIZIER_WALKB_02);
+
   /* frameset */
   init_guard_walkb_frameset ();
   init_fat_guard_walkb_frameset ();
+  init_vizier_walkb_frameset ();
 }
 
 void
@@ -98,6 +119,10 @@ unload_guard_walkb (void)
   /* fat_guard */
   al_destroy_bitmap (fat_guard_walkb_01);
   al_destroy_bitmap (fat_guard_walkb_02);
+
+  /* vizier */
+  al_destroy_bitmap (vizier_walkb_01);
+  al_destroy_bitmap (vizier_walkb_02);
 }
 
 void

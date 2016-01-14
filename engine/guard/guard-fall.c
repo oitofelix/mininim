@@ -32,9 +32,11 @@
 
 struct frameset guard_fall_frameset[GUARD_FALL_FRAMESET_NMEMB];
 struct frameset fat_guard_fall_frameset[GUARD_FALL_FRAMESET_NMEMB];
+struct frameset vizier_fall_frameset[GUARD_FALL_FRAMESET_NMEMB];
 
 static void init_guard_fall_frameset (void);
 static void init_fat_guard_fall_frameset (void);
+static void init_vizier_fall_frameset (void);
 static bool flow (struct anim *g);
 static bool physics_in (struct anim *g);
 static void physics_out (struct anim *g);
@@ -45,6 +47,9 @@ ALLEGRO_BITMAP *guard_fall_01, *guard_fall_02, *guard_fall_03;
 
 /* fat guard */
 ALLEGRO_BITMAP *fat_guard_fall_01, *fat_guard_fall_02, *fat_guard_fall_03;
+
+/* vizier */
+ALLEGRO_BITMAP *vizier_fall_01, *vizier_fall_02, *vizier_fall_03;
 
 static void
 init_guard_fall_frameset (void)
@@ -66,12 +71,23 @@ init_fat_guard_fall_frameset (void)
           GUARD_FALL_FRAMESET_NMEMB * sizeof (struct frameset));
 }
 
+static void
+init_vizier_fall_frameset (void)
+{
+  struct frameset frameset[GUARD_FALL_FRAMESET_NMEMB] =
+    {{vizier_fall_01,+0,+0},{vizier_fall_02,+0,+5},{vizier_fall_03,+0,+10}};
+
+  memcpy (&vizier_fall_frameset, &frameset,
+          GUARD_FALL_FRAMESET_NMEMB * sizeof (struct frameset));
+}
+
 struct frameset *
 get_guard_fall_frameset (enum anim_type t)
 {
   switch (t) {
   case GUARD: default: return guard_fall_frameset;
   case FAT_GUARD: return fat_guard_fall_frameset;
+  case VIZIER: return vizier_fall_frameset;
   }
 }
 
@@ -88,9 +104,15 @@ load_guard_fall (void)
   fat_guard_fall_02 = load_bitmap (FAT_GUARD_FALL_02);
   fat_guard_fall_03 = load_bitmap (FAT_GUARD_FALL_03);
 
+  /* vizier */
+  vizier_fall_01 = load_bitmap (VIZIER_FALL_01);
+  vizier_fall_02 = load_bitmap (VIZIER_FALL_02);
+  vizier_fall_03 = load_bitmap (VIZIER_FALL_03);
+
   /* frameset */
   init_guard_fall_frameset ();
   init_fat_guard_fall_frameset ();
+  init_vizier_fall_frameset ();
 }
 
 void
@@ -105,6 +127,11 @@ unload_guard_fall (void)
   al_destroy_bitmap (fat_guard_fall_01);
   al_destroy_bitmap (fat_guard_fall_02);
   al_destroy_bitmap (fat_guard_fall_03);
+
+  /* vizier */
+  al_destroy_bitmap (vizier_fall_01);
+  al_destroy_bitmap (vizier_fall_02);
+  al_destroy_bitmap (vizier_fall_03);
 }
 
 void
@@ -277,6 +304,10 @@ is_guard_fall (struct frame *f)
   /* fat guard */
   for (i = 0; i < GUARD_FALL_FRAMESET_NMEMB; i++)
     if (f->b == fat_guard_fall_frameset[i].frame) return true;
+
+  /* vizier */
+  for (i = 0; i < GUARD_FALL_FRAMESET_NMEMB; i++)
+    if (f->b == vizier_fall_frameset[i].frame) return true;
 
   return false;
 }

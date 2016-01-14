@@ -33,9 +33,11 @@
 
 struct frameset guard_attack_frameset[GUARD_ATTACK_FRAMESET_NMEMB];
 struct frameset fat_guard_attack_frameset[GUARD_ATTACK_FRAMESET_NMEMB];
+struct frameset vizier_attack_frameset[GUARD_ATTACK_FRAMESET_NMEMB];
 
 static void init_guard_attack_frameset (void);
 static void init_fat_guard_attack_frameset (void);
+static void init_vizier_attack_frameset (void);
 static bool flow (struct anim *g);
 static bool physics_in (struct anim *g);
 static void physics_out (struct anim *g);
@@ -53,6 +55,13 @@ ALLEGRO_BITMAP *fat_guard_attack_01, *fat_guard_attack_02,
   *fat_guard_attack_06, *fat_guard_attack_07, *fat_guard_attack_08,
   *fat_guard_attack_counter_defense_01, *fat_guard_attack_counter_defense_02,
   *fat_guard_attack_defended;
+
+/* vizier */
+ALLEGRO_BITMAP *vizier_attack_01, *vizier_attack_02,
+  *vizier_attack_03, *vizier_attack_04, *vizier_attack_05,
+  *vizier_attack_06, *vizier_attack_07, *vizier_attack_08,
+  *vizier_attack_counter_defense_01, *vizier_attack_counter_defense_02,
+  *vizier_attack_defended;
 
 static void
 init_guard_attack_frameset (void)
@@ -84,12 +93,28 @@ init_fat_guard_attack_frameset (void)
           GUARD_ATTACK_FRAMESET_NMEMB * sizeof (struct frameset));
 }
 
+static void
+init_vizier_attack_frameset (void)
+{
+  struct frameset frameset[GUARD_ATTACK_FRAMESET_NMEMB] =
+    {{vizier_attack_01,-6,0},{vizier_attack_02,+0,0},
+     {vizier_attack_03,-3,0},{vizier_attack_04,-6,0},
+     {vizier_attack_05,-7,0},{vizier_attack_06,+6,0},
+     {vizier_attack_07,+9,0},{vizier_attack_08,+7,0},
+     {vizier_attack_counter_defense_01,+0,0},
+     {vizier_attack_counter_defense_02,+6,0}};
+
+  memcpy (&vizier_attack_frameset, &frameset,
+          GUARD_ATTACK_FRAMESET_NMEMB * sizeof (struct frameset));
+}
+
 struct frameset *
 get_guard_attack_frameset (enum anim_type t)
 {
   switch (t) {
   case GUARD: default: return guard_attack_frameset;
   case FAT_GUARD: return fat_guard_attack_frameset;
+  case VIZIER: return vizier_attack_frameset;
   }
 }
 
@@ -99,6 +124,7 @@ get_guard_attack_defended_bitmap (enum anim_type t)
   switch (t) {
   case GUARD: default: return guard_attack_defended;
   case FAT_GUARD: return fat_guard_attack_defended;
+  case VIZIER: return vizier_attack_defended;
   }
 }
 
@@ -131,9 +157,23 @@ load_guard_attack (void)
   fat_guard_attack_counter_defense_02 = load_bitmap (FAT_GUARD_ATTACK_COUNTER_DEFENSE_02);
   fat_guard_attack_defended = load_bitmap (FAT_GUARD_ATTACK_DEFENDED);
 
+  /* vizier */
+  vizier_attack_01 = load_bitmap (VIZIER_ATTACK_01);
+  vizier_attack_02 = load_bitmap (VIZIER_ATTACK_02);
+  vizier_attack_03 = load_bitmap (VIZIER_ATTACK_03);
+  vizier_attack_04 = load_bitmap (VIZIER_ATTACK_04);
+  vizier_attack_05 = load_bitmap (VIZIER_ATTACK_05);
+  vizier_attack_06 = load_bitmap (VIZIER_ATTACK_06);
+  vizier_attack_07 = load_bitmap (VIZIER_ATTACK_07);
+  vizier_attack_08 = load_bitmap (VIZIER_ATTACK_08);
+  vizier_attack_counter_defense_01 = load_bitmap (VIZIER_ATTACK_COUNTER_DEFENSE_01);
+  vizier_attack_counter_defense_02 = load_bitmap (VIZIER_ATTACK_COUNTER_DEFENSE_02);
+  vizier_attack_defended = load_bitmap (VIZIER_ATTACK_DEFENDED);
+
   /* frameset */
   init_guard_attack_frameset ();
   init_fat_guard_attack_frameset ();
+  init_vizier_attack_frameset ();
 }
 
 void
@@ -164,6 +204,19 @@ unload_guard_attack (void)
   al_destroy_bitmap (fat_guard_attack_counter_defense_01);
   al_destroy_bitmap (fat_guard_attack_counter_defense_02);
   al_destroy_bitmap (fat_guard_attack_defended);
+
+  /* vizier */
+  al_destroy_bitmap (vizier_attack_01);
+  al_destroy_bitmap (vizier_attack_02);
+  al_destroy_bitmap (vizier_attack_03);
+  al_destroy_bitmap (vizier_attack_04);
+  al_destroy_bitmap (vizier_attack_05);
+  al_destroy_bitmap (vizier_attack_06);
+  al_destroy_bitmap (vizier_attack_07);
+  al_destroy_bitmap (vizier_attack_08);
+  al_destroy_bitmap (vizier_attack_counter_defense_01);
+  al_destroy_bitmap (vizier_attack_counter_defense_02);
+  al_destroy_bitmap (vizier_attack_defended);
 }
 
 void

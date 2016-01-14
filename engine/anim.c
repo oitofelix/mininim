@@ -139,6 +139,8 @@ create_anim (struct anim *a0, enum anim_type t, struct pos *p, enum dir dir)
   case KID: create_kid (a0, &a, p, dir); break;
   case GUARD:
   case FAT_GUARD:
+  case VIZIER:
+  case SKELETON:
     create_guard (a0, &a, p, dir); break;
   case MOUSE: create_mouse (a0, &a, p, dir); break;
   }
@@ -182,6 +184,8 @@ draw_anim_frame (ALLEGRO_BITMAP *bitmap, struct anim *a, enum vm vm)
   case KID: draw_kid_frame (bitmap, a, vm); break;
   case GUARD:
   case FAT_GUARD:
+  case VIZIER:
+  case SKELETON:
     draw_guard_frame (bitmap, a, vm); break;
   case MOUSE: draw_mouse_frame (bitmap, a, vm); break;
   }
@@ -300,6 +304,8 @@ is_anim_dead (struct anim *a)
   case KID: return is_kid_dead (&a->f);
   case GUARD:
   case FAT_GUARD:
+  case VIZIER:
+  case SKELETON:
     return is_guard_dead (&a->f);
   }
 }
@@ -312,6 +318,8 @@ is_anim_fall (struct anim *a)
   case KID: return is_kid_fall (&a->f);
   case GUARD:
   case FAT_GUARD:
+  case VIZIER:
+  case SKELETON:
     return is_guard_fall (&a->f);
   }
 }
@@ -324,6 +332,8 @@ anim_die_suddenly (struct anim *a)
   case KID: kid_die_suddenly (a); break;
   case GUARD:
   case FAT_GUARD:
+  case VIZIER:
+  case SKELETON:
     guard_die_suddenly (a); break;
   }
 }
@@ -336,6 +346,8 @@ anim_die_spiked (struct anim *a)
   case KID: kid_die_spiked (a); break;
   case GUARD:
   case FAT_GUARD:
+  case VIZIER:
+  case SKELETON:
     guard_die_spiked (a); break;
   }
 }
@@ -348,6 +360,8 @@ anim_die_chopped (struct anim *a)
   case KID: kid_die_chopped (a); break;
   case GUARD:
   case FAT_GUARD:
+  case VIZIER:
+  case SKELETON:
     guard_die_chopped (a); break;
   }
 }
@@ -360,6 +374,8 @@ anim_die (struct anim *a)
   case KID: kid_die (a); break;
   case GUARD:
   case FAT_GUARD:
+  case VIZIER:
+  case SKELETON:
     guard_die (a); break;
   }
 }
@@ -372,6 +388,8 @@ anim_sword_hit (struct anim *a)
   case KID: kid_sword_hit (a); break;
   case GUARD:
   case FAT_GUARD:
+  case VIZIER:
+  case SKELETON:
     guard_hit (a); break;
   }
 }
@@ -384,6 +402,8 @@ anim_fall (struct anim *a)
   case KID: kid_fall (a); break;
   case GUARD:
   case FAT_GUARD:
+  case VIZIER:
+  case SKELETON:
     guard_fall (a); break;
   }
 }
@@ -396,6 +416,8 @@ anim_walkf (struct anim *a)
   case KID: kid_sword_walkf (a); break;
   case GUARD:
   case FAT_GUARD:
+  case VIZIER:
+  case SKELETON:
     guard_walkf (a); break;
   }
 }
@@ -408,6 +430,8 @@ anim_walkb (struct anim *a)
   case KID: kid_sword_walkb (a); break;
   case GUARD:
   case FAT_GUARD:
+  case VIZIER:
+  case SKELETON:
     guard_walkb (a); break;
   }
 }

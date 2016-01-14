@@ -358,7 +358,9 @@ is_at_defendable_attack_frame (struct anim *k)
     || k->fo.b == guard_attack_04
     || k->fo.b == guard_attack_05
     || k->fo.b == fat_guard_attack_04
-    || k->fo.b == fat_guard_attack_05;
+    || k->fo.b == fat_guard_attack_05
+    || k->fo.b == vizier_attack_04
+    || k->fo.b == vizier_attack_05 ;
 }
 
 bool
@@ -366,7 +368,8 @@ is_at_hit_frame (struct anim *k)
 {
   return k->fo.b == kid_sword_attack_04
     || k->fo.b == guard_attack_05
-    || k->fo.b == fat_guard_attack_05;
+    || k->fo.b == fat_guard_attack_05
+    || k->fo.b == vizier_attack_05;
 }
 
 void
@@ -395,6 +398,8 @@ put_at_defense_frame (struct anim *k)
     break;
   case GUARD:
   case FAT_GUARD:
+  case VIZIER:
+  case SKELETON:
     frameset = get_guard_defense_frameset (k->type);
     select_frame (k, frameset, 0);
     select_xframe (&k->xf, sword_frameset, 11);
@@ -435,6 +440,8 @@ put_at_attack_frame (struct anim *k)
     break;
   case GUARD:
   case FAT_GUARD:
+  case VIZIER:
+  case SKELETON:
     k->fo.b = get_guard_attack_defended_bitmap (k->type);
     k->fo.dx = +1;
     k->fo.dy = 0;

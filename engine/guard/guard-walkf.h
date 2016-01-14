@@ -30,9 +30,15 @@
 #define FAT_GUARD_WALKF_02 "data/fat-guard/walkf/02.png"
 #define FAT_GUARD_WALKF_03 "data/fat-guard/walkf/03.png"
 
+/* vizier */
+#define VIZIER_WALKF_01 "data/vizier/walkf/01.png"
+#define VIZIER_WALKF_02 "data/vizier/walkf/02.png"
+#define VIZIER_WALKF_03 "data/vizier/walkf/03.png"
+
 #define GUARD_WALKF_FRAMESET_NMEMB 3
 extern struct frameset guard_walkf_frameset[GUARD_WALKF_FRAMESET_NMEMB];
 extern struct frameset fat_guard_walkf_frameset[GUARD_WALKF_FRAMESET_NMEMB];
+extern struct frameset vizier_walkf_frameset[GUARD_WALKF_FRAMESET_NMEMB];
 
 void load_guard_walkf (void);
 void unload_guard_walkf (void);
@@ -44,5 +50,8 @@ extern ALLEGRO_BITMAP *guard_walkf_01, *guard_walkf_02, *guard_walkf_03;
 
 /* fat guard */
 extern ALLEGRO_BITMAP *fat_guard_walkf_01, *fat_guard_walkf_02, *fat_guard_walkf_03;
+
+/* vizier */
+extern ALLEGRO_BITMAP *vizier_walkf_01, *vizier_walkf_02, *vizier_walkf_03;
 
 #endif	/* MININIM_GUARD_WALKF_H */

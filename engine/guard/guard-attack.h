@@ -46,9 +46,23 @@
 #define FAT_GUARD_ATTACK_COUNTER_DEFENSE_02 "data/fat-guard/attack/counter-defense-02.png"
 #define FAT_GUARD_ATTACK_DEFENDED "data/fat-guard/attack/defended.png"
 
+/* vizier */
+#define VIZIER_ATTACK_01 "data/vizier/attack/01.png"
+#define VIZIER_ATTACK_02 "data/vizier/attack/02.png"
+#define VIZIER_ATTACK_03 "data/vizier/attack/03.png"
+#define VIZIER_ATTACK_04 "data/vizier/attack/04.png"
+#define VIZIER_ATTACK_05 "data/vizier/attack/05.png"
+#define VIZIER_ATTACK_06 "data/vizier/attack/06.png"
+#define VIZIER_ATTACK_07 "data/vizier/attack/07.png"
+#define VIZIER_ATTACK_08 "data/vizier/attack/08.png"
+#define VIZIER_ATTACK_COUNTER_DEFENSE_01 "data/vizier/attack/counter-defense-01.png"
+#define VIZIER_ATTACK_COUNTER_DEFENSE_02 "data/vizier/attack/counter-defense-02.png"
+#define VIZIER_ATTACK_DEFENDED "data/vizier/attack/defended.png"
+
 #define GUARD_ATTACK_FRAMESET_NMEMB 10
 extern struct frameset guard_attack_frameset[GUARD_ATTACK_FRAMESET_NMEMB];
 extern struct frameset fat_guard_attack_frameset[GUARD_ATTACK_FRAMESET_NMEMB];
+extern struct frameset vizier_attack_frameset[GUARD_ATTACK_FRAMESET_NMEMB];
 
 void load_guard_attack (void);
 void unload_guard_attack (void);
@@ -69,5 +83,12 @@ extern ALLEGRO_BITMAP *fat_guard_attack_01, *fat_guard_attack_02,
   *fat_guard_attack_06, *fat_guard_attack_07, *fat_guard_attack_08,
   *fat_guard_attack_counter_defense_01, *fat_guard_attack_counter_defense_02,
   *fat_guard_attack_defended;
+
+/* vizier */
+extern ALLEGRO_BITMAP *vizier_attack_01, *vizier_attack_02,
+  *vizier_attack_03, *vizier_attack_04, *vizier_attack_05,
+  *vizier_attack_06, *vizier_attack_07, *vizier_attack_08,
+  *vizier_attack_counter_defense_01, *vizier_attack_counter_defense_02,
+  *vizier_attack_defended;
 
 #endif	/* MININIM_GUARD_ATTACK_H */

@@ -90,17 +90,8 @@ struct anim *
 create_guard (struct anim *g0, struct anim *g1, struct pos *p, enum dir dir)
 {
   if (! g0) {
-    switch (g1->type) {
-    case GUARD: default:
-      g1->f.b = guard_normal_00;
-      g1->fo.b = guard_normal_00;
-      break;
-    case FAT_GUARD:
-      g1->f.b = fat_guard_normal_00;
-      g1->fo.b = fat_guard_normal_00;
-      break;
-    }
-
+    g1->f.b = get_guard_normal_bitmap (g1->type);
+    g1->fo.b = g1->f.b;
     g1->action = guard_normal;
     g1->total_lives = 3;
     g1->current_lives = 3;

@@ -30,9 +30,11 @@
 
 struct frameset guard_vigilant_frameset[GUARD_VIGILANT_FRAMESET_NMEMB];
 struct frameset fat_guard_vigilant_frameset[GUARD_VIGILANT_FRAMESET_NMEMB];
+struct frameset vizier_vigilant_frameset[GUARD_VIGILANT_FRAMESET_NMEMB];
 
 static void init_guard_vigilant_frameset (void);
 static void init_fat_guard_vigilant_frameset (void);
+static void init_vizier_vigilant_frameset (void);
 static bool flow (struct anim *g);
 static bool physics_in (struct anim *g);
 static void physics_out (struct anim *g);
@@ -44,6 +46,10 @@ ALLEGRO_BITMAP *guard_vigilant_01, *guard_vigilant_02,
 /* fat guard */
 ALLEGRO_BITMAP *fat_guard_vigilant_01, *fat_guard_vigilant_02,
   *fat_guard_vigilant_03;
+
+/* vizier */
+ALLEGRO_BITMAP *vizier_vigilant_01, *vizier_vigilant_02,
+  *vizier_vigilant_03;
 
 static void
 init_guard_vigilant_frameset (void)
@@ -67,12 +73,24 @@ init_fat_guard_vigilant_frameset (void)
           GUARD_VIGILANT_FRAMESET_NMEMB * sizeof (struct frameset));
 }
 
+static void
+init_vizier_vigilant_frameset (void)
+{
+  struct frameset frameset[GUARD_VIGILANT_FRAMESET_NMEMB] =
+    {{vizier_vigilant_01,+0,0},{vizier_vigilant_02,+0,0},
+     {vizier_vigilant_03,+0,0}};
+
+  memcpy (&vizier_vigilant_frameset, &frameset,
+          GUARD_VIGILANT_FRAMESET_NMEMB * sizeof (struct frameset));
+}
+
 struct frameset *
 get_guard_vigilant_frameset (enum anim_type t)
 {
   switch (t) {
   case GUARD: default: return guard_vigilant_frameset;
   case FAT_GUARD: return fat_guard_vigilant_frameset;
+  case VIZIER: return vizier_vigilant_frameset;
   }
 }
 
@@ -89,9 +107,15 @@ load_guard_vigilant (void)
   fat_guard_vigilant_02 = load_bitmap (FAT_GUARD_VIGILANT_02);
   fat_guard_vigilant_03 = load_bitmap (FAT_GUARD_VIGILANT_03);
 
+  /* vizier */
+  vizier_vigilant_01 = load_bitmap (VIZIER_VIGILANT_01);
+  vizier_vigilant_02 = load_bitmap (VIZIER_VIGILANT_02);
+  vizier_vigilant_03 = load_bitmap (VIZIER_VIGILANT_03);
+
   /* frameset */
   init_guard_vigilant_frameset ();
   init_fat_guard_vigilant_frameset ();
+  init_vizier_vigilant_frameset ();
 }
 
 void
@@ -106,6 +130,11 @@ unload_guard_vigilant (void)
   al_destroy_bitmap (fat_guard_vigilant_01);
   al_destroy_bitmap (fat_guard_vigilant_02);
   al_destroy_bitmap (fat_guard_vigilant_03);
+
+  /* vizier */
+  al_destroy_bitmap (vizier_vigilant_01);
+  al_destroy_bitmap (vizier_vigilant_02);
+  al_destroy_bitmap (vizier_vigilant_03);
 }
 
 void

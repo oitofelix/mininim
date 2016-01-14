@@ -26,11 +26,21 @@
 /* fat guard */
 #define FAT_GUARD_NORMAL_00 "data/fat-guard/normal/00.png"
 
+/* vizier */
+#define VIZIER_NORMAL_00 "data/vizier/normal/00.png"
+
 void load_guard_normal (void);
 void unload_guard_normal (void);
 void guard_normal (struct anim *g);
 ALLEGRO_BITMAP *get_guard_normal_bitmap (enum anim_type t);
 
-ALLEGRO_BITMAP *guard_normal_00, *fat_guard_normal_00;
+/* guard */
+ALLEGRO_BITMAP *guard_normal_00;
+
+/* fat guard */
+ALLEGRO_BITMAP *fat_guard_normal_00;
+
+/* vizier */
+ALLEGRO_BITMAP *vizier_normal_00;
 
 #endif	/* MININIM_GUARD_NORMAL_H */

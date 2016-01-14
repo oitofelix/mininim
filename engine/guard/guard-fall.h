@@ -30,9 +30,15 @@
 #define FAT_GUARD_FALL_02 "data/fat-guard/fall/02.png"
 #define FAT_GUARD_FALL_03 "data/fat-guard/fall/03.png"
 
+/* vizier */
+#define VIZIER_FALL_01 "data/vizier/fall/01.png"
+#define VIZIER_FALL_02 "data/vizier/fall/02.png"
+#define VIZIER_FALL_03 "data/vizier/fall/03.png"
+
 #define GUARD_FALL_FRAMESET_NMEMB 3
 extern struct frameset guard_fall_frameset[GUARD_FALL_FRAMESET_NMEMB];
 extern struct frameset fat_guard_fall_frameset[GUARD_FALL_FRAMESET_NMEMB];
+extern struct frameset vizier_fall_frameset[GUARD_FALL_FRAMESET_NMEMB];
 
 void load_guard_fall (void);
 void unload_guard_fall (void);
@@ -45,5 +51,8 @@ extern ALLEGRO_BITMAP *guard_fall_01, *guard_fall_02, *guard_fall_03;
 
 /* fat guard */
 extern ALLEGRO_BITMAP *fat_guard_fall_01, *fat_guard_fall_02, *fat_guard_fall_03;
+
+/* vizier */
+extern ALLEGRO_BITMAP *vizier_fall_01, *vizier_fall_02, *vizier_fall_03;
 
 #endif	/* MININIM_GUARD_FALL_H */

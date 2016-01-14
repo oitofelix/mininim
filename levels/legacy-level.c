@@ -138,8 +138,11 @@ start (void)
     /* case GUARD: default: */
     /*   id = create_anim (NULL, GUARD, &g->p, g->dir); */
     /*   break; */
-    case FAT_GUARD: default:
-      id = create_anim (NULL, FAT_GUARD, &g->p, g->dir);
+    /* case FAT_GUARD: default: */
+    /*   id = create_anim (NULL, FAT_GUARD, &g->p, g->dir); */
+    /*   break; */
+    case VIZIER: default:
+      id = create_anim (NULL, VIZIER, &g->p, g->dir);
       break;
     }
     a = &anima[id];

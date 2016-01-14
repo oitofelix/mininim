@@ -32,9 +32,11 @@
 
 struct frameset guard_defense_frameset[GUARD_DEFENSE_FRAMESET_NMEMB];
 struct frameset fat_guard_defense_frameset[GUARD_DEFENSE_FRAMESET_NMEMB];
+struct frameset vizier_defense_frameset[GUARD_DEFENSE_FRAMESET_NMEMB];
 
 static void init_guard_defense_frameset (void);
 static void init_fat_guard_defense_frameset (void);
+static void init_vizier_defense_frameset (void);
 static bool flow (struct anim *g);
 static bool physics_in (struct anim *g);
 static void physics_out (struct anim *g);
@@ -44,6 +46,9 @@ ALLEGRO_BITMAP *guard_defense_01, *guard_defense_counter_attack;
 
 /* fat guard */
 ALLEGRO_BITMAP *fat_guard_defense_01, *fat_guard_defense_counter_attack;
+
+/* vizier */
+ALLEGRO_BITMAP *vizier_defense_01, *vizier_defense_counter_attack;
 
 static void
 init_guard_defense_frameset (void)
@@ -65,12 +70,23 @@ init_fat_guard_defense_frameset (void)
           GUARD_DEFENSE_FRAMESET_NMEMB * sizeof (struct frameset));
 }
 
+static void
+init_vizier_defense_frameset (void)
+{
+  struct frameset frameset[GUARD_DEFENSE_FRAMESET_NMEMB] =
+    {{vizier_defense_01,+0,0},{vizier_defense_counter_attack,+0,0}};
+
+  memcpy (&vizier_defense_frameset, &frameset,
+          GUARD_DEFENSE_FRAMESET_NMEMB * sizeof (struct frameset));
+}
+
 struct frameset *
 get_guard_defense_frameset (enum anim_type t)
 {
   switch (t) {
   case GUARD: default: return guard_defense_frameset;
   case FAT_GUARD: return fat_guard_defense_frameset;
+  case VIZIER: return vizier_defense_frameset;
   }
 }
 
@@ -85,9 +101,14 @@ load_guard_defense (void)
   fat_guard_defense_01 = load_bitmap (FAT_GUARD_DEFENSE_01);
   fat_guard_defense_counter_attack = load_bitmap (FAT_GUARD_DEFENSE_COUNTER_ATTACK);
 
+  /* vizier */
+  vizier_defense_01 = load_bitmap (VIZIER_DEFENSE_01);
+  vizier_defense_counter_attack = load_bitmap (VIZIER_DEFENSE_COUNTER_ATTACK);
+
   /* frameset */
   init_guard_defense_frameset ();
   init_fat_guard_defense_frameset ();
+  init_vizier_defense_frameset ();
 }
 
 void
@@ -100,6 +121,10 @@ unload_guard_defense (void)
   /* fat_guard */
   al_destroy_bitmap (fat_guard_defense_01);
   al_destroy_bitmap (fat_guard_defense_counter_attack);
+
+  /* vizier */
+  al_destroy_bitmap (vizier_defense_01);
+  al_destroy_bitmap (vizier_defense_counter_attack);
 }
 
 void
