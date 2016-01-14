@@ -41,10 +41,18 @@
 #define VIZIER_HIT_04 "data/vizier/hit/04.png"
 #define VIZIER_HIT_05 "data/vizier/hit/05.png"
 
+/* skeleton */
+#define SKELETON_HIT_01 "data/skeleton/hit/01.png"
+#define SKELETON_HIT_02 "data/skeleton/hit/02.png"
+#define SKELETON_HIT_03 "data/skeleton/hit/03.png"
+#define SKELETON_HIT_04 "data/skeleton/hit/04.png"
+#define SKELETON_HIT_05 "data/skeleton/hit/05.png"
+
 #define GUARD_HIT_FRAMESET_NMEMB 5
 extern struct frameset guard_hit_frameset[GUARD_HIT_FRAMESET_NMEMB];
 extern struct frameset fat_guard_hit_frameset[GUARD_HIT_FRAMESET_NMEMB];
 extern struct frameset vizier_hit_frameset[GUARD_HIT_FRAMESET_NMEMB];
+extern struct frameset skeleton_hit_frameset[GUARD_HIT_FRAMESET_NMEMB];
 
 void load_guard_hit (void);
 void unload_guard_hit (void);
@@ -62,5 +70,9 @@ extern ALLEGRO_BITMAP *fat_guard_hit_01, *fat_guard_hit_02,
 /* vizier */
 extern ALLEGRO_BITMAP *vizier_hit_01, *vizier_hit_02,
   *vizier_hit_03, *vizier_hit_04, *vizier_hit_05;
+
+/* skeleton */
+extern ALLEGRO_BITMAP *skeleton_hit_01, *skeleton_hit_02,
+  *skeleton_hit_03, *skeleton_hit_04, *skeleton_hit_05;
 
 #endif	/* MININIM_GUARD_HIT_H */

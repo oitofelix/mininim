@@ -39,6 +39,7 @@
 
 /* sounds */
 #define GUARD_HIT_SAMPLE "dat/digisnd1/taking a life to the enemy.ogg"
+#define SKELETON_SAMPLE "dat/digisnd2/skel alive.ogg"
 
 /* functions */
 void load_guard (void);
@@ -53,6 +54,6 @@ bool is_guard (struct anim *a);
 extern struct anim *guarda;
 extern size_t guarda_nmemb;
 
-extern ALLEGRO_SAMPLE *guard_hit_sample;
+extern ALLEGRO_SAMPLE *guard_hit_sample, *skeleton_sample;
 
 #endif	/* MININIM_GUARD_H */

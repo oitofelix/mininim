@@ -35,10 +35,16 @@
 #define VIZIER_VIGILANT_02 "data/vizier/vigilant/02.png"
 #define VIZIER_VIGILANT_03 "data/vizier/vigilant/03.png"
 
+/* skeleton */
+#define SKELETON_VIGILANT_01 "data/skeleton/vigilant/01.png"
+#define SKELETON_VIGILANT_02 "data/skeleton/vigilant/02.png"
+#define SKELETON_VIGILANT_03 "data/skeleton/vigilant/03.png"
+
 #define GUARD_VIGILANT_FRAMESET_NMEMB 3
 extern struct frameset guard_vigilant_frameset[GUARD_VIGILANT_FRAMESET_NMEMB];
 extern struct frameset fat_guard_vigilant_frameset[GUARD_VIGILANT_FRAMESET_NMEMB];
 extern struct frameset vizier_vigilant_frameset[GUARD_VIGILANT_FRAMESET_NMEMB];
+extern struct frameset skeleton_vigilant_frameset[GUARD_VIGILANT_FRAMESET_NMEMB];
 
 void load_guard_vigilant (void);
 void unload_guard_vigilant (void);
@@ -56,5 +62,9 @@ extern ALLEGRO_BITMAP *fat_guard_vigilant_01, *fat_guard_vigilant_02,
 /* vizier */
 extern ALLEGRO_BITMAP *vizier_vigilant_01, *vizier_vigilant_02,
   *vizier_vigilant_03;
+
+/* skeleton */
+extern ALLEGRO_BITMAP *skeleton_vigilant_01, *skeleton_vigilant_02,
+  *skeleton_vigilant_03;
 
 #endif	/* MININIM_GUARD_VIGILANT_H */

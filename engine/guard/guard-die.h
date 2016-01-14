@@ -46,10 +46,21 @@
 #define VIZIER_DIE_05 "data/vizier/die/05.png"
 #define VIZIER_DIE_06 "data/vizier/die/06.png"
 
+/* skeleton */
+#define SKELETON_DIE_01 "data/skeleton/die/01.png"
+#define SKELETON_DIE_02 "data/skeleton/die/02.png"
+#define SKELETON_DIE_03 "data/skeleton/die/03.png"
+#define SKELETON_DIE_04 "data/skeleton/die/04.png"
+#define SKELETON_DIE_05 "data/skeleton/die/05.png"
+#define SKELETON_DIE_06 "data/skeleton/die/06.png"
+#define SKELETON_DIE_SPIKED_00 "data/skeleton/die/spiked.png"
+#define SKELETON_DIE_CHOPPED_00 "data/skeleton/die/chopped.png"
+
 #define GUARD_DIE_FRAMESET_NMEMB 6
 extern struct frameset guard_die_frameset[GUARD_DIE_FRAMESET_NMEMB];
 extern struct frameset fat_guard_die_frameset[GUARD_DIE_FRAMESET_NMEMB];
 extern struct frameset vizier_die_frameset[GUARD_DIE_FRAMESET_NMEMB];
+extern struct frameset skeleton_die_frameset[GUARD_DIE_FRAMESET_NMEMB];
 
 void load_guard_die (void);
 void unload_guard_die (void);
@@ -59,6 +70,7 @@ void guard_die_chopped (struct anim *g);
 void guard_die_suddenly (struct anim *g);
 bool is_guard_dead (struct frame *f);
 struct frameset *get_guard_die_frameset (enum anim_type t);
+ALLEGRO_BITMAP *get_guard_die_spiked_bitmap (enum anim_type t);
 
 /* guard */
 extern ALLEGRO_BITMAP *guard_die_01, *guard_die_02, *guard_die_03,
@@ -71,5 +83,9 @@ extern ALLEGRO_BITMAP *fat_guard_die_01, *fat_guard_die_02, *fat_guard_die_03,
 /* vizier */
 extern ALLEGRO_BITMAP *vizier_die_01, *vizier_die_02, *vizier_die_03,
   *vizier_die_04, *vizier_die_05, *vizier_die_06;
+
+/* skeleton */
+extern ALLEGRO_BITMAP *skeleton_die_01, *skeleton_die_02, *skeleton_die_03,
+  *skeleton_die_04, *skeleton_die_05, *skeleton_die_06;
 
 #endif	/* MININIM_GUARD_DIE_H */

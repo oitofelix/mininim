@@ -43,6 +43,9 @@ ALLEGRO_BITMAP *fat_guard_normal_00;
 /* vizier */
 ALLEGRO_BITMAP *vizier_normal_00;
 
+/* skeleton */
+ALLEGRO_BITMAP *skeleton_normal_00;
+
 ALLEGRO_BITMAP *
 get_guard_normal_bitmap (enum anim_type t)
 {
@@ -50,6 +53,7 @@ get_guard_normal_bitmap (enum anim_type t)
   case GUARD: default: return guard_normal_00;
   case FAT_GUARD: return fat_guard_normal_00;
   case VIZIER: return vizier_normal_00;
+  case SKELETON: return skeleton_normal_00;
   }
 }
 
@@ -64,6 +68,9 @@ load_guard_normal (void)
 
   /* vizier */
   vizier_normal_00 = load_bitmap (VIZIER_NORMAL_00);
+
+  /* skeleton */
+  skeleton_normal_00 = load_bitmap (SKELETON_NORMAL_00);
 }
 
 void
@@ -77,6 +84,9 @@ unload_guard_normal (void)
 
   /* vizier */
   al_destroy_bitmap (vizier_normal_00);
+
+  /* skeleton */
+  al_destroy_bitmap (skeleton_normal_00);
 }
 
 void
@@ -119,7 +129,8 @@ flow (struct anim *g)
 
   select_xframe (&g->xf, sword_frameset, 30);
 
-  if (g->type == VIZIER) g->xf.dy += 4;
+  if (g->type == VIZIER) g->xf.dy += +4;
+  if (g->type == SKELETON) g->xf.dx += -5, g->xf.dy += -6;
 
   return true;
 }

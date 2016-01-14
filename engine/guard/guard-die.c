@@ -34,10 +34,12 @@
 struct frameset guard_die_frameset[GUARD_DIE_FRAMESET_NMEMB];
 struct frameset fat_guard_die_frameset[GUARD_DIE_FRAMESET_NMEMB];
 struct frameset vizier_die_frameset[GUARD_DIE_FRAMESET_NMEMB];
+struct frameset skeleton_die_frameset[GUARD_DIE_FRAMESET_NMEMB];
 
 static void init_guard_die_frameset (void);
 static void init_fat_guard_die_frameset (void);
 static void init_vizier_die_frameset (void);
+static void init_skeleton_die_frameset (void);
 static bool flow (struct anim *g);
 static bool physics_in (struct anim *g);
 static void physics_out (struct anim *g);
@@ -53,6 +55,11 @@ ALLEGRO_BITMAP *fat_guard_die_01, *fat_guard_die_02, *fat_guard_die_03,
 /* vizier */
 ALLEGRO_BITMAP *vizier_die_01, *vizier_die_02, *vizier_die_03, *vizier_die_04,
   *vizier_die_05, *vizier_die_06;
+
+/* skeleton */
+ALLEGRO_BITMAP *skeleton_die_01, *skeleton_die_02, *skeleton_die_03, *skeleton_die_04,
+  *skeleton_die_05, *skeleton_die_06, *skeleton_die_spiked_00,
+  *skeleton_die_chopped_00;
 
 static void
 init_guard_die_frameset (void)
@@ -87,6 +94,17 @@ init_vizier_die_frameset (void)
           GUARD_DIE_FRAMESET_NMEMB * sizeof (struct frameset));
 }
 
+static void
+init_skeleton_die_frameset (void)
+{
+  struct frameset frameset[GUARD_DIE_FRAMESET_NMEMB] =
+    {{skeleton_die_01,-8,+0},{skeleton_die_02,+0,+2},{skeleton_die_03,+0,+2},
+     {skeleton_die_04,+0,+0},{skeleton_die_05,+0,+0},{skeleton_die_06,+0,+0}};
+
+  memcpy (&skeleton_die_frameset, &frameset,
+          GUARD_DIE_FRAMESET_NMEMB * sizeof (struct frameset));
+}
+
 struct frameset *
 get_guard_die_frameset (enum anim_type t)
 {
@@ -94,6 +112,7 @@ get_guard_die_frameset (enum anim_type t)
   case GUARD: default: return guard_die_frameset;
   case FAT_GUARD: return fat_guard_die_frameset;
   case VIZIER: return vizier_die_frameset;
+  case SKELETON: return skeleton_die_frameset;
   }
 }
 
@@ -126,10 +145,21 @@ load_guard_die (void)
   vizier_die_05 = load_bitmap (VIZIER_DIE_05);
   vizier_die_06 = load_bitmap (VIZIER_DIE_06);
 
+  /* skeleton */
+  skeleton_die_01 = load_bitmap (SKELETON_DIE_01);
+  skeleton_die_02 = load_bitmap (SKELETON_DIE_02);
+  skeleton_die_03 = load_bitmap (SKELETON_DIE_03);
+  skeleton_die_04 = load_bitmap (SKELETON_DIE_04);
+  skeleton_die_05 = load_bitmap (SKELETON_DIE_05);
+  skeleton_die_06 = load_bitmap (SKELETON_DIE_06);
+  skeleton_die_spiked_00 = load_bitmap (SKELETON_DIE_SPIKED_00);
+  skeleton_die_chopped_00 = load_bitmap (SKELETON_DIE_CHOPPED_00);
+
   /* frameset */
   init_guard_die_frameset ();
   init_fat_guard_die_frameset ();
   init_vizier_die_frameset ();
+  init_skeleton_die_frameset ();
 }
 
 void
@@ -160,6 +190,25 @@ unload_guard_die (void)
   al_destroy_bitmap (vizier_die_04);
   al_destroy_bitmap (vizier_die_05);
   al_destroy_bitmap (vizier_die_06);
+
+  /* skeleton */
+  al_destroy_bitmap (skeleton_die_01);
+  al_destroy_bitmap (skeleton_die_02);
+  al_destroy_bitmap (skeleton_die_03);
+  al_destroy_bitmap (skeleton_die_04);
+  al_destroy_bitmap (skeleton_die_05);
+  al_destroy_bitmap (skeleton_die_06);
+  al_destroy_bitmap (skeleton_die_spiked_00);
+  al_destroy_bitmap (skeleton_die_chopped_00);
+}
+
+ALLEGRO_BITMAP *
+get_guard_die_spiked_bitmap (enum anim_type t)
+{
+  switch (t) {
+  case GUARD: default: return guard_die_spiked_00;
+  case SKELETON: return skeleton_die_spiked_00;
+  }
 }
 
 void
@@ -179,15 +228,29 @@ guard_die_spiked (struct anim *g)
     s->inactive = true;
     s->murdered_anim = g->id;
 
-    play_sample (spiked_sample, g->f.c.room);
+    if (g->type == SKELETON) play_sample (skeleton_sample, g->f.c.room);
+    else play_sample (spiked_sample, g->f.c.room);
   }
 
+  int dy;
+  if (g->type == SKELETON) dy = +45;
+  else dy = (g->f.dir == LEFT) ? +32 : +31;
+
+  ALLEGRO_BITMAP *bitmap = get_guard_die_spiked_bitmap (g->type);
   if (g->oaction != guard_die_spiked)
-    place_frame (&g->f, &g->f, guard_die_spiked_00,
-                 &g->p, (g->f.dir == LEFT)
-                 ? +8 : +9, (g->f.dir == LEFT) ? +32 : +31);
+    place_frame (&g->f, &g->f, bitmap,
+                 &g->p, (g->f.dir == LEFT) ? +8 : +9, dy);
 
   g->xf.b = NULL;
+}
+
+ALLEGRO_BITMAP *
+get_guard_die_chopped_bitmap (enum anim_type t)
+{
+  switch (t) {
+  case GUARD: default: return guard_die_chopped_00;
+  case SKELETON: return skeleton_die_chopped_00;
+  }
 }
 
 void
@@ -199,10 +262,11 @@ guard_die_chopped (struct anim *g)
 
   g->current_lives = 0;
 
+  ALLEGRO_BITMAP *bitmap = get_guard_die_chopped_bitmap (g->type);
   if (g->oaction != guard_die_chopped)
-    place_frame (&g->f, &g->f, guard_die_chopped_00,
-                 &g->p, (g->f.dir == LEFT)
-                 ? -10 : -7, +43);
+    place_frame (&g->f, &g->f, bitmap,
+                 &g->p, (g->f.dir == LEFT) ? -10 : -7,
+                 (g->type == SKELETON) ? +45 : +43);
 
   g->xf.b = NULL;
 }
@@ -261,6 +325,7 @@ flow (struct anim *g)
                  &g->p, (g->f.dir == LEFT)
                  ? +13 : +21, +17);
     g->i = -1, g->j = 0;
+    if (g->type == SKELETON) play_sample (skeleton_sample, g->f.c.room);
   }
 
   g->current_lives = 0;
@@ -324,6 +389,13 @@ is_guard_dead (struct frame *f)
   /* vizier */
   for (i = 0; i < GUARD_DIE_FRAMESET_NMEMB; i++)
     if (f->b == vizier_die_frameset[i].frame) return true;
+
+  /* skeleton */
+  for (i = 0; i < GUARD_DIE_FRAMESET_NMEMB; i++)
+    if (f->b == skeleton_die_frameset[i].frame) return true;
+
+  if (f->b == skeleton_die_spiked_00) return true;
+  if (f->b == skeleton_die_chopped_00) return true;
 
   return false;
 }

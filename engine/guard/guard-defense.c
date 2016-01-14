@@ -33,10 +33,12 @@
 struct frameset guard_defense_frameset[GUARD_DEFENSE_FRAMESET_NMEMB];
 struct frameset fat_guard_defense_frameset[GUARD_DEFENSE_FRAMESET_NMEMB];
 struct frameset vizier_defense_frameset[GUARD_DEFENSE_FRAMESET_NMEMB];
+struct frameset skeleton_defense_frameset[GUARD_DEFENSE_FRAMESET_NMEMB];
 
 static void init_guard_defense_frameset (void);
 static void init_fat_guard_defense_frameset (void);
 static void init_vizier_defense_frameset (void);
+static void init_skeleton_defense_frameset (void);
 static bool flow (struct anim *g);
 static bool physics_in (struct anim *g);
 static void physics_out (struct anim *g);
@@ -49,6 +51,9 @@ ALLEGRO_BITMAP *fat_guard_defense_01, *fat_guard_defense_counter_attack;
 
 /* vizier */
 ALLEGRO_BITMAP *vizier_defense_01, *vizier_defense_counter_attack;
+
+/* skeleton */
+ALLEGRO_BITMAP *skeleton_defense_01, *skeleton_defense_counter_attack;
 
 static void
 init_guard_defense_frameset (void)
@@ -80,6 +85,16 @@ init_vizier_defense_frameset (void)
           GUARD_DEFENSE_FRAMESET_NMEMB * sizeof (struct frameset));
 }
 
+static void
+init_skeleton_defense_frameset (void)
+{
+  struct frameset frameset[GUARD_DEFENSE_FRAMESET_NMEMB] =
+    {{skeleton_defense_01,+0,0},{skeleton_defense_counter_attack,+0,0}};
+
+  memcpy (&skeleton_defense_frameset, &frameset,
+          GUARD_DEFENSE_FRAMESET_NMEMB * sizeof (struct frameset));
+}
+
 struct frameset *
 get_guard_defense_frameset (enum anim_type t)
 {
@@ -87,6 +102,7 @@ get_guard_defense_frameset (enum anim_type t)
   case GUARD: default: return guard_defense_frameset;
   case FAT_GUARD: return fat_guard_defense_frameset;
   case VIZIER: return vizier_defense_frameset;
+  case SKELETON: return skeleton_defense_frameset;
   }
 }
 
@@ -105,10 +121,15 @@ load_guard_defense (void)
   vizier_defense_01 = load_bitmap (VIZIER_DEFENSE_01);
   vizier_defense_counter_attack = load_bitmap (VIZIER_DEFENSE_COUNTER_ATTACK);
 
+  /* skeleton */
+  skeleton_defense_01 = load_bitmap (SKELETON_DEFENSE_01);
+  skeleton_defense_counter_attack = load_bitmap (SKELETON_DEFENSE_COUNTER_ATTACK);
+
   /* frameset */
   init_guard_defense_frameset ();
   init_fat_guard_defense_frameset ();
   init_vizier_defense_frameset ();
+  init_skeleton_defense_frameset ();
 }
 
 void
@@ -125,6 +146,10 @@ unload_guard_defense (void)
   /* vizier */
   al_destroy_bitmap (vizier_defense_01);
   al_destroy_bitmap (vizier_defense_counter_attack);
+
+  /* skeleton */
+  al_destroy_bitmap (skeleton_defense_01);
+  al_destroy_bitmap (skeleton_defense_counter_attack);
 }
 
 void
@@ -168,6 +193,8 @@ flow (struct anim *g)
   if (g->i == 1) g->xf.b = NULL;
 
   if (g->oaction == guard_attack) g->fo.dx += +2;
+
+  if (g->type == SKELETON) g->xf.dy += -3;
 
   /* if (g->id == 0) */
   /*   printf ("guard_defense: g->i = %i, g->fo.dx = %i\n", */

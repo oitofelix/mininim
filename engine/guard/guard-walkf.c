@@ -31,10 +31,12 @@
 struct frameset guard_walkf_frameset[GUARD_WALKF_FRAMESET_NMEMB];
 struct frameset fat_guard_walkf_frameset[GUARD_WALKF_FRAMESET_NMEMB];
 struct frameset vizier_walkf_frameset[GUARD_WALKF_FRAMESET_NMEMB];
+struct frameset skeleton_walkf_frameset[GUARD_WALKF_FRAMESET_NMEMB];
 
 static void init_guard_walkf_frameset (void);
 static void init_fat_guard_walkf_frameset (void);
 static void init_vizier_walkf_frameset (void);
+static void init_skeleton_walkf_frameset (void);
 static bool flow (struct anim *g);
 static bool physics_in (struct anim *g);
 static void physics_out (struct anim *g);
@@ -47,6 +49,9 @@ ALLEGRO_BITMAP *fat_guard_walkf_01, *fat_guard_walkf_02, *fat_guard_walkf_03;
 
 /* vizier */
 ALLEGRO_BITMAP *vizier_walkf_01, *vizier_walkf_02, *vizier_walkf_03;
+
+/* skeleton */
+ALLEGRO_BITMAP *skeleton_walkf_01, *skeleton_walkf_02, *skeleton_walkf_03;
 
 static void
 init_guard_walkf_frameset (void)
@@ -81,6 +86,17 @@ init_vizier_walkf_frameset (void)
           GUARD_WALKF_FRAMESET_NMEMB * sizeof (struct frameset));
 }
 
+static void
+init_skeleton_walkf_frameset (void)
+{
+  struct frameset frameset[GUARD_WALKF_FRAMESET_NMEMB] =
+    {{skeleton_walkf_01,-7,0},{skeleton_walkf_02,-8,0},
+     {skeleton_walkf_03,-1,0}};
+
+  memcpy (&skeleton_walkf_frameset, &frameset,
+          GUARD_WALKF_FRAMESET_NMEMB * sizeof (struct frameset));
+}
+
 struct frameset *
 get_guard_walkf_frameset (enum anim_type t)
 {
@@ -88,6 +104,7 @@ get_guard_walkf_frameset (enum anim_type t)
   case GUARD: default: return guard_walkf_frameset;
   case FAT_GUARD: return fat_guard_walkf_frameset;
   case VIZIER: return vizier_walkf_frameset;
+  case SKELETON: return skeleton_walkf_frameset;
   }
 }
 
@@ -109,10 +126,16 @@ load_guard_walkf (void)
   vizier_walkf_02 = load_bitmap (VIZIER_WALKF_02);
   vizier_walkf_03 = load_bitmap (VIZIER_WALKF_03);
 
+  /* skeleton */
+  skeleton_walkf_01 = load_bitmap (SKELETON_WALKF_01);
+  skeleton_walkf_02 = load_bitmap (SKELETON_WALKF_02);
+  skeleton_walkf_03 = load_bitmap (SKELETON_WALKF_03);
+
   /* frameset */
   init_guard_walkf_frameset ();
   init_fat_guard_walkf_frameset ();
   init_vizier_walkf_frameset ();
+  init_skeleton_walkf_frameset ();
 }
 
 void
@@ -132,6 +155,11 @@ unload_guard_walkf (void)
   al_destroy_bitmap (vizier_walkf_01);
   al_destroy_bitmap (vizier_walkf_02);
   al_destroy_bitmap (vizier_walkf_03);
+
+  /* skeleton */
+  al_destroy_bitmap (skeleton_walkf_01);
+  al_destroy_bitmap (skeleton_walkf_02);
+  al_destroy_bitmap (skeleton_walkf_03);
 }
 
 void
@@ -167,6 +195,8 @@ flow (struct anim *g)
 
   if (g->i == 1) g->xf.dx = -6, g->xf.dy = +8;
   if (g->i == 2) g->xf.dx = -9, g->xf.dy = +11;
+
+  if (g->type == SKELETON) g->xf.dy += -3;
 
   return true;
 }

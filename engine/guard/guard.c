@@ -42,7 +42,7 @@
 ALLEGRO_BITMAP *guard_life, *guard_splash;
 
 /* sounds */
-ALLEGRO_SAMPLE *guard_hit_sample;
+ALLEGRO_SAMPLE *guard_hit_sample, *skeleton_sample;
 
 void
 load_guard (void)
@@ -63,6 +63,7 @@ load_guard (void)
 
   /* sounds */
   guard_hit_sample = load_sample (GUARD_HIT_SAMPLE);
+  skeleton_sample = load_sample (SKELETON_SAMPLE);
 }
 
 void
@@ -84,6 +85,7 @@ unload_guard (void)
 
   /* sounds */
   al_destroy_sample (guard_hit_sample);
+  al_destroy_sample (skeleton_sample);
 }
 
 struct anim *
@@ -369,9 +371,13 @@ draw_guard_frame (ALLEGRO_BITMAP *bitmap, struct anim *g, enum vm vm)
   struct frame f = g->f;
   struct frame_offset xf = g->xf;
 
-  palette pal = get_palette (g->style, vm);
-  f.b = apply_palette (f.b, pal);
-  xf.b = apply_palette (xf.b, pal);
+  palette pal = NULL;
+  if (g->type == GUARD || g->type == FAT_GUARD
+      || g->type == VIZIER) {
+    pal = get_palette (g->style, vm);
+    f.b = apply_palette (f.b, pal);
+    xf.b = apply_palette (xf.b, pal);
+  }
 
   if (hgc) {
     f.b = apply_palette (f.b, hgc_palette);
@@ -381,7 +387,7 @@ draw_guard_frame (ALLEGRO_BITMAP *bitmap, struct anim *g, enum vm vm)
   draw_xframe (bitmap, &f, &xf);
   draw_frame (bitmap, &f);
 
-  if (g->splash) {
+  if (g->splash && g->type != SKELETON) {
     ALLEGRO_BITMAP *splash = apply_palette (guard_splash, pal);
     if (hgc) splash = apply_palette (splash, hgc_palette);
     draw_bitmapc (splash, bitmap, splash_coord (&g->f, &c), g->f.flip);

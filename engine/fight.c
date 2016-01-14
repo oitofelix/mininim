@@ -360,7 +360,9 @@ is_at_defendable_attack_frame (struct anim *k)
     || k->fo.b == fat_guard_attack_04
     || k->fo.b == fat_guard_attack_05
     || k->fo.b == vizier_attack_04
-    || k->fo.b == vizier_attack_05 ;
+    || k->fo.b == vizier_attack_05
+    || k->fo.b == skeleton_attack_04
+    || k->fo.b == skeleton_attack_05;
 }
 
 bool
@@ -369,7 +371,8 @@ is_at_hit_frame (struct anim *k)
   return k->fo.b == kid_sword_attack_04
     || k->fo.b == guard_attack_05
     || k->fo.b == fat_guard_attack_05
-    || k->fo.b == vizier_attack_05;
+    || k->fo.b == vizier_attack_05
+    || k->fo.b == skeleton_attack_05;
 }
 
 void

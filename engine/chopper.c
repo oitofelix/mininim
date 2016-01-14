@@ -26,6 +26,7 @@
 #include "floor.h"
 #include "loose-floor.h"
 #include "kid/kid.h"
+#include "guard/guard.h"
 #include "level.h"
 #include "chopper.h"
 
@@ -405,13 +406,16 @@ compute_choppers (void)
                && pbb.place >= c->p.place)
               || (a->f.dir == RIGHT && pbf.place >= c->p.place
                   && pbb.place < c->p.place))) {
-        c->blood = true;
+        if (a->type != SKELETON) c->blood = true;
         a->splash = true;
         a->current_lives = 0;
         a->p = c->p;
-        video_effect.color = get_flicker_blood_color ();
-        start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
-        play_sample (chopped_sample, c->p.room);
+        if (a->type == KID) {
+          video_effect.color = get_flicker_blood_color ();
+          start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
+        }
+        if (a->type == SKELETON) play_sample (skeleton_sample, a->f.c.room);
+        else play_sample (chopped_sample, c->p.room);
         anim_die_chopped (a);
       }
     }

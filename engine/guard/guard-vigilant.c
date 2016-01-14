@@ -31,10 +31,12 @@
 struct frameset guard_vigilant_frameset[GUARD_VIGILANT_FRAMESET_NMEMB];
 struct frameset fat_guard_vigilant_frameset[GUARD_VIGILANT_FRAMESET_NMEMB];
 struct frameset vizier_vigilant_frameset[GUARD_VIGILANT_FRAMESET_NMEMB];
+struct frameset skeleton_vigilant_frameset[GUARD_VIGILANT_FRAMESET_NMEMB];
 
 static void init_guard_vigilant_frameset (void);
 static void init_fat_guard_vigilant_frameset (void);
 static void init_vizier_vigilant_frameset (void);
+static void init_skeleton_vigilant_frameset (void);
 static bool flow (struct anim *g);
 static bool physics_in (struct anim *g);
 static void physics_out (struct anim *g);
@@ -50,6 +52,10 @@ ALLEGRO_BITMAP *fat_guard_vigilant_01, *fat_guard_vigilant_02,
 /* vizier */
 ALLEGRO_BITMAP *vizier_vigilant_01, *vizier_vigilant_02,
   *vizier_vigilant_03;
+
+/* skeleton */
+ALLEGRO_BITMAP *skeleton_vigilant_01, *skeleton_vigilant_02,
+  *skeleton_vigilant_03;
 
 static void
 init_guard_vigilant_frameset (void)
@@ -84,6 +90,17 @@ init_vizier_vigilant_frameset (void)
           GUARD_VIGILANT_FRAMESET_NMEMB * sizeof (struct frameset));
 }
 
+static void
+init_skeleton_vigilant_frameset (void)
+{
+  struct frameset frameset[GUARD_VIGILANT_FRAMESET_NMEMB] =
+    {{skeleton_vigilant_01,+0,0},{skeleton_vigilant_02,+0,0},
+     {skeleton_vigilant_03,+0,0}};
+
+  memcpy (&skeleton_vigilant_frameset, &frameset,
+          GUARD_VIGILANT_FRAMESET_NMEMB * sizeof (struct frameset));
+}
+
 struct frameset *
 get_guard_vigilant_frameset (enum anim_type t)
 {
@@ -91,6 +108,7 @@ get_guard_vigilant_frameset (enum anim_type t)
   case GUARD: default: return guard_vigilant_frameset;
   case FAT_GUARD: return fat_guard_vigilant_frameset;
   case VIZIER: return vizier_vigilant_frameset;
+  case SKELETON: return skeleton_vigilant_frameset;
   }
 }
 
@@ -112,10 +130,16 @@ load_guard_vigilant (void)
   vizier_vigilant_02 = load_bitmap (VIZIER_VIGILANT_02);
   vizier_vigilant_03 = load_bitmap (VIZIER_VIGILANT_03);
 
+  /* skeleton */
+  skeleton_vigilant_01 = load_bitmap (SKELETON_VIGILANT_01);
+  skeleton_vigilant_02 = load_bitmap (SKELETON_VIGILANT_02);
+  skeleton_vigilant_03 = load_bitmap (SKELETON_VIGILANT_03);
+
   /* frameset */
   init_guard_vigilant_frameset ();
   init_fat_guard_vigilant_frameset ();
   init_vizier_vigilant_frameset ();
+  init_skeleton_vigilant_frameset ();
 }
 
 void
@@ -135,6 +159,11 @@ unload_guard_vigilant (void)
   al_destroy_bitmap (vizier_vigilant_01);
   al_destroy_bitmap (vizier_vigilant_02);
   al_destroy_bitmap (vizier_vigilant_03);
+
+  /* skeleton */
+  al_destroy_bitmap (skeleton_vigilant_01);
+  al_destroy_bitmap (skeleton_vigilant_02);
+  al_destroy_bitmap (skeleton_vigilant_03);
 }
 
 void
@@ -214,6 +243,8 @@ flow (struct anim *g)
 
   if (g->oaction == guard_normal) g->fo.dx += -1;
   if (g->oaction == guard_walkf) g->fo.dx += +2;
+
+  if (g->type == SKELETON) g->xf.dy += -3;
 
   return true;
 }
