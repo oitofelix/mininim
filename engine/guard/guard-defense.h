@@ -36,11 +36,16 @@
 #define SKELETON_DEFENSE_01 "data/skeleton/defense/01.png"
 #define SKELETON_DEFENSE_COUNTER_ATTACK "data/skeleton/defense/counter-attack.png"
 
+/* shadow */
+#define SHADOW_DEFENSE_01 "data/shadow/defense/01.png"
+#define SHADOW_DEFENSE_COUNTER_ATTACK "data/shadow/defense/counter-attack.png"
+
 #define GUARD_DEFENSE_FRAMESET_NMEMB 2
 extern struct frameset guard_defense_frameset[GUARD_DEFENSE_FRAMESET_NMEMB];
 extern struct frameset fat_guard_defense_frameset[GUARD_DEFENSE_FRAMESET_NMEMB];
 extern struct frameset vizier_defense_frameset[GUARD_DEFENSE_FRAMESET_NMEMB];
 extern struct frameset skeleton_defense_frameset[GUARD_DEFENSE_FRAMESET_NMEMB];
+extern struct frameset shadow_defense_frameset[GUARD_DEFENSE_FRAMESET_NMEMB];
 
 void load_guard_defense (void);
 void unload_guard_defense (void);
@@ -58,5 +63,8 @@ extern ALLEGRO_BITMAP *vizier_defense_01, *vizier_defense_counter_attack;
 
 /* skeleton */
 extern ALLEGRO_BITMAP *skeleton_defense_01, *skeleton_defense_counter_attack;
+
+/* shadow */
+extern ALLEGRO_BITMAP *shadow_defense_01, *shadow_defense_counter_attack;
 
 #endif	/* MININIM_GUARD_DEFENSE_H */

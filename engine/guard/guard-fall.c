@@ -34,11 +34,13 @@ struct frameset guard_fall_frameset[GUARD_FALL_FRAMESET_NMEMB];
 struct frameset fat_guard_fall_frameset[GUARD_FALL_FRAMESET_NMEMB];
 struct frameset vizier_fall_frameset[GUARD_FALL_FRAMESET_NMEMB];
 struct frameset skeleton_fall_frameset[GUARD_FALL_FRAMESET_NMEMB];
+struct frameset shadow_fall_frameset[GUARD_FALL_FRAMESET_NMEMB];
 
 static void init_guard_fall_frameset (void);
 static void init_fat_guard_fall_frameset (void);
 static void init_vizier_fall_frameset (void);
 static void init_skeleton_fall_frameset (void);
+static void init_shadow_fall_frameset (void);
 static bool flow (struct anim *g);
 static bool physics_in (struct anim *g);
 static void physics_out (struct anim *g);
@@ -55,6 +57,9 @@ ALLEGRO_BITMAP *vizier_fall_01, *vizier_fall_02, *vizier_fall_03;
 
 /* skeleton */
 ALLEGRO_BITMAP *skeleton_fall_01, *skeleton_fall_02, *skeleton_fall_03;
+
+/* shadow */
+ALLEGRO_BITMAP *shadow_fall_01, *shadow_fall_02, *shadow_fall_03;
 
 static void
 init_guard_fall_frameset (void)
@@ -96,6 +101,16 @@ init_skeleton_fall_frameset (void)
           GUARD_FALL_FRAMESET_NMEMB * sizeof (struct frameset));
 }
 
+static void
+init_shadow_fall_frameset (void)
+{
+  struct frameset frameset[GUARD_FALL_FRAMESET_NMEMB] =
+    {{shadow_fall_01,+0,+0},{shadow_fall_02,+0,+5},{shadow_fall_03,+0,+10}};
+
+  memcpy (&shadow_fall_frameset, &frameset,
+          GUARD_FALL_FRAMESET_NMEMB * sizeof (struct frameset));
+}
+
 struct frameset *
 get_guard_fall_frameset (enum anim_type t)
 {
@@ -104,6 +119,7 @@ get_guard_fall_frameset (enum anim_type t)
   case FAT_GUARD: return fat_guard_fall_frameset;
   case VIZIER: return vizier_fall_frameset;
   case SKELETON: return skeleton_fall_frameset;
+  case SHADOW: return shadow_fall_frameset;
   }
 }
 
@@ -130,11 +146,17 @@ load_guard_fall (void)
   skeleton_fall_02 = load_bitmap (SKELETON_FALL_02);
   skeleton_fall_03 = load_bitmap (SKELETON_FALL_03);
 
+  /* shadow */
+  shadow_fall_01 = load_bitmap (SHADOW_FALL_01);
+  shadow_fall_02 = load_bitmap (SHADOW_FALL_02);
+  shadow_fall_03 = load_bitmap (SHADOW_FALL_03);
+
   /* frameset */
   init_guard_fall_frameset ();
   init_fat_guard_fall_frameset ();
   init_vizier_fall_frameset ();
   init_skeleton_fall_frameset ();
+  init_shadow_fall_frameset ();
 }
 
 void
@@ -159,6 +181,11 @@ unload_guard_fall (void)
   al_destroy_bitmap (skeleton_fall_01);
   al_destroy_bitmap (skeleton_fall_02);
   al_destroy_bitmap (skeleton_fall_03);
+
+  /* shadow */
+  al_destroy_bitmap (shadow_fall_01);
+  al_destroy_bitmap (shadow_fall_02);
+  al_destroy_bitmap (shadow_fall_03);
 }
 
 void
@@ -189,13 +216,15 @@ flow (struct anim *g)
 
   if (g->i == 0) g->j = 28;
   if (g->i == 1) g->j = 32;
+  if (g->i == 2 && g->type == SHADOW) g->j = 29;
 
   select_xframe (&g->xf, sword_frameset, g->j);
 
   if (g->i == 0) g->xf.dx = -12, g->xf.dy = +4;
-  if (g->i >= 2) g->xf.b = NULL;
+  if (g->i >= 2 && g->type != SHADOW) g->xf.b = NULL;
 
   if (g->type == SKELETON) g->xf.dy += -3;
+  if (g->type == SHADOW && g->i < 2) g->xf.dy += -2;
 
   return true;
 }
@@ -341,6 +370,10 @@ is_guard_fall (struct frame *f)
   /* skeleton */
   for (i = 0; i < GUARD_FALL_FRAMESET_NMEMB; i++)
     if (f->b == skeleton_fall_frameset[i].frame) return true;
+
+  /* shadow */
+  for (i = 0; i < GUARD_FALL_FRAMESET_NMEMB; i++)
+    if (f->b == shadow_fall_frameset[i].frame) return true;
 
   return false;
 }

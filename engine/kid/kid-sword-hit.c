@@ -102,13 +102,16 @@ flow (struct anim *k)
 
   select_frame (k, kid_sword_hit_frameset, k->i + 1);
 
+  if (k->i == 0) k->j = 28;
+  if (k->i == 1) k->j = 32;
   if (k->i == 2) k->j = 29;
   if (k->i == 3) k->j = 7;
   if (k->i == 4) k->j = 17;
 
   select_xframe (&k->xf, sword_frameset, k->j);
 
-  if (k->i <= 1) k->xf.b = NULL;
+  if (k->i == 0) k->xf.dx = -12, k->xf.dy = +2;
+  if (k->i == 1) k->xf.dy += -2;
 
   return true;
 }

@@ -35,11 +35,13 @@ struct frameset guard_attack_frameset[GUARD_ATTACK_FRAMESET_NMEMB];
 struct frameset fat_guard_attack_frameset[GUARD_ATTACK_FRAMESET_NMEMB];
 struct frameset vizier_attack_frameset[GUARD_ATTACK_FRAMESET_NMEMB];
 struct frameset skeleton_attack_frameset[GUARD_ATTACK_FRAMESET_NMEMB];
+struct frameset shadow_attack_frameset[GUARD_ATTACK_FRAMESET_NMEMB];
 
 static void init_guard_attack_frameset (void);
 static void init_fat_guard_attack_frameset (void);
 static void init_vizier_attack_frameset (void);
 static void init_skeleton_attack_frameset (void);
+static void init_shadow_attack_frameset (void);
 static bool flow (struct anim *g);
 static bool physics_in (struct anim *g);
 static void physics_out (struct anim *g);
@@ -71,6 +73,13 @@ ALLEGRO_BITMAP *skeleton_attack_01, *skeleton_attack_02,
   *skeleton_attack_06, *skeleton_attack_07, *skeleton_attack_08,
   *skeleton_attack_counter_defense_01, *skeleton_attack_counter_defense_02,
   *skeleton_attack_defended;
+
+/* shadow */
+ALLEGRO_BITMAP *shadow_attack_01, *shadow_attack_02,
+  *shadow_attack_03, *shadow_attack_04, *shadow_attack_05,
+  *shadow_attack_06, *shadow_attack_07, *shadow_attack_08,
+  *shadow_attack_counter_defense_01, *shadow_attack_counter_defense_02,
+  *shadow_attack_defended;
 
 static void
 init_guard_attack_frameset (void)
@@ -132,6 +141,21 @@ init_skeleton_attack_frameset (void)
           GUARD_ATTACK_FRAMESET_NMEMB * sizeof (struct frameset));
 }
 
+static void
+init_shadow_attack_frameset (void)
+{
+  struct frameset frameset[GUARD_ATTACK_FRAMESET_NMEMB] =
+    {{shadow_attack_01,-6,0},{shadow_attack_02,+0,0},
+     {shadow_attack_03,-3,0},{shadow_attack_04,-6,0},
+     {shadow_attack_05,-7,0},{shadow_attack_06,+6,0},
+     {shadow_attack_07,+9,0},{shadow_attack_08,+7,0},
+     {shadow_attack_counter_defense_01,+0,0},
+     {shadow_attack_counter_defense_02,+6,0}};
+
+  memcpy (&shadow_attack_frameset, &frameset,
+          GUARD_ATTACK_FRAMESET_NMEMB * sizeof (struct frameset));
+}
+
 struct frameset *
 get_guard_attack_frameset (enum anim_type t)
 {
@@ -140,6 +164,7 @@ get_guard_attack_frameset (enum anim_type t)
   case FAT_GUARD: return fat_guard_attack_frameset;
   case VIZIER: return vizier_attack_frameset;
   case SKELETON: return skeleton_attack_frameset;
+  case SHADOW: return shadow_attack_frameset;
   }
 }
 
@@ -151,6 +176,7 @@ get_guard_attack_defended_bitmap (enum anim_type t)
   case FAT_GUARD: return fat_guard_attack_defended;
   case VIZIER: return vizier_attack_defended;
   case SKELETON: return skeleton_attack_defended;
+  case SHADOW: return shadow_attack_defended;
   }
 }
 
@@ -209,11 +235,25 @@ load_guard_attack (void)
   skeleton_attack_counter_defense_02 = load_bitmap (SKELETON_ATTACK_COUNTER_DEFENSE_02);
   skeleton_attack_defended = load_bitmap (SKELETON_ATTACK_DEFENDED);
 
+  /* shadow */
+  shadow_attack_01 = load_bitmap (SHADOW_ATTACK_01);
+  shadow_attack_02 = load_bitmap (SHADOW_ATTACK_02);
+  shadow_attack_03 = load_bitmap (SHADOW_ATTACK_03);
+  shadow_attack_04 = load_bitmap (SHADOW_ATTACK_04);
+  shadow_attack_05 = load_bitmap (SHADOW_ATTACK_05);
+  shadow_attack_06 = load_bitmap (SHADOW_ATTACK_06);
+  shadow_attack_07 = load_bitmap (SHADOW_ATTACK_07);
+  shadow_attack_08 = load_bitmap (SHADOW_ATTACK_08);
+  shadow_attack_counter_defense_01 = load_bitmap (SHADOW_ATTACK_COUNTER_DEFENSE_01);
+  shadow_attack_counter_defense_02 = load_bitmap (SHADOW_ATTACK_COUNTER_DEFENSE_02);
+  shadow_attack_defended = load_bitmap (SHADOW_ATTACK_DEFENDED);
+
   /* frameset */
   init_guard_attack_frameset ();
   init_fat_guard_attack_frameset ();
   init_vizier_attack_frameset ();
   init_skeleton_attack_frameset ();
+  init_shadow_attack_frameset ();
 }
 
 void
@@ -270,6 +310,19 @@ unload_guard_attack (void)
   al_destroy_bitmap (skeleton_attack_counter_defense_01);
   al_destroy_bitmap (skeleton_attack_counter_defense_02);
   al_destroy_bitmap (skeleton_attack_defended);
+
+  /* shadow */
+  al_destroy_bitmap (shadow_attack_01);
+  al_destroy_bitmap (shadow_attack_02);
+  al_destroy_bitmap (shadow_attack_03);
+  al_destroy_bitmap (shadow_attack_04);
+  al_destroy_bitmap (shadow_attack_05);
+  al_destroy_bitmap (shadow_attack_06);
+  al_destroy_bitmap (shadow_attack_07);
+  al_destroy_bitmap (shadow_attack_08);
+  al_destroy_bitmap (shadow_attack_counter_defense_01);
+  al_destroy_bitmap (shadow_attack_counter_defense_02);
+  al_destroy_bitmap (shadow_attack_defended);
 }
 
 void
@@ -353,6 +406,7 @@ flow (struct anim *g)
   if (g->i == 5 && g->attack_defended) g->fo.dx = -2;
 
   if (g->type == SKELETON) g->xf.dy += -3;
+  if (g->type == SHADOW) g->xf.dy += -2;
 
   return true;
 }

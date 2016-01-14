@@ -130,22 +130,25 @@ start (void)
     struct anim *a;
     int id;
     switch (g->type) {
-    case NO_ANIM: continue;
+    case NO_ANIM: default: continue;
     case KID:
       id = create_anim (NULL, KID, &g->p, g->dir);
       anima[id].shadow = true;
       break;
-    /* case GUARD: default: */
-    /*   id = create_anim (NULL, GUARD, &g->p, g->dir); */
-    /*   break; */
-    /* case FAT_GUARD: default: */
-    /*   id = create_anim (NULL, FAT_GUARD, &g->p, g->dir); */
-    /*   break; */
-    /* case VIZIER: default: */
-    /*   id = create_anim (NULL, VIZIER, &g->p, g->dir); */
-    /*   break; */
-    case SKELETON: default:
+    case GUARD:
+      id = create_anim (NULL, GUARD, &g->p, g->dir);
+      break;
+    case FAT_GUARD:
+      id = create_anim (NULL, FAT_GUARD, &g->p, g->dir);
+      break;
+    case VIZIER:
+      id = create_anim (NULL, VIZIER, &g->p, g->dir);
+      break;
+    case SKELETON:
       id = create_anim (NULL, SKELETON, &g->p, g->dir);
+      break;
+    case SHADOW:
+      id = create_anim (NULL, SHADOW, &g->p, g->dir);
       break;
     }
     a = &anima[id];

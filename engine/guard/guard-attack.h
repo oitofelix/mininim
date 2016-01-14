@@ -72,11 +72,25 @@
 #define SKELETON_ATTACK_COUNTER_DEFENSE_02 "data/skeleton/attack/counter-defense-02.png"
 #define SKELETON_ATTACK_DEFENDED "data/skeleton/attack/defended.png"
 
+/* shadow */
+#define SHADOW_ATTACK_01 "data/shadow/attack/01.png"
+#define SHADOW_ATTACK_02 "data/shadow/attack/02.png"
+#define SHADOW_ATTACK_03 "data/shadow/attack/03.png"
+#define SHADOW_ATTACK_04 "data/shadow/attack/04.png"
+#define SHADOW_ATTACK_05 "data/shadow/attack/05.png"
+#define SHADOW_ATTACK_06 "data/shadow/attack/06.png"
+#define SHADOW_ATTACK_07 "data/shadow/attack/07.png"
+#define SHADOW_ATTACK_08 "data/shadow/attack/08.png"
+#define SHADOW_ATTACK_COUNTER_DEFENSE_01 "data/shadow/attack/counter-defense-01.png"
+#define SHADOW_ATTACK_COUNTER_DEFENSE_02 "data/shadow/attack/counter-defense-02.png"
+#define SHADOW_ATTACK_DEFENDED "data/shadow/attack/defended.png"
+
 #define GUARD_ATTACK_FRAMESET_NMEMB 10
 extern struct frameset guard_attack_frameset[GUARD_ATTACK_FRAMESET_NMEMB];
 extern struct frameset fat_guard_attack_frameset[GUARD_ATTACK_FRAMESET_NMEMB];
 extern struct frameset vizier_attack_frameset[GUARD_ATTACK_FRAMESET_NMEMB];
 extern struct frameset skeleton_attack_frameset[GUARD_ATTACK_FRAMESET_NMEMB];
+extern struct frameset shadow_attack_frameset[GUARD_ATTACK_FRAMESET_NMEMB];
 
 void load_guard_attack (void);
 void unload_guard_attack (void);
@@ -111,5 +125,12 @@ extern ALLEGRO_BITMAP *skeleton_attack_01, *skeleton_attack_02,
   *skeleton_attack_06, *skeleton_attack_07, *skeleton_attack_08,
   *skeleton_attack_counter_defense_01, *skeleton_attack_counter_defense_02,
   *skeleton_attack_defended;
+
+/* shadow */
+extern ALLEGRO_BITMAP *shadow_attack_01, *shadow_attack_02,
+  *shadow_attack_03, *shadow_attack_04, *shadow_attack_05,
+  *shadow_attack_06, *shadow_attack_07, *shadow_attack_08,
+  *shadow_attack_counter_defense_01, *shadow_attack_counter_defense_02,
+  *shadow_attack_defended;
 
 #endif	/* MININIM_GUARD_ATTACK_H */

@@ -46,6 +46,9 @@ ALLEGRO_BITMAP *vizier_normal_00;
 /* skeleton */
 ALLEGRO_BITMAP *skeleton_normal_00;
 
+/* shadow */
+ALLEGRO_BITMAP *shadow_normal_00;
+
 ALLEGRO_BITMAP *
 get_guard_normal_bitmap (enum anim_type t)
 {
@@ -54,6 +57,7 @@ get_guard_normal_bitmap (enum anim_type t)
   case FAT_GUARD: return fat_guard_normal_00;
   case VIZIER: return vizier_normal_00;
   case SKELETON: return skeleton_normal_00;
+  case SHADOW: return shadow_normal_00;
   }
 }
 
@@ -71,6 +75,9 @@ load_guard_normal (void)
 
   /* skeleton */
   skeleton_normal_00 = load_bitmap (SKELETON_NORMAL_00);
+
+  /* shadow */
+  shadow_normal_00 = load_bitmap (SHADOW_NORMAL_00);
 }
 
 void
@@ -87,6 +94,9 @@ unload_guard_normal (void)
 
   /* skeleton */
   al_destroy_bitmap (skeleton_normal_00);
+
+  /* shadow */
+  al_destroy_bitmap (shadow_normal_00);
 }
 
 void

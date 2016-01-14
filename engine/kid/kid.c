@@ -54,7 +54,6 @@ ALLEGRO_SAMPLE *step_sample, *hit_ground_sample, *hit_ground_harm_sample,
 
 static void place_kid (struct anim *k, int room, int floor, int place);
 static struct coord *kid_life_coord (int i, struct coord *c);
-static palette get_palette (enum vm vm);
 static ALLEGRO_COLOR v_palette (ALLEGRO_COLOR c);
 static ALLEGRO_COLOR e_palette (ALLEGRO_COLOR c);
 static ALLEGRO_COLOR c_palette (ALLEGRO_COLOR c);
@@ -240,8 +239,8 @@ destroy_kid (struct anim *k)
   al_destroy_timer (k->floating);
 }
 
-static palette
-get_palette (enum vm vm)
+palette
+get_kid_palette (enum vm vm)
 {
   switch (vm) {
   case CGA: return c_palette;
@@ -251,7 +250,7 @@ get_palette (enum vm vm)
   return NULL;
 }
 
-static palette
+palette
 get_shadow_palette (enum vm vm)
 {
   switch (vm) {
@@ -273,7 +272,7 @@ draw_kid_frame (ALLEGRO_BITMAP *bitmap, struct anim *k,
   struct frame f = k->f;
   struct frame_offset xf = k->xf;
 
-  palette pal = get_palette (vm);
+  palette pal = get_kid_palette (vm);
   f.b = apply_palette (f.b, pal);
   xf.b = apply_palette (xf.b, pal);
 
@@ -462,7 +461,7 @@ draw_kid_lives (ALLEGRO_BITMAP *bitmap, struct anim *k,
 
   ALLEGRO_BITMAP *empty = NULL,
     *full = NULL;
-  palette pal = get_palette (vm);
+  palette pal = get_kid_palette (vm);
   empty = apply_palette (v_kid_empty_life, pal);
   full = apply_palette (v_kid_full_life, pal);
 

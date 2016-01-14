@@ -32,11 +32,13 @@ struct frameset guard_hit_frameset[GUARD_HIT_FRAMESET_NMEMB];
 struct frameset fat_guard_hit_frameset[GUARD_HIT_FRAMESET_NMEMB];
 struct frameset vizier_hit_frameset[GUARD_HIT_FRAMESET_NMEMB];
 struct frameset skeleton_hit_frameset[GUARD_HIT_FRAMESET_NMEMB];
+struct frameset shadow_hit_frameset[GUARD_HIT_FRAMESET_NMEMB];
 
 static void init_guard_hit_frameset (void);
 static void init_fat_guard_hit_frameset (void);
 static void init_vizier_hit_frameset (void);
 static void init_skeleton_hit_frameset (void);
+static void init_shadow_hit_frameset (void);
 static bool flow (struct anim *g);
 static bool physics_in (struct anim *g);
 static void physics_out (struct anim *g);
@@ -56,6 +58,10 @@ ALLEGRO_BITMAP *vizier_hit_01, *vizier_hit_02,
 /* skeleton */
 ALLEGRO_BITMAP *skeleton_hit_01, *skeleton_hit_02,
   *skeleton_hit_03, *skeleton_hit_04, *skeleton_hit_05;
+
+/* shadow */
+ALLEGRO_BITMAP *shadow_hit_01, *shadow_hit_02,
+  *shadow_hit_03, *shadow_hit_04, *shadow_hit_05;
 
 static void
 init_guard_hit_frameset (void)
@@ -105,6 +111,18 @@ init_skeleton_hit_frameset (void)
           GUARD_HIT_FRAMESET_NMEMB * sizeof (struct frameset));
 }
 
+static void
+init_shadow_hit_frameset (void)
+{
+  struct frameset frameset[GUARD_HIT_FRAMESET_NMEMB] =
+    {{shadow_hit_01,+0,0},{shadow_hit_02,+0,0},
+     {shadow_hit_03,+4,0},{shadow_hit_04,+8,0},
+     {shadow_hit_05,+8,0}};
+
+  memcpy (&shadow_hit_frameset, &frameset,
+          GUARD_HIT_FRAMESET_NMEMB * sizeof (struct frameset));
+}
+
 struct frameset *
 get_guard_hit_frameset (enum anim_type t)
 {
@@ -113,6 +131,7 @@ get_guard_hit_frameset (enum anim_type t)
   case FAT_GUARD: return fat_guard_hit_frameset;
   case VIZIER: return vizier_hit_frameset;
   case SKELETON: return skeleton_hit_frameset;
+  case SHADOW: return shadow_hit_frameset;
   }
 }
 
@@ -147,11 +166,19 @@ load_guard_hit (void)
   skeleton_hit_04 = load_bitmap (SKELETON_HIT_04);
   skeleton_hit_05 = load_bitmap (SKELETON_HIT_05);
 
+  /* shadow */
+  shadow_hit_01 = load_bitmap (SHADOW_HIT_01);
+  shadow_hit_02 = load_bitmap (SHADOW_HIT_02);
+  shadow_hit_03 = load_bitmap (SHADOW_HIT_03);
+  shadow_hit_04 = load_bitmap (SHADOW_HIT_04);
+  shadow_hit_05 = load_bitmap (SHADOW_HIT_05);
+
   /* frameset */
   init_guard_hit_frameset ();
   init_fat_guard_hit_frameset ();
   init_vizier_hit_frameset ();
   init_skeleton_hit_frameset ();
+  init_shadow_hit_frameset ();
 }
 
 void
@@ -184,6 +211,13 @@ unload_guard_hit (void)
   al_destroy_bitmap (skeleton_hit_03);
   al_destroy_bitmap (skeleton_hit_04);
   al_destroy_bitmap (skeleton_hit_05);
+
+  /* shadow */
+  al_destroy_bitmap (shadow_hit_01);
+  al_destroy_bitmap (shadow_hit_02);
+  al_destroy_bitmap (shadow_hit_03);
+  al_destroy_bitmap (shadow_hit_04);
+  al_destroy_bitmap (shadow_hit_05);
 }
 
 void
@@ -217,16 +251,18 @@ flow (struct anim *g)
 
   if (g->i == 0) g->j = 28;
   if (g->i == 1) g->j = 32;
+  if (g->i == 2 && g->type == SHADOW) g->j = 29;
   if (g->i == 3) g->j = 7;
   if (g->i == 4) g->j = 3;
 
   select_xframe (&g->xf, sword_frameset, g->j);
 
   if (g->i == 0) g->xf.dx = -12, g->xf.dy = +4;
-  if (g->i == 2) g->xf.b = NULL;
+  if (g->i == 2 && g->type != SHADOW) g->xf.b = NULL;
   if (g->i == 3) g->xf.dx = +0, g->xf.dy = +23;
 
   if (g->type == SKELETON) g->xf.dy += -3;
+  if (g->type == SHADOW && g->i != 2) g->xf.dy += -2;
 
   return true;
 }

@@ -100,6 +100,8 @@ void draw_kid_lives (ALLEGRO_BITMAP *bitmap, struct anim *k,
                      enum vm vm);
 void draw_kid_if_at_pos (ALLEGRO_BITMAP *bitmap, struct anim *k, struct pos *p,
                          enum vm vm);
+palette get_kid_palette (enum vm vm);
+palette get_shadow_palette (enum vm vm);
 ALLEGRO_COLOR colorful_shadow_palette (ALLEGRO_COLOR c);
 ALLEGRO_COLOR v_phantom_shadow_palette (ALLEGRO_COLOR c);
 ALLEGRO_COLOR e_phantom_shadow_palette (ALLEGRO_COLOR c);

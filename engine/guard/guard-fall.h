@@ -40,11 +40,17 @@
 #define SKELETON_FALL_02 "data/skeleton/fall/02.png"
 #define SKELETON_FALL_03 "data/skeleton/fall/03.png"
 
+/* shadow */
+#define SHADOW_FALL_01 "data/shadow/fall/01.png"
+#define SHADOW_FALL_02 "data/shadow/fall/02.png"
+#define SHADOW_FALL_03 "data/shadow/fall/03.png"
+
 #define GUARD_FALL_FRAMESET_NMEMB 3
 extern struct frameset guard_fall_frameset[GUARD_FALL_FRAMESET_NMEMB];
 extern struct frameset fat_guard_fall_frameset[GUARD_FALL_FRAMESET_NMEMB];
 extern struct frameset vizier_fall_frameset[GUARD_FALL_FRAMESET_NMEMB];
 extern struct frameset skeleton_fall_frameset[GUARD_FALL_FRAMESET_NMEMB];
+extern struct frameset shadow_fall_frameset[GUARD_FALL_FRAMESET_NMEMB];
 
 void load_guard_fall (void);
 void unload_guard_fall (void);
@@ -63,5 +69,8 @@ extern ALLEGRO_BITMAP *vizier_fall_01, *vizier_fall_02, *vizier_fall_03;
 
 /* skeleton */
 extern ALLEGRO_BITMAP *skeleton_fall_01, *skeleton_fall_02, *skeleton_fall_03;
+
+/* shadow */
+extern ALLEGRO_BITMAP *shadow_fall_01, *shadow_fall_02, *shadow_fall_03;
 
 #endif	/* MININIM_GUARD_FALL_H */

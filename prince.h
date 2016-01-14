@@ -419,7 +419,7 @@ enum carpet_design {
 };
 
 enum anim_type {
-  NO_ANIM, KID, GUARD, FAT_GUARD, SKELETON, VIZIER, PRINCESS, MOUSE
+  NO_ANIM, KID, SHADOW, GUARD, FAT_GUARD, SKELETON, VIZIER, PRINCESS, MOUSE
 };
 
 struct skill {

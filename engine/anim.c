@@ -137,6 +137,7 @@ create_anim (struct anim *a0, enum anim_type t, struct pos *p, enum dir dir)
   switch (a.type) {
   case NO_ANIM: default: break;
   case KID: create_kid (a0, &a, p, dir); break;
+  case SHADOW:
   case GUARD:
   case FAT_GUARD:
   case VIZIER:
@@ -182,6 +183,7 @@ draw_anim_frame (ALLEGRO_BITMAP *bitmap, struct anim *a, enum vm vm)
   switch (a->type) {
   case NO_ANIM: default: break;
   case KID: draw_kid_frame (bitmap, a, vm); break;
+  case SHADOW:
   case GUARD:
   case FAT_GUARD:
   case VIZIER:
@@ -302,6 +304,7 @@ is_anim_dead (struct anim *a)
   switch (a->type) {
   case NO_ANIM: default: return false;
   case KID: return is_kid_dead (&a->f);
+  case SHADOW:
   case GUARD:
   case FAT_GUARD:
   case VIZIER:
@@ -316,6 +319,7 @@ is_anim_fall (struct anim *a)
   switch (a->type) {
   case NO_ANIM: default: return false;
   case KID: return is_kid_fall (&a->f);
+  case SHADOW:
   case GUARD:
   case FAT_GUARD:
   case VIZIER:
@@ -330,6 +334,7 @@ anim_die_suddenly (struct anim *a)
   switch (a->type) {
   case NO_ANIM: default: break;
   case KID: kid_die_suddenly (a); break;
+  case SHADOW:
   case GUARD:
   case FAT_GUARD:
   case VIZIER:
@@ -344,6 +349,7 @@ anim_die_spiked (struct anim *a)
   switch (a->type) {
   case NO_ANIM: default: break;
   case KID: kid_die_spiked (a); break;
+  case SHADOW:
   case GUARD:
   case FAT_GUARD:
   case VIZIER:
@@ -358,6 +364,7 @@ anim_die_chopped (struct anim *a)
   switch (a->type) {
   case NO_ANIM: default: break;
   case KID: kid_die_chopped (a); break;
+  case SHADOW:
   case GUARD:
   case FAT_GUARD:
   case VIZIER:
@@ -372,6 +379,7 @@ anim_die (struct anim *a)
   switch (a->type) {
   case NO_ANIM: default: break;
   case KID: kid_die (a); break;
+  case SHADOW:
   case GUARD:
   case FAT_GUARD:
   case VIZIER:
@@ -386,6 +394,7 @@ anim_sword_hit (struct anim *a)
   switch (a->type) {
   case NO_ANIM: default: break;
   case KID: kid_sword_hit (a); break;
+  case SHADOW:
   case GUARD:
   case FAT_GUARD:
   case VIZIER:
@@ -400,6 +409,7 @@ anim_fall (struct anim *a)
   switch (a->type) {
   case NO_ANIM: default: break;
   case KID: kid_fall (a); break;
+  case SHADOW:
   case GUARD:
   case FAT_GUARD:
   case VIZIER:
@@ -414,6 +424,7 @@ anim_walkf (struct anim *a)
   switch (a->type) {
   case NO_ANIM: default: break;
   case KID: kid_sword_walkf (a); break;
+  case SHADOW:
   case GUARD:
   case FAT_GUARD:
   case VIZIER:
@@ -428,6 +439,7 @@ anim_walkb (struct anim *a)
   switch (a->type) {
   case NO_ANIM: default: break;
   case KID: kid_sword_walkb (a); break;
+  case SHADOW:
   case GUARD:
   case FAT_GUARD:
   case VIZIER:

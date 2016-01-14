@@ -56,11 +56,22 @@
 #define SKELETON_DIE_SPIKED_00 "data/skeleton/die/spiked.png"
 #define SKELETON_DIE_CHOPPED_00 "data/skeleton/die/chopped.png"
 
+/* shadow */
+#define SHADOW_DIE_01 "data/shadow/die/01.png"
+#define SHADOW_DIE_02 "data/shadow/die/02.png"
+#define SHADOW_DIE_03 "data/shadow/die/03.png"
+#define SHADOW_DIE_04 "data/shadow/die/04.png"
+#define SHADOW_DIE_05 "data/shadow/die/05.png"
+#define SHADOW_DIE_06 "data/shadow/die/06.png"
+#define SHADOW_DIE_SPIKED_00 "data/shadow/die/spiked.png"
+#define SHADOW_DIE_CHOPPED_00 "data/shadow/die/chopped.png"
+
 #define GUARD_DIE_FRAMESET_NMEMB 6
 extern struct frameset guard_die_frameset[GUARD_DIE_FRAMESET_NMEMB];
 extern struct frameset fat_guard_die_frameset[GUARD_DIE_FRAMESET_NMEMB];
 extern struct frameset vizier_die_frameset[GUARD_DIE_FRAMESET_NMEMB];
 extern struct frameset skeleton_die_frameset[GUARD_DIE_FRAMESET_NMEMB];
+extern struct frameset shadow_die_frameset[GUARD_DIE_FRAMESET_NMEMB];
 
 void load_guard_die (void);
 void unload_guard_die (void);
@@ -87,5 +98,9 @@ extern ALLEGRO_BITMAP *vizier_die_01, *vizier_die_02, *vizier_die_03,
 /* skeleton */
 extern ALLEGRO_BITMAP *skeleton_die_01, *skeleton_die_02, *skeleton_die_03,
   *skeleton_die_04, *skeleton_die_05, *skeleton_die_06;
+
+/* shadow */
+extern ALLEGRO_BITMAP *shadow_die_01, *shadow_die_02, *shadow_die_03,
+  *shadow_die_04, *shadow_die_05, *shadow_die_06;
 
 #endif	/* MININIM_GUARD_DIE_H */

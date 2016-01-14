@@ -36,6 +36,7 @@
 #include "engine/closer-floor.h"
 #include "engine/sword.h"
 #include "engine/fight.h"
+#include "engine/kid/kid.h"
 #include "guard.h"
 
 /* bitmaps */
@@ -371,12 +372,19 @@ draw_guard_frame (ALLEGRO_BITMAP *bitmap, struct anim *g, enum vm vm)
   struct frame f = g->f;
   struct frame_offset xf = g->xf;
 
-  palette pal = NULL;
+  palette pal = NULL, pals = NULL;
   if (g->type == GUARD || g->type == FAT_GUARD
       || g->type == VIZIER) {
     pal = get_palette (g->style, vm);
     f.b = apply_palette (f.b, pal);
     xf.b = apply_palette (xf.b, pal);
+  } else if (g->type == SHADOW) {
+    pal = get_kid_palette (vm);
+    f.b = apply_palette (f.b, pal);
+    xf.b = apply_palette (xf.b, pal);
+    pals = get_shadow_palette (vm);
+    f.b = apply_palette (f.b, pals);
+    xf.b = apply_palette (xf.b, pals);
   }
 
   if (hgc) {
@@ -388,7 +396,8 @@ draw_guard_frame (ALLEGRO_BITMAP *bitmap, struct anim *g, enum vm vm)
   draw_frame (bitmap, &f);
 
   if (g->splash && g->type != SKELETON) {
-    ALLEGRO_BITMAP *splash = apply_palette (guard_splash, pal);
+    ALLEGRO_BITMAP *splash = (g->type == SHADOW) ? v_kid_splash : guard_splash;
+    splash = apply_palette (splash, pal);
     if (hgc) splash = apply_palette (splash, hgc_palette);
     draw_bitmapc (splash, bitmap, splash_coord (&g->f, &c), g->f.flip);
   }
@@ -397,7 +406,8 @@ draw_guard_frame (ALLEGRO_BITMAP *bitmap, struct anim *g, enum vm vm)
 bool
 is_guard (struct anim *a)
 {
-  return a->type == GUARD
+  return a->type == SHADOW
+    || a->type == GUARD
     || a->type == FAT_GUARD
     || a->type == VIZIER
     || a->type == SKELETON;
