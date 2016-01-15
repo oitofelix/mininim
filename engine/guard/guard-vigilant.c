@@ -294,7 +294,7 @@ flow (struct anim *g)
 static bool
 physics_in (struct anim *g)
 {
-  struct coord tf; struct pos np, ptf;
+  struct coord nc; struct pos np, ptf, pmbo, pbb;
 
   /* collision */
   if (fight_door_split_collision (g)) return false;
@@ -306,8 +306,12 @@ physics_in (struct anim *g)
   /* } */
 
   /* fall */
-  survey (_tf, pos, &g->f, &tf, &ptf, &np);
-  if (is_strictly_traversable (&ptf)) {
+  survey (_tf, pos, &g->f, &nc, &ptf, &np);
+  survey (_mbo, pos, &g->f, &nc, &pmbo, &np);
+  survey (_bb, pos, &g->f, &nc, &pbb, &np);
+  if (is_strictly_traversable (&ptf)
+      || is_strictly_traversable (&pmbo)
+      || is_strictly_traversable (&pbb)) {
     guard_fall (g);
     return false;
   }

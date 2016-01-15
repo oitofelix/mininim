@@ -142,8 +142,10 @@ flow (struct anim *k)
       k->splash = true;
       if (k->current_lives == 0) k->death_reason = POTION_DEATH;
       play_sample (harm_sample, k->f.c.room);
-      video_effect.color = get_flicker_blood_color ();
-      start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
+      if (k->id == current_kid_id) {
+        video_effect.color = get_flicker_blood_color ();
+        start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
+      }
       break;
     case BIG_POISON_POTION:
       if (k->immortal
@@ -152,8 +154,10 @@ flow (struct anim *k)
       k->splash = true;
       k->death_reason = POTION_DEATH;
       play_sample (harm_sample, k->f.c.room);
-      video_effect.color = get_flicker_blood_color ();
-      start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
+      if (k->id == current_kid_id) {
+        video_effect.color = get_flicker_blood_color ();
+        start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
+      }
       break;
     case FLOAT_POTION: float_kid (k); break;
     case FLIP_POTION:

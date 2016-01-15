@@ -412,7 +412,7 @@ compute_choppers (void)
         a->current_lives = 0;
         a->p = c->p;
         a->death_reason = CHOPPER_DEATH;
-        if (a->type == KID) {
+        if (a->id == current_kid_id) {
           video_effect.color = get_flicker_blood_color ();
           start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
         }

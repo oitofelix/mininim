@@ -587,8 +587,10 @@ struct anim {
   bool immortal, poison_immune, loose_floor_immune, fall_immune,
     spikes_immune, chopper_immune, sword_immune;
 
-  int enemy_id;
+  int enemy_id, oenemy_id;
   bool enemy_aware;
+
+  bool dont_draw_lives;
 
   int style;
 

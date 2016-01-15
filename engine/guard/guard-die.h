@@ -79,6 +79,7 @@ void guard_die (struct anim *g);
 void guard_die_spiked (struct anim *g);
 void guard_die_chopped (struct anim *g);
 void guard_die_suddenly (struct anim *g);
+void raise_skeleton (struct anim *s);
 bool is_guard_dead (struct frame *f);
 bool is_guard_chopped (struct frame *f);
 struct frameset *get_guard_die_frameset (enum anim_type t);

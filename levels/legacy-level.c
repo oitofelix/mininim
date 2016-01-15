@@ -41,6 +41,7 @@
 static struct level legacy_level;
 static int level_3_checkpoint;
 static int shadow_id;
+static int skeleton_id;
 static bool played_sample;
 static int total_lives;
 static int current_lives;
@@ -103,7 +104,7 @@ start (void)
 {
   /* initialize some state */
   played_sample = false;
-  shadow_id = mouse_id = -1;
+  shadow_id = mouse_id = skeleton_id = -1;
   stop_all_samples ();
   al_destroy_timer (mouse_timer);
   mouse_timer = NULL;
@@ -243,33 +244,14 @@ start (void)
     level.nominal_number = 12;
 
   /* temporary placement for test */
-  /* if (level.number == 1) { */
+  /* if (level.number == 3) { */
   /*   /\* kid *\/ */
-  /*   struct pos p = {6,0,9}; */
-  /*   k->f.dir = LEFT; */
+  /*   struct pos p = {1,0,0}; */
+  /*   k->f.dir = RIGHT; */
   /*   place_frame (&k->f, &k->f, kid_normal_00, &p, */
   /*                k->f.dir == LEFT ? +22 : +31, +15); */
   /*   k->action = kid_normal; */
-  /*   room_view = 6; */
-  /*   k->has_sword = true; */
-  /*   k->fp.counter_attack_prob = 50; */
-  /*   k->fp.counter_defense_prob = 80; */
-
-  /*   /\* shadow *\/ */
-  /*   int id = create_kid (NULL); */
-  /*   struct anim *ks = &kida[id]; */
-  /*   p = (struct pos) {6,0,5}; */
-  /*   ks->f.dir = RIGHT; */
-  /*   ks->f.c.room = 6; */
-  /*   place_frame (&ks->f, &ks->f, kid_normal_00, &p, */
-  /*                +0, +15); */
-  /*   ks->has_sword = true; */
-  /*   ks->shadow = true; */
-  /*   /\* get_perfect_fighter_profile (&ks->fp); *\/ */
-  /*   /\* ks->fp.attack_prob = -1; *\/ */
-  /*   /\* ks->fp.return_prob = -1; *\/ */
-  /*   get_median_fighter_profile (&ks->fp); */
-  /*   ks->current_lives = 3; */
+  /*   room_view = 1; */
   /* } */
 }
 
@@ -303,6 +285,41 @@ special_events (void)
     p = (struct pos) {2,0,8};
     survey (_m, pos, &k->f, &nc, &pm, &np);
     if (peq (&pm, &p)) level_3_checkpoint = true;
+
+    struct anim *s = NULL;
+
+    struct pos skeleton_floor_pos = {1,1,5};
+    survey (_m, pos, &k->f, &nc, &pm, &np);
+    if (exit_level_door
+        && exit_level_door->i == 0
+        &&
+        pm.room == 1
+        && (pm.place == 2 || pm.place == 3)
+        && con (&skeleton_floor_pos)->fg == SKELETON_FLOOR) {
+      con (&skeleton_floor_pos)->fg = FLOOR;
+      skeleton_id = create_anim (NULL, SKELETON, &skeleton_floor_pos, LEFT);
+      s = &anima[skeleton_id];
+      get_legacy_skill (2, &s->skill);
+      s->has_sword = true;
+      s->total_lives = INT_MAX;
+      s->current_lives = INT_MAX;
+      s->dont_draw_lives = true;
+      s->p = skeleton_floor_pos;
+      s->refraction = 16;
+      raise_skeleton (s);
+    }
+
+    s = get_anim_by_id (skeleton_id);
+    if (s) {
+      survey (_m, pos, &s->f, &nc, &pm, &np);
+      p = (struct pos) {3,1,4};
+      if (s->f.c.room == 3 && pm.floor == 0
+          && is_guard_fall (&s->f)) {
+        s->f.dir = RIGHT;
+        s->action = guard_normal;
+        place_frame (&s->f, &s->f, skeleton_normal_00, &p, +16, +20);
+      }
+    }
   }
 
   /* in the fourth level */

@@ -242,6 +242,31 @@ unload_guard_die (void)
   al_destroy_bitmap (shadow_die_chopped_00);
 }
 
+void
+raise_skeleton (struct anim *s)
+{
+  s->oaction = s->action;
+  s->action = raise_skeleton;
+  s->f.flip = (s->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
+
+  if (s->oaction != raise_skeleton) {
+    play_sample (skeleton_sample, s->f.c.room);
+    place_frame (&s->f, &s->f, skeleton_die_frameset[2].frame,
+                 &s->p, (s->f.dir == LEFT) ? +12 : +0, +43);
+    s->i = 2;
+  }
+
+  if (s->i-- == 0) {
+    guard_vigilant (s);
+    return;
+  }
+
+  s->fo.b = skeleton_die_frameset[s->i].frame;
+  s->fo.dx = -skeleton_die_frameset[s->i + 1].dx;
+  s->fo.dy = -skeleton_die_frameset[s->i + 1].dy;
+  next_frame (&s->f, &s->f, &s->fo);
+}
+
 ALLEGRO_BITMAP *
 get_guard_die_spiked_bitmap (enum anim_type t)
 {
@@ -272,6 +297,9 @@ guard_die_spiked (struct anim *g)
 
     if (g->type == SKELETON) play_sample (skeleton_sample, g->f.c.room);
     else play_sample (spiked_sample, g->f.c.room);
+
+    struct anim *ke = get_anim_by_id (g->oenemy_id);
+    if (ke && ke->id == current_kid_id) play_sample (glory_sample, ke->f.c.room);
   }
 
   int dy;
@@ -316,8 +344,12 @@ guard_die_chopped (struct anim *g)
   }
 
   ALLEGRO_BITMAP *bitmap = get_guard_die_chopped_bitmap (g->type);
-  if (g->oaction != guard_die_chopped)
+  if (g->oaction != guard_die_chopped) {
     place_frame (&g->f, &g->f, bitmap, &g->p, dx, dy);
+    struct anim *ke = get_anim_by_id (g->oenemy_id);
+    if (ke && ke->id == current_kid_id) play_sample (glory_sample, ke->f.c.room);
+  }
+
 
   g->xf.b = NULL;
 }
@@ -333,10 +365,16 @@ guard_die_suddenly (struct anim *g)
 
   struct frameset *frameset = get_guard_die_frameset (g->type);
 
-  if (g->oaction != guard_die_suddenly)
+  int dy = (g->type == SKELETON) ? +44 : +47;
+
+  if (g->oaction != guard_die_suddenly) {
     place_frame (&g->f, &g->f, frameset[5].frame,
                  &g->p, (g->f.dir == LEFT)
-                 ? +9 : +4, +47);
+                 ? +9 : +4, dy);
+
+    struct anim *ke = get_anim_by_id (g->oenemy_id);
+    if (ke && ke->id == current_kid_id) play_sample (glory_sample, ke->f.c.room);
+  }
 
   g->xf.b = NULL;
 
@@ -377,6 +415,9 @@ flow (struct anim *g)
                  ? +13 : +21, (g->type == SHADOW) ? +18 : +17);
     g->i = -1, g->j = 0;
     if (g->type == SKELETON) play_sample (skeleton_sample, g->f.c.room);
+
+    struct anim *ke = get_anim_by_id (g->oenemy_id);
+    if (ke && ke->id == current_kid_id) play_sample (glory_sample, ke->f.c.room);
   }
 
   g->current_lives = 0;

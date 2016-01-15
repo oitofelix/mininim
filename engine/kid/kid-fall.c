@@ -112,11 +112,11 @@ physics_in (struct anim *k)
   struct frame_offset fo;
 
   bool hang_back = ((k->f.dir == LEFT) ? k->key.right : k->key.left)
-    && ! k->key.up && k->key.shift && k->i < 10
+    && ! k->key.up && k->key.shift && k->i < 9
     && k->current_lives > 0;
 
   bool hang_front = k->key.shift && ! hang_back
-    && k->i < 10 && k->current_lives > 0;
+    && k->i < 9 && k->current_lives > 0;
 
   int dir = (k->f.dir == LEFT) ? -1 : +1;
 
@@ -262,8 +262,10 @@ physics_in (struct anim *k)
         play_sample (hit_ground_harm_sample, k->f.c.room);
         k->uncouch_slowly = true;
       }
-      video_effect.color = get_flicker_blood_color ();
-      start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
+      if (k->id == current_kid_id) {
+        video_effect.color = get_flicker_blood_color ();
+        start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
+      }
     } else if (k->i > 3
                && ! al_get_timer_started (k->floating)) {
       play_sample (hit_ground_sample, k->f.c.room);

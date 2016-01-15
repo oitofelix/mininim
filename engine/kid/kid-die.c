@@ -114,8 +114,10 @@ kid_die_spiked (struct anim *k)
     s->inactive = true;
     s->murdered_anim = k->id;
 
-    video_effect.color = get_flicker_blood_color ();
-    start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
+    if (k->id == current_kid_id) {
+      video_effect.color = get_flicker_blood_color ();
+      start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
+    }
     play_sample (spiked_sample, k->f.c.room);
   }
 

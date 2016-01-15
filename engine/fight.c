@@ -326,9 +326,11 @@ forget_enemy (struct anim *k)
 {
   struct anim *ke = get_anim_by_id (k->enemy_id);
   if (ke) {
+    ke->oenemy_id = ke->enemy_id;
     ke->enemy_id = -1;
     ke->enemy_aware = false;
   }
+  k->oenemy_id = k->enemy_id;
   k->enemy_id = -1;
   k->enemy_aware = false;
 }
@@ -737,7 +739,6 @@ fight_hit (struct anim *k, struct anim *ke)
   prel (&k->p, &pb, 0, d);
 
   if (k->current_lives <= 0 || ! is_in_fight_mode (k)) {
-    if (ke->id == 0) play_sample (glory_sample, ke->f.c.room);
     forget_enemy (ke);
     anim_die (k);
     k->death_reason = FIGHT_DEATH;
@@ -754,7 +755,7 @@ fight_hit (struct anim *k, struct anim *ke)
 
   k->splash = true;
 
-  if (k->type == KID) {
+  if (k->id == current_kid_id) {
     video_effect.color = get_flicker_blood_color ();
     start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
     play_sample (sword_hit_sample, k->f.c.room);

@@ -107,9 +107,8 @@ create_guard (struct anim *g0, struct anim *g1, struct pos *p, enum dir dir)
     g1->current_lives = 3;
     g1->enemy_id = -1;
     g1->fight = true;
-    g1->skill.defense_prob = 70;
-    g1->skill.counter_attack_prob = 70;
-    g1->skill.counter_defense_prob = 70;
+    g1->skill.counter_attack_prob = -1;
+    g1->skill.counter_defense_prob = -1;
 
     place_frame (&g1->f, &g1->f, guard_normal_00, p,
                  g1->f.dir == LEFT ? +PLACE_WIDTH + 2 : +3, +14);
@@ -423,6 +422,8 @@ is_guard (struct anim *a)
 void
 draw_guard_lives (ALLEGRO_BITMAP *bitmap, struct anim *g, enum vm vm)
 {
+  if (g->dont_draw_lives) return;
+
   int i;
   struct coord c;
   struct rect r =
