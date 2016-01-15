@@ -296,8 +296,7 @@ physics_in (struct anim *g)
     g->fo.b = frameset[0].frame;
     g->fo.dx = g->fo.dy = 0;
     g->f.c.room = pbf.room;
-    g->f.c.x += (g->f.dir == LEFT) ? -6 : +6;
-    g->f.c.y = PLACE_HEIGHT * pbf.floor + 27;
+    g->f.c.y = PLACE_HEIGHT * pbf.floor + 26;
     g->f.b = frameset[0].frame;
 
     shake_loose_floor_row (&pbf);

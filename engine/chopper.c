@@ -344,7 +344,8 @@ should_chomp (struct pos *p)
 
   for (i = 0; i < anima_nmemb; i++) {
     struct anim *a = &anima[i];
-    if (is_anim_dead (a) && ! a->id == 0) continue;
+    if (a->type != KID
+        || (is_anim_dead (&a->f) && ! a->id == 0)) continue;
     survey (_m, pos, &a->f, &nc, &pm, &np);
     int inc = p->place < pm.place ? +1 : -1;
     if (p->room == pm.room && p->floor == pm.floor) {
@@ -389,8 +390,7 @@ compute_choppers (void)
     /* chomp kid */
     for (j = 0; j < anima_nmemb; j++) {
       struct anim *a = &anima[j];
-      if (is_anim_dead (a)
-          || is_anim_fall (a)
+      if (is_anim_fall (&a->f)
           || a->immortal
           || a->chopper_immune) continue;
       struct coord nc; struct pos np, pbf, pbb;
@@ -398,14 +398,15 @@ compute_choppers (void)
       survey (_bb, pos, &a->f, &nc, &pbb, &np);
       pos2room (&pbf, c->p.room, &pbf);
       pos2room (&pbb, c->p.room, &pbb);
-      if (((pbf.room == c->p.room
-            && pbf.floor == c->p.floor)
-           || (pbb.room == c->p.room
-               && pbb.floor == c->p.floor))
-          && ((a->f.dir == LEFT && pbf.place < c->p.place
-               && pbb.place >= c->p.place)
-              || (a->f.dir == RIGHT && pbf.place >= c->p.place
-                  && pbb.place < c->p.place))) {
+      if ((((pbf.room == c->p.room
+             && pbf.floor == c->p.floor)
+            || (pbb.room == c->p.room
+                && pbb.floor == c->p.floor))
+           && ((a->f.dir == LEFT && pbf.place < c->p.place
+                && pbb.place >= c->p.place)
+               || (a->f.dir == RIGHT && pbf.place >= c->p.place
+                   && pbb.place < c->p.place)))
+          && (! is_anim_dead (&a->f) || ! is_anim_chopped (&a->f))) {
         if (a->type != SKELETON) c->blood = true;
         a->splash = true;
         a->current_lives = 0;

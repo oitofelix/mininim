@@ -28,7 +28,10 @@
 #define FOLLOW_RANGE (2 * ORIGINAL_WIDTH)
 #define HIT_RANGE 50
 
-void fight_ai (struct anim *k0, struct anim *k1);
+bool are_valid_opponents (struct anim *k0, struct anim *k1);
+void leave_fight_logic (struct anim *k);
+void enter_fight_logic (struct anim *k);
+void fight_ai (struct anim *k);
 void fight_mechanics (struct anim *k);
 void fight_inversion_mechanics (struct anim *k, struct anim *ke);
 void consider_enemy (struct anim *k0, struct anim *k1);
@@ -55,12 +58,15 @@ bool is_safe_to_walkf (struct anim *k);
 bool is_safe_to_walkb (struct anim *k);
 bool is_safe_to_attack (struct anim *k);
 bool is_safe_to_turn (struct anim *k);
+bool is_safe_to_follow (struct anim *k0, struct anim *k1);
 void fight_turn (struct anim *k);
 void fight_defense (struct anim *k);
 void fight_attack (struct anim *k);
 void fight_walkf (struct anim *k);
 void fight_walkb (struct anim *k);
 void fight_hit (struct anim *k, struct anim *ke);
+enum confg fight_crel (struct anim *k, int floor, int place);
+bool fight_door_split_collision (struct anim *a);
 
 struct skill *
 get_perfect_skill (struct skill *fp);

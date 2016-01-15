@@ -26,6 +26,7 @@
 #include "engine/potion.h"
 #include "engine/sword.h"
 #include "engine/loose-floor.h"
+#include "engine/fight.h"
 #include "kid.h"
 
 static bool flow (struct anim *k);
@@ -126,6 +127,9 @@ static bool
 physics_in (struct anim *k)
 {
   struct coord nc; struct pos np, pbf, pmbo, pbb;
+
+  /* collision */
+  if (fight_door_split_collision (k)) return false;
 
   /* fall */
   survey (_bf, pos, &k->f, &nc, &pbf, &np);

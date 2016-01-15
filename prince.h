@@ -374,6 +374,9 @@
 #define C_RED_GUARD_BLOOD_COLOR (C_BLOOD_COLOR)
 #define C_RED_GUARD_SPLASH_COLOR (C_BLOOD_COLOR)
 
+#define GUARD_LIFE_COLOR_01  (al_map_rgb (0, 0, 160))
+#define GUARD_LIFE_COLOR_02  (al_map_rgb (0, 167, 0))
+
 /* environment mode */
 enum em {
   DUNGEON, PALACE,
@@ -582,6 +585,7 @@ struct anim {
     spikes_immune, chopper_immune, sword_immune;
 
   int enemy_id;
+  bool enemy_aware;
 
   int style;
 

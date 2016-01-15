@@ -310,7 +310,7 @@ guard_die_chopped (struct anim *g)
     dx = (g->f.dir == LEFT) ? -8 : -7;
     dy = +47;
   } else {
-    dx = (g->f.dir == LEFT) ? -10 : -7;
+    dx = (g->f.dir == LEFT) ? -10 : -13;
     dy = (g->type == SKELETON) ? +45 : +43;
   }
 
@@ -452,6 +452,21 @@ is_guard_dead (struct frame *f)
     if (f->b == shadow_die_frameset[i].frame) return true;
 
   if (f->b == shadow_die_spiked_00) return true;
+  if (f->b == shadow_die_chopped_00) return true;
+
+  return false;
+}
+
+bool
+is_guard_chopped (struct frame *f)
+{
+  /* guard */
+  if (f->b == guard_die_chopped_00) return true;
+
+  /* skeleton */
+  if (f->b == skeleton_die_chopped_00) return true;
+
+  /* shadow */
   if (f->b == shadow_die_chopped_00) return true;
 
   return false;

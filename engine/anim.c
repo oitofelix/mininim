@@ -72,7 +72,7 @@ play_anim (void (*draw_callback) (void),
         if (was_key_pressed (ALLEGRO_KEY_ESCAPE, 0, ALLEGRO_KEYMOD_CTRL, true))
           pause_anim = false;
 
-        /* kid_debug (); */
+        kid_debug ();
 
         if (! is_video_effect_started ()) show ();
         if (! pause_anim
@@ -137,11 +137,11 @@ create_anim (struct anim *a0, enum anim_type t, struct pos *p, enum dir dir)
   switch (a.type) {
   case NO_ANIM: default: break;
   case KID: create_kid (a0, &a, p, dir); break;
-  case SHADOW:
   case GUARD:
   case FAT_GUARD:
   case VIZIER:
   case SKELETON:
+  case SHADOW:
     create_guard (a0, &a, p, dir); break;
   case MOUSE: create_mouse (a0, &a, p, dir); break;
   }
@@ -172,6 +172,7 @@ struct anim *
 get_anim_by_id (int id)
 {
   int i;
+  if (id == -1) return NULL;
   for (i = 0; i < anima_nmemb; i++)
     if (anima[i].id == id) return &anima[i];
   return NULL;
@@ -183,11 +184,11 @@ draw_anim_frame (ALLEGRO_BITMAP *bitmap, struct anim *a, enum vm vm)
   switch (a->type) {
   case NO_ANIM: default: break;
   case KID: draw_kid_frame (bitmap, a, vm); break;
-  case SHADOW:
   case GUARD:
   case FAT_GUARD:
   case VIZIER:
   case SKELETON:
+  case SHADOW:
     draw_guard_frame (bitmap, a, vm); break;
   case MOUSE: draw_mouse_frame (bitmap, a, vm); break;
   }
@@ -299,33 +300,24 @@ clear_anims_keyboard_state (void)
 }
 
 bool
-is_anim_dead (struct anim *a)
+is_anim_dead (struct frame *f)
 {
-  switch (a->type) {
-  case NO_ANIM: default: return false;
-  case KID: return is_kid_dead (&a->f);
-  case SHADOW:
-  case GUARD:
-  case FAT_GUARD:
-  case VIZIER:
-  case SKELETON:
-    return is_guard_dead (&a->f);
-  }
+  return is_kid_dead (f)
+    || is_guard_dead (f);
 }
 
 bool
-is_anim_fall (struct anim *a)
+is_anim_chopped (struct frame *f)
 {
-  switch (a->type) {
-  case NO_ANIM: default: return false;
-  case KID: return is_kid_fall (&a->f);
-  case SHADOW:
-  case GUARD:
-  case FAT_GUARD:
-  case VIZIER:
-  case SKELETON:
-    return is_guard_fall (&a->f);
-  }
+  return is_kid_chopped (f)
+    || is_guard_chopped (f);
+}
+
+bool
+is_anim_fall (struct frame *f)
+{
+  return is_kid_fall (f)
+    || is_guard_fall (f);
 }
 
 void
@@ -334,11 +326,11 @@ anim_die_suddenly (struct anim *a)
   switch (a->type) {
   case NO_ANIM: default: break;
   case KID: kid_die_suddenly (a); break;
-  case SHADOW:
   case GUARD:
   case FAT_GUARD:
   case VIZIER:
   case SKELETON:
+  case SHADOW:
     guard_die_suddenly (a); break;
   }
 }
@@ -349,11 +341,11 @@ anim_die_spiked (struct anim *a)
   switch (a->type) {
   case NO_ANIM: default: break;
   case KID: kid_die_spiked (a); break;
-  case SHADOW:
   case GUARD:
   case FAT_GUARD:
   case VIZIER:
   case SKELETON:
+  case SHADOW:
     guard_die_spiked (a); break;
   }
 }
@@ -364,11 +356,11 @@ anim_die_chopped (struct anim *a)
   switch (a->type) {
   case NO_ANIM: default: break;
   case KID: kid_die_chopped (a); break;
-  case SHADOW:
   case GUARD:
   case FAT_GUARD:
   case VIZIER:
   case SKELETON:
+  case SHADOW:
     guard_die_chopped (a); break;
   }
 }
@@ -379,11 +371,11 @@ anim_die (struct anim *a)
   switch (a->type) {
   case NO_ANIM: default: break;
   case KID: kid_die (a); break;
-  case SHADOW:
   case GUARD:
   case FAT_GUARD:
   case VIZIER:
   case SKELETON:
+  case SHADOW:
     guard_die (a); break;
   }
 }
@@ -394,11 +386,11 @@ anim_sword_hit (struct anim *a)
   switch (a->type) {
   case NO_ANIM: default: break;
   case KID: kid_sword_hit (a); break;
-  case SHADOW:
   case GUARD:
   case FAT_GUARD:
   case VIZIER:
   case SKELETON:
+  case SHADOW:
     guard_hit (a); break;
   }
 }
@@ -409,11 +401,11 @@ anim_fall (struct anim *a)
   switch (a->type) {
   case NO_ANIM: default: break;
   case KID: kid_fall (a); break;
-  case SHADOW:
   case GUARD:
   case FAT_GUARD:
   case VIZIER:
   case SKELETON:
+  case SHADOW:
     guard_fall (a); break;
   }
 }
@@ -424,11 +416,11 @@ anim_walkf (struct anim *a)
   switch (a->type) {
   case NO_ANIM: default: break;
   case KID: kid_sword_walkf (a); break;
-  case SHADOW:
   case GUARD:
   case FAT_GUARD:
   case VIZIER:
   case SKELETON:
+  case SHADOW:
     guard_walkf (a); break;
   }
 }
@@ -439,11 +431,11 @@ anim_walkb (struct anim *a)
   switch (a->type) {
   case NO_ANIM: default: break;
   case KID: kid_sword_walkb (a); break;
-  case SHADOW:
   case GUARD:
   case FAT_GUARD:
   case VIZIER:
   case SKELETON:
+  case SHADOW:
     guard_walkb (a); break;
   }
 }
@@ -460,6 +452,7 @@ splash_coord (struct frame *f, struct coord *c)
   c->room = f->c.room;
   return c;
 }
+
 
 
 

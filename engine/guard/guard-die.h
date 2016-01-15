@@ -80,6 +80,7 @@ void guard_die_spiked (struct anim *g);
 void guard_die_chopped (struct anim *g);
 void guard_die_suddenly (struct anim *g);
 bool is_guard_dead (struct frame *f);
+bool is_guard_chopped (struct frame *f);
 struct frameset *get_guard_die_frameset (enum anim_type t);
 ALLEGRO_BITMAP *get_guard_die_spiked_bitmap (enum anim_type t);
 

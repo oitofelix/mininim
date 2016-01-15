@@ -44,8 +44,9 @@ int compare_anims (const void *a0, const void *a1);
 void draw_anim_if_at_pos (ALLEGRO_BITMAP *bitmap, struct anim *a,
                           struct pos *p, enum vm vm);
 void clear_anims_keyboard_state (void);
-bool is_anim_dead (struct anim *a);
-bool is_anim_fall (struct anim *a);
+bool is_anim_dead (struct frame *f);
+bool is_anim_chopped (struct frame *f);
+bool is_anim_fall (struct frame *f);
 void anim_die_suddenly (struct anim *a);
 void anim_die_spiked (struct anim *a);
 void anim_die_chopped (struct anim *a);

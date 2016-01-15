@@ -509,7 +509,7 @@ compute_loose_floor_fall (struct loose_floor *l)
   for (i = 0; i < anima_nmemb; i++) {
     struct coord kmt, ambo_f, ambo_nf; struct pos np, kpmt;
     struct anim *a = &anima[i];
-    if (is_anim_dead (a)
+    if (is_anim_dead (&a->f)
         || a->immortal
         || a->loose_floor_immune)
       continue;

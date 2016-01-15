@@ -49,6 +49,7 @@ struct anim *create_guard (struct anim *g0, struct anim *g1,
 void draw_guard_frame (ALLEGRO_BITMAP *bitmap, struct anim *g,
                        enum vm);
 bool is_guard (struct anim *a);
+void draw_guard_lives (ALLEGRO_BITMAP *bitmap, struct anim *g, enum vm vm);
 
 /* variables */
 extern struct anim *guarda;

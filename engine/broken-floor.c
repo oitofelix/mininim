@@ -201,7 +201,7 @@ draw_broken_floor_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
     struct anim *a = &anima[i];
     struct coord nc; struct pos np, pmt;
     survey (_mt, pos, &a->f, &nc, &pmt, &np);
-    if (peq (&pmt, p) && is_anim_dead (a)) return;
+    if (peq (&pmt, p) && is_anim_dead (&a->f)) return;
   }
 
   ALLEGRO_BITMAP *broken_floor_front = NULL;

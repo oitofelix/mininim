@@ -25,114 +25,193 @@
 #include "anim.h"
 #include "physics.h"
 #include "pos.h"
+#include "door.h"
 #include "mouse.h"
 #include "sword.h"
 #include "fight.h"
 
-void
-fight_ai (struct anim *k0, struct anim *k1)
+bool
+are_valid_opponents (struct anim *k0, struct anim *k1)
 {
-  if (k0->current_lives <= 0) return;
+  /* no one fights oneself */
+  if (k0->id == k1->id) return false;
+
+  /* anyone trying to fight the kid is fair game */
+  if (k0->id == 0 || k1->id == 0) return true;
+
+  return false;
+}
+
+void
+leave_fight_logic (struct anim *k)
+{
+  /* no enemy, no need to forget */
+  if (k->enemy_id == -1) return;
+
+  /* dead character doesn't fight */
+  if (k->current_lives <= 0) {
+    forget_enemy (k);
+    return;
+  }
+
+  /* who's the enemy? */
+  struct anim *ke = get_anim_by_id (k->enemy_id);
+
+  /* if the enemy doesn't exist, forget about it */
+  if (! ke) {
+    forget_enemy (k);
+    return;
+  }
+
+  /* if the enemy is dead no need to worry about him */
+  if (ke->current_lives <= 0) {
+    forget_enemy (k);
+    return;
+  }
+
+  /* if the enemy is beyond follow range, forget about him */
+  if (! is_in_range (k, ke, FOLLOW_RANGE)) {
+    forget_enemy (k);
+    return;
+  }
+}
+
+void
+enter_fight_logic (struct anim *k)
+{
+  /* has an enemy, no need to get another */
+  if (k->enemy_id != -1 && k->enemy_aware) return;
+
+  /* dead character doesn't fight */
+  if (k->current_lives <= 0) return;
+
+  int i;
+  for (i = 0; i < anima_nmemb; i++) {
+    struct anim *a = &anima[i];
+
+    /* no dead character is a valid oponent */
+    if (a->current_lives <= 0) continue;
+
+    /* only valid opponents matter */
+    if (! are_valid_opponents (k, a)) continue;
+
+    /* if seeing the character consider him an enemy */
+    if (is_seeing (k, a)) {
+      consider_enemy (k, a);
+      return;
+    }
+
+    /* if hearing the character on the back, turn */
+    if (is_hearing (k, a) && is_on_back (k, a)) {
+      fight_turn (k);
+      return;
+    }
+
+    /* if feeling the character's presence consider him an enemy */
+    if (is_near (k, a)) {
+      consider_enemy (k, a);
+      return;
+    }
+  }
+}
+
+void
+fight_ai (struct anim *k)
+{
+  /* controllables and non-fighters doesn't need AI to fight */
+  if (k->controllable || ! k->fight) return;
+
+  /* without an enemy or awareness, no need to fight */
+  if (k->enemy_id == -1 || ! k->enemy_aware) {
+    if (is_in_fight_mode (k)) leave_fight_mode (k);
+    return;
+  }
+
+  /* first thing, enter in fight mode */
+  if (! is_in_fight_mode (k)) {
+    enter_fight_mode (k);
+    return;
+  }
+
+  /* who's the enemy? */
+  struct anim *ke = get_anim_by_id (k->enemy_id);
+
+  /* if the enemy is on the back, turn */
+  if (is_on_back (k, ke)) {
+    if (is_safe_to_turn (k)) fight_turn (k);
+    else if (is_safe_to_walkb (k)) fight_walkb (k);
+    return;
+  }
+
+  /* if too near to a wall, back off to have room for an attack */
+  if (fight_crel (k, +0, +1) == WALL
+      && is_safe_to_walkb (k)) {
+    fight_walkb (k);
+    return;
+  }
+
+  /* stays at least in the fight range */
+  if (! is_in_range (k, ke, FIGHT_RANGE)
+      && is_safe_to_follow (k, ke)
+      && is_safe_to_walkf (k)) {
+    fight_walkf (k);
+    return;
+  }
+
+  /* in fight range, go towards attack range (with probability, unless
+     the enemy is not in fight mode, then go immediately) */
+  if (is_in_range (k, ke, FIGHT_RANGE)
+      && ! is_in_range (k, ke, ATTACK_RANGE)
+      && is_safe_to_follow (k, ke)
+      && is_safe_to_walkf (k)
+      && (prandom (99) <= k->skill.advance_prob
+          || ! is_in_fight_mode (ke))
+      && ! is_attacking (ke)) {
+    fight_walkf (k);
+    return;
+  }
+
+  /* in attack range, back off to fight range
+     (with probability) */
+  if (is_in_range (k, ke, ATTACK_RANGE)
+      && is_safe_to_walkb (k)
+      && prandom (99) <= k->skill.return_prob) {
+    fight_walkb (k);
+    return;
+  }
 
   /* in attack range, if being attacked, defend yourself (with
      probability) and counter attack (with probability handled
      elsewhere)*/
-  if (is_in_fight_mode (k0)
-      && k0->enemy_id == k1->id
-      && ! is_on_back (k0, k1)
-      && is_in_range (k0, k1, ATTACK_RANGE)
-      && (is_attacking (k1)
-          && (k0->type != KID || k1->i == 0)
-          && (k0->type == KID || k1->i == 1))
-      && prandom (99) <= k0->skill.defense_prob) {
-    fight_defense (k0);
-    if (is_safe_to_attack (k0)) fight_attack (k0);
-    else if (is_safe_to_walkb (k0)) fight_walkb (k0);
-  }
-  /* if defending, counter attack
-     (with probability handled elsewhere) */
-  /* else if (is_in_fight_mode (k0) */
-  /*          && k0->enemy_id == k1->id */
-  /*          && ! is_on_back (k0, k1) */
-  /*          && is_in_range (k0, k1, ATTACK_RANGE) */
-  /*          && is_defending (k0)) { */
-  /*   if (is_safe_to_attack (k0)) fight_attack (k0); */
-  /*   else if (is_safe_to_walkb (k0)) fight_walkb (k0); */
-  /* } */
-  /* if attacking, counter defend
-     (with probability handled elsewhere) */
-  else if (is_in_fight_mode (k0)
-           && k0->enemy_id == k1->id
-           && ! is_on_back (k0, k1)
-           && is_in_range (k0, k1, ATTACK_RANGE)
-           && is_attacking (k0))
-    fight_defense (k0);
-  /* in attack range, if not being attacked, attack (with probability,
-     unless the enemy is not in fight mode, then attack immediately) */
-  else if (is_in_fight_mode (k0)
-           && k0->enemy_id == k1->id
-           && ! is_on_back (k0, k1)
-           && ! is_attacking (k1)
-           && is_in_range (k0, k1, ATTACK_RANGE)
-           && (prandom (99) <= k0->skill.attack_prob
-               || ! is_in_fight_mode (k1))) {
-    if (is_safe_to_attack (k0)) fight_attack (k0);
-    else if (is_safe_to_walkb (k0)) fight_walkb (k0);
-  }
-   /* in attack range, back off to fight range
-      (with probability) */
-  else if (is_in_fight_mode (k0)
-           && k0->enemy_id == k1->id
-           && ! is_attacking (k1)
-           && is_in_range (k0, k1, ATTACK_RANGE)
-           && is_safe_to_walkb (k0)
-           && prandom (99) <= k0->skill.return_prob)
-    fight_walkb (k0);
-  /* in fight range, go towards attack range
-     (with probability) */
-  else if (is_in_fight_mode (k0)
-           && k0->enemy_id == k1->id
-           && ! is_attacking (k1)
-           && is_in_range (k0, k1, FIGHT_RANGE)
-           && ! is_in_range (k0, k1, ATTACK_RANGE)
-           && is_safe_to_walkf (k0)
-           && prandom (99) <= k0->skill.advance_prob)
-    fight_walkf (k0);
-  /* in follow range, stays at least in the fight range */
-  else if (is_in_fight_mode (k0)
-           && k0->enemy_id == k1->id
-           && ! is_in_range (k0, k1, FIGHT_RANGE)
-           && is_in_range (k0, k1, FOLLOW_RANGE)
-           && ! is_on_back (k0, k1)
-           && is_safe_to_walkf (k0))
-    fight_walkf (k0);
-  /* in follow range, but enemy on back, turn if safe*/
-  else if (is_in_fight_mode (k0)
-           && k0->enemy_id == k1->id
-           && is_in_range (k0, k1, FOLLOW_RANGE)
-           && is_on_back (k0, k1)) {
-    if (is_safe_to_turn (k0)) fight_turn (k0);
-    else if (is_safe_to_walkb (k0)) fight_walkb (k0);
-  } else if (is_seeing (k0, k1)) {
-    if (k0->enemy_id != k1->id
-        && k1->current_lives > 0)
-      consider_enemy (k0, k1);
-    if (k0->has_sword
-        && ! is_in_fight_mode (k0))
-      enter_fight_mode (k0);
-  } else if ((is_hearing (k0, k1)
-              || is_near (k0, k1))
-             && is_on_back (k0, k1)
-             && k0->enemy_id != k1->id) {
-    consider_enemy (k0, k1);
-    fight_turn (k0);
-  } else if (is_in_fight_mode (k0)
-             && ! (k0->enemy_id == k1->id
-                   && is_in_range (k0, k1, FIGHT_RANGE))) {
-    forget_enemy (k0);
-    leave_fight_mode (k0);
+  if (is_in_range (k, ke, ATTACK_RANGE)
+      && (is_attacking (ke)
+          && (k->type != KID || ke->i == 0)
+          && (k->type == KID || ke->i == 1))
+      && prandom (99) <= k->skill.defense_prob) {
+    fight_defense (k);
+    if (is_safe_to_attack (k)) fight_attack (k);
+    else if (is_safe_to_walkb (k)) fight_walkb (k);
+    return;
   }
 
+  /* if attacking, counter defend
+     (with probability handled elsewhere) */
+  if (is_in_range (k, ke, ATTACK_RANGE)
+           && is_attacking (k)) {
+    fight_defense (k);
+    return;
+  }
+
+  /* in attack range, if not being attacked, attack (with probability,
+     unless the enemy is not in fight mode, then attack immediately) */
+  if (! is_attacking (ke)
+           && is_in_range (k, ke, ATTACK_RANGE)
+           && (prandom (99) <= k->skill.attack_prob
+               || ! is_in_fight_mode (ke))) {
+    if (is_safe_to_attack (k)) fight_attack (k);
+    else if (is_safe_to_walkb (k)) fight_walkb (k);
+    return;
+  }
 }
 
 void
@@ -220,6 +299,7 @@ void
 consider_enemy (struct anim *k0, struct anim *k1)
 {
   k0->enemy_id = k1->id;
+  k0->enemy_aware = true;
   k1->enemy_id = k0->id;
 }
 
@@ -227,13 +307,18 @@ void
 forget_enemy (struct anim *k)
 {
   struct anim *ke = get_anim_by_id (k->enemy_id);
-  if (ke) ke->enemy_id = -1;
+  if (ke) {
+    ke->enemy_id = -1;
+    ke->enemy_aware = false;
+  }
   k->enemy_id = -1;
+  k->enemy_aware = false;
 }
 
 void
 enter_fight_mode (struct anim *k)
 {
+  if (! k->has_sword) return;
   k->key.enter = true;
 }
 
@@ -256,6 +341,17 @@ is_in_range (struct anim *k0, struct anim *k1, int r)
   return k0->f.c.room == f1.c.room
     && pm1.floor == pm0.floor
     && abs (m1.x - m0.x) < r;
+}
+
+enum confg
+fight_crel (struct anim *k, int floor, int place)
+{
+  struct coord nc; struct pos np, pm;
+  survey (_m, pos, &k->f, &nc, &pm, &np);
+
+  /* place sign indicates direction in relation to k orientation */
+  int dir = (k->f.dir == LEFT) ? -1 : +1;
+  return crel (&pm, floor, dir * place)->fg;
 }
 
 int
@@ -487,7 +583,8 @@ is_hearing (struct anim *k0, struct anim *k1)
         || is_kid_run_jump_running (&k1->f)
         || is_kid_run_jump_landing (&k1->f)
         || (is_kid_couch (&k1->f)
-            && k1->fall));
+            && k1->fall)
+        || k1->action == kid_take_sword);
 }
 
 bool
@@ -507,7 +604,7 @@ is_near (struct anim *k0, struct anim *k1)
   struct coord m0, m1; struct pos np, pm0, pm1;
   survey (_m, pos, &k0->f, &m0, &pm0, &np);
   survey (_m, pos, &k1->f, &m1, &pm1, &np);
-  return pm1.room == pm0.room
+  return pm1.room == pm0.room && pm1.floor == pm0.floor
     && ((k0->f.dir == LEFT && abs (m1.x - m0.x) < PLACE_WIDTH)
         || (k0->f.dir == RIGHT && abs (m1.x - m0.x) < PLACE_WIDTH));
 }
@@ -516,7 +613,8 @@ bool
 is_safe_to_walkf (struct anim *k)
 {
   int df = dist_fall (&k->f, false);
-  return (df > PLACE_WIDTH);
+  return df > PLACE_WIDTH
+    && fight_crel (k, +0, +2) != WALL;
 }
 
 bool
@@ -530,7 +628,7 @@ bool
 is_safe_to_attack (struct anim *k)
 {
   int df = dist_fall (&k->f, false);
-  return (df > PLACE_WIDTH);
+  return df > PLACE_WIDTH;
 }
 
 bool
@@ -538,6 +636,24 @@ is_safe_to_turn (struct anim *k)
 {
   int df = dist_fall (&k->f, false);
   return (df > PLACE_WIDTH);
+}
+
+bool
+is_safe_to_follow (struct anim *k0, struct anim *k1)
+{
+  struct frame f1 = k1->f;
+  frame2room (&f1, k0->f.c.room, &f1.c);
+
+  struct coord m0, m1; struct pos np, pm0, pm1, p;
+  survey (_m, pos, &k0->f, &m0, &pm0, &np);
+  survey (_m, pos, &f1, &m1, &pm1, &np);
+
+  int inc = (pm0.place < pm1.place) ? +1 : -1;
+  for (p = pm0; p.place != pm1.place; prel (&p, &p, +0, inc))
+    if (is_traversable (&p)
+        || con (&p)->fg == CHOPPER) return false;
+
+  return true;
 }
 
 void
@@ -580,6 +696,8 @@ fight_hit (struct anim *k, struct anim *ke)
 {
   if (k->immortal || k->sword_immune) return;
 
+  if (k->current_lives <= 0) return;
+
   place_on_the_ground (&k->f, &k->f.c);
   k->xf.b = NULL;
 
@@ -596,10 +714,12 @@ fight_hit (struct anim *k, struct anim *ke)
     anim_die (k);
   } else anim_sword_hit (k);
 
-  if (is_strictly_traversable (&pb)) {
-    place_at_pos (&k->f, _m, &pb, &k->f.c);
-    anim_fall (k);
-  } else place_at_distance (&ke->f, _tf, &k->f, _tf, 10, ke->f.dir, &k->f.c);
+  if (! is_colliding (&k->f, &k->fo, +PLACE_WIDTH, ke->f.dir == k->f.dir, &k->ci)) {
+    if (is_strictly_traversable (&pb)) {
+      place_at_pos (&k->f, _m, &pb, &k->f.c);
+      anim_fall (k);
+    } else place_at_distance (&ke->f, _tf, &k->f, _tf, 10, ke->f.dir, &k->f.c);
+  }
 
   k->splash = true;
 
@@ -608,6 +728,36 @@ fight_hit (struct anim *k, struct anim *ke)
     start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
     play_sample (sword_hit_sample, k->f.c.room);
   } else play_sample (guard_hit_sample, k->f.c.room);
+}
+
+bool
+fight_door_split_collision (struct anim *a)
+{
+  struct coord nc, tl; struct pos np, ptl, ptr;
+
+  survey (_tl, pos, &a->f, &tl, &ptl, &np);
+  survey (_tr, pos, &a->f, &nc, &ptr, &np);
+
+  int dtl = dist_next_place (&a->f, _tl, pos, +0, a->f.dir == LEFT);
+  int dtr = dist_next_place (&a->f, _tr, pos, +0, a->f.dir == RIGHT);
+
+  if (con (&ptl)->fg == DOOR
+      && ptr.place > ptl.place
+      && tl.y <= door_grid_tip_y (&ptl) - 10) {
+    if (dtl < dtr) {
+     a->f.c.x += dtl;
+      if (a->f.dir == RIGHT) anim_walkf (a);
+      else anim_walkb (a);
+      return true;
+    } else {
+      a->f.c.x -= dtr;
+      if (a->f.dir == LEFT) anim_walkf (a);
+      else anim_walkb (a);
+      return true;
+    }
+  }
+
+  return false;
 }
 
 struct skill *

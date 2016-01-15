@@ -45,6 +45,13 @@ ALLEGRO_BITMAP *guard_life, *guard_splash;
 /* sounds */
 ALLEGRO_SAMPLE *guard_hit_sample, *skeleton_sample;
 
+static struct coord *guard_life_coord (int i, struct coord *c);
+static ALLEGRO_COLOR c_shadow_life_palette (ALLEGRO_COLOR c);
+static ALLEGRO_COLOR e_shadow_life_palette (ALLEGRO_COLOR c);
+static ALLEGRO_COLOR v_shadow_life_palette (ALLEGRO_COLOR c);
+static palette get_shadow_life_palette (enum vm vm);
+static ALLEGRO_COLOR skeleton_life_palette (ALLEGRO_COLOR c);
+
 void
 load_guard (void)
 {
@@ -105,7 +112,7 @@ create_guard (struct anim *g0, struct anim *g1, struct pos *p, enum dir dir)
     g1->skill.counter_defense_prob = 70;
 
     place_frame (&g1->f, &g1->f, guard_normal_00, p,
-                 g1->f.dir == LEFT ? +PLACE_WIDTH + 2 : +3, +15);
+                 g1->f.dir == LEFT ? +PLACE_WIDTH + 2 : +3, +14);
     update_depressible_floor (g1, -4, -10);
   }
 
@@ -411,4 +418,109 @@ is_guard (struct anim *a)
     || a->type == FAT_GUARD
     || a->type == VIZIER
     || a->type == SKELETON;
+}
+
+void
+draw_guard_lives (ALLEGRO_BITMAP *bitmap, struct anim *g, enum vm vm)
+{
+  int i;
+  struct coord c;
+  struct rect r =
+    new_rect (room_view, ORIGINAL_WIDTH - 7 * g->current_lives,
+              ORIGINAL_HEIGHT - 8, 7 * g->current_lives, ORIGINAL_HEIGHT - 1);
+
+  ALLEGRO_COLOR bg_color;
+
+  switch (vm) {
+  case CGA: bg_color = C_LIVES_RECT_COLOR; break;
+  case EGA: bg_color = E_LIVES_RECT_COLOR; break;
+  case VGA: bg_color = V_LIVES_RECT_COLOR; break;
+  }
+
+  draw_filled_rect (bitmap, &r, bg_color);
+
+  ALLEGRO_BITMAP *life = guard_life;
+  palette pal = NULL;
+  if (g->type == GUARD || g->type == FAT_GUARD
+      || g->type == VIZIER) {
+    pal = get_palette (g->style, vm);
+    life = apply_palette (life, pal);
+  } else if (g->type == SHADOW) {
+    pal = get_shadow_life_palette (vm);
+    life = apply_palette (life, pal);
+  } else if (g->type == SKELETON)
+    life = apply_palette (life, skeleton_life_palette);
+
+  if (hgc) life = apply_palette (life, hgc_palette);
+
+  for (i = 0; i < g->current_lives; i++)
+    draw_bitmapc (life, bitmap, guard_life_coord (i, &c), 0);
+}
+
+static struct coord *
+guard_life_coord (int i, struct coord *c)
+{
+  c->x = ORIGINAL_WIDTH - 7 * (i + 1) + 1;
+  c->y = 194;
+  c->room = room_view;
+  return c;
+}
+
+static ALLEGRO_COLOR
+c_shadow_life_palette (ALLEGRO_COLOR c)
+{
+  unsigned char r, g, b, a;
+  al_unmap_rgba (c, &r, &g, &b, &a);
+  if (a == 0) return c;
+
+  if (color_eq (c, GUARD_LIFE_COLOR_01)) return C_KID_SHADOW_CLOTHES_COLOR_01;
+  if (color_eq (c, GUARD_LIFE_COLOR_02)) return C_KID_SHADOW_CLOTHES_COLOR_02;
+
+  return c;
+}
+
+static ALLEGRO_COLOR
+e_shadow_life_palette (ALLEGRO_COLOR c)
+{
+  unsigned char r, g, b, a;
+  al_unmap_rgba (c, &r, &g, &b, &a);
+  if (a == 0) return c;
+
+  if (color_eq (c, GUARD_LIFE_COLOR_01)) return E_KID_SHADOW_CLOTHES_COLOR_01;
+  if (color_eq (c, GUARD_LIFE_COLOR_02)) return E_KID_SHADOW_CLOTHES_COLOR_02;
+
+  return c;
+}
+
+static ALLEGRO_COLOR
+v_shadow_life_palette (ALLEGRO_COLOR c)
+{
+  unsigned char r, g, b, a;
+  al_unmap_rgba (c, &r, &g, &b, &a);
+  if (a == 0) return c;
+
+  if (color_eq (c, GUARD_LIFE_COLOR_01)) return V_KID_SHADOW_CLOTHES_COLOR_01;
+  if (color_eq (c, GUARD_LIFE_COLOR_02)) return V_KID_SHADOW_CLOTHES_COLOR_02;
+
+  return c;
+}
+
+static palette
+get_shadow_life_palette (enum vm vm)
+{
+  switch (vm) {
+  case CGA: return c_shadow_life_palette;
+  case EGA: return e_shadow_life_palette;
+  case VGA: return v_shadow_life_palette;
+  }
+  return NULL;
+}
+
+static ALLEGRO_COLOR
+skeleton_life_palette (ALLEGRO_COLOR c)
+{
+  unsigned char r, g, b, a;
+  al_unmap_rgba (c, &r, &g, &b, &a);
+  if (a == 0) return c;
+  return WHITE;
 }

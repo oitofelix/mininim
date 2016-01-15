@@ -44,7 +44,7 @@ static void
 init_kid_keep_sword_frameset (void)
 {
   struct frameset frameset[KID_KEEP_SWORD_FRAMESET_NMEMB] =
-    {{kid_keep_sword_01,+2,0},{kid_keep_sword_02,-2,0},{kid_keep_sword_03,+0,0},
+    {{kid_keep_sword_01,+2,+0},{kid_keep_sword_02,-2,0},{kid_keep_sword_03,+0,0},
      {kid_keep_sword_04,+1,0},{kid_keep_sword_05,-6,0},{kid_keep_sword_06,+2,0},
      {kid_keep_sword_07,+3,0},{kid_keep_sword_08,+0,0},{kid_keep_sword_09,+3,0},
      {kid_keep_sword_10,+0,0}};

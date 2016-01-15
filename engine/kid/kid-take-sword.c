@@ -42,7 +42,7 @@ static void
 init_kid_take_sword_frameset (void)
 {
   struct frameset frameset[KID_TAKE_SWORD_FRAMESET_NMEMB] =
-    {{kid_take_sword_01,-6,0},{kid_take_sword_02,+0,0},
+    {{kid_take_sword_01,-6,+0},{kid_take_sword_02,+0,0},
      {kid_take_sword_03,-4,0},{kid_take_sword_04,-6,0}};
 
   memcpy (&kid_take_sword_frameset, &frameset,

@@ -613,7 +613,7 @@ draw_room_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
   /* when falling at construct's left */
   if (br.y >= (pv.floor + 1) * PLACE_HEIGHT - 6
       && br.x >= pv.place * PLACE_WIDTH
-      && is_kid_fall (f)) {
+      && is_anim_fall (f)) {
     draw_confg_base (bitmap, &pv, em, vm);
     draw_confg_left (bitmap, &pv, em, vm, true);
 
@@ -667,7 +667,7 @@ draw_room_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
              /* && (peq (&pv, prel (&fpmbo, &np, -1, 0)) */
              /*     || peq (&pv, prel (&pmbo, &np, -1, 0))) */
              ! (is_kid_hang_or_climb (f) && f->dir == LEFT)
-             && ! is_kid_fall (f)
+             && ! is_anim_fall (f)
              && ! is_strictly_traversable (&pv)
              && tl.y <= (pv.floor + 1) * PLACE_HEIGHT + 3
              && bl.y >= (pv.floor + 1) * PLACE_HEIGHT + 3

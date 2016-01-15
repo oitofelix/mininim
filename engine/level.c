@@ -52,7 +52,8 @@
 static void draw_level (void);
 static void compute_level (void);
 static void process_keys (void);
-void display_remaining_time (void);
+static void display_remaining_time (void);
+static void draw_lives (ALLEGRO_BITMAP *bitmap, struct anim *k, enum vm vm);
 
 struct level *vanilla_level;
 struct level level;
@@ -196,20 +197,11 @@ compute_level (void)
 
   get_keyboard_state (&current_kid->key);
 
-  struct anim *k = get_anim_by_id (0);
-
-  for (i = 0; i < anima_nmemb; i++) {
-    struct anim *a = &anima[i];
-    if ((is_guard (a)
-         || (a->type == KID && ! a->controllable))
-        && a->fight)
-      fight_ai (a, k);
-  }
-
+  for (i = 0; i < anima_nmemb; i++) leave_fight_logic (&anima[i]);
+  for (i = 0; i < anima_nmemb; i++) enter_fight_logic (&anima[i]);
+  for (i = 0; i < anima_nmemb; i++) fight_ai (&anima[i]);
   for (i = 0; i < anima_nmemb; i++) anima[i].action (&anima[i]);
-
-  for (i = 0; i < anima_nmemb; i++)
-    if (anima[i].fight) fight_mechanics (&anima[i]);
+  for (i = 0; i < anima_nmemb; i++) fight_mechanics (&anima[i]);
 
   clear_anims_keyboard_state ();
 
@@ -306,7 +298,10 @@ process_keys (void)
   /* K: kill enemy */
   if (was_key_pressed (ALLEGRO_KEY_K, 0, 0, true)) {
     struct anim *ke = get_anim_by_id (current_kid->enemy_id);
-    if (ke) ke->current_lives = 0;
+    if (ke) {
+      ke->current_lives = 0;
+      play_sample (guard_hit_sample, ke->f.c.room);
+    }
   }
 
   /* I: enable/disable immortal mode */
@@ -502,7 +497,7 @@ draw_level (void)
   if (pause_game) {
     draw_bottom_text (NULL, "GAME PAUSED");
     clear_bitmap (uscreen, TRANSPARENT_COLOR);
-    draw_kid_lives (uscreen, get_anim_by_id (current_kid_id), vm);
+    draw_lives (uscreen, get_anim_by_id (current_kid_id), vm);
     draw_bottom_text (uscreen, NULL);
     return;
   }
@@ -549,7 +544,7 @@ draw_level (void)
   unpress_closer_floors ();
   uncross_mirrors ();
 
-  draw_kid_lives (uscreen, get_anim_by_id (current_kid_id), vm);
+  draw_lives (uscreen, get_anim_by_id (current_kid_id), vm);
 
   /* automatic remaining time display */
   int rem_time = 60 - al_get_timer_count (play_time);
@@ -567,11 +562,23 @@ draw_level (void)
   draw_bottom_text (uscreen, NULL);
 }
 
-void
+static void
 display_remaining_time (void)
 {
   char *text;
   xasprintf (&text, "%i MINUTES LEFT", 60 - al_get_timer_count (play_time));
   draw_bottom_text (NULL, text);
   al_free (text);
+}
+
+static void
+draw_lives (ALLEGRO_BITMAP *bitmap, struct anim *k, enum vm vm)
+{
+  if (k->f.c.room == room_view) {
+    draw_kid_lives (bitmap, k, vm);
+    if (k->enemy_id != -1) {
+      struct anim *ke = get_anim_by_id (k->enemy_id);
+      draw_guard_lives (bitmap, ke, vm);
+    }
+  }
 }

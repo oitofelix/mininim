@@ -259,6 +259,14 @@ is_kid_dead (struct frame *f)
   return false;
 }
 
+bool
+is_kid_chopped (struct frame *f)
+{
+  if (f->b == kid_die_chopped_00) return true;
+
+  return false;
+}
+
 void
 kill_kid_shadows (struct anim *k)
 {
