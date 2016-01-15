@@ -68,9 +68,7 @@ void fight_hit (struct anim *k, struct anim *ke);
 enum confg fight_crel (struct anim *k, int floor, int place);
 bool fight_door_split_collision (struct anim *a);
 
-struct skill *
-get_perfect_skill (struct skill *fp);
-struct skill *
-get_median_skill (struct skill *fp);
+struct skill *get_perfect_skill (struct skill *fp);
+struct skill *upgrade_skill (struct skill *s0, struct skill *s1);
 
 #endif	/* MININIM_FIGHT_H */

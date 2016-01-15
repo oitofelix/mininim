@@ -48,6 +48,7 @@ static struct level_door *exit_level_door;
 static ALLEGRO_TIMER *mouse_timer;
 static int mouse_id;
 static bool coming_from_12;
+static struct skill skill;
 
 static int life_table[] = {4, 3, 3, 3, 3, 4, 5, 4, 4, 5, 5, 5, 4, 6, 0, 0};
 
@@ -112,14 +113,19 @@ start (void)
   if (coming_from_12) auto_rem_time_1st_cycle = -1;
   else auto_rem_time_1st_cycle = 24;
 
-  /* start the game with only 3 lives */
-  if (level.number == 1) total_lives = 3;
+  /* start the game with only 3 lives and null skills */
+  if (level.number == 1) {
+    total_lives = 3;
+    skill.counter_attack_prob = -1;
+    skill.counter_defense_prob = -1;
+  }
   if (total_lives < 3) total_lives = 3;
 
   /* create kid */
   int id = create_anim (NULL, KID, &level.start_pos, level.start_dir);
   struct anim *k = &anima[id];
   k->total_lives = total_lives;
+  k->skill = skill;
   if (coming_from_12) k->current_lives = current_lives;
   else k->current_lives = total_lives;
   k->controllable = true;
@@ -430,6 +436,7 @@ special_events (void)
     if (k->f.c.room == roomd (1, BELOW)) {
       total_lives = k->total_lives;
       current_lives = k->current_lives;
+      skill = k->skill;
       quit_anim = NEXT_LEVEL;
     }
   }
@@ -494,6 +501,7 @@ special_events (void)
       coming_from_12 = true;
       total_lives = k->total_lives;
       current_lives = k->current_lives;
+      skill = k->skill;
       quit_anim = NEXT_LEVEL;
     }
   }
@@ -528,9 +536,11 @@ end (struct pos *p)
     played_sample = true;
   }
 
-  /* the kid must keep the total lives obtained for the next level */
+  /* the kid must keep the total lives and skills obtained for the
+     next level */
   total_lives = k->total_lives;
   current_lives = k->current_lives;
+  skill = k->skill;
 
   if (! is_playing_sample (si)) quit_anim = NEXT_LEVEL;
 }

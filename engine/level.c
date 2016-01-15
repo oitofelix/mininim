@@ -381,6 +381,34 @@ process_keys (void)
     display_remaining_time ();
   }
 
+  /* CTRL+=: increment counter attack skill */
+  if (was_key_pressed (ALLEGRO_KEY_EQUALS, 0, ALLEGRO_KEYMOD_CTRL, true)) {
+    if (current_kid->skill.counter_attack_prob < 99)
+      current_kid->skill.counter_attack_prob++;
+    display_skill (current_kid);
+  }
+
+  /* CTRL+-: decrement counter attack skill */
+  if (was_key_pressed (ALLEGRO_KEY_MINUS, 0, ALLEGRO_KEYMOD_CTRL, true)) {
+    if (current_kid->skill.counter_attack_prob > -1)
+      current_kid->skill.counter_attack_prob--;
+    display_skill (current_kid);
+  }
+
+  /* ALT+=: increment counter defense skill */
+  if (was_key_pressed (ALLEGRO_KEY_EQUALS, 0, ALLEGRO_KEYMOD_ALT, true)) {
+    if (current_kid->skill.counter_defense_prob < 99)
+      current_kid->skill.counter_defense_prob++;
+    display_skill (current_kid);
+  }
+
+  /* ALT+-: decrement counter defense skill */
+  if (was_key_pressed (ALLEGRO_KEY_MINUS, 0, ALLEGRO_KEYMOD_ALT, true)) {
+    if (current_kid->skill.counter_defense_prob > -1)
+      current_kid->skill.counter_defense_prob--;
+    display_skill (current_kid);
+  }
+
   /* CTRL+V: show engine name and version */
   if (was_key_pressed (ALLEGRO_KEY_V, 0, ALLEGRO_KEYMOD_CTRL, true)) {
     xasprintf (&text, "MININIM 0.9");
@@ -567,6 +595,17 @@ display_remaining_time (void)
 {
   char *text;
   xasprintf (&text, "%i MINUTES LEFT", 60 - al_get_timer_count (play_time));
+  draw_bottom_text (NULL, text);
+  al_free (text);
+}
+
+void
+display_skill (struct anim *k)
+{
+  char *text;
+  xasprintf (&text, "SKILL: %i%% %i%%",
+             k->skill.counter_attack_prob + 1,
+             k->skill.counter_defense_prob + 1);
   draw_bottom_text (NULL, text);
   al_free (text);
 }

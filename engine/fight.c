@@ -20,10 +20,12 @@
 #include <stdio.h>
 #include "kernel/video.h"
 #include "kernel/random.h"
+#include "kernel/array.h"
 #include "kid/kid.h"
 #include "guard/guard.h"
 #include "anim.h"
 #include "physics.h"
+#include "level.h"
 #include "pos.h"
 #include "door.h"
 #include "mouse.h"
@@ -714,6 +716,8 @@ fight_hit (struct anim *k, struct anim *ke)
     if (ke->id == 0) play_sample (glory_sample, ke->f.c.room);
     forget_enemy (ke);
     anim_die (k);
+    upgrade_skill (&ke->skill, &k->skill);
+    if (ke->id == 0) display_skill (ke);
   } else anim_sword_hit (k);
 
   if (! is_colliding (&k->f, &k->fo, +PLACE_WIDTH, ke->f.dir == k->f.dir, &k->ci)) {
@@ -765,23 +769,32 @@ fight_door_split_collision (struct anim *a)
 struct skill *
 get_perfect_skill (struct skill *skill)
 {
-  skill->attack_prob = 80;
-  skill->defense_prob = 99;
+  skill->attack_prob = 99;
   skill->counter_attack_prob = 99;
+  skill->defense_prob = 99;
   skill->counter_defense_prob = 99;
   skill->advance_prob = -1;
   skill->return_prob = 99;
+  skill->refraction = 0;
+  skill->extra_life = INT_MAX - 6;
   return skill;
 }
 
 struct skill *
-get_median_skill (struct skill *skill)
+upgrade_skill (struct skill *s0, struct skill *s1)
 {
-  skill->attack_prob = 5;
-  skill->defense_prob = 50;
-  skill->counter_attack_prob = 50;
-  skill->counter_defense_prob = 50;
-  skill->advance_prob = 5;
-  skill->return_prob = -1;
-  return skill;
+  int ca = (s1->attack_prob + s1->counter_attack_prob) / 2;
+  int cd = (s1->defense_prob + s1->counter_defense_prob) / 2;
+
+  if (s0->counter_attack_prob < ca)
+    s0->counter_attack_prob = ca;
+  else if (s0->counter_attack_prob < 99)
+    s0->counter_attack_prob += 1;
+
+  if (s0->counter_defense_prob < cd)
+    s0->counter_defense_prob = cd;
+  else if (s0->counter_defense_prob < 99)
+    s0->counter_defense_prob += 1;
+
+  return s0;
 }

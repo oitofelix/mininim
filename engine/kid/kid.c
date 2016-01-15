@@ -214,9 +214,8 @@ create_kid (struct anim *k0, struct anim *k1, struct pos *p, enum dir dir)
     k1->floating = create_timer (1.0);
     k1->fight = true;
     k1->enemy_id = -1;
-    k1->skill.defense_prob = 70;
-    k1->skill.counter_attack_prob = 70;
-    k1->skill.counter_defense_prob = 70;
+    k1->skill.counter_attack_prob = -1;
+    k1->skill.counter_defense_prob = -1;
 
     place_frame (&k1->f, &k1->f, kid_normal_00, p,
                  k1->f.dir == LEFT ? +22 : +31, +15);
