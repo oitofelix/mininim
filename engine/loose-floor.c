@@ -559,7 +559,7 @@ compute_loose_floor_fall (struct loose_floor *l)
     switch (fcmbo_f) {
     case LOOSE_FLOOR: /* loose floor isn't ground */
       m = loose_floor_at_pos (&fpmbo_f);
-      m->p.room = -1;
+      if (m) m->p.room = -1;
       must_remove = true;
       l->f = nf;
       l->f.b = get_correct_falling_loose_floor_bitmap (dv_broken_floor);

@@ -234,6 +234,27 @@ flow (struct anim *g)
   else if (g->oaction != guard_vigilant) g->i = -1;
 
   if (g->oaction == guard_vigilant) {
+
+    if (g->refraction <= 0) {
+      /* walkf */
+      if (walkf) {
+        guard_walkf (g);
+        return false;
+      }
+
+      /* walkb */
+      if (walkb) {
+        guard_walkb (g);
+        return false;
+      }
+
+      /* attack */
+      if (attack) {
+        guard_attack (g);
+        return false;
+      }
+    }
+
     /* death */
     if (g->current_lives <= 0) {
       survey (_mt, pos, &g->f, &nc, &pmt, &np);
@@ -245,24 +266,6 @@ flow (struct anim *g)
     /* normal */
     if (g->i == 2 && normal) {
       guard_normal (g);
-      return false;
-    }
-
-    /* walkf */
-    if (walkf) {
-      guard_walkf (g);
-      return false;
-    }
-
-    /* walkb */
-    if (walkb) {
-      guard_walkb (g);
-      return false;
-    }
-
-    /* attack */
-    if (attack) {
-      guard_attack (g);
       return false;
     }
 
@@ -282,6 +285,8 @@ flow (struct anim *g)
 
   if (g->type == SKELETON) g->xf.dy += -3;
   if (g->type == SHADOW) g->xf.dy += -2;
+
+  if (g->refraction > 0) g->refraction--;
 
   return true;
 }

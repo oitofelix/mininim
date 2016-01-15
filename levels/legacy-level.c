@@ -49,6 +49,8 @@ static ALLEGRO_TIMER *mouse_timer;
 static int mouse_id;
 static bool coming_from_12;
 
+static int life_table[] = {4, 3, 3, 3, 3, 4, 5, 4, 4, 5, 5, 5, 4, 6, 0, 0};
+
 static struct con room_0[FLOORS][PLACES] =
   {{{WALL}, {WALL}, {WALL}, {WALL}, {WALL},
     {WALL}, {WALL}, {WALL}, {WALL}, {WALL}},
@@ -87,7 +89,6 @@ static void start (void);
 static void special_events (void);
 static void end (struct pos *p);
 static struct skill *get_legacy_skill (int i, struct skill *skill);
-static int get_legacy_guard_total_lives (int i);
 
 void
 play_legacy_level (void)
@@ -816,7 +817,7 @@ load_legacy_level (int number)
 
     /* SKILL: ok */
     get_legacy_skill (lv.guard_skill[i], &g->skill);
-    g->total_lives = get_legacy_guard_total_lives (lv.guard_skill[i]);
+    g->total_lives = g->skill.extra_life + life_table[number];
 
     /* STYLE: ok */
     g->style = lv.guard_color[i];
@@ -829,29 +830,129 @@ load_legacy_level (int number)
 static struct skill *
 get_legacy_skill (int i, struct skill *skill)
 {
-  /* improve this */
-  skill->attack_prob = (i + 1) * 10;
-  skill->defense_prob = (i + 1) * 10;
-  skill->counter_attack_prob = (i + 1) * 10;
-  skill->counter_defense_prob = (i + 1) * 10;
-  skill->advance_prob = (9.0 / (i + 1)) * 10;
-  skill->return_prob = -1;
-
-  if (i == 7) skill->advance_prob = -1;
-
-  if (i == 9) {
-    skill->defense_prob = 95;
-    skill->counter_defense_prob = 95;
+  switch (i) {
+  case 0: default:
+    skill->attack_prob = 23;
+    skill->counter_attack_prob = -1;
+    skill->defense_prob = -1;
+    skill->counter_defense_prob = -1;
+    skill->advance_prob = 99;
+    skill->return_prob = -1;
+    skill->refraction = 16;
+    skill->extra_life = 0;
+    break;
+  case 1:
+    skill->attack_prob = 38;
+    skill->counter_attack_prob = -1;
+    skill->defense_prob = 58;
+    skill->counter_defense_prob = 23;
+    skill->advance_prob = 77;
+    skill->return_prob = -1;
+    skill->refraction = 16;
+    skill->extra_life = 0;
+    break;
+  case 2:
+    skill->attack_prob = 23;
+    skill->counter_attack_prob = -1;
+    skill->defense_prob = 58;
+    skill->counter_defense_prob = 23;
+    skill->advance_prob = 77;
+    skill->return_prob = -1;
+    skill->refraction = 16;
+    skill->extra_life = 0;
+    break;
+  case 3:
+    skill->attack_prob = 23;
+    skill->counter_attack_prob = 1;
+    skill->defense_prob = 77;
+    skill->counter_defense_prob = 38;
+    skill->advance_prob = 77;
+    skill->return_prob = -1;
+    skill->refraction = 16;
+    skill->extra_life = 0;
+    break;
+  case 4:
+    skill->attack_prob = 23;
+    skill->counter_attack_prob = 1;
+    skill->defense_prob = 77;
+    skill->counter_defense_prob = 38;
+    skill->advance_prob = 99;
+    skill->return_prob = -1;
+    skill->refraction = 8;
+    skill->extra_life = 1;
+    break;
+  case 5:
+    skill->attack_prob = 15;
+    skill->counter_attack_prob = 68;
+    skill->defense_prob = 99;
+    skill->counter_defense_prob = 56;
+    skill->advance_prob = 99;
+    skill->return_prob = -1;
+    skill->refraction = 8;
+    skill->extra_life = 0;
+    break;
+  case 6:
+    skill->attack_prob = 38;
+    skill->counter_attack_prob = 5;
+    skill->defense_prob = 77;
+    skill->counter_defense_prob = 38;
+    skill->advance_prob = 77;
+    skill->return_prob = -1;
+    skill->refraction = 8;
+    skill->extra_life = 0;
+    break;
+  case 7:
+    skill->attack_prob = 85;
+    skill->counter_attack_prob = 2;
+    skill->defense_prob = 97;
+    skill->counter_defense_prob = 97;
+    skill->advance_prob = -1;
+    skill->return_prob = -1;
+    skill->refraction = 8;
+    skill->extra_life = 0;
+    break;
+  case 8:
+    skill->attack_prob = -1;
+    skill->counter_attack_prob = -1;
+    skill->defense_prob = -1;
+    skill->counter_defense_prob = -1;
+    skill->advance_prob = -1;
+    skill->return_prob = -1;
+    skill->refraction = 0;
+    skill->extra_life = 0;
+    break;
+  case 9:
+    skill->attack_prob = 18;
+    skill->counter_attack_prob = 99;
+    skill->defense_prob = 99;
+    skill->counter_defense_prob = 56;
+    skill->advance_prob = 99;
+    skill->return_prob = -1;
+    skill->refraction = 8;
+    skill->extra_life = 0;
+    break;
+  case 10:
+    skill->attack_prob = 12;
+    skill->counter_attack_prob = 99;
+    skill->defense_prob = 99;
+    skill->counter_defense_prob = 99;
+    skill->advance_prob = 38;
+    skill->return_prob = -1;
+    skill->refraction = 0;
+    skill->extra_life = 0;
+    break;
+  case 11:
+    skill->attack_prob = 18;
+    skill->counter_attack_prob = 58;
+    skill->defense_prob = 99;
+    skill->counter_defense_prob = 68;
+    skill->advance_prob = 38;
+    skill->return_prob = -1;
+    skill->refraction = 0;
+    skill->extra_life = 0;
   }
 
   return skill;
-}
-
-static int
-get_legacy_guard_total_lives (int i)
-{
-  /* improve this */
-  return (i < 3) ? 3 : i;
 }
 
 static enum ltile

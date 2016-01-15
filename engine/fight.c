@@ -648,8 +648,10 @@ is_safe_to_follow (struct anim *k0, struct anim *k1)
   survey (_m, pos, &k0->f, &m0, &pm0, &np);
   survey (_m, pos, &f1, &m1, &pm1, &np);
 
-  int inc = (pm0.place < pm1.place) ? +1 : -1;
-  for (p = pm0; p.place != pm1.place; prel (&p, &p, +0, inc))
+  struct pos pi = (pm0.place < pm1.place) ? pm0 : pm1;
+  struct pos pf = (pm0.place > pm1.place) ? pm0 : pm1;
+
+  for (p = pi; p.place <= pf.place; prel (&p, &p, +0, +1))
     if (is_traversable (&p)
         || con (&p)->fg == CHOPPER) return false;
 

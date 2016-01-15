@@ -239,6 +239,7 @@ flow (struct anim *g)
   if (g->oaction != guard_hit) {
     g->i = -1;
     g->j = 0;
+    g->refraction = g->skill.refraction;
   }
 
   if (g->i == 4) {

@@ -426,12 +426,14 @@ enum anim_type {
 };
 
 struct skill {
-    int attack_prob;
-    int defense_prob;
-    int counter_attack_prob;
-    int counter_defense_prob;
-    int advance_prob;
-    int return_prob;
+  int attack_prob;
+  int counter_attack_prob;
+  int defense_prob;
+  int counter_defense_prob;
+  int advance_prob;
+  int return_prob;
+  int refraction;
+  int extra_life;
 };
 
 struct level {
@@ -575,6 +577,7 @@ struct anim {
   bool hurt_enemy_in_counter_attack;
 
   struct skill skill;
+  int refraction;
 
   ALLEGRO_TIMER *floating;
   ALLEGRO_SAMPLE_INSTANCE *sample;

@@ -445,7 +445,7 @@ draw_guard_lives (ALLEGRO_BITMAP *bitmap, struct anim *g, enum vm vm)
       || g->type == VIZIER) {
     pal = get_palette (g->style, vm);
     life = apply_palette (life, pal);
-  } else if (g->type == SHADOW) {
+  } else if (g->type == SHADOW || g->type == KID) {
     pal = get_shadow_life_palette (vm);
     life = apply_palette (life, pal);
   } else if (g->type == SKELETON)
