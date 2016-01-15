@@ -325,6 +325,7 @@ physics_in (struct anim *g)
     else if (g->current_lives <= 0) {
       play_sample (hit_ground_fatal_sample, g->f.c.room);
       guard_die_suddenly (g);
+      g->death_reason = FALL_DEATH;
     } else {
       place_on_the_ground (&g->f, &g->f.c);
       g->f.c.y++;

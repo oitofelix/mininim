@@ -76,6 +76,8 @@ flow (struct anim *k)
   bool walkb = ((k->f.dir == RIGHT) && k->key.left)
     || ((k->f.dir == LEFT) && k->key.right);
 
+  k->keep_sword_fast = k->enemy_id != -1;
+
   if (k->oaction == kid_sword_normal
       && k->current_lives <= 0) {
     survey (_mt, pos, &k->f, &nc, &pmt, &np);

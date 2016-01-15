@@ -48,8 +48,8 @@ ALLEGRO_SAMPLE *step_sample, *hit_ground_sample, *hit_ground_harm_sample,
   *drink_sample, *glory_sample, *take_sword_sample, *sword_attack_sample,
   *harm_sample, *action_not_allowed_sample, *small_life_potion_sample,
   *big_life_potion_sample, *scream_sample, *spiked_sample, *chopped_sample,
-  *floating_sample, *death_sample, *press_key_sample, *mirror_sample,
-  *suspense_sample, *success_sample, *success_suspense_sample,
+  *floating_sample, *death_sample, *fight_death_sample, *press_key_sample,
+  *mirror_sample, *suspense_sample, *success_sample, *success_suspense_sample,
   *sword_defense_sample, *sword_hit_sample;
 
 static void place_kid (struct anim *k, int room, int floor, int place);
@@ -118,6 +118,7 @@ load_kid (void)
   chopped_sample = load_sample (CHOPPED_SAMPLE);
   floating_sample = load_sample (FLOATING_SAMPLE);
   death_sample = load_sample (DEATH_SAMPLE);
+  fight_death_sample = load_sample (FIGHT_DEATH_SAMPLE);
   press_key_sample = load_sample (PRESS_KEY_SAMPLE);
   mirror_sample = load_sample (MIRROR_SAMPLE);
   suspense_sample = load_sample (SUSPENSE_SAMPLE);
@@ -187,6 +188,7 @@ unload_kid (void)
   al_destroy_sample (chopped_sample);
   al_destroy_sample (floating_sample);
   al_destroy_sample (death_sample);
+  al_destroy_sample (fight_death_sample);
   al_destroy_sample (press_key_sample);
   al_destroy_sample (mirror_sample);
   al_destroy_sample (suspense_sample);

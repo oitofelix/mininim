@@ -80,6 +80,7 @@ play_level (struct level *lv)
   level = *lv;
   register_cons ();
 
+  stop_all_samples ();
   if (level.start) level.start ();
 
   screen_flags = 0;
@@ -197,11 +198,13 @@ compute_level (void)
 
   get_keyboard_state (&current_kid->key);
 
-  for (i = 0; i < anima_nmemb; i++) leave_fight_logic (&anima[i]);
   for (i = 0; i < anima_nmemb; i++) enter_fight_logic (&anima[i]);
+  for (i = 0; i < anima_nmemb; i++) leave_fight_logic (&anima[i]);
   for (i = 0; i < anima_nmemb; i++) fight_ai (&anima[i]);
   for (i = 0; i < anima_nmemb; i++) anima[i].action (&anima[i]);
   for (i = 0; i < anima_nmemb; i++) fight_mechanics (&anima[i]);
+
+  fight_turn_controllable (current_kid);
 
   clear_anims_keyboard_state ();
 
@@ -492,7 +495,8 @@ process_keys (void)
     if (t < 12) k->sample = NULL;
 
     if (t >= 12 && ! k->sample)
-      k->sample = play_sample (death_sample, k->f.c.room);
+      k->sample = play_sample (k->death_reason == FIGHT_DEATH
+                               ? fight_death_sample : death_sample, k->f.c.room);
 
     if (t < 60) key.keyboard.keycode = 0;
 
@@ -603,7 +607,7 @@ void
 display_skill (struct anim *k)
 {
   char *text;
-  xasprintf (&text, "SKILL: %i%% %i%%",
+  xasprintf (&text, "SKILL: CA %i%% CD %i%%",
              k->skill.counter_attack_prob + 1,
              k->skill.counter_defense_prob + 1);
   draw_bottom_text (NULL, text);

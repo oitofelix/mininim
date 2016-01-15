@@ -87,11 +87,13 @@ kid_resurrect (struct anim *k)
   struct coord nc; struct pos np, pm;
   survey (_m, pos, &k->f, &nc, &pm, &np);
   k->current_lives = k->total_lives;
+  k->death_reason = NO_DEATH;
   k->action = kid_normal;
   place_frame (&k->f, &k->f, kid_normal_00,
                &pm, k->f.dir == LEFT ? +16 : +16, +15);
   reset_murder_spikes_floor (k->id);
   stop_sample (k->sample, death_sample);
+  stop_sample (k->sample, fight_death_sample);
 }
 
 void
@@ -104,6 +106,7 @@ kid_die_spiked (struct anim *k)
   if (k->oaction != kid_die_spiked) {
     k->current_lives = 0;
     k->splash = true;
+    k->death_reason = SPIKES_DEATH;
 
     struct spikes_floor *s = spikes_floor_at_pos (&k->p);
     s->i = 4;

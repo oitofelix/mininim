@@ -278,6 +278,7 @@ physics_in (struct anim *k)
       else {
         play_sample (hit_ground_fatal_sample, k->f.c.room);
         kid_die_suddenly (k);
+        k->death_reason = FALL_DEATH;
       }
     }
     else {

@@ -535,6 +535,7 @@ compute_loose_floor_fall (struct loose_floor *l)
       if (a->current_lives <= 0) {
         a->p = kpmt;
         anim_die_suddenly (a);
+        a->death_reason = LOOSE_FLOOR_DEATH;
       }
       else if (a->type == KID) kid_couch (a);
     }

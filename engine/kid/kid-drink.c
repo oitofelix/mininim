@@ -140,6 +140,7 @@ flow (struct anim *k)
           || k->poison_immune) break;
       k->current_lives--;
       k->splash = true;
+      if (k->current_lives == 0) k->death_reason = POTION_DEATH;
       play_sample (harm_sample, k->f.c.room);
       video_effect.color = get_flicker_blood_color ();
       start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
@@ -149,6 +150,7 @@ flow (struct anim *k)
           || k->poison_immune) break;
       k->current_lives = 0;
       k->splash = true;
+      k->death_reason = POTION_DEATH;
       play_sample (harm_sample, k->f.c.room);
       video_effect.color = get_flicker_blood_color ();
       start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));

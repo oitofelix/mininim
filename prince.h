@@ -598,6 +598,11 @@ struct anim {
 
   struct pos p, item_pos, hang_pos;
 
+  enum death_reason {
+    NO_DEATH, FALL_DEATH, LOOSE_FLOOR_DEATH, POTION_DEATH,
+    SPIKES_DEATH, CHOPPER_DEATH, FIGHT_DEATH
+  } death_reason;
+
   /* depressible floor */
   struct pos df_pos[2];
   struct pos df_posb[2];

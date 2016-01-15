@@ -262,6 +262,7 @@ guard_die_spiked (struct anim *g)
   if (g->oaction != guard_die_spiked) {
     g->current_lives = 0;
     g->splash = true;
+    g->death_reason = SPIKES_DEATH;
 
     struct spikes_floor *s = spikes_floor_at_pos (&g->p);
     s->i = 4;

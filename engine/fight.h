@@ -60,6 +60,7 @@ bool is_safe_to_attack (struct anim *k);
 bool is_safe_to_turn (struct anim *k);
 bool is_safe_to_follow (struct anim *k0, struct anim *k1);
 void fight_turn (struct anim *k);
+void fight_turn_controllable (struct anim *k);
 void fight_defense (struct anim *k);
 void fight_attack (struct anim *k);
 void fight_walkf (struct anim *k);

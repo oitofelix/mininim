@@ -56,6 +56,12 @@ leave_fight_logic (struct anim *k)
     return;
   }
 
+  /* character that went upstairs doesn't fight */
+  if (is_kid_stairs (&k->f)) {
+    forget_enemy (k);
+    return;
+  }
+
   /* who's the enemy? */
   struct anim *ke = get_anim_by_id (k->enemy_id);
 
@@ -73,6 +79,12 @@ leave_fight_logic (struct anim *k)
 
   /* if the enemy is beyond follow range, forget about him */
   if (! is_in_range (k, ke, FOLLOW_RANGE)) {
+    forget_enemy (k);
+    return;
+  }
+
+  /* if the enemy went up stairs, forget about him */
+  if (is_kid_stairs (&ke->f)) {
     forget_enemy (k);
     return;
   }
@@ -137,6 +149,10 @@ fight_ai (struct anim *k)
 
   /* who's the enemy? */
   struct anim *ke = get_anim_by_id (k->enemy_id);
+
+  /* prevent enemy from passing through harmlessly */
+  if (is_near (k, ke) && ! is_in_fight_mode (ke))
+    fight_hit (ke, k);
 
   /* if the enemy is on the back, turn */
   if (is_on_back (k, ke)) {
@@ -670,6 +686,15 @@ fight_turn (struct anim *k)
 }
 
 void
+fight_turn_controllable (struct anim *k)
+{
+  struct anim *ke = get_anim_by_id (k->enemy_id);
+  if (ke && is_on_back (k, ke)
+      && is_in_fight_mode (k))
+    fight_turn (k);
+}
+
+void
 fight_defense (struct anim *k)
 {
   k->key.up = true;
@@ -699,7 +724,6 @@ void
 fight_hit (struct anim *k, struct anim *ke)
 {
   if (k->immortal || k->sword_immune) return;
-
   if (k->current_lives <= 0) return;
 
   place_on_the_ground (&k->f, &k->f.c);
@@ -716,6 +740,7 @@ fight_hit (struct anim *k, struct anim *ke)
     if (ke->id == 0) play_sample (glory_sample, ke->f.c.room);
     forget_enemy (ke);
     anim_die (k);
+    k->death_reason = FIGHT_DEATH;
     upgrade_skill (&ke->skill, &k->skill);
     if (ke->id == 0) display_skill (ke);
   } else anim_sword_hit (k);
