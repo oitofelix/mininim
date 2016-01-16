@@ -185,10 +185,22 @@ get_sample_position (ALLEGRO_SAMPLE_INSTANCE *si)
 }
 
 bool
-is_playing_sample (struct ALLEGRO_SAMPLE_INSTANCE *si)
+is_playing_sample_instance (struct ALLEGRO_SAMPLE_INSTANCE *si)
 {
   if (isfinite (get_sample_position (si))) return true;
   else return false;
+}
+
+bool
+is_playing_sample (struct ALLEGRO_SAMPLE *s)
+{
+  size_t i;
+  for (i = 0; i < audio_sample_nmemb; i++) {
+    struct audio_sample *as = &audio_sample[i];
+    if (s == as->sample
+        && is_playing_sample_instance (as->instance)) return true;
+  }
+  return false;
 }
 
 void

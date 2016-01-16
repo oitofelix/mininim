@@ -35,6 +35,7 @@ void unload_level (void);
 void play_level (struct level *level);
 void register_cons (void);
 void destroy_cons (void);
+void display_remaining_time (void);
 void display_skill (struct anim *k);
 
 #endif	/* MININIM_LEVEL_H */

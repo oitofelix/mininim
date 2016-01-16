@@ -52,7 +52,6 @@
 static void draw_level (void);
 static void compute_level (void);
 static void process_keys (void);
-static void display_remaining_time (void);
 static void draw_lives (ALLEGRO_BITMAP *bitmap, struct anim *k, enum vm vm);
 
 struct level *vanilla_level;
@@ -216,14 +215,14 @@ compute_level (void)
     make_links_locally_consistent (prev_room, room_view);
   }
 
+  level.special_events ();
+
   compute_closer_floors ();
   compute_opener_floors ();
   compute_spikes_floors ();
   compute_doors ();
   compute_level_doors ();
   compute_choppers ();
-
-  level.special_events ();
 }
 
 static void
@@ -600,7 +599,7 @@ draw_level (void)
   draw_bottom_text (uscreen, NULL);
 }
 
-static void
+void
 display_remaining_time (void)
 {
   char *text;

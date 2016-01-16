@@ -178,7 +178,7 @@ title_anim (void)
     }
     break;
   case 7:
-    if (! is_playing_sample (si)) {
+    if (! is_playing_sample_instance (si)) {
       start_video_effect (VIDEO_ROLL_RIGHT, SECS_TO_VCYCLES (0.5));
       draw_bitmap (text_background, screen, 0, 0, 0);
       draw_pattern (screen, 17, 16, 286, 157, al_map_rgb (16, 0, 97),
@@ -195,7 +195,7 @@ title_anim (void)
     }
     break;
   case 9:
-    if (! is_video_effect_started () && ! is_playing_sample (si)) {
+    if (! is_video_effect_started () && ! is_playing_sample_instance (si)) {
       princess.f.c.x = 142;
       princess.f.c.y = 124;
       princess.f.b = princess_normal_00;
@@ -222,19 +222,19 @@ title_anim (void)
     }
     break;
   case 11:
-    if (! is_playing_sample (si)) {
+    if (! is_playing_sample_instance (si)) {
       si = play_sample (door_gate_opening_1, -1);
       i++;
     }
     break;
   case 12:
-    if (! is_playing_sample (si)) {
+    if (! is_playing_sample_instance (si)) {
       si = play_sample (door_opening, -1);
       i++;
     }
     break;
   case 13:
-    if (! is_playing_sample (si)) {
+    if (! is_playing_sample_instance (si)) {
       princess_turn (&princess);
       i++;
     }
@@ -331,7 +331,7 @@ title_anim (void)
     }
     break;
   case 26:
-    if (! is_playing_sample (si)) {
+    if (! is_playing_sample_instance (si)) {
       start_video_effect (VIDEO_ROLL_RIGHT, SECS_TO_VCYCLES (0.5));
       draw_bitmap (main_background, screen, 0, 0, 0);
       draw_bitmap (game_name, screen, 24, 107, 0);

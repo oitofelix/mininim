@@ -51,6 +51,8 @@ static int mouse_id;
 static bool coming_from_12;
 static struct skill skill;
 static bool shadow_merged;
+static bool met_jaffar;
+static bool played_vizier_death_sample;
 
 static int life_table[] = {4, 3, 3, 3, 3, 4, 5, 4, 4, 5, 5, 5, 4, 6, 0, 0};
 
@@ -112,6 +114,8 @@ start (void)
   exit_level_door = get_exit_level_door (0);
   anti_camera_room = -1;
   shadow_merged = false;
+  met_jaffar = false;
+  played_vizier_death_sample = false;
 
   if (coming_from_12) auto_rem_time_1st_cycle = -1;
   else auto_rem_time_1st_cycle = 24;
@@ -166,7 +170,7 @@ start (void)
     a->skill = g->skill;
     a->total_lives = g->total_lives;
     a->current_lives = g->total_lives;
-    a->style = g->style;
+    a->style = (level.number != 13) ? g->style : 0;
   }
 
   /* after kid creation k must be updated to point to the correct
@@ -245,15 +249,20 @@ start (void)
   if (level.number == 13 && retry_level == 13)
     level.nominal_number = 12;
 
+  if (level.number == 13) {
+    struct anim *v = get_anim_by_id (1);
+    v->fight = false;
+  }
+
   /* temporary placement for test */
-  /* if (level.number == 12) { */
+  /* if (level.number == 13) { */
   /*   /\* kid *\/ */
-  /*   struct pos p = {15,0,7}; */
-  /*   k->f.dir = LEFT; */
+  /*   struct pos p = {3,0,7}; */
+  /*   k->f.dir = RIGHT; */
   /*   place_frame (&k->f, &k->f, kid_normal_00, &p, */
   /*                k->f.dir == LEFT ? +22 : +31, +15); */
   /*   k->action = kid_normal; */
-  /*   room_view = 15; */
+  /*   room_view = 3; */
   /* } */
 }
 
@@ -640,7 +649,7 @@ special_events (void)
          making them glow intermittently */
     } else if (shadow_merged
                && is_instance_of_sample (k->sample, success_sample)
-               && is_playing_sample (k->sample))
+               && is_playing_sample_instance (k->sample))
       k->shadow = (anim_cycle % 2);
     /* after the success music has finished to play, the kid goes
        normal again */
@@ -674,6 +683,37 @@ special_events (void)
       p.place = prandom (9);
       activate_con (&p);
     }
+
+    struct anim *v = get_anim_by_id (1);
+    if (v) {
+      if (k->f.c.room == v->f.c.room
+          && v->action == guard_normal
+          && ! met_jaffar) {
+        k->sample = play_sample (meet_vizier_sample, -1);
+        met_jaffar = true;
+      }
+
+      if (k->sample
+          && is_instance_of_sample (k->sample, meet_vizier_sample)
+          && get_sample_position (k->sample) >= 2.2)
+        v->fight = true;
+
+      if (v->current_lives <= 0
+          && ! played_vizier_death_sample) {
+        video_effect.color = WHITE;
+        start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.8));
+        stop_sample (k->sample, meet_vizier_sample);
+        k->sample = play_sample (vizier_death_sample, -1);
+        played_vizier_death_sample = true;
+        al_stop_timer (play_time);
+        display_remaining_time ();
+      }
+
+      struct pos p = {24,0,0};
+      if (v->current_lives <= 0
+          && k->f.c.room != v->f.c.room)
+        activate_con (&p);
+    }
   }
 }
 
@@ -702,7 +742,7 @@ end (struct pos *p)
   current_lives = k->current_lives;
   skill = k->skill;
 
-  if (! is_playing_sample (si)) quit_anim = NEXT_LEVEL;
+  if (! is_playing_sample_instance (si)) quit_anim = NEXT_LEVEL;
 }
 
 static void

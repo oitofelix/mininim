@@ -496,7 +496,8 @@ increase_kid_current_lives (struct anim *k)
 {
   if (k->current_lives < k->total_lives) {
     k->current_lives++;
-    play_sample (small_life_potion_sample, k->f.c.room);
+    if (! is_playing_sample (small_life_potion_sample))
+      play_sample (small_life_potion_sample, k->f.c.room);
     if (k->id == current_kid_id) {
       video_effect.color = get_flicker_blood_color ();
       start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.3));
@@ -510,7 +511,8 @@ increase_kid_total_lives (struct anim *k)
   if (k->total_lives < 10) {
     k->total_lives++;
     k->current_lives = k->total_lives;
-    play_sample (big_life_potion_sample, k->f.c.room);
+    if (! is_playing_sample (big_life_potion_sample))
+      play_sample (big_life_potion_sample, k->f.c.room);
     if (k->id == current_kid_id) {
       video_effect.color = get_flicker_blood_color ();
       start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.3));
@@ -523,7 +525,8 @@ float_kid (struct anim *k)
 {
   al_set_timer_count (k->floating, 0);
   al_start_timer (k->floating);
-  play_sample (floating_sample, k->f.c.room);
+  if (! is_playing_sample (floating_sample))
+    play_sample (floating_sample, k->f.c.room);
   if (k->id == current_kid_id) {
     video_effect.color = get_flicker_float_color ();
     start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.3));
