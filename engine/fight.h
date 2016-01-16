@@ -58,7 +58,11 @@ bool is_safe_to_walkf (struct anim *k);
 bool is_safe_to_walkb (struct anim *k);
 bool is_safe_to_attack (struct anim *k);
 bool is_safe_to_turn (struct anim *k);
+struct pos *confg_from_anim_to_anim (struct anim *k0, struct anim *k1,
+                                     confg_set cs, struct pos *p);
+bool unsafe_to_follow_confg_set (enum confg t);
 bool is_safe_to_follow (struct anim *k0, struct anim *k1);
+bool is_enemy_reachable_below (struct anim *k, struct anim *ke);
 void fight_turn (struct anim *k);
 void fight_turn_controllable (struct anim *k);
 void fight_defense (struct anim *k);

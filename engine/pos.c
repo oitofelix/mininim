@@ -577,6 +577,24 @@ place_frame (struct frame *f, struct frame *nf, ALLEGRO_BITMAP *b,
   return nf;
 }
 
+coord_f
+opposite_cf (coord_f cf)
+{
+  if (cf == _ml) return _mr;
+  if (cf == _mr) return _ml;
+  if (cf == _mf) return _mba;
+  if (cf == _mba) return _mf;
+  if (cf == _tl) return _tr;
+  if (cf == _tr) return _tl;
+  if (cf == _tf) return _tb;
+  if (cf == _tb) return _tf;
+  if (cf == _bl) return _br;
+  if (cf == _br) return _bl;
+  if (cf == _bf) return _bb;
+  if (cf == _bb) return _bf;
+  return cf;
+}
+
 struct dim *
 dim (struct frame *f, struct dim *d)
 {

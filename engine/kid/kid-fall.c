@@ -184,7 +184,8 @@ physics_in (struct anim *k)
 
   /* collision */
   if (is_colliding (&k->f, &k->fo, +0, false, &k->ci)) {
-    k->inertia = 0; k->fo.dx = 0;
+    k->inertia = 0;
+    k->fo.dx = (k->f.dir == LEFT) ? +8 : -8;
   }
 
   /* hang front */
@@ -219,7 +220,7 @@ physics_in (struct anim *k)
       int speed = +21 + 3 * (k->i - 5);
       fo.dy = (speed > 33) ? 33 : speed;
     }
-    fo.dy += 6;
+    fo.dy += 8;
   }
 
   survey (_mbo, pos, &k->f, &nc, &np, &npmbo);

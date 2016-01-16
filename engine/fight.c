@@ -80,6 +80,9 @@ leave_fight_logic (struct anim *k)
     return;
   }
 
+  if (is_enemy_reachable_below (k, ke)
+      || is_enemy_reachable_below (ke, k)) return;
+
   /* if the enemy is beyond follow range, forget about him */
   if (! is_in_range (k, ke, FOLLOW_RANGE)) {
     forget_enemy (k);
@@ -122,8 +125,9 @@ enter_fight_logic (struct anim *k)
     }
 
     /* if hearing the character on the back, turn */
-    if (! k->controllable && is_hearing (k, a) && is_on_back (k, a)) {
-      fight_turn (k);
+    if (! k->controllable && is_hearing (k, a)
+        && is_on_back (k, a)) {
+      k->f.dir = (k->f.dir == LEFT) ? RIGHT : LEFT;
       return;
     }
 
@@ -161,7 +165,10 @@ fight_ai (struct anim *k)
     fight_hit (ke, k);
 
   /* if the enemy is on the back, turn */
-  if (is_on_back (k, ke)) {
+  struct coord nc; struct pos pm, pme, np;
+  survey (_m, pos, &k->f, &nc, &pm, &np);
+  survey (_m, pos, &ke->f, &nc, &pme, &np);
+  if (is_on_back (k, ke) && pm.floor == pme.floor) {
     if (is_safe_to_turn (k)) fight_turn (k);
     else if (is_safe_to_walkb (k)) fight_walkb (k);
     return;
@@ -181,6 +188,9 @@ fight_ai (struct anim *k)
     fight_walkf (k);
     return;
   }
+
+  if (is_enemy_reachable_below (k, ke)) fight_walkf (k);
+
 
   /* in fight range, go towards attack range (with probability, unless
      the enemy is not in fight mode, then go immediately) */
@@ -664,24 +674,66 @@ is_safe_to_turn (struct anim *k)
   return (df > PLACE_WIDTH);
 }
 
-bool
-is_safe_to_follow (struct anim *k0, struct anim *k1)
+struct pos *
+confg_from_anim_to_anim (struct anim *k0, struct anim *k1, confg_set cs, struct pos *p)
 {
   struct frame f1 = k1->f;
   frame2room (&f1, k0->f.c.room, &f1.c);
 
-  struct coord m0, m1; struct pos np, pm0, pm1, p;
-  survey (_m, pos, &k0->f, &m0, &pm0, &np);
-  survey (_m, pos, &f1, &m1, &pm1, &np);
+  struct coord nc; struct pos np, pm0, pm1;
+  survey (_m, pos, &k0->f, &nc, &pm0, &np);
+  survey (_m, pos, &f1, &nc, &pm1, &np);
 
   struct pos pi = (pm0.place < pm1.place) ? pm0 : pm1;
   struct pos pf = (pm0.place > pm1.place) ? pm0 : pm1;
 
-  for (p = pi; p.place <= pf.place; prel (&p, &p, +0, +1))
-    if (is_traversable (&p)
-        || con (&p)->fg == CHOPPER) return false;
+  pi.floor = pf.floor = pm0.floor;
+  if (pm0.floor != pm1.floor) {
+    if  (k0->f.dir == LEFT) {
+      pi.place = 0;
+      pf.place = pm0.place;
+    } else {
+      pi.place = pm0.place;
+      pf.place = PLACES - 1;
+    }
+  }
 
-  return true;
+  for (*p = pi; p->place <= pf.place; prel (p, p, +0, +1))
+    if (cs (con (p)->fg)) return p;
+
+  *p = (struct pos) {-1,-1,-1};
+  return p;
+}
+
+bool
+unsafe_to_follow_confg_set (enum confg t)
+{
+  return traversable_confg_set (t)
+    || t == CHOPPER;
+}
+
+bool
+is_safe_to_follow (struct anim *k0, struct anim *k1)
+{
+  struct pos p;
+  confg_from_anim_to_anim (k0, k1, unsafe_to_follow_confg_set, &p);
+  return p.room == -1;
+}
+
+bool
+is_enemy_reachable_below (struct anim *k, struct anim *ke)
+{
+  struct coord nc; struct pos np, pm, pme;
+  survey (_m, pos, &k->f, &nc, &pm, &np);
+  survey (_m, pos, &ke->f, &nc, &pme, &np);
+
+  struct pos p;
+  confg_from_anim_to_anim (k, ke, traversable_confg_set, &p);
+  if (p.room == -1) return false;
+  prel (&p, &p, +1, +0);
+
+  return pm.room == pme.room && pm.floor == pme.floor - 1
+    && ! is_traversable (&p) && con (&p)->fg != SPIKES_FLOOR;
 }
 
 void
@@ -697,9 +749,14 @@ void
 fight_turn_controllable (struct anim *k)
 {
   struct anim *ke = get_anim_by_id (k->enemy_id);
-  if (ke && is_on_back (k, ke)
-      && is_in_fight_mode (k))
-    fight_turn (k);
+  if (ke) {
+    struct coord nc; struct pos np, pm, pme;
+    survey (_m, pos, &k->f, &nc, &pm, &np);
+    survey (_m, pos, &ke->f, &nc, &pme, &np);
+    if (is_on_back (k, ke) && is_in_fight_mode (k)
+        && pm.floor == pme.floor)
+      fight_turn (k);
+  }
 }
 
 void
@@ -819,12 +876,12 @@ upgrade_skill (struct skill *s0, struct skill *s1)
   int cd = (s1->defense_prob + s1->counter_defense_prob) / 2;
 
   if (s0->counter_attack_prob < ca)
-    s0->counter_attack_prob = ca;
+    s0->counter_attack_prob = (s0->counter_attack_prob + ca) / 2;
   else if (s0->counter_attack_prob < 99)
     s0->counter_attack_prob += 1;
 
   if (s0->counter_defense_prob < cd)
-    s0->counter_defense_prob = cd;
+    s0->counter_defense_prob = (s0->counter_defense_prob + cd) / 2;
   else if (s0->counter_defense_prob < 99)
     s0->counter_defense_prob += 1;
 

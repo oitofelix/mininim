@@ -272,7 +272,7 @@ physics_in (struct anim *g)
     int speed = +21 + 3 * (g->i - 5);
     fo.dy = (speed > 33) ? 33 : speed;
   }
-  fo.dy += 6;
+  fo.dy += 8;
 
   survey (_mbo, pos, &g->f, &nc, &np, &npmbo);
   next_frame (&g->f, &nf, &fo);

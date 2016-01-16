@@ -23,6 +23,9 @@
 #include "prince.h"
 #include "pos.h"
 
+/* types */
+typedef bool (*confg_set) (enum confg);
+
 /* functions */
 struct con *con (struct pos *p);
 struct con *crel (struct pos *p, int floor, int place);
@@ -33,6 +36,9 @@ bool is_traversable (struct pos *p);
 bool is_rigid_con (struct pos *p);
 bool is_carpet (struct pos *p);
 bool is_arch_top (struct pos *p);
+bool strictly_traversable_confg_set (enum confg t);
+bool traversable_confg_set (enum confg t);
+bool arch_top_confg_set (enum confg t);
 
 
 
