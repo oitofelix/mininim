@@ -244,14 +244,14 @@ start (void)
     level.nominal_number = 12;
 
   /* temporary placement for test */
-  /* if (level.number == 3) { */
+  /* if (level.number == 4) { */
   /*   /\* kid *\/ */
-  /*   struct pos p = {1,0,0}; */
+  /*   struct pos p = {4,1,6}; */
   /*   k->f.dir = RIGHT; */
   /*   place_frame (&k->f, &k->f, kid_normal_00, &p, */
   /*                k->f.dir == LEFT ? +22 : +31, +15); */
   /*   k->action = kid_normal; */
-  /*   room_view = 1; */
+  /*   room_view = 4; */
   /* } */
 }
 
@@ -288,12 +288,13 @@ special_events (void)
 
     struct anim *s = NULL;
 
+    /* raise the skeleton as soon as the exit door is open and the
+       kid reaches the second place of the room 1 */
     struct pos skeleton_floor_pos = {1,1,5};
     survey (_m, pos, &k->f, &nc, &pm, &np);
     if (exit_level_door
         && exit_level_door->i == 0
-        &&
-        pm.room == 1
+        && pm.room == 1
         && (pm.place == 2 || pm.place == 3)
         && con (&skeleton_floor_pos)->fg == SKELETON_FLOOR) {
       con (&skeleton_floor_pos)->fg = FLOOR;
@@ -309,6 +310,8 @@ special_events (void)
       raise_skeleton (s);
     }
 
+    /* when the skeleton falls into room 3, place him at the center of
+       the screen waiting for the kid */
     s = get_anim_by_id (skeleton_id);
     if (s) {
       survey (_m, pos, &s->f, &nc, &pm, &np);

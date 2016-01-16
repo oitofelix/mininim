@@ -50,6 +50,9 @@ leave_fight_logic (struct anim *k)
   /* no enemy, no need to forget */
   if (k->enemy_id == -1) return;
 
+  /* non-fighter doesn't fight */
+  if (! k->fight) return;
+
   /* dead character doesn't fight */
   if (k->current_lives <= 0) {
     forget_enemy (k);
@@ -99,6 +102,9 @@ enter_fight_logic (struct anim *k)
   /* dead character doesn't fight */
   if (k->current_lives <= 0) return;
 
+  /* non-fighter doesn't fight */
+  if (! k->fight) return;
+
   int i;
   for (i = 0; i < anima_nmemb; i++) {
     struct anim *a = &anima[i];
@@ -116,7 +122,7 @@ enter_fight_logic (struct anim *k)
     }
 
     /* if hearing the character on the back, turn */
-    if (is_hearing (k, a) && is_on_back (k, a)) {
+    if (! k->controllable && is_hearing (k, a) && is_on_back (k, a)) {
       fight_turn (k);
       return;
     }
