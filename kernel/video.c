@@ -106,6 +106,13 @@ create_bitmap (int w, int h)
 {
   ALLEGRO_BITMAP *bitmap = al_create_bitmap (w, h);
   if (! bitmap) xerror (-1, 0, "%s (%i, %i): cannot create bitmap", __func__, w, h);
+
+  /* work around a bug (MinGW target), where bitmaps are loaded as
+     black/transparent images */
+  al_lock_bitmap(bitmap, al_get_bitmap_format(bitmap),
+                 ALLEGRO_LOCK_READWRITE);
+  al_unlock_bitmap(bitmap);
+
   return bitmap;
 }
 
