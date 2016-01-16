@@ -257,3 +257,11 @@ stop_sample (ALLEGRO_SAMPLE_INSTANCE *si,
 
   remove_sample (as);
 }
+
+bool
+is_instance_of_sample (ALLEGRO_SAMPLE_INSTANCE *si,
+             ALLEGRO_SAMPLE *s)
+{
+  struct audio_sample *as = get_audio_sample (si);
+  return si && s && as && as->sample == s;
+}

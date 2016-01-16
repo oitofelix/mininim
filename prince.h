@@ -602,7 +602,7 @@ struct anim {
 
   enum death_reason {
     NO_DEATH, FALL_DEATH, LOOSE_FLOOR_DEATH, POTION_DEATH,
-    SPIKES_DEATH, CHOPPER_DEATH, FIGHT_DEATH
+    SPIKES_DEATH, CHOPPER_DEATH, FIGHT_DEATH, SHADOW_FIGHT_DEATH
   } death_reason;
 
   /* depressible floor */

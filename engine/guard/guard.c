@@ -107,8 +107,11 @@ create_guard (struct anim *g0, struct anim *g1, struct pos *p, enum dir dir)
     g1->current_lives = 3;
     g1->enemy_id = -1;
     g1->fight = true;
+    g1->has_sword = true;
     g1->skill.counter_attack_prob = -1;
     g1->skill.counter_defense_prob = -1;
+
+    if (g1->type == SHADOW) g1->shadow = true;
 
     place_frame (&g1->f, &g1->f, guard_normal_00, p,
                  g1->f.dir == LEFT ? +PLACE_WIDTH + 2 : +3, +14);

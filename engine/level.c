@@ -494,9 +494,15 @@ process_keys (void)
 
     if (t < 12) k->sample = NULL;
 
-    if (t >= 12 && ! k->sample)
-      k->sample = play_sample (k->death_reason == FIGHT_DEATH
-                               ? fight_death_sample : death_sample, k->f.c.room);
+    if (t >= 12 && ! k->sample) {
+      ALLEGRO_SAMPLE *sample;
+      switch (k->death_reason) {
+      case SHADOW_FIGHT_DEATH: sample = success_suspense_sample; break;
+      case FIGHT_DEATH: sample = fight_death_sample; break;
+      default: sample = death_sample; break;
+      }
+      k->sample = play_sample (sample, -1);
+    }
 
     if (t < 60) key.keyboard.keycode = 0;
 

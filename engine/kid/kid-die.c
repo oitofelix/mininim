@@ -205,6 +205,7 @@ flow (struct anim *k)
                  &k->p, (k->f.dir == LEFT)
                  ? +13 : +21, +18);
     k->i = -1, k->j = 0;
+    k->xf.b = NULL;
   }
 
   k->current_lives = 0;

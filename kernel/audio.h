@@ -51,6 +51,8 @@ void adjust_samples_volume (void);
 float get_adjusted_sample_volume (struct audio_sample *as);
 void stop_sample (ALLEGRO_SAMPLE_INSTANCE *si, ALLEGRO_SAMPLE *s);
 void stop_all_samples (void);
+bool is_instance_of_sample (ALLEGRO_SAMPLE_INSTANCE *si,
+                            ALLEGRO_SAMPLE *s);
 
 /* variables */
 extern bool audio_enabled;

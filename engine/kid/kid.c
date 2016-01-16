@@ -48,9 +48,9 @@ ALLEGRO_SAMPLE *step_sample, *hit_ground_sample, *hit_ground_harm_sample,
   *drink_sample, *glory_sample, *take_sword_sample, *sword_attack_sample,
   *harm_sample, *action_not_allowed_sample, *small_life_potion_sample,
   *big_life_potion_sample, *scream_sample, *spiked_sample, *chopped_sample,
-  *floating_sample, *death_sample, *fight_death_sample, *press_key_sample,
-  *mirror_sample, *suspense_sample, *success_sample, *success_suspense_sample,
-  *sword_defense_sample, *sword_hit_sample;
+  *floating_sample, *death_sample, *fight_death_sample,
+  *press_key_sample, *mirror_sample, *suspense_sample, *success_sample,
+  *success_suspense_sample, *sword_defense_sample, *sword_hit_sample;
 
 static void place_kid (struct anim *k, int room, int floor, int place);
 static struct coord *kid_life_coord (int i, struct coord *c);

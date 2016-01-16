@@ -50,6 +50,7 @@ static ALLEGRO_TIMER *mouse_timer;
 static int mouse_id;
 static bool coming_from_12;
 static struct skill skill;
+static bool shadow_merged;
 
 static int life_table[] = {4, 3, 3, 3, 3, 4, 5, 4, 4, 5, 5, 5, 4, 6, 0, 0};
 
@@ -110,6 +111,7 @@ start (void)
   mouse_timer = NULL;
   exit_level_door = get_exit_level_door (0);
   anti_camera_room = -1;
+  shadow_merged = false;
 
   if (coming_from_12) auto_rem_time_1st_cycle = -1;
   else auto_rem_time_1st_cycle = 24;
@@ -244,22 +246,22 @@ start (void)
     level.nominal_number = 12;
 
   /* temporary placement for test */
-  /* if (level.number == 8) { */
+  /* if (level.number == 12) { */
   /*   /\* kid *\/ */
-  /*   struct pos p = {16,0,1}; */
-  /*   k->f.dir = RIGHT; */
+  /*   struct pos p = {15,0,7}; */
+  /*   k->f.dir = LEFT; */
   /*   place_frame (&k->f, &k->f, kid_normal_00, &p, */
   /*                k->f.dir == LEFT ? +22 : +31, +15); */
   /*   k->action = kid_normal; */
-  /*   room_view = 16; */
+  /*   room_view = 15; */
   /* } */
 }
 
 static void
 special_events (void)
 {
-  struct pos np, p, pm;
-  struct coord nc;
+  struct pos np, p, pm, pms;
+  struct coord nc, m, ms;
   struct anim *k = get_anim_by_id (current_kid_id);
 
   /* in the first animation cycle */
@@ -278,10 +280,12 @@ special_events (void)
 
   /* in the first level, first try, play the suspense sound */
   if (level.number == 1 && anim_cycle == 12 && retry_level != 1)
-    play_sample (suspense_sample, k->f.c.room);
+    play_sample (suspense_sample, -1);
 
-  /* level 3 checkpoint */
+  /* in the third level */
   if (level.number == 3) {
+
+    /* level 3 checkpoint */
     p = (struct pos) {2,0,8};
     survey (_m, pos, &k->f, &nc, &pm, &np);
     if (peq (&pm, &p)) level_3_checkpoint = true;
@@ -337,7 +341,7 @@ special_events (void)
         && con (&mirror_pos)->fg != MIRROR) {
       con (&mirror_pos)->fg = MIRROR;
       register_mirror (&mirror_pos);
-      play_sample (suspense_sample, 4);
+      play_sample (suspense_sample, -1);
     }
 
     /* if the kid is crossing the mirror, make his shadow appear */
@@ -441,7 +445,7 @@ special_events (void)
     /* when kid enters room 1, play the suspense sound */
     if (k->f.c.room == 1
         && ! played_sample) {
-      play_sample (suspense_sample, 1);
+      play_sample (suspense_sample, -1);
       played_sample = true;
     }
 
@@ -507,6 +511,7 @@ special_events (void)
     struct pos sword_pos = {15,0,1};
     struct pos first_hidden_floor_pos = {2,0,7};
     anti_camera_room = 23;
+    struct anim *ks = NULL;
 
     /* make the sword in room 15 disappear (kid's shadow has it) when
        the kid leaves room 18 to the right */
@@ -514,15 +519,143 @@ special_events (void)
         && con (&sword_pos)->ext.item == SWORD)
       con (&sword_pos)->ext.item = NO_ITEM;
 
-    /* (temporary condition for test until fighting the kid's shadow
-       is implemented) transform the empty space in hidden floors */
-    if (k->f.c.room == 2
+    /* make shadow fall in kid's front */
+    survey (_m, pos, &k->f, &nc, &pm, &np);
+    if (shadow_id == -1
+        && con (&sword_pos)->ext.item != SWORD
+        && pm.room == 15 && pm.place < 6
+        && ! shadow_merged) {
+      struct pos shadow_pos = (struct pos) {roomd (15, ABOVE),2,1};
+      shadow_id = create_anim (NULL, SHADOW, &shadow_pos, RIGHT);
+      ks = &anima[shadow_id];
+      ks->fight = true;
+      ks->controllable = false;
+      ks->action = guard_fall;
+      ks->refraction = 12;
+      ks->current_lives = ks->total_lives = 4;
+      get_legacy_skill (3, &ks->skill);
+      struct frameset *frameset = get_guard_fall_frameset (ks->type);
+      place_frame (&ks->f, &ks->f, frameset[0].frame, &shadow_pos,
+                   +9, +15);
+    } else if (shadow_id != -1) ks = get_anim_by_id (shadow_id);
+
+    /* if shadow has appeared but not merged yet */
+    if (ks) {
+      ks->death_reason = k->death_reason = SHADOW_FIGHT_DEATH;
+      survey (_m, pos, &ks->f, &ms, &pms, &np);
+      survey (_m, pos, &k->f, &m, &pm, &np);
+      ks->p = pms;
+      k->p = pm;
+
+      ks->keep_sword_fast = k->keep_sword_fast = false;
+
+      /* any harm caused to the shadow reflects to the kid */
+      if (ks->action == guard_hit && ks->i == 0) {
+        video_effect.color = get_flicker_blood_color ();
+        start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
+        play_sample (sword_hit_sample, k->f.c.room);
+        k->splash = true;
+        k->current_lives--;
+        kid_sword_hit (k);
+      }
+
+      /* any harm caused to the kid reflects to the shadow */
+      if (k->action == kid_sword_hit && k->i == 0) {
+        video_effect.color = get_flicker_blood_color ();
+        start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
+        play_sample (guard_hit_sample, ks->f.c.room);
+        ks->splash = true;
+        ks->current_lives--;
+        guard_hit (ks);
+      }
+
+      /* if the shadow dies, the kid dies */
+      if (ks->current_lives <= 0 && k->current_lives > 0) {
+        k->splash = true;
+        kid_die (k);
+      }
+
+      /* if the kid dies, the shadow dies */
+      if (k->current_lives <= 0 && ks->current_lives > 0) {
+        ks->splash = true;
+        guard_die (ks);
+      }
+
+      /* make the shadow disappear when the kid is dead */
+      if (k->current_lives <= 0
+          && is_instance_of_sample (k->sample, success_suspense_sample)
+          && get_sample_position (k->sample) >= 3.3
+          && ! ks->invisible) {
+        video_effect.color = WHITE;
+        start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.3));
+        ks->invisible = true;
+      }
+
+      /* if the kid keep his sword, the shadow does the same */
+      if (k->action == kid_keep_sword && ks->type == SHADOW) {
+        ks->type = KID;
+        ks->floating = create_timer (1.0);
+        ks->controllable = true;
+        kid_keep_sword (ks);
+        place_on_the_ground (&ks->f, &ks->f.c);
+        ks->f.c.x += (ks->f.dir == LEFT) ? +8 : -8;
+      }
+
+      /* if the kid change his mind and take the sword again, the
+         shadow becomes offensive again too */
+      if (k->action == kid_take_sword && ks->type == KID) {
+        ks->type = SHADOW;
+        al_destroy_timer (ks->floating);
+        ks->controllable = false;
+        guard_normal (ks);
+        place_on_the_ground (&ks->f, &ks->f.c);
+      }
+
+      /* if both, the kid and the shadow, are not in fight mode and
+         get close enough, a merge happens */
+      if (ks->type == KID && pms.room == pm.room && pms.floor == pm.floor
+          && abs (ms.x - m.x) <= 8) {
+        destroy_anim (ks);
+        shadow_id = -1; ks = NULL;
+        shadow_merged = true;
+        k = get_anim_by_id (current_kid_id);
+        k->sample = play_sample (success_sample, -1);
+        k->f.dir = (k->f.dir == LEFT) ? RIGHT : LEFT;
+        kid_turn_run (k);
+        k->current_lives = ++k->total_lives;
+        video_effect.color = WHITE;
+        start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.3));
+      }
+      /* while the merge doesn't happen and neither the shadow nor the
+         kid are in fight mode, the shadow's movements mirror the
+         kid's */
+      else if (ks->type == KID) {
+        get_keyboard_state (&ks->key);
+        bool l = ks->key.left;
+        bool r = ks->key.right;
+        ks->key.left = r;
+        ks->key.right = l;
+      }
+      /* if the shadow and the kid has merged, one overlaps each other
+         making them glow intermittently */
+    } else if (shadow_merged
+               && is_instance_of_sample (k->sample, success_sample)
+               && is_playing_sample (k->sample))
+      k->shadow = (anim_cycle % 2);
+    /* after the success music has finished to play, the kid goes
+       normal again */
+    else if (shadow_merged) k->shadow = false;
+
+    /* transform the empty space in hidden floors after the shadow and
+       the kid has merged */
+    if (shadow_merged
+        && k->f.c.room == 2
         && con (&first_hidden_floor_pos)->fg == NO_FLOOR)
       for (p = (struct pos) {2,0,-4}; p.place < PLACES;
            prel (&p, &p, +0, +1))
         if (con (&p)->fg == NO_FLOOR) con (&p)->fg = HIDDEN_FLOOR;
 
-    /* when the kid enters the room 23, go to the next level */
+    /* when the kid enters room 23, go to the next level */
     if (k->f.c.room == 23) {
       coming_from_12 = true;
       total_lives = k->total_lives;
@@ -535,6 +668,7 @@ special_events (void)
   /* in the thirteenth level */
   if (level.number == 13) {
 
+    /* make the top loose floors fall spontaneously */
     if (k->f.c.room == 16 || k->f.c.room == 23) {
       struct pos p = (struct pos) {k->f.c.room,-1,0};
       p.place = prandom (9);
@@ -554,9 +688,9 @@ end (struct pos *p)
     switch (level.number) {
     case 1: case 2: case 3: case 5: case 6: case 7:
     case 8: case 9: case 10: case 11: case 12:
-      si = play_sample (success_sample, p->room); break;
+      si = play_sample (success_sample, -1); break;
     case 4:
-      si = play_sample (success_suspense_sample, p->room); break;
+      si = play_sample (success_suspense_sample, -1); break;
     case 13: break;
     }
     played_sample = true;
@@ -649,7 +783,7 @@ load_legacy_level (int number)
         case LT_DEBRIS: c->fg = BROKEN_FLOOR; break;
         case LT_RAISE_BUTTON: c->fg = OPENER_FLOOR; break;
         case LT_EXIT_LEFT: c->fg = FLOOR; c->bg = NO_BRICKS; break;
-        case LT_EXIT_RIGHT: c->fg = LEVEL_DOOR; break;
+        case LT_EXIT_RIGHT: c->fg = LEVEL_DOOR; c->bg = NO_BRICKS; break;
         case LT_CHOPPER: c->fg = CHOPPER; break;
         case LT_TORCH: c->fg = FLOOR; c->bg = TORCH; break;
         case LT_WALL: c->fg = WALL; break;
@@ -829,7 +963,8 @@ load_legacy_level (int number)
   for (i = 0; i < LROOMS; i++) {
     struct guard *g = &legacy_level.guard[i + 1];
 
-    if (lv.guard_location[i] > 29) {
+    if (lv.guard_location[i] > 29
+        || lv.guard_color[i] == 0xFF) {
       g->type = NO_ANIM;
       continue;
     }

@@ -299,7 +299,8 @@ guard_die_spiked (struct anim *g)
     else play_sample (spiked_sample, g->f.c.room);
 
     struct anim *ke = get_anim_by_id (g->oenemy_id);
-    if (ke && ke->id == current_kid_id)
+    if (ke && ke->id == current_kid_id
+        && g->death_reason != SHADOW_FIGHT_DEATH)
       play_sample (glory_sample, ke->f.c.room);
     g->oenemy_id = -1;
   }
@@ -349,7 +350,8 @@ guard_die_chopped (struct anim *g)
   if (g->oaction != guard_die_chopped) {
     place_frame (&g->f, &g->f, bitmap, &g->p, dx, dy);
     struct anim *ke = get_anim_by_id (g->oenemy_id);
-    if (ke && ke->id == current_kid_id)
+    if (ke && ke->id == current_kid_id
+        && g->death_reason != SHADOW_FIGHT_DEATH)
       play_sample (glory_sample, ke->f.c.room);
     g->oenemy_id = -1;
   }
@@ -376,7 +378,8 @@ guard_die_suddenly (struct anim *g)
                  ? +9 : +4, dy);
 
     struct anim *ke = get_anim_by_id (g->oenemy_id);
-    if (ke && ke->id == current_kid_id)
+    if (ke && ke->id == current_kid_id
+        && g->death_reason != SHADOW_FIGHT_DEATH)
       play_sample (glory_sample, ke->f.c.room);
     g->oenemy_id = -1;
   }
@@ -422,9 +425,12 @@ flow (struct anim *g)
     if (g->type == SKELETON) play_sample (skeleton_sample, g->f.c.room);
 
     struct anim *ke = get_anim_by_id (g->oenemy_id);
-    if (ke && ke->id == current_kid_id)
+    if (ke && ke->id == current_kid_id
+        && g->death_reason != SHADOW_FIGHT_DEATH)
       play_sample (glory_sample, ke->f.c.room);
     g->oenemy_id = -1;
+
+    g->xf.b = NULL;
   }
 
   g->current_lives = 0;

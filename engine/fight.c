@@ -804,9 +804,11 @@ fight_hit (struct anim *k, struct anim *ke)
   if (k->current_lives <= 0 || ! is_in_fight_mode (k)) {
     forget_enemy (ke);
     anim_die (k);
-    k->death_reason = FIGHT_DEATH;
     upgrade_skill (&ke->skill, &k->skill);
-    if (ke->id == 0) display_skill (ke);
+    if (ke->id == 0
+        && k->death_reason != SHADOW_FIGHT_DEATH)
+      display_skill (ke);
+    k->death_reason = FIGHT_DEATH;
   } else anim_sword_hit (k);
 
   if (! is_colliding (&k->f, &k->fo, +PLACE_WIDTH, ke->f.dir == k->f.dir, &k->ci)) {

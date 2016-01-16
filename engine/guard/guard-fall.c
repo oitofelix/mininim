@@ -293,11 +293,8 @@ physics_in (struct anim *g)
     survey (_bf, pos, &g->f, &nc, &pbf, &np);
     /* pos2view (&pbf, &pbf); */
     frameset = get_guard_vigilant_frameset (g->type);
-    g->fo.b = frameset[0].frame;
-    g->fo.dx = g->fo.dy = 0;
-    g->f.c.room = pbf.room;
-    g->f.c.y = PLACE_HEIGHT * pbf.floor + 26;
     g->f.b = frameset[0].frame;
+    place_on_the_ground (&g->f, &g->f.c);
 
     shake_loose_floor_row (&pbf);
 
