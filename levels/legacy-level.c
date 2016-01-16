@@ -686,6 +686,8 @@ special_events (void)
 
     struct anim *v = get_anim_by_id (1);
     if (v) {
+      /* play a special tune when meeting the vizier for the first
+         time */
       if (k->f.c.room == v->f.c.room
           && v->action == guard_normal
           && ! met_jaffar) {
@@ -693,11 +695,14 @@ special_events (void)
         met_jaffar = true;
       }
 
+      /* put the vizier in vigilance */
       if (k->sample
           && is_instance_of_sample (k->sample, meet_vizier_sample)
           && get_sample_position (k->sample) >= 2.2)
         v->fight = true;
 
+      /* when the vizier dies do some video effect, play a tune, stop
+         the play timer and display the remaining time */
       if (v->current_lives <= 0
           && ! played_vizier_death_sample) {
         video_effect.color = WHITE;
@@ -709,6 +714,8 @@ special_events (void)
         display_remaining_time ();
       }
 
+      /* after vizier's death activate certain tile in order to open
+         the exit level door */
       struct pos p = {24,0,0};
       if (v->current_lives <= 0
           && k->f.c.room != v->f.c.room)
