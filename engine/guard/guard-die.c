@@ -299,7 +299,9 @@ guard_die_spiked (struct anim *g)
     else play_sample (spiked_sample, g->f.c.room);
 
     struct anim *ke = get_anim_by_id (g->oenemy_id);
-    if (ke && ke->id == current_kid_id) play_sample (glory_sample, ke->f.c.room);
+    if (ke && ke->id == current_kid_id)
+      play_sample (glory_sample, ke->f.c.room);
+    g->oenemy_id = -1;
   }
 
   int dy;
@@ -347,9 +349,10 @@ guard_die_chopped (struct anim *g)
   if (g->oaction != guard_die_chopped) {
     place_frame (&g->f, &g->f, bitmap, &g->p, dx, dy);
     struct anim *ke = get_anim_by_id (g->oenemy_id);
-    if (ke && ke->id == current_kid_id) play_sample (glory_sample, ke->f.c.room);
+    if (ke && ke->id == current_kid_id)
+      play_sample (glory_sample, ke->f.c.room);
+    g->oenemy_id = -1;
   }
-
 
   g->xf.b = NULL;
 }
@@ -373,7 +376,9 @@ guard_die_suddenly (struct anim *g)
                  ? +9 : +4, dy);
 
     struct anim *ke = get_anim_by_id (g->oenemy_id);
-    if (ke && ke->id == current_kid_id) play_sample (glory_sample, ke->f.c.room);
+    if (ke && ke->id == current_kid_id)
+      play_sample (glory_sample, ke->f.c.room);
+    g->oenemy_id = -1;
   }
 
   g->xf.b = NULL;
@@ -390,7 +395,7 @@ guard_die_suddenly (struct anim *g)
   }
 
   /* depressible floors */
-  update_depressible_floor (g, -3, -40);
+  update_depressible_floor (g, -12, -28);
 }
 
 void
@@ -417,7 +422,9 @@ flow (struct anim *g)
     if (g->type == SKELETON) play_sample (skeleton_sample, g->f.c.room);
 
     struct anim *ke = get_anim_by_id (g->oenemy_id);
-    if (ke && ke->id == current_kid_id) play_sample (glory_sample, ke->f.c.room);
+    if (ke && ke->id == current_kid_id)
+      play_sample (glory_sample, ke->f.c.room);
+    g->oenemy_id = -1;
   }
 
   g->current_lives = 0;
@@ -458,7 +465,7 @@ physics_out (struct anim *g)
   else if (g->i == 2) update_depressible_floor (g, -4, -13);
   else if (g->i == 3) update_depressible_floor (g, -2, -18);
   else if (g->i == 4) update_depressible_floor (g, 0, -27);
-  else if (g->i == 5) update_depressible_floor (g, -3, -40);
+  else if (g->i == 5) update_depressible_floor (g, -12, -28);
   else keep_depressible_floor (g);
 }
 

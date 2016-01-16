@@ -214,6 +214,7 @@ is_colliding_cf (struct frame *f, struct frame_offset *fo, int dx,
   survey (_tf, pos, &nf, &tf, &np, &np);
 
   if (pcf.room != _pcf.room) pos2room (&pcf, _f.c.room, &pcf);
+  if (pocf.room != pcf.room) pos2room (&pocf, pcf.room, &pocf);
 
   bool wall_collision = false;
   bool door_collision = false;

@@ -171,21 +171,21 @@ npos (struct pos *p, struct pos *np)
   do {
     m = false;
 
-    if (np->floor < 0) {
-      np->floor += FLOORS;
-      np->room = roomd (np->room, ABOVE);
-      m = true;
-    } else if (np->floor >= FLOORS) {
-      np->floor -= FLOORS;
-      np->room = roomd (np->room, BELOW);
-      m = true;
-    } else if (np->place < 0) {
+    if (np->place < 0) {
       np->place += PLACES;
       np->room = roomd (np->room, LEFT);
       m = true;
     } else if (np->place >= PLACES) {
       np->place -= PLACES;
       np->room = roomd (np->room, RIGHT);
+      m = true;
+    } else if (np->floor < 0) {
+      np->floor += FLOORS;
+      np->room = roomd (np->room, ABOVE);
+      m = true;
+    } else if (np->floor >= FLOORS) {
+      np->floor -= FLOORS;
+      np->room = roomd (np->room, BELOW);
       m = true;
     }
   } while (m);
@@ -506,12 +506,20 @@ cpos (struct pos *p0, struct pos *p1)
   npos (p0, &np0);
   npos (p1, &np1);
 
+  /* if (np0.room < np1.room) return -1; */
+  /* else if (np0.room > np1.room) return 1; */
+  /* else if (np0.floor < np1.floor) return 1; */
+  /* else if (np0.floor > np1.floor) return -1; */
+  /* else if (np0.place < np1.place) return -1; */
+  /* else if (np0.place > np1.place) return 1; */
+  /* else return 0; */
+
   if (np0.room < np1.room) return -1;
   else if (np0.room > np1.room) return 1;
-  else if (np0.floor < np1.floor) return 1;
-  else if (np0.floor > np1.floor) return -1;
   else if (np0.place < np1.place) return -1;
   else if (np0.place > np1.place) return 1;
+  else if (np0.floor < np1.floor) return 1;
+  else if (np0.floor > np1.floor) return -1;
   else return 0;
 }
 

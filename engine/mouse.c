@@ -67,7 +67,7 @@ create_mouse (struct anim *m0, struct anim *m1, struct pos *p, enum dir dir)
     m1->action = mouse_normal;
 
     place_frame (&m1->f, &m1->f, mouse_normal_00, p,
-                 m1->f.dir == LEFT ? +22 : +31, +15);
+                 m1->f.dir == LEFT ? +22 : +31, +48);
   }
 
   return m1;
@@ -173,6 +173,9 @@ mouse_run (struct anim *m)
   m->df = dist_fall (&m->f, false);
   m->dl = dist_con (&m->f, _bf, pos, -4, false, LOOSE_FLOOR);
 
+  if (is_colliding (&m->f, &m->fo, m->dc, false, &m->ci)
+      && m->ci.t == DOOR)
+    m->dc = PLACE_WIDTH + 1;
   if (m->dc < 12 || m->df < 12 || m->dl < 12) {
     mouse_normal (m);
     return;

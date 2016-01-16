@@ -259,6 +259,9 @@ compare_anims (const void *a0, const void *a1)
   int cpbl = cpos (&pbl0, &pbl1);
   if (cpbl && pbl0.room == pbl1.room) return cpbl;
 
+  if (ptl0.room < ptl1.room) return -1;
+  if (ptl0.room > ptl1.room) return 1;
+
   return 0;
 }
 

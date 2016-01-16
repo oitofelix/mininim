@@ -244,14 +244,14 @@ start (void)
     level.nominal_number = 12;
 
   /* temporary placement for test */
-  /* if (level.number == 4) { */
+  /* if (level.number == 8) { */
   /*   /\* kid *\/ */
-  /*   struct pos p = {4,1,6}; */
+  /*   struct pos p = {16,0,1}; */
   /*   k->f.dir = RIGHT; */
   /*   place_frame (&k->f, &k->f, kid_normal_00, &p, */
   /*                k->f.dir == LEFT ? +22 : +31, +15); */
   /*   k->action = kid_normal; */
-  /*   room_view = 4; */
+  /*   room_view = 16; */
   /* } */
 }
 
@@ -351,6 +351,8 @@ special_events (void)
         ks->fight = false;
         ks->f.dir = (ks->f.dir == LEFT) ? RIGHT : LEFT;
         ks->controllable = false;
+        ks->dont_draw_lives = true;
+        ks->immortal = true;
         shadow_id = id;
       }
     }
@@ -389,6 +391,8 @@ special_events (void)
       ks->controllable = false;
       ks->action = kid_run;
       ks->i = -1;
+      ks->immortal = true;
+      ks->dont_draw_lives = true;
       place_frame (&ks->f, &ks->f, kid_normal_00, &shadow_pos,
                    +0, +15);
       shadow_id = id;
@@ -427,6 +431,8 @@ special_events (void)
       ks->f.dir = RIGHT;
       ks->controllable = false;
       ks->action = kid_normal;
+      ks->dont_draw_lives = true;
+      ks->immortal = true;
       place_frame (&ks->f, &ks->f, kid_normal_00, &shadow_pos,
                    +9, +15);
       shadow_id = id;
@@ -444,7 +450,7 @@ special_events (void)
     struct pos door_pos = (struct pos) {1,1,2};
     if (k->f.c.room == 1
         && k->action == kid_run_jump
-        && k->i == 8
+        && k->i == 7
         && con (&door_pos)->fg == DOOR
         && door_at_pos (&door_pos)->i < DOOR_MAX_STEP) {
       ks->key.right = true;
@@ -466,7 +472,7 @@ special_events (void)
     struct pos mouse_pos = {16,0,12};
     struct anim *m = NULL;
 
-    if (mouse_id != -1) m = &anima[mouse_id];
+    if (mouse_id != -1) m = get_anim_by_id (mouse_id);
 
     if (mouse_timer) {
       /* if the exit level door is open and the kid is at room 16,

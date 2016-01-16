@@ -181,7 +181,7 @@ kid_die_suddenly (struct anim *k)
   }
 
   /* depressible floors */
-  update_depressible_floor (k, -1, -33);
+  update_depressible_floor (k, -12, -28);
 }
 
 void
@@ -247,7 +247,7 @@ physics_out (struct anim *k)
   else if (k->i == 2) update_depressible_floor (k, -3, -14);
   else if (k->i == 3) update_depressible_floor (k, -4, -15);
   else if (k->i == 4) update_depressible_floor (k, -3, -21);
-  else if (k->i == 5) update_depressible_floor (k, -1, -33);
+  else if (k->i == 5) update_depressible_floor (k, -12, -28);
   else keep_depressible_floor (k);
 }
 

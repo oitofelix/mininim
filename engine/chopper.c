@@ -390,7 +390,8 @@ compute_choppers (void)
     /* chomp kid */
     for (j = 0; j < anima_nmemb; j++) {
       struct anim *a = &anima[j];
-      if (is_anim_fall (&a->f)
+      if (a->type == MOUSE
+          || is_anim_fall (&a->f)
           || a->immortal
           || a->chopper_immune) continue;
       struct coord nc; struct pos np, pbf, pbb;
