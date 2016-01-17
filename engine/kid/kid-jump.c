@@ -137,9 +137,12 @@ flow (struct anim *k)
 
   /* hang front */
   survey (_m, pos, &k->f, &nc, &pm, &np);
-  if (k->i >= 8 && k->i <= 10
-      && hang_front && is_hangable_pos (&pm, k->f.dir)) {
-    k->hang_pos = pm;
+  survey (_tf, pos, &k->f, &nc, &ptf, &np);
+  if (k->i >= 8 && k->i <= 10 && hang_front
+      && (is_hangable_pos (&pm, k->f.dir)
+          || is_hangable_pos (&ptf, k->f.dir))) {
+    if (is_hangable_pos (&pm, k->f.dir)) k->hang_pos = pm;
+    else if (is_hangable_pos (&ptf, k->f.dir)) k->hang_pos = ptf;
     pos2room (&k->hang_pos, k->f.c.room, &k->hang_pos);
     k->hang = true;
     play_sample (hang_on_fall_sample, k->f.c.room);

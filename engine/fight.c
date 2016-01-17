@@ -270,7 +270,7 @@ fight_mechanics (struct anim *k)
   if (! ke->attack_defended)
     ke->attack_defended = (ke->i < 4 && k->key.up);
 
-  if (ke->attack_defended && (is_walking (k) || is_attacking (k)
+  if (ke->attack_defended && (is_walkingf (k) || is_attacking (k)
                               || ! is_in_fight_mode (k)))
     ke->attack_defended = 0;
 
@@ -480,6 +480,14 @@ is_walking (struct anim *k)
          || k->action == kid_sword_walkb
          || k->action == guard_walkf
          || k->action == guard_walkb;
+}
+
+bool
+is_walkingf (struct anim *k)
+{
+  if (! k) return false;
+  else return k->action == kid_sword_walkf
+         || k->action == guard_walkf;
 }
 
 bool

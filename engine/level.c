@@ -82,7 +82,6 @@ play_level (struct level *lv)
   stop_all_samples ();
   if (level.start) level.start ();
 
-  screen_flags = 0;
   anim_cycle = 0;
   last_auto_show_time = -1;
   current_kid_id = 0;
@@ -449,6 +448,28 @@ process_keys (void)
       break;
     }
     xasprintf (&text, "DISPLAY FLIP: %s", flip);
+    draw_bottom_text (NULL, text);
+    al_free (text);
+  }
+
+  /* SHIFT+K: flip keyboard */
+  if (was_key_pressed (ALLEGRO_KEY_K, 0, ALLEGRO_KEYMOD_SHIFT, true)) {
+    char *flip = "NONE";
+    if (! flip_keyboard_vertical && ! flip_keyboard_horizontal) {
+      flip_keyboard_vertical = true;
+      flip = "VERTICAL";
+    } else if (flip_keyboard_vertical && ! flip_keyboard_horizontal) {
+      flip_keyboard_vertical = false;
+      flip_keyboard_horizontal = true;
+      flip = "HORIZONTAL";
+    } else if (! flip_keyboard_vertical && flip_keyboard_horizontal) {
+      flip_keyboard_vertical = true;
+      flip = "VERTICAL + HORIZONTAL";
+    } else if (flip_keyboard_vertical && flip_keyboard_horizontal) {
+      flip_keyboard_vertical = false;
+      flip_keyboard_horizontal = false;
+    }
+    xasprintf (&text, "KEYBOARD FLIP: %s", flip);
     draw_bottom_text (NULL, text);
     al_free (text);
   }

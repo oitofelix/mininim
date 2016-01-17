@@ -21,6 +21,9 @@
 #include "xerror.h"
 #include "keyboard.h"
 
+/* flip settings */
+bool flip_keyboard_horizontal, flip_keyboard_vertical;
+
 /* keyboard state */
 ALLEGRO_KEYBOARD_STATE keyboard_state;
 
@@ -52,13 +55,28 @@ struct keyboard_state *
 get_keyboard_state (struct keyboard_state *k)
 {
   al_get_keyboard_state (&keyboard_state);
-  k->up = al_key_down (&keyboard_state, ALLEGRO_KEY_UP);
-  k->down = al_key_down (&keyboard_state, ALLEGRO_KEY_DOWN);
-  k->left = al_key_down (&keyboard_state, ALLEGRO_KEY_LEFT);
-  k->right = al_key_down (&keyboard_state, ALLEGRO_KEY_RIGHT);
+  bool up, down, left, right;
+
+  up = al_key_down (&keyboard_state, ALLEGRO_KEY_UP);
+  down = al_key_down (&keyboard_state, ALLEGRO_KEY_DOWN);
+  left = al_key_down (&keyboard_state, ALLEGRO_KEY_LEFT);
+  right = al_key_down (&keyboard_state, ALLEGRO_KEY_RIGHT);
+
+  k->up = up;
+  k->down = down;
+  k->left = left;
+  k->right = right;
+
+  if (flip_keyboard_vertical)
+    k->up = down, k->down = up;
+
+  if (flip_keyboard_horizontal)
+    k->left = right, k->right = left;
+
   k->shift = al_key_down (&keyboard_state, ALLEGRO_KEY_LSHIFT)
     || al_key_down (&keyboard_state, ALLEGRO_KEY_RSHIFT);
   k->enter = al_key_down (&keyboard_state, ALLEGRO_KEY_ENTER);
+
   return k;
 }
 

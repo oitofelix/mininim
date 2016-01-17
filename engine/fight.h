@@ -45,6 +45,7 @@ bool is_in_fight_mode (struct anim *k);
 bool is_attacking (struct anim *k);
 bool is_defending (struct anim *k);
 bool is_walking (struct anim *k);
+bool is_walkingf (struct anim *k);
 bool is_sword_hit (struct anim *k);
 bool is_at_defendable_attack_frame (struct anim *k);
 bool is_at_hit_frame (struct anim *k);

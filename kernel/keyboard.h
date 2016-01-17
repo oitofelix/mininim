@@ -29,6 +29,7 @@ struct keyboard_state {
 };
 
 /* variables */
+extern bool flip_keyboard_horizontal, flip_keyboard_vertical;
 extern ALLEGRO_KEYBOARD_STATE keyboard_state;
 extern ALLEGRO_EVENT key;
 

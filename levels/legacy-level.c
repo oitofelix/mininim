@@ -170,7 +170,9 @@ start (void)
     a->skill = g->skill;
     a->total_lives = g->total_lives;
     a->current_lives = g->total_lives;
-    a->style = (level.number != 13) ? g->style : 0;
+    if (level.number == 13) a->style = 0;
+    else if (level.number == 6) a->style = 1;
+    else a->style = g->style;
   }
 
   /* after kid creation k must be updated to point to the correct
@@ -243,6 +245,10 @@ start (void)
 
   /* in the eighth level */
   if (level.number == 8) mouse_timer = create_timer (1.0 / 12);
+
+  /* in the tenth level unflip the screen vertically, (helpful if the
+     kid has not drank the potion that would do it on its own) */
+  if (level.number == 10) screen_flags &= ~ ALLEGRO_FLIP_VERTICAL;
 
   /* level 13 adjustements */
   coming_from_12 = false;
