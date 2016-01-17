@@ -267,20 +267,32 @@ process_keys (void)
   if (was_key_pressed (ALLEGRO_KEY_HOME, 0, 0, true))
     room_view = current_kid->f.c.room;
 
-  /* H: view room at left */
-  if (was_key_pressed (ALLEGRO_KEY_H, 0, 0, true))
+  /* H: view room at left (J if flipped horizontally) */
+  if ((! flip_keyboard_horizontal
+       && was_key_pressed (ALLEGRO_KEY_H, 0, 0, true))
+      || (flip_keyboard_horizontal
+          && was_key_pressed (ALLEGRO_KEY_J, 0, 0, true)))
     room_view = level.link[room_view].l;
 
-  /* J: view room at right */
-  if (was_key_pressed (ALLEGRO_KEY_J, 0, 0, true))
+  /* J: view room at right (H if flipped horizontally) */
+  if ((! flip_keyboard_horizontal
+       && was_key_pressed (ALLEGRO_KEY_J, 0, 0, true))
+      || (flip_keyboard_horizontal
+          && was_key_pressed (ALLEGRO_KEY_H, 0, 0, true)))
     room_view = level.link[room_view].r;
 
-  /* U: view room above */
-  if (was_key_pressed (ALLEGRO_KEY_U, 0, 0, true))
+  /* U: view room above (N if flipped vertically) */
+  if ((! flip_keyboard_vertical
+       && was_key_pressed (ALLEGRO_KEY_U, 0, 0, true))
+      || (flip_keyboard_vertical
+          && was_key_pressed (ALLEGRO_KEY_N, 0, 0, true)))
     room_view = level.link[room_view].a;
 
-  /* N: view room below */
-  if (was_key_pressed (ALLEGRO_KEY_N, 0, 0, true))
+  /* N: view room below (U if flipped vertically) */
+  if ((! flip_keyboard_vertical
+       && was_key_pressed (ALLEGRO_KEY_N, 0, 0, true))
+      || (flip_keyboard_vertical
+          && was_key_pressed (ALLEGRO_KEY_U, 0, 0, true)))
     room_view = level.link[room_view].b;
 
   /* SHIFT+B: enable/disable room drawing */
@@ -637,20 +649,17 @@ void
 display_skill (struct anim *k)
 {
   char *text;
-  if (k->enemy_id == -1) {
-    xasprintf (&text, "KCA%i KCD%i",
-               k->skill.counter_attack_prob + 1,
-               k->skill.counter_defense_prob + 1);
-  } else {
-    struct anim *ke = get_anim_by_id (k->enemy_id);
-    xasprintf (&text, "KCA%i KCD%i A%i CA%i D%i CD%i",
-               k->skill.counter_attack_prob + 1,
-               k->skill.counter_defense_prob + 1,
-               ke->skill.attack_prob + 1,
-               ke->skill.counter_attack_prob + 1,
-               ke->skill.defense_prob + 1,
-               ke->skill.counter_defense_prob + 1);
-  }
+  struct anim *ke = get_anim_by_id (k->enemy_id);
+  if (ke) xasprintf (&text, "KCA%i KCD%i A%i CA%i D%i CD%i",
+                      k->skill.counter_attack_prob + 1,
+                      k->skill.counter_defense_prob + 1,
+                      ke->skill.attack_prob + 1,
+                      ke->skill.counter_attack_prob + 1,
+                      ke->skill.defense_prob + 1,
+                      ke->skill.counter_defense_prob + 1);
+  else xasprintf (&text, "KCA%i KCD%i",
+                  k->skill.counter_attack_prob + 1,
+                  k->skill.counter_defense_prob + 1);
   draw_bottom_text (NULL, text);
   al_free (text);
 }

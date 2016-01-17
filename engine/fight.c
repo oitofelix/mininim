@@ -839,7 +839,6 @@ fight_hit (struct anim *k, struct anim *ke)
   if (k->current_lives <= 0 || ! is_in_fight_mode (k)) {
     forget_enemy (ke);
     anim_die (k);
-    upgrade_skill (&ke->skill, &k->skill);
     k->death_reason = FIGHT_DEATH;
   } else anim_sword_hit (k);
 

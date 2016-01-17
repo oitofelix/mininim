@@ -29,6 +29,7 @@
 #include "engine/loose-floor.h"
 #include "engine/spikes-floor.h"
 #include "engine/kid/kid.h"
+#include "engine/fight.h"
 #include "guard.h"
 
 struct frameset guard_die_frameset[GUARD_DIE_FRAMESET_NMEMB];
@@ -303,6 +304,8 @@ guard_die_spiked (struct anim *g)
         && g->death_reason != SHADOW_FIGHT_DEATH)
       play_sample (glory_sample, ke->f.c.room);
     g->oenemy_id = -1;
+
+    if (ke) upgrade_skill (&ke->skill, &g->skill);
   }
 
   int dy;
@@ -354,6 +357,8 @@ guard_die_chopped (struct anim *g)
         && g->death_reason != SHADOW_FIGHT_DEATH)
       play_sample (glory_sample, ke->f.c.room);
     g->oenemy_id = -1;
+
+    if (ke) upgrade_skill (&ke->skill, &g->skill);
   }
 
   g->xf.b = NULL;
@@ -382,6 +387,8 @@ guard_die_suddenly (struct anim *g)
         && g->death_reason != SHADOW_FIGHT_DEATH)
       play_sample (glory_sample, ke->f.c.room);
     g->oenemy_id = -1;
+
+    if (ke) upgrade_skill (&ke->skill, &g->skill);
   }
 
   g->xf.b = NULL;
@@ -429,6 +436,8 @@ flow (struct anim *g)
         && g->death_reason != SHADOW_FIGHT_DEATH)
       play_sample (glory_sample, ke->f.c.room);
     g->oenemy_id = -1;
+
+    if (ke) upgrade_skill (&ke->skill, &g->skill);
 
     g->xf.b = NULL;
   }

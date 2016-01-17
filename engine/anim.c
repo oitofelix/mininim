@@ -33,6 +33,7 @@
 #include "kid/kid.h"
 #include "guard/guard.h"
 #include "mouse.h"
+#include "fight.h"
 #include "anim.h"
 
 /* set to true to quit animation */
@@ -154,6 +155,8 @@ create_anim (struct anim *a0, enum anim_type t, struct pos *p, enum dir dir)
 void
 destroy_anim (struct anim *a)
 {
+  forget_enemy (a);
+
   if (a->type == KID) destroy_kid (a);
 
   size_t i =  a - anima;
