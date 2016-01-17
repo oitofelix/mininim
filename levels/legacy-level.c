@@ -356,7 +356,8 @@ special_events (void)
     /* if the kid is crossing the mirror, make his shadow appear */
     if (con (&mirror_pos)->fg == MIRROR) {
       struct mirror *m = mirror_at_pos (&mirror_pos);
-      if (m->kid_crossing == k->id) {
+      if (m->kid_crossing == k->id
+          && shadow_id == -1) {
         k->current_lives = 1;
         int id = create_anim (k, 0, NULL, 0);
         struct anim *ks = &anima[id];

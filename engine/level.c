@@ -383,6 +383,10 @@ process_keys (void)
     display_remaining_time ();
   }
 
+  /* TAB: display skill */
+  if (was_key_pressed (ALLEGRO_KEY_TAB, 0, 0, true))
+    display_skill (current_kid);
+
   /* CTRL+=: increment counter attack skill */
   if (was_key_pressed (ALLEGRO_KEY_EQUALS, 0, ALLEGRO_KEYMOD_CTRL, true)) {
     if (current_kid->skill.counter_attack_prob < 99)
@@ -612,9 +616,20 @@ void
 display_skill (struct anim *k)
 {
   char *text;
-  xasprintf (&text, "SKILL: CA %i%% CD %i%%",
-             k->skill.counter_attack_prob + 1,
-             k->skill.counter_defense_prob + 1);
+  if (k->enemy_id == -1) {
+    xasprintf (&text, "KCA%i KCD%i",
+               k->skill.counter_attack_prob + 1,
+               k->skill.counter_defense_prob + 1);
+  } else {
+    struct anim *ke = get_anim_by_id (k->enemy_id);
+    xasprintf (&text, "KCA%i KCD%i A%i CA%i D%i CD%i",
+               k->skill.counter_attack_prob + 1,
+               k->skill.counter_defense_prob + 1,
+               ke->skill.attack_prob + 1,
+               ke->skill.counter_attack_prob + 1,
+               ke->skill.defense_prob + 1,
+               ke->skill.counter_defense_prob + 1);
+  }
   draw_bottom_text (NULL, text);
   al_free (text);
 }

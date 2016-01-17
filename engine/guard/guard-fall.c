@@ -27,6 +27,7 @@
 #include "engine/potion.h"
 #include "engine/sword.h"
 #include "engine/loose-floor.h"
+#include "engine/spikes-floor.h"
 #include "engine/kid/kid.h"
 #include "guard.h"
 
@@ -317,7 +318,8 @@ physics_in (struct anim *g)
     survey (_mt, pos, &g->f, &nc, &pmt, &np);
     g->p = pmt;
 
-    if (con (&pmt)->fg == SPIKES_FLOOR)
+    if (con (&pmt)->fg == SPIKES_FLOOR
+        && ! spikes_floor_at_pos (&pmt)->inactive)
       guard_die_spiked (g);
     else if (g->current_lives <= 0) {
       play_sample (hit_ground_fatal_sample, g->f.c.room);

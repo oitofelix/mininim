@@ -36,9 +36,11 @@ bool is_traversable (struct pos *p);
 bool is_rigid_con (struct pos *p);
 bool is_carpet (struct pos *p);
 bool is_arch_top (struct pos *p);
-bool strictly_traversable_confg_set (enum confg t);
-bool traversable_confg_set (enum confg t);
-bool arch_top_confg_set (enum confg t);
+bool strictly_traversable_cs (enum confg t);
+bool traversable_cs (enum confg t);
+bool arch_top_cs (enum confg t);
+struct pos *first_confg (struct pos *p0, struct pos *p1,
+                         confg_set cs, struct pos *p);
 
 
 

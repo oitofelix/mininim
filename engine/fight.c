@@ -25,7 +25,6 @@
 #include "guard/guard.h"
 #include "anim.h"
 #include "physics.h"
-#include "level.h"
 #include "pos.h"
 #include "door.h"
 #include "mouse.h"
@@ -47,6 +46,10 @@ are_valid_opponents (struct anim *k0, struct anim *k1)
 void
 leave_fight_logic (struct anim *k)
 {
+  /* controllables don't forget, they let this to the
+     non-controllable */
+  if (k->controllable) return;
+
   /* no enemy, no need to forget */
   if (k->enemy_id == -1) return;
 
@@ -80,17 +83,16 @@ leave_fight_logic (struct anim *k)
     return;
   }
 
-  if (is_enemy_reachable_below (k, ke)
-      || is_enemy_reachable_below (ke, k)) return;
-
-  /* if the enemy is beyond follow range, forget about him */
-  if (! is_in_range (k, ke, FOLLOW_RANGE)) {
+  /* if the enemy went up stairs, forget about him */
+  if (is_kid_stairs (&ke->f)) {
     forget_enemy (k);
     return;
   }
 
-  /* if the enemy went up stairs, forget about him */
-  if (is_kid_stairs (&ke->f)) {
+  /* if the enemy is not reachable, forget about him */
+  if (! is_in_range (k, ke, FOLLOW_RANGE)
+      && ! is_safe_to_follow (k, ke, LEFT)
+      && ! is_safe_to_follow (k, ke, RIGHT)) {
     forget_enemy (k);
     return;
   }
@@ -181,23 +183,29 @@ fight_ai (struct anim *k)
     return;
   }
 
-  /* stays at least in the fight range */
-  if (! is_in_range (k, ke, FIGHT_RANGE)
-      && is_safe_to_follow (k, ke)
-      && is_safe_to_walkf (k)) {
-    fight_walkf (k);
+  /* if the enemy can be followed in the opposite direction, turn */
+  enum dir odir = (k->f.dir == LEFT) ? RIGHT : LEFT;
+  if (! is_safe_to_follow (k, ke, k->f.dir)
+      && is_safe_to_follow (k, ke, odir)) {
+    fight_turn (k);
     return;
   }
 
-  if (is_enemy_reachable_below (k, ke)) fight_walkf (k);
-
+  /* stays at least in the fight range */
+  if (! is_in_range (k, ke, FIGHT_RANGE)
+      && is_safe_to_follow (k, ke, k->f.dir)
+      /* && is_safe_to_walkf (k) */
+      ) {
+    fight_walkf (k);
+    return;
+  }
 
   /* in fight range, go towards attack range (with probability, unless
      the enemy is not in fight mode, then go immediately) */
   if (is_in_range (k, ke, FIGHT_RANGE)
       && ! is_in_range (k, ke, ATTACK_RANGE)
-      && is_safe_to_follow (k, ke)
-      && is_safe_to_walkf (k)
+      && is_safe_to_follow (k, ke, k->f.dir)
+      /* && is_safe_to_walkf (k) */
       && (prandom (99) <= k->skill.advance_prob
           || ! is_in_fight_mode (ke))
       && ! is_attacking (ke)) {
@@ -596,14 +604,27 @@ put_at_attack_frame (struct anim *k)
 }
 
 bool
+opaque_cs (enum confg t)
+{
+  return t == WALL || t == CARPET || t == TCARPET || t == MIRROR;
+}
+
+bool
 is_seeing (struct anim *k0, struct anim *k1)
 {
-  struct coord m0, m1; struct pos np, pm0, pm1;
+  struct coord m0, m1; struct pos np, p, pm0, pm1;
   survey (_m, pos, &k0->f, &m0, &pm0, &np);
   survey (_m, pos, &k1->f, &m1, &pm1, &np);
-  return pm1.room == pm0.room && pm1.floor == pm0.floor
+
+  first_confg (&pm0, &pm1, opaque_cs, &p);
+
+  pos2room (&pm1, pm0.room, &pm1);
+  coord2room (&m1, pm0.room, &m1);
+
+  return m1.room == m0.room && pm1.floor == pm0.floor
     && ! (k0->f.dir == LEFT && m1.x > m0.x)
-    && ! (k0->f.dir == RIGHT && m1.x < m0.x);
+    && ! (k0->f.dir == RIGHT && m1.x < m0.x)
+    && p.room == -1;
 }
 
 bool
@@ -612,6 +633,9 @@ is_hearing (struct anim *k0, struct anim *k1)
   struct coord nc; struct pos np, pm0, pm1;
   survey (_m, pos, &k0->f, &nc, &pm0, &np);
   survey (_m, pos, &k1->f, &nc, &pm1, &np);
+
+  pos2room (&pm1, pm0.room, &pm1);
+
   return pm1.room == pm0.room
     && (is_kid_run (&k1->f)
         || is_kid_stop_run (&k1->f)
@@ -629,7 +653,11 @@ is_on_back (struct anim *k0, struct anim *k1)
   struct coord m0, m1; struct pos np, pm0, pm1;
   survey (_m, pos, &k0->f, &m0, &pm0, &np);
   survey (_m, pos, &k1->f, &m1, &pm1, &np);
-  return pm1.room == pm0.room
+
+  pos2room (&pm1, pm0.room, &pm1);
+  coord2room (&m1, pm0.room, &m1);
+
+  return m1.room == m0.room
     && ((k0->f.dir == LEFT && m1.x > m0.x)
         || (k0->f.dir == RIGHT && m1.x < m0.x));
 }
@@ -645,13 +673,13 @@ is_near (struct anim *k0, struct anim *k1)
         || (k0->f.dir == RIGHT && abs (m1.x - m0.x) < PLACE_WIDTH));
 }
 
-bool
-is_safe_to_walkf (struct anim *k)
-{
-  int df = dist_fall (&k->f, false);
-  return df > PLACE_WIDTH
-    && fight_crel (k, +0, +2) != WALL;
-}
+/* bool */
+/* is_safe_to_walkf (struct anim *k) */
+/* { */
+/*   int df = dist_fall (&k->f, false); */
+/*   return df > PLACE_WIDTH */
+/*     && fight_crel (k, +0, +2) != WALL; */
+/* } */
 
 bool
 is_safe_to_walkb (struct anim *k)
@@ -674,66 +702,65 @@ is_safe_to_turn (struct anim *k)
   return (df > PLACE_WIDTH);
 }
 
-struct pos *
-confg_from_anim_to_anim (struct anim *k0, struct anim *k1, confg_set cs, struct pos *p)
+bool
+dangerous_cs (enum confg t)
 {
-  struct frame f1 = k1->f;
-  frame2room (&f1, k0->f.c.room, &f1.c);
-
-  struct coord nc; struct pos np, pm0, pm1;
-  survey (_m, pos, &k0->f, &nc, &pm0, &np);
-  survey (_m, pos, &f1, &nc, &pm1, &np);
-
-  struct pos pi = (pm0.place < pm1.place) ? pm0 : pm1;
-  struct pos pf = (pm0.place > pm1.place) ? pm0 : pm1;
-
-  pi.floor = pf.floor = pm0.floor;
-  if (pm0.floor != pm1.floor) {
-    if  (k0->f.dir == LEFT) {
-      pi.place = 0;
-      pf.place = pm0.place;
-    } else {
-      pi.place = pm0.place;
-      pf.place = PLACES - 1;
-    }
-  }
-
-  for (*p = pi; p->place <= pf.place; prel (p, p, +0, +1))
-    if (cs (con (p)->fg)) return p;
-
-  *p = (struct pos) {-1,-1,-1};
-  return p;
+  return traversable_cs (t)
+    || t == WALL || t == CARPET || t == TCARPET || t == MIRROR || t == CHOPPER;
 }
 
 bool
-unsafe_to_follow_confg_set (enum confg t)
+door_cs (enum confg t)
 {
-  return traversable_confg_set (t)
-    || t == CHOPPER;
+  return t == DOOR;
 }
 
 bool
-is_safe_to_follow (struct anim *k0, struct anim *k1)
+is_safe_to_follow (struct anim *k0, struct anim *k1, enum dir dir)
 {
-  struct pos p;
-  confg_from_anim_to_anim (k0, k1, unsafe_to_follow_confg_set, &p);
-  return p.room == -1;
-}
+  struct coord nc, m0; struct pos np, pm, pme, p;
+  survey (_m, pos, &k0->f, &m0, &np, &pm);
+  survey (_m, pos, &k1->f, &nc, &np, &pme);
 
-bool
-is_enemy_reachable_below (struct anim *k, struct anim *ke)
-{
-  struct coord nc; struct pos np, pm, pme;
-  survey (_m, pos, &k->f, &nc, &pm, &np);
-  survey (_m, pos, &ke->f, &nc, &pme, &np);
+  pos2room (&pme, pm.room, &pme);
 
-  struct pos p;
-  confg_from_anim_to_anim (k, ke, traversable_confg_set, &p);
-  if (p.room == -1) return false;
-  prel (&p, &p, +1, +0);
+  if (pm.room != pme.room) return false;
 
-  return pm.room == pme.room && pm.floor == pme.floor - 1
-    && ! is_traversable (&p) && con (&p)->fg != SPIKES_FLOOR;
+  if (pm.floor == pme.floor && k0->f.dir == dir) {
+    p = pme;
+    if (dir == LEFT) prel (&p, &p, +0, +1);
+    first_confg (&pm, &p, dangerous_cs, &p);
+    if (p.room != -1) return false;
+
+    p = pme;
+    if (dir == RIGHT) prel (&p, &p, +0, -1);
+    first_confg (&pm, &p, door_cs, &p);
+    if (p.room == -1) return true;
+    else return m0.y > door_grid_tip_y (&p) - 10;
+  } else if (pm.floor < pme.floor) {
+    pme.floor = pm.floor;
+    pme.place = (dir == LEFT) ? -PLACES : 2 * PLACES - 1;
+
+    first_confg (&pm, &pme, traversable_cs, &p);
+    if (p.room == -1) return false;
+
+    /* if falling the follow is inevitable (necessary to prevent
+       leave_fight_logic from forgeting enemy based on the facing
+       direction of the is_in_range check) */
+    if (peq (&pm, &p)) return true;
+
+    prel (&p, &p, +1, +0);
+    if (is_traversable (&p) || con (&p)->fg == SPIKES_FLOOR)
+      return false;
+
+    int inc = (dir == LEFT) ? +1 : -1;
+    prel (&p, &pme, -1, inc);
+
+    first_confg (&pm, &pme, dangerous_cs, &p);
+    if (p.room != -1) return false;
+
+    return true;
+  } else return false;
 }
 
 void
@@ -805,9 +832,6 @@ fight_hit (struct anim *k, struct anim *ke)
     forget_enemy (ke);
     anim_die (k);
     upgrade_skill (&ke->skill, &k->skill);
-    if (ke->id == 0
-        && k->death_reason != SHADOW_FIGHT_DEATH)
-      display_skill (ke);
     k->death_reason = FIGHT_DEATH;
   } else anim_sword_hit (k);
 

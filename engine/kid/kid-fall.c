@@ -27,6 +27,7 @@
 #include "engine/potion.h"
 #include "engine/sword.h"
 #include "engine/loose-floor.h"
+#include "engine/spikes-floor.h"
 #include "kid.h"
 
 struct frameset kid_fall_frameset[KID_FALL_FRAMESET_NMEMB];
@@ -277,7 +278,9 @@ physics_in (struct anim *k)
     if (k->current_lives <= 0) {
       stop_sample (k->sample, scream_sample);
       k->p = pmt;
-      if (con (&pmt)->fg == SPIKES_FLOOR) kid_die_spiked (k);
+      if (con (&pmt)->fg == SPIKES_FLOOR
+          && ! spikes_floor_at_pos (&pmt)->inactive)
+        kid_die_spiked (k);
       else {
         play_sample (hit_ground_fatal_sample, k->f.c.room);
         kid_die_suddenly (k);
