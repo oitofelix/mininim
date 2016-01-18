@@ -303,7 +303,12 @@ special_events (void)
     /* level 3 checkpoint */
     p = (struct pos) {2,0,8};
     survey (_m, pos, &k->f, &nc, &pm, &np);
-    if (peq (&pm, &p)) level_3_checkpoint = true;
+    if (peq (&pm, &p)) {
+      level_3_checkpoint = true;
+      total_lives = k->total_lives;
+      current_lives = k->current_lives;
+      skill = k->skill;
+    }
 
     struct anim *s = NULL;
 
