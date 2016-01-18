@@ -739,6 +739,7 @@ end (struct pos *p)
 
   /* end music samples to play per level */
   if (! played_sample) {
+    stop_sample (k->sample, floating_sample);
     switch (level.number) {
     case 1: case 2: case 3: case 5: case 6: case 7:
     case 8: case 9: case 10: case 11: case 12:

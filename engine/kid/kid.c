@@ -526,7 +526,7 @@ float_kid (struct anim *k)
   al_set_timer_count (k->floating, 0);
   al_start_timer (k->floating);
   if (! is_playing_sample (floating_sample))
-    play_sample (floating_sample, k->f.c.room);
+    k->sample = play_sample (floating_sample, k->f.c.room);
   if (k->id == current_kid_id) {
     video_effect.color = get_flicker_float_color ();
     start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.3));

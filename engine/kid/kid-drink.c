@@ -164,9 +164,9 @@ flow (struct anim *k)
       if (screen_flags) screen_flags = 0;
       else {
         switch (prandom_pos (&k->item_pos, 2)) {
-        case 0: screen_flags = ALLEGRO_FLIP_VERTICAL; break;
-        case 1: screen_flags = ALLEGRO_FLIP_HORIZONTAL; break;
-        case 2: screen_flags = ALLEGRO_FLIP_VERTICAL | ALLEGRO_FLIP_HORIZONTAL; break;
+        case 0: screen_flags ^= ALLEGRO_FLIP_VERTICAL; break;
+        case 1: screen_flags ^= ALLEGRO_FLIP_HORIZONTAL; break;
+        case 2: screen_flags ^= ALLEGRO_FLIP_VERTICAL | ALLEGRO_FLIP_HORIZONTAL; break;
         }
       }
       break;

@@ -62,6 +62,7 @@ struct closer_floor {
   bool pressed;
   bool noise;
   bool broken;
+  bool unresponsive;
 };
 
 /* variables */

@@ -621,15 +621,15 @@ bool
 is_seeing (struct anim *k0, struct anim *k1)
 {
   struct coord m0, m1; struct pos np, p, pm0, pm1;
-  survey (_m, pos, &k0->f, &m0, &pm0, &np);
-  survey (_m, pos, &k1->f, &m1, &pm1, &np);
-
-  first_confg (&pm0, &pm1, opaque_cs, &p);
+  survey (_m, pos, &k0->f, &m0, &np, &pm0);
+  survey (_m, pos, &k1->f, &m1, &np, &pm1);
 
   pos2room (&pm1, pm0.room, &pm1);
   coord2room (&m1, pm0.room, &m1);
 
-  return m1.room == m0.room && pm1.floor == pm0.floor
+  first_confg (&pm0, &pm1, opaque_cs, &p);
+
+  return pm0.room == pm1.room && m1.room == m0.room && pm1.floor == pm0.floor
     && ! (k0->f.dir == LEFT && m1.x > m0.x)
     && ! (k0->f.dir == RIGHT && m1.x < m0.x)
     && p.room == -1;
@@ -941,7 +941,7 @@ alert_guards (struct pos *p)
   for (i = 0; i < anima_nmemb; i++) {
     struct anim *g = &anima[i];
     if (is_guard (g) && is_pos_on_back (g, p)
-        && g->enemy_id == -1) {
+        && g->current_lives > 0 && g->enemy_id == -1) {
       g->f.dir = (g->f.dir == LEFT) ? RIGHT : LEFT;
       g->f.flip ^= ALLEGRO_FLIP_HORIZONTAL;
     }

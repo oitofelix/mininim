@@ -148,6 +148,7 @@ register_closer_floor (struct pos *p)
   c.pressed = false;
   c.noise = false;
   c.broken = false;
+  c.unresponsive = false;
 
   closer_floor =
     add_to_array (&c, 1, closer_floor, &closer_floor_nmemb,
@@ -210,7 +211,7 @@ compute_closer_floors (void)
       /* remove_closer_floor (o); i--; */
       continue;
     }
-    if (c->pressed) {
+    if (c->pressed && ! c->unresponsive) {
       if (! c->noise) {
         alert_guards (&c->p);
         play_sample (closer_floor_sample, c->p.room);

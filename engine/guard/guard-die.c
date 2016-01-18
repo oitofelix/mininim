@@ -28,6 +28,7 @@
 #include "engine/sword.h"
 #include "engine/loose-floor.h"
 #include "engine/spikes-floor.h"
+#include "engine/closer-floor.h"
 #include "engine/kid/kid.h"
 #include "engine/fight.h"
 #include "guard.h"
@@ -389,6 +390,9 @@ guard_die_suddenly (struct anim *g)
     g->oenemy_id = -1;
 
     if (ke) upgrade_skill (&ke->skill, &g->skill);
+
+    if (con (&g->p)->fg == CLOSER_FLOOR)
+      closer_floor_at_pos (&g->p)->unresponsive = true;
   }
 
   g->xf.b = NULL;
@@ -438,6 +442,9 @@ flow (struct anim *g)
     g->oenemy_id = -1;
 
     if (ke) upgrade_skill (&ke->skill, &g->skill);
+
+    if (con (&g->p)->fg == CLOSER_FLOOR)
+      closer_floor_at_pos (&g->p)->unresponsive = true;
 
     g->xf.b = NULL;
   }
