@@ -27,6 +27,7 @@
 #include "kid/kid.h"
 #include "level.h"
 #include "door.h"
+#include "fight.h"
 #include "level-door.h"
 
 /* dungeon cga */
@@ -248,7 +249,10 @@ compute_doors (void)
         d->wait--;
       }
       else if (d->i > 0) {
-        if (d->i % 2 == 0) play_sample (door_open_sample, d->p.room);
+        if (d->i % 2 == 0) {
+          if (d->i == DOOR_MAX_STEP - 1) alert_guards (&d->p);
+          play_sample (door_open_sample, d->p.room);
+        }
         d->i--;
         d->wait = DOOR_WAIT;
       }
@@ -256,6 +260,7 @@ compute_doors (void)
     case CLOSE_DOOR:
       if (d->i < DOOR_MAX_STEP) {
         if (d->wait++ % 4 == 0) {
+          if (d->i == 0) alert_guards (&d->p);
           play_sample (door_close_sample, d->p.room);
           d->i++;
           d->noise = false;
@@ -273,6 +278,7 @@ compute_doors (void)
         d->i += r ? r : 12;
         if (d->i >= DOOR_MAX_STEP) {
           d->i = DOOR_MAX_STEP;
+          alert_guards (&d->p);
           play_sample (door_abruptly_close_sample, d->p.room);
         }
       } else {

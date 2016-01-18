@@ -261,14 +261,14 @@ start (void)
   }
 
   /* temporary placement for test */
-  /* if (level.number == 13) { */
+  /* if (level.number == 7) { */
   /*   /\* kid *\/ */
-  /*   struct pos p = {3,0,7}; */
+  /*   struct pos p = {10,1,4}; */
   /*   k->f.dir = RIGHT; */
   /*   place_frame (&k->f, &k->f, kid_normal_00, &p, */
   /*                k->f.dir == LEFT ? +22 : +31, +15); */
   /*   k->action = kid_normal; */
-  /*   room_view = 3; */
+  /*   room_view = p.room; */
   /* } */
 }
 

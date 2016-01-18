@@ -114,6 +114,7 @@ struct chopper {
   bool blood;
   bool activate;
   bool inactive;
+  bool alert;
 };
 
 /* variables */

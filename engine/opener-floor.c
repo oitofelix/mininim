@@ -27,6 +27,7 @@
 #include "level.h"
 #include "floor.h"
 #include "kid/kid.h"
+#include "fight.h"
 #include "door.h"
 #include "floor.h"
 #include "opener-floor.h"
@@ -213,6 +214,7 @@ compute_opener_floors (void)
     }
     if (o->pressed || o->broken) {
       if (! o->noise) {
+        alert_guards (&o->p);
         play_sample (opener_floor_sample, o->p.room);
         o->noise = true;
       }

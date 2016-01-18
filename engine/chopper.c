@@ -27,6 +27,7 @@
 #include "loose-floor.h"
 #include "kid/kid.h"
 #include "guard/guard.h"
+#include "fight.h"
 #include "level.h"
 #include "chopper.h"
 
@@ -314,6 +315,7 @@ register_chopper (struct pos *p)
   c.wait = CHOPPER_WAIT;
   c.blood = con (p)->ext.step & 0x80;
   c.inactive = (step >= 5);
+  c.alert = false;
 
   chopper =
     add_to_array (&c, 1, chopper, &chopper_nmemb, chopper_nmemb, sizeof (c));
@@ -374,11 +376,17 @@ compute_choppers (void)
     }
     switch (c->i) {
     case 0:
+      if (! c->alert) c->alert = ! should_chomp (&c->p);
       if ((c->wait-- <= 0 && should_chomp (&c->p)
            && (anim_cycle % CHOPPER_WAIT) ==
            prandom_pos (&c->p, CHOPPER_WAIT - 1))
           || c->activate) c->i++; break;
-    case 1: c->i++; play_sample (chopper_sample, c->p.room); break;
+    case 1: c->i++;
+      if (c->alert) {
+        alert_guards (&c->p);
+        c->alert = false;
+      }
+      play_sample (chopper_sample, c->p.room); break;
     case 2: c->i++; break;
     case 3: c->i++; break;
     case 4: c->i = 0; c->wait = CHOPPER_WAIT; c->activate = false;
@@ -417,7 +425,8 @@ compute_choppers (void)
           video_effect.color = get_flicker_blood_color ();
           start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
         }
-        if (a->type == SKELETON) play_sample (skeleton_sample, a->f.c.room);
+        if (a->type == SKELETON)
+          play_sample (skeleton_sample, a->f.c.room);
         else play_sample (chopped_sample, c->p.room);
         anim_die_chopped (a);
       }

@@ -26,13 +26,14 @@
 #include "anim.h"
 #include "physics.h"
 #include "kid/kid.h"
+#include "fight.h"
 #include "room.h"
 #include "floor.h"
 #include "broken-floor.h"
-#include "loose-floor.h"
 #include "opener-floor.h"
 #include "closer-floor.h"
 #include "spikes-floor.h"
+#include "loose-floor.h"
 
 /* dungeon cga */
 ALLEGRO_BITMAP *dc_loose_floor_left_01, *dc_loose_floor_right_01,
@@ -390,6 +391,7 @@ compute_loose_floor_shake (struct loose_floor *l)
 {
   switch (l->i) {
   case 0: l->state = 1;
+    alert_guards (&l->p);
     sample_random_loose_floor (l->p.room); l->i++; break;
   case 1: l->state = 0; l->i++; break;
   case 2: l->state = 2;
@@ -408,6 +410,7 @@ compute_loose_floor_release (struct loose_floor *l)
   }
   switch (l->i) {
   case 0: l->state = 1;
+    alert_guards (&l->p);
     sample_random_loose_floor (l->p.room); l->i++; break;
   case 1: l->state = 0; l->i++; break;
   case 2: l->state = 2;
@@ -530,6 +533,7 @@ compute_loose_floor_fall (struct loose_floor *l)
          while jumping, for example) */
       place_on_the_ground (&a->f, &a->f.c);
       play_sample (hit_wall_sample, kpmt.room);
+      alert_guards (&kpmt);
       if (a->id == current_kid_id) {
         video_effect.color = get_flicker_blood_color ();
         start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
@@ -571,6 +575,7 @@ compute_loose_floor_fall (struct loose_floor *l)
       con (&fpmbo_f)->fg = NO_FLOOR;
       must_sort = true;
       play_sample (broken_floor_sample, p.room);
+      alert_guards (&p);
       return;
     case OPENER_FLOOR: break_opener_floor (&fpmbo_f); break;
     case CLOSER_FLOOR: break_closer_floor (&fpmbo_f); break;
@@ -587,6 +592,7 @@ compute_loose_floor_fall (struct loose_floor *l)
   must_remove = true;
   must_sort = true;
   play_sample (broken_floor_sample, p.room);
+  alert_guards (&p);
 }
 
 void

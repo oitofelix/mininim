@@ -25,6 +25,7 @@
 #include "anim.h"
 #include "kid/kid.h"
 #include "floor.h"
+#include "fight.h"
 #include "spikes-floor.h"
 
 /* dungeon cga */
@@ -424,6 +425,7 @@ compute_spikes_floors (void)
     }
     switch (s->i) {
     case 0: if (should_spikes_raise (&s->p) || s->activate) {
+        alert_guards (&s->p);
         play_sample (spikes_sample, s->p.room);
         s->i++;
         s->wait = 12;

@@ -55,6 +55,7 @@ bool opaque_cs (enum confg t);
 bool is_seeing (struct anim *k0, struct anim *k1);
 bool is_hearing (struct anim *k0, struct anim *k1);
 bool is_on_back (struct anim *k0, struct anim *k1);
+bool is_pos_on_back (struct anim *k, struct pos *p);
 bool is_near (struct anim *k0, struct anim *k1);
 bool is_safe_to_walkf (struct anim *k);
 bool is_safe_to_walkb (struct anim *k);
@@ -71,6 +72,7 @@ void fight_walkb (struct anim *k);
 void fight_hit (struct anim *k, struct anim *ke);
 enum confg fight_crel (struct anim *k, int floor, int place);
 bool fight_door_split_collision (struct anim *a);
+void alert_guards (struct pos *p);
 
 struct skill *get_perfect_skill (struct skill *fp);
 struct skill *upgrade_skill (struct skill *s0, struct skill *s1);

@@ -656,6 +656,19 @@ is_hearing (struct anim *k0, struct anim *k1)
 }
 
 bool
+is_pos_on_back (struct anim *k, struct pos *p)
+{
+  struct coord nc; struct pos np, pm, pv;
+  survey (_m, pos, &k->f, &nc, &pm, &np);
+
+  pos2room (p, pm.room, &pv);
+
+  return pm.room == pv.room
+    && ((k->f.dir == LEFT && pv.place > pm.place)
+        || (k->f.dir == RIGHT && pv.place < pm.place));
+}
+
+bool
 is_on_back (struct anim *k0, struct anim *k1)
 {
   struct coord m0, m1; struct pos np, pm0, pm1;
@@ -919,4 +932,18 @@ upgrade_skill (struct skill *s0, struct skill *s1)
     s0->counter_defense_prob += 1;
 
   return s0;
+}
+
+void
+alert_guards (struct pos *p)
+{
+  int i;
+  for (i = 0; i < anima_nmemb; i++) {
+    struct anim *g = &anima[i];
+    if (is_guard (g) && is_pos_on_back (g, p)
+        && g->enemy_id == -1) {
+      g->f.dir = (g->f.dir == LEFT) ? RIGHT : LEFT;
+      g->f.flip ^= ALLEGRO_FLIP_HORIZONTAL;
+    }
+  }
 }

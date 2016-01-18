@@ -26,6 +26,7 @@
 #include "kid/kid.h"
 #include "door.h"
 #include "floor.h"
+#include "fight.h"
 #include "closer-floor.h"
 
 /* dungeon cga */
@@ -211,6 +212,7 @@ compute_closer_floors (void)
     }
     if (c->pressed) {
       if (! c->noise) {
+        alert_guards (&c->p);
         play_sample (closer_floor_sample, c->p.room);
         c->noise = true;
       }

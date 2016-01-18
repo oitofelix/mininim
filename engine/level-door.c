@@ -25,6 +25,7 @@
 #include "floor.h"
 #include "loose-floor.h"
 #include "kid/kid.h"
+#include "fight.h"
 #include "level.h"
 #include "level-door.h"
 
@@ -225,12 +226,18 @@ compute_level_doors (void)
     }
     switch (d->action) {
     case OPEN_LEVEL_DOOR:
-      if (d->i % 5 == 2 && d->i > 2) play_sample (level_door_open_sample, d->p.room);
+      if (d->i % 5 == 2 && d->i > 2) {
+        if (d->i == LEVEL_DOOR_MAX_STEP - 1) alert_guards (&d->p);
+        play_sample (level_door_open_sample, d->p.room);
+      }
       if (d->i > 0) d->i--;
       else d->action = NO_LEVEL_DOOR_ACTION;
       break;
     case CLOSE_LEVEL_DOOR:
-      if (d->i == 0) play_sample (level_door_open_sample, d->p.room);
+      if (d->i == 0) {
+        alert_guards (&d->p);
+        play_sample (level_door_open_sample, d->p.room);
+      }
       if (d->i < LEVEL_DOOR_MAX_STEP) {
         int r = 14 - (d->i % 15);
         d->i += r ? r : 15;
