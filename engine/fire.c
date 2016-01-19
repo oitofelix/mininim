@@ -29,13 +29,14 @@ static ALLEGRO_COLOR e_fire_palette (ALLEGRO_COLOR c);
 static ALLEGRO_COLOR c_fire_palette (ALLEGRO_COLOR c);
 
 /* vga */
-static ALLEGRO_BITMAP *v_fire_01, *v_fire_02, *v_fire_03, *v_fire_04,
-  *v_fire_05, *v_fire_06, *v_fire_07, *v_fire_08, *v_fire_09;
+static ALLEGRO_BITMAP *v_fire_00, *v_fire_01, *v_fire_02, *v_fire_03,
+  *v_fire_04, *v_fire_05, *v_fire_06, *v_fire_07, *v_fire_08;
 
 void
 load_fire (void)
 {
   /* vga */
+  v_fire_00 = load_bitmap (V_FIRE_00);
   v_fire_01 = load_bitmap (V_FIRE_01);
   v_fire_02 = load_bitmap (V_FIRE_02);
   v_fire_03 = load_bitmap (V_FIRE_03);
@@ -44,13 +45,13 @@ load_fire (void)
   v_fire_06 = load_bitmap (V_FIRE_06);
   v_fire_07 = load_bitmap (V_FIRE_07);
   v_fire_08 = load_bitmap (V_FIRE_08);
-  v_fire_09 = load_bitmap (V_FIRE_09);
 }
 
 void
 unload_fire (void)
 {
   /* vga */
+  al_destroy_bitmap (v_fire_00);
   al_destroy_bitmap (v_fire_01);
   al_destroy_bitmap (v_fire_02);
   al_destroy_bitmap (v_fire_03);
@@ -59,7 +60,6 @@ unload_fire (void)
   al_destroy_bitmap (v_fire_06);
   al_destroy_bitmap (v_fire_07);
   al_destroy_bitmap (v_fire_08);
-  al_destroy_bitmap (v_fire_09);
 }
 
 static ALLEGRO_BITMAP *
@@ -68,15 +68,15 @@ get_fire_frame (int i, enum vm vm)
   ALLEGRO_BITMAP *fire = NULL;
 
   switch (i) {
-  case 0: fire = v_fire_01; break;
-  case 1: fire = v_fire_02; break;
-  case 2: fire = v_fire_03; break;
-  case 3: fire = v_fire_04; break;
-  case 4: fire = v_fire_05; break;
-  case 5: fire = v_fire_06; break;
-  case 6: fire = v_fire_07; break;
-  case 7: fire = v_fire_08; break;
-  case 8: fire = v_fire_09; break;
+  case 0: fire = v_fire_00; break;
+  case 1: fire = v_fire_01; break;
+  case 2: fire = v_fire_02; break;
+  case 3: fire = v_fire_03; break;
+  case 4: fire = v_fire_04; break;
+  case 5: fire = v_fire_05; break;
+  case 6: fire = v_fire_06; break;
+  case 7: fire = v_fire_07; break;
+  case 8: fire = v_fire_08; break;
   }
 
   switch (vm) {

@@ -25,6 +25,7 @@
 #define FIRE_RANDOM_SEED_1 501477214
 
 /* vga */
+#define V_FIRE_00 "data/fire/v-00.png"
 #define V_FIRE_01 "data/fire/v-01.png"
 #define V_FIRE_02 "data/fire/v-02.png"
 #define V_FIRE_03 "data/fire/v-03.png"
@@ -33,7 +34,6 @@
 #define V_FIRE_06 "data/fire/v-06.png"
 #define V_FIRE_07 "data/fire/v-07.png"
 #define V_FIRE_08 "data/fire/v-08.png"
-#define V_FIRE_09 "data/fire/v-09.png"
 
 void load_fire (void);
 void unload_fire (void);
