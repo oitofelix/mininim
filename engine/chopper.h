@@ -25,6 +25,8 @@
 #define CHOPPER_WAIT 10
 
 /* dungeon cga */
+#define DC_CHOPPER_00 "data/chopper/dc-00.png"
+#define DC_CHOPPER_FG_00 "data/chopper/dc-fg-00.png"
 #define DC_CHOPPER_01 "data/chopper/dc-01.png"
 #define DC_CHOPPER_FG_01 "data/chopper/dc-fg-01.png"
 #define DC_CHOPPER_02 "data/chopper/dc-02.png"
@@ -33,10 +35,10 @@
 #define DC_CHOPPER_FG_03 "data/chopper/dc-fg-03.png"
 #define DC_CHOPPER_04 "data/chopper/dc-04.png"
 #define DC_CHOPPER_FG_04 "data/chopper/dc-fg-04.png"
-#define DC_CHOPPER_05 "data/chopper/dc-05.png"
-#define DC_CHOPPER_FG_05 "data/chopper/dc-fg-05.png"
 
 /* palace cga */
+#define PC_CHOPPER_00 "data/chopper/pc-00.png"
+#define PC_CHOPPER_FG_00 "data/chopper/pc-fg-00.png"
 #define PC_CHOPPER_01 "data/chopper/pc-01.png"
 #define PC_CHOPPER_FG_01 "data/chopper/pc-fg-01.png"
 #define PC_CHOPPER_02 "data/chopper/pc-02.png"
@@ -45,10 +47,10 @@
 #define PC_CHOPPER_FG_03 "data/chopper/pc-fg-03.png"
 #define PC_CHOPPER_04 "data/chopper/pc-04.png"
 #define PC_CHOPPER_FG_04 "data/chopper/pc-fg-04.png"
-#define PC_CHOPPER_05 "data/chopper/pc-05.png"
-#define PC_CHOPPER_FG_05 "data/chopper/pc-fg-05.png"
 
 /* dungeon ega */
+#define DE_CHOPPER_00 "data/chopper/de-00.png"
+#define DE_CHOPPER_FG_00 "data/chopper/de-fg-00.png"
 #define DE_CHOPPER_01 "data/chopper/de-01.png"
 #define DE_CHOPPER_FG_01 "data/chopper/de-fg-01.png"
 #define DE_CHOPPER_02 "data/chopper/de-02.png"
@@ -57,10 +59,10 @@
 #define DE_CHOPPER_FG_03 "data/chopper/de-fg-03.png"
 #define DE_CHOPPER_04 "data/chopper/de-04.png"
 #define DE_CHOPPER_FG_04 "data/chopper/de-fg-04.png"
-#define DE_CHOPPER_05 "data/chopper/de-05.png"
-#define DE_CHOPPER_FG_05 "data/chopper/de-fg-05.png"
 
 /* palace ega */
+#define PE_CHOPPER_00 "data/chopper/pe-00.png"
+#define PE_CHOPPER_FG_00 "data/chopper/pe-fg-00.png"
 #define PE_CHOPPER_01 "data/chopper/pe-01.png"
 #define PE_CHOPPER_FG_01 "data/chopper/pe-fg-01.png"
 #define PE_CHOPPER_02 "data/chopper/pe-02.png"
@@ -69,10 +71,10 @@
 #define PE_CHOPPER_FG_03 "data/chopper/pe-fg-03.png"
 #define PE_CHOPPER_04 "data/chopper/pe-04.png"
 #define PE_CHOPPER_FG_04 "data/chopper/pe-fg-04.png"
-#define PE_CHOPPER_05 "data/chopper/pe-05.png"
-#define PE_CHOPPER_FG_05 "data/chopper/pe-fg-05.png"
 
 /* dungeon vga */
+#define DV_CHOPPER_00 "data/chopper/dv-00.png"
+#define DV_CHOPPER_FG_00 "data/chopper/dv-fg-00.png"
 #define DV_CHOPPER_01 "data/chopper/dv-01.png"
 #define DV_CHOPPER_FG_01 "data/chopper/dv-fg-01.png"
 #define DV_CHOPPER_02 "data/chopper/dv-02.png"
@@ -81,10 +83,10 @@
 #define DV_CHOPPER_FG_03 "data/chopper/dv-fg-03.png"
 #define DV_CHOPPER_04 "data/chopper/dv-04.png"
 #define DV_CHOPPER_FG_04 "data/chopper/dv-fg-04.png"
-#define DV_CHOPPER_05 "data/chopper/dv-05.png"
-#define DV_CHOPPER_FG_05 "data/chopper/dv-fg-05.png"
 
 /* palace vga */
+#define PV_CHOPPER_00 "data/chopper/pv-00.png"
+#define PV_CHOPPER_FG_00 "data/chopper/pv-fg-00.png"
 #define PV_CHOPPER_01 "data/chopper/pv-01.png"
 #define PV_CHOPPER_FG_01 "data/chopper/pv-fg-01.png"
 #define PV_CHOPPER_02 "data/chopper/pv-02.png"
@@ -93,15 +95,13 @@
 #define PV_CHOPPER_FG_03 "data/chopper/pv-fg-03.png"
 #define PV_CHOPPER_04 "data/chopper/pv-04.png"
 #define PV_CHOPPER_FG_04 "data/chopper/pv-fg-04.png"
-#define PV_CHOPPER_05 "data/chopper/pv-05.png"
-#define PV_CHOPPER_FG_05 "data/chopper/pv-fg-05.png"
 
 /* palettable */
+#define CHOPPER_BLOOD_00 "data/chopper/blood-00.png"
 #define CHOPPER_BLOOD_01 "data/chopper/blood-01.png"
 #define CHOPPER_BLOOD_02 "data/chopper/blood-02.png"
 #define CHOPPER_BLOOD_03 "data/chopper/blood-03.png"
 #define CHOPPER_BLOOD_04 "data/chopper/blood-04.png"
-#define CHOPPER_BLOOD_05 "data/chopper/blood-05.png"
 
 /* types */
 struct chopper {
