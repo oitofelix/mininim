@@ -876,9 +876,9 @@ load_legacy_level (int number)
           case LM_FREE_NOTHING_DUNGEON_BLUE_LINE_PALACE: /* ok */
             c->bg = (t == LT_EMPTY) ? NO_BRICKS : NO_BG; break;
           case LM_FREE_SPOT1_DUNGEON_NO_BLUE_LINE_PALACE: /* ok */
-            c->bg = (t == LT_EMPTY) ? BRICKS_03 : BRICKS_01; break;
+            c->bg = (t == LT_EMPTY) ? BRICKS_02 : BRICKS_00; break;
           case LM_FREE_SPOT2_DUNGEON_BLUE_LINE2_PALACE: /* ok */
-            c->bg = (t == LT_EMPTY) ? BRICKS_04 : BRICKS_02; break;
+            c->bg = (t == LT_EMPTY) ? BRICKS_03 : BRICKS_01; break;
           case LM_FREE_WINDOW: c->bg = WINDOW; break;
           case LM_FREE_SPOT3_DUNGEON_BLUE_LINE_PALACE: /* ok */
             c->bg = (t == LT_EMPTY) ? NO_BRICKS : NO_BG; break;

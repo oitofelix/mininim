@@ -522,10 +522,10 @@ struct level {
     } fg;
     enum conbg {
       NO_BG,
+      BRICKS_00,
       BRICKS_01,
       BRICKS_02,
       BRICKS_03,
-      BRICKS_04,
       NO_BRICKS,
       TORCH,
       WINDOW,

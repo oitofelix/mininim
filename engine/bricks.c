@@ -29,11 +29,11 @@
 #include "bricks.h"
 
 /* dungeon vga */
-ALLEGRO_BITMAP *dv_bricks_01, *dv_bricks_02,
-  *dv_bricks_03, *dv_bricks_04;
+ALLEGRO_BITMAP *dv_bricks_00, *dv_bricks_01,
+  *dv_bricks_02, *dv_bricks_03;
 
 /* palace vga */
-ALLEGRO_BITMAP *pv_bricks_01, *pv_bricks_02;
+ALLEGRO_BITMAP *pv_bricks_00, *pv_bricks_01;
 
 static struct coord *d_bricks_coord_01 (struct pos *p, struct coord *c);
 static struct coord *p_bricks_coord_01 (struct pos *p, struct coord *c);
@@ -53,28 +53,28 @@ void
 load_bricks (void)
 {
   /* dungeon vga */
+  dv_bricks_00 = load_bitmap (DV_BRICKS_00);
   dv_bricks_01 = load_bitmap (DV_BRICKS_01);
   dv_bricks_02 = load_bitmap (DV_BRICKS_02);
   dv_bricks_03 = load_bitmap (DV_BRICKS_03);
-  dv_bricks_04 = load_bitmap (DV_BRICKS_04);
 
   /* palace vga */
+  pv_bricks_00 = load_bitmap (PV_BRICKS_00);
   pv_bricks_01 = load_bitmap (PV_BRICKS_01);
-  pv_bricks_02 = load_bitmap (PV_BRICKS_02);
 }
 
 void
 unload_bricks (void)
 {
   /* dungeon vga */
+  al_destroy_bitmap (dv_bricks_00);
   al_destroy_bitmap (dv_bricks_01);
   al_destroy_bitmap (dv_bricks_02);
   al_destroy_bitmap (dv_bricks_03);
-  al_destroy_bitmap (dv_bricks_04);
 
   /* palace vga */
+  al_destroy_bitmap (pv_bricks_00);
   al_destroy_bitmap (pv_bricks_01);
-  al_destroy_bitmap (pv_bricks_02);
 }
 
 palette
@@ -100,7 +100,7 @@ get_palette (enum em em, enum vm vm)
 }
 
 void
-draw_bricks_01 (ALLEGRO_BITMAP *bitmap, struct pos *p,
+draw_bricks_00 (ALLEGRO_BITMAP *bitmap, struct pos *p,
                 enum em em, enum vm vm)
 {
   pos2coord_f bricks_coord = NULL;
@@ -108,8 +108,32 @@ draw_bricks_01 (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (em == DUNGEON) {
     bricks_coord = d_bricks_coord_01;
-    bricks = dv_bricks_01;
+    bricks = dv_bricks_00;
   } else return;
+
+  palette pal = get_palette (em, vm);
+  bricks = apply_palette (bricks, pal);
+
+  if (hgc) bricks = apply_palette (bricks, hgc_palette);
+
+  struct coord c;
+  draw_bitmapc (bricks, bitmap, bricks_coord (p, &c) , 0);
+}
+
+void
+draw_bricks_01 (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                enum em em, enum vm vm)
+{
+  pos2coord_f bricks_coord = NULL;
+  ALLEGRO_BITMAP *bricks = NULL;
+
+  if (em == DUNGEON) {
+    bricks_coord = d_bricks_coord_02;
+    bricks = dv_bricks_01;
+  } else {
+    bricks_coord = p_bricks_coord_02;
+    bricks = pv_bricks_01;
+  }
 
   palette pal = get_palette (em, vm);
   bricks = apply_palette (bricks, pal);
@@ -128,11 +152,11 @@ draw_bricks_02 (ALLEGRO_BITMAP *bitmap, struct pos *p,
   ALLEGRO_BITMAP *bricks = NULL;
 
   if (em == DUNGEON) {
-    bricks_coord = d_bricks_coord_02;
+    bricks_coord = d_bricks_coord_03;
     bricks = dv_bricks_02;
   } else {
-    bricks_coord = p_bricks_coord_02;
-    bricks = pv_bricks_02;
+    bricks_coord = p_bricks_coord_01;
+    bricks = pv_bricks_00;
   }
 
   palette pal = get_palette (em, vm);
@@ -152,35 +176,11 @@ draw_bricks_03 (ALLEGRO_BITMAP *bitmap, struct pos *p,
   ALLEGRO_BITMAP *bricks = NULL;
 
   if (em == DUNGEON) {
-    bricks_coord = d_bricks_coord_03;
+    bricks_coord = d_bricks_coord_04;
     bricks = dv_bricks_03;
   } else {
-    bricks_coord = p_bricks_coord_01;
-    bricks = pv_bricks_01;
-  }
-
-  palette pal = get_palette (em, vm);
-  bricks = apply_palette (bricks, pal);
-
-  if (hgc) bricks = apply_palette (bricks, hgc_palette);
-
-  struct coord c;
-  draw_bitmapc (bricks, bitmap, bricks_coord (p, &c) , 0);
-}
-
-void
-draw_bricks_04 (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                enum em em, enum vm vm)
-{
-  pos2coord_f bricks_coord = NULL;
-  ALLEGRO_BITMAP *bricks = NULL;
-
-  if (em == DUNGEON) {
-    bricks_coord = d_bricks_coord_04;
-    bricks = dv_bricks_04;
-  } else {
     bricks_coord = p_bricks_coord_02;
-    bricks = pv_bricks_02;
+    bricks = pv_bricks_01;
   }
 
   palette pal = get_palette (em, vm);

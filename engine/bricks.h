@@ -21,24 +21,24 @@
 #define MININIM_BRICKS_H
 
 /* dungeon vga */
+#define DV_BRICKS_00 "data/bricks/dv-00.png"
 #define DV_BRICKS_01 "data/bricks/dv-01.png"
 #define DV_BRICKS_02 "data/bricks/dv-02.png"
 #define DV_BRICKS_03 "data/bricks/dv-03.png"
-#define DV_BRICKS_04 "data/bricks/dv-04.png"
 
 /* palace vga */
+#define PV_BRICKS_00 "data/bricks/pv-00.png"
 #define PV_BRICKS_01 "data/bricks/pv-01.png"
-#define PV_BRICKS_02 "data/bricks/pv-02.png"
 
 void load_bricks (void);
 void unload_bricks (void);
+void draw_bricks_00 (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                     enum em em, enum vm vm);
 void draw_bricks_01 (ALLEGRO_BITMAP *bitmap, struct pos *p,
                      enum em em, enum vm vm);
 void draw_bricks_02 (ALLEGRO_BITMAP *bitmap, struct pos *p,
                      enum em em, enum vm vm);
 void draw_bricks_03 (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                     enum em em, enum vm vm);
-void draw_bricks_04 (ALLEGRO_BITMAP *bitmap, struct pos *p,
                      enum em em, enum vm vm);
 
 #endif	/* MININIM_BRICKS_H */
