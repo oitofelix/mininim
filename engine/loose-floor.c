@@ -37,34 +37,34 @@
 #include "loose-floor.h"
 
 /* dungeon cga */
-ALLEGRO_BITMAP *dc_loose_floor_left_01, *dc_loose_floor_right_01,
-  *dc_loose_floor_base_01, *dc_loose_floor_left_02, *dc_loose_floor_right_02,
-  *dc_loose_floor_base_02, *dc_loose_floor_02, *dc_broken_floor;
+ALLEGRO_BITMAP *dc_loose_floor_left_00, *dc_loose_floor_right_00,
+  *dc_loose_floor_base_00, *dc_loose_floor_left_01, *dc_loose_floor_right_01,
+  *dc_loose_floor_base_01, *dc_loose_floor_02, *dc_broken_floor;
 
 /* palace cga */
-ALLEGRO_BITMAP *pc_loose_floor_left_01, *pc_loose_floor_right_01,
-  *pc_loose_floor_base_01, *pc_loose_floor_left_02, *pc_loose_floor_right_02,
-  *pc_loose_floor_base_02, *pc_loose_floor_02, *pc_broken_floor;
+ALLEGRO_BITMAP *pc_loose_floor_left_00, *pc_loose_floor_right_00,
+  *pc_loose_floor_base_00, *pc_loose_floor_left_01, *pc_loose_floor_right_01,
+  *pc_loose_floor_base_01, *pc_loose_floor_02, *pc_broken_floor;
 
 /* dungeon ega */
-ALLEGRO_BITMAP *de_loose_floor_left_01, *de_loose_floor_right_01,
-  *de_loose_floor_base_01, *de_loose_floor_left_02, *de_loose_floor_right_02,
-  *de_loose_floor_base_02, *de_loose_floor_02, *de_broken_floor;
+ALLEGRO_BITMAP *de_loose_floor_left_00, *de_loose_floor_right_00,
+  *de_loose_floor_base_00, *de_loose_floor_left_01, *de_loose_floor_right_01,
+  *de_loose_floor_base_01, *de_loose_floor_02, *de_broken_floor;
 
 /* palace ega */
-ALLEGRO_BITMAP *pe_loose_floor_left_01, *pe_loose_floor_right_01,
-  *pe_loose_floor_base_01, *pe_loose_floor_left_02, *pe_loose_floor_right_02,
-  *pe_loose_floor_base_02, *pe_loose_floor_02, *pe_broken_floor;
+ALLEGRO_BITMAP *pe_loose_floor_left_00, *pe_loose_floor_right_00,
+  *pe_loose_floor_base_00, *pe_loose_floor_left_01, *pe_loose_floor_right_01,
+  *pe_loose_floor_base_01, *pe_loose_floor_02, *pe_broken_floor;
 
 /* dungeon vga */
-ALLEGRO_BITMAP *dv_loose_floor_left_01, *dv_loose_floor_right_01,
-  *dv_loose_floor_base_01, *dv_loose_floor_left_02, *dv_loose_floor_right_02,
-  *dv_loose_floor_base_02, *dv_loose_floor_02, *dv_broken_floor;
+ALLEGRO_BITMAP *dv_loose_floor_left_00, *dv_loose_floor_right_00,
+  *dv_loose_floor_base_00, *dv_loose_floor_left_01, *dv_loose_floor_right_01,
+  *dv_loose_floor_base_01, *dv_loose_floor_02, *dv_broken_floor;
 
 /* palace vga */
-ALLEGRO_BITMAP *pv_loose_floor_left_01, *pv_loose_floor_right_01,
-  *pv_loose_floor_base_01, *pv_loose_floor_left_02, *pv_loose_floor_right_02,
-  *pv_loose_floor_base_02, *pv_loose_floor_02, *pv_broken_floor;
+ALLEGRO_BITMAP *pv_loose_floor_left_00, *pv_loose_floor_right_00,
+  *pv_loose_floor_base_00, *pv_loose_floor_left_01, *pv_loose_floor_right_01,
+  *pv_loose_floor_base_01, *pv_loose_floor_02, *pv_broken_floor;
 
 struct loose_floor *loose_floor = NULL;
 size_t loose_floor_nmemb = 0;
@@ -74,62 +74,62 @@ void
 load_loose_floor (void)
 {
   /* dungeon cga */
+  dc_loose_floor_left_00 = load_bitmap (DC_LOOSE_FLOOR_LEFT_00);
+  dc_loose_floor_right_00 = load_bitmap (DC_LOOSE_FLOOR_RIGHT_00);
+  dc_loose_floor_base_00 = load_bitmap (DC_LOOSE_FLOOR_BASE_00);
   dc_loose_floor_left_01 = load_bitmap (DC_LOOSE_FLOOR_LEFT_01);
   dc_loose_floor_right_01 = load_bitmap (DC_LOOSE_FLOOR_RIGHT_01);
   dc_loose_floor_base_01 = load_bitmap (DC_LOOSE_FLOOR_BASE_01);
-  dc_loose_floor_left_02 = load_bitmap (DC_LOOSE_FLOOR_LEFT_02);
-  dc_loose_floor_right_02 = load_bitmap (DC_LOOSE_FLOOR_RIGHT_02);
-  dc_loose_floor_base_02 = load_bitmap (DC_LOOSE_FLOOR_BASE_02);
   dc_loose_floor_02 = create_loose_floor_02_bitmap (DUNGEON, CGA);
   dc_broken_floor = create_broken_floor_bitmap (DUNGEON, CGA);
 
   /* palace cga */
+  pc_loose_floor_left_00 = load_bitmap (PC_LOOSE_FLOOR_LEFT_00);
+  pc_loose_floor_right_00 = load_bitmap (PC_LOOSE_FLOOR_RIGHT_00);
+  pc_loose_floor_base_00 = load_bitmap (PC_LOOSE_FLOOR_BASE_00);
   pc_loose_floor_left_01 = load_bitmap (PC_LOOSE_FLOOR_LEFT_01);
   pc_loose_floor_right_01 = load_bitmap (PC_LOOSE_FLOOR_RIGHT_01);
   pc_loose_floor_base_01 = load_bitmap (PC_LOOSE_FLOOR_BASE_01);
-  pc_loose_floor_left_02 = load_bitmap (PC_LOOSE_FLOOR_LEFT_02);
-  pc_loose_floor_right_02 = load_bitmap (PC_LOOSE_FLOOR_RIGHT_02);
-  pc_loose_floor_base_02 = load_bitmap (PC_LOOSE_FLOOR_BASE_02);
   pc_loose_floor_02 = create_loose_floor_02_bitmap (PALACE, CGA);
   pc_broken_floor = create_broken_floor_bitmap (PALACE, CGA);
 
   /* dungeon ega */
+  de_loose_floor_left_00 = load_bitmap (DE_LOOSE_FLOOR_LEFT_00);
+  de_loose_floor_right_00 = load_bitmap (DE_LOOSE_FLOOR_RIGHT_00);
+  de_loose_floor_base_00 = load_bitmap (DE_LOOSE_FLOOR_BASE_00);
   de_loose_floor_left_01 = load_bitmap (DE_LOOSE_FLOOR_LEFT_01);
   de_loose_floor_right_01 = load_bitmap (DE_LOOSE_FLOOR_RIGHT_01);
   de_loose_floor_base_01 = load_bitmap (DE_LOOSE_FLOOR_BASE_01);
-  de_loose_floor_left_02 = load_bitmap (DE_LOOSE_FLOOR_LEFT_02);
-  de_loose_floor_right_02 = load_bitmap (DE_LOOSE_FLOOR_RIGHT_02);
-  de_loose_floor_base_02 = load_bitmap (DE_LOOSE_FLOOR_BASE_02);
   de_loose_floor_02 = create_loose_floor_02_bitmap (DUNGEON, EGA);
   de_broken_floor = create_broken_floor_bitmap (DUNGEON, EGA);
 
   /* palace ega */
+  pe_loose_floor_left_00 = load_bitmap (PE_LOOSE_FLOOR_LEFT_00);
+  pe_loose_floor_right_00 = load_bitmap (PE_LOOSE_FLOOR_RIGHT_00);
+  pe_loose_floor_base_00 = load_bitmap (PE_LOOSE_FLOOR_BASE_00);
   pe_loose_floor_left_01 = load_bitmap (PE_LOOSE_FLOOR_LEFT_01);
   pe_loose_floor_right_01 = load_bitmap (PE_LOOSE_FLOOR_RIGHT_01);
   pe_loose_floor_base_01 = load_bitmap (PE_LOOSE_FLOOR_BASE_01);
-  pe_loose_floor_left_02 = load_bitmap (PE_LOOSE_FLOOR_LEFT_02);
-  pe_loose_floor_right_02 = load_bitmap (PE_LOOSE_FLOOR_RIGHT_02);
-  pe_loose_floor_base_02 = load_bitmap (PE_LOOSE_FLOOR_BASE_02);
   pe_loose_floor_02 = create_loose_floor_02_bitmap (PALACE, EGA);
   pe_broken_floor = create_broken_floor_bitmap (PALACE, EGA);
 
   /* dungeon vga */
+  dv_loose_floor_left_00 = load_bitmap (DV_LOOSE_FLOOR_LEFT_00);
+  dv_loose_floor_right_00 = load_bitmap (DV_LOOSE_FLOOR_RIGHT_00);
+  dv_loose_floor_base_00 = load_bitmap (DV_LOOSE_FLOOR_BASE_00);
   dv_loose_floor_left_01 = load_bitmap (DV_LOOSE_FLOOR_LEFT_01);
   dv_loose_floor_right_01 = load_bitmap (DV_LOOSE_FLOOR_RIGHT_01);
   dv_loose_floor_base_01 = load_bitmap (DV_LOOSE_FLOOR_BASE_01);
-  dv_loose_floor_left_02 = load_bitmap (DV_LOOSE_FLOOR_LEFT_02);
-  dv_loose_floor_right_02 = load_bitmap (DV_LOOSE_FLOOR_RIGHT_02);
-  dv_loose_floor_base_02 = load_bitmap (DV_LOOSE_FLOOR_BASE_02);
   dv_loose_floor_02 = create_loose_floor_02_bitmap (DUNGEON, VGA);
   dv_broken_floor = create_broken_floor_bitmap (DUNGEON, VGA);
 
   /* palace vga */
+  pv_loose_floor_left_00 = load_bitmap (PV_LOOSE_FLOOR_LEFT_00);
+  pv_loose_floor_right_00 = load_bitmap (PV_LOOSE_FLOOR_RIGHT_00);
+  pv_loose_floor_base_00 = load_bitmap (PV_LOOSE_FLOOR_BASE_00);
   pv_loose_floor_left_01 = load_bitmap (PV_LOOSE_FLOOR_LEFT_01);
   pv_loose_floor_right_01 = load_bitmap (PV_LOOSE_FLOOR_RIGHT_01);
   pv_loose_floor_base_01 = load_bitmap (PV_LOOSE_FLOOR_BASE_01);
-  pv_loose_floor_left_02 = load_bitmap (PV_LOOSE_FLOOR_LEFT_02);
-  pv_loose_floor_right_02 = load_bitmap (PV_LOOSE_FLOOR_RIGHT_02);
-  pv_loose_floor_base_02 = load_bitmap (PV_LOOSE_FLOOR_BASE_02);
   pv_loose_floor_02 = create_loose_floor_02_bitmap (PALACE, VGA);
   pv_broken_floor = create_broken_floor_bitmap (PALACE, VGA);
 }
@@ -138,62 +138,62 @@ void
 unload_loose_floor (void)
 {
   /* dungeon cga */
+  al_destroy_bitmap (dc_loose_floor_left_00);
+  al_destroy_bitmap (dc_loose_floor_right_00);
+  al_destroy_bitmap (dc_loose_floor_base_00);
   al_destroy_bitmap (dc_loose_floor_left_01);
   al_destroy_bitmap (dc_loose_floor_right_01);
   al_destroy_bitmap (dc_loose_floor_base_01);
-  al_destroy_bitmap (dc_loose_floor_left_02);
-  al_destroy_bitmap (dc_loose_floor_right_02);
-  al_destroy_bitmap (dc_loose_floor_base_02);
   al_destroy_bitmap (dc_loose_floor_02);
   al_destroy_bitmap (dc_broken_floor);
 
   /* palace cga */
+  al_destroy_bitmap (pc_loose_floor_left_00);
+  al_destroy_bitmap (pc_loose_floor_right_00);
+  al_destroy_bitmap (pc_loose_floor_base_00);
   al_destroy_bitmap (pc_loose_floor_left_01);
   al_destroy_bitmap (pc_loose_floor_right_01);
   al_destroy_bitmap (pc_loose_floor_base_01);
-  al_destroy_bitmap (pc_loose_floor_left_02);
-  al_destroy_bitmap (pc_loose_floor_right_02);
-  al_destroy_bitmap (pc_loose_floor_base_02);
   al_destroy_bitmap (pc_loose_floor_02);
   al_destroy_bitmap (pc_broken_floor);
 
   /* dungeon ega */
+  al_destroy_bitmap (de_loose_floor_left_00);
+  al_destroy_bitmap (de_loose_floor_right_00);
+  al_destroy_bitmap (de_loose_floor_base_00);
   al_destroy_bitmap (de_loose_floor_left_01);
   al_destroy_bitmap (de_loose_floor_right_01);
   al_destroy_bitmap (de_loose_floor_base_01);
-  al_destroy_bitmap (de_loose_floor_left_02);
-  al_destroy_bitmap (de_loose_floor_right_02);
-  al_destroy_bitmap (de_loose_floor_base_02);
   al_destroy_bitmap (de_loose_floor_02);
   al_destroy_bitmap (de_broken_floor);
 
   /* palace ega */
+  al_destroy_bitmap (pe_loose_floor_left_00);
+  al_destroy_bitmap (pe_loose_floor_right_00);
+  al_destroy_bitmap (pe_loose_floor_base_00);
   al_destroy_bitmap (pe_loose_floor_left_01);
   al_destroy_bitmap (pe_loose_floor_right_01);
   al_destroy_bitmap (pe_loose_floor_base_01);
-  al_destroy_bitmap (pe_loose_floor_left_02);
-  al_destroy_bitmap (pe_loose_floor_right_02);
-  al_destroy_bitmap (pe_loose_floor_base_02);
   al_destroy_bitmap (pe_loose_floor_02);
   al_destroy_bitmap (pe_broken_floor);
 
   /* dungeon vga */
+  al_destroy_bitmap (dv_loose_floor_left_00);
+  al_destroy_bitmap (dv_loose_floor_right_00);
+  al_destroy_bitmap (dv_loose_floor_base_00);
   al_destroy_bitmap (dv_loose_floor_left_01);
   al_destroy_bitmap (dv_loose_floor_right_01);
   al_destroy_bitmap (dv_loose_floor_base_01);
-  al_destroy_bitmap (dv_loose_floor_left_02);
-  al_destroy_bitmap (dv_loose_floor_right_02);
-  al_destroy_bitmap (dv_loose_floor_base_02);
   al_destroy_bitmap (dv_loose_floor_02);
   al_destroy_bitmap (dv_broken_floor);
 
   /* palace vga */
+  al_destroy_bitmap (pv_loose_floor_left_00);
+  al_destroy_bitmap (pv_loose_floor_right_00);
+  al_destroy_bitmap (pv_loose_floor_base_00);
   al_destroy_bitmap (pv_loose_floor_left_01);
   al_destroy_bitmap (pv_loose_floor_right_01);
   al_destroy_bitmap (pv_loose_floor_base_01);
-  al_destroy_bitmap (pv_loose_floor_left_02);
-  al_destroy_bitmap (pv_loose_floor_right_02);
-  al_destroy_bitmap (pv_loose_floor_base_02);
   al_destroy_bitmap (pv_loose_floor_02);
   al_destroy_bitmap (pv_broken_floor);
 }
@@ -201,64 +201,64 @@ unload_loose_floor (void)
 ALLEGRO_BITMAP *
 create_loose_floor_02_bitmap (enum em em, enum vm vm)
 {
-  ALLEGRO_BITMAP *loose_floor_base_02 = NULL,
-    *loose_floor_left_02 = NULL,
-    *loose_floor_right_02 = NULL;
+  ALLEGRO_BITMAP *loose_floor_base_01 = NULL,
+    *loose_floor_left_01 = NULL,
+    *loose_floor_right_01 = NULL;
 
   switch (em) {
   case DUNGEON:
     switch (vm) {
     case CGA:
-      loose_floor_base_02 = dc_loose_floor_base_02;
-      loose_floor_left_02 = dc_loose_floor_left_02;
-      loose_floor_right_02 = dc_loose_floor_right_02;
+      loose_floor_base_01 = dc_loose_floor_base_01;
+      loose_floor_left_01 = dc_loose_floor_left_01;
+      loose_floor_right_01 = dc_loose_floor_right_01;
       break;
     case EGA:
-      loose_floor_base_02 = de_loose_floor_base_02;
-      loose_floor_left_02 = de_loose_floor_left_02;
-      loose_floor_right_02 = de_loose_floor_right_02;
+      loose_floor_base_01 = de_loose_floor_base_01;
+      loose_floor_left_01 = de_loose_floor_left_01;
+      loose_floor_right_01 = de_loose_floor_right_01;
       break;
     case VGA:
-      loose_floor_base_02 = dv_loose_floor_base_02;
-      loose_floor_left_02 = dv_loose_floor_left_02;
-      loose_floor_right_02 = dv_loose_floor_right_02;
+      loose_floor_base_01 = dv_loose_floor_base_01;
+      loose_floor_left_01 = dv_loose_floor_left_01;
+      loose_floor_right_01 = dv_loose_floor_right_01;
       break;
     }
     break;
   case PALACE:
     switch (vm) {
     case CGA:
-      loose_floor_base_02 = pc_loose_floor_base_02;
-      loose_floor_left_02 = pc_loose_floor_left_02;
-      loose_floor_right_02 = pc_loose_floor_right_02;
+      loose_floor_base_01 = pc_loose_floor_base_01;
+      loose_floor_left_01 = pc_loose_floor_left_01;
+      loose_floor_right_01 = pc_loose_floor_right_01;
       break;
     case EGA:
-      loose_floor_base_02 = pe_loose_floor_base_02;
-      loose_floor_left_02 = pe_loose_floor_left_02;
-      loose_floor_right_02 = pe_loose_floor_right_02;
+      loose_floor_base_01 = pe_loose_floor_base_01;
+      loose_floor_left_01 = pe_loose_floor_left_01;
+      loose_floor_right_01 = pe_loose_floor_right_01;
       break;
     case VGA:
-      loose_floor_base_02 = pv_loose_floor_base_02;
-      loose_floor_left_02 = pv_loose_floor_left_02;
-      loose_floor_right_02 = pv_loose_floor_right_02;
+      loose_floor_base_01 = pv_loose_floor_base_01;
+      loose_floor_left_01 = pv_loose_floor_left_01;
+      loose_floor_right_01 = pv_loose_floor_right_01;
       break;
     }
     break;
   }
 
-  int wl = al_get_bitmap_width (loose_floor_left_02);
-  int wr = al_get_bitmap_width (loose_floor_right_02);
+  int wl = al_get_bitmap_width (loose_floor_left_01);
+  int wr = al_get_bitmap_width (loose_floor_right_01);
   int w = wl + wr;
-  int hl = al_get_bitmap_height (loose_floor_left_02);
-  int hr = al_get_bitmap_height (loose_floor_right_02);
-  int hb = al_get_bitmap_height (loose_floor_base_02);
+  int hl = al_get_bitmap_height (loose_floor_left_01);
+  int hr = al_get_bitmap_height (loose_floor_right_01);
+  int hb = al_get_bitmap_height (loose_floor_base_01);
   int h = max_int (hl, hr) + hb;
 
   ALLEGRO_BITMAP *bitmap = create_bitmap (w, h);
   clear_bitmap (bitmap, al_map_rgba (0, 0, 0, 0));
-  draw_bitmap (loose_floor_base_02, bitmap, 0, 14, 0);
-  draw_bitmap (loose_floor_left_02, bitmap, 0, 1, 0);
-  draw_bitmap (loose_floor_right_02, bitmap, 32, 0, 0);
+  draw_bitmap (loose_floor_base_01, bitmap, 0, 14, 0);
+  draw_bitmap (loose_floor_left_01, bitmap, 0, 1, 0);
+  draw_bitmap (loose_floor_right_01, bitmap, 32, 0, 0);
 
   return bitmap;
 }
@@ -697,6 +697,102 @@ void
 draw_loose_floor_01_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
                           enum em em, enum vm vm)
 {
+  ALLEGRO_BITMAP *loose_floor_base_00 = NULL;
+
+  switch (em) {
+  case DUNGEON:
+    switch (vm) {
+    case CGA: loose_floor_base_00 = dc_loose_floor_base_00; break;
+    case EGA: loose_floor_base_00 = de_loose_floor_base_00; break;
+    case VGA: loose_floor_base_00 = dv_loose_floor_base_00; break;
+    }
+    break;
+  case PALACE:
+    switch (vm) {
+    case CGA: loose_floor_base_00 = pc_loose_floor_base_00; break;
+    case EGA: loose_floor_base_00 = pe_loose_floor_base_00; break;
+    case VGA: loose_floor_base_00 = pv_loose_floor_base_00; break;
+    }
+    break;
+  }
+
+  if (hgc) loose_floor_base_00 = apply_palette (loose_floor_base_00, hgc_palette);
+
+  struct coord c;
+  draw_bitmapc (loose_floor_base_00, bitmap, floor_base_coord (p, &c), 0);
+}
+
+void
+draw_loose_floor_01_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                          enum em em, enum vm vm)
+{
+  ALLEGRO_BITMAP *loose_floor_left_00 = NULL;
+
+  switch (em) {
+  case DUNGEON:
+    switch (vm) {
+    case CGA: loose_floor_left_00 = dc_loose_floor_left_00; break;
+    case EGA: loose_floor_left_00 = de_loose_floor_left_00; break;
+    case VGA: loose_floor_left_00 = dv_loose_floor_left_00; break;
+    }
+    break;
+  case PALACE:
+    switch (vm) {
+    case CGA: loose_floor_left_00 = pc_loose_floor_left_00; break;
+    case EGA: loose_floor_left_00 = pe_loose_floor_left_00; break;
+    case VGA: loose_floor_left_00 = pv_loose_floor_left_00; break;
+    }
+    break;
+  }
+
+  if (hgc) loose_floor_left_00 = apply_palette (loose_floor_left_00, hgc_palette);
+
+  struct coord c;
+  draw_bitmapc (loose_floor_left_00, bitmap, loose_floor_left_coord (p, &c), 0);
+}
+
+void
+draw_loose_floor_01_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                           enum em em, enum vm vm)
+{
+  ALLEGRO_BITMAP *loose_floor_right_00 = NULL;
+
+  switch (em) {
+  case DUNGEON:
+    switch (vm) {
+    case CGA: loose_floor_right_00 = dc_loose_floor_right_00; break;
+    case EGA: loose_floor_right_00 = de_loose_floor_right_00; break;
+    case VGA: loose_floor_right_00 = dv_loose_floor_right_00; break;
+    }
+    break;
+  case PALACE:
+    switch (vm) {
+    case CGA: loose_floor_right_00 = pc_loose_floor_right_00; break;
+    case EGA: loose_floor_right_00 = pe_loose_floor_right_00; break;
+    case VGA: loose_floor_right_00 = pv_loose_floor_right_00; break;
+    }
+    break;
+  }
+
+  if (hgc) loose_floor_right_00 = apply_palette (loose_floor_right_00, hgc_palette);
+
+  struct coord c;
+  draw_bitmapc (loose_floor_right_00, bitmap, loose_floor_right_coord (p, &c), 0);
+}
+
+void
+draw_loose_floor_02 (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                     enum em em, enum vm vm)
+{
+  draw_loose_floor_02_base (bitmap, p, em, vm);
+  draw_loose_floor_02_left (bitmap, p, em, vm);
+  draw_loose_floor_02_right (bitmap, p, em, vm);
+}
+
+void
+draw_loose_floor_02_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                          enum em em, enum vm vm)
+{
   ALLEGRO_BITMAP *loose_floor_base_01 = NULL;
 
   switch (em) {
@@ -723,7 +819,7 @@ draw_loose_floor_01_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
 }
 
 void
-draw_loose_floor_01_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
+draw_loose_floor_02_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
                           enum em em, enum vm vm)
 {
   ALLEGRO_BITMAP *loose_floor_left_01 = NULL;
@@ -748,11 +844,11 @@ draw_loose_floor_01_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
   if (hgc) loose_floor_left_01 = apply_palette (loose_floor_left_01, hgc_palette);
 
   struct coord c;
-  draw_bitmapc (loose_floor_left_01, bitmap, loose_floor_left_coord (p, &c), 0);
+  draw_bitmapc (loose_floor_left_01, bitmap, floor_left_coord (p, &c), 0);
 }
 
 void
-draw_loose_floor_01_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
+draw_loose_floor_02_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
                            enum em em, enum vm vm)
 {
   ALLEGRO_BITMAP *loose_floor_right_01 = NULL;
@@ -778,102 +874,6 @@ draw_loose_floor_01_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   struct coord c;
   draw_bitmapc (loose_floor_right_01, bitmap, loose_floor_right_coord (p, &c), 0);
-}
-
-void
-draw_loose_floor_02 (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                     enum em em, enum vm vm)
-{
-  draw_loose_floor_02_base (bitmap, p, em, vm);
-  draw_loose_floor_02_left (bitmap, p, em, vm);
-  draw_loose_floor_02_right (bitmap, p, em, vm);
-}
-
-void
-draw_loose_floor_02_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                          enum em em, enum vm vm)
-{
-  ALLEGRO_BITMAP *loose_floor_base_02 = NULL;
-
-  switch (em) {
-  case DUNGEON:
-    switch (vm) {
-    case CGA: loose_floor_base_02 = dc_loose_floor_base_02; break;
-    case EGA: loose_floor_base_02 = de_loose_floor_base_02; break;
-    case VGA: loose_floor_base_02 = dv_loose_floor_base_02; break;
-    }
-    break;
-  case PALACE:
-    switch (vm) {
-    case CGA: loose_floor_base_02 = pc_loose_floor_base_02; break;
-    case EGA: loose_floor_base_02 = pe_loose_floor_base_02; break;
-    case VGA: loose_floor_base_02 = pv_loose_floor_base_02; break;
-    }
-    break;
-  }
-
-  if (hgc) loose_floor_base_02 = apply_palette (loose_floor_base_02, hgc_palette);
-
-  struct coord c;
-  draw_bitmapc (loose_floor_base_02, bitmap, floor_base_coord (p, &c), 0);
-}
-
-void
-draw_loose_floor_02_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                          enum em em, enum vm vm)
-{
-  ALLEGRO_BITMAP *loose_floor_left_02 = NULL;
-
-  switch (em) {
-  case DUNGEON:
-    switch (vm) {
-    case CGA: loose_floor_left_02 = dc_loose_floor_left_02; break;
-    case EGA: loose_floor_left_02 = de_loose_floor_left_02; break;
-    case VGA: loose_floor_left_02 = dv_loose_floor_left_02; break;
-    }
-    break;
-  case PALACE:
-    switch (vm) {
-    case CGA: loose_floor_left_02 = pc_loose_floor_left_02; break;
-    case EGA: loose_floor_left_02 = pe_loose_floor_left_02; break;
-    case VGA: loose_floor_left_02 = pv_loose_floor_left_02; break;
-    }
-    break;
-  }
-
-  if (hgc) loose_floor_left_02 = apply_palette (loose_floor_left_02, hgc_palette);
-
-  struct coord c;
-  draw_bitmapc (loose_floor_left_02, bitmap, floor_left_coord (p, &c), 0);
-}
-
-void
-draw_loose_floor_02_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                           enum em em, enum vm vm)
-{
-  ALLEGRO_BITMAP *loose_floor_right_02 = NULL;
-
-  switch (em) {
-  case DUNGEON:
-    switch (vm) {
-    case CGA: loose_floor_right_02 = dc_loose_floor_right_02; break;
-    case EGA: loose_floor_right_02 = de_loose_floor_right_02; break;
-    case VGA: loose_floor_right_02 = dv_loose_floor_right_02; break;
-    }
-    break;
-  case PALACE:
-    switch (vm) {
-    case CGA: loose_floor_right_02 = pc_loose_floor_right_02; break;
-    case EGA: loose_floor_right_02 = pe_loose_floor_right_02; break;
-    case VGA: loose_floor_right_02 = pv_loose_floor_right_02; break;
-    }
-    break;
-  }
-
-  if (hgc) loose_floor_right_02 = apply_palette (loose_floor_right_02, hgc_palette);
-
-  struct coord c;
-  draw_bitmapc (loose_floor_right_02, bitmap, loose_floor_right_coord (p, &c), 0);
 }
 
 struct coord *

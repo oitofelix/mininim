@@ -26,52 +26,52 @@
 #define LOOSE_FLOOR_RESISTENCE 0
 
 /* dungeon cga */
+#define DC_LOOSE_FLOOR_BASE_00 "data/loose-floor/dc-base-00.png"
+#define DC_LOOSE_FLOOR_LEFT_00 "data/loose-floor/dc-left-00.png"
+#define DC_LOOSE_FLOOR_RIGHT_00 "data/loose-floor/dc-right-00.png"
 #define DC_LOOSE_FLOOR_BASE_01 "data/loose-floor/dc-base-01.png"
 #define DC_LOOSE_FLOOR_LEFT_01 "data/loose-floor/dc-left-01.png"
 #define DC_LOOSE_FLOOR_RIGHT_01 "data/loose-floor/dc-right-01.png"
-#define DC_LOOSE_FLOOR_BASE_02 "data/loose-floor/dc-base-02.png"
-#define DC_LOOSE_FLOOR_LEFT_02 "data/loose-floor/dc-left-02.png"
-#define DC_LOOSE_FLOOR_RIGHT_02 "data/loose-floor/dc-right-02.png"
 
 /* palace cga */
+#define PC_LOOSE_FLOOR_BASE_00 "data/loose-floor/pc-base-00.png"
+#define PC_LOOSE_FLOOR_LEFT_00 "data/loose-floor/pc-left-00.png"
+#define PC_LOOSE_FLOOR_RIGHT_00 "data/loose-floor/pc-right-00.png"
 #define PC_LOOSE_FLOOR_BASE_01 "data/loose-floor/pc-base-01.png"
 #define PC_LOOSE_FLOOR_LEFT_01 "data/loose-floor/pc-left-01.png"
 #define PC_LOOSE_FLOOR_RIGHT_01 "data/loose-floor/pc-right-01.png"
-#define PC_LOOSE_FLOOR_BASE_02 "data/loose-floor/pc-base-02.png"
-#define PC_LOOSE_FLOOR_LEFT_02 "data/loose-floor/pc-left-02.png"
-#define PC_LOOSE_FLOOR_RIGHT_02 "data/loose-floor/pc-right-02.png"
 
 /* dungeon ega */
+#define DE_LOOSE_FLOOR_BASE_00 "data/loose-floor/de-base-00.png"
+#define DE_LOOSE_FLOOR_LEFT_00 "data/loose-floor/de-left-00.png"
+#define DE_LOOSE_FLOOR_RIGHT_00 "data/loose-floor/de-right-00.png"
 #define DE_LOOSE_FLOOR_BASE_01 "data/loose-floor/de-base-01.png"
 #define DE_LOOSE_FLOOR_LEFT_01 "data/loose-floor/de-left-01.png"
 #define DE_LOOSE_FLOOR_RIGHT_01 "data/loose-floor/de-right-01.png"
-#define DE_LOOSE_FLOOR_BASE_02 "data/loose-floor/de-base-02.png"
-#define DE_LOOSE_FLOOR_LEFT_02 "data/loose-floor/de-left-02.png"
-#define DE_LOOSE_FLOOR_RIGHT_02 "data/loose-floor/de-right-02.png"
 
 /* palace ega */
+#define PE_LOOSE_FLOOR_BASE_00 "data/loose-floor/pe-base-00.png"
+#define PE_LOOSE_FLOOR_LEFT_00 "data/loose-floor/pe-left-00.png"
+#define PE_LOOSE_FLOOR_RIGHT_00 "data/loose-floor/pe-right-00.png"
 #define PE_LOOSE_FLOOR_BASE_01 "data/loose-floor/pe-base-01.png"
 #define PE_LOOSE_FLOOR_LEFT_01 "data/loose-floor/pe-left-01.png"
 #define PE_LOOSE_FLOOR_RIGHT_01 "data/loose-floor/pe-right-01.png"
-#define PE_LOOSE_FLOOR_BASE_02 "data/loose-floor/pe-base-02.png"
-#define PE_LOOSE_FLOOR_LEFT_02 "data/loose-floor/pe-left-02.png"
-#define PE_LOOSE_FLOOR_RIGHT_02 "data/loose-floor/pe-right-02.png"
 
 /* dungeon vga */
+#define DV_LOOSE_FLOOR_BASE_00 "data/loose-floor/dv-base-00.png"
+#define DV_LOOSE_FLOOR_LEFT_00 "data/loose-floor/dv-left-00.png"
+#define DV_LOOSE_FLOOR_RIGHT_00 "data/loose-floor/dv-right-00.png"
 #define DV_LOOSE_FLOOR_BASE_01 "data/loose-floor/dv-base-01.png"
 #define DV_LOOSE_FLOOR_LEFT_01 "data/loose-floor/dv-left-01.png"
 #define DV_LOOSE_FLOOR_RIGHT_01 "data/loose-floor/dv-right-01.png"
-#define DV_LOOSE_FLOOR_BASE_02 "data/loose-floor/dv-base-02.png"
-#define DV_LOOSE_FLOOR_LEFT_02 "data/loose-floor/dv-left-02.png"
-#define DV_LOOSE_FLOOR_RIGHT_02 "data/loose-floor/dv-right-02.png"
 
 /* palace vga */
+#define PV_LOOSE_FLOOR_BASE_00 "data/loose-floor/pv-base-00.png"
+#define PV_LOOSE_FLOOR_LEFT_00 "data/loose-floor/pv-left-00.png"
+#define PV_LOOSE_FLOOR_RIGHT_00 "data/loose-floor/pv-right-00.png"
 #define PV_LOOSE_FLOOR_BASE_01 "data/loose-floor/pv-base-01.png"
 #define PV_LOOSE_FLOOR_LEFT_01 "data/loose-floor/pv-left-01.png"
 #define PV_LOOSE_FLOOR_RIGHT_01 "data/loose-floor/pv-right-01.png"
-#define PV_LOOSE_FLOOR_BASE_02 "data/loose-floor/pv-base-02.png"
-#define PV_LOOSE_FLOOR_LEFT_02 "data/loose-floor/pv-left-02.png"
-#define PV_LOOSE_FLOOR_RIGHT_02 "data/loose-floor/pv-right-02.png"
 
 /* types */
 struct loose_floor {
