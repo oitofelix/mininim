@@ -49,25 +49,25 @@ static void physics_out (struct anim *g);
 static void place_in_initial_fall (struct anim *g);
 
 /* guard */
-ALLEGRO_BITMAP *guard_fall_01, *guard_fall_02, *guard_fall_03;
+ALLEGRO_BITMAP *guard_fall_00, *guard_fall_01, *guard_fall_02;
 
 /* fat guard */
-ALLEGRO_BITMAP *fat_guard_fall_01, *fat_guard_fall_02, *fat_guard_fall_03;
+ALLEGRO_BITMAP *fat_guard_fall_00, *fat_guard_fall_01, *fat_guard_fall_02;
 
 /* vizier */
-ALLEGRO_BITMAP *vizier_fall_01, *vizier_fall_02, *vizier_fall_03;
+ALLEGRO_BITMAP *vizier_fall_00, *vizier_fall_01, *vizier_fall_02;
 
 /* skeleton */
-ALLEGRO_BITMAP *skeleton_fall_01, *skeleton_fall_02, *skeleton_fall_03;
+ALLEGRO_BITMAP *skeleton_fall_00, *skeleton_fall_01, *skeleton_fall_02;
 
 /* shadow */
-ALLEGRO_BITMAP *shadow_fall_01, *shadow_fall_02, *shadow_fall_03;
+ALLEGRO_BITMAP *shadow_fall_00, *shadow_fall_01, *shadow_fall_02;
 
 static void
 init_guard_fall_frameset (void)
 {
   struct frameset frameset[GUARD_FALL_FRAMESET_NMEMB] =
-    {{guard_fall_01,+0,+0},{guard_fall_02,+0,+5},{guard_fall_03,+0,+10}};
+    {{guard_fall_00,+0,+0},{guard_fall_01,+0,+5},{guard_fall_02,+0,+10}};
 
   memcpy (&guard_fall_frameset, &frameset,
           GUARD_FALL_FRAMESET_NMEMB * sizeof (struct frameset));
@@ -77,7 +77,7 @@ static void
 init_fat_guard_fall_frameset (void)
 {
   struct frameset frameset[GUARD_FALL_FRAMESET_NMEMB] =
-    {{fat_guard_fall_01,+0,+0},{fat_guard_fall_02,+0,+5},{fat_guard_fall_03,+0,+10}};
+    {{fat_guard_fall_00,+0,+0},{fat_guard_fall_01,+0,+5},{fat_guard_fall_02,+0,+10}};
 
   memcpy (&fat_guard_fall_frameset, &frameset,
           GUARD_FALL_FRAMESET_NMEMB * sizeof (struct frameset));
@@ -87,7 +87,7 @@ static void
 init_vizier_fall_frameset (void)
 {
   struct frameset frameset[GUARD_FALL_FRAMESET_NMEMB] =
-    {{vizier_fall_01,+0,+0},{vizier_fall_02,+0,+5},{vizier_fall_03,+0,+10}};
+    {{vizier_fall_00,+0,+0},{vizier_fall_01,+0,+5},{vizier_fall_02,+0,+10}};
 
   memcpy (&vizier_fall_frameset, &frameset,
           GUARD_FALL_FRAMESET_NMEMB * sizeof (struct frameset));
@@ -97,7 +97,7 @@ static void
 init_skeleton_fall_frameset (void)
 {
   struct frameset frameset[GUARD_FALL_FRAMESET_NMEMB] =
-    {{skeleton_fall_01,+0,+0},{skeleton_fall_02,+0,+5},{skeleton_fall_03,+0,+10}};
+    {{skeleton_fall_00,+0,+0},{skeleton_fall_01,+0,+5},{skeleton_fall_02,+0,+10}};
 
   memcpy (&skeleton_fall_frameset, &frameset,
           GUARD_FALL_FRAMESET_NMEMB * sizeof (struct frameset));
@@ -107,7 +107,7 @@ static void
 init_shadow_fall_frameset (void)
 {
   struct frameset frameset[GUARD_FALL_FRAMESET_NMEMB] =
-    {{shadow_fall_01,+0,+0},{shadow_fall_02,+0,+5},{shadow_fall_03,+0,+10}};
+    {{shadow_fall_00,+0,+0},{shadow_fall_01,+0,+5},{shadow_fall_02,+0,+10}};
 
   memcpy (&shadow_fall_frameset, &frameset,
           GUARD_FALL_FRAMESET_NMEMB * sizeof (struct frameset));
@@ -129,29 +129,29 @@ void
 load_guard_fall (void)
 {
   /* guard */
+  guard_fall_00 = load_bitmap (GUARD_FALL_00);
   guard_fall_01 = load_bitmap (GUARD_FALL_01);
   guard_fall_02 = load_bitmap (GUARD_FALL_02);
-  guard_fall_03 = load_bitmap (GUARD_FALL_03);
 
   /* fat guard */
+  fat_guard_fall_00 = load_bitmap (FAT_GUARD_FALL_00);
   fat_guard_fall_01 = load_bitmap (FAT_GUARD_FALL_01);
   fat_guard_fall_02 = load_bitmap (FAT_GUARD_FALL_02);
-  fat_guard_fall_03 = load_bitmap (FAT_GUARD_FALL_03);
 
   /* vizier */
+  vizier_fall_00 = load_bitmap (VIZIER_FALL_00);
   vizier_fall_01 = load_bitmap (VIZIER_FALL_01);
   vizier_fall_02 = load_bitmap (VIZIER_FALL_02);
-  vizier_fall_03 = load_bitmap (VIZIER_FALL_03);
 
   /* skeleton */
+  skeleton_fall_00 = load_bitmap (SKELETON_FALL_00);
   skeleton_fall_01 = load_bitmap (SKELETON_FALL_01);
   skeleton_fall_02 = load_bitmap (SKELETON_FALL_02);
-  skeleton_fall_03 = load_bitmap (SKELETON_FALL_03);
 
   /* shadow */
+  shadow_fall_00 = load_bitmap (SHADOW_FALL_00);
   shadow_fall_01 = load_bitmap (SHADOW_FALL_01);
   shadow_fall_02 = load_bitmap (SHADOW_FALL_02);
-  shadow_fall_03 = load_bitmap (SHADOW_FALL_03);
 
   /* frameset */
   init_guard_fall_frameset ();
@@ -165,29 +165,29 @@ void
 unload_guard_fall (void)
 {
   /* guard */
+  al_destroy_bitmap (guard_fall_00);
   al_destroy_bitmap (guard_fall_01);
   al_destroy_bitmap (guard_fall_02);
-  al_destroy_bitmap (guard_fall_03);
 
   /* fat guard */
+  al_destroy_bitmap (fat_guard_fall_00);
   al_destroy_bitmap (fat_guard_fall_01);
   al_destroy_bitmap (fat_guard_fall_02);
-  al_destroy_bitmap (fat_guard_fall_03);
 
   /* vizier */
+  al_destroy_bitmap (vizier_fall_00);
   al_destroy_bitmap (vizier_fall_01);
   al_destroy_bitmap (vizier_fall_02);
-  al_destroy_bitmap (vizier_fall_03);
 
   /* skeleton */
+  al_destroy_bitmap (skeleton_fall_00);
   al_destroy_bitmap (skeleton_fall_01);
   al_destroy_bitmap (skeleton_fall_02);
-  al_destroy_bitmap (skeleton_fall_03);
 
   /* shadow */
+  al_destroy_bitmap (shadow_fall_00);
   al_destroy_bitmap (shadow_fall_01);
   al_destroy_bitmap (shadow_fall_02);
-  al_destroy_bitmap (shadow_fall_03);
 }
 
 void

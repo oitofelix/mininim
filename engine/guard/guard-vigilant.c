@@ -45,31 +45,31 @@ static bool physics_in (struct anim *g);
 static void physics_out (struct anim *g);
 
 /* guard */
-ALLEGRO_BITMAP *guard_vigilant_01, *guard_vigilant_02,
-  *guard_vigilant_03;
+ALLEGRO_BITMAP *guard_vigilant_00, *guard_vigilant_01,
+  *guard_vigilant_02;
 
 /* fat guard */
-ALLEGRO_BITMAP *fat_guard_vigilant_01, *fat_guard_vigilant_02,
-  *fat_guard_vigilant_03;
+ALLEGRO_BITMAP *fat_guard_vigilant_00, *fat_guard_vigilant_01,
+  *fat_guard_vigilant_02;
 
 /* vizier */
-ALLEGRO_BITMAP *vizier_vigilant_01, *vizier_vigilant_02,
-  *vizier_vigilant_03;
+ALLEGRO_BITMAP *vizier_vigilant_00, *vizier_vigilant_01,
+  *vizier_vigilant_02;
 
 /* skeleton */
-ALLEGRO_BITMAP *skeleton_vigilant_01, *skeleton_vigilant_02,
-  *skeleton_vigilant_03;
+ALLEGRO_BITMAP *skeleton_vigilant_00, *skeleton_vigilant_01,
+  *skeleton_vigilant_02;
 
 /* shadow */
-ALLEGRO_BITMAP *shadow_vigilant_01, *shadow_vigilant_02,
-  *shadow_vigilant_03;
+ALLEGRO_BITMAP *shadow_vigilant_00, *shadow_vigilant_01,
+  *shadow_vigilant_02;
 
 static void
 init_guard_vigilant_frameset (void)
 {
   struct frameset frameset[GUARD_VIGILANT_FRAMESET_NMEMB] =
-    {{guard_vigilant_01,+0,0},{guard_vigilant_02,+0,0},
-     {guard_vigilant_03,+0,0}};
+    {{guard_vigilant_00,+0,0},{guard_vigilant_01,+0,0},
+     {guard_vigilant_02,+0,0}};
 
   memcpy (&guard_vigilant_frameset, &frameset,
           GUARD_VIGILANT_FRAMESET_NMEMB * sizeof (struct frameset));
@@ -79,8 +79,8 @@ static void
 init_fat_guard_vigilant_frameset (void)
 {
   struct frameset frameset[GUARD_VIGILANT_FRAMESET_NMEMB] =
-    {{fat_guard_vigilant_01,+0,0},{fat_guard_vigilant_02,+0,0},
-     {fat_guard_vigilant_03,+0,0}};
+    {{fat_guard_vigilant_00,+0,0},{fat_guard_vigilant_01,+0,0},
+     {fat_guard_vigilant_02,+0,0}};
 
   memcpy (&fat_guard_vigilant_frameset, &frameset,
           GUARD_VIGILANT_FRAMESET_NMEMB * sizeof (struct frameset));
@@ -90,8 +90,8 @@ static void
 init_vizier_vigilant_frameset (void)
 {
   struct frameset frameset[GUARD_VIGILANT_FRAMESET_NMEMB] =
-    {{vizier_vigilant_01,+0,0},{vizier_vigilant_02,+0,0},
-     {vizier_vigilant_03,+0,0}};
+    {{vizier_vigilant_00,+0,0},{vizier_vigilant_01,+0,0},
+     {vizier_vigilant_02,+0,0}};
 
   memcpy (&vizier_vigilant_frameset, &frameset,
           GUARD_VIGILANT_FRAMESET_NMEMB * sizeof (struct frameset));
@@ -101,8 +101,8 @@ static void
 init_skeleton_vigilant_frameset (void)
 {
   struct frameset frameset[GUARD_VIGILANT_FRAMESET_NMEMB] =
-    {{skeleton_vigilant_01,+0,0},{skeleton_vigilant_02,+0,0},
-     {skeleton_vigilant_03,+0,0}};
+    {{skeleton_vigilant_00,+0,0},{skeleton_vigilant_01,+0,0},
+     {skeleton_vigilant_02,+0,0}};
 
   memcpy (&skeleton_vigilant_frameset, &frameset,
           GUARD_VIGILANT_FRAMESET_NMEMB * sizeof (struct frameset));
@@ -112,8 +112,8 @@ static void
 init_shadow_vigilant_frameset (void)
 {
   struct frameset frameset[GUARD_VIGILANT_FRAMESET_NMEMB] =
-    {{shadow_vigilant_01,+0,0},{shadow_vigilant_02,+0,0},
-     {shadow_vigilant_03,+0,0}};
+    {{shadow_vigilant_00,+0,0},{shadow_vigilant_01,+0,0},
+     {shadow_vigilant_02,+0,0}};
 
   memcpy (&shadow_vigilant_frameset, &frameset,
           GUARD_VIGILANT_FRAMESET_NMEMB * sizeof (struct frameset));
@@ -135,29 +135,29 @@ void
 load_guard_vigilant (void)
 {
   /* guard */
+  guard_vigilant_00 = load_bitmap (GUARD_VIGILANT_00);
   guard_vigilant_01 = load_bitmap (GUARD_VIGILANT_01);
   guard_vigilant_02 = load_bitmap (GUARD_VIGILANT_02);
-  guard_vigilant_03 = load_bitmap (GUARD_VIGILANT_03);
 
   /* fat_guard */
+  fat_guard_vigilant_00 = load_bitmap (FAT_GUARD_VIGILANT_00);
   fat_guard_vigilant_01 = load_bitmap (FAT_GUARD_VIGILANT_01);
   fat_guard_vigilant_02 = load_bitmap (FAT_GUARD_VIGILANT_02);
-  fat_guard_vigilant_03 = load_bitmap (FAT_GUARD_VIGILANT_03);
 
   /* vizier */
+  vizier_vigilant_00 = load_bitmap (VIZIER_VIGILANT_00);
   vizier_vigilant_01 = load_bitmap (VIZIER_VIGILANT_01);
   vizier_vigilant_02 = load_bitmap (VIZIER_VIGILANT_02);
-  vizier_vigilant_03 = load_bitmap (VIZIER_VIGILANT_03);
 
   /* skeleton */
+  skeleton_vigilant_00 = load_bitmap (SKELETON_VIGILANT_00);
   skeleton_vigilant_01 = load_bitmap (SKELETON_VIGILANT_01);
   skeleton_vigilant_02 = load_bitmap (SKELETON_VIGILANT_02);
-  skeleton_vigilant_03 = load_bitmap (SKELETON_VIGILANT_03);
 
   /* shadow */
+  shadow_vigilant_00 = load_bitmap (SHADOW_VIGILANT_00);
   shadow_vigilant_01 = load_bitmap (SHADOW_VIGILANT_01);
   shadow_vigilant_02 = load_bitmap (SHADOW_VIGILANT_02);
-  shadow_vigilant_03 = load_bitmap (SHADOW_VIGILANT_03);
 
   /* frameset */
   init_guard_vigilant_frameset ();
@@ -171,29 +171,29 @@ void
 unload_guard_vigilant (void)
 {
   /* guard */
+  al_destroy_bitmap (guard_vigilant_00);
   al_destroy_bitmap (guard_vigilant_01);
   al_destroy_bitmap (guard_vigilant_02);
-  al_destroy_bitmap (guard_vigilant_03);
 
   /* fat_guard */
+  al_destroy_bitmap (fat_guard_vigilant_00);
   al_destroy_bitmap (fat_guard_vigilant_01);
   al_destroy_bitmap (fat_guard_vigilant_02);
-  al_destroy_bitmap (fat_guard_vigilant_03);
 
   /* vizier */
+  al_destroy_bitmap (vizier_vigilant_00);
   al_destroy_bitmap (vizier_vigilant_01);
   al_destroy_bitmap (vizier_vigilant_02);
-  al_destroy_bitmap (vizier_vigilant_03);
 
   /* skeleton */
+  al_destroy_bitmap (skeleton_vigilant_00);
   al_destroy_bitmap (skeleton_vigilant_01);
   al_destroy_bitmap (skeleton_vigilant_02);
-  al_destroy_bitmap (skeleton_vigilant_03);
 
   /* shadow */
+  al_destroy_bitmap (shadow_vigilant_00);
   al_destroy_bitmap (shadow_vigilant_01);
   al_destroy_bitmap (shadow_vigilant_02);
-  al_destroy_bitmap (shadow_vigilant_03);
 }
 
 void

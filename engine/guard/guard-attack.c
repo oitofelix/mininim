@@ -48,50 +48,50 @@ static bool physics_in (struct anim *g);
 static void physics_out (struct anim *g);
 
 /* guard */
-ALLEGRO_BITMAP *guard_attack_01, *guard_attack_02,
-  *guard_attack_03, *guard_attack_04, *guard_attack_05,
-  *guard_attack_06, *guard_attack_07, *guard_attack_08,
-  *guard_attack_counter_defense_01, *guard_attack_counter_defense_02,
+ALLEGRO_BITMAP *guard_attack_00, *guard_attack_01,
+  *guard_attack_02, *guard_attack_03, *guard_attack_04,
+  *guard_attack_05, *guard_attack_06, *guard_attack_07,
+  *guard_attack_counter_defense_00, *guard_attack_counter_defense_01,
   *guard_attack_defended;
 
 /* fat guard */
-ALLEGRO_BITMAP *fat_guard_attack_01, *fat_guard_attack_02,
-  *fat_guard_attack_03, *fat_guard_attack_04, *fat_guard_attack_05,
-  *fat_guard_attack_06, *fat_guard_attack_07, *fat_guard_attack_08,
-  *fat_guard_attack_counter_defense_01, *fat_guard_attack_counter_defense_02,
+ALLEGRO_BITMAP *fat_guard_attack_00, *fat_guard_attack_01,
+  *fat_guard_attack_02, *fat_guard_attack_03, *fat_guard_attack_04,
+  *fat_guard_attack_05, *fat_guard_attack_06, *fat_guard_attack_07,
+  *fat_guard_attack_counter_defense_00, *fat_guard_attack_counter_defense_01,
   *fat_guard_attack_defended;
 
 /* vizier */
-ALLEGRO_BITMAP *vizier_attack_01, *vizier_attack_02,
-  *vizier_attack_03, *vizier_attack_04, *vizier_attack_05,
-  *vizier_attack_06, *vizier_attack_07, *vizier_attack_08,
-  *vizier_attack_counter_defense_01, *vizier_attack_counter_defense_02,
+ALLEGRO_BITMAP *vizier_attack_00, *vizier_attack_01,
+  *vizier_attack_02, *vizier_attack_03, *vizier_attack_04,
+  *vizier_attack_05, *vizier_attack_06, *vizier_attack_07,
+  *vizier_attack_counter_defense_00, *vizier_attack_counter_defense_01,
   *vizier_attack_defended;
 
 /* skeleton */
-ALLEGRO_BITMAP *skeleton_attack_01, *skeleton_attack_02,
-  *skeleton_attack_03, *skeleton_attack_04, *skeleton_attack_05,
-  *skeleton_attack_06, *skeleton_attack_07, *skeleton_attack_08,
-  *skeleton_attack_counter_defense_01, *skeleton_attack_counter_defense_02,
+ALLEGRO_BITMAP *skeleton_attack_00, *skeleton_attack_01,
+  *skeleton_attack_02, *skeleton_attack_03, *skeleton_attack_04,
+  *skeleton_attack_05, *skeleton_attack_06, *skeleton_attack_07,
+  *skeleton_attack_counter_defense_00, *skeleton_attack_counter_defense_01,
   *skeleton_attack_defended;
 
 /* shadow */
-ALLEGRO_BITMAP *shadow_attack_01, *shadow_attack_02,
-  *shadow_attack_03, *shadow_attack_04, *shadow_attack_05,
-  *shadow_attack_06, *shadow_attack_07, *shadow_attack_08,
-  *shadow_attack_counter_defense_01, *shadow_attack_counter_defense_02,
+ALLEGRO_BITMAP *shadow_attack_00, *shadow_attack_01,
+  *shadow_attack_02, *shadow_attack_03, *shadow_attack_04,
+  *shadow_attack_05, *shadow_attack_06, *shadow_attack_07,
+  *shadow_attack_counter_defense_00, *shadow_attack_counter_defense_01,
   *shadow_attack_defended;
 
 static void
 init_guard_attack_frameset (void)
 {
   struct frameset frameset[GUARD_ATTACK_FRAMESET_NMEMB] =
-    {{guard_attack_01,-6,0},{guard_attack_02,+0,0},
-     {guard_attack_03,-3,0},{guard_attack_04,-6,0},
-     {guard_attack_05,-7,0},{guard_attack_06,+6,0},
-     {guard_attack_07,+9,0},{guard_attack_08,+7,0},
-     {guard_attack_counter_defense_01,+0,0},
-     {guard_attack_counter_defense_02,+6,0}};
+    {{guard_attack_00,-6,0},{guard_attack_01,+0,0},
+     {guard_attack_02,-3,0},{guard_attack_03,-6,0},
+     {guard_attack_04,-7,0},{guard_attack_05,+6,0},
+     {guard_attack_06,+9,0},{guard_attack_07,+7,0},
+     {guard_attack_counter_defense_00,+0,0},
+     {guard_attack_counter_defense_01,+6,0}};
 
   memcpy (&guard_attack_frameset, &frameset,
           GUARD_ATTACK_FRAMESET_NMEMB * sizeof (struct frameset));
@@ -101,12 +101,12 @@ static void
 init_fat_guard_attack_frameset (void)
 {
   struct frameset frameset[GUARD_ATTACK_FRAMESET_NMEMB] =
-    {{fat_guard_attack_01,-6,0},{fat_guard_attack_02,+0,0},
-     {fat_guard_attack_03,-3,0},{fat_guard_attack_04,-6,0},
-     {fat_guard_attack_05,-7,0},{fat_guard_attack_06,+6,0},
-     {fat_guard_attack_07,+9,0},{fat_guard_attack_08,+7,0},
-     {fat_guard_attack_counter_defense_01,+0,0},
-     {fat_guard_attack_counter_defense_02,+6,0}};
+    {{fat_guard_attack_00,-6,0},{fat_guard_attack_01,+0,0},
+     {fat_guard_attack_02,-3,0},{fat_guard_attack_03,-6,0},
+     {fat_guard_attack_04,-7,0},{fat_guard_attack_05,+6,0},
+     {fat_guard_attack_06,+9,0},{fat_guard_attack_07,+7,0},
+     {fat_guard_attack_counter_defense_00,+0,0},
+     {fat_guard_attack_counter_defense_01,+6,0}};
 
   memcpy (&fat_guard_attack_frameset, &frameset,
           GUARD_ATTACK_FRAMESET_NMEMB * sizeof (struct frameset));
@@ -116,12 +116,12 @@ static void
 init_vizier_attack_frameset (void)
 {
   struct frameset frameset[GUARD_ATTACK_FRAMESET_NMEMB] =
-    {{vizier_attack_01,-6,0},{vizier_attack_02,+0,0},
-     {vizier_attack_03,-3,0},{vizier_attack_04,-6,0},
-     {vizier_attack_05,-7,0},{vizier_attack_06,+6,0},
-     {vizier_attack_07,+9,0},{vizier_attack_08,+7,0},
-     {vizier_attack_counter_defense_01,+0,0},
-     {vizier_attack_counter_defense_02,+6,0}};
+    {{vizier_attack_00,-6,0},{vizier_attack_01,+0,0},
+     {vizier_attack_02,-3,0},{vizier_attack_03,-6,0},
+     {vizier_attack_04,-7,0},{vizier_attack_05,+6,0},
+     {vizier_attack_06,+9,0},{vizier_attack_07,+7,0},
+     {vizier_attack_counter_defense_00,+0,0},
+     {vizier_attack_counter_defense_01,+6,0}};
 
   memcpy (&vizier_attack_frameset, &frameset,
           GUARD_ATTACK_FRAMESET_NMEMB * sizeof (struct frameset));
@@ -131,12 +131,12 @@ static void
 init_skeleton_attack_frameset (void)
 {
   struct frameset frameset[GUARD_ATTACK_FRAMESET_NMEMB] =
-    {{skeleton_attack_01,-6,0},{skeleton_attack_02,+0,0},
-     {skeleton_attack_03,-3,0},{skeleton_attack_04,-6,0},
-     {skeleton_attack_05,-7,0},{skeleton_attack_06,+6,0},
-     {skeleton_attack_07,+9,0},{skeleton_attack_08,+7,0},
-     {skeleton_attack_counter_defense_01,+0,0},
-     {skeleton_attack_counter_defense_02,+6,0}};
+    {{skeleton_attack_00,-6,0},{skeleton_attack_01,+0,0},
+     {skeleton_attack_02,-3,0},{skeleton_attack_03,-6,0},
+     {skeleton_attack_04,-7,0},{skeleton_attack_05,+6,0},
+     {skeleton_attack_06,+9,0},{skeleton_attack_07,+7,0},
+     {skeleton_attack_counter_defense_00,+0,0},
+     {skeleton_attack_counter_defense_01,+6,0}};
 
   memcpy (&skeleton_attack_frameset, &frameset,
           GUARD_ATTACK_FRAMESET_NMEMB * sizeof (struct frameset));
@@ -146,12 +146,12 @@ static void
 init_shadow_attack_frameset (void)
 {
   struct frameset frameset[GUARD_ATTACK_FRAMESET_NMEMB] =
-    {{shadow_attack_01,-6,0},{shadow_attack_02,+0,0},
-     {shadow_attack_03,-3,0},{shadow_attack_04,-6,0},
-     {shadow_attack_05,-7,0},{shadow_attack_06,+6,0},
-     {shadow_attack_07,+9,0},{shadow_attack_08,+7,0},
-     {shadow_attack_counter_defense_01,+0,0},
-     {shadow_attack_counter_defense_02,+6,0}};
+    {{shadow_attack_00,-6,0},{shadow_attack_01,+0,0},
+     {shadow_attack_02,-3,0},{shadow_attack_03,-6,0},
+     {shadow_attack_04,-7,0},{shadow_attack_05,+6,0},
+     {shadow_attack_06,+9,0},{shadow_attack_07,+7,0},
+     {shadow_attack_counter_defense_00,+0,0},
+     {shadow_attack_counter_defense_01,+6,0}};
 
   memcpy (&shadow_attack_frameset, &frameset,
           GUARD_ATTACK_FRAMESET_NMEMB * sizeof (struct frameset));
@@ -185,6 +185,7 @@ void
 load_guard_attack (void)
 {
   /* guard */
+  guard_attack_00 = load_bitmap (GUARD_ATTACK_00);
   guard_attack_01 = load_bitmap (GUARD_ATTACK_01);
   guard_attack_02 = load_bitmap (GUARD_ATTACK_02);
   guard_attack_03 = load_bitmap (GUARD_ATTACK_03);
@@ -192,12 +193,12 @@ load_guard_attack (void)
   guard_attack_05 = load_bitmap (GUARD_ATTACK_05);
   guard_attack_06 = load_bitmap (GUARD_ATTACK_06);
   guard_attack_07 = load_bitmap (GUARD_ATTACK_07);
-  guard_attack_08 = load_bitmap (GUARD_ATTACK_08);
+  guard_attack_counter_defense_00 = load_bitmap (GUARD_ATTACK_COUNTER_DEFENSE_00);
   guard_attack_counter_defense_01 = load_bitmap (GUARD_ATTACK_COUNTER_DEFENSE_01);
-  guard_attack_counter_defense_02 = load_bitmap (GUARD_ATTACK_COUNTER_DEFENSE_02);
   guard_attack_defended = load_bitmap (GUARD_ATTACK_DEFENDED);
 
   /* fat guard */
+  fat_guard_attack_00 = load_bitmap (FAT_GUARD_ATTACK_00);
   fat_guard_attack_01 = load_bitmap (FAT_GUARD_ATTACK_01);
   fat_guard_attack_02 = load_bitmap (FAT_GUARD_ATTACK_02);
   fat_guard_attack_03 = load_bitmap (FAT_GUARD_ATTACK_03);
@@ -205,12 +206,12 @@ load_guard_attack (void)
   fat_guard_attack_05 = load_bitmap (FAT_GUARD_ATTACK_05);
   fat_guard_attack_06 = load_bitmap (FAT_GUARD_ATTACK_06);
   fat_guard_attack_07 = load_bitmap (FAT_GUARD_ATTACK_07);
-  fat_guard_attack_08 = load_bitmap (FAT_GUARD_ATTACK_08);
+  fat_guard_attack_counter_defense_00 = load_bitmap (FAT_GUARD_ATTACK_COUNTER_DEFENSE_00);
   fat_guard_attack_counter_defense_01 = load_bitmap (FAT_GUARD_ATTACK_COUNTER_DEFENSE_01);
-  fat_guard_attack_counter_defense_02 = load_bitmap (FAT_GUARD_ATTACK_COUNTER_DEFENSE_02);
   fat_guard_attack_defended = load_bitmap (FAT_GUARD_ATTACK_DEFENDED);
 
   /* vizier */
+  vizier_attack_00 = load_bitmap (VIZIER_ATTACK_00);
   vizier_attack_01 = load_bitmap (VIZIER_ATTACK_01);
   vizier_attack_02 = load_bitmap (VIZIER_ATTACK_02);
   vizier_attack_03 = load_bitmap (VIZIER_ATTACK_03);
@@ -218,12 +219,12 @@ load_guard_attack (void)
   vizier_attack_05 = load_bitmap (VIZIER_ATTACK_05);
   vizier_attack_06 = load_bitmap (VIZIER_ATTACK_06);
   vizier_attack_07 = load_bitmap (VIZIER_ATTACK_07);
-  vizier_attack_08 = load_bitmap (VIZIER_ATTACK_08);
+  vizier_attack_counter_defense_00 = load_bitmap (VIZIER_ATTACK_COUNTER_DEFENSE_00);
   vizier_attack_counter_defense_01 = load_bitmap (VIZIER_ATTACK_COUNTER_DEFENSE_01);
-  vizier_attack_counter_defense_02 = load_bitmap (VIZIER_ATTACK_COUNTER_DEFENSE_02);
   vizier_attack_defended = load_bitmap (VIZIER_ATTACK_DEFENDED);
 
   /* skeleton */
+  skeleton_attack_00 = load_bitmap (SKELETON_ATTACK_00);
   skeleton_attack_01 = load_bitmap (SKELETON_ATTACK_01);
   skeleton_attack_02 = load_bitmap (SKELETON_ATTACK_02);
   skeleton_attack_03 = load_bitmap (SKELETON_ATTACK_03);
@@ -231,12 +232,12 @@ load_guard_attack (void)
   skeleton_attack_05 = load_bitmap (SKELETON_ATTACK_05);
   skeleton_attack_06 = load_bitmap (SKELETON_ATTACK_06);
   skeleton_attack_07 = load_bitmap (SKELETON_ATTACK_07);
-  skeleton_attack_08 = load_bitmap (SKELETON_ATTACK_08);
+  skeleton_attack_counter_defense_00 = load_bitmap (SKELETON_ATTACK_COUNTER_DEFENSE_00);
   skeleton_attack_counter_defense_01 = load_bitmap (SKELETON_ATTACK_COUNTER_DEFENSE_01);
-  skeleton_attack_counter_defense_02 = load_bitmap (SKELETON_ATTACK_COUNTER_DEFENSE_02);
   skeleton_attack_defended = load_bitmap (SKELETON_ATTACK_DEFENDED);
 
   /* shadow */
+  shadow_attack_00 = load_bitmap (SHADOW_ATTACK_00);
   shadow_attack_01 = load_bitmap (SHADOW_ATTACK_01);
   shadow_attack_02 = load_bitmap (SHADOW_ATTACK_02);
   shadow_attack_03 = load_bitmap (SHADOW_ATTACK_03);
@@ -244,9 +245,8 @@ load_guard_attack (void)
   shadow_attack_05 = load_bitmap (SHADOW_ATTACK_05);
   shadow_attack_06 = load_bitmap (SHADOW_ATTACK_06);
   shadow_attack_07 = load_bitmap (SHADOW_ATTACK_07);
-  shadow_attack_08 = load_bitmap (SHADOW_ATTACK_08);
+  shadow_attack_counter_defense_00 = load_bitmap (SHADOW_ATTACK_COUNTER_DEFENSE_00);
   shadow_attack_counter_defense_01 = load_bitmap (SHADOW_ATTACK_COUNTER_DEFENSE_01);
-  shadow_attack_counter_defense_02 = load_bitmap (SHADOW_ATTACK_COUNTER_DEFENSE_02);
   shadow_attack_defended = load_bitmap (SHADOW_ATTACK_DEFENDED);
 
   /* frameset */
@@ -261,6 +261,7 @@ void
 unload_guard_attack (void)
 {
   /* guard */
+  al_destroy_bitmap (guard_attack_00);
   al_destroy_bitmap (guard_attack_01);
   al_destroy_bitmap (guard_attack_02);
   al_destroy_bitmap (guard_attack_03);
@@ -268,12 +269,12 @@ unload_guard_attack (void)
   al_destroy_bitmap (guard_attack_05);
   al_destroy_bitmap (guard_attack_06);
   al_destroy_bitmap (guard_attack_07);
-  al_destroy_bitmap (guard_attack_08);
+  al_destroy_bitmap (guard_attack_counter_defense_00);
   al_destroy_bitmap (guard_attack_counter_defense_01);
-  al_destroy_bitmap (guard_attack_counter_defense_02);
   al_destroy_bitmap (guard_attack_defended);
 
   /* fat guard */
+  al_destroy_bitmap (fat_guard_attack_00);
   al_destroy_bitmap (fat_guard_attack_01);
   al_destroy_bitmap (fat_guard_attack_02);
   al_destroy_bitmap (fat_guard_attack_03);
@@ -281,12 +282,12 @@ unload_guard_attack (void)
   al_destroy_bitmap (fat_guard_attack_05);
   al_destroy_bitmap (fat_guard_attack_06);
   al_destroy_bitmap (fat_guard_attack_07);
-  al_destroy_bitmap (fat_guard_attack_08);
+  al_destroy_bitmap (fat_guard_attack_counter_defense_00);
   al_destroy_bitmap (fat_guard_attack_counter_defense_01);
-  al_destroy_bitmap (fat_guard_attack_counter_defense_02);
   al_destroy_bitmap (fat_guard_attack_defended);
 
   /* vizier */
+  al_destroy_bitmap (vizier_attack_00);
   al_destroy_bitmap (vizier_attack_01);
   al_destroy_bitmap (vizier_attack_02);
   al_destroy_bitmap (vizier_attack_03);
@@ -294,12 +295,12 @@ unload_guard_attack (void)
   al_destroy_bitmap (vizier_attack_05);
   al_destroy_bitmap (vizier_attack_06);
   al_destroy_bitmap (vizier_attack_07);
-  al_destroy_bitmap (vizier_attack_08);
+  al_destroy_bitmap (vizier_attack_counter_defense_00);
   al_destroy_bitmap (vizier_attack_counter_defense_01);
-  al_destroy_bitmap (vizier_attack_counter_defense_02);
   al_destroy_bitmap (vizier_attack_defended);
 
   /* skeleton */
+  al_destroy_bitmap (skeleton_attack_00);
   al_destroy_bitmap (skeleton_attack_01);
   al_destroy_bitmap (skeleton_attack_02);
   al_destroy_bitmap (skeleton_attack_03);
@@ -307,12 +308,12 @@ unload_guard_attack (void)
   al_destroy_bitmap (skeleton_attack_05);
   al_destroy_bitmap (skeleton_attack_06);
   al_destroy_bitmap (skeleton_attack_07);
-  al_destroy_bitmap (skeleton_attack_08);
+  al_destroy_bitmap (skeleton_attack_counter_defense_00);
   al_destroy_bitmap (skeleton_attack_counter_defense_01);
-  al_destroy_bitmap (skeleton_attack_counter_defense_02);
   al_destroy_bitmap (skeleton_attack_defended);
 
   /* shadow */
+  al_destroy_bitmap (shadow_attack_00);
   al_destroy_bitmap (shadow_attack_01);
   al_destroy_bitmap (shadow_attack_02);
   al_destroy_bitmap (shadow_attack_03);
@@ -320,9 +321,8 @@ unload_guard_attack (void)
   al_destroy_bitmap (shadow_attack_05);
   al_destroy_bitmap (shadow_attack_06);
   al_destroy_bitmap (shadow_attack_07);
-  al_destroy_bitmap (shadow_attack_08);
+  al_destroy_bitmap (shadow_attack_counter_defense_00);
   al_destroy_bitmap (shadow_attack_counter_defense_01);
-  al_destroy_bitmap (shadow_attack_counter_defense_02);
   al_destroy_bitmap (shadow_attack_defended);
 }
 

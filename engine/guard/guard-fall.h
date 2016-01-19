@@ -21,29 +21,29 @@
 #define MININIM_GUARD_FALL_H
 
 /* guard */
+#define GUARD_FALL_00 "data/guard/fall/00.png"
 #define GUARD_FALL_01 "data/guard/fall/01.png"
 #define GUARD_FALL_02 "data/guard/fall/02.png"
-#define GUARD_FALL_03 "data/guard/fall/03.png"
 
 /* fat guard */
+#define FAT_GUARD_FALL_00 "data/fat-guard/fall/00.png"
 #define FAT_GUARD_FALL_01 "data/fat-guard/fall/01.png"
 #define FAT_GUARD_FALL_02 "data/fat-guard/fall/02.png"
-#define FAT_GUARD_FALL_03 "data/fat-guard/fall/03.png"
 
 /* vizier */
+#define VIZIER_FALL_00 "data/vizier/fall/00.png"
 #define VIZIER_FALL_01 "data/vizier/fall/01.png"
 #define VIZIER_FALL_02 "data/vizier/fall/02.png"
-#define VIZIER_FALL_03 "data/vizier/fall/03.png"
 
 /* skeleton */
+#define SKELETON_FALL_00 "data/skeleton/fall/00.png"
 #define SKELETON_FALL_01 "data/skeleton/fall/01.png"
 #define SKELETON_FALL_02 "data/skeleton/fall/02.png"
-#define SKELETON_FALL_03 "data/skeleton/fall/03.png"
 
 /* shadow */
+#define SHADOW_FALL_00 "data/shadow/fall/00.png"
 #define SHADOW_FALL_01 "data/shadow/fall/01.png"
 #define SHADOW_FALL_02 "data/shadow/fall/02.png"
-#define SHADOW_FALL_03 "data/shadow/fall/03.png"
 
 #define GUARD_FALL_FRAMESET_NMEMB 3
 extern struct frameset guard_fall_frameset[GUARD_FALL_FRAMESET_NMEMB];
@@ -59,18 +59,18 @@ bool is_guard_fall (struct frame *f);
 struct frameset *get_guard_fall_frameset (enum anim_type t);
 
 /* guard */
-extern ALLEGRO_BITMAP *guard_fall_01, *guard_fall_02, *guard_fall_03;
+extern ALLEGRO_BITMAP *guard_fall_00, *guard_fall_01, *guard_fall_02;
 
 /* fat guard */
-extern ALLEGRO_BITMAP *fat_guard_fall_01, *fat_guard_fall_02, *fat_guard_fall_03;
+extern ALLEGRO_BITMAP *fat_guard_fall_00, *fat_guard_fall_01, *fat_guard_fall_02;
 
 /* vizier */
-extern ALLEGRO_BITMAP *vizier_fall_01, *vizier_fall_02, *vizier_fall_03;
+extern ALLEGRO_BITMAP *vizier_fall_00, *vizier_fall_01, *vizier_fall_02;
 
 /* skeleton */
-extern ALLEGRO_BITMAP *skeleton_fall_01, *skeleton_fall_02, *skeleton_fall_03;
+extern ALLEGRO_BITMAP *skeleton_fall_00, *skeleton_fall_01, *skeleton_fall_02;
 
 /* shadow */
-extern ALLEGRO_BITMAP *shadow_fall_01, *shadow_fall_02, *shadow_fall_03;
+extern ALLEGRO_BITMAP *shadow_fall_00, *shadow_fall_01, *shadow_fall_02;
 
 #endif	/* MININIM_GUARD_FALL_H */

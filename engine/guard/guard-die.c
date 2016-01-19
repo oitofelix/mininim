@@ -50,33 +50,33 @@ static bool physics_in (struct anim *g);
 static void physics_out (struct anim *g);
 
 /* guard */
-ALLEGRO_BITMAP *guard_die_01, *guard_die_02, *guard_die_03, *guard_die_04,
-  *guard_die_05, *guard_die_06, *guard_die_spiked_00, *guard_die_chopped_00;
+ALLEGRO_BITMAP *guard_die_00, *guard_die_01, *guard_die_02, *guard_die_03,
+  *guard_die_04, *guard_die_05, *guard_die_spiked_00, *guard_die_chopped_00;
 
 /* fat guard */
-ALLEGRO_BITMAP *fat_guard_die_01, *fat_guard_die_02, *fat_guard_die_03,
-  *fat_guard_die_04, *fat_guard_die_05, *fat_guard_die_06;
+ALLEGRO_BITMAP *fat_guard_die_00, *fat_guard_die_01, *fat_guard_die_02,
+  *fat_guard_die_03, *fat_guard_die_04, *fat_guard_die_05;
 
 /* vizier */
-ALLEGRO_BITMAP *vizier_die_01, *vizier_die_02, *vizier_die_03, *vizier_die_04,
-  *vizier_die_05, *vizier_die_06;
+ALLEGRO_BITMAP *vizier_die_00, *vizier_die_01, *vizier_die_02, *vizier_die_03,
+  *vizier_die_04, *vizier_die_05;
 
 /* skeleton */
-ALLEGRO_BITMAP *skeleton_die_01, *skeleton_die_02, *skeleton_die_03, *skeleton_die_04,
-  *skeleton_die_05, *skeleton_die_06, *skeleton_die_spiked_00,
+ALLEGRO_BITMAP *skeleton_die_00, *skeleton_die_01, *skeleton_die_02, *skeleton_die_03,
+  *skeleton_die_04, *skeleton_die_05, *skeleton_die_spiked_00,
   *skeleton_die_chopped_00;
 
 /* shadow */
-ALLEGRO_BITMAP *shadow_die_01, *shadow_die_02, *shadow_die_03, *shadow_die_04,
-  *shadow_die_05, *shadow_die_06, *shadow_die_spiked_00,
+ALLEGRO_BITMAP *shadow_die_00, *shadow_die_01, *shadow_die_02, *shadow_die_03,
+  *shadow_die_04, *shadow_die_05, *shadow_die_spiked_00,
   *shadow_die_chopped_00;
 
 static void
 init_guard_die_frameset (void)
 {
   struct frameset frameset[GUARD_DIE_FRAMESET_NMEMB] =
-    {{guard_die_01,-1,0},{guard_die_02,+0,0},{guard_die_03,-3,+1},
-     {guard_die_04,-2,+2},{guard_die_05,+0,+0},{guard_die_06,-2,+0}};
+    {{guard_die_00,-1,0},{guard_die_01,+0,0},{guard_die_02,-3,+1},
+     {guard_die_03,-2,+2},{guard_die_04,+0,+0},{guard_die_05,-2,+0}};
 
   memcpy (&guard_die_frameset, &frameset,
           GUARD_DIE_FRAMESET_NMEMB * sizeof (struct frameset));
@@ -86,8 +86,8 @@ static void
 init_fat_guard_die_frameset (void)
 {
   struct frameset frameset[GUARD_DIE_FRAMESET_NMEMB] =
-    {{fat_guard_die_01,-1,0},{fat_guard_die_02,+0,0},{fat_guard_die_03,-3,+1},
-     {fat_guard_die_04,-2,+2},{fat_guard_die_05,+0,+0},{fat_guard_die_06,+0,+0}};
+    {{fat_guard_die_00,-1,0},{fat_guard_die_01,+0,0},{fat_guard_die_02,-3,+1},
+     {fat_guard_die_03,-2,+2},{fat_guard_die_04,+0,+0},{fat_guard_die_05,+0,+0}};
 
   memcpy (&fat_guard_die_frameset, &frameset,
           GUARD_DIE_FRAMESET_NMEMB * sizeof (struct frameset));
@@ -97,8 +97,8 @@ static void
 init_vizier_die_frameset (void)
 {
   struct frameset frameset[GUARD_DIE_FRAMESET_NMEMB] =
-    {{vizier_die_01,-1,0},{vizier_die_02,+0,0},{vizier_die_03,-3,+1},
-     {vizier_die_04,-2,+2},{vizier_die_05,+0,+0},{vizier_die_06,-2,+0}};
+    {{vizier_die_00,-1,0},{vizier_die_01,+0,0},{vizier_die_02,-3,+1},
+     {vizier_die_03,-2,+2},{vizier_die_04,+0,+0},{vizier_die_05,-2,+0}};
 
   memcpy (&vizier_die_frameset, &frameset,
           GUARD_DIE_FRAMESET_NMEMB * sizeof (struct frameset));
@@ -108,8 +108,8 @@ static void
 init_skeleton_die_frameset (void)
 {
   struct frameset frameset[GUARD_DIE_FRAMESET_NMEMB] =
-    {{skeleton_die_01,-8,+0},{skeleton_die_02,+0,+2},{skeleton_die_03,+0,+2},
-     {skeleton_die_04,+0,+0},{skeleton_die_05,+0,+0},{skeleton_die_06,+0,+0}};
+    {{skeleton_die_00,-8,+0},{skeleton_die_01,+0,+2},{skeleton_die_02,+0,+2},
+     {skeleton_die_03,+0,+0},{skeleton_die_04,+0,+0},{skeleton_die_05,+0,+0}};
 
   memcpy (&skeleton_die_frameset, &frameset,
           GUARD_DIE_FRAMESET_NMEMB * sizeof (struct frameset));
@@ -119,8 +119,8 @@ static void
 init_shadow_die_frameset (void)
 {
   struct frameset frameset[GUARD_DIE_FRAMESET_NMEMB] =
-    {{shadow_die_01,-1,+0},{shadow_die_02,+0,+0},{shadow_die_03,-3,+1},
-     {shadow_die_04,-2,+1},{shadow_die_05,+0,+2},{shadow_die_06,+2,+1}};
+    {{shadow_die_00,-1,+0},{shadow_die_01,+0,+0},{shadow_die_02,-3,+1},
+     {shadow_die_03,-2,+1},{shadow_die_04,+0,+2},{shadow_die_05,+2,+1}};
 
   memcpy (&shadow_die_frameset, &frameset,
           GUARD_DIE_FRAMESET_NMEMB * sizeof (struct frameset));
@@ -142,48 +142,48 @@ void
 load_guard_die (void)
 {
   /* guard */
+  guard_die_00 = load_bitmap (GUARD_DIE_00);
   guard_die_01 = load_bitmap (GUARD_DIE_01);
   guard_die_02 = load_bitmap (GUARD_DIE_02);
   guard_die_03 = load_bitmap (GUARD_DIE_03);
   guard_die_04 = load_bitmap (GUARD_DIE_04);
   guard_die_05 = load_bitmap (GUARD_DIE_05);
-  guard_die_06 = load_bitmap (GUARD_DIE_06);
   guard_die_spiked_00 = load_bitmap (GUARD_DIE_SPIKED_00);
   guard_die_chopped_00 = load_bitmap (GUARD_DIE_CHOPPED_00);
 
   /* fat guard */
+  fat_guard_die_00 = load_bitmap (FAT_GUARD_DIE_00);
   fat_guard_die_01 = load_bitmap (FAT_GUARD_DIE_01);
   fat_guard_die_02 = load_bitmap (FAT_GUARD_DIE_02);
   fat_guard_die_03 = load_bitmap (FAT_GUARD_DIE_03);
   fat_guard_die_04 = load_bitmap (FAT_GUARD_DIE_04);
   fat_guard_die_05 = load_bitmap (FAT_GUARD_DIE_05);
-  fat_guard_die_06 = load_bitmap (FAT_GUARD_DIE_06);
 
   /* vizier */
+  vizier_die_00 = load_bitmap (VIZIER_DIE_00);
   vizier_die_01 = load_bitmap (VIZIER_DIE_01);
   vizier_die_02 = load_bitmap (VIZIER_DIE_02);
   vizier_die_03 = load_bitmap (VIZIER_DIE_03);
   vizier_die_04 = load_bitmap (VIZIER_DIE_04);
   vizier_die_05 = load_bitmap (VIZIER_DIE_05);
-  vizier_die_06 = load_bitmap (VIZIER_DIE_06);
 
   /* skeleton */
+  skeleton_die_00 = load_bitmap (SKELETON_DIE_00);
   skeleton_die_01 = load_bitmap (SKELETON_DIE_01);
   skeleton_die_02 = load_bitmap (SKELETON_DIE_02);
   skeleton_die_03 = load_bitmap (SKELETON_DIE_03);
   skeleton_die_04 = load_bitmap (SKELETON_DIE_04);
   skeleton_die_05 = load_bitmap (SKELETON_DIE_05);
-  skeleton_die_06 = load_bitmap (SKELETON_DIE_06);
   skeleton_die_spiked_00 = load_bitmap (SKELETON_DIE_SPIKED_00);
   skeleton_die_chopped_00 = load_bitmap (SKELETON_DIE_CHOPPED_00);
 
   /* shadow */
+  shadow_die_00 = load_bitmap (SHADOW_DIE_00);
   shadow_die_01 = load_bitmap (SHADOW_DIE_01);
   shadow_die_02 = load_bitmap (SHADOW_DIE_02);
   shadow_die_03 = load_bitmap (SHADOW_DIE_03);
   shadow_die_04 = load_bitmap (SHADOW_DIE_04);
   shadow_die_05 = load_bitmap (SHADOW_DIE_05);
-  shadow_die_06 = load_bitmap (SHADOW_DIE_06);
   shadow_die_spiked_00 = load_bitmap (SHADOW_DIE_SPIKED_00);
   shadow_die_chopped_00 = load_bitmap (SHADOW_DIE_CHOPPED_00);
 
@@ -199,48 +199,48 @@ void
 unload_guard_die (void)
 {
   /* guard */
+  al_destroy_bitmap (guard_die_00);
   al_destroy_bitmap (guard_die_01);
   al_destroy_bitmap (guard_die_02);
   al_destroy_bitmap (guard_die_03);
   al_destroy_bitmap (guard_die_04);
   al_destroy_bitmap (guard_die_05);
-  al_destroy_bitmap (guard_die_06);
   al_destroy_bitmap (guard_die_spiked_00);
   al_destroy_bitmap (guard_die_chopped_00);
 
   /* fat guard */
+  al_destroy_bitmap (fat_guard_die_00);
   al_destroy_bitmap (fat_guard_die_01);
   al_destroy_bitmap (fat_guard_die_02);
   al_destroy_bitmap (fat_guard_die_03);
   al_destroy_bitmap (fat_guard_die_04);
   al_destroy_bitmap (fat_guard_die_05);
-  al_destroy_bitmap (fat_guard_die_06);
 
   /* vizier */
+  al_destroy_bitmap (vizier_die_00);
   al_destroy_bitmap (vizier_die_01);
   al_destroy_bitmap (vizier_die_02);
   al_destroy_bitmap (vizier_die_03);
   al_destroy_bitmap (vizier_die_04);
   al_destroy_bitmap (vizier_die_05);
-  al_destroy_bitmap (vizier_die_06);
 
   /* skeleton */
+  al_destroy_bitmap (skeleton_die_00);
   al_destroy_bitmap (skeleton_die_01);
   al_destroy_bitmap (skeleton_die_02);
   al_destroy_bitmap (skeleton_die_03);
   al_destroy_bitmap (skeleton_die_04);
   al_destroy_bitmap (skeleton_die_05);
-  al_destroy_bitmap (skeleton_die_06);
   al_destroy_bitmap (skeleton_die_spiked_00);
   al_destroy_bitmap (skeleton_die_chopped_00);
 
   /* shadow */
+  al_destroy_bitmap (shadow_die_00);
   al_destroy_bitmap (shadow_die_01);
   al_destroy_bitmap (shadow_die_02);
   al_destroy_bitmap (shadow_die_03);
   al_destroy_bitmap (shadow_die_04);
   al_destroy_bitmap (shadow_die_05);
-  al_destroy_bitmap (shadow_die_06);
   al_destroy_bitmap (shadow_die_spiked_00);
   al_destroy_bitmap (shadow_die_chopped_00);
 }

@@ -21,29 +21,29 @@
 #define MININIM_GUARD_WALKF_H
 
 /* guard */
+#define GUARD_WALKF_00 "data/guard/walkf/00.png"
 #define GUARD_WALKF_01 "data/guard/walkf/01.png"
 #define GUARD_WALKF_02 "data/guard/walkf/02.png"
-#define GUARD_WALKF_03 "data/guard/walkf/03.png"
 
 /* fat guard */
+#define FAT_GUARD_WALKF_00 "data/fat-guard/walkf/00.png"
 #define FAT_GUARD_WALKF_01 "data/fat-guard/walkf/01.png"
 #define FAT_GUARD_WALKF_02 "data/fat-guard/walkf/02.png"
-#define FAT_GUARD_WALKF_03 "data/fat-guard/walkf/03.png"
 
 /* vizier */
+#define VIZIER_WALKF_00 "data/vizier/walkf/00.png"
 #define VIZIER_WALKF_01 "data/vizier/walkf/01.png"
 #define VIZIER_WALKF_02 "data/vizier/walkf/02.png"
-#define VIZIER_WALKF_03 "data/vizier/walkf/03.png"
 
 /* skeleton */
+#define SKELETON_WALKF_00 "data/skeleton/walkf/00.png"
 #define SKELETON_WALKF_01 "data/skeleton/walkf/01.png"
 #define SKELETON_WALKF_02 "data/skeleton/walkf/02.png"
-#define SKELETON_WALKF_03 "data/skeleton/walkf/03.png"
 
 /* shadow */
+#define SHADOW_WALKF_00 "data/shadow/walkf/00.png"
 #define SHADOW_WALKF_01 "data/shadow/walkf/01.png"
 #define SHADOW_WALKF_02 "data/shadow/walkf/02.png"
-#define SHADOW_WALKF_03 "data/shadow/walkf/03.png"
 
 #define GUARD_WALKF_FRAMESET_NMEMB 3
 extern struct frameset guard_walkf_frameset[GUARD_WALKF_FRAMESET_NMEMB];
@@ -58,18 +58,18 @@ void guard_walkf (struct anim *g);
 struct frameset *get_guard_walkf_frameset (enum anim_type t);
 
 /* guard */
-extern ALLEGRO_BITMAP *guard_walkf_01, *guard_walkf_02, *guard_walkf_03;
+extern ALLEGRO_BITMAP *guard_walkf_00, *guard_walkf_01, *guard_walkf_02;
 
 /* fat guard */
-extern ALLEGRO_BITMAP *fat_guard_walkf_01, *fat_guard_walkf_02, *fat_guard_walkf_03;
+extern ALLEGRO_BITMAP *fat_guard_walkf_00, *fat_guard_walkf_01, *fat_guard_walkf_02;
 
 /* vizier */
-extern ALLEGRO_BITMAP *vizier_walkf_01, *vizier_walkf_02, *vizier_walkf_03;
+extern ALLEGRO_BITMAP *vizier_walkf_00, *vizier_walkf_01, *vizier_walkf_02;
 
 /* skeleton */
-extern ALLEGRO_BITMAP *skeleton_walkf_01, *skeleton_walkf_02, *skeleton_walkf_03;
+extern ALLEGRO_BITMAP *skeleton_walkf_00, *skeleton_walkf_01, *skeleton_walkf_02;
 
 /* shadow */
-extern ALLEGRO_BITMAP *shadow_walkf_01, *shadow_walkf_02, *shadow_walkf_03;
+extern ALLEGRO_BITMAP *shadow_walkf_00, *shadow_walkf_01, *shadow_walkf_02;
 
 #endif	/* MININIM_GUARD_WALKF_H */

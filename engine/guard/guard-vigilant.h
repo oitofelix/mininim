@@ -21,29 +21,29 @@
 #define MININIM_GUARD_VIGILANT_H
 
 /* guard */
+#define GUARD_VIGILANT_00 "data/guard/vigilant/00.png"
 #define GUARD_VIGILANT_01 "data/guard/vigilant/01.png"
 #define GUARD_VIGILANT_02 "data/guard/vigilant/02.png"
-#define GUARD_VIGILANT_03 "data/guard/vigilant/03.png"
 
 /* fat guard */
+#define FAT_GUARD_VIGILANT_00 "data/fat-guard/vigilant/00.png"
 #define FAT_GUARD_VIGILANT_01 "data/fat-guard/vigilant/01.png"
 #define FAT_GUARD_VIGILANT_02 "data/fat-guard/vigilant/02.png"
-#define FAT_GUARD_VIGILANT_03 "data/fat-guard/vigilant/03.png"
 
 /* vizier */
+#define VIZIER_VIGILANT_00 "data/vizier/vigilant/00.png"
 #define VIZIER_VIGILANT_01 "data/vizier/vigilant/01.png"
 #define VIZIER_VIGILANT_02 "data/vizier/vigilant/02.png"
-#define VIZIER_VIGILANT_03 "data/vizier/vigilant/03.png"
 
 /* skeleton */
+#define SKELETON_VIGILANT_00 "data/skeleton/vigilant/00.png"
 #define SKELETON_VIGILANT_01 "data/skeleton/vigilant/01.png"
 #define SKELETON_VIGILANT_02 "data/skeleton/vigilant/02.png"
-#define SKELETON_VIGILANT_03 "data/skeleton/vigilant/03.png"
 
 /* shadow */
+#define SHADOW_VIGILANT_00 "data/shadow/vigilant/00.png"
 #define SHADOW_VIGILANT_01 "data/shadow/vigilant/01.png"
 #define SHADOW_VIGILANT_02 "data/shadow/vigilant/02.png"
-#define SHADOW_VIGILANT_03 "data/shadow/vigilant/03.png"
 
 #define GUARD_VIGILANT_FRAMESET_NMEMB 3
 extern struct frameset guard_vigilant_frameset[GUARD_VIGILANT_FRAMESET_NMEMB];
@@ -58,23 +58,23 @@ void guard_vigilant (struct anim *k);
 struct frameset *get_guard_vigilant_frameset (enum anim_type t);
 
 /* guard */
-extern ALLEGRO_BITMAP *guard_vigilant_01, *guard_vigilant_02,
-  *guard_vigilant_03;
+extern ALLEGRO_BITMAP *guard_vigilant_00, *guard_vigilant_01,
+  *guard_vigilant_02;
 
 /* fat guard */
-extern ALLEGRO_BITMAP *fat_guard_vigilant_01, *fat_guard_vigilant_02,
-  *fat_guard_vigilant_03;
+extern ALLEGRO_BITMAP *fat_guard_vigilant_00, *fat_guard_vigilant_01,
+  *fat_guard_vigilant_02;
 
 /* vizier */
-extern ALLEGRO_BITMAP *vizier_vigilant_01, *vizier_vigilant_02,
-  *vizier_vigilant_03;
+extern ALLEGRO_BITMAP *vizier_vigilant_00, *vizier_vigilant_01,
+  *vizier_vigilant_02;
 
 /* skeleton */
-extern ALLEGRO_BITMAP *skeleton_vigilant_01, *skeleton_vigilant_02,
-  *skeleton_vigilant_03;
+extern ALLEGRO_BITMAP *skeleton_vigilant_00, *skeleton_vigilant_01,
+  *skeleton_vigilant_02;
 
 /* shadow */
-extern ALLEGRO_BITMAP *shadow_vigilant_01, *shadow_vigilant_02,
-  *shadow_vigilant_03;
+extern ALLEGRO_BITMAP *shadow_vigilant_00, *shadow_vigilant_01,
+  *shadow_vigilant_02;
 
 #endif	/* MININIM_GUARD_VIGILANT_H */

@@ -44,25 +44,25 @@ static bool physics_in (struct anim *g);
 static void physics_out (struct anim *g);
 
 /* guard */
-ALLEGRO_BITMAP *guard_walkb_01, *guard_walkb_02;
+ALLEGRO_BITMAP *guard_walkb_00, *guard_walkb_01;
 
 /* fat guard */
-ALLEGRO_BITMAP *fat_guard_walkb_01, *fat_guard_walkb_02;
+ALLEGRO_BITMAP *fat_guard_walkb_00, *fat_guard_walkb_01;
 
 /* vizier */
-ALLEGRO_BITMAP *vizier_walkb_01, *vizier_walkb_02;
+ALLEGRO_BITMAP *vizier_walkb_00, *vizier_walkb_01;
 
 /* skeleton */
-ALLEGRO_BITMAP *skeleton_walkb_01, *skeleton_walkb_02;
+ALLEGRO_BITMAP *skeleton_walkb_00, *skeleton_walkb_01;
 
 /* shadow */
-ALLEGRO_BITMAP *shadow_walkb_01, *shadow_walkb_02;
+ALLEGRO_BITMAP *shadow_walkb_00, *shadow_walkb_01;
 
 static void
 init_guard_walkb_frameset (void)
 {
   struct frameset frameset[GUARD_WALKB_FRAMESET_NMEMB] =
-    {{guard_walkb_01,+2,0},{guard_walkb_02,+10,0}};
+    {{guard_walkb_00,+2,0},{guard_walkb_01,+10,0}};
 
   memcpy (&guard_walkb_frameset, &frameset,
           GUARD_WALKB_FRAMESET_NMEMB * sizeof (struct frameset));
@@ -72,7 +72,7 @@ static void
 init_fat_guard_walkb_frameset (void)
 {
   struct frameset frameset[GUARD_WALKB_FRAMESET_NMEMB] =
-    {{fat_guard_walkb_01,+2,0},{fat_guard_walkb_02,+10,0}};
+    {{fat_guard_walkb_00,+2,0},{fat_guard_walkb_01,+10,0}};
 
   memcpy (&fat_guard_walkb_frameset, &frameset,
           GUARD_WALKB_FRAMESET_NMEMB * sizeof (struct frameset));
@@ -82,7 +82,7 @@ static void
 init_vizier_walkb_frameset (void)
 {
   struct frameset frameset[GUARD_WALKB_FRAMESET_NMEMB] =
-    {{vizier_walkb_01,+2,0},{vizier_walkb_02,+10,0}};
+    {{vizier_walkb_00,+2,0},{vizier_walkb_01,+10,0}};
 
   memcpy (&vizier_walkb_frameset, &frameset,
           GUARD_WALKB_FRAMESET_NMEMB * sizeof (struct frameset));
@@ -92,7 +92,7 @@ static void
 init_skeleton_walkb_frameset (void)
 {
   struct frameset frameset[GUARD_WALKB_FRAMESET_NMEMB] =
-    {{skeleton_walkb_01,+2,0},{skeleton_walkb_02,+10,0}};
+    {{skeleton_walkb_00,+2,0},{skeleton_walkb_01,+10,0}};
 
   memcpy (&skeleton_walkb_frameset, &frameset,
           GUARD_WALKB_FRAMESET_NMEMB * sizeof (struct frameset));
@@ -102,7 +102,7 @@ static void
 init_shadow_walkb_frameset (void)
 {
   struct frameset frameset[GUARD_WALKB_FRAMESET_NMEMB] =
-    {{shadow_walkb_01,+2,0},{shadow_walkb_02,+10,0}};
+    {{shadow_walkb_00,+2,0},{shadow_walkb_01,+10,0}};
 
   memcpy (&shadow_walkb_frameset, &frameset,
           GUARD_WALKB_FRAMESET_NMEMB * sizeof (struct frameset));
@@ -124,24 +124,24 @@ void
 load_guard_walkb (void)
 {
   /* guard */
+  guard_walkb_00 = load_bitmap (GUARD_WALKB_00);
   guard_walkb_01 = load_bitmap (GUARD_WALKB_01);
-  guard_walkb_02 = load_bitmap (GUARD_WALKB_02);
 
   /* fat guard */
+  fat_guard_walkb_00 = load_bitmap (FAT_GUARD_WALKB_00);
   fat_guard_walkb_01 = load_bitmap (FAT_GUARD_WALKB_01);
-  fat_guard_walkb_02 = load_bitmap (FAT_GUARD_WALKB_02);
 
   /* vizier */
+  vizier_walkb_00 = load_bitmap (VIZIER_WALKB_00);
   vizier_walkb_01 = load_bitmap (VIZIER_WALKB_01);
-  vizier_walkb_02 = load_bitmap (VIZIER_WALKB_02);
 
   /* skeleton */
+  skeleton_walkb_00 = load_bitmap (SKELETON_WALKB_00);
   skeleton_walkb_01 = load_bitmap (SKELETON_WALKB_01);
-  skeleton_walkb_02 = load_bitmap (SKELETON_WALKB_02);
 
   /* shadow */
+  shadow_walkb_00 = load_bitmap (SHADOW_WALKB_00);
   shadow_walkb_01 = load_bitmap (SHADOW_WALKB_01);
-  shadow_walkb_02 = load_bitmap (SHADOW_WALKB_02);
 
   /* frameset */
   init_guard_walkb_frameset ();
@@ -155,24 +155,24 @@ void
 unload_guard_walkb (void)
 {
   /* guard */
+  al_destroy_bitmap (guard_walkb_00);
   al_destroy_bitmap (guard_walkb_01);
-  al_destroy_bitmap (guard_walkb_02);
 
   /* fat_guard */
+  al_destroy_bitmap (fat_guard_walkb_00);
   al_destroy_bitmap (fat_guard_walkb_01);
-  al_destroy_bitmap (fat_guard_walkb_02);
 
   /* vizier */
+  al_destroy_bitmap (vizier_walkb_00);
   al_destroy_bitmap (vizier_walkb_01);
-  al_destroy_bitmap (vizier_walkb_02);
 
   /* skeleton */
+  al_destroy_bitmap (skeleton_walkb_00);
   al_destroy_bitmap (skeleton_walkb_01);
-  al_destroy_bitmap (skeleton_walkb_02);
 
   /* shadow */
+  al_destroy_bitmap (shadow_walkb_00);
   al_destroy_bitmap (shadow_walkb_01);
-  al_destroy_bitmap (shadow_walkb_02);
 }
 
 void

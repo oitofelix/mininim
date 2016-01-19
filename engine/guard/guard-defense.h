@@ -21,23 +21,23 @@
 #define MININIM_GUARD_DEFENSE_H
 
 /* guard */
-#define GUARD_DEFENSE_01 "data/guard/defense/01.png"
+#define GUARD_DEFENSE_00 "data/guard/defense/00.png"
 #define GUARD_DEFENSE_COUNTER_ATTACK "data/guard/defense/counter-attack.png"
 
 /* fat guard */
-#define FAT_GUARD_DEFENSE_01 "data/fat-guard/defense/01.png"
+#define FAT_GUARD_DEFENSE_00 "data/fat-guard/defense/00.png"
 #define FAT_GUARD_DEFENSE_COUNTER_ATTACK "data/fat-guard/defense/counter-attack.png"
 
 /* vizier */
-#define VIZIER_DEFENSE_01 "data/vizier/defense/01.png"
+#define VIZIER_DEFENSE_00 "data/vizier/defense/00.png"
 #define VIZIER_DEFENSE_COUNTER_ATTACK "data/vizier/defense/counter-attack.png"
 
 /* skeleton */
-#define SKELETON_DEFENSE_01 "data/skeleton/defense/01.png"
+#define SKELETON_DEFENSE_00 "data/skeleton/defense/00.png"
 #define SKELETON_DEFENSE_COUNTER_ATTACK "data/skeleton/defense/counter-attack.png"
 
 /* shadow */
-#define SHADOW_DEFENSE_01 "data/shadow/defense/01.png"
+#define SHADOW_DEFENSE_00 "data/shadow/defense/00.png"
 #define SHADOW_DEFENSE_COUNTER_ATTACK "data/shadow/defense/counter-attack.png"
 
 #define GUARD_DEFENSE_FRAMESET_NMEMB 2
@@ -53,18 +53,18 @@ void guard_defense (struct anim *g);
 struct frameset *get_guard_defense_frameset (enum anim_type t);
 
 /* guard */
-extern ALLEGRO_BITMAP *guard_defense_01, *guard_defense_counter_attack;
+extern ALLEGRO_BITMAP *guard_defense_00, *guard_defense_counter_attack;
 
 /* fat guard */
-extern ALLEGRO_BITMAP *fat_guard_defense_01, *fat_guard_defense_counter_attack;
+extern ALLEGRO_BITMAP *fat_guard_defense_00, *fat_guard_defense_counter_attack;
 
 /* vizier */
-extern ALLEGRO_BITMAP *vizier_defense_01, *vizier_defense_counter_attack;
+extern ALLEGRO_BITMAP *vizier_defense_00, *vizier_defense_counter_attack;
 
 /* skeleton */
-extern ALLEGRO_BITMAP *skeleton_defense_01, *skeleton_defense_counter_attack;
+extern ALLEGRO_BITMAP *skeleton_defense_00, *skeleton_defense_counter_attack;
 
 /* shadow */
-extern ALLEGRO_BITMAP *shadow_defense_01, *shadow_defense_counter_attack;
+extern ALLEGRO_BITMAP *shadow_defense_00, *shadow_defense_counter_attack;
 
 #endif	/* MININIM_GUARD_DEFENSE_H */

@@ -21,24 +21,24 @@
 #define MININIM_GUARD_WALKB_H
 
 /* guard */
+#define GUARD_WALKB_00 "data/guard/walkb/00.png"
 #define GUARD_WALKB_01 "data/guard/walkb/01.png"
-#define GUARD_WALKB_02 "data/guard/walkb/02.png"
 
 /* fat guard */
+#define FAT_GUARD_WALKB_00 "data/fat-guard/walkb/00.png"
 #define FAT_GUARD_WALKB_01 "data/fat-guard/walkb/01.png"
-#define FAT_GUARD_WALKB_02 "data/fat-guard/walkb/02.png"
 
 /* vizier */
+#define VIZIER_WALKB_00 "data/vizier/walkb/00.png"
 #define VIZIER_WALKB_01 "data/vizier/walkb/01.png"
-#define VIZIER_WALKB_02 "data/vizier/walkb/02.png"
 
 /* skeleton */
+#define SKELETON_WALKB_00 "data/skeleton/walkb/00.png"
 #define SKELETON_WALKB_01 "data/skeleton/walkb/01.png"
-#define SKELETON_WALKB_02 "data/skeleton/walkb/02.png"
 
 /* shadow */
+#define SHADOW_WALKB_00 "data/shadow/walkb/00.png"
 #define SHADOW_WALKB_01 "data/shadow/walkb/01.png"
-#define SHADOW_WALKB_02 "data/shadow/walkb/02.png"
 
 #define GUARD_WALKB_FRAMESET_NMEMB 2
 extern struct frameset guard_walkb_frameset[GUARD_WALKB_FRAMESET_NMEMB];
@@ -53,18 +53,18 @@ void guard_walkb (struct anim *k);
 struct frameset *get_guard_walkb_frameset (enum anim_type t);
 
 /* guard */
-ALLEGRO_BITMAP *guard_walkb_01, *guard_walkb_02;
+ALLEGRO_BITMAP *guard_walkb_00, *guard_walkb_01;
 
 /* fat guard */
-ALLEGRO_BITMAP *fat_guard_walkb_01, *fat_guard_walkb_02;
+ALLEGRO_BITMAP *fat_guard_walkb_00, *fat_guard_walkb_01;
 
 /* vizier */
-ALLEGRO_BITMAP *vizier_walkb_01, *vizier_walkb_02;
+ALLEGRO_BITMAP *vizier_walkb_00, *vizier_walkb_01;
 
 /* skeleton */
-ALLEGRO_BITMAP *skeleton_walkb_01, *skeleton_walkb_02;
+ALLEGRO_BITMAP *skeleton_walkb_00, *skeleton_walkb_01;
 
 /* shadow */
-ALLEGRO_BITMAP *shadow_walkb_01, *shadow_walkb_02;
+ALLEGRO_BITMAP *shadow_walkb_00, *shadow_walkb_01;
 
 #endif	/* MININIM_GUARD_WALKB_H */
