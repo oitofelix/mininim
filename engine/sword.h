@@ -36,6 +36,7 @@ extern struct frameset sword_frameset[SWORD_FRAMESET_NMEMB];
 #define V_SHINY_SWORD "data/sword/v-shiny.png"
 
 /* palettable */
+#define SWORD_00 "data/sword/00.png"
 #define SWORD_01 "data/sword/01.png"
 #define SWORD_02 "data/sword/02.png"
 #define SWORD_03 "data/sword/03.png"
@@ -69,7 +70,6 @@ extern struct frameset sword_frameset[SWORD_FRAMESET_NMEMB];
 #define SWORD_31 "data/sword/31.png"
 #define SWORD_32 "data/sword/32.png"
 #define SWORD_33 "data/sword/33.png"
-#define SWORD_34 "data/sword/34.png"
 
 void load_sword (void);
 void unload_sword (void);

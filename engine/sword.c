@@ -37,12 +37,12 @@ static ALLEGRO_BITMAP *e_normal_sword, *e_shiny_sword;
 static ALLEGRO_BITMAP *v_normal_sword, *v_shiny_sword;
 
 /* palettable */
-static ALLEGRO_BITMAP *sword_01, *sword_02, *sword_03, *sword_04,
-  *sword_05, *sword_06, *sword_07, *sword_08, *sword_09, *sword_10,
-  *sword_11, *sword_12, *sword_13, *sword_14, *sword_15, *sword_16,
-  *sword_17, *sword_18, *sword_19, *sword_20, *sword_21, *sword_22,
-  *sword_23, *sword_24, *sword_25, *sword_26, *sword_27, *sword_28,
-  *sword_29, *sword_30, *sword_31, *sword_32, *sword_33, *sword_34;
+static ALLEGRO_BITMAP *sword_00, *sword_01, *sword_02, *sword_03,
+  *sword_04, *sword_05, *sword_06, *sword_07, *sword_08, *sword_09,
+  *sword_10, *sword_11, *sword_12, *sword_13, *sword_14, *sword_15,
+  *sword_16, *sword_17, *sword_18, *sword_19, *sword_20, *sword_21,
+  *sword_22, *sword_23, *sword_24, *sword_25, *sword_26, *sword_27,
+  *sword_28, *sword_29, *sword_30, *sword_31, *sword_32, *sword_33;
 
 static struct coord *sword_coord (struct pos *p, struct coord *c);
 
@@ -62,6 +62,7 @@ load_sword (void)
   v_shiny_sword = load_bitmap (V_SHINY_SWORD);
 
   /* palettable */
+  sword_00 = load_bitmap (SWORD_00);
   sword_01 = load_bitmap (SWORD_01);
   sword_02 = load_bitmap (SWORD_02);
   sword_03 = load_bitmap (SWORD_03);
@@ -95,7 +96,6 @@ load_sword (void)
   sword_31 = load_bitmap (SWORD_31);
   sword_32 = load_bitmap (SWORD_32);
   sword_33 = load_bitmap (SWORD_33);
-  sword_34 = load_bitmap (SWORD_34);
 
   /* frameset */
   init_sword_frameset ();
@@ -117,6 +117,7 @@ unload_sword (void)
   al_destroy_bitmap (v_shiny_sword);
 
   /* palettable */
+  al_destroy_bitmap (sword_00);
   al_destroy_bitmap (sword_01);
   al_destroy_bitmap (sword_02);
   al_destroy_bitmap (sword_03);
@@ -150,25 +151,24 @@ unload_sword (void)
   al_destroy_bitmap (sword_31);
   al_destroy_bitmap (sword_32);
   al_destroy_bitmap (sword_33);
-  al_destroy_bitmap (sword_34);
 }
 
 void
 init_sword_frameset (void)
 {
   struct frameset frameset[SWORD_FRAMESET_NMEMB] =
-    {{sword_01,+0,+18},{sword_02,-7,+5},{sword_03,-17,+4},
-     {sword_04,-18,+20},{sword_05,-16,+13},{sword_06,+9,+1},
-     {sword_07,-7,+18},{sword_08,+0,+17},{sword_09,-7,-4},
-     {sword_10,-7,-8},{sword_11,-11,+13},{sword_12,-10,+14},
-     {sword_13,-22,+12},{sword_14,-28,+10},{sword_15,-13,-5},
-     {sword_16,-1,-11},{sword_17,+0,+0},{sword_18,-15,+15},
-     {sword_19,-14,+4},{sword_20,-22,+10},{sword_21,-7,-11},
-     {sword_22,-14,-11},{sword_23,-14,-11},{sword_24,-14,-5},
-     {sword_25,-28,+3},{sword_26,-28,+8},{sword_27,-21,+7},
-     {sword_28,-14,+5},{sword_29,-14,+2},{sword_30,+0,+12},
-     {sword_31,-12,+23},{sword_32,+0,+0},{sword_33,-14,+9},
-     {sword_34,-5,+12}};
+    {{sword_00,+0,+18},{sword_01,-7,+5},{sword_02,-17,+4},
+     {sword_03,-18,+20},{sword_04,-16,+13},{sword_05,+9,+1},
+     {sword_06,-7,+18},{sword_07,+0,+17},{sword_08,-7,-4},
+     {sword_09,-7,-8},{sword_10,-11,+13},{sword_11,-10,+14},
+     {sword_12,-22,+12},{sword_13,-28,+10},{sword_14,-13,-5},
+     {sword_15,-1,-11},{sword_16,+0,+0},{sword_17,-15,+15},
+     {sword_18,-14,+4},{sword_19,-22,+10},{sword_20,-7,-11},
+     {sword_21,-14,-11},{sword_22,-14,-11},{sword_23,-14,-5},
+     {sword_24,-28,+3},{sword_25,-28,+8},{sword_26,-21,+7},
+     {sword_27,-14,+5},{sword_28,-14,+2},{sword_29,+0,+12},
+     {sword_30,-12,+23},{sword_31,+0,+0},{sword_32,-14,+9},
+     {sword_33,-5,+12}};
 
   memcpy (&sword_frameset, &frameset,
           SWORD_FRAMESET_NMEMB * sizeof (struct frameset));
