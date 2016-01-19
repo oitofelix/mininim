@@ -28,6 +28,9 @@
 /* dungeon cga */
 #define DC_SPIKES_FLOOR_LEFT "data/spikes-floor/dc-left.png"
 #define DC_SPIKES_FLOOR_RIGHT "data/spikes-floor/dc-right.png"
+#define DC_SPIKES_LEFT_00 "data/spikes-floor/dc-spikes-left-00.png"
+#define DC_SPIKES_RIGHT_00 "data/spikes-floor/dc-spikes-right-00.png"
+#define DC_SPIKES_FG_00 "data/spikes-floor/dc-spikes-fg-00.png"
 #define DC_SPIKES_LEFT_01 "data/spikes-floor/dc-spikes-left-01.png"
 #define DC_SPIKES_RIGHT_01 "data/spikes-floor/dc-spikes-right-01.png"
 #define DC_SPIKES_FG_01 "data/spikes-floor/dc-spikes-fg-01.png"
@@ -40,13 +43,13 @@
 #define DC_SPIKES_LEFT_04 "data/spikes-floor/dc-spikes-left-04.png"
 #define DC_SPIKES_RIGHT_04 "data/spikes-floor/dc-spikes-right-04.png"
 #define DC_SPIKES_FG_04 "data/spikes-floor/dc-spikes-fg-04.png"
-#define DC_SPIKES_LEFT_05 "data/spikes-floor/dc-spikes-left-05.png"
-#define DC_SPIKES_RIGHT_05 "data/spikes-floor/dc-spikes-right-05.png"
-#define DC_SPIKES_FG_05 "data/spikes-floor/dc-spikes-fg-05.png"
 
 /* palace cga */
 #define PC_SPIKES_FLOOR_LEFT "data/spikes-floor/pc-left.png"
 #define PC_SPIKES_FLOOR_RIGHT "data/spikes-floor/pc-right.png"
+#define PC_SPIKES_LEFT_00 "data/spikes-floor/pc-spikes-left-00.png"
+#define PC_SPIKES_RIGHT_00 "data/spikes-floor/pc-spikes-right-00.png"
+#define PC_SPIKES_FG_00 "data/spikes-floor/pc-spikes-fg-00.png"
 #define PC_SPIKES_LEFT_01 "data/spikes-floor/pc-spikes-left-01.png"
 #define PC_SPIKES_RIGHT_01 "data/spikes-floor/pc-spikes-right-01.png"
 #define PC_SPIKES_FG_01 "data/spikes-floor/pc-spikes-fg-01.png"
@@ -59,13 +62,13 @@
 #define PC_SPIKES_LEFT_04 "data/spikes-floor/pc-spikes-left-04.png"
 #define PC_SPIKES_RIGHT_04 "data/spikes-floor/pc-spikes-right-04.png"
 #define PC_SPIKES_FG_04 "data/spikes-floor/pc-spikes-fg-04.png"
-#define PC_SPIKES_LEFT_05 "data/spikes-floor/pc-spikes-left-05.png"
-#define PC_SPIKES_RIGHT_05 "data/spikes-floor/pc-spikes-right-05.png"
-#define PC_SPIKES_FG_05 "data/spikes-floor/pc-spikes-fg-05.png"
 
 /* dungeon ega */
 #define DE_SPIKES_FLOOR_LEFT "data/spikes-floor/de-left.png"
 #define DE_SPIKES_FLOOR_RIGHT "data/spikes-floor/de-right.png"
+#define DE_SPIKES_LEFT_00 "data/spikes-floor/de-spikes-left-00.png"
+#define DE_SPIKES_RIGHT_00 "data/spikes-floor/de-spikes-right-00.png"
+#define DE_SPIKES_FG_00 "data/spikes-floor/de-spikes-fg-00.png"
 #define DE_SPIKES_LEFT_01 "data/spikes-floor/de-spikes-left-01.png"
 #define DE_SPIKES_RIGHT_01 "data/spikes-floor/de-spikes-right-01.png"
 #define DE_SPIKES_FG_01 "data/spikes-floor/de-spikes-fg-01.png"
@@ -78,13 +81,13 @@
 #define DE_SPIKES_LEFT_04 "data/spikes-floor/de-spikes-left-04.png"
 #define DE_SPIKES_RIGHT_04 "data/spikes-floor/de-spikes-right-04.png"
 #define DE_SPIKES_FG_04 "data/spikes-floor/de-spikes-fg-04.png"
-#define DE_SPIKES_LEFT_05 "data/spikes-floor/de-spikes-left-05.png"
-#define DE_SPIKES_RIGHT_05 "data/spikes-floor/de-spikes-right-05.png"
-#define DE_SPIKES_FG_05 "data/spikes-floor/de-spikes-fg-05.png"
 
 /* palace ega */
 #define PE_SPIKES_FLOOR_LEFT "data/spikes-floor/pe-left.png"
 #define PE_SPIKES_FLOOR_RIGHT "data/spikes-floor/pe-right.png"
+#define PE_SPIKES_LEFT_00 "data/spikes-floor/pe-spikes-left-00.png"
+#define PE_SPIKES_RIGHT_00 "data/spikes-floor/pe-spikes-right-00.png"
+#define PE_SPIKES_FG_00 "data/spikes-floor/pe-spikes-fg-00.png"
 #define PE_SPIKES_LEFT_01 "data/spikes-floor/pe-spikes-left-01.png"
 #define PE_SPIKES_RIGHT_01 "data/spikes-floor/pe-spikes-right-01.png"
 #define PE_SPIKES_FG_01 "data/spikes-floor/pe-spikes-fg-01.png"
@@ -97,13 +100,13 @@
 #define PE_SPIKES_LEFT_04 "data/spikes-floor/pe-spikes-left-04.png"
 #define PE_SPIKES_RIGHT_04 "data/spikes-floor/pe-spikes-right-04.png"
 #define PE_SPIKES_FG_04 "data/spikes-floor/pe-spikes-fg-04.png"
-#define PE_SPIKES_LEFT_05 "data/spikes-floor/pe-spikes-left-05.png"
-#define PE_SPIKES_RIGHT_05 "data/spikes-floor/pe-spikes-right-05.png"
-#define PE_SPIKES_FG_05 "data/spikes-floor/pe-spikes-fg-05.png"
 
 /* dungeon vga */
 #define DV_SPIKES_FLOOR_LEFT "data/spikes-floor/dv-left.png"
 #define DV_SPIKES_FLOOR_RIGHT "data/spikes-floor/dv-right.png"
+#define DV_SPIKES_LEFT_00 "data/spikes-floor/dv-spikes-left-00.png"
+#define DV_SPIKES_RIGHT_00 "data/spikes-floor/dv-spikes-right-00.png"
+#define DV_SPIKES_FG_00 "data/spikes-floor/dv-spikes-fg-00.png"
 #define DV_SPIKES_LEFT_01 "data/spikes-floor/dv-spikes-left-01.png"
 #define DV_SPIKES_RIGHT_01 "data/spikes-floor/dv-spikes-right-01.png"
 #define DV_SPIKES_FG_01 "data/spikes-floor/dv-spikes-fg-01.png"
@@ -116,13 +119,13 @@
 #define DV_SPIKES_LEFT_04 "data/spikes-floor/dv-spikes-left-04.png"
 #define DV_SPIKES_RIGHT_04 "data/spikes-floor/dv-spikes-right-04.png"
 #define DV_SPIKES_FG_04 "data/spikes-floor/dv-spikes-fg-04.png"
-#define DV_SPIKES_LEFT_05 "data/spikes-floor/dv-spikes-left-05.png"
-#define DV_SPIKES_RIGHT_05 "data/spikes-floor/dv-spikes-right-05.png"
-#define DV_SPIKES_FG_05 "data/spikes-floor/dv-spikes-fg-05.png"
 
 /* palace vga */
 #define PV_SPIKES_FLOOR_LEFT "data/spikes-floor/pv-left.png"
 #define PV_SPIKES_FLOOR_RIGHT "data/spikes-floor/pv-right.png"
+#define PV_SPIKES_LEFT_00 "data/spikes-floor/pv-spikes-left-00.png"
+#define PV_SPIKES_RIGHT_00 "data/spikes-floor/pv-spikes-right-00.png"
+#define PV_SPIKES_FG_00 "data/spikes-floor/pv-spikes-fg-00.png"
 #define PV_SPIKES_LEFT_01 "data/spikes-floor/pv-spikes-left-01.png"
 #define PV_SPIKES_RIGHT_01 "data/spikes-floor/pv-spikes-right-01.png"
 #define PV_SPIKES_FG_01 "data/spikes-floor/pv-spikes-fg-01.png"
@@ -135,9 +138,6 @@
 #define PV_SPIKES_LEFT_04 "data/spikes-floor/pv-spikes-left-04.png"
 #define PV_SPIKES_RIGHT_04 "data/spikes-floor/pv-spikes-right-04.png"
 #define PV_SPIKES_FG_04 "data/spikes-floor/pv-spikes-fg-04.png"
-#define PV_SPIKES_LEFT_05 "data/spikes-floor/pv-spikes-left-05.png"
-#define PV_SPIKES_RIGHT_05 "data/spikes-floor/pv-spikes-right-05.png"
-#define PV_SPIKES_FG_05 "data/spikes-floor/pv-spikes-fg-05.png"
 
 /* types */
 struct spikes_floor {
@@ -183,7 +183,21 @@ void draw_spikes_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
 void draw_spikes_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
                         struct spikes_floor *s, enum em em, enum vm vm);
 void draw_spikes_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, enum em em, enum vm vm);
-void draw_spikes_01 (ALLEGRO_BITMAP *bitmap, struct pos *p, enum em em, enum vm vm);
+void draw_spikes_00 (ALLEGRO_BITMAP *bitmap, struct pos *p, enum em em, enum vm vm);
+void draw_spikes_left_00 (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                          enum em em, enum vm vm);
+void draw_spikes_right_00 (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                           enum em em, enum vm vm);
+void draw_spikes_fg_00 (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                        enum em em, enum vm vm);
+struct coord *d_spikes_left_00_coord (struct pos *p, struct coord *c);
+struct coord *p_spikes_left_00_coord (struct pos *p, struct coord *c);
+struct coord *d_spikes_right_00_coord (struct pos *p, struct coord *c);
+struct coord *p_spikes_right_00_coord (struct pos *p, struct coord *c);
+struct coord *d_spikes_fg_00_coord (struct pos *p, struct coord *c);
+struct coord *p_spikes_fg_00_coord (struct pos *p, struct coord *c);
+void draw_spikes_01 (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                     enum em em, enum vm vm);
 void draw_spikes_left_01 (ALLEGRO_BITMAP *bitmap, struct pos *p,
                           enum em em, enum vm vm);
 void draw_spikes_right_01 (ALLEGRO_BITMAP *bitmap, struct pos *p,
@@ -238,19 +252,5 @@ struct coord *d_spikes_right_04_coord (struct pos *p, struct coord *c);
 struct coord *p_spikes_right_04_coord (struct pos *p, struct coord *c);
 struct coord *d_spikes_fg_04_coord (struct pos *p, struct coord *c);
 struct coord *p_spikes_fg_04_coord (struct pos *p, struct coord *c);
-void draw_spikes_05 (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                     enum em em, enum vm vm);
-void draw_spikes_left_05 (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                          enum em em, enum vm vm);
-void draw_spikes_right_05 (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                           enum em em, enum vm vm);
-void draw_spikes_fg_05 (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                        enum em em, enum vm vm);
-struct coord *d_spikes_left_05_coord (struct pos *p, struct coord *c);
-struct coord *p_spikes_left_05_coord (struct pos *p, struct coord *c);
-struct coord *d_spikes_right_05_coord (struct pos *p, struct coord *c);
-struct coord *p_spikes_right_05_coord (struct pos *p, struct coord *c);
-struct coord *d_spikes_fg_05_coord (struct pos *p, struct coord *c);
-struct coord *p_spikes_fg_05_coord (struct pos *p, struct coord *c);
 
 #endif	/* MININIM_SPIKES_H */
