@@ -45,13 +45,13 @@
 #define PV_BIG_POTION "data/potion/pv-big.png"
 
 /* palettable */
+#define BUBBLE_00 "data/potion/bubble-00.png"
 #define BUBBLE_01 "data/potion/bubble-01.png"
 #define BUBBLE_02 "data/potion/bubble-02.png"
 #define BUBBLE_03 "data/potion/bubble-03.png"
 #define BUBBLE_04 "data/potion/bubble-04.png"
 #define BUBBLE_05 "data/potion/bubble-05.png"
 #define BUBBLE_06 "data/potion/bubble-06.png"
-#define BUBBLE_07 "data/potion/bubble-07.png"
 
 void load_potion (void);
 void unload_potion (void);

@@ -44,8 +44,8 @@ ALLEGRO_BITMAP *dv_small_potion, *dv_big_potion;
 ALLEGRO_BITMAP *pv_small_potion, *pv_big_potion;
 
 /* palettable */
-ALLEGRO_BITMAP *bubble_01, *bubble_02, *bubble_03, *bubble_04, *bubble_05,
-  *bubble_06, *bubble_07;
+ALLEGRO_BITMAP *bubble_00, *bubble_01, *bubble_02, *bubble_03, *bubble_04,
+  *bubble_05, *bubble_06;
 
 static struct coord *small_potion_coord (struct pos *p, struct coord *c);
 static struct coord *small_potion_bubble_coord (struct pos *p, struct coord *c);
@@ -93,13 +93,13 @@ load_potion (void)
   pv_big_potion = load_bitmap (PV_BIG_POTION);
 
   /* palettable */
+  bubble_00 = load_bitmap (BUBBLE_00);
   bubble_01 = load_bitmap (BUBBLE_01);
   bubble_02 = load_bitmap (BUBBLE_02);
   bubble_03 = load_bitmap (BUBBLE_03);
   bubble_04 = load_bitmap (BUBBLE_04);
   bubble_05 = load_bitmap (BUBBLE_05);
   bubble_06 = load_bitmap (BUBBLE_06);
-  bubble_07 = load_bitmap (BUBBLE_07);
 }
 
 void
@@ -130,26 +130,26 @@ unload_potion (void)
   al_destroy_bitmap (pv_big_potion);
 
   /* palettable */
+  al_destroy_bitmap (bubble_00);
   al_destroy_bitmap (bubble_01);
   al_destroy_bitmap (bubble_02);
   al_destroy_bitmap (bubble_03);
   al_destroy_bitmap (bubble_04);
   al_destroy_bitmap (bubble_05);
   al_destroy_bitmap (bubble_06);
-  al_destroy_bitmap (bubble_07);
 }
 
 static ALLEGRO_BITMAP *
 get_bubble_frame (int i)
 {
   switch (i) {
-  case 0: return bubble_01;
-  case 1: return bubble_02;
-  case 2: return bubble_03;
-  case 3: return bubble_04;
-  case 4: return bubble_05;
-  case 5: return bubble_06;
-  case 6: return bubble_07;
+  case 0: return bubble_00;
+  case 1: return bubble_01;
+  case 2: return bubble_02;
+  case 3: return bubble_03;
+  case 4: return bubble_04;
+  case 5: return bubble_05;
+  case 6: return bubble_06;
   default:
     xerror (-1, 0, "%s (%i): unknown bubble frame", __func__, i);
   }
