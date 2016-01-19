@@ -27,6 +27,7 @@
 #include "kid/kid.h"
 #include "fight.h"
 #include "level.h"
+#include "samples.h"
 #include "level-door.h"
 
 /* dungeon cga */
@@ -58,8 +59,6 @@ ALLEGRO_BITMAP *dv_level_door_top_left, *dv_level_door_top_right,
 ALLEGRO_BITMAP *pv_level_door_top_left, *pv_level_door_top_right,
   *pv_level_door_bottom, *pv_level_door_floor, *pv_level_door_stairs,
   *pv_level_door_front;
-
-ALLEGRO_SAMPLE *level_door_open_sample, *level_door_close_sample;
 
 struct level_door *level_door = NULL;
 size_t level_door_nmemb = 0;
@@ -166,20 +165,6 @@ unload_level_door (void)
   al_destroy_bitmap (pv_level_door_floor);
   al_destroy_bitmap (pv_level_door_stairs);
   al_destroy_bitmap (pv_level_door_front);
-}
-
-void
-load_level_door_samples (void)
-{
-  level_door_open_sample = load_sample (LEVEL_DOOR_OPEN_SAMPLE);
-  level_door_close_sample = load_sample (LEVEL_DOOR_CLOSE_SAMPLE);
-}
-
-void
-unload_level_door_samples (void)
-{
-  al_destroy_sample (level_door_open_sample);
-  al_destroy_sample (level_door_close_sample);
 }
 
 void

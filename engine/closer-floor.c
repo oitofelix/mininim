@@ -27,6 +27,7 @@
 #include "door.h"
 #include "floor.h"
 #include "fight.h"
+#include "samples.h"
 #include "closer-floor.h"
 
 /* dungeon cga */
@@ -52,8 +53,6 @@ ALLEGRO_BITMAP *dv_unpressed_closer_floor_base, *dv_pressed_closer_floor_base,
 /* palace vga */
 ALLEGRO_BITMAP *pv_unpressed_closer_floor_base, *pv_pressed_closer_floor_base,
   *pv_pressed_closer_floor_right;
-
-ALLEGRO_SAMPLE *closer_floor_sample;
 
 struct closer_floor *closer_floor = NULL;
 size_t closer_floor_nmemb = 0;
@@ -124,18 +123,6 @@ unload_closer_floor (void)
   al_destroy_bitmap (pv_unpressed_closer_floor_base);
   al_destroy_bitmap (pv_pressed_closer_floor_base);
   al_destroy_bitmap (pv_pressed_closer_floor_right);
-}
-
-void
-load_closer_floor_samples (void)
-{
-  closer_floor_sample = load_sample (CLOSER_FLOOR_SAMPLE);
-}
-
-void
-unload_closer_floor_samples (void)
-{
-  al_destroy_sample (closer_floor_sample);
 }
 
 void

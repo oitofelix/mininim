@@ -27,6 +27,7 @@
 #include "engine/potion.h"
 #include "engine/sword.h"
 #include "engine/loose-floor.h"
+#include "engine/samples.h"
 #include "kid.h"
 
 struct frameset kid_stop_run_frameset[KID_STOP_RUN_FRAMESET_NMEMB];

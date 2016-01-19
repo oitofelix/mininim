@@ -33,6 +33,7 @@
 #include "opener-floor.h"
 #include "closer-floor.h"
 #include "spikes-floor.h"
+#include "samples.h"
 #include "loose-floor.h"
 
 /* dungeon cga */
@@ -64,9 +65,6 @@ ALLEGRO_BITMAP *dv_loose_floor_left_01, *dv_loose_floor_right_01,
 ALLEGRO_BITMAP *pv_loose_floor_left_01, *pv_loose_floor_right_01,
   *pv_loose_floor_base_01, *pv_loose_floor_left_02, *pv_loose_floor_right_02,
   *pv_loose_floor_base_02, *pv_loose_floor_02, *pv_broken_floor;
-
-ALLEGRO_SAMPLE *loose_floor_01_sample, *loose_floor_02_sample, *loose_floor_03_sample,
-  *broken_floor_sample;
 
 struct loose_floor *loose_floor = NULL;
 size_t loose_floor_nmemb = 0;
@@ -198,24 +196,6 @@ unload_loose_floor (void)
   al_destroy_bitmap (pv_loose_floor_base_02);
   al_destroy_bitmap (pv_loose_floor_02);
   al_destroy_bitmap (pv_broken_floor);
-}
-
-void
-load_loose_floor_samples (void)
-{
-  loose_floor_01_sample = load_sample (LOOSE_FLOOR_01_SAMPLE);
-  loose_floor_02_sample = load_sample (LOOSE_FLOOR_02_SAMPLE);
-  loose_floor_03_sample = load_sample (LOOSE_FLOOR_03_SAMPLE);
-  broken_floor_sample = load_sample (BROKEN_FLOOR_SAMPLE);
-}
-
-void
-unload_loose_floor_samples (void)
-{
-  al_destroy_sample (loose_floor_01_sample);
-  al_destroy_sample (loose_floor_02_sample);
-  al_destroy_sample (loose_floor_03_sample);
-  al_destroy_sample (broken_floor_sample);
 }
 
 ALLEGRO_BITMAP *

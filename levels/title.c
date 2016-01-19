@@ -28,6 +28,7 @@
 #include "engine/princess.h"
 #include "engine/jaffar.h"
 #include "engine/clock.h"
+#include "engine/samples.h"
 #include "title.h"
 
 /* functions */
@@ -39,7 +40,7 @@ static ALLEGRO_BITMAP *main_background, *presents, *author, *game_name, *copyrig
   *princess_room_pillar, *marry_jaffar, *credits;
 
 static ALLEGRO_SAMPLE *main_theme, *story_1, *princess_waiting_3,
-  *jaffar_appearing_3, *story_3, *door_opening, *door_gate_opening_1;
+  *jaffar_appearing_3, *story_3, *door_opening;
 
 bool title_started;
 
@@ -67,7 +68,6 @@ load_title (void)
   jaffar_appearing_3 = load_sample (JAFFAR_APPEARING_3);
   story_3 = load_sample (STORY_3);
   door_opening = load_sample (DOOR_OPENING);
-  door_gate_opening_1 = load_sample (DOOR_GATE_OPENING_1);
 
   /* modules */
   load_princess ();
@@ -99,7 +99,6 @@ unload_title (void)
   al_destroy_sample (jaffar_appearing_3);
   al_destroy_sample (story_3);
   al_destroy_sample (door_opening);
-  al_destroy_sample (door_gate_opening_1);
 
   /* modules */
   unload_princess ();
@@ -223,7 +222,7 @@ title_anim (void)
     break;
   case 11:
     if (! is_playing_sample_instance (si)) {
-      si = play_sample (door_gate_opening_1, -1);
+      si = play_sample (door_close_sample, -1);
       i++;
     }
     break;

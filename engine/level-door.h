@@ -72,10 +72,6 @@
 #define PV_LEVEL_DOOR_STAIRS "data/level-door/pv-stairs.png"
 #define PV_LEVEL_DOOR_FRONT "data/level-door/pv-front.png"
 
-/* sounds */
-#define LEVEL_DOOR_OPEN_SAMPLE "dat/digisnd3/level door opening.ogg"
-#define LEVEL_DOOR_CLOSE_SAMPLE "dat/digisnd3/res10014.ogg"
-
 /* types */
 struct level_door {
   struct pos p;
@@ -93,8 +89,6 @@ extern size_t level_door_nmemb;
 /* functions */
 void load_level_door (void);
 void unload_level_door (void);
-void load_level_door_samples (void);
-void unload_level_door_samples (void);
 void register_level_door (struct pos *p);
 int compare_level_doors (const void *d0, const void *d1);
 struct level_door *level_door_at_pos (struct pos *p);

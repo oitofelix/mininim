@@ -73,12 +73,6 @@
 #define PV_LOOSE_FLOOR_LEFT_02 "data/loose-floor/pv-left-02.png"
 #define PV_LOOSE_FLOOR_RIGHT_02 "data/loose-floor/pv-right-02.png"
 
-/* sounds */
-#define LOOSE_FLOOR_01_SAMPLE "dat/digisnd1/tile moving 1.ogg"
-#define LOOSE_FLOOR_02_SAMPLE "dat/digisnd1/tile moving 2.ogg"
-#define LOOSE_FLOOR_03_SAMPLE "dat/digisnd1/door tile pressed 1.ogg"
-#define BROKEN_FLOOR_SAMPLE "dat/digisnd1/tile crashing into the floor.ogg"
-
 /* types */
 struct loose_floor {
   struct pos p;
@@ -104,8 +98,6 @@ extern size_t loose_floor_nmemb;
 /* functions */
 void load_loose_floor (void);
 void unload_loose_floor (void);
-void load_loose_floor_samples (void);
-void unload_loose_floor_samples (void);
 ALLEGRO_BITMAP *create_loose_floor_02_bitmap (enum em em, enum vm vm);
 void register_loose_floor (struct pos *p);
 void sort_loose_floors (void);

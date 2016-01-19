@@ -29,6 +29,7 @@
 #include "engine/loose-floor.h"
 #include "engine/fight.h"
 #include "engine/kid/kid.h"
+#include "engine/samples.h"
 #include "guard.h"
 
 struct frameset guard_attack_frameset[GUARD_ATTACK_FRAMESET_NMEMB];

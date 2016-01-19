@@ -26,6 +26,7 @@
 #include "kid/kid.h"
 #include "floor.h"
 #include "fight.h"
+#include "samples.h"
 #include "spikes-floor.h"
 
 /* dungeon cga */
@@ -75,8 +76,6 @@ ALLEGRO_BITMAP *pv_spikes_floor_left, *pv_spikes_floor_right,
   *pv_spikes_left_03, *pv_spikes_right_03, *pv_spikes_fg_03,
   *pv_spikes_left_04, *pv_spikes_right_04, *pv_spikes_fg_04,
   *pv_spikes_left_05, *pv_spikes_right_05, *pv_spikes_fg_05;
-
-ALLEGRO_SAMPLE *spikes_sample;
 
 struct spikes_floor *spikes_floor = NULL;
 size_t spikes_floor_nmemb = 0;
@@ -315,18 +314,6 @@ unload_spikes_floor (void)
   al_destroy_bitmap (pv_spikes_left_05);
   al_destroy_bitmap (pv_spikes_right_05);
   al_destroy_bitmap (pv_spikes_fg_05);
-}
-
-void
-load_spikes_floor_samples (void)
-{
-  spikes_sample = load_sample (SPIKES_SAMPLE);
-}
-
-void
-unload_spikes_floor_samples (void)
-{
-  al_destroy_sample (spikes_sample);
 }
 
 void

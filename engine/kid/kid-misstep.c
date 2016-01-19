@@ -26,6 +26,7 @@
 #include "engine/potion.h"
 #include "engine/sword.h"
 #include "engine/loose-floor.h"
+#include "engine/samples.h"
 #include "kid.h"
 
 struct frameset kid_misstep_frameset[KID_MISSTEP_FRAMESET_NMEMB];

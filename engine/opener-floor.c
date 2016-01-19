@@ -30,6 +30,7 @@
 #include "fight.h"
 #include "door.h"
 #include "floor.h"
+#include "samples.h"
 #include "opener-floor.h"
 
 /* dungeon cga */
@@ -55,8 +56,6 @@ ALLEGRO_BITMAP *dv_unpressed_opener_floor_base,
 /* palace vga */
 ALLEGRO_BITMAP *pv_unpressed_opener_floor_base,
   *pv_unpressed_opener_floor_left, *pv_unpressed_opener_floor_right;
-
-ALLEGRO_SAMPLE *opener_floor_sample;
 
 struct opener_floor *opener_floor = NULL;
 size_t opener_floor_nmemb = 0;
@@ -127,18 +126,6 @@ unload_opener_floor (void)
   al_destroy_bitmap (pv_unpressed_opener_floor_base);
   al_destroy_bitmap (pv_unpressed_opener_floor_left);
   al_destroy_bitmap (pv_unpressed_opener_floor_right);
-}
-
-void
-load_opener_floor_samples (void)
-{
-  opener_floor_sample = load_sample (OPENER_FLOOR_SAMPLE);
-}
-
-void
-unload_opener_floor_samples (void)
-{
-  al_destroy_sample (opener_floor_sample);
 }
 
 void

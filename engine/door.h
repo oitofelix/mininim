@@ -82,12 +82,6 @@
 #define PV_DOOR_GRID "data/door/pv-grid.png"
 #define PV_DOOR_GRID_TIP "data/door/pv-grid-tip.png"
 
-/* sounds */
-#define DOOR_OPEN_SAMPLE "dat/digisnd1/door gate closing slow 1.ogg"
-#define DOOR_CLOSE_SAMPLE "dat/digisnd1/door gate opening 1.ogg"
-#define DOOR_END_SAMPLE "dat/digisnd1/drinking potion.ogg"
-#define DOOR_ABRUPTLY_CLOSE_SAMPLE "dat/digisnd1/door gate closing fast.ogg"
-
 /* types */
 struct door {
   struct pos p;
@@ -106,8 +100,6 @@ extern size_t door_nmemb;
 /* functions */
 void load_door (void);
 void unload_door (void);
-void load_door_samples (void);
-void unload_door_samples (void);
 void register_door (struct pos *p);
 int compare_doors (const void *d0, const void *d1);
 struct door *door_at_pos (struct pos *p);

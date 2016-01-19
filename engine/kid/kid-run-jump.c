@@ -27,6 +27,7 @@
 #include "engine/sword.h"
 #include "engine/loose-floor.h"
 #include "engine/mirror.h"
+#include "engine/samples.h"
 #include "kid.h"
 
 struct frameset kid_run_jump_frameset[KID_JUMP_FRAMESET_NMEMB];

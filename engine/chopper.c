@@ -29,6 +29,7 @@
 #include "guard/guard.h"
 #include "fight.h"
 #include "level.h"
+#include "samples.h"
 #include "chopper.h"
 
 /* dungeon cga */
@@ -76,8 +77,6 @@ ALLEGRO_BITMAP *pv_chopper_01, *pv_chopper_fg_01,
 /* palettable */
 ALLEGRO_BITMAP *chopper_blood_01, *chopper_blood_02,
   *chopper_blood_03, *chopper_blood_04, *chopper_blood_05;
-
-ALLEGRO_SAMPLE *chopper_sample;
 
 struct chopper *chopper = NULL;
 size_t chopper_nmemb = 0;
@@ -289,18 +288,6 @@ unload_chopper (void)
   al_destroy_bitmap (chopper_blood_03);
   al_destroy_bitmap (chopper_blood_04);
   al_destroy_bitmap (chopper_blood_05);
-}
-
-void
-load_chopper_samples (void)
-{
-  chopper_sample = load_sample (CHOPPER_SAMPLE);
-}
-
-void
-unload_chopper_samples (void)
-{
-  al_destroy_sample (chopper_sample);
 }
 
 void

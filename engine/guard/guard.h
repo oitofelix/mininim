@@ -37,12 +37,6 @@
 #define GUARD_LIFE "data/life/guard.png"
 #define GUARD_SPLASH "data/splash/guard.png"
 
-/* sounds */
-#define GUARD_HIT_SAMPLE "dat/digisnd1/taking a life to the enemy.ogg"
-#define SKELETON_SAMPLE "dat/digisnd2/skel alive.ogg"
-#define MEET_VIZIER_SAMPLE "dat/midisnd1/meet-vizier.ogg"
-#define VIZIER_DEATH_SAMPLE "dat/midisnd1/vizier-death.ogg"
-
 /* functions */
 void load_guard (void);
 void unload_guard (void);
@@ -56,8 +50,5 @@ void draw_guard_lives (ALLEGRO_BITMAP *bitmap, struct anim *g, enum vm vm);
 /* variables */
 extern struct anim *guarda;
 extern size_t guarda_nmemb;
-
-extern ALLEGRO_SAMPLE *guard_hit_sample, *skeleton_sample,
-  *meet_vizier_sample, *vizier_death_sample;
 
 #endif	/* MININIM_GUARD_H */

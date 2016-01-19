@@ -28,6 +28,7 @@
 #include "engine/sword.h"
 #include "engine/loose-floor.h"
 #include "engine/fight.h"
+#include "engine/samples.h"
 #include "kid.h"
 
 struct frameset kid_sword_attack_frameset[KID_SWORD_ATTACK_FRAMESET_NMEMB];
@@ -175,7 +176,6 @@ physics_in (struct anim *k)
   /* collision */
   if (is_colliding (&k->f, &k->fo, +PLACE_WIDTH, false, &k->ci)
       && k->i == 0) {
-    /* sample_action_not_allowed = true; */
     kid_sword_normal (k);
     return false;
   }

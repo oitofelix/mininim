@@ -27,6 +27,7 @@
 #include "engine/sword.h"
 #include "engine/loose-floor.h"
 #include "engine/level.h"
+#include "engine/samples.h"
 #include "kid.h"
 
 struct frameset kid_stairs_frameset[KID_STAIRS_FRAMESET_NMEMB];

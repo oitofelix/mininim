@@ -61,35 +61,6 @@
 #define V_KID_EMPTY_LIFE "data/life/v-kid-empty.png"
 #define V_KID_SPLASH "data/splash/v-kid.png"
 
-/* sounds */
-#define STEP_SAMPLE "dat/digisnd1/running 2.ogg"
-#define HIT_GROUND_SAMPLE "dat/digisnd1/running 1.ogg"
-#define HIT_GROUND_HARM_SAMPLE "dat/digisnd1/loosing a life falling.ogg"
-#define HIT_GROUND_FATAL_SAMPLE "dat/digisnd1/prince crashing into the floor.ogg"
-#define HIT_WALL_SAMPLE "dat/digisnd1/touching a wall.ogg"
-#define HANG_ON_FALL_SAMPLE "dat/digisnd1/normal falling.ogg"
-#define DRINK_SAMPLE "dat/digisnd3/drinking.ogg"
-#define GLORY_SAMPLE "dat/midisnd1/guard death 1.ogg"
-#define TAKE_SWORD_SAMPLE "dat/digisnd1/taking out the sword.ogg"
-#define SWORD_ATTACK_SAMPLE "dat/digisnd1/sword moving.ogg"
-#define HARM_SAMPLE "dat/digisnd1/loosing a life from the enemy.ogg"
-#define ACTION_NOT_ALLOWED_SAMPLE "dat/digisnd1/drinking potion.ogg"
-#define SMALL_LIFE_POTION_SAMPLE "dat/midisnd1/potion 2.ogg"
-#define BIG_LIFE_POTION_SAMPLE "dat/midisnd1/potion 1.ogg"
-#define SCREAM_SAMPLE "dat/digisnd3/falling.ogg"
-#define SPIKED_SAMPLE "dat/digisnd2/something spiked.ogg"
-#define CHOPPED_SAMPLE "dat/digisnd2/something chopped.ogg"
-#define FLOATING_SAMPLE "dat/midisnd1/floating.ogg"
-#define DEATH_SAMPLE "dat/midisnd1/death.ogg"
-#define FIGHT_DEATH_SAMPLE "dat/midisnd1/fight-death.ogg"
-#define PRESS_KEY_SAMPLE "dat/digisnd1/press-key.ogg"
-#define MIRROR_SAMPLE "dat/digisnd2/mirror.ogg"
-#define SUSPENSE_SAMPLE "dat/midisnd1/suspense.ogg"
-#define SUCCESS_SAMPLE "dat/midisnd1/success.ogg"
-#define SUCCESS_SUSPENSE_SAMPLE "dat/midisnd1/success-suspense.ogg"
-#define SWORD_DEFENSE_SAMPLE "dat/digisnd1/sword vs sword.ogg"
-#define SWORD_HIT_SAMPLE "dat/digisnd1/loosing a life from the enemy.ogg"
-
 /* functions */
 void load_kid (void);
 void unload_kid (void);
@@ -121,14 +92,5 @@ bool kid_door_split_collision (struct anim *k);
 extern int current_kid_id;
 
 extern ALLEGRO_BITMAP *v_kid_full_life, *v_kid_empty_life, *v_kid_splash;
-
-extern ALLEGRO_SAMPLE *step_sample, *hit_ground_sample, *hit_ground_harm_sample,
-  *hit_ground_fatal_sample, *hit_wall_sample, *hang_on_fall_sample,
-  *drink_sample, *glory_sample, *take_sword_sample, *sword_attack_sample,
-  *harm_sample, *action_not_allowed_sample, *small_life_potion_sample,
-  *big_life_potion_sample, *scream_sample, *spiked_sample, *chopped_sample,
-  *floating_sample, *death_sample, *fight_death_sample,
-  *press_key_sample, *mirror_sample, *suspense_sample, *success_sample,
-  *success_suspense_sample, *sword_defense_sample, *sword_hit_sample;
 
 #endif	/* MININIM_KID_H */

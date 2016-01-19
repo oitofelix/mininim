@@ -37,20 +37,12 @@
 #include "engine/potion.h"
 #include "engine/sword.h"
 #include "engine/fight.h"
+#include "engine/samples.h"
 #include "kid.h"
 
 int current_kid_id;
 
 ALLEGRO_BITMAP *v_kid_full_life, *v_kid_empty_life, *v_kid_splash;
-
-ALLEGRO_SAMPLE *step_sample, *hit_ground_sample, *hit_ground_harm_sample,
-  *hit_ground_fatal_sample, *hit_wall_sample, *hang_on_fall_sample,
-  *drink_sample, *glory_sample, *take_sword_sample, *sword_attack_sample,
-  *harm_sample, *action_not_allowed_sample, *small_life_potion_sample,
-  *big_life_potion_sample, *scream_sample, *spiked_sample, *chopped_sample,
-  *floating_sample, *death_sample, *fight_death_sample,
-  *press_key_sample, *mirror_sample, *suspense_sample, *success_sample,
-  *success_suspense_sample, *sword_defense_sample, *sword_hit_sample;
 
 static void place_kid (struct anim *k, int room, int floor, int place);
 static struct coord *kid_life_coord (int i, struct coord *c);
@@ -97,35 +89,6 @@ load_kid (void)
   v_kid_full_life = load_bitmap (V_KID_FULL_LIFE);
   v_kid_empty_life = load_bitmap (V_KID_EMPTY_LIFE);
   v_kid_splash = load_bitmap (V_KID_SPLASH);
-
-  /* sound */
-  step_sample = load_sample (STEP_SAMPLE);
-  hit_ground_sample = load_sample (HIT_GROUND_SAMPLE);
-  hit_ground_harm_sample = load_sample (HIT_GROUND_HARM_SAMPLE);
-  hit_ground_fatal_sample = load_sample (HIT_GROUND_FATAL_SAMPLE);
-  hit_wall_sample = load_sample (HIT_WALL_SAMPLE);
-  hang_on_fall_sample = load_sample (HANG_ON_FALL_SAMPLE);
-  drink_sample = load_sample (DRINK_SAMPLE);
-  glory_sample = load_sample (GLORY_SAMPLE);
-  take_sword_sample = load_sample (TAKE_SWORD_SAMPLE);
-  sword_attack_sample = load_sample (SWORD_ATTACK_SAMPLE);
-  harm_sample = load_sample (HARM_SAMPLE);
-  action_not_allowed_sample = load_sample (ACTION_NOT_ALLOWED_SAMPLE);
-  small_life_potion_sample = load_sample (SMALL_LIFE_POTION_SAMPLE);
-  big_life_potion_sample = load_sample (BIG_LIFE_POTION_SAMPLE);
-  scream_sample = load_sample (SCREAM_SAMPLE);
-  spiked_sample = load_sample (SPIKED_SAMPLE);
-  chopped_sample = load_sample (CHOPPED_SAMPLE);
-  floating_sample = load_sample (FLOATING_SAMPLE);
-  death_sample = load_sample (DEATH_SAMPLE);
-  fight_death_sample = load_sample (FIGHT_DEATH_SAMPLE);
-  press_key_sample = load_sample (PRESS_KEY_SAMPLE);
-  mirror_sample = load_sample (MIRROR_SAMPLE);
-  suspense_sample = load_sample (SUSPENSE_SAMPLE);
-  success_sample = load_sample (SUCCESS_SAMPLE);
-  success_suspense_sample = load_sample (SUCCESS_SUSPENSE_SAMPLE);
-  sword_defense_sample = load_sample (SWORD_DEFENSE_SAMPLE);
-  sword_hit_sample = load_sample (SWORD_HIT_SAMPLE);
 }
 
 void
@@ -167,35 +130,6 @@ unload_kid (void)
   al_destroy_bitmap (v_kid_full_life);
   al_destroy_bitmap (v_kid_empty_life);
   al_destroy_bitmap (v_kid_splash);
-
-  /* sounds */
-  al_destroy_sample (step_sample);
-  al_destroy_sample (hit_ground_sample);
-  al_destroy_sample (hit_ground_harm_sample);
-  al_destroy_sample (hit_ground_fatal_sample);
-  al_destroy_sample (hit_wall_sample);
-  al_destroy_sample (hang_on_fall_sample);
-  al_destroy_sample (drink_sample);
-  al_destroy_sample (glory_sample);
-  al_destroy_sample (take_sword_sample);
-  al_destroy_sample (sword_attack_sample);
-  al_destroy_sample (harm_sample);
-  al_destroy_sample (action_not_allowed_sample);
-  al_destroy_sample (small_life_potion_sample);
-  al_destroy_sample (big_life_potion_sample);
-  al_destroy_sample (scream_sample);
-  al_destroy_sample (spiked_sample);
-  al_destroy_sample (chopped_sample);
-  al_destroy_sample (floating_sample);
-  al_destroy_sample (death_sample);
-  al_destroy_sample (fight_death_sample);
-  al_destroy_sample (press_key_sample);
-  al_destroy_sample (mirror_sample);
-  al_destroy_sample (suspense_sample);
-  al_destroy_sample (success_sample);
-  al_destroy_sample (success_suspense_sample);
-  al_destroy_sample (sword_defense_sample);
-  al_destroy_sample (sword_hit_sample);
 }
 
 struct anim *

@@ -105,7 +105,6 @@ physics_in (struct anim *k)
   /* collision */
   if (is_colliding (&k->f, &k->fo, +PLACE_WIDTH, false, &k->ci)
       && k->i == 0) {
-    /* sample_action_not_allowed = true; */
     kid_sword_normal (k);
     return false;
   }

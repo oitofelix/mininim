@@ -26,6 +26,7 @@
 #include "engine/potion.h"
 #include "engine/sword.h"
 #include "engine/loose-floor.h"
+#include "engine/samples.h"
 #include "kid.h"
 
 static bool flow (struct anim *k);

@@ -41,7 +41,6 @@
 #define JAFFAR_APPEARING_3 "dat/midisnd2/story2 jaffar and clock apprearing.ogg"
 #define STORY_3 "dat/midisnd2/story3.ogg"
 #define DOOR_OPENING "dat/digisnd2/res10051.ogg"
-#define DOOR_GATE_OPENING_1 "dat/digisnd1/door gate opening 1.ogg"
 
 /* functions */
 void play_title (void);

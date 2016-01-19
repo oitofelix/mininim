@@ -29,6 +29,7 @@
 #include "engine/loose-floor.h"
 #include "engine/spikes-floor.h"
 #include "engine/kid/kid.h"
+#include "engine/samples.h"
 #include "guard.h"
 
 struct frameset guard_fall_frameset[GUARD_FALL_FRAMESET_NMEMB];

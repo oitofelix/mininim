@@ -27,6 +27,7 @@
 #include "engine/potion.h"
 #include "engine/sword.h"
 #include "engine/loose-floor.h"
+#include "engine/samples.h"
 #include "kid.h"
 
 struct frameset kid_drink_frameset[KID_DRINK_FRAMESET_NMEMB];

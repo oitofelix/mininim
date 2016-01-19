@@ -103,9 +103,6 @@
 #define CHOPPER_BLOOD_04 "data/chopper/blood-04.png"
 #define CHOPPER_BLOOD_05 "data/chopper/blood-05.png"
 
-/* sounds */
-#define CHOPPER_SAMPLE "dat/digisnd2/chopper.ogg"
-
 /* types */
 struct chopper {
   struct pos p;
@@ -124,8 +121,6 @@ extern size_t chopper_nmemb;
 /* functions */
 void load_chopper (void);
 void unload_chopper (void);
-void load_chopper_samples (void);
-void unload_chopper_samples (void);
 void register_chopper (struct pos *p);
 int compare_choppers (const void *d0, const void *d1);
 struct chopper *chopper_at_pos (struct pos *p);

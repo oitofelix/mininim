@@ -42,10 +42,6 @@
 /* bitmaps */
 ALLEGRO_BITMAP *guard_life, *guard_splash;
 
-/* sounds */
-ALLEGRO_SAMPLE *guard_hit_sample, *skeleton_sample,
-  *meet_vizier_sample, *vizier_death_sample;
-
 static struct coord *guard_life_coord (int i, struct coord *c);
 static ALLEGRO_COLOR c_shadow_life_palette (ALLEGRO_COLOR c);
 static ALLEGRO_COLOR e_shadow_life_palette (ALLEGRO_COLOR c);
@@ -69,12 +65,6 @@ load_guard (void)
   /* bitmaps */
   guard_life = load_bitmap (GUARD_LIFE);
   guard_splash = load_bitmap (GUARD_SPLASH);
-
-  /* sounds */
-  guard_hit_sample = load_sample (GUARD_HIT_SAMPLE);
-  skeleton_sample = load_sample (SKELETON_SAMPLE);
-  meet_vizier_sample = load_sample (MEET_VIZIER_SAMPLE);
-  vizier_death_sample = load_sample (VIZIER_DEATH_SAMPLE);
 }
 
 void
@@ -93,12 +83,6 @@ unload_guard (void)
   /* bitmaps */
   al_destroy_bitmap (guard_life);
   al_destroy_bitmap (guard_splash);
-
-  /* sounds */
-  al_destroy_sample (guard_hit_sample);
-  al_destroy_sample (skeleton_sample);
-  al_destroy_sample (meet_vizier_sample);
-  al_destroy_sample (vizier_death_sample);
 }
 
 struct anim *

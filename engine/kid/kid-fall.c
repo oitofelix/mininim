@@ -28,6 +28,7 @@
 #include "engine/sword.h"
 #include "engine/loose-floor.h"
 #include "engine/spikes-floor.h"
+#include "engine/samples.h"
 #include "kid.h"
 
 struct frameset kid_fall_frameset[KID_FALL_FRAMESET_NMEMB];

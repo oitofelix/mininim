@@ -31,6 +31,7 @@
 #include "engine/closer-floor.h"
 #include "engine/kid/kid.h"
 #include "engine/fight.h"
+#include "engine/samples.h"
 #include "guard.h"
 
 struct frameset guard_die_frameset[GUARD_DIE_FRAMESET_NMEMB];

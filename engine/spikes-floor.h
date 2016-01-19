@@ -139,9 +139,6 @@
 #define PV_SPIKES_RIGHT_05 "data/spikes-floor/pv-spikes-right-05.png"
 #define PV_SPIKES_FG_05 "data/spikes-floor/pv-spikes-fg-05.png"
 
-/* sounds */
-#define SPIKES_SAMPLE "dat/digisnd2/spikes.ogg"
-
 /* types */
 struct spikes_floor {
   struct pos p;
@@ -158,8 +155,6 @@ extern size_t spikes_floor_nmemb;
 /* functions */
 void load_spikes_floor (void);
 void unload_spikes_floor (void);
-void load_spikes_floor_samples (void);
-void unload_spikes_floor_samples (void);
 void register_spikes_floor (struct pos *p);
 void sort_spikes_floors (void);
 int compare_spikes_floors (const void *s0, const void *s1);

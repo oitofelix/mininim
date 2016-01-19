@@ -46,6 +46,7 @@
 #include "mouse.h"
 #include "fight.h"
 #include "kid/kid-sword-hit.h"
+#include "samples.h"
 #include "level.h"
 
 /* functions */

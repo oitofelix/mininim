@@ -82,14 +82,6 @@ load_room (void)
   load_carpet ();
   load_stars ();
   load_mirror ();
-
-  load_loose_floor_samples ();
-  load_opener_floor_samples ();
-  load_closer_floor_samples ();
-  load_spikes_floor_samples ();
-  load_door_samples ();
-  load_level_door_samples ();
-  load_chopper_samples ();
 }
 
 void
@@ -117,15 +109,6 @@ unload_room (void)
   unload_carpet ();
   unload_stars ();
   unload_mirror ();
-
-  /* sounds */
-  unload_loose_floor_samples ();
-  unload_opener_floor_samples ();
-  unload_closer_floor_samples ();
-  unload_spikes_floor_samples ();
-  unload_door_samples ();
-  unload_level_door_samples ();
-  unload_chopper_samples ();
 }
 
 struct rect

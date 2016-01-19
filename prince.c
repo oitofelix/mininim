@@ -28,6 +28,7 @@
 #include "kernel/timer.h"
 #include "kernel/xerror.h"
 #include "engine/level.h"
+#include "engine/samples.h"
 #include "levels/title.h"
 #include "levels/level-1.h"
 #include "levels/consistency-level.h"
@@ -53,6 +54,7 @@ main (int argc, char **argv)
              ALLEGRO_ALIGN_CENTRE);
   show ();
 
+  load_samples ();
   load_level ();
   load_title ();
 
@@ -77,6 +79,7 @@ main (int argc, char **argv)
  quit_game:
   unload_level ();
   unload_title ();
+  unload_samples ();
 
   finalize_video ();
   finalize_audio ();

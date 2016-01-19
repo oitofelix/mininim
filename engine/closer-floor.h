@@ -52,9 +52,6 @@
 #define PV_PRESSED_CLOSER_FLOOR_BASE "data/closer-floor/pv-pressed-base.png"
 #define PV_PRESSED_CLOSER_FLOOR_RIGHT "data/closer-floor/pv-pressed-right.png"
 
-/* sounds */
-#define CLOSER_FLOOR_SAMPLE "dat/digisnd1/door tile pressed 1.ogg"
-
 /* types */
 struct closer_floor {
   struct pos p;
@@ -72,8 +69,6 @@ extern size_t closer_floor_nmemb;
 /* functions */
 void load_closer_floor (void);
 void unload_closer_floor (void);
-void load_closer_floor_samples (void);
-void unload_closer_floor_samples (void);
 void register_closer_floor (struct pos *p);
 int compare_closer_floors (const void *c0, const void *c1);
 struct closer_floor * closer_floor_at_pos (struct pos *p);

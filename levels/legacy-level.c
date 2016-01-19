@@ -36,6 +36,7 @@
 #include "engine/potion.h"
 #include "engine/mouse.h"
 #include "engine/fight.h"
+#include "engine/samples.h"
 #include "legacy-level.h"
 
 static struct level legacy_level;
@@ -574,7 +575,7 @@ special_events (void)
       if (ks->action == guard_hit && ks->i == 0) {
         video_effect.color = get_flicker_blood_color ();
         start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
-        play_sample (sword_hit_sample, k->f.c.room);
+        play_sample (harm_sample, k->f.c.room);
         k->splash = true;
         k->current_lives--;
         kid_sword_hit (k);
