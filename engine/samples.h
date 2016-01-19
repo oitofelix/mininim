@@ -57,8 +57,8 @@
 #define LEVEL_DOOR_OPEN_SAMPLE "data/sample/level-door-open.ogg"
 #define LEVEL_DOOR_CLOSE_SAMPLE "data/sample/level-door-close.ogg"
 #define CLOSER_FLOOR_SAMPLE "data/sample/closer-floor.ogg"
-#define LOOSE_FLOOR_01_SAMPLE "data/sample/loose-floor-01.ogg"
-#define LOOSE_FLOOR_02_SAMPLE "data/sample/loose-floor-02.ogg"
+#define LOOSE_FLOOR_00_SAMPLE "data/sample/loose-floor-01.ogg"
+#define LOOSE_FLOOR_01_SAMPLE "data/sample/loose-floor-02.ogg"
 #define LOOSE_FLOOR_03_SAMPLE "data/sample/loose-floor-03.ogg"
 #define BROKEN_FLOOR_SAMPLE "data/sample/broken-floor.ogg"
 #define SPIKES_SAMPLE "data/sample/spikes.ogg"
@@ -104,8 +104,8 @@ extern ALLEGRO_SAMPLE *step_sample,
   *level_door_open_sample,
   *level_door_close_sample,
   *closer_floor_sample,
+  *loose_floor_00_sample,
   *loose_floor_01_sample,
-  *loose_floor_02_sample,
   *loose_floor_03_sample,
   *broken_floor_sample,
   *spikes_sample,

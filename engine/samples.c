@@ -57,8 +57,8 @@ ALLEGRO_SAMPLE *step_sample,
   *level_door_open_sample,
   *level_door_close_sample,
   *closer_floor_sample,
+  *loose_floor_00_sample,
   *loose_floor_01_sample,
-  *loose_floor_02_sample,
   *loose_floor_03_sample,
   *broken_floor_sample,
   *spikes_sample,
@@ -104,8 +104,8 @@ load_samples (void)
   level_door_open_sample = load_sample (LEVEL_DOOR_OPEN_SAMPLE);
   level_door_close_sample = load_sample (LEVEL_DOOR_CLOSE_SAMPLE);
   closer_floor_sample = load_sample (CLOSER_FLOOR_SAMPLE);
+  loose_floor_00_sample = load_sample (LOOSE_FLOOR_00_SAMPLE);
   loose_floor_01_sample = load_sample (LOOSE_FLOOR_01_SAMPLE);
-  loose_floor_02_sample = load_sample (LOOSE_FLOOR_02_SAMPLE);
   loose_floor_03_sample = load_sample (LOOSE_FLOOR_03_SAMPLE);
   broken_floor_sample = load_sample (BROKEN_FLOOR_SAMPLE);
   spikes_sample = load_sample (SPIKES_SAMPLE);
@@ -152,8 +152,8 @@ unload_samples (void)
   al_destroy_sample (level_door_open_sample);
   al_destroy_sample (level_door_close_sample);
   al_destroy_sample (closer_floor_sample);
+  al_destroy_sample (loose_floor_00_sample);
   al_destroy_sample (loose_floor_01_sample);
-  al_destroy_sample (loose_floor_02_sample);
   al_destroy_sample (loose_floor_03_sample);
   al_destroy_sample (broken_floor_sample);
   al_destroy_sample (spikes_sample);

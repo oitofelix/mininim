@@ -98,7 +98,7 @@ extern size_t loose_floor_nmemb;
 /* functions */
 void load_loose_floor (void);
 void unload_loose_floor (void);
-ALLEGRO_BITMAP *create_loose_floor_02_bitmap (enum em em, enum vm vm);
+ALLEGRO_BITMAP *create_loose_floor_01_bitmap (enum em em, enum vm vm);
 void register_loose_floor (struct pos *p);
 void sort_loose_floors (void);
 int compare_loose_floors (const void *l0, const void *l1);
@@ -122,6 +122,14 @@ void draw_loose_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
                              enum em em, enum vm vm);
 void draw_falling_loose_floor (ALLEGRO_BITMAP *bitmap, struct pos *p,
                                enum em em, enum vm vm);
+void draw_loose_floor_00 (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                          enum em em, enum vm vm);
+void draw_loose_floor_00_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                               enum em em, enum vm vm);
+void draw_loose_floor_00_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                               enum em em, enum vm vm);
+void draw_loose_floor_00_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                                enum em em, enum vm vm);
 void draw_loose_floor_01 (ALLEGRO_BITMAP *bitmap, struct pos *p,
                           enum em em, enum vm vm);
 void draw_loose_floor_01_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
@@ -129,14 +137,6 @@ void draw_loose_floor_01_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
 void draw_loose_floor_01_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
                                enum em em, enum vm vm);
 void draw_loose_floor_01_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                                enum em em, enum vm vm);
-void draw_loose_floor_02 (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                          enum em em, enum vm vm);
-void draw_loose_floor_02_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                               enum em em, enum vm vm);
-void draw_loose_floor_02_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                               enum em em, enum vm vm);
-void draw_loose_floor_02_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
                                 enum em em, enum vm vm);
 struct coord *loose_floor_left_coord (struct pos *p, struct coord *c);
 struct coord *loose_floor_right_coord (struct pos *p, struct coord *c);
