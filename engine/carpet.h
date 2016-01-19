@@ -21,40 +21,40 @@
 #define MININIM_CARPET_H
 
 /* dungeon cga */
+#define DC_CARPET_00 "data/carpet/dc-00.png"
+#define DC_CARPET_TOP_00 "data/carpet/dc-top-00.png"
 #define DC_CARPET_01 "data/carpet/dc-01.png"
 #define DC_CARPET_TOP_01 "data/carpet/dc-top-01.png"
-#define DC_CARPET_02 "data/carpet/dc-02.png"
-#define DC_CARPET_TOP_02 "data/carpet/dc-top-02.png"
 
 /* palace cga */
+#define PC_CARPET_00 "data/carpet/pc-00.png"
+#define PC_CARPET_TOP_00 "data/carpet/pc-top-00.png"
 #define PC_CARPET_01 "data/carpet/pc-01.png"
 #define PC_CARPET_TOP_01 "data/carpet/pc-top-01.png"
-#define PC_CARPET_02 "data/carpet/pc-02.png"
-#define PC_CARPET_TOP_02 "data/carpet/pc-top-02.png"
 
 /* dungeon ega */
+#define DE_CARPET_00 "data/carpet/de-00.png"
+#define DE_CARPET_TOP_00 "data/carpet/de-top-00.png"
 #define DE_CARPET_01 "data/carpet/de-01.png"
 #define DE_CARPET_TOP_01 "data/carpet/de-top-01.png"
-#define DE_CARPET_02 "data/carpet/de-02.png"
-#define DE_CARPET_TOP_02 "data/carpet/de-top-02.png"
 
 /* palace ega */
+#define PE_CARPET_00 "data/carpet/pe-00.png"
+#define PE_CARPET_TOP_00 "data/carpet/pe-top-00.png"
 #define PE_CARPET_01 "data/carpet/pe-01.png"
 #define PE_CARPET_TOP_01 "data/carpet/pe-top-01.png"
-#define PE_CARPET_02 "data/carpet/pe-02.png"
-#define PE_CARPET_TOP_02 "data/carpet/pe-top-02.png"
 
 /* dungeon vga */
+#define DV_CARPET_00 "data/carpet/dv-00.png"
+#define DV_CARPET_TOP_00 "data/carpet/dv-top-00.png"
 #define DV_CARPET_01 "data/carpet/dv-01.png"
 #define DV_CARPET_TOP_01 "data/carpet/dv-top-01.png"
-#define DV_CARPET_02 "data/carpet/dv-02.png"
-#define DV_CARPET_TOP_02 "data/carpet/dv-top-02.png"
 
 /* palace vga */
+#define PV_CARPET_00 "data/carpet/pv-00.png"
+#define PV_CARPET_TOP_00 "data/carpet/pv-top-00.png"
 #define PV_CARPET_01 "data/carpet/pv-01.png"
 #define PV_CARPET_TOP_01 "data/carpet/pv-top-01.png"
-#define PV_CARPET_02 "data/carpet/pv-02.png"
-#define PV_CARPET_TOP_02 "data/carpet/pv-top-02.png"
 
 void load_carpet (void);
 void unload_carpet (void);

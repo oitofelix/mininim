@@ -37,107 +37,107 @@ static void get_carpet_bitmaps (struct pos *p, enum em em,
                                 ALLEGRO_BITMAP **carpet_top);
 
 /* dungeon cga */
-ALLEGRO_BITMAP *dc_carpet_01, *dc_carpet_top_01,
-  *dc_carpet_02, *dc_carpet_top_02;
+ALLEGRO_BITMAP *dc_carpet_00, *dc_carpet_top_00,
+  *dc_carpet_01, *dc_carpet_top_01;
 
 /* palace cga */
-ALLEGRO_BITMAP *pc_carpet_01, *pc_carpet_top_01,
-  *pc_carpet_02, *pc_carpet_top_02;
+ALLEGRO_BITMAP *pc_carpet_00, *pc_carpet_top_00,
+  *pc_carpet_01, *pc_carpet_top_01;
 
 /* dungeon ega */
-ALLEGRO_BITMAP *de_carpet_01, *de_carpet_top_01,
-  *de_carpet_02, *de_carpet_top_02;
+ALLEGRO_BITMAP *de_carpet_00, *de_carpet_top_00,
+  *de_carpet_01, *de_carpet_top_01;
 
 /* palace ega */
-ALLEGRO_BITMAP *pe_carpet_01, *pe_carpet_top_01,
-  *pe_carpet_02, *pe_carpet_top_02;
+ALLEGRO_BITMAP *pe_carpet_00, *pe_carpet_top_00,
+  *pe_carpet_01, *pe_carpet_top_01;
 
 /* dungeon vga */
-ALLEGRO_BITMAP *dv_carpet_01, *dv_carpet_top_01,
-  *dv_carpet_02, *dv_carpet_top_02;
+ALLEGRO_BITMAP *dv_carpet_00, *dv_carpet_top_00,
+  *dv_carpet_01, *dv_carpet_top_01;
 
 /* palace vga */
-ALLEGRO_BITMAP *pv_carpet_01, *pv_carpet_top_01,
-  *pv_carpet_02, *pv_carpet_top_02;
+ALLEGRO_BITMAP *pv_carpet_00, *pv_carpet_top_00,
+  *pv_carpet_01, *pv_carpet_top_01;
 
 void
 load_carpet (void)
 {
   /* dungeon cga */
+  dc_carpet_00 = load_bitmap (DC_CARPET_00);
+  dc_carpet_top_00 = load_bitmap (DC_CARPET_TOP_00);
   dc_carpet_01 = load_bitmap (DC_CARPET_01);
   dc_carpet_top_01 = load_bitmap (DC_CARPET_TOP_01);
-  dc_carpet_02 = load_bitmap (DC_CARPET_02);
-  dc_carpet_top_02 = load_bitmap (DC_CARPET_TOP_02);
 
   /* palace cga */
+  pc_carpet_00 = load_bitmap (PC_CARPET_00);
+  pc_carpet_top_00 = load_bitmap (PC_CARPET_TOP_00);
   pc_carpet_01 = load_bitmap (PC_CARPET_01);
   pc_carpet_top_01 = load_bitmap (PC_CARPET_TOP_01);
-  pc_carpet_02 = load_bitmap (PC_CARPET_02);
-  pc_carpet_top_02 = load_bitmap (PC_CARPET_TOP_02);
 
   /* dungeon ega */
+  de_carpet_00 = load_bitmap (DE_CARPET_00);
+  de_carpet_top_00 = load_bitmap (DE_CARPET_TOP_00);
   de_carpet_01 = load_bitmap (DE_CARPET_01);
   de_carpet_top_01 = load_bitmap (DE_CARPET_TOP_01);
-  de_carpet_02 = load_bitmap (DE_CARPET_02);
-  de_carpet_top_02 = load_bitmap (DE_CARPET_TOP_02);
 
   /* palace ega */
+  pe_carpet_00 = load_bitmap (PE_CARPET_00);
+  pe_carpet_top_00 = load_bitmap (PE_CARPET_TOP_00);
   pe_carpet_01 = load_bitmap (PE_CARPET_01);
   pe_carpet_top_01 = load_bitmap (PE_CARPET_TOP_01);
-  pe_carpet_02 = load_bitmap (PE_CARPET_02);
-  pe_carpet_top_02 = load_bitmap (PE_CARPET_TOP_02);
 
   /* dungeon vga */
+  dv_carpet_00 = load_bitmap (DV_CARPET_00);
+  dv_carpet_top_00 = load_bitmap (DV_CARPET_TOP_00);
   dv_carpet_01 = load_bitmap (DV_CARPET_01);
   dv_carpet_top_01 = load_bitmap (DV_CARPET_TOP_01);
-  dv_carpet_02 = load_bitmap (DV_CARPET_02);
-  dv_carpet_top_02 = load_bitmap (DV_CARPET_TOP_02);
 
   /* palace vga */
+  pv_carpet_00 = load_bitmap (PV_CARPET_00);
+  pv_carpet_top_00 = load_bitmap (PV_CARPET_TOP_00);
   pv_carpet_01 = load_bitmap (PV_CARPET_01);
   pv_carpet_top_01 = load_bitmap (PV_CARPET_TOP_01);
-  pv_carpet_02 = load_bitmap (PV_CARPET_02);
-  pv_carpet_top_02 = load_bitmap (PV_CARPET_TOP_02);
 }
 
 void
 unload_carpet (void)
 {
   /* dungeon cga */
+  al_destroy_bitmap (dc_carpet_00);
+  al_destroy_bitmap (dc_carpet_top_00);
   al_destroy_bitmap (dc_carpet_01);
   al_destroy_bitmap (dc_carpet_top_01);
-  al_destroy_bitmap (dc_carpet_02);
-  al_destroy_bitmap (dc_carpet_top_02);
 
   /* palace cga */
+  al_destroy_bitmap (pc_carpet_00);
+  al_destroy_bitmap (pc_carpet_top_00);
   al_destroy_bitmap (pc_carpet_01);
   al_destroy_bitmap (pc_carpet_top_01);
-  al_destroy_bitmap (pc_carpet_02);
-  al_destroy_bitmap (pc_carpet_top_02);
 
   /* dungeon ega */
+  al_destroy_bitmap (de_carpet_00);
+  al_destroy_bitmap (de_carpet_top_00);
   al_destroy_bitmap (de_carpet_01);
   al_destroy_bitmap (de_carpet_top_01);
-  al_destroy_bitmap (de_carpet_02);
-  al_destroy_bitmap (de_carpet_top_02);
 
   /* palace ega */
+  al_destroy_bitmap (pe_carpet_00);
+  al_destroy_bitmap (pe_carpet_top_00);
   al_destroy_bitmap (pe_carpet_01);
   al_destroy_bitmap (pe_carpet_top_01);
-  al_destroy_bitmap (pe_carpet_02);
-  al_destroy_bitmap (pe_carpet_top_02);
 
   /* dungeon vga */
+  al_destroy_bitmap (dv_carpet_00);
+  al_destroy_bitmap (dv_carpet_top_00);
   al_destroy_bitmap (dv_carpet_01);
   al_destroy_bitmap (dv_carpet_top_01);
-  al_destroy_bitmap (dv_carpet_02);
-  al_destroy_bitmap (dv_carpet_top_02);
 
   /* palace vga */
+  al_destroy_bitmap (pv_carpet_00);
+  al_destroy_bitmap (pv_carpet_top_00);
   al_destroy_bitmap (pv_carpet_01);
   al_destroy_bitmap (pv_carpet_top_01);
-  al_destroy_bitmap (pv_carpet_02);
-  al_destroy_bitmap (pv_carpet_top_02);
 }
 
 static void
@@ -145,78 +145,78 @@ get_carpet_bitmaps (struct pos *p, enum em em, enum vm vm,
                     ALLEGRO_BITMAP **carpet,
                     ALLEGRO_BITMAP **carpet_top)
 {
-  ALLEGRO_BITMAP *carpet_01 = NULL,
-    *carpet_top_01 = NULL,
-    *carpet_02 = NULL,
-    *carpet_top_02 = NULL;
+  ALLEGRO_BITMAP *carpet_00 = NULL,
+    *carpet_top_00 = NULL,
+    *carpet_01 = NULL,
+    *carpet_top_01 = NULL;
 
   switch (em) {
   case DUNGEON:
     switch (vm) {
     case CGA:
+      carpet_00 = dc_carpet_00;
+      carpet_top_00 = dc_carpet_top_00;
       carpet_01 = dc_carpet_01;
       carpet_top_01 = dc_carpet_top_01;
-      carpet_02 = dc_carpet_02;
-      carpet_top_02 = dc_carpet_top_02;
       break;
     case EGA:
+      carpet_00 = de_carpet_00;
+      carpet_top_00 = de_carpet_top_00;
       carpet_01 = de_carpet_01;
       carpet_top_01 = de_carpet_top_01;
-      carpet_02 = de_carpet_02;
-      carpet_top_02 = de_carpet_top_02;
       break;
     case VGA:
+      carpet_00 = dv_carpet_00;
+      carpet_top_00 = dv_carpet_top_00;
       carpet_01 = dv_carpet_01;
       carpet_top_01 = dv_carpet_top_01;
-      carpet_02 = dv_carpet_02;
-      carpet_top_02 = dv_carpet_top_02;
       break;
     }
     break;
   case PALACE:
     switch (vm) {
     case CGA:
+      carpet_00 = pc_carpet_00;
+      carpet_top_00 = pc_carpet_top_00;
       carpet_01 = pc_carpet_01;
       carpet_top_01 = pc_carpet_top_01;
-      carpet_02 = pc_carpet_02;
-      carpet_top_02 = pc_carpet_top_02;
       break;
     case EGA:
+      carpet_00 = pe_carpet_00;
+      carpet_top_00 = pe_carpet_top_00;
       carpet_01 = pe_carpet_01;
       carpet_top_01 = pe_carpet_top_01;
-      carpet_02 = pe_carpet_02;
-      carpet_top_02 = pe_carpet_top_02;
       break;
     case VGA:
+      carpet_00 = pv_carpet_00;
+      carpet_top_00 = pv_carpet_top_00;
       carpet_01 = pv_carpet_01;
       carpet_top_01 = pv_carpet_top_01;
-      carpet_02 = pv_carpet_02;
-      carpet_top_02 = pv_carpet_top_02;
       break;
     }
     break;
   }
 
   switch (con (p)->ext.design) {
+  case CARPET_00:
+    *carpet = carpet_00;
+    *carpet_top = carpet_top_00;
+    break;
   case CARPET_01:
     *carpet = carpet_01;
     *carpet_top = carpet_top_01;
-    break;
-  case CARPET_02:
-    *carpet = carpet_02;
-    *carpet_top = carpet_top_02;
     break;
   case ARCH_CARPET_LEFT:
     *carpet = NULL;
     *carpet_top = NULL;
     break;
   case ARCH_CARPET_RIGHT_01:
-    *carpet = carpet_01;
-    *carpet_top = carpet_top_01;
+    *carpet = carpet_00;
+    *carpet_top = carpet_top_00;
     break;
   case ARCH_CARPET_RIGHT_02:
-    *carpet = carpet_02;
-    *carpet_top = carpet_top_02;
+    *carpet = carpet_01;
+    *carpet_top = carpet_top_01;
     break;
   }
 }

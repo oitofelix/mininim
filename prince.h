@@ -462,8 +462,8 @@ enum dir {
 };
 
 enum carpet_design {
+  CARPET_00,
   CARPET_01,
-  CARPET_02,
   ARCH_CARPET_LEFT,
   ARCH_CARPET_RIGHT_01,
   ARCH_CARPET_RIGHT_02,
