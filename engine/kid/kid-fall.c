@@ -38,15 +38,15 @@ static bool physics_in (struct anim *k);
 static void physics_out (struct anim *k);
 static void place_in_initial_fall (struct anim *k);
 
-ALLEGRO_BITMAP *kid_fall_13, *kid_fall_14, *kid_fall_15,
-  *kid_fall_16, *kid_fall_17;
+ALLEGRO_BITMAP *kid_fall_00, *kid_fall_01, *kid_fall_02,
+  *kid_fall_03, *kid_fall_04;
 
 static void
 init_kid_fall_frameset (void)
 {
   struct frameset frameset[KID_FALL_FRAMESET_NMEMB] =
-    {{kid_fall_13,+0,+0},{kid_fall_14,+0,+5},{kid_fall_15,+0,+10},
-     {kid_fall_16,+0,+11},{kid_fall_17,+0,+20}};
+    {{kid_fall_00,+0,+0},{kid_fall_01,+0,+5},{kid_fall_02,+0,+10},
+     {kid_fall_03,+0,+11},{kid_fall_04,+0,+20}};
 
   memcpy (&kid_fall_frameset, &frameset,
           KID_FALL_FRAMESET_NMEMB * sizeof (struct frameset));
@@ -56,11 +56,11 @@ void
 load_kid_fall (void)
 {
   /* bitmaps */
-  kid_fall_13 = load_bitmap (KID_FALL_13);
-  kid_fall_14 = load_bitmap (KID_FALL_14);
-  kid_fall_15 = load_bitmap (KID_FALL_15);
-  kid_fall_16 = load_bitmap (KID_FALL_16);
-  kid_fall_17 = load_bitmap (KID_FALL_17);
+  kid_fall_00 = load_bitmap (KID_FALL_00);
+  kid_fall_01 = load_bitmap (KID_FALL_01);
+  kid_fall_02 = load_bitmap (KID_FALL_02);
+  kid_fall_03 = load_bitmap (KID_FALL_03);
+  kid_fall_04 = load_bitmap (KID_FALL_04);
 
   /* frameset */
   init_kid_fall_frameset ();
@@ -69,11 +69,11 @@ load_kid_fall (void)
 void
 unload_kid_fall (void)
 {
-  al_destroy_bitmap (kid_fall_13);
-  al_destroy_bitmap (kid_fall_14);
-  al_destroy_bitmap (kid_fall_15);
-  al_destroy_bitmap (kid_fall_16);
-  al_destroy_bitmap (kid_fall_17);
+  al_destroy_bitmap (kid_fall_00);
+  al_destroy_bitmap (kid_fall_01);
+  al_destroy_bitmap (kid_fall_02);
+  al_destroy_bitmap (kid_fall_03);
+  al_destroy_bitmap (kid_fall_04);
 }
 
 void
@@ -314,11 +314,11 @@ physics_out (struct anim *k)
 bool
 is_kid_fall (struct frame *f)
 {
-  return f->b == kid_fall_13
-    || f->b == kid_fall_14
-    || f->b == kid_fall_15
-    || f->b == kid_fall_16
-    || f->b == kid_fall_17;
+  return f->b == kid_fall_00
+    || f->b == kid_fall_01
+    || f->b == kid_fall_02
+    || f->b == kid_fall_03
+    || f->b == kid_fall_04;
 }
 
 static void

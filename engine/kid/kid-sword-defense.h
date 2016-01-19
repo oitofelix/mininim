@@ -21,9 +21,9 @@
 #define MININIM_KID_SWORD_DEFENSE_H
 
 /* bitmaps */
-#define KID_SWORD_DEFENSE_18 "dat/kid/sword attacking/frame18.png"
-#define KID_SWORD_DEFENSE_11 "dat/kid/sword attacking/frame11.png"
-#define KID_SWORD_DEFENSE_12 "dat/kid/sword attacking/frame12.png"
+#define KID_SWORD_DEFENSE_00 "data/kid/sword-defense/00.png"
+#define KID_SWORD_DEFENSE_01 "data/kid/sword-defense/01.png"
+#define KID_SWORD_DEFENSE_02 "data/kid/sword-defense/02.png"
 
 #define KID_SWORD_DEFENSE_FRAMESET_NMEMB 3
 extern struct frameset kid_sword_defense_frameset[KID_SWORD_DEFENSE_FRAMESET_NMEMB];
@@ -32,6 +32,6 @@ void load_kid_sword_defense (void);
 void unload_kid_sword_defense (void);
 void kid_sword_defense (struct anim *k);
 
-extern ALLEGRO_BITMAP *kid_sword_defense_18, *kid_sword_defense_11;
+extern ALLEGRO_BITMAP *kid_sword_defense_00, *kid_sword_defense_01;
 
 #endif	/* MININIM_KID_SWORD_DEFENSE_H */

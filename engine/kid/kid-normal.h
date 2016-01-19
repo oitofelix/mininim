@@ -21,7 +21,7 @@
 #define MININIM_KID_NORMAL_H
 
 /* bitmaps */
-#define KID_NORMAL_00 "dat/kid/normal.png"
+#define KID_NORMAL_00 "data/kid/normal/00.png"
 
 void load_kid_normal (void);
 void unload_kid_normal (void);

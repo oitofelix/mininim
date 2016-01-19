@@ -36,15 +36,15 @@ static bool flow (struct anim *k);
 static bool physics_in (struct anim *k);
 static void physics_out (struct anim *k);
 
-ALLEGRO_BITMAP *kid_stop_run_01, *kid_stop_run_02,
-  *kid_stop_run_03, *kid_stop_run_04;
+ALLEGRO_BITMAP *kid_stop_run_00, *kid_stop_run_01,
+  *kid_stop_run_02, *kid_stop_run_03;
 
 static void
 init_kid_stop_run_frameset (void)
 {
   struct frameset frameset[KID_STOP_RUN_FRAMESET_NMEMB] =
-    {{kid_stop_run_01,+0,0},{kid_stop_run_02,-1,0},
-     {kid_stop_run_03,-21,0},{kid_stop_run_04,-2,0}};
+    {{kid_stop_run_00,+0,0},{kid_stop_run_01,-1,0},
+     {kid_stop_run_02,-21,0},{kid_stop_run_03,-2,0}};
 
   memcpy (&kid_stop_run_frameset, &frameset,
           KID_STOP_RUN_FRAMESET_NMEMB * sizeof (struct frameset));
@@ -54,10 +54,10 @@ void
 load_kid_stop_run (void)
 {
   /* bitmaps */
+  kid_stop_run_00 = load_bitmap (KID_STOP_RUN_00);
   kid_stop_run_01 = load_bitmap (KID_STOP_RUN_01);
   kid_stop_run_02 = load_bitmap (KID_STOP_RUN_02);
   kid_stop_run_03 = load_bitmap (KID_STOP_RUN_03);
-  kid_stop_run_04 = load_bitmap (KID_STOP_RUN_04);
 
   /* frameset */
   init_kid_stop_run_frameset ();
@@ -66,10 +66,10 @@ load_kid_stop_run (void)
 void
 unload_kid_stop_run (void)
 {
+  al_destroy_bitmap (kid_stop_run_00);
   al_destroy_bitmap (kid_stop_run_01);
   al_destroy_bitmap (kid_stop_run_02);
   al_destroy_bitmap (kid_stop_run_03);
-  al_destroy_bitmap (kid_stop_run_04);
 }
 
 void

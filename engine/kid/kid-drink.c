@@ -36,20 +36,20 @@ static bool flow (struct anim *k);
 static bool physics_in (struct anim *k);
 static void physics_out (struct anim *k);
 
-ALLEGRO_BITMAP *kid_drink_01, *kid_drink_02, *kid_drink_03,
-  *kid_drink_04, *kid_drink_05, *kid_drink_06, *kid_drink_07,
-  *kid_drink_08, *kid_drink_09, *kid_drink_10, *kid_drink_11,
-  *kid_drink_12, *kid_drink_13, *kid_drink_14, *kid_drink_15;
+ALLEGRO_BITMAP *kid_drink_00, *kid_drink_01, *kid_drink_02,
+  *kid_drink_03, *kid_drink_04, *kid_drink_05, *kid_drink_06,
+  *kid_drink_07, *kid_drink_08, *kid_drink_09, *kid_drink_10,
+  *kid_drink_11, *kid_drink_12, *kid_drink_13, *kid_drink_14;
 
 static void
 init_kid_drink_frameset (void)
 {
   struct frameset frameset[KID_DRINK_FRAMESET_NMEMB] =
-    {{kid_drink_01,-7,0},{kid_drink_02,+1,+1},{kid_drink_03,+1,-1},
-     {kid_drink_04,+0,0},{kid_drink_05,+2,0},{kid_drink_06,-1,0},
-     {kid_drink_07,+1,0},{kid_drink_08,+6,0},{kid_drink_09,-1,0},
-     {kid_drink_10,+2,-1},{kid_drink_11,-2,+1},{kid_drink_12,+0,-1},
-     {kid_drink_13,-1,0},{kid_drink_14,+1,0},{kid_drink_15,+1,0}};
+    {{kid_drink_00,-7,0},{kid_drink_01,+1,+1},{kid_drink_02,+1,-1},
+     {kid_drink_03,+0,0},{kid_drink_04,+2,0},{kid_drink_05,-1,0},
+     {kid_drink_06,+1,0},{kid_drink_07,+6,0},{kid_drink_08,-1,0},
+     {kid_drink_09,+2,-1},{kid_drink_10,-2,+1},{kid_drink_11,+0,-1},
+     {kid_drink_12,-1,0},{kid_drink_13,+1,0},{kid_drink_14,+1,0}};
 
   memcpy (&kid_drink_frameset, &frameset,
           KID_DRINK_FRAMESET_NMEMB * sizeof (struct frameset));
@@ -59,6 +59,7 @@ void
 load_kid_drink (void)
 {
   /* bitmaps */
+  kid_drink_00 = load_bitmap (KID_DRINK_00);
   kid_drink_01 = load_bitmap (KID_DRINK_01);
   kid_drink_02 = load_bitmap (KID_DRINK_02);
   kid_drink_03 = load_bitmap (KID_DRINK_03);
@@ -73,7 +74,6 @@ load_kid_drink (void)
   kid_drink_12 = load_bitmap (KID_DRINK_12);
   kid_drink_13 = load_bitmap (KID_DRINK_13);
   kid_drink_14 = load_bitmap (KID_DRINK_14);
-  kid_drink_15 = load_bitmap (KID_DRINK_15);
 
   /* frameset */
   init_kid_drink_frameset ();
@@ -82,6 +82,7 @@ load_kid_drink (void)
 void
 unload_kid_drink (void)
 {
+  al_destroy_bitmap (kid_drink_00);
   al_destroy_bitmap (kid_drink_01);
   al_destroy_bitmap (kid_drink_02);
   al_destroy_bitmap (kid_drink_03);
@@ -96,7 +97,6 @@ unload_kid_drink (void)
   al_destroy_bitmap (kid_drink_12);
   al_destroy_bitmap (kid_drink_13);
   al_destroy_bitmap (kid_drink_14);
-  al_destroy_bitmap (kid_drink_15);
 }
 
 void

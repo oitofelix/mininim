@@ -21,24 +21,24 @@
 #define MININIM_KID_VJUMP_H
 
 /* bitmaps */
-#define KID_VJUMP_01 "dat/kid/scaling/frame01.png"
-#define KID_VJUMP_02 "dat/kid/scaling/frame02.png"
-#define KID_VJUMP_03 "dat/kid/scaling/frame03.png"
-#define KID_VJUMP_04 "dat/kid/scaling/frame04.png"
-#define KID_VJUMP_05 "dat/kid/scaling/frame05.png"
-#define KID_VJUMP_06 "dat/kid/scaling/frame06.png"
-#define KID_VJUMP_07 "dat/kid/scaling/frame07.png"
-#define KID_VJUMP_08 "dat/kid/scaling/frame08.png"
-#define KID_VJUMP_09 "dat/kid/scaling/frame09.png"
-#define KID_VJUMP_10 "dat/kid/scaling/frame10.png"
-#define KID_VJUMP_11 "dat/kid/scaling/frame11.png"
-#define KID_VJUMP_12 "dat/kid/scaling/frame12.png"
-#define KID_VJUMP_13 "dat/kid/scaling/frame13.png"
-#define KID_VJUMP_15 "dat/kid/scaling/frame15.png"
-#define KID_VJUMP_16 "dat/kid/scaling/frame16.png"
-#define KID_VJUMP_17 "dat/kid/scaling/frame17.png"
-#define KID_VJUMP_18 "dat/kid/scaling/frame18.png"
-#define KID_VJUMP_19 "dat/kid/scaling/frame19.png"
+#define KID_VJUMP_00 "data/kid/vjump/00.png"
+#define KID_VJUMP_01 "data/kid/vjump/01.png"
+#define KID_VJUMP_02 "data/kid/vjump/02.png"
+#define KID_VJUMP_03 "data/kid/vjump/03.png"
+#define KID_VJUMP_04 "data/kid/vjump/04.png"
+#define KID_VJUMP_05 "data/kid/vjump/05.png"
+#define KID_VJUMP_06 "data/kid/vjump/06.png"
+#define KID_VJUMP_07 "data/kid/vjump/07.png"
+#define KID_VJUMP_08 "data/kid/vjump/08.png"
+#define KID_VJUMP_09 "data/kid/vjump/09.png"
+#define KID_VJUMP_10 "data/kid/vjump/10.png"
+#define KID_VJUMP_11 "data/kid/vjump/11.png"
+#define KID_VJUMP_12 "data/kid/vjump/12.png"
+#define KID_VJUMP_13 "data/kid/vjump/13.png"
+#define KID_VJUMP_14 "data/kid/vjump/14.png"
+#define KID_VJUMP_15 "data/kid/vjump/15.png"
+#define KID_VJUMP_16 "data/kid/vjump/16.png"
+#define KID_VJUMP_17 "data/kid/vjump/17.png"
 
 #define KID_VJUMP_FRAMESET_NMEMB 18
 extern struct frameset kid_vjump_frameset[KID_VJUMP_FRAMESET_NMEMB];
@@ -48,10 +48,10 @@ void unload_kid_vjump (void);
 void kid_vjump (struct anim *k);
 bool is_kid_vjump (struct frame *f);
 
-ALLEGRO_BITMAP *kid_vjump_01, *kid_vjump_02, *kid_vjump_03,
-  *kid_vjump_04, *kid_vjump_05, *kid_vjump_06, *kid_vjump_07,
-  *kid_vjump_08, *kid_vjump_09, *kid_vjump_10, *kid_vjump_11,
-  *kid_vjump_12, *kid_vjump_13, *kid_vjump_15, *kid_vjump_16,
-  *kid_vjump_17, *kid_vjump_18, *kid_vjump_19;
+ALLEGRO_BITMAP *kid_vjump_00, *kid_vjump_01, *kid_vjump_02,
+  *kid_vjump_03, *kid_vjump_04, *kid_vjump_05, *kid_vjump_06,
+  *kid_vjump_07, *kid_vjump_08, *kid_vjump_09, *kid_vjump_10,
+  *kid_vjump_11, *kid_vjump_12, *kid_vjump_13, *kid_vjump_14,
+  *kid_vjump_15, *kid_vjump_16, *kid_vjump_17;
 
 #endif	/* MININIM_KID_VJUMP_H */

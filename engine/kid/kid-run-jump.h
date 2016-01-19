@@ -21,17 +21,17 @@
 #define MININIM_KID_RUN_JUMP_H
 
 /* bitmaps */
-#define KID_RUN_JUMP_01 "dat/kid/running jump/frame01.png"
-#define KID_RUN_JUMP_02 "dat/kid/running jump/frame02.png"
-#define KID_RUN_JUMP_03 "dat/kid/running jump/frame03.png"
-#define KID_RUN_JUMP_04 "dat/kid/running jump/frame04.png"
-#define KID_RUN_JUMP_05 "dat/kid/running jump/frame05.png"
-#define KID_RUN_JUMP_06 "dat/kid/running jump/frame06.png"
-#define KID_RUN_JUMP_07 "dat/kid/running jump/frame07.png"
-#define KID_RUN_JUMP_08 "dat/kid/running jump/frame08.png"
-#define KID_RUN_JUMP_09 "dat/kid/running jump/frame09.png"
-#define KID_RUN_JUMP_10 "dat/kid/running jump/frame10.png"
-#define KID_RUN_JUMP_11 "dat/kid/running jump/frame11.png"
+#define KID_RUN_JUMP_00 "data/kid/run-jump/00.png"
+#define KID_RUN_JUMP_01 "data/kid/run-jump/01.png"
+#define KID_RUN_JUMP_02 "data/kid/run-jump/02.png"
+#define KID_RUN_JUMP_03 "data/kid/run-jump/03.png"
+#define KID_RUN_JUMP_04 "data/kid/run-jump/04.png"
+#define KID_RUN_JUMP_05 "data/kid/run-jump/05.png"
+#define KID_RUN_JUMP_06 "data/kid/run-jump/06.png"
+#define KID_RUN_JUMP_07 "data/kid/run-jump/07.png"
+#define KID_RUN_JUMP_08 "data/kid/run-jump/08.png"
+#define KID_RUN_JUMP_09 "data/kid/run-jump/09.png"
+#define KID_RUN_JUMP_10 "data/kid/run-jump/10.png"
 
 #define KID_RUN_JUMP_FRAMESET_NMEMB 11
 extern struct frameset kid_run_jump_frameset[KID_JUMP_FRAMESET_NMEMB];
@@ -42,9 +42,9 @@ void kid_run_jump (struct anim *k);
 bool is_kid_run_jump_running (struct frame *f);
 bool is_kid_run_jump_landing (struct frame *f);
 
-extern ALLEGRO_BITMAP *kid_run_jump_01, *kid_run_jump_02, *kid_run_jump_03,
-  *kid_run_jump_04, *kid_run_jump_05, *kid_run_jump_06,
-  *kid_run_jump_07, *kid_run_jump_08, *kid_run_jump_09,
-  *kid_run_jump_10, *kid_run_jump_11;
+extern ALLEGRO_BITMAP *kid_run_jump_00, *kid_run_jump_01, *kid_run_jump_02,
+  *kid_run_jump_03, *kid_run_jump_04, *kid_run_jump_05,
+  *kid_run_jump_06, *kid_run_jump_07, *kid_run_jump_08,
+  *kid_run_jump_09, *kid_run_jump_10;
 
 #endif	/* MININIM_KID_RUN_JUMP_H */

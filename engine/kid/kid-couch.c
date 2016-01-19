@@ -30,10 +30,10 @@
 
 struct frameset kid_couch_frameset[KID_COUCH_FRAMESET_NMEMB];
 
-ALLEGRO_BITMAP *kid_couch_01, *kid_couch_02, *kid_couch_03,
-  *kid_couch_04, *kid_couch_05, *kid_couch_06, *kid_couch_07,
-  *kid_couch_08, *kid_couch_09, *kid_couch_10, *kid_couch_11,
-  *kid_couch_12, *kid_couch_13;
+ALLEGRO_BITMAP *kid_couch_00, *kid_couch_01, *kid_couch_02,
+  *kid_couch_03, *kid_couch_04, *kid_couch_05, *kid_couch_06,
+  *kid_couch_07, *kid_couch_08, *kid_couch_09, *kid_couch_10,
+  *kid_couch_11, *kid_couch_12;
 
 static void init_kid_couch_frameset (void);
 static bool flow (struct anim *k);
@@ -44,11 +44,11 @@ static void
 init_kid_couch_frameset (void)
 {
   struct frameset frameset[KID_COUCH_FRAMESET_NMEMB] =
-    {{kid_couch_01,-3,0},{kid_couch_02,-4,0},{kid_couch_03,+0,0},
-     {kid_couch_04,-4,0},{kid_couch_05,-1,0},{kid_couch_06,-4,0},
-     {kid_couch_07,+1,0},{kid_couch_08,-2,0},{kid_couch_09,-1,0},
-     {kid_couch_10,+0,0},{kid_couch_11,+3,0},{kid_couch_12,+0,0},
-     {kid_couch_13,+4,0}};
+    {{kid_couch_00,-3,0},{kid_couch_01,-4,0},{kid_couch_02,+0,0},
+     {kid_couch_03,-4,0},{kid_couch_04,-1,0},{kid_couch_05,-4,0},
+     {kid_couch_06,+1,0},{kid_couch_07,-2,0},{kid_couch_08,-1,0},
+     {kid_couch_09,+0,0},{kid_couch_10,+3,0},{kid_couch_11,+0,0},
+     {kid_couch_12,+4,0}};
 
   memcpy (&kid_couch_frameset, &frameset,
           KID_COUCH_FRAMESET_NMEMB * sizeof (struct frameset));
@@ -58,6 +58,7 @@ void
 load_kid_couch (void)
 {
   /* bitmaps */
+  kid_couch_00 = load_bitmap (KID_COUCH_00);
   kid_couch_01 = load_bitmap (KID_COUCH_01);
   kid_couch_02 = load_bitmap (KID_COUCH_02);
   kid_couch_03 = load_bitmap (KID_COUCH_03);
@@ -70,7 +71,6 @@ load_kid_couch (void)
   kid_couch_10 = load_bitmap (KID_COUCH_10);
   kid_couch_11 = load_bitmap (KID_COUCH_11);
   kid_couch_12 = load_bitmap (KID_COUCH_12);
-  kid_couch_13 = load_bitmap (KID_COUCH_13);
 
   /* frameset */
   init_kid_couch_frameset ();
@@ -80,6 +80,7 @@ void
 unload_kid_couch (void)
 {
   /* bitmaps */
+  al_destroy_bitmap (kid_couch_00);
   al_destroy_bitmap (kid_couch_01);
   al_destroy_bitmap (kid_couch_02);
   al_destroy_bitmap (kid_couch_03);
@@ -92,7 +93,6 @@ unload_kid_couch (void)
   al_destroy_bitmap (kid_couch_10);
   al_destroy_bitmap (kid_couch_11);
   al_destroy_bitmap (kid_couch_12);
-  al_destroy_bitmap (kid_couch_13);
 }
 
 void

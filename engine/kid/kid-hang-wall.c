@@ -114,7 +114,7 @@ flow (struct anim *k)
   k->fo.dy = (k->reverse) ? -kid_hang_frameset[k->i + 1].dy
     : kid_hang_frameset[k->i].dy;
 
-  if (k->f.b == kid_hang_14) k->fo.dx = +0, k->fo.dy = +1;
+  if (k->f.b == kid_hang_13) k->fo.dx = +0, k->fo.dy = +1;
 
   if (k->reverse && k->wait == 0) {
     k->fo.dx = 0;

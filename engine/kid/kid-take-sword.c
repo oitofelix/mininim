@@ -35,15 +35,15 @@ static bool flow (struct anim *k);
 static bool physics_in (struct anim *k);
 static void physics_out (struct anim *k);
 
-ALLEGRO_BITMAP *kid_take_sword_01, *kid_take_sword_02,
-  *kid_take_sword_03, *kid_take_sword_04;
+ALLEGRO_BITMAP *kid_take_sword_00, *kid_take_sword_01,
+  *kid_take_sword_02, *kid_take_sword_03;
 
 static void
 init_kid_take_sword_frameset (void)
 {
   struct frameset frameset[KID_TAKE_SWORD_FRAMESET_NMEMB] =
-    {{kid_take_sword_01,-6,+0},{kid_take_sword_02,+0,0},
-     {kid_take_sword_03,-4,0},{kid_take_sword_04,-6,0}};
+    {{kid_take_sword_00,-6,+0},{kid_take_sword_01,+0,0},
+     {kid_take_sword_02,-4,0},{kid_take_sword_03,-6,0}};
 
   memcpy (&kid_take_sword_frameset, &frameset,
           KID_TAKE_SWORD_FRAMESET_NMEMB * sizeof (struct frameset));
@@ -53,10 +53,10 @@ void
 load_kid_take_sword (void)
 {
   /* bitmaps */
+  kid_take_sword_00 = load_bitmap (KID_TAKE_SWORD_00);
   kid_take_sword_01 = load_bitmap (KID_TAKE_SWORD_01);
   kid_take_sword_02 = load_bitmap (KID_TAKE_SWORD_02);
   kid_take_sword_03 = load_bitmap (KID_TAKE_SWORD_03);
-  kid_take_sword_04 = load_bitmap (KID_TAKE_SWORD_04);
 
   /* frameset */
   init_kid_take_sword_frameset ();
@@ -65,10 +65,10 @@ load_kid_take_sword (void)
 void
 unload_kid_take_sword (void)
 {
+  al_destroy_bitmap (kid_take_sword_00);
   al_destroy_bitmap (kid_take_sword_01);
   al_destroy_bitmap (kid_take_sword_02);
   al_destroy_bitmap (kid_take_sword_03);
-  al_destroy_bitmap (kid_take_sword_04);
 }
 
 void

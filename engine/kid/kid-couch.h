@@ -21,19 +21,19 @@
 #define MININIM_KID_COUCH_H
 
 /* bitmaps */
-#define KID_COUCH_01 "dat/kid/couching/frame01.png"
-#define KID_COUCH_02 "dat/kid/couching/frame02.png"
-#define KID_COUCH_03 "dat/kid/couching/frame03.png"
-#define KID_COUCH_04 "dat/kid/couching/frame04.png"
-#define KID_COUCH_05 "dat/kid/couching/frame05.png"
-#define KID_COUCH_06 "dat/kid/couching/frame06.png"
-#define KID_COUCH_07 "dat/kid/couching/frame07.png"
-#define KID_COUCH_08 "dat/kid/couching/frame08.png"
-#define KID_COUCH_09 "dat/kid/couching/frame09.png"
-#define KID_COUCH_10 "dat/kid/couching/frame10.png"
-#define KID_COUCH_11 "dat/kid/couching/frame11.png"
-#define KID_COUCH_12 "dat/kid/couching/frame12.png"
-#define KID_COUCH_13 "dat/kid/couching/frame13.png"
+#define KID_COUCH_00 "data/kid/couch/00.png"
+#define KID_COUCH_01 "data/kid/couch/01.png"
+#define KID_COUCH_02 "data/kid/couch/02.png"
+#define KID_COUCH_03 "data/kid/couch/03.png"
+#define KID_COUCH_04 "data/kid/couch/04.png"
+#define KID_COUCH_05 "data/kid/couch/05.png"
+#define KID_COUCH_06 "data/kid/couch/06.png"
+#define KID_COUCH_07 "data/kid/couch/07.png"
+#define KID_COUCH_08 "data/kid/couch/08.png"
+#define KID_COUCH_09 "data/kid/couch/09.png"
+#define KID_COUCH_10 "data/kid/couch/10.png"
+#define KID_COUCH_11 "data/kid/couch/11.png"
+#define KID_COUCH_12 "data/kid/couch/12.png"
 
 #define KID_COUCH_FRAMESET_NMEMB 13
 extern struct frameset kid_couch_frameset[KID_COUCH_FRAMESET_NMEMB];
@@ -45,9 +45,9 @@ void kid_couch_collision (struct anim *k);
 void kid_couch_suddenly (struct anim *k);
 bool is_kid_couch (struct frame *f);
 
-extern ALLEGRO_BITMAP *kid_couch_01, *kid_couch_02, *kid_couch_03, *kid_couch_04,
-  *kid_couch_05, *kid_couch_06, *kid_couch_07, *kid_couch_08,
-  *kid_couch_09, *kid_couch_10, *kid_couch_11, *kid_couch_12,
-  *kid_couch_13;
+extern ALLEGRO_BITMAP *kid_couch_00, *kid_couch_01, *kid_couch_02, *kid_couch_03,
+  *kid_couch_04, *kid_couch_05, *kid_couch_06, *kid_couch_07,
+  *kid_couch_08, *kid_couch_09, *kid_couch_10, *kid_couch_11,
+  *kid_couch_12;
 
 #endif	/* MININIM_KID_COUCH_H */

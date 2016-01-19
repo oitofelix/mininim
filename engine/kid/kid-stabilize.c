@@ -35,15 +35,15 @@ static bool flow (struct anim *k);
 static bool physics_in (struct anim *k);
 static void physics_out (struct anim *k);
 
-ALLEGRO_BITMAP *kid_stabilize_05, *kid_stabilize_06, *kid_stabilize_07,
-  *kid_stabilize_08;
+ALLEGRO_BITMAP *kid_stabilize_00, *kid_stabilize_01, *kid_stabilize_02,
+  *kid_stabilize_03;
 
 static void
 init_kid_stabilize_frameset (void)
 {
   struct frameset frameset[KID_STABILIZE_FRAMESET_NMEMB] =
-    {{kid_stabilize_05,-3,0},{kid_stabilize_06,-4,0},
-     {kid_stabilize_07,+2,0},{kid_stabilize_08,+4,0}};
+    {{kid_stabilize_00,-3,0},{kid_stabilize_01,-4,0},
+     {kid_stabilize_02,+2,0},{kid_stabilize_03,+4,0}};
 
   memcpy (&kid_stabilize_frameset, &frameset,
           KID_STABILIZE_FRAMESET_NMEMB * sizeof (struct frameset));
@@ -53,10 +53,10 @@ void
 load_kid_stabilize (void)
 {
   /* bitmaps */
-  kid_stabilize_05 = load_bitmap (KID_STABILIZE_05);
-  kid_stabilize_06 = load_bitmap (KID_STABILIZE_06);
-  kid_stabilize_07 = load_bitmap (KID_STABILIZE_07);
-  kid_stabilize_08 = load_bitmap (KID_STABILIZE_08);
+  kid_stabilize_00 = load_bitmap (KID_STABILIZE_00);
+  kid_stabilize_01 = load_bitmap (KID_STABILIZE_01);
+  kid_stabilize_02 = load_bitmap (KID_STABILIZE_02);
+  kid_stabilize_03 = load_bitmap (KID_STABILIZE_03);
 
   /* frameset */
   init_kid_stabilize_frameset ();
@@ -65,10 +65,10 @@ load_kid_stabilize (void)
 void
 unload_kid_stabilize (void)
 {
-  al_destroy_bitmap (kid_stabilize_05);
-  al_destroy_bitmap (kid_stabilize_06);
-  al_destroy_bitmap (kid_stabilize_07);
-  al_destroy_bitmap (kid_stabilize_08);
+  al_destroy_bitmap (kid_stabilize_00);
+  al_destroy_bitmap (kid_stabilize_01);
+  al_destroy_bitmap (kid_stabilize_02);
+  al_destroy_bitmap (kid_stabilize_03);
 }
 
 void

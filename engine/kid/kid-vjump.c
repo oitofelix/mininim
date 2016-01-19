@@ -35,21 +35,21 @@ static bool flow (struct anim *k);
 static bool physics_in (struct anim *k);
 static void physics_out (struct anim *k);
 
-ALLEGRO_BITMAP *kid_vjump_01, *kid_vjump_02, *kid_vjump_03, *kid_vjump_04,
-  *kid_vjump_05, *kid_vjump_06, *kid_vjump_07, *kid_vjump_08, *kid_vjump_09,
-  *kid_vjump_10, *kid_vjump_11, *kid_vjump_12, *kid_vjump_13, *kid_vjump_15,
-  *kid_vjump_16, *kid_vjump_17, *kid_vjump_18, *kid_vjump_19;
+ALLEGRO_BITMAP *kid_vjump_00, *kid_vjump_01, *kid_vjump_02, *kid_vjump_03,
+  *kid_vjump_04, *kid_vjump_05, *kid_vjump_06, *kid_vjump_07, *kid_vjump_08,
+  *kid_vjump_09, *kid_vjump_10, *kid_vjump_11, *kid_vjump_12, *kid_vjump_13,
+  *kid_vjump_14, *kid_vjump_15, *kid_vjump_16, *kid_vjump_17;
 
 static void
 init_kid_vjump_frameset (void)
 {
   struct frameset frameset[KID_VJUMP_FRAMESET_NMEMB] =
-    {{kid_vjump_01,+3,+0},{kid_vjump_02,-1,+0},{kid_vjump_03,-1,+0},
-     {kid_vjump_04,+2,+0},{kid_vjump_05,+0,+0},{kid_vjump_06,-1,+0},
-     {kid_vjump_07,-1,+0},{kid_vjump_08,-3,+0},{kid_vjump_09,-1,+0},
-     {kid_vjump_10,-6,+0},{kid_vjump_11,+0,+0},{kid_vjump_12,+2,-3},
-     {kid_vjump_13,+3,-7},{kid_vjump_15,+0,+8},{kid_vjump_16,+3,+2},
-     {kid_vjump_17,-1,+0},{kid_vjump_18,+0,+0},{kid_vjump_19,+0,0}};
+    {{kid_vjump_00,+3,+0},{kid_vjump_01,-1,+0},{kid_vjump_02,-1,+0},
+     {kid_vjump_03,+2,+0},{kid_vjump_04,+0,+0},{kid_vjump_05,-1,+0},
+     {kid_vjump_06,-1,+0},{kid_vjump_07,-3,+0},{kid_vjump_08,-1,+0},
+     {kid_vjump_09,-6,+0},{kid_vjump_10,+0,+0},{kid_vjump_11,+2,-3},
+     {kid_vjump_12,+3,-7},{kid_vjump_13,+0,+8},{kid_vjump_14,+3,+2},
+     {kid_vjump_15,-1,+0},{kid_vjump_16,+0,+0},{kid_vjump_17,+0,0}};
 
   memcpy (&kid_vjump_frameset, &frameset,
           KID_VJUMP_FRAMESET_NMEMB * sizeof (struct frameset));
@@ -59,6 +59,7 @@ void
 load_kid_vjump (void)
 {
   /* bitmaps */
+  kid_vjump_00 = load_bitmap (KID_VJUMP_00);
   kid_vjump_01 = load_bitmap (KID_VJUMP_01);
   kid_vjump_02 = load_bitmap (KID_VJUMP_02);
   kid_vjump_03 = load_bitmap (KID_VJUMP_03);
@@ -72,11 +73,10 @@ load_kid_vjump (void)
   kid_vjump_11 = load_bitmap (KID_VJUMP_11);
   kid_vjump_12 = load_bitmap (KID_VJUMP_12);
   kid_vjump_13 = load_bitmap (KID_VJUMP_13);
+  kid_vjump_14 = load_bitmap (KID_VJUMP_14);
   kid_vjump_15 = load_bitmap (KID_VJUMP_15);
   kid_vjump_16 = load_bitmap (KID_VJUMP_16);
   kid_vjump_17 = load_bitmap (KID_VJUMP_17);
-  kid_vjump_18 = load_bitmap (KID_VJUMP_18);
-  kid_vjump_19 = load_bitmap (KID_VJUMP_19);
 
   /* frameset */
   init_kid_vjump_frameset ();
@@ -85,6 +85,7 @@ load_kid_vjump (void)
 void
 unload_kid_vjump (void)
 {
+  al_destroy_bitmap (kid_vjump_00);
   al_destroy_bitmap (kid_vjump_01);
   al_destroy_bitmap (kid_vjump_02);
   al_destroy_bitmap (kid_vjump_03);
@@ -98,11 +99,10 @@ unload_kid_vjump (void)
   al_destroy_bitmap (kid_vjump_11);
   al_destroy_bitmap (kid_vjump_12);
   al_destroy_bitmap (kid_vjump_13);
+  al_destroy_bitmap (kid_vjump_14);
   al_destroy_bitmap (kid_vjump_15);
   al_destroy_bitmap (kid_vjump_16);
   al_destroy_bitmap (kid_vjump_17);
-  al_destroy_bitmap (kid_vjump_18);
-  al_destroy_bitmap (kid_vjump_19);
 }
 
 void

@@ -30,7 +30,7 @@ static struct frameset run_frameset[RUN_FRAMESET_NMEMB];
 static void init_run_frameset (void);
 
 /* variables */
-ALLEGRO_BITMAP *mouse_normal_00, *mouse_run_01, *mouse_run_02;
+ALLEGRO_BITMAP *mouse_normal_00, *mouse_run_00, *mouse_run_01;
 
 static ALLEGRO_COLOR v_palette (ALLEGRO_COLOR c);
 static ALLEGRO_COLOR e_palette (ALLEGRO_COLOR c);
@@ -40,8 +40,8 @@ void
 load_mouse (void)
 {
   mouse_normal_00 = load_bitmap (MOUSE_NORMAL_00);
+  mouse_run_00 = load_bitmap (MOUSE_RUN_00);
   mouse_run_01 = load_bitmap (MOUSE_RUN_01);
-  mouse_run_02 = load_bitmap (MOUSE_RUN_02);
 
   /* framesets */
   init_run_frameset ();
@@ -51,8 +51,8 @@ void
 unload_mouse (void)
 {
   al_destroy_bitmap (mouse_normal_00);
+  al_destroy_bitmap (mouse_run_00);
   al_destroy_bitmap (mouse_run_01);
-  al_destroy_bitmap (mouse_run_02);
 }
 
 
@@ -127,7 +127,7 @@ void
 init_run_frameset (void)
 {
   struct frameset frameset[RUN_FRAMESET_NMEMB] =
-    {{mouse_run_01,-8,+0},{mouse_run_02,-8,+0}};
+    {{mouse_run_00,-8,+0},{mouse_run_01,-8,+0}};
 
   memcpy (&run_frameset, &frameset,
           RUN_FRAMESET_NMEMB * sizeof (struct frameset));

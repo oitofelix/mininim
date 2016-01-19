@@ -35,16 +35,16 @@ static bool flow (struct anim *k);
 static bool physics_in (struct anim *k);
 static void physics_out (struct anim *k);
 
-ALLEGRO_BITMAP *kid_run_07, *kid_run_08, *kid_run_09, *kid_run_10,
-  *kid_run_11, *kid_run_12, *kid_run_13, *kid_run_14;
+ALLEGRO_BITMAP *kid_run_00, *kid_run_01, *kid_run_02, *kid_run_03,
+  *kid_run_04, *kid_run_05, *kid_run_06, *kid_run_07;
 
 static void
 init_kid_run_frameset (void)
 {
   struct frameset frameset[KID_RUN_FRAMESET_NMEMB] =
-    {{kid_run_07,-10,0},{kid_run_08,-7,0},{kid_run_09,-6,0},
-     {kid_run_10,-4,0},{kid_run_11,-8,0},{kid_run_12,-11,0},
-     {kid_run_13,-4,0},{kid_run_14,-8,0}};
+    {{kid_run_00,-10,0},{kid_run_01,-7,0},{kid_run_02,-6,0},
+     {kid_run_03,-4,0},{kid_run_04,-8,0},{kid_run_05,-11,0},
+     {kid_run_06,-4,0},{kid_run_07,-8,0}};
 
   memcpy (&kid_run_frameset, &frameset,
           KID_RUN_FRAMESET_NMEMB * sizeof (struct frameset));
@@ -54,14 +54,14 @@ void
 load_kid_run (void)
 {
   /* bitmaps */
+  kid_run_00 = load_bitmap (KID_RUN_00);
+  kid_run_01 = load_bitmap (KID_RUN_01);
+  kid_run_02 = load_bitmap (KID_RUN_02);
+  kid_run_03 = load_bitmap (KID_RUN_03);
+  kid_run_04 = load_bitmap (KID_RUN_04);
+  kid_run_05 = load_bitmap (KID_RUN_05);
+  kid_run_06 = load_bitmap (KID_RUN_06);
   kid_run_07 = load_bitmap (KID_RUN_07);
-  kid_run_08 = load_bitmap (KID_RUN_08);
-  kid_run_09 = load_bitmap (KID_RUN_09);
-  kid_run_10 = load_bitmap (KID_RUN_10);
-  kid_run_11 = load_bitmap (KID_RUN_11);
-  kid_run_12 = load_bitmap (KID_RUN_12);
-  kid_run_13 = load_bitmap (KID_RUN_13);
-  kid_run_14 = load_bitmap (KID_RUN_14);
 
   /* frameset */
   init_kid_run_frameset ();
@@ -70,14 +70,14 @@ load_kid_run (void)
 void
 unload_kid_run (void)
 {
+  al_destroy_bitmap (kid_run_00);
+  al_destroy_bitmap (kid_run_01);
+  al_destroy_bitmap (kid_run_02);
+  al_destroy_bitmap (kid_run_03);
+  al_destroy_bitmap (kid_run_04);
+  al_destroy_bitmap (kid_run_05);
+  al_destroy_bitmap (kid_run_06);
   al_destroy_bitmap (kid_run_07);
-  al_destroy_bitmap (kid_run_08);
-  al_destroy_bitmap (kid_run_09);
-  al_destroy_bitmap (kid_run_10);
-  al_destroy_bitmap (kid_run_11);
-  al_destroy_bitmap (kid_run_12);
-  al_destroy_bitmap (kid_run_13);
-  al_destroy_bitmap (kid_run_14);
 }
 
 void

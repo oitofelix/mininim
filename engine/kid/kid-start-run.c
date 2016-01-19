@@ -35,16 +35,16 @@ static bool flow (struct anim *k);
 static bool physics_in (struct anim *k);
 static void physics_out (struct anim *k);
 
-ALLEGRO_BITMAP *kid_start_run_01, *kid_start_run_02, *kid_start_run_03,
-  *kid_start_run_04, *kid_start_run_05, *kid_start_run_06;
+ALLEGRO_BITMAP *kid_start_run_00, *kid_start_run_01, *kid_start_run_02,
+  *kid_start_run_03, *kid_start_run_04, *kid_start_run_05;
 
 static void
 init_kid_start_run_frameset (void)
 {
   struct frameset frameset[KID_START_RUN_FRAMESET_NMEMB] =
-    {{kid_start_run_01,-1,0},{kid_start_run_02,-2,0},
-     {kid_start_run_03,-5,0},{kid_start_run_04,-1,0},
-     {kid_start_run_05,-7,0},{kid_start_run_06,-6,0}};
+    {{kid_start_run_00,-1,0},{kid_start_run_01,-2,0},
+     {kid_start_run_02,-5,0},{kid_start_run_03,-1,0},
+     {kid_start_run_04,-7,0},{kid_start_run_05,-6,0}};
 
   memcpy (&kid_start_run_frameset, &frameset,
           KID_START_RUN_FRAMESET_NMEMB * sizeof (struct frameset));
@@ -54,12 +54,12 @@ void
 load_kid_start_run (void)
 {
   /* bitmaps */
+  kid_start_run_00 = load_bitmap (KID_START_RUN_00);
   kid_start_run_01 = load_bitmap (KID_START_RUN_01);
   kid_start_run_02 = load_bitmap (KID_START_RUN_02);
   kid_start_run_03 = load_bitmap (KID_START_RUN_03);
   kid_start_run_04 = load_bitmap (KID_START_RUN_04);
   kid_start_run_05 = load_bitmap (KID_START_RUN_05);
-  kid_start_run_06 = load_bitmap (KID_START_RUN_06);
 
   /* frameset */
   init_kid_start_run_frameset ();
@@ -68,12 +68,12 @@ load_kid_start_run (void)
 void
 unload_kid_start_run (void)
 {
+  al_destroy_bitmap (kid_start_run_00);
   al_destroy_bitmap (kid_start_run_01);
   al_destroy_bitmap (kid_start_run_02);
   al_destroy_bitmap (kid_start_run_03);
   al_destroy_bitmap (kid_start_run_04);
   al_destroy_bitmap (kid_start_run_05);
-  al_destroy_bitmap (kid_start_run_06);
 }
 
 void

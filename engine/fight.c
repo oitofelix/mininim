@@ -501,8 +501,8 @@ is_sword_hit (struct anim *k)
 bool
 is_at_defendable_attack_frame (struct anim *k)
 {
-  return k->fo.b == kid_sword_attack_03
-    || k->fo.b == kid_sword_attack_04
+  return k->fo.b == kid_sword_attack_02
+    || k->fo.b == kid_sword_attack_03
     || k->fo.b == guard_attack_04
     || k->fo.b == guard_attack_05
     || k->fo.b == fat_guard_attack_04
@@ -518,7 +518,7 @@ is_at_defendable_attack_frame (struct anim *k)
 bool
 is_at_hit_frame (struct anim *k)
 {
-  return k->fo.b == kid_sword_attack_04
+  return k->fo.b == kid_sword_attack_03
     || k->fo.b == guard_attack_05
     || k->fo.b == fat_guard_attack_05
     || k->fo.b == vizier_attack_05
@@ -587,7 +587,7 @@ put_at_attack_frame (struct anim *k)
     next_frame (&k->f, &k->f, &k->fo);
     select_frame (k, kid_sword_attack_frameset, 2);
 
-    k->fo.b = kid_sword_attack_16;
+    k->fo.b = kid_sword_attack_defended;
     select_xframe (&k->xf, sword_frameset, 17);
     k->xf.dx = -21;
     k->xf.dy = +11;

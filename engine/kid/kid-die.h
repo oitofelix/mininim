@@ -21,14 +21,14 @@
 #define MININIM_KID_DIE_H
 
 /* bitmaps */
-#define KID_DIE_01 "dat/kid/dieing/frame01.png"
-#define KID_DIE_02 "dat/kid/dieing/frame02.png"
-#define KID_DIE_03 "dat/kid/dieing/frame03.png"
-#define KID_DIE_04 "dat/kid/dieing/frame04.png"
-#define KID_DIE_05 "dat/kid/dieing/frame05.png"
-#define KID_DIE_06 "dat/kid/deaths/dead.png"
-#define KID_DIE_SPIKED_00 "dat/kid/deaths/spiked.png"
-#define KID_DIE_CHOPPED_00 "dat/kid/deaths/chopped.png"
+#define KID_DIE_00 "data/kid/die/00.png"
+#define KID_DIE_01 "data/kid/die/01.png"
+#define KID_DIE_02 "data/kid/die/02.png"
+#define KID_DIE_03 "data/kid/die/03.png"
+#define KID_DIE_04 "data/kid/die/04.png"
+#define KID_DIE_05 "data/kid/die/05.png"
+#define KID_DIE_SPIKED_00 "data/kid/die/spiked.png"
+#define KID_DIE_CHOPPED_00 "data/kid/die/chopped.png"
 
 #define KID_DIE_FRAMESET_NMEMB 6
 extern struct frameset kid_die_frameset[KID_DIE_FRAMESET_NMEMB];
@@ -44,7 +44,7 @@ bool is_kid_dead (struct frame *f);
 bool is_kid_chopped (struct frame *f);
 void kill_kid_shadows (struct anim *k);
 
-extern ALLEGRO_BITMAP *kid_die_01, *kid_die_02, *kid_die_03,
-  *kid_die_04, *kid_die_05, *kid_die_06;
+extern ALLEGRO_BITMAP *kid_die_00, *kid_die_01, *kid_die_02,
+  *kid_die_03, *kid_die_04, *kid_die_05;
 
 #endif	/* MININIM_KID_DIE_H */

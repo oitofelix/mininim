@@ -21,15 +21,15 @@
 #define MININIM_KID_TURN_RUN_H
 
 /* bitmaps */
-#define KID_TURN_RUN_05 "dat/kid/turn running/frame05.png"
-#define KID_TURN_RUN_06 "dat/kid/turn running/frame06.png"
-#define KID_TURN_RUN_07 "dat/kid/turn running/frame07.png"
-#define KID_TURN_RUN_08 "dat/kid/turn running/frame08.png"
-#define KID_TURN_RUN_09 "dat/kid/turn running/frame09.png"
-#define KID_TURN_RUN_10 "dat/kid/turn running/frame10.png"
-#define KID_TURN_RUN_11 "dat/kid/turn running/frame11.png"
-#define KID_TURN_RUN_12 "dat/kid/turn running/frame12.png"
-#define KID_TURN_RUN_13 "dat/kid/turn running/frame13.png"
+#define KID_TURN_RUN_00 "data/kid/turn-run/00.png"
+#define KID_TURN_RUN_01 "data/kid/turn-run/01.png"
+#define KID_TURN_RUN_02 "data/kid/turn-run/02.png"
+#define KID_TURN_RUN_03 "data/kid/turn-run/03.png"
+#define KID_TURN_RUN_04 "data/kid/turn-run/04.png"
+#define KID_TURN_RUN_05 "data/kid/turn-run/05.png"
+#define KID_TURN_RUN_06 "data/kid/turn-run/06.png"
+#define KID_TURN_RUN_07 "data/kid/turn-run/07.png"
+#define KID_TURN_RUN_08 "data/kid/turn-run/08.png"
 
 #define KID_TURN_RUN_FRAMESET_NMEMB 9
 extern struct frameset kid_turn_run_frameset[KID_TURN_RUN_FRAMESET_NMEMB];
@@ -39,8 +39,8 @@ void unload_kid_turn_run (void);
 void kid_turn_run (struct anim *k);
 bool is_kid_turn_run (struct frame *f);
 
-extern ALLEGRO_BITMAP *kid_turn_run_05, *kid_turn_run_06, *kid_turn_run_07,
-  *kid_turn_run_08, *kid_turn_run_09, *kid_turn_run_10, *kid_turn_run_11,
-  *kid_turn_run_12, *kid_turn_run_13;
+extern ALLEGRO_BITMAP *kid_turn_run_00, *kid_turn_run_01, *kid_turn_run_02,
+  *kid_turn_run_03, *kid_turn_run_04, *kid_turn_run_05, *kid_turn_run_06,
+  *kid_turn_run_07, *kid_turn_run_08;
 
 #endif	/* MININIM_KID_TURN_RUN_H */

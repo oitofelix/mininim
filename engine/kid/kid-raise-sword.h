@@ -21,10 +21,10 @@
 #define MININIM_KID_RAISE_SWORD_H
 
 /* bitmaps */
-#define KID_RAISE_SWORD_01 "dat/kid/got sword/frame01.png"
-#define KID_RAISE_SWORD_02 "dat/kid/got sword/frame02.png"
-#define KID_RAISE_SWORD_03 "dat/kid/got sword/frame03.png"
-#define KID_RAISE_SWORD_04 "dat/kid/got sword/frame04.png"
+#define KID_RAISE_SWORD_00 "data/kid/raise-sword/00.png"
+#define KID_RAISE_SWORD_01 "data/kid/raise-sword/01.png"
+#define KID_RAISE_SWORD_02 "data/kid/raise-sword/02.png"
+#define KID_RAISE_SWORD_03 "data/kid/raise-sword/03.png"
 
 #define KID_RAISE_SWORD_FRAMESET_NMEMB 4
 extern struct frameset kid_raise_sword_frameset[KID_RAISE_SWORD_FRAMESET_NMEMB];
@@ -33,7 +33,7 @@ void load_kid_raise_sword (void);
 void unload_kid_raise_sword (void);
 void kid_raise_sword (struct anim *k);
 
-extern ALLEGRO_BITMAP *kid_raise_sword_01, *kid_raise_sword_02,
-  *kid_raise_sword_03, *kid_raise_sword_04;
+extern ALLEGRO_BITMAP *kid_raise_sword_00, *kid_raise_sword_01,
+  *kid_raise_sword_02, *kid_raise_sword_03;
 
 #endif	/* MININIM_KID_RAISE_SWORD_H */

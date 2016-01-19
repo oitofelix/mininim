@@ -38,7 +38,7 @@ static void physics_out (struct anim *k);
 ALLEGRO_BITMAP *kid_hang_00, *kid_hang_01, *kid_hang_02,
   *kid_hang_03, *kid_hang_04, *kid_hang_05, *kid_hang_06,
   *kid_hang_07, *kid_hang_08, *kid_hang_09, *kid_hang_10,
-  *kid_hang_11, *kid_hang_12, *kid_hang_14;
+  *kid_hang_11, *kid_hang_12, *kid_hang_13;
 
 static void
 init_kid_hang_frameset (void)
@@ -71,7 +71,7 @@ load_kid_hang (void)
   kid_hang_10 = load_bitmap (KID_HANG_10);
   kid_hang_11 = load_bitmap (KID_HANG_11);
   kid_hang_12 = load_bitmap (KID_HANG_12);
-  kid_hang_14 = load_bitmap (KID_HANG_14);
+  kid_hang_13 = load_bitmap (KID_HANG_13);
 
   /* frameset */
   init_kid_hang_frameset ();
@@ -93,7 +93,7 @@ unload_kid_hang (void)
   al_destroy_bitmap (kid_hang_10);
   al_destroy_bitmap (kid_hang_11);
   al_destroy_bitmap (kid_hang_12);
-  al_destroy_bitmap (kid_hang_14);
+  al_destroy_bitmap (kid_hang_13);
 }
 
 void
@@ -116,11 +116,11 @@ flow (struct anim *k)
     k->i = -1, k->hang_caller = k->oaction, k->misstep = false;
 
   int dir = (k->f.dir == LEFT) ? 0 : 1;
-  place_frame (&k->f, &k->f, kid_hang_14,
+  place_frame (&k->f, &k->f, kid_hang_13,
                &k->hang_pos, PLACE_WIDTH * dir + 7, -9);
 
   if (k->i == -1 && k->oaction != kid_unclimb) {
-    k->fo.b = kid_hang_14;
+    k->fo.b = kid_hang_13;
     k->fo.dx = +0;
     k->fo.dy = +0;
   } else if (is_hang_pos_free (&k->hang_pos, k->f.dir)) {
@@ -172,8 +172,9 @@ is_kid_hang_or_climb (struct frame *f)
     || f->b == kid_hang_10
     || f->b == kid_hang_11
     || f->b == kid_hang_12
-    || f->b == kid_hang_14
+    || f->b == kid_hang_13
 
+    || f->b == kid_climb_00
     || f->b == kid_climb_01
     || f->b == kid_climb_02
     || f->b == kid_climb_03
@@ -182,8 +183,7 @@ is_kid_hang_or_climb (struct frame *f)
     || f->b == kid_climb_06
     || f->b == kid_climb_07
     || f->b == kid_climb_08
-    || f->b == kid_climb_09
-    || f->b == kid_climb_10;
+    || f->b == kid_climb_09;
 }
 
 bool

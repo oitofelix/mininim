@@ -35,19 +35,19 @@ static bool flow (struct anim *k);
 static bool physics_in (struct anim *k);
 static void physics_out (struct anim *k);
 
-ALLEGRO_BITMAP *kid_keep_sword_01, *kid_keep_sword_02,
-  *kid_keep_sword_03, *kid_keep_sword_04, *kid_keep_sword_05,
-  *kid_keep_sword_06, *kid_keep_sword_07, *kid_keep_sword_08,
-  *kid_keep_sword_09, *kid_keep_sword_10;
+ALLEGRO_BITMAP *kid_keep_sword_00, *kid_keep_sword_01,
+  *kid_keep_sword_02, *kid_keep_sword_03, *kid_keep_sword_04,
+  *kid_keep_sword_05, *kid_keep_sword_06, *kid_keep_sword_07,
+  *kid_keep_sword_08, *kid_keep_sword_09;
 
 static void
 init_kid_keep_sword_frameset (void)
 {
   struct frameset frameset[KID_KEEP_SWORD_FRAMESET_NMEMB] =
-    {{kid_keep_sword_01,+2,+0},{kid_keep_sword_02,-2,0},{kid_keep_sword_03,+0,0},
-     {kid_keep_sword_04,+1,0},{kid_keep_sword_05,-6,0},{kid_keep_sword_06,+2,0},
-     {kid_keep_sword_07,+3,0},{kid_keep_sword_08,+0,0},{kid_keep_sword_09,+3,0},
-     {kid_keep_sword_10,+0,0}};
+    {{kid_keep_sword_00,+2,+0},{kid_keep_sword_01,-2,0},{kid_keep_sword_02,+0,0},
+     {kid_keep_sword_03,+1,0},{kid_keep_sword_04,-6,0},{kid_keep_sword_05,+2,0},
+     {kid_keep_sword_06,+3,0},{kid_keep_sword_07,+0,0},{kid_keep_sword_08,+3,0},
+     {kid_keep_sword_09,+0,0}};
 
   memcpy (&kid_keep_sword_frameset, &frameset,
           KID_KEEP_SWORD_FRAMESET_NMEMB * sizeof (struct frameset));
@@ -57,6 +57,7 @@ void
 load_kid_keep_sword (void)
 {
   /* bitmaps */
+  kid_keep_sword_00 = load_bitmap (KID_KEEP_SWORD_00);
   kid_keep_sword_01 = load_bitmap (KID_KEEP_SWORD_01);
   kid_keep_sword_02 = load_bitmap (KID_KEEP_SWORD_02);
   kid_keep_sword_03 = load_bitmap (KID_KEEP_SWORD_03);
@@ -66,7 +67,6 @@ load_kid_keep_sword (void)
   kid_keep_sword_07 = load_bitmap (KID_KEEP_SWORD_07);
   kid_keep_sword_08 = load_bitmap (KID_KEEP_SWORD_08);
   kid_keep_sword_09 = load_bitmap (KID_KEEP_SWORD_09);
-  kid_keep_sword_10 = load_bitmap (KID_KEEP_SWORD_10);
 
   /* frameset */
   init_kid_keep_sword_frameset ();
@@ -75,6 +75,7 @@ load_kid_keep_sword (void)
 void
 unload_kid_keep_sword (void)
 {
+  al_destroy_bitmap (kid_keep_sword_00);
   al_destroy_bitmap (kid_keep_sword_01);
   al_destroy_bitmap (kid_keep_sword_02);
   al_destroy_bitmap (kid_keep_sword_03);
@@ -84,7 +85,6 @@ unload_kid_keep_sword (void)
   al_destroy_bitmap (kid_keep_sword_07);
   al_destroy_bitmap (kid_keep_sword_08);
   al_destroy_bitmap (kid_keep_sword_09);
-  al_destroy_bitmap (kid_keep_sword_10);
 }
 
 void
@@ -135,7 +135,7 @@ flow (struct anim *k)
   if (k->i == 9 && k->wait < 2) k->fo.dx = 0;
   if (k->keep_sword_fast && k->i % 2)
     k->fo.dx += kid_keep_sword_frameset[k->i - 1].dx;
-  if (k->f.b == kid_sword_normal_08) k->fo.dx = +8;
+  if (k->f.b == kid_sword_normal_00) k->fo.dx = +8;
 
   return true;
 }

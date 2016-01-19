@@ -36,21 +36,21 @@ static bool flow (struct anim *k);
 static bool physics_in (struct anim *k);
 static void physics_out (struct anim *k);
 
-ALLEGRO_BITMAP *kid_run_jump_01, *kid_run_jump_02, *kid_run_jump_03,
-  *kid_run_jump_04, *kid_run_jump_05, *kid_run_jump_06,
-  *kid_run_jump_07, *kid_run_jump_08, *kid_run_jump_09,
-  *kid_run_jump_10, *kid_run_jump_11;
+ALLEGRO_BITMAP *kid_run_jump_00, *kid_run_jump_01, *kid_run_jump_02,
+  *kid_run_jump_03, *kid_run_jump_04, *kid_run_jump_05,
+  *kid_run_jump_06, *kid_run_jump_07, *kid_run_jump_08,
+  *kid_run_jump_09, *kid_run_jump_10;
 
 static void
 init_kid_run_jump_frameset (void)
 {
   struct frameset frameset[KID_RUN_JUMP_FRAMESET_NMEMB] =
-    {{kid_run_jump_01,-10,+0},{kid_run_jump_02,-11,+0},
-     {kid_run_jump_03,-13,+0},{kid_run_jump_04,-7,+0},
-     {kid_run_jump_05,-12,+0},{kid_run_jump_06,-15,+0},
-     {kid_run_jump_07,-29,-3},{kid_run_jump_08,-17,-9},
-     {kid_run_jump_09,-18,-2},{kid_run_jump_10,-10,+11},
-     {kid_run_jump_11,-8,+3}};
+    {{kid_run_jump_00,-10,+0},{kid_run_jump_01,-11,+0},
+     {kid_run_jump_02,-13,+0},{kid_run_jump_03,-7,+0},
+     {kid_run_jump_04,-12,+0},{kid_run_jump_05,-15,+0},
+     {kid_run_jump_06,-29,-3},{kid_run_jump_07,-17,-9},
+     {kid_run_jump_08,-18,-2},{kid_run_jump_09,-10,+11},
+     {kid_run_jump_10,-8,+3}};
 
   memcpy (&kid_run_jump_frameset, &frameset,
           KID_RUN_JUMP_FRAMESET_NMEMB * sizeof (struct frameset));
@@ -60,6 +60,7 @@ void
 load_kid_run_jump (void)
 {
   /* bitmaps */
+  kid_run_jump_00 = load_bitmap (KID_RUN_JUMP_00);
   kid_run_jump_01 = load_bitmap (KID_RUN_JUMP_01);
   kid_run_jump_02 = load_bitmap (KID_RUN_JUMP_02);
   kid_run_jump_03 = load_bitmap (KID_RUN_JUMP_03);
@@ -70,7 +71,6 @@ load_kid_run_jump (void)
   kid_run_jump_08 = load_bitmap (KID_RUN_JUMP_08);
   kid_run_jump_09 = load_bitmap (KID_RUN_JUMP_09);
   kid_run_jump_10 = load_bitmap (KID_RUN_JUMP_10);
-  kid_run_jump_11 = load_bitmap (KID_RUN_JUMP_11);
 
   /* frameset */
   init_kid_run_jump_frameset ();
@@ -79,6 +79,7 @@ load_kid_run_jump (void)
 void
 unload_kid_run_jump (void)
 {
+  al_destroy_bitmap (kid_run_jump_00);
   al_destroy_bitmap (kid_run_jump_01);
   al_destroy_bitmap (kid_run_jump_02);
   al_destroy_bitmap (kid_run_jump_03);
@@ -89,7 +90,6 @@ unload_kid_run_jump (void)
   al_destroy_bitmap (kid_run_jump_08);
   al_destroy_bitmap (kid_run_jump_09);
   al_destroy_bitmap (kid_run_jump_10);
-  al_destroy_bitmap (kid_run_jump_11);
 }
 
 void

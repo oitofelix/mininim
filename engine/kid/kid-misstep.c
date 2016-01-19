@@ -39,10 +39,10 @@ static void
 init_kid_misstep_frameset (void)
 {
   struct frameset frameset[KID_MISSTEP_FRAMESET_NMEMB] =
-    {{kid_walk_01,-1,0},{kid_walk_02,-1,0},{kid_walk_03,+0,0},
-     {kid_walk_04,-8,0},{kid_walk_05,-7,0},{kid_walk_06,-4,0},
-     {kid_jump_14,+8,0},{kid_couch_10,+8,0},{kid_couch_11,+3,0},
-     {kid_couch_12,+0,0},{kid_couch_13,+4,0}};
+    {{kid_walk_00,-1,0},{kid_walk_01,-1,0},{kid_walk_02,+0,0},
+     {kid_walk_03,-8,0},{kid_walk_04,-7,0},{kid_walk_05,-4,0},
+     {kid_jump_13,+8,0},{kid_couch_09,+8,0},{kid_couch_10,+3,0},
+     {kid_couch_11,+0,0},{kid_couch_12,+4,0}};
 
   memcpy (&kid_misstep_frameset, &frameset,
           KID_MISSTEP_FRAMESET_NMEMB * sizeof (struct frameset));

@@ -35,17 +35,17 @@ static bool flow (struct anim *k);
 static bool physics_in (struct anim *k);
 static void physics_out (struct anim *k);
 
-ALLEGRO_BITMAP *kid_turn_run_05, *kid_turn_run_06, *kid_turn_run_07, *kid_turn_run_08,
-  *kid_turn_run_09, *kid_turn_run_10, *kid_turn_run_11, *kid_turn_run_12,
-  *kid_turn_run_13;
+ALLEGRO_BITMAP *kid_turn_run_00, *kid_turn_run_01, *kid_turn_run_02, *kid_turn_run_03,
+  *kid_turn_run_04, *kid_turn_run_05, *kid_turn_run_06, *kid_turn_run_07,
+  *kid_turn_run_08;
 
 static void
 init_kid_turn_run_frameset (void)
 {
   struct frameset frameset[KID_TURN_RUN_FRAMESET_NMEMB] =
-    {{kid_turn_run_05,-18,0},{kid_turn_run_06,-6,0},{kid_turn_run_07,-4,0},
-     {kid_turn_run_08,+2,0},{kid_turn_run_09,-6,0},{kid_turn_run_10,+3,0},
-     {kid_turn_run_11,-1,0},{kid_turn_run_12,+0,0},{kid_turn_run_13,+4,0}};
+    {{kid_turn_run_00,-18,0},{kid_turn_run_01,-6,0},{kid_turn_run_02,-4,0},
+     {kid_turn_run_03,+2,0},{kid_turn_run_04,-6,0},{kid_turn_run_05,+3,0},
+     {kid_turn_run_06,-1,0},{kid_turn_run_07,+0,0},{kid_turn_run_08,+4,0}};
 
   memcpy (&kid_turn_run_frameset, &frameset,
           KID_TURN_RUN_FRAMESET_NMEMB * sizeof (struct frameset));
@@ -55,15 +55,15 @@ void
 load_kid_turn_run (void)
 {
   /* bitmaps */
+  kid_turn_run_00 = load_bitmap (KID_TURN_RUN_00);
+  kid_turn_run_01 = load_bitmap (KID_TURN_RUN_01);
+  kid_turn_run_02 = load_bitmap (KID_TURN_RUN_02);
+  kid_turn_run_03 = load_bitmap (KID_TURN_RUN_03);
+  kid_turn_run_04 = load_bitmap (KID_TURN_RUN_04);
   kid_turn_run_05 = load_bitmap (KID_TURN_RUN_05);
   kid_turn_run_06 = load_bitmap (KID_TURN_RUN_06);
   kid_turn_run_07 = load_bitmap (KID_TURN_RUN_07);
   kid_turn_run_08 = load_bitmap (KID_TURN_RUN_08);
-  kid_turn_run_09 = load_bitmap (KID_TURN_RUN_09);
-  kid_turn_run_10 = load_bitmap (KID_TURN_RUN_10);
-  kid_turn_run_11 = load_bitmap (KID_TURN_RUN_11);
-  kid_turn_run_12 = load_bitmap (KID_TURN_RUN_12);
-  kid_turn_run_13 = load_bitmap (KID_TURN_RUN_13);
 
   /* frameset */
   init_kid_turn_run_frameset ();
@@ -72,15 +72,15 @@ load_kid_turn_run (void)
 void
 unload_kid_turn_run (void)
 {
+  al_destroy_bitmap (kid_turn_run_00);
+  al_destroy_bitmap (kid_turn_run_01);
+  al_destroy_bitmap (kid_turn_run_02);
+  al_destroy_bitmap (kid_turn_run_03);
+  al_destroy_bitmap (kid_turn_run_04);
   al_destroy_bitmap (kid_turn_run_05);
   al_destroy_bitmap (kid_turn_run_06);
   al_destroy_bitmap (kid_turn_run_07);
   al_destroy_bitmap (kid_turn_run_08);
-  al_destroy_bitmap (kid_turn_run_09);
-  al_destroy_bitmap (kid_turn_run_10);
-  al_destroy_bitmap (kid_turn_run_11);
-  al_destroy_bitmap (kid_turn_run_12);
-  al_destroy_bitmap (kid_turn_run_13);
 }
 
 void

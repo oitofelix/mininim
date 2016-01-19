@@ -21,8 +21,8 @@
 #define MININIM_KID_SWORD_WALKF_H
 
 /* bitmaps */
-#define KID_SWORD_WALKF_14 "dat/kid/sword attacking/frame14.png"
-#define KID_SWORD_WALKF_15 "dat/kid/sword attacking/frame15.png"
+#define KID_SWORD_WALKF_00 "data/kid/sword-walkf/00.png"
+#define KID_SWORD_WALKF_01 "data/kid/sword-walkf/01.png"
 
 #define KID_SWORD_WALKF_FRAMESET_NMEMB 2
 extern struct frameset kid_sword_walkf_frameset[KID_SWORD_WALKF_FRAMESET_NMEMB];
@@ -31,6 +31,6 @@ void load_kid_sword_walkf (void);
 void unload_kid_sword_walkf (void);
 void kid_sword_walkf (struct anim *k);
 
-extern ALLEGRO_BITMAP *kid_sword_walkf_14, *kid_sword_walkf_15;
+extern ALLEGRO_BITMAP *kid_sword_walkf_00, *kid_sword_walkf_01;
 
 #endif	/* MININIM_KID_SWORD_WALKF_H */

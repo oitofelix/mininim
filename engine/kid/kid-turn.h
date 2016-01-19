@@ -21,10 +21,10 @@
 #define MININIM_KID_TURN_H
 
 /* bitmaps */
-#define KID_TURN_01 "dat/kid/turning/frame01.png"
-#define KID_TURN_02 "dat/kid/turning/frame02.png"
-#define KID_TURN_03 "dat/kid/turning/frame03.png"
-#define KID_TURN_04 "dat/kid/turning/frame04.png"
+#define KID_TURN_00 "data/kid/turn/00.png"
+#define KID_TURN_01 "data/kid/turn/01.png"
+#define KID_TURN_02 "data/kid/turn/02.png"
+#define KID_TURN_03 "data/kid/turn/03.png"
 
 #define KID_TURN_FRAMESET_NMEMB 4
 extern struct frameset kid_turn_frameset[KID_TURN_FRAMESET_NMEMB];
@@ -34,6 +34,6 @@ void unload_kid_turn (void);
 void kid_turn (struct anim *k);
 bool is_kid_turn (struct frame *f);
 
-extern ALLEGRO_BITMAP *kid_turn_01, *kid_turn_02, *kid_turn_03, *kid_turn_04;
+extern ALLEGRO_BITMAP *kid_turn_00, *kid_turn_01, *kid_turn_02, *kid_turn_03;
 
 #endif	/* MININIM_KID_TURN_H */

@@ -21,12 +21,12 @@
 #define MININIM_KID_SWORD_NORMAL_H
 
 /* bitmaps */
-#define KID_SWORD_NORMAL_08 "dat/kid/sword attacking/frame08.png"
+#define KID_SWORD_NORMAL_00 "data/kid/sword-normal/00.png"
 
 void load_kid_sword_normal (void);
 void unload_kid_sword_normal (void);
 void kid_sword_normal (struct anim *k);
 
-ALLEGRO_BITMAP *kid_sword_normal_08;
+ALLEGRO_BITMAP *kid_sword_normal_00;
 
 #endif	/* MININIM_KID_SWORD_NORMAL_H */

@@ -25,7 +25,7 @@ MODULES = ${KERNEL_MODULES:%=kernel/%} ${ENGINE_MODULES:%=engine/%}	\
 
 SRCS = ${MODULES:=.c}
 OBJECTS = ${MODULES:=.o}
-COV_FILES = ${MODULES:=.gcda} ${MODULES:=.gcno}
+COV_FILES = ${MODULES:=.gcda} ${MODULES:=.gcno} gmon.out
 LDFLAGS = -lm -lallegro -lallegro_image -lallegro_audio	\
   -lallegro_acodec -lallegro_font -lallegro_primitives
 CFLAGS_DEV = -Wall -ggdb3 -Werror -Wno-error=unused-function \
@@ -46,4 +46,4 @@ prince : ${OBJECTS}
 
 .PHONY: clean
 clean:
-	rm -f prince ${OBJECTS} ${COV_FILES} gmon.out .depend
+	rm -f prince ${OBJECTS} .depend

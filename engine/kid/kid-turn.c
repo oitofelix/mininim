@@ -35,14 +35,14 @@ static bool flow (struct anim *k);
 static bool physics_in (struct anim *k);
 static void physics_out (struct anim *k);
 
-ALLEGRO_BITMAP *kid_turn_01, *kid_turn_02, *kid_turn_03, *kid_turn_04;
+ALLEGRO_BITMAP *kid_turn_00, *kid_turn_01, *kid_turn_02, *kid_turn_03;
 
 static void
 init_kid_turn_frameset (void)
 {
   struct frameset frameset[KID_TURN_FRAMESET_NMEMB] =
-    {{kid_turn_01,+2,0},{kid_turn_02,+1,0},
-     {kid_turn_03,-3,0},{kid_turn_04,+0,+0}};
+    {{kid_turn_00,+2,0},{kid_turn_01,+1,0},
+     {kid_turn_02,-3,0},{kid_turn_03,+0,+0}};
 
   memcpy (&kid_turn_frameset, &frameset,
           KID_TURN_FRAMESET_NMEMB * sizeof (struct frameset));
@@ -52,10 +52,10 @@ void
 load_kid_turn (void)
 {
   /* bitmaps */
+  kid_turn_00 = load_bitmap (KID_TURN_00);
   kid_turn_01 = load_bitmap (KID_TURN_01);
   kid_turn_02 = load_bitmap (KID_TURN_02);
   kid_turn_03 = load_bitmap (KID_TURN_03);
-  kid_turn_04 = load_bitmap (KID_TURN_04);
 
   /* frameset */
   init_kid_turn_frameset ();
@@ -64,10 +64,10 @@ load_kid_turn (void)
 void
 unload_kid_turn (void)
 {
+  al_destroy_bitmap (kid_turn_00);
   al_destroy_bitmap (kid_turn_01);
   al_destroy_bitmap (kid_turn_02);
   al_destroy_bitmap (kid_turn_03);
-  al_destroy_bitmap (kid_turn_04);
 }
 
 void

@@ -637,16 +637,16 @@ draw_room_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
       if (con (&pv)->fg == DOOR)
         draw_door_fg (bitmap, &pv, f, em, vm);
 
-      if (f->b == kid_climb_03
-          || f->b == kid_climb_09
-          || f->b == kid_climb_10)
+      if (f->b == kid_climb_02
+          || f->b == kid_climb_08
+          || f->b == kid_climb_09)
         draw_floor_corner_03 (bitmap, &pv, em, vm);
-      else if (f->b == kid_climb_06
-               || f->b == kid_climb_07)
+      else if (f->b == kid_climb_05
+               || f->b == kid_climb_06)
         draw_floor_corner_01 (bitmap, &pv, em, vm);
-      else if (f->b == kid_climb_04
-               || f->b == kid_climb_08
-               || f->b == kid_climb_05)
+      else if (f->b == kid_climb_03
+               || f->b == kid_climb_07
+               || f->b == kid_climb_04)
         draw_floor_corner_02 (bitmap, &pv, em, vm);
 
       if (con (&pv)->fg == PILLAR)

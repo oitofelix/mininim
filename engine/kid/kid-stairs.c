@@ -36,19 +36,19 @@ static bool flow (struct anim *k);
 static bool physics_in (struct anim *k);
 static void physics_out (struct anim *k);
 
-ALLEGRO_BITMAP *kid_stairs_01, *kid_stairs_02, *kid_stairs_03,
-  *kid_stairs_04, *kid_stairs_05, *kid_stairs_06, *kid_stairs_07,
-  *kid_stairs_08, *kid_stairs_09, *kid_stairs_10, *kid_stairs_11,
-  *kid_stairs_12;
+ALLEGRO_BITMAP *kid_stairs_00, *kid_stairs_01, *kid_stairs_02,
+  *kid_stairs_03, *kid_stairs_04, *kid_stairs_05, *kid_stairs_06,
+  *kid_stairs_07, *kid_stairs_08, *kid_stairs_09, *kid_stairs_10,
+  *kid_stairs_11;
 
 static void
 init_kid_stairs_frameset (void)
 {
   struct frameset frameset[KID_STAIRS_FRAMESET_NMEMB] =
-    {{kid_stairs_01,+0,+0},{kid_stairs_02,-1,+0},{kid_stairs_03,+0,+0},
-     {kid_stairs_04,-2,+0},{kid_stairs_05,+10,-3},{kid_stairs_06,+8,-2},
-     {kid_stairs_07,+4,-3},{kid_stairs_08,+7,-8},{kid_stairs_09,+4,-1},
-     {kid_stairs_10,+5,-4},{kid_stairs_11,+3,-6},{kid_stairs_12,+4,+0}};
+    {{kid_stairs_00,+0,+0},{kid_stairs_01,-1,+0},{kid_stairs_02,+0,+0},
+     {kid_stairs_03,-2,+0},{kid_stairs_04,+10,-3},{kid_stairs_05,+8,-2},
+     {kid_stairs_06,+4,-3},{kid_stairs_07,+7,-8},{kid_stairs_08,+4,-1},
+     {kid_stairs_09,+5,-4},{kid_stairs_10,+3,-6},{kid_stairs_11,+4,+0}};
 
   memcpy (&kid_stairs_frameset, &frameset,
           KID_STAIRS_FRAMESET_NMEMB * sizeof (struct frameset));
@@ -58,6 +58,7 @@ void
 load_kid_stairs (void)
 {
   /* bitmaps */
+  kid_stairs_00 = load_bitmap (KID_STAIRS_00);
   kid_stairs_01 = load_bitmap (KID_STAIRS_01);
   kid_stairs_02 = load_bitmap (KID_STAIRS_02);
   kid_stairs_03 = load_bitmap (KID_STAIRS_03);
@@ -69,7 +70,6 @@ load_kid_stairs (void)
   kid_stairs_09 = load_bitmap (KID_STAIRS_09);
   kid_stairs_10 = load_bitmap (KID_STAIRS_10);
   kid_stairs_11 = load_bitmap (KID_STAIRS_11);
-  kid_stairs_12 = load_bitmap (KID_STAIRS_12);
 
   /* frameset */
   init_kid_stairs_frameset ();
@@ -78,6 +78,7 @@ load_kid_stairs (void)
 void
 unload_kid_stairs (void)
 {
+  al_destroy_bitmap (kid_stairs_00);
   al_destroy_bitmap (kid_stairs_01);
   al_destroy_bitmap (kid_stairs_02);
   al_destroy_bitmap (kid_stairs_03);
@@ -89,7 +90,6 @@ unload_kid_stairs (void)
   al_destroy_bitmap (kid_stairs_09);
   al_destroy_bitmap (kid_stairs_10);
   al_destroy_bitmap (kid_stairs_11);
-  al_destroy_bitmap (kid_stairs_12);
 }
 
 void

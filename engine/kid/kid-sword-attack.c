@@ -37,19 +37,19 @@ static bool flow (struct anim *k);
 static bool physics_in (struct anim *k);
 static void physics_out (struct anim *k);
 
-ALLEGRO_BITMAP *kid_sword_attack_01, *kid_sword_attack_02,
-  *kid_sword_attack_03, *kid_sword_attack_04, *kid_sword_attack_05,
-  *kid_sword_attack_06, *kid_sword_attack_07, *kid_sword_attack_09,
-  *kid_sword_attack_16;
+ALLEGRO_BITMAP *kid_sword_attack_00, *kid_sword_attack_01,
+  *kid_sword_attack_02, *kid_sword_attack_03, *kid_sword_attack_04,
+  *kid_sword_attack_05, *kid_sword_attack_06, *kid_sword_attack_counter_defense,
+  *kid_sword_attack_defended;
 
 static void
 init_kid_sword_attack_frameset (void)
 {
   struct frameset frameset[KID_SWORD_ATTACK_FRAMESET_NMEMB] =
-    {{kid_sword_attack_01,+1,0},{kid_sword_attack_02,-8,0},
-     {kid_sword_attack_03,-8,0},{kid_sword_attack_04,-9,0},
-     {kid_sword_attack_05,+8,0},{kid_sword_attack_06,+8,0},
-     {kid_sword_attack_07,+8,0},{kid_sword_attack_09,-8,0}};
+    {{kid_sword_attack_00,+1,0},{kid_sword_attack_01,-8,0},
+     {kid_sword_attack_02,-8,0},{kid_sword_attack_03,-9,0},
+     {kid_sword_attack_04,+8,0},{kid_sword_attack_05,+8,0},
+     {kid_sword_attack_06,+8,0},{kid_sword_attack_counter_defense,-8,0}};
 
   memcpy (&kid_sword_attack_frameset, &frameset,
           KID_SWORD_ATTACK_FRAMESET_NMEMB * sizeof (struct frameset));
@@ -59,16 +59,16 @@ void
 load_kid_sword_attack (void)
 {
   /* bitmaps */
+  kid_sword_attack_00 = load_bitmap (KID_SWORD_ATTACK_00);
   kid_sword_attack_01 = load_bitmap (KID_SWORD_ATTACK_01);
   kid_sword_attack_02 = load_bitmap (KID_SWORD_ATTACK_02);
   kid_sword_attack_03 = load_bitmap (KID_SWORD_ATTACK_03);
   kid_sword_attack_04 = load_bitmap (KID_SWORD_ATTACK_04);
   kid_sword_attack_05 = load_bitmap (KID_SWORD_ATTACK_05);
   kid_sword_attack_06 = load_bitmap (KID_SWORD_ATTACK_06);
-  kid_sword_attack_07 = load_bitmap (KID_SWORD_ATTACK_07);
-  kid_sword_attack_09 = load_bitmap (KID_SWORD_ATTACK_09);
+  kid_sword_attack_counter_defense = load_bitmap (KID_SWORD_ATTACK_COUNTER_DEFENSE);
 
-  kid_sword_attack_16 = load_bitmap (KID_SWORD_ATTACK_16);
+  kid_sword_attack_defended = load_bitmap (KID_SWORD_ATTACK_DEFENDED);
 
   /* frameset */
   init_kid_sword_attack_frameset ();
@@ -77,16 +77,16 @@ load_kid_sword_attack (void)
 void
 unload_kid_sword_attack (void)
 {
+  al_destroy_bitmap (kid_sword_attack_00);
   al_destroy_bitmap (kid_sword_attack_01);
   al_destroy_bitmap (kid_sword_attack_02);
   al_destroy_bitmap (kid_sword_attack_03);
   al_destroy_bitmap (kid_sword_attack_04);
   al_destroy_bitmap (kid_sword_attack_05);
   al_destroy_bitmap (kid_sword_attack_06);
-  al_destroy_bitmap (kid_sword_attack_07);
-  al_destroy_bitmap (kid_sword_attack_09);
+  al_destroy_bitmap (kid_sword_attack_counter_defense);
 
-  al_destroy_bitmap (kid_sword_attack_16);
+  al_destroy_bitmap (kid_sword_attack_defended);
 }
 
 void

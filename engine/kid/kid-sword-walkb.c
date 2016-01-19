@@ -35,13 +35,13 @@ static bool flow (struct anim *k);
 static bool physics_in (struct anim *k);
 static void physics_out (struct anim *k);
 
-ALLEGRO_BITMAP *kid_sword_walkb_10, *kid_sword_walkb_07;
+ALLEGRO_BITMAP *kid_sword_walkb_00, *kid_sword_walkb_01;
 
 static void
 init_kid_sword_walkb_frameset (void)
 {
   struct frameset frameset[KID_SWORD_WALKB_FRAMESET_NMEMB] =
-    {{kid_sword_walkb_10,-1,0},{kid_sword_walkb_07,+11,0}};
+    {{kid_sword_walkb_00,-1,0},{kid_sword_walkb_01,+11,0}};
 
   memcpy (&kid_sword_walkb_frameset, &frameset,
           KID_SWORD_WALKB_FRAMESET_NMEMB * sizeof (struct frameset));
@@ -51,8 +51,8 @@ void
 load_kid_sword_walkb (void)
 {
   /* bitmaps */
-  kid_sword_walkb_10 = load_bitmap (KID_SWORD_WALKB_10);
-  kid_sword_walkb_07 = load_bitmap (KID_SWORD_WALKB_07);
+  kid_sword_walkb_00 = load_bitmap (KID_SWORD_WALKB_00);
+  kid_sword_walkb_01 = load_bitmap (KID_SWORD_WALKB_01);
 
   /* frameset */
   init_kid_sword_walkb_frameset ();
@@ -61,8 +61,8 @@ load_kid_sword_walkb (void)
 void
 unload_kid_sword_walkb (void)
 {
-  al_destroy_bitmap (kid_sword_walkb_10);
-  al_destroy_bitmap (kid_sword_walkb_07);
+  al_destroy_bitmap (kid_sword_walkb_00);
+  al_destroy_bitmap (kid_sword_walkb_01);
 }
 
 void

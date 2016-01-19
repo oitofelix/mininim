@@ -21,10 +21,10 @@
 #define MININIM_KID_TAKE_SWORD_H
 
 /* bitmaps */
-#define KID_TAKE_SWORD_01 "dat/kid/taking sword out/frame01.png"
-#define KID_TAKE_SWORD_02 "dat/kid/taking sword out/frame02.png"
-#define KID_TAKE_SWORD_03 "dat/kid/taking sword out/frame03.png"
-#define KID_TAKE_SWORD_04 "dat/kid/taking sword out/frame04.png"
+#define KID_TAKE_SWORD_00 "data/kid/take-sword/00.png"
+#define KID_TAKE_SWORD_01 "data/kid/take-sword/01.png"
+#define KID_TAKE_SWORD_02 "data/kid/take-sword/02.png"
+#define KID_TAKE_SWORD_03 "data/kid/take-sword/03.png"
 
 #define KID_TAKE_SWORD_FRAMESET_NMEMB 4
 extern struct frameset kid_take_sword_frameset[KID_TAKE_SWORD_FRAMESET_NMEMB];
@@ -33,7 +33,7 @@ void load_kid_take_sword (void);
 void unload_kid_take_sword (void);
 void kid_take_sword (struct anim *k);
 
-extern ALLEGRO_BITMAP *kid_take_sword_01, *kid_take_sword_02,
-  *kid_take_sword_03, *kid_take_sword_04;
+extern ALLEGRO_BITMAP *kid_take_sword_00, *kid_take_sword_01,
+  *kid_take_sword_02, *kid_take_sword_03;
 
 #endif	/* MININIM_KID_TAKE_SWORD_H */

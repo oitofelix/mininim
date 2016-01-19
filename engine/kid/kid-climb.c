@@ -35,20 +35,20 @@ static bool flow (struct anim *k);
 static bool physics_in (struct anim *k);
 static void physics_out (struct anim *k);
 
-ALLEGRO_BITMAP *kid_climb_01, *kid_climb_02, *kid_climb_03,
-  *kid_climb_04, *kid_climb_05, *kid_climb_06, *kid_climb_07,
-  *kid_climb_08, *kid_climb_09, *kid_climb_10, *kid_climb_11,
-  *kid_climb_12, *kid_climb_13, *kid_climb_14, *kid_climb_15;
+ALLEGRO_BITMAP *kid_climb_00, *kid_climb_01, *kid_climb_02,
+  *kid_climb_03, *kid_climb_04, *kid_climb_05, *kid_climb_06,
+  *kid_climb_07, *kid_climb_08, *kid_climb_09, *kid_climb_10,
+  *kid_climb_11, *kid_climb_12, *kid_climb_13, *kid_climb_14;
 
 static void
 init_kid_climb_frameset (void)
 {
   struct frameset frameset[KID_CLIMB_FRAMESET_NMEMB] =
-    {{kid_climb_01,+1,+0},{kid_climb_02,+0,-9},{kid_climb_03,-4,-5},
-     {kid_climb_04,-8,-6},{kid_climb_05,-5,-4},{kid_climb_06,-2,-5},
-     {kid_climb_07,-1,-5},{kid_climb_08,-4,-8},{kid_climb_09,+0,-4},
-     {kid_climb_10,+0,-1},{kid_climb_11,-3,-4},{kid_climb_12,+1,+0},
-     {kid_climb_13,+0,+0},{kid_climb_14,-1,+0},{kid_climb_15,+0,+0}};
+    {{kid_climb_00,+1,+0},{kid_climb_01,+0,-9},{kid_climb_02,-4,-5},
+     {kid_climb_03,-8,-6},{kid_climb_04,-5,-4},{kid_climb_05,-2,-5},
+     {kid_climb_06,-1,-5},{kid_climb_07,-4,-8},{kid_climb_08,+0,-4},
+     {kid_climb_09,+0,-1},{kid_climb_10,-3,-4},{kid_climb_11,+1,+0},
+     {kid_climb_12,+0,+0},{kid_climb_13,-1,+0},{kid_climb_14,+0,+0}};
 
   memcpy (&kid_climb_frameset, &frameset,
           KID_CLIMB_FRAMESET_NMEMB * sizeof (struct frameset));
@@ -58,6 +58,7 @@ void
 load_kid_climb (void)
 {
   /* bitmaps */
+  kid_climb_00 = load_bitmap (KID_CLIMB_00);
   kid_climb_01 = load_bitmap (KID_CLIMB_01);
   kid_climb_02 = load_bitmap (KID_CLIMB_02);
   kid_climb_03 = load_bitmap (KID_CLIMB_03);
@@ -72,7 +73,6 @@ load_kid_climb (void)
   kid_climb_12 = load_bitmap (KID_CLIMB_12);
   kid_climb_13 = load_bitmap (KID_CLIMB_13);
   kid_climb_14 = load_bitmap (KID_CLIMB_14);
-  kid_climb_15 = load_bitmap (KID_CLIMB_15);
 
   /* frameset */
   init_kid_climb_frameset ();
@@ -81,6 +81,7 @@ load_kid_climb (void)
 void
 unload_kid_climb (void)
 {
+  al_destroy_bitmap (kid_climb_00);
   al_destroy_bitmap (kid_climb_01);
   al_destroy_bitmap (kid_climb_02);
   al_destroy_bitmap (kid_climb_03);
@@ -95,7 +96,6 @@ unload_kid_climb (void)
   al_destroy_bitmap (kid_climb_12);
   al_destroy_bitmap (kid_climb_13);
   al_destroy_bitmap (kid_climb_14);
-  al_destroy_bitmap (kid_climb_15);
 }
 
 void

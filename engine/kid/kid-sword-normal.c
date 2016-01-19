@@ -33,18 +33,18 @@ static bool flow (struct anim *k);
 static bool physics_in (struct anim *k);
 static void physics_out (struct anim *k);
 
-ALLEGRO_BITMAP *kid_sword_normal_08;
+ALLEGRO_BITMAP *kid_sword_normal_00;
 
 void
 load_kid_sword_normal (void)
 {
-  kid_sword_normal_08 = load_bitmap (KID_SWORD_NORMAL_08);
+  kid_sword_normal_00 = load_bitmap (KID_SWORD_NORMAL_00);
 }
 
 void
 unload_kid_sword_normal (void)
 {
-  al_destroy_bitmap (kid_sword_normal_08);
+  al_destroy_bitmap (kid_sword_normal_00);
 }
 
 void
@@ -114,7 +114,7 @@ flow (struct anim *k)
     }
   }
 
-  k->fo.b = kid_sword_normal_08;
+  k->fo.b = kid_sword_normal_00;
   k->fo.dx = k->fo.dy = +0;
   select_xframe (&k->xf, sword_frameset, 13);
 

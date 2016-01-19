@@ -21,11 +21,11 @@
 #define MININIM_KID_FALL_H
 
 /* bitmaps */
-#define KID_FALL_13 "dat/kid/hanging and falling/frame13.png"
-#define KID_FALL_14 "dat/kid/hanging and falling/frame14.png"
-#define KID_FALL_15 "dat/kid/hanging and falling/frame15.png"
-#define KID_FALL_16 "dat/kid/hanging and falling/frame16.png"
-#define KID_FALL_17 "dat/kid/hanging and falling/frame17.png"
+#define KID_FALL_00 "data/kid/fall/00.png"
+#define KID_FALL_01 "data/kid/fall/01.png"
+#define KID_FALL_02 "data/kid/fall/02.png"
+#define KID_FALL_03 "data/kid/fall/03.png"
+#define KID_FALL_04 "data/kid/fall/04.png"
 
 #define KID_FALL_FRAMESET_NMEMB 13
 extern struct frameset kid_fall_frameset[KID_FALL_FRAMESET_NMEMB];
@@ -35,7 +35,7 @@ void unload_kid_fall (void);
 void kid_fall (struct anim *k);
 bool is_kid_fall (struct frame *f);
 
-extern ALLEGRO_BITMAP *kid_fall_13, *kid_fall_14, *kid_fall_15,
-  *kid_fall_16, *kid_fall_17;
+extern ALLEGRO_BITMAP *kid_fall_00, *kid_fall_01, *kid_fall_02,
+  *kid_fall_03, *kid_fall_04;
 
 #endif	/* MININIM_KID_FALL_H */

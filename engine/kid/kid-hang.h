@@ -21,20 +21,20 @@
 #define MININIM_KID_HANG_H
 
 /* bitmaps */
-#define KID_HANG_00 "dat/kid/hanging and falling/frame00.png"
-#define KID_HANG_01 "dat/kid/hanging and falling/frame01.png"
-#define KID_HANG_02 "dat/kid/hanging and falling/frame02.png"
-#define KID_HANG_03 "dat/kid/hanging and falling/frame03.png"
-#define KID_HANG_04 "dat/kid/hanging and falling/frame04.png"
-#define KID_HANG_05 "dat/kid/hanging and falling/frame05.png"
-#define KID_HANG_06 "dat/kid/hanging and falling/frame06.png"
-#define KID_HANG_07 "dat/kid/hanging and falling/frame07.png"
-#define KID_HANG_08 "dat/kid/hanging and falling/frame08.png"
-#define KID_HANG_09 "dat/kid/hanging and falling/frame09.png"
-#define KID_HANG_10 "dat/kid/hanging and falling/frame10.png"
-#define KID_HANG_11 "dat/kid/hanging and falling/frame11.png"
-#define KID_HANG_12 "dat/kid/hanging and falling/frame12.png"
-#define KID_HANG_14 "dat/kid/scaling/frame14.png"
+#define KID_HANG_00 "data/kid/hang/00.png"
+#define KID_HANG_01 "data/kid/hang/01.png"
+#define KID_HANG_02 "data/kid/hang/02.png"
+#define KID_HANG_03 "data/kid/hang/03.png"
+#define KID_HANG_04 "data/kid/hang/04.png"
+#define KID_HANG_05 "data/kid/hang/05.png"
+#define KID_HANG_06 "data/kid/hang/06.png"
+#define KID_HANG_07 "data/kid/hang/07.png"
+#define KID_HANG_08 "data/kid/hang/08.png"
+#define KID_HANG_09 "data/kid/hang/09.png"
+#define KID_HANG_10 "data/kid/hang/10.png"
+#define KID_HANG_11 "data/kid/hang/11.png"
+#define KID_HANG_12 "data/kid/hang/12.png"
+#define KID_HANG_13 "data/kid/hang/13.png"
 
 #define KID_HANG_FRAMESET_NMEMB 13
 extern struct frameset kid_hang_frameset[KID_HANG_FRAMESET_NMEMB];
@@ -48,6 +48,6 @@ bool is_kid_hanging_at_pos (struct frame *f, struct pos *p);
 extern ALLEGRO_BITMAP *kid_hang_00, *kid_hang_01, *kid_hang_02,
   *kid_hang_03, *kid_hang_04, *kid_hang_05, *kid_hang_06,
   *kid_hang_07, *kid_hang_08, *kid_hang_09, *kid_hang_10,
-  *kid_hang_11, *kid_hang_12, *kid_hang_14;
+  *kid_hang_11, *kid_hang_12, *kid_hang_13;
 
 #endif	/* MININIM_KID_HANG_H */

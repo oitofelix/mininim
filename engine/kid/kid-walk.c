@@ -36,19 +36,19 @@ static bool flow (struct anim *k);
 static bool physics_in (struct anim *k);
 static void physics_out (struct anim *k);
 
-ALLEGRO_BITMAP *kid_walk_01, *kid_walk_02, *kid_walk_03,
-  *kid_walk_04, *kid_walk_05, *kid_walk_06, *kid_walk_07,
-  *kid_walk_08, *kid_walk_09, *kid_walk_10, *kid_walk_11,
-  *kid_walk_12;
+ALLEGRO_BITMAP *kid_walk_00, *kid_walk_01, *kid_walk_02,
+  *kid_walk_03, *kid_walk_04, *kid_walk_05, *kid_walk_06,
+  *kid_walk_07, *kid_walk_08, *kid_walk_09, *kid_walk_10,
+  *kid_walk_11;
 
 static void
 init_kid_walk_frameset (void)
 {
   struct frameset frameset[KID_WALK_FRAMESET_NMEMB] =
-    {{kid_walk_01,-1,0},{kid_walk_02,-1,0},{kid_walk_03,+0,0},
-     {kid_walk_04,-8,0},{kid_walk_05,-7,0},{kid_walk_06,-6,0},
-     {kid_walk_07,+3,0},{kid_walk_08,-2,0},{kid_walk_09,-1,0},
-     {kid_walk_10,-1,0},{kid_walk_11,-2,0},{kid_walk_12,+0,0}};
+    {{kid_walk_00,-1,0},{kid_walk_01,-1,0},{kid_walk_02,+0,0},
+     {kid_walk_03,-8,0},{kid_walk_04,-7,0},{kid_walk_05,-6,0},
+     {kid_walk_06,+3,0},{kid_walk_07,-2,0},{kid_walk_08,-1,0},
+     {kid_walk_09,-1,0},{kid_walk_10,-2,0},{kid_walk_11,+0,0}};
 
   memcpy (&kid_walk_frameset, &frameset,
           KID_WALK_FRAMESET_NMEMB * sizeof (struct frameset));
@@ -58,6 +58,7 @@ void
 load_kid_walk (void)
 {
   /* bitmaps */
+  kid_walk_00 = load_bitmap (KID_WALK_00);
   kid_walk_01 = load_bitmap (KID_WALK_01);
   kid_walk_02 = load_bitmap (KID_WALK_02);
   kid_walk_03 = load_bitmap (KID_WALK_03);
@@ -69,7 +70,6 @@ load_kid_walk (void)
   kid_walk_09 = load_bitmap (KID_WALK_09);
   kid_walk_10 = load_bitmap (KID_WALK_10);
   kid_walk_11 = load_bitmap (KID_WALK_11);
-  kid_walk_12 = load_bitmap (KID_WALK_12);
 
   /* frameset */
   init_kid_walk_frameset ();
@@ -78,6 +78,7 @@ load_kid_walk (void)
 void
 unload_kid_walk (void)
 {
+  al_destroy_bitmap (kid_walk_00);
   al_destroy_bitmap (kid_walk_01);
   al_destroy_bitmap (kid_walk_02);
   al_destroy_bitmap (kid_walk_03);
@@ -89,7 +90,6 @@ unload_kid_walk (void)
   al_destroy_bitmap (kid_walk_09);
   al_destroy_bitmap (kid_walk_10);
   al_destroy_bitmap (kid_walk_11);
-  al_destroy_bitmap (kid_walk_12);
 }
 
 void

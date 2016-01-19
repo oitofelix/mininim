@@ -21,24 +21,24 @@
 #define MININIM_KID_JUMP_H
 
 /* bitmaps */
-#define KID_JUMP_01 "dat/kid/simple jump/frame01.png"
-#define KID_JUMP_02 "dat/kid/simple jump/frame02.png"
-#define KID_JUMP_03 "dat/kid/simple jump/frame03.png"
-#define KID_JUMP_04 "dat/kid/simple jump/frame04.png"
-#define KID_JUMP_05 "dat/kid/simple jump/frame05.png"
-#define KID_JUMP_06 "dat/kid/simple jump/frame06.png"
-#define KID_JUMP_07 "dat/kid/simple jump/frame07.png"
-#define KID_JUMP_08 "dat/kid/simple jump/frame08.png"
-#define KID_JUMP_09 "dat/kid/simple jump/frame09.png"
-#define KID_JUMP_10 "dat/kid/simple jump/frame10.png"
-#define KID_JUMP_11 "dat/kid/simple jump/frame11.png"
-#define KID_JUMP_12 "dat/kid/simple jump/frame12.png"
-#define KID_JUMP_13 "dat/kid/simple jump/frame13.png"
-#define KID_JUMP_14 "dat/kid/simple jump/frame14.png"
-#define KID_JUMP_15 "dat/kid/simple jump/frame15.png"
-#define KID_JUMP_16 "dat/kid/simple jump/frame16.png"
-#define KID_JUMP_17 "dat/kid/simple jump/frame17.png"
-#define KID_JUMP_18 "dat/kid/simple jump/frame18.png"
+#define KID_JUMP_00 "data/kid/jump/00.png"
+#define KID_JUMP_01 "data/kid/jump/01.png"
+#define KID_JUMP_02 "data/kid/jump/02.png"
+#define KID_JUMP_03 "data/kid/jump/03.png"
+#define KID_JUMP_04 "data/kid/jump/04.png"
+#define KID_JUMP_05 "data/kid/jump/05.png"
+#define KID_JUMP_06 "data/kid/jump/06.png"
+#define KID_JUMP_07 "data/kid/jump/07.png"
+#define KID_JUMP_08 "data/kid/jump/08.png"
+#define KID_JUMP_09 "data/kid/jump/09.png"
+#define KID_JUMP_10 "data/kid/jump/10.png"
+#define KID_JUMP_11 "data/kid/jump/11.png"
+#define KID_JUMP_12 "data/kid/jump/12.png"
+#define KID_JUMP_13 "data/kid/jump/13.png"
+#define KID_JUMP_14 "data/kid/jump/14.png"
+#define KID_JUMP_15 "data/kid/jump/15.png"
+#define KID_JUMP_16 "data/kid/jump/16.png"
+#define KID_JUMP_17 "data/kid/jump/17.png"
 
 #define KID_JUMP_FRAMESET_NMEMB 18
 extern struct frameset kid_jump_frameset[KID_JUMP_FRAMESET_NMEMB];
@@ -48,10 +48,10 @@ void unload_kid_jump (void);
 void kid_jump (struct anim *k);
 bool is_kid_jump_landing (struct frame *f);
 
-extern ALLEGRO_BITMAP *kid_jump_01, *kid_jump_02, *kid_jump_03,
-  *kid_jump_04, *kid_jump_05, *kid_jump_06, *kid_jump_07,
-  *kid_jump_08, *kid_jump_09, *kid_jump_10, *kid_jump_11,
-  *kid_jump_12, *kid_jump_13, *kid_jump_14, *kid_jump_15,
-  *kid_jump_16, *kid_jump_17, *kid_jump_18;
+extern ALLEGRO_BITMAP *kid_jump_00, *kid_jump_01, *kid_jump_02,
+  *kid_jump_03, *kid_jump_04, *kid_jump_05, *kid_jump_06,
+  *kid_jump_07, *kid_jump_08, *kid_jump_09, *kid_jump_10,
+  *kid_jump_11, *kid_jump_12, *kid_jump_13, *kid_jump_14,
+  *kid_jump_15, *kid_jump_16, *kid_jump_17;
 
 #endif	/* MININIM_KID_JUMP_H */

@@ -21,18 +21,18 @@
 #define MININIM_KID_STAIRS_H
 
 /* bitmaps */
-#define KID_STAIRS_01 "dat/kid/stairs/frame01.png"
-#define KID_STAIRS_02 "dat/kid/stairs/frame02.png"
-#define KID_STAIRS_03 "dat/kid/stairs/frame03.png"
-#define KID_STAIRS_04 "dat/kid/stairs/frame04.png"
-#define KID_STAIRS_05 "dat/kid/stairs/frame05.png"
-#define KID_STAIRS_06 "dat/kid/stairs/frame06.png"
-#define KID_STAIRS_07 "dat/kid/stairs/frame07.png"
-#define KID_STAIRS_08 "dat/kid/stairs/frame08.png"
-#define KID_STAIRS_09 "dat/kid/stairs/frame09.png"
-#define KID_STAIRS_10 "dat/kid/stairs/frame10.png"
-#define KID_STAIRS_11 "dat/kid/stairs/frame11.png"
-#define KID_STAIRS_12 "dat/kid/stairs/frame12.png"
+#define KID_STAIRS_00 "data/kid/stairs/00.png"
+#define KID_STAIRS_01 "data/kid/stairs/01.png"
+#define KID_STAIRS_02 "data/kid/stairs/02.png"
+#define KID_STAIRS_03 "data/kid/stairs/03.png"
+#define KID_STAIRS_04 "data/kid/stairs/04.png"
+#define KID_STAIRS_05 "data/kid/stairs/05.png"
+#define KID_STAIRS_06 "data/kid/stairs/06.png"
+#define KID_STAIRS_07 "data/kid/stairs/07.png"
+#define KID_STAIRS_08 "data/kid/stairs/08.png"
+#define KID_STAIRS_09 "data/kid/stairs/09.png"
+#define KID_STAIRS_10 "data/kid/stairs/10.png"
+#define KID_STAIRS_11 "data/kid/stairs/11.png"
 
 #define KID_STAIRS_FRAMESET_NMEMB 12
 extern struct frameset kid_stairs_frameset[KID_STAIRS_FRAMESET_NMEMB];
@@ -42,9 +42,9 @@ void unload_kid_stairs (void);
 void kid_stairs (struct anim *k);
 bool is_kid_stairs (struct frame *f);
 
-extern ALLEGRO_BITMAP *kid_stairs_01, *kid_stairs_02, *kid_stairs_03,
-  *kid_stairs_04, *kid_stairs_05, *kid_stairs_06, *kid_stairs_07,
-  *kid_stairs_08, *kid_stairs_09, *kid_stairs_10, *kid_stairs_11,
-  *kid_stairs_12;
+extern ALLEGRO_BITMAP *kid_stairs_00, *kid_stairs_01, *kid_stairs_02,
+  *kid_stairs_03, *kid_stairs_04, *kid_stairs_05, *kid_stairs_06,
+  *kid_stairs_07, *kid_stairs_08, *kid_stairs_09, *kid_stairs_10,
+  *kid_stairs_11;
 
 #endif	/* MININIM_KID_STAIRS_H */

@@ -21,15 +21,15 @@
 #define MININIM_KID_SWORD_ATTACK_H
 
 /* bitmaps */
-#define KID_SWORD_ATTACK_01 "dat/kid/sword attacking/frame01.png"
-#define KID_SWORD_ATTACK_02 "dat/kid/sword attacking/frame02.png"
-#define KID_SWORD_ATTACK_03 "dat/kid/sword attacking/frame03.png"
-#define KID_SWORD_ATTACK_04 "dat/kid/sword attacking/frame04.png"
-#define KID_SWORD_ATTACK_05 "dat/kid/sword attacking/frame05.png"
-#define KID_SWORD_ATTACK_06 "dat/kid/sword attacking/frame06.png"
-#define KID_SWORD_ATTACK_07 "dat/kid/sword attacking/frame07.png"
-#define KID_SWORD_ATTACK_09 "dat/kid/sword attacking/frame09.png"
-#define KID_SWORD_ATTACK_16 "dat/kid/sword attacking/frame16.png"
+#define KID_SWORD_ATTACK_00 "data/kid/sword-attack/00.png"
+#define KID_SWORD_ATTACK_01 "data/kid/sword-attack/01.png"
+#define KID_SWORD_ATTACK_02 "data/kid/sword-attack/02.png"
+#define KID_SWORD_ATTACK_03 "data/kid/sword-attack/03.png"
+#define KID_SWORD_ATTACK_04 "data/kid/sword-attack/04.png"
+#define KID_SWORD_ATTACK_05 "data/kid/sword-attack/05.png"
+#define KID_SWORD_ATTACK_06 "data/kid/sword-attack/06.png"
+#define KID_SWORD_ATTACK_COUNTER_DEFENSE "data/kid/sword-attack/counter-defense.png"
+#define KID_SWORD_ATTACK_DEFENDED "data/kid/sword-attack/defended.png"
 
 #define KID_SWORD_ATTACK_FRAMESET_NMEMB 8
 extern struct frameset kid_sword_attack_frameset[KID_SWORD_ATTACK_FRAMESET_NMEMB];
@@ -38,9 +38,9 @@ void load_kid_sword_attack (void);
 void unload_kid_sword_attack (void);
 void kid_sword_attack (struct anim *k);
 
-extern ALLEGRO_BITMAP *kid_sword_attack_01, *kid_sword_attack_02,
-  *kid_sword_attack_03, *kid_sword_attack_04, *kid_sword_attack_05,
-  *kid_sword_attack_06, *kid_sword_attack_07, *kid_sword_attack_09,
-  *kid_sword_attack_16;
+extern ALLEGRO_BITMAP *kid_sword_attack_00, *kid_sword_attack_01,
+  *kid_sword_attack_02, *kid_sword_attack_03, *kid_sword_attack_04,
+  *kid_sword_attack_05, *kid_sword_attack_06, *kid_sword_attack_counter_defense,
+  *kid_sword_attack_defended;
 
 #endif	/* MININIM_KID_SWORD_ATTACK_H */

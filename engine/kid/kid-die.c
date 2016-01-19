@@ -37,15 +37,15 @@ static bool flow (struct anim *k);
 static bool physics_in (struct anim *k);
 static void physics_out (struct anim *k);
 
-ALLEGRO_BITMAP *kid_die_01, *kid_die_02, *kid_die_03, *kid_die_04,
-  *kid_die_05, *kid_die_06, *kid_die_spiked_00, *kid_die_chopped_00;
+ALLEGRO_BITMAP *kid_die_00, *kid_die_01, *kid_die_02, *kid_die_03,
+  *kid_die_04, *kid_die_05, *kid_die_spiked_00, *kid_die_chopped_00;
 
 static void
 init_kid_die_frameset (void)
 {
   struct frameset frameset[KID_DIE_FRAMESET_NMEMB] =
-    {{kid_die_01,-1,0},{kid_die_02,+0,0},{kid_die_03,-3,+1},
-     {kid_die_04,-2,+2},{kid_die_05,+0,+3},{kid_die_06,+2,+1}};
+    {{kid_die_00,-1,0},{kid_die_01,+0,0},{kid_die_02,-3,+1},
+     {kid_die_03,-2,+2},{kid_die_04,+0,+3},{kid_die_05,+2,+1}};
 
   memcpy (&kid_die_frameset, &frameset,
           KID_DIE_FRAMESET_NMEMB * sizeof (struct frameset));
@@ -55,12 +55,12 @@ void
 load_kid_die (void)
 {
   /* bitmaps */
+  kid_die_00 = load_bitmap (KID_DIE_00);
   kid_die_01 = load_bitmap (KID_DIE_01);
   kid_die_02 = load_bitmap (KID_DIE_02);
   kid_die_03 = load_bitmap (KID_DIE_03);
   kid_die_04 = load_bitmap (KID_DIE_04);
   kid_die_05 = load_bitmap (KID_DIE_05);
-  kid_die_06 = load_bitmap (KID_DIE_06);
   kid_die_spiked_00 = load_bitmap (KID_DIE_SPIKED_00);
   kid_die_chopped_00 = load_bitmap (KID_DIE_CHOPPED_00);
 
@@ -71,12 +71,12 @@ load_kid_die (void)
 void
 unload_kid_die (void)
 {
+  al_destroy_bitmap (kid_die_00);
   al_destroy_bitmap (kid_die_01);
   al_destroy_bitmap (kid_die_02);
   al_destroy_bitmap (kid_die_03);
   al_destroy_bitmap (kid_die_04);
   al_destroy_bitmap (kid_die_05);
-  al_destroy_bitmap (kid_die_06);
   al_destroy_bitmap (kid_die_spiked_00);
   al_destroy_bitmap (kid_die_chopped_00);
 }
@@ -160,7 +160,7 @@ kid_die_suddenly (struct anim *k)
   k->current_lives = 0;
 
   if (k->oaction != kid_die_suddenly) {
-    place_frame (&k->f, &k->f, kid_die_06,
+    place_frame (&k->f, &k->f, kid_die_05,
                  &k->p, (k->f.dir == LEFT)
                  ? +9 : +4, +47);
 

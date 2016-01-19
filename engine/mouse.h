@@ -20,9 +20,9 @@
 #ifndef MININIM_MOUSE_H
 #define MININIM_MOUSE_H
 
-#define MOUSE_NORMAL_00 "dat/kid/mouse/frame03.png"
-#define MOUSE_RUN_01 "dat/kid/mouse/frame01.png"
-#define MOUSE_RUN_02 "dat/kid/mouse/frame02.png"
+#define MOUSE_NORMAL_00 "data/mouse/normal/00.png"
+#define MOUSE_RUN_00 "data/mouse/run/00.png"
+#define MOUSE_RUN_01 "data/mouse/run/01.png"
 
 /* functions */
 void load_mouse (void);
@@ -34,6 +34,6 @@ void mouse_normal (struct anim *mouse);
 void mouse_run (struct anim *mouse);
 
 /* variables */
-extern ALLEGRO_BITMAP *mouse_normal_00, *mouse_run_01, *mouse_run_02;
+extern ALLEGRO_BITMAP *mouse_normal_00, *mouse_run_00, *mouse_run_01;
 
 #endif	/* MININIM_MOUSE_H */
