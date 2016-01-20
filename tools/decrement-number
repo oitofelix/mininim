@@ -1,7 +1,7 @@
 #!/bin/bash
-prefix=loose_floor
-d=1
-for i in {1..2}
+prefix=jaffar_lower_arms
+d=30
+for i in {30..35}
 do find -name '*.c' -or -name '*.h' |
-   xargs sed -i "s/${prefix}_$(printf "%02d" $i)/${prefix}_$(printf "%02d" $(($i - $d)))/g;s/${prefix^^}_$(printf "%02d" $i)/${prefix^^}_$(printf "%02d" $(($i - $d)))/g"
+   xargs sed -i "s/\\<${prefix}_$(printf "%02d" $i)\\>/${prefix}_$(printf "%02d" $(($i - $d)))/g;s/\\<${prefix^^}_$(printf "%02d" $i)\\>/${prefix^^}_$(printf "%02d" $(($i - $d)))/g"
 done

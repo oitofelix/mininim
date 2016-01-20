@@ -385,8 +385,8 @@ c_red_palette (ALLEGRO_COLOR c)
   return c;
 }
 
-static palette
-get_palette (int style, enum vm vm)
+palette
+get_guard_palette (int style, enum vm vm)
 {
   switch (vm) {
   case CGA:
@@ -439,7 +439,7 @@ draw_guard_frame (ALLEGRO_BITMAP *bitmap, struct anim *g, enum vm vm)
   palette pal = NULL, pals = NULL;
   if (g->type == GUARD || g->type == FAT_GUARD
       || g->type == VIZIER) {
-    pal = get_palette (g->style, vm);
+    pal = get_guard_palette (g->style, vm);
     f.b = apply_palette (f.b, pal);
     xf.b = apply_palette (xf.b, pal);
   } else if (g->type == SHADOW) {
@@ -502,7 +502,7 @@ draw_guard_lives (ALLEGRO_BITMAP *bitmap, struct anim *g, enum vm vm)
   palette pal = NULL;
   if (g->type == GUARD || g->type == FAT_GUARD
       || g->type == VIZIER) {
-    pal = get_palette (g->style, vm);
+    pal = get_guard_palette (g->style, vm);
     life = apply_palette (life, pal);
   } else if (g->type == SHADOW || g->type == KID) {
     pal = get_shadow_life_palette (vm);

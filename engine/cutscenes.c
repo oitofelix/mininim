@@ -292,7 +292,7 @@ title_anim (void)
     break;
   case 20:
     jaffar.action (&jaffar);
-    if (jaffar.f.b == jaffar_raise_arms_27) {
+    if (jaffar.f.b == jaffar_raise_arms_06) {
       video_effect.color = WHITE;
       start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (1));
       princess_room_clock = clock_01;
@@ -301,7 +301,7 @@ title_anim (void)
     break;
   case 21:
     jaffar.action (&jaffar);
-    if (! is_video_effect_started () && jaffar.f.b == jaffar_raise_arms_29) {
+    if (! is_video_effect_started () && jaffar.f.b == jaffar_raise_arms_10) {
       jaffar_lower_arms (&jaffar);
       i++;
     }
@@ -460,7 +460,7 @@ draw_princess_room (ALLEGRO_BITMAP *bitmap, enum vm vm)
   draw_princess_room_stars (bitmap, vm);
   draw_princess_room_fire (bitmap, vm);
   draw_frame (bitmap, &princess.f);
-  draw_frame (bitmap, &jaffar.f);
+  draw_jaffar_frame (bitmap, &jaffar, vm);
   draw_clock ();
   draw_bitmap (princess_room_pillar, bitmap, 245, 120, 0);
 }

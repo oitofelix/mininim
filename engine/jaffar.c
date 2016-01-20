@@ -19,6 +19,7 @@
 
 #include "kernel/video.h"
 #include "anim.h"
+#include "guard/guard.h"
 #include "jaffar.h"
 
 struct anim jaffar;
@@ -43,19 +44,19 @@ static void init_turn_walk_frameset (void);
 
 /* variables */
 ALLEGRO_BITMAP *jaffar_normal_00,
-  *jaffar_walk_01, *jaffar_walk_02, *jaffar_walk_03, *jaffar_walk_04, *jaffar_walk_05,
-  *jaffar_walk_06, *jaffar_walk_08, *jaffar_walk_09,
-  *jaffar_turn_walk_10, *jaffar_turn_walk_11, *jaffar_turn_walk_12,
-  *jaffar_turn_walk_13, *jaffar_turn_walk_14, *jaffar_turn_walk_15,
-  *jaffar_turn_walk_16, *jaffar_turn_walk_17, *jaffar_turn_walk_18,
-  *jaffar_turn_walk_19,
-  *jaffar_open_arms_38, *jaffar_open_arms_20,
-  *jaffar_raise_arms_21, *jaffar_raise_arms_22, *jaffar_raise_arms_23,
-  *jaffar_raise_arms_24, *jaffar_raise_arms_25, *jaffar_raise_arms_26,
-  *jaffar_raise_arms_27, *jaffar_raise_arms_28, *jaffar_raise_arms_36,
-  *jaffar_raise_arms_37, *jaffar_raise_arms_29,
-  *jaffar_lower_arms_30, *jaffar_lower_arms_31, *jaffar_lower_arms_32,
-  *jaffar_lower_arms_33, *jaffar_lower_arms_34, *jaffar_lower_arms_35;
+  *jaffar_walk_00, *jaffar_walk_01, *jaffar_walk_02, *jaffar_walk_03, *jaffar_walk_04,
+  *jaffar_walk_05, *jaffar_walk_06, *jaffar_walk_07,
+  *jaffar_turn_walk_00, *jaffar_turn_walk_01, *jaffar_turn_walk_02,
+  *jaffar_turn_walk_03, *jaffar_turn_walk_04, *jaffar_turn_walk_05,
+  *jaffar_turn_walk_06, *jaffar_turn_walk_07, *jaffar_turn_walk_08,
+  *jaffar_turn_walk_09,
+  *jaffar_open_arms_00, *jaffar_open_arms_01,
+  *jaffar_raise_arms_00, *jaffar_raise_arms_01, *jaffar_raise_arms_02,
+  *jaffar_raise_arms_03, *jaffar_raise_arms_04, *jaffar_raise_arms_05,
+  *jaffar_raise_arms_06, *jaffar_raise_arms_07, *jaffar_raise_arms_08,
+  *jaffar_raise_arms_09, *jaffar_raise_arms_10,
+  *jaffar_lower_arms_00, *jaffar_lower_arms_01, *jaffar_lower_arms_02,
+  *jaffar_lower_arms_03, *jaffar_lower_arms_04, *jaffar_lower_arms_05;
 
 
 
@@ -64,43 +65,43 @@ void
 load_jaffar (void)
 {
   jaffar_normal_00 = load_bitmap (JAFFAR_NORMAL_00);
+  jaffar_walk_00 = load_bitmap (JAFFAR_WALK_00);
   jaffar_walk_01 = load_bitmap (JAFFAR_WALK_01);
   jaffar_walk_02 = load_bitmap (JAFFAR_WALK_02);
   jaffar_walk_03 = load_bitmap (JAFFAR_WALK_03);
   jaffar_walk_04 = load_bitmap (JAFFAR_WALK_04);
   jaffar_walk_05 = load_bitmap (JAFFAR_WALK_05);
-  jaffar_walk_06 = load_bitmap (JAFFAR_WALK_06);
-  jaffar_walk_08 = load_bitmap (JAFFAR_WALK_09);
-  jaffar_walk_09 = load_bitmap (JAFFAR_WALK_09);
-  jaffar_turn_walk_10 = load_bitmap (JAFFAR_TURN_WALK_10);
-  jaffar_turn_walk_11 = load_bitmap (JAFFAR_TURN_WALK_11);
-  jaffar_turn_walk_12 = load_bitmap (JAFFAR_TURN_WALK_12);
-  jaffar_turn_walk_13 = load_bitmap (JAFFAR_TURN_WALK_13);
-  jaffar_turn_walk_14 = load_bitmap (JAFFAR_TURN_WALK_14);
-  jaffar_turn_walk_15 = load_bitmap (JAFFAR_TURN_WALK_15);
-  jaffar_turn_walk_16 = load_bitmap (JAFFAR_TURN_WALK_16);
-  jaffar_turn_walk_17 = load_bitmap (JAFFAR_TURN_WALK_17);
-  jaffar_turn_walk_18 = load_bitmap (JAFFAR_TURN_WALK_18);
-  jaffar_turn_walk_19 = load_bitmap (JAFFAR_TURN_WALK_19);
-  jaffar_open_arms_38 = load_bitmap (JAFFAR_OPEN_ARMS_38);
-  jaffar_open_arms_20 = load_bitmap (JAFFAR_OPEN_ARMS_20);
-  jaffar_raise_arms_21 = load_bitmap (JAFFAR_RAISE_ARMS_21);
-  jaffar_raise_arms_22 = load_bitmap (JAFFAR_RAISE_ARMS_22);
-  jaffar_raise_arms_23 = load_bitmap (JAFFAR_RAISE_ARMS_23);
-  jaffar_raise_arms_24 = load_bitmap (JAFFAR_RAISE_ARMS_24);
-  jaffar_raise_arms_25 = load_bitmap (JAFFAR_RAISE_ARMS_25);
-  jaffar_raise_arms_26 = load_bitmap (JAFFAR_RAISE_ARMS_26);
-  jaffar_raise_arms_27 = load_bitmap (JAFFAR_RAISE_ARMS_27);
-  jaffar_raise_arms_28 = load_bitmap (JAFFAR_RAISE_ARMS_28);
-  jaffar_raise_arms_36 = load_bitmap (JAFFAR_RAISE_ARMS_36);
-  jaffar_raise_arms_37 = load_bitmap (JAFFAR_RAISE_ARMS_37);
-  jaffar_raise_arms_29 = load_bitmap (JAFFAR_RAISE_ARMS_29);
-  jaffar_lower_arms_30 = load_bitmap (JAFFAR_LOWER_ARMS_30);
-  jaffar_lower_arms_31 = load_bitmap (JAFFAR_LOWER_ARMS_31);
-  jaffar_lower_arms_32 = load_bitmap (JAFFAR_LOWER_ARMS_32);
-  jaffar_lower_arms_33 = load_bitmap (JAFFAR_LOWER_ARMS_33);
-  jaffar_lower_arms_34 = load_bitmap (JAFFAR_LOWER_ARMS_34);
-  jaffar_lower_arms_35 = load_bitmap (JAFFAR_LOWER_ARMS_35);
+  jaffar_walk_06 = load_bitmap (JAFFAR_WALK_07);
+  jaffar_walk_07 = load_bitmap (JAFFAR_WALK_07);
+  jaffar_turn_walk_00 = load_bitmap (JAFFAR_TURN_WALK_00);
+  jaffar_turn_walk_01 = load_bitmap (JAFFAR_TURN_WALK_01);
+  jaffar_turn_walk_02 = load_bitmap (JAFFAR_TURN_WALK_02);
+  jaffar_turn_walk_03 = load_bitmap (JAFFAR_TURN_WALK_03);
+  jaffar_turn_walk_04 = load_bitmap (JAFFAR_TURN_WALK_04);
+  jaffar_turn_walk_05 = load_bitmap (JAFFAR_TURN_WALK_05);
+  jaffar_turn_walk_06 = load_bitmap (JAFFAR_TURN_WALK_06);
+  jaffar_turn_walk_07 = load_bitmap (JAFFAR_TURN_WALK_07);
+  jaffar_turn_walk_08 = load_bitmap (JAFFAR_TURN_WALK_08);
+  jaffar_turn_walk_09 = load_bitmap (JAFFAR_TURN_WALK_09);
+  jaffar_open_arms_00 = load_bitmap (JAFFAR_OPEN_ARMS_00);
+  jaffar_open_arms_01 = load_bitmap (JAFFAR_OPEN_ARMS_01);
+  jaffar_raise_arms_00 = load_bitmap (JAFFAR_RAISE_ARMS_00);
+  jaffar_raise_arms_01 = load_bitmap (JAFFAR_RAISE_ARMS_01);
+  jaffar_raise_arms_02 = load_bitmap (JAFFAR_RAISE_ARMS_02);
+  jaffar_raise_arms_03 = load_bitmap (JAFFAR_RAISE_ARMS_03);
+  jaffar_raise_arms_04 = load_bitmap (JAFFAR_RAISE_ARMS_04);
+  jaffar_raise_arms_05 = load_bitmap (JAFFAR_RAISE_ARMS_05);
+  jaffar_raise_arms_06 = load_bitmap (JAFFAR_RAISE_ARMS_06);
+  jaffar_raise_arms_07 = load_bitmap (JAFFAR_RAISE_ARMS_07);
+  jaffar_raise_arms_08 = load_bitmap (JAFFAR_RAISE_ARMS_08);
+  jaffar_raise_arms_09 = load_bitmap (JAFFAR_RAISE_ARMS_09);
+  jaffar_raise_arms_10 = load_bitmap (JAFFAR_RAISE_ARMS_10);
+  jaffar_lower_arms_00 = load_bitmap (JAFFAR_LOWER_ARMS_00);
+  jaffar_lower_arms_01 = load_bitmap (JAFFAR_LOWER_ARMS_01);
+  jaffar_lower_arms_02 = load_bitmap (JAFFAR_LOWER_ARMS_02);
+  jaffar_lower_arms_03 = load_bitmap (JAFFAR_LOWER_ARMS_03);
+  jaffar_lower_arms_04 = load_bitmap (JAFFAR_LOWER_ARMS_04);
+  jaffar_lower_arms_05 = load_bitmap (JAFFAR_LOWER_ARMS_05);
 
   /* framesets */
   init_walk_frameset ();
@@ -114,43 +115,43 @@ void
 unload_jaffar (void)
 {
   al_destroy_bitmap (jaffar_normal_00);
+  al_destroy_bitmap (jaffar_walk_00);
   al_destroy_bitmap (jaffar_walk_01);
   al_destroy_bitmap (jaffar_walk_02);
   al_destroy_bitmap (jaffar_walk_03);
   al_destroy_bitmap (jaffar_walk_04);
   al_destroy_bitmap (jaffar_walk_05);
   al_destroy_bitmap (jaffar_walk_06);
-  al_destroy_bitmap (jaffar_walk_08);
-  al_destroy_bitmap (jaffar_walk_09);
-  al_destroy_bitmap (jaffar_turn_walk_10);
-  al_destroy_bitmap (jaffar_turn_walk_11);
-  al_destroy_bitmap (jaffar_turn_walk_12);
-  al_destroy_bitmap (jaffar_turn_walk_13);
-  al_destroy_bitmap (jaffar_turn_walk_14);
-  al_destroy_bitmap (jaffar_turn_walk_15);
-  al_destroy_bitmap (jaffar_turn_walk_16);
-  al_destroy_bitmap (jaffar_turn_walk_17);
-  al_destroy_bitmap (jaffar_turn_walk_18);
-  al_destroy_bitmap (jaffar_turn_walk_19);
-  al_destroy_bitmap (jaffar_open_arms_38);
-  al_destroy_bitmap (jaffar_open_arms_20);
-  al_destroy_bitmap (jaffar_raise_arms_21);
-  al_destroy_bitmap (jaffar_raise_arms_22);
-  al_destroy_bitmap (jaffar_raise_arms_23);
-  al_destroy_bitmap (jaffar_raise_arms_24);
-  al_destroy_bitmap (jaffar_raise_arms_25);
-  al_destroy_bitmap (jaffar_raise_arms_26);
-  al_destroy_bitmap (jaffar_raise_arms_27);
-  al_destroy_bitmap (jaffar_raise_arms_28);
-  al_destroy_bitmap (jaffar_raise_arms_36);
-  al_destroy_bitmap (jaffar_raise_arms_37);
-  al_destroy_bitmap (jaffar_raise_arms_29);
-  al_destroy_bitmap (jaffar_lower_arms_30);
-  al_destroy_bitmap (jaffar_lower_arms_31);
-  al_destroy_bitmap (jaffar_lower_arms_32);
-  al_destroy_bitmap (jaffar_lower_arms_33);
-  al_destroy_bitmap (jaffar_lower_arms_34);
-  al_destroy_bitmap (jaffar_lower_arms_35);
+  al_destroy_bitmap (jaffar_walk_07);
+  al_destroy_bitmap (jaffar_turn_walk_00);
+  al_destroy_bitmap (jaffar_turn_walk_01);
+  al_destroy_bitmap (jaffar_turn_walk_02);
+  al_destroy_bitmap (jaffar_turn_walk_03);
+  al_destroy_bitmap (jaffar_turn_walk_04);
+  al_destroy_bitmap (jaffar_turn_walk_05);
+  al_destroy_bitmap (jaffar_turn_walk_06);
+  al_destroy_bitmap (jaffar_turn_walk_07);
+  al_destroy_bitmap (jaffar_turn_walk_08);
+  al_destroy_bitmap (jaffar_turn_walk_09);
+  al_destroy_bitmap (jaffar_open_arms_00);
+  al_destroy_bitmap (jaffar_open_arms_01);
+  al_destroy_bitmap (jaffar_raise_arms_00);
+  al_destroy_bitmap (jaffar_raise_arms_01);
+  al_destroy_bitmap (jaffar_raise_arms_02);
+  al_destroy_bitmap (jaffar_raise_arms_03);
+  al_destroy_bitmap (jaffar_raise_arms_04);
+  al_destroy_bitmap (jaffar_raise_arms_05);
+  al_destroy_bitmap (jaffar_raise_arms_06);
+  al_destroy_bitmap (jaffar_raise_arms_07);
+  al_destroy_bitmap (jaffar_raise_arms_08);
+  al_destroy_bitmap (jaffar_raise_arms_09);
+  al_destroy_bitmap (jaffar_raise_arms_10);
+  al_destroy_bitmap (jaffar_lower_arms_00);
+  al_destroy_bitmap (jaffar_lower_arms_01);
+  al_destroy_bitmap (jaffar_lower_arms_02);
+  al_destroy_bitmap (jaffar_lower_arms_03);
+  al_destroy_bitmap (jaffar_lower_arms_04);
+  al_destroy_bitmap (jaffar_lower_arms_05);
 }
 
 
@@ -159,9 +160,9 @@ void
 init_walk_frameset (void)
 {
   struct frameset frameset[WALK_FRAMESET_NMEMB] =
-    {{jaffar_walk_01,-2,0},{jaffar_walk_02,-4,0},{jaffar_walk_03,-13,0},
-     {jaffar_walk_04,-1,0},{jaffar_walk_05,+2,0},{jaffar_walk_06,-1,0},
-     {jaffar_walk_08,-2,0},{jaffar_walk_09,+0,0}};
+    {{jaffar_walk_00,-2,0},{jaffar_walk_01,-4,0},{jaffar_walk_02,-13,0},
+     {jaffar_walk_03,-1,0},{jaffar_walk_04,+2,0},{jaffar_walk_05,-1,0},
+     {jaffar_walk_06,-2,0},{jaffar_walk_07,+0,0}};
 
   memcpy (&walk_frameset, &frameset,
           WALK_FRAMESET_NMEMB * sizeof (struct frameset));
@@ -171,7 +172,7 @@ void
 init_open_arms_frameset (void)
 {
   struct frameset frameset[OPEN_ARMS_FRAMESET_NMEMB] =
-    {{jaffar_open_arms_38,-2,0},{jaffar_open_arms_20,+0,0}};
+    {{jaffar_open_arms_00,-2,0},{jaffar_open_arms_01,+0,0}};
 
   memcpy (&open_arms_frameset, &frameset,
           OPEN_ARMS_FRAMESET_NMEMB * sizeof (struct frameset));
@@ -181,12 +182,12 @@ void
 init_raise_arms_frameset (void)
 {
   struct frameset frameset[RAISE_ARMS_FRAMESET_NMEMB] =
-    {{jaffar_raise_arms_21,+0,0},{jaffar_raise_arms_22,+0,0},
-     {jaffar_raise_arms_23,+2,0},{jaffar_raise_arms_24,-1,0},
-     {jaffar_raise_arms_25,-5,0},{jaffar_raise_arms_26,+0,0},
-     {jaffar_raise_arms_27,+9,0},{jaffar_raise_arms_28,-2,0},
-     {jaffar_raise_arms_36,+1,0},{jaffar_raise_arms_37,+0,0},
-     {jaffar_raise_arms_29,+0,0}};
+    {{jaffar_raise_arms_00,+0,0},{jaffar_raise_arms_01,+0,0},
+     {jaffar_raise_arms_02,+2,0},{jaffar_raise_arms_03,-1,0},
+     {jaffar_raise_arms_04,-5,0},{jaffar_raise_arms_05,+0,0},
+     {jaffar_raise_arms_06,+9,0},{jaffar_raise_arms_07,-2,0},
+     {jaffar_raise_arms_08,+1,0},{jaffar_raise_arms_09,+0,0},
+     {jaffar_raise_arms_10,+0,0}};
 
   memcpy (&raise_arms_frameset, &frameset,
           RAISE_ARMS_FRAMESET_NMEMB * sizeof (struct frameset));
@@ -196,9 +197,9 @@ void
 init_lower_arms_frameset (void)
 {
   struct frameset frameset[LOWER_ARMS_FRAMESET_NMEMB] =
-    {{jaffar_lower_arms_30,+2,0},{jaffar_lower_arms_31,+0,0},
-     {jaffar_lower_arms_32,-2,0},{jaffar_lower_arms_33,-2,0},
-     {jaffar_lower_arms_34,+0,0},{jaffar_lower_arms_35,+7,0}};
+    {{jaffar_lower_arms_00,+2,0},{jaffar_lower_arms_01,+0,0},
+     {jaffar_lower_arms_02,-2,0},{jaffar_lower_arms_03,-2,0},
+     {jaffar_lower_arms_04,+0,0},{jaffar_lower_arms_05,+7,0}};
 
   memcpy (&lower_arms_frameset, &frameset,
           LOWER_ARMS_FRAMESET_NMEMB * sizeof (struct frameset));
@@ -208,11 +209,11 @@ void
 init_turn_walk_frameset (void)
 {
   struct frameset frameset[TURN_WALK_FRAMESET_NMEMB] =
-    {{jaffar_turn_walk_10,-1,+1},{jaffar_turn_walk_11,+1,0},
-     {jaffar_turn_walk_12,+0,0},{jaffar_turn_walk_13,-2,0},
-     {jaffar_turn_walk_14,-1,0},{jaffar_turn_walk_15,-4,0},
-     {jaffar_turn_walk_16,+2,0},{jaffar_turn_walk_17,+7,0},
-     {jaffar_turn_walk_18,+3,0},{jaffar_turn_walk_19,+1,0}};
+    {{jaffar_turn_walk_00,-1,+1},{jaffar_turn_walk_01,+1,0},
+     {jaffar_turn_walk_02,+0,0},{jaffar_turn_walk_03,-2,0},
+     {jaffar_turn_walk_04,-1,0},{jaffar_turn_walk_05,-4,0},
+     {jaffar_turn_walk_06,+2,0},{jaffar_turn_walk_07,+7,0},
+     {jaffar_turn_walk_08,+3,0},{jaffar_turn_walk_09,+1,0}};
 
   memcpy (&turn_walk_frameset, &frameset,
           TURN_WALK_FRAMESET_NMEMB * sizeof (struct frameset));
@@ -344,4 +345,22 @@ jaffar_turn_walk (struct anim *jaffar)
   next_frame_inv = true;
   next_frame (&jaffar->f, &jaffar->f, &jaffar->fo);
   next_frame_inv = false;
+}
+
+
+
+void
+draw_jaffar_frame (ALLEGRO_BITMAP *bitmap, struct anim *j, enum vm vm)
+{
+  if (j->invisible) return;
+
+  struct frame f = j->f;
+
+  palette pal = NULL;
+  pal = get_guard_palette (j->style, vm);
+  f.b = apply_palette (f.b, pal);
+
+  if (hgc) f.b = apply_palette (f.b, hgc_palette);
+
+  draw_frame (bitmap, &f);
 }

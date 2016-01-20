@@ -20,44 +20,44 @@
 #ifndef MININIM_JAFFAR_H
 #define MININIM_JAFFAR_H
 
-#define JAFFAR_NORMAL_00 "dat/pv/jaffar/walking/frame07.png"
-#define JAFFAR_WALK_01 "dat/pv/jaffar/walking/frame01.png"
-#define JAFFAR_WALK_02 "dat/pv/jaffar/walking/frame02.png"
-#define JAFFAR_WALK_03 "dat/pv/jaffar/walking/frame03.png"
-#define JAFFAR_WALK_04 "dat/pv/jaffar/walking/frame04.png"
-#define JAFFAR_WALK_05 "dat/pv/jaffar/walking/frame05.png"
-#define JAFFAR_WALK_06 "dat/pv/jaffar/walking/frame06.png"
-#define JAFFAR_WALK_08 "dat/pv/jaffar/walking/frame08.png"
-#define JAFFAR_WALK_09 "dat/pv/jaffar/walking/frame09.png"
-#define JAFFAR_TURN_WALK_10 "dat/pv/jaffar/walking/frame10.png"
-#define JAFFAR_TURN_WALK_11 "dat/pv/jaffar/walking/frame11.png"
-#define JAFFAR_TURN_WALK_12 "dat/pv/jaffar/walking/frame12.png"
-#define JAFFAR_TURN_WALK_13 "dat/pv/jaffar/walking/frame13.png"
-#define JAFFAR_TURN_WALK_14 "dat/pv/jaffar/walking/frame14.png"
-#define JAFFAR_TURN_WALK_15 "dat/pv/jaffar/walking/frame15.png"
-#define JAFFAR_TURN_WALK_16 "dat/pv/jaffar/walking/frame16.png"
-#define JAFFAR_TURN_WALK_17 "dat/pv/jaffar/walking/frame17.png"
-#define JAFFAR_TURN_WALK_18 "dat/pv/jaffar/walking/frame18.png"
-#define JAFFAR_TURN_WALK_19 "dat/pv/jaffar/walking/frame19.png"
-#define JAFFAR_OPEN_ARMS_38 "dat/pv/jaffar/conjuring/frame38.png"
-#define JAFFAR_OPEN_ARMS_20 "dat/pv/jaffar/conjuring/frame20.png"
-#define JAFFAR_RAISE_ARMS_21 "dat/pv/jaffar/conjuring/frame21.png"
-#define JAFFAR_RAISE_ARMS_22 "dat/pv/jaffar/conjuring/frame22.png"
-#define JAFFAR_RAISE_ARMS_23 "dat/pv/jaffar/conjuring/frame23.png"
-#define JAFFAR_RAISE_ARMS_24 "dat/pv/jaffar/conjuring/frame24.png"
-#define JAFFAR_RAISE_ARMS_25 "dat/pv/jaffar/conjuring/frame25.png"
-#define JAFFAR_RAISE_ARMS_26 "dat/pv/jaffar/conjuring/frame26.png"
-#define JAFFAR_RAISE_ARMS_27 "dat/pv/jaffar/conjuring/frame27.png"
-#define JAFFAR_RAISE_ARMS_28 "dat/pv/jaffar/conjuring/frame28.png"
-#define JAFFAR_RAISE_ARMS_36 "dat/pv/jaffar/conjuring/frame36.png"
-#define JAFFAR_RAISE_ARMS_37 "dat/pv/jaffar/conjuring/frame37.png"
-#define JAFFAR_RAISE_ARMS_29 "dat/pv/jaffar/conjuring/frame29.png"
-#define JAFFAR_LOWER_ARMS_30 "dat/pv/jaffar/conjuring/frame30.png"
-#define JAFFAR_LOWER_ARMS_31 "dat/pv/jaffar/conjuring/frame31.png"
-#define JAFFAR_LOWER_ARMS_32 "dat/pv/jaffar/conjuring/frame32.png"
-#define JAFFAR_LOWER_ARMS_33 "dat/pv/jaffar/conjuring/frame33.png"
-#define JAFFAR_LOWER_ARMS_34 "dat/pv/jaffar/conjuring/frame34.png"
-#define JAFFAR_LOWER_ARMS_35 "dat/pv/jaffar/conjuring/frame35.png"
+#define JAFFAR_NORMAL_00 "data/jaffar/normal/00.png"
+#define JAFFAR_WALK_00 "data/jaffar/walk/00.png"
+#define JAFFAR_WALK_01 "data/jaffar/walk/01.png"
+#define JAFFAR_WALK_02 "data/jaffar/walk/02.png"
+#define JAFFAR_WALK_03 "data/jaffar/walk/03.png"
+#define JAFFAR_WALK_04 "data/jaffar/walk/04.png"
+#define JAFFAR_WALK_05 "data/jaffar/walk/05.png"
+#define JAFFAR_WALK_06 "data/jaffar/walk/06.png"
+#define JAFFAR_WALK_07 "data/jaffar/walk/07.png"
+#define JAFFAR_TURN_WALK_00 "data/jaffar/turn-walk/00.png"
+#define JAFFAR_TURN_WALK_01 "data/jaffar/turn-walk/01.png"
+#define JAFFAR_TURN_WALK_02 "data/jaffar/turn-walk/02.png"
+#define JAFFAR_TURN_WALK_03 "data/jaffar/turn-walk/03.png"
+#define JAFFAR_TURN_WALK_04 "data/jaffar/turn-walk/04.png"
+#define JAFFAR_TURN_WALK_05 "data/jaffar/turn-walk/05.png"
+#define JAFFAR_TURN_WALK_06 "data/jaffar/turn-walk/06.png"
+#define JAFFAR_TURN_WALK_07 "data/jaffar/turn-walk/07.png"
+#define JAFFAR_TURN_WALK_08 "data/jaffar/turn-walk/08.png"
+#define JAFFAR_TURN_WALK_09 "data/jaffar/turn-walk/09.png"
+#define JAFFAR_OPEN_ARMS_00 "data/jaffar/open-arms/00.png"
+#define JAFFAR_OPEN_ARMS_01 "data/jaffar/open-arms/01.png"
+#define JAFFAR_RAISE_ARMS_00 "data/jaffar/raise-arms/00.png"
+#define JAFFAR_RAISE_ARMS_01 "data/jaffar/raise-arms/01.png"
+#define JAFFAR_RAISE_ARMS_02 "data/jaffar/raise-arms/02.png"
+#define JAFFAR_RAISE_ARMS_03 "data/jaffar/raise-arms/03.png"
+#define JAFFAR_RAISE_ARMS_04 "data/jaffar/raise-arms/04.png"
+#define JAFFAR_RAISE_ARMS_05 "data/jaffar/raise-arms/05.png"
+#define JAFFAR_RAISE_ARMS_06 "data/jaffar/raise-arms/06.png"
+#define JAFFAR_RAISE_ARMS_07 "data/jaffar/raise-arms/07.png"
+#define JAFFAR_RAISE_ARMS_08 "data/jaffar/raise-arms/08.png"
+#define JAFFAR_RAISE_ARMS_09 "data/jaffar/raise-arms/09.png"
+#define JAFFAR_RAISE_ARMS_10 "data/jaffar/raise-arms/10.png"
+#define JAFFAR_LOWER_ARMS_00 "data/jaffar/lower-arms/00.png"
+#define JAFFAR_LOWER_ARMS_01 "data/jaffar/lower-arms/01.png"
+#define JAFFAR_LOWER_ARMS_02 "data/jaffar/lower-arms/02.png"
+#define JAFFAR_LOWER_ARMS_03 "data/jaffar/lower-arms/03.png"
+#define JAFFAR_LOWER_ARMS_04 "data/jaffar/lower-arms/04.png"
+#define JAFFAR_LOWER_ARMS_05 "data/jaffar/lower-arms/05.png"
 
 /* functions */
 void load_jaffar (void);
@@ -68,23 +68,25 @@ void jaffar_open_arms (struct anim *jaffar);
 void jaffar_raise_arms (struct anim *jaffar);
 void jaffar_lower_arms (struct anim *jaffar);
 void jaffar_turn_walk (struct anim *jaffar);
+void draw_jaffar_frame (ALLEGRO_BITMAP *bitmap, struct anim *j,
+                        enum vm vm);
 
 /* variables */
 extern struct anim jaffar; /* animation object */
 
 extern ALLEGRO_BITMAP *jaffar_normal_00,
-  *jaffar_walk_01, *jaffar_walk_02, *jaffar_walk_03, *jaffar_walk_04, *jaffar_walk_05,
-  *jaffar_walk_06, *jaffar_walk_08, *jaffar_walk_09,
-  *jaffar_turn_walk_10, *jaffar_turn_walk_11, *jaffar_turn_walk_12,
-  *jaffar_turn_walk_13, *jaffar_turn_walk_14, *jaffar_turn_walk_15,
-  *jaffar_turn_walk_16, *jaffar_turn_walk_17, *jaffar_turn_walk_18,
-  *jaffar_turn_walk_19,
-  *jaffar_open_arms_38, *jaffar_open_arms_20,
-  *jaffar_raise_arms_21, *jaffar_raise_arms_22, *jaffar_raise_arms_23,
-  *jaffar_raise_arms_24, *jaffar_raise_arms_25, *jaffar_raise_arms_26,
-  *jaffar_raise_arms_27, *jaffar_raise_arms_28, *jaffar_raise_arms_36,
-  *jaffar_raise_arms_37, *jaffar_raise_arms_29,
-  *jaffar_lower_arms_30, *jaffar_lower_arms_31, *jaffar_lower_arms_32,
-  *jaffar_lower_arms_33, *jaffar_lower_arms_34, *jaffar_lower_arms_35;
+  *jaffar_walk_00, *jaffar_walk_01, *jaffar_walk_02, *jaffar_walk_03, *jaffar_walk_04,
+  *jaffar_walk_05, *jaffar_walk_06, *jaffar_walk_07,
+  *jaffar_turn_walk_00, *jaffar_turn_walk_01, *jaffar_turn_walk_02,
+  *jaffar_turn_walk_03, *jaffar_turn_walk_04, *jaffar_turn_walk_05,
+  *jaffar_turn_walk_06, *jaffar_turn_walk_07, *jaffar_turn_walk_08,
+  *jaffar_turn_walk_09,
+  *jaffar_open_arms_00, *jaffar_open_arms_01,
+  *jaffar_raise_arms_00, *jaffar_raise_arms_01, *jaffar_raise_arms_02,
+  *jaffar_raise_arms_03, *jaffar_raise_arms_04, *jaffar_raise_arms_05,
+  *jaffar_raise_arms_06, *jaffar_raise_arms_07, *jaffar_raise_arms_08,
+  *jaffar_raise_arms_09, *jaffar_raise_arms_10,
+  *jaffar_lower_arms_00, *jaffar_lower_arms_01, *jaffar_lower_arms_02,
+  *jaffar_lower_arms_03, *jaffar_lower_arms_04, *jaffar_lower_arms_05;
 
 #endif	/* MININIM_JAFFAR_H */
