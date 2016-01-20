@@ -20,23 +20,23 @@
 #ifndef MININIM_PRINCESS_H
 #define MININIM_PRINCESS_H
 
-#define PRINCESS_NORMAL_00 "dat/pv/princess/in story/frame01.png"
-#define PRINCESS_TURN_02 "dat/pv/princess/in story/frame02.png"
-#define PRINCESS_TURN_03 "dat/pv/princess/in story/frame03.png"
-#define PRINCESS_TURN_04 "dat/pv/princess/in story/frame04.png"
-#define PRINCESS_TURN_05 "dat/pv/princess/in story/frame05.png"
-#define PRINCESS_TURN_06 "dat/pv/princess/in story/frame06.png"
-#define PRINCESS_TURN_07 "dat/pv/princess/in story/frame07.png"
-#define PRINCESS_TURN_08 "dat/pv/princess/in story/frame08.png"
-#define PRINCESS_TURN_09 "dat/pv/princess/in story/frame09.png"
-#define PRINCESS_STEP_BACK_10 "dat/pv/princess/in story/frame10.png"
-#define PRINCESS_STEP_BACK_11 "dat/pv/princess/in story/frame11.png"
-#define PRINCESS_STEP_BACK_12 "dat/pv/princess/in story/frame12.png"
-#define PRINCESS_STEP_BACK_13 "dat/pv/princess/in story/frame13.png"
-#define PRINCESS_STEP_BACK_14 "dat/pv/princess/in story/frame14.png"
-#define PRINCESS_STEP_BACK_15 "dat/pv/princess/in story/frame15.png"
-#define PRINCESS_LOOK_DOWN_16 "dat/pv/princess/in story/frame16.png"
-#define PRINCESS_LOOK_DOWN_17 "dat/pv/princess/in story/frame17.png"
+#define PRINCESS_NORMAL_00 "data/princess/normal/00.png"
+#define PRINCESS_TURN_00 "data/princess/turn/00.png"
+#define PRINCESS_TURN_01 "data/princess/turn/01.png"
+#define PRINCESS_TURN_02 "data/princess/turn/02.png"
+#define PRINCESS_TURN_03 "data/princess/turn/03.png"
+#define PRINCESS_TURN_04 "data/princess/turn/04.png"
+#define PRINCESS_TURN_05 "data/princess/turn/05.png"
+#define PRINCESS_TURN_06 "data/princess/turn/06.png"
+#define PRINCESS_TURN_07 "data/princess/turn/07.png"
+#define PRINCESS_STEP_BACK_00 "data/princess/step-back/00.png"
+#define PRINCESS_STEP_BACK_01 "data/princess/step-back/01.png"
+#define PRINCESS_STEP_BACK_02 "data/princess/step-back/02.png"
+#define PRINCESS_STEP_BACK_03 "data/princess/step-back/03.png"
+#define PRINCESS_STEP_BACK_04 "data/princess/step-back/04.png"
+#define PRINCESS_STEP_BACK_05 "data/princess/step-back/05.png"
+#define PRINCESS_LOOK_DOWN_00 "data/princess/look-down/00.png"
+#define PRINCESS_LOOK_DOWN_01 "data/princess/look-down/01.png"
 
 /* functions */
 void load_princess (void);
@@ -45,15 +45,21 @@ void princess_normal (struct anim *princess);
 void princess_turn (struct anim *princess);
 void princess_step_back (struct anim *princess);
 void princess_look_down (struct anim *princess);
+void draw_princess_frame (ALLEGRO_BITMAP *bitmap, struct anim *p,
+                          enum vm vm);
+palette get_princess_palette (enum vm vm);
+ALLEGRO_COLOR c_princess_palette (ALLEGRO_COLOR c);
+ALLEGRO_COLOR e_princess_palette (ALLEGRO_COLOR c);
+ALLEGRO_COLOR v_princess_palette (ALLEGRO_COLOR c);
 
 /* variables */
 extern struct anim princess; /* princess animation object */
 
 extern ALLEGRO_BITMAP *princess_normal_00,
-  *princess_turn_02, *princess_turn_03, *princess_turn_04, *princess_turn_05,
-  *princess_turn_06, *princess_turn_07, *princess_turn_08, *princess_turn_09,
-  *princess_step_back_10, *princess_step_back_11, *princess_step_back_12,
-  *princess_step_back_13, *princess_step_back_14, *princess_step_back_15,
-  *princess_look_down_16, *princess_look_down_17;
+  *princess_turn_00, *princess_turn_01, *princess_turn_02, *princess_turn_03,
+  *princess_turn_04, *princess_turn_05, *princess_turn_06, *princess_turn_07,
+  *princess_step_back_00, *princess_step_back_01, *princess_step_back_02,
+  *princess_step_back_03, *princess_step_back_04, *princess_step_back_05,
+  *princess_look_down_00, *princess_look_down_01;
 
 #endif	/* MININIM_PRINCESS_H */

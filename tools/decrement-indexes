@@ -1,0 +1,7 @@
+#!/bin/bash
+prefix=clock_sand
+d=1
+for i in {1..3}
+do find -name '*.c' -or -name '*.h' |
+   xargs sed -i "s/\\<${prefix}_$(printf "%02d" $i)\\>/${prefix}_$(printf "%02d" $(($i - $d)))/g;s/\\<${prefix^^}_$(printf "%02d" $i)\\>/${prefix^^}_$(printf "%02d" $(($i - $d)))/g"
+done

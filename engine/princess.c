@@ -37,32 +37,32 @@ static void init_look_down_frameset (void);
 
 /* variables */
 ALLEGRO_BITMAP *princess_normal_00,
-  *princess_turn_02, *princess_turn_03, *princess_turn_04, *princess_turn_05,
-  *princess_turn_06, *princess_turn_07, *princess_turn_08, *princess_turn_09,
-  *princess_step_back_10, *princess_step_back_11, *princess_step_back_12,
-  *princess_step_back_13, *princess_step_back_14, *princess_step_back_15,
-  *princess_look_down_16, *princess_look_down_17;
+  *princess_turn_00, *princess_turn_01, *princess_turn_02, *princess_turn_03,
+  *princess_turn_04, *princess_turn_05, *princess_turn_06, *princess_turn_07,
+  *princess_step_back_00, *princess_step_back_01, *princess_step_back_02,
+  *princess_step_back_03, *princess_step_back_04, *princess_step_back_05,
+  *princess_look_down_00, *princess_look_down_01;
 
 void
 load_princess (void)
 {
   princess_normal_00 = load_bitmap (PRINCESS_NORMAL_00);
+  princess_turn_00 = load_bitmap (PRINCESS_TURN_00);
+  princess_turn_01 = load_bitmap (PRINCESS_TURN_01);
   princess_turn_02 = load_bitmap (PRINCESS_TURN_02);
   princess_turn_03 = load_bitmap (PRINCESS_TURN_03);
   princess_turn_04 = load_bitmap (PRINCESS_TURN_04);
   princess_turn_05 = load_bitmap (PRINCESS_TURN_05);
   princess_turn_06 = load_bitmap (PRINCESS_TURN_06);
   princess_turn_07 = load_bitmap (PRINCESS_TURN_07);
-  princess_turn_08 = load_bitmap (PRINCESS_TURN_08);
-  princess_turn_09 = load_bitmap (PRINCESS_TURN_09);
-  princess_step_back_10 = load_bitmap (PRINCESS_STEP_BACK_10);
-  princess_step_back_11 = load_bitmap (PRINCESS_STEP_BACK_11);
-  princess_step_back_12 = load_bitmap (PRINCESS_STEP_BACK_12);
-  princess_step_back_13 = load_bitmap (PRINCESS_STEP_BACK_13);
-  princess_step_back_14 = load_bitmap (PRINCESS_STEP_BACK_14);
-  princess_step_back_15 = load_bitmap (PRINCESS_STEP_BACK_15);
-  princess_look_down_16 = load_bitmap (PRINCESS_LOOK_DOWN_16);
-  princess_look_down_17 = load_bitmap (PRINCESS_LOOK_DOWN_17);
+  princess_step_back_00 = load_bitmap (PRINCESS_STEP_BACK_00);
+  princess_step_back_01 = load_bitmap (PRINCESS_STEP_BACK_01);
+  princess_step_back_02 = load_bitmap (PRINCESS_STEP_BACK_02);
+  princess_step_back_03 = load_bitmap (PRINCESS_STEP_BACK_03);
+  princess_step_back_04 = load_bitmap (PRINCESS_STEP_BACK_04);
+  princess_step_back_05 = load_bitmap (PRINCESS_STEP_BACK_05);
+  princess_look_down_00 = load_bitmap (PRINCESS_LOOK_DOWN_00);
+  princess_look_down_01 = load_bitmap (PRINCESS_LOOK_DOWN_01);
 
   /* framesets */
   init_turn_frameset ();
@@ -74,22 +74,22 @@ void
 unload_princess (void)
 {
   al_destroy_bitmap (princess_normal_00);
+  al_destroy_bitmap (princess_turn_00);
+  al_destroy_bitmap (princess_turn_01);
   al_destroy_bitmap (princess_turn_02);
   al_destroy_bitmap (princess_turn_03);
   al_destroy_bitmap (princess_turn_04);
   al_destroy_bitmap (princess_turn_05);
   al_destroy_bitmap (princess_turn_06);
   al_destroy_bitmap (princess_turn_07);
-  al_destroy_bitmap (princess_turn_08);
-  al_destroy_bitmap (princess_turn_09);
-  al_destroy_bitmap (princess_step_back_10);
-  al_destroy_bitmap (princess_step_back_11);
-  al_destroy_bitmap (princess_step_back_12);
-  al_destroy_bitmap (princess_step_back_13);
-  al_destroy_bitmap (princess_step_back_14);
-  al_destroy_bitmap (princess_step_back_15);
-  al_destroy_bitmap (princess_look_down_16);
-  al_destroy_bitmap (princess_look_down_17);
+  al_destroy_bitmap (princess_step_back_00);
+  al_destroy_bitmap (princess_step_back_01);
+  al_destroy_bitmap (princess_step_back_02);
+  al_destroy_bitmap (princess_step_back_03);
+  al_destroy_bitmap (princess_step_back_04);
+  al_destroy_bitmap (princess_step_back_05);
+  al_destroy_bitmap (princess_look_down_00);
+  al_destroy_bitmap (princess_look_down_01);
 }
 
 
@@ -98,9 +98,9 @@ void
 init_turn_frameset (void)
 {
   struct frameset frameset[TURN_FRAMESET_NMEMB] =
-    {{princess_turn_02,+0,0},{princess_turn_03,-1,0},{princess_turn_04,+0,0},
-     {princess_turn_05,+2,0},{princess_turn_06,-6,0},{princess_turn_07,-2,0},
-     {princess_turn_08,+6,0},{princess_turn_09,-2,0}};
+    {{princess_turn_00,+0,0},{princess_turn_01,-1,0},{princess_turn_02,+0,0},
+     {princess_turn_03,+2,0},{princess_turn_04,-6,0},{princess_turn_05,-2,0},
+     {princess_turn_06,+6,0},{princess_turn_07,-2,0}};
 
   memcpy (&turn_frameset, &frameset,
           TURN_FRAMESET_NMEMB * sizeof (struct frameset));
@@ -110,9 +110,9 @@ void
 init_step_back_frameset (void)
 {
   struct frameset frameset[STEP_BACK_FRAMESET_NMEMB] =
-    {{princess_step_back_10,-6,0},{princess_step_back_11,-4,0},
-     {princess_step_back_12,-1,0},{princess_step_back_13,-7,0},
-     {princess_step_back_14,-2,0},{princess_step_back_15,+0,0}};
+    {{princess_step_back_00,-6,0},{princess_step_back_01,-4,0},
+     {princess_step_back_02,-1,0},{princess_step_back_03,-7,0},
+     {princess_step_back_04,-2,0},{princess_step_back_05,+0,0}};
 
   memcpy (&step_back_frameset, &frameset,
           STEP_BACK_FRAMESET_NMEMB * sizeof (struct frameset));
@@ -122,7 +122,7 @@ void
 init_look_down_frameset (void)
 {
   struct frameset frameset[LOOK_DOWN_FRAMESET_NMEMB] =
-    {{princess_look_down_16,+0,0},{princess_look_down_17,+0,0}};
+    {{princess_look_down_00,+0,0},{princess_look_down_01,+0,0}};
 
   memcpy (&look_down_frameset, &frameset,
           LOOK_DOWN_FRAMESET_NMEMB * sizeof (struct frameset));
@@ -202,4 +202,79 @@ princess_look_down (struct anim *princess)
 
   select_frame (princess, look_down_frameset, princess->i);
   next_frame (&princess->f, &princess->f, &princess->fo);
+}
+
+
+
+
+ALLEGRO_COLOR
+c_princess_palette (ALLEGRO_COLOR c)
+{
+  if (color_eq (c, PRINCESS_SKIN_COLOR_01)) return C_PRINCESS_SKIN_COLOR_01;
+  if (color_eq (c, PRINCESS_SKIN_COLOR_02)) return C_PRINCESS_SKIN_COLOR_02;
+  if (color_eq (c, PRINCESS_SKIN_COLOR_03)) return C_PRINCESS_SKIN_COLOR_03;
+  if (color_eq (c, PRINCESS_DRESS_COLOR_01)) return C_PRINCESS_DRESS_COLOR_01;
+  if (color_eq (c, PRINCESS_DRESS_COLOR_02)) return C_PRINCESS_DRESS_COLOR_02;
+  if (color_eq (c, PRINCESS_DRESS_COLOR_03)) return C_PRINCESS_DRESS_COLOR_03;
+  if (color_eq (c, PRINCESS_HAIR_COLOR_01)) return C_PRINCESS_HAIR_COLOR_01;
+  if (color_eq (c, PRINCESS_HAIR_COLOR_02)) return C_PRINCESS_HAIR_COLOR_02;
+  if (color_eq (c, PRINCESS_EYES_COLOR)) return C_PRINCESS_EYES_COLOR;
+  return c;
+}
+
+ALLEGRO_COLOR
+e_princess_palette (ALLEGRO_COLOR c)
+{
+  if (color_eq (c, PRINCESS_SKIN_COLOR_01)) return E_PRINCESS_SKIN_COLOR_01;
+  if (color_eq (c, PRINCESS_SKIN_COLOR_02)) return E_PRINCESS_SKIN_COLOR_02;
+  if (color_eq (c, PRINCESS_SKIN_COLOR_03)) return E_PRINCESS_SKIN_COLOR_03;
+  if (color_eq (c, PRINCESS_DRESS_COLOR_01)) return E_PRINCESS_DRESS_COLOR_01;
+  if (color_eq (c, PRINCESS_DRESS_COLOR_02)) return E_PRINCESS_DRESS_COLOR_02;
+  if (color_eq (c, PRINCESS_DRESS_COLOR_03)) return E_PRINCESS_DRESS_COLOR_03;
+  if (color_eq (c, PRINCESS_HAIR_COLOR_01)) return E_PRINCESS_HAIR_COLOR_01;
+  if (color_eq (c, PRINCESS_HAIR_COLOR_02)) return E_PRINCESS_HAIR_COLOR_02;
+  if (color_eq (c, PRINCESS_EYES_COLOR)) return E_PRINCESS_EYES_COLOR;
+  return c;
+}
+
+ALLEGRO_COLOR
+v_princess_palette (ALLEGRO_COLOR c)
+{
+  if (color_eq (c, PRINCESS_SKIN_COLOR_01)) return V_PRINCESS_SKIN_COLOR_01;
+  if (color_eq (c, PRINCESS_SKIN_COLOR_02)) return V_PRINCESS_SKIN_COLOR_02;
+  if (color_eq (c, PRINCESS_SKIN_COLOR_03)) return V_PRINCESS_SKIN_COLOR_03;
+  if (color_eq (c, PRINCESS_DRESS_COLOR_01)) return V_PRINCESS_DRESS_COLOR_01;
+  if (color_eq (c, PRINCESS_DRESS_COLOR_02)) return V_PRINCESS_DRESS_COLOR_02;
+  if (color_eq (c, PRINCESS_DRESS_COLOR_03)) return V_PRINCESS_DRESS_COLOR_03;
+  if (color_eq (c, PRINCESS_HAIR_COLOR_01)) return V_PRINCESS_HAIR_COLOR_01;
+  if (color_eq (c, PRINCESS_HAIR_COLOR_02)) return V_PRINCESS_HAIR_COLOR_02;
+  if (color_eq (c, PRINCESS_EYES_COLOR)) return V_PRINCESS_EYES_COLOR;
+  return c;
+}
+
+palette
+get_princess_palette (enum vm vm)
+{
+  switch (vm) {
+  case CGA: return c_princess_palette;
+  case EGA: return e_princess_palette;
+  case VGA: return v_princess_palette;
+  }
+  return NULL;
+}
+
+void
+draw_princess_frame (ALLEGRO_BITMAP *bitmap, struct anim *p, enum vm vm)
+{
+  if (p->invisible) return;
+
+  struct frame f = p->f;
+
+  palette pal = NULL;
+  pal = get_princess_palette (vm);
+  f.b = apply_palette (f.b, pal);
+
+  if (hgc) f.b = apply_palette (f.b, hgc_palette);
+
+  draw_frame (bitmap, &f);
 }

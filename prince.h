@@ -425,6 +425,46 @@
 #define GUARD_LIFE_COLOR_01  (al_map_rgb (0, 0, 160))
 #define GUARD_LIFE_COLOR_02  (al_map_rgb (0, 167, 0))
 
+#define PRINCESS_SKIN_COLOR_01 (al_map_rgb (160, 80, 0))
+#define PRINCESS_SKIN_COLOR_02 (al_map_rgb (160, 0, 160))
+#define PRINCESS_SKIN_COLOR_03 (al_map_rgb (80, 248, 255))
+#define PRINCESS_DRESS_COLOR_01 (al_map_rgb (0, 0, 160))
+#define PRINCESS_DRESS_COLOR_02 (al_map_rgb (0, 167, 0))
+#define PRINCESS_DRESS_COLOR_03 (al_map_rgb (80, 80, 255))
+#define PRINCESS_HAIR_COLOR_01 (al_map_rgb (0, 167, 160))
+#define PRINCESS_HAIR_COLOR_02 (al_map_rgb (255, 248, 80))
+#define PRINCESS_EYES_COLOR (al_map_rgb (160, 0, 0))
+
+#define V_PRINCESS_SKIN_COLOR_01 (al_map_rgb (252, 156, 128))
+#define V_PRINCESS_SKIN_COLOR_02 (al_map_rgb (220, 132, 112))
+#define V_PRINCESS_SKIN_COLOR_03 (al_map_rgb (252, 172, 144))
+#define V_PRINCESS_DRESS_COLOR_01 (al_map_rgb (252, 56, 252))
+#define V_PRINCESS_DRESS_COLOR_02 (al_map_rgb (208, 48, 208))
+#define V_PRINCESS_DRESS_COLOR_03 (al_map_rgb (252, 216, 252))
+#define V_PRINCESS_HAIR_COLOR_01 (al_map_rgb (144, 92, 0))
+#define V_PRINCESS_HAIR_COLOR_02 (al_map_rgb (112, 72, 0))
+#define V_PRINCESS_EYES_COLOR (al_map_rgb (112, 64, 0))
+
+#define E_PRINCESS_SKIN_COLOR_01 (al_map_rgb (168, 84, 0))
+#define E_PRINCESS_SKIN_COLOR_02 (E_PRINCESS_SKIN_COLOR_01)
+#define E_PRINCESS_SKIN_COLOR_03 (E_PRINCESS_SKIN_COLOR_01)
+#define E_PRINCESS_DRESS_COLOR_01 (al_map_rgb (0, 168, 168))
+#define E_PRINCESS_DRESS_COLOR_02 (E_PRINCESS_DRESS_COLOR_01)
+#define E_PRINCESS_DRESS_COLOR_03 (al_map_rgb (248, 252, 248))
+#define E_PRINCESS_HAIR_COLOR_01 (al_map_rgb (168, 0, 0))
+#define E_PRINCESS_HAIR_COLOR_02 (E_PRINCESS_HAIR_COLOR_01)
+#define E_PRINCESS_EYES_COLOR (al_map_rgb (0, 0, 0))
+
+#define C_PRINCESS_SKIN_COLOR_01 (al_map_rgb (255, 85, 255))
+#define C_PRINCESS_SKIN_COLOR_02 (C_PRINCESS_SKIN_COLOR_01)
+#define C_PRINCESS_SKIN_COLOR_03 (C_PRINCESS_SKIN_COLOR_01)
+#define C_PRINCESS_DRESS_COLOR_01 (al_map_rgb (85, 255, 255))
+#define C_PRINCESS_DRESS_COLOR_02 (C_PRINCESS_DRESS_COLOR_01)
+#define C_PRINCESS_DRESS_COLOR_03 (al_map_rgb (255, 255, 255))
+#define C_PRINCESS_HAIR_COLOR_01 (al_map_rgb (255, 255, 255))
+#define C_PRINCESS_HAIR_COLOR_02 (C_PRINCESS_HAIR_COLOR_01)
+#define C_PRINCESS_EYES_COLOR (al_map_rgb (0, 0, 0))
+
 /* environment mode */
 enum em {
   DUNGEON, PALACE,

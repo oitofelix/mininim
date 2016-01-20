@@ -23,39 +23,39 @@
 #include "clock.h"
 
 /* variables */
-ALLEGRO_BITMAP *clock_01, *clock_02, *clock_03, *clock_04, *clock_05, *clock_06,
-  *clock_07, *clock_sand_01, *clock_sand_02, *clock_sand_03;
+ALLEGRO_BITMAP *clock_00, *clock_01, *clock_02, *clock_03, *clock_04, *clock_05,
+  *clock_06, *clock_sand_00, *clock_sand_01, *clock_sand_02;
 
 ALLEGRO_BITMAP *princess_room_clock = NULL;
 
 void
 load_clock (void)
 {
+  clock_00 = load_bitmap (CLOCK_00);
   clock_01 = load_bitmap (CLOCK_01);
   clock_02 = load_bitmap (CLOCK_02);
   clock_03 = load_bitmap (CLOCK_03);
   clock_04 = load_bitmap (CLOCK_04);
   clock_05 = load_bitmap (CLOCK_05);
   clock_06 = load_bitmap (CLOCK_06);
-  clock_07 = load_bitmap (CLOCK_07);
+  clock_sand_00 = load_bitmap (CLOCK_SAND_00);
   clock_sand_01 = load_bitmap (CLOCK_SAND_01);
   clock_sand_02 = load_bitmap (CLOCK_SAND_02);
-  clock_sand_03 = load_bitmap (CLOCK_SAND_03);
 }
 
 void
 unload_clock (void)
 {
+  al_destroy_bitmap (clock_00);
   al_destroy_bitmap (clock_01);
   al_destroy_bitmap (clock_02);
   al_destroy_bitmap (clock_03);
   al_destroy_bitmap (clock_04);
   al_destroy_bitmap (clock_05);
   al_destroy_bitmap (clock_06);
-  al_destroy_bitmap (clock_07);
+  al_destroy_bitmap (clock_sand_00);
   al_destroy_bitmap (clock_sand_01);
   al_destroy_bitmap (clock_sand_02);
-  al_destroy_bitmap (clock_sand_03);
 }
 
 void
@@ -67,9 +67,9 @@ draw_clock (void)
   if (! princess_room_clock) return;
 
   switch (i % 3) {
-  case 0: sand = clock_sand_01; break;
-  case 1: sand = clock_sand_02; break;
-  case 2: sand = clock_sand_03; break;
+  case 0: sand = clock_sand_00; break;
+  case 1: sand = clock_sand_01; break;
+  case 2: sand = clock_sand_02; break;
   default:
     xerror (-1, 0, "%s: arithmetic error", __func__);
   }

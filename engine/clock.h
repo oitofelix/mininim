@@ -20,16 +20,16 @@
 #ifndef MININIM_CLOCK_H
 #define MININIM_CLOCK_H
 
-#define CLOCK_01 "dat/pv/objects/clock01.png"
-#define CLOCK_02 "dat/pv/objects/clock02.png"
-#define CLOCK_03 "dat/pv/objects/clock03.png"
-#define CLOCK_04 "dat/pv/objects/clock04.png"
-#define CLOCK_05 "dat/pv/objects/clock05.png"
-#define CLOCK_06 "dat/pv/objects/clock06.png"
-#define CLOCK_07 "dat/pv/objects/clock07.png"
-#define CLOCK_SAND_01 "dat/pv/objects/clocksand01.png"
-#define CLOCK_SAND_02 "dat/pv/objects/clocksand02.png"
-#define CLOCK_SAND_03 "dat/pv/objects/clocksand03.png"
+#define CLOCK_00 "data/clock/00.png"
+#define CLOCK_01 "data/clock/01.png"
+#define CLOCK_02 "data/clock/02.png"
+#define CLOCK_03 "data/clock/03.png"
+#define CLOCK_04 "data/clock/04.png"
+#define CLOCK_05 "data/clock/05.png"
+#define CLOCK_06 "data/clock/06.png"
+#define CLOCK_SAND_00 "data/clock/sand-00.png"
+#define CLOCK_SAND_01 "data/clock/sand-01.png"
+#define CLOCK_SAND_02 "data/clock/sand-02.png"
 
 /* functions */
 void load_clock (void);
@@ -39,7 +39,7 @@ void draw_clock (void);
 /* variables */
 extern ALLEGRO_BITMAP *princess_room_clock;
 
-extern ALLEGRO_BITMAP *clock_01, *clock_02, *clock_03, *clock_04, *clock_05, *clock_06,
-  *clock_07, *clock_sand_01, *clock_sand_02, *clock_sand_03;
+extern ALLEGRO_BITMAP *clock_00, *clock_01, *clock_02, *clock_03, *clock_04, *clock_05,
+  *clock_06, *clock_sand_00, *clock_sand_01, *clock_sand_02;
 
 #endif	/* MININIM_CLOCK_H */

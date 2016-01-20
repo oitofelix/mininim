@@ -221,6 +221,7 @@ title_anim (void)
       jaffar.f.c.y = 119;
       jaffar.f.b = jaffar_normal_00;
       jaffar.f.dir = LEFT;
+      jaffar.style = 0;
       jaffar_normal (&jaffar);
 
       princess_room_clock = NULL;
@@ -264,7 +265,7 @@ title_anim (void)
     break;
   case 16:
     jaffar.action (&jaffar);
-    if (get_sample_position (si) >= 3.0 && jaffar.f.b == jaffar_normal_00) {
+    if (get_sample_position (si) >= 4.0 && jaffar.f.b == jaffar_normal_00) {
       jaffar.repeat = 5;
       jaffar_walk (&jaffar);
       i++;
@@ -272,7 +273,7 @@ title_anim (void)
     break;
   case 17:
     jaffar.action (&jaffar);
-    if (get_sample_position (si) >= 12.0 && jaffar.f.b == jaffar_normal_00) {
+    if (get_sample_position (si) >= 12.5 && jaffar.f.b == jaffar_normal_00) {
       jaffar_open_arms (&jaffar);
       i++;
     }
@@ -285,7 +286,7 @@ title_anim (void)
   case 19:
     princess.action (&princess);
     jaffar.action (&jaffar);
-    if (princess.f.b == princess_step_back_15) {
+    if (princess.f.b == princess_step_back_05) {
       jaffar_raise_arms (&jaffar);
       i++;
     }
@@ -295,7 +296,7 @@ title_anim (void)
     if (jaffar.f.b == jaffar_raise_arms_06) {
       video_effect.color = WHITE;
       start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (1));
-      princess_room_clock = clock_01;
+      princess_room_clock = clock_00;
       i++;
     }
     break;
@@ -348,7 +349,7 @@ title_anim (void)
     }
     break;
   case 28:
-    if (! wait_anim (SECS_TO_SCYCLES (3))) {
+    if (! wait_anim (SECS_TO_SCYCLES (5))) {
       start_video_effect (VIDEO_ROLL_RIGHT, SECS_TO_VCYCLES (0.5));
       i++;
     }
@@ -459,7 +460,7 @@ draw_princess_room (ALLEGRO_BITMAP *bitmap, enum vm vm)
   draw_bitmap (princess_room, bitmap, 0, 0, 0);
   draw_princess_room_stars (bitmap, vm);
   draw_princess_room_fire (bitmap, vm);
-  draw_frame (bitmap, &princess.f);
+  draw_princess_frame (bitmap, &princess, vm);
   draw_jaffar_frame (bitmap, &jaffar, vm);
   draw_clock ();
   draw_bitmap (princess_room_pillar, bitmap, 245, 120, 0);
