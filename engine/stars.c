@@ -166,7 +166,7 @@ redraw_stars_bitmap (struct star s[], struct stars_bitmap *sb,
 }
 
 void
-draw_princess_room_stars (void)
+draw_princess_room_stars (ALLEGRO_BITMAP *bitmap, enum vm vm)
 {
   int i, min_x = INT_MAX, min_y = INT_MAX,
     max_x = INT_MIN, max_y = INT_MIN;
@@ -193,7 +193,12 @@ draw_princess_room_stars (void)
     redraw_stars_bitmap (&s[0], &sb, 6, vm);
   }
 
-  draw_stars (screen, s, &sb, 6, vm);
+  if (vm != last_vm) {
+    redraw_stars_bitmap (&s[0], &sb, 6, vm);
+    last_vm = vm;
+  }
+
+  draw_stars (bitmap, s, &sb, 6, vm);
 }
 
 void

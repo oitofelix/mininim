@@ -38,7 +38,7 @@
 void load_fire (void);
 void unload_fire (void);
 void draw_fire (ALLEGRO_BITMAP* bitmap, struct pos *p, enum vm vm);
-void draw_princess_room_fire (void);
+void draw_princess_room_fire (ALLEGRO_BITMAP *bitmap, enum vm vm);
 struct coord *fire_coord (struct pos *p, struct coord *c);
 
 #endif	/* MININIM_FIRE_H */

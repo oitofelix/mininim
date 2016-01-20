@@ -59,10 +59,16 @@ ALLEGRO_SAMPLE *step_sample,
   *closer_floor_sample,
   *loose_floor_00_sample,
   *loose_floor_01_sample,
-  *loose_floor_03_sample,
+  *loose_floor_02_sample,
   *broken_floor_sample,
   *spikes_sample,
-  *opener_floor_sample;
+  *opener_floor_sample,
+  *main_theme_sample,
+  *in_the_absence_sample,
+  *princess_waiting_sample,
+  *vizier_and_princess_sample,
+  *marry_jaffar_sample,
+  *creaking_door_sample;
 
 void
 load_samples (void)
@@ -106,10 +112,16 @@ load_samples (void)
   closer_floor_sample = load_sample (CLOSER_FLOOR_SAMPLE);
   loose_floor_00_sample = load_sample (LOOSE_FLOOR_00_SAMPLE);
   loose_floor_01_sample = load_sample (LOOSE_FLOOR_01_SAMPLE);
-  loose_floor_03_sample = load_sample (LOOSE_FLOOR_03_SAMPLE);
+  loose_floor_02_sample = load_sample (LOOSE_FLOOR_02_SAMPLE);
   broken_floor_sample = load_sample (BROKEN_FLOOR_SAMPLE);
   spikes_sample = load_sample (SPIKES_SAMPLE);
   opener_floor_sample = load_sample (OPENER_FLOOR_SAMPLE);
+  main_theme_sample = load_sample (MAIN_THEME_SAMPLE);
+  in_the_absence_sample = load_sample (IN_THE_ABSENCE_SAMPLE);
+  princess_waiting_sample = load_sample (PRINCESS_WAITING_SAMPLE);
+  vizier_and_princess_sample = load_sample (VIZIER_AND_PRINCESS_SAMPLE);
+  marry_jaffar_sample = load_sample (MARRY_JAFFAR_SAMPLE);
+  creaking_door_sample = load_sample (CREAKING_DOOR_SAMPLE);
 }
 
 void
@@ -154,8 +166,14 @@ unload_samples (void)
   al_destroy_sample (closer_floor_sample);
   al_destroy_sample (loose_floor_00_sample);
   al_destroy_sample (loose_floor_01_sample);
-  al_destroy_sample (loose_floor_03_sample);
+  al_destroy_sample (loose_floor_02_sample);
   al_destroy_sample (broken_floor_sample);
   al_destroy_sample (spikes_sample);
   al_destroy_sample (opener_floor_sample);
+  al_destroy_sample (main_theme_sample);
+  al_destroy_sample (in_the_absence_sample);
+  al_destroy_sample (princess_waiting_sample);
+  al_destroy_sample (vizier_and_princess_sample);
+  al_destroy_sample (marry_jaffar_sample);
+  al_destroy_sample (creaking_door_sample);
 }

@@ -57,12 +57,18 @@
 #define LEVEL_DOOR_OPEN_SAMPLE "data/sample/level-door-open.ogg"
 #define LEVEL_DOOR_CLOSE_SAMPLE "data/sample/level-door-close.ogg"
 #define CLOSER_FLOOR_SAMPLE "data/sample/closer-floor.ogg"
-#define LOOSE_FLOOR_00_SAMPLE "data/sample/loose-floor-01.ogg"
-#define LOOSE_FLOOR_01_SAMPLE "data/sample/loose-floor-02.ogg"
-#define LOOSE_FLOOR_03_SAMPLE "data/sample/loose-floor-03.ogg"
+#define LOOSE_FLOOR_00_SAMPLE "data/sample/loose-floor-00.ogg"
+#define LOOSE_FLOOR_01_SAMPLE "data/sample/loose-floor-01.ogg"
+#define LOOSE_FLOOR_02_SAMPLE "data/sample/loose-floor-02.ogg"
 #define BROKEN_FLOOR_SAMPLE "data/sample/broken-floor.ogg"
 #define SPIKES_SAMPLE "data/sample/spikes.ogg"
 #define OPENER_FLOOR_SAMPLE "data/sample/opener-floor.ogg"
+#define MAIN_THEME_SAMPLE "data/sample/main-theme.ogg"
+#define IN_THE_ABSENCE_SAMPLE "data/sample/in-the-absence.ogg"
+#define PRINCESS_WAITING_SAMPLE "data/sample/princess-waiting.ogg"
+#define VIZIER_AND_PRINCESS_SAMPLE "data/sample/vizier-and-princess.ogg"
+#define MARRY_JAFFAR_SAMPLE "data/sample/marry-jaffar.ogg"
+#define CREAKING_DOOR_SAMPLE "data/sample/creaking-door.ogg"
 
 void load_samples (void);
 void unload_samples (void);
@@ -106,9 +112,15 @@ extern ALLEGRO_SAMPLE *step_sample,
   *closer_floor_sample,
   *loose_floor_00_sample,
   *loose_floor_01_sample,
-  *loose_floor_03_sample,
+  *loose_floor_02_sample,
   *broken_floor_sample,
   *spikes_sample,
-  *opener_floor_sample;
+  *opener_floor_sample,
+  *main_theme_sample,
+  *in_the_absence_sample,
+  *princess_waiting_sample,
+  *vizier_and_princess_sample,
+  *marry_jaffar_sample,
+  *creaking_door_sample;
 
 #endif	/* MININIM_SAMPLES_H */

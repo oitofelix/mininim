@@ -104,15 +104,15 @@ draw_fire (ALLEGRO_BITMAP* bitmap, struct pos *p, enum vm vm)
 }
 
 void
-draw_princess_room_fire (void)
+draw_princess_room_fire (ALLEGRO_BITMAP *bitmap, enum vm vm)
 {
   static int i = 0;
 
-  ALLEGRO_BITMAP *fire_0 = get_fire_frame (prandom_uniq (FIRE_RANDOM_SEED_0 + i, 1, 8), VGA);
-  ALLEGRO_BITMAP *fire_1 = get_fire_frame (prandom_uniq (FIRE_RANDOM_SEED_1 + i, 1, 8), VGA);
+  ALLEGRO_BITMAP *fire_0 = get_fire_frame (prandom_uniq (FIRE_RANDOM_SEED_0 + i, 1, 8), vm);
+  ALLEGRO_BITMAP *fire_1 = get_fire_frame (prandom_uniq (FIRE_RANDOM_SEED_1 + i, 1, 8), vm);
 
-  draw_bitmap (fire_0, screen, 92, 99, prandom (1) ? ALLEGRO_FLIP_HORIZONTAL : 0);
-  draw_bitmap (fire_1, screen, 210, 99, prandom (1) ? ALLEGRO_FLIP_HORIZONTAL : 0);
+  draw_bitmap (fire_0, bitmap, 93, 99, 0);
+  draw_bitmap (fire_1, bitmap, 211, 99, 0);
 
   i++;
 }

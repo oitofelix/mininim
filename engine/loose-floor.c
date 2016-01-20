@@ -597,7 +597,7 @@ sample_random_loose_floor (int room)
   switch (prandom (2)) {
   case 0: play_sample (loose_floor_00_sample, room);
   case 1: play_sample (loose_floor_01_sample, room);
-  case 2: play_sample (loose_floor_03_sample, room);
+  case 2: play_sample (loose_floor_02_sample, room);
   }
 }
 

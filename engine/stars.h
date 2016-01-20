@@ -33,7 +33,7 @@ struct star {
 /* functions */
 void load_stars (void);
 void unload_stars (void);
-void draw_princess_room_stars (void);
+void draw_princess_room_stars (ALLEGRO_BITMAP *bitmap, enum vm vm);
 void draw_balcony_stars (ALLEGRO_BITMAP *bitmap, struct pos *p,
                          enum vm vm);
 

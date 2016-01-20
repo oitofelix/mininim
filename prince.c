@@ -29,7 +29,7 @@
 #include "kernel/xerror.h"
 #include "engine/level.h"
 #include "engine/samples.h"
-#include "levels/title.h"
+#include "engine/cutscenes.h"
 #include "levels/level-1.h"
 #include "levels/consistency-level.h"
 #include "levels/legacy-level.h"
@@ -56,7 +56,7 @@ main (int argc, char **argv)
 
   load_samples ();
   load_level ();
-  load_title ();
+  load_cutscenes ();
 
  restart_game:
   clear_bitmap (screen, BLACK);
@@ -78,7 +78,7 @@ main (int argc, char **argv)
 
  quit_game:
   unload_level ();
-  unload_title ();
+  unload_cutscenes ();
   unload_samples ();
 
   finalize_video ();

@@ -234,6 +234,10 @@ process_keys (void)
 
   int prev_room = room_view;
 
+  /* clear the keyboard buffer at the first cycle, so any key pressed
+     on the title don't trigger any action */
+  if (anim_cycle == 0) memset (&key, 0, sizeof (key));
+
   /* ESC: pause game */
   if (step_one_cycle) {
     step_one_cycle = false;
@@ -343,10 +347,6 @@ process_keys (void)
   if (was_key_pressed (ALLEGRO_KEY_A, 0, ALLEGRO_KEYMOD_CTRL, true))
     quit_anim = RESTART_LEVEL;
 
-  /* CTRL+R: restart game */
-  if (was_key_pressed (ALLEGRO_KEY_R, 0, ALLEGRO_KEYMOD_CTRL, true))
-    quit_anim = RESTART_GAME;
-
   /* SHIFT+L: warp to next level */
   if (was_key_pressed (ALLEGRO_KEY_L, 0, ALLEGRO_KEYMOD_SHIFT, true))
     quit_anim = NEXT_LEVEL;
@@ -427,66 +427,6 @@ process_keys (void)
     display_skill (current_kid);
   }
 
-  /* CTRL+V: show engine name and version */
-  if (was_key_pressed (ALLEGRO_KEY_V, 0, ALLEGRO_KEYMOD_CTRL, true)) {
-    xasprintf (&text, "MININIM 0.9");
-    draw_bottom_text (NULL, text);
-    al_free (text);
-  }
-
-  /* CTRL+S: enable/disable sound */
-  if (was_key_pressed (ALLEGRO_KEY_S, 0, ALLEGRO_KEYMOD_CTRL, true)) {
-    audio_enabled = ! audio_enabled;
-    enable_audio (audio_enabled);
-    xasprintf (&text, "SOUND %s", audio_enabled ? "ON" : "OFF");
-    draw_bottom_text (NULL, text);
-    al_free (text);
-  }
-
-  /* SHIFT+I: flip screen */
-  if (was_key_pressed (ALLEGRO_KEY_I, 0, ALLEGRO_KEYMOD_SHIFT, true)) {
-    char *flip = "NONE";
-    switch (screen_flags) {
-    case 0:
-      screen_flags = ALLEGRO_FLIP_VERTICAL;
-      flip = "VERTICAL"; break;
-    case ALLEGRO_FLIP_VERTICAL:
-      screen_flags = ALLEGRO_FLIP_HORIZONTAL;
-      flip = "HORIZONTAL"; break;
-    case ALLEGRO_FLIP_HORIZONTAL:
-      screen_flags = ALLEGRO_FLIP_VERTICAL | ALLEGRO_FLIP_HORIZONTAL;
-      flip = "VERTICAL + HORIZONTAL"; break;
-    case ALLEGRO_FLIP_VERTICAL | ALLEGRO_FLIP_HORIZONTAL:
-      screen_flags = 0;
-      break;
-    }
-    xasprintf (&text, "DISPLAY FLIP: %s", flip);
-    draw_bottom_text (NULL, text);
-    al_free (text);
-  }
-
-  /* SHIFT+K: flip keyboard */
-  if (was_key_pressed (ALLEGRO_KEY_K, 0, ALLEGRO_KEYMOD_SHIFT, true)) {
-    char *flip = "NONE";
-    if (! flip_keyboard_vertical && ! flip_keyboard_horizontal) {
-      flip_keyboard_vertical = true;
-      flip = "VERTICAL";
-    } else if (flip_keyboard_vertical && ! flip_keyboard_horizontal) {
-      flip_keyboard_vertical = false;
-      flip_keyboard_horizontal = true;
-      flip = "HORIZONTAL";
-    } else if (! flip_keyboard_vertical && flip_keyboard_horizontal) {
-      flip_keyboard_vertical = true;
-      flip = "VERTICAL + HORIZONTAL";
-    } else if (flip_keyboard_vertical && flip_keyboard_horizontal) {
-      flip_keyboard_vertical = false;
-      flip_keyboard_horizontal = false;
-    }
-    xasprintf (&text, "KEYBOARD FLIP: %s", flip);
-    draw_bottom_text (NULL, text);
-    al_free (text);
-  }
-
   /* F11: change environmt mode */
   if (was_key_pressed (ALLEGRO_KEY_F11, 0, 0, true)) {
     char *em_str = NULL;
@@ -497,27 +437,6 @@ process_keys (void)
     }
 
     xasprintf (&text, "ENVIRONMENT MODE: %s", em_str);
-    draw_bottom_text (NULL, text);
-    al_free (text);
-  }
-
-  /* F12: change video mode */
-  if (was_key_pressed (ALLEGRO_KEY_F12, 0, 0, true)) {
-    char *vm_str = NULL;
-
-    switch (vm) {
-    case CGA:
-      if (hgc) {
-        hgc = false; vm = VGA; vm_str = "VGA";
-      } else {
-        hgc = true; vm = CGA; vm_str = "HGC";
-      }
-      break;
-    case EGA: vm = CGA; vm_str = "CGA"; break;
-    case VGA: vm = EGA; vm_str = "EGA"; break;
-    }
-
-    xasprintf (&text, "VIDEO MODE: %s", vm_str);
     draw_bottom_text (NULL, text);
     al_free (text);
   }
@@ -573,13 +492,11 @@ draw_level (void)
     draw_bottom_text (NULL, "GAME PAUSED");
     clear_bitmap (uscreen, TRANSPARENT_COLOR);
     draw_lives (uscreen, get_anim_by_id (current_kid_id), vm);
-    draw_bottom_text (uscreen, NULL);
     return;
   }
 
   /* drawing */
   clear_bitmap (screen, BLACK);
-  clear_bitmap (uscreen, TRANSPARENT_COLOR);
 
   struct pos p;
   p.room = room_view;
@@ -633,8 +550,6 @@ draw_level (void)
     display_remaining_time ();
     last_auto_show_time = rem_time;
   }
-
-  draw_bottom_text (uscreen, NULL);
 }
 
 void

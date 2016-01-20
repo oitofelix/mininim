@@ -4,7 +4,7 @@ ENGINE_MODULES = anim pos physics level consistency stars floor				\
   broken-floor skeleton-floor loose-floor opener-floor closer-floor		\
   spikes-floor door level-door pillar big-pillar chopper bricks torch	\
   window balcony arch carpet mirror room fire potion sword clock			\
-  princess jaffar mouse fight samples
+  princess jaffar mouse fight samples cutscenes
 WALL_MODULES = wall wall-depedv wall-pv wall-dcpc
 KID_MODULES = kid kid-normal kid-walk kid-start-run kid-run						\
   kid-stop-run kid-turn-run kid-couch kid-turn kid-stabilize kid-jump	\
@@ -15,7 +15,7 @@ KID_MODULES = kid kid-normal kid-walk kid-start-run kid-run						\
   kid-sword-hit kid-die kid-stairs
 GUARD_MODULES = guard guard-normal guard-vigilant guard-hit guard-die	\
   guard-fall guard-walkf guard-walkb guard-attack guard-defense
-LEVEL_MODULES = title level-1 consistency-level legacy-level
+LEVEL_MODULES = level-1 consistency-level legacy-level
 MAIN_MODULES = prince
 
 MODULES = ${KERNEL_MODULES:%=kernel/%} ${ENGINE_MODULES:%=engine/%}	\

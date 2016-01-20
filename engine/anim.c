@@ -80,7 +80,9 @@ play_anim (void (*draw_callback) (void),
             || was_key_pressed (ALLEGRO_KEY_ESCAPE, 0,
                                 ALLEGRO_KEYMOD_ALT, true)) {
           if (compute_callback) compute_callback ();
+          clear_bitmap (uscreen, TRANSPARENT_COLOR);
           draw_callback ();
+          draw_bottom_text (uscreen, NULL);
           play_samples ();
           anim_cycle++;
         }
@@ -106,8 +108,98 @@ play_anim (void (*draw_callback) (void),
       break;
     case ALLEGRO_EVENT_KEY_CHAR:
       key = event;
+
+      char *text = NULL;
+
+      /* CTRL+R: restart game */
+      if (was_key_pressed (ALLEGRO_KEY_R, 0, ALLEGRO_KEYMOD_CTRL, true))
+        quit_anim = RESTART_GAME;
+
+      /* CTRL+Q: quit game */
       if (was_key_pressed (ALLEGRO_KEY_Q, 0, ALLEGRO_KEYMOD_CTRL, true))
         quit_anim = QUIT_GAME;
+
+      /* CTRL+V: show engine name and version */
+      if (was_key_pressed (ALLEGRO_KEY_V, 0, ALLEGRO_KEYMOD_CTRL, true)) {
+        xasprintf (&text, "MININIM 0.9");
+        draw_bottom_text (NULL, text);
+        al_free (text);
+      }
+
+      /* CTRL+S: enable/disable sound */
+      if (was_key_pressed (ALLEGRO_KEY_S, 0, ALLEGRO_KEYMOD_CTRL, true)) {
+        audio_enabled = ! audio_enabled;
+        enable_audio (audio_enabled);
+        xasprintf (&text, "SOUND %s", audio_enabled ? "ON" : "OFF");
+        draw_bottom_text (NULL, text);
+        al_free (text);
+      }
+
+      /* SHIFT+I: flip screen */
+      if (was_key_pressed (ALLEGRO_KEY_I, 0, ALLEGRO_KEYMOD_SHIFT, true)) {
+        char *flip = "NONE";
+        switch (screen_flags) {
+        case 0:
+          screen_flags = ALLEGRO_FLIP_VERTICAL;
+          flip = "VERTICAL"; break;
+        case ALLEGRO_FLIP_VERTICAL:
+          screen_flags = ALLEGRO_FLIP_HORIZONTAL;
+          flip = "HORIZONTAL"; break;
+        case ALLEGRO_FLIP_HORIZONTAL:
+          screen_flags = ALLEGRO_FLIP_VERTICAL | ALLEGRO_FLIP_HORIZONTAL;
+          flip = "VERTICAL + HORIZONTAL"; break;
+        case ALLEGRO_FLIP_VERTICAL | ALLEGRO_FLIP_HORIZONTAL:
+          screen_flags = 0;
+          break;
+        }
+        xasprintf (&text, "DISPLAY FLIP: %s", flip);
+        draw_bottom_text (NULL, text);
+        al_free (text);
+      }
+
+      /* SHIFT+K: flip keyboard */
+      if (was_key_pressed (ALLEGRO_KEY_K, 0, ALLEGRO_KEYMOD_SHIFT, true)) {
+        char *flip = "NONE";
+        if (! flip_keyboard_vertical && ! flip_keyboard_horizontal) {
+          flip_keyboard_vertical = true;
+          flip = "VERTICAL";
+        } else if (flip_keyboard_vertical && ! flip_keyboard_horizontal) {
+          flip_keyboard_vertical = false;
+          flip_keyboard_horizontal = true;
+          flip = "HORIZONTAL";
+        } else if (! flip_keyboard_vertical && flip_keyboard_horizontal) {
+          flip_keyboard_vertical = true;
+          flip = "VERTICAL + HORIZONTAL";
+        } else if (flip_keyboard_vertical && flip_keyboard_horizontal) {
+          flip_keyboard_vertical = false;
+          flip_keyboard_horizontal = false;
+        }
+        xasprintf (&text, "KEYBOARD FLIP: %s", flip);
+        draw_bottom_text (NULL, text);
+        al_free (text);
+      }
+
+      /* F12: change video mode */
+      if (was_key_pressed (ALLEGRO_KEY_F12, 0, 0, true)) {
+        char *vm_str = NULL;
+
+        switch (vm) {
+        case CGA:
+          if (hgc) {
+            hgc = false; vm = VGA; vm_str = "VGA";
+          } else {
+            hgc = true; vm = CGA; vm_str = "HGC";
+          }
+          break;
+        case EGA: vm = CGA; vm_str = "CGA"; break;
+        case VGA: vm = EGA; vm_str = "EGA"; break;
+        }
+
+        xasprintf (&text, "VIDEO MODE: %s", vm_str);
+        draw_bottom_text (NULL, text);
+        al_free (text);
+      }
+
       break;
     }
   }
