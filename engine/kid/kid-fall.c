@@ -187,7 +187,7 @@ physics_in (struct anim *k)
   /* collision */
   if (is_colliding (&k->f, &k->fo, +0, false, &k->ci)) {
     k->inertia = 0;
-    k->fo.dx = (k->f.dir == LEFT) ? +8 : -8;
+    k->fo.dx = +0;
   }
 
   /* hang front */
