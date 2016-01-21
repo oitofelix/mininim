@@ -64,6 +64,7 @@ main (int argc, char **argv)
   title_started = false;
   stop_all_samples ();
   play_title ();
+  stop_video_effect ();
   if (quit_anim == QUIT_GAME) goto quit_game;
   stop_all_samples ();
 

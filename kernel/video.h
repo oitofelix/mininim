@@ -70,6 +70,7 @@ void draw_shutter (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
 void draw_pattern (ALLEGRO_BITMAP *bitmap, int ox, int oy, int w, int h,
                    ALLEGRO_COLOR color_0, ALLEGRO_COLOR color_1);
 void start_video_effect (enum video_effect_type type, int duration);
+void stop_video_effect (void);
 bool is_video_effect_started (void);
 void show (void);
 

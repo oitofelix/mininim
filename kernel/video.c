@@ -366,6 +366,15 @@ start_video_effect (enum video_effect_type type, int duration)
   al_start_timer (video_timer);
 }
 
+void
+stop_video_effect (void)
+{
+  video_effect.type = VIDEO_NO_EFFECT;
+  al_stop_timer (video_timer);
+  clear_bitmap (screen, BLACK);
+  draw_bitmap (effect_buffer, screen, 0, 0, 0);
+}
+
 bool
 is_video_effect_started (void)
 {
@@ -383,18 +392,15 @@ show (void)
   default: break;
   }
 
-  if (++i >= video_effect.duration) {
+  if (++i >= video_effect.duration + 1) {
     i = 0;
-    video_effect.type = VIDEO_NO_EFFECT;
-    al_stop_timer (video_timer);
-    /* clear_bitmap (screen, BLACK); */
-    /* draw_bitmap (effect_buffer, screen, 0, 0, 0); */
+    stop_video_effect ();
     return;
   }
 
   switch (video_effect.type) {
   case VIDEO_FLICKERING:
-    if (i % 2) {
+    if (i % 2 && i < video_effect.duration) {
       clear_bitmap (effect_buffer, video_effect.color);
       al_convert_mask_to_alpha (screen, BLACK);
     } else clear_bitmap (effect_buffer, BLACK);
@@ -421,7 +427,7 @@ show (void)
       draw_fade (screen, effect_buffer, (float) i / (float) video_effect.duration);
       break;
     }
-    if (i + 1 >= video_effect.duration) clear_bitmap (screen, BLACK);
+    if (i + 1 >= video_effect.duration) clear_bitmap (effect_buffer, BLACK);
     break;
   case VIDEO_ROLL_RIGHT:
     draw_roll_right (screen, effect_buffer, video_effect.duration, i);

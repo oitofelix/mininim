@@ -91,9 +91,9 @@ play_anim (void (*draw_callback) (void),
         al_set_timer_count (timer, 0);
       } else if (event.timer.source == video_timer) {
         show ();
-        drop_all_events_from_source
-          (event_queue, get_timer_event_source (video_timer));
-        al_set_timer_count (video_timer, 0);
+        /* drop_all_events_from_source */
+        /*   (event_queue, get_timer_event_source (video_timer)); */
+        /* al_set_timer_count (video_timer, 0); */
       }
       break;
     case ALLEGRO_EVENT_DISPLAY_RESIZE:
