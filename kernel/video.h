@@ -65,6 +65,8 @@ void acknowledge_resize (void);
 void draw_fade (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to, float factor);
 void draw_roll_right (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
                       int total, int current);
+void draw_shutter (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
+                   int total, int i);
 void draw_pattern (ALLEGRO_BITMAP *bitmap, int ox, int oy, int w, int h,
                    ALLEGRO_COLOR color_0, ALLEGRO_COLOR color_1);
 void start_video_effect (enum video_effect_type type, int duration);

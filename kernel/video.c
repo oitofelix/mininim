@@ -33,6 +33,7 @@ int screen_flags = 0;
 bool hgc;
 static ALLEGRO_BITMAP *effect_buffer;
 static ALLEGRO_BITMAP *memory_bitmap;
+static ALLEGRO_BITMAP *black_screen;
 struct video_effect video_effect = {.type = VIDEO_NO_EFFECT};
 static ALLEGRO_FONT *builtin_font;
 
@@ -58,6 +59,7 @@ init_video (void)
   screen = create_bitmap (ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
   uscreen = create_bitmap (ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
   effect_buffer = create_bitmap (ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
+  black_screen = create_bitmap (ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
 
   int flags = al_get_new_bitmap_flags ();
   al_add_new_bitmap_flag (ALLEGRO_MEMORY_BITMAP);
@@ -82,6 +84,7 @@ finalize_video (void)
   al_destroy_bitmap (screen);
   al_destroy_bitmap (uscreen);
   al_destroy_bitmap (effect_buffer);
+  al_destroy_bitmap (black_screen);
   al_destroy_bitmap (memory_bitmap);
   al_destroy_font (builtin_font);
   al_destroy_timer (video_timer);
@@ -310,9 +313,9 @@ acknowledge_resize (void)
 void
 draw_fade (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to, float factor)
 {
-  al_set_target_bitmap (to);
-  al_draw_tinted_bitmap
-    (from, al_map_rgba_f (factor, factor, factor, 1.0), 0, 0, 0);
+  clear_bitmap (black_screen, al_map_rgba_f (0, 0, 0, factor));
+  draw_bitmap (from, to, 0, 0, 0);
+  draw_bitmap (black_screen, to, 0, 0, 0);
 }
 
 void
@@ -321,11 +324,20 @@ draw_roll_right (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
 {
   int w = al_get_bitmap_width (from);
   int h = al_get_bitmap_height (from);
-
   float slice =  w / total;
+  draw_bitmap_region (from, to, 0, 0, i * slice, h, 0, 0, 0);
+}
 
-  draw_bitmap_region (from, to, (i - 1) * slice, 0, i * slice, h,
-                      (i - 1) * slice, 0, 0);
+void
+draw_shutter (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
+              int total, int i)
+{
+  int sw = al_get_bitmap_width (from);
+  int sh = al_get_bitmap_height (from);
+
+  int sy;
+  for (sy = 0; sy < sh; sy += total)
+    draw_bitmap_region (from, to, 0, sy, sw, i, 0, sy, 0);
 }
 
 void
@@ -349,6 +361,7 @@ start_video_effect (enum video_effect_type type, int duration)
   video_effect.type = type;
   video_effect.duration = duration;
   clear_bitmap (effect_buffer, BLACK);
+  clear_bitmap (black_screen, BLACK);
   draw_bitmap (screen, effect_buffer, 0, 0, 0);
   al_start_timer (video_timer);
 }
@@ -370,7 +383,7 @@ show (void)
   default: break;
   }
 
-  if (++i >= video_effect.duration) {
+  if (++i >= video_effect.duration + 1) {
     i = 0;
     video_effect.type = VIDEO_NO_EFFECT;
     clear_bitmap (screen, BLACK);
@@ -387,11 +400,27 @@ show (void)
     draw_bitmap (screen, effect_buffer, 0, 0, 0);
     break;
   case VIDEO_FADE_IN:
-    draw_fade (screen, effect_buffer, (float) i / (float) video_effect.duration);
+    switch (vm) {
+    case CGA: case EGA:
+      draw_shutter (screen, effect_buffer, video_effect.duration / 4, i);
+      if (i >= video_effect.duration / 4) i = video_effect.duration;
+      break;
+    case VGA:
+      draw_fade (screen, effect_buffer, 1 - (float) i / (float) video_effect.duration);
+      break;
+    }
     break;
   case VIDEO_FADE_OUT:
-    draw_fade (screen, effect_buffer, 1 - (float) i / (float) video_effect.duration);
-    if (i + 1 >= video_effect.duration) clear_bitmap (effect_buffer, BLACK);
+    switch (vm) {
+    case CGA: case EGA:
+      draw_shutter (black_screen, effect_buffer, video_effect.duration / 4, i);
+      if (i >= video_effect.duration / 4) i = video_effect.duration;
+      break;
+    case VGA:
+      draw_fade (screen, effect_buffer, (float) i / (float) video_effect.duration);
+      if (i + 1 >= video_effect.duration) clear_bitmap (effect_buffer, BLACK);
+      break;
+    }
     break;
   case VIDEO_ROLL_RIGHT:
     draw_roll_right (screen, effect_buffer, video_effect.duration, i);

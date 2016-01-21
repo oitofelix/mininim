@@ -228,7 +228,6 @@ title_anim (void)
 
       clock_type = -1;
 
-      draw_princess_room (screen, vm);
       start_video_effect (VIDEO_FADE_IN, SECS_TO_VCYCLES (1));
       i++;
     }
