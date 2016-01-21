@@ -465,6 +465,11 @@
 #define C_PRINCESS_HAIR_COLOR_02 (C_PRINCESS_HAIR_COLOR_01)
 #define C_PRINCESS_EYES_COLOR (al_map_rgb (0, 0, 0))
 
+#define CLOCK_SAND_COLOR (al_map_rgb (255, 255, 255))
+#define V_CLOCK_SAND_COLOR (al_map_rgb (252, 232, 168))
+#define E_CLOCK_SAND_COLOR (al_map_rgb (248, 252, 248))
+#define C_CLOCK_SAND_COLOR (al_map_rgb (255, 255, 255))
+
 /* environment mode */
 enum em {
   DUNGEON, PALACE,

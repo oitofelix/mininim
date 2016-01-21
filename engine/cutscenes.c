@@ -49,6 +49,8 @@ static ALLEGRO_BITMAP *message_presents, *message_author,
 
 bool title_started;
 
+static int clock_type = -1;
+
 void
 load_cutscenes (void)
 {
@@ -224,7 +226,7 @@ title_anim (void)
       jaffar.style = 0;
       jaffar_normal (&jaffar);
 
-      princess_room_clock = NULL;
+      clock_type = -1;
 
       draw_princess_room (screen, vm);
       start_video_effect (VIDEO_FADE_IN, SECS_TO_VCYCLES (1));
@@ -296,7 +298,7 @@ title_anim (void)
     if (jaffar.f.b == jaffar_raise_arms_06) {
       video_effect.color = WHITE;
       start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (1));
-      princess_room_clock = clock_00;
+      clock_type = 0;
       i++;
     }
     break;
@@ -462,6 +464,6 @@ draw_princess_room (ALLEGRO_BITMAP *bitmap, enum vm vm)
   draw_princess_room_fire (bitmap, vm);
   draw_princess_frame (bitmap, &princess, vm);
   draw_jaffar_frame (bitmap, &jaffar, vm);
-  draw_clock ();
+  draw_clock (bitmap, clock_type, vm);
   draw_bitmap (princess_room_pillar, bitmap, 245, 120, 0);
 }
