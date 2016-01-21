@@ -48,11 +48,13 @@
 #define TEXT_CREDITS "data/title/text-credits.png"
 
 /* functions */
-void play_title (void);
 void load_cutscenes (void);
 void unload_cutscenes (void);
+void play_title (void);
+void cutscene_01_anim (void);
+void cutscene_03_anim (void);
 
 /* variables */
-extern bool title_started;
+extern bool cutscene_started;
 
 #endif	/* MININIM_CUTSCENES_H */

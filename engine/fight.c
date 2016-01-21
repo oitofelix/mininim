@@ -713,7 +713,7 @@ get_pos (struct anim *k, struct pos *p, struct coord *m)
 {
   struct pos np;
   survey (_m, pos, &k->f, m, &np, p);
-  while (p->room != m->room) {
+  while (p->room != m->room && con (p)->fg != DOOR) {
     if (p->room == roomd (m->room, LEFT)) p->place++;
     else if (p->room == roomd (m->room, RIGHT)) p->place--;
     else if (p->room == roomd (m->room, ABOVE)) p->floor++;
@@ -836,6 +836,13 @@ fight_hit (struct anim *k, struct anim *ke)
   int d = (k->f.dir == LEFT) ? +1 : -1;
   struct coord nc; struct pos np, pb;
   survey (_m, pos, &k->f, &nc, &k->p, &np);
+
+  /* ensure anim doesn't die within a wall */
+  if (con (&k->p)->fg == WALL) {
+    if (crel (&k->p, +0, +1)->fg != WALL) k->p.place++;
+    else if (crel (&k->p, +0, -1)->fg != WALL) k->p.place--;
+  }
+
   prel (&k->p, &pb, 0, d);
 
   if (k->current_lives <= 0 || ! is_in_fight_mode (k)) {
@@ -844,7 +851,7 @@ fight_hit (struct anim *k, struct anim *ke)
     k->death_reason = FIGHT_DEATH;
   } else anim_sword_hit (k);
 
-  if (! is_colliding (&k->f, &k->fo, +PLACE_WIDTH, ke->f.dir == k->f.dir, &k->ci)) {
+  if (! is_colliding (&k->f, &k->fo, +PLACE_WIDTH, ke->f.dir != k->f.dir, &k->ci)) {
     if (is_strictly_traversable (&pb)) {
       place_at_pos (&k->f, _m, &pb, &k->f.c);
       anim_fall (k);

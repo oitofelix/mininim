@@ -369,6 +369,7 @@ start_video_effect (enum video_effect_type type, int duration)
 void
 stop_video_effect (void)
 {
+  if (! al_get_timer_started (video_timer)) return;
   video_effect.type = VIDEO_NO_EFFECT;
   al_stop_timer (video_timer);
   clear_bitmap (screen, BLACK);

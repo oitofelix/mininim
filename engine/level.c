@@ -47,6 +47,7 @@
 #include "fight.h"
 #include "kid/kid-sword-hit.h"
 #include "samples.h"
+#include "cutscenes.h"
 #include "level.h"
 
 /* functions */
@@ -72,11 +73,11 @@ void
 play_level (struct level *lv)
 {
   char *text;
-  cutscene = false;
   vanilla_level = lv;
   death_timer = create_timer (1.0 / 12);
 
  start:
+  cutscene = false;
   level = *lv;
   register_cons ();
 
@@ -111,6 +112,15 @@ play_level (struct level *lv)
     destroy_cons ();
     if (level.next_level) level.next_level (level.number + 1);
     draw_bottom_text (NULL, NULL);
+    if (level.cutscene) {
+      cutscene_started = false;
+      cutscene = true;
+      stop_video_effect ();
+      stop_all_samples ();
+      play_anim (level.cutscene, NULL, 10);
+      stop_video_effect ();
+      stop_all_samples ();
+    }
     goto start;
   case RESTART_GAME:
     retry_level = -1;

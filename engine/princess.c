@@ -41,7 +41,7 @@ ALLEGRO_BITMAP *princess_normal_00,
   *princess_turn_04, *princess_turn_05, *princess_turn_06, *princess_turn_07,
   *princess_step_back_00, *princess_step_back_01, *princess_step_back_02,
   *princess_step_back_03, *princess_step_back_04, *princess_step_back_05,
-  *princess_look_down_00, *princess_look_down_01;
+  *princess_look_down_00, *princess_look_down_01, *princess_rest_00;
 
 void
 load_princess (void)
@@ -63,6 +63,7 @@ load_princess (void)
   princess_step_back_05 = load_bitmap (PRINCESS_STEP_BACK_05);
   princess_look_down_00 = load_bitmap (PRINCESS_LOOK_DOWN_00);
   princess_look_down_01 = load_bitmap (PRINCESS_LOOK_DOWN_01);
+  princess_rest_00 = load_bitmap (PRINCESS_REST_00);
 
   /* framesets */
   init_turn_frameset ();
@@ -90,6 +91,7 @@ unload_princess (void)
   al_destroy_bitmap (princess_step_back_05);
   al_destroy_bitmap (princess_look_down_00);
   al_destroy_bitmap (princess_look_down_01);
+  al_destroy_bitmap (princess_rest_00);
 }
 
 
@@ -204,6 +206,18 @@ princess_look_down (struct anim *princess)
   next_frame (&princess->f, &princess->f, &princess->fo);
 }
 
+void
+princess_rest (struct anim *princess)
+{
+  princess->oaction = princess->action;
+  princess->action = princess_rest;
+  princess->f.flip = (princess->f.dir == RIGHT) ? 0 : ALLEGRO_FLIP_HORIZONTAL;
+
+  princess->fo.b = princess_rest_00;
+  princess->fo.dx = princess->fo.dy = +0;
+
+  next_frame (&princess->f, &princess->f, &princess->fo);
+}
 
 
 

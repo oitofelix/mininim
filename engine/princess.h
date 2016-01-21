@@ -37,6 +37,7 @@
 #define PRINCESS_STEP_BACK_05 "data/princess/step-back/05.png"
 #define PRINCESS_LOOK_DOWN_00 "data/princess/look-down/00.png"
 #define PRINCESS_LOOK_DOWN_01 "data/princess/look-down/01.png"
+#define PRINCESS_REST_00 "data/princess/rest/00.png"
 
 /* functions */
 void load_princess (void);
@@ -45,6 +46,7 @@ void princess_normal (struct anim *princess);
 void princess_turn (struct anim *princess);
 void princess_step_back (struct anim *princess);
 void princess_look_down (struct anim *princess);
+void princess_rest (struct anim *princess);
 void draw_princess_frame (ALLEGRO_BITMAP *bitmap, struct anim *p,
                           enum vm vm);
 palette get_princess_palette (enum vm vm);
@@ -60,6 +62,6 @@ extern ALLEGRO_BITMAP *princess_normal_00,
   *princess_turn_04, *princess_turn_05, *princess_turn_06, *princess_turn_07,
   *princess_step_back_00, *princess_step_back_01, *princess_step_back_02,
   *princess_step_back_03, *princess_step_back_04, *princess_step_back_05,
-  *princess_look_down_00, *princess_look_down_01;
+  *princess_look_down_00, *princess_look_down_01, *princess_rest_00;
 
 #endif	/* MININIM_PRINCESS_H */

@@ -37,6 +37,7 @@
 #include "engine/mouse.h"
 #include "engine/fight.h"
 #include "engine/samples.h"
+#include "engine/cutscenes.h"
 #include "legacy-level.h"
 
 static struct level legacy_level;
@@ -801,6 +802,13 @@ load_legacy_level (int number)
   legacy_level.end = end;
   legacy_level.next_level = next_level;
   memcpy (&legacy_level.con[0], &room_0, sizeof (room_0));
+
+  /* CUTSCENES: ... */
+  switch (number) {
+  default: break;
+  case 1: legacy_level.cutscene = cutscene_01_anim; break;
+  case 3: legacy_level.cutscene = cutscene_03_anim; break;
+  }
 
   /* LINKS: ok */
   for (p.room = 1; p.room <= LROOMS; p.room++) {

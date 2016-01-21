@@ -61,7 +61,7 @@ main (int argc, char **argv)
  restart_game:
   clear_bitmap (screen, BLACK);
   clear_bitmap (uscreen, TRANSPARENT_COLOR);
-  title_started = false;
+  cutscene_started = false;
   stop_all_samples ();
   play_title ();
   stop_video_effect ();

@@ -47,7 +47,7 @@ static ALLEGRO_BITMAP *message_presents, *message_author,
   *message_game_name, *message_copyright,
   *text_in_the_absence, *text_marry_jaffar, *text_credits;
 
-bool title_started;
+bool cutscene_started;
 
 static int clock_type = -1;
 
@@ -159,8 +159,8 @@ title_anim (void)
   static int i;
   static ALLEGRO_SAMPLE_INSTANCE *si = NULL;
 
-  if (! title_started) {
-    i = 0; key.keyboard.keycode = 0; title_started = true;
+  if (! cutscene_started) {
+    i = 0; key.keyboard.keycode = 0; cutscene_started = true;
   }
 
   if (key.keyboard.keycode) {
@@ -429,6 +429,102 @@ draw_title_screen (ALLEGRO_BITMAP *bitmap, int i, enum vm vm)
   }
 
   /* printf ("step %i\n", i); */
+}
+
+void
+cutscene_01_anim (void)
+{
+  static int i;
+  static ALLEGRO_SAMPLE_INSTANCE *si = NULL;
+
+  if (! cutscene_started) {
+    i = 0; key.keyboard.keycode = 0; cutscene_started = true;
+  }
+
+  if (key.keyboard.keycode) {
+    quit_anim = true;
+    return;
+  }
+
+  switch (i) {
+  case 0:
+    princess.f.c.x = 126;
+    princess.f.c.y = 124;
+    princess.f.b = princess_normal_00;
+    princess.f.dir = RIGHT;
+    princess_normal (&princess);
+
+    jaffar.invisible = true;
+
+    clock_type = 2;
+
+    start_video_effect (VIDEO_FADE_IN, SECS_TO_VCYCLES (1));
+    si = play_sample (cutscene_01_03_05_11_sample, -1);
+    i++;
+    break;
+  case 1:
+    if (get_sample_position (si) >= 5.5
+        && ! is_video_effect_started ()) {
+      start_video_effect (VIDEO_FADE_OUT, SECS_TO_VCYCLES (1));
+      i++;
+    }
+    break;
+  case 2:
+    if (! is_playing_sample_instance (si)
+        && ! is_video_effect_started ()) quit_anim = true;
+    break;
+  }
+
+  if (i < 2 || is_video_effect_started ())
+    draw_princess_room (screen, vm);
+}
+
+void
+cutscene_03_anim (void)
+{
+  static int i;
+  static ALLEGRO_SAMPLE_INSTANCE *si = NULL;
+
+  if (! cutscene_started) {
+    i = 0; key.keyboard.keycode = 0; cutscene_started = true;
+  }
+
+  if (key.keyboard.keycode) {
+    quit_anim = true;
+    return;
+  }
+
+  switch (i) {
+  case 0:
+    princess.f.c.x = 77;
+    princess.f.c.y = 138;
+    princess.f.b = princess_rest_00;
+    princess.f.dir = RIGHT;
+    princess_rest (&princess);
+
+    jaffar.invisible = true;
+
+    clock_type = 2;
+
+    start_video_effect (VIDEO_FADE_IN, SECS_TO_VCYCLES (1));
+    si = play_sample (cutscene_01_03_05_11_sample, -1);
+    i++;
+    break;
+  case 1:
+    if (get_sample_position (si) >= 5.5
+        && ! is_video_effect_started ()) {
+      start_video_effect (VIDEO_FADE_OUT, SECS_TO_VCYCLES (1));
+      i++;
+    }
+    break;
+  case 2:
+    if (! is_playing_sample_instance (si)
+        && ! is_video_effect_started ()) quit_anim = true;
+    break;
+  }
+
+  if (i < 2 || is_video_effect_started ())
+    draw_princess_room (screen, vm);
 }
 
 static void

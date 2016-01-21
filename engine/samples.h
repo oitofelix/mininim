@@ -69,6 +69,7 @@
 #define VIZIER_AND_PRINCESS_SAMPLE "data/sample/vizier-and-princess.ogg"
 #define MARRY_JAFFAR_SAMPLE "data/sample/marry-jaffar.ogg"
 #define CREAKING_DOOR_SAMPLE "data/sample/creaking-door.ogg"
+#define CUTSCENE_01_03_05_11_SAMPLE "data/sample/cutscene-01-03-05-11.ogg"
 
 void load_samples (void);
 void unload_samples (void);
@@ -121,6 +122,7 @@ extern ALLEGRO_SAMPLE *step_sample,
   *princess_waiting_sample,
   *vizier_and_princess_sample,
   *marry_jaffar_sample,
-  *creaking_door_sample;
+  *creaking_door_sample,
+  *cutscene_01_03_05_11_sample;
 
 #endif	/* MININIM_SAMPLES_H */

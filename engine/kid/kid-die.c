@@ -172,6 +172,10 @@ kid_die_suddenly (struct anim *k)
 
   k->hit_by_loose_floor = false;
 
+  /* collision */
+  uncollide (&k->f, &k->fo, &k->fo, +0, false, &k->ci);
+  uncollide (&k->f, &k->fo, &k->fo, +0, true, &k->ci);
+
   /* fall */
   struct coord nc;
   struct pos np, pm;
@@ -228,6 +232,10 @@ flow (struct anim *k)
 static bool
 physics_in (struct anim *k)
 {
+  /* collision */
+  uncollide (&k->f, &k->fo, &k->fo, +0, false, &k->ci);
+  uncollide (&k->f, &k->fo, &k->fo, +0, true, &k->ci);
+
   /* fall */
   struct coord nc;
   struct pos np, pm;

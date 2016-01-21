@@ -68,7 +68,8 @@ ALLEGRO_SAMPLE *step_sample,
   *princess_waiting_sample,
   *vizier_and_princess_sample,
   *marry_jaffar_sample,
-  *creaking_door_sample;
+  *creaking_door_sample,
+  *cutscene_01_03_05_11_sample;
 
 void
 load_samples (void)
@@ -122,6 +123,7 @@ load_samples (void)
   vizier_and_princess_sample = load_sample (VIZIER_AND_PRINCESS_SAMPLE);
   marry_jaffar_sample = load_sample (MARRY_JAFFAR_SAMPLE);
   creaking_door_sample = load_sample (CREAKING_DOOR_SAMPLE);
+  cutscene_01_03_05_11_sample = load_sample (CUTSCENE_01_03_05_11_SAMPLE);
 }
 
 void
@@ -176,4 +178,5 @@ unload_samples (void)
   al_destroy_sample (vizier_and_princess_sample);
   al_destroy_sample (marry_jaffar_sample);
   al_destroy_sample (creaking_door_sample);
+  al_destroy_sample (cutscene_01_03_05_11_sample);
 }

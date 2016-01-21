@@ -534,6 +534,7 @@ struct level {
   void (*special_events) (void);
   void (*end) (struct pos *p);
   void (*next_level) (int);
+  void (*cutscene) (void);
   int number;
   int nominal_number;
 
