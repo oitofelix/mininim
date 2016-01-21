@@ -63,6 +63,13 @@ main (int argc, char **argv)
   clear_bitmap (uscreen, TRANSPARENT_COLOR);
   cutscene_started = false;
   stop_all_samples ();
+
+  /* begin test */
+  /* cutscene = true; */
+  /* play_anim (cutscene_08_anim, NULL, 10); */
+  /* exit (0); */
+  /* end test */
+
   play_title ();
   stop_video_effect ();
   if (quit_anim == QUIT_GAME) goto quit_game;

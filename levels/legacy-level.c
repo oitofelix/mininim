@@ -282,7 +282,7 @@ special_events (void)
   struct anim *k = get_anim_by_id (current_kid_id);
 
   /* in the first animation cycle */
-  if (anim_cycle == 0) {
+  if (anim_cycle == 0 || anim_cycle == 1) {
     /* close any level door in the starting room */
     struct pos p;
     p.room = k->f.c.room;
@@ -290,8 +290,8 @@ special_events (void)
       for (p.place = -1; p.place < PLACES; p.place++)
         if (con (&p)->fg == LEVEL_DOOR) {
           struct level_door *ld = level_door_at_pos (&p);
-          ld->i = 0;
-          ld->action = CLOSE_LEVEL_DOOR;
+          if (anim_cycle == 0) ld->i = 0;
+          if (anim_cycle == 1) ld->action = CLOSE_LEVEL_DOOR;
         }
   }
 
@@ -806,8 +806,12 @@ load_legacy_level (int number)
   /* CUTSCENES: ... */
   switch (number) {
   default: break;
-  case 1: legacy_level.cutscene = cutscene_01_anim; break;
+  case 1: legacy_level.cutscene = cutscene_01_05_11_anim; break;
   case 3: legacy_level.cutscene = cutscene_03_anim; break;
+  case 5: legacy_level.cutscene = cutscene_01_05_11_anim; break;
+  case 7: legacy_level.cutscene = cutscene_07_anim; break;
+  case 8: legacy_level.cutscene = cutscene_08_anim; break;
+  case 11: legacy_level.cutscene = cutscene_01_05_11_anim; break;
   }
 
   /* LINKS: ok */

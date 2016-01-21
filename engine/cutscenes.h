@@ -51,8 +51,10 @@
 void load_cutscenes (void);
 void unload_cutscenes (void);
 void play_title (void);
-void cutscene_01_anim (void);
+void cutscene_01_05_11_anim (void);
 void cutscene_03_anim (void);
+void cutscene_07_anim (void);
+void cutscene_08_anim (void);
 
 /* variables */
 extern bool cutscene_started;

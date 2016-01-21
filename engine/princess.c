@@ -26,14 +26,20 @@ struct anim princess;
 #define TURN_FRAMESET_NMEMB 8
 #define STEP_BACK_FRAMESET_NMEMB 6
 #define LOOK_DOWN_FRAMESET_NMEMB 2
+#define COUCH_FRAMESET_NMEMB 11
+#define STROKE_FRAMESET_NMEMB 3
 
 static struct frameset turn_frameset[TURN_FRAMESET_NMEMB];
 static struct frameset step_back_frameset[STEP_BACK_FRAMESET_NMEMB];
 static struct frameset look_down_frameset[LOOK_DOWN_FRAMESET_NMEMB];
+static struct frameset couch_frameset[COUCH_FRAMESET_NMEMB];
+static struct frameset stroke_frameset[STROKE_FRAMESET_NMEMB];
 
 static void init_turn_frameset (void);
 static void init_step_back_frameset (void);
 static void init_look_down_frameset (void);
+static void init_couch_frameset (void);
+static void init_stroke_frameset (void);
 
 /* variables */
 ALLEGRO_BITMAP *princess_normal_00,
@@ -41,7 +47,12 @@ ALLEGRO_BITMAP *princess_normal_00,
   *princess_turn_04, *princess_turn_05, *princess_turn_06, *princess_turn_07,
   *princess_step_back_00, *princess_step_back_01, *princess_step_back_02,
   *princess_step_back_03, *princess_step_back_04, *princess_step_back_05,
-  *princess_look_down_00, *princess_look_down_01, *princess_rest_00;
+  *princess_look_down_00, *princess_look_down_01, *princess_rest_00,
+  *princess_couch_00, *princess_couch_01, *princess_couch_02,
+  *princess_couch_03, *princess_couch_04, *princess_couch_05,
+  *princess_couch_06, *princess_couch_07, *princess_couch_08,
+  *princess_couch_09, *princess_couch_10,
+  *princess_stroke_00, *princess_stroke_01, *princess_stroke_02;
 
 void
 load_princess (void)
@@ -64,11 +75,27 @@ load_princess (void)
   princess_look_down_00 = load_bitmap (PRINCESS_LOOK_DOWN_00);
   princess_look_down_01 = load_bitmap (PRINCESS_LOOK_DOWN_01);
   princess_rest_00 = load_bitmap (PRINCESS_REST_00);
+  princess_couch_00 = load_bitmap (PRINCESS_COUCH_00);
+  princess_couch_01 = load_bitmap (PRINCESS_COUCH_01);
+  princess_couch_02 = load_bitmap (PRINCESS_COUCH_02);
+  princess_couch_03 = load_bitmap (PRINCESS_COUCH_03);
+  princess_couch_04 = load_bitmap (PRINCESS_COUCH_04);
+  princess_couch_05 = load_bitmap (PRINCESS_COUCH_05);
+  princess_couch_06 = load_bitmap (PRINCESS_COUCH_06);
+  princess_couch_07 = load_bitmap (PRINCESS_COUCH_07);
+  princess_couch_08 = load_bitmap (PRINCESS_COUCH_08);
+  princess_couch_09 = load_bitmap (PRINCESS_COUCH_09);
+  princess_couch_10 = load_bitmap (PRINCESS_COUCH_10);
+  princess_stroke_00 = load_bitmap (PRINCESS_STROKE_00);
+  princess_stroke_01 = load_bitmap (PRINCESS_STROKE_01);
+  princess_stroke_02 = load_bitmap (PRINCESS_STROKE_02);
 
   /* framesets */
   init_turn_frameset ();
   init_step_back_frameset ();
   init_look_down_frameset ();
+  init_couch_frameset ();
+  init_stroke_frameset ();
 }
 
 void
@@ -92,6 +119,20 @@ unload_princess (void)
   al_destroy_bitmap (princess_look_down_00);
   al_destroy_bitmap (princess_look_down_01);
   al_destroy_bitmap (princess_rest_00);
+  al_destroy_bitmap (princess_couch_00);
+  al_destroy_bitmap (princess_couch_01);
+  al_destroy_bitmap (princess_couch_02);
+  al_destroy_bitmap (princess_couch_03);
+  al_destroy_bitmap (princess_couch_04);
+  al_destroy_bitmap (princess_couch_05);
+  al_destroy_bitmap (princess_couch_06);
+  al_destroy_bitmap (princess_couch_07);
+  al_destroy_bitmap (princess_couch_08);
+  al_destroy_bitmap (princess_couch_09);
+  al_destroy_bitmap (princess_couch_10);
+  al_destroy_bitmap (princess_stroke_00);
+  al_destroy_bitmap (princess_stroke_01);
+  al_destroy_bitmap (princess_stroke_02);
 }
 
 
@@ -130,6 +171,30 @@ init_look_down_frameset (void)
           LOOK_DOWN_FRAMESET_NMEMB * sizeof (struct frameset));
 }
 
+void
+init_couch_frameset (void)
+{
+  struct frameset frameset[COUCH_FRAMESET_NMEMB] =
+    {{princess_couch_00,+0,0},{princess_couch_01,-3,0},{princess_couch_02,+0,0},
+     {princess_couch_03,+0,0},{princess_couch_04,-2,0},{princess_couch_05,+1,0},
+     {princess_couch_06,+0,0},{princess_couch_07,+0,0},{princess_couch_08,+0,0},
+     {princess_couch_09,-2,0},{princess_couch_10,+4,0}};
+
+  memcpy (&couch_frameset, &frameset,
+          COUCH_FRAMESET_NMEMB * sizeof (struct frameset));
+}
+
+void
+init_stroke_frameset (void)
+{
+  struct frameset frameset[STROKE_FRAMESET_NMEMB] =
+    {{princess_stroke_00,+0,0},{princess_stroke_01,-2,0},
+     {princess_stroke_02,-3,0}};
+
+  memcpy (&stroke_frameset, &frameset,
+          STROKE_FRAMESET_NMEMB * sizeof (struct frameset));
+}
+
 
 
 void
@@ -141,6 +206,8 @@ princess_normal (struct anim *princess)
 
   princess->fo.b = princess_normal_00;
   princess->fo.dx = princess->fo.dy = +0;
+
+  if (princess->oaction == princess_uncouch) princess->fo.dx = -1;
 
   next_frame (&princess->f, &princess->f, &princess->fo);
 }
@@ -215,6 +282,85 @@ princess_rest (struct anim *princess)
 
   princess->fo.b = princess_rest_00;
   princess->fo.dx = princess->fo.dy = +0;
+
+  next_frame (&princess->f, &princess->f, &princess->fo);
+}
+
+void
+princess_couch (struct anim *princess)
+{
+  princess->oaction = princess->action;
+  princess->action = princess_couch;
+  princess->f.flip = (princess->f.dir == RIGHT) ? 0 : ALLEGRO_FLIP_HORIZONTAL;
+
+  if (princess->oaction != princess_couch) {
+    princess->i = -1;
+    princess->j = 0;
+  }
+
+  if (princess->i == 10) princess->j = 1;
+  if (princess->i < 10) princess->i++;
+
+  select_frame (princess, couch_frameset, princess->i);
+
+  if (princess->j) princess->fo.dx = 0;
+
+  next_frame (&princess->f, &princess->f, &princess->fo);
+}
+
+void
+princess_uncouch (struct anim *princess)
+{
+  princess->oaction = princess->action;
+  princess->action = princess_uncouch;
+  princess->f.flip = (princess->f.dir == RIGHT) ? 0 : ALLEGRO_FLIP_HORIZONTAL;
+
+  if (princess->oaction != princess_uncouch) princess->i = 10;
+
+  if (princess->i == 0) {
+    princess_normal (princess);
+    return;
+  }
+
+  princess->fo.b = couch_frameset[--princess->i].frame;
+  princess->fo.dx = -couch_frameset[princess->i + 1].dx;
+  princess->fo.dy = -couch_frameset[princess->i + 1].dy;
+
+  next_frame (&princess->f, &princess->f, &princess->fo);
+}
+
+void
+princess_stroke (struct anim *princess)
+{
+  princess->oaction = princess->action;
+  princess->action = princess_stroke;
+  princess->f.flip = (princess->f.dir == RIGHT) ? 0 : ALLEGRO_FLIP_HORIZONTAL;
+
+  if (princess->oaction != princess_stroke) {
+    princess->i = -1;
+    princess->reverse = false;
+    princess->wait = 0;
+  }
+
+  if (princess->wait++ % 3) return;
+
+  if (princess->i == 2
+      && ! princess->reverse)
+    princess->reverse = true;
+
+  if (princess->i == 0
+      && princess->reverse)
+    princess->reverse = false;
+
+  if (princess->reverse) {
+    princess->i--;
+    princess->fo.b = stroke_frameset[princess->i].frame;
+    princess->fo.dx = -stroke_frameset[princess->i + 1].dx;
+    princess->fo.dy = -stroke_frameset[princess->i + 1].dy;
+  } else {
+    princess->i++;
+    select_frame (princess, stroke_frameset, princess->i);
+  }
 
   next_frame (&princess->f, &princess->f, &princess->fo);
 }

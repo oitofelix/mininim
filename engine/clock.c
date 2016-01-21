@@ -204,5 +204,12 @@ draw_clock (ALLEGRO_BITMAP *bitmap, int i, enum vm vm)
   }
 
   draw_bitmap (clock, bitmap, 153, 141, 0);
-  draw_bitmap (clock_sand, bitmap, 162, 157, 0);
+  if (i < 6) draw_bitmap (clock_sand, bitmap, 162, 157, 0);
+}
+
+int
+get_clock_by_time_left (void)
+{
+  float f = al_get_timer_count (play_time) / 60.0;
+  return f * 6;
 }

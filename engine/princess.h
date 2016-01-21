@@ -38,6 +38,20 @@
 #define PRINCESS_LOOK_DOWN_00 "data/princess/look-down/00.png"
 #define PRINCESS_LOOK_DOWN_01 "data/princess/look-down/01.png"
 #define PRINCESS_REST_00 "data/princess/rest/00.png"
+#define PRINCESS_COUCH_00 "data/princess/couch/00.png"
+#define PRINCESS_COUCH_01 "data/princess/couch/01.png"
+#define PRINCESS_COUCH_02 "data/princess/couch/02.png"
+#define PRINCESS_COUCH_03 "data/princess/couch/03.png"
+#define PRINCESS_COUCH_04 "data/princess/couch/04.png"
+#define PRINCESS_COUCH_05 "data/princess/couch/05.png"
+#define PRINCESS_COUCH_06 "data/princess/couch/06.png"
+#define PRINCESS_COUCH_07 "data/princess/couch/07.png"
+#define PRINCESS_COUCH_08 "data/princess/couch/08.png"
+#define PRINCESS_COUCH_09 "data/princess/couch/09.png"
+#define PRINCESS_COUCH_10 "data/princess/couch/10.png"
+#define PRINCESS_STROKE_00 "data/princess/stroke/00.png"
+#define PRINCESS_STROKE_01 "data/princess/stroke/01.png"
+#define PRINCESS_STROKE_02 "data/princess/stroke/02.png"
 
 /* functions */
 void load_princess (void);
@@ -47,6 +61,9 @@ void princess_turn (struct anim *princess);
 void princess_step_back (struct anim *princess);
 void princess_look_down (struct anim *princess);
 void princess_rest (struct anim *princess);
+void princess_couch (struct anim *princess);
+void princess_uncouch (struct anim *princess);
+void princess_stroke (struct anim *princess);
 void draw_princess_frame (ALLEGRO_BITMAP *bitmap, struct anim *p,
                           enum vm vm);
 palette get_princess_palette (enum vm vm);
@@ -62,6 +79,11 @@ extern ALLEGRO_BITMAP *princess_normal_00,
   *princess_turn_04, *princess_turn_05, *princess_turn_06, *princess_turn_07,
   *princess_step_back_00, *princess_step_back_01, *princess_step_back_02,
   *princess_step_back_03, *princess_step_back_04, *princess_step_back_05,
-  *princess_look_down_00, *princess_look_down_01, *princess_rest_00;
+  *princess_look_down_00, *princess_look_down_01, *princess_rest_00,
+  *princess_couch_00, *princess_couch_01, *princess_couch_02,
+  *princess_couch_03, *princess_couch_04, *princess_couch_05,
+  *princess_couch_06, *princess_couch_07, *princess_couch_08,
+  *princess_couch_09, *princess_couch_10,
+  *princess_stroke_00, *princess_stroke_01, *princess_stroke_02;
 
 #endif	/* MININIM_PRINCESS_H */

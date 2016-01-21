@@ -27,6 +27,7 @@
 #include "engine/fire.h"
 #include "engine/princess.h"
 #include "engine/jaffar.h"
+#include "engine/mouse.h"
 #include "engine/clock.h"
 #include "engine/samples.h"
 #include "cutscenes.h"
@@ -50,6 +51,8 @@ static ALLEGRO_BITMAP *message_presents, *message_author,
 bool cutscene_started;
 
 static int clock_type = -1;
+
+struct anim mouse;
 
 void
 load_cutscenes (void)
@@ -217,14 +220,18 @@ title_anim (void)
       princess.f.c.y = 124;
       princess.f.b = princess_normal_00;
       princess.f.dir = LEFT;
+      princess.f.flip = 0;
       princess_normal (&princess);
 
       jaffar.f.c.x = 321;
       jaffar.f.c.y = 119;
       jaffar.f.b = jaffar_normal_00;
       jaffar.f.dir = LEFT;
+      jaffar.f.flip = 0;
       jaffar.style = 0;
       jaffar_normal (&jaffar);
+
+      mouse.invisible = true;
 
       clock_type = -1;
 
@@ -432,7 +439,7 @@ draw_title_screen (ALLEGRO_BITMAP *bitmap, int i, enum vm vm)
 }
 
 void
-cutscene_01_anim (void)
+cutscene_01_05_11_anim (void)
 {
   static int i;
   static ALLEGRO_SAMPLE_INSTANCE *si = NULL;
@@ -452,11 +459,13 @@ cutscene_01_anim (void)
     princess.f.c.y = 124;
     princess.f.b = princess_normal_00;
     princess.f.dir = RIGHT;
+    princess.f.flip = ALLEGRO_FLIP_HORIZONTAL;
     princess_normal (&princess);
 
     jaffar.invisible = true;
+    mouse.invisible = true;
 
-    clock_type = 2;
+    clock_type = get_clock_by_time_left ();
 
     start_video_effect (VIDEO_FADE_IN, SECS_TO_VCYCLES (1));
     si = play_sample (cutscene_01_03_05_11_sample, -1);
@@ -500,11 +509,13 @@ cutscene_03_anim (void)
     princess.f.c.y = 138;
     princess.f.b = princess_rest_00;
     princess.f.dir = RIGHT;
+    princess.f.flip = 0;
     princess_rest (&princess);
 
     jaffar.invisible = true;
+    mouse.invisible = true;
 
-    clock_type = 2;
+    clock_type = get_clock_by_time_left ();
 
     start_video_effect (VIDEO_FADE_IN, SECS_TO_VCYCLES (1));
     si = play_sample (cutscene_01_03_05_11_sample, -1);
@@ -525,6 +536,160 @@ cutscene_03_anim (void)
 
   if (i < 2 || is_video_effect_started ())
     draw_princess_room (screen, vm);
+}
+
+void
+cutscene_07_anim (void)
+{
+  static int i;
+  static ALLEGRO_SAMPLE_INSTANCE *si = NULL;
+
+  if (! cutscene_started) {
+    i = 0; key.keyboard.keycode = 0; cutscene_started = true;
+  }
+
+  if (key.keyboard.keycode) {
+    quit_anim = true;
+    return;
+  }
+
+  switch (i) {
+  case 0:
+    princess.f.c.x = 170;
+    princess.f.c.y = 147;
+    princess.f.b = princess_couch_10;
+    princess.f.dir = RIGHT;
+    princess.f.flip = 0;
+    princess.action = princess_couch;
+
+    jaffar.invisible = true;
+
+    mouse.f.c.x = 196;
+    mouse.f.c.y = 164;
+    mouse.f.b = mouse_run_00;
+    mouse.f.dir = LEFT;
+    mouse.f.flip = 0;
+    mouse.action = mouse_run;
+    mouse.invisible = false;
+
+    clock_type = get_clock_by_time_left ();
+
+    start_video_effect (VIDEO_FADE_IN, SECS_TO_VCYCLES (1));
+    si = play_sample (cutscene_07_08_sample, -1);
+    i++;
+    break;
+  case 1:
+    if (get_sample_position (si) >= 3.5) {
+      mouse_normal (&mouse);
+      i++;
+    }
+    break;
+  case 2:
+    mouse.action (&mouse);
+    if (get_sample_position (si) >= 5.5) {
+      princess_uncouch (&princess);
+      i++;
+    }
+    break;
+  case 3:
+    mouse.action (&mouse);
+    princess.action (&princess);
+    if (get_sample_position (si) >= 7.5
+        && ! is_video_effect_started ()) {
+      start_video_effect (VIDEO_FADE_OUT, SECS_TO_VCYCLES (1));
+      i++;
+    }
+    break;
+  case 4:
+    if (! is_playing_sample_instance (si)
+        && ! is_video_effect_started ()) quit_anim = true;
+    break;
+  }
+
+  if (i < 4 || is_video_effect_started ())
+    draw_princess_room (screen, vm);
+}
+
+void
+cutscene_08_anim (void)
+{
+  static int i;
+  static ALLEGRO_SAMPLE_INSTANCE *si = NULL;
+
+  if (! cutscene_started) {
+    i = 0; key.keyboard.keycode = 0; cutscene_started = true;
+  }
+
+  if (key.keyboard.keycode) {
+    quit_anim = true;
+    return;
+  }
+
+  switch (i) {
+  case 0:
+    princess.f.c.x = 178;
+    princess.f.c.y = 127;
+    princess.f.b = princess_normal_00;
+    princess.f.dir = RIGHT;
+    princess.f.flip = ALLEGRO_FLIP_HORIZONTAL;
+    princess.action = princess_normal;
+
+    jaffar.invisible = true;
+
+    mouse.f.c.x = 320;
+    mouse.f.c.y = 160;
+    mouse.f.b = mouse_normal_00;
+    mouse.f.dir = RIGHT;
+    mouse.f.flip = ALLEGRO_FLIP_HORIZONTAL;
+    mouse.action = mouse_normal;
+    mouse.invisible = false;
+
+    clock_type = get_clock_by_time_left ();
+
+    start_video_effect (VIDEO_FADE_IN, SECS_TO_VCYCLES (1));
+    si = play_sample (cutscene_07_08_sample, -1);
+    i++;
+    break;
+  case 1:
+    if (get_sample_position (si) >= 1) i++;
+    break;
+  case 2:
+    mouse.action (&mouse);
+    if (get_sample_position (si) >= 2.5) {
+      princess_couch (&princess);
+      i++;
+    }
+    break;
+  case 3:
+    if (mouse.f.c.x >= 204) mouse.action (&mouse);
+    else if (princess.j) {
+      mouse_normal (&mouse);
+      mouse.f.c.x = 199;
+      mouse.f.c.y = 160;
+      princess_stroke (&princess);
+      i++;
+    }
+    princess.action (&princess);
+    break;
+  case 4:
+    princess.action (&princess);
+    if (get_sample_position (si) >= 7.5
+        && ! is_video_effect_started ()) {
+      start_video_effect (VIDEO_FADE_OUT, SECS_TO_VCYCLES (1));
+      i++;
+    }
+    break;
+  case 5:
+    princess.action (&princess);
+    if (! is_playing_sample_instance (si)
+        && ! is_video_effect_started ()) quit_anim = true;
+    break;
+  }
+
+  if (i < 5 || is_video_effect_started ())
+    draw_princess_room (screen, vm);
+
+  /* printf ("step %i, sample pos %f\n", i, get_sample_position (si)); */
 }
 
 static void
@@ -559,6 +724,7 @@ draw_princess_room (ALLEGRO_BITMAP *bitmap, enum vm vm)
   draw_princess_room_fire (bitmap, vm);
   draw_princess_frame (bitmap, &princess, vm);
   draw_jaffar_frame (bitmap, &jaffar, vm);
+  draw_mouse_frame (bitmap, &mouse, vm);
   draw_clock (bitmap, clock_type, vm);
   draw_bitmap (princess_room_pillar, bitmap, 245, 120, 0);
 }
