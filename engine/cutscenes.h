@@ -56,6 +56,8 @@ void cutscene_01_05_11_anim (void);
 void cutscene_03_anim (void);
 void cutscene_07_anim (void);
 void cutscene_08_anim (void);
+void cutscene_11_little_time_left_anim (void);
+void cutscene_11_anim (void);
 void cutscene_14_anim (void);
 
 /* variables */

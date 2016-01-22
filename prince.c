@@ -65,8 +65,9 @@ main (int argc, char **argv)
   stop_all_samples ();
 
   /* begin test */
+  /* if (! play_time) play_time = create_timer (60.0); */
   /* cutscene = true; */
-  /* play_anim (cutscene_14_anim, NULL, 10); */
+  /* play_anim (cutscene_11_little_time_left_anim, NULL, 10); */
   /* exit (0); */
   /* end test */
 

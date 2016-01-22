@@ -824,7 +824,7 @@ load_legacy_level (int number)
   case 5: legacy_level.cutscene = cutscene_01_05_11_anim; break;
   case 7: legacy_level.cutscene = cutscene_07_anim; break;
   case 8: legacy_level.cutscene = cutscene_08_anim; break;
-  case 11: legacy_level.cutscene = cutscene_01_05_11_anim; break;
+  case 11: legacy_level.cutscene = cutscene_11_anim; break;
   case 14: legacy_level.cutscene = cutscene_14_anim; break;
   }
 

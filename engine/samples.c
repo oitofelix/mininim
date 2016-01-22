@@ -72,7 +72,8 @@ ALLEGRO_SAMPLE *step_sample,
   *cutscene_01_03_05_11_sample,
   *cutscene_07_08_sample,
   *cutscene_14_sample,
-  *happy_end_sample;
+  *happy_end_sample,
+  *cutscene_11_little_time_left_sample;
 
 void
 load_samples (void)
@@ -130,6 +131,7 @@ load_samples (void)
   cutscene_07_08_sample = load_sample (CUTSCENE_07_08_SAMPLE);
   cutscene_14_sample = load_sample (CUTSCENE_14_SAMPLE);
   happy_end_sample = load_sample (HAPPY_END_SAMPLE);
+  cutscene_11_little_time_left_sample = load_sample (CUTSCENE_11_LITTLE_TIME_LEFT_SAMPLE);
 }
 
 void
@@ -188,4 +190,5 @@ unload_samples (void)
   al_destroy_sample (cutscene_07_08_sample);
   al_destroy_sample (cutscene_14_sample);
   al_destroy_sample (happy_end_sample);
+  al_destroy_sample (cutscene_11_little_time_left_sample);
 }
