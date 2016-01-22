@@ -22,14 +22,15 @@
 #include "kernel/video.h"
 #include "kernel/audio.h"
 #include "kernel/keyboard.h"
-#include "engine/anim.h"
-#include "engine/stars.h"
-#include "engine/fire.h"
-#include "engine/princess.h"
-#include "engine/jaffar.h"
-#include "engine/mouse.h"
-#include "engine/clock.h"
-#include "engine/samples.h"
+#include "anim.h"
+#include "stars.h"
+#include "fire.h"
+#include "princess.h"
+#include "jaffar.h"
+#include "mouse.h"
+#include "clock.h"
+#include "samples.h"
+#include "kid/kid.h"
 #include "cutscenes.h"
 
 /* functions */
@@ -52,7 +53,7 @@ bool cutscene_started;
 
 static int clock_type = -1;
 
-struct anim mouse;
+struct anim mouse, kid;
 
 void
 load_cutscenes (void)
@@ -232,6 +233,7 @@ title_anim (void)
       jaffar_normal (&jaffar);
 
       mouse.invisible = true;
+      kid.invisible = true;
 
       clock_type = -1;
 
@@ -464,6 +466,7 @@ cutscene_01_05_11_anim (void)
 
     jaffar.invisible = true;
     mouse.invisible = true;
+    kid.invisible = true;
 
     clock_type = get_clock_by_time_left ();
 
@@ -514,6 +517,7 @@ cutscene_03_anim (void)
 
     jaffar.invisible = true;
     mouse.invisible = true;
+    kid.invisible = true;
 
     clock_type = get_clock_by_time_left ();
 
@@ -571,6 +575,8 @@ cutscene_07_anim (void)
     mouse.f.flip = 0;
     mouse.action = mouse_run;
     mouse.invisible = false;
+
+    kid.invisible = true;
 
     clock_type = get_clock_by_time_left ();
 
@@ -644,6 +650,8 @@ cutscene_08_anim (void)
     mouse.action = mouse_normal;
     mouse.invisible = false;
 
+    kid.invisible = true;
+
     clock_type = get_clock_by_time_left ();
 
     start_video_effect (VIDEO_FADE_IN, SECS_TO_VCYCLES (1));
@@ -688,8 +696,99 @@ cutscene_08_anim (void)
 
   if (i < 5 || is_video_effect_started ())
     draw_princess_room (screen, vm);
+}
 
-  /* printf ("step %i, sample pos %f\n", i, get_sample_position (si)); */
+void
+cutscene_14_anim (void)
+{
+  static int i;
+  static ALLEGRO_SAMPLE_INSTANCE *si = NULL;
+
+  if (! cutscene_started) {
+    i = 0; key.keyboard.keycode = 0; cutscene_started = true;
+  }
+
+  if (key.keyboard.keycode && i > 5) {
+    quit_anim = true;
+    return;
+  }
+
+  switch (i) {
+  case 0:
+    princess.f.c.x = 164;
+    princess.f.c.y = 129;
+    princess.f.b = princess_turn_embrace_00;
+    princess.f.dir = LEFT;
+    princess.f.flip = 0;
+    princess.i = 0;
+    princess.action = princess_turn_embrace;
+
+    jaffar.invisible = true;
+
+    mouse.f.c.x = 320;
+    mouse.f.c.y = 160;
+    mouse.f.b = mouse_normal_00;
+    mouse.f.dir = RIGHT;
+    mouse.f.flip = ALLEGRO_FLIP_HORIZONTAL;
+    mouse.action = mouse_normal;
+    mouse.invisible = false;
+
+    kid.f.c.x = 316;
+    kid.f.c.y = 129;
+    kid.f.b = kid_start_run_frameset[5].frame;
+    kid.f.dir = LEFT;
+    kid.f.flip = 0;
+    kid.action = kid_start_run;
+    kid.invisible = false;
+    kid.key.left = true;
+    kid.current_lives = kid.total_lives = 3;
+    kid_run (&kid);
+
+    clock_type = -1;
+
+    start_video_effect (VIDEO_FADE_IN, SECS_TO_VCYCLES (1));
+    si = play_sample (cutscene_14_sample, -1);
+    i++;
+    break;
+  case 1:
+    kid.action (&kid);
+    if (get_sample_position (si) >= 1) {
+      kid.key.left = false;
+      i++;
+    }
+    break;
+  case 2:
+    princess.action (&princess);
+    if (princess.i < 8) kid.action (&kid);
+    else kid.invisible = true;
+    if (princess.i == 13) i++;
+    break;
+  case 3:
+    if (mouse.f.c.x >= 228) mouse.action (&mouse);
+    else {
+      mouse_normal (&mouse);
+      mouse.f.c.x = 224;
+      mouse.f.c.y = 160;
+      i++;
+    }
+    break;
+  case 4:
+    princess.action (&princess);
+    if (get_sample_position (si) >= 10
+        && ! is_video_effect_started ()) {
+      start_video_effect (VIDEO_FADE_OUT, SECS_TO_VCYCLES (1));
+      i++;
+    }
+    break;
+  case 5:
+    princess.action (&princess);
+    if (! is_playing_sample_instance (si)
+        && ! is_video_effect_started ()) quit_anim = true;
+    break;
+  }
+
+  if (i < 5 || is_video_effect_started ())
+    draw_princess_room (screen, vm);
 }
 
 static void
@@ -725,6 +824,7 @@ draw_princess_room (ALLEGRO_BITMAP *bitmap, enum vm vm)
   draw_princess_frame (bitmap, &princess, vm);
   draw_jaffar_frame (bitmap, &jaffar, vm);
   draw_mouse_frame (bitmap, &mouse, vm);
+  draw_kid_frame (bitmap, &kid, vm);
   draw_clock (bitmap, clock_type, vm);
   draw_bitmap (princess_room_pillar, bitmap, 245, 120, 0);
 }

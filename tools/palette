@@ -1,13 +1,6 @@
 #!/bin/bash
 
 for f in *.png; do convert $f \
--fill 'rgb(160,80,0)' -opaque 'rgb(252,156,128)' \
--fill 'rgb(160,0,160)' -opaque 'rgb(220,132,112)' \
--fill 'rgb(80,248,255)' -opaque 'rgb(252,172,144)' \
--fill 'rgb(0,0,160)' -opaque 'rgb(252,56,252)' \
--fill 'rgb(0,167,0)' -opaque 'rgb(208,48,208)' \
--fill 'rgb(80,80,255)' -opaque 'rgb(252,216,252)' \
--fill 'rgb(0,167,160)' -opaque 'rgb(144,92,0)' \
--fill 'rgb(255,248,80)' -opaque 'rgb(112,72,0)' \
--fill 'rgb(160,0,0)' -opaque 'rgb(112,64,0)' \
+-fill 'rgb(252,252,216)' -opaque 'rgb(252,232,216)' \
+-fill 'rgb(216,184,160)' -opaque 'rgb(200,184,152)' \
 $f; done

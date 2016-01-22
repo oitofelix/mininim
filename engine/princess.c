@@ -19,6 +19,7 @@
 
 #include "kernel/video.h"
 #include "anim.h"
+#include "kid/kid.h"
 #include "princess.h"
 
 struct anim princess;
@@ -28,18 +29,21 @@ struct anim princess;
 #define LOOK_DOWN_FRAMESET_NMEMB 2
 #define COUCH_FRAMESET_NMEMB 11
 #define STROKE_FRAMESET_NMEMB 3
+#define TURN_EMBRACE_FRAMESET_NMEMB 14
 
 static struct frameset turn_frameset[TURN_FRAMESET_NMEMB];
 static struct frameset step_back_frameset[STEP_BACK_FRAMESET_NMEMB];
 static struct frameset look_down_frameset[LOOK_DOWN_FRAMESET_NMEMB];
 static struct frameset couch_frameset[COUCH_FRAMESET_NMEMB];
 static struct frameset stroke_frameset[STROKE_FRAMESET_NMEMB];
+static struct frameset turn_embrace_frameset[TURN_EMBRACE_FRAMESET_NMEMB];
 
 static void init_turn_frameset (void);
 static void init_step_back_frameset (void);
 static void init_look_down_frameset (void);
 static void init_couch_frameset (void);
 static void init_stroke_frameset (void);
+static void init_turn_embrace_frameset (void);
 
 /* variables */
 ALLEGRO_BITMAP *princess_normal_00,
@@ -52,7 +56,12 @@ ALLEGRO_BITMAP *princess_normal_00,
   *princess_couch_03, *princess_couch_04, *princess_couch_05,
   *princess_couch_06, *princess_couch_07, *princess_couch_08,
   *princess_couch_09, *princess_couch_10,
-  *princess_stroke_00, *princess_stroke_01, *princess_stroke_02;
+  *princess_stroke_00, *princess_stroke_01, *princess_stroke_02,
+  *princess_turn_embrace_00, *princess_turn_embrace_01, *princess_turn_embrace_02,
+  *princess_turn_embrace_03, *princess_turn_embrace_04, *princess_turn_embrace_05,
+  *princess_turn_embrace_06, *princess_turn_embrace_07, *princess_turn_embrace_08,
+  *princess_turn_embrace_09, *princess_turn_embrace_10, *princess_turn_embrace_11,
+  *princess_turn_embrace_12, *princess_turn_embrace_13;
 
 void
 load_princess (void)
@@ -89,6 +98,20 @@ load_princess (void)
   princess_stroke_00 = load_bitmap (PRINCESS_STROKE_00);
   princess_stroke_01 = load_bitmap (PRINCESS_STROKE_01);
   princess_stroke_02 = load_bitmap (PRINCESS_STROKE_02);
+  princess_turn_embrace_00 = load_bitmap (PRINCESS_TURN_EMBRACE_00);
+  princess_turn_embrace_01 = load_bitmap (PRINCESS_TURN_EMBRACE_01);
+  princess_turn_embrace_02 = load_bitmap (PRINCESS_TURN_EMBRACE_02);
+  princess_turn_embrace_03 = load_bitmap (PRINCESS_TURN_EMBRACE_03);
+  princess_turn_embrace_04 = load_bitmap (PRINCESS_TURN_EMBRACE_04);
+  princess_turn_embrace_05 = load_bitmap (PRINCESS_TURN_EMBRACE_05);
+  princess_turn_embrace_06 = load_bitmap (PRINCESS_TURN_EMBRACE_06);
+  princess_turn_embrace_07 = load_bitmap (PRINCESS_TURN_EMBRACE_07);
+  princess_turn_embrace_08 = load_bitmap (PRINCESS_TURN_EMBRACE_08);
+  princess_turn_embrace_09 = load_bitmap (PRINCESS_TURN_EMBRACE_09);
+  princess_turn_embrace_10 = load_bitmap (PRINCESS_TURN_EMBRACE_10);
+  princess_turn_embrace_11 = load_bitmap (PRINCESS_TURN_EMBRACE_11);
+  princess_turn_embrace_12 = load_bitmap (PRINCESS_TURN_EMBRACE_12);
+  princess_turn_embrace_13 = load_bitmap (PRINCESS_TURN_EMBRACE_13);
 
   /* framesets */
   init_turn_frameset ();
@@ -96,6 +119,7 @@ load_princess (void)
   init_look_down_frameset ();
   init_couch_frameset ();
   init_stroke_frameset ();
+  init_turn_embrace_frameset ();
 }
 
 void
@@ -133,6 +157,20 @@ unload_princess (void)
   al_destroy_bitmap (princess_stroke_00);
   al_destroy_bitmap (princess_stroke_01);
   al_destroy_bitmap (princess_stroke_02);
+  al_destroy_bitmap (princess_turn_embrace_00);
+  al_destroy_bitmap (princess_turn_embrace_01);
+  al_destroy_bitmap (princess_turn_embrace_02);
+  al_destroy_bitmap (princess_turn_embrace_03);
+  al_destroy_bitmap (princess_turn_embrace_04);
+  al_destroy_bitmap (princess_turn_embrace_05);
+  al_destroy_bitmap (princess_turn_embrace_06);
+  al_destroy_bitmap (princess_turn_embrace_07);
+  al_destroy_bitmap (princess_turn_embrace_08);
+  al_destroy_bitmap (princess_turn_embrace_09);
+  al_destroy_bitmap (princess_turn_embrace_10);
+  al_destroy_bitmap (princess_turn_embrace_11);
+  al_destroy_bitmap (princess_turn_embrace_12);
+  al_destroy_bitmap (princess_turn_embrace_13);
 }
 
 
@@ -195,6 +233,21 @@ init_stroke_frameset (void)
           STROKE_FRAMESET_NMEMB * sizeof (struct frameset));
 }
 
+void
+init_turn_embrace_frameset (void)
+{
+  struct frameset frameset[TURN_EMBRACE_FRAMESET_NMEMB] =
+    {{princess_turn_embrace_00,+0,0},{princess_turn_embrace_01,+0,0},
+     {princess_turn_embrace_02,-1,0},{princess_turn_embrace_03,-2,0},
+     {princess_turn_embrace_04,-6,0},{princess_turn_embrace_05,+1,0},
+     {princess_turn_embrace_06,-8,0},{princess_turn_embrace_07,-8,0},
+     {princess_turn_embrace_08,-25,0},{princess_turn_embrace_09,+2,0},
+     {princess_turn_embrace_10,-1,0},{princess_turn_embrace_11,-2,0},
+     {princess_turn_embrace_12,+2,0},{princess_turn_embrace_13,+0,0}};
+
+  memcpy (&turn_embrace_frameset, &frameset,
+          TURN_EMBRACE_FRAMESET_NMEMB * sizeof (struct frameset));
+}
 
 
 void
@@ -365,6 +418,29 @@ princess_stroke (struct anim *princess)
   next_frame (&princess->f, &princess->f, &princess->fo);
 }
 
+void
+princess_turn_embrace (struct anim *princess)
+{
+  princess->oaction = princess->action;
+  princess->action = princess_turn_embrace;
+
+  if (princess->oaction != princess_turn_embrace) {
+    princess->f.dir = (princess->f.dir == RIGHT) ? LEFT : RIGHT;
+    princess->i = -1;
+  }
+
+  princess->f.flip = (princess->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
+
+  if (princess->i < 13) princess->i++;
+
+  select_frame (princess, turn_embrace_frameset, princess->i);
+  next_frame_inv = true;
+  next_frame (&princess->f, &princess->f, &princess->fo);
+  next_frame_inv = false;
+}
+
+
+
 
 
 ALLEGRO_COLOR
@@ -431,6 +507,8 @@ draw_princess_frame (ALLEGRO_BITMAP *bitmap, struct anim *p, enum vm vm)
   struct frame f = p->f;
 
   palette pal = NULL;
+  pal = get_kid_palette (vm);
+  f.b = apply_palette (f.b, pal);
   pal = get_princess_palette (vm);
   f.b = apply_palette (f.b, pal);
 

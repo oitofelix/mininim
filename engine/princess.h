@@ -52,6 +52,20 @@
 #define PRINCESS_STROKE_00 "data/princess/stroke/00.png"
 #define PRINCESS_STROKE_01 "data/princess/stroke/01.png"
 #define PRINCESS_STROKE_02 "data/princess/stroke/02.png"
+#define PRINCESS_TURN_EMBRACE_00 "data/princess/turn-embrace/00.png"
+#define PRINCESS_TURN_EMBRACE_01 "data/princess/turn-embrace/01.png"
+#define PRINCESS_TURN_EMBRACE_02 "data/princess/turn-embrace/02.png"
+#define PRINCESS_TURN_EMBRACE_03 "data/princess/turn-embrace/03.png"
+#define PRINCESS_TURN_EMBRACE_04 "data/princess/turn-embrace/04.png"
+#define PRINCESS_TURN_EMBRACE_05 "data/princess/turn-embrace/05.png"
+#define PRINCESS_TURN_EMBRACE_06 "data/princess/turn-embrace/06.png"
+#define PRINCESS_TURN_EMBRACE_07 "data/princess/turn-embrace/07.png"
+#define PRINCESS_TURN_EMBRACE_08 "data/princess/turn-embrace/08.png"
+#define PRINCESS_TURN_EMBRACE_09 "data/princess/turn-embrace/09.png"
+#define PRINCESS_TURN_EMBRACE_10 "data/princess/turn-embrace/10.png"
+#define PRINCESS_TURN_EMBRACE_11 "data/princess/turn-embrace/11.png"
+#define PRINCESS_TURN_EMBRACE_12 "data/princess/turn-embrace/12.png"
+#define PRINCESS_TURN_EMBRACE_13 "data/princess/turn-embrace/13.png"
 
 /* functions */
 void load_princess (void);
@@ -64,6 +78,7 @@ void princess_rest (struct anim *princess);
 void princess_couch (struct anim *princess);
 void princess_uncouch (struct anim *princess);
 void princess_stroke (struct anim *princess);
+void princess_turn_embrace (struct anim *princess);
 void draw_princess_frame (ALLEGRO_BITMAP *bitmap, struct anim *p,
                           enum vm vm);
 palette get_princess_palette (enum vm vm);
@@ -84,6 +99,11 @@ extern ALLEGRO_BITMAP *princess_normal_00,
   *princess_couch_03, *princess_couch_04, *princess_couch_05,
   *princess_couch_06, *princess_couch_07, *princess_couch_08,
   *princess_couch_09, *princess_couch_10,
-  *princess_stroke_00, *princess_stroke_01, *princess_stroke_02;
+  *princess_stroke_00, *princess_stroke_01, *princess_stroke_02,
+  *princess_turn_embrace_00, *princess_turn_embrace_01, *princess_turn_embrace_02,
+  *princess_turn_embrace_03, *princess_turn_embrace_04, *princess_turn_embrace_05,
+  *princess_turn_embrace_06, *princess_turn_embrace_07, *princess_turn_embrace_08,
+  *princess_turn_embrace_09, *princess_turn_embrace_10, *princess_turn_embrace_11,
+  *princess_turn_embrace_12, *princess_turn_embrace_13;
 
 #endif	/* MININIM_PRINCESS_H */

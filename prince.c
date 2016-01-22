@@ -66,7 +66,7 @@ main (int argc, char **argv)
 
   /* begin test */
   /* cutscene = true; */
-  /* play_anim (cutscene_08_anim, NULL, 10); */
+  /* play_anim (cutscene_14_anim, NULL, 10); */
   /* exit (0); */
   /* end test */
 

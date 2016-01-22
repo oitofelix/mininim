@@ -56,7 +56,7 @@ kid_normal (struct anim *k)
   k->f.flip = (k->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
   if (! flow (k)) return;
-  if (! physics_in (k)) return;
+  if (! cutscene && ! physics_in (k)) return;
   next_frame (&k->f, &k->f, &k->fo);
   physics_out (k);
 }

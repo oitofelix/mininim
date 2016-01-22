@@ -736,6 +736,19 @@ special_events (void)
         activate_con (&p);
     }
   }
+
+  /* in the fourteenth level */
+  if (level.number == 14) {
+    anti_camera_room = 5;
+
+    /* when the kid enters room 5, go to the next level */
+    if (k->f.c.room == 5) {
+      total_lives = k->total_lives;
+      current_lives = k->current_lives;
+      skill = k->skill;
+      quit_anim = NEXT_LEVEL;
+    }
+  }
 }
 
 static void
@@ -812,6 +825,7 @@ load_legacy_level (int number)
   case 7: legacy_level.cutscene = cutscene_07_anim; break;
   case 8: legacy_level.cutscene = cutscene_08_anim; break;
   case 11: legacy_level.cutscene = cutscene_01_05_11_anim; break;
+  case 14: legacy_level.cutscene = cutscene_14_anim; break;
   }
 
   /* LINKS: ok */
