@@ -74,6 +74,7 @@
 #define CUTSCENE_14_SAMPLE "data/sample/cutscene-14.ogg"
 #define HAPPY_END_SAMPLE "data/sample/happy-end.ogg"
 #define CUTSCENE_11_LITTLE_TIME_LEFT_SAMPLE "data/sample/cutscene-11-little-time-left.ogg"
+#define CUTSCENE_OUT_OF_TIME_SAMPLE "data/sample/cutscene-out-of-time.ogg"
 
 void load_samples (void);
 void unload_samples (void);
@@ -131,6 +132,7 @@ extern ALLEGRO_SAMPLE *step_sample,
   *cutscene_07_08_sample,
   *cutscene_14_sample,
   *happy_end_sample,
-  *cutscene_11_little_time_left_sample;
+  *cutscene_11_little_time_left_sample,
+  *cutscene_out_of_time_sample;
 
 #endif	/* MININIM_SAMPLES_H */

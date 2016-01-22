@@ -65,7 +65,6 @@ main (int argc, char **argv)
   stop_all_samples ();
 
   /* begin test */
-  /* if (! play_time) play_time = create_timer (60.0); */
   /* cutscene = true; */
   /* play_anim (cutscene_11_little_time_left_anim, NULL, 10); */
   /* exit (0); */
@@ -76,7 +75,7 @@ main (int argc, char **argv)
   if (quit_anim == QUIT_GAME) goto quit_game;
   stop_all_samples ();
 
-  if (! play_time) play_time = create_timer (60.0);
+  if (! play_time) play_time = create_timer (1.0);
   al_set_timer_count (play_time, 0);
   al_start_timer (play_time);
 

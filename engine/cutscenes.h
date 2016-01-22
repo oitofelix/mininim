@@ -59,6 +59,7 @@ void cutscene_08_anim (void);
 void cutscene_11_little_time_left_anim (void);
 void cutscene_11_anim (void);
 void cutscene_14_anim (void);
+void cutscene_out_of_time_anim (void);
 
 /* variables */
 extern bool cutscene_started;

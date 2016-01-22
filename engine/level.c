@@ -132,6 +132,16 @@ play_level (struct level *lv)
     draw_bottom_text (NULL, NULL);
     break;
   case QUIT_GAME: break;
+  case OUT_OF_TIME:
+    cutscene_started = false;
+    cutscene = true;
+    stop_video_effect ();
+    stop_all_samples ();
+    play_anim (cutscene_out_of_time_anim, NULL, 10);
+    stop_video_effect ();
+    stop_all_samples ();
+    goto restart_game;
+    break;
   }
 }
 
@@ -398,13 +408,17 @@ process_keys (void)
 
   /* +: increment and display remaining time */
   if (was_key_pressed (ALLEGRO_KEY_EQUALS, 0, ALLEGRO_KEYMOD_SHIFT, true)) {
-    al_add_timer_count (play_time, -1);
+    int t = 60 * 60 - al_get_timer_count (play_time);
+    int d = t > 60 ? -60 : -1;
+    al_add_timer_count (play_time, d);
     display_remaining_time ();
   }
 
   /* -: decrement and display remaining time */
   if (was_key_pressed (ALLEGRO_KEY_MINUS, 0, 0, true)) {
-    al_add_timer_count (play_time, +1);
+    int t = 60 * 60 - al_get_timer_count (play_time);
+    int d = t > 60 ? +60 : +1;
+    al_add_timer_count (play_time, d);
     display_remaining_time ();
   }
 
@@ -552,24 +566,31 @@ draw_level (void)
   draw_lives (uscreen, get_anim_by_id (current_kid_id), vm);
 
   /* automatic remaining time display */
-  int rem_time = 60 - al_get_timer_count (play_time);
-  if ((rem_time % 5 == 0
+  int rem_time = 60 * 60 - al_get_timer_count (play_time);
+  if ((rem_time % (5 * 60) == 0
        && last_auto_show_time != rem_time
        && anim_cycle > 720)
       || (auto_rem_time_1st_cycle >= 0
           && last_auto_show_time != rem_time
           && anim_cycle >= auto_rem_time_1st_cycle
-          && anim_cycle <= auto_rem_time_1st_cycle + 6)) {
+          && anim_cycle <= auto_rem_time_1st_cycle + 6)
+      || rem_time <= 60) {
     display_remaining_time ();
+    if (rem_time <= 60 && rem_time != last_auto_show_time)
+      play_sample (press_key_sample, -1);
     last_auto_show_time = rem_time;
   }
+  if (rem_time <= 0) quit_anim = OUT_OF_TIME;
 }
 
 void
 display_remaining_time (void)
 {
   char *text;
-  xasprintf (&text, "%i MINUTES LEFT", 60 - al_get_timer_count (play_time));
+  int t = 60 * 60 - al_get_timer_count (play_time);
+  if (t < 0) t = 0;
+  if (t > 60) xasprintf (&text, "%i MINUTES LEFT", t / 60 + 1);
+  else xasprintf (&text, "%i SECONDS LEFT", t);
   draw_bottom_text (NULL, text);
   al_free (text);
 }
