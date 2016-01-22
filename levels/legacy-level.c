@@ -185,7 +185,7 @@ start (void)
   switch (level.number) {
   case 1:
     k->f.dir = (k->f.dir == LEFT) ? RIGHT : LEFT;
-    k->i = -1; k->action = kid_normal;
+    k->i = -1; k->action = kid_turn;
     break;
   case 13:
     k->f.dir = (k->f.dir == LEFT) ? RIGHT : LEFT;
