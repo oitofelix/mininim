@@ -589,7 +589,8 @@ display_remaining_time (void)
   char *text;
   int t = 60 * 60 - al_get_timer_count (play_time);
   if (t < 0) t = 0;
-  if (t > 60) xasprintf (&text, "%i MINUTES LEFT", t / 60 + 1);
+  int m = t / 60 + ((t % 60) ? 1 : 0);
+  if (t > 60) xasprintf (&text, "%i MINUTES LEFT", m);
   else xasprintf (&text, "%i SECONDS LEFT", t);
   draw_bottom_text (NULL, text);
   al_free (text);

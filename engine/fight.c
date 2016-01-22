@@ -738,7 +738,10 @@ is_safe_to_follow (struct anim *k0, struct anim *k1, enum dir dir)
 
   if (p0.floor == p1.floor && k0->f.dir == dir) {
     p = p1;
-    if (dir == LEFT) prel (&p, &p, +0, +1);
+    if (dir == LEFT) {
+      if (is_carpet (&p0)) prel (&p0, &p0, +0, -1);
+      if (! is_carpet (&p)) prel (&p, &p, +0, +1);
+    }
     first_confg (&p0, &p, dangerous_cs, &p);
     if (p.room != -1) return false;
 
