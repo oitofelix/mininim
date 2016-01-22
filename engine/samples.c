@@ -71,7 +71,8 @@ ALLEGRO_SAMPLE *step_sample,
   *creaking_door_sample,
   *cutscene_01_03_05_11_sample,
   *cutscene_07_08_sample,
-  *cutscene_14_sample;
+  *cutscene_14_sample,
+  *happy_end_sample;
 
 void
 load_samples (void)
@@ -128,6 +129,7 @@ load_samples (void)
   cutscene_01_03_05_11_sample = load_sample (CUTSCENE_01_03_05_11_SAMPLE);
   cutscene_07_08_sample = load_sample (CUTSCENE_07_08_SAMPLE);
   cutscene_14_sample = load_sample (CUTSCENE_14_SAMPLE);
+  happy_end_sample = load_sample (HAPPY_END_SAMPLE);
 }
 
 void
@@ -185,4 +187,5 @@ unload_samples (void)
   al_destroy_sample (cutscene_01_03_05_11_sample);
   al_destroy_sample (cutscene_07_08_sample);
   al_destroy_sample (cutscene_14_sample);
+  al_destroy_sample (happy_end_sample);
 }

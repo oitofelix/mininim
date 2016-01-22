@@ -470,6 +470,16 @@
 #define E_CLOCK_SAND_COLOR (al_map_rgb (248, 252, 248))
 #define C_CLOCK_SAND_COLOR (al_map_rgb (255, 255, 255))
 
+#define C_TITLE_BACKGROUND_PATTERN_COLOR (al_map_rgb (0, 0, 0))
+#define C_ENDING_BACKGROUND_PATTERN_COLOR (al_map_rgb (0, 0, 0))
+
+#define E_TITLE_BACKGROUND_PATTERN_COLOR (al_map_rgb (0, 0, 168))
+#define E_ENDING_BACKGROUND_PATTERN_COLOR (al_map_rgb (168, 0, 0))
+
+#define V_TITLE_BACKGROUND_PATTERN_COLOR (al_map_rgb (16, 0, 97))
+#define V_ENDING_BACKGROUND_PATTERN_COLOR (al_map_rgb (128, 0, 0))
+
+
 /* environment mode */
 enum em {
   DUNGEON, PALACE,

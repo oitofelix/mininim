@@ -34,20 +34,23 @@
 #include "cutscenes.h"
 
 /* functions */
-static ALLEGRO_BITMAP *create_background_pattern_bitmap (enum vm vm);
+static ALLEGRO_BITMAP *create_background_pattern_bitmap (ALLEGRO_COLOR c);
 static void title_anim (void);
 static void draw_title_screen (ALLEGRO_BITMAP *bitmap, int i, enum vm vm);
+static void draw_ending_screen (ALLEGRO_BITMAP *bitmap, int i, enum vm vm);
 static void draw_princess_room (ALLEGRO_BITMAP *bitmap, enum vm vm);
 
 static ALLEGRO_BITMAP *c_main_background, *e_main_background, *v_main_background;
 static ALLEGRO_BITMAP *c_text_background, *e_text_background, *v_text_background;
-static ALLEGRO_BITMAP *c_background_pattern, *e_background_pattern, *v_background_pattern;
+static ALLEGRO_BITMAP *c_title_background_pattern, *e_title_background_pattern, *v_title_background_pattern;
+static ALLEGRO_BITMAP *c_ending_background_pattern, *e_ending_background_pattern, *v_ending_background_pattern;
 static ALLEGRO_BITMAP *c_princess_room, *e_princess_room, *v_princess_room;
 static ALLEGRO_BITMAP *c_princess_room_pillar, *e_princess_room_pillar, *v_princess_room_pillar;
 
 static ALLEGRO_BITMAP *message_presents, *message_author,
   *message_game_name, *message_copyright,
-  *text_in_the_absence, *text_marry_jaffar, *text_credits;
+  *text_in_the_absence, *text_marry_jaffar, *text_credits,
+  *text_the_tyrant;
 
 bool cutscene_started;
 
@@ -61,21 +64,24 @@ load_cutscenes (void)
   /* cga */
   c_main_background = load_bitmap (C_MAIN_BACKGROUND);
   c_text_background = load_bitmap (C_TEXT_BACKGROUND);
-  c_background_pattern = create_background_pattern_bitmap (CGA);
+  c_title_background_pattern = create_background_pattern_bitmap (C_TITLE_BACKGROUND_PATTERN_COLOR);
+  c_ending_background_pattern = create_background_pattern_bitmap (C_ENDING_BACKGROUND_PATTERN_COLOR);
   c_princess_room = load_bitmap (C_PRINCESS_ROOM);
   c_princess_room_pillar = load_bitmap (C_PRINCESS_ROOM_PILLAR);
 
   /* ega */
   e_main_background = load_bitmap (E_MAIN_BACKGROUND);
   e_text_background = load_bitmap (E_TEXT_BACKGROUND);
-  e_background_pattern = create_background_pattern_bitmap (EGA);
+  e_title_background_pattern = create_background_pattern_bitmap (E_TITLE_BACKGROUND_PATTERN_COLOR);
+  e_ending_background_pattern = create_background_pattern_bitmap (E_ENDING_BACKGROUND_PATTERN_COLOR);
   e_princess_room = load_bitmap (E_PRINCESS_ROOM);
   e_princess_room_pillar = load_bitmap (E_PRINCESS_ROOM_PILLAR);
 
   /* vga */
   v_main_background = load_bitmap (V_MAIN_BACKGROUND);
   v_text_background = load_bitmap (V_TEXT_BACKGROUND);
-  v_background_pattern = create_background_pattern_bitmap (VGA);
+  v_title_background_pattern = create_background_pattern_bitmap (V_TITLE_BACKGROUND_PATTERN_COLOR);
+  v_ending_background_pattern = create_background_pattern_bitmap (V_ENDING_BACKGROUND_PATTERN_COLOR);
   v_princess_room = load_bitmap (V_PRINCESS_ROOM);
   v_princess_room_pillar = load_bitmap (V_PRINCESS_ROOM_PILLAR);
 
@@ -87,6 +93,7 @@ load_cutscenes (void)
   text_in_the_absence = load_bitmap (TEXT_IN_THE_ABSENCE);
   text_marry_jaffar = load_bitmap (TEXT_MARRY_JAFFAR);
   text_credits = load_bitmap (TEXT_CREDITS);
+  text_the_tyrant = load_bitmap (TEXT_THE_TYRANT);
 
   /* modules */
   load_princess ();
@@ -100,21 +107,24 @@ unload_cutscenes (void)
   /* cga */
   al_destroy_bitmap (c_main_background);
   al_destroy_bitmap (c_text_background);
-  al_destroy_bitmap (c_background_pattern);
+  al_destroy_bitmap (c_title_background_pattern);
+  al_destroy_bitmap (c_ending_background_pattern);
   al_destroy_bitmap (c_princess_room);
   al_destroy_bitmap (c_princess_room_pillar);
 
   /* ega */
   al_destroy_bitmap (e_main_background);
   al_destroy_bitmap (e_text_background);
-  al_destroy_bitmap (e_background_pattern);
+  al_destroy_bitmap (e_title_background_pattern);
+  al_destroy_bitmap (e_ending_background_pattern);
   al_destroy_bitmap (e_princess_room);
   al_destroy_bitmap (e_princess_room_pillar);
 
   /* vga */
   al_destroy_bitmap (v_main_background);
   al_destroy_bitmap (v_text_background);
-  al_destroy_bitmap (v_background_pattern);
+  al_destroy_bitmap (v_title_background_pattern);
+  al_destroy_bitmap (v_ending_background_pattern);
   al_destroy_bitmap (v_princess_room);
   al_destroy_bitmap (v_princess_room_pillar);
 
@@ -126,6 +136,7 @@ unload_cutscenes (void)
   al_destroy_bitmap (text_in_the_absence);
   al_destroy_bitmap (text_marry_jaffar);
   al_destroy_bitmap (text_credits);
+  al_destroy_bitmap (text_the_tyrant);
 
   /* modules */
   unload_princess ();
@@ -134,19 +145,11 @@ unload_cutscenes (void)
 }
 
 static ALLEGRO_BITMAP *
-create_background_pattern_bitmap (enum vm vm)
+create_background_pattern_bitmap (ALLEGRO_COLOR c)
 {
   ALLEGRO_BITMAP *b = create_bitmap (ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
   clear_bitmap (b, TRANSPARENT_COLOR);
-
-  switch (vm) {
-  case CGA: break;
-  case EGA: draw_pattern (b, 17, 16, 286, 157, al_map_rgb (0, 0, 168),
-                          al_map_rgb (0, 0, 0)); break;
-  case  VGA: draw_pattern (b, 17, 16, 286, 157, al_map_rgb (16, 0, 97),
-                           al_map_rgb (0, 0, 0)); break;
-  }
-
+  draw_pattern (b, 17, 16, 286, 157, c, BLACK);
   return b;
 }
 
@@ -230,6 +233,7 @@ title_anim (void)
       jaffar.f.dir = LEFT;
       jaffar.f.flip = 0;
       jaffar.style = 0;
+      jaffar.invisible = false;
       jaffar_normal (&jaffar);
 
       mouse.invisible = true;
@@ -376,68 +380,6 @@ title_anim (void)
 
   if (i >= 11 && i <= 26) draw_princess_room (screen, vm);
   else draw_title_screen (screen, i, vm);
-}
-
-static void
-draw_title_screen (ALLEGRO_BITMAP *bitmap, int i, enum vm vm)
-{
-  ALLEGRO_BITMAP *main_background = NULL,
-    *text_background = NULL,
-    *background_pattern = NULL;
-
-  switch (vm) {
-  case CGA:
-    main_background = c_main_background;
-    text_background = c_text_background;
-    background_pattern = c_background_pattern;
-    break;
-  case EGA:
-    main_background = e_main_background;
-    text_background = e_text_background;
-    background_pattern = e_background_pattern;
-    break;
-  case VGA:
-    main_background = v_main_background;
-    text_background = v_text_background;
-    background_pattern = v_background_pattern;
-    break;
-  }
-
-  if (hgc) {
-    main_background = apply_palette (main_background, hgc_palette);
-    text_background = apply_palette (text_background, hgc_palette);
-  }
-
-  clear_bitmap (bitmap, BLACK);
-  switch (i) {
-  default: break;
-  case 1: case 2: case 4: case 6:
-    draw_bitmap (main_background, bitmap, 0, 0, 0); break;
-  case 3:
-    draw_bitmap (main_background, bitmap, 0, 0, 0);
-    draw_bitmap (message_presents, bitmap, 96, 106, 0); break;
-  case 5:
-    draw_bitmap (main_background, bitmap, 0, 0, 0);
-    draw_bitmap (message_author, bitmap, 96, 122, 0); break;
-  case 7: case 29: case 30:
-    draw_bitmap (main_background, bitmap, 0, 0, 0);
-    draw_bitmap (message_game_name, bitmap, 24, 107, 0);
-    draw_bitmap (message_copyright, bitmap, 48, 184, 0); break;
-  case 8: case 9:
-    draw_bitmap (text_background, bitmap, 0, 0, 0);
-    draw_bitmap (background_pattern, bitmap, 0, 0, 0);
-    draw_bitmap (text_in_the_absence, bitmap, 24, 25, 0); break;
-  case 27:
-    draw_bitmap (text_background, bitmap, 0, 0, 0);
-    draw_bitmap (background_pattern, bitmap, 0, 0, 0);
-    draw_bitmap (text_marry_jaffar, bitmap, 24, 25, 0); break;
-  case 28:
-    draw_bitmap (text_background, bitmap, 0, 0, 0);
-    draw_bitmap (background_pattern, bitmap, 0, 0, 0);
-    draw_bitmap (text_credits, bitmap, 24, 25, 0); break;
-  }
-
-  /* printf ("step %i\n", i); */
 }
 
 void
@@ -709,7 +651,7 @@ cutscene_14_anim (void)
   }
 
   if (key.keyboard.keycode && i > 5) {
-    quit_anim = true;
+    quit_anim = RESTART_GAME;
     return;
   }
 
@@ -783,12 +725,166 @@ cutscene_14_anim (void)
   case 5:
     princess.action (&princess);
     if (! is_playing_sample_instance (si)
-        && ! is_video_effect_started ()) quit_anim = true;
+        && ! is_video_effect_started ()) {
+      start_video_effect (VIDEO_FADE_IN, SECS_TO_VCYCLES (1));
+      si = play_sample (happy_end_sample, -1);
+      key.keyboard.keycode = 0;
+      i++;
+    }
+    break;
+  case 6:
+    if (get_sample_position (si) >= 26) {
+      start_video_effect (VIDEO_ROLL_RIGHT, SECS_TO_VCYCLES (1));
+      i++;
+    }
+    break;
+  case 7:
+    if (get_sample_position (si) >= 52) {
+      start_video_effect (VIDEO_ROLL_RIGHT, SECS_TO_VCYCLES (1));
+      i++;
+    }
+    break;
+  case 8:
+    if (get_sample_position (si) >= 80) {
+      start_video_effect (VIDEO_ROLL_RIGHT, SECS_TO_VCYCLES (1));
+      i++;
+    }
+    break;
+  case 9:
+    if (get_sample_position (si) >= 111.1) i++;
+    break;
+  case 10:
+    if (! is_playing_sample_instance (si)) {
+      start_video_effect (VIDEO_FADE_OUT, SECS_TO_VCYCLES (1));
+      i++;
+    }
+    break;
+  case 11:
+    if (! is_video_effect_started ()) {
+      quit_anim = RESTART_GAME;
+      return;
+    }
     break;
   }
 
-  if (i < 5 || is_video_effect_started ())
+  if (i < 5 || (i == 5 && is_video_effect_started ()))
     draw_princess_room (screen, vm);
+  else draw_ending_screen (screen, i, vm);
+}
+
+static void
+draw_title_screen (ALLEGRO_BITMAP *bitmap, int i, enum vm vm)
+{
+  ALLEGRO_BITMAP *main_background = NULL,
+    *text_background = NULL,
+    *background_pattern = NULL;
+
+  switch (vm) {
+  case CGA:
+    main_background = c_main_background;
+    text_background = c_text_background;
+    background_pattern = c_title_background_pattern;
+    break;
+  case EGA:
+    main_background = e_main_background;
+    text_background = e_text_background;
+    background_pattern = e_title_background_pattern;
+    break;
+  case VGA:
+    main_background = v_main_background;
+    text_background = v_text_background;
+    background_pattern = v_title_background_pattern;
+    break;
+  }
+
+  if (hgc) {
+    main_background = apply_palette (main_background, hgc_palette);
+    text_background = apply_palette (text_background, hgc_palette);
+  }
+
+  clear_bitmap (bitmap, BLACK);
+  switch (i) {
+  default: break;
+  case 1: case 2: case 4: case 6:
+    draw_bitmap (main_background, bitmap, 0, 0, 0); break;
+  case 3:
+    draw_bitmap (main_background, bitmap, 0, 0, 0);
+    draw_bitmap (message_presents, bitmap, 96, 106, 0); break;
+  case 5:
+    draw_bitmap (main_background, bitmap, 0, 0, 0);
+    draw_bitmap (message_author, bitmap, 96, 122, 0); break;
+  case 7: case 29: case 30:
+    draw_bitmap (main_background, bitmap, 0, 0, 0);
+    draw_bitmap (message_game_name, bitmap, 24, 107, 0);
+    draw_bitmap (message_copyright, bitmap, 48, 184, 0); break;
+  case 8: case 9:
+    draw_bitmap (text_background, bitmap, 0, 0, 0);
+    draw_bitmap (background_pattern, bitmap, 0, 0, 0);
+    draw_bitmap (text_in_the_absence, bitmap, 24, 25, 0); break;
+  case 27:
+    draw_bitmap (text_background, bitmap, 0, 0, 0);
+    draw_bitmap (background_pattern, bitmap, 0, 0, 0);
+    draw_bitmap (text_marry_jaffar, bitmap, 24, 25, 0); break;
+  case 28:
+    draw_bitmap (text_background, bitmap, 0, 0, 0);
+    draw_bitmap (background_pattern, bitmap, 0, 0, 0);
+    draw_bitmap (text_credits, bitmap, 24, 25, 0); break;
+  }
+
+  /* printf ("step %i\n", i); */
+}
+
+static void
+draw_ending_screen (ALLEGRO_BITMAP *bitmap, int i, enum vm vm)
+{
+  ALLEGRO_BITMAP *main_background = NULL,
+    *text_background = NULL,
+    *background_pattern = NULL;
+
+  switch (vm) {
+  case CGA:
+    main_background = c_main_background;
+    text_background = c_text_background;
+    background_pattern = c_ending_background_pattern;
+    break;
+  case EGA:
+    main_background = e_main_background;
+    text_background = e_text_background;
+    background_pattern = e_ending_background_pattern;
+    break;
+  case VGA:
+    main_background = v_main_background;
+    text_background = v_text_background;
+    background_pattern = v_ending_background_pattern;
+    break;
+  }
+
+  if (hgc) {
+    main_background = apply_palette (main_background, hgc_palette);
+    text_background = apply_palette (text_background, hgc_palette);
+  }
+
+  clear_bitmap (bitmap, BLACK);
+  switch (i) {
+  default: break;
+  case 6:
+    draw_bitmap (text_background, bitmap, 0, 0, 0);
+    draw_bitmap (background_pattern, bitmap, 0, 0, 0);
+    draw_bitmap (text_the_tyrant, bitmap, 24, 25, 0); break;
+  case 7: case 9:
+    draw_bitmap (main_background, bitmap, 0, 0, 0); break;
+    break;
+  case 8:
+    draw_bitmap (text_background, bitmap, 0, 0, 0);
+    draw_bitmap (background_pattern, bitmap, 0, 0, 0);
+    draw_bitmap (text_credits, bitmap, 24, 25, 0); break;
+  case 10: case 11:
+    draw_bitmap (main_background, bitmap, 0, 0, 0);
+    draw_bitmap (message_game_name, bitmap, 24, 107, 0); break;
+    break;
+  }
+
+  /* printf ("step %i\n", i); */
 }
 
 static void

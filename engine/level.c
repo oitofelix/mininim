@@ -120,9 +120,12 @@ play_level (struct level *lv)
       play_anim (level.cutscene, NULL, 10);
       stop_video_effect ();
       stop_all_samples ();
+
+      if (quit_anim == RESTART_GAME) goto restart_game;
     }
     goto start;
   case RESTART_GAME:
+  restart_game:
     retry_level = -1;
     destroy_anims ();
     destroy_cons ();

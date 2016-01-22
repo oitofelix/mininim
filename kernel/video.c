@@ -393,7 +393,7 @@ show (void)
   default: break;
   }
 
-  if (++i >= video_effect.duration + 1) {
+  if (++i >= video_effect.duration + 2) {
     i = 0;
     stop_video_effect ();
     return;

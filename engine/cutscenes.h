@@ -46,6 +46,7 @@
 #define TEXT_IN_THE_ABSENCE "data/title/text-in-the-absence.png"
 #define TEXT_MARRY_JAFFAR "data/title/text-marry-jaffar.png"
 #define TEXT_CREDITS "data/title/text-credits.png"
+#define TEXT_THE_TYRANT "data/title/text-the-tyrant.png"
 
 /* functions */
 void load_cutscenes (void);
