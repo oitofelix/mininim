@@ -17,6 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <config.h>
+
 #include <stdio.h>
 #include "event.h"
 #include "timer.h"
@@ -121,7 +123,7 @@ play_anim (void (*draw_callback) (void),
 
       /* CTRL+V: show engine name and version */
       if (was_key_pressed (ALLEGRO_KEY_V, 0, ALLEGRO_KEYMOD_CTRL, true)) {
-        xasprintf (&text, "MININIM 0.9");
+        asprintf (&text, "MININIM 0.9");
         draw_bottom_text (NULL, text);
         al_free (text);
       }
@@ -130,7 +132,7 @@ play_anim (void (*draw_callback) (void),
       if (was_key_pressed (ALLEGRO_KEY_S, 0, ALLEGRO_KEYMOD_CTRL, true)) {
         audio_enabled = ! audio_enabled;
         enable_audio (audio_enabled);
-        xasprintf (&text, "SOUND %s", audio_enabled ? "ON" : "OFF");
+        asprintf (&text, "SOUND %s", audio_enabled ? "ON" : "OFF");
         draw_bottom_text (NULL, text);
         al_free (text);
       }
@@ -152,7 +154,7 @@ play_anim (void (*draw_callback) (void),
           screen_flags = 0;
           break;
         }
-        xasprintf (&text, "DISPLAY FLIP: %s", flip);
+        asprintf (&text, "DISPLAY FLIP: %s", flip);
         draw_bottom_text (NULL, text);
         al_free (text);
       }
@@ -174,7 +176,7 @@ play_anim (void (*draw_callback) (void),
           flip_keyboard_vertical = false;
           flip_keyboard_horizontal = false;
         }
-        xasprintf (&text, "KEYBOARD FLIP: %s", flip);
+        asprintf (&text, "KEYBOARD FLIP: %s", flip);
         draw_bottom_text (NULL, text);
         al_free (text);
       }
@@ -195,7 +197,7 @@ play_anim (void (*draw_callback) (void),
         case VGA: vm = EGA; vm_str = "EGA"; break;
         }
 
-        xasprintf (&text, "VIDEO MODE: %s", vm_str);
+        asprintf (&text, "VIDEO MODE: %s", vm_str);
         draw_bottom_text (NULL, text);
         al_free (text);
       }

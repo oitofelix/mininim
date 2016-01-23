@@ -17,9 +17,11 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <config.h>
+
+#include <error.h>
 #include "video.h"
 #include "random.h"
-#include "xerror.h"
 #include "level.h"
 #include "physics.h"
 #include "room.h"
@@ -151,7 +153,7 @@ get_bubble_frame (int i)
   case 5: return bubble_05;
   case 6: return bubble_06;
   default:
-    xerror (-1, 0, "%s (%i): unknown bubble frame", __func__, i);
+    error (-1, 0, "%s (%i): unknown bubble frame", __func__, i);
   }
 
   return NULL;
@@ -224,7 +226,7 @@ draw_potion (ALLEGRO_BITMAP *bitmap, struct pos *p,
     big_potion_bubble_coord (p, &bubble_coord);
     break;
   default:
-    xerror (-1, 0, "%s (%i): unknown potion type", __func__, item);
+    error (-1, 0, "%s (%i): unknown potion type", __func__, item);
     break;
   }
 
@@ -262,7 +264,7 @@ draw_potion (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case FLIP_POTION: bubble_palette = flip_palette; break;
   case ACTIVATION_POTION: bubble_palette = poison_palette; break;
   default:
-    xerror (-1, 0, "%s (%i): unknown potion type", __func__, item);
+    error (-1, 0, "%s (%i): unknown potion type", __func__, item);
     break;
   }
 

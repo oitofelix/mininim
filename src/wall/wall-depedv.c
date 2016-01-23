@@ -17,11 +17,13 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <config.h>
+
+#include <error.h>
 #include <stdio.h>
 #include "mininim.h"
 #include "video.h"
 #include "random.h"
-#include "xerror.h"
 #include "room.h"
 #include "wall.h"
 #include "wall-depedv.h"
@@ -202,7 +204,7 @@ draw_wall_base_depedv (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case WWS: draw_wws_base (bitmap, p, em, vm); break;
   case WWW: draw_www_base (bitmap, p, em, vm); break;
   default:
-    xerror (-1, 0, "%s: unknown wall correlation (%i, %i. %i)",
+    error (-1, 0, "%s: unknown wall correlation (%i, %i. %i)",
            __func__, p->room, p->floor, p->place);
   }
 }
@@ -217,7 +219,7 @@ draw_wall_left_depedv (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case WWS: draw_wws_left (bitmap, p, em, vm); break;
   case WWW: draw_www_left (bitmap, p, em, vm); break;
   default:
-    xerror (-1, 0, "%s: unknown wall correlation (%i, %i. %i)",
+    error (-1, 0, "%s: unknown wall correlation (%i, %i. %i)",
            __func__, p->room, p->floor, p->place);
   }
   draw_randomization (bitmap, p, em, vm);
@@ -403,7 +405,7 @@ draw_randomization (ALLEGRO_BITMAP *bitmap, struct pos *p,
     }
     break;
   default:
-    xerror (-1, 0, "%s: unknown wall correlation (%i)", __func__, wc);
+    error (-1, 0, "%s: unknown wall correlation (%i)", __func__, wc);
   }
 
   unseedp ();

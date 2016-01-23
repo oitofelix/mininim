@@ -91,16 +91,17 @@ mininim_SOURCES = src/mininim.c src/mininim.h src/anim.c src/anim.h		\
 		src/kernel/audio.c src/kernel/audio.h src/kernel/memory.c					\
 		src/kernel/memory.h src/kernel/keyboard.c src/kernel/keyboard.h		\
 		src/kernel/random.c src/kernel/random.h src/kernel/array.c				\
-		src/kernel/array.h src/kernel/xerror.c src/kernel/xerror.h
+		src/kernel/array.h
 
-AM_CPPFLAGS = -DLOCALEDIR=\"$(localedir)\" -I${srcdir}/src				\
--I${srcdir}/src/kernel -I${srcdir}/src/guard -I${srcdir}/src/kid	\
--I${srcdir}/src/levels -I${srcdir}/src/wall
+AM_CPPFLAGS = -DLOCALEDIR=\"$(localedir)\" -I$(top_builddir)/gnulib	\
+-I$(top_srcdir)/gnulib -I${srcdir}/src -I${srcdir}/src/kernel				\
+-I${srcdir}/src/guard -I${srcdir}/src/kid -I${srcdir}/src/levels	\
+-I${srcdir}/src/wall
 CFLAGS_DEV = -Wall -ggdb3 -Werror -Wno-error=unused-function	\
   -Wno-error=unused-variable -Wno-error=unused-but-set-variable
 AM_CFLAGS = ${CFLAGS_DEV} ${ALLEGRO_CFLAGS}
 AM_LDFLAGS = -lm ${ALLEGRO_LIBS}
-
+LDADD = gnulib/libgnu.a
 
 
 
@@ -108,8 +109,8 @@ AM_LDFLAGS = -lm ${ALLEGRO_LIBS}
 # Automake directives #
 #######################
 
-ACLOCAL_AMFLAGS = -I m4
-SUBDIRS = doc
+ACLOCAL_AMFLAGS = -I gnulib/m4
+SUBDIRS = doc gnulib
 EXTRA_DIST = ${top_level_doc} data ChangeLog
 
 

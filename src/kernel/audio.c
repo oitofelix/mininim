@@ -17,6 +17,9 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <config.h>
+
+#include <error.h>
 #include <math.h>
 #include <stdio.h>
 #include <allegro5/allegro_audio.h>
@@ -25,7 +28,6 @@
 #include "anim.h"
 #include "pos.h"
 #include "level.h"
-#include "xerror.h"
 #include "audio.h"
 
 static struct audio_sample *audio_sample;
@@ -39,11 +41,11 @@ void
 init_audio (void)
 {
   if (! al_install_audio ())
-    xerror (-1, 0, "%s (void): cannot initialize audio", __func__);
+    error (-1, 0, "%s (void): cannot initialize audio", __func__);
   if (! al_init_acodec_addon ())
-    xerror (-1, 0, "%s (void): cannot initialize audio codecs", __func__);
+    error (-1, 0, "%s (void): cannot initialize audio codecs", __func__);
   if (! al_reserve_samples (16))
-    xerror (-1, 0, "%s (void): cannot reserve audio samples", __func__);
+    error (-1, 0, "%s (void): cannot reserve audio samples", __func__);
 }
 
 void
@@ -56,7 +58,7 @@ ALLEGRO_SAMPLE *
 load_sample (char *filename)
 {
   ALLEGRO_SAMPLE *sample = al_load_sample (filename);
-  if (! sample) xerror (-1, 0, "%s (\"%s\"): cannot load sample", __func__, filename);
+  if (! sample) error (-1, 0, "%s (\"%s\"): cannot load sample", __func__, filename);
 
   return sample;
 }
@@ -80,14 +82,14 @@ void
 set_mixer_gain (ALLEGRO_MIXER *mixer, float new_gain)
 {
   if (! al_set_mixer_gain (mixer, new_gain))
-    xerror (-1, 0, "%s (%p, %f): cannot set mixer gain", __func__, mixer, new_gain);
+    error (-1, 0, "%s (%p, %f): cannot set mixer gain", __func__, mixer, new_gain);
 }
 
 ALLEGRO_MIXER *
 get_default_mixer (void)
 {
   ALLEGRO_MIXER *mixer = al_get_default_mixer ();
-  if (! mixer) xerror (-1, 0, "%s (void): default mixer not set", __func__);
+  if (! mixer) error (-1, 0, "%s (void): default mixer not set", __func__);
   return mixer;
 }
 
@@ -115,7 +117,7 @@ play_sample (ALLEGRO_SAMPLE *sample, int room)
   as.volume = -1;
 
   if (! as.instance)
-    xerror (-1, 0, "%s (%p): cannot create sample instance", __func__, sample);
+    error (-1, 0, "%s (%p): cannot create sample instance", __func__, sample);
 
   audio_sample =
     add_to_array (&as, 1, audio_sample, &audio_sample_nmemb,
@@ -138,14 +140,14 @@ play_samples (void)
       ALLEGRO_MIXER *mixer = get_default_mixer ();
 
       if (! al_attach_sample_instance_to_mixer(as->instance, mixer))
-        xerror (-1, 0, "%s: cannot attach sample instance to mixer (%p, %p)",
+        error (-1, 0, "%s: cannot attach sample instance to mixer (%p, %p)",
                 __func__, as->sample, as->instance);
 
       as->volume = get_adjusted_sample_volume (as);
       al_set_sample_instance_gain (as->instance, as->volume);
 
       if (! al_play_sample_instance (as->instance))
-        xerror (-1, 0, "%s: cannot play sample instance (%p, %p)",
+        error (-1, 0, "%s: cannot play sample instance (%p, %p)",
                 __func__, as->sample, as->instance);
 
       as->played = true;

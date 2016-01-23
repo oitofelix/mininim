@@ -17,7 +17,7 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#define _GNU_SOURCE
+#include <config.h>
 
 #include <stdio.h>
 #include <string.h>
@@ -26,7 +26,6 @@
 #include "audio.h"
 #include "keyboard.h"
 #include "timer.h"
-#include "xerror.h"
 #include "level.h"
 #include "samples.h"
 #include "cutscenes.h"

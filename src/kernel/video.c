@@ -17,13 +17,13 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#define _GNU_SOURCE
+#include <config.h>
 
+#include <error.h>
 #include <stdio.h>
 #include "event.h"
 #include "timer.h"
 #include "array.h"
-#include "xerror.h"
 #include "video.h"
 
 ALLEGRO_DISPLAY *display;
@@ -47,14 +47,14 @@ void
 init_video (void)
 {
   if (! al_init_image_addon ())
-    xerror (-1, 0, "%s (void): failed to initialize image addon",
+    error (-1, 0, "%s (void): failed to initialize image addon",
             __func__);
 
   al_set_new_display_flags (ALLEGRO_WINDOWED | ALLEGRO_RESIZABLE |
                             ALLEGRO_GENERATE_EXPOSE_EVENTS);
 
   display = al_create_display (DISPLAY_WIDTH, DISPLAY_HEIGHT);
-  if (! display) xerror (-1, 0, "%s (void): failed to initialize display", __func__);
+  if (! display) error (-1, 0, "%s (void): failed to initialize display", __func__);
 
   screen = create_bitmap (ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
   uscreen = create_bitmap (ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
@@ -71,10 +71,10 @@ init_video (void)
   al_init_font_addon ();
   builtin_font = al_create_builtin_font ();
   if (! builtin_font)
-    xerror (-1, 0, "%s (void): cannot create builtin font", __func__);
+    error (-1, 0, "%s (void): cannot create builtin font", __func__);
 
   if (! al_init_primitives_addon ())
-    xerror (-1, 0, "%s (void): failed to initialize primitives addon",
+    error (-1, 0, "%s (void): failed to initialize primitives addon",
            __func__);
 }
 
@@ -99,7 +99,7 @@ get_display_event_source (ALLEGRO_DISPLAY *display)
 {
   ALLEGRO_EVENT_SOURCE *event_source = al_get_display_event_source (display);
   if (! event_source)
-    xerror (-1, 0, "%s: failed to get display event source (%p)",
+    error (-1, 0, "%s: failed to get display event source (%p)",
            __func__,  display);
   return event_source;
 }
@@ -108,7 +108,7 @@ ALLEGRO_BITMAP *
 create_bitmap (int w, int h)
 {
   ALLEGRO_BITMAP *bitmap = al_create_bitmap (w, h);
-  if (! bitmap) xerror (-1, 0, "%s (%i, %i): cannot create bitmap", __func__, w, h);
+  if (! bitmap) error (-1, 0, "%s (%i, %i): cannot create bitmap", __func__, w, h);
   return bitmap;
 }
 
@@ -116,7 +116,7 @@ ALLEGRO_BITMAP *
 clone_bitmap (ALLEGRO_BITMAP *bitmap)
 {
   ALLEGRO_BITMAP *new_bitmap = al_clone_bitmap (bitmap);
-  if (! new_bitmap) xerror (-1, 0, "%s (%p): cannot clone bitmap", __func__, bitmap);
+  if (! new_bitmap) error (-1, 0, "%s (%p): cannot clone bitmap", __func__, bitmap);
   return new_bitmap;
 }
 
@@ -237,7 +237,7 @@ draw_bottom_text (ALLEGRO_BITMAP *bitmap, char *text)
 
   if (text) {
     if (current_text) al_free (current_text);
-    xasprintf (&current_text, "%s", text);
+    asprintf (&current_text, "%s", text);
     al_set_timer_count (timer, 0);
     al_start_timer (timer);
   } else if (al_get_timer_count (timer) >= BOTTOM_TEXT_DURATION
@@ -267,7 +267,7 @@ load_bitmap (char *filename)
 {
   ALLEGRO_BITMAP *bitmap = al_load_bitmap (filename);
   if (! bitmap)
-    xerror (-1, 0, "%s: cannot load bitmap file '%s'",
+    error (-1, 0, "%s: cannot load bitmap file '%s'",
             __func__, filename);
 
   /* work around a bug (MinGW target), where bitmaps are loaded as
@@ -307,7 +307,7 @@ void
 acknowledge_resize (void)
 {
   if (! al_acknowledge_resize (display))
-    xerror (-1, 0, "%s: cannot acknowledge display resize (%p)", __func__, display);
+    error (-1, 0, "%s: cannot acknowledge display resize (%p)", __func__, display);
 }
 
 void
@@ -434,8 +434,8 @@ show (void)
     draw_roll_right (screen, effect_buffer, video_effect.duration, i);
     break;
   default:
-    xerror (-1, 0, "%s (void): unknown video effect type (%i)",
-            __func__, video_effect.type);
+    error (-1, 0, "%s (void): unknown video effect type (%i)",
+           __func__, video_effect.type);
   }
 
   flip_display (effect_buffer);

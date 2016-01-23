@@ -28,6 +28,8 @@ src/mininim
 
 **/*~
 
+# Ignore gnulib files
+/gnulib
 
 # Ignore all Autoconf M4 files except the non-standard ones used by
 # this project.  Ignore also the Autom4te temporary cache.

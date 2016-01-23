@@ -17,14 +17,13 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <stdarg.h>
-#include <stdio.h>
+#include <config.h>
+
 #include <stddef.h>
 #include <string.h>
 #include <assert.h>
 #include <allegro5/allegro.h>
 #include "memory.h"
-#include "xerror.h"
 #include "array.h"
 
 void *
@@ -89,18 +88,4 @@ destroy_array (void **base, size_t *nmemb)
   al_free (*base);
   *base = NULL;
   *nmemb = 0;
-}
-
-void
-xasprintf (char **ptr, const char *template, ...)
-{
-  va_list ap;
-  va_start (ap, template);
-
-  *ptr = xmalloc (256);
-
-  if (vsnprintf (*ptr, 256, template, ap) < 0)
-    xerror (-1, 0, "%s (%p, %p): cannot create string",
-            __func__, ptr, template);
-  va_end (ap);
 }

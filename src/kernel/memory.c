@@ -17,8 +17,10 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <config.h>
+
+#include <error.h>
 #include <allegro5/allegro.h>
-#include "xerror.h"
 
 void *
 xmalloc (size_t n)
@@ -27,7 +29,7 @@ xmalloc (size_t n)
 
   void *ptr = al_malloc (n);
   if (! ptr)
-    xerror (-1, 0, "%s (%zu): cannot allocate memory", __func__, n);
+    error (-1, 0, "%s (%zu): cannot allocate memory", __func__, n);
   return ptr;
 }
 
@@ -42,7 +44,7 @@ xrealloc (void *ptr, size_t n)
 
   void *_ptr = al_realloc (ptr, n);
   if (! _ptr)
-    xerror (-1, 0, "%s (%p, %zu): cannot reallocate memory", __func__, ptr, n);
+    error (-1, 0, "%s (%p, %zu): cannot reallocate memory", __func__, ptr, n);
   return _ptr;
 }
 
@@ -53,6 +55,6 @@ xcalloc (size_t count, size_t n)
 
   void *ptr = al_calloc (count, n);
   if (! ptr)
-    xerror (-1, 0, "%s (%zu, %zu): cannot allocat memory", __func__, count, n);
+    error (-1, 0, "%s (%zu, %zu): cannot allocat memory", __func__, count, n);
   return ptr;
 }

@@ -44,10 +44,6 @@ AC_PREREQ(2.60)
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_SRCDIR([src/mininim.c])
 
-# GNUlib initialization;
-dnl gl_EARLY
-dnl gl_INIT
-
 # GNU Automake settings;
 AM_INIT_AUTOMAKE([-Wall -Wno-portability -Wno-override foreign subdir-objects])
 AM_SILENT_RULES([yes])
@@ -81,6 +77,10 @@ AC_PROG_SED
 
 # Check for `cc'.
 AC_PROG_CC
+
+# GNUlib;
+gl_EARLY
+gl_INIT
 
 # Check for Allegro library
 PKG_CHECK_MODULES([ALLEGRO],
@@ -223,7 +223,8 @@ dnl src/Makefile
 AC_CONFIG_FILES(
 [Makefile
 doc/Makefile
-doc/release/release.texi])
+doc/release/release.texi
+gnulib/Makefile])
 
 dnl enable this when mininim supports the '--help' option
 dnl doc/man/Makefile
