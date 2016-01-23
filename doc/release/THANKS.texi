@@ -1,0 +1,92 @@
+@c
+@c THANKS.texi -- List of minor contributors;
+@c
+@c Copyright (C) 2016 Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
+@c
+@c Permission is granted to copy, distribute and/or modify this
+@c document under the terms of the GNU Free Documentation License,
+@c Version 1.3 or any later version published by the Free Software
+@c Foundation; with no Invariant Sections.
+@c
+@c You should have received a copy of the GNU Free Documentation
+@c License along with this program.  If not, see
+@c <http://www.gnu.org/licenses/>.
+@c
+
+
+@c %**start of header
+@ifclear manual
+@setfilename THANKS
+@documentencoding UTF-8
+@c @documentlanguage en_US
+@firstparagraphindent insert
+@footnotestyle end
+@settitle THANKS
+@end ifclear
+@include release.texi
+@c %**end of header
+
+
+
+
+
+@c --- homepage: Navigation bar;
+@ifset homepage
+@include navigation.texi
+@end ifset
+
+
+
+
+
+@c --- file: Copying notice;
+@ifset file
+@set FILE THANKS
+@include copying.texi
+@insertcopying
+@end ifset
+
+
+
+
+
+@c --- THANKS;
+@ifclear manual
+@centerchap Thanks
+@end ifclear
+
+This @inlineifset{manual, chapter}@inlineifset{file,
+file}@inlineifset{homepage, page} contains a list of people that
+reported problems, suggested improvements or submitted relatively
+small portions of actual code.  This program would not be what it is
+today without the invaluable help of these people, to whom we would
+like to say:
+
+@center @strong{THANK YOU!}
+@sp 1
+
+The names are listed in chronological order of contribution.  Each
+person's contact information, usually email, and a summary of that
+person's contribution is put in per correspondent section.
+
+For contributions that does matter for copyright purposes, e.g., major
+source code contributions, see @inlineifset{homepage,
+@url{AUTHORS.html, the authors page}}@inlineifset{file, @file{AUTHORS}
+file}@inlineifset{manual, @ref{Authors}}.  If you would appreciate
+your own name listed here, @strong{please contribute!}  See
+@inlineifset{homepage, @url{README.html#Contributing, how to
+contribute}}@inlineifset{file, the ``Contributing'' section of the
+@file{README} file}@inlineifset{manual, @ref{Contributing}}.
+
+@table @asis
+@item ---
+@end table
+
+
+
+
+
+@c --- homepage: Footer;
+@ifset homepage
+@include footer.texi
+@end ifset

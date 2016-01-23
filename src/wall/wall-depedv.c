@@ -18,7 +18,7 @@
 */
 
 #include <stdio.h>
-#include "prince.h"
+#include "mininim.h"
 #include "video.h"
 #include "random.h"
 #include "xerror.h"

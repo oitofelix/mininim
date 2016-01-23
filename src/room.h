@@ -20,7 +20,7 @@
 #ifndef MININIM_ROOM_H
 #define MININIM_ROOM_H
 
-#include "prince.h"
+#include "mininim.h"
 
 typedef void (*room_callback_f) (int, int);
 

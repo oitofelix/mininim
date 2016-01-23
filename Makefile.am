@@ -28,9 +28,8 @@ include documentation.am
 # Program #
 ###########
 
-bin_PROGRAMS = prince
-# prince_SOURCES = ${MODULES:=.c} ${MODULES:=.h}
-prince_SOURCES = src/prince.c src/prince.h src/anim.c src/anim.h			\
+bin_PROGRAMS = mininim
+mininim_SOURCES = src/mininim.c src/mininim.h src/anim.c src/anim.h		\
 		src/pos.c src/pos.h src/physics.c src/physics.h src/level.c				\
 		src/level.h src/consistency.c src/consistency.h src/stars.c				\
 		src/stars.h src/floor.c src/floor.h src/broken-floor.c						\
@@ -47,7 +46,7 @@ prince_SOURCES = src/prince.c src/prince.h src/anim.c src/anim.h			\
 		src/sword.c src/sword.h src/clock.c src/clock.h src/princess.c		\
 		src/princess.h src/jaffar.c src/jaffar.h src/mouse.c src/mouse.h	\
 		src/samples.c src/samples.h src/cutscenes.c src/cutscenes.h				\
-		src/fight.c src/fight.h src/wall/wall.c src/wall/wallh						\
+		src/fight.c src/fight.h src/wall/wall.c src/wall/wall.h						\
 		src/wall/wall-depedv.c src/wall/wall-depedv.h src/wall/wall-pv.c	\
 		src/wall/wall-pv.h src/wall/wall-dcpc.c src/wall/wall-dcpc.h			\
 		src/kid/kid.c src/kid/kid.h src/kid/kid-normal.c									\
@@ -94,12 +93,15 @@ prince_SOURCES = src/prince.c src/prince.h src/anim.c src/anim.h			\
 		src/kernel/random.c src/kernel/random.h src/kernel/array.c				\
 		src/kernel/array.h src/kernel/xerror.c src/kernel/xerror.h
 
-AM_CPPFLAGS = -DLOCALEDIR=\"$(localedir)\" -Isrc -Isrc/kernel	\
-  -Isrc/guard -Isrc/kid -Isrc/levels -Isrc/wall
+AM_CPPFLAGS = -DLOCALEDIR=\"$(localedir)\" -I${srcdir}/src				\
+-I${srcdir}/src/kernel -I${srcdir}/src/guard -I${srcdir}/src/kid	\
+-I${srcdir}/src/levels -I${srcdir}/src/wall
 CFLAGS_DEV = -Wall -ggdb3 -Werror -Wno-error=unused-function	\
   -Wno-error=unused-variable -Wno-error=unused-but-set-variable
 AM_CFLAGS = ${CFLAGS_DEV} ${ALLEGRO_CFLAGS}
 AM_LDFLAGS = -lm ${ALLEGRO_LIBS}
+
+
 
 
 #######################
@@ -107,14 +109,8 @@ AM_LDFLAGS = -lm ${ALLEGRO_LIBS}
 #######################
 
 ACLOCAL_AMFLAGS = -I m4
-
-# SUBDIRS = src
-# SUBDIRS = po src doc
-
-# EXTRA_DIST = ${top_level_doc} ChangeLog po/Rules-mininim po/LINGUAS.in
-
-# DISTCLEANFILES = po/LINGUAS
-
+SUBDIRS = doc
+EXTRA_DIST = ${top_level_doc} data ChangeLog
 
 
 
@@ -125,9 +121,8 @@ ACLOCAL_AMFLAGS = -I m4
 
 release_texi = ${abs_top_srcdir}/doc/release/release.texi.in
 description_texi = ${abs_top_srcdir}/doc/release/description.texi
-manifesto_texi = ${abs_top_srcdir}/doc/release/manifesto.texi
 
-README : ${manifesto_texi} ${description_texi}
+README : ${description_texi}
 ANNOUNCEMENT : ${description_texi}
 
 ### Template recipe intended to generate the top-level release
@@ -213,4 +208,4 @@ ensure-vcs :
 	  echo "***** Sorry, the requested target can only be made from \
 	VCS checkouts. *****"; exit 1; fi
 
-.PHONY : doxygen-run doxygen-doc ensure-vcs
+.PHONY : ensure-vcs

@@ -1,0 +1,537 @@
+@c
+@c README.texi -- Description, distribution, obtaining, contact,
+@c                bug reports, contribution, donation and hacking;
+@c
+@c Copyright (C) 2016 Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
+@c
+@c Permission is granted to copy, distribute and/or modify this
+@c document under the terms of the GNU Free Documentation License,
+@c Version 1.3 or any later version published by the Free Software
+@c Foundation; with no Invariant Sections.
+@c
+@c You should have received a copy of the GNU Free Documentation
+@c License along with this program.  If not, see
+@c <http://www.gnu.org/licenses/>.
+@c
+
+@c %**start of header
+@ifclear manual
+@setfilename README
+@documentencoding UTF-8
+@c @documentlanguage en_US
+@firstparagraphindent insert
+@footnotestyle end
+@settitle README
+@end ifclear
+@include release.texi
+@c %**end of header
+
+
+
+
+
+@c --- Macros;
+
+@c --- --- metaSection
+@macro metaSection{name}
+@ifset file
+@node \name\
+@chapter \name\
+@end ifset
+@ifset manual
+@node \name\
+@section \name\
+@end ifset
+@ifset homepage
+@anchor{\name\}
+@majorheading \name\
+@end ifset
+@end macro
+
+
+
+
+
+@c --- homepage: Navigation bar;
+@ifset homepage
+@include navigation.texi
+
+@majorheading Main
+
+@multitable @columnfractions .1 .1 .1 .1 .1 .1
+@headitem @ref{Download}
+@tab @ref{Contact}
+@tab @ref{Bug reporting}
+@tab @ref{Contributing}
+@tab @ref{Donating}
+@tab @ref{Hacking}
+@end multitable
+@end ifset
+
+
+
+
+
+@c --- file: Copying notice;
+@ifset file
+@set FILE README
+@include copying.texi
+@insertcopying
+@end ifset
+
+
+
+
+
+@c --- file: Table of contents;
+@ifset file
+@sp 1
+@noindent
+--- Table of Contents ---
+@contents
+@sp 2
+@end ifset
+
+
+
+
+
+@c --- file/manual: Preface;
+@ifclear homepage
+@ifset file
+@unnumbered Preface
+@end ifset
+
+This @inlineifset{manual, chapter}@inlineifset{file, file} briefly
+explains for what this package is intended, gives relevant
+considerations regarding dependencies, configuration, build,
+installation and use, describes which are the rules for its
+distribution, how to get a copy of it, how to contact the community,
+how to fill bug reports, how to contribute to the package, how to make
+donations to support its development and how to get started hacking
+the code.  Bear in mind that instructions in this @inlineifset{manual,
+chapter}@inlineifset{file, file} are package-specific; for general and
+in-depth configuration, build and installation instructions refer to
+the file @file{INSTALL} present in the top-level directory of the
+source distribution.  If you have checked out the source tree from the
+VCS repository see @ref{Hacking}.
+
+@ifset file
+For other information about this package you can check the following
+files found in the top level directory of the distribution:
+
+@table @file
+@item NEWS
+User-visible changes since previous versions;
+@item TODO
+Features we want to see implemented someday;
+@item AUTHORS
+List of major contributors;
+@item THANKS
+List of minor contributors;
+@c @item BUGS
+@c Bugs you must be aware of;
+@item DONORS
+People who supported the development by donations;
+@item INSTALL
+Generic build and installation instructions;
+@item ABOUT-NLS
+Internationalization and localization matters;
+@item COPYING
+The program license;
+@item GNU-FREE-DOCUMENTATION-LICENSE
+The documentation license;
+@item ChangeLog
+Detailed list of changes of the source code;
+@end table
+
+Information about the GNU operating system, the GNU Project and the
+Free Software Movement are included in the distribution --- for your
+pleasure --- in the form of some articles by Richard Stallman (RMS).
+See the top-level files:
+
+@itemize
+@item THE-GNU-MANIFESTO
+@item THE-GNU-PROJECT
+@item LINUX-AND-THE-GNU-SYSTEM
+@item WHY-SOFTWARE-SHOULD-NOT-HAVE-OWNERS
+@item WHY-FREE-SOFTWARE-NEEDS-FREE-DOCUMENTATION
+@end itemize
+
+@end ifset
+
+@menu
+* Description::    What this package is all about;
+* Distribution::   The user's right to modify and redistribute;
+* Getting a copy:: GNU FTP server and VCS;
+* Contact::        Mailing list and IRC;
+* Bug reporting::  Support and bug trackers;
+* Contributing::   Several ways to help program's development;
+* Donating::       Supporting developer's work;
+* Hacking::        Get started with the VCS checkout;
+@end menu
+
+For more information about this program you can visit its home page at
+@url{@value{webPage}}.  If you want to receive notifications about new
+releases of this program or important issues related to it, subscribe to
+its mailing list, as described in @ref{Contact}, or subscribe to the
+package atom feed @url{@value{atomFeed}}.
+
+@end ifclear
+
+
+
+
+
+@c --- Description;
+@ifset file
+@chapter Description
+@end ifset
+@ifset manual
+@node Description
+@section Description
+@end ifset
+
+@include description.texi
+
+
+
+
+
+@c --- file, manual: Distribution;
+@ifclear homepage
+@metaSection Distribution
+
+This program is @dfn{free software}; this means that everyone is free
+to use it and free to redistribute it under certain conditions.  This
+program is not in the public domain; it is copyrighted and there are
+restrictions on its distribution, but these restrictions are designed
+to permit everything that a good cooperating citizen would want to do.
+What is not allowed is to try to prevent others from further sharing
+any version of this program that they might get from you.  The precise
+conditions are found in the @inlineifset{file, GNU General Public
+License (@file{COPYING} file)}@inlineifset{manual, GNU
+@acronym{@url{@value{progLicenseURL}, GPL}, General Public Licence}}.
+The program manual is covered by the @inlineifset{file, GNU Free
+Documentation License (@file{GNU-FREE-DOCUMENTATION-LICENSE}
+file)}@inlineifset{manual, GFDL (@ref{GNU Free Documentation
+License})}.  This license is similar in spirit to the GNU General
+Public License, but is more suitable for documentation.
+@end ifclear
+
+
+
+
+
+@c --- file, manual: Getting a copy;
+@ifclear homepage
+@metaSection Getting a copy
+
+One way to get a copy of this program is from someone else who has it.
+You need not ask for our permission to do so, or tell any one else;
+just copy it.  You may also receive this program when you buy a
+computer.  Computer manufacturers are free to distribute copies on the
+same terms that apply to everyone else.  These terms require them to
+give you the full sources, including whatever changes they may have
+made, and to permit you to redistribute the program received from them
+under the usual terms of the GNU General Public License.  In other
+words, the program must be free for you when you get it, not just free
+for the manufacturer.
+
+If you have access to the Internet, you can get the latest
+distribution version of this program at @url{@value{ftpDir}}.  Please,
+use a mirror if possible; you will be automatically redirected to the
+nearest mirror at @url{@value{ftpMirrorDir}}.
+
+A VCS repository, where the development takes place, is also
+available.  It maintains the full history of modifications of every
+single source file.  You can checkout any given revision of any file
+or get a snapshot of the entire source tree in a particular desired
+state.  Special build tools, as described in @ref{Hacking}, are
+required to build from those checkouts, though.  Notably, to stay up
+to date with the latest developments in the source tree, you can
+anonymously checkout the repository with the following command:
+@example
+git clone @value{GITurl}
+@end example
+@end ifclear
+
+
+
+
+
+@c --- homepage: Download;
+@ifset homepage
+@anchor{Download}
+@majorheading Download
+
+@strong{The current stable release is @value{version}} (released
+@value{date}).
+
+@noindent
+Here are the compressed sources and a GPG detached signature:
+@example
+@value{ftpTarball}
+@value{ftpTarSign}
+@end example
+
+@noindent
+Use a mirror for higher download bandwidth:
+@example
+@value{ftpMirrorTarball}
+@value{ftpMirrorTarSign}
+@end example
+
+You can find that and earlier releases at a nearby
+@url{@value{ftpMirrorDir}, GNU@tie{}ftp@tie{}mirror}; or if automatic
+redirection does not work use the @url{@value{ftpDir},
+GNU@tie{}main@tie{}ftp@tie{}server}.
+
+The oldest (non-GNU) releases are available from
+@url{@value{ftpOldMirror}, Savannah mirror download area}
+(alternatively @url{@value{ftpOld}, Savannah download area}).  They
+are only of historical interest and are no longer supported.
+
+Use a @file{.sig} file to verify that the corresponding file (without
+the @file{.sig} suffix) is intact.  First, be sure to download both
+the @file{.sig} file and the corresponding tarball.  Then, run a
+command like this:
+
+@example
+gpg --verify @value{tarSign}
+@end example
+
+If that command fails because you don't have the required public key,
+then run this command to import it:
+
+@example
+gpg --recv-keys @value{keyID} --keyserver hkp://keys.gnupg.net
+@end example
+
+@noindent
+and rerun the @code{gpg --verify} command.
+
+This release is signed by @emph{@value{signer}}.  His key fingerprint
+is @code{@value{fingerprint}}.
+
+Check the key's authenticity with the command
+@example
+gpg --fingerprint @value{keyID} | sed -n '/^[[:blank:]]\+Key/s/^.*= //p'
+@end example
+
+It must print the following fingerprint:
+@example
+@value{fingerprint}
+@end example
+
+Otherwise something is wrong!  In that case don't use the downloaded
+tarball and contact the developers as described in @ref{Contact}.
+
+A VCS repository, where the development takes place, is also
+available.  To stay up to date with the latest developments in the
+source tree, you can anonymously checkout the repository with the
+following command:
+@example
+git clone @value{GITurl}
+@end example
+@end ifset
+
+
+
+
+
+@c --- Contact
+@metaSection Contact
+
+You can get in touch with other users and the developers of this program
+by subscribing to its mailing list.  Anyone is welcome to join the list;
+to do so, visit @url{@value{mailHelpWeb}, MININIM help and support
+mailing list web interface}.  To post a message to all the list members,
+send email to @email{@value{mailHelpAddr}}.  To see the collection of
+prior postings to the list, visit @url{@value{mailHelpArch}, its
+archive}.  You can use this list for all discussion, including asking
+for help and bug reporting, although the preferred method for reporting
+bugs is sending a mail to @email{@value{mailBugAddr}}, the MININIM bug
+reporting mailing list.  See @ref{Bug reporting}.
+
+If you feel somewhat chatty, eager for a somewhat more instantaneous
+response from community, you can join us on our friendly IRC channel:
+@samp{@value{IRCurl}}.
+
+
+
+
+
+@c --- Bug reporting
+@metaSection Bug reporting
+
+If you came across some problem and need help you can contact the
+community as described in @ref{Contact}.  If you think you found a bug,
+but is not quite sure about it, you can ask for support sending a mail
+to @email{@value{mailHelpAddr}}.  We will revise your post, advise you
+and take the appropriate measures.  If you are confident you have found
+a bug, you can submit a bug report directly to
+@email{@value{mailBugAddr}}.  You can subscribe to this MININIM bug
+reporting mailing list at @url{@value{mailBugWeb}, its web interface}.
+To see the collection of prior reported bugs, visit
+@url{@value{mailBugArch}, its archive}.  Please, when reporting a bug
+include enough information for the maintainers to reproduce the problem.
+Generally speaking, that means:
+
+@itemize
+@item
+The contents of any input files necessary to reproduce the bug and
+command line invocations of the program(s) involved (crucial!).
+@item
+A description of the problem and any samples of the erroneous output.
+@item
+The version number of the program(s) involved (use
+@option{--version}).
+@item
+Hardware, operating system, and compiler versions (@code{uname -a}).
+@item
+Unusual options you gave to configure, if any (see
+@file{config.status}).
+@item
+Anything else that you think would be helpful.
+@end itemize
+
+
+
+
+
+@c --- Contributing
+@metaSection Contributing
+
+This program is a collaborative effort and we encourage contributions
+from anyone and everyone --- your help is very much appreciated.  You
+can help in many ways:
+
+@itemize
+@item
+Donate to developers in order to support their work.  See
+@ref{Donating}.
+@item
+Write documentation.  We are specially in need to complete the CCD
+sheet format specification.
+@item
+Help users in the mailing list and IRC channel.
+@item
+Find and report bugs.  @xref{Bug reporting}.
+@item
+Fix reported bugs.
+@item
+Implement new feature ideas.
+@item
+Write test cases.
+@item
+Check the documentation against the implementation.
+@item
+Translate the program strings to other languages.
+@end itemize
+
+You can join the development team to contribute code and documentation
+at the @url{@value{develPage}, development page}.  Patches are most
+welcome, but contributed code should follow the @ref{,,, standards,
+GNU Coding Standards}.  If it doesn't, we'll need to find someone to
+fix the code before we can use it.  It is also necessary that the
+contributor be willing to assign their copyright to the FSF, since the
+developers plan to make it officially part of the GNU operating system
+and they want FSF to enforce the program's license.  To get started
+hacking see @inlinefmtifelse{html, @url{README.html#Hacking, how to
+hack}, @ref{Hacking}}.
+
+
+
+
+
+@c --- Donating;
+@metaSection Donating
+
+If you find this program useful, please @strong{send a donation} to
+its developers to support their work.  If you use this program at your
+workplace, please suggest that the company make a donation.  We
+appreciate contributions of any size -- donations enable us to spend
+more time working on this package, and help cover our infrastructure
+expenses.
+
+If you'd like to make a donation of any value, please send it to the
+following Bitcoin address:
+
+@example
+@value{btcAddr}
+@end example
+
+Since we aren't a tax-exempt organization, we can't offer you a tax
+deduction, but for all donations over 0.05@tie{}BTC, we'd be happy to
+recognize your contribution on the @url{DONORS.html, donors@tie{}page}
+and on @file{DONORS} file for the next release.
+
+We are also happy to consider making particular improvements or
+changes, or giving specific technical assistance, in return for a
+substantial donation over 0.5@tie{}BTC.  If you would like to discuss
+this possibility, write to me at @email{oitofelix@@gnu.org}.
+
+Another possibility is to pay a software maintenance fee.  Again,
+write to me about this at @email{oitofelix@@gnu.org} to discuss how
+much you want to pay and how much maintenance we can offer in return.
+
+@center @strong{Thanks for your support!}
+@sp 1
+
+
+
+
+
+@c --- Hacking;
+@metaSection Hacking
+
+@noindent
+The development sources are available through VCS at Savannah:
+
+@display
+@value{GITsavannah}
+@end display
+
+If you are getting the sources from a VCS (or change
+@file{configure.ac}), you'll need to have Automake, Autoconf and Gettext
+installed to (re)build.  You'll also need help2man.  All of these
+programs are available from @url{@value{ftp}}.
+
+After getting the VCS sources, and installing the tools above, you can
+run @code{./bootstrap && ./configure && make} to do a fresh build.
+After that first time, running @command{make} should suffice to rebuild
+the program with your changes.  See file @file{INSTALL}.
+
+When modifying the sources, or making a distribution, more is needed,
+as follows:
+
+@itemize
+@item
+This distribution also uses @url{https://www.gnu.org/software/gnulib,
+Gnulib} to share common files, stored as a submodule in git.
+@item
+When updating gettext, besides the normal installation on the system,
+it is necessary to run @code{gettextize -f} in this hierarchy to
+update the @file{po/} infrastructure.  After doing so, rerun
+@code{gnulib-tool --import} since otherwise older files will have been
+imported.  @xref{,,, gnulib, Gnulib Manual}, for more information.
+@end itemize
+
+When committing changes to the repository always create an entry in the
+@file{doc/release/latest-news.texi} file for any user-visible changes or
+additions made.  This file is intended to provide the latest release
+news for the @file{NEWS.texi} and @file{ANNOUNCEMENT.texi} files to
+avoid duplication of information and syncing work.  After a release is
+made the news items should be moved to the @file{NEWS.texi} file and
+another news list should be built from scratch in the
+@file{ANNOUNCEMENT.texi} file.
+
+
+
+
+
+@c --- homepage: Footer;
+@ifset homepage
+@include footer.texi
+@end ifset

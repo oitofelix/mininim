@@ -42,7 +42,7 @@ AC_DEFINE(PACKAGE_COPYRIGHT_HOLDER, ["Bruno Fe'lix Rezende Ribeiro"],
 AC_CONFIG_AUX_DIR([build-aux])
 AC_PREREQ(2.60)
 AC_CONFIG_HEADERS([config.h])
-AC_CONFIG_SRCDIR([src/prince.c])
+AC_CONFIG_SRCDIR([src/mininim.c])
 
 # GNUlib initialization;
 dnl gl_EARLY
@@ -217,14 +217,16 @@ AS_IF([test x$VCS = xy],
 # Output files;
 dnl po/Makefile.in
 dnl po/LINGUAS
-dnl doc/Makefile
 dnl doc/Doxyfile
-dnl doc/man/Makefile
-dnl doc/release/release.texi
 dnl src/Makefile
 
 AC_CONFIG_FILES(
-[Makefile])
+[Makefile
+doc/Makefile
+doc/release/release.texi])
+
+dnl enable this when mininim supports the '--help' option
+dnl doc/man/Makefile
 
 AC_OUTPUT
 

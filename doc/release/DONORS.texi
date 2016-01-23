@@ -1,0 +1,83 @@
+@c
+@c DONORS.texi -- People who supported the development by donations;
+@c
+@c Copyright (C) 2016 Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
+@c
+@c Permission is granted to copy, distribute and/or modify this
+@c document under the terms of the GNU Free Documentation License,
+@c Version 1.3 or any later version published by the Free Software
+@c Foundation; with no Invariant Sections.
+@c
+@c You should have received a copy of the GNU Free Documentation
+@c License along with this program.  If not, see
+@c <http://www.gnu.org/licenses/>.
+@c
+
+@c %**start of header
+@ifclear manual
+@setfilename DONORS
+@documentencoding UTF-8
+@c @documentlanguage en_US
+@firstparagraphindent insert
+@footnotestyle end
+@settitle DONORS
+@end ifclear
+@include release.texi
+@c %**end of header
+
+
+
+
+
+@c --- homepage: Navigation bar;
+@ifset homepage
+@include navigation.texi
+@end ifset
+
+
+
+
+
+@c --- Copying notice;
+@ifset file
+@set FILE DONORS
+@include copying.texi
+@insertcopying
+@end ifset
+
+
+
+
+
+@c --- DONORS;
+@ifclear manual
+@centerchap Donors
+@end ifclear
+
+This @inlineifset{manual, chapter}@inlineifset{file,
+file}@inlineifset{homepage, page} contains a list of people that
+supported development by means of donation.  This program would not be
+what it is today without the invaluable help of these people, to whom
+we would like to say:
+
+@center @strong{THANK YOU VERY MUCH!}
+@sp 1
+
+If you would appreciate your own name listed here, @strong{please
+donate!}  See @inlineifset{homepage, @url{README.html#Donating, how to
+donate}}@inlineifset{file, the ``Donating'' section of the
+@file{README} file}@inlineifset{manual, @ref{Donating}}.
+
+@multitable @columnfractions .500 .380 .120
+@headitem Name @tab Email @tab BTC
+@item --- @tab --- @tab ---
+@end multitable
+
+
+
+
+
+@c --- homepage: Footer;
+@ifset homepage
+@include footer.texi
+@end ifset

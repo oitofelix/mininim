@@ -19,7 +19,7 @@
 
 #include <stdio.h>
 #include <allegro5/allegro.h>
-#include "prince.h"
+#include "mininim.h"
 #include "video.h"
 #include "random.h"
 #include "array.h"

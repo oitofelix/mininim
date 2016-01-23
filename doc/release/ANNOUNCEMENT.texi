@@ -1,0 +1,151 @@
+@c
+@c ANNOUNCEMENT.texi -- Announcement of new release;
+@c
+@c Copyright (C) 2016 Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
+@c
+@c Permission is granted to copy, distribute and/or modify this
+@c document under the terms of the GNU Free Documentation License,
+@c Version 1.3 or any later version published by the Free Software
+@c Foundation; with no Invariant Sections.
+@c
+@c You should have received a copy of the GNU Free Documentation
+@c License along with this program.  If not, see
+@c <http://www.gnu.org/licenses/>.
+@c
+
+@c %**start of header
+@ifclear manual
+@setfilename ANNOUNCEMENT
+@documentencoding UTF-8
+@c @documentlanguage en_US
+@firstparagraphindent insert
+@footnotestyle end
+@settitle ANNOUNCEMENT
+@end ifclear
+@include release.texi
+@c %**end of header
+@set announcement
+
+
+
+
+
+@c --- homepage: Navigation bar;
+@ifset homepage
+@include navigation.texi
+@end ifset
+
+
+
+
+
+@c --- file: Copying notice;
+@c @ifset file
+@c @set FILE ANNOUNCEMENT
+@c @include copying.texi
+@c @insertcopying
+@c @end ifset
+
+
+
+
+
+@ifclear manual
+@centerchap @value{package} @value{version} (@value{date})
+@end ifclear
+
+@include description.texi
+
+
+
+
+@heading News
+
+@include latest-news.texi
+
+
+
+
+
+@heading Download
+
+@noindent
+Here are the compressed sources and a GPG detached signature:
+@example
+@value{ftpTarball}
+@value{ftpTarSign}
+@end example
+
+@noindent
+Use a mirror for higher download bandwidth:
+@example
+@value{ftpMirrorTarball}
+@value{ftpMirrorTarSign}
+@end example
+
+Use a @file{.sig} file to verify that the corresponding file (without
+the @file{.sig} suffix) is intact.  First, be sure to download both
+the @file{.sig} file and the corresponding tarball.  Then, run a
+command like this:
+
+@example
+gpg --verify @value{tarSign}
+@end example
+
+If that command fails because you don't have the required public key,
+then run this command to import it:
+
+@example
+gpg --recv-keys @value{keyID} --keyserver hkp://keys.gnupg.net
+@end example
+
+@noindent
+and rerun the @code{gpg --verify} command.
+
+This release is signed by @emph{@value{signer}}.  His key fingerprint
+is @code{@value{fingerprint}}.
+
+@noindent
+This release was bootstrapped with the following tools:
+@itemize
+@item
+GNU Autoconf @value{autoconfVersion}
+@item
+GNU Automake @value{automakeVersion}
+@item
+GNU Texinfo @value{texinfoVersion}
+@end itemize
+
+
+
+
+
+@heading Links
+
+@table @asis
+@item Homepage
+@value{webPage}
+@item Atom feed
+@value{atomFeed}
+@item Help and support mailing list
+@value{mailHelpAddr}
+@item Bug reporting mailing list
+@value{mailBugAddr}
+@item IRC channel
+@value{IRCurl}
+@item Support Tracker
+@value{supportTrack}
+@item Bug Tracker
+@value{bugTrack}
+@item Development page
+@value{develPage}
+@end table
+
+
+
+
+
+@c --- homepage: Footer;
+@ifset homepage
+@include footer.texi
+@end ifset

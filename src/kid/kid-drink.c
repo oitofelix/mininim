@@ -17,7 +17,7 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "prince.h"
+#include "mininim.h"
 #include "video.h"
 #include "keyboard.h"
 #include "random.h"

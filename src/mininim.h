@@ -1,5 +1,5 @@
 /*
-  prince.h -- MININIM main module;
+  mininim.h -- MININIM main module;
 
   Copyright (C) 2015, 2016 Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
 
@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MININIM_PRINCE_H
-#define MININIM_PRINCE_H
+#ifndef MININIM_MININIM_H
+#define MININIM_MININIM_H
 
 #include <allegro5/allegro.h>
 #include "keyboard.h"
@@ -724,4 +724,4 @@ extern enum em em;
 extern enum vm vm;
 extern char *program_name;
 
-#endif	/* MININIM_PRINCE_H */
+#endif	/* MININIM_MININIM_H */

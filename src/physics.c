@@ -18,7 +18,7 @@
 */
 
 #include <stdio.h>
-#include "prince.h"
+#include "mininim.h"
 #include "random.h"
 #include "level.h"
 #include "kid.h"

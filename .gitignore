@@ -90,6 +90,7 @@ gmon.out
 /core
 .depend
 prince.gdb
+*.info
 
 # Local Variables:
 # mode: conf-space

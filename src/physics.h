@@ -20,7 +20,7 @@
 #ifndef MININIM_PHYSICS_H
 #define MININIM_PHYSICS_H
 
-#include "prince.h"
+#include "mininim.h"
 #include "pos.h"
 
 /* types */

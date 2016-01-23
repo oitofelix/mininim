@@ -20,7 +20,7 @@
 #ifndef MININIM_ANIM_H
 #define MININIM_ANIM_H
 
-#include "prince.h"
+#include "mininim.h"
 
 /* types */
 enum quit_anim {

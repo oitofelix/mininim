@@ -18,7 +18,7 @@
 */
 
 #include <stdio.h>
-#include "prince.h"
+#include "mininim.h"
 #include "video.h"
 #include "keyboard.h"
 #include "anim.h"

@@ -51,7 +51,8 @@ export texinfo_includes = \
 -I ${abs_top_srcdir}/doc \
 -I ${abs_top_srcdir}/doc/release \
 -I ${abs_top_srcdir}/doc/philosophy \
--I ${abs_top_srcdir}/doc/www
+-I ${abs_top_srcdir}/doc/www \
+-I ${abs_top_builddir}/doc/release
 
 export AM_MAKEINFOFLAGS = ${texinfo_includes}
 export makeinfo = ${MAKEINFO} ${AM_MAKEINFOFLAGS} ${MAKEINFOFLAGS}

@@ -1,0 +1,44 @@
+@c
+@c mininim.texi -- Description
+@c
+@c Copyright (C) 2016 Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
+@c
+@c Permission is granted to copy, distribute and/or modify this
+@c document under the terms of the GNU Free Documentation License,
+@c Version 1.3 or any later version published by the Free Software
+@c Foundation; with no Invariant Sections.
+@c
+@c You should have received a copy of the GNU Free Documentation
+@c License along with this program.  If not, see
+@c <http://www.gnu.org/licenses/>.
+@c
+
+MININIM is the Advanced Prince of Persia engine.
+
+@ifset homepage
+@ifclear announcement
+@multitable {} {}
+@item @image{images/gpl} @tab
+@emph{MININIM is free software}; you can redistribute it and/or modify
+it under the terms of the GNU @acronym{@url{@value{progLicenseURL},
+GPL}, General Public Licence} as published by the @acronym{FSF, Free
+Software Foundation}; either version 3, or (at your option) any later
+version.
+@end multitable
+@end ifclear
+@end ifset
+
+MININIM has detailed documentation.
+
+@ifset homepage
+@ifclear announcement
+@multitable {} {}
+@item @image{images/fdl} @tab
+@emph{MININIM documentation is free}; you can redistribute it and/or
+modify it under the terms of the GNU
+@acronym{@url{@value{docLicenseURL}, FDL}, Free Documentation Licence}
+as published by the FSF --- with no Invariant Sections; either version
+1.3, or (at your option) any later version.
+@end multitable
+@end ifclear
+@end ifset

@@ -1,5 +1,5 @@
 /*
-  prince.c -- MININIM main module;
+  mininim.c -- MININIM main module;
 
   Copyright (C) 2015, 2016 Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
 
@@ -21,7 +21,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "prince.h"
+#include "mininim.h"
 #include "video.h"
 #include "audio.h"
 #include "keyboard.h"

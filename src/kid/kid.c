@@ -19,7 +19,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "prince.h"
+#include "mininim.h"
 #include "video.h"
 #include "audio.h"
 #include "keyboard.h"
