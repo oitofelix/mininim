@@ -19,7 +19,7 @@ README
 # Ignore binary objects, Guile snarfed files and dependency
 # directories in source code directory.
 
-src/*.[ox]
+src/**/*.[ox]
 src/mininim
 **/.deps/
 
@@ -72,6 +72,7 @@ config.status
 stamp-h1
 doc/stamp-vti
 doc/Doxyfile
+doc/release/release.texi
 
 # Ignore GTAGS files
 /GPATH
@@ -86,9 +87,10 @@ doc/Doxyfile
 gmon.out
 
 # Others
-/prince
+/mininim
 /core
 .depend
+.dirstamp
 prince.gdb
 *.info
 
