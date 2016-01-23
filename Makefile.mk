@@ -18,8 +18,8 @@ KERNEL_MODULES = event timer video audio memory keyboard random array	\
   xerror
 
 MODULES = ${KERNEL_MODULES:%=src/kernel/%} ${ENGINE_MODULES:%=src/%}	\
-	${WALL_MODULES:%=src/wall/%} ${KID_MODULES:%=src/kid/%}			\
-	${GUARD_MODULES:%=src/guard/%} ${LEVEL_MODULES:%=src/levels/%}			\
+	${WALL_MODULES:%=src/wall/%} ${KID_MODULES:%=src/kid/%}							\
+	${GUARD_MODULES:%=src/guard/%} ${LEVEL_MODULES:%=src/levels/%}
 
 SRCS = ${MODULES:=.c}
 OBJECTS = ${MODULES:=.o}
@@ -31,7 +31,8 @@ CFLAGS_DEV = -Wall -ggdb3 -Werror -Wno-error=unused-function \
 CFLAGS_REL = -O3 -march=native
 CFLAGS_COV = ${CFLAGS_DEV} --coverage -pg
 CFLAGS = ${CFLAGS_DEV}
-CPPFLAGS = -Isrc -Isrc/kernel -Isrc/guard -Isrc/kid -Isrc/levels -Isrc/wall
+CPPFLAGS = -Isrc -Isrc/kernel -Isrc/guard -Isrc/kid -Isrc/levels	\
+  -Isrc/wall
 
 prince : ${OBJECTS}
 	${CC} ${OBJECTS} -o $@ ${CPPFLAGS} ${CFLAGS} ${LDFLAGS}

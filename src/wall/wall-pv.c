@@ -30,7 +30,6 @@ static ALLEGRO_COLOR wall_color_array[3][4][11];
 
 static ALLEGRO_COLOR wall_color (int i);
 static void compute_wall_color_array (int last_room, int room);
-static ALLEGRO_COLOR compute_wall_color (struct pos *p, int row, int col);
 static void draw_wall_brick (ALLEGRO_BITMAP *bitmap, struct pos *p,
                                 int row, int col);
 static struct rect *wall_brick_rect (struct pos *p, int row, int col,

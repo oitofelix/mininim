@@ -44,7 +44,6 @@ int current_kid_id;
 
 ALLEGRO_BITMAP *v_kid_full_life, *v_kid_empty_life, *v_kid_splash;
 
-static void place_kid (struct anim *k, int room, int floor, int place);
 static struct coord *kid_life_coord (int i, struct coord *c);
 static ALLEGRO_COLOR v_palette (ALLEGRO_COLOR c);
 static ALLEGRO_COLOR e_palette (ALLEGRO_COLOR c);

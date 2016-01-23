@@ -1,0 +1,25 @@
+#!/bin/bash
+
+set -e
+
+function ensure_defined {
+    while test $# != 0; do
+	if test -z "${!1}"; then
+	    echo "error: $1 environment variable undefined"
+	    exit -1; fi;
+	shift; done;
+}
+
+ensure_defined PACKAGE_NAME PACKAGE_VERSION PACKAGE_MAILING_LIST
+
+cat <<EOF
+Content-Type: text/plain; charset=UTF-8
+From: $(git config --get user.name) <$(git config --get user.email)>
+To: info-gnu@gnu.org
+Cc: ${PACKAGE_MAILING_LIST}, coordinator@translationproject.org
+Subject: ${PACKAGE_NAME} ${PACKAGE_VERSION} released
+Date: $(date --rfc-2822)
+Organization: The GNU Project
+EOF
+
+gpg --batch --no-tty --output - --clearsign ANNOUNCEMENT

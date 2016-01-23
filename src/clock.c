@@ -135,7 +135,7 @@ draw_clock (ALLEGRO_BITMAP *bitmap, int i, enum vm vm)
 {
   if (i == -1) return;
 
-  ALLEGRO_BITMAP *clock,
+  ALLEGRO_BITMAP *clock = NULL,
     *clock_00 = NULL,
     *clock_01 = NULL,
     *clock_02 = NULL,
@@ -145,7 +145,7 @@ draw_clock (ALLEGRO_BITMAP *bitmap, int i, enum vm vm)
     *clock_06 = NULL,
     *clock_sand = NULL;
 
-  palette pal;
+  palette pal = NULL;
 
   switch (vm) {
   case CGA:
