@@ -1,10 +1,8 @@
-KERNEL_MODULES = event timer video audio memory keyboard random array	\
-  xerror
-ENGINE_MODULES = anim pos physics level consistency stars floor				\
-  broken-floor skeleton-floor loose-floor opener-floor closer-floor		\
-  spikes-floor door level-door pillar big-pillar chopper bricks torch	\
-  window balcony arch carpet mirror room fire potion sword clock			\
-  princess jaffar mouse fight samples cutscenes
+ENGINE_MODULES = prince anim pos physics level consistency stars			\
+  floor broken-floor skeleton-floor loose-floor opener-floor					\
+  closer-floor spikes-floor door level-door pillar big-pillar chopper	\
+  bricks torch window balcony arch carpet mirror room fire potion			\
+  sword clock princess jaffar mouse fight samples cutscenes
 WALL_MODULES = wall wall-depedv wall-pv wall-dcpc
 KID_MODULES = kid kid-normal kid-walk kid-start-run kid-run						\
   kid-stop-run kid-turn-run kid-couch kid-turn kid-stabilize kid-jump	\
@@ -16,12 +14,12 @@ KID_MODULES = kid kid-normal kid-walk kid-start-run kid-run						\
 GUARD_MODULES = guard guard-normal guard-vigilant guard-hit guard-die	\
   guard-fall guard-walkf guard-walkb guard-attack guard-defense
 LEVEL_MODULES = level-1 consistency-level legacy-level
-MAIN_MODULES = prince
+KERNEL_MODULES = event timer video audio memory keyboard random array	\
+  xerror
 
-MODULES = ${KERNEL_MODULES:%=kernel/%} ${ENGINE_MODULES:%=engine/%}	\
-	${WALL_MODULES:%=engine/wall/%} ${KID_MODULES:%=engine/kid/%}			\
-	${GUARD_MODULES:%=engine/guard/%} ${LEVEL_MODULES:%=levels/%}			\
-	${MAIN_MODULES}
+MODULES = ${KERNEL_MODULES:%=src/kernel/%} ${ENGINE_MODULES:%=src/%}	\
+	${WALL_MODULES:%=src/wall/%} ${KID_MODULES:%=src/kid/%}			\
+	${GUARD_MODULES:%=src/guard/%} ${LEVEL_MODULES:%=src/levels/%}			\
 
 SRCS = ${MODULES:=.c}
 OBJECTS = ${MODULES:=.o}
@@ -33,7 +31,7 @@ CFLAGS_DEV = -Wall -ggdb3 -Werror -Wno-error=unused-function \
 CFLAGS_REL = -O3 -march=native
 CFLAGS_COV = ${CFLAGS_DEV} --coverage -pg
 CFLAGS = ${CFLAGS_DEV}
-CPPFLAGS = -I$(shell pwd)
+CPPFLAGS = -Isrc -Isrc/kernel -Isrc/guard -Isrc/kid -Isrc/levels -Isrc/wall
 
 prince : ${OBJECTS}
 	${CC} ${OBJECTS} -o $@ ${CPPFLAGS} ${CFLAGS} ${LDFLAGS}
