@@ -17,11 +17,6 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <config.h>
-
-#include <error.h>
-#include <math.h>
-#include <stdlib.h>
 #include "mininim.h"
 
 bool coord_wa;

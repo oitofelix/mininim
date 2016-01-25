@@ -20,8 +20,6 @@
 #ifndef MININIM_PHYSICS_H
 #define MININIM_PHYSICS_H
 
-#include "mininim.h"
-
 /* functions */
 struct con *con (struct pos *p);
 struct con *crel (struct pos *p, int floor, int place);

@@ -17,9 +17,6 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <config.h>
-
-#include <stdio.h>
 #include "mininim.h"
 
 struct frameset guard_fall_frameset[GUARD_FALL_FRAMESET_NMEMB];

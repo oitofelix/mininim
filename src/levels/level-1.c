@@ -17,8 +17,6 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <config.h>
-
 #include "mininim.h"
 
 static void next_level (int lv);

@@ -17,9 +17,6 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <config.h>
-
-#include <stdio.h>
 #include "mininim.h"
 
 static void create_mirror_bitmaps (int last_room, int room);

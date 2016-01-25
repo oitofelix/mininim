@@ -17,8 +17,6 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <config.h>
-
 #include "mininim.h"
 
 static ALLEGRO_COLOR e_fire_palette (ALLEGRO_COLOR c);

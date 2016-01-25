@@ -17,9 +17,6 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <config.h>
-
-#include <stdio.h>
 #include "mininim.h"
 
 struct frameset kid_jump_frameset[KID_JUMP_FRAMESET_NMEMB];

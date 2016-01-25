@@ -17,11 +17,6 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <config.h>
-
-#include <stddef.h>
-#include <string.h>
-#include <assert.h>
 #include "mininim.h"
 
 void *

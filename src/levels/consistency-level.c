@@ -17,10 +17,6 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <config.h>
-
-#include <stdio.h>
-#include <time.h>
 #include "mininim.h"
 
 static struct level consistency_level;

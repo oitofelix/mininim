@@ -20,9 +20,6 @@
 #ifndef MININIM_MIRROR_H
 #define MININIM_MIRROR_H
 
-#define MIRROR_BITMAP_W 16
-#define MIRROR_BITMAP_H 50
-
 /* dungeon cga */
 #define DC_MIRROR "data/mirror/dc.png"
 

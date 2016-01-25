@@ -20,8 +20,6 @@
 #ifndef MININIM_CLOSER_FLOOR_H
 #define MININIM_CLOSER_FLOOR_H
 
-#include "mininim.h"
-
 /* dungeon cga */
 #define DC_UNPRESSED_CLOSER_FLOOR_BASE "data/closer-floor/dc-unpressed-base.png"
 #define DC_PRESSED_CLOSER_FLOOR_BASE "data/closer-floor/dc-pressed-base.png"

@@ -20,6 +20,18 @@
 #ifndef MININIM_MININIM_H
 #define MININIM_MININIM_H
 
+#include <config.h>
+
+#include <stdio.h>
+#include <string.h>
+#include <stddef.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <assert.h>
+#include <error.h>
+#include <math.h>
+#include <time.h>
+
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_audio.h>

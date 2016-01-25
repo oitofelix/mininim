@@ -17,10 +17,6 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <config.h>
-
-#include <error.h>
-#include <stdio.h>
 #include "mininim.h"
 
 static int last_level;

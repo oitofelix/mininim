@@ -20,8 +20,6 @@
 #ifndef MININIM_ANIM_H
 #define MININIM_ANIM_H
 
-#include "mininim.h"
-
 /* functions */
 void play_anim (void (*draw_callback) (void),
                 void (*compute_callback) (void),
@@ -68,6 +66,8 @@ void select_frame (struct anim *a, struct frameset *fs, int i);
 void select_xframe (struct frame_offset *xf, struct frameset *fs, int j);
 bool wait_anim (int cycles);
 
+
+
 /* variables */
 extern struct anim *anima;
 extern size_t anima_nmemb;

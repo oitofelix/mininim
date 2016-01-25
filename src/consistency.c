@@ -17,9 +17,6 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <config.h>
-
-#include <stdio.h>
 #include "mininim.h"
 
 static void fix_single_walls_at_place_0 (struct pos *p);

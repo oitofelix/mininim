@@ -20,8 +20,6 @@
 #ifndef MININIM_POSITION_H
 #define MININIM_POSITION_H
 
-#include "mininim.h"
-
 extern bool coord_wa;
 
 /* types */
