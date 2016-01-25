@@ -21,19 +21,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "audio.h"
-#include "video.h"
-#include "array.h"
-#include "physics.h"
-#include "room.h"
-#include "level.h"
-#include "floor.h"
-#include "kid.h"
-#include "fight.h"
-#include "door.h"
-#include "floor.h"
-#include "samples.h"
-#include "opener-floor.h"
+#include "mininim.h"
 
 /* dungeon cga */
 ALLEGRO_BITMAP *dc_unpressed_opener_floor_base,

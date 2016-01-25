@@ -20,18 +20,7 @@
 #include <config.h>
 
 #include <stdio.h>
-#include "video.h"
-#include "audio.h"
-#include "array.h"
-#include "anim.h"
-#include "room.h"
-#include "floor.h"
-#include "loose-floor.h"
-#include "kid.h"
-#include "level.h"
-#include "arch.h"
-#include "door.h"
-#include "carpet.h"
+#include "mininim.h"
 
 static void get_carpet_bitmaps (struct pos *p, enum em em,
                                 enum vm vm,

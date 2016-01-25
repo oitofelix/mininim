@@ -19,9 +19,7 @@
 
 #include <config.h>
 
-#include "video.h"
-#include "anim.h"
-#include "clock.h"
+#include "mininim.h"
 
 /* cga */
 ALLEGRO_BITMAP *c_clock_00, *c_clock_01, *c_clock_02,

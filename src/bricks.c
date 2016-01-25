@@ -20,15 +20,7 @@
 #include <config.h>
 
 #include <stdio.h>
-#include "video.h"
-#include "audio.h"
-#include "random.h"
-#include "physics.h"
-#include "kid.h"
-#include "pillar.h"
-#include "level.h"
-#include "room.h"
-#include "bricks.h"
+#include "mininim.h"
 
 /* dungeon vga */
 ALLEGRO_BITMAP *dv_bricks_00, *dv_bricks_01,

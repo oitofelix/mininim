@@ -19,12 +19,7 @@
 
 #include <config.h>
 
-#include "video.h"
-#include "random.h"
-#include "level.h"
-#include "physics.h"
-#include "room.h"
-#include "sword.h"
+#include "mininim.h"
 
 struct frameset sword_frameset[SWORD_FRAMESET_NMEMB];
 static void init_sword_frameset (void);

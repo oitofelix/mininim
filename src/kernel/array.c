@@ -22,9 +22,7 @@
 #include <stddef.h>
 #include <string.h>
 #include <assert.h>
-#include <allegro5/allegro.h>
-#include "memory.h"
-#include "array.h"
+#include "mininim.h"
 
 void *
 add_to_array (void *s_base, size_t s_nmemb,

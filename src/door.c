@@ -20,18 +20,7 @@
 #include <config.h>
 
 #include <stdio.h>
-#include "audio.h"
-#include "array.h"
-#include "anim.h"
-#include "room.h"
-#include "floor.h"
-#include "loose-floor.h"
-#include "kid.h"
-#include "level.h"
-#include "door.h"
-#include "fight.h"
-#include "samples.h"
-#include "level-door.h"
+#include "mininim.h"
 
 /* dungeon cga */
 ALLEGRO_BITMAP *dc_door_left, *dc_door_right, *dc_door_pole, *dc_door_pole_base,

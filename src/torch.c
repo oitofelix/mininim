@@ -20,15 +20,7 @@
 #include <config.h>
 
 #include <stdio.h>
-#include "video.h"
-#include "audio.h"
-#include "random.h"
-#include "physics.h"
-#include "kid.h"
-#include "pillar.h"
-#include "level.h"
-#include "room.h"
-#include "torch.h"
+#include "mininim.h"
 
 /* dungeon cga */
 ALLEGRO_BITMAP *dc_torch;

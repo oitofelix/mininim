@@ -20,14 +20,6 @@
 #ifndef MININIM_DOOR_H
 #define MININIM_DOOR_H
 
-#include "video.h"
-
-#define DOOR_MAX_STEP 47
-#define DOOR_WAIT SECS_TO_SCYCLES (5)
-
-#define DOOR_CLIMB_LIMIT 40
-#define DOOR_WAIT_LOOK 4
-
 /* dungeon cga */
 #define DC_DOOR_LEFT "data/door/dc-left.png"
 #define DC_DOOR_RIGHT "data/door/dc-right.png"
@@ -81,17 +73,6 @@
 #define PV_DOOR_TOP "data/door/pv-top.png"
 #define PV_DOOR_GRID "data/door/pv-grid.png"
 #define PV_DOOR_GRID_TIP "data/door/pv-grid-tip.png"
-
-/* types */
-struct door {
-  struct pos p;
-  int i;
-  enum {
-    NO_DOOR_ACTION, OPEN_DOOR, CLOSE_DOOR, ABRUPTLY_CLOSE_DOOR,
-  } action;
-  int wait;
-  bool noise;
-};
 
 /* variables */
 extern struct door *door;

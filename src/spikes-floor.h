@@ -20,11 +20,6 @@
 #ifndef MININIM_SPIKES_H
 #define MININIM_SPIKES_H
 
-#include "video.h"
-
-/* constants */
-#define SPIKES_WAIT SECS_TO_SCYCLES (1)
-
 /* dungeon cga */
 #define DC_SPIKES_FLOOR_LEFT "data/spikes-floor/dc-left.png"
 #define DC_SPIKES_FLOOR_RIGHT "data/spikes-floor/dc-right.png"
@@ -138,15 +133,6 @@
 #define PV_SPIKES_LEFT_04 "data/spikes-floor/pv-spikes-left-04.png"
 #define PV_SPIKES_RIGHT_04 "data/spikes-floor/pv-spikes-right-04.png"
 #define PV_SPIKES_FG_04 "data/spikes-floor/pv-spikes-fg-04.png"
-
-/* types */
-struct spikes_floor {
-  struct pos p;
-  int i, wait, state;
-  bool inactive;
-  int murdered_anim;
-  bool activate;
-};
 
 /* variables */
 extern struct spikes_floor *spikes_floor;

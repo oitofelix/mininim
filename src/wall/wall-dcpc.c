@@ -21,11 +21,6 @@
 
 #include <stdio.h>
 #include "mininim.h"
-#include "video.h"
-#include "random.h"
-#include "room.h"
-#include "wall.h"
-#include "wall-dcpc.h"
 
 /* dungeon cga */
 ALLEGRO_BITMAP *dc_wall_base, *dc_wall_left;

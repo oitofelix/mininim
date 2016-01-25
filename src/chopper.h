@@ -20,10 +20,6 @@
 #ifndef MININIM_CHOPPER_H
 #define MININIM_CHOPPER_H
 
-#include "video.h"
-
-#define CHOPPER_WAIT 10
-
 /* dungeon cga */
 #define DC_CHOPPER_00 "data/chopper/dc-00.png"
 #define DC_CHOPPER_FG_00 "data/chopper/dc-fg-00.png"

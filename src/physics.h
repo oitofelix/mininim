@@ -21,10 +21,6 @@
 #define MININIM_PHYSICS_H
 
 #include "mininim.h"
-#include "pos.h"
-
-/* types */
-typedef bool (*confg_set) (enum confg);
 
 /* functions */
 struct con *con (struct pos *p);

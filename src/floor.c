@@ -20,18 +20,7 @@
 #include <config.h>
 
 #include <stdio.h>
-#include "video.h"
-#include "audio.h"
-#include "random.h"
-#include "physics.h"
-#include "kid.h"
-#include "pillar.h"
-#include "level.h"
-#include "room.h"
-#include "loose-floor.h"
-#include "opener-floor.h"
-#include "spikes-floor.h"
-#include "floor.h"
+#include "mininim.h"
 
 /* dungeon cga */
 ALLEGRO_BITMAP *dc_floor_base, *dc_floor_left,

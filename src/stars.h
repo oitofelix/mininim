@@ -20,16 +20,6 @@
 #ifndef MININIM_STARS_H
 #define MININIM_STARS_H
 
-/* macros */
-#define STARS_RANDOM_SEED 78234782
-#define STARS 7
-
-/* types */
-struct star {
-  int x, y;
-  int color;
-};
-
 /* functions */
 void load_stars (void);
 void unload_stars (void);

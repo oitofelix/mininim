@@ -20,19 +20,6 @@
 #ifndef MININIM_GUARD_H
 #define MININIM_GUARD_H
 
-#include "audio.h"
-
-/* kid actions */
-#include "guard-normal.h"
-#include "guard-vigilant.h"
-#include "guard-hit.h"
-#include "guard-die.h"
-#include "guard-fall.h"
-#include "guard-walkf.h"
-#include "guard-walkb.h"
-#include "guard-attack.h"
-#include "guard-defense.h"
-
 /* bitmaps */
 #define GUARD_LIFE "data/life/guard.png"
 #define GUARD_SPLASH "data/splash/guard.png"

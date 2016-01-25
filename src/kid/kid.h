@@ -20,42 +20,6 @@
 #ifndef MININIM_KID_H
 #define MININIM_KID_H
 
-#include "video.h"
-#include "audio.h"
-
-/* kid actions */
-#include "kid-normal.h"
-#include "kid-walk.h"
-#include "kid-start-run.h"
-#include "kid-run.h"
-#include "kid-stop-run.h"
-#include "kid-turn-run.h"
-#include "kid-couch.h"
-#include "kid-turn.h"
-#include "kid-stabilize.h"
-#include "kid-jump.h"
-#include "kid-vjump.h"
-#include "kid-run-jump.h"
-#include "kid-misstep.h"
-#include "kid-hang.h"
-#include "kid-hang-wall.h"
-#include "kid-hang-free.h"
-#include "kid-climb.h"
-#include "kid-unclimb.h"
-#include "kid-fall.h"
-#include "kid-drink.h"
-#include "kid-raise-sword.h"
-#include "kid-keep-sword.h"
-#include "kid-take-sword.h"
-#include "kid-sword-normal.h"
-#include "kid-sword-walkf.h"
-#include "kid-sword-walkb.h"
-#include "kid-sword-defense.h"
-#include "kid-sword-attack.h"
-#include "kid-sword-hit.h"
-#include "kid-die.h"
-#include "kid-stairs.h"
-
 /* bitmaps */
 #define V_KID_FULL_LIFE "data/life/v-kid-full.png"
 #define V_KID_EMPTY_LIFE "data/life/v-kid-empty.png"

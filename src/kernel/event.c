@@ -20,8 +20,7 @@
 #include <config.h>
 
 #include <error.h>
-#include <allegro5/allegro.h>
-#include "event.h"
+#include "mininim.h"
 
 ALLEGRO_EVENT_QUEUE *
 create_event_queue (void)

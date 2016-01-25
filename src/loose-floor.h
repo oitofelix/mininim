@@ -20,11 +20,6 @@
 #ifndef MININIM_LOOSE_FLOOR_H
 #define MININIM_LOOSE_FLOOR_H
 
-#include "audio.h"
-
-/* constants */
-#define LOOSE_FLOOR_RESISTENCE 0
-
 /* dungeon cga */
 #define DC_LOOSE_FLOOR_BASE_00 "data/loose-floor/dc-base-00.png"
 #define DC_LOOSE_FLOOR_LEFT_00 "data/loose-floor/dc-left-00.png"
@@ -72,24 +67,6 @@
 #define PV_LOOSE_FLOOR_BASE_01 "data/loose-floor/pv-base-01.png"
 #define PV_LOOSE_FLOOR_LEFT_01 "data/loose-floor/pv-left-01.png"
 #define PV_LOOSE_FLOOR_RIGHT_01 "data/loose-floor/pv-right-01.png"
-
-/* types */
-struct loose_floor {
-  struct pos p;
-  int i;
-  int resist;
-  int state;
-  bool cant_fall;
-
-  enum {
-    NO_LOOSE_FLOOR_ACTION,
-    SHAKE_LOOSE_FLOOR,
-    RELEASE_LOOSE_FLOOR,
-    FALL_LOOSE_FLOOR,
-  } action;
-
-  struct frame f;
-};
 
 /* variables */
 extern struct loose_floor *loose_floor;

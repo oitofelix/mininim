@@ -24,10 +24,6 @@
   (ALLEGRO_KEYMOD_SCROLLLOCK | ALLEGRO_KEYMOD_NUMLOCK \
    | ALLEGRO_KEYMOD_CAPSLOCK)
 
-struct keyboard_state {
-  bool up, down, left, right, shift, enter;
-};
-
 /* variables */
 extern bool flip_keyboard_horizontal, flip_keyboard_vertical;
 extern ALLEGRO_KEYBOARD_STATE keyboard_state;

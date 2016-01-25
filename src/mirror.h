@@ -41,12 +41,6 @@
 /* palace vga */
 #define PV_MIRROR "data/mirror/pv.png"
 
-/* types */
-struct mirror {
-  struct pos p;
-  int kid_crossing;
-};
-
 void load_mirror (void);
 void unload_mirror (void);
 void register_mirror (struct pos *p);

@@ -20,19 +20,7 @@
 #include <config.h>
 
 #include <stdio.h>
-#include "audio.h"
-#include "array.h"
-#include "random.h"
-#include "anim.h"
-#include "room.h"
-#include "floor.h"
-#include "loose-floor.h"
-#include "kid.h"
-#include "guard.h"
-#include "fight.h"
-#include "level.h"
-#include "samples.h"
-#include "chopper.h"
+#include "mininim.h"
 
 /* dungeon cga */
 ALLEGRO_BITMAP *dc_chopper_00, *dc_chopper_fg_00,

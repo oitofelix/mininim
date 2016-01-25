@@ -21,17 +21,6 @@
 
 #include <stdio.h>
 #include "mininim.h"
-#include "video.h"
-#include "keyboard.h"
-#include "anim.h"
-#include "physics.h"
-#include "door.h"
-#include "potion.h"
-#include "sword.h"
-#include "loose-floor.h"
-#include "fight.h"
-#include "samples.h"
-#include "kid.h"
 
 struct frameset kid_sword_attack_frameset[KID_SWORD_ATTACK_FRAMESET_NMEMB];
 

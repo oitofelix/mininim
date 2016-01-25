@@ -22,25 +22,7 @@
 #include <error.h>
 #include <stdio.h>
 #include <time.h>
-#include "video.h"
-#include "audio.h"
-#include "random.h"
-#include "array.h"
-#include "timer.h"
-#include "level.h"
-#include "kid.h"
-#include "guard.h"
-#include "door.h"
-#include "level-door.h"
-#include "physics.h"
-#include "anim.h"
-#include "mirror.h"
-#include "potion.h"
-#include "mouse.h"
-#include "fight.h"
-#include "samples.h"
-#include "cutscenes.h"
-#include "legacy-level.h"
+#include "mininim.h"
 
 static struct level legacy_level;
 static int level_3_checkpoint;

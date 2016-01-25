@@ -22,25 +22,6 @@
 #include <stdio.h>
 #include <string.h>
 #include "mininim.h"
-#include "video.h"
-#include "audio.h"
-#include "keyboard.h"
-#include "array.h"
-#include "random.h"
-#include "timer.h"
-#include "anim.h"
-#include "physics.h"
-#include "level.h"
-#include "room.h"
-#include "door.h"
-#include "loose-floor.h"
-#include "opener-floor.h"
-#include "closer-floor.h"
-#include "potion.h"
-#include "sword.h"
-#include "fight.h"
-#include "samples.h"
-#include "kid.h"
 
 int current_kid_id;
 

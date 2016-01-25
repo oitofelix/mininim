@@ -20,8 +20,6 @@
 #ifndef MININIM_BIG_PILLAR_H
 #define MININIM_BIG_PILLAR_H
 
-#include "physics.h"
-
 /* dungeon cga */
 #define DC_BIG_PILLAR_BOTTOM_LEFT "data/big-pillar/dc-bottom-left.png"
 #define DC_BIG_PILLAR_BOTTOM_RIGHT "data/big-pillar/dc-bottom-right.png"

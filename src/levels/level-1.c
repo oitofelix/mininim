@@ -19,10 +19,7 @@
 
 #include <config.h>
 
-#include "video.h"
-#include "physics.h"
-#include "level.h"
-#include "kid.h"
+#include "mininim.h"
 
 static void next_level (int lv);
 static void start (void);

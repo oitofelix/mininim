@@ -20,7 +20,7 @@
 #include <config.h>
 
 #include <error.h>
-#include <allegro5/allegro.h>
+#include "mininim.h"
 
 void *
 xmalloc (size_t n)

@@ -20,7 +20,7 @@
 #ifndef MININIM_CLOSER_FLOOR_H
 #define MININIM_CLOSER_FLOOR_H
 
-#include "pos.h"
+#include "mininim.h"
 
 /* dungeon cga */
 #define DC_UNPRESSED_CLOSER_FLOOR_BASE "data/closer-floor/dc-unpressed-base.png"
@@ -51,16 +51,6 @@
 #define PV_UNPRESSED_CLOSER_FLOOR_BASE "data/closer-floor/pv-unpressed-base.png"
 #define PV_PRESSED_CLOSER_FLOOR_BASE "data/closer-floor/pv-pressed-base.png"
 #define PV_PRESSED_CLOSER_FLOOR_RIGHT "data/closer-floor/pv-pressed-right.png"
-
-/* types */
-struct closer_floor {
-  struct pos p;
-  int event;
-  bool pressed;
-  bool noise;
-  bool broken;
-  bool unresponsive;
-};
 
 /* variables */
 extern struct closer_floor *closer_floor;

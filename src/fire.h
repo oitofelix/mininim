@@ -20,10 +20,6 @@
 #ifndef MININIM_FIRE_H
 #define MININIM_FIRE_H
 
-/* macros */
-#define FIRE_RANDOM_SEED_0 234423479
-#define FIRE_RANDOM_SEED_1 501477214
-
 /* vga */
 #define V_FIRE_00 "data/fire/v-00.png"
 #define V_FIRE_01 "data/fire/v-01.png"

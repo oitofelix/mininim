@@ -20,10 +20,6 @@
 #ifndef MININIM_TIMER_H
 #define MININIM_TIMER_H
 
-#include <allegro5/allegro.h>
-
-#include "event.h"
-
 /* functions */
 ALLEGRO_TIMER *create_timer (double speed_secs);
 ALLEGRO_EVENT_SOURCE *get_timer_event_source (ALLEGRO_TIMER *timer);

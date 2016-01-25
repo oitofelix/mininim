@@ -20,20 +20,7 @@
 #include <config.h>
 
 #include <stdio.h>
-
-#include "video.h"
-#include "audio.h"
-#include "keyboard.h"
-#include "anim.h"
-#include "stars.h"
-#include "fire.h"
-#include "princess.h"
-#include "jaffar.h"
-#include "mouse.h"
-#include "clock.h"
-#include "samples.h"
-#include "kid.h"
-#include "cutscenes.h"
+#include "mininim.h"
 
 /* functions */
 static ALLEGRO_BITMAP *create_background_pattern_bitmap (ALLEGRO_COLOR c);

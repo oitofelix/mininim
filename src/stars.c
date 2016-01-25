@@ -20,12 +20,7 @@
 #include <config.h>
 
 #include <stddef.h>
-#include "video.h"
-#include "random.h"
-#include "anim.h"
-#include "room.h"
-#include "physics.h"
-#include "stars.h"
+#include "mininim.h"
 
 static struct stars_bitmap {
   ALLEGRO_BITMAP *b;

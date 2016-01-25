@@ -19,8 +19,7 @@
 
 #include <config.h>
 
-#include "audio.h"
-#include "samples.h"
+#include "mininim.h"
 
 ALLEGRO_SAMPLE *step_sample,
   *hit_ground_sample,

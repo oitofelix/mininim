@@ -22,16 +22,6 @@
 #include <stdio.h>
 #include <string.h>
 #include "mininim.h"
-#include "video.h"
-#include "audio.h"
-#include "keyboard.h"
-#include "timer.h"
-#include "level.h"
-#include "samples.h"
-#include "cutscenes.h"
-#include "level-1.h"
-#include "consistency-level.h"
-#include "legacy-level.h"
 
 ALLEGRO_TIMER *play_time;
 enum em em = DUNGEON;

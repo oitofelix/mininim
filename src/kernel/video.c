@@ -21,10 +21,7 @@
 
 #include <error.h>
 #include <stdio.h>
-#include "event.h"
-#include "timer.h"
-#include "array.h"
-#include "video.h"
+#include "mininim.h"
 
 ALLEGRO_DISPLAY *display;
 ALLEGRO_BITMAP *screen, *uscreen;

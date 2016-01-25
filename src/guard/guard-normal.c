@@ -20,17 +20,6 @@
 #include <config.h>
 
 #include "mininim.h"
-#include "video.h"
-#include "keyboard.h"
-#include "anim.h"
-#include "physics.h"
-#include "level.h"
-#include "door.h"
-#include "potion.h"
-#include "sword.h"
-#include "loose-floor.h"
-#include "level-door.h"
-#include "guard.h"
 
 static bool flow (struct anim *g);
 static bool physics_in (struct anim *g);

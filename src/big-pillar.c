@@ -19,10 +19,7 @@
 
 #include <config.h>
 
-#include "video.h"
-#include "floor.h"
-#include "room.h"
-#include "big-pillar.h"
+#include "mininim.h"
 
 /* dungeon cga */
 ALLEGRO_BITMAP *dc_big_pillar_bottom_left, *dc_big_pillar_bottom_right,

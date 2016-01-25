@@ -20,23 +20,7 @@
 #include <config.h>
 
 #include <stdio.h>
-#include "event.h"
-#include "timer.h"
-#include "video.h"
-#include "audio.h"
-#include "keyboard.h"
-#include "array.h"
-#include "level.h"
-#include "pos.h"
-#include "physics.h"
-#include "level.h"
-#include "room.h"
-#include "loose-floor.h"
-#include "kid.h"
-#include "guard.h"
-#include "mouse.h"
-#include "fight.h"
-#include "anim.h"
+#include "mininim.h"
 
 /* set to true to quit animation */
 enum quit_anim quit_anim;

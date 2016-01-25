@@ -20,10 +20,6 @@
 #ifndef MININIM_ROOM_H
 #define MININIM_ROOM_H
 
-#include "mininim.h"
-
-typedef void (*room_callback_f) (int, int);
-
 void load_room (void);
 void unload_room (void);
 

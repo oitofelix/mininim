@@ -19,10 +19,7 @@
 
 #include <config.h>
 
-#include "video.h"
-#include "anim.h"
-#include "guard.h"
-#include "jaffar.h"
+#include "mininim.h"
 
 struct anim jaffar;
 

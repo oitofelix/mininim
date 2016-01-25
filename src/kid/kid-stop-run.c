@@ -21,16 +21,6 @@
 
 #include <stdio.h>
 #include "mininim.h"
-#include "video.h"
-#include "keyboard.h"
-#include "anim.h"
-#include "physics.h"
-#include "door.h"
-#include "potion.h"
-#include "sword.h"
-#include "loose-floor.h"
-#include "samples.h"
-#include "kid.h"
 
 struct frameset kid_stop_run_frameset[KID_STOP_RUN_FRAMESET_NMEMB];
 

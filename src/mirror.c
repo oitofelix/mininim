@@ -20,16 +20,7 @@
 #include <config.h>
 
 #include <stdio.h>
-#include "video.h"
-#include "audio.h"
-#include "array.h"
-#include "anim.h"
-#include "room.h"
-#include "floor.h"
-#include "loose-floor.h"
-#include "kid.h"
-#include "level.h"
-#include "mirror.h"
+#include "mininim.h"
 
 static void create_mirror_bitmaps (int last_room, int room);
 

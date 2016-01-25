@@ -20,9 +20,7 @@
 #include <config.h>
 
 #include <stdio.h>
-#include "pos.h"
-#include "level.h"
-#include "physics.h"
+#include "mininim.h"
 
 static void fix_single_walls_at_place_0 (struct pos *p);
 static void fix_inaccessible_enclosure (struct pos *p);

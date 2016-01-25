@@ -22,11 +22,6 @@
 #include <error.h>
 #include <stdio.h>
 #include "mininim.h"
-#include "video.h"
-#include "random.h"
-#include "room.h"
-#include "wall.h"
-#include "wall-depedv.h"
 
 /* wall randomization auxiliary numbers */
 static int r0, r1, r2, r3;

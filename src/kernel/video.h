@@ -20,28 +20,7 @@
 #ifndef MININIM_GRAPHICS_H
 #define MININIM_GRAPHICS_H
 
-#include <allegro5/allegro.h>
-#include <allegro5/allegro_font.h>
-#include <allegro5/allegro_image.h>
-#include <allegro5/allegro_primitives.h>
-
-#include "event.h"
-#include "pos.h"
-
-/* types */
-enum video_effect_type {
-  VIDEO_NO_EFFECT, VIDEO_OFF, VIDEO_FADE_IN,
-  VIDEO_FADE_OUT, VIDEO_ROLL_RIGHT, VIDEO_FLICKERING,
-};
-
-struct video_effect {
-  enum video_effect_type type;
-  int duration;
-  ALLEGRO_COLOR color;
-};
-
-typedef ALLEGRO_COLOR (*palette) (ALLEGRO_COLOR c);
-
+#include "mininim.h"
 
 /* functions */
 void init_video (void);

@@ -20,8 +20,7 @@
 #include <config.h>
 
 #include <error.h>
-#include <allegro5/allegro.h>
-#include "keyboard.h"
+#include "mininim.h"
 
 /* flip settings */
 bool flip_keyboard_horizontal, flip_keyboard_vertical;

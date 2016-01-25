@@ -20,9 +20,6 @@
 #ifndef MININIM_RANDOM_H
 #define MININIM_RANDOM_H
 
-#include <stdint.h>
-#include "pos.h"
-
 /* random number generator seed */
 extern uint32_t random_seed;
 

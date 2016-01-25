@@ -20,8 +20,6 @@
 #ifndef MININIM_OPENER_FLOOR_H
 #define MININIM_OPENER_FLOOR_H
 
-#include "pos.h"
-
 /* dungeon cga */
 #define DC_UNPRESSED_OPENER_FLOOR_BASE "data/opener-floor/dc-unpressed-base.png"
 #define DC_UNPRESSED_OPENER_FLOOR_LEFT "data/opener-floor/dc-unpressed-left.png"
@@ -51,15 +49,6 @@
 #define PV_UNPRESSED_OPENER_FLOOR_BASE "data/opener-floor/pv-unpressed-base.png"
 #define PV_UNPRESSED_OPENER_FLOOR_LEFT "data/opener-floor/pv-unpressed-left.png"
 #define PV_UNPRESSED_OPENER_FLOOR_RIGHT "data/opener-floor/pv-unpressed-right.png"
-
-/* types */
-struct opener_floor {
-  struct pos p;
-  int event;
-  bool pressed;
-  bool noise;
-  bool broken;
-};
 
 /* variables */
 extern struct opener_floor *opener_floor;

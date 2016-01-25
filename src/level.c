@@ -20,35 +20,7 @@
 #include <config.h>
 
 #include <stdio.h>
-#include "video.h"
-#include "keyboard.h"
-#include "array.h"
-#include "timer.h"
-#include "random.h"
-#include "anim.h"
-#include "physics.h"
-#include "room.h"
-#include "fire.h"
-#include "potion.h"
-#include "sword.h"
-#include "kid.h"
-#include "guard.h"
-#include "loose-floor.h"
-#include "opener-floor.h"
-#include "closer-floor.h"
-#include "spikes-floor.h"
-#include "door.h"
-#include "level-door.h"
-#include "chopper.h"
-#include "consistency.h"
-#include "stars.h"
-#include "mirror.h"
-#include "mouse.h"
-#include "fight.h"
-#include "kid-sword-hit.h"
-#include "samples.h"
-#include "cutscenes.h"
-#include "level.h"
+#include "mininim.h"
 
 /* functions */
 static void draw_level (void);

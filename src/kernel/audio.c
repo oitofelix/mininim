@@ -22,13 +22,7 @@
 #include <error.h>
 #include <math.h>
 #include <stdio.h>
-#include <allegro5/allegro_audio.h>
-#include <allegro5/allegro_acodec.h>
-#include "array.h"
-#include "anim.h"
-#include "pos.h"
-#include "level.h"
-#include "audio.h"
+#include "mininim.h"
 
 static struct audio_sample *audio_sample;
 static size_t audio_sample_nmemb;

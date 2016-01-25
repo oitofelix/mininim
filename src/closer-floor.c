@@ -19,18 +19,7 @@
 
 #include <config.h>
 
-#include "audio.h"
-#include "video.h"
-#include "array.h"
-#include "physics.h"
-#include "room.h"
-#include "floor.h"
-#include "kid.h"
-#include "door.h"
-#include "floor.h"
-#include "fight.h"
-#include "samples.h"
-#include "closer-floor.h"
+#include "mininim.h"
 
 /* dungeon cga */
 ALLEGRO_BITMAP *dc_unpressed_closer_floor_base, *dc_pressed_closer_floor_base,

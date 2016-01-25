@@ -20,14 +20,6 @@
 #ifndef MININIM_FIGHT_H
 #define MININIM_FIGHT_H
 
-#include "anim.h"
-
-#define INVERSION_RANGE 18
-#define ATTACK_RANGE 61
-#define FIGHT_RANGE 75
-#define FOLLOW_RANGE (2 * ORIGINAL_WIDTH)
-#define HIT_RANGE 50
-
 bool are_valid_opponents (struct anim *k0, struct anim *k1);
 void leave_fight_logic (struct anim *k);
 void enter_fight_logic (struct anim *k);

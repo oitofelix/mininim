@@ -22,12 +22,7 @@
 #include <error.h>
 #include <math.h>
 #include <stdlib.h>
-#include "random.h"
-#include "level.h"
-#include "kid.h"
-#include "physics.h"
-#include "room.h"
-#include "pos.h"
+#include "mininim.h"
 
 bool coord_wa;
 

@@ -20,9 +20,6 @@
 #ifndef MININIM_BROKEN_FLOOR_H
 #define MININIM_BROKEN_FLOOR_H
 
-#include "audio.h"
-#include "physics.h"
-
 /* dungeon cga */
 #define DC_BROKEN_FLOOR_LEFT "data/broken-floor/dc-left.png"
 #define DC_BROKEN_FLOOR_RIGHT "data/broken-floor/dc-right.png"

@@ -20,10 +20,6 @@
 #ifndef MININIM_LEVEL_DOOR_H
 #define MININIM_LEVEL_DOOR_H
 
-#include "video.h"
-
-#define LEVEL_DOOR_MAX_STEP 43
-
 /* dungeon cga */
 #define DC_LEVEL_DOOR_TOP_LEFT "data/level-door/dc-top-left.png"
 #define DC_LEVEL_DOOR_TOP_RIGHT "data/level-door/dc-top-right.png"
@@ -71,16 +67,6 @@
 #define PV_LEVEL_DOOR_FLOOR "data/level-door/pv-floor.png"
 #define PV_LEVEL_DOOR_STAIRS "data/level-door/pv-stairs.png"
 #define PV_LEVEL_DOOR_FRONT "data/level-door/pv-front.png"
-
-/* types */
-struct level_door {
-  struct pos p;
-  int i;
-  enum {
-    NO_LEVEL_DOOR_ACTION, OPEN_LEVEL_DOOR, CLOSE_LEVEL_DOOR,
-  } action;
-  bool no_stairs;
-};
 
 /* variables */
 extern struct level_door *level_door;

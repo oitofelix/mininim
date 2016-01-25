@@ -21,22 +21,6 @@
 
 #include <stdio.h>
 #include "mininim.h"
-#include "video.h"
-#include "random.h"
-#include "array.h"
-#include "level.h"
-#include "anim.h"
-#include "physics.h"
-#include "kid.h"
-#include "fight.h"
-#include "room.h"
-#include "floor.h"
-#include "broken-floor.h"
-#include "opener-floor.h"
-#include "closer-floor.h"
-#include "spikes-floor.h"
-#include "samples.h"
-#include "loose-floor.h"
 
 /* dungeon cga */
 ALLEGRO_BITMAP *dc_loose_floor_left_00, *dc_loose_floor_right_00,

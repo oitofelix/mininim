@@ -20,16 +20,7 @@
 #include <config.h>
 
 #include <stdio.h>
-#include "video.h"
-#include "audio.h"
-#include "array.h"
-#include "anim.h"
-#include "room.h"
-#include "floor.h"
-#include "loose-floor.h"
-#include "kid.h"
-#include "level.h"
-#include "balcony.h"
+#include "mininim.h"
 
 /* dungeon cga */
 ALLEGRO_BITMAP *dc_balcony_top_left, *dc_balcony_top_right,

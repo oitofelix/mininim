@@ -20,12 +20,7 @@
 #include <config.h>
 
 #include <error.h>
-#include "video.h"
-#include "random.h"
-#include "level.h"
-#include "physics.h"
-#include "room.h"
-#include "potion.h"
+#include "mininim.h"
 
 /* dungeon cga */
 ALLEGRO_BITMAP *dc_small_potion, *dc_big_potion;

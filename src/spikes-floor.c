@@ -19,17 +19,7 @@
 
 #include <config.h>
 
-#include "audio.h"
-#include "array.h"
-#include "physics.h"
-#include "room.h"
-#include "level.h"
-#include "anim.h"
-#include "kid.h"
-#include "floor.h"
-#include "fight.h"
-#include "samples.h"
-#include "spikes-floor.h"
+#include "mininim.h"
 
 /* dungeon cga */
 ALLEGRO_BITMAP *dc_spikes_floor_left, *dc_spikes_floor_right,

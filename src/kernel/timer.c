@@ -20,8 +20,7 @@
 #include <config.h>
 
 #include <error.h>
-#include <allegro5/allegro.h>
-#include "timer.h"
+#include "mininim.h"
 
 ALLEGRO_TIMER *
 create_timer (double speed_secs)

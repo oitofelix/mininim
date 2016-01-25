@@ -20,15 +20,6 @@
 #include <config.h>
 
 #include "mininim.h"
-#include "video.h"
-#include "keyboard.h"
-#include "anim.h"
-#include "physics.h"
-#include "door.h"
-#include "potion.h"
-#include "sword.h"
-#include "loose-floor.h"
-#include "guard.h"
 
 struct frameset guard_walkf_frameset[GUARD_WALKF_FRAMESET_NMEMB];
 struct frameset fat_guard_walkf_frameset[GUARD_WALKF_FRAMESET_NMEMB];

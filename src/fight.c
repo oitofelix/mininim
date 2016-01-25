@@ -20,19 +20,7 @@
 #include <config.h>
 
 #include <stdio.h>
-#include "video.h"
-#include "random.h"
-#include "array.h"
-#include "kid.h"
-#include "guard.h"
-#include "anim.h"
-#include "physics.h"
-#include "pos.h"
-#include "door.h"
-#include "mouse.h"
-#include "sword.h"
-#include "samples.h"
-#include "fight.h"
+#include "mininim.h"
 
 bool
 are_valid_opponents (struct anim *k0, struct anim *k1)

@@ -21,20 +21,6 @@
 
 #include <stdio.h>
 #include "mininim.h"
-#include "random.h"
-#include "level.h"
-#include "kid.h"
-#include "anim.h"
-#include "room.h"
-#include "loose-floor.h"
-#include "opener-floor.h"
-#include "closer-floor.h"
-#include "spikes-floor.h"
-#include "chopper.h"
-#include "level-door.h"
-#include "pos.h"
-#include "door.h"
-#include "physics.h"
 
 struct con *
 con (struct pos *p)

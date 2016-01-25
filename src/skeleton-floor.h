@@ -20,9 +20,6 @@
 #ifndef MININIM_SKELETON_FLOOR_H
 #define MININIM_SKELETON_FLOOR_H
 
-#include "audio.h"
-#include "physics.h"
-
 /* dungeon cga */
 #define DC_SKELETON_FLOOR_LEFT "data/skeleton-floor/dc-left.png"
 #define DC_SKELETON_FLOOR_RIGHT "data/skeleton-floor/dc-right.png"

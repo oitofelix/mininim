@@ -29,24 +29,25 @@ include documentation.am
 ###########
 
 bin_PROGRAMS = mininim
-mininim_SOURCES = src/mininim.c src/mininim.h src/anim.c src/anim.h		\
-		src/pos.c src/pos.h src/physics.c src/physics.h src/level.c				\
-		src/level.h src/consistency.c src/consistency.h src/stars.c				\
-		src/stars.h src/floor.c src/floor.h src/broken-floor.c						\
-		src/broken-floor.h src/skeleton-floor.c src/skeleton-floor.h			\
-		src/loose-floor.c src/loose-floor.h src/opener-floor.c						\
-		src/opener-floor.h src/closer-floor.c src/closer-floor.h					\
-		src/spikes-floor.c src/spikes-floor.h src/door.c src/door.h				\
-		src/level-door.c src/level-door.h src/pillar.c src/pillar.h				\
-		src/big-pillar.c src/big-pillar.h src/chopper.c src/chopper.h			\
-		src/bricks.c src/bricks.h src/torch.c src/torch.h src/window.c		\
-		src/window.h src/balcony.c src/balcony.h src/arch.c src/arch.h		\
-		src/carpet.c src/carpet.h src/mirror.c src/mirror.h src/room.c		\
-		src/room.h src/fire.c src/fire.h src/potion.c src/potion.h				\
-		src/sword.c src/sword.h src/clock.c src/clock.h src/princess.c		\
-		src/princess.h src/jaffar.c src/jaffar.h src/mouse.c src/mouse.h	\
-		src/samples.c src/samples.h src/cutscenes.c src/cutscenes.h				\
-		src/fight.c src/fight.h src/wall/wall.c src/wall/wall.h						\
+mininim_SOURCES = src/mininim.c src/mininim.h src/constants.h					\
+		src/types.h src/colors.h src/anim.c src/anim.h src/pos.c					\
+		src/pos.h src/physics.c src/physics.h src/level.c src/level.h			\
+		src/consistency.c src/consistency.h src/stars.c src/stars.h				\
+		src/floor.c src/floor.h src/broken-floor.c src/broken-floor.h			\
+		src/skeleton-floor.c src/skeleton-floor.h src/loose-floor.c				\
+		src/loose-floor.h src/opener-floor.c src/opener-floor.h						\
+		src/closer-floor.c src/closer-floor.h src/spikes-floor.c					\
+		src/spikes-floor.h src/door.c src/door.h src/level-door.c					\
+		src/level-door.h src/pillar.c src/pillar.h src/big-pillar.c				\
+		src/big-pillar.h src/chopper.c src/chopper.h src/bricks.c					\
+		src/bricks.h src/torch.c src/torch.h src/window.c src/window.h		\
+		src/balcony.c src/balcony.h src/arch.c src/arch.h src/carpet.c		\
+		src/carpet.h src/mirror.c src/mirror.h src/room.c src/room.h			\
+		src/fire.c src/fire.h src/potion.c src/potion.h src/sword.c				\
+		src/sword.h src/clock.c src/clock.h src/princess.c src/princess.h	\
+		src/jaffar.c src/jaffar.h src/mouse.c src/mouse.h src/samples.c		\
+		src/samples.h src/cutscenes.c src/cutscenes.h src/fight.c					\
+		src/fight.h src/wall/wall.c src/wall/wall.h												\
 		src/wall/wall-depedv.c src/wall/wall-depedv.h src/wall/wall-pv.c	\
 		src/wall/wall-pv.h src/wall/wall-dcpc.c src/wall/wall-dcpc.h			\
 		src/kid/kid.c src/kid/kid.h src/kid/kid-normal.c									\

@@ -22,11 +22,6 @@
 
 #include "mininim.h"
 
-/* types */
-enum quit_anim {
-  NO_QUIT, RESTART_LEVEL, NEXT_LEVEL, RESTART_GAME, QUIT_GAME, OUT_OF_TIME
-};
-
 /* functions */
 void play_anim (void (*draw_callback) (void),
                 void (*compute_callback) (void),
@@ -80,10 +75,5 @@ extern enum quit_anim quit_anim; /* set to true to quit animation */
 extern bool next_frame_inv; /* invert draw_anim offset interpretation  */
 extern bool cutscene; /* don't apply physics if set */
 extern uint64_t anim_cycle;
-
-/* macros */
-#define SCRIPT_HZ 12
-#define CYCLE_TO_EFFECT_DURATION(x) ((x) * (EFFECT_HZ / SCRIPT_HZ))
-#define SECS_TO_SCYCLES(x) ((x) * SCRIPT_HZ)
 
 #endif	/* MININIM_ANIM_H */

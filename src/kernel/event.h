@@ -20,8 +20,6 @@
 #ifndef MININIM_EVENT_H
 #define MININIM_EVENT_H
 
-#include <allegro5/allegro.h>
-
 /* Functions */
 ALLEGRO_EVENT_QUEUE *create_event_queue (void);
 void drop_all_events_from_source  (ALLEGRO_EVENT_QUEUE *queue,

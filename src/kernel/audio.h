@@ -20,18 +20,6 @@
 #ifndef MININIM_AUDIO_H
 #define MININIM_AUDIO_H
 
-#include <allegro5/allegro_audio.h>
-
-/* types */
-struct audio_sample {
-  ALLEGRO_SAMPLE *sample;
-  ALLEGRO_SAMPLE_INSTANCE *instance;
-  bool played;
-  uint64_t anim_cycle;
-  int room;
-  float volume;
-};
-
 /* functions */
 void init_audio (void);
 void finalize_audio (void);

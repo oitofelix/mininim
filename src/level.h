@@ -20,9 +20,6 @@
 #ifndef MININIM_LEVEL_H
 #define MININIM_LEVEL_H
 
-#include "anim.h"
-
-/* current level */
 extern struct level level;
 extern int room_view;
 extern int retry_level;

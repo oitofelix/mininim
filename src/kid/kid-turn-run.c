@@ -20,15 +20,6 @@
 #include <config.h>
 
 #include "mininim.h"
-#include "video.h"
-#include "keyboard.h"
-#include "anim.h"
-#include "physics.h"
-#include "door.h"
-#include "potion.h"
-#include "sword.h"
-#include "loose-floor.h"
-#include "kid.h"
 
 struct frameset kid_turn_run_frameset[KID_TURN_RUN_FRAMESET_NMEMB];
 

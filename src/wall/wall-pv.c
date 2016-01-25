@@ -21,12 +21,6 @@
 
 #include <stdio.h>
 #include "mininim.h"
-#include "video.h"
-#include "random.h"
-#include "room.h"
-#include "anim.h"
-#include "wall.h"
-#include "wall-pv.h"
 
 static ALLEGRO_COLOR wall_color_array[3][4][11];
 

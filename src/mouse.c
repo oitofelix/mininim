@@ -19,13 +19,7 @@
 
 #include <config.h>
 
-#include "video.h"
-#include "array.h"
-#include "room.h"
-#include "level.h"
-#include "anim.h"
-#include "physics.h"
-#include "mouse.h"
+#include "mininim.h"
 
 #define RUN_FRAMESET_NMEMB 2
 static struct frameset run_frameset[RUN_FRAMESET_NMEMB];

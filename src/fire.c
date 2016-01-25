@@ -19,13 +19,7 @@
 
 #include <config.h>
 
-#include "video.h"
-#include "random.h"
-#include "physics.h"
-#include "level.h"
-#include "pos.h"
-#include "room.h"
-#include "fire.h"
+#include "mininim.h"
 
 static ALLEGRO_COLOR e_fire_palette (ALLEGRO_COLOR c);
 static ALLEGRO_COLOR c_fire_palette (ALLEGRO_COLOR c);

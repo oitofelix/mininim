@@ -22,14 +22,6 @@
 #include <error.h>
 #include <stdio.h>
 #include "mininim.h"
-#include "video.h"
-#include "random.h"
-#include "physics.h"
-#include "room.h"
-#include "wall-depedv.h"
-#include "wall-pv.h"
-#include "wall-dcpc.h"
-#include "wall.h"
 
 /* wall cache */
 static ALLEGRO_BITMAP *wall_cache;

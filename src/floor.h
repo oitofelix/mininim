@@ -20,9 +20,6 @@
 #ifndef MININIM_FLOOR_H
 #define MININIM_FLOOR_H
 
-#include "audio.h"
-#include "physics.h"
-
 /* dungeon cga */
 #define DC_FLOOR_LEFT "data/floor/dc-left.png"
 #define DC_FLOOR_RIGHT "data/floor/dc-right.png"

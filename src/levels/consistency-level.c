@@ -21,11 +21,7 @@
 
 #include <stdio.h>
 #include <time.h>
-#include "video.h"
-#include "random.h"
-#include "level.h"
-#include "consistency.h"
-#include "kid.h"
+#include "mininim.h"
 
 static struct level consistency_level;
 static void next_level (int lv);

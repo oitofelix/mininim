@@ -21,8 +21,7 @@
 
 #include <stdint.h>
 #include <time.h>
-#include "pos.h"
-#include "random.h"
+#include "mininim.h"
 
 /* random number generator seed */
 uint32_t random_seed = 0;

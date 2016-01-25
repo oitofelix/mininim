@@ -21,36 +21,7 @@
 
 #include <error.h>
 #include <stdio.h>
-#include <allegro5/allegro.h>
 #include "mininim.h"
-#include "video.h"
-#include "random.h"
-#include "array.h"
-#include "physics.h"
-#include "level.h"
-#include "kid.h"
-#include "floor.h"
-#include "broken-floor.h"
-#include "skeleton-floor.h"
-#include "loose-floor.h"
-#include "opener-floor.h"
-#include "closer-floor.h"
-#include "spikes-floor.h"
-#include "pillar.h"
-#include "big-pillar.h"
-#include "wall.h"
-#include "door.h"
-#include "level-door.h"
-#include "chopper.h"
-#include "bricks.h"
-#include "torch.h"
-#include "window.h"
-#include "balcony.h"
-#include "arch.h"
-#include "carpet.h"
-#include "stars.h"
-#include "mirror.h"
-#include "room.h"
 
 static int last_level;
 static int last_room;

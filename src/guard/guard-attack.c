@@ -21,18 +21,6 @@
 
 #include <stdio.h>
 #include "mininim.h"
-#include "video.h"
-#include "keyboard.h"
-#include "anim.h"
-#include "physics.h"
-#include "door.h"
-#include "potion.h"
-#include "sword.h"
-#include "loose-floor.h"
-#include "fight.h"
-#include "kid.h"
-#include "samples.h"
-#include "guard.h"
 
 struct frameset guard_attack_frameset[GUARD_ATTACK_FRAMESET_NMEMB];
 struct frameset fat_guard_attack_frameset[GUARD_ATTACK_FRAMESET_NMEMB];

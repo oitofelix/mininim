@@ -69,8 +69,4 @@ struct coord *dc_wall_face_top_coord (struct pos *p, struct coord *c);
 struct coord *d_wall_face_top_coord (struct pos *p, struct coord *c);
 struct coord *p_wall_face_top_coord (struct pos *p, struct coord *c);
 
-enum wall_correlation {
-  SWS, SWW, WWS, WWW
-};
-
 #endif	/* MININIM_WALL_H */
