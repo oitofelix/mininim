@@ -234,7 +234,7 @@ draw_bottom_text (ALLEGRO_BITMAP *bitmap, char *text)
 
   if (text) {
     if (current_text) al_free (current_text);
-    asprintf (&current_text, "%s", text);
+    xasprintf (&current_text, "%s", text);
     al_set_timer_count (timer, 0);
     al_start_timer (timer);
   } else if (al_get_timer_count (timer) >= BOTTOM_TEXT_DURATION

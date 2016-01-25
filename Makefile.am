@@ -92,7 +92,7 @@ mininim_SOURCES = src/mininim.c src/mininim.h src/constants.h					\
 		src/kernel/audio.c src/kernel/audio.h src/kernel/memory.c					\
 		src/kernel/memory.h src/kernel/keyboard.c src/kernel/keyboard.h		\
 		src/kernel/random.c src/kernel/random.h src/kernel/array.c				\
-		src/kernel/array.h
+		src/kernel/array.h src/kernel/xstdio.c src/kernel/xstdio.h
 
 AM_CPPFLAGS = -DLOCALEDIR=\"$(localedir)\" -I$(top_builddir)/gnulib	\
 -I$(top_srcdir)/gnulib -I${srcdir}/src -I${srcdir}/src/kernel				\

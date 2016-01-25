@@ -61,7 +61,7 @@ play_level (struct level *lv)
   current_kid_id = 0;
 
   if (level.nominal_number >= 0) {
-    asprintf (&text, "LEVEL %i", level.nominal_number);
+    xasprintf (&text, "LEVEL %i", level.nominal_number);
     draw_bottom_text (NULL, text);
     al_free (text);
   }
@@ -320,7 +320,7 @@ process_keys (void)
   /* I: enable/disable immortal mode */
   if (was_key_pressed (ALLEGRO_KEY_I, 0, 0, true)) {
     current_kid->immortal = ! current_kid->immortal;
-    asprintf (&text, "%s MODE", current_kid->immortal
+    xasprintf (&text, "%s MODE", current_kid->immortal
                ? "IMMORTAL" : "MORTAL");
     draw_bottom_text (NULL, text);
     al_free (text);
@@ -354,7 +354,7 @@ process_keys (void)
     int a = roomd (room_view, ABOVE);
     int b = roomd (room_view, BELOW);
 
-    asprintf (&text, "S%i L%i R%i A%i B%i", s, l, r, a, b);
+    xasprintf (&text, "S%i L%i R%i A%i B%i", s, l, r, a, b);
     draw_bottom_text (NULL, text);
     al_free (text);
   }
@@ -368,7 +368,7 @@ process_keys (void)
     int bl = roomd (b, LEFT);
     int br = roomd (b, RIGHT);
 
-    asprintf (&text, "LV%i AL%i AR%i BL%i BR%i",
+    xasprintf (&text, "LV%i AL%i AR%i BL%i BR%i",
                level.number, al, ar, bl, br);
     draw_bottom_text (NULL, text);
     al_free (text);
@@ -435,7 +435,7 @@ process_keys (void)
     case PALACE: em = DUNGEON; em_str = "DUNGEON"; break;
     }
 
-    asprintf (&text, "ENVIRONMENT MODE: %s", em_str);
+    xasprintf (&text, "ENVIRONMENT MODE: %s", em_str);
     draw_bottom_text (NULL, text);
     al_free (text);
   }
@@ -465,7 +465,7 @@ process_keys (void)
       if (t < 240 || t % 12 < 8) {
         if (t >= 252 && t % 12 == 0)
           play_sample (press_key_sample, -1);
-        asprintf (&text, "Press Button to Continue");
+        xasprintf (&text, "Press Button to Continue");
         draw_bottom_text (NULL, text);
         al_free (text);
       } else draw_bottom_text (NULL, "");
@@ -562,8 +562,8 @@ display_remaining_time (void)
   int t = 60 * 60 - al_get_timer_count (play_time);
   if (t < 0) t = 0;
   int m = t / 60 + ((t % 60) ? 1 : 0);
-  if (t > 60) asprintf (&text, "%i MINUTES LEFT", m);
-  else asprintf (&text, "%i SECONDS LEFT", t);
+  if (t > 60) xasprintf (&text, "%i MINUTES LEFT", m);
+  else xasprintf (&text, "%i SECONDS LEFT", t);
   draw_bottom_text (NULL, text);
   al_free (text);
 }
@@ -573,14 +573,14 @@ display_skill (struct anim *k)
 {
   char *text;
   struct anim *ke = get_anim_by_id (k->enemy_id);
-  if (ke) asprintf (&text, "KCA%i KCD%i A%i CA%i D%i CD%i",
+  if (ke) xasprintf (&text, "KCA%i KCD%i A%i CA%i D%i CD%i",
                       k->skill.counter_attack_prob + 1,
                       k->skill.counter_defense_prob + 1,
                       ke->skill.attack_prob + 1,
                       ke->skill.counter_attack_prob + 1,
                       ke->skill.defense_prob + 1,
                       ke->skill.counter_defense_prob + 1);
-  else asprintf (&text, "KCA%i KCD%i",
+  else xasprintf (&text, "KCA%i KCD%i",
                   k->skill.counter_attack_prob + 1,
                   k->skill.counter_defense_prob + 1);
   draw_bottom_text (NULL, text);

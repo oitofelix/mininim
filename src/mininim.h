@@ -39,6 +39,7 @@
 #include "random.h"
 #include "timer.h"
 #include "video.h"
+#include "xstdio.h"
 #include "anim.h"
 #include "arch.h"
 #include "balcony.h"

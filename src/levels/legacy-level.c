@@ -775,7 +775,7 @@ static void
 load_legacy_level (int number)
 {
   char *lvfn;
-  asprintf (&lvfn, "data/legacy-levels/%02d", number);
+  xasprintf (&lvfn, "data/legacy-levels/%02d", number);
 
   FILE *lvf;
   lvf = fopen (lvfn, "r");
