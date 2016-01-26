@@ -30,8 +30,8 @@ struct level level;
 static bool no_room_drawing = false;
 static int last_auto_show_time;
 static ALLEGRO_TIMER *death_timer;
-static bool pause_game, step_one_cycle;
 
+bool pause_game, step_one_cycle;
 int room_view;
 int retry_level = -1;
 int anti_camera_room;
@@ -183,7 +183,11 @@ compute_level (void)
 
   int prev_room = current_kid->f.c.room;
 
-  for (i = 0; i < anima_nmemb; i++) anima[i].splash = false;
+  for (i = 0; i < anima_nmemb; i++) {
+    struct anim *a = &anima[i];
+    a->splash = false;
+    a->xf.b = NULL;
+  }
 
   compute_loose_floors ();
 
@@ -446,28 +450,6 @@ process_keys (void)
     al_free (text);
   }
 
-  /* F11: change environment mode */
-  if (was_key_pressed (ALLEGRO_KEY_F11, 0, 0, true)) {
-    char *em_str = NULL;
-
-    if (force_em) {
-      if (original_em == em) force_em = false;
-      else em = (em == DUNGEON) ? PALACE : DUNGEON;
-    } else {
-      em = (em == DUNGEON) ? PALACE : DUNGEON;
-      force_em = true;
-    }
-
-    if (force_em) {
-      if (em == DUNGEON) em_str = "DUNGEON";
-      else em_str = "PALACE";
-    } else em_str = "ORIGINAL";
-
-    xasprintf (&text, "ENVIRONMENT MODE: %s", em_str);
-    draw_bottom_text (NULL, text);
-    al_free (text);
-  }
-
   /* Restart level after death */
   struct anim *k = get_anim_by_id (0);
   if (is_kid_dead (&k->f)
@@ -515,13 +497,6 @@ process_keys (void)
 static void
 draw_level (void)
 {
-  if (pause_game) {
-    draw_bottom_text (NULL, "GAME PAUSED");
-    clear_bitmap (uscreen, TRANSPARENT_COLOR);
-    draw_lives (uscreen, get_anim_by_id (current_kid_id), vm);
-    return;
-  }
-
   /* drawing */
   clear_bitmap (screen, BLACK);
 
@@ -581,6 +556,8 @@ draw_level (void)
     last_auto_show_time = rem_time;
   }
   if (rem_time <= 0) quit_anim = OUT_OF_TIME;
+
+  if (pause_game) draw_bottom_text (NULL, "GAME PAUSED");
 }
 
 void

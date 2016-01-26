@@ -162,6 +162,28 @@ play_anim (void (*draw_callback) (void),
         al_free (text);
       }
 
+      /* F11: change environment mode */
+      if (was_key_pressed (ALLEGRO_KEY_F11, 0, 0, true)) {
+        char *em_str = NULL;
+
+        if (force_em) {
+          if (original_em == em) force_em = false;
+          else em = (em == DUNGEON) ? PALACE : DUNGEON;
+        } else {
+          em = (em == DUNGEON) ? PALACE : DUNGEON;
+          force_em = true;
+        }
+
+        if (force_em) {
+          if (em == DUNGEON) em_str = "DUNGEON";
+          else em_str = "PALACE";
+        } else em_str = "ORIGINAL";
+
+        xasprintf (&text, "ENVIRONMENT MODE: %s", em_str);
+        draw_bottom_text (NULL, text);
+        al_free (text);
+      }
+
       /* F12: change video mode */
       if (was_key_pressed (ALLEGRO_KEY_F12, 0, 0, true)) {
         char *vm_str = NULL;
@@ -298,7 +320,6 @@ draw_anims (ALLEGRO_BITMAP *bitmap, enum em em, enum vm vm)
     draw_falling_loose_floor (bitmap, &pmlr, em, vm);
     draw_falling_loose_floor (bitmap, &pmlra, em, vm);
     draw_room_anim_fg (bitmap, em, vm, a);
-    a->xf.b = NULL;
   }
 
   /* coord_wa = false; */
