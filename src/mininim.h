@@ -28,10 +28,10 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <assert.h>
-#include <error.h>
 #include <math.h>
 #include <time.h>
-#include <argp.h>
+#include "error.h"
+#include "argp.h"
 
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_image.h>

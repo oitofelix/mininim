@@ -52,16 +52,17 @@ parser (int key, char *arg, struct argp_state *state)
     else if (! strcasecmp ("EGA", arg)) vm = EGA;
     else if (! strcasecmp ("CGA", arg)) vm = CGA;
     else if (! strcasecmp ("HGC", arg)) vm = CGA, hgc = true;
+    else argp_error (state, "'%s' is not a valid value for the option 'video-mode'.\nValid values are: VGA, EGA, CGA and HGC.", arg);
     break;
   case ENVIRONMENT_MODE_OPTION:
     if (! strcasecmp ("ORIGINAL", arg)) force_em = false;
     else if (! strcasecmp ("DUNGEON", arg)) force_em = true, em = DUNGEON;
     else if (! strcasecmp ("PALACE", arg)) force_em = true, em = PALACE;
+    else argp_error (state, "'%s' is not a valid value for the option 'environment-mode'.\nValid values are: ORIGINAL, DUNGEON and PALACE.", arg);
     break;
   default:
     return ARGP_ERR_UNKNOWN;
   }
-
   return 0;
 }
 
