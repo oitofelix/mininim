@@ -33,9 +33,9 @@ enum options {
 };
 
 static struct argp_option options[] = {
-  {"video-mode", VIDEO_MODE_OPTION, "VIDEO-MODE", 0, "Select video mode.  Valid values for VIDEO-MODE are: VGA, EGA, CGA and HGC.  The default is VGA.  This can be changed in-game by the F12 key.", 0},
-  {"environment-mode", ENVIRONMENT_MODE_OPTION, "ENVIRONMENT-MODE", 0, "Select environment mode.  Valid values for ENVIRONMENT-MODE are: ORIGINAL, DUNGEON and PALACE.  The 'ORIGINAL' value gives level modules autonomy in this choice for each particular level.  This is the default.  This can be changed in-game by the F11 key.", 0},
-  {"guard-mode", GUARD_MODE_OPTION, "GUARD-MODE", 0, "Select guard mode.  Valid values for GUARD-MODE are: ORIGINAL, GUARD, FAT-GUARD, VIZIER, SKELETON and SHADOW.  The 'ORIGINAL' value gives level modules autonomy in this choice for each particular guard.  This is the default.  This can be changed in game by the F10 key.", 0},
+  {"video-mode", VIDEO_MODE_OPTION, "VIDEO-MODE", 0, "select video mode.  Valid values for VIDEO-MODE are: VGA, EGA, CGA and HGC.  The default is VGA.  This can be changed in-game by the F12 key.", 0},
+  {"environment-mode", ENVIRONMENT_MODE_OPTION, "ENVIRONMENT-MODE", 0, "select environment mode.  Valid values for ENVIRONMENT-MODE are: ORIGINAL, DUNGEON and PALACE.  The 'ORIGINAL' value gives level modules autonomy in this choice for each particular level.  This is the default.  This can be changed in-game by the F11 key.", 0},
+  {"guard-mode", GUARD_MODE_OPTION, "GUARD-MODE", 0, "select guard mode.  Valid values for GUARD-MODE are: ORIGINAL, GUARD, FAT-GUARD, VIZIER, SKELETON and SHADOW.  The 'ORIGINAL' value gives level modules autonomy in this choice for each particular guard.  This is the default.  This can be changed in game by the F10 key.", 0},
   {0},
 };
 
@@ -77,9 +77,33 @@ parser (int key, char *arg, struct argp_state *state)
   return 0;
 }
 
+static void
+version (FILE *stream, struct argp_state *state)
+{
+  fprintf (stream,
+           "%s (%s) %s\n\n"	/* mininim (MININIM) a.b */
+
+           /* TRANSLATORS: Use "Félix" in place of "Fe'lix" */
+           "Copyright (C) %s " PACKAGE_COPYRIGHT_HOLDER " <%s>\n\n"
+
+           "%s\n\n"		/* License GPLv3+... */
+           "%s\n",		/* Written by... */
+           PACKAGE, PACKAGE_NAME, VERSION,
+           "2015, 2016", "oitofelix@gnu.org",
+           "\
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\n\
+This is free software: you are free to change and redistribute it.\n\
+There is NO WARRANTY, to the extent permitted by law.",
+
+           /* TRANSLATORS: Use "Félix" in place of "F'elix" */
+           "Written by Bruno Fe'lix Rezende Ribeiro.");
+}
+
+
 int
 main (int argc, char **argv)
 {
+  argp_program_version_hook = version;
   argp.doc = doc;
 
   argp_parse (&argp, argc, argv, 0, NULL, NULL);
