@@ -19,14 +19,17 @@
 
 #include "mininim.h"
 
-void
+int
 xasprintf (char **ptr, const char *template, ...)
 {
   va_list ap;
   va_start (ap, template);
 
-  if (vasprintf (ptr, template, ap) < 0)
+  int r = vasprintf (ptr, template, ap);
+  if (r < 0)
     error (-1, 0, "%s (%p, %p): cannot create string",
            __func__, ptr, template);
   va_end (ap);
+
+  return r;
 }

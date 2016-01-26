@@ -46,8 +46,27 @@ finalize_audio (void)
 ALLEGRO_SAMPLE *
 load_sample (char *filename)
 {
-  ALLEGRO_SAMPLE *sample = al_load_sample (filename);
-  if (! sample) error (-1, 0, "%s (\"%s\"): cannot load sample", __func__, filename);
+  ALLEGRO_SAMPLE *sample = NULL;
+  char *data_path_filename;
+  char *pkgdatadir_filename;
+
+  if (data_path && ! sample) {
+    xasprintf (&data_path_filename, "%s/%s", data_path, filename);
+    sample = al_load_sample (data_path_filename);
+    al_free (data_path_filename);
+  }
+
+  if (! sample) sample = al_load_sample (filename);
+
+  if (! sample) {
+    xasprintf (&pkgdatadir_filename, "%s/%s", PKGDATADIR, filename);
+    sample = al_load_sample (pkgdatadir_filename);
+    al_free (pkgdatadir_filename);
+  }
+
+  if (! sample)
+    error (-1, 0, "%s (\"%s\"): cannot load sample",
+           __func__, filename);
 
   return sample;
 }

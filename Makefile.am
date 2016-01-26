@@ -94,8 +94,9 @@ mininim_SOURCES = src/mininim.c src/mininim.h src/constants.h					\
 		src/kernel/random.c src/kernel/random.h src/kernel/array.c				\
 		src/kernel/array.h src/kernel/xstdio.c src/kernel/xstdio.h
 
-AM_CPPFLAGS = -DLOCALEDIR=\"$(localedir)\" -I$(top_builddir)/gnulib	\
--I$(top_srcdir)/gnulib -I${srcdir}/src -I${srcdir}/src/kernel				\
+AM_CPPFLAGS = -DLOCALEDIR=\"$(localedir)\"												\
+-DPKGDATADIR=\"$(pkgdatadir)\" -I$(top_builddir)/gnulib						\
+-I$(top_srcdir)/gnulib -I${srcdir}/src -I${srcdir}/src/kernel			\
 -I${srcdir}/src/guard -I${srcdir}/src/kid -I${srcdir}/src/levels	\
 -I${srcdir}/src/wall
 CFLAGS_DEV = -Wall -ggdb3 -Werror -Wno-error=unused-function	\
@@ -103,6 +104,9 @@ CFLAGS_DEV = -Wall -ggdb3 -Werror -Wno-error=unused-function	\
 AM_CFLAGS = ${CFLAGS_DEV} ${ALLEGRO_CFLAGS}
 AM_LDFLAGS = -lm ${ALLEGRO_LIBS}
 LDADD = gnulib/libgnu.a
+
+install-data-hook:
+	cp -rv ${top_srcdir}/data ${pkgdatadir}
 
 
 
@@ -112,7 +116,7 @@ LDADD = gnulib/libgnu.a
 
 ACLOCAL_AMFLAGS = -I gnulib/m4
 SUBDIRS = doc gnulib
-EXTRA_DIST = ${top_level_doc} data ChangeLog
+EXTRA_DIST = ${top_level_doc} ChangeLog data
 
 
 

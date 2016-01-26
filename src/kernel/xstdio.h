@@ -20,6 +20,6 @@
 #ifndef MININIM_XSTDIO_H
 #define MININIM_XSTDIO_H
 
-void xasprintf (char **ptr, const char *template, ...);
+int xasprintf (char **ptr, const char *template, ...);
 
 #endif	/* MININIM_XSTDIO_H */

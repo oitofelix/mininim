@@ -156,5 +156,6 @@ extern int initial_total_lives, total_lives,
 extern int start_level;
 extern int time_limit;
 extern struct skill skill;
+extern char *data_path;
 
 #endif	/* MININIM_MININIM_H */

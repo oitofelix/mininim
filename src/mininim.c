@@ -32,7 +32,7 @@ int start_level;
 int time_limit = TIME_LIMIT;
 struct skill skill = {.counter_attack_prob = INITIAL_KCA,
                       .counter_defense_prob = INITIAL_KCD};
-
+char *data_path;
 static bool sound_disabled_cmd;
 
 static error_t parser (int key, char *arg, struct argp_state *state);
@@ -42,7 +42,7 @@ enum options {
   SOUND_OPTION, DISPLAY_FLIP_MODE_OPTION, KEYBOARD_FLIP_MODE_OPTION,
   MIRROR_MODE_OPTION, BLIND_MODE_OPTION, IMMORTAL_MODE_OPTION,
   TOTAL_LIVES_OPTION, START_LEVEL_OPTION, TIME_LIMIT_OPTION,
-  KCA_OPTION, KCD_OPTION,
+  KCA_OPTION, KCD_OPTION, DATA_PATH_OPTION
 };
 
 static struct argp_option options[] = {
@@ -60,6 +60,7 @@ static struct argp_option options[] = {
   {"time-limit", TIME_LIMIT_OPTION, "N", 0, "Set the time limit to complete the game to N seconds.  The default is 3600.  Valid integers range from 1 to infinity.  This can be changed in-game by the + and - keys.", 0},
   {"kca", KCA_OPTION, "N", 0, "Set kid's counter attack skill to N.  The default is 0.  Valid integers range from 0 to 100.  This can be changed in-game by the CTRL+= and CTRL+- keys.", 0},
   {"kcd", KCD_OPTION, "N", 0, "Set kid's counter defense skill to N.  The default is 0.  Valid integers range from 0 to 100.  This can be changed in-game by the ALT+= and ALT+- keys.", 0},
+  {"data-path", DATA_PATH_OPTION, "PATH", 0, "Set data path to PATH.  Normally, the data files are looked for in the current working directory, and then in the hard-coded package data directory.  If this option is given, before looking there the data files are looked for in PATH.", 0},
   {0},
 };
 
@@ -184,6 +185,7 @@ parser (int key, char *arg, struct argp_state *state)
       argp_error (state, "'%s' is not a valid decimal integer for the option 'kcd'.\nValid integers range from 0 to 100.", arg);
     skill.counter_defense_prob--;
     break;
+  case DATA_PATH_OPTION: xasprintf (&data_path, "%s", arg); break;
   default:
     return ARGP_ERR_UNKNOWN;
   }

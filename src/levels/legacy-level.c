@@ -760,16 +760,33 @@ next_level (int number)
 static void
 load_legacy_level (int number)
 {
-  char *lvfn;
-  xasprintf (&lvfn, "data/legacy-levels/%02d", number);
+  FILE *lvf = NULL;
+  char *filename;
+  char *data_path_filename;
+  char *pkgdatadir_filename;
 
-  FILE *lvf;
-  lvf = fopen (lvfn, "r");
-  if (! lvf) error (-1, 0, "cannot read legacy level file %s", lvfn);
+  xasprintf (&filename, "data/legacy-levels/%02d", number);
+
+  if (data_path && ! lvf) {
+    xasprintf (&data_path_filename, "%s/%s", data_path, filename);
+    lvf = fopen (data_path_filename, "r");
+    al_free (data_path_filename);
+  }
+
+  if (! lvf) lvf = fopen (filename, "r");
+
+  if (! lvf) {
+    xasprintf (&pkgdatadir_filename, "%s/%s", PKGDATADIR, filename);
+    lvf = fopen (pkgdatadir_filename, "r");
+    al_free (pkgdatadir_filename);
+  }
+
+  if (! lvf)
+    error (-1, 0, "cannot read legacy level file %s", filename);
+
   fread (&lv, sizeof (lv), 1, lvf);
   fclose (lvf);
-
-  al_free (lvfn);
+  al_free (filename);
 
   struct pos p;
 
