@@ -42,6 +42,8 @@
 #define KID_MINIMUM_LIVES_TO_BLINK 1
 #define BOTTOM_TEXT_DURATION 3
 
+#define TIME_LIMIT 3600
+
 #define EFFECT_HZ 30
 #define SECS_TO_VCYCLES(x) ((x) * EFFECT_HZ)
 

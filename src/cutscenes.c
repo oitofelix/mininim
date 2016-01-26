@@ -483,7 +483,7 @@ cutscene_11_little_time_left_anim (void)
 void
 cutscene_11_anim (void)
 {
-  if (al_get_timer_count (play_time) >= 55 * 60)
+  if (al_get_timer_count (play_time) >= (92 * time_limit) / 100)
     cutscene_11_little_time_left_anim ();
   else cutscene_01_05_11_anim ();
 }

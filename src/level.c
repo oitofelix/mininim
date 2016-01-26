@@ -381,7 +381,7 @@ process_keys (void)
 
   /* +: increment and display remaining time */
   if (was_key_pressed (ALLEGRO_KEY_EQUALS, 0, ALLEGRO_KEYMOD_SHIFT, true)) {
-    int t = 60 * 60 - al_get_timer_count (play_time);
+    int t = time_limit - al_get_timer_count (play_time);
     int d = t > 60 ? -60 : -1;
     al_add_timer_count (play_time, d);
     display_remaining_time ();
@@ -389,7 +389,7 @@ process_keys (void)
 
   /* -: decrement and display remaining time */
   if (was_key_pressed (ALLEGRO_KEY_MINUS, 0, 0, true)) {
-    int t = 60 * 60 - al_get_timer_count (play_time);
+    int t = time_limit - al_get_timer_count (play_time);
     int d = t > 60 ? +60 : +1;
     al_add_timer_count (play_time, d);
     display_remaining_time ();
@@ -541,7 +541,7 @@ draw_level (void)
   draw_lives (uscreen, get_anim_by_id (current_kid_id), vm);
 
   /* automatic remaining time display */
-  int rem_time = 60 * 60 - al_get_timer_count (play_time);
+  int rem_time = time_limit - al_get_timer_count (play_time);
   if ((rem_time % (5 * 60) == 0
        && last_auto_show_time != rem_time
        && anim_cycle > 720)
@@ -564,7 +564,7 @@ void
 display_remaining_time (void)
 {
   char *text;
-  int t = 60 * 60 - al_get_timer_count (play_time);
+  int t = time_limit - al_get_timer_count (play_time);
   if (t < 0) t = 0;
   int m = t / 60 + ((t % 60) ? 1 : 0);
   if (t > 60) xasprintf (&text, "%i MINUTES LEFT", m);
