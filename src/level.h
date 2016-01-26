@@ -26,7 +26,7 @@ extern int retry_level;
 extern int camera_follow_kid;
 extern int anti_camera_room;
 extern int auto_rem_time_1st_cycle;
-extern bool pause_game, step_one_cycle;
+extern bool no_room_drawing, pause_game, step_one_cycle;
 
 void load_level (void);
 void unload_level (void);

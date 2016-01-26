@@ -27,11 +27,10 @@ static void draw_lives (ALLEGRO_BITMAP *bitmap, struct anim *k, enum vm vm);
 
 struct level *vanilla_level;
 struct level level;
-static bool no_room_drawing = false;
 static int last_auto_show_time;
 static ALLEGRO_TIMER *death_timer;
 
-bool pause_game, step_one_cycle;
+bool no_room_drawing, pause_game, step_one_cycle;
 int room_view;
 int retry_level = -1;
 int anti_camera_room;
