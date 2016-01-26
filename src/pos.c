@@ -868,7 +868,7 @@ place_at_distance (struct frame *f0, coord_f cf0,
   struct coord tl; _tl (f1, &tl);
 
   *c = c1;
-  coord2room (c, c0.room, c);
+  coord2room (&c0, c1.room, &c0);
 
   c->x = (c0.x - c1.x) + ((dir == RIGHT) ? d : -d) + tl.x;
 
