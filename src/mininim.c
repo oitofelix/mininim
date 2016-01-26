@@ -31,14 +31,16 @@ static bool sound_disabled_cmd;
 static error_t parser (int key, char *arg, struct argp_state *state);
 
 enum options {
-  VIDEO_MODE_OPTION = 256, ENVIRONMENT_MODE_OPTION, GUARD_MODE_OPTION, NO_SOUND_OPTION
+  VIDEO_MODE_OPTION = 256, ENVIRONMENT_MODE_OPTION, GUARD_MODE_OPTION,
+  NO_SOUND_OPTION, DISPLAY_FLIP_OPTION,
 };
 
 static struct argp_option options[] = {
-  {"video-mode", VIDEO_MODE_OPTION, "VIDEO-MODE", 0, "select video mode.  Valid values for VIDEO-MODE are: VGA, EGA, CGA and HGC.  The default is VGA.  This can be changed in-game by the F12 key.", 0},
-  {"environment-mode", ENVIRONMENT_MODE_OPTION, "ENVIRONMENT-MODE", 0, "select environment mode.  Valid values for ENVIRONMENT-MODE are: ORIGINAL, DUNGEON and PALACE.  The 'ORIGINAL' value gives level modules autonomy in this choice for each particular level.  This is the default.  This can be changed in-game by the F11 key.", 0},
-  {"guard-mode", GUARD_MODE_OPTION, "GUARD-MODE", 0, "select guard mode.  Valid values for GUARD-MODE are: ORIGINAL, GUARD, FAT-GUARD, VIZIER, SKELETON and SHADOW.  The 'ORIGINAL' value gives level modules autonomy in this choice for each particular guard.  This is the default.  This can be changed in game by the F10 key.", 0},
-  {"no-sound", NO_SOUND_OPTION, NULL, 0, "disable sound.  The default is to have sound enabled.  This can be changed in game by the CTRL+S keystroke.", 0},
+  {"video-mode", VIDEO_MODE_OPTION, "VIDEO-MODE", 0, "Select video mode.  Valid values for VIDEO-MODE are: VGA, EGA, CGA and HGC.  The default is VGA.  This can be changed in-game by the F12 key.", 0},
+  {"environment-mode", ENVIRONMENT_MODE_OPTION, "ENVIRONMENT-MODE", 0, "Select environment mode.  Valid values for ENVIRONMENT-MODE are: ORIGINAL, DUNGEON and PALACE.  The 'ORIGINAL' value gives level modules autonomy in this choice for each particular level.  This is the default.  This can be changed in-game by the F11 key.", 0},
+  {"guard-mode", GUARD_MODE_OPTION, "GUARD-MODE", 0, "Select guard mode.  Valid values for GUARD-MODE are: ORIGINAL, GUARD, FAT-GUARD, VIZIER, SKELETON and SHADOW.  The 'ORIGINAL' value gives level modules autonomy in this choice for each particular guard.  This is the default.  This can be changed in-game by the F10 key.", 0},
+  {"no-sound", NO_SOUND_OPTION, NULL, 0, "Disable sound.  The default is to have sound enabled.  This can be changed in-game by the CTRL+S keystroke.", 0},
+  {"display-flip", DISPLAY_FLIP_OPTION, "FLIP-MODE", 0, "Select display flip mode.  Valid values for FLIP-MODE are: NONE, VERTICAL, HORIZONTAL and VERTICAL-HORIZONTAL.  The default is NONE.  This can be changed in-game by the SHIFT+I keystroke.", 0},
   {0},
 };
 
@@ -75,6 +77,17 @@ parser (int key, char *arg, struct argp_state *state)
     else argp_error (state, "'%s' is not a valid value for the option 'guard-mode'.\nValid values are: ORIGINAL, GUARD, FAT-GUARD, VIZIER, SKELETON and SHADOW.", arg);
     break;
   case NO_SOUND_OPTION: sound_disabled_cmd = true; break;
+  case DISPLAY_FLIP_OPTION:
+    if (! strcasecmp ("NONE", arg))
+      screen_flags = 0;
+    else if (! strcasecmp ("VERTICAL", arg))
+      screen_flags = ALLEGRO_FLIP_VERTICAL;
+    else if (! strcasecmp ("HORIZONTAL", arg))
+      screen_flags = ALLEGRO_FLIP_HORIZONTAL;
+    else if (! strcasecmp ("VERTICAL-HORIZONTAL", arg))
+      screen_flags = ALLEGRO_FLIP_VERTICAL | ALLEGRO_FLIP_HORIZONTAL;
+    else argp_error (state, "'%s' is not a valid value for the option 'display-flip'.\nValid values are: NONE, VERTICAL, HORIZONTAL, VERTICAL-HORIZONTAL.", arg);
+    break;
   default:
     return ARGP_ERR_UNKNOWN;
   }
