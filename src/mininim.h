@@ -31,6 +31,7 @@
 #include <error.h>
 #include <math.h>
 #include <time.h>
+#include <argp.h>
 
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_image.h>
@@ -144,8 +145,9 @@ int min_int (int a, int b);
 
 /* variables */
 extern ALLEGRO_TIMER *play_time;
-extern enum em em;
 extern enum vm vm;
-extern char *program_name;
+extern enum em em;
+extern enum em original_em;
+extern bool force_em;
 
 #endif	/* MININIM_MININIM_H */

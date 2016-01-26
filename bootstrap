@@ -1,6 +1,6 @@
 #!/bin/sh
 
 gnulib-tool --source-base=gnulib --m4-base=gnulib/m4 \
---aux-dir=gnulib/build-aux --import error vasprintf
+--aux-dir=gnulib/build-aux --import error vasprintf argp
 
 autoreconf --install

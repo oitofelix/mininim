@@ -20,15 +20,57 @@
 #include "mininim.h"
 
 ALLEGRO_TIMER *play_time;
-enum em em = DUNGEON;
 enum vm vm = VGA;
+enum em em = DUNGEON;
+enum em original_em = DUNGEON;
+bool force_em = false;
 
-char *program_name;
+static error_t parser (int key, char *arg, struct argp_state *state);
+
+enum options {
+  VIDEO_MODE_OPTION = 256, ENVIRONMENT_MODE_OPTION,
+};
+
+static struct argp_option options[] = {
+  {"video-mode", VIDEO_MODE_OPTION, "MODE", 0, "Select video mode.  Valid values for MODE are: VGA, EGA, CGA and HGC.  The default is VGA.", 0},
+  {"environment-mode", ENVIRONMENT_MODE_OPTION, "MODE", 0, "Select environment mode.  Valid values for MODE are: ORIGINAL, DUNGEON and PALACE.  The 'ORIGINAL' value gives level modules autonomy in this choice for each particular level.  This is the default.", 0},
+  {0},
+};
+
+static const char *doc = "MININIM: The Advanced Prince of Persia Engine\v";
+
+struct argp_child argp_child = { NULL };
+
+static struct argp argp = {options, parser, NULL, NULL, &argp_child, NULL, NULL};
+
+static error_t
+parser (int key, char *arg, struct argp_state *state)
+{
+  switch (key) {
+  case VIDEO_MODE_OPTION:
+    if (! strcasecmp ("VGA", arg)) vm = VGA;
+    else if (! strcasecmp ("EGA", arg)) vm = EGA;
+    else if (! strcasecmp ("CGA", arg)) vm = CGA;
+    else if (! strcasecmp ("HGC", arg)) vm = CGA, hgc = true;
+    break;
+  case ENVIRONMENT_MODE_OPTION:
+    if (! strcasecmp ("ORIGINAL", arg)) force_em = false;
+    else if (! strcasecmp ("DUNGEON", arg)) force_em = true, em = DUNGEON;
+    else if (! strcasecmp ("PALACE", arg)) force_em = true, em = PALACE;
+    break;
+  default:
+    return ARGP_ERR_UNKNOWN;
+  }
+
+  return 0;
+}
 
 int
 main (int argc, char **argv)
 {
-  program_name = "MININIM";
+  argp.doc = doc;
+
+  argp_parse (&argp, argc, argv, 0, NULL, NULL);
 
   al_init ();
   init_video ();

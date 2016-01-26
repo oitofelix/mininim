@@ -427,10 +427,18 @@ process_keys (void)
   if (was_key_pressed (ALLEGRO_KEY_F11, 0, 0, true)) {
     char *em_str = NULL;
 
-    switch (em) {
-    case DUNGEON: em = PALACE; em_str = "PALACE"; break;
-    case PALACE: em = DUNGEON; em_str = "DUNGEON"; break;
+    if (force_em) {
+      if (original_em == em) force_em = false;
+      else em = (em == DUNGEON) ? PALACE : DUNGEON;
+    } else {
+      em = (em == DUNGEON) ? PALACE : DUNGEON;
+      force_em = true;
     }
+
+    if (force_em) {
+      if (em == DUNGEON) em_str = "DUNGEON";
+      else em_str = "PALACE";
+    } else em_str = "ORIGINAL";
 
     xasprintf (&text, "ENVIRONMENT MODE: %s", em_str);
     draw_bottom_text (NULL, text);

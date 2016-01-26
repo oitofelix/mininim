@@ -187,12 +187,12 @@ start (void)
   }
 
   /* define the enviroment mode based on the level */
-  if (retry_level != level.number)
-    switch (level.number) {
-    case 4: case 5: case 6: case 10: case 11: case 14:
-      em = PALACE; break;
-    default: em = DUNGEON; break;
-    }
+  switch (level.number) {
+  case 4: case 5: case 6: case 10: case 11: case 14:
+    original_em = PALACE; break;
+  default: original_em = DUNGEON; break;
+  }
+  if (! force_em) em = original_em;
 
   /* give the sword to kid if it's not in the starting level */
   if (level.number > 1) k->has_sword = true;
