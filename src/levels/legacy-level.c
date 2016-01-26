@@ -24,8 +24,6 @@ static int level_3_checkpoint;
 static int shadow_id;
 static int skeleton_id;
 static bool played_sample;
-static int total_lives;
-static int current_lives;
 static struct level_door *exit_level_door;
 static ALLEGRO_TIMER *mouse_timer;
 static int mouse_id;
@@ -103,11 +101,9 @@ start (void)
 
   /* start the game with only 3 lives and null skills */
   if (level.number == 1) {
-    total_lives = 3;
     skill.counter_attack_prob = -1;
     skill.counter_defense_prob = -1;
   }
-  if (total_lives < 3) total_lives = 3;
 
   /* create kid */
   int id = create_anim (NULL, KID, &level.start_pos, level.start_dir);

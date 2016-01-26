@@ -26,6 +26,8 @@ enum em original_em = DUNGEON;
 bool force_em = false;
 enum gm gm = ORIGINAL_GM;
 bool immortal_mode;
+int initial_total_lives = KID_INITIAL_TOTAL_LIVES, total_lives;
+int initial_current_lives = KID_INITIAL_CURRENT_LIVES, current_lives;
 
 static bool sound_disabled_cmd;
 
@@ -35,6 +37,7 @@ enum options {
   VIDEO_MODE_OPTION = 256, ENVIRONMENT_MODE_OPTION, GUARD_MODE_OPTION,
   SOUND_OPTION, DISPLAY_FLIP_MODE_OPTION, KEYBOARD_FLIP_MODE_OPTION,
   MIRROR_MODE_OPTION, BLIND_MODE_OPTION, IMMORTAL_MODE_OPTION,
+  TOTAL_LIVES_OPTION,
 };
 
 static struct argp_option options[] = {
@@ -47,11 +50,12 @@ static struct argp_option options[] = {
   {"mirror-mode", MIRROR_MODE_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable mirror mode.  In mirror mode the screen and the keyboard are flipped horizontally.  This is equivalent of specifying both the options --display-flip-mode=horizontal and --keyboard-flip-mode=horizontal.  The default is FALSE.  This can be changed in-game by the SHIFT+I and SHIFT+K keystrokes for the display and keyboard, respectively.", 0},
   {"blind-mode", BLIND_MODE_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable blind mode.  In blind mode background and non-animated sprites are not drawn.  The default is FALSE.  This can be changed in-game by the SHIFT+B keystroke.", 0},
   {"immortal-mode", IMMORTAL_MODE_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable immortal mode.  In immortal mode the kid can't be harmed.  The default is FALSE.  This can be changed in-game by the I key.", 0},
+  {"total-lives", TOTAL_LIVES_OPTION, "N", 0, "Make the kid start with N total lives.  The default is 3.  Valid integers range from 1 to 10.  This can be changed in-game by the SHIFT+T keystroke.", 0},
   {0},
 };
 
-static const char *doc = "MININIM: The Advanced Prince of Persia Engine\n(a childhood dream coming true)\v\
-Unless otherwise noted, option values are case insensitive but must be specified in their entirety.  Long option names on the other hand, can be partially specified as long as they are kept unambiguous.  BOOLEAN is FALSE to disable the respective feature, and any other value (even the null string) to enable it.  For any non-specified option the documented default applies.  Key and keystroke references are based on the default mapping.";
+static const char *doc = "MININIM: The Advanced Prince of Persia Engine\n(a childhood dream)\v\
+Unless otherwise noted, option values are case insensitive but must be specified in their entirety.  Long option names on the other hand, can be partially specified as long as they are kept unambiguous.  BOOLEAN is FALSE to disable the respective feature, and any other value (even the null string or no string at all) to enable it.  For any non-specified option the documented default applies.  Key and keystroke references are based on the default mapping.";
 
 struct argp_child argp_child = { NULL };
 
@@ -144,6 +148,11 @@ parser (int key, char *arg, struct argp_state *state)
       immortal_mode = false;
     }
     break;
+  case TOTAL_LIVES_OPTION:
+    if (sscanf (arg, "%d", &initial_total_lives) != 1
+        || initial_total_lives < 1 || initial_total_lives > 10)
+      argp_error (state, "'%s' is not a valid decimal integer for the option 'total-lives'.\nValid integers range from 1 to 10.", arg);
+    break;
   default:
     return ARGP_ERR_UNKNOWN;
   }
@@ -196,6 +205,9 @@ main (int argc, char **argv)
   load_cutscenes ();
 
  restart_game:
+  total_lives = initial_total_lives;
+  current_lives = initial_current_lives;
+
   clear_bitmap (screen, BLACK);
   clear_bitmap (uscreen, TRANSPARENT_COLOR);
   cutscene_started = false;

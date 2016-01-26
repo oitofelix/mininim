@@ -18,8 +18,8 @@
 @c --- Copying;
 @copying
 @noindent
-@value{package} is the advanced Prince of Persia engine --- a childhood
-dream coming true.
+@value{package} is The advanced Prince of Persia Engine --- a childhood
+dream.
 
 @iftex
 @sp 1
