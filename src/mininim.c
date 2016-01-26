@@ -25,6 +25,7 @@ enum em em = DUNGEON;
 enum em original_em = DUNGEON;
 bool force_em = false;
 enum gm gm = ORIGINAL_GM;
+bool immortal_mode;
 
 static bool sound_disabled_cmd;
 
@@ -33,7 +34,7 @@ static error_t parser (int key, char *arg, struct argp_state *state);
 enum options {
   VIDEO_MODE_OPTION = 256, ENVIRONMENT_MODE_OPTION, GUARD_MODE_OPTION,
   SOUND_OPTION, DISPLAY_FLIP_MODE_OPTION, KEYBOARD_FLIP_MODE_OPTION,
-  MIRROR_MODE_OPTION, BLIND_MODE_OPTION,
+  MIRROR_MODE_OPTION, BLIND_MODE_OPTION, IMMORTAL_MODE_OPTION,
 };
 
 static struct argp_option options[] = {
@@ -45,6 +46,7 @@ static struct argp_option options[] = {
   {"keyboard-flip-mode", KEYBOARD_FLIP_MODE_OPTION, "KEYBOARD-FLIP-MODE", 0, "Select keyboard flip mode.  Valid values for KEYBOARD-FLIP-MODE are: NONE, VERTICAL, HORIZONTAL and VERTICAL-HORIZONTAL.  The default is NONE.  This can be changed in-game by the SHIFT+K keystroke.", 0},
   {"mirror-mode", MIRROR_MODE_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable mirror mode.  In mirror mode the screen and the keyboard are flipped horizontally.  This is equivalent of specifying both the options --display-flip-mode=horizontal and --keyboard-flip-mode=horizontal.  The default is FALSE.  This can be changed in-game by the SHIFT+I and SHIFT+K keystrokes for the display and keyboard, respectively.", 0},
   {"blind-mode", BLIND_MODE_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable blind mode.  In blind mode background and non-animated sprites are not drawn.  The default is FALSE.  This can be changed in-game by the SHIFT+B keystroke.", 0},
+  {"immortal-mode", IMMORTAL_MODE_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable immortal mode.  In immortal mode the kid can't be harmed.  The default is FALSE.  This can be changed in-game by the I key.", 0},
   {0},
 };
 
@@ -131,6 +133,15 @@ parser (int key, char *arg, struct argp_state *state)
     } else {
       /* false */
       no_room_drawing = false;
+    }
+    break;
+  case IMMORTAL_MODE_OPTION:
+    if (! arg || strcasecmp ("FALSE", arg)) {
+      /* true */
+      immortal_mode = true;
+    } else {
+      /* false */
+      immortal_mode = false;
     }
     break;
   default:

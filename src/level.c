@@ -319,8 +319,9 @@ process_keys (void)
 
   /* I: enable/disable immortal mode */
   if (was_key_pressed (ALLEGRO_KEY_I, 0, 0, true)) {
-    current_kid->immortal = ! current_kid->immortal;
-    xasprintf (&text, "%s MODE", current_kid->immortal
+    immortal_mode = ! immortal_mode;
+    current_kid->immortal = immortal_mode;
+    xasprintf (&text, "%s MODE", immortal_mode
                ? "IMMORTAL" : "MORTAL");
     draw_bottom_text (NULL, text);
     al_free (text);

@@ -150,5 +150,6 @@ extern enum gm gm;
 extern enum em em;
 extern enum em original_em;
 extern bool force_em;
+extern bool immortal_mode;
 
 #endif	/* MININIM_MININIM_H */

@@ -117,6 +117,7 @@ start (void)
   if (coming_from_12) k->current_lives = current_lives;
   else k->current_lives = total_lives;
   k->controllable = true;
+  k->immortal = immortal_mode;
 
   /* create guards */
   int i;
