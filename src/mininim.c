@@ -32,7 +32,7 @@ static error_t parser (int key, char *arg, struct argp_state *state);
 
 enum options {
   VIDEO_MODE_OPTION = 256, ENVIRONMENT_MODE_OPTION, GUARD_MODE_OPTION,
-  NO_SOUND_OPTION, DISPLAY_FLIP_OPTION, KEYBOARD_FLIP_OPTION,
+  NO_SOUND_OPTION, DISPLAY_FLIP_MODE_OPTION, KEYBOARD_FLIP_MODE_OPTION, MIRROR_MODE_OPTION,
 };
 
 static struct argp_option options[] = {
@@ -40,12 +40,14 @@ static struct argp_option options[] = {
   {"environment-mode", ENVIRONMENT_MODE_OPTION, "ENVIRONMENT-MODE", 0, "Select environment mode.  Valid values for ENVIRONMENT-MODE are: ORIGINAL, DUNGEON and PALACE.  The 'ORIGINAL' value gives level modules autonomy in this choice for each particular level.  This is the default.  This can be changed in-game by the F11 key.", 0},
   {"guard-mode", GUARD_MODE_OPTION, "GUARD-MODE", 0, "Select guard mode.  Valid values for GUARD-MODE are: ORIGINAL, GUARD, FAT-GUARD, VIZIER, SKELETON and SHADOW.  The 'ORIGINAL' value gives level modules autonomy in this choice for each particular guard.  This is the default.  This can be changed in-game by the F10 key.", 0},
   {"no-sound", NO_SOUND_OPTION, NULL, 0, "Disable sound.  The default is to have sound enabled.  This can be changed in-game by the CTRL+S keystroke.", 0},
-  {"display-flip", DISPLAY_FLIP_OPTION, "DISPLAY-FLIP-MODE", 0, "Select display flip mode.  Valid values for DISPLAY-FLIP-MODE are: NONE, VERTICAL, HORIZONTAL and VERTICAL-HORIZONTAL.  The default is NONE.  This can be changed in-game by the SHIFT+I keystroke.", 0},
-  {"keyboard-flip", KEYBOARD_FLIP_OPTION, "KEYBOARD-FLIP-MODE", 0, "Select keyboard flip mode.  Valid values for KEYBOARD-FLIP-MODE are: NONE, VERTICAL, HORIZONTAL and VERTICAL-HORIZONTAL.  The default is NONE.  This can be changed in-game by the SHIFT+K keystroke.", 0},
+  {"display-flip-mode", DISPLAY_FLIP_MODE_OPTION, "DISPLAY-FLIP-MODE", 0, "Select display flip mode.  Valid values for DISPLAY-FLIP-MODE are: NONE, VERTICAL, HORIZONTAL and VERTICAL-HORIZONTAL.  The default is NONE.  This can be changed in-game by the SHIFT+I keystroke.", 0},
+  {"keyboard-flip-mode", KEYBOARD_FLIP_MODE_OPTION, "KEYBOARD-FLIP-MODE", 0, "Select keyboard flip mode.  Valid values for KEYBOARD-FLIP-MODE are: NONE, VERTICAL, HORIZONTAL and VERTICAL-HORIZONTAL.  The default is NONE.  This can be changed in-game by the SHIFT+K keystroke.", 0},
+  {"mirror-mode", MIRROR_MODE_OPTION, NULL, 0, "Start the game in mirror mode.  In mirror mode the screen and the keyboard are flipped horizontally.  This is equivalent of specifying both the options --display-flip-mode=horizontal and --keyboard-flip-mode=horizontal.  The default is to have display and keyboard in their usual orientations (NONE).  This can be changed in-game by the SHIFT+I and SHIFT+K keystrokes for the display and keyboard, respectively.", 0},
   {0},
 };
 
-static const char *doc = "MININIM: The Advanced Prince of Persia Engine\v";
+static const char *doc = "MININIM: The Advanced Prince of Persia Engine\n(a childhood dream coming true)\v\
+Unless otherwise noted, option values are case insensitive but must be specified in their entirety.  Long option names on the other hand, can be partially specified as long as they are kept unambiguous.  Key and keystroke references are based on the default mapping.";
 
 struct argp_child argp_child = { NULL };
 
@@ -78,7 +80,7 @@ parser (int key, char *arg, struct argp_state *state)
     else argp_error (state, "'%s' is not a valid value for the option 'guard-mode'.\nValid values are: ORIGINAL, GUARD, FAT-GUARD, VIZIER, SKELETON and SHADOW.", arg);
     break;
   case NO_SOUND_OPTION: sound_disabled_cmd = true; break;
-  case DISPLAY_FLIP_OPTION:
+  case DISPLAY_FLIP_MODE_OPTION:
     if (! strcasecmp ("NONE", arg))
       screen_flags = 0;
     else if (! strcasecmp ("VERTICAL", arg))
@@ -89,7 +91,7 @@ parser (int key, char *arg, struct argp_state *state)
       screen_flags = ALLEGRO_FLIP_VERTICAL | ALLEGRO_FLIP_HORIZONTAL;
     else argp_error (state, "'%s' is not a valid value for the option 'display-flip'.\nValid values are: NONE, VERTICAL, HORIZONTAL, VERTICAL-HORIZONTAL.", arg);
     break;
-  case KEYBOARD_FLIP_OPTION:
+  case KEYBOARD_FLIP_MODE_OPTION:
     if (! strcasecmp ("NONE", arg)) {
       flip_keyboard_vertical = false;
       flip_keyboard_horizontal = false;
@@ -103,6 +105,11 @@ parser (int key, char *arg, struct argp_state *state)
       flip_keyboard_vertical = true;
       flip_keyboard_horizontal = true;
     } else argp_error (state, "'%s' is not a valid value for the option 'keyboard-flip'.\nValid values are: NONE, VERTICAL, HORIZONTAL, VERTICAL-HORIZONTAL.", arg);
+    break;
+  case MIRROR_MODE_OPTION:
+    flip_keyboard_vertical = false;
+    flip_keyboard_horizontal = true;
+    screen_flags = ALLEGRO_FLIP_HORIZONTAL;
     break;
   default:
     return ARGP_ERR_UNKNOWN;
