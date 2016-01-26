@@ -28,7 +28,6 @@ static struct level_door *exit_level_door;
 static ALLEGRO_TIMER *mouse_timer;
 static int mouse_id;
 static bool coming_from_12;
-static struct skill skill;
 static bool shadow_merged;
 static bool met_jaffar;
 static bool played_vizier_death_sample;
@@ -98,12 +97,6 @@ start (void)
 
   if (coming_from_12) auto_rem_time_1st_cycle = -1;
   else auto_rem_time_1st_cycle = 24;
-
-  /* start the game with only 3 lives and null skills */
-  if (level.number == 1) {
-    skill.counter_attack_prob = -1;
-    skill.counter_defense_prob = -1;
-  }
 
   /* create kid */
   int id = create_anim (NULL, KID, &level.start_pos, level.start_dir);

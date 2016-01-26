@@ -44,6 +44,9 @@
 
 #define TIME_LIMIT 3600
 
+#define INITIAL_KCA -1
+#define INITIAL_KCD -1
+
 #define EFFECT_HZ 30
 #define SECS_TO_VCYCLES(x) ((x) * EFFECT_HZ)
 

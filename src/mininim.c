@@ -30,6 +30,8 @@ int initial_total_lives = KID_INITIAL_TOTAL_LIVES, total_lives;
 int initial_current_lives = KID_INITIAL_CURRENT_LIVES, current_lives;
 int start_level;
 int time_limit = TIME_LIMIT;
+struct skill skill = {.counter_attack_prob = INITIAL_KCA,
+                      .counter_defense_prob = INITIAL_KCD};
 
 static bool sound_disabled_cmd;
 
@@ -40,6 +42,7 @@ enum options {
   SOUND_OPTION, DISPLAY_FLIP_MODE_OPTION, KEYBOARD_FLIP_MODE_OPTION,
   MIRROR_MODE_OPTION, BLIND_MODE_OPTION, IMMORTAL_MODE_OPTION,
   TOTAL_LIVES_OPTION, START_LEVEL_OPTION, TIME_LIMIT_OPTION,
+  KCA_OPTION, KCD_OPTION,
 };
 
 static struct argp_option options[] = {
@@ -55,6 +58,8 @@ static struct argp_option options[] = {
   {"total-lives", TOTAL_LIVES_OPTION, "N", 0, "Make the kid start with N total lives.  The default is 3.  Valid integers range from 1 to 10.  This can be changed in-game by the SHIFT+T keystroke.", 0},
   {"start-level", START_LEVEL_OPTION, "N", 0, "Make the kid start at level N.  The default is 1.  Valid integers range from 1 to infinity.  This can be changed in-game by the SHIFT+L keystroke.", 0},
   {"time-limit", TIME_LIMIT_OPTION, "N", 0, "Set the time limit to complete the game to N seconds.  The default is 3600.  Valid integers range from 1 to infinity.  This can be changed in-game by the + and - keys.", 0},
+  {"kca", KCA_OPTION, "N", 0, "Set kid's counter attack skill to N.  The default is 0.  Valid integers range from 0 to 100.  This can be changed in-game by the CTRL+= and CTRL+- keys.", 0},
+  {"kcd", KCD_OPTION, "N", 0, "Set kid's counter defense skill to N.  The default is 0.  Valid integers range from 0 to 100.  This can be changed in-game by the ALT+= and ALT+- keys.", 0},
   {0},
 };
 
@@ -166,6 +171,18 @@ parser (int key, char *arg, struct argp_state *state)
     if (sscanf (arg, "%d", &time_limit) != 1
         || time_limit < 1)
       argp_error (state, "'%s' is not a valid decimal integer for the option 'time-limit'.\nValid integers range from 1 to infinity.", arg);
+    break;
+  case KCA_OPTION:
+    if (sscanf (arg, "%d", &skill.counter_attack_prob) != 1
+        || skill.counter_attack_prob < 0 || skill.counter_attack_prob > 100)
+      argp_error (state, "'%s' is not a valid decimal integer for the option 'kca'.\nValid integers range from 0 to 100.", arg);
+    skill.counter_attack_prob--;
+    break;
+  case KCD_OPTION:
+    if (sscanf (arg, "%d", &skill.counter_defense_prob) != 1
+        || skill.counter_defense_prob < 0 || skill.counter_defense_prob > 100)
+      argp_error (state, "'%s' is not a valid decimal integer for the option 'kcd'.\nValid integers range from 0 to 100.", arg);
+    skill.counter_defense_prob--;
     break;
   default:
     return ARGP_ERR_UNKNOWN;
