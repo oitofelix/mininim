@@ -75,9 +75,9 @@ static void end (struct pos *p);
 static struct skill *get_legacy_skill (int i, struct skill *skill);
 
 void
-play_legacy_level (void)
+play_legacy_level (int number)
 {
-  next_level (1);
+  next_level (number);
   play_level (&legacy_level);
 }
 
@@ -760,7 +760,7 @@ end (struct pos *p)
 static void
 next_level (int number)
 {
-  if (number > 14) number = 1;
+  if (number < 1 || number > 14) number = 1;
   load_legacy_level (number);
 }
 

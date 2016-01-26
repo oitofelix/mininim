@@ -118,6 +118,6 @@ enum lm_exit {
   LM_EXIT_MOST_OPEN = 0xFF,
 };
 
-void play_legacy_level (void);
+void play_legacy_level (int number);
 
 #endif	/* MININIM_LEGACY_LEVEL_H */

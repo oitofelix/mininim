@@ -153,5 +153,6 @@ extern bool force_em;
 extern bool immortal_mode;
 extern int initial_total_lives, total_lives,
   initial_current_lives, current_lives;
+extern int start_level;
 
 #endif	/* MININIM_MININIM_H */

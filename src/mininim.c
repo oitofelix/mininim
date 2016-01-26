@@ -28,6 +28,7 @@ enum gm gm = ORIGINAL_GM;
 bool immortal_mode;
 int initial_total_lives = KID_INITIAL_TOTAL_LIVES, total_lives;
 int initial_current_lives = KID_INITIAL_CURRENT_LIVES, current_lives;
+int start_level;
 
 static bool sound_disabled_cmd;
 
@@ -37,7 +38,7 @@ enum options {
   VIDEO_MODE_OPTION = 256, ENVIRONMENT_MODE_OPTION, GUARD_MODE_OPTION,
   SOUND_OPTION, DISPLAY_FLIP_MODE_OPTION, KEYBOARD_FLIP_MODE_OPTION,
   MIRROR_MODE_OPTION, BLIND_MODE_OPTION, IMMORTAL_MODE_OPTION,
-  TOTAL_LIVES_OPTION,
+  TOTAL_LIVES_OPTION, START_LEVEL_OPTION,
 };
 
 static struct argp_option options[] = {
@@ -51,6 +52,7 @@ static struct argp_option options[] = {
   {"blind-mode", BLIND_MODE_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable blind mode.  In blind mode background and non-animated sprites are not drawn.  The default is FALSE.  This can be changed in-game by the SHIFT+B keystroke.", 0},
   {"immortal-mode", IMMORTAL_MODE_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable immortal mode.  In immortal mode the kid can't be harmed.  The default is FALSE.  This can be changed in-game by the I key.", 0},
   {"total-lives", TOTAL_LIVES_OPTION, "N", 0, "Make the kid start with N total lives.  The default is 3.  Valid integers range from 1 to 10.  This can be changed in-game by the SHIFT+T keystroke.", 0},
+  {"start-level", START_LEVEL_OPTION, "N", 0, "Make the kid start at level N.  The default is 1.  Valid integers range from 1 to infinity.  This can be changed in-game by the SHIFT+L keystroke.", 0},
   {0},
 };
 
@@ -153,6 +155,11 @@ parser (int key, char *arg, struct argp_state *state)
         || initial_total_lives < 1 || initial_total_lives > 10)
       argp_error (state, "'%s' is not a valid decimal integer for the option 'total-lives'.\nValid integers range from 1 to 10.", arg);
     break;
+  case START_LEVEL_OPTION:
+    if (sscanf (arg, "%d", &start_level) != 1
+        || start_level < 1)
+      argp_error (state, "'%s' is not a valid decimal integer for the option 'start-level'.\nValid integers range from 1 to infinity.", arg);
+    break;
   default:
     return ARGP_ERR_UNKNOWN;
   }
@@ -230,7 +237,7 @@ main (int argc, char **argv)
 
   /* play_level_1 (); */
   /* play_consistency_level (); */
-  play_legacy_level ();
+  play_legacy_level (start_level);
   if (quit_anim == RESTART_GAME) goto restart_game;
 
  quit_game:
