@@ -42,7 +42,7 @@ enum options {
   SOUND_OPTION, DISPLAY_FLIP_MODE_OPTION, KEYBOARD_FLIP_MODE_OPTION,
   MIRROR_MODE_OPTION, BLIND_MODE_OPTION, IMMORTAL_MODE_OPTION,
   TOTAL_LIVES_OPTION, START_LEVEL_OPTION, TIME_LIMIT_OPTION,
-  KCA_OPTION, KCD_OPTION, DATA_PATH_OPTION
+  KCA_OPTION, KCD_OPTION, DATA_PATH_OPTION, FULLSCREEN_OPTION,
 };
 
 static struct argp_option options[] = {
@@ -61,6 +61,7 @@ static struct argp_option options[] = {
   {"kca", KCA_OPTION, "N", 0, "Set kid's counter attack skill to N.  The default is 0.  Valid integers range from 0 to 100.  This can be changed in-game by the CTRL+= and CTRL+- keys.", 0},
   {"kcd", KCD_OPTION, "N", 0, "Set kid's counter defense skill to N.  The default is 0.  Valid integers range from 0 to 100.  This can be changed in-game by the ALT+= and ALT+- keys.", 0},
   {"data-path", DATA_PATH_OPTION, "PATH", 0, "Set data path to PATH.  Normally, the data files are looked for in the current working directory, and then in the hard-coded package data directory.  If this option is given, before looking there the data files are looked for in PATH.", 0},
+  {"fullscreen", FULLSCREEN_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable fullscreen mode.  In fullscreen mode the game window spans the entire screen.  The default is FALSE.  This can be changed in-game by the F key.", 0},
   {0},
 };
 
@@ -186,6 +187,17 @@ parser (int key, char *arg, struct argp_state *state)
     skill.counter_defense_prob--;
     break;
   case DATA_PATH_OPTION: xasprintf (&data_path, "%s", arg); break;
+  case FULLSCREEN_OPTION:
+    if (! arg || strcasecmp ("FALSE", arg)) {
+      /* true */
+      al_set_new_display_flags (al_get_new_display_flags ()
+                                | ALLEGRO_FULLSCREEN_WINDOW);
+    } else {
+      /* false */
+      al_set_new_display_flags (al_get_new_display_flags ()
+                                & ~ALLEGRO_FULLSCREEN_WINDOW);
+    }
+    break;
   default:
     return ARGP_ERR_UNKNOWN;
   }
@@ -218,12 +230,13 @@ There is NO WARRANTY, to the extent permitted by law.",
 int
 main (int argc, char **argv)
 {
+  al_init ();
+
   argp_program_version_hook = version;
   argp.doc = doc;
 
   argp_parse (&argp, argc, argv, 0, NULL, NULL);
 
-  al_init ();
   init_video ();
   init_audio ();
   if (sound_disabled_cmd) enable_audio (false);

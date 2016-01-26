@@ -151,6 +151,22 @@ play_anim (void (*draw_callback) (void),
         al_free (text);
       }
 
+      /* F: enable/disable fullscreen mode */
+      if (was_key_pressed (ALLEGRO_KEY_F, 0, 0, true)) {
+        char *boolean;
+        int flags = al_get_display_flags (display);
+        if (flags & ALLEGRO_FULLSCREEN_WINDOW) {
+          al_set_display_flag (display, ALLEGRO_FULLSCREEN_WINDOW, false);
+          boolean = "OFF";
+        } else {
+          al_set_display_flag (display, ALLEGRO_FULLSCREEN_WINDOW, true);
+          boolean = "ON";
+        }
+        xasprintf (&text, "FULLSCREEN MODE %s", boolean);
+        draw_bottom_text (NULL, text);
+        al_free (text);
+      }
+
       /* SHIFT+I: flip screen */
       if (was_key_pressed (ALLEGRO_KEY_I, 0, ALLEGRO_KEYMOD_SHIFT, true)) {
         char *flip = "NONE";

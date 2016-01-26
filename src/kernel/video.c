@@ -43,8 +43,9 @@ init_video (void)
     error (-1, 0, "%s (void): failed to initialize image addon",
             __func__);
 
-  al_set_new_display_flags (ALLEGRO_WINDOWED | ALLEGRO_RESIZABLE |
-                            ALLEGRO_GENERATE_EXPOSE_EVENTS);
+  al_set_new_display_flags (al_get_new_display_flags ()
+                            | ALLEGRO_WINDOWED | ALLEGRO_RESIZABLE
+                            | ALLEGRO_GENERATE_EXPOSE_EVENTS);
 
   display = al_create_display (DISPLAY_WIDTH, DISPLAY_HEIGHT);
   if (! display) error (-1, 0, "%s (void): failed to initialize display", __func__);
