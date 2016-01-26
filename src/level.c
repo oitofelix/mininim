@@ -267,38 +267,6 @@ process_keys (void)
   if (was_key_pressed (ALLEGRO_KEY_HOME, 0, 0, true))
     room_view = current_kid->f.c.room;
 
-  /* H: view room at left (J if flipped horizontally) */
-  if ((! flip_keyboard_horizontal
-       && was_key_pressed (ALLEGRO_KEY_H, 0, 0, true))
-      || (flip_keyboard_horizontal
-          && was_key_pressed (ALLEGRO_KEY_J, 0, 0, true)))
-    room_view = level.link[room_view].l;
-
-  /* J: view room at right (H if flipped horizontally) */
-  if ((! flip_keyboard_horizontal
-       && was_key_pressed (ALLEGRO_KEY_J, 0, 0, true))
-      || (flip_keyboard_horizontal
-          && was_key_pressed (ALLEGRO_KEY_H, 0, 0, true)))
-    room_view = level.link[room_view].r;
-
-  /* U: view room above (N if flipped vertically) */
-  if ((! flip_keyboard_vertical
-       && was_key_pressed (ALLEGRO_KEY_U, 0, 0, true))
-      || (flip_keyboard_vertical
-          && was_key_pressed (ALLEGRO_KEY_N, 0, 0, true)))
-    room_view = level.link[room_view].a;
-
-  /* N: view room below (U if flipped vertically) */
-  if ((! flip_keyboard_vertical
-       && was_key_pressed (ALLEGRO_KEY_N, 0, 0, true))
-      || (flip_keyboard_vertical
-          && was_key_pressed (ALLEGRO_KEY_U, 0, 0, true)))
-    room_view = level.link[room_view].b;
-
-  /* SHIFT+B: enable/disable room drawing */
-  if (was_key_pressed (ALLEGRO_KEY_B, 0, ALLEGRO_KEYMOD_SHIFT, true))
-    no_room_drawing = ! no_room_drawing;
-
   /* A: alternate between kid and its shadows */
   if (was_key_pressed (ALLEGRO_KEY_A, 0, 0, true)) {
     do {
