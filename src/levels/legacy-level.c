@@ -147,6 +147,7 @@ start (void)
       break;
     }
     a = &anima[id];
+    apply_guard_mode (a, gm);
     a->has_sword = true;
     a->skill = g->skill;
     a->total_lives = g->total_lives;

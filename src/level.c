@@ -423,7 +423,30 @@ process_keys (void)
     display_skill (current_kid);
   }
 
-  /* F11: change environmt mode */
+  /* F10: change guard mode */
+  if (was_key_pressed (ALLEGRO_KEY_F10, 0, 0, true)) {
+    char *gm_str = NULL;
+
+    /* get next guard mode */
+    switch (gm) {
+    case ORIGINAL_GM: gm = GUARD_GM, gm_str = "GUARD"; break;
+    case GUARD_GM: gm = FAT_GUARD_GM, gm_str = "FAT GUARD"; break;
+    case FAT_GUARD_GM: gm = VIZIER_GM, gm_str = "VIZIER"; break;
+    case VIZIER_GM: gm = SKELETON_GM, gm_str = "SKELETON"; break;
+    case SKELETON_GM: gm = SHADOW_GM, gm_str = "SHADOW"; break;
+    case SHADOW_GM: gm = ORIGINAL_GM, gm_str = "ORIGINAL"; break;
+    }
+
+    /* apply next guard mode */
+    int i;
+    for (i = 0; i < anima_nmemb; i++) apply_guard_mode (&anima[i], gm);
+
+    xasprintf (&text, "GUARD MODE: %s", gm_str);
+    draw_bottom_text (NULL, text);
+    al_free (text);
+  }
+
+  /* F11: change environment mode */
   if (was_key_pressed (ALLEGRO_KEY_F11, 0, 0, true)) {
     char *em_str = NULL;
 

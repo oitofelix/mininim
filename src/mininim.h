@@ -146,6 +146,7 @@ int min_int (int a, int b);
 /* variables */
 extern ALLEGRO_TIMER *play_time;
 extern enum vm vm;
+extern enum gm gm;
 extern enum em em;
 extern enum em original_em;
 extern bool force_em;

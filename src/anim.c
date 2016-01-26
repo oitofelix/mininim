@@ -203,6 +203,7 @@ create_anim (struct anim *a0, enum anim_type t, struct pos *p, enum dir dir)
   if (a0) a = *a0;
   else {
     a.type = t;
+    a.original_type = t;
     a.f.dir = dir;
     a.f.c.room = p->room;
     a.controllable = false;

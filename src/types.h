@@ -64,6 +64,10 @@ enum carpet_design {
   ARCH_CARPET_RIGHT_02,
 };
 
+enum gm {
+  ORIGINAL_GM, GUARD_GM, FAT_GUARD_GM, VIZIER_GM, SKELETON_GM, SHADOW_GM
+};
+
 enum anim_type {
   NO_ANIM, KID, SHADOW, GUARD, FAT_GUARD, SKELETON, VIZIER, PRINCESS, MOUSE
 };
@@ -181,6 +185,7 @@ typedef void (*ACTION) (struct anim *a);
 
 struct anim {
   enum anim_type type;
+  enum anim_type original_type;
 
   int id;
   int shadow_of;

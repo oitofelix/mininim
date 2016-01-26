@@ -34,6 +34,7 @@ void draw_guard_frame (ALLEGRO_BITMAP *bitmap, struct anim *g,
 bool is_guard (struct anim *a);
 void draw_guard_lives (ALLEGRO_BITMAP *bitmap, struct anim *g, enum vm vm);
 palette get_guard_palette (int style, enum vm vm);
+void apply_guard_mode (struct anim *g, enum gm gm);
 
 /* variables */
 extern struct anim *guarda;

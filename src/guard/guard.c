@@ -90,6 +90,20 @@ create_guard (struct anim *g0, struct anim *g1, struct pos *p, enum dir dir)
   return g1;
 }
 
+void
+apply_guard_mode (struct anim *g, enum gm gm)
+{
+  if (! is_guard (g)) return;
+  switch (gm) {
+  case ORIGINAL_GM: g->type = g->original_type; break;
+  case GUARD_GM: g->type = GUARD; break;
+  case FAT_GUARD_GM: g->type = FAT_GUARD; break;
+  case VIZIER_GM: g->type = VIZIER; break;
+  case SKELETON_GM: g->type = SKELETON; break;
+  case SHADOW_GM: g->type = SHADOW; break;
+  }
+}
+
 static ALLEGRO_COLOR
 v_salmon_palette (ALLEGRO_COLOR c)
 {

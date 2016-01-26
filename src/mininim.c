@@ -24,16 +24,18 @@ enum vm vm = VGA;
 enum em em = DUNGEON;
 enum em original_em = DUNGEON;
 bool force_em = false;
+enum gm gm = ORIGINAL_GM;
 
 static error_t parser (int key, char *arg, struct argp_state *state);
 
 enum options {
-  VIDEO_MODE_OPTION = 256, ENVIRONMENT_MODE_OPTION,
+  VIDEO_MODE_OPTION = 256, ENVIRONMENT_MODE_OPTION, GUARD_MODE_OPTION
 };
 
 static struct argp_option options[] = {
-  {"video-mode", VIDEO_MODE_OPTION, "MODE", 0, "Select video mode.  Valid values for MODE are: VGA, EGA, CGA and HGC.  The default is VGA.", 0},
-  {"environment-mode", ENVIRONMENT_MODE_OPTION, "MODE", 0, "Select environment mode.  Valid values for MODE are: ORIGINAL, DUNGEON and PALACE.  The 'ORIGINAL' value gives level modules autonomy in this choice for each particular level.  This is the default.", 0},
+  {"video-mode", VIDEO_MODE_OPTION, "VIDEO-MODE", 0, "Select video mode.  Valid values for VIDEO-MODE are: VGA, EGA, CGA and HGC.  The default is VGA.  This can be changed in-game by the F12 key.", 0},
+  {"environment-mode", ENVIRONMENT_MODE_OPTION, "ENVIRONMENT-MODE", 0, "Select environment mode.  Valid values for ENVIRONMENT-MODE are: ORIGINAL, DUNGEON and PALACE.  The 'ORIGINAL' value gives level modules autonomy in this choice for each particular level.  This is the default.  This can be changed in-game by the F11 key.", 0},
+  {"guard-mode", GUARD_MODE_OPTION, "GUARD-MODE", 0, "Select guard mode.  Valid values for GUARD-MODE are: ORIGINAL, GUARD, FAT-GUARD, VIZIER, SKELETON and SHADOW.  The 'ORIGINAL' value gives level modules autonomy in this choice for each particular guard.  This is the default.  This can be changed in game by the F10 key.", 0},
   {0},
 };
 
@@ -59,6 +61,15 @@ parser (int key, char *arg, struct argp_state *state)
     else if (! strcasecmp ("DUNGEON", arg)) force_em = true, em = DUNGEON;
     else if (! strcasecmp ("PALACE", arg)) force_em = true, em = PALACE;
     else argp_error (state, "'%s' is not a valid value for the option 'environment-mode'.\nValid values are: ORIGINAL, DUNGEON and PALACE.", arg);
+    break;
+  case GUARD_MODE_OPTION:
+    if (! strcasecmp ("ORIGINAL", arg)) gm = ORIGINAL_GM;
+    else if (! strcasecmp ("GUARD", arg)) gm = GUARD_GM;
+    else if (! strcasecmp ("FAT-GUARD", arg)) gm = FAT_GUARD_GM;
+    else if (! strcasecmp ("VIZIER", arg)) gm = VIZIER_GM;
+    else if (! strcasecmp ("SKELETON", arg)) gm = SKELETON_GM;
+    else if (! strcasecmp ("SHADOW", arg)) gm = SHADOW_GM;
+    else argp_error (state, "'%s' is not a valid value for the option 'guard-mode'.\nValid values are: ORIGINAL, GUARD, FAT-GUARD, VIZIER, SKELETON and SHADOW.", arg);
     break;
   default:
     return ARGP_ERR_UNKNOWN;
