@@ -44,6 +44,7 @@ enum options {
   TOTAL_LIVES_OPTION, START_LEVEL_OPTION, TIME_LIMIT_OPTION,
   KCA_OPTION, KCD_OPTION, DATA_PATH_OPTION, FULLSCREEN_OPTION,
   WINDOW_POSITION_OPTION, WINDOW_DIMENSIONS_OPTION,
+  INHIBIT_SCREENSAVER_OPTION
 };
 
 static struct argp_option options[] = {
@@ -65,6 +66,7 @@ static struct argp_option options[] = {
   {"fullscreen", FULLSCREEN_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable fullscreen mode.  In fullscreen mode the window spans the entire screen.  The default is FALSE.  This can be changed in-game by the F key.", 0},
   {"window-position", WINDOW_POSITION_OPTION, "X,Y", 0, "Place the window at screen coordinates X,Y.  The default is to let this choice to the window manager.  The values X and Y are integers and must be separated by a comma.", 0},
   {"window-dimensions", WINDOW_DIMENSIONS_OPTION, "WxH", 0, "Set window width and height to W and H, respectively.  The default is 640x400.  The values W and H are strictly positive integers and must be separated by an 'x'.", 0},
+  {"inhibit-screensaver", INHIBIT_SCREENSAVER_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Prevent the system screensaver from starting up.  The default is FALSE.", 0},
   {0},
 };
 
@@ -212,6 +214,15 @@ parser (int key, char *arg, struct argp_state *state)
     if (sscanf (arg, "%ix%i", &display_width, &display_height) != 2
         || display_width < 1 || display_height < 1)
       argp_error (state, "'%s' is not a valid dimension for the option 'window-dimensions'.\nValid values have the format WxH where W and H are strictly positive integers.", arg);
+    break;
+  case INHIBIT_SCREENSAVER_OPTION:
+    if (! arg || strcasecmp ("FALSE", arg)) {
+      /* true */
+      al_inhibit_screensaver (true);
+    } else {
+      /* false */
+      al_inhibit_screensaver (false);
+    }
     break;
   default:
     return ARGP_ERR_UNKNOWN;
