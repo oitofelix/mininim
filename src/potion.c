@@ -203,8 +203,10 @@ draw_potion (ALLEGRO_BITMAP *bitmap, struct pos *p,
   enum item item = con (p)->ext.item;
 
   switch (item) {
+  case EMPTY_POTION:
   case SMALL_LIFE_POTION:
   case SMALL_POISON_POTION:
+  case ACTIVATION_POTION:
     bottle = small_potion;
     small_potion_coord (p, &bottle_coord);
     small_potion_bubble_coord (p, &bubble_coord);

@@ -20,6 +20,6 @@
 #ifndef MININIM_CONSISTENCY_LEVEL_H
 #define MININIM_CONSISTENCY_LEVEL_H
 
-void play_consistency_level (void);
+void play_consistency_level (int number);
 
 #endif	/* MININIM_CONSISTENCY_LEVEL_H */

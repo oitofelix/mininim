@@ -210,7 +210,7 @@ compute_level (void)
     make_links_locally_consistent (prev_room, room_view);
   }
 
-  level.special_events ();
+  if (level.special_events) level.special_events ();
 
   compute_closer_floors ();
   compute_opener_floors ();

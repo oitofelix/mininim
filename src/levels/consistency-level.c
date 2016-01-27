@@ -24,9 +24,9 @@ static void next_level (int lv);
 static void start (void);
 
 void
-play_consistency_level (void)
+play_consistency_level (int number)
 {
-  next_level (1);
+  next_level (number);
   play_level (&consistency_level);
 }
 
@@ -36,6 +36,9 @@ start (void)
   struct pos p = {1,0,0};
   create_anim (NULL, KID, &p, RIGHT);
   create_anim (&anima[0], 0, NULL, 0);
+  anima[0].controllable = true;
+  anima[1].controllable = true;
+  room_view = p.room;
 }
 
 static void
@@ -46,7 +49,7 @@ next_level (int number)
 
   random_seed = number;
   /* random_seed = time (NULL); */
-  printf ("LEVEL NUMBER: %u\n", random_seed);
+  /* printf ("LEVEL NUMBER: %u\n", random_seed); */
 
   struct level *lv = &consistency_level;
 
@@ -198,6 +201,7 @@ next_level (int number)
   consistency_level = level;
 
   consistency_level.number = number;
+  consistency_level.nominal_number = number;
   consistency_level.start = start;
   consistency_level.next_level = next_level;
 }

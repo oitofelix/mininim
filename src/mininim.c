@@ -28,12 +28,13 @@ enum gm gm = ORIGINAL_GM;
 bool immortal_mode;
 int initial_total_lives = KID_INITIAL_TOTAL_LIVES, total_lives;
 int initial_current_lives = KID_INITIAL_CURRENT_LIVES, current_lives;
-int start_level;
+int start_level = 1;
 int time_limit = TIME_LIMIT;
 struct skill skill = {.counter_attack_prob = INITIAL_KCA,
                       .counter_defense_prob = INITIAL_KCD};
 char *data_path;
 static bool sound_disabled_cmd;
+static bool skip_title;
 
 static error_t parser (int key, char *arg, struct argp_state *state);
 static void draw_loading_screen (void);
@@ -47,16 +48,28 @@ enum options {
   KCA_OPTION, KCD_OPTION, DATA_PATH_OPTION, FULLSCREEN_OPTION,
   WINDOW_POSITION_OPTION, WINDOW_DIMENSIONS_OPTION,
   INHIBIT_SCREENSAVER_OPTION, PRINT_ALLEGRO_STANDARD_PATHS_OPTION,
+  LEVEL_MODULE_OPTION, SKIP_TITLE_OPTION,
 };
 
+enum level_module {
+  LEGACY_LEVEL_MODULE, CONSISTENCY_LEVEL_MODULE,
+} level_module;
+
 static struct argp_option options[] = {
+  /* Level */
+  {NULL, 0, NULL, 0, "Level:", 0},
+  {"level-module", LEVEL_MODULE_OPTION, "LEVEL-MODULE", 0, "Select level module.  A level module determines a way to generate consecutive levels for use by the engine.  Valid values for LEVEL-MODULE are: LEGACY and CONSISTENCY.  LEGACY is the module designed to read the original unarchived PoP 1 DOS level files.  CONSISTENCY is the module designed to generate random-corrected levels for accessing the engine robustness.  The default is LEGACY.", 0},
+  {"start-level", START_LEVEL_OPTION, "N", 0, "Make the kid start at level N.  The default is 1.  Valid integers range from 1 to INT_MAX.  This can be changed in-game by the SHIFT+L keystroke.", 0},
+
+  /* Game */
   {NULL, 0, NULL, 0, "Game:", 0},
   {"immortal-mode", IMMORTAL_MODE_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable immortal mode.  In immortal mode the kid can't be harmed.  The default is FALSE.  This can be changed in-game by the I key.", 0},
   {"total-lives", TOTAL_LIVES_OPTION, "N", 0, "Make the kid start with N total lives.  The default is 3.  Valid integers range from 1 to 10.  This can be changed in-game by the SHIFT+T keystroke.", 0},
-  {"start-level", START_LEVEL_OPTION, "N", 0, "Make the kid start at level N.  The default is 1.  Valid integers range from 1 to INT_MAX.  This can be changed in-game by the SHIFT+L keystroke.", 0},
   {"time-limit", TIME_LIMIT_OPTION, "N", 0, "Set the time limit to complete the game to N seconds.  The default is 3600.  Valid integers range from 1 to INT_MAX.  This can be changed in-game by the + and - keys.", 0},
   {"kca", KCA_OPTION, "N", 0, "Set kid's counter attack skill to N.  The default is 0.  Valid integers range from 0 to 100.  This can be changed in-game by the CTRL+= and CTRL+- keys.", 0},
   {"kcd", KCD_OPTION, "N", 0, "Set kid's counter defense skill to N.  The default is 0.  Valid integers range from 0 to 100.  This can be changed in-game by the ALT+= and ALT+- keys.", 0},
+
+  /* Rendering */
   {NULL, 0, NULL, 0, "Rendering:", 0},
   {"video-mode", VIDEO_MODE_OPTION, "VIDEO-MODE", 0, "Select video mode.  Valid values for VIDEO-MODE are: VGA, EGA, CGA and HGC.  The default is VGA.  This can be changed in-game by the F12 key.", 0},
   {"environment-mode", ENVIRONMENT_MODE_OPTION, "ENVIRONMENT-MODE", 0, "Select environment mode.  Valid values for ENVIRONMENT-MODE are: ORIGINAL, DUNGEON and PALACE.  The 'ORIGINAL' value gives level modules autonomy in this choice for each particular level.  This is the default.  This can be changed in-game by the F11 key.", 0},
@@ -64,16 +77,23 @@ static struct argp_option options[] = {
   {"display-flip-mode", DISPLAY_FLIP_MODE_OPTION, "DISPLAY-FLIP-MODE", 0, "Select display flip mode.  Valid values for DISPLAY-FLIP-MODE are: NONE, VERTICAL, HORIZONTAL and VERTICAL-HORIZONTAL.  The default is NONE.  This can be changed in-game by the SHIFT+I keystroke.", 0},
   {"mirror-mode", MIRROR_MODE_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable mirror mode.  In mirror mode the screen and the keyboard are flipped horizontally.  This is equivalent of specifying both the options --display-flip-mode=horizontal and --keyboard-flip-mode=horizontal.  The default is FALSE.  This can be changed in-game by the SHIFT+I and SHIFT+K keystrokes for the display and keyboard, respectively.", 0},
   {"blind-mode", BLIND_MODE_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable blind mode.  In blind mode background and non-animated sprites are not drawn.  The default is FALSE.  This can be changed in-game by the SHIFT+B keystroke.", 0},
+
+  /* Window */
   {NULL, 0, NULL, 0, "Window:", 0},
   {"fullscreen", FULLSCREEN_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable fullscreen mode.  In fullscreen mode the window spans the entire screen.  The default is FALSE.  This can be changed in-game by the F key.", 0},
   {"window-position", WINDOW_POSITION_OPTION, "X,Y", 0, "Place the window at screen coordinates X,Y.  The default is to let this choice to the window manager.  The values X and Y are integers and must be separated by a comma.", 0},
   {"window-dimensions", WINDOW_DIMENSIONS_OPTION, "WxH", 0, "Set window width and height to W and H, respectively.  The default is 640x400.  The values W and H are strictly positive integers and must be separated by an 'x'.", 0},
   {"inhibit-screensaver", INHIBIT_SCREENSAVER_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Prevent the system screensaver from starting up.  The default is FALSE.", 0},
+
+  /* Others */
   {NULL, 0, NULL, 0, "Others", 0},
   {"sound", SOUND_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable sound.  The default is TRUE.  This can be changed in-game by the CTRL+S keystroke.", 0},
   {"keyboard-flip-mode", KEYBOARD_FLIP_MODE_OPTION, "KEYBOARD-FLIP-MODE", 0, "Select keyboard flip mode.  Valid values for KEYBOARD-FLIP-MODE are: NONE, VERTICAL, HORIZONTAL and VERTICAL-HORIZONTAL.  The default is NONE.  This can be changed in-game by the SHIFT+K keystroke.", 0},
   {"data-path", DATA_PATH_OPTION, "PATH", 0, "Set data path to PATH.  Normally, the data files are looked for in the current working directory, and then in the hard-coded package data directory.  If this option is given, before looking there the data files are looked for in PATH.", 0},
   {"print-allegro-standard-paths", PRINT_ALLEGRO_STANDARD_PATHS_OPTION, NULL, 0, "Print Allegro library standard paths and exit.", 0},
+  {"skip-title", SKIP_TITLE_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Skip title screen.  The default is FALSE.", 0},
+
+  /* Help */
   {NULL, 0, NULL, 0, "Help:", -1},
   {0},
 };
@@ -91,6 +111,11 @@ parser (int key, char *arg, struct argp_state *state)
   int x, y;
 
   switch (key) {
+  case LEVEL_MODULE_OPTION:
+    if (! strcasecmp ("LEGACY", arg)) level_module = LEGACY_LEVEL_MODULE;
+    else if (! strcasecmp ("CONSISTENCY", arg)) level_module = CONSISTENCY_LEVEL_MODULE;
+    else argp_error (state, "'%s' is not a valid value for the option 'level-module'.\nValid values are: LEGACY and CONSISTENCY.", arg);
+    break;
   case VIDEO_MODE_OPTION:
     if (! strcasecmp ("VGA", arg)) vm = VGA;
     else if (! strcasecmp ("EGA", arg)) vm = EGA;
@@ -235,6 +260,15 @@ parser (int key, char *arg, struct argp_state *state)
   case PRINT_ALLEGRO_STANDARD_PATHS_OPTION:
     print_allegro_standard_paths ();
     exit (0);
+  case SKIP_TITLE_OPTION:
+    if (! arg || strcasecmp ("FALSE", arg)) {
+      /* true */
+      skip_title = true;
+    } else {
+      /* false */
+      skip_title = false;
+    }
+    break;
   default:
     return ARGP_ERR_UNKNOWN;
   }
@@ -293,10 +327,9 @@ main (int argc, char **argv)
   load_level ();
   load_cutscenes ();
 
- restart_game:
-  total_lives = initial_total_lives;
-  current_lives = initial_current_lives;
+  if (skip_title) goto play_game;
 
+ restart_game:
   clear_bitmap (screen, BLACK);
   clear_bitmap (uscreen, TRANSPARENT_COLOR);
   cutscene_started = false;
@@ -313,13 +346,24 @@ main (int argc, char **argv)
   if (quit_anim == QUIT_GAME) goto quit_game;
   stop_all_samples ();
 
+ play_game:
+  total_lives = initial_total_lives;
+  current_lives = initial_current_lives;
+
   if (! play_time) play_time = create_timer (1.0);
   al_set_timer_count (play_time, 0);
   al_start_timer (play_time);
 
   /* play_level_1 (); */
-  /* play_consistency_level (); */
-  play_legacy_level (start_level);
+  switch (level_module) {
+  case LEGACY_LEVEL_MODULE: default:
+    play_legacy_level (start_level);
+    break;
+  case CONSISTENCY_LEVEL_MODULE:
+    play_consistency_level (start_level);
+    break;
+  }
+
   if (quit_anim == RESTART_GAME) goto restart_game;
 
  quit_game:
