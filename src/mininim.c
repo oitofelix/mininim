@@ -36,6 +36,7 @@ char *data_path;
 static bool sound_disabled_cmd;
 
 static error_t parser (int key, char *arg, struct argp_state *state);
+static void draw_loading_screen (void);
 
 enum options {
   VIDEO_MODE_OPTION = 256, ENVIRONMENT_MODE_OPTION, GUARD_MODE_OPTION,
@@ -268,9 +269,7 @@ main (int argc, char **argv)
   if (sound_disabled_cmd) enable_audio (false);
   init_keyboard ();
 
-  draw_text (screen, "Loading....", ORIGINAL_WIDTH / 2.0, ORIGINAL_HEIGHT / 2.0,
-             ALLEGRO_ALIGN_CENTRE);
-  show ();
+  draw_loading_screen ();
 
   load_samples ();
   load_level ();
@@ -317,6 +316,20 @@ main (int argc, char **argv)
   fprintf (stderr, "MININIM: Hope you enjoyed it!\n");
 
   return 0;
+}
+
+static void
+draw_loading_screen (void)
+{
+  int x = 138;
+  int y = 40;
+  int w = al_get_bitmap_width (icon);
+  int h = al_get_bitmap_height (icon);
+  draw_filled_rectangle (screen, x - 1, y - 1, x + w, y + h, WHITE);
+  draw_bitmap (icon, screen, x, y, 0);
+  draw_text (screen, "Loading....", ORIGINAL_WIDTH / 2.0, ORIGINAL_HEIGHT / 2.0,
+             ALLEGRO_ALIGN_CENTRE);
+  show ();
 }
 
 int
