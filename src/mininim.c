@@ -43,6 +43,7 @@ enum options {
   MIRROR_MODE_OPTION, BLIND_MODE_OPTION, IMMORTAL_MODE_OPTION,
   TOTAL_LIVES_OPTION, START_LEVEL_OPTION, TIME_LIMIT_OPTION,
   KCA_OPTION, KCD_OPTION, DATA_PATH_OPTION, FULLSCREEN_OPTION,
+  WINDOW_POSITION_OPTION,
 };
 
 static struct argp_option options[] = {
@@ -61,12 +62,13 @@ static struct argp_option options[] = {
   {"kca", KCA_OPTION, "N", 0, "Set kid's counter attack skill to N.  The default is 0.  Valid integers range from 0 to 100.  This can be changed in-game by the CTRL+= and CTRL+- keys.", 0},
   {"kcd", KCD_OPTION, "N", 0, "Set kid's counter defense skill to N.  The default is 0.  Valid integers range from 0 to 100.  This can be changed in-game by the ALT+= and ALT+- keys.", 0},
   {"data-path", DATA_PATH_OPTION, "PATH", 0, "Set data path to PATH.  Normally, the data files are looked for in the current working directory, and then in the hard-coded package data directory.  If this option is given, before looking there the data files are looked for in PATH.", 0},
-  {"fullscreen", FULLSCREEN_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable fullscreen mode.  In fullscreen mode the game window spans the entire screen.  The default is FALSE.  This can be changed in-game by the F key.", 0},
+  {"fullscreen", FULLSCREEN_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable fullscreen mode.  In fullscreen mode the window spans the entire screen.  The default is FALSE.  This can be changed in-game by the F key.", 0},
+  {"window-position", WINDOW_POSITION_OPTION, "X,Y", 0, "Place the window at screen coordinates X,Y.  The default is to let this choice to the window manager.  The values X and Y are integers and must be separated by a comma.", 0},
   {0},
 };
 
 static const char *doc = "MININIM: The Advanced Prince of Persia Engine\n(a childhood dream)\v\
-Unless otherwise noted, option values are case insensitive but must be specified in their entirety.  Long option names on the other hand, can be partially specified as long as they are kept unambiguous.  BOOLEAN is FALSE to disable the respective feature, and any other value (even the null string or no string at all) to enable it.  For any non-specified option the documented default applies.  Key and keystroke references are based on the default mapping.";
+Unless otherwise noted, option values are case insensitive but must be specified in their entirety.  Long option names on the other hand, can be partially specified as long as they are kept unambiguous.  BOOLEAN is FALSE to disable the respective feature, and any other value (even the null string or no string at all) to enable it.  For any non-specified option the documented default applies.  Integers can be specified in any of the formats defined by the C language.  Key and keystroke references are based on the default mapping.";
 
 struct argp_child argp_child = { NULL };
 
@@ -75,6 +77,8 @@ static struct argp argp = {options, parser, NULL, NULL, &argp_child, NULL, NULL}
 static error_t
 parser (int key, char *arg, struct argp_state *state)
 {
+  int x, y;
+
   switch (key) {
   case VIDEO_MODE_OPTION:
     if (! strcasecmp ("VGA", arg)) vm = VGA;
@@ -160,30 +164,30 @@ parser (int key, char *arg, struct argp_state *state)
     }
     break;
   case TOTAL_LIVES_OPTION:
-    if (sscanf (arg, "%d", &initial_total_lives) != 1
+    if (sscanf (arg, "%i", &initial_total_lives) != 1
         || initial_total_lives < 1 || initial_total_lives > 10)
-      argp_error (state, "'%s' is not a valid decimal integer for the option 'total-lives'.\nValid integers range from 1 to 10.", arg);
+      argp_error (state, "'%s' is not a valid integer for the option 'total-lives'.\nValid integers range from 1 to 10.", arg);
     break;
   case START_LEVEL_OPTION:
-    if (sscanf (arg, "%d", &start_level) != 1
+    if (sscanf (arg, "%i", &start_level) != 1
         || start_level < 1)
-      argp_error (state, "'%s' is not a valid decimal integer for the option 'start-level'.\nValid integers range from 1 to infinity.", arg);
+      argp_error (state, "'%s' is not a valid integer for the option 'start-level'.\nValid integers range from 1 to infinity.", arg);
     break;
   case TIME_LIMIT_OPTION:
-    if (sscanf (arg, "%d", &time_limit) != 1
+    if (sscanf (arg, "%i", &time_limit) != 1
         || time_limit < 1)
-      argp_error (state, "'%s' is not a valid decimal integer for the option 'time-limit'.\nValid integers range from 1 to infinity.", arg);
+      argp_error (state, "'%s' is not a valid integer for the option 'time-limit'.\nValid integers range from 1 to infinity.", arg);
     break;
   case KCA_OPTION:
-    if (sscanf (arg, "%d", &skill.counter_attack_prob) != 1
+    if (sscanf (arg, "%i", &skill.counter_attack_prob) != 1
         || skill.counter_attack_prob < 0 || skill.counter_attack_prob > 100)
-      argp_error (state, "'%s' is not a valid decimal integer for the option 'kca'.\nValid integers range from 0 to 100.", arg);
+      argp_error (state, "'%s' is not a valid integer for the option 'kca'.\nValid integers range from 0 to 100.", arg);
     skill.counter_attack_prob--;
     break;
   case KCD_OPTION:
-    if (sscanf (arg, "%d", &skill.counter_defense_prob) != 1
+    if (sscanf (arg, "%i", &skill.counter_defense_prob) != 1
         || skill.counter_defense_prob < 0 || skill.counter_defense_prob > 100)
-      argp_error (state, "'%s' is not a valid decimal integer for the option 'kcd'.\nValid integers range from 0 to 100.", arg);
+      argp_error (state, "'%s' is not a valid integer for the option 'kcd'.\nValid integers range from 0 to 100.", arg);
     skill.counter_defense_prob--;
     break;
   case DATA_PATH_OPTION: xasprintf (&data_path, "%s", arg); break;
@@ -197,6 +201,11 @@ parser (int key, char *arg, struct argp_state *state)
       al_set_new_display_flags (al_get_new_display_flags ()
                                 & ~ALLEGRO_FULLSCREEN_WINDOW);
     }
+    break;
+  case WINDOW_POSITION_OPTION:
+    if (sscanf (arg, "%i,%i", &x, &y) != 2)
+      argp_error (state, "'%s' is not a valid position for the option 'window-position'.\nValid values have the format X,Y where X and Y are integers.", arg);
+    al_set_new_window_position (x, y);
     break;
   default:
     return ARGP_ERR_UNKNOWN;
