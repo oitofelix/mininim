@@ -239,14 +239,21 @@ parser (int key, char *arg, struct argp_state *state)
 static void
 version (FILE *stream, struct argp_state *state)
 {
+  uint32_t allegro_version = al_get_allegro_version ();
+  int allegro_major = allegro_version >> 24;
+  int allegro_minor = (allegro_version >> 16) & 255;
+  int allegro_revision = (allegro_version >> 8) & 255;
+  int allegro_release = allegro_version & 255;
+
   fprintf (stream,
            "%s (%s) %s\n\n"	/* mininim (MININIM) a.b */
 
            /* TRANSLATORS: Use "Félix" in place of "Fe'lix" */
            "Copyright (C) %s " PACKAGE_COPYRIGHT_HOLDER " <%s>\n\n"
 
-           "%s\n\n"		/* License GPLv3+... */
-           "%s\n",		/* Written by... */
+           "%s\n\n" /* License GPLv3+... */
+           "%s\n\n" /* Written by... */
+           "Using Allegro %i.%i.%i[%i].\n", /* Using Allegro... */
            PACKAGE, PACKAGE_NAME, VERSION,
            "2015, 2016", "oitofelix@gnu.org",
            "\
@@ -255,7 +262,8 @@ This is free software: you are free to change and redistribute it.\n\
 There is NO WARRANTY, to the extent permitted by law.",
 
            /* TRANSLATORS: Use "Félix" in place of "F'elix" */
-           "Written by Bruno Fe'lix Rezende Ribeiro.");
+           "Written by Bruno Fe'lix Rezende Ribeiro.",
+           allegro_major, allegro_minor, allegro_revision, allegro_release);
 }
 
 
@@ -370,6 +378,14 @@ print_allegro_standard_paths (void)
   printf ("ALLEGRO_USER_DATA_PATH: %s\n", allegro_user_data_path_str);
   printf ("ALLEGRO_USER_SETTINGS_PATH: %s\n", allegro_user_settings_path_str);
   printf ("ALLEGRO_EXENAME_PATH: %s\n", allegro_exename_path_str);
+
+  al_destroy_path (allegro_resources_path);
+  al_destroy_path (allegro_temp_path);
+  al_destroy_path (allegro_user_home_path);
+  al_destroy_path (allegro_user_documents_path);
+  al_destroy_path (allegro_user_data_path);
+  al_destroy_path (allegro_user_settings_path);
+  al_destroy_path (allegro_exename_path);
 }
 
 int
