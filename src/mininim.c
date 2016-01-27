@@ -37,6 +37,7 @@ static bool sound_disabled_cmd;
 
 static error_t parser (int key, char *arg, struct argp_state *state);
 static void draw_loading_screen (void);
+static void print_allegro_standard_paths (void);
 
 enum options {
   VIDEO_MODE_OPTION = 256, ENVIRONMENT_MODE_OPTION, GUARD_MODE_OPTION,
@@ -45,7 +46,7 @@ enum options {
   TOTAL_LIVES_OPTION, START_LEVEL_OPTION, TIME_LIMIT_OPTION,
   KCA_OPTION, KCD_OPTION, DATA_PATH_OPTION, FULLSCREEN_OPTION,
   WINDOW_POSITION_OPTION, WINDOW_DIMENSIONS_OPTION,
-  INHIBIT_SCREENSAVER_OPTION
+  INHIBIT_SCREENSAVER_OPTION, PRINT_ALLEGRO_STANDARD_PATHS_OPTION,
 };
 
 static struct argp_option options[] = {
@@ -68,6 +69,7 @@ static struct argp_option options[] = {
   {"window-position", WINDOW_POSITION_OPTION, "X,Y", 0, "Place the window at screen coordinates X,Y.  The default is to let this choice to the window manager.  The values X and Y are integers and must be separated by a comma.", 0},
   {"window-dimensions", WINDOW_DIMENSIONS_OPTION, "WxH", 0, "Set window width and height to W and H, respectively.  The default is 640x400.  The values W and H are strictly positive integers and must be separated by an 'x'.", 0},
   {"inhibit-screensaver", INHIBIT_SCREENSAVER_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Prevent the system screensaver from starting up.  The default is FALSE.", 0},
+  {"print-allegro-standard-paths", PRINT_ALLEGRO_STANDARD_PATHS_OPTION, NULL, 0, "Print Allegro library standard paths and exit.", 0},
   {0},
 };
 
@@ -225,6 +227,9 @@ parser (int key, char *arg, struct argp_state *state)
       al_inhibit_screensaver (false);
     }
     break;
+  case PRINT_ALLEGRO_STANDARD_PATHS_OPTION:
+    print_allegro_standard_paths ();
+    exit (0);
   default:
     return ARGP_ERR_UNKNOWN;
   }
@@ -330,6 +335,41 @@ draw_loading_screen (void)
   draw_text (screen, "Loading....", ORIGINAL_WIDTH / 2.0, ORIGINAL_HEIGHT / 2.0,
              ALLEGRO_ALIGN_CENTRE);
   show ();
+}
+
+static void
+print_allegro_standard_paths (void)
+{
+  ALLEGRO_PATH *allegro_resources_path = al_get_standard_path (ALLEGRO_RESOURCES_PATH);
+  ALLEGRO_PATH *allegro_temp_path = al_get_standard_path (ALLEGRO_TEMP_PATH);
+  ALLEGRO_PATH *allegro_user_home_path = al_get_standard_path (ALLEGRO_USER_HOME_PATH);
+  ALLEGRO_PATH *allegro_user_documents_path = al_get_standard_path (ALLEGRO_USER_DOCUMENTS_PATH);
+  ALLEGRO_PATH *allegro_user_data_path = al_get_standard_path (ALLEGRO_USER_DATA_PATH);
+  ALLEGRO_PATH *allegro_user_settings_path = al_get_standard_path (ALLEGRO_USER_SETTINGS_PATH);
+  ALLEGRO_PATH *allegro_exename_path = al_get_standard_path (ALLEGRO_EXENAME_PATH);
+
+  const char *allegro_resources_path_str =
+    al_path_cstr (allegro_resources_path, ALLEGRO_NATIVE_PATH_SEP);
+  const char *allegro_temp_path_str =
+    al_path_cstr (allegro_temp_path, ALLEGRO_NATIVE_PATH_SEP);
+  const char *allegro_user_home_path_str =
+    al_path_cstr (allegro_user_home_path, ALLEGRO_NATIVE_PATH_SEP);
+  const char *allegro_user_documents_path_str =
+    al_path_cstr (allegro_user_documents_path, ALLEGRO_NATIVE_PATH_SEP);
+  const char *allegro_user_data_path_str =
+    al_path_cstr (allegro_user_data_path, ALLEGRO_NATIVE_PATH_SEP);
+  const char *allegro_user_settings_path_str =
+    al_path_cstr (allegro_user_settings_path, ALLEGRO_NATIVE_PATH_SEP);
+  const char *allegro_exename_path_str =
+    al_path_cstr (allegro_exename_path, ALLEGRO_NATIVE_PATH_SEP);
+
+  printf ("ALLEGRO_RESOURCES_PATH: %s\n", allegro_resources_path_str);
+  printf ("ALLEGRO_TEMP_PATH: %s\n", allegro_temp_path_str);
+  printf ("ALLEGRO_USER_HOME_PATH: %s\n", allegro_user_home_path_str);
+  printf ("ALLEGRO_USER_DOCUMENTS_PATH: %s\n", allegro_user_documents_path_str);
+  printf ("ALLEGRO_USER_DATA_PATH: %s\n", allegro_user_data_path_str);
+  printf ("ALLEGRO_USER_SETTINGS_PATH: %s\n", allegro_user_settings_path_str);
+  printf ("ALLEGRO_EXENAME_PATH: %s\n", allegro_exename_path_str);
 }
 
 int
