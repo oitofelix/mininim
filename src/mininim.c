@@ -43,7 +43,7 @@ enum options {
   MIRROR_MODE_OPTION, BLIND_MODE_OPTION, IMMORTAL_MODE_OPTION,
   TOTAL_LIVES_OPTION, START_LEVEL_OPTION, TIME_LIMIT_OPTION,
   KCA_OPTION, KCD_OPTION, DATA_PATH_OPTION, FULLSCREEN_OPTION,
-  WINDOW_POSITION_OPTION,
+  WINDOW_POSITION_OPTION, WINDOW_DIMENSIONS_OPTION,
 };
 
 static struct argp_option options[] = {
@@ -57,13 +57,14 @@ static struct argp_option options[] = {
   {"blind-mode", BLIND_MODE_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable blind mode.  In blind mode background and non-animated sprites are not drawn.  The default is FALSE.  This can be changed in-game by the SHIFT+B keystroke.", 0},
   {"immortal-mode", IMMORTAL_MODE_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable immortal mode.  In immortal mode the kid can't be harmed.  The default is FALSE.  This can be changed in-game by the I key.", 0},
   {"total-lives", TOTAL_LIVES_OPTION, "N", 0, "Make the kid start with N total lives.  The default is 3.  Valid integers range from 1 to 10.  This can be changed in-game by the SHIFT+T keystroke.", 0},
-  {"start-level", START_LEVEL_OPTION, "N", 0, "Make the kid start at level N.  The default is 1.  Valid integers range from 1 to infinity.  This can be changed in-game by the SHIFT+L keystroke.", 0},
-  {"time-limit", TIME_LIMIT_OPTION, "N", 0, "Set the time limit to complete the game to N seconds.  The default is 3600.  Valid integers range from 1 to infinity.  This can be changed in-game by the + and - keys.", 0},
+  {"start-level", START_LEVEL_OPTION, "N", 0, "Make the kid start at level N.  The default is 1.  Valid integers range from 1 to INT_MAX.  This can be changed in-game by the SHIFT+L keystroke.", 0},
+  {"time-limit", TIME_LIMIT_OPTION, "N", 0, "Set the time limit to complete the game to N seconds.  The default is 3600.  Valid integers range from 1 to INT_MAX.  This can be changed in-game by the + and - keys.", 0},
   {"kca", KCA_OPTION, "N", 0, "Set kid's counter attack skill to N.  The default is 0.  Valid integers range from 0 to 100.  This can be changed in-game by the CTRL+= and CTRL+- keys.", 0},
   {"kcd", KCD_OPTION, "N", 0, "Set kid's counter defense skill to N.  The default is 0.  Valid integers range from 0 to 100.  This can be changed in-game by the ALT+= and ALT+- keys.", 0},
   {"data-path", DATA_PATH_OPTION, "PATH", 0, "Set data path to PATH.  Normally, the data files are looked for in the current working directory, and then in the hard-coded package data directory.  If this option is given, before looking there the data files are looked for in PATH.", 0},
   {"fullscreen", FULLSCREEN_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable fullscreen mode.  In fullscreen mode the window spans the entire screen.  The default is FALSE.  This can be changed in-game by the F key.", 0},
   {"window-position", WINDOW_POSITION_OPTION, "X,Y", 0, "Place the window at screen coordinates X,Y.  The default is to let this choice to the window manager.  The values X and Y are integers and must be separated by a comma.", 0},
+  {"window-dimensions", WINDOW_DIMENSIONS_OPTION, "WxH", 0, "Set window width and height to W and H, respectively.  The default is 640x400.  The values W and H are strictly positive integers and must be separated by an 'x'.", 0},
   {0},
 };
 
@@ -171,12 +172,12 @@ parser (int key, char *arg, struct argp_state *state)
   case START_LEVEL_OPTION:
     if (sscanf (arg, "%i", &start_level) != 1
         || start_level < 1)
-      argp_error (state, "'%s' is not a valid integer for the option 'start-level'.\nValid integers range from 1 to infinity.", arg);
+      argp_error (state, "'%s' is not a valid integer for the option 'start-level'.\nValid integers range from 1 to INT_MAX.", arg);
     break;
   case TIME_LIMIT_OPTION:
     if (sscanf (arg, "%i", &time_limit) != 1
         || time_limit < 1)
-      argp_error (state, "'%s' is not a valid integer for the option 'time-limit'.\nValid integers range from 1 to infinity.", arg);
+      argp_error (state, "'%s' is not a valid integer for the option 'time-limit'.\nValid integers range from 1 to INT_MAX.", arg);
     break;
   case KCA_OPTION:
     if (sscanf (arg, "%i", &skill.counter_attack_prob) != 1
@@ -206,6 +207,11 @@ parser (int key, char *arg, struct argp_state *state)
     if (sscanf (arg, "%i,%i", &x, &y) != 2)
       argp_error (state, "'%s' is not a valid position for the option 'window-position'.\nValid values have the format X,Y where X and Y are integers.", arg);
     al_set_new_window_position (x, y);
+    break;
+  case WINDOW_DIMENSIONS_OPTION:
+    if (sscanf (arg, "%ix%i", &display_width, &display_height) != 2
+        || display_width < 1 || display_height < 1)
+      argp_error (state, "'%s' is not a valid dimension for the option 'window-dimensions'.\nValid values have the format WxH where W and H are strictly positive integers.", arg);
     break;
   default:
     return ARGP_ERR_UNKNOWN;
