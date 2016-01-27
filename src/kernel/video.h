@@ -56,7 +56,7 @@ void show (void);
 /* palette */
 int compare_palette_caches (const void *pc0, const void *pc1);
 ALLEGRO_BITMAP *apply_palette (ALLEGRO_BITMAP *bitmap, palette p);
-ALLEGRO_BITMAP * get_cached_palette (ALLEGRO_BITMAP *bitmap, palette p);
+ALLEGRO_BITMAP *get_cached_palette (ALLEGRO_BITMAP *bitmap, palette p);
 ALLEGRO_COLOR hgc_palette (ALLEGRO_COLOR c);
 
 /* variables */
@@ -67,5 +67,6 @@ extern struct video_effect video_effect;
 extern int screen_flags;
 extern bool hgc;
 extern int display_width, display_height;
+extern ALLEGRO_BITMAP *icon;
 
 #endif	/* MININIM_VIDEO_H */

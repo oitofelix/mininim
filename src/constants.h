@@ -20,6 +20,9 @@
 #ifndef MININIM_CONSTANTS_H
 #define MININIM_CONSTANTS_H
 
+#define WINDOW_TITLE "MININIM: The Advanced Prince of Persia Engine (a childhood dream)"
+#define ICON "data/icons/mininim.png"
+
 #define ROOMS 25
 #define FLOORS 3
 #define PLACES 10

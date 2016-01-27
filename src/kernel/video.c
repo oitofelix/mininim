@@ -30,6 +30,7 @@ static ALLEGRO_BITMAP *black_screen;
 struct video_effect video_effect = {.type = VIDEO_NO_EFFECT};
 static ALLEGRO_FONT *builtin_font;
 int display_width = DISPLAY_WIDTH, display_height = DISPLAY_HEIGHT;
+ALLEGRO_BITMAP *icon;
 
 static struct palette_cache {
   ALLEGRO_BITMAP *ib, *ob;
@@ -50,6 +51,10 @@ init_video (void)
 
   display = al_create_display (display_width, display_height);
   if (! display) error (-1, 0, "%s (void): failed to initialize display", __func__);
+
+  al_set_window_title (display, WINDOW_TITLE);
+  icon = load_bitmap (ICON);
+  al_set_display_icon (display, icon);
 
   screen = create_bitmap (ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
   uscreen = create_bitmap (ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
@@ -76,6 +81,7 @@ init_video (void)
 void
 finalize_video (void)
 {
+  al_destroy_bitmap (icon);
   al_destroy_bitmap (screen);
   al_destroy_bitmap (uscreen);
   al_destroy_bitmap (effect_buffer);
