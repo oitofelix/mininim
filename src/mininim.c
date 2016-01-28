@@ -19,6 +19,16 @@
 
 #include "mininim.h"
 
+static char **argv;
+static size_t argc;
+static char **eargv;
+static size_t eargc;
+
+enum option_phase {
+  CONFIGURATION_FILES_OPTION_PHASE, ENVIRONMENT_VARIABLES_OPTION_PHASE,
+  COMMAND_LINE_OPTION_PHASE,
+} option_phase;
+
 ALLEGRO_TIMER *play_time;
 enum vm vm = VGA;
 enum em em = DUNGEON;
@@ -39,6 +49,7 @@ static bool skip_title;
 static error_t parser (int key, char *arg, struct argp_state *state);
 static void draw_loading_screen (void);
 static void print_allegro_standard_paths (void);
+static char *env_option_name (const char *option_name);
 
 enum options {
   VIDEO_MODE_OPTION = 256, ENVIRONMENT_MODE_OPTION, GUARD_MODE_OPTION,
@@ -99,175 +110,305 @@ static struct argp_option options[] = {
 };
 
 static const char *doc = "MININIM: The Advanced Prince of Persia Engine\n(a childhood dream)\v\
-Unless otherwise noted, option values are case insensitive but must be specified in their entirety.  Long option names on the other hand, can be partially specified as long as they are kept unambiguous.  BOOLEAN is FALSE to disable the respective feature, and any other value (even the null string or no string at all) to enable it.  For any non-specified option the documented default applies.  Integers can be specified in any of the formats defined by the C language.  Key and keystroke references are based on the default mapping.";
+Long option names are case sensitive.  Option values are case insensitive.   Both can be partially specified as long as they are kept unambiguous.  BOOLEAN is an integer equating to 0, or any sub-string (including the null string) of 'FALSE', 'OFF' or 'NO' to disable the respective feature, and any other value (even no string at all) to enable it.  For any non-specified option the documented default applies.  Integers can be specified in any of the formats defined by the C language.  Key and keystroke references are based on the default mapping.  For every command line option of the form 'x-y' there is an equivalent environement variable option 'MININIM_X_Y'.  Command-line options take precedence over environment variables.";
 
 struct argp_child argp_child = { NULL };
 
 static struct argp argp = {options, parser, NULL, NULL, &argp_child, NULL, NULL};
 
+static char *
+key_to_option_name (int key)
+{
+  size_t i;
+  for (i = 0; options[i].name != NULL
+         || options[i].key != 0
+         || options[i].arg != NULL
+         || options[i].flags != 0
+         || options[i].doc != NULL
+         || options[i].group != 0; i++)
+    if (options[i].key == key) return (char *) options[i].name;
+
+  return NULL;
+}
+
+static void
+option_value_error (int key, char *arg, struct argp_state *state,
+                    char **enum_vals, bool invalid)
+{
+  char *msg = "";
+  char *option_name = key_to_option_name (key);
+
+  switch (option_phase) {
+  case CONFIGURATION_FILES_OPTION_PHASE:
+    msg = invalid
+      ? "is not a valid value for the configuration file option"
+      : "is an ambiguous value for the configuration file option";
+    xasprintf (&option_name, "%s", option_name);
+    break;
+  case ENVIRONMENT_VARIABLES_OPTION_PHASE:
+    msg = invalid
+      ? "is not a valid value for the option environment variable"
+      : "is an ambiguous value for the environment variable option";
+    option_name = env_option_name (option_name);
+    break;
+  case COMMAND_LINE_OPTION_PHASE:
+    msg = invalid
+      ? "is not a valid value for the command line option"
+      : "is an ambiguous value for the command line option";
+    xasprintf (&option_name, "%s", option_name);
+    break;
+  }
+
+  char *prefix = invalid ? "" : arg;
+
+  char *valid_values = NULL;
+  size_t i;
+  for (i = 0; enum_vals[i] != NULL; i++)
+    if (strcasestr (enum_vals[i], prefix) == enum_vals[i]) {
+      char *tmpstr = valid_values;
+      if (! valid_values)
+        xasprintf (&valid_values, "'%s'", enum_vals[i]);
+      else
+        xasprintf (&valid_values, "%s, '%s'", valid_values, enum_vals[i]);
+      if (tmpstr) al_free (tmpstr);
+    }
+
+  char *msg2 = "";
+
+  if (invalid) msg2 = "Valid values are:";
+  else xasprintf (&msg2, "Valid values starting with '%s' are:", arg);
+
+  argp_error (state, "'%s' %s '%s'.\n%s %s.",
+              arg, msg, option_name, msg2, valid_values);
+}
+
+static bool
+optval_to_bool (char *arg)
+{
+  int i;
+  char *FALSE = "FALSE";
+  char *OFF = "OFF";
+  char *NO = "NO";
+
+  if (! arg) return true;
+
+  if (sscanf (arg, "%i", &i) == 1 && i == 0) return false;
+  if (strcasestr (FALSE, arg) == FALSE) return false;
+  if (strcasestr (OFF, arg) == OFF) return false;
+  if (strcasestr (NO, arg) == NO) return false;
+
+  return true;
+}
+
+static int
+optval_to_enum (int key, char *arg, struct argp_state *state,
+                char **enum_vals)
+{
+  size_t i;
+  int optval = -1;
+  bool ambiguous = false;
+
+  for (i = 0; enum_vals[i] != NULL; i++) {
+    if (strcasestr (enum_vals[i], arg) == enum_vals[i]) {
+      if (! strcasecmp (enum_vals[i], arg)) return i;
+      if (optval != -1) ambiguous = true;
+      optval = i;
+    }
+  }
+
+  if (optval == -1)
+    option_value_error (key, arg, state, enum_vals, true);
+  else if (ambiguous)
+    option_value_error (key, arg, state, enum_vals, false);
+
+  return optval;
+}
+
+static int
+optval_to_int (int key, char *arg, struct argp_state *state,
+               int min, int max)
+{
+  int i;
+  if (sscanf (arg, "%i", &i) != 1
+      || i < min || i > max) {
+    char *option_name = key_to_option_name (key);
+    argp_error (state, "'%s' is not a valid integer for the option '%s'.\nValid integers range from %i to %i.", arg, option_name, min, max);
+  }
+  return i;
+}
+
+static void
+optval_to_int_pair (int key, char *arg, struct argp_state *state,
+                    int min, int max, char s, char A, char B,
+                    int *a, int *b)
+{
+  char *template;
+  xasprintf (&template, "%%i%c%%i", s);
+
+  if (sscanf (arg, template, a, b) != 2
+      || *a < min || *a > max || *b < min || *b > max) {
+    char *option_name = key_to_option_name (key);
+    argp_error (state, "'%s' is not a valid integer pair for the option '%s'.\n\
+Valid values have the form %c%c%c where %c and %c range from %i to %i.",
+                arg, option_name, A, s, B, A, B, min, max);
+  }
+
+  al_free (template);
+}
+
 static error_t
 parser (int key, char *arg, struct argp_state *state)
 {
-  int x, y;
+  int x, y, i;
+
+  char *level_module_enum[] = {"LEGACY", "CONSISTENCY", NULL};
+
+  char *video_mode_enum[] = {"VGA", "EGA", "CGA", "HGC", NULL};
+
+  char *environment_mode_enum[] = {"ORIGINAL", "DUNGEON", "PALACE", NULL};
+
+  char *guard_mode_enum[] = {"ORIGINAL", "GUARD", "FAT-GUARD",
+                             "VIZIER", "SKELETON", "SHADOW", NULL};
+
+  char *display_flip_mode_enum[] = {"NONE", "VERTICAL", "HORIZONTAL",
+                                    "VERTICAL-HORIZONTAL", NULL};
+
+  char *keyboard_flip_mode_enum[] = {"NONE", "VERTICAL", "HORIZONTAL",
+                                     "VERTICAL-HORIZONTAL", NULL};
 
   switch (key) {
   case LEVEL_MODULE_OPTION:
-    if (! strcasecmp ("LEGACY", arg)) level_module = LEGACY_LEVEL_MODULE;
-    else if (! strcasecmp ("CONSISTENCY", arg)) level_module = CONSISTENCY_LEVEL_MODULE;
-    else argp_error (state, "'%s' is not a valid value for the option 'level-module'.\nValid values are: LEGACY and CONSISTENCY.", arg);
+    i = optval_to_enum (key, arg, state, level_module_enum);
+    switch (i) {
+    case 0: level_module = LEGACY_LEVEL_MODULE; break;
+    case 1: level_module = CONSISTENCY_LEVEL_MODULE; break;
+    }
     break;
   case VIDEO_MODE_OPTION:
-    if (! strcasecmp ("VGA", arg)) vm = VGA;
-    else if (! strcasecmp ("EGA", arg)) vm = EGA;
-    else if (! strcasecmp ("CGA", arg)) vm = CGA;
-    else if (! strcasecmp ("HGC", arg)) vm = CGA, hgc = true;
-    else argp_error (state, "'%s' is not a valid value for the option 'video-mode'.\nValid values are: VGA, EGA, CGA and HGC.", arg);
+    i = optval_to_enum (key, arg, state, video_mode_enum);
+    switch (i) {
+    case 0: vm = VGA; break;
+    case 1: vm = EGA; break;
+    case 2: vm = CGA; break;
+    case 3: vm = CGA, hgc = true; break;
+    }
     break;
   case ENVIRONMENT_MODE_OPTION:
-    if (! strcasecmp ("ORIGINAL", arg)) force_em = false;
-    else if (! strcasecmp ("DUNGEON", arg)) force_em = true, em = DUNGEON;
-    else if (! strcasecmp ("PALACE", arg)) force_em = true, em = PALACE;
-    else argp_error (state, "'%s' is not a valid value for the option 'environment-mode'.\nValid values are: ORIGINAL, DUNGEON and PALACE.", arg);
+    i = optval_to_enum (key, arg, state, environment_mode_enum);
+    switch (i) {
+    case 0: force_em = false; break;
+    case 1: force_em = true, em = DUNGEON; break;
+    case 2: force_em = true, em = PALACE; break;
+    }
     break;
   case GUARD_MODE_OPTION:
-    if (! strcasecmp ("ORIGINAL", arg)) gm = ORIGINAL_GM;
-    else if (! strcasecmp ("GUARD", arg)) gm = GUARD_GM;
-    else if (! strcasecmp ("FAT-GUARD", arg)) gm = FAT_GUARD_GM;
-    else if (! strcasecmp ("VIZIER", arg)) gm = VIZIER_GM;
-    else if (! strcasecmp ("SKELETON", arg)) gm = SKELETON_GM;
-    else if (! strcasecmp ("SHADOW", arg)) gm = SHADOW_GM;
-    else argp_error (state, "'%s' is not a valid value for the option 'guard-mode'.\nValid values are: ORIGINAL, GUARD, FAT-GUARD, VIZIER, SKELETON and SHADOW.", arg);
+    i = optval_to_enum (key, arg, state, guard_mode_enum);
+    switch (i) {
+    case 0: gm = ORIGINAL_GM; break;
+    case 1: gm = GUARD_GM; break;
+    case 2: gm = FAT_GUARD_GM; break;
+    case 3: gm = VIZIER_GM; break;
+    case 4: gm = SKELETON_GM; break;
+    case 5: gm = SHADOW_GM; break;
+    }
     break;
   case SOUND_OPTION:
-    if (! arg || strcasecmp ("FALSE", arg)) sound_disabled_cmd = false; /* true */
-    else sound_disabled_cmd = true; /* false */
+    sound_disabled_cmd = ! optval_to_bool (arg);
     break;
   case DISPLAY_FLIP_MODE_OPTION:
-    if (! strcasecmp ("NONE", arg))
-      screen_flags = 0;
-    else if (! strcasecmp ("VERTICAL", arg))
-      screen_flags = ALLEGRO_FLIP_VERTICAL;
-    else if (! strcasecmp ("HORIZONTAL", arg))
-      screen_flags = ALLEGRO_FLIP_HORIZONTAL;
-    else if (! strcasecmp ("VERTICAL-HORIZONTAL", arg))
-      screen_flags = ALLEGRO_FLIP_VERTICAL | ALLEGRO_FLIP_HORIZONTAL;
-    else argp_error (state, "'%s' is not a valid value for the option 'display-flip'.\nValid values are: NONE, VERTICAL, HORIZONTAL, VERTICAL-HORIZONTAL.", arg);
+    i = optval_to_enum (key, arg, state, display_flip_mode_enum);
+    switch (i) {
+    case 0: screen_flags = 0; break;
+    case 1: screen_flags = ALLEGRO_FLIP_VERTICAL; break;
+    case 2: screen_flags = ALLEGRO_FLIP_HORIZONTAL; break;
+    case 3: screen_flags = ALLEGRO_FLIP_VERTICAL | ALLEGRO_FLIP_HORIZONTAL; break;
+    }
     break;
   case KEYBOARD_FLIP_MODE_OPTION:
-    if (! strcasecmp ("NONE", arg)) {
+    i = optval_to_enum (key, arg, state, keyboard_flip_mode_enum);
+    switch (i) {
+    case 0:
       flip_keyboard_vertical = false;
       flip_keyboard_horizontal = false;
-    } else if (! strcasecmp ("VERTICAL", arg)) {
+      break;
+    case 1:
       flip_keyboard_vertical = true;
       flip_keyboard_horizontal = false;
-    } else if (! strcasecmp ("HORIZONTAL", arg)) {
+      break;
+    case 2:
       flip_keyboard_vertical = false;
       flip_keyboard_horizontal = true;
-    } else if (! strcasecmp ("VERTICAL-HORIZONTAL", arg)) {
+      break;
+    case 3:
       flip_keyboard_vertical = true;
       flip_keyboard_horizontal = true;
-    } else argp_error (state, "'%s' is not a valid value for the option 'keyboard-flip'.\nValid values are: NONE, VERTICAL, HORIZONTAL, VERTICAL-HORIZONTAL.", arg);
+      break;
+    }
     break;
   case MIRROR_MODE_OPTION:
-    if (! arg || strcasecmp ("FALSE", arg)) {
-      /* true */
+    if (optval_to_bool (arg)) {
       flip_keyboard_vertical = false;
       flip_keyboard_horizontal = true;
       screen_flags = ALLEGRO_FLIP_HORIZONTAL;
     } else {
-      /* false */
       flip_keyboard_vertical = false;
       flip_keyboard_horizontal = false;
       screen_flags = 0;
     }
     break;
   case BLIND_MODE_OPTION:
-    if (! arg || strcasecmp ("FALSE", arg)) {
-      /* true */
-      no_room_drawing = true;
-    } else {
-      /* false */
-      no_room_drawing = false;
-    }
+    no_room_drawing = optval_to_bool (arg);
     break;
   case IMMORTAL_MODE_OPTION:
-    if (! arg || strcasecmp ("FALSE", arg)) {
-      /* true */
-      immortal_mode = true;
-    } else {
-      /* false */
-      immortal_mode = false;
-    }
+    immortal_mode = optval_to_bool (arg);
     break;
   case TOTAL_LIVES_OPTION:
-    if (sscanf (arg, "%i", &initial_total_lives) != 1
-        || initial_total_lives < 1 || initial_total_lives > 10)
-      argp_error (state, "'%s' is not a valid integer for the option 'total-lives'.\nValid integers range from 1 to 10.", arg);
+    i = optval_to_int (key, arg, state, 1, 10);
+    initial_total_lives = i;
     break;
   case START_LEVEL_OPTION:
-    if (sscanf (arg, "%i", &start_level) != 1
-        || start_level < 1)
-      argp_error (state, "'%s' is not a valid integer for the option 'start-level'.\nValid integers range from 1 to INT_MAX.", arg);
+    i = optval_to_int (key, arg, state, 1, INT_MAX);
+    start_level = i;
     break;
   case TIME_LIMIT_OPTION:
-    if (sscanf (arg, "%i", &time_limit) != 1
-        || time_limit < 1)
-      argp_error (state, "'%s' is not a valid integer for the option 'time-limit'.\nValid integers range from 1 to INT_MAX.", arg);
+    i = optval_to_int (key, arg, state, 1, INT_MAX);
+    time_limit = i;
     break;
   case KCA_OPTION:
-    if (sscanf (arg, "%i", &skill.counter_attack_prob) != 1
-        || skill.counter_attack_prob < 0 || skill.counter_attack_prob > 100)
-      argp_error (state, "'%s' is not a valid integer for the option 'kca'.\nValid integers range from 0 to 100.", arg);
-    skill.counter_attack_prob--;
+    i = optval_to_int (key, arg, state, 0, 100);
+    skill.counter_attack_prob = i - 1;
     break;
   case KCD_OPTION:
-    if (sscanf (arg, "%i", &skill.counter_defense_prob) != 1
-        || skill.counter_defense_prob < 0 || skill.counter_defense_prob > 100)
-      argp_error (state, "'%s' is not a valid integer for the option 'kcd'.\nValid integers range from 0 to 100.", arg);
-    skill.counter_defense_prob--;
+    i = optval_to_int (key, arg, state, 0, 100);
+    skill.counter_defense_prob = i - 1;
     break;
-  case DATA_PATH_OPTION: xasprintf (&data_path, "%s", arg); break;
+  case DATA_PATH_OPTION:
+    xasprintf (&data_path, "%s", arg);
+    break;
   case FULLSCREEN_OPTION:
-    if (! arg || strcasecmp ("FALSE", arg)) {
-      /* true */
+    if (optval_to_bool (arg))
       al_set_new_display_flags (al_get_new_display_flags ()
                                 | ALLEGRO_FULLSCREEN_WINDOW);
-    } else {
-      /* false */
-      al_set_new_display_flags (al_get_new_display_flags ()
-                                & ~ALLEGRO_FULLSCREEN_WINDOW);
-    }
+    else al_set_new_display_flags (al_get_new_display_flags ()
+                                   & ~ALLEGRO_FULLSCREEN_WINDOW);
     break;
   case WINDOW_POSITION_OPTION:
-    if (sscanf (arg, "%i,%i", &x, &y) != 2)
-      argp_error (state, "'%s' is not a valid position for the option 'window-position'.\nValid values have the format X,Y where X and Y are integers.", arg);
+    optval_to_int_pair (key, arg, state, INT_MIN, INT_MAX, ',',
+                        'X', 'Y', &x, &y);
     al_set_new_window_position (x, y);
     break;
   case WINDOW_DIMENSIONS_OPTION:
-    if (sscanf (arg, "%ix%i", &display_width, &display_height) != 2
-        || display_width < 1 || display_height < 1)
-      argp_error (state, "'%s' is not a valid dimension for the option 'window-dimensions'.\nValid values have the format WxH where W and H are strictly positive integers.", arg);
+    optval_to_int_pair (key, arg, state, 1, INT_MAX, 'x',
+                        'W', 'H', &display_width, &display_height);
     break;
   case INHIBIT_SCREENSAVER_OPTION:
-    if (! arg || strcasecmp ("FALSE", arg)) {
-      /* true */
-      al_inhibit_screensaver (true);
-    } else {
-      /* false */
-      al_inhibit_screensaver (false);
-    }
+    al_inhibit_screensaver (optval_to_bool (arg));
     break;
   case PRINT_ALLEGRO_STANDARD_PATHS_OPTION:
     print_allegro_standard_paths ();
     exit (0);
   case SKIP_TITLE_OPTION:
-    if (! arg || strcasecmp ("FALSE", arg)) {
-      /* true */
-      skip_title = true;
-    } else {
-      /* false */
-      skip_title = false;
-    }
+    skip_title = optval_to_bool (arg);
     break;
   default:
     return ARGP_ERR_UNKNOWN;
@@ -305,15 +446,76 @@ There is NO WARRANTY, to the extent permitted by law.",
            allegro_major, allegro_minor, allegro_revision, allegro_release);
 }
 
+void
+toupper_str (char *str)
+{
+  size_t i;
+  for (i = 0; str[i] != 0; i++) str[i] = toupper (str[i]);
+}
+
+void
+repl_str_char (char *str, char a, char b)
+{
+  size_t i;
+  for (i = 0; str[i] != 0; i++) if (str[i] == a) str[i] = b;
+}
+
+static char *
+env_option_name (const char *option_name)
+{
+  char *env_opt_name;
+  xasprintf (&env_opt_name, "MININIM_%s", option_name);
+  toupper_str (env_opt_name);
+  repl_str_char (env_opt_name, '-', '_');
+  return env_opt_name;
+}
+
+void
+get_env_args (size_t *eargc, char ***eargv, struct argp_option *options)
+{
+  size_t i;
+
+  *eargv = add_to_array (&argv[0], 1, *eargv, eargc, *eargc, sizeof (argv[0]));
+
+  for (i = 0; options[i].name != NULL
+         || options[i].key != 0
+         || options[i].arg != NULL
+         || options[i].flags != 0
+         || options[i].doc != NULL
+         || options[i].group != 0; i++) {
+    if (! options[i].name) continue;
+    char *env_opt_name = env_option_name (options[i].name);
+    char *env_opt_value = getenv (env_opt_name);
+    if (env_opt_value) {
+      char *option;
+      xasprintf (&option, "--%s=%s", options[i].name, env_opt_value);
+      *eargv = add_to_array (&option, 1, *eargv, eargc, *eargc, sizeof (option));
+    }
+
+    al_free (env_opt_name);
+  }
+}
 
 int
-main (int argc, char **argv)
+main (int _argc, char **_argv)
 {
+  argc = _argc;
+  argv = _argv;
+
+  get_env_args (&eargc, &eargv, options);
+
+  /* size_t i; */
+  /* for (i = 0; i < eargc; i++) printf ("%s\n", eargv[i]); */
+  /* exit (0); */
+
   al_init ();
 
   argp_program_version_hook = version;
   argp.doc = doc;
 
+  option_phase = ENVIRONMENT_VARIABLES_OPTION_PHASE;
+  argp_parse (&argp, eargc, eargv, 0, NULL, NULL);
+  option_phase = COMMAND_LINE_OPTION_PHASE;
   argp_parse (&argp, argc, argv, 0, NULL, NULL);
 
   init_video ();
