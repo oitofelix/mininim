@@ -255,11 +255,9 @@ dnl src/Makefile
 AC_CONFIG_FILES(
 [Makefile
 doc/Makefile
+doc/man/Makefile
 doc/release/release.texi
 gnulib/Makefile])
-
-dnl enable this when mininim supports the '--help' option
-dnl doc/man/Makefile
 
 AC_OUTPUT
 

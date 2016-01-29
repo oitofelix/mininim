@@ -29,8 +29,7 @@ include ../documentation.am
 # Automake directives #
 #######################
 
-# enable this when mininim supports the '--help' option
-# SUBDIRS = man
+SUBDIRS = man
 
 TEXI2DVI := ${TEXI2DVI} ${texinfo_includes}
 

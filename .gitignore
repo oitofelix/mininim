@@ -9,6 +9,9 @@ ChangeLog
 NEWS
 README
 
+# Ignore Unix man page
+
+/doc/man/mininim.1
 
 # Ignore Makefiles throughout the whole tree.
 

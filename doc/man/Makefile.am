@@ -31,8 +31,8 @@ mininim.1: $(top_srcdir)/src/mininim.c
 	${AM_V_GEN}
 	${AM_V_at} $(MAKE) --directory=$(top_builddir) $(AM_MAKEFLAGS) mininim
 	${AM_V_at} $(HELP2MAN) \
-	  --name='Prince of Persia engine' \
-	  --output=$@  $(top_builddir)/src/mininim
+	  --name='The Advanced Prince of Persia Engine (a childhood dream)' \
+	  --output=$@  $(top_builddir)/mininim
 
 mininim.%.1: $(top_srcdir)/src/mininim.c $(top_srcdir)/po/%.gmo
 	${AM_V_GEN}
