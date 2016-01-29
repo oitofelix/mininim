@@ -46,6 +46,7 @@
 #define BOTTOM_TEXT_DURATION 3
 
 #define TIME_LIMIT 3600
+#define START_TIME 0
 
 #define INITIAL_KCA -1
 #define INITIAL_KCD -1

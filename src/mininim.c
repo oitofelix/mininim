@@ -55,6 +55,7 @@ int initial_total_lives = KID_INITIAL_TOTAL_LIVES, total_lives;
 int initial_current_lives = KID_INITIAL_CURRENT_LIVES, current_lives;
 int start_level = 1;
 int time_limit = TIME_LIMIT;
+int start_time = START_TIME;
 struct skill skill = {.counter_attack_prob = INITIAL_KCA,
                       .counter_defense_prob = INITIAL_KCD};
 static bool sound_disabled_cmd;
@@ -75,7 +76,7 @@ enum options {
   KCA_OPTION, KCD_OPTION, DATA_PATH_OPTION, FULLSCREEN_OPTION,
   WINDOW_POSITION_OPTION, WINDOW_DIMENSIONS_OPTION,
   INHIBIT_SCREENSAVER_OPTION, PRINT_PATHS_OPTION,
-  LEVEL_MODULE_OPTION, SKIP_TITLE_OPTION,
+  LEVEL_MODULE_OPTION, SKIP_TITLE_OPTION, START_TIME_OPTION,
 };
 
 enum level_module {
@@ -93,6 +94,7 @@ static struct argp_option options[] = {
   {"immortal-mode", IMMORTAL_MODE_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable immortal mode.  In immortal mode the kid can't be harmed.  The default is FALSE.  This can be changed in-game by the I key.", 0},
   {"total-lives", TOTAL_LIVES_OPTION, "N", 0, "Make the kid start with N total lives.  The default is 3.  Valid integers range from 1 to 10.  This can be changed in-game by the SHIFT+T keystroke.", 0},
   {"time-limit", TIME_LIMIT_OPTION, "N", 0, "Set the time limit to complete the game to N seconds.  The default is 3600.  Valid integers range from 1 to INT_MAX.  This can be changed in-game by the + and - keys.", 0},
+  {"start-time", START_TIME_OPTION, "N", 0, "Set the play time counter.  The default is 0.  Valid integers range from 0 to INT_MAX.", 0},
   {"kca", KCA_OPTION, "N", 0, "Set kid's counter attack skill to N.  The default is 0.  Valid integers range from 0 to 100.  This can be changed in-game by the CTRL+= and CTRL+- keys.", 0},
   {"kcd", KCD_OPTION, "N", 0, "Set kid's counter defense skill to N.  The default is 0.  Valid integers range from 0 to 100.  This can be changed in-game by the ALT+= and ALT+- keys.", 0},
 
@@ -445,6 +447,11 @@ parser (int key, char *arg, struct argp_state *state)
     if (e) return e;
     time_limit = i;
     break;
+  case START_TIME_OPTION:
+    e = optval_to_int (&i, key, arg, state, 0, INT_MAX);
+    if (e) return e;
+    start_time = i;
+    break;
   case KCA_OPTION:
     e = optval_to_int (&i, key, arg, state, 0, 100);
     if (e) return e;
@@ -687,7 +694,7 @@ main (int _argc, char **_argv)
   current_lives = initial_current_lives;
 
   if (! play_time) play_time = create_timer (1.0);
-  al_set_timer_count (play_time, 0);
+  al_set_timer_count (play_time, start_time);
   al_start_timer (play_time);
 
   /* play_level_1 (); */
@@ -886,18 +893,18 @@ void
 save_game (char *filename)
 {
   ALLEGRO_CONFIG *config = create_config ();
-  char *start_level_str, *time_limit_str,
+  char *start_level_str, *start_time_str,
     *total_lives_str, *kca_str, *kcd_str;
 
   xasprintf (&start_level_str, "%i", level.number);
-  xasprintf (&time_limit_str, "%i", time_limit - al_get_timer_count (play_time));
+  xasprintf (&start_time_str, "%i", al_get_timer_count (play_time));
   xasprintf (&total_lives_str, "%i", total_lives);
   xasprintf (&kca_str, "%i", skill.counter_attack_prob + 1);
   xasprintf (&kcd_str, "%i", skill.counter_defense_prob + 1);
 
   al_add_config_comment (config, NULL, "MININIM save file");
   al_set_config_value (config, NULL, "start level", start_level_str);
-  al_set_config_value (config, NULL, "time limit", time_limit_str);
+  al_set_config_value (config, NULL, "start time", start_time_str);
   al_set_config_value (config, NULL, "total lives", total_lives_str);
   al_set_config_value (config, NULL, "kca", kca_str);
   al_set_config_value (config, NULL, "kcd", kcd_str);
@@ -910,7 +917,7 @@ save_game (char *filename)
 
   al_destroy_config (config);
   al_free (start_level_str);
-  al_free (time_limit_str);
+  al_free (start_time_str);
   al_free (total_lives_str);
   al_free (kca_str);
   al_free (kcd_str);
