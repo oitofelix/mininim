@@ -42,6 +42,8 @@ enum option_phase {
   COMMAND_LINE_OPTION_PHASE,
 } option_phase;
 
+ALLEGRO_THREAD *load_config_dialog_thread;
+
 ALLEGRO_TIMER *play_time;
 enum vm vm = VGA;
 enum em em = DUNGEON;
@@ -133,6 +135,8 @@ static struct argp argp = {options, parser, NULL, NULL, &argp_child, NULL, NULL}
 static char *
 key_to_option_name (int key)
 {
+  char *option_name;
+
   size_t i;
   for (i = 0; options[i].name != NULL
          || options[i].key != 0
@@ -140,14 +144,24 @@ key_to_option_name (int key)
          || options[i].flags != 0
          || options[i].doc != NULL
          || options[i].group != 0; i++)
-    if (options[i].key == key) return (char *) options[i].name;
+    if (options[i].key == key) {
+      switch (option_phase) {
+      case CONFIGURATION_FILE_OPTION_PHASE:
+        return config_option_name (options[i].name);
+      case ENVIRONMENT_VARIABLES_OPTION_PHASE:
+        return env_option_name (options[i].name);
+      case COMMAND_LINE_OPTION_PHASE:
+        xasprintf (&option_name, "%s", options[i].name);
+        return option_name;
+      }
+    }
 
   return NULL;
 }
 
 static void
-option_value_error (int key, char *arg, struct argp_state *state,
-                    char **enum_vals, bool invalid)
+option_enum_value_error (int key, char *arg, struct argp_state *state,
+                         char **enum_vals, bool invalid)
 {
   char *msg = "";
   char *option_name = key_to_option_name (key);
@@ -157,19 +171,16 @@ option_value_error (int key, char *arg, struct argp_state *state,
     msg = invalid
       ? "is not a valid value for the configuration file option"
       : "is an ambiguous value for the configuration file option";
-    option_name = config_option_name (option_name);
     break;
   case ENVIRONMENT_VARIABLES_OPTION_PHASE:
     msg = invalid
       ? "is not a valid value for the option environment variable"
       : "is an ambiguous value for the environment variable option";
-    option_name = env_option_name (option_name);
     break;
   case COMMAND_LINE_OPTION_PHASE:
     msg = invalid
       ? "is not a valid value for the command line option"
       : "is an ambiguous value for the command line option";
-    xasprintf (&option_name, "%s", option_name);
     break;
   }
 
@@ -187,13 +198,54 @@ option_value_error (int key, char *arg, struct argp_state *state,
       if (tmpstr) al_free (tmpstr);
     }
 
-  char *msg2 = "";
-
-  if (invalid) msg2 = "Valid values are:";
+  char *msg2;
+  if (invalid) xasprintf (&msg2, "%s", "Valid values are:");
   else xasprintf (&msg2, "Valid values starting with '%s' are:", arg);
 
-  argp_error (state, "'%s' %s '%s'.\n%s %s.",
-              arg, msg, option_name, msg2, valid_values);
+  char *error_template = "'%s' %s '%s'.\n%s %s.\n";
+  if (option_phase == CONFIGURATION_FILE_OPTION_PHASE
+      && state->flags & ARGP_SILENT)
+    al_append_native_text_log (state->input, error_template,
+                               arg, msg, option_name, msg2, valid_values);
+  else argp_error (state, error_template,
+                   arg, msg, option_name, msg2, valid_values);
+
+  al_free (option_name);
+  al_free (msg2);
+  al_free (valid_values);
+}
+
+static error_t
+optval_to_enum (int *retval, int key, char *arg, struct argp_state *state,
+                char **enum_vals)
+{
+  size_t i;
+  int optval = -1;
+  bool ambiguous = false;
+
+  for (i = 0; enum_vals[i] != NULL; i++) {
+    if (strcasestr (enum_vals[i], arg) == enum_vals[i]) {
+      if (! strcasecmp (enum_vals[i], arg)) {
+        *retval = i;
+        return 0;
+      }
+      if (optval != -1) ambiguous = true;
+      optval = i;
+    }
+  }
+
+  if (optval == -1) {
+    option_enum_value_error (key, arg, state, enum_vals, true);
+    return EINVAL;
+  }
+  else if (ambiguous) {
+    option_enum_value_error (key, arg, state, enum_vals, false);
+    return EINVAL;
+  }
+
+  *retval = optval;
+
+  return 0;
 }
 
 static bool
@@ -214,66 +266,62 @@ optval_to_bool (char *arg)
   return true;
 }
 
-static int
-optval_to_enum (int key, char *arg, struct argp_state *state,
-                char **enum_vals)
-{
-  size_t i;
-  int optval = -1;
-  bool ambiguous = false;
-
-  for (i = 0; enum_vals[i] != NULL; i++) {
-    if (strcasestr (enum_vals[i], arg) == enum_vals[i]) {
-      if (! strcasecmp (enum_vals[i], arg)) return i;
-      if (optval != -1) ambiguous = true;
-      optval = i;
-    }
-  }
-
-  if (optval == -1)
-    option_value_error (key, arg, state, enum_vals, true);
-  else if (ambiguous)
-    option_value_error (key, arg, state, enum_vals, false);
-
-  return optval;
-}
-
-static int
-optval_to_int (int key, char *arg, struct argp_state *state,
+static error_t
+optval_to_int (int *retval, int key, char *arg, struct argp_state *state,
                int min, int max)
 {
   int i;
   if (sscanf (arg, "%i", &i) != 1
       || i < min || i > max) {
     char *option_name = key_to_option_name (key);
-    argp_error (state, "'%s' is not a valid integer for the option '%s'.\nValid integers range from %i to %i.", arg, option_name, min, max);
+    char *error_template = "'%s' is not a valid integer for the option '%s'.\n\
+Valid integers range from %i to %i.\n";
+    if (option_phase == CONFIGURATION_FILE_OPTION_PHASE
+      && state->flags & ARGP_SILENT)
+      al_append_native_text_log (state->input, error_template,
+                                 arg, option_name, min, max);
+    else argp_error (state, error_template, arg, option_name, min, max);
+    al_free (option_name);
+    return EINVAL;
   }
-  return i;
+  *retval = i;
+  return 0;
 }
 
-static void
-optval_to_int_pair (int key, char *arg, struct argp_state *state,
-                    int min, int max, char s, char A, char B,
-                    int *a, int *b)
+static error_t
+optval_to_int_pair (int *a, int *b, int key, char *arg, struct argp_state *state,
+                    int min, int max, char s, char A, char B)
 {
   char *template;
+  int _a, _b;
   xasprintf (&template, "%%i%c%%i", s);
 
-  if (sscanf (arg, template, a, b) != 2
-      || *a < min || *a > max || *b < min || *b > max) {
+  if (sscanf (arg, template, &_a, &_b) != 2
+      || _a < min || _a > max || _b < min || _b > max) {
     char *option_name = key_to_option_name (key);
-    argp_error (state, "'%s' is not a valid integer pair for the option '%s'.\n\
-Valid values have the form %c%c%c where %c and %c range from %i to %i.",
-                arg, option_name, A, s, B, A, B, min, max);
+    char *error_template = "'%s' is not a valid integer pair for the option '%s'.\n\
+Valid values have the form %c%c%c where %c and %c range from %i to %i.\n";
+    if (option_phase == CONFIGURATION_FILE_OPTION_PHASE
+        && state->flags & ARGP_SILENT)
+      al_append_native_text_log (state->input, error_template,
+                                 arg, option_name, A, s, B, A, B, min, max);
+    else argp_error (state, error_template,
+                     arg, option_name, A, s, B, A, B, min, max);
+    al_free (template);
+    al_free (option_name);
+    return EINVAL;
   }
 
+  *a = _a;
+  *b = _b;
   al_free (template);
+  return 0;
 }
 
 static error_t
 parser (int key, char *arg, struct argp_state *state)
 {
-  int x, y, i;
+  int x, y, i, e;
 
   char *level_module_enum[] = {"LEGACY", "CONSISTENCY", NULL};
 
@@ -292,14 +340,16 @@ parser (int key, char *arg, struct argp_state *state)
 
   switch (key) {
   case LEVEL_MODULE_OPTION:
-    i = optval_to_enum (key, arg, state, level_module_enum);
+    e = optval_to_enum (&i, key, arg, state, level_module_enum);
+    if (e) return e;
     switch (i) {
     case 0: level_module = LEGACY_LEVEL_MODULE; break;
     case 1: level_module = CONSISTENCY_LEVEL_MODULE; break;
     }
     break;
   case VIDEO_MODE_OPTION:
-    i = optval_to_enum (key, arg, state, video_mode_enum);
+    e = optval_to_enum (&i, key, arg, state, video_mode_enum);
+    if (e) return e;
     switch (i) {
     case 0: vm = VGA; break;
     case 1: vm = EGA; break;
@@ -308,7 +358,8 @@ parser (int key, char *arg, struct argp_state *state)
     }
     break;
   case ENVIRONMENT_MODE_OPTION:
-    i = optval_to_enum (key, arg, state, environment_mode_enum);
+    e = optval_to_enum (&i, key, arg, state, environment_mode_enum);
+    if (e) return e;
     switch (i) {
     case 0: force_em = false; break;
     case 1: force_em = true, em = DUNGEON; break;
@@ -316,7 +367,8 @@ parser (int key, char *arg, struct argp_state *state)
     }
     break;
   case GUARD_MODE_OPTION:
-    i = optval_to_enum (key, arg, state, guard_mode_enum);
+    e = optval_to_enum (&i, key, arg, state, guard_mode_enum);
+    if (e) return e;
     switch (i) {
     case 0: gm = ORIGINAL_GM; break;
     case 1: gm = GUARD_GM; break;
@@ -330,7 +382,8 @@ parser (int key, char *arg, struct argp_state *state)
     sound_disabled_cmd = ! optval_to_bool (arg);
     break;
   case DISPLAY_FLIP_MODE_OPTION:
-    i = optval_to_enum (key, arg, state, display_flip_mode_enum);
+    e = optval_to_enum (&i, key, arg, state, display_flip_mode_enum);
+    if (e) return e;
     switch (i) {
     case 0: screen_flags = 0; break;
     case 1: screen_flags = ALLEGRO_FLIP_VERTICAL; break;
@@ -339,7 +392,8 @@ parser (int key, char *arg, struct argp_state *state)
     }
     break;
   case KEYBOARD_FLIP_MODE_OPTION:
-    i = optval_to_enum (key, arg, state, keyboard_flip_mode_enum);
+    e = optval_to_enum (&i, key, arg, state, keyboard_flip_mode_enum);
+    if (e) return e;
     switch (i) {
     case 0:
       flip_keyboard_vertical = false;
@@ -377,23 +431,28 @@ parser (int key, char *arg, struct argp_state *state)
     immortal_mode = optval_to_bool (arg);
     break;
   case TOTAL_LIVES_OPTION:
-    i = optval_to_int (key, arg, state, 1, 10);
+    e = optval_to_int (&i, key, arg, state, 1, 10);
+    if (e) return e;
     initial_total_lives = i;
     break;
   case START_LEVEL_OPTION:
-    i = optval_to_int (key, arg, state, 1, INT_MAX);
+    e = optval_to_int (&i, key, arg, state, 1, INT_MAX);
+    if (e) return e;
     start_level = i;
     break;
   case TIME_LIMIT_OPTION:
-    i = optval_to_int (key, arg, state, 1, INT_MAX);
+    e = optval_to_int (&i, key, arg, state, 1, INT_MAX);
+    if (e) return e;
     time_limit = i;
     break;
   case KCA_OPTION:
-    i = optval_to_int (key, arg, state, 0, 100);
+    e = optval_to_int (&i, key, arg, state, 0, 100);
+    if (e) return e;
     skill.counter_attack_prob = i - 1;
     break;
   case KCD_OPTION:
-    i = optval_to_int (key, arg, state, 0, 100);
+    e = optval_to_int (&i, key, arg, state, 0, 100);
+    if (e) return e;
     skill.counter_defense_prob = i - 1;
     break;
   case DATA_PATH_OPTION:
@@ -407,13 +466,15 @@ parser (int key, char *arg, struct argp_state *state)
                                    & ~ALLEGRO_FULLSCREEN_WINDOW);
     break;
   case WINDOW_POSITION_OPTION:
-    optval_to_int_pair (key, arg, state, INT_MIN, INT_MAX, ',',
-                        'X', 'Y', &x, &y);
+    e = optval_to_int_pair (&x, &y, key, arg, state, INT_MIN, INT_MAX, ',',
+                            'X', 'Y');
+    if (e) return e;
     al_set_new_window_position (x, y);
     break;
   case WINDOW_DIMENSIONS_OPTION:
-    optval_to_int_pair (key, arg, state, 1, INT_MAX, 'x',
-                        'W', 'H', &display_width, &display_height);
+    e = optval_to_int_pair (&display_width, &display_height, key, arg, state, 1,
+                            INT_MAX, 'x', 'W', 'H');
+    if (e) return e;
     break;
   case INHIBIT_SCREENSAVER_OPTION:
     al_inhibit_screensaver (optval_to_bool (arg));
@@ -594,6 +655,7 @@ main (int _argc, char **_argv)
   init_audio ();
   if (sound_disabled_cmd) enable_audio (false);
   init_keyboard ();
+  init_dialog ();
 
   draw_loading_screen ();
 
@@ -648,6 +710,7 @@ main (int _argc, char **_argv)
   finalize_video ();
   finalize_audio ();
   finalize_keyboard ();
+  finalize_dialog ();
 
   fprintf (stderr, "MININIM: Hope you enjoyed it!\n");
 
@@ -728,6 +791,65 @@ print_paths (void)
   printf ("User settings: %s\n", user_settings_dir);
   printf ("Executable file: %s\n", exe_filename);
   printf ("Configuration file: %s\n", config_filename);
+}
+
+void *
+load_config_dialog (ALLEGRO_THREAD *thread, void *arg)
+{
+  ALLEGRO_FILECHOOSER *dialog =
+    create_native_file_dialog (NULL, "Load configuration file",
+                               "*.ini", ALLEGRO_FILECHOOSER_FILE_MUST_EXIST);
+  show_native_file_dialog (display, dialog);
+
+  char *filename = NULL;
+  if (al_get_native_file_dialog_count (dialog)) {
+    filename = (char *) al_get_native_file_dialog_path (dialog, 0);
+    xasprintf (&filename, "%s", filename);
+  }
+
+  al_destroy_native_file_dialog (dialog);
+  al_set_thread_should_stop (thread);
+  return filename;
+}
+
+ALLEGRO_TEXTLOG *
+load_config (char *filename)
+{
+  char **cargv = NULL;
+  size_t cargc = 0;
+
+  ALLEGRO_TEXTLOG *textlog =
+    open_native_text_log ("Configuration loading results",
+                          ALLEGRO_TEXTLOG_MONOSPACE);
+
+  al_append_native_text_log (textlog, "Loading %s...\n", filename);
+
+  get_config_args (&cargc, &cargv, options, filename);
+  option_phase = CONFIGURATION_FILE_OPTION_PHASE;
+
+  bool parse_error = false;
+  int arg_index = 0;
+  error_t e;
+
+  do {
+    e = argp_parse (&argp, cargc - arg_index, &cargv[arg_index],
+                    ARGP_SILENT, &arg_index, textlog);
+    arg_index++;
+    if (! parse_error) parse_error = e;
+  } while (e);
+
+  destroy_array ((void **) &cargv, &cargc);
+
+  char *error_str;
+  if (! parse_error) {
+    al_close_native_text_log (textlog);
+    textlog = NULL;
+    error_str = "CONFIGURATION LOADED SUCCESSFULLY";
+  } else error_str = "CONFIGURATION LOADED WITH ERRORS";
+
+  draw_bottom_text (NULL, error_str);
+
+  return textlog;
 }
 
 int

@@ -51,6 +51,21 @@ play_anim (void (*draw_callback) (void),
     switch (event.type) {
     case ALLEGRO_EVENT_TIMER:
       if (event.timer.source == timer) {
+        if (load_config_dialog_thread
+            && al_get_thread_should_stop (load_config_dialog_thread)) {
+          char *filename;
+          al_join_thread (load_config_dialog_thread, (void *) &filename);
+          al_destroy_thread (load_config_dialog_thread);
+          load_config_dialog_thread = NULL;
+          if (filename) {
+            ALLEGRO_TEXTLOG *textlog = load_config (filename);
+            al_free (filename);
+            if (textlog)
+              al_register_event_source
+                (event_queue, get_native_text_log_event_source (textlog));
+          }
+        }
+
         if (was_key_pressed (ALLEGRO_KEY_ESCAPE, 0, ALLEGRO_KEYMOD_ALT, false))
           pause_anim = true;
         if (was_key_pressed (ALLEGRO_KEY_ESCAPE, 0, ALLEGRO_KEYMOD_CTRL, true))
@@ -88,6 +103,9 @@ play_anim (void (*draw_callback) (void),
       break;
     case ALLEGRO_EVENT_DISPLAY_CLOSE:
       quit_anim = QUIT_GAME;
+      break;
+    case ALLEGRO_EVENT_NATIVE_DIALOG_CLOSE:
+      al_close_native_text_log ((ALLEGRO_TEXTLOG *) event.user.data1);
       break;
     case ALLEGRO_EVENT_KEY_CHAR:
       key = event;
@@ -252,6 +270,14 @@ play_anim (void (*draw_callback) (void),
         xasprintf (&text, "VIDEO MODE: %s", vm_str);
         draw_bottom_text (NULL, text);
         al_free (text);
+      }
+
+      /* CTRL+L: load configuration */
+      if (was_key_pressed (ALLEGRO_KEY_L, 0, ALLEGRO_KEYMOD_CTRL, true)
+          && ! load_config_dialog_thread) {
+        load_config_dialog_thread =
+          create_thread (load_config_dialog, NULL);
+        al_start_thread (load_config_dialog_thread);
       }
 
       if (room_view == 0) room_view = prev_room;

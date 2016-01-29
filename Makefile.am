@@ -93,7 +93,8 @@ mininim_SOURCES = src/mininim.c src/mininim.h src/constants.h					\
 		src/kernel/memory.h src/kernel/keyboard.c src/kernel/keyboard.h		\
 		src/kernel/random.c src/kernel/random.h src/kernel/array.c				\
 		src/kernel/array.h src/kernel/xstdio.c src/kernel/xstdio.h				\
-		src/kernel/file.c src/kernel/file.h
+		src/kernel/file.c src/kernel/file.h src/kernel/dialog.c						\
+		src/kernel/dialog.h src/kernel/threads.c src/kernel/threads.h
 
 ${mininim_OBJECTS}: src/mininim.h.gch
 
@@ -109,8 +110,13 @@ AM_CPPFLAGS = -DLOCALEDIR=\"$(localedir)\"												\
 -I${srcdir}/src/levels -I${srcdir}/src/wall
 CFLAGS_DEV = -Wall -ggdb3 -Werror -Wno-error=unused-function	\
   -Wno-error=unused-variable -Wno-error=unused-but-set-variable
-AM_CFLAGS = ${CFLAGS_DEV} ${ALLEGRO_CFLAGS}
-AM_LDFLAGS = -lm ${ALLEGRO_LIBS}
+AM_CFLAGS = ${CFLAGS_DEV} ${ALLEGRO_CFLAGS} ${ALLEGRO_IMAGE_CFLAGS}	\
+	${ALLEGRO_AUDIO_CFLAGS} ${ALLEGRO_ACODEC_CFLAGS}									\
+	${ALLEGRO_FONT_CFLAGS} ${ALLEGRO_PRIMITIVES_CFLAGS}								\
+	${ALLEGRO_DIALOG_CFLAGS}
+AM_LDFLAGS = -lm ${ALLEGRO_LIBS} ${ALLEGRO_IMAGE_LIBS}							\
+  ${ALLEGRO_AUDIO_LIBS} ${ALLEGRO_ACODEC_LIBS} ${ALLEGRO_FONT_LIBS}	\
+  ${ALLEGRO_PRIMITIVES_LIBS} ${ALLEGRO_DIALOG_LIBS}
 LDADD = gnulib/libgnu.a
 
 install-data-hook:

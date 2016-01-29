@@ -273,6 +273,8 @@ struct room_dist {
 
 typedef void *(*load_resource_f) (char *);
 
+typedef void *(*thread_f)(ALLEGRO_THREAD *thread, void *arg);
+
 enum video_effect_type {
   VIDEO_NO_EFFECT, VIDEO_OFF, VIDEO_FADE_IN,
   VIDEO_FADE_OUT, VIDEO_ROLL_RIGHT, VIDEO_FLICKERING,

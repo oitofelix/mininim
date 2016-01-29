@@ -82,17 +82,49 @@ AC_PROG_CC
 gl_EARLY
 gl_INIT
 
-# Check for Allegro library
+# Check for Allegro library and its addons
 PKG_CHECK_MODULES([ALLEGRO],
-[allegro-5.0
- allegro_image-5.0
- allegro_audio-5.0
- allegro_acodec-5.0
- allegro_font-5.0
- allegro_primitives-5.0],,
+[allegro-5.0],,
  AC_MSG_ERROR(MININIM requires Allegro 5))
 AC_SUBST([ALLEGRO_CFLAGS])
 AC_SUBST([ALLEGRO_LIBS])
+
+PKG_CHECK_MODULES([ALLEGRO_IMAGE],
+[allegro_image-5.0],,
+ AC_MSG_ERROR(MININIM requires Allegro 5 image addon))
+AC_SUBST([ALLEGRO_IMAGE_CFLAGS])
+AC_SUBST([ALLEGRO_IMAGE_LIBS])
+
+PKG_CHECK_MODULES([ALLEGRO_AUDIO],
+[allegro_audio-5.0],,
+ AC_MSG_ERROR(MININIM requires Allegro 5 audio addon))
+AC_SUBST([ALLEGRO_AUDIO_CFLAGS])
+AC_SUBST([ALLEGRO_AUDIO_LIBS])
+
+PKG_CHECK_MODULES([ALLEGRO_ACODEC],
+[allegro_acodec-5.0],,
+ AC_MSG_ERROR(MININIM requires Allegro 5 audio codecs addon))
+AC_SUBST([ALLEGRO_ACODEC_CFLAGS])
+AC_SUBST([ALLEGRO_ACODEC_LIBS])
+
+PKG_CHECK_MODULES([ALLEGRO_FONT],
+[allegro_font-5.0],,
+ AC_MSG_ERROR(MININIM requires Allegro 5 font addon))
+AC_SUBST([ALLEGRO_FONT_CFLAGS])
+AC_SUBST([ALLEGRO_FONT_LIBS])
+
+PKG_CHECK_MODULES([ALLEGRO_PRIMITIVES],
+[allegro_primitives-5.0],,
+ AC_MSG_ERROR(MININIM requires Allegro 5 primitives addon))
+AC_SUBST([ALLEGRO_PRIMITIVES_CFLAGS])
+AC_SUBST([ALLEGRO_PRIMITIVES_LIBS])
+
+PKG_CHECK_MODULES([ALLEGRO_DIALOG],
+[allegro_dialog-5.0],,
+ AC_MSG_ERROR(MININIM requires Allegro 5 dialogs addon))
+AC_SUBST([ALLEGRO_DIALOG_CFLAGS])
+AC_SUBST([ALLEGRO_DIALOG_LIBS])
+
 
 ##########
 ### Check for programs needed to build documentation.

@@ -39,10 +39,12 @@
 #include <allegro5/allegro_acodec.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_primitives.h>
+#include <allegro5/allegro_native_dialog.h>
 
 #include "constants.h"
 #include "types.h"
 #include "colors.h"
+
 #include "array.h"
 #include "audio.h"
 #include "video.h"
@@ -54,6 +56,9 @@
 #include "video.h"
 #include "xstdio.h"
 #include "file.h"
+#include "dialog.h"
+#include "threads.h"
+
 #include "anim.h"
 #include "arch.h"
 #include "balcony.h"
@@ -90,6 +95,7 @@
 #include "sword.h"
 #include "torch.h"
 #include "window.h"
+
 #include "guard.h"
 #include "guard-attack.h"
 #include "guard-defense.h"
@@ -100,6 +106,7 @@
 #include "guard-vigilant.h"
 #include "guard-walkb.h"
 #include "guard-walkf.h"
+
 #include "kid.h"
 #include "kid-normal.h"
 #include "kid-walk.h"
@@ -132,15 +139,19 @@
 #include "kid-sword-hit.h"
 #include "kid-die.h"
 #include "kid-stairs.h"
+
 #include "consistency-level.h"
 #include "legacy-level.h"
 #include "level-1.h"
+
 #include "wall.h"
 #include "wall-dcpc.h"
 #include "wall-depedv.h"
 #include "wall-pv.h"
 
 /* functions */
+void *load_config_dialog (ALLEGRO_THREAD *thread, void *arg);
+ALLEGRO_TEXTLOG *load_config (char *filename);
 int max_int (int a, int b);
 int min_int (int a, int b);
 
@@ -167,5 +178,7 @@ extern char *resources_dir,
   *data_dir,
   *exe_filename,
   *config_filename;
+
+extern ALLEGRO_THREAD *load_config_dialog_thread;
 
 #endif	/* MININIM_MININIM_H */
