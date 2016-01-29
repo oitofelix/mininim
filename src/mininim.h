@@ -53,6 +53,7 @@
 #include "timer.h"
 #include "video.h"
 #include "xstdio.h"
+#include "file.h"
 #include "anim.h"
 #include "arch.h"
 #include "balcony.h"
@@ -156,6 +157,15 @@ extern int initial_total_lives, total_lives,
 extern int start_level;
 extern int time_limit;
 extern struct skill skill;
-extern char *data_path;
+extern char *resources_dir,
+  *temp_dir,
+  *user_home_dir,
+  *user_documents_dir,
+  *user_data_dir,
+  *user_settings_dir,
+  *system_data_dir,
+  *data_dir,
+  *exe_filename,
+  *config_filename;
 
 #endif	/* MININIM_MININIM_H */

@@ -266,23 +266,8 @@ draw_bottom_text (ALLEGRO_BITMAP *bitmap, char *text)
 ALLEGRO_BITMAP *
 load_bitmap (char *filename)
 {
-  ALLEGRO_BITMAP *bitmap = NULL;
-  char *data_path_filename;
-  char *pkgdatadir_filename;
-
-  if (data_path && ! bitmap) {
-    xasprintf (&data_path_filename, "%s/%s", data_path, filename);
-    bitmap = al_load_bitmap (data_path_filename);
-    al_free (data_path_filename);
-  }
-
-  if (! bitmap) bitmap = al_load_bitmap (filename);
-
-  if (! bitmap) {
-    xasprintf (&pkgdatadir_filename, "%s/%s", PKGDATADIR, filename);
-    bitmap = al_load_bitmap (pkgdatadir_filename);
-    al_free (pkgdatadir_filename);
-  }
+  ALLEGRO_BITMAP *bitmap =
+    load_resource (filename, (load_resource_f) al_load_bitmap);
 
   if (! bitmap)
     error (-1, 0, "%s: cannot load bitmap file '%s'",

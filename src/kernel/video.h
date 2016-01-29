@@ -17,10 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MININIM_GRAPHICS_H
-#define MININIM_GRAPHICS_H
-
-#include "mininim.h"
+#ifndef MININIM_VIDEO_H
+#define MININIM_VIDEO_H
 
 /* functions */
 void init_video (void);

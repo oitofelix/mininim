@@ -271,6 +271,8 @@ struct room_dist {
   bool visited;
 };
 
+typedef void *(*load_resource_f) (char *);
+
 enum video_effect_type {
   VIDEO_NO_EFFECT, VIDEO_OFF, VIDEO_FADE_IN,
   VIDEO_FADE_OUT, VIDEO_ROLL_RIGHT, VIDEO_FLICKERING,

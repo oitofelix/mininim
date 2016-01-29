@@ -20,9 +20,9 @@ README
 # directories in source code directory.
 
 src/**/*.[ox]
-src/mininim
+/mininim
 **/.deps/
-
+*.gch
 
 # Ignore Emacs backup files recursively.
 
@@ -89,7 +89,6 @@ doc/release/release.texi
 gmon.out
 
 # Others
-/mininim
 /core
 .depend
 .dirstamp

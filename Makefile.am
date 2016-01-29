@@ -92,13 +92,21 @@ mininim_SOURCES = src/mininim.c src/mininim.h src/constants.h					\
 		src/kernel/audio.c src/kernel/audio.h src/kernel/memory.c					\
 		src/kernel/memory.h src/kernel/keyboard.c src/kernel/keyboard.h		\
 		src/kernel/random.c src/kernel/random.h src/kernel/array.c				\
-		src/kernel/array.h src/kernel/xstdio.c src/kernel/xstdio.h
+		src/kernel/array.h src/kernel/xstdio.c src/kernel/xstdio.h				\
+		src/kernel/file.c src/kernel/file.h
+
+${mininim_OBJECTS}: src/mininim.h.gch
+
+src/mininim.h.gch: ${mininim_SOURCES:%.c=${srcdir}/%.h}
+	$(AM_V_CC) $(COMPILE) -c $<
+
+CLEANFILES = src/mininim.h.gch
 
 AM_CPPFLAGS = -DLOCALEDIR=\"$(localedir)\"												\
 -DPKGDATADIR=\"$(pkgdatadir)\" -I$(top_builddir)/gnulib						\
--I$(top_srcdir)/gnulib -I${srcdir}/src -I${srcdir}/src/kernel			\
--I${srcdir}/src/guard -I${srcdir}/src/kid -I${srcdir}/src/levels	\
--I${srcdir}/src/wall
+-I$(top_srcdir)/gnulib -I${builddir}/src -I${srcdir}/src					\
+-I${srcdir}/src/kernel -I${srcdir}/src/guard -I${srcdir}/src/kid	\
+-I${srcdir}/src/levels -I${srcdir}/src/wall
 CFLAGS_DEV = -Wall -ggdb3 -Werror -Wno-error=unused-function	\
   -Wno-error=unused-variable -Wno-error=unused-but-set-variable
 AM_CFLAGS = ${CFLAGS_DEV} ${ALLEGRO_CFLAGS}

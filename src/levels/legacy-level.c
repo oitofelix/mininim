@@ -760,26 +760,11 @@ next_level (int number)
 static void
 load_legacy_level (int number)
 {
-  ALLEGRO_FILE *lvf = NULL;
   char *filename;
-  char *data_path_filename;
-  char *pkgdatadir_filename;
-
   xasprintf (&filename, "data/legacy-levels/%02d", number);
 
-  if (data_path && ! lvf) {
-    xasprintf (&data_path_filename, "%s/%s", data_path, filename);
-    lvf = al_fopen (data_path_filename, "r");
-    al_free (data_path_filename);
-  }
-
-  if (! lvf) lvf = al_fopen (filename, "r");
-
-  if (! lvf) {
-    xasprintf (&pkgdatadir_filename, "%s/%s", PKGDATADIR, filename);
-    lvf = al_fopen (pkgdatadir_filename, "r");
-    al_free (pkgdatadir_filename);
-  }
+  ALLEGRO_FILE *lvf =
+    load_resource (filename, (load_resource_f) xfopen_r);
 
   if (! lvf)
     error (-1, 0, "cannot read legacy level file %s", filename);

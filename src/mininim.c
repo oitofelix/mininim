@@ -23,9 +23,22 @@ static char **argv;
 static size_t argc;
 static char **eargv;
 static size_t eargc;
+static char **cargv;
+static size_t cargc;
+
+char *resources_dir,
+  *temp_dir,
+  *user_home_dir,
+  *user_documents_dir,
+  *user_data_dir,
+  *user_settings_dir,
+  *system_data_dir = PKGDATADIR,
+  *data_dir,
+  *exe_filename,
+  *config_filename;
 
 enum option_phase {
-  CONFIGURATION_FILES_OPTION_PHASE, ENVIRONMENT_VARIABLES_OPTION_PHASE,
+  CONFIGURATION_FILE_OPTION_PHASE, ENVIRONMENT_VARIABLES_OPTION_PHASE,
   COMMAND_LINE_OPTION_PHASE,
 } option_phase;
 
@@ -42,14 +55,15 @@ int start_level = 1;
 int time_limit = TIME_LIMIT;
 struct skill skill = {.counter_attack_prob = INITIAL_KCA,
                       .counter_defense_prob = INITIAL_KCD};
-char *data_path;
 static bool sound_disabled_cmd;
 static bool skip_title;
 
 static error_t parser (int key, char *arg, struct argp_state *state);
 static void draw_loading_screen (void);
-static void print_allegro_standard_paths (void);
+static void print_paths (void);
 static char *env_option_name (const char *option_name);
+static char *config_option_name (const char *option_name);
+static void get_paths (void);
 
 enum options {
   VIDEO_MODE_OPTION = 256, ENVIRONMENT_MODE_OPTION, GUARD_MODE_OPTION,
@@ -58,7 +72,7 @@ enum options {
   TOTAL_LIVES_OPTION, START_LEVEL_OPTION, TIME_LIMIT_OPTION,
   KCA_OPTION, KCD_OPTION, DATA_PATH_OPTION, FULLSCREEN_OPTION,
   WINDOW_POSITION_OPTION, WINDOW_DIMENSIONS_OPTION,
-  INHIBIT_SCREENSAVER_OPTION, PRINT_ALLEGRO_STANDARD_PATHS_OPTION,
+  INHIBIT_SCREENSAVER_OPTION, PRINT_PATHS_OPTION,
   LEVEL_MODULE_OPTION, SKIP_TITLE_OPTION,
 };
 
@@ -100,8 +114,8 @@ static struct argp_option options[] = {
   {NULL, 0, NULL, 0, "Others", 0},
   {"sound", SOUND_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable sound.  The default is TRUE.  This can be changed in-game by the CTRL+S keystroke.", 0},
   {"keyboard-flip-mode", KEYBOARD_FLIP_MODE_OPTION, "KEYBOARD-FLIP-MODE", 0, "Select keyboard flip mode.  Valid values for KEYBOARD-FLIP-MODE are: NONE, VERTICAL, HORIZONTAL and VERTICAL-HORIZONTAL.  The default is NONE.  This can be changed in-game by the SHIFT+K keystroke.", 0},
-  {"data-path", DATA_PATH_OPTION, "PATH", 0, "Set data path to PATH.  Normally, the data files are looked for in the current working directory, and then in the hard-coded package data directory.  If this option is given, before looking there the data files are looked for in PATH.", 0},
-  {"print-allegro-standard-paths", PRINT_ALLEGRO_STANDARD_PATHS_OPTION, NULL, 0, "Print Allegro library standard paths and exit.", 0},
+  {"data-path", DATA_PATH_OPTION, "PATH", 0, "Set data path to PATH.  Normally, the data files are looked for in the current working directory, then in the user data directory, then in the resources directory, and finally in the system data directory.  If this option is given, before looking there the data files are looked for in PATH.", 0},
+  {"print-paths", PRINT_PATHS_OPTION, NULL, 0, "Print paths and exit.", 0},
   {"skip-title", SKIP_TITLE_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Skip title screen.  The default is FALSE.", 0},
 
   /* Help */
@@ -110,7 +124,7 @@ static struct argp_option options[] = {
 };
 
 static const char *doc = "MININIM: The Advanced Prince of Persia Engine\n(a childhood dream)\v\
-Long option names are case sensitive.  Option values are case insensitive.   Both can be partially specified as long as they are kept unambiguous.  BOOLEAN is an integer equating to 0, or any sub-string (including the null string) of 'FALSE', 'OFF' or 'NO' to disable the respective feature, and any other value (even no string at all) to enable it.  For any non-specified option the documented default applies.  Integers can be specified in any of the formats defined by the C language.  Key and keystroke references are based on the default mapping.  For every command line option of the form 'x-y' there is an equivalent environement variable option 'MININIM_X_Y'.  Command-line options take precedence over environment variables.";
+Long option names are case sensitive.  Option values are case insensitive.   Both can be partially specified as long as they are kept unambiguous.  BOOLEAN is an integer equating to 0, or any sub-string (including the null string) of 'FALSE', 'OFF' or 'NO' to disable the respective feature, and any other value (even no string at all) to enable it.  For any non-specified option the documented default applies.  Integers can be specified in any of the formats defined by the C language.  Key and keystroke references are based on the default mapping.  For every command line option of the form 'x-y' there is an equivalent environment variable option 'MININIM_X_Y' and an equivalent configuration file option 'x y'.  The increasing order of precedence for options is: configuration file, environment variables, and then command line.";
 
 struct argp_child argp_child = { NULL };
 
@@ -139,11 +153,11 @@ option_value_error (int key, char *arg, struct argp_state *state,
   char *option_name = key_to_option_name (key);
 
   switch (option_phase) {
-  case CONFIGURATION_FILES_OPTION_PHASE:
+  case CONFIGURATION_FILE_OPTION_PHASE:
     msg = invalid
       ? "is not a valid value for the configuration file option"
       : "is an ambiguous value for the configuration file option";
-    xasprintf (&option_name, "%s", option_name);
+    option_name = config_option_name (option_name);
     break;
   case ENVIRONMENT_VARIABLES_OPTION_PHASE:
     msg = invalid
@@ -383,7 +397,7 @@ parser (int key, char *arg, struct argp_state *state)
     skill.counter_defense_prob = i - 1;
     break;
   case DATA_PATH_OPTION:
-    xasprintf (&data_path, "%s", arg);
+    xasprintf (&data_dir, "%s", arg);
     break;
   case FULLSCREEN_OPTION:
     if (optval_to_bool (arg))
@@ -404,8 +418,8 @@ parser (int key, char *arg, struct argp_state *state)
   case INHIBIT_SCREENSAVER_OPTION:
     al_inhibit_screensaver (optval_to_bool (arg));
     break;
-  case PRINT_ALLEGRO_STANDARD_PATHS_OPTION:
-    print_allegro_standard_paths ();
+  case PRINT_PATHS_OPTION:
+    print_paths ();
     exit (0);
   case SKIP_TITLE_OPTION:
     skip_title = optval_to_bool (arg);
@@ -444,6 +458,13 @@ There is NO WARRANTY, to the extent permitted by law.",
            /* TRANSLATORS: Use "Félix" in place of "F'elix" */
            "Written by Bruno Fe'lix Rezende Ribeiro.",
            allegro_major, allegro_minor, allegro_revision, allegro_release);
+}
+
+void
+tolower_str (char *str)
+{
+  size_t i;
+  for (i = 0; str[i] != 0; i++) str[i] = tolower (str[i]);
 }
 
 void
@@ -496,23 +517,74 @@ get_env_args (size_t *eargc, char ***eargv, struct argp_option *options)
   }
 }
 
+static char *
+config_option_name (const char *option_name)
+{
+  char *config_opt_name;
+  xasprintf (&config_opt_name, "%s", option_name);
+  tolower_str (config_opt_name);
+  repl_str_char (config_opt_name, '-', ' ');
+  return config_opt_name;
+}
+
+void
+get_config_args (size_t *cargc, char ***cargv, struct argp_option *options,
+                 char *filename)
+{
+  size_t i;
+
+  *cargv = add_to_array (&argv[0], 1, *cargv, cargc, *cargc, sizeof (argv[0]));
+
+  ALLEGRO_CONFIG *config = al_load_config_file (filename);
+  if (! config) return;
+
+  for (i = 0; options[i].name != NULL
+         || options[i].key != 0
+         || options[i].arg != NULL
+         || options[i].flags != 0
+         || options[i].doc != NULL
+         || options[i].group != 0; i++) {
+    if (! options[i].name) continue;
+    char *config_opt_name = config_option_name (options[i].name);
+    const char *config_opt_value = al_get_config_value (config, NULL, config_opt_name);
+    if (config_opt_value) {
+      char *option;
+      xasprintf (&option, "--%s=%s", options[i].name, config_opt_value);
+      *cargv = add_to_array (&option, 1, *cargv, cargc, *cargc, sizeof (option));
+    }
+
+    al_free (config_opt_name);
+  }
+}
+
 int
 main (int _argc, char **_argv)
 {
+  /* make command-line arguments available globally */
   argc = _argc;
   argv = _argv;
 
+  /* initialize Allegro */
+  al_init ();
+
+  /* get global paths */
+  get_paths ();
+
+  /* get environment variable arguments */
   get_env_args (&eargc, &eargv, options);
 
-  /* size_t i; */
-  /* for (i = 0; i < eargc; i++) printf ("%s\n", eargv[i]); */
-  /* exit (0); */
+  /* get configuration file arguments */
+  get_config_args (&cargc, &cargv, options, config_filename);
 
-  al_init ();
+  /* size_t i; */
+  /* for (i = 0; i < cargc; i++) printf ("%s\n", cargv[i]); */
+  /* exit (0); */
 
   argp_program_version_hook = version;
   argp.doc = doc;
 
+  option_phase = CONFIGURATION_FILE_OPTION_PHASE;
+  argp_parse (&argp, cargc, cargv, 0, NULL, NULL);
   option_phase = ENVIRONMENT_VARIABLES_OPTION_PHASE;
   argp_parse (&argp, eargc, eargv, 0, NULL, NULL);
   option_phase = COMMAND_LINE_OPTION_PHASE;
@@ -597,46 +669,65 @@ draw_loading_screen (void)
 }
 
 static void
-print_allegro_standard_paths (void)
+get_paths (void)
 {
-  ALLEGRO_PATH *allegro_resources_path = al_get_standard_path (ALLEGRO_RESOURCES_PATH);
-  ALLEGRO_PATH *allegro_temp_path = al_get_standard_path (ALLEGRO_TEMP_PATH);
-  ALLEGRO_PATH *allegro_user_home_path = al_get_standard_path (ALLEGRO_USER_HOME_PATH);
-  ALLEGRO_PATH *allegro_user_documents_path = al_get_standard_path (ALLEGRO_USER_DOCUMENTS_PATH);
-  ALLEGRO_PATH *allegro_user_data_path = al_get_standard_path (ALLEGRO_USER_DATA_PATH);
-  ALLEGRO_PATH *allegro_user_settings_path = al_get_standard_path (ALLEGRO_USER_SETTINGS_PATH);
-  ALLEGRO_PATH *allegro_exename_path = al_get_standard_path (ALLEGRO_EXENAME_PATH);
+  /* get resources path string */
+  ALLEGRO_PATH *resources_path = al_get_standard_path (ALLEGRO_RESOURCES_PATH);
+  resources_dir = (char *) al_path_cstr (resources_path, ALLEGRO_NATIVE_PATH_SEP);
+  xasprintf (&resources_dir, "%s", resources_dir);
+  al_destroy_path (resources_path);
 
-  const char *allegro_resources_path_str =
-    al_path_cstr (allegro_resources_path, ALLEGRO_NATIVE_PATH_SEP);
-  const char *allegro_temp_path_str =
-    al_path_cstr (allegro_temp_path, ALLEGRO_NATIVE_PATH_SEP);
-  const char *allegro_user_home_path_str =
-    al_path_cstr (allegro_user_home_path, ALLEGRO_NATIVE_PATH_SEP);
-  const char *allegro_user_documents_path_str =
-    al_path_cstr (allegro_user_documents_path, ALLEGRO_NATIVE_PATH_SEP);
-  const char *allegro_user_data_path_str =
-    al_path_cstr (allegro_user_data_path, ALLEGRO_NATIVE_PATH_SEP);
-  const char *allegro_user_settings_path_str =
-    al_path_cstr (allegro_user_settings_path, ALLEGRO_NATIVE_PATH_SEP);
-  const char *allegro_exename_path_str =
-    al_path_cstr (allegro_exename_path, ALLEGRO_NATIVE_PATH_SEP);
+  /* get temp path string */
+  ALLEGRO_PATH *temp_path = al_get_standard_path (ALLEGRO_TEMP_PATH);
+  temp_dir = (char *) al_path_cstr (temp_path, ALLEGRO_NATIVE_PATH_SEP);
+  xasprintf (&temp_dir, "%s", temp_dir);
+  al_destroy_path (temp_path);
 
-  printf ("ALLEGRO_RESOURCES_PATH: %s\n", allegro_resources_path_str);
-  printf ("ALLEGRO_TEMP_PATH: %s\n", allegro_temp_path_str);
-  printf ("ALLEGRO_USER_HOME_PATH: %s\n", allegro_user_home_path_str);
-  printf ("ALLEGRO_USER_DOCUMENTS_PATH: %s\n", allegro_user_documents_path_str);
-  printf ("ALLEGRO_USER_DATA_PATH: %s\n", allegro_user_data_path_str);
-  printf ("ALLEGRO_USER_SETTINGS_PATH: %s\n", allegro_user_settings_path_str);
-  printf ("ALLEGRO_EXENAME_PATH: %s\n", allegro_exename_path_str);
+  /* get user home path string */
+  ALLEGRO_PATH *user_home_path = al_get_standard_path (ALLEGRO_USER_HOME_PATH);
+  user_home_dir = (char *) al_path_cstr (user_home_path, ALLEGRO_NATIVE_PATH_SEP);
+  xasprintf (&user_home_dir, "%s", user_home_dir);
+  al_destroy_path (user_home_path);
 
-  al_destroy_path (allegro_resources_path);
-  al_destroy_path (allegro_temp_path);
-  al_destroy_path (allegro_user_home_path);
-  al_destroy_path (allegro_user_documents_path);
-  al_destroy_path (allegro_user_data_path);
-  al_destroy_path (allegro_user_settings_path);
-  al_destroy_path (allegro_exename_path);
+  /* get user documents path string */
+  ALLEGRO_PATH *user_documents_path = al_get_standard_path (ALLEGRO_USER_DOCUMENTS_PATH);
+  user_documents_dir = (char *) al_path_cstr (user_documents_path, ALLEGRO_NATIVE_PATH_SEP);
+  xasprintf (&user_documents_dir, "%s", user_documents_dir);
+  al_destroy_path (user_documents_path);
+
+  /* get user data path string */
+  ALLEGRO_PATH *user_data_path = al_get_standard_path (ALLEGRO_USER_DATA_PATH);
+  user_data_dir = (char *) al_path_cstr (user_data_path, ALLEGRO_NATIVE_PATH_SEP);
+  xasprintf (&user_data_dir, "%s", user_data_dir);
+  al_destroy_path (user_data_path);
+
+  /* get user settings path string */
+  ALLEGRO_PATH *user_settings_path = al_get_standard_path (ALLEGRO_USER_SETTINGS_PATH);
+  user_settings_dir = (char *) al_path_cstr (user_settings_path, ALLEGRO_NATIVE_PATH_SEP);
+  xasprintf (&user_settings_dir, "%s", user_settings_dir);
+  al_destroy_path (user_settings_path);
+
+  /* get executable file name */
+  ALLEGRO_PATH *exename_path = al_get_standard_path (ALLEGRO_EXENAME_PATH);
+  exe_filename = (char *) al_path_cstr (exename_path, ALLEGRO_NATIVE_PATH_SEP);
+  xasprintf (&exe_filename, "%s", exe_filename);
+  al_destroy_path (exename_path);
+
+  /* get config file name */
+  xasprintf (&config_filename, "%smininim.ini", user_settings_dir);
+}
+
+static void
+print_paths (void)
+{
+  printf ("Resources: %s\n", resources_dir);
+  printf ("Temporary: %s\n", temp_dir);
+  printf ("User home: %s\n", user_home_dir);
+  printf ("User documents: %s\n", user_documents_dir);
+  printf ("User data: %s\n", user_data_dir);
+  printf ("User settings: %s\n", user_settings_dir);
+  printf ("Executable file: %s\n", exe_filename);
+  printf ("Configuration file: %s\n", config_filename);
 }
 
 int
