@@ -101,7 +101,7 @@ flow (struct anim *k)
   struct coord nc; struct pos np, pm, ptf;
 
   if (k->oaction != kid_run_jump)
-    k->i = -1, k->hang = false;
+    k->i = -1, k->hang = false, k->crossing_mirror = false;
 
   bool hang_front = ((k->f.dir == LEFT) ? k->key.left : k->key.right)
     && ! k->key.up && k->key.shift;
@@ -163,7 +163,7 @@ physics_in (struct anim *k)
   bool cross_mirror =
     k->ci.t == MIRROR && k->i >= 5 && k->i <= 8;
 
-  if (colliding && ! cross_mirror) {
+  if (colliding && ! cross_mirror && ! k->crossing_mirror) {
     if (k->i < 6) kid_stabilize_collision (k);
     else kid_couch_collision (k);
     return false;
@@ -172,6 +172,7 @@ physics_in (struct anim *k)
     struct pos p; prel (&k->ci.p, &p, +0, k->f.dir == LEFT
                         ? +1 : +0);
     mirror_at_pos (&p)->kid_crossing = k->id;
+    k->crossing_mirror = true;
   }
 
   /* fall */

@@ -224,7 +224,7 @@ struct anim {
   bool reverse, collision, fall, hit_ceiling,
     just_hanged, hang, hang_limit, misstep, uncouch_slowly,
     keep_sword_fast, turn, shadow, splash, hit_by_loose_floor,
-    invisible, has_sword, hurt, controllable, fight;
+    invisible, has_sword, hurt, controllable, fight, crossing_mirror;
 
   int attack_defended, counter_attacked, counter_defense;
   bool hurt_enemy_in_counter_attack;

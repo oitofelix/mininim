@@ -233,9 +233,9 @@ start (void)
   }
 
   /* temporary placement for test */
-  /* if (level.number == 7) { */
+  /* if (level.number == 4) { */
   /*   /\* kid *\/ */
-  /*   struct pos p = {10,1,4}; */
+  /*   struct pos p = {4,1,5}; */
   /*   k->f.dir = RIGHT; */
   /*   place_frame (&k->f, &k->f, kid_normal_00, &p, */
   /*                k->f.dir == LEFT ? +22 : +31, +15); */
