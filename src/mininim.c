@@ -42,7 +42,7 @@ enum option_phase {
   COMMAND_LINE_OPTION_PHASE,
 } option_phase;
 
-ALLEGRO_THREAD *load_config_dialog_thread;
+ALLEGRO_THREAD *load_config_dialog_thread, *save_game_dialog_thread;
 
 ALLEGRO_TIMER *play_time;
 enum vm vm = VGA;
@@ -797,14 +797,44 @@ void *
 load_config_dialog (ALLEGRO_THREAD *thread, void *arg)
 {
   ALLEGRO_FILECHOOSER *dialog =
-    create_native_file_dialog (NULL, "Load configuration file",
-                               "*.ini", ALLEGRO_FILECHOOSER_FILE_MUST_EXIST);
+    create_native_file_dialog (user_home_dir, "Load configuration file",
+                               "*.*", ALLEGRO_FILECHOOSER_FILE_MUST_EXIST);
   show_native_file_dialog (display, dialog);
 
   char *filename = NULL;
   if (al_get_native_file_dialog_count (dialog)) {
     filename = (char *) al_get_native_file_dialog_path (dialog, 0);
     xasprintf (&filename, "%s", filename);
+  }
+
+  al_destroy_native_file_dialog (dialog);
+  al_set_thread_should_stop (thread);
+  return filename;
+}
+
+void *
+save_game_dialog (ALLEGRO_THREAD *thread, void *arg)
+{
+  ALLEGRO_FILECHOOSER *dialog =
+    create_native_file_dialog (user_home_dir, "Save game",
+                               "*.*", ALLEGRO_FILECHOOSER_SAVE);
+  show_native_file_dialog (display, dialog);
+
+  char *filename = NULL;
+  if (al_get_native_file_dialog_count (dialog)) {
+    filename = (char *) al_get_native_file_dialog_path (dialog, 0);
+
+    int r = 1;
+    if (al_filename_exists (filename))
+      r = al_show_native_message_box
+        (display, "Warning",
+         "File already exists!",
+         "Do you want to overwrite it?",
+         NULL,
+         ALLEGRO_MESSAGEBOX_WARN | ALLEGRO_MESSAGEBOX_YES_NO);
+
+    if (r == 1) xasprintf (&filename, "%s", filename);
+    else filename = NULL;
   }
 
   al_destroy_native_file_dialog (dialog);
@@ -850,6 +880,40 @@ load_config (char *filename)
   draw_bottom_text (NULL, error_str);
 
   return textlog;
+}
+
+void
+save_game (char *filename)
+{
+  ALLEGRO_CONFIG *config = create_config ();
+  char *start_level_str, *time_limit_str,
+    *total_lives_str, *kca_str, *kcd_str;
+
+  xasprintf (&start_level_str, "%i", level.number);
+  xasprintf (&time_limit_str, "%i", time_limit - al_get_timer_count (play_time));
+  xasprintf (&total_lives_str, "%i", total_lives);
+  xasprintf (&kca_str, "%i", skill.counter_attack_prob + 1);
+  xasprintf (&kcd_str, "%i", skill.counter_defense_prob + 1);
+
+  al_add_config_comment (config, NULL, "MININIM save file");
+  al_set_config_value (config, NULL, "start level", start_level_str);
+  al_set_config_value (config, NULL, "time limit", time_limit_str);
+  al_set_config_value (config, NULL, "total lives", total_lives_str);
+  al_set_config_value (config, NULL, "kca", kca_str);
+  al_set_config_value (config, NULL, "kcd", kcd_str);
+
+  char *error_str = al_save_config_file (filename, config)
+    ? "GAME HAS BEEN SAVED"
+    : "GAME SAVE FAILED";
+
+  draw_bottom_text (NULL, error_str);
+
+  al_destroy_config (config);
+  al_free (start_level_str);
+  al_free (time_limit_str);
+  al_free (total_lives_str);
+  al_free (kca_str);
+  al_free (kcd_str);
 }
 
 int

@@ -58,6 +58,7 @@
 #include "file.h"
 #include "dialog.h"
 #include "threads.h"
+#include "xconfig.h"
 
 #include "anim.h"
 #include "arch.h"
@@ -151,7 +152,9 @@
 
 /* functions */
 void *load_config_dialog (ALLEGRO_THREAD *thread, void *arg);
+void *save_game_dialog (ALLEGRO_THREAD *thread, void *arg);
 ALLEGRO_TEXTLOG *load_config (char *filename);
+void save_game (char *filename);
 int max_int (int a, int b);
 int min_int (int a, int b);
 
@@ -179,6 +182,7 @@ extern char *resources_dir,
   *exe_filename,
   *config_filename;
 
-extern ALLEGRO_THREAD *load_config_dialog_thread;
+extern ALLEGRO_THREAD *load_config_dialog_thread,
+  *save_game_dialog_thread;
 
 #endif	/* MININIM_MININIM_H */

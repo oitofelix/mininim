@@ -418,6 +418,14 @@ process_keys (void)
     al_free (text);
   }
 
+  /* CTRL+G: save game */
+  if (was_key_pressed (ALLEGRO_KEY_G, 0, ALLEGRO_KEYMOD_CTRL, true)
+      && ! save_game_dialog_thread) {
+    save_game_dialog_thread =
+      create_thread (save_game_dialog, NULL);
+    al_start_thread (save_game_dialog_thread);
+  }
+
   /* Restart level after death */
   struct anim *k = get_anim_by_id (0);
   if (is_kid_dead (&k->f)

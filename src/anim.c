@@ -51,6 +51,8 @@ play_anim (void (*draw_callback) (void),
     switch (event.type) {
     case ALLEGRO_EVENT_TIMER:
       if (event.timer.source == timer) {
+
+        /* load configuration */
         if (load_config_dialog_thread
             && al_get_thread_should_stop (load_config_dialog_thread)) {
           char *filename;
@@ -63,6 +65,19 @@ play_anim (void (*draw_callback) (void),
             if (textlog)
               al_register_event_source
                 (event_queue, get_native_text_log_event_source (textlog));
+          }
+        }
+
+        /* save game */
+        if (save_game_dialog_thread
+            && al_get_thread_should_stop (save_game_dialog_thread)) {
+          char *filename;
+          al_join_thread (save_game_dialog_thread, (void *) &filename);
+          al_destroy_thread (save_game_dialog_thread);
+          save_game_dialog_thread = NULL;
+          if (filename) {
+            save_game (filename);
+            al_free (filename);
           }
         }
 

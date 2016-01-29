@@ -94,7 +94,8 @@ mininim_SOURCES = src/mininim.c src/mininim.h src/constants.h					\
 		src/kernel/random.c src/kernel/random.h src/kernel/array.c				\
 		src/kernel/array.h src/kernel/xstdio.c src/kernel/xstdio.h				\
 		src/kernel/file.c src/kernel/file.h src/kernel/dialog.c						\
-		src/kernel/dialog.h src/kernel/threads.c src/kernel/threads.h
+		src/kernel/dialog.h src/kernel/threads.c src/kernel/threads.h			\
+		src/kernel/xconfig.c src/kernel/xconfig.h
 
 ${mininim_OBJECTS}: src/mininim.h.gch
 
