@@ -19,6 +19,17 @@
 
 #include "mininim.h"
 
+struct config_info {
+  enum {
+    CI_CONFIGURATION_FILE, CI_ENVIRONMENT_VARIABLES,
+    CI_COMMAND_LINE,
+  } type;
+  char *filename;
+  ALLEGRO_TEXTLOG *textlog;
+};
+
+bool ignore_main_config, ignore_environment;
+
 static char **argv;
 static size_t argc;
 static char **eargv;
@@ -36,11 +47,6 @@ char *resources_dir,
   *data_dir,
   *exe_filename,
   *config_filename;
-
-enum option_phase {
-  CONFIGURATION_FILE_OPTION_PHASE, ENVIRONMENT_VARIABLES_OPTION_PHASE,
-  COMMAND_LINE_OPTION_PHASE,
-} option_phase;
 
 ALLEGRO_THREAD *load_config_dialog_thread, *save_game_dialog_thread;
 
@@ -67,6 +73,11 @@ static void print_paths (void);
 static char *env_option_name (const char *option_name);
 static char *config_option_name (const char *option_name);
 static void get_paths (void);
+static error_t get_config_args (size_t *cargc, char ***cargv,
+                                struct argp_option *options,
+                                char *filename);
+static error_t
+pre_parser (int key, char *arg, struct argp_state *state);
 
 enum options {
   VIDEO_MODE_OPTION = 256, ENVIRONMENT_MODE_OPTION, GUARD_MODE_OPTION,
@@ -77,6 +88,7 @@ enum options {
   WINDOW_POSITION_OPTION, WINDOW_DIMENSIONS_OPTION,
   INHIBIT_SCREENSAVER_OPTION, PRINT_PATHS_OPTION,
   LEVEL_MODULE_OPTION, SKIP_TITLE_OPTION, START_TIME_OPTION,
+  LOAD_CONFIG_OPTION, IGNORE_MAIN_CONFIG_OPTION, IGNORE_ENVIRONMENT_OPTION
 };
 
 enum level_module {
@@ -84,19 +96,35 @@ enum level_module {
 } level_module;
 
 static struct argp_option options[] = {
+  /* Configuration */
+  {NULL, 0, NULL, 0, "Configuration:", 0},
+
+  {"load-config", LOAD_CONFIG_OPTION, "FILE", 0, "Load configuration file FILE.  The options set in FILE have the same precedence as the equivalent command line options given at its place of occurrence.  This can be done in-game by the CTRL+L keystroke.", 0},
+
+  {"ignore-main-config", IGNORE_MAIN_CONFIG_OPTION, NULL, 0, "Ignore main configuration file.  The default is to parse it at the very beginning of each run.", 0},
+
+  {"ignore-environment", IGNORE_ENVIRONMENT_OPTION, NULL, 0, "Ignore environment variables.  The default is to parse them after the main configuration file.", 0},
+
+  {NULL, 0, NULL, OPTION_DOC, "There are three methods of configuration: command line options, environment variables and configuration files.  For every command line option of the form 'x-y' there is an equivalent environment variable option 'MININIM_X_Y' and an equivalent configuration file option 'x y'.  The multiple methods of configuration are cumulative but command line options override any other, while environment variables override the main configuration file.  In any method applicable later options override earlier ones.  The option '--print-paths' shows, among other things, the expected file name of the main configuration file.", 0},
+
+  {NULL, 0, NULL, OPTION_DOC, "Notice that save files (CTRL+G) are a particular case of configuration files and should be loaded the same way.  When loaded in-game, configuration files take effect immediately, however some effects only become visible under certain conditions.  For instance save files show their effect only on game (re)start.", 0},
+
   /* Level */
   {NULL, 0, NULL, 0, "Level:", 0},
   {"level-module", LEVEL_MODULE_OPTION, "LEVEL-MODULE", 0, "Select level module.  A level module determines a way to generate consecutive levels for use by the engine.  Valid values for LEVEL-MODULE are: LEGACY and CONSISTENCY.  LEGACY is the module designed to read the original unarchived PoP 1 DOS level files.  CONSISTENCY is the module designed to generate random-corrected levels for accessing the engine robustness.  The default is LEGACY.", 0},
   {"start-level", START_LEVEL_OPTION, "N", 0, "Make the kid start at level N.  The default is 1.  Valid integers range from 1 to INT_MAX.  This can be changed in-game by the SHIFT+L keystroke.", 0},
 
-  /* Game */
-  {NULL, 0, NULL, 0, "Game:", 0},
-  {"immortal-mode", IMMORTAL_MODE_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable immortal mode.  In immortal mode the kid can't be harmed.  The default is FALSE.  This can be changed in-game by the I key.", 0},
-  {"total-lives", TOTAL_LIVES_OPTION, "N", 0, "Make the kid start with N total lives.  The default is 3.  Valid integers range from 1 to 10.  This can be changed in-game by the SHIFT+T keystroke.", 0},
+  /* Time */
+  {NULL, 0, NULL, 0, "Time:", 0},
   {"time-limit", TIME_LIMIT_OPTION, "N", 0, "Set the time limit to complete the game to N seconds.  The default is 3600.  Valid integers range from 1 to INT_MAX.  This can be changed in-game by the + and - keys.", 0},
   {"start-time", START_TIME_OPTION, "N", 0, "Set the play time counter.  The default is 0.  Valid integers range from 0 to INT_MAX.", 0},
+
+  /* Skills */
+  {NULL, 0, NULL, 0, "Skills:", 0},
+  {"total-lives", TOTAL_LIVES_OPTION, "N", 0, "Make the kid start with N total lives.  The default is 3.  Valid integers range from 1 to 10.  This can be changed in-game by the SHIFT+T keystroke.", 0},
   {"kca", KCA_OPTION, "N", 0, "Set kid's counter attack skill to N.  The default is 0.  Valid integers range from 0 to 100.  This can be changed in-game by the CTRL+= and CTRL+- keys.", 0},
   {"kcd", KCD_OPTION, "N", 0, "Set kid's counter defense skill to N.  The default is 0.  Valid integers range from 0 to 100.  This can be changed in-game by the ALT+= and ALT+- keys.", 0},
+  {"immortal-mode", IMMORTAL_MODE_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable immortal mode.  In immortal mode the kid can't be harmed.  The default is FALSE.  This can be changed in-game by the I key.", 0},
 
   /* Rendering */
   {NULL, 0, NULL, 0, "Rendering:", 0},
@@ -112,15 +140,18 @@ static struct argp_option options[] = {
   {"fullscreen", FULLSCREEN_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable fullscreen mode.  In fullscreen mode the window spans the entire screen.  The default is FALSE.  This can be changed in-game by the F key.", 0},
   {"window-position", WINDOW_POSITION_OPTION, "X,Y", 0, "Place the window at screen coordinates X,Y.  The default is to let this choice to the window manager.  The values X and Y are integers and must be separated by a comma.", 0},
   {"window-dimensions", WINDOW_DIMENSIONS_OPTION, "WxH", 0, "Set window width and height to W and H, respectively.  The default is 640x400.  The values W and H are strictly positive integers and must be separated by an 'x'.", 0},
-  {"inhibit-screensaver", INHIBIT_SCREENSAVER_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Prevent the system screensaver from starting up.  The default is FALSE.", 0},
+
+  /* Paths */
+  {NULL, 0, NULL, 0, "Paths:", 0},
+  {"data-path", DATA_PATH_OPTION, "PATH", 0, "Set data path to PATH.  Normally, the data files are looked for in the current working directory, then in the user data directory, then in the resources directory, and finally in the system data directory.  If this option is given, before looking there the data files are looked for in PATH.", 0},
+  {"print-paths", PRINT_PATHS_OPTION, NULL, 0, "Print paths and exit.", 0},
 
   /* Others */
   {NULL, 0, NULL, 0, "Others", 0},
   {"sound", SOUND_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable sound.  The default is TRUE.  This can be changed in-game by the CTRL+S keystroke.", 0},
   {"keyboard-flip-mode", KEYBOARD_FLIP_MODE_OPTION, "KEYBOARD-FLIP-MODE", 0, "Select keyboard flip mode.  Valid values for KEYBOARD-FLIP-MODE are: NONE, VERTICAL, HORIZONTAL and VERTICAL-HORIZONTAL.  The default is NONE.  This can be changed in-game by the SHIFT+K keystroke.", 0},
-  {"data-path", DATA_PATH_OPTION, "PATH", 0, "Set data path to PATH.  Normally, the data files are looked for in the current working directory, then in the user data directory, then in the resources directory, and finally in the system data directory.  If this option is given, before looking there the data files are looked for in PATH.", 0},
-  {"print-paths", PRINT_PATHS_OPTION, NULL, 0, "Print paths and exit.", 0},
   {"skip-title", SKIP_TITLE_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Skip title screen.  The default is FALSE.", 0},
+  {"inhibit-screensaver", INHIBIT_SCREENSAVER_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Prevent the system screensaver from starting up.  The default is FALSE.", 0},
 
   /* Help */
   {NULL, 0, NULL, 0, "Help:", -1},
@@ -128,16 +159,18 @@ static struct argp_option options[] = {
 };
 
 static const char *doc = "MININIM: The Advanced Prince of Persia Engine\n(a childhood dream)\v\
-Long option names are case sensitive.  Option values are case insensitive.   Both can be partially specified as long as they are kept unambiguous.  BOOLEAN is an integer equating to 0, or any sub-string (including the null string) of 'FALSE', 'OFF' or 'NO' to disable the respective feature, and any other value (even no string at all) to enable it.  For any non-specified option the documented default applies.  Integers can be specified in any of the formats defined by the C language.  Key and keystroke references are based on the default mapping.  For every command line option of the form 'x-y' there is an equivalent environment variable option 'MININIM_X_Y' and an equivalent configuration file option 'x y'.  The increasing order of precedence for options is: configuration file, environment variables, and then command line.";
+Long option names are case sensitive.  Option values are case insensitive.   Both can be partially specified as long as they are kept unambiguous.  BOOLEAN is an integer equating to 0, or any sub-string (including the null string) of 'FALSE', 'OFF' or 'NO' to disable the respective feature, and any other value (even no string at all) to enable it.  For any non-specified option the documented default applies.  Integers can be specified in any of the formats defined by the C language.  Key and keystroke references are based on the default mapping.";
 
 struct argp_child argp_child = { NULL };
 
+static struct argp pre_argp = {options, pre_parser, NULL, NULL, &argp_child, NULL, NULL};
 static struct argp argp = {options, parser, NULL, NULL, &argp_child, NULL, NULL};
 
 static char *
-key_to_option_name (int key)
+key_to_option_name (int key, struct argp_state *state)
 {
   char *option_name;
+  struct config_info *config_info = (struct config_info *) state->input;
 
   size_t i;
   for (i = 0; options[i].name != NULL
@@ -147,12 +180,12 @@ key_to_option_name (int key)
          || options[i].doc != NULL
          || options[i].group != 0; i++)
     if (options[i].key == key) {
-      switch (option_phase) {
-      case CONFIGURATION_FILE_OPTION_PHASE:
+      switch (config_info->type) {
+      case CI_CONFIGURATION_FILE:
         return config_option_name (options[i].name);
-      case ENVIRONMENT_VARIABLES_OPTION_PHASE:
+      case CI_ENVIRONMENT_VARIABLES:
         return env_option_name (options[i].name);
-      case COMMAND_LINE_OPTION_PHASE:
+      case CI_COMMAND_LINE:
         xasprintf (&option_name, "%s", options[i].name);
         return option_name;
       }
@@ -165,24 +198,28 @@ static void
 option_enum_value_error (int key, char *arg, struct argp_state *state,
                          char **enum_vals, bool invalid)
 {
-  char *msg = "";
-  char *option_name = key_to_option_name (key);
+  char *msg = NULL;
+  char *option_name = key_to_option_name (key, state);
+  struct config_info *config_info = (struct config_info *) state->input;
 
-  switch (option_phase) {
-  case CONFIGURATION_FILE_OPTION_PHASE:
-    msg = invalid
-      ? "is not a valid value for the configuration file option"
-      : "is an ambiguous value for the configuration file option";
+  switch (config_info->type) {
+  case CI_CONFIGURATION_FILE:
+    xasprintf
+      (&msg, "%s", invalid
+       ? "is not a valid value for the configuration file option"
+       : "is an ambiguous value for the configuration file option");
     break;
-  case ENVIRONMENT_VARIABLES_OPTION_PHASE:
-    msg = invalid
-      ? "is not a valid value for the option environment variable"
-      : "is an ambiguous value for the environment variable option";
+  case CI_ENVIRONMENT_VARIABLES:
+    xasprintf
+      (&msg, "%s", invalid
+       ? "is not a valid value for the environment variable option"
+       : "is an ambiguous value for the environment variable option");
     break;
-  case COMMAND_LINE_OPTION_PHASE:
-    msg = invalid
-      ? "is not a valid value for the command line option"
-      : "is an ambiguous value for the command line option";
+  case CI_COMMAND_LINE:
+    xasprintf
+      (&msg, "%s", invalid
+       ? "is not a valid value for the command line option"
+       : "is an ambiguous value for the command line option");
     break;
   }
 
@@ -204,17 +241,26 @@ option_enum_value_error (int key, char *arg, struct argp_state *state,
   if (invalid) xasprintf (&msg2, "%s", "Valid values are:");
   else xasprintf (&msg2, "Valid values starting with '%s' are:", arg);
 
-  char *error_template = "'%s' %s '%s'.\n%s %s.\n";
-  if (option_phase == CONFIGURATION_FILE_OPTION_PHASE
+  char *config_file_prefix;
+  if (config_info->type == CI_CONFIGURATION_FILE)
+    xasprintf (&config_file_prefix, "%s: ", config_info->filename);
+  else xasprintf (&config_file_prefix, "");
+
+  char *error_template = "%s'%s' %s '%s'.\n%s %s.\n";
+  if (config_info->type == CI_CONFIGURATION_FILE
       && state->flags & ARGP_SILENT)
-    al_append_native_text_log (state->input, error_template,
-                               arg, msg, option_name, msg2, valid_values);
+    al_append_native_text_log (config_info->textlog, error_template,
+                               config_file_prefix, arg, msg, option_name,
+                               msg2, valid_values);
   else argp_error (state, error_template,
-                   arg, msg, option_name, msg2, valid_values);
+                   config_file_prefix, arg, msg, option_name,
+                   msg2, valid_values);
 
   al_free (option_name);
+  al_free (msg);
   al_free (msg2);
   al_free (valid_values);
+  al_free (config_file_prefix);
 }
 
 static error_t
@@ -272,18 +318,26 @@ static error_t
 optval_to_int (int *retval, int key, char *arg, struct argp_state *state,
                int min, int max)
 {
+  struct config_info *config_info = (struct config_info *) state->input;
   int i;
+
   if (sscanf (arg, "%i", &i) != 1
       || i < min || i > max) {
-    char *option_name = key_to_option_name (key);
-    char *error_template = "'%s' is not a valid integer for the option '%s'.\n\
-Valid integers range from %i to %i.\n";
-    if (option_phase == CONFIGURATION_FILE_OPTION_PHASE
-      && state->flags & ARGP_SILENT)
-      al_append_native_text_log (state->input, error_template,
-                                 arg, option_name, min, max);
-    else argp_error (state, error_template, arg, option_name, min, max);
+    char *option_name = key_to_option_name (key, state);
+    char *config_file_prefix;
+    if (config_info->type == CI_CONFIGURATION_FILE)
+      xasprintf (&config_file_prefix, "%s: ", config_info->filename);
+    else xasprintf (&config_file_prefix, "");
+    char *error_template = "%s'%s' is not a valid integer for the option '%s'.\n"
+      "Valid integers range from %i to %i.\n";
+    if (config_info->type == CI_CONFIGURATION_FILE
+        && state->flags & ARGP_SILENT)
+      al_append_native_text_log (config_info->textlog, error_template,
+                                 config_file_prefix, arg, option_name, min, max);
+    else argp_error (state, error_template,
+                     config_file_prefix, arg, option_name, min, max);
     al_free (option_name);
+    al_free (config_file_prefix);
     return EINVAL;
   }
   *retval = i;
@@ -294,23 +348,31 @@ static error_t
 optval_to_int_pair (int *a, int *b, int key, char *arg, struct argp_state *state,
                     int min, int max, char s, char A, char B)
 {
+  struct config_info *config_info = (struct config_info *) state->input;
   char *template;
   int _a, _b;
   xasprintf (&template, "%%i%c%%i", s);
 
   if (sscanf (arg, template, &_a, &_b) != 2
       || _a < min || _a > max || _b < min || _b > max) {
-    char *option_name = key_to_option_name (key);
-    char *error_template = "'%s' is not a valid integer pair for the option '%s'.\n\
+    char *option_name = key_to_option_name (key, state);
+    char *config_file_prefix;
+    if (config_info->type == CI_CONFIGURATION_FILE)
+      xasprintf (&config_file_prefix, "%s: ", config_info->filename);
+    else xasprintf (&config_file_prefix, "");
+    char *error_template = "%s'%s' is not a valid integer pair for the option '%s'.\n\
 Valid values have the form %c%c%c where %c and %c range from %i to %i.\n";
-    if (option_phase == CONFIGURATION_FILE_OPTION_PHASE
+    if (config_info->type == CI_CONFIGURATION_FILE
         && state->flags & ARGP_SILENT)
-      al_append_native_text_log (state->input, error_template,
-                                 arg, option_name, A, s, B, A, B, min, max);
+      al_append_native_text_log (config_info->textlog, error_template,
+                                 config_file_prefix, arg, option_name,
+                                 A, s, B, A, B, min, max);
     else argp_error (state, error_template,
-                     arg, option_name, A, s, B, A, B, min, max);
+                     config_file_prefix, arg, option_name,
+                     A, s, B, A, B, min, max);
     al_free (template);
     al_free (option_name);
+    al_free (config_file_prefix);
     return EINVAL;
   }
 
@@ -321,9 +383,26 @@ Valid values have the form %c%c%c where %c and %c range from %i to %i.\n";
 }
 
 static error_t
+pre_parser (int key, char *arg, struct argp_state *state)
+{
+  switch (key) {
+  case IGNORE_MAIN_CONFIG_OPTION:
+    ignore_main_config = true;
+    break;
+  case IGNORE_ENVIRONMENT_OPTION:
+    ignore_environment = true;
+    break;
+  }
+  return 0;
+}
+
+static error_t
 parser (int key, char *arg, struct argp_state *state)
 {
+  char **cargv = NULL;
+  size_t cargc = 0;
   int x, y, i, e;
+  struct config_info config_info;
 
   char *level_module_enum[] = {"LEGACY", "CONSISTENCY", NULL};
 
@@ -341,6 +420,22 @@ parser (int key, char *arg, struct argp_state *state)
                                      "VERTICAL-HORIZONTAL", NULL};
 
   switch (key) {
+  case IGNORE_MAIN_CONFIG_OPTION:
+    break;
+  case IGNORE_ENVIRONMENT_OPTION:
+    break;
+  case LOAD_CONFIG_OPTION:
+    e = get_config_args (&cargc, &cargv, options, arg);
+    if (e) {
+      argp_failure (state, -1, e, "can't load configuration file '%s'", arg);
+      return e;
+    }
+    config_info.type = CI_CONFIGURATION_FILE;
+    config_info.filename = arg;
+    config_info.textlog = NULL;
+    argp_parse (&argp, cargc, cargv, 0, NULL, &config_info);
+    destroy_array ((void **) &cargv, &cargc);
+    break;
   case LEVEL_MODULE_OPTION:
     e = optval_to_enum (&i, key, arg, state, level_module_enum);
     if (e) return e;
@@ -595,7 +690,7 @@ config_option_name (const char *option_name)
   return config_opt_name;
 }
 
-void
+static error_t
 get_config_args (size_t *cargc, char ***cargv, struct argp_option *options,
                  char *filename)
 {
@@ -604,7 +699,7 @@ get_config_args (size_t *cargc, char ***cargv, struct argp_option *options,
   *cargv = add_to_array (&argv[0], 1, *cargv, cargc, *cargc, sizeof (argv[0]));
 
   ALLEGRO_CONFIG *config = al_load_config_file (filename);
-  if (! config) return;
+  if (! config) return al_get_errno ();
 
   for (i = 0; options[i].name != NULL
          || options[i].key != 0
@@ -623,11 +718,15 @@ get_config_args (size_t *cargc, char ***cargv, struct argp_option *options,
 
     al_free (config_opt_name);
   }
+
+  return 0;
 }
 
 int
 main (int _argc, char **_argv)
 {
+  struct config_info config_info;
+
   /* make command-line arguments available globally */
   argc = _argc;
   argv = _argv;
@@ -650,13 +749,24 @@ main (int _argc, char **_argv)
 
   argp_program_version_hook = version;
   argp.doc = doc;
+  pre_argp.doc = doc;
 
-  option_phase = CONFIGURATION_FILE_OPTION_PHASE;
-  argp_parse (&argp, cargc, cargv, 0, NULL, NULL);
-  option_phase = ENVIRONMENT_VARIABLES_OPTION_PHASE;
-  argp_parse (&argp, eargc, eargv, 0, NULL, NULL);
-  option_phase = COMMAND_LINE_OPTION_PHASE;
-  argp_parse (&argp, argc, argv, 0, NULL, NULL);
+  /* pre parser */
+  config_info.type = CI_COMMAND_LINE;
+  argp_parse (&pre_argp, argc, argv, 0, NULL, &config_info);
+
+  /* parser */
+  if (! ignore_main_config) {
+    config_info.type = CI_CONFIGURATION_FILE;
+    config_info.filename = config_filename;
+    argp_parse (&argp, cargc, cargv, 0, NULL, &config_info);
+  }
+  if (! ignore_environment) {
+    config_info.type = CI_ENVIRONMENT_VARIABLES;
+    argp_parse (&argp, eargc, eargv, 0, NULL, &config_info);
+  }
+  config_info.type = CI_COMMAND_LINE;
+  argp_parse (&argp, argc, argv, 0, NULL, &config_info);
 
   init_video ();
   init_audio ();
@@ -790,14 +900,15 @@ get_paths (void)
 static void
 print_paths (void)
 {
+  printf ("Main configuration file: %s\n", config_filename);
+  printf ("Executable file: %s\n", exe_filename);
   printf ("Resources: %s\n", resources_dir);
+  printf ("System data: %s%c\n", system_data_dir, ALLEGRO_NATIVE_PATH_SEP);
   printf ("Temporary: %s\n", temp_dir);
   printf ("User home: %s\n", user_home_dir);
   printf ("User documents: %s\n", user_documents_dir);
   printf ("User data: %s\n", user_data_dir);
   printf ("User settings: %s\n", user_settings_dir);
-  printf ("Executable file: %s\n", exe_filename);
-  printf ("Configuration file: %s\n", config_filename);
 }
 
 void *
@@ -854,6 +965,7 @@ load_config (char *filename)
 {
   char **cargv = NULL;
   size_t cargc = 0;
+  struct config_info config_info;
 
   ALLEGRO_TEXTLOG *textlog =
     open_native_text_log ("Configuration loading results",
@@ -862,18 +974,21 @@ load_config (char *filename)
   al_append_native_text_log (textlog, "Loading %s...\n", filename);
 
   get_config_args (&cargc, &cargv, options, filename);
-  option_phase = CONFIGURATION_FILE_OPTION_PHASE;
+
+  config_info.type = CI_CONFIGURATION_FILE;
+  config_info.filename = filename;
+  config_info.textlog = textlog;
 
   bool parse_error = false;
-  int arg_index = 0;
+  int last_arg_index, arg_index = -1;
   error_t e;
 
   do {
+    last_arg_index = ++arg_index;
     e = argp_parse (&argp, cargc - arg_index, &cargv[arg_index],
-                    ARGP_SILENT, &arg_index, textlog);
-    arg_index++;
+                    ARGP_SILENT, &arg_index, &config_info);
     if (! parse_error) parse_error = e;
-  } while (e);
+  } while (e && arg_index > last_arg_index);
 
   destroy_array ((void **) &cargv, &cargc);
 
