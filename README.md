@@ -1,2 +1,2 @@
 # MININIM
-Prince of Persia engine
+The Advanced Prince of Persia Engine (a childhood dream)
