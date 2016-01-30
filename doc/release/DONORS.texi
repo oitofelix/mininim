@@ -69,7 +69,7 @@ donate}}@inlineifset{file, the ``Donating'' section of the
 @file{README} file}@inlineifset{manual, @ref{Donating}}.
 
 @multitable @columnfractions .500 .380 .120
-@headitem Name @tab Email @tab BTC
+@headitem Name @tab Email @tab $
 @item --- @tab --- @tab ---
 @end multitable
 

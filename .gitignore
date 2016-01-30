@@ -9,8 +9,10 @@ ChangeLog
 NEWS
 README
 
-# Ignore Unix man page
+# Ignore built documentation
 
+/doc/mininim.pdf
+/doc/mininim.t2p/
 /doc/man/mininim.1
 
 # Ignore Makefiles throughout the whole tree.

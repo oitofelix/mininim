@@ -101,8 +101,8 @@ Indexes:
 
 @c --- Title page;
 @titlepage
-@title @value{package}
-@subtitle for version @value{version} (@value{date})
+@title @value{package} @value{version}
+@subtitle The Advanced Prince of Persia Engine (a childhood dream)
 @author Bruno Félix Rezende Ribeiro <@email{oitofelix@@gnu.org}>
 @page
 @vskip 0pt plus 1filll
