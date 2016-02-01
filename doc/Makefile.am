@@ -58,6 +58,10 @@ mininim_TEXINFOS = \
   copying.texi \
   release/description.texi
 
+EXTRA_DIST = mininim-figures
+
+install-info-local:
+	cp -rv ${top_srcdir}/doc/mininim-figures ${infodir}
 
 
 

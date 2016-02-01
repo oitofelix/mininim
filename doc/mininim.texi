@@ -31,17 +31,16 @@
 
 
 @c --- Macros;
-@macro webdoc{text, url}
-@inlinefmtifelse{info, @emph{\text\}@footnote{See @url{\url\}.},
-@inlinefmtifelse{html, @url{\url\,,\text\},
-@inlinefmtifelse{tex, @url{\url\,,@emph{\text\}}@footnote{See @url{\url\}.},
-@url{\url\,,@emph{\text\}}@footnote{See @url{\url\}.}}}}
-@end macro
+@c @macro webdoc{text, url}
+@c @inlinefmtifelse{info, @emph{\text\}@footnote{See @url{\url\}.},
+@c @inlinefmtifelse{html, @url{\url\,,\text\},
+@c @inlinefmtifelse{tex, @url{\url\,,@emph{\text\}}@footnote{See @url{\url\}.},
+@c @url{\url\,,@emph{\text\}}@footnote{See @url{\url\}.}}}}
+@c @end macro
 
-@macro n
-@inlinefmt{tex,}
-@end macro
-
+@c @macro n
+@c @inlinefmt{tex,}
+@c @end macro
 
 
 
@@ -75,21 +74,26 @@
 
 @c --- Menu;
 @menu
-* Preface::    Motivation, program definition and document organization;
+* Constructions:: The matter the world is made of
+* Movements:: How the kid reacts to user input
 
-* Overview::   Description, distribution, obtaining, contact, bug reports,
-                contribution, donation and hacking;
-* Release::    Information specifically relevant for the current release;
 
-Appendices:
-* GNU Free Documentation License:: The license for this documentation;
 
-GNU philosophy:
-* The GNU Manifesto::
-* The GNU Project::
-* Linux and the GNU system::
-* Why Software Should Not Have Owners::
-* Why Free Software Needs Free Documentation::
+@c * Preface::    Motivation, program definition and document organization;
+
+@c * Overview::   Description, distribution, obtaining, contact, bug reports,
+@c                 contribution, donation and hacking;
+@c * Release::    Information specifically relevant for the current release;
+
+@c Appendices:
+@c * GNU Free Documentation License:: The license for this documentation;
+
+@c GNU philosophy:
+@c * The GNU Manifesto::
+@c * The GNU Project::
+@c * Linux and the GNU system::
+@c * Why Software Should Not Have Owners::
+@c * Why Free Software Needs Free Documentation::
 
 Indexes:
 * Index:: Concepts and reference material.
@@ -100,9 +104,12 @@ Indexes:
 
 
 @c --- Title page;
+@finalout
 @titlepage
 @title @value{package} @value{version}
 @subtitle The Advanced Prince of Persia Engine (a childhood dream)
+@sp 6
+@center @image{mininim-figures/mininim,2in}
 @author Bruno Félix Rezende Ribeiro <@email{oitofelix@@gnu.org}>
 @page
 @vskip 0pt plus 1filll
@@ -119,171 +126,364 @@ Indexes:
 
 
 
-
 
-@c --- Preface;
-@node Preface
-@unnumbered Preface
-@cindex introduction
+@c --- Construction;
+@node Construction
+@chapter Construction
+@cindex construction
 
-<Here comes an introduction to MININIM>
+Each @dfn{level} is comprised of @dfn{rooms}@footnote{Some call these
+@dfn{screens}.}.  Each room is a comprised of three @dfn{floors}.  Each
+floor is comprised of 10 @dfn{places}.  Each place holds a
+@dfn{construction} (or @dfn{con} for short) @footnote{Some call these
+@dfn{tiles}.}.
 
+@center @image{mininim-figures/level-layout}
 
-
-@c --- Overview;
-@node Overview
-@chapter Overview
-@include README.texi
+@section Foreground
 
+@subsection Floors
 
+@table @asis
+  @item @image{mininim-figures/floor} This is a normal floor.
+  @item @image{mininim-figures/broken-floor} This is a broken floor.
+  @item @image{mininim-figures/closer-floor} This is a closer floor.
+  @item @image{mininim-figures/loose-floor} This is a loose floor.
+  @item @image{mininim-figures/opener-floor} This is an opener floor.
+  @item @image{mininim-figures/skeleton-floor} This is an skeleton floor.
+  @item @image{mininim-figures/spikes-floor} This is an spikes floor.
+@end table
 
+@subsection Pillars
 
-
-@c --- Release;
-@node Release
-@chapter Release
+@table @asis
+  @item @image{mininim-figures/big-pillar-top} This is a big pillar top.
+  @item @image{mininim-figures/big-pillar-bottom} This is a big pillar bottom.
+@end table
 
-In this chapter one can find information that are specific to the
-current release or subject to change between releases.  It
-presents the features this package acquired over time, problems that
-affect its overall usage and what possibly could happen to it --- by
-our wishes --- in the future.  Last but not least, people whose
-contribution for this package are noteworthy are acknowledged.
+@subsection Arch
 
-@menu
-Present and Future:
-* Announcement::  Published announcement message of this new release;
-* News::          User-visible changes since previous versions;
-* To do::         Features we want to see implemented someday;
+@table @asis
+  @item @image{mininim-figures/arch-bottom} This is an arch bottom.
 
-People:
-* Authors::  List of major contributors;
-* Thanks::   List of minor contributors;
-* Donors::   People who supported the development by donations;
-@end menu
+  @item @image{mininim-figures/arch-top-mid} This is an arch top mid.
 
+  @item @image{mininim-figures/arch-top-small} This is an arch top small.
 
+  @item @image{mininim-figures/arch-top-left}
+  @itemx @image{mininim-figures/arch-top-left-end} This is an arch top left.
 
+  @item @image{mininim-figures/arch-top-right}
+  @itemx @image{mininim-figures/arch-top-right-end} This is an arch top right.
 
-
-@c --- News;
-@page
-@node Announcement
-@section Announcement
-@include ANNOUNCEMENT.texi
-
-
+@end table
 
 
-
-@c --- News;
-@page
-@node News
-@section News
-@include NEWS.texi
+@section Background
 
-
+@table @asis
+  @item @image{mininim-figures/balcony} This is a balcony.
+@end table
 
 
 
-@c --- To do;
-@page
-@node To do
-@section To do
-@include TODO.texi
+@c --- Movements;
+@node Movements
+@chapter Movements
+@cindex movements
+
+In his journey to save the princess, the kid has to endure several
+levels full of challenging traps and skilled opponents.  Run, walk,
+turn, crouch, jump, hang, climb, take sword, attack, defend are some of
+the kid's movements at your disposal to help him make his way to the
+princess tower.  Although, this is a relatively large set of movements,
+basically all these movements are accomplished by some combination of
+the directional and shift keys, often conditioned to the current kid's
+movement state.  This chapter explains in detail all possible movements
+of the kid.
+
+There are four major modes of movement: @dfn{normal}, @dfn{crouch},
+@dfn{run} and @dfn{fight}.  The major mode the kid is in is the foremost
+element determining how the input is translated into kid's movements.
+
+@heading Normal
+
+The major movement mode at the beginning of each level is normal.  While
+in it the kid stands at rest.
+
+@center @image{mininim-figures/kid-normal-right}
+
+If you press the horizontal directional key in the opposite direction
+the kid is facing, he @strong{turns} and then faces the opposite
+direction likewise.
+
+@center @image{mininim-figures/kid-normal-right} @arrow{} @image{mininim-figures/kid-turn} @arrow{} @image{mininim-figures/kid-normal-left}
+
+Pressing the up directional key, makes the kid perform a
+@strong{vertical jump}.
+
+@center @image{mininim-figures/kid-normal-left} @arrow{} @image{mininim-figures/kid-vjump}
+
+Pressing the up and the horizontal directional keys at once makes the
+kid @strong{jump} forward.
+
+@center @image{mininim-figures/kid-normal-left} @arrow{} @image{mininim-figures/kid-jump}
+
+Pressing the horizontal directional key in the same direction the kid is
+facing while holding the shift key, makes him @strong{walk} carefully.
+
+@center @image{mininim-figures/kid-normal-left} @arrow{} @image{mininim-figures/kid-walk}
+
+
+@heading Crouch
+
+If you press the down directional the kid crouches.
+
+@center @image{mininim-figures/kid-normal-left} @arrow{} @image{mininim-figures/kid-couch}
+
+The kid stays crouched as long as you keep the down directional pressed.
+If you press the horizontal directional key in the same direction the
+kid is facing, without releasing the down directional, the kid performs
+little @strong{crouching jumps} forwards.
+
+@center @image{mininim-figures/kid-couch} @arrow{} @image{mininim-figures/kid-couch-forward} @arrow{} @image{mininim-figures/kid-couch}
+
+Releasing the down directional makes the kid stand up again.
+
+@center @image{mininim-figures/kid-uncouch} @arrow{} @image{mininim-figures/kid-normal-left}
+
+
+@heading Run
+
+Pressing the horizontal directional key in the same direction the kid is
+facing, makes him start to run.
+
+@center @image{mininim-figures/kid-normal-left} @arrow{} @image{mininim-figures/kid-start-run}
+
+He runs as long as you keep the directional key pressed.
+
+@center @image{mininim-figures/kid-start-run} @arrow{} @image{mininim-figures/kid-run}
+
+In case you press the up directional key while running, he makes a
+@strong{running jump}, and continue to run if you keep the horizontal
+directional pressed.
+
+@center @image{mininim-figures/kid-run} @arrow{} @image{mininim-figures/kid-run-jump}
+
+Instead, if you press the down directional key, he @strong{crouches}
+slipping with some inertia, and then the crouching input rules apply.
+
+@center @image{mininim-figures/kid-run} @arrow{} @image{mininim-figures/kid-couch}
+
+If you press the horizontal directional key in the opposite direction
+the kid is facing while running, he @strong{turns} without stopping.
+
+@center @image{mininim-figures/kid-run} @arrow{} @image{mininim-figures/kid-turn-run}
+
+He continues to run while you keep the directional pressed, but
+releasing the directional key makes him stop, and go back to the normal
+stage.
+
+@center @image{mininim-figures/kid-stop-run} @arrow{} @image{mininim-figures/kid-normal-left}
+
+
+@heading Fight
+
+If the kid has got the sword, the return key @strong{takes the sword}
+and puts him in fight mode.
+
+@center @image{mininim-figures/kid-normal-left} @arrow{} @image{mininim-figures/kid-take-sword} @arrow{} @image{mininim-figures/kid-sword-normal}
+
+Pressing the horizontal directional key in the same direction kid is
+facing, makes him @strong{walk forward}.
+
+@center @image{mininim-figures/kid-sword-normal} @arrow{} @image{mininim-figures/kid-sword-walkf}
+
+Likewise if you press in the opposite direction, he @strong{goes
+backward}.
+
+@center @image{mininim-figures/kid-sword-normal} @arrow{} @image{mininim-figures/kid-sword-walkb}
+
+If you press the up directional, the kid makes the @strong{defense
+movement}.
+
+@center @image{mininim-figures/kid-sword-normal} @arrow{} @image{mininim-figures/kid-sword-defense}
+
+The shift key make him @strong{attack}.
+
+@center @image{mininim-figures/kid-sword-normal} @arrow{} @image{mininim-figures/kid-sword-attack}
+
+Finally you can make him @strong{keep the sword} and return to normal
+mode by pressing the down directional.
+
+@center @image{mininim-figures/kid-sword-normal} @arrow{} @image{mininim-figures/kid-keep-sword} @arrow{} @image{mininim-figures/kid-normal-left}
+
+
+@c 
+@c @c --- Preface;
+@c @node Preface
+@c @unnumbered Preface
+@c @cindex introduction
+
+@c <Here comes an introduction to MININIM and its documentation>
+
+
+
+@c 
+@c @c --- Overview;
+@c @node Overview
+@c @chapter Overview
+@c @include README.texi
 
 
 
 
-
-@c --- Authors;
-@page
-@node Authors
-@section Authors
-@include AUTHORS.texi
+@c 
+@c @c --- Release;
+@c @node Release
+@c @chapter Release
+
+@c In this chapter one can find information that are specific to the
+@c current release or subject to change between releases.  It
+@c presents the features this package acquired over time, problems that
+@c affect its overall usage and what possibly could happen to it --- by
+@c our wishes --- in the future.  Last but not least, people whose
+@c contribution for this package are noteworthy are acknowledged.
+
+@c @menu
+@c Present and Future:
+@c * Announcement::  Published announcement message of this new release;
+@c * News::          User-visible changes since previous versions;
+@c * To do::         Features we want to see implemented someday;
+
+@c People:
+@c * Authors::  List of major contributors;
+@c * Thanks::   List of minor contributors;
+@c * Donors::   People who supported the development by donations;
+@c @end menu
 
 
 
 
-
-@c --- Thanks;
-@page
-@node Thanks
-@section Thanks
-@include THANKS.texi
+@c 
+@c @c --- News;
+@c @page
+@c @node Announcement
+@c @section Announcement
+@c @include ANNOUNCEMENT.texi
 
 
 
 
-
-@c --- Donors;
-@page
-@node Donors
-@section Donors
-@include DONORS.texi
+@c 
+@c @c --- News;
+@c @page
+@c @node News
+@c @section News
+@c @include NEWS.texi
 
 
 
 
-
-@c --- GNU Free Documentation License;
-@node GNU Free Documentation License
-@appendix GNU Free Documentation License
-@cindex license documentation
-@cindex documentation license
-@cindex license of manual
-@cindex manual license
-@cindex copying documentation
-@cindex documentation copying
-@cindex copying manual
-@cindex manual copying
-
-@include gnu-free-documentation-license.texi
+@c 
+@c @c --- To do;
+@c @page
+@c @node To do
+@c @section To do
+@c @include TODO.texi
 
 
 
 
-
-@c --- The GNU Manifesto;
-@node The GNU Manifesto
-@appendix The GNU Manifesto
-@include the-gnu-manifesto.texi
+@c 
+@c @c --- Authors;
+@c @page
+@c @node Authors
+@c @section Authors
+@c @include AUTHORS.texi
 
 
 
 
-
-@c --- The GNU Project;
-@node The GNU Project
-@appendix The GNU Project
-@include the-gnu-project.texi
+@c 
+@c @c --- Thanks;
+@c @page
+@c @node Thanks
+@c @section Thanks
+@c @include THANKS.texi
 
 
 
 
-
-@c --- Linux and the GNU system;
-@node Linux and the GNU system
-@appendix Linux and the GNU system
-@include linux-and-the-gnu-system.texi
+@c 
+@c @c --- Donors;
+@c @page
+@c @node Donors
+@c @section Donors
+@c @include DONORS.texi
 
 
 
 
-
-@c --- Why Software Should Not Have Owners;
-@node Why Software Should Not Have Owners
-@appendix Why Software Should Not Have Owners
-@include why-software-should-not-have-owners.texi
+@c 
+@c @c --- GNU Free Documentation License;
+@c @node GNU Free Documentation License
+@c @appendix GNU Free Documentation License
+@c @cindex license documentation
+@c @cindex documentation license
+@c @cindex license of manual
+@c @cindex manual license
+@c @cindex copying documentation
+@c @cindex documentation copying
+@c @cindex copying manual
+@c @cindex manual copying
+
+@c @include gnu-free-documentation-license.texi
 
 
 
 
-
-@c --- Why Free Software Needs Free Documentation;
-@node Why Free Software Needs Free Documentation
-@appendix Why Free Software Needs Free Documentation
-@include why-free-software-needs-free-documentation.texi
+@c 
+@c @c --- The GNU Manifesto;
+@c @node The GNU Manifesto
+@c @appendix The GNU Manifesto
+@c @include the-gnu-manifesto.texi
+
+
+
+
+@c 
+@c @c --- The GNU Project;
+@c @node The GNU Project
+@c @appendix The GNU Project
+@c @include the-gnu-project.texi
+
+
+
+
+@c 
+@c @c --- Linux and the GNU system;
+@c @node Linux and the GNU system
+@c @appendix Linux and the GNU system
+@c @include linux-and-the-gnu-system.texi
+
+
+
+
+@c 
+@c @c --- Why Software Should Not Have Owners;
+@c @node Why Software Should Not Have Owners
+@c @appendix Why Software Should Not Have Owners
+@c @include why-software-should-not-have-owners.texi
+
+
+
+
+@c 
+@c @c --- Why Free Software Needs Free Documentation;
+@c @node Why Free Software Needs Free Documentation
+@c @appendix Why Free Software Needs Free Documentation
+@c @include why-free-software-needs-free-documentation.texi
 
 
 
