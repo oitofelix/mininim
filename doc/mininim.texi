@@ -127,10 +127,10 @@ Indexes:
 
 
 
-@c --- Construction;
-@node Construction
-@chapter Construction
-@cindex construction
+@c --- Constructions;
+@node Constructions
+@chapter Constructions
+@cindex constructions
 
 Each @dfn{level} is comprised of @dfn{rooms}@footnote{Some call these
 @dfn{screens}.}.  Each room is a comprised of three @dfn{floors}.  Each
@@ -145,6 +145,7 @@ floor is comprised of 10 @dfn{places}.  Each place holds a
 @subsection Floors
 
 @table @asis
+  @item This is no floor.
   @item @image{mininim-figures/floor} This is a normal floor.
   @item @image{mininim-figures/broken-floor} This is a broken floor.
   @item @image{mininim-figures/closer-floor} This is a closer floor.
@@ -156,34 +157,123 @@ floor is comprised of 10 @dfn{places}.  Each place holds a
 
 @subsection Pillars
 
-@table @asis
-  @item @image{mininim-figures/big-pillar-top} This is a big pillar top.
-  @item @image{mininim-figures/big-pillar-bottom} This is a big pillar bottom.
-@end table
+@multitable @columnfractions .25 .15 .15 .45
+  @headitem Code @tab Dungeon @tab Palace @tab Notes
+
+  @item @code{BIG_PILLAR_TOP}
+  @tab @center @image{mininim-figures/d-big-pillar-top}
+  @tab
+  @tab This is a big pillar top.
+
+  @item @code{BIG_PILLAR_BOTTOM}
+  @tab @center @image{mininim-figures/d-big-pillar-bottom}
+  @tab
+  @tab This is a big pillar bottom.
+@end multitable
 
 @subsection Arch
 
-@table @asis
-  @item @image{mininim-figures/arch-bottom} This is an arch bottom.
+In the original game there is no dungeon version of arches.
 
-  @item @image{mininim-figures/arch-top-mid} This is an arch top mid.
+@multitable @columnfractions .2 .15 .15 .5
+  @headitem Code @tab Dungeon @tab Palace @tab Notes
 
-  @item @image{mininim-figures/arch-top-small} This is an arch top small.
+  @item @code{ARCH_BOTTOM}
+  @tab @center @image{mininim-figures/d-arch-bottom}
+  @tab @center @image{mininim-figures/p-arch-bottom}
+  @tab This should be placed below an @w{@code{ARCH_TOP_MID}}.
 
-  @item @image{mininim-figures/arch-top-left}
-  @itemx @image{mininim-figures/arch-top-left-end} This is an arch top left.
+  @item @code{ARCH_TOP_MID}
+  @tab @center @image{mininim-figures/d-arch-top-mid}
+  @tab @center @image{mininim-figures/p-arch-top-mid}
+  @tab This should be placed above an @code{ARCH_BOTTOM} and at left of an
+  @code{ARCH_TOP_LEFT}, at right of an @code{ARCH_TOP_RIGHT}, or next to
+  an @code{ARCH_TOP_SMALL}.
 
-  @item @image{mininim-figures/arch-top-right}
-  @itemx @image{mininim-figures/arch-top-right-end} This is an arch top right.
+  @item @code{ARCH_TOP_SMALL}
+  @tab @center @image{mininim-figures/d-arch-top-small}
+  @tab @center @image{mininim-figures/p-arch-top-small}
+  @tab This should be placed in between two @code{ARCH_TOP_MID}.
 
-@end table
+  @item @code{ARCH_TOP_LEFT}
+  @tab @center @image{mininim-figures/d-arch-top-left}
+  @tab @center @image{mininim-figures/p-arch-top-left}
+  @tab This should be placed at left of an @code{ARCH_TOP_RIGHT}.
+
+  @item @code{ARCH_TOP_LEFT}
+  @tab @center @image{mininim-figures/d-arch-top-left-end}
+  @tab @center @image{mininim-figures/p-arch-top-left-end}
+  @tab These graphics are drawn when this construction ends an arch.
+  This should be placed at left of an @code{ARCH_TOP_MID}.
+
+  @item @code{ARCH_TOP_RIGHT}
+  @tab @center @image{mininim-figures/d-arch-top-right}
+  @tab @center @image{mininim-figures/p-arch-top-right}
+  @tab This should be place at right of an @code{ARCH_TOP_LEFT}.
+
+  @item @code{ARCH_TOP_RIGHT}
+  @tab @center @image{mininim-figures/d-arch-top-right-end}
+  @tab @center @image{mininim-figures/p-arch-top-right-end}
+  @tab These graphics are drawn when this construction ends an arch.
+  This should be placed at right of an @code{ARCH_TOP_MID}.
+@end multitable
 
 
 @section Background
 
-@table @asis
-  @item @image{mininim-figures/balcony} This is a balcony.
-@end table
+@multitable @columnfractions .12 .2 .2 .48
+  @headitem Code @tab Dungeon @tab Palace @tab Notes
+
+  @item @code{NO_BG}
+  @tab
+  @tab @center @image{mininim-figures/p-bricks-00}
+  @tab For the dungeon this results in no graphics at all.  For the palace this
+   results in the same graphics as @code{BRICKS_02}.
+
+  @item @code{BRICKS_00}
+  @tab @center @image{mininim-figures/d-bricks-00}
+  @tab
+  @tab For the palace this results in no graphics at all.
+
+  @item @code{BRICKS_01}
+  @tab @center @image{mininim-figures/d-bricks-01}
+  @tab @center @image{mininim-figures/p-bricks-01}
+  @tab For the palace this results in the same graphics as @code{BRICKS_03}
+
+  @item @code{BRICKS_02}
+  @tab @center @image{mininim-figures/d-bricks-02}
+  @tab @center @image{mininim-figures/p-bricks-00}
+  @tab For the palace this results in the same graphics as @code{NO_BG}.
+
+  @item @code{BRICKS_03}
+  @tab @center @image{mininim-figures/d-bricks-03}
+  @tab @center @image{mininim-figures/p-bricks-01}
+  @tab For the palace this results in the same graphics as @code{BRICKS_01}.
+
+  @item @code{NO_BRICKS}
+  @tab
+  @tab
+  @tab For the dungeon and palace this results in no graphics at all.
+
+  @item @code{TORCH}
+  @tab @center @image{mininim-figures/d-torch}
+  @tab @center @image{mininim-figures/p-torch}
+  @tab Better than in the original game, which draw the fire sprites as
+  they are, the fire sprites are mirrored horizontally depending on the
+  level coordinates the torch has.
+
+  @item @code{WINDOW}
+  @tab @center @image{mininim-figures/d-window}
+  @tab @center @image{mininim-figures/p-window}
+  @tab
+
+  @item @code{BALCONY}
+  @tab @center @image{mininim-figures/d-balcony}
+  @tab @center @image{mininim-figures/p-balcony}
+  @tab Better than in the original game, which has the same white stars
+  in the same place for every balcony, the background stars are randomly
+  positioned and animated.
+@end multitable
 
 
 
