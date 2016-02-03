@@ -323,6 +323,7 @@ acknowledge_resize (void)
 void
 draw_fade (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to, float factor)
 {
+  factor = factor < 0 ? 0 : factor;
   clear_bitmap (black_screen, al_map_rgba_f (0, 0, 0, factor));
   draw_bitmap (from, to, 0, 0, 0);
   draw_bitmap (black_screen, to, 0, 0, 0);
