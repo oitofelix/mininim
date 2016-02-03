@@ -300,16 +300,16 @@ static bool
 optval_to_bool (char *arg)
 {
   int i;
-  char *FALSE = "FALSE";
-  char *OFF = "OFF";
-  char *NO = "NO";
+  char *FALSE_VAL = "FALSE";
+  char *OFF_VAL = "OFF";
+  char *NO_VAL = "NO";
 
   if (! arg) return true;
 
   if (sscanf (arg, "%i", &i) == 1 && i == 0) return false;
-  if (strcasestr (FALSE, arg) == FALSE) return false;
-  if (strcasestr (OFF, arg) == OFF) return false;
-  if (strcasestr (NO, arg) == NO) return false;
+  if (strcasestr (FALSE_VAL, arg) == FALSE_VAL) return false;
+  if (strcasestr (OFF_VAL, arg) == OFF_VAL) return false;
+  if (strcasestr (NO_VAL, arg) == NO_VAL) return false;
 
   return true;
 }
