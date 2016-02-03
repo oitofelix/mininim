@@ -132,56 +132,232 @@ Indexes:
 @chapter Constructions
 @cindex constructions
 
-Each @dfn{level} is comprised of @dfn{rooms}@footnote{Some call these
-@dfn{screens}.}.  Each room is a comprised of three @dfn{floors}.  Each
-floor is comprised of 10 @dfn{places}.  Each place holds a
-@dfn{construction} (or @dfn{con} for short) @footnote{Some call these
-@dfn{tiles}.}.
+Each @dfn{level} is comprised of @dfn{rooms}@footnote{The terminology
+used for @dfn{rooms} in the original game is @dfn{screens}.}.  Each room
+is a comprised of three @dfn{floors}.  Each floor is comprised of 10
+@dfn{places}.  Each place holds a @dfn{construction} (or @dfn{con} for
+short) @footnote{The terminology used for @dfn{constructions} in the
+original game is @dfn{tiles}.}.
 
 @center @image{mininim-figures/level-layout}
 
-@section Foreground
+@section Foregrounds
+
+All traversable, collidable, rigid and trap constructions are marked as
+such.  Non-hangable conditions are noted as well.
 
 @subsection Floors
 
-@table @asis
-  @item This is no floor.
-  @item @image{mininim-figures/floor} This is a normal floor.
-  @item @image{mininim-figures/broken-floor} This is a broken floor.
-  @item @image{mininim-figures/closer-floor} This is a closer floor.
-  @item @image{mininim-figures/loose-floor} This is a loose floor.
-  @item @image{mininim-figures/opener-floor} This is an opener floor.
-  @item @image{mininim-figures/skeleton-floor} This is an skeleton floor.
-  @item @image{mininim-figures/spikes-floor} This is an spikes floor.
-@end table
+All depressible floors are marked as such.
+
+@multitable @columnfractions .25 .15 .15 .45
+  @headitem Code @tab Dungeon @tab Palace @tab Notes
+
+  @item @code{NO_FLOOR}
+  @tab
+  @tab
+  @tab For the dungeon and palace this results in no graphics at all.
+  This is an @emph{strictly traversable construction}.
+
+  @item @code{FLOOR}
+  @tab @center @image{mininim-figures/d-floor}
+  @tab @center @image{mininim-figures/p-floor}
+  @tab This is a normal floor.
+
+  @item @code{BROKEN_FLOOR}
+  @tab @center @image{mininim-figures/d-broken-floor}
+  @tab @center @image{mininim-figures/p-broken-floor}
+  @tab This behaves like @code{FLOOR}.  As soon as a falling
+  @code{LOOSE_FLOOR} encounters a rigid construction, it creates a
+  @code{BROKEN_FLOOR} over it.
+
+  @item @code{SKELETON_FLOOR}
+  @tab @center @image{mininim-figures/d-skeleton-floor}
+  @tab @center @image{mininim-figures/p-skeleton-floor}
+  @footnote{The original game has no palace version of the skeleton floor.}
+  @tab This behaves like @code{FLOOR}.
+
+  @item @code{LOOSE_FLOOR}
+  @tab @center @image{mininim-figures/d-loose-floor}
+  @tab @center @image{mininim-figures/p-loose-floor}
+  @tab This is rendered as @code{FLOOR}, but shakes as the kid hits the
+  ground.  If the kid is near enough it's released and falls.  This is a
+  @emph{traversable construction}. This is a @emph{depressible floor}.
+  This is a @emph{trap construction}.
+
+  @item @code{SPIKES_FLOOR}
+  @tab @center @image{mininim-figures/d-spikes-floor}
+  @tab @center @image{mininim-figures/p-spikes-floor}
+  @tab Spikes come out of it, killing the kid if he falls or step too
+  fast over it.  This is a @emph{trap construction}.
+
+  @item @code{OPENER_FLOOR}
+  @tab @center @image{mininim-figures/d-opener-floor}
+  @tab @center @image{mininim-figures/p-opener-floor}
+  @tab This opens one or more doors.  This is a @emph{depressible floor}.
+
+  @item @code{CLOSER_FLOOR}
+  @tab @center @image{mininim-figures/d-closer-floor}
+  @tab @center @image{mininim-figures/p-closer-floor}
+  @tab  This closes one or more doors. This is a @emph{depressible floor}.
+
+  @item @code{STUCK_FLOOR}
+  @tab @center @image{mininim-figures/d-stuck-floor}
+  @tab @center @image{mininim-figures/p-stuck-floor}
+  @tab This is rendered like a pressed @code{CLOSER_FLOOR}, but it can't
+  be unpressed.
+
+  @item @code{HIDDEN_FLOOR}
+  @tab
+  @tab
+  @tab This is rendered as @code{NO_FLOOR}, but as soon as the kid
+  presses it, it's replaced by @code{FLOOR}.  This is a
+  @emph{depressible floor}.
+@end multitable
+
+@iftex
+@page
+@end iftex
 
 @subsection Pillars
 
 @multitable @columnfractions .25 .15 .15 .45
   @headitem Code @tab Dungeon @tab Palace @tab Notes
 
+  @item @code{PILLAR}
+  @tab @center @image{mininim-figures/d-pillar}
+  @tab @center @image{mininim-figures/p-pillar}
+  @tab
+
   @item @code{BIG_PILLAR_TOP}
   @tab @center @image{mininim-figures/d-big-pillar-top}
-  @tab
-  @tab This is a big pillar top.
+  @tab @center @image{mininim-figures/p-big-pillar-top}
+  @tab This should be placed above a @code{BIG_PILLAR_BOTTOM}.  This is
+  an @emph{strictly traversable construction}.
 
   @item @code{BIG_PILLAR_BOTTOM}
   @tab @center @image{mininim-figures/d-big-pillar-bottom}
-  @tab
-  @tab This is a big pillar bottom.
+  @tab @center @image{mininim-figures/p-big-pillar-bottom}
+  @tab This should be place below a @code{BIG_PILLAR_TOP}.
 @end multitable
 
-@subsection Arch
+@subsection Wall
 
-In the original game there is no dungeon version of arches.
+@multitable @columnfractions .15 .2 .2 .45
+  @headitem Code @tab Dungeon @tab Palace @tab Notes
+
+  @item @code{WALL}
+  @tab @center @image{mininim-figures/d-wall}
+  @tab @center @image{mininim-figures/p-wall}
+  @tab This is a @emph{collidable}, @emph{rigid} and @emph{non-hangable}
+  construction.
+@end multitable
+
+@iftex
+@page
+@end iftex
+
+@subsection Doors
+
+@multitable @columnfractions .15 .2 .2 .45
+  @headitem Code @tab Dungeon @tab Palace @tab Notes
+
+  @item @code{DOOR}
+  @tab @center @image{mininim-figures/d-door}
+  @tab @center @image{mininim-figures/p-door}
+  @tab
+
+  @item @code{LEVEL_DOOR}
+  @tab @center @image{mininim-figures/d-level-door}
+  @tab @center @image{mininim-figures/p-level-door}
+  @tab
+@end multitable
+
+@subsection Chopper
+
+@multitable @columnfractions .15 .2 .2 .45
+  @headitem Code @tab Dungeon @tab Palace @tab Notes
+
+  @item @code{CHOPPER}
+  @tab @center @image{mininim-figures/d-chopper}
+  @tab @center @image{mininim-figures/p-chopper}
+  @tab
+
+@end multitable
+
+@subsection Mirror
+
+@multitable @columnfractions .15 .2 .2 .45
+  @headitem Code @tab Dungeon @tab Palace @tab Notes
+
+  @item @code{MIRROR}
+  @tab @center @image{mininim-figures/d-mirror}
+  @tab @center @image{mininim-figures/p-mirror}
+  @tab
+
+@end multitable
+
+@iftex
+@page
+@end iftex
+
+@subsection Carpets
+
+@multitable @columnfractions .15 .2 .2 .45
+  @headitem Code @tab Dungeon @tab Palace @tab Notes
+
+  @item @code{TCARPET}
+  @tab @center @image{mininim-figures/d-tcarpet-00}
+  @tab @center @image{mininim-figures/p-tcarpet-00}
+  @tab
+
+  @item @code{TCARPET}
+  @tab @center @image{mininim-figures/d-tcarpet-01}
+  @tab @center @image{mininim-figures/p-tcarpet-01}
+  @tab
+
+  @item @code{TCARPET}
+  @tab @center @image{mininim-figures/d-arch-top-right-end}
+  @tab @center @image{mininim-figures/p-arch-top-right-end}
+  @tab These graphics are drawn when this construction ends an arch.
+  This should be placed at right of an @code{ARCH_TOP_MID}.
+
+  @item @code{TCARPET}
+  @tab @center @image{mininim-figures/d-arch-top-left-end}
+  @tab @center @image{mininim-figures/p-arch-top-left-end}
+  @tab These graphics are drawn when this construction ends an arch.
+  This should be placed at left of an @code{ARCH_TOP_MID}.
+
+  @item @code{CARPET}
+  @tab @center @image{mininim-figures/d-carpet-00}
+  @tab @center @image{mininim-figures/p-carpet-00}
+  @tab
+
+  @item @code{CARPET}
+  @tab @center @image{mininim-figures/d-carpet-01}
+  @tab @center @image{mininim-figures/p-carpet-01}
+  @tab
+
+@c fix this!
+  @item @code{CARPET}
+  @tab @center @image{mininim-figures/d-arch-top-left-end}
+  @tab @center @image{mininim-figures/p-arch-top-left-end}
+  @tab These graphics are drawn when this construction ends an arch.
+  This should be placed at left of an @code{ARCH_TOP_MID}.
+
+@end multitable
+
+@subsection Arches
 
 @multitable @columnfractions .2 .15 .15 .5
-  @headitem Code @tab Dungeon @tab Palace @tab Notes
+  @headitem Code @tab Dungeon
+  @footnote{In the original game there is no dungeon version of arches.}
+ @tab Palace @tab Notes
 
   @item @code{ARCH_BOTTOM}
   @tab @center @image{mininim-figures/d-arch-bottom}
   @tab @center @image{mininim-figures/p-arch-bottom}
-  @tab This should be placed below an @w{@code{ARCH_TOP_MID}}.
+  @tab This should be placed below an @code{ARCH_TOP_MID}.
 
   @item @code{ARCH_TOP_MID}
   @tab @center @image{mininim-figures/d-arch-top-mid}
@@ -200,29 +376,21 @@ In the original game there is no dungeon version of arches.
   @tab @center @image{mininim-figures/p-arch-top-left}
   @tab This should be placed at left of an @code{ARCH_TOP_RIGHT}.
 
-  @item @code{ARCH_TOP_LEFT}
-  @tab @center @image{mininim-figures/d-arch-top-left-end}
-  @tab @center @image{mininim-figures/p-arch-top-left-end}
-  @tab These graphics are drawn when this construction ends an arch.
-  This should be placed at left of an @code{ARCH_TOP_MID}.
-
   @item @code{ARCH_TOP_RIGHT}
   @tab @center @image{mininim-figures/d-arch-top-right}
   @tab @center @image{mininim-figures/p-arch-top-right}
   @tab This should be place at right of an @code{ARCH_TOP_LEFT}.
-
-  @item @code{ARCH_TOP_RIGHT}
-  @tab @center @image{mininim-figures/d-arch-top-right-end}
-  @tab @center @image{mininim-figures/p-arch-top-right-end}
-  @tab These graphics are drawn when this construction ends an arch.
-  This should be placed at right of an @code{ARCH_TOP_MID}.
 @end multitable
 
-
-@section Background
+@section Backgrounds
 
 @multitable @columnfractions .12 .2 .2 .48
   @headitem Code @tab Dungeon @tab Palace @tab Notes
+
+  @item @code{NO_BRICKS}
+  @tab
+  @tab
+  @tab For the dungeon and palace this results in no graphics at all.
 
   @item @code{NO_BG}
   @tab
@@ -250,29 +418,23 @@ In the original game there is no dungeon version of arches.
   @tab @center @image{mininim-figures/p-bricks-01}
   @tab For the palace this results in the same graphics as @code{BRICKS_01}.
 
-  @item @code{NO_BRICKS}
-  @tab
-  @tab
-  @tab For the dungeon and palace this results in no graphics at all.
-
-  @item @code{TORCH}
+  @item @code{TORCH}@footnote{The fire sprites are mirrored
+  horizontally depending on the level coordinates the torch has.
+  This is not so in the original game.}
   @tab @center @image{mininim-figures/d-torch}
   @tab @center @image{mininim-figures/p-torch}
-  @tab Better than in the original game, which draw the fire sprites as
-  they are, the fire sprites are mirrored horizontally depending on the
-  level coordinates the torch has.
+  @tab
 
   @item @code{WINDOW}
   @tab @center @image{mininim-figures/d-window}
   @tab @center @image{mininim-figures/p-window}
   @tab
 
-  @item @code{BALCONY}
+  @item @code{BALCONY}@footnote{The background stars are randomly
+  positioned and animated.  In the original game, all balconies have
+  non-animated white stars in fixed positions.}
   @tab @center @image{mininim-figures/d-balcony}
   @tab @center @image{mininim-figures/p-balcony}
-  @tab Better than in the original game, which has the same white stars
-  in the same place for every balcony, the background stars are randomly
-  positioned and animated.
 @end multitable
 
 
