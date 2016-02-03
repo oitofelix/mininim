@@ -305,6 +305,7 @@ flip_display (ALLEGRO_BITMAP *bitmap)
   int h = al_get_display_height (display);
 
   al_set_target_backbuffer (display);
+  al_clear_to_color (BLACK);
   al_draw_scaled_bitmap (bitmap, 0, 0, ORIGINAL_WIDTH, ORIGINAL_HEIGHT,
                          0, 0, w, h, screen_flags);
   al_draw_scaled_bitmap (uscreen, 0, 0, ORIGINAL_WIDTH, ORIGINAL_HEIGHT,
