@@ -89,6 +89,7 @@ allegro_ver=5.0.10
 dumb_ver=0.9.3
 flac_ver=1.2.1
 freetype_ver=2.4.8
+vorbis_ver=1.3.2
 ogg_ver=1.2.1
 zlib_ver=1.2.5
 openal_ver=1.14
@@ -117,6 +118,8 @@ AS_CASE([$host],
    mingw_ldadd="-ldumb-${dumb_ver}-static-mt \
       -lFLAC-${flac_ver}-static-mt \
       -lfreetype-${freetype_ver}-static-mt \
+      -lvorbisfile-${vorbis_ver}-static-mt \
+      -lvorbis-${vorbis_ver}-static-mt \
       -logg-${ogg_ver}-static-mt \
       -lzlib-${zlib_ver}-static-mt \
       -lopenal-${openal_ver}-static-mt \
