@@ -86,6 +86,12 @@ gl_INIT
 
 mingw_dir=/c/mingw
 allegro_ver=5.0.10
+dumb_ver=0.9.3
+flac_ver=1.2.1
+freetype_ver=2.4.8
+ogg_ver=1.2.1
+zlib_ver=1.2.5
+openal_ver=1.14
 
 AM_CONDITIONAL([mingw_build], [expr "x$build_os" : "xmingw"])
 
@@ -108,12 +114,12 @@ AS_CASE([$host],
    ALLEGRO_PRIMITIVES_LIBS="-lallegro_primitives-${allegro_ver}-static-mt ${ALLEGRO_LIBS}"
    ALLEGRO_DIALOG_CFLAGS="${ALLEGRO_CFLAGS}"
    ALLEGRO_DIALOG_LIBS="-lallegro_dialog-${allegro_ver}-static-mt ${ALLEGRO_LIBS}"
-   mingw_ldadd="-ldumb-0.9.3-static-mt \
-      -lFLAC-1.2.1-static-mt \
-      -lfreetype-2.4.4-static-mt \
-      -logg-1.2.1-static-mt \
-      -lzlib-1.2.5-static-mt \
-      -lopenal-1.14-static-mt \
+   mingw_ldadd="-ldumb-${dumb_ver}-static-mt \
+      -lFLAC-${flac_ver}-static-mt \
+      -lfreetype-${freetype_ver}-static-mt \
+      -logg-${ogg_ver}-static-mt \
+      -lzlib-${zlib_ver}-static-mt \
+      -lopenal-${openal_ver}-static-mt \
       -lgdiplus \
       -luuid \
       -lkernel32 \
