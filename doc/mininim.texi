@@ -146,6 +146,8 @@ original game is @dfn{tiles}.}.
 All traversable, collidable, rigid and trap constructions are marked as
 such.  Non-hangable conditions are noted as well.
 
+Explain design field.
+
 @subsection Floors
 
 All depressible floors are marked as such.
@@ -317,16 +319,25 @@ All depressible floors are marked as such.
   @tab
 
   @item @code{TCARPET}
-  @tab @center @image{mininim-figures/d-arch-top-right-end}
-  @tab @center @image{mininim-figures/p-arch-top-right-end}
-  @tab These graphics are drawn when this construction ends an arch.
-  This should be placed at right of an @code{ARCH_TOP_MID}.
+  @tab @center @image{mininim-figures/d-arch-tcarpet-right-00}
+  @tab @center @image{mininim-figures/p-arch-tcarpet-right-00}
+  @tab These graphics are drawn for the design
+  @code{ARCH_CARPET_RIGHT_00}.  This is designed to end an arch.  This
+  should be placed at right of an @code{ARCH_TOP_MID}.
 
   @item @code{TCARPET}
-  @tab @center @image{mininim-figures/d-arch-top-left-end}
-  @tab @center @image{mininim-figures/p-arch-top-left-end}
-  @tab These graphics are drawn when this construction ends an arch.
-  This should be placed at left of an @code{ARCH_TOP_MID}.
+  @tab @center @image{mininim-figures/d-arch-tcarpet-right-01}
+  @tab @center @image{mininim-figures/p-arch-tcarpet-right-01}
+  @tab These graphics are drawn for the design
+  @code{ARCH_CARPET_RIGHT_01}.  This is designed to end an arch.  This
+  should be placed at right of an @code{ARCH_TOP_MID}.
+
+  @item @code{TCARPET}
+  @tab @center @image{mininim-figures/d-arch-tcarpet-left}
+  @tab @center @image{mininim-figures/p-arch-tcarpet-left}
+  @tab These graphics are drawn for the design @code{ARCH_CARPET_LEFT}.
+  This is designed to end an arch.  This should be placed two places to
+  the left of an @code{ARCH_TOP_MID}.
 
   @item @code{CARPET}
   @tab @center @image{mininim-figures/d-carpet-00}
@@ -338,10 +349,9 @@ All depressible floors are marked as such.
   @tab @center @image{mininim-figures/p-carpet-01}
   @tab
 
-@c fix this!
   @item @code{CARPET}
-  @tab @center @image{mininim-figures/d-arch-top-left-end}
-  @tab @center @image{mininim-figures/p-arch-top-left-end}
+  @tab @center @image{mininim-figures/d-arch-carpet-left}
+  @tab @center @image{mininim-figures/p-arch-carpet-left}
   @tab These graphics are drawn when this construction ends an arch.
   This should be placed at left of an @code{ARCH_TOP_MID}.
 

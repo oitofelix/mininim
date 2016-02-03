@@ -938,10 +938,10 @@ load_legacy_level (int number)
           case LM_TTOP_WITH_LATTICE: c->ext.design = ARCH_CARPET_LEFT; break;
           case LM_TTOP_ALTERNATIVE_DESIGN:
             c->ext.design = get_tile (&pl) == LT_LATTICE_SUPPORT ?
-              ARCH_CARPET_RIGHT_01 : CARPET_00; break;
+              ARCH_CARPET_RIGHT_00 : CARPET_00; break;
           case LM_TTOP_NORMAL:
             c->ext.design = get_tile (&pl) == LT_LATTICE_SUPPORT ?
-              ARCH_CARPET_RIGHT_02 : CARPET_01; break;
+              ARCH_CARPET_RIGHT_01 : CARPET_01; break;
             /* needless */
           case LM_TTOP_BLACK_01: break;
           case LM_TTOP_BLACK_02: break;

@@ -198,11 +198,11 @@ get_carpet_bitmaps (struct pos *p, enum em em, enum vm vm,
     *carpet = NULL;
     *carpet_top = NULL;
     break;
-  case ARCH_CARPET_RIGHT_01:
+  case ARCH_CARPET_RIGHT_00:
     *carpet = carpet_00;
     *carpet_top = carpet_top_00;
     break;
-  case ARCH_CARPET_RIGHT_02:
+  case ARCH_CARPET_RIGHT_01:
     *carpet = carpet_01;
     *carpet_top = carpet_top_01;
     break;

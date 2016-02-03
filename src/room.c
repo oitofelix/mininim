@@ -324,8 +324,8 @@ draw_confg_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
     draw_door_pole (bitmap, &pv, em, vm);
     break;
   case TCARPET:
-    if (con (p)->ext.design == ARCH_CARPET_RIGHT_01
-        || con (p)->ext.design == ARCH_CARPET_RIGHT_02)
+    if (con (p)->ext.design == ARCH_CARPET_RIGHT_00
+        || con (p)->ext.design == ARCH_CARPET_RIGHT_01)
       draw_arch_top_right_end (bitmap, p, em, vm);
     else {
       draw_door_pole (bitmap, &pv, em, vm);
