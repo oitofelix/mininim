@@ -47,7 +47,7 @@ AC_CONFIG_SRCDIR([src/mininim.c])
 # GNU Automake settings;
 AM_INIT_AUTOMAKE([-Wall -Wno-portability -Wno-override foreign subdir-objects])
 AM_SILENT_RULES([yes])
-AM_EXTRA_RECURSIVE_TARGETS([homepage install-man])
+dnl AM_EXTRA_RECURSIVE_TARGETS([homepage install-man])
 dnl AM_GNU_GETTEXT_VERSION([0.18.1])
 dnl AM_GNU_GETTEXT([external])
 
@@ -55,6 +55,8 @@ dnl AM_GNU_GETTEXT([external])
 AS_IF([[test -d "$srcdir"/.git]], [[VCS=y]], [[VCS=n]])
 AC_SUBST([VCS])
 
+# Compute the canonical build-system variables.
+AC_CANONICAL_BUILD
 
 
 
@@ -82,49 +84,94 @@ AC_PROG_CC
 gl_EARLY
 gl_INIT
 
+mingw_dir=/c/mingw
+allegro_ver=5.0.10
+
 # Check for Allegro library and its addons
-PKG_CHECK_MODULES([ALLEGRO],
-[allegro-5.0],,
- AC_MSG_ERROR(MININIM requires Allegro 5))
+AS_CASE([$host],
+
+# MinGW
+[*-*-mingw*],
+  [ALLEGRO_CFLAGS=-I${mingw_dir}/include
+   ALLEGRO_LIBS=-lallegro-${allegro_ver}-static-mt
+   ALLEGRO_IMAGE_CFLAGS=${ALLEGRO_CFLAGS}
+   ALLEGRO_IMAGE_LIBS=-lallegro_image-${allegro_ver}-static-mt ${ALLEGRO_LIBS}
+   ALLEGRO_AUDIO_CFLAGS=${ALLEGRO_CFLAGS}
+   ALLEGRO_AUDIO_LIBS=-lallegro_audio-${allegro_ver}-static-mt ${ALLEGRO_LIBS}
+   ALLEGRO_ACODEC_CFLAGS=${ALLEGRO_CFLAGS}
+   ALLEGRO_ACODEC_LIBS=-lallegro_acodec-${allegro_ver}-static-mt ${ALLEGRO_AUDIO_LIBS}
+   ALLEGRO_FONT_CFLAGS=${ALLEGRO_CFLAGS}
+   ALLEGRO_FONT_LIBS=-lallegro_font-${allegro_ver}-static-mt ${ALLEGRO_LIBS}
+   ALLEGRO_PRIMITIVES_CFLAGS=${ALLEGRO_CFLAGS}
+   ALLEGRO_PRIMITIVES_LIBS=-lallegro_primitives-${allegro_ver}-static-mt ${ALLEGRO_LIBS}
+   ALLEGRO_DIALOG_CFLAGS=${ALLEGRO_CFLAGS}
+   ALLEGRO_DIALOG_LIBS=-lallegro_dialog-${allegro_ver}-static-mt ${ALLEGRO_LIBS}
+   mingw_ldadd=-ldumb-0.9.3-static-mt \
+      -lFLAC-1.2.1-static-mt \
+      -lfreetype-2.4.4-static-mt \
+      -logg-1.2.1-static-mt \
+      -lzlib-1.2.5-static-mt \
+      -lopenal-1.14-static-mt \
+      -lgdiplus \
+      -luuid \
+      -lkernel32 \
+      -lwinmm \
+      -lpsapi \
+      -lopengl32 \
+      -lglu32 \
+      -luser32 \
+      -lcomdlg32 \
+      -lgdi32 \
+      -lshell32 \
+      -lole32 \
+      -ladvapi32 \
+      -lws2_32 \
+      -lshlwapi],
+
+# Default
+ [PKG_CHECK_MODULES([ALLEGRO],
+  [allegro-5.0],,
+   AC_MSG_ERROR(MININIM requires Allegro 5))
+
+  PKG_CHECK_MODULES([ALLEGRO_IMAGE],
+  [allegro_image-5.0],,
+   AC_MSG_ERROR(MININIM requires Allegro 5 image addon))
+
+  PKG_CHECK_MODULES([ALLEGRO_AUDIO],
+  [allegro_audio-5.0],,
+   AC_MSG_ERROR(MININIM requires Allegro 5 audio addon))
+
+  PKG_CHECK_MODULES([ALLEGRO_ACODEC],
+  [allegro_acodec-5.0],,
+   AC_MSG_ERROR(MININIM requires Allegro 5 audio codecs addon))
+
+  PKG_CHECK_MODULES([ALLEGRO_FONT],
+  [allegro_font-5.0],,
+   AC_MSG_ERROR(MININIM requires Allegro 5 font addon))
+
+  PKG_CHECK_MODULES([ALLEGRO_PRIMITIVES],
+  [allegro_primitives-5.0],,
+   AC_MSG_ERROR(MININIM requires Allegro 5 primitives addon))
+
+  PKG_CHECK_MODULES([ALLEGRO_DIALOG],
+  [allegro_dialog-5.0],,
+   AC_MSG_ERROR(MININIM requires Allegro 5 dialogs addon))])
+
 AC_SUBST([ALLEGRO_CFLAGS])
 AC_SUBST([ALLEGRO_LIBS])
-
-PKG_CHECK_MODULES([ALLEGRO_IMAGE],
-[allegro_image-5.0],,
- AC_MSG_ERROR(MININIM requires Allegro 5 image addon))
 AC_SUBST([ALLEGRO_IMAGE_CFLAGS])
 AC_SUBST([ALLEGRO_IMAGE_LIBS])
-
-PKG_CHECK_MODULES([ALLEGRO_AUDIO],
-[allegro_audio-5.0],,
- AC_MSG_ERROR(MININIM requires Allegro 5 audio addon))
 AC_SUBST([ALLEGRO_AUDIO_CFLAGS])
 AC_SUBST([ALLEGRO_AUDIO_LIBS])
-
-PKG_CHECK_MODULES([ALLEGRO_ACODEC],
-[allegro_acodec-5.0],,
- AC_MSG_ERROR(MININIM requires Allegro 5 audio codecs addon))
 AC_SUBST([ALLEGRO_ACODEC_CFLAGS])
 AC_SUBST([ALLEGRO_ACODEC_LIBS])
-
-PKG_CHECK_MODULES([ALLEGRO_FONT],
-[allegro_font-5.0],,
- AC_MSG_ERROR(MININIM requires Allegro 5 font addon))
 AC_SUBST([ALLEGRO_FONT_CFLAGS])
 AC_SUBST([ALLEGRO_FONT_LIBS])
-
-PKG_CHECK_MODULES([ALLEGRO_PRIMITIVES],
-[allegro_primitives-5.0],,
- AC_MSG_ERROR(MININIM requires Allegro 5 primitives addon))
 AC_SUBST([ALLEGRO_PRIMITIVES_CFLAGS])
 AC_SUBST([ALLEGRO_PRIMITIVES_LIBS])
-
-PKG_CHECK_MODULES([ALLEGRO_DIALOG],
-[allegro_dialog-5.0],,
- AC_MSG_ERROR(MININIM requires Allegro 5 dialogs addon))
 AC_SUBST([ALLEGRO_DIALOG_CFLAGS])
 AC_SUBST([ALLEGRO_DIALOG_LIBS])
-
+AC_SUBST([mingw_ldadd])
 
 ##########
 ### Check for programs needed to build documentation.
@@ -132,77 +179,88 @@ AC_SUBST([ALLEGRO_DIALOG_LIBS])
 
 AC_MSG_NOTICE([checking programs needed in order to build documentation])
 
-# Check for GNU Texinfo program `makeinfo'.
-
-### Define GNU Texinfo minimal version.
-m4_define([TEXINFO_MINVER], 5.1)
-
 ### Declare `MAKEINFO' as a precious variable.
 AC_ARG_VAR([MAKEINFO], [Texinfo `makeinfo' program])
 
 ### Check for `makeinfo'.
 AC_PATH_PROG([MAKEINFO], [makeinfo])
 
-# Check for GNU Texinfo existence.  If not building from a VCS
-# checkout, GNU Texinfo is not required.
-AS_IF([[test x$MAKEINFO = x && test x$VCS = xy]],
-  AC_MSG_ERROR(
-[[GNU Texinfo not found.  It is required at least version ]]TEXINFO_MINVER.
-[[You can find it at https://gnu.org/software/texinfo/.]]))
 
-# If GNU Texinfo was not found and you are not building from a VCS
-# checkout, warn the user about what the lack of that optional
-# dependence means.
-AS_IF([[test x$MAKEINFO = x]],
-  AC_MSG_WARN(
-[[GNU Texinfo not found.  It is required at least version ]]TEXINFO_MINVER.
-[[You can find it at https://gnu.org/software/texinfo/.]]
-[[It will not be possible to rebuild the Info documentation
-nor generate any other documentation format.]]))
+AS_CASE([$host],
 
-### If `makeinfo' was found, test whether its version is at least
-### TEXINFO_MINVER.
-AS_IF([[test x$MAKEINFO != x]],
-  # Put `makeinfo' version in variable `texinfo_version'.
-  [[texinfo_version=`$MAKEINFO --version |
-      $SED -n 's/^makeinfo.* \(@<:@@<:@:digit:@:>@.@:>@*\)$/\1/p'`]]
+# MinGW
+[*-*-mingw*],,
 
-  # If `makeinfo' version is less than TEXINFO_VER, print an error
-  # message and abort when building from VCS checkout or warn the user
-  # otherwise.
-  AS_VERSION_COMPARE([[$texinfo_version]], TEXINFO_MINVER,
-    [AS_IF([test x$VCS = xy ],
-      AC_MSG_ERROR(
-[[GNU Texinfo is too old.  It is required at least version ]]TEXINFO_MINVER.
-[[You can find it at https://gnu.org/software/texinfo/.]]),
-      AC_MSG_WARN(
-[[GNU Texinfo is too old.  It is required at least version ]]TEXINFO_MINVER.
-[[You can find it at https://gnu.org/software/texinfo/.]]
-[[It will not be possible to rebuild the Info documentation
-nor generate any other documentation format.]]))]))
+# Default
+  [
 
-AM_MISSING_PROG([MAKEINFO], [makeinfo])
+  # Check for GNU Texinfo program `makeinfo'.
+
+  ### Define GNU Texinfo minimal version.
+  m4_define([TEXINFO_MINVER], 5.1)
+
+  # Check for GNU Texinfo existence.  If not building from a VCS
+  # checkout, GNU Texinfo is not required.
+  AS_IF([[test x$MAKEINFO = x && test x$VCS = xy]],
+    AC_MSG_ERROR(
+  [[GNU Texinfo not found.  It is required at least version ]]TEXINFO_MINVER.
+  [[You can find it at https://gnu.org/software/texinfo/.]]))
+
+  # If GNU Texinfo was not found and you are not building from a VCS
+  # checkout, warn the user about what the lack of that optional
+  # dependence means.
+  AS_IF([[test x$MAKEINFO = x]],
+    AC_MSG_WARN(
+  [[GNU Texinfo not found.  It is required at least version ]]TEXINFO_MINVER.
+  [[You can find it at https://gnu.org/software/texinfo/.]]
+  [[It will not be possible to rebuild the Info documentation
+  nor generate any other documentation format.]]))
+
+  ### If `makeinfo' was found, test whether its version is at least
+  ### TEXINFO_MINVER.
+  AS_IF([[test x$MAKEINFO != x]],
+    # Put `makeinfo' version in variable `texinfo_version'.
+    [[texinfo_version=`$MAKEINFO --version |
+        $SED -n 's/^makeinfo.* \(@<:@@<:@:digit:@:>@.@:>@*\)$/\1/p'`]]
+
+    # If `makeinfo' version is less than TEXINFO_VER, print an error
+    # message and abort when building from VCS checkout or warn the user
+    # otherwise.
+    AS_VERSION_COMPARE([[$texinfo_version]], TEXINFO_MINVER,
+      [AS_IF([test x$VCS = xy ],
+        AC_MSG_ERROR(
+  [[GNU Texinfo is too old.  It is required at least version ]]TEXINFO_MINVER.
+  [[You can find it at https://gnu.org/software/texinfo/.]]),
+        AC_MSG_WARN(
+  [[GNU Texinfo is too old.  It is required at least version ]]TEXINFO_MINVER.
+  [[You can find it at https://gnu.org/software/texinfo/.]]
+  [[It will not be possible to rebuild the Info documentation
+  nor generate any other documentation format.]]))]))
+
+  AM_MISSING_PROG([MAKEINFO], [makeinfo])
 
 
-### Declare `HELP2MAN' as a precious variable.
-AC_ARG_VAR([HELP2MAN], ['help2man' program])
+  ### Declare `HELP2MAN' as a precious variable.
+  AC_ARG_VAR([HELP2MAN], ['help2man' program])
 
-### Check for `help2man'.
-AC_PATH_PROG([HELP2MAN], [help2man])
+  ### Check for `help2man'.
+  AC_PATH_PROG([HELP2MAN], [help2man])
 
-# Check for GNU help2man existence.  If not building from a VCS
-# checkout, it is not required.
-AS_IF([[test x$HELP2MAN = x && test x$VCS = xy]],
-  AC_MSG_ERROR(
-[[GNU help2man not found.  You can get it at https://gnu.org/software/help2man/.]]))
+  # Check for GNU help2man existence.  If not building from a VCS
+  # checkout, it is not required.
+  AS_IF([[test x$HELP2MAN = x && test x$VCS = xy]],
+    AC_MSG_ERROR(
+  [[GNU help2man not found.  You can get it at https://gnu.org/software/help2man/.]]))
 
-# Check for GNU help2man existence.  It should only be used if not
-# cross-compiling.
-AS_IF([[test $cross_compiling = no]],
-  [AM_MISSING_PROG([HELP2MAN], [help2man])], HELP2MAN=:)
+  # Check for GNU help2man existence.  It should only be used if not
+  # cross-compiling.
+  AS_IF([[test $cross_compiling = no]],
+    [AM_MISSING_PROG([HELP2MAN], [help2man])], HELP2MAN=:)
 
-# rsync is needed to fetch PO files from 'translationproject.org'.
-AM_MISSING_PROG([RSYNC], [rsync])
+  # rsync is needed to fetch PO files from 'translationproject.org'.
+  AM_MISSING_PROG([RSYNC], [rsync])
+
+])
 
 
 

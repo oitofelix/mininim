@@ -118,7 +118,7 @@ AM_CFLAGS = ${CFLAGS_DEV} ${ALLEGRO_CFLAGS} ${ALLEGRO_IMAGE_CFLAGS}	\
 AM_LDFLAGS = -lm ${ALLEGRO_LIBS} ${ALLEGRO_IMAGE_LIBS}							\
   ${ALLEGRO_AUDIO_LIBS} ${ALLEGRO_ACODEC_LIBS} ${ALLEGRO_FONT_LIBS}	\
   ${ALLEGRO_PRIMITIVES_LIBS} ${ALLEGRO_DIALOG_LIBS}
-LDADD = gnulib/libgnu.a
+LDADD = gnulib/libgnu.a ${mingw_ldadd}
 
 install-data-hook:
 	cp -rv ${top_srcdir}/data ${pkgdatadir}
