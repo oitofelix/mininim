@@ -61,7 +61,7 @@ static struct {
   uint8_t guard_color[LROOMS];
   uint8_t unknown_4d[16];
   uint8_t signature[2];
-} lv;
+} __attribute__((packed)) lv;
 
 static enum ltile get_tile (struct pos *p);
 static enum lgroup get_group (enum ltile t);

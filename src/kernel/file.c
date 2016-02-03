@@ -65,5 +65,5 @@ load_resource (char *filename, load_resource_f lrf)
 ALLEGRO_FILE *
 xfopen_r (char *filename)
 {
-  return al_fopen (filename, "r");
+  return al_fopen (filename, "rb");
 }

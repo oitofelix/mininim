@@ -26,6 +26,7 @@ README
 
 src/**/*.[ox]
 /mininim
+/mininim.exe
 **/.deps/
 *.gch
 
