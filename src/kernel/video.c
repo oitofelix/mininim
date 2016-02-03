@@ -273,13 +273,19 @@ load_bitmap (char *filename)
     error (-1, 0, "%s: cannot load bitmap file '%s'",
            __func__, filename);
 
-  /* work around a bug (MinGW target), where bitmaps are loaded as
-     black/transparent images */
-  al_lock_bitmap(bitmap, al_get_bitmap_format(bitmap),
-                 ALLEGRO_LOCK_READWRITE);
-  al_unlock_bitmap(bitmap);
+  validate_bitmap_for_mingw (bitmap);
 
   return bitmap;
+}
+
+void
+validate_bitmap_for_mingw (ALLEGRO_BITMAP *bitmap)
+{
+  /* work around a bug (MinGW target), where bitmaps are loaded as
+     black/transparent images */
+  al_lock_bitmap(bitmap, ALLEGRO_PIXEL_FORMAT_ANY,
+		 ALLEGRO_LOCK_READWRITE);
+  al_unlock_bitmap(bitmap);
 }
 
 ALLEGRO_COLOR

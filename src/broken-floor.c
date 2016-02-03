@@ -296,5 +296,7 @@ create_broken_floor_bitmap (enum em em, enum vm vm)
   draw_bitmap (broken_floor_left, bitmap, 0, 1, 0);
   draw_bitmap (broken_floor_right, bitmap, 32, 0, 0);
 
+  validate_bitmap_for_mingw (bitmap);
+
   return bitmap;
 }

@@ -243,6 +243,8 @@ create_loose_floor_01_bitmap (enum em em, enum vm vm)
   draw_bitmap (loose_floor_left_01, bitmap, 0, 1, 0);
   draw_bitmap (loose_floor_right_01, bitmap, 32, 0, 0);
 
+  validate_bitmap_for_mingw (bitmap);
+
   return bitmap;
 }
 

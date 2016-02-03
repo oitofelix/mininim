@@ -136,6 +136,7 @@ create_background_pattern_bitmap (ALLEGRO_COLOR c)
   ALLEGRO_BITMAP *b = create_bitmap (ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
   clear_bitmap (b, TRANSPARENT_COLOR);
   draw_pattern (b, 17, 16, 286, 157, c, BLACK);
+  validate_bitmap_for_mingw (b);
   return b;
 }
 
