@@ -28,7 +28,7 @@ void save_config_file (const char *filename,
 void save_config_file_f (ALLEGRO_FILE *file,
                          const ALLEGRO_CONFIG *config);
 ALLEGRO_CONFIG *
-al_merge_config (const ALLEGRO_CONFIG *cfg1,
-                 const ALLEGRO_CONFIG *cfg2);
+merge_config (const ALLEGRO_CONFIG *cfg1,
+              const ALLEGRO_CONFIG *cfg2);
 
 #endif	/* MININIM_XCONFIG_H */

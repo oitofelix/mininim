@@ -115,10 +115,10 @@ AM_CFLAGS = ${CFLAGS_DEV} ${ALLEGRO_CFLAGS} ${ALLEGRO_IMAGE_CFLAGS}	\
 	${ALLEGRO_AUDIO_CFLAGS} ${ALLEGRO_ACODEC_CFLAGS}									\
 	${ALLEGRO_FONT_CFLAGS} ${ALLEGRO_PRIMITIVES_CFLAGS}								\
 	${ALLEGRO_DIALOG_CFLAGS}
-AM_LDFLAGS = -lm ${ALLEGRO_LIBS} ${ALLEGRO_IMAGE_LIBS}							\
+LIBS = -lm ${ALLEGRO_LIBS} ${ALLEGRO_IMAGE_LIBS}										\
   ${ALLEGRO_AUDIO_LIBS} ${ALLEGRO_ACODEC_LIBS} ${ALLEGRO_FONT_LIBS}	\
-  ${ALLEGRO_PRIMITIVES_LIBS} ${ALLEGRO_DIALOG_LIBS}
-LDADD = gnulib/libgnu.a ${mingw_ldadd}
+  ${ALLEGRO_PRIMITIVES_LIBS} ${ALLEGRO_DIALOG_LIBS} ${mingw_ldadd}
+LDADD = gnulib/libgnu.a
 
 install-data-hook:
 	cp -rv ${top_srcdir}/data ${pkgdatadir}
@@ -130,10 +130,9 @@ install-data-hook:
 #######################
 
 ACLOCAL_AMFLAGS = -I gnulib/m4
-if mingw_build
 SUBDIRS = gnulib
-else
-SUBDIRS = doc gnulib
+if mingw_build
+SUBDIRS += doc
 endif
 EXTRA_DIST = ${top_level_doc} ChangeLog data
 

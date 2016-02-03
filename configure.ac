@@ -134,7 +134,8 @@ AS_CASE([$host],
       -lole32 \
       -ladvapi32 \
       -lws2_32 \
-      -lshlwapi"],
+      -lshlwapi \
+      -lstdc++"],
 
 # Default
  [PKG_CHECK_MODULES([ALLEGRO],
