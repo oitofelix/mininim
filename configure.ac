@@ -87,26 +87,28 @@ gl_INIT
 mingw_dir=/c/mingw
 allegro_ver=5.0.10
 
+AM_CONDITIONAL([mingw_build], [expr "x$build_os" : "xmingw"])
+
 # Check for Allegro library and its addons
 AS_CASE([$host],
 
 # MinGW
 [*-*-mingw*],
-  [ALLEGRO_CFLAGS=-I${mingw_dir}/include
-   ALLEGRO_LIBS=-lallegro-${allegro_ver}-static-mt
-   ALLEGRO_IMAGE_CFLAGS=${ALLEGRO_CFLAGS}
-   ALLEGRO_IMAGE_LIBS=-lallegro_image-${allegro_ver}-static-mt ${ALLEGRO_LIBS}
-   ALLEGRO_AUDIO_CFLAGS=${ALLEGRO_CFLAGS}
-   ALLEGRO_AUDIO_LIBS=-lallegro_audio-${allegro_ver}-static-mt ${ALLEGRO_LIBS}
-   ALLEGRO_ACODEC_CFLAGS=${ALLEGRO_CFLAGS}
-   ALLEGRO_ACODEC_LIBS=-lallegro_acodec-${allegro_ver}-static-mt ${ALLEGRO_AUDIO_LIBS}
-   ALLEGRO_FONT_CFLAGS=${ALLEGRO_CFLAGS}
-   ALLEGRO_FONT_LIBS=-lallegro_font-${allegro_ver}-static-mt ${ALLEGRO_LIBS}
-   ALLEGRO_PRIMITIVES_CFLAGS=${ALLEGRO_CFLAGS}
-   ALLEGRO_PRIMITIVES_LIBS=-lallegro_primitives-${allegro_ver}-static-mt ${ALLEGRO_LIBS}
-   ALLEGRO_DIALOG_CFLAGS=${ALLEGRO_CFLAGS}
-   ALLEGRO_DIALOG_LIBS=-lallegro_dialog-${allegro_ver}-static-mt ${ALLEGRO_LIBS}
-   mingw_ldadd=-ldumb-0.9.3-static-mt \
+  [ALLEGRO_CFLAGS="-I${mingw_dir}/include"
+   ALLEGRO_LIBS="-lallegro-${allegro_ver}-static-mt"
+   ALLEGRO_IMAGE_CFLAGS="${ALLEGRO_CFLAGS}"
+   ALLEGRO_IMAGE_LIBS="-lallegro_image-${allegro_ver}-static-mt ${ALLEGRO_LIBS}"
+   ALLEGRO_AUDIO_CFLAGS="${ALLEGRO_CFLAGS}"
+   ALLEGRO_AUDIO_LIBS="-lallegro_audio-${allegro_ver}-static-mt ${ALLEGRO_LIBS}"
+   ALLEGRO_ACODEC_CFLAGS="${ALLEGRO_CFLAGS}"
+   ALLEGRO_ACODEC_LIBS="-lallegro_acodec-${allegro_ver}-static-mt ${ALLEGRO_AUDIO_LIBS}"
+   ALLEGRO_FONT_CFLAGS="${ALLEGRO_CFLAGS}"
+   ALLEGRO_FONT_LIBS="-lallegro_font-${allegro_ver}-static-mt ${ALLEGRO_LIBS}"
+   ALLEGRO_PRIMITIVES_CFLAGS="${ALLEGRO_CFLAGS}"
+   ALLEGRO_PRIMITIVES_LIBS="-lallegro_primitives-${allegro_ver}-static-mt ${ALLEGRO_LIBS}"
+   ALLEGRO_DIALOG_CFLAGS="${ALLEGRO_CFLAGS}"
+   ALLEGRO_DIALOG_LIBS="-lallegro_dialog-${allegro_ver}-static-mt ${ALLEGRO_LIBS}"
+   mingw_ldadd="-ldumb-0.9.3-static-mt \
       -lFLAC-1.2.1-static-mt \
       -lfreetype-2.4.4-static-mt \
       -logg-1.2.1-static-mt \
@@ -126,7 +128,7 @@ AS_CASE([$host],
       -lole32 \
       -ladvapi32 \
       -lws2_32 \
-      -lshlwapi],
+      -lshlwapi"],
 
 # Default
  [PKG_CHECK_MODULES([ALLEGRO],

@@ -130,7 +130,11 @@ install-data-hook:
 #######################
 
 ACLOCAL_AMFLAGS = -I gnulib/m4
+if mingw_build
+SUBDIRS = gnulib
+else
 SUBDIRS = doc gnulib
+endif
 EXTRA_DIST = ${top_level_doc} ChangeLog data
 
 
