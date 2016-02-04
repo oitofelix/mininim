@@ -116,14 +116,14 @@ AM_CFLAGS = ${ALLEGRO_CFLAGS} ${ALLEGRO_IMAGE_CFLAGS}	\
 	${ALLEGRO_DIALOG_CFLAGS}
 
 if DEBUG
-  AM_CFLAGS += -O0 -Wall -ggdb3 -Werror -Wno-error=unused-function	\
+  CFLAGS += -O0 -Wall -ggdb3 -Werror -Wno-error=unused-function	\
   -Wno-error=unused-variable -Wno-error=unused-but-set-variable
 else
-  AM_CFLAGS += -O3
+  CFLAGS += -O3 -g0
 endif
 
 if OPTIMIZATIONS
- AM_CFLAGS += -march=native
+ CFLAGS += -O3 -march=native
 endif
 
 LIBS = -lm ${ALLEGRO_LIBS} ${ALLEGRO_IMAGE_LIBS}										\

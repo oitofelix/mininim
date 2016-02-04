@@ -53,6 +53,10 @@ void
 show_native_file_dialog (ALLEGRO_DISPLAY *display,
                          ALLEGRO_FILECHOOSER *dialog)
 {
+  /* It seems that on MinGW al_show_native_file_dialog returns false
+     when the dialog is cancelled, thus you may want to call
+     al_show_native_file_dialog directly. */
+
   if (! al_show_native_file_dialog (display, dialog))
     error (-1, 0, "%s (%p, %p): failed to show native file dialog",
            __func__, display, dialog);

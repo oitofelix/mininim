@@ -52,6 +52,9 @@ init_video (void)
   display = al_create_display (display_width, display_height);
   if (! display) error (-1, 0, "%s (void): failed to initialize display", __func__);
 
+  al_set_target_backbuffer (display);
+  al_set_new_bitmap_flags (ALLEGRO_VIDEO_BITMAP);
+
   al_set_window_title (display, WINDOW_TITLE);
   icon = load_bitmap (ICON);
   al_set_display_icon (display, icon);
@@ -108,8 +111,10 @@ get_display_event_source (ALLEGRO_DISPLAY *display)
 ALLEGRO_BITMAP *
 create_bitmap (int w, int h)
 {
+  al_set_target_backbuffer (display);
   ALLEGRO_BITMAP *bitmap = al_create_bitmap (w, h);
   if (! bitmap) error (-1, 0, "%s (%i, %i): cannot create bitmap", __func__, w, h);
+  validate_bitmap_for_mingw (bitmap);
   return bitmap;
 }
 
@@ -266,6 +271,8 @@ draw_bottom_text (ALLEGRO_BITMAP *bitmap, char *text)
 ALLEGRO_BITMAP *
 load_bitmap (char *filename)
 {
+  al_set_target_backbuffer (display);
+
   ALLEGRO_BITMAP *bitmap =
     load_resource (filename, (load_resource_f) al_load_bitmap);
 

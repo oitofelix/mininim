@@ -917,7 +917,7 @@ load_config_dialog (ALLEGRO_THREAD *thread, void *arg)
   ALLEGRO_FILECHOOSER *dialog =
     create_native_file_dialog (user_home_dir, "Load configuration file",
                                "*.*", ALLEGRO_FILECHOOSER_FILE_MUST_EXIST);
-  show_native_file_dialog (display, dialog);
+  al_show_native_file_dialog (display, dialog);
 
   char *filename = NULL;
   if (al_get_native_file_dialog_count (dialog)) {
@@ -936,7 +936,7 @@ save_game_dialog (ALLEGRO_THREAD *thread, void *arg)
   ALLEGRO_FILECHOOSER *dialog =
     create_native_file_dialog (user_home_dir, "Save game",
                                "*.*", ALLEGRO_FILECHOOSER_SAVE);
-  show_native_file_dialog (display, dialog);
+  al_show_native_file_dialog (display, dialog);
 
   char *filename = NULL;
   if (al_get_native_file_dialog_count (dialog)) {
