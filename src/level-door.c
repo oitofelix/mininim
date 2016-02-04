@@ -165,6 +165,7 @@ register_level_door (struct pos *p)
   d.i = con (p)->ext.step;
   d.action = NO_LEVEL_DOOR_ACTION;
   d.no_stairs = peq (p, &level.start_pos);
+  d.broken = false;
 
   level_door =
     add_to_array (&d, 1, level_door, &level_door_nmemb, level_door_nmemb, sizeof (d));
@@ -185,6 +186,14 @@ level_door_at_pos (struct pos *p)
   d.p = *p;
 
   return bsearch (&d, level_door, level_door_nmemb, sizeof (d), compare_level_doors);
+}
+
+void
+break_level_door (struct pos *p)
+{
+  struct level_door *d = level_door_at_pos (p);
+  if (! d) return;
+  d->broken = true;
 }
 
 void
@@ -428,6 +437,26 @@ draw_level_door_front (ALLEGRO_BITMAP *bitmap, struct pos *p, int i,
                        level_door_front_coord_base (p, &c), 0);
   for (j = 0; j <= q; j++)
     draw_bitmapc (level_door_front, bitmap, level_door_front_coord (p, &c, j, i), 0);
+}
+
+void
+draw_level_door_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                      enum em em, enum vm vm)
+{
+  struct level_door *d = level_door_at_pos (p);
+  if (! d) return;
+  if (d->broken) draw_broken_floor_left (bitmap, p, em, vm);
+  else draw_floor_left (bitmap, p, em, vm);
+}
+
+void
+draw_level_door_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                      enum em em, enum vm vm)
+{
+  struct level_door *d = level_door_at_pos (p);
+  if (! d) return;
+  if (d->broken) draw_broken_floor_right (bitmap, p, em, vm);
+  else draw_floor_right (bitmap, p, em, vm);
 }
 
 struct coord *

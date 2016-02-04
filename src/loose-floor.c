@@ -545,13 +545,14 @@ compute_loose_floor_fall (struct loose_floor *l)
     case OPENER_FLOOR: break_opener_floor (&fpmbo_f); break;
     case CLOSER_FLOOR: break_closer_floor (&fpmbo_f); break;
     case SPIKES_FLOOR: break_spikes_floor (&fpmbo_f); break;
+    case LEVEL_DOOR: break_level_door (&fpmbo_f); break;
     default: break;
     }
   }
 
   /* reach here only if the floor hit a rigid structure or the
      ground */
-  con (&p)->fg = BROKEN_FLOOR;
+  if (con (&p)->fg != LEVEL_DOOR) con (&p)->fg = BROKEN_FLOOR;
   shake_loose_floor_row (&p);
   l->p.room = -1;
   must_remove = true;

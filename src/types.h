@@ -341,6 +341,7 @@ struct door {
 struct level_door {
   struct pos p;
   int i;
+  bool broken;
   enum {
     NO_LEVEL_DOOR_ACTION, OPEN_LEVEL_DOOR, CLOSE_LEVEL_DOOR,
   } action;
