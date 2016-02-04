@@ -355,7 +355,6 @@ All depressible floors are marked as such.
   @tab These graphics are drawn for the design @code{ARCH_CARPET_LEFT}.
   This is designed to end an arch.  This should be placed two places to
   the left of an @code{ARCH_TOP_MID}.
-
 @end multitable
 
 @subsection Arches
@@ -446,6 +445,71 @@ All depressible floors are marked as such.
   non-animated white stars in fixed positions.}
   @tab @center @image{mininim-figures/d-balcony}
   @tab @center @image{mininim-figures/p-balcony}
+@end multitable
+
+
+@section Items
+
+@multitable @columnfractions .3 .15 .55
+  @headitem Code @tab Graphics @tab Notes
+
+  @item @code{NO_ITEM}
+  @tab
+  @tab For the dungeon and palace this results in no graphics at all.
+
+  @item @code{EMPTY_POTION}
+  @tab @center @image{mininim-figures/empty-potion}
+  @tab This potion has no bubbles and no effect.
+
+  @item @code{SMALL_LIFE_POTION}
+  @tab @center @image{mininim-figures/small-life-potion}
+  @tab This potion has red bubbles and recovers one life point.
+
+  @item @code{BIG_LIFE_POTION}
+  @tab @center @image{mininim-figures/big-life-potion}
+  @tab This potion has red bubbles, adds one life point container and
+  recover all life points.
+
+  @item @code{SMALL_POISON_POTION}
+  @tab @center @image{mininim-figures/small-poison-potion}
+  @tab This potion has blue bubbles and takes one life point.  It has
+  the same graphics as @code{ACTIVATION_POTION}.
+
+  @item @code{BIG_POISON_POTION}
+  @tab @center @image{mininim-figures/big-poison-potion}
+  @tab This potion has blue bubbles and takes all life point,
+  effectively killing the kid.
+
+  @item @code{FLOAT_POTION}
+  @tab @center @image{mininim-figures/float-potion}
+  @tab This potion has green bubbles and allows the kid to levitate,
+  effectively making long falls harmless.
+
+  @item @code{FLIP_POTION}
+  @tab @center @image{mininim-figures/flip-potion}
+  @tab This potion has yellow bubbles and flips the screen horizontally,
+  vertically or both, depending on its level coordinates@footnote{In the
+  original game, flip potions only invert the screen vertically and
+  are drawn as @code{FLOAT_POTION}, that is, with green bubbles.}.
+  Drinking another one undo this effect.
+
+  @item @code{ACTIVATION_POTION}
+  @tab @center @image{mininim-figures/activation-potion}
+  @tab This potion has the same graphics as @code{SMALL_POISON_POTION}
+  and is used to activate a construction.@footnote{In the original game
+  the @emph{activation potion} is designed to be used in the potion
+  level, a copy protection mechanism employed to stop people from
+  sharing.  @strong{MININIM is free software}, and we repudiate this
+  kind of measure.  Thus here @emph{activation potions} may be used to
+  handicap the kid, but certainly won't be used to do so to you nor your
+  friends.}
+
+  @item @code{SWORD}@footnote{The sword graphics is mirrored
+  horizontally depending on its level coordinates.  This is not so in
+  the original game.}
+  @tab @center @image{mininim-figures/sword}
+  @tab This allows the kid to enter fight mode.  The sword
+  blinks from time to time.
 @end multitable
 
 
