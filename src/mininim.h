@@ -32,6 +32,7 @@
 #include <time.h>
 #include "error.h"
 #include "argp.h"
+#include "progname.h"
 
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_image.h>

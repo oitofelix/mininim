@@ -731,6 +731,8 @@ main (int _argc, char **_argv)
   argc = _argc;
   argv = _argv;
 
+  set_program_name (argv[0]);
+
   /* initialize Allegro */
   al_init ();
 

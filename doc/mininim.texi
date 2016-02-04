@@ -352,8 +352,9 @@ All depressible floors are marked as such.
   @item @code{CARPET}
   @tab @center @image{mininim-figures/d-arch-carpet-left}
   @tab @center @image{mininim-figures/p-arch-carpet-left}
-  @tab These graphics are drawn when this construction ends an arch.
-  This should be placed at left of an @code{ARCH_TOP_MID}.
+  @tab These graphics are drawn for the design @code{ARCH_CARPET_LEFT}.
+  This is designed to end an arch.  This should be placed two places to
+  the left of an @code{ARCH_TOP_MID}.
 
 @end multitable
 
