@@ -68,6 +68,8 @@ flow (struct anim *k)
 
   k->keep_sword_fast = k->enemy_id != -1;
 
+  if (k->oaction != kid_sword_normal) k->i = -1;
+
   if (k->oaction == kid_sword_normal
       && k->current_lives <= 0) {
     survey (_mt, pos, &k->f, &nc, &pmt, &np);
@@ -111,6 +113,8 @@ flow (struct anim *k)
   if (k->f.b == kid_take_sword_frameset[3].frame) k->fo.dx = -4;
   if (k->f.b == kid_sword_walkf_frameset[1].frame) k->fo.dx = +5;
   if (k->f.b == kid_sword_walkb_frameset[1].frame) k->fo.dx = +2;
+
+  k->i++;
 
   return true;
 }

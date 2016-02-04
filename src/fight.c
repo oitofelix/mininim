@@ -191,15 +191,17 @@ fight_ai (struct anim *k)
     return;
   }
 
-  /* in fight range, go towards attack range (with probability, unless
-     the enemy is not in fight mode, then go immediately) */
+  /* in fight range, if the enemy is not attacking, go towards attack
+     range (with probability, unless the enemy is not in fight mode,
+     then go immediately) */
   if (is_in_range (k, ke, FIGHT_RANGE)
       && ! is_in_range (k, ke, ATTACK_RANGE)
       && is_safe_to_follow (k, ke, k->f.dir)
       /* && is_safe_to_walkf (k) */
       && (prandom (99) <= k->skill.advance_prob
           || ! is_in_fight_mode (ke))
-      && ! is_attacking (ke)) {
+      && ! is_attacking (ke)
+      && ke->i >= 6 + prandom (24)) {
     fight_walkf (k);
     return;
   }
