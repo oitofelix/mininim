@@ -58,6 +58,25 @@ AC_SUBST([VCS])
 # Compute the canonical build-system variables.
 AC_CANONICAL_BUILD
 
+# Debug option
+AC_ARG_ENABLE([debug],
+[AS_HELP_STRING([--enable-debug], [Turn on debugging])],
+[case "${enableval}" in
+yes) debug=true ;;
+no)  debug=false ;;
+*) AC_MSG_ERROR([bad value ${enableval} for --enable-debug]) ;;
+esac],[debug=false])
+AM_CONDITIONAL([DEBUG], [test x$debug = xtrue])
+
+# Optimizations option
+AC_ARG_ENABLE([optimizations],
+[AS_HELP_STRING([--enable-optimizations],[Turn on optimizations])],
+[case "${enableval}" in
+yes) optimizations=true ;;
+no)  optimizations=false ;;
+*) AC_MSG_ERROR([bad value ${enableval} for --enable-optimizations]) ;;
+esac],[optimizations=false])
+AM_CONDITIONAL([OPTIMIZATIONS], [test x$optimizations = xtrue])
 
 
 

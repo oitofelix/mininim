@@ -109,12 +109,23 @@ AM_CPPFLAGS = -DLOCALEDIR=\"$(localedir)\"												\
 -I$(top_srcdir)/gnulib -I${builddir}/src -I${srcdir}/src					\
 -I${srcdir}/src/kernel -I${srcdir}/src/guard -I${srcdir}/src/kid	\
 -I${srcdir}/src/levels -I${srcdir}/src/wall
-CFLAGS_DEV = -Wall -ggdb3 -Werror -Wno-error=unused-function	\
-  -Wno-error=unused-variable -Wno-error=unused-but-set-variable
-AM_CFLAGS = ${CFLAGS_DEV} ${ALLEGRO_CFLAGS} ${ALLEGRO_IMAGE_CFLAGS}	\
-	${ALLEGRO_AUDIO_CFLAGS} ${ALLEGRO_ACODEC_CFLAGS}									\
-	${ALLEGRO_FONT_CFLAGS} ${ALLEGRO_PRIMITIVES_CFLAGS}								\
+
+AM_CFLAGS = ${ALLEGRO_CFLAGS} ${ALLEGRO_IMAGE_CFLAGS}	\
+	${ALLEGRO_AUDIO_CFLAGS} ${ALLEGRO_ACODEC_CFLAGS}		\
+	${ALLEGRO_FONT_CFLAGS} ${ALLEGRO_PRIMITIVES_CFLAGS}	\
 	${ALLEGRO_DIALOG_CFLAGS}
+
+if DEBUG
+  AM_CFLAGS += -O0 -Wall -ggdb3 -Werror -Wno-error=unused-function	\
+  -Wno-error=unused-variable -Wno-error=unused-but-set-variable
+else
+  AM_CFLAGS += -O3
+endif
+
+if OPTIMIZATIONS
+ AM_CFLAGS += -march=native
+endif
+
 LIBS = -lm ${ALLEGRO_LIBS} ${ALLEGRO_IMAGE_LIBS}										\
   ${ALLEGRO_AUDIO_LIBS} ${ALLEGRO_ACODEC_LIBS} ${ALLEGRO_FONT_LIBS}	\
   ${ALLEGRO_PRIMITIVES_LIBS} ${ALLEGRO_DIALOG_LIBS} ${mingw_ldadd}
