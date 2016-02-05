@@ -134,14 +134,58 @@ Indexes:
 
 Each @dfn{level} is comprised of @dfn{rooms}@footnote{The terminology
 used for @dfn{rooms} in the original game is @dfn{screens}.}.  Each room
-is a comprised of three @dfn{floors}.  Each floor is comprised of 10
+is comprised of three @dfn{floors}.  Each floor is comprised of 10
 @dfn{places}.  Each place holds a @dfn{construction} (or @dfn{con} for
 short) @footnote{The terminology used for @dfn{constructions} in the
-original game is @dfn{tiles}.}.
+original game is @dfn{tiles}.}.  The following figure illustrates this
+arrangement.
 
 @center @image{mininim-figures/level-layout}
 
+Therefore, any given construction is uniquely identified within a level
+by its coordinates, which are defined as the triplet @emph{room},
+@emph{floor} and @emph{place}.
+
+Constructions are comprised of three elements: foreground, background
+and extension.  A @dfn{construction foreground} is the physical part the
+kid interacts with.  It determines collision, hang and fall conditions,
+for instance.  On the other hand, a @dfn{construction background} is the
+part that yet visible, doesn't affect the kid in any way --- its sole
+purpose is ornamental; torches and windows are examples of this.  A
+@dfn{construction extension} is a modifier which determines in some way
+how the con looks or behaves.  For example, an item over a floor and
+door opening level are expressed by them.
+
 @section Foregrounds
+
+Construction foregrounds have physical properties that determine how the
+kid is affected by the interaction with them.
+
+@table @dfn
+@item Strictly traversable
+This property means that the construction can't support the kid
+vertically, thus he falls immediately when trying to rest on it.
+@item Traversable
+This property means that the construction can't @emph{indefinitely}
+support the kid vertically, thus he @emph{eventually} falls when trying
+to rest on it.  Notice that @emph{strictly traversable} is a particular
+case of this.
+@item Collidable
+This property means that the construction prevents the kid from passing
+through it horizontally, thus he collides, often recoiling from the
+impact, when trying to do so.
+@item Rigid
+This property means that the construction can't be smashed by another
+falling one, thus the falling construction stops at the rigid con's top.
+@item Hangable
+This property means that the kid can hang on the construction.
+@item Depressible
+This property means that the construction is sensible to pressure on its
+top, thus it triggers some reaction when the kid is exerting such
+pressure.
+@item Trap
+This property means that the construction might harm the kid.
+@end table
 
 All traversable, collidable, rigid and trap constructions are marked as
 such.  Non-hangable conditions are noted as well.
@@ -150,8 +194,6 @@ Explain design field.
 
 @subsection Floors
 
-All depressible floors are marked as such.
-
 @multitable @columnfractions .25 .15 .15 .45
   @headitem Code @tab Dungeon @tab Palace @tab Notes
 
@@ -159,12 +201,12 @@ All depressible floors are marked as such.
   @tab
   @tab
   @tab For the dungeon and palace this results in no graphics at all.
-  This is an @emph{strictly traversable construction}.
+  This is an @emph{strictly traversable} construction.
 
   @item @code{FLOOR}
   @tab @center @image{mininim-figures/d-floor}
   @tab @center @image{mininim-figures/p-floor}
-  @tab This is a normal floor.
+  @tab This is a normal floor.  This is a @emph{hangable} construction.
 
   @item @code{BROKEN_FLOOR}
   @tab @center @image{mininim-figures/d-broken-floor}
