@@ -196,6 +196,9 @@ traversable} is a particular case of this.
 This property means that the construction prevents the kid from passing
 through it horizontally, thus he collides (often recoiling from the
 impact) when trying to do so.
+@item Semi-collidable
+This property means that the construction is @emph{collidable} only
+under certain circumstances.
 @item Hangable
 This property means that the kid can hang on the construction, in case
 there is an @emph{strictly traversable} one on its side.
@@ -218,13 +221,14 @@ conditions of the construction and/or the kid.
 
 @subsection Floors
 
-Floors make the ground above constructions the kid stands on.  All of
-them are @emph{hangable}, except for @code{NO_FLOOR}.
+@dfn{Floors} make the ground above constructions the kid stands on.  All
+of them are @emph{hangable}, except for @code{NO_FLOOR}.
 
 @multitable @columnfractions .19 .15 .15 .51
   @headitem Code @tab Dungeon @tab Palace @tab Notes
 
-  @item @code{NO_FLOOR}
+  @item @code{NO_FLOOR}@footnote{The @dfn{no floor} con is called
+  @dfn{empty} in the original game.}
   @tab
   @tab
   @tab This is an empty space.  This is @emph{strictly traversable} and
@@ -235,7 +239,8 @@ them are @emph{hangable}, except for @code{NO_FLOOR}.
   @tab @center @image{mininim-figures/p-floor}
   @tab This is a normal floor. This uses the @emph{item} extension.
 
-  @item @code{BROKEN_FLOOR}
+  @item @code{BROKEN_FLOOR}@footnote{The @dfn{broken floor} is called
+  @emph{debris} in the original game.}
   @tab @center @image{mininim-figures/d-broken-floor}
   @tab @center @image{mininim-figures/p-broken-floor}
   @tab As soon as a falling @code{LOOSE_FLOOR} encounters a @emph{rigid}
@@ -253,7 +258,8 @@ them are @emph{hangable}, except for @code{NO_FLOOR}.
   @footnote{The original game has no palace version of the skeleton floor.}
   @tab This behaves like @code{FLOOR} but uses no extension.
 
-  @item @code{LOOSE_FLOOR}
+  @item @code{LOOSE_FLOOR}@footnote{The @dfn{loose floor} is called
+  @emph{loose board} in the original game.}
   @tab @center @image{mininim-figures/d-loose-floor}
   @tab @center @image{mininim-figures/p-loose-floor}
   @tab This is rendered as @code{FLOOR}, but shakes as the kid hits the
@@ -268,27 +274,34 @@ them are @emph{hangable}, except for @code{NO_FLOOR}.
   @tab @center @image{mininim-figures/p-spikes-floor}
   @tab Spikes come out of it, killing the kid if he falls or step too
   fast over it.  This is a @emph{trap}, @emph{dynamic} and uses the
-  @emph{step} extension (ranging from 0 to 9).
+  @emph{step} extension (ranging from 0 to 9).  This gets activated as
+  soon as the kid is in the same room and vertical place, and in the
+  same or higher floor without a wall in between.  Guards can activate
+  this as well.
 
-  @item @code{OPENER_FLOOR}
+  @item @code{OPENER_FLOOR}@footnote{The @dfn{opener floor} is called
+  @emph{raise button} in the original game.}
   @tab @center @image{mininim-figures/d-opener-floor}
   @tab @center @image{mininim-figures/p-opener-floor}
   @tab This opens one or more doors.  This is @emph{depressible},
   @emph{dynamic} and uses the @emph{event} extension.
 
-  @item @code{CLOSER_FLOOR}
+  @item @code{CLOSER_FLOOR}@footnote{The @dfn{closer floor} is called
+  @emph{drop button} in the original game.}
   @tab @center @image{mininim-figures/d-closer-floor}
   @tab @center @image{mininim-figures/p-closer-floor}
   @tab  This closes one or more doors. This is @emph{depressible},
   @emph{dynamic} and uses the @emph{event} extension.
 
-  @item @code{STUCK_FLOOR}
+  @item @code{STUCK_FLOOR}@footnote{The @dfn{stuck floor} is called
+  @emph {stuck button} in the original game.}
   @tab @center @image{mininim-figures/d-stuck-floor}
   @tab @center @image{mininim-figures/p-stuck-floor}
   @tab This is rendered like a pressed @code{CLOSER_FLOOR}, but it can't
   be unpressed.  This uses no extension.
 
-  @item @code{HIDDEN_FLOOR}
+  @item @code{HIDDEN_FLOOR}@footnote{The original game doesn't have a
+  @code{HIDDEN_FLOOR} construction by itself.}
   @tab
   @tab
   @tab This is rendered as @code{NO_FLOOR}, but as soon as the kid
@@ -296,14 +309,10 @@ them are @emph{hangable}, except for @code{NO_FLOOR}.
   @emph{depressible} and uses no extension.
 @end multitable
 
-@iftex
-@page
-@end iftex
-
 @subsection Pillars
 
-Pillars are aesthetic supports for the constructions on the floor above
-them.  All of them are @emph{hangable}, except for
+@dfn{Pillars} are aesthetic supports for the constructions on the floor
+above them.  All of them are @emph{hangable}, except for
 @code{BIG_PILLAR_TOP}.  Pillars use no extension.
 
 @multitable @columnfractions .25 .15 .15 .45
@@ -324,12 +333,17 @@ them.  All of them are @emph{hangable}, except for
   @tab @center @image{mininim-figures/d-big-pillar-bottom}
   @tab @center @image{mininim-figures/p-big-pillar-bottom}
   @tab This should be place below a @code{BIG_PILLAR_TOP}.
+
+  @item @code{ARCH_BOTTOM}
+  @tab @center @image{mininim-figures/d-arch-bottom}
+  @tab @center @image{mininim-figures/p-arch-bottom}
+  @tab This should be placed below an @code{ARCH_TOP_MID}.
 @end multitable
 
 @subsection Wall
 
-Wall is a solid constructs that separates sections of the level.  It's
-@emph{collidable}, @emph{rigid} and uses no extension.
+The @dfn{wall} is a solid constructs that separates sections of the
+level.  It's @emph{collidable}, @emph{rigid} and uses no extension.
 
 @multitable @columnfractions .20 .40 .40
   @headitem Code @tab Dungeon @tab Palace
@@ -339,32 +353,45 @@ Wall is a solid constructs that separates sections of the level.  It's
   @tab @center @image{mininim-figures/p-wall}
 @end multitable
 
-@iftex
-@page
-@end iftex
-
 @subsection Doors
 
-Doors@footnote{@dfn{Doors} are called @emph{gates} in the original
-game.} are sort of @emph{semi-collidable} constructions that
-conditionally separate levels and in-level sections.  Both door types
-are @emph{hangable}, @emph{dynamic} and use the @emph{step} extension.
+@dfn{Doors} are constructions that conditionally separate levels and
+in-level sections.  Both door types are @emph{hangable}, @emph{dynamic}
+and use the @emph{step} extension.  The extension determines the door
+opening level, ranging from fully open (0) to fully closed.
 
-@multitable @columnfractions .15 .2 .2 .45
+@multitable @columnfractions .16 .20 .20 .44
   @headitem Code @tab Dungeon @tab Palace @tab Notes
 
-  @item @code{DOOR}
+  @item @code{DOOR}@footnote{The @dfn{door} is called @emph{gate} in the
+  original game.}
   @tab @center @image{mininim-figures/d-door}
   @tab @center @image{mininim-figures/p-door}
-  @tab This is @emph{rigid}.
+  @tab This is sort of @emph{semi-collidable}, as the kid might pass or
+  not through it depending on the difference of the grid tip height and
+  kid's movement height.  This is @emph{rigid} and its @emph{step}
+  extension range from 0 to 47.
 
-  @item @code{LEVEL_DOOR}
+  @item @code{LEVEL_DOOR}@footnote{The @dfn{level door} is called simply
+  @emph{exit} in the original game.  There it's divided into two
+  constructions: @emph{exit left} and @emph{exit right}.}
   @tab @center @image{mininim-figures/d-level-door}
   @tab @center @image{mininim-figures/p-level-door}
-  @tab
+  @tab Often the kid progress through levels entering these.  This can
+  only be entered when fully open.  Its @emph{step} extension range from
+  0 to 43.
 @end multitable
 
 @subsection Chopper
+
+The @dfn{chopper}@footnote{The @dfn{chopper} is called @dfn{chomper} in
+the original game.} can leave the kid in half.  It's a @emph{trap},
+@emph{hangable} at right, @emph{rigid} and @emph{dynamic}.  It uses the
+@emph{step} extension which range from 0 to 4 and 128 to 132 (bloody
+counterpart).  It gets activated as soon as the kid is in the same room
+and floor and there is no wall in between.  It doesn't get activated by
+guards, but can kill them as well.  The chopper nullifies the
+@emph{hangable at left} property of the construction above it.
 
 @multitable @columnfractions .20 .40 .40
   @headitem Code @tab Dungeon @tab Palace
@@ -376,6 +403,11 @@ are @emph{hangable}, @emph{dynamic} and use the @emph{step} extension.
 
 @subsection Mirror
 
+The @dfn{mirror} reflects the kid's image and prevents him from passing
+trough, except if he is able to perform a running jump, whatever the
+side.  It's @emph{semi-collidable}, @emph{hangable} at right,
+@emph{rigid} and uses no extension.
+
 @multitable @columnfractions .20 .40 .40
   @headitem Code @tab Dungeon @tab Palace
 
@@ -384,11 +416,16 @@ are @emph{hangable}, @emph{dynamic} and use the @emph{step} extension.
   @tab @center @image{mininim-figures/p-mirror}
 @end multitable
 
-@iftex
-@page
-@end iftex
-
 @subsection Carpets
+
+@dfn{Carpets}@footnote{@dfn{Carpets} are called @emph{tapestry} in the
+original game.} are ornamental constructions often placed over
+@code{DOOR} cons.  They come in two flavors: @code{CARPET} and
+@code{TCARPET}; the watershed difference being the @emph{traversable}
+property, which the latter has but the former lacks.  Both are
+@emph{collidable}, @emph{rigid} and make use of the @emph{design}
+extension.  The @code{CARPET} construction is also @emph{hangable} at
+left.
 
 @multitable @columnfractions .15 .2 .2 .45
   @headitem Code @tab Dungeon @tab Palace @tab Notes
@@ -396,63 +433,63 @@ are @emph{hangable}, @emph{dynamic} and use the @emph{step} extension.
   @item @code{TCARPET}
   @tab @center @image{mininim-figures/d-tcarpet-00}
   @tab @center @image{mininim-figures/p-tcarpet-00}
-  @tab
+  @tab These graphics are drawn for the @emph{design} @code{CARPET_00}.
 
   @item @code{TCARPET}
   @tab @center @image{mininim-figures/d-tcarpet-01}
   @tab @center @image{mininim-figures/p-tcarpet-01}
-  @tab
+  @tab These graphics are drawn for the @emph{design} @code{CARPET_01}.
 
   @item @code{TCARPET}
   @tab @center @image{mininim-figures/d-arch-tcarpet-right-00}
   @tab @center @image{mininim-figures/p-arch-tcarpet-right-00}
   @tab These graphics are drawn for the design
-  @code{ARCH_CARPET_RIGHT_00}.  This is designed to end an arch.  This
+  @code{ARCH_CARPET_RIGHT_00}.  This is intended to end an arch.  This
   should be placed at right of an @code{ARCH_TOP_MID}.
 
   @item @code{TCARPET}
   @tab @center @image{mininim-figures/d-arch-tcarpet-right-01}
   @tab @center @image{mininim-figures/p-arch-tcarpet-right-01}
   @tab These graphics are drawn for the design
-  @code{ARCH_CARPET_RIGHT_01}.  This is designed to end an arch.  This
+  @code{ARCH_CARPET_RIGHT_01}.  This is intended to end an arch.  This
   should be placed at right of an @code{ARCH_TOP_MID}.
 
   @item @code{TCARPET}
   @tab @center @image{mininim-figures/d-arch-tcarpet-left}
   @tab @center @image{mininim-figures/p-arch-tcarpet-left}
   @tab These graphics are drawn for the design @code{ARCH_CARPET_LEFT}.
-  This is designed to end an arch.  This should be placed two places to
+  This is intended to end an arch.  This should be placed two places to
   the left of an @code{ARCH_TOP_MID}.
 
   @item @code{CARPET}
   @tab @center @image{mininim-figures/d-carpet-00}
   @tab @center @image{mininim-figures/p-carpet-00}
-  @tab
+  @tab These graphics are drawn for the @emph{design} @code{CARPET_00}.
 
   @item @code{CARPET}
   @tab @center @image{mininim-figures/d-carpet-01}
   @tab @center @image{mininim-figures/p-carpet-01}
-  @tab
+  @tab These graphics are drawn for the @emph{design} @code{CARPET_01}.
 
   @item @code{CARPET}
   @tab @center @image{mininim-figures/d-arch-carpet-left}
   @tab @center @image{mininim-figures/p-arch-carpet-left}
   @tab These graphics are drawn for the design @code{ARCH_CARPET_LEFT}.
-  This is designed to end an arch.  This should be placed two places to
+  This is intended to end an arch.  This should be placed two places to
   the left of an @code{ARCH_TOP_MID}.
 @end multitable
 
 @subsection Arches
 
+@dfn{Arches}@footnote{@dfn{Arches} are called @dfn{lattices} in the
+original game.} are ornamental constructions that can be indefinitely
+chained together to make a structure that spans several rooms across.
+They are @emph{strictly traversable}, @emph{rigid} and use no extension.
+
 @multitable @columnfractions .2 .15 .15 .5
   @headitem Code @tab Dungeon
   @footnote{In the original game there is no dungeon version of arches.}
  @tab Palace @tab Notes
-
-  @item @code{ARCH_BOTTOM}
-  @tab @center @image{mininim-figures/d-arch-bottom}
-  @tab @center @image{mininim-figures/p-arch-bottom}
-  @tab This should be placed below an @code{ARCH_TOP_MID}.
 
   @item @code{ARCH_TOP_MID}
   @tab @center @image{mininim-figures/d-arch-top-mid}
@@ -478,6 +515,10 @@ are @emph{hangable}, @emph{dynamic} and use the @emph{step} extension.
 @end multitable
 
 @section Backgrounds
+
+Any combination of construction background and foreground is allowed,
+but be aware that some may simply not look right, or even not make a
+difference at all (like a torch behind a wall).
 
 @multitable @columnfractions .12 .2 .2 .48
   @headitem Code @tab Dungeon @tab Palace @tab Notes
@@ -535,7 +576,9 @@ are @emph{hangable}, @emph{dynamic} and use the @emph{step} extension.
 
 @section Items
 
-The item extension is used only by @code{FLOOR}.
+The item extension is used only by @code{FLOOR}.  Items are placed over
+the floor construction they belong to and animated.  They can be caught
+by the kid by pressing the shift key.
 
 @multitable @columnfractions .3 .15 .55
   @headitem Code @tab Graphics @tab Notes
