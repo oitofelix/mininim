@@ -185,12 +185,13 @@ interaction with them.
 @table @dfn
 @item Strictly traversable
 This property means that the construction can't support the kid
-vertically, thus he falls immediately when trying to rest on it.
+vertically at its bottom, thus he falls immediately when trying to rest
+on it.
 @item Traversable
 This property means that the construction can't @emph{indefinitely}
-support the kid vertically, thus he @emph{eventually} falls when trying
-to rest on it.  Notice that @emph{strictly traversable} is a particular
-case of this.
+support the kid vertically at its bottom, thus he @emph{eventually}
+falls when trying to rest on it.  Notice that @emph{strictly
+traversable} is a particular case of this.
 @item Collidable
 This property means that the construction prevents the kid from passing
 through it horizontally, thus he collides (often recoiling from the
@@ -212,10 +213,13 @@ in which it can be in.  Such states matter for how the construction
 looks and behaves.
 @end table
 
+It's possible that some of these properties may apply only under certain
+conditions of the construction and/or the kid.
+
 @subsection Floors
 
-The floors make the ground above constructions the kid stands on.  All
-of them, except for @code{NO_FLOOR}, are @emph{hangable}.
+Floors make the ground above constructions the kid stands on.  All of
+them are @emph{hangable}, except for @code{NO_FLOOR}.
 
 @multitable @columnfractions .19 .15 .15 .51
   @headitem Code @tab Dungeon @tab Palace @tab Notes
@@ -298,19 +302,23 @@ of them, except for @code{NO_FLOOR}, are @emph{hangable}.
 
 @subsection Pillars
 
+Pillars are aesthetic supports for the constructions on the floor above
+them.  All of them are @emph{hangable}, except for
+@code{BIG_PILLAR_TOP}.  Pillars use no extension.
+
 @multitable @columnfractions .25 .15 .15 .45
   @headitem Code @tab Dungeon @tab Palace @tab Notes
 
   @item @code{PILLAR}
   @tab @center @image{mininim-figures/d-pillar}
   @tab @center @image{mininim-figures/p-pillar}
-  @tab
+  @tab This is @emph{rigid}.
 
   @item @code{BIG_PILLAR_TOP}
   @tab @center @image{mininim-figures/d-big-pillar-top}
   @tab @center @image{mininim-figures/p-big-pillar-top}
   @tab This should be placed above a @code{BIG_PILLAR_BOTTOM}.  This is
-  an @emph{strictly traversable construction}.
+  @emph{strictly traversable} and @emph{rigid}.
 
   @item @code{BIG_PILLAR_BOTTOM}
   @tab @center @image{mininim-figures/d-big-pillar-bottom}
@@ -320,14 +328,15 @@ of them, except for @code{NO_FLOOR}, are @emph{hangable}.
 
 @subsection Wall
 
-@multitable @columnfractions .15 .2 .2 .45
-  @headitem Code @tab Dungeon @tab Palace @tab Notes
+Wall is a solid constructs that separates sections of the level.  It's
+@emph{collidable}, @emph{rigid} and uses no extension.
+
+@multitable @columnfractions .20 .40 .40
+  @headitem Code @tab Dungeon @tab Palace
 
   @item @code{WALL}
   @tab @center @image{mininim-figures/d-wall}
   @tab @center @image{mininim-figures/p-wall}
-  @tab This is a @emph{collidable}, @emph{rigid} and @emph{non-hangable}
-  construction.
 @end multitable
 
 @iftex
@@ -336,13 +345,18 @@ of them, except for @code{NO_FLOOR}, are @emph{hangable}.
 
 @subsection Doors
 
+Doors@footnote{@dfn{Doors} are called @emph{gates} in the original
+game.} are sort of @emph{semi-collidable} constructions that
+conditionally separate levels and in-level sections.  Both door types
+are @emph{hangable}, @emph{dynamic} and use the @emph{step} extension.
+
 @multitable @columnfractions .15 .2 .2 .45
   @headitem Code @tab Dungeon @tab Palace @tab Notes
 
   @item @code{DOOR}
   @tab @center @image{mininim-figures/d-door}
   @tab @center @image{mininim-figures/p-door}
-  @tab
+  @tab This is @emph{rigid}.
 
   @item @code{LEVEL_DOOR}
   @tab @center @image{mininim-figures/d-level-door}
@@ -352,26 +366,22 @@ of them, except for @code{NO_FLOOR}, are @emph{hangable}.
 
 @subsection Chopper
 
-@multitable @columnfractions .15 .2 .2 .45
-  @headitem Code @tab Dungeon @tab Palace @tab Notes
+@multitable @columnfractions .20 .40 .40
+  @headitem Code @tab Dungeon @tab Palace
 
   @item @code{CHOPPER}
   @tab @center @image{mininim-figures/d-chopper}
   @tab @center @image{mininim-figures/p-chopper}
-  @tab
-
 @end multitable
 
 @subsection Mirror
 
-@multitable @columnfractions .15 .2 .2 .45
-  @headitem Code @tab Dungeon @tab Palace @tab Notes
+@multitable @columnfractions .20 .40 .40
+  @headitem Code @tab Dungeon @tab Palace
 
   @item @code{MIRROR}
   @tab @center @image{mininim-figures/d-mirror}
   @tab @center @image{mininim-figures/p-mirror}
-  @tab
-
 @end multitable
 
 @iftex
