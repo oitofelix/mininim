@@ -70,6 +70,7 @@ build-aux/*
 !build-aux/make-announcement-mail
 !build-aux/ncftpput
 !build-aux/texinfo.tex
+!build-aux/pkg.m4
 
 # Ignore all Autotools configuration-time files.
 
