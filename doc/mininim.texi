@@ -148,18 +148,39 @@ by its coordinates, which are defined as the triplet @emph{room},
 
 Constructions are comprised of three elements: foreground, background
 and extension.  A @dfn{construction foreground} is the physical part the
-kid interacts with.  It determines collision, hang and fall conditions,
-for instance.  On the other hand, a @dfn{construction background} is the
-part that yet visible, doesn't affect the kid in any way --- its sole
-purpose is ornamental; torches and windows are examples of this.  A
-@dfn{construction extension} is a modifier which determines in some way
-how the con looks or behaves.  For example, an item over a floor and
-door opening level are expressed by them.
+kid interacts with.  Physical properties determined by it are collision,
+hang and fall conditions, to name a few.  On the other hand, a
+@dfn{construction background} is the part that yet visible, doesn't
+affect the kid in any way --- its sole purpose is ornamental; torches
+and windows are examples of this.  A @dfn{construction extension} is a
+modifier which tells how the con looks or behaves.  For example, items
+and door opening states are both expressed by them.  Any given
+construction can have only one extension.  The valid extensions are:
+
+@table @dfn
+@item Item
+This is a code indicating which item should be put on the construction.
+Used by @code{FLOOR}.
+@item Can't fall
+This is a boolean indicating whether the construction should ignore
+fall conditions.  Used by @code{LOOSE_FLOOR}.
+@item Event
+This is an integer indicating which door event the construction
+triggers.  Used by @code{OPENER_FLOOR} and @code{CLOSER_FLOOR}.
+@item Step
+This is a integer indicating in which state, of a progressive set of
+configurations, a construction is in.  Used by dynamic constructions
+that don't use other extension.
+@item Design
+This is a code indicating which alternative graphical design should be
+used to render the construction.  Used by the carpet constructions.
+@end table
 
 @section Foregrounds
 
-Construction foregrounds have physical properties that determine how the
-kid is affected by the interaction with them.
+Construction foregrounds have physical properties that determine how it
+behaves in certain events and also how the kid is affected by the
+interaction with them.
 
 @table @dfn
 @item Strictly traversable
@@ -172,91 +193,103 @@ to rest on it.  Notice that @emph{strictly traversable} is a particular
 case of this.
 @item Collidable
 This property means that the construction prevents the kid from passing
-through it horizontally, thus he collides, often recoiling from the
-impact, when trying to do so.
-@item Rigid
-This property means that the construction can't be smashed by another
-falling one, thus the falling construction stops at the rigid con's top.
+through it horizontally, thus he collides (often recoiling from the
+impact) when trying to do so.
 @item Hangable
-This property means that the kid can hang on the construction.
+This property means that the kid can hang on the construction, in case
+there is an @emph{strictly traversable} one on its side.
 @item Depressible
-This property means that the construction is sensible to pressure on its
-top, thus it triggers some reaction when the kid is exerting such
-pressure.
+This property means that the construction is sensible to pressure at its
+top, thus some reaction is triggered when the kid exerts such pressure.
 @item Trap
 This property means that the construction might harm the kid.
+@item Rigid
+This property means that the construction can't be smashed by a falling
+one, thus that which falls stops at the rigid con's top.
+@item Dynamic
+This property means that the construction has a set of distinct states
+in which it can be in.  Such states matter for how the construction
+looks and behaves.
 @end table
-
-All traversable, collidable, rigid and trap constructions are marked as
-such.  Non-hangable conditions are noted as well.
-
-Explain design field.
 
 @subsection Floors
 
-@multitable @columnfractions .25 .15 .15 .45
+The floors make the ground above constructions the kid stands on.  All
+of them, except for @code{NO_FLOOR}, are @emph{hangable}.
+
+@multitable @columnfractions .19 .15 .15 .51
   @headitem Code @tab Dungeon @tab Palace @tab Notes
 
   @item @code{NO_FLOOR}
   @tab
   @tab
-  @tab For the dungeon and palace this results in no graphics at all.
-  This is an @emph{strictly traversable} construction.
+  @tab This is an empty space.  This is @emph{strictly traversable} and
+  uses no extension.
 
   @item @code{FLOOR}
   @tab @center @image{mininim-figures/d-floor}
   @tab @center @image{mininim-figures/p-floor}
-  @tab This is a normal floor.  This is a @emph{hangable} construction.
+  @tab This is a normal floor. This uses the @emph{item} extension.
 
   @item @code{BROKEN_FLOOR}
   @tab @center @image{mininim-figures/d-broken-floor}
   @tab @center @image{mininim-figures/p-broken-floor}
-  @tab This behaves like @code{FLOOR}.  As soon as a falling
-  @code{LOOSE_FLOOR} encounters a rigid construction, it creates a
-  @code{BROKEN_FLOOR} over it.
+  @tab As soon as a falling @code{LOOSE_FLOOR} encounters a @emph{rigid}
+  construction, it disappears replacing the con @strong{over} that by a
+  @code{BROKEN_FLOOR}.  In contrast, if it encounters a @emph{non-rigid}
+  and @emph{non-traversable} construction, it disappears replacing that
+  very con by a @code{BROKEN_FLOOR}.  Finally, if it encounters a
+  @emph{non-rigid} but @emph{traversable} construction, it pass through,
+  breaking over it in case the con is not @emph{strictly traversable}.
+  This uses no extension.
 
   @item @code{SKELETON_FLOOR}
   @tab @center @image{mininim-figures/d-skeleton-floor}
   @tab @center @image{mininim-figures/p-skeleton-floor}
   @footnote{The original game has no palace version of the skeleton floor.}
-  @tab This behaves like @code{FLOOR}.
+  @tab This behaves like @code{FLOOR} but uses no extension.
 
   @item @code{LOOSE_FLOOR}
   @tab @center @image{mininim-figures/d-loose-floor}
   @tab @center @image{mininim-figures/p-loose-floor}
   @tab This is rendered as @code{FLOOR}, but shakes as the kid hits the
-  ground.  If the kid is near enough it's released and falls.  This is a
-  @emph{traversable construction}. This is a @emph{depressible floor}.
-  This is a @emph{trap construction}.
+  ground, by falling (from above), or vertically jumping (from below).
+  If the kid hits near enough it's released and falls.  It might harm
+  the kid when falling over him.  This is @emph{traversable},
+  @emph{depressible}, a @emph{trap}, @emph{dynamic} and uses the
+  @emph{can't fall} extension.
 
   @item @code{SPIKES_FLOOR}
   @tab @center @image{mininim-figures/d-spikes-floor}
   @tab @center @image{mininim-figures/p-spikes-floor}
   @tab Spikes come out of it, killing the kid if he falls or step too
-  fast over it.  This is a @emph{trap construction}.
+  fast over it.  This is a @emph{trap}, @emph{dynamic} and uses the
+  @emph{step} extension (ranging from 0 to 9).
 
   @item @code{OPENER_FLOOR}
   @tab @center @image{mininim-figures/d-opener-floor}
   @tab @center @image{mininim-figures/p-opener-floor}
-  @tab This opens one or more doors.  This is a @emph{depressible floor}.
+  @tab This opens one or more doors.  This is @emph{depressible},
+  @emph{dynamic} and uses the @emph{event} extension.
 
   @item @code{CLOSER_FLOOR}
   @tab @center @image{mininim-figures/d-closer-floor}
   @tab @center @image{mininim-figures/p-closer-floor}
-  @tab  This closes one or more doors. This is a @emph{depressible floor}.
+  @tab  This closes one or more doors. This is @emph{depressible},
+  @emph{dynamic} and uses the @emph{event} extension.
 
   @item @code{STUCK_FLOOR}
   @tab @center @image{mininim-figures/d-stuck-floor}
   @tab @center @image{mininim-figures/p-stuck-floor}
   @tab This is rendered like a pressed @code{CLOSER_FLOOR}, but it can't
-  be unpressed.
+  be unpressed.  This uses no extension.
 
   @item @code{HIDDEN_FLOOR}
   @tab
   @tab
   @tab This is rendered as @code{NO_FLOOR}, but as soon as the kid
-  presses it, it's replaced by @code{FLOOR}.  This is a
-  @emph{depressible floor}.
+  presses it, it's replaced by @code{FLOOR}.  This is
+  @emph{depressible} and uses no extension.
 @end multitable
 
 @iftex
@@ -491,6 +524,8 @@ Explain design field.
 
 
 @section Items
+
+The item extension is used only by @code{FLOOR}.
 
 @multitable @columnfractions .3 .15 .55
   @headitem Code @tab Graphics @tab Notes
