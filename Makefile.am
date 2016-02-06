@@ -149,7 +149,7 @@ install-data-hook:
 # Automake directives #
 #######################
 
-ACLOCAL_AMFLAGS = -I gnulib/m4
+ACLOCAL_AMFLAGS = -I gnulib/m4 -I build-aux
 SUBDIRS = gnulib
 if !mingw_build
 SUBDIRS += doc

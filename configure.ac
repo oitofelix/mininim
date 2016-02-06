@@ -40,6 +40,7 @@ AC_DEFINE(PACKAGE_COPYRIGHT_HOLDER, ["Bruno Fe'lix Rezende Ribeiro"],
 
 # GNU Autoconf settings;
 AC_CONFIG_AUX_DIR([build-aux])
+AC_CONFIG_MACRO_DIR([build-aux])
 AC_PREREQ(2.60)
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_SRCDIR([src/mininim.c])
