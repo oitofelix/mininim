@@ -22,6 +22,7 @@
 static struct level consistency_level;
 static void next_level (int lv);
 static void start (void);
+static void end (struct pos *p);
 
 void
 play_consistency_level (int number)
@@ -39,6 +40,12 @@ start (void)
   anima[0].controllable = true;
   anima[1].controllable = true;
   room_view = p.room;
+}
+
+static void
+end (struct pos *p)
+{
+  quit_anim = NEXT_LEVEL;
 }
 
 static void
@@ -204,4 +211,5 @@ next_level (int number)
   consistency_level.nominal_number = number;
   consistency_level.start = start;
   consistency_level.next_level = next_level;
+  consistency_level.end = end;
 }
