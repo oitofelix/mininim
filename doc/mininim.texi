@@ -186,7 +186,7 @@ interaction with them.
 @item Strictly traversable
 This property means that the construction can't support the kid
 vertically at its bottom, thus he falls immediately when trying to rest
-on it.
+on it.  Notice that cons having this property can't be @emph{hangable}.
 @item Traversable
 This property means that the construction can't @emph{indefinitely}
 support the kid vertically at its bottom, thus he @emph{eventually}
@@ -200,8 +200,8 @@ impact) when trying to do so.
 This property means that the construction is @emph{collidable} only
 under certain circumstances.
 @item Hangable
-This property means that the kid can hang on the construction, in case
-there is an @emph{strictly traversable} one on its side.
+This property means that the kid can hang on the construction's bottom,
+in case there is an @emph{strictly traversable} one at its side.
 @item Depressible
 This property means that the construction is sensible to pressure at its
 top, thus some reaction is triggered when the kid exerts such pressure.
@@ -332,7 +332,7 @@ above them.  All of them are @emph{hangable}, except for
   @item @code{BIG_PILLAR_BOTTOM}
   @tab @center @image{mininim-figures/d-big-pillar-bottom}
   @tab @center @image{mininim-figures/p-big-pillar-bottom}
-  @tab This should be place below a @code{BIG_PILLAR_TOP}.
+  @tab This should be placed below a @code{BIG_PILLAR_TOP}.
 
   @item @code{ARCH_BOTTOM}
   @tab @center @image{mininim-figures/d-arch-bottom}
@@ -367,8 +367,8 @@ opening level, ranging from fully open (0) to fully closed.
   original game.}
   @tab @center @image{mininim-figures/d-door}
   @tab @center @image{mininim-figures/p-door}
-  @tab This is sort of @emph{semi-collidable}, as the kid might pass or
-  not through it depending on the difference of the grid tip height and
+  @tab This is @emph{semi-collidable}, as the kid might pass or not
+  through it depending on the difference of the grid tip height and
   kid's movement height.  This is @emph{rigid} and its @emph{step}
   extension range from 0 to 47.
 
@@ -386,7 +386,7 @@ opening level, ranging from fully open (0) to fully closed.
 
 The @dfn{chopper}@footnote{The @dfn{chopper} is called @dfn{chomper} in
 the original game.} can leave the kid in half.  It's a @emph{trap},
-@emph{hangable} at right, @emph{rigid} and @emph{dynamic}.  It uses the
+@emph{hangable at right}, @emph{rigid} and @emph{dynamic}.  It uses the
 @emph{step} extension which range from 0 to 4 and 128 to 132 (bloody
 counterpart).  It gets activated as soon as the kid is in the same room
 and floor and there is no wall in between.  It doesn't get activated by
@@ -405,8 +405,9 @@ guards, but can kill them as well.  The chopper nullifies the
 
 The @dfn{mirror} reflects the kid's image and prevents him from passing
 trough, except if he is able to perform a running jump, whatever the
-side.  It's @emph{semi-collidable}, @emph{hangable} at right,
-@emph{rigid} and uses no extension.
+side.  It's @emph{semi-collidable}, @emph{hangable at right},
+@emph{rigid} and uses no extension.  The mirror nullifies the
+@emph{hangable at left} property of the construction above it.
 
 @multitable @columnfractions .20 .40 .40
   @headitem Code @tab Dungeon @tab Palace
@@ -424,8 +425,9 @@ original game.} are ornamental constructions often placed over
 @code{TCARPET}; the watershed difference being the @emph{traversable}
 property, which the latter has but the former lacks.  Both are
 @emph{collidable}, @emph{rigid} and make use of the @emph{design}
-extension.  The @code{CARPET} construction is also @emph{hangable} at
-left.
+extension.  The @code{CARPET} construction is also @emph{hangable at
+left}.  Also, carpets nullify the @emph{hangable at left} property of
+the constructions at its top right corner and at its right.
 
 @multitable @columnfractions .15 .2 .2 .45
   @headitem Code @tab Dungeon @tab Palace @tab Notes
@@ -511,7 +513,7 @@ They are @emph{strictly traversable}, @emph{rigid} and use no extension.
   @item @code{ARCH_TOP_RIGHT}
   @tab @center @image{mininim-figures/d-arch-top-right}
   @tab @center @image{mininim-figures/p-arch-top-right}
-  @tab This should be place at right of an @code{ARCH_TOP_LEFT}.
+  @tab This should be placed at right of an @code{ARCH_TOP_LEFT}.
 @end multitable
 
 @section Backgrounds
@@ -631,8 +633,8 @@ by the kid by pressing the shift key.
   level, a copy protection mechanism employed to stop people from
   sharing.  @strong{MININIM is free software}, and we repudiate this
   kind of measure.  Thus here @emph{activation potions} may be used to
-  handicap the kid, but certainly won't be used to do so to you nor your
-  friends.}
+  handicap the kid, but certainly won't be used to do so to you nor to
+  your friends.}
 
   @item @code{SWORD}@footnote{The sword graphics is mirrored
   horizontally depending on its level coordinates.  This is not so in
@@ -651,108 +653,185 @@ by the kid by pressing the shift key.
 
 In his journey to save the princess, the kid has to endure several
 levels full of challenging traps and skilled opponents.  Run, walk,
-turn, crouch, jump, hang, climb, take sword, attack, defend are some of
-the kid's movements at your disposal to help him make his way to the
-princess tower.  Although, this is a relatively large set of movements,
-basically all these movements are accomplished by some combination of
+turn, crouch, jump, hang, climb, take the sword, attack and defend are
+some of the kid's movements at your disposal to help him make his way to
+the princess tower.  Although, this is a relatively large set of
+movements, basically all these are accomplished by some combination of
 the directional and shift keys, often conditioned to the current kid's
-movement state.  This chapter explains in detail all possible movements
-of the kid.
+state.  This chapter explains in detail all possible movements of the
+kid.
 
-There are four major modes of movement: @dfn{normal}, @dfn{crouch},
-@dfn{run} and @dfn{fight}.  The major mode the kid is in is the foremost
-element determining how the input is translated into kid's movements.
+There are five major modes of movement: @dfn{normal}, @dfn{crouch},
+@dfn{run}, @dfn{hang} and @dfn{fight}.  The major mode the kid is in is
+the foremost element determining how the input is translated into kid's
+movements.
 
-@heading Normal
+Quite a few movements might culminate in the kid hanging on a
+construction.  In order to describe the conditions in which that may
+happen, it's necessary to define the concept of @emph{hangable place}.
+
+@cartouche
+@noindent@strong{Hangable place:} we say a @emph{place} the kid is in is
+@dfn{hangable} for him, if (and only if) the construction above it is
+@emph{strictly traversable} and the con adjacent to that, in the
+direction the kid faces, is @emph{hangable} at the opposite direction.
+@end cartouche
+
+@section Normal
 
 The major movement mode at the beginning of each level is normal.  While
 in it the kid stands at rest.
 
 @center @image{mininim-figures/kid-normal-right}
 
-If you press the horizontal directional key in the opposite direction
-the kid is facing, he @strong{turns} and then faces the opposite
-direction likewise.
+
+@subsection Turn
+
+If you press the horizontal key in the opposite direction the kid is
+facing, he turns and then faces the opposite direction likewise.
 
 @center @image{mininim-figures/kid-normal-right} @arrow{} @image{mininim-figures/kid-turn} @arrow{} @image{mininim-figures/kid-normal-left}
 
-Pressing the up directional key, makes the kid perform a
-@strong{vertical jump}.
+
+@subsection Vertical jump
+
+Pressing the up key, makes the kid perform a vertical jump.
 
 @center @image{mininim-figures/kid-normal-left} @arrow{} @image{mininim-figures/kid-vjump}
 
-Pressing the up and the horizontal directional keys at once makes the
-kid @strong{jump} forward.
+In case the construction above him is @emph{strictly traversable} but he
+isn't in a @emph{hangable place}, he performs a long vertical jump and
+comes back to the @strong{exact} same position he was before the
+jump@footnote{This is not so in the original game, where he moves a
+little bit forward at each vertical jump.}.
+
+@center @image{mininim-figures/kid-vjump} @arrow{} @image{mininim-figures/kid-normal-left}
+
+In case he's in a @emph{hangable place}, he performs a long vertical
+jump (after coming close enough to the edge if he isn't already) and
+hangs for a brief period of time.
+
+@center @image{mininim-figures/kid-vjump-floor-no-floor} @arrow{} @image{mininim-figures/kid-hang-left}
+
+In case the place behind him is @emph{hangable}, he backs off so the
+situation fits the previous paragraph description.
+
+@center @image{mininim-figures/kid-vjump-floor} @arrow{} @image{mininim-figures/kid-vjump-floor-no-floor}
+
+If holding the shift key, the kid enters in @emph{hang mode}, otherwise
+he just drops back to the ground.
+
+@center @image{mininim-figures/kid-hang-left} @arrow{} @image{mininim-figures/kid-vjump-floor-no-floor}
+
+In case the construction above him is not @emph{strictly traversable}
+and the place behind him is not @emph{hangable}, he performs a short
+vertical jump and then comes back to the exact same position he was
+before the jump.
+
+@center @image{mininim-figures/kid-vjump-normal-floor-floor} @arrow{} @image{mininim-figures/kid-vjump-vjump-floor-floor} @arrow{} @image{mininim-figures/kid-vjump-normal-floor-floor}
+
+
+@subsection Jump
+
+Pressing the up and the horizontal keys at once makes the kid jump
+forward.
 
 @center @image{mininim-figures/kid-normal-left} @arrow{} @image{mininim-figures/kid-jump}
 
-Pressing the horizontal directional key in the same direction the kid is
-facing while holding the shift key, makes him @strong{walk} carefully.
+While is in the air, if he's in a @emph{hangable place}, holding shift
+and the horizontal key in the direction he's facing makes him hang on
+the construction and enter @emph{hang mode}.@footnote{The original game
+has no such movement.}
+
+@center @image{mininim-figures/kid-jump-floor-no-floor} @arrow{} @image{mininim-figures/kid-hang-left}
+
+If he's in a @emph{hangable place} for the opposite direction, holding
+shift and the horizontal key in that direction makes him turn in midair,
+hang on the construction and enter @emph{hang mode}.@footnote{The
+original game has no such movement.}
+
+@center @image{mininim-figures/kid-jump-no-floor-floor} @arrow{} @image{mininim-figures/kid-hang-right}
+
+
+@subsection Walk
+
+Pressing the horizontal key in the same direction the kid is facing
+while holding the shift key, makes him walk carefully.
 
 @center @image{mininim-figures/kid-normal-left} @arrow{} @image{mininim-figures/kid-walk}
 
+He always safely stops before a collision, fall, loose floor, closer
+floor and chopper blade.
 
-@heading Crouch
+@center @image{mininim-figures/kid-walk-wall} @arrow{} @image{mininim-figures/kid-normal-wall}
 
-If you press the down directional the kid crouches.
+@center @image{mininim-figures/kid-walk-no-floor} @arrow{} @image{mininim-figures/kid-normal-no-floor}
+
+@center @image{mininim-figures/kid-walk-loose-floor} @arrow{} @image{mininim-figures/kid-normal-loose-floor}
+
+@center @image{mininim-figures/kid-walk-closer-floor} @arrow{} @image{mininim-figures/kid-normal-closer-floor}
+
+@center @image{mininim-figures/kid-walk-chopper} @arrow{} @image{mininim-figures/kid-normal-chopper}
+
+@section Crouch
+
+If you press the down key the kid crouches.
 
 @center @image{mininim-figures/kid-normal-left} @arrow{} @image{mininim-figures/kid-couch}
 
-The kid stays crouched as long as you keep the down directional pressed.
-If you press the horizontal directional key in the same direction the
-kid is facing, without releasing the down directional, the kid performs
-little @strong{crouching jumps} forwards.
+The kid stays crouched as long as you keep the down key pressed.  If you
+press the horizontal key in the same direction the kid is facing,
+without releasing the down key, the kid performs little
+@strong{crouching jumps} forwards.
 
 @center @image{mininim-figures/kid-couch} @arrow{} @image{mininim-figures/kid-couch-forward} @arrow{} @image{mininim-figures/kid-couch}
 
-Releasing the down directional makes the kid stand up again.
+Releasing the down key makes the kid stand up again.
 
 @center @image{mininim-figures/kid-uncouch} @arrow{} @image{mininim-figures/kid-normal-left}
 
 
-@heading Run
+@section Run
 
-Pressing the horizontal directional key in the same direction the kid is
-facing, makes him start to run.
+Pressing the horizontal key in the same direction the kid is facing,
+makes him start to run.
 
 @center @image{mininim-figures/kid-normal-left} @arrow{} @image{mininim-figures/kid-start-run}
 
-He runs as long as you keep the directional key pressed.
+He runs as long as you keep the horizontal key pressed.
 
 @center @image{mininim-figures/kid-start-run} @arrow{} @image{mininim-figures/kid-run}
 
-In case you press the up directional key while running, he makes a
-@strong{running jump}, and continue to run if you keep the horizontal
-directional pressed.
+In case you press the up key while running, he makes a @strong{running
+jump}, and continue to run if you keep the horizontal key pressed.
 
 @center @image{mininim-figures/kid-run} @arrow{} @image{mininim-figures/kid-run-jump}
 
-Instead, if you press the down directional key, he @strong{crouches}
-slipping with some inertia, and then the crouching input rules apply.
+Instead, if you press the down key, he @strong{crouches} slipping with
+some inertia, and then the crouching input rules apply.
 
 @center @image{mininim-figures/kid-run} @arrow{} @image{mininim-figures/kid-couch}
 
-If you press the horizontal directional key in the opposite direction
-the kid is facing while running, he @strong{turns} without stopping.
+If you press the horizontal key in the opposite direction the kid is
+facing while running, he @strong{turns} without stopping.
 
 @center @image{mininim-figures/kid-run} @arrow{} @image{mininim-figures/kid-turn-run}
 
-He continues to run while you keep the directional pressed, but
-releasing the directional key makes him stop, and go back to the normal
-stage.
+He continues to run while you keep the horizontal key pressed, but
+releasing it makes him stop, and go back to the normal stage.
 
 @center @image{mininim-figures/kid-stop-run} @arrow{} @image{mininim-figures/kid-normal-left}
 
 
-@heading Fight
+@section Fight
 
 If the kid has got the sword, the return key @strong{takes the sword}
 and puts him in fight mode.
 
 @center @image{mininim-figures/kid-normal-left} @arrow{} @image{mininim-figures/kid-take-sword} @arrow{} @image{mininim-figures/kid-sword-normal}
 
-Pressing the horizontal directional key in the same direction kid is
-facing, makes him @strong{walk forward}.
+Pressing the horizontal key in the same direction kid is facing, makes
+him @strong{walk forward}.
 
 @center @image{mininim-figures/kid-sword-normal} @arrow{} @image{mininim-figures/kid-sword-walkf}
 
@@ -761,8 +840,7 @@ backward}.
 
 @center @image{mininim-figures/kid-sword-normal} @arrow{} @image{mininim-figures/kid-sword-walkb}
 
-If you press the up directional, the kid makes the @strong{defense
-movement}.
+If you press the up key, the kid makes the @strong{defense movement}.
 
 @center @image{mininim-figures/kid-sword-normal} @arrow{} @image{mininim-figures/kid-sword-defense}
 
@@ -771,7 +849,7 @@ The shift key make him @strong{attack}.
 @center @image{mininim-figures/kid-sword-normal} @arrow{} @image{mininim-figures/kid-sword-attack}
 
 Finally you can make him @strong{keep the sword} and return to normal
-mode by pressing the down directional.
+mode by pressing the down key.
 
 @center @image{mininim-figures/kid-sword-normal} @arrow{} @image{mininim-figures/kid-keep-sword} @arrow{} @image{mininim-figures/kid-normal-left}
 
