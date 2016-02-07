@@ -178,6 +178,14 @@ compute_level (void)
 
   if (pause_game) return;
 
+  /* this condition is necessary to honor any floor press the start
+     level function might have */
+  if (anim_cycle > 0) {
+    unpress_opener_floors ();
+    unpress_closer_floors ();
+    uncross_mirrors ();
+  }
+
   struct anim *current_kid = get_anim_by_id (current_kid_id);
 
   int prev_room = current_kid->f.c.room;
@@ -509,10 +517,6 @@ draw_level (void)
       draw_potion (screen, &p, em, vm);
       draw_sword (screen, &p, vm);
     }
-
-  unpress_opener_floors ();
-  unpress_closer_floors ();
-  uncross_mirrors ();
 
   draw_lives (uscreen, get_anim_by_id (current_kid_id), vm);
 
