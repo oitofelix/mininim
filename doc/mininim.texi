@@ -880,11 +880,19 @@ kid @dfn{hangs free} when the construction below the hanged one is not
 collidable at the direction of hanging.  Otherwise he @dfn{hangs
 non-free}.  While hanging free the kid swings back and forth like a
 pendulum.  However, there is a limit for how much time he can support
-his own weight, after which he drops from the construction.
+his own weight, after which he drops from the construction.  Releasing
+the shift key in the meantime has the same effect.
 
 @center @image{mininim-figures/kid-hang-left} @arrow{} @image{mininim-figures/kid-hang-left-forth} @arrow{} @image{mininim-figures/kid-hang-left} @arrow{} @image{mininim-figures/kid-hang-left-back}
 
+The kid will fall either vertically aligned with the @emph{hangable
+place} or with the hanged con's place, depending upon which his feet are
+aligned to when he leaves the hanged construction.  @footnote{It's not
+possible to make such movements in the original game, because there the
+kid always falls aligned with a @emph{non-traversable} construction
+below him, in case there is one.}
 
+@center @image{mininim-figures/kid-hang-free-fall}
 
 @section Fight
 
