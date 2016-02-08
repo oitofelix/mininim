@@ -873,6 +873,16 @@ warning of the eminent danger.
 If you insist and try again, he'll obey and suffer the consequences ---
 so, be careful!
 
+@subsection Descend
+
+If you press the down key and the kid's bottom back place is
+@emph{hangable} and he's near enough to it, he descends, then hangs
+briefly --- entering @emph{hang mode} if shift is kept pressed, or
+dropping off otherwise.
+
+@center @image{mininim-figures/kid-hang-climb-01} @arrow{} @image{mininim-figures/kid-hang-climb-00}
+
+
 @section Crouch
 
 If you press the down key and the kid's bottom back place is
@@ -893,7 +903,6 @@ without releasing the down key, the kid performs little crouching jumps
 forward.
 
 @center @image{mininim-figures/kid-couch} @arrow{} @image{mininim-figures/kid-couch-forward} @arrow{} @image{mininim-figures/kid-couch}
-
 
 
 @section Run
@@ -1023,35 +1032,248 @@ for both modes.
 @center @image{mininim-figures/kid-hang-climb-00} @arrow{} @image{mininim-figures/kid-hang-climb-01} @image{mininim-figures/kid-hang-climb-non-free-00} @arrow{} @image{mininim-figures/kid-hang-climb-non-free-01}
 
 
+@section Fall
+
+This mode is not really related to a key combination, but instead to a
+circumstance: the kid trying to support his own weight on an
+@emph{strictly traversable} construction.  When this happens he
+accelerates downwards (eventually reaching terminal velocity), until he
+encounters a @emph{non-strictly traversable} construction or hangs at a
+@emph{hangable place} which might appear in his way down.
+
+If the kid hits a @emph{non-traversable} construction with sufficient
+speed, he is harmed or can even die.  Falling from a height of one floor
+inflicts no damage on him.  Two floors takes one life point.  Three or
+more kills him.
+
+@subsection Falling hang
+
+When falling if the kid is passing through a @emph{hangable place} and
+his vertical velocity is low enough, and he's near enough to the
+@emph{hangable construction}, he is able to hang there and enter
+@emph{hang mode} if you hold shift down.
+
+@center @image{mininim-figures/kid-fall-floor-front} @arrow{} @image{mininim-figures/kid-hang-left}
+
+@subsection Falling turn
+
+If instead the place is @emph{hangable} at the opposite direction,
+pressing shift and the horizontal keys in the @emph{hangable
+construction}'s direction makes the kid turn in mid air, hang there and
+enter @emph{hang mode}.@footnote{This movement is not available in the
+original game.}
+
+@center @image{mininim-figures/kid-fall-floor-back} @arrow{} @image{mininim-figures/kid-hang-right}
+
+
 @section Fight
 
-If the kid has got the sword, the return key @strong{takes the sword}
-and puts him in fight mode.
+If the kid has got the sword, the return key takes the sword and puts
+him in @emph{fight mode}.@footnote{In the original game, the kid enters
+fight mode automatically in the eminence of an enemy threat.}
 
 @center @image{mininim-figures/kid-normal-left} @arrow{} @image{mininim-figures/kid-take-sword} @arrow{} @image{mininim-figures/kid-sword-normal}
 
+@subsection Fight walk forward
+
 Pressing the horizontal key in the same direction kid is facing, makes
-him @strong{walk forward}.
+him walk forward.
 
 @center @image{mininim-figures/kid-sword-normal} @arrow{} @image{mininim-figures/kid-sword-walkf}
 
-Likewise if you press in the opposite direction, he @strong{goes
-backward}.
+@subsection Fight walk backward
+
+Likewise if you press in the opposite direction, he goes backward.
 
 @center @image{mininim-figures/kid-sword-normal} @arrow{} @image{mininim-figures/kid-sword-walkb}
 
-If you press the up key, the kid makes the @strong{defense movement}.
+@subsection Defense
+
+If you press the up key, the kid makes the defense movement.
 
 @center @image{mininim-figures/kid-sword-normal} @arrow{} @image{mininim-figures/kid-sword-defense}
 
-The shift key make him @strong{attack}.
+@subsection Attack
+
+The shift key makes him attack.
 
 @center @image{mininim-figures/kid-sword-normal} @arrow{} @image{mininim-figures/kid-sword-attack}
 
-Finally you can make him @strong{keep the sword} and return to normal
-mode by pressing the down key.
+@subsection Counter attack and counter defense
+
+Holding the shift and up keys puts the kid in counter attack and counter
+defense mode.  At first, there is no immediate noticeable difference
+from standing still in fight mode, but as an enemy attacks, the kid
+defends for certain. Then, depending upon probability whose likelihood
+is given by the @acronym{KCA, Kid's Counter Attack} skill, he may
+counter attack.
+
+Depending on the enemy's skills, the enemy may counter defend (if not
+the enemy loses a life point) and then counter attack.  In that case,
+depending upon probability whose likelihood is given by the
+@acronym{KCD, Kid's Counter Defense}, the kid may counter defend (if not
+he loses a life point) and the process restarts at the kid's counter
+attack stage, making for a chain of counter attacks and counter defenses
+whose length is determined only by the fighters' skills (and a little
+bit of luck).
+
+When standing still in this mode, releasing the up key initiates an
+attack (but at the same time makes the kid briefly vulnerable to the
+enemy's attacks).  In this case the same counter attack and counter
+defense chain logic described above is symmetrically applied.
+
+Pressing the horizontal keys makes the kid walk forward or backward, as
+appropriate, without leaving this mode.  However, although walking
+backward doesn't make the kid lower his guard, walking forward makes him
+vulnerable until he puts himself on guard again.
+
+The kid's skills are built up by defeating enemies.  The more advanced
+the defeated enemy's skills, the more the kid's skills improve.
+
+@subsection Keep sword
+
+Finally you can make him keep the sword and return to normal mode by
+pressing the down key.
 
 @center @image{mininim-figures/kid-sword-normal} @arrow{} @image{mininim-figures/kid-keep-sword} @arrow{} @image{mininim-figures/kid-normal-left}
+
+
+
+
+
+@c --- Movements;
+@node Key bindings
+@chapter Key bindings
+@cindex Key bindings
+
+The engine has several key bindings that perform useful functions.  Here
+is a list of them.
+
+@section Time
+
+@table @kbd
+@item SPACE
+Display remaining time.
+@item +
+Increment and display remaining time.
+@item -
+Decrement and display remaining time.
+@end table
+
+@section Skills
+
+@table @kbd
+@item TAB
+Display skills.
+@item CTRL+=
+Increment counter attack skill.
+@item CTRL+-
+Decrement counter attack skill.
+@item ALT+=
+Increment counter defense skill.
+@item ALT+-
+Decrement counter defense skill.
+@end table
+
+@section Life and death
+
+@table @kbd
+@item R
+Resurrect kid.
+@item K
+Kill enemy.
+@item I
+Toggle immortal mode.
+@item SHIFT+S
+Increment kid current life points.
+@item SHIFT+T
+Increment kid total life points.
+@end table
+
+@section Game flow
+
+@table @kbd
+@item CTRL+R
+Restart the game.
+@item CTRL+Q
+Quit the game.
+@item CTRL+A
+Restart level.
+@item SHIFT+L
+Warp to next level.
+@end table
+
+@section Rendering
+
+@table @kbd
+@item F
+Toggle fullscreen mode.
+@item F10
+Change guard mode. This circulates around the modes: ``ORIGINAL'',
+``GUARD'', ``FAT GUARD'', ``VIZIER'', ``SKELETON'' and ``SHADOW''.
+@item F11
+Change environment mode.  This circulates around the modes:
+``ORIGINAL'', ``DUNGEON'' and ``PALACE''.
+@item F12
+Change video mode.  This circulates around the modes: ``VGA'', ``EGA'',
+``CGA'' and ``HGC''.  This works including at the title screen and cut
+scenes.
+@item SHIFT+I
+Flip screen.  This circulates around the modes: ``NONE'', ``VERTICAL'',
+``HORIZONTAL'' and ``VERTICAL + HORIZONTAL''.
+@item SHIFT+B
+Toggle blind mode.  In blind mode background and non-animated sprites
+are not drawn.
+@end table
+
+@section Level navigation
+
+The navigation keys allow you to move the camera around the level,
+making it possible to view any room linked to the current one without
+having to move the kid there.  Notice that if the kid enters the room
+the camera is on, it starts following him again.
+
+@table @kbd
+@item H
+Move the camera to the room at left (right if the screen is flipped
+horizontally).
+@item J
+Move the camera to the room at right (left if the screen is flipped
+horizontally).
+@item U
+Move the camera to the room above (below if the screen is flipped
+vertically).
+@item N
+Move the camera to the room below (above if the screen is flipped
+vertically).
+@item HOME
+Move the camera back to the kid's room.
+@end table
+
+@section Miscellaneous
+
+@table @kbd
+@item CTRL+V
+Show engine name and version.
+@item CTRL+S
+Toggle sound.
+@item CTRL+L
+Load configuration.
+@item CTRL+G
+Save game.
+@item C
+Show direct coordinates.
+@item SHIFT+C
+Show indirect coordinates.
+@item A
+Alternate between kid and its shadows.
+@item SHIFT+W
+Float kid.
+@item SHIFT+K
+Flip keyboard.  This circulates around the modes: ``NONE'',
+``VERTICAL'', ``HORIZONTAL'' and ``VERTICAL + HORIZONTAL''.
+@end table
+
 
 
 @c 
