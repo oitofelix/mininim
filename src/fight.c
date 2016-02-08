@@ -201,7 +201,8 @@ fight_ai (struct anim *k)
       && (prandom (99) <= k->skill.advance_prob
           || ! is_in_fight_mode (ke))
       && ! is_attacking (ke)
-      && ke->i >= 6 + prandom (24)) {
+      && (! is_in_fight_mode (ke)
+          || ke->i >= 6 + prandom (24))) {
     fight_walkf (k);
     return;
   }

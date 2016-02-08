@@ -26,7 +26,8 @@ xmalloc (size_t n)
 
   void *ptr = al_malloc (n);
   if (! ptr)
-    error (-1, 0, "%s (%u): cannot allocate memory", __func__, n);
+    error (-1, 0, "%s (%u): cannot allocate memory", __func__,
+           (unsigned int) n);
   return ptr;
 }
 
@@ -41,7 +42,8 @@ xrealloc (void *ptr, size_t n)
 
   void *_ptr = al_realloc (ptr, n);
   if (! _ptr)
-    error (-1, 0, "%s (%p, %u): cannot reallocate memory", __func__, ptr, n);
+    error (-1, 0, "%s (%p, %u): cannot reallocate memory", __func__, ptr,
+           (unsigned int) n);
   return _ptr;
 }
 
@@ -52,6 +54,8 @@ xcalloc (size_t count, size_t n)
 
   void *ptr = al_calloc (count, n);
   if (! ptr)
-    error (-1, 0, "%s (%u, %u): cannot allocat memory", __func__, count, n);
+    error (-1, 0, "%s (%u, %u): cannot allocat memory", __func__,
+           (unsigned int) count,
+           (unsigned int) n);
   return ptr;
 }
