@@ -128,8 +128,39 @@ arrangement.
 @center @image{mininim-figures/level-layout}
 
 Therefore, any given construction is uniquely identified within a level
-by its coordinates, which are defined as the triplet @emph{room},
-@emph{floor} and @emph{place}.
+by the coordinates of its place@footnote{The term @emph{place} is used
+throughout the text to describe both the last coordinate of the triplet
+and the world space the triplet refers to.  Also, often the term
+@emph{place} is omitted and the text refer just to the construction
+itself, implying a reference to its place, as in ``the left
+construction'', meaning ``the construction one place to the left''.
+Hopefully, these shouldn't be a source of ambiguity.}, which are defined
+as the triplet @emph{room}, @emph{floor} and @emph{place}:
+@math{(r,f,p)}.
+
+In order to easily talk about the relations between constructions it's
+necessary to define the @dfn{non-directed relative positioning} of a
+given place to its adjacent ones.  Consider the place @emph{C}, which
+has the coordinates @math{(r,f,p)}, and its 8 adjacent places, as shown
+in the following figure.
+
+@center @image{mininim-figures/relative-coordinates-non-directed}
+
+Then we define the following mapping between names and coordinates:
+
+@cartouche
+@itemize
+@item TL (top left): @math{(r,f - 1,p - 1)}
+@item T (top): @math{(r,f - 1,p)}
+@item TR (top right): @math{(r,f - 1,p + 1)}
+@item L (left): @math{(r,f,p - 1)}
+@item C (center): @math{(r,f,p)}
+@item R (right): @math{(r,f,p + 1)}
+@item BL (bottom left): @math{(r,f + 1,p - 1)}
+@item B (bottom): @math{(r,f + 1,p)}
+@item BR (bottom right): @math{(r,f + 1,p + 1)}
+@end itemize
+@end cartouche
 
 Constructions are comprised of three elements: foreground, background
 and extension.  A @dfn{construction foreground} is the physical part the
@@ -376,7 +407,7 @@ the original game.} can leave the kid in half.  It's a @emph{trap},
 counterpart).  It gets activated as soon as the kid is in the same room
 and floor and there is no wall in between.  It doesn't get activated by
 guards, but can kill them as well.  The chopper nullifies the
-@emph{hangable at left} property of the construction above it.
+@emph{hangable at left} property of its top construction.
 
 @multitable @columnfractions .20 .40 .40
   @headitem Code @tab Dungeon @tab Palace
@@ -392,7 +423,7 @@ The @dfn{mirror} reflects the kid's image and prevents him from passing
 trough, except if he is able to perform a running jump, whatever the
 side.  It's @emph{semi-collidable} at left, @emph{hangable at right},
 @emph{rigid} and uses no extension.  The mirror nullifies the
-@emph{hangable at left} property of the construction above it.
+@emph{hangable at left} property of its top construction.
 
 @multitable @columnfractions .20 .40 .40
   @headitem Code @tab Dungeon @tab Palace
@@ -412,8 +443,7 @@ property, which the latter has but the former lacks.  Both are
 @emph{collidable} at right, @emph{rigid} and make use of the
 @emph{design} extension.  The @code{CARPET} construction is also
 @emph{hangable at left}.  Also, carpets nullify the @emph{hangable at
-left} property of the constructions at its top right corner and at its
-right.
+left} property of their @emph{right} and @emph{top right} constructions.
 
 @multitable @columnfractions .15 .2 .2 .45
   @headitem Code @tab Dungeon @tab Palace @tab Notes
@@ -652,15 +682,62 @@ There are six modes of movement: @dfn{normal}, @dfn{crouch}, @dfn{run},
 foremost element determining how the input is translated into kid's
 movements.
 
+Analogous to the defined concept of @emph{non-directed relative
+positioning} (used to describe relations between constructions), is the
+concept of @emph{directed relative positioning}, necessary to easily
+describe the relations between constructions and the kid.  Consider the
+kid's place @emph{C}, which has the coordinates @math{(r,f,p)}, its 8
+adjacent places and the direction the kid is facing, as shown in the
+following two figures.
+
+@center @image{mininim-figures/relative-coordinates-directed-left} @image{mininim-figures/relative-coordinates-directed-right}
+
+Then we define the following mapping between names and coordinates for
+the left direction:
+
+@cartouche
+@center @strong{LEFT}
+@itemize
+@item TF (top front): @math{(r,f - 1,p - 1)}
+@item T (top): @math{(r,f - 1,p)}
+@item TB (top back): @math{(r,f - 1,p + 1)}
+@item F (front): @math{(r,f,p - 1)}
+@item C (center): @math{(r,f,p)}
+@item BA (back): @math{(r,f,p + 1)}
+@item BF (bottom front): @math{(r,f + 1,p - 1)}
+@item B (bottom): @math{(r,f + 1,p)}
+@item BB (bottom back): @math{(r,f + 1,p + 1)}
+@end itemize
+@end cartouche
+
+
+And the following mapping between names and coordinates for the right
+direction:
+
+@cartouche
+@center @strong{RIGHT}
+@itemize
+@item TB (top back): @math{(r,f - 1,p - 1)}
+@item T (top): @math{(r,f - 1,p)}
+@item TF (top front): @math{(r,f - 1,p + 1)}
+@item BA (back): @math{(r,f,p - 1)}
+@item C (center): @math{(r,f,p)}
+@item F (front): @math{(r,f,p + 1)}
+@item BB (bottom back): @math{(r,f + 1,p - 1)}
+@item B (bottom): @math{(r,f + 1,p)}
+@item BF (bottom front): @math{(r,f + 1,p + 1)}
+@end itemize
+@end cartouche
+
 Quite a few movements might culminate in the kid hanging on a
 construction.  In order to describe the conditions in which that may
 happen, it's necessary to define the concept of @emph{hangable place}.
 
 @cartouche
-@noindent@strong{Hangable place:} we say a @emph{place} the kid is in is
-@dfn{hangable} for him, if (and only if) the construction above it is
-@emph{strictly traversable} and the con adjacent to that, in the
-direction the kid faces, is @emph{hangable} in the opposite direction.
+@noindent@strong{Hangable place:} we say the kid's place is
+@dfn{hangable}, if (and only if) its top construction is @emph{strictly
+traversable} and its top front one is @emph{hangable} in the opposite
+direction.
 @end cartouche
 
 Notice that (whenever it makes sense) for any move, holding its
@@ -719,15 +796,15 @@ hangs for a brief period of time.
 
 @center @image{mininim-figures/kid-vjump-floor-no-floor} @arrow{} @image{mininim-figures/kid-vjump-hang-left}
 
-In case the place behind him is @emph{hangable} and
-@emph{non-traversable}, he backs off so the situation fits the previous
-paragraph description.
+In case the place behind him is @emph{hangable} and @emph{non-strictly
+traversable}, he backs off so the situation fits the previous paragraph
+description.
 
 @center @image{mininim-figures/kid-vjump-floor} @arrow{} @image{mininim-figures/kid-vjump-floor-no-floor}
 
-If it's @emph{hangable} but @emph{traversable}, he backs off just
-enough, without entering the @emph{traversable} place, to perform a very
-vertical jump, and then hangs as described.
+If it's @emph{hangable} but @emph{strictly traversable}, he backs off
+just enough, without entering the @emph{strictly traversable} place, to
+perform a very vertical jump, and then hangs as described.
 
 @center @image{mininim-figures/kid-vjump-floor-traversable} @arrow{} @image{mininim-figures/kid-vjump-floor-no-floor-traversable} @arrow{} @image{mininim-figures/kid-vjump-hang-left-traversable}
 
@@ -798,7 +875,9 @@ so, be careful!
 
 @section Crouch
 
-If you press the down key the kid crouches.
+If you press the down key and the kid's bottom back place is
+@emph{non-hangable}, or the kid is not near enough to it, the kid
+crouches.
 
 @center @image{mininim-figures/kid-normal-left} @arrow{} @image{mininim-figures/kid-couch}
 
@@ -906,8 +985,8 @@ will fall either vertically aligned with the @emph{hangable place} or
 with the hanged con's place, depending upon which his feet are aligned
 with when he leaves the hanged construction.@footnote{It's not possible
 to perform such movements in the original game, because there the kid
-always falls aligned with a @emph{non-traversable} construction below
-him, in case there is one.}
+always falls aligned with a @emph{non-strictly traversable} construction
+below him, in case there is one.}
 
 @center @image{mininim-figures/kid-hang-free-fall}
 
