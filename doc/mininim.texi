@@ -706,28 +706,37 @@ little bit forward at each vertical jump.}
 
 @center @image{mininim-figures/kid-vjump} @arrow{} @image{mininim-figures/kid-normal-left}
 
-In case he's in a @emph{hangable place}, he performs a long vertical
-jump (after coming close enough to the edge if he isn't already) and
-hangs for a brief period of time.
-
-@center @image{mininim-figures/kid-vjump-floor-no-floor} @arrow{} @image{mininim-figures/kid-hang-left}
-
-In case the place behind him is @emph{hangable}, he backs off so the
-situation fits the previous paragraph description.
-
-@center @image{mininim-figures/kid-vjump-floor} @arrow{} @image{mininim-figures/kid-vjump-floor-no-floor}
-
-If holding the shift key, the kid enters in @emph{hang mode}, otherwise
-he just drops back to the ground.
-
-@center @image{mininim-figures/kid-hang-left} @arrow{} @image{mininim-figures/kid-vjump-floor-no-floor}
-
 In case the construction above him is not @emph{strictly traversable}
 and the place behind him is not @emph{hangable}, he performs a short
 vertical jump and then comes back to the exact same position he was
 before the jump.
 
 @center @image{mininim-figures/kid-vjump-normal-floor-floor} @arrow{} @image{mininim-figures/kid-vjump-vjump-floor-floor} @arrow{} @image{mininim-figures/kid-vjump-normal-floor-floor}
+
+In case he's in a @emph{hangable place}, he performs a long vertical
+jump (after coming close enough to the edge if he isn't already) and
+hangs for a brief period of time.
+
+@center @image{mininim-figures/kid-vjump-floor-no-floor} @arrow{} @image{mininim-figures/kid-vjump-hang-left}
+
+In case the place behind him is @emph{hangable} and
+@emph{non-traversable}, he backs off so the situation fits the previous
+paragraph description.
+
+@center @image{mininim-figures/kid-vjump-floor} @arrow{} @image{mininim-figures/kid-vjump-floor-no-floor}
+
+If it's @emph{hangable} but @emph{traversable}, he backs off just
+enough, without entering the @emph{traversable} place, to perform a very
+vertical jump, and then hangs as described.
+
+@center @image{mininim-figures/kid-vjump-floor-traversable} @arrow{} @image{mininim-figures/kid-vjump-floor-no-floor-traversable} @arrow{} @image{mininim-figures/kid-vjump-hang-left-traversable}
+
+If holding the shift key, the kid enters in @emph{hang mode}, otherwise
+he just drops back to the ground.
+
+@center @image{mininim-figures/kid-vjump-hang-left} @arrow{} @image{mininim-figures/kid-vjump-floor-no-floor}
+
+@center @image{mininim-figures/kid-vjump-hang-left-traversable} @arrow{} @image{mininim-figures/kid-vjump-floor-no-floor-traversable}
 
 
 @subsection Normal jump
@@ -873,26 +882,67 @@ the opposite direction if you keep the horizontal key pressed.
 
 @center @image{mininim-figures/kid-run} @arrow{} @image{mininim-figures/kid-turn-run} @arrow{} @image{mininim-figures/kid-run-right}
 
-@subsection Hang
+@section Hang
 
 There are two modes of hanging: @emph{free} and @emph{non-free}.  The
 kid @dfn{hangs free} when the construction below the hanged one is not
 collidable at the direction of hanging.  Otherwise he @dfn{hangs
-non-free}.  While hanging free the kid swings back and forth like a
-pendulum.  However, there is a limit for how much time he can support
-his own weight, after which he drops from the construction.  Releasing
-the shift key in the meantime has the same effect.
+non-free}.
+
+While @emph{hanging free} the kid swings back and forth like a pendulum.
 
 @center @image{mininim-figures/kid-hang-left} @arrow{} @image{mininim-figures/kid-hang-left-forth} @arrow{} @image{mininim-figures/kid-hang-left} @arrow{} @image{mininim-figures/kid-hang-left-back}
 
-The kid will fall either vertically aligned with the @emph{hangable
-place} or with the hanged con's place, depending upon which his feet are
-aligned to when he leaves the hanged construction.  @footnote{It's not
-possible to make such movements in the original game, because there the
-kid always falls aligned with a @emph{non-traversable} construction
-below him, in case there is one.}
+By contrast, when @emph{hanging non-free} the kid keeps himself static.
+
+@center @image{mininim-figures/kid-hang-left-non-free}
+
+@subsection Hanging fall
+
+When @emph{hanging free}, there is a limit for how much time he can
+support his own weight, after which he drops from the construction.
+Releasing the shift key in the meantime has the same effect.  The kid
+will fall either vertically aligned with the @emph{hangable place} or
+with the hanged con's place, depending upon which his feet are aligned
+with when he leaves the hanged construction.@footnote{It's not possible
+to perform such movements in the original game, because there the kid
+always falls aligned with a @emph{non-traversable} construction below
+him, in case there is one.}
 
 @center @image{mininim-figures/kid-hang-free-fall}
+
+The kid can sustain himself indefinitely when @emph{hanging non-free},
+thus the only way to make him drop the con is by releasing the shift
+key.  As one would expect, the kid always falls aligned to the
+@emph{hangable place}.
+
+@center @image{mininim-figures/kid-hang-left-non-free-floor-00} @arrow{} @image{mininim-figures/kid-hang-left-non-free-floor-01}
+
+@subsection Hanging turn
+
+When the kid is @emph{hanging free} in a place that is @emph{hangable}
+in both directions and his feet are aligned with it, pressing the
+horizontal key in the opposite direction he's facing, while holding
+shift, makes him turn in midair and hang on the con at his
+back.@footnote{This movement is not present in the original game.}
+
+@center @image{mininim-figures/kid-hang-left-back-floor-no-floor-floor} @arrow{} @image{mininim-figures/kid-hang-right-floor-no-floor-floor}
+
+Naturally, if @emph{hanging non-free} in a place that is @emph{hangable}
+in both directions, there is no need to observe the kid's body
+inclination, just pressing the horizontal key in the opposite direction
+he's facing, will do the job (granted shift is keep
+pressed).@footnote{This movement is not present in the original game.}
+
+@center @image{mininim-figures/kid-hang-left-back-floor-no-floor-floor-non-free} @arrow{} @image{mininim-figures/kid-hang-right-floor-no-floor-floor-non-free}
+
+@subsection Climb
+
+Pressing the up key while hanging makes the kid climb the construction
+for both modes.
+
+@center @image{mininim-figures/kid-hang-climb-00} @arrow{} @image{mininim-figures/kid-hang-climb-01} @image{mininim-figures/kid-hang-climb-non-free-00} @arrow{} @image{mininim-figures/kid-hang-climb-non-free-01}
+
 
 @section Fight
 
