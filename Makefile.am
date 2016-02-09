@@ -133,7 +133,7 @@ LDADD = gnulib/libgnu.a
 
 if mingw_build
   LDADD += mininim.rc.$(OBJEXT)
-  AM_CFLAGS += -mwindows
+  # AM_CFLAGS += -mwindows
 endif
 SUFFIXES = .rc
 WINDRES = windres
