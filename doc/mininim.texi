@@ -59,6 +59,7 @@
 
 @c --- Menu;
 @menu
+* Preface:: What's is this all about
 * Constructions:: The matter the world is made of
 * Movements:: How the kid reacts to user input
 * Key bindings:: Keys with useful functions
@@ -109,6 +110,32 @@ Indexes:
 @c --- Table of contents;
 @contents
 
+
+
+
+
+@c --- Preface;
+@node Preface
+@unnumbered Preface
+@cindex Preface
+
+@emph{Menininho} is the Brazilian Portuguese word for @emph{male kid},
+and @emph{Mininim} is how it's informally spoken throughout the country.
+@emph{Kid} is the term used by @emph{Jordan Mechner}@footnote{Jordan
+Mechner (born June 4, 1964) is an American video game designer, author,
+screenwriter, and filmmaker, best known for creating the Prince of
+Persia video game franchise and the 8-bit computer game Karateka.} when
+referring to the main character of his most famous game
+---@strong{Prince of Persia}--- in its source code and documentation,
+because the character's movements were derived from rotoscoping footage
+of Mechner's little brother.  @strong{MININIM} is the @emph{Advanced
+Prince of Persia Engine}, written by computer programmer and free
+software activist @emph{Bruno Félix Rezende Ribeiro} @code{(oitofelix)}.
+Bruno had a childhood dream of deciphering the secrets of his favorite
+game ---a dream dreamt when he was just a kid, a dream realized now that
+he's still a ``mininim'' deep in his heart.@footnote{Of course, none of
+this is reason enough to name a game engine ``MININIM'', if not by the
+fact that it's a really cool palindrome!}
 
 
 
@@ -1626,16 +1653,6 @@ Print a short usage message and exit
 Print program name and version and exit
 @end table
 
-
-
-
-@c 
-@c @c --- Preface;
-@c @node Preface
-@c @unnumbered Preface
-@c @cindex introduction
-
-@c <Here comes an introduction to MININIM and its documentation>
 
 
 
