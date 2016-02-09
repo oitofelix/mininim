@@ -61,7 +61,8 @@
 @menu
 * Constructions:: The matter the world is made of
 * Movements:: How the kid reacts to user input
-
+* Key bindings:: Keys with useful functions
+* Configuration:: How to make the engine match user's preferences
 
 
 @c * Preface::    Motivation, program definition and document organization;
@@ -115,7 +116,7 @@ Indexes:
 @c --- Constructions;
 @node Constructions
 @chapter Constructions
-@cindex constructions
+@cindex Constructions
 
 Each @dfn{level} is comprised of @dfn{rooms}@footnote{The terminology
 used for @dfn{rooms} in the original game is @dfn{screens}.}.  Each room
@@ -665,7 +666,7 @@ by the kid by pressing the shift key.
 @c --- Movements;
 @node Movements
 @chapter Movements
-@cindex movements
+@cindex Movements
 
 In his journey to save the princess, the kid has to endure several
 levels full of challenging traps and skilled opponents.  Run, walk,
@@ -1150,7 +1151,7 @@ pressing the down key.
 
 
 
-@c --- Movements;
+@c --- Key bindings;
 @node Key bindings
 @chapter Key bindings
 @cindex Key bindings
@@ -1310,17 +1311,19 @@ Show indirect coordinates.
 
 @section Files
 
-These key bindings are used to save and load configuration files.
+These key bindings are used to save and load configuration files.  They
+open a platform-dependent file choosing dialog.  Notice that save files
+are a particular case of configuration files and should be loaded the
+same way.  When loaded in-game, configuration files take effect
+immediately, however some effects only become visible under certain
+conditions.  For instance save files show their effect only on game
+(re)start.
 
 @table @kbd
 @item CTRL+L
 Load configuration.  Related to option @option{--load-config}.
 @item CTRL+G
-Save game.  Notice that save files are a particular case of
-configuration files and should be loaded the same way.  When loaded
-in-game, configuration files take effect immediately, however some
-effects only become visible under certain conditions.  For instance save
-files show their effect only on game (re)start.
+Save game.
 @end table
 
 @section Peripherals
@@ -1354,6 +1357,275 @@ These are key bindings that don't fit in any other category.
 @item CTRL+V
 Show engine name and version.  Related to option @option{--version}.
 @end table
+
+
+
+
+@c --- Configuration;
+@node Configuration
+@chapter Configuration
+@cindex Configuration
+
+MININIM can be easily setup to match user's preferences regarding the
+way the game looks and behaves.  It features an integrated configuration
+system which offers three distinct interfaces: @emph{command line
+options}, @emph{environment variables} and @emph{configuration files}.
+
+The configuration system uses the command line options parser as the
+central interpreter for the configuration process.  Providing a single
+options parsing routine allows for easy maintenance, equivalence between
+methods and a canonical interface for integrating future methods.
+
+For that end, each configuration option backend implements a translator
+between its specifics of option representation and access to a normal
+command line array.  Then the resulting options are roughly processed as
+if they were given at the engine invocation command line.
+
+As the options are the same for all three current methods of
+configuration, and all of them are in essence processed as command line
+options, it's unnecessary to describe all options for each of them
+separately.  Therefore, we provide systematic rules for converting
+between method option names and their command line equivalents, and then
+describe only the latter.
+
+The rule for option naming conversion is very simple: for every command
+line option of the form @option{x-y} there is an equivalent environment
+variable option @env{MININIM_X_Y} and an equivalent configuration file
+option @samp{x y}.
+
+The multiple methods of configuration are cumulative but command line
+options override any other, while environment variables override the
+main configuration file.  In any method applicable later options
+override earlier ones.  The option @option{--print-paths} shows, among
+other things, the expected file name of the main configuration file.
+Notice that configuration files have INI format without any sections,
+like this:
+
+@example
+option 0 = value 0
+...
+option n = value n
+@end example
+
+Notice that many options can be changed on the fly by key binding
+counterparts.
+
+The following remarks apply to the options list in this chapter:
+
+@itemize
+@item Long option names are case sensitive.
+
+@item Option values are case insensitive.
+
+@item Both can be partially specified as long as they are kept
+unambiguous.
+
+@item @var{boolean} is an integer equating to @samp{0}, or any sub-string
+(including the null string) of @samp{FALSE}, @samp{OFF} or @samp{NO} to
+disable the respective feature, and any other value (even no string at
+all) to enable it.
+
+@item For any non-specified option the documented default
+applies.
+
+@item Integers can be specified in any of the formats defined by the
+C language.
+
+@item Key bindings references are based on the default mapping.
+@end itemize
+
+
+@section Configuration options
+
+@table @option
+@item --ignore-environment
+Ignore environment variables.  The default is to parse them after the
+main configuration file.
+
+@item --ignore-main-config
+Ignore main configuration file.  The default is to parse it at the very
+beginning of each run.
+
+@item --load-config=FILE
+Load configuration file @var{file}.  The options set in @var{file} have
+the same precedence as the equivalent command line options given at its
+place of occurrence.  This can be done in-game by the @kbd{CTRL+L} key
+binding.
+@end table
+
+
+@section Level options
+
+@table @option
+@item --level-module=LEVEL-MODULE
+Select level module.  A level module determines a way to generate
+consecutive levels for use by the engine.  Valid values for
+@var{level-module} are: @samp{LEGACY} and @samp{CONSISTENCY}.
+@samp{LEGACY} is the module designed to read the original unarchived
+@acronym{PoP, Prince of Persia} 1 DOS level files.  @samp{CONSISTENCY}
+is the module designed to generate random-corrected levels for accessing
+the engine robustness.  The default is @samp{LEGACY}.
+
+@item --start-level=N
+Make the kid start at level @var{n}.  The default is @samp{1}.  Valid
+integers range from @samp{1} to @code{INT_MAX}.  This can be changed
+in-game by the @kbd{SHIFT+L} key binding.
+@end table
+
+
+@section Time options
+
+@table @option
+@item --start-time=N
+Set the play time counter to @var{n} seconds.  The default is @samp{0}.  Valid
+integers range from @samp{0} to @code{INT_MAX}.
+
+@item --time-limit=N
+Set the time limit to complete the game to @var{n} seconds.  The default
+is @samp{3600} (1 hour).  Valid integers range from @samp{1} to @code{INT_MAX}.
+This can be changed in-game by the @kbd{+} and @kbd{-} key bindings.
+@end table
+
+
+@section Skills options
+
+@table @option
+@item --immortal-mode[=BOOLEAN]
+Enable/disable immortal mode.  In immortal mode the kid can't be harmed.
+The default is @samp{FALSE}.  This can be changed in-game by the @kbd{I}
+key binding.
+
+@item --kca=N
+Set kid's counter attack skill to @var{n}.  The default is @samp{0}.
+Valid integers range from @samp{0} to @samp{100}.  This can be changed
+in-game by the @kbd{CTRL+=} and @kbd{CTRL+-} key bindings.
+
+@item --kcd=N
+Set kid's counter defense skill to @var{n}.  The default is @samp{0}.
+Valid integers range from @samp{0} to @samp{100}.  This can be changed
+in-game by the @kbd{ALT+=} and @kbd{ALT+-} key bindings.
+
+@item --total-lives=N
+Make the kid start with @var{n} total lives.  The default is @samp{3}.
+Valid integers range from @samp{1} to @samp{10}.  This can be changed
+in-game by the @kbd{SHIFT+T} key binding.
+@end table
+
+
+@section Rendering options
+
+@table @option
+@item --blind-mode[=BOOLEAN]
+Enable/disable blind mode.  In blind mode background and non-animated
+sprites are not drawn.  The default is @samp{FALSE}.  This can be
+changed in-game by the @kbd{SHIFT+B} key binding.
+
+@item --display-flip-mode=DISPLAY-FLIP-MODE
+Select display flip mode.  Valid values for @var{display-flip-mode} are:
+@samp{NONE}, @samp{VERTICAL}, @samp{HORIZONTAL} and
+@samp{VERTICAL-HORIZONTAL}.  The default is @samp{NONE}.  This can be
+changed in-game by the @kbd{SHIFT+I} key binding.
+
+@item --environment-mode=ENVIRONMENT-MODE
+Select environment mode.  Valid values for @var{environment-mode} are:
+@samp{ORIGINAL}, @samp{DUNGEON} and @samp{PALACE}.  The @samp{ORIGINAL}
+value gives level modules autonomy in this choice for each particular
+level.  This is the default.  This can be changed in-game by the
+@kbd{F11} key binding.
+
+@item --guard-mode=GUARD-MODE
+Select guard mode.  Valid values for @var{guard-mode} are:
+@samp{ORIGINAL}, @samp{GUARD}, @samp{FAT-GUARD}, @samp{VIZIER},
+@samp{SKELETON} and @samp{SHADOW}.  The @samp{ORIGINAL} value gives
+level modules autonomy in this choice for each particular guard.  This
+is the default.  This can be changed in-game by the @kbd{F10} key
+binding.
+
+@item --mirror-mode[=BOOLEAN]
+Enable/disable mirror mode.  In mirror mode the screen and the keyboard
+are flipped horizontally.  This is equivalent of specifying both the
+options @option{--display-flip-mode=HORIZONTAL} and
+@option{--keyboard-flip-mode=HORIZONTAL}.  The default is @samp{FALSE}.
+This can be changed in-game by the @kbd{SHIFT+I} and @kbd{SHIFT+K} key
+bindings for the display and keyboard, respectively.
+
+@item --video-mode=VIDEO-MODE
+Select video mode.  Valid values for @var{video-mode} are: @samp{VGA},
+@samp{EGA}, @samp{CGA} and @samp{HGC}.  The default is @samp{VGA}.  This
+can be changed in-game by the @kbd{F12} key binding.
+@end table
+
+
+@section Window options
+
+@table @option
+@item --fullscreen[=BOOLEAN]
+Enable/disable fullscreen mode.  In fullscreen mode the window spans the
+entire screen.  The default is @samp{FALSE}.  This can be changed
+in-game by the @kbd{F} key binding.
+
+@item --window-dimensions=WxH
+Set window width and height to @var{w} and @var{h}, respectively.  The
+default is @samp{640x400}.  The values @var{w} and @var{h} are strictly
+positive integers and must be separated by an @samp{x}.
+
+@item --window-position=X,Y
+Place the window at screen coordinates @var{x,y}.  The default is to let
+this choice to the window manager.  The values @var{x} and @var{y} are
+integers and must be separated by a comma.
+@end table
+
+
+@section Paths options
+
+@table @option
+@item --data-path=PATH
+Set data path to @var{path}.  Normally, the data files are looked for in
+the current working directory, then in the user data directory, then in
+the resources directory, and finally in the system data directory.  If
+this option is given, before looking there the data files are looked for
+in @var{path}.
+
+@item --print-paths
+Print paths and exit.
+@end table
+
+
+@section Other options
+
+@table @option
+@item --inhibit-screensaver[=BOOLEAN]
+Prevent the system screensaver from starting up.  The default is
+@samp{FALSE}.
+
+@item --keyboard-flip-mode=KEYBOARD-FLIP-MODE
+Select keyboard flip mode.  Valid values for @var{keyboard-flip-mode}
+are: @samp{NONE}, @samp{VERTICAL}, @samp{HORIZONTAL} and
+@samp{VERTICAL-HORIZONTAL}.  The default is @samp{NONE}.  This can be
+changed in-game by the @kbd{SHIFT+K} key binding.
+
+@item --skip-title[=BOOLEAN]
+Skip title screen.  The default is @samp{FALSE}.
+
+@item --sound[=BOOLEAN]
+Enable/disable sound.  The default is @samp{TRUE}.  This can be changed
+in-game by the @kbd{CTRL+S} key binding.
+@end table
+
+
+@section Help options
+
+@table @option
+@item -?
+@itemx --help
+Print options list and exit
+@item --usage
+Print a short usage message and exit
+@item -V
+@itemx --version
+Print program name and version and exit
+@end table
+
 
 
 
