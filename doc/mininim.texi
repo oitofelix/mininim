@@ -1103,10 +1103,13 @@ The shift key makes him attack.
 
 Holding the shift and up keys puts the kid in counter attack and counter
 defense mode.  At first, there is no immediate noticeable difference
-from standing still in fight mode, but as an enemy attacks, the kid
-defends for certain. Then, depending upon probability whose likelihood
-is given by the @acronym{KCA, Kid's Counter Attack} skill, he may
-counter attack.
+from standing still in fight mode, but as an enemy attacks@footnote{In
+the original game the terminology for ``attack'' is ``striking'', for
+``counter attack'' is ``re-striking after block'', for ``defense'' is
+``blocking strike'' and for ``counter defense'' is ``improper
+blocking''.}, the kid defends for certain. Then, depending upon
+probability whose likelihood is given by the @acronym{KCA, Kid's Counter
+Attack} skill, he may counter attack.
 
 Depending on the enemy's skills, the enemy may counter defend (if not
 the enemy loses a life point) and then counter attack.  In that case,
@@ -1127,12 +1130,18 @@ appropriate, without leaving this mode.  However, although walking
 backward doesn't make the kid lower his guard, walking forward makes him
 vulnerable until he puts himself on guard again.
 
-The kid's skills are built up by defeating enemies.  The more advanced
-the defeated enemy's skills, the more the kid's skills improve.
+The kid's skills are built up by defeating enemies.@footnote{In the
+original game there is no such skills scheme.  There, if you don't get
+tired of pressing the shift and up keys, the kid's counter attack and
+counter defense are infallible.}  The more advanced the defeated enemy's
+skills, the more the kid's skills improve.  Both skills ---KCA and
+KCD--- are given by a number between 0 and 100, interpreted as
+percentages, indicating the likelihood of counter attacking and counter
+defending, respectively.
 
 @subsection Keep sword
 
-Finally you can make him keep the sword and return to normal mode by
+Finally you can make the kid keep his sword and return to normal mode by
 pressing the down key.
 
 @center @image{mininim-figures/kid-sword-normal} @arrow{} @image{mininim-figures/kid-keep-sword} @arrow{} @image{mininim-figures/kid-normal-left}
@@ -1146,92 +1155,137 @@ pressing the down key.
 @chapter Key bindings
 @cindex Key bindings
 
-The engine has several key bindings that perform useful functions.  Here
-is a list of them.
+The engine has several key bindings that control an wide range of
+settings and perform useful functions.  Many key bindings work anytime,
+in the title screen, cut scenes and levels, while others work only in
+the latter.  The key bindings are designed to mimic those of the
+original game when started with the option @option{megahit}
+(@option{improved} in latter revisions), however they can implement a
+super-set of the functions available there and MININIM implements quite
+a few more.  Also, many key bindings have a configuration option
+counterpart.
 
-@section Time
+@section Game flow
 
 @table @kbd
-@item SPACE
-Display remaining time.
-@item +
-Increment and display remaining time.
-@item -
-Decrement and display remaining time.
+@item SHIFT+L
+Warp to next level.  Related to option @option{--start-level}.
+@item CTRL+A
+Restart level.
+@item CTRL+R
+Restart the game.
+@item CTRL+Q
+Quit the game.
 @end table
 
-@section Skills
+@section Graphical rendering
+
+These key bindings modify how the engine graphically renders the game
+world objects.
 
 @table @kbd
-@item TAB
-Display skills.
-@item CTRL+=
-Increment counter attack skill.
-@item CTRL+-
-Decrement counter attack skill.
-@item ALT+=
-Increment counter defense skill.
-@item ALT+-
-Decrement counter defense skill.
+@item F10
+Select guard mode. This circulates around the modes: ``ORIGINAL'',
+``GUARD'', ``FAT GUARD'', ``VIZIER'', ``SKELETON'' and ``SHADOW''.  The
+``ORIGINAL'' mode gives level modules autonomy in this choice for each
+particular guard.  This is the default.  Related to option
+@option{--guard-mode}.
+@item F11
+Select environment mode.  This circulates around the modes:
+``ORIGINAL'', ``DUNGEON'' and ``PALACE''.  The ``ORIGINAL'' value gives
+level modules autonomy in this choice for each particular level.  This
+is the default.  Related to option @option{--environment-mode}.
+@item F12
+Select video mode.  This circulates around the modes: ``VGA'', ``EGA'',
+``CGA'' and ``HGC''. The default is VGA.  Related to option
+@option{--video-mode}.
+@item SHIFT+B
+Toggle blind mode.  In blind mode background and non-animated sprites
+are not drawn.  The default is to draw everything.  Related to option
+@option{--blind-mode}.
 @end table
 
 @section Life and death
 
 @table @kbd
+@item K
+Kill enemy.@footnote{This only works for the enemy currently associated
+with the kid.  In the original game this works for the enemy in the room
+at view, as it can only handle one guard per room.  There is no such
+limit in MININIM.}
 @item R
 Resurrect kid.
-@item K
-Kill enemy.
 @item I
-Toggle immortal mode.
+Toggle immortal mode.  In immortal mode the kid can't be harmed.  The
+default mode is mortal.  Related to option @option{--immortal-mode}.
 @item SHIFT+S
-Increment kid current life points.
+Increment kid's current life points.
 @item SHIFT+T
-Increment kid total life points.
+Increment kid's total life points.  Related to option
+@option{--total-lives}.
 @end table
 
-@section Game flow
+@section Kid special
+
+These key bindings give or trigger special kid's abilities.
 
 @table @kbd
-@item CTRL+R
-Restart the game.
-@item CTRL+Q
-Quit the game.
-@item CTRL+A
-Restart level.
-@item SHIFT+L
-Warp to next level.
+@item A
+Alternate between kid and its shadows.  This is intended for level
+modules that make use of such feature.  That's not the legacy module
+case.
+@item SHIFT+W
+Float kid.  This is equivalent to drinking a float potion.
 @end table
 
-@section Rendering
+@section Time
+
+These key bindings allow you to control the remaining time available to
+end the game.  They are related to options @option{--time-limit} and
+@option{--start-time}.
 
 @table @kbd
-@item F
-Toggle fullscreen mode.
-@item F10
-Change guard mode. This circulates around the modes: ``ORIGINAL'',
-``GUARD'', ``FAT GUARD'', ``VIZIER'', ``SKELETON'' and ``SHADOW''.
-@item F11
-Change environment mode.  This circulates around the modes:
-``ORIGINAL'', ``DUNGEON'' and ``PALACE''.
-@item F12
-Change video mode.  This circulates around the modes: ``VGA'', ``EGA'',
-``CGA'' and ``HGC''.  This works including at the title screen and cut
-scenes.
-@item SHIFT+I
-Flip screen.  This circulates around the modes: ``NONE'', ``VERTICAL'',
-``HORIZONTAL'' and ``VERTICAL + HORIZONTAL''.
-@item SHIFT+B
-Toggle blind mode.  In blind mode background and non-animated sprites
-are not drawn.
+@item SPACE
+Display remaining time.  Notice that the remaining time is displayed
+automatically when it reaches multiples of 5 minutes, and it's
+constantly shown when remains less than a minute to its end.
+@item +
+Increment and display remaining time.  If the remaining time is greater
+than 1 minute, increment remaining time by 1 minute, otherwise by 1
+second.
+@item -
+Decrement and display remaining time.  If the remaining time is greater
+than 1 minute, decrement remaining time by 1 minute, otherwise by 1
+second.
+@end table
+
+@section Skills
+
+These key bindings allow you to set the kid skills.  They are related to
+options @option{--kca} and @option{--kcd}.
+
+@table @kbd
+@item TAB
+Display skills.  If the kid is associated with an enemy, it shows both
+fighters' skills, otherwise it only shows the kid's.
+@item CTRL+=
+Increment KCA skill.
+@item CTRL+-
+Decrement KCA skill.
+@item ALT+=
+Increment KCD skill.
+@item ALT+-
+Decrement KCD skill.
 @end table
 
 @section Level navigation
 
-The navigation keys allow you to move the camera around the level,
-making it possible to view any room linked to the current one without
-having to move the kid there.  Notice that if the kid enters the room
-the camera is on, it starts following him again.
+These key bindings allow you to move the camera around the level, making
+it possible to view any room linked to the current one without having to
+move the kid there.  Notice that if the kid enters the room the camera
+is on, it starts following him again.  There is also a couple of key
+bindings intended to show room coordinates, which is useful when
+building levels.
 
 @table @kbd
 @item H
@@ -1248,30 +1302,57 @@ Move the camera to the room below (above if the screen is flipped
 vertically).
 @item HOME
 Move the camera back to the kid's room.
-@end table
-
-@section Miscellaneous
-
-@table @kbd
-@item CTRL+V
-Show engine name and version.
-@item CTRL+S
-Toggle sound.
-@item CTRL+L
-Load configuration.
-@item CTRL+G
-Save game.
 @item C
 Show direct coordinates.
 @item SHIFT+C
 Show indirect coordinates.
-@item A
-Alternate between kid and its shadows.
-@item SHIFT+W
-Float kid.
+@end table
+
+@section Files
+
+These key bindings are used to save and load configuration files.
+
+@table @kbd
+@item CTRL+L
+Load configuration.  Related to option @option{--load-config}.
+@item CTRL+G
+Save game.  Notice that save files are a particular case of
+configuration files and should be loaded the same way.  When loaded
+in-game, configuration files take effect immediately, however some
+effects only become visible under certain conditions.  For instance save
+files show their effect only on game (re)start.
+@end table
+
+@section Peripherals
+
+These key bindings allow you to tune hardware peripherals that work with
+the game.
+
+@table @kbd
+@item F
+Toggle fullscreen mode.  In fullscreen mode the window spans the entire
+screen.  The default is to have a window of 640x400 resolution.  Related
+to option @option{--fullscreen}.
+@item SHIFT+I
+Select display flip mode.  This circulates around the modes: ``NONE'',
+``VERTICAL'', ``HORIZONTAL'' and ``VERTICAL + HORIZONTAL''.  The default
+is ``NONE''.  Related to option @option{--display-flip-mode}.
 @item SHIFT+K
-Flip keyboard.  This circulates around the modes: ``NONE'',
-``VERTICAL'', ``HORIZONTAL'' and ``VERTICAL + HORIZONTAL''.
+Select keyboard flip mode.  This circulates around the modes: ``NONE'',
+``VERTICAL'', ``HORIZONTAL'' and ``VERTICAL + HORIZONTAL''.  The default
+is ``NONE''.  Related to option @option{--keyboard-flip-mode}.
+@item CTRL+S
+Toggle sound.  The default is to have sound enabled.  Related to option
+@option{--sound}.
+@end table
+
+@section Miscellaneous
+
+These are key bindings that don't fit in any other category.
+
+@table @kbd
+@item CTRL+V
+Show engine name and version.  Related to option @option{--version}.
 @end table
 
 
