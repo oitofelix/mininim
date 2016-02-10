@@ -170,7 +170,7 @@ play_anim (void (*draw_callback) (void),
 
       /* CTRL+V: show engine name and version */
       if (was_key_pressed (ALLEGRO_KEY_V, 0, ALLEGRO_KEYMOD_CTRL, true)) {
-        xasprintf (&text, "MININIM 0.9");
+        xasprintf (&text, "MININIM %s", VERSION);
         draw_bottom_text (NULL, text);
         al_free (text);
       }
