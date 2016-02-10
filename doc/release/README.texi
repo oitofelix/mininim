@@ -139,20 +139,10 @@ The program license;
 The documentation license;
 @item ChangeLog
 Detailed list of changes of the source code;
-@end table
-
-Information about the GNU operating system, the GNU Project and the
-Free Software Movement are included in the distribution --- for your
-pleasure --- in the form of some articles by Richard Stallman (RMS).
-See the top-level files:
-
-@itemize
-@item THE-GNU-MANIFESTO
-@item THE-GNU-PROJECT
 @item LINUX-AND-THE-GNU-SYSTEM
-@item WHY-SOFTWARE-SHOULD-NOT-HAVE-OWNERS
-@item WHY-FREE-SOFTWARE-NEEDS-FREE-DOCUMENTATION
-@end itemize
+Article by Richard Stallman (RMS) talking about the relationship between
+the GNU operating system and the kernel Linux.
+@end table
 
 @end ifset
 
