@@ -97,12 +97,12 @@ mininim_SOURCES = src/mininim.c src/mininim.h src/constants.h					\
 		src/kernel/dialog.h src/kernel/threads.c src/kernel/threads.h			\
 		src/kernel/xconfig.c src/kernel/xconfig.h
 
-${mininim_OBJECTS}: src/mininim.h.gch
+${mininim_OBJECTS}: ${top_builddir}/src/mininim.h.gch
 
-src/mininim.h.gch: ${mininim_SOURCES:%.c=${srcdir}/%.h}
-	$(AM_V_CC) $(COMPILE) -c $<
+${top_builddir}/src/mininim.h.gch: ${mininim_SOURCES:%.c=${srcdir}/%.h}
+	$(AM_V_CC) $(COMPILE) -o $@ -c $<
 
-CLEANFILES = src/mininim.h.gch
+CLEANFILES = ${top_builddir}/src/mininim.h.gch
 
 AM_CPPFLAGS = -DLOCALEDIR=\"$(localedir)\"												\
 -DPKGDATADIR=\"$(pkgdatadir)\" -I$(top_builddir)/gnulib						\
@@ -141,7 +141,15 @@ WINDRES = windres
 	$(WINDRES) $(WINDRESFLAGS) -o $@ $<
 
 install-data-hook:
-	cp -rv ${top_srcdir}/data ${pkgdatadir}
+	$(MKDIR_P) "${pkgdatadir}"
+	chmod u+w "${pkgdatadir}"
+	cp -rv "${top_srcdir}/data" "${pkgdatadir}"
+
+uninstall-local:
+	find "${pkgdatadir}/data" \( -type f -or -type d \) \
+		! -perm -u+w -exec chmod u+w {} ';'
+	rm -rf "${pkgdatadir}/data"
+
 
 
 

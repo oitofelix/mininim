@@ -65,22 +65,13 @@
 * Key bindings:: Keys with useful functions
 * Configuration:: How to make the engine match user's preferences
 
+* Software package:: Build, installation, distribution, contribution and
+                     donation;
+* Release::    Information specifically relevant for the current release;
 
-@c * Preface::    Motivation, program definition and document organization;
-
-@c * Overview::   Description, distribution, obtaining, contact, bug reports,
-@c                 contribution, donation and hacking;
-@c * Release::    Information specifically relevant for the current release;
-
-@c Appendices:
-@c * GNU Free Documentation License:: The license for this documentation;
-
-@c GNU philosophy:
-@c * The GNU Manifesto::
-@c * The GNU Project::
-@c * Linux and the GNU system::
-@c * Why Software Should Not Have Owners::
-@c * Why Free Software Needs Free Documentation::
+Appendices:
+* GNU FDL:: The license for this documentation;
+* Linux and the GNU system:: GNU philosophy
 
 Indexes:
 * Index:: Concepts and reference material.
@@ -117,7 +108,17 @@ Indexes:
 @c --- Preface;
 @node Preface
 @unnumbered Preface
-@cindex Preface
+@cindex preface
+@cindex manifesto, MININIM
+@cindex motivation, MININIM
+@cindex origin, MININIM
+@cindex name, MININIM
+@cindex Jordan Mechner
+@cindex Mechner, Jordan
+@cindex childhood dream
+@cindex dream childhood
+@cindex Bruno Félix Rezende Ribeiro
+@cindex oitofelix
 
 @emph{Menininho} is the Brazilian Portuguese word for @emph{male kid},
 and @emph{mininim} is how it's informally spoken throughout the country.
@@ -129,14 +130,14 @@ referring to the main character of his most famous game
 ---@strong{Prince of Persia}--- in its source code and documentation,
 because the character's movements were derived from rotoscoping footage
 of Mechner's little brother.  @strong{MININIM} is the @emph{Advanced
-Prince of Persia Engine}, written by computer programmer and free
-software activist @emph{Bruno Félix Rezende Ribeiro} @code{(oitofelix)}.
-Bruno had a childhood dream of deciphering the secrets of his favorite
-game which introduced him to computing ---a dream dreamt when he was
-just a kid, a dream realized now that he's still a ``mininim'' deep in
-his heart.@footnote{Of course, none of this is reason enough to name a
-game engine ``MININIM'', if not by the fact that it's a really cool
-palindrome!}
+Prince of Persia Engine}, written from scratch by computer programmer
+and free software activist @emph{Bruno Félix Rezende Ribeiro}
+(@code{oitofelix}).  Bruno had a childhood dream of deciphering the
+secrets of his favorite game which introduced him to computing ---a
+dream dreamt when he was just a kid, a dream realized now that he's
+still a @emph{mininim} deep in his heart.@footnote{Of course, none of
+this is reason enough to name a game engine ``MININIM'', if not by the
+fact that it's a really cool palindrome!}
 
 
 
@@ -145,8 +146,14 @@ palindrome!}
 @c --- Constructions;
 @node Constructions
 @chapter Constructions
-@cindex Constructions
+@cindex constructions
 
+@cindex room
+@cindex floor
+@cindex place
+@cindex con
+@cindex screen
+@cindex tile
 Each @dfn{level} is comprised of @dfn{rooms}@footnote{The terminology
 used for @dfn{rooms} in the original game is @dfn{screens}.}.  Each room
 is comprised of three @dfn{floors}.  Each floor is comprised of 10
@@ -157,6 +164,8 @@ arrangement.
 
 @center @image{mininim-figures/level-layout}
 
+@cindex coordinates, level
+@cindex level coordinates
 Therefore, any given construction is uniquely identified within a level
 by the coordinates of its place@footnote{The term @emph{place} is used
 throughout the text to describe both the last coordinate of the triplet
@@ -695,7 +704,7 @@ by the kid by pressing the shift key.
 @c --- Movements;
 @node Movements
 @chapter Movements
-@cindex Movements
+@cindex movements
 
 In his journey to save the princess, the kid has to endure several
 levels full of challenging traps and skilled opponents.  Run, walk,
@@ -1183,7 +1192,7 @@ pressing the down key.
 @c --- Key bindings;
 @node Key bindings
 @chapter Key bindings
-@cindex Key bindings
+@cindex key bindings
 
 The engine has several key bindings that control an wide range of
 settings and perform useful functions.  Many key bindings work anytime,
@@ -1393,7 +1402,7 @@ Show engine name and version.  Related to option @option{--version}.
 @c --- Configuration;
 @node Configuration
 @chapter Configuration
-@cindex Configuration
+@cindex configuration
 
 MININIM can be easily setup to match user's preferences regarding the
 way the game looks and behaves.  It features an integrated configuration
@@ -1658,161 +1667,113 @@ Print program name and version and exit
 
 
 
-@c 
-@c @c --- Overview;
-@c @node Overview
-@c @chapter Overview
-@c @include README.texi
+
+@c --- Software package;
+@node Software package
+@chapter Software package
+@include README.texi
 
 
 
 
-@c 
-@c @c --- Release;
-@c @node Release
-@c @chapter Release
+
+@c --- Release;
+@node Release
+@chapter Release
 
-@c In this chapter one can find information that are specific to the
-@c current release or subject to change between releases.  It
-@c presents the features this package acquired over time, problems that
-@c affect its overall usage and what possibly could happen to it --- by
-@c our wishes --- in the future.  Last but not least, people whose
-@c contribution for this package are noteworthy are acknowledged.
+In this chapter one can find information that are specific to the
+current release or subject to change between releases.  It presents the
+features this package acquired over time, problems that affect its
+overall usage and what possibly could happen to it by our wishes.  Last
+but not least, people whose contribution for this package are noteworthy
+are acknowledged.
 
-@c @menu
-@c Present and Future:
-@c * Announcement::  Published announcement message of this new release;
-@c * News::          User-visible changes since previous versions;
-@c * To do::         Features we want to see implemented someday;
+@menu
+Present and Future:
+* Announcement::  Published announcement message of this new release;
+* News::          User-visible changes since previous versions;
+* To do::         Features we want to see implemented someday;
 
-@c People:
-@c * Authors::  List of major contributors;
-@c * Thanks::   List of minor contributors;
-@c * Donors::   People who supported the development by donations;
-@c @end menu
-
-
-
-
-@c 
-@c @c --- News;
-@c @page
-@c @node Announcement
-@c @section Announcement
-@c @include ANNOUNCEMENT.texi
+People:
+* Authors::  List of major contributors;
+* Thanks::   List of minor contributors;
+* Donors::   People who supported the development by donations;
+@end menu
 
 
 
 
-@c 
-@c @c --- News;
-@c @page
-@c @node News
-@c @section News
-@c @include NEWS.texi
+
+@c --- News;
+@node Announcement
+@section Announcement
+@include ANNOUNCEMENT.texi
 
 
 
 
-@c 
-@c @c --- To do;
-@c @page
-@c @node To do
-@c @section To do
-@c @include TODO.texi
+
+@c --- News;
+@node News
+@section News
+@include NEWS.texi
 
 
 
 
-@c 
-@c @c --- Authors;
-@c @page
-@c @node Authors
-@c @section Authors
-@c @include AUTHORS.texi
+
+@c --- To do;
+@node To do
+@section To do
+@include TODO.texi
 
 
 
 
-@c 
-@c @c --- Thanks;
-@c @page
-@c @node Thanks
-@c @section Thanks
-@c @include THANKS.texi
+
+@c --- Authors;
+@node Authors
+@section Authors
+@include AUTHORS.texi
 
 
 
 
-@c 
-@c @c --- Donors;
-@c @page
-@c @node Donors
-@c @section Donors
-@c @include DONORS.texi
+
+@c --- Thanks;
+@node Thanks
+@section Thanks
+@include THANKS.texi
 
 
 
 
-@c 
-@c @c --- GNU Free Documentation License;
-@c @node GNU Free Documentation License
-@c @appendix GNU Free Documentation License
-@c @cindex license documentation
-@c @cindex documentation license
-@c @cindex license of manual
-@c @cindex manual license
-@c @cindex copying documentation
-@c @cindex documentation copying
-@c @cindex copying manual
-@c @cindex manual copying
-
-@c @include gnu-free-documentation-license.texi
+
+@c --- Donors;
+@node Donors
+@section Donors
+@include DONORS.texi
 
 
 
 
-@c 
-@c @c --- The GNU Manifesto;
-@c @node The GNU Manifesto
-@c @appendix The GNU Manifesto
-@c @include the-gnu-manifesto.texi
+
+@c --- GNU Free Documentation License;
+@node GNU FDL
+@appendix GNU FDL
+@cindex license documentation
+@cindex copying manual
+
+@include gnu-free-documentation-license.texi
 
 
 
 
-@c 
-@c @c --- The GNU Project;
-@c @node The GNU Project
-@c @appendix The GNU Project
-@c @include the-gnu-project.texi
-
-
-
-
-@c 
-@c @c --- Linux and the GNU system;
-@c @node Linux and the GNU system
-@c @appendix Linux and the GNU system
-@c @include linux-and-the-gnu-system.texi
-
-
-
-
-@c 
-@c @c --- Why Software Should Not Have Owners;
-@c @node Why Software Should Not Have Owners
-@c @appendix Why Software Should Not Have Owners
-@c @include why-software-should-not-have-owners.texi
-
-
-
-
-@c 
-@c @c --- Why Free Software Needs Free Documentation;
-@c @node Why Free Software Needs Free Documentation
-@c @appendix Why Free Software Needs Free Documentation
-@c @include why-free-software-needs-free-documentation.texi
+
+@c --- Linux and the GNU system;
+@node Linux and the GNU system
+@appendix Linux and the GNU system
+@include linux-and-the-gnu-system.texi
 
 
 

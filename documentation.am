@@ -30,9 +30,7 @@ top_level_doc = ${release_doc} $(call uc,${philosophy_doc})
 
 release_doc = README NEWS TODO AUTHORS THANKS DONORS ANNOUNCEMENT
 
-philosophy_doc = the-gnu-manifesto the-gnu-project		\
-linux-and-the-gnu-system why-software-should-not-have-owners	\
-why-free-software-needs-free-documentation			\
+philosophy_doc = linux-and-the-gnu-system				\
 gnu-free-documentation-license
 
 # Lower-case to upper-case conversion funtion

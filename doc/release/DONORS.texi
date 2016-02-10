@@ -54,7 +54,7 @@
 @centerchap Donors
 @end ifclear
 
-This @inlineifset{manual, chapter}@inlineifset{file,
+This @inlineifset{manual, section}@inlineifset{file,
 file}@inlineifset{homepage, page} contains a list of people that
 supported development by means of donation.  This program would not be
 what it is today without the invaluable help of these people, to whom

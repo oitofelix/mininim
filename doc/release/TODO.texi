@@ -54,7 +54,7 @@
 @centerchap To do
 @end ifclear
 
-This @inlineifset{manual, chapter}@inlineifset{file,
+This @inlineifset{manual, section}@inlineifset{file,
 file}@inlineifset{homepage, page} contains a list of ideas and
 features which would be nice to see implemented some day.  If you are
 ready to start working on any of these TODO items, we appreciate your
@@ -76,14 +76,24 @@ involved, see @inlineifset{manual,
 the section ``Contributing'' in the @file{README} file}.
 
 As well as the issues listed here, there are bug reports, which are
-effectively to-do items too --- that can use your help --- at the
+effectively to-do that can use your help at the
 @url{https://savannah.gnu.org/bugs/?group=mininim, bug tracker web
 interface}.  See @inlineifset{homepage, @url{README.html#Bug-reporting,
 how to report a bug}}@inlineifset{file, the section ``Bug reporting'' in
 @file{README} file}@inlineifset{manual, @ref{Bug reporting}} for more
 information.
 
+Here are the major features we want to implement for futures versions of
+this package:
 
+@itemize
+@item Joystick support
+@item Native level format
+@item Level editor
+@item Level generator module
+@item Guile scripting
+@item Network play
+@end itemize
 
 
 

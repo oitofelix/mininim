@@ -55,7 +55,7 @@
 @centerchap Thanks
 @end ifclear
 
-This @inlineifset{manual, chapter}@inlineifset{file,
+This @inlineifset{manual, section}@inlineifset{file,
 file}@inlineifset{homepage, page} contains a list of people that
 reported problems, suggested improvements or submitted relatively
 small portions of actual code.  This program would not be what it is

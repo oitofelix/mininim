@@ -32,8 +32,10 @@
 @c --- Internet resources;
 
 @c --- --- GNU
-@set domain gnu.org
-@set webPage https://www.@value{domain}/software/@value{GNUid}/
+@c @set domain gnu.org
+@c @set webPage https://www.@value{domain}/software/@value{GNUid}/
+@set domain oitofelix.freeshell.org
+@set webPage https://@value{domain}/@value{GNUid}/
 @c --- --- non-GNU
 @c @set domain nongnu.org
 @c @set webpage http://www.@value{domain}/@value{GNUid}/
@@ -41,10 +43,12 @@
 
 
 @c --- --- Savannah;
-@set atomFeed https://savannah.@value{domain}/news/atom.php?group=@value{GNUid}
-@set develPage https://savannah.@value{domain}/projects/@value{GNUid}/
-@set supportTrack https://savannah.@value{domain}/support/?group=@value{GNUid}
-@set bugTrack https://savannah.@value{domain}/bugs/?group=@value{GNUid}
+@c @set forge savannah
+@set forge forge
+@set atomFeed https://@value{forge}.@value{domain}/news/atom.php?group=@value{GNUid}
+@set develPage https://@value{forge}.@value{domain}/projects/@value{GNUid}/
+@set supportTrack https://@value{forge}.@value{domain}/support/?group=@value{GNUid}
+@set bugTrack https://@value{forge}.@value{domain}/bugs/?group=@value{GNUid}
 
 
 
@@ -80,13 +84,13 @@
 @set tarSign @value{tarball}.sig
 
 @c --- --- --- GNU
-@set ftp https://ftp.gnu.org/gnu/
-@set ftpMirror http://ftpmirror.gnu.org/
-@set ftpOld http://download.savannah.gnu.org/releases/@value{GNUid}/
-@set ftpOldMirror http://download-mirror.savannah.gnu.org/releases/@value{GNUid}/
+@set ftp https://ftp.@value{domain}/gnu/
+@set ftpMirror http://ftpmirror.@value{domain}/
+@set ftpOld http://download.@value{forge}.@value{domain}/releases/@value{GNUid}/
+@set ftpOldMirror http://download-mirror.@value{forge}.@value{domain}/releases/@value{GNUid}/
 @c --- --- --- non-GNU
-@c @set ftp http://download.savannah.nongnu.org/releases/
-@c @set ftpMirror http://download-mirror.savannah.nongnu.org/releases/
+@c @set ftp http://download.@value{forge}.nongnu.org/releases/
+@c @set ftpMirror http://download-mirror.@value{forge}.nongnu.org/releases/
 
 @set ftpDir @value{ftp}@value{GNUid}/
 @set ftpMirrorDir @value{ftpMirror}@value{GNUid}/
@@ -96,14 +100,14 @@
 @set ftpMirrorTarSign @value{ftpMirrorDir}@value{tarSign}
 
 @c --- --- CVS;
-@set CVSsavannah https://savannah.@value{domain}/cvs/?group=@value{GNUid}
-@set CVSserver cvs.savannah.@value{domain}
+@set CVSsavannah https://@value{forge}.@value{domain}/cvs/?group=@value{GNUid}
+@set CVSserver cvs.@value{forge}.@value{domain}
 @set CVSdir /sources/@value{GNUid}
 @set CVSurl @value{CVSserver}:@value{CVSdir}
 
 @c --- --- GIT;
-@set GITsavannah https://savannah.@value{domain}/git/?group=@value{GNUid}
-@set GITserver git://git.savannah.@value{domain}
+@set GITsavannah https://@value{forge}.@value{domain}/git/?group=@value{GNUid}
+@set GITserver git://git.@value{forge}.@value{domain}
 @set GITdir @value{GNUid}.git
 @set GITurl @value{GITserver}/@value{GITdir}
 
@@ -129,7 +133,7 @@
 
 
 @c --- Financial;
-@set btcAddr 12sKDaBNYekQuRPdrpnbUL4YRDKrzMnY62
+@set btcAddr 16atTwmYogSunTeaxEofjrBdLAdCn9EuCa
 
 @end ifclear
 @set packageInclude

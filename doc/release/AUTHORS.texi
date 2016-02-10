@@ -53,12 +53,12 @@
 @centerchap Authors
 @end ifclear
 
-This @inlineifset{manual, chapter}@inlineifset{file,
+This @inlineifset{manual, section}@inlineifset{file,
 file}@inlineifset{homepage, page} contains a list of people that made
 sufficiently large contributions to development that they can be
 regarded as truly authors of the program.  This program would not be
-what it is today without the invaluable help of these people, to whom
-we would like to say:
+what it is today without the invaluable help of these people, to whom we
+would like to say:
 
 @center @strong{THANK YOU VERY MUCH!}
 @sp 1

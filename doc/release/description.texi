@@ -13,7 +13,9 @@
 @c <http://www.gnu.org/licenses/>.
 @c
 
-MININIM is the Advanced Prince of Persia engine.
+MININIM is the Advanced Prince of Persia Engine --- a childhood dream,
+the free software engine for Jordan Mechner's masterpiece, developed
+from scratch by Bruno Félix Rezende Ribeiro (@code{oitofelix}).
 
 @ifset homepage
 @ifclear announcement
@@ -28,7 +30,9 @@ version.
 @end ifclear
 @end ifset
 
-MININIM has detailed documentation.
+MININIM aims to have detailed documentation on all matters concerning
+the original 1989 Prince of Persia world, ranging from its design
+concepts to the engine's practical use and development.
 
 @ifset homepage
 @ifclear announcement

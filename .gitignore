@@ -12,8 +12,18 @@ README
 # Ignore built documentation
 
 /doc/mininim.pdf
+/doc/mininim.dvi
 /doc/mininim.t2p/
+/doc/mininim.t2d/
+/mininim-*.tar.gz
 /doc/man/mininim.1
+/doc/mininim-figures/*.eps
+/ANNOUNCEMENT
+/DONORS
+/GNU-FREE-DOCUMENTATION-LICENSE
+/LINUX-AND-THE-GNU-SYSTEM
+/THANKS
+/TODO
 
 # Ignore Makefiles throughout the whole tree.
 

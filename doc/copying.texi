@@ -18,8 +18,9 @@
 @c --- Copying;
 @copying
 @noindent
-@value{package} is The Advanced Prince of Persia Engine --- a childhood
-dream.
+MININIM is the Advanced Prince of Persia Engine --- a childhood dream,
+the free software engine for Jordan Mechner's masterpiece, developed
+from scratch by Bruno Félix Rezende Ribeiro (@code{oitofelix}).
 
 @iftex
 @sp 1

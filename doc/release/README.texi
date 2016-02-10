@@ -103,18 +103,14 @@
 @end ifset
 
 This @inlineifset{manual, chapter}@inlineifset{file, file} briefly
-explains for what this package is intended, gives relevant
-considerations regarding dependencies, configuration, build,
-installation and use, describes which are the rules for its
-distribution, how to get a copy of it, how to contact the community,
-how to fill bug reports, how to contribute to the package, how to make
-donations to support its development and how to get started hacking
-the code.  Bear in mind that instructions in this @inlineifset{manual,
-chapter}@inlineifset{file, file} are package-specific; for general and
-in-depth configuration, build and installation instructions refer to
-the file @file{INSTALL} present in the top-level directory of the
-source distribution.  If you have checked out the source tree from the
-VCS repository see @ref{Hacking}.
+discuss matters relevant to @value{package} while a software package:
+build, installation, distribution and contribution are some of the
+covered topics.  Bear in mind that instructions in this
+@inlineifset{manual, chapter}@inlineifset{file, file} are
+package-specific; for general and in-depth configuration, build and
+installation instructions refer to the @file{INSTALL} file present in
+the top-level directory of the source distribution.  If you have checked
+out the source tree from the VCS repository see @ref{Hacking}.
 
 @ifset file
 For other information about this package you can check the following
@@ -163,7 +159,7 @@ See the top-level files:
 @menu
 * Description::    What this package is all about;
 * Distribution::   The user's right to modify and redistribute;
-* Getting a copy:: GNU FTP server and VCS;
+* Getting a copy:: FTP server and VCS;
 * Contact::        Mailing list and IRC;
 * Bug reporting::  Support and bug trackers;
 * Contributing::   Several ways to help program's development;
@@ -202,21 +198,21 @@ package atom feed @url{@value{atomFeed}}.
 @ifclear homepage
 @metaSection Distribution
 
-This program is @dfn{free software}; this means that everyone is free
-to use it and free to redistribute it under certain conditions.  This
+This program is @dfn{free software}; this means that everyone is free to
+use it and free to redistribute it under certain conditions.  This
 program is not in the public domain; it is copyrighted and there are
-restrictions on its distribution, but these restrictions are designed
-to permit everything that a good cooperating citizen would want to do.
-What is not allowed is to try to prevent others from further sharing
-any version of this program that they might get from you.  The precise
+restrictions on its distribution, but these restrictions are designed to
+permit everything that a good cooperating citizen would want to do.
+What is not allowed is to try to prevent others from further sharing any
+version of this program that they might get from you.  The precise
 conditions are found in the @inlineifset{file, GNU General Public
 License (@file{COPYING} file)}@inlineifset{manual, GNU
 @acronym{@url{@value{progLicenseURL}, GPL}, General Public Licence}}.
 The program manual is covered by the @inlineifset{file, GNU Free
 Documentation License (@file{GNU-FREE-DOCUMENTATION-LICENSE}
-file)}@inlineifset{manual, GFDL (@ref{GNU Free Documentation
-License})}.  This license is similar in spirit to the GNU General
-Public License, but is more suitable for documentation.
+file)}@inlineifset{manual, GNU Free Documentation License (@ref{GNU
+FDL})}.  This license is similar in spirit to the GNU General Public
+License, but is more suitable for documentation.
 @end ifclear
 
 
@@ -283,14 +279,13 @@ Use a mirror for higher download bandwidth:
 @end example
 
 You can find that and earlier releases at a nearby
-@url{@value{ftpMirrorDir}, GNU@tie{}ftp@tie{}mirror}; or if automatic
+@url{@value{ftpMirrorDir}, ftp@tie{}mirror}; or if automatic
 redirection does not work use the @url{@value{ftpDir},
-GNU@tie{}main@tie{}ftp@tie{}server}.
+main@tie{}ftp@tie{}server}.
 
-The oldest (non-GNU) releases are available from
-@url{@value{ftpOldMirror}, Savannah mirror download area}
-(alternatively @url{@value{ftpOld}, Savannah download area}).  They
-are only of historical interest and are no longer supported.
+The oldest releases are available from @url{@value{ftpOldMirror}, mirror
+download area} (alternatively @url{@value{ftpOld}, download area}).
+They are only of historical interest and are no longer supported.
 
 Use a @file{.sig} file to verify that the corresponding file (without
 the @file{.sig} suffix) is intact.  First, be sure to download both
@@ -412,8 +407,7 @@ can help in many ways:
 Donate to developers in order to support their work.  See
 @ref{Donating}.
 @item
-Write documentation.  We are specially in need to complete the CCD
-sheet format specification.
+Write documentation.
 @item
 Help users in the mailing list and IRC channel.
 @item
@@ -487,7 +481,7 @@ much you want to pay and how much maintenance we can offer in return.
 @metaSection Hacking
 
 @noindent
-The development sources are available through VCS at Savannah:
+The development sources are available through VCS:
 
 @display
 @value{GITsavannah}
@@ -527,6 +521,41 @@ made the news items should be moved to the @file{NEWS.texi} file and
 another news list should be built from scratch in the
 @file{ANNOUNCEMENT.texi} file.
 
+@section MinGW
+
+These are the steps to build using MinGW, in a machine running Microsoft
+Windows.
+
+@itemize
+@item Download and install git: @url{https://git-scm.com/download/win}.
+
+@item Clone the gnulib repository:
+  @code{git clone git://git.savannah.gnu.org/gnulib.git} and add the
+  gnulib root to your @env{PATH}.
+
+@item Download MinGW:
+  @url{http://downloads.sourceforge.net/project/mingw/Installer/mingw-get-setup.exe}
+
+@item Install the packages: @samp{mingw32-base}, @samp{mingw32-gcc-g++},
+      @samp{msys-base}, @samp{mingw32-autoconf},
+      @samp{mingw32-automake}.
+
+@item Rename the file @file{C:/MinGW/msys/1.0/etc/fstab.sample} to @file{fstab}.
+
+@item Download Allegro:
+  @url{http://cdn.allegro.cc/file/library/allegro/5.0.10/allegro-5.0.10-mingw-4.7.0.zip}
+  and extract its root folder's contents to @file{C:\MinGW}.
+
+@item Run msys: @file{C:\MinGW\msys\1.0\msys.bat}
+
+@item Clone the repository: @code{git clone https://github.com/oitofelix/mininim.git}
+
+@item Build: @code{cd mininim && ./bootstrap && ./configure && make}
+
+@item Distribute the resulting binary mininim.exe along with the following dlls:
+  @file{C:\MinGW\bin\libstdc++-6.dll} and
+  @file{C:\MinGW\bin\libgcc_s_dw2-1.dll}.
+@end itemize
 
 
 
