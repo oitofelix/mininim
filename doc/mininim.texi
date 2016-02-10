@@ -24,6 +24,13 @@
 @settitle MININIM
 @set manual
 @set GNUphiThird
+@defcodeindex fg
+@defcodeindex bg
+@defcodeindex ext
+@syncodeindex fg cp
+@syncodeindex bg cp
+@syncodeindex ext cp
+@syncodeindex ky cp
 @c %**end of header
 
 
@@ -170,12 +177,64 @@ Therefore, any given construction is uniquely identified within a level
 by the coordinates of its place@footnote{The term @emph{place} is used
 throughout the text to describe both the last coordinate of the triplet
 and the world space the triplet refers to.  Also, often the term
-@emph{place} is omitted and the text refer just to the construction
+@emph{place} is omitted and the text refers just to the construction
 itself, implying a reference to its place, as in ``the left
 construction'', meaning ``the construction one place to the left''.
 Hopefully, these shouldn't be a source of ambiguity.}, which are defined
 as the triplet @emph{room}, @emph{floor} and @emph{place}:
 @math{(r,f,p)}.
+
+@cindex construction foreground
+@cindex foreground, construction
+@cindex construction background
+@cindex background, construction
+@cindex construction extension
+@cindex extension, construction
+Constructions are comprised of three elements: @emph{foreground},
+@emph{background} and @emph{extension}.  A @dfn{construction foreground}
+is the physical part the kid interacts with.  Physical properties
+determined by it are collision, hang and fall conditions, to name a few.
+On the other hand, a @dfn{construction background} is the part that yet
+visible, doesn't affect the kid in any way --- its sole purpose is
+ornamental; torches and windows are examples of this.  A
+@dfn{construction extension} is a modifier which tells how the con looks
+or behaves.  For example, items and door opening states are both
+expressed by them.  Any given construction can have only one extension.
+The valid extensions are:
+
+@table @dfn
+@cindex con ext item
+@cindex item, con ext
+@item Item
+This is a code indicating which item should be put on the construction.
+Used by @code{FLOOR}.
+@cindex con ext can't fall
+@cindex can't fall, con ext
+@item Can't fall
+This is a boolean indicating whether the construction should ignore
+fall conditions.  Used by @code{LOOSE_FLOOR}.
+@cindex con ext event
+@cindex event, con ext
+@item Event
+This is an integer indicating which door event the construction
+triggers.  Used by @code{OPENER_FLOOR} and @code{CLOSER_FLOOR}.
+@cindex con ext step
+@cindex step, con ext
+@item Step
+This is a integer indicating in which state, of a progressive set of
+configurations, a construction is in.  Used by dynamic constructions
+that don't use other extension.
+@cindex con ext design
+@cindex design, con ext
+@item Design
+This is a code indicating which alternative graphical design should be
+used to render the construction.  Used by carpet constructions.
+@end table
+
+@section Non-directed relative positioning
+@cindex non-directed relative positioning
+@cindex relative positioning, non-directed
+@cindex positioning, non-directed relative
 
 In order to easily talk about the relations between constructions it's
 necessary to define the @dfn{non-directed relative positioning} of a
@@ -185,86 +244,82 @@ in the following figure.
 
 @center @image{mininim-figures/relative-coordinates-non-directed}
 
+@smallindentedblock
+@center @abbr{@strong{TL}, top left} @abbr{@strong{T}, top} @abbr{@strong{TR}, top right} @abbr{@strong{L}, left} @abbr{@strong{C}, center}
+@center @abbr{@strong{R}, right} @abbr{@strong{BL}, bottom left}, @abbr{@strong{B}, bottom} @abbr{@strong{BR}, bottom right}
+@end smallindentedblock
+
 Then we define the following mapping between names and coordinates:
 
-@cartouche
-@itemize
-@item TL (top left): @math{(r,f - 1,p - 1)}
-@item T (top): @math{(r,f - 1,p)}
-@item TR (top right): @math{(r,f - 1,p + 1)}
-@item L (left): @math{(r,f,p - 1)}
-@item C (center): @math{(r,f,p)}
-@item R (right): @math{(r,f,p + 1)}
-@item BL (bottom left): @math{(r,f + 1,p - 1)}
-@item B (bottom): @math{(r,f + 1,p)}
-@item BR (bottom right): @math{(r,f + 1,p + 1)}
-@end itemize
-@end cartouche
+@multitable @columnfractions .50 .50
+@headitem Name @tab Coordinates
+@item TL @tab @math{(r,f - 1,p - 1)}
+@item T  @tab @math{(r,f - 1,p)}
+@item TR @tab @math{(r,f - 1,p + 1)}
+@item L @tab @math{(r,f,p - 1)}
+@item C @tab @math{(r,f,p)}
+@item R @tab @math{(r,f,p + 1)}
+@item BL @tab @math{(r,f + 1,p - 1)}
+@item B @tab @math{(r,f + 1,p)}
+@item BR @tab @math{(r,f + 1,p + 1)}
+@end multitable
 
-Constructions are comprised of three elements: foreground, background
-and extension.  A @dfn{construction foreground} is the physical part the
-kid interacts with.  Physical properties determined by it are collision,
-hang and fall conditions, to name a few.  On the other hand, a
-@dfn{construction background} is the part that yet visible, doesn't
-affect the kid in any way --- its sole purpose is ornamental; torches
-and windows are examples of this.  A @dfn{construction extension} is a
-modifier which tells how the con looks or behaves.  For example, items
-and door opening states are both expressed by them.  Any given
-construction can have only one extension.  The valid extensions are:
-
-@table @dfn
-@item Item
-This is a code indicating which item should be put on the construction.
-Used by @code{FLOOR}.
-@item Can't fall
-This is a boolean indicating whether the construction should ignore
-fall conditions.  Used by @code{LOOSE_FLOOR}.
-@item Event
-This is an integer indicating which door event the construction
-triggers.  Used by @code{OPENER_FLOOR} and @code{CLOSER_FLOOR}.
-@item Step
-This is a integer indicating in which state, of a progressive set of
-configurations, a construction is in.  Used by dynamic constructions
-that don't use other extension.
-@item Design
-This is a code indicating which alternative graphical design should be
-used to render the construction.  Used by the carpet constructions.
-@end table
 
 @section Foregrounds
+@cindex construction foreground
+@cindex foreground, construction
 
-Construction foregrounds have physical properties that determine how it
-behaves in certain events and also how the kid is affected by the
+Construction foregrounds have physical properties that determine how
+they behave in certain events and also how the kid is affected by the
 interaction with them.
 
 @table @dfn
+
+@cindex strictly traversable
+@cindex traversable, strictly
 @item Strictly traversable
 This property means that the construction can't support the kid
 vertically at its bottom, thus he falls immediately when trying to rest
 on it.  Notice that cons having this property can't be @emph{hangable}.
+
+@cindex traversable
 @item Traversable
 This property means that the construction can't @emph{indefinitely}
 support the kid vertically at its bottom, thus he @emph{eventually}
 falls when trying to rest on it.  Notice that @emph{strictly
 traversable} is a particular case of this.
+
+@cindex collidable
 @item Collidable
 This property means that the construction prevents the kid from passing
 through it horizontally, thus he collides (often recoiling from the
 impact) when trying to do so.
+
+@cindex semi-collidable
 @item Semi-collidable
 This property means that the construction is @emph{collidable} only
 under certain circumstances.
+
+@cindex hangable
 @item Hangable
 This property means that the kid can hang on the construction's bottom,
 in case there is an @emph{strictly traversable} one at its side.
+
+@cindex depressible
 @item Depressible
 This property means that the construction is sensible to pressure at its
 top, thus some reaction is triggered when the kid exerts such pressure.
+
+@cindex trap
 @item Trap
 This property means that the construction might harm the kid.
+
+@cindex rigid
 @item Rigid
 This property means that the construction can't be smashed by a falling
 one, thus that which falls stops at the rigid con's top.
+
+@cindex dynamic
 @item Dynamic
 This property means that the construction has a set of distinct states
 in which it can be in.  Such states matter for how the construction
@@ -275,6 +330,7 @@ It's possible that some of these properties may apply only under certain
 conditions of the construction and/or the kid.
 
 @subsection Floors
+@cindex floors
 
 @dfn{Floors} make the ground above constructions the kid stands on.  All
 of them are @emph{hangable}, except for @code{NO_FLOOR}.
@@ -282,6 +338,7 @@ of them are @emph{hangable}, except for @code{NO_FLOOR}.
 @multitable @columnfractions .19 .15 .15 .51
   @headitem Code @tab Dungeon @tab Palace @tab Notes
 
+  @fgindex NO_FLOOR
   @item @code{NO_FLOOR}@footnote{The @dfn{no floor} con is called
   @dfn{empty} in the original game.}
   @tab
@@ -289,30 +346,34 @@ of them are @emph{hangable}, except for @code{NO_FLOOR}.
   @tab This is an empty space.  This is @emph{strictly traversable} and
   uses no extension.
 
+  @fgindex FLOOR
   @item @code{FLOOR}
   @tab @center @image{mininim-figures/d-floor}
   @tab @center @image{mininim-figures/p-floor}
   @tab This is a normal floor. This uses the @emph{item} extension.
 
+  @fgindex BROKEN_FLOOR
   @item @code{BROKEN_FLOOR}@footnote{The @dfn{broken floor} is called
   @emph{debris} in the original game.}
   @tab @center @image{mininim-figures/d-broken-floor}
   @tab @center @image{mininim-figures/p-broken-floor}
   @tab As soon as a falling @code{LOOSE_FLOOR} encounters a @emph{rigid}
-  construction, it disappears replacing the con @strong{over} that by a
+  construction, it disappears replacing the rigid con's top by a
   @code{BROKEN_FLOOR}.  In contrast, if it encounters a @emph{non-rigid}
   and @emph{non-traversable} construction, it disappears replacing that
   very con by a @code{BROKEN_FLOOR}.  Finally, if it encounters a
   @emph{non-rigid} but @emph{traversable} construction, it pass through,
-  breaking over it in case the con is not @emph{strictly traversable}.
+  breaking over the con in case that is not @emph{strictly traversable}.
   This uses no extension.
 
+  @fgindex SKELETON_FLOOR
   @item @code{SKELETON_FLOOR}
   @tab @center @image{mininim-figures/d-skeleton-floor}
   @tab @center @image{mininim-figures/p-skeleton-floor}
   @footnote{The original game has no palace version of the skeleton floor.}
   @tab This behaves like @code{FLOOR} but uses no extension.
 
+  @fgindex LOOSE_FLOOR
   @item @code{LOOSE_FLOOR}@footnote{The @dfn{loose floor} is called
   @emph{loose board} in the original game.}
   @tab @center @image{mininim-figures/d-loose-floor}
@@ -324,16 +385,18 @@ of them are @emph{hangable}, except for @code{NO_FLOOR}.
   @emph{depressible}, a @emph{trap}, @emph{dynamic} and uses the
   @emph{can't fall} extension.
 
+  @fgindex SPIKES_FLOOR
   @item @code{SPIKES_FLOOR}
   @tab @center @image{mininim-figures/d-spikes-floor}
   @tab @center @image{mininim-figures/p-spikes-floor}
-  @tab Spikes come out of it, killing the kid if he falls or step too
+  @tab Spikes come out of it, killing the kid if he falls or steps too
   fast over it.  This is a @emph{trap}, @emph{dynamic} and uses the
   @emph{step} extension (ranging from 0 to 9).  This gets activated as
-  soon as the kid is in the same room and vertical place, and in the
-  same or higher floor without a wall in between.  Guards can activate
-  this as well.
+  soon as the kid is in the same room and place column, and in the same
+  or higher floor without a wall in between.  Guards can activate this
+  as well.
 
+  @fgindex OPENER_FLOOR
   @item @code{OPENER_FLOOR}@footnote{The @dfn{opener floor} is called
   @emph{raise button} in the original game.}
   @tab @center @image{mininim-figures/d-opener-floor}
@@ -341,6 +404,7 @@ of them are @emph{hangable}, except for @code{NO_FLOOR}.
   @tab This opens one or more doors.  This is @emph{depressible},
   @emph{dynamic} and uses the @emph{event} extension.
 
+  @fgindex CLOSER_FLOOR
   @item @code{CLOSER_FLOOR}@footnote{The @dfn{closer floor} is called
   @emph{drop button} in the original game.}
   @tab @center @image{mininim-figures/d-closer-floor}
@@ -348,6 +412,7 @@ of them are @emph{hangable}, except for @code{NO_FLOOR}.
   @tab  This closes one or more doors. This is @emph{depressible},
   @emph{dynamic} and uses the @emph{event} extension.
 
+  @fgindex STUCK_FLOOR
   @item @code{STUCK_FLOOR}@footnote{The @dfn{stuck floor} is called
   @emph {stuck button} in the original game.}
   @tab @center @image{mininim-figures/d-stuck-floor}
@@ -355,6 +420,7 @@ of them are @emph{hangable}, except for @code{NO_FLOOR}.
   @tab This is rendered like a pressed @code{CLOSER_FLOOR}, but it can't
   be unpressed.  This uses no extension.
 
+  @fgindex HIDDEN_FLOOR
   @item @code{HIDDEN_FLOOR}@footnote{The original game doesn't have a
   @code{HIDDEN_FLOOR} construction by itself.}
   @tab
@@ -365,6 +431,7 @@ of them are @emph{hangable}, except for @code{NO_FLOOR}.
 @end multitable
 
 @subsection Pillars
+@cindex pillars
 
 @dfn{Pillars} are aesthetic supports for the constructions on the floor
 above them.  All of them are @emph{hangable}, except for
@@ -373,22 +440,26 @@ above them.  All of them are @emph{hangable}, except for
 @multitable @columnfractions .25 .15 .15 .45
   @headitem Code @tab Dungeon @tab Palace @tab Notes
 
+  @fgindex PILLAR
   @item @code{PILLAR}
   @tab @center @image{mininim-figures/d-pillar}
   @tab @center @image{mininim-figures/p-pillar}
   @tab This is @emph{rigid}.
 
+  @fgindex BIG_PILLAR_TOP
   @item @code{BIG_PILLAR_TOP}
   @tab @center @image{mininim-figures/d-big-pillar-top}
   @tab @center @image{mininim-figures/p-big-pillar-top}
   @tab This should be placed above a @code{BIG_PILLAR_BOTTOM}.  This is
   @emph{strictly traversable} and @emph{rigid}.
 
+  @fgindex BIG_PILLAR_BOTTOM
   @item @code{BIG_PILLAR_BOTTOM}
   @tab @center @image{mininim-figures/d-big-pillar-bottom}
   @tab @center @image{mininim-figures/p-big-pillar-bottom}
   @tab This should be placed below a @code{BIG_PILLAR_TOP}.
 
+  @fgindex ARCH_BOTTOM
   @item @code{ARCH_BOTTOM}
   @tab @center @image{mininim-figures/d-arch-bottom}
   @tab @center @image{mininim-figures/p-arch-bottom}
@@ -396,6 +467,7 @@ above them.  All of them are @emph{hangable}, except for
 @end multitable
 
 @subsection Wall
+@cindex wall
 
 The @dfn{wall} is a solid constructs that separates sections of the
 level.  It's @emph{collidable}, @emph{rigid} and uses no extension.
@@ -403,12 +475,14 @@ level.  It's @emph{collidable}, @emph{rigid} and uses no extension.
 @multitable @columnfractions .20 .40 .40
   @headitem Code @tab Dungeon @tab Palace
 
+  @fgindex WALL
   @item @code{WALL}
   @tab @center @image{mininim-figures/d-wall}
   @tab @center @image{mininim-figures/p-wall}
 @end multitable
 
 @subsection Doors
+@cindex doors
 
 @dfn{Doors} are constructions that conditionally separate levels and
 in-level sections.  Both door types are @emph{hangable}, @emph{dynamic}
@@ -418,6 +492,7 @@ opening level, ranging from fully open (0) to fully closed.
 @multitable @columnfractions .16 .20 .20 .44
   @headitem Code @tab Dungeon @tab Palace @tab Notes
 
+  @fgindex DOOR
   @item @code{DOOR}@footnote{The @dfn{door} is called @emph{gate} in the
   original game.}
   @tab @center @image{mininim-figures/d-door}
@@ -427,6 +502,7 @@ opening level, ranging from fully open (0) to fully closed.
   kid's movement height.  This is @emph{rigid} and its @emph{step}
   extension range from 0 to 47.
 
+  @fgindex LEVEL_DOOR
   @item @code{LEVEL_DOOR}@footnote{The @dfn{level door} is called simply
   @emph{exit} in the original game.  There it's divided into two
   constructions: @emph{exit left} and @emph{exit right}.}
@@ -438,6 +514,7 @@ opening level, ranging from fully open (0) to fully closed.
 @end multitable
 
 @subsection Chopper
+@cindex chopper
 
 The @dfn{chopper}@footnote{The @dfn{chopper} is called @dfn{chomper} in
 the original game.} can leave the kid in half.  It's a @emph{trap},
@@ -451,12 +528,14 @@ guards, but can kill them as well.  The chopper nullifies the
 @multitable @columnfractions .20 .40 .40
   @headitem Code @tab Dungeon @tab Palace
 
+  @fgindex CHOPPER
   @item @code{CHOPPER}
   @tab @center @image{mininim-figures/d-chopper}
   @tab @center @image{mininim-figures/p-chopper}
 @end multitable
 
 @subsection Mirror
+@cindex mirror
 
 The @dfn{mirror} reflects the kid's image and prevents him from passing
 trough, except if he is able to perform a running jump, whatever the
@@ -467,12 +546,14 @@ side.  It's @emph{semi-collidable} at left, @emph{hangable at right},
 @multitable @columnfractions .20 .40 .40
   @headitem Code @tab Dungeon @tab Palace
 
+  @fgindex MIRROR
   @item @code{MIRROR}
   @tab @center @image{mininim-figures/d-mirror}
   @tab @center @image{mininim-figures/p-mirror}
 @end multitable
 
 @subsection Carpets
+@cindex carpets
 
 @dfn{Carpets}@footnote{@dfn{Carpets} are called @emph{tapestry} in the
 original game.} are ornamental constructions often placed over
@@ -487,16 +568,19 @@ left} property of their @emph{right} and @emph{top right} constructions.
 @multitable @columnfractions .15 .2 .2 .45
   @headitem Code @tab Dungeon @tab Palace @tab Notes
 
+  @fgindex TCARPET, CARPET_00
   @item @code{TCARPET}
   @tab @center @image{mininim-figures/d-tcarpet-00}
   @tab @center @image{mininim-figures/p-tcarpet-00}
   @tab These graphics are drawn for the @emph{design} @code{CARPET_00}.
 
+  @fgindex TCARPET, CARPET_01
   @item @code{TCARPET}
   @tab @center @image{mininim-figures/d-tcarpet-01}
   @tab @center @image{mininim-figures/p-tcarpet-01}
   @tab These graphics are drawn for the @emph{design} @code{CARPET_01}.
 
+  @fgindex TCARPET, ARCH_CARPET_RIGHT_00
   @item @code{TCARPET}
   @tab @center @image{mininim-figures/d-arch-tcarpet-right-00}
   @tab @center @image{mininim-figures/p-arch-tcarpet-right-00}
@@ -504,6 +588,7 @@ left} property of their @emph{right} and @emph{top right} constructions.
   @code{ARCH_CARPET_RIGHT_00}.  This is intended to end an arch.  This
   should be placed at right of an @code{ARCH_TOP_MID}.
 
+  @fgindex TCARPET, ARCH_CARPET_RIGHT_01
   @item @code{TCARPET}
   @tab @center @image{mininim-figures/d-arch-tcarpet-right-01}
   @tab @center @image{mininim-figures/p-arch-tcarpet-right-01}
@@ -511,6 +596,7 @@ left} property of their @emph{right} and @emph{top right} constructions.
   @code{ARCH_CARPET_RIGHT_01}.  This is intended to end an arch.  This
   should be placed at right of an @code{ARCH_TOP_MID}.
 
+  @fgindex TCARPET, ARCH_CARPET_LEFT
   @item @code{TCARPET}
   @tab @center @image{mininim-figures/d-arch-tcarpet-left}
   @tab @center @image{mininim-figures/p-arch-tcarpet-left}
@@ -518,16 +604,19 @@ left} property of their @emph{right} and @emph{top right} constructions.
   This is intended to end an arch.  This should be placed two places to
   the left of an @code{ARCH_TOP_MID}.
 
+  @fgindex CARPET, CARPET_00
   @item @code{CARPET}
   @tab @center @image{mininim-figures/d-carpet-00}
   @tab @center @image{mininim-figures/p-carpet-00}
   @tab These graphics are drawn for the @emph{design} @code{CARPET_00}.
 
+  @fgindex CARPET, CARPET_01
   @item @code{CARPET}
   @tab @center @image{mininim-figures/d-carpet-01}
   @tab @center @image{mininim-figures/p-carpet-01}
   @tab These graphics are drawn for the @emph{design} @code{CARPET_01}.
 
+  @fgindex CARPET, ARCH_CARPET_LEFT
   @item @code{CARPET}
   @tab @center @image{mininim-figures/d-arch-carpet-left}
   @tab @center @image{mininim-figures/p-arch-carpet-left}
@@ -537,6 +626,7 @@ left} property of their @emph{right} and @emph{top right} constructions.
 @end multitable
 
 @subsection Arches
+@cindex arches
 
 @dfn{Arches}@footnote{@dfn{Arches} are called @dfn{lattices} in the
 original game.} are ornamental constructions that can be indefinitely
@@ -548,6 +638,7 @@ They are @emph{strictly traversable}, @emph{rigid} and use no extension.
   @footnote{In the original game there is no dungeon version of arches.}
  @tab Palace @tab Notes
 
+  @fgindex ARCH_TOP_MID
   @item @code{ARCH_TOP_MID}
   @tab @center @image{mininim-figures/d-arch-top-mid}
   @tab @center @image{mininim-figures/p-arch-top-mid}
@@ -555,16 +646,19 @@ They are @emph{strictly traversable}, @emph{rigid} and use no extension.
   @code{ARCH_TOP_LEFT}, at right of an @code{ARCH_TOP_RIGHT}, or next to
   an @code{ARCH_TOP_SMALL}.
 
+  @fgindex ARCH_TOP_SMALL
   @item @code{ARCH_TOP_SMALL}
   @tab @center @image{mininim-figures/d-arch-top-small}
   @tab @center @image{mininim-figures/p-arch-top-small}
   @tab This should be placed in between two @code{ARCH_TOP_MID}.
 
+  @fgindex ARCH_TOP_LEFT
   @item @code{ARCH_TOP_LEFT}
   @tab @center @image{mininim-figures/d-arch-top-left}
   @tab @center @image{mininim-figures/p-arch-top-left}
   @tab This should be placed at left of an @code{ARCH_TOP_RIGHT}.
 
+  @fgindex ARCH_TOP_RIGHT
   @item @code{ARCH_TOP_RIGHT}
   @tab @center @image{mininim-figures/d-arch-top-right}
   @tab @center @image{mininim-figures/p-arch-top-right}
@@ -572,6 +666,7 @@ They are @emph{strictly traversable}, @emph{rigid} and use no extension.
 @end multitable
 
 @section Backgrounds
+@cindex backgrounds
 
 Any combination of construction background and foreground is allowed,
 but be aware that some may simply not look right, or even not make a
@@ -580,37 +675,44 @@ difference at all (like a torch behind a wall).
 @multitable @columnfractions .12 .2 .2 .48
   @headitem Code @tab Dungeon @tab Palace @tab Notes
 
+  @bgindex NO_BRICKS
   @item @code{NO_BRICKS}
   @tab
   @tab
   @tab For the dungeon and palace this results in no graphics at all.
 
+  @bgindex NO_BG
   @item @code{NO_BG}
   @tab
   @tab @center @image{mininim-figures/p-bricks-00}
-  @tab For the dungeon this results in no graphics at all.  For the palace this
+  @tab For the dungeon this results in no graphics.  For the palace this
    results in the same graphics as @code{BRICKS_02}.
 
+  @bgindex BRICKS_00
   @item @code{BRICKS_00}
   @tab @center @image{mininim-figures/d-bricks-00}
   @tab
-  @tab For the palace this results in no graphics at all.
+  @tab For the palace this results in no graphics.
 
+  @bgindex BRICKS_01
   @item @code{BRICKS_01}
   @tab @center @image{mininim-figures/d-bricks-01}
   @tab @center @image{mininim-figures/p-bricks-01}
   @tab For the palace this results in the same graphics as @code{BRICKS_03}
 
+  @bgindex BRICKS_02
   @item @code{BRICKS_02}
   @tab @center @image{mininim-figures/d-bricks-02}
   @tab @center @image{mininim-figures/p-bricks-00}
   @tab For the palace this results in the same graphics as @code{NO_BG}.
 
+  @bgindex BRICKS_03
   @item @code{BRICKS_03}
   @tab @center @image{mininim-figures/d-bricks-03}
   @tab @center @image{mininim-figures/p-bricks-01}
   @tab For the palace this results in the same graphics as @code{BRICKS_01}.
 
+  @bgindex TORCH
   @item @code{TORCH}@footnote{The fire sprites are mirrored
   horizontally depending on the level coordinates the torch has.
   This is not so in the original game.}
@@ -618,11 +720,13 @@ difference at all (like a torch behind a wall).
   @tab @center @image{mininim-figures/p-torch}
   @tab
 
+  @bgindex WINDOW
   @item @code{WINDOW}
   @tab @center @image{mininim-figures/d-window}
   @tab @center @image{mininim-figures/p-window}
   @tab
 
+  @bgindex BALCONY
   @item @code{BALCONY}@footnote{The background stars are randomly
   positioned and animated.  In the original game, all balconies have
   non-animated white stars in fixed positions.}
@@ -632,6 +736,7 @@ difference at all (like a torch behind a wall).
 
 
 @section Items
+@cindex items
 
 The item extension is used only by @code{FLOOR}.  Items are placed over
 the floor construction they belong to and animated.  They can be caught
@@ -640,38 +745,47 @@ by the kid by pressing the shift key.
 @multitable @columnfractions .3 .15 .55
   @headitem Code @tab Graphics @tab Notes
 
+  @extindex NO_ITEM
   @item @code{NO_ITEM}
   @tab
-  @tab For the dungeon and palace this results in no graphics at all.
+  @tab This results in no graphics at all.
 
+  @extindex EMPTY_POTION
   @item @code{EMPTY_POTION}
   @tab @center @image{mininim-figures/empty-potion}
   @tab This potion has no bubbles and no effect.
 
+  @extindex SMALL_LIFE_POTION
   @item @code{SMALL_LIFE_POTION}
   @tab @center @image{mininim-figures/small-life-potion}
   @tab This potion has red bubbles and recovers one life point.
 
+  @extindex BIG_LIFE_POTION
   @item @code{BIG_LIFE_POTION}
   @tab @center @image{mininim-figures/big-life-potion}
   @tab This potion has red bubbles, adds one life point container and
   recover all life points.
 
+  @extindex SMALL_POISON_POTION
   @item @code{SMALL_POISON_POTION}
   @tab @center @image{mininim-figures/small-poison-potion}
   @tab This potion has blue bubbles and takes one life point.  It has
   the same graphics as @code{ACTIVATION_POTION}.
 
-  @item @code{BIG_POISON_POTION}
+  @extindex BIG_POISON_POTION
+  @item @code{BIG_POISON_POTION}@footnote{The big poison potion is not
+  available in the original game.}
   @tab @center @image{mininim-figures/big-poison-potion}
   @tab This potion has blue bubbles and takes all life point,
   effectively killing the kid.
 
+  @extindex FLOAT_POTION
   @item @code{FLOAT_POTION}
   @tab @center @image{mininim-figures/float-potion}
   @tab This potion has green bubbles and allows the kid to levitate,
   effectively making long falls harmless.
 
+  @extindex FLIP_POTION
   @item @code{FLIP_POTION}
   @tab @center @image{mininim-figures/flip-potion}
   @tab This potion has yellow bubbles and flips the screen horizontally,
@@ -680,6 +794,7 @@ by the kid by pressing the shift key.
   are drawn as @code{FLOAT_POTION}, that is, with green bubbles.}
   Drinking another one undo this effect.
 
+  @extindex ACTIVATION_POTION
   @item @code{ACTIVATION_POTION}
   @tab @center @image{mininim-figures/activation-potion}
   @tab This potion has the same graphics as @code{SMALL_POISON_POTION}
@@ -691,6 +806,7 @@ by the kid by pressing the shift key.
   handicap the kid, but certainly won't be used to do so to you nor to
   your friends.}
 
+  @extindex SWORD
   @item @code{SWORD}@footnote{The sword graphics is mirrored
   horizontally depending on its level coordinates.  This is not so in
   the original game.}
@@ -709,64 +825,81 @@ by the kid by pressing the shift key.
 In his journey to save the princess, the kid has to endure several
 levels full of challenging traps and skilled opponents.  Run, walk,
 turn, crouch, jump, hang, climb, take the sword, attack and defend are
-some of the kid's movements at your disposal to help him make his way to
-the princess tower.  Although, this is a relatively large set of
-movements, basically all these are accomplished by some combination of
-the directional and shift keys, often conditioned to the current kid's
+some of the kid's movements at your disposal to make the way to the
+princess tower.  Although, this is a relatively large set of movements,
+basically all these are accomplished by some combination of the
+directional and shift keys, often conditioned to the current kid's
 state.  This chapter explains in detail all possible movements of the
 kid.
 
+@cindex movement mode
+@cindex mode, movement
 There are six modes of movement: @dfn{normal}, @dfn{crouch}, @dfn{run},
 @dfn{hang}, @dfn{fall} and @dfn{fight}.  The mode the kid is in is the
 foremost element determining how the input is translated into kid's
 movements.
 
-Analogous to the defined concept of @emph{non-directed relative
-positioning} (used to describe relations between constructions), is the
-concept of @emph{directed relative positioning}, necessary to easily
-describe the relations between constructions and the kid.  Consider the
-kid's place @emph{C}, which has the coordinates @math{(r,f,p)}, its 8
-adjacent places and the direction the kid is facing, as shown in the
-following two figures.
+Notice that (whenever it makes sense) for any move, holding its
+triggering keys continues or repeats the movement.@footnote{That's not
+so for the original game, in which for many situations you have to
+release and press the keys again to have the movement repeated.}  Often,
+when transitioning from a movement to another that shares some keys, you
+can keep the common keys pressed and the kid will just do the right
+thing.  It's also worth nothing that the kid responds to the input in
+real time, that is, in the next animation cycle.@footnote{That's not so
+for the original game, in which the kid delays one cycle to respond.}
+
+@kindex LEFT
+@kindex RIGHT
+@kindex UP
+@kindex DOWN
+The term @emph{horizontal key(s)} is used in this text to refer to the
+@kbd{LEFT} or @kbd{RIGHT} directional keys without alluding to a
+particular direction.  The @kbd{UP} and @kbd{DOWN} directional keys are
+simply referred as such.
+
+@iftex
+@page
+@end iftex
+
+@section Directed relative positioning
+@cindex directed relative positioning
+@cindex positioning, directed relative
+@cindex relative positioning, directed
+
+The concept of @emph{directed relative positioning}, necessary to easily
+describe the relations between constructions and the kid is analogous to
+the already defined concept of @emph{non-directed relative positioning},
+used to describe relations between constructions.  Consider the kid's
+place @emph{C}, which has the coordinates @math{(r,f,p)}, its 8 adjacent
+places and the direction the kid is facing, as shown in the following
+two figures.
 
 @center @image{mininim-figures/relative-coordinates-directed-left} @image{mininim-figures/relative-coordinates-directed-right}
 
-Then we define the following mapping between names and coordinates for
-the left direction:
+@smallindentedblock
+@center @abbr{@strong{TF}, top front} @abbr{@strong{T}, top} @abbr{@strong{TB}, top back} @abbr{@strong{F}, front} @abbr{@strong{C}, center}
+@center @abbr{@strong{BA}, back} @abbr{@strong{BF}, bottom front}, @abbr{@strong{B}, bottom} @abbr{@strong{BB}, bottom back}
+@end smallindentedblock
 
-@cartouche
-@center @strong{LEFT}
-@itemize
-@item TF (top front): @math{(r,f - 1,p - 1)}
-@item T (top): @math{(r,f - 1,p)}
-@item TB (top back): @math{(r,f - 1,p + 1)}
-@item F (front): @math{(r,f,p - 1)}
-@item C (center): @math{(r,f,p)}
-@item BA (back): @math{(r,f,p + 1)}
-@item BF (bottom front): @math{(r,f + 1,p - 1)}
-@item B (bottom): @math{(r,f + 1,p)}
-@item BB (bottom back): @math{(r,f + 1,p + 1)}
-@end itemize
-@end cartouche
+Then we define the following mapping between names and coordinates:
+
+@multitable @columnfractions .33 .33 .33
+@headitem Left @tab Right @tab Coordinates
+@item TF @tab TB @tab @math{(r,f - 1,p - 1)}
+@item T  @tab T @tab @math{(r,f - 1,p)}
+@item TB @tab TF @tab @math{(r,f - 1,p + 1)}
+@item F @tab BA @tab @math{(r,f,p - 1)}
+@item C @tab C @tab @math{(r,f,p)}
+@item BA @tab F @tab @math{(r,f,p + 1)}
+@item BF @tab BB @tab @math{(r,f + 1,p - 1)}
+@item B @tab B @tab @math{(r,f + 1,p)}
+@item BB @tab BF @tab @math{(r,f + 1,p + 1)}
+@end multitable
 
 
-And the following mapping between names and coordinates for the right
-direction:
-
-@cartouche
-@center @strong{RIGHT}
-@itemize
-@item TB (top back): @math{(r,f - 1,p - 1)}
-@item T (top): @math{(r,f - 1,p)}
-@item TF (top front): @math{(r,f - 1,p + 1)}
-@item BA (back): @math{(r,f,p - 1)}
-@item C (center): @math{(r,f,p)}
-@item F (front): @math{(r,f,p + 1)}
-@item BB (bottom back): @math{(r,f + 1,p - 1)}
-@item B (bottom): @math{(r,f + 1,p)}
-@item BF (bottom front): @math{(r,f + 1,p + 1)}
-@end itemize
-@end cartouche
+@section Hangable place
+@cindex hangable place
 
 Quite a few movements might culminate in the kid hanging on a
 construction.  In order to describe the conditions in which that may
@@ -779,23 +912,14 @@ traversable} and its top front one is @emph{hangable} in the opposite
 direction.
 @end cartouche
 
-Notice that (whenever it makes sense) for any move, holding its
-triggering keys continues or repeats the movement.@footnote{That's not
-so for the original game, in which for many situations you have to
-release and press the keys again to have the movement repeated.}  Often,
-when transitioning from a movement to another that shares some keys, you
-can keep the common keys pressed and the kid will just do the right
-thing.
-
-It's also worth nothing that the kid responds to the input in real time,
-that is, in the next animation cycle.@footnote{That's not so for the
-original game, in which the kid delays one cycle to respond.}
-
 
 @section Normal
+@cindex normal movement mode
+@cindex mode, movement normal
+@cindex normal mode, movement
 
-The movement mode at the beginning of each level is normal.  While in it
-the kid stands at rest.
+The movement mode at the beginning of each level is @emph{normal}.
+While in it the kid is standing still.
 
 @center @image{mininim-figures/kid-normal-right}
 
