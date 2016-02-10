@@ -57,17 +57,9 @@
 
 This @inlineifset{manual, section}@inlineifset{file,
 file}@inlineifset{homepage, page} contains a list of people that
-reported problems, suggested improvements or submitted relatively
-small portions of actual code.  This program would not be what it is
-today without the invaluable help of these people, to whom we would
-like to say:
-
-@center @strong{THANK YOU!}
-@sp 1
-
-The names are listed in chronological order of contribution.  Each
-person's contact information, usually email, and a summary of that
-person's contribution is put in per correspondent section.
+reported problems, suggested improvements or submitted relatively small
+portions of actual code.  The names are listed in chronological order of
+contribution.
 
 For contributions that does matter for copyright purposes, e.g., major
 source code contributions, see @inlineifset{homepage,

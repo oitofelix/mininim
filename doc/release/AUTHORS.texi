@@ -56,16 +56,8 @@
 This @inlineifset{manual, section}@inlineifset{file,
 file}@inlineifset{homepage, page} contains a list of people that made
 sufficiently large contributions to development that they can be
-regarded as truly authors of the program.  This program would not be
-what it is today without the invaluable help of these people, to whom we
-would like to say:
-
-@center @strong{THANK YOU VERY MUCH!}
-@sp 1
-
-The names are listed in chronological order of contribution.  Each
-person's contact information, usually email, and a summary of that
-person's contribution is put in per correspondent section.
+regarded as truly authors of the program.  The names are listed in
+chronological order of contribution.
 
 For contributions that does not matter for copyright purposes, e.g.,
 minor or non-source code contributions, see @inlineifset{homepage,
