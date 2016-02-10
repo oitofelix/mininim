@@ -27,10 +27,12 @@
 @defcodeindex fg
 @defcodeindex bg
 @defcodeindex ext
+@defcodeindex opt
 @syncodeindex fg cp
 @syncodeindex bg cp
 @syncodeindex ext cp
 @syncodeindex ky cp
+@syncodeindex opt cp
 @c %**end of header
 
 
@@ -128,19 +130,19 @@ Indexes:
 @cindex oitofelix
 
 @emph{Menininho} is the Brazilian Portuguese word for @emph{male kid},
-and @emph{mininim} is how it's informally spoken throughout the country.
-@emph{Kid} is the term used by @emph{Jordan Mechner}@footnote{Jordan
-Mechner (born June 4, 1964) is an American video game designer, author,
-screenwriter, and filmmaker, best known for creating the Prince of
-Persia video game franchise and the 8-bit computer game Karateka.} when
-referring to the main character of his most famous game
----@strong{Prince of Persia}--- in its source code and documentation,
-because the character's movements were derived from rotoscoping footage
-of Mechner's little brother.  @strong{MININIM} is the @emph{Advanced
-Prince of Persia Engine}, written from scratch by computer programmer
-and free software activist @emph{Bruno Félix Rezende Ribeiro}
-(@code{oitofelix}).  Bruno had a childhood dream of deciphering the
-secrets of his favorite game which introduced him to computing ---a
+and @emph{mininim} is how it's informally pronounced throughout the
+country.  @emph{Kid} is the term used by @emph{Jordan
+Mechner}@footnote{Jordan Mechner (born June 4, 1964) is an American
+video game designer, author, screenwriter, and filmmaker, best known for
+creating the Prince of Persia video game franchise and the 8-bit
+computer game Karateka.} when referring to the main character of his
+most famous game --- @strong{Prince of Persia} --- in its source code
+and documentation, because the character's movements were derived from
+rotoscoping footage of Mechner's little brother.  @strong{MININIM} is
+the @emph{Advanced Prince of Persia Engine}, written from scratch by
+computer programmer and free software activist @emph{Bruno Félix Rezende
+Ribeiro} (@code{oitofelix}).  Bruno had a childhood dream of deciphering
+the secrets of his favorite game that introduced him to computing --- a
 dream dreamt when he was just a kid, a dream realized now that he's
 still a @emph{mininim} deep in his heart.@footnote{Of course, none of
 this is reason enough to name a game engine ``MININIM'', if not by the
@@ -843,20 +845,22 @@ Notice that (whenever it makes sense) for any move, holding its
 triggering keys continues or repeats the movement.@footnote{That's not
 so for the original game, in which for many situations you have to
 release and press the keys again to have the movement repeated.}  Often,
-when transitioning from a movement to another that shares some keys, you
-can keep the common keys pressed and the kid will just do the right
-thing.  It's also worth nothing that the kid responds to the input in
-real time, that is, in the next animation cycle.@footnote{That's not so
-for the original game, in which the kid delays one cycle to respond.}
+when transitioning from a movement to another that share some keys, you
+can keep the common keys pressed, as well as any other keys ignored by
+an intermediate movement, and the kid will just do the right thing.
+It's also worth nothing that the kid responds to the input in real time,
+that is, in the next animation cycle.@footnote{That's not so for the
+original game, in which the kid delays one cycle to respond.}
 
 @kindex LEFT
 @kindex RIGHT
 @kindex UP
 @kindex DOWN
-The term @emph{horizontal key(s)} is used in this text to refer to the
-@kbd{LEFT} or @kbd{RIGHT} directional keys without alluding to a
-particular direction.  The @kbd{UP} and @kbd{DOWN} directional keys are
-simply referred as such.
+@kindex FRONT
+@kindex BACK
+@kbd{FRONT} and @kbd{BACK} are meta-keys used to refer to @kbd{LEFT} and
+@kbd{RIGHT} conditionally subject to kid's facing direction.  The
+@kbd{UP} and @kbd{DOWN} directional keys are simply referred as such.
 
 @iftex
 @page
@@ -915,8 +919,8 @@ direction.
 
 @section Normal
 @cindex normal movement mode
-@cindex mode, movement normal
-@cindex normal mode, movement
+@cindex mode, normal movement
+@cindex movement mode, normal
 
 The movement mode at the beginning of each level is @emph{normal}.
 While in it the kid is standing still.
@@ -925,29 +929,34 @@ While in it the kid is standing still.
 
 
 @subsection Turn
+@cindex turn movement
+@cindex movement, turn
 
-If you press the horizontal key in the opposite direction the kid is
-facing, he turns and then faces the opposite direction likewise.
+If you press @kbd{BACK}, the kid turns and then faces the opposite
+direction likewise.
 
 @center @image{mininim-figures/kid-normal-right} @arrow{} @image{mininim-figures/kid-turn} @arrow{} @image{mininim-figures/kid-normal-left}
 
 
 @subsection Vertical jump
+@cindex vertical jump movement
+@cindex movement, vertical jump
+@cindex jump movement, vertical
 
-Pressing the up key, makes the kid perform a vertical jump.
+Pressing @kbd{UP}, makes the kid perform a vertical jump.
 
 @center @image{mininim-figures/kid-normal-left} @arrow{} @image{mininim-figures/kid-vjump}
 
-In case the construction above him is @emph{strictly traversable} but he
-isn't in a @emph{hangable place}, he performs a long vertical jump and
-comes back to the @strong{exact} same position he was before the
+In case his @emph{top construction} is @emph{strictly traversable} but
+he isn't in a @emph{hangable place}, he performs a long vertical jump
+and comes back to the @strong{exact} same position he was before the
 jump.@footnote{This is not so in the original game, where he moves a
 little bit forward at each vertical jump.}
 
 @center @image{mininim-figures/kid-vjump} @arrow{} @image{mininim-figures/kid-normal-left}
 
-In case the construction above him is not @emph{strictly traversable}
-and the place behind him is not @emph{hangable}, he performs a short
+In case his @emph{top construction} is not @emph{strictly traversable}
+and his @emph{back place} is not @emph{hangable}, he performs a short
 vertical jump and then comes back to the exact same position he was
 before the jump.
 
@@ -959,20 +968,21 @@ hangs for a brief period of time.
 
 @center @image{mininim-figures/kid-vjump-floor-no-floor} @arrow{} @image{mininim-figures/kid-vjump-hang-left}
 
-In case the place behind him is @emph{hangable} and @emph{non-strictly
+In case his @emph{back place} is @emph{hangable} and @emph{non-strictly
 traversable}, he backs off so the situation fits the previous paragraph
 description.
 
 @center @image{mininim-figures/kid-vjump-floor} @arrow{} @image{mininim-figures/kid-vjump-floor-no-floor}
 
-If it's @emph{hangable} but @emph{strictly traversable}, he backs off
-just enough, without entering the @emph{strictly traversable} place, to
-perform a very vertical jump, and then hangs as described.
+In case his @emph{back place} is @emph{hangable} but @emph{strictly
+traversable}, he backs off just enough, without entering the
+@emph{strictly traversable} place, to perform a very vertical jump, and
+then hangs as described.
 
 @center @image{mininim-figures/kid-vjump-floor-traversable} @arrow{} @image{mininim-figures/kid-vjump-floor-no-floor-traversable} @arrow{} @image{mininim-figures/kid-vjump-hang-left-traversable}
 
-If holding the shift key, the kid enters in @emph{hang mode}, otherwise
-he just drops back to the ground.
+If holding @kbd{SHIFT}, the kid enters @emph{hang mode}, otherwise he
+just drops back to the ground.
 
 @center @image{mininim-figures/kid-vjump-hang-left} @arrow{} @image{mininim-figures/kid-vjump-floor-no-floor}
 
@@ -980,32 +990,35 @@ he just drops back to the ground.
 
 
 @subsection Normal jump
+@cindex normal jump movement
+@cindex movement, normal jump
+@cindex jump movement, normal
 
-Pressing the up and the horizontal keys at once makes the kid jump
-forward.  The kid can jump over (up to) two @emph{places} across without
-falling.
+Pressing @kbd{UP} and @kbd{FRONT} at once makes the kid jump forward.
+He can jump over (up to) two @emph{places} across without falling.
 
 @center @image{mininim-figures/kid-normal-left} @arrow{} @image{mininim-figures/kid-jump}
 
-In midair, if he's in a @emph{hangable place}, holding shift and the
-horizontal key in the direction he's facing makes him hang on the
-construction and enter @emph{hang mode}.@footnote{The original game has
-no such movement.}
+In midair, if he's in a @emph{hangable place}, holding @kbd{SHIFT} and
+pressing @kbd{FRONT} makes him hang on the construction and enter
+@emph{hang mode}.@footnote{The original game has no such movement.}
 
 @center @image{mininim-figures/kid-jump-floor-no-floor} @arrow{} @image{mininim-figures/kid-hang-left}
 
 If he's in a @emph{hangable place} for the opposite direction, holding
-shift and the horizontal key in that direction makes him turn in midair,
-hang on the construction and enter @emph{hang mode}.@footnote{The
-original game has no such movement.}
+@kbd{SHIFT} and pressing @kbd{BACK} makes him turn in midair, hang on
+the construction and enter @emph{hang mode}.@footnote{The original game
+has no such movement.}
 
 @center @image{mininim-figures/kid-jump-no-floor-floor} @arrow{} @image{mininim-figures/kid-hang-right}
 
 
 @subsection Walk
+@cindex walk movement
+@cindex movement, walk
 
-Pressing the horizontal key in the same direction the kid is facing
-while holding the shift key, makes him walk carefully.
+Pressing @kbd{FRONT} while holding @kbd{SHIFT}, makes the kid walk
+carefully.
 
 @center @image{mininim-figures/kid-normal-left} @arrow{} @image{mininim-figures/kid-walk}
 
@@ -1033,52 +1046,61 @@ warning of the eminent danger.
 
 @center @image{mininim-figures/kid-misstep-closer-floor} @arrow{} @image{mininim-figures/kid-normal-closer-floor}
 
-If you insist and try again, he'll obey and suffer the consequences ---
-so, be careful!
+If you insist, he'll obey and suffer the consequences --- so, be
+careful!
+
 
 @subsection Descend
+@cindex descend movement
+@cindex movement, descend
 
-If you press the down key and the kid's bottom back place is
+If you press @kbd{DOWN} and the kid's @emph{bottom back place} is
 @emph{hangable} and he's near enough to it, he descends, then hangs
-briefly --- entering @emph{hang mode} if shift is kept pressed, or
+briefly --- entering @emph{hang mode} if @kbd{SHIFT} is kept pressed, or
 dropping off otherwise.
 
 @center @image{mininim-figures/kid-hang-climb-01} @arrow{} @image{mininim-figures/kid-hang-climb-00}
 
 
 @section Crouch
+@cindex crouch movement mode
+@cindex mode, crouch movement
+@cindex movement mode, crouch
 
-If you press the down key and the kid's bottom back place is
-@emph{non-hangable}, or the kid is not near enough to it, the kid
-crouches.
+If you press @kbd{DOWN} and the kid's @emph{bottom back place} is
+@emph{non-hangable}, or the kid is not near enough to it, he crouches.
 
 @center @image{mininim-figures/kid-normal-left} @arrow{} @image{mininim-figures/kid-couch}
 
-The kid stays crouched as long as you keep the down key pressed.
-Releasing the down key makes the kid stand up again.
+The kid stays crouched as long as you keep @kbd{DOWN} pressed.
+Releasing it makes him stand up again.
 
 @center @image{mininim-figures/kid-uncouch} @arrow{} @image{mininim-figures/kid-normal-left}
 
 @subsection Crouching jump
+@cindex crouching jump movement
+@cindex movement, crouching jump
+@cindex jump movement, crouching
 
-If you press the horizontal key in the same direction the kid is facing,
-without releasing the down key, the kid performs little crouching jumps
-forward.
+If you press @kbd{FRONT} without releasing @kbd{DOWN}, the kid performs
+little crouching jumps forward.
 
 @center @image{mininim-figures/kid-couch} @arrow{} @image{mininim-figures/kid-couch-forward} @arrow{} @image{mininim-figures/kid-couch}
 
 
 @section Run
+@cindex run movement mode
+@cindex mode, run movement
+@cindex movement mode, run
 
-Pressing the horizontal key in the same direction the kid is facing,
-makes him start to run.@footnote{Unless he is facing a @emph{collidable}
-construction with at most one place of distance, in which case he
-performs a @emph{walk}.  Notice that in the original game the threshold
-is lower.}
+Pressing @kbd{FRONT}, makes the kid start to run.@footnote{Unless he is
+facing a @emph{collidable} construction with at most one place of
+distance, in which case he performs a @emph{walk}.  Notice that in the
+original game the threshold is lower.}
 
 @center @image{mininim-figures/kid-normal-left} @arrow{} @image{mininim-figures/kid-start-run}
 
-He runs as long as you keep the horizontal key pressed.
+He runs as long as you keep @kbd{FRONT} pressed.
 
 @center @image{mininim-figures/kid-start-run} @arrow{} @image{mininim-figures/kid-run}
 
@@ -1087,15 +1109,19 @@ Releasing it makes him stop, and go back to the normal stage.
 @center @image{mininim-figures/kid-stop-run} @arrow{} @image{mininim-figures/kid-normal-left}
 
 @subsection Running jump
+@cindex running jump movement
+@cindex movement, running jump
+@cindex jump movement, running
 
-In case you press the up key while running, he makes a running jump.
-The running jump has a reach greater than the @emph{normal jump}.  The
-kid can jump over (up to) three @emph{places} across without falling.
+In case you press @kbd{UP} while running, the kid performs a running
+jump.  The running jump has a reach greater than the @emph{normal jump}.
+The kid can jump over (up to) three @emph{places} across without
+falling.
 
 @center @image{mininim-figures/kid-run} @arrow{} @image{mininim-figures/kid-run-jump}
 
-When the kid lands on ground, he continues to run if you keep the
-horizontal key pressed.
+When the kid lands on ground, he continues to run if you keep
+@kbd{FRONT} pressed.
 
 @center @image{mininim-figures/kid-run-jump} @arrow{} @image{mininim-figures/kid-run}
 
@@ -1104,98 +1130,120 @@ indefinitely.
 
 @center @image{mininim-figures/kid-run} @arrow{} @image{mininim-figures/kid-run-jump} @arrow{} @image{mininim-figures/kid-run} @arrow{} @image{mininim-figures/kid-run-jump}
 
-In midair, if he's in a @emph{hangable place}, holding shift and the
-horizontal key in the direction he's facing makes him hang on the
-construction and enter @emph{hang mode}.@footnote{The original game has
-no such movement.}
+In midair, if he's in a @emph{hangable place}, holding @kbd{SHIFT} and
+pressing @kbd{FRONT} makes him hang on the construction and enter
+@emph{hang mode}.@footnote{The original game has no such movement.}
 
 @center @image{mininim-figures/kid-run-jump-floor-no-floor} @arrow{} @image{mininim-figures/kid-hang-left}
 
 If he's in a @emph{hangable place} for the opposite direction, holding
-shift and the horizontal key in that direction makes him turn in midair,
-hang on the construction and enter @emph{hang mode}.@footnote{The
-original game has no such movement.}
+@kbd{SHIFT} and pressing @kbd{BACK} makes him turn in midair, hang on
+the construction and enter @emph{hang mode}.@footnote{The original game
+has no such movement.}
 
 @center @image{mininim-figures/kid-run-jump-no-floor-floor} @arrow{} @image{mininim-figures/kid-hang-right}
 
 @subsection Running crouch
+@cindex running crouch movement
+@cindex movement, running crouch
+@cindex couch movement, running
 
-If you press the down key while running, he crouches, slipping with some
+If you press @kbd{DOWN} while running, he crouches, slipping with some
 momentum, and then he enters @emph{crouch mode}.
 
 @center @image{mininim-figures/kid-run} @arrow{} @image{mininim-figures/kid-couch}
 
 @subsection Running turn
+@cindex running turn movement
+@cindex movement, running turn
+@cindex turn movement, running
 
-If you press the horizontal key in the opposite direction the kid is
-facing while running, he turns without stopping and continues to run to
-the opposite direction if you keep the horizontal key pressed.
+If you press @kbd{BACK} while running, the kid turns without stopping
+and continues to run in the opposite direction if you keep it pressed.
 
 @center @image{mininim-figures/kid-run} @arrow{} @image{mininim-figures/kid-turn-run} @arrow{} @image{mininim-figures/kid-run-right}
 
 @section Hang
+@cindex hang movement mode
+@cindex mode, hang movement
+@cindex movement mode, hang
 
+@cindex hang free
+@cindex hang non-free
 There are two modes of hanging: @emph{free} and @emph{non-free}.  The
-kid @dfn{hangs free} when the construction below the hanged one is not
-collidable at the direction of hanging.  Otherwise he @dfn{hangs
+kid @dfn{hangs free} when his @emph{front construction} is not
+collidable in the direction of hanging.  Otherwise he @dfn{hangs
 non-free}.
 
+@cindex hang free
 While @emph{hanging free} the kid swings back and forth like a pendulum.
 
 @center @image{mininim-figures/kid-hang-left} @arrow{} @image{mininim-figures/kid-hang-left-forth} @arrow{} @image{mininim-figures/kid-hang-left} @arrow{} @image{mininim-figures/kid-hang-left-back}
 
+@cindex hang non-free
 By contrast, when @emph{hanging non-free} the kid keeps himself static.
 
 @center @image{mininim-figures/kid-hang-left-non-free}
 
 @subsection Hanging fall
+@cindex hanging fall movement
+@cindex movement, hanging fall
+@cindex fall movement, hanging
 
-When @emph{hanging free}, there is a limit for how much time he can
+When @emph{hanging free}, there is a limit for how much time the kid can
 support his own weight, after which he drops from the construction.
-Releasing the shift key in the meantime has the same effect.  The kid
-will fall either vertically aligned with the @emph{hangable place} or
-with the hanged con's place, depending upon which his feet are aligned
-with when he leaves the hanged construction.@footnote{It's not possible
-to perform such movements in the original game, because there the kid
-always falls aligned with a @emph{non-strictly traversable} construction
-below him, in case there is one.}
+Releasing @kbd{SHIFT} in the meantime has the same effect.  The kid will
+fall either aligned with the @emph{hangable place's column} or with the
+@emph{hangable place's front column}, depending upon which his feet are
+in when he leaves the hanged construction.@footnote{It's not possible to
+perform such movements in the original game, because there the kid
+always falls over a @emph{non-strictly traversable} construction, in
+case there is one.}
 
 @center @image{mininim-figures/kid-hang-free-fall}
 
 The kid can sustain himself indefinitely when @emph{hanging non-free},
-thus the only way to make him drop the con is by releasing the shift
-key.  As one would expect, the kid always falls aligned to the
-@emph{hangable place}.
+thus the only way to make him drop is by releasing @kbd{SHIFT}.  As one
+would expect, the kid always falls aligned to the @emph{hangable place's
+column}.
 
 @center @image{mininim-figures/kid-hang-left-non-free-floor-00} @arrow{} @image{mininim-figures/kid-hang-left-non-free-floor-01}
 
 @subsection Hanging turn
+@cindex hanging turn movement
+@cindex movement, hanging turn
+@cindex turn movement, hanging
 
 When the kid is @emph{hanging free} in a place that is @emph{hangable}
-in both directions and his feet are aligned with it, pressing the
-horizontal key in the opposite direction he's facing, while holding
-shift, makes him turn in midair and hang on the con at his
-back.@footnote{This movement is not present in the original game.}
+in both directions and his feet are in the @emph{hangable place},
+pressing @kbd{BACK} while holding @kbd{SHIFT}, makes him turn in midair
+and hang on the con at his back.@footnote{This movement is not present
+in the original game.}
 
 @center @image{mininim-figures/kid-hang-left-back-floor-no-floor-floor} @arrow{} @image{mininim-figures/kid-hang-right-floor-no-floor-floor}
 
 Naturally, if @emph{hanging non-free} in a place that is @emph{hangable}
 in both directions, there is no need to observe the kid's body
-inclination, just pressing the horizontal key in the opposite direction
-he's facing, will do the job (granted shift is keep
-pressed).@footnote{This movement is not present in the original game.}
+inclination, just pressing @kbd{BACK}, will do the job (granted
+@kbd{SHIFT} is kept pressed).@footnote{This movement is not present in
+the original game.}
 
 @center @image{mininim-figures/kid-hang-left-back-floor-no-floor-floor-non-free} @arrow{} @image{mininim-figures/kid-hang-right-floor-no-floor-floor-non-free}
 
 @subsection Climb
+@cindex climb movement
+@cindex movement, climb
 
-Pressing the up key while hanging makes the kid climb the construction
-for both modes.
+Pressing @kbd{UP} while hanging makes the kid climb the construction for
+both modes.
 
 @center @image{mininim-figures/kid-hang-climb-00} @arrow{} @image{mininim-figures/kid-hang-climb-01} @image{mininim-figures/kid-hang-climb-non-free-00} @arrow{} @image{mininim-figures/kid-hang-climb-non-free-01}
 
 
 @section Fall
+@cindex fall movement mode
+@cindex mode, fall movement
+@cindex movement mode, fall
 
 This mode is not really related to a key combination, but instead to a
 circumstance: the kid trying to support his own weight on an
@@ -1207,95 +1255,117 @@ encounters a @emph{non-strictly traversable} construction or hangs at a
 If the kid hits a @emph{non-traversable} construction with sufficient
 speed, he is harmed or can even die.  Falling from a height of one floor
 inflicts no damage on him.  Two floors takes one life point.  Three or
-more kills him.
+more kills him instantly.
 
 @subsection Falling hang
+@cindex falling hang movement
+@cindex movement, falling hang
+@cindex hang movement, falling
 
 When falling if the kid is passing through a @emph{hangable place} and
 his vertical velocity is low enough, and he's near enough to the
 @emph{hangable construction}, he is able to hang there and enter
-@emph{hang mode} if you hold shift down.
+@emph{hang mode} if you hold @kbd{SHIFT} down.
 
 @center @image{mininim-figures/kid-fall-floor-front} @arrow{} @image{mininim-figures/kid-hang-left}
 
 @subsection Falling turn
+@cindex falling turn movement
+@cindex movement, falling turn
+@cindex turn movement, falling
 
 If instead the place is @emph{hangable} at the opposite direction,
-pressing shift and the horizontal keys in the @emph{hangable
-construction}'s direction makes the kid turn in mid air, hang there and
-enter @emph{hang mode}.@footnote{This movement is not available in the
-original game.}
+holding @kbd{SHIFT} and pressing @kbd{BACK} makes the kid turn in mid
+air, hang there and enter @emph{hang mode}.@footnote{This movement is
+not available in the original game.}
 
 @center @image{mininim-figures/kid-fall-floor-back} @arrow{} @image{mininim-figures/kid-hang-right}
 
 
 @section Fight
+@cindex fight movement mode
+@cindex mode, fight movement
+@cindex movement mode, fight
 
-If the kid has got the sword, the return key takes the sword and puts
-him in @emph{fight mode}.@footnote{In the original game, the kid enters
+If the kid has got the sword, @kbd{RETURN} takes the sword and puts him
+in @emph{fight mode}.@footnote{In the original game, the kid enters
 fight mode automatically in the eminence of an enemy threat.}
 
 @center @image{mininim-figures/kid-normal-left} @arrow{} @image{mininim-figures/kid-take-sword} @arrow{} @image{mininim-figures/kid-sword-normal}
 
 @subsection Fight walk forward
+@cindex fight walk forward movement
+@cindex movement, fight walk forward
 
-Pressing the horizontal key in the same direction kid is facing, makes
-him walk forward.
+Pressing @kbd{FRONT}, makes the kid walk forward.
 
 @center @image{mininim-figures/kid-sword-normal} @arrow{} @image{mininim-figures/kid-sword-walkf}
 
 @subsection Fight walk backward
+@cindex fight walk backward movement
+@cindex movement, fight walk backward
 
-Likewise if you press in the opposite direction, he goes backward.
+If you press @kbd{BACK}, the kid goes backward.
 
 @center @image{mininim-figures/kid-sword-normal} @arrow{} @image{mininim-figures/kid-sword-walkb}
 
 @subsection Defense
+@cindex defense movement
+@cindex movement, defense
 
-If you press the up key, the kid makes the defense movement.
+If you press @kbd{UP}, the kid makes the defense movement.
 
 @center @image{mininim-figures/kid-sword-normal} @arrow{} @image{mininim-figures/kid-sword-defense}
 
 @subsection Attack
+@cindex attack movement
+@cindex movement, attack
 
-The shift key makes him attack.
+Pressing @kbd{SHIFT} makes the kid attack.
 
 @center @image{mininim-figures/kid-sword-normal} @arrow{} @image{mininim-figures/kid-sword-attack}
 
 @subsection Counter attack and counter defense
+@cindex counter attack
+@cindex counter defense
+@cindex mode, counter attack
+@cindex mode, counter defense
+@cindex kca
+@cindex kcd
 
-Holding the shift and up keys puts the kid in counter attack and counter
-defense mode.  At first, there is no immediate noticeable difference
-from standing still in fight mode, but as an enemy attacks@footnote{In
-the original game the terminology for ``attack'' is ``striking'', for
-``counter attack'' is ``re-striking after block'', for ``defense'' is
-``blocking strike'' and for ``counter defense'' is ``improper
-blocking''.}, the kid defends for certain. Then, depending upon
-probability whose likelihood is given by the @acronym{KCA, Kid's Counter
-Attack} skill, he may counter attack.
+Holding @kbd{SHIFT} and @kbd{UP} puts the kid in counter attack and
+counter defense mode.  At first, there is no immediate noticeable
+difference from standing still in fight mode, but as an enemy
+attacks@footnote{In the original game the terminology for ``attack'' is
+``striking'', for ``counter attack'' is ``re-striking after block'', for
+``defense'' is ``blocking strike'' and for ``counter defense'' is
+``improper blocking''.}, the kid defends for certain. Then, depending
+upon probability whose likelihood is given by the @acronym{KCA, Kid's
+Counter Attack skill}, he may counter attack.
 
-Depending on the enemy's skills, the enemy may counter defend (if not
-the enemy loses a life point) and then counter attack.  In that case,
-depending upon probability whose likelihood is given by the
-@acronym{KCD, Kid's Counter Defense}, the kid may counter defend (if not
-he loses a life point) and the process restarts at the kid's counter
+If he does, depending on the enemy's skills, they may counter defend and
+then counter attack.  In that case, depending upon probability whose
+likelihood is given by the @acronym{KCD, Kid's Counter Defense skill},
+the kid may counter defend and the process restarts at the kid's counter
 attack stage, making for a chain of counter attacks and counter defenses
 whose length is determined only by the fighters' skills (and a little
-bit of luck).
+bit of luck).  Every counter attack that is not responded with a counter
+defense by the opponent, makes him lose a life point.
 
-When standing still in this mode, releasing the up key initiates an
-attack (but at the same time makes the kid briefly vulnerable to the
-enemy's attacks).  In this case the same counter attack and counter
-defense chain logic described above is symmetrically applied.
+When standing still in this mode, releasing @kbd{UP} initiates an attack
+(but at the same time makes the kid briefly vulnerable to the enemy's
+attacks).  In this case the same counter attack and counter defense
+chain logic described above is symmetrically applied.
 
-Pressing the horizontal keys makes the kid walk forward or backward, as
-appropriate, without leaving this mode.  However, although walking
-backward doesn't make the kid lower his guard, walking forward makes him
-vulnerable until he puts himself on guard again.
+Pressing @kbd{FRONT} and @kbd{BACK} (while holding @kbd{SHIFT} and
+@kbd{UP}) makes the kid walk forward and backward, respectively, without
+leaving this mode.  However, although walking backward doesn't make him
+lower his guard, walking forward makes him vulnerable until he puts
+himself on guard again.
 
 The kid's skills are built up by defeating enemies.@footnote{In the
 original game there is no such skills scheme.  There, if you don't get
-tired of pressing the shift and up keys, the kid's counter attack and
+tired of pressing @kbd{SHIFT} and @kbd{UP}, the kid's counter attack and
 counter defense are infallible.}  The more advanced the defeated enemy's
 skills, the more the kid's skills improve.  Both skills ---KCA and
 KCD--- are given by a number between 0 and 100, interpreted as
@@ -1303,9 +1373,11 @@ percentages, indicating the likelihood of counter attacking and counter
 defending, respectively.
 
 @subsection Keep sword
+@cindex keep sword movement
+@cindex movement, keep sword
 
-Finally you can make the kid keep his sword and return to normal mode by
-pressing the down key.
+Finally you can make the kid keep his sword and return to @emph{normal
+mode} by pressing @kbd{DOWN}.
 
 @center @image{mininim-figures/kid-sword-normal} @arrow{} @image{mininim-figures/kid-keep-sword} @arrow{} @image{mininim-figures/kid-normal-left}
 
@@ -1318,6 +1390,8 @@ pressing the down key.
 @chapter Key bindings
 @cindex key bindings
 
+@cindex megahit
+@cindex improved
 The engine has several key bindings that control an wide range of
 settings and perform useful functions.  Many key bindings work anytime,
 in the title screen, cut scenes and levels, while others work only in
@@ -1326,42 +1400,65 @@ original game when started with the option @option{megahit}
 (@option{improved} in latter revisions), however they can implement a
 super-set of the functions available there and MININIM implements quite
 a few more.  Also, many key bindings have a configuration option
-counterpart.
+counterpart.  @ref{Configuration}.
 
 @section Game flow
+@cindex game flow key bindings
+@cindex key bindings, game flow
 
 @table @kbd
+@kindex SHIFT+L
+@cindex @code{--start-level}, related key binding
 @item SHIFT+L
 Warp to next level.  Related to option @option{--start-level}.
+
+@kindex CTRL+A
 @item CTRL+A
 Restart level.
+
+@kindex CTRL+R
 @item CTRL+R
 Restart the game.
+
+@kindex CTRL+Q
 @item CTRL+Q
 Quit the game.
 @end table
 
 @section Graphical rendering
+@cindex graphical rendering key bindings
+@cindex key bindings, graphical rendering
 
 These key bindings modify how the engine graphically renders the game
 world objects.
 
 @table @kbd
+@kindex F10
+@cindex @code{--guard-mode}, related key binding
 @item F10
 Select guard mode. This circulates around the modes: ``ORIGINAL'',
 ``GUARD'', ``FAT GUARD'', ``VIZIER'', ``SKELETON'' and ``SHADOW''.  The
 ``ORIGINAL'' mode gives level modules autonomy in this choice for each
 particular guard.  This is the default.  Related to option
 @option{--guard-mode}.
+
+@kindex F11
+@cindex @code{--environment-mode}, related key binding
 @item F11
 Select environment mode.  This circulates around the modes:
 ``ORIGINAL'', ``DUNGEON'' and ``PALACE''.  The ``ORIGINAL'' value gives
 level modules autonomy in this choice for each particular level.  This
 is the default.  Related to option @option{--environment-mode}.
+
+@kindex F12
+@cindex @code{--video-mode}, related key binding
 @item F12
 Select video mode.  This circulates around the modes: ``VGA'', ``EGA'',
 ``CGA'' and ``HGC''. The default is VGA.  Related to option
 @option{--video-mode}.
+
+@kindex SHIFT+B
+@cindex @code{--blind-mode}, related key binding
 @item SHIFT+B
 Toggle blind mode.  In blind mode background and non-animated sprites
 are not drawn.  The default is to draw everything.  Related to option
@@ -1369,53 +1466,80 @@ are not drawn.  The default is to draw everything.  Related to option
 @end table
 
 @section Life and death
+@cindex life and death key bindings
+@cindex key bindings, life and death
 
 @table @kbd
+@kindex K
 @item K
 Kill enemy.@footnote{This only works for the enemy currently associated
 with the kid.  In the original game this works for the enemy in the room
 at view, as it can only handle one guard per room.  There is no such
 limit in MININIM.}
+
+@kindex R
 @item R
 Resurrect kid.
+
+@kindex I
+@cindex @code{--immortal-mode}, related key binding
 @item I
 Toggle immortal mode.  In immortal mode the kid can't be harmed.  The
 default mode is mortal.  Related to option @option{--immortal-mode}.
+
+@kindex SHIFT+S
 @item SHIFT+S
 Increment kid's current life points.
+
+@kindex SHIFT+T
+@cindex @code{--total-lives}, related key binding
 @item SHIFT+T
 Increment kid's total life points.  Related to option
 @option{--total-lives}.
 @end table
 
 @section Kid special
+@cindex kid special key bindings
+@cindex key bindings, kid special
 
 These key bindings give or trigger special kid's abilities.
 
 @table @kbd
+@kindex A
 @item A
 Alternate between kid and its shadows.  This is intended for level
 modules that make use of such feature.  That's not the legacy module
 case.
+
+@kindex SHIFT+W
 @item SHIFT+W
 Float kid.  This is equivalent to drinking a float potion.
 @end table
 
 @section Time
+@cindex time key bindings
+@cindex key bindings, time
+@cindex @code{--time-limit}, related key binding
+@cindex @code{--start-time}, related key binding
 
 These key bindings allow you to control the remaining time available to
 end the game.  They are related to options @option{--time-limit} and
 @option{--start-time}.
 
 @table @kbd
+@kindex SPACE
 @item SPACE
 Display remaining time.  Notice that the remaining time is displayed
 automatically when it reaches multiples of 5 minutes, and it's
 constantly shown when remains less than a minute to its end.
+
+@kindex +
 @item +
 Increment and display remaining time.  If the remaining time is greater
 than 1 minute, increment remaining time by 1 minute, otherwise by 1
 second.
+
+@kindex -
 @item -
 Decrement and display remaining time.  If the remaining time is greater
 than 1 minute, decrement remaining time by 1 minute, otherwise by 1
@@ -1423,25 +1547,44 @@ second.
 @end table
 
 @section Skills
+@cindex skills key bindings
+@cindex key bindings, skills
+@cindex @code{--kca}, related key binding
+@cindex @code{--kcd}, related key binding
 
 These key bindings allow you to set the kid skills.  They are related to
 options @option{--kca} and @option{--kcd}.
 
 @table @kbd
+@kindex TAB
 @item TAB
 Display skills.  If the kid is associated with an enemy, it shows both
 fighters' skills, otherwise it only shows the kid's.
+
+@kindex CTRL+=
 @item CTRL+=
 Increment KCA skill.
+
+@kindex CTRL+-
 @item CTRL+-
 Decrement KCA skill.
+
+@kindex ALT+=
 @item ALT+=
 Increment KCD skill.
+
+@kindex ALT+-
 @item ALT+-
 Decrement KCD skill.
 @end table
 
 @section Level navigation
+@cindex level navigation key bindings
+@cindex key bindings, level navigation
+@cindex camera moving
+@cindex moving camera
+@cindex room coordinates
+@cindex coordinates, room
 
 These key bindings allow you to move the camera around the level, making
 it possible to view any room linked to the current one without having to
@@ -1451,27 +1594,42 @@ bindings intended to show room coordinates, which is useful when
 building levels.
 
 @table @kbd
+@kindex H
 @item H
 Move the camera to the room at left (right if the screen is flipped
 horizontally).
+
+@kindex J
 @item J
 Move the camera to the room at right (left if the screen is flipped
 horizontally).
+
+@kindex U
 @item U
 Move the camera to the room above (below if the screen is flipped
 vertically).
+
+@kindex N
 @item N
 Move the camera to the room below (above if the screen is flipped
 vertically).
+
+@kindex HOME
 @item HOME
 Move the camera back to the kid's room.
+
+@kindex C
 @item C
 Show direct coordinates.
+
+@kindex SHIFT+C
 @item SHIFT+C
 Show indirect coordinates.
 @end table
 
 @section Files
+@cindex files key bindings
+@cindex key bindings, files
 
 These key bindings are used to save and load configuration files.  They
 open a platform-dependent file choosing dialog.  Notice that save files
@@ -1482,40 +1640,61 @@ conditions.  For instance save files show their effect only on game
 (re)start.
 
 @table @kbd
+@kindex CTRL+L
+@cindex @code{--load-config}, related key binding
 @item CTRL+L
 Load configuration.  Related to option @option{--load-config}.
+
+@kindex CTRL+G
 @item CTRL+G
 Save game.
 @end table
 
 @section Peripherals
+@cindex peripherals key bindings
+@cindex key bindings, peripherals
 
 These key bindings allow you to tune hardware peripherals that work with
 the game.
 
 @table @kbd
+@kindex F
+@cindex @code{--fullscreen}, related key binding
 @item F
 Toggle fullscreen mode.  In fullscreen mode the window spans the entire
 screen.  The default is to have a window of 640x400 resolution.  Related
 to option @option{--fullscreen}.
+
+@kindex SHIFT+I
+@cindex @code{--display-flip-mode}, related key binding
 @item SHIFT+I
 Select display flip mode.  This circulates around the modes: ``NONE'',
 ``VERTICAL'', ``HORIZONTAL'' and ``VERTICAL + HORIZONTAL''.  The default
 is ``NONE''.  Related to option @option{--display-flip-mode}.
+
+@kindex SHIFT+K
+@cindex @code{--keyboard-flip-mode}, related key binding
 @item SHIFT+K
 Select keyboard flip mode.  This circulates around the modes: ``NONE'',
 ``VERTICAL'', ``HORIZONTAL'' and ``VERTICAL + HORIZONTAL''.  The default
 is ``NONE''.  Related to option @option{--keyboard-flip-mode}.
+
+@kindex CTRL+S
+@cindex @code{--sound}, related key binding
 @item CTRL+S
 Toggle sound.  The default is to have sound enabled.  Related to option
 @option{--sound}.
 @end table
 
 @section Miscellaneous
+@cindex miscellaneous key bindings
+@cindex key bindings, miscellaneous
 
 These are key bindings that don't fit in any other category.
 
 @table @kbd
+@kindex CTRL+V
+@cindex @code{--version}, related key binding
 @item CTRL+V
 Show engine name and version.  Related to option @option{--version}.
 @end table
@@ -1528,6 +1707,9 @@ Show engine name and version.  Related to option @option{--version}.
 @chapter Configuration
 @cindex configuration
 
+@cindex command line options
+@cindex environment variables
+@cindex configuration files
 MININIM can be easily setup to match user's preferences regarding the
 way the game looks and behaves.  It features an integrated configuration
 system which offers three distinct interfaces: @emph{command line
@@ -1539,17 +1721,19 @@ options parsing routine allows for easy maintenance, equivalence between
 methods and a canonical interface for integrating future methods.
 
 For that end, each configuration option backend implements a translator
-between its specifics of option representation and access to a normal
+between its specifics of option representation and access, to a normal
 command line array.  Then the resulting options are roughly processed as
 if they were given at the engine invocation command line.
 
 As the options are the same for all three current methods of
 configuration, and all of them are in essence processed as command line
-options, it's unnecessary to describe all options for each of them
-separately.  Therefore, we provide systematic rules for converting
-between method option names and their command line equivalents, and then
-describe only the latter.
+options, it's unnecessary to describe all options for each separately.
+Therefore, we provide systematic rules for converting between method
+option names and their command line equivalents, and then describe only
+the latter.
 
+@cindex option name conversion
+@cindex conversion, option name
 The rule for option naming conversion is very simple: for every command
 line option of the form @option{x-y} there is an equivalent environment
 variable option @env{MININIM_X_Y} and an equivalent configuration file
@@ -1560,8 +1744,7 @@ options override any other, while environment variables override the
 main configuration file.  In any method applicable later options
 override earlier ones.  The option @option{--print-paths} shows, among
 other things, the expected file name of the main configuration file.
-Notice that configuration files have INI format without any sections,
-like this:
+Configuration files have INI format without any sections, like this:
 
 @example
 option 0 = value 0
@@ -1570,7 +1753,7 @@ option n = value n
 @end example
 
 Notice that many options can be changed on the fly by key binding
-counterparts.
+counterparts. @xref{Key bindings}.
 
 The following remarks apply to the options list in this chapter:
 
@@ -1598,16 +1781,22 @@ C language.
 
 
 @section Configuration options
+@cindex configuration options
+@cindex options, configuration
 
 @table @option
+@optindex --ignore-environment
 @item --ignore-environment
 Ignore environment variables.  The default is to parse them after the
 main configuration file.
 
+@optindex --ignore-main-config
 @item --ignore-main-config
 Ignore main configuration file.  The default is to parse it at the very
 beginning of each run.
 
+@optindex --load-config
+@cindex @kbd{CTRL+L}, related option
 @item --load-config=FILE
 Load configuration file @var{file}.  The options set in @var{file} have
 the same precedence as the equivalent command line options given at its
@@ -1617,8 +1806,11 @@ binding.
 
 
 @section Level options
+@cindex level options
+@cindex options, level
 
 @table @option
+@optindex --level-module
 @item --level-module=LEVEL-MODULE
 Select level module.  A level module determines a way to generate
 consecutive levels for use by the engine.  Valid values for
@@ -1628,6 +1820,8 @@ consecutive levels for use by the engine.  Valid values for
 is the module designed to generate random-corrected levels for accessing
 the engine robustness.  The default is @samp{LEGACY}.
 
+@optindex --start-level
+@cindex @kbd{SHIFT+L}, related option
 @item --start-level=N
 Make the kid start at level @var{n}.  The default is @samp{1}.  Valid
 integers range from @samp{1} to @code{INT_MAX}.  This can be changed
@@ -1636,37 +1830,56 @@ in-game by the @kbd{SHIFT+L} key binding.
 
 
 @section Time options
+@cindex time options
+@cindex options, time
 
 @table @option
+@optindex --start-time
 @item --start-time=N
 Set the play time counter to @var{n} seconds.  The default is @samp{0}.  Valid
 integers range from @samp{0} to @code{INT_MAX}.
 
+@optindex --time-limit
+@cindex @kbd{+}, related option
+@cindex @kbd{-}, related option
 @item --time-limit=N
 Set the time limit to complete the game to @var{n} seconds.  The default
-is @samp{3600} (1 hour).  Valid integers range from @samp{1} to @code{INT_MAX}.
-This can be changed in-game by the @kbd{+} and @kbd{-} key bindings.
+is @samp{3600} (1 hour).  Valid integers range from @samp{1} to
+@code{INT_MAX}.  This can be changed in-game by the @kbd{+} and @kbd{-}
+key bindings.
 @end table
 
 
 @section Skills options
+@cindex skills options
+@cindex options, skills
 
 @table @option
+@optindex --immortal-mode
+@cindex @kbd{I}, related option
 @item --immortal-mode[=BOOLEAN]
 Enable/disable immortal mode.  In immortal mode the kid can't be harmed.
 The default is @samp{FALSE}.  This can be changed in-game by the @kbd{I}
 key binding.
 
+@optindex --kca
+@cindex @kbd{CTRL+=}, related option
+@cindex @kbd{CTRL+-}, related option
 @item --kca=N
 Set kid's counter attack skill to @var{n}.  The default is @samp{0}.
 Valid integers range from @samp{0} to @samp{100}.  This can be changed
 in-game by the @kbd{CTRL+=} and @kbd{CTRL+-} key bindings.
 
+@optindex --kcd
+@cindex @kbd{ALT+=}, related option
+@cindex @kbd{ALT+-}, related option
 @item --kcd=N
 Set kid's counter defense skill to @var{n}.  The default is @samp{0}.
 Valid integers range from @samp{0} to @samp{100}.  This can be changed
 in-game by the @kbd{ALT+=} and @kbd{ALT+-} key bindings.
 
+@optindex --total-lives
+@cindex @kbd{SHIFT+T}, related option
 @item --total-lives=N
 Make the kid start with @var{n} total lives.  The default is @samp{3}.
 Valid integers range from @samp{1} to @samp{10}.  This can be changed
@@ -1675,19 +1888,27 @@ in-game by the @kbd{SHIFT+T} key binding.
 
 
 @section Rendering options
+@cindex rendering options
+@cindex options, rendering
 
 @table @option
+@optindex --blind-mode
+@cindex @kbd{SHIFT+B}, related option
 @item --blind-mode[=BOOLEAN]
 Enable/disable blind mode.  In blind mode background and non-animated
 sprites are not drawn.  The default is @samp{FALSE}.  This can be
 changed in-game by the @kbd{SHIFT+B} key binding.
 
+@optindex --display-flip-mode
+@cindex @kbd{SHIFT+I}, related option
 @item --display-flip-mode=DISPLAY-FLIP-MODE
 Select display flip mode.  Valid values for @var{display-flip-mode} are:
 @samp{NONE}, @samp{VERTICAL}, @samp{HORIZONTAL} and
 @samp{VERTICAL-HORIZONTAL}.  The default is @samp{NONE}.  This can be
 changed in-game by the @kbd{SHIFT+I} key binding.
 
+@optindex --environment-mode
+@cindex @kbd{F11}, related option
 @item --environment-mode=ENVIRONMENT-MODE
 Select environment mode.  Valid values for @var{environment-mode} are:
 @samp{ORIGINAL}, @samp{DUNGEON} and @samp{PALACE}.  The @samp{ORIGINAL}
@@ -1695,6 +1916,8 @@ value gives level modules autonomy in this choice for each particular
 level.  This is the default.  This can be changed in-game by the
 @kbd{F11} key binding.
 
+@optindex --guard-mode
+@cindex @kbd{F10}, related option
 @item --guard-mode=GUARD-MODE
 Select guard mode.  Valid values for @var{guard-mode} are:
 @samp{ORIGINAL}, @samp{GUARD}, @samp{FAT-GUARD}, @samp{VIZIER},
@@ -1703,6 +1926,9 @@ level modules autonomy in this choice for each particular guard.  This
 is the default.  This can be changed in-game by the @kbd{F10} key
 binding.
 
+@optindex --mirror-mode
+@cindex @kbd{SHIFT+I}, related option (mirror mode)
+@cindex @kbd{SHIFT+K}, related option (mirror mode)
 @item --mirror-mode[=BOOLEAN]
 Enable/disable mirror mode.  In mirror mode the screen and the keyboard
 are flipped horizontally.  This is equivalent of specifying both the
@@ -1711,6 +1937,8 @@ options @option{--display-flip-mode=HORIZONTAL} and
 This can be changed in-game by the @kbd{SHIFT+I} and @kbd{SHIFT+K} key
 bindings for the display and keyboard, respectively.
 
+@optindex --video-mode
+@cindex @kbd{F12}, related option
 @item --video-mode=VIDEO-MODE
 Select video mode.  Valid values for @var{video-mode} are: @samp{VGA},
 @samp{EGA}, @samp{CGA} and @samp{HGC}.  The default is @samp{VGA}.  This
@@ -1719,18 +1947,24 @@ can be changed in-game by the @kbd{F12} key binding.
 
 
 @section Window options
+@cindex window options
+@cindex options, window
 
 @table @option
+@optindex --fullscreen
+@cindex @kbd{F}, related option
 @item --fullscreen[=BOOLEAN]
 Enable/disable fullscreen mode.  In fullscreen mode the window spans the
 entire screen.  The default is @samp{FALSE}.  This can be changed
 in-game by the @kbd{F} key binding.
 
+@optindex --window-dimensions
 @item --window-dimensions=WxH
 Set window width and height to @var{w} and @var{h}, respectively.  The
 default is @samp{640x400}.  The values @var{w} and @var{h} are strictly
 positive integers and must be separated by an @samp{x}.
 
+@optindex --window-position
 @item --window-position=X,Y
 Place the window at screen coordinates @var{x,y}.  The default is to let
 this choice to the window manager.  The values @var{x} and @var{y} are
@@ -1739,8 +1973,11 @@ integers and must be separated by a comma.
 
 
 @section Paths options
+@cindex paths options
+@cindex options, paths
 
 @table @option
+@optindex --data-path
 @item --data-path=PATH
 Set data path to @var{path}.  Normally, the data files are looked for in
 the current working directory, then in the user data directory, then in
@@ -1748,27 +1985,36 @@ the resources directory, and finally in the system data directory.  If
 this option is given, before looking there the data files are looked for
 in @var{path}.
 
+@optindex --print-paths
 @item --print-paths
 Print paths and exit.
 @end table
 
 
 @section Other options
+@cindex other options
+@cindex options, other
 
 @table @option
+@optindex --inhibit-screensaver
 @item --inhibit-screensaver[=BOOLEAN]
 Prevent the system screensaver from starting up.  The default is
 @samp{FALSE}.
 
+@optindex --keyboard-flip-mode
+@cindex @kbd{SHIFT+K}, related option
 @item --keyboard-flip-mode=KEYBOARD-FLIP-MODE
 Select keyboard flip mode.  Valid values for @var{keyboard-flip-mode}
 are: @samp{NONE}, @samp{VERTICAL}, @samp{HORIZONTAL} and
 @samp{VERTICAL-HORIZONTAL}.  The default is @samp{NONE}.  This can be
 changed in-game by the @kbd{SHIFT+K} key binding.
 
+@optindex --skip-title
 @item --skip-title[=BOOLEAN]
 Skip title screen.  The default is @samp{FALSE}.
 
+@optindex --sound
+@cindex @kbd{CTRL+S}, related option
 @item --sound[=BOOLEAN]
 Enable/disable sound.  The default is @samp{TRUE}.  This can be changed
 in-game by the @kbd{CTRL+S} key binding.
@@ -1776,13 +2022,22 @@ in-game by the @kbd{CTRL+S} key binding.
 
 
 @section Help options
+@cindex help options
+@cindex options, help
 
 @table @option
+@optindex -?
+@optindex --help
 @item -?
 @itemx --help
 Print options list and exit
+
+@optindex --usage
 @item --usage
 Print a short usage message and exit
+
+@optindex -V
+@optindex --version
 @item -V
 @itemx --version
 Print program name and version and exit
