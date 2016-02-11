@@ -1,0 +1,3 @@
+baseurl: /mininim
+highlighter: pygments
+exclude: ['platforms', 'plugins']
