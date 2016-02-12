@@ -65,10 +65,10 @@ run directly from its source directory.
 
 - [0.9.1 release source code]({{ page.base_local }}{{ site.baseurl }}/mininim-0.9.1.tar.gz)
 
-If you are under _Microsoft Windows_ there is a readily available
-MinGW build.  No installation is required, just extract the zip
-archive and run `mininim.exe`.  The PDF build of the manual is bundled
-as well.
+If you are under _Microsoft Windows_ a MinGW build is readily
+available.  No installation is required, just extract the zip archive
+and run `mininim.exe`.  The PDF build of the manual is bundled as
+well.
 
 - [0.9.1 MinGW build]({{ page.base_local }}{{ site.baseurl }}/mininim-0.9.1-win32.zip)
 
