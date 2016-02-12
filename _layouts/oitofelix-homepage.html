@@ -46,7 +46,7 @@
     <meta name="keywords" content="{{ page.tags }}" />
 
     <!-- External resources -->
-    <link rel="stylesheet" href="{{ page.base_local | append: site.baseurl | append: page.url | remove: '.html' | append: '.css'}}" />
+    <link rel="stylesheet" href="{{ page.base_local | append: site.baseurl | append: '/index.html' | remove: '.html' | append: '.css'}}" />
 
     {% unless page.news == null %}
     <script src="/scripts/jquery-1.6.4.min.js"></script>
