@@ -12,11 +12,8 @@ base: http://oitofelix.github.io
 <div id="markdown" markdown="1">
 ## MININIM
 
-<div>
 <img style="border: 0px;" src="{{ page.base_local }}{{ site.baseurl }}/mininim.png"
 alt="MININIM logo">
-<img src="{{ page.base_local }}{{ site.baseurl }}/game-play.png">
-</div>
 
 <blockquote markdown="1">
 _Menininho_ is the Brazilian Portuguese word for _male kid_, and
@@ -50,6 +47,11 @@ it under the terms of the
 [GNU Free Documentation Licence](https://www.gnu.org/licenses/fdl.html)
 as published by the Free Software Foundation --- with no Invariant
 Sections; either version 1.3, or (at your option) any later version.
+
+<a href="{{ page.base_local }}{{ site.baseurl }}/game-play.png"
+alt="Game play" title="Click here to watch a game play (APNG format).">
+<img src="{{ page.base_local }}{{ site.baseurl }}/game-play-thumb.png">
+</a>
 
 ### Download
 
