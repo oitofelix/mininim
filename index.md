@@ -53,9 +53,9 @@ Sections; either version 1.3, or (at your option) any later version.
 __MININIM__ development is voluntary.  If you like this game and want
 to thank the author for the work he has done so far, or want to enable
 him to spend more time improving it, please
-[make a donation!](/funding.html).  For values equal or greater than
-50 US$ or 0.12 BTC your name will be acknowledged in the MININIM
-manual and in the donors page.  Thank you for your support.
+[make a donation!](/funding.html) For values equal or greater than 50
+US$ or 0.12 BTC your name will be acknowledged in the MININIM manual
+and in the donors page.  Thank you for your support.
 
 [__PLEASE, SUPPORT MININIM DEVELOPMENT!__](/funding.html)
 
