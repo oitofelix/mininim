@@ -48,7 +48,7 @@ it under the terms of the
 as published by the Free Software Foundation --- with no Invariant
 Sections; either version 1.3, or (at your option) any later version.
 
-__PLEASE, SUPPORT MININIM DEVELOPMENT__
+### [Support MININIM development](/funding.html)
 
 __MININIM__ development is voluntary.  If you like this game and want
 to thank the author for the work he has done so far, or want to enable
@@ -57,6 +57,12 @@ him to spend more time improving it, please
 50 US$ or 0.12 BTC your name will be acknowledged in the MININIM
 manual and in the donors page.  Thank you for your support.
 
+### Game play
+
+The image below links to a game play demonstration in the animated PNG
+(APNG) format.  This format was chosen because it produces perfect
+image quality with sizes __much smaller__ than the common general
+video formats.  It may not work with all browsers.
 
 <a href="{{ page.base_local }}{{ site.baseurl }}/game-play.png"
 alt="Game play" title="Click here to watch a game play (APNG format).">
