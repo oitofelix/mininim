@@ -131,6 +131,9 @@ LIBS = -lm ${ALLEGRO_LIBS} ${ALLEGRO_IMAGE_LIBS}										\
   ${ALLEGRO_PRIMITIVES_LIBS} ${ALLEGRO_DIALOG_LIBS} ${mingw_ldadd}
 LDADD = gnulib/libgnu.a
 
+gnulib/libgnu.a:
+	cd gnulib && $(MAKE) $(AM_MAKEFLAGS) all-recursive
+
 if mingw_build
   LDADD += mininim.rc.$(OBJEXT)
   # AM_CFLAGS += -mwindows

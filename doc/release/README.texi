@@ -121,10 +121,8 @@ files found in the top level directory of the distribution:
 User-visible changes since previous versions;
 @item TODO
 Features we want to see implemented someday;
-@item AUTHORS
-List of major contributors;
 @item THANKS
-List of minor contributors;
+List of contributors;
 @c @item BUGS
 @c Bugs you must be aware of;
 @item DONORS
