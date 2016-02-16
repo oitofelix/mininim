@@ -28,7 +28,7 @@
 
 top_level_doc = ${release_doc} $(call uc,${philosophy_doc})
 
-release_doc = README NEWS TODO AUTHORS THANKS DONORS ANNOUNCEMENT
+release_doc = README NEWS TODO THANKS DONORS ANNOUNCEMENT
 
 philosophy_doc = linux-and-the-gnu-system				\
 gnu-free-documentation-license

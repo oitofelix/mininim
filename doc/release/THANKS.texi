@@ -57,18 +57,12 @@
 
 This @inlineifset{manual, section}@inlineifset{file,
 file}@inlineifset{homepage, page} contains a list of people that
-reported problems, suggested improvements or submitted relatively small
-portions of actual code.  The names are listed in chronological order of
-contribution.
-
-For contributions that does matter for copyright purposes, e.g., major
-source code contributions, see @inlineifset{homepage,
-@url{AUTHORS.html, the authors page}}@inlineifset{file, @file{AUTHORS}
-file}@inlineifset{manual, @ref{Authors}}.  If you would appreciate
-your own name listed here, @strong{please contribute!}  See
-@inlineifset{homepage, @url{README.html#Contributing, how to
-contribute}}@inlineifset{file, the ``Contributing'' section of the
-@file{README} file}@inlineifset{manual, @ref{Contributing}}.
+submitted actual code.  The names are listed in chronological order of
+contribution.  If you would appreciate your own name listed here,
+@strong{please contribute!}  See @inlineifset{homepage,
+@url{README.html#Contributing, how to contribute}}@inlineifset{file, the
+``Contributing'' section of the @file{README} file}@inlineifset{manual,
+@ref{Contributing}}.
 
 @table @asis
 @item ---

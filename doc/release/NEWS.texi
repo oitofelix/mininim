@@ -54,14 +54,9 @@
 @centerchap News
 @end ifclear
 
-This document contains a list of user-visible changes worth
-mentioning.  The changes are split and ordered by version in reverse
-chronological order.  If you want to receive notifications about new
-releases of this program or important issues related to it, subscribe
-to the mailing list, as described in @inlineifset{manual,
-@ref{Contact}}@inlineifset{homepage, @url{README.html#Contact,
-Contact}}@inlineifset{file, ``Contact'' section of @file{README}
-file}, or subscribe to the package atom feed @url{@value{atomFeed}}.
+This document contains a list of user-visible changes worth mentioning.
+The changes are split and ordered by version in reverse chronological
+order.
 
 @table @asis
 @item @value{version}

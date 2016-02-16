@@ -56,7 +56,8 @@ mininim_TEXINFOS = \
   philosophy/essay-header.texi \
   $(addprefix philosophy/,${philosophy_doc:=.texi}) \
   copying.texi \
-  release/description.texi
+  release/description.texi \
+	release/donating.texi
 
 EXTRA_DIST = mininim-figures
 

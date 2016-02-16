@@ -1,5 +1,5 @@
 @c
-@c mininim.texi -- Description
+@c description.texi -- Description
 @c
 @c Copyright (C) 2016 Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
 @c

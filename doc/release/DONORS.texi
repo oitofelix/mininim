@@ -56,9 +56,9 @@
 
 This @inlineifset{manual, section}@inlineifset{file,
 file}@inlineifset{homepage, page} contains a list of people that
-supported development by means of donation.  This program would not be
-what it is today without the invaluable help of these people, to whom
-we would like to say:
+supported the development financially.  This program would not be what
+it is today without the invaluable help of these people, to whom we
+would like to say:
 
 @center @strong{THANK YOU VERY MUCH!}
 @sp 1

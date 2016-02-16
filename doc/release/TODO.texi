@@ -55,36 +55,11 @@
 @end ifclear
 
 This @inlineifset{manual, section}@inlineifset{file,
-file}@inlineifset{homepage, page} contains a list of ideas and
-features which would be nice to see implemented some day.  If you are
-ready to start working on any of these TODO items, we appreciate your
-help; please write to @email{@value{mailBugAddr}} so we can be aware
-that the problem is being addressed, and talk with you how to do it
-best.  @inlineifclear{homepage, It is best to consult the latest
-version of this file in the program source code repository.
-@inlineifset{file, See the sections ``Getting a copy'' and ``Hacking''
-of the @file{README} file}@inlineifset{manual, See @ref{Getting a
-copy} and @ref{Hacking}} for instruction on how to access it.}
-
-Since the developers of this program are willing to assign the
-copyright of this package to FSF, please be prepared to sign legal
-papers to transfer the copyright on your work to the FSF too.  For
-more details on this and some more practical details about getting
-involved, see @inlineifset{manual,
-@ref{Contributing}}@inlineifset{homepage,
-@url{README.html#Contributing, how to contribute}}@inlineifset{file,
-the section ``Contributing'' in the @file{README} file}.
-
-As well as the issues listed here, there are bug reports, which are
-effectively to-do that can use your help at the
-@url{https://savannah.gnu.org/bugs/?group=mininim, bug tracker web
-interface}.  See @inlineifset{homepage, @url{README.html#Bug-reporting,
-how to report a bug}}@inlineifset{file, the section ``Bug reporting'' in
-@file{README} file}@inlineifset{manual, @ref{Bug reporting}} for more
-information.
-
-Here are the major features we want to implement for futures versions of
-this package:
+file}@inlineifset{homepage, page} contains a list of ideas and features
+the author plans to implement.  If you would like to see any of them
+implemented, @strong{please donate!}.  @inlineifset{manual,
+@xref{Donating}}@inlineifset{file, You can make your financial
+contribution at @url{@value{donationUrl.html}}}.
 
 @itemize
 @item Joystick support

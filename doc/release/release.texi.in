@@ -19,120 +19,48 @@
 @set package @PACKAGE_NAME@
 @set tarName @PACKAGE_TARNAME@
 @set version @PACKAGE_VERSION@
-@set GNUid @PACKAGE_TARNAME@
 @set date @RELEASE_DATE@
 @set autoconfVersion @AUTOCONF_VERSION@
 @set automakeVersion @AUTOMAKE_VERSION@
 @set texinfoVersion @TEXINFO_VERSION@
 
+@c --- Web;
+@set webUrl http://oitofelix.github.io/mininim/
+@set atomUrl http://oitofelix.github.io/feed.xml
+@set authorMail oitofelix@@gnu.org
 
-
-
-
-@c --- Internet resources;
-
-@c --- --- GNU
-@c @set domain gnu.org
-@c @set webPage https://www.@value{domain}/software/@value{GNUid}/
-@set domain oitofelix.freeshell.org
-@set webPage https://@value{domain}/@value{GNUid}/
-@c --- --- non-GNU
-@c @set domain nongnu.org
-@c @set webpage http://www.@value{domain}/@value{GNUid}/
-
-
-
-@c --- --- Savannah;
-@c @set forge savannah
-@set forge forge
-@set atomFeed https://@value{forge}.@value{domain}/news/atom.php?group=@value{GNUid}
-@set develPage https://@value{forge}.@value{domain}/projects/@value{GNUid}/
-@set supportTrack https://@value{forge}.@value{domain}/support/?group=@value{GNUid}
-@set bugTrack https://@value{forge}.@value{domain}/bugs/?group=@value{GNUid}
-
-
-
-@c --- --- Mailing lists;
-
-@c --- --- --- Bug
-@c --- --- --- --- GNU
-@set mailBugName bug-@value{GNUid}
-@c --- --- --- --- non-GNU
-@c @set mailBugName @value{GNUid}-bug
-@set mailBugAddr @value{mailBugName}@@@value{domain}
-@set mailBugWeb https://lists.@value{domain}/mailman/listinfo/@value{mailBugName}/
-@set mailBugArch https://lists.@value{domain}/archive/html/@value{mailBugName}/
-
-@c --- --- --- Private
-@c --- --- --- --- GNU
-@set mailHelpName @value{GNUid}
-@c --- --- --- --- non-GNU
-@c @set mailHelpName @value{GNUid}-support
-@set mailHelpAddr @value{mailHelpName}@@@value{domain}
-@set mailHelpWeb https://lists.@value{domain}/mailman/listinfo/@value{mailHelpName}/
-@set mailHelpArch https://lists.@value{domain}/archive/html/@value{mailHelpName}/
-
-
-
-@c --- --- IRC;
-@set IRCchan @value{GNUid}
-@set IRCserver irc.freenode.net
-@set IRCurl irc://@value{IRCserver}/@value{IRCchan}
-
-@c --- --- FTP;
+@c --- Tarball
 @set tarball @value{tarName}-@value{version}.tar.gz
 @set tarSign @value{tarball}.sig
+@set tarballUrl @value{webUrl}@value{tarball}
+@set tarSignUrl @value{webUrl}@value{tarSign}
 
-@c --- --- --- GNU
-@set ftp https://ftp.@value{domain}/gnu/
-@set ftpMirror http://ftpmirror.@value{domain}/
-@set ftpOld http://download.@value{forge}.@value{domain}/releases/@value{GNUid}/
-@set ftpOldMirror http://download-mirror.@value{forge}.@value{domain}/releases/@value{GNUid}/
-@c --- --- --- non-GNU
-@c @set ftp http://download.@value{forge}.nongnu.org/releases/
-@c @set ftpMirror http://download-mirror.@value{forge}.nongnu.org/releases/
+@c --- Forum;
+@set forumUrl http://forum.princed.org/index.php
 
-@set ftpDir @value{ftp}@value{GNUid}/
-@set ftpMirrorDir @value{ftpMirror}@value{GNUid}/
-@set ftpTarball @value{ftpDir}@value{tarball}
-@set ftpTarSign @value{ftpDir}@value{tarSign}
-@set ftpMirrorTarball @value{ftpMirrorDir}@value{tarball}
-@set ftpMirrorTarSign @value{ftpMirrorDir}@value{tarSign}
+@c --- IRC;
+@set IRCurl irc://irc.freenode.net/mininim
 
-@c --- --- CVS;
-@set CVSsavannah https://@value{forge}.@value{domain}/cvs/?group=@value{GNUid}
-@set CVSserver cvs.@value{forge}.@value{domain}
-@set CVSdir /sources/@value{GNUid}
-@set CVSurl @value{CVSserver}:@value{CVSdir}
+@c --- GIT;
+@set GITweb https://github.com/oitofelix/mininim
+@set GITurl https://github.com/oitofelix/mininim.git
 
-@c --- --- GIT;
-@set GITsavannah https://@value{forge}.@value{domain}/git/?group=@value{GNUid}
-@set GITserver git://git.@value{forge}.@value{domain}
-@set GITdir @value{GNUid}.git
-@set GITurl @value{GITserver}/@value{GITdir}
+@c --- Issues;
+@set issuesUrl https://github.com/oitofelix/mininim/issues
 
-
-
-
-
 @c --- GPG;
 @set signer Bruno Félix Rezende Ribeiro
 @set keyID 0x28D618AF
 @set fingerprint 7CB1 208C 7336 56B7 5962  2500 27B9 C6FD 28D6 18AF
 
-
-
-
-
 @c --- Licenses;
-@set progLicenseURL https://www.gnu.org/licenses/gpl.html
-@set docLicenseURL https://www.gnu.org/licenses/fdl.html
+@set progLicenseURL http://www.gnu.org/licenses/gpl.html
+@set docLicenseURL http://www.gnu.org/licenses/fdl.html
 
-
-
-
-
 @c --- Financial;
+@set donationUrl http://oitofelix.github.io/funding.html
+@set donorsUrl http://oitofelix.github.io/funding.html#donors
+@set paypalAddr xilefotio@@gmail.com
 @set btcAddr 16atTwmYogSunTeaxEofjrBdLAdCn9EuCa
 
 @end ifclear

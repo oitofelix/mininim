@@ -39,17 +39,6 @@
 
 
 
-@c --- file: Copying notice;
-@c @ifset file
-@c @set FILE ANNOUNCEMENT
-@c @include copying.texi
-@c @insertcopying
-@c @end ifset
-
-
-
-
-
 @ifclear manual
 @centerchap @value{package} @value{version} (@value{date})
 @end ifclear
@@ -72,21 +61,13 @@
 @noindent
 Here are the compressed sources and a GPG detached signature:
 @example
-@value{ftpTarball}
-@value{ftpTarSign}
+@value{tarballUrl}
+@value{tarSignUrl}
 @end example
 
-@noindent
-Use a mirror for higher download bandwidth:
-@example
-@value{ftpMirrorTarball}
-@value{ftpMirrorTarSign}
-@end example
-
-Use a @file{.sig} file to verify that the corresponding file (without
-the @file{.sig} suffix) is intact.  First, be sure to download both
-the @file{.sig} file and the corresponding tarball.  Then, run a
-command like this:
+Use the @file{.sig} file to verify that the corresponding file (without
+the @file{.sig} suffix) is intact.  First, be sure to download both the
+@file{.sig} file and the corresponding tarball.  Then, run this command:
 
 @example
 gpg --verify @value{tarSign}
@@ -124,22 +105,25 @@ GNU Texinfo @value{texinfoVersion}
 
 @table @asis
 @item Homepage
-@value{webPage}
+@value{webUrl}
 @item Atom feed
-@value{atomFeed}
-@item Help and support mailing list
-@value{mailHelpAddr}
-@item Bug reporting mailing list
-@value{mailBugAddr}
+@value{atomUrl}
+@item Forum
+@value{forumUrl}
 @item IRC channel
 @value{IRCurl}
-@item Support Tracker
-@value{supportTrack}
-@item Bug Tracker
-@value{bugTrack}
-@item Development page
-@value{develPage}
+@item Bug reporting
+@value{issuesUrl}
+@item VCS
+@value{GITweb}
 @end table
+
+
+
+
+
+@heading Please, support MININIM development!
+@include donating.texi
 
 
 

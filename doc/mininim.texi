@@ -2062,10 +2062,9 @@ Print program name and version and exit
 
 In this chapter one can find information that are specific to the
 current release or subject to change between releases.  It presents the
-features this package acquired over time, problems that affect its
-overall usage and what possibly could happen to it by our wishes.  Last
-but not least, people whose contribution for this package are noteworthy
-are acknowledged.
+features this package acquired over time and what are our plans for it.
+Last but not least, people whose contribution for this package are
+noteworthy are acknowledged.
 
 @menu
 Present and Future:
@@ -2074,8 +2073,7 @@ Present and Future:
 * To do::         Features we want to see implemented someday;
 
 People:
-* Authors::  List of major contributors;
-* Thanks::   List of minor contributors;
+* Thanks::   List of contributors;
 * Donors::   People who supported the development by donations;
 @end menu
 
@@ -2105,15 +2103,6 @@ People:
 @node To do
 @section To do
 @include TODO.texi
-
-
-
-
-
-@c --- Authors;
-@node Authors
-@section Authors
-@include AUTHORS.texi
 
 
 

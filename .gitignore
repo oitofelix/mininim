@@ -112,6 +112,7 @@ gmon.out
 .dirstamp
 prince.gdb
 *.info
+/_site/
 
 # Local Variables:
 # mode: conf-space

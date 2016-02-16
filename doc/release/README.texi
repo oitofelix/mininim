@@ -150,18 +150,17 @@ the GNU operating system and the kernel Linux.
 * Description::    What this package is all about;
 * Distribution::   The user's right to modify and redistribute;
 * Getting a copy:: FTP server and VCS;
-* Contact::        Mailing list and IRC;
+* Contact::        Forum and IRC;
 * Bug reporting::  Support and bug trackers;
-* Contributing::   Several ways to help program's development;
-* Donating::       Supporting developer's work;
+* Contributing::   Several ways to help the program's development;
+* Donating::       Supporting the author's work;
 * Hacking::        Get started with the VCS checkout;
 @end menu
 
 For more information about this program you can visit its home page at
-@url{@value{webPage}}.  If you want to receive notifications about new
-releases of this program or important issues related to it, subscribe to
-its mailing list, as described in @ref{Contact}, or subscribe to the
-package atom feed @url{@value{atomFeed}}.
+@url{@value{webUrl}}.  If you want to receive notifications about new
+releases of this program subscribe to the author's atom feed at
+@url{@value{atomUrl}}.
 
 @end ifclear
 
@@ -214,29 +213,18 @@ License, but is more suitable for documentation.
 @metaSection Getting a copy
 
 One way to get a copy of this program is from someone else who has it.
-You need not ask for our permission to do so, or tell any one else;
-just copy it.  You may also receive this program when you buy a
-computer.  Computer manufacturers are free to distribute copies on the
-same terms that apply to everyone else.  These terms require them to
-give you the full sources, including whatever changes they may have
-made, and to permit you to redistribute the program received from them
-under the usual terms of the GNU General Public License.  In other
-words, the program must be free for you when you get it, not just free
-for the manufacturer.
+You need not ask for our permission to do so, or tell any one else; just
+copy it.  If you have access to the Internet, you can get the latest
+distribution version of this program at @url{@value{webUrl}}.
 
-If you have access to the Internet, you can get the latest
-distribution version of this program at @url{@value{ftpDir}}.  Please,
-use a mirror if possible; you will be automatically redirected to the
-nearest mirror at @url{@value{ftpMirrorDir}}.
-
-A VCS repository, where the development takes place, is also
-available.  It maintains the full history of modifications of every
-single source file.  You can checkout any given revision of any file
-or get a snapshot of the entire source tree in a particular desired
-state.  Special build tools, as described in @ref{Hacking}, are
-required to build from those checkouts, though.  Notably, to stay up
-to date with the latest developments in the source tree, you can
-anonymously checkout the repository with the following command:
+A VCS repository, where the development takes place, is also available.
+It maintains the full history of modifications for every single source
+file.  You can checkout any given revision of any file or get an
+snapshot of the entire source tree in a particular desired state.
+Special build tools, as described in @ref{Hacking}, are required to
+build from those checkouts.  To stay up to date with the latest
+developments in the source tree, you can anonymously checkout the
+repository with the following command:
 @example
 git clone @value{GITurl}
 @end example
@@ -257,25 +245,9 @@ git clone @value{GITurl}
 @noindent
 Here are the compressed sources and a GPG detached signature:
 @example
-@value{ftpTarball}
-@value{ftpTarSign}
+@value{tarballUrl}
+@value{tarSignUrl}
 @end example
-
-@noindent
-Use a mirror for higher download bandwidth:
-@example
-@value{ftpMirrorTarball}
-@value{ftpMirrorTarSign}
-@end example
-
-You can find that and earlier releases at a nearby
-@url{@value{ftpMirrorDir}, ftp@tie{}mirror}; or if automatic
-redirection does not work use the @url{@value{ftpDir},
-main@tie{}ftp@tie{}server}.
-
-The oldest releases are available from @url{@value{ftpOldMirror}, mirror
-download area} (alternatively @url{@value{ftpOld}, download area}).
-They are only of historical interest and are no longer supported.
 
 Use a @file{.sig} file to verify that the corresponding file (without
 the @file{.sig} suffix) is intact.  First, be sure to download both
@@ -310,7 +282,7 @@ It must print the following fingerprint:
 @end example
 
 Otherwise something is wrong!  In that case don't use the downloaded
-tarball and contact the developers as described in @ref{Contact}.
+tarball and contact the author as described in @ref{Contact}.
 
 A VCS repository, where the development takes place, is also
 available.  To stay up to date with the latest developments in the
@@ -328,20 +300,10 @@ git clone @value{GITurl}
 @c --- Contact
 @metaSection Contact
 
-You can get in touch with other users and the developers of this program
-by subscribing to its mailing list.  Anyone is welcome to join the list;
-to do so, visit @url{@value{mailHelpWeb}, MININIM help and support
-mailing list web interface}.  To post a message to all the list members,
-send email to @email{@value{mailHelpAddr}}.  To see the collection of
-prior postings to the list, visit @url{@value{mailHelpArch}, its
-archive}.  You can use this list for all discussion, including asking
-for help and bug reporting, although the preferred method for reporting
-bugs is sending a mail to @email{@value{mailBugAddr}}, the MININIM bug
-reporting mailing list.  See @ref{Bug reporting}.
-
-If you feel somewhat chatty, eager for a somewhat more instantaneous
-response from community, you can join us on our friendly IRC channel:
-@samp{@value{IRCurl}}.
+You can get in touch with other users of this program by posting to the
+forum at @url{@value{forumUrl}}.  You can contact the author at
+@url{@value{authorMail}}.  You may also join us on our friendly IRC
+channel at @url{@value{IRCurl}}.
 
 
 
@@ -350,18 +312,9 @@ response from community, you can join us on our friendly IRC channel:
 @c --- Bug reporting
 @metaSection Bug reporting
 
-If you came across some problem and need help you can contact the
-community as described in @ref{Contact}.  If you think you found a bug,
-but is not quite sure about it, you can ask for support sending a mail
-to @email{@value{mailHelpAddr}}.  We will revise your post, advise you
-and take the appropriate measures.  If you are confident you have found
-a bug, you can submit a bug report directly to
-@email{@value{mailBugAddr}}.  You can subscribe to this MININIM bug
-reporting mailing list at @url{@value{mailBugWeb}, its web interface}.
-To see the collection of prior reported bugs, visit
-@url{@value{mailBugArch}, its archive}.  Please, when reporting a bug
-include enough information for the maintainers to reproduce the problem.
-Generally speaking, that means:
+You can report bugs at @url{@value{issuesUrl}}.  Please, when reporting
+a bug include enough information for the author to reproduce the
+problem.  Generally speaking, that means:
 
 @itemize
 @item
@@ -394,36 +347,16 @@ can help in many ways:
 
 @itemize
 @item
-Donate to developers in order to support their work.  See
-@ref{Donating}.
+Donate to the author in order to support his work. @xref{Donating}.
 @item
-Write documentation.
-@item
-Help users in the mailing list and IRC channel.
+Help users in the forum and IRC channel.  @xref{Contact}.
 @item
 Find and report bugs.  @xref{Bug reporting}.
 @item
-Fix reported bugs.
-@item
-Implement new feature ideas.
-@item
-Write test cases.
-@item
-Check the documentation against the implementation.
+Suggest new features.
 @item
 Translate the program strings to other languages.
 @end itemize
-
-You can join the development team to contribute code and documentation
-at the @url{@value{develPage}, development page}.  Patches are most
-welcome, but contributed code should follow the @ref{,,, standards,
-GNU Coding Standards}.  If it doesn't, we'll need to find someone to
-fix the code before we can use it.  It is also necessary that the
-contributor be willing to assign their copyright to the FSF, since the
-developers plan to make it officially part of the GNU operating system
-and they want FSF to enforce the program's license.  To get started
-hacking see @inlinefmtifelse{html, @url{README.html#Hacking, how to
-hack}, @ref{Hacking}}.
 
 
 
@@ -431,38 +364,7 @@ hack}, @ref{Hacking}}.
 
 @c --- Donating;
 @metaSection Donating
-
-If you find this program useful, please @strong{send a donation} to
-its developers to support their work.  If you use this program at your
-workplace, please suggest that the company make a donation.  We
-appreciate contributions of any size -- donations enable us to spend
-more time working on this package, and help cover our infrastructure
-expenses.
-
-If you'd like to make a donation of any value, please send it to the
-following Bitcoin address:
-
-@example
-@value{btcAddr}
-@end example
-
-Since we aren't a tax-exempt organization, we can't offer you a tax
-deduction, but for all donations over 0.05@tie{}BTC, we'd be happy to
-recognize your contribution on the @url{DONORS.html, donors@tie{}page}
-and on @file{DONORS} file for the next release.
-
-We are also happy to consider making particular improvements or
-changes, or giving specific technical assistance, in return for a
-substantial donation over 0.5@tie{}BTC.  If you would like to discuss
-this possibility, write to me at @email{oitofelix@@gnu.org}.
-
-Another possibility is to pay a software maintenance fee.  Again,
-write to me about this at @email{oitofelix@@gnu.org} to discuss how
-much you want to pay and how much maintenance we can offer in return.
-
-@center @strong{Thanks for your support!}
-@sp 1
-
+@include donating.texi
 
 
 
@@ -474,13 +376,12 @@ much you want to pay and how much maintenance we can offer in return.
 The development sources are available through VCS:
 
 @display
-@value{GITsavannah}
+@value{GITweb}
 @end display
 
-If you are getting the sources from a VCS (or change
+If you are getting the sources from the VCS (or change
 @file{configure.ac}), you'll need to have Automake, Autoconf and Gettext
-installed to (re)build.  You'll also need help2man.  All of these
-programs are available from @url{@value{ftp}}.
+installed to (re)build.  You'll also need help2man.
 
 After getting the VCS sources, and installing the tools above, you can
 run @code{./bootstrap && ./configure && make} to do a fresh build.
