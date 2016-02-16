@@ -57,7 +57,7 @@ him to spend more time improving it, please
 50 US$ or 0.12 BTC your name will be acknowledged in the MININIM
 manual and in the donors page.  Thank you for your support.
 
-[PLEASE, SUPPORT MININIM DEVELOPMENT](/funding.html)
+[__PLEASE, SUPPORT MININIM DEVELOPMENT!__](/funding.html)
 
 ### Game play
 
