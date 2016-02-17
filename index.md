@@ -54,10 +54,11 @@ __MININIM__ development is voluntary.  If you like this game and want
 to thank the author for the work he has done so far, or want to enable
 him to spend more time improving it, please
 [make a donation!](/funding.html) For values equal or greater than 50
-US$ or 0.12 BTC your name will be acknowledged in the MININIM manual
-and in the [donors page](/funding.html#donors).  If you decide to make
-recurrent donations, the total amount of your donations will be
-updated every month for all records.  Thank you for your support.
+US$ or 0.12 BTC your name will be acknowledged in the section "Donors"
+of the manual and in the [donors page](/funding.html#donors).  If you
+decide to make recurrent donations, the total amount of your donations
+will be updated every month for all records.  Thank you for your
+support.
 
 [__PLEASE, SUPPORT MININIM DEVELOPMENT!__](/funding.html)
 
@@ -68,10 +69,12 @@ The image below links to a game play demonstration in the animated PNG
 image quality with sizes __much smaller__ than the common general
 video formats.  It may not work with all browsers.
 
+<div>
 <a href="{{ page.base_local }}{{ site.baseurl }}/game-play.png"
 alt="Game play" title="Click here to watch a game play (APNG format).">
 <img src="{{ page.base_local }}{{ site.baseurl }}/game-play-thumb.png">
 </a>
+</div>
 
 ### Download
 
@@ -85,20 +88,21 @@ usual incantation `./configure && make` is often enough.  The
 installation step (`make install`) is optional as MININIM is able to
 run directly from its source directory.
 
-- [0.9.1 release source code]({{ page.base_local }}{{ site.baseurl }}/mininim-0.9.1.tar.gz)
+- [0.9.2 release source code]({{ page.base_local }}{{ site.baseurl }}/mininim-0.9.2.tar.gz)
+- [0.9.2 release signature]({{ page.base_local }}{{ site.baseurl }}/mininim-0.9.2.tar.gz.sig)
 
 If you are under _Microsoft Windows_ a MinGW build is readily
 available.  No installation is required, just extract the zip archive
 and run `mininim.exe`.  The PDF build of the manual is bundled as
 well.
 
-- [0.9.1 MinGW build]({{ page.base_local }}{{ site.baseurl }}/mininim-0.9.1-win32.zip)
+- [0.9.2 MinGW build]({{ page.base_local }}{{ site.baseurl }}/mininim-0.9.2-win32.zip)
 
 
 If you just want to have a look in the latest release documentation,
 you can download the manual in PDF format separately.
 
-- [0.9.1 PDF manual]({{ page.base_local }}{{ site.baseurl }}/mininim-0.9.1.pdf)
+- [0.9.2 PDF manual]({{ page.base_local }}{{ site.baseurl }}/mininim-0.9.2.pdf)
 
 If you are interested in the latest features, not present yet in the
 latest release, you can build from the VCS repository.  Build
