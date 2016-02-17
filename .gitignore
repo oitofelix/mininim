@@ -16,6 +16,7 @@ README
 /doc/mininim.t2p/
 /doc/mininim.t2d/
 /mininim-*.tar.gz
+/mininim-*.tar.gz.sig
 /doc/man/mininim.1
 /doc/mininim-figures/*.eps
 /ANNOUNCEMENT
