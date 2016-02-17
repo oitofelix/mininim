@@ -88,28 +88,28 @@ usual incantation `./configure && make` is often enough.  The
 installation step (`make install`) is optional as MININIM is able to
 run directly from its source directory.
 
-- [0.9.2 release source code]({{ page.base_local }}{{ site.baseurl }}/mininim-0.9.2.tar.gz)
-- [0.9.2 release signature]({{ page.base_local }}{{ site.baseurl }}/mininim-0.9.2.tar.gz.sig)
+- [mininim-0.9.2.tar.gz]({{ page.base_local }}{{ site.baseurl }}/mininim-0.9.2.tar.gz)
+- [mininim-0.9.2.tar.gz.sig]({{ page.base_local }}{{ site.baseurl }}/mininim-0.9.2.tar.gz.sig)
 
 If you are under _Microsoft Windows_ a MinGW build is readily
 available.  No installation is required, just extract the zip archive
 and run `mininim.exe`.  The PDF build of the manual is bundled as
 well.
 
-- [0.9.2 MinGW build]({{ page.base_local }}{{ site.baseurl }}/mininim-0.9.2-win32.zip)
+- [mininim-0.9.2-win32.zip]({{ page.base_local }}{{ site.baseurl }}/mininim-0.9.2-win32.zip)
 
 
 If you just want to have a look in the latest release documentation,
 you can download the manual in PDF format separately.
 
-- [0.9.2 PDF manual]({{ page.base_local }}{{ site.baseurl }}/mininim-0.9.2.pdf)
+- [mininim-0.9.2.pdf]({{ page.base_local }}{{ site.baseurl }}/mininim-0.9.2.pdf)
 
 If you are interested in the latest features, not present yet in the
 latest release, you can build from the VCS repository.  Build
 instructions for both GNU/Linux and MinGW are available in the
 documentation.
 
-- [VCS repository](http://github.com/oitofelix/mininim/)
+- [mininim.git](http://github.com/oitofelix/mininim/)
 
 
 <hr>
