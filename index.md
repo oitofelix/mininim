@@ -54,7 +54,7 @@ __MININIM__ development is voluntary.  If you like this game and want
 to thank the author for the work he has done so far, or want to enable
 him to spend more time improving it, please
 [make a donation!](/funding.html) For values equal or greater than 50
-US$ or 0.12 BTC your name will be acknowledged in the section "Donors"
+US$ or 0.12 BTC your name will be acknowledged in the "Donors" section
 of the manual and in the [donors page](/funding.html#donors).  If you
 decide to make recurrent donations, the total amount of your donations
 will be updated every month for all records.  Thank you for your
