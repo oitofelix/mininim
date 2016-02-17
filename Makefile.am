@@ -132,7 +132,7 @@ LIBS = -lm ${ALLEGRO_LIBS} ${ALLEGRO_IMAGE_LIBS}										\
 LDADD = gnulib/libgnu.a
 
 gnulib/libgnu.a:
-	cd gnulib && $(MAKE) $(AM_MAKEFLAGS) all-recursive
+	cd gnulib && $(MAKE)
 
 if mingw_build
   LDADD += mininim.rc.$(OBJEXT)
