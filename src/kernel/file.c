@@ -67,3 +67,16 @@ xfopen_r (char *filename)
 {
   return al_fopen (filename, "rb");
 }
+
+int8_t *
+load_file (char *filename)
+{
+  ALLEGRO_FILE *f = xfopen_r (filename);
+  if (! f) return NULL;
+  int64_t s = al_fsize (f);
+  if (s == -1) return NULL;
+  int8_t *mf = xmalloc (s);
+  al_fread (f, mf, s);
+  al_fclose (f);
+  return mf;
+}

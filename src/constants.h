@@ -29,6 +29,9 @@
 #define EVENTS 256
 #define GUARDS 25
 
+#define LEVENTS 256
+#define LROOMS 24
+
 #define DISPLAY_WIDTH 640
 #define DISPLAY_HEIGHT 400
 #define ORIGINAL_WIDTH 320

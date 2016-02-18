@@ -96,10 +96,10 @@ doc/Doxyfile
 doc/release/release.texi
 
 # Ignore GTAGS files
-/GPATH
-/GRTAGS
-/GSYMS
-/GTAGS
+GPATH
+GRTAGS
+GSYMS
+GTAGS
 
 # Ignore coverage and profiling files
 *.gcda

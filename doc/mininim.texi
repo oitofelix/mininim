@@ -1814,11 +1814,13 @@ binding.
 @item --level-module=LEVEL-MODULE
 Select level module.  A level module determines a way to generate
 consecutive levels for use by the engine.  Valid values for
-@var{level-module} are: @samp{LEGACY} and @samp{CONSISTENCY}.
-@samp{LEGACY} is the module designed to read the original unarchived
-@acronym{PoP, Prince of Persia} 1 DOS level files.  @samp{CONSISTENCY}
-is the module designed to generate random-corrected levels for accessing
-the engine robustness.  The default is @samp{LEGACY}.
+@var{level-module} are: @samp{LEGACY}, @samp{DAT} and
+@samp{CONSISTENCY}.  @samp{LEGACY} is the module designed to read the
+original @acronym{PoP, Prince of Persia} 1 @code{PLV} files.  @samp{DAT}
+is the module designed to read the original PoP 1 @file{LEVELS.DAT}
+file.  @samp{CONSISTENCY} is the module designed to generate
+random-corrected levels for accessing the engine robustness.  The
+default is @samp{LEGACY}.
 
 @optindex --start-level
 @cindex @kbd{SHIFT+L}, related option

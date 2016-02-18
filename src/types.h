@@ -177,6 +177,27 @@ struct level {
   } guard[GUARDS];
 };
 
+struct legacy_level {
+  uint8_t foretable[LROOMS][FLOORS][PLACES];
+  uint8_t backtable[LROOMS][FLOORS][PLACES];
+  uint8_t door_1[LEVENTS];
+  uint8_t door_2[LEVENTS];
+  uint8_t link[LROOMS][4];
+  uint8_t unknown_1[64];
+  uint8_t start_position[3];
+  uint8_t unknown_2[3];
+  uint8_t unknown_3;
+  uint8_t guard_location[LROOMS];
+  uint8_t guard_direction[LROOMS];
+  uint8_t unknown_4a[LROOMS];
+  uint8_t unknown_4b[LROOMS];
+  uint8_t guard_skill[LROOMS];
+  uint8_t unknown_4c[LROOMS];
+  uint8_t guard_color[LROOMS];
+  uint8_t unknown_4d[16];
+  uint8_t signature[2];
+} __attribute__((packed));
+
 /* avoid "'struct' declared inside parameter list" error for the
    ACTION definition */
 struct anim *_action;

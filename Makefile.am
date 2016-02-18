@@ -47,7 +47,7 @@ mininim_SOURCES = src/mininim.c src/mininim.h src/constants.h					\
 		src/sword.h src/clock.c src/clock.h src/princess.c src/princess.h	\
 		src/jaffar.c src/jaffar.h src/mouse.c src/mouse.h src/samples.c		\
 		src/samples.h src/cutscenes.c src/cutscenes.h src/fight.c					\
-		src/fight.h src/wall/wall.c src/wall/wall.h												\
+		src/fight.h src/dat.c src/dat.h src/wall/wall.c src/wall/wall.h		\
 		src/wall/wall-depedv.c src/wall/wall-depedv.h src/wall/wall-pv.c	\
 		src/wall/wall-pv.h src/wall/wall-dcpc.c src/wall/wall-dcpc.h			\
 		src/kid/kid.c src/kid/kid.h src/kid/kid-normal.c									\
@@ -87,15 +87,16 @@ mininim_SOURCES = src/mininim.c src/mininim.h src/constants.h					\
 		src/levels/level-1.c src/levels/level-1.h													\
 		src/levels/consistency-level.c src/levels/consistency-level.h			\
 		src/levels/legacy-level.c src/levels/legacy-level.h								\
-		src/kernel/timer.c src/kernel/timer.h src/kernel/event.c					\
-		src/kernel/event.h src/kernel/video.c src/kernel/video.h					\
-		src/kernel/audio.c src/kernel/audio.h src/kernel/memory.c					\
-		src/kernel/memory.h src/kernel/keyboard.c src/kernel/keyboard.h		\
-		src/kernel/random.c src/kernel/random.h src/kernel/array.c				\
-		src/kernel/array.h src/kernel/xstdio.c src/kernel/xstdio.h				\
-		src/kernel/file.c src/kernel/file.h src/kernel/dialog.c						\
-		src/kernel/dialog.h src/kernel/threads.c src/kernel/threads.h			\
-		src/kernel/xconfig.c src/kernel/xconfig.h
+		src/levels/dat-level.c src/levels/dat-level.h src/kernel/timer.c	\
+		src/kernel/timer.h src/kernel/event.c src/kernel/event.h					\
+		src/kernel/video.c src/kernel/video.h src/kernel/audio.c					\
+		src/kernel/audio.h src/kernel/memory.c src/kernel/memory.h				\
+		src/kernel/keyboard.c src/kernel/keyboard.h src/kernel/random.c		\
+		src/kernel/random.h src/kernel/array.c src/kernel/array.h					\
+		src/kernel/xstdio.c src/kernel/xstdio.h src/kernel/file.c					\
+		src/kernel/file.h src/kernel/dialog.c src/kernel/dialog.h					\
+		src/kernel/threads.c src/kernel/threads.h src/kernel/xconfig.c		\
+		src/kernel/xconfig.h
 
 ${mininim_OBJECTS}: ${top_builddir}/src/mininim.h.gch
 

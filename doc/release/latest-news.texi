@@ -20,5 +20,6 @@
 @c be built from scratch here.
 
 @itemize
-@item First release
+@item Add support for reading legacy PoP 1 @file{LEVELS.DAT} file using
+the option @option{--legacy-level=dat}.
 @end itemize

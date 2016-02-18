@@ -105,17 +105,17 @@ GNU Texinfo @value{texinfoVersion}
 
 @table @asis
 @item Homepage
-@value{webUrl}
+@url{@value{webUrl}}
 @item Atom feed
-@value{atomUrl}
+@url{@value{atomUrl}}
 @item Forum
-@value{forumUrl}
+@url{@value{forumUrl}}
 @item IRC channel
-@value{IRCurl}
+@url{@value{IRCurl}}
 @item Bug reporting
-@value{issuesUrl}
+@url{@value{issuesUrl}}
 @item VCS
-@value{GITweb}
+@url{@value{GITweb}}
 @end table
 
 

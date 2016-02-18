@@ -97,6 +97,7 @@
 #include "sword.h"
 #include "torch.h"
 #include "window.h"
+#include "dat.h"
 
 #include "guard.h"
 #include "guard-attack.h"
@@ -144,6 +145,7 @@
 
 #include "consistency-level.h"
 #include "legacy-level.h"
+#include "dat-level.h"
 #include "level-1.h"
 
 #include "wall.h"

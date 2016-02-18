@@ -19,7 +19,7 @@
 
 #include "mininim.h"
 
-static struct level legacy_level;
+struct level legacy_level;
 static int level_3_checkpoint;
 static int shadow_id;
 static int skeleton_id;
@@ -42,26 +42,7 @@ static struct con room_0[FLOORS][PLACES] =
    {{WALL}, {WALL}, {WALL}, {WALL}, {WALL},
     {WALL}, {WALL}, {WALL}, {WALL}, {WALL}}};
 
-static struct {
-  uint8_t foretable[LROOMS][FLOORS][PLACES];
-  uint8_t backtable[LROOMS][FLOORS][PLACES];
-  uint8_t door_1[LEVENTS];
-  uint8_t door_2[LEVENTS];
-  uint8_t link[LROOMS][4];
-  uint8_t unknown_1[64];
-  uint8_t start_position[3];
-  uint8_t unknown_2[3];
-  uint8_t unknown_3;
-  uint8_t guard_location[LROOMS];
-  uint8_t guard_direction[LROOMS];
-  uint8_t unknown_4a[LROOMS];
-  uint8_t unknown_4b[LROOMS];
-  uint8_t guard_skill[LROOMS];
-  uint8_t unknown_4c[LROOMS];
-  uint8_t guard_color[LROOMS];
-  uint8_t unknown_4d[16];
-  uint8_t signature[2];
-} __attribute__((packed)) lv;
+struct legacy_level lv;
 
 static enum ltile get_tile (struct pos *p);
 static enum lgroup get_group (enum ltile t);
@@ -773,6 +754,12 @@ load_legacy_level (int number)
   al_fclose (lvf);
   al_free (filename);
 
+  interpret_legacy_level (number);
+}
+
+void
+interpret_legacy_level (int number)
+{
   struct pos p;
 
   memset (&legacy_level, 0, sizeof (legacy_level));

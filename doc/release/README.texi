@@ -408,7 +408,7 @@ news for the @file{NEWS.texi} and @file{ANNOUNCEMENT.texi} files to
 avoid duplication of information and syncing work.  After a release is
 made the news items should be moved to the @file{NEWS.texi} file and
 another news list should be built from scratch in the
-@file{ANNOUNCEMENT.texi} file.
+@file{latest-news.texi} file.
 
 @section MinGW
 

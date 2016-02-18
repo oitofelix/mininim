@@ -20,9 +20,6 @@
 #ifndef MININIM_LEGACY_LEVEL_H
 #define MININIM_LEGACY_LEVEL_H
 
-#define LEVENTS 256
-#define LROOMS 24
-
 enum ltile {
   LT_EMPTY, LT_FLOOR, LT_SPIKES, LT_PILLAR, LT_GATE, LT_STUCK_BUTTON,
   LT_DROP_BUTTON, LT_TAPESTRY, LT_BOTTOM_BIG_PILLAR, LT_TOP_BIG_PILLAR,
@@ -119,5 +116,8 @@ enum lm_exit {
 };
 
 void play_legacy_level (int number);
+void interpret_legacy_level (int number);
+extern struct legacy_level lv;
+extern struct level legacy_level;
 
 #endif	/* MININIM_LEGACY_LEVEL_H */

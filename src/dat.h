@@ -1,5 +1,5 @@
 /*
-  file.h -- file module;
+  dat.h -- dat module;
 
   Copyright (C) 2015, 2016 Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
 
@@ -17,11 +17,9 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MININIM_FILE_H
-#define MININIM_FILE_H
+#ifndef MININIM_DAT_H
+#define MININIM_DAT_H
 
-void *load_resource (char *filename, load_resource_f lrf);
-ALLEGRO_FILE *xfopen_r (char *filename);
-int8_t *load_file (char *filename);
+void dat_getres (int8_t *dat, uint16_t id, int8_t **offset, int16_t *size);
 
-#endif	/* MININIM_FILE_H */
+#endif	/* MININIM_DAT_H */
