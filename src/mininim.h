@@ -184,7 +184,8 @@ extern char *resources_dir,
   *system_data_dir,
   *data_dir,
   *exe_filename,
-  *config_filename;
+  *config_filename,
+  *levels_dat_filename;
 
 extern ALLEGRO_THREAD *load_config_dialog_thread,
   *save_game_dialog_thread;

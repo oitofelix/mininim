@@ -46,7 +46,10 @@ char *resources_dir,
   *system_data_dir = PKGDATADIR,
   *data_dir,
   *exe_filename,
-  *config_filename;
+  *config_filename,
+  *levels_dat_filename = "data/dat-levels/LEVELS.DAT";
+
+char *levels_dat_compat_filename;
 
 ALLEGRO_THREAD *load_config_dialog_thread, *save_game_dialog_thread;
 
@@ -66,6 +69,7 @@ struct skill skill = {.counter_attack_prob = INITIAL_KCA,
                       .counter_defense_prob = INITIAL_KCD};
 static bool sound_disabled_cmd;
 static bool skip_title;
+static bool level_module_given;
 
 static error_t parser (int key, char *arg, struct argp_state *state);
 static void draw_loading_screen (void);
@@ -113,6 +117,8 @@ static struct argp_option options[] = {
   {NULL, 0, NULL, 0, "Level:", 0},
   {"level-module", LEVEL_MODULE_OPTION, "LEVEL-MODULE", 0, "Select level module.  A level module determines a way to generate consecutive levels for use by the engine.  Valid values for LEVEL-MODULE are: LEGACY, PLV, DAT and CONSISTENCY.  LEGACY is the module designed to read the original PoP 1 raw level files.  PLV is the module designed to read the original PoP 1 PLV extended level files.  DAT is the module designed to read the original PoP 1 LEVELS.DAT file.  CONSISTENCY is the module designed to generate random-corrected levels for accessing the engine robustness.  The default is LEGACY.", 0},
   {"start-level", START_LEVEL_OPTION, "N", 0, "Make the kid start at level N.  The default is 1.  Valid integers range from 1 to INT_MAX.  This can be changed in-game by the SHIFT+L key binding.", 0},
+
+  {NULL, 0, NULL, OPTION_DOC, "If the option '--level-module' is not given and there is a LEVELS.DAT file in the resources directory, the DAT level module is automatically used to load that file.  This is a compatibility measure for applications which depend upon this legacy behavior.", 0},
 
   /* Time */
   {NULL, 0, NULL, 0, "Time:", 0},
@@ -440,6 +446,7 @@ parser (int key, char *arg, struct argp_state *state)
   case LEVEL_MODULE_OPTION:
     e = optval_to_enum (&i, key, arg, state, level_module_enum);
     if (e) return e;
+    level_module_given = true;
     switch (i) {
     case 0: level_module = LEGACY_LEVEL_MODULE; break;
     case 1: level_module = PLV_LEVEL_MODULE; break;
@@ -855,6 +862,13 @@ main (int _argc, char **_argv)
   al_start_timer (play_time);
 
   /* play_level_1 (); */
+
+  if (al_filename_exists (levels_dat_compat_filename)
+      && ! level_module_given) {
+    level_module = DAT_LEVEL_MODULE;
+    levels_dat_filename = levels_dat_compat_filename;
+  }
+
   switch (level_module) {
   case LEGACY_LEVEL_MODULE: default:
     play_legacy_level (start_level);
@@ -948,6 +962,9 @@ get_paths (void)
 
   /* get config file name */
   xasprintf (&config_filename, "%smininim.ini", user_settings_dir);
+
+  /* get legacy LEVELS.DAT compatibility path */
+  xasprintf (&levels_dat_compat_filename, "%sLEVELS.DAT", resources_dir);
 }
 
 static void

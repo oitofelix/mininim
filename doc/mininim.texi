@@ -1896,6 +1896,12 @@ integers range from @samp{1} to @code{INT_MAX}.  This can be changed
 in-game by the @kbd{SHIFT+L} key binding.
 @end table
 
+@cindex @file{LEVELS.DAT}
+If the option @option{--level-module} is not given and there is a
+@file{LEVELS.DAT} file in the resources directory, the DAT level module
+is automatically used to load that file.  This is a compatibility
+measure for applications which depend upon this legacy behavior.
+
 
 @section Time options
 @cindex time options

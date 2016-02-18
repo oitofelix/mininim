@@ -39,7 +39,7 @@ void
 load_dat_level (int number)
 {
   char *filename;
-  xasprintf (&filename, "data/dat-levels/LEVELS.DAT", number);
+  xasprintf (&filename, levels_dat_filename);
 
   int8_t *dat =
     load_resource (filename, (load_resource_f) load_file);

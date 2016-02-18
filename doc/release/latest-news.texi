@@ -24,4 +24,7 @@
 the option @option{--legacy-level=DAT}.
 @item Add support for reading legacy PoP 1 PLV extended level files using
 the option @option{--legacy-level=PLV}.
+@item Implement command line compatibility for the sake of applications
+(like level editors) which use it.
+@item Implement @file{LEVELS.DAT} legacy loading behavior.
 @end itemize
