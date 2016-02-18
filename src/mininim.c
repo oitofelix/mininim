@@ -159,7 +159,8 @@ static struct argp_option options[] = {
 };
 
 static const char *doc = "MININIM: The Advanced Prince of Persia Engine\n(a childhood dream)\v\
-Long option names are case sensitive.  Option values are case insensitive.   Both can be partially specified as long as they are kept unambiguous.  BOOLEAN is an integer equating to 0, or any sub-string (including the null string) of 'FALSE', 'OFF' or 'NO' to disable the respective feature, and any other value (even no string at all) to enable it.  For any non-specified option the documented default applies.  Integers can be specified in any of the formats defined by the C language.  Key bindings references are based on the default mapping.";
+Long option names are case sensitive.  Option values are case insensitive.   Both can be partially specified as long as they are kept unambiguous.  BOOLEAN is an integer equating to 0, or any sub-string (including the null string) of 'FALSE', 'OFF' or 'NO' to disable the respective feature, and any other value (even no string at all) to enable it.  For any non-specified option the documented default applies.  Integers can be specified in any of the formats defined by the C language.  Key bindings references are based on the default mapping.\n\n\
+The legacy command line interface present in versions 1.0, 1.3 and 1.4 of the original game is supported for the sake of compatibility with software that use it.  Legacy level and video non-option arguments are honored, while all others are currently ignored silently.  The legacy arguments can't be used by other configuration method besides the command line.";
 
 struct argp_child argp_child = { NULL };
 
@@ -588,6 +589,48 @@ parser (int key, char *arg, struct argp_state *state)
     exit (0);
   case SKIP_TITLE_OPTION:
     skip_title = optval_to_bool (arg);
+    break;
+  case ARGP_KEY_ARG:
+    /* cheat */
+    if (! strcasecmp ("MEGAHIT", arg)) break;
+    else if (! strcasecmp ("IMPROVED", arg)) break;
+    else if (sscanf (arg, "%i", &i) == 1
+             && i >= 1 && i <= INT_MAX) start_level = i;
+
+    /* audio */
+    else if (! strcasecmp ("ADLIB", arg)) break;
+    else if (! strcasecmp ("COMPUADD", arg)) break;
+    else if (! strcasecmp ("COVOX", arg)) break;
+    else if (! strcasecmp ("DIGI", arg)) break;
+    else if (! strcasecmp ("DISNEY", arg)) break;
+    else if (! strcasecmp ("GBLAST", arg)) break;
+    else if (! strcasecmp ("IBMG", arg)) break;
+    else if (! strcasecmp ("MIDI", arg)) break;
+    else if (! strcasecmp ("MVPAS", arg)) break;
+    else if (! strcasecmp ("SBLAST", arg)) break;
+    else if (! strcasecmp ("STDSND", arg)) break;
+    else if (! strcasecmp ("TANDY", arg)) break;
+
+    /* video */
+    else if (! strcasecmp ("CGA", arg)) vm = CGA;
+    else if (! strcasecmp ("DRAW", arg)) break;
+    else if (! strcasecmp ("EGA", arg)) vm = EGA;
+    else if (! strcasecmp ("HERC", arg)) vm = CGA, hgc = true;
+    else if (! strcasecmp ("HGA", arg)) vm = CGA, hgc = true;
+    else if (! strcasecmp ("MCGA", arg)) vm = VGA;
+    else if (! strcasecmp ("TGA", arg)) vm = EGA;
+    else if (! strcasecmp ("VGA", arg)) vm = VGA;
+
+    /* memory */
+    else if (! strcasecmp ("BYPASS", arg)) break;
+    else if (! strcasecmp ("PACK", arg)) break;
+    else if (! strcasecmp ("UNPACK", arg)) break;
+
+    /* miscellaneous */
+    else if (! strcasecmp ("DEMO", arg)) break;
+    else if (! strcasecmp ("J", arg)) break;
+
+    else return ARGP_ERR_UNKNOWN;
     break;
   default:
     return ARGP_ERR_UNKNOWN;

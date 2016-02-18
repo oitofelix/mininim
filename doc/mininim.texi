@@ -1779,6 +1779,63 @@ C language.
 @item Key bindings references are based on the default mapping.
 @end itemize
 
+@cindex legacy command line arguments
+@cindex arguments, legacy command line
+@cindex command line arguments, legacy
+@cindex legacy options
+@cindex options, legacy
+The legacy command line interface present in versions 1.0, 1.3 and 1.4
+of the original game is supported for the sake of compatibility with
+software that use it.  Legacy level and video non-option arguments are
+honored, while all others are currently ignored silently.  The legacy
+arguments can't be used by other configuration method besides the
+command line.  The legacy command line arguments are:
+
+@itemize
+@optindex megahit
+@optindex improved
+@item @strong{Cheat:} @option{megahit}, @option{improved};
+@optindex adlib
+@optindex compuadd
+@optindex covox
+@optindex digi
+@optindex disney
+@optindex gblast
+@optindex ibmg
+@optindex midi
+@optindex mvpas
+@optindex sblast
+@optindex stdsnd
+@optindex tandy
+@item @strong{Audio:} @option{adlib}, @option{compuadd}, @option{covox},
+@option{digi}, @option{disney}, @option{gblast}, @option{ibmg},
+@option{midi}, @option{mvpas}, @option{sblast}, @option{stdsnd},
+@option{tandy};
+@optindex cga
+@optindex draw
+@optindex ega
+@optindex herc
+@optindex hga
+@optindex mcga
+@optindex tga
+@optindex vga
+@item @strong{Video:} @option{cga}, @option{draw}, @option{ega},
+@option{herc}, @option{hga}, @option{mcga}, @option{tga}, @option{vga};
+@optindex bypass
+@optindex pack
+@optindex unpack
+@optindex demo
+@optindex j
+@item @strong{Memory:} @option{bypass}, @option{pack}, @option{unpack},
+@option{demo}, @option{j};
+@end itemize
+
+These are case insensitive.  Additionally specifying a standalone
+integer @var{i} is equivalent to passing the option
+@option{--start-level=i}.  Unlike the original game, there is no
+dependence between any two arguments (like start level and cheat
+arguments).
+
 
 @section Configuration options
 @cindex configuration options
@@ -1811,6 +1868,14 @@ binding.
 
 @table @option
 @optindex --level-module
+@cindex @samp{LEGACY} level module
+@cindex level module, @samp{LEGACY}
+@cindex @samp{PLV} level module
+@cindex level module, @samp{PLV}
+@cindex @samp{DAT} level module
+@cindex level module, @samp{DAT}
+@cindex @samp{CONSISTENCY} level module
+@cindex level module, @samp{CONSISTENCY}
 @item --level-module=LEVEL-MODULE
 Select level module.  A level module determines a way to generate
 consecutive levels for use by the engine.  Valid values for
