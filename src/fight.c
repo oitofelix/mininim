@@ -218,12 +218,13 @@ fight_ai (struct anim *k)
 
   /* in attack range, if being attacked, defend yourself (with
      probability) and counter attack (with probability handled
-     elsewhere)*/
+     elsewhere) */
   if (is_in_range (k, ke, ATTACK_RANGE)
       && (is_attacking (ke)
           && (k->type != KID || ke->i == 0)
           && (k->type == KID || ke->i == 1))
-      && prandom (99) <= k->skill.defense_prob) {
+      && (prandom (99) <= k->skill.defense_prob
+          || k->refraction > 0)) {
     fight_defense (k);
     if (is_safe_to_attack (k)) fight_attack (k);
     else if (is_safe_to_walkb (k)) fight_walkb (k);
