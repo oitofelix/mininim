@@ -87,7 +87,8 @@ mininim_SOURCES = src/mininim.c src/mininim.h src/constants.h					\
 		src/levels/level-1.c src/levels/level-1.h													\
 		src/levels/consistency-level.c src/levels/consistency-level.h			\
 		src/levels/legacy-level.c src/levels/legacy-level.h								\
-		src/levels/dat-level.c src/levels/dat-level.h src/kernel/timer.c	\
+		src/levels/dat-level.c src/levels/dat-level.h											\
+		src/levels/plv-level.c src/levels/plv-level.h src/kernel/timer.c	\
 		src/kernel/timer.h src/kernel/event.c src/kernel/event.h					\
 		src/kernel/video.c src/kernel/video.h src/kernel/audio.c					\
 		src/kernel/audio.h src/kernel/memory.c src/kernel/memory.h				\

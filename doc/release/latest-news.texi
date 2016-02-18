@@ -21,5 +21,7 @@
 
 @itemize
 @item Add support for reading legacy PoP 1 @file{LEVELS.DAT} file using
-the option @option{--legacy-level=dat}.
+the option @option{--legacy-level=DAT}.
+@item Add support for reading legacy PoP 1 PLV extended level files using
+the option @option{--legacy-level=PLV}.
 @end itemize

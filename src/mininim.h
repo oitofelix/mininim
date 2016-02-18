@@ -146,6 +146,7 @@
 #include "consistency-level.h"
 #include "legacy-level.h"
 #include "dat-level.h"
+#include "plv-level.h"
 #include "level-1.h"
 
 #include "wall.h"
