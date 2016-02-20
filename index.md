@@ -31,10 +31,10 @@ now that he's still a _mininim_ deep in his heart.<sup>2</sup>
 </blockquote>
 
 __MININIM__ is the _Advanced Prince of Persia Engine_ --- a childhood
-dream, the free software engine for _Jordan Mechner_'s masterpiece,
-developed from scratch by _Bruno Félix Rezende Ribeiro_ (`oitofelix`).
-_MININIM is free software_; you can redistribute it and/or modify it
-under the terms of the
+dream, the free software implementation of _Jordan Mechner_'s
+masterpiece game, developed from scratch by _Bruno Félix Rezende
+Ribeiro_ (`oitofelix`).  _MININIM is free software_; you can
+redistribute it and/or modify it under the terms of the
 [GNU General Public License](https://www.gnu.org/licenses/gpl.html) as
 published by the Free Software Foundation; either version 3, or (at
 your option) any later version.
