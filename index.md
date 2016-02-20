@@ -83,10 +83,15 @@ operating systems.
 
 If you use _GNU/Linux_, you have to build from source.  This should be
 quite straightforward, provided you install the _Allegro 5_
-development libraries using your distribution's package manager.  The
-usual incantation `./configure && make` is often enough.  The
-installation step (`make install`) is optional as MININIM is able to
-run directly from its source directory.
+development libraries using your distribution's package manager.  If
+you use an apt based distribution (Debian, Ubuntu, ...) you can do
+this by invoking the command `sudo apt-get install
+'^liballegro.*5-dev$'`.  When building the sources, the usual
+incantation `./configure && make` is often enough.  The installation
+step (`make install`) is optional as MININIM is able to run directly
+from its source directory (provided you didn't make a VPATH build, in
+which case you need to specify the data path.  See the `--data-path`
+option).
 
 - [mininim-0.9.2.tar.gz]({{ page.base_local }}{{ site.baseurl }}/mininim-0.9.2.tar.gz)
 - [mininim-0.9.2.tar.gz.sig]({{ page.base_local }}{{ site.baseurl }}/mininim-0.9.2.tar.gz.sig)
