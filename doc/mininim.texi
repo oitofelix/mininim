@@ -842,6 +842,25 @@ original game, in which the kid delays one cycle to respond.}
 @kbd{RIGHT} conditionally subject to kid's facing direction.  The
 @kbd{UP} and @kbd{DOWN} directional keys are simply referred as such.
 
+The classic numeric keypad controls can be used.  The equivalence
+between this and the common arrows method is given by the following
+table.  Additionally, the numeric keypad @kbd{ENTER} key corresponds to
+the main @kbd{ENTER} key.
+
+@multitable @columnfractions .50 .50
+@headitem Numeric keypad @tab Arrows
+@item @kbd{4} @tab @kbd{LEFT}
+@item @kbd{8} @tab @kbd{UP}
+@item @kbd{6} @tab @kbd{RIGHT}
+@item @kbd{5}, @kbd{2} @tab @kbd{DOWN}
+@item @kbd{7} @tab @kbd{LEFT} and @kbd{UP}
+@item @kbd{9} @tab @kbd{RIGHT} and @kbd{UP}
+@item @kbd{1} @tab @kbd{LEFT} and @kbd{DOWN}
+@item @kbd{3} @tab @kbd{RIGHT} and @kbd{DOWN}
+@end multitable
+
+
+
 @iftex
 @page
 @end iftex

@@ -153,21 +153,34 @@ get_gamepad_state (struct gamepad_state *k)
   bool up, down, left, right;
 
   up = al_key_down (&keyboard_state, ALLEGRO_KEY_UP)
+    || al_key_down (&keyboard_state, ALLEGRO_KEY_PAD_7)
+    || al_key_down (&keyboard_state, ALLEGRO_KEY_PAD_8)
+    || al_key_down (&keyboard_state, ALLEGRO_KEY_PAD_9)
     || (get_joystick_v_axis () <
         joystick_v_center - joystick_v_threshold)
     || (get_joystick_button (joystick_up_button) >
         joystick_up_released + joystick_up_threshold);
   down = al_key_down (&keyboard_state, ALLEGRO_KEY_DOWN)
+    || al_key_down (&keyboard_state, ALLEGRO_KEY_PAD_5)
+    || al_key_down (&keyboard_state, ALLEGRO_KEY_PAD_1)
+    || al_key_down (&keyboard_state, ALLEGRO_KEY_PAD_2)
+    || al_key_down (&keyboard_state, ALLEGRO_KEY_PAD_3)
     || (get_joystick_v_axis () >
         joystick_v_center + joystick_v_threshold)
     || (get_joystick_button (joystick_down_button) >
         joystick_down_released + joystick_down_threshold);
   left = al_key_down (&keyboard_state, ALLEGRO_KEY_LEFT)
+    || al_key_down (&keyboard_state, ALLEGRO_KEY_PAD_1)
+    || al_key_down (&keyboard_state, ALLEGRO_KEY_PAD_7)
+    || al_key_down (&keyboard_state, ALLEGRO_KEY_PAD_4)
     || (get_joystick_h_axis () <
         joystick_h_center - joystick_h_threshold)
     || (get_joystick_button (joystick_left_button) >
         joystick_left_released + joystick_left_threshold);
   right = al_key_down (&keyboard_state, ALLEGRO_KEY_RIGHT)
+    || al_key_down (&keyboard_state, ALLEGRO_KEY_PAD_3)
+    || al_key_down (&keyboard_state, ALLEGRO_KEY_PAD_6)
+    || al_key_down (&keyboard_state, ALLEGRO_KEY_PAD_9)
     || (get_joystick_h_axis () >
         joystick_h_center + joystick_h_threshold)
     || (get_joystick_button (joystick_right_button) >
@@ -189,6 +202,7 @@ get_gamepad_state (struct gamepad_state *k)
     || (get_joystick_button (joystick_shift_button) >
         joystick_shift_released + joystick_shift_threshold);
   k->enter = al_key_down (&keyboard_state, ALLEGRO_KEY_ENTER)
+    || al_key_down (&keyboard_state, ALLEGRO_KEY_PAD_ENTER)
     || (get_joystick_button (joystick_enter_button) >
         joystick_enter_released + joystick_enter_threshold);
 
