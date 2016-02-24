@@ -2160,7 +2160,7 @@ Print paths and exit.
 @optindex --inhibit-screensaver
 @item --inhibit-screensaver[=BOOLEAN]
 Prevent the system screensaver from starting up.  The default is
-@samp{FALSE}.
+@samp{TRUE}.
 
 @optindex --skip-title
 @item --skip-title[=BOOLEAN]

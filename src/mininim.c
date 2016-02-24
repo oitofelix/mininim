@@ -70,6 +70,7 @@ struct skill skill = {.counter_attack_prob = INITIAL_KCA,
 static bool sound_disabled_cmd;
 static bool skip_title;
 static bool level_module_given;
+static bool inhibit_screensaver = true;
 
 static error_t parser (int key, char *arg, struct argp_state *state);
 static void draw_loading_screen (void);
@@ -169,7 +170,7 @@ static struct argp_option options[] = {
   {NULL, 0, NULL, 0, "Others", 0},
   {"sound", SOUND_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable sound.  The default is TRUE.  This can be changed in-game by the CTRL+S key binding.", 0},
   {"skip-title", SKIP_TITLE_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Skip title screen.  The default is FALSE.", 0},
-  {"inhibit-screensaver", INHIBIT_SCREENSAVER_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Prevent the system screensaver from starting up.  The default is FALSE.", 0},
+  {"inhibit-screensaver", INHIBIT_SCREENSAVER_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Prevent the system screensaver from starting up.  The default is TRUE.", 0},
 
   /* Help */
   {NULL, 0, NULL, 0, "Help:", -1},
@@ -743,7 +744,7 @@ parser (int key, char *arg, struct argp_state *state)
     if (e) return e;
     break;
   case INHIBIT_SCREENSAVER_OPTION:
-    al_inhibit_screensaver (optval_to_bool (arg));
+    inhibit_screensaver = optval_to_bool (arg);
     break;
   case PRINT_PATHS_OPTION:
     print_paths ();
@@ -1044,6 +1045,8 @@ main (int _argc, char **_argv)
   if (sound_disabled_cmd) enable_audio (false);
   init_gamepad ();
   init_dialog ();
+
+  al_inhibit_screensaver (inhibit_screensaver);
 
   draw_loading_screen ();
 
