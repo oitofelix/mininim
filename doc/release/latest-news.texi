@@ -20,6 +20,7 @@
 @c be built from scratch here.
 
 @itemize
+@item Apoplexy level editor integration.
 @item Add support for reading legacy PoP 1 @file{LEVELS.DAT} file using
 the option @option{--legacy-level=DAT}.
 @item Add support for reading legacy PoP 1 PLV extended level files using
@@ -27,4 +28,6 @@ the option @option{--legacy-level=PLV}.
 @item Implement command line compatibility for the sake of applications
 (like level editors) which use it.
 @item Implement @file{LEVELS.DAT} legacy loading behavior.
+@item Guards now have infallible defense in refraction period.
+@item Fix spurious wall collision occurring in kid's stabilization movement.
 @end itemize
