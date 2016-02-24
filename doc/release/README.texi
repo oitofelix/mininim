@@ -353,7 +353,7 @@ Find and report bugs.  @xref{Bug reporting}.
 @item
 Suggest new features.
 @item
-Translate the program strings to other languages.
+Submit portability patches.
 @end itemize
 
 
@@ -378,28 +378,25 @@ The development sources are available through VCS:
 @end display
 
 If you are getting the sources from the VCS (or change
-@file{configure.ac}), you'll need to have Automake, Autoconf and Gettext
-installed to (re)build.  You'll also need help2man.
+@file{configure.ac}), you'll need to have Automake, Autoconf and
+help2man installed to (re)build.
 
-After getting the VCS sources, and installing the tools above, you can
-run @code{./bootstrap && ./configure && make} to do a fresh build.
-After that first time, running @command{make} should suffice to rebuild
-the program with your changes.  See file @file{INSTALL}.
+Building from sources should be quite straightforward, provided you
+install the Allegro@tie{}5 development libraries using your distribution’s
+package manager.  If you use an apt based distribution (Debian, Ubuntu,
+@enddots{}) you can do this by invoking the command:
 
-When modifying the sources, or making a distribution, more is needed,
-as follows:
+@example
+sudo apt-get install '^liballegro.*5-dev$'
+@end example
 
-@itemize
-@item
-This distribution also uses @url{https://www.gnu.org/software/gnulib,
-Gnulib} to share common files, stored as a submodule in git.
-@item
-When updating gettext, besides the normal installation on the system,
-it is necessary to run @code{gettextize -f} in this hierarchy to
-update the @file{po/} infrastructure.  After doing so, rerun
-@code{gnulib-tool --import} since otherwise older files will have been
-imported.  @xref{,,, gnulib, Gnulib Manual}, for more information.
-@end itemize
+When building the sources, the usual incantation @code{./bootstrap &&
+./configure && make} is often enough. The installation step (@code{make
+install}) is optional as MININIM is able to run directly from its source
+directory (provided you don’t make a @env{VPATH} build, in which case
+you need to specify the @emph{data path}. See the @option{--data-path}
+option).  After that first time, running @command{make} should suffice
+to rebuild the program with your changes.  See file @file{INSTALL}.
 
 When committing changes to the repository always create an entry in the
 @file{doc/release/latest-news.texi} file for any user-visible changes or

@@ -66,30 +66,6 @@
 
 
 
-@c --- Menu;
-@menu
-* Preface:: What's is this all about
-* Constructions:: The matter the world is made of
-* Movements:: How the kid reacts to user input
-* Key bindings:: Keys with useful functions
-* Configuration:: How to make the engine match user's preferences
-
-* Software package:: Build, installation, distribution, contribution and
-                     donation;
-* Release::    Information specifically relevant for the current release;
-
-Appendices:
-* GNU FDL:: The license for this documentation;
-* Linux and the GNU system:: GNU philosophy
-
-Indexes:
-* Index:: Concepts and reference material.
-@end menu
-
-
-
-
-
 @c --- Title page;
 @finalout
 @titlepage
@@ -233,6 +209,7 @@ This is a code indicating which alternative graphical design should be
 used to render the construction.  Used by carpet constructions.
 @end table
 
+@node Non-directed relative positioning
 @section Non-directed relative positioning
 @cindex non-directed relative positioning
 @cindex relative positioning, non-directed
@@ -267,6 +244,7 @@ Then we define the following mapping between names and coordinates:
 @end multitable
 
 
+@node Foregrounds
 @section Foregrounds
 @cindex construction foreground
 @cindex foreground, construction
@@ -667,6 +645,7 @@ They are @emph{strictly traversable}, @emph{rigid} and use no extension.
   @tab This should be placed at right of an @code{ARCH_TOP_LEFT}.
 @end multitable
 
+@node Backgrounds
 @section Backgrounds
 @cindex backgrounds
 
@@ -737,6 +716,7 @@ difference at all (like a torch behind a wall).
 @end multitable
 
 
+@node Items
 @section Items
 @cindex items
 
@@ -866,6 +846,7 @@ original game, in which the kid delays one cycle to respond.}
 @page
 @end iftex
 
+@node Directed relative positioning
 @section Directed relative positioning
 @cindex directed relative positioning
 @cindex positioning, directed relative
@@ -902,6 +883,7 @@ Then we define the following mapping between names and coordinates:
 @end multitable
 
 
+@node Hangable place
 @section Hangable place
 @cindex hangable place
 
@@ -917,6 +899,7 @@ direction.
 @end cartouche
 
 
+@node Normal
 @section Normal
 @cindex normal movement mode
 @cindex mode, normal movement
@@ -1062,6 +1045,7 @@ dropping off otherwise.
 @center @image{mininim-figures/kid-hang-climb-01} @arrow{} @image{mininim-figures/kid-hang-climb-00}
 
 
+@node Crouch
 @section Crouch
 @cindex crouch movement mode
 @cindex mode, crouch movement
@@ -1088,6 +1072,7 @@ little crouching jumps forward.
 @center @image{mininim-figures/kid-couch} @arrow{} @image{mininim-figures/kid-couch-forward} @arrow{} @image{mininim-figures/kid-couch}
 
 
+@node Run
 @section Run
 @cindex run movement mode
 @cindex mode, run movement
@@ -1163,6 +1148,7 @@ and continues to run in the opposite direction if you keep it pressed.
 
 @center @image{mininim-figures/kid-run} @arrow{} @image{mininim-figures/kid-turn-run} @arrow{} @image{mininim-figures/kid-run-right}
 
+@node Hang
 @section Hang
 @cindex hang movement mode
 @cindex mode, hang movement
@@ -1240,6 +1226,7 @@ both modes.
 @center @image{mininim-figures/kid-hang-climb-00} @arrow{} @image{mininim-figures/kid-hang-climb-01} @image{mininim-figures/kid-hang-climb-non-free-00} @arrow{} @image{mininim-figures/kid-hang-climb-non-free-01}
 
 
+@node Fall
 @section Fall
 @cindex fall movement mode
 @cindex mode, fall movement
@@ -1282,6 +1269,7 @@ not available in the original game.}
 @center @image{mininim-figures/kid-fall-floor-back} @arrow{} @image{mininim-figures/kid-hang-right}
 
 
+@node Fight
 @section Fight
 @cindex fight movement mode
 @cindex mode, fight movement
@@ -1400,8 +1388,9 @@ original game when started with the option @option{megahit}
 (@option{improved} in latter revisions), however they can implement a
 super-set of the functions available there and MININIM implements quite
 a few more.  Also, many key bindings have a configuration option
-counterpart.  @ref{Configuration}.
+counterpart.  @xref{Configuration}.
 
+@node Game flow
 @section Game flow
 @cindex game flow key bindings
 @cindex key bindings, game flow
@@ -1425,6 +1414,7 @@ Restart the game.
 Quit the game.
 @end table
 
+@node Graphical rendering
 @section Graphical rendering
 @cindex graphical rendering key bindings
 @cindex key bindings, graphical rendering
@@ -1465,6 +1455,7 @@ are not drawn.  The default is to draw everything.  Related to option
 @option{--blind-mode}.
 @end table
 
+@node Life and death
 @section Life and death
 @cindex life and death key bindings
 @cindex key bindings, life and death
@@ -1498,6 +1489,7 @@ Increment kid's total life points.  Related to option
 @option{--total-lives}.
 @end table
 
+@node Kid special
 @section Kid special
 @cindex kid special key bindings
 @cindex key bindings, kid special
@@ -1516,6 +1508,7 @@ case.
 Float kid.  This is equivalent to drinking a float potion.
 @end table
 
+@node Time
 @section Time
 @cindex time key bindings
 @cindex key bindings, time
@@ -1546,6 +1539,7 @@ than 1 minute, decrement remaining time by 1 minute, otherwise by 1
 second.
 @end table
 
+@node Skills
 @section Skills
 @cindex skills key bindings
 @cindex key bindings, skills
@@ -1578,6 +1572,7 @@ Increment KCD skill.
 Decrement KCD skill.
 @end table
 
+@node Level navigation
 @section Level navigation
 @cindex level navigation key bindings
 @cindex key bindings, level navigation
@@ -1627,6 +1622,7 @@ Show direct coordinates.
 Show indirect coordinates.
 @end table
 
+@node Files
 @section Files
 @cindex files key bindings
 @cindex key bindings, files
@@ -1650,6 +1646,7 @@ Load configuration.  Related to option @option{--load-config}.
 Save game.
 @end table
 
+@node Peripherals
 @section Peripherals
 @cindex peripherals key bindings
 @cindex key bindings, peripherals
@@ -1673,11 +1670,21 @@ Select display flip mode.  This circulates around the modes: ``NONE'',
 is ``NONE''.  Related to option @option{--display-flip-mode}.
 
 @kindex SHIFT+K
-@cindex @code{--keyboard-flip-mode}, related key binding
+@cindex @code{--gamepad-flip-mode}, related key binding
 @item SHIFT+K
 Select keyboard flip mode.  This circulates around the modes: ``NONE'',
 ``VERTICAL'', ``HORIZONTAL'' and ``VERTICAL + HORIZONTAL''.  The default
-is ``NONE''.  Related to option @option{--keyboard-flip-mode}.
+is ``NONE''.  Related to option @option{--gamepad-flip-mode}.
+
+@kindex CTRL+J
+@item CTRL+J
+@cindex joystick calibration
+@cindex calibration, joystick
+@cindex @code{--joystick-axis-threshold}, related key binding
+@cindex @code{--joystick-button-threshold}, related key binding
+Activate and auto-calibrate joystick.  Use this when hot-plugging a
+joystick or in case the joystick starts to behave oddly.  @xref{Gamepad
+options}.
 
 @kindex CTRL+S
 @cindex @code{--sound}, related key binding
@@ -1686,6 +1693,7 @@ Toggle sound.  The default is to have sound enabled.  Related to option
 @option{--sound}.
 @end table
 
+@node Miscellaneous
 @section Miscellaneous
 @cindex miscellaneous key bindings
 @cindex key bindings, miscellaneous
@@ -1837,6 +1845,7 @@ dependence between any two arguments (like start level and cheat
 arguments).
 
 
+@node Configuration options
 @section Configuration options
 @cindex configuration options
 @cindex options, configuration
@@ -1862,6 +1871,7 @@ binding.
 @end table
 
 
+@node Level options
 @section Level options
 @cindex level options
 @cindex options, level
@@ -1903,6 +1913,7 @@ is automatically used to load that file.  This is a compatibility
 measure for applications which depend upon this legacy behavior.
 
 
+@node Time options
 @section Time options
 @cindex time options
 @cindex options, time
@@ -1924,6 +1935,7 @@ key bindings.
 @end table
 
 
+@node Skills options
 @section Skills options
 @cindex skills options
 @cindex options, skills
@@ -1961,6 +1973,7 @@ in-game by the @kbd{SHIFT+T} key binding.
 @end table
 
 
+@node Rendering options
 @section Rendering options
 @cindex rendering options
 @cindex options, rendering
@@ -2007,7 +2020,7 @@ binding.
 Enable/disable mirror mode.  In mirror mode the screen and the keyboard
 are flipped horizontally.  This is equivalent of specifying both the
 options @option{--display-flip-mode=HORIZONTAL} and
-@option{--keyboard-flip-mode=HORIZONTAL}.  The default is @samp{FALSE}.
+@option{--gamepad-flip-mode=HORIZONTAL}.  The default is @samp{FALSE}.
 This can be changed in-game by the @kbd{SHIFT+I} and @kbd{SHIFT+K} key
 bindings for the display and keyboard, respectively.
 
@@ -2019,7 +2032,79 @@ Select video mode.  Valid values for @var{video-mode} are: @samp{VGA},
 can be changed in-game by the @kbd{F12} key binding.
 @end table
 
+@node Gamepad options
+@section Gamepad options
+@cindex gamepad options
+@cindex options, gamepad
+@cindex joystick options
+@cindex options, joystick
+@cindex keyboard options
+@cindex options, keyboard
 
+Gamepad is an umbrella term used in MININIM to describe any hardware
+device that enables the user to control the kid's movements.  Currently,
+there is support for two classes of gamepads: @emph{keyboard} and
+@emph{joystick}.
+
+The primary joystick's axis and button numbers are listed by the option
+@option{--joystick-info}.  You can find out the number of a particular
+axis or button by pressing it before invoking MININIM with that option.
+If a stick, axis or button given to an option doesn't exist in the
+primary joystick, it's silently ignored.  The joystick can be activated
+and auto-calibrated in-game by the @kbd{CTRL+J} key binding.
+@xref{Peripherals}.  If your joystick is peculiar enough, proving the
+auto-calibration mechanism insufficient, the
+@option{--joystick-axis-threshold} and
+@option{--joystick-button-threshold} options may help.
+
+@table @option
+@optindex --gamepad-flip-mode
+@cindex @kbd{SHIFT+K}, related option
+@item --gamepad-flip-mode=GAMEPAD-FLIP-MODE
+Select gamepad flip mode.  Valid values for @var{gamepad-flip-mode}
+are: @samp{NONE}, @samp{VERTICAL}, @samp{HORIZONTAL} and
+@samp{VERTICAL-HORIZONTAL}.  The default is @samp{NONE}.  This can be
+changed in-game by the @kbd{SHIFT+K} key binding.
+
+@optindex --joystick-axis
+@item --joystick-axis=FUNC,STICK,AXIS
+Map function @var{func} to joystick axis @var{stick,axis}.  Valid values
+for @var{func} are: @samp{H} and @samp{V}.  @var{stick,axis} is a valid
+stick and axis pair.  The default @var{stick,axis} for @samp{H} is
+@samp{0,0} and for @samp{V} is @samp{0,1}.
+
+@optindex --joystick-axis-threshold
+@cindex @kbd{CTRL+J}, related option
+@item --joystick-axis-threshold=FUNC,VALUE
+Set joystick threshold to @var{value} for the axis mapped to @var{func}.
+Valid values for @var{func} are @samp{H} and @samp{V}.  @var{value} is a
+floating point ranging from @math{0.0} to @math{1.0}.  The default
+@var{value} for @samp{H} is @math{0.1} and for @samp{Y} is @math{0.8}.
+
+@optindex --joystick-button
+@item --joystick-button=FUNC,BUTTON
+Map function @var{func} to joystick button @var{button}.  Valid values
+for @var{func} are: @samp{UP}, @samp{RIGHT}, @samp{DOWN}, @samp{LEFT},
+@samp{ENTER}, @samp{SHIFT}, @samp{TIME}, @samp{PAUSE}.  @var{button} is
+a valid joystick button number.  The default @var{button} values are 0,
+1, 2, 3, 4, 5, 8 and 9, respectively.
+
+@optindex --joystick-button-threshold
+@cindex @kbd{CTRL+J}, related option
+@item --joystick-button-threshold=FUNC,VALUE
+Set joystick threshold to @var{value} for the button mapped to
+@var{func}.  Valid values for @var{func} are: @samp{UP}, @samp{RIGHT},
+@samp{DOWN}, @samp{LEFT}, @samp{ENTER}, @samp{SHIFT}.  @var{value} is an
+integer ranging from 0 to 32767.  The default @var{value} for any
+function is 100.
+
+@optindex --joystick-info
+@item --joystick-info
+Print information about the primary joystick and exit.
+@end table
+
+
+@node Window options
 @section Window options
 @cindex window options
 @cindex options, window
@@ -2046,6 +2131,7 @@ integers and must be separated by a comma.
 @end table
 
 
+@node Paths options
 @section Paths options
 @cindex paths options
 @cindex options, paths
@@ -2065,6 +2151,7 @@ Print paths and exit.
 @end table
 
 
+@node Other options
 @section Other options
 @cindex other options
 @cindex options, other
@@ -2074,14 +2161,6 @@ Print paths and exit.
 @item --inhibit-screensaver[=BOOLEAN]
 Prevent the system screensaver from starting up.  The default is
 @samp{FALSE}.
-
-@optindex --keyboard-flip-mode
-@cindex @kbd{SHIFT+K}, related option
-@item --keyboard-flip-mode=KEYBOARD-FLIP-MODE
-Select keyboard flip mode.  Valid values for @var{keyboard-flip-mode}
-are: @samp{NONE}, @samp{VERTICAL}, @samp{HORIZONTAL} and
-@samp{VERTICAL-HORIZONTAL}.  The default is @samp{NONE}.  This can be
-changed in-game by the @kbd{SHIFT+K} key binding.
 
 @optindex --skip-title
 @item --skip-title[=BOOLEAN]
@@ -2095,6 +2174,7 @@ in-game by the @kbd{CTRL+S} key binding.
 @end table
 
 
+@node Help options
 @section Help options
 @cindex help options
 @cindex options, help
@@ -2139,18 +2219,6 @@ current release or subject to change between releases.  It presents the
 features this package acquired over time and what are our plans for it.
 Last but not least, people whose contribution for this package are
 noteworthy are acknowledged.
-
-@menu
-Present and Future:
-* Announcement::  Published announcement message of this new release;
-* News::          User-visible changes since previous versions;
-* To do::         Features we want to see implemented someday;
-
-People:
-* Thanks::   List of contributors;
-* Donors::   People who supported the development by donations;
-@end menu
-
 
 
 

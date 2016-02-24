@@ -61,14 +61,7 @@ implemented, @strong{please donate!}.  @inlineifset{manual,
 @xref{Donating}.}@inlineifset{file, You can make your financial
 contribution at @url{@value{donationUrl}}.}
 
-@itemize
-@item Joystick support
-@item Native level format
-@item Level editor
-@item Level generator module
-@item Guile scripting
-@item Network play
-@end itemize
+@include todo-items.texi
 
 
 

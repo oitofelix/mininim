@@ -83,7 +83,7 @@ struct skill {
   int extra_life;
 };
 
-struct keyboard_state {
+struct gamepad_state {
   bool up, down, left, right, shift, enter;
 };
 
@@ -234,7 +234,7 @@ struct anim {
     struct pos p;
   } ci;
 
-  struct keyboard_state key;
+  struct gamepad_state key;
 
   ACTION oaction;
   ACTION action;
@@ -334,6 +334,17 @@ enum wall_correlation {
   SWS, SWW, WWS, WWW
 };
 
+struct int_range {
+  int a, b;
+};
+
+struct float_range {
+  float a, b;
+};
+
+enum opt_arg_type {
+  ARG_TYPE_NULL, ARG_TYPE_BOOL, ARG_TYPE_INT, ARG_TYPE_FLOAT, ARG_TYPE_ENUM,
+};
 
 /****************
  * CONSTRUCTIONS

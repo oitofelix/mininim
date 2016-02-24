@@ -50,7 +50,7 @@
 #include "audio.h"
 #include "video.h"
 #include "event.h"
-#include "keyboard.h"
+#include "gamepad.h"
 #include "memory.h"
 #include "random.h"
 #include "timer.h"

@@ -85,14 +85,16 @@ pre_parser (int key, char *arg, struct argp_state *state);
 
 enum options {
   VIDEO_MODE_OPTION = 256, ENVIRONMENT_MODE_OPTION, GUARD_MODE_OPTION,
-  SOUND_OPTION, DISPLAY_FLIP_MODE_OPTION, KEYBOARD_FLIP_MODE_OPTION,
+  SOUND_OPTION, DISPLAY_FLIP_MODE_OPTION, GAMEPAD_FLIP_MODE_OPTION,
   MIRROR_MODE_OPTION, BLIND_MODE_OPTION, IMMORTAL_MODE_OPTION,
   TOTAL_LIVES_OPTION, START_LEVEL_OPTION, TIME_LIMIT_OPTION,
   KCA_OPTION, KCD_OPTION, DATA_PATH_OPTION, FULLSCREEN_OPTION,
   WINDOW_POSITION_OPTION, WINDOW_DIMENSIONS_OPTION,
   INHIBIT_SCREENSAVER_OPTION, PRINT_PATHS_OPTION,
   LEVEL_MODULE_OPTION, SKIP_TITLE_OPTION, START_TIME_OPTION,
-  LOAD_CONFIG_OPTION, IGNORE_MAIN_CONFIG_OPTION, IGNORE_ENVIRONMENT_OPTION
+  LOAD_CONFIG_OPTION, IGNORE_MAIN_CONFIG_OPTION, IGNORE_ENVIRONMENT_OPTION,
+  JOYSTICK_AXIS_THRESHOLD_OPTION, JOYSTICK_BUTTON_THRESHOLD_OPTION,
+  JOYSTICK_AXIS_OPTION, JOYSTICK_BUTTON_OPTION, JOYSTICK_INFO_OPTION,
 };
 
 enum level_module {
@@ -138,8 +140,19 @@ static struct argp_option options[] = {
   {"environment-mode", ENVIRONMENT_MODE_OPTION, "ENVIRONMENT-MODE", 0, "Select environment mode.  Valid values for ENVIRONMENT-MODE are: ORIGINAL, DUNGEON and PALACE.  The 'ORIGINAL' value gives level modules autonomy in this choice for each particular level.  This is the default.  This can be changed in-game by the F11 key binding.", 0},
   {"guard-mode", GUARD_MODE_OPTION, "GUARD-MODE", 0, "Select guard mode.  Valid values for GUARD-MODE are: ORIGINAL, GUARD, FAT-GUARD, VIZIER, SKELETON and SHADOW.  The 'ORIGINAL' value gives level modules autonomy in this choice for each particular guard.  This is the default.  This can be changed in-game by the F10 key binding.", 0},
   {"display-flip-mode", DISPLAY_FLIP_MODE_OPTION, "DISPLAY-FLIP-MODE", 0, "Select display flip mode.  Valid values for DISPLAY-FLIP-MODE are: NONE, VERTICAL, HORIZONTAL and VERTICAL-HORIZONTAL.  The default is NONE.  This can be changed in-game by the SHIFT+I key binding.", 0},
-  {"mirror-mode", MIRROR_MODE_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable mirror mode.  In mirror mode the screen and the keyboard are flipped horizontally.  This is equivalent of specifying both the options --display-flip-mode=HORIZONTAL and --keyboard-flip-mode=HORIZONTAL.  The default is FALSE.  This can be changed in-game by the SHIFT+I and SHIFT+K key bindings for the display and keyboard, respectively.", 0},
+  {"mirror-mode", MIRROR_MODE_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable mirror mode.  In mirror mode the screen and the keyboard are flipped horizontally.  This is equivalent of specifying both the options --display-flip-mode=HORIZONTAL and --gamepad-flip-mode=HORIZONTAL.  The default is FALSE.  This can be changed in-game by the SHIFT+I and SHIFT+K key bindings for the display and keyboard, respectively.", 0},
   {"blind-mode", BLIND_MODE_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable blind mode.  In blind mode background and non-animated sprites are not drawn.  The default is FALSE.  This can be changed in-game by the SHIFT+B key binding.", 0},
+
+  /* Gamepad */
+  {NULL, 0, NULL, 0, "Gamepad:", 0},
+  {"gamepad-flip-mode", GAMEPAD_FLIP_MODE_OPTION, "GAMEPAD-FLIP-MODE", 0, "Select gamepad flip mode.  Valid values for GAMEPAD-FLIP-MODE are: NONE, VERTICAL, HORIZONTAL and VERTICAL-HORIZONTAL.  The default is NONE.  This can be changed in-game by the SHIFT+K key binding.", 0},
+  {"joystick-axis-threshold", JOYSTICK_AXIS_THRESHOLD_OPTION, "FUNC,VALUE", 0, "Set joystick threshold to VALUE for the axis mapped to FUNC.  Valid values for FUNC are H and V.   VALUE is a floating point ranging from 0.0 to 1.0.  The default VALUE for H is 0.1 and for Y is 0.8.", 0},
+  {"joystick-button-threshold", JOYSTICK_BUTTON_THRESHOLD_OPTION, "FUNC,VALUE", 0, "Set joystick threshold to VALUE for the button mapped to FUNC.  Valid values for FUNC are: UP, RIGHT, DOWN, LEFT, ENTER, SHIFT.  VALUE is an integer ranging from 0 to 32767.  The default VALUE for any function is 100.", 0},
+  {"joystick-axis", JOYSTICK_AXIS_OPTION, "FUNC,STICK,AXIS", 0, "Map function FUNC to joystick axis STICK,AXIS.  Valid values for FUNC are: H and V.  STICK,AXIS is a valid stick and axis pair.  The default STICK,AXIS for H is 0,0 and for V is 0,1.", 0},
+  {"joystick-button", JOYSTICK_BUTTON_OPTION, "FUNC,BUTTON", 0, "Map function FUNC to joystick button BUTTON.  Valid values for FUNC are: UP, RIGHT, DOWN, LEFT, ENTER, SHIFT, TIME, PAUSE.  BUTTON is a valid joystick button number.  The default BUTTON values are 0, 1, 2, 3, 4, 5, 8 and 9, respectively.", 0},
+  {"joystick-info", JOYSTICK_INFO_OPTION, NULL, 0, "Print information about the primary joystick and exit.", 0},
+
+  {NULL, 0, NULL, OPTION_DOC, "The primary joystick's axis and button numbers are listed by the option '--joystick-info'.  You can find out the number of a particular axis or button by pressing it before invoking MININIM with that option.  If a stick, axis or button given to an option doesn't exist in the primary joystick, it's silently ignored.  The joystick can be activated and auto-calibrated in-game by the CTRL+J key binding.  Use this when hot-plugging a joystick or in case the joystick starts to behave oddly.  If your joystick is peculiar enough, proving the auto-calibration mechanism insufficient, the '--joystick-axis-threshold' and '--joystick-button-threshold' options may help.", 0},
 
   /* Window */
   {NULL, 0, NULL, 0, "Window:", 0},
@@ -155,7 +168,6 @@ static struct argp_option options[] = {
   /* Others */
   {NULL, 0, NULL, 0, "Others", 0},
   {"sound", SOUND_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable sound.  The default is TRUE.  This can be changed in-game by the CTRL+S key binding.", 0},
-  {"keyboard-flip-mode", KEYBOARD_FLIP_MODE_OPTION, "KEYBOARD-FLIP-MODE", 0, "Select keyboard flip mode.  Valid values for KEYBOARD-FLIP-MODE are: NONE, VERTICAL, HORIZONTAL and VERTICAL-HORIZONTAL.  The default is NONE.  This can be changed in-game by the SHIFT+K key binding.", 0},
   {"skip-title", SKIP_TITLE_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Skip title screen.  The default is FALSE.", 0},
   {"inhibit-screensaver", INHIBIT_SCREENSAVER_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Prevent the system screensaver from starting up.  The default is FALSE.", 0},
 
@@ -203,7 +215,7 @@ key_to_option_name (int key, struct argp_state *state)
 
 static void
 option_enum_value_error (int key, char *arg, struct argp_state *state,
-                         char **enum_vals, bool invalid)
+                         char **enum_vals, bool invalid, int number)
 {
   char *msg = NULL;
   char *option_name = key_to_option_name (key, state);
@@ -213,20 +225,20 @@ option_enum_value_error (int key, char *arg, struct argp_state *state,
   case CI_CONFIGURATION_FILE:
     xasprintf
       (&msg, "%s", invalid
-       ? "is not a valid value for the configuration file option"
-       : "is an ambiguous value for the configuration file option");
+       ? "is invalid for the configuration file option"
+       : "is ambiguous for the configuration file option");
     break;
   case CI_ENVIRONMENT_VARIABLES:
     xasprintf
       (&msg, "%s", invalid
-       ? "is not a valid value for the environment variable option"
-       : "is an ambiguous value for the environment variable option");
+       ? "is invalid for the environment variable option"
+       : "is ambiguous for the environment variable option");
     break;
   case CI_COMMAND_LINE:
     xasprintf
       (&msg, "%s", invalid
-       ? "is not a valid value for the command line option"
-       : "is an ambiguous value for the command line option");
+       ? "is invalid for the command line option"
+       : "is ambiguous for the command line option");
     break;
   }
 
@@ -253,15 +265,15 @@ option_enum_value_error (int key, char *arg, struct argp_state *state,
     xasprintf (&config_file_prefix, "%s: ", config_info->filename);
   else xasprintf (&config_file_prefix, "");
 
-  char *error_template = "%s'%s' %s '%s'.\n%s %s.\n";
+  char *error_template = "%s'%s' %s '%s' argument %i.\n%s %s.";
   if (config_info->type == CI_CONFIGURATION_FILE
       && state->flags & ARGP_SILENT)
     al_append_native_text_log (config_info->textlog, error_template,
                                config_file_prefix, arg, msg, option_name,
-                               msg2, valid_values);
+                               number, msg2, valid_values);
   else argp_error (state, error_template,
                    config_file_prefix, arg, msg, option_name,
-                   msg2, valid_values);
+                   number, msg2, valid_values);
 
   al_free (option_name);
   al_free (msg);
@@ -270,37 +282,48 @@ option_enum_value_error (int key, char *arg, struct argp_state *state,
   al_free (config_file_prefix);
 }
 
-static error_t
-optval_to_enum (int *retval, int key, char *arg, struct argp_state *state,
-                char **enum_vals)
+static void
+option_arg_error (int key, char *arg, struct argp_state *state, int number, char *estr)
 {
-  size_t i;
-  int optval = -1;
-  bool ambiguous = false;
+  struct config_info *config_info = (struct config_info *) state->input;
+  char *option_name = key_to_option_name (key, state);
+  char *config_file_prefix;
+  char *msg;
+  char *argument_msg;
 
-  for (i = 0; enum_vals[i] != NULL; i++) {
-    if (strcasestr (enum_vals[i], arg) == enum_vals[i]) {
-      if (! strcasecmp (enum_vals[i], arg)) {
-        *retval = i;
-        return 0;
-      }
-      if (optval != -1) ambiguous = true;
-      optval = i;
-    }
+  if (config_info->type == CI_CONFIGURATION_FILE)
+    xasprintf (&config_file_prefix, "%s: ", config_info->filename);
+  else xasprintf (&config_file_prefix, "");
+
+  switch (config_info->type) {
+  case CI_CONFIGURATION_FILE:
+    msg = "is invalid for the configuration file option";
+    break;
+  case CI_ENVIRONMENT_VARIABLES:
+    msg = "is invalid for the environment variable option";
+    break;
+  case CI_COMMAND_LINE:
+    msg = "is invalid for the command line option";
+    break;
   }
 
-  if (optval == -1) {
-    option_enum_value_error (key, arg, state, enum_vals, true);
-    return EINVAL;
-  }
-  else if (ambiguous) {
-    option_enum_value_error (key, arg, state, enum_vals, false);
-    return EINVAL;
-  }
+  if (number != -1) xasprintf (&argument_msg, " argument %i", number);
+  else xasprintf (&argument_msg, "");
 
-  *retval = optval;
+  char *error_template = "%s'%s' %s '%s'%s.\n%s";
 
-  return 0;
+  if (config_info->type == CI_CONFIGURATION_FILE
+      && state->flags & ARGP_SILENT)
+    al_append_native_text_log (config_info->textlog, error_template,
+                               config_file_prefix, arg, msg, option_name,
+                               argument_msg, estr);
+  else argp_error (state, error_template,
+                   config_file_prefix, arg, msg, option_name,
+                   argument_msg, estr);
+
+  al_free (option_name);
+  al_free (config_file_prefix);
+  al_free (argument_msg);
 }
 
 static bool
@@ -323,70 +346,190 @@ optval_to_bool (char *arg)
 
 static error_t
 optval_to_int (int *retval, int key, char *arg, struct argp_state *state,
-               int min, int max)
+               struct int_range *r, int number)
 {
-  struct config_info *config_info = (struct config_info *) state->input;
   int i;
+  char *estr;
 
-  if (sscanf (arg, "%i", &i) != 1
-      || i < min || i > max) {
-    char *option_name = key_to_option_name (key, state);
-    char *config_file_prefix;
-    if (config_info->type == CI_CONFIGURATION_FILE)
-      xasprintf (&config_file_prefix, "%s: ", config_info->filename);
-    else xasprintf (&config_file_prefix, "");
-    char *error_template = "%s'%s' is not a valid integer for the option '%s'.\n"
-      "Valid integers range from %i to %i.\n";
-    if (config_info->type == CI_CONFIGURATION_FILE
-        && state->flags & ARGP_SILENT)
-      al_append_native_text_log (config_info->textlog, error_template,
-                                 config_file_prefix, arg, option_name, min, max);
-    else argp_error (state, error_template,
-                     config_file_prefix, arg, option_name, min, max);
-    al_free (option_name);
-    al_free (config_file_prefix);
+  if (sscanf (arg, "%i", &i) != 1) {
+    option_arg_error (key, arg, state, number, "Reason: argument is not an integer.");
     return EINVAL;
   }
+
+  if (i < r->a || i > r->b) {
+    xasprintf (&estr, "Reason: argument is not in the range [%i,%i].", r->a, r->b);
+    option_arg_error (key, arg, state, number, estr);
+    al_free (estr);
+    return EINVAL;
+  }
+
   *retval = i;
   return 0;
 }
 
 static error_t
-optval_to_int_pair (int *a, int *b, int key, char *arg, struct argp_state *state,
-                    int min, int max, char s, char A, char B)
+optval_to_float (float *retval, int key, char *arg, struct argp_state *state,
+                 struct float_range *r, int number)
 {
-  struct config_info *config_info = (struct config_info *) state->input;
-  char *template;
-  int _a, _b;
-  xasprintf (&template, "%%i%c%%i", s);
+  float f;
+  char *estr;
 
-  if (sscanf (arg, template, &_a, &_b) != 2
-      || _a < min || _a > max || _b < min || _b > max) {
-    char *option_name = key_to_option_name (key, state);
-    char *config_file_prefix;
-    if (config_info->type == CI_CONFIGURATION_FILE)
-      xasprintf (&config_file_prefix, "%s: ", config_info->filename);
-    else xasprintf (&config_file_prefix, "");
-    char *error_template = "%s'%s' is not a valid integer pair for the option '%s'.\n\
-Valid values have the form %c%c%c where %c and %c range from %i to %i.\n";
-    if (config_info->type == CI_CONFIGURATION_FILE
-        && state->flags & ARGP_SILENT)
-      al_append_native_text_log (config_info->textlog, error_template,
-                                 config_file_prefix, arg, option_name,
-                                 A, s, B, A, B, min, max);
-    else argp_error (state, error_template,
-                     config_file_prefix, arg, option_name,
-                     A, s, B, A, B, min, max);
-    al_free (template);
-    al_free (option_name);
-    al_free (config_file_prefix);
+  if (sscanf (arg, "%f", &f) != 1) {
+    option_arg_error (key, arg, state, number, "Reason: argument is not a float.");
     return EINVAL;
   }
 
-  *a = _a;
-  *b = _b;
-  al_free (template);
+  if (f < r->a || f > r->b) {
+    xasprintf (&estr, "Reason: argument is not in the range [%f,%f].", r->a, r->b);
+    option_arg_error (key, arg, state, number, estr);
+    al_free (estr);
+    return EINVAL;
+  }
+
+  *retval = f;
   return 0;
+}
+
+static error_t
+optval_to_enum (int *retval, int key, char *arg, struct argp_state *state,
+                char **enum_vals, int number)
+{
+  size_t i;
+  int optval = -1;
+  bool ambiguous = false;
+
+  for (i = 0; enum_vals[i] != NULL; i++) {
+    if (strcasestr (enum_vals[i], arg) == enum_vals[i]) {
+      if (! strcasecmp (enum_vals[i], arg)) {
+        *retval = i;
+        return 0;
+      }
+      if (optval != -1) ambiguous = true;
+      optval = i;
+    }
+  }
+
+  if (optval == -1) {
+    option_enum_value_error (key, arg, state, enum_vals, true, number);
+    return EINVAL;
+  }
+  else if (ambiguous) {
+    option_enum_value_error (key, arg, state, enum_vals, false, number);
+    return EINVAL;
+  }
+
+  *retval = optval;
+
+  return 0;
+}
+
+static error_t
+option_get_args (int key, char *arg, struct argp_state *state, char s, ...)
+{
+  va_list ap, at, av, as, ar, atype, astr, aval, arange;
+  int i;
+  error_t retval;
+  char *template;
+  xasprintf (&template, "");
+  char *estr;
+
+  /* initialize argument lists */
+  va_start (ap, s);
+  va_start (at, s);
+  va_start (av, s);
+  va_start (as, s);
+  va_start (ar, s);
+  va_start (atype, s);
+  va_start (astr, s);
+  va_start (aval, s);
+  va_start (arange, s);
+
+  /* count number of arguments */
+  int num_args = 0;
+  va_start (ap, s);
+  while (va_arg (ap, enum opt_arg_type) != ARG_TYPE_NULL) num_args++;
+
+  /* Nothing to do, if it expects 0 arguments */
+  if (num_args == 0) {
+    retval = 0;
+    goto end;
+  }
+
+  /* set argument lists */
+  va_start (atype, s);
+  va_copy (ap, atype);
+  for (i = 0; i <= num_args; i++) va_arg (ap, enum opt_arg_type);
+  va_copy (astr, ap);
+  for (i = 0; i < num_args; i++) va_arg (ap, char **);
+  va_copy (aval, ap);
+  for (i = 0; i < num_args; i++) va_arg (ap, void *);
+  va_copy (arange, ap);
+
+  /* build template string */
+  for (i = 0; i < num_args; i++) {
+    char *str = template;
+    if (i)
+      xasprintf (&template, "%s%c%%a[^%c]", template, s, s);
+    else xasprintf (&template, "%%a[^%c]", s);
+    al_free (str);
+  }
+
+  /* get argument strings */
+  va_copy (ap, astr);
+  if (vsscanf (arg, template, ap) != num_args) {
+    xasprintf (&estr, "Reason: less than %i arguments provided.", num_args);
+    option_arg_error (key, arg, state, -1, estr);
+    al_free (estr);
+    retval = EINVAL;
+    goto end;
+  }
+
+  /* get values and check ranges */
+  va_copy (at, atype);
+  va_copy (as, astr);
+  va_copy (av, aval);
+  va_copy (ar, arange);
+  for (i = 0; i < num_args; i++) {
+    enum opt_arg_type type = va_arg (at, enum opt_arg_type);
+    char *str = *va_arg (as, char **);
+    void *val = va_arg (av, void *);
+    void *range = va_arg (ar, void *);
+
+    assert (type == ARG_TYPE_INT || type == ARG_TYPE_FLOAT
+            || type == ARG_TYPE_ENUM);
+    switch (type) {
+    case ARG_TYPE_BOOL:
+      retval = 0;
+      *(bool *) val = optval_to_bool (str);
+      break;
+    case ARG_TYPE_INT:
+      retval = optval_to_int ((int *) val, key, str, state, range, i);
+      break;
+    case ARG_TYPE_FLOAT:
+      retval = optval_to_float ((float *) val, key, str, state, range, i);
+      break;
+    case ARG_TYPE_ENUM:
+      retval = optval_to_enum ((int *) val, key, str, state, range, i);
+    default: break;
+    }
+
+    if (retval) goto end;
+  }
+
+  retval = 0;
+
+ end: /* cleanup */
+  va_end (ap);
+  va_end (at);
+  va_end (av);
+  va_end (as);
+  va_end (ar);
+  va_end (atype);
+  va_end (astr);
+  va_end (aval);
+  va_end (arange);
+  al_free (template);
+  return retval;
 }
 
 static error_t
@@ -410,6 +553,9 @@ parser (int key, char *arg, struct argp_state *state)
   size_t cargc = 0;
   int x, y, i, e;
   struct config_info config_info;
+  float float_val;
+  int int_val0, int_val1;
+  char *str0, *str1, *str2;
 
   char *level_module_enum[] = {"LEGACY", "PLV", "DAT", "CONSISTENCY", NULL};
 
@@ -423,8 +569,31 @@ parser (int key, char *arg, struct argp_state *state)
   char *display_flip_mode_enum[] = {"NONE", "VERTICAL", "HORIZONTAL",
                                     "VERTICAL-HORIZONTAL", NULL};
 
-  char *keyboard_flip_mode_enum[] = {"NONE", "VERTICAL", "HORIZONTAL",
-                                     "VERTICAL-HORIZONTAL", NULL};
+  char *gamepad_flip_mode_enum[] = {"NONE", "VERTICAL", "HORIZONTAL",
+                                    "VERTICAL-HORIZONTAL", NULL};
+
+  char *joystick_axis_threshold_enum[] = {"H", "V", NULL};
+
+  char *joystick_button_threshold_enum[] = {"UP", "RIGHT", "DOWN", "LEFT",
+                                            "ENTER", "SHIFT", NULL};
+
+  char *joystick_axis_enum[] = {"H", "V", NULL};
+
+  char *joystick_button_enum[] = {"UP", "RIGHT", "DOWN", "LEFT",
+                                  "ENTER", "SHIFT", "TIME", "PAUSE", NULL};
+
+  struct int_range total_lives_range = {1, 10};
+  struct int_range start_level_range = {1, INT_MAX};
+  struct int_range time_limit_range = {1, INT_MAX};
+  struct int_range start_time_range = {0, INT_MAX};
+  struct int_range kca_range = {0, 100};
+  struct int_range kcd_range = {0, 100};
+  struct int_range window_position_range = {INT_MIN, INT_MAX};
+  struct int_range window_dimensions_range = {1, INT_MAX};
+  struct float_range joystick_axis_threshold_range = {0.0,1.0};
+  struct int_range joystick_button_threshold_range = {0, 32767};
+  struct int_range joystick_axis_range = {0, INT_MAX};
+  struct int_range joystick_button_range = {0, INT_MAX};
 
   switch (key) {
   case IGNORE_MAIN_CONFIG_OPTION:
@@ -444,7 +613,7 @@ parser (int key, char *arg, struct argp_state *state)
     destroy_array ((void **) &cargv, &cargc);
     break;
   case LEVEL_MODULE_OPTION:
-    e = optval_to_enum (&i, key, arg, state, level_module_enum);
+    e = optval_to_enum (&i, key, arg, state, level_module_enum, 0);
     if (e) return e;
     level_module_given = true;
     switch (i) {
@@ -455,7 +624,7 @@ parser (int key, char *arg, struct argp_state *state)
     }
     break;
   case VIDEO_MODE_OPTION:
-    e = optval_to_enum (&i, key, arg, state, video_mode_enum);
+    e = optval_to_enum (&i, key, arg, state, video_mode_enum, 0);
     if (e) return e;
     switch (i) {
     case 0: vm = VGA; break;
@@ -465,7 +634,7 @@ parser (int key, char *arg, struct argp_state *state)
     }
     break;
   case ENVIRONMENT_MODE_OPTION:
-    e = optval_to_enum (&i, key, arg, state, environment_mode_enum);
+    e = optval_to_enum (&i, key, arg, state, environment_mode_enum, 0);
     if (e) return e;
     switch (i) {
     case 0: force_em = false; break;
@@ -474,7 +643,7 @@ parser (int key, char *arg, struct argp_state *state)
     }
     break;
   case GUARD_MODE_OPTION:
-    e = optval_to_enum (&i, key, arg, state, guard_mode_enum);
+    e = optval_to_enum (&i, key, arg, state, guard_mode_enum, 0);
     if (e) return e;
     switch (i) {
     case 0: gm = ORIGINAL_GM; break;
@@ -489,7 +658,7 @@ parser (int key, char *arg, struct argp_state *state)
     sound_disabled_cmd = ! optval_to_bool (arg);
     break;
   case DISPLAY_FLIP_MODE_OPTION:
-    e = optval_to_enum (&i, key, arg, state, display_flip_mode_enum);
+    e = optval_to_enum (&i, key, arg, state, display_flip_mode_enum, 0);
     if (e) return e;
     switch (i) {
     case 0: screen_flags = 0; break;
@@ -498,36 +667,36 @@ parser (int key, char *arg, struct argp_state *state)
     case 3: screen_flags = ALLEGRO_FLIP_VERTICAL | ALLEGRO_FLIP_HORIZONTAL; break;
     }
     break;
-  case KEYBOARD_FLIP_MODE_OPTION:
-    e = optval_to_enum (&i, key, arg, state, keyboard_flip_mode_enum);
+  case GAMEPAD_FLIP_MODE_OPTION:
+    e = optval_to_enum (&i, key, arg, state, gamepad_flip_mode_enum, 0);
     if (e) return e;
     switch (i) {
     case 0:
-      flip_keyboard_vertical = false;
-      flip_keyboard_horizontal = false;
+      flip_gamepad_vertical = false;
+      flip_gamepad_horizontal = false;
       break;
     case 1:
-      flip_keyboard_vertical = true;
-      flip_keyboard_horizontal = false;
+      flip_gamepad_vertical = true;
+      flip_gamepad_horizontal = false;
       break;
     case 2:
-      flip_keyboard_vertical = false;
-      flip_keyboard_horizontal = true;
+      flip_gamepad_vertical = false;
+      flip_gamepad_horizontal = true;
       break;
     case 3:
-      flip_keyboard_vertical = true;
-      flip_keyboard_horizontal = true;
+      flip_gamepad_vertical = true;
+      flip_gamepad_horizontal = true;
       break;
     }
     break;
   case MIRROR_MODE_OPTION:
     if (optval_to_bool (arg)) {
-      flip_keyboard_vertical = false;
-      flip_keyboard_horizontal = true;
+      flip_gamepad_vertical = false;
+      flip_gamepad_horizontal = true;
       screen_flags = ALLEGRO_FLIP_HORIZONTAL;
     } else {
-      flip_keyboard_vertical = false;
-      flip_keyboard_horizontal = false;
+      flip_gamepad_vertical = false;
+      flip_gamepad_horizontal = false;
       screen_flags = 0;
     }
     break;
@@ -538,32 +707,32 @@ parser (int key, char *arg, struct argp_state *state)
     immortal_mode = optval_to_bool (arg);
     break;
   case TOTAL_LIVES_OPTION:
-    e = optval_to_int (&i, key, arg, state, 1, 10);
+    e = optval_to_int (&i, key, arg, state, &total_lives_range, 0);
     if (e) return e;
     initial_total_lives = i;
     break;
   case START_LEVEL_OPTION:
-    e = optval_to_int (&i, key, arg, state, 1, INT_MAX);
+    e = optval_to_int (&i, key, arg, state, &start_level_range, 0);
     if (e) return e;
     start_level = i;
     break;
   case TIME_LIMIT_OPTION:
-    e = optval_to_int (&i, key, arg, state, 1, INT_MAX);
+    e = optval_to_int (&i, key, arg, state, &time_limit_range, 0);
     if (e) return e;
     time_limit = i;
     break;
   case START_TIME_OPTION:
-    e = optval_to_int (&i, key, arg, state, 0, INT_MAX);
+    e = optval_to_int (&i, key, arg, state, &start_time_range, 0);
     if (e) return e;
     start_time = i;
     break;
   case KCA_OPTION:
-    e = optval_to_int (&i, key, arg, state, 0, 100);
+    e = optval_to_int (&i, key, arg, state, &kca_range, 0);
     if (e) return e;
     skill.counter_attack_prob = i - 1;
     break;
   case KCD_OPTION:
-    e = optval_to_int (&i, key, arg, state, 0, 100);
+    e = optval_to_int (&i, key, arg, state, &kcd_range, 0);
     if (e) return e;
     skill.counter_defense_prob = i - 1;
     break;
@@ -578,14 +747,16 @@ parser (int key, char *arg, struct argp_state *state)
                                    & ~ALLEGRO_FULLSCREEN_WINDOW);
     break;
   case WINDOW_POSITION_OPTION:
-    e = optval_to_int_pair (&x, &y, key, arg, state, INT_MIN, INT_MAX, ',',
-                            'X', 'Y');
+    e = option_get_args (key, arg, state, ',', ARG_TYPE_INT, ARG_TYPE_INT, 0,
+                         &str0, &str1, &x, &y,
+                         &window_position_range, &window_position_range);
     if (e) return e;
     al_set_new_window_position (x, y);
     break;
   case WINDOW_DIMENSIONS_OPTION:
-    e = optval_to_int_pair (&display_width, &display_height, key, arg, state, 1,
-                            INT_MAX, 'x', 'W', 'H');
+    e = option_get_args (key, arg, state, 'x', ARG_TYPE_INT, ARG_TYPE_INT, 0,
+                         &str0, &str1, &display_width, &display_height,
+                         &window_dimensions_range, &window_dimensions_range);
     if (e) return e;
     break;
   case INHIBIT_SCREENSAVER_OPTION:
@@ -596,6 +767,69 @@ parser (int key, char *arg, struct argp_state *state)
     exit (0);
   case SKIP_TITLE_OPTION:
     skip_title = optval_to_bool (arg);
+    break;
+  case JOYSTICK_AXIS_THRESHOLD_OPTION:
+    e = option_get_args (key, arg, state, ',', ARG_TYPE_ENUM, ARG_TYPE_FLOAT, 0,
+                         &str0, &str1, &i, &float_val, joystick_axis_threshold_enum,
+                         &joystick_axis_threshold_range);
+    if (e) return e;
+    switch (i) {
+    case 0: joystick_h_threshold = float_val; break;
+    case 1: joystick_v_threshold = float_val; break;
+    }
+    break;
+  case JOYSTICK_BUTTON_THRESHOLD_OPTION:
+    e = option_get_args (key, arg, state, ',', ARG_TYPE_ENUM, ARG_TYPE_INT, 0,
+                         &str0, &str1, &i, &int_val0, joystick_button_threshold_enum,
+                         &joystick_button_threshold_range);
+    if (e) return e;
+    switch (i) {
+    case 0: joystick_up_threshold = int_val0; break;
+    case 1: joystick_right_threshold = int_val0; break;
+    case 2: joystick_down_threshold = int_val0; break;
+    case 3: joystick_left_threshold = int_val0; break;
+    case 4: joystick_enter_threshold = int_val0; break;
+    case 5: joystick_shift_threshold = int_val0; break;
+    }
+    break;
+  case JOYSTICK_AXIS_OPTION:
+    e = option_get_args (key, arg, state, ',', ARG_TYPE_ENUM, ARG_TYPE_INT, ARG_TYPE_INT, 0,
+                         &str0, &str1, &str2, &i, &int_val0, &int_val1, joystick_axis_enum,
+                         &joystick_axis_range, &joystick_axis_range);
+    if (e) return e;
+    switch (i) {
+    case 0:
+      joystick_h_stick = int_val0;
+      joystick_h_axis = int_val1;
+      break;
+    case 1:
+      joystick_v_stick = int_val0;
+      joystick_v_axis = int_val1;
+      break;
+    }
+    break;
+  case JOYSTICK_BUTTON_OPTION:
+    e = option_get_args (key, arg, state, ',', ARG_TYPE_ENUM, ARG_TYPE_INT, 0,
+                         &str0, &str1, &i, &int_val0, joystick_button_enum,
+                         &joystick_button_range);
+    if (e) return e;
+    switch (i) {
+    case 0: joystick_up_button = int_val0; break;
+    case 1: joystick_right_button = int_val0; break;
+    case 2: joystick_down_button = int_val0; break;
+    case 3: joystick_left_button = int_val0; break;
+    case 4: joystick_enter_button = int_val0; break;
+    case 5: joystick_shift_button = int_val0; break;
+    case 6: joystick_time_button = int_val0; break;
+    case 7: joystick_pause_button = int_val0; break;
+    }
+    break;
+  case JOYSTICK_INFO_OPTION:
+    if (joystick_info ()) {
+      error (-1, 0, "Joystick not found");
+      exit (-1);
+    }
+    exit (0);
     break;
   case ARGP_KEY_ARG:
     /* cheat */
@@ -825,7 +1059,7 @@ main (int _argc, char **_argv)
   init_video ();
   init_audio ();
   if (sound_disabled_cmd) enable_audio (false);
-  init_keyboard ();
+  init_gamepad ();
   init_dialog ();
 
   draw_loading_screen ();
@@ -893,7 +1127,7 @@ main (int _argc, char **_argv)
 
   finalize_video ();
   finalize_audio ();
-  finalize_keyboard ();
+  finalize_gamepad ();
   finalize_dialog ();
 
   fprintf (stderr, "MININIM: Hope you enjoyed it!\n");

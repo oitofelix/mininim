@@ -56,14 +56,71 @@
 
 
 
+@heading Links
+
+@table @asis
+@item Homepage
+@url{@value{webUrl}}
+@item Atom feed
+@url{@value{atomUrl}}
+@item Forum
+@url{@value{forumUrl}}
+@item IRC channel
+@url{@value{IRCurl}}
+@item Bug reporting
+@url{@value{issuesUrl}}
+@item VCS
+@url{@value{GITweb}}
+@end table
+
+
+
+
+
 @heading Download
+
+@subheading User's Manual
+
+If you just want to have a look in the latest release documentation, you
+can download the manual in PDF format separately.
+
+@url{@value{pdfUrl}}
+
+
+@subheading Windows
+
+If you are under Microsoft Windows a MinGW build is readily available.
+No installation is required, just extract the zip archive and run
+@command{mininim.exe}.  The PDF manual is bundled as well.
+
+@url{@value{winZipUrl}}
+
+
+@subheading GNU/Linux
+
+If you use GNU/Linux, you have to build from source.  This should be
+quite straightforward, provided you install the Allegro 5 development
+libraries using your distribution’s package manager.  If you use an apt
+based distribution (Debian, Ubuntu, @enddots{}) you can do this by
+invoking the command:
+
+@example
+sudo apt-get install '^liballegro.*5-dev$'
+@end example
+
+When building the sources, the usual incantation @code{./configure &&
+make} is often enough. The installation step (@code{make install}) is
+optional as MININIM is able to run directly from its source directory
+(provided you don’t make a @env{VPATH} build, in which case you need to
+specify the @emph{data path}. See the @option{--data-path} option).
 
 @noindent
 Here are the compressed sources and a GPG detached signature:
-@example
-@value{tarballUrl}
-@value{tarSignUrl}
-@end example
+
+@itemize
+@item @url{@value{tarballUrl}}
+@item @url{@value{tarSignUrl}}
+@end itemize
 
 Use the @file{.sig} file to verify that the corresponding file (without
 the @file{.sig} suffix) is intact.  First, be sure to download both the
@@ -101,22 +158,13 @@ GNU Texinfo @value{texinfoVersion}
 
 
 
-@heading Links
+@heading To do
 
-@table @asis
-@item Homepage
-@url{@value{webUrl}}
-@item Atom feed
-@url{@value{atomUrl}}
-@item Forum
-@url{@value{forumUrl}}
-@item IRC channel
-@url{@value{IRCurl}}
-@item Bug reporting
-@url{@value{issuesUrl}}
-@item VCS
-@url{@value{GITweb}}
-@end table
+The following additional features are planned to be implemented
+eventually.
+
+
+@include todo-items.texi
 
 
 

@@ -26,7 +26,7 @@ dnl
 ##################
 
 # Release definitions;
-AC_INIT([MININIM], [0.9.2.1],
+AC_INIT([MININIM], [0.9.2.2],
 [oitofelix@gnu.org], [mininim],
 [http://oitofelix.freeshell.org/mininim/])
 AC_SUBST([PACKAGE_MAILING_LIST], [])
@@ -46,7 +46,7 @@ AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_SRCDIR([src/mininim.c])
 
 # GNU Automake settings;
-AM_INIT_AUTOMAKE([-Wall -Wno-portability -Wno-override foreign subdir-objects])
+AM_INIT_AUTOMAKE([foreign subdir-objects])
 AM_SILENT_RULES([yes])
 dnl AM_EXTRA_RECURSIVE_TARGETS([homepage install-man])
 dnl AM_GNU_GETTEXT_VERSION([0.18.1])

@@ -28,15 +28,20 @@
 @set webUrl http://oitofelix.github.io/mininim/
 @set atomUrl http://oitofelix.github.io/feed.xml
 @set authorMail oitofelix@@gnu.org
+@set downloadUrl https://github.com/@/oitofelix/@/mininim/@/releases/@/download/@/v@value{version}/@/
 
 @c --- Tarball
 @set tarball @value{tarName}-@value{version}.tar.gz
 @set tarSign @value{tarball}.sig
-@set tarballUrl @value{webUrl}@value{tarball}
-@set tarSignUrl @value{webUrl}@value{tarSign}
+@set tarballUrl @value{downloadUrl}@value{tarball}
+@set tarSignUrl @value{downloadUrl}@value{tarSign}
+@set winZip @value{tarName}-@value{version}-win32.zip
+@set winZipUrl @value{downloadUrl}@value{winZip}
+@set pdf @value{tarName}-@value{version}.pdf
+@set pdfUrl @value{downloadUrl}@value{pdf}
 
 @c --- Forum;
-@set forumUrl http://forum.princed.org/index.php
+@set forumUrl http://forum.princed.org/viewtopic.php?f=69&t=3783
 
 @c --- IRC;
 @set IRCurl irc://irc.freenode.net/mininim

@@ -198,7 +198,7 @@ compute_level (void)
 
   compute_loose_floors ();
 
-  get_keyboard_state (&current_kid->key);
+  get_gamepad_state (&current_kid->key);
 
   for (i = 0; i < anima_nmemb; i++) enter_fight_logic (&anima[i]);
   for (i = 0; i < anima_nmemb; i++) leave_fight_logic (&anima[i]);
@@ -239,7 +239,10 @@ process_keys (void)
 
   /* clear the keyboard buffer at the first cycle, so any key pressed
      on the title don't trigger any action */
-  if (anim_cycle == 0) memset (&key, 0, sizeof (key));
+  if (anim_cycle == 0) {
+    memset (&key, 0, sizeof (key));
+    button = -1;
+  }
 
   /* ESC: pause game */
   if (step_one_cycle) {
@@ -248,7 +251,8 @@ process_keys (void)
     al_stop_timer (play_time);
   }
 
-  if (was_key_pressed (ALLEGRO_KEY_ESCAPE, 0, 0, true)) {
+  if (was_key_pressed (ALLEGRO_KEY_ESCAPE, 0, 0, true)
+      || was_button_pressed (joystick_pause_button, true)) {
     if (pause_game) {
       step_one_cycle = true;
       pause_game = false;
@@ -257,10 +261,11 @@ process_keys (void)
       pause_game = true;
       al_stop_timer (play_time);
     }
-  } else if (pause_game && key.keyboard.keycode) {
+  } else if (pause_game && (key.keyboard.keycode || button != -1)) {
     pause_game = false;
     draw_bottom_text (NULL, NULL);
     memset (&key, 0, sizeof (key));
+    button = -1;
     al_start_timer (play_time);
   }
 
@@ -352,7 +357,8 @@ process_keys (void)
   }
 
   /* SPACE: display remaining time */
-  if (was_key_pressed (ALLEGRO_KEY_SPACE, 0, 0, true))
+  if (was_key_pressed (ALLEGRO_KEY_SPACE, 0, 0, true)
+      || was_button_pressed (joystick_time_button, true))
     display_remaining_time ();
 
   /* +: increment and display remaining time */
@@ -453,7 +459,10 @@ process_keys (void)
       k->sample = play_sample (sample, -1);
     }
 
-    if (t < 60) key.keyboard.keycode = 0;
+    if (t < 60) {
+      key.keyboard.keycode = 0;
+      button = -1;
+    }
 
     if (t >= 60) {
       if (t < 240 || t % 12 < 8) {
@@ -464,7 +473,8 @@ process_keys (void)
         al_free (text);
       } else draw_bottom_text (NULL, "");
 
-      if (key.keyboard.keycode) quit_anim = RESTART_LEVEL;
+      if (key.keyboard.keycode || button != -1)
+        quit_anim = RESTART_LEVEL;
     }
   } else if (al_get_timer_started (death_timer)
              && ! pause_game) {

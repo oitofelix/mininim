@@ -42,6 +42,7 @@ play_anim (void (*draw_callback) (void),
   ALLEGRO_EVENT_QUEUE *event_queue = create_event_queue ();
   al_register_event_source (event_queue, get_display_event_source (display));
   al_register_event_source (event_queue, get_keyboard_event_source ());
+  al_register_event_source (event_queue, get_joystick_event_source ());
   al_register_event_source (event_queue, get_timer_event_source (video_timer));
   al_register_event_source (event_queue, get_timer_event_source (timer));
   al_start_timer (timer);
@@ -122,6 +123,12 @@ play_anim (void (*draw_callback) (void),
     case ALLEGRO_EVENT_NATIVE_DIALOG_CLOSE:
       al_close_native_text_log ((ALLEGRO_TEXTLOG *) event.user.data1);
       break;
+    case ALLEGRO_EVENT_JOYSTICK_CONFIGURATION:
+      calibrate_joystick ();
+      break;
+    case ALLEGRO_EVENT_JOYSTICK_BUTTON_DOWN:
+      button = event.joystick.button;
+      break;
     case ALLEGRO_EVENT_KEY_CHAR:
       key = event;
 
@@ -129,30 +136,30 @@ play_anim (void (*draw_callback) (void),
       int prev_room = room_view;
 
       /* H: view room at left (J if flipped horizontally) */
-      if ((! flip_keyboard_horizontal
+      if ((! flip_gamepad_horizontal
            && was_key_pressed (ALLEGRO_KEY_H, 0, 0, true))
-          || (flip_keyboard_horizontal
+          || (flip_gamepad_horizontal
               && was_key_pressed (ALLEGRO_KEY_J, 0, 0, true)))
         room_view = level.link[room_view].l;
 
       /* J: view room at right (H if flipped horizontally) */
-      if ((! flip_keyboard_horizontal
+      if ((! flip_gamepad_horizontal
            && was_key_pressed (ALLEGRO_KEY_J, 0, 0, true))
-          || (flip_keyboard_horizontal
+          || (flip_gamepad_horizontal
               && was_key_pressed (ALLEGRO_KEY_H, 0, 0, true)))
         room_view = level.link[room_view].r;
 
       /* U: view room above (N if flipped vertically) */
-      if ((! flip_keyboard_vertical
+      if ((! flip_gamepad_vertical
            && was_key_pressed (ALLEGRO_KEY_U, 0, 0, true))
-          || (flip_keyboard_vertical
+          || (flip_gamepad_vertical
               && was_key_pressed (ALLEGRO_KEY_N, 0, 0, true)))
         room_view = level.link[room_view].a;
 
       /* N: view room below (U if flipped vertically) */
-      if ((! flip_keyboard_vertical
+      if ((! flip_gamepad_vertical
            && was_key_pressed (ALLEGRO_KEY_N, 0, 0, true))
-          || (flip_keyboard_vertical
+          || (flip_gamepad_vertical
               && was_key_pressed (ALLEGRO_KEY_U, 0, 0, true)))
         room_view = level.link[room_view].b;
 
@@ -222,24 +229,32 @@ play_anim (void (*draw_callback) (void),
         al_free (text);
       }
 
-      /* SHIFT+K: flip keyboard */
+      /* SHIFT+K: flip gamepad */
       if (was_key_pressed (ALLEGRO_KEY_K, 0, ALLEGRO_KEYMOD_SHIFT, true)) {
         char *flip = "NONE";
-        if (! flip_keyboard_vertical && ! flip_keyboard_horizontal) {
-          flip_keyboard_vertical = true;
+        if (! flip_gamepad_vertical && ! flip_gamepad_horizontal) {
+          flip_gamepad_vertical = true;
           flip = "VERTICAL";
-        } else if (flip_keyboard_vertical && ! flip_keyboard_horizontal) {
-          flip_keyboard_vertical = false;
-          flip_keyboard_horizontal = true;
+        } else if (flip_gamepad_vertical && ! flip_gamepad_horizontal) {
+          flip_gamepad_vertical = false;
+          flip_gamepad_horizontal = true;
           flip = "HORIZONTAL";
-        } else if (! flip_keyboard_vertical && flip_keyboard_horizontal) {
-          flip_keyboard_vertical = true;
+        } else if (! flip_gamepad_vertical && flip_gamepad_horizontal) {
+          flip_gamepad_vertical = true;
           flip = "VERTICAL + HORIZONTAL";
-        } else if (flip_keyboard_vertical && flip_keyboard_horizontal) {
-          flip_keyboard_vertical = false;
-          flip_keyboard_horizontal = false;
+        } else if (flip_gamepad_vertical && flip_gamepad_horizontal) {
+          flip_gamepad_vertical = false;
+          flip_gamepad_horizontal = false;
         }
-        xasprintf (&text, "KEYBOARD FLIP: %s", flip);
+        xasprintf (&text, "GAMEPAD FLIP: %s", flip);
+        draw_bottom_text (NULL, text);
+        al_free (text);
+      }
+
+      /* CTRL+J: calibrate joystick */
+      if (was_key_pressed (ALLEGRO_KEY_J, 0, ALLEGRO_KEYMOD_CTRL, true)) {
+        calibrate_joystick ();
+        xasprintf (&text, "JOYSTICK %s", joystick ? "CALIBRATED" : "NOT FOUND");
         draw_bottom_text (NULL, text);
         al_free (text);
       }

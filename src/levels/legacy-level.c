@@ -604,7 +604,7 @@ special_events (void)
          kid are in fight mode, the shadow's movements mirror the
          kid's */
       else if (ks->type == KID) {
-        get_keyboard_state (&ks->key);
+        get_gamepad_state (&ks->key);
         bool l = ks->key.left;
         bool r = ks->key.right;
         ks->key.left = r;

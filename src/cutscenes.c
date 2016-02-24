@@ -154,10 +154,11 @@ title_anim (void)
   static ALLEGRO_SAMPLE_INSTANCE *si = NULL;
 
   if (! cutscene_started) {
-    i = 0; key.keyboard.keycode = 0; cutscene_started = true;
+    i = 0; key.keyboard.keycode = 0; button = -1; cutscene_started = true;
   }
 
-  if (key.keyboard.keycode) {
+  if (key.keyboard.keycode
+      || button != -1) {
     quit_anim = true;
     return;
   }
@@ -377,10 +378,11 @@ cutscene_01_05_11_anim (void)
   static ALLEGRO_SAMPLE_INSTANCE *si = NULL;
 
   if (! cutscene_started) {
-    i = 0; key.keyboard.keycode = 0; cutscene_started = true;
+    i = 0; key.keyboard.keycode = 0; button = -1; cutscene_started = true;
   }
 
-  if (key.keyboard.keycode) {
+  if (key.keyboard.keycode
+      || button != -1) {
     quit_anim = true;
     return;
   }
@@ -429,10 +431,11 @@ cutscene_11_little_time_left_anim (void)
   static ALLEGRO_SAMPLE_INSTANCE *si = NULL;
 
   if (! cutscene_started) {
-    i = 0; key.keyboard.keycode = 0; cutscene_started = true;
+    i = 0; key.keyboard.keycode = 0; button = -1; cutscene_started = true;
   }
 
-  if (key.keyboard.keycode) {
+  if (key.keyboard.keycode
+      || button != -1) {
     quit_anim = true;
     return;
   }
@@ -496,10 +499,11 @@ cutscene_03_anim (void)
   static ALLEGRO_SAMPLE_INSTANCE *si = NULL;
 
   if (! cutscene_started) {
-    i = 0; key.keyboard.keycode = 0; cutscene_started = true;
+    i = 0; key.keyboard.keycode = 0; button = -1; cutscene_started = true;
   }
 
-  if (key.keyboard.keycode) {
+  if (key.keyboard.keycode
+      || button != -1) {
     quit_anim = true;
     return;
   }
@@ -548,10 +552,11 @@ cutscene_07_anim (void)
   static ALLEGRO_SAMPLE_INSTANCE *si = NULL;
 
   if (! cutscene_started) {
-    i = 0; key.keyboard.keycode = 0; cutscene_started = true;
+    i = 0; key.keyboard.keycode = 0; button = -1; cutscene_started = true;
   }
 
-  if (key.keyboard.keycode) {
+  if (key.keyboard.keycode
+      || button != -1) {
     quit_anim = true;
     return;
   }
@@ -623,10 +628,11 @@ cutscene_08_anim (void)
   static ALLEGRO_SAMPLE_INSTANCE *si = NULL;
 
   if (! cutscene_started) {
-    i = 0; key.keyboard.keycode = 0; cutscene_started = true;
+    i = 0; key.keyboard.keycode = 0; button = -1; cutscene_started = true;
   }
 
-  if (key.keyboard.keycode) {
+  if (key.keyboard.keycode
+      || button != -1) {
     quit_anim = true;
     return;
   }
@@ -706,10 +712,11 @@ cutscene_14_anim (void)
   static ALLEGRO_SAMPLE_INSTANCE *si = NULL;
 
   if (! cutscene_started) {
-    i = 0; key.keyboard.keycode = 0; cutscene_started = true;
+    i = 0; key.keyboard.keycode = 0; button = -1; cutscene_started = true;
   }
 
-  if (key.keyboard.keycode && i > 5) {
+  if ((key.keyboard.keycode || button != -1)
+      && i > 5) {
     quit_anim = RESTART_GAME;
     return;
   }
@@ -789,6 +796,7 @@ cutscene_14_anim (void)
       start_video_effect (VIDEO_FADE_IN, SECS_TO_VCYCLES (1));
       si = play_sample (happy_end_sample, -1);
       key.keyboard.keycode = 0;
+      button = -1;
       i++;
     }
     break;
@@ -839,7 +847,7 @@ cutscene_out_of_time_anim (void)
   static ALLEGRO_SAMPLE_INSTANCE *si = NULL;
 
   if (! cutscene_started) {
-    i = 0; key.keyboard.keycode = 0; cutscene_started = true;
+    i = 0; key.keyboard.keycode = 0; button = -1; cutscene_started = true;
   }
 
   /* if (key.keyboard.keycode) { */

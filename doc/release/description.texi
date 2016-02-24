@@ -14,35 +14,20 @@
 @c
 
 MININIM is the Advanced Prince of Persia Engine --- a childhood dream,
-the free software engine for Jordan Mechner's masterpiece, developed
-from scratch by Bruno Félix Rezende Ribeiro (@code{oitofelix}).
+the free software implementation of Jordan Mechner's masterpiece game,
+developed from scratch by Bruno Félix Rezende Ribeiro
+(@code{oitofelix}).  @emph{MININIM is free software}; you can
+redistribute it and/or modify it under the terms of the GNU
+@acronym{@url{@value{progLicenseURL}, GPL}, General Public Licence} as
+published by the @acronym{FSF, Free Software Foundation}; either version
+3, or (at your option) any later version.
 
-@ifset homepage
-@ifclear announcement
-@multitable {} {}
-@item @image{images/gpl} @tab
-@emph{MININIM is free software}; you can redistribute it and/or modify
-it under the terms of the GNU @acronym{@url{@value{progLicenseURL},
-GPL}, General Public Licence} as published by the @acronym{FSF, Free
-Software Foundation}; either version 3, or (at your option) any later
-version.
-@end multitable
-@end ifclear
-@end ifset
-
-MININIM aims to have detailed documentation on all matters concerning
-the original 1989 Prince of Persia world, ranging from its design
-concepts to the engine's practical use and development.
-
-@ifset homepage
-@ifclear announcement
-@multitable {} {}
-@item @image{images/fdl} @tab
-@emph{MININIM documentation is free}; you can redistribute it and/or
-modify it under the terms of the GNU
+In addition to being already a complete replacement for the original
+game with several improvements, MININIM aims to have detailed
+documentation on all matters concerning the original Prince of Persia
+world, ranging from its design concepts to the engine's practical use
+and development.  @emph{MININIM documentation is free}; you can
+redistribute it and/or modify it under the terms of the GNU
 @acronym{@url{@value{docLicenseURL}, FDL}, Free Documentation Licence}
 as published by the FSF --- with no Invariant Sections; either version
 1.3, or (at your option) any later version.
-@end multitable
-@end ifclear
-@end ifset

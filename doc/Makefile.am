@@ -33,7 +33,7 @@ SUBDIRS = man
 
 TEXI2DVI := ${TEXI2DVI} ${texinfo_includes}
 
-
+AUTOMAKE_OPTIONS = foreign no-installinfo
 
 
 
@@ -57,7 +57,9 @@ mininim_TEXINFOS = \
   $(addprefix philosophy/,${philosophy_doc:=.texi}) \
   copying.texi \
   release/description.texi \
-	release/donating.texi
+	release/donating.texi \
+	release/latest-news.texi \
+  release/todo-items.texi
 
 EXTRA_DIST = mininim-figures
 
