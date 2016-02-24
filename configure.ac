@@ -253,7 +253,7 @@ AS_CASE([$host],
   AS_IF([[test x$MAKEINFO != x]],
     # Put `makeinfo' version in variable `texinfo_version'.
     [[texinfo_version=`$MAKEINFO --version |
-        $SED -n 's/^makeinfo.* \(@<:@@<:@:digit:@:>@.@:>@*\)$/\1/p'`]]
+        $SED -n '1s/^.* \(@<:@@<:@:digit:@:>@.@:>@*\)$/\1/p'`]]
 
     # If `makeinfo' version is less than TEXINFO_VER, print an error
     # message and abort when building from VCS checkout or warn the user
@@ -325,7 +325,7 @@ AS_IF([test x$VCS = xy],
 
   AC_MSG_CHECKING([Texinfo version])
   AC_SUBST([TEXINFO_VERSION], `$MAKEINFO --version |
-    $SED -n 's/^makeinfo.* \(@<:@@<:@:digit:@:>@.@:>@*\)$/\1/p'`)
+    $SED -n '1s/^.* \(@<:@@<:@:digit:@:>@.@:>@*\)$/\1/p'`)
   AC_MSG_RESULT([$TEXINFO_VERSION]))
 
 
