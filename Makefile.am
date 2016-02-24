@@ -146,9 +146,9 @@ WINDRES = windres
 	$(WINDRES) $(WINDRESFLAGS) -o $@ $<
 
 install-data-hook:
-	$(MKDIR_P) "${pkgdatadir}"
-	chmod u+w "${pkgdatadir}"
-	cp -rv "${top_srcdir}/data" "${pkgdatadir}"
+	$(MKDIR_P) "${DESTDIR}${pkgdatadir}"
+	chmod u+w "${DESTDIR}${pkgdatadir}"
+	cp -rv "${top_srcdir}/data" "${DESTDIR}${pkgdatadir}"
 
 uninstall-local:
 	find "${pkgdatadir}/data" \( -type f -or -type d \) \
