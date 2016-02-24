@@ -31,4 +31,5 @@ which use it.
 @item @file{LEVELS.DAT} legacy loading behavior.
 @item Guards have infallible defense in refraction periods.
 @item Fix spurious wall collision occurring in kid's stabilization movement.
+@item Fix bug where the kid can't hang on a ledge after a long floating fall.
 @end itemize

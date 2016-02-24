@@ -102,11 +102,13 @@ physics_in (struct anim *k)
   struct frame_offset fo;
 
   bool hang_back = ((k->f.dir == LEFT) ? k->key.right : k->key.left)
-    && ! k->key.up && k->key.shift && k->i < 9
+    && ! k->key.up && k->key.shift
+    && (k->i < 9 || al_get_timer_started (k->floating))
     && k->current_lives > 0;
 
   bool hang_front = k->key.shift && ! hang_back
-    && k->i < 9 && k->current_lives > 0;
+    && (k->i < 9 || al_get_timer_started (k->floating))
+    && k->current_lives > 0;
 
   int dir = (k->f.dir == LEFT) ? -1 : +1;
 
