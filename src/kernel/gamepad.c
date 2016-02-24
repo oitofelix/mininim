@@ -214,10 +214,10 @@ joystick_info (void)
   printf ("Sticks: %i\n", al_get_joystick_num_sticks (joystick));
 
   for (i = 0; i < al_get_joystick_num_sticks (joystick); i++) {
-    printf ("\t%i: %s [%i axes]\n", i, al_get_joystick_stick_name (joystick, i),
+    printf ("  %i: %s [%i axes]\n", i, al_get_joystick_stick_name (joystick, i),
             al_get_joystick_num_axes (joystick, i));
     for (j = 0; j < al_get_joystick_num_axes (joystick, i); j++)
-      printf ("\t\t%i: %s (%f)", j, al_get_joystick_axis_name (joystick, i, j),
+      printf ("    %i: %s (%f)", j, al_get_joystick_axis_name (joystick, i, j),
               joystick_state.stick[i].axis[j]);
     printf ("\n");
   }
@@ -225,7 +225,7 @@ joystick_info (void)
   printf ("Buttons: %i\n", al_get_joystick_num_buttons (joystick));
 
   for (i = 0; i < al_get_joystick_num_buttons (joystick); i++) {
-    printf ("\t%i: %s (%i)\n", i, al_get_joystick_button_name (joystick, i),
+    printf ("  %i: %s (%i)\n", i, al_get_joystick_button_name (joystick, i),
             joystick_state.button[i]);
   }
 
