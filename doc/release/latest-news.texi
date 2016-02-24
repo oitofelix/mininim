@@ -33,5 +33,7 @@ which use it.
 @item Disable screensaver by default.
 @item Guards have infallible defense in refraction periods.
 @item Fix spurious wall collision occurring in kid's stabilization movement.
-@item Fix bug where the kid can't hang on a ledge after a long floating fall.
+@item Fix bug where the kid couldn't hang on a ledge after a long floating fall.
+@item Fix bug where the kid's @emph{run} movement after a
+@emph{running turn} started one frame off.
 @end itemize

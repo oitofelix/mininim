@@ -111,7 +111,7 @@ flow (struct anim *k)
 
   if (k->i == 7) k->i = -1;
 
-  if (k->f.b == kid_turn_run_frameset[8].frame) k->i = 6;
+  if (k->f.b == kid_turn_run_frameset[8].frame) k->i = 5;
 
   select_frame (k, kid_run_frameset, k->i + 1);
 
