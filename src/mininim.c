@@ -426,11 +426,11 @@ optval_to_enum (int *retval, int key, char *arg, struct argp_state *state,
 static error_t
 option_get_args (int key, char *arg, struct argp_state *state, char s, ...)
 {
-  va_list ap, at, av, as, ar, atype, astr, aval, arange;
+  va_list ap, at, av, as, ar, atype, aval, arange;
   int i;
   error_t retval;
-  char *template;
-  xasprintf (&template, "");
+  char *arg2;
+  xasprintf (&arg2, "%s", arg);
   char *estr;
 
   /* initialize argument lists */
@@ -440,7 +440,6 @@ option_get_args (int key, char *arg, struct argp_state *state, char s, ...)
   va_start (as, s);
   va_start (ar, s);
   va_start (atype, s);
-  va_start (astr, s);
   va_start (aval, s);
   va_start (arange, s);
 
@@ -459,39 +458,26 @@ option_get_args (int key, char *arg, struct argp_state *state, char s, ...)
   va_start (atype, s);
   va_copy (ap, atype);
   for (i = 0; i <= num_args; i++) va_arg (ap, enum opt_arg_type);
-  va_copy (astr, ap);
-  for (i = 0; i < num_args; i++) va_arg (ap, char **);
   va_copy (aval, ap);
   for (i = 0; i < num_args; i++) va_arg (ap, void *);
   va_copy (arange, ap);
 
-  /* build template string */
-  for (i = 0; i < num_args; i++) {
-    char *str = template;
-    if (i)
-      xasprintf (&template, "%s%c%%a[^%c]", template, s, s);
-    else xasprintf (&template, "%%a[^%c]", s);
-    al_free (str);
-  }
-
-  /* get argument strings */
-  va_copy (ap, astr);
-  if (vsscanf (arg, template, ap) != num_args) {
-    xasprintf (&estr, "Reason: less than %i arguments provided.", num_args);
-    option_arg_error (key, arg, state, -1, estr);
-    al_free (estr);
-    retval = EINVAL;
-    goto end;
-  }
-
   /* get values and check ranges */
   va_copy (at, atype);
-  va_copy (as, astr);
   va_copy (av, aval);
   va_copy (ar, arange);
   for (i = 0; i < num_args; i++) {
     enum opt_arg_type type = va_arg (at, enum opt_arg_type);
-    char *str = *va_arg (as, char **);
+
+    char *str = strtok (i ? NULL : arg2, ",");
+    if (! str) {
+      xasprintf (&estr, "Reason: less than %i arguments provided.", num_args);
+      option_arg_error (key, arg, state, -1, estr);
+      al_free (estr);
+      retval = EINVAL;
+      goto end;
+    }
+
     void *val = va_arg (av, void *);
     void *range = va_arg (ar, void *);
 
@@ -525,10 +511,9 @@ option_get_args (int key, char *arg, struct argp_state *state, char s, ...)
   va_end (as);
   va_end (ar);
   va_end (atype);
-  va_end (astr);
   va_end (aval);
   va_end (arange);
-  al_free (template);
+  al_free (arg2);
   return retval;
 }
 
@@ -555,7 +540,6 @@ parser (int key, char *arg, struct argp_state *state)
   struct config_info config_info;
   float float_val;
   int int_val0, int_val1;
-  char *str0, *str1, *str2;
 
   char *level_module_enum[] = {"LEGACY", "PLV", "DAT", "CONSISTENCY", NULL};
 
@@ -748,14 +732,13 @@ parser (int key, char *arg, struct argp_state *state)
     break;
   case WINDOW_POSITION_OPTION:
     e = option_get_args (key, arg, state, ',', ARG_TYPE_INT, ARG_TYPE_INT, 0,
-                         &str0, &str1, &x, &y,
-                         &window_position_range, &window_position_range);
+                         &x, &y, &window_position_range, &window_position_range);
     if (e) return e;
     al_set_new_window_position (x, y);
     break;
   case WINDOW_DIMENSIONS_OPTION:
     e = option_get_args (key, arg, state, 'x', ARG_TYPE_INT, ARG_TYPE_INT, 0,
-                         &str0, &str1, &display_width, &display_height,
+                         &display_width, &display_height,
                          &window_dimensions_range, &window_dimensions_range);
     if (e) return e;
     break;
@@ -770,7 +753,7 @@ parser (int key, char *arg, struct argp_state *state)
     break;
   case JOYSTICK_AXIS_THRESHOLD_OPTION:
     e = option_get_args (key, arg, state, ',', ARG_TYPE_ENUM, ARG_TYPE_FLOAT, 0,
-                         &str0, &str1, &i, &float_val, joystick_axis_threshold_enum,
+                         &i, &float_val, joystick_axis_threshold_enum,
                          &joystick_axis_threshold_range);
     if (e) return e;
     switch (i) {
@@ -780,7 +763,7 @@ parser (int key, char *arg, struct argp_state *state)
     break;
   case JOYSTICK_BUTTON_THRESHOLD_OPTION:
     e = option_get_args (key, arg, state, ',', ARG_TYPE_ENUM, ARG_TYPE_INT, 0,
-                         &str0, &str1, &i, &int_val0, joystick_button_threshold_enum,
+                         &i, &int_val0, joystick_button_threshold_enum,
                          &joystick_button_threshold_range);
     if (e) return e;
     switch (i) {
@@ -793,8 +776,9 @@ parser (int key, char *arg, struct argp_state *state)
     }
     break;
   case JOYSTICK_AXIS_OPTION:
-    e = option_get_args (key, arg, state, ',', ARG_TYPE_ENUM, ARG_TYPE_INT, ARG_TYPE_INT, 0,
-                         &str0, &str1, &str2, &i, &int_val0, &int_val1, joystick_axis_enum,
+    e = option_get_args (key, arg, state, ',',
+                         ARG_TYPE_ENUM, ARG_TYPE_INT, ARG_TYPE_INT, 0,
+                         &i, &int_val0, &int_val1, joystick_axis_enum,
                          &joystick_axis_range, &joystick_axis_range);
     if (e) return e;
     switch (i) {
@@ -810,8 +794,7 @@ parser (int key, char *arg, struct argp_state *state)
     break;
   case JOYSTICK_BUTTON_OPTION:
     e = option_get_args (key, arg, state, ',', ARG_TYPE_ENUM, ARG_TYPE_INT, 0,
-                         &str0, &str1, &i, &int_val0, joystick_button_enum,
-                         &joystick_button_range);
+                         &i, &int_val0, joystick_button_enum, &joystick_button_range);
     if (e) return e;
     switch (i) {
     case 0: joystick_up_button = int_val0; break;
