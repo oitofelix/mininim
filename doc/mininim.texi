@@ -840,24 +840,56 @@ original game, in which the kid delays one cycle to respond.}
 @kindex BACK
 @kbd{FRONT} and @kbd{BACK} are meta-keys used to refer to @kbd{LEFT} and
 @kbd{RIGHT} conditionally subject to kid's facing direction.  The
-@kbd{UP} and @kbd{DOWN} directional keys are simply referred as such.
+@kbd{UP}, @kbd{DOWN}, @kbd{SHIFT} and @kbd{ENTER} keys are simply
+referred as such.  The following figure illustrates how these keys
+appear in a common keyboard.
 
-The classic numeric keypad controls can be used.  The equivalence
-between this and the common arrows method is given by the following
-table.  Additionally, the numeric keypad @kbd{ENTER} key corresponds to
-the main @kbd{ENTER} key.
+@center @image{mininim-figures/keyboard}
 
-@multitable @columnfractions .50 .50
-@headitem Numeric keypad @tab Arrows
-@item @kbd{4} @tab @kbd{LEFT}
-@item @kbd{8} @tab @kbd{UP}
-@item @kbd{6} @tab @kbd{RIGHT}
-@item @kbd{5}, @kbd{2} @tab @kbd{DOWN}
-@item @kbd{7} @tab @kbd{LEFT} and @kbd{UP}
-@item @kbd{9} @tab @kbd{RIGHT} and @kbd{UP}
-@item @kbd{1} @tab @kbd{LEFT} and @kbd{DOWN}
-@item @kbd{3} @tab @kbd{RIGHT} and @kbd{DOWN}
-@end multitable
+@iftex
+@page
+@end iftex
+
+@node Alternative gamepads
+@section Alternative gamepads
+@cindex alternative gamepads
+@cindex gamepads, alternative
+
+@cindex numeric keypad
+@cindex keypad, numeric
+@cindex gamepad, numeric keypad
+The classic numeric keypad controls, described in the original game's
+manual, may be used.  Its mapping is shown in the following figure.
+
+@center @image{mininim-figures/keypad}
+
+@smallindentedblock
+@center @kbd{ENTER} (@kbd{ENTER}) @kbd{4} (@kbd{LEFT}) @kbd{8} (@kbd{UP}) @kbd{6} (@kbd{RIGHT}) @kbd{5}, @kbd{2} (@kbd{DOWN})
+@center @kbd{7} (@kbd{LEFT} + @kbd{UP}) @kbd{9} (@kbd{RIGHT} + @kbd{UP}) @kbd{1} (@kbd{LEFT} + @kbd{DOWN}) @kbd{3} (@kbd{RIGHT} + @kbd{DOWN})
+@end smallindentedblock
+
+
+@cindex joystick mapping
+@cindex mapping joystick
+@cindex gamepad, joystick
+You can also use a joystick to control the kid.  After hot-plugging the
+joystick in, make sure the axes are centered and no button is pressed,
+then press @kbd{CTRL+J} to enable and auto-calibrate your joystick
+on-the-fly.  The figure below shows the default assumed joystick layout.
+If for some reason your joystick doesn't work with this mapping or you
+want to modify the default mapping, use the @option{--joystick-axis} and
+@option{--joystick-button} options.  In case your joystick starts to
+behave oddly, press @kbd{CTRL+J} again to re-calibrate it.  If the kid
+continues to perform spurious movements, the options
+@option{--joystick-axis-threshold} and
+@option{--joystick-button-threshold} may help.  @xref{Gamepad options}.
+
+@center @image{mininim-figures/joystick}
+
+@smallindentedblock
+@center @strong{H-} (@kbd{LEFT}) @strong{H+} (@kbd{RIGHT}) @strong{V-} (@kbd{UP}) @strong{V+} (@kbd{DOWN})
+@center @strong{0} (@kbd{UP}) @strong{1} (@kbd{RIGHT}) @strong{2} (@kbd{DOWN}) @strong{3} (@kbd{LEFT}) @strong{4} (@kbd{ENTER}) @strong{5} (@kbd{SHIFT}) @strong{8} (@kbd{TIME}) @strong{9} (@kbd{PAUSE})
+@end smallindentedblock
 
 
 
