@@ -22,6 +22,7 @@
 @itemize
 @item Joystick support.
 @item Apoplexy level editor integration.
+@item Classic numeric keypad control.
 @item Support for reading legacy PoP 1 @file{LEVELS.DAT} file using
 the option @option{--legacy-level=DAT}.
 @item Support for reading legacy PoP 1 PLV extended level files using
@@ -29,11 +30,15 @@ the option @option{--legacy-level=PLV}.
 @item Command line compatibility for the sake of applications
 which use it.
 @item @file{LEVELS.DAT} legacy loading behavior compatibility.
-@item Classic numeric keypad control.
 @item Disable screensaver by default.
 @item Guards have infallible defense in refraction periods.
-@item Fix spurious wall collision occurring in kid's stabilization movement.
-@item Fix bug where the kid couldn't hang on a ledge after a long floating fall.
-@item Fix bug where the kid's @emph{run} movement after a
-@emph{running turn} started one frame off.
+@item @strong{Bug fix:} spurious wall collision occurs in kid's
+stabilization movement.
+@item @strong{Bug fix:} kid can't hang on a ledge after a
+long floating fall.
+@item @strong{Bug fix:} kid's @emph{run} movement after a
+@emph{running turn} starts one frame off.
+@item @strong{Bug fix:} in some circumstances the kid is unable to reach
+the other end after a jump, as if a force field prevented him from
+landing there.
 @end itemize

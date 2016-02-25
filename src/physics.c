@@ -389,15 +389,12 @@ uncollide (struct frame *f, struct frame_offset *fo,
            struct frame_offset *_fo, int dx,
            int reverse, struct collision_info *ci)
 {
-  int ow = al_get_bitmap_width (f->b);
-  int w = al_get_bitmap_width (fo->b);
-
   *_fo = *fo;
 
   int inc = reverse ? -1 : +1;
 
   while (is_colliding (f, _fo, dx, reverse, ci)
-         && abs (_fo->dx) <= abs (ow - w + 1))
+         && abs (_fo->dx) <= PLACE_WIDTH)
     _fo->dx += inc;
 
   return _fo;
