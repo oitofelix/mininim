@@ -207,10 +207,28 @@ physics_out (struct anim *k)
 }
 
 bool
+is_kid_run_jump (struct frame *f)
+{
+  int i;
+  for (i = 0; i < KID_RUN_JUMP_FRAMESET_NMEMB; i++)
+    if (f->b == kid_run_jump_frameset[i].frame) return true;
+  return false;
+}
+
+bool
 is_kid_run_jump_running (struct frame *f)
 {
   int i;
   for (i = 0; i < 5; i++)
+    if (f->b == kid_run_jump_frameset[i].frame) return true;
+  return false;
+}
+
+bool
+is_kid_run_jump_air (struct frame *f)
+{
+  int i;
+  for (i = 5; i < 9; i++)
     if (f->b == kid_run_jump_frameset[i].frame) return true;
   return false;
 }

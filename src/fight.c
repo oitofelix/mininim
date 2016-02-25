@@ -153,9 +153,9 @@ fight_ai (struct anim *k)
   /* what's the facing opposite direction? */
   enum dir odir = (k->f.dir == LEFT) ? RIGHT : LEFT;
 
-  /* prevent enemy from passing through harmlessly */
-  if (is_near (k, ke) && ! is_in_fight_mode (ke))
-    fight_hit (ke, k);
+  /* /\* prevent enemy from passing through harmlessly *\/ */
+  /* if (is_near (k, ke) && ! is_in_fight_mode (ke)) */
+  /*   fight_hit (ke, k); */
 
   /* if the enemy is on the back, turn */
   struct coord nc; struct pos p, pe;
@@ -179,6 +179,18 @@ fight_ai (struct anim *k)
   if (! is_safe_to_follow (k, ke, k->f.dir)
       && is_safe_to_follow (k, ke, odir)) {
     fight_turn (k);
+    return;
+  }
+
+  /* if the enemy is trying to bypass, attack him */
+  if (! is_in_fight_mode (ke)
+      && ke->f.dir != k->f.dir
+      && is_in_range (k, ke, 4 * PLACE_WIDTH)
+      && (is_kid_run (&ke->f)
+          || is_kid_run_jump (&ke->f)
+          || (is_kid_jump (&ke->f) && ke->i > 5))) {
+    if (is_safe_to_attack (k)) fight_attack (k);
+    else if (is_safe_to_walkb (k)) fight_walkb (k);
     return;
   }
 
@@ -242,9 +254,9 @@ fight_ai (struct anim *k)
   /* in attack range, if not being attacked, attack (with probability,
      unless the enemy is not in fight mode, then attack immediately) */
   if (! is_attacking (ke)
-           && is_in_range (k, ke, ATTACK_RANGE)
-           && (prandom (99) <= k->skill.attack_prob
-               || ! is_in_fight_mode (ke))) {
+      && is_in_range (k, ke, ATTACK_RANGE)
+      && (prandom (99) <= k->skill.attack_prob
+          || ! is_in_fight_mode (ke))) {
     if (is_safe_to_attack (k)) fight_attack (k);
     else if (is_safe_to_walkb (k)) fight_walkb (k);
     return;
