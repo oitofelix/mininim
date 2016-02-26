@@ -300,9 +300,8 @@ guard_die_spiked (struct anim *g)
   else dy = (g->f.dir == LEFT) ? +32 : +31;
 
   ALLEGRO_BITMAP *bitmap = get_guard_die_spiked_bitmap (g->type);
-  if (g->oaction != guard_die_spiked)
-    place_frame (&g->f, &g->f, bitmap,
-                 &g->p, (g->f.dir == LEFT) ? +8 : +9, dy);
+  place_frame (&g->f, &g->f, bitmap,
+               &g->p, (g->f.dir == LEFT) ? +8 : +9, dy);
 
   g->xf.b = NULL;
 }
@@ -337,8 +336,9 @@ guard_die_chopped (struct anim *g)
   }
 
   ALLEGRO_BITMAP *bitmap = get_guard_die_chopped_bitmap (g->type);
+  place_frame (&g->f, &g->f, bitmap, &g->p, dx, dy);
+
   if (g->oaction != guard_die_chopped) {
-    place_frame (&g->f, &g->f, bitmap, &g->p, dx, dy);
     struct anim *ke = get_anim_by_id (g->oenemy_id);
     if (ke && ke->id == current_kid_id
         && g->death_reason != SHADOW_FIGHT_DEATH)
@@ -364,11 +364,11 @@ guard_die_suddenly (struct anim *g)
 
   int dy = (g->type == SKELETON) ? +44 : +47;
 
-  if (g->oaction != guard_die_suddenly) {
-    place_frame (&g->f, &g->f, frameset[5].frame,
-                 &g->p, (g->f.dir == LEFT)
-                 ? +9 : +4, dy);
+  place_frame (&g->f, &g->f, frameset[5].frame,
+               &g->p, (g->f.dir == LEFT)
+               ? +9 : +4, dy);
 
+  if (g->oaction != guard_die_suddenly) {
     struct anim *ke = get_anim_by_id (g->oenemy_id);
     if (ke && ke->id == current_kid_id
         && g->death_reason != SHADOW_FIGHT_DEATH)

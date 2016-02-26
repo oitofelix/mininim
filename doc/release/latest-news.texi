@@ -57,4 +57,6 @@ because MININIM is lacking platform edge detection.
 manages to pass through them without being hit.
 @item @strong{Bug fix:} guards continue to advance towards the kid,
 even when he is running towards them.
+@item @strong{Bug fix:} guard mode changing doesn't work for guards
+that died falling, spiked or chopped.
 @end itemize
