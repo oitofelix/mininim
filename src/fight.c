@@ -161,6 +161,7 @@ fight_ai (struct anim *k)
   /* prevent enemy from passing through */
   if (is_near (k, ke)
       && ! is_in_fight_mode (ke)
+      && ! ke->immortal
       && ke->f.dir != k->f.dir
       && (is_kid_run_jump (&ke->f)
           || is_kid_jump_air (&ke->f)
