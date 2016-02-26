@@ -607,6 +607,18 @@ dim (struct frame *f, struct dim *d)
   return d;
 }
 
+/* cons coordinates */
+
+struct coord *
+con_m (struct pos *p, struct coord *c)
+{
+  c->room = p->room;
+  c->x = PLACE_WIDTH * p->place + 15 + PLACE_WIDTH / 2;
+  c->y = PLACE_HEIGHT * p->floor + 3 + PLACE_HEIGHT / 2;
+  return c;
+}
+
+
 /* <->
    000
    010

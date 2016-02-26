@@ -100,8 +100,19 @@ flow (struct anim *k)
   }
 
   if (jump && k->f.b != kid_run_jump_frameset[10].frame) {
-    kid_run_jump (k);
-    return false;
+    /* platform edge detection */
+    struct coord mf, cm; struct pos np, pmf;
+    survey (_mf, pos, &k->f, &mf, &pmf, &np);
+    int dir = (k->f.dir == LEFT) ? -1 : +1;
+    struct pos p;
+    prel (&pmf, &p, +0, dir * 2);
+    con_m (&p, &cm);
+    if (! (strictly_traversable_cs (crel (&pmf, +0, dir * 2)->fg)
+           && ! strictly_traversable_cs (crel (&pmf, +0, dir)->fg)
+           && dist_coord (&mf, &cm) > 2 * PLACE_WIDTH - 4)) {
+      kid_run_jump (k);
+      return false;
+    }
   }
 
   if ((stop && k->f.b != kid_run_jump_frameset[10].frame)) {

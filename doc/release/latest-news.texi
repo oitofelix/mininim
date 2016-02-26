@@ -51,4 +51,6 @@ kid defends even if too far from the guard, when he could otherwise let
 the guard strike only thin air.
 @item @strong{Bug fix:} restarting the game while it's paused causes it
 to get stuck in a paused state after the title screen.
+@item @strong{Bug fix:} it's hard to perform 3-tile running jumps
+because MININIM is lacking platform edge detection.
 @end itemize
