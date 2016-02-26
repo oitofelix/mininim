@@ -153,14 +153,24 @@ fight_ai (struct anim *k)
   /* what's the facing opposite direction? */
   enum dir odir = (k->f.dir == LEFT) ? RIGHT : LEFT;
 
-  /* /\* prevent enemy from passing through harmlessly *\/ */
-  /* if (is_near (k, ke) && ! is_in_fight_mode (ke)) */
-  /*   fight_hit (ke, k); */
-
-  /* if the enemy is on the back, turn */
+  /* get positions */
   struct coord nc; struct pos p, pe;
   get_pos (k, &p, &nc);
   get_pos (ke, &pe, &nc);
+
+  /* prevent enemy from passing through */
+  if (is_near (k, ke)
+      && ! is_in_fight_mode (ke)
+      && ke->f.dir != k->f.dir
+      && (is_kid_run_jump (&ke->f)
+          || is_kid_jump_air (&ke->f)
+          || is_kid_run (&ke->f))) {
+    place_at_distance (&k->f, _tf, &ke->f, _tf, 10, k->f.dir, &ke->f.c);
+    place_on_the_ground (&ke->f, &ke->f.c);
+    kid_stabilize (ke);
+  }
+
+  /* if the enemy is on the back, turn */
   if (is_on_back (k, ke) && is_seeing (k, ke, odir)
       && p.floor == pe.floor) {
     if (is_safe_to_turn (k)) fight_turn (k);
@@ -185,17 +195,26 @@ fight_ai (struct anim *k)
   /* if the enemy is trying to bypass, attack him */
   if (! is_in_fight_mode (ke)
       && ke->f.dir != k->f.dir
-      && is_in_range (k, ke, 4 * PLACE_WIDTH)
-      && (is_kid_run (&ke->f)
-          || is_kid_run_jump (&ke->f)
-          || (is_kid_jump (&ke->f) && ke->i > 5))) {
+      && ((is_kid_run (&ke->f)
+           && is_in_range (k, ke, 3 * PLACE_WIDTH - 4))
+          || (is_kid_run_jump (&ke->f)
+              && is_in_range (k, ke, 4 * PLACE_WIDTH - 4))
+          || (is_kid_jump_air (&ke->f) && ke->i < 9
+              && is_in_range (k, ke, 4 * PLACE_WIDTH)))) {
     if (is_safe_to_attack (k)) fight_attack (k);
     else if (is_safe_to_walkb (k)) fight_walkb (k);
     return;
   }
 
-  /* stays at least in the fight range */
+  /* stays at least in the fight range.  Advance, unless the enemy is
+     not running towards you */
   if (! is_in_range (k, ke, FIGHT_RANGE)
+      && (ke->f.dir == k->f.dir
+          || p.room != pe.room
+          || p.floor != pe.floor
+          || ! (is_kid_run (&ke->f)
+                || is_kid_run_jump (&ke->f)
+                || is_kid_jump (&ke->f)))
       && is_safe_to_follow (k, ke, k->f.dir)
       /* && is_safe_to_walkf (k) */
       ) {

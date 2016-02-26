@@ -53,4 +53,8 @@ the guard strike only thin air.
 to get stuck in a paused state after the title screen.
 @item @strong{Bug fix:} it's hard to perform 3-tile running jumps
 because MININIM is lacking platform edge detection.
+@item @strong{Bug fix:} kid doesn't stumble on guards, in case he
+manages to pass through them without being hit.
+@item @strong{Bug fix:} guards continue to advance towards the kid,
+even when he is running towards them.
 @end itemize
