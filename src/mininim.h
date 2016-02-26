@@ -173,6 +173,7 @@ extern bool immortal_mode;
 extern int initial_total_lives, total_lives,
   initial_current_lives, current_lives;
 extern int start_level;
+extern struct pos start_pos;
 extern int time_limit;
 extern struct skill skill;
 extern char *resources_dir,

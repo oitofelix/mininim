@@ -133,6 +133,7 @@ fact that it's a really cool palindrome!}
 @chapter Constructions
 @cindex constructions
 
+@cindex position
 @cindex room
 @cindex floor
 @cindex place
@@ -1955,6 +1956,16 @@ The default is @samp{LEGACY}.
 Make the kid start at level @var{n}.  The default is @samp{1}.  Valid
 integers range from @samp{1} to @code{INT_MAX}.  This can be changed
 in-game by the @kbd{SHIFT+L} key binding.
+
+@optindex --start-pos
+@cindex position, option
+@cindex option position
+@item --start-pos=R,F,P
+Make the kid start at room @var{r}, floor @var{f} and place @var{p}.
+The default is to let this decision to the level module.  @var{r} is an
+integer ranging from 1 to @code{INT_MAX}, @var{f} is an integer ranging
+from 0 to 2 and @var{p} is an integer ranging from 0 to 9.
+@xref{Constructions}.
 @end table
 
 @cindex @file{LEVELS.DAT}

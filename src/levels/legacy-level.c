@@ -80,7 +80,14 @@ start (void)
   else auto_rem_time_1st_cycle = 24;
 
   /* create kid */
-  int id = create_anim (NULL, KID, &level.start_pos, level.start_dir);
+  struct pos kid_start_pos;
+  if ((start_pos.room != 0
+       || start_pos.floor != 0
+       || start_pos.place != 0)
+      && start_pos.room <= LROOMS)
+    kid_start_pos = start_pos;
+  else kid_start_pos = level.start_pos;
+  int id = create_anim (NULL, KID, &kid_start_pos, level.start_dir);
   struct anim *k = &anima[id];
   k->total_lives = total_lives;
   k->skill = skill;

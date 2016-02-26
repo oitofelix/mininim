@@ -34,7 +34,13 @@ play_consistency_level (int number)
 static void
 start (void)
 {
-  struct pos p = {1,0,0};
+  struct pos p;
+  if ((start_pos.room != 0
+       || start_pos.floor != 0
+       || start_pos.place != 0)
+      && start_pos.room <= LROOMS)
+    p = start_pos;
+  else p = (struct pos) {1,0,0};
   create_anim (NULL, KID, &p, RIGHT);
   create_anim (&anima[0], 0, NULL, 0);
   anima[0].controllable = true;

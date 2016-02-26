@@ -63,6 +63,7 @@ bool immortal_mode;
 int initial_total_lives = KID_INITIAL_TOTAL_LIVES, total_lives;
 int initial_current_lives = KID_INITIAL_CURRENT_LIVES, current_lives;
 int start_level = 1;
+struct pos start_pos;
 int time_limit = TIME_LIMIT;
 int start_time = START_TIME;
 struct skill skill = {.counter_attack_prob = INITIAL_KCA,
@@ -96,6 +97,7 @@ enum options {
   LOAD_CONFIG_OPTION, IGNORE_MAIN_CONFIG_OPTION, IGNORE_ENVIRONMENT_OPTION,
   JOYSTICK_AXIS_THRESHOLD_OPTION, JOYSTICK_BUTTON_THRESHOLD_OPTION,
   JOYSTICK_AXIS_OPTION, JOYSTICK_BUTTON_OPTION, JOYSTICK_INFO_OPTION,
+  START_POS_OPTION,
 };
 
 enum level_module {
@@ -120,7 +122,7 @@ static struct argp_option options[] = {
   {NULL, 0, NULL, 0, "Level:", 0},
   {"level-module", LEVEL_MODULE_OPTION, "LEVEL-MODULE", 0, "Select level module.  A level module determines a way to generate consecutive levels for use by the engine.  Valid values for LEVEL-MODULE are: LEGACY, PLV, DAT and CONSISTENCY.  LEGACY is the module designed to read the original PoP 1 raw level files.  PLV is the module designed to read the original PoP 1 PLV extended level files.  DAT is the module designed to read the original PoP 1 LEVELS.DAT file.  CONSISTENCY is the module designed to generate random-corrected levels for accessing the engine robustness.  The default is LEGACY.", 0},
   {"start-level", START_LEVEL_OPTION, "N", 0, "Make the kid start at level N.  The default is 1.  Valid integers range from 1 to INT_MAX.  This can be changed in-game by the SHIFT+L key binding.", 0},
-
+  {"start-pos", START_POS_OPTION, "R,F,P", 0, "Make the kid start at room R, floor F and place P.  The default is to let this decision to the level module.  R is an integer ranging from 1 to INT_MAX, F is an integer ranging from 0 to 2 and P is an integer ranging from 0 to 9.", 0},
   {NULL, 0, NULL, OPTION_DOC, "If the option '--level-module' is not given and there is a LEVELS.DAT file in the resources directory, the DAT level module is automatically used to load that file.  This is a compatibility measure for applications which depend upon this legacy behavior.", 0},
 
   /* Time */
@@ -540,7 +542,7 @@ parser (int key, char *arg, struct argp_state *state)
   int x, y, i, e;
   struct config_info config_info;
   float float_val;
-  int int_val0, int_val1;
+  int int_val0, int_val1, int_val2;
 
   char *level_module_enum[] = {"LEGACY", "PLV", "DAT", "CONSISTENCY", NULL};
 
@@ -569,6 +571,9 @@ parser (int key, char *arg, struct argp_state *state)
 
   struct int_range total_lives_range = {1, 10};
   struct int_range start_level_range = {1, INT_MAX};
+  struct int_range start_pos_room_range = {1, INT_MAX};
+  struct int_range start_pos_floor_range = {0, 2};
+  struct int_range start_pos_place_range = {0, 9};
   struct int_range time_limit_range = {1, INT_MAX};
   struct int_range start_time_range = {0, INT_MAX};
   struct int_range kca_range = {0, 100};
@@ -700,6 +705,15 @@ parser (int key, char *arg, struct argp_state *state)
     e = optval_to_int (&i, key, arg, state, &start_level_range, 0);
     if (e) return e;
     start_level = i;
+    break;
+  case START_POS_OPTION:
+    e = option_get_args (key, arg, state, ',', ARG_TYPE_INT, ARG_TYPE_INT, ARG_TYPE_INT, 0,
+                         &int_val0, &int_val1, &int_val2,
+                         &start_pos_room_range, &start_pos_floor_range, &start_pos_place_range);
+    if (e) return e;
+    start_pos.room = int_val0;
+    start_pos.floor = int_val1;
+    start_pos.place = int_val2;
     break;
   case TIME_LIMIT_OPTION:
     e = optval_to_int (&i, key, arg, state, &time_limit_range, 0);
