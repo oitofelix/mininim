@@ -49,4 +49,6 @@ to prevent the kid from bypassing them.
 @item @strong{Bug fix:} while in counter attack and counter defense mode
 kid defends even if too far from the guard, when he could otherwise let
 the guard strike only thin air.
+@item @strong{Bug fix:} restarting the game while it's paused causes it
+to get stuck in a paused state after the title screen.
 @end itemize

@@ -238,7 +238,7 @@ process_keys (void)
   int prev_room = room_view;
 
   /* clear the keyboard buffer at the first cycle, so any key pressed
-     on the title don't trigger any action */
+     on the title doesn't trigger any action */
   if (anim_cycle == 0) {
     memset (&key, 0, sizeof (key));
     button = -1;
