@@ -303,8 +303,10 @@ fight_mechanics (struct anim *k)
            && is_at_hit_frame (ke)
            && is_in_range (k, ke, HIT_RANGE)) fight_hit (k, ke);
   else if (ke->attack_defended == 1 && is_at_defendable_attack_frame (ke)) {
-    put_at_defense_frame (k);
-    put_at_attack_frame (ke);
+    if (is_in_range (k, ke, HIT_RANGE + 4)) {
+      put_at_defense_frame (k);
+      put_at_attack_frame (ke);
+    } else ke->attack_defended = 0;
   }
 
 /*   printf ("id: %i, ad: %i, ca: %i, cd: %i, i: %i, hurt: %i\n\ */

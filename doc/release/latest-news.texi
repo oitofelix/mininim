@@ -44,4 +44,7 @@ landing there.
 @item @strong{Bug fix:} kid dies after just touching guards.
 @item @strong{Bug fix:} guards spuriously attack thin air while trying
 to prevent the kid from bypassing them.
+@item @strong{Bug fix:} while in counter attack and counter defense mode
+kid defends even if too far from the guard, when he could otherwise let
+the guard strike only thin air.
 @end itemize
