@@ -435,69 +435,42 @@ draw_anims (ALLEGRO_BITMAP *bitmap, enum em em, enum vm vm)
 int
 compare_anims (const void *_a0, const void *_a1)
 {
-  struct coord bl0, bl1;
+  struct coord tr0, tr1;
 
   struct anim *a0 = (struct anim *) _a0;
   struct anim *a1 = (struct anim *) _a1;
 
-  _bl (&a0->f, &bl0);
-  _bl (&a1->f, &bl1);
+  if (is_kid_stairs (&a0->f) && ! is_kid_stairs (&a1->f))
+    return -1;
+  if (! is_kid_stairs (&a0->f) && is_kid_stairs (&a1->f))
+    return 1;
 
-  coord2room (&bl1, bl0.room, &bl1);
+  _tr (&a0->f, &tr0);
+  _tr (&a1->f, &tr1);
 
-  if (bl0.room < bl1.room) return -1;
-  if (bl0.room > bl1.room) return 1;
+  coord2room (&tr1, tr0.room, &tr1);
 
-  struct coord o = {bl0.room,0,ORIGINAL_HEIGHT};
+  if (tr0.room < tr1.room) return -1;
+  if (tr0.room > tr1.room) return 1;
 
-  double d0 = dist_coord (&o, &bl0);
-  double d1 = dist_coord (&o, &bl1);
+  if (is_near (a0, a1)) {
+    if (tr0.x < tr1.x) return -1;
+    if (tr0.x > tr1.x) return 1;
+  }
+
+  struct coord o = {tr0.room,0,ORIGINAL_HEIGHT};
+
+  double d0 = dist_coord (&o, &tr0);
+  double d1 = dist_coord (&o, &tr1);
 
   if (d0 < d1) return -1;
   if (d1 < d0) return 1;
 
+  if (a0->id < a1->id) return -1;
+  if (a1->id < a0->id) return 1;
+
   return 0;
 }
-
-/* int */
-/* compare_anims (const void *a0, const void *a1) */
-/* { */
-/*   struct coord nc; */
-/*   struct pos np, ptl0, ptl1, ptr0, ptr1, */
-/*     pbl0, pbl1, pbr0, pbr1; */
-
-/*   struct anim *_a0 = (struct anim *) a0; */
-/*   struct anim *_a1 = (struct anim *) a1; */
-
-/*   survey (_br, pos, &_a0->f, &nc, &np, &pbr0); */
-/*   survey (_br, pos, &_a1->f, &nc, &np, &pbr1); */
-
-/*   survey (_bl, pos, &_a0->f, &nc, &np, &pbl0); */
-/*   survey (_bl, pos, &_a1->f, &nc, &np, &pbl1); */
-
-/*   survey (_tr, pos, &_a0->f, &nc, &np, &ptr0); */
-/*   survey (_tr, pos, &_a1->f, &nc, &np, &ptr1); */
-
-/*   survey (_tl, pos, &_a0->f, &nc, &np, &ptl0); */
-/*   survey (_tl, pos, &_a1->f, &nc, &np, &ptl1); */
-
-/*   int cptr = cpos (&ptr0, &ptr1); */
-/*   if (cptr && ptr0.room == ptr1.room) return cptr; */
-
-/*   int cpbr = cpos (&pbr0, &pbr1); */
-/*   if (cpbr && pbr0.room == pbr1.room) return cpbr; */
-
-/*   int cptl = cpos (&ptl0, &ptl1); */
-/*   if (cptl && ptl0.room == ptl1.room) return cptl; */
-
-/*   int cpbl = cpos (&pbl0, &pbl1); */
-/*   if (cpbl && pbl0.room == pbl1.room) return cpbl; */
-
-/*   if (ptl0.room < ptl1.room) return -1; */
-/*   if (ptl0.room > ptl1.room) return 1; */
-
-/*   return 0; */
-/* } */
 
 void
 draw_anim_if_at_pos (ALLEGRO_BITMAP *bitmap, struct anim *a, struct pos *p,

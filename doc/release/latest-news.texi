@@ -72,4 +72,6 @@ expected if the kid manages to enter room 15 from below after exiting
 room 18 to the right.
 @item @strong{Bug fix:} guards turn too quickly when their attention is
 grabbed from opposite directions in a short period of time.
+@item @strong{Bug fix:} drawing glitches occur in several situations
+involving two characters near each other.
 @end itemize
