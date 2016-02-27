@@ -60,5 +60,7 @@ even when he is running towards them.
 @item @strong{Bug fix:} guard mode changing doesn't work for guards
 that died falling, spiked or chopped.
 @item @strong{Bug fix:} kid can't battle properly against more than one
-guard at once
+guard at once.
+@item @strong{Bug fix:} shadow death music in level 12 plays in a row if
+reviving kid with R repeatedly in a short period of time.
 @end itemize

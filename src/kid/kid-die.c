@@ -83,6 +83,7 @@ kid_resurrect (struct anim *k)
   reset_murder_spikes_floor (k->id);
   stop_sample (k->sample, death_sample);
   stop_sample (k->sample, fight_death_sample);
+  stop_sample (k->sample, success_suspense_sample);
 }
 
 void
