@@ -113,6 +113,7 @@ vorbis_ver=1.3.2
 ogg_ver=1.2.1
 zlib_ver=1.2.5
 openal_ver=1.14
+allegro_minver=5.0.9
 
 AM_CONDITIONAL([mingw_build], [expr "x$build_os" : "xmingw"])
 
@@ -162,32 +163,32 @@ AS_CASE([$host],
 
 # Default
  [PKG_CHECK_MODULES([ALLEGRO],
-  [allegro-5.0],,
-   AC_MSG_ERROR(MININIM requires Allegro 5))
+  [allegro-5.0 >= $allegro_minver],,
+   AC_MSG_ERROR([MININIM requires Allegro $allegro_minver (or superior)]))
 
   PKG_CHECK_MODULES([ALLEGRO_IMAGE],
-  [allegro_image-5.0],,
-   AC_MSG_ERROR(MININIM requires Allegro 5 image addon))
+  [allegro_image-5.0 >= $allegro_minver],,
+   AC_MSG_ERROR([MININIM requires Allegro $allegro_minver (or superior) image addon]))
 
   PKG_CHECK_MODULES([ALLEGRO_AUDIO],
-  [allegro_audio-5.0],,
-   AC_MSG_ERROR(MININIM requires Allegro 5 audio addon))
+  [allegro_audio-5.0 >= $allegro_minver],,
+   AC_MSG_ERROR([MININIM requires Allegro $allegro_minver (or superior) audio addon]))
 
   PKG_CHECK_MODULES([ALLEGRO_ACODEC],
-  [allegro_acodec-5.0],,
-   AC_MSG_ERROR(MININIM requires Allegro 5 audio codecs addon))
+  [allegro_acodec-5.0 >= $allegro_minver],,
+   AC_MSG_ERROR([MININIM requires Allegro $allegro_minver (or superior) audio codecs addon]))
 
   PKG_CHECK_MODULES([ALLEGRO_FONT],
-  [allegro_font-5.0],,
-   AC_MSG_ERROR(MININIM requires Allegro 5 font addon))
+  [allegro_font-5.0 >= $allegro_minver],,
+   AC_MSG_ERROR([MININIM requires Allegro $allegro_minver (or superior) font addon]))
 
   PKG_CHECK_MODULES([ALLEGRO_PRIMITIVES],
-  [allegro_primitives-5.0],,
-   AC_MSG_ERROR(MININIM requires Allegro 5 primitives addon))
+  [allegro_primitives-5.0 >= $allegro_minver],,
+   AC_MSG_ERROR([MININIM requires Allegro $allegro_minver (or superior) primitives addon]))
 
   PKG_CHECK_MODULES([ALLEGRO_DIALOG],
-  [allegro_dialog-5.0],,
-   AC_MSG_ERROR(MININIM requires Allegro 5 dialogs addon))])
+  [allegro_dialog-5.0 >= $allegro_minver],,
+   AC_MSG_ERROR([MININIM requires Allegro $allegro_minver (or superior) dialogs addon]))])
 
 AC_SUBST([ALLEGRO_CFLAGS])
 AC_SUBST([ALLEGRO_LIBS])
