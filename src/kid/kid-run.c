@@ -109,7 +109,7 @@ flow (struct anim *k)
     con_m (&p, &cm);
     if (! (strictly_traversable_cs (crel (&pmf, +0, dir * 2)->fg)
            && ! strictly_traversable_cs (crel (&pmf, +0, dir)->fg)
-           && dist_coord (&mf, &cm) > 2 * PLACE_WIDTH - 4)) {
+           && dist_coord (&mf, &cm) > 2 * PLACE_WIDTH - 3)) {
       kid_run_jump (k);
       return false;
     }
