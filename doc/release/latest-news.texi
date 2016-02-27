@@ -65,4 +65,6 @@ that died falling, spiked or chopped.
 guard at once.
 @item @strong{Bug fix:} shadow death music in level 12 plays in a row if
 reviving kid with R repeatedly in a short period of time.
+@item @strong{Bug fix:} legacy level rooms above room 0 may have
+traversable constructions at bottom over room 0's walls.
 @end itemize

@@ -390,3 +390,19 @@ is_loose (struct pos *p)
 {
   return con (p)->fg == LOOSE_FLOOR;
 }
+
+void
+fix_legacy_room_above_zero_with_traversable_at_bottom (void)
+{
+  struct pos p;
+
+  /* fix rooms above room 0 that have traversable cons at the
+     bottom */
+  p.floor = 2;
+  for (p.room = 1; p.room < LROOMS; p.room++)
+    for (p.place = 0; p.place < PLACES; p.place++) {
+      if (roomd (p.room, BELOW) != 0) continue;
+      if (is_traversable (&p))
+        con (&p)->fg = SPIKES_FLOOR;
+    }
+}

@@ -22,5 +22,6 @@
 
 void fix_level (void);
 void make_links_locally_consistent (int prev_room, int current_room);
+void fix_legacy_room_above_zero_with_traversable_at_bottom (void);
 
 #endif	/* MININIM_CONSISTENCY_H */

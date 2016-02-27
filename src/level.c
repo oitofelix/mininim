@@ -47,6 +47,12 @@ play_level (struct level *lv)
  start:
   cutscene = false;
   level = *lv;
+
+  if (level_module == LEGACY_LEVEL_MODULE
+      || level_module == PLV_LEVEL_MODULE
+      || level_module == DAT_LEVEL_MODULE)
+    fix_legacy_room_above_zero_with_traversable_at_bottom ();
+
   register_cons ();
 
   stop_all_samples ();
