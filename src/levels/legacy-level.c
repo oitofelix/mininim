@@ -513,7 +513,8 @@ special_events (void)
       ks->controllable = false;
       ks->action = guard_fall;
       ks->refraction = 12;
-      ks->current_lives = ks->total_lives = 4;
+      ks->current_lives = k->current_lives;
+      ks->total_lives = k->total_lives;
       get_legacy_skill (3, &ks->skill);
       struct frameset *frameset = get_guard_fall_frameset (ks->type);
       place_frame (&ks->f, &ks->f, frameset[0].frame, &shadow_pos,
@@ -531,7 +532,8 @@ special_events (void)
       ks->keep_sword_fast = k->keep_sword_fast = false;
 
       /* any harm caused to the shadow reflects to the kid */
-      if (ks->action == guard_hit && ks->i == 0) {
+      if (ks->action == guard_hit && ks->i == 0
+          && is_attacking (k)) {
         video_effect.color = get_flicker_blood_color ();
         start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
         play_sample (harm_sample, k->f.c.room);
@@ -541,7 +543,8 @@ special_events (void)
       }
 
       /* any harm caused to the kid reflects to the shadow */
-      if (k->action == kid_sword_hit && k->i == 0) {
+      if (k->action == kid_sword_hit && k->i == 0
+          && is_attacking (ks)) {
         video_effect.color = get_flicker_blood_color ();
         start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
         play_sample (guard_hit_sample, ks->f.c.room);

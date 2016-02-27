@@ -34,6 +34,8 @@ which use it.
 @option{--start-pos} option.
 @item Disable screensaver by default.
 @item Guards have infallible defense in refraction periods.
+@item Shadow in legacy level 12 has the same total/current life points
+as the kid, and life points are taken off one at a time.
 @item @strong{Bug fix:} spurious wall collision occurs in kid's
 stabilization movement.
 @item @strong{Bug fix:} kid can't hang on a ledge after a
