@@ -271,6 +271,8 @@ struct anim {
 
   enum item item;
 
+  uint64_t alert_cycle;
+
   struct pos p, item_pos, hang_pos;
 
   enum death_reason {

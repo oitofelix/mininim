@@ -116,8 +116,10 @@ enter_fight_logic (struct anim *k)
 
     /* if hearing the character on the back, turn */
     if (! k->controllable && is_hearing (k, a)
-        && is_on_back (k, a)) {
+        && is_on_back (k, a)
+        && abs (anim_cycle - k->alert_cycle) > 24) {
       k->f.dir = (k->f.dir == LEFT) ? RIGHT : LEFT;
+      k->alert_cycle = anim_cycle;
       return;
     }
 
@@ -903,6 +905,7 @@ fight_hit (struct anim *k, struct anim *ke)
     forget_enemy (ke);
     anim_die (k);
     k->death_reason = FIGHT_DEATH;
+    ke->alert_cycle = anim_cycle;
   } else anim_sword_hit (k);
 
   if (! is_colliding (&k->f, &k->fo, +PLACE_WIDTH, ke->f.dir != k->f.dir, &k->ci)) {
@@ -991,9 +994,11 @@ alert_guards (struct pos *p)
   for (i = 0; i < anima_nmemb; i++) {
     struct anim *g = &anima[i];
     if (is_guard (g) && is_pos_on_back (g, p)
-        && g->current_lives > 0 && g->enemy_id == -1) {
+        && g->current_lives > 0 && g->enemy_id == -1
+        && abs (anim_cycle - g->alert_cycle) > 24) {
       g->f.dir = (g->f.dir == LEFT) ? RIGHT : LEFT;
       g->f.flip ^= ALLEGRO_FLIP_HORIZONTAL;
+      g->alert_cycle = anim_cycle;
     }
   }
 }
