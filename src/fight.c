@@ -223,6 +223,9 @@ fight_ai (struct anim *k)
     return;
   }
 
+  /* if the enemy is not targeting you, do nothing more */
+  if (ke->enemy_id != -1 && ke->enemy_id != k->id) return;
+
   /* in fight range, if the enemy is not attacking, go towards attack
      range (with probability, unless the enemy is not in fight mode,
      then go immediately) */
@@ -288,7 +291,7 @@ fight_mechanics (struct anim *k)
 {
   struct anim *ke = get_anim_by_id (k->enemy_id);
 
-  if (! ke) return;
+  if (! ke || ke->enemy_id != k->id) return;
 
   fight_inversion_mechanics (k, ke);
 
@@ -813,7 +816,30 @@ fight_turn (struct anim *k)
 void
 fight_turn_controllable (struct anim *k)
 {
-  struct anim *ke = get_anim_by_id (k->enemy_id);
+  int d = INT_MAX;
+  int t; /* threshold */
+  struct anim *ke = NULL;
+  struct anim *ke0 = get_anim_by_id (k->enemy_id);
+
+  /* make the kid target the nearest enemy targeting him */
+  int i;
+  for (i = 0; i < anima_nmemb; i++) {
+    struct anim *a = &anima[i];
+    if (a->enemy_id != k->id) continue;
+    int de = dist_enemy (a);
+    if (de < d) {
+      d = de;
+      ke = a;
+    }
+  }
+
+  if (ke && ke0 && ke->f.dir != ke0->f.dir) t = 20;
+  else t = -1;
+
+  if (ke && abs (dist_enemy (k) - d) > t)
+    consider_enemy (k, ke);
+
+  ke = get_anim_by_id (k->enemy_id);
   if (ke) {
     struct coord nc; struct pos p, pe;
     get_pos (k, &p, &nc);

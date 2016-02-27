@@ -59,4 +59,6 @@ manages to pass through them without being hit.
 even when he is running towards them.
 @item @strong{Bug fix:} guard mode changing doesn't work for guards
 that died falling, spiked or chopped.
+@item @strong{Bug fix:} kid can't battle properly against more than one
+guard at once
 @end itemize
