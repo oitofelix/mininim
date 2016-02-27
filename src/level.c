@@ -258,6 +258,8 @@ process_keys (void)
       pause_game = false;
       al_start_timer (play_time);
     } else {
+      memset (&key, 0, sizeof (key));
+      button = -1;
       pause_game = true;
       al_stop_timer (play_time);
     }
