@@ -504,7 +504,7 @@ special_events (void)
     survey (_m, pos, &k->f, &nc, &pm, &np);
     if (shadow_id == -1
         && con (&sword_pos)->ext.item != SWORD
-        && pm.room == 15 && pm.place < 6
+        && pm.room == 15 && pm.floor == 0 && pm.place < 6
         && ! shadow_merged) {
       struct pos shadow_pos = (struct pos) {roomd (15, ABOVE),2,1};
       shadow_id = create_anim (NULL, SHADOW, &shadow_pos, RIGHT);

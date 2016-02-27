@@ -67,4 +67,7 @@ guard at once.
 reviving kid with R repeatedly in a short period of time.
 @item @strong{Bug fix:} legacy level rooms above room 0 may have
 traversable constructions at bottom over room 0's walls.
+@item @strong{Bug fix:} in legacy level 12 shadow appears sooner than
+expected if the kid manages to enter room 15 from below after exiting
+room 18 to the right.
 @end itemize
