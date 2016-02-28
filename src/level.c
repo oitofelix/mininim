@@ -30,7 +30,7 @@ struct level level;
 static int last_auto_show_time;
 static ALLEGRO_TIMER *death_timer;
 
-bool no_room_drawing, pause_game, step_one_cycle;
+bool no_room_drawing, game_paused, step_one_cycle;
 int room_view;
 int retry_level = -1;
 int anti_camera_room;
@@ -182,7 +182,7 @@ compute_level (void)
 
   process_keys ();
 
-  if (pause_game) return;
+  if (game_paused) return;
 
   /* this condition is necessary to honor any floor press the start
      level function might have */
@@ -253,31 +253,23 @@ process_keys (void)
   /* ESC: pause game */
   if (step_one_cycle) {
     step_one_cycle = false;
-    pause_game = true;
+    game_paused = true;
     al_stop_timer (play_time);
   }
 
   if (was_key_pressed (ALLEGRO_KEY_ESCAPE, 0, 0, true)
       || was_button_pressed (joystick_pause_button, true)) {
-    if (pause_game) {
+    if (game_paused) {
       step_one_cycle = true;
-      pause_game = false;
+      game_paused = false;
       al_start_timer (play_time);
-    } else {
-      memset (&key, 0, sizeof (key));
-      button = -1;
-      pause_game = true;
-      al_stop_timer (play_time);
-    }
-  } else if (pause_game && (key.keyboard.keycode || button != -1)) {
-    pause_game = false;
-    draw_bottom_text (NULL, NULL);
-    memset (&key, 0, sizeof (key));
-    button = -1;
-    al_start_timer (play_time);
-  }
+    } else pause_game ();
+  } else if (game_paused
+             && (key.keyboard.keycode || button != -1)
+             && ! save_game_dialog_thread)
+    unpause_game ();
 
-  if (pause_game) anim_cycle--;
+  if (game_paused) anim_cycle--;
 
   /* R: resurrect kid */
   if (was_key_pressed (ALLEGRO_KEY_R, 0, 0, true)
@@ -446,12 +438,13 @@ process_keys (void)
     save_game_dialog_thread =
       create_thread (save_game_dialog, NULL);
     al_start_thread (save_game_dialog_thread);
+    pause_game ();
   }
 
   /* Restart level after death */
   struct anim *k = get_anim_by_id (0);
   if (is_kid_dead (&k->f)
-      && ! pause_game) {
+      && ! game_paused) {
     al_start_timer (death_timer);
     int64_t t = al_get_timer_count (death_timer);
 
@@ -485,7 +478,7 @@ process_keys (void)
         quit_anim = RESTART_LEVEL;
     }
   } else if (al_get_timer_started (death_timer)
-             && ! pause_game) {
+             && ! game_paused) {
     al_stop_timer (death_timer);
     al_set_timer_count (death_timer, 0);
     draw_bottom_text (NULL, NULL);
@@ -555,7 +548,7 @@ draw_level (void)
   }
   if (rem_time <= 0) quit_anim = OUT_OF_TIME;
 
-  if (pause_game) draw_bottom_text (NULL, "GAME PAUSED");
+  if (game_paused) draw_bottom_text (NULL, "GAME PAUSED");
 }
 
 void
@@ -600,4 +593,23 @@ draw_lives (ALLEGRO_BITMAP *bitmap, struct anim *k, enum vm vm)
       if (ke) draw_guard_lives (bitmap, ke, vm);
     }
   }
+}
+
+void
+pause_game (void)
+{
+  memset (&key, 0, sizeof (key));
+  button = -1;
+  game_paused = true;
+  al_stop_timer (play_time);
+}
+
+void
+unpause_game (void)
+{
+  game_paused = false;
+  draw_bottom_text (NULL, NULL);
+  memset (&key, 0, sizeof (key));
+  button = -1;
+  al_start_timer (play_time);
 }

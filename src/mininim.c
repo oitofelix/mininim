@@ -1069,7 +1069,7 @@ main (int _argc, char **_argv)
   stop_all_samples ();
 
  play_game:
-  pause_game = false;
+  game_paused = false;
   total_lives = initial_total_lives;
   current_lives = initial_current_lives;
 

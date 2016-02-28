@@ -80,6 +80,7 @@ play_anim (void (*draw_callback) (void),
             save_game (filename);
             al_free (filename);
           }
+          unpause_game ();
         }
 
         if (was_key_pressed (ALLEGRO_KEY_ESCAPE, 0, ALLEGRO_KEYMOD_ALT, false))

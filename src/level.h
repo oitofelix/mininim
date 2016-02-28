@@ -26,7 +26,7 @@ extern int retry_level;
 extern int camera_follow_kid;
 extern int anti_camera_room;
 extern int auto_rem_time_1st_cycle;
-extern bool no_room_drawing, pause_game, step_one_cycle;
+extern bool no_room_drawing, game_paused, step_one_cycle;
 
 void load_level (void);
 void unload_level (void);
@@ -35,5 +35,7 @@ void register_cons (void);
 void destroy_cons (void);
 void display_remaining_time (void);
 void display_skill (struct anim *k);
+void pause_game (void);
+void unpause_game (void);
 
 #endif	/* MININIM_LEVEL_H */
