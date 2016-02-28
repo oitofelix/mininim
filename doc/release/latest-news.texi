@@ -74,4 +74,6 @@ room 18 to the right.
 grabbed from opposite directions in a short period of time.
 @item @strong{Bug fix:} drawing glitches occur in several situations
 involving two characters near each other.
+@item @strong{Bug fix:} fight mode collision detection is ill-behaved
+for kid and guards.
 @end itemize

@@ -225,13 +225,6 @@ physics_in (struct anim *k)
       && npmbo.floor != npmbo_nf.floor) {
     k->inertia = k->cinertia = 0;
 
-    /* if (is_colliding (&k->f, &k->fo, +16, false, &k->ci)) { */
-    /*   if (k->ci.t != WALL) */
-    /*     k->f.c.x += (k->f.dir == LEFT) ? +16 : -16; */
-    /*   else */
-    /*     k->f.c.x += (k->f.dir == LEFT) ? +8 : -8; */
-    /* } */
-
     survey (_bf, pos, &k->f, &nc, &pbf, &np);
     /* pos2view (&pbf, &pbf); */
     k->fo.b = kid_couch_frameset[0].frame;

@@ -125,6 +125,7 @@ physics_in (struct anim *k)
   struct coord nc; struct pos np, pbf, pmbo, pbb;
 
   /* collision */
+  uncollide (&k->f, &k->fo, &k->fo, +0, true, &k->ci);
   if (fight_door_split_collision (k)) return false;
 
   /* fall */

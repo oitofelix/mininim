@@ -142,9 +142,6 @@ physics_in (struct anim *g)
   /* inertia */
   g->inertia = g->cinertia = 0;
 
-  /* collision */
-  /* if (kid_door_split_collision (g)) return false; */
-
   /* fall */
   survey (_mbo, pos, &g->f, &nc, &pmbo, &np);
   survey (_bb, pos, &g->f, &nc, &pbb, &np);

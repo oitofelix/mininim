@@ -162,11 +162,7 @@ physics_in (struct anim *k)
   struct coord nc; struct pos np, pbf, pmbo, pbb;
 
   /* collision */
-  if (is_colliding (&k->f, &k->fo, +PLACE_WIDTH, false, &k->ci)
-      && k->i == 0) {
-    kid_sword_normal (k);
-    return false;
-  }
+  uncollide (&k->f, &k->fo, &k->fo, +8, false, &k->ci);
 
   /* fall */
   survey (_bf, pos, &k->f, &nc, &pbf, &np);

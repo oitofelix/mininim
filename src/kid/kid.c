@@ -508,7 +508,9 @@ kid_debug (void)
     if (was_key_pressed (ALLEGRO_KEY_PGDN, 0, 0, true)) current_kid->f.c.x++;
     int dn = dist_next_place (&current_kid->f, _bf, pos, 0, false);
     int dp = dist_next_place (&current_kid->f, _bf, pos, 0, true);
-    int dc = dist_collision (&current_kid->f, false, &current_kid->ci) + 4;
+    /* int dc = dist_collision (&current_kid->f, false, &current_kid->ci) + 4; */
+    int dc = dist_collision (&current_kid->f, false, &current_kid->ci);
+    int dcb = dist_collision (&current_kid->f, true, &current_kid->ci);
     int df = dist_fall (&current_kid->f, false);
     int dl = dist_con (&current_kid->f, _bf, pos, -4, false, LOOSE_FLOOR);
     int dcl = dist_con (&current_kid->f, _bf, pos, -4, false, CLOSER_FLOOR);
@@ -516,8 +518,8 @@ kid_debug (void)
     int de = dist_enemy (current_kid);
     if (was_key_pressed (ALLEGRO_KEY_F1, 0, 0, true))
       printf ("\
-f = %i, p = %i, dn = %i, dp = %i, dc = %i, df = %i, dl = %i, dcl = %i, dch = %i, de = %i\n",
-              pbf.floor, pbf.place, dn, dp, dc, df, dl, dcl, dch, de);
+f = %i, p = %i, dn = %i, dp = %i, dc = %i, dcb = %i, df = %i, dl = %i, dcl = %i, dch = %i, de = %i\n",
+              pbf.floor, pbf.place, dn, dp, dc, dcb, df, dl, dcl, dch, de);
   }
   /* end kid hack */
 }

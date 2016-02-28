@@ -134,6 +134,9 @@ flow (struct anim *k)
 static bool
 physics_in (struct anim *k)
 {
+  /* collision */
+  uncollide (&k->f, &k->fo, &k->fo, +0, true, &k->ci);
+
   return true;
 }
 

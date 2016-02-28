@@ -272,12 +272,9 @@ physics_in (struct anim *g)
       && npmbo.floor != npmbo_nf.floor) {
     g->inertia = g->cinertia = 0;
 
-    if (is_colliding (&g->f, &g->fo, +16, false, &g->ci)) {
-      if (g->ci.t != WALL)
-        g->f.c.x += (g->f.dir == LEFT) ? +16 : -16;
-      else
-        g->f.c.x += (g->f.dir == LEFT) ? +8 : -8;
-    }
+    /* collision */
+    uncollide (&g->f, &g->fo, &g->fo, +0, false, &g->ci);
+    uncollide (&g->f, &g->fo, &g->fo, +0, true, &g->ci);
 
     survey (_bf, pos, &g->f, &nc, &pbf, &np);
     /* pos2view (&pbf, &pbf); */

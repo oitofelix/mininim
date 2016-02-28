@@ -122,6 +122,9 @@ physics_in (struct anim *k)
 {
   struct coord nc; struct pos np, pbf, pmbo, pbb;
 
+  /* collision */
+  uncollide (&k->f, &k->fo, &k->fo, +0, true, &k->ci);
+
   /* fall */
   survey (_bf, pos, &k->f, &nc, &pbf, &np);
   survey (_mbo, pos, &k->f, &nc, &pmbo, &np);

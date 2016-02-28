@@ -138,7 +138,9 @@ flow (struct anim *k)
       return false;
     }
 
-    if (take_sword) {
+    if (take_sword
+        && (dist_collision (&k->f, false, &k->ci) > PLACE_WIDTH
+            || dist_collision (&k->f, true, &k->ci) > PLACE_WIDTH)) {
       kid_take_sword (k);
       return false;
     }

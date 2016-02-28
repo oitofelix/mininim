@@ -215,13 +215,7 @@ flow (struct anim *g)
   bool attack = g->key.shift && ! g->key.up
     && ! g->key.left && ! g->key.right;
 
-  /* honor collision from sub-actions */
-  if (g->oaction == guard_walkf && g->i == 0) {
-    g->i = 1;
-    g->f.c.x += (g->f.dir == LEFT) ? -2 : +2;
-  } else if (g->oaction == guard_walkb && g->i == 0) g->i = 1;
-  else if (g->oaction == guard_attack && g->i == 0) g->i = 1;
-  else if (g->oaction != guard_vigilant) g->i = -1;
+  if (g->oaction != guard_vigilant) g->i = -1;
 
   if (g->oaction == guard_vigilant) {
 
@@ -285,15 +279,6 @@ static bool
 physics_in (struct anim *g)
 {
   struct coord nc; struct pos np, ptf, pmbo, pbb;
-
-  /* collision */
-  if (fight_door_split_collision (g)) return false;
-
-  /* if (is_colliding (&g->f, &g->fo, +PLACE_WIDTH, false, &g->ci) */
-  /*     && g->i == 0) { */
-  /*   guard_walkb (g); */
-  /*   return false; */
-  /* } */
 
   /* fall */
   survey (_tf, pos, &g->f, &nc, &ptf, &np);

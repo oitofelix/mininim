@@ -227,11 +227,7 @@ physics_in (struct anim *g)
   struct coord nc; struct pos np, pbf, pmbo, pbb;
 
   /* collision */
-  if (is_colliding (&g->f, &g->fo, +PLACE_WIDTH, false, &g->ci)
-      && g->i == 0) {
-    guard_vigilant (g);
-    return false;
-  }
+  uncollide (&g->f, &g->fo, &g->fo, +0, false, &g->ci);
 
   /* fall */
   survey (_bf, pos, &g->f, &nc, &pbf, &np);
