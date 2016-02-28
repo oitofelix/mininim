@@ -100,6 +100,17 @@ min_room_dist (struct room_dist room[], int *dmax)
   return r;
 }
 
+bool
+coord_eq (struct coord *_c0, struct coord *_c1)
+{
+  struct coord c0, c1;
+  ncoord (_c0, &c0);
+  ncoord (_c1, &c1);
+
+  return c0.room == c1.room && c0.x == c1.x
+    && c0.y == c1.y;
+}
+
 struct coord *
 ncoord (struct coord *c, struct coord *nc)
 {

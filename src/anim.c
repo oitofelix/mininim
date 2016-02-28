@@ -457,18 +457,17 @@ compare_anims (const void *_a0, const void *_a1)
   if (is_near (a0, a1)) {
     if (tr0.x < tr1.x) return -1;
     if (tr0.x > tr1.x) return 1;
+    if (a0->id < a1->id) return -1;
+    if (a0->id > a1->id) return 1;
+  } else {
+    struct coord o = {tr0.room,0,ORIGINAL_HEIGHT};
+
+    double d0 = dist_coord (&o, &tr0);
+    double d1 = dist_coord (&o, &tr1);
+
+    if (d0 < d1) return -1;
+    if (d0 > d1) return 1;
   }
-
-  struct coord o = {tr0.room,0,ORIGINAL_HEIGHT};
-
-  double d0 = dist_coord (&o, &tr0);
-  double d1 = dist_coord (&o, &tr1);
-
-  if (d0 < d1) return -1;
-  if (d1 < d0) return 1;
-
-  if (a0->id < a1->id) return -1;
-  if (a1->id < a0->id) return 1;
 
   return 0;
 }
@@ -751,6 +750,15 @@ prev_frame (struct frame *f, struct frame *pf)
   pf->c = f->oc;
   pf->b = f->ob;
   return pf;
+}
+
+bool
+frame_eq (struct frame *f0, struct frame *f1)
+{
+  return coord_eq (&f0->c, &f1->c)
+    && f0->b == f1->b
+    && f0->dir == f1->dir
+    && f0->flip == f1->flip;
 }
 
 bool

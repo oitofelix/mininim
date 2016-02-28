@@ -280,6 +280,10 @@ physics_in (struct anim *g)
 {
   struct coord nc; struct pos np, ptf, pmbo, pbb;
 
+  /* collision */
+  uncollide (&g->f, &g->fo, &g->fo, +0, true, &g->ci);
+  if (fight_door_split_collision (g)) return false;
+
   /* fall */
   survey (_tf, pos, &g->f, &nc, &ptf, &np);
   survey (_mbo, pos, &g->f, &nc, &pmbo, &np);

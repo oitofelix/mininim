@@ -26,6 +26,7 @@ extern bool coord_wa;
 int roomd (int room, enum dir dir);
 int room_dist (int r0, int r1, int max);
 int min_room_dist (struct room_dist room[], int *dmax);
+bool coord_eq (struct coord *_c0, struct coord *_c1);
 struct coord *ncoord (struct coord *c, struct coord *nc);
 struct pos *npos (struct pos *p, struct pos *np);
 struct coord *nframe (struct frame *f, struct coord *c);
