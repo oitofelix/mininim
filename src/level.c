@@ -443,7 +443,7 @@ process_keys (void)
 
   /* Restart level after death */
   struct anim *k = get_anim_by_id (0);
-  if (is_kid_dead (&k->f)
+  if (k->current_lives <= 0
       && ! game_paused) {
     al_start_timer (death_timer);
     int64_t t = al_get_timer_count (death_timer);

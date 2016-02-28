@@ -77,4 +77,6 @@ involving two characters near each other.
 @item @strong{Bug fix:} fight mode collision detection is ill-behaved
 for kid and guards.
 @item @strong{Bug fix:} game doesn't pause while saving.
+@item @strong{Bug fix:} in some cases of death after fight, the normal death
+tune is played along the fight one.
 @end itemize
