@@ -19,8 +19,9 @@
 @copying
 @noindent
 MININIM is the Advanced Prince of Persia Engine --- a childhood dream,
-the free software engine for Jordan Mechner's masterpiece, developed
-from scratch by Bruno Félix Rezende Ribeiro (@code{oitofelix}).
+the free software implementation of Jordan Mechner's masterpiece game,
+developed from scratch by Bruno Félix Rezende Ribeiro
+(@code{oitofelix}).
 
 @iftex
 @sp 1
@@ -38,10 +39,6 @@ This manual is for @value{package} version @value{version} (@value{date}).
 @iftex
 @sp 1
 @end iftex
-
-@noindent
-@c This package is a component of the GNU Operating System and is
-@c developed by the GNU Project.
 
 @iftex
 @sp 1

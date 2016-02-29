@@ -19,6 +19,8 @@
 @c below should be moved to the 'NEWS.texi' file and another list should
 @c be built from scratch here.
 
+@strong{Features:}
+
 @itemize
 @item Joystick support.
 @item Apoplexy level editor integration.
@@ -36,59 +38,64 @@ which use it.
 @item Guards have infallible defense in refraction periods.
 @item Shadow in legacy level 12 has the same total/current life points
 as the kid, and life points are taken off one at a time.
-@item @strong{Bug fix:} spurious wall collision occurs in kid's
+@end itemize
+
+@strong{Bug fixes:}
+
+@itemize
+@item Spurious wall collision occurs in kid's
 stabilization movement.
-@item @strong{Bug fix:} kid can't hang on a ledge after a
+@item Kid can't hang on a ledge after a
 long floating fall.
-@item @strong{Bug fix:} kid's @emph{run} movement after a
+@item Kid's @emph{run} movement after a
 @emph{running turn} starts one frame off.
-@item @strong{Bug fix:} in some circumstances the kid is unable to reach
+@item In some circumstances the kid is unable to reach
 the other end after a jump, as if a force field prevented him from
 landing there.
-@item @strong{Bug fix:} kid dies after just touching guards.
-@item @strong{Bug fix:} guards spuriously attack thin air while trying
+@item Kid dies after just touching guards.
+@item Guards spuriously attack thin air while trying
 to prevent the kid from bypassing them.
-@item @strong{Bug fix:} while in counter attack and counter defense mode
+@item While in counter attack and counter defense mode
 kid defends even if too far from the guard, when he could otherwise let
 the guard strike only thin air.
-@item @strong{Bug fix:} restarting the game while it's paused causes it
+@item Restarting the game while it's paused causes it
 to get stuck in a paused state after the title screen.
-@item @strong{Bug fix:} it's hard to perform 3-tile running jumps
+@item It's hard to perform 3-tile running jumps
 because MININIM is lacking platform edge detection.
-@item @strong{Bug fix:} kid doesn't stumble on guards, in case he
+@item Kid doesn't stumble on guards, in case he
 manages to pass through them without being hit.
-@item @strong{Bug fix:} guards continue to advance towards the kid,
+@item Guards continue to advance towards the kid,
 even when he is running towards them.
-@item @strong{Bug fix:} guard mode changing doesn't work for guards
+@item Guard mode changing doesn't work for guards
 that died falling, spiked or chopped.
-@item @strong{Bug fix:} kid can't battle properly against more than one
+@item Kid can't battle properly against more than one
 guard at once.
-@item @strong{Bug fix:} shadow death music in level 12 plays in a row if
+@item Shadow death music in level 12 plays in a row if
 reviving kid with R repeatedly in a short period of time.
-@item @strong{Bug fix:} legacy level rooms above room 0 may have
+@item Legacy level rooms above room 0 may have
 traversable constructions at bottom over room 0's walls.
-@item @strong{Bug fix:} in legacy level 12 shadow appears sooner than
+@item In legacy level 12 shadow appears sooner than
 expected if the kid manages to enter room 15 from below after exiting
 room 18 to the right.
-@item @strong{Bug fix:} guards turn too quickly when their attention is
+@item Guards turn too quickly when their attention is
 grabbed from opposite directions in a short period of time.
-@item @strong{Bug fix:} drawing glitches occur in several situations
+@item Drawing glitches occur in several situations
 involving two characters near each other.
-@item @strong{Bug fix:} fight mode collision detection is ill-behaved
+@item Fight mode collision detection is ill-behaved
 for kid and guards.
-@item @strong{Bug fix:} game doesn't pause while saving.
-@item @strong{Bug fix:} in some cases of death after fight, the normal death
+@item Game doesn't pause while saving.
+@item In some cases of death after fight, the normal death
 tune is played along the fight one.
-@item @strong{Bug fix:} falling close to door makes kid collide and
+@item Falling close to door makes kid collide and
 stabilize standing, instead of crouching.
-@item @strong{Bug fix:} guard chasing logic has flaws and corner cases
+@item Guard chasing logic has flaws and corner cases
 that result in counter-intuitive guard behavior in certain situations.
-@item @strong{Bug fix:} if the kid is exactly 27 pixels from falling,
+@item If the kid is exactly 27 pixels from falling,
 walking to the very edge and then from there again doesn't trigger a
 misstep.
-@item @strong{Bug fix:} turning close to door at its left causes a
+@item Turning close to door at its left causes a
 spurious collision.
-@item @strong{Bug fix:} game saves should store the remaining time of when
+@item Game saves should store the remaining time of when
 kid first enters the level, not of when the game is saved.
-@item @strong{Bug fix:} simple jump fall earlier than expected.
+@item Simple jump might fall earlier than expected.
 @end itemize
