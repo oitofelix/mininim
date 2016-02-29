@@ -86,4 +86,6 @@ that result in counter-intuitive guard behavior in certain situations.
 @item @strong{Bug fix:} if the kid is exactly 27 pixels from falling,
 walking to the very edge and then from there again doesn't trigger a
 misstep.
+@item @strong{Bug fix:} turning close to door at its left causes a
+spurious collision.
 @end itemize

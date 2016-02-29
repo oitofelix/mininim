@@ -182,6 +182,10 @@ flow (struct anim *k)
         place_frame (&k->f, &k->f, kid_normal_00, &k->p,
                      (k->f.dir == LEFT) ? +15
                      : PLACE_WIDTH + 3, +15);
+      else if (k->confg == DOOR
+               && k->f.dir == RIGHT)
+        place_frame (&k->f, &k->f, kid_normal_00, &k->p,
+                     PLACE_WIDTH + 5 - k->dcd, +15);
       else place_frame (&k->f, &k->f, kid_normal_00, &k->p,
                         (k->f.dir == LEFT) ? +11 + k->dcd
                         : PLACE_WIDTH + 7 - k->dcd, +15);
