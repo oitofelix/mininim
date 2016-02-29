@@ -200,7 +200,7 @@ triggers.  Used by @code{OPENER_FLOOR} and @code{CLOSER_FLOOR}.
 @cindex con ext step
 @cindex step, con ext
 @item Step
-This is a integer indicating in which state, of a progressive set of
+This is an integer indicating in which state, of a progressive set of
 configurations, a construction is in.  Used by dynamic constructions
 that don't use other extension.
 @cindex con ext design
@@ -450,7 +450,7 @@ above them.  All of them are @emph{hangable}, except for
 @subsection Wall
 @cindex wall
 
-The @dfn{wall} is a solid constructs that separates sections of the
+The @dfn{wall} is a solid construct that separates sections of the
 level.  It's @emph{collidable}, @emph{rigid} and uses no extension.
 
 @multitable @columnfractions .20 .40 .40
