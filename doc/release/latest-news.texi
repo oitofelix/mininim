@@ -88,4 +88,6 @@ walking to the very edge and then from there again doesn't trigger a
 misstep.
 @item @strong{Bug fix:} turning close to door at its left causes a
 spurious collision.
+@item @strong{Bug fix:} game saves should store the remaining time of when
+kid first enters the level, not of when the game is saved.
 @end itemize

@@ -76,11 +76,11 @@ play_anim (void (*draw_callback) (void),
           al_join_thread (save_game_dialog_thread, (void *) &filename);
           al_destroy_thread (save_game_dialog_thread);
           save_game_dialog_thread = NULL;
+          unpause_game ();
           if (filename) {
             save_game (filename);
             al_free (filename);
           }
-          unpause_game ();
         }
 
         if (was_key_pressed (ALLEGRO_KEY_ESCAPE, 0, ALLEGRO_KEYMOD_ALT, false))

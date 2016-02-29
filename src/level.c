@@ -71,6 +71,9 @@ play_level (struct level *lv)
   al_stop_timer (death_timer);
   al_set_timer_count (death_timer, 0);
 
+  if (retry_level != level.number)
+    start_level_time = al_get_timer_count (play_time);
+
   play_anim (draw_level, compute_level, 12);
 
   switch (quit_anim) {

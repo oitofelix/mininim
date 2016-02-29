@@ -66,6 +66,7 @@ int start_level = 1;
 struct pos start_pos;
 int time_limit = TIME_LIMIT;
 int start_time = START_TIME;
+int start_level_time;
 struct skill skill = {.counter_attack_prob = INITIAL_KCA,
                       .counter_defense_prob = INITIAL_KCD};
 static bool sound_disabled_cmd;
@@ -1298,7 +1299,7 @@ save_game (char *filename)
     *total_lives_str, *kca_str, *kcd_str;
 
   xasprintf (&start_level_str, "%i", level.number);
-  xasprintf (&start_time_str, "%i", al_get_timer_count (play_time));
+  xasprintf (&start_time_str, "%i", start_level_time);
   xasprintf (&total_lives_str, "%i", total_lives);
   xasprintf (&kca_str, "%i", skill.counter_attack_prob + 1);
   xasprintf (&kcd_str, "%i", skill.counter_defense_prob + 1);
