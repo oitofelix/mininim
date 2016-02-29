@@ -79,4 +79,6 @@ for kid and guards.
 @item @strong{Bug fix:} game doesn't pause while saving.
 @item @strong{Bug fix:} in some cases of death after fight, the normal death
 tune is played along the fight one.
+@item @strong{Bug fix:} falling close to door makes kid collide and
+stabilize standing, instead of crouching.
 @end itemize

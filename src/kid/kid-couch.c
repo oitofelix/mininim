@@ -239,7 +239,7 @@ physics_in (struct anim *k)
     }
   }
 
-  if (kid_door_split_collision (k)) return false;
+  if (! k->fall && kid_door_split_collision (k)) return false;
 
 
   /* fall */
