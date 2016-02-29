@@ -748,9 +748,12 @@ is_on_back (struct anim *k0, struct anim *k1)
 bool
 is_near (struct anim *k0, struct anim *k1)
 {
-  struct coord m0, m1; struct pos p0, p1;
-  get_pos (k0, &p0, &m0);
-  get_pos (k1, &p1, &m1);
+  struct coord m0, m1; struct pos np, p0, p1;
+  survey (_m, pos, &k0->f, &m0, &p0, &np);
+  survey (_m, pos, &k1->f, &m1, &p1, &np);
+
+  _m (&k0->f, &m0);
+  _m (&k1->f, &m1);
   coord2room (&m1, m0.room, &m1);
 
   return m1.room == m0.room && p1.floor == p0.floor
