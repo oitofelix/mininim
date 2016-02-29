@@ -309,7 +309,7 @@ is_kid_fall (struct frame *f)
 static void
 place_in_initial_fall (struct anim *k)
 {
-  struct coord nc;
+  struct coord nc, cmt, cmtf, tf;
   struct pos np, pmt, pmtf, pmtb;
   struct pos fall_pos;
 
@@ -321,7 +321,15 @@ place_in_initial_fall (struct anim *k)
 
   fall_pos.room = -1;
 
-  if (is_strictly_traversable (&pmt)) fall_pos = pmt;
+  if (is_strictly_traversable (&pmt)
+      && is_strictly_traversable (&pmtf)) {
+    _tf (&k->f, &tf);
+    con_m (&pmt, &cmt);
+    con_m (&pmtf, &cmtf);
+    int d = dist_coord (&tf, &cmtf) - dist_coord (&tf, &cmt);
+    if (d < -12) fall_pos = pmtf;
+    else fall_pos = pmt;
+  } else if (is_strictly_traversable (&pmt)) fall_pos = pmt;
   else if (is_strictly_traversable (&pmtf)) fall_pos = pmtf;
   else if (is_strictly_traversable (&pmtb)) fall_pos = pmtb;
 

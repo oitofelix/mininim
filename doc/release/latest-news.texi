@@ -90,4 +90,5 @@ misstep.
 spurious collision.
 @item @strong{Bug fix:} game saves should store the remaining time of when
 kid first enters the level, not of when the game is saved.
+@item @strong{Bug fix:} simple jump fall earlier than expected.
 @end itemize
