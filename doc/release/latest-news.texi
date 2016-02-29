@@ -81,4 +81,6 @@ for kid and guards.
 tune is played along the fight one.
 @item @strong{Bug fix:} falling close to door makes kid collide and
 stabilize standing, instead of crouching.
+@item @strong{Bug fix:} guard chasing logic has flaws and corner cases
+that result in counter-intuitive guard behavior in certain situations
 @end itemize

@@ -356,7 +356,7 @@ compute_loose_floor_shake (struct loose_floor *l)
 {
   switch (l->i) {
   case 0: l->state = 1;
-    alert_guards (&l->p);
+    /* alert_guards (&l->p); */
     sample_random_loose_floor (l->p.room); l->i++; break;
   case 1: l->state = 0; l->i++; break;
   case 2: l->state = 2;

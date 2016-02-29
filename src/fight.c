@@ -79,8 +79,10 @@ leave_fight_logic (struct anim *k)
 
   /* if the enemy is not reachable, forget about him */
   if (! is_seeing (k, ke, k->f.dir)
-      && ! is_safe_to_follow (k, ke, LEFT)
-      && ! is_safe_to_follow (k, ke, RIGHT)) {
+      && ! is_safe_to_follow (k, ke, k->f.dir)
+      /* && ! is_safe_to_follow (k, ke, LEFT) */
+      /* && ! is_safe_to_follow (k, ke, RIGHT) */
+      ) {
     forget_enemy (k);
     return;
   }
@@ -159,6 +161,18 @@ fight_ai (struct anim *k)
   struct coord nc; struct pos p, pe;
   get_pos (k, &p, &nc);
   get_pos (ke, &pe, &nc);
+  pos2room (&pe, p.room, &pe);
+
+  /* remember the place the enemy was last seen */
+  if (pe.room == p.room
+      && pe.floor == p.floor) {
+    k->enemy_pos = pe;
+  } else {
+    if (pe.floor > p.floor
+        && ! is_strictly_traversable (&k->enemy_pos)) {
+      k->enemy_pos.place = pe.place;
+    }
+  }
 
   /* prevent enemy from passing through */
   if (is_near (k, ke)
@@ -188,12 +202,12 @@ fight_ai (struct anim *k)
     return;
   }
 
-  /* if the enemy can be followed in the opposite direction, turn */
-  if (! is_safe_to_follow (k, ke, k->f.dir)
-      && is_safe_to_follow (k, ke, odir)) {
-    fight_turn (k);
-    return;
-  }
+  /* /\* if the enemy can be followed in the opposite direction, turn *\/ */
+  /* if (! is_safe_to_follow (k, ke, k->f.dir) */
+  /*     && is_safe_to_follow (k, ke, odir)) { */
+  /*   fight_turn (k); */
+  /*   return; */
+  /* } */
 
   /* if the enemy is trying to bypass, attack him */
   if (! is_in_fight_mode (ke)
@@ -239,6 +253,7 @@ fight_ai (struct anim *k)
           || ! is_in_fight_mode (ke))
       && ! is_attacking (ke)
       && (! is_in_fight_mode (ke)
+          || is_walking (ke)
           || ke->i >= 6 + prandom (24))) {
     fight_walkf (k);
     return;
@@ -755,55 +770,83 @@ get_pos (struct anim *k, struct pos *p, struct coord *m)
 }
 
 bool
+is_safe_at_right (struct pos *p, struct frame *f)
+{
+  enum confg t = con (p)->fg;
+
+  struct coord tf;
+  _tf (f, &tf);
+
+  if (t == DOOR) return tf.y > door_grid_tip_y (p) - 10;
+
+  return t != WALL && t != CARPET && t != TCARPET;
+}
+
+bool
+is_safe_at_left (struct pos *p)
+{
+  enum confg t = con (p)->fg;
+
+  return t != WALL && t != CHOPPER && t != MIRROR;
+}
+
+bool
 is_safe_to_follow (struct anim *k0, struct anim *k1, enum dir dir)
 {
-  struct coord tf, nc; struct pos p0, p1, p;
+  struct coord tf, nc; struct pos p0, p, p1, pke, pk;
   get_pos (k0, &p0, &nc);
   get_pos (k1, &p1, &nc);
   _tf (&k0->f, &tf);
 
   pos2room (&p1, p0.room, &p1);
 
+  /* not reachable, to start with */
   if (p0.room != p1.room) return false;
+  if (p0.floor > p1.floor) return false;
 
-  if (p0.floor == p1.floor && k0->f.dir == dir) {
-    p = p1;
-    if (dir == LEFT) {
-      if (is_carpet (&p0)) prel (&p0, &p0, +0, -1);
-      if (! is_carpet (&p)) prel (&p, &p, +0, +1);
-    }
-    first_confg (&p0, &p, dangerous_cs, &p);
-    if (p.room != -1) return false;
+  /* the character went down after the enemy */
+  if (p0.floor != k0->enemy_pos.floor) {
+    enum dir odir = (dir == LEFT) ? RIGHT : LEFT;
+    if (is_on_back (k0, k1) && is_seeing (k0, k1, odir)
+        && p0.floor == p1.floor) return true;
+    return false;
+  }
 
-    p = p1;
-    if (dir == RIGHT) prel (&p, &p, +0, -1);
-    first_confg (&p0, &p, door_cs, &p);
-    if (p.room == -1) return true;
-    else return tf.y > door_grid_tip_y (&p) - 10;
-  } else if (p0.floor < p1.floor) {
-    p1.floor = p0.floor;
-    p1.place = (dir == LEFT) ? -PLACES : 2 * PLACES - 1;
+  /* if falling the chasing is inevitable (necessary to prevent
+     leave_fight_logic from forgeting enemy based on the facing
+     direction of the is_in_range check) */
+  if (is_anim_fall (&k0->f)) return true;
 
-    first_confg (&p0, &p1, traversable_cs, &p);
-    if (p.room == -1) return false;
+  if (dir == LEFT) {
+    if (! is_safe_at_left (&p0)) return false;
+    if (! is_safe_at_right (&k0->enemy_pos, &k0->f)) return false;
+    prel (&p0, &pk, +0, -1);
+    prel (&k0->enemy_pos, &pke, +0, +1);
+  } else {
+    if (! is_safe_at_right (&p0, &k0->f)) return false;
+    if (! is_safe_at_left (&k0->enemy_pos)) return false;
+    prel (&p0, &pk, +0, +1);
+    prel (&k0->enemy_pos, &pke, +0, -1);
+  }
 
-    /* if falling the follow is inevitable (necessary to prevent
-       leave_fight_logic from forgeting enemy based on the facing
-       direction of the is_in_range check) */
-    if (peq (&p0, &p)) return true;
-
-    prel (&p, &p, +1, +0);
-    if (is_traversable (&p) || con (&p)->fg == SPIKES_FLOOR)
+  /* enemy went down */
+  if (is_traversable (&k0->enemy_pos)) {
+    prel (&k0->enemy_pos, &pke, +1, +0);
+    if (is_traversable (&pke) || con (&pke)->fg == SPIKES_FLOOR)
       return false;
+    int d = (dir == LEFT) ? -1 : +1;
+    if (peq (&pk, &k0->enemy_pos)) return true;
+    prel (&k0->enemy_pos, &pke, +0, -1 * d);
+  }
 
-    int inc = (dir == LEFT) ? +1 : -1;
-    prel (&p, &p1, -1, inc);
+  if (peq (&p0, &k0->enemy_pos)) return false;
 
-    first_confg (&p0, &p1, dangerous_cs, &p);
-    if (p.room != -1) return false;
+  first_confg (&pk, &pke, dangerous_cs, &p);
+  if (p.room != -1) return false;
 
-    return true;
-  } else return false;
+  first_confg (&pk, &pke, door_cs, &p);
+  if (p.room == -1) return true;
+  else return tf.y > door_grid_tip_y (&p) - 10;
 }
 
 void

@@ -337,6 +337,7 @@ create_anim (struct anim *a0, enum anim_type t, struct pos *p, enum dir dir)
     a.f.dir = dir;
     a.f.c.room = p->room;
     a.controllable = false;
+    a.enemy_pos = (struct pos) {-1,-1,-1};
   }
 
   a.id = i;

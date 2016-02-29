@@ -273,7 +273,7 @@ struct anim {
 
   uint64_t alert_cycle;
 
-  struct pos p, item_pos, hang_pos;
+  struct pos p, item_pos, hang_pos, enemy_pos;
 
   enum death_reason {
     NO_DEATH, FALL_DEATH, LOOSE_FLOOR_DEATH, POTION_DEATH,
