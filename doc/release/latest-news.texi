@@ -83,4 +83,7 @@ tune is played along the fight one.
 stabilize standing, instead of crouching.
 @item @strong{Bug fix:} guard chasing logic has flaws and corner cases
 that result in counter-intuitive guard behavior in certain situations.
+@item @strong{Bug fix:} if the kid is exactly 27 pixels from falling,
+walking to the very edge and then from there again doesn't trigger a
+misstep.
 @end itemize

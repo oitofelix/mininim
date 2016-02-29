@@ -161,8 +161,8 @@ flow (struct anim *k)
       else if (k->dc < 22 || k->df < 22 || k->dl < 22
                || k->dcl < 22 || k->dch < 22)
         k->walk = 2, dx = 15;
-      else if (k->dc < 27 || k->df < 27 || k->dl < 27
-               || k->dcl < 27 || k->dch < 27)
+      else if (k->dc < 28 || k->df < 28 || k->dl < 28
+               || k->dcl < 28 || k->dch < 28)
         k->walk = 3, dx = 22;
 
       if (k->walk != -1 )
