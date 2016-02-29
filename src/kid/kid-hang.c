@@ -148,23 +148,21 @@ physics_out (struct anim *k)
 }
 
 bool
+is_kid_hang (struct frame *f)
+{
+  int i;
+  for (i = 0; i < KID_HANG_FRAMESET_NMEMB; i++)
+    if (f->b == kid_hang_frameset[i].frame) return true;
+
+  if (f->b == kid_hang_13) return true;
+
+  return false;
+}
+
+bool
 is_kid_hang_or_climb (struct frame *f)
 {
-  return f->b == kid_hang_00
-    || f->b == kid_hang_01
-    || f->b == kid_hang_02
-    || f->b == kid_hang_03
-    || f->b == kid_hang_04
-    || f->b == kid_hang_05
-    || f->b == kid_hang_06
-    || f->b == kid_hang_07
-    || f->b == kid_hang_08
-    || f->b == kid_hang_09
-    || f->b == kid_hang_10
-    || f->b == kid_hang_11
-    || f->b == kid_hang_12
-    || f->b == kid_hang_13
-
+  return is_kid_hang (f)
     || f->b == kid_climb_00
     || f->b == kid_climb_01
     || f->b == kid_climb_02
