@@ -74,6 +74,9 @@ play_level (struct level *lv)
   if (retry_level != level.number)
     start_level_time = al_get_timer_count (play_time);
 
+  if (! force_em) em = level.em;
+  if (! force_hue) hue = level.hue;
+
   play_anim (draw_level, compute_level, 12);
 
   switch (quit_anim) {

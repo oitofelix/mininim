@@ -181,6 +181,13 @@ draw_balcony (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (vm == VGA) {
+    balcony_bottom_left = apply_hue_palette (balcony_bottom_left);
+    balcony_bottom_right = apply_hue_palette (balcony_bottom_right);
+    balcony_top_left = apply_hue_palette (balcony_top_left);
+    balcony_top_right = apply_hue_palette (balcony_top_right);
+  }
+
   if (hgc) {
     balcony_bottom_left = apply_palette (balcony_bottom_left, hgc_palette);
     balcony_bottom_right = apply_palette (balcony_bottom_right, hgc_palette);

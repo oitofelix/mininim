@@ -125,6 +125,7 @@ draw_skeleton_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (vm == VGA) skeleton_floor_left = apply_hue_palette (skeleton_floor_left);
   if (hgc) skeleton_floor_left = apply_palette (skeleton_floor_left, hgc_palette);
 
   struct coord c;
@@ -154,6 +155,7 @@ draw_skeleton_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (vm == VGA) skeleton_floor_right = apply_hue_palette (skeleton_floor_right);
   if (hgc) skeleton_floor_right = apply_palette (skeleton_floor_right, hgc_palette);
 
   struct coord c;

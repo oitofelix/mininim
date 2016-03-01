@@ -55,4 +55,7 @@ void draw_room_anim_fg (ALLEGRO_BITMAP *bitmap,
 void draw_room_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
                    enum em em, enum vm vm, struct frame *f);
 
+ALLEGRO_BITMAP *apply_hue_palette (ALLEGRO_BITMAP *bitmap);
+ALLEGRO_COLOR apply_hue_color (ALLEGRO_COLOR c);
+
 #endif	/* MININIM_ROOM_H */

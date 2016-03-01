@@ -222,7 +222,7 @@ draw_sws_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
 {
   ALLEGRO_BITMAP *wall_single = NULL;
 
-  if (vm == VGA) wall_single = dv_wall_single;
+  if (vm == VGA) wall_single = apply_hue_palette (dv_wall_single);
   else if (em == DUNGEON) wall_single = de_wall_single;
   else wall_single = pe_wall_single;
 
@@ -236,7 +236,7 @@ draw_sws_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
 {
   ALLEGRO_BITMAP *wall_single_base = NULL;
 
-  if (vm == VGA) wall_single_base = dv_wall_single_base;
+  if (vm == VGA) wall_single_base = apply_hue_palette (dv_wall_single_base);
   else if (em == DUNGEON) wall_single_base = de_wall_single_base;
   else wall_single_base = pe_wall_single_base;
 
@@ -250,7 +250,7 @@ draw_sww_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
 {
   ALLEGRO_BITMAP *wall_left = NULL;
 
-  if (vm == VGA) wall_left = dv_wall_left;
+  if (vm == VGA) wall_left = apply_hue_palette (dv_wall_left);
   else if (em == DUNGEON) wall_left = de_wall_left;
   else wall_left = pe_wall_left;
 
@@ -264,7 +264,7 @@ draw_sww_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
 {
   ALLEGRO_BITMAP *wall_left_base = NULL;
 
-  if (vm == VGA) wall_left_base = dv_wall_left_base;
+  if (vm == VGA) wall_left_base = apply_hue_palette (dv_wall_left_base);
   else if (em == DUNGEON) wall_left_base = de_wall_left_base;
   else wall_left_base = pe_wall_left_base;
 
@@ -278,7 +278,7 @@ draw_wws_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
 {
   ALLEGRO_BITMAP *wall_right = NULL;
 
-  if (vm == VGA) wall_right = dv_wall_right;
+  if (vm == VGA) wall_right = apply_hue_palette (dv_wall_right);
   else if (em == DUNGEON) wall_right = de_wall_right;
   else wall_right = pe_wall_right;
 
@@ -292,7 +292,7 @@ draw_wws_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
 {
   ALLEGRO_BITMAP *wall_right_base = NULL;
 
-  if (vm == VGA) wall_right_base = dv_wall_right_base;
+  if (vm == VGA) wall_right_base = apply_hue_palette (dv_wall_right_base);
   else if (em == DUNGEON) wall_right_base = de_wall_right_base;
   else wall_right_base = pe_wall_right_base;
 
@@ -306,7 +306,7 @@ draw_www_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
 {
   ALLEGRO_BITMAP *wall_center = NULL;
 
-  if (vm == VGA) wall_center = dv_wall_center;
+  if (vm == VGA) wall_center = apply_hue_palette (dv_wall_center);
   else if (em == DUNGEON) wall_center = de_wall_center;
   else  wall_center = pe_wall_center;
 
@@ -320,7 +320,7 @@ draw_www_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
 {
   ALLEGRO_BITMAP *wall_center_base = NULL;
 
-  if (vm == VGA) wall_center_base = dv_wall_center_base;
+  if (vm == VGA) wall_center_base = apply_hue_palette (dv_wall_center_base);
   else if (em == DUNGEON) wall_center_base = de_wall_center_base;
   else wall_center_base = pe_wall_center_base;
 
@@ -336,8 +336,8 @@ draw_randomization (ALLEGRO_BITMAP *bitmap, struct pos *p,
     *wall_wide_divider = NULL;
 
   if (vm == VGA) {
-    wall_narrow_divider = dv_wall_narrow_divider;
-    wall_wide_divider = dv_wall_wide_divider;
+    wall_narrow_divider = apply_hue_palette (dv_wall_narrow_divider);
+    wall_wide_divider = apply_hue_palette (dv_wall_wide_divider);
   } else if (em == DUNGEON) {
     wall_narrow_divider = de_wall_narrow_divider;
     wall_wide_divider = de_wall_wide_divider;
@@ -408,7 +408,7 @@ draw_random_block (ALLEGRO_BITMAP *bitmap, struct pos *p,
 {
   ALLEGRO_BITMAP *wall_random_block = NULL;
 
-  if (vm == VGA) wall_random_block = dv_wall_random_block;
+  if (vm == VGA) wall_random_block = apply_hue_palette (dv_wall_random_block);
   else if (em == DUNGEON) wall_random_block = de_wall_random_block;
   else wall_random_block = pe_wall_random_block;
 
@@ -440,8 +440,8 @@ draw_left_mark (ALLEGRO_BITMAP *bitmap, struct pos *p, int r,
     *wall_mark_bottom_left = NULL;
 
   if (vm == VGA) {
-    wall_mark_top_left = dv_wall_mark_top_left;
-    wall_mark_bottom_left = dv_wall_mark_bottom_left;
+    wall_mark_top_left = apply_hue_palette (dv_wall_mark_top_left);
+    wall_mark_bottom_left = apply_hue_palette (dv_wall_mark_bottom_left);
   } else {
     wall_mark_top_left = de_wall_mark_top_left;
     wall_mark_bottom_left = de_wall_mark_bottom_left;
@@ -472,8 +472,8 @@ draw_right_mark (ALLEGRO_BITMAP *bitmap, struct pos *p, int r,
     *wall_mark_bottom_right = NULL;
 
   if (vm == VGA) {
-    wall_mark_top_right = dv_wall_mark_top_right;
-    wall_mark_bottom_right = dv_wall_mark_bottom_right;
+    wall_mark_top_right = apply_hue_palette (dv_wall_mark_top_right);
+    wall_mark_bottom_right = apply_hue_palette (dv_wall_mark_bottom_right);
   } else {
     wall_mark_top_right = de_wall_mark_top_right;
     wall_mark_bottom_right = de_wall_mark_bottom_right;

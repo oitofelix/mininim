@@ -143,6 +143,7 @@ draw_broken_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (vm == VGA) broken_floor_left = apply_hue_palette (broken_floor_left);
   if (hgc) broken_floor_left = apply_palette (broken_floor_left, hgc_palette);
 
   struct coord c;
@@ -172,6 +173,7 @@ draw_broken_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (vm == VGA) broken_floor_right = apply_hue_palette (broken_floor_right);
   if (hgc) broken_floor_right = apply_palette (broken_floor_right, hgc_palette);
 
   struct coord c;
@@ -210,6 +212,7 @@ draw_broken_floor_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (vm == VGA) broken_floor_front = apply_hue_palette (broken_floor_front);
   if (hgc) broken_floor_front = apply_palette (broken_floor_front, hgc_palette);
 
   draw_bitmapc (broken_floor_front, bitmap,

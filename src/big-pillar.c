@@ -185,6 +185,7 @@ draw_big_pillar_bottom_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (vm == VGA) big_pillar_bottom_left = apply_hue_palette (big_pillar_bottom_left);
   if (hgc) big_pillar_bottom_left = apply_palette (big_pillar_bottom_left, hgc_palette);
 
   struct coord c;
@@ -215,6 +216,7 @@ draw_big_pillar_bottom_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (vm == VGA) big_pillar_bottom_right = apply_hue_palette (big_pillar_bottom_right);
   if (hgc) big_pillar_bottom_right = apply_palette (big_pillar_bottom_right, hgc_palette);
 
   struct coord c;
@@ -245,6 +247,7 @@ draw_big_pillar_bottom_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (vm == VGA) big_pillar_bottom_fg = apply_hue_palette (big_pillar_bottom_fg);
   if (hgc) big_pillar_bottom_fg = apply_palette (big_pillar_bottom_fg, hgc_palette);
 
   struct coord c;
@@ -283,6 +286,7 @@ draw_big_pillar_top_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (vm == VGA) big_pillar_top_left = apply_hue_palette (big_pillar_top_left);
   if (hgc) big_pillar_top_left = apply_palette (big_pillar_top_left, hgc_palette);
 
   struct coord c;
@@ -334,6 +338,11 @@ draw_big_pillar_top_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
       break;
     }
     break;
+  }
+
+  if (vm == VGA) {
+    big_pillar_top_right = apply_hue_palette (big_pillar_top_right);
+    big_pillar_top_right_top = apply_hue_palette (big_pillar_top_right_top);
   }
 
   if (hgc) {

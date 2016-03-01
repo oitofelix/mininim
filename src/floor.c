@@ -185,6 +185,7 @@ draw_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (vm == VGA) floor_base = apply_hue_palette (floor_base);
   if (hgc) floor_base = apply_palette (floor_base, hgc_palette);
 
   struct coord c;
@@ -214,6 +215,7 @@ draw_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (vm == VGA) floor_left = apply_hue_palette (floor_left);
   if (hgc) floor_left = apply_palette (floor_left, hgc_palette);
 
   struct coord c;
@@ -243,6 +245,7 @@ draw_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (vm == VGA) floor_right = apply_hue_palette (floor_right);
   if (hgc) floor_right = apply_palette (floor_right, hgc_palette);
 
   struct coord c;
@@ -272,6 +275,7 @@ draw_floor_corner_00 (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (vm == VGA) floor_corner_00 = apply_hue_palette (floor_corner_00);
   if (hgc) floor_corner_00 = apply_palette (floor_corner_00, hgc_palette);
 
   struct coord c; floor_corner_00_coord (p, &c);
@@ -302,6 +306,7 @@ draw_floor_corner_01 (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (vm == VGA) floor_corner_01 = apply_hue_palette (floor_corner_01);
   if (hgc) floor_corner_01 = apply_palette (floor_corner_01, hgc_palette);
 
   struct coord c; floor_corner_01_coord (p, &c);
@@ -332,6 +337,7 @@ draw_floor_corner_02 (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (vm == VGA) floor_corner_02 = apply_hue_palette (floor_corner_02);
   if (hgc) floor_corner_02 = apply_palette (floor_corner_02, hgc_palette);
 
   struct coord c; floor_corner_02_coord (p, &c);

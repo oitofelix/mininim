@@ -123,11 +123,14 @@ draw_wall_brick (ALLEGRO_BITMAP *bitmap, struct pos *p,
   struct pos np; npos (p, &np);
   ALLEGRO_COLOR c = wall_color_array[np.floor][row][np.place + col];
   /* c = compute_wall_color (p, row, col); */
+  c = apply_hue_color (c);
   wall_brick_rect (p, row, col, &r);
   draw_filled_rect (bitmap, &r, c);
 
   wall_mark_frame (p, row, &f0);
+  f0.b = apply_hue_palette (f0.b);
   wall_mark_frame (p, row + 1, &f1);
+  f1.b = apply_hue_palette (f1.b);
   draw_frame (bitmap, &f0);
   draw_frame (bitmap, &f1);
 }

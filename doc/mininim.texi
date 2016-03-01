@@ -1475,6 +1475,16 @@ These key bindings modify how the engine graphically renders the game
 world objects.
 
 @table @kbd
+@kindex F9
+@cindex @code{--hue-mode}, related key binding
+@item F9
+Select hue mode.  This circulates around the modes: ``ORIGINAL'',
+``NONE'', ``GREEN'', ``GRAY'', ``YELLOW'' and ``BLUE''.  The
+``ORIGINAL'' value gives level modules autonomy in this choice for each
+particular level.  This is the default.  For the classic behavior of the
+first version of the original game select ``NONE''.  Related to option
+@option{--hue-mode}.
+
 @kindex F10
 @cindex @code{--guard-mode}, related key binding
 @item F10
@@ -2074,6 +2084,16 @@ Select guard mode.  Valid values for @var{guard-mode} are:
 level modules autonomy in this choice for each particular guard.  This
 is the default.  This can be changed in-game by the @kbd{F10} key
 binding.
+
+@optindex --hue-mode
+@cindex @kbd{F9}, related option
+@item --hue-mode=HUE-MODE
+Select hue mode.  Valid values for @var{hue-mode} are: @samp{ORIGINAL},
+@samp{NONE}, @samp{GREEN}, @samp{GRAY}, @samp{YELLOW} and @samp{BLUE}.
+The @samp{ORIGINAL} value gives level modules autonomy in this choice
+for each particular level.  This is the default.  For the classic
+behavior of the first version of the original game use @samp{NONE}.
+This can be changed in-game by the @kbd{F9} key binding.
 
 @optindex --mirror-mode
 @cindex @kbd{SHIFT+I}, related option (mirror mode)

@@ -24,6 +24,7 @@ static int last_room;
 static enum em last_em;
 static enum vm last_vm;
 static int last_hgc;
+static enum hue last_hue;
 static room_callback_f *room_callback;
 static size_t room_callback_nmemb;
 
@@ -187,11 +188,13 @@ draw_room (ALLEGRO_BITMAP *bitmap, int room,
       || em != last_em
       || vm != last_vm
       || hgc != last_hgc
+      || hue != last_hue
       || level.number != last_level) {
     update_wall_cache (room, em, vm);
     last_em = em;
     last_vm = vm;
     last_hgc = hgc;
+    last_hue = hue;
     last_room = room;
     last_level = level.number;
   }
@@ -635,4 +638,80 @@ draw_room_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
   }
   /* other cases */
   else draw_confg_fg (bitmap, &pv, em, vm, f);
+}
+
+ALLEGRO_COLOR
+green_hue_palette (ALLEGRO_COLOR c)
+{
+  unsigned char r, g, b, a;
+  al_unmap_rgba (c, &r, &g, &b, &a);
+  if (a == 0) return c;
+  r = add_char (r, -12);
+  g = add_char (g, +16);
+  b = add_char (b, -29);
+  return al_map_rgb (r, g, b);
+}
+
+ALLEGRO_COLOR
+gray_hue_palette (ALLEGRO_COLOR c)
+{
+  unsigned char r, g, b, a;
+  al_unmap_rgba (c, &r, &g, &b, &a);
+  if (a == 0) return c;
+  r = add_char (r, +13);
+  g = add_char (g, -7);
+  b = add_char (b, -52);
+  return al_map_rgb (r, g, b);
+}
+
+ALLEGRO_COLOR
+yellow_hue_palette (ALLEGRO_COLOR c)
+{
+  unsigned char r, g, b, a;
+  al_unmap_rgba (c, &r, &g, &b, &a);
+  if (a == 0) return c;
+  r = add_char (r, +78);
+  g = add_char (g, +25);
+  b = add_char (b, -64);
+  return al_map_rgb (r, g, b);
+}
+
+ALLEGRO_COLOR
+blue_hue_palette (ALLEGRO_COLOR c)
+{
+  unsigned char r, g, b, a;
+  al_unmap_rgba (c, &r, &g, &b, &a);
+  if (a == 0) return c;
+  r = add_char (r, -96);
+  g = add_char (g, -80);
+  b = add_char (b, +64);
+  return al_map_rgb (r, g, b);
+}
+
+ALLEGRO_BITMAP *
+apply_hue_palette (ALLEGRO_BITMAP *bitmap)
+{
+  switch (hue) {
+  case HUE_NONE: default: return bitmap;
+  case HUE_GREEN:
+    return apply_palette (bitmap, green_hue_palette);
+  case HUE_GRAY:
+    return apply_palette (bitmap, gray_hue_palette);
+  case HUE_YELLOW:
+    return apply_palette (bitmap, yellow_hue_palette);
+  case HUE_BLUE:
+    return apply_palette (bitmap, blue_hue_palette);
+  }
+}
+
+ALLEGRO_COLOR
+apply_hue_color (ALLEGRO_COLOR c)
+{
+  switch (hue) {
+  case HUE_NONE: default: return c;
+  case HUE_GREEN: return green_hue_palette (c);
+  case HUE_GRAY: return gray_hue_palette (c);
+  case HUE_YELLOW: return yellow_hue_palette (c);
+  case HUE_BLUE: return blue_hue_palette (c);
+  }
 }

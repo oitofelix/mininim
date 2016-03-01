@@ -260,22 +260,41 @@ play_anim (void (*draw_callback) (void),
         al_free (text);
       }
 
+      /* F9: change hue palette */
+      if (was_key_pressed (ALLEGRO_KEY_F9, 0, 0, true)) {
+        char *em_str = NULL;
+
+        if (force_hue) {
+          switch (hue) {
+          case HUE_NONE: hue = HUE_GREEN; em_str = "GREEN"; break;
+          case HUE_GREEN: hue = HUE_GRAY; em_str = "GRAY"; break;
+          case HUE_GRAY: hue = HUE_YELLOW; em_str = "YELLOW"; break;
+          case HUE_YELLOW: hue = HUE_BLUE; em_str = "BLUE"; break;
+          case HUE_BLUE: hue = level.hue;
+            em_str = "ORIGINAL"; force_hue = false; break;
+          }
+        } else {
+          hue = HUE_NONE; em_str = "NONE"; force_hue = true;
+        }
+
+        xasprintf (&text, "HUE MODE: %s", em_str);
+        draw_bottom_text (NULL, text);
+        al_free (text);
+      }
+
       /* F11: change environment mode */
       if (was_key_pressed (ALLEGRO_KEY_F11, 0, 0, true)) {
         char *em_str = NULL;
 
         if (force_em) {
-          if (original_em == em) force_em = false;
-          else em = (em == DUNGEON) ? PALACE : DUNGEON;
+          switch (em) {
+          case DUNGEON: em = PALACE; em_str = "PALACE"; break;
+          case PALACE: em = level.em;
+            em_str = "ORIGINAL"; force_em = false; break;
+          }
         } else {
-          em = (em == DUNGEON) ? PALACE : DUNGEON;
-          force_em = true;
+          em = DUNGEON; em_str = "DUNGEON"; force_em = true;
         }
-
-        if (force_em) {
-          if (em == DUNGEON) em_str = "DUNGEON";
-          else em_str = "PALACE";
-        } else em_str = "ORIGINAL";
 
         xasprintf (&text, "ENVIRONMENT MODE: %s", em_str);
         draw_bottom_text (NULL, text);

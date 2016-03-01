@@ -105,6 +105,7 @@ draw_bricks_00 (ALLEGRO_BITMAP *bitmap, struct pos *p,
   palette pal = get_palette (em, vm);
   bricks = apply_palette (bricks, pal);
 
+  if (vm == VGA) bricks = apply_hue_palette (bricks);
   if (hgc) bricks = apply_palette (bricks, hgc_palette);
 
   struct coord c;
@@ -129,6 +130,7 @@ draw_bricks_01 (ALLEGRO_BITMAP *bitmap, struct pos *p,
   palette pal = get_palette (em, vm);
   bricks = apply_palette (bricks, pal);
 
+  if (vm == VGA) bricks = apply_hue_palette (bricks);
   if (hgc) bricks = apply_palette (bricks, hgc_palette);
 
   struct coord c;
@@ -153,6 +155,7 @@ draw_bricks_02 (ALLEGRO_BITMAP *bitmap, struct pos *p,
   palette pal = get_palette (em, vm);
   bricks = apply_palette (bricks, pal);
 
+  if (vm == VGA) bricks = apply_hue_palette (bricks);
   if (hgc) bricks = apply_palette (bricks, hgc_palette);
 
   struct coord c;
@@ -177,6 +180,7 @@ draw_bricks_03 (ALLEGRO_BITMAP *bitmap, struct pos *p,
   palette pal = get_palette (em, vm);
   bricks = apply_palette (bricks, pal);
 
+  if (vm == VGA) bricks = apply_hue_palette (bricks);
   if (hgc) bricks = apply_palette (bricks, hgc_palette);
 
   struct coord c;

@@ -165,14 +165,6 @@ start (void)
     camera_follow_kid = k->id;
   }
 
-  /* define the enviroment mode based on the level */
-  switch (level.number) {
-  case 4: case 5: case 6: case 10: case 11: case 14:
-    original_em = PALACE; break;
-  default: original_em = DUNGEON; break;
-  }
-  if (! force_em) em = original_em;
-
   /* give the sword to kid if it's not in the starting level */
   if (level.number > 1) k->has_sword = true;
 
@@ -1051,6 +1043,23 @@ interpret_legacy_level (int number)
 
     /* printf ("(%i, %i, %i), style: %i\n", */
     /*         g->p.room, g->p.floor, g->p.place, g->style); */
+  }
+
+  /* define the enviroment mode based on the level */
+  switch (legacy_level.number) {
+  case 4: case 5: case 6: case 10: case 11: case 14:
+    legacy_level.em = PALACE; break;
+  default: legacy_level.em = DUNGEON; break;
+  }
+
+  /* define hue palettes based on the level */
+  switch (number) {
+  default:
+    legacy_level.hue = HUE_NONE; break;
+  case 3: case 7: legacy_level.hue = HUE_GREEN; break;
+  case 8: case 9: legacy_level.hue = HUE_GRAY; break;
+  case 12: case 13: legacy_level.hue = HUE_YELLOW; break;
+  case 14: legacy_level.hue = HUE_BLUE; break;
   }
 }
 

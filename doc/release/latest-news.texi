@@ -19,28 +19,68 @@
 @c below should be moved to the 'NEWS.texi' file and another list should
 @c be built from scratch here.
 
-@strong{Features:}
+@noindent @strong{Features:}
 
 @itemize
-@item Joystick support.
-@item Apoplexy level editor integration.
-@item Classic numeric keypad control.
+@item Joystick support.  To use a joystick just plug it in and press
+@kbd{CTRL+J} to enable and auto-calibrate it on the fly.  See the manual
+for the default mapping.  If the default mapping doesn't suit you or
+your joystick, you can use the options @option{--joystick-axis},
+@option{-joystick-button} and @option{--joystick-info} to define a new
+mapping.  In case your joystick is ill-behaved the
+@option{--joystick-axis-threshold} and
+@option{--joystick-button-threshold} options may help.  Using a joystick
+doesn't disable the keyboard --- you can use both interchangeably.
+@item Classic numeric keypad control.  This is always enabled, and can
+be used along the two other input methods (arrow keys and joystick).
+The original game manual used to refer to this as the standard input
+method.
+@item Apoplexy level editor integration.  Just copy MININIM's executable
+along with any dlls (if under @emph{Windows}) and its @file{data}
+directory to apoplexy's @file{prince/} directory, rename the executable
+to @file{prince.exe} (@file{prince} if under @emph{GNU/Linux}) and make
+sure there is a @file{LEVELS.DAT} file there, and you are ready to go.
+Apoplexy will invoke MININIM as a drop-in replacement for the original
+engine.
+@item Hue coloring support.  This makes the engine able to render
+VGA color schemes like the 1.3 and 1.4 versions of the original game.
+That's the default.  You can force particular hue modes by using the
+@option{--hue-mode} option or the @kbd{F9} key binding.  To revert to
+the previous and classic behavior use @option{--hue-mode=NONE}.
 @item Support for reading legacy PoP 1 @file{LEVELS.DAT} file using
-the option @option{--legacy-level=DAT}.
+the option @option{--legacy-level=DAT}.  Put the @file{LEVELS.DAT} file
+inside @file{data/dat-levels/} directory and use that option.
 @item Support for reading legacy PoP 1 PLV extended level files using
-the option @option{--legacy-level=PLV}.
-@item Command line compatibility for the sake of applications
-which use it.
-@item @file{LEVELS.DAT} legacy loading behavior compatibility.
+the option @option{--legacy-level=PLV}.  Put the
+@file{00.plv}..@file{15.plv} PLV files inside @file{data/plv-levels/}
+and use that option.
+@item Command line legacy compatibility for the sake of applications
+which use it.  Used by apoplexy.
+@item @file{LEVELS.DAT} legacy loading behavior compatibility for the
+sake of applications that rely on it.  Used by apoplexy.  Just put the
+@file{LEVELS.DAT} file in the same directory as the @file{mininim}
+executable and preference will be given to it, over the legacy level
+files under the @file{dat/legacy-levels/} directory.
 @item Kid start position can be specified using the
-@option{--start-pos} option.
+@option{--start-pos} option.  Very useful for placing the kid in a
+specific place for tests.  To start with the kid in level 12, room 15,
+floor 0 and place 7, invoke MININIM with the options
+@code{--start-level=12 --start-pos=15,0,7}.
 @item Disable screensaver by default.
-@item Guards have infallible defense in refraction periods.
+@item Guards have infallible defense in refraction periods, for longer
+and more dramatic battles.
 @item Shadow in legacy level 12 has the same total/current life points
-as the kid, and life points are taken off one at a time.
+as the kid, and life points are taken off one at a time, for a longer
+and more dramatic battle.
+@item @option{--keyboard-flip-mode} option renamed to
+@option{--gamepad-flip-mode}, since now it applies to joysticks as well.
 @end itemize
 
-@strong{Bug fixes:}
+@noindent @strong{Bug fixes:}
+
+All the bugs the author knew about at the time of this release have been
+fixed.  If you've found a bug or annoyance in the previous version,
+chances are it has been fixed, as well. ;-)
 
 @itemize
 @item Spurious wall collision occurs in kid's

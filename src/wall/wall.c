@@ -240,6 +240,11 @@ draw_wall_face (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (vm == VGA) {
+    wall_face = apply_hue_palette (wall_face);
+    wall_face_top = apply_hue_palette (wall_face_top);
+  }
+
   if (hgc) {
     wall_face = apply_palette (wall_face, hgc_palette);
     wall_face_top = apply_palette (wall_face_top, hgc_palette);

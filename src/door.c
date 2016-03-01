@@ -356,6 +356,7 @@ draw_door_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (vm == VGA) door_left = apply_hue_palette (door_left);
   if (hgc) door_left = apply_palette (door_left, hgc_palette);
 
   struct coord c;
@@ -408,6 +409,11 @@ draw_door_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (vm == VGA) {
+    door_right = apply_hue_palette (door_right);
+    door_top = apply_hue_palette (door_top);
+  }
+
   if (hgc) {
     door_right = apply_palette (door_right, hgc_palette);
     door_top = apply_palette (door_top, hgc_palette);
@@ -443,6 +449,7 @@ draw_door_pole (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (vm == VGA) door_pole = apply_hue_palette (door_pole);
   if (hgc) door_pole = apply_palette (door_pole, hgc_palette);
 
   draw_bitmapc (door_pole, bitmap, door_pole_coord (p, &c), 0);
@@ -473,6 +480,7 @@ draw_door_pole_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (vm == VGA) door_pole_base = apply_hue_palette (door_pole_base);
   if (hgc) door_pole_base = apply_palette (door_pole_base, hgc_palette);
 
   draw_bitmapc (door_pole_base, bitmap, door_pole_base_coord (p, &c), 0);
@@ -567,6 +575,11 @@ draw_door_grid (ALLEGRO_BITMAP *bitmap, struct pos *p, int i,
       break;
     }
     break;
+  }
+
+  if (vm == VGA) {
+    door_grid = apply_hue_palette (door_grid);
+    door_grid_tip = apply_hue_palette (door_grid_tip);
   }
 
   if (hgc) {

@@ -548,6 +548,7 @@ draw_spikes_floor_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (vm == VGA) spikes_floor_left = apply_hue_palette (spikes_floor_left);
   if (hgc) spikes_floor_left = apply_palette (spikes_floor_left, hgc_palette);
 
   struct coord c;
@@ -577,6 +578,7 @@ draw_spikes_floor_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (vm == VGA) spikes_floor_right = apply_hue_palette (spikes_floor_right);
   if (hgc) spikes_floor_right = apply_palette (spikes_floor_right, hgc_palette);
 
   struct coord c;
@@ -670,6 +672,7 @@ draw_spikes_left_00 (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (vm == VGA) spikes_left_00 = apply_hue_palette (spikes_left_00);
   if (hgc) spikes_left_00 = apply_palette (spikes_left_00, hgc_palette);
 
   struct coord c;
@@ -702,6 +705,7 @@ draw_spikes_right_00 (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (vm == VGA) spikes_right_00 = apply_hue_palette (spikes_right_00);
   if (hgc) spikes_right_00 = apply_palette (spikes_right_00, hgc_palette);
 
   struct coord c;
@@ -734,6 +738,7 @@ draw_spikes_fg_00 (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (vm == VGA) spikes_fg_00 = apply_hue_palette (spikes_fg_00);
   if (hgc) spikes_fg_00 = apply_palette (spikes_fg_00, hgc_palette);
 
   struct coord c;
@@ -828,6 +833,7 @@ draw_spikes_left_01 (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (vm == VGA) spikes_left_01 = apply_hue_palette (spikes_left_01);
   if (hgc) spikes_left_01 = apply_palette (spikes_left_01, hgc_palette);
 
   struct coord c;
@@ -860,6 +866,7 @@ draw_spikes_right_01 (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (vm == VGA) spikes_right_01 = apply_hue_palette (spikes_right_01);
   if (hgc) spikes_right_01 = apply_palette (spikes_right_01, hgc_palette);
 
   struct coord c;
@@ -892,6 +899,7 @@ draw_spikes_fg_01 (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (vm == VGA) spikes_fg_01 = apply_hue_palette (spikes_fg_01);
   if (hgc) spikes_fg_01 = apply_palette (spikes_fg_01, hgc_palette);
 
   struct coord c;
@@ -986,6 +994,7 @@ draw_spikes_left_02 (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (vm == VGA) spikes_left_02 = apply_hue_palette (spikes_left_02);
   if (hgc) spikes_left_02 = apply_palette (spikes_left_02, hgc_palette);
 
   struct coord c;
@@ -1018,6 +1027,7 @@ draw_spikes_right_02 (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (vm == VGA) spikes_right_02 = apply_hue_palette (spikes_right_02);
   if (hgc) spikes_right_02 = apply_palette (spikes_right_02, hgc_palette);
 
   struct coord c;
@@ -1050,6 +1060,7 @@ draw_spikes_fg_02 (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (vm == VGA) spikes_fg_02 = apply_hue_palette (spikes_fg_02);
   if (hgc) spikes_fg_02 = apply_palette (spikes_fg_02, hgc_palette);
 
   struct coord c;
@@ -1144,6 +1155,7 @@ draw_spikes_left_03 (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (vm == VGA) spikes_left_03 = apply_hue_palette (spikes_left_03);
   if (hgc) spikes_left_03 = apply_palette (spikes_left_03, hgc_palette);
 
   struct coord c;
@@ -1176,6 +1188,7 @@ draw_spikes_right_03 (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (vm == VGA) spikes_right_03 = apply_hue_palette (spikes_right_03);
   if (hgc) spikes_right_03 = apply_palette (spikes_right_03, hgc_palette);
 
   struct coord c;
@@ -1208,6 +1221,7 @@ draw_spikes_fg_03 (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (vm == VGA) spikes_fg_03 = apply_hue_palette (spikes_fg_03);
   if (hgc) spikes_fg_03 = apply_palette (spikes_fg_03, hgc_palette);
 
   struct coord c;
@@ -1302,6 +1316,7 @@ draw_spikes_left_04 (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (vm == VGA) spikes_left_04 = apply_hue_palette (spikes_left_04);
   if (hgc) spikes_left_04 = apply_palette (spikes_left_04, hgc_palette);
 
   struct coord c;
@@ -1334,6 +1349,7 @@ draw_spikes_right_04 (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (vm == VGA) spikes_right_04 = apply_hue_palette (spikes_right_04);
   if (hgc) spikes_right_04 = apply_palette (spikes_right_04, hgc_palette);
 
   struct coord c;
@@ -1366,6 +1382,7 @@ draw_spikes_fg_04 (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (vm == VGA) spikes_fg_04 = apply_hue_palette (spikes_fg_04);
   if (hgc) spikes_fg_04 = apply_palette (spikes_fg_04, hgc_palette);
 
   struct coord c;

@@ -20,11 +20,6 @@
 #ifndef MININIM_TYPES_H
 #define MININIM_TYPES_H
 
-/* environment mode */
-enum em {
-  DUNGEON, PALACE,
-};
-
 /* video mode */
 enum vm {
   CGA, EGA, VGA,
@@ -175,6 +170,14 @@ struct level {
     int total_lives;
     int style;
   } guard[GUARDS];
+
+  enum em {
+    DUNGEON, PALACE,
+  } em;
+
+  enum hue {
+    HUE_NONE, HUE_GREEN, HUE_GRAY, HUE_YELLOW, HUE_BLUE,
+  } hue;
 };
 
 struct legacy_level {
@@ -360,7 +363,7 @@ enum options {
   LOAD_CONFIG_OPTION, IGNORE_MAIN_CONFIG_OPTION, IGNORE_ENVIRONMENT_OPTION,
   JOYSTICK_AXIS_THRESHOLD_OPTION, JOYSTICK_BUTTON_THRESHOLD_OPTION,
   JOYSTICK_AXIS_OPTION, JOYSTICK_BUTTON_OPTION, JOYSTICK_INFO_OPTION,
-  START_POS_OPTION,
+  START_POS_OPTION, HUE_MODE_OPTION,
 };
 
 enum level_module {

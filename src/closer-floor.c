@@ -269,6 +269,7 @@ draw_pressed_closer_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (vm == VGA) pressed_closer_floor_base = apply_hue_palette (pressed_closer_floor_base);
   if (hgc) pressed_closer_floor_base = apply_palette (pressed_closer_floor_base, hgc_palette);
 
   struct coord c;
@@ -307,6 +308,7 @@ draw_pressed_closer_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (vm == VGA) pressed_closer_floor_left = apply_hue_palette (pressed_closer_floor_left);
   if (hgc) pressed_closer_floor_left = apply_palette (pressed_closer_floor_left, hgc_palette);
 
   struct coord c;
@@ -356,6 +358,11 @@ draw_pressed_closer_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (vm == VGA) {
+    floor_right = apply_hue_palette (floor_right);
+    pressed_closer_floor_right = apply_hue_palette (pressed_closer_floor_right);
+  }
+
   if (hgc) {
     floor_right = apply_palette (floor_right, hgc_palette);
     pressed_closer_floor_right = apply_palette (pressed_closer_floor_right, hgc_palette);
@@ -401,6 +408,7 @@ draw_unpressed_closer_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (vm == VGA) unpressed_closer_floor_base = apply_hue_palette (unpressed_closer_floor_base);
   if (hgc) unpressed_closer_floor_base = apply_palette (unpressed_closer_floor_base, hgc_palette);
 
   struct coord c;

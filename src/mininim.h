@@ -161,14 +161,16 @@ ALLEGRO_TEXTLOG *load_config (char *filename);
 void save_game (char *filename);
 int max_int (int a, int b);
 int min_int (int a, int b);
+unsigned char add_char (unsigned char a, signed char b);
 
 /* variables */
 extern ALLEGRO_TIMER *play_time;
 extern enum vm vm;
 extern enum gm gm;
 extern enum em em;
-extern enum em original_em;
 extern bool force_em;
+extern enum hue hue;
+extern bool force_hue;
 extern bool immortal_mode;
 extern int initial_total_lives, total_lives,
   initial_current_lives, current_lives;

@@ -222,6 +222,11 @@ draw_carpet_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
   else {
     get_carpet_bitmaps (p, em, vm, &carpet, &carpet_top);
 
+    if (vm == VGA) {
+      carpet = apply_hue_palette (carpet);
+      carpet_top = apply_hue_palette (carpet_top);
+    }
+
     if (hgc) {
       carpet = apply_palette (carpet, hgc_palette);
       carpet_top = apply_palette (carpet_top, hgc_palette);
@@ -251,6 +256,11 @@ draw_carpet_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
     draw_confg_left (bitmap, &pr, em, vm, true);
   } else {
     get_carpet_bitmaps (p, em, vm, &carpet, &carpet_top);
+
+    if (vm == VGA) {
+      carpet = apply_hue_palette (carpet);
+      carpet_top = apply_hue_palette (carpet_top);
+    }
 
     if (hgc) {
       carpet = apply_palette (carpet, hgc_palette);

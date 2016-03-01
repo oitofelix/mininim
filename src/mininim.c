@@ -56,8 +56,9 @@ ALLEGRO_THREAD *load_config_dialog_thread, *save_game_dialog_thread;
 ALLEGRO_TIMER *play_time;
 enum vm vm = VGA;
 enum em em = DUNGEON;
-enum em original_em = DUNGEON;
 bool force_em = false;
+enum hue hue = HUE_NONE;
+bool force_hue = false;
 enum gm gm = ORIGINAL_GM;
 bool immortal_mode;
 int initial_total_lives = KID_INITIAL_TOTAL_LIVES, total_lives;
@@ -122,8 +123,9 @@ static struct argp_option options[] = {
   /* Rendering */
   {NULL, 0, NULL, 0, "Rendering:", 0},
   {"video-mode", VIDEO_MODE_OPTION, "VIDEO-MODE", 0, "Select video mode.  Valid values for VIDEO-MODE are: VGA, EGA, CGA and HGC.  The default is VGA.  This can be changed in-game by the F12 key binding.", 0},
-  {"environment-mode", ENVIRONMENT_MODE_OPTION, "ENVIRONMENT-MODE", 0, "Select environment mode.  Valid values for ENVIRONMENT-MODE are: ORIGINAL, DUNGEON and PALACE.  The 'ORIGINAL' value gives level modules autonomy in this choice for each particular level.  This is the default.  This can be changed in-game by the F11 key binding.", 0},
-  {"guard-mode", GUARD_MODE_OPTION, "GUARD-MODE", 0, "Select guard mode.  Valid values for GUARD-MODE are: ORIGINAL, GUARD, FAT-GUARD, VIZIER, SKELETON and SHADOW.  The 'ORIGINAL' value gives level modules autonomy in this choice for each particular guard.  This is the default.  This can be changed in-game by the F10 key binding.", 0},
+  {"environment-mode", ENVIRONMENT_MODE_OPTION, "ENVIRONMENT-MODE", 0, "Select environment mode.  Valid values for ENVIRONMENT-MODE are: ORIGINAL, DUNGEON and PALACE.  The ORIGINAL value gives level modules autonomy in this choice for each particular level.  This is the default.  This can be changed in-game by the F11 key binding.", 0},
+  {"guard-mode", GUARD_MODE_OPTION, "GUARD-MODE", 0, "Select guard mode.  Valid values for GUARD-MODE are: ORIGINAL, GUARD, FAT-GUARD, VIZIER, SKELETON and SHADOW.  The ORIGINAL value gives level modules autonomy in this choice for each particular guard.  This is the default.  This can be changed in-game by the F10 key binding.", 0},
+{"hue-mode", HUE_MODE_OPTION, "HUE-MODE", 0, "Select hue mode.  Valid values for HUE-MODE are: ORIGINAL, NONE, GREEN, GRAY, YELLOW and BLUE.  The ORIGINAL value gives level modules autonomy in this choice for each particular level.  This is the default.  For the classic behavior of the first version of the original game use NONE.  This can be changed in-game by the F9 key binding.", 0},
   {"display-flip-mode", DISPLAY_FLIP_MODE_OPTION, "DISPLAY-FLIP-MODE", 0, "Select display flip mode.  Valid values for DISPLAY-FLIP-MODE are: NONE, VERTICAL, HORIZONTAL and VERTICAL-HORIZONTAL.  The default is NONE.  This can be changed in-game by the SHIFT+I key binding.", 0},
   {"mirror-mode", MIRROR_MODE_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable mirror mode.  In mirror mode the screen and the keyboard are flipped horizontally.  This is equivalent of specifying both the options --display-flip-mode=HORIZONTAL and --gamepad-flip-mode=HORIZONTAL.  The default is FALSE.  This can be changed in-game by the SHIFT+I and SHIFT+K key bindings for the display and keyboard, respectively.", 0},
   {"blind-mode", BLIND_MODE_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable blind mode.  In blind mode background and non-animated sprites are not drawn.  The default is FALSE.  This can be changed in-game by the SHIFT+B key binding.", 0},
@@ -532,6 +534,9 @@ parser (int key, char *arg, struct argp_state *state)
 
   char *environment_mode_enum[] = {"ORIGINAL", "DUNGEON", "PALACE", NULL};
 
+  char *hue_mode_enum[] = {"ORIGINAL", "NONE", "GREEN",
+                           "GRAY", "YELLOW", "BLUE", NULL};
+
   char *guard_mode_enum[] = {"ORIGINAL", "GUARD", "FAT-GUARD",
                              "VIZIER", "SKELETON", "SHADOW", NULL};
 
@@ -612,6 +617,18 @@ parser (int key, char *arg, struct argp_state *state)
     case 0: force_em = false; break;
     case 1: force_em = true, em = DUNGEON; break;
     case 2: force_em = true, em = PALACE; break;
+    }
+    break;
+  case HUE_MODE_OPTION:
+    e = optval_to_enum (&i, key, arg, state, hue_mode_enum, 0);
+    if (e) return e;
+    switch (i) {
+    case 0: force_hue = false; break;
+    case 1: force_hue = true, hue = HUE_NONE; break;
+    case 2: force_hue = true, hue = HUE_GREEN; break;
+    case 3: force_hue = true, hue = HUE_GRAY; break;
+    case 4: force_hue = true, hue = HUE_YELLOW; break;
+    case 5: force_hue = true, hue = HUE_BLUE; break;
     }
     break;
   case GUARD_MODE_OPTION:
@@ -1335,4 +1352,12 @@ int
 min_int (int a, int b)
 {
   return (a < b) ? a : b;
+}
+
+unsigned char
+add_char (unsigned char a, signed char b)
+{
+  if (b < 0 && -b > a) return 0;
+  if (b > 0 && b > UCHAR_MAX - a) return UCHAR_MAX;
+  return a + b;
 }

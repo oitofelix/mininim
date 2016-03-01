@@ -459,6 +459,7 @@ draw_left_01 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
     break;
   }
 
+  if (vm == VGA) chopper = apply_hue_palette (chopper);
   if (hgc) chopper = apply_palette (chopper, hgc_palette);
 
   struct coord c;
@@ -494,6 +495,7 @@ draw_left_02 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
     break;
   }
 
+  if (vm == VGA) chopper = apply_hue_palette (chopper);
   if (hgc) chopper = apply_palette (chopper, hgc_palette);
 
   struct coord c;
@@ -529,6 +531,7 @@ draw_left_03 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
     break;
   }
 
+  if (vm == VGA) chopper = apply_hue_palette (chopper);
   if (hgc) chopper = apply_palette (chopper, hgc_palette);
 
   struct coord c;
@@ -564,6 +567,7 @@ draw_left_04 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
     break;
   }
 
+  if (vm == VGA) chopper = apply_hue_palette (chopper);
   if (hgc) chopper = apply_palette (chopper, hgc_palette);
 
   struct coord c;
@@ -599,6 +603,7 @@ draw_left_05 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
     break;
   }
 
+  if (vm == VGA) chopper = apply_hue_palette (chopper);
   if (hgc) chopper = apply_palette (chopper, hgc_palette);
 
   struct coord c;
@@ -650,6 +655,7 @@ draw_fg_01 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
     break;
   }
 
+  if (vm == VGA) fg = apply_hue_palette (fg);
   if (hgc) fg = apply_palette (fg, hgc_palette);
 
   struct coord c;
@@ -686,6 +692,7 @@ draw_fg_02 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
     break;
   }
 
+  if (vm == VGA) fg = apply_hue_palette (fg);
   if (hgc) fg = apply_palette (fg, hgc_palette);
 
   struct coord c;
@@ -722,6 +729,7 @@ draw_fg_03 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
     break;
   }
 
+  if (vm == VGA) fg = apply_hue_palette (fg);
   if (hgc) fg = apply_palette (fg, hgc_palette);
 
   struct coord c;
@@ -758,6 +766,7 @@ draw_fg_04 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
     break;
   }
 
+  if (vm == VGA) fg = apply_hue_palette (fg);
   if (hgc) fg = apply_palette (fg, hgc_palette);
 
   struct coord c;
@@ -794,6 +803,7 @@ draw_fg_05 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
     break;
   }
 
+  if (vm == VGA) fg = apply_hue_palette (fg);
   if (hgc) fg = apply_palette (fg, hgc_palette);
 
   struct coord c;

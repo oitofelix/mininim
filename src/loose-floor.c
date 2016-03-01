@@ -602,6 +602,7 @@ draw_falling_loose_floor (ALLEGRO_BITMAP *bitmap, struct pos *p,
     survey (_br, posf, &l->f, &br, &fpbr, &nfpbr);
     l->f.b = get_correct_falling_loose_floor_bitmap (l->f.b);
     struct frame f = l->f;
+    if (vm == VGA) f.b = apply_hue_palette (f.b);
     if (hgc) f.b = apply_palette (f.b, hgc_palette);
     draw_frame (bitmap, &f);
     draw_confg_base (bitmap, &fptr, em, vm);
@@ -702,6 +703,7 @@ draw_loose_floor_00_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (vm == VGA) loose_floor_base_00 = apply_hue_palette (loose_floor_base_00);
   if (hgc) loose_floor_base_00 = apply_palette (loose_floor_base_00, hgc_palette);
 
   struct coord c;
@@ -731,6 +733,7 @@ draw_loose_floor_00_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (vm == VGA) loose_floor_left_00 = apply_hue_palette (loose_floor_left_00);
   if (hgc) loose_floor_left_00 = apply_palette (loose_floor_left_00, hgc_palette);
 
   struct coord c;
@@ -760,6 +763,7 @@ draw_loose_floor_00_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (vm == VGA) loose_floor_right_00 = apply_hue_palette (loose_floor_right_00);
   if (hgc) loose_floor_right_00 = apply_palette (loose_floor_right_00, hgc_palette);
 
   struct coord c;
@@ -798,6 +802,7 @@ draw_loose_floor_01_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (vm == VGA) loose_floor_base_01 = apply_hue_palette (loose_floor_base_01);
   if (hgc) loose_floor_base_01 = apply_palette (loose_floor_base_01, hgc_palette);
 
   struct coord c;
@@ -827,6 +832,7 @@ draw_loose_floor_01_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (vm == VGA) loose_floor_left_01 = apply_hue_palette (loose_floor_left_01);
   if (hgc) loose_floor_left_01 = apply_palette (loose_floor_left_01, hgc_palette);
 
   struct coord c;
@@ -856,6 +862,7 @@ draw_loose_floor_01_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  if (vm == VGA) loose_floor_right_01 = apply_hue_palette (loose_floor_right_01);
   if (hgc) loose_floor_right_01 = apply_palette (loose_floor_right_01, hgc_palette);
 
   struct coord c;
