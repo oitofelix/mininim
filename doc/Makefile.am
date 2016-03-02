@@ -63,20 +63,26 @@ mininim_TEXINFOS = \
 
 EXTRA_DIST = mininim-figures
 
-eps:
-	$(MKDIR_P) "${builddir}/mininim-figures/"
-	for f in "${srcdir}/mininim-figures/"*.png; do \
-		convert $$f "${builddir}/mininim-figures/"`basename $${f%.png}.eps`; done
+mininim.info:
+	touch mininim.info
 
-install-info-local:
-	$(MKDIR_P) "${infodir}"
-	chmod u+w "${infodir}"
-	cp -rv "${srcdir}/mininim-figures" "${infodir}"
+mininim.dvi: mininim.pdf
+	touch mininim.dvi
 
-uninstall-local:
-	find "${infodir}/mininim-figures" \( -type f -or -type d \) \
-		! -perm -u+w -exec chmod u+w {} ';'
-	rm -rf "${infodir}/mininim-figures"
+# eps:
+# 	$(MKDIR_P) "${builddir}/mininim-figures/"
+# 	for f in "${srcdir}/mininim-figures/"*.png; do \
+# 		convert $$f "${builddir}/mininim-figures/"`basename $${f%.png}.eps`; done
+
+# install-info-local:
+# 	$(MKDIR_P) "${infodir}"
+# 	chmod u+w "${infodir}"
+# 	cp -rv "${srcdir}/mininim-figures" "${infodir}"
+
+# uninstall-local:
+# 	find "${infodir}/mininim-figures" \( -type f -or -type d \) \
+# 		! -perm -u+w -exec chmod u+w {} ';'
+# 	rm -rf "${infodir}/mininim-figures"
 
 
 

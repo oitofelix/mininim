@@ -151,9 +151,9 @@ install-data-hook:
 	cp -rv "${top_srcdir}/data" "${DESTDIR}${pkgdatadir}"
 
 uninstall-local:
-	find "${pkgdatadir}/data" \( -type f -or -type d \) \
+	find "${DESTDIR}${pkgdatadir}/data" \( -type f -or -type d \) \
 		! -perm -u+w -exec chmod u+w {} ';'
-	rm -rf "${pkgdatadir}/data"
+	rm -rf "${DESTDIR}${pkgdatadir}/data"
 
 
 
