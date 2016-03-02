@@ -49,9 +49,9 @@ redistribute it and/or modify it under the terms of the
 Licence) as published by the FSF — with no Invariant Sections; either
 version 1.3, or (at your option) any later version.
 
-MININIM features various of improvements over the original game, too
-many to make an exhaustive list here.  Some of its noteworthy
-advantages are:
+MININIM features various improvements over the original game, too many
+to make an exhaustive list here.  Some of its noteworthy advantages
+are:
 
 - Portable to modern operating systems.
 - Video, environment, hue and guard modes may be selected on-the-fly.
