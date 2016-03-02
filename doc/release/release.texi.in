@@ -41,7 +41,7 @@
 @set pdfUrl @value{downloadUrl}@value{pdf}
 
 @c --- Forum;
-@set forumUrl http://forum.princed.org/viewtopic.php?f=69&t=3783
+@set forumUrl http://forum.princed.org/viewforum.php?f=127
 
 @c --- IRC;
 @set IRCurl irc://irc.freenode.net/mininim
