@@ -71,7 +71,7 @@ are:
 
 - [Homepage](http://oitofelix.github.io/mininim/)
 - [Atom feed](http://oitofelix.github.io/feed.xml)
-- [Forum](http://forum.princed.org/viewtopic.php?f=69&t=3783)
+- [Forum](http://forum.princed.org/viewforum.php?f=127)
 - [IRC channel](irc://irc.freenode.net/mininim)
 - [Bug reporting](https://github.com/oitofelix/mininim/issues)
 - [VCS](https://github.com/oitofelix/mininim)
