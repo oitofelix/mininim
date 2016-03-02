@@ -49,9 +49,9 @@ redistribute it and/or modify it under the terms of the
 Licence) as published by the FSF — with no Invariant Sections; either
 version 1.3, or (at your option) any later version.
 
-   MININIM features various of improvements over the original game, too
-many to make an exhaustive list here.  Some of its noteworthy advantages
-are:
+MININIM features various of improvements over the original game, too
+many to make an exhaustive list here.  Some of its noteworthy
+advantages are:
 
 - Portable to modern operating systems.
 - Video, environment, hue and guard modes may be selected on-the-fly.
@@ -67,6 +67,31 @@ are:
 - Capability of loading level files in multiple formats.
 
 
+### Links
+
+- [Homepage](http://oitofelix.github.io/mininim/)
+- [Atom feed](http://oitofelix.github.io/feed.xml)
+- [Forum](http://forum.princed.org/viewtopic.php?f=69&t=3783)
+- [IRC channel](irc://irc.freenode.net/mininim)
+- [Bug reporting](https://github.com/oitofelix/mininim/issues)
+- [VCS](https://github.com/oitofelix/mininim)
+
+
+### Support MININIM development
+
+__MININIM__ development is voluntary.  If you like this game and want
+to thank the author for the work he has done so far, or want to enable
+him to spend more time improving it, please
+[make a donation!](/funding.html) For values equal or greater than 50
+US$ or 0.12 BTC your name will be acknowledged in the "Donors" section
+of the manual and in the [donors page](/funding.html#donors).  If you
+decide to make recurrent donations, the total amount of your donations
+will be updated every month for all records.  Thank you for your
+support.
+
+[__PLEASE, SUPPORT MININIM DEVELOPMENT!__](/funding.html)
+
+
 ### Game play
 
 The image below links to a game play demonstration in the animated PNG
@@ -80,6 +105,71 @@ alt="Game play" title="Click here to watch a game play (APNG format).">
 <img src="{{ page.base_local }}{{ site.baseurl }}/game-play-thumb.png">
 </a>
 </div>
+
+
+### Download
+
+
+**User’s Manual**
+
+   If you just want to have a look in the latest release documentation,
+you can download the manual in PDF format separately.
+
+   [mininim-0.10.pdf](https://github.com/oitofelix/mininim/releases/download/v0.10/mininim-0.10.pdf)
+
+
+**Windows**
+
+   If you are under Microsoft Windows a MinGW build is readily
+available.  No installation is required, just extract the zip archive
+and run ‘mininim.exe’.  The PDF manual is bundled as well.
+
+   [mininim-0.10-win32.zip](https://github.com/oitofelix/mininim/releases/download/v0.10/mininim-0.10-win32.zip)
+
+
+**GNU/Linux**
+
+   If you use GNU/Linux, you have to build from source.  This should be
+quite straightforward, provided you install the Allegro 5 development
+libraries using your distribution’s package manager.  If you use an apt
+based distribution (Debian, Ubuntu, ...)  you can do this by invoking
+the command:
+
+     sudo apt-get install '^liballegro.*5-dev$'
+
+   When building the sources, the usual incantation ‘./configure &&
+make’ is often enough.  The installation step (‘make install’) is
+optional as MININIM is able to run directly from its source directory
+(provided you don’t make a ‘VPATH’ build, in which case you need to
+specify the _data path_.  See the ‘--data-path’ option).
+
+Here are the compressed sources and a GPG detached signature:
+
+- [mininim-0.10.tar.gz](https://github.com/oitofelix/mininim/releases/download/v0.10/mininim-0.10.tar.gz)
+- [mininim-0.10.tar.gz.sig](https://github.com/oitofelix/mininim/releases/download/v0.10/mininim-0.10.tar.gz.sig)
+
+
+Use the ‘.sig’ file to verify that the corresponding file (without the
+‘.sig’ suffix) is intact.  First, be sure to download both the ‘.sig’
+file and the corresponding tarball.  Then, run this command:
+
+     gpg --verify mininim-0.10.tar.gz.sig
+
+If that command fails because you don’t have the required public key,
+then run this command to import it:
+
+     gpg --recv-keys 0x28D618AF --keyserver hkp://keys.gnupg.net
+
+and rerun the ‘gpg --verify’ command.
+
+This release is signed by _Bruno Félix Rezende Ribeiro_.  His key
+fingerprint is ‘7CB1 208C 7336 56B7 5962 2500 27B9 C6FD 28D6 18AF’.
+
+This release was bootstrapped with the following tools:
+
+- GNU Autoconf 2.69
+- GNU Automake 1.14.1
+- GNU Texinfo 5.2
 
 
 ### MININIM 0.10 (March 01, 2016)
@@ -228,80 +318,6 @@ the level, not of when the game is saved.
 - Simple jump might fall earlier than expected.
 
 
-### Links
-
-- [Homepage](http://oitofelix.github.io/mininim/)
-- [Atom feed](http://oitofelix.github.io/feed.xml)
-- [Forum](http://forum.princed.org/viewtopic.php?f=69&t=3783)
-- [IRC channel](irc://irc.freenode.net/mininim)
-- [Bug reporting](https://github.com/oitofelix/mininim/issues)
-- [VCS](https://github.com/oitofelix/mininim)
-
-
-### Download
-
-
-**User’s Manual**
-
-   If you just want to have a look in the latest release documentation,
-you can download the manual in PDF format separately.
-
-   [mininim-0.10.pdf](https://github.com/oitofelix/mininim/releases/download/v0.10/mininim-0.10.pdf)
-
-
-**Windows**
-
-   If you are under Microsoft Windows a MinGW build is readily
-available.  No installation is required, just extract the zip archive
-and run ‘mininim.exe’.  The PDF manual is bundled as well.
-
-   [mininim-0.10-win32.zip](https://github.com/oitofelix/mininim/releases/download/v0.10/mininim-0.10-win32.zip)
-
-
-**GNU/Linux**
-
-   If you use GNU/Linux, you have to build from source.  This should be
-quite straightforward, provided you install the Allegro 5 development
-libraries using your distribution’s package manager.  If you use an apt
-based distribution (Debian, Ubuntu, ...)  you can do this by invoking
-the command:
-
-     sudo apt-get install '^liballegro.*5-dev$'
-
-   When building the sources, the usual incantation ‘./configure &&
-make’ is often enough.  The installation step (‘make install’) is
-optional as MININIM is able to run directly from its source directory
-(provided you don’t make a ‘VPATH’ build, in which case you need to
-specify the _data path_.  See the ‘--data-path’ option).
-
-Here are the compressed sources and a GPG detached signature:
-
-- [mininim-0.10.tar.gz](https://github.com/oitofelix/mininim/releases/download/v0.10/mininim-0.10.tar.gz)
-- [mininim-0.10.tar.gz.sig](https://github.com/oitofelix/mininim/releases/download/v0.10/mininim-0.10.tar.gz.sig)
-
-   Use the ‘.sig’ file to verify that the corresponding file (without
-the ‘.sig’ suffix) is intact.  First, be sure to download both the
-‘.sig’ file and the corresponding tarball.  Then, run this command:
-
-     gpg --verify mininim-0.10.tar.gz.sig
-
-   If that command fails because you don’t have the required public key,
-then run this command to import it:
-
-     gpg --recv-keys 0x28D618AF --keyserver hkp://keys.gnupg.net
-
-and rerun the ‘gpg --verify’ command.
-
-   This release is signed by _Bruno Félix Rezende Ribeiro_.  His key
-fingerprint is ‘7CB1 208C 7336 56B7 5962 2500 27B9 C6FD 28D6 18AF’.
-
-This release was bootstrapped with the following tools:
-
-- GNU Autoconf 2.69
-- GNU Automake 1.14.1
-- GNU Texinfo 5.2
-
-
 ### To do
 
 The following additional features are planned to be implemented
@@ -312,21 +328,6 @@ eventually.
 - Level generator module
 - Guile scripting
 - Network play
-
-
-### Support MININIM development
-
-__MININIM__ development is voluntary.  If you like this game and want
-to thank the author for the work he has done so far, or want to enable
-him to spend more time improving it, please
-[make a donation!](/funding.html) For values equal or greater than 50
-US$ or 0.12 BTC your name will be acknowledged in the "Donors" section
-of the manual and in the [donors page](/funding.html#donors).  If you
-decide to make recurrent donations, the total amount of your donations
-will be updated every month for all records.  Thank you for your
-support.
-
-[__PLEASE, SUPPORT MININIM DEVELOPMENT!__](/funding.html)
 
 
 <hr>
