@@ -82,9 +82,9 @@ alt="Game play" title="Click here to watch a game play (APNG format).">
 </div>
 
 
-### News (MININIM 0.10 [March 01, 2016])
+### MININIM 0.10 (March 01, 2016)
 
-*Features:*
+**Features:**
 
 - Joystick support.  To use a joystick just plug it in and press
 ‘CTRL+J’ to enable and auto-calibrate it on the fly.  See the manual
@@ -147,7 +147,7 @@ more dramatic battle.
 - ‘--keyboard-flip-mode’ option renamed to ‘--gamepad-flip-mode’,
 since now it applies to joysticks as well.
 
-*Bug fixes:*
+**Bug fixes:**
 
 All the bugs the author knew about at the time of this release have
 been fixed.  If you’ve found a bug or annoyance in the previous
@@ -240,25 +240,25 @@ the level, not of when the game is saved.
 
 ### Download
 
-User’s Manual
--------------
+
+**User’s Manual**
 
    If you just want to have a look in the latest release documentation,
 you can download the manual in PDF format separately.
 
-   <https://github.com/oitofelix/mininim/releases/download/v0.10/mininim-0.10.pdf>
+   [mininim-0.10.pdf](https://github.com/oitofelix/mininim/releases/download/v0.10/mininim-0.10.pdf)
 
-Windows
--------
+
+**Windows**
 
    If you are under Microsoft Windows a MinGW build is readily
 available.  No installation is required, just extract the zip archive
 and run ‘mininim.exe’.  The PDF manual is bundled as well.
 
-   <https://github.com/oitofelix/mininim/releases/download/v0.10/mininim-0.10-win32.zip>
+   [mininim-0.10-win32.zip](https://github.com/oitofelix/mininim/releases/download/v0.10/mininim-0.10-win32.zip)
 
-GNU/Linux
----------
+
+**GNU/Linux**
 
    If you use GNU/Linux, you have to build from source.  This should be
 quite straightforward, provided you install the Allegro 5 development
@@ -276,10 +276,8 @@ specify the _data path_.  See the ‘--data-path’ option).
 
 Here are the compressed sources and a GPG detached signature:
 
-   •
-     <https://github.com/oitofelix/mininim/releases/download/v0.10/mininim-0.10.tar.gz>
-   •
-     <https://github.com/oitofelix/mininim/releases/download/v0.10/mininim-0.10.tar.gz.sig>
+- [mininim-0.10.tar.gz](https://github.com/oitofelix/mininim/releases/download/v0.10/mininim-0.10.tar.gz)
+- [mininim-0.10.tar.gz.sig](https://github.com/oitofelix/mininim/releases/download/v0.10/mininim-0.10.tar.gz.sig)
 
    Use the ‘.sig’ file to verify that the corresponding file (without
 the ‘.sig’ suffix) is intact.  First, be sure to download both the
@@ -298,9 +296,10 @@ and rerun the ‘gpg --verify’ command.
 fingerprint is ‘7CB1 208C 7336 56B7 5962 2500 27B9 C6FD 28D6 18AF’.
 
 This release was bootstrapped with the following tools:
-   • GNU Autoconf 2.69
-   • GNU Automake 1.14.1
-   • GNU Texinfo 5.2
+
+- GNU Autoconf 2.69
+- GNU Automake 1.14.1
+- GNU Texinfo 5.2
 
 
 ### To do
