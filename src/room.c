@@ -254,8 +254,20 @@ draw_confg_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (con (p)->fg != WALL) pv = *p;
 
+  enum conbg bg = con (&pv)->bg;
+  struct rect r;
   switch (con (&pv)->fg) {
-  case NO_FLOOR: break;
+  case NO_FLOOR:
+    if (peq (p, &mouse_pos)
+        && (bg == NO_BRICKS
+            || (em == DUNGEON && bg == NO_BG)
+            || (em == PALACE && bg == BRICKS_00))) {
+      r = new_rect (p->room, p->place * PLACE_WIDTH + 25,
+                    p->floor * PLACE_HEIGHT + 3,
+                    PLACE_WIDTH, PLACE_HEIGHT - 16);
+      draw_filled_rect (bitmap, &r, al_map_rgba (64, 64, 64, 0));
+    }
+    break;
   case FLOOR: draw_floor_base (bitmap, &pv, em, vm); break;
   case BROKEN_FLOOR: draw_floor_base (bitmap, &pv, em, vm); break;
   case SKELETON_FLOOR: draw_floor_base (bitmap, &pv, em, vm); break;
@@ -571,11 +583,12 @@ draw_room_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
   /* when falling at construct's left */
   if (br.y >= (pv.floor + 1) * PLACE_HEIGHT - 6
       && br.x >= pv.place * PLACE_WIDTH
-      && is_anim_fall (f)) {
+      && is_anim_fall (f)
+      && con (&pv)->fg != NO_FLOOR) {
     draw_confg_base (bitmap, &pv, em, vm);
     draw_confg_left (bitmap, &pv, em, vm, true);
 
-    if (con (p)->fg == TCARPET)
+    if (con (&pv)->fg == TCARPET)
       draw_confg_right (bitmap, &pv, em, vm, true);
   }
   /* when climbing the construct */
