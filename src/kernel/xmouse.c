@@ -57,7 +57,21 @@ get_mouse_pos (struct pos *p)
   c.room = room_view;
 
   int ry = (c.y - 3) % PLACE_HEIGHT;
-  if (ry >= 60) return pos_gen (&c, p, 0, 3);
-  else if (ry >= 50) return pos_gen (&c, p, 23 - 2.5 * (ry - 50), 3);
-  else return pos_gen (&c, p, 23, 3);
+
+  posf (&c, p);
+
+  switch (con (p)->fg) {
+  case WALL: case PILLAR: case BIG_PILLAR_TOP:
+  case BIG_PILLAR_BOTTOM: case ARCH_BOTTOM:
+  case ARCH_TOP_MID: case ARCH_TOP_SMALL:
+  case ARCH_TOP_LEFT: case ARCH_TOP_RIGHT:
+    return p;
+    break;
+  default:
+    if (ry >= 60) return pos_gen (&c, p, 0, 3);
+    else if (ry >= 50)
+      return pos_gen (&c, p, 23 - 2.5 * (ry - 50), 3);
+    else return pos_gen (&c, p, 23, 3);
+    break;
+  }
 }
