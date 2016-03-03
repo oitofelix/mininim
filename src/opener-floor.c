@@ -278,6 +278,8 @@ draw_unpressed_opener_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (vm == VGA) unpressed_opener_floor_base = apply_hue_palette (unpressed_opener_floor_base);
   if (hgc) unpressed_opener_floor_base = apply_palette (unpressed_opener_floor_base, hgc_palette);
+  if (peq (p, &mouse_pos))
+    unpressed_opener_floor_base = apply_palette (unpressed_opener_floor_base, selection_palette);
 
   struct coord c;
   draw_bitmapc (unpressed_opener_floor_base, bitmap, floor_base_coord (p, &c), 0);
@@ -308,6 +310,8 @@ draw_unpressed_opener_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (vm == VGA) unpressed_opener_floor_left = apply_hue_palette (unpressed_opener_floor_left);
   if (hgc) unpressed_opener_floor_left = apply_palette (unpressed_opener_floor_left, hgc_palette);
+  if (peq (p, &mouse_pos))
+    unpressed_opener_floor_left = apply_palette (unpressed_opener_floor_left, selection_palette);
 
   struct coord c;
   draw_bitmapc (unpressed_opener_floor_left, bitmap,
@@ -339,6 +343,8 @@ draw_unpressed_opener_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (vm == VGA) unpressed_opener_floor_right = apply_hue_palette (unpressed_opener_floor_right);
   if (hgc) unpressed_opener_floor_right = apply_palette (unpressed_opener_floor_right, hgc_palette);
+  if (peq (p, &mouse_pos))
+    unpressed_opener_floor_right = apply_palette (unpressed_opener_floor_right, selection_palette);
 
   struct coord c;
   draw_bitmapc (unpressed_opener_floor_right, bitmap,

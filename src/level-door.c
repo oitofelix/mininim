@@ -346,6 +346,14 @@ draw_level_door (ALLEGRO_BITMAP *bitmap, struct pos *p,
     level_door_top_right = apply_palette (level_door_top_right, hgc_palette);
   }
 
+  if (peq (p, &mouse_pos)) {
+    level_door_bottom = apply_palette (level_door_bottom, selection_palette);
+    level_door_top_left = apply_palette (level_door_top_left, selection_palette);
+    level_door_floor = apply_palette (level_door_floor, selection_palette);
+    level_door_stairs = apply_palette (level_door_stairs, selection_palette);
+    level_door_top_right = apply_palette (level_door_top_right, selection_palette);
+  }
+
   draw_bitmapc (level_door_bottom, bitmap,
                 level_door_bottom_left_coord (p, &c), 0);
   draw_bitmapc (level_door_top_left, bitmap,
@@ -393,6 +401,8 @@ draw_level_door_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f,
 
   if (vm == VGA) level_door_bottom = apply_hue_palette (level_door_bottom);
   if (hgc) level_door_bottom = apply_palette (level_door_bottom, hgc_palette);
+  if (peq (p, &mouse_pos))
+    level_door_bottom = apply_palette (level_door_bottom, selection_palette);
 
   if (! is_kid_stairs (f)) return;
   prel (p, &pl, +0, -1);
@@ -436,6 +446,8 @@ draw_level_door_front (ALLEGRO_BITMAP *bitmap, struct pos *p, int i,
 
   if (vm == VGA) level_door_front = apply_hue_palette (level_door_front);
   if (hgc) level_door_front = apply_palette (level_door_front, hgc_palette);
+  if (peq (p, &mouse_pos))
+    level_door_front = apply_palette (level_door_front, selection_palette);
 
   int q = (i + 1) / 4;
   int r = (i + 1) % 4;

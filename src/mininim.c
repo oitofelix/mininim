@@ -1058,6 +1058,7 @@ main (int _argc, char **_argv)
   if (sound_disabled_cmd) enable_audio (false);
   init_gamepad ();
   init_dialog ();
+  init_mouse ();
 
   al_inhibit_screensaver (inhibit_screensaver);
 
@@ -1129,6 +1130,7 @@ main (int _argc, char **_argv)
   finalize_audio ();
   finalize_gamepad ();
   finalize_dialog ();
+  finalize_mouse ();
 
   fprintf (stderr, "MININIM: Hope you enjoyed it!\n");
 

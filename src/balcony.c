@@ -195,6 +195,13 @@ draw_balcony (ALLEGRO_BITMAP *bitmap, struct pos *p,
     balcony_top_right = apply_palette (balcony_top_right, hgc_palette);
   }
 
+  if (peq (p, &mouse_pos)) {
+    balcony_bottom_left = apply_palette (balcony_bottom_left, selection_palette);
+    balcony_bottom_right = apply_palette (balcony_bottom_right, selection_palette);
+    balcony_top_left = apply_palette (balcony_top_left, selection_palette);
+    balcony_top_right = apply_palette (balcony_top_right, selection_palette);
+  }
+
   draw_bitmapc (balcony_bottom_left, bitmap,
                 balcony_bottom_left_coord (p, &c), 0);
   draw_bitmapc (balcony_bottom_right, bitmap,

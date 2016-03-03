@@ -43,6 +43,7 @@ play_anim (void (*draw_callback) (void),
   al_register_event_source (event_queue, get_display_event_source (display));
   al_register_event_source (event_queue, get_keyboard_event_source ());
   al_register_event_source (event_queue, get_joystick_event_source ());
+  al_register_event_source (event_queue, get_mouse_event_source ());
   al_register_event_source (event_queue, get_timer_event_source (video_timer));
   al_register_event_source (event_queue, get_timer_event_source (timer));
   al_start_timer (timer);
@@ -52,6 +53,8 @@ play_anim (void (*draw_callback) (void),
     switch (event.type) {
     case ALLEGRO_EVENT_TIMER:
       if (event.timer.source == timer) {
+        /* update mouse pos */
+        get_mouse_pos (&mouse_pos);
 
         /* load configuration */
         if (load_config_dialog_thread
@@ -129,6 +132,11 @@ play_anim (void (*draw_callback) (void),
       break;
     case ALLEGRO_EVENT_JOYSTICK_BUTTON_DOWN:
       button = event.joystick.button;
+      break;
+    case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
+      printf ("%i,%i\n",
+              (event.mouse.x * ORIGINAL_WIDTH) / al_get_display_width (display),
+              (event.mouse.y * ORIGINAL_HEIGHT) / al_get_display_height (display));
       break;
     case ALLEGRO_EVENT_KEY_CHAR:
       key = event;

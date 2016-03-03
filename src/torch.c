@@ -106,6 +106,8 @@ draw_torch (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (vm == VGA) torch = apply_hue_palette (torch);
   if (hgc) torch = apply_palette (torch, hgc_palette);
+  if (peq (p, &mouse_pos))
+    torch = apply_palette (torch, selection_palette);
 
   struct coord c;
   draw_bitmapc (torch, bitmap, torch_coord (p, &c), 0);

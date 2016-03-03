@@ -187,6 +187,8 @@ draw_big_pillar_bottom_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (vm == VGA) big_pillar_bottom_left = apply_hue_palette (big_pillar_bottom_left);
   if (hgc) big_pillar_bottom_left = apply_palette (big_pillar_bottom_left, hgc_palette);
+  if (peq (p, &mouse_pos))
+    big_pillar_bottom_left = apply_palette (big_pillar_bottom_left, selection_palette);
 
   struct coord c;
   draw_bitmapc (big_pillar_bottom_left, bitmap,
@@ -218,6 +220,8 @@ draw_big_pillar_bottom_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (vm == VGA) big_pillar_bottom_right = apply_hue_palette (big_pillar_bottom_right);
   if (hgc) big_pillar_bottom_right = apply_palette (big_pillar_bottom_right, hgc_palette);
+  if (peq (p, &mouse_pos))
+    big_pillar_bottom_right = apply_palette (big_pillar_bottom_right, selection_palette);
 
   struct coord c;
   draw_bitmapc (big_pillar_bottom_right, bitmap,
@@ -249,6 +253,8 @@ draw_big_pillar_bottom_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (vm == VGA) big_pillar_bottom_fg = apply_hue_palette (big_pillar_bottom_fg);
   if (hgc) big_pillar_bottom_fg = apply_palette (big_pillar_bottom_fg, hgc_palette);
+  if (peq (p, &mouse_pos))
+    big_pillar_bottom_fg = apply_palette (big_pillar_bottom_fg, selection_palette);
 
   struct coord c;
   draw_bitmapc (big_pillar_bottom_fg, bitmap, big_pillar_bottom_fg_coord (p, &c), 0);
@@ -288,6 +294,8 @@ draw_big_pillar_top_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (vm == VGA) big_pillar_top_left = apply_hue_palette (big_pillar_top_left);
   if (hgc) big_pillar_top_left = apply_palette (big_pillar_top_left, hgc_palette);
+  if (peq (p, &mouse_pos))
+    big_pillar_top_left = apply_palette (big_pillar_top_left, selection_palette);
 
   struct coord c;
   draw_bitmapc (big_pillar_top_left, bitmap,
@@ -348,6 +356,11 @@ draw_big_pillar_top_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
   if (hgc) {
     big_pillar_top_right = apply_palette (big_pillar_top_right, hgc_palette);
     big_pillar_top_right_top = apply_palette (big_pillar_top_right_top, hgc_palette);
+  }
+
+  if (peq (p, &mouse_pos)) {
+    big_pillar_top_right = apply_palette (big_pillar_top_right, selection_palette);
+    big_pillar_top_right_top = apply_palette (big_pillar_top_right_top, selection_palette);
   }
 
   struct coord c;

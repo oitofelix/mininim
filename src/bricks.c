@@ -107,6 +107,8 @@ draw_bricks_00 (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (vm == VGA) bricks = apply_hue_palette (bricks);
   if (hgc) bricks = apply_palette (bricks, hgc_palette);
+  if (peq (p, &mouse_pos))
+    bricks = apply_palette (bricks, selection_palette);
 
   struct coord c;
   draw_bitmapc (bricks, bitmap, bricks_coord (p, &c) , 0);
@@ -132,6 +134,8 @@ draw_bricks_01 (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (vm == VGA) bricks = apply_hue_palette (bricks);
   if (hgc) bricks = apply_palette (bricks, hgc_palette);
+  if (peq (p, &mouse_pos))
+    bricks = apply_palette (bricks, selection_palette);
 
   struct coord c;
   draw_bitmapc (bricks, bitmap, bricks_coord (p, &c) , 0);
@@ -157,6 +161,8 @@ draw_bricks_02 (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (vm == VGA) bricks = apply_hue_palette (bricks);
   if (hgc) bricks = apply_palette (bricks, hgc_palette);
+  if (peq (p, &mouse_pos))
+    bricks = apply_palette (bricks, selection_palette);
 
   struct coord c;
   draw_bitmapc (bricks, bitmap, bricks_coord (p, &c) , 0);
@@ -182,6 +188,8 @@ draw_bricks_03 (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (vm == VGA) bricks = apply_hue_palette (bricks);
   if (hgc) bricks = apply_palette (bricks, hgc_palette);
+  if (peq (p, &mouse_pos))
+    bricks = apply_palette (bricks, selection_palette);
 
   struct coord c;
   draw_bitmapc (bricks, bitmap, bricks_coord (p, &c) , 0);

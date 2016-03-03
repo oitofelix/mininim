@@ -550,6 +550,8 @@ draw_spikes_floor_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (vm == VGA) spikes_floor_left = apply_hue_palette (spikes_floor_left);
   if (hgc) spikes_floor_left = apply_palette (spikes_floor_left, hgc_palette);
+  if (peq (p, &mouse_pos))
+    spikes_floor_left = apply_palette (spikes_floor_left, selection_palette);
 
   struct coord c;
   draw_bitmapc (spikes_floor_left, bitmap, floor_left_coord (p, &c), 0);
@@ -580,6 +582,8 @@ draw_spikes_floor_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (vm == VGA) spikes_floor_right = apply_hue_palette (spikes_floor_right);
   if (hgc) spikes_floor_right = apply_palette (spikes_floor_right, hgc_palette);
+  if (peq (p, &mouse_pos))
+    spikes_floor_right = apply_palette (spikes_floor_right, selection_palette);
 
   struct coord c;
   draw_bitmapc (spikes_floor_right, bitmap, floor_right_coord (p, &c), 0);
@@ -674,6 +678,8 @@ draw_spikes_left_00 (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (vm == VGA) spikes_left_00 = apply_hue_palette (spikes_left_00);
   if (hgc) spikes_left_00 = apply_palette (spikes_left_00, hgc_palette);
+  if (peq (p, &mouse_pos))
+    spikes_left_00 = apply_palette (spikes_left_00, selection_palette);
 
   struct coord c;
   draw_bitmapc (spikes_left_00, bitmap, spikes_left_00_coord (p, &c), 0);
@@ -707,6 +713,8 @@ draw_spikes_right_00 (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (vm == VGA) spikes_right_00 = apply_hue_palette (spikes_right_00);
   if (hgc) spikes_right_00 = apply_palette (spikes_right_00, hgc_palette);
+  if (peq (p, &mouse_pos))
+    spikes_right_00 = apply_palette (spikes_right_00, selection_palette);
 
   struct coord c;
   draw_bitmapc (spikes_right_00, bitmap, spikes_right_00_coord (p, &c), 0);
@@ -740,6 +748,8 @@ draw_spikes_fg_00 (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (vm == VGA) spikes_fg_00 = apply_hue_palette (spikes_fg_00);
   if (hgc) spikes_fg_00 = apply_palette (spikes_fg_00, hgc_palette);
+  if (peq (p, &mouse_pos))
+    spikes_fg_00 = apply_palette (spikes_fg_00, selection_palette);
 
   struct coord c;
   draw_bitmapc (spikes_fg_00, bitmap, spikes_fg_00_coord (p, &c), 0);
@@ -835,6 +845,8 @@ draw_spikes_left_01 (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (vm == VGA) spikes_left_01 = apply_hue_palette (spikes_left_01);
   if (hgc) spikes_left_01 = apply_palette (spikes_left_01, hgc_palette);
+  if (peq (p, &mouse_pos))
+    spikes_left_01 = apply_palette (spikes_left_01, selection_palette);
 
   struct coord c;
   draw_bitmapc (spikes_left_01, bitmap, spikes_left_01_coord (p, &c), 0);
@@ -868,6 +880,8 @@ draw_spikes_right_01 (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (vm == VGA) spikes_right_01 = apply_hue_palette (spikes_right_01);
   if (hgc) spikes_right_01 = apply_palette (spikes_right_01, hgc_palette);
+  if (peq (p, &mouse_pos))
+    spikes_right_01 = apply_palette (spikes_right_01, selection_palette);
 
   struct coord c;
   draw_bitmapc (spikes_right_01, bitmap, spikes_right_01_coord (p, &c), 0);
@@ -901,6 +915,8 @@ draw_spikes_fg_01 (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (vm == VGA) spikes_fg_01 = apply_hue_palette (spikes_fg_01);
   if (hgc) spikes_fg_01 = apply_palette (spikes_fg_01, hgc_palette);
+  if (peq (p, &mouse_pos))
+    spikes_fg_01 = apply_palette (spikes_fg_01, selection_palette);
 
   struct coord c;
   draw_bitmapc (spikes_fg_01, bitmap, spikes_fg_01_coord (p, &c), 0);
@@ -996,6 +1012,8 @@ draw_spikes_left_02 (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (vm == VGA) spikes_left_02 = apply_hue_palette (spikes_left_02);
   if (hgc) spikes_left_02 = apply_palette (spikes_left_02, hgc_palette);
+  if (peq (p, &mouse_pos))
+    spikes_left_02 = apply_palette (spikes_left_02, selection_palette);
 
   struct coord c;
   draw_bitmapc (spikes_left_02, bitmap, spikes_left_02_coord (p, &c), 0);
@@ -1029,6 +1047,8 @@ draw_spikes_right_02 (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (vm == VGA) spikes_right_02 = apply_hue_palette (spikes_right_02);
   if (hgc) spikes_right_02 = apply_palette (spikes_right_02, hgc_palette);
+  if (peq (p, &mouse_pos))
+    spikes_right_02 = apply_palette (spikes_right_02, selection_palette);
 
   struct coord c;
   draw_bitmapc (spikes_right_02, bitmap, spikes_right_02_coord (p, &c), 0);
@@ -1062,6 +1082,8 @@ draw_spikes_fg_02 (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (vm == VGA) spikes_fg_02 = apply_hue_palette (spikes_fg_02);
   if (hgc) spikes_fg_02 = apply_palette (spikes_fg_02, hgc_palette);
+  if (peq (p, &mouse_pos))
+    spikes_fg_02 = apply_palette (spikes_fg_02, selection_palette);
 
   struct coord c;
   draw_bitmapc (spikes_fg_02, bitmap, spikes_fg_02_coord (p, &c), 0);
@@ -1157,6 +1179,8 @@ draw_spikes_left_03 (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (vm == VGA) spikes_left_03 = apply_hue_palette (spikes_left_03);
   if (hgc) spikes_left_03 = apply_palette (spikes_left_03, hgc_palette);
+  if (peq (p, &mouse_pos))
+    spikes_left_03 = apply_palette (spikes_left_03, selection_palette);
 
   struct coord c;
   draw_bitmapc (spikes_left_03, bitmap, spikes_left_03_coord (p, &c), 0);
@@ -1190,6 +1214,8 @@ draw_spikes_right_03 (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (vm == VGA) spikes_right_03 = apply_hue_palette (spikes_right_03);
   if (hgc) spikes_right_03 = apply_palette (spikes_right_03, hgc_palette);
+  if (peq (p, &mouse_pos))
+    spikes_right_03 = apply_palette (spikes_right_03, selection_palette);
 
   struct coord c;
   draw_bitmapc (spikes_right_03, bitmap, spikes_right_03_coord (p, &c), 0);
@@ -1223,6 +1249,8 @@ draw_spikes_fg_03 (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (vm == VGA) spikes_fg_03 = apply_hue_palette (spikes_fg_03);
   if (hgc) spikes_fg_03 = apply_palette (spikes_fg_03, hgc_palette);
+  if (peq (p, &mouse_pos))
+    spikes_fg_03 = apply_palette (spikes_fg_03, selection_palette);
 
   struct coord c;
   draw_bitmapc (spikes_fg_03, bitmap, spikes_fg_03_coord (p, &c), 0);
@@ -1318,6 +1346,8 @@ draw_spikes_left_04 (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (vm == VGA) spikes_left_04 = apply_hue_palette (spikes_left_04);
   if (hgc) spikes_left_04 = apply_palette (spikes_left_04, hgc_palette);
+  if (peq (p, &mouse_pos))
+    spikes_left_04 = apply_palette (spikes_left_04, selection_palette);
 
   struct coord c;
   draw_bitmapc (spikes_left_04, bitmap, spikes_left_04_coord (p, &c), 0);
@@ -1351,6 +1381,8 @@ draw_spikes_right_04 (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (vm == VGA) spikes_right_04 = apply_hue_palette (spikes_right_04);
   if (hgc) spikes_right_04 = apply_palette (spikes_right_04, hgc_palette);
+  if (peq (p, &mouse_pos))
+    spikes_right_04 = apply_palette (spikes_right_04, selection_palette);
 
   struct coord c;
   draw_bitmapc (spikes_right_04, bitmap, spikes_right_04_coord (p, &c), 0);
@@ -1384,6 +1416,8 @@ draw_spikes_fg_04 (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (vm == VGA) spikes_fg_04 = apply_hue_palette (spikes_fg_04);
   if (hgc) spikes_fg_04 = apply_palette (spikes_fg_04, hgc_palette);
+  if (peq (p, &mouse_pos))
+    spikes_fg_04 = apply_palette (spikes_fg_04, selection_palette);
 
   struct coord c;
   draw_bitmapc (spikes_fg_04, bitmap, spikes_fg_04_coord (p, &c), 0);

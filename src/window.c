@@ -110,6 +110,8 @@ draw_window (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (vm == VGA) window = apply_hue_palette (window);
   if (hgc) window = apply_palette (window, hgc_palette);
+  if (peq (p, &mouse_pos))
+    window = apply_palette (window, selection_palette);
 
   struct coord c;
   draw_bitmapc (window, bitmap, window_coord (p, &c), 0);

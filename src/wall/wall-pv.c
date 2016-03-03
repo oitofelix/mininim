@@ -124,13 +124,16 @@ draw_wall_brick (ALLEGRO_BITMAP *bitmap, struct pos *p,
   ALLEGRO_COLOR c = wall_color_array[np.floor][row][np.place + col];
   /* c = compute_wall_color (p, row, col); */
   c = apply_hue_color (c);
+  if (peq (p, &mouse_pos)) c = selection_palette (c);
   wall_brick_rect (p, row, col, &r);
   draw_filled_rect (bitmap, &r, c);
 
   wall_mark_frame (p, row, &f0);
   f0.b = apply_hue_palette (f0.b);
+  if (peq (p, &mouse_pos)) f0.b = apply_palette (f0.b, selection_palette);
   wall_mark_frame (p, row + 1, &f1);
   f1.b = apply_hue_palette (f1.b);
+  if (peq (p, &mouse_pos)) f1.b = apply_palette (f1.b, selection_palette);
   draw_frame (bitmap, &f0);
   draw_frame (bitmap, &f1);
 }

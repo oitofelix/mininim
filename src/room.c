@@ -25,6 +25,7 @@ static enum em last_em;
 static enum vm last_vm;
 static int last_hgc;
 static enum hue last_hue;
+struct pos last_mouse_pos;
 static room_callback_f *room_callback;
 static size_t room_callback_nmemb;
 
@@ -189,12 +190,14 @@ draw_room (ALLEGRO_BITMAP *bitmap, int room,
       || vm != last_vm
       || hgc != last_hgc
       || hue != last_hue
+      || ! peq (&mouse_pos, &last_mouse_pos)
       || level.number != last_level) {
     update_wall_cache (room, em, vm);
     last_em = em;
     last_vm = vm;
     last_hgc = hgc;
     last_hue = hue;
+    last_mouse_pos = mouse_pos;
     last_room = room;
     last_level = level.number;
   }
@@ -684,6 +687,18 @@ blue_hue_palette (ALLEGRO_COLOR c)
   if (a == 0) return c;
   r = add_char (r, -96);
   g = add_char (g, -80);
+  b = add_char (b, +64);
+  return al_map_rgb (r, g, b);
+}
+
+ALLEGRO_COLOR
+selection_palette (ALLEGRO_COLOR c)
+{
+  unsigned char r, g, b, a;
+  al_unmap_rgba (c, &r, &g, &b, &a);
+  if (a == 0) return c;
+  r = add_char (r, +64);
+  g = add_char (g, +64);
   b = add_char (b, +64);
   return al_map_rgb (r, g, b);
 }

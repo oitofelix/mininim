@@ -705,6 +705,8 @@ draw_loose_floor_00_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (vm == VGA) loose_floor_base_00 = apply_hue_palette (loose_floor_base_00);
   if (hgc) loose_floor_base_00 = apply_palette (loose_floor_base_00, hgc_palette);
+  if (peq (p, &mouse_pos))
+    loose_floor_base_00 = apply_palette (loose_floor_base_00, selection_palette);
 
   struct coord c;
   draw_bitmapc (loose_floor_base_00, bitmap, floor_base_coord (p, &c), 0);
@@ -735,6 +737,8 @@ draw_loose_floor_00_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (vm == VGA) loose_floor_left_00 = apply_hue_palette (loose_floor_left_00);
   if (hgc) loose_floor_left_00 = apply_palette (loose_floor_left_00, hgc_palette);
+  if (peq (p, &mouse_pos))
+    loose_floor_left_00 = apply_palette (loose_floor_left_00, selection_palette);
 
   struct coord c;
   draw_bitmapc (loose_floor_left_00, bitmap, loose_floor_left_coord (p, &c), 0);
@@ -765,6 +769,8 @@ draw_loose_floor_00_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (vm == VGA) loose_floor_right_00 = apply_hue_palette (loose_floor_right_00);
   if (hgc) loose_floor_right_00 = apply_palette (loose_floor_right_00, hgc_palette);
+  if (peq (p, &mouse_pos))
+    loose_floor_right_00 = apply_palette (loose_floor_right_00, selection_palette);
 
   struct coord c;
   draw_bitmapc (loose_floor_right_00, bitmap, loose_floor_right_coord (p, &c), 0);
@@ -804,6 +810,8 @@ draw_loose_floor_01_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (vm == VGA) loose_floor_base_01 = apply_hue_palette (loose_floor_base_01);
   if (hgc) loose_floor_base_01 = apply_palette (loose_floor_base_01, hgc_palette);
+  if (peq (p, &mouse_pos))
+    loose_floor_base_01 = apply_palette (loose_floor_base_01, selection_palette);
 
   struct coord c;
   draw_bitmapc (loose_floor_base_01, bitmap, floor_base_coord (p, &c), 0);
@@ -834,6 +842,8 @@ draw_loose_floor_01_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (vm == VGA) loose_floor_left_01 = apply_hue_palette (loose_floor_left_01);
   if (hgc) loose_floor_left_01 = apply_palette (loose_floor_left_01, hgc_palette);
+  if (peq (p, &mouse_pos))
+    loose_floor_left_01 = apply_palette (loose_floor_left_01, selection_palette);
 
   struct coord c;
   draw_bitmapc (loose_floor_left_01, bitmap, floor_left_coord (p, &c), 0);
@@ -864,6 +874,8 @@ draw_loose_floor_01_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (vm == VGA) loose_floor_right_01 = apply_hue_palette (loose_floor_right_01);
   if (hgc) loose_floor_right_01 = apply_palette (loose_floor_right_01, hgc_palette);
+  if (peq (p, &mouse_pos))
+    loose_floor_right_01 = apply_palette (loose_floor_right_01, selection_palette);
 
   struct coord c;
   draw_bitmapc (loose_floor_right_01, bitmap, loose_floor_right_coord (p, &c), 0);

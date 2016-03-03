@@ -26,7 +26,7 @@ dnl
 ##################
 
 # Release definitions;
-AC_INIT([MININIM], [0.10],
+AC_INIT([MININIM], [0.10.0.1],
 [oitofelix@gnu.org], [mininim],
 [http://oitofelix.freeshell.org/mininim/])
 AC_SUBST([PACKAGE_MAILING_LIST], [])

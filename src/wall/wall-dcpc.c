@@ -68,6 +68,8 @@ draw_wall_base_dcpc (ALLEGRO_BITMAP *bitmap, struct pos *p,
   else wall_base = pc_wall_base;
 
   if (hgc) wall_base = apply_palette (wall_base, hgc_palette);
+  if (peq (p, &mouse_pos))
+    wall_base = apply_palette (wall_base, selection_palette);
 
   struct coord c;
   draw_bitmapc (wall_base, bitmap, wall_base_coord (p, &c), 0);
@@ -83,6 +85,8 @@ draw_wall_left_dcpc (ALLEGRO_BITMAP *bitmap, struct pos *p,
   else wall_left = pc_wall_left;
 
   if (hgc) wall_left = apply_palette (wall_left, hgc_palette);
+  if (peq (p, &mouse_pos))
+    wall_left = apply_palette (wall_left, selection_palette);
 
   struct coord c;
   draw_bitmapc (wall_left, bitmap, wall_coord (p, &c), 0);

@@ -205,6 +205,8 @@ draw_mirror (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   mirror = apply_hue_palette (mirror);
   if (hgc) mirror = apply_palette (mirror, hgc_palette);
+  if (peq (p, &mouse_pos))
+    mirror = apply_palette (mirror, selection_palette);
 
   ALLEGRO_BITMAP *b = mirror_bitmap[p->floor + 1][p->place + 1];
   if (b) draw_bitmapc (b, bitmap, mirror_reflex_coord (p, &c), 0);
@@ -238,6 +240,8 @@ draw_mirror_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   mirror = apply_hue_palette (mirror);
   if (hgc) mirror = apply_palette (mirror, hgc_palette);
+  if (peq (p, &mouse_pos))
+    mirror = apply_palette (mirror, selection_palette);
 
   ALLEGRO_BITMAP *b = mirror_bitmap[p->floor + 1][p->place + 1];
   if (b) draw_bitmapc (b, bitmap, mirror_reflex_coord (p, &c), 0);

@@ -202,6 +202,8 @@ draw_arch_bottom (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (vm == VGA) arch_bottom = apply_hue_palette (arch_bottom);
   if (hgc) arch_bottom = apply_palette (arch_bottom, hgc_palette);
+  if (peq (p, &mouse_pos))
+    arch_bottom = apply_palette (arch_bottom, selection_palette);
 
   struct coord c;
   draw_bitmapc (arch_bottom, bitmap, arch_bottom_coord (p, &c), 0);
@@ -232,6 +234,8 @@ draw_arch_top_mid (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (vm == VGA) arch_top_mid = apply_hue_palette (arch_top_mid);
   if (hgc) arch_top_mid = apply_palette (arch_top_mid, hgc_palette);
+  if (peq (p, &mouse_pos))
+    arch_top_mid = apply_palette (arch_top_mid, selection_palette);
 
   struct coord c;
   draw_bitmapc (arch_top_mid, bitmap, arch_top_coord (p, &c), 0);
@@ -263,6 +267,8 @@ draw_arch_top_small (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (vm == VGA) arch_top_small = apply_hue_palette (arch_top_small);
   if (hgc) arch_top_small = apply_palette (arch_top_small, hgc_palette);
+  if (peq (p, &mouse_pos))
+    arch_top_small = apply_palette (arch_top_small, selection_palette);
 
   struct coord c;
   draw_bitmapc (arch_top_small, bitmap, arch_top_coord (p, &c), 0);
@@ -294,6 +300,8 @@ draw_arch_top_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (vm == VGA) arch_top_left = apply_hue_palette (arch_top_left);
   if (hgc) arch_top_left = apply_palette (arch_top_left, hgc_palette);
+  if (peq (p, &mouse_pos))
+    arch_top_left = apply_palette (arch_top_left, selection_palette);
 
   struct coord c;
   draw_bitmapc (arch_top_left, bitmap, arch_top_coord (p, &c), 0);
@@ -325,6 +333,8 @@ draw_arch_top_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (vm == VGA) arch_top_right = apply_hue_palette (arch_top_right);
   if (hgc) arch_top_right = apply_palette (arch_top_right, hgc_palette);
+  if (peq (p, &mouse_pos))
+    arch_top_right = apply_palette (arch_top_right, selection_palette);
 
   struct coord c;
   draw_bitmapc (arch_top_right, bitmap, arch_top_coord (p, &c), 0);
@@ -356,6 +366,8 @@ draw_arch_top_left_end (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (vm == VGA) arch_top_left_end = apply_hue_palette (arch_top_left_end);
   if (hgc) arch_top_left_end = apply_palette (arch_top_left_end, hgc_palette);
+  if (peq (p, &mouse_pos))
+    arch_top_left_end = apply_palette (arch_top_left_end, selection_palette);
 
   struct coord c;
   draw_bitmapc (arch_top_left_end, bitmap, arch_top_left_end_coord (p, &c), 0);
@@ -386,6 +398,8 @@ draw_arch_top_right_end (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (vm == VGA) arch_top_right_end = apply_hue_palette (arch_top_right_end);
   if (hgc) arch_top_right_end = apply_palette (arch_top_right_end, hgc_palette);
+  if (peq (p, &mouse_pos))
+    arch_top_right_end = apply_palette (arch_top_right_end, selection_palette);
 
   struct coord c;
   draw_bitmapc (arch_top_right_end, bitmap, arch_top_top_coord (p, &c), 0);
@@ -416,6 +430,8 @@ draw_arch_top_top (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (vm == VGA) arch_top_top = apply_hue_palette (arch_top_top);
   if (hgc) arch_top_top = apply_palette (arch_top_top, hgc_palette);
+  if (peq (p, &mouse_pos))
+    arch_top_top = apply_palette (arch_top_top, selection_palette);
 
   struct coord c;
   draw_bitmapc (arch_top_top, bitmap, arch_top_top_coord (p, &c), 0);

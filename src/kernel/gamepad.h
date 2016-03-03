@@ -1,5 +1,5 @@
 /*
-  keyboard.h -- keyboard module;
+  gamepad.h -- gamepad module;
 
   Copyright (C) 2015, 2016 Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
 
@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MININIM_KEYBOARD_H
-#define MININIM_KEYBOARD_H
+#ifndef MININIM_GAMEPAD_H
+#define MININIM_GAMEPAD_H
 
 #define IGNORED_KEYBOARD_MODIFIERS \
   (ALLEGRO_KEYMOD_SCROLLLOCK | ALLEGRO_KEYMOD_NUMLOCK \
@@ -71,4 +71,4 @@ bool was_key_pressed (int keycode, int unichar, unsigned int modifiers,
                       bool consume);
 bool was_button_pressed (int _button, bool consume);
 
-#endif	/* MININIM_KEYBOARD_H */
+#endif	/* MININIM_GAMEPAD_H */

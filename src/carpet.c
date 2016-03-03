@@ -232,6 +232,11 @@ draw_carpet_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
       carpet_top = apply_palette (carpet_top, hgc_palette);
     }
 
+    if (peq (p, &mouse_pos)) {
+      carpet = apply_palette (carpet, selection_palette);
+      carpet_top = apply_palette (carpet_top, selection_palette);
+    }
+
     draw_bitmapc (carpet, bitmap, carpet_coord (p, &c), 0);
     draw_bitmapc (carpet_top, bitmap, carpet_top_coord (p, &c), 0);
   }
@@ -265,6 +270,11 @@ draw_carpet_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
     if (hgc) {
       carpet = apply_palette (carpet, hgc_palette);
       carpet_top = apply_palette (carpet_top, hgc_palette);
+    }
+
+    if (peq (p, &mouse_pos)) {
+      carpet = apply_palette (carpet, selection_palette);
+      carpet_top = apply_palette (carpet_top, selection_palette);
     }
 
     if (! should_draw_door_grid (p, f)) return;
