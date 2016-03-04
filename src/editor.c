@@ -77,6 +77,11 @@ editor (void)
      {'A', "ARCH BOTTOM"},
      {0}};
 
+  struct menu_item door_menu[] =
+    {{'D', "DOOR"},
+     {'L', "LEVEL DOOR"},
+     {0}};
+
   struct pos p = mouse_pos;
   struct anim *k;
 
@@ -110,7 +115,7 @@ editor (void)
       con (&p)->fg = WALL;
       update_wall_cache (room_view, em, vm);
       break;
-    case 'D': break;
+    case 'D': edit = EDIT_DOOR; break;
     case 'C': break;
     case 'M': break;
     case 'R': break;
@@ -156,6 +161,25 @@ editor (void)
     case 'B': con (&p)->fg = BIG_PILLAR_BOTTOM; break;
     case 'A': con (&p)->fg = ARCH_BOTTOM; break;
     }
+    break;
+  case EDIT_DOOR:
+    c = process_menu (door_menu, "FD>");
+    if (! c) break;
+
+    if ((c == 'D' && con (&p)->fg == DOOR)
+        || (c == 'L' && con (&p)->fg == LEVEL_DOOR))
+      break;
+
+    destroy_con_at_pos (&p);
+
+    switch (c) {
+    case BACKSPACE_KEY: edit = EDIT_FG; break;
+    case 'D': con (&p)->fg = DOOR; break;
+    case 'L': con (&p)->fg = LEVEL_DOOR; break;
+    }
+
+    register_con_at_pos (&p);
+
     break;
   }
 }
