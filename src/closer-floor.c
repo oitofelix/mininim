@@ -152,6 +152,14 @@ closer_floor_at_pos (struct pos *p)
 }
 
 void
+remove_closer_floor (struct closer_floor *c)
+{
+  size_t i =  c - closer_floor;
+  closer_floor =
+    remove_from_array (closer_floor, &closer_floor_nmemb, i, 1, sizeof (*c));
+}
+
+void
 press_closer_floor (struct pos *p)
 {
   struct closer_floor *c = closer_floor_at_pos (p);

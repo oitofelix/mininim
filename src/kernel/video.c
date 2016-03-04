@@ -24,6 +24,7 @@ ALLEGRO_BITMAP *screen, *uscreen;
 ALLEGRO_TIMER *video_timer;
 int screen_flags = 0;
 bool hgc;
+ALLEGRO_TIMER *bottom_text_timer = NULL;
 static ALLEGRO_BITMAP *effect_buffer;
 static ALLEGRO_BITMAP *memory_bitmap;
 static ALLEGRO_BITMAP *black_screen;
@@ -70,6 +71,8 @@ init_video (void)
   al_set_new_bitmap_flags (flags);
 
   video_timer = create_timer (1.0 / EFFECT_HZ);
+
+  bottom_text_timer = create_timer (1.0);
 
   al_init_font_addon ();
   builtin_font = al_create_builtin_font ();
@@ -236,20 +239,17 @@ draw_text (ALLEGRO_BITMAP *bitmap, char const *text, float x, float y, int flags
 void
 draw_bottom_text (ALLEGRO_BITMAP *bitmap, char *text)
 {
-  static ALLEGRO_TIMER *timer = NULL;
   static char *current_text = NULL;
-
-  if (! timer) timer = create_timer (1.0);
 
   if (text) {
     if (current_text) al_free (current_text);
     xasprintf (&current_text, "%s", text);
-    al_set_timer_count (timer, 0);
-    al_start_timer (timer);
-  } else if (al_get_timer_count (timer) >= BOTTOM_TEXT_DURATION
+    al_set_timer_count (bottom_text_timer, 0);
+    al_start_timer (bottom_text_timer);
+  } else if (al_get_timer_count (bottom_text_timer) >= BOTTOM_TEXT_DURATION
              || ! bitmap)
-    al_stop_timer (timer);
-  else if (al_get_timer_started (timer)) {
+    al_stop_timer (bottom_text_timer);
+  else if (al_get_timer_started (bottom_text_timer)) {
     ALLEGRO_COLOR bg_color;
 
     switch (vm) {

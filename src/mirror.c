@@ -128,6 +128,14 @@ mirror_at_pos (struct pos *p)
 }
 
 void
+remove_mirror (struct mirror *m)
+{
+  size_t i =  m - mirror;
+  mirror =
+    remove_from_array (mirror, &mirror_nmemb, i, 1, sizeof (*m));
+}
+
+void
 uncross_mirrors (void)
 {
   size_t i;

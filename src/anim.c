@@ -134,6 +134,11 @@ play_anim (void (*draw_callback) (void),
       button = event.joystick.button;
       break;
     case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
+      if (edit == EDIT_NONE) edit = EDIT_MAIN;
+      else {
+        edit = EDIT_NONE;
+        draw_bottom_text (NULL, NULL);
+      }
       printf ("%i,%i\n",
               (event.mouse.x * ORIGINAL_WIDTH) / al_get_display_width (display),
               (event.mouse.y * ORIGINAL_HEIGHT) / al_get_display_height (display));
@@ -145,31 +150,35 @@ play_anim (void (*draw_callback) (void),
       int prev_room = room_view;
 
       /* H: view room at left (J if flipped horizontally) */
-      if ((! flip_gamepad_horizontal
-           && was_key_pressed (ALLEGRO_KEY_H, 0, 0, true))
-          || (flip_gamepad_horizontal
-              && was_key_pressed (ALLEGRO_KEY_J, 0, 0, true)))
+      if (edit == EDIT_NONE
+          && ((! flip_gamepad_horizontal
+               && was_key_pressed (ALLEGRO_KEY_H, 0, 0, true))
+              || (flip_gamepad_horizontal
+                  && was_key_pressed (ALLEGRO_KEY_J, 0, 0, true))))
         room_view = level.link[room_view].l;
 
       /* J: view room at right (H if flipped horizontally) */
-      if ((! flip_gamepad_horizontal
-           && was_key_pressed (ALLEGRO_KEY_J, 0, 0, true))
-          || (flip_gamepad_horizontal
-              && was_key_pressed (ALLEGRO_KEY_H, 0, 0, true)))
+      if (edit == EDIT_NONE
+          && ((! flip_gamepad_horizontal
+               && was_key_pressed (ALLEGRO_KEY_J, 0, 0, true))
+              || (flip_gamepad_horizontal
+                  && was_key_pressed (ALLEGRO_KEY_H, 0, 0, true))))
         room_view = level.link[room_view].r;
 
       /* U: view room above (N if flipped vertically) */
-      if ((! flip_gamepad_vertical
-           && was_key_pressed (ALLEGRO_KEY_U, 0, 0, true))
-          || (flip_gamepad_vertical
-              && was_key_pressed (ALLEGRO_KEY_N, 0, 0, true)))
+      if (edit == EDIT_NONE
+          && ((! flip_gamepad_vertical
+               && was_key_pressed (ALLEGRO_KEY_U, 0, 0, true))
+              || (flip_gamepad_vertical
+                  && was_key_pressed (ALLEGRO_KEY_N, 0, 0, true))))
         room_view = level.link[room_view].a;
 
       /* N: view room below (U if flipped vertically) */
-      if ((! flip_gamepad_vertical
-           && was_key_pressed (ALLEGRO_KEY_N, 0, 0, true))
-          || (flip_gamepad_vertical
-              && was_key_pressed (ALLEGRO_KEY_U, 0, 0, true)))
+      if (edit == EDIT_NONE
+          && ((! flip_gamepad_vertical
+               && was_key_pressed (ALLEGRO_KEY_N, 0, 0, true))
+              || (flip_gamepad_vertical
+                  && was_key_pressed (ALLEGRO_KEY_U, 0, 0, true))))
         room_view = level.link[room_view].b;
 
       /* SHIFT+B: enable/disable room drawing */
@@ -201,7 +210,8 @@ play_anim (void (*draw_callback) (void),
       }
 
       /* F: enable/disable fullscreen mode */
-      if (was_key_pressed (ALLEGRO_KEY_F, 0, 0, true)) {
+      if (edit == EDIT_NONE
+          && was_key_pressed (ALLEGRO_KEY_F, 0, 0, true)) {
         char *boolean;
         int flags = al_get_display_flags (display);
         if (flags & ALLEGRO_FULLSCREEN_WINDOW) {

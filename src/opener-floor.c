@@ -151,6 +151,14 @@ opener_floor_at_pos (struct pos *p)
 }
 
 void
+remove_opener_floor (struct opener_floor *o)
+{
+  size_t i =  o - opener_floor;
+  opener_floor =
+    remove_from_array (opener_floor, &opener_floor_nmemb, i, 1, sizeof (*o));
+}
+
+void
 press_opener_floor (struct pos *p)
 {
   struct opener_floor *o = opener_floor_at_pos (p);

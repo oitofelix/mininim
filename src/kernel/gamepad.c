@@ -252,9 +252,9 @@ was_key_pressed (int keycode, int unichar, unsigned int modifiers,
 {
   key.keyboard.modifiers &= ~ IGNORED_KEYBOARD_MODIFIERS;
 
-  if ((((keycode == key.keyboard.keycode && unichar <= 0)
-        || (unichar == key.keyboard.unichar && unichar > 0))
-       && modifiers == key.keyboard.modifiers)) {
+  if ((keycode == key.keyboard.keycode && unichar <= 0
+       && modifiers == key.keyboard.modifiers)
+      || (unichar == key.keyboard.unichar && unichar > 0)) {
     if (consume) memset (&key, 0, sizeof (key));
     return true;
   } else return false;

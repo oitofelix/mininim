@@ -311,6 +311,14 @@ chopper_at_pos (struct pos *p)
   return bsearch (&c, chopper, chopper_nmemb, sizeof (c), compare_choppers);
 }
 
+void
+remove_chopper (struct chopper *c)
+{
+  size_t i =  c - chopper;
+  chopper =
+    remove_from_array (chopper, &chopper_nmemb, i, 1, sizeof (*c));
+}
+
 bool
 should_chomp (struct pos *p)
 {

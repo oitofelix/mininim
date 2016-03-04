@@ -258,6 +258,7 @@ draw_confg_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
   struct rect r;
   switch (con (&pv)->fg) {
   case NO_FLOOR:
+    /* mouse selection */
     if (peq (p, &mouse_pos)
         && (bg == NO_BRICKS
             || (em == DUNGEON && bg == NO_BG)
@@ -265,7 +266,7 @@ draw_confg_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
       r = new_rect (p->room, p->place * PLACE_WIDTH + 25,
                     p->floor * PLACE_HEIGHT + 3,
                     PLACE_WIDTH, PLACE_HEIGHT - 16);
-      draw_filled_rect (bitmap, &r, al_map_rgba (64, 64, 64, 0));
+      draw_filled_rect (bitmap, &r, al_map_rgb (64, 64, 64));
     }
     break;
   case FLOOR: draw_floor_base (bitmap, &pv, em, vm); break;
@@ -580,11 +581,13 @@ draw_room_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
   struct pos pv; pos2room (p, room_view, &pv);
   pv = *p;
 
+  /* if NO_FLOOR, there is nothing to draw */
+  if (con (&pv)->fg == NO_FLOOR) return;
+
   /* when falling at construct's left */
   if (br.y >= (pv.floor + 1) * PLACE_HEIGHT - 6
       && br.x >= pv.place * PLACE_WIDTH
-      && is_anim_fall (f)
-      && con (&pv)->fg != NO_FLOOR) {
+      && is_anim_fall (f)) {
     draw_confg_base (bitmap, &pv, em, vm);
     draw_confg_left (bitmap, &pv, em, vm, true);
 

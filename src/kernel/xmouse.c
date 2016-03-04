@@ -60,6 +60,11 @@ get_mouse_pos (struct pos *p)
 
   posf (&c, p);
 
+  if (p->floor == -1 || p->floor > 2) {
+    *p = (struct pos) {-1,-2,-1};
+    return p;
+  }
+
   switch (con (p)->fg) {
   case WALL: case PILLAR: case BIG_PILLAR_TOP:
   case BIG_PILLAR_BOTTOM: case ARCH_BOTTOM:

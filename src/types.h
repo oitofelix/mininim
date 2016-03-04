@@ -370,6 +370,14 @@ enum level_module {
   LEGACY_LEVEL_MODULE, PLV_LEVEL_MODULE, DAT_LEVEL_MODULE, CONSISTENCY_LEVEL_MODULE,
 } level_module;
 
+enum edit {
+  EDIT_NONE, EDIT_MAIN, EDIT_FG, EDIT_FLOOR,
+};
+
+struct menu_item {
+  char key;
+  char *desc;
+};
 
 /****************
  * CONSTRUCTIONS

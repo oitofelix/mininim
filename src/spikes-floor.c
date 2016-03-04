@@ -363,6 +363,14 @@ spikes_floor_at_pos (struct pos *p)
 }
 
 void
+remove_spikes_floor (struct spikes_floor *s)
+{
+  size_t i =  s - spikes_floor;
+  spikes_floor =
+    remove_from_array (spikes_floor, &spikes_floor_nmemb, i, 1, sizeof (*s));
+}
+
+void
 break_spikes_floor (struct pos *p)
 {
   struct spikes_floor *s = spikes_floor_at_pos (p);

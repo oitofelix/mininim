@@ -126,23 +126,45 @@ play_level (struct level *lv)
 }
 
 void
+register_con_at_pos (struct pos *p)
+{
+  switch (con (p)->fg) {
+  case LOOSE_FLOOR: register_loose_floor (p); break;
+  case OPENER_FLOOR: register_opener_floor (p); break;
+  case CLOSER_FLOOR: register_closer_floor (p); break;
+  case SPIKES_FLOOR: register_spikes_floor (p); break;
+  case DOOR: register_door (p); break;
+  case LEVEL_DOOR: register_level_door (p); break;
+  case CHOPPER: register_chopper (p); break;
+  case MIRROR: register_mirror (p); break;
+  default: break;
+  }
+}
+
+void
 register_cons (void)
 {
   struct pos p;
   for (p.room = 0; p.room < ROOMS; p.room++)
     for (p.floor = 0; p.floor < FLOORS; p.floor++)
       for (p.place = 0; p.place < PLACES; p.place++)
-        switch (con (&p)->fg) {
-        case LOOSE_FLOOR: register_loose_floor (&p); break;
-        case OPENER_FLOOR: register_opener_floor (&p); break;
-        case CLOSER_FLOOR: register_closer_floor (&p); break;
-        case SPIKES_FLOOR: register_spikes_floor (&p); break;
-        case DOOR: register_door (&p); break;
-        case LEVEL_DOOR: register_level_door (&p); break;
-        case CHOPPER: register_chopper (&p); break;
-        case MIRROR: register_mirror (&p); break;
-        default: break;
-        }
+        register_con_at_pos (&p);
+}
+
+void
+destroy_con_at_pos (struct pos *p)
+{
+  switch (con (p)->fg) {
+  case LOOSE_FLOOR: remove_loose_floor (loose_floor_at_pos (p)); break;
+  case OPENER_FLOOR: remove_opener_floor (opener_floor_at_pos (p)); break;
+  case CLOSER_FLOOR: remove_closer_floor (closer_floor_at_pos (p)); break;
+  case SPIKES_FLOOR: remove_spikes_floor (spikes_floor_at_pos (p)); break;
+  case DOOR: remove_door (door_at_pos (p)); break;
+  case LEVEL_DOOR: remove_level_door (level_door_at_pos (p)); break;
+  case CHOPPER: remove_chopper (chopper_at_pos (p)); break;
+  case MIRROR: remove_mirror (mirror_at_pos (p)); break;
+  default: break;
+  }
 }
 
 void
@@ -187,6 +209,8 @@ compute_level (void)
   size_t i;
 
   process_keys ();
+
+  editor ();
 
   if (game_paused) return;
 
@@ -263,8 +287,9 @@ process_keys (void)
     al_stop_timer (play_time);
   }
 
-  if (was_key_pressed (ALLEGRO_KEY_ESCAPE, 0, 0, true)
-      || was_button_pressed (joystick_pause_button, true)) {
+  if (edit == EDIT_NONE
+      && (was_key_pressed (ALLEGRO_KEY_ESCAPE, 0, 0, true)
+          || was_button_pressed (joystick_pause_button, true))) {
     if (game_paused) {
       step_one_cycle = true;
       game_paused = false;
@@ -272,13 +297,15 @@ process_keys (void)
     } else pause_game ();
   } else if (game_paused
              && (key.keyboard.keycode || button != -1)
-             && ! save_game_dialog_thread)
+             && ! save_game_dialog_thread
+             && edit == EDIT_NONE)
     unpause_game ();
 
   if (game_paused) anim_cycle--;
 
   /* R: resurrect kid */
-  if (was_key_pressed (ALLEGRO_KEY_R, 0, 0, true)
+  if (edit == EDIT_NONE
+      && was_key_pressed (ALLEGRO_KEY_R, 0, 0, true)
       && is_kid_dead (&current_kid->f))
     kid_resurrect (current_kid);
 
@@ -287,7 +314,8 @@ process_keys (void)
     room_view = current_kid->f.c.room;
 
   /* A: alternate between kid and its shadows */
-  if (was_key_pressed (ALLEGRO_KEY_A, 0, 0, true)) {
+  if (edit == EDIT_NONE
+      && was_key_pressed (ALLEGRO_KEY_A, 0, 0, true)) {
     do {
       current_kid = &anima[(current_kid - anima + 1) % anima_nmemb];
     } while (current_kid->type != KID || ! current_kid->controllable);
@@ -296,7 +324,8 @@ process_keys (void)
   }
 
   /* K: kill enemy */
-  if (was_key_pressed (ALLEGRO_KEY_K, 0, 0, true)) {
+  if (edit == EDIT_NONE
+      && was_key_pressed (ALLEGRO_KEY_K, 0, 0, true)) {
     struct anim *ke = get_anim_by_id (current_kid->enemy_id);
     if (ke) {
       ke->current_lives = 0;
@@ -305,7 +334,8 @@ process_keys (void)
   }
 
   /* I: enable/disable immortal mode */
-  if (was_key_pressed (ALLEGRO_KEY_I, 0, 0, true)) {
+  if (edit == EDIT_NONE
+      && was_key_pressed (ALLEGRO_KEY_I, 0, 0, true)) {
     immortal_mode = ! immortal_mode;
     current_kid->immortal = immortal_mode;
     xasprintf (&text, "%s MODE", immortal_mode
@@ -335,7 +365,8 @@ process_keys (void)
     quit_anim = NEXT_LEVEL;
 
   /* C: show direct coordinates */
-  if (was_key_pressed (ALLEGRO_KEY_C, 0, 0, true)) {
+  if (edit == EDIT_NONE
+      && was_key_pressed (ALLEGRO_KEY_C, 0, 0, true)) {
     int s = room_view;
     int l = roomd (room_view, LEFT);
     int r = roomd (room_view, RIGHT);
@@ -368,7 +399,8 @@ process_keys (void)
     display_remaining_time ();
 
   /* +: increment and display remaining time */
-  if (was_key_pressed (ALLEGRO_KEY_EQUALS, 0, ALLEGRO_KEYMOD_SHIFT, true)) {
+  if (edit == EDIT_NONE
+      && was_key_pressed (ALLEGRO_KEY_EQUALS, 0, ALLEGRO_KEYMOD_SHIFT, true)) {
     int t = time_limit - al_get_timer_count (play_time);
     int d = t > 60 ? -60 : -1;
     al_add_timer_count (play_time, d);
@@ -376,7 +408,8 @@ process_keys (void)
   }
 
   /* -: decrement and display remaining time */
-  if (was_key_pressed (ALLEGRO_KEY_MINUS, 0, 0, true)) {
+  if (edit == EDIT_NONE
+      && was_key_pressed (ALLEGRO_KEY_MINUS, 0, 0, true)) {
     int t = time_limit - al_get_timer_count (play_time);
     int d = t > 60 ? +60 : +1;
     al_add_timer_count (play_time, d);
@@ -471,7 +504,7 @@ process_keys (void)
       button = -1;
     }
 
-    if (t >= 60) {
+    if (t >= 60 && edit == EDIT_NONE) {
       if (t < 240 || t % 12 < 8) {
         if (t >= 252 && t % 12 == 0)
           play_sample (press_key_sample, -1);
@@ -554,7 +587,8 @@ draw_level (void)
   }
   if (rem_time <= 0) quit_anim = OUT_OF_TIME;
 
-  if (game_paused) draw_bottom_text (NULL, "GAME PAUSED");
+  if (game_paused && edit == EDIT_NONE)
+    draw_bottom_text (NULL, "GAME PAUSED");
 }
 
 void

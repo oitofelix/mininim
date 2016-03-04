@@ -189,6 +189,14 @@ level_door_at_pos (struct pos *p)
 }
 
 void
+remove_level_door (struct level_door *d)
+{
+  size_t i =  d - level_door;
+  level_door =
+    remove_from_array (level_door, &level_door_nmemb, i, 1, sizeof (*d));
+}
+
+void
 break_level_door (struct pos *p)
 {
   struct level_door *d = level_door_at_pos (p);

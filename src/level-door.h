@@ -78,6 +78,7 @@ void unload_level_door (void);
 void register_level_door (struct pos *p);
 int compare_level_doors (const void *d0, const void *d1);
 struct level_door *level_door_at_pos (struct pos *p);
+void remove_level_door (struct level_door *d);
 void break_level_door (struct pos *p);
 void compute_level_doors (void);
 struct level_door *get_exit_level_door (int n);

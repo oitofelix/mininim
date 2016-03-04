@@ -84,6 +84,7 @@ void unload_door (void);
 void register_door (struct pos *p);
 int compare_doors (const void *d0, const void *d1);
 struct door *door_at_pos (struct pos *p);
+void remove_door (struct door *d);
 void open_door (int e);
 void close_door (int e);
 void compute_doors (void);

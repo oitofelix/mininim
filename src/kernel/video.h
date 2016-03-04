@@ -67,5 +67,6 @@ extern int screen_flags;
 extern bool hgc;
 extern int display_width, display_height;
 extern ALLEGRO_BITMAP *icon;
+extern ALLEGRO_TIMER *bottom_text_timer;
 
 #endif	/* MININIM_VIDEO_H */

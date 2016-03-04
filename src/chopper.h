@@ -120,6 +120,7 @@ void unload_chopper (void);
 void register_chopper (struct pos *p);
 int compare_choppers (const void *d0, const void *d1);
 struct chopper *chopper_at_pos (struct pos *p);
+void remove_chopper (struct chopper *c);
 bool should_chomp (struct pos *p);
 void compute_choppers (void);
 void draw_chopper_left (ALLEGRO_BITMAP *bitmap, struct pos *p,

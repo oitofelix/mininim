@@ -155,6 +155,9 @@
 #include "wall-depedv.h"
 #include "wall-pv.h"
 
+#include "menu.h"
+#include "editor.h"
+
 /* functions */
 void *load_config_dialog (ALLEGRO_THREAD *thread, void *arg);
 void *save_game_dialog (ALLEGRO_THREAD *thread, void *arg);

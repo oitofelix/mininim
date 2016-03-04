@@ -86,4 +86,6 @@
 #define STARS_RANDOM_SEED 78234782
 #define STARS 7
 
+#define ESCAPE_KEY 27
+
 #endif	/* MININIM_CONSTANTS_H */

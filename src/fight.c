@@ -808,14 +808,14 @@ get_pos (struct anim *k, struct pos *p, struct coord *m)
     return p;
   }
 
-  while (p->room != m->room && con (p)->fg != DOOR) {
-    if (p->room == roomd (m->room, LEFT)) p->place++;
-    else if (p->room == roomd (m->room, RIGHT)) p->place--;
-    else if (p->room == roomd (m->room, ABOVE)) p->floor++;
-    else if (p->room == roomd (m->room, BELOW)) p->floor--;
-    else break;
-    npos (p, p);
-  }
+  /* while (p->room != m->room && con (p)->fg != DOOR) { */
+  /*   if (p->room == roomd (m->room, LEFT)) p->place++; */
+  /*   else if (p->room == roomd (m->room, RIGHT)) p->place--; */
+  /*   else if (p->room == roomd (m->room, ABOVE)) p->floor++; */
+  /*   else if (p->room == roomd (m->room, BELOW)) p->floor--; */
+  /*   else break; */
+  /*   npos (p, p); */
+  /* } */
 
   return p;
 }

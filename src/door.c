@@ -195,6 +195,14 @@ door_at_pos (struct pos *p)
 }
 
 void
+remove_door (struct door *d)
+{
+  size_t i =  d - door;
+  door =
+    remove_from_array (door, &door_nmemb, i, 1, sizeof (*d));
+}
+
+void
 compute_doors (void)
 {
   size_t i;
