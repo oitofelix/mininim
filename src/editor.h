@@ -25,5 +25,6 @@ extern enum edit edit;
 
 /* functions */
 void editor (void);
+void exit_editor (void);
 
 #endif	/* MININIM_EDITOR_H */

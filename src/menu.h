@@ -20,6 +20,12 @@
 #ifndef MININIM_MENU_H
 #define MININIM_MENU_H
 
+/* variable */
+extern bool active_menu;
+
+/* functions */
+void reset_menu (void);
 char process_menu (struct menu_item *menu, char *prefix);
+bool was_menu_key_pressed (void);
 
 #endif	/* MININIM_MENU_H */

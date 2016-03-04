@@ -87,5 +87,6 @@
 #define STARS 7
 
 #define ESCAPE_KEY 27
+#define BACKSPACE_KEY 8
 
 #endif	/* MININIM_CONSTANTS_H */

@@ -60,7 +60,8 @@ get_mouse_pos (struct pos *p)
 
   posf (&c, p);
 
-  if (p->floor == -1 || p->floor > 2) {
+  if (p->floor == -1 || p->floor > 2
+      || edit == EDIT_NONE) {
     *p = (struct pos) {-1,-2,-1};
     return p;
   }

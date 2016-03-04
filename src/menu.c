@@ -19,14 +19,24 @@
 
 #include "mininim.h"
 
+bool active_menu;
 static int help;
 static uint64_t help_cycles;
 static size_t help_item;
+
+void
+reset_menu (void)
+{
+  help = 0;
+  active_menu = false;
+}
 
 char
 process_menu (struct menu_item *menu, char *prefix)
 {
   size_t i = 0;
+  active_menu = false;
+  char c;
 
   if (key.keyboard.unichar > 0) {
     if (help == 1) {
@@ -40,18 +50,20 @@ process_menu (struct menu_item *menu, char *prefix)
         i++;
       }
     }
-    else if (help == 2 && key.keyboard.unichar == ESCAPE_KEY) help = 0;
+    else if (help == 2 && key.keyboard.keycode == ALLEGRO_KEY_BACKSPACE) help = 0;
     else if (key.keyboard.unichar == '?') help = 1;
-    else if (key.keyboard.unichar == ESCAPE_KEY) {
+    else if (key.keyboard.keycode == ALLEGRO_KEY_BACKSPACE) {
       memset (&key, 0, sizeof (key));
       help = 0;
-      return ESCAPE_KEY;
+      c = BACKSPACE_KEY;
+      goto end;
     } else {
       while (menu[i].key) {
         if (menu[i].key == toupper (key.keyboard.unichar)) {
           help = 0;
           memset (&key, 0, sizeof (key));
-          return menu[i].key;
+          c = menu[i].key;
+          goto end;
         }
         i++;
       }
@@ -88,5 +100,28 @@ process_menu (struct menu_item *menu, char *prefix)
     al_free (menu_str);
   }
 
-  return 0;
+  c = 0;
+
+ end:
+  active_menu = true;
+  return c;
+}
+
+bool
+was_menu_key_pressed (void)
+{
+  switch (toupper (key.keyboard.unichar)) {
+  case '0': case '1': case '2': case '3': case '4': case '5':
+  case '6': case '7': case '8': case '9': case 'A': case 'B':
+  case 'C': case 'D': case 'E': case 'F': case 'G': case 'H':
+  case 'I': case 'J': case 'K': case 'L': case 'M': case 'N':
+  case 'O': case 'P': case 'Q': case 'R': case 'S': case 'T':
+  case 'U': case 'V': case 'W': case 'X': case 'Y': case 'Z':
+  case '?': case '-': case '+': case '=':
+    return true;
+  }
+
+  if (key.keyboard.keycode == ALLEGRO_KEY_BACKSPACE) return true;
+
+  return false;
 }

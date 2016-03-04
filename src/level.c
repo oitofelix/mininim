@@ -46,6 +46,7 @@ play_level (struct level *lv)
 
  start:
   cutscene = false;
+  game_paused = false;
   level = *lv;
 
   if (level_module == LEGACY_LEVEL_MODULE
@@ -210,8 +211,6 @@ compute_level (void)
 
   process_keys ();
 
-  editor ();
-
   if (game_paused) return;
 
   /* this condition is necessary to honor any floor press the start
@@ -287,24 +286,23 @@ process_keys (void)
     al_stop_timer (play_time);
   }
 
-  if (edit == EDIT_NONE
-      && (was_key_pressed (ALLEGRO_KEY_ESCAPE, 0, 0, true)
-          || was_button_pressed (joystick_pause_button, true))) {
+  if (was_key_pressed (ALLEGRO_KEY_ESCAPE, 0, 0, true)
+      || was_button_pressed (joystick_pause_button, true)) {
     if (game_paused) {
       step_one_cycle = true;
       game_paused = false;
       al_start_timer (play_time);
     } else pause_game ();
   } else if (game_paused
+             && ! was_menu_key_pressed ()
              && (key.keyboard.keycode || button != -1)
-             && ! save_game_dialog_thread
-             && edit == EDIT_NONE)
+             && ! save_game_dialog_thread)
     unpause_game ();
 
   if (game_paused) anim_cycle--;
 
   /* R: resurrect kid */
-  if (edit == EDIT_NONE
+  if (! active_menu
       && was_key_pressed (ALLEGRO_KEY_R, 0, 0, true)
       && is_kid_dead (&current_kid->f))
     kid_resurrect (current_kid);
@@ -314,7 +312,7 @@ process_keys (void)
     room_view = current_kid->f.c.room;
 
   /* A: alternate between kid and its shadows */
-  if (edit == EDIT_NONE
+  if (! active_menu
       && was_key_pressed (ALLEGRO_KEY_A, 0, 0, true)) {
     do {
       current_kid = &anima[(current_kid - anima + 1) % anima_nmemb];
@@ -324,7 +322,7 @@ process_keys (void)
   }
 
   /* K: kill enemy */
-  if (edit == EDIT_NONE
+  if (! active_menu
       && was_key_pressed (ALLEGRO_KEY_K, 0, 0, true)) {
     struct anim *ke = get_anim_by_id (current_kid->enemy_id);
     if (ke) {
@@ -334,7 +332,7 @@ process_keys (void)
   }
 
   /* I: enable/disable immortal mode */
-  if (edit == EDIT_NONE
+  if (! active_menu
       && was_key_pressed (ALLEGRO_KEY_I, 0, 0, true)) {
     immortal_mode = ! immortal_mode;
     current_kid->immortal = immortal_mode;
@@ -365,7 +363,7 @@ process_keys (void)
     quit_anim = NEXT_LEVEL;
 
   /* C: show direct coordinates */
-  if (edit == EDIT_NONE
+  if (! active_menu
       && was_key_pressed (ALLEGRO_KEY_C, 0, 0, true)) {
     int s = room_view;
     int l = roomd (room_view, LEFT);
@@ -399,7 +397,7 @@ process_keys (void)
     display_remaining_time ();
 
   /* +: increment and display remaining time */
-  if (edit == EDIT_NONE
+  if (! active_menu
       && was_key_pressed (ALLEGRO_KEY_EQUALS, 0, ALLEGRO_KEYMOD_SHIFT, true)) {
     int t = time_limit - al_get_timer_count (play_time);
     int d = t > 60 ? -60 : -1;
@@ -408,7 +406,7 @@ process_keys (void)
   }
 
   /* -: decrement and display remaining time */
-  if (edit == EDIT_NONE
+  if (! active_menu
       && was_key_pressed (ALLEGRO_KEY_MINUS, 0, 0, true)) {
     int t = time_limit - al_get_timer_count (play_time);
     int d = t > 60 ? +60 : +1;
@@ -504,7 +502,7 @@ process_keys (void)
       button = -1;
     }
 
-    if (t >= 60 && edit == EDIT_NONE) {
+    if (t >= 60 && ! active_menu) {
       if (t < 240 || t % 12 < 8) {
         if (t >= 252 && t % 12 == 0)
           play_sample (press_key_sample, -1);
@@ -587,7 +585,7 @@ draw_level (void)
   }
   if (rem_time <= 0) quit_anim = OUT_OF_TIME;
 
-  if (game_paused && edit == EDIT_NONE)
+  if (game_paused && ! active_menu)
     draw_bottom_text (NULL, "GAME PAUSED");
 }
 

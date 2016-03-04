@@ -100,10 +100,11 @@ play_anim (void (*draw_callback) (void),
           if (compute_callback) compute_callback ();
           clear_bitmap (uscreen, TRANSPARENT_COLOR);
           draw_callback ();
-          draw_bottom_text (uscreen, NULL);
           play_samples ();
           anim_cycle++;
         }
+        if (! cutscene) editor ();
+        draw_bottom_text (uscreen, NULL);
         drop_all_events_from_source
           (event_queue, get_timer_event_source (timer));
         al_set_timer_count (timer, 0);
@@ -134,10 +135,9 @@ play_anim (void (*draw_callback) (void),
       button = event.joystick.button;
       break;
     case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
-      if (edit == EDIT_NONE) edit = EDIT_MAIN;
-      else {
-        edit = EDIT_NONE;
-        draw_bottom_text (NULL, NULL);
+      if (! cutscene) {
+        if (edit == EDIT_NONE) edit = EDIT_MAIN;
+        else exit_editor ();
       }
       printf ("%i,%i\n",
               (event.mouse.x * ORIGINAL_WIDTH) / al_get_display_width (display),
@@ -150,7 +150,7 @@ play_anim (void (*draw_callback) (void),
       int prev_room = room_view;
 
       /* H: view room at left (J if flipped horizontally) */
-      if (edit == EDIT_NONE
+      if (! active_menu
           && ((! flip_gamepad_horizontal
                && was_key_pressed (ALLEGRO_KEY_H, 0, 0, true))
               || (flip_gamepad_horizontal
@@ -158,7 +158,7 @@ play_anim (void (*draw_callback) (void),
         room_view = level.link[room_view].l;
 
       /* J: view room at right (H if flipped horizontally) */
-      if (edit == EDIT_NONE
+      if (! active_menu
           && ((! flip_gamepad_horizontal
                && was_key_pressed (ALLEGRO_KEY_J, 0, 0, true))
               || (flip_gamepad_horizontal
@@ -166,7 +166,7 @@ play_anim (void (*draw_callback) (void),
         room_view = level.link[room_view].r;
 
       /* U: view room above (N if flipped vertically) */
-      if (edit == EDIT_NONE
+      if (! active_menu
           && ((! flip_gamepad_vertical
                && was_key_pressed (ALLEGRO_KEY_U, 0, 0, true))
               || (flip_gamepad_vertical
@@ -174,7 +174,7 @@ play_anim (void (*draw_callback) (void),
         room_view = level.link[room_view].a;
 
       /* N: view room below (U if flipped vertically) */
-      if (edit == EDIT_NONE
+      if (! active_menu
           && ((! flip_gamepad_vertical
                && was_key_pressed (ALLEGRO_KEY_N, 0, 0, true))
               || (flip_gamepad_vertical
@@ -210,7 +210,7 @@ play_anim (void (*draw_callback) (void),
       }
 
       /* F: enable/disable fullscreen mode */
-      if (edit == EDIT_NONE
+      if (! active_menu
           && was_key_pressed (ALLEGRO_KEY_F, 0, 0, true)) {
         char *boolean;
         int flags = al_get_display_flags (display);

@@ -70,6 +70,13 @@ editor (void)
      {'H', "HIDDEN FLOOR"},
      {0}};
 
+  struct menu_item pillar_menu[] =
+    {{'P', "PILLAR"},
+     {'T', "BIG PILLAR TOP"},
+     {'B', "BIG PILLAR BOTTOM"},
+     {'A', "ARCH BOTTOM"},
+     {0}};
+
   struct pos p = mouse_pos;
   struct anim *k;
 
@@ -77,14 +84,12 @@ editor (void)
   case EDIT_NONE: break;
   case EDIT_MAIN:
     switch (process_menu (main_menu, NULL)) {
-    case ESCAPE_KEY:
-      edit = EDIT_NONE;
-      draw_bottom_text (NULL, NULL);
-      break;
+    case BACKSPACE_KEY: exit_editor (); break;
     case 'F': edit = EDIT_FG; break;
     case 'B': break;
     case 'E': break;
     case 'K':
+      if (p.room <= 0) break;
       k = get_anim_by_id (current_kid_id);
       place_frame (&k->f, &k->f, kid_normal_00, &p,
                    k->f.dir == LEFT ? +22 : +31, +15);
@@ -97,8 +102,19 @@ editor (void)
     break;
   case EDIT_FG:
     switch (process_menu (fg_menu, "F>")) {
-    case ESCAPE_KEY: edit = EDIT_MAIN; break;
+    case BACKSPACE_KEY: edit = EDIT_MAIN; break;
     case 'F': edit = EDIT_FLOOR; break;
+    case 'P': edit = EDIT_PILLAR; break;
+    case 'W':
+      if (con (&p)->fg == WALL) break;
+      con (&p)->fg = WALL;
+      update_wall_cache (room_view, em, vm);
+      break;
+    case 'D': break;
+    case 'C': break;
+    case 'M': break;
+    case 'R': break;
+    case 'A': break;
     default: break;
     }
     break;
@@ -115,7 +131,7 @@ editor (void)
     destroy_con_at_pos (&p);
 
     switch (c) {
-    case ESCAPE_KEY: edit = EDIT_FG; break;
+    case BACKSPACE_KEY: edit = EDIT_FG; break;
     case 'N': con (&p)->fg = NO_FLOOR; break;
     case 'F': con (&p)->fg = FLOOR; break;
     case 'B': con (&p)->fg = BROKEN_FLOOR; break;
@@ -132,5 +148,24 @@ editor (void)
     register_con_at_pos (&p);
 
     break;
+  case EDIT_PILLAR:
+    switch (process_menu (pillar_menu, "FP>")) {
+    case BACKSPACE_KEY: edit = EDIT_FG; break;
+    case 'P': con (&p)->fg = PILLAR; break;
+    case 'T': con (&p)->fg = BIG_PILLAR_TOP; break;
+    case 'B': con (&p)->fg = BIG_PILLAR_BOTTOM; break;
+    case 'A': con (&p)->fg = ARCH_BOTTOM; break;
+    }
+    break;
   }
+}
+
+void
+exit_editor (void)
+{
+  edit = EDIT_NONE;
+  reset_menu ();
+  if (game_paused)
+    draw_bottom_text (NULL, "GAME PAUSED");
+  else draw_bottom_text (NULL, NULL);
 }
