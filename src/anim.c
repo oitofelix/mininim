@@ -139,9 +139,9 @@ play_anim (void (*draw_callback) (void),
         if (edit == EDIT_NONE) edit = EDIT_MAIN;
         else exit_editor ();
       }
-      printf ("%i,%i\n",
-              (event.mouse.x * ORIGINAL_WIDTH) / al_get_display_width (display),
-              (event.mouse.y * ORIGINAL_HEIGHT) / al_get_display_height (display));
+      /* printf ("%i,%i\n", */
+      /*         (event.mouse.x * ORIGINAL_WIDTH) / al_get_display_width (display), */
+      /*         (event.mouse.y * ORIGINAL_HEIGHT) / al_get_display_height (display)); */
       break;
     case ALLEGRO_EVENT_KEY_CHAR:
       key = event;

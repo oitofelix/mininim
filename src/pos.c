@@ -545,6 +545,9 @@ ccoord (struct coord *c0, struct coord *c1)
 bool
 peq (struct pos *p0, struct pos *p1)
 {
+  if (p0->room < 0 || p1->room < 0)
+    return false;
+
   /* optimization: sufficient condition */
   if (p0->room == p1->room
       && p0->floor == p1->floor

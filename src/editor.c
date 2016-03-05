@@ -43,6 +43,7 @@ editor (void)
      {'B', "BACKGROUND"},
      {'E', "EXTENSION"},
      {'K', "PLACE KID"},
+     {'J', "JUMP TO ROOM"},
      {'L', "ROOM LINKING"},
      {0}};
 
@@ -106,9 +107,23 @@ editor (void)
      {'B', "BALCONY"},
      {0}};
 
+  struct menu_item items_menu[] =
+    {{'N', "NO ITEM"},
+     {'E', "EMPTY POTION"},
+     {'S', "SMALL LIFE POTION"},
+     {'B', "BIG LIFE POTION"},
+     {'P', "SMALL POISON POTION"},
+     {'O', "BIG POISON POTION"},
+     {'F', "FLOAT POTION"},
+     {'L', "FLIP POTION"},
+     {'A', "ACTIVATION POTION"},
+     {'W', "SWORD"},
+     {0}};
+
   struct pos p = mouse_pos;
   struct anim *k;
 
+  int r;
   switch (edit) {
   case EDIT_NONE: break;
   case EDIT_MAIN:
@@ -116,7 +131,7 @@ editor (void)
     case BACKSPACE_KEY: exit_editor (); break;
     case 'F': edit = EDIT_FG; break;
     case 'B': edit = EDIT_BG; break;
-    case 'E': break;
+    case 'E': edit = EDIT_EXT; break;
     case 'K':
       if (p.room <= 0) break;
       k = get_anim_by_id (current_kid_id);
@@ -125,6 +140,7 @@ editor (void)
       kid_normal (k);
       update_depressible_floor (k, -4, -10);
       break;
+    case 'J': edit = EDIT_JUMP_ROOM; break;
     case 'L': break;
     }
     break;
@@ -263,7 +279,7 @@ editor (void)
 
     break;
   case EDIT_BG:
-    switch (process_menu (bg_menu, NULL)) {
+    switch (process_menu (bg_menu, "B>")) {
     case BACKSPACE_KEY: edit = EDIT_MAIN; break;
     case 'N': con (&p)->bg = NO_BRICKS; break;
     case 'G': con (&p)->bg = NO_BG; break;
@@ -278,6 +294,49 @@ editor (void)
       compute_stars_position (room_view, room_view);
       break;
     }
+    break;
+  case EDIT_EXT:
+    switch (con (&p)->fg) {
+    case FLOOR:
+      switch (process_menu (items_menu, "E>")) {
+      case BACKSPACE_KEY: edit = EDIT_MAIN; break;
+      case 'N': con (&p)->ext.item = NO_ITEM; break;
+      case 'E': con (&p)->ext.item = EMPTY_POTION; break;
+      case 'S': con (&p)->ext.item = SMALL_LIFE_POTION; break;
+      case 'B': con (&p)->ext.item = BIG_LIFE_POTION; break;
+      case 'P': con (&p)->ext.item = SMALL_POISON_POTION; break;
+      case 'O': con (&p)->ext.item = BIG_POISON_POTION; break;
+      case 'F': con (&p)->ext.item = FLOAT_POTION; break;
+      case 'L': con (&p)->ext.item = FLIP_POTION; break;
+      case 'A': con (&p)->ext.item = ACTIVATION_POTION; break;
+      case 'W': con (&p)->ext.item = SWORD; break;
+      }
+      break;
+    case DOOR:
+      destroy_con_at_pos (&p);
+      r = menu_int (con (&p)->ext.step, 0, DOOR_MAX_STEP, "STEP");
+      if (r == INT_MAX) {
+        register_con_at_pos (&p);
+        edit = EDIT_MAIN;
+        break;
+      }
+      con (&p)->ext.step = r;
+      register_con_at_pos (&p);
+      break;
+    default:
+      draw_bottom_text (NULL, "CONSTRUCTION USES NO EXTENSION");
+      if (was_key_pressed (ALLEGRO_KEY_BACKSPACE, 0, 0, true))
+        edit = EDIT_MAIN;
+      break;
+    }
+    break;
+  case EDIT_JUMP_ROOM:
+    r = menu_int (room_view, 1, ROOMS - 1, "ROOM");
+    if (r == INT_MAX) {
+      edit = EDIT_MAIN;
+      break;
+    }
+    room_view = r;
     break;
   }
 }

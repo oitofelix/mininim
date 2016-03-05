@@ -62,7 +62,7 @@ get_mouse_pos (struct pos *p)
 
   if (p->floor == -1 || p->floor > 2
       || edit == EDIT_NONE) {
-    *p = (struct pos) {-1,-2,-1};
+    *p = (struct pos) {-1,-1,-1};
     return p;
   }
 
@@ -71,13 +71,17 @@ get_mouse_pos (struct pos *p)
   case BIG_PILLAR_BOTTOM: case ARCH_BOTTOM:
   case ARCH_TOP_MID: case ARCH_TOP_SMALL:
   case ARCH_TOP_LEFT: case ARCH_TOP_RIGHT:
-    return p;
     break;
   default:
-    if (ry >= 60) return pos_gen (&c, p, 0, 3);
-    else if (ry >= 50)
-      return pos_gen (&c, p, 23 - 2.5 * (ry - 50), 3);
-    else return pos_gen (&c, p, 23, 3);
+    if (ry >= 60) pos_gen (&c, p, 0, 3);
+    else if (ry >= 50) pos_gen (&c, p, 23 - 2.5 * (ry - 50), 3);
+    else pos_gen (&c, p, 23, 3);
     break;
   }
+
+  struct pos np;
+  npos (p, &np);
+  if (np.room == 0) *p = (struct pos) {-1,-1,-1};
+
+  return p;
 }
