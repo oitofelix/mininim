@@ -749,6 +749,7 @@ draw_no_floor_selection (ALLEGRO_BITMAP *bitmap, struct pos *p)
     struct rect r = new_rect (p->room, p->place * PLACE_WIDTH + 25,
                               p->floor * PLACE_HEIGHT + 3,
                               PLACE_WIDTH, PLACE_HEIGHT - 16);
-    draw_filled_rect (bitmap, &r, al_map_rgba (64, 64, 64, 0));
+    draw_filled_rect (bitmap, &r, selection_palette
+                      (apply_hue_color (al_map_rgba (69, 93, 113, 1))));
   }
 }
