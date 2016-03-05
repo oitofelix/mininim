@@ -136,7 +136,7 @@ play_anim (void (*draw_callback) (void),
       break;
     case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
       if (! cutscene) {
-        if (edit == EDIT_NONE) edit = EDIT_MAIN;
+        if (edit == EDIT_NONE) enter_editor ();
         else exit_editor ();
       }
       /* printf ("%i,%i\n", */

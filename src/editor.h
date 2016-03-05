@@ -22,9 +22,11 @@
 
 /* variables */
 extern enum edit edit;
+extern enum edit last_edit;
 
 /* functions */
 void editor (void);
+void enter_editor (void);
 void exit_editor (void);
 
 #endif	/* MININIM_EDITOR_H */

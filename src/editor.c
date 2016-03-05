@@ -19,14 +19,16 @@
 
 #include "mininim.h"
 
+static void menu_step_ext (struct pos *p, int max);
+static void menu_event_ext (struct pos *p);
+
 enum edit edit;
+enum edit last_edit = EDIT_MAIN;
 static struct pos last_mouse_pos = {-1,-1,-1};
 
 void
 editor (void)
 {
-  char *text, c;
-
   if (edit == EDIT_NONE) return;
 
   /* if (last_mouse_pos.room == -1) */
@@ -44,6 +46,7 @@ editor (void)
      {'E', "EXTENSION"},
      {'K', "PLACE KID"},
      {'J', "JUMP TO ROOM"},
+     {'I', "CONSTRUCTION INFO"},
      {'L', "ROOM LINKING"},
      {0}};
 
@@ -120,15 +123,24 @@ editor (void)
      {'W', "SWORD"},
      {0}};
 
+  struct menu_item loose_floor_ext_menu[] =
+    {{'F', "FALL"},
+     {'C', "CAN'T FALL"},
+     {0}};
+
   struct pos p = mouse_pos;
   struct anim *k;
 
   int r;
+  char *fg_str = NULL, *bg_str = NULL, *ext_str = NULL;
+  bool free_ext_str;
+  char *str = NULL, c;
+
   switch (edit) {
   case EDIT_NONE: break;
   case EDIT_MAIN:
     switch (process_menu (main_menu, NULL)) {
-    case BACKSPACE_KEY: exit_editor (); break;
+    /* case BACKSPACE_KEY: exit_editor (); break; */
     case 'F': edit = EDIT_FG; break;
     case 'B': edit = EDIT_BG; break;
     case 'E': edit = EDIT_EXT; break;
@@ -141,6 +153,7 @@ editor (void)
       update_depressible_floor (k, -4, -10);
       break;
     case 'J': edit = EDIT_JUMP_ROOM; break;
+    case 'I': edit = EDIT_INFO; break;
     case 'L': break;
     }
     break;
@@ -312,19 +325,45 @@ editor (void)
       case 'W': con (&p)->ext.item = SWORD; break;
       }
       break;
-    case DOOR:
-      destroy_con_at_pos (&p);
-      r = menu_int (con (&p)->ext.step, 0, DOOR_MAX_STEP, "STEP");
-      if (r == INT_MAX) {
-        register_con_at_pos (&p);
-        edit = EDIT_MAIN;
-        break;
+    case LOOSE_FLOOR:
+      c = process_menu (loose_floor_ext_menu, "E>");
+      if (! c) break;
+
+      if (c == BACKSPACE_KEY) {
+        edit = EDIT_FG; break;
       }
-      con (&p)->ext.step = r;
+
+      if ((c == 'F' && con (&p)->ext.cant_fall == false)
+          || (c == 'C' && con (&p)->ext.cant_fall == true))
+        break;
+
+      destroy_con_at_pos (&p);
+
+      switch (c) {
+      case 'F': con (&p)->ext.cant_fall = false; break;
+      case 'C': con (&p)->ext.cant_fall = true; break;
+      }
+
       register_con_at_pos (&p);
+
+      break;
+    case SPIKES_FLOOR:
+      menu_step_ext (&p, SPIKES_FLOOR_MAX_STEP);
+      break;
+    case OPENER_FLOOR:
+      menu_event_ext (&p);
+      break;
+    case CLOSER_FLOOR:
+      menu_event_ext (&p);
+      break;
+    case DOOR:
+      menu_step_ext (&p, DOOR_MAX_STEP);
+      break;
+    case LEVEL_DOOR:
+      menu_step_ext (&p, LEVEL_DOOR_MAX_STEP);
       break;
     default:
-      draw_bottom_text (NULL, "CONSTRUCTION USES NO EXTENSION");
+      draw_bottom_text (NULL, "NO EXTENSION");
       if (was_key_pressed (ALLEGRO_KEY_BACKSPACE, 0, 0, true))
         edit = EDIT_MAIN;
       break;
@@ -338,15 +377,158 @@ editor (void)
     }
     room_view = r;
     break;
+  case EDIT_INFO:
+    if (was_key_pressed (ALLEGRO_KEY_BACKSPACE, 0, 0, true))
+      edit = EDIT_MAIN;
+
+    free_ext_str = false;
+
+    switch (con (&p)->fg) {
+    case NO_FLOOR: fg_str = "NO FLOOR"; break;
+    case FLOOR: fg_str = "FLOOR"; break;
+    case BROKEN_FLOOR: fg_str = "BROKEN FLOOR"; break;
+    case SKELETON_FLOOR: fg_str = "SKELETON FLOOR"; break;
+    case LOOSE_FLOOR: fg_str = "LOOSE FLOOR"; break;
+    case SPIKES_FLOOR: fg_str = "SPIKES FLOOR"; break;
+    case OPENER_FLOOR: fg_str = "OPENER FLOOR"; break;
+    case CLOSER_FLOOR: fg_str = "CLOSER FLOOR"; break;
+    case STUCK_FLOOR: fg_str = "STUCK FLOOR"; break;
+    case HIDDEN_FLOOR: fg_str = "HIDDEN FLOOR"; break;
+    case PILLAR: fg_str = "PILLAR"; break;
+    case BIG_PILLAR_BOTTOM: fg_str = "BIG PILLAR BOTTOM"; break;
+    case BIG_PILLAR_TOP: fg_str = "BIG PILLAR TOP"; break;
+    case WALL: fg_str = "WALL"; break;
+    case DOOR: fg_str = "DOOR"; break;
+    case LEVEL_DOOR: fg_str = "LEVEL DOOR"; break;
+    case CHOPPER: fg_str = "CHOPPER"; break;
+    case MIRROR: fg_str = "MIRROR"; break;
+    case CARPET: fg_str = "CARPET"; break;
+    case TCARPET: fg_str = "TCARPET"; break;
+    case ARCH_BOTTOM: fg_str = "ARCH BOTTOM"; break;
+    case ARCH_TOP_LEFT: fg_str = "ARCH TOP LEFT"; break;
+    case ARCH_TOP_RIGHT: fg_str = "ARCH TOP RIGHT"; break;
+    case ARCH_TOP_MID: fg_str = "ARCH TOP MID"; break;
+    case ARCH_TOP_SMALL: fg_str = "ARCH TOP SMALL"; break;
+    deafult: fg_str = "UNKNOWN FG"; break;
+    }
+
+    switch (con (&p)->bg) {
+    case NO_BG: bg_str = "NO BG"; break;
+    case BRICKS_00: bg_str = "BRICKS 00"; break;
+    case BRICKS_01: bg_str = "BRICKS 01"; break;
+    case BRICKS_02: bg_str = "BRICKS 02"; break;
+    case BRICKS_03: bg_str = "BRICKS 03"; break;
+    case NO_BRICKS: bg_str = "NO BRICKS"; break;
+    case TORCH: bg_str = "TORCH"; break;
+    case WINDOW: bg_str = "WINDOW"; break;
+    case BALCONY: bg_str = "BALCONY"; break;
+    default: bg_str = "UNKNOWN BG"; break;
+    }
+
+    switch (con (&p)->fg) {
+    case FLOOR:
+      switch (con (&p)->ext.item) {
+      case NO_ITEM: ext_str = "NO ITEM"; break;
+      case EMPTY_POTION: ext_str = "EMPTY POTION"; break;
+      case SMALL_LIFE_POTION: ext_str = "SMALL LIFE POTION"; break;
+      case BIG_LIFE_POTION: ext_str = "BIG LIFE POTION"; break;
+      case SMALL_POISON_POTION: ext_str = "SMALL POISON POTION"; break;
+      case BIG_POISON_POTION: ext_str = "BIG POISON POTION"; break;
+      case FLOAT_POTION: ext_str = "FLOAT POTION"; break;
+      case FLIP_POTION: ext_str = "FLIP POTION"; break;
+      case ACTIVATION_POTION: ext_str = "ACTIVATION POTION"; break;
+      case SWORD: ext_str = "SWORD"; break;
+      default: ext_str = "UNKNOWN EXTENSION"; break;
+      }
+      break;
+    case LOOSE_FLOOR:
+      ext_str = con (&p)->ext.cant_fall ? "CAN'T FALL" : "FALL";
+      break;
+    case SPIKES_FLOOR:
+      xasprintf (&ext_str, "%i", con (&p)->ext.step);
+      free_ext_str = true;
+      break;
+    case OPENER_FLOOR:
+      xasprintf (&ext_str, "%i", con (&p)->ext.event);
+      free_ext_str = true;
+      break;
+    case CLOSER_FLOOR:
+      xasprintf (&ext_str, "%i", con (&p)->ext.event);
+      free_ext_str = true;
+      break;
+    case DOOR:
+      xasprintf (&ext_str, "%i", con (&p)->ext.step);
+      free_ext_str = true;
+      break;
+    case LEVEL_DOOR:
+      xasprintf (&ext_str, "%i", con (&p)->ext.step);
+      free_ext_str = true;
+      break;
+    /* case CHOPPER: fg_str = "CHOPPER"; break; */
+    /* case MIRROR: fg_str = "MIRROR"; break; */
+    /* case CARPET: fg_str = "CARPET"; break; */
+    /* case TCARPET: fg_str = "TCARPET"; break; */
+    /* case ARCH_BOTTOM: fg_str = "ARCH BOTTOM"; break; */
+    /* case ARCH_TOP_LEFT: fg_str = "ARCH TOP LEFT"; break; */
+    /* case ARCH_TOP_RIGHT: fg_str = "ARCH TOP RIGHT"; break; */
+    /* case ARCH_TOP_MID: fg_str = "ARCH TOP MID"; break; */
+    /* case ARCH_TOP_SMALL: fg_str = "ARCH TOP SMALL"; break; */
+    default: ext_str = "NO EXTENSION"; break;
+    }
+
+    xasprintf (&str, "%s-%s-%s", fg_str, bg_str, ext_str);
+    draw_bottom_text (NULL, str);
+    al_free (str);
+    if (free_ext_str) al_free (ext_str);
+
+    break;
   }
+}
+
+void
+enter_editor (void)
+{
+  edit = last_edit;
+  memset (&key, 0, sizeof (key));
 }
 
 void
 exit_editor (void)
 {
+  last_edit = edit;
   edit = EDIT_NONE;
   reset_menu ();
   if (game_paused)
     draw_bottom_text (NULL, "GAME PAUSED");
   else draw_bottom_text (NULL, NULL);
+}
+
+static void
+menu_step_ext (struct pos *p, int max)
+{
+  int r = menu_int (con (p)->ext.step, 0, max, "STEP");
+  if (r == INT_MAX) {
+    edit = EDIT_MAIN;
+    return;
+  }
+  if (con (p)->ext.step != r) {
+    destroy_con_at_pos (p);
+    con (p)->ext.step = r;
+    register_con_at_pos (p);
+  }
+}
+
+static void
+menu_event_ext (struct pos *p)
+{
+  int r = menu_int (con (p)->ext.event, 0, EVENTS - 1, "EVENT");
+  if (r == INT_MAX) {
+    edit = EDIT_MAIN;
+    return;
+  }
+  if (con (p)->ext.event != r) {
+    destroy_con_at_pos (p);
+    con (p)->ext.event = r;
+    register_con_at_pos (p);
+  }
 }

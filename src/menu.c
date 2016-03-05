@@ -38,7 +38,8 @@ process_menu (struct menu_item *menu, char *prefix)
   active_menu = false;
   char c;
 
-  if (key.keyboard.unichar > 0) {
+  if (key.keyboard.unichar > 0
+      && key.keyboard.keycode != ALLEGRO_KEY_BACKSPACE) {
     if (help == 1) {
       while (menu[i].key) {
         if (menu[i].key == toupper (key.keyboard.unichar)) {
@@ -50,14 +51,8 @@ process_menu (struct menu_item *menu, char *prefix)
         i++;
       }
     }
-    else if (help == 2 && key.keyboard.keycode == ALLEGRO_KEY_BACKSPACE) help = 0;
     else if (key.keyboard.unichar == '?') help = 1;
-    else if (key.keyboard.keycode == ALLEGRO_KEY_BACKSPACE) {
-      memset (&key, 0, sizeof (key));
-      help = 0;
-      c = BACKSPACE_KEY;
-      goto end;
-    } else {
+    else {
       while (menu[i].key) {
         if (menu[i].key == toupper (key.keyboard.unichar)) {
           help = 0;
@@ -101,6 +96,13 @@ process_menu (struct menu_item *menu, char *prefix)
   }
 
   c = 0;
+
+  if (key.keyboard.keycode == ALLEGRO_KEY_BACKSPACE) {
+    memset (&key, 0, sizeof (key));
+    help = 0;
+    c = BACKSPACE_KEY;
+    goto end;
+  }
 
  end:
   active_menu = true;
