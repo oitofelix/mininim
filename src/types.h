@@ -371,7 +371,8 @@ enum level_module {
 } level_module;
 
 enum edit {
-  EDIT_NONE, EDIT_MAIN, EDIT_FG, EDIT_FLOOR, EDIT_PILLAR, EDIT_DOOR,
+  EDIT_NONE, EDIT_MAIN, EDIT_FG, EDIT_FLOOR, EDIT_PILLAR,
+  EDIT_DOOR, EDIT_CARPET, EDIT_ARCH, EDIT_BG,
 };
 
 struct menu_item {

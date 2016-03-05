@@ -52,5 +52,6 @@ void draw_mirror_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
                      enum em em, enum vm vm);
 struct coord *mirror_coord (struct pos *p, struct coord *c);
 struct coord *mirror_reflex_coord (struct pos *p, struct coord *c);
+void create_mirror_bitmaps (int last_room, int room);
 
 #endif	/* MININIM_MIRROR_H */

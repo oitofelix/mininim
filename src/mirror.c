@@ -19,8 +19,6 @@
 
 #include "mininim.h"
 
-static void create_mirror_bitmaps (int last_room, int room);
-
 static ALLEGRO_BITMAP *mirror_bitmap[FLOORS + 2][PLACES + 1];
 
 /* dungeon cga */
@@ -143,7 +141,7 @@ uncross_mirrors (void)
     mirror[i].kid_crossing = -1;
 }
 
-static void
+void
 create_mirror_bitmaps (int last_room, int room)
 {
   struct coord c;

@@ -82,6 +82,30 @@ editor (void)
      {'L', "LEVEL DOOR"},
      {0}};
 
+  struct menu_item carpet_menu[] =
+    {{'C', "CARPET"},
+     {'T', "TRAVERSABLE CARPET"},
+     {0}};
+
+  struct menu_item arch_menu[] =
+    {{'M', "ARCH TOP MID"},
+     {'S', "ARCH TOP SMALL"},
+     {'L', "ARCH TOP LEFT"},
+     {'R', "ARCH TOP RIGHT"},
+     {0}};
+
+  struct menu_item bg_menu[] =
+    {{'N', "NO BRICKS"},
+     {'G', "NO BG"},
+     {'0', "BRICKS 00"},
+     {'1', "BRICKS 01"},
+     {'2', "BRICKS 02"},
+     {'3', "BRICKS 03"},
+     {'T', "TORCH"},
+     {'W', "WINDOW"},
+     {'B', "BALCONY"},
+     {0}};
+
   struct pos p = mouse_pos;
   struct anim *k;
 
@@ -91,7 +115,7 @@ editor (void)
     switch (process_menu (main_menu, NULL)) {
     case BACKSPACE_KEY: exit_editor (); break;
     case 'F': edit = EDIT_FG; break;
-    case 'B': break;
+    case 'B': edit = EDIT_BG; break;
     case 'E': break;
     case 'K':
       if (p.room <= 0) break;
@@ -102,7 +126,6 @@ editor (void)
       update_depressible_floor (k, -4, -10);
       break;
     case 'L': break;
-    default: break;
     }
     break;
   case EDIT_FG:
@@ -112,20 +135,35 @@ editor (void)
     case 'P': edit = EDIT_PILLAR; break;
     case 'W':
       if (con (&p)->fg == WALL) break;
+      destroy_con_at_pos (&p);
       con (&p)->fg = WALL;
       update_wall_cache (room_view, em, vm);
       break;
     case 'D': edit = EDIT_DOOR; break;
-    case 'C': break;
-    case 'M': break;
-    case 'R': break;
-    case 'A': break;
-    default: break;
+    case 'C':
+      if (con (&p)->fg == CHOPPER) break;
+      destroy_con_at_pos (&p);
+      con (&p)->fg = CHOPPER;
+      register_con_at_pos (&p);
+      break;
+    case 'M':
+      if (con (&p)->fg == MIRROR) break;
+      destroy_con_at_pos (&p);
+      con (&p)->fg = MIRROR;
+      register_con_at_pos (&p);
+      create_mirror_bitmaps (room_view, room_view);
+      break;
+    case 'R': edit = EDIT_CARPET; break;
+    case 'A': edit = EDIT_ARCH; break;
     }
     break;
   case EDIT_FLOOR:
     c = process_menu (floor_menu, "FF>");
     if (! c) break;
+
+    if (c == BACKSPACE_KEY) {
+      edit = EDIT_FG; break;
+    }
 
     if ((c == 'L' && con (&p)->fg == LOOSE_FLOOR)
         || (c == 'P' && con (&p)->fg == SPIKES_FLOOR)
@@ -136,7 +174,6 @@ editor (void)
     destroy_con_at_pos (&p);
 
     switch (c) {
-    case BACKSPACE_KEY: edit = EDIT_FG; break;
     case 'N': con (&p)->fg = NO_FLOOR; break;
     case 'F': con (&p)->fg = FLOOR; break;
     case 'B': con (&p)->fg = BROKEN_FLOOR; break;
@@ -147,15 +184,22 @@ editor (void)
     case 'C': con (&p)->fg = CLOSER_FLOOR; break;
     case 'T': con (&p)->fg = STUCK_FLOOR; break;
     case 'H': con (&p)->fg = HIDDEN_FLOOR; break;
-    default: break;
     }
 
     register_con_at_pos (&p);
 
     break;
   case EDIT_PILLAR:
-    switch (process_menu (pillar_menu, "FP>")) {
-    case BACKSPACE_KEY: edit = EDIT_FG; break;
+    c = process_menu (pillar_menu, "FP>");
+    if (! c) break;
+
+    if (c == BACKSPACE_KEY) {
+      edit = EDIT_FG; break;
+    }
+
+    destroy_con_at_pos (&p);
+
+    switch (c) {
     case 'P': con (&p)->fg = PILLAR; break;
     case 'T': con (&p)->fg = BIG_PILLAR_TOP; break;
     case 'B': con (&p)->fg = BIG_PILLAR_BOTTOM; break;
@@ -166,6 +210,10 @@ editor (void)
     c = process_menu (door_menu, "FD>");
     if (! c) break;
 
+    if (c == BACKSPACE_KEY) {
+      edit = EDIT_FG; break;
+    }
+
     if ((c == 'D' && con (&p)->fg == DOOR)
         || (c == 'L' && con (&p)->fg == LEVEL_DOOR))
       break;
@@ -173,13 +221,63 @@ editor (void)
     destroy_con_at_pos (&p);
 
     switch (c) {
-    case BACKSPACE_KEY: edit = EDIT_FG; break;
     case 'D': con (&p)->fg = DOOR; break;
     case 'L': con (&p)->fg = LEVEL_DOOR; break;
     }
 
     register_con_at_pos (&p);
 
+    break;
+  case EDIT_CARPET:
+    c = process_menu (carpet_menu, "FR>");
+    if (! c) break;
+
+    if (c == BACKSPACE_KEY) {
+      edit = EDIT_FG; break;
+    }
+
+    destroy_con_at_pos (&p);
+
+    switch (c) {
+    case 'C': con (&p)->fg = CARPET; break;
+    case 'T': con (&p)->fg = TCARPET; break;
+    }
+
+    break;
+  case EDIT_ARCH:
+    c = process_menu (arch_menu, "FA>");
+    if (! c) break;
+
+    if (c == BACKSPACE_KEY) {
+      edit = EDIT_FG; break;
+    }
+
+    destroy_con_at_pos (&p);
+
+    switch (c) {
+    case 'M': con (&p)->fg = ARCH_TOP_MID; break;
+    case 'S': con (&p)->fg = ARCH_TOP_SMALL; break;
+    case 'L': con (&p)->fg = ARCH_TOP_LEFT; break;
+    case 'R': con (&p)->fg = ARCH_TOP_RIGHT; break;
+    }
+
+    break;
+  case EDIT_BG:
+    switch (process_menu (bg_menu, NULL)) {
+    case BACKSPACE_KEY: edit = EDIT_MAIN; break;
+    case 'N': con (&p)->bg = NO_BRICKS; break;
+    case 'G': con (&p)->bg = NO_BG; break;
+    case '0': con (&p)->bg = BRICKS_00; break;
+    case '1': con (&p)->bg = BRICKS_01; break;
+    case '2': con (&p)->bg = BRICKS_02; break;
+    case '3': con (&p)->bg = BRICKS_03; break;
+    case 'T': con (&p)->bg = TORCH; break;
+    case 'W': con (&p)->bg = WINDOW; break;
+    case 'B':
+      con (&p)->bg = BALCONY;
+      compute_stars_position (room_view, room_view);
+      break;
+    }
     break;
   }
 }

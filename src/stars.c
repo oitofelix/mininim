@@ -31,7 +31,6 @@ static enum vm last_vm = -1;
 void draw_star (struct star *s, struct stars_bitmap *sb, enum vm vm);
 static void draw_stars (ALLEGRO_BITMAP *bitmap, struct star s[],
                         struct stars_bitmap *sb, size_t count, enum vm vm);
-static void compute_stars_position (int last_room, int room);
 static ALLEGRO_COLOR get_star_color (int i, enum vm vm);
 static int next_color (int color);
 static struct star *star_coord (struct pos *p, int i, struct star *s);
@@ -52,7 +51,7 @@ unload_stars (void)
   remove_room_callback (compute_stars_position);
 }
 
-static void
+void
 compute_stars_position (int last_room, int room)
 {
   struct pos p;
