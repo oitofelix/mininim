@@ -543,6 +543,10 @@ draw_level (void)
       draw_balcony_stars (screen, &p, vm);
     }
 
+  for (p.floor = FLOORS; p.floor >= 0; p.floor--)
+    for (p.place = -1; p.place < PLACES; p.place++)
+      draw_no_floor_selection (screen, &p);
+
   if (! no_room_drawing) draw_room (screen, room_view, em, vm);
 
   for (p.floor = FLOORS; p.floor >= -1; p.floor--)

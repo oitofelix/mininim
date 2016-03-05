@@ -254,21 +254,8 @@ draw_confg_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (con (p)->fg != WALL) pv = *p;
 
-  enum conbg bg = con (&pv)->bg;
-  struct rect r;
   switch (con (&pv)->fg) {
-  case NO_FLOOR:
-    /* mouse selection */
-    if (peq (p, &mouse_pos)
-        && (bg == NO_BRICKS
-            || (em == DUNGEON && bg == NO_BG)
-            || (em == PALACE && bg == BRICKS_00))) {
-      r = new_rect (p->room, p->place * PLACE_WIDTH + 25,
-                    p->floor * PLACE_HEIGHT + 3,
-                    PLACE_WIDTH, PLACE_HEIGHT - 16);
-      draw_filled_rect (bitmap, &r, al_map_rgb (64, 64, 64));
-    }
-    break;
+  case NO_FLOOR: break;
   case FLOOR: draw_floor_base (bitmap, &pv, em, vm); break;
   case BROKEN_FLOOR: draw_floor_base (bitmap, &pv, em, vm); break;
   case SKELETON_FLOOR: draw_floor_base (bitmap, &pv, em, vm); break;
@@ -747,5 +734,21 @@ apply_hue_color (ALLEGRO_COLOR c)
   case HUE_GRAY: return gray_hue_palette (c);
   case HUE_YELLOW: return yellow_hue_palette (c);
   case HUE_BLUE: return blue_hue_palette (c);
+  }
+}
+
+void
+draw_no_floor_selection (ALLEGRO_BITMAP *bitmap, struct pos *p)
+{
+  enum conbg bg = con (p)->bg;
+  if (peq (p, &mouse_pos)
+      && con (p)->fg == NO_FLOOR
+      && (bg == NO_BRICKS
+          || (em == DUNGEON && bg == NO_BG)
+          || (em == PALACE && bg == BRICKS_00))) {
+    struct rect r = new_rect (p->room, p->place * PLACE_WIDTH + 25,
+                              p->floor * PLACE_HEIGHT + 3,
+                              PLACE_WIDTH, PLACE_HEIGHT - 16);
+    draw_filled_rect (bitmap, &r, al_map_rgba (64, 64, 64, 0));
   }
 }

@@ -58,5 +58,6 @@ void draw_room_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
 ALLEGRO_BITMAP *apply_hue_palette (ALLEGRO_BITMAP *bitmap);
 ALLEGRO_COLOR apply_hue_color (ALLEGRO_COLOR c);
 ALLEGRO_COLOR selection_palette (ALLEGRO_COLOR c);
+void draw_no_floor_selection (ALLEGRO_BITMAP *bitmap, struct pos *p);
 
 #endif	/* MININIM_ROOM_H */
