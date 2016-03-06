@@ -41,13 +41,17 @@ editor (void)
   /* } */
 
   struct menu_item main_menu[] =
+    {{'C', "CONSTRUCTION"},
+     {'K', "PLACE KID"},
+     {'J', "JUMP TO ROOM"},
+     {'L', "ROOM LINKING"},
+     {0}};
+
+  struct menu_item con_menu[] =
     {{'F', "FOREGROUND"},
      {'B', "BACKGROUND"},
      {'E', "EXTENSION"},
-     {'K', "PLACE KID"},
-     {'J', "JUMP TO ROOM"},
-     {'I', "CONSTRUCTION INFO"},
-     {'L', "ROOM LINKING"},
+     {'I', "INFO"},
      {0}};
 
   struct menu_item fg_menu[] =
@@ -154,10 +158,7 @@ editor (void)
   case EDIT_NONE: break;
   case EDIT_MAIN:
     switch (process_menu (main_menu, NULL)) {
-    /* case BACKSPACE_KEY: exit_editor (); break; */
-    case 'F': edit = EDIT_FG; break;
-    case 'B': edit = EDIT_BG; break;
-    case 'E': edit = EDIT_EXT; break;
+    case 'C': edit = EDIT_CON; break;
     case 'K':
       if (p.room <= 0) break;
       k = get_anim_by_id (current_kid_id);
@@ -167,13 +168,21 @@ editor (void)
       update_depressible_floor (k, -4, -10);
       break;
     case 'J': edit = EDIT_JUMP_ROOM; break;
-    case 'I': edit = EDIT_INFO; break;
     case 'L': break;
     }
     break;
-  case EDIT_FG:
-    switch (process_menu (fg_menu, "F>")) {
+  case EDIT_CON:
+    switch (process_menu (con_menu, "C>")) {
     case BACKSPACE_KEY: edit = EDIT_MAIN; break;
+    case 'F': edit = EDIT_FG; break;
+    case 'B': edit = EDIT_BG; break;
+    case 'E': edit = EDIT_EXT; break;
+    case 'I': edit = EDIT_INFO; break;
+    }
+    break;
+  case EDIT_FG:
+    switch (process_menu (fg_menu, "CF>")) {
+    case BACKSPACE_KEY: edit = EDIT_CON; break;
     case 'F': edit = EDIT_FLOOR; break;
     case 'P': edit = EDIT_PILLAR; break;
     case 'W':
@@ -201,7 +210,7 @@ editor (void)
     }
     break;
   case EDIT_FLOOR:
-    c = process_menu (floor_menu, "FF>");
+    c = process_menu (floor_menu, "CFF>");
     if (! c) break;
 
     if (c == BACKSPACE_KEY) {
@@ -233,7 +242,7 @@ editor (void)
 
     break;
   case EDIT_PILLAR:
-    c = process_menu (pillar_menu, "FP>");
+    c = process_menu (pillar_menu, "CFP>");
     if (! c) break;
 
     if (c == BACKSPACE_KEY) {
@@ -250,7 +259,7 @@ editor (void)
     }
     break;
   case EDIT_DOOR:
-    c = process_menu (door_menu, "FD>");
+    c = process_menu (door_menu, "CFD>");
     if (! c) break;
 
     if (c == BACKSPACE_KEY) {
@@ -272,7 +281,7 @@ editor (void)
 
     break;
   case EDIT_CARPET:
-    c = process_menu (carpet_menu, "FR>");
+    c = process_menu (carpet_menu, "CFR>");
     if (! c) break;
 
     if (c == BACKSPACE_KEY) {
@@ -288,7 +297,7 @@ editor (void)
 
     break;
   case EDIT_ARCH:
-    c = process_menu (arch_menu, "FA>");
+    c = process_menu (arch_menu, "CFA>");
     if (! c) break;
 
     if (c == BACKSPACE_KEY) {
@@ -306,8 +315,8 @@ editor (void)
 
     break;
   case EDIT_BG:
-    switch (process_menu (bg_menu, "B>")) {
-    case BACKSPACE_KEY: edit = EDIT_MAIN; break;
+    switch (process_menu (bg_menu, "CB>")) {
+    case BACKSPACE_KEY: edit = EDIT_CON; break;
     case 'N': con (&p)->bg = NO_BRICKS; break;
     case 'G': con (&p)->bg = NO_BG; break;
     case '0': con (&p)->bg = BRICKS_00; break;
@@ -325,8 +334,8 @@ editor (void)
   case EDIT_EXT:
     switch (con (&p)->fg) {
     case FLOOR:
-      switch (process_menu (items_menu, "E>")) {
-      case BACKSPACE_KEY: edit = EDIT_MAIN; break;
+      switch (process_menu (items_menu, "CE>")) {
+      case BACKSPACE_KEY: edit = EDIT_CON; break;
       case 'N': con (&p)->ext.item = NO_ITEM; break;
       case 'E': con (&p)->ext.item = EMPTY_POTION; break;
       case 'S': con (&p)->ext.item = SMALL_LIFE_POTION; break;
@@ -340,11 +349,11 @@ editor (void)
       }
       break;
     case LOOSE_FLOOR:
-      c = process_menu (loose_floor_ext_menu, "E>");
+      c = process_menu (loose_floor_ext_menu, "CE>");
       if (! c) break;
 
       if (c == BACKSPACE_KEY) {
-        edit = EDIT_FG; break;
+        edit = EDIT_CON; break;
       }
 
       if ((c == 'F' && con (&p)->ext.cant_fall == false)
@@ -381,8 +390,8 @@ editor (void)
       b = con (&p)->ext.step & 0x80;
       min = b ? 128 : 0;
       max = b ? 133 : 5;
-      if (menu_int (&r, &b, min, max, "STEP", "BLOODY"))
-        edit = EDIT_MAIN;
+      if (menu_int (&r, &b, min, max, "CE>STEP", "BLOODY"))
+        edit = EDIT_CON;
       else if (r != con (&p)->ext.step
                || b != (con (&p)->ext.step & 0x80)) {
         destroy_con_at_pos (&p);
@@ -391,16 +400,16 @@ editor (void)
       }
       break;
     case CARPET:
-      switch (process_menu (carpet_ext_menu, "E>")) {
-      case BACKSPACE_KEY: edit = EDIT_MAIN; break;
+      switch (process_menu (carpet_ext_menu, "CE>")) {
+      case BACKSPACE_KEY: edit = EDIT_CON; break;
       case '0': con (&p)->ext.design = CARPET_00; break;
       case '1': con (&p)->ext.design = CARPET_01; break;
       case 'A': con (&p)->ext.design = ARCH_CARPET_LEFT; break;
       }
       break;
     case TCARPET:
-      switch (process_menu (tcarpet_ext_menu, "E>")) {
-      case BACKSPACE_KEY: edit = EDIT_MAIN; break;
+      switch (process_menu (tcarpet_ext_menu, "CE>")) {
+      case BACKSPACE_KEY: edit = EDIT_CON; break;
       case '0': con (&p)->ext.design = CARPET_00; break;
       case '1': con (&p)->ext.design = CARPET_01; break;
       case 'A': con (&p)->ext.design = ARCH_CARPET_LEFT; break;
@@ -411,18 +420,13 @@ editor (void)
     default:
       draw_bottom_text (NULL, "NO EXTENSION");
       if (was_key_pressed (ALLEGRO_KEY_BACKSPACE, 0, 0, true))
-        edit = EDIT_MAIN;
+        edit = EDIT_CON;
       break;
     }
     break;
-  case EDIT_JUMP_ROOM:
-    b = -1;
-    if (menu_int (&room_view, &b, 1, ROOMS - 1, "ROOM", NULL))
-      edit = EDIT_MAIN;
-    break;
   case EDIT_INFO:
     if (was_key_pressed (ALLEGRO_KEY_BACKSPACE, 0, 0, true))
-      edit = EDIT_MAIN;
+      edit = EDIT_CON;
 
     free_ext_str = false;
 
@@ -516,11 +520,16 @@ editor (void)
     default: ext_str = "NO EXTENSION"; break;
     }
 
-    xasprintf (&str, "%s-%s-%s", fg_str, bg_str, ext_str);
+    xasprintf (&str, "%s/%s/%s", fg_str, bg_str, ext_str);
     draw_bottom_text (NULL, str);
     al_free (str);
     if (free_ext_str) al_free (ext_str);
 
+    break;
+  case EDIT_JUMP_ROOM:
+    b = -1;
+    if (menu_int (&room_view, &b, 1, ROOMS - 1, "ROOM", NULL))
+      edit = EDIT_MAIN;
     break;
   }
 }
@@ -548,8 +557,8 @@ menu_step_ext (struct pos *p, int max)
 {
   int r = con (p)->ext.step;
   int b = -1;
-  if (menu_int (&r, &b, 0, max, "STEP", NULL))
-    edit = EDIT_MAIN;
+  if (menu_int (&r, &b, 0, max, "CE>STEP", NULL))
+    edit = EDIT_CON;
   else {
     if (con (p)->ext.step != r) {
       destroy_con_at_pos (p);
@@ -564,8 +573,8 @@ menu_event_ext (struct pos *p)
 {
   int r = con (p)->ext.event;
   int b = -1;
-  if (menu_int (&r, &b, 0, EVENTS - 1, "EVENT", NULL))
-    edit = EDIT_MAIN;
+  if (menu_int (&r, &b, 0, EVENTS - 1, "CE>EVENT", NULL))
+    edit = EDIT_CON;
   else {
     if (con (p)->ext.event != r) {
       destroy_con_at_pos (p);

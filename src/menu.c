@@ -98,9 +98,9 @@ process_menu (struct menu_item *menu, char *prefix)
   c = 0;
 
   if (key.keyboard.keycode == ALLEGRO_KEY_BACKSPACE) {
+    if (help == 0) c = BACKSPACE_KEY;
     memset (&key, 0, sizeof (key));
     help = 0;
-    c = BACKSPACE_KEY;
     goto end;
   }
 
