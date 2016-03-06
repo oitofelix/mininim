@@ -484,11 +484,12 @@ opening level, ranging from fully open (0) to fully closed.
 The @dfn{chopper}@footnote{The @dfn{chopper} is called @dfn{chomper} in
 the original game.} can leave the kid in half.  It's a @emph{trap},
 @emph{hangable at right}, @emph{rigid} and @emph{dynamic}.  It uses the
-@emph{step} extension which range from 0 to 4 and 128 to 132 (bloody
-counterpart).  It gets activated as soon as the kid is in the same room
-and floor and there is no wall in between.  It doesn't get activated by
-guards, but can kill them as well.  The chopper nullifies the
-@emph{hangable at left} property of its top construction.
+@emph{step} extension which range from 0 to 5 and 128 to 133 (bloody
+counterpart).  With a @emph{step} of 0 or 128, it gets activated as soon
+as the kid is in the same room and floor and there is no wall in
+between.  It doesn't get activated by guards, but can kill them as well.
+Other @emph{steps} make it permanently inactive.  The chopper nullifies
+the @emph{hangable at left} property of its top construction.
 
 @multitable @columnfractions .20 .40 .40
   @headitem Code @tab Dungeon @tab Palace

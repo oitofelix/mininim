@@ -109,11 +109,16 @@ process_menu (struct menu_item *menu, char *prefix)
   return c;
 }
 
-int
-menu_int (int v, int min, int max, char *prefix)
+bool
+menu_int (int *v, int *b, int min, int max, char *pref_int, char *pref_bool)
 {
   char *str;
-  xasprintf (&str, "%s %i-%i:%i", prefix, min, max, v);
+
+  if (*b < 0)
+    xasprintf (&str, "%s %i-%i:%i", pref_int, min, max, *v);
+  else
+    xasprintf (&str, "%s %i-%i:%i %s",
+               pref_int, min, max, *v, *b ? pref_bool : "-");
   draw_bottom_text (NULL, str);
   al_free (str);
 
@@ -122,28 +127,35 @@ menu_int (int v, int min, int max, char *prefix)
 
   memset (&key, 0, sizeof (key));
 
-  if (keycode == ALLEGRO_KEY_BACKSPACE) return INT_MAX;
+  if (keycode == ALLEGRO_KEY_BACKSPACE) return true;
 
   int r;
   switch (c) {
   case '-':
-    r = v - 1;
-    return r >= min ? r : v;
+    r = *v - 1;
+    *v = r >= min ? r : *v;
+    break;
   case '+': case '=':
-    r = v + 1;
-    return r <= max ? r : v;
+    r = *v + 1;
+    *v = r <= max ? r : *v;
+    break;
   case '0': case '1': case '2': case '3': case '4': case '5':
   case '6': case '7': case '8': case '9':
-    xasprintf (&str, "%i%c", v, c);
+    xasprintf (&str, "%i%c", *v, c);
     sscanf (str, "%d", &r);
     al_free (str);
-    return r <= max ? r : v;
+    *v = r <= max ? r : *v;
     break;
   case '\\':
-    r = v / 10;
-    return r >= min ? r : v;
-  default: return v;
+    r = *v / 10;
+    *v = r >= min ? r : *v;
+    break;
+  case ' ':
+    if (*b >= 0) *b = ! *b;
+    break;
   }
+
+  return false;
 }
 
 bool
@@ -156,7 +168,7 @@ was_menu_key_pressed (void)
   case 'I': case 'J': case 'K': case 'L': case 'M': case 'N':
   case 'O': case 'P': case 'Q': case 'R': case 'S': case 'T':
   case 'U': case 'V': case 'W': case 'X': case 'Y': case 'Z':
-  case '?': case '-': case '+': case '=': case '\\':
+  case '?': case '-': case '+': case '=': case '\\': case ' ':
     return true;
   }
 

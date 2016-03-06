@@ -294,7 +294,7 @@ process_keys (void)
       al_start_timer (play_time);
     } else pause_game ();
   } else if (game_paused
-             && ! was_menu_key_pressed ()
+             && (! active_menu || ! was_menu_key_pressed ())
              && (key.keyboard.keycode || button != -1)
              && ! save_game_dialog_thread)
     unpause_game ();
@@ -392,8 +392,9 @@ process_keys (void)
   }
 
   /* SPACE: display remaining time */
-  if (was_key_pressed (ALLEGRO_KEY_SPACE, 0, 0, true)
-      || was_button_pressed (joystick_time_button, true))
+  if (! active_menu
+      && (was_key_pressed (ALLEGRO_KEY_SPACE, 0, 0, true)
+          || was_button_pressed (joystick_time_button, true)))
     display_remaining_time ();
 
   /* +: increment and display remaining time */

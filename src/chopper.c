@@ -285,10 +285,10 @@ register_chopper (struct pos *p)
   int step = con (p)->ext.step & 0x7F;
 
   c.p = *p;
-  c.i = step < 5 ? step : 0;
+  c.i = step % CHOPPER_MAX_STEP;
   c.wait = CHOPPER_WAIT;
   c.blood = con (p)->ext.step & 0x80;
-  c.inactive = (step >= 5);
+  c.inactive = (step > 0);
   c.alert = false;
 
   chopper =

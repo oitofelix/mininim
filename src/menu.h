@@ -26,7 +26,7 @@ extern bool active_menu;
 /* functions */
 void reset_menu (void);
 char process_menu (struct menu_item *menu, char *prefix);
-int menu_int (int v, int max, int min, char *prefix);
+bool menu_int (int *v, int *b, int min, int max, char *pref_int, char *pref_bool);
 bool was_menu_key_pressed (void);
 
 #endif	/* MININIM_MENU_H */

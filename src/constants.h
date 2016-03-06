@@ -62,6 +62,7 @@
 #define SECS_TO_SCYCLES(x) ((x) * SCRIPT_HZ)
 
 #define CHOPPER_WAIT 10
+#define CHOPPER_MAX_STEP 5
 
 #define DOOR_MAX_STEP 47
 #define DOOR_WAIT SECS_TO_SCYCLES (5)

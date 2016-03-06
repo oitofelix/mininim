@@ -24,7 +24,7 @@ static void menu_event_ext (struct pos *p);
 
 enum edit edit;
 enum edit last_edit = EDIT_MAIN;
-static struct pos last_mouse_pos = {-1,-1,-1};
+/* static struct pos last_mouse_pos = {-1,-1,-1}; */
 
 void
 editor (void)
@@ -128,10 +128,24 @@ editor (void)
      {'C', "CAN'T FALL"},
      {0}};
 
+  struct menu_item carpet_ext_menu[] =
+    {{'0', "CARPET 00"},
+     {'1', "CARPET 01"},
+     {'A', "ARCH CARPET LEFT"},
+     {0}};
+
+  struct menu_item tcarpet_ext_menu[] =
+    {{'0', "CARPET 00"},
+     {'1', "CARPET 01"},
+     {'A', "ARCH CARPET LEFT"},
+     {'B', "ARCH CARPET RIGHT 00"},
+     {'C', "ARCH CARPET RIGHT 01"},
+     {0}};
+
   struct pos p = mouse_pos;
   struct anim *k;
 
-  int r;
+  int b, r, min, max;
   char *fg_str = NULL, *bg_str = NULL, *ext_str = NULL;
   bool free_ext_str;
   char *str = NULL, c;
@@ -362,6 +376,38 @@ editor (void)
     case LEVEL_DOOR:
       menu_step_ext (&p, LEVEL_DOOR_MAX_STEP);
       break;
+    case CHOPPER:
+      r = con (&p)->ext.step;
+      b = con (&p)->ext.step & 0x80;
+      min = b ? 128 : 0;
+      max = b ? 133 : 5;
+      if (menu_int (&r, &b, min, max, "STEP", "BLOODY"))
+        edit = EDIT_MAIN;
+      else if (r != con (&p)->ext.step
+               || b != (con (&p)->ext.step & 0x80)) {
+        destroy_con_at_pos (&p);
+        con (&p)->ext.step = b ? r | 0x80 : r & ~ 0x80;
+        register_con_at_pos (&p);
+      }
+      break;
+    case CARPET:
+      switch (process_menu (carpet_ext_menu, "E>")) {
+      case BACKSPACE_KEY: edit = EDIT_MAIN; break;
+      case '0': con (&p)->ext.design = CARPET_00; break;
+      case '1': con (&p)->ext.design = CARPET_01; break;
+      case 'A': con (&p)->ext.design = ARCH_CARPET_LEFT; break;
+      }
+      break;
+    case TCARPET:
+      switch (process_menu (tcarpet_ext_menu, "E>")) {
+      case BACKSPACE_KEY: edit = EDIT_MAIN; break;
+      case '0': con (&p)->ext.design = CARPET_00; break;
+      case '1': con (&p)->ext.design = CARPET_01; break;
+      case 'A': con (&p)->ext.design = ARCH_CARPET_LEFT; break;
+      case 'B': con (&p)->ext.design = ARCH_CARPET_RIGHT_00; break;
+      case 'C': con (&p)->ext.design = ARCH_CARPET_RIGHT_01; break;
+      }
+      break;
     default:
       draw_bottom_text (NULL, "NO EXTENSION");
       if (was_key_pressed (ALLEGRO_KEY_BACKSPACE, 0, 0, true))
@@ -370,12 +416,9 @@ editor (void)
     }
     break;
   case EDIT_JUMP_ROOM:
-    r = menu_int (room_view, 1, ROOMS - 1, "ROOM");
-    if (r == INT_MAX) {
+    b = -1;
+    if (menu_int (&room_view, &b, 1, ROOMS - 1, "ROOM", NULL))
       edit = EDIT_MAIN;
-      break;
-    }
-    room_view = r;
     break;
   case EDIT_INFO:
     if (was_key_pressed (ALLEGRO_KEY_BACKSPACE, 0, 0, true))
@@ -409,7 +452,7 @@ editor (void)
     case ARCH_TOP_RIGHT: fg_str = "ARCH TOP RIGHT"; break;
     case ARCH_TOP_MID: fg_str = "ARCH TOP MID"; break;
     case ARCH_TOP_SMALL: fg_str = "ARCH TOP SMALL"; break;
-    deafult: fg_str = "UNKNOWN FG"; break;
+    default: fg_str = "UNKNOWN FG"; break;
     }
 
     switch (con (&p)->bg) {
@@ -444,35 +487,32 @@ editor (void)
     case LOOSE_FLOOR:
       ext_str = con (&p)->ext.cant_fall ? "CAN'T FALL" : "FALL";
       break;
-    case SPIKES_FLOOR:
+    case SPIKES_FLOOR: case DOOR: case LEVEL_DOOR: case CHOPPER:
       xasprintf (&ext_str, "%i", con (&p)->ext.step);
       free_ext_str = true;
       break;
-    case OPENER_FLOOR:
+    case OPENER_FLOOR: case CLOSER_FLOOR:
       xasprintf (&ext_str, "%i", con (&p)->ext.event);
       free_ext_str = true;
       break;
-    case CLOSER_FLOOR:
-      xasprintf (&ext_str, "%i", con (&p)->ext.event);
-      free_ext_str = true;
+    case CARPET:
+      switch (con (&p)->ext.design) {
+      case CARPET_00: ext_str = "CARPET 00"; break;
+      case CARPET_01: ext_str = "CARPET 01"; break;
+      case ARCH_CARPET_LEFT: ext_str = "ARCH CARPET LEFT"; break;
+      default: ext_str = "UNKNOWN EXTENSION"; break;
+      }
       break;
-    case DOOR:
-      xasprintf (&ext_str, "%i", con (&p)->ext.step);
-      free_ext_str = true;
+    case TCARPET:
+      switch (con (&p)->ext.design) {
+      case CARPET_00: ext_str = "CARPET 00"; break;
+      case CARPET_01: ext_str = "CARPET 01"; break;
+      case ARCH_CARPET_RIGHT_00: ext_str = "ARCH CARPET RIGHT 00"; break;
+      case ARCH_CARPET_RIGHT_01: ext_str = "ARCH CARPET RIGHT 01"; break;
+      case ARCH_CARPET_LEFT: ext_str = "ARCH CARPET LEFT"; break;
+      default: ext_str = "UNKNOWN EXTENSION"; break;
+      }
       break;
-    case LEVEL_DOOR:
-      xasprintf (&ext_str, "%i", con (&p)->ext.step);
-      free_ext_str = true;
-      break;
-    /* case CHOPPER: fg_str = "CHOPPER"; break; */
-    /* case MIRROR: fg_str = "MIRROR"; break; */
-    /* case CARPET: fg_str = "CARPET"; break; */
-    /* case TCARPET: fg_str = "TCARPET"; break; */
-    /* case ARCH_BOTTOM: fg_str = "ARCH BOTTOM"; break; */
-    /* case ARCH_TOP_LEFT: fg_str = "ARCH TOP LEFT"; break; */
-    /* case ARCH_TOP_RIGHT: fg_str = "ARCH TOP RIGHT"; break; */
-    /* case ARCH_TOP_MID: fg_str = "ARCH TOP MID"; break; */
-    /* case ARCH_TOP_SMALL: fg_str = "ARCH TOP SMALL"; break; */
     default: ext_str = "NO EXTENSION"; break;
     }
 
@@ -506,29 +546,31 @@ exit_editor (void)
 static void
 menu_step_ext (struct pos *p, int max)
 {
-  int r = menu_int (con (p)->ext.step, 0, max, "STEP");
-  if (r == INT_MAX) {
+  int r = con (p)->ext.step;
+  int b = -1;
+  if (menu_int (&r, &b, 0, max, "STEP", NULL))
     edit = EDIT_MAIN;
-    return;
-  }
-  if (con (p)->ext.step != r) {
-    destroy_con_at_pos (p);
-    con (p)->ext.step = r;
-    register_con_at_pos (p);
+  else {
+    if (con (p)->ext.step != r) {
+      destroy_con_at_pos (p);
+      con (p)->ext.step = r;
+      register_con_at_pos (p);
+    }
   }
 }
 
 static void
 menu_event_ext (struct pos *p)
 {
-  int r = menu_int (con (p)->ext.event, 0, EVENTS - 1, "EVENT");
-  if (r == INT_MAX) {
+  int r = con (p)->ext.event;
+  int b = -1;
+  if (menu_int (&r, &b, 0, EVENTS - 1, "EVENT", NULL))
     edit = EDIT_MAIN;
-    return;
-  }
-  if (con (p)->ext.event != r) {
-    destroy_con_at_pos (p);
-    con (p)->ext.event = r;
-    register_con_at_pos (p);
+  else {
+    if (con (p)->ext.event != r) {
+      destroy_con_at_pos (p);
+      con (p)->ext.event = r;
+      register_con_at_pos (p);
+    }
   }
 }
