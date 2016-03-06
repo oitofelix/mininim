@@ -27,6 +27,9 @@ extern struct pos mouse_pos;
 void init_mouse (void);
 void finalize_mouse (void);
 ALLEGRO_EVENT_SOURCE *get_mouse_event_source (void);
+struct coord *get_mouse_coord (struct coord *c);
 struct pos *get_mouse_pos (struct pos *p);
+void set_mouse_coord (struct coord *c);
+void set_mouse_pos (struct pos *p);
 
 #endif	/* MININIM_XMOUSE_H */

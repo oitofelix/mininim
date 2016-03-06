@@ -109,7 +109,7 @@ process_menu (struct menu_item *menu, char *prefix)
   return c;
 }
 
-bool
+int
 menu_int (int *v, int *b, int min, int max, char *pref_int, char *pref_bool)
 {
   char *str;
@@ -127,7 +127,7 @@ menu_int (int *v, int *b, int min, int max, char *pref_int, char *pref_bool)
 
   memset (&key, 0, sizeof (key));
 
-  if (keycode == ALLEGRO_KEY_BACKSPACE) return true;
+  if (keycode == ALLEGRO_KEY_BACKSPACE) return 1;
 
   int r;
   switch (c) {
@@ -153,9 +153,11 @@ menu_int (int *v, int *b, int min, int max, char *pref_int, char *pref_bool)
   case ' ':
     if (*b >= 0) *b = ! *b;
     break;
+  case '/':
+    return -1;
   }
 
-  return false;
+  return 0;
 }
 
 bool
@@ -169,6 +171,7 @@ was_menu_key_pressed (void)
   case 'O': case 'P': case 'Q': case 'R': case 'S': case 'T':
   case 'U': case 'V': case 'W': case 'X': case 'Y': case 'Z':
   case '?': case '-': case '+': case '=': case '\\': case ' ':
+  case '/':
     return true;
   }
 

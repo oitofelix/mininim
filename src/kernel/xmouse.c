@@ -44,17 +44,23 @@ get_mouse_event_source (void)
   return event_source;
 }
 
-struct pos *
-get_mouse_pos (struct pos *p)
+struct coord *
+get_mouse_coord (struct coord *c)
 {
   int w = al_get_display_width (display);
   int h = al_get_display_height (display);
-
-  struct coord c;
   al_get_mouse_state (&mouse_state);
-  c.x = (mouse_state.x * ORIGINAL_WIDTH) / w;
-  c.y = (mouse_state.y * ORIGINAL_HEIGHT) / h;
-  c.room = room_view;
+  c->x = (mouse_state.x * ORIGINAL_WIDTH) / w;
+  c->y = (mouse_state.y * ORIGINAL_HEIGHT) / h;
+  c->room = room_view;
+  return c;
+}
+
+struct pos *
+get_mouse_pos (struct pos *p)
+{
+  struct coord c;
+  get_mouse_coord (&c);
 
   int ry = (c.y - 3) % PLACE_HEIGHT;
 
@@ -84,4 +90,28 @@ get_mouse_pos (struct pos *p)
   if (np.room == 0) *p = (struct pos) {-1,-1,-1};
 
   return p;
+}
+
+void
+set_mouse_coord (struct coord *c)
+{
+  int w = al_get_display_width (display);
+  int h = al_get_display_height (display);
+
+  int mx = (c->x * w) / ORIGINAL_WIDTH;
+  int my = (c->y * h) / ORIGINAL_HEIGHT;
+
+  room_view = c->room;
+
+  if (! al_set_mouse_xy (display, mx, my))
+    error (0, 0, "%s (%i,%i): cannot set mouse xy coordinates",
+           __func__, c->x, c->y);
+}
+
+void
+set_mouse_pos (struct pos *p)
+{
+  struct coord c;
+  con_m (p, &c);
+  set_mouse_coord (&c);
 }
