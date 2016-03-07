@@ -164,6 +164,14 @@ ncoord (struct coord *c, struct coord *nc)
   return nc;
 }
 
+bool
+is_valid_pos (struct pos *p)
+{
+  return p->room > 0 && p->room < ROOMS
+    && p->floor >= 0 && p->floor < FLOORS
+    && p->place >=0 && p->place < PLACES;
+}
+
 struct pos *
 npos (struct pos *p, struct pos *np)
 {

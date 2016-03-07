@@ -168,7 +168,7 @@ editor (void)
   switch (edit) {
   case EDIT_NONE: break;
   case EDIT_MAIN:
-    switch (process_menu (main_menu, NULL)) {
+    switch (menu_enum (main_menu, NULL)) {
     case 'C': edit = EDIT_CON; break;
     case 'E': edit = EDIT_EVENT; break;
     case 'K':
@@ -184,7 +184,7 @@ editor (void)
     }
     break;
   case EDIT_CON:
-    switch (process_menu (con_menu, "C>")) {
+    switch (menu_enum (con_menu, "C>")) {
     case BACKSPACE_KEY: edit = EDIT_MAIN; break;
     case 'F': edit = EDIT_FG; break;
     case 'B': edit = EDIT_BG; break;
@@ -193,7 +193,7 @@ editor (void)
     }
     break;
   case EDIT_FG:
-    switch (process_menu (fg_menu, "CF>")) {
+    switch (menu_enum (fg_menu, "CF>")) {
     case BACKSPACE_KEY: edit = EDIT_CON; break;
     case 'F': edit = EDIT_FLOOR; break;
     case 'P': edit = EDIT_PILLAR; break;
@@ -222,7 +222,7 @@ editor (void)
     }
     break;
   case EDIT_FLOOR:
-    c = process_menu (floor_menu, "CFF>");
+    c = menu_enum (floor_menu, "CFF>");
     if (! c) break;
 
     if (c == BACKSPACE_KEY) {
@@ -254,7 +254,7 @@ editor (void)
 
     break;
   case EDIT_PILLAR:
-    c = process_menu (pillar_menu, "CFP>");
+    c = menu_enum (pillar_menu, "CFP>");
     if (! c) break;
 
     if (c == BACKSPACE_KEY) {
@@ -271,7 +271,7 @@ editor (void)
     }
     break;
   case EDIT_DOOR:
-    c = process_menu (door_menu, "CFD>");
+    c = menu_enum (door_menu, "CFD>");
     if (! c) break;
 
     if (c == BACKSPACE_KEY) {
@@ -293,7 +293,7 @@ editor (void)
 
     break;
   case EDIT_CARPET:
-    c = process_menu (carpet_menu, "CFR>");
+    c = menu_enum (carpet_menu, "CFR>");
     if (! c) break;
 
     if (c == BACKSPACE_KEY) {
@@ -309,7 +309,7 @@ editor (void)
 
     break;
   case EDIT_ARCH:
-    c = process_menu (arch_menu, "CFA>");
+    c = menu_enum (arch_menu, "CFA>");
     if (! c) break;
 
     if (c == BACKSPACE_KEY) {
@@ -327,7 +327,7 @@ editor (void)
 
     break;
   case EDIT_BG:
-    switch (process_menu (bg_menu, "CB>")) {
+    switch (menu_enum (bg_menu, "CB>")) {
     case BACKSPACE_KEY: edit = EDIT_CON; break;
     case 'N': con (&p)->bg = NO_BRICKS; break;
     case 'G': con (&p)->bg = NO_BG; break;
@@ -346,7 +346,7 @@ editor (void)
   case EDIT_EXT:
     switch (con (&p)->fg) {
     case FLOOR:
-      switch (process_menu (items_menu, "CE>")) {
+      switch (menu_enum (items_menu, "CE>")) {
       case BACKSPACE_KEY: edit = EDIT_CON; break;
       case 'N': con (&p)->ext.item = NO_ITEM; break;
       case 'E': con (&p)->ext.item = EMPTY_POTION; break;
@@ -361,7 +361,7 @@ editor (void)
       }
       break;
     case LOOSE_FLOOR:
-      c = process_menu (loose_floor_ext_menu, "CE>");
+      c = menu_enum (loose_floor_ext_menu, "CE>");
       if (! c) break;
 
       if (c == BACKSPACE_KEY) {
@@ -412,7 +412,7 @@ editor (void)
       }
       break;
     case CARPET:
-      switch (process_menu (carpet_ext_menu, "CE>")) {
+      switch (menu_enum (carpet_ext_menu, "CE>")) {
       case BACKSPACE_KEY: edit = EDIT_CON; break;
       case '0': con (&p)->ext.design = CARPET_00; break;
       case '1': con (&p)->ext.design = CARPET_01; break;
@@ -420,7 +420,7 @@ editor (void)
       }
       break;
     case TCARPET:
-      switch (process_menu (tcarpet_ext_menu, "CE>")) {
+      switch (menu_enum (tcarpet_ext_menu, "CE>")) {
       case BACKSPACE_KEY: edit = EDIT_CON; break;
       case '0': con (&p)->ext.design = CARPET_00; break;
       case '1': con (&p)->ext.design = CARPET_01; break;
@@ -539,18 +539,19 @@ editor (void)
 
     break;
   case EDIT_EVENT:
-    switch (process_menu (event_menu, "E>")) {
+    switch (menu_enum (event_menu, "E>")) {
     case BACKSPACE_KEY: edit = EDIT_MAIN; break;
     case 'D':
       edit = EDIT_EVENT2DOOR;
       get_mouse_coord (&last_mouse_coord);
-      set_mouse_pos (&level.event[last_event].p);
+      s = last_event;
       break;
     case 'F':
       edit = EDIT_EVENT2FLOOR;
       get_mouse_coord (&last_mouse_coord);
       last_event2floor_pos = (struct pos) {-1,-1,-1};
-      next_pos_by_pred (&last_event2floor_pos, 0, is_event_at_pos, &last_event);
+      t = last_event;
+      next_pos_by_pred (&last_event2floor_pos, 0, is_event_at_pos, &t);
       break;
     case 'R':
       edit = EDIT_DOOR2EVENT;
@@ -558,47 +559,52 @@ editor (void)
       break;
     case 'S':
       edit = EDIT_EVENT_SET;
+      s = last_event;
       b = level.event[last_event].next;
       break;
     }
     break;
   case EDIT_EVENT2DOOR:
-    b = level.event[last_event].next;
-    s = last_event;
+    if (! is_valid_pos (&level.event[s].p)
+        || ! is_door (&level.event[s].p)) {
+      struct coord c = {room_view, 0, 0};
+      set_mouse_coord (&c);
+    } else set_mouse_pos (&level.event[s].p);
+    b = level.event[s].next;
     switch (menu_int (&s, &b, 0, EVENTS - 1, "ED>EVENT", "N")) {
     case -1: set_mouse_coord (&last_mouse_coord); edit = EDIT_EVENT; break;
-    case 0:
-      if (s != last_event) {
-        last_event = s;
-        set_mouse_pos (&level.event[last_event].p);
-      }
+    case 0: break;
+    case 1:
+      edit = EDIT_EVENT;
+      last_event = s;
       break;
-    case 1: edit = EDIT_EVENT; break;
     }
     break;
   case EDIT_EVENT2FLOOR:
-    if (last_event2floor_pos.room < 0) {
+    if (! is_valid_pos (&last_event2floor_pos)) {
       struct coord c = {room_view, 0, 0};
       set_mouse_coord (&c);
     } else set_mouse_pos (&last_event2floor_pos);
-    switch (menu_list (&s, &r, last_event, "EF>EVENT")) {
+    switch (menu_list (&s, &r, t, "EF>EVENT")) {
     case -1: set_mouse_coord (&last_mouse_coord); edit = EDIT_EVENT; break;
     case 0:
       if (s) {
-        int e = last_event + s;
-        if (e >= 0 && e < EVENTS) {
-          last_event = e;
+        if (t + s >= 0 && t + s < EVENTS) {
+          t += s;
           last_event2floor_pos = (struct pos) {-1,-1,-1};
         } else s = 0;
       }
-      if (s || r) next_pos_by_pred (&last_event2floor_pos, r,
-                                    is_event_at_pos, &last_event);
+      if (s || r)
+        next_pos_by_pred (&last_event2floor_pos, r, is_event_at_pos, &t);
       break;
-    case 1: edit = EDIT_EVENT; break;
+    case 1:
+      edit = EDIT_EVENT;
+      last_event = t;
+      break;
     }
     break;
   case EDIT_DOOR2EVENT:
-    if (con (&p)->fg != DOOR && con (&p)->fg != LEVEL_DOOR) {
+    if (! is_door (&p)) {
       if (was_key_pressed (ALLEGRO_KEY_BACKSPACE, 0, 0, true)
           || was_key_pressed (0, '/', 0, true))
         edit = EDIT_EVENT;
@@ -616,23 +622,22 @@ editor (void)
     }
     break;
   case EDIT_EVENT_SET:
-    if (con (&p)->fg != DOOR && con (&p)->fg != LEVEL_DOOR) {
+    if (! is_door (&p)) {
       if (was_key_pressed (ALLEGRO_KEY_BACKSPACE, 0, 0, true)
           || was_key_pressed (0, '/', 0, true))
         edit = EDIT_EVENT;
       draw_bottom_text (NULL, "SELECT DOOR");
       memset (&key, 0, sizeof (key));
     } else {
-      s = last_event;
-      r = menu_int (&s, &b, 0, EVENTS - 1, "ES>EVENT", "N");
-      if (s != last_event) {
+      switch (menu_int (&s, &b, 0, EVENTS - 1, "ES>EVENT", "N")) {
+      case -1: edit = EDIT_EVENT; break;
+      case 0: break;
+      case 1:
+        level.event[s].p = p;
+        level.event[s].next = b ? true : false;
         last_event = s;
-        b = level.event[last_event].next;
-      }
-      if (r) edit = EDIT_EVENT;
-      if (r == 1) {
-        level.event[last_event].p = p;
-        level.event[last_event].next = b ? true : false;
+        edit = EDIT_EVENT;
+        break;
       }
     }
     break;

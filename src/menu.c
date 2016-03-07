@@ -32,7 +32,7 @@ reset_menu (void)
 }
 
 char
-process_menu (struct menu_item *menu, char *prefix)
+menu_enum (struct menu_item *menu, char *prefix)
 {
   size_t i = 0;
   char c;

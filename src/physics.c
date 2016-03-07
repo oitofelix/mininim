@@ -133,6 +133,14 @@ arch_top_cs (enum confg t)
     || t == ARCH_TOP_RIGHT;
 }
 
+bool
+is_door (struct pos *p)
+{
+  enum confg t = con (p)->fg;
+  return t == DOOR
+    || t == LEVEL_DOOR;
+}
+
 struct pos *
 first_confg (struct pos *p0, struct pos *p1, confg_set cs, struct pos *p)
 {
