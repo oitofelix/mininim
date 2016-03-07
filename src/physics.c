@@ -161,6 +161,60 @@ first_confg (struct pos *p0, struct pos *p1, confg_set cs, struct pos *p)
   return p;
 }
 
+struct pos *
+next_pos_by_pred (struct pos *p, int dir, pos_pred pred, void *data)
+{
+  struct pos q = *p;
+
+  if (q.room < 0 || q.floor < 0 || q.place < 0) q = (struct pos) {0,0,-1};
+  if (q.room > ROOMS - 1 || q.floor > FLOORS - 1 || q.place > PLACES - 1)
+    q = (struct pos) {ROOMS - 1,FLOORS - 1,PLACES};
+
+  if (dir < 0) {
+    goto loop_prev;
+
+    for (q.room = ROOMS - 1; q.room >= 0; q.room--)
+      for (q.floor = FLOORS - 1; q.floor >= 0; q.floor--)
+        for (q.place = PLACES - 1; q.place >= 0; q.place--) {
+          if (pred (&q, data)) {
+            *p = q;
+            return p;
+          }
+
+        loop_prev:
+          q = q;
+        }
+  } else {
+    goto loop_next;
+
+    for (q.room = 0; q.room < ROOMS; q.room++)
+      for (q.floor = 0; q.floor < FLOORS; q.floor++)
+        for (q.place = 0; q.place < PLACES; q.place++) {
+          if (pred (&q, data)) {
+            *p = q;
+            return p;
+          }
+
+        loop_next:
+          q = q;
+        }
+  }
+
+  return NULL;
+}
+
+bool
+is_event_at_pos (struct pos *p, void *data)
+{
+  int *event = (int *) data;
+
+  return
+    (con (p)->fg == OPENER_FLOOR
+     || con (p)->fg == CLOSER_FLOOR)
+    && con (p)->ext.event == *event;
+}
+
+
 
 
 

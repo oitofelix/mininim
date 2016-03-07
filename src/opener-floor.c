@@ -150,6 +150,33 @@ opener_floor_at_pos (struct pos *p)
                   compare_opener_floors);
 }
 
+struct opener_floor *
+opener_floor_by_event (struct pos *p, int event, int dir)
+{
+  struct opener_floor *o;
+  if (p) o = opener_floor_at_pos (p);
+  else o = &opener_floor[0];
+
+  if (! o) {
+    o = &opener_floor[0];
+    p = NULL;
+  }
+
+  int i;
+
+  if (dir < 0)
+    for (i = o - opener_floor - (p ? 1 : 0); i >= 0; i--) {
+      if (opener_floor[i].event == event) return &opener_floor[i];
+    }
+  else
+    for (i = o - opener_floor + (p ? 1 : 0);
+         i < opener_floor_nmemb; i++) {
+      if (opener_floor[i].event == event) return &opener_floor[i];
+    }
+
+  return NULL;
+}
+
 void
 remove_opener_floor (struct opener_floor *o)
 {

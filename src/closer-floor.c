@@ -151,6 +151,33 @@ closer_floor_at_pos (struct pos *p)
                   compare_closer_floors);
 }
 
+struct closer_floor *
+closer_floor_by_event (struct pos *p, int event, int dir)
+{
+  struct closer_floor *c;
+  if (p) c = closer_floor_at_pos (p);
+  else c = &closer_floor[0];
+
+  if (! c) {
+    c = &closer_floor[0];
+    p = NULL;
+  }
+
+  int i;
+
+  if (dir < 0)
+    for (i = c - closer_floor - (p ? 1 : 0); i >= 0; i--) {
+      if (closer_floor[i].event == event) return &closer_floor[i];
+    }
+  else
+    for (i = c - closer_floor + (p ? 1 : 0);
+         i < closer_floor_nmemb; i++) {
+      if (closer_floor[i].event == event) return &closer_floor[i];
+    }
+
+  return NULL;
+}
+
 void
 remove_closer_floor (struct closer_floor *c)
 {
@@ -192,7 +219,7 @@ compute_closer_floors (void)
   for (i = 0; i < closer_floor_nmemb; i++) {
     struct closer_floor *c = &closer_floor[i];
     if (c->p.room == -1) {
-      /* remove_closer_floor (o); i--; */
+      /* remove_closer_floor (c); i--; */
       continue;
     }
     if (c->pressed && ! c->unresponsive) {

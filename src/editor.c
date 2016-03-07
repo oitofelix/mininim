@@ -23,6 +23,7 @@ static void menu_step_ext (struct pos *p, int max);
 static void menu_event_ext (struct pos *p);
 static int last_event;
 static struct coord last_mouse_coord;
+static struct pos last_event2floor_pos;
 /* static struct pos last_mouse_pos = {-1,-1,-1}; */
 
 enum edit edit;
@@ -150,7 +151,8 @@ editor (void)
      {0}};
 
   struct menu_item event_menu[] =
-    {{'V', "VIEW EVENT"},
+    {{'D', "EVENT->DOOR"},
+     {'F', "EVENT->FLOOR"},
      {'S', "SET EVENT"},
      {0}};
 
@@ -538,10 +540,16 @@ editor (void)
   case EDIT_EVENT:
     switch (process_menu (event_menu, "E>")) {
     case BACKSPACE_KEY: edit = EDIT_MAIN; break;
-    case 'V':
-      edit = EDIT_EVENT_VIEW;
+    case 'D':
+      edit = EDIT_EVENT2DOOR;
       get_mouse_coord (&last_mouse_coord);
       set_mouse_pos (&level.event[last_event].p);
+      break;
+    case 'F':
+      edit = EDIT_EVENT2FLOOR;
+      get_mouse_coord (&last_mouse_coord);
+      last_event2floor_pos = (struct pos) {-1,-1,-1};
+      next_pos_by_pred (&last_event2floor_pos, 0, is_event_at_pos, &last_event);
       break;
     case 'S':
       edit = EDIT_EVENT_SET;
@@ -549,10 +557,10 @@ editor (void)
       break;
     }
     break;
-  case EDIT_EVENT_VIEW:
+  case EDIT_EVENT2DOOR:
     b = level.event[last_event].next;
     s = last_event;
-    switch (menu_int (&s, &b, 0, EVENTS - 1, "EV>EVENT", "N")) {
+    switch (menu_int (&s, &b, 0, EVENTS - 1, "ED>EVENT", "N")) {
     case -1: set_mouse_coord (&last_mouse_coord); edit = EDIT_EVENT; break;
     case 0:
       if (s != last_event) {
@@ -563,9 +571,31 @@ editor (void)
     case 1: edit = EDIT_EVENT; break;
     }
     break;
+  case EDIT_EVENT2FLOOR:
+    if (last_event2floor_pos.room < 0) {
+      struct coord c = {room_view, 0, 0};
+      set_mouse_coord (&c);
+    } else set_mouse_pos (&last_event2floor_pos);
+    switch (menu_list (&s, &r, last_event, "EF>EVENT")) {
+    case -1: set_mouse_coord (&last_mouse_coord); edit = EDIT_EVENT; break;
+    case 0:
+      if (s) {
+        int e = last_event + s;
+        if (e >= 0 && e < EVENTS) {
+          last_event = e;
+          last_event2floor_pos = (struct pos) {-1,-1,-1};
+        } else s = 0;
+      }
+      if (s || r) next_pos_by_pred (&last_event2floor_pos, r,
+                                    is_event_at_pos, &last_event);
+      break;
+    case 1: edit = EDIT_EVENT; break;
+    }
+    break;
   case EDIT_EVENT_SET:
     if (con (&p)->fg != DOOR && con (&p)->fg != LEVEL_DOOR) {
-      if (was_key_pressed (ALLEGRO_KEY_BACKSPACE, 0, 0, true))
+      if (was_key_pressed (ALLEGRO_KEY_BACKSPACE, 0, 0, true)
+          || was_key_pressed (0, '/', 0, true))
         edit = EDIT_EVENT;
       draw_bottom_text (NULL, "SELECT DOOR");
       memset (&key, 0, sizeof (key));
@@ -607,6 +637,13 @@ exit_editor (void)
   if (game_paused)
     draw_bottom_text (NULL, "GAME PAUSED");
   else draw_bottom_text (NULL, NULL);
+}
+
+void
+editor_level_change (void)
+{
+  last_event2floor_pos = (struct pos) {-1,-1,-1};
+  next_pos_by_pred (&last_event2floor_pos, 0, is_event_at_pos, &last_event);
 }
 
 static void

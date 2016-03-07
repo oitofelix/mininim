@@ -78,6 +78,8 @@ play_level (struct level *lv)
   if (! force_em) em = level.em;
   if (! force_hue) hue = level.hue;
 
+  editor_level_change ();
+
   play_anim (draw_level, compute_level, 12);
 
   switch (quit_anim) {

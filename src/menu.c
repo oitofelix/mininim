@@ -35,8 +35,9 @@ char
 process_menu (struct menu_item *menu, char *prefix)
 {
   size_t i = 0;
-  active_menu = false;
   char c;
+
+  active_menu = true;
 
   if (key.keyboard.unichar > 0
       && key.keyboard.keycode != ALLEGRO_KEY_BACKSPACE) {
@@ -57,8 +58,7 @@ process_menu (struct menu_item *menu, char *prefix)
         if (menu[i].key == toupper (key.keyboard.unichar)) {
           help = 0;
           memset (&key, 0, sizeof (key));
-          c = menu[i].key;
-          goto end;
+          return menu[i].key;
         }
         i++;
       }
@@ -101,17 +101,16 @@ process_menu (struct menu_item *menu, char *prefix)
     if (help == 0) c = BACKSPACE_KEY;
     memset (&key, 0, sizeof (key));
     help = 0;
-    goto end;
   }
 
- end:
-  active_menu = true;
   return c;
 }
 
 int
 menu_int (int *v, int *b, int min, int max, char *pref_int, char *pref_bool)
 {
+  active_menu = true;
+
   char *str;
 
   if (*b < 0)
@@ -131,7 +130,7 @@ menu_int (int *v, int *b, int min, int max, char *pref_int, char *pref_bool)
 
   int r;
   switch (c) {
-  case '-':
+  case '-': case '_':
     r = *v - 1;
     *v = r >= min ? r : *v;
     break;
@@ -160,6 +159,48 @@ menu_int (int *v, int *b, int min, int max, char *pref_int, char *pref_bool)
   return 0;
 }
 
+int
+menu_list (int *dir0, int *dir1, int index, char *prefix)
+{
+  active_menu = true;
+
+  char *str;
+
+  xasprintf (&str, "%s %i +-<>", prefix, index);
+  draw_bottom_text (NULL, str);
+  al_free (str);
+
+  int c = toupper (key.keyboard.unichar);
+  int keycode = key.keyboard.keycode;
+
+  memset (&key, 0, sizeof (key));
+
+  if (keycode == ALLEGRO_KEY_BACKSPACE) return 1;
+
+  switch (c) {
+  case '-': case '_':
+    *dir0 = -1;
+    break;
+  case '+': case '=':
+    *dir0 = +1;
+    break;
+  case ',': case '<':
+    *dir1 = -1;
+    break;
+  case '.': case '>':
+    *dir1 = +1;
+    break;
+  case '/':
+    return -1;
+  default:
+    *dir0 = 0;
+    *dir1 = 0;
+    break;
+  }
+
+  return 0;
+}
+
 bool
 was_menu_key_pressed (void)
 {
@@ -170,8 +211,8 @@ was_menu_key_pressed (void)
   case 'I': case 'J': case 'K': case 'L': case 'M': case 'N':
   case 'O': case 'P': case 'Q': case 'R': case 'S': case 'T':
   case 'U': case 'V': case 'W': case 'X': case 'Y': case 'Z':
-  case '?': case '-': case '+': case '=': case '\\': case ' ':
-  case '/':
+  case '?': case '-': case '_': case '+': case '=': case '\\':
+  case ' ': case '/': case ',': case '.': case '<': case '>':
     return true;
   }
 

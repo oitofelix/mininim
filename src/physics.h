@@ -35,6 +35,9 @@ bool traversable_cs (enum confg t);
 bool arch_top_cs (enum confg t);
 struct pos *first_confg (struct pos *p0, struct pos *p1,
                          confg_set cs, struct pos *p);
+struct pos *next_pos_by_pred (struct pos *p, int dir,
+                              pos_pred pred, void *data);
+bool is_event_at_pos (struct pos *p, void *data);
 
 
 

@@ -27,6 +27,7 @@ extern bool active_menu;
 void reset_menu (void);
 char process_menu (struct menu_item *menu, char *prefix);
 int menu_int (int *v, int *b, int min, int max, char *pref_int, char *pref_bool);
+int menu_list (int *dir0, int *dir1, int index, char *prefix);
 bool was_menu_key_pressed (void);
 
 #endif	/* MININIM_MENU_H */
