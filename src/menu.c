@@ -40,7 +40,8 @@ menu_enum (struct menu_item *menu, char *prefix)
   active_menu = true;
 
   if (key.keyboard.unichar > 0
-      && key.keyboard.keycode != ALLEGRO_KEY_BACKSPACE) {
+      && key.keyboard.keycode != ALLEGRO_KEY_BACKSPACE
+      && key.keyboard.unichar != '/') {
     if (help == 1) {
       while (menu[i].key) {
         if (menu[i].key == toupper (key.keyboard.unichar)) {
@@ -64,7 +65,6 @@ menu_enum (struct menu_item *menu, char *prefix)
       }
     }
     if (! menu[i].key && key.keyboard.unichar != '?') help = 0;
-    memset (&key, 0, sizeof (key));
   }
 
   if (help == 1)
@@ -98,11 +98,16 @@ menu_enum (struct menu_item *menu, char *prefix)
   c = 0;
 
   if (key.keyboard.keycode == ALLEGRO_KEY_BACKSPACE) {
-    if (help == 0) c = BACKSPACE_KEY;
-    memset (&key, 0, sizeof (key));
-    help = 0;
+    if (help == 0) c = 1;
+    else help = 0;
   }
 
+  if (key.keyboard.unichar == '/') {
+    if (help == 0) c = -1;
+    else help = 0;
+  }
+
+  memset (&key, 0, sizeof (key));
   return c;
 }
 
@@ -220,4 +225,11 @@ was_menu_key_pressed (void)
   if (key.keyboard.keycode == ALLEGRO_KEY_BACKSPACE) return true;
 
   return false;
+}
+
+bool
+was_menu_return_pressed (void)
+{
+  return was_key_pressed (ALLEGRO_KEY_BACKSPACE, 0, 0, true)
+    || was_key_pressed (0, '/', 0, true);
 }

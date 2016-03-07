@@ -68,5 +68,6 @@ extern bool hgc;
 extern int display_width, display_height;
 extern ALLEGRO_BITMAP *icon;
 extern ALLEGRO_TIMER *bottom_text_timer;
+extern bool is_display_focused;
 
 #endif	/* MININIM_VIDEO_H */

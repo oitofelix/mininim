@@ -21,6 +21,7 @@
 
 ALLEGRO_MOUSE_STATE mouse_state;
 struct pos mouse_pos;
+bool ignore_first_click;
 
 void
 init_mouse (void)

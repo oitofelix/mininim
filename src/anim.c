@@ -122,6 +122,13 @@ play_anim (void (*draw_callback) (void),
     case ALLEGRO_EVENT_DISPLAY_EXPOSE:
       show ();
       break;
+    case ALLEGRO_EVENT_DISPLAY_SWITCH_OUT:
+      is_display_focused = false;
+      ignore_first_click = true;
+      break;
+    case ALLEGRO_EVENT_DISPLAY_SWITCH_IN:
+      is_display_focused = true;
+      break;
     case ALLEGRO_EVENT_DISPLAY_CLOSE:
       quit_anim = QUIT_GAME;
       break;
@@ -135,10 +142,13 @@ play_anim (void (*draw_callback) (void),
       button = event.joystick.button;
       break;
     case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
-      if (! cutscene) {
+      if (! cutscene && ! ignore_first_click) {
         if (edit == EDIT_NONE) enter_editor ();
         else exit_editor ();
       }
+
+      if (ignore_first_click) ignore_first_click = false;
+
       /* printf ("%i,%i\n", */
       /*         (event.mouse.x * ORIGINAL_WIDTH) / al_get_display_width (display), */
       /*         (event.mouse.y * ORIGINAL_HEIGHT) / al_get_display_height (display)); */

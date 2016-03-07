@@ -25,6 +25,7 @@ ALLEGRO_TIMER *video_timer;
 int screen_flags = 0;
 bool hgc;
 ALLEGRO_TIMER *bottom_text_timer = NULL;
+bool is_display_focused = true;
 static ALLEGRO_BITMAP *effect_buffer;
 static ALLEGRO_BITMAP *memory_bitmap;
 static ALLEGRO_BITMAP *black_screen;

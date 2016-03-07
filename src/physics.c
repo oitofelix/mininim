@@ -841,3 +841,74 @@ activate_con (struct pos *p)
   default: break;
   }
 }
+
+char *
+get_confg_name (struct pos *p)
+{
+  switch (con (p)->fg) {
+  case NO_FLOOR: return "NO FLOOR";
+  case FLOOR: return "FLOOR";
+  case BROKEN_FLOOR: return "BROKEN FLOOR";
+  case SKELETON_FLOOR: return "SKELETON FLOOR";
+  case LOOSE_FLOOR: return "LOOSE FLOOR";
+  case SPIKES_FLOOR: return "SPIKES FLOOR";
+  case OPENER_FLOOR: return "OPENER FLOOR";
+  case CLOSER_FLOOR: return "CLOSER FLOOR";
+  case STUCK_FLOOR: return "STUCK FLOOR";
+  case HIDDEN_FLOOR: return "HIDDEN FLOOR";
+  case PILLAR: return "PILLAR";
+  case BIG_PILLAR_BOTTOM: return "BIG PILLAR BOTTOM";
+  case BIG_PILLAR_TOP: return "BIG PILLAR TOP";
+  case WALL: return "WALL";
+  case DOOR: return "DOOR";
+  case LEVEL_DOOR: return "LEVEL DOOR";
+  case CHOPPER: return "CHOPPER";
+  case MIRROR: return "MIRROR";
+  case CARPET: return "CARPET";
+  case TCARPET: return "TCARPET";
+  case ARCH_BOTTOM: return "ARCH BOTTOM";
+  case ARCH_TOP_LEFT: return "ARCH TOP LEFT";
+  case ARCH_TOP_RIGHT: return "ARCH TOP RIGHT";
+  case ARCH_TOP_MID: return "ARCH TOP MID";
+  case ARCH_TOP_SMALL: return "ARCH TOP SMALL";
+  default: return "UNKNOWN FG";
+  }
+}
+
+char *
+get_conbg_name (struct pos *p)
+{
+  switch (con (p)->bg) {
+  case NO_BG: return "NO BG";
+  case BRICKS_00: return "BRICKS 00";
+  case BRICKS_01: return "BRICKS 01";
+  case BRICKS_02: return "BRICKS 02";
+  case BRICKS_03: return "BRICKS 03";
+  case NO_BRICKS: return "NO BRICKS";
+  case TORCH: return "TORCH";
+  case WINDOW: return "WINDOW";
+  case BALCONY: return "BALCONY";
+  default: return "UNKNOWN BG";
+  }
+}
+
+char *
+get_item_name (struct pos *p)
+{
+  /* only a normal floor can have items */
+  assert (con (p)->fg == FLOOR);
+
+  switch (con (p)->ext.item) {
+  case NO_ITEM: return "NO ITEM";
+  case EMPTY_POTION: return "EMPTY POTION";
+  case SMALL_LIFE_POTION: return "SMALL LIFE POTION";
+  case BIG_LIFE_POTION: return "BIG LIFE POTION";
+  case SMALL_POISON_POTION: return "SMALL POISON POTION";
+  case BIG_POISON_POTION: return "BIG POISON POTION";
+  case FLOAT_POTION: return "FLOAT POTION";
+  case FLIP_POTION: return "FLIP POTION";
+  case ACTIVATION_POTION: return "ACTIVATION POTION";
+  case SWORD: return "SWORD";
+  default: return "UNKNOWN EXTENSION";
+  }
+}

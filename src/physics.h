@@ -92,5 +92,8 @@ void unhide_hidden_floor (struct pos *p);
 
 
 void activate_con (struct pos *p);
+char *get_confg_name (struct pos *p);
+char *get_conbg_name (struct pos *p);
+char *get_item_name (struct pos *p);
 
 #endif	/* MININIM_PHYSICS_H */

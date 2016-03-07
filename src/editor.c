@@ -188,7 +188,7 @@ editor (void)
     break;
   case EDIT_CON:
     switch (menu_enum (con_menu, "C>")) {
-    case BACKSPACE_KEY: edit = EDIT_MAIN; break;
+    case -1: case 1: edit = EDIT_MAIN; break;
     case 'F': edit = EDIT_FG; break;
     case 'B': edit = EDIT_BG; break;
     case 'E': edit = EDIT_EXT; break;
@@ -197,7 +197,7 @@ editor (void)
     break;
   case EDIT_FG:
     switch (menu_enum (fg_menu, "CF>")) {
-    case BACKSPACE_KEY: edit = EDIT_CON; break;
+    case -1: case 1: edit = EDIT_CON; break;
     case 'F': edit = EDIT_FLOOR; break;
     case 'P': edit = EDIT_PILLAR; break;
     case 'W':
@@ -228,7 +228,7 @@ editor (void)
     c = menu_enum (floor_menu, "CFF>");
     if (! c) break;
 
-    if (c == BACKSPACE_KEY) {
+    if (c == -1 || c == 1) {
       edit = EDIT_FG; break;
     }
 
@@ -260,7 +260,7 @@ editor (void)
     c = menu_enum (pillar_menu, "CFP>");
     if (! c) break;
 
-    if (c == BACKSPACE_KEY) {
+    if (c == -1 || c == 1) {
       edit = EDIT_FG; break;
     }
 
@@ -277,7 +277,7 @@ editor (void)
     c = menu_enum (door_menu, "CFD>");
     if (! c) break;
 
-    if (c == BACKSPACE_KEY) {
+    if (c == -1 || c == 1) {
       edit = EDIT_FG; break;
     }
 
@@ -299,7 +299,7 @@ editor (void)
     c = menu_enum (carpet_menu, "CFR>");
     if (! c) break;
 
-    if (c == BACKSPACE_KEY) {
+    if (c == -1 || c == 1) {
       edit = EDIT_FG; break;
     }
 
@@ -315,7 +315,7 @@ editor (void)
     c = menu_enum (arch_menu, "CFA>");
     if (! c) break;
 
-    if (c == BACKSPACE_KEY) {
+    if (c == -1 || c == 1) {
       edit = EDIT_FG; break;
     }
 
@@ -331,7 +331,7 @@ editor (void)
     break;
   case EDIT_BG:
     switch (menu_enum (bg_menu, "CB>")) {
-    case BACKSPACE_KEY: edit = EDIT_CON; break;
+    case -1: case 1: edit = EDIT_CON; break;
     case 'N': con (&p)->bg = NO_BRICKS; break;
     case 'G': con (&p)->bg = NO_BG; break;
     case '0': con (&p)->bg = BRICKS_00; break;
@@ -350,7 +350,7 @@ editor (void)
     switch (con (&p)->fg) {
     case FLOOR:
       switch (menu_enum (items_menu, "CE>")) {
-      case BACKSPACE_KEY: edit = EDIT_CON; break;
+      case -1: case 1: edit = EDIT_CON; break;
       case 'N': con (&p)->ext.item = NO_ITEM; break;
       case 'E': con (&p)->ext.item = EMPTY_POTION; break;
       case 'S': con (&p)->ext.item = SMALL_LIFE_POTION; break;
@@ -367,7 +367,7 @@ editor (void)
       c = menu_enum (loose_floor_ext_menu, "CE>");
       if (! c) break;
 
-      if (c == BACKSPACE_KEY) {
+      if (c == -1 || c == 1) {
         edit = EDIT_CON; break;
       }
 
@@ -416,7 +416,7 @@ editor (void)
       break;
     case CARPET:
       switch (menu_enum (carpet_ext_menu, "CE>")) {
-      case BACKSPACE_KEY: edit = EDIT_CON; break;
+      case -1: case 1: edit = EDIT_CON; break;
       case '0': con (&p)->ext.design = CARPET_00; break;
       case '1': con (&p)->ext.design = CARPET_01; break;
       case 'A': con (&p)->ext.design = ARCH_CARPET_LEFT; break;
@@ -424,7 +424,7 @@ editor (void)
       break;
     case TCARPET:
       switch (menu_enum (tcarpet_ext_menu, "CE>")) {
-      case BACKSPACE_KEY: edit = EDIT_CON; break;
+      case -1: case 1: edit = EDIT_CON; break;
       case '0': con (&p)->ext.design = CARPET_00; break;
       case '1': con (&p)->ext.design = CARPET_01; break;
       case 'A': con (&p)->ext.design = ARCH_CARPET_LEFT; break;
@@ -434,74 +434,21 @@ editor (void)
       break;
     default:
       draw_bottom_text (NULL, "NO EXTENSION");
-      if (was_key_pressed (ALLEGRO_KEY_BACKSPACE, 0, 0, true))
-        edit = EDIT_CON;
+      if (was_menu_return_pressed ()) edit = EDIT_CON;
       break;
     }
     break;
   case EDIT_INFO:
-    if (was_key_pressed (ALLEGRO_KEY_BACKSPACE, 0, 0, true))
-      edit = EDIT_CON;
+    if (was_menu_return_pressed ()) edit = EDIT_CON;
 
     free_ext_str = false;
 
-    switch (con (&p)->fg) {
-    case NO_FLOOR: fg_str = "NO FLOOR"; break;
-    case FLOOR: fg_str = "FLOOR"; break;
-    case BROKEN_FLOOR: fg_str = "BROKEN FLOOR"; break;
-    case SKELETON_FLOOR: fg_str = "SKELETON FLOOR"; break;
-    case LOOSE_FLOOR: fg_str = "LOOSE FLOOR"; break;
-    case SPIKES_FLOOR: fg_str = "SPIKES FLOOR"; break;
-    case OPENER_FLOOR: fg_str = "OPENER FLOOR"; break;
-    case CLOSER_FLOOR: fg_str = "CLOSER FLOOR"; break;
-    case STUCK_FLOOR: fg_str = "STUCK FLOOR"; break;
-    case HIDDEN_FLOOR: fg_str = "HIDDEN FLOOR"; break;
-    case PILLAR: fg_str = "PILLAR"; break;
-    case BIG_PILLAR_BOTTOM: fg_str = "BIG PILLAR BOTTOM"; break;
-    case BIG_PILLAR_TOP: fg_str = "BIG PILLAR TOP"; break;
-    case WALL: fg_str = "WALL"; break;
-    case DOOR: fg_str = "DOOR"; break;
-    case LEVEL_DOOR: fg_str = "LEVEL DOOR"; break;
-    case CHOPPER: fg_str = "CHOPPER"; break;
-    case MIRROR: fg_str = "MIRROR"; break;
-    case CARPET: fg_str = "CARPET"; break;
-    case TCARPET: fg_str = "TCARPET"; break;
-    case ARCH_BOTTOM: fg_str = "ARCH BOTTOM"; break;
-    case ARCH_TOP_LEFT: fg_str = "ARCH TOP LEFT"; break;
-    case ARCH_TOP_RIGHT: fg_str = "ARCH TOP RIGHT"; break;
-    case ARCH_TOP_MID: fg_str = "ARCH TOP MID"; break;
-    case ARCH_TOP_SMALL: fg_str = "ARCH TOP SMALL"; break;
-    default: fg_str = "UNKNOWN FG"; break;
-    }
-
-    switch (con (&p)->bg) {
-    case NO_BG: bg_str = "NO BG"; break;
-    case BRICKS_00: bg_str = "BRICKS 00"; break;
-    case BRICKS_01: bg_str = "BRICKS 01"; break;
-    case BRICKS_02: bg_str = "BRICKS 02"; break;
-    case BRICKS_03: bg_str = "BRICKS 03"; break;
-    case NO_BRICKS: bg_str = "NO BRICKS"; break;
-    case TORCH: bg_str = "TORCH"; break;
-    case WINDOW: bg_str = "WINDOW"; break;
-    case BALCONY: bg_str = "BALCONY"; break;
-    default: bg_str = "UNKNOWN BG"; break;
-    }
+    fg_str = get_confg_name (&p);
+    bg_str = get_conbg_name (&p);
 
     switch (con (&p)->fg) {
     case FLOOR:
-      switch (con (&p)->ext.item) {
-      case NO_ITEM: ext_str = "NO ITEM"; break;
-      case EMPTY_POTION: ext_str = "EMPTY POTION"; break;
-      case SMALL_LIFE_POTION: ext_str = "SMALL LIFE POTION"; break;
-      case BIG_LIFE_POTION: ext_str = "BIG LIFE POTION"; break;
-      case SMALL_POISON_POTION: ext_str = "SMALL POISON POTION"; break;
-      case BIG_POISON_POTION: ext_str = "BIG POISON POTION"; break;
-      case FLOAT_POTION: ext_str = "FLOAT POTION"; break;
-      case FLIP_POTION: ext_str = "FLIP POTION"; break;
-      case ACTIVATION_POTION: ext_str = "ACTIVATION POTION"; break;
-      case SWORD: ext_str = "SWORD"; break;
-      default: ext_str = "UNKNOWN EXTENSION"; break;
-      }
+      ext_str = get_item_name (&p);
       break;
     case LOOSE_FLOOR:
       ext_str = con (&p)->ext.cant_fall ? "CAN'T FALL" : "FALL";
@@ -543,7 +490,7 @@ editor (void)
     break;
   case EDIT_EVENT:
     switch (menu_enum (event_menu, "E>")) {
-    case BACKSPACE_KEY: edit = EDIT_MAIN; break;
+    case -1: case 1: edit = EDIT_MAIN; break;
     case 'D':
       edit = EDIT_EVENT2DOOR;
       get_mouse_coord (&last_mouse_coord);
@@ -608,9 +555,7 @@ editor (void)
     break;
   case EDIT_DOOR2EVENT:
     if (! is_door (&p)) {
-      if (was_key_pressed (ALLEGRO_KEY_BACKSPACE, 0, 0, true)
-          || was_key_pressed (0, '/', 0, true))
-        edit = EDIT_EVENT;
+      if (was_menu_return_pressed ()) edit = EDIT_EVENT;
       draw_bottom_text (NULL, "SELECT DOOR");
       memset (&key, 0, sizeof (key));
     } else {
@@ -626,9 +571,7 @@ editor (void)
     break;
   case EDIT_EVENT_SET:
     if (! is_door (&p)) {
-      if (was_key_pressed (ALLEGRO_KEY_BACKSPACE, 0, 0, true)
-          || was_key_pressed (0, '/', 0, true))
-        edit = EDIT_EVENT;
+      if (was_menu_return_pressed ()) edit = EDIT_EVENT;
       draw_bottom_text (NULL, "SELECT DOOR");
       memset (&key, 0, sizeof (key));
     } else {

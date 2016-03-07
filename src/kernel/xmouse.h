@@ -22,6 +22,7 @@
 
 /* variables */
 extern struct pos mouse_pos;
+extern bool ignore_first_click;
 
 /* functions */
 void init_mouse (void);
