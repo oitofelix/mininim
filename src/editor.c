@@ -179,7 +179,10 @@ editor (void)
       kid_normal (k);
       update_depressible_floor (k, -4, -10);
       break;
-    case 'J': edit = EDIT_JUMP_ROOM; break;
+    case 'J':
+      get_mouse_coord (&last_mouse_coord);
+      edit = EDIT_JUMP_ROOM;
+      break;
     case 'L': break;
     }
     break;
@@ -643,8 +646,11 @@ editor (void)
     break;
   case EDIT_JUMP_ROOM:
     b = -1;
-    if (menu_int (&room_view, &b, 1, ROOMS - 1, "ROOM", NULL))
-      edit = EDIT_MAIN;
+    switch (menu_int (&room_view, &b, 1, ROOMS - 1, "ROOM", NULL)) {
+    case -1: edit = EDIT_MAIN; set_mouse_coord (&last_mouse_coord); break;
+    case 0: break;
+    case 1: edit = EDIT_MAIN; break;
+    }
     break;
   }
 }
