@@ -214,6 +214,51 @@ is_event_at_pos (struct pos *p, void *data)
     && con (p)->ext.event == *event;
 }
 
+int
+next_int_by_pred (int *n, int dir, int min, int max,
+                  int_pred pred, void *data)
+{
+  int m = *n;
+
+  if (m < min) m = min - 1;
+  if (m > max) m = max + 1;
+
+  if (dir < 0) {
+    goto loop_prev;
+
+    for (m = max; m >= min; m--) {
+      if (pred (m, data)) {
+        *n = m;
+        return m;
+      }
+
+    loop_prev:
+      m = m;
+    }
+  } else {
+    goto loop_next;
+
+    for (m = min; m <= max; m++) {
+      if (pred (m, data)) {
+        *n = m;
+        return m;
+      }
+
+    loop_next:
+      m = m;
+    }
+  }
+
+  return -1;
+}
+
+bool
+is_pos_at_event (int e, void *_p)
+{
+  struct pos *p = (struct pos *) _p;
+  return peq (&level.event[e].p, p);
+}
+
 
 
 

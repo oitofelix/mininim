@@ -38,6 +38,9 @@ struct pos *first_confg (struct pos *p0, struct pos *p1,
 struct pos *next_pos_by_pred (struct pos *p, int dir,
                               pos_pred pred, void *data);
 bool is_event_at_pos (struct pos *p, void *data);
+int next_int_by_pred (int *n, int dir, int min, int max,
+                      int_pred pred, void *data);
+bool is_pos_at_event (int e, void *_p);
 
 
 

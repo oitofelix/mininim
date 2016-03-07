@@ -153,13 +153,14 @@ editor (void)
   struct menu_item event_menu[] =
     {{'D', "EVENT->DOOR"},
      {'F', "EVENT->FLOOR"},
+     {'R', "DOOR->EVENT"},
      {'S', "SET EVENT"},
      {0}};
 
   struct pos p = mouse_pos;
   struct anim *k;
 
-  static int b, r, s, min, max;
+  static int b, r, s, t, min, max;
   char *fg_str = NULL, *bg_str = NULL, *ext_str = NULL;
   bool free_ext_str;
   char *str = NULL, c;
@@ -551,6 +552,10 @@ editor (void)
       last_event2floor_pos = (struct pos) {-1,-1,-1};
       next_pos_by_pred (&last_event2floor_pos, 0, is_event_at_pos, &last_event);
       break;
+    case 'R':
+      edit = EDIT_DOOR2EVENT;
+      t = -1;
+      break;
     case 'S':
       edit = EDIT_EVENT_SET;
       b = level.event[last_event].next;
@@ -590,6 +595,24 @@ editor (void)
                                     is_event_at_pos, &last_event);
       break;
     case 1: edit = EDIT_EVENT; break;
+    }
+    break;
+  case EDIT_DOOR2EVENT:
+    if (con (&p)->fg != DOOR && con (&p)->fg != LEVEL_DOOR) {
+      if (was_key_pressed (ALLEGRO_KEY_BACKSPACE, 0, 0, true)
+          || was_key_pressed (0, '/', 0, true))
+        edit = EDIT_EVENT;
+      draw_bottom_text (NULL, "SELECT DOOR");
+      memset (&key, 0, sizeof (key));
+    } else {
+      if (t < 0) next_int_by_pred (&t, 0, 0, EVENTS - 1, is_pos_at_event, &p);
+      switch (menu_list (NULL, &r, t, "ER>EVENT")) {
+      case -1: edit = EDIT_EVENT; break;
+      case 0:
+        if (r) next_int_by_pred (&t, r, 0, EVENTS - 1, is_pos_at_event, &p);
+        break;
+      case 1: last_event = t; edit = EDIT_EVENT; break;
+      }
     }
     break;
   case EDIT_EVENT_SET:

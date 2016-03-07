@@ -291,7 +291,8 @@ struct anim {
 typedef struct coord *(*coord_f) (struct frame *, struct coord *);
 typedef struct pos *(*pos_f) (struct coord *, struct pos *);
 typedef struct coord *(*pos2coord_f) (struct pos *, struct coord *);
-typedef bool (*pos_pred) (struct pos *, void*);
+typedef bool (*pos_pred) (struct pos *, void *);
+typedef bool (*int_pred) (int, void *);
 
 struct room_dist {
   int dist;
@@ -376,7 +377,7 @@ enum edit {
   EDIT_NONE, EDIT_MAIN, EDIT_CON, EDIT_FG, EDIT_FLOOR, EDIT_PILLAR,
   EDIT_DOOR, EDIT_CARPET, EDIT_ARCH, EDIT_BG, EDIT_EXT,
   EDIT_JUMP_ROOM, EDIT_INFO, EDIT_EVENT, EDIT_EVENT_SET, EDIT_EVENT2DOOR,
-  EDIT_EVENT2FLOOR,
+  EDIT_EVENT2FLOOR, EDIT_DOOR2EVENT,
 };
 
 struct menu_item {

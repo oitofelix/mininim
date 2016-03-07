@@ -166,7 +166,8 @@ menu_list (int *dir0, int *dir1, int index, char *prefix)
 
   char *str;
 
-  xasprintf (&str, "%s %i +-<>", prefix, index);
+  xasprintf (&str, "%s %i %s%s", prefix, index,
+             dir0 ? "+-" : "", dir1 ? "<>" : "");
   draw_bottom_text (NULL, str);
   al_free (str);
 
@@ -179,22 +180,22 @@ menu_list (int *dir0, int *dir1, int index, char *prefix)
 
   switch (c) {
   case '-': case '_':
-    *dir0 = -1;
+    if (dir0) *dir0 = -1;
     break;
   case '+': case '=':
-    *dir0 = +1;
+    if (dir0) *dir0 = +1;
     break;
   case ',': case '<':
-    *dir1 = -1;
+    if (dir1) *dir1 = -1;
     break;
   case '.': case '>':
-    *dir1 = +1;
+    if (dir1) *dir1 = +1;
     break;
   case '/':
     return -1;
   default:
-    *dir0 = 0;
-    *dir1 = 0;
+    if (dir0) *dir0 = 0;
+    if (dir1) *dir1 = 0;
     break;
   }
 
