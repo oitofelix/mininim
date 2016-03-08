@@ -734,6 +734,7 @@ menu_link (enum dir dir)
     int room1 = room_view;
 
     *roomd_ptr (room0, dir) = room1;
+    set_mouse_coord (&last_mouse_coord);
     /* make_fully_consistent_link (room0, room1, dir); */
     /* ensure_link_consistency (); */
   }
