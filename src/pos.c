@@ -21,18 +21,24 @@
 
 bool coord_wa;
 
+int *
+roomd_ptr (int room, enum dir dir)
+{
+  switch (dir) {
+  case LEFT: return &level.link[room].l;
+  case RIGHT: return &level.link[room].r;
+  case ABOVE: return &level.link[room].a;
+  case BELOW: return &level.link[room].b;
+  default:
+    error (-1, 0, "%s: unknown direction (%i)", __func__, dir);
+    return NULL;
+  }
+}
+
 int
 roomd (int room, enum dir dir)
 {
-  switch (dir) {
-  case LEFT: return level.link[room].l;
-  case RIGHT: return level.link[room].r;
-  case ABOVE: return level.link[room].a;
-  case BELOW: return level.link[room].b;
-  default:
-    error (-1, 0, "%s: unknown direction (%i)", __func__, dir);
-    return room;
-  }
+  return *roomd_ptr (room, dir);
 }
 
 int
@@ -615,6 +621,32 @@ opposite_cf (coord_f cf)
   if (cf == _bf) return _bb;
   if (cf == _bb) return _bf;
   return cf;
+}
+
+enum dir
+opposite_dir (enum dir dir)
+{
+  switch (dir) {
+  case LEFT: return RIGHT;
+  case RIGHT: return LEFT;
+  case ABOVE: return BELOW;
+  case BELOW: return ABOVE;
+  }
+
+  return LEFT;
+}
+
+enum dir
+perpendicular_dir (enum dir dir, int n)
+{
+  switch (dir) {
+  case LEFT: return n ? ABOVE : BELOW;
+  case RIGHT: return n ? ABOVE : BELOW;
+  case ABOVE: return n ? LEFT : RIGHT;
+  case BELOW: return n ? LEFT : RIGHT;
+  }
+
+  return LEFT;
 }
 
 struct dim *

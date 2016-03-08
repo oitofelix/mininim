@@ -21,6 +21,9 @@
 
 static void menu_step_ext (struct pos *p, int max);
 static void menu_event_ext (struct pos *p);
+static int menu_select_room (enum edit up_edit, char *prefix);
+static int menu_link (enum dir dir);
+
 static int last_event;
 static struct coord last_mouse_coord;
 static struct pos last_event2floor_pos;
@@ -46,9 +49,8 @@ editor (void)
   struct menu_item main_menu[] =
     {{'C', "CONSTRUCTION"},
      {'E', "EVENT"},
+     {'R', "ROOM"},
      {'K', "PLACE KID"},
-     {'J', "JUMP TO ROOM"},
-     {'L', "ROOM LINKING"},
      {0}};
 
   struct menu_item con_menu[] =
@@ -157,6 +159,18 @@ editor (void)
      {'S', "SET EVENT"},
      {0}};
 
+  struct menu_item room_menu[] =
+    {{'J', "JUMP TO ROOM"},
+     {'L', "ROOM LINKING"},
+     {0}};
+
+  struct menu_item link_menu[] =
+    {{'L', "LEFT"},
+     {'R', "RIGHT"},
+     {'A', "ABOVE"},
+     {'B', "BELOW"},
+     {0}};
+
   struct pos p = mouse_pos;
   struct anim *k;
 
@@ -171,6 +185,7 @@ editor (void)
     switch (menu_enum (main_menu, NULL)) {
     case 'C': edit = EDIT_CON; break;
     case 'E': edit = EDIT_EVENT; break;
+    case 'R': edit = EDIT_ROOM; break;
     case 'K':
       if (p.room <= 0) break;
       k = get_anim_by_id (current_kid_id);
@@ -179,11 +194,6 @@ editor (void)
       kid_normal (k);
       update_depressible_floor (k, -4, -10);
       break;
-    case 'J':
-      get_mouse_coord (&last_mouse_coord);
-      edit = EDIT_JUMP_ROOM;
-      break;
-    case 'L': break;
     }
     break;
   case EDIT_CON:
@@ -587,13 +597,47 @@ editor (void)
       }
     }
     break;
-  case EDIT_JUMP_ROOM:
-    b = -1;
-    switch (menu_int (&room_view, &b, 1, ROOMS - 1, "ROOM", NULL)) {
-    case -1: edit = EDIT_MAIN; set_mouse_coord (&last_mouse_coord); break;
-    case 0: break;
-    case 1: edit = EDIT_MAIN; break;
+  case EDIT_ROOM:
+    switch (menu_enum (room_menu, "R>")) {
+    case -1: case 1: edit = EDIT_MAIN; break;
+    case 'J':
+      get_mouse_coord (&last_mouse_coord);
+      edit = EDIT_JUMP_ROOM;
+      break;
+    case 'L': edit = EDIT_LINK; break;
     }
+    break;
+  case EDIT_JUMP_ROOM:
+    menu_select_room (EDIT_ROOM, "ROOM");
+    break;
+  case EDIT_LINK:
+    switch (menu_enum (link_menu, "RL>")) {
+    case -1: case 1: edit = EDIT_ROOM; break;
+    case 'L':
+      get_mouse_coord (&last_mouse_coord);
+      edit = EDIT_LINK_LEFT; break;
+    case 'R':
+      get_mouse_coord (&last_mouse_coord);
+      edit = EDIT_LINK_RIGHT; break;
+    case 'A':
+      get_mouse_coord (&last_mouse_coord);
+      edit = EDIT_LINK_ABOVE; break;
+    case 'B':
+      get_mouse_coord (&last_mouse_coord);
+      edit = EDIT_LINK_BELOW; break;
+    }
+    break;
+  case EDIT_LINK_LEFT:
+    menu_link (LEFT);
+    break;
+  case EDIT_LINK_RIGHT:
+    menu_link (RIGHT);
+    break;
+  case EDIT_LINK_ABOVE:
+    menu_link (ABOVE);
+    break;
+  case EDIT_LINK_BELOW:
+    menu_link (BELOW);
     break;
   }
 }
@@ -653,4 +697,48 @@ menu_event_ext (struct pos *p)
       register_con_at_pos (p);
     }
   }
+}
+
+static int
+menu_select_room (enum edit up_edit, char *prefix)
+{
+  int b = -1;
+  int r = menu_int (&room_view, &b, 1, ROOMS - 1, prefix, NULL);
+  switch (r) {
+  case -1: edit = up_edit; set_mouse_coord (&last_mouse_coord); break;
+  case 0: break;
+  case 1: edit = up_edit; break;
+  }
+
+  return r;
+}
+
+static int
+menu_link (enum dir dir)
+{
+  char *prefix, c;
+
+  switch (dir) {
+  case LEFT: c = 'L'; break;
+  case RIGHT: c = 'R'; break;
+  case ABOVE: c = 'A'; break;
+  case BELOW: c = 'B'; break;
+  }
+
+  xasprintf (&prefix, "RL%c>ROOM", c);
+
+  int r = menu_select_room (EDIT_LINK, prefix);
+
+  if (r == 1) {
+    int room0 = last_mouse_coord.room;
+    int room1 = room_view;
+
+    *roomd_ptr (room0, dir) = room1;
+    /* make_fully_consistent_link (room0, room1, dir); */
+    /* ensure_link_consistency (); */
+  }
+
+  al_free (prefix);
+
+  return r;
 }

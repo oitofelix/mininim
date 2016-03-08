@@ -406,3 +406,87 @@ fix_legacy_room_above_zero_with_traversable_at_bottom (void)
         con (&p)->fg = SPIKES_FLOOR;
     }
 }
+
+
+
+/****************
+ * ROOM LINKING *
+ ****************/
+
+void
+make_reciprocal_link (int room0, int room1, enum dir dir)
+{
+  if (room0) *roomd_ptr (room0, dir) = room1;
+  if (room1) *roomd_ptr (room1, opposite_dir (dir)) = room0;
+}
+
+void
+make_link_locally_unique (int room, enum dir dir)
+{
+  if (dir != LEFT && roomd (room, LEFT) == roomd (room, dir))
+    *roomd_ptr (room, LEFT) = 0;
+  if (dir != RIGHT && roomd (room, RIGHT) == roomd (room, dir))
+    *roomd_ptr (room, RIGHT) = 0;
+  if (dir != ABOVE && roomd (room, ABOVE) == roomd (room, dir))
+    *roomd_ptr (room, ABOVE) = 0;
+  if (dir != BELOW && roomd (room, BELOW) == roomd (room, dir))
+    *roomd_ptr (room, BELOW) = 0;
+}
+
+void
+make_link_globally_unique (int room, enum dir dir)
+{
+  int i;
+  for (i = 1; i < ROOMS; i++) {
+    if (room != i && roomd (i, dir) == roomd (room, dir))
+      *roomd_ptr (i, dir) = 0;
+  }
+}
+
+void
+make_semi_consistent_link (int room0, int room1, enum dir dir)
+{
+  make_reciprocal_link (room0, room1, dir);
+
+  make_link_locally_unique (room0, dir);
+  make_link_locally_unique (room1, opposite_dir (dir));
+
+  make_link_globally_unique (room0, dir);
+  make_link_globally_unique (room1, opposite_dir (dir));
+}
+
+void
+make_link_adjacency_bound (int room, enum dir dir)
+{
+  int r = roomd (room, dir);
+  int dir0 = perpendicular_dir (dir, 0);
+  int dir1 = perpendicular_dir (dir, 1);
+
+  int room0a = roomd (room, dir0);
+  int room0b = roomd (r, dir0);
+
+  int room1a = roomd (room, dir1);
+  int room1b = roomd (r, dir1);
+
+  make_semi_consistent_link (room0a, room0b, dir);
+  make_semi_consistent_link (room1a, room1b, dir);
+}
+
+void
+make_fully_consistent_link (int room0, int room1, enum dir dir)
+{
+  make_semi_consistent_link (room0, room1, dir);
+  make_link_adjacency_bound (room0, dir);
+}
+
+void
+ensure_link_consistency (void)
+{
+  int i;
+  for (i = 1; i < ROOMS; i++) {
+    make_fully_consistent_link (i, roomd (i, LEFT), LEFT);
+    make_fully_consistent_link (i, roomd (i, RIGHT), RIGHT);
+    make_fully_consistent_link (i, roomd (i, ABOVE), ABOVE);
+    make_fully_consistent_link (i, roomd (i, BELOW), BELOW);
+  }
+}

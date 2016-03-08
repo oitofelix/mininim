@@ -23,6 +23,7 @@
 extern bool coord_wa;
 
 /* types */
+int *roomd_ptr (int room, enum dir dir);
 int roomd (int room, enum dir dir);
 int room_dist (int r0, int r1, int max);
 int min_room_dist (struct room_dist room[], int *dmax);
@@ -51,6 +52,8 @@ struct frame *place_frame (struct frame *f, struct frame *nf,
                            ALLEGRO_BITMAP *b, struct pos *p,
                            int dx, int dy);
 coord_f opposite_cf (coord_f cf);
+enum dir opposite_dir (enum dir dir);
+enum dir perpendicular_dir (enum dir dir, int n);
 
 struct coord *con_m (struct pos *p, struct coord *c);
 
