@@ -142,28 +142,28 @@ ncoord (struct coord *c, struct coord *nc)
 
     if (nc->y < 0
         /* && (ra != nc->room || coord_wa) */
-        /* && rab == nc->room */
+        && rab == nc->room
         ) {
       nc->y += PLACE_HEIGHT * FLOORS;
       nc->room = ra;
       m = true;
     } else if (nc->y >= PLACE_HEIGHT * FLOORS + 11
                /* && (rb != nc->room || coord_wa) */
-               /* && rba == nc->room */
+               && rba == nc->room
                ) {
       nc->y -= PLACE_HEIGHT * FLOORS;
       nc->room = rb;
       m = true;
     } else if (nc->x < 0
                /* && (rl != nc->room || coord_wa) */
-               /* && rlr == nc->room */
+               && rlr == nc->room
                ) {
       nc->x += PLACE_WIDTH * PLACES;
       nc->room = rl;
       m = true;
     } else if (nc->x >= PLACE_WIDTH * PLACES
                /* && (rr != nc->room || coord_wa) */
-               /* && rrl == nc->room */
+               && rrl == nc->room
                ) {
       nc->x -= PLACE_WIDTH * PLACES;
       nc->room = rr;
@@ -243,7 +243,7 @@ struct pos *
 pos2room (struct pos *p, int room, struct pos *pv)
 {
   *pv = *p;
-  npos (pv, pv);
+  /* npos (pv, pv); */
 
   if (pv->room == room) return pv;
 

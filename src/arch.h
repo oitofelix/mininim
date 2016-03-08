@@ -84,6 +84,8 @@ void load_arch (void);
 void unload_arch (void);
 void draw_arch_bottom (ALLEGRO_BITMAP *bitmap, struct pos *p,
                        enum em em, enum vm vm);
+void draw_arch_bottom_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                          enum em em, enum vm vm);
 void draw_arch_top_mid (ALLEGRO_BITMAP *bitmap, struct pos *p,
                         enum em em, enum vm vm);
 void draw_arch_top_top (ALLEGRO_BITMAP *bitmap, struct pos *p,

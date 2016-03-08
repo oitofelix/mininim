@@ -336,7 +336,7 @@ draw_confg_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case TCARPET:
     if (con (p)->ext.design == ARCH_CARPET_RIGHT_00
         || con (p)->ext.design == ARCH_CARPET_RIGHT_01)
-      draw_arch_top_right_end (bitmap, p, em, vm);
+      draw_arch_top_right_end (bitmap, &pv, em, vm);
     else {
       draw_door_pole (bitmap, &pv, em, vm);
       draw_door_pole_base (bitmap, &pv, em, vm);
@@ -349,6 +349,11 @@ draw_confg_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
   }
 
   if (! redraw) return;
+
+  if (con (&pv)->fg == ARCH_BOTTOM) {
+    struct pos pa; prel (p, &pa, -1, +0);
+    draw_confg_base (bitmap, &pa, em, vm);
+  }
 
   if (con (&pv)->fg == MIRROR)
     draw_mirror (bitmap, &pv, em, vm);
@@ -442,8 +447,6 @@ draw_confg_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
   /* if (con (p)->fg != WALL) pv = *p; */
   pv = *p;
 
-  struct pos pl; prel (&pv, &pl, +0, -1);
-
   switch (con (&pv)->fg) {
   case NO_FLOOR: break;
   case FLOOR: break;
@@ -461,13 +464,12 @@ draw_confg_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case BIG_PILLAR_TOP:
     draw_big_pillar_top_left (bitmap, &pv, em, vm); break;
   case WALL:
-    draw_wall_left_cache (bitmap, &pv);
-    /* printf ("%i,%i,%i\n", pv.room, pv.floor, pv.place); */
-    break;
+    draw_wall_left_cache (bitmap, &pv); break;
   case DOOR: draw_door_fg (bitmap, &pv, f, em, vm); break;
   case LEVEL_DOOR: draw_level_door_fg (bitmap, &pv, f, em, vm); break;
   case CHOPPER: draw_chopper_fg (bitmap, &pv, em, vm); break;
-  case ARCH_BOTTOM: draw_arch_bottom (bitmap, &pv, em, vm); break;
+  case ARCH_BOTTOM: draw_arch_bottom_fg (bitmap, &pv, em, vm);
+    break;
   case ARCH_TOP_MID: draw_arch_top_mid (bitmap, &pv, em, vm); break;
   case ARCH_TOP_SMALL: draw_arch_top_small (bitmap, &pv, em, vm); break;
   case ARCH_TOP_LEFT: draw_arch_top_left (bitmap, &pv, em, vm); break;
@@ -624,7 +626,7 @@ draw_room_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
       else if (con (&pv)->fg == BIG_PILLAR_BOTTOM)
         draw_big_pillar_bottom_fg (bitmap, &pv, em, vm);
       else if (con (&pv)->fg == ARCH_BOTTOM)
-        draw_arch_bottom (bitmap, &pv, em, vm);
+        draw_arch_bottom_fg (bitmap, &pv, em, vm);
     }
     /* when below the construction */
   } else if (

@@ -210,6 +210,15 @@ draw_arch_bottom (ALLEGRO_BITMAP *bitmap, struct pos *p,
 }
 
 void
+draw_arch_bottom_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                     enum em em, enum vm vm)
+{
+  struct pos pa; prel (p, &pa, -1, +0);
+  draw_arch_bottom (bitmap, p, em, vm);
+  draw_confg_base (bitmap, &pa, em, vm);
+}
+
+void
 draw_arch_top_mid (ALLEGRO_BITMAP *bitmap, struct pos *p,
                   enum em em, enum vm vm)
 {
