@@ -141,26 +141,30 @@ ncoord (struct coord *c, struct coord *nc)
     rrl = roomd (rr, LEFT);
 
     if (nc->y < 0
-        && (ra != nc->room || coord_wa)
-        && rab == nc->room) {
+        /* && (ra != nc->room || coord_wa) */
+        /* && rab == nc->room */
+        ) {
       nc->y += PLACE_HEIGHT * FLOORS;
       nc->room = ra;
       m = true;
     } else if (nc->y >= PLACE_HEIGHT * FLOORS + 11
-               && (rb != nc->room || coord_wa)
-               && rba == nc->room) {
+               /* && (rb != nc->room || coord_wa) */
+               /* && rba == nc->room */
+               ) {
       nc->y -= PLACE_HEIGHT * FLOORS;
       nc->room = rb;
       m = true;
     } else if (nc->x < 0
-               && (rl != nc->room || coord_wa)
-               && rlr == nc->room) {
+               /* && (rl != nc->room || coord_wa) */
+               /* && rlr == nc->room */
+               ) {
       nc->x += PLACE_WIDTH * PLACES;
       nc->room = rl;
       m = true;
     } else if (nc->x >= PLACE_WIDTH * PLACES
-               && (rr != nc->room || coord_wa)
-               && rrl == nc->room) {
+               /* && (rr != nc->room || coord_wa) */
+               /* && rrl == nc->room */
+               ) {
       nc->x -= PLACE_WIDTH * PLACES;
       nc->room = rr;
       m = true;
@@ -188,21 +192,21 @@ npos (struct pos *p, struct pos *np)
   do {
     m = false;
 
-    if (np->place < 0) {
-      np->place += PLACES;
-      np->room = roomd (np->room, LEFT);
-      m = true;
-    } else if (np->place >= PLACES) {
-      np->place -= PLACES;
-      np->room = roomd (np->room, RIGHT);
-      m = true;
-    } else if (np->floor < 0) {
+    if (np->floor < 0) {
       np->floor += FLOORS;
       np->room = roomd (np->room, ABOVE);
       m = true;
     } else if (np->floor >= FLOORS) {
       np->floor -= FLOORS;
       np->room = roomd (np->room, BELOW);
+      m = true;
+    } else if (np->place < 0) {
+      np->place += PLACES;
+      np->room = roomd (np->room, LEFT);
+      m = true;
+    } else if (np->place >= PLACES) {
+      np->place -= PLACES;
+      np->room = roomd (np->room, RIGHT);
       m = true;
     }
   } while (m);

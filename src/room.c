@@ -100,7 +100,7 @@ draw_filled_rect (ALLEGRO_BITMAP *to, struct rect *r,
 {
   struct coord nc = r->c;
 
-  if (! cutscene) {
+  if (! cutscene && nc.room != room_view) {
     rect2room (r, room_view, &nc);
     if (nc.room != room_view) return;
   }
@@ -117,7 +117,7 @@ draw_bitmapc (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
 
   struct coord nc = *c;
 
-  if (! cutscene) {
+  if (! cutscene && nc.room != room_view) {
     struct frame f;
     f.b = from;
     f.c = *c;
@@ -137,7 +137,7 @@ draw_bitmap_regionc (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
 
   struct coord nc = *c;
 
-  if (! cutscene) {
+  if (! cutscene && nc.room != room_view) {
     struct frame f;
     f.b = from;
     f.c = *c;
@@ -252,7 +252,8 @@ draw_confg_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
   if (pv.floor < -1 || pv.floor > FLOORS
       || pv.place < -1 || pv.place > PLACES) return;
 
-  if (con (p)->fg != WALL) pv = *p;
+  /* if (con (p)->fg != WALL) pv = *p; */
+  pv = *p;
 
   switch (con (&pv)->fg) {
   case NO_FLOOR: break;
@@ -295,7 +296,8 @@ draw_confg_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
   if (pv.floor < -1 || pv.floor > FLOORS
       || pv.place < -1 || pv.place > PLACES) return;
 
-  if (con (p)->fg != WALL) pv = *p;
+  /* if (con (p)->fg != WALL) pv = *p; */
+  pv = *p;
 
   struct pos pl; prel (&pv, &pl, +0, -1);
 
@@ -437,7 +439,8 @@ draw_confg_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
   if (pv.floor < -1 || pv.floor > FLOORS
       || pv.place < -1 || pv.place > PLACES) return;
 
-  if (con (p)->fg != WALL) pv = *p;
+  /* if (con (p)->fg != WALL) pv = *p; */
+  pv = *p;
 
   struct pos pl; prel (&pv, &pl, +0, -1);
 
@@ -457,7 +460,10 @@ draw_confg_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
     draw_big_pillar_bottom_fg (bitmap, &pv, em, vm); break;
   case BIG_PILLAR_TOP:
     draw_big_pillar_top_left (bitmap, &pv, em, vm); break;
-  case WALL: draw_wall_left_cache (bitmap, &pv); break;
+  case WALL:
+    draw_wall_left_cache (bitmap, &pv);
+    /* printf ("%i,%i,%i\n", pv.room, pv.floor, pv.place); */
+    break;
   case DOOR: draw_door_fg (bitmap, &pv, f, em, vm); break;
   case LEVEL_DOOR: draw_level_door_fg (bitmap, &pv, f, em, vm); break;
   case CHOPPER: draw_chopper_fg (bitmap, &pv, em, vm); break;

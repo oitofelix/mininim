@@ -252,7 +252,7 @@ compute_level (void)
       && current_kid->f.c.room != anti_camera_room)  {
     if (camera_follow_kid == current_kid->id)
       room_view = current_kid->f.c.room;
-    make_links_locally_consistent (prev_room, room_view);
+    /* make_links_locally_consistent (prev_room, room_view); */
   }
 
   if (level.special_events) level.special_events ();

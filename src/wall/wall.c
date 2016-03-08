@@ -279,7 +279,8 @@ update_wall_cache (int room, enum em em, enum vm vm)
 void
 draw_wall_left_cache (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
-  struct coord c; wall_coord (p, &c);
+  struct pos pv; pos2room (p, room_view, &pv);
+  struct coord c; wall_coord (&pv, &c);
   draw_bitmap_regionc (wall_cache, bitmap, c.x, c.y,
                        PLACE_WIDTH, PLACE_HEIGHT - 3, &c, 0);
 }
@@ -287,7 +288,8 @@ draw_wall_left_cache (ALLEGRO_BITMAP *bitmap, struct pos *p)
 void
 draw_wall_base_cache (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
-  struct coord c; wall_base_coord (p, &c);
+  struct pos pv; pos2room (p, room_view, &pv);
+  struct coord c; wall_base_coord (&pv, &c);
   draw_bitmap_regionc (wall_cache, bitmap, c.x, c.y,
                        PLACE_WIDTH, 3, &c, 0);
 }
