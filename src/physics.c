@@ -348,7 +348,8 @@ is_colliding_cf (struct frame *f, struct frame_offset *fo, int dx,
 
   /* wall */
 
-  if (_f.dir == LEFT && pcf.place <= _pcf.place)
+  if (_f.dir == LEFT && pcf.place <= _pcf.place
+      && _f.c.room != roomd (_f.c.room, LEFT))
     for (p = _pcf; p.place >= pcf.place; prel (&p, &p, +0, -1))
       if (con (&p)->fg == WALL) {
         wall_collision = true;
@@ -356,14 +357,14 @@ is_colliding_cf (struct frame *f, struct frame_offset *fo, int dx,
         break;
       }
 
-  if (_f.dir == RIGHT && pcf.place >= _pcf.place)
-    for (p = _pcf; p.place <= pcf.place; prel (&p, &p, +0, +1)) {
+  if (_f.dir == RIGHT && pcf.place >= _pcf.place
+      && _f.c.room != roomd (_f.c.room, RIGHT))
+    for (p = _pcf; p.place <= pcf.place; prel (&p, &p, +0, +1))
       if (con (&p)->fg == WALL) {
         wall_collision = true;
         ci->p = p;
         break;
       }
-    }
 
   if (con (&pcf)->fg == WALL) {
     wall_collision = true;
@@ -373,7 +374,8 @@ is_colliding_cf (struct frame *f, struct frame_offset *fo, int dx,
 
   /* door */
 
-  if (_f.dir == LEFT && pcf.place < _pcf.place)
+  if (_f.dir == LEFT && pcf.place < _pcf.place
+      && _f.c.room != roomd (_f.c.room, LEFT))
     for (prel (&_pcf, &p, +0, -1); p.place >= pcf.place; prel (&p, &p, +0, -1))
       if (con (&p)->fg == DOOR
           && tf.y <= door_grid_tip_y (&p) - 10) {
@@ -382,7 +384,8 @@ is_colliding_cf (struct frame *f, struct frame_offset *fo, int dx,
         break;
       }
 
-  if (_f.dir == RIGHT && pcf.place > _pcf.place)
+  if (_f.dir == RIGHT && pcf.place > _pcf.place
+      && _f.c.room != roomd (_f.c.room, RIGHT))
     for (prel (&_pcf, &p, +0, +1); p.place <= pcf.place; prel (&p, &p, +0, +1)) {
       prel (&p, &pl, +0, -1);
       if (con (&pl)->fg == DOOR
@@ -410,7 +413,8 @@ is_colliding_cf (struct frame *f, struct frame_offset *fo, int dx,
 
   /* carpet */
 
-  if (_f.dir == LEFT && pcf.place < _pcf.place)
+  if (_f.dir == LEFT && pcf.place < _pcf.place
+      && _f.c.room != roomd (_f.c.room, LEFT))
     for (prel (&_pcf, &p, +0, -1); p.place >= pcf.place; prel (&p, &p, +0, -1))
       if (is_carpet (&p)) {
         carpet_collision = true;
@@ -418,7 +422,8 @@ is_colliding_cf (struct frame *f, struct frame_offset *fo, int dx,
         break;
       }
 
-  if (_f.dir == RIGHT && pcf.place > _pcf.place)
+  if (_f.dir == RIGHT && pcf.place > _pcf.place
+      && _f.c.room != roomd (_f.c.room, RIGHT))
     for (prel (&_pcf, &p, +0, +1); p.place <= pcf.place; prel (&p, &p, +0, +1)) {
       prel (&p, &pl, +0, -1);
       if (is_carpet (&pl)) {
@@ -443,7 +448,8 @@ is_colliding_cf (struct frame *f, struct frame_offset *fo, int dx,
 
   /* mirror */
 
-  if (_f.dir == LEFT && pcf.place < _pcf.place)
+  if (_f.dir == LEFT && pcf.place < _pcf.place
+      && _f.c.room != roomd (_f.c.room, LEFT))
     for (prel (&_pcf, &p, +0, -1); p.place >= pcf.place; prel (&p, &p, +0, -1)) {
       prel (&p, &pr, +0, +1);
       if (con (&pr)->fg == MIRROR) {
@@ -453,7 +459,8 @@ is_colliding_cf (struct frame *f, struct frame_offset *fo, int dx,
       }
     }
 
-  if (_f.dir == RIGHT && pcf.place > _pcf.place)
+  if (_f.dir == RIGHT && pcf.place > _pcf.place
+      && _f.c.room != roomd (_f.c.room, RIGHT))
     for (prel (&_pcf, &p, +0, +1); p.place <= pcf.place; prel (&p, &p, +0, +1)) {
       if (con (&p)->fg == MIRROR) {
         mirror_collision = true;
