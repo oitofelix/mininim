@@ -490,19 +490,19 @@ struct pos *
 pos_gen (struct coord *c, struct pos *p, int dx, int dy)
 {
   p->room = c->room;
-  p->place = (c->x - dx) / PLACE_WIDTH;
-  p->floor = (c->y - dy) / PLACE_HEIGHT;
+  /* p->place = (c->x - dx) / PLACE_WIDTH; */
+  /* p->floor = (c->y - dy) / PLACE_HEIGHT; */
 
-  if (c->x < dx) p->place = -1;
-  if (c->y < dy) p->floor = -1;
+  /* if (c->x < dx) p->place = -1; */
+  /* if (c->y < dy) p->floor = -1; */
 
-  /* if (c->x >= dx) p->place = (c->x - dx) / PLACE_WIDTH; */
-  /* else if (0 <= c->x && c->x < dx) p->place = -1; */
-  /* else p->place = -(((dx - c->x - 1) / PLACE_WIDTH) + 1); */
+  if (c->x >= dx) p->place = (c->x - dx) / PLACE_WIDTH;
+  else if (0 <= c->x && c->x < dx) p->place = -1;
+  else p->place = -(((dx - c->x - 1) / PLACE_WIDTH) + 1);
 
-  /* if (c->y >= dy) p->floor = (c->y - dy) / PLACE_HEIGHT; */
-  /* else if (0 <= c->y && c->y < dy) p->floor = -1; */
-  /* else p->floor = -(((dy - c->y - 1) / PLACE_HEIGHT) + 1); */
+  if (c->y >= dy) p->floor = (c->y - dy) / PLACE_HEIGHT;
+  else if (0 <= c->y && c->y < dy) p->floor = -1;
+  else p->floor = -(((dy - c->y - 1) / PLACE_HEIGHT) + 1);
 
   return p;
 }
