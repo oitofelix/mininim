@@ -32,7 +32,7 @@ reset_menu (void)
 }
 
 char
-menu_enum (struct menu_item *menu, char *prefix)
+menu_opt (struct menu_item *menu, char *prefix)
 {
   size_t i = 0;
   char c;
@@ -73,27 +73,7 @@ menu_enum (struct menu_item *menu, char *prefix)
     draw_bottom_text (NULL, menu[help_item].desc);
   else if (help == 2) help = 0;
 
-  if (! help) {
-    i = 0;
-    char *menu_str = NULL, *tmp_str = NULL;
-    while (menu[i].key) {
-      if (menu_str) {
-        tmp_str = menu_str;
-        xasprintf (&menu_str, "%s%c", menu_str, menu[i].key);
-      } else {
-        xasprintf (&menu_str, "%s%c", prefix ? prefix : "", menu[i].key);
-      }
-      if (tmp_str) al_free (tmp_str);
-      i++;
-    }
-    if (menu_str) {
-      tmp_str = menu_str;
-      xasprintf (&menu_str, "%s%c", menu_str, '?');
-    }
-    if (tmp_str) al_free (tmp_str);
-    draw_bottom_text (NULL, menu_str);
-    al_free (menu_str);
-  }
+  if (! help) draw_bottom_text (NULL, prefix);
 
   c = 0;
 
@@ -108,6 +88,31 @@ menu_enum (struct menu_item *menu, char *prefix)
   }
 
   memset (&key, 0, sizeof (key));
+  return c;
+}
+
+char
+menu_enum (struct menu_item *menu, char *prefix)
+{
+  int i = 0;
+  char *menu_str = NULL, *tmp_str = NULL;
+  while (menu[i].key) {
+    if (menu_str) {
+      tmp_str = menu_str;
+      xasprintf (&menu_str, "%s%c", menu_str, menu[i].key);
+    } else {
+      xasprintf (&menu_str, "%s%c", prefix ? prefix : "", menu[i].key);
+    }
+    if (tmp_str) al_free (tmp_str);
+    i++;
+  }
+  if (menu_str) {
+    tmp_str = menu_str;
+    xasprintf (&menu_str, "%s%c", menu_str, '?');
+  }
+  if (tmp_str) al_free (tmp_str);
+  char c = menu_opt (menu, menu_str);
+  al_free (menu_str);
   return c;
 }
 

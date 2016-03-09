@@ -162,6 +162,7 @@ editor (void)
   struct menu_item room_menu[] =
     {{'J', "JUMP TO ROOM"},
      {'L', "ROOM LINKING"},
+     {'S', "LINKING SETTINGS"},
      {'X', "EXCHANGE ROOMS"},
      {0}};
 
@@ -212,6 +213,7 @@ editor (void)
     case 'F': edit = EDIT_FLOOR; break;
     case 'P': edit = EDIT_PILLAR; break;
     case 'W':
+      if (! is_valid_pos (&p)) break;
       if (con (&p)->fg == WALL) break;
       destroy_con_at_pos (&p);
       con (&p)->fg = WALL;
@@ -219,12 +221,14 @@ editor (void)
       break;
     case 'D': edit = EDIT_DOOR; break;
     case 'C':
+      if (! is_valid_pos (&p)) break;
       if (con (&p)->fg == CHOPPER) break;
       destroy_con_at_pos (&p);
       con (&p)->fg = CHOPPER;
       register_con_at_pos (&p);
       break;
     case 'M':
+      if (! is_valid_pos (&p)) break;
       if (con (&p)->fg == MIRROR) break;
       destroy_con_at_pos (&p);
       con (&p)->fg = MIRROR;
@@ -238,6 +242,7 @@ editor (void)
   case EDIT_FLOOR:
     c = menu_enum (floor_menu, "CFF>");
     if (! c) break;
+    if (! is_valid_pos (&p)) break;
 
     if (c == -1 || c == 1) {
       edit = EDIT_FG; break;
@@ -270,6 +275,7 @@ editor (void)
   case EDIT_PILLAR:
     c = menu_enum (pillar_menu, "CFP>");
     if (! c) break;
+    if (! is_valid_pos (&p)) break;
 
     if (c == -1 || c == 1) {
       edit = EDIT_FG; break;
@@ -287,6 +293,7 @@ editor (void)
   case EDIT_DOOR:
     c = menu_enum (door_menu, "CFD>");
     if (! c) break;
+    if (! is_valid_pos (&p)) break;
 
     if (c == -1 || c == 1) {
       edit = EDIT_FG; break;
@@ -309,6 +316,7 @@ editor (void)
   case EDIT_CARPET:
     c = menu_enum (carpet_menu, "CFR>");
     if (! c) break;
+    if (! is_valid_pos (&p)) break;
 
     if (c == -1 || c == 1) {
       edit = EDIT_FG; break;
@@ -325,6 +333,7 @@ editor (void)
   case EDIT_ARCH:
     c = menu_enum (arch_menu, "CFA>");
     if (! c) break;
+    if (! is_valid_pos (&p)) break;
 
     if (c == -1 || c == 1) {
       edit = EDIT_FG; break;
@@ -341,7 +350,9 @@ editor (void)
 
     break;
   case EDIT_BG:
-    switch (menu_enum (bg_menu, "CB>")) {
+    c = menu_enum (bg_menu, "CB>");
+    if (! is_valid_pos (&p)) break;
+    switch (c) {
     case -1: case 1: edit = EDIT_CON; break;
     case 'N': con (&p)->bg = NO_BRICKS; break;
     case 'G': con (&p)->bg = NO_BG; break;
@@ -358,6 +369,12 @@ editor (void)
     }
     break;
   case EDIT_EXT:
+    if (! is_valid_pos (&p)) {
+      draw_bottom_text (NULL, "NO EXTENSION");
+      if (was_menu_return_pressed ()) edit = EDIT_CON;
+      break;
+    }
+
     switch (con (&p)->fg) {
     case FLOOR:
       switch (menu_enum (items_menu, "CE>")) {
@@ -450,6 +467,12 @@ editor (void)
     }
     break;
   case EDIT_INFO:
+    if (! is_valid_pos (&p)) {
+      draw_bottom_text (NULL, "SELECT CONSTRUCTION");
+      if (was_menu_return_pressed ()) edit = EDIT_CON;
+      break;
+    }
+
     if (was_menu_return_pressed ()) edit = EDIT_CON;
 
     free_ext_str = false;
@@ -565,7 +588,7 @@ editor (void)
     }
     break;
   case EDIT_DOOR2EVENT:
-    if (! is_door (&p)) {
+    if (! is_valid_pos (&p) || ! is_door (&p)) {
       if (was_menu_return_pressed ()) edit = EDIT_EVENT;
       draw_bottom_text (NULL, "SELECT DOOR");
       memset (&key, 0, sizeof (key));
@@ -581,7 +604,7 @@ editor (void)
     }
     break;
   case EDIT_EVENT_SET:
-    if (! is_door (&p)) {
+    if (! is_valid_pos (&p) || ! is_door (&p)) {
       if (was_menu_return_pressed ()) edit = EDIT_EVENT;
       draw_bottom_text (NULL, "SELECT DOOR");
       memset (&key, 0, sizeof (key));
@@ -606,6 +629,7 @@ editor (void)
       edit = EDIT_JUMP_ROOM;
       break;
     case 'L': edit = EDIT_LINK; break;
+    case 'S': edit = EDIT_LINKING_SETTINGS; break;
     case 'X':
       get_mouse_coord (&last_mouse_coord);
       edit = EDIT_ROOM_EXCHANGE; break;
@@ -660,6 +684,9 @@ editor (void)
       set_mouse_coord (&last_mouse_coord);
       update_wall_cache (room_view, em, vm);
     }
+
+    break;
+  case EDIT_LINKING_SETTINGS:
 
     break;
   }

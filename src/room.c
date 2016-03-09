@@ -185,7 +185,8 @@ draw_room (ALLEGRO_BITMAP *bitmap, int room,
   struct pos p;
   p.room = room;
 
-  if (room != last_room
+  if (anim_cycle == 0
+      || room != last_room
       || em != last_em
       || vm != last_vm
       || hgc != last_hgc

@@ -25,6 +25,7 @@ extern bool active_menu;
 
 /* functions */
 void reset_menu (void);
+char menu_opt (struct menu_item *menu, char *prefix);
 char menu_enum (struct menu_item *menu, char *prefix);
 int menu_int (int *v, int *b, int min, int max, char *pref_int, char *pref_bool);
 int menu_list (int *dir0, int *dir1, int index, char *prefix);
