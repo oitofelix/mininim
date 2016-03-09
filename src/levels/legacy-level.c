@@ -1011,8 +1011,7 @@ interpret_legacy_level (int number)
   for (i = 0; i < LROOMS; i++) {
     struct guard *g = &legacy_level.guard[i + 1];
 
-    if (lv.guard_location[i] > 29
-        || lv.guard_color[i] == 0xFF) {
+    if (lv.guard_location[i] > 29) {
       g->type = NO_ANIM;
       continue;
     }
