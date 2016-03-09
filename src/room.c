@@ -190,16 +190,24 @@ draw_room (ALLEGRO_BITMAP *bitmap, int room,
       || vm != last_vm
       || hgc != last_hgc
       || hue != last_hue
-      || ! peq (&mouse_pos, &last_mouse_pos)
       || level.number != last_level) {
     update_wall_cache (room, em, vm);
     last_em = em;
     last_vm = vm;
     last_hgc = hgc;
     last_hue = hue;
-    last_mouse_pos = mouse_pos;
     last_room = room;
     last_level = level.number;
+  }
+
+  if (mouse_pos.room != last_mouse_pos.room
+      || mouse_pos.floor != last_mouse_pos.floor
+      || mouse_pos.place != last_mouse_pos.place) {
+    if (is_valid_pos (&mouse_pos))
+      update_wall_cache_pos (&mouse_pos, em, vm);
+    if (is_valid_pos (&last_mouse_pos))
+      update_wall_cache_pos (&last_mouse_pos, em, vm);
+    last_mouse_pos = mouse_pos;
   }
 
   for (p.floor = FLOORS; p.floor >= -1; p.floor--)

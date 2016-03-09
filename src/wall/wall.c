@@ -270,10 +270,15 @@ update_wall_cache (int room, enum em em, enum vm vm)
 
   for (p.floor = FLOORS; p.floor >= -1; p.floor--)
     for (p.place = -1; p.place < PLACES; p.place++)
-      if (con (&p)->fg == WALL) {
-        draw_wall_base (wall_cache, &p, em, vm);
-        draw_wall_left (wall_cache, &p, em, vm);
-      }
+      update_wall_cache_pos (&p, em, vm);
+}
+
+void
+update_wall_cache_pos (struct pos *p, enum em em, enum vm vm)
+{
+  if (con (p)->fg != WALL) return;
+  draw_wall_base (wall_cache, p, em, vm);
+  draw_wall_left (wall_cache, p, em, vm);
 }
 
 void
