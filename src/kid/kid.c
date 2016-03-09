@@ -420,15 +420,17 @@ increase_kid_current_lives (struct anim *k)
 void
 increase_kid_total_lives (struct anim *k)
 {
-  if (k->total_lives < 10) {
-    k->total_lives++;
-    k->current_lives = k->total_lives;
-    if (! is_playing_sample (big_life_potion_sample))
-      play_sample (big_life_potion_sample, -1);
-    if (k->id == current_kid_id) {
-      video_effect.color = get_flicker_blood_color ();
-      start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.3));
-    }
+  if (k->total_lives >= 10
+      && k->current_lives >= k->total_lives)
+    return;
+
+  if (k->total_lives < 10) k->total_lives++;
+  k->current_lives = k->total_lives;
+  if (! is_playing_sample (big_life_potion_sample))
+    play_sample (big_life_potion_sample, -1);
+  if (k->id == current_kid_id) {
+    video_effect.color = get_flicker_blood_color ();
+    start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.3));
   }
 }
 
