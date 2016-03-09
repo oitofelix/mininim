@@ -116,6 +116,52 @@ menu_enum (struct menu_item *menu, char *prefix)
   return c;
 }
 
+char
+menu_bool (struct menu_item *menu, char *prefix, ...)
+{
+  va_list ap;
+  va_start (ap, prefix);
+
+  int i = 0;
+  char *menu_str = NULL, *tmp_str = NULL;
+  while (menu[i].key) {
+    bool *b = va_arg (ap, bool *);
+    if (menu_str) {
+      tmp_str = menu_str;
+      xasprintf (&menu_str, "%s%c%c", menu_str,
+                 menu[i].key, *b ? '*' : '-');
+    } else {
+      xasprintf (&menu_str, "%s%c%c", prefix ? prefix : "",
+                 menu[i].key, *b ? '*' : '-');
+    }
+    if (tmp_str) al_free (tmp_str);
+    i++;
+  }
+  if (menu_str) {
+    tmp_str = menu_str;
+    xasprintf (&menu_str, "%s%c", menu_str, '?');
+  }
+  va_end (ap);
+
+  if (tmp_str) al_free (tmp_str);
+  char c = menu_opt (menu, menu_str);
+
+  i = 0;
+  va_start (ap, prefix);
+  while (menu[i].key) {
+    bool *b = va_arg (ap, bool *);
+    if (menu[i].key == c) {
+      *b = ! *b;
+      break;
+    }
+    i++;
+  }
+  va_end (ap);
+
+  al_free (menu_str);
+  return c;
+}
+
 int
 menu_int (int *v, int *b, int min, int max, char *pref_int, char *pref_bool)
 {

@@ -28,6 +28,8 @@ static int last_event;
 static struct coord last_mouse_coord;
 static struct pos last_event2floor_pos;
 /* static struct pos last_mouse_pos = {-1,-1,-1}; */
+static bool reciprocal_links, locally_unique_links,
+  globally_unique_links;
 
 enum edit edit;
 enum edit last_edit = EDIT_MAIN;
@@ -163,7 +165,7 @@ editor (void)
     {{'J', "JUMP TO ROOM"},
      {'L', "ROOM LINKING"},
      {'S', "LINKING SETTINGS"},
-     {'X', "EXCHANGE ROOMS"},
+     {'X', "EXCHANGE ROOM"},
      {0}};
 
   struct menu_item link_menu[] =
@@ -173,10 +175,17 @@ editor (void)
      {'B', "BELOW"},
      {0}};
 
+  struct menu_item linking_settings_menu[] =
+    {{'R', "RECIPROCAL"},
+     {'L', "LOCALLY UNIQUE"},
+     {'G', "GLOBALLY UNIQUE"},
+     {0}};
+
   struct pos p = mouse_pos;
   struct anim *k;
 
   static int b, r, s, t, min, max;
+  static bool b0, b1, b2;
   char *fg_str = NULL, *bg_str = NULL, *ext_str = NULL;
   bool free_ext_str;
   char *str = NULL, c;
@@ -629,14 +638,18 @@ editor (void)
       edit = EDIT_JUMP_ROOM;
       break;
     case 'L': edit = EDIT_LINK; break;
-    case 'S': edit = EDIT_LINKING_SETTINGS; break;
+    case 'S': edit = EDIT_LINKING_SETTINGS;
+      b0 = reciprocal_links;
+      b1 = locally_unique_links;
+      b2 = globally_unique_links;
+      break;
     case 'X':
       get_mouse_coord (&last_mouse_coord);
       edit = EDIT_ROOM_EXCHANGE; break;
     }
     break;
   case EDIT_JUMP_ROOM:
-    menu_select_room (EDIT_ROOM, "ROOM");
+    menu_select_room (EDIT_ROOM, "RJ>ROOM");
     break;
   case EDIT_LINK:
     switch (menu_enum (link_menu, "RL>")) {
@@ -672,7 +685,7 @@ editor (void)
     menu_link (BELOW);
     break;
   case EDIT_ROOM_EXCHANGE:
-    r = menu_select_room (EDIT_ROOM, "ROOM");
+    r = menu_select_room (EDIT_ROOM, "RX>ROOM");
 
     if (r == 1) {
       int room0 = last_mouse_coord.room;
@@ -684,10 +697,18 @@ editor (void)
       set_mouse_coord (&last_mouse_coord);
       update_wall_cache (room_view, em, vm);
     }
-
     break;
   case EDIT_LINKING_SETTINGS:
-
+    switch (menu_bool (linking_settings_menu, "RS>", &b0, &b1, &b2)) {
+    case -1: edit = EDIT_ROOM; break;
+    case 0: break;
+    case 1:
+      reciprocal_links = b0;
+      locally_unique_links = b1;
+      globally_unique_links = b2;
+      edit = EDIT_ROOM;
+      break;
+    }
     break;
   }
 }
@@ -784,6 +805,18 @@ menu_link (enum dir dir)
     int room1 = room_view;
 
     *roomd_ptr (room0, dir) = room1;
+    if (reciprocal_links) make_reciprocal_link (room0, room1, dir);
+
+    if (locally_unique_links) {
+      make_link_locally_unique (room0, dir);
+      if (reciprocal_links) make_link_locally_unique (room1, opposite_dir (dir));
+    }
+
+    if (globally_unique_links) {
+      make_link_globally_unique (room0, dir);
+      if (reciprocal_links) make_link_globally_unique (room1, opposite_dir (dir));
+    }
+
     set_mouse_coord (&last_mouse_coord);
     update_wall_cache (room_view, em, vm);
   }
