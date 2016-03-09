@@ -162,6 +162,7 @@ editor (void)
   struct menu_item room_menu[] =
     {{'J', "JUMP TO ROOM"},
      {'L', "ROOM LINKING"},
+     {'X', "EXCHANGE ROOMS"},
      {0}};
 
   struct menu_item link_menu[] =
@@ -187,10 +188,10 @@ editor (void)
     case 'E': edit = EDIT_EVENT; break;
     case 'R': edit = EDIT_ROOM; break;
     case 'K':
-      if (p.room <= 0) break;
+      if (! is_valid_pos (&p)) break;
       k = get_anim_by_id (current_kid_id);
       place_frame (&k->f, &k->f, kid_normal_00, &p,
-                   k->f.dir == LEFT ? +22 : +31, +15);
+                   k->f.dir == LEFT ? +22 : +28, +15);
       kid_normal (k);
       update_depressible_floor (k, -4, -10);
       break;
@@ -605,6 +606,9 @@ editor (void)
       edit = EDIT_JUMP_ROOM;
       break;
     case 'L': edit = EDIT_LINK; break;
+    case 'X':
+      get_mouse_coord (&last_mouse_coord);
+      edit = EDIT_ROOM_EXCHANGE; break;
     }
     break;
   case EDIT_JUMP_ROOM:
@@ -615,15 +619,19 @@ editor (void)
     case -1: case 1: edit = EDIT_ROOM; break;
     case 'L':
       get_mouse_coord (&last_mouse_coord);
+      room_view = roomd (room_view, LEFT);
       edit = EDIT_LINK_LEFT; break;
     case 'R':
       get_mouse_coord (&last_mouse_coord);
+      room_view = roomd (room_view, RIGHT);
       edit = EDIT_LINK_RIGHT; break;
     case 'A':
       get_mouse_coord (&last_mouse_coord);
+      room_view = roomd (room_view, ABOVE);
       edit = EDIT_LINK_ABOVE; break;
     case 'B':
       get_mouse_coord (&last_mouse_coord);
+      room_view = roomd (room_view, BELOW);
       edit = EDIT_LINK_BELOW; break;
     }
     break;
@@ -638,6 +646,21 @@ editor (void)
     break;
   case EDIT_LINK_BELOW:
     menu_link (BELOW);
+    break;
+  case EDIT_ROOM_EXCHANGE:
+    r = menu_select_room (EDIT_ROOM, "ROOM");
+
+    if (r == 1) {
+      int room0 = last_mouse_coord.room;
+      int room1 = room_view;
+
+      exchange_rooms (room0, room1);
+
+      last_mouse_coord.room = room1;
+      set_mouse_coord (&last_mouse_coord);
+      update_wall_cache (room_view, em, vm);
+    }
+
     break;
   }
 }
@@ -703,7 +726,7 @@ static int
 menu_select_room (enum edit up_edit, char *prefix)
 {
   int b = -1;
-  int r = menu_int (&room_view, &b, 1, ROOMS - 1, prefix, NULL);
+  int r = menu_int (&room_view, &b, 0, ROOMS - 1, prefix, NULL);
   switch (r) {
   case -1: edit = up_edit; set_mouse_coord (&last_mouse_coord); break;
   case 0: break;
@@ -735,8 +758,7 @@ menu_link (enum dir dir)
 
     *roomd_ptr (room0, dir) = room1;
     set_mouse_coord (&last_mouse_coord);
-    /* make_fully_consistent_link (room0, room1, dir); */
-    /* ensure_link_consistency (); */
+    update_wall_cache (room_view, em, vm);
   }
 
   al_free (prefix);

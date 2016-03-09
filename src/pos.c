@@ -177,9 +177,7 @@ ncoord (struct coord *c, struct coord *nc)
 bool
 is_valid_pos (struct pos *p)
 {
-  return p->room > 0 && p->room < ROOMS
-    && p->floor >= 0 && p->floor < FLOORS
-    && p->place >=0 && p->place < PLACES;
+  return p->room >= 0 && p->room < ROOMS;
 }
 
 struct pos *

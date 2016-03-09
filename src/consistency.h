@@ -31,8 +31,6 @@ void make_link_locally_unique (int room, enum dir dir);
 void make_link_globally_unique (int room, enum dir dir);
 void make_semi_consistent_link (int room0, int room1, enum dir dir);
 void make_link_adjacency_bound (int room, enum dir dir);
-void make_fully_consistent_link (int room0, int room1, enum dir dir);
-void ensure_link_consistency (void);
-
+void exchange_rooms  (int room0, int room1);
 
 #endif	/* MININIM_CONSISTENCY_H */

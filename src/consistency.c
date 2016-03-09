@@ -473,20 +473,25 @@ make_link_adjacency_bound (int room, enum dir dir)
 }
 
 void
-make_fully_consistent_link (int room0, int room1, enum dir dir)
+exchange_rooms  (int room0, int room1)
 {
-  make_semi_consistent_link (room0, room1, dir);
-  make_link_adjacency_bound (room0, dir);
-}
+  int r0l = roomd (room0, LEFT);
+  int r0r = roomd (room0, RIGHT);
+  int r0a = roomd (room0, ABOVE);
+  int r0b = roomd (room0, BELOW);
 
-void
-ensure_link_consistency (void)
-{
-  int i;
-  for (i = 1; i < ROOMS; i++) {
-    make_fully_consistent_link (i, roomd (i, LEFT), LEFT);
-    make_fully_consistent_link (i, roomd (i, RIGHT), RIGHT);
-    make_fully_consistent_link (i, roomd (i, ABOVE), ABOVE);
-    make_fully_consistent_link (i, roomd (i, BELOW), BELOW);
-  }
+  int r1l = roomd (room1, LEFT);
+  int r1r = roomd (room1, RIGHT);
+  int r1a = roomd (room1, ABOVE);
+  int r1b = roomd (room1, BELOW);
+
+  make_reciprocal_link (room0, r1l, LEFT);
+  make_reciprocal_link (room0, r1r, RIGHT);
+  make_reciprocal_link (room0, r1a, ABOVE);
+  make_reciprocal_link (room0, r1b, BELOW);
+
+  make_reciprocal_link (room1, r0l, LEFT);
+  make_reciprocal_link (room1, r0r, RIGHT);
+  make_reciprocal_link (room1, r0a, ABOVE);
+  make_reciprocal_link (room1, r0b, BELOW);
 }

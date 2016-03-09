@@ -67,7 +67,7 @@ get_mouse_pos (struct pos *p)
 
   posf (&c, p);
 
-  if (p->floor == -1 || p->floor > 2
+  if (p->floor < 0 || p->floor > 2
       || edit == EDIT_NONE) {
     *p = (struct pos) {-1,-1,-1};
     return p;
@@ -86,9 +86,9 @@ get_mouse_pos (struct pos *p)
     break;
   }
 
-  struct pos np;
-  npos (p, &np);
-  if (np.room == 0) *p = (struct pos) {-1,-1,-1};
+  /* struct pos np; */
+  /* npos (p, &np); */
+  /* if (np.room == 0) *p = (struct pos) {-1,-1,-1}; */
 
   return p;
 }
