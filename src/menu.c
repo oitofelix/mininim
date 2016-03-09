@@ -39,6 +39,8 @@ menu_opt (struct menu_item *menu, char *prefix)
 
   active_menu = true;
 
+  if (! help) draw_bottom_text (NULL, prefix);
+
   if (key.keyboard.unichar > 0
       && key.keyboard.keycode != ALLEGRO_KEY_BACKSPACE
       && key.keyboard.unichar != '/') {
@@ -72,8 +74,6 @@ menu_opt (struct menu_item *menu, char *prefix)
   if (help == 2 && --help_cycles)
     draw_bottom_text (NULL, menu[help_item].desc);
   else if (help == 2) help = 0;
-
-  if (! help) draw_bottom_text (NULL, prefix);
 
   c = 0;
 

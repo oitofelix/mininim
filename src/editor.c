@@ -52,7 +52,7 @@ editor (void)
     {{'C', "CONSTRUCTION"},
      {'E', "EVENT"},
      {'R', "ROOM"},
-     {'K', "PLACE KID"},
+     {'K', "KID"},
      {0}};
 
   struct menu_item con_menu[] =
@@ -181,6 +181,13 @@ editor (void)
      {'G', "GLOBALLY UNIQUE"},
      {0}};
 
+  struct menu_item kid_menu[] =
+    {{'P', "PLACE KID"},
+     {'S', "SET START POSITION"},
+     {'J', "JUMP TO START POSITION"},
+     {'D', "TOGGLE START DIRECTION"},
+     {0}};
+
   struct pos p = mouse_pos;
   struct anim *k;
 
@@ -197,14 +204,7 @@ editor (void)
     case 'C': edit = EDIT_CON; break;
     case 'E': edit = EDIT_EVENT; break;
     case 'R': edit = EDIT_ROOM; break;
-    case 'K':
-      if (! is_valid_pos (&p)) break;
-      k = get_anim_by_id (current_kid_id);
-      place_frame (&k->f, &k->f, kid_normal_00, &p,
-                   k->f.dir == LEFT ? +22 : +28, +15);
-      kid_normal (k);
-      update_depressible_floor (k, -4, -10);
-      break;
+    case 'K': edit = EDIT_KID; break;
     }
     break;
   case EDIT_CON:
@@ -707,6 +707,32 @@ editor (void)
       locally_unique_links = b1;
       globally_unique_links = b2;
       edit = EDIT_ROOM;
+      break;
+    }
+    break;
+  case EDIT_KID:
+    if (room_view == level.start_pos.room)
+      draw_start_kid (screen, vm);
+    switch (menu_enum (kid_menu, "K>")) {
+    case -1: case 1: edit = EDIT_MAIN; break;
+    case 'P':
+      if (! is_valid_pos (&p)) break;
+      k = get_anim_by_id (current_kid_id);
+      place_frame (&k->f, &k->f, kid_normal_00, &p,
+                   k->f.dir == LEFT ? +22 : +28, +15);
+      kid_normal (k);
+      update_depressible_floor (k, -4, -10);
+      break;
+    case 'J':
+      set_mouse_pos (&level.start_pos);
+      break;
+    case 'S':
+      if (! is_valid_pos (&p)) break;
+      level.start_pos = p;
+      break;
+    case 'D':
+      if (room_view != level.start_pos.room) break;
+      level.start_dir = (level.start_dir == LEFT) ? RIGHT : LEFT;
       break;
     }
     break;

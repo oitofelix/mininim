@@ -211,6 +211,34 @@ draw_kid_frame (ALLEGRO_BITMAP *bitmap, struct anim *k,
 
 }
 
+static ALLEGRO_COLOR
+start_kid_palette (ALLEGRO_COLOR c)
+{
+  unsigned char r, g, b, a;
+  al_unmap_rgba (c, &r, &g, &b, &a);
+  if (a == 0) return c;
+  r = add_char (r, -64);
+  g = add_char (g, -64);
+  b = add_char (b, -64);
+  return al_map_rgba (r, g, b, 100);
+}
+
+void
+draw_start_kid (ALLEGRO_BITMAP *bitmap, enum vm vm)
+{
+  struct frame f;
+  f.c.room = level.start_pos.room;
+  palette pal = get_kid_palette (vm);
+  f.b = kid_normal_00;
+  f.b = apply_palette (f.b, pal);
+  if (hgc) f.b = apply_palette (f.b, hgc_palette);
+  f.b = apply_palette (f.b, start_kid_palette);
+  f.flip = (level.start_dir == LEFT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
+  place_frame (&f, &f, f.b, &level.start_pos,
+               level.start_dir == LEFT ? +28 : +22, +15);
+  draw_frame (bitmap, &f);
+}
+
 ALLEGRO_COLOR
 colorful_shadow_palette (ALLEGRO_COLOR c)
 {

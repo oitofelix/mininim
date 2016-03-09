@@ -33,6 +33,7 @@ struct anim *create_kid (struct anim *k0, struct anim *k1,
 void destroy_kid (struct anim *k);
 void draw_kid_frame (ALLEGRO_BITMAP *bitmap, struct anim *k,
                      enum vm);
+void draw_start_kid (ALLEGRO_BITMAP *bitmap, enum vm vm);
 void draw_kid_lives (ALLEGRO_BITMAP *bitmap, struct anim *k,
                      enum vm vm);
 void draw_kid_if_at_pos (ALLEGRO_BITMAP *bitmap, struct anim *k, struct pos *p,
