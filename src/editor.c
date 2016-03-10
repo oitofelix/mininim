@@ -30,6 +30,8 @@ static struct pos last_event2floor_pos;
 /* static struct pos last_mouse_pos = {-1,-1,-1}; */
 static bool reciprocal_links, locally_unique_links,
   globally_unique_links;
+static bool b0, b1, b2, b3, b4;
+
 
 enum edit edit;
 enum edit last_edit = EDIT_MAIN;
@@ -53,6 +55,7 @@ editor (void)
      {'E', "EVENT"},
      {'R', "ROOM"},
      {'K', "KID"},
+     {'L', "LEVEL"},
      {0}};
 
   struct menu_item con_menu[] =
@@ -188,11 +191,28 @@ editor (void)
      {'D', "TOGGLE START DIRECTION"},
      {0}};
 
+  struct menu_item level_menu[] =
+    {{'E', "ENVIRONMENT"},
+     {'H', "HUE"},
+     {0}};
+
+  struct menu_item environment_menu[] =
+    {{'D', "DUNGEON"},
+     {'P', "PALACE"},
+     {0}};
+
+  struct menu_item hue_menu[] =
+    {{'N', "NONE"},
+     {'G', "GREEN"},
+     {'R', "GRAY"},
+     {'Y', "YELLOW"},
+     {'B', "BLUE"},
+     {0}};
+
   struct pos p = mouse_pos;
   struct anim *k;
 
   static int b, r, s, t, min, max;
-  static bool b0, b1, b2;
   char *fg_str = NULL, *bg_str = NULL, *ext_str = NULL;
   bool free_ext_str;
   char *str = NULL, c;
@@ -205,6 +225,7 @@ editor (void)
     case 'E': edit = EDIT_EVENT; break;
     case 'R': edit = EDIT_ROOM; break;
     case 'K': edit = EDIT_KID; break;
+    case 'L': edit = EDIT_LEVEL; break;
     }
     break;
   case EDIT_CON:
@@ -699,7 +720,7 @@ editor (void)
     }
     break;
   case EDIT_LINKING_SETTINGS:
-    switch (menu_bool (linking_settings_menu, "RS>", &b0, &b1, &b2)) {
+    switch (menu_bool (linking_settings_menu, "RS>", false, &b0, &b1, &b2)) {
     case -1: edit = EDIT_ROOM; break;
     case 0: break;
     case 1:
@@ -736,6 +757,53 @@ editor (void)
       break;
     }
     break;
+  case EDIT_LEVEL:
+    switch (menu_enum (level_menu, "L>")) {
+    case -1: case 1: edit = EDIT_MAIN; break;
+    case 'E': edit = EDIT_ENVIRONMENT;
+      b0 = (level.em == DUNGEON) ? true : false;
+      b1 = (level.em == PALACE) ? true : false;
+      break;
+    case 'H': edit = EDIT_HUE;
+      b0 = (level.hue == HUE_NONE) ? true : false;
+      b1 = (level.hue == HUE_GREEN) ? true : false;
+      b2 = (level.hue == HUE_GRAY) ? true : false;
+      b3 = (level.hue == HUE_YELLOW) ? true : false;
+      b4 = (level.hue == HUE_BLUE) ? true : false;
+      break;
+    }
+   break;
+  case EDIT_ENVIRONMENT:
+    switch (menu_bool (environment_menu, "LE>", true, &b0, &b1)) {
+    case -1: edit = EDIT_LEVEL; break;
+    case 0: break;
+    case 1:
+      level.em = em;
+      edit = EDIT_LEVEL;
+      break;
+    default:
+      if (b0) em = DUNGEON;
+      if (b1) em = PALACE;
+      break;
+    }
+    break;
+  case EDIT_HUE:
+    switch (menu_bool (hue_menu, "LH>", true, &b0, &b1, &b2, &b3, &b4)) {
+    case -1: edit = EDIT_LEVEL; break;
+    case 0: break;
+    case 1:
+      level.hue = hue;
+      edit = EDIT_LEVEL;
+      break;
+    default:
+      if (b0) hue = HUE_NONE;
+      if (b1) hue = HUE_GREEN;
+      if (b2) hue = HUE_GRAY;
+      if (b3) hue = HUE_YELLOW;
+      if (b4) hue = HUE_BLUE;
+      break;
+    }
+    break;
   }
 }
 
@@ -760,8 +828,24 @@ exit_editor (void)
 void
 editor_level_change (void)
 {
-  last_event2floor_pos = (struct pos) {-1,-1,-1};
-  next_pos_by_pred (&last_event2floor_pos, 0, is_event_at_pos, &last_event);
+  switch (edit) {
+  case EDIT_EVENT2FLOOR:
+    last_event2floor_pos = (struct pos) {-1,-1,-1};
+    next_pos_by_pred (&last_event2floor_pos, 0, is_event_at_pos, &last_event);
+    break;
+  case EDIT_ENVIRONMENT:
+    b0 = (level.em == DUNGEON) ? true : false;
+    b1 = (level.em == PALACE) ? true : false;
+    break;
+  case EDIT_HUE:
+    b0 = (level.hue == HUE_NONE) ? true : false;
+    b1 = (level.hue == HUE_GREEN) ? true : false;
+    b2 = (level.hue == HUE_GRAY) ? true : false;
+    b3 = (level.hue == HUE_YELLOW) ? true : false;
+    b4 = (level.hue == HUE_BLUE) ? true : false;
+    break;
+  default: break;
+  }
 }
 
 static void

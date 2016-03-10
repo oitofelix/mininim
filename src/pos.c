@@ -128,17 +128,17 @@ ncoord (struct coord *c, struct coord *nc)
     m = false;
 
     int ra, rb, rl, rr;
-    int rab, rba, rlr, rrl;
+    /* int rab, rba, rlr, rrl; */
 
     ra = roomd (nc->room, ABOVE);
     rb = roomd (nc->room, BELOW);
     rl = roomd (nc->room, LEFT);
     rr = roomd (nc->room, RIGHT);
 
-    rab = roomd (ra, BELOW);
-    rba = roomd (rb, ABOVE);
-    rlr = roomd (rl, RIGHT);
-    rrl = roomd (rr, LEFT);
+    /* rab = roomd (ra, BELOW); */
+    /* rba = roomd (rb, ABOVE); */
+    /* rlr = roomd (rl, RIGHT); */
+    /* rrl = roomd (rr, LEFT); */
 
     if (nc->x < 0
                /* && (rl != nc->room || coord_wa) */
