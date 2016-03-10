@@ -82,8 +82,10 @@ create_guard (struct anim *g0, struct anim *g1, struct pos *p, enum dir dir)
 
     if (g1->type == SHADOW) g1->shadow = true;
 
-    place_frame (&g1->f, &g1->f, guard_normal_00, p,
-                 g1->f.dir == LEFT ? +PLACE_WIDTH + 2 : +3, +14);
+    place_frame (&g1->f, &g1->f, g1->f.b, p,
+                 g1->f.dir == LEFT ? +16 : +22, +14);
+    place_on_the_ground (&g1->f, &g1->f.c);
+
     update_depressible_floor (g1, -4, -10);
   }
 
@@ -420,44 +422,71 @@ get_guard_palette (int style, enum vm vm)
   return NULL;
 }
 
+ALLEGRO_BITMAP *
+apply_guard_palette (ALLEGRO_BITMAP *bitmap, enum anim_type type,
+                     int style, enum vm vm)
+{
+  palette pal = NULL, pals = NULL;
+  if (type == GUARD || type == FAT_GUARD
+      || type == VIZIER) {
+    pal = get_guard_palette (style, vm);
+    bitmap = apply_palette (bitmap, pal);
+  } else if (type == SHADOW) {
+    pal = get_kid_palette (vm);
+    bitmap = apply_palette (bitmap, pal);
+    pals = get_shadow_palette (vm);
+    bitmap = apply_palette (bitmap, pals);
+  } else return bitmap;
+
+  if (hgc) bitmap = apply_palette (bitmap, hgc_palette);
+
+  return bitmap;
+}
+
 void
 draw_guard_frame (ALLEGRO_BITMAP *bitmap, struct anim *g, enum vm vm)
 {
   struct coord c;
 
+  if (! is_guard (g)) return;
   if (g->invisible) return;
 
   struct frame f = g->f;
   struct frame_offset xf = g->xf;
 
-  palette pal = NULL, pals = NULL;
-  if (g->type == GUARD || g->type == FAT_GUARD
-      || g->type == VIZIER) {
-    pal = get_guard_palette (g->style, vm);
-    f.b = apply_palette (f.b, pal);
-    xf.b = apply_palette (xf.b, pal);
-  } else if (g->type == SHADOW) {
-    pal = get_kid_palette (vm);
-    f.b = apply_palette (f.b, pal);
-    xf.b = apply_palette (xf.b, pal);
-    pals = get_shadow_palette (vm);
-    f.b = apply_palette (f.b, pals);
-    xf.b = apply_palette (xf.b, pals);
-  }
-
-  if (hgc) {
-    f.b = apply_palette (f.b, hgc_palette);
-    xf.b = apply_palette (xf.b, hgc_palette);
-  }
+  f.b = apply_guard_palette (f.b, g->type, g->style, vm);
+  xf.b = apply_guard_palette (xf.b, g->type, g->style, vm);
 
   draw_xframe (bitmap, &f, &xf);
   draw_frame (bitmap, &f);
 
   if (g->splash && g->type != SKELETON) {
     ALLEGRO_BITMAP *splash = (g->type == SHADOW) ? v_kid_splash : guard_splash;
+    palette pal = get_guard_palette (g->style, vm);
     splash = apply_palette (splash, pal);
     if (hgc) splash = apply_palette (splash, hgc_palette);
     draw_bitmapc (splash, bitmap, splash_coord (&g->f, &c), g->f.flip);
+  }
+}
+
+void
+draw_start_guards (ALLEGRO_BITMAP *bitmap, enum vm vm)
+{
+  struct frame f;
+
+  int i;
+  for (i = 1; i < GUARDS; i++) {
+    struct guard *g = &level.guard[i];
+    if (g->type == NO_ANIM) continue;
+    f.c.room = g->p.room;
+    f.b = get_guard_normal_bitmap (g->type);
+    f.b = apply_guard_palette (f.b, g->type, g->style, vm);
+    f.b = apply_palette (f.b, start_anim_palette);
+    f.flip = (g->dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
+    place_frame (&f, &f, f.b, &g->p,
+                 g->dir == LEFT ? +16 : +22, +14);
+    place_on_the_ground (&f, &f.c);
+    draw_frame (bitmap, &f);
   }
 }
 
@@ -475,12 +504,17 @@ void
 draw_guard_lives (ALLEGRO_BITMAP *bitmap, struct anim *g, enum vm vm)
 {
   if (g->dont_draw_lives) return;
+  if (g->current_lives <= 0) return;
+
+  int current_lives = (g->current_lives > 10)
+    ? 10 : g->current_lives;
 
   int i;
   struct coord c;
   struct rect r =
-    new_rect (room_view, ORIGINAL_WIDTH - 7 * g->current_lives,
-              ORIGINAL_HEIGHT - 8, 7 * g->current_lives, ORIGINAL_HEIGHT - 1);
+    new_rect (room_view, ORIGINAL_WIDTH - 7 * current_lives,
+              ORIGINAL_HEIGHT - 8, 7 * current_lives,
+              ORIGINAL_HEIGHT - 1);
 
   ALLEGRO_COLOR bg_color;
 
@@ -506,7 +540,7 @@ draw_guard_lives (ALLEGRO_BITMAP *bitmap, struct anim *g, enum vm vm)
 
   if (hgc) life = apply_palette (life, hgc_palette);
 
-  for (i = 0; i < g->current_lives; i++)
+  for (i = 0; i < current_lives; i++)
     draw_bitmapc (life, bitmap, guard_life_coord (i, &c), 0);
 }
 

@@ -66,6 +66,7 @@ void select_frame (struct anim *a, struct frameset *fs, int i);
 void select_xframe (struct frame_offset *xf, struct frameset *fs, int j);
 bool frame_eq (struct frame *f0, struct frame *f1);
 bool wait_anim (int cycles);
+ALLEGRO_COLOR start_anim_palette (ALLEGRO_COLOR c);
 
 
 

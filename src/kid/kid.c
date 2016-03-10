@@ -132,7 +132,7 @@ create_kid (struct anim *k0, struct anim *k1, struct pos *p, enum dir dir)
     k1->skill.counter_defense_prob = -1;
 
     place_frame (&k1->f, &k1->f, kid_normal_00, p,
-                 k1->f.dir == LEFT ? +22 : +31, +15);
+                 k1->f.dir == LEFT ? +22 : +28, +15);
     update_depressible_floor (k1, -4, -10);
   }
 
@@ -211,18 +211,6 @@ draw_kid_frame (ALLEGRO_BITMAP *bitmap, struct anim *k,
 
 }
 
-static ALLEGRO_COLOR
-start_kid_palette (ALLEGRO_COLOR c)
-{
-  unsigned char r, g, b, a;
-  al_unmap_rgba (c, &r, &g, &b, &a);
-  if (a == 0) return c;
-  r = add_char (r, -64);
-  g = add_char (g, -64);
-  b = add_char (b, -64);
-  return al_map_rgba (r, g, b, 100);
-}
-
 void
 draw_start_kid (ALLEGRO_BITMAP *bitmap, enum vm vm)
 {
@@ -232,7 +220,7 @@ draw_start_kid (ALLEGRO_BITMAP *bitmap, enum vm vm)
   f.b = kid_normal_00;
   f.b = apply_palette (f.b, pal);
   if (hgc) f.b = apply_palette (f.b, hgc_palette);
-  f.b = apply_palette (f.b, start_kid_palette);
+  f.b = apply_palette (f.b, start_anim_palette);
   f.flip = (level.start_dir == LEFT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
   place_frame (&f, &f, f.b, &level.start_pos,
                level.start_dir == LEFT ? +28 : +22, +15);
@@ -385,12 +373,19 @@ draw_kid_lives (ALLEGRO_BITMAP *bitmap, struct anim *k,
                 enum vm vm)
 {
   if (k->dont_draw_lives) return;
+  if (k->current_lives <= 0 || k->current_lives > 10) return;
+
+  int current_lives = (k->current_lives < 0) ? 0 : k->current_lives;
+  current_lives = (k->current_lives > 10) ? 10 : k->current_lives;
+
+  int total_lives = (k->total_lives < 0) ? 0 : k->total_lives;
+  total_lives = (k->total_lives > 10) ? 10 : k->total_lives;
 
   int i;
   struct coord c;
   struct rect r =
     new_rect (room_view, 0, ORIGINAL_HEIGHT - 8,
-              7 * k->total_lives, ORIGINAL_HEIGHT - 1);
+              7 * total_lives, ORIGINAL_HEIGHT - 1);
 
   ALLEGRO_COLOR bg_color;
 
@@ -413,12 +408,12 @@ draw_kid_lives (ALLEGRO_BITMAP *bitmap, struct anim *k,
     full = apply_palette (full, hgc_palette);
   }
 
-  for (i = 0; i < k->total_lives; i++)
+  for (i = 0; i < total_lives; i++)
     draw_bitmapc (empty, bitmap, kid_life_coord (i, &c), 0);
 
-  if (k->current_lives <= KID_MINIMUM_LIVES_TO_BLINK && anim_cycle % 2) return;
+  if (current_lives <= KID_MINIMUM_LIVES_TO_BLINK && anim_cycle % 2) return;
 
-  for (i = 0; i < k->current_lives; i++)
+  for (i = 0; i < current_lives; i++)
     draw_bitmapc (full, bitmap, kid_life_coord (i, &c), 0);
 }
 

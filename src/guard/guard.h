@@ -29,8 +29,12 @@ void load_guard (void);
 void unload_guard (void);
 struct anim *create_guard (struct anim *g0, struct anim *g1,
                            struct pos *p, enum dir dir);
+ALLEGRO_BITMAP *apply_guard_palette (ALLEGRO_BITMAP *bitmap,
+                                     enum anim_type type, int style,
+                                     enum vm vm);
 void draw_guard_frame (ALLEGRO_BITMAP *bitmap, struct anim *g,
                        enum vm);
+void draw_start_guards (ALLEGRO_BITMAP *bitmap, enum vm vm);
 bool is_guard (struct anim *a);
 void draw_guard_lives (ALLEGRO_BITMAP *bitmap, struct anim *g, enum vm vm);
 palette get_guard_palette (int style, enum vm vm);

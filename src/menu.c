@@ -170,18 +170,23 @@ menu_bool (struct menu_item *menu, char *prefix, bool exclusive, ...)
   return c;
 }
 
-int
+char
 menu_int (int *v, int *b, int min, int max, char *pref_int, char *pref_bool)
 {
   active_menu = true;
 
   char *str;
 
-  if (*b < 0)
-    xasprintf (&str, "%s %i-%i:%i", pref_int, min, max, *v);
-  else
-    xasprintf (&str, "%s %i-%i:%i %s",
-               pref_int, min, max, *v, *b ? pref_bool : "-");
+  if (b) {
+    if (max == INT_MAX) xasprintf (&str, "%s %i->:%i %s",
+                                   pref_int, min, *v, *b ? pref_bool : "-");
+    else xasprintf (&str, "%s %i-%i:%i %s",
+                    pref_int, min, max, *v, *b ? pref_bool : "-");
+  } else {
+    if (max == INT_MAX) xasprintf (&str, "%s %i->:%i", pref_int, min, *v);
+    else xasprintf (&str, "%s %i-%i:%i", pref_int, min, max, *v);
+  }
+
   draw_bottom_text (NULL, str);
   al_free (str);
 
@@ -195,26 +200,23 @@ menu_int (int *v, int *b, int min, int max, char *pref_int, char *pref_bool)
   int r;
   switch (c) {
   case '-': case '_':
-    r = *v - 1;
-    *v = r >= min ? r : *v;
+    *v = (*v <= min) ? min : *v - 1;
     break;
   case '+': case '=':
-    r = *v + 1;
-    *v = r <= max ? r : *v;
+    *v = (*v >= max) ? max : *v + 1;
     break;
   case '0': case '1': case '2': case '3': case '4': case '5':
   case '6': case '7': case '8': case '9':
     xasprintf (&str, "%i%c", *v, c);
-    sscanf (str, "%d", &r);
+    if (sscanf (str, "%d", &r) != 1) r = *v;
     al_free (str);
-    *v = r <= max ? r : *v;
+    *v = (*v >= max) ? max : r;
     break;
   case '\\':
-    r = *v / 10;
-    *v = r >= min ? r : *v;
+    *v = (*v <= min) ? min : *v / 10;
     break;
   case ' ':
-    if (*b >= 0) *b = ! *b;
+    if (b) *b = ! *b;
     break;
   case '/':
     return -1;
@@ -223,7 +225,7 @@ menu_int (int *v, int *b, int min, int max, char *pref_int, char *pref_bool)
   return 0;
 }
 
-int
+char
 menu_list (int *dir0, int *dir1, int index, char *prefix)
 {
   active_menu = true;

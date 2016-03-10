@@ -128,7 +128,7 @@ start (void)
     apply_guard_mode (a, gm);
     a->has_sword = true;
     a->skill = g->skill;
-    a->total_lives = g->total_lives;
+    a->total_lives = g->total_lives + g->skill.extra_life;
     a->current_lives = g->total_lives;
     if (level.number == 13) a->style = 0;
     else if (level.number == 6) a->style = 1;
@@ -1035,7 +1035,7 @@ interpret_legacy_level (int number)
 
     /* SKILL: ok */
     get_legacy_skill (lv.guard_skill[i], &g->skill);
-    g->total_lives = g->skill.extra_life + life_table[number];
+    g->total_lives = life_table[number];
 
     /* STYLE: ok */
     g->style = lv.guard_color[i];

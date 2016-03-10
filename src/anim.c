@@ -815,3 +815,15 @@ wait_anim (int cycles)
   if (i == 0) i = cycles + 1;
   return --i;
 }
+
+ALLEGRO_COLOR
+start_anim_palette (ALLEGRO_COLOR c)
+{
+  unsigned char r, g, b, a;
+  al_unmap_rgba (c, &r, &g, &b, &a);
+  if (a == 0) return c;
+  r = add_char (r, -64);
+  g = add_char (g, -64);
+  b = add_char (b, -64);
+  return al_map_rgba (r, g, b, 100);
+}

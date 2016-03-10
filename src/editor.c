@@ -19,10 +19,12 @@
 
 #include "mininim.h"
 
-static void menu_step_ext (struct pos *p, int max);
-static void menu_event_ext (struct pos *p);
-static int menu_select_room (enum edit up_edit, char *prefix);
-static int menu_link (enum dir dir);
+static char menu_step_ext (struct pos *p, int max);
+static char menu_event_ext (struct pos *p);
+static char menu_select_room (enum edit up_edit, char *prefix);
+static char menu_link (enum dir dir);
+static void mouse2guard (int i);
+static char menu_skill (char *prefix, int *skill, int max, enum edit up_edit);
 
 static int last_event;
 static struct coord last_mouse_coord;
@@ -30,8 +32,9 @@ static struct pos last_event2floor_pos;
 /* static struct pos last_mouse_pos = {-1,-1,-1}; */
 static bool reciprocal_links, locally_unique_links,
   globally_unique_links;
-static bool b0, b1, b2, b3, b4;
-
+static bool b0, b1, b2, b3, b4, b5;
+static int guard_index;
+static int b, r, s, t, min, max;
 
 enum edit edit;
 enum edit last_edit = EDIT_MAIN;
@@ -55,6 +58,7 @@ editor (void)
      {'E', "EVENT"},
      {'R', "ROOM"},
      {'K', "KID"},
+     {'G', "GUARD"},
      {'L', "LEVEL"},
      {0}};
 
@@ -209,10 +213,41 @@ editor (void)
      {'B', "BLUE"},
      {0}};
 
+  struct menu_item guard_menu[] =
+    {{'S', "SELECT GUARD"},
+     {'J', "JUMP TO START POSITION"},
+     {'P', "SET START POSITION"},
+     {'D', "TOGGLE START DIRECTION"},
+     {'K', "SKILL"},
+     {'L', "LIVES"},
+     {'T', "TYPE"},
+     {'Y', "STYLE"},
+     {0}};
+
+  struct menu_item skill_menu[] =
+    {{'A', "ATTACK"},
+     {'B', "COUNTER ATTACK"},
+     {'D', "DEFENSE"},
+     {'E', "COUNTER DEFENSE"},
+     {'V', "ADVANCE"},
+     {'R', "RETURN"},
+     {'F', "REFRACTION"},
+     {'X', "EXTRA LIFE"},
+     {0}};
+
+  struct menu_item guard_type_menu[] =
+    {{'D', "DISABLED"},
+     {'G', "GUARD"},
+     {'F', "FAT GUARD"},
+     {'V', "VIZIER"},
+     {'S', "SKELETON"},
+     {'H', "SHADOW"},
+     {0}};
+
   struct pos p = mouse_pos;
   struct anim *k;
+  struct guard *g;
 
-  static int b, r, s, t, min, max;
   char *fg_str = NULL, *bg_str = NULL, *ext_str = NULL;
   bool free_ext_str;
   char *str = NULL, c;
@@ -225,6 +260,7 @@ editor (void)
     case 'E': edit = EDIT_EVENT; break;
     case 'R': edit = EDIT_ROOM; break;
     case 'K': edit = EDIT_KID; break;
+    case 'G': edit = EDIT_GUARD; break;
     case 'L': edit = EDIT_LEVEL; break;
     }
     break;
@@ -732,8 +768,7 @@ editor (void)
     }
     break;
   case EDIT_KID:
-    if (room_view == level.start_pos.room)
-      draw_start_kid (screen, vm);
+    draw_start_kid (screen, vm);
     switch (menu_enum (kid_menu, "K>")) {
     case -1: case 1: edit = EDIT_MAIN; break;
     case 'P':
@@ -804,6 +839,151 @@ editor (void)
       break;
     }
     break;
+  case EDIT_GUARD:
+    draw_start_guards (screen, vm);
+    g = &level.guard[guard_index];
+    xasprintf (&str, "G%i>", guard_index);
+    switch (menu_enum (guard_menu, str)) {
+    case -1: case 1: edit = EDIT_MAIN; break;
+    case 'S': edit = EDIT_GUARD_SELECT;
+      s = guard_index; get_mouse_coord (&last_mouse_coord); break;
+    case 'J': mouse2guard (guard_index); break;
+    case 'P':
+      if (! is_valid_pos (&p)) break;
+      g->p = p;
+      break;
+    case 'D':
+      if (room_view != g->p.room) break;
+      g->dir = (g->dir == LEFT) ? RIGHT : LEFT;
+      break;
+    case 'K': edit = EDIT_GUARD_SKILL; break;
+    case 'L': edit = EDIT_GUARD_LIVES;
+      s = g->total_lives; break;
+    case 'T': edit = EDIT_GUARD_TYPE;
+      b = g->type;
+      b0 = (g->type == NO_ANIM) ? true : false;
+      b1 = (g->type == GUARD) ? true : false;
+      b2 = (g->type == FAT_GUARD) ? true : false;
+      b3 = (g->type == VIZIER) ? true : false;
+      b4 = (g->type == SKELETON) ? true : false;
+      b5 = (g->type == SHADOW) ? true : false;
+      break;
+    case 'Y': edit = EDIT_GUARD_STYLE;
+      b = g->style; break;
+    }
+    al_free (str);
+    break;
+  case EDIT_GUARD_SELECT:
+    draw_start_guards (screen, vm);
+    mouse2guard (s);
+    switch (menu_int (&s, NULL, 0, GUARDS - 1, "GS>GUARD", NULL)) {
+    case -1: edit = EDIT_GUARD;
+      set_mouse_coord (&last_mouse_coord); break;
+    case 0: break;
+    case 1:
+      guard_index = s;
+      edit = EDIT_GUARD;
+      break;
+    }
+    break;
+  case EDIT_GUARD_SKILL:
+    draw_start_guards (screen, vm);
+    g = &level.guard[guard_index];
+    xasprintf (&str, "G%iK>", guard_index);
+    switch (menu_enum (skill_menu, str)) {
+    case -1: case 1: edit = EDIT_GUARD; break;
+    case 'A': edit = EDIT_GUARD_SKILL_ATTACK;
+      s = g->skill.attack_prob + 1; break;
+    case 'B': edit = EDIT_GUARD_SKILL_COUNTER_ATTACK;
+      s = g->skill.counter_attack_prob + 1; break;
+    case 'D': edit = EDIT_GUARD_SKILL_DEFENSE;
+      s = g->skill.defense_prob + 1; break;
+    case 'E': edit = EDIT_GUARD_SKILL_COUNTER_DEFENSE;
+      s = g->skill.counter_defense_prob + 1; break;
+    case 'V': edit = EDIT_GUARD_SKILL_ADVANCE;
+      s = g->skill.advance_prob + 1; break;
+    case 'R': edit = EDIT_GUARD_SKILL_RETURN;
+      s = g->skill.return_prob + 1; break;
+    case 'F': edit = EDIT_GUARD_SKILL_REFRACTION;
+      s = g->skill.refraction; break;
+    case 'X': edit = EDIT_GUARD_SKILL_EXTRA_LIFE;
+      s = g->skill.extra_life; break;
+    }
+    al_free (str);
+    break;
+  case EDIT_GUARD_SKILL_ATTACK:
+    menu_skill
+      ("KA>ATTACK", &level.guard[guard_index].skill.attack_prob,
+       100, EDIT_GUARD_SKILL);
+    break;
+  case EDIT_GUARD_SKILL_COUNTER_ATTACK:
+    menu_skill
+      ("KB>C.ATTACK", &level.guard[guard_index].skill.counter_attack_prob,
+       100, EDIT_GUARD_SKILL);
+    break;
+  case EDIT_GUARD_SKILL_DEFENSE:
+    menu_skill
+      ("KD>DEFENSE", &level.guard[guard_index].skill.defense_prob,
+       100, EDIT_GUARD_SKILL);
+    break;
+  case EDIT_GUARD_SKILL_COUNTER_DEFENSE:
+    menu_skill
+      ("KE>C.DEFENSE", &level.guard[guard_index].skill.counter_defense_prob,
+       100, EDIT_GUARD_SKILL);
+    break;
+  case EDIT_GUARD_SKILL_ADVANCE:
+    menu_skill
+      ("KV>ADVANCE", &level.guard[guard_index].skill.advance_prob,
+       100, EDIT_GUARD_SKILL);
+    break;
+  case EDIT_GUARD_SKILL_RETURN:
+    menu_skill
+      ("KR>RETURN", &level.guard[guard_index].skill.return_prob,
+       100, EDIT_GUARD_SKILL);
+    break;
+  case EDIT_GUARD_SKILL_REFRACTION:
+    menu_skill
+      ("KF>REFRACTION", &level.guard[guard_index].skill.refraction,
+       INT_MAX, EDIT_GUARD_SKILL);
+    break;
+  case EDIT_GUARD_SKILL_EXTRA_LIFE:
+    menu_skill
+      ("KX>EXT.LIFE", &level.guard[guard_index].skill.extra_life,
+       INT_MAX, EDIT_GUARD_SKILL);
+    break;
+  case EDIT_GUARD_LIVES:
+    menu_skill
+      ("L>LIVES", &level.guard[guard_index].total_lives,
+       INT_MAX, EDIT_GUARD);
+    break;
+  case EDIT_GUARD_TYPE:
+    draw_start_guards (screen, vm);
+    g = &level.guard[guard_index];
+    xasprintf (&str, "G%iT>", guard_index);
+    switch (menu_bool (guard_type_menu, str, true, &b0, &b1, &b2, &b3, &b4, &b5)) {
+    case -1: edit = EDIT_GUARD; g->type = b; break;
+    case 0: break;
+    case 1: edit = EDIT_GUARD; break;
+    default:
+      if (b0) g->type = NO_ANIM;
+      if (b1) g->type = GUARD;
+      if (b2) g->type = FAT_GUARD;
+      if (b3) g->type = VIZIER;
+      if (b4) g->type = SKELETON;
+      if (b5) g->type = SHADOW;
+      break;
+    }
+    al_free (str);
+    break;
+  case EDIT_GUARD_STYLE:
+    draw_start_guards (screen, vm);
+    g = &level.guard[guard_index];
+    switch (menu_int (&g->style, NULL, 0, 7, "GY>STYLE", NULL)) {
+    case -1: edit = EDIT_GUARD; g->style = b; break;
+    case 0: break;
+    case 1: edit = EDIT_GUARD; break;
+    }
+    break;
   }
 }
 
@@ -825,35 +1005,12 @@ exit_editor (void)
   else draw_bottom_text (NULL, NULL);
 }
 
-void
-editor_level_change (void)
-{
-  switch (edit) {
-  case EDIT_EVENT2FLOOR:
-    last_event2floor_pos = (struct pos) {-1,-1,-1};
-    next_pos_by_pred (&last_event2floor_pos, 0, is_event_at_pos, &last_event);
-    break;
-  case EDIT_ENVIRONMENT:
-    b0 = (level.em == DUNGEON) ? true : false;
-    b1 = (level.em == PALACE) ? true : false;
-    break;
-  case EDIT_HUE:
-    b0 = (level.hue == HUE_NONE) ? true : false;
-    b1 = (level.hue == HUE_GREEN) ? true : false;
-    b2 = (level.hue == HUE_GRAY) ? true : false;
-    b3 = (level.hue == HUE_YELLOW) ? true : false;
-    b4 = (level.hue == HUE_BLUE) ? true : false;
-    break;
-  default: break;
-  }
-}
-
-static void
+static char
 menu_step_ext (struct pos *p, int max)
 {
   int r = con (p)->ext.step;
-  int b = -1;
-  if (menu_int (&r, &b, 0, max, "CE>STEP", NULL))
+  char c = menu_int (&r, NULL, 0, max, "CE>STEP", NULL);
+  if (c)
     edit = EDIT_CON;
   else {
     if (con (p)->ext.step != r) {
@@ -862,14 +1019,15 @@ menu_step_ext (struct pos *p, int max)
       register_con_at_pos (p);
     }
   }
+  return c;
 }
 
-static void
+static char
 menu_event_ext (struct pos *p)
 {
   int r = con (p)->ext.event;
-  int b = -1;
-  if (menu_int (&r, &b, 0, EVENTS - 1, "CE>EVENT", NULL))
+  char c = menu_int (&r, NULL, 0, EVENTS - 1, "CE>EVENT", NULL);
+  if (c)
     edit = EDIT_CON;
   else {
     if (con (p)->ext.event != r) {
@@ -878,23 +1036,22 @@ menu_event_ext (struct pos *p)
       register_con_at_pos (p);
     }
   }
+  return c;
 }
 
-static int
+static char
 menu_select_room (enum edit up_edit, char *prefix)
 {
-  int b = -1;
-  int r = menu_int (&room_view, &b, 0, ROOMS - 1, prefix, NULL);
+  char r = menu_int (&room_view, NULL, 0, ROOMS - 1, prefix, NULL);
   switch (r) {
   case -1: edit = up_edit; set_mouse_coord (&last_mouse_coord); break;
   case 0: break;
   case 1: edit = up_edit; break;
   }
-
   return r;
 }
 
-static int
+static char
 menu_link (enum dir dir)
 {
   char *prefix, c;
@@ -907,8 +1064,8 @@ menu_link (enum dir dir)
   }
 
   xasprintf (&prefix, "RL%c>ROOM", c);
-
-  int r = menu_select_room (EDIT_LINK, prefix);
+  char r = menu_select_room (EDIT_LINK, prefix);
+  al_free (prefix);
 
   if (r == 1) {
     int room0 = last_mouse_coord.room;
@@ -931,7 +1088,36 @@ menu_link (enum dir dir)
     update_wall_cache (room_view, em, vm);
   }
 
-  al_free (prefix);
-
   return r;
+}
+
+static void
+mouse2guard (int i)
+{
+  struct guard *g = &level.guard[i];
+  if (g->type != NO_ANIM) set_mouse_pos (&g->p);
+  else {
+    struct coord c = {room_view, 0, 0};
+    set_mouse_coord (&c);
+  }
+}
+
+static char
+menu_skill (char *prefix, int *skill, int max, enum edit up_edit)
+{
+  draw_start_guards (screen, vm);
+  char *str;
+  xasprintf (&str, "G%i%s", guard_index, prefix);
+  char c = menu_int (&s, NULL, 0, max, str, NULL);
+  al_free (str);
+  switch (c) {
+  case -1: edit = up_edit; break;
+  case 0: break;
+  case 1:
+    if (max <= 100) *skill = s - 1;
+    else *skill = s;
+    edit = up_edit;
+    break;
+  }
+  return c;
 }

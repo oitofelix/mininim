@@ -28,6 +28,5 @@ extern enum edit last_edit;
 void editor (void);
 void enter_editor (void);
 void exit_editor (void);
-void editor_level_change (void);
 
 #endif	/* MININIM_EDITOR_H */
