@@ -63,12 +63,6 @@ play_level (struct level *lv)
   last_auto_show_time = -1;
   current_kid_id = 0;
 
-  if (level.nominal_number >= 0) {
-    xasprintf (&text, "LEVEL %i", level.nominal_number);
-    draw_bottom_text (NULL, text);
-    al_free (text);
-  }
-
   al_stop_timer (death_timer);
   al_set_timer_count (death_timer, 0);
 
@@ -80,6 +74,12 @@ play_level (struct level *lv)
 
   edit = EDIT_MAIN;
   exit_editor ();
+
+  if (level.nominal_number >= 0) {
+    xasprintf (&text, "LEVEL %i", level.nominal_number);
+    draw_bottom_text (NULL, text);
+    al_free (text);
+  }
 
   play_anim (draw_level, compute_level, 12);
 

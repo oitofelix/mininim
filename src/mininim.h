@@ -144,6 +144,7 @@
 #include "kid-die.h"
 #include "kid-stairs.h"
 
+#include "native-level.h"
 #include "consistency-level.h"
 #include "legacy-level.h"
 #include "dat-level.h"

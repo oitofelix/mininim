@@ -21,6 +21,7 @@
 #define MININIM_PHYSICS_H
 
 /* functions */
+struct con *xcon (struct level *l, struct pos *p);
 struct con *con (struct pos *p);
 struct con *crel (struct pos *p, int floor, int place);
 bool is_frame_visible (struct frame *f);

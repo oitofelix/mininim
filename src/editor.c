@@ -198,6 +198,7 @@ editor (void)
   struct menu_item level_menu[] =
     {{'E', "ENVIRONMENT"},
      {'H', "HUE"},
+     {'S', "SAVE"},
      {0}};
 
   struct menu_item environment_menu[] =
@@ -806,6 +807,7 @@ editor (void)
       b3 = (level.hue == HUE_YELLOW) ? true : false;
       b4 = (level.hue == HUE_BLUE) ? true : false;
       break;
+    case 'S': save_native_level (&level, "t.mim"); break;
     }
    break;
   case EDIT_ENVIRONMENT:
