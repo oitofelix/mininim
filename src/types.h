@@ -48,15 +48,15 @@ struct dim {
 };
 
 enum dir {
-  LEFT, RIGHT, ABOVE, BELOW
+  LEFT = 0, RIGHT = 1, ABOVE = 2, BELOW = 3,
 };
 
 enum carpet_design {
-  CARPET_00,
-  CARPET_01,
-  ARCH_CARPET_LEFT,
-  ARCH_CARPET_RIGHT_00,
-  ARCH_CARPET_RIGHT_01,
+  CARPET_00 = 0,
+  CARPET_01 = 1,
+  ARCH_CARPET_LEFT = 2,
+  ARCH_CARPET_RIGHT_00 = 3,
+  ARCH_CARPET_RIGHT_01 = 4,
 };
 
 enum gm {
@@ -64,7 +64,8 @@ enum gm {
 };
 
 enum anim_type {
-  NO_ANIM, KID, SHADOW, GUARD, FAT_GUARD, SKELETON, VIZIER, PRINCESS, MOUSE
+  NO_ANIM = 0, KID = 1, SHADOW = 2, GUARD = 3, FAT_GUARD = 4,
+  SKELETON = 5, VIZIER = 6, PRINCESS = 7, MOUSE = 8,
 };
 
 struct skill {
@@ -93,64 +94,64 @@ struct level {
 
   struct con {
     enum confg {
-      NO_FLOOR,
-      FLOOR,
-      BROKEN_FLOOR,
-      SKELETON_FLOOR,
-      LOOSE_FLOOR,
-      SPIKES_FLOOR,
-      OPENER_FLOOR,
-      CLOSER_FLOOR,
-      STUCK_FLOOR,
-      HIDDEN_FLOOR,
-      PILLAR,
-      BIG_PILLAR_BOTTOM,
-      BIG_PILLAR_TOP,
-      WALL,
-      DOOR,
-      LEVEL_DOOR,
-      CHOPPER,
-      MIRROR,
-      CARPET,
-      TCARPET,
-      ARCH_BOTTOM,
-      ARCH_TOP_LEFT,
-      ARCH_TOP_RIGHT,
-      ARCH_TOP_MID,
-      ARCH_TOP_SMALL,
+      NO_FLOOR = 0,
+      FLOOR = 1,
+      BROKEN_FLOOR = 2,
+      SKELETON_FLOOR = 3,
+      LOOSE_FLOOR = 4,
+      SPIKES_FLOOR = 5,
+      OPENER_FLOOR = 6,
+      CLOSER_FLOOR = 7,
+      STUCK_FLOOR = 8,
+      HIDDEN_FLOOR = 9,
+      PILLAR = 10,
+      BIG_PILLAR_BOTTOM = 11,
+      BIG_PILLAR_TOP = 12,
+      WALL = 13,
+      DOOR = 14,
+      LEVEL_DOOR = 15,
+      CHOPPER = 16,
+      MIRROR = 17,
+      CARPET = 18,
+      TCARPET = 19,
+      ARCH_BOTTOM = 20,
+      ARCH_TOP_LEFT = 21,
+      ARCH_TOP_RIGHT = 22,
+      ARCH_TOP_MID = 23,
+      ARCH_TOP_SMALL = 24,
     } fg;
     enum conbg {
-      NO_BG,
-      BRICKS_00,
-      BRICKS_01,
-      BRICKS_02,
-      BRICKS_03,
-      NO_BRICKS,
-      TORCH,
-      WINDOW,
-      BALCONY,
+      NO_BG = 0,
+      BRICKS_00 = 1,
+      BRICKS_01 = 2,
+      BRICKS_02 = 3,
+      BRICKS_03 = 4,
+      NO_BRICKS = 5,
+      TORCH = 6,
+      WINDOW = 7,
+      BALCONY = 8,
     } bg;
     union conext {
       int event;
       int design;
       int step;
-      bool cant_fall;
+      int cant_fall;
       enum item {
-        NO_ITEM,
-        EMPTY_POTION,
-        SMALL_LIFE_POTION,
-        BIG_LIFE_POTION,
-        SMALL_POISON_POTION,
-        BIG_POISON_POTION,
-        FLOAT_POTION,
-        FLIP_POTION,
-        ACTIVATION_POTION,
-        SWORD,
+        NO_ITEM = 0,
+        EMPTY_POTION = 1,
+        SMALL_LIFE_POTION = 2,
+        BIG_LIFE_POTION = 3,
+        SMALL_POISON_POTION = 4,
+        BIG_POISON_POTION = 5,
+        FLOAT_POTION = 6,
+        FLIP_POTION = 7,
+        ACTIVATION_POTION = 8,
+        SWORD = 9,
       } item;
     } ext;
   } con[ROOMS][FLOORS][PLACES];
 
-  struct {
+  struct room_linking {
     int l, r, a, b;
   } link[ROOMS];
 

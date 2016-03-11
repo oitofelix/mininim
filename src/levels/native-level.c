@@ -24,35 +24,98 @@ save_native_level (struct level *l, char *filename)
 {
   ALLEGRO_CONFIG *c = create_config ();
   char *s, *v;
+  int i;
 
   /* MININIM LEVEL FILE */
   al_add_config_comment (c, NULL, "MININIM LEVEL FILE");
+
+  /* NOMINAL NUMBER */
+  /* N=n */
+  xasprintf (&v, "%i", l->nominal_number);
+  al_set_config_value (c, NULL, "N", v);
+  al_free (v);
+
+  /* START POSITION AND DIRECTION*/
+  /* P=r f p d */
+  struct pos *sp = &l->start_pos;
+  xasprintf (&v, "%i %i %i %i", sp->room, sp->floor, sp->place, l->start_dir);
+  al_set_config_value (c, NULL, "P", v);
+  al_free (v);
+
+  /* ENVIRONMENT AND HUE */
+  /* S=e h */
+  xasprintf (&v, "%i %i", l->em, l->hue);
+  al_set_config_value (c, NULL, "S", v);
+  al_free (v);
+
+  /* GUARDS */
+  for (i = 0; i < GUARDS; i++) {
+    struct guard *g = &l->guard[i];
+
+    /* GUARD TYPE AND STYLE */
+    /* GiT=t s */
+    xasprintf (&s, "G%iT", i);
+    xasprintf (&v, "%i %i", g->type, g->style);
+    al_set_config_value (c, NULL, s, v);
+    al_free (s);
+    al_free (v);
+
+    /* GUARD START POSITION AND DIRECTION */
+    /* GiP=r f p d */
+    xasprintf (&s, "G%iP", i);
+    xasprintf (&v, "%i %i %i %i", g->p.room, g->p.floor, g->p.place, g->dir);
+    al_set_config_value (c, NULL, s, v);
+    al_free (s);
+    al_free (v);
+
+    /* GUARD SKILLS AND TOTAL LIVES */
+    /* GiK=a b d e a r f x l */
+    xasprintf (&s, "G%iK", i);
+    xasprintf (&v, "%i %i %i %i %i %i %i %i %i",
+               g->skill.attack_prob, g->skill.counter_attack_prob,
+               g->skill.defense_prob, g->skill.counter_defense_prob,
+               g->skill.advance_prob, g->skill.return_prob,
+               g->skill.refraction, g->skill.extra_life,
+               g->total_lives);
+    al_set_config_value (c, NULL, s, v);
+    al_free (s);
+    al_free (v);
+  }
+
+  /* LINKS */
+  for (i = 0; i < ROOMS; i++) {
+    /* Li=l r a b */
+    struct room_linking *r = &l->link[i];
+    xasprintf (&s, "L%i", i);
+    xasprintf (&v, "%i %i %i %i", r->l, r->r, r->a, r->b);
+    al_set_config_value (c, NULL, s, v);
+    al_free (s);
+    al_free (v);
+  }
+
+  /* EVENTS */
+  for (i = 0; i < EVENTS; i++) {
+    /* Ei=r f p n*/
+    struct level_event *e = &l->event[i];
+    xasprintf (&s, "E%i", i);
+    xasprintf (&v, "%i %i %i %i", e->p.room, e->p.floor, e->p.place, e->next);
+    al_set_config_value (c, NULL, s, v);
+    al_free (s);
+    al_free (v);
+  }
 
   /* CONSTRUCTIONS */
   struct pos p;
   for (p.room = 0; p.room < ROOMS; p.room++)
     for (p.floor = 0; p.floor < FLOORS; p.floor++)
       for (p.place = 0; p.place < PLACES; p.place++) {
-
-        /* [CON r f p] */
-        xasprintf (&s, "CON %i %i %i", p.room, p.floor, p.place);
-
-        /* FG= */
-        v = get_confg_str (l, &p);
-        if (v) al_set_config_value (c, s, "FG", v);
-
-        /* BG= */
-        v = get_conbg_str (l, &p);
-        if (v) al_set_config_value (c, s, "BG", v);
-
-        /* EXT= */
-        v = get_conext_str (l, &p);
-        if (v) {
-         al_set_config_value (c, s, "EXT", v);
-         al_free (v);
-        }
-
+        /* Cr f p=f b e*/
+        xasprintf (&s, "C%i %i %i", p.room, p.floor, p.place);
+        xasprintf (&v, "%i %i %i", xcon (l, &p)->fg,
+                   xcon (l, &p)->bg, xcon (l, &p)->ext);
+        al_set_config_value (c, NULL, s, v);
         al_free (s);
+        al_free (v);
       }
 
   save_config_file (filename, c);
