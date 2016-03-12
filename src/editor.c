@@ -193,12 +193,13 @@ editor (void)
      {'S', "SET START POSITION"},
      {'J', "JUMP TO START POSITION"},
      {'D', "TOGGLE START DIRECTION"},
+     {'W', "TOGGLE HAS SWORD"},
      {0}};
 
   struct menu_item level_menu[] =
     {{'E', "ENVIRONMENT"},
      {'H', "HUE"},
-     {'S', "SAVE"},
+     {'S', "SAVE LEVEL"},
      {0}};
 
   struct menu_item environment_menu[] =
@@ -791,6 +792,10 @@ editor (void)
       if (room_view != level.start_pos.room) break;
       level.start_dir = (level.start_dir == LEFT) ? RIGHT : LEFT;
       break;
+    case 'W':
+      if (room_view != level.start_pos.room) break;
+      level.has_sword = ! level.has_sword;
+      break;
     }
     break;
   case EDIT_LEVEL:
@@ -807,7 +812,12 @@ editor (void)
       b3 = (level.hue == HUE_YELLOW) ? true : false;
       b4 = (level.hue == HUE_BLUE) ? true : false;
       break;
-    case 'S': save_native_level (&level, "t.mim"); break;
+    case 'S':
+      *vanilla_level = level;
+      /* xasprintf (&str, "data/levels/%02d.mim", level.number); */
+      /* save_native_level (&level, str); */
+      /* al_free (str); */
+      break;
     }
    break;
   case EDIT_ENVIRONMENT:

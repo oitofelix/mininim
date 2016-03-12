@@ -210,7 +210,7 @@ menu_int (int *v, int *b, int min, int max, char *pref_int, char *pref_bool)
     xasprintf (&str, "%i%c", *v, c);
     if (sscanf (str, "%d", &r) != 1) r = *v;
     al_free (str);
-    *v = (*v >= max) ? max : r;
+    *v = (r >= max) ? max : r;
     break;
   case '\\':
     *v = (*v <= min) ? min : *v / 10;

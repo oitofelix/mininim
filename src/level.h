@@ -27,6 +27,7 @@ extern int camera_follow_kid;
 extern int anti_camera_room;
 extern int auto_rem_time_1st_cycle;
 extern bool no_room_drawing, game_paused, step_one_cycle;
+extern struct level *vanilla_level;
 
 void load_level (void);
 void unload_level (void);

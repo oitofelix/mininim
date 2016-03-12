@@ -115,6 +115,10 @@ enum lm_exit {
   LM_EXIT_MOST_OPEN = 0xFF,
 };
 
+void legacy_level_start (void);
+void legacy_level_special_events (void);
+void legacy_level_end (struct pos *p);
+
 void play_legacy_level (int number);
 void interpret_legacy_level (int number);
 extern struct legacy_level lv;

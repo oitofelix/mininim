@@ -28,6 +28,13 @@ load_resource (char *filename, load_resource_f lrf)
   char *resources_path_filename;
   char *system_data_path_filename;
 
+  /* user data path */
+  if (! resource) {
+    xasprintf (&user_data_path_filename, "%s/%s", user_data_dir, filename);
+    resource = lrf (user_data_path_filename);
+    al_free (user_data_path_filename);
+  }
+
   /* data path */
   if (data_dir && ! resource) {
     xasprintf (&data_path_filename, "%s/%s", data_dir, filename);
@@ -37,13 +44,6 @@ load_resource (char *filename, load_resource_f lrf)
 
   /* current working directory */
   if (! resource) resource = lrf (filename);
-
-  /* user data path */
-  if (! resource) {
-    xasprintf (&user_data_path_filename, "%s/%s", user_data_dir, filename);
-    resource = lrf (user_data_path_filename);
-    al_free (user_data_path_filename);
-  }
 
   /* resources path */
   if (! resource) {

@@ -19,11 +19,166 @@
 
 #include "mininim.h"
 
+static void next_level (int number);
+
+struct level native_level;
+
+void
+play_native_level (int number)
+{
+  next_level (number);
+  play_level (&native_level);
+}
+
+static void
+next_level (int number)
+{
+  if (number < 1 || number > 14) number = 1;
+  load_native_level (number, &native_level);
+}
+
+void
+load_native_level (int number, struct level *l)
+{
+  char *filename;
+  xasprintf (&filename, "data/levels/%02d.mim", number);
+
+  ALLEGRO_CONFIG *c =
+    load_resource (filename, (load_resource_f) al_load_config_file);
+
+  if (! c)
+    error (-1, 0, "cannot read native level file %s", filename);
+
+  al_free (filename);
+
+  char *k;
+  const char *v;
+  int i;
+
+  memset (l, 0, sizeof (*l));
+
+  l->number = number;
+  l->start = legacy_level_start;
+  l->special_events = legacy_level_special_events;
+  l->end = legacy_level_end;
+  l->next_level = next_level;
+
+  /* CUTSCENES: ok */
+  switch (number) {
+  default: break;
+  case 1: l->cutscene = cutscene_01_05_11_anim; break;
+  case 3: l->cutscene = cutscene_03_anim; break;
+  case 5: l->cutscene = cutscene_01_05_11_anim; break;
+  case 7: l->cutscene = cutscene_07_anim; break;
+  case 8: l->cutscene = cutscene_08_anim; break;
+  case 11: l->cutscene = cutscene_11_anim; break;
+  case 14: l->cutscene = cutscene_14_anim; break;
+  }
+
+  /* NOMINAL NUMBER */
+  /* N=n */
+  l->nominal_number = number;
+  v = al_get_config_value (c, NULL, "N");
+  if (v) sscanf (v, "%i", &l->nominal_number);
+
+  /* START POSITION AND DIRECTION */
+  /* P=r f p d s */
+  struct pos *sp = &l->start_pos;
+  sp->room = 1, sp->floor = 0, sp->place = 0,
+    l->start_dir = LEFT, l->has_sword = false;
+  v = al_get_config_value (c, NULL, "P");
+  if (v) sscanf (v, "%i %i %i %i %i", &sp->room, &sp->floor, &sp->place,
+                 (int *) &l->start_dir, (int *) &l->has_sword);
+
+  /* ENVIRONMENT AND HUE */
+  /* S=e h */
+  l->em = DUNGEON, l->hue = HUE_NONE;
+  v = al_get_config_value (c, NULL, "S");
+  if (v) sscanf (v, "%i %i", (int *) &l->em, (int *) &l->hue);
+
+  /* GUARDS */
+  for (i = 0;; i++) {
+    struct guard *g = &l->guard[i];
+
+    /* GUARD TYPE AND STYLE */
+    /* GiT=t s */
+    xasprintf (&k, "G%iT", i);
+    v = al_get_config_value (c, NULL, k);
+    al_free (k);
+    if (! v) break;
+    g->type = NO_ANIM, g->style = 0;
+    sscanf (v, "%i %i", (int *) &g->type, (int *) &g->style);
+
+    /* GUARD START POSITION AND DIRECTION */
+    /* GiP=r f p d */
+    xasprintf (&k, "G%iP", i);
+    v = al_get_config_value (c, NULL, k);
+    al_free (k);
+    if (! v) break;
+    g->p.room = 0, g->p.floor = 0, g->p.place = 0, g->dir = LEFT;
+    sscanf (v, "%i %i %i %i", &g->p.room, &g->p.floor, &g->p.place,
+            (int *) &g->dir);
+
+    /* GUARD SKILLS AND TOTAL LIVES */
+    /* GiK=a b d e a r f x l */
+    xasprintf (&k, "G%iK", i);
+    v = al_get_config_value (c, NULL, k);
+    al_free (k);
+    if (! v) break;
+    sscanf (v, "%i %i %i %i %i %i %i %i %i",
+            &g->skill.attack_prob, &g->skill.counter_attack_prob,
+            &g->skill.defense_prob, &g->skill.counter_defense_prob,
+            &g->skill.advance_prob, &g->skill.return_prob,
+            &g->skill.refraction, &g->skill.extra_life,
+            &g->total_lives);
+  }
+
+  /* LINKS */
+  for (i = 0;; i++) {
+    /* Li=l r a b */
+    struct room_linking *r = &l->link[i];
+    xasprintf (&k, "L%i", i);
+    v = al_get_config_value (c, NULL, k);
+    al_free (k);
+    if (! v) break;
+    sscanf (v, "%i %i %i %i", &r->l, &r->r, &r->a, &r->b);
+  }
+
+  /* EVENTS */
+  for (i = 0;; i++) {
+    /* Ei=r f p n*/
+    struct level_event *e = &l->event[i];
+    xasprintf (&k, "E%i", i);
+    v = al_get_config_value (c, NULL, k);
+    al_free (k);
+    if (! v) break;
+    sscanf (v, "%i %i %i %i", &e->p.room, &e->p.floor, &e->p.place,
+            (int *) &e->next);
+  }
+
+  /* CONSTRUCTIONS */
+  struct pos p;
+  for (p.room = 0;; p.room++)
+    for (p.floor = 0; p.floor < FLOORS; p.floor++)
+      for (p.place = 0; p.place < PLACES; p.place++) {
+        xasprintf (&k, "C%i %i %i", p.room, p.floor, p.place);
+        v = al_get_config_value (c, NULL, k);
+        al_free (k);
+        if (! v) goto end_con_loop;
+        sscanf (v, "%i %i %i", (int *) &xcon(l, &p)->fg,
+                (int *) &xcon (l, &p)->bg,
+                (int *) &xcon (l, &p)->ext);
+      }
+ end_con_loop:
+
+  al_destroy_config (c);
+}
+
 void
 save_native_level (struct level *l, char *filename)
 {
   ALLEGRO_CONFIG *c = create_config ();
-  char *s, *v;
+  char *k, *v;
   int i;
 
   /* MININIM LEVEL FILE */
@@ -36,9 +191,10 @@ save_native_level (struct level *l, char *filename)
   al_free (v);
 
   /* START POSITION AND DIRECTION*/
-  /* P=r f p d */
+  /* P=r f p d s */
   struct pos *sp = &l->start_pos;
-  xasprintf (&v, "%i %i %i %i", sp->room, sp->floor, sp->place, l->start_dir);
+  xasprintf (&v, "%i %i %i %i %i", sp->room, sp->floor, sp->place,
+             l->start_dir, l->has_sword);
   al_set_config_value (c, NULL, "P", v);
   al_free (v);
 
@@ -54,31 +210,31 @@ save_native_level (struct level *l, char *filename)
 
     /* GUARD TYPE AND STYLE */
     /* GiT=t s */
-    xasprintf (&s, "G%iT", i);
+    xasprintf (&k, "G%iT", i);
     xasprintf (&v, "%i %i", g->type, g->style);
-    al_set_config_value (c, NULL, s, v);
-    al_free (s);
+    al_set_config_value (c, NULL, k, v);
+    al_free (k);
     al_free (v);
 
     /* GUARD START POSITION AND DIRECTION */
     /* GiP=r f p d */
-    xasprintf (&s, "G%iP", i);
+    xasprintf (&k, "G%iP", i);
     xasprintf (&v, "%i %i %i %i", g->p.room, g->p.floor, g->p.place, g->dir);
-    al_set_config_value (c, NULL, s, v);
-    al_free (s);
+    al_set_config_value (c, NULL, k, v);
+    al_free (k);
     al_free (v);
 
     /* GUARD SKILLS AND TOTAL LIVES */
     /* GiK=a b d e a r f x l */
-    xasprintf (&s, "G%iK", i);
+    xasprintf (&k, "G%iK", i);
     xasprintf (&v, "%i %i %i %i %i %i %i %i %i",
                g->skill.attack_prob, g->skill.counter_attack_prob,
                g->skill.defense_prob, g->skill.counter_defense_prob,
                g->skill.advance_prob, g->skill.return_prob,
                g->skill.refraction, g->skill.extra_life,
                g->total_lives);
-    al_set_config_value (c, NULL, s, v);
-    al_free (s);
+    al_set_config_value (c, NULL, k, v);
+    al_free (k);
     al_free (v);
   }
 
@@ -86,10 +242,10 @@ save_native_level (struct level *l, char *filename)
   for (i = 0; i < ROOMS; i++) {
     /* Li=l r a b */
     struct room_linking *r = &l->link[i];
-    xasprintf (&s, "L%i", i);
+    xasprintf (&k, "L%i", i);
     xasprintf (&v, "%i %i %i %i", r->l, r->r, r->a, r->b);
-    al_set_config_value (c, NULL, s, v);
-    al_free (s);
+    al_set_config_value (c, NULL, k, v);
+    al_free (k);
     al_free (v);
   }
 
@@ -97,10 +253,10 @@ save_native_level (struct level *l, char *filename)
   for (i = 0; i < EVENTS; i++) {
     /* Ei=r f p n*/
     struct level_event *e = &l->event[i];
-    xasprintf (&s, "E%i", i);
+    xasprintf (&k, "E%i", i);
     xasprintf (&v, "%i %i %i %i", e->p.room, e->p.floor, e->p.place, e->next);
-    al_set_config_value (c, NULL, s, v);
-    al_free (s);
+    al_set_config_value (c, NULL, k, v);
+    al_free (k);
     al_free (v);
   }
 
@@ -110,11 +266,11 @@ save_native_level (struct level *l, char *filename)
     for (p.floor = 0; p.floor < FLOORS; p.floor++)
       for (p.place = 0; p.place < PLACES; p.place++) {
         /* Cr f p=f b e*/
-        xasprintf (&s, "C%i %i %i", p.room, p.floor, p.place);
+        xasprintf (&k, "C%i %i %i", p.room, p.floor, p.place);
         xasprintf (&v, "%i %i %i", xcon (l, &p)->fg,
                    xcon (l, &p)->bg, xcon (l, &p)->ext);
-        al_set_config_value (c, NULL, s, v);
-        al_free (s);
+        al_set_config_value (c, NULL, k, v);
+        al_free (k);
         al_free (v);
       }
 

@@ -571,7 +571,7 @@ draw_level (void)
   for (p.floor = FLOORS; p.floor >= -1; p.floor--)
     for (p.place = -1; p.place < PLACES; p.place++) {
       draw_potion (screen, &p, em, vm);
-      draw_sword (screen, &p, vm);
+      if (is_sword (&p)) draw_sword (screen, &p, vm);
     }
 
   draw_lives (uscreen, get_anim_by_id (current_kid_id), vm);

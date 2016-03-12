@@ -19,6 +19,8 @@
 
 #include "mininim.h"
 
+enum level_module level_module = LEGACY_LEVEL_MODULE;
+
 struct config_info {
   enum {
     CI_CONFIGURATION_FILE, CI_ENVIRONMENT_VARIABLES,
@@ -103,7 +105,7 @@ static struct argp_option options[] = {
 
   /* Level */
   {NULL, 0, NULL, 0, "Level:", 0},
-  {"level-module", LEVEL_MODULE_OPTION, "LEVEL-MODULE", 0, "Select level module.  A level module determines a way to generate consecutive levels for use by the engine.  Valid values for LEVEL-MODULE are: LEGACY, PLV, DAT and CONSISTENCY.  LEGACY is the module designed to read the original PoP 1 raw level files.  PLV is the module designed to read the original PoP 1 PLV extended level files.  DAT is the module designed to read the original PoP 1 LEVELS.DAT file.  CONSISTENCY is the module designed to generate random-corrected levels for accessing the engine robustness.  The default is LEGACY.", 0},
+  {"level-module", LEVEL_MODULE_OPTION, "LEVEL-MODULE", 0, "Select level module.  A level module determines a way to generate consecutive levels for use by the engine.  Valid values for LEVEL-MODULE are: NATIVE, LEGACY, PLV, DAT and CONSISTENCY.  NATIVE is the module designed to read the native format that supports all features.  LEGACY is the module designed to read the original PoP 1 raw level files.  PLV is the module designed to read the original PoP 1 PLV extended level files.  DAT is the module designed to read the original PoP 1 LEVELS.DAT file.  CONSISTENCY is the module designed to generate random-corrected levels for accessing the engine robustness.  The default is NATIVE.", 0},
   {"start-level", START_LEVEL_OPTION, "N", 0, "Make the kid start at level N.  The default is 1.  Valid integers range from 1 to INT_MAX.  This can be changed in-game by the SHIFT+L key binding.", 0},
   {"start-pos", START_POS_OPTION, "R,F,P", 0, "Make the kid start at room R, floor F and place P.  The default is to let this decision to the level module.  R is an integer ranging from 1 to INT_MAX, F is an integer ranging from 0 to 2 and P is an integer ranging from 0 to 9.", 0},
   {NULL, 0, NULL, OPTION_DOC, "If the option '--level-module' is not given and there is a LEVELS.DAT file in the resources directory, the DAT level module is automatically used to load that file.  This is a compatibility measure for applications which depend upon this legacy behavior.", 0},
@@ -149,7 +151,7 @@ static struct argp_option options[] = {
 
   /* Paths */
   {NULL, 0, NULL, 0, "Paths:", 0},
-  {"data-path", DATA_PATH_OPTION, "PATH", 0, "Set data path to PATH.  Normally, the data files are looked for in the current working directory, then in the user data directory, then in the resources directory, and finally in the system data directory.  If this option is given, before looking there the data files are looked for in PATH.", 0},
+  {"data-path", DATA_PATH_OPTION, "PATH", 0, "Set data path to PATH.  Normally, the data files are looked for in the user data directory, then in the current working directory, then in the resources directory, and finally in the system data directory.  If this option is given, after looking in the user data directory the data files are looked for in PATH.", 0},
   {"print-paths", PRINT_PATHS_OPTION, NULL, 0, "Print paths and exit.", 0},
 
   /* Others */
@@ -528,7 +530,7 @@ parser (int key, char *arg, struct argp_state *state)
   float float_val;
   int int_val0, int_val1, int_val2;
 
-  char *level_module_enum[] = {"LEGACY", "PLV", "DAT", "CONSISTENCY", NULL};
+  char *level_module_enum[] = {"NATIVE", "LEGACY", "PLV", "DAT", "CONSISTENCY", NULL};
 
   char *video_mode_enum[] = {"VGA", "EGA", "CGA", "HGC", NULL};
 
@@ -594,10 +596,11 @@ parser (int key, char *arg, struct argp_state *state)
     if (e) return e;
     level_module_given = true;
     switch (i) {
-    case 0: level_module = LEGACY_LEVEL_MODULE; break;
-    case 1: level_module = PLV_LEVEL_MODULE; break;
-    case 2: level_module = DAT_LEVEL_MODULE; break;
-    case 3: level_module = CONSISTENCY_LEVEL_MODULE; break;
+    case 0: level_module = NATIVE_LEVEL_MODULE; break;
+    case 1: level_module = LEGACY_LEVEL_MODULE; break;
+    case 2: level_module = PLV_LEVEL_MODULE; break;
+    case 3: level_module = DAT_LEVEL_MODULE; break;
+    case 4: level_module = CONSISTENCY_LEVEL_MODULE; break;
     }
     break;
   case VIDEO_MODE_OPTION:
@@ -1105,7 +1108,10 @@ main (int _argc, char **_argv)
   }
 
   switch (level_module) {
-  case LEGACY_LEVEL_MODULE: default:
+  case NATIVE_LEVEL_MODULE: default:
+    play_native_level (start_level);
+    break;
+  case LEGACY_LEVEL_MODULE:
     play_legacy_level (start_level);
     break;
   case PLV_LEVEL_MODULE:

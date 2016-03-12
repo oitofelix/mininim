@@ -169,6 +169,7 @@ int min_int (int a, int b);
 unsigned char add_char (unsigned char a, signed char b);
 
 /* variables */
+extern enum level_module level_module;
 extern ALLEGRO_TIMER *play_time;
 extern enum vm vm;
 extern enum gm gm;

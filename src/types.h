@@ -92,6 +92,36 @@ struct level {
   int number;
   int nominal_number;
 
+  struct pos start_pos;
+  enum dir start_dir;
+  bool has_sword;
+
+  enum em {
+    DUNGEON, PALACE,
+  } em;
+
+  enum hue {
+    HUE_NONE, HUE_GREEN, HUE_GRAY, HUE_YELLOW, HUE_BLUE,
+  } hue;
+
+  struct room_linking {
+    int l, r, a, b;
+  } link[ROOMS];
+
+  struct level_event {
+    struct pos p;
+    bool next;
+  } event[EVENTS];
+
+  struct guard {
+    enum anim_type type;
+    struct pos p;
+    enum dir dir;
+    struct skill skill;
+    int total_lives;
+    int style;
+  } guard[GUARDS];
+
   struct con {
     enum confg {
       NO_FLOOR = 0,
@@ -150,35 +180,6 @@ struct level {
       } item;
     } ext;
   } con[ROOMS][FLOORS][PLACES];
-
-  struct room_linking {
-    int l, r, a, b;
-  } link[ROOMS];
-
-  struct level_event {
-    struct pos p;
-    bool next;
-  } event[EVENTS];
-
-  struct pos start_pos;
-  enum dir start_dir;
-
-  struct guard {
-    enum anim_type type;
-    struct pos p;
-    enum dir dir;
-    struct skill skill;
-    int total_lives;
-    int style;
-  } guard[GUARDS];
-
-  enum em {
-    DUNGEON, PALACE,
-  } em;
-
-  enum hue {
-    HUE_NONE, HUE_GREEN, HUE_GRAY, HUE_YELLOW, HUE_BLUE,
-  } hue;
 };
 
 struct legacy_level {
@@ -371,8 +372,9 @@ enum options {
 };
 
 enum level_module {
-  LEGACY_LEVEL_MODULE, PLV_LEVEL_MODULE, DAT_LEVEL_MODULE, CONSISTENCY_LEVEL_MODULE,
-} level_module;
+  NATIVE_LEVEL_MODULE, LEGACY_LEVEL_MODULE, PLV_LEVEL_MODULE,
+  DAT_LEVEL_MODULE, CONSISTENCY_LEVEL_MODULE,
+};
 
 enum edit {
   EDIT_NONE, EDIT_MAIN, EDIT_CON, EDIT_FG, EDIT_FLOOR, EDIT_PILLAR,

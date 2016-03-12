@@ -196,8 +196,13 @@ draw_sword (ALLEGRO_BITMAP *bitmap, struct pos *p, enum vm vm)
     shiny_sword = apply_palette (shiny_sword, hgc_palette);
   }
 
+  if (edit == EDIT_KID && peq (p, &level.start_pos)) {
+    normal_sword = apply_palette (normal_sword, start_anim_palette);
+    shiny_sword = apply_palette (shiny_sword, start_anim_palette);
+  }
+
   struct coord c;
-  if (! is_sword (p)) return;
+  /* if (! is_sword (p)) return; */
   ALLEGRO_BITMAP *sword = anim_cycle % 60 ? normal_sword : shiny_sword;
   seedp (p);
   draw_bitmapc (sword, bitmap, sword_coord (p, &c),

@@ -1925,6 +1925,8 @@ binding.
 
 @table @option
 @optindex --level-module
+@cindex @samp{NATIVE} level module
+@cindex level module, @samp{NATIVE}
 @cindex @samp{LEGACY} level module
 @cindex level module, @samp{LEGACY}
 @cindex @samp{PLV} level module
@@ -1936,14 +1938,16 @@ binding.
 @item --level-module=LEVEL-MODULE
 Select level module.  A level module determines a way to generate
 consecutive levels for use by the engine.  Valid values for
-@var{level-module} are: @samp{LEGACY}, @samp{PLV}, @samp{DAT} and
-@samp{CONSISTENCY}.  @samp{LEGACY} is the module designed to read the
-original @acronym{PoP, Prince of Persia} 1 raw level files.  @samp{PLV}
-is the module designed to read the original PoP 1 @code{PLV} extended
-level files.  @samp{DAT} is the module designed to read the original PoP
-1 @file{LEVELS.DAT} file.  @samp{CONSISTENCY} is the module designed to
-generate random-corrected levels for accessing the engine robustness.
-The default is @samp{LEGACY}.
+@var{level-module} are: @samp{NATIVE}, @samp{LEGACY}, @samp{PLV},
+@samp{DAT} and @samp{CONSISTENCY}.  @samp{NATIVE} is the module designed
+to read the native format that supports all features.  @samp{LEGACY} is
+the module designed to read the original @acronym{PoP, Prince of Persia}
+1 raw level files.  @samp{PLV} is the module designed to read the
+original PoP 1 @code{PLV} extended level files.  @samp{DAT} is the
+module designed to read the original PoP 1 @file{LEVELS.DAT} file.
+@samp{CONSISTENCY} is the module designed to generate random-corrected
+levels for accessing the engine robustness.  The default is
+@samp{NATIVE}.
 
 @optindex --start-level
 @cindex @kbd{SHIFT+L}, related option
@@ -2207,10 +2211,10 @@ integers and must be separated by a comma.
 @optindex --data-path
 @item --data-path=PATH
 Set data path to @var{path}.  Normally, the data files are looked for in
-the current working directory, then in the user data directory, then in
+the user data directory, then in the current working directory, then in
 the resources directory, and finally in the system data directory.  If
-this option is given, before looking there the data files are looked for
-in @var{path}.
+this option is given, after looking in the user data directory the data
+files are looked for in @var{path}.
 
 @optindex --print-paths
 @item --print-paths

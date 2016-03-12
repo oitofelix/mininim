@@ -475,7 +475,7 @@ draw_start_guards (ALLEGRO_BITMAP *bitmap, enum vm vm)
   struct frame f;
 
   int i;
-  for (i = 1; i < GUARDS; i++) {
+  for (i = 0; i < GUARDS; i++) {
     struct guard *g = &level.guard[i];
     if (g->type == NO_ANIM) continue;
     f.c.room = g->p.room;

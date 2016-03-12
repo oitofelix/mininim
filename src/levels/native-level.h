@@ -20,6 +20,8 @@
 #ifndef MININIM_NATIVE_LEVEL_H
 #define MININIM_NATIVE_LEVEL_H
 
+void play_native_level (int number);
+void load_native_level (int number, struct level *l);
 void save_native_level (struct level *l, char *filename);
 char *get_confg_str (struct level *l, struct pos *p);
 char *get_conbg_str (struct level *l, struct pos *p);

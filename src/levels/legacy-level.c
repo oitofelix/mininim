@@ -49,9 +49,6 @@ static enum lgroup get_group (enum ltile t);
 
 static void next_level (int lv);
 static void load_legacy_level (int number);
-static void start (void);
-static void special_events (void);
-static void end (struct pos *p);
 static struct skill *get_legacy_skill (int i, struct skill *skill);
 
 void
@@ -61,8 +58,8 @@ play_legacy_level (int number)
   play_level (&legacy_level);
 }
 
-static void
-start (void)
+void
+legacy_level_start (void)
 {
   /* initialize some state */
   played_sample = false;
@@ -95,10 +92,11 @@ start (void)
   else k->current_lives = total_lives;
   k->controllable = true;
   k->immortal = immortal_mode;
+  k->has_sword = level.has_sword;
 
   /* create guards */
   int i;
-  for (i = 1; i < GUARDS; i++) {
+  for (i = 0; i < GUARDS; i++) {
     struct guard *g = &level.guard[i];
     struct anim *a;
     int id;
@@ -165,9 +163,6 @@ start (void)
     camera_follow_kid = k->id;
   }
 
-  /* give the sword to kid if it's not in the starting level */
-  if (level.number > 1) k->has_sword = true;
-
   /* in the first level */
   if (level.number == 1) {
     /* activate tile, usually to close the opened door in the starting
@@ -224,8 +219,8 @@ start (void)
   /* } */
 }
 
-static void
-special_events (void)
+void
+legacy_level_special_events (void)
 {
   struct pos np, p, pm, pms;
   struct coord nc, m, ms;
@@ -704,8 +699,8 @@ special_events (void)
   }
 }
 
-static void
-end (struct pos *p)
+void
+legacy_level_end (struct pos *p)
 {
   struct anim *k = get_anim_by_id (current_kid_id);
   static ALLEGRO_SAMPLE_INSTANCE *si = NULL;
@@ -771,13 +766,13 @@ interpret_legacy_level (int number)
     else legacy_level.nominal_number = 12;
   } else if (number == 14) legacy_level.nominal_number = -1;
   else legacy_level.nominal_number = number;
-  legacy_level.start = start;
-  legacy_level.special_events = special_events;
-  legacy_level.end = end;
+  legacy_level.start = legacy_level_start;
+  legacy_level.special_events = legacy_level_special_events;
+  legacy_level.end = legacy_level_end;
   legacy_level.next_level = next_level;
   memcpy (&legacy_level.con[0], &room_0, sizeof (room_0));
 
-  /* CUTSCENES: ... */
+  /* CUTSCENES: ok */
   switch (number) {
   default: break;
   case 1: legacy_level.cutscene = cutscene_01_05_11_anim; break;
@@ -788,6 +783,9 @@ interpret_legacy_level (int number)
   case 11: legacy_level.cutscene = cutscene_11_anim; break;
   case 14: legacy_level.cutscene = cutscene_14_anim; break;
   }
+
+  /* SWORD: ok */
+  legacy_level.has_sword = (number != 1);
 
   /* LINKS: ok */
   for (p.room = 1; p.room <= LROOMS; p.room++) {

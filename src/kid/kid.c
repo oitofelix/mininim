@@ -214,6 +214,7 @@ draw_kid_frame (ALLEGRO_BITMAP *bitmap, struct anim *k,
 void
 draw_start_kid (ALLEGRO_BITMAP *bitmap, enum vm vm)
 {
+  /* kid */
   struct frame f;
   f.c.room = level.start_pos.room;
   palette pal = get_kid_palette (vm);
@@ -225,6 +226,9 @@ draw_start_kid (ALLEGRO_BITMAP *bitmap, enum vm vm)
   place_frame (&f, &f, f.b, &level.start_pos,
                level.start_dir == LEFT ? +28 : +22, +15);
   draw_frame (bitmap, &f);
+
+  /* sword */
+  if (level.has_sword) draw_sword (bitmap, &level.start_pos, vm);
 }
 
 ALLEGRO_COLOR
