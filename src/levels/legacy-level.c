@@ -75,66 +75,11 @@ legacy_level_start (void)
   if (coming_from_12) auto_rem_time_1st_cycle = -1;
   else auto_rem_time_1st_cycle = 24;
 
-  /* create kid */
-  struct pos kid_start_pos;
-  if ((start_pos.room != 0
-       || start_pos.floor != 0
-       || start_pos.place != 0)
-      && start_pos.room <= LROOMS)
-    kid_start_pos = start_pos;
-  else kid_start_pos = level.start_pos;
-  int id = create_anim (NULL, KID, &kid_start_pos, level.start_dir);
-  struct anim *k = &anima[id];
-  k->total_lives = total_lives;
-  k->skill = skill;
+  /* get kid */
+  struct anim *k = get_anim_by_id (0);
+
   if (coming_from_12) k->current_lives = current_lives;
   else k->current_lives = total_lives;
-  k->controllable = true;
-  k->immortal = immortal_mode;
-  k->has_sword = level.has_sword;
-
-  /* create guards */
-  int i;
-  for (i = 0; i < GUARDS; i++) {
-    struct guard *g = &level.guard[i];
-    struct anim *a;
-    int id;
-    switch (g->type) {
-    case NO_ANIM: default: continue;
-    case KID:
-      id = create_anim (NULL, KID, &g->p, g->dir);
-      anima[id].shadow = true;
-      break;
-    case GUARD:
-      id = create_anim (NULL, GUARD, &g->p, g->dir);
-      break;
-    case FAT_GUARD:
-      id = create_anim (NULL, FAT_GUARD, &g->p, g->dir);
-      break;
-    case VIZIER:
-      id = create_anim (NULL, VIZIER, &g->p, g->dir);
-      break;
-    case SKELETON:
-      id = create_anim (NULL, SKELETON, &g->p, g->dir);
-      break;
-    case SHADOW:
-      id = create_anim (NULL, SHADOW, &g->p, g->dir);
-      break;
-    }
-    a = &anima[id];
-    apply_guard_mode (a, gm);
-    a->has_sword = true;
-    a->skill = g->skill;
-    a->total_lives = g->total_lives + g->skill.extra_life;
-    a->current_lives = g->total_lives;
-    if (level.number == 13) a->style = 0;
-    else if (level.number == 6) a->style = 1;
-    else a->style = g->style;
-  }
-
-  /* after kid creation k must be updated to point to the correct
-     array element */
-  k = get_anim_by_id (0);
 
   /* make the kid turn as appropriate */
   switch (level.number) {

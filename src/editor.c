@@ -200,6 +200,7 @@ editor (void)
     {{'E', "ENVIRONMENT"},
      {'H', "HUE"},
      {'S', "SAVE LEVEL"},
+     {'L', "RELOAD LEVEL"},
      {0}};
 
   struct menu_item environment_menu[] =
@@ -253,8 +254,8 @@ editor (void)
   char *fg_str = NULL, *bg_str = NULL, *ext_str = NULL;
   bool free_ext_str;
   char *str = NULL, c, *f, *d;
-  static char *save_msg = NULL;
-  static uint64_t save_msg_cycles = 0;
+  static char *msg = NULL;
+  static uint64_t msg_cycles = 0;
 
   switch (edit) {
   case EDIT_NONE: break;
@@ -801,10 +802,11 @@ editor (void)
     }
     break;
   case EDIT_LEVEL:
-    if (save_msg_cycles > 0 && save_msg) {
-      save_msg_cycles--;
-      draw_bottom_text (NULL, save_msg);
-      if (was_menu_return_pressed ()) save_msg_cycles = 0;
+    if (msg_cycles > 0 && msg) {
+      msg_cycles--;
+      draw_bottom_text (NULL, msg);
+      if (was_menu_return_pressed ()) msg_cycles = 0;
+      memset (&key, 0, sizeof (key));
       break;
     }
     switch (menu_enum (level_menu, "L>")) {
@@ -821,7 +823,7 @@ editor (void)
       b4 = (level.hue == HUE_BLUE) ? true : false;
       break;
     case 'S':
-      save_msg_cycles = 18;
+      msg_cycles = 18;
       xasprintf (&d, "%sdata/levels/", user_data_dir);
       if (! al_make_directory (d)) {
         error (0, al_get_errno (), "%s (%s): failed to create native level directory",
@@ -838,10 +840,17 @@ editor (void)
         goto save_failed;
       }
       *vanilla_level = level;
-      save_msg = "LEVEL HAS BEEN SAVED";
+      msg = "LEVEL HAS BEEN SAVED";
       break;
     save_failed:
-      save_msg = "LEVEL SAVE FAILED";
+      msg = "LEVEL SAVE FAILED";
+      break;
+    case 'L':
+      msg_cycles = 18;
+      msg = "LEVEL RELOADED";
+      level = *vanilla_level;
+      destroy_cons ();
+      register_cons ();
       break;
     }
    break;

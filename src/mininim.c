@@ -66,7 +66,7 @@ bool immortal_mode;
 int initial_total_lives = KID_INITIAL_TOTAL_LIVES, total_lives;
 int initial_current_lives = KID_INITIAL_CURRENT_LIVES, current_lives;
 int start_level = 1;
-struct pos start_pos;
+struct pos start_pos = {-1,-1,-1};
 int time_limit = TIME_LIMIT;
 int start_time = START_TIME;
 int start_level_time;

@@ -55,6 +55,7 @@ play_level (struct level *lv)
     fix_legacy_room_above_zero_with_traversable_at_bottom ();
 
   register_cons ();
+  register_anims ();
 
   stop_all_samples ();
   if (level.start) level.start ();
@@ -181,6 +182,63 @@ destroy_cons (void)
   destroy_array ((void **) &door, &door_nmemb);
   destroy_array ((void **) &level_door, &level_door_nmemb);
   destroy_array ((void **) &chopper, &chopper_nmemb);
+}
+
+void
+register_anims (void)
+{
+  /* create kid */
+  struct pos kid_start_pos;
+  if (is_valid_pos (&start_pos))
+    kid_start_pos = start_pos;
+  else kid_start_pos = level.start_pos;
+  int id = create_anim (NULL, KID, &kid_start_pos, level.start_dir);
+  struct anim *k = &anima[id];
+  k->total_lives = total_lives;
+  k->skill = skill;
+  k->current_lives = total_lives;
+  k->controllable = true;
+  k->immortal = immortal_mode;
+  k->has_sword = level.has_sword;
+
+  /* create guards */
+  int i;
+  for (i = 0; i < GUARDS; i++) {
+    struct guard *g = &level.guard[i];
+    struct anim *a;
+    int id;
+    switch (g->type) {
+    case NO_ANIM: default: continue;
+    case KID:
+      id = create_anim (NULL, KID, &g->p, g->dir);
+      anima[id].shadow = true;
+      break;
+    case GUARD:
+      id = create_anim (NULL, GUARD, &g->p, g->dir);
+      break;
+    case FAT_GUARD:
+      id = create_anim (NULL, FAT_GUARD, &g->p, g->dir);
+      break;
+    case VIZIER:
+      id = create_anim (NULL, VIZIER, &g->p, g->dir);
+      break;
+    case SKELETON:
+      id = create_anim (NULL, SKELETON, &g->p, g->dir);
+      break;
+    case SHADOW:
+      id = create_anim (NULL, SHADOW, &g->p, g->dir);
+      break;
+    }
+    a = &anima[id];
+    apply_guard_mode (a, gm);
+    a->has_sword = true;
+    a->skill = g->skill;
+    a->total_lives = g->total_lives + g->skill.extra_life;
+    a->current_lives = g->total_lives;
+    if (level.number == 13) a->style = 0;
+    else if (level.number == 6) a->style = 1;
+    else a->style = g->style;
+  }
 }
 
 void
