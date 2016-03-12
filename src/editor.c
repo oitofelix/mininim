@@ -236,6 +236,7 @@ editor (void)
      {'R', "RETURN"},
      {'F', "REFRACTION"},
      {'X', "EXTRA LIFE"},
+     {'L', "LEGACY TEMPLATES"},
      {0}};
 
   struct menu_item guard_type_menu[] =
@@ -954,6 +955,27 @@ editor (void)
       s = g->skill.refraction; break;
     case 'X': edit = EDIT_GUARD_SKILL_EXTRA_LIFE;
       s = g->skill.extra_life; break;
+    case 'L': edit = EDIT_SKILL_LEGACY_TEMPLATES;
+      s = 0;
+      break;
+    }
+    al_free (str);
+    break;
+  case EDIT_SKILL_LEGACY_TEMPLATES:
+    draw_start_guards (screen, vm);
+    g = &level.guard[guard_index];
+    xasprintf (&str, "G%iKL>L.SKILL", guard_index);
+    static struct skill gskill;
+    switch (menu_int (&s, NULL, 0, 11, str, NULL)) {
+    case -1: edit = EDIT_GUARD_SKILL; break;
+    case 0: break;
+    case 1:
+      g->skill = gskill;
+      edit = EDIT_GUARD_SKILL;
+      break;
+    default:
+      get_legacy_skill (s, &gskill);
+      break;
     }
     al_free (str);
     break;
@@ -1009,7 +1031,13 @@ editor (void)
     switch (menu_bool (guard_type_menu, str, true, &b0, &b1, &b2, &b3, &b4, &b5)) {
     case -1: edit = EDIT_GUARD; g->type = b; break;
     case 0: break;
-    case 1: edit = EDIT_GUARD; break;
+    case 1:
+      edit = EDIT_GUARD;
+      if (g->type != NO_ANIM && ! g->total_lives)
+        g->total_lives = 3;
+      if (g->type != NO_ANIM && ! g->skill.attack_prob)
+        get_legacy_skill (0, &g->skill);
+      break;
     default:
       if (b0) g->type = NO_ANIM;
       if (b1) g->type = GUARD;

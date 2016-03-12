@@ -218,11 +218,11 @@ menu_int (int *v, int *b, int min, int max, char *pref_int, char *pref_bool)
   case ' ':
     if (b) *b = ! *b;
     break;
-  case '/':
-    return -1;
+  case '/': return -1;
+  default: c = 0; break;
   }
 
-  return 0;
+  return c;
 }
 
 char
@@ -262,10 +262,11 @@ menu_list (int *dir0, int *dir1, int index, char *prefix)
   default:
     if (dir0) *dir0 = 0;
     if (dir1) *dir1 = 0;
+    c = 0;
     break;
   }
 
-  return 0;
+  return c;
 }
 
 bool

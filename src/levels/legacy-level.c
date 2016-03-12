@@ -48,7 +48,6 @@ static enum ltile get_tile (struct pos *p);
 static enum lgroup get_group (enum ltile t);
 
 static void load_legacy_level (int number);
-static struct skill *get_legacy_skill (int i, struct skill *skill);
 
 void
 play_legacy_level (int number)
@@ -1004,7 +1003,7 @@ interpret_legacy_level (int number)
   }
 }
 
-static struct skill *
+struct skill *
 get_legacy_skill (int i, struct skill *skill)
 {
   switch (i) {
