@@ -20,6 +20,11 @@
 #ifndef MININIM_CONSISTENCY_LEVEL_H
 #define MININIM_CONSISTENCY_LEVEL_H
 
+/* functions */
 void play_consistency_level (int number);
+void next_consistency_level (int number);
+
+/* variables */
+extern struct level consistency_level;
 
 #endif	/* MININIM_CONSISTENCY_LEVEL_H */

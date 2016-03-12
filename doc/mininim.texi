@@ -1773,9 +1773,8 @@ options}, @emph{environment variables} and @emph{configuration files}.
 The configuration system uses the command line options parser as the
 central interpreter for the configuration process.  Providing a single
 options parsing routine allows for easy maintenance, equivalence between
-methods and a canonical interface for integrating future methods.
-
-For that end, each configuration option backend implements a translator
+methods and a canonical interface for integrating future methods.  For
+this end, each configuration option backend implements a translator
 between its specifics of option representation and access, to a normal
 command line array.  Then the resulting options are roughly processed as
 if they were given at the engine invocation command line.
@@ -1783,9 +1782,9 @@ if they were given at the engine invocation command line.
 As the options are the same for all three current methods of
 configuration, and all of them are in essence processed as command line
 options, it's unnecessary to describe all options for each separately.
-Therefore, we provide systematic rules for converting between method
-option names and their command line equivalents, and then describe only
-the latter.
+Therefore, we provide a simple systematic rule for converting between
+method option names and their command line equivalents, and then
+describe only the latter.
 
 @cindex option name conversion
 @cindex conversion, option name
@@ -1924,6 +1923,19 @@ binding.
 @cindex options, level
 
 @table @option
+@optindex --convert-levels
+@cindex @kbd{E>LV}, related option
+@item --convert-levels
+Batch convert levels 1 to 14 accessible by the current level module to
+the native format and exit.  The levels are saved in the user data
+directory, where they take precedence over levels in every other
+location.  When using this option there is no point in using any other
+options besides @option{--level-module} that must occur before this to
+take effect.  You can accomplish a similar result in-game on a per level
+basis by using the @kbd{E>LS} command.  Notice that in this case any
+changes made to the level by special events (or otherwise) before you
+trigger the save command will be retained.
+
 @optindex --level-module
 @cindex @samp{NATIVE} level module
 @cindex level module, @samp{NATIVE}

@@ -19,17 +19,15 @@
 
 #include "mininim.h"
 
-static void next_level (int number);
-
 void
 play_dat_level (int number)
 {
-  next_level (number);
+  next_dat_level (number);
   play_level (&legacy_level);
 }
 
-static void
-next_level (int number)
+void
+next_dat_level (int number)
 {
   if (number < 1 || number > 14) number = 1;
   load_dat_level (number);
@@ -59,7 +57,7 @@ load_dat_level (int number)
   memcpy (&lv, offset, sizeof (lv));
 
   interpret_legacy_level (number);
-  legacy_level.next_level = next_level;
+  legacy_level.next_level = next_dat_level;
 
   al_free (dat);
 }

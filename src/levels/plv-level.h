@@ -21,6 +21,7 @@
 #define MININIM_PLV_LEVEL_H
 
 void play_plv_level (int number);
+void next_plv_level (int number);
 void load_plv_level (int number);
 
 #endif	/* MININIM_PLV_LEVEL_H */

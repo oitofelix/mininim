@@ -47,14 +47,13 @@ struct legacy_level lv;
 static enum ltile get_tile (struct pos *p);
 static enum lgroup get_group (enum ltile t);
 
-static void next_level (int lv);
 static void load_legacy_level (int number);
 static struct skill *get_legacy_skill (int i, struct skill *skill);
 
 void
 play_legacy_level (int number)
 {
-  next_level (number);
+  next_legacy_level (number);
   play_level (&legacy_level);
 }
 
@@ -728,8 +727,8 @@ legacy_level_end (struct pos *p)
   if (! is_playing_sample_instance (si)) quit_anim = NEXT_LEVEL;
 }
 
-static void
-next_level (int number)
+void
+next_legacy_level (int number)
 {
   if (number < 1 || number > 14) number = 1;
   load_legacy_level (number);
@@ -769,7 +768,7 @@ interpret_legacy_level (int number)
   legacy_level.start = legacy_level_start;
   legacy_level.special_events = legacy_level_special_events;
   legacy_level.end = legacy_level_end;
-  legacy_level.next_level = next_level;
+  legacy_level.next_level = next_legacy_level;
   memcpy (&legacy_level.con[0], &room_0, sizeof (room_0));
 
   /* CUTSCENES: ok */

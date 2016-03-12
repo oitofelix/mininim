@@ -21,6 +21,7 @@
 #define MININIM_DAT_LEVEL_H
 
 void play_dat_level (int number);
+void next_dat_level (int number);
 void load_dat_level (int number);
 
 #endif	/* MININIM_DAT_LEVEL_H */

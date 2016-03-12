@@ -19,7 +19,7 @@
 
 #include "mininim.h"
 
-enum level_module level_module = LEGACY_LEVEL_MODULE;
+enum level_module level_module;
 
 struct config_info {
   enum {
@@ -88,6 +88,7 @@ static error_t get_config_args (size_t *cargc, char ***cargv,
                                 char *filename);
 static error_t
 pre_parser (int key, char *arg, struct argp_state *state);
+static void give_dat_compat_preference (void);
 
 static struct argp_option options[] = {
   /* Configuration */
@@ -106,9 +107,11 @@ static struct argp_option options[] = {
   /* Level */
   {NULL, 0, NULL, 0, "Level:", 0},
   {"level-module", LEVEL_MODULE_OPTION, "LEVEL-MODULE", 0, "Select level module.  A level module determines a way to generate consecutive levels for use by the engine.  Valid values for LEVEL-MODULE are: NATIVE, LEGACY, PLV, DAT and CONSISTENCY.  NATIVE is the module designed to read the native format that supports all features.  LEGACY is the module designed to read the original PoP 1 raw level files.  PLV is the module designed to read the original PoP 1 PLV extended level files.  DAT is the module designed to read the original PoP 1 LEVELS.DAT file.  CONSISTENCY is the module designed to generate random-corrected levels for accessing the engine robustness.  The default is NATIVE.", 0},
+  {"convert-levels", CONVERT_LEVELS_OPTION, NULL, 0, "Batch convert levels 1 to 14 accessible by the current level module to the native format and exit.  The levels are saved in the user data directory, where they take precedence over levels in every other location.  When using this option there is no point in using any other options besides '--level-module' that must occur before this to take effect.  You can accomplish a similar result in-game on a per level basis by using the 'E>LS' command.  Notice that in that case any changes made to the level by special events (or otherwise) before you trigger the save command will be retained.", 0},
   {"start-level", START_LEVEL_OPTION, "N", 0, "Make the kid start at level N.  The default is 1.  Valid integers range from 1 to INT_MAX.  This can be changed in-game by the SHIFT+L key binding.", 0},
   {"start-pos", START_POS_OPTION, "R,F,P", 0, "Make the kid start at room R, floor F and place P.  The default is to let this decision to the level module.  R is an integer ranging from 1 to INT_MAX, F is an integer ranging from 0 to 2 and P is an integer ranging from 0 to 9.", 0},
   {NULL, 0, NULL, OPTION_DOC, "If the option '--level-module' is not given and there is a LEVELS.DAT file in the resources directory, the DAT level module is automatically used to load that file.  This is a compatibility measure for applications which depend upon this legacy behavior.", 0},
+  {NULL, 0, NULL, OPTION_DOC, "", 0},
 
   /* Time */
   {NULL, 0, NULL, 0, "Time:", 0},
@@ -602,6 +605,51 @@ parser (int key, char *arg, struct argp_state *state)
     case 3: level_module = DAT_LEVEL_MODULE; break;
     case 4: level_module = CONSISTENCY_LEVEL_MODULE; break;
     }
+    break;
+  case CONVERT_LEVELS_OPTION:
+    give_dat_compat_preference ();
+    void (*next_level_f) (int);
+    struct level *l;
+    char *f, *d;
+    switch (level_module) {
+    case NATIVE_LEVEL_MODULE: default:
+      next_level_f = next_native_level;
+      l = &native_level;
+      break;
+    case LEGACY_LEVEL_MODULE:
+      next_level_f = next_legacy_level;
+      l = &legacy_level;
+      break;
+    case PLV_LEVEL_MODULE:
+      next_level_f = next_plv_level;
+      l = &legacy_level;
+      break;
+    case DAT_LEVEL_MODULE:
+      next_level_f = next_dat_level;
+      l = &legacy_level;
+      break;
+    case CONSISTENCY_LEVEL_MODULE:
+      next_level_f = next_consistency_level;
+      l = &consistency_level;
+      break;
+    }
+
+    xasprintf (&d, "%s/data/levels/", user_data_dir);
+    if (! al_make_directory (d))
+        error (-1, al_get_errno (), "%s (%s): failed to create native level directory",
+               __func__, d);
+
+    for (i = 1; i <= 14; i++) {
+      next_level_f (i);
+      xasprintf (&f, "%s%02d.mim", d, i);
+      if (! save_native_level (l, f))
+        error (-1, al_get_errno (), "%s (%s): failed to save native level file",
+               __func__, f);
+      al_free (f);
+    }
+    al_free (d);
+
+    exit (0);
     break;
   case VIDEO_MODE_OPTION:
     e = optval_to_enum (&i, key, arg, state, video_mode_enum, 0);
@@ -1101,11 +1149,7 @@ main (int _argc, char **_argv)
 
   /* play_level_1 (); */
 
-  if (al_filename_exists (levels_dat_compat_filename)
-      && ! level_module_given) {
-    level_module = DAT_LEVEL_MODULE;
-    levels_dat_filename = levels_dat_compat_filename;
-  }
+  give_dat_compat_preference ();
 
   switch (level_module) {
   case NATIVE_LEVEL_MODULE: default:
@@ -1141,6 +1185,16 @@ main (int _argc, char **_argv)
   fprintf (stderr, "MININIM: Hope you enjoyed it!\n");
 
   return 0;
+}
+
+static void
+give_dat_compat_preference (void)
+{
+  if (al_filename_exists (levels_dat_compat_filename)
+      && ! level_module_given) {
+    level_module = DAT_LEVEL_MODULE;
+    levels_dat_filename = levels_dat_compat_filename;
+  }
 }
 
 static void

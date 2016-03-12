@@ -19,15 +19,14 @@
 
 #include "mininim.h"
 
-static struct level consistency_level;
-static void next_level (int lv);
+struct level consistency_level;
 static void start (void);
 static void end (struct pos *p);
 
 void
 play_consistency_level (int number)
 {
-  next_level (number);
+  next_consistency_level (number);
   play_level (&consistency_level);
 }
 
@@ -54,8 +53,8 @@ end (struct pos *p)
   quit_anim = NEXT_LEVEL;
 }
 
-static void
-next_level (int number)
+void
+next_consistency_level (int number)
 {
   int i;
   struct pos p;
@@ -216,6 +215,6 @@ next_level (int number)
   consistency_level.number = number;
   consistency_level.nominal_number = number;
   consistency_level.start = start;
-  consistency_level.next_level = next_level;
+  consistency_level.next_level = next_consistency_level;
   consistency_level.end = end;
 }

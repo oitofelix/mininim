@@ -118,6 +118,7 @@ enum lm_exit {
 void legacy_level_start (void);
 void legacy_level_special_events (void);
 void legacy_level_end (struct pos *p);
+void next_legacy_level (int number);
 
 void play_legacy_level (int number);
 void interpret_legacy_level (int number);

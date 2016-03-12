@@ -19,19 +19,17 @@
 
 #include "mininim.h"
 
-static void next_level (int number);
-
 struct level native_level;
 
 void
 play_native_level (int number)
 {
-  next_level (number);
+  next_native_level (number);
   play_level (&native_level);
 }
 
-static void
-next_level (int number)
+void
+next_native_level (int number)
 {
   if (number < 1 || number > 14) number = 1;
   load_native_level (number, &native_level);
@@ -61,7 +59,7 @@ load_native_level (int number, struct level *l)
   l->start = legacy_level_start;
   l->special_events = legacy_level_special_events;
   l->end = legacy_level_end;
-  l->next_level = next_level;
+  l->next_level = next_native_level;
 
   /* CUTSCENES: ok */
   switch (number) {
@@ -174,7 +172,7 @@ load_native_level (int number, struct level *l)
   al_destroy_config (c);
 }
 
-void
+bool
 save_native_level (struct level *l, char *filename)
 {
   ALLEGRO_CONFIG *c = create_config ();
@@ -274,8 +272,9 @@ save_native_level (struct level *l, char *filename)
         al_free (v);
       }
 
-  save_config_file (filename, c);
+  bool r = al_save_config_file (filename, c);
   al_destroy_config (c);
+  return r;
 }
 
 char *
