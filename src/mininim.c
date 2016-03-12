@@ -634,7 +634,7 @@ parser (int key, char *arg, struct argp_state *state)
       break;
     }
 
-    xasprintf (&d, "%s/data/levels/", user_data_dir);
+    xasprintf (&d, "%sdata/levels/", user_data_dir);
     if (! al_make_directory (d))
         error (-1, al_get_errno (), "%s (%s): failed to create native level directory",
                __func__, d);

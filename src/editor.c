@@ -252,7 +252,9 @@ editor (void)
 
   char *fg_str = NULL, *bg_str = NULL, *ext_str = NULL;
   bool free_ext_str;
-  char *str = NULL, c;
+  char *str = NULL, c, *f, *d;
+  static char *save_msg = NULL;
+  static uint64_t save_msg_cycles = 0;
 
   switch (edit) {
   case EDIT_NONE: break;
@@ -799,6 +801,12 @@ editor (void)
     }
     break;
   case EDIT_LEVEL:
+    if (save_msg_cycles > 0 && save_msg) {
+      save_msg_cycles--;
+      draw_bottom_text (NULL, save_msg);
+      if (was_menu_return_pressed ()) save_msg_cycles = 0;
+      break;
+    }
     switch (menu_enum (level_menu, "L>")) {
     case -1: case 1: edit = EDIT_MAIN; break;
     case 'E': edit = EDIT_ENVIRONMENT;
@@ -813,10 +821,27 @@ editor (void)
       b4 = (level.hue == HUE_BLUE) ? true : false;
       break;
     case 'S':
+      save_msg_cycles = 18;
+      xasprintf (&d, "%sdata/levels/", user_data_dir);
+      if (! al_make_directory (d)) {
+        error (0, al_get_errno (), "%s (%s): failed to create native level directory",
+               __func__, d);
+        al_free (d);
+        goto save_failed;
+      }
+      xasprintf (&f, "%s%02d.mim", d, level.number);
+      if (! save_native_level (&level, f)) {
+        error (0, al_get_errno (), "%s (%s): failed to save native level file",
+               __func__, f);
+        al_free (f);
+        al_free (d);
+        goto save_failed;
+      }
       *vanilla_level = level;
-      /* xasprintf (&str, "data/levels/%02d.mim", level.number); */
-      /* save_native_level (&level, str); */
-      /* al_free (str); */
+      save_msg = "LEVEL HAS BEEN SAVED";
+      break;
+    save_failed:
+      save_msg = "LEVEL SAVE FAILED";
       break;
     }
    break;
