@@ -2308,6 +2308,123 @@ Print program name and version and exit
 
 
 
+@c --- Menu system;
+@node Menu system
+@chapter Menu system
+@cindex Menu system
+
+MININIM features an uniform@footnote{As the menu system is uniform we
+describe its general behavior and expected interface of interaction in
+this chapter and let the chapters intended to describe major features
+which make use of it, to focus on the specifics details of their subject
+matter.} and non-intrusive bottom-line menu interface intended as a way
+to provide quick and convenient access to engine features that would be
+utterly complex or unfeasible to provide as simple key bindings, and
+couldn't be offered by the configuration system because of their dynamic
+on-the-fly characteristics.
+
+When active the menu system makes use of the bottom line that is
+traditionally used for transitory messages.  It looks like this:
+
+@center @kbd{ABCDEF?}
+
+Each capital letter indicates which key triggers the related @dfn{menu
+command} (case insensitive).  Each menu command may be terminal or
+non-terminal.  @dfn{Terminal menu commands} execute an action right away
+when you press its correspondent key, while @dfn{non-terminal menu
+commands} open a sub-menu with further menu commands to choose from.  In
+principle, non-terminal menu commands may nest to arbitrary depth.  A
+terminal menu command may be either an @dfn{input command} or a
+@dfn{non-input command}.  The former puts the bottom line in input mode,
+so the user can enter a value expected by the command, while the latter
+needs no further information to perform its action.  There are several
+specialized input modes that are described later. Although capital
+letters usually represent the initials of the related command, they have
+no universal or intrinsic meaning, and are freely reused within
+sub-menus and may have been chosen arbitrarily in case they were
+ambiguous.
+
+The @kbd{?} key is present in every menu because it's special: it's used
+to query the exact command performed by a given key.  When pressed the
+bottom line says: @samp{PRESS KEY FOR HELP}.  Then, if any key expected
+by the current menu is pressed, the description of the command performed
+by it is given.  In case it's a non-terminal command, the description
+ends with the @samp{>} character.  Otherwise, if it's an input command,
+the description ends with the @samp{<} character.  Some commands may be
+terminal or non-terminal, input or non-input, depending upon some
+context like the mouse selection.  These have their descriptions ended
+by the @samp{*} character.  The current menu comes back into view, in
+case you press any key invalid for it.
+
+Usually every menu command has a path prefix, indicating where in the
+menu hierarchy it's located.  Consider the following menu system bottom
+line:
+
+@center @kbd{HYT>KJQTW?}
+
+The @samp{HYT} string before the @samp{>} character is the @dfn{menu
+path}.  It says the current menu is three levels deep, and its direct
+parent is @samp{T}, whose parent in turn is @samp{Y}, whose parent in
+turn is @samp{H}, which is located in the topmost menu.  By looking at
+the menu path you can figure out if you are actually where you are
+supposed to, and how to quickly get there again from the topmost menu.
+Sometimes a path prefix may contain digits indicating the index of the
+object to which the menu commands apply, usually having a command to
+change the selected index.  This is a provision to facilitate the
+manipulation of a multitude of objects whose mechanism of selection
+doesn't give ubiquitous visual feedback.
+
+There are two universal keys (called @dfn{menu return keys}) that allow
+you to go up into the menu hierarchy, from any type of command:
+@kbd{BACKSPACE} and @kbd{/}.  The difference between both is that the
+former ``confirms'' before returning, while the latter doesn't.  What
+``to confirm'' means is dependent on the specific context and input
+method of the command at hand, but the general principle is that ``to
+confirm'' implies in a change of state.  In cases where no change of
+state is involved, like a common non-terminal (sub-menu) command, both
+keys can be used interchangeably.  Holding down any menu return key for
+a second or so, gets you back to the topmost menu.
+
+While the menu system is active any key bindings that doesn't conflict
+with its input methods continue to work as usual.  However, the menu
+system takes precedence over the others, like the ones consisting of
+alpha-numeric keys or any other keys with a special meaning, like
+@kbd{?}, @kbd{BACKSPACE} and @kbd{/}.  In order for well established,
+but conflicting key bindings to be easily accessed when working with the
+menu system, the menu persistence comes in hand.  The menu system always
+remembers the last command invoked, so the menu is restored to the same
+state it was before being deactivated.  This allows for a fast
+alternation between menu-based and key binding-based commands in tasks
+that require both, like navigating through and editing a level.
+
+The menu system never takes over the kid control keys, so the game can
+be played while it's active.  On the other hand, it completely takes
+over the transitory message bottom line, so even though a certain key
+binding may take effect, any message that it usually shows on the bottom
+line is suppressed.
+
+@node Mouse selection
+@section Mouse selection
+@cindex mouse selection
+@cindex selection, mouse
+
+Often menu commands apply to a particular place within a level.  The
+provided mechanism to select such a place is called @dfn{mouse
+selection}.  While it's enabled the mouse cursor can be used to select a
+particular place by simply pointing at the construction held by it.  The
+selected place's construction will be shown in a brighter color than its
+surroundings like in the picture below.
+
+@center @image{mininim-figures/mouse-selection}
+
+As you move the cursor across the screen, the limits of each selected
+place is determined by which construction it holds, roughly considering
+the depth of the region the cursor points to.
+
+
+
+
+
 @c --- Software package;
 @node Software package
 @chapter Software package
