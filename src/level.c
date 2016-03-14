@@ -185,6 +185,21 @@ destroy_cons (void)
 }
 
 void
+prepare_con_at_pos (struct pos *p)
+{
+  switch (con (p)->fg) {
+  case WALL: update_wall_cache (room_view, em, vm); break;
+  case MIRROR: create_mirror_bitmaps (room_view, room_view); break;
+  default: break;
+  }
+
+  switch (con (p)->bg) {
+  case BALCONY: compute_stars_position (room_view, room_view); break;
+  default: break;
+  }
+}
+
+void
 register_anims (void)
 {
   /* create kid */

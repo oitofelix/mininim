@@ -35,6 +35,8 @@ static bool reciprocal_links, locally_unique_links,
 static bool b0, b1, b2, b3, b4, b5;
 static int guard_index;
 static int b, r, s, t, min, max;
+static struct con con_copy;
+static struct con room_copy[1][FLOORS][PLACES];
 
 enum edit edit;
 enum edit last_edit = EDIT_MAIN;
@@ -67,6 +69,8 @@ editor (void)
      {'B', "BACKGROUND"},
      {'E', "EXTENSION"},
      {'I', "INFO"},
+     {'C', "COPY"},
+     {'P', "PASTE"},
      {0}};
 
   struct menu_item fg_menu[] =
@@ -173,6 +177,8 @@ editor (void)
      {'L', "ROOM LINKING"},
      {'S', "LINKING SETTINGS"},
      {'X', "EXCHANGE ROOM"},
+     {'C', "COPY"},
+     {'P', "PASTE"},
      {0}};
 
   struct menu_item link_menu[] =
@@ -251,6 +257,7 @@ editor (void)
   struct pos p = mouse_pos;
   struct anim *k;
   struct guard *g;
+  struct pos p0;
 
   char *fg_str = NULL, *bg_str = NULL, *ext_str = NULL;
   bool free_ext_str;
@@ -271,12 +278,31 @@ editor (void)
     }
     break;
   case EDIT_CON:
+    if (msg_cycles > 0 && msg) {
+      msg_cycles--;
+      draw_bottom_text (NULL, msg);
+      if (key.keyboard.keycode) msg_cycles = 0;
+      break;
+    }
     switch (menu_enum (con_menu, "C>")) {
     case -1: case 1: edit = EDIT_MAIN; break;
     case 'F': edit = EDIT_FG; break;
     case 'B': edit = EDIT_BG; break;
     case 'E': edit = EDIT_EXT; break;
     case 'I': edit = EDIT_INFO; break;
+    case 'C':
+      if (! is_valid_pos (&p)) break;
+      con_copy = *con (&p);
+      msg_cycles = 12;
+      msg = "COPIED";
+      break;
+    case 'P':
+      if (! is_valid_pos (&p)) break;
+      destroy_con_at_pos (&p);
+      *con (&p) = con_copy;
+      register_con_at_pos (&p);
+      prepare_con_at_pos (&p);
+      break;
     }
     break;
   case EDIT_FG:
@@ -694,6 +720,12 @@ editor (void)
     }
     break;
   case EDIT_ROOM:
+    if (msg_cycles > 0 && msg) {
+      msg_cycles--;
+      draw_bottom_text (NULL, msg);
+      if (key.keyboard.keycode) msg_cycles = 0;
+      break;
+    }
     switch (menu_enum (room_menu, "R>")) {
     case -1: case 1: edit = EDIT_MAIN; break;
     case 'J':
@@ -709,6 +741,28 @@ editor (void)
     case 'X':
       get_mouse_coord (&last_mouse_coord);
       edit = EDIT_ROOM_EXCHANGE; break;
+    case 'C':
+      if (! is_valid_pos (&p)) break;
+      p0.room = p.room;
+      for (p0.floor = 0; p0.floor < FLOORS; p0.floor++)
+        for (p0.place = 0; p0.place < PLACES; p0.place++)
+          room_copy[0][p0.floor][p0.place] = *con (&p0);
+      msg_cycles = 12;
+      msg = "COPIED";
+      break;
+    case 'P':
+      if (! is_valid_pos (&p)) break;
+      p0.room = p.room;
+      for (p0.floor = 0; p0.floor < FLOORS; p0.floor++)
+        for (p0.place = 0; p0.place < PLACES; p0.place++) {
+          destroy_con_at_pos (&p0);
+          *con (&p0) = room_copy[0][p0.floor][p0.place];
+          register_con_at_pos (&p0);
+        }
+      update_wall_cache (room_view, em, vm);
+      create_mirror_bitmaps (room_view, room_view);
+      compute_stars_position (room_view, room_view);
+      break;
     }
     break;
   case EDIT_JUMP_ROOM:

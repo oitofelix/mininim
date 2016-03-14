@@ -36,6 +36,7 @@ void register_con_at_pos (struct pos *p);
 void register_cons (void);
 void destroy_con_at_pos (struct pos *p);
 void destroy_cons (void);
+void prepare_con_at_pos (struct pos *p);
 void register_anims (void);
 void display_remaining_time (void);
 void display_skill (struct anim *k);
