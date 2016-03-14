@@ -56,32 +56,32 @@ editor (void)
   /* } */
 
   struct menu_item main_menu[] =
-    {{'C', "CONSTRUCTION"},
-     {'E', "EVENT"},
-     {'R', "ROOM"},
-     {'K', "KID"},
-     {'G', "GUARD"},
-     {'L', "LEVEL"},
+    {{'C', "CONSTRUCTION>"},
+     {'E', "EVENT>"},
+     {'R', "ROOM>"},
+     {'K', "KID>"},
+     {'G', "GUARD>"},
+     {'L', "LEVEL>"},
      {0}};
 
   struct menu_item con_menu[] =
-    {{'F', "FOREGROUND"},
-     {'B', "BACKGROUND"},
-     {'E', "EXTENSION"},
+    {{'F', "FOREGROUND>"},
+     {'B', "BACKGROUND>"},
+     {'E', "EXTENSION*"},
      {'I', "INFO"},
      {'C', "COPY"},
      {'P', "PASTE"},
      {0}};
 
   struct menu_item fg_menu[] =
-    {{'F', "FLOOR"},
-     {'P', "PILLAR"},
+    {{'F', "FLOOR>"},
+     {'P', "PILLAR>"},
      {'W', "WALL"},
-     {'D', "DOOR"},
+     {'D', "DOOR>"},
      {'C', "CHOPPER"},
      {'M', "MIRROR"},
-     {'R', "CARPET"},
-     {'A', "ARCH"},
+     {'R', "CARPET>"},
+     {'A', "ARCH>"},
      {0}};
 
   struct menu_item floor_menu[] =
@@ -166,26 +166,26 @@ editor (void)
      {0}};
 
   struct menu_item event_menu[] =
-    {{'D', "EVENT->DOOR"},
-     {'F', "EVENT->FLOOR"},
-     {'R', "DOOR->EVENT"},
-     {'S', "SET EVENT"},
+    {{'D', "EVENT->DOOR<"},
+     {'F', "EVENT->FLOOR<"},
+     {'R', "DOOR->EVENT<"},
+     {'S', "SET EVENT<"},
      {0}};
 
   struct menu_item room_menu[] =
-    {{'J', "JUMP TO ROOM"},
-     {'L', "ROOM LINKING"},
-     {'S', "LINKING SETTINGS"},
-     {'X', "EXCHANGE ROOM"},
+    {{'J', "JUMP TO ROOM<"},
+     {'L', "ROOM LINKING>"},
+     {'S', "LINKING SETTINGS<"},
+     {'X', "EXCHANGE ROOM<"},
      {'C', "COPY"},
      {'P', "PASTE"},
      {0}};
 
   struct menu_item link_menu[] =
-    {{'L', "LEFT"},
-     {'R', "RIGHT"},
-     {'A', "ABOVE"},
-     {'B', "BELOW"},
+    {{'L', "LEFT<"},
+     {'R', "RIGHT<"},
+     {'A', "ABOVE<"},
+     {'B', "BELOW<"},
      {0}};
 
   struct menu_item linking_settings_menu[] =
@@ -203,8 +203,8 @@ editor (void)
      {0}};
 
   struct menu_item level_menu[] =
-    {{'E', "ENVIRONMENT"},
-     {'H', "HUE"},
+    {{'E', "ENVIRONMENT<"},
+     {'H', "HUE<"},
      {'S', "SAVE LEVEL"},
      {'L', "RELOAD LEVEL"},
      {0}};
@@ -223,26 +223,26 @@ editor (void)
      {0}};
 
   struct menu_item guard_menu[] =
-    {{'S', "SELECT GUARD"},
+    {{'S', "SELECT GUARD<"},
      {'J', "JUMP TO START POSITION"},
      {'P', "SET START POSITION"},
      {'D', "TOGGLE START DIRECTION"},
-     {'K', "SKILL"},
-     {'L', "LIVES"},
-     {'T', "TYPE"},
-     {'Y', "STYLE"},
+     {'K', "SKILL>"},
+     {'L', "LIVES<"},
+     {'T', "TYPE<"},
+     {'Y', "STYLE<"},
      {0}};
 
   struct menu_item skill_menu[] =
-    {{'A', "ATTACK"},
-     {'B', "COUNTER ATTACK"},
-     {'D', "DEFENSE"},
-     {'E', "COUNTER DEFENSE"},
-     {'V', "ADVANCE"},
-     {'R', "RETURN"},
-     {'F', "REFRACTION"},
-     {'X', "EXTRA LIFE"},
-     {'L', "LEGACY TEMPLATES"},
+    {{'A', "ATTACK<"},
+     {'B', "COUNTER ATTACK<"},
+     {'D', "DEFENSE<"},
+     {'E', "COUNTER DEFENSE<"},
+     {'V', "ADVANCE<"},
+     {'R', "RETURN<"},
+     {'F', "REFRACTION<"},
+     {'X', "EXTRA LIFE<"},
+     {'L', "LEGACY TEMPLATES<"},
      {0}};
 
   struct menu_item guard_type_menu[] =
@@ -667,9 +667,14 @@ editor (void)
       struct coord c = {room_view, 0, 0};
       set_mouse_coord (&c);
     } else set_mouse_pos (&last_event2floor_pos);
-    switch (menu_list (&s, &r, t, "EF>EVENT")) {
+    switch (menu_list (&s, &r, t, 0, EVENTS - 1, "EF>EVENT")) {
     case -1: set_mouse_coord (&last_mouse_coord); edit = EDIT_EVENT; break;
-    case 0:
+    case 0: break;
+    case 1:
+      edit = EDIT_EVENT;
+      last_event = t;
+      break;
+    default:
       if (s) {
         if (t + s >= 0 && t + s < EVENTS) {
           t += s;
@@ -679,10 +684,6 @@ editor (void)
       if (s || r)
         next_pos_by_pred (&last_event2floor_pos, r, is_event_at_pos, &t);
       break;
-    case 1:
-      edit = EDIT_EVENT;
-      last_event = t;
-      break;
     }
     break;
   case EDIT_DOOR2EVENT:
@@ -690,14 +691,16 @@ editor (void)
       if (was_menu_return_pressed ()) edit = EDIT_EVENT;
       draw_bottom_text (NULL, "SELECT DOOR");
       memset (&key, 0, sizeof (key));
+      t = -1;
     } else {
       if (t < 0) next_int_by_pred (&t, 0, 0, EVENTS - 1, is_pos_at_event, &p);
-      switch (menu_list (NULL, &r, t, "ER>EVENT")) {
+      switch (menu_list (NULL, &r, t, 0, EVENTS - 1, "ER>EVENT")) {
       case -1: edit = EDIT_EVENT; break;
-      case 0:
+      case 0: break;
+      case 1: last_event = t; edit = EDIT_EVENT; break;
+      default:
         if (r) next_int_by_pred (&t, r, 0, EVENTS - 1, is_pos_at_event, &p);
         break;
-      case 1: last_event = t; edit = EDIT_EVENT; break;
       }
     }
     break;

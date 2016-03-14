@@ -29,7 +29,7 @@ char menu_opt (struct menu_item *menu, char *prefix);
 char menu_enum (struct menu_item *menu, char *prefix);
 char menu_bool (struct menu_item *menu, char *prefix, bool exclusive, ...);
 char menu_int (int *v, int *b, int min, int max, char *pref_int, char *pref_bool);
-char menu_list (int *dir0, int *dir1, int index, char *prefix);
+char menu_list (int *dir0, int *dir1, int index, int min, int max, char *prefix);
 bool was_menu_key_pressed (void);
 bool was_menu_return_pressed (void);
 
