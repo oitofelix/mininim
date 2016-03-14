@@ -1019,11 +1019,23 @@ He can jump over (up to) two @emph{places} across without falling.
 
 @center @image{mininim-figures/kid-normal-left} @arrow{} @image{mininim-figures/kid-jump}
 
+@subsubsection Normal jump hang
+@cindex normal jump hang movement
+@cindex movement, normal jump hang
+@cindex hang movement, normal jump
+@cindex jump hang movement, normal
+
 In midair, if he's in a @emph{hangable place}, holding @kbd{SHIFT} and
 pressing @kbd{FRONT} makes him hang on the construction and enter
 @emph{hang mode}.@footnote{The original game has no such movement.}
 
 @center @image{mininim-figures/kid-jump-floor-no-floor} @arrow{} @image{mininim-figures/kid-hang-left}
+
+@subsubsection Normal jump turn
+@cindex normal jump turn movement
+@cindex movement, normal jump turn
+@cindex turn movement, normal jump
+@cindex jump turn movement, normal
 
 If he's in a @emph{hangable place} for the opposite direction, holding
 @kbd{SHIFT} and pressing @kbd{BACK} makes him turn in midair, hang on
@@ -1152,11 +1164,23 @@ indefinitely.
 
 @center @image{mininim-figures/kid-run} @arrow{} @image{mininim-figures/kid-run-jump} @arrow{} @image{mininim-figures/kid-run} @arrow{} @image{mininim-figures/kid-run-jump}
 
+@subsubsection Running jump hang
+@cindex running jump hang movement
+@cindex movement, running jump hang
+@cindex hang movement, running jump
+@cindex jump hang movement, running
+
 In midair, if he's in a @emph{hangable place}, holding @kbd{SHIFT} and
 pressing @kbd{FRONT} makes him hang on the construction and enter
 @emph{hang mode}.@footnote{The original game has no such movement.}
 
 @center @image{mininim-figures/kid-run-jump-floor-no-floor} @arrow{} @image{mininim-figures/kid-hang-left}
+
+@subsubsection Running jump turn
+@cindex running jump turn movement
+@cindex movement, running jump turn
+@cindex turn movement, running jump
+@cindex jump turn movement, running
 
 If he's in a @emph{hangable place} for the opposite direction, holding
 @kbd{SHIFT} and pressing @kbd{BACK} makes him turn in midair, hang on
