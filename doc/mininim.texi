@@ -2374,6 +2374,14 @@ change the selected index.  This is a provision to facilitate the
 manipulation of a multitude of objects whose mechanism of selection
 doesn't give ubiquitous visual feedback.
 
+A similar notation is used for unequivocal and brief menu command
+references in documentation.  Each top level menu is associated with a
+capital letter --- the level editor menu is associated with @samp{E},
+for instance.  If we want to describe the command to change the
+foreground construction to @code{BIG_PILLAR_TOP}, for example, we take
+its path prefix, @samp{CFPT} and prefix it with the top level menu
+letter @samp{E}, like this: @samp{E>CFPT}.
+
 There are two universal keys (called @dfn{menu return keys}) that allow
 you to go up into the menu hierarchy, from any type of command:
 @kbd{BACKSPACE} and @kbd{/}.  The difference between both is that the
@@ -2402,6 +2410,10 @@ be played while it's active.  On the other hand, it completely takes
 over the transitory message bottom line, so even though a certain key
 binding may take effect, any message that it usually shows on the bottom
 line is suppressed.
+
+@iftex
+@page
+@end iftex
 
 @node Mouse selection
 @section Mouse selection
