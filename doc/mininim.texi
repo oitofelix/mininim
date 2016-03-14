@@ -2421,6 +2421,12 @@ As you move the cursor across the screen, the limits of each selected
 place is determined by which construction it holds, roughly considering
 the depth of the region the cursor points to.
 
+It's easy to apply a place-targeting command to a whole contiguous
+region of the current room by simply holding down the command key while
+moving the mouse cursor through each one of its places.  For example, a
+common application of this is to quickly populate a room with walls and
+normal floors before changing smaller details when editing a level.
+
 
 
 
