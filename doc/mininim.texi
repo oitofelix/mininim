@@ -793,10 +793,10 @@ by the kid by pressing the shift key.
 In his journey to save the princess, the kid has to endure several
 levels full of challenging traps and skilled opponents.  Run, walk,
 turn, crouch, jump, hang, climb, take the sword, attack and defend are
-some of the kid's movements at your disposal to make the way to the
-princess tower.  Although, this is a relatively large set of movements,
-basically all these are accomplished by some combination of the
-directional and shift keys, often conditioned to the current kid's
+some of the kid's movements at the user's disposal to make his way to
+the princess tower.  Although, this is a relatively large set of
+movements, basically all these are accomplished by some combination of
+the directional and shift keys, often conditioned to the current kid's
 state.  This chapter explains in detail all possible movements of the
 kid.
 
@@ -809,11 +809,11 @@ movements.
 
 Notice that (whenever it makes sense) for any move, holding its
 triggering keys continues or repeats the movement.@footnote{That's not
-so for the original game, in which for many situations you have to
+so for the original game, in which for many situations the user have to
 release and press the keys again to have the movement repeated.}  Often,
-when transitioning from a movement to another that share some keys, you
-can keep the common keys pressed, as well as any other keys ignored by
-an intermediate movement, and the kid will just do the right thing.
+when transitioning from a movement to another that share some keys, the
+user can keep the common keys pressed, as well as any other keys ignored
+by an intermediate movement, and the kid will just do the right thing.
 It's also worth nothing that the kid responds to the input in real time,
 that is, in the next animation cycle.@footnote{That's not so for the
 original game, in which the kid delays one cycle to respond.}
@@ -858,16 +858,16 @@ manual, may be used.  Its mapping is shown in the following figure.
 @cindex joystick mapping
 @cindex mapping joystick
 @cindex gamepad, joystick
-You can also use a joystick to control the kid.  After hot-plugging the
-joystick in, make sure the axes are centered and no button is pressed,
-then press @kbd{CTRL+J} to enable and auto-calibrate your joystick
-on-the-fly.  The figure below shows the default assumed joystick layout.
-If for some reason your joystick doesn't work with this mapping or you
-want to modify the default mapping, use the @option{--joystick-axis} and
-@option{--joystick-button} options.  In case your joystick starts to
-behave oddly, press @kbd{CTRL+J} again to re-calibrate it.  If the kid
-continues to perform spurious movements, the options
-@option{--joystick-axis-threshold} and
+The user can also use a joystick to control the kid.  After hot-plugging
+the joystick in, make sure the axes are centered and no button is
+pressed, then press @kbd{CTRL+J} to enable and auto-calibrate the
+joystick on-the-fly.  The figure below shows the default assumed
+joystick layout.  If for some reason the joystick doesn't work with this
+mapping or the user wants to modify the default mapping, use the
+@option{--joystick-axis} and @option{--joystick-button} options.  In
+case the joystick starts to behave oddly, press @kbd{CTRL+J} again to
+re-calibrate it.  If the kid continues to perform spurious movements,
+the options @option{--joystick-axis-threshold} and
 @option{--joystick-button-threshold} may help.  @xref{Gamepad options}.
 
 @center @image{mininim-figures/joystick}
@@ -952,8 +952,8 @@ While in it the kid is standing still.
 @cindex turn movement
 @cindex movement, turn
 
-If you press @kbd{BACK}, the kid turns and then faces the opposite
-direction likewise.
+If the user presses @kbd{BACK}, the kid turns and then faces the
+opposite direction likewise.
 
 @center @image{mininim-figures/kid-normal-right} @arrow{} @image{mininim-figures/kid-turn} @arrow{} @image{mininim-figures/kid-normal-left}
 
@@ -1078,15 +1078,14 @@ warning of the eminent danger.
 
 @center @image{mininim-figures/kid-misstep-closer-floor} @arrow{} @image{mininim-figures/kid-normal-closer-floor}
 
-If you insist, he'll obey and suffer the consequences --- so, be
-careful!
+If the user insists, the kid will obey and suffer the consequences!
 
 
 @subsection Descend
 @cindex descend movement
 @cindex movement, descend
 
-If you press @kbd{DOWN} and the kid's @emph{bottom back place} is
+If the user presses @kbd{DOWN} and the kid's @emph{bottom back place} is
 @emph{hangable} and he's near enough to it, he descends, then hangs
 briefly --- entering @emph{hang mode} if @kbd{SHIFT} is kept pressed, or
 dropping off otherwise.
@@ -1100,12 +1099,12 @@ dropping off otherwise.
 @cindex mode, crouch movement
 @cindex movement mode, crouch
 
-If you press @kbd{DOWN} and the kid's @emph{bottom back place} is
+If the user presses @kbd{DOWN} and the kid's @emph{bottom back place} is
 @emph{non-hangable}, or the kid is not near enough to it, he crouches.
 
 @center @image{mininim-figures/kid-normal-left} @arrow{} @image{mininim-figures/kid-couch}
 
-The kid stays crouched as long as you keep @kbd{DOWN} pressed.
+The kid stays crouched as long as the user keeps @kbd{DOWN} pressed.
 Releasing it makes him stand up again.
 
 @center @image{mininim-figures/kid-uncouch} @arrow{} @image{mininim-figures/kid-normal-left}
@@ -1115,8 +1114,8 @@ Releasing it makes him stand up again.
 @cindex movement, crouching jump
 @cindex jump movement, crouching
 
-If you press @kbd{FRONT} without releasing @kbd{DOWN}, the kid performs
-little crouching jumps forward.
+If the user presses @kbd{FRONT} without releasing @kbd{DOWN}, the kid
+performs little crouching jumps forward.
 
 @center @image{mininim-figures/kid-couch} @arrow{} @image{mininim-figures/kid-couch-forward} @arrow{} @image{mininim-figures/kid-couch}
 
@@ -1134,7 +1133,7 @@ original game the threshold is lower.}
 
 @center @image{mininim-figures/kid-normal-left} @arrow{} @image{mininim-figures/kid-start-run}
 
-He runs as long as you keep @kbd{FRONT} pressed.
+He runs as long as the user keeps @kbd{FRONT} pressed.
 
 @center @image{mininim-figures/kid-start-run} @arrow{} @image{mininim-figures/kid-run}
 
@@ -1147,20 +1146,20 @@ Releasing it makes him stop, and go back to the normal stage.
 @cindex movement, running jump
 @cindex jump movement, running
 
-In case you press @kbd{UP} while running, the kid performs a running
-jump.  The running jump has a reach greater than the @emph{normal jump}.
-The kid can jump over (up to) three @emph{places} across without
-falling.
+In case the user presses @kbd{UP} while running, the kid performs a
+running jump.  The running jump has a reach greater than the
+@emph{normal jump}.  The kid can jump over (up to) three @emph{places}
+across without falling.
 
 @center @image{mininim-figures/kid-run} @arrow{} @image{mininim-figures/kid-run-jump}
 
-When the kid lands on ground, he continues to run if you keep
+When the kid lands on ground, he continues to run if the user keeps
 @kbd{FRONT} pressed.
 
 @center @image{mininim-figures/kid-run-jump} @arrow{} @image{mininim-figures/kid-run}
 
-This implies that, if you keep both keys pressed the movement repeats
-indefinitely.
+This implies that, if the user keeps both keys pressed the movement
+repeats indefinitely.
 
 @center @image{mininim-figures/kid-run} @arrow{} @image{mininim-figures/kid-run-jump} @arrow{} @image{mininim-figures/kid-run} @arrow{} @image{mininim-figures/kid-run-jump}
 
@@ -1194,8 +1193,8 @@ has no such movement.}
 @cindex movement, running crouch
 @cindex couch movement, running
 
-If you press @kbd{DOWN} while running, he crouches, slipping with some
-momentum, and then he enters @emph{crouch mode}.
+If the user presses @kbd{DOWN} while running, he crouches, slipping with
+some momentum, and then he enters @emph{crouch mode}.
 
 @center @image{mininim-figures/kid-run} @arrow{} @image{mininim-figures/kid-couch}
 
@@ -1204,8 +1203,9 @@ momentum, and then he enters @emph{crouch mode}.
 @cindex movement, running turn
 @cindex turn movement, running
 
-If you press @kbd{BACK} while running, the kid turns without stopping
-and continues to run in the opposite direction if you keep it pressed.
+If the user presses @kbd{BACK} while running, the kid turns without
+stopping and continues to run in the opposite direction if the user
+keeps it pressed.
 
 @center @image{mininim-figures/kid-run} @arrow{} @image{mininim-figures/kid-turn-run} @arrow{} @image{mininim-figures/kid-run-right}
 
@@ -1313,7 +1313,7 @@ more kills him instantly.
 When falling if the kid is passing through a @emph{hangable place} and
 his vertical velocity is low enough, and he's near enough to the
 @emph{hangable construction}, he is able to hang there and enter
-@emph{hang mode} if you hold @kbd{SHIFT} down.
+@emph{hang mode} if the user holds @kbd{SHIFT} down.
 
 @center @image{mininim-figures/kid-fall-floor-front} @arrow{} @image{mininim-figures/kid-hang-left}
 
@@ -1354,7 +1354,7 @@ Pressing @kbd{FRONT}, makes the kid walk forward.
 @cindex fight walk backward movement
 @cindex movement, fight walk backward
 
-If you press @kbd{BACK}, the kid goes backward.
+If the user presses @kbd{BACK}, the kid goes backward.
 
 @center @image{mininim-figures/kid-sword-normal} @arrow{} @image{mininim-figures/kid-sword-walkb}
 
@@ -1362,7 +1362,7 @@ If you press @kbd{BACK}, the kid goes backward.
 @cindex defense movement
 @cindex movement, defense
 
-If you press @kbd{UP}, the kid makes the defense movement.
+If the user presses @kbd{UP}, the kid makes the defense movement.
 
 @center @image{mininim-figures/kid-sword-normal} @arrow{} @image{mininim-figures/kid-sword-defense}
 
@@ -1413,20 +1413,20 @@ lower his guard, walking forward makes him vulnerable until he puts
 himself on guard again.
 
 The kid's skills are built up by defeating enemies.@footnote{In the
-original game there is no such skills scheme.  There, if you don't get
-tired of pressing @kbd{SHIFT} and @kbd{UP}, the kid's counter attack and
-counter defense are infallible.}  The more advanced the defeated enemy's
-skills, the more the kid's skills improve.  Both skills ---KCA and
-KCD--- are given by a number between 0 and 100, interpreted as
-percentages, indicating the likelihood of counter attacking and counter
-defending, respectively.
+original game there is no such skills scheme.  There, if the user
+doesn't get tired of pressing @kbd{SHIFT} and @kbd{UP}, the kid's
+counter attack and counter defense are infallible.}  The more advanced
+the defeated enemy's skills, the more the kid's skills improve.  Both
+skills ---KCA and KCD--- are given by a number between 0 and 100,
+interpreted as percentages, indicating the likelihood of counter
+attacking and counter defending, respectively.
 
 @subsection Keep sword
 @cindex keep sword movement
 @cindex movement, keep sword
 
-Finally you can make the kid keep his sword and return to @emph{normal
-mode} by pressing @kbd{DOWN}.
+Finally the user can make the kid keep his sword and return to
+@emph{normal mode} by pressing @kbd{DOWN}.
 
 @center @image{mininim-figures/kid-sword-normal} @arrow{} @image{mininim-figures/kid-keep-sword} @arrow{} @image{mininim-figures/kid-normal-left}
 
@@ -1586,9 +1586,9 @@ Float kid.  This is equivalent to drinking a float potion.
 @cindex @code{--time-limit}, related key binding
 @cindex @code{--start-time}, related key binding
 
-These key bindings allow you to control the remaining time available to
-end the game.  They are related to options @option{--time-limit} and
-@option{--start-time}.
+These key bindings allow the user to control the remaining time
+available to end the game.  They are related to options
+@option{--time-limit} and @option{--start-time}.
 
 @table @kbd
 @kindex SPACE
@@ -1617,8 +1617,8 @@ second.
 @cindex @code{--kca}, related key binding
 @cindex @code{--kcd}, related key binding
 
-These key bindings allow you to set the kid skills.  They are related to
-options @option{--kca} and @option{--kcd}.
+These key bindings allow the user to set the kid skills.  They are
+related to options @option{--kca} and @option{--kcd}.
 
 @table @kbd
 @kindex TAB
@@ -1652,11 +1652,11 @@ Decrement KCD skill.
 @cindex room coordinates
 @cindex coordinates, room
 
-These key bindings allow you to move the camera around the level, making
-it possible to view any room linked to the current one without having to
-move the kid there.  Notice that if the kid enters the room the camera
-is on, it starts following him again.  There is also a couple of key
-bindings intended to show room coordinates, which is useful when
+These key bindings allow the user to move the camera around the level,
+making it possible to view any room linked to the current one without
+having to move the kid there.  Notice that if the kid enters the room
+the camera is on, it starts following him again.  There is also a couple
+of key bindings intended to show room coordinates, which is useful when
 building levels.
 
 @table @kbd
@@ -1722,8 +1722,8 @@ Save game.
 @cindex peripherals key bindings
 @cindex key bindings, peripherals
 
-These key bindings allow you to tune hardware peripherals that work with
-the game.
+These key bindings allow the user to tune hardware peripherals that work
+with the game.
 
 @table @kbd
 @kindex F
@@ -1955,10 +1955,10 @@ the native format and exit.  The levels are saved in the user data
 directory, where they take precedence over levels in every other
 location.  When using this option there is no point in using any other
 options besides @option{--level-module} that must occur before this to
-take effect.  You can accomplish a similar result in-game on a per level
-basis by using the @kbd{E>LS} command.  Notice that in this case any
-changes made to the level by special events (or otherwise) before you
-trigger the save command will be retained.
+take effect.  The user can accomplish a similar result in-game on a per
+level basis by using the @kbd{E>LS} command.  Notice that in this case
+any changes made to the level by special events (or otherwise) before
+the user triggers the save command will be retained.
 
 @optindex --level-module
 @cindex @samp{NATIVE} level module
@@ -2154,13 +2154,13 @@ there is support for two classes of gamepads: @emph{keyboard} and
 @emph{joystick}.
 
 The primary joystick's axis and button numbers are listed by the option
-@option{--joystick-info}.  You can find out the number of a particular
-axis or button by pressing it before invoking MININIM with that option.
-If a stick, axis or button given to an option doesn't exist in the
-primary joystick, it's silently ignored.  The joystick can be activated
-and auto-calibrated in-game by the @kbd{CTRL+J} key binding.
-@xref{Peripherals}.  If your joystick is peculiar enough, proving the
-auto-calibration mechanism insufficient, the
+@option{--joystick-info}.  The user can find out the number of a
+particular axis or button by pressing it before invoking MININIM with
+that option.  If a stick, axis or button given to an option doesn't
+exist in the primary joystick, it's silently ignored.  The joystick can
+be activated and auto-calibrated in-game by the @kbd{CTRL+J} key
+binding.  @xref{Peripherals}.  If the joystick is peculiar enough,
+proving the auto-calibration mechanism insufficient, the
 @option{--joystick-axis-threshold} and
 @option{--joystick-button-threshold} options may help.
 
@@ -2311,7 +2311,7 @@ Print program name and version and exit
 @c --- Menu system;
 @node Menu system
 @chapter Menu system
-@cindex Menu system
+@cindex menu system
 
 MININIM features an uniform@footnote{As the menu system is uniform we
 describe its general behavior and expected interface of interaction in
@@ -2331,18 +2331,18 @@ traditionally used for transitory messages.  It looks like this:
 Each capital letter indicates which key triggers the related @dfn{menu
 command} (case insensitive).  Each menu command may be terminal or
 non-terminal.  @dfn{Terminal menu commands} execute an action right away
-when you press its correspondent key, while @dfn{non-terminal menu
-commands} open a sub-menu with further menu commands to choose from.  In
-principle, non-terminal menu commands may nest to arbitrary depth.  A
-terminal menu command may be either an @dfn{input command} or a
-@dfn{non-input command}.  The former puts the bottom line in input mode,
-so the user can enter a value expected by the command, while the latter
-needs no further information to perform its action.  There are a few
-specialized input modes that are described in the following sections.
-Although capital letters usually represent the initials of the related
-command, they have no universal or intrinsic meaning, and are freely
-reused within sub-menus and may have been chosen arbitrarily in case
-they were ambiguous.
+when the user presses its correspondent key, while @dfn{non-terminal
+menu commands} open a sub-menu with further menu commands to choose
+from.  In principle, non-terminal menu commands may nest to arbitrary
+depth.  A terminal menu command may be either an @dfn{input command} or
+a @dfn{non-input command}.  The former puts the bottom line in input
+mode, so the user can enter a value expected by the command, while the
+latter needs no further information to perform its action.  There are a
+few specialized input modes that are described in the following
+sections.  Although capital letters usually represent the initials of
+the related command, they have no universal or intrinsic meaning, and
+are freely reused within sub-menus and may have been chosen arbitrarily
+in case they were ambiguous.
 
 The @kbd{?} key is present in every menu because it's special: it's used
 to query the exact command performed by a given key.  When pressed the
@@ -2354,7 +2354,7 @@ the description ends with the @samp{<} character.  Some commands may be
 terminal or non-terminal, input or non-input, depending upon some
 context like the mouse selection.  These have their descriptions ended
 by the @samp{*} character.  The current menu comes back into view, in
-case you press any key invalid for it.
+case the user presses any key invalid for it.
 
 Usually every menu command has a path prefix, indicating where in the
 menu hierarchy it's located.  Consider the following menu system bottom
@@ -2366,7 +2366,7 @@ The @samp{HYT} string before the @samp{>} character is the @dfn{menu
 path}.  It says the current menu is three levels deep, and its direct
 parent is @samp{T}, whose parent in turn is @samp{Y}, whose parent in
 turn is @samp{H}, which is located in the topmost menu.  By looking at
-the menu path you can figure out if you are actually where you are
+the menu path the user can figure out if he is actually where he's
 supposed to, and how to quickly get there again from the topmost menu.
 Sometimes a path prefix may contain digits indicating the index of the
 object to which the menu commands apply, usually having a command to
@@ -2383,7 +2383,7 @@ its path prefix, @samp{CFPT} and prefix it with the top level menu
 letter @samp{E}, like this: @samp{E>CFPT}.
 
 There are two universal keys (called @dfn{menu return keys}) that allow
-you to go up into the menu hierarchy, from any type of command:
+the user to go up into the menu hierarchy, from any type of command:
 @kbd{BACKSPACE} and @kbd{/}.  The difference between both is that the
 former ``confirms'' before returning, while the latter doesn't.  What
 ``to confirm'' means is dependent on the specific context and input mode
@@ -2391,7 +2391,7 @@ of the command at hand, but the general principle is that ``to confirm''
 implies in a change of state.  In cases where no change of state is
 involved, like a common non-terminal (sub-menu) command, both keys can
 be used interchangeably.  Holding down any menu return key for a second
-or so, gets you back to the topmost menu.
+or so, gets the user back to the topmost menu.
 
 While the menu system is active any key bindings that doesn't conflict
 with its input methods continue to work as usual.  However, the menu
@@ -2429,9 +2429,9 @@ surroundings like in the picture below.
 
 @center @image{mininim-figures/mouse-selection}
 
-As you move the cursor across the screen, the limits of each selected
-place is determined by which construction it holds, roughly considering
-the depth of the region the cursor points to.
+As the user moves the cursor across the screen, the limits of each
+selected place is determined by which construction it holds, roughly
+considering the depth of the region the cursor points to.
 
 It's easy to apply a place-targeting command to a whole contiguous
 region of the current room by simply holding down the command key while
@@ -2648,6 +2648,112 @@ parameter index.  When handling bi-dimensional lists, for each element
 in the first index there is possibly a list of elements in the second
 index.  For uni-dimensional lists, either index may be used.
 
+
+
+
+
+@c --- Level editor;
+@node Level editor
+@chapter Level editor
+@cindex level editor
+
+MININIM has a complete built-in level editor that enables the user to
+easily construct and modify levels on-the-fly, using the menu system
+interface (see @ref{Menu system}).  It gives the user quick and
+convenient access to the full potential of the engine and its native
+level format without quitting the playing mode, so the user can
+simultaneously build and test the levels.
+
+The level editor is enabled/disabled by clicking with any mouse button
+anywhere in the game screen.  For a more convenient play-editing
+experience, the last menu state is always restored when enabling the
+level editor.  When enabled the mouse selection is always active (see
+@ref{Mouse selection}).  The topmost level editor menu looks like this:
+
+@center @kbd{CERKGL?}
+
+Each one of these menu commands and their sub-commands (recursively),
+are defined and explored in the following sections.
+
+@node Construction E>C
+@section Construction: E>C
+@cindex level editor, construction E>C
+@cindex E>C level editor, construction
+@cindex construction E>C, level editor
+
+
+
+@node Foreground E>CF
+@subsection Foreground: E>CF
+@cindex level editor, construction foreground E>CF
+@cindex E>CF level editor, construction foreground
+@cindex construction foreground E>CF, level editor
+
+@node Background E>CB
+@subsection Background: E>CB
+@cindex level editor, construction background E>CB
+@cindex E>CB level editor, construction background
+@cindex construction background  E>CB, level editor
+
+@node Extension E>CE
+@subsection Extension: E>CE
+@cindex level editor, construction extension E>CE
+@cindex E>CE level editor, construction extension
+@cindex construction extension E>CE, level editor
+
+@node Info E>CI
+@subsection Info: E>CI
+@cindex level editor, construction info E>CI
+@cindex E>CI level editor, construction info
+@cindex construction info E>CI, level editor
+
+@node Copy E>CC
+@subsection Copy: E>CC
+@cindex level editor, construction copy E>CC
+@cindex E>CC level editor, construction copy
+@cindex construction copy E>CC, level editor
+
+@node Paste E>CP
+@subsection Paste: E>CP
+@cindex level editor, construction paste E>CP
+@cindex E>CP level editor, construction paste
+@cindex construction paste E>CP, level editor
+
+
+@node Event
+@section Event
+@cindex level editor, event
+@cindex event, level editor
+
+@node Room
+@section Room
+@cindex level editor, room
+@cindex room, level editor
+
+@node Kid
+@section Kid
+@cindex level editor, kid
+@cindex kid, level editor
+
+@node Guard
+@section Guard
+@cindex level editor, guard
+@cindex guard, level editor
+
+@node Level
+@section Level
+@cindex level editor, level
+@cindex level, level editor
+
+
+
+
+@c --- Native level format;
+@node Native level format
+@chapter Native level format
+@cindex native level format
+@cindex format, native level
+@cindex level format, native
 
 
 
