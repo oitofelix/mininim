@@ -28,11 +28,13 @@
 @defcodeindex bg
 @defcodeindex ext
 @defcodeindex opt
+@defcodeindex mc
 @syncodeindex fg cp
 @syncodeindex bg cp
 @syncodeindex ext cp
 @syncodeindex ky cp
 @syncodeindex opt cp
+@syncodeindex mc cp
 @c %**end of header
 
 
@@ -2670,54 +2672,192 @@ experience, the last menu state is always restored when enabling the
 level editor.  When enabled the mouse selection is always active (see
 @ref{Mouse selection}).  The topmost level editor menu looks like this:
 
-@center @kbd{CERKGL?}
+@center @kbd{CERKGL}
 
 Each one of these menu commands and their sub-commands (recursively),
 are defined and explored in the following sections.
 
+
 @node Construction E>C
 @section Construction: E>C
-@cindex level editor, construction E>C
-@cindex E>C level editor, construction
-@cindex construction E>C, level editor
+@cindex level editor, construction
+@cindex construction, level editor
+@mcindex E>C
 
+This non-terminal command has sub-commands for setting and querying the
+three intrinsic construction attributes: @emph{foreground},
+@emph{background} and @emph{extension}.  @xref{Constructions}.  All
+commands in this hierarchy applies to the selected construction.
+
+@center @kbd{C>FBEICP}
 
 
 @node Foreground E>CF
 @subsection Foreground: E>CF
-@cindex level editor, construction foreground E>CF
-@cindex E>CF level editor, construction foreground
-@cindex construction foreground E>CF, level editor
+@cindex level editor, construction foreground
+@cindex construction foreground, level editor
+@mcindex E>CF
+
+This non-terminal command has sub-commands for all possible construction
+foregrounds.  Each immediate sub-command represents a construction
+foreground class as described in @ref{Foregrounds}.
+
+@center @kbd{CF>FPWDCMRA}
+
+The only terminal commands are @kbd{W} (Wall), @kbd{C} (Chopper) and
+@kbd{M} (Mirror), because they represent classes with just one member.
+The remaining non-terminal commands are comprised solely of terminal
+commands, one for each member of the respective class.  Every terminal
+command in this hierarchy works in the same way: they immediately change
+the foreground of the selected construction.  The user may keep the
+respective command key pressed while moving the mouse selection around
+to easily apply a particular foreground to an wider region, as described
+in @ref{Mouse selection}.  This command's hierarchy is structured as
+follows:
+
+@itemize
+@mcindex E>CFF
+@item @kbd{F} (Floor): @kbd{CFF>NFBSLPOCTH}
+@itemize
+@mcindex E>CFFN
+@item @kbd{N} @code{NO_FLOOR}
+@mcindex E>CFFF
+@item @kbd{F} @code{FLOOR}
+@mcindex E>CFFB
+@item @kbd{B} @code{BROKEN_FLOOR}
+@mcindex E>CFFS
+@item @kbd{S} @code{SKELETON_FLOOR}
+@mcindex E>CFFL
+@item @kbd{L} @code{LOOSE_FLOOR}
+@mcindex E>CFFP
+@item @kbd{P} @code{SPIKES_FLOOR}
+@mcindex E>CFFO
+@item @kbd{O} @code{OPENER_FLOOR}
+@mcindex E>CFFC
+@item @kbd{C} @code{CLOSER_FLOOR}
+@mcindex E>CFFT
+@item @kbd{T} @code{STUCK_FLOOR}
+@mcindex E>CFFH
+@item @kbd{H} @code{HIDDEN_FLOOR}
+@end itemize
+
+@mcindex E>CFP
+@item @kbd{P} (Pillar): @kbd{CFP>PTBA}
+@itemize
+@mcindex E>CFPP
+@item @kbd{P} @code{PILLAR}
+@mcindex E>CFPT
+@item @kbd{T} @code{BIG_PILLAR_TOP}
+@mcindex E>CFPB
+@item @kbd{B} @code{BIG_PILLAR_BOTTOM}
+@mcindex E>CFPA
+@item @kbd{A} @code{ARCH_BOTTOM}
+@end itemize
+
+@mcindex E>CFW
+@item @kbd{W} @code{WALL}
+
+@mcindex E>CFD
+@item @kbd{D} (Door): @kbd{CFD>DL}
+@itemize
+@mcindex E>CFDD
+@item @kbd{D} @code{DOOR}
+@mcindex E>CFDL
+@item @kbd{L} @code{LEVEL_DOOR}
+@end itemize
+
+@mcindex E>CFC
+@item @kbd{C} @code{CHOPPER}
+
+@mcindex E>CFM
+@item @kbd{M} @code{MIRROR}
+
+@mcindex E>CFR
+@item @kbd{R} (Carpet): @kbd{CFR>CT}
+@itemize
+@mcindex E>CFRC
+@item @kbd{C} @code{CARPET}
+@mcindex E>CFRT
+@item @kbd{T} @code{TCARPET}
+@end itemize
+
+@mcindex E>CFA
+@item @kbd{A} (Arch): @kbd{CFA>MSLR}
+@itemize
+@mcindex E>CFAM
+@item @kbd{M} @code{ARCH_TOP_MID}
+@mcindex E>CFAS
+@item @kbd{S} @code{ARCH_TOP_SMALL}
+@mcindex E>CFAL
+@item @kbd{L} @code{ARCH_TOP_LEFT}
+@mcindex E>CFAR
+@item @kbd{R} @code{ARCH_TOP_RIGHT}
+@end itemize
+@end itemize
+
 
 @node Background E>CB
 @subsection Background: E>CB
-@cindex level editor, construction background E>CB
-@cindex E>CB level editor, construction background
-@cindex construction background  E>CB, level editor
+@cindex level editor, construction background
+@cindex construction background, level editor
+@mcindex E>CB
+
+This non-terminal command has sub-commands for all possible construction
+backgrounds.  Each sub-command is terminal and represents a construction
+background as described in @ref{Backgrounds}.
+
+@center @kbd{CB>NG0123TWB}
+
+Every sub-command works in the same way: they immediately change the
+background of the selected construction.  The user may keep the
+respective command key pressed while moving the mouse selection around
+to easily apply a particular background to an wider region, as described
+in @ref{Mouse selection}.  The sub-commands have the following meanings:
+
+@itemize
+@mcindex E>CBN
+@item @kbd{N} @code{NO_BRICKS}
+@mcindex E>CBG
+@item @kbd{G} @code{NO_BG}
+@mcindex E>CB0
+@item @kbd{0} @code{BRICKS_00}
+@mcindex E>CB1
+@item @kbd{1} @code{BRICKS_01}
+@mcindex E>CB2
+@item @kbd{2} @code{BRICKS_02}
+@mcindex E>CB3
+@item @kbd{3} @code{BRICKS_03}
+@mcindex E>CBT
+@item @kbd{T} @code{TORCH}
+@mcindex E>CBW
+@item @kbd{W} @code{WINDOW}
+@mcindex E>CBB
+@item @kbd{B} @code{BALCONY}
+@end itemize
 
 @node Extension E>CE
 @subsection Extension: E>CE
-@cindex level editor, construction extension E>CE
-@cindex E>CE level editor, construction extension
-@cindex construction extension E>CE, level editor
+@cindex level editor, construction extension
+@cindex construction extension, level editor
+@mcindex E>CE
 
 @node Info E>CI
 @subsection Info: E>CI
-@cindex level editor, construction info E>CI
-@cindex E>CI level editor, construction info
-@cindex construction info E>CI, level editor
+@cindex level editor, construction info
+@cindex construction info, level editor
+@mcindex E>CI
 
 @node Copy E>CC
 @subsection Copy: E>CC
-@cindex level editor, construction copy E>CC
-@cindex E>CC level editor, construction copy
-@cindex construction copy E>CC, level editor
+@cindex level editor, construction copy
+@cindex construction copy, level editor
+@mcindex E>CC
 
 @node Paste E>CP
 @subsection Paste: E>CP
-@cindex level editor, construction paste E>CP
-@cindex E>CP level editor, construction paste
-@cindex construction paste E>CP, level editor
+@cindex level editor, construction paste
+@cindex construction paste, level editor
+@cindex E>CP
 
 
 @node Event
