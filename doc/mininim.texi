@@ -2386,12 +2386,12 @@ There are two universal keys (called @dfn{menu return keys}) that allow
 you to go up into the menu hierarchy, from any type of command:
 @kbd{BACKSPACE} and @kbd{/}.  The difference between both is that the
 former ``confirms'' before returning, while the latter doesn't.  What
-``to confirm'' means is dependent on the specific context and input
-method of the command at hand, but the general principle is that ``to
-confirm'' implies in a change of state.  In cases where no change of
-state is involved, like a common non-terminal (sub-menu) command, both
-keys can be used interchangeably.  Holding down any menu return key for
-a second or so, gets you back to the topmost menu.
+``to confirm'' means is dependent on the specific context and input mode
+of the command at hand, but the general principle is that ``to confirm''
+implies in a change of state.  In cases where no change of state is
+involved, like a common non-terminal (sub-menu) command, both keys can
+be used interchangeably.  Holding down any menu return key for a second
+or so, gets you back to the topmost menu.
 
 While the menu system is active any key bindings that doesn't conflict
 with its input methods continue to work as usual.  However, the menu
@@ -2440,6 +2440,112 @@ common application of this is to quickly populate a room with walls and
 normal floors before changing smaller details when editing a level.
 
 
+@node Integer input
+@section Integer input
+@cindex integer input
+@cindex input, integer
+
+@cartouche
+@center @kbd{PREF>PAR MIN-MAX:I B}
+@end cartouche
+
+@table @var
+@item PREF
+command prefix
+@item PAR
+name of the parameter
+@item MIN
+minimum acceptable value
+@item MAX
+maximum acceptable value
+@item I
+current value.  Its always kept between @var{MIN} and @var{MAX}
+inclusive.
+@item B
+auxiliary boolean.  Its meaning is command dependent.  @samp{-} means
+disabled and any other capital letter (which often suggests the meaning)
+is enabled.  It may not be used in which case nothing is shown in this
+field.
+@end table
+
+@cartouche
+@center @noindent @strong{KEYS}
+@end cartouche
+
+@table @kbd
+@item -
+@itemx _
+decrement @var{I}. If @var{I} equals @var{MIN} nothing happens.
+@item +
+@itemx =
+increment @var{I}.  If @var{I} equals @var{MAX} nothing happens.
+@item 0..9
+enter decimal value directly.  The resulting @var{I} is the minimum
+between @var{MAX} and @math{10I + d}, where @var{d} is the entered
+decimal digit.
+@item \
+delete least significant decimal digit.  The resulting @var{I} is the
+maximum between @var{MIN} and the integer quotient of @math{I/10}.
+@item SPACE
+toggle auxiliary boolean.  Only effective if the auxiliary boolean is
+used.
+@item BACKSPACE
+confirm and return
+@item /
+return
+@end table
+
+
+@node List navigation
+@section List navigation
+@cindex list navigation
+@cindex navigation, list
+
+@cartouche
+@center @kbd{PREF>PAR I +-<>}
+@end cartouche
+
+@table @var
+@item PREF
+command prefix
+@item PAR
+name of the parameter
+@item I
+parameter index
+@item @kbd{-+}
+indicates that the keys @kbd{-} and @kbd{+} can be used to
+decrement/increment the first index
+@item @kbd{<>}
+indicates that the keys @kbd{<} and @kbd{>} can be used to
+decrement/increment the second index
+@end table
+
+@cartouche
+@center @noindent @strong{KEYS}
+@end cartouche
+
+@table @kbd
+@item -
+@itemx _
+decrement the first index. If already at the minimum index nothing
+happens.
+@item +
+@itemx =
+increment the first index.  If already at the maximum index nothing
+happens.
+@item ,
+@itemx <
+decrement the second index. If already at the minimum index nothing
+happens.
+@item .
+@itemx >
+increment the second index.  If already at the maximum index nothing
+happens.
+@item BACKSPACE
+confirm and return
+@item /
+return
+@end table
 
 
 
