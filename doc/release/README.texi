@@ -167,17 +167,14 @@ releases of this program subscribe to the author's atom feed at
 
 
 @c --- Description;
+@ifclear manual
 @ifset file
 @chapter Description
-@end ifset
-@ifset manual
-@node Description
-@section Description
 @end ifset
 
 @include description.texi
 
-
+@end ifclear
 
 
 
