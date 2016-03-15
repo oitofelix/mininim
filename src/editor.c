@@ -531,13 +531,19 @@ editor (void)
       b = con (&p)->ext.step & 0x80;
       min = b ? 128 : 0;
       max = b ? 133 : 5;
-      if (menu_int (&r, &b, min, max, "CE>STEP", "B"))
-        edit = EDIT_CON;
-      else if (r != con (&p)->ext.step
-               || b != (con (&p)->ext.step & 0x80)) {
-        destroy_con_at_pos (&p);
-        con (&p)->ext.step = b ? r | 0x80 : r & ~ 0x80;
-        register_con_at_pos (&p);
+      s = menu_int (&r, &b, min, max, "CE>STEP", "B");
+      switch (s) {
+      case -1: edit = EDIT_CON; break;
+      case 0: break;
+      case 1: edit = EDIT_CON; break;
+      default:
+        if (r != con (&p)->ext.step
+            || b != (con (&p)->ext.step & 0x80)) {
+          destroy_con_at_pos (&p);
+          con (&p)->ext.step = b ? r | 0x80 : r & ~ 0x80;
+          register_con_at_pos (&p);
+        }
+        break;
       }
       break;
     case CARPET:
@@ -1141,14 +1147,17 @@ menu_step_ext (struct pos *p, int max)
 {
   int r = con (p)->ext.step;
   char c = menu_int (&r, NULL, 0, max, "CE>STEP", NULL);
-  if (c)
-    edit = EDIT_CON;
-  else {
+  switch (c) {
+  case -1: edit = EDIT_CON; break;
+  case 0: break;
+  case 1: edit = EDIT_CON; break;
+  default:
     if (con (p)->ext.step != r) {
       destroy_con_at_pos (p);
       con (p)->ext.step = r;
       register_con_at_pos (p);
     }
+    break;
   }
   return c;
 }
@@ -1158,14 +1167,17 @@ menu_event_ext (struct pos *p)
 {
   int r = con (p)->ext.event;
   char c = menu_int (&r, NULL, 0, EVENTS - 1, "CE>EVENT", NULL);
-  if (c)
-    edit = EDIT_CON;
-  else {
+  switch (c) {
+  case -1: edit = EDIT_CON; break;
+  case 0: break;
+  case 1: edit = EDIT_CON; break;
+  default:
     if (con (p)->ext.event != r) {
       destroy_con_at_pos (p);
       con (p)->ext.event = r;
       register_con_at_pos (p);
     }
+    break;
   }
   return c;
 }
