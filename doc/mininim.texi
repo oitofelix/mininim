@@ -2337,12 +2337,12 @@ principle, non-terminal menu commands may nest to arbitrary depth.  A
 terminal menu command may be either an @dfn{input command} or a
 @dfn{non-input command}.  The former puts the bottom line in input mode,
 so the user can enter a value expected by the command, while the latter
-needs no further information to perform its action.  There are several
-specialized input modes that are described later. Although capital
-letters usually represent the initials of the related command, they have
-no universal or intrinsic meaning, and are freely reused within
-sub-menus and may have been chosen arbitrarily in case they were
-ambiguous.
+needs no further information to perform its action.  There are a few
+specialized input modes that are described in the following sections.
+Although capital letters usually represent the initials of the related
+command, they have no universal or intrinsic meaning, and are freely
+reused within sub-menus and may have been chosen arbitrarily in case
+they were ambiguous.
 
 The @kbd{?} key is present in every menu because it's special: it's used
 to query the exact command performed by a given key.  When pressed the
@@ -2439,9 +2439,38 @@ moving the mouse cursor through each one of its places.  For example, a
 common application of this is to quickly populate a room with walls and
 normal floors before changing smaller details when editing a level.
 
+Mouse selection is also used by menu commands to give visual feedback on
+the placement of a particular object within the game world.  Some
+commands move the mouse selection arbitrarily and lock it on a
+particular object, so the user doesn't interfere with their
+selection-based report mechanism until them return.
+
+
+@node Input modes
+@section Input modes
+@cindex input modes
+@cindex modes, input
+
+All input terminal commands use one of the input modes described in this
+section in a way or another.  The input mode defines the type of
+parameter expected by the command and the input interface for setting
+it.  User input is processed in real time and the commands give visual
+feedback usually in the form of changes in mouse selection and message
+line status.  In this chapter the input modes are briefly described in
+the next sections following the layout:
+
+@enumerate
+@item General output look of the particular input mode in the message
+line.
+@item Definition table that explains the meaning of each output field.
+@item Input table that lists the valid keys and their effect on the
+input mode.
+@item Brief description and remarks about the input mode.
+@end enumerate
+
 
 @node Integer input
-@section Integer input
+@subsection Integer input
 @cindex integer input
 @cindex input, integer
 
@@ -2462,10 +2491,10 @@ maximum acceptable value
 current value.  Its always kept between @var{MIN} and @var{MAX}
 inclusive.
 @item B
-auxiliary boolean.  Its meaning is command dependent.  @samp{-} means
-disabled and any other capital letter (which often suggests the meaning)
-is enabled.  It may not be used in which case nothing is shown in this
-field.
+auxiliary boolean parameter.  Its meaning is command dependent.
+@samp{-} means disabled and any other capital letter (which often
+suggests the meaning) is enabled.  It may not be used in which case
+nothing is shown in this field.
 @end table
 
 @cartouche
@@ -2487,19 +2516,84 @@ decimal digit.
 delete least significant decimal digit.  The resulting @var{I} is the
 maximum between @var{MIN} and the integer quotient of @math{I/10}.
 @item SPACE
-toggle auxiliary boolean.  Only effective if the auxiliary boolean is
-used.
+toggle auxiliary boolean parameter.  Only effective if the auxiliary
+boolean parameter is used.
 @item BACKSPACE
 confirm and return
 @item /
 return
 @end table
 
+This is the canonical input mode for setting integer parameters.  It
+processes user input in such a way that it's impossible to enter an
+integer outside the expected range.  The integer may be inputted
+directly, useful in cases the user want to input a value significantly
+far from the current one and doesn't care about any visual feedback for
+values in between, or may otherwise be incremented or decremented one by
+one.
 
-@node List navigation
-@section List navigation
-@cindex list navigation
-@cindex navigation, list
+If present, an auxiliary boolean parameter somehow associated with the
+integer parameter may be set as well.  In some cases toggling it,
+effectively changes the acceptable range for the integer parameter.
+
+@node Boolean input
+@subsection Boolean input
+@cindex boolean input
+@cindex input, boolean
+
+@cartouche
+@center @kbd{PREF>A-B*C-...?}
+@end cartouche
+
+@table @var
+@item PREF
+command prefix
+@item A
+@itemx B
+@itemx C
+@itemx ...
+arbitrary number of parameters
+@item @kbd{-}
+respective parameter is disabled
+@item @kbd{*}
+respective parameter is enabled
+@item @kbd{?}
+description of parameters.
+@end table
+
+@cartouche
+@center @noindent @strong{KEYS}
+@end cartouche
+
+@table @kbd
+@item A
+@itemx B
+@itemx C
+@itemx ...
+toggle the respective parameter
+@item ?
+help on a particular parameter.  Press this followed by the respective
+parameter key.
+@item BACKSPACE
+confirm and return
+@item /
+return
+@end table
+
+This input mode works similarly to a common non-terminal command, that
+is, a sub-menu.  The difference is that what would otherwise be commands
+are actually parameters which are toggled when the respective keys are
+pressed.  Boolean inputs have two forms: @dfn{exclusive} and
+@dfn{non-exclusive}.  In the former only one parameter may be enabled at
+a time, so enabling a parameter automatically disables all others
+(a.k.a. @dfn{radio buttons}).  The latter has no such restriction
+(a.k.a. @dfn{checklist}).
+
+
+@node List input
+@subsection List input
+@cindex list input
+@cindex input, list
 
 @cartouche
 @center @kbd{PREF>PAR I +-<>}
@@ -2546,6 +2640,15 @@ confirm and return
 @item /
 return
 @end table
+
+This input mode is used to allow the user to walk through
+uni-dimensional and bi-dimensional lists of elements while receiving
+visual feedback, usually in the form of mouse selection and/or the
+parameter index.  When handling bi-dimensional lists, for each element
+in the first index there is possibly a list of elements in the second
+index.  For uni-dimensional lists, either index may be used.
+
+
 
 
 
