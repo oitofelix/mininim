@@ -147,8 +147,7 @@ editor (void)
      {0}};
 
   struct menu_item loose_floor_ext_menu[] =
-    {{'F', "FALL"},
-     {'C', "CAN'T FALL"},
+    {{'C', "CAN'T FALL"},
      {0}};
 
   struct menu_item carpet_ext_menu[] =
@@ -490,26 +489,17 @@ editor (void)
       }
       break;
     case LOOSE_FLOOR:
-      c = menu_enum (loose_floor_ext_menu, "CE>");
-      if (! c) break;
-
-      if (c == -1 || c == 1) {
-        edit = EDIT_CON; break;
-      }
-
-      if ((c == 'F' && con (&p)->ext.cant_fall == false)
-          || (c == 'C' && con (&p)->ext.cant_fall == true))
-        break;
-
-      destroy_con_at_pos (&p);
-
+      c = menu_bool (loose_floor_ext_menu, "CE>", false, &b0);
       switch (c) {
-      case 'F': con (&p)->ext.cant_fall = false; break;
-      case 'C': con (&p)->ext.cant_fall = true; break;
+      case -1: edit = EDIT_CON; break;
+      case 0: break;
+      case 1: edit = EDIT_CON; break;
+      default:
+        destroy_con_at_pos (&p);
+        con (&p)->ext.cant_fall = b0;
+        register_con_at_pos (&p);
+        break;
       }
-
-      register_con_at_pos (&p);
-
       break;
     case SPIKES_FLOOR:
       menu_step_ext (&p, SPIKES_FLOOR_MAX_STEP);
