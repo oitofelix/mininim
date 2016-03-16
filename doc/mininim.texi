@@ -187,13 +187,14 @@ triggers.  Used by @code{OPENER_FLOOR} and @code{CLOSER_FLOOR}.
 @cindex step, con ext
 @item Step
 This is an integer indicating in which state, of a progressive set of
-configurations, a construction is in.  Used by dynamic constructions
-that don't use other extension.
+configurations, a construction is in.  Used by @code{SPIKES_FLOOR},
+@code{DOOR}, @code{LEVEL_DOOR} and @code{CHOPPER}.
 @cindex con ext design
 @cindex design, con ext
 @item Design
 This is a code indicating which alternative graphical design should be
-used to render the construction.  Used by carpet constructions.
+used to render the construction.  Used by @code{CARPET} and
+@code{TCARPET}.
 @end table
 
 @node Non-directed relative positioning
@@ -2568,7 +2569,7 @@ respective parameter is disabled
 @item @kbd{*}
 respective parameter is enabled
 @item @kbd{?}
-description of parameters.
+description of parameters
 @end table
 
 @cartouche
@@ -2855,7 +2856,7 @@ construction use which extension (if any) and what it means is described
 throughout @ref{Foregrounds}.  On that ground, the behavior of this
 command depends upon the selected construction's foreground.  If the
 selected con doesn't use any extension, or if there is no selected
-construction, @samp{NO@tie{}EXTENSION} is displayed in the message line.
+construction, @samp{NO@tie{}EXTENSION} is displayed on the message line.
 
 @node Item extension E>CE
 @subsubsection Item
@@ -2863,7 +2864,7 @@ construction, @samp{NO@tie{}EXTENSION} is displayed in the message line.
 @cindex construction item extension, level editor
 
 If the selected con uses the @emph{item extension} (@code{FLOOR}), this
-command is non-terminal and comprised of the following menu:
+command is non-terminal:
 
 @center @kbd{CE>NESBPOFLAW}
 
@@ -2895,12 +2896,78 @@ have the following meanings:
 @item @kbd{W} @code{SWORD}
 @end itemize
 
-@node Can't Fall extension E>CE
-@subsubsection Can't Fall
+@node Can't fall extension E>CE
+@subsubsection Can't fall
 @cindex level editor, construction can't fall extension
 @cindex construction can't fall extension, level editor
 
+If the selected con uses the @emph{can't fall extension}
+(@code{LOOSE_FLOOR}), this command is a boolean input (@ref{Boolean
+input}):
 
+@center @kbd{CE>C-?}
+
+Pressing @kbd{C} immediately toggles the @emph{can't fall extension} of
+the selected construction.
+
+@node Event extension E>CE
+@subsubsection Event
+@cindex level editor, construction event extension
+@cindex construction event extension, level editor
+
+If the selected con uses the @emph{event extension} (@code{OPENER_FLOOR}
+and @code{CLOSER_FLOOR}), this command is an integer input (@ref{Integer
+input}):
+
+@center @kbd{CE>EVENT 0-255:I}
+
+Where @var{I} is the event currently triggered by the selected
+construction.  Changes in @var{I} takes effect immediately.
+
+@node Step extension E>CE
+@subsubsection Step
+@cindex level editor, construction step extension
+@cindex construction step extension, level editor
+
+If the selected con uses the @emph{step extension} (@code{SPIKES_FLOOR},
+@code{DOOR}, @code{LEVEL_DOOR} and @code{CHOPPER}), this command is an
+integer input (@ref{Integer input}):
+
+@center @kbd{CE>STEP 0-MAX:I}
+
+Where @var{MAX} is the maximum acceptable step and @var{I} is the
+current step value of the selected construction.  Changes in @var{I}
+takes effect immediately, and the selected dynamic construction gives
+instant visual feedback.
+
+@node Design extension E>CE
+@subsubsection Design
+@cindex level editor, construction design extension
+@cindex construction design extension, level editor
+
+If the selected con uses the @emph{design extension} (@code{CARPET} and
+@code{TCARPET}), this command is non-terminal:
+
+@center @kbd{CE>01A} (@code{CARPET})
+@center @kbd{CE>01ABC} (@code{TCARPET})
+
+Each one of its sub-commands is terminal and corresponds to one of the
+carpet designs listed in @ref{Carpets}.  All of them work in the same
+way: they immediately change the extension of the selected construction.
+They have the following meanings:
+
+@itemize
+@mcindex E>CE0
+@item @kbd{0} @code{CARPET_00}
+@mcindex E>CE1
+@item @kbd{1} @code{CARPET_01}
+@mcindex E>CEA
+@item @kbd{A} @code{ARCH_CARPET_LEFT}
+@mcindex E>CEB
+@item @kbd{B} @code{ARCH_CARPET_RIGHT_00}
+@mcindex E>CEC
+@item @kbd{C} @code{ARCH_CARPET_RIGHT_01}
+@end itemize
 
 @node Info E>CI
 @subsection Info: E>CI
