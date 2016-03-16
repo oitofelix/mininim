@@ -46,14 +46,7 @@ editor (void)
 {
   if (edit == EDIT_NONE) return;
 
-  /* if (last_mouse_pos.room == -1) */
-  /*   last_mouse_pos = mouse_pos; */
-  /* else if (! peq (&last_mouse_pos, &mouse_pos)) { */
-  /*   edit = EDIT_NONE; */
-  /*   draw_bottom_text (NULL, NULL); */
-  /*   last_mouse_pos = (struct pos) {-1,-1,-1}; */
-  /*   return; */
-  /* } */
+  active_menu = true;
 
   struct menu_item main_menu[] =
     {{'C', "CONSTRUCTION>"},
