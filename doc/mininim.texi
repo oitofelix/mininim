@@ -2694,7 +2694,7 @@ are defined and explored in the following sections.
 @mcindex E>C
 
 This non-terminal command has sub-commands for setting and querying the
-three intrinsic construction attributes: @emph{foreground},
+three intrinsic construction components: @emph{foreground},
 @emph{background} and @emph{extension}.  @xref{Constructions}.  All
 commands in this hierarchy applies to the selected construction.
 
@@ -2975,11 +2975,31 @@ They have the following meanings:
 @cindex construction info, level editor
 @mcindex E>CI
 
+This terminal command prints on the message line the three components of
+the selected construction in the following format:
+
+@center @samp{FG/BG/EXT}
+
+Where @var{FG}, @var{BG} and @var{EXT} are the string representation of
+the selected con's foreground, background and extension, respectively.
+In case no construction is selected, the message
+@samp{SELECT@tie{}CONSTRUCTION} is shown instead.
+
 @node Copy E>CC
 @subsection Copy: E>CC
 @cindex level editor, construction copy
 @cindex construction copy, level editor
 @mcindex E>CC
+
+This is a terminal command intended to copy the selected construction in
+its entirety (foreground, background and extension) to a temporary
+memory area so it can later be retrieved and pasted elsewhere (see
+@ref{Paste E>CP}).  After invoked it briefly displays on the message
+line @samp{COPIED} to indicate that the selected con has been
+successfully stored.  Notice that only one construction can be held at a
+time, so further invocations replace previously stored cons.  The
+construction originally held in the temporary area---before the first
+successful invocation of this command---is @code{NO_FLOOR/NO_BG}.
 
 @node Paste E>CP
 @subsection Paste: E>CP
@@ -2987,6 +3007,12 @@ They have the following meanings:
 @cindex construction paste, level editor
 @cindex E>CP
 
+This is a terminal command intended to paste a previously copied
+construction over the selected one (see @ref{Copy E>CC}).  After invoked
+it immediately replaces the selected construction.  The user may keep
+the respective command key pressed while moving the mouse selection
+around to easily paste the same con onto an wider region, as described
+in @ref{Mouse selection}.
 
 @node Event
 @section Event
