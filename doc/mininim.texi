@@ -370,7 +370,7 @@ of them are @emph{hangable}, except for @code{NO_FLOOR}.
   @emph{raise button} in the original game.}
   @tab @center @image{mininim-figures/d-opener-floor}
   @tab @center @image{mininim-figures/p-opener-floor}
-  @tab This opens one or more doors.  This is @emph{depressible},
+  @tab This may open one or more doors.  This is @emph{depressible},
   @emph{dynamic} and uses the @emph{event} extension.
 
   @fgindex CLOSER_FLOOR
@@ -378,7 +378,7 @@ of them are @emph{hangable}, except for @code{NO_FLOOR}.
   @emph{drop button} in the original game.}
   @tab @center @image{mininim-figures/d-closer-floor}
   @tab @center @image{mininim-figures/p-closer-floor}
-  @tab  This closes one or more doors. This is @emph{depressible},
+  @tab This may close one or more doors. This is @emph{depressible},
   @emph{dynamic} and uses the @emph{event} extension.
 
   @fgindex STUCK_FLOOR
@@ -2454,7 +2454,10 @@ Mouse selection is also used by menu commands to give visual feedback on
 the placement of a particular object within the game world.  Some
 commands move the mouse selection arbitrarily and lock it on a
 particular object, so the user doesn't interfere with their
-selection-based report mechanism until them return.
+selection-based report mechanism until them return.  In case these
+commands need to report a nonexistent or invalid place (or object) they
+lock the mouse cursor on the screen's very top left, meaning that the
+mouse selection is pointing nowhere.
 
 
 @node Input modes
@@ -2528,7 +2531,7 @@ delete least significant decimal digit.  The resulting @var{I} is the
 maximum between @var{MIN} and the integer quotient of @math{I/10}.
 @item SPACE
 toggle auxiliary boolean parameter.  Only effective if the auxiliary
-boolean parameter is used.
+boolean parameter is used and is not read-only.
 @item BACKSPACE
 confirm and return
 @item /
@@ -2699,7 +2702,6 @@ three intrinsic construction components: @emph{foreground},
 commands in this hierarchy applies to the selected construction.
 
 @center @kbd{C>FBEICP}
-
 
 @node Foreground E>CF
 @subsection Foreground: E>CF
@@ -3014,28 +3016,129 @@ the respective command key pressed while moving the mouse selection
 around to easily paste the same con onto an wider region, as described
 in @ref{Mouse selection}.
 
-@node Event
-@section Event
+@node Event E>E
+@section Event: E>E
 @cindex level editor, event
 @cindex event, level editor
 
-@node Room
-@section Room
+Consider the figure below where @var{F} denotes an opener or closer
+floor, @var{E} denotes an event and @var{D} denotes a door or level
+door.
+
+@center @image{mininim-figures/events}
+
+Each opener and closer floor is actively associated with one (and only
+one) event (by its extension) and each event is associated with one (and
+only one) door or level door.  In the other way around, each door may be
+passively associated with multiple events, and each event with multiple
+floors.
+
+When the kid presses an opener floor (closer floor resp.), the event
+associated with it by its @emph{event extension} is triggered, then the
+door associated with that event is opened (closed resp.), and the next
+event may or may not be triggered depending upon the @emph{next} field
+status of the triggered event.
+
+This non-terminal command has terminal sub-commands for setting events
+and navigating through the floor-event-door tree.  The @dfn{selected
+event} is the event targeted by the sub-command actions.  At return (for
+all sub-commands) @kbd{BACKSPACE} updates the selected event, while
+@kbd{/} maintains its previous value.
+
+@node Event@arrow{}Door E>ED
+@subsection Event@arrow{}Door: E>ED
+@cindex level editor, event@arrow{}door
+@cindex event@arrow{}door, level editor
+@mcindex E>ED
+
+This command is used to find out which door is associated with a given
+event.  It's an integer input whose parameter is an event number, and
+the auxiliary boolean represents the @emph{next} field status of the
+respective event (read-only).  @xref{Integer input}.
+
+@center @kbd{ED>EVENT 0-255:I -}
+
+It gives instant visual feedback locking the mouse selection on the door
+associated with the selected event.  If the selected event isn't
+associated with any door, the mouse selection points nowhere.
+@kbd{BACKSPACE} keeps the mouse selection where it is, while @kbd{/}
+restores it to the state it had before this command's invocation.
+
+@node Event@arrow{}Floor E>EF
+@subsection Event@arrow{}Floor: E>EF
+@cindex level editor, event@arrow{}floor
+@cindex event@arrow{}floor, level editor
+@mcindex E>EF
+
+This command is used to find out which floors are associated with a
+given event.  It's a list input whose parameter and first index are the
+selected event number, and the second index run through the associated
+floors.  @xref{List input}.
+
+@center @kbd{EF>EVENT I -+<>}
+
+It gives instant visual feedback locking the mouse selection on the
+floors associated with the selected event.  If the selected event isn't
+associated with any floors, the mouse selection points nowhere.
+@kbd{BACKSPACE} keeps the mouse selection where it is, while @kbd{/}
+restores it to the state it had before this command's invocation.
+
+@node Door@arrow{}Event E>ER
+@subsection Door@arrow{}Event: E>ER
+@cindex level editor, door@arrow{}event
+@cindex door@arrow{}event, level editor
+@mcindex E>ER
+
+This command is used to find out which events are associated with the
+selected door.  If the mouse selection is not over a door it displays
+@samp{SELECT DOOR} on the message line.  As soon as a door is selected
+this command turns into a list input whose parameter and second index
+run through the associated events (the first index is disabled).
+@xref{List input}.
+
+@center @kbd{ER>EVENT I <>}
+
+It displays the associated events on the message line as the user
+increments/decrements the second index.  If the selected door isn't
+associated with any events, @var{I} is replaced by the string
+@samp{NONE}.
+
+@node Set event E>ES
+@subsection Set event: E>ES
+@cindex level editor, set event
+@cindex set event, level editor
+@mcindex E>ES
+
+This command is used to associate an event to a selected door.  If the
+mouse selection is not over a door it displays @samp{SELECT DOOR} on the
+message line.  As soon as a door is selected this command turns into an
+integer input whose parameter is an event number, and the auxiliary
+boolean represents the @emph{next} field status of the respective event.
+@xref{Integer input}.
+
+@center @kbd{ES>EVENT 0-255:I -}
+
+This command doesn't take effect immediately, so the user can freely
+select a door and an event to associate with.  @kbd{BACKSPACE} confirms
+the association and returns, while @kbd{/} returns straight away.
+
+@node Room E>R
+@section Room: E>R
 @cindex level editor, room
 @cindex room, level editor
 
-@node Kid
-@section Kid
+@node Kid E>K
+@section Kid: E>K
 @cindex level editor, kid
 @cindex kid, level editor
 
-@node Guard
-@section Guard
+@node Guard E>G
+@section Guard: E>G
 @cindex level editor, guard
 @cindex guard, level editor
 
-@node Level
-@section Level
+@node Level E>L
+@section Level: E>L
 @cindex level editor, level
 @cindex level, level editor
 
