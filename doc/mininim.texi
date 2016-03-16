@@ -296,6 +296,7 @@ looks and behaves.
 It's possible that some of these properties may apply only under certain
 conditions of the construction and/or the kid.
 
+@node Floors
 @subsection Floors
 @cindex floors
 
@@ -397,6 +398,7 @@ of them are @emph{hangable}, except for @code{NO_FLOOR}.
   @emph{depressible} and uses no extension.
 @end multitable
 
+@node Pillars
 @subsection Pillars
 @cindex pillars
 
@@ -433,6 +435,7 @@ above them.  All of them are @emph{hangable}, except for
   @tab This should be placed below an @code{ARCH_TOP_MID}.
 @end multitable
 
+@node Wall
 @subsection Wall
 @cindex wall
 
@@ -448,6 +451,7 @@ level.  It's @emph{collidable}, @emph{rigid} and uses no extension.
   @tab @center @image{mininim-figures/p-wall}
 @end multitable
 
+@node Doors
 @subsection Doors
 @cindex doors
 
@@ -480,6 +484,7 @@ opening level, ranging from fully open (0) to fully closed.
   0 to 43.
 @end multitable
 
+@node Chopper
 @subsection Chopper
 @cindex chopper
 
@@ -502,6 +507,7 @@ the @emph{hangable at left} property of its top construction.
   @tab @center @image{mininim-figures/p-chopper}
 @end multitable
 
+@node Mirror
 @subsection Mirror
 @cindex mirror
 
@@ -520,6 +526,7 @@ side.  It's @emph{semi-collidable} at left, @emph{hangable at right},
   @tab @center @image{mininim-figures/p-mirror}
 @end multitable
 
+@node Carpets
 @subsection Carpets
 @cindex carpets
 
@@ -593,6 +600,7 @@ left} property of their @emph{right} and @emph{top right} constructions.
   the left of an @code{ARCH_TOP_MID}.
 @end multitable
 
+@node Arches
 @subsection Arches
 @cindex arches
 
@@ -2717,7 +2725,7 @@ follows:
 
 @itemize
 @mcindex E>CFF
-@item @kbd{F} (Floor): @kbd{CFF>NFBSLPOCTH}
+@item @kbd{F} (Floor): @kbd{CFF>NFBSLPOCTH}.  @xref{Floors}.
 @itemize
 @mcindex E>CFFN
 @item @kbd{N} @code{NO_FLOOR}
@@ -2742,7 +2750,7 @@ follows:
 @end itemize
 
 @mcindex E>CFP
-@item @kbd{P} (Pillar): @kbd{CFP>PTBA}
+@item @kbd{P} (Pillar): @kbd{CFP>PTBA}.  @xref{Pillars}.
 @itemize
 @mcindex E>CFPP
 @item @kbd{P} @code{PILLAR}
@@ -2755,10 +2763,10 @@ follows:
 @end itemize
 
 @mcindex E>CFW
-@item @kbd{W} @code{WALL}
+@item @kbd{W} @code{WALL}.  @xref{Wall}.
 
 @mcindex E>CFD
-@item @kbd{D} (Door): @kbd{CFD>DL}
+@item @kbd{D} (Door): @kbd{CFD>DL}.  @xref{Doors}.
 @itemize
 @mcindex E>CFDD
 @item @kbd{D} @code{DOOR}
@@ -2767,13 +2775,13 @@ follows:
 @end itemize
 
 @mcindex E>CFC
-@item @kbd{C} @code{CHOPPER}
+@item @kbd{C} @code{CHOPPER}.  @xref{Chopper}.
 
 @mcindex E>CFM
-@item @kbd{M} @code{MIRROR}
+@item @kbd{M} @code{MIRROR}.  @xref{Mirror}.
 
 @mcindex E>CFR
-@item @kbd{R} (Carpet): @kbd{CFR>CT}
+@item @kbd{R} (Carpet): @kbd{CFR>CT}.  @xref{Carpets}.
 @itemize
 @mcindex E>CFRC
 @item @kbd{C} @code{CARPET}
@@ -2782,7 +2790,7 @@ follows:
 @end itemize
 
 @mcindex E>CFA
-@item @kbd{A} (Arch): @kbd{CFA>MSLR}
+@item @kbd{A} (Arch): @kbd{CFA>MSLR}.  @xref{Arches}.
 @itemize
 @mcindex E>CFAM
 @item @kbd{M} @code{ARCH_TOP_MID}
@@ -2840,6 +2848,59 @@ in @ref{Mouse selection}.  The sub-commands have the following meanings:
 @cindex level editor, construction extension
 @cindex construction extension, level editor
 @mcindex E>CE
+
+As described in @ref{Constructions}, any given construction foreground
+may or may not use one among a handful of extensions.  Which
+construction use which extension (if any) and what it means is described
+throughout @ref{Foregrounds}.  On that ground, the behavior of this
+command depends upon the selected construction's foreground.  If the
+selected con doesn't use any extension, or if there is no selected
+construction, @samp{NO@tie{}EXTENSION} is displayed in the message line.
+
+@node Item extension E>CE
+@subsubsection Item
+@cindex level editor, construction item extension
+@cindex construction item extension, level editor
+
+If the selected con uses the @emph{item extension} (@code{FLOOR}), this
+command is non-terminal and comprised of the following menu:
+
+@center @kbd{CE>NESBPOFLAW}
+
+Each one of its sub-commands is terminal and corresponds to one of the
+items listed in @ref{Items}.  All of them work in the same way: they
+immediately change the extension of the selected construction.  They
+have the following meanings:
+
+@itemize
+@mcindex E>CEN
+@item @kbd{N} @code{NO_ITEM}
+@mcindex E>CEE
+@item @kbd{E} @code{EMPTY_POTION}
+@mcindex E>CES
+@item @kbd{S} @code{SMALL_LIFE_POTION}
+@mcindex E>CEB
+@item @kbd{B} @code{BIG_LIFE_POTION}
+@mcindex E>CEP
+@item @kbd{P} @code{SMALL_POISON_POTION}
+@mcindex E>CEO
+@item @kbd{O} @code{BIG_POISON_POTION}
+@mcindex E>CEF
+@item @kbd{F} @code{FLOAT_POTION}
+@mcindex E>CEL
+@item @kbd{L} @code{FLIP_POTION}
+@mcindex E>CEA
+@item @kbd{A} @code{ACTIVATION_POTION}
+@mcindex E>CEW
+@item @kbd{W} @code{SWORD}
+@end itemize
+
+@node Can't Fall extension E>CE
+@subsubsection Can't Fall
+@cindex level editor, construction can't fall extension
+@cindex construction can't fall extension, level editor
+
+
 
 @node Info E>CI
 @subsection Info: E>CI
