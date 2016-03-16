@@ -3127,6 +3127,74 @@ the association and returns, while @kbd{/} returns straight away.
 @cindex level editor, room
 @cindex room, level editor
 
+The layout of rooms disposition and adjacency in a level is given by
+@dfn{room linking}.  For any given room there are four directions of
+linking: @emph{left}, @emph{right}, @emph{above} and @emph{below}.
+
+@cartouche
+@noindent@strong{Room linking:} room A is @dfn{linked} to room B from
+direction D, if (and only if) exiting room A from direction D enters
+room B from the opposite direction.
+@end cartouche
+
+Notice that the only constraint put on links is that they must be well
+defined, that is to say that every link points to one (and only one)
+existing room.  Such wide definition allows for a number of
+counter-intuitive room linking arrangements.  Some noteworthy examples
+are:
+
+@itemize
+@item A room that links to iself.
+@item A room that links to other room from more than one direction.
+@item Two distinct rooms that link to the same room from the same
+direction.
+@item A room that links to another room from a certain direction, but is
+not linked back from that room from the opposite direction.
+@end itemize
+
+MININIM officially supports all these room linking arrangement features
+in the sense of providing robust physics and rendering behavior in such
+circumstances.@footnote{The original game levels don't use such features
+which are indiscriminately referred to as @dfn{broken links}.  Although
+many custom legacy levels make use of them, it's safe to say they are
+not completely supported by the original engine, as some arrangements
+like a room linked to itself from below could crash the game.}  In a
+sense this is an intrinsic property of the engine, since by convention
+room 0, which is usually linked to itself in all direction and filled
+with walls, is used to delimit rooms that would otherwise link
+recursively to other rooms @emph{ad infinitum} in order to replicate the
+common euclidean room linking layout.@footnote{In the original game
+there is no actual room 0, so links pointing to it were in fact pointing
+to nowhere.  MININIM has an actual room 0, because of the requirement of
+all links being defined.  That room is usually built in such a way that
+linking to it has virtually the same effect of linking to nowhere in the
+original game.  However that's not a strict requirement, and room 0 can
+be treated as a common room by native levels.}
+
+In order to cope with the aforementioned link irregularities some
+linking policies may be enforced.  Keep in mind that they are not
+applied when linking to room 0.
+
+@cartouche
+@noindent@strong{Reciprocal link:} a link from room A to room B from
+direction D is @dfn{reciprocal}, if (and only if) there is a link from
+room B to room A from the opposite direction.
+@end cartouche
+
+@cartouche
+@noindent@strong{Locally unique link:} a link from room A to room B from
+direction D is @dfn{locally unique}, if (and only if) there is no other
+link from room A to room B from a different direction.
+@end cartouche
+
+@cartouche
+@noindent@strong{Globally unique link:} a link from room A to room B
+from direction D is @dfn{globally unique}, if (and only if) there is no
+other room linking to room B from the same direction.
+@end cartouche
+
+
+
 @node Kid E>K
 @section Kid: E>K
 @cindex level editor, kid
