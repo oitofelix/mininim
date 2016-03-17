@@ -22,6 +22,7 @@
 
 /* variable */
 extern bool active_menu;
+extern int menu_help;
 
 /* functions */
 void reset_menu (void);

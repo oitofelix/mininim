@@ -20,14 +20,14 @@
 #include "mininim.h"
 
 bool active_menu;
-static int help;
+int menu_help;
 static uint64_t help_cycles;
 static size_t help_item;
 
 void
 reset_menu (void)
 {
-  help = 0;
+  menu_help = 0;
   active_menu = false;
 }
 
@@ -39,15 +39,15 @@ menu_opt (struct menu_item *menu, char *prefix)
 
   active_menu = true;
 
-  if (! help) draw_bottom_text (NULL, prefix);
+  if (! menu_help) draw_bottom_text (NULL, prefix);
 
   if (key.keyboard.unichar > 0
       && key.keyboard.keycode != ALLEGRO_KEY_BACKSPACE
       && key.keyboard.unichar != '/') {
-    if (help == 1) {
+    if (menu_help == 1) {
       while (menu[i].key) {
         if (menu[i].key == toupper (key.keyboard.unichar)) {
-          help = 2;
+          menu_help = 2;
           help_cycles = 18;
           help_item = i;
           break;
@@ -55,36 +55,36 @@ menu_opt (struct menu_item *menu, char *prefix)
         i++;
       }
     }
-    else if (key.keyboard.unichar == '?') help = 1;
+    else if (key.keyboard.unichar == '?') menu_help = 1;
     else {
       while (menu[i].key) {
         if (menu[i].key == toupper (key.keyboard.unichar)) {
-          help = 0;
+          menu_help = 0;
           memset (&key, 0, sizeof (key));
           return menu[i].key;
         }
         i++;
       }
     }
-    if (! menu[i].key && key.keyboard.unichar != '?') help = 0;
+    if (! menu[i].key && key.keyboard.unichar != '?') menu_help = 0;
   }
 
-  if (help == 1)
+  if (menu_help == 1)
     draw_bottom_text (NULL, "PRESS KEY FOR HELP");
-  if (help == 2 && --help_cycles)
+  if (menu_help == 2 && --help_cycles)
     draw_bottom_text (NULL, menu[help_item].desc);
-  else if (help == 2) help = 0;
+  else if (menu_help == 2) menu_help = 0;
 
   c = 0;
 
   if (key.keyboard.keycode == ALLEGRO_KEY_BACKSPACE) {
-    if (help == 0) c = 1;
-    else help = 0;
+    if (menu_help == 0) c = 1;
+    else menu_help = 0;
   }
 
   if (key.keyboard.unichar == '/') {
-    if (help == 0) c = -1;
-    else help = 0;
+    if (menu_help == 0) c = -1;
+    else menu_help = 0;
   }
 
   memset (&key, 0, sizeof (key));
