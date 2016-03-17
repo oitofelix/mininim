@@ -25,6 +25,7 @@ static char menu_select_room (enum edit up_edit, char *prefix);
 static char menu_link (enum dir dir);
 static void mouse2guard (int i);
 static char menu_skill (char *prefix, int *skill, int max, enum edit up_edit);
+static void editor_msg (char *m, uint64_t cycles);
 
 static int last_event;
 static struct coord last_mouse_coord;
@@ -37,6 +38,8 @@ static int guard_index;
 static int b, r, s, t, min, max;
 static struct con con_copy;
 static struct con room_copy[1][FLOORS][PLACES];
+static char *msg;
+static uint64_t msg_cycles;
 
 enum edit edit;
 enum edit last_edit = EDIT_MAIN;
@@ -254,8 +257,15 @@ editor (void)
   char *fg_str = NULL, *bg_str = NULL, *ext_str = NULL;
   bool free_ext_str;
   char *str = NULL, c, *f, *d;
-  static char *msg = NULL;
-  static uint64_t msg_cycles = 0;
+
+  /* display message if available */
+  if (msg_cycles > 0 && msg) {
+    msg_cycles--;
+    draw_bottom_text (NULL, msg);
+    if (was_menu_return_pressed ()) msg_cycles = 0;
+    memset (&key, 0, sizeof (key));
+    return;
+  }
 
   switch (edit) {
   case EDIT_NONE: break;
@@ -270,10 +280,8 @@ editor (void)
     }
     break;
   case EDIT_CON:
-    if (msg_cycles > 0 && msg) {
-      msg_cycles--;
-      draw_bottom_text (NULL, msg);
-      if (key.keyboard.keycode) msg_cycles = 0;
+    if (! is_valid_pos (&p)) {
+      editor_msg ("SELECT CONSTRUCTION", 1);
       break;
     }
     switch (menu_enum (con_menu, "C>")) {
@@ -283,13 +291,10 @@ editor (void)
     case 'E': edit = EDIT_EXT; break;
     case 'I': edit = EDIT_INFO; break;
     case 'C':
-      if (! is_valid_pos (&p)) break;
       con_copy = *con (&p);
-      msg_cycles = 12;
-      msg = "COPIED";
+      editor_msg ("COPIED", 12);
       break;
     case 'P':
-      if (! is_valid_pos (&p)) break;
       destroy_con_at_pos (&p);
       *con (&p) = con_copy;
       register_con_at_pos (&p);
@@ -298,12 +303,15 @@ editor (void)
     }
     break;
   case EDIT_FG:
+    if (! is_valid_pos (&p)) {
+      editor_msg ("SELECT CONSTRUCTION", 1);
+      break;
+    }
     switch (menu_enum (fg_menu, "CF>")) {
     case -1: case 1: edit = EDIT_CON; break;
     case 'F': edit = EDIT_FLOOR; break;
     case 'P': edit = EDIT_PILLAR; break;
     case 'W':
-      if (! is_valid_pos (&p)) break;
       if (con (&p)->fg == WALL) break;
       destroy_con_at_pos (&p);
       con (&p)->fg = WALL;
@@ -311,14 +319,12 @@ editor (void)
       break;
     case 'D': edit = EDIT_DOOR; break;
     case 'C':
-      if (! is_valid_pos (&p)) break;
       if (con (&p)->fg == CHOPPER) break;
       destroy_con_at_pos (&p);
       con (&p)->fg = CHOPPER;
       register_con_at_pos (&p);
       break;
     case 'M':
-      if (! is_valid_pos (&p)) break;
       if (con (&p)->fg == MIRROR) break;
       destroy_con_at_pos (&p);
       con (&p)->fg = MIRROR;
@@ -330,9 +336,12 @@ editor (void)
     }
     break;
   case EDIT_FLOOR:
+    if (! is_valid_pos (&p)) {
+      editor_msg ("SELECT CONSTRUCTION", 1);
+      break;
+    }
     c = menu_enum (floor_menu, "CFF>");
     if (! c) break;
-    if (! is_valid_pos (&p)) break;
 
     if (c == -1 || c == 1) {
       edit = EDIT_FG; break;
@@ -363,9 +372,12 @@ editor (void)
 
     break;
   case EDIT_PILLAR:
+    if (! is_valid_pos (&p)) {
+      editor_msg ("SELECT CONSTRUCTION", 1);
+      break;
+    }
     c = menu_enum (pillar_menu, "CFP>");
     if (! c) break;
-    if (! is_valid_pos (&p)) break;
 
     if (c == -1 || c == 1) {
       edit = EDIT_FG; break;
@@ -381,9 +393,12 @@ editor (void)
     }
     break;
   case EDIT_DOOR:
+    if (! is_valid_pos (&p)) {
+      editor_msg ("SELECT CONSTRUCTION", 1);
+      break;
+    }
     c = menu_enum (door_menu, "CFD>");
     if (! c) break;
-    if (! is_valid_pos (&p)) break;
 
     if (c == -1 || c == 1) {
       edit = EDIT_FG; break;
@@ -404,9 +419,12 @@ editor (void)
 
     break;
   case EDIT_CARPET:
+    if (! is_valid_pos (&p)) {
+      editor_msg ("SELECT CONSTRUCTION", 1);
+      break;
+    }
     c = menu_enum (carpet_menu, "CFR>");
     if (! c) break;
-    if (! is_valid_pos (&p)) break;
 
     if (c == -1 || c == 1) {
       edit = EDIT_FG; break;
@@ -421,9 +439,12 @@ editor (void)
 
     break;
   case EDIT_ARCH:
+    if (! is_valid_pos (&p)) {
+      editor_msg ("SELECT CONSTRUCTION", 1);
+      break;
+    }
     c = menu_enum (arch_menu, "CFA>");
     if (! c) break;
-    if (! is_valid_pos (&p)) break;
 
     if (c == -1 || c == 1) {
       edit = EDIT_FG; break;
@@ -440,8 +461,11 @@ editor (void)
 
     break;
   case EDIT_BG:
+    if (! is_valid_pos (&p)) {
+      editor_msg ("SELECT CONSTRUCTION", 1);
+      break;
+    }
     c = menu_enum (bg_menu, "CB>");
-    if (! is_valid_pos (&p)) break;
     switch (c) {
     case -1: case 1: edit = EDIT_CON; break;
     case 'N': con (&p)->bg = NO_BRICKS; break;
@@ -460,8 +484,7 @@ editor (void)
     break;
   case EDIT_EXT:
     if (! is_valid_pos (&p)) {
-      draw_bottom_text (NULL, "NO EXTENSION");
-      if (was_menu_return_pressed ()) edit = EDIT_CON;
+      editor_msg ("SELECT CONSTRUCTION", 1);
       break;
     }
 
@@ -555,8 +578,7 @@ editor (void)
     break;
   case EDIT_INFO:
     if (! is_valid_pos (&p)) {
-      draw_bottom_text (NULL, "SELECT CONSTRUCTION");
-      if (was_menu_return_pressed ()) edit = EDIT_CON;
+      editor_msg ("SELECT CONSTRUCTION", 1);
       break;
     }
 
@@ -677,9 +699,8 @@ editor (void)
     break;
   case EDIT_DOOR2EVENT:
     if (! is_valid_pos (&p) || ! is_door (&p)) {
+      editor_msg ("SELECT DOOR", 1);
       if (was_menu_return_pressed ()) edit = EDIT_EVENT;
-      draw_bottom_text (NULL, "SELECT DOOR");
-      memset (&key, 0, sizeof (key));
       t = -1;
     } else {
       if (t < 0) next_int_by_pred (&t, 0, 0, EVENTS - 1, is_pos_at_event, &p);
@@ -695,9 +716,8 @@ editor (void)
     break;
   case EDIT_EVENT_SET:
     if (! is_valid_pos (&p) || ! is_door (&p)) {
+      editor_msg ("SELECT DOOR", 1);
       if (was_menu_return_pressed ()) edit = EDIT_EVENT;
-      draw_bottom_text (NULL, "SELECT DOOR");
-      memset (&key, 0, sizeof (key));
     } else {
       switch (menu_int (&s, &b, 0, EVENTS - 1, "ES>EVENT", "N")) {
       case -1: edit = EDIT_EVENT; break;
@@ -712,12 +732,6 @@ editor (void)
     }
     break;
   case EDIT_ROOM:
-    if (msg_cycles > 0 && msg) {
-      msg_cycles--;
-      draw_bottom_text (NULL, msg);
-      if (key.keyboard.keycode) msg_cycles = 0;
-      break;
-    }
     switch (menu_enum (room_menu, "R>")) {
     case -1: case 1: edit = EDIT_MAIN; break;
     case 'J':
@@ -734,17 +748,14 @@ editor (void)
       get_mouse_coord (&last_mouse_coord);
       edit = EDIT_ROOM_EXCHANGE; break;
     case 'C':
-      if (! is_valid_pos (&p)) break;
-      p0.room = p.room;
+      p0.room = room_view;
       for (p0.floor = 0; p0.floor < FLOORS; p0.floor++)
         for (p0.place = 0; p0.place < PLACES; p0.place++)
           room_copy[0][p0.floor][p0.place] = *con (&p0);
-      msg_cycles = 12;
-      msg = "COPIED";
+      editor_msg ("COPIED", 12);
       break;
     case 'P':
-      if (! is_valid_pos (&p)) break;
-      p0.room = p.room;
+      p0.room = room_view;
       for (p0.floor = 0; p0.floor < FLOORS; p0.floor++)
         for (p0.place = 0; p0.place < PLACES; p0.place++) {
           destroy_con_at_pos (&p0);
@@ -824,7 +835,10 @@ editor (void)
     switch (menu_enum (kid_menu, "K>")) {
     case -1: case 1: edit = EDIT_MAIN; break;
     case 'P':
-      if (! is_valid_pos (&p)) break;
+      if (! is_valid_pos (&p)) {
+        editor_msg ("SELECT CONSTRUCTION", 12);
+        break;
+      }
       k = get_anim_by_id (current_kid_id);
       place_frame (&k->f, &k->f, kid_normal_00, &p,
                    k->f.dir == LEFT ? +22 : +28, +15);
@@ -835,7 +849,10 @@ editor (void)
       set_mouse_pos (&level.start_pos);
       break;
     case 'S':
-      if (! is_valid_pos (&p)) break;
+      if (! is_valid_pos (&p)) {
+        editor_msg ("SELECT CONSTRUCTION", 12);
+        break;
+      }
       level.start_pos = p;
       break;
     case 'D':
@@ -849,13 +866,6 @@ editor (void)
     }
     break;
   case EDIT_LEVEL:
-    if (msg_cycles > 0 && msg) {
-      msg_cycles--;
-      draw_bottom_text (NULL, msg);
-      if (was_menu_return_pressed ()) msg_cycles = 0;
-      memset (&key, 0, sizeof (key));
-      break;
-    }
     switch (menu_enum (level_menu, "L>")) {
     case -1: case 1: edit = EDIT_MAIN; break;
     case 'E': edit = EDIT_ENVIRONMENT;
@@ -870,7 +880,6 @@ editor (void)
       b4 = (level.hue == HUE_BLUE) ? true : false;
       break;
     case 'S':
-      msg_cycles = 18;
       xasprintf (&d, "%sdata/levels/", user_data_dir);
       if (! al_make_directory (d)) {
         error (0, al_get_errno (), "%s (%s): failed to create native level directory",
@@ -887,14 +896,13 @@ editor (void)
         goto save_failed;
       }
       *vanilla_level = level;
-      msg = "LEVEL HAS BEEN SAVED";
+      editor_msg ("LEVEL HAS BEEN SAVED", 18);
       break;
     save_failed:
-      msg = "LEVEL SAVE FAILED";
+      editor_msg ("LEVEL SAVE FAILED", 18);
       break;
     case 'L':
-      msg_cycles = 18;
-      msg = "LEVEL RELOADED";
+      editor_msg ("LEVEL RELOADED", 18);
       level = *vanilla_level;
       destroy_cons ();
       register_cons ();
@@ -942,7 +950,10 @@ editor (void)
       s = guard_index; get_mouse_coord (&last_mouse_coord); break;
     case 'J': mouse2guard (guard_index); break;
     case 'P':
-      if (! is_valid_pos (&p)) break;
+      if (! is_valid_pos (&p)) {
+        editor_msg ("SELECT CONSTRUCTION", 12);
+        break;
+      }
       g->p = p;
       break;
     case 'D':
@@ -1246,4 +1257,12 @@ menu_skill (char *prefix, int *skill, int max, enum edit up_edit)
     break;
   }
   return c;
+}
+
+static void
+editor_msg (char *m, uint64_t cycles)
+{
+  msg_cycles = cycles;
+  msg = m;
+  draw_bottom_text (NULL, msg);
 }

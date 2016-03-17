@@ -480,18 +480,36 @@ exchange_rooms  (int room0, int room1)
   int r0a = roomd (room0, ABOVE);
   int r0b = roomd (room0, BELOW);
 
+  int r0lr = roomd (r0l, RIGHT);
+  int r0rl = roomd (r0r, LEFT);
+  int r0ab = roomd (r0a, BELOW);
+  int r0ba = roomd (r0b, ABOVE);
+
   int r1l = roomd (room1, LEFT);
   int r1r = roomd (room1, RIGHT);
   int r1a = roomd (room1, ABOVE);
   int r1b = roomd (room1, BELOW);
 
-  make_reciprocal_link (room0, r1l, LEFT);
-  make_reciprocal_link (room0, r1r, RIGHT);
-  make_reciprocal_link (room0, r1a, ABOVE);
-  make_reciprocal_link (room0, r1b, BELOW);
+  int r1lr = roomd (r1l, RIGHT);
+  int r1rl = roomd (r1r, LEFT);
+  int r1ab = roomd (r1a, BELOW);
+  int r1ba = roomd (r1b, ABOVE);
 
-  make_reciprocal_link (room1, r0l, LEFT);
-  make_reciprocal_link (room1, r0r, RIGHT);
-  make_reciprocal_link (room1, r0a, ABOVE);
-  make_reciprocal_link (room1, r0b, BELOW);
+  *roomd_ptr (room0, LEFT) = r1l;
+  if (r1lr == room1) *roomd_ptr (r1l, RIGHT) = room0;
+  *roomd_ptr (room0, RIGHT) = r1r;
+  if (r1rl == room1) *roomd_ptr (r1r, LEFT) = room0;
+  *roomd_ptr (room0, ABOVE) = r1a;
+  if (r1ab == room1) *roomd_ptr (r1a, BELOW) = room0;
+  *roomd_ptr (room0, BELOW) = r1b;
+  if (r1ba == room1) *roomd_ptr (r1b, ABOVE) = room0;
+
+  *roomd_ptr (room1, LEFT) = r0l;
+  if (r0lr == room0) *roomd_ptr (r0l, RIGHT) = room1;
+  *roomd_ptr (room1, RIGHT) = r0r;
+  if (r0rl == room0) *roomd_ptr (r0r, LEFT) = room1;
+  *roomd_ptr (room1, ABOVE) = r0a;
+  if (r0ab == room0) *roomd_ptr (r0a, BELOW) = room1;
+  *roomd_ptr (room1, BELOW) = r0b;
+  if (r0ba == room0) *roomd_ptr (r0b, ABOVE) = room1;
 }

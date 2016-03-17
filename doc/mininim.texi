@@ -2457,7 +2457,15 @@ particular object, so the user doesn't interfere with their
 selection-based report mechanism until them return.  In case these
 commands need to report a nonexistent or invalid place (or object) they
 lock the mouse cursor on the screen's very top left, meaning that the
-mouse selection is pointing nowhere.
+mouse selection is pointing nowhere.  The mouse selection stores all
+coordinates of a place within a level, meaning that commands may change
+the currently displayed room as well, when moving or restoring the mouse
+selection.
+
+The mouse selection can't be used to select constructions of the rooms
+above and below from the current room, because the topmost pixels are
+reserved to selection pointing nowhere and the bottom region to the
+message line and menu system.
 
 
 @node Input modes
@@ -2489,22 +2497,22 @@ input mode.
 @cindex input, integer
 
 @cartouche
-@center @kbd{PREF>PAR MIN-MAX:I B}
+@center @kbd{pref>par min-max:i b}
 @end cartouche
 
 @table @var
-@item PREF
+@item pref
 command prefix
-@item PAR
+@item par
 name of the parameter
-@item MIN
+@item min
 minimum acceptable value
-@item MAX
+@item max
 maximum acceptable value
-@item I
-current value.  Its always kept between @var{MIN} and @var{MAX}
+@item i
+current value.  Its always kept between @var{min} and @var{max}
 inclusive.
-@item B
+@item b
 auxiliary boolean parameter.  Its meaning is command dependent.
 @samp{-} means disabled and any other capital letter (which often
 suggests the meaning) is enabled.  It may not be used in which case
@@ -2518,17 +2526,17 @@ nothing is shown in this field.
 @table @kbd
 @item -
 @itemx _
-decrement @var{I}. If @var{I} equals @var{MIN} nothing happens.
+decrement @var{i}. If @var{i} equals @var{min} nothing happens.
 @item +
 @itemx =
-increment @var{I}.  If @var{I} equals @var{MAX} nothing happens.
+increment @var{i}.  If @var{i} equals @var{max} nothing happens.
 @item 0..9
-enter decimal value directly.  The resulting @var{I} is the minimum
-between @var{MAX} and @math{10I + d}, where @var{d} is the entered
+enter decimal value directly.  The resulting @var{i} is the minimum
+between @var{max} and @math{10i + d}, where @var{d} is the entered
 decimal digit.
 @item \
-delete least significant decimal digit.  The resulting @var{I} is the
-maximum between @var{MIN} and the integer quotient of @math{I/10}.
+delete least significant decimal digit.  The resulting @var{i} is the
+maximum between @var{min} and the integer quotient of @math{i/10}.
 @item SPACE
 toggle auxiliary boolean parameter.  Only effective if the auxiliary
 boolean parameter is used and is not read-only.
@@ -2556,15 +2564,15 @@ effectively changes the acceptable range for the integer parameter.
 @cindex input, boolean
 
 @cartouche
-@center @kbd{PREF>A-B*C-...?}
+@center @kbd{pref>a-b*c-...?}
 @end cartouche
 
 @table @var
-@item PREF
+@item pref
 command prefix
-@item A
-@itemx B
-@itemx C
+@item a
+@itemx b
+@itemx c
 @itemx ...
 arbitrary number of parameters
 @item @kbd{-}
@@ -2580,9 +2588,9 @@ description of parameters
 @end cartouche
 
 @table @kbd
-@item A
-@itemx B
-@itemx C
+@item a
+@itemx b
+@itemx c
 @itemx ...
 toggle the respective parameter
 @item ?
@@ -2603,22 +2611,21 @@ a time, so enabling a parameter automatically disables all others
 (a.k.a. @dfn{radio buttons}).  The latter has no such restriction
 (a.k.a. @dfn{checklist}).
 
-
 @node List input
 @subsection List input
 @cindex list input
 @cindex input, list
 
 @cartouche
-@center @kbd{PREF>PAR I +-<>}
+@center @kbd{pref>par i +-<>}
 @end cartouche
 
 @table @var
-@item PREF
+@item pref
 command prefix
-@item PAR
+@item par
 name of the parameter
-@item I
+@item i
 parameter index
 @item @kbd{-+}
 indicates that the keys @kbd{-} and @kbd{+} can be used to
@@ -2682,7 +2689,9 @@ The level editor is enabled/disabled by clicking with any mouse button
 anywhere in the game screen.  For a more convenient play-editing
 experience, the last menu state is always restored when enabling the
 level editor.  When enabled the mouse selection is always active (see
-@ref{Mouse selection}).  The topmost level editor menu looks like this:
+@ref{Mouse selection}), the kid can be normally controlled and the game
+can be paused and unpaused freely.  The topmost level editor menu looks
+like this:
 
 @center @kbd{CERKGL}
 
@@ -2699,7 +2708,10 @@ are defined and explored in the following sections.
 This non-terminal command has sub-commands for setting and querying the
 three intrinsic construction components: @emph{foreground},
 @emph{background} and @emph{extension}.  @xref{Constructions}.  All
-commands in this hierarchy applies to the selected construction.
+commands in this hierarchy applies to the selected construction.  If the
+mouse selection is pointing to nowhere when any command of this
+hierarchy is invoked, it displays @samp{SELECT CONSTRUCTION} on the
+message line.
 
 @center @kbd{C>FBEICP}
 
@@ -2723,7 +2735,7 @@ command in this hierarchy works in the same way: they immediately change
 the foreground of the selected construction.  The user may keep the
 respective command key pressed while moving the mouse selection around
 to easily apply a particular foreground to an wider region, as described
-in @ref{Mouse selection}.  This command's hierarchy is structured as
+in @ref{Mouse selection}.  This command hierarchy is structured as
 follows:
 
 @itemize
@@ -2823,7 +2835,8 @@ Every sub-command works in the same way: they immediately change the
 background of the selected construction.  The user may keep the
 respective command key pressed while moving the mouse selection around
 to easily apply a particular background to an wider region, as described
-in @ref{Mouse selection}.  The sub-commands have the following meanings:
+in @ref{Mouse selection}.  These sub-commands have the following
+meanings:
 
 @itemize
 @mcindex E>CBN
@@ -2857,8 +2870,8 @@ may or may not use one among a handful of extensions.  Which
 construction use which extension (if any) and what it means is described
 throughout @ref{Foregrounds}.  On that ground, the behavior of this
 command depends upon the selected construction's foreground.  If the
-selected con doesn't use any extension, or if there is no selected
-construction, @samp{NO@tie{}EXTENSION} is displayed on the message line.
+selected con doesn't use any extension @samp{NO@tie{}EXTENSION} is
+displayed on the message line.
 
 @node Item extension E>CE
 @subsubsection Item
@@ -2905,9 +2918,9 @@ have the following meanings:
 
 If the selected con uses the @emph{can't fall extension}
 (@code{LOOSE_FLOOR}), this command is a boolean input (@ref{Boolean
-input}):
+input}) where @var{b} is the @emph{can't fall extension} boolean status:
 
-@center @kbd{CE>C-?}
+@center @kbd{CE>Cb?}
 
 Pressing @kbd{C} immediately toggles the @emph{can't fall extension} of
 the selected construction.
@@ -2921,9 +2934,9 @@ If the selected con uses the @emph{event extension} (@code{OPENER_FLOOR}
 and @code{CLOSER_FLOOR}), this command is an integer input (@ref{Integer
 input}):
 
-@center @kbd{CE>EVENT 0-255:I}
+@center @kbd{CE>EVENT 0-255:i}
 
-Where @var{I} is the event currently triggered by the selected
+Where @var{i} is the event currently triggered by the selected
 construction.  Changes in @var{I} takes effect immediately.
 
 @node Step extension E>CE
@@ -2935,10 +2948,10 @@ If the selected con uses the @emph{step extension} (@code{SPIKES_FLOOR},
 @code{DOOR}, @code{LEVEL_DOOR} and @code{CHOPPER}), this command is an
 integer input (@ref{Integer input}):
 
-@center @kbd{CE>STEP 0-MAX:I}
+@center @kbd{CE>STEP 0-max:i}
 
-Where @var{MAX} is the maximum acceptable step and @var{I} is the
-current step value of the selected construction.  Changes in @var{I}
+Where @var{max} is the maximum acceptable step and @var{i} is the
+current step value of the selected construction.  Changes in @var{i}
 takes effect immediately, and the selected dynamic construction gives
 instant visual feedback.
 
@@ -2984,12 +2997,11 @@ the selected construction in the following format:
 
 Where @var{FG}, @var{BG} and @var{EXT} are the string representation of
 the selected con's foreground, background and extension, respectively.
-In case no construction is selected, the message
-@samp{SELECT@tie{}CONSTRUCTION} is shown instead.
 
 @node Copy E>CC
 @subsection Copy: E>CC
 @cindex level editor, construction copy
+@cindex copy construction, level editor
 @cindex construction copy, level editor
 @mcindex E>CC
 
@@ -3001,11 +3013,13 @@ line @samp{COPIED} to indicate that the selected con has been
 successfully stored.  Notice that only one construction can be held at a
 time, so further invocations replace previously stored cons.  The
 construction originally held in the temporary area---before the first
-successful invocation of this command---is @code{NO_FLOOR/NO_BG}.
+successful invocation of this command---is @code{NO_FLOOR/NO_BG}.  To
+copy the constructions of an entire room see @ref{Copy E>RC}.
 
 @node Paste E>CP
 @subsection Paste: E>CP
 @cindex level editor, construction paste
+@cindex paste construction, level editor
 @cindex construction paste, level editor
 @cindex E>CP
 
@@ -3014,7 +3028,8 @@ construction over the selected one (see @ref{Copy E>CC}).  After invoked
 it immediately replaces the selected construction.  The user may keep
 the respective command key pressed while moving the mouse selection
 around to easily paste the same con onto an wider region, as described
-in @ref{Mouse selection}.
+in @ref{Mouse selection}.  To paste the constructions of an entire room
+see @ref{Paste E>RP}.
 
 @node Event E>E
 @section Event: E>E
@@ -3052,17 +3067,17 @@ all sub-commands) @kbd{BACKSPACE} updates the selected event, while
 @mcindex E>ED
 
 This command is used to find out which door is associated with a given
-event.  It's an integer input whose parameter is an event number, and
-the auxiliary boolean represents the @emph{next} field status of the
-respective event (read-only).  @xref{Integer input}.
+event.  It's an integer input whose parameter @var{i} is an event
+number, and the auxiliary boolean @var{n} represents the @emph{next}
+field status of the respective event (read-only).  @xref{Integer input}.
 
-@center @kbd{ED>EVENT 0-255:I -}
+@center @kbd{ED>EVENT 0-255:i n}
 
 It gives instant visual feedback locking the mouse selection on the door
 associated with the selected event.  If the selected event isn't
 associated with any door, the mouse selection points nowhere.
 @kbd{BACKSPACE} keeps the mouse selection where it is, while @kbd{/}
-restores it to the state it had before this command's invocation.
+restores it to the state it had before this command invocation.
 
 @node Event@arrow{}Floor E>EF
 @subsection Event@arrow{}Floor: E>EF
@@ -3071,17 +3086,17 @@ restores it to the state it had before this command's invocation.
 @mcindex E>EF
 
 This command is used to find out which floors are associated with a
-given event.  It's a list input whose parameter and first index are the
-selected event number, and the second index run through the associated
-floors.  @xref{List input}.
+given event.  It's a list input whose parameter @var{i} and first index
+are the selected event number, and the second index run through the
+associated floors.  @xref{List input}.
 
-@center @kbd{EF>EVENT I -+<>}
+@center @kbd{EF>EVENT i -+<>}
 
 It gives instant visual feedback locking the mouse selection on the
 floors associated with the selected event.  If the selected event isn't
 associated with any floors, the mouse selection points nowhere.
 @kbd{BACKSPACE} keeps the mouse selection where it is, while @kbd{/}
-restores it to the state it had before this command's invocation.
+restores it to the state it had before this command invocation.
 
 @node Door@arrow{}Event E>ER
 @subsection Door@arrow{}Event: E>ER
@@ -3092,11 +3107,11 @@ restores it to the state it had before this command's invocation.
 This command is used to find out which events are associated with the
 selected door.  If the mouse selection is not over a door it displays
 @samp{SELECT DOOR} on the message line.  As soon as a door is selected
-this command turns into a list input whose parameter and second index
-run through the associated events (the first index is disabled).
+this command turns into a list input whose parameter @var{i} and second
+index run through the associated events (the first index is disabled).
 @xref{List input}.
 
-@center @kbd{ER>EVENT I <>}
+@center @kbd{ER>EVENT i <>}
 
 It displays the associated events on the message line as the user
 increments/decrements the second index.  If the selected door isn't
@@ -3112,11 +3127,11 @@ associated with any events, @var{I} is replaced by the string
 This command is used to associate an event to a selected door.  If the
 mouse selection is not over a door it displays @samp{SELECT DOOR} on the
 message line.  As soon as a door is selected this command turns into an
-integer input whose parameter is an event number, and the auxiliary
-boolean represents the @emph{next} field status of the respective event.
-@xref{Integer input}.
+integer input whose parameter @var{i} is an event number, and the
+auxiliary boolean @var{n} represents the @emph{next} field status of the
+respective event.  @xref{Integer input}.
 
-@center @kbd{ES>EVENT 0-255:I -}
+@center @kbd{ES>EVENT 0-255:i n}
 
 This command doesn't take effect immediately, so the user can freely
 select a door and an event to associate with.  @kbd{BACKSPACE} confirms
@@ -3150,29 +3165,31 @@ are:
 direction.
 @item A room that links to another room from a certain direction, but is
 not linked back from that room from the opposite direction.
+@item An isolated room that can't be reached from other rooms.
 @end itemize
 
 MININIM officially supports all these room linking arrangement features
 in the sense of providing robust physics and rendering behavior in such
 circumstances.@footnote{The original game levels don't use such features
 which are indiscriminately referred to as @dfn{broken links}.  Although
-many custom legacy levels make use of them, it's safe to say they are
-not completely supported by the original engine, as some arrangements
-like a room linked to itself from below could crash the game.}  In a
-sense this is an intrinsic property of the engine, since by convention
-room 0, which is usually linked to itself in all direction and filled
-with walls, is used to delimit rooms that would otherwise link
-recursively to other rooms @emph{ad infinitum} in order to replicate the
-common euclidean room linking layout.@footnote{In the original game
-there is no actual room 0, so links pointing to it were in fact pointing
-to nowhere.  MININIM has an actual room 0, because of the requirement of
-all links being defined.  That room is usually built in such a way that
-linking to it has virtually the same effect of linking to nowhere in the
-original game.  However that's not a strict requirement, and room 0 can
-be treated as a common room by native levels.}
+many custom legacy levels make use of them, it's safe to say that they
+are not completely supported by the original engine, as some
+arrangements like a room linked to itself from below could crash the
+game.}  In a sense this is an intrinsic property of the engine, since by
+convention room 0, which is usually linked to itself in all direction
+and filled with walls, is used to delimit rooms that would otherwise
+link recursively to other rooms @emph{ad infinitum} in order to
+replicate the common euclidean room linking layout.@footnote{In the
+original game there is no actual room 0, so links pointing to it were in
+fact pointing to nowhere.  MININIM has an actual room 0, because of the
+requirement of all links being defined.  That room is usually built in
+such a way that linking to it has virtually the same effect of linking
+to nowhere in the original game.  However that's not a strict
+requirement, and room 0 can be treated as a common room by native
+levels.}
 
-In order to cope with the aforementioned link irregularities some
-linking policies may be enforced.  Keep in mind that they are not
+In order to cope with some of the aforementioned link irregularities a
+few linking policies may be enforced.  Keep in mind that they are not
 applied when linking to room 0.
 
 @cartouche
@@ -3193,7 +3210,144 @@ from direction D is @dfn{globally unique}, if (and only if) there is no
 other room linking to room B from the same direction.
 @end cartouche
 
+This non-terminal command has sub-commands for handling room linking,
+room constructions as a whole and navigating through rooms.
 
+There are complementary commands that can be used to navigate through
+rooms by linkage and query the linking of the current room and its
+surroundings.  @xref{Level navigation}.  As they are available as direct
+alphabetic key bindings, the user should disable the level editor
+temporarily before being able to invoke them.  That shouldn't be a
+problem, though, as the menu system persistence allows for fast
+alternation between these modes.
+
+@node Jump to room E>RJ
+@subsection Jump to room: E>RJ
+@cindex level editor, jump to room
+@cindex jump to room, level editor
+@mcindex E>RJ
+
+This command instantly puts the mouse selection within the chosen room.
+This is useful for reaching isolated rooms and room 0, that can't be
+reached by linkage navigation.  It's an integer input whose parameter
+@var{i} is a room number.  @xref{Integer input}.
+
+@center @kbd{RJ>ROOM 0-24:i}
+
+It gives instant visual feedback by changing the currently displayed
+room to the chosen one.  @kbd{BACKSPACE} keeps the currently displayed
+room, while @kbd{/} restores to the room displayed before this command
+invocation.
+
+@node Room linking E>RL
+@subsection Room linking: E>RL
+@cindex level editor, construction room linking
+@cindex construction room linking, level editor
+@mcindex E>RL
+
+This non-terminal command has terminal sub-commands for all linking
+directions.
+
+@center @kbd{RL>LRAB}
+
+Every sub-command works in the same way: they change the current's room
+link from the respective direction.  They have the following meanings:
+
+@itemize
+@mcindex E>RLL
+@item @kbd{L} Left
+@mcindex E>RLR
+@item @kbd{R} Right
+@mcindex E>RLA
+@item @kbd{A} Above
+@mcindex E>RLB
+@item @kbd{B} Below
+@end itemize
+
+Each sub-command is an integer input whose parameter @var{i} is a room
+number and @var{d} is the respective direction.  @xref{Integer input}.
+
+@center @kbd{RLd>ROOM 0-24:i}
+
+It gives instant visual feedback by changing the currently displayed
+room to the chosen one.  @kbd{BACKSPACE} confirms the new linking to the
+currently displayed room from direction @var{d}, while @kbd{/} maintains
+the current link.  After return the mouse selection is restored.
+
+The linkage is subject to the linking policies currently in effect.
+@xref{Linking settings E>RS}.
+
+@node Linking settings E>RS
+@subsection Linking settings: E>RS
+@cindex level editor, linking settings
+@cindex linking settings, level editor
+@mcindex E>RS
+
+This command is used to configure the current linking policies.  These
+policies are used by room linking (see @ref{Room linking E>RL}) to
+assist the user in circumventing some link irregularities (see @ref{Room
+E>R}).  It's a boolean input (@ref{Boolean input}), where @var{a},
+@var{b} and @var{c} represents the boolean value of its parameters R
+(reciprocal), L (locally unique) and G (globally unique), respectively.
+
+@center @kbd{RS>RaLbGc?}
+
+@kbd{BACKSPACE} confirms the new linking policy settings, while @kbd{/}
+maintains the current one.  When any of these parameters are turned on
+all links are made in way to ensure the compliance with the policy
+definition.
+
+@node Exchange room E>RX
+@subsection Exchange room: E>RX
+@cindex level editor, exchange room
+@cindex exchange room, level editor
+@mcindex E>RX
+
+This command exchange the links of the current room with those of the
+chosen one from all respective directions.  It effectively swaps the
+position of two rooms within a level.  Reciprocal links are swapped as
+well, while non-reciprocal ones are left alone.  It's an integer input
+whose parameter @var{i} is a room number.  @xref{Integer input}.
+
+@center @kbd{RX>ROOM 0-24:i}
+
+It gives instant visual feedback by changing the currently displayed
+room to the chosen one.  @kbd{BACKSPACE} confirms the exchange with the
+currently displayed room and keeps it on display, while @kbd{/} cancels
+the exchange and reverts back to the room displayed before this command
+invocation.
+
+@node Copy E>RC
+@subsection Copy: E>RC
+@cindex level editor, room copy
+@cindex copy room, level editor
+@cindex room copy, level editor
+@mcindex E>RC
+
+This is a terminal command intended to copy the constructions of the
+currently displayed room in their entirety (foreground, background and
+extension) to a temporary memory area so they can later be retrieved and
+pasted over another room (see @ref{Paste E>RP}).  After invoked it
+briefly displays on the message line @samp{COPIED} to indicate that the
+constructions of the current room have been successfully stored.  Notice
+that only one room may have its constructions held at a time, so further
+invocations replace previously stored cons.  The constructions
+originally held in the temporary area---before the first successful
+invocation of this command---are @code{NO_FLOOR/NO_BG}.  To copy just
+one construction see @ref{Copy E>CC}.
+
+@node Paste E>RP
+@subsection Paste: E>RP
+@cindex level editor, room paste
+@cindex paste room, level editor
+@cindex room paste, level editor
+@cindex E>RP
+
+This is a terminal command intended to paste the previously copied
+constructions of an entire room over the currently displayed one (see
+@ref{Copy E>RC}).  After invoked it immediately replaces the
+constructions of the current room.  To paste just one construction see
+@ref{Paste E>CP}.
 
 @node Kid E>K
 @section Kid: E>K
