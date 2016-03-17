@@ -222,7 +222,7 @@ draw_start_kid (ALLEGRO_BITMAP *bitmap, enum vm vm)
   f.b = apply_palette (f.b, pal);
   if (hgc) f.b = apply_palette (f.b, hgc_palette);
   f.b = apply_palette (f.b, start_anim_palette);
-  f.flip = (level.start_dir == LEFT) ? 0 : ALLEGRO_FLIP_HORIZONTAL;
+  f.flip = (level.start_dir == LEFT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
   place_frame (&f, &f, f.b, &level.start_pos,
                level.start_dir == LEFT ? +28 : +22, +15);
   draw_frame (bitmap, &f);
