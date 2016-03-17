@@ -3055,10 +3055,13 @@ event may or may not be triggered depending upon the @emph{next} field
 status of the triggered event.
 
 This non-terminal command has terminal sub-commands for setting events
-and navigating through the floor-event-door tree.  The @dfn{selected
-event} is the event targeted by the sub-command actions.  At return (for
-all sub-commands) @kbd{BACKSPACE} updates the selected event, while
-@kbd{/} maintains its previous value.
+and navigating through the floor-event-door tree.
+
+@center @kbd{E>DFRS}
+
+The @dfn{selected event} is the event targeted by the sub-command
+actions.  At return (for all sub-commands) @kbd{BACKSPACE} updates the
+selected event, while @kbd{/} maintains its previous value.
 
 @node Event@arrow{}Door E>ED
 @subsection Event@arrow{}Door: E>ED
@@ -3213,6 +3216,8 @@ other room linking to room B from the same direction.
 This non-terminal command has sub-commands for handling room linking,
 room constructions as a whole and navigating through rooms.
 
+@center @kbd{R>JLSXCP}
+
 There are complementary commands that can be used to navigate through
 rooms by linkage and query the linking of the current room and its
 surroundings.  @xref{Level navigation}.  As they are available as direct
@@ -3353,6 +3358,75 @@ constructions of the current room.  To paste just one construction see
 @section Kid: E>K
 @cindex level editor, kid
 @cindex kid, level editor
+
+Every level has three basic attributes concerning the kid: his start
+position, facing direction and sword possession.  This non-terminal
+command has sub-commands for setting these attributes as well as putting
+the kid in an arbitrary place on-the-fly.
+
+@center @kbd{K>PSJDW}
+
+While this command is active, a darker semi-transparent image of the kid
+is shown in his start place (above all constructions and characters) in
+case it's located in the currently displayed room.  A sword image with
+the same characteristics is shown near him, in case he starts with one.
+
+@node Place kid E>KP
+@subsection Place kid: E>KP
+@cindex level editor, place kid
+@cindex place kid, level editor
+@mcindex E>KP
+
+This terminal command instantly puts the kid in the selected
+construction's place.  This is useful for placing the kid in arbitrary
+positions throughout the level for testing.  The kid is placed at rest
+independently of the movement he is performing at the instant of
+invocation.  There is no restriction of placement, and he can be placed
+even inside walls.  If the mouse selection is pointing to nowhere when
+this command is invoked, it displays @samp{SELECT CONSTRUCTION} on the
+message line.
+
+@node Set start position E>KS
+@subsection Set start position: E>KS
+@cindex level editor, set start position
+@cindex set start position, level editor
+@mcindex E>KS
+
+This terminal command instantly sets kid's start position to the
+selected construction's place.  There is no restriction of placement,
+and he can be placed even inside walls.  If the mouse selection is
+pointing to nowhere when this command is invoked, it displays
+@samp{SELECT CONSTRUCTION} on the message line.
+
+@node Jump to start position E>KJ
+@subsection Jump to start position: E>KJ
+@cindex level editor, jump to start position
+@cindex jump to start position, level editor
+@mcindex E>KJ
+
+This terminal command instantly sets the mouse selection to the kid's
+start position.  This is a handy way of finding it without having to
+look at each room.
+
+@node Toggle start direction E>KD
+@subsection Toggle start direction: E>KD
+@cindex level editor, toggle start direction
+@cindex toggle start direction, level editor
+@mcindex E>KD
+
+This terminal command instantly toggles kid's start facing direction.
+It only works if his start position is located in the currently
+displayed room.
+
+@node Toggle has sword E>KW
+@subsection Toggle has sword: E>KW
+@cindex level editor, toggle has sword
+@cindex toggle has sword, level editor
+@mcindex E>KW
+
+This terminal command instantly toggles kid's start sword possession.
+It only works if his start position is located in the currently
+displayed room.
 
 @node Guard E>G
 @section Guard: E>G
