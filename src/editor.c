@@ -660,7 +660,7 @@ editor (void)
   case EDIT_EVENT2DOOR:
     if (! is_valid_pos (&level.event[s].p)
         || ! is_door (&level.event[s].p)) {
-      struct coord c = {room_view, 0, 0};
+      struct coord c = {last_mouse_coord.room, 0, 0};
       set_mouse_coord (&c);
     } else set_mouse_pos (&level.event[s].p);
     b = level.event[s].next;
@@ -675,7 +675,7 @@ editor (void)
     break;
   case EDIT_EVENT2FLOOR:
     if (! is_valid_pos (&last_event2floor_pos)) {
-      struct coord c = {room_view, 0, 0};
+      struct coord c = {last_mouse_coord.room, 0, 0};
       set_mouse_coord (&c);
     } else set_mouse_pos (&last_event2floor_pos);
     switch (menu_list (&s, &r, t, 0, EVENTS - 1, "EF>EVENT")) {
@@ -856,11 +856,17 @@ editor (void)
       level.start_pos = p;
       break;
     case 'D':
-      if (room_view != level.start_pos.room) break;
+      if (room_view != level.start_pos.room) {
+        editor_msg ("NOT IN THIS ROOM", 12);
+        break;
+      }
       level.start_dir = (level.start_dir == LEFT) ? RIGHT : LEFT;
       break;
     case 'W':
-      if (room_view != level.start_pos.room) break;
+      if (room_view != level.start_pos.room) {
+        editor_msg ("NOT IN THIS ROOM", 12);
+        break;
+      }
       level.has_sword = ! level.has_sword;
       break;
     }
@@ -950,6 +956,10 @@ editor (void)
       s = guard_index; get_mouse_coord (&last_mouse_coord); break;
     case 'J': mouse2guard (guard_index); break;
     case 'P':
+      if (! is_guard_by_type (g->type)) {
+        editor_msg ("DISABLED GUARD", 12);
+        break;
+      }
       if (! is_valid_pos (&p)) {
         editor_msg ("SELECT CONSTRUCTION", 12);
         break;
@@ -957,22 +967,44 @@ editor (void)
       g->p = p;
       break;
     case 'D':
-      if (room_view != g->p.room) break;
+      if (! is_guard_by_type (g->type)) {
+        editor_msg ("DISABLED GUARD", 12);
+        break;
+      }
+      if (room_view != g->p.room) {
+        editor_msg ("NOT IN THIS ROOM", 12);
+        break;
+      }
       g->dir = (g->dir == LEFT) ? RIGHT : LEFT;
       break;
-    case 'K': edit = EDIT_GUARD_SKILL; break;
-    case 'L': edit = EDIT_GUARD_LIVES;
+    case 'K':
+      if (! is_guard_by_type (g->type)) {
+        editor_msg ("DISABLED GUARD", 12);
+        break;
+      }
+      edit = EDIT_GUARD_SKILL; break;
+    case 'L':
+      if (! is_guard_by_type (g->type)) {
+        editor_msg ("DISABLED GUARD", 12);
+        break;
+      }
+      edit = EDIT_GUARD_LIVES;
       s = g->total_lives; break;
     case 'T': edit = EDIT_GUARD_TYPE;
       b = g->type;
-      b0 = (g->type == NO_ANIM) ? true : false;
+      b0 = (! is_guard_by_type (g->type)) ? true : false;
       b1 = (g->type == GUARD) ? true : false;
       b2 = (g->type == FAT_GUARD) ? true : false;
       b3 = (g->type == VIZIER) ? true : false;
       b4 = (g->type == SKELETON) ? true : false;
       b5 = (g->type == SHADOW) ? true : false;
       break;
-    case 'Y': edit = EDIT_GUARD_STYLE;
+    case 'Y':
+      if (! is_guard_by_type (g->type)) {
+        editor_msg ("DISABLED GUARD", 12);
+        break;
+      }
+      edit = EDIT_GUARD_STYLE;
       b = g->style; break;
     }
     al_free (str);
@@ -1090,9 +1122,9 @@ editor (void)
     case 0: break;
     case 1:
       edit = EDIT_GUARD;
-      if (g->type != NO_ANIM && ! g->total_lives)
+      if (is_guard_by_type (g->type) && ! g->total_lives)
         g->total_lives = 3;
-      if (g->type != NO_ANIM && ! g->skill.attack_prob)
+      if (is_guard_by_type (g->type) && ! g->skill.attack_prob)
         get_legacy_skill (0, &g->skill);
       break;
     default:
@@ -1130,6 +1162,8 @@ exit_editor (void)
 {
   last_edit = edit;
   edit = EDIT_NONE;
+  msg = NULL;
+  msg_cycles = 0;
   reset_menu ();
   if (game_paused)
     draw_bottom_text (NULL, "GAME PAUSED");
@@ -1232,9 +1266,9 @@ static void
 mouse2guard (int i)
 {
   struct guard *g = &level.guard[i];
-  if (g->type != NO_ANIM) set_mouse_pos (&g->p);
+  if (is_guard_by_type (g->type)) set_mouse_pos (&g->p);
   else {
-    struct coord c = {room_view, 0, 0};
+    struct coord c = {last_mouse_coord.room, 0, 0};
     set_mouse_coord (&c);
   }
 }

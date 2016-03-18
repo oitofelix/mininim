@@ -156,7 +156,7 @@
 #define E_STAR_COLOR_03 (al_map_rgb (248, 252, 248))
 #define V_STAR_COLOR_01 (al_map_rgb (80, 84, 80))
 #define V_STAR_COLOR_02 (al_map_rgb (168, 168, 168))
-#define V_STAR_COLOR_03 (al_map_rgb (248, 252, 248))
+#define V_STAR_COLOR_03 (al_map_rgb (255, 255, 255))
 
 #define C_MOUSE_FUR_COLOR (al_map_rgb (255, 255, 255))
 #define C_MOUSE_SKIN_COLOR_01 (al_map_rgb (255, 255, 255))
@@ -451,5 +451,11 @@
 
 #define V_TITLE_BACKGROUND_PATTERN_COLOR (al_map_rgb (16, 0, 97))
 #define V_ENDING_BACKGROUND_PATTERN_COLOR (al_map_rgb (128, 0, 0))
+
+#define SKELETON_COLOR (al_map_rgb (252, 252, 240))
+#define V_SKELETON_COLOR (al_map_rgb (252, 252, 240))
+#define E_SKELETON_COLOR (al_map_rgb (248, 252, 248))
+#define C_SKELETON_COLOR (al_map_rgb (255, 255, 255))
+
 
 #endif	/* MININIM_COLORS_H */

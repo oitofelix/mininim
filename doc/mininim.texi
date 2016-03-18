@@ -3359,7 +3359,7 @@ constructions of the current room.  To paste just one construction see
 @cindex level editor, kid
 @cindex kid, level editor
 
-Every level has three basic attributes concerning the kid: his start
+Every level has three basic attributes concerning the kid: his starting
 position, facing direction and sword possession.  This non-terminal
 command has sub-commands for setting these attributes as well as putting
 the kid in an arbitrary place on-the-fly.
@@ -3367,9 +3367,10 @@ the kid in an arbitrary place on-the-fly.
 @center @kbd{K>PSJDW}
 
 While this command is active, a darker semi-transparent image of the kid
-is shown in his start place (above all constructions and characters) in
-case it's located in the currently displayed room.  A sword image with
-the same characteristics is shown near him, in case he starts with one.
+is shown in his starting place (above all constructions and characters)
+in case it's located in the currently displayed room.  A sword image
+with the same characteristics is shown near him, in case he starts with
+one.
 
 @node Place kid E>KP
 @subsection Place kid: E>KP
@@ -3392,7 +3393,7 @@ message line.
 @cindex set start position, level editor
 @mcindex E>KS
 
-This terminal command instantly sets kid's start position to the
+This terminal command instantly sets kid's starting position to the
 selected construction's place.  There is no restriction of placement,
 and he can be placed even inside walls.  If the mouse selection is
 pointing to nowhere when this command is invoked, it displays
@@ -3405,7 +3406,7 @@ pointing to nowhere when this command is invoked, it displays
 @mcindex E>KJ
 
 This terminal command instantly sets the mouse selection to the kid's
-start position.  This is a handy way of finding it without having to
+starting position.  This is a handy way of finding it without having to
 look at each room.
 
 @node Toggle start direction E>KD
@@ -3414,9 +3415,10 @@ look at each room.
 @cindex toggle start direction, level editor
 @mcindex E>KD
 
-This terminal command instantly toggles kid's start facing direction.
-It only works if his start position is located in the currently
-displayed room.
+This terminal command instantly toggles kid's starting facing direction.
+It only works if his starting position is located in the currently
+displayed room.  In case it isn't, it displays @samp{NOT IN THIS ROOM}
+on the message line.
 
 @node Toggle has sword E>KW
 @subsection Toggle has sword: E>KW
@@ -3424,14 +3426,45 @@ displayed room.
 @cindex toggle has sword, level editor
 @mcindex E>KW
 
-This terminal command instantly toggles kid's start sword possession.
+This terminal command instantly toggles kid's starting sword possession.
 It only works if his start position is located in the currently
-displayed room.
+displayed room.  In case it isn't, it displays @samp{NOT IN THIS ROOM}
+on the message line.
 
 @node Guard E>G
 @section Guard: E>G
 @cindex level editor, guard
 @cindex guard, level editor
+
+Enemies in the game are collectively referred to as ``guards''.  The
+couple attributes that set guards aesthetically apart from one another
+are: @dfn{type} and @dfn{style}.  The former is the most significant in
+the sense that it determines the actual graphical shape of the guard,
+while the latter determines only his coloring.  Not every @emph{type}
+has more than one effective @emph{style}, though.
+
+The five guard types are: @code{GUARD}, @code{FAT_GUARD}, @code{VIZIER},
+@code{SKELETON} and @code{SHADOW}.  The former three have 8 different
+styles (given by integers in the range 0--7), while the two latter have
+only one effective style.  These are summarized in the table below.
+
+@c footnote about differences between MININIM and the original engine.
+
+@c @multitable @columnfractions .05 .189 .189 .189 .189 .189
+@c   @headitem @ Style @tab @ @ @ @ GUARD @tab @ @ FAT_GUARD
+@c   @tab @ @ @ @ VIZIER @tab @ @ SKELETON
+@c   @tab @ @ @ SHADOW
+
+@c   @item @center 0
+@c   @tab @center @image{mininim-figures/guard-0}
+@c   @tab @center @image{mininim-figures/fat-guard-0}
+@c   @tab @center @image{mininim-figures/vizier-0}
+@c   @tab @center @image{mininim-figures/skeleton}
+@c   @tab @center @image{mininim-figures/shadow}
+@c @end multitable
+
+
+
 
 @node Level E>L
 @section Level: E>L

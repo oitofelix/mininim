@@ -579,16 +579,17 @@ process_keys (void)
       button = -1;
     }
 
-    if (t >= 60 && ! active_menu) {
-      if (t < 240 || t % 12 < 8) {
+    if (t >= 60) {
+      if ((t < 240 || t % 12 < 8) && ! active_menu) {
         if (t >= 252 && t % 12 == 0)
           play_sample (press_key_sample, -1);
         xasprintf (&text, "Press Button to Continue");
         draw_bottom_text (NULL, text);
         al_free (text);
-      } else draw_bottom_text (NULL, "");
+      } else if (! active_menu) draw_bottom_text (NULL, "");
 
-      if (key.keyboard.keycode || button != -1)
+      if ((key.keyboard.keycode || button != -1)
+          && ! was_menu_key_pressed ())
         quit_anim = RESTART_LEVEL;
     }
   } else if (al_get_timer_started (death_timer)

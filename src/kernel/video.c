@@ -26,13 +26,14 @@ int screen_flags = 0;
 bool hgc;
 ALLEGRO_TIMER *bottom_text_timer = NULL;
 bool is_display_focused = true;
-static ALLEGRO_BITMAP *effect_buffer;
+ALLEGRO_BITMAP *effect_buffer;
 static ALLEGRO_BITMAP *memory_bitmap;
 static ALLEGRO_BITMAP *black_screen;
 struct video_effect video_effect = {.type = VIDEO_NO_EFFECT};
 static ALLEGRO_FONT *builtin_font;
 int display_width = DISPLAY_WIDTH, display_height = DISPLAY_HEIGHT;
 ALLEGRO_BITMAP *icon;
+int effect_counter;
 
 static struct palette_cache {
   ALLEGRO_BITMAP *ib, *ob;
@@ -306,7 +307,7 @@ hgc_palette (ALLEGRO_COLOR c)
   return c;
 }
 
-static void
+void
 flip_display (ALLEGRO_BITMAP *bitmap)
 {
   int w = al_get_display_width (display);
@@ -391,8 +392,12 @@ stop_video_effect (void)
   if (! al_get_timer_started (video_timer)) return;
   video_effect.type = VIDEO_NO_EFFECT;
   al_stop_timer (video_timer);
+  al_set_timer_count (video_timer, 0);
+  drop_all_events_from_source
+    (event_queue, get_timer_event_source (video_timer));
   clear_bitmap (screen, BLACK);
   draw_bitmap (effect_buffer, screen, 0, 0, 0);
+  effect_counter = 0;
 }
 
 bool
@@ -404,23 +409,21 @@ is_video_effect_started (void)
 void
 show (void)
 {
-  static int i = 0;
-
   switch (video_effect.type) {
   case VIDEO_NO_EFFECT: flip_display (screen); return;
   case VIDEO_OFF: return;
   default: break;
   }
 
-  if (++i >= video_effect.duration + 2) {
-    i = 0;
+  if (++effect_counter >= video_effect.duration + 2) {
+    effect_counter = 0;
     stop_video_effect ();
     return;
   }
 
   switch (video_effect.type) {
   case VIDEO_FLICKERING:
-    if (i % 2 && i < video_effect.duration) {
+    if (effect_counter % 2 && effect_counter < video_effect.duration) {
       clear_bitmap (effect_buffer, video_effect.color);
       al_convert_mask_to_alpha (screen, BLACK);
     } else clear_bitmap (effect_buffer, BLACK);
@@ -429,28 +432,33 @@ show (void)
   case VIDEO_FADE_IN:
     switch (vm) {
     case CGA: case EGA:
-      draw_shutter (screen, effect_buffer, video_effect.duration / 4, i);
-      if (i >= video_effect.duration / 4) i += video_effect.duration;
+      draw_shutter (screen, effect_buffer, video_effect.duration / 4, effect_counter);
+      if (effect_counter >= video_effect.duration / 4)
+        effect_counter += video_effect.duration;
       break;
     case VGA:
-      draw_fade (screen, effect_buffer, 1 - (float) i / (float) video_effect.duration);
+      draw_fade (screen, effect_buffer, 1 - (float) effect_counter
+                 / (float) video_effect.duration);
       break;
     }
     break;
   case VIDEO_FADE_OUT:
     switch (vm) {
     case CGA: case EGA:
-      draw_shutter (black_screen, effect_buffer, video_effect.duration / 4, i);
-      if (i >= video_effect.duration / 4) i += video_effect.duration;
+      draw_shutter (black_screen, effect_buffer, video_effect.duration / 4,
+                    effect_counter);
+      if (effect_counter >= video_effect.duration / 4)
+        effect_counter += video_effect.duration;
       break;
     case VGA:
-      draw_fade (screen, effect_buffer, (float) i / (float) video_effect.duration);
+      draw_fade (screen, effect_buffer, (float) effect_counter
+                 / (float) video_effect.duration);
       break;
     }
-    if (i + 1 >= video_effect.duration) clear_bitmap (effect_buffer, BLACK);
+    if (effect_counter + 1 >= video_effect.duration) clear_bitmap (effect_buffer, BLACK);
     break;
   case VIDEO_ROLL_RIGHT:
-    draw_roll_right (screen, effect_buffer, video_effect.duration, i);
+    draw_roll_right (screen, effect_buffer, video_effect.duration, effect_counter);
     break;
   default:
     error (-1, 0, "%s (void): unknown video effect type (%i)",

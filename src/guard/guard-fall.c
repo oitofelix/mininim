@@ -210,7 +210,8 @@ flow (struct anim *g)
   select_xframe (&g->xf, sword_frameset, g->j);
 
   if (g->i == 0) g->xf.dx = -12, g->xf.dy = +4;
-  if (g->i >= 2 && g->type != SHADOW) g->xf.b = NULL;
+  if (g->i >= 2 && g->type != SHADOW
+      && g->type != SKELETON) g->xf.b = NULL;
 
   if (g->type == SKELETON) g->xf.dy += -3;
   if (g->type == SHADOW && g->i < 2) g->xf.dy += -2;

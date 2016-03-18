@@ -26,6 +26,8 @@ bool cutscene;
 bool next_frame_inv;
 uint64_t anim_cycle;
 
+ALLEGRO_EVENT_QUEUE *event_queue;
+
 struct anim *anima;
 size_t anima_nmemb;
 
@@ -39,7 +41,7 @@ play_anim (void (*draw_callback) (void),
   acknowledge_resize ();
   ALLEGRO_EVENT event;
   ALLEGRO_TIMER *timer = create_timer (1.0 / freq);
-  ALLEGRO_EVENT_QUEUE *event_queue = create_event_queue ();
+  event_queue = create_event_queue ();
   al_register_event_source (event_queue, get_display_event_source (display));
   al_register_event_source (event_queue, get_keyboard_event_source ());
   al_register_event_source (event_queue, get_joystick_event_source ());
@@ -93,7 +95,11 @@ play_anim (void (*draw_callback) (void),
 
         kid_debug ();
 
-        if (! is_video_effect_started ()) show ();
+        if (is_video_effect_started ()) {
+          effect_counter--;
+          show ();
+        } else show ();
+
         if (! pause_anim
             || was_key_pressed (ALLEGRO_KEY_ESCAPE, 0,
                                 ALLEGRO_KEYMOD_ALT, true)) {

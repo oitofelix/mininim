@@ -51,6 +51,7 @@ void start_video_effect (enum video_effect_type type, int duration);
 void stop_video_effect (void);
 bool is_video_effect_started (void);
 void show (void);
+void flip_display (ALLEGRO_BITMAP *bitmap);
 
 /* palette */
 int compare_palette_caches (const void *pc0, const void *pc1);
@@ -61,6 +62,7 @@ ALLEGRO_COLOR hgc_palette (ALLEGRO_COLOR c);
 /* variables */
 extern ALLEGRO_DISPLAY *display;
 extern ALLEGRO_BITMAP *screen, *uscreen;
+extern ALLEGRO_BITMAP *effect_buffer;
 extern ALLEGRO_TIMER *video_timer;
 extern struct video_effect video_effect;
 extern int screen_flags;
@@ -69,5 +71,6 @@ extern int display_width, display_height;
 extern ALLEGRO_BITMAP *icon;
 extern ALLEGRO_TIMER *bottom_text_timer;
 extern bool is_display_focused;
+extern int effect_counter;
 
 #endif	/* MININIM_VIDEO_H */
