@@ -457,5 +457,4 @@
 #define E_SKELETON_COLOR (al_map_rgb (248, 252, 248))
 #define C_SKELETON_COLOR (al_map_rgb (255, 255, 255))
 
-
 #endif	/* MININIM_COLORS_H */

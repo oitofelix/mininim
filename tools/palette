@@ -1,6 +1,5 @@
 #!/bin/bash
 
-for f in *.png; do convert $f \
--fill 'rgb(252,252,216)' -opaque 'rgb(252,232,216)' \
--fill 'rgb(216,184,160)' -opaque 'rgb(200,184,152)' \
-$f; done
+find -name '*.png' -exec convert '{}' \
+-fill 'rgb(254,254,254)' -opaque 'rgb(252,252,216)' \
+'{}' \;

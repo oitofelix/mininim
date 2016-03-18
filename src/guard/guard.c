@@ -612,20 +612,16 @@ ALLEGRO_BITMAP *
 apply_guard_palette (ALLEGRO_BITMAP *bitmap, enum anim_type type,
                      int style, enum vm vm)
 {
-  palette pal = NULL, pals = NULL;
-  if (type == GUARD || type == FAT_GUARD
-      || type == VIZIER || type == SKELETON) {
-    pal = get_guard_palette (style, vm);
-    bitmap = apply_palette (bitmap, pal);
-  } else if (type == SHADOW) {
+  palette pal = NULL;
+
+  if (type == SHADOW) {
     pal = get_kid_palette (vm);
     bitmap = apply_palette (bitmap, pal);
+  }
 
-    pals = get_guard_palette (style, vm);
-    bitmap = apply_palette (bitmap, pals);
-
-    /* pals = get_shadow_palette (vm); */
-    /* bitmap = apply_palette (bitmap, pals); */
+  if (is_guard_by_type (type)) {
+    pal = get_guard_palette (style, vm);
+    bitmap = apply_palette (bitmap, pal);
   } else return bitmap;
 
   if (hgc) bitmap = apply_palette (bitmap, hgc_palette);
