@@ -1141,11 +1141,13 @@ editor (void)
   case EDIT_GUARD_STYLE:
     draw_start_guards (screen, vm);
     g = &level.guard[guard_index];
-    switch (menu_int (&g->style, NULL, 0, 7, "GY>STYLE", NULL)) {
+    xasprintf (&str, "G%iY>STYLE", guard_index);
+    switch (menu_int (&g->style, NULL, 0, 7, str, NULL)) {
     case -1: edit = EDIT_GUARD; g->style = b; break;
     case 0: break;
     case 1: edit = EDIT_GUARD; break;
     }
+    al_free (str);
     break;
   }
 }

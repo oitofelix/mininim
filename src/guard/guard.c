@@ -117,7 +117,7 @@ v_salmon_palette (ALLEGRO_COLOR c)
   /* KID */
   if (color_eq (c, V_KID_CLOTHES_COLOR_01)) return V_KID_SHADOW_CLOTHES_COLOR_01;
   if (color_eq (c, V_KID_CLOTHES_COLOR_02)) return V_KID_SHADOW_CLOTHES_COLOR_02;
-  if (color_eq (c, V_KID_EYE_COLOR)) return V_KID_SHADOW_EYE_COLOR;
+  if (color_eq (c, V_KID_EYE_COLOR)) return V_SALMON_GUARD_EYES_COLOR;
 
   /* SKELETON */
   if (color_eq (c, SKELETON_COLOR)) return V_SKELETON_COLOR;

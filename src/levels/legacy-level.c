@@ -979,7 +979,9 @@ interpret_legacy_level (int number)
     g->total_lives = life_table[number];
 
     /* STYLE: ok */
-    g->style = lv.guard_color[i];
+    if (number == 13) g->style = 0;
+    else if (number == 6) g->style = 1;
+    else g->style = lv.guard_color[i];
 
     /* printf ("(%i, %i, %i), style: %i\n", */
     /*         g->p.room, g->p.floor, g->p.place, g->style); */

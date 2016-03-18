@@ -28,6 +28,7 @@ ALLEGRO_BITMAP *create_bitmap (int w, int h);
 ALLEGRO_BITMAP *clone_bitmap (ALLEGRO_BITMAP *bitmap);
 ALLEGRO_BITMAP *load_bitmap (char *filename);
 void validate_bitmap_for_mingw (ALLEGRO_BITMAP *bitmap);
+void save_bitmap (char *filename, ALLEGRO_BITMAP *bitmap);
 bool color_eq (ALLEGRO_COLOR c0, ALLEGRO_COLOR c1);
 void clear_bitmap (ALLEGRO_BITMAP *bitmap, ALLEGRO_COLOR color);
 void draw_bitmap (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,

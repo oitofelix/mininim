@@ -1119,6 +1119,11 @@ main (int _argc, char **_argv)
   load_level ();
   load_cutscenes ();
 
+  /* ----------------- */
+  /* save_guard_bitmaps (VGA); */
+  /* exit (0); */
+  /* --------------- */
+
   if (skip_title) goto play_game;
 
  restart_game:

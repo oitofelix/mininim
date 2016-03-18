@@ -250,9 +250,7 @@ register_anims (void)
     a->skill = g->skill;
     a->total_lives = g->total_lives + g->skill.extra_life;
     a->current_lives = g->total_lives;
-    if (level.number == 13) a->style = 0;
-    else if (level.number == 6) a->style = 1;
-    else a->style = g->style;
+    a->style = g->style;
   }
 }
 

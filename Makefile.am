@@ -99,7 +99,8 @@ mininim_SOURCES = src/mininim.c src/mininim.h src/constants.h					\
 		src/kernel/xstdio.h src/kernel/file.c src/kernel/file.h						\
 		src/kernel/dialog.c src/kernel/dialog.h src/kernel/threads.c			\
 		src/kernel/threads.h src/kernel/xconfig.c src/kernel/xconfig.h		\
-		src/menu.c src/menu.h src/editor.c src/editor.h
+		src/menu.c src/menu.h src/editor.c src/editor.h src/debug.c				\
+		src/debug.h
 
 ${mininim_OBJECTS}: ${top_builddir}/src/mininim.h.gch
 

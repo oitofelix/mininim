@@ -297,6 +297,14 @@ validate_bitmap_for_mingw (ALLEGRO_BITMAP *bitmap)
   al_unlock_bitmap(bitmap);
 }
 
+void
+save_bitmap (char *filename, ALLEGRO_BITMAP *bitmap)
+{
+  if (! al_save_bitmap (filename, bitmap))
+    error (-1, 0, "%s: cannot save bitmap file '%s'",
+           __func__, filename);
+}
+
 ALLEGRO_COLOR
 hgc_palette (ALLEGRO_COLOR c)
 {

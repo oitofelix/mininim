@@ -190,9 +190,11 @@ draw_kid_frame (ALLEGRO_BITMAP *bitmap, struct anim *k,
   xf.b = apply_palette (xf.b, pal);
 
   if (k->shadow) {
-    palette pals = get_shadow_palette (vm);
-    f.b = apply_palette (f.b, pals);
-    xf.b = apply_palette (xf.b, pals);
+    f.b = apply_guard_palette (f.b, SHADOW, 0, vm);
+    xf.b = apply_guard_palette (xf.b, SHADOW, 0, vm);
+    /* palette pals = get_shadow_palette (vm); */
+    /* f.b = apply_palette (f.b, pals); */
+    /* xf.b = apply_palette (xf.b, pals); */
   }
 
   if (hgc) {

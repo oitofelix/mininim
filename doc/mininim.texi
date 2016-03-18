@@ -3440,28 +3440,76 @@ Enemies in the game are collectively referred to as ``guards''.  The
 couple attributes that set guards aesthetically apart from one another
 are: @dfn{type} and @dfn{style}.  The former is the most significant in
 the sense that it determines the actual graphical shape of the guard,
-while the latter determines only his coloring.  Not every @emph{type}
-has more than one effective @emph{style}, though.
+while the latter determines only his coloring.
 
 The five guard types are: @code{GUARD}, @code{FAT_GUARD}, @code{VIZIER},
-@code{SKELETON} and @code{SHADOW}.  The former three have 8 different
-styles (given by integers in the range 0--7), while the two latter have
-only one effective style.  These are summarized in the table below.
+@code{SKELETON} and @code{SHADOW}.  They have 8 different styles, given
+by integers ranging from 0 to 7.  These are summarized in the table
+below.
 
 @c footnote about differences between MININIM and the original engine.
 
-@c @multitable @columnfractions .05 .189 .189 .189 .189 .189
-@c   @headitem @ Style @tab @ @ @ @ GUARD @tab @ @ FAT_GUARD
-@c   @tab @ @ @ @ VIZIER @tab @ @ SKELETON
-@c   @tab @ @ @ SHADOW
+@multitable @columnfractions .05 .189 .189 .189 .189 .189
+  @headitem @ Style @tab @ @ @ @ GUARD @tab @ @ FAT_GUARD
+  @tab @ @ @ @ VIZIER @tab @ @ SKELETON
+  @tab @ @ @ SHADOW
 
-@c   @item @center 0
-@c   @tab @center @image{mininim-figures/guard-0}
-@c   @tab @center @image{mininim-figures/fat-guard-0}
-@c   @tab @center @image{mininim-figures/vizier-0}
-@c   @tab @center @image{mininim-figures/skeleton}
-@c   @tab @center @image{mininim-figures/shadow}
-@c @end multitable
+  @item @center 0
+  @tab @center @image{mininim-figures/guard-0}
+  @tab @center @image{mininim-figures/fat-guard-0}
+  @tab @center @image{mininim-figures/vizier-0}
+  @tab @center @image{mininim-figures/skeleton-0}
+  @tab @center @image{mininim-figures/shadow-0}
+
+  @item @center 1
+  @tab @center @image{mininim-figures/guard-1}
+  @tab @center @image{mininim-figures/fat-guard-1}
+  @tab @center @image{mininim-figures/vizier-1}
+  @tab @center @image{mininim-figures/skeleton-1}
+  @tab @center @image{mininim-figures/shadow-1}
+
+  @item @center 2
+  @tab @center @image{mininim-figures/guard-2}
+  @tab @center @image{mininim-figures/fat-guard-2}
+  @tab @center @image{mininim-figures/vizier-2}
+  @tab @center @image{mininim-figures/skeleton-2}
+  @tab @center @image{mininim-figures/shadow-2}
+
+  @item @center 3
+  @tab @center @image{mininim-figures/guard-3}
+  @tab @center @image{mininim-figures/fat-guard-3}
+  @tab @center @image{mininim-figures/vizier-3}
+  @tab @center @image{mininim-figures/skeleton-3}
+  @tab @center @image{mininim-figures/shadow-3}
+
+  @item @center 4
+  @tab @center @image{mininim-figures/guard-4}
+  @tab @center @image{mininim-figures/fat-guard-4}
+  @tab @center @image{mininim-figures/vizier-4}
+  @tab @center @image{mininim-figures/skeleton-4}
+  @tab @center @image{mininim-figures/shadow-4}
+
+  @item @center 5
+  @tab @center @image{mininim-figures/guard-5}
+  @tab @center @image{mininim-figures/fat-guard-5}
+  @tab @center @image{mininim-figures/vizier-5}
+  @tab @center @image{mininim-figures/skeleton-5}
+  @tab @center @image{mininim-figures/shadow-5}
+
+  @item @center 6
+  @tab @center @image{mininim-figures/guard-6}
+  @tab @center @image{mininim-figures/fat-guard-6}
+  @tab @center @image{mininim-figures/vizier-6}
+  @tab @center @image{mininim-figures/skeleton-6}
+  @tab @center @image{mininim-figures/shadow-6}
+
+  @item @center 7
+  @tab @center @image{mininim-figures/guard-7}
+  @tab @center @image{mininim-figures/fat-guard-7}
+  @tab @center @image{mininim-figures/vizier-7}
+  @tab @center @image{mininim-figures/skeleton-7}
+  @tab @center @image{mininim-figures/shadow-7}
+@end multitable
 
 
 
