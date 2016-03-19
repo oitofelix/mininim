@@ -226,12 +226,6 @@ flow (struct anim *g)
         return false;
       }
 
-      /* walkb */
-      if (walkb) {
-        guard_walkb (g);
-        return false;
-      }
-
       /* attack */
       if (attack) {
         guard_attack (g);
@@ -250,6 +244,12 @@ flow (struct anim *g)
     /* normal */
     if (g->i == 2 && normal) {
       guard_normal (g);
+      return false;
+    }
+
+    /* walkb */
+    if (walkb) {
+      guard_walkb (g);
       return false;
     }
 

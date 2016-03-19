@@ -1385,6 +1385,7 @@ Pressing @kbd{SHIFT} makes the kid attack.
 
 @center @image{mininim-figures/kid-sword-normal} @arrow{} @image{mininim-figures/kid-sword-attack}
 
+@node Counter attack and counter defense
 @subsection Counter attack and counter defense
 @cindex counter attack
 @cindex counter defense
@@ -2508,7 +2509,8 @@ name of the parameter
 @item min
 minimum acceptable value
 @item max
-maximum acceptable value
+maximum acceptable value.  @samp{>} for @code{INT_MAX} (largest
+representable integer);
 @item i
 current value.  Its always kept between @var{min} and @var{max}
 inclusive.
@@ -2741,53 +2743,69 @@ follows:
 @itemize
 @mcindex E>CFF
 @item @kbd{F} (Floor): @kbd{CFF>NFBSLPOCTH}.  @xref{Floors}.
-@itemize
+@table @kbd
 @mcindex E>CFFN
-@item @kbd{N} @code{NO_FLOOR}
+@item N
+@code{NO_FLOOR}
 @mcindex E>CFFF
-@item @kbd{F} @code{FLOOR}
+@item F
+@code{FLOOR}
 @mcindex E>CFFB
-@item @kbd{B} @code{BROKEN_FLOOR}
+@item B
+@code{BROKEN_FLOOR}
 @mcindex E>CFFS
-@item @kbd{S} @code{SKELETON_FLOOR}
+@item S
+@code{SKELETON_FLOOR}
 @mcindex E>CFFL
-@item @kbd{L} @code{LOOSE_FLOOR}
+@item L
+@code{LOOSE_FLOOR}
 @mcindex E>CFFP
-@item @kbd{P} @code{SPIKES_FLOOR}
+@item P
+@code{SPIKES_FLOOR}
 @mcindex E>CFFO
-@item @kbd{O} @code{OPENER_FLOOR}
+@item O
+@code{OPENER_FLOOR}
 @mcindex E>CFFC
-@item @kbd{C} @code{CLOSER_FLOOR}
+@item C
+@code{CLOSER_FLOOR}
 @mcindex E>CFFT
-@item @kbd{T} @code{STUCK_FLOOR}
+@item T
+@code{STUCK_FLOOR}
 @mcindex E>CFFH
-@item @kbd{H} @code{HIDDEN_FLOOR}
-@end itemize
+@item H
+@code{HIDDEN_FLOOR}
+@end table
 
 @mcindex E>CFP
 @item @kbd{P} (Pillar): @kbd{CFP>PTBA}.  @xref{Pillars}.
-@itemize
+@table @kbd
 @mcindex E>CFPP
-@item @kbd{P} @code{PILLAR}
+@item P
+@code{PILLAR}
 @mcindex E>CFPT
-@item @kbd{T} @code{BIG_PILLAR_TOP}
+@item T
+@code{BIG_PILLAR_TOP}
 @mcindex E>CFPB
-@item @kbd{B} @code{BIG_PILLAR_BOTTOM}
+@item B
+@code{BIG_PILLAR_BOTTOM}
 @mcindex E>CFPA
-@item @kbd{A} @code{ARCH_BOTTOM}
-@end itemize
+@item A
+@code{ARCH_BOTTOM}
+@end table
 
 @mcindex E>CFW
 @item @kbd{W} @code{WALL}.  @xref{Wall}.
 
 @mcindex E>CFD
 @item @kbd{D} (Door): @kbd{CFD>DL}.  @xref{Doors}.
-@itemize
+@table @kbd
 @mcindex E>CFDD
-@item @kbd{D} @code{DOOR}
+@item D
+@code{DOOR}
 @mcindex E>CFDL
-@item @kbd{L} @code{LEVEL_DOOR}
-@end itemize
+@item L
+@code{LEVEL_DOOR}
+@end table
 
 @mcindex E>CFC
 @item @kbd{C} @code{CHOPPER}.  @xref{Chopper}.
@@ -2797,25 +2815,31 @@ follows:
 
 @mcindex E>CFR
 @item @kbd{R} (Carpet): @kbd{CFR>CT}.  @xref{Carpets}.
-@itemize
+@table @kbd
 @mcindex E>CFRC
-@item @kbd{C} @code{CARPET}
+@item C
+@code{CARPET}
 @mcindex E>CFRT
-@item @kbd{T} @code{TCARPET}
-@end itemize
+@item T
+@code{TCARPET}
+@end table
 
 @mcindex E>CFA
 @item @kbd{A} (Arch): @kbd{CFA>MSLR}.  @xref{Arches}.
-@itemize
+@table @kbd
 @mcindex E>CFAM
-@item @kbd{M} @code{ARCH_TOP_MID}
+@item M
+@code{ARCH_TOP_MID}
 @mcindex E>CFAS
-@item @kbd{S} @code{ARCH_TOP_SMALL}
+@item S
+@code{ARCH_TOP_SMALL}
 @mcindex E>CFAL
-@item @kbd{L} @code{ARCH_TOP_LEFT}
+@item L
+@code{ARCH_TOP_LEFT}
 @mcindex E>CFAR
-@item @kbd{R} @code{ARCH_TOP_RIGHT}
-@end itemize
+@item R
+@code{ARCH_TOP_RIGHT}
+@end table
 @end itemize
 
 
@@ -2838,26 +2862,35 @@ to easily apply a particular background to an wider region, as described
 in @ref{Mouse selection}.  These sub-commands have the following
 meanings:
 
-@itemize
+@table @kbd
 @mcindex E>CBN
-@item @kbd{N} @code{NO_BRICKS}
+@item N
+@code{NO_BRICKS}
 @mcindex E>CBG
-@item @kbd{G} @code{NO_BG}
+@item G
+@code{NO_BG}
 @mcindex E>CB0
-@item @kbd{0} @code{BRICKS_00}
+@item 0
+@code{BRICKS_00}
 @mcindex E>CB1
-@item @kbd{1} @code{BRICKS_01}
+@item 1
+@code{BRICKS_01}
 @mcindex E>CB2
-@item @kbd{2} @code{BRICKS_02}
+@item 2
+@code{BRICKS_02}
 @mcindex E>CB3
-@item @kbd{3} @code{BRICKS_03}
+@item 3
+@code{BRICKS_03}
 @mcindex E>CBT
-@item @kbd{T} @code{TORCH}
+@item T
+@code{TORCH}
 @mcindex E>CBW
-@item @kbd{W} @code{WINDOW}
+@item W
+@code{WINDOW}
 @mcindex E>CBB
-@item @kbd{B} @code{BALCONY}
-@end itemize
+@item B
+@code{BALCONY}
+@end table
 
 @node Extension E>CE
 @subsection Extension: E>CE
@@ -2888,28 +2921,38 @@ items listed in @ref{Items}.  All of them work in the same way: they
 immediately change the extension of the selected construction.  They
 have the following meanings:
 
-@itemize
+@table @kbd
 @mcindex E>CEN
-@item @kbd{N} @code{NO_ITEM}
+@item N
+@code{NO_ITEM}
 @mcindex E>CEE
-@item @kbd{E} @code{EMPTY_POTION}
+@item E
+@code{EMPTY_POTION}
 @mcindex E>CES
-@item @kbd{S} @code{SMALL_LIFE_POTION}
+@item S
+@code{SMALL_LIFE_POTION}
 @mcindex E>CEB
-@item @kbd{B} @code{BIG_LIFE_POTION}
+@item B
+@code{BIG_LIFE_POTION}
 @mcindex E>CEP
-@item @kbd{P} @code{SMALL_POISON_POTION}
+@item P
+@code{SMALL_POISON_POTION}
 @mcindex E>CEO
-@item @kbd{O} @code{BIG_POISON_POTION}
+@item O
+@code{BIG_POISON_POTION}
 @mcindex E>CEF
-@item @kbd{F} @code{FLOAT_POTION}
+@item F
+@code{FLOAT_POTION}
 @mcindex E>CEL
-@item @kbd{L} @code{FLIP_POTION}
+@item L
+@code{FLIP_POTION}
 @mcindex E>CEA
-@item @kbd{A} @code{ACTIVATION_POTION}
+@item A
+@code{ACTIVATION_POTION}
 @mcindex E>CEW
-@item @kbd{W} @code{SWORD}
-@end itemize
+@item W
+@code{SWORD}
+@end table
 
 @node Can't fall extension E>CE
 @subsubsection Can't fall
@@ -2971,18 +3014,23 @@ carpet designs listed in @ref{Carpets}.  All of them work in the same
 way: they immediately change the extension of the selected construction.
 They have the following meanings:
 
-@itemize
+@table @kbd
 @mcindex E>CE0
-@item @kbd{0} @code{CARPET_00}
+@item 0
+@code{CARPET_00}
 @mcindex E>CE1
-@item @kbd{1} @code{CARPET_01}
+@item 1
+@code{CARPET_01}
 @mcindex E>CEA
-@item @kbd{A} @code{ARCH_CARPET_LEFT}
+@item A
+@code{ARCH_CARPET_LEFT}
 @mcindex E>CEB
-@item @kbd{B} @code{ARCH_CARPET_RIGHT_00}
+@item B
+@code{ARCH_CARPET_RIGHT_00}
 @mcindex E>CEC
-@item @kbd{C} @code{ARCH_CARPET_RIGHT_01}
-@end itemize
+@item C
+@code{ARCH_CARPET_RIGHT_01}
+@end table
 
 @node Info E>CI
 @subsection Info: E>CI
@@ -3258,16 +3306,20 @@ directions.
 Every sub-command works in the same way: they change the current's room
 link from the respective direction.  They have the following meanings:
 
-@itemize
+@table @kbd
 @mcindex E>RLL
-@item @kbd{L} Left
+@item L
+left
 @mcindex E>RLR
-@item @kbd{R} Right
+@item R
+right
 @mcindex E>RLA
-@item @kbd{A} Above
+@item A
+above
 @mcindex E>RLB
-@item @kbd{B} Below
-@end itemize
+@item B
+below
+@end table
 
 Each sub-command is an integer input whose parameter @var{i} is a room
 number and @var{d} is the respective direction.  @xref{Integer input}.
@@ -3367,10 +3419,9 @@ the kid in an arbitrary place on-the-fly.
 @center @kbd{K>PSJDW}
 
 While this command is active, a darker semi-transparent image of the kid
-is shown in his starting place (above all constructions and characters)
-in case it's located in the currently displayed room.  A sword image
-with the same characteristics is shown near him, in case he starts with
-one.
+is shown in his starting place, above all constructions and characters.
+A sword image with the same characteristics is shown near him, in case
+he starts with one.
 
 @node Place kid E>KP
 @subsection Place kid: E>KP
@@ -3416,8 +3467,8 @@ look at each room.
 @mcindex E>KD
 
 This terminal command instantly toggles kid's starting facing direction.
-It only works if his starting position is located in the currently
-displayed room.  In case it isn't, it displays @samp{NOT IN THIS ROOM}
+It only works if kid's starting position is located in the currently
+displayed room.  In negative case, @samp{NOT IN THIS ROOM} is displayed
 on the message line.
 
 @node Toggle has sword E>KW
@@ -3439,15 +3490,21 @@ on the message line.
 Enemies in the game are collectively referred to as ``guards''.  The
 couple attributes that set guards aesthetically apart from one another
 are: @dfn{type} and @dfn{style}.  The former is the most significant in
-the sense that it determines the actual graphical shape of the guard,
-while the latter determines only his coloring.
-
-The five guard types are: @code{GUARD}, @code{FAT_GUARD}, @code{VIZIER},
-@code{SKELETON} and @code{SHADOW}.  They have 8 different styles, given
-by integers ranging from 0 to 7.  These are summarized in the table
+the sense that it determines the actual graphical shape of the
+guard,@footnote{In the original game the guard type is not given per
+guard, but instead per level: 3@arrow{}@code{SKELETON},
+6@arrow{}@code{FAT_GUARD}, 12@arrow{}@code{SHADOW},
+13@arrow{}@code{VIZIER}, others@arrow@code{GUARD}.} while the latter
+determines only his coloring.  The five guard types are: @code{GUARD},
+@code{FAT_GUARD}, @code{VIZIER}, @code{SKELETON} and @code{SHADOW}.
+They have 8 different styles, given by integers ranging from 0 to
+7.@footnote{The original game has the same styles (from 1 to 7) for
+guards of type @code{GUARD}, but has a fixed style for all others.
+MININIM has equivalent styles in that range for every other guard type,
+and uses style 0 to give the original vizier style to guards of type
+@code{GUARD} and @code{FAT_GUARD}, while reserving it as the original
+style for all other guard types.} These are summarized in the table
 below.
-
-@c footnote about differences between MININIM and the original engine.
 
 @multitable @columnfractions .05 .189 .189 .189 .189 .189
   @headitem @ Style @tab @ @ @ @ GUARD @tab @ @ FAT_GUARD
@@ -3510,6 +3567,182 @@ below.
   @tab @center @image{mininim-figures/skeleton-7}
   @tab @center @image{mininim-figures/shadow-7}
 @end multitable
+
+Like the kid, each guard has a starting position and facing direction,
+but naturally, every guard starts with a sword in his possession.  Each
+guard also has an arbitrary number of total lives.@footnote{In the
+original game the number of total lives is fixed per level and can't be
+changed.}
+
+Each guard also has its own set of skills which influence how strong
+they are in battle.  There are six skills that are given as percentage
+(between 0% and 100%, inclusive) indicating the probability of the
+related action succeeding.@footnote{In the original game guard skills
+can't be fine-tuned individually, as the game uses a predefined set of
+12 possible skill configurations (ranging from 0 to 11).  @xref{Legacy
+skill templates E>GKL}.}  In the following descriptions, @dfn{fight
+range} is the safe distance from the kid guards strive to keep during
+battle: a step away from striking, but far enough for not being hit.
+@dfn{Attack range} is the nearer distance guards have to be in order to
+make an effective strike.
+
+@table @dfn
+@item Attack
+Probability of the guard initiating an attack when in @emph{attack
+range}.  If the kid is not in fight mode the attack is immediate
+regardless of this.
+
+@item Counter attack
+Probability of the guard initiating a counter attack after a successful
+defense.
+
+@item Defense
+Probability of the guard defending an attack when in @emph{attack
+range}.
+
+@item Counter defense
+Probability of the guard defending a counter attack.
+
+@item Advance
+Probability of the guard going towards @emph{attack range} when in
+@emph{fight range}, if the kid is not attacking.  If the kid is not in
+fight mode the advance is immediate regardless of this.
+
+@item Return@footnote{This skill attribute is not available in the original game as guards there never back off by themselves.}
+Probability of the guard backing off to @emph{fight range} when in
+@emph{attack range}.
+@end table
+
+For how these skills are related to kid's in battle, see @ref{Counter
+attack and counter defense}.  For skills that are tested at each cycle
+(12th of a second) like @emph{attack}, @emph{advance} and @emph{return},
+1% means once every 8.33 seconds on average.  The user has to keep in
+mind that this drops quickly (8% means once every 1.04 seconds), thus
+care is needed or the guard might end up having very unnatural
+movements, like alternating too fast between advancing and returning.
+
+There are two more attributes that are categorized under guard skills,
+which are not interpreted as percentage.
+
+@table @dfn
+@item Refraction period
+How many cycles the guard is kept still after being hit, before being
+able to advance and attack.
+
+@item Extra lives
+How many lives to add to the common total lives.
+@end table
+
+This non-terminal command has sub-commands for setting all these
+characteristics.
+
+@center @kbd{Gj>SJPDKLTY}
+
+All actions apply to the currently selected guard, whose index @var{j}
+is shown by all commands of this hierarchy.  Before being able to
+perform further actions upon a guard it has to be enabled.  This is done
+by selecting the guard's type.  @xref{Type E>GT}.  If a guard is
+disabled, attempts to execute any other command will fail showing
+@samp{DISABLED GUARD} on the message line.  While commands of this
+hierarchy are active, darker semi-transparent images of the guards are
+shown in their starting place, above all constructions and characters.
+
+@node Select guard E>GS
+@subsection Select guard: E>GS
+@cindex level editor, select guard
+@cindex select guard, level editor
+@mcindex E>GS
+
+This command is used to change the currently selected guard.  It's an
+integer input whose parameter @var{i} is the guard number.
+@xref{Integer input}.
+
+@center @kbd{GjS>GUARD 0-24:i}
+
+It gives instant visual feedback locking the mouse selection on the
+starting place of the chosen guard.  If the chosen guard is disabled,
+the mouse selection points nowhere.  @kbd{BACKSPACE} makes the chosen
+guard the currently selected one and keeps the mouse selection, while
+@kbd{/} keeps the currently selected guard and reverts the mouse
+selection to the state it had before this command invocation.
+
+@node Jump to start position E>GJ
+@subsection Jump to start position: E>GJ
+@cindex level editor, jump to start position
+@cindex jump to start position, level editor
+@mcindex E>GJ
+
+This terminal command instantly sets the mouse selection to the starting
+position of the currently select guard.  This is a handy way of finding
+him without having to re-select.  If the selected guard is disabled or
+has no starting position yet, the mouse selection points nowhere.
+
+@node Set start position E>GP
+@subsection Set start position: E>GP
+@cindex level editor, set start position
+@cindex set start position, level editor
+@mcindex E>GP
+
+This terminal command instantly sets the starting position of the
+currently selected guard to the selected construction's place.  There is
+no restriction of placement, and he can be placed even inside walls.  If
+the mouse selection is pointing to nowhere when this command is invoked,
+it displays @samp{SELECT CONSTRUCTION} on the message line.
+
+@node Toggle start direction E>GD
+@subsection Toggle start direction: E>GD
+@cindex level editor, toggle start direction
+@cindex toggle start direction, level editor
+@mcindex E>GD
+
+This terminal command instantly toggles the facing direction of the
+currently selected guard.  It only works if the guard's starting
+position is located in the currently displayed room.  In negative case,
+@samp{NOT IN THIS ROOM} is displayed on the message line.
+
+@node Skill E>GK
+@subsection Skill: E>GK
+@cindex level editor, guard skill
+@cindex guard skill, level editor
+@mcindex E>GK
+
+This non-terminal command has integer input sub-commands for all guard
+skill attributes.
+
+@center @kbd{GjK>ABDEVRFXL}
+
+The first six commands correspond to the probability-based skills.
+
+@table @kbd
+@mcindex E>GKA
+@item A
+attack
+@mcindex E>GKB
+@item B
+counter attack
+@mcindex E>GKD
+@item D
+defense
+@mcindex E>GKE
+@item E
+counter defense
+@mcindex E>GKV
+@item V
+advance
+@mcindex E>GKR
+@item R
+return
+@end table
+
+Each one of these sub-commands is an integer input whose parameter
+@var{i} is a percentage indicating the likelihood of the related action
+@var{act} (relative to command @var{a}) succeeding.  @xref{Integer
+input}.
+
+@center @kbd{GjKa>act 0-100:i}
+
+@kbd{BACKSPACE} confirms the new skill setting, while @kbd{/} maintains
+the current one.
 
 
 

@@ -117,7 +117,6 @@ v_salmon_palette (ALLEGRO_COLOR c)
   /* KID */
   if (color_eq (c, V_KID_CLOTHES_COLOR_01)) return V_KID_SHADOW_CLOTHES_COLOR_01;
   if (color_eq (c, V_KID_CLOTHES_COLOR_02)) return V_KID_SHADOW_CLOTHES_COLOR_02;
-  if (color_eq (c, V_KID_EYE_COLOR)) return V_SALMON_GUARD_EYES_COLOR;
 
   /* SKELETON */
   if (color_eq (c, SKELETON_COLOR)) return V_SKELETON_COLOR;
@@ -152,7 +151,6 @@ v_light_blue_palette (ALLEGRO_COLOR c)
   /* KID */
   if (color_eq (c, V_KID_CLOTHES_COLOR_01)) return V_LIGHT_BLUE_GUARD_PANTS_COLOR_01;
   if (color_eq (c, V_KID_CLOTHES_COLOR_02)) return V_LIGHT_BLUE_GUARD_PANTS_COLOR_02;
-  if (color_eq (c, V_KID_EYE_COLOR)) return V_LIGHT_BLUE_GUARD_EYES_COLOR;
 
   /* SKELETON */
   if (color_eq (c, SKELETON_COLOR)) return V_LIGHT_BLUE_GUARD_PANTS_COLOR_01;
@@ -188,7 +186,6 @@ v_red_palette (ALLEGRO_COLOR c)
   /* KID */
   if (color_eq (c, V_KID_CLOTHES_COLOR_01)) return V_RED_GUARD_PANTS_COLOR_01;
   if (color_eq (c, V_KID_CLOTHES_COLOR_02)) return V_RED_GUARD_PANTS_COLOR_02;
-  if (color_eq (c, V_KID_EYE_COLOR)) return V_RED_GUARD_EYES_COLOR;
 
   /* SKELETON */
   if (color_eq (c, SKELETON_COLOR)) return V_RED_GUARD_PANTS_COLOR_01;
@@ -223,7 +220,6 @@ v_orange_palette (ALLEGRO_COLOR c)
   /* KID */
   if (color_eq (c, V_KID_CLOTHES_COLOR_01)) return V_ORANGE_GUARD_PANTS_COLOR_01;
   if (color_eq (c, V_KID_CLOTHES_COLOR_02)) return V_ORANGE_GUARD_PANTS_COLOR_02;
-  if (color_eq (c, V_KID_EYE_COLOR)) return V_ORANGE_GUARD_EYES_COLOR;
 
   /* SKELETON */
   if (color_eq (c, SKELETON_COLOR)) return V_ORANGE_GUARD_PANTS_COLOR_01;
@@ -258,7 +254,6 @@ v_green_palette (ALLEGRO_COLOR c)
   /* KID */
   if (color_eq (c, V_KID_CLOTHES_COLOR_01)) return V_GREEN_GUARD_PANTS_COLOR_01;
   if (color_eq (c, V_KID_CLOTHES_COLOR_02)) return V_GREEN_GUARD_PANTS_COLOR_02;
-  if (color_eq (c, V_KID_EYE_COLOR)) return V_GREEN_GUARD_EYES_COLOR;
 
   /* SKELETON */
   if (color_eq (c, SKELETON_COLOR)) return V_GREEN_GUARD_PANTS_COLOR_01;
@@ -293,7 +288,6 @@ v_dark_blue_palette (ALLEGRO_COLOR c)
   /* KID */
   if (color_eq (c, V_KID_CLOTHES_COLOR_01)) return V_DARK_BLUE_GUARD_PANTS_COLOR_01;
   if (color_eq (c, V_KID_CLOTHES_COLOR_02)) return V_DARK_BLUE_GUARD_PANTS_COLOR_02;
-  if (color_eq (c, V_KID_EYE_COLOR)) return V_DARK_BLUE_GUARD_EYES_COLOR;
 
   /* SKELETON */
   if (color_eq (c, SKELETON_COLOR)) return V_DARK_BLUE_GUARD_PANTS_COLOR_01;
@@ -329,7 +323,6 @@ v_purple_palette (ALLEGRO_COLOR c)
   /* KID */
   if (color_eq (c, V_KID_CLOTHES_COLOR_01)) return V_PURPLE_GUARD_PANTS_COLOR_01;
   if (color_eq (c, V_KID_CLOTHES_COLOR_02)) return V_PURPLE_GUARD_PANTS_COLOR_02;
-  if (color_eq (c, V_KID_EYE_COLOR)) return V_PURPLE_GUARD_EYES_COLOR;
 
   /* SKELETON */
   if (color_eq (c, SKELETON_COLOR)) return V_PURPLE_GUARD_PANTS_COLOR_01;
@@ -364,7 +357,6 @@ v_yellow_palette (ALLEGRO_COLOR c)
   /* KID */
   if (color_eq (c, V_KID_CLOTHES_COLOR_01)) return V_YELLOW_GUARD_PANTS_COLOR_01;
   if (color_eq (c, V_KID_CLOTHES_COLOR_02)) return V_YELLOW_GUARD_PANTS_COLOR_02;
-  if (color_eq (c, V_KID_EYE_COLOR)) return V_YELLOW_GUARD_EYES_COLOR;
 
   /* SKELETON */
   if (color_eq (c, SKELETON_COLOR)) return V_YELLOW_GUARD_PANTS_COLOR_01;

@@ -954,7 +954,9 @@ editor (void)
     case -1: case 1: edit = EDIT_MAIN; break;
     case 'S': edit = EDIT_GUARD_SELECT;
       s = guard_index; get_mouse_coord (&last_mouse_coord); break;
-    case 'J': mouse2guard (guard_index); break;
+    case 'J':
+      get_mouse_coord (&last_mouse_coord);
+      mouse2guard (guard_index); break;
     case 'P':
       if (! is_guard_by_type (g->type)) {
         editor_msg ("DISABLED GUARD", 12);
@@ -1012,7 +1014,8 @@ editor (void)
   case EDIT_GUARD_SELECT:
     draw_start_guards (screen, vm);
     mouse2guard (s);
-    switch (menu_int (&s, NULL, 0, GUARDS - 1, "GS>GUARD", NULL)) {
+    xasprintf (&str, "G%iS>GUARD", guard_index);
+    switch (menu_int (&s, NULL, 0, GUARDS - 1, str, NULL)) {
     case -1: edit = EDIT_GUARD;
       set_mouse_coord (&last_mouse_coord); break;
     case 0: break;
@@ -1021,6 +1024,7 @@ editor (void)
       edit = EDIT_GUARD;
       break;
     }
+    al_free (str);
     break;
   case EDIT_GUARD_SKILL:
     draw_start_guards (screen, vm);

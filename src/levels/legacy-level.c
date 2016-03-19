@@ -957,13 +957,14 @@ interpret_legacy_level (int number)
       continue;
     }
 
-    /* guard type */
+    /* TYPE AND STYLE: ok */
     switch (number) {
-    case 3: g->type = SKELETON; break;
-    case 6: g->type = FAT_GUARD; break;
-    case 12: g->type = KID; break;
-    case 13: g->type = VIZIER; break;
-    default: g->type = GUARD; break;
+    case 3: g->type = SKELETON; g->style = 0; break;
+    case 6: g->type = FAT_GUARD; g->style = 1; break;
+    case 12: g->type = SHADOW; g->style = 0; break;
+    case 13: g->type = VIZIER; g->style = 0; break;
+    default: g->type = GUARD;
+      g->style = lv.guard_color[i]; break;
     }
 
     /* LOCATION: ok */
@@ -978,11 +979,6 @@ interpret_legacy_level (int number)
     get_legacy_skill (lv.guard_skill[i], &g->skill);
     g->total_lives = life_table[number];
 
-    /* STYLE: ok */
-    if (number == 13) g->style = 0;
-    else if (number == 6) g->style = 1;
-    else g->style = lv.guard_color[i];
-
     /* printf ("(%i, %i, %i), style: %i\n", */
     /*         g->p.room, g->p.floor, g->p.place, g->style); */
   }
@@ -996,8 +992,7 @@ interpret_legacy_level (int number)
 
   /* define hue palettes based on the level */
   switch (number) {
-  default:
-    legacy_level.hue = HUE_NONE; break;
+  default: legacy_level.hue = HUE_NONE; break;
   case 3: case 7: legacy_level.hue = HUE_GREEN; break;
   case 8: case 9: legacy_level.hue = HUE_GRAY; break;
   case 12: case 13: legacy_level.hue = HUE_YELLOW; break;
