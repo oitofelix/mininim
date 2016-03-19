@@ -295,10 +295,10 @@ git clone @value{GITurl}
 @c --- Contact
 @metaSection Contact
 
-You can get in touch with other users of this program by posting to the
-forum at @url{@value{forumUrl}}.  You can contact the author at
-@url{@value{authorMail}}.  You may also join us on our friendly IRC
-channel at @url{@value{IRCurl}}.
+You can get in touch with other users of this program by posting to its
+forum at @url{@value{forumUrl}}.  You may also join us on our friendly
+IRC channel at @url{@value{IRCurl}}.  You can contact the author at
+@url{@value{authorMail}}.
 
 
 

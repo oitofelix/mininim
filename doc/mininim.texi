@@ -2961,9 +2961,9 @@ have the following meanings:
 
 If the selected con uses the @emph{can't fall extension}
 (@code{LOOSE_FLOOR}), this command is a boolean input (@ref{Boolean
-input}) where @var{b} is the @emph{can't fall extension} boolean status:
+input}) where @var{c} is the @emph{can't fall extension} boolean value:
 
-@center @kbd{CE>Cb?}
+@center @kbd{CE>Cc?}
 
 Pressing @kbd{C} immediately toggles the @emph{can't fall extension} of
 the selected construction.
@@ -3343,11 +3343,22 @@ The linkage is subject to the linking policies currently in effect.
 This command is used to configure the current linking policies.  These
 policies are used by room linking (see @ref{Room linking E>RL}) to
 assist the user in circumventing some link irregularities (see @ref{Room
-E>R}).  It's a boolean input (@ref{Boolean input}), where @var{a},
-@var{b} and @var{c} represents the boolean value of its parameters R
-(reciprocal), L (locally unique) and G (globally unique), respectively.
+E>R}).  It's a boolean input (@ref{Boolean input}), whose parameters
+have the following meaning:
 
-@center @kbd{RS>RaLbGc?}
+@table @kbd
+@item R
+reciprocal
+@item L
+locally unique
+@item G
+globally unique
+@end table
+
+The lower case letters represent the boolean value of their respective
+parameters.
+
+@center @kbd{RS>RrLlGc?}
 
 @kbd{BACKSPACE} confirms the new linking policy settings, while @kbd{/}
 maintains the current one.  When any of these parameters are turned on
@@ -3445,10 +3456,10 @@ message line.
 @mcindex E>KS
 
 This terminal command instantly sets kid's starting position to the
-selected construction's place.  There is no restriction of placement,
-and he can be placed even inside walls.  If the mouse selection is
-pointing to nowhere when this command is invoked, it displays
-@samp{SELECT CONSTRUCTION} on the message line.
+selected construction's place.  It gives instant visual feedback.  There
+is no restriction of placement, and he can be placed even inside walls.
+If the mouse selection is pointing to nowhere when this command is
+invoked, it displays @samp{SELECT CONSTRUCTION} on the message line.
 
 @node Jump to start position E>KJ
 @subsection Jump to start position: E>KJ
@@ -3467,9 +3478,9 @@ look at each room.
 @mcindex E>KD
 
 This terminal command instantly toggles kid's starting facing direction.
-It only works if kid's starting position is located in the currently
-displayed room.  In negative case, @samp{NOT IN THIS ROOM} is displayed
-on the message line.
+It gives instant visual feedback and only works if kid's starting
+position is located in the currently displayed room.  In negative case,
+@samp{NOT IN THIS ROOM} is displayed on the message line.
 
 @node Toggle has sword E>KW
 @subsection Toggle has sword: E>KW
@@ -3478,9 +3489,9 @@ on the message line.
 @mcindex E>KW
 
 This terminal command instantly toggles kid's starting sword possession.
-It only works if his start position is located in the currently
-displayed room.  In case it isn't, it displays @samp{NOT IN THIS ROOM}
-on the message line.
+It gives instant visual feedback and only works if his start position is
+located in the currently displayed room.  In negative case, @samp{NOT IN
+THIS ROOM} is displayed on the message line.
 
 @node Guard E>G
 @section Guard: E>G
@@ -3579,12 +3590,12 @@ they are in battle.  There are six skills that are given as percentage
 (between 0% and 100%, inclusive) indicating the probability of the
 related action succeeding.@footnote{In the original game guard skills
 can't be fine-tuned individually, as the game uses a predefined set of
-12 possible skill configurations (ranging from 0 to 11).  @xref{Legacy
-skill templates E>GKL}.}  In the following descriptions, @dfn{fight
-range} is the safe distance from the kid guards strive to keep during
-battle: a step away from striking, but far enough for not being hit.
-@dfn{Attack range} is the nearer distance guards have to be in order to
-make an effective strike.
+12 possible skill configurations (ranging from 0 to 11).  @xref{Skill
+E>GK}.}  In the following descriptions, @dfn{fight range} is the safe
+distance from the kid guards strive to keep during battle: a step away
+from striking, but far enough for not being hit.  @dfn{Attack range} is
+the nearer distance guards have to be in order to make an effective
+strike.
 
 @table @dfn
 @item Attack
@@ -3679,15 +3690,16 @@ has no starting position yet, the mouse selection points nowhere.
 
 @node Set start position E>GP
 @subsection Set start position: E>GP
-@cindex level editor, set start position
-@cindex set start position, level editor
+@cindex level editor, guard start position
+@cindex guard start position, level editor
 @mcindex E>GP
 
 This terminal command instantly sets the starting position of the
-currently selected guard to the selected construction's place.  There is
-no restriction of placement, and he can be placed even inside walls.  If
-the mouse selection is pointing to nowhere when this command is invoked,
-it displays @samp{SELECT CONSTRUCTION} on the message line.
+currently selected guard to the selected construction's place.  It gives
+instant visual feedback.  There is no restriction of placement, and the
+guard can be placed even inside walls.  If the mouse selection is
+pointing to nowhere when this command is invoked, it displays
+@samp{SELECT CONSTRUCTION} on the message line.
 
 @node Toggle start direction E>GD
 @subsection Toggle start direction: E>GD
@@ -3696,9 +3708,10 @@ it displays @samp{SELECT CONSTRUCTION} on the message line.
 @mcindex E>GD
 
 This terminal command instantly toggles the facing direction of the
-currently selected guard.  It only works if the guard's starting
-position is located in the currently displayed room.  In negative case,
-@samp{NOT IN THIS ROOM} is displayed on the message line.
+currently selected guard.  It gives instant visual feedback and only
+works if the guard's starting position is located in the currently
+displayed room.  In negative case, @samp{NOT IN THIS ROOM} is displayed
+on the message line.
 
 @node Skill E>GK
 @subsection Skill: E>GK
@@ -3711,7 +3724,9 @@ skill attributes.
 
 @center @kbd{GjK>ABDEVRFXL}
 
-The first six commands correspond to the probability-based skills.
+For all of them, @kbd{BACKSPACE} confirms the new skill setting, while
+@kbd{/} maintains the current one.  The first six commands correspond to
+the probability-based skills.
 
 @table @kbd
 @mcindex E>GKA
@@ -3741,10 +3756,102 @@ input}.
 
 @center @kbd{GjKa>act 0-100:i}
 
-@kbd{BACKSPACE} confirms the new skill setting, while @kbd{/} maintains
-the current one.
+The next couple commands correspond to the remaining skill attributes
+that are not probability-based.
 
+@table @kbd
+@mcindex E>GKF
+@item F
+Refraction period
+@mcindex E>GKX
+@item X
+Extra lives
+@end table
 
+Each one of these sub-commands is an integer input whose parameter
+@var{i} is the value of the related attribute @var{attr} (relative to
+command @var{a}).
+
+@center @kbd{GjKa>attr 0->:i}
+
+The last command @kbd{K} (@samp{LEGACY TEMPLATES}) allows the user to
+use a predefined skill template roughly equivalent to the ones available
+in the original game.  There are 12 skill sets (ranging from 0 to 11) to
+choose from.  These populate the values of each skill, which can be
+later fine-tuned using the aforementioned commands.  It's an integer
+input whose parameter @var{i} indicates the skill set of choice.  It
+always starts at 0.
+
+@center @kbd{GjKL>L.SKILL 0-11:i}
+
+@node Lives E>GL
+@subsection Lives: E>GL
+@cindex level editor, guard lives
+@cindex guard lives, level editor
+@mcindex E>GL
+
+This command is used to set the total lives of the currently selected
+guard.  It's an integer input whose parameter @var{i} represents the
+guard's amount of lives.  @xref{Integer input}.
+
+@center @kbd{GjL>LIVES 0->:i}
+
+@kbd{BACKSPACE} confirms the new total lives value, while @kbd{/}
+maintains the current one.  If set to 0, the guard dies alone when the
+level starts.
+
+@node Type E>GT
+@subsection Type: E>GT
+@cindex level editor, guard type
+@cindex guard type, level editor
+@mcindex E>GT
+
+This command is used to set the currently selected guard's type.  It's
+an exclusive boolean input (@ref{Boolean input}), whose parameters have
+the following meaning:
+
+@table @kbd
+@item D
+disabled
+@item G
+@code{GUARD}
+@item F
+@code{FAT_GUARD}
+@item V
+@code{VIZIER}
+@item S
+@code{SKELETON}
+@item H
+@code{SHADOW}
+@end table
+
+The lower case letters represent the boolean value of their respective
+parameters.
+
+@center @kbd{GjT>DdGgFfVvSsHh?}
+
+It gives instant visual feedback, in case the starting place of the
+currently selected guard is in the currently displayed room.  If any
+parameter different from @kbd{D} is true, the guard is enabled.
+@kbd{BACKSPACE} confirms the new type, while @kbd{/} maintains the
+current one.
+
+@node Style E>GY
+@subsection Style: E>GY
+@cindex level editor, guard style
+@cindex guard style, level editor
+@mcindex E>GY
+
+This command is used to set the style of the currently selected guard.
+It's an integer input whose parameter @var{i} represents the style.
+@xref{Integer input}.
+
+@center @kbd{GjY>STYLE 0-7:i}
+
+It gives instant visual feedback, in case the starting place of the
+currently selected guard is in the currently displayed room.
+@kbd{BACKSPACE} confirms the new style, while @kbd{/} maintains the
+current one.
 
 
 @node Level E>L

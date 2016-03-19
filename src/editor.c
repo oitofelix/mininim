@@ -235,8 +235,8 @@ editor (void)
      {'E', "COUNTER DEFENSE<"},
      {'V', "ADVANCE<"},
      {'R', "RETURN<"},
-     {'F', "REFRACTION<"},
-     {'X', "EXTRA LIFE<"},
+     {'F', "REFRACTION PERIOD<"},
+     {'X', "EXTRA LIVES<"},
      {'L', "LEGACY TEMPLATES<"},
      {0}};
 
