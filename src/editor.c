@@ -872,13 +872,16 @@ editor (void)
     }
     break;
   case EDIT_LEVEL:
-    switch (menu_enum (level_menu, "L>")) {
+    xasprintf (&str, "L%i>", level.number);
+    switch (menu_enum (level_menu, str)) {
     case -1: case 1: edit = EDIT_MAIN; break;
     case 'E': edit = EDIT_ENVIRONMENT;
+      b = em;
       b0 = (level.em == DUNGEON) ? true : false;
       b1 = (level.em == PALACE) ? true : false;
       break;
     case 'H': edit = EDIT_HUE;
+      b = hue;
       b0 = (level.hue == HUE_NONE) ? true : false;
       b1 = (level.hue == HUE_GREEN) ? true : false;
       b2 = (level.hue == HUE_GRAY) ? true : false;
@@ -914,10 +917,12 @@ editor (void)
       register_cons ();
       break;
     }
+    al_free (str);
    break;
   case EDIT_ENVIRONMENT:
-    switch (menu_bool (environment_menu, "LE>", true, &b0, &b1)) {
-    case -1: edit = EDIT_LEVEL; break;
+    xasprintf (&str, "L%iE>", level.number);
+    switch (menu_bool (environment_menu, str, true, &b0, &b1)) {
+    case -1: edit = EDIT_LEVEL; em = b; break;
     case 0: break;
     case 1:
       level.em = em;
@@ -928,10 +933,12 @@ editor (void)
       if (b1) em = PALACE;
       break;
     }
+    al_free (str);
     break;
   case EDIT_HUE:
-    switch (menu_bool (hue_menu, "LH>", true, &b0, &b1, &b2, &b3, &b4)) {
-    case -1: edit = EDIT_LEVEL; break;
+    xasprintf (&str, "L%iH>", level.number);
+    switch (menu_bool (hue_menu, str, true, &b0, &b1, &b2, &b3, &b4)) {
+    case -1: edit = EDIT_LEVEL; hue = b; break;
     case 0: break;
     case 1:
       level.hue = hue;
@@ -945,6 +952,7 @@ editor (void)
       if (b4) hue = HUE_BLUE;
       break;
     }
+    al_free (str);
     break;
   case EDIT_GUARD:
     draw_start_guards (screen, vm);

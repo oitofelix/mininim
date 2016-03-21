@@ -2250,10 +2250,10 @@ integers and must be separated by a comma.
 @end table
 
 
-@node Paths options
-@section Paths options
-@cindex paths options
-@cindex options, paths
+@node Path options
+@section Path options
+@cindex path options
+@cindex options, path
 
 @table @option
 @optindex --data-path
@@ -2729,10 +2729,10 @@ foreground class as described in @ref{Foregrounds}.
 
 @center @kbd{CF>FPWDCMRA}
 
-The only terminal commands are @kbd{W} (Wall), @kbd{C} (Chopper) and
+The only terminal sub-commands are @kbd{W} (Wall), @kbd{C} (Chopper) and
 @kbd{M} (Mirror), because they represent classes with just one member.
-The remaining non-terminal commands are comprised solely of terminal
-commands, one for each member of the respective class.  Every terminal
+The remaining non-terminal commands are comprised solely of non-input
+commands, one for each member of the respective class.  Every non-input
 command in this hierarchy works in the same way: they immediately change
 the foreground of the selected construction.  The user may keep the
 respective command key pressed while moving the mouse selection around
@@ -2850,8 +2850,8 @@ follows:
 @mcindex E>CB
 
 This non-terminal command has sub-commands for all possible construction
-backgrounds.  Each sub-command is terminal and represents a construction
-background as described in @ref{Backgrounds}.
+backgrounds.  Each sub-command is non-input and represents a
+construction background as described in @ref{Backgrounds}.
 
 @center @kbd{CB>NG0123TWB}
 
@@ -2916,7 +2916,7 @@ command is non-terminal:
 
 @center @kbd{CE>NESBPOFLAW}
 
-Each one of its sub-commands is terminal and corresponds to one of the
+Each one of its sub-commands is non-input and corresponds to one of the
 items listed in @ref{Items}.  All of them work in the same way: they
 immediately change the extension of the selected construction.  They
 have the following meanings:
@@ -3009,7 +3009,7 @@ If the selected con uses the @emph{design extension} (@code{CARPET} and
 @center @kbd{CE>01A} (@code{CARPET})
 @center @kbd{CE>01ABC} (@code{TCARPET})
 
-Each one of its sub-commands is terminal and corresponds to one of the
+Each one of its sub-commands is non-input and corresponds to one of the
 carpet designs listed in @ref{Carpets}.  All of them work in the same
 way: they immediately change the extension of the selected construction.
 They have the following meanings:
@@ -3038,8 +3038,8 @@ They have the following meanings:
 @cindex construction info, level editor
 @mcindex E>CI
 
-This terminal command prints on the message line the three components of
-the selected construction in the following format:
+This non-input command prints on the message line the three components
+of the selected construction in the following format:
 
 @center @samp{FG/BG/EXT}
 
@@ -3053,8 +3053,8 @@ the selected con's foreground, background and extension, respectively.
 @cindex construction copy, level editor
 @mcindex E>CC
 
-This is a terminal command intended to copy the selected construction in
-its entirety (foreground, background and extension) to a temporary
+This is a non-input command intended to copy the selected construction
+in its entirety (foreground, background and extension) to a temporary
 memory area so it can later be retrieved and pasted elsewhere (see
 @ref{Paste E>CP}).  After invoked it briefly displays on the message
 line @samp{COPIED} to indicate that the selected con has been
@@ -3071,7 +3071,7 @@ copy the constructions of an entire room see @ref{Copy E>RC}.
 @cindex construction paste, level editor
 @cindex E>CP
 
-This is a terminal command intended to paste a previously copied
+This is a non-input command intended to paste a previously copied
 construction over the selected one (see @ref{Copy E>CC}).  After invoked
 it immediately replaces the selected construction.  The user may keep
 the respective command key pressed while moving the mouse selection
@@ -3298,7 +3298,7 @@ invocation.
 @cindex construction room linking, level editor
 @mcindex E>RL
 
-This non-terminal command has terminal sub-commands for all linking
+This non-terminal command has input sub-commands for all linking
 directions.
 
 @center @kbd{RL>LRAB}
@@ -3392,7 +3392,7 @@ invocation.
 @cindex room copy, level editor
 @mcindex E>RC
 
-This is a terminal command intended to copy the constructions of the
+This is a non-input command intended to copy the constructions of the
 currently displayed room in their entirety (foreground, background and
 extension) to a temporary memory area so they can later be retrieved and
 pasted over another room (see @ref{Paste E>RP}).  After invoked it
@@ -3411,7 +3411,7 @@ one construction see @ref{Copy E>CC}.
 @cindex room paste, level editor
 @cindex E>RP
 
-This is a terminal command intended to paste the previously copied
+This is a non-input command intended to paste the previously copied
 constructions of an entire room over the currently displayed one (see
 @ref{Copy E>RC}).  After invoked it immediately replaces the
 constructions of the current room.  To paste just one construction see
@@ -3424,8 +3424,8 @@ constructions of the current room.  To paste just one construction see
 
 Every level has three basic attributes concerning the kid: his starting
 position, facing direction and sword possession.  This non-terminal
-command has sub-commands for setting these attributes as well as putting
-the kid in an arbitrary place on-the-fly.
+command has non-input sub-commands for setting these attributes as well
+as putting the kid in an arbitrary place on-the-fly.
 
 @center @kbd{K>PSJDW}
 
@@ -3440,7 +3440,7 @@ he starts with one.
 @cindex place kid, level editor
 @mcindex E>KP
 
-This terminal command instantly puts the kid in the selected
+This non-input command instantly puts the kid in the selected
 construction's place.  This is useful for placing the kid in arbitrary
 positions throughout the level for testing.  The kid is placed at rest
 independently of the movement he is performing at the instant of
@@ -3455,7 +3455,7 @@ message line.
 @cindex set start position, level editor
 @mcindex E>KS
 
-This terminal command instantly sets kid's starting position to the
+This non-input command instantly sets kid's starting position to the
 selected construction's place.  It gives instant visual feedback.  There
 is no restriction of placement, and he can be placed even inside walls.
 If the mouse selection is pointing to nowhere when this command is
@@ -3467,7 +3467,7 @@ invoked, it displays @samp{SELECT CONSTRUCTION} on the message line.
 @cindex jump to start position, level editor
 @mcindex E>KJ
 
-This terminal command instantly sets the mouse selection to the kid's
+This non-input command instantly sets the mouse selection to the kid's
 starting position.  This is a handy way of finding it without having to
 look at each room.
 
@@ -3477,7 +3477,7 @@ look at each room.
 @cindex toggle start direction, level editor
 @mcindex E>KD
 
-This terminal command instantly toggles kid's starting facing direction.
+This non-input command instantly toggles kid's start facing direction.
 It gives instant visual feedback and only works if kid's starting
 position is located in the currently displayed room.  In negative case,
 @samp{NOT IN THIS ROOM} is displayed on the message line.
@@ -3488,10 +3488,10 @@ position is located in the currently displayed room.  In negative case,
 @cindex toggle has sword, level editor
 @mcindex E>KW
 
-This terminal command instantly toggles kid's starting sword possession.
-It gives instant visual feedback and only works if his start position is
-located in the currently displayed room.  In negative case, @samp{NOT IN
-THIS ROOM} is displayed on the message line.
+This non-input command instantly toggles kid's starting sword
+possession.  It gives instant visual feedback and only works if his
+start position is located in the currently displayed room.  In negative
+case, @samp{NOT IN THIS ROOM} is displayed on the message line.
 
 @node Guard E>G
 @section Guard: E>G
@@ -3683,10 +3683,11 @@ selection to the state it had before this command invocation.
 @cindex jump to start position, level editor
 @mcindex E>GJ
 
-This terminal command instantly sets the mouse selection to the starting
-position of the currently select guard.  This is a handy way of finding
-him without having to re-select.  If the selected guard is disabled or
-has no starting position yet, the mouse selection points nowhere.
+This non-input command instantly sets the mouse selection to the
+starting position of the currently select guard.  This is a handy way of
+finding him without having to re-select.  If the selected guard is
+disabled or has no starting position yet, the mouse selection points
+nowhere.
 
 @node Set start position E>GP
 @subsection Set start position: E>GP
@@ -3694,7 +3695,7 @@ has no starting position yet, the mouse selection points nowhere.
 @cindex guard start position, level editor
 @mcindex E>GP
 
-This terminal command instantly sets the starting position of the
+This non-input command instantly sets the starting position of the
 currently selected guard to the selected construction's place.  It gives
 instant visual feedback.  There is no restriction of placement, and the
 guard can be placed even inside walls.  If the mouse selection is
@@ -3707,7 +3708,7 @@ pointing to nowhere when this command is invoked, it displays
 @cindex toggle start direction, level editor
 @mcindex E>GD
 
-This terminal command instantly toggles the facing direction of the
+This non-input command instantly toggles the facing direction of the
 currently selected guard.  It gives instant visual feedback and only
 works if the guard's starting position is located in the currently
 displayed room.  In negative case, @samp{NOT IN THIS ROOM} is displayed
@@ -3858,6 +3859,118 @@ current one.
 @section Level: E>L
 @cindex level editor, level
 @cindex level, level editor
+
+Options related to the level as whole, like environment and hue modes,
+or saving and loading levels are made available by this non-terminal
+command.
+
+@center @kbd{Lj>EHSL}
+
+The current level is indicated by @var{j} in all prefixed commands of
+this hierarchy.
+
+@node Environment E>LE
+@subsection Environment: E>LE
+@cindex level editor, level environment
+@cindex level environment, level editor
+@mcindex E>LE
+
+This command is used to set the level environment.  It's an exclusive
+boolean input (@ref{Boolean input}), whose parameters have the following
+meaning:
+
+@table @kbd
+@item D
+@code{DUNGEON}
+@item P
+@code{PALACE}
+@end table
+
+The lower case letters represent the boolean value of their respective
+parameters.
+
+@center @kbd{LjE>DdPp?}
+
+Notice that the level environment isn't necessarily the currently
+displayed one, because the user may have manually changed the latter
+using a configuration option (@ref{Rendering options}) or a key binding
+(@ref{Graphical rendering}).
+
+This command gives instant visual feedback by changing the currently
+displayed environment to the selected one.  @kbd{BACKSPACE} confirms the
+new level environment and maintains the currently displayed one, while
+@kbd{/} maintains the level current one and reverts to the previously
+displayed environment.
+
+@node Hue E>LH
+@subsection Hue: E>LH
+@cindex level editor, level hue
+@cindex level hue, level editor
+@mcindex E>LH
+
+This command is used to set the level hue.  It's an exclusive boolean
+input (@ref{Boolean input}), whose parameters have the following
+meaning:
+
+@table @kbd
+@item N
+@code{NONE}
+@item G
+@code{GREEN}
+@item R
+@code{GRAY}
+@item Y
+@code{YELLOW}
+@item B
+@code{BLUE}
+@end table
+
+The lower case letters represent the boolean value of their respective
+parameters.
+
+@center @kbd{LjH>NnGgRrYyBb?}
+
+Notice that the level hue isn't necessarily the currently displayed one,
+because the user may have manually changed the latter using a
+configuration option (@ref{Rendering options}) or a key binding
+(@ref{Graphical rendering}).
+
+This command gives instant visual feedback by changing the currently
+displayed hue to the selected one.  @kbd{BACKSPACE} confirms the new
+level hue and maintains the currently displayed one, while @kbd{/}
+maintains the level current one and reverts to the previously displayed
+hue.
+
+@node Save E>LS
+@subsection Save: E>LS
+@cindex level editor, level save
+@cindex level save, level editor
+@mcindex E>LS
+
+This non-input command saves the current level using the native level
+format (see @ref{Native level format}) in the user data directory, where
+they take precedence over levels in every other location.  The option
+@option{--print-paths} show among other things where that directory is
+located in the file system.  @xref{Path options}.  If this command
+succeeds, the level cache is updated and @samp{LEVEL HAS BEEN SAVED} is
+displayed on the message line.  Otherwise @samp{LEVEL SAVE FAILED} is
+shown and an error message describing the problem is printed out to the
+console.  The saved level can be fully reloaded using the @kbd{CTRL+A}
+key binding (see @ref{Game flow}), or may have only its constructions
+reloaded---keeping every other element (like characters) in their curent
+state---using the reload command.  @xref{Reload E>LL}.
+
+@node Reload E>LL
+@subsection Reload: E>LL
+@cindex level editor, level reload
+@cindex level reload, level editor
+@mcindex E>LL
+
+This non-input command restores the current level's cached
+constructions, which represent the level state at the moment of the
+latest save operation.  This command is useful for undoing unintended
+changes to the cons of a level when editing or playing it.  This command
+always succeeds, showing @samp{LEVEL RELOADED} on the message line.
 
 
 
