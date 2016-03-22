@@ -22,120 +22,37 @@
 @noindent @strong{Features:}
 
 @itemize
-@item Joystick support.  To use a joystick just plug it in and press
-@kbd{CTRL+J} to enable and auto-calibrate it on the fly.  See the manual
-for the default mapping.  If the default mapping doesn't suit you or
-your joystick, you can use the options @option{--joystick-axis},
-@option{-joystick-button} and @option{--joystick-info} to define a new
-mapping.  In case your joystick is ill-behaved the
-@option{--joystick-axis-threshold} and
-@option{--joystick-button-threshold} options may help.  Using a joystick
-doesn't disable the keyboard --- you can use both interchangeably.
-@item Classic numeric keypad control.  This is always enabled, and can
-be used along the two other input methods (arrow keys and joystick).
-The original game manual used to refer to this as the standard input
-method.
-@item Apoplexy level editor integration.  Just copy MININIM's executable
-along with any dlls (if under @emph{Windows}) and its @file{data}
-directory to apoplexy's @file{prince/} directory, rename the executable
-to @file{prince.exe} (@file{prince} if under @emph{GNU/Linux}) and make
-sure there is a @file{LEVELS.DAT} file there, and you are ready to go.
-Apoplexy will invoke MININIM as a drop-in replacement for the original
-engine.
-@item Hue coloring support.  This makes the engine able to render
-VGA color schemes like the 1.3 and 1.4 versions of the original game.
-That's the default.  You can force particular hue modes by using the
-@option{--hue-mode} option or the @kbd{F9} key binding.  To revert to
-the previous and classic behavior use @option{--hue-mode=NONE}.
-@item Support for reading legacy PoP 1 @file{LEVELS.DAT} file using
-the option @option{--legacy-level=DAT}.  Put the @file{LEVELS.DAT} file
-inside @file{data/dat-levels/} directory and use that option.
-@item Support for reading legacy PoP 1 PLV extended level files using
-the option @option{--legacy-level=PLV}.  Put the
-@file{00.plv}..@file{15.plv} PLV files inside @file{data/plv-levels/}
-and use that option.
-@item Command line legacy compatibility for the sake of applications
-which use it.  Used by apoplexy.
-@item @file{LEVELS.DAT} legacy loading behavior compatibility for the
-sake of applications that rely on it.  Used by apoplexy.  Just put the
-@file{LEVELS.DAT} file in the same directory as the @file{mininim}
-executable and preference will be given to it, over the legacy level
-files under the @file{dat/legacy-levels/} directory.
-@item Kid start position can be specified using the
-@option{--start-pos} option.  Very useful for placing the kid in a
-specific place for tests.  To start with the kid in level 12, room 15,
-floor 0 and place 7, invoke MININIM with the options
-@code{--start-level=12 --start-pos=15,0,7}.
-@item Disable screensaver by default.
-@item Guards have infallible defense in refraction periods, for longer
-and more dramatic battles.
-@item Shadow in legacy level 12 has the same total/current life points
-as the kid, and life points are taken off one at a time, for a longer
-and more dramatic battle.
-@item @option{--keyboard-flip-mode} option renamed to
-@option{--gamepad-flip-mode}, since now it applies to joysticks as well.
+@item Complete on-the-fly level editor.
+@item Uniform and non-intrusive bottom-line menu interface.
+@item Native level format.
+@item Add 7 styles for skeleton and shadow for symmetry with guards.
+@item New default value for @option{--level-module} option: @samp{NATIVE}.
+@item Data files looked for first in the user data directory.
+@item Add option @option{--convert-levels} to batch convert legacy formats to
+the native format.
+@item Guards can back off in refraction periods.
 @end itemize
 
 @noindent @strong{Bug fixes:}
 
-All the bugs the author knew about at the time of this release have been
-fixed.  If you've found a bug or annoyance in the previous version,
-chances are it has been fixed, as well. ;-)
-
 @itemize
-@item Spurious wall collision occurs in kid's
-stabilization movement.
-@item Kid can't hang on a ledge after a
-long floating fall.
-@item Kid's @emph{run} movement after a
-@emph{running turn} starts one frame off.
-@item In some circumstances the kid is unable to reach
-the other end after a jump, as if a force field prevented him from
-landing there.
-@item Kid dies after just touching guards.
-@item Guards spuriously attack thin air while trying
-to prevent the kid from bypassing them.
-@item While in counter attack and counter defense mode
-kid defends even if too far from the guard, when he could otherwise let
-the guard strike only thin air.
-@item Restarting the game while it's paused causes it
-to get stuck in a paused state after the title screen.
-@item It's hard to perform 3-tile running jumps
-because MININIM is lacking platform edge detection.
-@item Kid doesn't stumble on guards, in case he
-manages to pass through them without being hit.
-@item Guards continue to advance towards the kid,
-even when he is running towards them.
-@item Guard mode changing doesn't work for guards
-that died falling, spiked or chopped.
-@item Kid can't battle properly against more than one
-guard at once.
-@item Shadow death music in level 12 plays in a row if
-reviving kid with R repeatedly in a short period of time.
-@item Legacy level rooms above room 0 may have
-traversable constructions at bottom over room 0's walls.
-@item In legacy level 12 shadow appears sooner than
-expected if the kid manages to enter room 15 from below after exiting
-room 18 to the right.
-@item Guards turn too quickly when their attention is
-grabbed from opposite directions in a short period of time.
-@item Drawing glitches occur in several situations
-involving two characters near each other.
-@item Fight mode collision detection is ill-behaved
-for kid and guards.
-@item Game doesn't pause while saving.
-@item In some cases of death after fight, the normal death
-tune is played along the fight one.
-@item Falling close to door makes kid collide and
-stabilize standing, instead of crouching.
-@item Guard chasing logic has flaws and corner cases
-that result in counter-intuitive guard behavior in certain situations.
-@item If the kid is exactly 27 pixels from falling,
-walking to the very edge and then from there again doesn't trigger a
-misstep.
-@item Turning close to door at its left causes a
-spurious collision.
-@item Game saves should store the remaining time of when
-kid first enters the level, not of when the game is saved.
-@item Simple jump might fall earlier than expected.
+@item Chopper doesn't handle step extension correctly.
+@item Drawing of rooms with broken links is ill-behaved.  There are
+glitches in room drawing for rooms with more than one link to the same
+room, and kid drawing glitches for rooms linked to themselves, as well
+as several other minor glitches.
+@item Foreground drawing glitches when @code{ARCH_BOTTOM} is below an
+ordinary floor. @item Spurious collisions happen when the kid is
+climbing at the limits of a room linked to itself.
+@item The kid can't hang turn properly in a hangable place with a
+closed door in the opposite direction he's facing.
+@item Spikes kill kid in the last few frames of landing after a normal jump.
+@item @code{BIG_LIFE_POTION} doesn't fill all life points, if
+the kid has the maximum amount of life point containers.
+@item Legacy level module ignore guards with invalid palette.
+@item Skeleton doesn't hold his sword when falling.
+@item Interrupting a video effect before its end results in normal
+draw cycles being skipped.
+@item Sometimes the crossing mirror sound is played more than once.
+@item Shadow's sword isn't white.
 @end itemize

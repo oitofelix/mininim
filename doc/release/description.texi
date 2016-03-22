@@ -58,15 +58,16 @@ to make an exhaustive list here.  Some of its noteworthy advantages are:
 
 @itemize
 @item Portable to modern operating systems.
+@item Complete built-in level editor featuring an uniform and
+non-intrusive bottom-line menu interface.
 @item Video, environment, hue and guard modes may be selected on-the-fly.
-@item Mirror mode (inverts screen and gamepad axis horizontally).
 @item Joystick mapping and threshold configuration.
 @item Improved battle system based on upgradable skills, arbitrary
 number of simultaneous fighters and smarter enemy AI.
 @item Real-time responsiveness, higher world interaction accuracy and
 more stable animations.
 @item New useful movements.
-@item Volume of sounds based on distance from the source.
 @item Integrated configuration system using multiple back-ends.
-@item Capability of loading level files in multiple formats.
+@item Capability of loading level files in multiple formats, including
+legacy and native level formats.
 @end itemize

@@ -250,7 +250,7 @@ save_native_level (struct level *l, char *filename)
 
   /* EVENTS */
   for (i = 0; i < EVENTS; i++) {
-    /* Ei=r f p n*/
+    /* Ei=r f p n */
     struct level_event *e = &l->event[i];
     xasprintf (&k, "E%i", i);
     xasprintf (&v, "%i %i %i %i", e->p.room, e->p.floor, e->p.place, e->next);
@@ -264,7 +264,7 @@ save_native_level (struct level *l, char *filename)
   for (p.room = 0; p.room < ROOMS; p.room++)
     for (p.floor = 0; p.floor < FLOORS; p.floor++)
       for (p.place = 0; p.place < PLACES; p.place++) {
-        /* Cr f p=f b e*/
+        /* Cr f p=f b e */
         xasprintf (&k, "C%i %i %i", p.room, p.floor, p.place);
         xasprintf (&v, "%i %i %i", xcon (l, &p)->fg,
                    xcon (l, &p)->bg, xcon (l, &p)->ext);
