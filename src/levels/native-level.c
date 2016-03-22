@@ -159,6 +159,7 @@ load_native_level (int number, struct level *l)
   for (p.room = 0;; p.room++)
     for (p.floor = 0; p.floor < FLOORS; p.floor++)
       for (p.place = 0; p.place < PLACES; p.place++) {
+        /* Cr f p=f b e */
         xasprintf (&k, "C%i %i %i", p.room, p.floor, p.place);
         v = al_get_config_value (c, NULL, k);
         al_free (k);

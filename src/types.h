@@ -97,11 +97,11 @@ struct level {
   bool has_sword;
 
   enum em {
-    DUNGEON, PALACE,
+    DUNGEON = 0, PALACE = 1,
   } em;
 
   enum hue {
-    HUE_NONE, HUE_GREEN, HUE_GRAY, HUE_YELLOW, HUE_BLUE,
+    HUE_NONE = 0, HUE_GREEN = 1, HUE_GRAY = 2, HUE_YELLOW = 3, HUE_BLUE = 4,
   } hue;
 
   struct room_linking {
