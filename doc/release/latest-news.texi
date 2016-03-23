@@ -55,4 +55,5 @@ the kid has the maximum amount of life point containers.
 draw cycles being skipped.
 @item Sometimes the crossing mirror sound is played more than once.
 @item Shadow's sword isn't white.
+@item Mirror is not fully opaque.
 @end itemize

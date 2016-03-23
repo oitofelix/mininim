@@ -172,6 +172,11 @@ update_mirror_bitmap (ALLEGRO_BITMAP *bitmap, struct pos *p)
   ALLEGRO_BITMAP *b = mirror_bitmap[p->floor + 1][p->place + 1];
   if (! b) return;
 
+  struct rect r = new_rect (p->room, p->place * PLACE_WIDTH + 6,
+                            p->floor * PLACE_HEIGHT + 6,
+                            19, 44);
+  draw_filled_rect (bitmap, &r, al_map_rgb (0, 0, 0));
+
   int i;
   for (i = 0; i < anima_nmemb; i++)
     draw_anim_if_at_pos (bitmap, &anima[i], p, vm);

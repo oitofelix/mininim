@@ -628,6 +628,7 @@ draw_level (void)
 
   for (p.floor = FLOORS; p.floor >= -1; p.floor--)
     for (p.place = -1; p.place < PLACES; p.place++) {
+      if (con (&p)->fg != MIRROR) continue;
       update_mirror_bitmap (screen, &p);
       if (! no_room_drawing) draw_mirror (screen, &p, em, vm);
     }
