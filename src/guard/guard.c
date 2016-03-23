@@ -86,7 +86,7 @@ create_guard (struct anim *g0, struct anim *g1, struct pos *p, enum dir dir)
                  g1->f.dir == LEFT ? +16 : +22, +14);
     place_on_the_ground (&g1->f, &g1->f.c);
 
-    update_depressible_floor (g1, -4, -10);
+    update_depressible_floor (g1, -7, -26);
   }
 
   return g1;

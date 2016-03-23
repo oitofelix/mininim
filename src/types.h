@@ -214,6 +214,7 @@ struct anim {
 
   int id;
   int shadow_of;
+  int level_id;
 
   struct frame {
     void *id;

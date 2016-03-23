@@ -75,6 +75,7 @@ extern struct frameset shadow_die_frameset[GUARD_DIE_FRAMESET_NMEMB];
 
 void load_guard_die (void);
 void unload_guard_die (void);
+void guard_resurrect (struct anim *g);
 void guard_die (struct anim *g);
 void guard_die_spiked (struct anim *g);
 void guard_die_chopped (struct anim *g);

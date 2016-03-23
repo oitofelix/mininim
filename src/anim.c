@@ -393,6 +393,7 @@ create_anim (struct anim *a0, enum anim_type t, struct pos *p, enum dir dir)
   }
 
   a.id = i;
+  a.level_id = -1;
 
   switch (a.type) {
   case NO_ANIM: default: break;
@@ -434,9 +435,20 @@ struct anim *
 get_anim_by_id (int id)
 {
   int i;
-  if (id == -1) return NULL;
+  if (id < 0) return NULL;
   for (i = 0; i < anima_nmemb; i++)
     if (anima[i].id == id) return &anima[i];
+  return NULL;
+}
+
+struct anim *
+get_guard_anim_by_level_id (int id)
+{
+  int i;
+  if (id < 0) return NULL;
+  for (i = 0; i < anima_nmemb; i++)
+    if (is_guard (&anima[i]) && anima[i].level_id == id)
+      return &anima[i];
   return NULL;
 }
 

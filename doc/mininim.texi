@@ -3669,17 +3669,17 @@ disabled, attempts to execute any other command will fail showing
 hierarchy are active, darker semi-transparent images of the guards are
 shown in their starting place, above all constructions and characters.
 
-@node Select guard E>GS
-@subsection Select guard: E>GS
+@node Select guard E>GG
+@subsection Select guard: E>GG
 @cindex level editor, select guard
 @cindex select guard, level editor
-@mcindex E>GS
+@mcindex E>GG
 
 This command is used to change the currently selected guard.  It's an
 integer input whose parameter @var{i} is the guard number.
 @xref{Integer input}.
 
-@center @kbd{GjS>GUARD 0-24:i}
+@center @kbd{GjG>GUARD 0-24:i}
 
 It gives instant visual feedback locking the mouse selection on the
 starting place of the chosen guard.  If the chosen guard is disabled,
@@ -3687,6 +3687,34 @@ the mouse selection points nowhere.  @kbd{BACKSPACE} makes the chosen
 guard the currently selected one and keeps the mouse selection, while
 @kbd{/} keeps the currently selected guard and reverts the mouse
 selection to the state it had before this command invocation.
+
+@node Place guard E>GP
+@subsection Place guard: E>GP
+@cindex level editor, place guard
+@cindex place guard, level editor
+@mcindex E>GP
+
+This non-input command instantly puts the live instance of the currently
+selected guard in the selected construction's place.  This is useful for
+placing guards in arbitrary positions throughout the level for testing.
+The guard is placed at rest independently of the movement he is
+performing at the instant of invocation.  There is no restriction of
+placement, and guards can be placed even inside walls.  If the mouse
+selection is pointing to nowhere when this command is invoked, it
+displays @samp{SELECT CONSTRUCTION} on the message line.
+
+@node Set start position E>GS
+@subsection Set start position: E>GS
+@cindex level editor, guard start position
+@cindex guard start position, level editor
+@mcindex E>GS
+
+This non-input command instantly sets the starting position of the
+currently selected guard to the selected construction's place.  It gives
+instant visual feedback.  There is no restriction of placement, and the
+guard can be placed even inside walls.  If the mouse selection is
+pointing to nowhere when this command is invoked, it displays
+@samp{SELECT CONSTRUCTION} on the message line.
 
 @node Jump to start position E>GJ
 @subsection Jump to start position: E>GJ
@@ -3699,19 +3727,6 @@ starting position of the currently select guard.  This is a handy way of
 finding him without having to re-select.  If the selected guard is
 disabled or has no starting position yet, the mouse selection points
 nowhere.
-
-@node Set start position E>GP
-@subsection Set start position: E>GP
-@cindex level editor, guard start position
-@cindex guard start position, level editor
-@mcindex E>GP
-
-This non-input command instantly sets the starting position of the
-currently selected guard to the selected construction's place.  It gives
-instant visual feedback.  There is no restriction of placement, and the
-guard can be placed even inside walls.  If the mouse selection is
-pointing to nowhere when this command is invoked, it displays
-@samp{SELECT CONSTRUCTION} on the message line.
 
 @node Toggle start direction E>GD
 @subsection Toggle start direction: E>GD
@@ -4144,7 +4159,7 @@ given by this key.
 @cindex native level format, guard start position and direction
 @cindex guard start position and direction, native level format
 
-Guard start position (see @ref{Set start position E>GP}) and facing
+Guard start position (see @ref{Set start position E>GS}) and facing
 direction (see @ref{Toggle start direction E>GD}) are given by this key.
 
 @center @code{GiP=r f p d}

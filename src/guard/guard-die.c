@@ -231,6 +231,20 @@ unload_guard_die (void)
 }
 
 void
+guard_resurrect (struct anim *g)
+{
+  struct coord nc; struct pos np, pm;
+  survey (_m, pos, &g->f, &nc, &pm, &np);
+  g->current_lives = g->total_lives;
+  g->death_reason = NO_DEATH;
+  g->action = guard_normal;
+  place_frame (&g->f, &g->f, get_guard_normal_bitmap (g->type),
+               &pm, g->f.dir == LEFT ? +16 : +22, +14);
+  place_on_the_ground (&g->f, &g->f.c);
+  reset_murder_spikes_floor (g->id);
+}
+
+void
 raise_skeleton (struct anim *s)
 {
   s->oaction = s->action;

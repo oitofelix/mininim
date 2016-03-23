@@ -246,6 +246,7 @@ register_anims (void)
     }
     a = &anima[id];
     apply_guard_mode (a, gm);
+    a->level_id = i;
     a->has_sword = true;
     a->skill = g->skill;
     a->total_lives = g->total_lives + g->skill.extra_life;

@@ -219,9 +219,10 @@ editor (void)
      {0}};
 
   struct menu_item guard_menu[] =
-    {{'S', "SELECT GUARD<"},
+    {{'G', "SELECT GUARD<"},
+     {'P', "PLACE GUARD"},
+     {'S', "SET START POSITION"},
      {'J', "JUMP TO START POSITION"},
-     {'P', "SET START POSITION"},
      {'D', "TOGGLE START DIRECTION"},
      {'K', "SKILL>"},
      {'L', "LIVES<"},
@@ -854,6 +855,7 @@ editor (void)
         break;
       }
       k = get_anim_by_id (current_kid_id);
+      kid_resurrect (k);
       place_frame (&k->f, &k->f, kid_normal_00, &p,
                    k->f.dir == LEFT ? +22 : +28, +15);
       kid_normal (k);
@@ -974,12 +976,26 @@ editor (void)
     xasprintf (&str, "G%i>", guard_index);
     switch (menu_enum (guard_menu, str)) {
     case -1: case 1: edit = EDIT_MAIN; break;
-    case 'S': edit = EDIT_GUARD_SELECT;
+    case 'G': edit = EDIT_GUARD_SELECT;
       s = guard_index; get_mouse_coord (&last_mouse_coord); break;
-    case 'J':
-      get_mouse_coord (&last_mouse_coord);
-      mouse2guard (guard_index); break;
     case 'P':
+      if (! is_guard_by_type (g->type)) {
+        editor_msg ("DISABLED GUARD", 12);
+        break;
+      }
+      if (! is_valid_pos (&p)) {
+        editor_msg ("SELECT CONSTRUCTION", 12);
+        break;
+      }
+      k = get_guard_anim_by_level_id (guard_index);
+      guard_resurrect (k);
+      place_frame (&k->f, &k->f, get_guard_normal_bitmap (k->type), &p,
+                   k->f.dir == LEFT ? +16 : +22, +14);
+      place_on_the_ground (&k->f, &k->f.c);
+      guard_normal (k);
+      update_depressible_floor (k, -7, -26);
+      break;
+    case 'S':
       if (! is_guard_by_type (g->type)) {
         editor_msg ("DISABLED GUARD", 12);
         break;
@@ -990,6 +1006,9 @@ editor (void)
       }
       g->p = p;
       break;
+    case 'J':
+      get_mouse_coord (&last_mouse_coord);
+      mouse2guard (guard_index); break;
     case 'D':
       if (! is_guard_by_type (g->type)) {
         editor_msg ("DISABLED GUARD", 12);
@@ -1036,7 +1055,7 @@ editor (void)
   case EDIT_GUARD_SELECT:
     draw_start_guards (screen, vm);
     mouse2guard (s);
-    xasprintf (&str, "G%iS>GUARD", guard_index);
+    xasprintf (&str, "G%iG>GUARD", guard_index);
     switch (menu_int (&s, NULL, 0, GUARDS - 1, str, NULL)) {
     case -1: edit = EDIT_GUARD;
       set_mouse_coord (&last_mouse_coord); break;
