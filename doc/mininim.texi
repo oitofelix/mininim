@@ -3705,7 +3705,9 @@ The guard is placed at rest independently of the movement he is
 performing at the instant of invocation.  There is no restriction of
 placement, and guards can be placed even inside walls.  If the mouse
 selection is pointing to nowhere when this command is invoked, it
-displays @samp{SELECT CONSTRUCTION} on the message line.
+displays @samp{SELECT CONSTRUCTION} on the message line.  If the
+currently selected guard has no correspondent live instance, it displays
+@samp{NO LIVE INSTANCE} on the message line.
 
 @node Set start position E>GS
 @subsection Set start position: E>GS

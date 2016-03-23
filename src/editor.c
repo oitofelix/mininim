@@ -880,6 +880,10 @@ editor (void)
         break;
       }
       k = get_anim_by_id (current_kid_id);
+      if (! k) {
+        editor_msg ("NO LIVE INSTANCE", 12);
+        break;
+      }
       kid_resurrect (k);
       place_frame (&k->f, &k->f, kid_normal_00, &p,
                    k->f.dir == LEFT ? +22 : +28, +15);
@@ -1028,6 +1032,10 @@ editor (void)
         break;
       }
       k = get_guard_anim_by_level_id (guard_index);
+      if (! k) {
+        editor_msg ("NO LIVE INSTANCE", 12);
+        break;
+      }
       guard_resurrect (k);
       place_frame (&k->f, &k->f, get_guard_normal_bitmap (k->type), &p,
                    k->f.dir == LEFT ? +16 : +22, +14);
@@ -1197,6 +1205,9 @@ editor (void)
     break;
   case EDIT_GUARD_TYPE:
     g = &level.guard[guard_index];
+    if (! is_guard_by_type (g->type)
+        && g->p.room == 0 && g->p.floor == 0 && g->p.place == 0)
+      g->p.room = g->p.floor = g->p.place = -1;
     xasprintf (&str, "G%iT>", guard_index);
     switch (menu_bool (guard_type_menu, str, true, &b0, &b1, &b2, &b3, &b4, &b5)) {
     case -1: edit = EDIT_GUARD; g->type = b; break;
@@ -1348,7 +1359,8 @@ static void
 mouse2guard (int i)
 {
   struct guard *g = &level.guard[i];
-  if (is_guard_by_type (g->type)) set_mouse_pos (&g->p);
+  if (is_guard_by_type (g->type)
+      && is_valid_pos (&g->p)) set_mouse_pos (&g->p);
   else {
     struct coord c = {last_mouse_coord.room, 0, 0};
     set_mouse_coord (&c);
