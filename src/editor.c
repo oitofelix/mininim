@@ -260,6 +260,31 @@ editor (void)
   bool free_ext_str;
   char *str = NULL, c, *f, *d;
 
+  /* additional graphics */
+  switch (edit) {
+  case EDIT_GUARD:
+  case EDIT_GUARD_SELECT:
+  case EDIT_GUARD_SKILL:
+  case EDIT_SKILL_LEGACY_TEMPLATES:
+  case EDIT_GUARD_TYPE:
+  case EDIT_GUARD_STYLE:
+  case EDIT_GUARD_SKILL_ATTACK:
+  case EDIT_GUARD_SKILL_COUNTER_ATTACK:
+  case EDIT_GUARD_SKILL_DEFENSE:
+  case EDIT_GUARD_SKILL_COUNTER_DEFENSE:
+  case EDIT_GUARD_SKILL_ADVANCE:
+  case EDIT_GUARD_SKILL_RETURN:
+  case EDIT_GUARD_SKILL_REFRACTION:
+  case EDIT_GUARD_SKILL_EXTRA_LIFE:
+  case EDIT_GUARD_LIVES:
+    draw_start_guards (screen, vm);
+    break;
+  case EDIT_KID:
+    draw_start_kid (screen, vm);
+    break;
+  default: break;
+ }
+
   /* display message if available */
   if (msg_cycles > 0 && msg) {
     msg_cycles--;
@@ -846,7 +871,6 @@ editor (void)
     }
     break;
   case EDIT_KID:
-    draw_start_kid (screen, vm);
     switch (menu_enum (kid_menu, "K>")) {
     case -1: case 1: edit = EDIT_MAIN; break;
     case 'P':
@@ -971,7 +995,6 @@ editor (void)
     al_free (str);
     break;
   case EDIT_GUARD:
-    draw_start_guards (screen, vm);
     g = &level.guard[guard_index];
     xasprintf (&str, "G%i>", guard_index);
     switch (menu_enum (guard_menu, str)) {
@@ -1053,7 +1076,6 @@ editor (void)
     al_free (str);
     break;
   case EDIT_GUARD_SELECT:
-    draw_start_guards (screen, vm);
     mouse2guard (s);
     xasprintf (&str, "G%iG>GUARD", guard_index);
     switch (menu_int (&s, NULL, 0, GUARDS - 1, str, NULL)) {
@@ -1068,7 +1090,6 @@ editor (void)
     al_free (str);
     break;
   case EDIT_GUARD_SKILL:
-    draw_start_guards (screen, vm);
     g = &level.guard[guard_index];
     xasprintf (&str, "G%iK>", guard_index);
     switch (menu_enum (skill_menu, str)) {
@@ -1096,7 +1117,6 @@ editor (void)
     al_free (str);
     break;
   case EDIT_SKILL_LEGACY_TEMPLATES:
-    draw_start_guards (screen, vm);
     g = &level.guard[guard_index];
     xasprintf (&str, "G%iKL>L.SKILL", guard_index);
     static struct skill gskill;
@@ -1159,7 +1179,6 @@ editor (void)
        INT_MAX, EDIT_GUARD);
     break;
   case EDIT_GUARD_TYPE:
-    draw_start_guards (screen, vm);
     g = &level.guard[guard_index];
     xasprintf (&str, "G%iT>", guard_index);
     switch (menu_bool (guard_type_menu, str, true, &b0, &b1, &b2, &b3, &b4, &b5)) {
@@ -1184,7 +1203,6 @@ editor (void)
     al_free (str);
     break;
   case EDIT_GUARD_STYLE:
-    draw_start_guards (screen, vm);
     g = &level.guard[guard_index];
     xasprintf (&str, "G%iY>STYLE", guard_index);
     switch (menu_int (&g->style, NULL, 0, 7, str, NULL)) {
@@ -1323,7 +1341,6 @@ mouse2guard (int i)
 static char
 menu_skill (char *prefix, int *skill, int max, enum edit up_edit)
 {
-  draw_start_guards (screen, vm);
   char *str;
   xasprintf (&str, "G%i%s", guard_index, prefix);
   char c = menu_int (&s, NULL, 0, max, str, NULL);
