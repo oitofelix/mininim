@@ -32,5 +32,6 @@ struct coord *get_mouse_coord (struct coord *c);
 struct pos *get_mouse_pos (struct pos *p);
 void set_mouse_coord (struct coord *c);
 void set_mouse_pos (struct pos *p);
+void set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR id);
 
 #endif	/* MININIM_XMOUSE_H */

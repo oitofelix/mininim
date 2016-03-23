@@ -135,3 +135,11 @@ set_mouse_pos (struct pos *p)
   con_m (p, &c);
   set_mouse_coord (&c);
 }
+
+void
+set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR id)
+{
+  if (! al_set_system_mouse_cursor (display, id))
+    error (0, 0, "%s (%i): cannot set system mouse cursor",
+           __func__, id);
+}

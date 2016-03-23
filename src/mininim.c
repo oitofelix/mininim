@@ -1115,9 +1115,13 @@ main (int _argc, char **_argv)
 
   draw_loading_screen ();
 
+  set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_BUSY);
+
   load_samples ();
   load_level ();
   load_cutscenes ();
+
+  set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
 
   /* ----------------- */
   /* save_guard_bitmaps (VGA); */

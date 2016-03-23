@@ -298,6 +298,7 @@ editor (void)
   switch (edit) {
   case EDIT_NONE: break;
   case EDIT_MAIN:
+    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
     switch (menu_enum (main_menu, NULL)) {
     case 'C': edit = EDIT_CON; break;
     case 'E': edit = EDIT_EVENT; break;
@@ -310,8 +311,10 @@ editor (void)
   case EDIT_CON:
     if (! is_valid_pos (&p)) {
       editor_msg ("SELECT CONSTRUCTION", 1);
+      set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       break;
     }
+    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_PRECISION);
     switch (menu_enum (con_menu, "C>")) {
     case -1: case 1: edit = EDIT_MAIN; break;
     case 'F': edit = EDIT_FG; break;
@@ -333,8 +336,10 @@ editor (void)
   case EDIT_FG:
     if (! is_valid_pos (&p)) {
       editor_msg ("SELECT CONSTRUCTION", 1);
+      set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       break;
     }
+    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_PRECISION);
     switch (menu_enum (fg_menu, "CF>")) {
     case -1: case 1: edit = EDIT_CON; break;
     case 'F': edit = EDIT_FLOOR; break;
@@ -366,8 +371,10 @@ editor (void)
   case EDIT_FLOOR:
     if (! is_valid_pos (&p)) {
       editor_msg ("SELECT CONSTRUCTION", 1);
+      set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       break;
     }
+    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_PRECISION);
     c = menu_enum (floor_menu, "CFF>");
     if (! c) break;
 
@@ -402,8 +409,10 @@ editor (void)
   case EDIT_PILLAR:
     if (! is_valid_pos (&p)) {
       editor_msg ("SELECT CONSTRUCTION", 1);
+      set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       break;
     }
+    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_PRECISION);
     c = menu_enum (pillar_menu, "CFP>");
     if (! c) break;
 
@@ -423,8 +432,10 @@ editor (void)
   case EDIT_DOOR:
     if (! is_valid_pos (&p)) {
       editor_msg ("SELECT CONSTRUCTION", 1);
+      set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       break;
     }
+    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_PRECISION);
     c = menu_enum (door_menu, "CFD>");
     if (! c) break;
 
@@ -449,8 +460,10 @@ editor (void)
   case EDIT_CARPET:
     if (! is_valid_pos (&p)) {
       editor_msg ("SELECT CONSTRUCTION", 1);
+      set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       break;
     }
+    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_PRECISION);
     c = menu_enum (carpet_menu, "CFR>");
     if (! c) break;
 
@@ -469,8 +482,10 @@ editor (void)
   case EDIT_ARCH:
     if (! is_valid_pos (&p)) {
       editor_msg ("SELECT CONSTRUCTION", 1);
+      set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       break;
     }
+    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_PRECISION);
     c = menu_enum (arch_menu, "CFA>");
     if (! c) break;
 
@@ -491,8 +506,10 @@ editor (void)
   case EDIT_BG:
     if (! is_valid_pos (&p)) {
       editor_msg ("SELECT CONSTRUCTION", 1);
+      set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       break;
     }
+    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_PRECISION);
     c = menu_enum (bg_menu, "CB>");
     switch (c) {
     case -1: case 1: edit = EDIT_CON; break;
@@ -513,11 +530,13 @@ editor (void)
   case EDIT_EXT:
     if (! is_valid_pos (&p)) {
       editor_msg ("SELECT CONSTRUCTION", 1);
+      set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       break;
     }
 
     switch (con (&p)->fg) {
     case FLOOR:
+      set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_PRECISION);
       switch (menu_enum (items_menu, "CE>")) {
       case -1: case 1: edit = EDIT_CON; break;
       case 'N': con (&p)->ext.item = NO_ITEM; break;
@@ -533,6 +552,7 @@ editor (void)
       }
       break;
     case LOOSE_FLOOR:
+      set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
       c = menu_bool (loose_floor_ext_menu, "CE>", false, &b0);
       switch (c) {
       case -1: edit = EDIT_CON; break;
@@ -561,6 +581,7 @@ editor (void)
       menu_step_ext (&p, LEVEL_DOOR_MAX_STEP);
       break;
     case CHOPPER:
+      set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
       r = con (&p)->ext.step;
       b = con (&p)->ext.step & 0x80;
       min = b ? 128 : 0;
@@ -581,6 +602,7 @@ editor (void)
       }
       break;
     case CARPET:
+      set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_PRECISION);
       switch (menu_enum (carpet_ext_menu, "CE>")) {
       case -1: case 1: edit = EDIT_CON; break;
       case '0': con (&p)->ext.design = CARPET_00; break;
@@ -589,6 +611,7 @@ editor (void)
       }
       break;
     case TCARPET:
+      set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_PRECISION);
       switch (menu_enum (tcarpet_ext_menu, "CE>")) {
       case -1: case 1: edit = EDIT_CON; break;
       case '0': con (&p)->ext.design = CARPET_00; break;
@@ -599,6 +622,7 @@ editor (void)
       }
       break;
     default:
+      set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       draw_bottom_text (NULL, "NO EXTENSION");
       if (was_menu_return_pressed ()) edit = EDIT_CON;
       break;
@@ -607,8 +631,10 @@ editor (void)
   case EDIT_INFO:
     if (! is_valid_pos (&p)) {
       editor_msg ("SELECT CONSTRUCTION", 1);
+      set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       break;
     }
+    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_PRECISION);
 
     if (was_menu_return_pressed ()) edit = EDIT_CON;
 
@@ -660,6 +686,7 @@ editor (void)
 
     break;
   case EDIT_EVENT:
+    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
     switch (menu_enum (event_menu, "E>")) {
     case -1: case 1: edit = EDIT_MAIN; break;
     case 'D':
@@ -688,9 +715,13 @@ editor (void)
   case EDIT_EVENT2DOOR:
     if (! is_valid_pos (&level.event[s].p)
         || ! is_door (&level.event[s].p)) {
+      set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       struct coord c = {last_mouse_coord.room, 0, 0};
       set_mouse_coord (&c);
-    } else set_mouse_pos (&level.event[s].p);
+    } else {
+      set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
+      set_mouse_pos (&level.event[s].p);
+    }
     b = level.event[s].next;
     switch (menu_int (&s, &b, 0, EVENTS - 1, "ED>EVENT", "N")) {
     case -1: set_mouse_coord (&last_mouse_coord); edit = EDIT_EVENT; break;
@@ -703,9 +734,13 @@ editor (void)
     break;
   case EDIT_EVENT2FLOOR:
     if (! is_valid_pos (&last_event2floor_pos)) {
+      set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       struct coord c = {last_mouse_coord.room, 0, 0};
       set_mouse_coord (&c);
-    } else set_mouse_pos (&last_event2floor_pos);
+    } else {
+      set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
+      set_mouse_pos (&last_event2floor_pos);
+    }
     switch (menu_list (&s, &r, t, 0, EVENTS - 1, "EF>EVENT")) {
     case -1: set_mouse_coord (&last_mouse_coord); edit = EDIT_EVENT; break;
     case 0: break;
@@ -727,10 +762,12 @@ editor (void)
     break;
   case EDIT_DOOR2EVENT:
     if (! is_valid_pos (&p) || ! is_door (&p)) {
+      set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       editor_msg ("SELECT DOOR", 1);
       if (was_menu_return_pressed ()) edit = EDIT_EVENT;
       t = -1;
     } else {
+      set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
       if (t < 0) next_int_by_pred (&t, 0, 0, EVENTS - 1, is_pos_at_event, &p);
       switch (menu_list (NULL, &r, t, 0, EVENTS - 1, "ER>EVENT")) {
       case -1: edit = EDIT_EVENT; break;
@@ -744,9 +781,11 @@ editor (void)
     break;
   case EDIT_EVENT_SET:
     if (! is_valid_pos (&p) || ! is_door (&p)) {
+      set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       editor_msg ("SELECT DOOR", 1);
       if (was_menu_return_pressed ()) edit = EDIT_EVENT;
     } else {
+      set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
       switch (menu_int (&s, &b, 0, EVENTS - 1, "ES>EVENT", "N")) {
       case -1: edit = EDIT_EVENT; break;
       case 0: break;
@@ -760,6 +799,7 @@ editor (void)
     }
     break;
   case EDIT_ROOM:
+    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
     switch (menu_enum (room_menu, "R>")) {
     case -1: case 1: edit = EDIT_MAIN; break;
     case 'J':
@@ -813,6 +853,7 @@ editor (void)
     menu_select_room (EDIT_ROOM, "RJ>ROOM");
     break;
   case EDIT_LINK:
+    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
     switch (menu_enum (link_menu, "RL>")) {
     case -1: case 1: edit = EDIT_ROOM; break;
     case 'L':
@@ -860,6 +901,7 @@ editor (void)
     }
     break;
   case EDIT_LINKING_SETTINGS:
+    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
     switch (menu_bool (linking_settings_menu, "RS>", false, &b0, &b1, &b2)) {
     case -1: edit = EDIT_ROOM; break;
     case 0: break;
@@ -872,6 +914,7 @@ editor (void)
     }
     break;
   case EDIT_KID:
+    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
     switch (menu_enum (kid_menu, "K>")) {
     case -1: case 1: edit = EDIT_MAIN; break;
     case 'P':
@@ -917,6 +960,7 @@ editor (void)
     }
     break;
   case EDIT_LEVEL:
+    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
     xasprintf (&str, "L%i>", level.number);
     switch (menu_enum (level_menu, str)) {
     case -1: case 1: edit = EDIT_MAIN; break;
@@ -968,6 +1012,7 @@ editor (void)
     al_free (str);
    break;
   case EDIT_NOMINAL_NUMBER:
+    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
     xasprintf (&str, "L%iN>N.NUMBER", level.number);
     switch (menu_int (&s, NULL, 0, INT_MAX, str, NULL)) {
     case -1: edit = EDIT_LEVEL; break;
@@ -981,6 +1026,7 @@ editor (void)
     al_free (str);
     break;
   case EDIT_ENVIRONMENT:
+    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
     xasprintf (&str, "L%iE>", level.number);
     switch (menu_bool (environment_menu, str, true, &b0, &b1)) {
     case -1: edit = EDIT_LEVEL; em = b; break;
@@ -997,6 +1043,7 @@ editor (void)
     al_free (str);
     break;
   case EDIT_HUE:
+    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
     xasprintf (&str, "L%iH>", level.number);
     switch (menu_bool (hue_menu, str, true, &b0, &b1, &b2, &b3, &b4)) {
     case -1: edit = EDIT_LEVEL; hue = b; break;
@@ -1017,6 +1064,9 @@ editor (void)
     break;
   case EDIT_GUARD:
     g = &level.guard[guard_index];
+    set_system_mouse_cursor (is_guard_by_type (g->type)
+                             ? ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT
+                             : ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
     xasprintf (&str, "G%i>", guard_index);
     switch (menu_enum (guard_menu, str)) {
     case -1: case 1: edit = EDIT_MAIN; break;
@@ -1115,6 +1165,7 @@ editor (void)
     al_free (str);
     break;
   case EDIT_GUARD_SKILL:
+    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
     g = &level.guard[guard_index];
     xasprintf (&str, "G%iK>", guard_index);
     switch (menu_enum (skill_menu, str)) {
@@ -1142,6 +1193,7 @@ editor (void)
     al_free (str);
     break;
   case EDIT_SKILL_LEGACY_TEMPLATES:
+    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
     g = &level.guard[guard_index];
     xasprintf (&str, "G%iKL>L.SKILL", guard_index);
     static struct skill gskill;
@@ -1204,6 +1256,7 @@ editor (void)
        INT_MAX, EDIT_GUARD);
     break;
   case EDIT_GUARD_TYPE:
+    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
     g = &level.guard[guard_index];
     if (! is_guard_by_type (g->type)
         && g->p.room == 0 && g->p.floor == 0 && g->p.place == 0)
@@ -1231,6 +1284,7 @@ editor (void)
     al_free (str);
     break;
   case EDIT_GUARD_STYLE:
+    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
     g = &level.guard[guard_index];
     xasprintf (&str, "G%iY>STYLE", guard_index);
     switch (menu_int (&g->style, NULL, 0, 7, str, NULL)) {
@@ -1258,6 +1312,7 @@ exit_editor (void)
   msg = NULL;
   msg_cycles = 0;
   reset_menu ();
+  set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
   if (game_paused)
     draw_bottom_text (NULL, "GAME PAUSED");
   else draw_bottom_text (NULL, NULL);
@@ -1266,6 +1321,7 @@ exit_editor (void)
 static char
 menu_step_ext (struct pos *p, int max)
 {
+  set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
   int r = con (p)->ext.step;
   char c = menu_int (&r, NULL, 0, max, "CE>STEP", NULL);
   switch (c) {
@@ -1286,6 +1342,7 @@ menu_step_ext (struct pos *p, int max)
 static char
 menu_event_ext (struct pos *p)
 {
+  set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
   int r = con (p)->ext.event;
   char c = menu_int (&r, NULL, 0, EVENTS - 1, "CE>EVENT", NULL);
   switch (c) {
@@ -1306,6 +1363,7 @@ menu_event_ext (struct pos *p)
 static char
 menu_select_room (enum edit up_edit, char *prefix)
 {
+  set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
   char r = menu_int (&room_view, NULL, 0, ROOMS - 1, prefix, NULL);
   switch (r) {
   case -1: edit = up_edit; set_mouse_coord (&last_mouse_coord); break;
@@ -1318,6 +1376,7 @@ menu_select_room (enum edit up_edit, char *prefix)
 static char
 menu_link (enum dir dir)
 {
+  set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
   char *prefix, c;
 
   switch (dir) {
@@ -1360,8 +1419,12 @@ mouse2guard (int i)
 {
   struct guard *g = &level.guard[i];
   if (is_guard_by_type (g->type)
-      && is_valid_pos (&g->p)) set_mouse_pos (&g->p);
+      && is_valid_pos (&g->p)) {
+    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
+    set_mouse_pos (&g->p);
+  }
   else {
+    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
     struct coord c = {last_mouse_coord.room, 0, 0};
     set_mouse_coord (&c);
   }
@@ -1370,6 +1433,7 @@ mouse2guard (int i)
 static char
 menu_skill (char *prefix, int *skill, int max, enum edit up_edit)
 {
+  set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
   char *str;
   xasprintf (&str, "G%i%s", guard_index, prefix);
   char c = menu_int (&s, NULL, 0, max, str, NULL);
