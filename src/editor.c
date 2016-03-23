@@ -199,7 +199,8 @@ editor (void)
      {0}};
 
   struct menu_item level_menu[] =
-    {{'E', "ENVIRONMENT<"},
+    {{'N', "NOMINAL NUMBER"},
+     {'E', "ENVIRONMENT<"},
      {'H', "HUE<"},
      {'S', "SAVE LEVEL"},
      {'L', "RELOAD LEVEL"},
@@ -915,6 +916,9 @@ editor (void)
     xasprintf (&str, "L%i>", level.number);
     switch (menu_enum (level_menu, str)) {
     case -1: case 1: edit = EDIT_MAIN; break;
+    case 'N': edit = EDIT_NOMINAL_NUMBER;
+      s = level.nominal_number;
+      break;
     case 'E': edit = EDIT_ENVIRONMENT;
       b = em;
       b0 = (level.em == DUNGEON) ? true : false;
@@ -959,6 +963,19 @@ editor (void)
     }
     al_free (str);
    break;
+  case EDIT_NOMINAL_NUMBER:
+    xasprintf (&str, "L%iN>N.NUMBER", level.number);
+    switch (menu_int (&s, NULL, 0, INT_MAX, str, NULL)) {
+    case -1: edit = EDIT_LEVEL; break;
+    case 0: break;
+    case 1:
+      level.nominal_number = s;
+      edit = EDIT_LEVEL;
+      break;
+    default: break;
+    }
+    al_free (str);
+    break;
   case EDIT_ENVIRONMENT:
     xasprintf (&str, "L%iE>", level.number);
     switch (menu_bool (environment_menu, str, true, &b0, &b1)) {

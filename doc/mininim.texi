@@ -3886,6 +3886,12 @@ current one.
 @cindex level editor, level
 @cindex level, level editor
 
+Each level has an actual number and a nominal number.  The actual number
+is the one used to name its file.  The @dfn{nominal number} is the one
+used for representative purposes like the @samp{LEVEL @var{n}} message
+shown at the beginning of each level.  It's useful when a set of actual
+levels should be considered as a single level in the broader sense.
+
 Options related to the level as whole, like environment and hue modes,
 or saving and loading levels are made available by this non-terminal
 command.
@@ -3894,6 +3900,21 @@ command.
 
 The current level is indicated by @var{j} in all prefixed commands of
 this hierarchy.
+
+@node Nominal number E>LN
+@subsection Nominal number: E>LN
+@cindex level editor, level nominal number
+@cindex level nominal number, level editor
+@mcindex E>LN
+
+This command is used to set the nominal number of the current level.
+It's an integer input whose parameter @var{i} represents the level
+nominal number.  @xref{Integer input}.
+
+@center @kbd{LjN>N.NUMBER 0->:i}
+
+@kbd{BACKSPACE} confirms the new nominal number, while @kbd{/} maintains
+the current one.
 
 @node Environment E>LE
 @subsection Environment: E>LE
@@ -4047,11 +4068,8 @@ sections below.
 @cindex native level format, nominal number
 @cindex nominal number, native level format
 
-Each level has an actual number and a nominal number.  The actual number
-is the one used to name its file.  The @dfn{nominal number} is the one
-used for representative purposes like the @samp{LEVEL @var{n}} message
-shown at the beginning of each level.  It's useful when a set of actual
-levels should be considered as a single level in the broader sense.
+The level nominal number (see @ref{Nominal number E>LN}) is given by
+this key.
 
 @center @code{N=n}
 
