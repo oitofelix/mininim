@@ -314,7 +314,7 @@ editor (void)
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       break;
     }
-    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_PRECISION);
+    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
     switch (menu_enum (con_menu, "C>")) {
     case -1: case 1: edit = EDIT_MAIN; break;
     case 'F': edit = EDIT_FG; break;
@@ -339,7 +339,7 @@ editor (void)
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       break;
     }
-    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_PRECISION);
+    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
     switch (menu_enum (fg_menu, "CF>")) {
     case -1: case 1: edit = EDIT_CON; break;
     case 'F': edit = EDIT_FLOOR; break;
@@ -374,7 +374,7 @@ editor (void)
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       break;
     }
-    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_PRECISION);
+    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
     c = menu_enum (floor_menu, "CFF>");
     if (! c) break;
 
@@ -412,7 +412,7 @@ editor (void)
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       break;
     }
-    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_PRECISION);
+    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
     c = menu_enum (pillar_menu, "CFP>");
     if (! c) break;
 
@@ -435,7 +435,7 @@ editor (void)
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       break;
     }
-    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_PRECISION);
+    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
     c = menu_enum (door_menu, "CFD>");
     if (! c) break;
 
@@ -463,7 +463,7 @@ editor (void)
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       break;
     }
-    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_PRECISION);
+    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
     c = menu_enum (carpet_menu, "CFR>");
     if (! c) break;
 
@@ -485,7 +485,7 @@ editor (void)
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       break;
     }
-    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_PRECISION);
+    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
     c = menu_enum (arch_menu, "CFA>");
     if (! c) break;
 
@@ -509,7 +509,7 @@ editor (void)
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       break;
     }
-    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_PRECISION);
+    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
     c = menu_enum (bg_menu, "CB>");
     switch (c) {
     case -1: case 1: edit = EDIT_CON; break;
@@ -536,7 +536,7 @@ editor (void)
 
     switch (con (&p)->fg) {
     case FLOOR:
-      set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_PRECISION);
+      set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
       switch (menu_enum (items_menu, "CE>")) {
       case -1: case 1: edit = EDIT_CON; break;
       case 'N': con (&p)->ext.item = NO_ITEM; break;
@@ -602,7 +602,7 @@ editor (void)
       }
       break;
     case CARPET:
-      set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_PRECISION);
+      set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
       switch (menu_enum (carpet_ext_menu, "CE>")) {
       case -1: case 1: edit = EDIT_CON; break;
       case '0': con (&p)->ext.design = CARPET_00; break;
@@ -611,7 +611,7 @@ editor (void)
       }
       break;
     case TCARPET:
-      set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_PRECISION);
+      set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
       switch (menu_enum (tcarpet_ext_menu, "CE>")) {
       case -1: case 1: edit = EDIT_CON; break;
       case '0': con (&p)->ext.design = CARPET_00; break;
@@ -634,7 +634,7 @@ editor (void)
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       break;
     }
-    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_PRECISION);
+    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
 
     if (was_menu_return_pressed ()) edit = EDIT_CON;
 
