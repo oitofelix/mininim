@@ -3385,6 +3385,17 @@ currently displayed room and keeps it on display, while @kbd{/} cancels
 the exchange and reverts back to the room displayed before this command
 invocation.
 
+@node Clear E>RR
+@subsection Clear: E>RR
+@cindex level editor, room clear
+@cindex clear room, level editor
+@cindex room clear, level editor
+@mcindex E>RR
+
+This non-input command immediately sets the constructions of the
+currently displayed room to @code{NO_FLOOR/NO_BG}, making the room
+empty.  Useful if the user wants to construct a room from scratch.
+
 @node Copy E>RC
 @subsection Copy: E>RC
 @cindex level editor, room copy

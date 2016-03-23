@@ -172,6 +172,7 @@ editor (void)
      {'L', "ROOM LINKING>"},
      {'S', "LINKING SETTINGS<"},
      {'X', "EXCHANGE ROOM<"},
+     {'R', "CLEAR"},
      {'C', "COPY"},
      {'P', "PASTE"},
      {0}};
@@ -747,6 +748,19 @@ editor (void)
     case 'X':
       get_mouse_coord (&last_mouse_coord);
       edit = EDIT_ROOM_EXCHANGE; break;
+    case 'R':
+      p0.room = room_view;
+      for (p0.floor = 0; p0.floor < FLOORS; p0.floor++)
+        for (p0.place = 0; p0.place < PLACES; p0.place++) {
+          destroy_con_at_pos (&p0);
+          con (&p0)->fg = NO_FLOOR;
+          con (&p0)->bg = NO_BG;
+          con (&p0)->bg = NO_ITEM;
+        }
+      update_wall_cache (room_view, em, vm);
+      create_mirror_bitmaps (room_view, room_view);
+      compute_stars_position (room_view, room_view);
+      break;
     case 'C':
       p0.room = room_view;
       for (p0.floor = 0; p0.floor < FLOORS; p0.floor++)

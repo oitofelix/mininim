@@ -19,9 +19,8 @@
 @c release.
 
 @itemize
-@item Native level format
-@item Level editor
-@item Level generator module
-@item Guile scripting
+@item Arbitrary number of events, guards and rooms per level
+@item Guile scripting and arbitrary number of levels
 @item Network play
+@item Level generator module
 @end itemize
