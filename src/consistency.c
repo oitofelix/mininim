@@ -416,21 +416,21 @@ fix_legacy_room_above_zero_with_traversable_at_bottom (void)
 void
 make_reciprocal_link (int room0, int room1, enum dir dir)
 {
-  if (room0) *roomd_ptr (room0, dir) = room1;
-  if (room1) *roomd_ptr (room1, opposite_dir (dir)) = room0;
+  link_room (room0, room1, dir);
+  link_room (room1, room0, opposite_dir (dir));
 }
 
 void
 make_link_locally_unique (int room, enum dir dir)
 {
   if (dir != LEFT && roomd (room, LEFT) == roomd (room, dir))
-    *roomd_ptr (room, LEFT) = 0;
+    link_room (room, 0, LEFT);
   if (dir != RIGHT && roomd (room, RIGHT) == roomd (room, dir))
-    *roomd_ptr (room, RIGHT) = 0;
+    link_room (room, 0, RIGHT);
   if (dir != ABOVE && roomd (room, ABOVE) == roomd (room, dir))
-    *roomd_ptr (room, ABOVE) = 0;
+    link_room (room, 0, ABOVE);
   if (dir != BELOW && roomd (room, BELOW) == roomd (room, dir))
-    *roomd_ptr (room, BELOW) = 0;
+    link_room (room, 0, BELOW);
 }
 
 void
@@ -439,7 +439,7 @@ make_link_globally_unique (int room, enum dir dir)
   int i;
   for (i = 1; i < ROOMS; i++) {
     if (room != i && roomd (i, dir) == roomd (room, dir))
-      *roomd_ptr (i, dir) = 0;
+      link_room (i, 0, dir);
   }
 }
 
@@ -495,21 +495,21 @@ exchange_rooms  (int room0, int room1)
   int r1ab = roomd (r1a, BELOW);
   int r1ba = roomd (r1b, ABOVE);
 
-  *roomd_ptr (room0, LEFT) = r1l;
-  if (r1lr == room1) *roomd_ptr (r1l, RIGHT) = room0;
-  *roomd_ptr (room0, RIGHT) = r1r;
-  if (r1rl == room1) *roomd_ptr (r1r, LEFT) = room0;
-  *roomd_ptr (room0, ABOVE) = r1a;
-  if (r1ab == room1) *roomd_ptr (r1a, BELOW) = room0;
-  *roomd_ptr (room0, BELOW) = r1b;
-  if (r1ba == room1) *roomd_ptr (r1b, ABOVE) = room0;
+  link_room (room0, r1l, LEFT);
+  if (r1lr == room1) link_room (r1l, room0, RIGHT);
+  link_room (room0, r1r, RIGHT);
+  if (r1rl == room1) link_room (r1r, room0, LEFT);
+  link_room (room0, r1a, ABOVE);
+  if (r1ab == room1) link_room (r1a, room0, BELOW);
+  link_room (room0, r1b, BELOW);
+  if (r1ba == room1) link_room (r1b, room0, ABOVE);
 
-  *roomd_ptr (room1, LEFT) = r0l;
-  if (r0lr == room0) *roomd_ptr (r0l, RIGHT) = room1;
-  *roomd_ptr (room1, RIGHT) = r0r;
-  if (r0rl == room0) *roomd_ptr (r0r, LEFT) = room1;
-  *roomd_ptr (room1, ABOVE) = r0a;
-  if (r0ab == room0) *roomd_ptr (r0a, BELOW) = room1;
-  *roomd_ptr (room1, BELOW) = r0b;
-  if (r0ba == room0) *roomd_ptr (r0b, ABOVE) = room1;
+  link_room (room1, r0l, LEFT);
+  if (r0lr == room0) link_room (r0l, room1, RIGHT);
+  link_room (room1, r0r, RIGHT);
+  if (r0rl == room0) link_room (r0r, room1, LEFT);
+  link_room (room1, r0a, ABOVE);
+  if (r0ab == room0) link_room (r0a, room1, BELOW);
+  link_room (room1, r0b, BELOW);
+  if (r0ba == room0) link_room (r0b, room1, ABOVE);
 }

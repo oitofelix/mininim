@@ -3264,7 +3264,11 @@ other room linking to room B from the same direction.
 This non-terminal command has sub-commands for handling room linking,
 room constructions as a whole and navigating through rooms.
 
-@center @kbd{R>JLSXCP}
+@center @kbd{R>JLSXRCP}
+
+Room 0 links are never modified implicitly (not even by linking
+policies), and can only be changed by explicitly using the room linking
+command (see @ref{Room linking E>RL}).
 
 There are complementary commands that can be used to navigate through
 rooms by linkage and query the linking of the current room and its
@@ -3658,7 +3662,7 @@ How many lives to add to the common total lives.
 This non-terminal command has sub-commands for setting all these
 characteristics.
 
-@center @kbd{Gj>SJPDKLTY}
+@center @kbd{Gj>GPSJDKLTY}
 
 All actions apply to the currently selected guard, whose index @var{j}
 is shown by all commands of this hierarchy.  Before being able to
@@ -3896,7 +3900,7 @@ Options related to the level as whole, like environment and hue modes,
 or saving and loading levels are made available by this non-terminal
 command.
 
-@center @kbd{Lj>EHSL}
+@center @kbd{Lj>NEHSL}
 
 The current level is indicated by @var{j} in all prefixed commands of
 this hierarchy.

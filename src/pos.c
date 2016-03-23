@@ -41,6 +41,12 @@ roomd (int room, enum dir dir)
   return *roomd_ptr (room, dir);
 }
 
+void
+link_room (int room0, int room1, enum dir dir)
+{
+  if (room0) *roomd_ptr (room0, dir) = room1;
+}
+
 int
 room_dist (int r0, int r1, int max)
 {
