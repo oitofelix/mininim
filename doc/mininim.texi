@@ -2436,8 +2436,9 @@ Often menu commands apply to a particular place within a level.  The
 provided mechanism to select such a place is called @dfn{mouse
 selection}.  While it's enabled the mouse cursor can be used to select a
 particular place by simply pointing at the construction held by it.  The
-selected place's construction will be shown in a brighter color than its
-surroundings like in the picture below.
+selected place's construction will be shown in a brighter or darker
+color than its surroundings (depending upon the video and environment
+modes) like in the picture below.
 
 @center @image{mininim-figures/mouse-selection}
 
@@ -2464,8 +2465,8 @@ the currently displayed room as well, when moving or restoring the mouse
 selection.
 
 The mouse selection can't be used to select constructions of the rooms
-above and below from the current room, because the topmost pixels are
-reserved to selection pointing nowhere and the bottom region to the
+above and below while at the current room, because the topmost pixels
+are reserved to selection pointing nowhere and the bottom region to the
 message line and menu system.
 
 

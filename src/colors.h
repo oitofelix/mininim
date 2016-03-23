@@ -27,6 +27,8 @@
 #define YELLOW (al_map_rgb (255, 255, 0))
 #define WHITE (al_map_rgb (255, 255, 255))
 
+#define NO_FLOOR_SELECTION_COLOR (al_map_rgb (128, 128, 128))
+
 #define V_KID_HAIR_COLOR_01 (al_map_rgb (184, 144, 0))
 #define V_KID_HAIR_COLOR_02 (al_map_rgb (120, 92, 56))
 #define V_KID_SKIN_COLOR_01 (al_map_rgb (220, 128, 108))

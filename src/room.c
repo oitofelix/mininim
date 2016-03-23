@@ -720,9 +720,15 @@ selection_palette (ALLEGRO_COLOR c)
   unsigned char r, g, b, a;
   al_unmap_rgba (c, &r, &g, &b, &a);
   if (a == 0) return c;
-  r = add_char (r, +64);
-  g = add_char (g, +64);
-  b = add_char (b, +64);
+
+  signed char d;
+  if (vm == CGA && ! hgc) d = -128;
+  else if (vm == CGA && hgc && em == DUNGEON) d = -96;
+  else d = +64;
+
+  r = add_char (r, d);
+  g = add_char (g, d);
+  b = add_char (b, d);
   return al_map_rgb (r, g, b);
 }
 
@@ -766,7 +772,6 @@ draw_no_floor_selection (ALLEGRO_BITMAP *bitmap, struct pos *p)
     struct rect r = new_rect (p->room, p->place * PLACE_WIDTH + 25,
                               p->floor * PLACE_HEIGHT + 3,
                               PLACE_WIDTH, PLACE_HEIGHT - 16);
-    draw_filled_rect (bitmap, &r, selection_palette
-                      (apply_hue_color (al_map_rgba (69, 93, 113, 1))));
+    draw_filled_rect (bitmap, &r, NO_FLOOR_SELECTION_COLOR);
   }
 }
