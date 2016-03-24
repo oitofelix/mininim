@@ -108,13 +108,22 @@ is_traversable (struct pos *p)
 }
 
 bool
+is_pillar (struct pos *p)
+{
+  enum confg fg = con (p)->fg;
+  return fg == PILLAR
+    || fg == BIG_PILLAR_TOP
+    || fg == BIG_PILLAR_BOTTOM
+    || fg == ARCH_BOTTOM;
+}
+
+bool
 is_rigid_con (struct pos *p)
 {
   enum confg fg = con (p)->fg;
-  return fg == PILLAR || fg == BIG_PILLAR_TOP
-    || fg == WALL || fg == DOOR || fg == CHOPPER
-    || is_arch_top (p) || is_carpet (p)
-    || fg == MIRROR;
+  return is_pillar (p)
+    || fg == WALL || fg == DOOR || fg == CHOPPER || fg == MIRROR
+    || is_arch_top (p) || is_carpet (p);
 }
 
 bool

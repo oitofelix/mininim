@@ -70,4 +70,5 @@ draw cycles being skipped.
 @item Mirror is not fully opaque.
 @item Approximately 25% of the time balcony stars don't respect the
 paused game state.
+@item Not all pillar types are rigid.
 @end itemize

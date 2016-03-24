@@ -28,6 +28,7 @@ bool is_frame_visible (struct frame *f);
 bool is_pos_visible (struct pos *p);
 bool is_strictly_traversable (struct pos *p);
 bool is_traversable (struct pos *p);
+bool is_pillar (struct pos *p);
 bool is_rigid_con (struct pos *p);
 bool is_carpet (struct pos *p);
 bool is_arch_top (struct pos *p);

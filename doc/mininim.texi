@@ -405,7 +405,7 @@ of them are @emph{hangable}, except for @code{NO_FLOOR}.
 
 @dfn{Pillars} are aesthetic supports for the constructions on the floor
 above them.  All of them are @emph{hangable}, except for
-@code{BIG_PILLAR_TOP}.  Pillars use no extension.
+@code{BIG_PILLAR_TOP}, and @emph{rigid}.  Pillars use no extension.
 
 @multitable @columnfractions .25 .15 .15 .45
   @headitem Code @tab Dungeon @tab Palace @tab Notes
@@ -414,14 +414,14 @@ above them.  All of them are @emph{hangable}, except for
   @item @code{PILLAR}
   @tab @center @image{mininim-figures/d-pillar}
   @tab @center @image{mininim-figures/p-pillar}
-  @tab This is @emph{rigid}.
+  @tab
 
   @fgindex BIG_PILLAR_TOP
   @item @code{BIG_PILLAR_TOP}
   @tab @center @image{mininim-figures/d-big-pillar-top}
   @tab @center @image{mininim-figures/p-big-pillar-top}
   @tab This should be placed above a @code{BIG_PILLAR_BOTTOM}.  This is
-  @emph{strictly traversable} and @emph{rigid}.
+  @emph{strictly traversable}.
 
   @fgindex BIG_PILLAR_BOTTOM
   @item @code{BIG_PILLAR_BOTTOM}
