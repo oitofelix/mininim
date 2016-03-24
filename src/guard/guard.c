@@ -712,15 +712,17 @@ draw_guard_lives (ALLEGRO_BITMAP *bitmap, struct anim *g, enum vm vm)
 
   ALLEGRO_BITMAP *life = guard_life;
   palette pal = NULL;
-  if (g->type == GUARD || g->type == FAT_GUARD
-      || g->type == VIZIER) {
-    pal = get_guard_palette (g->style, vm);
-    life = apply_palette (life, pal);
-  } else if (g->type == SHADOW || g->type == KID) {
+
+  if ((g->type == SHADOW && g->style == 0)
+      || g->type == KID) {
     pal = get_shadow_life_palette (vm);
     life = apply_palette (life, pal);
-  } else if (g->type == SKELETON)
+  } else if (g->type == SKELETON && g->style == 0)
     life = apply_palette (life, skeleton_life_palette);
+  else if (is_guard (g)) {
+    pal = get_guard_palette (g->style, vm);
+    life = apply_palette (life, pal);
+  }
 
   if (hgc) life = apply_palette (life, hgc_palette);
 
