@@ -110,7 +110,7 @@ static struct argp_option options[] = {
   {"convert-levels", CONVERT_LEVELS_OPTION, NULL, 0, "Batch convert levels 1 to 14 accessible by the current level module to the native format and exit.  The levels are saved in the user data directory, where they take precedence over levels in every other location.  When using this option there is no point in using any other options besides '--level-module' that must occur before this to take effect.  You can accomplish a similar result in-game on a per level basis by using the 'E>LS' command.  Notice that in that case any changes made to the level by special events (or otherwise) before you trigger the save command will be retained.", 0},
   {"start-level", START_LEVEL_OPTION, "N", 0, "Make the kid start at level N.  The default is 1.  Valid integers range from 1 to INT_MAX.  This can be changed in-game by the SHIFT+L key binding.", 0},
   {"start-pos", START_POS_OPTION, "R,F,P", 0, "Make the kid start at room R, floor F and place P.  The default is to let this decision to the level module.  R is an integer ranging from 1 to INT_MAX, F is an integer ranging from 0 to 2 and P is an integer ranging from 0 to 9.", 0},
-  {NULL, 0, NULL, OPTION_DOC, "If the option '--level-module' is not given and there is a LEVELS.DAT file in the resources directory, the DAT level module is automatically used to load that file.  This is a compatibility measure for applications which depend upon this legacy behavior.", 0},
+  {NULL, 0, NULL, OPTION_DOC, "If the option '--level-module' is not given and there is a LEVELS.DAT file in the working directory, the DAT level module is automatically used to load that file.  This is a compatibility measure for applications which depend upon this legacy behavior.", 0},
   {NULL, 0, NULL, OPTION_DOC, "", 0},
 
   /* Time */
@@ -1269,7 +1269,7 @@ get_paths (void)
   xasprintf (&config_filename, "%smininim.ini", user_settings_dir);
 
   /* get legacy LEVELS.DAT compatibility path */
-  xasprintf (&levels_dat_compat_filename, "%sLEVELS.DAT", resources_dir);
+  xasprintf (&levels_dat_compat_filename, "LEVELS.DAT");
 }
 
 static void

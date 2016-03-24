@@ -2017,9 +2017,9 @@ from 0 to 2 and @var{p} is an integer ranging from 0 to 9.
 
 @cindex @file{LEVELS.DAT}
 If the option @option{--level-module} is not given and there is a
-@file{LEVELS.DAT} file in the resources directory, the DAT level module
-is automatically used to load that file.  This is a compatibility
-measure for applications which depend upon this legacy behavior.
+@file{LEVELS.DAT} file in the working directory, the DAT level module is
+automatically used to load that file.  This is a compatibility measure
+for applications which depend upon this legacy behavior.
 
 
 @node Time options

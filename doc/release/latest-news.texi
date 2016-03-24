@@ -31,6 +31,9 @@
 @item Add option @option{--convert-levels} to batch convert legacy formats to
 the native format.
 @item Guards can back off in refraction periods.
+@item LEVELS.DAT loading path changed from resources directory to
+working directory, to make this legacy mechanism compatible with
+symbolic links.
 @end itemize
 
 @noindent @strong{Bug fixes:}
