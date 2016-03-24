@@ -2469,6 +2469,22 @@ above and below while at the current room, because the topmost pixels
 are reserved to selection pointing nowhere and the bottom region to the
 message line and menu system.
 
+The mouse cursor changes to indicate conditions related to the the mouse
+selection and the menu system.  Four different cursors are used for this
+purpose, that (unless otherwise noted) have the following meanings:
+
+@table @code
+@item DEFAULT
+no other situation applies
+@item LINK
+the current menu command expects or sets a valid mouse selection
+@item QUESTION
+the current menu command expects input
+@item UNAVAILABLE
+the mouse selection or some object selected using the menu system is
+somehow invalid
+@end table
+
 
 @node Input modes
 @section Input modes
@@ -2714,7 +2730,9 @@ three intrinsic construction components: @emph{foreground},
 commands in this hierarchy applies to the selected construction.  If the
 mouse selection is pointing to nowhere when any command of this
 hierarchy is invoked, it displays @samp{SELECT CONSTRUCTION} on the
-message line.
+message line and sets the mouse cursor to @code{UNAVAILABLE}.
+Otherwise, the mouse cursor is set to @code{LINK}, unless an input
+command is applicable, in which case it's set to @code{QUESTION}.
 
 @center @kbd{C>FBEICP}
 
@@ -2905,7 +2923,8 @@ construction use which extension (if any) and what it means is described
 throughout @ref{Foregrounds}.  On that ground, the behavior of this
 command depends upon the selected construction's foreground.  If the
 selected con doesn't use any extension @samp{NO@tie{}EXTENSION} is
-displayed on the message line.
+displayed on the message line and the mouse cursor is set to
+@code{UNAVAILABLE}.
 
 @node Item extension E>CE
 @subsubsection Item
@@ -3158,10 +3177,10 @@ restores it to the state it had before this command invocation.
 
 This command is used to find out which events are associated with the
 selected door.  If the mouse selection is not over a door it displays
-@samp{SELECT DOOR} on the message line.  As soon as a door is selected
-this command turns into a list input whose parameter @var{i} and second
-index run through the associated events (the first index is disabled).
-@xref{List input}.
+@samp{SELECT DOOR} on the message line and sets the mouse cursor to
+@code{UNAVAILABLE}.  As soon as a door is selected this command turns
+into a list input whose parameter @var{i} and second index run through
+the associated events (the first index is disabled).  @xref{List input}.
 
 @center @kbd{ER>EVENT i <>}
 
@@ -3178,10 +3197,11 @@ associated with any events, @var{I} is replaced by the string
 
 This command is used to associate an event to a selected door.  If the
 mouse selection is not over a door it displays @samp{SELECT DOOR} on the
-message line.  As soon as a door is selected this command turns into an
-integer input whose parameter @var{i} is an event number, and the
-auxiliary boolean @var{n} represents the @emph{next} field status of the
-respective event.  @xref{Integer input}.
+message line and sets the mouse cursor to @code{UNAVAILABLE}.  As soon
+as a door is selected this command turns into an integer input whose
+parameter @var{i} is an event number, and the auxiliary boolean @var{n}
+represents the @emph{next} field status of the respective event.
+@xref{Integer input}.
 
 @center @kbd{ES>EVENT 0-255:i n}
 
@@ -3668,11 +3688,13 @@ characteristics.
 All actions apply to the currently selected guard, whose index @var{j}
 is shown by all commands of this hierarchy.  Before being able to
 perform further actions upon a guard it has to be enabled.  This is done
-by selecting the guard's type.  @xref{Type E>GT}.  If a guard is
-disabled, attempts to execute any other command will fail showing
-@samp{DISABLED GUARD} on the message line.  While commands of this
-hierarchy are active, darker semi-transparent images of the guards are
-shown in their starting place, above all constructions and characters.
+by selecting the guard's type.  @xref{Type E>GT}.  If the currently
+selected guard is disabled, the mouse cursor is set to
+@code{UNAVAILABLE} and attempts to execute any other command will fail
+showing @samp{DISABLED GUARD} on the message line.  While commands of
+this hierarchy are active, darker semi-transparent images of the guards
+are shown in their starting place, above all constructions and
+characters.
 
 @node Select guard E>GG
 @subsection Select guard: E>GG
