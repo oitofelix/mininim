@@ -65,7 +65,8 @@ editor (void)
      {'B', "BACKGROUND>"},
      {'E', "EXTENSION*"},
      {'I', "INFO"},
-     {'R', "CLEAR"},
+     {'A', "CLEAR"},
+     {'R', "RANDOM"},
      {'C', "COPY"},
      {'P', "PASTE"},
      {0}};
@@ -173,7 +174,8 @@ editor (void)
      {'L', "ROOM LINKING>"},
      {'S', "LINKING SETTINGS<"},
      {'X', "EXCHANGE ROOM<"},
-     {'R', "CLEAR"},
+     {'A', "CLEAR"},
+     {'R', "RANDOM"},
      {'C', "COPY"},
      {'P', "PASTE"},
      {0}};
@@ -322,11 +324,19 @@ editor (void)
     case 'B': edit = EDIT_BG; break;
     case 'E': edit = EDIT_EXT; break;
     case 'I': edit = EDIT_INFO; break;
-    case 'R':
+    case 'A':
       destroy_con_at_pos (&p);
       con (&p)->fg = NO_FLOOR;
       con (&p)->bg = NO_BG;
-      con (&p)->bg = NO_ITEM;
+      con (&p)->ext.item = NO_ITEM;
+      break;
+    case 'R':
+      destroy_con_at_pos (&p);
+      con (&p)->fg = prandom (ARCH_TOP_SMALL);
+      con (&p)->bg = prandom (BALCONY);
+      con (&p)->ext.item = NO_ITEM;
+      register_con_at_pos (&p);
+      prepare_con_at_pos (&p);
       break;
     case 'C':
       con_copy = *con (&p);
@@ -822,14 +832,28 @@ editor (void)
     case 'X':
       get_mouse_coord (&last_mouse_coord);
       edit = EDIT_ROOM_EXCHANGE; break;
-    case 'R':
+    case 'A':
       p0.room = room_view;
       for (p0.floor = 0; p0.floor < FLOORS; p0.floor++)
         for (p0.place = 0; p0.place < PLACES; p0.place++) {
           destroy_con_at_pos (&p0);
           con (&p0)->fg = NO_FLOOR;
           con (&p0)->bg = NO_BG;
-          con (&p0)->bg = NO_ITEM;
+          con (&p0)->ext.item = NO_ITEM;
+        }
+      update_wall_cache (room_view, em, vm);
+      create_mirror_bitmaps (room_view, room_view);
+      compute_stars_position (room_view, room_view);
+      break;
+    case 'R':
+      p0.room = room_view;
+      for (p0.floor = 0; p0.floor < FLOORS; p0.floor++)
+        for (p0.place = 0; p0.place < PLACES; p0.place++) {
+          destroy_con_at_pos (&p0);
+          con (&p0)->fg = prandom (ARCH_TOP_SMALL);
+          con (&p0)->bg = prandom (BALCONY);
+          con (&p0)->ext.item = NO_ITEM;
+          register_con_at_pos (&p0);
         }
       update_wall_cache (room_view, em, vm);
       create_mirror_bitmaps (room_view, room_view);

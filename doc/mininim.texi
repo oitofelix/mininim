@@ -2740,7 +2740,7 @@ message line and sets the mouse cursor to @code{UNAVAILABLE}.
 Otherwise, the mouse cursor is set to @code{LINK}, unless an input
 command is applicable, in which case it's set to @code{QUESTION}.
 
-@center @kbd{C>FBEICP}
+@center @kbd{C>FBEIARCP}
 
 @node Foreground E>CF
 @subsection Foreground: E>CF
@@ -3072,19 +3072,33 @@ of the selected construction in the following format:
 Where @var{FG}, @var{BG} and @var{EXT} are the string representation of
 the selected con's foreground, background and extension, respectively.
 
-@node Clear E>CR
-@subsection Clear: E>CR
+@node Clear E>CA
+@subsection Clear: E>CA
 @cindex level editor, clear construction
 @cindex construction clear, level editor
 @cindex clear construction, level editor
-@mcindex E>CR
+@mcindex E>CA
 
 This non-input command immediately sets the selected construction to
 @code{NO_FLOOR/NO_BG}, making the place empty.  The user may keep the
 respective command key pressed while moving the mouse selection around
 to easily empty an wider region, as described in @ref{Mouse selection}.
 To clear the constructions of an entire room at once see @ref{Clear
-E>RR}.
+E>RA}.
+
+@node Random E>CR
+@subsection Random: E>CR
+@cindex level editor, random construction
+@cindex construction random, level editor
+@cindex random construction, level editor
+@mcindex E>CR
+
+This non-input command immediately sets the selected construction
+randomly to any possible combination of foreground and background.  The
+user may keep the respective command key pressed while moving the mouse
+selection around to easily randomize an wider region, as described in
+@ref{Mouse selection}.  To randomize the constructions of an entire room
+at once see @ref{Random E>RR}.
 
 @node Copy E>CC
 @subsection Copy: E>CC
@@ -3305,7 +3319,7 @@ other room linking to room B from the same direction.
 This non-terminal command has sub-commands for handling room linking,
 room constructions as a whole and navigating through rooms.
 
-@center @kbd{R>JLSXRCP}
+@center @kbd{R>JLSXARCP}
 
 Room 0 links are never modified implicitly (not even by linking
 policies), and can only be changed by explicitly using the room linking
@@ -3430,17 +3444,30 @@ currently displayed room and keeps it on display, while @kbd{/} cancels
 the exchange and reverts back to the room displayed before this command
 invocation.
 
-@node Clear E>RR
-@subsection Clear: E>RR
+@node Clear E>RA
+@subsection Clear: E>RA
 @cindex level editor, room clear
 @cindex clear room, level editor
 @cindex room clear, level editor
-@mcindex E>RR
+@mcindex E>RA
 
 This non-input command immediately sets the constructions of the
 currently displayed room to @code{NO_FLOOR/NO_BG}, making the room
 empty.  Useful if the user wants to construct a room from scratch.  To
-clear just a strict sub-region of a room see @ref{Clear E>CR}.
+clear just a strict sub-region of a room see @ref{Clear E>CA}.
+
+@node Random E>RR
+@subsection Random: E>RR
+@cindex level editor, room randomization
+@cindex randomization room, level editor
+@cindex room randomization, level editor
+@mcindex E>RR
+
+This non-input command immediately sets the constructions of the
+currently displayed room randomly to any possible combination of
+foreground and background.  Useful if the user doesn't have an initial
+idea for how the room should look like.  To randomize just a strict
+sub-region of a room see @ref{Random E>CR}.
 
 @node Copy E>RC
 @subsection Copy: E>RC
