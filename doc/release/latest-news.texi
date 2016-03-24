@@ -68,4 +68,6 @@ draw cycles being skipped.
 @item Sometimes the crossing mirror sound is played more than once.
 @item Shadow's sword isn't white.
 @item Mirror is not fully opaque.
+@item Approximately 25% of the time balcony stars don't respect the
+paused game state.
 @end itemize

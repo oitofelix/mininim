@@ -130,7 +130,7 @@ static void
 draw_stars (ALLEGRO_BITMAP *bitmap, struct star s[], struct stars_bitmap *sb,
             size_t count, enum vm vm)
 {
-  if (anim_cycle % 4) {
+  if (anim_cycle % 4 || game_paused) {
     draw_bitmapc (sb->b, bitmap, &sb->c, 0);
     return;
   }
