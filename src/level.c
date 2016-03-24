@@ -29,6 +29,7 @@ struct level *vanilla_level;
 struct level level;
 static int last_auto_show_time;
 static ALLEGRO_TIMER *death_timer;
+static bool ignore_level_cutscene;
 
 bool no_room_drawing, game_paused, step_one_cycle;
 int room_view;
@@ -92,12 +93,14 @@ play_level (struct level *lv)
     destroy_cons ();
     draw_bottom_text (NULL, NULL);
    goto start;
+  case PREVIOUS_LEVEL:
   case NEXT_LEVEL:
     destroy_anims ();
     destroy_cons ();
-    if (level.next_level) level.next_level (level.number + 1);
+    int d = (quit_anim == PREVIOUS_LEVEL) ? -1 : +1;
+    if (level.next_level) level.next_level (level.number + d);
     draw_bottom_text (NULL, NULL);
-    if (level.cutscene) {
+    if (level.cutscene && ! ignore_level_cutscene) {
       cutscene_started = false;
       cutscene = true;
       stop_video_effect ();
@@ -108,6 +111,7 @@ play_level (struct level *lv)
 
       if (quit_anim == RESTART_GAME) goto restart_game;
     }
+    ignore_level_cutscene = false;
     goto start;
   case RESTART_GAME:
   restart_game:
@@ -434,8 +438,16 @@ process_keys (void)
     quit_anim = RESTART_LEVEL;
 
   /* SHIFT+L: warp to next level */
-  if (was_key_pressed (ALLEGRO_KEY_L, 0, ALLEGRO_KEYMOD_SHIFT, true))
+  if (was_key_pressed (ALLEGRO_KEY_L, 0, ALLEGRO_KEYMOD_SHIFT, true)) {
+    ignore_level_cutscene = true;
     quit_anim = NEXT_LEVEL;
+  }
+
+  /* SHIFT+M: warp to previous level */
+  if (was_key_pressed (ALLEGRO_KEY_M, 0, ALLEGRO_KEYMOD_SHIFT, true)) {
+    ignore_level_cutscene = true;
+    quit_anim = PREVIOUS_LEVEL;
+  }
 
   /* C: show direct coordinates */
   if (! active_menu

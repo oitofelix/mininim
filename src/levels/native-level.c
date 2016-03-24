@@ -31,7 +31,8 @@ play_native_level (int number)
 void
 next_native_level (int number)
 {
-  if (number < 1 || number > 14) number = 1;
+  if (number < 1) number = 14;
+  else if (number > 14) number = 1;
   load_native_level (number, &native_level);
 }
 

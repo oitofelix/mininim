@@ -26,14 +26,23 @@
 @item Uniform and non-intrusive bottom-line menu interface.
 @item Native level format.
 @item Add 7 styles for skeleton and shadow for symmetry with guards.
-@item New default value for @option{--level-module} option: @samp{NATIVE}.
-@item Data files looked for first in the user data directory.
 @item Add option @option{--convert-levels} to batch convert legacy formats to
 the native format.
 @item Guards can back off in refraction periods.
+@item Add @kbd{SHIFT+M} previous level command key binding.
+@end itemize
+
+@noindent @strong{Behavior changes:}
+
+@itemize
+@item New default value for @option{--level-module} option: @samp{NATIVE}.
+@item Data files looked for first in the user data directory, where
+native levels are saved by the level editor in order to make it easier
+to work with.
 @item LEVELS.DAT loading path changed from resources directory to
 working directory, to make this legacy mechanism compatible with
 symbolic links.
+@item @kbd{SHIFT+L} doesn't play level cut-scenes anymore, for faster progression.
 @end itemize
 
 @noindent @strong{Bug fixes:}

@@ -320,7 +320,8 @@ struct video_effect {
 typedef ALLEGRO_COLOR (*palette) (ALLEGRO_COLOR c);
 
 enum quit_anim {
-  NO_QUIT, RESTART_LEVEL, NEXT_LEVEL, RESTART_GAME, QUIT_GAME, OUT_OF_TIME
+  NO_QUIT, RESTART_LEVEL, NEXT_LEVEL, PREVIOUS_LEVEL, RESTART_GAME,
+  QUIT_GAME, OUT_OF_TIME
 };
 
 struct audio_sample {

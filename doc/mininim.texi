@@ -1474,6 +1474,11 @@ counterpart.  @xref{Configuration}.
 @item SHIFT+L
 Warp to next level.  Related to option @option{--start-level}.
 
+@kindex SHIFT+M
+@cindex @code{--start-level}, related key binding
+@item SHIFT+M
+Warp to previous level.  Related to option @option{--start-level}.
+
 @kindex CTRL+A
 @item CTRL+A
 Restart level.
@@ -1999,10 +2004,11 @@ levels for accessing the engine robustness.  The default is
 
 @optindex --start-level
 @cindex @kbd{SHIFT+L}, related option
+@cindex @kbd{SHIFT+M}, related option
 @item --start-level=N
 Make the kid start at level @var{n}.  The default is @samp{1}.  Valid
 integers range from @samp{1} to @code{INT_MAX}.  This can be changed
-in-game by the @kbd{SHIFT+L} key binding.
+in-game by the @kbd{SHIFT+L} and @kbd{SHIFT+M} key binding.
 
 @optindex --start-pos
 @cindex position, option

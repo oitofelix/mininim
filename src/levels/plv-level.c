@@ -29,7 +29,8 @@ play_plv_level (int number)
 void
 next_plv_level (int number)
 {
-  if (number < 1 || number > 14) number = 1;
+  if (number < 1) number = 14;
+  else if (number > 14) number = 1;
   load_plv_level (number);
 }
 

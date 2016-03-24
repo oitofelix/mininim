@@ -674,7 +674,8 @@ legacy_level_end (struct pos *p)
 void
 next_legacy_level (int number)
 {
-  if (number < 1 || number > 14) number = 1;
+  if (number < 1) number = 14;
+  else if (number > 14) number = 1;
   load_legacy_level (number);
 }
 

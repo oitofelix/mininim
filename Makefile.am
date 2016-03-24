@@ -85,7 +85,6 @@ mininim_SOURCES = src/mininim.c src/mininim.h src/constants.h					\
 		src/guard/guard-attack.c src/guard/guard-attack.h									\
 		src/guard/guard-defense.c src/guard/guard-defense.h								\
 		src/levels/native-level.c src/levels/native-level.h								\
-		src/levels/level-1.c src/levels/level-1.h													\
 		src/levels/consistency-level.c src/levels/consistency-level.h			\
 		src/levels/legacy-level.c src/levels/legacy-level.h								\
 		src/levels/dat-level.c src/levels/dat-level.h											\
