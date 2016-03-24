@@ -65,6 +65,7 @@ editor (void)
      {'B', "BACKGROUND>"},
      {'E', "EXTENSION*"},
      {'I', "INFO"},
+     {'R', "CLEAR"},
      {'C', "COPY"},
      {'P', "PASTE"},
      {0}};
@@ -321,6 +322,12 @@ editor (void)
     case 'B': edit = EDIT_BG; break;
     case 'E': edit = EDIT_EXT; break;
     case 'I': edit = EDIT_INFO; break;
+    case 'R':
+      destroy_con_at_pos (&p);
+      con (&p)->fg = NO_FLOOR;
+      con (&p)->bg = NO_BG;
+      con (&p)->bg = NO_ITEM;
+      break;
     case 'C':
       con_copy = *con (&p);
       editor_msg ("COPIED", 12);

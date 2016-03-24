@@ -3066,6 +3066,20 @@ of the selected construction in the following format:
 Where @var{FG}, @var{BG} and @var{EXT} are the string representation of
 the selected con's foreground, background and extension, respectively.
 
+@node Clear E>CR
+@subsection Clear: E>CR
+@cindex level editor, clear construction
+@cindex construction clear, level editor
+@cindex clear construction, level editor
+@mcindex E>CR
+
+This non-input command immediately sets the selected construction to
+@code{NO_FLOOR/NO_BG}, making the place empty.  The user may keep the
+respective command key pressed while moving the mouse selection around
+to easily empty an wider region, as described in @ref{Mouse selection}.
+To clear the constructions of an entire room at once see @ref{Clear
+E>RR}.
+
 @node Copy E>CC
 @subsection Copy: E>CC
 @cindex level editor, construction copy
@@ -3419,7 +3433,8 @@ invocation.
 
 This non-input command immediately sets the constructions of the
 currently displayed room to @code{NO_FLOOR/NO_BG}, making the room
-empty.  Useful if the user wants to construct a room from scratch.
+empty.  Useful if the user wants to construct a room from scratch.  To
+clear just a strict sub-region of a room see @ref{Clear E>CR}.
 
 @node Copy E>RC
 @subsection Copy: E>RC
