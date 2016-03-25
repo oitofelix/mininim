@@ -599,6 +599,33 @@ peqr (struct pos *p0, struct pos *p1, int floor, int place)
   return peq (p0, prel (p1, &np, floor, place));
 }
 
+struct pos *
+reflect_pos_h (struct pos *p0, struct pos *p1)
+{
+  p1->room = p0->room;
+  p1->floor = p0->floor;
+  p1->place = (PLACES - 1) - p0->place;
+  return p1;
+}
+
+struct pos *
+reflect_pos_v (struct pos *p0, struct pos *p1)
+{
+  p1->room = p0->room;
+  p1->floor = (FLOORS - 1) - p0->floor;
+  p1->place = p0->place;
+  return p1;
+}
+
+struct pos *
+random_pos (struct pos *p)
+{
+  p->room = prandom (ROOMS - 1);
+  p->floor = prandom (FLOORS - 1);
+  p->place = prandom (PLACES - 1);
+  return p;
+}
+
 double
 dist_coord (struct coord *a, struct coord *b)
 {

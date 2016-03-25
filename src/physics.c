@@ -283,6 +283,96 @@ is_pos_at_event (int e, void *_p)
   return peq (&level.event[e].p, p);
 }
 
+void
+exchange_event_pos (struct pos *p0, struct pos *p1)
+{
+  int i;
+  for (i = 0; i < EVENTS; i++)
+    if (peq (&level.event[i].p, p0))
+      level.event[i].p = *p1;
+    else if (peq (&level.event[i].p, p1))
+      level.event[i].p = *p0;
+}
+
+void
+exchange_guard_pos (struct pos *p0, struct pos *p1, bool invert_dir)
+{
+  int i;
+  for (i = 0; i < GUARDS; i++)
+    if (peq (&level.guard[i].p, p0)) {
+      level.guard[i].p = *p1;
+      if (invert_dir)
+        level.guard[i].dir = level.guard[i].dir == LEFT ? RIGHT : LEFT;
+    } else if (peq (&level.event[i].p, p1)) {
+      level.guard[i].p = *p0;
+      if (invert_dir)
+        level.guard[i].dir = level.guard[i].dir == LEFT ? RIGHT : LEFT;
+    }
+}
+
+void
+exchange_kid_start_pos (struct pos *p0, struct pos *p1, bool invert_dir)
+{
+  if (peq (&level.start_pos, p0)) {
+    level.start_pos = *p1;
+    if (invert_dir)
+      level.start_dir = level.start_dir == LEFT ? RIGHT : LEFT;
+  } else if (peq (&level.start_pos, p1)) {
+    level.start_pos = *p0;
+    if (invert_dir)
+      level.start_dir = level.start_dir == LEFT ? RIGHT : LEFT;
+  }
+}
+
+void
+exchange_anim_pos (struct pos *p0, struct pos *p1, bool invert_dir)
+{
+  int i;
+  for (i = 0; i < anima_nmemb; i++) {
+    struct anim *a = &anima[i];
+
+    struct coord m; struct pos np, p;
+    survey (_m, pos, &a->f, &m, &p, &np);
+
+    if (peq (&p, p0)) {
+      place_at_pos (&a->f, _m, p1, &a->f.c);
+      place_on_the_ground (&a->f, &a->f.c);
+      if (invert_dir) {
+        a->f.dir = (a->f.dir == LEFT) ? RIGHT : LEFT;
+        a->f.flip ^= ALLEGRO_FLIP_HORIZONTAL;
+      }
+    } else if (peq (&p, p1)) {
+      place_at_pos (&a->f, _m, p0, &a->f.c);
+      place_on_the_ground (&a->f, &a->f.c);
+      if (invert_dir) {
+        a->f.dir = (a->f.dir == LEFT) ? RIGHT : LEFT;
+        a->f.flip ^= ALLEGRO_FLIP_HORIZONTAL;
+      }
+    }
+  }
+}
+
+void
+exchange_pos (struct pos *p0, struct pos *p1, bool prepare, bool invert_dir)
+{
+  if (peq (p0, p1)) return;
+  struct con con0 = *con (p0);
+  struct con con1 = *con (p1);
+  destroy_con_at_pos (p0);
+  destroy_con_at_pos (p1);
+  *con (p0) = con1;
+  *con (p1) = con0;
+  register_con_at_pos (p0);
+  register_con_at_pos (p1);
+  if (prepare) {
+    prepare_con_at_pos (p0);
+    prepare_con_at_pos (p1);
+  }
+  exchange_event_pos (p0, p1);
+  exchange_guard_pos (p0, p1, invert_dir);
+  exchange_kid_start_pos (p0, p1, invert_dir);
+  exchange_anim_pos (p0, p1, invert_dir);
+}
 
 
 

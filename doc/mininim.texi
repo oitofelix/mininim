@@ -2740,7 +2740,7 @@ message line and sets the mouse cursor to @code{UNAVAILABLE}.
 Otherwise, the mouse cursor is set to @code{LINK}, unless an input
 command is applicable, in which case it's set to @code{QUESTION}.
 
-@center @kbd{C>FBEIARCP}
+@center @kbd{C>FBEIARHCP}
 
 @node Foreground E>CF
 @subsection Foreground: E>CF
@@ -3100,6 +3100,49 @@ selection around to easily randomize an wider region, as described in
 @ref{Mouse selection}.  To randomize the constructions of an entire room
 at once see @ref{Random E>RR}.
 
+@node Exchange cons E>CH
+@subsection Exchange cons: E>CH
+@cindex level editor, construction exchange
+@cindex construction exchange, level editor
+@mcindex E>CH
+
+This non-terminal command has sub-commands for exchanging two
+construction (swapping places) in their entirety: foreground, background
+and extension.  If any of the following positions are referencing either
+of the exchanging places, they are updated to point to the exchanged
+places.
+
+@itemize
+@item event position
+@item guard starting position
+@item kid starting position
+@item character instance position
+@end itemize
+
+Each sub-command is non-input and represents a particular place mapping.
+
+@center @kbd{CH>HVR}
+
+Every sub-command works in the same way: they immediately exchange the
+selected construction with the one given by its particular mapping.
+These sub-commands have the following meanings:
+
+@table @kbd
+@mcindex E>CHH
+@item H
+horizontal reflection.  Inverts the start facing direction of guards and
+the kid, and current facing direction of character instances as well.
+@mcindex E>CHV
+@item V
+vertical reflection
+@mcindex E>CHR
+@item R
+random place within the currently selected room
+@end table
+
+To apply the exchange to constructions of an entire room see
+@ref{Exchange cons E>RH}.
+
 @node Copy E>CC
 @subsection Copy: E>CC
 @cindex level editor, construction copy
@@ -3319,7 +3362,7 @@ other room linking to room B from the same direction.
 This non-terminal command has sub-commands for handling room linking,
 room constructions as a whole and navigating through rooms.
 
-@center @kbd{R>JLSXARCP}
+@center @kbd{R>JLSXARHCP}
 
 Room 0 links are never modified implicitly (not even by linking
 policies), and can only be changed by explicitly using the room linking
@@ -3468,6 +3511,49 @@ currently displayed room randomly to any possible combination of
 foreground and background.  Useful if the user doesn't have an initial
 idea for how the room should look like.  To randomize just a strict
 sub-region of a room see @ref{Random E>CR}.
+
+@node Exchange cons E>RH
+@subsection Exchange cons: E>RH
+@cindex level editor, room construction exchange
+@cindex room construction exchange, level editor
+@mcindex E>RH
+
+This non-terminal command has sub-commands for exchanging all room
+constructions (swapping places) in their entirety: foreground,
+background and extension.  If any of the following positions are
+referencing either of the exchanging places, they are updated to point
+to the exchanged places.
+
+@itemize
+@item event position
+@item guard starting position
+@item kid starting position
+@item character instance position
+@end itemize
+
+Each sub-command is non-input and represents a particular place mapping.
+
+@center @kbd{RH>HVR}
+
+Every sub-command works in the same way: they immediately exchange the
+constructions of the currently displayed room according to their
+particular mapping.  These sub-commands have the following meanings:
+
+@table @kbd
+@mcindex E>RHH
+@item H
+horizontal reflection.  Inverts the start facing direction of guards and
+the kid, and current facing direction of character instances as well.
+@mcindex E>RHV
+@item V
+vertical reflection
+@mcindex E>RHR
+@item R
+random place within the currently selected room
+@end table
+
+To apply the exchange to just a couple of constructions see
+@ref{Exchange cons E>CH}.
 
 @node Copy E>RC
 @subsection Copy: E>RC

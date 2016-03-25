@@ -48,6 +48,9 @@ int cpos (struct pos *p0, struct pos *p1);
 int ccoord (struct coord *c0, struct coord *c1);
 bool peq (struct pos *p0, struct pos *p1);
 bool peqr (struct pos *p0, struct pos *p1, int floor, int place);
+struct pos *reflect_pos_h (struct pos *p0, struct pos *p1);
+struct pos *reflect_pos_v (struct pos *p0, struct pos *p1);
+struct pos *random_pos (struct pos *p);
 double dist_coord (struct coord *a, struct coord *b);
 struct frame *place_frame (struct frame *f, struct frame *nf,
                            ALLEGRO_BITMAP *b, struct pos *p,

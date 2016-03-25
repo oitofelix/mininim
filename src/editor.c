@@ -67,8 +67,15 @@ editor (void)
      {'I', "INFO"},
      {'A', "CLEAR"},
      {'R', "RANDOM"},
+     {'H', "EXCHANGE CONS"},
      {'C', "COPY"},
      {'P', "PASTE"},
+     {0}};
+
+  struct menu_item con_exchange_menu[] =
+    {{'H', "HORIZONTAL"},
+     {'V', "VERTICAL"},
+     {'R', "RANDOM"},
      {0}};
 
   struct menu_item fg_menu[] =
@@ -176,6 +183,7 @@ editor (void)
      {'X', "EXCHANGE ROOM<"},
      {'A', "CLEAR"},
      {'R', "RANDOM"},
+     {'H', "EXCHANGE CONS"},
      {'C', "COPY"},
      {'P', "PASTE"},
      {0}};
@@ -258,7 +266,7 @@ editor (void)
   struct pos p = mouse_pos;
   struct anim *k;
   struct guard *g;
-  struct pos p0;
+  struct pos p0, p1;
 
   char *fg_str = NULL, *bg_str = NULL, *ext_str = NULL;
   bool free_ext_str;
@@ -295,6 +303,7 @@ editor (void)
     draw_bottom_text (NULL, msg);
     if (was_menu_return_pressed ()) msg_cycles = 0;
     memset (&key, 0, sizeof (key));
+    menu_help = 0;
     return;
   }
 
@@ -338,6 +347,7 @@ editor (void)
       register_con_at_pos (&p);
       prepare_con_at_pos (&p);
       break;
+    case 'H': edit = EDIT_CON_EXCHANGE; break;
     case 'C':
       con_copy = *con (&p);
       editor_msg ("COPIED", 12);
@@ -347,6 +357,30 @@ editor (void)
       *con (&p) = con_copy;
       register_con_at_pos (&p);
       prepare_con_at_pos (&p);
+      break;
+    }
+    break;
+  case EDIT_CON_EXCHANGE:
+    if (! is_valid_pos (&p)) {
+      editor_msg ("SELECT CONSTRUCTION", 1);
+      set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
+      break;
+    }
+    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
+    switch (menu_enum (con_exchange_menu, "CH>")) {
+    case -1: case 1: edit = EDIT_CON; break;
+    case 'H':
+      reflect_pos_h (&p, &p0);
+      exchange_pos (&p, &p0, true, true);
+      break;
+    case 'V':
+      reflect_pos_v (&p, &p0);
+      exchange_pos (&p, &p0, true, false);
+      break;
+    case 'R':
+      random_pos (&p0);
+      p0.room = p.room;
+      exchange_pos (&p, &p0, true, false);
       break;
     }
     break;
@@ -859,6 +893,7 @@ editor (void)
       create_mirror_bitmaps (room_view, room_view);
       compute_stars_position (room_view, room_view);
       break;
+    case 'H': edit = EDIT_ROOM_CON_EXCHANGE; break;
     case 'C':
       p0.room = room_view;
       for (p0.floor = 0; p0.floor < FLOORS; p0.floor++)
@@ -873,6 +908,46 @@ editor (void)
           destroy_con_at_pos (&p0);
           *con (&p0) = room_copy[0][p0.floor][p0.place];
           register_con_at_pos (&p0);
+        }
+      update_wall_cache (room_view, em, vm);
+      create_mirror_bitmaps (room_view, room_view);
+      compute_stars_position (room_view, room_view);
+      break;
+    }
+    break;
+  case EDIT_ROOM_CON_EXCHANGE:
+    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
+    switch (menu_enum (con_exchange_menu, "RH>")) {
+    case -1: case 1: edit = EDIT_ROOM; break;
+    case 'H':
+      p0.room = room_view;
+      for (p0.floor = 0; p0.floor < FLOORS; p0.floor++)
+        for (p0.place = 0; p0.place < PLACES / 2; p0.place++) {
+          reflect_pos_h (&p0, &p1);
+          exchange_pos (&p0, &p1, false, true);
+        }
+      update_wall_cache (room_view, em, vm);
+      create_mirror_bitmaps (room_view, room_view);
+      compute_stars_position (room_view, room_view);
+      break;
+    case 'V':
+      p0.room = room_view;
+      for (p0.floor = 0; p0.floor < FLOORS / 2; p0.floor++)
+        for (p0.place = 0; p0.place < PLACES; p0.place++) {
+          reflect_pos_v (&p0, &p1);
+          exchange_pos (&p0, &p1, false, false);
+        }
+      update_wall_cache (room_view, em, vm);
+      create_mirror_bitmaps (room_view, room_view);
+      compute_stars_position (room_view, room_view);
+      break;
+    case 'R':
+      p0.room = room_view;
+      for (p0.floor = 0; p0.floor < FLOORS; p0.floor++)
+        for (p0.place = 0; p0.place < PLACES; p0.place++) {
+          random_pos (&p1);
+          p1.room = p0.room;
+          exchange_pos (&p0, &p1, false, false);
         }
       update_wall_cache (room_view, em, vm);
       create_mirror_bitmaps (room_view, room_view);
