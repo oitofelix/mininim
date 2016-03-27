@@ -21,7 +21,6 @@
 
 ALLEGRO_MOUSE_STATE mouse_state;
 struct pos mouse_pos;
-bool ignore_first_click;
 
 void
 init_mouse (void)
@@ -142,4 +141,20 @@ set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR id)
   if (! al_set_system_mouse_cursor (display, id))
     error (0, 0, "%s (%i): cannot set system mouse cursor",
            __func__, id);
+}
+
+void
+show_mouse_cursor (void)
+{
+  if (! al_show_mouse_cursor (display))
+    error (0, 0, "%s (void): cannot show mouse cursor",
+           __func__);
+}
+
+void
+hide_mouse_cursor (void)
+{
+  if (! al_hide_mouse_cursor (display))
+    error (0, 0, "%s (void): cannot hide mouse cursor",
+           __func__);
 }

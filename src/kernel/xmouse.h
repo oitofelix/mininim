@@ -22,7 +22,6 @@
 
 /* variables */
 extern struct pos mouse_pos;
-extern bool ignore_first_click;
 
 /* functions */
 void init_mouse (void);
@@ -33,5 +32,7 @@ struct pos *get_mouse_pos (struct pos *p);
 void set_mouse_coord (struct coord *c);
 void set_mouse_pos (struct pos *p);
 void set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR id);
+void show_mouse_cursor (void);
+void hide_mouse_cursor (void);
 
 #endif	/* MININIM_XMOUSE_H */

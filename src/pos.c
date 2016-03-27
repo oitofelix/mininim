@@ -48,6 +48,13 @@ link_room (int room0, int room1, enum dir dir)
 }
 
 int
+roomd_n0 (int room, enum dir dir)
+{
+  int r = roomd (room, dir);
+  return r ? r : room;
+}
+
+int
 room_dist (int r0, int r1, int max)
 {
   struct room_dist room[ROOMS];

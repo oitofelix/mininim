@@ -351,8 +351,6 @@ process_keys (void)
 
   struct anim *current_kid = get_anim_by_id (current_kid_id);
 
-  int prev_room = room_view;
-
   /* clear the keyboard buffer at the first cycle, so any key pressed
      on the title doesn't trigger any action */
   if (anim_cycle == 0) {
@@ -612,7 +610,6 @@ process_keys (void)
     draw_bottom_text (NULL, NULL);
   }
 
-  if (room_view == 0) room_view = prev_room;
   camera_follow_kid = (current_kid->f.c.room == room_view)
     ? current_kid->id : -1;
 }

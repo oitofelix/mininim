@@ -1411,10 +1411,19 @@ editor (void)
 }
 
 void
+enter_exit_editor (void)
+{
+  if (edit == EDIT_NONE) enter_editor ();
+  else exit_editor ();
+}
+
+void
 enter_editor (void)
 {
+  if (cutscene) return;
   edit = last_edit;
   memset (&key, 0, sizeof (key));
+  show_mouse_cursor ();
 }
 
 void
@@ -1426,6 +1435,7 @@ exit_editor (void)
   msg_cycles = 0;
   reset_menu ();
   set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
+  hide_mouse_cursor ();
   if (game_paused)
     draw_bottom_text (NULL, "GAME PAUSED");
   else draw_bottom_text (NULL, NULL);

@@ -1760,7 +1760,7 @@ is ``NONE''.  Related to option @option{--display-flip-mode}.
 @kindex SHIFT+K
 @cindex @code{--gamepad-flip-mode}, related key binding
 @item SHIFT+K
-Select keyboard flip mode.  This circulates around the modes: ``NONE'',
+Select gamepad flip mode.  This circulates around the modes: ``NONE'',
 ``VERTICAL'', ``HORIZONTAL'' and ``VERTICAL + HORIZONTAL''.  The default
 is ``NONE''.  Related to option @option{--gamepad-flip-mode}.
 
@@ -1789,6 +1789,10 @@ Toggle sound.  The default is to have sound enabled.  Related to option
 These are key bindings that don't fit in any other category.
 
 @table @kbd
+@kindex F8
+@item F8
+Enable/disable level editor.  @xref{Level editor}.
+
 @kindex CTRL+V
 @cindex @code{--version}, related key binding
 @item CTRL+V
@@ -2147,7 +2151,7 @@ are flipped horizontally.  This is equivalent of specifying both the
 options @option{--display-flip-mode=HORIZONTAL} and
 @option{--gamepad-flip-mode=HORIZONTAL}.  The default is @samp{FALSE}.
 This can be changed in-game by the @kbd{SHIFT+I} and @kbd{SHIFT+K} key
-bindings for the display and keyboard, respectively.
+bindings for the display and gamepad, respectively.
 
 @optindex --video-mode
 @cindex @kbd{F12}, related option
@@ -2491,6 +2495,23 @@ the mouse selection or some object selected using the menu system is
 somehow invalid
 @end table
 
+While the mouse selection is enabled the horizontal and vertical mouse
+wheels may be used to navigate through linked rooms.  Rolling the
+horizontal wheel changes the currently displayed room to the room at
+left or right, depending upon direction.  The vertical wheel works in a
+similar fashion for the rooms above and below.  Holding @kbd{CTRL} while
+rolling either of the wheels invert their meaning, that is, the
+horizontal wheel becomes vertical and vice-versa.  This way, if the
+user's mouse has only one wheel, he can simulate the missing one by
+holding @kbd{CTRL}.  While the mouse selection is enabled, the third
+mouse button (usually the one activated by pressing the vertical wheel)
+sets the currently selected room to the one the kid is in.  It's also
+possible to navigate through linked rooms by using key bindings.
+@xref{Level navigation}.  However, this requires the menu system to be
+disabled first.
+
+The mouse selection honors the display flip mode and the mouse wheels
+honor the gamepad flip mode.  @xref{Peripherals}.
 
 @node Input modes
 @section Input modes
@@ -2710,13 +2731,14 @@ convenient access to the full potential of the engine and its native
 level format without quitting the playing mode, so the user can
 simultaneously build and test the levels.
 
-The level editor is enabled/disabled by clicking with any mouse button
-anywhere in the game screen.  For a more convenient play-editing
-experience, the last menu state is always restored when enabling the
-level editor.  When enabled the mouse selection is always active (see
-@ref{Mouse selection}), the kid can be normally controlled and the game
-can be paused and unpaused freely.  The topmost level editor menu looks
-like this:
+The level editor is enabled/disabled by clicking with the first mouse
+button while the mouse cursor is within the game screen (be it visible
+or not).  Alternatively, the user can use the @kbd{F8} key binding.  For
+a more convenient play-editing experience, the last menu state is always
+restored when enabling the level editor.  When enabled the mouse
+selection is always active (see @ref{Mouse selection}), the kid can be
+normally controlled and the game can be paused and unpaused freely.  The
+topmost level editor menu looks like this:
 
 @center @kbd{CERKGL}
 
@@ -3374,7 +3396,9 @@ surroundings.  @xref{Level navigation}.  As they are available as direct
 alphabetic key bindings, the user should disable the level editor
 temporarily before being able to invoke them.  That shouldn't be a
 problem, though, as the menu system persistence allows for fast
-alternation between these modes.
+alternation between these modes.  Alternatively, the user can navigate
+through linked rooms while the mouse selection is active by using the
+mouse wheels.  @xref{Mouse selection}.
 
 @node Jump to room E>RJ
 @subsection Jump to room: E>RJ

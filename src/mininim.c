@@ -1121,6 +1121,7 @@ main (int _argc, char **_argv)
   load_level ();
   load_cutscenes ();
 
+  hide_mouse_cursor ();
   set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
 
   /* ----------------- */

@@ -38,6 +38,8 @@ play_anim (void (*draw_callback) (void),
 {
   quit_anim = NO_QUIT;
 
+  struct anim *current_kid;
+
   acknowledge_resize ();
   ALLEGRO_EVENT event;
   ALLEGRO_TIMER *timer = create_timer (1.0 / freq);
@@ -130,7 +132,6 @@ play_anim (void (*draw_callback) (void),
       break;
     case ALLEGRO_EVENT_DISPLAY_SWITCH_OUT:
       is_display_focused = false;
-      ignore_first_click = true;
       break;
     case ALLEGRO_EVENT_DISPLAY_SWITCH_IN:
       is_display_focused = true;
@@ -148,21 +149,53 @@ play_anim (void (*draw_callback) (void),
       button = event.joystick.button;
       break;
     case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
-      if (! cutscene && ! ignore_first_click) {
-        if (edit == EDIT_NONE) enter_editor ();
-        else exit_editor ();
-      }
+      current_kid = get_anim_by_id (current_kid_id);
 
-      if (ignore_first_click) ignore_first_click = false;
+      switch (event.mouse.button) {
+      case 1: enter_exit_editor (); break;
+      case 3:
+        if (edit != EDIT_NONE)
+          room_view = current_kid->f.c.room; break;
+      default: break;
+      }
 
       /* struct coord c; get_mouse_coord (&c); */
       /* printf ("%i,%i\n", c.x, c.y); */
+      break;
+    case ALLEGRO_EVENT_MOUSE_AXES:
+      if (edit == EDIT_NONE) break;
+      int dz = event.mouse.dz;  /* vertical */
+      int dw = event.mouse.dw;  /* horizontal */
+
+      ALLEGRO_KEYBOARD_STATE ks;
+
+      al_get_keyboard_state (&ks);
+      bool ctrl = al_key_down (&ks, ALLEGRO_KEY_LCTRL)
+        || al_key_down (&ks, ALLEGRO_KEY_RCTRL);
+
+      if (ctrl) {
+        int dt;
+        dt = dw;
+        dw = dz;
+        dz = dt;
+      }
+
+      if (flip_gamepad_vertical) dz *= -1;
+      if (flip_gamepad_horizontal) dw *= -1;
+
+      if (dz < 0) while (dz++ < 0) room_view = roomd_n0 (room_view, BELOW);
+      else if (dz > 0) while (dz-- > 0) room_view = roomd_n0 (room_view, ABOVE);
+      if (dw < 0) while (dw++ < 0) room_view = roomd_n0 (room_view, LEFT);
+      else if (dw > 0) while (dw-- > 0) room_view = roomd_n0 (room_view, RIGHT);
       break;
     case ALLEGRO_EVENT_KEY_CHAR:
       key = event;
 
       char *text = NULL;
-      int prev_room = room_view;
+
+      /* F8: enable/disable level editor */
+      if (was_key_pressed (ALLEGRO_KEY_F8, 0, 0, true))
+        enter_exit_editor ();
 
       /* H: view room at left (J if flipped horizontally) */
       if (! active_menu
@@ -170,7 +203,7 @@ play_anim (void (*draw_callback) (void),
                && was_key_pressed (ALLEGRO_KEY_H, 0, 0, true))
               || (flip_gamepad_horizontal
                   && was_key_pressed (ALLEGRO_KEY_J, 0, 0, true))))
-        room_view = level.link[room_view].l;
+        room_view = roomd_n0 (room_view, LEFT);
 
       /* J: view room at right (H if flipped horizontally) */
       if (! active_menu
@@ -178,7 +211,7 @@ play_anim (void (*draw_callback) (void),
                && was_key_pressed (ALLEGRO_KEY_J, 0, 0, true))
               || (flip_gamepad_horizontal
                   && was_key_pressed (ALLEGRO_KEY_H, 0, 0, true))))
-        room_view = level.link[room_view].r;
+        room_view = roomd_n0 (room_view, RIGHT);
 
       /* U: view room above (N if flipped vertically) */
       if (! active_menu
@@ -186,7 +219,7 @@ play_anim (void (*draw_callback) (void),
                && was_key_pressed (ALLEGRO_KEY_U, 0, 0, true))
               || (flip_gamepad_vertical
                   && was_key_pressed (ALLEGRO_KEY_N, 0, 0, true))))
-        room_view = level.link[room_view].a;
+        room_view = roomd_n0 (room_view, ABOVE);
 
       /* N: view room below (U if flipped vertically) */
       if (! active_menu
@@ -194,7 +227,7 @@ play_anim (void (*draw_callback) (void),
                && was_key_pressed (ALLEGRO_KEY_N, 0, 0, true))
               || (flip_gamepad_vertical
                   && was_key_pressed (ALLEGRO_KEY_U, 0, 0, true))))
-        room_view = level.link[room_view].b;
+        room_view = roomd_n0 (room_view, BELOW);
 
       /* SHIFT+B: enable/disable room drawing */
       if (was_key_pressed (ALLEGRO_KEY_B, 0, ALLEGRO_KEYMOD_SHIFT, true))
@@ -362,8 +395,6 @@ play_anim (void (*draw_callback) (void),
           create_thread (load_config_dialog, NULL);
         al_start_thread (load_config_dialog_thread);
       }
-
-      if (room_view == 0) room_view = prev_room;
 
       break;
     }
