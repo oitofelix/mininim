@@ -3362,7 +3362,7 @@ other room linking to room B from the same direction.
 This non-terminal command has sub-commands for handling room linking,
 room constructions as a whole and navigating through rooms.
 
-@center @kbd{R>JLSXARHCP}
+@center @kbd{R>JLSXARDHCP}
 
 Room 0 links are never modified implicitly (not even by linking
 policies), and can only be changed by explicitly using the room linking
@@ -3511,6 +3511,19 @@ currently displayed room randomly to any possible combination of
 foreground and background.  Useful if the user doesn't have an initial
 idea for how the room should look like.  To randomize just a strict
 sub-region of a room see @ref{Random E>CR}.
+
+@node Decoration E>RD
+@subsection Decoration: E>RD
+@cindex level editor, room decoration
+@cindex decoration room, level editor
+@cindex room decoration, level editor
+@mcindex E>RD
+
+This non-input command randomly redecorates the currently displayed
+room.  Constructions' foreground, background and extension may be
+changed as long as these changes are purely aesthetical.  Useful if the
+user doesn't have an strict idea for how the room decoration should look
+like.
 
 @node Exchange cons E>RH
 @subsection Exchange cons: E>RH

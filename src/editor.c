@@ -183,6 +183,7 @@ editor (void)
      {'X', "EXCHANGE ROOM<"},
      {'A', "CLEAR"},
      {'R', "RANDOM"},
+     {'D', "DECORATION"},
      {'H', "EXCHANGE CONS"},
      {'C', "COPY"},
      {'P', "PASTE"},
@@ -892,6 +893,12 @@ editor (void)
       update_wall_cache (room_view, em, vm);
       create_mirror_bitmaps (room_view, room_view);
       compute_stars_position (room_view, room_view);
+      break;
+    case 'D':
+      p0.room = room_view;
+      for (p0.floor = 0; p0.floor < FLOORS; p0.floor++)
+        for (p0.place = 0; p0.place < PLACES; p0.place++)
+          decorate_pos (&p0);
       break;
     case 'H': edit = EDIT_ROOM_CON_EXCHANGE; break;
     case 'C':

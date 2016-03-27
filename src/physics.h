@@ -36,6 +36,7 @@ bool strictly_traversable_cs (enum confg t);
 bool traversable_cs (enum confg t);
 bool arch_top_cs (enum confg t);
 bool is_door (struct pos *p);
+bool is_floor (struct pos *p);
 struct pos *first_confg (struct pos *p0, struct pos *p1,
                          confg_set cs, struct pos *p);
 struct pos *next_pos_by_pred (struct pos *p, int dir,
@@ -49,6 +50,7 @@ void exchange_guard_pos (struct pos *p0, struct pos *p1, bool invert_dir);
 void exchange_kid_start_pos (struct pos *p0, struct pos *p1, bool invert_dir);
 void exchange_anim_pos (struct pos *p0, struct pos *p1, bool invert_dir);
 void exchange_pos (struct pos *p0, struct pos *p1, bool prepare, bool invert_dir);
+void decorate_pos (struct pos *p);
 
 
 

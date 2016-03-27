@@ -157,6 +157,22 @@ is_door (struct pos *p)
     || t == LEVEL_DOOR;
 }
 
+bool
+is_floor (struct pos *p)
+{
+  enum confg t = con (p)->fg;
+  return t == NO_FLOOR
+    || t == FLOOR
+    || t == BROKEN_FLOOR
+    || t == SKELETON_FLOOR
+    || t == LOOSE_FLOOR
+    || t == SPIKES_FLOOR
+    || t == OPENER_FLOOR
+    || t == CLOSER_FLOOR
+    || t == STUCK_FLOOR
+    || t == HIDDEN_FLOOR;
+}
+
 struct pos *
 first_confg (struct pos *p0, struct pos *p1, confg_set cs, struct pos *p)
 {
@@ -286,6 +302,7 @@ is_pos_at_event (int e, void *_p)
 void
 exchange_event_pos (struct pos *p0, struct pos *p1)
 {
+  if (peq (p0, p1)) return;
   int i;
   for (i = 0; i < EVENTS; i++)
     if (peq (&level.event[i].p, p0))
@@ -297,6 +314,7 @@ exchange_event_pos (struct pos *p0, struct pos *p1)
 void
 exchange_guard_pos (struct pos *p0, struct pos *p1, bool invert_dir)
 {
+  if (peq (p0, p1)) return;
   int i;
   for (i = 0; i < GUARDS; i++)
     if (peq (&level.guard[i].p, p0)) {
@@ -313,6 +331,7 @@ exchange_guard_pos (struct pos *p0, struct pos *p1, bool invert_dir)
 void
 exchange_kid_start_pos (struct pos *p0, struct pos *p1, bool invert_dir)
 {
+  if (peq (p0, p1)) return;
   if (peq (&level.start_pos, p0)) {
     level.start_pos = *p1;
     if (invert_dir)
@@ -327,6 +346,7 @@ exchange_kid_start_pos (struct pos *p0, struct pos *p1, bool invert_dir)
 void
 exchange_anim_pos (struct pos *p0, struct pos *p1, bool invert_dir)
 {
+  if (peq (p0, p1)) return;
   int i;
   for (i = 0; i < anima_nmemb; i++) {
     struct anim *a = &anima[i];
@@ -374,6 +394,84 @@ exchange_pos (struct pos *p0, struct pos *p1, bool prepare, bool invert_dir)
   exchange_anim_pos (p0, p1, invert_dir);
 }
 
+void
+decorate_pos (struct pos *p)
+{
+  struct con *c = con (p);
+  struct pos np;
+
+  switch (c->fg) {
+  case FLOOR: case BROKEN_FLOOR: case SKELETON_FLOOR:
+    if (c->fg == FLOOR && c->ext.item != NO_ITEM) break;
+    switch (prandom (2)) {
+    case 0: c->fg = FLOOR; break;
+    case 1: c->fg = BROKEN_FLOOR; break;
+    case 2:
+      if (is_traversable (prel (p, &np, +0, -1))) break;
+      c->fg = SKELETON_FLOOR;
+      break;
+    }
+    break;
+  case PILLAR: case BIG_PILLAR_BOTTOM: case ARCH_BOTTOM:
+    if (c->fg == BIG_PILLAR_BOTTOM
+        && crel (p, -1, +0)->fg == BIG_PILLAR_TOP) break;
+    if (c->fg == ARCH_BOTTOM
+        && crel (p, -1, +0)->fg == ARCH_TOP_MID) break;
+    switch (prandom (2)) {
+    case 0: c->fg = PILLAR; break;
+    case 1:
+      if (crel (p, -1, +1)->fg == NO_FLOOR) break;
+      c->fg = BIG_PILLAR_BOTTOM; break;
+    case 2: c->fg = ARCH_BOTTOM; break;
+    }
+    break;
+  default: break;
+  }
+
+  if (c->bg != WINDOW
+      && c->bg != BALCONY) {
+    if (is_floor (p)
+        || c->fg == CHOPPER
+        || c->fg == MIRROR
+        || c->fg == ARCH_BOTTOM) {
+      switch (prandom (4)) {
+      case 0: c->bg = NO_BG; break;
+      case 1: c->bg = BRICKS_01; break;
+      case 2: c->bg = BRICKS_02; break;
+      case 3: c->bg = BRICKS_03; break;
+      case 4: c->bg = TORCH; break;
+      }
+    } else if (c->fg == DOOR) {
+      switch (prandom (4)) {
+      case 0: c->bg = NO_BG; break;
+      case 1: c->bg = BRICKS_01; break;
+      case 2: c->bg = BRICKS_02; break;
+      case 3: c->bg = BRICKS_03; break;
+      }
+    } else if (c->fg == WALL
+               && (wall_correlation (p) == SWS
+                   || wall_correlation (p) == WWS))
+      c->bg = NO_BG;
+    else c->bg = NO_BRICKS;
+  }
+
+  if (is_carpet (p)) {
+    switch (c->ext.design) {
+    case CARPET_00:
+    case CARPET_01:
+      c->ext.design = prandom (1) ? CARPET_00 : CARPET_01;
+      c->bg = NO_BG;
+      break;
+    case ARCH_CARPET_RIGHT_00:
+    case ARCH_CARPET_RIGHT_01:
+      c->ext.design = prandom (1)
+        ? ARCH_CARPET_RIGHT_00 : ARCH_CARPET_RIGHT_01;
+      c->bg = NO_BG;
+      break;
+    default: break;
+    }
+  }
+}
 
 
 
