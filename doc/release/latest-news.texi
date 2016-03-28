@@ -71,4 +71,6 @@ draw cycles being skipped.
 @item Approximately 25% of the time balcony stars don't respect the
 paused game state.
 @item Not all pillar types are rigid.
+@item The game crashes when the option @option{--start-time} receives a
+value lager than the option @option{--time-limit}.
 @end itemize
