@@ -27,6 +27,10 @@ static void draw_lives (ALLEGRO_BITMAP *bitmap, struct anim *k, enum vm vm);
 
 struct level *vanilla_level;
 struct level level;
+struct diffset undo;
+struct level old_level;
+
+static char *undo_msg;
 static int last_auto_show_time;
 static ALLEGRO_TIMER *death_timer;
 static bool ignore_level_cutscene;
@@ -44,11 +48,14 @@ play_level (struct level *lv)
   char *text;
   vanilla_level = lv;
   death_timer = create_timer (1.0 / 12);
+  bool first_play = true;
 
  start:
   cutscene = false;
   game_paused = false;
+  if (! first_play) prepare_level_undo ();
   level = *lv;
+  if (! first_play) register_level_undo ("REPLAY LEVEL");
 
   if (level_module == LEGACY_LEVEL_MODULE
       || level_module == PLV_LEVEL_MODULE
@@ -85,6 +92,8 @@ play_level (struct level *lv)
 
   play_anim (draw_level, compute_level, 12);
 
+  first_play = false;
+
   switch (quit_anim) {
   case NO_QUIT: break;
   case RESTART_LEVEL:
@@ -95,6 +104,8 @@ play_level (struct level *lv)
    goto start;
   case PREVIOUS_LEVEL:
   case NEXT_LEVEL:
+    first_play = true;
+    free_diffset (&undo);
     destroy_anims ();
     destroy_cons ();
     int d = (quit_anim == PREVIOUS_LEVEL) ? -1 : +1;
@@ -356,6 +367,38 @@ process_keys (void)
   if (anim_cycle == 0) {
     memset (&key, 0, sizeof (key));
     button = -1;
+  }
+
+  /* CTRL+Z: undo */
+  if (was_key_pressed (ALLEGRO_KEY_Z, 0, ALLEGRO_KEYMOD_CTRL, true)) {
+    destroy_cons ();
+    bool b = apply_diffset_diff (&undo, (uint8_t *) &level, -1, &text);
+    if (! b) editor_msg ("NO FURTHER UNDO", 24);
+    else {
+      if (undo_msg) al_free (undo_msg);
+      xasprintf (&undo_msg, "UNDO: %s", text);
+      editor_msg (undo_msg, 24);
+    }
+    register_cons ();
+    update_wall_cache (room_view, em, vm);
+    create_mirror_bitmaps (room_view, room_view);
+    compute_stars_position (room_view, room_view);
+  }
+
+  /* CTRL+Y: redo */
+  if (was_key_pressed (ALLEGRO_KEY_Y, 0, ALLEGRO_KEYMOD_CTRL, true)) {
+    destroy_cons ();
+    bool b = apply_diffset_diff (&undo, (uint8_t *) &level, +1, &text);
+    if (! b) editor_msg ("NO FURTHER REDO", 24);
+    else {
+      if (undo_msg) al_free (undo_msg);
+      xasprintf (&undo_msg, "REDO: %s", text);
+      editor_msg (undo_msg, 24);
+    }
+    register_cons ();
+    update_wall_cache (room_view, em, vm);
+    create_mirror_bitmaps (room_view, room_view);
+    compute_stars_position (room_view, room_view);
   }
 
   /* ESC: pause game */
@@ -743,4 +786,17 @@ unpause_game (void)
   memset (&key, 0, sizeof (key));
   button = -1;
   al_start_timer (play_time);
+}
+
+void
+prepare_level_undo (void)
+{
+  old_level = level;
+}
+
+void
+register_level_undo (char *msg)
+{
+  add_diffset_diff (&undo, (uint8_t *) &old_level, (uint8_t *) &level,
+                    sizeof (level), msg);
 }

@@ -1,5 +1,5 @@
 /*
-  editor.h -- editor module;
+  diff.h -- diff module;
 
   Copyright (C) 2015, 2016 Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
 
@@ -17,18 +17,18 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MININIM_EDITOR_H
-#define MININIM_EDITOR_H
+#ifndef MININIM_DIFF_H
+#define MININIM_DIFF_H
 
-/* variables */
-extern enum edit edit;
-extern enum edit last_edit;
+void add_diffset_diff (struct diffset *diffset, uint8_t *ptr0, uint8_t *ptr1,
+                       size_t size, char *desc);
+bool apply_diffset_diff (struct diffset *diffset, uint8_t *base, int dir,
+                         char **desc);
+void free_diffset (struct diffset *diffset);
+void free_diff (struct diff *d);
+void apply_diff (struct diff *d, uint8_t *base, int dir);
+struct diff *diff (uint8_t *ptr0, uint8_t *ptr1, size_t size, struct diff *d,
+                   char *desc);
+void add_diff_line_byte (struct diff_line *l, uint8_t b0, uint8_t b1, size_t offset);
 
-/* functions */
-void editor (void);
-void enter_editor (void);
-void exit_editor (void);
-void enter_exit_editor (void);
-void editor_msg (char *m, uint64_t cycles);
-
-#endif	/* MININIM_EDITOR_H */
+#endif	/* MININIM_DIFF_H */

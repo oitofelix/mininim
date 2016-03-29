@@ -28,6 +28,8 @@ extern int anti_camera_room;
 extern int auto_rem_time_1st_cycle;
 extern bool no_room_drawing, game_paused, step_one_cycle;
 extern struct level *vanilla_level;
+extern struct level old_level;
+extern struct diffset undo;
 
 void load_level (void);
 void unload_level (void);
@@ -42,5 +44,7 @@ void display_remaining_time (void);
 void display_skill (struct anim *k);
 void pause_game (void);
 void unpause_game (void);
+void prepare_level_undo (void);
+void register_level_undo (char *msg);
 
 #endif	/* MININIM_LEVEL_H */

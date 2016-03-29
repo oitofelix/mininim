@@ -61,6 +61,7 @@
 #include "dialog.h"
 #include "threads.h"
 #include "xconfig.h"
+#include "diff.h"
 
 #include "anim.h"
 #include "arch.h"

@@ -25,7 +25,6 @@ static char menu_select_room (enum edit up_edit, char *prefix);
 static char menu_link (enum dir dir);
 static void mouse2guard (int i);
 static char menu_skill (char *prefix, int *skill, int max, enum edit up_edit);
-static void editor_msg (char *m, uint64_t cycles);
 
 static int last_event;
 static struct coord last_mouse_coord;
@@ -440,8 +439,8 @@ editor (void)
         || (c == 'C' && con (&p)->fg == CLOSER_FLOOR))
       break;
 
+    prepare_level_undo ();
     destroy_con_at_pos (&p);
-
     switch (c) {
     case 'N': con (&p)->fg = NO_FLOOR; break;
     case 'F': con (&p)->fg = FLOOR; break;
@@ -454,9 +453,8 @@ editor (void)
     case 'T': con (&p)->fg = STUCK_FLOOR; break;
     case 'H': con (&p)->fg = HIDDEN_FLOOR; break;
     }
-
     register_con_at_pos (&p);
-
+    register_level_undo ("FLOOR");
     break;
   case EDIT_PILLAR:
     if (! is_valid_pos (&p)) {
@@ -472,14 +470,15 @@ editor (void)
       edit = EDIT_FG; break;
     }
 
+    prepare_level_undo ();
     destroy_con_at_pos (&p);
-
     switch (c) {
     case 'P': con (&p)->fg = PILLAR; break;
     case 'T': con (&p)->fg = BIG_PILLAR_TOP; break;
     case 'B': con (&p)->fg = BIG_PILLAR_BOTTOM; break;
     case 'A': con (&p)->fg = ARCH_BOTTOM; break;
     }
+    register_level_undo ("PILLAR");
     break;
   case EDIT_DOOR:
     if (! is_valid_pos (&p)) {
@@ -499,15 +498,14 @@ editor (void)
         || (c == 'L' && con (&p)->fg == LEVEL_DOOR))
       break;
 
+    prepare_level_undo ();
     destroy_con_at_pos (&p);
-
     switch (c) {
     case 'D': con (&p)->fg = DOOR; break;
     case 'L': con (&p)->fg = LEVEL_DOOR; break;
     }
-
     register_con_at_pos (&p);
-
+    register_level_undo ("DOOR");
     break;
   case EDIT_CARPET:
     if (! is_valid_pos (&p)) {
@@ -523,13 +521,13 @@ editor (void)
       edit = EDIT_FG; break;
     }
 
+    prepare_level_undo ();
     destroy_con_at_pos (&p);
-
     switch (c) {
     case 'C': con (&p)->fg = CARPET; break;
     case 'T': con (&p)->fg = TCARPET; break;
     }
-
+    register_level_undo ("CARPET");
     break;
   case EDIT_ARCH:
     if (! is_valid_pos (&p)) {
@@ -545,15 +543,15 @@ editor (void)
       edit = EDIT_FG; break;
     }
 
+    prepare_level_undo ();
     destroy_con_at_pos (&p);
-
     switch (c) {
     case 'M': con (&p)->fg = ARCH_TOP_MID; break;
     case 'S': con (&p)->fg = ARCH_TOP_SMALL; break;
     case 'L': con (&p)->fg = ARCH_TOP_LEFT; break;
     case 'R': con (&p)->fg = ARCH_TOP_RIGHT; break;
     }
-
+    register_level_undo ("ARCH");
     break;
   case EDIT_BG:
     if (! is_valid_pos (&p)) {
@@ -881,6 +879,7 @@ editor (void)
       compute_stars_position (room_view, room_view);
       break;
     case 'R':
+      prepare_level_undo ();
       p0.room = room_view;
       for (p0.floor = 0; p0.floor < FLOORS; p0.floor++)
         for (p0.place = 0; p0.place < PLACES; p0.place++) {
@@ -890,6 +889,7 @@ editor (void)
           con (&p0)->ext.item = NO_ITEM;
           register_con_at_pos (&p0);
         }
+      register_level_undo ("RANDOM ROOM");
       update_wall_cache (room_view, em, vm);
       create_mirror_bitmaps (room_view, room_view);
       compute_stars_position (room_view, room_view);
@@ -1573,10 +1573,12 @@ menu_skill (char *prefix, int *skill, int max, enum edit up_edit)
   return c;
 }
 
-static void
+void
 editor_msg (char *m, uint64_t cycles)
 {
-  msg_cycles = cycles;
-  msg = m;
-  draw_bottom_text (NULL, msg);
+  if (edit != EDIT_NONE) {
+    msg_cycles = cycles;
+    msg = m;
+  }
+  draw_bottom_text (NULL, m);
 }

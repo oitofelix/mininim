@@ -24,6 +24,8 @@
 @itemize
 @item Complete on-the-fly level editor.
 @item Uniform and non-intrusive bottom-line menu interface.
+@item Unlimited undo/redo capability for level playing and editing
+modifications.
 @item Native level format.
 @item Add 7 styles for skeleton and shadow for symmetry with guards.
 @item Add option @option{--convert-levels} to batch convert legacy formats to
@@ -72,5 +74,5 @@ draw cycles being skipped.
 paused game state.
 @item Not all pillar types are rigid.
 @item The game crashes when the option @option{--start-time} receives a
-value lager than the option @option{--time-limit}.
+value larger than the option @option{--time-limit}.
 @end itemize

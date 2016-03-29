@@ -1710,6 +1710,41 @@ Show direct coordinates.
 Show indirect coordinates.
 @end table
 
+@node Level editing key bindings
+@section Level editing
+@cindex level editing key bindings
+@cindex key bindings, level editing
+
+These key bindings are somehow related to level editing.  See @ref{Level
+editor} for in-depth coverage of level editing features.
+
+@table @kbd
+@kindex F8
+@item F8
+Enable/disable level editor.  This can also be accomplished by clicking
+with the first mouse button while the mouse cursor is within the game
+screen boundaries (even if it's not visible).
+
+@kindex CTRL+Z
+@item CTRL+Z
+@cindex undo level modification
+Undo the previous level modification done.  A description of the undone
+modification is displayed on the message line.  If there is no level
+modification to be undone @samp{NO FURTHER UNDO} is displayed on the
+message line.  This key binding can be used regardless of whether the
+level editor is enabled or disabled.
+
+@kindex CTRL+Y
+@item CTRL+Y
+@cindex redo level modification
+Redo the next level modification undone.  A description of the redone
+modification is displayed on the message line.  If there is no level
+modification to be redone @samp{NO FURTHER REDO} is displayed on the
+message line.  This key binding can be used regardless of whether the
+level editor is enabled or disabled.
+@end table
+
+
 @node Files
 @section Files
 @cindex files key bindings
@@ -1789,10 +1824,6 @@ Toggle sound.  The default is to have sound enabled.  Related to option
 These are key bindings that don't fit in any other category.
 
 @table @kbd
-@kindex F8
-@item F8
-Enable/disable level editor.  @xref{Level editor}.
-
 @kindex CTRL+V
 @cindex @code{--version}, related key binding
 @item CTRL+V
@@ -2729,7 +2760,9 @@ easily construct and modify levels on-the-fly, using the menu system
 interface (see @ref{Menu system}).  It gives the user quick and
 convenient access to the full potential of the engine and its native
 level format without quitting the playing mode, so the user can
-simultaneously build and test the levels.
+simultaneously build and test the levels.  MININIM also features
+unlimited undo/redo capability for modifications made to a level by
+playing or editing.  @xref{Level editing key bindings}.
 
 The level editor is enabled/disabled by clicking with the first mouse
 button while the mouse cursor is within the game screen (be it visible

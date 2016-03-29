@@ -203,6 +203,22 @@ struct legacy_level {
   uint8_t signature[2];
 } __attribute__((packed));
 
+struct diffset {
+  struct diff {
+    struct diff_line {
+      uint8_t *forward;
+      uint8_t *backward;
+      size_t size;
+      size_t offset;
+    } *line;
+    size_t count;
+    char *desc;
+  } *diff;
+
+  size_t count;
+  int current;
+};
+
 /* avoid "'struct' declared inside parameter list" error for the
    ACTION definition */
 struct anim *_action;
