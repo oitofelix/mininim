@@ -206,11 +206,12 @@ struct legacy_level {
 struct diffset {
   struct diff {
     struct diff_line {
-      uint8_t *forward;
-      uint8_t *backward;
-      size_t size;
+      void *forward;
+      void *backward;
+      size_t count;
       size_t offset;
     } *line;
+    size_t unit_size;
     size_t count;
     char *desc;
   } *diff;

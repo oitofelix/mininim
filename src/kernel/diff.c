@@ -20,8 +20,8 @@
 #include "mininim.h"
 
 void
-add_diffset_diff (struct diffset *diffset, uint8_t *ptr0, uint8_t *ptr1,
-                  size_t size, char *desc)
+add_diffset_diff (struct diffset *diffset, void *ptr0, void *ptr1,
+                  size_t size, size_t unit_size, char *desc)
 {
   if (! diffset->diff || ! diffset->count) diffset->current = -1;
 
@@ -33,7 +33,7 @@ add_diffset_diff (struct diffset *diffset, uint8_t *ptr0, uint8_t *ptr1,
   diffset->diff = xrealloc (diffset->diff, diffset->count * sizeof (* diffset->diff));
   diffset->current++;
 
-  diff (ptr0, ptr1, size, &diffset->diff[diffset->current], desc);
+  diff (ptr0, ptr1, size, unit_size, &diffset->diff[diffset->current], desc);
 
   if (! diffset->diff[diffset->current].line) {
     diffset->count--;
@@ -43,7 +43,7 @@ add_diffset_diff (struct diffset *diffset, uint8_t *ptr0, uint8_t *ptr1,
 }
 
 bool
-apply_diffset_diff (struct diffset *diffset, uint8_t *base, size_t size,
+apply_diffset_diff (struct diffset *diffset, void *base, size_t size,
                     int dir, char **desc)
 {
   if ((diffset->current == -1 && dir < 0)
@@ -82,27 +82,32 @@ free_diff (struct diff *d)
 }
 
 void
-apply_diff (struct diff *d, uint8_t *base, size_t size, int dir)
+apply_diff (struct diff *d, void *base, size_t size, int dir)
 {
   size_t i;
   for (i = 0; i < d->count; i++) {
     if (d->line[i].offset >= size) return;
-    uint8_t *src = (dir >= 0) ? d->line[i].forward : d->line[i].backward;
-    memcpy (base + d->line[i].offset, src, d->line[i].size);
+    void *src = (dir >= 0) ? d->line[i].forward : d->line[i].backward;
+    memcpy (base + d->line[i].offset, src, d->line[i].count * d->unit_size);
   }
 }
 
 struct diff *
-diff (uint8_t *ptr0, uint8_t *ptr1, size_t size, struct diff *d, char *desc)
+diff (void *ptr0, void *ptr1, size_t size, size_t unit_size,
+      struct diff *d, char *desc)
 {
   d->line = NULL;
   d->count = 0;
   d->desc = desc;
+  d->unit_size = unit_size;
+
+  uint8_t *_ptr0 = ptr0;
+  uint8_t *_ptr1 = ptr1;
 
   bool prev_diff = false;
   size_t i;
-  for (i = 0; i < size; i++) {
-    if (ptr0[i] == ptr1[i]) {
+  for (i = 0; i < size; i += unit_size) {
+    if (! memcmp (&_ptr0[i], &_ptr1[i], unit_size)) {
       prev_diff = false;
       continue;
     }
@@ -114,7 +119,7 @@ diff (uint8_t *ptr0, uint8_t *ptr1, size_t size, struct diff *d, char *desc)
       d->line[d->count - 1].offset = i;
     }
 
-    add_diff_line_byte (&d->line[d->count - 1], ptr0[i], ptr1[i]);
+    add_diff_line_unit (&d->line[d->count - 1], &_ptr0[i], &_ptr1[i], unit_size);
 
     prev_diff = true;
   }
@@ -123,11 +128,13 @@ diff (uint8_t *ptr0, uint8_t *ptr1, size_t size, struct diff *d, char *desc)
 }
 
 void
-add_diff_line_byte (struct diff_line *l, uint8_t b0, uint8_t b1)
+add_diff_line_unit (struct diff_line *l, void *d0, void *d1, size_t unit_size)
 {
-  l->size++;
-  l->forward = xrealloc (l->forward, l->size * sizeof (* l->forward));
-  l->backward = xrealloc (l->backward, l->size * sizeof (* l->backward));
-  l->forward[l->size - 1] = b1;
-  l->backward[l->size - 1] = b0;
+  l->count++;
+  l->forward = xrealloc (l->forward, l->count * unit_size);
+  l->backward = xrealloc (l->backward, l->count * unit_size);
+  uint8_t *f = l->forward;
+  uint8_t *b = l->backward;
+  memcpy (&f[(l->count - 1) * unit_size], d1, unit_size);
+  memcpy (&b[(l->count - 1) * unit_size], d0, unit_size);
 }

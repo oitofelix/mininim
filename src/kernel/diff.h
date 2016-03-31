@@ -20,15 +20,16 @@
 #ifndef MININIM_DIFF_H
 #define MININIM_DIFF_H
 
-void add_diffset_diff (struct diffset *diffset, uint8_t *ptr0, uint8_t *ptr1,
-                       size_t size, char *desc);
-bool apply_diffset_diff (struct diffset *diffset, uint8_t *base, size_t size,
+void add_diffset_diff (struct diffset *diffset, void *ptr0, void *ptr1,
+                       size_t size, size_t unit_size, char *desc);
+bool apply_diffset_diff (struct diffset *diffset, void *base, size_t size,
                          int dir, char **desc);
 void free_diffset (struct diffset *diffset);
 void free_diff (struct diff *d);
-void apply_diff (struct diff *d, uint8_t *base, size_t size, int dir);
-struct diff *diff (uint8_t *ptr0, uint8_t *ptr1, size_t size, struct diff *d,
-                   char *desc);
-void add_diff_line_byte (struct diff_line *l, uint8_t b0, uint8_t b1);
+void apply_diff (struct diff *d, void *base, size_t size, int dir);
+struct diff *diff (void *ptr0, void *ptr1, size_t size, size_t unit_size,
+                   struct diff *d, char *desc);
+void add_diff_line_unit (struct diff_line *l, void *b0, void *b1,
+                         size_t unit_size);
 
 #endif	/* MININIM_DIFF_H */

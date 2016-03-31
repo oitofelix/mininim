@@ -783,8 +783,8 @@ prepare_play_level_undo (void)
 void
 register_play_level_undo (char *msg)
 {
-  add_diffset_diff (&play_level_undo, (uint8_t *) &old_level, (uint8_t *) &level,
-                    sizeof (level), msg);
+  add_diffset_diff (&play_level_undo, &old_level, &level,
+                    sizeof (level), sizeof (int), msg);
 }
 
 void
@@ -796,8 +796,8 @@ prepare_edit_level_undo (void)
 void
 register_edit_level_undo (char *msg)
 {
-  add_diffset_diff (&edit_level_undo, (uint8_t *) &old_level, (uint8_t *) &level,
-                    sizeof (level), msg);
+  add_diffset_diff (&edit_level_undo, &old_level, &level,
+                    sizeof (level), sizeof (int), msg);
 }
 
 void
@@ -807,8 +807,7 @@ level_undo (struct diffset *diffset, int dir, char *prefix)
   char *dir_str = (dir >= 0) ? "REDO" : "UNDO";
 
   destroy_cons ();
-  bool b = apply_diffset_diff (diffset, (uint8_t *) &level,
-                               sizeof (level), dir, &text);
+  bool b = apply_diffset_diff (diffset, &level, sizeof (level), dir, &text);
 
   if (undo_msg) al_free (undo_msg);
   if (! b) xasprintf (&undo_msg, "NO FURTHER %s %s", prefix, dir_str);
