@@ -206,7 +206,7 @@ break_level_door (struct pos *p)
   d->broken = true;
   prepare_play_level_undo ();
   con (p)->ext.step = -con (p)->ext.step - 1;
-  register_play_level_undo ("LEVEL DOOR BREAKING");
+  register_play_level_undo ("LOOSE FLOOR BREAKING");
 }
 
 void
@@ -222,6 +222,12 @@ compute_level_doors (void)
     }
     switch (d->action) {
     case OPEN_LEVEL_DOOR:
+      if (d->i == 0) {
+        prepare_play_level_undo ();
+        con (&d->p)->ext.step = (d->broken) ? -d->i - 1 : d->i;
+        register_play_level_undo ("OPEN LEVEL DOOR");
+      }
+
       if (d->i % 5 == 2 && d->i > 2) {
         if (d->i == LEVEL_DOOR_MAX_STEP - 1) alert_guards (&d->p);
         play_sample (level_door_open_sample, d->p.room);
@@ -241,6 +247,9 @@ compute_level_doors (void)
           d->i = LEVEL_DOOR_MAX_STEP;
           d->action = NO_LEVEL_DOOR_ACTION;
           play_sample (level_door_close_sample, d->p.room);
+          prepare_play_level_undo ();
+          con (&d->p)->ext.step = (d->broken) ? -d->i - 1 : d->i;
+          register_play_level_undo ("CLOSE LEVEL DOOR");
         }
       }
       break;

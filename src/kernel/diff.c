@@ -35,7 +35,7 @@ add_diffset_diff (struct diffset *diffset, void *ptr0, void *ptr1,
 
   diff (ptr0, ptr1, size, unit_size, &diffset->diff[diffset->current], desc);
 
-  if (! diffset->diff[diffset->current].line) {
+  if (! diffset->diff[diffset->current].line && ! desc) {
     diffset->count--;
     diffset->diff = xrealloc (diffset->diff, diffset->count * sizeof (* diffset->diff));
     diffset->current--;
