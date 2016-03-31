@@ -334,18 +334,22 @@ editor (void)
     case 'E': edit = EDIT_EXT; break;
     case 'I': edit = EDIT_INFO; break;
     case 'A':
+      prepare_edit_level_undo ();
       destroy_con_at_pos (&p);
       con (&p)->fg = NO_FLOOR;
       con (&p)->bg = NO_BG;
       con (&p)->ext.item = NO_ITEM;
+      register_edit_level_undo ("CLEAR CON");
       break;
     case 'R':
+      prepare_edit_level_undo ();
       destroy_con_at_pos (&p);
       con (&p)->fg = prandom (ARCH_TOP_SMALL);
       con (&p)->bg = prandom (BALCONY);
       con (&p)->ext.item = NO_ITEM;
       register_con_at_pos (&p);
       prepare_con_at_pos (&p);
+      register_edit_level_undo ("RANDOM CON");
       break;
     case 'H': edit = EDIT_CON_EXCHANGE; break;
     case 'C':
@@ -353,10 +357,12 @@ editor (void)
       editor_msg ("COPIED", 12);
       break;
     case 'P':
+      prepare_edit_level_undo ();
       destroy_con_at_pos (&p);
       *con (&p) = con_copy;
       register_con_at_pos (&p);
       prepare_con_at_pos (&p);
+      register_edit_level_undo ("PASTE CON");
       break;
     }
     break;
@@ -370,17 +376,23 @@ editor (void)
     switch (menu_enum (con_exchange_menu, "CH>")) {
     case -1: case 1: edit = EDIT_CON; break;
     case 'H':
+      prepare_edit_level_undo ();
       reflect_pos_h (&p, &p0);
       exchange_pos (&p, &p0, true, true);
+      register_edit_level_undo ("H. EXCHANGE CON");
       break;
     case 'V':
+      prepare_edit_level_undo ();
       reflect_pos_v (&p, &p0);
       exchange_pos (&p, &p0, true, false);
+      register_edit_level_undo ("V. EXCHANGE CON");
       break;
     case 'R':
+      prepare_edit_level_undo ();
       random_pos (&p0);
       p0.room = p.room;
       exchange_pos (&p, &p0, true, false);
+      register_edit_level_undo ("R. EXCHANGE CON");
       break;
     }
     break;
@@ -397,22 +409,28 @@ editor (void)
     case 'P': edit = EDIT_PILLAR; break;
     case 'W':
       if (con (&p)->fg == WALL) break;
+      prepare_edit_level_undo ();
       destroy_con_at_pos (&p);
       con (&p)->fg = WALL;
       update_wall_cache (room_view, em, vm);
+      register_edit_level_undo ("WALL");
       break;
     case 'D': edit = EDIT_DOOR; break;
     case 'C':
       if (con (&p)->fg == CHOPPER) break;
+      prepare_edit_level_undo ();
       destroy_con_at_pos (&p);
       con (&p)->fg = CHOPPER;
       register_con_at_pos (&p);
+      register_edit_level_undo ("CHOPPER");
       break;
     case 'M':
       if (con (&p)->fg == MIRROR) break;
+      prepare_edit_level_undo ();
       destroy_con_at_pos (&p);
       con (&p)->fg = MIRROR;
       register_con_at_pos (&p);
+      register_edit_level_undo ("MIRROR");
       create_mirror_bitmaps (room_view, room_view);
       break;
     case 'R': edit = EDIT_CARPET; break;
@@ -439,7 +457,7 @@ editor (void)
         || (c == 'C' && con (&p)->fg == CLOSER_FLOOR))
       break;
 
-    prepare_level_undo ();
+    prepare_edit_level_undo ();
     destroy_con_at_pos (&p);
     switch (c) {
     case 'N': con (&p)->fg = NO_FLOOR; break;
@@ -454,7 +472,7 @@ editor (void)
     case 'H': con (&p)->fg = HIDDEN_FLOOR; break;
     }
     register_con_at_pos (&p);
-    register_level_undo ("FLOOR");
+    register_edit_level_undo ("FLOOR");
     break;
   case EDIT_PILLAR:
     if (! is_valid_pos (&p)) {
@@ -470,7 +488,7 @@ editor (void)
       edit = EDIT_FG; break;
     }
 
-    prepare_level_undo ();
+    prepare_edit_level_undo ();
     destroy_con_at_pos (&p);
     switch (c) {
     case 'P': con (&p)->fg = PILLAR; break;
@@ -478,7 +496,7 @@ editor (void)
     case 'B': con (&p)->fg = BIG_PILLAR_BOTTOM; break;
     case 'A': con (&p)->fg = ARCH_BOTTOM; break;
     }
-    register_level_undo ("PILLAR");
+    register_edit_level_undo ("PILLAR");
     break;
   case EDIT_DOOR:
     if (! is_valid_pos (&p)) {
@@ -498,14 +516,14 @@ editor (void)
         || (c == 'L' && con (&p)->fg == LEVEL_DOOR))
       break;
 
-    prepare_level_undo ();
+    prepare_edit_level_undo ();
     destroy_con_at_pos (&p);
     switch (c) {
     case 'D': con (&p)->fg = DOOR; break;
     case 'L': con (&p)->fg = LEVEL_DOOR; break;
     }
     register_con_at_pos (&p);
-    register_level_undo ("DOOR");
+    register_edit_level_undo ("DOOR");
     break;
   case EDIT_CARPET:
     if (! is_valid_pos (&p)) {
@@ -521,13 +539,13 @@ editor (void)
       edit = EDIT_FG; break;
     }
 
-    prepare_level_undo ();
+    prepare_edit_level_undo ();
     destroy_con_at_pos (&p);
     switch (c) {
     case 'C': con (&p)->fg = CARPET; break;
     case 'T': con (&p)->fg = TCARPET; break;
     }
-    register_level_undo ("CARPET");
+    register_edit_level_undo ("CARPET");
     break;
   case EDIT_ARCH:
     if (! is_valid_pos (&p)) {
@@ -543,7 +561,7 @@ editor (void)
       edit = EDIT_FG; break;
     }
 
-    prepare_level_undo ();
+    prepare_edit_level_undo ();
     destroy_con_at_pos (&p);
     switch (c) {
     case 'M': con (&p)->fg = ARCH_TOP_MID; break;
@@ -551,7 +569,7 @@ editor (void)
     case 'L': con (&p)->fg = ARCH_TOP_LEFT; break;
     case 'R': con (&p)->fg = ARCH_TOP_RIGHT; break;
     }
-    register_level_undo ("ARCH");
+    register_edit_level_undo ("ARCH");
     break;
   case EDIT_BG:
     if (! is_valid_pos (&p)) {
@@ -879,7 +897,7 @@ editor (void)
       compute_stars_position (room_view, room_view);
       break;
     case 'R':
-      prepare_level_undo ();
+      prepare_edit_level_undo ();
       p0.room = room_view;
       for (p0.floor = 0; p0.floor < FLOORS; p0.floor++)
         for (p0.place = 0; p0.place < PLACES; p0.place++) {
@@ -889,7 +907,7 @@ editor (void)
           con (&p0)->ext.item = NO_ITEM;
           register_con_at_pos (&p0);
         }
-      register_level_undo ("RANDOM ROOM");
+      register_edit_level_undo ("RANDOM ROOM");
       update_wall_cache (room_view, em, vm);
       create_mirror_bitmaps (room_view, room_view);
       compute_stars_position (room_view, room_view);
@@ -1435,7 +1453,7 @@ exit_editor (void)
   msg_cycles = 0;
   reset_menu ();
   set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
-  hide_mouse_cursor ();
+  if (is_fullscreen ()) hide_mouse_cursor ();
   if (game_paused)
     draw_bottom_text (NULL, "GAME PAUSED");
   else draw_bottom_text (NULL, NULL);

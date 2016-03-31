@@ -34,10 +34,17 @@ add_diffset_diff (struct diffset *diffset, uint8_t *ptr0, uint8_t *ptr1,
   diffset->current++;
 
   diff (ptr0, ptr1, size, &diffset->diff[diffset->current], desc);
+
+  if (! diffset->diff[diffset->current].line) {
+    diffset->count--;
+    diffset->diff = xrealloc (diffset->diff, diffset->count * sizeof (* diffset->diff));
+    diffset->current--;
+  }
 }
 
 bool
-apply_diffset_diff (struct diffset *diffset, uint8_t *base, int dir, char **desc)
+apply_diffset_diff (struct diffset *diffset, uint8_t *base, size_t size,
+                    int dir, char **desc)
 {
   if ((diffset->current == -1 && dir < 0)
       || (diffset->current == diffset->count - 1 && dir >= 0)
@@ -46,7 +53,7 @@ apply_diffset_diff (struct diffset *diffset, uint8_t *base, int dir, char **desc
     return false;
   }
   if (dir >= 0) diffset->current++;
-  apply_diff (&diffset->diff[diffset->current], base, dir);
+  apply_diff (&diffset->diff[diffset->current], base, size, dir);
   *desc = diffset->diff[diffset->current].desc;
   if (dir < 0) diffset->current--;
   return true;
@@ -75,10 +82,11 @@ free_diff (struct diff *d)
 }
 
 void
-apply_diff (struct diff *d, uint8_t *base, int dir)
+apply_diff (struct diff *d, uint8_t *base, size_t size, int dir)
 {
   size_t i;
   for (i = 0; i < d->count; i++) {
+    if (d->line[i].offset >= size) return;
     uint8_t *src = (dir >= 0) ? d->line[i].forward : d->line[i].backward;
     memcpy (base + d->line[i].offset, src, d->line[i].size);
   }
@@ -103,9 +111,10 @@ diff (uint8_t *ptr0, uint8_t *ptr1, size_t size, struct diff *d, char *desc)
       d->count++;
       d->line = xrealloc (d->line, d->count * sizeof (* d->line));
       memset (&d->line[d->count - 1], 0, sizeof (* d->line));
+      d->line[d->count - 1].offset = i;
     }
 
-    add_diff_line_byte (&d->line[d->count - 1], ptr0[i], ptr1[i], i);
+    add_diff_line_byte (&d->line[d->count - 1], ptr0[i], ptr1[i]);
 
     prev_diff = true;
   }
@@ -114,10 +123,9 @@ diff (uint8_t *ptr0, uint8_t *ptr1, size_t size, struct diff *d, char *desc)
 }
 
 void
-add_diff_line_byte (struct diff_line *l, uint8_t b0, uint8_t b1, size_t offset)
+add_diff_line_byte (struct diff_line *l, uint8_t b0, uint8_t b1)
 {
   l->size++;
-  l->offset = offset;
   l->forward = xrealloc (l->forward, l->size * sizeof (* l->forward));
   l->backward = xrealloc (l->backward, l->size * sizeof (* l->backward));
   l->forward[l->size - 1] = b1;

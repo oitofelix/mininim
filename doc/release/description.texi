@@ -59,7 +59,8 @@ to make an exhaustive list here.  Some of its noteworthy advantages are:
 @itemize
 @item Portable to modern operating systems.
 @item Complete built-in level editor featuring an uniform and
-non-intrusive bottom-line menu interface.
+non-intrusive bottom-line menu interface and unlimited undo/redo for
+level modifications.
 @item Video, environment, hue and guard modes may be selected on-the-fly.
 @item Joystick mapping and threshold configuration.
 @item Improved battle system based on upgradable skills, arbitrary

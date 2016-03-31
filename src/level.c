@@ -27,7 +27,8 @@ static void draw_lives (ALLEGRO_BITMAP *bitmap, struct anim *k, enum vm vm);
 
 struct level *vanilla_level;
 struct level level;
-struct diffset undo;
+struct diffset play_level_undo;
+struct diffset edit_level_undo;
 struct level old_level;
 
 static char *undo_msg;
@@ -53,9 +54,9 @@ play_level (struct level *lv)
  start:
   cutscene = false;
   game_paused = false;
-  if (! first_play) prepare_level_undo ();
+  if (! first_play) prepare_play_level_undo ();
   level = *lv;
-  if (! first_play) register_level_undo ("REPLAY LEVEL");
+  if (! first_play) register_play_level_undo ("REPLAY LEVEL");
 
   if (level_module == LEGACY_LEVEL_MODULE
       || level_module == PLV_LEVEL_MODULE
@@ -105,7 +106,8 @@ play_level (struct level *lv)
   case PREVIOUS_LEVEL:
   case NEXT_LEVEL:
     first_play = true;
-    free_diffset (&undo);
+    free_diffset (&play_level_undo);
+    free_diffset (&edit_level_undo);
     destroy_anims ();
     destroy_cons ();
     int d = (quit_anim == PREVIOUS_LEVEL) ? -1 : +1;
@@ -369,37 +371,21 @@ process_keys (void)
     button = -1;
   }
 
-  /* CTRL+Z: undo */
-  if (was_key_pressed (ALLEGRO_KEY_Z, 0, ALLEGRO_KEYMOD_CTRL, true)) {
-    destroy_cons ();
-    bool b = apply_diffset_diff (&undo, (uint8_t *) &level, -1, &text);
-    if (! b) editor_msg ("NO FURTHER UNDO", 24);
-    else {
-      if (undo_msg) al_free (undo_msg);
-      xasprintf (&undo_msg, "UNDO: %s", text);
-      editor_msg (undo_msg, 24);
-    }
-    register_cons ();
-    update_wall_cache (room_view, em, vm);
-    create_mirror_bitmaps (room_view, room_view);
-    compute_stars_position (room_view, room_view);
-  }
+  /* ALT+Z: play undo */
+  if (was_key_pressed (ALLEGRO_KEY_Z, 0, ALLEGRO_KEYMOD_ALT, true))
+    level_undo (&play_level_undo, -1, "PLAY");
 
-  /* CTRL+Y: redo */
-  if (was_key_pressed (ALLEGRO_KEY_Y, 0, ALLEGRO_KEYMOD_CTRL, true)) {
-    destroy_cons ();
-    bool b = apply_diffset_diff (&undo, (uint8_t *) &level, +1, &text);
-    if (! b) editor_msg ("NO FURTHER REDO", 24);
-    else {
-      if (undo_msg) al_free (undo_msg);
-      xasprintf (&undo_msg, "REDO: %s", text);
-      editor_msg (undo_msg, 24);
-    }
-    register_cons ();
-    update_wall_cache (room_view, em, vm);
-    create_mirror_bitmaps (room_view, room_view);
-    compute_stars_position (room_view, room_view);
-  }
+  /* ALT+Y: play redo */
+  if (was_key_pressed (ALLEGRO_KEY_Y, 0, ALLEGRO_KEYMOD_ALT, true))
+    level_undo (&play_level_undo, +1, "PLAY");
+
+  /* CTRL+Z: edit undo */
+  if (was_key_pressed (ALLEGRO_KEY_Z, 0, ALLEGRO_KEYMOD_CTRL, true))
+    level_undo (&edit_level_undo, -1, "EDIT");
+
+  /* CTRL+Y: edit redo */
+  if (was_key_pressed (ALLEGRO_KEY_Y, 0, ALLEGRO_KEYMOD_CTRL, true))
+    level_undo (&edit_level_undo, +1, "EDIT");
 
   /* ESC: pause game */
   if (step_one_cycle) {
@@ -789,14 +775,48 @@ unpause_game (void)
 }
 
 void
-prepare_level_undo (void)
+prepare_play_level_undo (void)
 {
   old_level = level;
 }
 
 void
-register_level_undo (char *msg)
+register_play_level_undo (char *msg)
 {
-  add_diffset_diff (&undo, (uint8_t *) &old_level, (uint8_t *) &level,
+  add_diffset_diff (&play_level_undo, (uint8_t *) &old_level, (uint8_t *) &level,
                     sizeof (level), msg);
+}
+
+void
+prepare_edit_level_undo (void)
+{
+  old_level = level;
+}
+
+void
+register_edit_level_undo (char *msg)
+{
+  add_diffset_diff (&edit_level_undo, (uint8_t *) &old_level, (uint8_t *) &level,
+                    sizeof (level), msg);
+}
+
+void
+level_undo (struct diffset *diffset, int dir, char *prefix)
+{
+  char *text;
+  char *dir_str = (dir >= 0) ? "REDO" : "UNDO";
+
+  destroy_cons ();
+  bool b = apply_diffset_diff (diffset, (uint8_t *) &level,
+                               sizeof (level), dir, &text);
+
+  if (undo_msg) al_free (undo_msg);
+  if (! b) xasprintf (&undo_msg, "NO FURTHER %s %s", prefix, dir_str);
+  else xasprintf (&undo_msg, "%s %s: %s", prefix, dir_str, text);
+  editor_msg (undo_msg, 24);
+
+  register_cons ();
+  update_wall_cache (room_view, em, vm);
+  create_mirror_bitmaps (room_view, room_view);
+  compute_stars_position (room_view, room_view);
 }

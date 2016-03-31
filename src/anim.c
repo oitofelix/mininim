@@ -261,13 +261,14 @@ play_anim (void (*draw_callback) (void),
       if (! active_menu
           && was_key_pressed (ALLEGRO_KEY_F, 0, 0, true)) {
         char *boolean;
-        int flags = al_get_display_flags (display);
-        if (flags & ALLEGRO_FULLSCREEN_WINDOW) {
+        if (is_fullscreen ()) {
           al_set_display_flag (display, ALLEGRO_FULLSCREEN_WINDOW, false);
           boolean = "OFF";
+          show_mouse_cursor ();
         } else {
           al_set_display_flag (display, ALLEGRO_FULLSCREEN_WINDOW, true);
           boolean = "ON";
+          hide_mouse_cursor ();
         }
         xasprintf (&text, "FULLSCREEN MODE %s", boolean);
         draw_bottom_text (NULL, text);

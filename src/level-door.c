@@ -161,11 +161,13 @@ register_level_door (struct pos *p)
 {
   struct level_door d;
 
+  int step = con (p)->ext.step;
+
   d.p = *p;
-  d.i = con (p)->ext.step;
+  d.broken = (step < 0);
+  d.i = (step < 0) ? -step - 1 : step;
   d.action = NO_LEVEL_DOOR_ACTION;
   d.no_stairs = peq (p, &level.start_pos);
-  d.broken = false;
 
   level_door =
     add_to_array (&d, 1, level_door, &level_door_nmemb, level_door_nmemb, sizeof (d));
@@ -202,6 +204,9 @@ break_level_door (struct pos *p)
   struct level_door *d = level_door_at_pos (p);
   if (! d) return;
   d->broken = true;
+  prepare_play_level_undo ();
+  con (p)->ext.step = -con (p)->ext.step - 1;
+  register_play_level_undo ("LEVEL DOOR BREAKING");
 }
 
 void
@@ -433,6 +438,9 @@ void
 draw_level_door_front (ALLEGRO_BITMAP *bitmap, struct pos *p, int i,
                        enum em em, enum vm vm)
 {
+  i = i < 0 ? 0 : i;
+  i = i > LEVEL_DOOR_MAX_STEP ? LEVEL_DOOR_MAX_STEP : i;
+
   ALLEGRO_BITMAP *level_door_front = NULL;
 
   switch (em) {

@@ -475,3 +475,9 @@ show (void)
 
   flip_display (effect_buffer);
 }
+
+bool
+is_fullscreen ()
+{
+  return al_get_display_flags (display) & ALLEGRO_FULLSCREEN_WINDOW;
+}

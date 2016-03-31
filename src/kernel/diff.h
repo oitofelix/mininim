@@ -22,13 +22,13 @@
 
 void add_diffset_diff (struct diffset *diffset, uint8_t *ptr0, uint8_t *ptr1,
                        size_t size, char *desc);
-bool apply_diffset_diff (struct diffset *diffset, uint8_t *base, int dir,
-                         char **desc);
+bool apply_diffset_diff (struct diffset *diffset, uint8_t *base, size_t size,
+                         int dir, char **desc);
 void free_diffset (struct diffset *diffset);
 void free_diff (struct diff *d);
-void apply_diff (struct diff *d, uint8_t *base, int dir);
+void apply_diff (struct diff *d, uint8_t *base, size_t size, int dir);
 struct diff *diff (uint8_t *ptr0, uint8_t *ptr1, size_t size, struct diff *d,
                    char *desc);
-void add_diff_line_byte (struct diff_line *l, uint8_t b0, uint8_t b1, size_t offset);
+void add_diff_line_byte (struct diff_line *l, uint8_t b0, uint8_t b1);
 
 #endif	/* MININIM_DIFF_H */
