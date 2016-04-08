@@ -256,9 +256,6 @@ compute_doors (void)
           d->i = DOOR_MAX_STEP;
           alert_guards (&d->p);
           play_sample (door_abruptly_close_sample, d->p.room);
-          prepare_play_level_undo ();
-          con (&d->p)->ext.step = d->i;
-          register_play_level_undo ("CLOSE DOOR");
         }
       } else {
         d->action = NO_DOOR_ACTION;

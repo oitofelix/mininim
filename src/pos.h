@@ -26,6 +26,7 @@ extern bool coord_wa;
 int *roomd_ptr (int room, enum dir dir);
 int roomd (int room, enum dir dir);
 int roomd_n0 (int room, enum dir dir);
+bool is_room_adjacent (int room0, int room1);
 void link_room (int room0, int room1, enum dir dir);
 int room_dist (int r0, int r1, int max);
 int min_room_dist (struct room_dist room[], int *dmax);

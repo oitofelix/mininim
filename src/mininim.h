@@ -159,6 +159,7 @@
 #include "menu.h"
 #include "editor.h"
 #include "debug.h"
+#include "undo.h"
 
 /* functions */
 void *load_config_dialog (ALLEGRO_THREAD *thread, void *arg);

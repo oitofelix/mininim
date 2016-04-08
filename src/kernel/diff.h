@@ -22,6 +22,7 @@
 
 void add_diffset_diff (struct diffset *diffset, void *ptr0, void *ptr1,
                        size_t size, size_t unit_size, char *desc);
+bool can_apply_diffset (struct diffset *diffset, int dir);
 bool apply_diffset_diff (struct diffset *diffset, void *base, size_t size,
                          int dir, char **desc);
 void free_diffset (struct diffset *diffset);

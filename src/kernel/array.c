@@ -65,14 +65,11 @@ remove_from_array (void *base, size_t *nmemb, size_t index, size_t count, size_t
   memmove ((char *) base + (index * size), (char *) base + (index + count) * size,
            (*nmemb - index - count) * size);
 
-  /* Reallocate array */
-  void *ptr = xrealloc (base, (*nmemb - count) * size);
-
   /* Decrement array member counter */
   *nmemb -= count;
 
-  /* Return the pointer to the new array */
-  return ptr;
+  /* Return the pointer to the new reallocated array */
+  return xrealloc (base, *nmemb * size);
 }
 
 void

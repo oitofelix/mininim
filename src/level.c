@@ -27,9 +27,8 @@ static void draw_lives (ALLEGRO_BITMAP *bitmap, struct anim *k, enum vm vm);
 
 struct level *vanilla_level;
 struct level level;
-struct diffset play_level_undo;
-struct diffset edit_level_undo;
-struct level old_level;
+
+struct undo undo;
 
 static char *undo_msg;
 static int last_auto_show_time;
@@ -49,14 +48,11 @@ play_level (struct level *lv)
   char *text;
   vanilla_level = lv;
   death_timer = create_timer (1.0 / 12);
-  bool first_play = true;
 
  start:
   cutscene = false;
   game_paused = false;
-  if (! first_play) prepare_play_level_undo ();
   level = *lv;
-  if (! first_play) register_play_level_undo ("REPLAY LEVEL");
 
   if (level_module == LEGACY_LEVEL_MODULE
       || level_module == PLV_LEVEL_MODULE
@@ -93,8 +89,6 @@ play_level (struct level *lv)
 
   play_anim (draw_level, compute_level, 12);
 
-  first_play = false;
-
   switch (quit_anim) {
   case NO_QUIT: break;
   case RESTART_LEVEL:
@@ -105,9 +99,6 @@ play_level (struct level *lv)
    goto start;
   case PREVIOUS_LEVEL:
   case NEXT_LEVEL:
-    first_play = true;
-    free_diffset (&play_level_undo);
-    free_diffset (&edit_level_undo);
     destroy_anims ();
     destroy_cons ();
     int d = (quit_anim == PREVIOUS_LEVEL) ? -1 : +1;
@@ -164,13 +155,21 @@ register_con_at_pos (struct pos *p)
 }
 
 void
-register_cons (void)
+register_room (int room)
 {
   struct pos p;
-  for (p.room = 0; p.room < ROOMS; p.room++)
-    for (p.floor = 0; p.floor < FLOORS; p.floor++)
-      for (p.place = 0; p.place < PLACES; p.place++)
-        register_con_at_pos (&p);
+  p.room = room;
+  for (p.floor = 0; p.floor < FLOORS; p.floor++)
+    for (p.place = 0; p.place < PLACES; p.place++)
+      register_con_at_pos (&p);
+}
+
+void
+register_cons (void)
+{
+  int room;
+  for (room = 0; room < ROOMS; room++)
+    register_room (room);
 }
 
 void
@@ -187,6 +186,16 @@ destroy_con_at_pos (struct pos *p)
   case MIRROR: remove_mirror (mirror_at_pos (p)); break;
   default: break;
   }
+}
+
+void
+destroy_room (int room)
+{
+  struct pos p;
+  p.room = room;
+  for (p.floor = 0; p.floor < FLOORS; p.floor++)
+    for (p.place = 0; p.place < PLACES; p.place++)
+      destroy_con_at_pos (&p);
 }
 
 void
@@ -216,6 +225,15 @@ prepare_con_at_pos (struct pos *p)
   case BALCONY: compute_stars_position (room_view, room_view); break;
   default: break;
   }
+}
+
+void
+prepare_room (int room)
+{
+  if (! is_room_adjacent (room_view, room)) return;
+  update_wall_cache (room_view, em, vm);
+  create_mirror_bitmaps (room_view, room_view);
+  compute_stars_position (room_view, room_view);
 }
 
 void
@@ -371,21 +389,13 @@ process_keys (void)
     button = -1;
   }
 
-  /* ALT+Z: play undo */
-  if (was_key_pressed (ALLEGRO_KEY_Z, 0, ALLEGRO_KEYMOD_ALT, true))
-    level_undo (&play_level_undo, -1, "PLAY");
-
-  /* ALT+Y: play redo */
-  if (was_key_pressed (ALLEGRO_KEY_Y, 0, ALLEGRO_KEYMOD_ALT, true))
-    level_undo (&play_level_undo, +1, "PLAY");
-
-  /* CTRL+Z: edit undo */
+  /* CTRL+Z: undo */
   if (was_key_pressed (ALLEGRO_KEY_Z, 0, ALLEGRO_KEYMOD_CTRL, true))
-    level_undo (&edit_level_undo, -1, "EDIT");
+    ui_undo_pass (&undo, -1, NULL);
 
-  /* CTRL+Y: edit redo */
+  /* CTRL+Y: redo */
   if (was_key_pressed (ALLEGRO_KEY_Y, 0, ALLEGRO_KEYMOD_CTRL, true))
-    level_undo (&edit_level_undo, +1, "EDIT");
+    ui_undo_pass (&undo, +1, NULL);
 
   /* ESC: pause game */
   if (step_one_cycle) {
@@ -774,30 +784,50 @@ unpause_game (void)
   al_start_timer (play_time);
 }
 
-void
-prepare_play_level_undo (void)
-{
-  old_level = level;
-}
+/************************************/
+/* NOT USED ALTERNATIVE UNDO METHOD */
+/************************************/
 
 void
-register_play_level_undo (char *msg)
+apply_to_diff_pos (struct diff *d, void (*func) (struct pos *p))
 {
-  add_diffset_diff (&play_level_undo, &old_level, &level,
-                    sizeof (level), sizeof (int), msg);
-}
+  size_t base = ((uint8_t *) &level.con[0][0][0]) - ((uint8_t *) &level);
+  size_t end = ((uint8_t *) &level.con[ROOMS - 1][FLOORS - 1][PLACES - 1])
+    - ((uint8_t *) &level);
 
-void
-prepare_edit_level_undo (void)
-{
-  old_level = level;
-}
+  size_t i, j;
+  for (i = 0; i < d->count; i++) {
+    if (d->line[i].offset < base) continue;
+    if (d->line[i].offset > end) continue;
 
-void
-register_edit_level_undo (char *msg)
-{
-  add_diffset_diff (&edit_level_undo, &old_level, &level,
-                    sizeof (level), sizeof (int), msg);
+    size_t base_con = d->line[i].offset - base;
+
+    struct pos prev_p = {-1,-1,-1};
+    for (j = 0; j < d->line[i].count; j++) {
+      struct pos p;
+      size_t qr = (base_con + j * d->unit_size)
+        / (sizeof (struct con) * PLACES * FLOORS);
+      size_t rr = (base_con + j * d->unit_size)
+        % (sizeof (struct con) * PLACES * FLOORS);
+
+      size_t qf = rr / (sizeof (struct con) * PLACES);
+      size_t rf = rr % (sizeof (struct con) * PLACES);
+
+      size_t qp = rf / sizeof (struct con);
+
+      p.room = qr;
+      p.floor = qf;
+      p.place = qp;
+
+      if (! peq (&p, &prev_p)) {
+        /* printf ("%s: %i,%i,%i\n", */
+        /*         (func == destroy_con_at_pos) ? "destroy" : "register", */
+        /*         p.room, p.floor, p.place); */
+        func (&p);
+        prev_p = p;
+      }
+    }
+  }
 }
 
 void
@@ -806,16 +836,25 @@ level_undo (struct diffset *diffset, int dir, char *prefix)
   char *text;
   char *dir_str = (dir >= 0) ? "REDO" : "UNDO";
 
-  destroy_cons ();
-  bool b = apply_diffset_diff (diffset, &level, sizeof (level), dir, &text);
+  bool b = can_apply_diffset (diffset, dir);
 
   if (undo_msg) al_free (undo_msg);
-  if (! b) xasprintf (&undo_msg, "NO FURTHER %s %s", prefix, dir_str);
-  else xasprintf (&undo_msg, "%s %s: %s", prefix, dir_str, text);
-  editor_msg (undo_msg, 24);
 
-  register_cons ();
+  if (! b) {
+    xasprintf (&undo_msg, "NO FURTHER %s %s", prefix, dir_str);
+    editor_msg (undo_msg, 24);
+    return;
+  }
+
+  size_t i = diffset->current;
+
+  apply_to_diff_pos (&diffset->diff[(dir >= 0) ? i + 1 : i], destroy_con_at_pos);
+  apply_diffset_diff (diffset, &level, sizeof (level), dir, &text);
+  apply_to_diff_pos (&diffset->diff[(dir >= 0) ? i + 1 : i], register_con_at_pos);
   update_wall_cache (room_view, em, vm);
   create_mirror_bitmaps (room_view, room_view);
   compute_stars_position (room_view, room_view);
+
+  xasprintf (&undo_msg, "%s %s: %s", prefix, dir_str, text);
+  editor_msg (undo_msg, 24);
 }

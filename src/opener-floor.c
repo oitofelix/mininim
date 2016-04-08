@@ -119,11 +119,13 @@ register_opener_floor (struct pos *p)
 {
   struct opener_floor o;
 
+  int event = con (p)->ext.event;
+
   o.p = *p;
-  o.event = con (p)->ext.event;
-  o.pressed = false;
-  o.noise = false;
-  o.broken = false;
+  o.event = (event < 0) ? -event - 1 : event;
+  o.pressed = (event < 0);
+  o.noise = (event < 0);
+  o.broken = (event < 0);
 
   opener_floor =
     add_to_array (&o, 1, opener_floor, &opener_floor_nmemb,
@@ -199,6 +201,10 @@ break_opener_floor (struct pos *p)
   struct opener_floor *o = opener_floor_at_pos (p);
   if (! o) return;
   o->broken = true;
+  register_con_undo
+    (&undo, p,
+     IGNORE, IGNORE, -abs (con (p)->ext.event) - 1,
+     false, false, false, "LOOSE FLOOR BREAKING");
 }
 
 void
@@ -238,7 +244,11 @@ draw_opener_floor (ALLEGRO_BITMAP *bitmap, struct pos *p,
   struct opener_floor *o = opener_floor_at_pos (p);
   if (! o) return;
 
-  if (o->broken) return;
+  if (o->broken) {
+    draw_broken_floor (bitmap, p, em, vm);
+    return;
+  }
+
   if (o->pressed) draw_floor (bitmap, p, em, vm);
   else draw_unpressed_opener_floor (bitmap, p, em, vm);
 }
@@ -250,7 +260,11 @@ draw_opener_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
   struct opener_floor *o = opener_floor_at_pos (p);
   if (! o) return;
 
-  if (o->broken) return;
+  if (o->broken) {
+    draw_floor_base (bitmap, p, em, vm);
+    return;
+  }
+
   if (o->pressed) draw_floor_base (bitmap, p, em, vm);
   else draw_unpressed_opener_floor_base (bitmap, p, em, vm);
 }
@@ -262,7 +276,11 @@ draw_opener_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
   struct opener_floor *o = opener_floor_at_pos (p);
   if (! o) return;
 
-  if (o->broken) return;
+  if (o->broken) {
+    draw_broken_floor_left (bitmap, p, em, vm);
+    return;
+  }
+
   if (o->pressed) draw_floor_left (bitmap, p, em, vm);
   else draw_unpressed_opener_floor_left (bitmap, p, em, vm);
 }
@@ -274,9 +292,26 @@ draw_opener_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
   struct opener_floor *o = opener_floor_at_pos (p);
   if (! o) return;
 
-  if (o->broken) return;
+  if (o->broken) {
+    draw_broken_floor_right (bitmap, p, em, vm);
+    return;
+  }
+
   if (o->pressed) draw_floor_right (bitmap, p, em, vm);
   else draw_unpressed_opener_floor_right (bitmap, p, em, vm);
+}
+
+void
+draw_opener_floor_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                      enum em em, enum vm vm)
+{
+  struct opener_floor *o = opener_floor_at_pos (p);
+  if (! o) return;
+
+  if (o->broken) {
+    draw_broken_floor_fg (bitmap, p, em, vm);
+    return;
+  }
 }
 
 void

@@ -84,5 +84,7 @@ void draw_unpressed_opener_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
                                         enum em em, enum vm vm);
 struct coord *unpressed_opener_floor_left_coord (struct pos *p, struct coord *c);
 struct coord *unpressed_opener_floor_right_coord (struct pos *p, struct coord *c);
+void draw_opener_floor_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                           enum em em, enum vm vm);
 
 #endif	/* MININIM_OPENER_FLOOR_H */

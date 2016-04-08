@@ -121,5 +121,8 @@ physics_out (struct anim *k)
   }
 
   /* consume sword */
-  if (k->i == 0) con (&k->item_pos)->ext.item = NO_ITEM;
+  if (k->i == 0)
+    register_con_undo (&undo, &k->item_pos,
+                       IGNORE, IGNORE, NO_ITEM,
+                       false, false, false, "CONSUME ITEM");
 }

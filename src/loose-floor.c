@@ -389,9 +389,9 @@ compute_loose_floor_release (struct loose_floor *l)
   case 8: l->state = 2; l->i++; break;
   case 9: l->state = 2; l->i++; break;
   case 10:
-    prepare_play_level_undo ();
-    con (&l->p)->fg = NO_FLOOR;
-    register_play_level_undo ("LOOSE FLOOR RELEASE");
+    register_con_undo (&undo, &l->p,
+                       NO_FLOOR, IGNORE, IGNORE,
+                       false, false, false, "LOOSE FLOOR RELEASE");
     l->state = 2;
     l->i = 0;
     l->f.id = &l->f;
@@ -539,9 +539,9 @@ compute_loose_floor_fall (struct loose_floor *l)
       l->f.b = get_correct_falling_loose_floor_bitmap (dv_broken_floor);
       l->p = fpmbo_f;
       l->i = 0;
-      prepare_play_level_undo ();
-      con (&fpmbo_f)->fg = NO_FLOOR;
-      register_play_level_undo ("LOOSE FLOOR CHAIN RELEASE");
+      register_con_undo (&undo, &fpmbo_f,
+                         NO_FLOOR, IGNORE, IGNORE,
+                         false, false, false, "LOOSE FLOOR CHAIN RELEASE");
       must_sort = true;
       play_sample (broken_floor_sample, p.room);
       alert_guards (&p);
@@ -556,10 +556,12 @@ compute_loose_floor_fall (struct loose_floor *l)
 
   /* reach here only if the floor hit a rigid structure or the
      ground */
-  if (con (&p)->fg != LEVEL_DOOR) {
-    prepare_play_level_undo ();
-    con (&p)->fg = BROKEN_FLOOR;
-    register_play_level_undo ("LOOSE FLOOR BREAKING");
+  if (con (&p)->fg != LEVEL_DOOR
+      && con (&p)->fg != OPENER_FLOOR
+      && con (&p)->fg != CLOSER_FLOOR) {
+    register_con_undo (&undo, &p,
+                       BROKEN_FLOOR, IGNORE, IGNORE,
+                       false, false, false, "LOOSE FLOOR BREAKING");
   }
   shake_loose_floor_row (&p);
   l->p.room = -1;

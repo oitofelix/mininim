@@ -88,5 +88,7 @@ void draw_unpressed_closer_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
                                        enum em em, enum vm vm);
 struct coord *pressed_closer_floor_left_coord (struct pos *p, struct coord *c);
 struct coord *pressed_closer_floor_right_coord (struct pos *p, struct coord *c);
+void draw_closer_floor_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                           enum em em, enum vm vm);
 
 #endif	/* MININIM_CLOSER_FLOOR_H */

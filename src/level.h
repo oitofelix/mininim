@@ -28,27 +28,27 @@ extern int anti_camera_room;
 extern int auto_rem_time_1st_cycle;
 extern bool no_room_drawing, game_paused, step_one_cycle;
 extern struct level *vanilla_level;
-extern struct level old_level;
-extern struct diffset play_level_undo;
-extern struct diffset edit_level_undo;
+extern struct undo undo;
 
 void load_level (void);
 void unload_level (void);
 void play_level (struct level *level);
 void register_con_at_pos (struct pos *p);
+void register_room (int room);
 void register_cons (void);
 void destroy_con_at_pos (struct pos *p);
+void destroy_room (int room);
 void destroy_cons (void);
 void prepare_con_at_pos (struct pos *p);
+void prepare_room (int room);
 void register_anims (void);
 void display_remaining_time (void);
 void display_skill (struct anim *k);
 void pause_game (void);
 void unpause_game (void);
-void prepare_play_level_undo (void);
-void register_play_level_undo (char *msg);
-void prepare_edit_level_undo (void);
-void register_edit_level_undo (char *msg);
+
+/* not used */
+void apply_to_diff_pos (struct diff *d, void (*func) (struct pos *p));
 void level_undo (struct diffset *diffset, int dir, char *prefix);
 
 #endif	/* MININIM_LEVEL_H */

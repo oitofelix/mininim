@@ -43,12 +43,18 @@ add_diffset_diff (struct diffset *diffset, void *ptr0, void *ptr1,
 }
 
 bool
+can_apply_diffset (struct diffset *diffset, int dir)
+{
+  return ! (diffset->current == -1 && dir < 0)
+    && ! (diffset->current == diffset->count - 1 && dir >= 0)
+    && diffset->diff && diffset->count;
+}
+
+bool
 apply_diffset_diff (struct diffset *diffset, void *base, size_t size,
                     int dir, char **desc)
 {
-  if ((diffset->current == -1 && dir < 0)
-      || (diffset->current == diffset->count - 1 && dir >= 0)
-      || ! diffset->diff || ! diffset->count) {
+  if (! can_apply_diffset (diffset, dir)) {
     desc = NULL;
     return false;
   }

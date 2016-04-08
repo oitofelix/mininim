@@ -54,6 +54,16 @@ roomd_n0 (int room, enum dir dir)
   return r ? r : room;
 }
 
+bool
+is_room_adjacent (int room0, int room1)
+{
+  return room0 == room1
+    || roomd (room0, LEFT) == room1
+    || roomd (room0, RIGHT) == room1
+    || roomd (room0, ABOVE) == room1
+    || roomd (room0, BELOW) == room1;
+}
+
 int
 room_dist (int r0, int r1, int max)
 {

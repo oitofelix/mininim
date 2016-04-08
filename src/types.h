@@ -486,4 +486,36 @@ struct spikes_floor {
   bool activate;
 };
 
+/*******
+ * UNDO
+ *******/
+
+typedef void (*undo_f) (void *data, int dir);
+
+struct undo {
+  struct undo_pass {
+    void *data;
+    undo_f f;
+    char *desc;
+  } *pass;
+
+  size_t count;
+  int current;
+};
+
+struct con_undo {
+  struct con b, f;
+  struct pos p;
+};
+
+struct exchange_pos_undo {
+  struct pos p0, p1;
+  bool prepare, invert_dir;
+};
+
+struct room_undo {
+  int room;
+  struct con b[FLOORS][PLACES], f[FLOORS][PLACES];
+};
+
 #endif	/* MININIM_TYPES_H */

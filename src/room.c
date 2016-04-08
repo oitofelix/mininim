@@ -463,8 +463,8 @@ draw_confg_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case SKELETON_FLOOR: break;
   case LOOSE_FLOOR: break;
   case SPIKES_FLOOR: draw_spikes_fg (bitmap, &pv, em, vm); break;
-  case OPENER_FLOOR: break;
-  case CLOSER_FLOOR: break;
+  case OPENER_FLOOR: draw_opener_floor_fg (bitmap, &pv, em, vm); break;
+  case CLOSER_FLOOR: draw_closer_floor_fg (bitmap, &pv, em, vm); break;
   case STUCK_FLOOR: break;
   case HIDDEN_FLOOR: break;
   case PILLAR: draw_pillar_fg (bitmap, &pv, em, vm); break;
@@ -614,6 +614,12 @@ draw_room_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
     if (con (&pv)->fg == BROKEN_FLOOR)
       draw_broken_floor_fg (bitmap, &pv, em, vm);
+    else if (con (&pv)->fg == OPENER_FLOOR
+             && opener_floor_at_pos (&pv)->broken)
+      draw_opener_floor_fg (bitmap, &pv, em, vm);
+    else if (con (&pv)->fg == CLOSER_FLOOR
+             && closer_floor_at_pos (&pv)->broken)
+      draw_closer_floor_fg (bitmap, &pv, em, vm);
     else {
       if (con (&pv)->fg == DOOR)
         draw_door_fg (bitmap, &pv, f, em, vm);
@@ -638,16 +644,7 @@ draw_room_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
         draw_arch_bottom_fg (bitmap, &pv, em, vm);
     }
     /* when below the construction */
-  } else if (
-             /* (peq (&pv, &fptl) */
-             /*  || peq (&pv, &fptr) */
-             /*  || peq (&pv, &fpmt) */
-             /*  || peq (&pv, &ptl) */
-             /*  || peq (&pv, &ptr) */
-             /*  || peq (&pv, &pmt)) */
-             /* && (peq (&pv, prel (&fpmbo, &np, -1, 0)) */
-             /*     || peq (&pv, prel (&pmbo, &np, -1, 0))) */
-             ! (is_kid_hang_or_climb (f) && f->dir == LEFT)
+  } else if (! (is_kid_hang_or_climb (f) && f->dir == LEFT)
              && ! is_anim_fall (f)
              && ! is_strictly_traversable (&pv)
              && tl.y <= (pv.floor + 1) * PLACE_HEIGHT + 3

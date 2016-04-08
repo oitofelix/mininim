@@ -23,6 +23,8 @@
 #define WINDOW_TITLE "MININIM: The Advanced Prince of Persia Engine (a childhood dream)"
 #define ICON "data/icons/mininim.png"
 
+#define IGNORE (INT_MIN)
+
 #define ROOMS 25
 #define FLOORS 3
 #define PLACES 10
