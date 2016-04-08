@@ -273,6 +273,8 @@ editor (void)
   char *str = NULL, c, *f, *d;
 
   enum confg fg;
+  enum conbg bg;
+  union conext ext;
   struct con room_buf[FLOORS][PLACES];
 
   /* additional graphics */
@@ -450,6 +452,7 @@ editor (void)
     case 'T': fg = STUCK_FLOOR; break;
     case 'H': fg = HIDDEN_FLOOR; break;
     }
+
     register_con_undo (&undo, &p,
                        fg, IGNORE, IGNORE,
                        true, true, false, "FLOOR");
@@ -474,6 +477,7 @@ editor (void)
     case 'B': fg = BIG_PILLAR_BOTTOM; break;
     case 'A': fg = ARCH_BOTTOM; break;
     }
+
     register_con_undo (&undo, &p,
                        fg, IGNORE, IGNORE,
                        true, false, false, "PILLAR");
@@ -500,6 +504,7 @@ editor (void)
     case 'D': fg = DOOR; break;
     case 'L': fg = LEVEL_DOOR; break;
     }
+
     register_con_undo (&undo, &p,
                        fg, IGNORE, IGNORE,
                        true, true, false, "DOOR");
@@ -522,6 +527,7 @@ editor (void)
     case 'C': fg = CARPET; break;
     case 'T': fg = TCARPET; break;
     }
+
     register_con_undo (&undo, &p,
                        fg, IGNORE, IGNORE,
                        true, false, false, "CARPET");
@@ -546,6 +552,7 @@ editor (void)
     case 'L': fg = ARCH_TOP_LEFT; break;
     case 'R': fg = ARCH_TOP_RIGHT; break;
     }
+
     register_con_undo (&undo, &p,
                        fg, IGNORE, IGNORE,
                        true, false, false, "ARCH");
@@ -558,21 +565,27 @@ editor (void)
     }
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
     c = menu_enum (bg_menu, "CB>");
-    switch (c) {
-    case -1: case 1: edit = EDIT_CON; break;
-    case 'N': con (&p)->bg = NO_BRICKS; break;
-    case 'G': con (&p)->bg = NO_BG; break;
-    case '0': con (&p)->bg = BRICKS_00; break;
-    case '1': con (&p)->bg = BRICKS_01; break;
-    case '2': con (&p)->bg = BRICKS_02; break;
-    case '3': con (&p)->bg = BRICKS_03; break;
-    case 'T': con (&p)->bg = TORCH; break;
-    case 'W': con (&p)->bg = WINDOW; break;
-    case 'B':
-      con (&p)->bg = BALCONY;
-      compute_stars_position (room_view, room_view);
-      break;
+    if (! c) break;
+
+    if (c == -1 || c == 1) {
+      edit = EDIT_CON; break;
     }
+
+    switch (c) {
+    case 'N': bg = NO_BRICKS; break;
+    case 'G': bg = NO_BG; break;
+    case '0': bg = BRICKS_00; break;
+    case '1': bg = BRICKS_01; break;
+    case '2': bg = BRICKS_02; break;
+    case '3': bg = BRICKS_03; break;
+    case 'T': bg = TORCH; break;
+    case 'W': bg = WINDOW; break;
+    case 'B': bg = BALCONY; break;
+    }
+
+    register_con_undo (&undo, &p,
+                       IGNORE, bg, IGNORE,
+                       false, false, (bg == BALCONY), "BACKGROUND");
     break;
   case EDIT_EXT:
     if (! is_valid_pos (&p)) {
@@ -584,33 +597,43 @@ editor (void)
     switch (con (&p)->fg) {
     case FLOOR:
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
-      switch (menu_enum (items_menu, "CE>")) {
-      case -1: case 1: edit = EDIT_CON; break;
-      case 'N': con (&p)->ext.item = NO_ITEM; break;
-      case 'E': con (&p)->ext.item = EMPTY_POTION; break;
-      case 'S': con (&p)->ext.item = SMALL_LIFE_POTION; break;
-      case 'B': con (&p)->ext.item = BIG_LIFE_POTION; break;
-      case 'P': con (&p)->ext.item = SMALL_POISON_POTION; break;
-      case 'O': con (&p)->ext.item = BIG_POISON_POTION; break;
-      case 'F': con (&p)->ext.item = FLOAT_POTION; break;
-      case 'L': con (&p)->ext.item = FLIP_POTION; break;
-      case 'A': con (&p)->ext.item = ACTIVATION_POTION; break;
-      case 'W': con (&p)->ext.item = SWORD; break;
+      c = menu_enum (items_menu, "CE>");
+      if (! c) break;
+
+      if (c == -1 || c == 1) {
+        edit = EDIT_CON; break;
       }
+
+      switch (c) {
+      case 'N': ext.item = NO_ITEM; break;
+      case 'E': ext.item = EMPTY_POTION; break;
+      case 'S': ext.item = SMALL_LIFE_POTION; break;
+      case 'B': ext.item = BIG_LIFE_POTION; break;
+      case 'P': ext.item = SMALL_POISON_POTION; break;
+      case 'O': ext.item = BIG_POISON_POTION; break;
+      case 'F': ext.item = FLOAT_POTION; break;
+      case 'L': ext.item = FLIP_POTION; break;
+      case 'A': ext.item = ACTIVATION_POTION; break;
+      case 'W': ext.item = SWORD; break;
+      }
+
+      register_con_undo (&undo, &p,
+                         IGNORE, IGNORE, ext.item,
+                         false, false, false, "ITEM EXTENSION");
       break;
     case LOOSE_FLOOR:
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
+      b0 = con (&p)->ext.cant_fall;
       c = menu_bool (loose_floor_ext_menu, "CE>", false, &b0);
-      switch (c) {
-      case -1: edit = EDIT_CON; break;
-      case 0: break;
-      case 1: edit = EDIT_CON; break;
-      default:
-        destroy_con_at_pos (&p);
-        con (&p)->ext.cant_fall = b0;
-        register_con_at_pos (&p);
-        break;
+      if (! c) break;
+
+      if (c == -1 || c == 1) {
+        edit = EDIT_CON; break;
       }
+
+      register_con_undo (&undo, &p,
+                         IGNORE, IGNORE, b0,
+                         true, true, false, "CAN'T FALL EXTENSION");
       break;
     case SPIKES_FLOOR:
       menu_step_ext (&p, SPIKES_FLOOR_MAX_STEP);
@@ -634,39 +657,55 @@ editor (void)
       min = b ? 128 : 0;
       max = b ? 133 : 5;
       s = menu_int (&r, &b, min, max, "CE>STEP", "B");
-      switch (s) {
-      case -1: edit = EDIT_CON; break;
-      case 0: break;
-      case 1: edit = EDIT_CON; break;
-      default:
-        if (r != con (&p)->ext.step
-            || b != (con (&p)->ext.step & 0x80)) {
-          destroy_con_at_pos (&p);
-          con (&p)->ext.step = b ? r | 0x80 : r & ~ 0x80;
-          register_con_at_pos (&p);
-        }
-        break;
+      if (! s) break;
+
+      if (s == -1 || s == 1) {
+        edit = EDIT_CON; break;
       }
+
+      register_con_undo (&undo, &p,
+                         IGNORE, IGNORE, b ? r | 0x80 : r & ~ 0x80,
+                         true, true, false, "STEP EXTENSION");
       break;
     case CARPET:
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
-      switch (menu_enum (carpet_ext_menu, "CE>")) {
-      case -1: case 1: edit = EDIT_CON; break;
-      case '0': con (&p)->ext.design = CARPET_00; break;
-      case '1': con (&p)->ext.design = CARPET_01; break;
-      case 'A': con (&p)->ext.design = ARCH_CARPET_LEFT; break;
+      c = menu_enum (carpet_ext_menu, "CE>");
+      if (! c) break;
+
+      if (c == -1 || c == 1) {
+        edit = EDIT_CON; break;
       }
+
+      switch (c) {
+      case '0': ext.design = CARPET_00; break;
+      case '1': ext.design = CARPET_01; break;
+      case 'A': ext.design = ARCH_CARPET_LEFT; break;
+      }
+
+      register_con_undo (&undo, &p,
+                         IGNORE, IGNORE, ext.design,
+                         false, false, false, "DESIGN EXTENSION");
       break;
     case TCARPET:
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
-      switch (menu_enum (tcarpet_ext_menu, "CE>")) {
-      case -1: case 1: edit = EDIT_CON; break;
-      case '0': con (&p)->ext.design = CARPET_00; break;
-      case '1': con (&p)->ext.design = CARPET_01; break;
-      case 'A': con (&p)->ext.design = ARCH_CARPET_LEFT; break;
-      case 'B': con (&p)->ext.design = ARCH_CARPET_RIGHT_00; break;
-      case 'C': con (&p)->ext.design = ARCH_CARPET_RIGHT_01; break;
+      c = menu_enum (tcarpet_ext_menu, "CE>");
+      if (! c) break;
+
+      if (c == -1 || c == 1) {
+        edit = EDIT_CON; break;
       }
+
+      switch (c) {
+      case '0': ext.design = CARPET_00; break;
+      case '1': ext.design = CARPET_01; break;
+      case 'A': ext.design = ARCH_CARPET_LEFT; break;
+      case 'B': ext.design = ARCH_CARPET_RIGHT_00; break;
+      case 'C': ext.design = ARCH_CARPET_RIGHT_01; break;
+      }
+
+      register_con_undo (&undo, &p,
+                         IGNORE, IGNORE, ext.design,
+                         false, false, false, "DESIGN EXTENSION");
       break;
     default:
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
@@ -1428,18 +1467,15 @@ menu_step_ext (struct pos *p, int max)
   set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
   int r = con (p)->ext.step;
   char c = menu_int (&r, NULL, 0, max, "CE>STEP", NULL);
-  switch (c) {
-  case -1: edit = EDIT_CON; break;
-  case 0: break;
-  case 1: edit = EDIT_CON; break;
-  default:
-    if (con (p)->ext.step != r) {
-      destroy_con_at_pos (p);
-      con (p)->ext.step = r;
-      register_con_at_pos (p);
-    }
-    break;
+  if (! c) return c;
+
+  if (c == -1 || c == 1) {
+    edit = EDIT_CON; return c;
   }
+
+  register_con_undo (&undo, p,
+                     IGNORE, IGNORE, r,
+                     true, true, false, "STEP EXTENSION");
   return c;
 }
 
@@ -1449,18 +1485,15 @@ menu_event_ext (struct pos *p)
   set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
   int r = con (p)->ext.event;
   char c = menu_int (&r, NULL, 0, EVENTS - 1, "CE>EVENT", NULL);
-  switch (c) {
-  case -1: edit = EDIT_CON; break;
-  case 0: break;
-  case 1: edit = EDIT_CON; break;
-  default:
-    if (con (p)->ext.event != r) {
-      destroy_con_at_pos (p);
-      con (p)->ext.event = r;
-      register_con_at_pos (p);
-    }
-    break;
+  if (! c) return c;
+
+  if (c == -1 || c == 1) {
+    edit = EDIT_CON; return c;
   }
+
+  register_con_undo (&undo, p,
+                     IGNORE, IGNORE, r,
+                     true, true, false, "EVENT EXTENSION");
   return c;
 }
 
