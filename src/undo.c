@@ -139,8 +139,7 @@ register_exchange_pos_undo (struct undo *u, struct pos *p0, struct pos *p1,
   d->prepare = prepare;
   d->invert_dir = invert_dir;
   register_undo (u, d, (undo_f) exchange_pos_undo, desc);
-
-  exchange_pos (p0, p1, prepare, invert_dir);
+  exchange_pos_undo (d, +1);
 }
 
 void
@@ -165,18 +164,15 @@ void
 register_room_undo (struct undo *u, int room, struct con c[FLOORS][PLACES],
                     char *desc)
 {
-  if (! memcmp (&level.con[room], &c, FLOORS * PLACES * sizeof (struct con))) return;
+  if (! memcmp (&level.con[room], c, FLOORS * PLACES * sizeof (struct con)))
+    return;
 
   struct room_undo *d = xmalloc (sizeof (struct room_undo));
   d->room = room;
   memcpy (&d->b, &level.con[room], sizeof (d->b));
   memcpy (&d->f, c, sizeof (d->f));
   register_undo (u, d, (undo_f) room_undo, desc);
-
-  destroy_room (room);
-  memcpy (&level.con[room], c, FLOORS * PLACES * sizeof (struct con));
-  register_room (room);
-  prepare_room (room);
+  room_undo (d, +1);
 }
 
 void
@@ -206,12 +202,111 @@ register_event_undo (struct undo *u, int e, struct pos *p, bool next,
   d->f.p = *p;
   d->f.next = next;
   register_undo (u, d, (undo_f) event_undo, desc);
-
-  level.event[e] = d->f;
+  event_undo (d, +1);
 }
 
 void
 event_undo (struct event_undo *d, int dir)
 {
   level.event[d->e] = (dir >= 0) ? d->f : d->b;
+}
+
+/********************************/
+/* HORIZONTAL ROOM CON EXCHANGE */
+/********************************/
+
+void
+register_h_room_con_exchange_undo (struct undo *u, int _room, char *desc)
+{
+  int *room = xmalloc (sizeof (* room));
+  *room = _room;
+  register_undo (u, room, (undo_f) h_room_con_exchange_undo, desc);
+  h_room_con_exchange_undo (room, +1);
+}
+
+void
+h_room_con_exchange_undo (int *room, int dir)
+{
+  struct pos p0, p1;
+  p0.room = *room;
+  for (p0.floor = 0; p0.floor < FLOORS; p0.floor++)
+    for (p0.place = 0; p0.place < PLACES / 2; p0.place++) {
+      reflect_pos_h (&p0, &p1);
+      exchange_pos (&p0, &p1, false, true);
+    }
+  prepare_room (p0.room);
+}
+
+/********************************/
+/* VERTICAL ROOM CON EXCHANGE */
+/********************************/
+
+void
+register_v_room_con_exchange_undo (struct undo *u, int _room, char *desc)
+{
+  int *room = xmalloc (sizeof (* room));
+  *room = _room;
+  register_undo (u, room, (undo_f) v_room_con_exchange_undo, desc);
+  v_room_con_exchange_undo (room, +1);
+}
+
+void
+v_room_con_exchange_undo (int *room, int dir)
+{
+  struct pos p0, p1;
+  p0.room = *room;
+  for (p0.floor = 0; p0.floor < FLOORS / 2; p0.floor++)
+    for (p0.place = 0; p0.place < PLACES; p0.place++) {
+      reflect_pos_v (&p0, &p1);
+      exchange_pos (&p0, &p1, false, false);
+    }
+  prepare_room (p0.room);
+}
+
+/****************************/
+/* RANDOM ROOM CON EXCHANGE */
+/****************************/
+
+void
+register_random_room_con_exchange_undo (struct undo *u, int _room,
+                                        bool prepare, bool invert_dir,
+                                        char *desc)
+{
+  struct random_room_con_exchange_undo *d = xmalloc (sizeof (* d));
+  d->room = _room;
+  d->prepare = prepare;
+  d->invert_dir = invert_dir;
+
+  struct pos p;
+  for (p.floor = 0; p.floor < FLOORS; p.floor++)
+    for (p.place = 0; p.place < PLACES; p.place++)
+      random_pos (&d->p[p.floor][p.place]);
+
+  register_undo (u, d, (undo_f) random_room_con_exchange_undo, desc);
+
+  random_room_con_exchange_undo (d, +1);
+}
+
+void
+random_room_con_exchange_undo (struct random_room_con_exchange_undo *d, int dir)
+{
+  struct pos p0, p1;
+  p0.room = d->room;
+
+  if (dir >= 0)
+    for (p0.floor = 0; p0.floor < FLOORS; p0.floor++)
+      for (p0.place = 0; p0.place < PLACES; p0.place++) {
+        p1 = d->p[p0.floor][p0.place];
+        p1.room = d->room;
+        exchange_pos (&p0, &p1, d->prepare, d->invert_dir);
+      }
+  else
+    for (p0.floor = FLOORS - 1; p0.floor >= 0; p0.floor--)
+      for (p0.place = PLACES - 1; p0.place >= 0; p0.place--) {
+        p1 = d->p[p0.floor][p0.place];
+        p1.room = d->room;
+        exchange_pos (&p1, &p0, d->prepare, d->invert_dir);
+      }
+
+  prepare_room (d->room);
 }

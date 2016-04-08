@@ -48,4 +48,18 @@ register_event_undo (struct undo *u, int e, struct pos *p, bool next,
                      char *desc);
 void event_undo (struct event_undo *d, int dir);
 
+/* HORIZONTAL ROOM CON EXCHANGE */
+void register_h_room_con_exchange_undo (struct undo *u, int _room, char *desc);
+void h_room_con_exchange_undo (int *room, int dir);
+
+/* VERTICAL ROOM CON EXCHANGE */
+void register_v_room_con_exchange_undo (struct undo *u, int _room, char *desc);
+void v_room_con_exchange_undo (int *room, int dir);
+
+/* RANDOM ROOM CON EXCHANGE */
+void register_random_room_con_exchange_undo (struct undo *u, int _room,
+                                             bool prepare, bool invert_dir,
+                                             char *desc);
+void random_room_con_exchange_undo (struct random_room_con_exchange_undo *d, int dir);
+
 #endif	/* MININIM_UNDO_H */

@@ -29,14 +29,13 @@ static char menu_skill (char *prefix, int *skill, int max, enum edit up_edit);
 static int last_event;
 static struct coord last_mouse_coord;
 static struct pos last_event2floor_pos;
-/* static struct pos last_mouse_pos = {-1,-1,-1}; */
 static bool reciprocal_links, locally_unique_links,
   globally_unique_links;
 static bool b0, b1, b2, b3, b4, b5;
 static int guard_index;
 static int b, r, s, t, min, max;
 static struct con con_copy;
-static struct con room_copy[1][FLOORS][PLACES];
+static struct con room_copy[FLOORS][PLACES];
 static char *msg;
 static uint64_t msg_cycles;
 
@@ -266,7 +265,7 @@ editor (void)
   struct pos p = mouse_pos;
   struct anim *k;
   struct guard *g;
-  static struct pos p0, p1;
+  static struct pos p0;
 
   char *fg_str = NULL, *bg_str = NULL, *ext_str = NULL;
   bool free_ext_str;
@@ -275,7 +274,7 @@ editor (void)
   enum confg fg;
   enum conbg bg;
   union conext ext;
-  struct con room_buf[FLOORS][PLACES];
+  struct con room_buf[FLOORS][PLACES], room_buf2[FLOORS][PLACES];
 
   /* additional graphics */
   switch (edit) {
@@ -907,46 +906,37 @@ editor (void)
       p0.room = room_view;
       for (p0.floor = 0; p0.floor < FLOORS; p0.floor++)
         for (p0.place = 0; p0.place < PLACES; p0.place++) {
-          destroy_con_at_pos (&p0);
-          con (&p0)->fg = NO_FLOOR;
-          con (&p0)->bg = NO_BG;
-          con (&p0)->ext.item = NO_ITEM;
+          room_buf[p0.floor][p0.place] =
+            (struct con) {.fg = NO_FLOOR, .bg = NO_BG, .ext.step = 0};
         }
-      prepare_room (room_view);
+      register_room_undo (&undo, room_view, room_buf, "CLEAR ROOM");
       break;
     case 'R':
       p0.room = room_view;
       for (p0.floor = 0; p0.floor < FLOORS; p0.floor++)
-        for (p0.place = 0; p0.place < PLACES; p0.place++) {
+        for (p0.place = 0; p0.place < PLACES; p0.place++)
           room_buf[p0.floor][p0.place] =
             (struct con) {.fg = prandom (ARCH_TOP_SMALL), .bg = prandom (BALCONY),
-             .ext.step = 0};
-        }
+                          .ext.step = 0};
       register_room_undo (&undo, room_view, room_buf, "RANDOM ROOM");
       break;
     case 'D':
+      memcpy (&room_buf2, &level.con[room_view], sizeof (room_buf2));
       p0.room = room_view;
       for (p0.floor = 0; p0.floor < FLOORS; p0.floor++)
         for (p0.place = 0; p0.place < PLACES; p0.place++)
           decorate_pos (&p0);
+      memcpy (&room_buf, &level.con[room_view], sizeof (room_buf));
+      memcpy (&level.con[room_view], &room_buf2, sizeof (room_buf2));
+      register_room_undo (&undo, room_view, room_buf, "DECORATE ROOM");
       break;
     case 'H': edit = EDIT_ROOM_CON_EXCHANGE; break;
     case 'C':
-      p0.room = room_view;
-      for (p0.floor = 0; p0.floor < FLOORS; p0.floor++)
-        for (p0.place = 0; p0.place < PLACES; p0.place++)
-          room_copy[0][p0.floor][p0.place] = *con (&p0);
+      memcpy (&room_copy, &level.con[room_view], sizeof (room_copy));
       editor_msg ("COPIED", 12);
       break;
     case 'P':
-      p0.room = room_view;
-      for (p0.floor = 0; p0.floor < FLOORS; p0.floor++)
-        for (p0.place = 0; p0.place < PLACES; p0.place++) {
-          destroy_con_at_pos (&p0);
-          *con (&p0) = room_copy[0][p0.floor][p0.place];
-          register_con_at_pos (&p0);
-        }
-      prepare_room (room_view);
+      register_room_undo (&undo, room_view, room_copy, "PASTE ROOM");
       break;
     }
     break;
@@ -955,32 +945,14 @@ editor (void)
     switch (menu_enum (con_exchange_menu, "RH>")) {
     case -1: case 1: edit = EDIT_ROOM; break;
     case 'H':
-      p0.room = room_view;
-      for (p0.floor = 0; p0.floor < FLOORS; p0.floor++)
-        for (p0.place = 0; p0.place < PLACES / 2; p0.place++) {
-          reflect_pos_h (&p0, &p1);
-          exchange_pos (&p0, &p1, false, true);
-        }
-      prepare_room (room_view);
+      register_h_room_con_exchange_undo (&undo, room_view, "ROOM H.CON EXCHANGE");
       break;
     case 'V':
-      p0.room = room_view;
-      for (p0.floor = 0; p0.floor < FLOORS / 2; p0.floor++)
-        for (p0.place = 0; p0.place < PLACES; p0.place++) {
-          reflect_pos_v (&p0, &p1);
-          exchange_pos (&p0, &p1, false, false);
-        }
-      prepare_room (room_view);
+      register_v_room_con_exchange_undo (&undo, room_view, "ROOM V.CON EXCHANGE");
       break;
     case 'R':
-      p0.room = room_view;
-      for (p0.floor = 0; p0.floor < FLOORS; p0.floor++)
-        for (p0.place = 0; p0.place < PLACES; p0.place++) {
-          random_pos (&p1);
-          p1.room = p0.room;
-          exchange_pos (&p0, &p1, false, false);
-        }
-      prepare_room (room_view);
+      register_random_room_con_exchange_undo (&undo, room_view, false, false,
+                                              "ROOM RANDOM CON EXCHANGE");
       break;
     }
     break;

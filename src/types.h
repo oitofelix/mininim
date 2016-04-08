@@ -523,4 +523,10 @@ struct event_undo {
   struct level_event b, f;
 };
 
+struct random_room_con_exchange_undo {
+  struct pos p[FLOORS][PLACES];
+  int room;
+  bool prepare, invert_dir;
+};
+
 #endif	/* MININIM_TYPES_H */
