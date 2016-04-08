@@ -188,3 +188,30 @@ room_undo (struct room_undo *d, int dir)
   register_room (d->room);
   prepare_room (d->room);
 }
+
+/*********/
+/* EVENT */
+/*********/
+
+void
+register_event_undo (struct undo *u, int e, struct pos *p, bool next,
+                     char *desc)
+{
+  if (peq (&level.event[e].p, p)
+      && level.event[e].next == next) return;
+
+  struct event_undo *d = xmalloc (sizeof (struct event_undo));
+  d->e = e;
+  d->b = level.event[e];
+  d->f.p = *p;
+  d->f.next = next;
+  register_undo (u, d, (undo_f) event_undo, desc);
+
+  level.event[e] = d->f;
+}
+
+void
+event_undo (struct event_undo *d, int dir)
+{
+  level.event[d->e] = (dir >= 0) ? d->f : d->b;
+}

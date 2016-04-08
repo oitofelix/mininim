@@ -295,8 +295,8 @@ was_menu_key_pressed (void)
 }
 
 bool
-was_menu_return_pressed (void)
+was_menu_return_pressed (bool consume)
 {
-  return was_key_pressed (ALLEGRO_KEY_BACKSPACE, 0, 0, true)
-    || was_key_pressed (0, '/', 0, true);
+  return was_key_pressed (ALLEGRO_KEY_BACKSPACE, 0, 0, consume)
+    || was_key_pressed (0, '/', 0, consume);
 }

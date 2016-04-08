@@ -42,4 +42,10 @@ void register_room_undo (struct undo *u, int room, struct con c[FLOORS][PLACES],
                          char *desc);
 void room_undo (struct room_undo *d, int dir);
 
+/* EVENT */
+void
+register_event_undo (struct undo *u, int e, struct pos *p, bool next,
+                     char *desc);
+void event_undo (struct event_undo *d, int dir);
+
 #endif	/* MININIM_UNDO_H */

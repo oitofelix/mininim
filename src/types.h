@@ -518,4 +518,9 @@ struct room_undo {
   struct con b[FLOORS][PLACES], f[FLOORS][PLACES];
 };
 
+struct event_undo {
+  int e;
+  struct level_event b, f;
+};
+
 #endif	/* MININIM_TYPES_H */

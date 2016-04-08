@@ -266,7 +266,7 @@ editor (void)
   struct pos p = mouse_pos;
   struct anim *k;
   struct guard *g;
-  struct pos p0, p1;
+  static struct pos p0, p1;
 
   char *fg_str = NULL, *bg_str = NULL, *ext_str = NULL;
   bool free_ext_str;
@@ -303,14 +303,13 @@ editor (void)
  }
 
   /* display message if available */
-  if (msg_cycles > 0 && msg) {
+  if (msg_cycles > 0 && msg && ! was_menu_return_pressed (false)) {
     msg_cycles--;
     draw_bottom_text (NULL, msg);
-    if (was_menu_return_pressed ()) msg_cycles = 0;
     memset (&key, 0, sizeof (key));
     menu_help = 0;
     return;
-  }
+  } else msg_cycles = 0;
 
   switch (edit) {
   case EDIT_NONE: break;
@@ -710,7 +709,7 @@ editor (void)
     default:
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       draw_bottom_text (NULL, "NO EXTENSION");
-      if (was_menu_return_pressed ()) edit = EDIT_CON;
+      if (was_menu_return_pressed (true)) edit = EDIT_CON;
       break;
     }
     break;
@@ -722,7 +721,7 @@ editor (void)
     }
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
 
-    if (was_menu_return_pressed ()) edit = EDIT_CON;
+    if (was_menu_return_pressed (true)) edit = EDIT_CON;
 
     free_ext_str = false;
 
@@ -789,7 +788,7 @@ editor (void)
       break;
     case 'R':
       edit = EDIT_DOOR2EVENT;
-      t = -1;
+      p0 = (struct pos) {-1,-1,-1};
       break;
     case 'S':
       edit = EDIT_EVENT_SET;
@@ -850,11 +849,15 @@ editor (void)
     if (! is_valid_pos (&p) || ! is_door (&p)) {
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       editor_msg ("SELECT DOOR", 1);
-      if (was_menu_return_pressed ()) edit = EDIT_EVENT;
+      if (was_menu_return_pressed (true)) edit = EDIT_EVENT;
       t = -1;
     } else {
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
-      if (t < 0) next_int_by_pred (&t, 0, 0, EVENTS - 1, is_pos_at_event, &p);
+      if (! peq (&p, &p0)) {
+        t = -1;
+        next_int_by_pred (&t, 0, 0, EVENTS - 1, is_pos_at_event, &p);
+        p0 = p;
+      }
       switch (menu_list (NULL, &r, t, 0, EVENTS - 1, "ER>EVENT")) {
       case -1: edit = EDIT_EVENT; break;
       case 0: break;
@@ -869,15 +872,14 @@ editor (void)
     if (! is_valid_pos (&p) || ! is_door (&p)) {
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       editor_msg ("SELECT DOOR", 1);
-      if (was_menu_return_pressed ()) edit = EDIT_EVENT;
+      if (was_menu_return_pressed (true)) edit = EDIT_EVENT;
     } else {
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
       switch (menu_int (&s, &b, 0, EVENTS - 1, "ES>EVENT", "N")) {
       case -1: edit = EDIT_EVENT; break;
       case 0: break;
       case 1:
-        level.event[s].p = p;
-        level.event[s].next = b ? true : false;
+        register_event_undo (&undo, s, &p, b ? true : false, "EVENT");
         last_event = s;
         edit = EDIT_EVENT;
         break;
