@@ -997,14 +997,17 @@ editor (void)
     r = menu_select_room (EDIT_ROOM, "RX>ROOM");
 
     if (r == 1) {
+      struct room_linking l[ROOMS];
+      memcpy (&l, &level.link, sizeof (l));
+
       int room0 = last_mouse_coord.room;
       int room1 = room_view;
 
       exchange_rooms (room0, room1);
 
+      register_link_undo (&undo, l, "ROOM EXCHANGE");
       last_mouse_coord.room = room1;
       set_mouse_coord (&last_mouse_coord);
-      update_wall_cache (room_view, em, vm);
     }
     break;
   case EDIT_LINKING_SETTINGS:
@@ -1502,6 +1505,9 @@ menu_link (enum dir dir)
   al_free (prefix);
 
   if (r == 1) {
+    struct room_linking l[ROOMS];
+    memcpy (&l, &level.link, sizeof (l));
+
     int room0 = last_mouse_coord.room;
     int room1 = room_view;
 
@@ -1518,8 +1524,8 @@ menu_link (enum dir dir)
       if (reciprocal_links) make_link_globally_unique (room1, opposite_dir (dir));
     }
 
+    register_link_undo (&undo, l, "LINK");
     set_mouse_coord (&last_mouse_coord);
-    update_wall_cache (room_view, em, vm);
   }
 
   return r;

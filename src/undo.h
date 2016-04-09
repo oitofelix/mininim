@@ -62,4 +62,9 @@ void register_random_room_con_exchange_undo (struct undo *u, int _room,
                                              char *desc);
 void random_room_con_exchange_undo (struct random_room_con_exchange_undo *d, int dir);
 
+/* LINK */
+void register_link_undo (struct undo *u, struct room_linking l[ROOMS],
+                         char *desc);
+void link_undo (struct link_undo *d, int dir);
+
 #endif	/* MININIM_UNDO_H */

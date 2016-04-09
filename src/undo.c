@@ -310,3 +310,27 @@ random_room_con_exchange_undo (struct random_room_con_exchange_undo *d, int dir)
 
   prepare_room (d->room);
 }
+
+/********/
+/* LINK */
+/********/
+
+void
+register_link_undo (struct undo *u, struct room_linking l[ROOMS],
+                    char *desc)
+{
+  if (! memcmp (l, &level.link, sizeof (level.link))) return;
+
+  struct link_undo *d = xmalloc (sizeof (struct link_undo));
+  memcpy (&d->b, l, sizeof (d->b));
+  memcpy (&d->f, &level.link, sizeof (d->f));
+  register_undo (u, d, (undo_f) link_undo, desc);
+  link_undo (d, +1);
+}
+
+void
+link_undo (struct link_undo *d, int dir)
+{
+  memcpy (&level.link, (dir >= 0) ? &d->f : &d->b, sizeof (d->f));
+  prepare_room (room_view);
+}

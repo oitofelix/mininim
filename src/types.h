@@ -529,4 +529,8 @@ struct random_room_con_exchange_undo {
   bool prepare, invert_dir;
 };
 
+struct link_undo {
+  struct room_linking b[ROOMS], f[ROOMS];
+};
+
 #endif	/* MININIM_TYPES_H */
