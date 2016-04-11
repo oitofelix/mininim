@@ -67,4 +67,16 @@ void register_link_undo (struct undo *u, struct room_linking l[ROOMS],
                          char *desc);
 void link_undo (struct link_undo *d, int dir);
 
+/* START POSITION */
+void register_start_pos_undo (struct undo *u, struct pos *p, char *desc);
+void start_pos_undo (struct start_pos_undo *d, int dir);
+
+/* TOGGLE START POSITION */
+void register_toggle_start_dir_undo (struct undo *u, char *desc);
+void toggle_start_dir_undo (struct start_pos_undo *d, int dir);
+
+/* TOGGLE HAS SWORD */
+void register_toggle_has_sword_undo (struct undo *u, char *desc);
+void toggle_has_sword_undo (struct start_pos_undo *d, int dir);
+
 #endif	/* MININIM_UNDO_H */

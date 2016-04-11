@@ -533,4 +533,8 @@ struct link_undo {
   struct room_linking b[ROOMS], f[ROOMS];
 };
 
+struct start_pos_undo {
+  struct pos b, f;
+};
+
 #endif	/* MININIM_TYPES_H */

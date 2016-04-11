@@ -334,3 +334,59 @@ link_undo (struct link_undo *d, int dir)
   memcpy (&level.link, (dir >= 0) ? &d->f : &d->b, sizeof (d->f));
   prepare_room (room_view);
 }
+
+/******************/
+/* START POSITION */
+/******************/
+
+void
+register_start_pos_undo (struct undo *u, struct pos *p, char *desc)
+{
+  if (peq (p, &level.start_pos)) return;
+
+  struct start_pos_undo *d = xmalloc (sizeof (* d));
+  d->b = level.start_pos;
+  d->f = *p;
+  register_undo (u, d, (undo_f) start_pos_undo, desc);
+  start_pos_undo (d, +1);
+}
+
+void
+start_pos_undo (struct start_pos_undo *d, int dir)
+{
+  level.start_pos = (dir >= 0) ? d->f : d->b;
+}
+
+/**************************/
+/* TOGGLE START DIRECTION */
+/**************************/
+
+void
+register_toggle_start_dir_undo (struct undo *u, char *desc)
+{
+  register_undo (u, NULL, (undo_f) toggle_start_dir_undo, desc);
+  toggle_start_dir_undo (NULL, +1);
+}
+
+void
+toggle_start_dir_undo (struct start_pos_undo *d, int dir)
+{
+  level.start_dir = (level.start_dir == LEFT) ? RIGHT : LEFT;
+}
+
+/********************/
+/* TOGGLE HAS SWORD */
+/********************/
+
+void
+register_toggle_has_sword_undo (struct undo *u, char *desc)
+{
+  register_undo (u, NULL, (undo_f) toggle_has_sword_undo, desc);
+  toggle_has_sword_undo (NULL, +1);
+}
+
+void
+toggle_has_sword_undo (struct start_pos_undo *d, int dir)
+{
+  level.has_sword = ! level.has_sword;
+}

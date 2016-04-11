@@ -1051,21 +1051,21 @@ editor (void)
         editor_msg ("SELECT CONSTRUCTION", 12);
         break;
       }
-      level.start_pos = p;
+      register_start_pos_undo (&undo, &p, "START POSITION");
       break;
     case 'D':
       if (room_view != level.start_pos.room) {
         editor_msg ("NOT IN THIS ROOM", 12);
         break;
       }
-      level.start_dir = (level.start_dir == LEFT) ? RIGHT : LEFT;
+      register_toggle_start_dir_undo (&undo, "TOGGLE START DIRECTION");
       break;
     case 'W':
       if (room_view != level.start_pos.room) {
         editor_msg ("NOT IN THIS ROOM", 12);
         break;
       }
-      level.has_sword = ! level.has_sword;
+      register_toggle_has_sword_undo (&undo, "TOGGLE HAS SWORD");
       break;
     }
     break;
