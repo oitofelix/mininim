@@ -93,14 +93,24 @@ void guard_skill_undo (struct guard_skill_undo *d, int dir);
 
 /* GUARD LIVES */
 void register_guard_lives_undo (struct undo *u, int i, int l, char *desc);
-void guard_lives_undo (struct int_undo *d, int dir);
+void guard_lives_undo (struct indexed_int_undo *d, int dir);
 
 /* GUARD TYPE */
 void register_guard_type_undo (struct undo *u, int i, enum anim_type t, char *desc);
-void guard_type_undo (struct int_undo *d, int dir);
+void guard_type_undo (struct indexed_int_undo *d, int dir);
 
 /* GUARD STYLE */
 void register_guard_style_undo (struct undo *u, int i, int t, char *desc);
-void guard_style_undo (struct int_undo *d, int dir);
+void guard_style_undo (struct indexed_int_undo *d, int dir);
+
+/* INT UNDO */
+void register_int_undo (struct undo *u, int *f, int b, undo_f func, char *desc);
+void int_undo (struct int_undo *d, int dir);
+
+/* LEVEL ENVIRONMENT UNDO */
+void level_environment_undo (struct int_undo *d, int dir);
+
+/* LEVEL HUE UNDO */
+void level_hue_undo (struct int_undo *d, int dir);
 
 #endif	/* MININIM_UNDO_H */

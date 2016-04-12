@@ -547,8 +547,12 @@ struct guard_skill_undo {
   struct skill b_skill, f_skill;
 };
 
-struct int_undo {
+struct indexed_int_undo {
   int i, b, f;
+};
+
+struct int_undo {
+  int *i, b, f;
 };
 
 #endif	/* MININIM_TYPES_H */

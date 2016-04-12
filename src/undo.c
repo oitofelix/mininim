@@ -469,7 +469,7 @@ register_guard_lives_undo (struct undo *u, int i, int l, char *desc)
   struct guard *g = &level.guard[i];
   if (g->total_lives == l) return;
 
-  struct int_undo *d = xmalloc (sizeof (* d));
+  struct indexed_int_undo *d = xmalloc (sizeof (* d));
   d->i = i;
   d->b = l;
   d->f = g->total_lives;
@@ -478,7 +478,7 @@ register_guard_lives_undo (struct undo *u, int i, int l, char *desc)
 }
 
 void
-guard_lives_undo (struct int_undo *d, int dir)
+guard_lives_undo (struct indexed_int_undo *d, int dir)
 {
   struct guard *g = &level.guard[d->i];
   g->total_lives = (dir >= 0) ? d->f : d->b;
@@ -494,7 +494,7 @@ register_guard_type_undo (struct undo *u, int i, enum anim_type t, char *desc)
   struct guard *g = &level.guard[i];
   if (g->type == t) return;
 
-  struct int_undo *d = xmalloc (sizeof (* d));
+  struct indexed_int_undo *d = xmalloc (sizeof (* d));
   d->i = i;
   d->b = t;
   d->f = g->type;
@@ -503,7 +503,7 @@ register_guard_type_undo (struct undo *u, int i, enum anim_type t, char *desc)
 }
 
 void
-guard_type_undo (struct int_undo *d, int dir)
+guard_type_undo (struct indexed_int_undo *d, int dir)
 {
   struct guard *g = &level.guard[d->i];
   g->type = (dir >= 0) ? d->f : d->b;
@@ -519,7 +519,7 @@ register_guard_style_undo (struct undo *u, int i, int s, char *desc)
   struct guard *g = &level.guard[i];
   if (g->style == s) return;
 
-  struct int_undo *d = xmalloc (sizeof (* d));
+  struct indexed_int_undo *d = xmalloc (sizeof (* d));
   d->i = i;
   d->b = s;
   d->f = g->style;
@@ -528,8 +528,53 @@ register_guard_style_undo (struct undo *u, int i, int s, char *desc)
 }
 
 void
-guard_style_undo (struct int_undo *d, int dir)
+guard_style_undo (struct indexed_int_undo *d, int dir)
 {
   struct guard *g = &level.guard[d->i];
   g->style = (dir >= 0) ? d->f : d->b;
+}
+
+/************/
+/* INT UNDO */
+/************/
+
+void
+register_int_undo (struct undo *u, int *f, int b, undo_f func, char *desc)
+{
+  if (*f == b) return;
+
+  struct int_undo *d = xmalloc (sizeof (* d));
+  d->i = f;
+  d->b = b;
+  d->f = *f;
+  register_undo (u, d, (undo_f) func, desc);
+  func (d, +1);
+}
+
+void
+int_undo (struct int_undo *d, int dir)
+{
+  *d->i = (dir >= 0) ? d->f : d->b;
+}
+
+/**************************/
+/* LEVEL ENVIRONMENT UNDO */
+/**************************/
+
+void
+level_environment_undo (struct int_undo *d, int dir)
+{
+  int_undo (d, dir);
+  em = level.em;
+}
+
+/******************/
+/* LEVEL HUE UNDO */
+/******************/
+
+void
+level_hue_undo (struct int_undo *d, int dir)
+{
+  int_undo (d, dir);
+  hue = level.hue;
 }

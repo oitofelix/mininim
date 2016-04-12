@@ -1125,12 +1125,13 @@ editor (void)
   case EDIT_NOMINAL_NUMBER:
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
     xasprintf (&str, "L%iN>N.NUMBER", level.number);
-    switch (menu_int (&s, NULL, 0, INT_MAX, str, NULL)) {
-    case -1: edit = EDIT_LEVEL; break;
+    switch (menu_int (&level.nominal_number, NULL, 0, INT_MAX, str, NULL)) {
+    case -1: edit = EDIT_LEVEL; level.nominal_number = s; break;
     case 0: break;
     case 1:
-      level.nominal_number = s;
       edit = EDIT_LEVEL;
+      register_int_undo (&undo, &level.nominal_number, s, (undo_f) int_undo,
+                         "LEVEL NOMINAL NUMBER");
       break;
     default: break;
     }
@@ -1139,16 +1140,22 @@ editor (void)
   case EDIT_ENVIRONMENT:
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
     xasprintf (&str, "L%iE>", level.number);
+    b0 = b1 = false;
+    if (level.em == DUNGEON) b0 = true;
+    if (level.em == PALACE) b1 = true;
+    em = level.em;
     switch (menu_bool (environment_menu, str, true, &b0, &b1)) {
-    case -1: edit = EDIT_LEVEL; em = b; break;
+    case -1: edit = EDIT_LEVEL; level.em = b; em = b; break;
     case 0: break;
     case 1:
-      level.em = em;
       edit = EDIT_LEVEL;
+      register_int_undo (&undo, (int *) &level.em, b, (undo_f) level_environment_undo,
+                         "LEVEL ENVIRONMENT");
       break;
     default:
-      if (b0) em = DUNGEON;
-      if (b1) em = PALACE;
+      if (b0) level.em = DUNGEON;
+      if (b1) level.em = PALACE;
+      em = level.em;
       break;
     }
     al_free (str);
@@ -1156,19 +1163,28 @@ editor (void)
   case EDIT_HUE:
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
     xasprintf (&str, "L%iH>", level.number);
+    b0 = b1 = b2 = b3 = b4 = 0;
+    if (level.hue == HUE_NONE) b0 = true;
+    if (level.hue == HUE_GREEN) b1 = true;
+    if (level.hue == HUE_GRAY) b2 = true;
+    if (level.hue == HUE_YELLOW) b3 = true;
+    if (level.hue == HUE_BLUE) b4 = true;
+    hue = level.hue;
     switch (menu_bool (hue_menu, str, true, &b0, &b1, &b2, &b3, &b4)) {
-    case -1: edit = EDIT_LEVEL; hue = b; break;
+    case -1: edit = EDIT_LEVEL; level.hue = b; hue = b; break;
     case 0: break;
     case 1:
-      level.hue = hue;
       edit = EDIT_LEVEL;
+      register_int_undo (&undo, (int *) &level.hue, b, (undo_f) level_hue_undo,
+                         "LEVEL HUE");
       break;
     default:
-      if (b0) hue = HUE_NONE;
-      if (b1) hue = HUE_GREEN;
-      if (b2) hue = HUE_GRAY;
-      if (b3) hue = HUE_YELLOW;
-      if (b4) hue = HUE_BLUE;
+      if (b0) level.hue = HUE_NONE;
+      if (b1) level.hue = HUE_GREEN;
+      if (b2) level.hue = HUE_GRAY;
+      if (b3) level.hue = HUE_YELLOW;
+      if (b4) level.hue = HUE_BLUE;
+      hue = level.hue;
       break;
     }
     al_free (str);
