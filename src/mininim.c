@@ -1373,7 +1373,7 @@ load_config (char *filename)
     error_str = "CONFIGURATION LOADED SUCCESSFULLY";
   } else error_str = "CONFIGURATION LOADED WITH ERRORS";
 
-  draw_bottom_text (NULL, error_str);
+  draw_bottom_text (NULL, error_str, 0);
 
   return textlog;
 }
@@ -1402,7 +1402,7 @@ save_game (char *filename)
     ? "GAME HAS BEEN SAVED"
     : "GAME SAVE FAILED";
 
-  draw_bottom_text (NULL, error_str);
+  draw_bottom_text (NULL, error_str, 0);
 
   al_destroy_config (config);
   al_free (start_level_str);

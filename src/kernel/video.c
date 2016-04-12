@@ -74,7 +74,7 @@ init_video (void)
 
   video_timer = create_timer (1.0 / EFFECT_HZ);
 
-  bottom_text_timer = create_timer (1.0);
+  bottom_text_timer = create_timer (1.0 / SCRIPT_HZ);
 
   al_init_font_addon ();
   builtin_font = al_create_builtin_font ();
@@ -239,18 +239,25 @@ draw_text (ALLEGRO_BITMAP *bitmap, char const *text, float x, float y, int flags
 }
 
 void
-draw_bottom_text (ALLEGRO_BITMAP *bitmap, char *text)
+draw_bottom_text (ALLEGRO_BITMAP *bitmap, char *text, int priority)
 {
   static char *current_text = NULL;
+  static int cur_priority = INT_MIN;
+
+  if (bitmap == NULL && priority < cur_priority
+      && al_get_timer_count (bottom_text_timer) < BOTTOM_TEXT_DURATION) return;
 
   if (text) {
     if (current_text) al_free (current_text);
     xasprintf (&current_text, "%s", text);
     al_set_timer_count (bottom_text_timer, 0);
     al_start_timer (bottom_text_timer);
+    cur_priority = priority;
   } else if (al_get_timer_count (bottom_text_timer) >= BOTTOM_TEXT_DURATION
-             || ! bitmap)
+             || ! bitmap) {
     al_stop_timer (bottom_text_timer);
+    cur_priority = INT_MIN;
+  }
   else if (al_get_timer_started (bottom_text_timer)) {
     ALLEGRO_COLOR bg_color;
 

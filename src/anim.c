@@ -112,7 +112,7 @@ play_anim (void (*draw_callback) (void),
           anim_cycle++;
         }
         if (! cutscene) editor ();
-        draw_bottom_text (uscreen, NULL);
+        draw_bottom_text (uscreen, NULL, 0);
         drop_all_events_from_source
           (event_queue, get_timer_event_source (timer));
         al_set_timer_count (timer, 0);
@@ -244,7 +244,7 @@ play_anim (void (*draw_callback) (void),
       /* CTRL+V: show engine name and version */
       if (was_key_pressed (ALLEGRO_KEY_V, 0, ALLEGRO_KEYMOD_CTRL, true)) {
         xasprintf (&text, "MININIM %s", VERSION);
-        draw_bottom_text (NULL, text);
+        draw_bottom_text (NULL, text, 0);
         al_free (text);
       }
 
@@ -253,7 +253,7 @@ play_anim (void (*draw_callback) (void),
         audio_enabled = ! audio_enabled;
         enable_audio (audio_enabled);
         xasprintf (&text, "SOUND %s", audio_enabled ? "ON" : "OFF");
-        draw_bottom_text (NULL, text);
+        draw_bottom_text (NULL, text, 0);
         al_free (text);
       }
 
@@ -271,7 +271,7 @@ play_anim (void (*draw_callback) (void),
           hide_mouse_cursor ();
         }
         xasprintf (&text, "FULLSCREEN MODE %s", boolean);
-        draw_bottom_text (NULL, text);
+        draw_bottom_text (NULL, text, 0);
         al_free (text);
       }
 
@@ -293,7 +293,7 @@ play_anim (void (*draw_callback) (void),
           break;
         }
         xasprintf (&text, "DISPLAY FLIP: %s", flip);
-        draw_bottom_text (NULL, text);
+        draw_bottom_text (NULL, text, 0);
         al_free (text);
       }
 
@@ -315,7 +315,7 @@ play_anim (void (*draw_callback) (void),
           flip_gamepad_horizontal = false;
         }
         xasprintf (&text, "GAMEPAD FLIP: %s", flip);
-        draw_bottom_text (NULL, text);
+        draw_bottom_text (NULL, text, 0);
         al_free (text);
       }
 
@@ -323,7 +323,7 @@ play_anim (void (*draw_callback) (void),
       if (was_key_pressed (ALLEGRO_KEY_J, 0, ALLEGRO_KEYMOD_CTRL, true)) {
         calibrate_joystick ();
         xasprintf (&text, "JOYSTICK %s", joystick ? "CALIBRATED" : "NOT FOUND");
-        draw_bottom_text (NULL, text);
+        draw_bottom_text (NULL, text, 0);
         al_free (text);
       }
 
@@ -345,7 +345,7 @@ play_anim (void (*draw_callback) (void),
         }
 
         xasprintf (&text, "HUE MODE: %s", em_str);
-        draw_bottom_text (NULL, text);
+        draw_bottom_text (NULL, text, 0);
         al_free (text);
       }
 
@@ -364,7 +364,7 @@ play_anim (void (*draw_callback) (void),
         }
 
         xasprintf (&text, "ENVIRONMENT MODE: %s", em_str);
-        draw_bottom_text (NULL, text);
+        draw_bottom_text (NULL, text, 0);
         al_free (text);
       }
 
@@ -385,7 +385,7 @@ play_anim (void (*draw_callback) (void),
         }
 
         xasprintf (&text, "VIDEO MODE: %s", vm_str);
-        draw_bottom_text (NULL, text);
+        draw_bottom_text (NULL, text, 0);
         al_free (text);
       }
 

@@ -305,7 +305,7 @@ editor (void)
   /* display message if available */
   if (msg_cycles > 0 && msg && ! was_menu_return_pressed (false)) {
     msg_cycles--;
-    draw_bottom_text (NULL, msg);
+    draw_bottom_text (NULL, msg, 0);
     memset (&key, 0, sizeof (key));
     menu_help = 0;
     return;
@@ -708,7 +708,7 @@ editor (void)
       break;
     default:
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
-      draw_bottom_text (NULL, "NO EXTENSION");
+      draw_bottom_text (NULL, "NO EXTENSION", 0);
       if (was_menu_return_pressed (true)) edit = EDIT_CON;
       break;
     }
@@ -765,7 +765,7 @@ editor (void)
     }
 
     xasprintf (&str, "%s/%s/%s", fg_str, bg_str, ext_str);
-    draw_bottom_text (NULL, str);
+    draw_bottom_text (NULL, str, 0);
     al_free (str);
     if (free_ext_str) al_free (ext_str);
 
@@ -1477,8 +1477,8 @@ exit_editor (void)
   set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
   if (is_fullscreen ()) hide_mouse_cursor ();
   if (game_paused)
-    draw_bottom_text (NULL, "GAME PAUSED");
-  else draw_bottom_text (NULL, NULL);
+    draw_bottom_text (NULL, "GAME PAUSED", 0);
+  else draw_bottom_text (NULL, NULL, 0);
 }
 
 static char
@@ -1616,5 +1616,5 @@ editor_msg (char *m, uint64_t cycles)
     msg_cycles = cycles;
     msg = m;
   }
-  draw_bottom_text (NULL, m);
+  draw_bottom_text (NULL, m, 0);
 }

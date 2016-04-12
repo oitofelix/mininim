@@ -83,7 +83,7 @@ play_level (struct level *lv)
 
   if (level.nominal_number >= 0) {
     xasprintf (&text, "LEVEL %i", level.nominal_number);
-    draw_bottom_text (NULL, text);
+    draw_bottom_text (NULL, text, 0);
     al_free (text);
   }
 
@@ -95,7 +95,7 @@ play_level (struct level *lv)
     retry_level = level.number;
     destroy_anims ();
     destroy_cons ();
-    draw_bottom_text (NULL, NULL);
+    draw_bottom_text (NULL, NULL, 0);
    goto start;
   case PREVIOUS_LEVEL:
   case NEXT_LEVEL:
@@ -103,7 +103,7 @@ play_level (struct level *lv)
     destroy_cons ();
     int d = (quit_anim == PREVIOUS_LEVEL) ? -1 : +1;
     if (level.next_level) level.next_level (level.number + d);
-    draw_bottom_text (NULL, NULL);
+    draw_bottom_text (NULL, NULL, 0);
     if (level.cutscene && ! ignore_level_cutscene) {
       cutscene_started = false;
       cutscene = true;
@@ -122,7 +122,7 @@ play_level (struct level *lv)
     retry_level = -1;
     destroy_anims ();
     destroy_cons ();
-    draw_bottom_text (NULL, NULL);
+    draw_bottom_text (NULL, NULL, 0);
     break;
   case QUIT_GAME: break;
   case OUT_OF_TIME:
@@ -456,7 +456,7 @@ process_keys (void)
     current_kid->immortal = immortal_mode;
     xasprintf (&text, "%s MODE", immortal_mode
                ? "IMMORTAL" : "MORTAL");
-    draw_bottom_text (NULL, text);
+    draw_bottom_text (NULL, text, 0);
     al_free (text);
   }
 
@@ -498,7 +498,7 @@ process_keys (void)
     int b = roomd (room_view, BELOW);
 
     xasprintf (&text, "S%i L%i R%i A%i B%i", s, l, r, a, b);
-    draw_bottom_text (NULL, text);
+    draw_bottom_text (NULL, text, 0);
     al_free (text);
   }
 
@@ -513,7 +513,7 @@ process_keys (void)
 
     xasprintf (&text, "LV%i AL%i AR%i BL%i BR%i",
                level.number, al, ar, bl, br);
-    draw_bottom_text (NULL, text);
+    draw_bottom_text (NULL, text, 0);
     al_free (text);
   }
 
@@ -592,7 +592,7 @@ process_keys (void)
     for (i = 0; i < anima_nmemb; i++) apply_guard_mode (&anima[i], gm);
 
     xasprintf (&text, "GUARD MODE: %s", gm_str);
-    draw_bottom_text (NULL, text);
+    draw_bottom_text (NULL, text, 0);
     al_free (text);
   }
 
@@ -634,9 +634,9 @@ process_keys (void)
         if (t >= 252 && t % 12 == 0)
           play_sample (press_key_sample, -1);
         xasprintf (&text, "Press Button to Continue");
-        draw_bottom_text (NULL, text);
+        draw_bottom_text (NULL, text, 0);
         al_free (text);
-      } else if (! active_menu) draw_bottom_text (NULL, "");
+      } else if (! active_menu) draw_bottom_text (NULL, "", 0);
 
       if ((key.keyboard.keycode || button != -1)
           && ! was_menu_key_pressed ())
@@ -646,7 +646,7 @@ process_keys (void)
              && ! game_paused) {
     al_stop_timer (death_timer);
     al_set_timer_count (death_timer, 0);
-    draw_bottom_text (NULL, NULL);
+    draw_bottom_text (NULL, NULL, 0);
   }
 
   camera_follow_kid = (current_kid->f.c.room == room_view)
@@ -718,7 +718,7 @@ draw_level (void)
   if (rem_time <= 0) quit_anim = OUT_OF_TIME;
 
   if (game_paused && ! active_menu)
-    draw_bottom_text (NULL, "GAME PAUSED");
+    draw_bottom_text (NULL, "GAME PAUSED", -1);
 }
 
 void
@@ -730,7 +730,7 @@ display_remaining_time (void)
   int m = t / 60 + ((t % 60) ? 1 : 0);
   if (t > 60) xasprintf (&text, "%i MINUTES LEFT", m);
   else xasprintf (&text, "%i SECONDS LEFT", t);
-  draw_bottom_text (NULL, text);
+  draw_bottom_text (NULL, text, 0);
   al_free (text);
 }
 
@@ -749,7 +749,7 @@ display_skill (struct anim *k)
   else xasprintf (&text, "KCA%i KCD%i",
                   k->skill.counter_attack_prob + 1,
                   k->skill.counter_defense_prob + 1);
-  draw_bottom_text (NULL, text);
+  draw_bottom_text (NULL, text, 0);
   al_free (text);
 }
 
@@ -778,7 +778,7 @@ void
 unpause_game (void)
 {
   game_paused = false;
-  draw_bottom_text (NULL, NULL);
+  draw_bottom_text (NULL, NULL, 0);
   memset (&key, 0, sizeof (key));
   button = -1;
   al_start_timer (play_time);
