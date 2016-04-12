@@ -390,3 +390,146 @@ toggle_has_sword_undo (struct start_pos_undo *d, int dir)
 {
   level.has_sword = ! level.has_sword;
 }
+
+/************************/
+/* GUARD START POSITION */
+/************************/
+
+void
+register_guard_start_pos_undo (struct undo *u, int i, struct pos *p, char *desc)
+{
+  struct guard *g = &level.guard[i];
+  if (peq (p, &g->p)) return;
+
+  struct guard_start_pos_undo *d = xmalloc (sizeof (* d));
+  d->i = i;
+  d->b = g->p;
+  d->f = *p;
+  register_undo (u, d, (undo_f) guard_start_pos_undo, desc);
+  guard_start_pos_undo (d, +1);
+}
+
+void
+guard_start_pos_undo (struct guard_start_pos_undo *d, int dir)
+{
+  level.guard[d->i].p = (dir >= 0) ? d->f : d->b;
+}
+
+/********************************/
+/* TOGGLE GUARD START DIRECTION */
+/********************************/
+
+void
+register_toggle_guard_start_dir_undo (struct undo *u, int i, char *desc)
+{
+  int *d = xmalloc (sizeof (* d));
+  *d = i;
+  register_undo (u, d, (undo_f) toggle_guard_start_dir_undo, desc);
+  toggle_guard_start_dir_undo (d, +1);
+}
+
+void
+toggle_guard_start_dir_undo (int *d, int dir)
+{
+  level.guard[*d].dir = (level.guard[*d].dir == LEFT) ? RIGHT : LEFT;
+}
+
+/***************/
+/* GUARD SKILL */
+/***************/
+
+void
+register_guard_skill_undo (struct undo *u, int i, struct skill *s, char *desc)
+{
+  struct guard *g = &level.guard[i];
+  if (! memcmp (s, &g->skill, sizeof (* s))) return;
+
+  struct guard_skill_undo *d = xmalloc (sizeof (* d));
+  d->i = i;
+  d->b_skill = *s;
+  d->f_skill = g->skill;
+  register_undo (u, d, (undo_f) guard_skill_undo, desc);
+  guard_skill_undo (d, +1);
+}
+
+void
+guard_skill_undo (struct guard_skill_undo *d, int dir)
+{
+  struct guard *g = &level.guard[d->i];
+  memcpy (&g->skill, (dir >= 0) ? &d->f_skill : &d->b_skill, sizeof (g->skill));
+}
+
+/***************/
+/* GUARD LIVES */
+/***************/
+
+void
+register_guard_lives_undo (struct undo *u, int i, int l, char *desc)
+{
+  struct guard *g = &level.guard[i];
+  if (g->total_lives == l) return;
+
+  struct int_undo *d = xmalloc (sizeof (* d));
+  d->i = i;
+  d->b = l;
+  d->f = g->total_lives;
+  register_undo (u, d, (undo_f) guard_lives_undo, desc);
+  guard_lives_undo (d, +1);
+}
+
+void
+guard_lives_undo (struct int_undo *d, int dir)
+{
+  struct guard *g = &level.guard[d->i];
+  g->total_lives = (dir >= 0) ? d->f : d->b;
+}
+
+/**************/
+/* GUARD TYPE */
+/**************/
+
+void
+register_guard_type_undo (struct undo *u, int i, enum anim_type t, char *desc)
+{
+  struct guard *g = &level.guard[i];
+  if (g->type == t) return;
+
+  struct int_undo *d = xmalloc (sizeof (* d));
+  d->i = i;
+  d->b = t;
+  d->f = g->type;
+  register_undo (u, d, (undo_f) guard_type_undo, desc);
+  guard_type_undo (d, +1);
+}
+
+void
+guard_type_undo (struct int_undo *d, int dir)
+{
+  struct guard *g = &level.guard[d->i];
+  g->type = (dir >= 0) ? d->f : d->b;
+}
+
+/***************/
+/* GUARD STYLE */
+/***************/
+
+void
+register_guard_style_undo (struct undo *u, int i, int s, char *desc)
+{
+  struct guard *g = &level.guard[i];
+  if (g->style == s) return;
+
+  struct int_undo *d = xmalloc (sizeof (* d));
+  d->i = i;
+  d->b = s;
+  d->f = g->style;
+  register_undo (u, d, (undo_f) guard_style_undo, desc);
+  guard_style_undo (d, +1);
+}
+
+void
+guard_style_undo (struct int_undo *d, int dir)
+{
+  struct guard *g = &level.guard[d->i];
+  g->style = (dir >= 0) ? d->f : d->b;
+}

@@ -264,7 +264,7 @@ editor (void)
 
   struct pos p = mouse_pos;
   struct anim *k;
-  struct guard *g;
+  static struct guard *g;
   static struct pos p0;
 
   char *fg_str = NULL, *bg_str = NULL, *ext_str = NULL;
@@ -275,6 +275,7 @@ editor (void)
   enum conbg bg;
   union conext ext;
   struct con room_buf[FLOORS][PLACES], room_buf2[FLOORS][PLACES];
+  static struct skill skill_buf;
 
   /* additional graphics */
   switch (edit) {
@@ -1058,14 +1059,14 @@ editor (void)
         editor_msg ("NOT IN THIS ROOM", 12);
         break;
       }
-      register_toggle_start_dir_undo (&undo, "TOGGLE START DIRECTION");
+      register_toggle_start_dir_undo (&undo, "START DIRECTION");
       break;
     case 'W':
       if (room_view != level.start_pos.room) {
         editor_msg ("NOT IN THIS ROOM", 12);
         break;
       }
-      register_toggle_has_sword_undo (&undo, "TOGGLE HAS SWORD");
+      register_toggle_has_sword_undo (&undo, "HAS SWORD");
       break;
     }
     break;
@@ -1212,7 +1213,7 @@ editor (void)
         editor_msg ("SELECT CONSTRUCTION", 12);
         break;
       }
-      g->p = p;
+      register_guard_start_pos_undo (&undo, guard_index, &p, "GUARD START POSITION");
       break;
     case 'J':
       get_mouse_coord (&last_mouse_coord);
@@ -1226,7 +1227,8 @@ editor (void)
         editor_msg ("NOT IN THIS ROOM", 12);
         break;
       }
-      g->dir = (g->dir == LEFT) ? RIGHT : LEFT;
+      register_toggle_guard_start_dir_undo
+        (&undo, guard_index, "GUARD START DIRECTION");
       break;
     case 'K':
       if (! is_guard_by_type (g->type)) {
@@ -1278,8 +1280,16 @@ editor (void)
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
     g = &level.guard[guard_index];
     xasprintf (&str, "G%iK>", guard_index);
-    switch (menu_enum (skill_menu, str)) {
-    case -1: case 1: edit = EDIT_GUARD; break;
+    c = menu_enum (skill_menu, str);
+    if (! c) break;
+
+    if (c == -1 || c == 1) {
+      edit = EDIT_GUARD; break;
+    }
+
+    memcpy (&skill_buf, &g->skill, sizeof (skill_buf));
+
+    switch (c) {
     case 'A': edit = EDIT_GUARD_SKILL_ATTACK;
       s = g->skill.attack_prob + 1; break;
     case 'B': edit = EDIT_GUARD_SKILL_COUNTER_ATTACK;
@@ -1306,64 +1316,68 @@ editor (void)
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
     g = &level.guard[guard_index];
     xasprintf (&str, "G%iKL>L.SKILL", guard_index);
-    static struct skill gskill;
-    switch (menu_int (&s, NULL, 0, 11, str, NULL)) {
-    case -1: edit = EDIT_GUARD_SKILL; break;
-    case 0: break;
-    case 1:
-      g->skill = gskill;
+    c = menu_int (&s, NULL, 0, 11, str, NULL);
+    if (! c) break;
+    switch (c) {
+    case -1:
+      g->skill = skill_buf;
       edit = EDIT_GUARD_SKILL;
       break;
+    case 1: edit = EDIT_GUARD_SKILL;
+      register_guard_skill_undo (&undo, guard_index, &skill_buf,
+                                 "GUARD LEGACY SKILL");
+      break;
     default:
-      get_legacy_skill (s, &gskill);
+      get_legacy_skill (s, &g->skill);
       break;
     }
     al_free (str);
     break;
   case EDIT_GUARD_SKILL_ATTACK:
-    menu_skill
-      ("KA>ATTACK", &level.guard[guard_index].skill.attack_prob,
-       100, EDIT_GUARD_SKILL);
+    c = menu_skill ("KA>ATTACK", &g->skill.attack_prob, 100, EDIT_GUARD_SKILL);
+    if (c == 1)
+      register_guard_skill_undo (&undo, guard_index, &skill_buf,
+                                 "GUARD ATTACK SKILL");
     break;
   case EDIT_GUARD_SKILL_COUNTER_ATTACK:
-    menu_skill
-      ("KB>C.ATTACK", &level.guard[guard_index].skill.counter_attack_prob,
-       100, EDIT_GUARD_SKILL);
+    c = menu_skill ("KB>C.ATTACK", &g->skill.counter_attack_prob, 100, EDIT_GUARD_SKILL);
+    if (c == 1) register_guard_skill_undo (&undo, guard_index, &skill_buf,
+                                           "GUARD COUNTER ATTACK SKILL");
     break;
   case EDIT_GUARD_SKILL_DEFENSE:
-    menu_skill
-      ("KD>DEFENSE", &level.guard[guard_index].skill.defense_prob,
-       100, EDIT_GUARD_SKILL);
+    c = menu_skill ("KD>DEFENSE", &g->skill.defense_prob, 100, EDIT_GUARD_SKILL);
+    if (c == 1) register_guard_skill_undo (&undo, guard_index, &skill_buf,
+                                           "GUARD DEFENSE SKILL");
     break;
   case EDIT_GUARD_SKILL_COUNTER_DEFENSE:
-    menu_skill
-      ("KE>C.DEFENSE", &level.guard[guard_index].skill.counter_defense_prob,
-       100, EDIT_GUARD_SKILL);
+    c = menu_skill ("KE>C.DEFENSE", &g->skill.counter_defense_prob, 100, EDIT_GUARD_SKILL);
+    if (c == 1) register_guard_skill_undo (&undo, guard_index, &skill_buf,
+                                           "GUARD COUNTER DEFENSE SKILL");
     break;
   case EDIT_GUARD_SKILL_ADVANCE:
-    menu_skill
-      ("KV>ADVANCE", &level.guard[guard_index].skill.advance_prob,
-       100, EDIT_GUARD_SKILL);
+    c = menu_skill ("KV>ADVANCE", &g->skill.advance_prob, 100, EDIT_GUARD_SKILL);
+    if (c == 1) register_guard_skill_undo (&undo, guard_index, &skill_buf,
+                                           "GUARD ADVANCE SKILL");
     break;
   case EDIT_GUARD_SKILL_RETURN:
-    menu_skill
-      ("KR>RETURN", &level.guard[guard_index].skill.return_prob,
-       100, EDIT_GUARD_SKILL);
+    c = menu_skill ("KR>RETURN", &g->skill.return_prob, 100, EDIT_GUARD_SKILL);
+    if (c == 1) register_guard_skill_undo (&undo, guard_index, &skill_buf,
+                                           "GUARD RETURN SKILL");
     break;
   case EDIT_GUARD_SKILL_REFRACTION:
-    menu_skill
-      ("KF>REFRACTION", &level.guard[guard_index].skill.refraction,
-       INT_MAX, EDIT_GUARD_SKILL);
+    c = menu_skill ("KF>REFRACTION", &g->skill.refraction, INT_MAX, EDIT_GUARD_SKILL);
+    if (c == 1) register_guard_skill_undo (&undo, guard_index, &skill_buf,
+                                             "GUARD REFRACTION SKILL");
     break;
   case EDIT_GUARD_SKILL_EXTRA_LIFE:
-    menu_skill
-      ("KX>EXT.LIFE", &level.guard[guard_index].skill.extra_life,
-       INT_MAX, EDIT_GUARD_SKILL);
+    c = menu_skill ("KX>EXT.LIFE", &g->skill.extra_life, INT_MAX, EDIT_GUARD_SKILL);
+    if (c == 1) register_guard_skill_undo (&undo, guard_index, &skill_buf,
+                                           "GUARD EXTRA LIFE SKILL");
     break;
   case EDIT_GUARD_LIVES:
-    menu_skill
-      ("L>LIVES", &level.guard[guard_index].total_lives,
-       INT_MAX, EDIT_GUARD);
+    c = menu_skill ("L>LIVES", &g->total_lives, INT_MAX, EDIT_GUARD);
+    if (c == 1) register_guard_lives_undo (&undo, guard_index, s,
+                                           "GUARD TOTAL LIVES");
     break;
   case EDIT_GUARD_TYPE:
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
@@ -1372,6 +1386,13 @@ editor (void)
         && g->p.room == 0 && g->p.floor == 0 && g->p.place == 0)
       g->p.room = g->p.floor = g->p.place = -1;
     xasprintf (&str, "G%iT>", guard_index);
+    b0 = b1 = b2 = b3 = b4 = b5 = 0;
+    if (g->type == NO_ANIM) b0 = true;
+    if (g->type == GUARD) b1 = true;
+    if (g->type == FAT_GUARD) b2 = true;
+    if (g->type == VIZIER) b3 = true;
+    if (g->type == SKELETON) b4 = true;
+    if (g->type == SHADOW) b5 = true;
     switch (menu_bool (guard_type_menu, str, true, &b0, &b1, &b2, &b3, &b4, &b5)) {
     case -1: edit = EDIT_GUARD; g->type = b; break;
     case 0: break;
@@ -1381,6 +1402,8 @@ editor (void)
         g->total_lives = 3;
       if (is_guard_by_type (g->type) && ! g->skill.attack_prob)
         get_legacy_skill (0, &g->skill);
+      register_guard_type_undo (&undo, guard_index, b,
+                                "GUARD TYPE");
       break;
     default:
       if (b0) g->type = NO_ANIM;
@@ -1400,7 +1423,11 @@ editor (void)
     switch (menu_int (&g->style, NULL, 0, 7, str, NULL)) {
     case -1: edit = EDIT_GUARD; g->style = b; break;
     case 0: break;
-    case 1: edit = EDIT_GUARD; break;
+    case 1:
+      edit = EDIT_GUARD;
+      register_guard_style_undo (&undo, guard_index, b,
+                                 "GUARD STYLE");
+      break;
     }
     al_free (str);
     break;
@@ -1553,16 +1580,15 @@ menu_skill (char *prefix, int *skill, int max, enum edit up_edit)
   set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
   char *str;
   xasprintf (&str, "G%i%s", guard_index, prefix);
-  char c = menu_int (&s, NULL, 0, max, str, NULL);
+  int a = (max <= 100) ? *skill + 1 : *skill;
+  char c = menu_int (&a, NULL, 0, max, str, NULL);
+  *skill = (max <= 100) ? a - 1 : a;
   al_free (str);
   switch (c) {
-  case -1: edit = up_edit; break;
+  case -1: edit = up_edit;
+    *skill = (max <= 100) ? s - 1 : s; break;
   case 0: break;
-  case 1:
-    if (max <= 100) *skill = s - 1;
-    else *skill = s;
-    edit = up_edit;
-    break;
+  case 1: edit = up_edit; break;
   }
   return c;
 }

@@ -537,4 +537,18 @@ struct start_pos_undo {
   struct pos b, f;
 };
 
+struct guard_start_pos_undo {
+  int i;
+  struct pos b, f;
+};
+
+struct guard_skill_undo {
+  int i;
+  struct skill b_skill, f_skill;
+};
+
+struct int_undo {
+  int i, b, f;
+};
+
 #endif	/* MININIM_TYPES_H */

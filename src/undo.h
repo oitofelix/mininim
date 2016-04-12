@@ -79,4 +79,28 @@ void toggle_start_dir_undo (struct start_pos_undo *d, int dir);
 void register_toggle_has_sword_undo (struct undo *u, char *desc);
 void toggle_has_sword_undo (struct start_pos_undo *d, int dir);
 
+/* GUARD START POSITION */
+void register_guard_start_pos_undo (struct undo *u, int i, struct pos *p, char *desc);
+void guard_start_pos_undo (struct guard_start_pos_undo *d, int dir);
+
+/* TOGGLE GUARD START DIRECTION */
+void register_toggle_guard_start_dir_undo (struct undo *u, int i, char *desc);
+void toggle_guard_start_dir_undo (int *d, int dir);
+
+/* GUARD SKILL */
+void register_guard_skill_undo (struct undo *u, int i, struct skill *s, char *desc);
+void guard_skill_undo (struct guard_skill_undo *d, int dir);
+
+/* GUARD LIVES */
+void register_guard_lives_undo (struct undo *u, int i, int l, char *desc);
+void guard_lives_undo (struct int_undo *d, int dir);
+
+/* GUARD TYPE */
+void register_guard_type_undo (struct undo *u, int i, enum anim_type t, char *desc);
+void guard_type_undo (struct int_undo *d, int dir);
+
+/* GUARD STYLE */
+void register_guard_style_undo (struct undo *u, int i, int t, char *desc);
+void guard_style_undo (struct int_undo *d, int dir);
+
 #endif	/* MININIM_UNDO_H */
