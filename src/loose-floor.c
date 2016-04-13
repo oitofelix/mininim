@@ -391,7 +391,8 @@ compute_loose_floor_release (struct loose_floor *l)
   case 10:
     register_con_undo (&undo, &l->p,
                        NO_FLOOR, IGNORE, IGNORE,
-                       false, false, false, "LOOSE FLOOR RELEASE");
+                       false, false, false, false,
+                       "LOOSE FLOOR RELEASE");
     l->state = 2;
     l->i = 0;
     l->f.id = &l->f;
@@ -541,7 +542,8 @@ compute_loose_floor_fall (struct loose_floor *l)
       l->i = 0;
       register_con_undo (&undo, &fpmbo_f,
                          NO_FLOOR, IGNORE, IGNORE,
-                         false, false, false, "LOOSE FLOOR CHAIN RELEASE");
+                         false, false, false, false,
+                         "LOOSE FLOOR CHAIN RELEASE");
       must_sort = true;
       play_sample (broken_floor_sample, p.room);
       alert_guards (&p);
@@ -561,7 +563,8 @@ compute_loose_floor_fall (struct loose_floor *l)
       && con (&p)->fg != CLOSER_FLOOR) {
     register_con_undo (&undo, &p,
                        BROKEN_FLOOR, IGNORE, IGNORE,
-                       false, false, false, "LOOSE FLOOR BREAKING");
+                       false, false, false, false,
+                       "LOOSE FLOOR BREAKING");
   }
   shake_loose_floor_row (&p);
   l->p.room = -1;

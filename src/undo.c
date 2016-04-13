@@ -54,7 +54,7 @@ undo_pass (struct undo *u, int dir, char **desc)
   }
   if (dir >= 0) u->current++;
   u->pass[u->current].f (u->pass[u->current].data, dir);
-  *desc = u->pass[u->current].desc;
+  if (desc) *desc = u->pass[u->current].desc;
   if (dir < 0) u->current--;
   return true;
 }
@@ -92,13 +92,30 @@ void
 register_con_undo (struct undo *u, struct pos *p,
                    enum confg fg, enum conbg bg, int ext,
                    bool should_destroy, bool should_register, bool should_prepare,
-                   char *desc)
+                   bool ignore_intermediate, char *desc)
 {
   struct con c;
 
   c.fg = (fg != IGNORE) ? fg : con (p)->fg;
   c.bg = (bg != IGNORE) ? bg : con (p)->bg;
   c.ext = (ext != IGNORE) ? (union conext) ext : con (p)->ext;
+
+  /* if (! memcmp (con (p), &c, sizeof (c))) return; */
+
+  struct con_undo *prev_data = u->count
+    ? (struct con_undo *) u->pass[u->current].data
+    : NULL;
+
+  enum con_diff cd = con_diff (con (p), &c);
+
+  if (ignore_intermediate
+      && prev_data
+      && u->pass[u->current].f == (undo_f) con_undo
+      && peq (&prev_data->p, p)
+      && cd == con_diff (&prev_data->b, &prev_data->f)
+      && cd != CON_DIFF_MIXED
+      && cd != CON_DIFF_NO_DIFF)
+    undo_pass (u, -1, NULL);
 
   if (! memcmp (con (p), &c, sizeof (c))) return;
 

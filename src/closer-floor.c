@@ -207,7 +207,7 @@ break_closer_floor (struct pos *p)
   register_con_undo
     (&undo, p,
      IGNORE, IGNORE, -abs (con (p)->ext.event) - 1,
-     false, false, false, "LOOSE FLOOR BREAKING");
+     false, false, false, false, "LOOSE FLOOR BREAKING");
 }
 
 void

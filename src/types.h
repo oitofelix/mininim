@@ -415,6 +415,10 @@ struct menu_item {
   char *desc;
 };
 
+enum con_diff {
+  CON_DIFF_NO_DIFF, CON_DIFF_FG, CON_DIFF_BG, CON_DIFF_EXT, CON_DIFF_MIXED,
+};
+
 /****************
  * CONSTRUCTIONS
  ****************/

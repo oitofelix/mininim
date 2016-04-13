@@ -473,6 +473,24 @@ decorate_pos (struct pos *p)
   }
 }
 
+enum con_diff
+con_diff (struct con *c0, struct con *c1)
+{
+  if (c0->fg == c1->fg && c0->bg == c1->bg && c0->ext.step == c1->ext.step)
+    return CON_DIFF_NO_DIFF;
+
+  if (c0->fg != c1->fg && c0->bg == c1->bg && c0->ext.step == c1->ext.step)
+    return CON_DIFF_FG;
+
+  if (c0->fg == c1->fg && c0->bg != c1->bg && c0->ext.step == c1->ext.step)
+    return CON_DIFF_BG;
+
+  if (c0->fg == c1->fg && c0->bg == c1->bg && c0->ext.step != c1->ext.step)
+    return CON_DIFF_EXT;
+
+  return CON_DIFF_MIXED;
+}
+
 
 
 int
