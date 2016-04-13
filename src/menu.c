@@ -200,25 +200,28 @@ menu_int (int *v, int *b, int min, int max, char *pref_int, char *pref_bool)
   int r;
   switch (c) {
   case '-': case '_':
-    *v = (*v <= min) ? min : *v - 1;
+    *v = int_to_range (*v - 1, min, max);
     break;
   case '+': case '=':
-    *v = (*v >= max) ? max : *v + 1;
+    *v = int_to_range (*v + 1, min, max);
     break;
   case '0': case '1': case '2': case '3': case '4': case '5':
   case '6': case '7': case '8': case '9':
     xasprintf (&str, "%i%c", *v, c);
     if (sscanf (str, "%d", &r) != 1) r = *v;
     al_free (str);
-    *v = (r >= max) ? max : r;
+    *v = int_to_range (r, min, max);
     break;
   case '\\':
-    *v = (*v <= min) ? min : *v / 10;
+    *v = int_to_range (*v / 10, min, max);
     break;
   case ' ':
     if (b) *b = ! *b;
     break;
   case '/': return -1;
+  case 'N':
+    *v = int_to_range (-*v, min, max);
+    break;
   default: c = 0; break;
   }
 

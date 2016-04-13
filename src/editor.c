@@ -19,7 +19,7 @@
 
 #include "mininim.h"
 
-static char menu_step_ext (struct pos *p, int max);
+static char menu_step_ext (struct pos *p, int min, int max);
 static char menu_event_ext (struct pos *p);
 static char menu_select_room (enum edit up_edit, char *prefix);
 static char menu_link (enum dir dir);
@@ -635,7 +635,7 @@ editor (void)
                          true, true, false, "CAN'T FALL EXTENSION");
       break;
     case SPIKES_FLOOR:
-      menu_step_ext (&p, SPIKES_FLOOR_MAX_STEP);
+      menu_step_ext (&p, 0, SPIKES_FLOOR_MAX_STEP);
       break;
     case OPENER_FLOOR:
       menu_event_ext (&p);
@@ -644,10 +644,10 @@ editor (void)
       menu_event_ext (&p);
       break;
     case DOOR:
-      menu_step_ext (&p, DOOR_MAX_STEP);
+      menu_step_ext (&p, 0, DOOR_MAX_STEP);
       break;
     case LEVEL_DOOR:
-      menu_step_ext (&p, LEVEL_DOOR_MAX_STEP);
+      menu_step_ext (&p, -LEVEL_DOOR_MAX_STEP - 1, LEVEL_DOOR_MAX_STEP);
       break;
     case CHOPPER:
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
@@ -1482,11 +1482,11 @@ exit_editor (void)
 }
 
 static char
-menu_step_ext (struct pos *p, int max)
+menu_step_ext (struct pos *p, int min, int max)
 {
   set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
   int r = con (p)->ext.step;
-  char c = menu_int (&r, NULL, 0, max, "CE>STEP", NULL);
+  char c = menu_int (&r, NULL, min, max, "CE>STEP", NULL);
   if (! c) return c;
 
   if (c == -1 || c == 1) {
@@ -1504,7 +1504,7 @@ menu_event_ext (struct pos *p)
 {
   set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
   int r = con (p)->ext.event;
-  char c = menu_int (&r, NULL, 0, EVENTS - 1, "CE>EVENT", NULL);
+  char c = menu_int (&r, NULL, -EVENTS, EVENTS - 1, "CE>EVENT", NULL);
   if (! c) return c;
 
   if (c == -1 || c == 1) {

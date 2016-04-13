@@ -122,6 +122,7 @@ play_anim (void (*draw_callback) (void),
         /*   (event_queue, get_timer_event_source (video_timer)); */
         /* al_set_timer_count (video_timer, 0); */
       }
+      memset (&key, 0, sizeof (key));
       break;
     case ALLEGRO_EVENT_DISPLAY_RESIZE:
       acknowledge_resize ();

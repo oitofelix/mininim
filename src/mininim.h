@@ -169,6 +169,7 @@ void save_game (char *filename);
 int max_int (int a, int b);
 int min_int (int a, int b);
 unsigned char add_char (unsigned char a, signed char b);
+int int_to_range (int i, int min, int max);
 
 /* variables */
 extern enum level_module level_module;

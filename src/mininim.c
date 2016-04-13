@@ -1431,3 +1431,11 @@ add_char (unsigned char a, signed char b)
   if (b > 0 && b > UCHAR_MAX - a) return UCHAR_MAX;
   return a + b;
 }
+
+int
+int_to_range (int i, int min, int max)
+{
+  if (i >= max) return max;
+  else if (i <= min) return min;
+  else return i;
+}

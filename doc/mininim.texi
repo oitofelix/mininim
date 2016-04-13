@@ -197,6 +197,13 @@ used to render the construction.  Used by @code{CARPET} and
 @code{TCARPET}.
 @end table
 
+Integer extensions (@emph{event} and @emph{step}) may be negative
+indicating that their respective constructions are broken.  Except for
+this, the negative integer extension @var{i} is equivalent to the
+non-negative @math{-i - 1} one.  While the @emph{event} extension may be
+negative for any construction, the @emph{step} extension may only be so
+for @code{LEVEL_DOOR}.
+
 @node Non-directed relative positioning
 @section Non-directed relative positioning
 @cindex non-directed relative positioning
@@ -2603,17 +2610,16 @@ nothing is shown in this field.
 @table @kbd
 @item -
 @itemx _
-decrement @var{i}. If @var{i} equals @var{min} nothing happens.
+decrement @var{i}
 @item +
 @itemx =
-increment @var{i}.  If @var{i} equals @var{max} nothing happens.
+increment @var{i}
 @item 0..9
-enter decimal value directly.  The resulting @var{i} is the minimum
-between @var{max} and @math{10i + d}, where @var{d} is the entered
-decimal digit.
+enter decimal value directly
 @item \
-delete least significant decimal digit.  The resulting @var{i} is the
-maximum between @var{min} and the integer quotient of @math{i/10}.
+delete least significant decimal digit
+@item N
+negates @var{i}
 @item SPACE
 toggle auxiliary boolean parameter.  Only effective if the auxiliary
 boolean parameter is used and is not read-only.
