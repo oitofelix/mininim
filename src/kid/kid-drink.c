@@ -72,21 +72,21 @@ load_kid_drink (void)
 void
 unload_kid_drink (void)
 {
-  al_destroy_bitmap (kid_drink_00);
-  al_destroy_bitmap (kid_drink_01);
-  al_destroy_bitmap (kid_drink_02);
-  al_destroy_bitmap (kid_drink_03);
-  al_destroy_bitmap (kid_drink_04);
-  al_destroy_bitmap (kid_drink_05);
-  al_destroy_bitmap (kid_drink_06);
-  al_destroy_bitmap (kid_drink_07);
-  al_destroy_bitmap (kid_drink_08);
-  al_destroy_bitmap (kid_drink_09);
-  al_destroy_bitmap (kid_drink_10);
-  al_destroy_bitmap (kid_drink_11);
-  al_destroy_bitmap (kid_drink_12);
-  al_destroy_bitmap (kid_drink_13);
-  al_destroy_bitmap (kid_drink_14);
+  destroy_bitmap (kid_drink_00);
+  destroy_bitmap (kid_drink_01);
+  destroy_bitmap (kid_drink_02);
+  destroy_bitmap (kid_drink_03);
+  destroy_bitmap (kid_drink_04);
+  destroy_bitmap (kid_drink_05);
+  destroy_bitmap (kid_drink_06);
+  destroy_bitmap (kid_drink_07);
+  destroy_bitmap (kid_drink_08);
+  destroy_bitmap (kid_drink_09);
+  destroy_bitmap (kid_drink_10);
+  destroy_bitmap (kid_drink_11);
+  destroy_bitmap (kid_drink_12);
+  destroy_bitmap (kid_drink_13);
+  destroy_bitmap (kid_drink_14);
 }
 
 void

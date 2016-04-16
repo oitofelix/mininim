@@ -63,15 +63,15 @@ load_kid_turn_run (void)
 void
 unload_kid_turn_run (void)
 {
-  al_destroy_bitmap (kid_turn_run_00);
-  al_destroy_bitmap (kid_turn_run_01);
-  al_destroy_bitmap (kid_turn_run_02);
-  al_destroy_bitmap (kid_turn_run_03);
-  al_destroy_bitmap (kid_turn_run_04);
-  al_destroy_bitmap (kid_turn_run_05);
-  al_destroy_bitmap (kid_turn_run_06);
-  al_destroy_bitmap (kid_turn_run_07);
-  al_destroy_bitmap (kid_turn_run_08);
+  destroy_bitmap (kid_turn_run_00);
+  destroy_bitmap (kid_turn_run_01);
+  destroy_bitmap (kid_turn_run_02);
+  destroy_bitmap (kid_turn_run_03);
+  destroy_bitmap (kid_turn_run_04);
+  destroy_bitmap (kid_turn_run_05);
+  destroy_bitmap (kid_turn_run_06);
+  destroy_bitmap (kid_turn_run_07);
+  destroy_bitmap (kid_turn_run_08);
 }
 
 void

@@ -41,12 +41,12 @@ void
 unload_wall_dcpc (void)
 {
   /* dungeon cga */
-  al_destroy_bitmap (dc_wall_base);
-  al_destroy_bitmap (dc_wall_left);
+  destroy_bitmap (dc_wall_base);
+  destroy_bitmap (dc_wall_left);
 
   /* palace cga */
-  al_destroy_bitmap (pc_wall_base);
-  al_destroy_bitmap (pc_wall_left);
+  destroy_bitmap (pc_wall_base);
+  destroy_bitmap (pc_wall_left);
 }
 
 void

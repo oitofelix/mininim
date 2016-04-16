@@ -45,15 +45,15 @@ void
 unload_fire (void)
 {
   /* vga */
-  al_destroy_bitmap (v_fire_00);
-  al_destroy_bitmap (v_fire_01);
-  al_destroy_bitmap (v_fire_02);
-  al_destroy_bitmap (v_fire_03);
-  al_destroy_bitmap (v_fire_04);
-  al_destroy_bitmap (v_fire_05);
-  al_destroy_bitmap (v_fire_06);
-  al_destroy_bitmap (v_fire_07);
-  al_destroy_bitmap (v_fire_08);
+  destroy_bitmap (v_fire_00);
+  destroy_bitmap (v_fire_01);
+  destroy_bitmap (v_fire_02);
+  destroy_bitmap (v_fire_03);
+  destroy_bitmap (v_fire_04);
+  destroy_bitmap (v_fire_05);
+  destroy_bitmap (v_fire_06);
+  destroy_bitmap (v_fire_07);
+  destroy_bitmap (v_fire_08);
 }
 
 static ALLEGRO_BITMAP *

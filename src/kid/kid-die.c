@@ -60,14 +60,14 @@ load_kid_die (void)
 void
 unload_kid_die (void)
 {
-  al_destroy_bitmap (kid_die_00);
-  al_destroy_bitmap (kid_die_01);
-  al_destroy_bitmap (kid_die_02);
-  al_destroy_bitmap (kid_die_03);
-  al_destroy_bitmap (kid_die_04);
-  al_destroy_bitmap (kid_die_05);
-  al_destroy_bitmap (kid_die_spiked_00);
-  al_destroy_bitmap (kid_die_chopped_00);
+  destroy_bitmap (kid_die_00);
+  destroy_bitmap (kid_die_01);
+  destroy_bitmap (kid_die_02);
+  destroy_bitmap (kid_die_03);
+  destroy_bitmap (kid_die_04);
+  destroy_bitmap (kid_die_05);
+  destroy_bitmap (kid_die_spiked_00);
+  destroy_bitmap (kid_die_chopped_00);
 }
 
 void

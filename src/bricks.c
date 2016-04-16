@@ -58,14 +58,14 @@ void
 unload_bricks (void)
 {
   /* dungeon vga */
-  al_destroy_bitmap (dv_bricks_00);
-  al_destroy_bitmap (dv_bricks_01);
-  al_destroy_bitmap (dv_bricks_02);
-  al_destroy_bitmap (dv_bricks_03);
+  destroy_bitmap (dv_bricks_00);
+  destroy_bitmap (dv_bricks_01);
+  destroy_bitmap (dv_bricks_02);
+  destroy_bitmap (dv_bricks_03);
 
   /* palace vga */
-  al_destroy_bitmap (pv_bricks_00);
-  al_destroy_bitmap (pv_bricks_01);
+  destroy_bitmap (pv_bricks_00);
+  destroy_bitmap (pv_bricks_01);
 }
 
 palette

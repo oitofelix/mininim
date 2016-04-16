@@ -152,29 +152,29 @@ void
 unload_guard_fall (void)
 {
   /* guard */
-  al_destroy_bitmap (guard_fall_00);
-  al_destroy_bitmap (guard_fall_01);
-  al_destroy_bitmap (guard_fall_02);
+  destroy_bitmap (guard_fall_00);
+  destroy_bitmap (guard_fall_01);
+  destroy_bitmap (guard_fall_02);
 
   /* fat guard */
-  al_destroy_bitmap (fat_guard_fall_00);
-  al_destroy_bitmap (fat_guard_fall_01);
-  al_destroy_bitmap (fat_guard_fall_02);
+  destroy_bitmap (fat_guard_fall_00);
+  destroy_bitmap (fat_guard_fall_01);
+  destroy_bitmap (fat_guard_fall_02);
 
   /* vizier */
-  al_destroy_bitmap (vizier_fall_00);
-  al_destroy_bitmap (vizier_fall_01);
-  al_destroy_bitmap (vizier_fall_02);
+  destroy_bitmap (vizier_fall_00);
+  destroy_bitmap (vizier_fall_01);
+  destroy_bitmap (vizier_fall_02);
 
   /* skeleton */
-  al_destroy_bitmap (skeleton_fall_00);
-  al_destroy_bitmap (skeleton_fall_01);
-  al_destroy_bitmap (skeleton_fall_02);
+  destroy_bitmap (skeleton_fall_00);
+  destroy_bitmap (skeleton_fall_01);
+  destroy_bitmap (skeleton_fall_02);
 
   /* shadow */
-  al_destroy_bitmap (shadow_fall_00);
-  al_destroy_bitmap (shadow_fall_01);
-  al_destroy_bitmap (shadow_fall_02);
+  destroy_bitmap (shadow_fall_00);
+  destroy_bitmap (shadow_fall_01);
+  destroy_bitmap (shadow_fall_02);
 }
 
 void

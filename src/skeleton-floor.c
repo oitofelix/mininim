@@ -69,28 +69,28 @@ void
 unload_skeleton_floor (void)
 {
   /* dungeon cga */
-  al_destroy_bitmap (dc_skeleton_floor_left);
-  al_destroy_bitmap (dc_skeleton_floor_right);
+  destroy_bitmap (dc_skeleton_floor_left);
+  destroy_bitmap (dc_skeleton_floor_right);
 
   /* palace cga */
-  al_destroy_bitmap (pc_skeleton_floor_left);
-  al_destroy_bitmap (pc_skeleton_floor_right);
+  destroy_bitmap (pc_skeleton_floor_left);
+  destroy_bitmap (pc_skeleton_floor_right);
 
   /* dungeon ega */
-  al_destroy_bitmap (de_skeleton_floor_left);
-  al_destroy_bitmap (de_skeleton_floor_right);
+  destroy_bitmap (de_skeleton_floor_left);
+  destroy_bitmap (de_skeleton_floor_right);
 
   /* palace ega */
-  al_destroy_bitmap (pe_skeleton_floor_left);
-  al_destroy_bitmap (pe_skeleton_floor_right);
+  destroy_bitmap (pe_skeleton_floor_left);
+  destroy_bitmap (pe_skeleton_floor_right);
 
   /* dungeon vga */
-  al_destroy_bitmap (dv_skeleton_floor_left);
-  al_destroy_bitmap (dv_skeleton_floor_right);
+  destroy_bitmap (dv_skeleton_floor_left);
+  destroy_bitmap (dv_skeleton_floor_right);
 
   /* palace vga */
-  al_destroy_bitmap (pv_skeleton_floor_left);
-  al_destroy_bitmap (pv_skeleton_floor_right);
+  destroy_bitmap (pv_skeleton_floor_left);
+  destroy_bitmap (pv_skeleton_floor_right);
 }
 
 void

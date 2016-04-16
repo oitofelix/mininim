@@ -161,29 +161,29 @@ void
 unload_guard_vigilant (void)
 {
   /* guard */
-  al_destroy_bitmap (guard_vigilant_00);
-  al_destroy_bitmap (guard_vigilant_01);
-  al_destroy_bitmap (guard_vigilant_02);
+  destroy_bitmap (guard_vigilant_00);
+  destroy_bitmap (guard_vigilant_01);
+  destroy_bitmap (guard_vigilant_02);
 
   /* fat_guard */
-  al_destroy_bitmap (fat_guard_vigilant_00);
-  al_destroy_bitmap (fat_guard_vigilant_01);
-  al_destroy_bitmap (fat_guard_vigilant_02);
+  destroy_bitmap (fat_guard_vigilant_00);
+  destroy_bitmap (fat_guard_vigilant_01);
+  destroy_bitmap (fat_guard_vigilant_02);
 
   /* vizier */
-  al_destroy_bitmap (vizier_vigilant_00);
-  al_destroy_bitmap (vizier_vigilant_01);
-  al_destroy_bitmap (vizier_vigilant_02);
+  destroy_bitmap (vizier_vigilant_00);
+  destroy_bitmap (vizier_vigilant_01);
+  destroy_bitmap (vizier_vigilant_02);
 
   /* skeleton */
-  al_destroy_bitmap (skeleton_vigilant_00);
-  al_destroy_bitmap (skeleton_vigilant_01);
-  al_destroy_bitmap (skeleton_vigilant_02);
+  destroy_bitmap (skeleton_vigilant_00);
+  destroy_bitmap (skeleton_vigilant_01);
+  destroy_bitmap (skeleton_vigilant_02);
 
   /* shadow */
-  al_destroy_bitmap (shadow_vigilant_00);
-  al_destroy_bitmap (shadow_vigilant_01);
-  al_destroy_bitmap (shadow_vigilant_02);
+  destroy_bitmap (shadow_vigilant_00);
+  destroy_bitmap (shadow_vigilant_01);
+  destroy_bitmap (shadow_vigilant_02);
 }
 
 void

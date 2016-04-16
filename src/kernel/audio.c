@@ -123,6 +123,8 @@ play_sample (ALLEGRO_SAMPLE *sample, int room)
 void
 play_samples (void)
 {
+  /* return; */
+
   clear_played_samples ();
   adjust_samples_volume ();
 

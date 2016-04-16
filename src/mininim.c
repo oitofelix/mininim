@@ -19,6 +19,8 @@
 
 #include "mininim.h"
 
+int mr_w = 2, mr_h = 2;
+
 enum level_module level_module;
 
 struct config_info {

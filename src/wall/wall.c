@@ -20,7 +20,7 @@
 #include "mininim.h"
 
 /* wall cache */
-static ALLEGRO_BITMAP *wall_cache;
+ALLEGRO_BITMAP *wall_cache;
 
 /* dungeon cga */
 ALLEGRO_BITMAP *dc_wall_face, *dc_wall_face_top;
@@ -71,45 +71,39 @@ load_wall (void)
   load_wall_dcpc ();
   load_wall_depedv ();
   load_wall_pv ();
-
-  /* wall cache */
-  wall_cache = create_bitmap (ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
 }
 
 void
 unload_wall (void)
 {
   /* dungeon cga */
-  al_destroy_bitmap (dc_wall_face);
-  al_destroy_bitmap (dc_wall_face_top);
+  destroy_bitmap (dc_wall_face);
+  destroy_bitmap (dc_wall_face_top);
 
   /* palace cga */
-  al_destroy_bitmap (pc_wall_face);
-  al_destroy_bitmap (pc_wall_face_top);
+  destroy_bitmap (pc_wall_face);
+  destroy_bitmap (pc_wall_face_top);
 
   /* dungeon ega */
-  al_destroy_bitmap (de_wall_face);
-  al_destroy_bitmap (de_wall_face_top);
+  destroy_bitmap (de_wall_face);
+  destroy_bitmap (de_wall_face_top);
 
   /* palace ega */
-  al_destroy_bitmap (pe_wall_face);
-  al_destroy_bitmap (pe_wall_face_top);
+  destroy_bitmap (pe_wall_face);
+  destroy_bitmap (pe_wall_face_top);
 
   /* dungeon vga */
-  al_destroy_bitmap (dv_wall_face);
-  al_destroy_bitmap (dv_wall_face_top);
+  destroy_bitmap (dv_wall_face);
+  destroy_bitmap (dv_wall_face_top);
 
   /* palace vga */
-  al_destroy_bitmap (pv_wall_face);
-  al_destroy_bitmap (pv_wall_face_top);
+  destroy_bitmap (pv_wall_face);
+  destroy_bitmap (pv_wall_face_top);
 
   /* modules */
   unload_wall_dcpc ();
   unload_wall_depedv ();
   unload_wall_pv ();
-
-  /* wall cache */
-  al_destroy_bitmap (wall_cache);
 }
 
 void
@@ -261,24 +255,42 @@ draw_wall_face (ALLEGRO_BITMAP *bitmap, struct pos *p,
 }
 
 void
-update_wall_cache (int room, enum em em, enum vm vm)
+update_wall_cache (enum em em, enum vm vm)
 {
+  int x, y;
   struct pos p;
-  p.room = room;
+
+  int room_view_bkp = room_view;
 
   clear_bitmap (wall_cache, TRANSPARENT_COLOR);
 
-  for (p.floor = FLOORS; p.floor >= -1; p.floor--)
-    for (p.place = -1; p.place < PLACES; p.place++)
-      update_wall_cache_pos (&p, em, vm);
+  for (y = mr.h - 1; y >= 0; y--)
+    for (x = 0; x < mr.w; x++) {
+      p.room = mr.cell[x][y].room;
+      p.room = (p.room > 0) ? p.room : 0;
+      room_view = p.room;
+      for (p.floor = FLOORS; p.floor >= -1; p.floor--)
+        for (p.place = -1; p.place < PLACES; p.place++) {
+          if (con (&p)->fg != WALL) continue;
+          draw_wall_base (mr.cell[x][y].wall, &p, em, vm);
+          draw_wall_left (mr.cell[x][y].wall, &p, em, vm);
+        }
+    }
+  room_view = room_view_bkp;
 }
 
 void
 update_wall_cache_pos (struct pos *p, enum em em, enum vm vm)
 {
+  int x, y;
   if (con (p)->fg != WALL) return;
-  draw_wall_base (wall_cache, p, em, vm);
-  draw_wall_left (wall_cache, p, em, vm);
+  struct pos np; npos (p, &np);
+  if (! mr_coord (np.room, -1, &x, &y)) return;
+  int room_view_bkp = room_view;
+  room_view = np.room;
+  draw_wall_base (mr.cell[x][y].wall, p, em, vm);
+  draw_wall_left (mr.cell[x][y].wall, p, em, vm);
+  room_view = room_view_bkp;
 }
 
 void
@@ -286,7 +298,7 @@ draw_wall_left_cache (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   struct pos pv; pos2room (p, room_view, &pv);
   struct coord c; wall_coord (&pv, &c);
-  draw_bitmap_regionc (wall_cache, bitmap, c.x, c.y,
+  draw_bitmap_regionc (mr.cell[mr.dx][mr.dy].wall, bitmap, c.x, c.y,
                        PLACE_WIDTH, PLACE_HEIGHT - 3, &c, 0);
 }
 
@@ -295,7 +307,7 @@ draw_wall_base_cache (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   struct pos pv; pos2room (p, room_view, &pv);
   struct coord c; wall_base_coord (&pv, &c);
-  draw_bitmap_regionc (wall_cache, bitmap, c.x, c.y,
+  draw_bitmap_regionc (mr.cell[mr.dx][mr.dy].wall, bitmap, c.x, c.y,
                        PLACE_WIDTH, 3, &c, 0);
 }
 

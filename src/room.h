@@ -20,6 +20,10 @@
 #ifndef MININIM_ROOM_H
 #define MININIM_ROOM_H
 
+/* variables */
+extern ALLEGRO_BITMAP *wall_cache;
+
+/* functions */
 void load_room (void);
 void unload_room (void);
 

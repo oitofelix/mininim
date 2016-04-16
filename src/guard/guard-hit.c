@@ -176,39 +176,39 @@ void
 unload_guard_hit (void)
 {
   /* guard */
-  al_destroy_bitmap (guard_hit_00);
-  al_destroy_bitmap (guard_hit_01);
-  al_destroy_bitmap (guard_hit_02);
-  al_destroy_bitmap (guard_hit_03);
-  al_destroy_bitmap (guard_hit_04);
+  destroy_bitmap (guard_hit_00);
+  destroy_bitmap (guard_hit_01);
+  destroy_bitmap (guard_hit_02);
+  destroy_bitmap (guard_hit_03);
+  destroy_bitmap (guard_hit_04);
 
   /* fat guard */
-  al_destroy_bitmap (fat_guard_hit_00);
-  al_destroy_bitmap (fat_guard_hit_01);
-  al_destroy_bitmap (fat_guard_hit_02);
-  al_destroy_bitmap (fat_guard_hit_03);
-  al_destroy_bitmap (fat_guard_hit_04);
+  destroy_bitmap (fat_guard_hit_00);
+  destroy_bitmap (fat_guard_hit_01);
+  destroy_bitmap (fat_guard_hit_02);
+  destroy_bitmap (fat_guard_hit_03);
+  destroy_bitmap (fat_guard_hit_04);
 
   /* vizier */
-  al_destroy_bitmap (vizier_hit_00);
-  al_destroy_bitmap (vizier_hit_01);
-  al_destroy_bitmap (vizier_hit_02);
-  al_destroy_bitmap (vizier_hit_03);
-  al_destroy_bitmap (vizier_hit_04);
+  destroy_bitmap (vizier_hit_00);
+  destroy_bitmap (vizier_hit_01);
+  destroy_bitmap (vizier_hit_02);
+  destroy_bitmap (vizier_hit_03);
+  destroy_bitmap (vizier_hit_04);
 
   /* skeleton */
-  al_destroy_bitmap (skeleton_hit_00);
-  al_destroy_bitmap (skeleton_hit_01);
-  al_destroy_bitmap (skeleton_hit_02);
-  al_destroy_bitmap (skeleton_hit_03);
-  al_destroy_bitmap (skeleton_hit_04);
+  destroy_bitmap (skeleton_hit_00);
+  destroy_bitmap (skeleton_hit_01);
+  destroy_bitmap (skeleton_hit_02);
+  destroy_bitmap (skeleton_hit_03);
+  destroy_bitmap (skeleton_hit_04);
 
   /* shadow */
-  al_destroy_bitmap (shadow_hit_00);
-  al_destroy_bitmap (shadow_hit_01);
-  al_destroy_bitmap (shadow_hit_02);
-  al_destroy_bitmap (shadow_hit_03);
-  al_destroy_bitmap (shadow_hit_04);
+  destroy_bitmap (shadow_hit_00);
+  destroy_bitmap (shadow_hit_01);
+  destroy_bitmap (shadow_hit_02);
+  destroy_bitmap (shadow_hit_03);
+  destroy_bitmap (shadow_hit_04);
 }
 
 void

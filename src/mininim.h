@@ -160,6 +160,7 @@
 #include "editor.h"
 #include "debug.h"
 #include "undo.h"
+#include "multi-room.h"
 
 /* functions */
 void *load_config_dialog (ALLEGRO_THREAD *thread, void *arg);
@@ -172,6 +173,7 @@ unsigned char add_char (unsigned char a, signed char b);
 int int_to_range (int i, int min, int max);
 
 /* variables */
+extern int mr_w, mr_h;
 extern enum level_module level_module;
 extern ALLEGRO_TIMER *play_time;
 extern enum vm vm;

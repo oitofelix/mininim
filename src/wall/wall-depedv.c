@@ -129,51 +129,51 @@ void
 unload_wall_depedv (void)
 {
   /* dungeon ega */
-  al_destroy_bitmap (de_wall_left);
-  al_destroy_bitmap (de_wall_center);
-  al_destroy_bitmap (de_wall_right);
-  al_destroy_bitmap (de_wall_single);
-  al_destroy_bitmap (de_wall_left_base);
-  al_destroy_bitmap (de_wall_center_base);
-  al_destroy_bitmap (de_wall_right_base);
-  al_destroy_bitmap (de_wall_single_base);
-  al_destroy_bitmap (de_wall_random_block);
-  al_destroy_bitmap (de_wall_wide_divider);
-  al_destroy_bitmap (de_wall_narrow_divider);
-  al_destroy_bitmap (de_wall_mark_top_left);
-  al_destroy_bitmap (de_wall_mark_top_right);
-  al_destroy_bitmap (de_wall_mark_bottom_left);
-  al_destroy_bitmap (de_wall_mark_bottom_right);
+  destroy_bitmap (de_wall_left);
+  destroy_bitmap (de_wall_center);
+  destroy_bitmap (de_wall_right);
+  destroy_bitmap (de_wall_single);
+  destroy_bitmap (de_wall_left_base);
+  destroy_bitmap (de_wall_center_base);
+  destroy_bitmap (de_wall_right_base);
+  destroy_bitmap (de_wall_single_base);
+  destroy_bitmap (de_wall_random_block);
+  destroy_bitmap (de_wall_wide_divider);
+  destroy_bitmap (de_wall_narrow_divider);
+  destroy_bitmap (de_wall_mark_top_left);
+  destroy_bitmap (de_wall_mark_top_right);
+  destroy_bitmap (de_wall_mark_bottom_left);
+  destroy_bitmap (de_wall_mark_bottom_right);
 
   /* palace ega */
-  al_destroy_bitmap (pe_wall_left);
-  al_destroy_bitmap (pe_wall_center);
-  al_destroy_bitmap (pe_wall_right);
-  al_destroy_bitmap (pe_wall_single);
-  al_destroy_bitmap (pe_wall_left_base);
-  al_destroy_bitmap (pe_wall_center_base);
-  al_destroy_bitmap (pe_wall_right_base);
-  al_destroy_bitmap (pe_wall_single_base);
-  al_destroy_bitmap (pe_wall_random_block);
-  al_destroy_bitmap (pe_wall_wide_divider);
-  al_destroy_bitmap (pe_wall_narrow_divider);
+  destroy_bitmap (pe_wall_left);
+  destroy_bitmap (pe_wall_center);
+  destroy_bitmap (pe_wall_right);
+  destroy_bitmap (pe_wall_single);
+  destroy_bitmap (pe_wall_left_base);
+  destroy_bitmap (pe_wall_center_base);
+  destroy_bitmap (pe_wall_right_base);
+  destroy_bitmap (pe_wall_single_base);
+  destroy_bitmap (pe_wall_random_block);
+  destroy_bitmap (pe_wall_wide_divider);
+  destroy_bitmap (pe_wall_narrow_divider);
 
   /* dungeon vga */
-  al_destroy_bitmap (dv_wall_left);
-  al_destroy_bitmap (dv_wall_center);
-  al_destroy_bitmap (dv_wall_right);
-  al_destroy_bitmap (dv_wall_single);
-  al_destroy_bitmap (dv_wall_left_base);
-  al_destroy_bitmap (dv_wall_center_base);
-  al_destroy_bitmap (dv_wall_right_base);
-  al_destroy_bitmap (dv_wall_single_base);
-  al_destroy_bitmap (dv_wall_random_block);
-  al_destroy_bitmap (dv_wall_wide_divider);
-  al_destroy_bitmap (dv_wall_narrow_divider);
-  al_destroy_bitmap (dv_wall_mark_top_left);
-  al_destroy_bitmap (dv_wall_mark_top_right);
-  al_destroy_bitmap (dv_wall_mark_bottom_left);
-  al_destroy_bitmap (dv_wall_mark_bottom_right);
+  destroy_bitmap (dv_wall_left);
+  destroy_bitmap (dv_wall_center);
+  destroy_bitmap (dv_wall_right);
+  destroy_bitmap (dv_wall_single);
+  destroy_bitmap (dv_wall_left_base);
+  destroy_bitmap (dv_wall_center_base);
+  destroy_bitmap (dv_wall_right_base);
+  destroy_bitmap (dv_wall_single_base);
+  destroy_bitmap (dv_wall_random_block);
+  destroy_bitmap (dv_wall_wide_divider);
+  destroy_bitmap (dv_wall_narrow_divider);
+  destroy_bitmap (dv_wall_mark_top_left);
+  destroy_bitmap (dv_wall_mark_top_right);
+  destroy_bitmap (dv_wall_mark_bottom_left);
+  destroy_bitmap (dv_wall_mark_bottom_right);
 }
 
 void

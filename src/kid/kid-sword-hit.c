@@ -58,11 +58,11 @@ load_kid_sword_hit (void)
 void
 unload_kid_sword_hit (void)
 {
-  al_destroy_bitmap (kid_sword_hit_00);
-  al_destroy_bitmap (kid_sword_hit_01);
-  al_destroy_bitmap (kid_sword_hit_02);
-  al_destroy_bitmap (kid_sword_hit_03);
-  al_destroy_bitmap (kid_sword_hit_04);
+  destroy_bitmap (kid_sword_hit_00);
+  destroy_bitmap (kid_sword_hit_01);
+  destroy_bitmap (kid_sword_hit_02);
+  destroy_bitmap (kid_sword_hit_03);
+  destroy_bitmap (kid_sword_hit_04);
 }
 
 void

@@ -76,24 +76,24 @@ load_kid_vjump (void)
 void
 unload_kid_vjump (void)
 {
-  al_destroy_bitmap (kid_vjump_00);
-  al_destroy_bitmap (kid_vjump_01);
-  al_destroy_bitmap (kid_vjump_02);
-  al_destroy_bitmap (kid_vjump_03);
-  al_destroy_bitmap (kid_vjump_04);
-  al_destroy_bitmap (kid_vjump_05);
-  al_destroy_bitmap (kid_vjump_06);
-  al_destroy_bitmap (kid_vjump_07);
-  al_destroy_bitmap (kid_vjump_08);
-  al_destroy_bitmap (kid_vjump_09);
-  al_destroy_bitmap (kid_vjump_10);
-  al_destroy_bitmap (kid_vjump_11);
-  al_destroy_bitmap (kid_vjump_12);
-  al_destroy_bitmap (kid_vjump_13);
-  al_destroy_bitmap (kid_vjump_14);
-  al_destroy_bitmap (kid_vjump_15);
-  al_destroy_bitmap (kid_vjump_16);
-  al_destroy_bitmap (kid_vjump_17);
+  destroy_bitmap (kid_vjump_00);
+  destroy_bitmap (kid_vjump_01);
+  destroy_bitmap (kid_vjump_02);
+  destroy_bitmap (kid_vjump_03);
+  destroy_bitmap (kid_vjump_04);
+  destroy_bitmap (kid_vjump_05);
+  destroy_bitmap (kid_vjump_06);
+  destroy_bitmap (kid_vjump_07);
+  destroy_bitmap (kid_vjump_08);
+  destroy_bitmap (kid_vjump_09);
+  destroy_bitmap (kid_vjump_10);
+  destroy_bitmap (kid_vjump_11);
+  destroy_bitmap (kid_vjump_12);
+  destroy_bitmap (kid_vjump_13);
+  destroy_bitmap (kid_vjump_14);
+  destroy_bitmap (kid_vjump_15);
+  destroy_bitmap (kid_vjump_16);
+  destroy_bitmap (kid_vjump_17);
 }
 
 void

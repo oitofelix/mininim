@@ -49,16 +49,27 @@ get_mouse_coord (struct coord *c)
 {
   int w = al_get_display_width (display);
   int h = al_get_display_height (display);
+  int sw = al_get_bitmap_width (screen);
+  int sh = al_get_bitmap_height (screen);
+
   al_get_mouse_state (&mouse_state);
-  c->x = (mouse_state.x * ORIGINAL_WIDTH) / w;
-  c->y = (mouse_state.y * ORIGINAL_HEIGHT) / h;
-  c->room = room_view;
+  int x = (mouse_state.x * (sw - 1)) / w;
+  int y = (mouse_state.y * (sh - 1)) / h;
 
   if (screen_flags & ALLEGRO_FLIP_HORIZONTAL)
-    c->x = ORIGINAL_WIDTH - c->x;
+    x = sw - x;
 
   if (screen_flags & ALLEGRO_FLIP_VERTICAL)
-    c->y = ORIGINAL_HEIGHT - c->y;
+    y = sh - y;
+
+  if (y < 3 || y >= sh - 8 || x < 0 || x > sw - 1) c->room = -1;
+  else {
+    c->room = mr.cell[x / ORIGINAL_WIDTH][(y - 3) / ROOM_HEIGHT].room;
+    c->room = (c->room != -1) ? c->room : 0;
+  }
+
+  c->x = x % ORIGINAL_WIDTH;
+  c->y = (y - 3) % ROOM_HEIGHT;
 
   return c;
 }
@@ -69,14 +80,11 @@ get_mouse_pos (struct pos *p)
   struct coord c;
   get_mouse_coord (&c);
 
-  int ry = (c.y - 3) % PLACE_HEIGHT;
+  int ry = c.y % PLACE_HEIGHT;
 
-  posf (&c, p);
+  pos_mr (&c, p);
 
-  if (p->floor < 0 || p->floor > 2
-      || edit == EDIT_NONE
-      || c.x < 0 || c.x >= ORIGINAL_WIDTH
-      || c.y < 0 || c.y >= ORIGINAL_HEIGHT) {
+  if (edit == EDIT_NONE) {
     *p = (struct pos) {-1,-1,-1};
     return p;
   }
@@ -97,10 +105,6 @@ get_mouse_pos (struct pos *p)
     else pos_gen (&c, p, 23, 3);
     break;
   }
-
-  /* struct pos np; */
-  /* npos (p, &np); */
-  /* if (np.room == 0) *p = (struct pos) {-1,-1,-1}; */
 
   return p;
 }

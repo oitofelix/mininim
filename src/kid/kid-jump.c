@@ -76,24 +76,24 @@ load_kid_jump (void)
 void
 unload_kid_jump (void)
 {
-  al_destroy_bitmap (kid_jump_00);
-  al_destroy_bitmap (kid_jump_01);
-  al_destroy_bitmap (kid_jump_02);
-  al_destroy_bitmap (kid_jump_03);
-  al_destroy_bitmap (kid_jump_04);
-  al_destroy_bitmap (kid_jump_05);
-  al_destroy_bitmap (kid_jump_06);
-  al_destroy_bitmap (kid_jump_07);
-  al_destroy_bitmap (kid_jump_08);
-  al_destroy_bitmap (kid_jump_09);
-  al_destroy_bitmap (kid_jump_10);
-  al_destroy_bitmap (kid_jump_11);
-  al_destroy_bitmap (kid_jump_12);
-  al_destroy_bitmap (kid_jump_13);
-  al_destroy_bitmap (kid_jump_14);
-  al_destroy_bitmap (kid_jump_15);
-  al_destroy_bitmap (kid_jump_16);
-  al_destroy_bitmap (kid_jump_17);
+  destroy_bitmap (kid_jump_00);
+  destroy_bitmap (kid_jump_01);
+  destroy_bitmap (kid_jump_02);
+  destroy_bitmap (kid_jump_03);
+  destroy_bitmap (kid_jump_04);
+  destroy_bitmap (kid_jump_05);
+  destroy_bitmap (kid_jump_06);
+  destroy_bitmap (kid_jump_07);
+  destroy_bitmap (kid_jump_08);
+  destroy_bitmap (kid_jump_09);
+  destroy_bitmap (kid_jump_10);
+  destroy_bitmap (kid_jump_11);
+  destroy_bitmap (kid_jump_12);
+  destroy_bitmap (kid_jump_13);
+  destroy_bitmap (kid_jump_14);
+  destroy_bitmap (kid_jump_15);
+  destroy_bitmap (kid_jump_16);
+  destroy_bitmap (kid_jump_17);
 }
 
 void

@@ -61,14 +61,14 @@ load_kid_run (void)
 void
 unload_kid_run (void)
 {
-  al_destroy_bitmap (kid_run_00);
-  al_destroy_bitmap (kid_run_01);
-  al_destroy_bitmap (kid_run_02);
-  al_destroy_bitmap (kid_run_03);
-  al_destroy_bitmap (kid_run_04);
-  al_destroy_bitmap (kid_run_05);
-  al_destroy_bitmap (kid_run_06);
-  al_destroy_bitmap (kid_run_07);
+  destroy_bitmap (kid_run_00);
+  destroy_bitmap (kid_run_01);
+  destroy_bitmap (kid_run_02);
+  destroy_bitmap (kid_run_03);
+  destroy_bitmap (kid_run_04);
+  destroy_bitmap (kid_run_05);
+  destroy_bitmap (kid_run_06);
+  destroy_bitmap (kid_run_07);
 }
 
 void

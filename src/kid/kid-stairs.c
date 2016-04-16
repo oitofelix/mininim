@@ -68,18 +68,18 @@ load_kid_stairs (void)
 void
 unload_kid_stairs (void)
 {
-  al_destroy_bitmap (kid_stairs_00);
-  al_destroy_bitmap (kid_stairs_01);
-  al_destroy_bitmap (kid_stairs_02);
-  al_destroy_bitmap (kid_stairs_03);
-  al_destroy_bitmap (kid_stairs_04);
-  al_destroy_bitmap (kid_stairs_05);
-  al_destroy_bitmap (kid_stairs_06);
-  al_destroy_bitmap (kid_stairs_07);
-  al_destroy_bitmap (kid_stairs_08);
-  al_destroy_bitmap (kid_stairs_09);
-  al_destroy_bitmap (kid_stairs_10);
-  al_destroy_bitmap (kid_stairs_11);
+  destroy_bitmap (kid_stairs_00);
+  destroy_bitmap (kid_stairs_01);
+  destroy_bitmap (kid_stairs_02);
+  destroy_bitmap (kid_stairs_03);
+  destroy_bitmap (kid_stairs_04);
+  destroy_bitmap (kid_stairs_05);
+  destroy_bitmap (kid_stairs_06);
+  destroy_bitmap (kid_stairs_07);
+  destroy_bitmap (kid_stairs_08);
+  destroy_bitmap (kid_stairs_09);
+  destroy_bitmap (kid_stairs_10);
+  destroy_bitmap (kid_stairs_11);
 }
 
 void

@@ -156,29 +156,29 @@ void
 unload_guard_walkf (void)
 {
   /* guard */
-  al_destroy_bitmap (guard_walkf_00);
-  al_destroy_bitmap (guard_walkf_01);
-  al_destroy_bitmap (guard_walkf_02);
+  destroy_bitmap (guard_walkf_00);
+  destroy_bitmap (guard_walkf_01);
+  destroy_bitmap (guard_walkf_02);
 
   /* fat guard */
-  al_destroy_bitmap (fat_guard_walkf_00);
-  al_destroy_bitmap (fat_guard_walkf_01);
-  al_destroy_bitmap (fat_guard_walkf_02);
+  destroy_bitmap (fat_guard_walkf_00);
+  destroy_bitmap (fat_guard_walkf_01);
+  destroy_bitmap (fat_guard_walkf_02);
 
   /* vizier */
-  al_destroy_bitmap (vizier_walkf_00);
-  al_destroy_bitmap (vizier_walkf_01);
-  al_destroy_bitmap (vizier_walkf_02);
+  destroy_bitmap (vizier_walkf_00);
+  destroy_bitmap (vizier_walkf_01);
+  destroy_bitmap (vizier_walkf_02);
 
   /* skeleton */
-  al_destroy_bitmap (skeleton_walkf_00);
-  al_destroy_bitmap (skeleton_walkf_01);
-  al_destroy_bitmap (skeleton_walkf_02);
+  destroy_bitmap (skeleton_walkf_00);
+  destroy_bitmap (skeleton_walkf_01);
+  destroy_bitmap (skeleton_walkf_02);
 
   /* shadow */
-  al_destroy_bitmap (shadow_walkf_00);
-  al_destroy_bitmap (shadow_walkf_01);
-  al_destroy_bitmap (shadow_walkf_02);
+  destroy_bitmap (shadow_walkf_00);
+  destroy_bitmap (shadow_walkf_01);
+  destroy_bitmap (shadow_walkf_02);
 }
 
 void

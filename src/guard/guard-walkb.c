@@ -146,24 +146,24 @@ void
 unload_guard_walkb (void)
 {
   /* guard */
-  al_destroy_bitmap (guard_walkb_00);
-  al_destroy_bitmap (guard_walkb_01);
+  destroy_bitmap (guard_walkb_00);
+  destroy_bitmap (guard_walkb_01);
 
   /* fat_guard */
-  al_destroy_bitmap (fat_guard_walkb_00);
-  al_destroy_bitmap (fat_guard_walkb_01);
+  destroy_bitmap (fat_guard_walkb_00);
+  destroy_bitmap (fat_guard_walkb_01);
 
   /* vizier */
-  al_destroy_bitmap (vizier_walkb_00);
-  al_destroy_bitmap (vizier_walkb_01);
+  destroy_bitmap (vizier_walkb_00);
+  destroy_bitmap (vizier_walkb_01);
 
   /* skeleton */
-  al_destroy_bitmap (skeleton_walkb_00);
-  al_destroy_bitmap (skeleton_walkb_01);
+  destroy_bitmap (skeleton_walkb_00);
+  destroy_bitmap (skeleton_walkb_01);
 
   /* shadow */
-  al_destroy_bitmap (shadow_walkb_00);
-  al_destroy_bitmap (shadow_walkb_01);
+  destroy_bitmap (shadow_walkb_00);
+  destroy_bitmap (shadow_walkb_01);
 }
 
 void

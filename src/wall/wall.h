@@ -57,7 +57,7 @@ void draw_wall_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
 void draw_wall_face (ALLEGRO_BITMAP *bitmap, struct pos *p,
                      enum em, enum vm vm);
 
-void update_wall_cache (int room, enum em em, enum vm vm);
+void update_wall_cache (enum em em, enum vm vm);
 void update_wall_cache_pos (struct pos *p, enum em em, enum vm vm);
 void draw_wall_left_cache (ALLEGRO_BITMAP *bitmap, struct pos *p);
 void draw_wall_base_cache (ALLEGRO_BITMAP *bitmap, struct pos *p);

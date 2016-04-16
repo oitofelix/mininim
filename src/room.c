@@ -19,13 +19,7 @@
 
 #include "mininim.h"
 
-static int last_level;
 static int last_room;
-static enum em last_em;
-static enum vm last_vm;
-static int last_hgc;
-static enum hue last_hue;
-struct pos last_mouse_pos;
 static room_callback_f *room_callback;
 static size_t room_callback_nmemb;
 
@@ -185,39 +179,16 @@ draw_room (ALLEGRO_BITMAP *bitmap, int room,
   struct pos p;
   p.room = room;
 
-  if (anim_cycle == 0
-      || room != last_room
-      || em != last_em
-      || vm != last_vm
-      || hgc != last_hgc
-      || hue != last_hue
-      || level.number != last_level) {
-    update_wall_cache (room, em, vm);
-    last_em = em;
-    last_vm = vm;
-    last_hgc = hgc;
-    last_hue = hue;
-    last_room = room;
-    last_level = level.number;
-  }
-
-  if (mouse_pos.room != last_mouse_pos.room
-      || mouse_pos.floor != last_mouse_pos.floor
-      || mouse_pos.place != last_mouse_pos.place) {
-    if (is_valid_pos (&mouse_pos))
-      update_wall_cache_pos (&mouse_pos, em, vm);
-    if (is_valid_pos (&last_mouse_pos))
-      update_wall_cache_pos (&last_mouse_pos, em, vm);
-    last_mouse_pos = mouse_pos;
-  }
+  last_room = room;
 
   for (p.floor = FLOORS; p.floor >= -1; p.floor--)
     for (p.place = -1; p.place < PLACES; p.place++)
       draw_conbg (bitmap, &p, em, vm);
 
   for (p.floor = FLOORS; p.floor >= -1; p.floor--)
-    for (p.place = -1; p.place <= PLACES; p.place++)
+    for (p.place = -1; p.place <= PLACES; p.place++) {
       draw_confg (bitmap, &p, em, vm, false);
+    }
 }
 
 void
@@ -248,8 +219,10 @@ void
 draw_confg (ALLEGRO_BITMAP *bitmap, struct pos *p,
             enum em em, enum vm vm, bool redraw)
 {
-  draw_confg_base (bitmap, p, em, vm);
-  draw_confg_left (bitmap, p, em, vm, redraw);
+  if (con (p)->fg != WALL) {
+    draw_confg_base (bitmap, p, em, vm);
+    draw_confg_left (bitmap, p, em, vm, redraw);
+  }
   draw_confg_right (bitmap, p, em, vm, redraw);
 }
 

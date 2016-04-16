@@ -24,12 +24,15 @@
 void init_video (void);
 void finalize_video (void);
 ALLEGRO_EVENT_SOURCE *get_display_event_source (ALLEGRO_DISPLAY *display);
+void destroy_bitmap (ALLEGRO_BITMAP *bitmap);
 ALLEGRO_BITMAP *create_bitmap (int w, int h);
 ALLEGRO_BITMAP *clone_bitmap (ALLEGRO_BITMAP *bitmap);
 ALLEGRO_BITMAP *load_bitmap (char *filename);
 void validate_bitmap_for_mingw (ALLEGRO_BITMAP *bitmap);
 void save_bitmap (char *filename, ALLEGRO_BITMAP *bitmap);
 bool color_eq (ALLEGRO_COLOR c0, ALLEGRO_COLOR c1);
+void set_target_bitmap (ALLEGRO_BITMAP *bitmap);
+void set_target_backbuffer (ALLEGRO_DISPLAY *display);
 void clear_bitmap (ALLEGRO_BITMAP *bitmap, ALLEGRO_COLOR color);
 void draw_bitmap (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
                   float dx, float dy, int flags);
@@ -65,6 +68,7 @@ ALLEGRO_COLOR hgc_palette (ALLEGRO_COLOR c);
 extern ALLEGRO_DISPLAY *display;
 extern ALLEGRO_BITMAP *screen, *uscreen;
 extern ALLEGRO_BITMAP *effect_buffer;
+extern ALLEGRO_BITMAP *black_screen;
 extern ALLEGRO_TIMER *video_timer;
 extern struct video_effect video_effect;
 extern int screen_flags;

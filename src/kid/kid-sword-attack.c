@@ -66,16 +66,16 @@ load_kid_sword_attack (void)
 void
 unload_kid_sword_attack (void)
 {
-  al_destroy_bitmap (kid_sword_attack_00);
-  al_destroy_bitmap (kid_sword_attack_01);
-  al_destroy_bitmap (kid_sword_attack_02);
-  al_destroy_bitmap (kid_sword_attack_03);
-  al_destroy_bitmap (kid_sword_attack_04);
-  al_destroy_bitmap (kid_sword_attack_05);
-  al_destroy_bitmap (kid_sword_attack_06);
-  al_destroy_bitmap (kid_sword_attack_counter_defense);
+  destroy_bitmap (kid_sword_attack_00);
+  destroy_bitmap (kid_sword_attack_01);
+  destroy_bitmap (kid_sword_attack_02);
+  destroy_bitmap (kid_sword_attack_03);
+  destroy_bitmap (kid_sword_attack_04);
+  destroy_bitmap (kid_sword_attack_05);
+  destroy_bitmap (kid_sword_attack_06);
+  destroy_bitmap (kid_sword_attack_counter_defense);
 
-  al_destroy_bitmap (kid_sword_attack_defended);
+  destroy_bitmap (kid_sword_attack_defended);
 }
 
 void

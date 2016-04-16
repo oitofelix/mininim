@@ -55,9 +55,9 @@ load_kid_sword_defense (void)
 void
 unload_kid_sword_defense (void)
 {
-  al_destroy_bitmap (kid_sword_defense_00);
-  al_destroy_bitmap (kid_sword_defense_01);
-  al_destroy_bitmap (kid_sword_defense_02);
+  destroy_bitmap (kid_sword_defense_00);
+  destroy_bitmap (kid_sword_defense_01);
+  destroy_bitmap (kid_sword_defense_02);
 }
 
 void

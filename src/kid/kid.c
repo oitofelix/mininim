@@ -105,9 +105,9 @@ unload_kid (void)
   unload_kid_stairs ();
 
   /* bitmaps */
-  al_destroy_bitmap (v_kid_full_life);
-  al_destroy_bitmap (v_kid_empty_life);
-  al_destroy_bitmap (v_kid_splash);
+  destroy_bitmap (v_kid_full_life);
+  destroy_bitmap (v_kid_empty_life);
+  destroy_bitmap (v_kid_splash);
 }
 
 struct anim *

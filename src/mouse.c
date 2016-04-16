@@ -44,9 +44,9 @@ load_mouse (void)
 void
 unload_mouse (void)
 {
-  al_destroy_bitmap (mouse_normal_00);
-  al_destroy_bitmap (mouse_run_00);
-  al_destroy_bitmap (mouse_run_01);
+  destroy_bitmap (mouse_normal_00);
+  destroy_bitmap (mouse_run_00);
+  destroy_bitmap (mouse_run_01);
 }
 
 

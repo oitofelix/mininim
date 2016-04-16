@@ -63,22 +63,22 @@ void
 unload_window (void)
 {
   /* dungeon cga */
-  al_destroy_bitmap (dc_window);
+  destroy_bitmap (dc_window);
 
   /* palace cga */
-  al_destroy_bitmap (pc_window);
+  destroy_bitmap (pc_window);
 
   /* dungeon ega */
-  al_destroy_bitmap (de_window);
+  destroy_bitmap (de_window);
 
   /* palace ega */
-  al_destroy_bitmap (pe_window);
+  destroy_bitmap (pe_window);
 
   /* dungeon vga */
-  al_destroy_bitmap (dv_window);
+  destroy_bitmap (dv_window);
 
   /* palace vga */
-  al_destroy_bitmap (pv_window);
+  destroy_bitmap (pv_window);
 }
 
 void

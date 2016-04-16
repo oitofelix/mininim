@@ -58,11 +58,11 @@ load_kid_fall (void)
 void
 unload_kid_fall (void)
 {
-  al_destroy_bitmap (kid_fall_00);
-  al_destroy_bitmap (kid_fall_01);
-  al_destroy_bitmap (kid_fall_02);
-  al_destroy_bitmap (kid_fall_03);
-  al_destroy_bitmap (kid_fall_04);
+  destroy_bitmap (kid_fall_00);
+  destroy_bitmap (kid_fall_01);
+  destroy_bitmap (kid_fall_02);
+  destroy_bitmap (kid_fall_03);
+  destroy_bitmap (kid_fall_04);
 }
 
 void

@@ -66,16 +66,16 @@ load_kid_keep_sword (void)
 void
 unload_kid_keep_sword (void)
 {
-  al_destroy_bitmap (kid_keep_sword_00);
-  al_destroy_bitmap (kid_keep_sword_01);
-  al_destroy_bitmap (kid_keep_sword_02);
-  al_destroy_bitmap (kid_keep_sword_03);
-  al_destroy_bitmap (kid_keep_sword_04);
-  al_destroy_bitmap (kid_keep_sword_05);
-  al_destroy_bitmap (kid_keep_sword_06);
-  al_destroy_bitmap (kid_keep_sword_07);
-  al_destroy_bitmap (kid_keep_sword_08);
-  al_destroy_bitmap (kid_keep_sword_09);
+  destroy_bitmap (kid_keep_sword_00);
+  destroy_bitmap (kid_keep_sword_01);
+  destroy_bitmap (kid_keep_sword_02);
+  destroy_bitmap (kid_keep_sword_03);
+  destroy_bitmap (kid_keep_sword_04);
+  destroy_bitmap (kid_keep_sword_05);
+  destroy_bitmap (kid_keep_sword_06);
+  destroy_bitmap (kid_keep_sword_07);
+  destroy_bitmap (kid_keep_sword_08);
+  destroy_bitmap (kid_keep_sword_09);
 }
 
 void

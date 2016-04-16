@@ -146,24 +146,24 @@ void
 unload_guard_defense (void)
 {
   /* guard */
-  al_destroy_bitmap (guard_defense_00);
-  al_destroy_bitmap (guard_defense_counter_attack);
+  destroy_bitmap (guard_defense_00);
+  destroy_bitmap (guard_defense_counter_attack);
 
   /* fat_guard */
-  al_destroy_bitmap (fat_guard_defense_00);
-  al_destroy_bitmap (fat_guard_defense_counter_attack);
+  destroy_bitmap (fat_guard_defense_00);
+  destroy_bitmap (fat_guard_defense_counter_attack);
 
   /* vizier */
-  al_destroy_bitmap (vizier_defense_00);
-  al_destroy_bitmap (vizier_defense_counter_attack);
+  destroy_bitmap (vizier_defense_00);
+  destroy_bitmap (vizier_defense_counter_attack);
 
   /* skeleton */
-  al_destroy_bitmap (skeleton_defense_00);
-  al_destroy_bitmap (skeleton_defense_counter_attack);
+  destroy_bitmap (skeleton_defense_00);
+  destroy_bitmap (skeleton_defense_counter_attack);
 
   /* shadow */
-  al_destroy_bitmap (shadow_defense_00);
-  al_destroy_bitmap (shadow_defense_counter_attack);
+  destroy_bitmap (shadow_defense_00);
+  destroy_bitmap (shadow_defense_counter_attack);
 }
 
 void

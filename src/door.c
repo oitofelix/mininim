@@ -108,58 +108,58 @@ void
 unload_door (void)
 {
   /* dungeon cga */
-  al_destroy_bitmap (dc_door_left);
-  al_destroy_bitmap (dc_door_right);
-  al_destroy_bitmap (dc_door_pole);
-  al_destroy_bitmap (dc_door_pole_base);
-  al_destroy_bitmap (dc_door_top);
-  al_destroy_bitmap (dc_door_grid);
-  al_destroy_bitmap (dc_door_grid_tip);
+  destroy_bitmap (dc_door_left);
+  destroy_bitmap (dc_door_right);
+  destroy_bitmap (dc_door_pole);
+  destroy_bitmap (dc_door_pole_base);
+  destroy_bitmap (dc_door_top);
+  destroy_bitmap (dc_door_grid);
+  destroy_bitmap (dc_door_grid_tip);
 
   /* palace cga */
-  al_destroy_bitmap (pc_door_left);
-  al_destroy_bitmap (pc_door_right);
-  al_destroy_bitmap (pc_door_pole);
-  al_destroy_bitmap (pc_door_pole_base);
-  al_destroy_bitmap (pc_door_top);
-  al_destroy_bitmap (pc_door_grid);
-  al_destroy_bitmap (pc_door_grid_tip);
+  destroy_bitmap (pc_door_left);
+  destroy_bitmap (pc_door_right);
+  destroy_bitmap (pc_door_pole);
+  destroy_bitmap (pc_door_pole_base);
+  destroy_bitmap (pc_door_top);
+  destroy_bitmap (pc_door_grid);
+  destroy_bitmap (pc_door_grid_tip);
 
   /* dungeon ega */
-  al_destroy_bitmap (de_door_left);
-  al_destroy_bitmap (de_door_right);
-  al_destroy_bitmap (de_door_pole);
-  al_destroy_bitmap (de_door_pole_base);
-  al_destroy_bitmap (de_door_top);
-  al_destroy_bitmap (de_door_grid);
-  al_destroy_bitmap (de_door_grid_tip);
+  destroy_bitmap (de_door_left);
+  destroy_bitmap (de_door_right);
+  destroy_bitmap (de_door_pole);
+  destroy_bitmap (de_door_pole_base);
+  destroy_bitmap (de_door_top);
+  destroy_bitmap (de_door_grid);
+  destroy_bitmap (de_door_grid_tip);
 
   /* palace ega */
-  al_destroy_bitmap (pe_door_left);
-  al_destroy_bitmap (pe_door_right);
-  al_destroy_bitmap (pe_door_pole);
-  al_destroy_bitmap (pe_door_pole_base);
-  al_destroy_bitmap (pe_door_top);
-  al_destroy_bitmap (pe_door_grid);
-  al_destroy_bitmap (pe_door_grid_tip);
+  destroy_bitmap (pe_door_left);
+  destroy_bitmap (pe_door_right);
+  destroy_bitmap (pe_door_pole);
+  destroy_bitmap (pe_door_pole_base);
+  destroy_bitmap (pe_door_top);
+  destroy_bitmap (pe_door_grid);
+  destroy_bitmap (pe_door_grid_tip);
 
   /* dungeon vga */
-  al_destroy_bitmap (dv_door_left);
-  al_destroy_bitmap (dv_door_right);
-  al_destroy_bitmap (dv_door_pole);
-  al_destroy_bitmap (dv_door_pole_base);
-  al_destroy_bitmap (dv_door_top);
-  al_destroy_bitmap (dv_door_grid);
-  al_destroy_bitmap (dv_door_grid_tip);
+  destroy_bitmap (dv_door_left);
+  destroy_bitmap (dv_door_right);
+  destroy_bitmap (dv_door_pole);
+  destroy_bitmap (dv_door_pole_base);
+  destroy_bitmap (dv_door_top);
+  destroy_bitmap (dv_door_grid);
+  destroy_bitmap (dv_door_grid_tip);
 
   /* palace vga */
-  al_destroy_bitmap (pv_door_left);
-  al_destroy_bitmap (pv_door_right);
-  al_destroy_bitmap (pv_door_pole);
-  al_destroy_bitmap (pv_door_pole_base);
-  al_destroy_bitmap (pv_door_top);
-  al_destroy_bitmap (pv_door_grid);
-  al_destroy_bitmap (pv_door_grid_tip);
+  destroy_bitmap (pv_door_left);
+  destroy_bitmap (pv_door_right);
+  destroy_bitmap (pv_door_pole);
+  destroy_bitmap (pv_door_pole_base);
+  destroy_bitmap (pv_door_top);
+  destroy_bitmap (pv_door_grid);
+  destroy_bitmap (pv_door_grid_tip);
 }
 
 void

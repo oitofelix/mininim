@@ -71,22 +71,22 @@ void
 unload_mirror (void)
 {
   /* dungeon cga */
-  al_destroy_bitmap (dc_mirror);
+  destroy_bitmap (dc_mirror);
 
   /* palace cga */
-  al_destroy_bitmap (pc_mirror);
+  destroy_bitmap (pc_mirror);
 
   /* dungeon ega */
-  al_destroy_bitmap (de_mirror);
+  destroy_bitmap (de_mirror);
 
   /* palace ega */
-  al_destroy_bitmap (pe_mirror);
+  destroy_bitmap (pe_mirror);
 
   /* dungeon vga */
-  al_destroy_bitmap (dv_mirror);
+  destroy_bitmap (dv_mirror);
 
   /* palace vga */
-  al_destroy_bitmap (pv_mirror);
+  destroy_bitmap (pv_mirror);
 
   /* callbacks */
   remove_room_callback (create_mirror_bitmaps);
@@ -152,7 +152,7 @@ create_mirror_bitmaps (int last_room, int room)
     for (p.place = -1; p.place < PLACES; p.place++) {
       ALLEGRO_BITMAP **b = &mirror_bitmap[p.floor + 1][p.place + 1];
       if (*b) {
-        al_destroy_bitmap (*b);
+        destroy_bitmap (*b);
         *b = NULL;
       }
       if (con (&p)->fg != MIRROR) continue;

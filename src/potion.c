@@ -100,37 +100,37 @@ void
 unload_potion (void)
 {
   /* dungeon cga */
-  al_destroy_bitmap (dc_small_potion);
-  al_destroy_bitmap (dc_big_potion);
+  destroy_bitmap (dc_small_potion);
+  destroy_bitmap (dc_big_potion);
 
   /* palace cga */
-  al_destroy_bitmap (pc_small_potion);
-  al_destroy_bitmap (pc_big_potion);
+  destroy_bitmap (pc_small_potion);
+  destroy_bitmap (pc_big_potion);
 
   /* dungeon ega */
-  al_destroy_bitmap (de_small_potion);
-  al_destroy_bitmap (de_big_potion);
+  destroy_bitmap (de_small_potion);
+  destroy_bitmap (de_big_potion);
 
   /* palace ega */
-  al_destroy_bitmap (pe_small_potion);
-  al_destroy_bitmap (pe_big_potion);
+  destroy_bitmap (pe_small_potion);
+  destroy_bitmap (pe_big_potion);
 
   /* dungeon vga */
-  al_destroy_bitmap (dv_small_potion);
-  al_destroy_bitmap (dv_big_potion);
+  destroy_bitmap (dv_small_potion);
+  destroy_bitmap (dv_big_potion);
 
   /* palace vga */
-  al_destroy_bitmap (pv_small_potion);
-  al_destroy_bitmap (pv_big_potion);
+  destroy_bitmap (pv_small_potion);
+  destroy_bitmap (pv_big_potion);
 
   /* palettable */
-  al_destroy_bitmap (bubble_00);
-  al_destroy_bitmap (bubble_01);
-  al_destroy_bitmap (bubble_02);
-  al_destroy_bitmap (bubble_03);
-  al_destroy_bitmap (bubble_04);
-  al_destroy_bitmap (bubble_05);
-  al_destroy_bitmap (bubble_06);
+  destroy_bitmap (bubble_00);
+  destroy_bitmap (bubble_01);
+  destroy_bitmap (bubble_02);
+  destroy_bitmap (bubble_03);
+  destroy_bitmap (bubble_04);
+  destroy_bitmap (bubble_05);
+  destroy_bitmap (bubble_06);
 }
 
 static ALLEGRO_BITMAP *

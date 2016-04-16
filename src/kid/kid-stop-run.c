@@ -56,10 +56,10 @@ load_kid_stop_run (void)
 void
 unload_kid_stop_run (void)
 {
-  al_destroy_bitmap (kid_stop_run_00);
-  al_destroy_bitmap (kid_stop_run_01);
-  al_destroy_bitmap (kid_stop_run_02);
-  al_destroy_bitmap (kid_stop_run_03);
+  destroy_bitmap (kid_stop_run_00);
+  destroy_bitmap (kid_stop_run_01);
+  destroy_bitmap (kid_stop_run_02);
+  destroy_bitmap (kid_stop_run_03);
 }
 
 void

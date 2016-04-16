@@ -105,52 +105,52 @@ void
 unload_big_pillar (void)
 {
   /* dungeon cga */
-  al_destroy_bitmap (dc_big_pillar_bottom_left);
-  al_destroy_bitmap (dc_big_pillar_bottom_right);
-  al_destroy_bitmap (dc_big_pillar_top_left);
-  al_destroy_bitmap (dc_big_pillar_top_right);
-  al_destroy_bitmap (dc_big_pillar_top_right_top);
-  al_destroy_bitmap (dc_big_pillar_bottom_fg);
+  destroy_bitmap (dc_big_pillar_bottom_left);
+  destroy_bitmap (dc_big_pillar_bottom_right);
+  destroy_bitmap (dc_big_pillar_top_left);
+  destroy_bitmap (dc_big_pillar_top_right);
+  destroy_bitmap (dc_big_pillar_top_right_top);
+  destroy_bitmap (dc_big_pillar_bottom_fg);
 
   /* palace cga */
-  al_destroy_bitmap (pc_big_pillar_bottom_left);
-  al_destroy_bitmap (pc_big_pillar_bottom_right);
-  al_destroy_bitmap (pc_big_pillar_top_left);
-  al_destroy_bitmap (pc_big_pillar_top_right);
-  al_destroy_bitmap (pc_big_pillar_top_right_top);
-  al_destroy_bitmap (pc_big_pillar_bottom_fg);
+  destroy_bitmap (pc_big_pillar_bottom_left);
+  destroy_bitmap (pc_big_pillar_bottom_right);
+  destroy_bitmap (pc_big_pillar_top_left);
+  destroy_bitmap (pc_big_pillar_top_right);
+  destroy_bitmap (pc_big_pillar_top_right_top);
+  destroy_bitmap (pc_big_pillar_bottom_fg);
 
   /* dungeon ega */
-  al_destroy_bitmap (de_big_pillar_bottom_left);
-  al_destroy_bitmap (de_big_pillar_bottom_right);
-  al_destroy_bitmap (de_big_pillar_top_left);
-  al_destroy_bitmap (de_big_pillar_top_right);
-  al_destroy_bitmap (de_big_pillar_top_right_top);
-  al_destroy_bitmap (de_big_pillar_bottom_fg);
+  destroy_bitmap (de_big_pillar_bottom_left);
+  destroy_bitmap (de_big_pillar_bottom_right);
+  destroy_bitmap (de_big_pillar_top_left);
+  destroy_bitmap (de_big_pillar_top_right);
+  destroy_bitmap (de_big_pillar_top_right_top);
+  destroy_bitmap (de_big_pillar_bottom_fg);
 
   /* palace ega */
-  al_destroy_bitmap (pe_big_pillar_bottom_left);
-  al_destroy_bitmap (pe_big_pillar_bottom_right);
-  al_destroy_bitmap (pe_big_pillar_top_left);
-  al_destroy_bitmap (pe_big_pillar_top_right);
-  al_destroy_bitmap (pe_big_pillar_top_right_top);
-  al_destroy_bitmap (pe_big_pillar_bottom_fg);
+  destroy_bitmap (pe_big_pillar_bottom_left);
+  destroy_bitmap (pe_big_pillar_bottom_right);
+  destroy_bitmap (pe_big_pillar_top_left);
+  destroy_bitmap (pe_big_pillar_top_right);
+  destroy_bitmap (pe_big_pillar_top_right_top);
+  destroy_bitmap (pe_big_pillar_bottom_fg);
 
   /* dungeon vga */
-  al_destroy_bitmap (dv_big_pillar_bottom_left);
-  al_destroy_bitmap (dv_big_pillar_bottom_right);
-  al_destroy_bitmap (dv_big_pillar_top_left);
-  al_destroy_bitmap (dv_big_pillar_top_right);
-  al_destroy_bitmap (dv_big_pillar_top_right_top);
-  al_destroy_bitmap (dv_big_pillar_bottom_fg);
+  destroy_bitmap (dv_big_pillar_bottom_left);
+  destroy_bitmap (dv_big_pillar_bottom_right);
+  destroy_bitmap (dv_big_pillar_top_left);
+  destroy_bitmap (dv_big_pillar_top_right);
+  destroy_bitmap (dv_big_pillar_top_right_top);
+  destroy_bitmap (dv_big_pillar_bottom_fg);
 
   /* palace vga */
-  al_destroy_bitmap (pv_big_pillar_bottom_left);
-  al_destroy_bitmap (pv_big_pillar_bottom_right);
-  al_destroy_bitmap (pv_big_pillar_top_left);
-  al_destroy_bitmap (pv_big_pillar_top_right);
-  al_destroy_bitmap (pv_big_pillar_top_right_top);
-  al_destroy_bitmap (pv_big_pillar_bottom_fg);
+  destroy_bitmap (pv_big_pillar_bottom_left);
+  destroy_bitmap (pv_big_pillar_bottom_right);
+  destroy_bitmap (pv_big_pillar_top_left);
+  destroy_bitmap (pv_big_pillar_top_right);
+  destroy_bitmap (pv_big_pillar_top_right_top);
+  destroy_bitmap (pv_big_pillar_bottom_fg);
 }
 
 void

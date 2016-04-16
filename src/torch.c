@@ -63,22 +63,22 @@ void
 unload_torch (void)
 {
   /* dungeon cga */
-  al_destroy_bitmap (dc_torch);
+  destroy_bitmap (dc_torch);
 
   /* palace cga */
-  al_destroy_bitmap (pc_torch);
+  destroy_bitmap (pc_torch);
 
   /* dungeon vga */
-  al_destroy_bitmap (de_torch);
+  destroy_bitmap (de_torch);
 
   /* palace ega */
-  al_destroy_bitmap (pe_torch);
+  destroy_bitmap (pe_torch);
 
   /* dungeon vga */
-  al_destroy_bitmap (dv_torch);
+  destroy_bitmap (dv_torch);
 
   /* palace vga */
-  al_destroy_bitmap (pv_torch);
+  destroy_bitmap (pv_torch);
 }
 
 void

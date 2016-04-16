@@ -117,64 +117,64 @@ void
 unload_arch (void)
 {
   /* dungeon cga */
-  al_destroy_bitmap (dc_arch_bottom);
-  al_destroy_bitmap (dc_arch_top_left);
-  al_destroy_bitmap (dc_arch_top_left_end);
-  al_destroy_bitmap (dc_arch_top_right);
-  al_destroy_bitmap (dc_arch_top_right_end);
-  al_destroy_bitmap (dc_arch_top_mid);
-  al_destroy_bitmap (dc_arch_top_small);
-  al_destroy_bitmap (dc_arch_top_top);
+  destroy_bitmap (dc_arch_bottom);
+  destroy_bitmap (dc_arch_top_left);
+  destroy_bitmap (dc_arch_top_left_end);
+  destroy_bitmap (dc_arch_top_right);
+  destroy_bitmap (dc_arch_top_right_end);
+  destroy_bitmap (dc_arch_top_mid);
+  destroy_bitmap (dc_arch_top_small);
+  destroy_bitmap (dc_arch_top_top);
 
   /* palace cga */
-  al_destroy_bitmap (pc_arch_bottom);
-  al_destroy_bitmap (pc_arch_top_left);
-  al_destroy_bitmap (pc_arch_top_left_end);
-  al_destroy_bitmap (pc_arch_top_right);
-  al_destroy_bitmap (pc_arch_top_right_end);
-  al_destroy_bitmap (pc_arch_top_mid);
-  al_destroy_bitmap (pc_arch_top_small);
-  al_destroy_bitmap (pc_arch_top_top);
+  destroy_bitmap (pc_arch_bottom);
+  destroy_bitmap (pc_arch_top_left);
+  destroy_bitmap (pc_arch_top_left_end);
+  destroy_bitmap (pc_arch_top_right);
+  destroy_bitmap (pc_arch_top_right_end);
+  destroy_bitmap (pc_arch_top_mid);
+  destroy_bitmap (pc_arch_top_small);
+  destroy_bitmap (pc_arch_top_top);
 
   /* dungeon ega */
-  al_destroy_bitmap (de_arch_bottom);
-  al_destroy_bitmap (de_arch_top_left);
-  al_destroy_bitmap (de_arch_top_left_end);
-  al_destroy_bitmap (de_arch_top_right);
-  al_destroy_bitmap (de_arch_top_right_end);
-  al_destroy_bitmap (de_arch_top_mid);
-  al_destroy_bitmap (de_arch_top_small);
-  al_destroy_bitmap (de_arch_top_top);
+  destroy_bitmap (de_arch_bottom);
+  destroy_bitmap (de_arch_top_left);
+  destroy_bitmap (de_arch_top_left_end);
+  destroy_bitmap (de_arch_top_right);
+  destroy_bitmap (de_arch_top_right_end);
+  destroy_bitmap (de_arch_top_mid);
+  destroy_bitmap (de_arch_top_small);
+  destroy_bitmap (de_arch_top_top);
 
   /* palace ega */
-  al_destroy_bitmap (pe_arch_bottom);
-  al_destroy_bitmap (pe_arch_top_left);
-  al_destroy_bitmap (pe_arch_top_left_end);
-  al_destroy_bitmap (pe_arch_top_right);
-  al_destroy_bitmap (pe_arch_top_right_end);
-  al_destroy_bitmap (pe_arch_top_mid);
-  al_destroy_bitmap (pe_arch_top_small);
-  al_destroy_bitmap (pe_arch_top_top);
+  destroy_bitmap (pe_arch_bottom);
+  destroy_bitmap (pe_arch_top_left);
+  destroy_bitmap (pe_arch_top_left_end);
+  destroy_bitmap (pe_arch_top_right);
+  destroy_bitmap (pe_arch_top_right_end);
+  destroy_bitmap (pe_arch_top_mid);
+  destroy_bitmap (pe_arch_top_small);
+  destroy_bitmap (pe_arch_top_top);
 
   /* dungeon vga */
-  al_destroy_bitmap (dv_arch_bottom);
-  al_destroy_bitmap (dv_arch_top_left);
-  al_destroy_bitmap (dv_arch_top_left_end);
-  al_destroy_bitmap (dv_arch_top_right);
-  al_destroy_bitmap (dv_arch_top_right_end);
-  al_destroy_bitmap (dv_arch_top_mid);
-  al_destroy_bitmap (dv_arch_top_small);
-  al_destroy_bitmap (dv_arch_top_top);
+  destroy_bitmap (dv_arch_bottom);
+  destroy_bitmap (dv_arch_top_left);
+  destroy_bitmap (dv_arch_top_left_end);
+  destroy_bitmap (dv_arch_top_right);
+  destroy_bitmap (dv_arch_top_right_end);
+  destroy_bitmap (dv_arch_top_mid);
+  destroy_bitmap (dv_arch_top_small);
+  destroy_bitmap (dv_arch_top_top);
 
   /* palace vga */
-  al_destroy_bitmap (pv_arch_bottom);
-  al_destroy_bitmap (pv_arch_top_left);
-  al_destroy_bitmap (pv_arch_top_left_end);
-  al_destroy_bitmap (pv_arch_top_right);
-  al_destroy_bitmap (pv_arch_top_right_end);
-  al_destroy_bitmap (pv_arch_top_mid);
-  al_destroy_bitmap (pv_arch_top_small);
-  al_destroy_bitmap (pv_arch_top_top);
+  destroy_bitmap (pv_arch_bottom);
+  destroy_bitmap (pv_arch_top_left);
+  destroy_bitmap (pv_arch_top_left_end);
+  destroy_bitmap (pv_arch_top_right);
+  destroy_bitmap (pv_arch_top_right_end);
+  destroy_bitmap (pv_arch_top_mid);
+  destroy_bitmap (pv_arch_top_small);
+  destroy_bitmap (pv_arch_top_top);
 }
 
 void

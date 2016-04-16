@@ -65,7 +65,7 @@ compute_stars_position (int last_room, int room)
       struct stars_bitmap *sb =
         &stars_bitmap[p.floor + 1][p.place + 1];
       if (sb->b) {
-        al_destroy_bitmap (sb->b);
+        destroy_bitmap (sb->b);
         sb->b = NULL;
       }
       if (con (&p)->bg != BALCONY) continue;
@@ -145,7 +145,7 @@ void
 draw_star (struct star *s, struct stars_bitmap *sb, enum vm vm)
 {
   al_lock_bitmap (sb->b, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READWRITE);
-  al_set_target_bitmap (sb->b);
+  set_target_bitmap (sb->b);
   al_put_pixel (s->x - sb->c.x, s->y - sb->c.y, get_star_color (s->color, vm));
   al_unlock_bitmap (sb->b);
 }

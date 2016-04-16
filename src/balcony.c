@@ -87,40 +87,40 @@ void
 unload_balcony (void)
 {
   /* dungeon cga */
-  al_destroy_bitmap (dc_balcony_top_left);
-  al_destroy_bitmap (dc_balcony_top_right);
-  al_destroy_bitmap (dc_balcony_bottom_left);
-  al_destroy_bitmap (dc_balcony_bottom_right);
+  destroy_bitmap (dc_balcony_top_left);
+  destroy_bitmap (dc_balcony_top_right);
+  destroy_bitmap (dc_balcony_bottom_left);
+  destroy_bitmap (dc_balcony_bottom_right);
 
   /* palace cga */
-  al_destroy_bitmap (pc_balcony_top_left);
-  al_destroy_bitmap (pc_balcony_top_right);
-  al_destroy_bitmap (pc_balcony_bottom_left);
-  al_destroy_bitmap (pc_balcony_bottom_right);
+  destroy_bitmap (pc_balcony_top_left);
+  destroy_bitmap (pc_balcony_top_right);
+  destroy_bitmap (pc_balcony_bottom_left);
+  destroy_bitmap (pc_balcony_bottom_right);
 
   /* dungeon ega */
-  al_destroy_bitmap (de_balcony_top_left);
-  al_destroy_bitmap (de_balcony_top_right);
-  al_destroy_bitmap (de_balcony_bottom_left);
-  al_destroy_bitmap (de_balcony_bottom_right);
+  destroy_bitmap (de_balcony_top_left);
+  destroy_bitmap (de_balcony_top_right);
+  destroy_bitmap (de_balcony_bottom_left);
+  destroy_bitmap (de_balcony_bottom_right);
 
   /* palace ega */
-  al_destroy_bitmap (pe_balcony_top_left);
-  al_destroy_bitmap (pe_balcony_top_right);
-  al_destroy_bitmap (pe_balcony_bottom_left);
-  al_destroy_bitmap (pe_balcony_bottom_right);
+  destroy_bitmap (pe_balcony_top_left);
+  destroy_bitmap (pe_balcony_top_right);
+  destroy_bitmap (pe_balcony_bottom_left);
+  destroy_bitmap (pe_balcony_bottom_right);
 
   /* dungeon vga */
-  al_destroy_bitmap (dv_balcony_top_left);
-  al_destroy_bitmap (dv_balcony_top_right);
-  al_destroy_bitmap (dv_balcony_bottom_left);
-  al_destroy_bitmap (dv_balcony_bottom_right);
+  destroy_bitmap (dv_balcony_top_left);
+  destroy_bitmap (dv_balcony_top_right);
+  destroy_bitmap (dv_balcony_bottom_left);
+  destroy_bitmap (dv_balcony_bottom_right);
 
   /* palace vga */
-  al_destroy_bitmap (pv_balcony_top_left);
-  al_destroy_bitmap (pv_balcony_top_right);
-  al_destroy_bitmap (pv_balcony_bottom_left);
-  al_destroy_bitmap (pv_balcony_bottom_right);
+  destroy_bitmap (pv_balcony_top_left);
+  destroy_bitmap (pv_balcony_top_right);
+  destroy_bitmap (pv_balcony_bottom_left);
+  destroy_bitmap (pv_balcony_bottom_right);
 }
 
 void

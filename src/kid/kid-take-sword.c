@@ -56,10 +56,10 @@ load_kid_take_sword (void)
 void
 unload_kid_take_sword (void)
 {
-  al_destroy_bitmap (kid_take_sword_00);
-  al_destroy_bitmap (kid_take_sword_01);
-  al_destroy_bitmap (kid_take_sword_02);
-  al_destroy_bitmap (kid_take_sword_03);
+  destroy_bitmap (kid_take_sword_00);
+  destroy_bitmap (kid_take_sword_01);
+  destroy_bitmap (kid_take_sword_02);
+  destroy_bitmap (kid_take_sword_03);
 }
 
 void

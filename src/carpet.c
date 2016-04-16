@@ -92,40 +92,40 @@ void
 unload_carpet (void)
 {
   /* dungeon cga */
-  al_destroy_bitmap (dc_carpet_00);
-  al_destroy_bitmap (dc_carpet_top_00);
-  al_destroy_bitmap (dc_carpet_01);
-  al_destroy_bitmap (dc_carpet_top_01);
+  destroy_bitmap (dc_carpet_00);
+  destroy_bitmap (dc_carpet_top_00);
+  destroy_bitmap (dc_carpet_01);
+  destroy_bitmap (dc_carpet_top_01);
 
   /* palace cga */
-  al_destroy_bitmap (pc_carpet_00);
-  al_destroy_bitmap (pc_carpet_top_00);
-  al_destroy_bitmap (pc_carpet_01);
-  al_destroy_bitmap (pc_carpet_top_01);
+  destroy_bitmap (pc_carpet_00);
+  destroy_bitmap (pc_carpet_top_00);
+  destroy_bitmap (pc_carpet_01);
+  destroy_bitmap (pc_carpet_top_01);
 
   /* dungeon ega */
-  al_destroy_bitmap (de_carpet_00);
-  al_destroy_bitmap (de_carpet_top_00);
-  al_destroy_bitmap (de_carpet_01);
-  al_destroy_bitmap (de_carpet_top_01);
+  destroy_bitmap (de_carpet_00);
+  destroy_bitmap (de_carpet_top_00);
+  destroy_bitmap (de_carpet_01);
+  destroy_bitmap (de_carpet_top_01);
 
   /* palace ega */
-  al_destroy_bitmap (pe_carpet_00);
-  al_destroy_bitmap (pe_carpet_top_00);
-  al_destroy_bitmap (pe_carpet_01);
-  al_destroy_bitmap (pe_carpet_top_01);
+  destroy_bitmap (pe_carpet_00);
+  destroy_bitmap (pe_carpet_top_00);
+  destroy_bitmap (pe_carpet_01);
+  destroy_bitmap (pe_carpet_top_01);
 
   /* dungeon vga */
-  al_destroy_bitmap (dv_carpet_00);
-  al_destroy_bitmap (dv_carpet_top_00);
-  al_destroy_bitmap (dv_carpet_01);
-  al_destroy_bitmap (dv_carpet_top_01);
+  destroy_bitmap (dv_carpet_00);
+  destroy_bitmap (dv_carpet_top_00);
+  destroy_bitmap (dv_carpet_01);
+  destroy_bitmap (dv_carpet_top_01);
 
   /* palace vga */
-  al_destroy_bitmap (pv_carpet_00);
-  al_destroy_bitmap (pv_carpet_top_00);
-  al_destroy_bitmap (pv_carpet_01);
-  al_destroy_bitmap (pv_carpet_top_01);
+  destroy_bitmap (pv_carpet_00);
+  destroy_bitmap (pv_carpet_top_00);
+  destroy_bitmap (pv_carpet_01);
+  destroy_bitmap (pv_carpet_top_01);
 }
 
 static void

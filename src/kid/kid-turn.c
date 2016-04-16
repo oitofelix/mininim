@@ -55,10 +55,10 @@ load_kid_turn (void)
 void
 unload_kid_turn (void)
 {
-  al_destroy_bitmap (kid_turn_00);
-  al_destroy_bitmap (kid_turn_01);
-  al_destroy_bitmap (kid_turn_02);
-  al_destroy_bitmap (kid_turn_03);
+  destroy_bitmap (kid_turn_00);
+  destroy_bitmap (kid_turn_01);
+  destroy_bitmap (kid_turn_02);
+  destroy_bitmap (kid_turn_03);
 }
 
 void

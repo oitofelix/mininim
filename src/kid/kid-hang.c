@@ -71,20 +71,20 @@ load_kid_hang (void)
 void
 unload_kid_hang (void)
 {
-  al_destroy_bitmap (kid_hang_00);
-  al_destroy_bitmap (kid_hang_01);
-  al_destroy_bitmap (kid_hang_02);
-  al_destroy_bitmap (kid_hang_03);
-  al_destroy_bitmap (kid_hang_04);
-  al_destroy_bitmap (kid_hang_05);
-  al_destroy_bitmap (kid_hang_06);
-  al_destroy_bitmap (kid_hang_07);
-  al_destroy_bitmap (kid_hang_08);
-  al_destroy_bitmap (kid_hang_09);
-  al_destroy_bitmap (kid_hang_10);
-  al_destroy_bitmap (kid_hang_11);
-  al_destroy_bitmap (kid_hang_12);
-  al_destroy_bitmap (kid_hang_13);
+  destroy_bitmap (kid_hang_00);
+  destroy_bitmap (kid_hang_01);
+  destroy_bitmap (kid_hang_02);
+  destroy_bitmap (kid_hang_03);
+  destroy_bitmap (kid_hang_04);
+  destroy_bitmap (kid_hang_05);
+  destroy_bitmap (kid_hang_06);
+  destroy_bitmap (kid_hang_07);
+  destroy_bitmap (kid_hang_08);
+  destroy_bitmap (kid_hang_09);
+  destroy_bitmap (kid_hang_10);
+  destroy_bitmap (kid_hang_11);
+  destroy_bitmap (kid_hang_12);
+  destroy_bitmap (kid_hang_13);
 }
 
 void

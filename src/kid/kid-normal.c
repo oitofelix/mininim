@@ -34,7 +34,7 @@ load_kid_normal (void)
 void
 unload_kid_normal (void)
 {
-  al_destroy_bitmap (kid_normal_00);
+  destroy_bitmap (kid_normal_00);
 }
 
 void

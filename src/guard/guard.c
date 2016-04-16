@@ -61,8 +61,8 @@ unload_guard (void)
   unload_guard_defense ();
 
   /* bitmaps */
-  al_destroy_bitmap (guard_life);
-  al_destroy_bitmap (guard_splash);
+  destroy_bitmap (guard_life);
+  destroy_bitmap (guard_splash);
 }
 
 struct anim *

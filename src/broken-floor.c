@@ -81,34 +81,34 @@ void
 unload_broken_floor (void)
 {
   /* dungeon cga */
-  al_destroy_bitmap (dc_broken_floor_left);
-  al_destroy_bitmap (dc_broken_floor_right);
-  al_destroy_bitmap (dc_broken_floor_front);
+  destroy_bitmap (dc_broken_floor_left);
+  destroy_bitmap (dc_broken_floor_right);
+  destroy_bitmap (dc_broken_floor_front);
 
   /* palace cga */
-  al_destroy_bitmap (pc_broken_floor_left);
-  al_destroy_bitmap (pc_broken_floor_right);
-  al_destroy_bitmap (pc_broken_floor_front);
+  destroy_bitmap (pc_broken_floor_left);
+  destroy_bitmap (pc_broken_floor_right);
+  destroy_bitmap (pc_broken_floor_front);
 
   /* dungeon ega */
-  al_destroy_bitmap (de_broken_floor_left);
-  al_destroy_bitmap (de_broken_floor_right);
-  al_destroy_bitmap (de_broken_floor_front);
+  destroy_bitmap (de_broken_floor_left);
+  destroy_bitmap (de_broken_floor_right);
+  destroy_bitmap (de_broken_floor_front);
 
   /* palace ega */
-  al_destroy_bitmap (pe_broken_floor_left);
-  al_destroy_bitmap (pe_broken_floor_right);
-  al_destroy_bitmap (pe_broken_floor_front);
+  destroy_bitmap (pe_broken_floor_left);
+  destroy_bitmap (pe_broken_floor_right);
+  destroy_bitmap (pe_broken_floor_front);
 
   /* dungeon vga */
-  al_destroy_bitmap (dv_broken_floor_left);
-  al_destroy_bitmap (dv_broken_floor_right);
-  al_destroy_bitmap (dv_broken_floor_front);
+  destroy_bitmap (dv_broken_floor_left);
+  destroy_bitmap (dv_broken_floor_right);
+  destroy_bitmap (dv_broken_floor_front);
 
   /* palace vga */
-  al_destroy_bitmap (pv_broken_floor_left);
-  al_destroy_bitmap (pv_broken_floor_right);
-  al_destroy_bitmap (pv_broken_floor_front);
+  destroy_bitmap (pv_broken_floor_left);
+  destroy_bitmap (pv_broken_floor_right);
+  destroy_bitmap (pv_broken_floor_front);
 }
 
 void

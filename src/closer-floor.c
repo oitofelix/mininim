@@ -84,34 +84,34 @@ void
 unload_closer_floor (void)
 {
   /* dungeon cga */
-  al_destroy_bitmap (dc_unpressed_closer_floor_base);
-  al_destroy_bitmap (dc_pressed_closer_floor_base);
-  al_destroy_bitmap (dc_pressed_closer_floor_right);
+  destroy_bitmap (dc_unpressed_closer_floor_base);
+  destroy_bitmap (dc_pressed_closer_floor_base);
+  destroy_bitmap (dc_pressed_closer_floor_right);
 
   /* palace cga */
-  al_destroy_bitmap (pc_unpressed_closer_floor_base);
-  al_destroy_bitmap (pc_pressed_closer_floor_base);
-  al_destroy_bitmap (pc_pressed_closer_floor_right);
+  destroy_bitmap (pc_unpressed_closer_floor_base);
+  destroy_bitmap (pc_pressed_closer_floor_base);
+  destroy_bitmap (pc_pressed_closer_floor_right);
 
   /* dungeon ega */
-  al_destroy_bitmap (de_unpressed_closer_floor_base);
-  al_destroy_bitmap (de_pressed_closer_floor_base);
-  al_destroy_bitmap (de_pressed_closer_floor_right);
+  destroy_bitmap (de_unpressed_closer_floor_base);
+  destroy_bitmap (de_pressed_closer_floor_base);
+  destroy_bitmap (de_pressed_closer_floor_right);
 
   /* palace ega */
-  al_destroy_bitmap (pe_unpressed_closer_floor_base);
-  al_destroy_bitmap (pe_pressed_closer_floor_base);
-  al_destroy_bitmap (pe_pressed_closer_floor_right);
+  destroy_bitmap (pe_unpressed_closer_floor_base);
+  destroy_bitmap (pe_pressed_closer_floor_base);
+  destroy_bitmap (pe_pressed_closer_floor_right);
 
   /* dungeon vga */
-  al_destroy_bitmap (dv_unpressed_closer_floor_base);
-  al_destroy_bitmap (dv_pressed_closer_floor_base);
-  al_destroy_bitmap (dv_pressed_closer_floor_right);
+  destroy_bitmap (dv_unpressed_closer_floor_base);
+  destroy_bitmap (dv_pressed_closer_floor_base);
+  destroy_bitmap (dv_pressed_closer_floor_right);
 
   /* palace vga */
-  al_destroy_bitmap (pv_unpressed_closer_floor_base);
-  al_destroy_bitmap (pv_pressed_closer_floor_base);
-  al_destroy_bitmap (pv_pressed_closer_floor_right);
+  destroy_bitmap (pv_unpressed_closer_floor_base);
+  destroy_bitmap (pv_pressed_closer_floor_base);
+  destroy_bitmap (pv_pressed_closer_floor_right);
 }
 
 void

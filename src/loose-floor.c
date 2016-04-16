@@ -121,64 +121,64 @@ void
 unload_loose_floor (void)
 {
   /* dungeon cga */
-  al_destroy_bitmap (dc_loose_floor_left_00);
-  al_destroy_bitmap (dc_loose_floor_right_00);
-  al_destroy_bitmap (dc_loose_floor_base_00);
-  al_destroy_bitmap (dc_loose_floor_left_01);
-  al_destroy_bitmap (dc_loose_floor_right_01);
-  al_destroy_bitmap (dc_loose_floor_base_01);
-  al_destroy_bitmap (dc_loose_floor_01);
-  al_destroy_bitmap (dc_broken_floor);
+  destroy_bitmap (dc_loose_floor_left_00);
+  destroy_bitmap (dc_loose_floor_right_00);
+  destroy_bitmap (dc_loose_floor_base_00);
+  destroy_bitmap (dc_loose_floor_left_01);
+  destroy_bitmap (dc_loose_floor_right_01);
+  destroy_bitmap (dc_loose_floor_base_01);
+  destroy_bitmap (dc_loose_floor_01);
+  destroy_bitmap (dc_broken_floor);
 
   /* palace cga */
-  al_destroy_bitmap (pc_loose_floor_left_00);
-  al_destroy_bitmap (pc_loose_floor_right_00);
-  al_destroy_bitmap (pc_loose_floor_base_00);
-  al_destroy_bitmap (pc_loose_floor_left_01);
-  al_destroy_bitmap (pc_loose_floor_right_01);
-  al_destroy_bitmap (pc_loose_floor_base_01);
-  al_destroy_bitmap (pc_loose_floor_01);
-  al_destroy_bitmap (pc_broken_floor);
+  destroy_bitmap (pc_loose_floor_left_00);
+  destroy_bitmap (pc_loose_floor_right_00);
+  destroy_bitmap (pc_loose_floor_base_00);
+  destroy_bitmap (pc_loose_floor_left_01);
+  destroy_bitmap (pc_loose_floor_right_01);
+  destroy_bitmap (pc_loose_floor_base_01);
+  destroy_bitmap (pc_loose_floor_01);
+  destroy_bitmap (pc_broken_floor);
 
   /* dungeon ega */
-  al_destroy_bitmap (de_loose_floor_left_00);
-  al_destroy_bitmap (de_loose_floor_right_00);
-  al_destroy_bitmap (de_loose_floor_base_00);
-  al_destroy_bitmap (de_loose_floor_left_01);
-  al_destroy_bitmap (de_loose_floor_right_01);
-  al_destroy_bitmap (de_loose_floor_base_01);
-  al_destroy_bitmap (de_loose_floor_01);
-  al_destroy_bitmap (de_broken_floor);
+  destroy_bitmap (de_loose_floor_left_00);
+  destroy_bitmap (de_loose_floor_right_00);
+  destroy_bitmap (de_loose_floor_base_00);
+  destroy_bitmap (de_loose_floor_left_01);
+  destroy_bitmap (de_loose_floor_right_01);
+  destroy_bitmap (de_loose_floor_base_01);
+  destroy_bitmap (de_loose_floor_01);
+  destroy_bitmap (de_broken_floor);
 
   /* palace ega */
-  al_destroy_bitmap (pe_loose_floor_left_00);
-  al_destroy_bitmap (pe_loose_floor_right_00);
-  al_destroy_bitmap (pe_loose_floor_base_00);
-  al_destroy_bitmap (pe_loose_floor_left_01);
-  al_destroy_bitmap (pe_loose_floor_right_01);
-  al_destroy_bitmap (pe_loose_floor_base_01);
-  al_destroy_bitmap (pe_loose_floor_01);
-  al_destroy_bitmap (pe_broken_floor);
+  destroy_bitmap (pe_loose_floor_left_00);
+  destroy_bitmap (pe_loose_floor_right_00);
+  destroy_bitmap (pe_loose_floor_base_00);
+  destroy_bitmap (pe_loose_floor_left_01);
+  destroy_bitmap (pe_loose_floor_right_01);
+  destroy_bitmap (pe_loose_floor_base_01);
+  destroy_bitmap (pe_loose_floor_01);
+  destroy_bitmap (pe_broken_floor);
 
   /* dungeon vga */
-  al_destroy_bitmap (dv_loose_floor_left_00);
-  al_destroy_bitmap (dv_loose_floor_right_00);
-  al_destroy_bitmap (dv_loose_floor_base_00);
-  al_destroy_bitmap (dv_loose_floor_left_01);
-  al_destroy_bitmap (dv_loose_floor_right_01);
-  al_destroy_bitmap (dv_loose_floor_base_01);
-  al_destroy_bitmap (dv_loose_floor_01);
-  al_destroy_bitmap (dv_broken_floor);
+  destroy_bitmap (dv_loose_floor_left_00);
+  destroy_bitmap (dv_loose_floor_right_00);
+  destroy_bitmap (dv_loose_floor_base_00);
+  destroy_bitmap (dv_loose_floor_left_01);
+  destroy_bitmap (dv_loose_floor_right_01);
+  destroy_bitmap (dv_loose_floor_base_01);
+  destroy_bitmap (dv_loose_floor_01);
+  destroy_bitmap (dv_broken_floor);
 
   /* palace vga */
-  al_destroy_bitmap (pv_loose_floor_left_00);
-  al_destroy_bitmap (pv_loose_floor_right_00);
-  al_destroy_bitmap (pv_loose_floor_base_00);
-  al_destroy_bitmap (pv_loose_floor_left_01);
-  al_destroy_bitmap (pv_loose_floor_right_01);
-  al_destroy_bitmap (pv_loose_floor_base_01);
-  al_destroy_bitmap (pv_loose_floor_01);
-  al_destroy_bitmap (pv_broken_floor);
+  destroy_bitmap (pv_loose_floor_left_00);
+  destroy_bitmap (pv_loose_floor_right_00);
+  destroy_bitmap (pv_loose_floor_base_00);
+  destroy_bitmap (pv_loose_floor_left_01);
+  destroy_bitmap (pv_loose_floor_right_01);
+  destroy_bitmap (pv_loose_floor_base_01);
+  destroy_bitmap (pv_loose_floor_01);
+  destroy_bitmap (pv_broken_floor);
 }
 
 ALLEGRO_BITMAP *

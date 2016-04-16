@@ -28,7 +28,7 @@ ALLEGRO_TIMER *bottom_text_timer = NULL;
 bool is_display_focused = true;
 ALLEGRO_BITMAP *effect_buffer;
 static ALLEGRO_BITMAP *memory_bitmap;
-static ALLEGRO_BITMAP *black_screen;
+ALLEGRO_BITMAP *black_screen;
 struct video_effect video_effect = {.type = VIDEO_NO_EFFECT};
 static ALLEGRO_FONT *builtin_font;
 int display_width = DISPLAY_WIDTH, display_height = DISPLAY_HEIGHT;
@@ -55,17 +55,15 @@ init_video (void)
   display = al_create_display (display_width, display_height);
   if (! display) error (-1, 0, "%s (void): failed to initialize display", __func__);
 
-  al_set_target_backbuffer (display);
+  set_target_backbuffer (display);
   al_set_new_bitmap_flags (ALLEGRO_VIDEO_BITMAP);
 
   al_set_window_title (display, WINDOW_TITLE);
   icon = load_bitmap (ICON);
   al_set_display_icon (display, icon);
 
-  screen = create_bitmap (ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
+  set_multi_room (1, 1);
   uscreen = create_bitmap (ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
-  effect_buffer = create_bitmap (ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
-  black_screen = create_bitmap (ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
 
   int flags = al_get_new_bitmap_flags ();
   al_add_new_bitmap_flag (ALLEGRO_MEMORY_BITMAP);
@@ -89,12 +87,12 @@ init_video (void)
 void
 finalize_video (void)
 {
-  al_destroy_bitmap (icon);
-  al_destroy_bitmap (screen);
-  al_destroy_bitmap (uscreen);
-  al_destroy_bitmap (effect_buffer);
-  al_destroy_bitmap (black_screen);
-  al_destroy_bitmap (memory_bitmap);
+  destroy_bitmap (icon);
+  destroy_bitmap (screen);
+  destroy_bitmap (uscreen);
+  destroy_bitmap (effect_buffer);
+  destroy_bitmap (black_screen);
+  destroy_bitmap (memory_bitmap);
   al_destroy_font (builtin_font);
   al_destroy_timer (video_timer);
   al_destroy_display (display);
@@ -116,11 +114,21 @@ get_display_event_source (ALLEGRO_DISPLAY *display)
 ALLEGRO_BITMAP *
 create_bitmap (int w, int h)
 {
-  al_set_target_backbuffer (display);
+  set_target_backbuffer (display);
   ALLEGRO_BITMAP *bitmap = al_create_bitmap (w, h);
-  if (! bitmap) error (-1, 0, "%s (%i, %i): cannot create bitmap", __func__, w, h);
+  if (! bitmap) {
+    error (0, 0, "%s (%i, %i): cannot create bitmap", __func__, w, h);
+    return NULL;
+  }
   validate_bitmap_for_mingw (bitmap);
   return bitmap;
+}
+
+void
+destroy_bitmap (ALLEGRO_BITMAP *bitmap)
+{
+  al_hold_bitmap_drawing (false);
+  al_destroy_bitmap (bitmap);
 }
 
 ALLEGRO_BITMAP *
@@ -132,9 +140,24 @@ clone_bitmap (ALLEGRO_BITMAP *bitmap)
 }
 
 void
+set_target_bitmap (ALLEGRO_BITMAP *bitmap)
+{
+  if (bitmap == al_get_target_bitmap ()) return;
+  al_hold_bitmap_drawing (false);
+  al_set_target_bitmap (bitmap);
+  al_hold_bitmap_drawing (true);
+}
+
+void
+set_target_backbuffer (ALLEGRO_DISPLAY *display)
+{
+  set_target_bitmap (al_get_backbuffer (display));
+}
+
+void
 clear_bitmap (ALLEGRO_BITMAP *bitmap, ALLEGRO_COLOR color)
 {
-  al_set_target_bitmap (bitmap);
+  set_target_bitmap (bitmap);
   al_clear_to_color (color);
 }
 
@@ -178,7 +201,7 @@ apply_palette (ALLEGRO_BITMAP *bitmap, palette p)
   int w = al_get_bitmap_width (bitmap);
   int h = al_get_bitmap_height (bitmap);
   al_lock_bitmap (rbitmap, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READWRITE);
-  al_set_target_bitmap (rbitmap);
+  set_target_bitmap (rbitmap);
   for (y = 0; y < h; y++)
     for (x = 0; x < w; x++)
       al_put_pixel (x, y, p (al_get_pixel (rbitmap, x, y)));
@@ -209,9 +232,16 @@ color_eq (ALLEGRO_COLOR c0, ALLEGRO_COLOR c1)
 }
 
 void
+convert_mask_to_alpha (ALLEGRO_BITMAP *bitmap, ALLEGRO_COLOR mask_color)
+{
+  al_hold_bitmap_drawing (false);
+  al_convert_mask_to_alpha (screen, BLACK);
+}
+
+void
 draw_bitmap (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to, float dx, float dy, int flags)
 {
-  al_set_target_bitmap (to);
+  set_target_bitmap (to);
   al_draw_bitmap (from, dx, dy, flags);
 }
 
@@ -219,7 +249,7 @@ void
 draw_bitmap_region (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to, float sx, float sy,
                     float sw, float sh, float dx, float dy, int flags)
 {
-  al_set_target_bitmap (to);
+  set_target_bitmap (to);
   al_draw_bitmap_region (from, sx, sy, sw, sh, dx, dy, flags);
 }
 
@@ -227,14 +257,14 @@ void
 draw_filled_rectangle (ALLEGRO_BITMAP *to, float x1, float y1,
                        float x2, float y2, ALLEGRO_COLOR color)
 {
-  al_set_target_bitmap (to);
+  set_target_bitmap (to);
   al_draw_filled_rectangle (x1, y1, x2 + 1, y2 + 1, color);
 }
 
 void
 draw_text (ALLEGRO_BITMAP *bitmap, char const *text, float x, float y, int flags)
 {
-  al_set_target_bitmap (bitmap);
+  set_target_bitmap (bitmap);
   al_draw_text (builtin_font, WHITE, x, y, flags, text);
 }
 
@@ -267,7 +297,7 @@ draw_bottom_text (ALLEGRO_BITMAP *bitmap, char *text, int priority)
     case VGA: bg_color = V_MSG_LINE_COLOR; break;
     }
 
-    al_set_target_bitmap (bitmap);
+    set_target_bitmap (bitmap);
     al_draw_filled_rectangle (0, ORIGINAL_HEIGHT - 8,
                               ORIGINAL_WIDTH, ORIGINAL_HEIGHT,
                               bg_color);
@@ -280,7 +310,7 @@ draw_bottom_text (ALLEGRO_BITMAP *bitmap, char *text, int priority)
 ALLEGRO_BITMAP *
 load_bitmap (char *filename)
 {
-  al_set_target_backbuffer (display);
+  set_target_backbuffer (display);
 
   ALLEGRO_BITMAP *bitmap =
     load_resource (filename, (load_resource_f) al_load_bitmap);
@@ -328,12 +358,17 @@ flip_display (ALLEGRO_BITMAP *bitmap)
   int w = al_get_display_width (display);
   int h = al_get_display_height (display);
 
-  al_set_target_backbuffer (display);
+  int bw = al_get_bitmap_width (bitmap);
+  int bh = al_get_bitmap_height (bitmap);
+
+  int uw = al_get_bitmap_width (uscreen);
+  int uh = al_get_bitmap_height (uscreen);
+
+  set_target_backbuffer (display);
   al_clear_to_color (BLACK);
-  al_draw_scaled_bitmap (bitmap, 0, 0, ORIGINAL_WIDTH, ORIGINAL_HEIGHT,
-                         0, 0, w, h, screen_flags);
-  al_draw_scaled_bitmap (uscreen, 0, 0, ORIGINAL_WIDTH, ORIGINAL_HEIGHT,
-                         0, 0, w, h, 0);
+  al_draw_scaled_bitmap (bitmap, 0, 0, bw, bh, 0, 0, w, h, screen_flags);
+  al_draw_scaled_bitmap (uscreen, 0, 0, uw, uh, 0, 0, w, h, 0);
+  al_hold_bitmap_drawing (false);
   al_flip_display ();
 }
 
@@ -381,7 +416,7 @@ draw_pattern (ALLEGRO_BITMAP *bitmap, int ox, int oy, int w, int h,
 {
   int x, y;
   draw_bitmap (bitmap, memory_bitmap, 0, 0, 0);
-  al_set_target_bitmap (memory_bitmap);
+  set_target_bitmap (memory_bitmap);
   al_lock_bitmap (memory_bitmap, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_WRITEONLY);
   for (y = oy; y < oy + h; y++)
     for (x = ox; x < ox + w; x++)
@@ -440,7 +475,7 @@ show (void)
   case VIDEO_FLICKERING:
     if (effect_counter % 2 && effect_counter < video_effect.duration) {
       clear_bitmap (effect_buffer, video_effect.color);
-      al_convert_mask_to_alpha (screen, BLACK);
+      convert_mask_to_alpha (screen, BLACK);
     } else clear_bitmap (effect_buffer, BLACK);
     draw_bitmap (screen, effect_buffer, 0, 0, 0);
     break;

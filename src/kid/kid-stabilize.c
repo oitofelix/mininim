@@ -56,10 +56,10 @@ load_kid_stabilize (void)
 void
 unload_kid_stabilize (void)
 {
-  al_destroy_bitmap (kid_stabilize_00);
-  al_destroy_bitmap (kid_stabilize_01);
-  al_destroy_bitmap (kid_stabilize_02);
-  al_destroy_bitmap (kid_stabilize_03);
+  destroy_bitmap (kid_stabilize_00);
+  destroy_bitmap (kid_stabilize_01);
+  destroy_bitmap (kid_stabilize_02);
+  destroy_bitmap (kid_stabilize_03);
 }
 
 void

@@ -66,21 +66,21 @@ void
 unload_wall_pv (void)
 {
   /* palace vga */
-  al_destroy_bitmap (pv_wall_mark_00);
-  al_destroy_bitmap (pv_wall_mark_01);
-  al_destroy_bitmap (pv_wall_mark_02);
-  al_destroy_bitmap (pv_wall_mark_03);
-  al_destroy_bitmap (pv_wall_mark_04);
-  al_destroy_bitmap (pv_wall_mark_05);
-  al_destroy_bitmap (pv_wall_mark_06);
-  al_destroy_bitmap (pv_wall_mark_07);
-  al_destroy_bitmap (pv_wall_mark_08);
-  al_destroy_bitmap (pv_wall_mark_09);
-  al_destroy_bitmap (pv_wall_mark_10);
-  al_destroy_bitmap (pv_wall_mark_11);
-  al_destroy_bitmap (pv_wall_mark_12);
-  al_destroy_bitmap (pv_wall_mark_13);
-  al_destroy_bitmap (pv_wall_mark_14);
+  destroy_bitmap (pv_wall_mark_00);
+  destroy_bitmap (pv_wall_mark_01);
+  destroy_bitmap (pv_wall_mark_02);
+  destroy_bitmap (pv_wall_mark_03);
+  destroy_bitmap (pv_wall_mark_04);
+  destroy_bitmap (pv_wall_mark_05);
+  destroy_bitmap (pv_wall_mark_06);
+  destroy_bitmap (pv_wall_mark_07);
+  destroy_bitmap (pv_wall_mark_08);
+  destroy_bitmap (pv_wall_mark_09);
+  destroy_bitmap (pv_wall_mark_10);
+  destroy_bitmap (pv_wall_mark_11);
+  destroy_bitmap (pv_wall_mark_12);
+  destroy_bitmap (pv_wall_mark_13);
+  destroy_bitmap (pv_wall_mark_14);
 
   /* callbacks */
   remove_room_callback (compute_wall_color_array);

@@ -198,83 +198,83 @@ void
 unload_chopper (void)
 {
   /* dungeon cga */
-  al_destroy_bitmap (dc_chopper_00);
-  al_destroy_bitmap (dc_chopper_fg_00);
-  al_destroy_bitmap (dc_chopper_01);
-  al_destroy_bitmap (dc_chopper_fg_01);
-  al_destroy_bitmap (dc_chopper_02);
-  al_destroy_bitmap (dc_chopper_fg_02);
-  al_destroy_bitmap (dc_chopper_03);
-  al_destroy_bitmap (dc_chopper_fg_03);
-  al_destroy_bitmap (dc_chopper_04);
-  al_destroy_bitmap (dc_chopper_fg_04);
+  destroy_bitmap (dc_chopper_00);
+  destroy_bitmap (dc_chopper_fg_00);
+  destroy_bitmap (dc_chopper_01);
+  destroy_bitmap (dc_chopper_fg_01);
+  destroy_bitmap (dc_chopper_02);
+  destroy_bitmap (dc_chopper_fg_02);
+  destroy_bitmap (dc_chopper_03);
+  destroy_bitmap (dc_chopper_fg_03);
+  destroy_bitmap (dc_chopper_04);
+  destroy_bitmap (dc_chopper_fg_04);
 
   /* palace cga */
-  al_destroy_bitmap (pc_chopper_00);
-  al_destroy_bitmap (pc_chopper_fg_00);
-  al_destroy_bitmap (pc_chopper_01);
-  al_destroy_bitmap (pc_chopper_fg_01);
-  al_destroy_bitmap (pc_chopper_02);
-  al_destroy_bitmap (pc_chopper_fg_02);
-  al_destroy_bitmap (pc_chopper_03);
-  al_destroy_bitmap (pc_chopper_fg_03);
-  al_destroy_bitmap (pc_chopper_04);
-  al_destroy_bitmap (pc_chopper_fg_04);
+  destroy_bitmap (pc_chopper_00);
+  destroy_bitmap (pc_chopper_fg_00);
+  destroy_bitmap (pc_chopper_01);
+  destroy_bitmap (pc_chopper_fg_01);
+  destroy_bitmap (pc_chopper_02);
+  destroy_bitmap (pc_chopper_fg_02);
+  destroy_bitmap (pc_chopper_03);
+  destroy_bitmap (pc_chopper_fg_03);
+  destroy_bitmap (pc_chopper_04);
+  destroy_bitmap (pc_chopper_fg_04);
 
   /* dungeon ega */
-  al_destroy_bitmap (de_chopper_00);
-  al_destroy_bitmap (de_chopper_fg_00);
-  al_destroy_bitmap (de_chopper_01);
-  al_destroy_bitmap (de_chopper_fg_01);
-  al_destroy_bitmap (de_chopper_02);
-  al_destroy_bitmap (de_chopper_fg_02);
-  al_destroy_bitmap (de_chopper_03);
-  al_destroy_bitmap (de_chopper_fg_03);
-  al_destroy_bitmap (de_chopper_04);
-  al_destroy_bitmap (de_chopper_fg_04);
+  destroy_bitmap (de_chopper_00);
+  destroy_bitmap (de_chopper_fg_00);
+  destroy_bitmap (de_chopper_01);
+  destroy_bitmap (de_chopper_fg_01);
+  destroy_bitmap (de_chopper_02);
+  destroy_bitmap (de_chopper_fg_02);
+  destroy_bitmap (de_chopper_03);
+  destroy_bitmap (de_chopper_fg_03);
+  destroy_bitmap (de_chopper_04);
+  destroy_bitmap (de_chopper_fg_04);
 
   /* palace ega */
-  al_destroy_bitmap (pe_chopper_00);
-  al_destroy_bitmap (pe_chopper_fg_00);
-  al_destroy_bitmap (pe_chopper_01);
-  al_destroy_bitmap (pe_chopper_fg_01);
-  al_destroy_bitmap (pe_chopper_02);
-  al_destroy_bitmap (pe_chopper_fg_02);
-  al_destroy_bitmap (pe_chopper_03);
-  al_destroy_bitmap (pe_chopper_fg_03);
-  al_destroy_bitmap (pe_chopper_04);
-  al_destroy_bitmap (pe_chopper_fg_04);
+  destroy_bitmap (pe_chopper_00);
+  destroy_bitmap (pe_chopper_fg_00);
+  destroy_bitmap (pe_chopper_01);
+  destroy_bitmap (pe_chopper_fg_01);
+  destroy_bitmap (pe_chopper_02);
+  destroy_bitmap (pe_chopper_fg_02);
+  destroy_bitmap (pe_chopper_03);
+  destroy_bitmap (pe_chopper_fg_03);
+  destroy_bitmap (pe_chopper_04);
+  destroy_bitmap (pe_chopper_fg_04);
 
   /* dungeon vga */
-  al_destroy_bitmap (dv_chopper_00);
-  al_destroy_bitmap (dv_chopper_fg_00);
-  al_destroy_bitmap (dv_chopper_01);
-  al_destroy_bitmap (dv_chopper_fg_01);
-  al_destroy_bitmap (dv_chopper_02);
-  al_destroy_bitmap (dv_chopper_fg_02);
-  al_destroy_bitmap (dv_chopper_03);
-  al_destroy_bitmap (dv_chopper_fg_03);
-  al_destroy_bitmap (dv_chopper_04);
-  al_destroy_bitmap (dv_chopper_fg_04);
+  destroy_bitmap (dv_chopper_00);
+  destroy_bitmap (dv_chopper_fg_00);
+  destroy_bitmap (dv_chopper_01);
+  destroy_bitmap (dv_chopper_fg_01);
+  destroy_bitmap (dv_chopper_02);
+  destroy_bitmap (dv_chopper_fg_02);
+  destroy_bitmap (dv_chopper_03);
+  destroy_bitmap (dv_chopper_fg_03);
+  destroy_bitmap (dv_chopper_04);
+  destroy_bitmap (dv_chopper_fg_04);
 
   /* palace vga */
-  al_destroy_bitmap (pv_chopper_00);
-  al_destroy_bitmap (pv_chopper_fg_00);
-  al_destroy_bitmap (pv_chopper_01);
-  al_destroy_bitmap (pv_chopper_fg_01);
-  al_destroy_bitmap (pv_chopper_02);
-  al_destroy_bitmap (pv_chopper_fg_02);
-  al_destroy_bitmap (pv_chopper_03);
-  al_destroy_bitmap (pv_chopper_fg_03);
-  al_destroy_bitmap (pv_chopper_04);
-  al_destroy_bitmap (pv_chopper_fg_04);
+  destroy_bitmap (pv_chopper_00);
+  destroy_bitmap (pv_chopper_fg_00);
+  destroy_bitmap (pv_chopper_01);
+  destroy_bitmap (pv_chopper_fg_01);
+  destroy_bitmap (pv_chopper_02);
+  destroy_bitmap (pv_chopper_fg_02);
+  destroy_bitmap (pv_chopper_03);
+  destroy_bitmap (pv_chopper_fg_03);
+  destroy_bitmap (pv_chopper_04);
+  destroy_bitmap (pv_chopper_fg_04);
 
   /* palettable */
-  al_destroy_bitmap (chopper_blood_00);
-  al_destroy_bitmap (chopper_blood_01);
-  al_destroy_bitmap (chopper_blood_02);
-  al_destroy_bitmap (chopper_blood_03);
-  al_destroy_bitmap (chopper_blood_04);
+  destroy_bitmap (chopper_blood_00);
+  destroy_bitmap (chopper_blood_01);
+  destroy_bitmap (chopper_blood_02);
+  destroy_bitmap (chopper_blood_03);
+  destroy_bitmap (chopper_blood_04);
 }
 
 void

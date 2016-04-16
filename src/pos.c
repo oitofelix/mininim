@@ -168,28 +168,36 @@ ncoord (struct coord *c, struct coord *nc)
                /* && rlr == nc->room */
                ) {
       nc->x += PLACE_WIDTH * PLACES;
+      nc->prev_room = nc->room;
       nc->room = rl;
+      nc->xd = LEFT;
       m = true;
     } else if (nc->x >= PLACE_WIDTH * PLACES
                /* && (rr != nc->room || coord_wa) */
                /* && rrl == nc->room */
                ) {
       nc->x -= PLACE_WIDTH * PLACES;
+      nc->prev_room = nc->room;
       nc->room = rr;
+      nc->xd = RIGHT;
       m = true;
     } else if (nc->y < 0
         /* && (ra != nc->room || coord_wa) */
         /* && rab == nc->room */
         ) {
       nc->y += PLACE_HEIGHT * FLOORS;
+      nc->prev_room = nc->room;
       nc->room = ra;
+      nc->xd = ABOVE;
       m = true;
     } else if (nc->y >= PLACE_HEIGHT * FLOORS + 11
                /* && (rb != nc->room || coord_wa) */
                /* && rba == nc->room */
                ) {
       nc->y -= PLACE_HEIGHT * FLOORS;
+      nc->prev_room = nc->room;
       nc->room = rb;
+      nc->xd = BELOW;
       m = true;
     }
   } while (m);
@@ -538,6 +546,12 @@ struct pos *
 posf (struct coord *c, struct pos *p)
 {
   return pos_gen (c, p, 0, 3);
+}
+
+struct pos *
+pos_mr (struct coord *c, struct pos *p)
+{
+  return pos_gen (c, p, 0, 0);
 }
 
 struct pos *

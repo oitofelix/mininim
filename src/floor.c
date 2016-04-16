@@ -105,52 +105,52 @@ void
 unload_floor (void)
 {
   /* dungeon cga */
-  al_destroy_bitmap (dc_floor_left);
-  al_destroy_bitmap (dc_floor_right);
-  al_destroy_bitmap (dc_floor_base);
-  al_destroy_bitmap (dc_floor_corner_00);
-  al_destroy_bitmap (dc_floor_corner_01);
-  al_destroy_bitmap (dc_floor_corner_02);
+  destroy_bitmap (dc_floor_left);
+  destroy_bitmap (dc_floor_right);
+  destroy_bitmap (dc_floor_base);
+  destroy_bitmap (dc_floor_corner_00);
+  destroy_bitmap (dc_floor_corner_01);
+  destroy_bitmap (dc_floor_corner_02);
 
   /* palace cga */
-  al_destroy_bitmap (pc_floor_left);
-  al_destroy_bitmap (pc_floor_right);
-  al_destroy_bitmap (pc_floor_base);
-  al_destroy_bitmap (pc_floor_corner_00);
-  al_destroy_bitmap (pc_floor_corner_01);
-  al_destroy_bitmap (pc_floor_corner_02);
+  destroy_bitmap (pc_floor_left);
+  destroy_bitmap (pc_floor_right);
+  destroy_bitmap (pc_floor_base);
+  destroy_bitmap (pc_floor_corner_00);
+  destroy_bitmap (pc_floor_corner_01);
+  destroy_bitmap (pc_floor_corner_02);
 
   /* dungeon ega */
-  al_destroy_bitmap (de_floor_left);
-  al_destroy_bitmap (de_floor_right);
-  al_destroy_bitmap (de_floor_base);
-  al_destroy_bitmap (de_floor_corner_00);
-  al_destroy_bitmap (de_floor_corner_01);
-  al_destroy_bitmap (de_floor_corner_02);
+  destroy_bitmap (de_floor_left);
+  destroy_bitmap (de_floor_right);
+  destroy_bitmap (de_floor_base);
+  destroy_bitmap (de_floor_corner_00);
+  destroy_bitmap (de_floor_corner_01);
+  destroy_bitmap (de_floor_corner_02);
 
   /* palace ega */
-  al_destroy_bitmap (pe_floor_left);
-  al_destroy_bitmap (pe_floor_right);
-  al_destroy_bitmap (pe_floor_base);
-  al_destroy_bitmap (pe_floor_corner_00);
-  al_destroy_bitmap (pe_floor_corner_01);
-  al_destroy_bitmap (pe_floor_corner_02);
+  destroy_bitmap (pe_floor_left);
+  destroy_bitmap (pe_floor_right);
+  destroy_bitmap (pe_floor_base);
+  destroy_bitmap (pe_floor_corner_00);
+  destroy_bitmap (pe_floor_corner_01);
+  destroy_bitmap (pe_floor_corner_02);
 
   /* dungeon vga */
-  al_destroy_bitmap (dv_floor_left);
-  al_destroy_bitmap (dv_floor_right);
-  al_destroy_bitmap (dv_floor_base);
-  al_destroy_bitmap (dv_floor_corner_00);
-  al_destroy_bitmap (dv_floor_corner_01);
-  al_destroy_bitmap (dv_floor_corner_02);
+  destroy_bitmap (dv_floor_left);
+  destroy_bitmap (dv_floor_right);
+  destroy_bitmap (dv_floor_base);
+  destroy_bitmap (dv_floor_corner_00);
+  destroy_bitmap (dv_floor_corner_01);
+  destroy_bitmap (dv_floor_corner_02);
 
   /* palace vga */
-  al_destroy_bitmap (pv_floor_left);
-  al_destroy_bitmap (pv_floor_right);
-  al_destroy_bitmap (pv_floor_base);
-  al_destroy_bitmap (pv_floor_corner_00);
-  al_destroy_bitmap (pv_floor_corner_01);
-  al_destroy_bitmap (pv_floor_corner_02);
+  destroy_bitmap (pv_floor_left);
+  destroy_bitmap (pv_floor_right);
+  destroy_bitmap (pv_floor_base);
+  destroy_bitmap (pv_floor_corner_00);
+  destroy_bitmap (pv_floor_corner_01);
+  destroy_bitmap (pv_floor_corner_02);
 }
 
 void

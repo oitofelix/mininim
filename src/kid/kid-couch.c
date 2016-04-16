@@ -71,19 +71,19 @@ void
 unload_kid_couch (void)
 {
   /* bitmaps */
-  al_destroy_bitmap (kid_couch_00);
-  al_destroy_bitmap (kid_couch_01);
-  al_destroy_bitmap (kid_couch_02);
-  al_destroy_bitmap (kid_couch_03);
-  al_destroy_bitmap (kid_couch_04);
-  al_destroy_bitmap (kid_couch_05);
-  al_destroy_bitmap (kid_couch_06);
-  al_destroy_bitmap (kid_couch_07);
-  al_destroy_bitmap (kid_couch_08);
-  al_destroy_bitmap (kid_couch_09);
-  al_destroy_bitmap (kid_couch_10);
-  al_destroy_bitmap (kid_couch_11);
-  al_destroy_bitmap (kid_couch_12);
+  destroy_bitmap (kid_couch_00);
+  destroy_bitmap (kid_couch_01);
+  destroy_bitmap (kid_couch_02);
+  destroy_bitmap (kid_couch_03);
+  destroy_bitmap (kid_couch_04);
+  destroy_bitmap (kid_couch_05);
+  destroy_bitmap (kid_couch_06);
+  destroy_bitmap (kid_couch_07);
+  destroy_bitmap (kid_couch_08);
+  destroy_bitmap (kid_couch_09);
+  destroy_bitmap (kid_couch_10);
+  destroy_bitmap (kid_couch_11);
+  destroy_bitmap (kid_couch_12);
 }
 
 void

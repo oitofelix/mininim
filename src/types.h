@@ -34,8 +34,17 @@ struct frameset {
   int dx, dy;
 };
 
+struct dim {
+  int x, y, w, h, fx, bx;
+};
+
+enum dir {
+  LEFT = 0, RIGHT = 1, ABOVE = 2, BELOW = 3,
+};
+
 struct coord {
-  int room, x, y;
+  int prev_room, room, x, y;
+  enum dir xd;
 };
 
 struct rect {
@@ -43,12 +52,17 @@ struct rect {
   int w, h;
 };
 
-struct dim {
-  int x, y, w, h, fx, bx;
-};
-
-enum dir {
-  LEFT = 0, RIGHT = 1, ABOVE = 2, BELOW = 3,
+struct multi_room {
+  int w, h;
+  int x, y;
+  int dx, dy;
+  int room;
+  struct multi_room_cell {
+    ALLEGRO_BITMAP *screen;
+    ALLEGRO_BITMAP *wall;
+    bool done;
+    int room;
+  } **cell;
 };
 
 enum carpet_design {

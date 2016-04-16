@@ -72,21 +72,21 @@ load_kid_climb (void)
 void
 unload_kid_climb (void)
 {
-  al_destroy_bitmap (kid_climb_00);
-  al_destroy_bitmap (kid_climb_01);
-  al_destroy_bitmap (kid_climb_02);
-  al_destroy_bitmap (kid_climb_03);
-  al_destroy_bitmap (kid_climb_04);
-  al_destroy_bitmap (kid_climb_05);
-  al_destroy_bitmap (kid_climb_06);
-  al_destroy_bitmap (kid_climb_07);
-  al_destroy_bitmap (kid_climb_08);
-  al_destroy_bitmap (kid_climb_09);
-  al_destroy_bitmap (kid_climb_10);
-  al_destroy_bitmap (kid_climb_11);
-  al_destroy_bitmap (kid_climb_12);
-  al_destroy_bitmap (kid_climb_13);
-  al_destroy_bitmap (kid_climb_14);
+  destroy_bitmap (kid_climb_00);
+  destroy_bitmap (kid_climb_01);
+  destroy_bitmap (kid_climb_02);
+  destroy_bitmap (kid_climb_03);
+  destroy_bitmap (kid_climb_04);
+  destroy_bitmap (kid_climb_05);
+  destroy_bitmap (kid_climb_06);
+  destroy_bitmap (kid_climb_07);
+  destroy_bitmap (kid_climb_08);
+  destroy_bitmap (kid_climb_09);
+  destroy_bitmap (kid_climb_10);
+  destroy_bitmap (kid_climb_11);
+  destroy_bitmap (kid_climb_12);
+  destroy_bitmap (kid_climb_13);
+  destroy_bitmap (kid_climb_14);
 }
 
 void

@@ -184,50 +184,50 @@ void
 unload_guard_die (void)
 {
   /* guard */
-  al_destroy_bitmap (guard_die_00);
-  al_destroy_bitmap (guard_die_01);
-  al_destroy_bitmap (guard_die_02);
-  al_destroy_bitmap (guard_die_03);
-  al_destroy_bitmap (guard_die_04);
-  al_destroy_bitmap (guard_die_05);
-  al_destroy_bitmap (guard_die_spiked_00);
-  al_destroy_bitmap (guard_die_chopped_00);
+  destroy_bitmap (guard_die_00);
+  destroy_bitmap (guard_die_01);
+  destroy_bitmap (guard_die_02);
+  destroy_bitmap (guard_die_03);
+  destroy_bitmap (guard_die_04);
+  destroy_bitmap (guard_die_05);
+  destroy_bitmap (guard_die_spiked_00);
+  destroy_bitmap (guard_die_chopped_00);
 
   /* fat guard */
-  al_destroy_bitmap (fat_guard_die_00);
-  al_destroy_bitmap (fat_guard_die_01);
-  al_destroy_bitmap (fat_guard_die_02);
-  al_destroy_bitmap (fat_guard_die_03);
-  al_destroy_bitmap (fat_guard_die_04);
-  al_destroy_bitmap (fat_guard_die_05);
+  destroy_bitmap (fat_guard_die_00);
+  destroy_bitmap (fat_guard_die_01);
+  destroy_bitmap (fat_guard_die_02);
+  destroy_bitmap (fat_guard_die_03);
+  destroy_bitmap (fat_guard_die_04);
+  destroy_bitmap (fat_guard_die_05);
 
   /* vizier */
-  al_destroy_bitmap (vizier_die_00);
-  al_destroy_bitmap (vizier_die_01);
-  al_destroy_bitmap (vizier_die_02);
-  al_destroy_bitmap (vizier_die_03);
-  al_destroy_bitmap (vizier_die_04);
-  al_destroy_bitmap (vizier_die_05);
+  destroy_bitmap (vizier_die_00);
+  destroy_bitmap (vizier_die_01);
+  destroy_bitmap (vizier_die_02);
+  destroy_bitmap (vizier_die_03);
+  destroy_bitmap (vizier_die_04);
+  destroy_bitmap (vizier_die_05);
 
   /* skeleton */
-  al_destroy_bitmap (skeleton_die_00);
-  al_destroy_bitmap (skeleton_die_01);
-  al_destroy_bitmap (skeleton_die_02);
-  al_destroy_bitmap (skeleton_die_03);
-  al_destroy_bitmap (skeleton_die_04);
-  al_destroy_bitmap (skeleton_die_05);
-  al_destroy_bitmap (skeleton_die_spiked_00);
-  al_destroy_bitmap (skeleton_die_chopped_00);
+  destroy_bitmap (skeleton_die_00);
+  destroy_bitmap (skeleton_die_01);
+  destroy_bitmap (skeleton_die_02);
+  destroy_bitmap (skeleton_die_03);
+  destroy_bitmap (skeleton_die_04);
+  destroy_bitmap (skeleton_die_05);
+  destroy_bitmap (skeleton_die_spiked_00);
+  destroy_bitmap (skeleton_die_chopped_00);
 
   /* shadow */
-  al_destroy_bitmap (shadow_die_00);
-  al_destroy_bitmap (shadow_die_01);
-  al_destroy_bitmap (shadow_die_02);
-  al_destroy_bitmap (shadow_die_03);
-  al_destroy_bitmap (shadow_die_04);
-  al_destroy_bitmap (shadow_die_05);
-  al_destroy_bitmap (shadow_die_spiked_00);
-  al_destroy_bitmap (shadow_die_chopped_00);
+  destroy_bitmap (shadow_die_00);
+  destroy_bitmap (shadow_die_01);
+  destroy_bitmap (shadow_die_02);
+  destroy_bitmap (shadow_die_03);
+  destroy_bitmap (shadow_die_04);
+  destroy_bitmap (shadow_die_05);
+  destroy_bitmap (shadow_die_spiked_00);
+  destroy_bitmap (shadow_die_chopped_00);
 }
 
 void

@@ -100,52 +100,52 @@ void
 unload_sword (void)
 {
   /* cga */
-  al_destroy_bitmap (c_normal_sword);
-  al_destroy_bitmap (c_shiny_sword);
+  destroy_bitmap (c_normal_sword);
+  destroy_bitmap (c_shiny_sword);
 
   /* ega */
-  al_destroy_bitmap (e_normal_sword);
-  al_destroy_bitmap (e_shiny_sword);
+  destroy_bitmap (e_normal_sword);
+  destroy_bitmap (e_shiny_sword);
 
   /* vga */
-  al_destroy_bitmap (v_normal_sword);
-  al_destroy_bitmap (v_shiny_sword);
+  destroy_bitmap (v_normal_sword);
+  destroy_bitmap (v_shiny_sword);
 
   /* palettable */
-  al_destroy_bitmap (sword_00);
-  al_destroy_bitmap (sword_01);
-  al_destroy_bitmap (sword_02);
-  al_destroy_bitmap (sword_03);
-  al_destroy_bitmap (sword_04);
-  al_destroy_bitmap (sword_05);
-  al_destroy_bitmap (sword_06);
-  al_destroy_bitmap (sword_07);
-  al_destroy_bitmap (sword_08);
-  al_destroy_bitmap (sword_09);
-  al_destroy_bitmap (sword_10);
-  al_destroy_bitmap (sword_11);
-  al_destroy_bitmap (sword_12);
-  al_destroy_bitmap (sword_13);
-  al_destroy_bitmap (sword_14);
-  al_destroy_bitmap (sword_15);
-  al_destroy_bitmap (sword_16);
-  al_destroy_bitmap (sword_17);
-  al_destroy_bitmap (sword_18);
-  al_destroy_bitmap (sword_19);
-  al_destroy_bitmap (sword_20);
-  al_destroy_bitmap (sword_21);
-  al_destroy_bitmap (sword_22);
-  al_destroy_bitmap (sword_23);
-  al_destroy_bitmap (sword_24);
-  al_destroy_bitmap (sword_25);
-  al_destroy_bitmap (sword_26);
-  al_destroy_bitmap (sword_27);
-  al_destroy_bitmap (sword_28);
-  al_destroy_bitmap (sword_29);
-  al_destroy_bitmap (sword_30);
-  al_destroy_bitmap (sword_31);
-  al_destroy_bitmap (sword_32);
-  al_destroy_bitmap (sword_33);
+  destroy_bitmap (sword_00);
+  destroy_bitmap (sword_01);
+  destroy_bitmap (sword_02);
+  destroy_bitmap (sword_03);
+  destroy_bitmap (sword_04);
+  destroy_bitmap (sword_05);
+  destroy_bitmap (sword_06);
+  destroy_bitmap (sword_07);
+  destroy_bitmap (sword_08);
+  destroy_bitmap (sword_09);
+  destroy_bitmap (sword_10);
+  destroy_bitmap (sword_11);
+  destroy_bitmap (sword_12);
+  destroy_bitmap (sword_13);
+  destroy_bitmap (sword_14);
+  destroy_bitmap (sword_15);
+  destroy_bitmap (sword_16);
+  destroy_bitmap (sword_17);
+  destroy_bitmap (sword_18);
+  destroy_bitmap (sword_19);
+  destroy_bitmap (sword_20);
+  destroy_bitmap (sword_21);
+  destroy_bitmap (sword_22);
+  destroy_bitmap (sword_23);
+  destroy_bitmap (sword_24);
+  destroy_bitmap (sword_25);
+  destroy_bitmap (sword_26);
+  destroy_bitmap (sword_27);
+  destroy_bitmap (sword_28);
+  destroy_bitmap (sword_29);
+  destroy_bitmap (sword_30);
+  destroy_bitmap (sword_31);
+  destroy_bitmap (sword_32);
+  destroy_bitmap (sword_33);
 }
 
 void

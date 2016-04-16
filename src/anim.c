@@ -36,6 +36,9 @@ play_anim (void (*draw_callback) (void),
            void (*compute_callback) (void),
            int freq)
 {
+  if (cutscene) set_multi_room (1, 1);
+  else set_multi_room (mr_w, mr_h);
+
   quit_anim = NO_QUIT;
 
   struct anim *current_kid;
@@ -160,8 +163,8 @@ play_anim (void (*draw_callback) (void),
       default: break;
       }
 
-      /* struct coord c; get_mouse_coord (&c); */
-      /* printf ("%i,%i\n", c.x, c.y); */
+      struct coord c; get_mouse_coord (&c);
+      printf ("%i,%i,%i\n", c.room, c.x, c.y);
       break;
     case ALLEGRO_EVENT_MOUSE_AXES:
       if (edit == EDIT_NONE) break;
@@ -194,6 +197,37 @@ play_anim (void (*draw_callback) (void),
 
       char *text = NULL;
 
+      /* [: decrease multi-room resolution */
+      if (was_key_pressed (ALLEGRO_KEY_OPENBRACE, 0, 0, true)
+          && ! cutscene) {
+        if (mr_w > 1) mr_w--;
+        if (mr_h > 1) mr_h--;
+        set_multi_room (mr_w, mr_h);
+        mr_center_room (room_view);
+        update_wall_cache (em, vm);
+        xasprintf (&text, "MULTI-ROOM %ix%i", mr_w, mr_h);
+        draw_bottom_text (NULL, text, 0);
+        al_free (text);
+      }
+
+      /* ]: increase multi-room resolution */
+      if (was_key_pressed (ALLEGRO_KEY_CLOSEBRACE, 0, 0, true)
+          && ! cutscene) {
+        mr_w++;
+        mr_h++;
+        if (! set_multi_room (mr_w, mr_h)) {
+          draw_bottom_text (NULL, "VIDEO CARD LIMIT REACHED", 0);
+          mr_w--;
+          mr_h--;
+        } else {
+          mr_center_room (room_view);
+          update_wall_cache (em, vm);
+          xasprintf (&text, "MULTI-ROOM %ix%i", mr_w, mr_h);
+          draw_bottom_text (NULL, text, 0);
+          al_free (text);
+        }
+      }
+
       /* F8: enable/disable level editor */
       if (was_key_pressed (ALLEGRO_KEY_F8, 0, 0, true))
         enter_exit_editor ();
@@ -204,7 +238,7 @@ play_anim (void (*draw_callback) (void),
                && was_key_pressed (ALLEGRO_KEY_H, 0, 0, true))
               || (flip_gamepad_horizontal
                   && was_key_pressed (ALLEGRO_KEY_J, 0, 0, true))))
-        room_view = roomd_n0 (room_view, LEFT);
+        mr.room = roomd_n0 (mr.room, LEFT);
 
       /* J: view room at right (H if flipped horizontally) */
       if (! active_menu
@@ -212,7 +246,7 @@ play_anim (void (*draw_callback) (void),
                && was_key_pressed (ALLEGRO_KEY_J, 0, 0, true))
               || (flip_gamepad_horizontal
                   && was_key_pressed (ALLEGRO_KEY_H, 0, 0, true))))
-        room_view = roomd_n0 (room_view, RIGHT);
+        mr.room = roomd_n0 (mr.room, RIGHT);
 
       /* U: view room above (N if flipped vertically) */
       if (! active_menu
@@ -220,7 +254,7 @@ play_anim (void (*draw_callback) (void),
                && was_key_pressed (ALLEGRO_KEY_U, 0, 0, true))
               || (flip_gamepad_vertical
                   && was_key_pressed (ALLEGRO_KEY_N, 0, 0, true))))
-        room_view = roomd_n0 (room_view, ABOVE);
+        mr.room = roomd_n0 (mr.room, ABOVE);
 
       /* N: view room below (U if flipped vertically) */
       if (! active_menu
@@ -228,7 +262,7 @@ play_anim (void (*draw_callback) (void),
                && was_key_pressed (ALLEGRO_KEY_N, 0, 0, true))
               || (flip_gamepad_vertical
                   && was_key_pressed (ALLEGRO_KEY_U, 0, 0, true))))
-        room_view = roomd_n0 (room_view, BELOW);
+        mr.room = roomd_n0 (mr.room, BELOW);
 
       /* SHIFT+B: enable/disable room drawing */
       if (was_key_pressed (ALLEGRO_KEY_B, 0, ALLEGRO_KEYMOD_SHIFT, true))

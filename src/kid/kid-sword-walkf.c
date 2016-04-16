@@ -52,8 +52,8 @@ load_kid_sword_walkf (void)
 void
 unload_kid_sword_walkf (void)
 {
-  al_destroy_bitmap (kid_sword_walkf_00);
-  al_destroy_bitmap (kid_sword_walkf_01);
+  destroy_bitmap (kid_sword_walkf_00);
+  destroy_bitmap (kid_sword_walkf_01);
 }
 
 void

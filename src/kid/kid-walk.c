@@ -68,18 +68,18 @@ load_kid_walk (void)
 void
 unload_kid_walk (void)
 {
-  al_destroy_bitmap (kid_walk_00);
-  al_destroy_bitmap (kid_walk_01);
-  al_destroy_bitmap (kid_walk_02);
-  al_destroy_bitmap (kid_walk_03);
-  al_destroy_bitmap (kid_walk_04);
-  al_destroy_bitmap (kid_walk_05);
-  al_destroy_bitmap (kid_walk_06);
-  al_destroy_bitmap (kid_walk_07);
-  al_destroy_bitmap (kid_walk_08);
-  al_destroy_bitmap (kid_walk_09);
-  al_destroy_bitmap (kid_walk_10);
-  al_destroy_bitmap (kid_walk_11);
+  destroy_bitmap (kid_walk_00);
+  destroy_bitmap (kid_walk_01);
+  destroy_bitmap (kid_walk_02);
+  destroy_bitmap (kid_walk_03);
+  destroy_bitmap (kid_walk_04);
+  destroy_bitmap (kid_walk_05);
+  destroy_bitmap (kid_walk_06);
+  destroy_bitmap (kid_walk_07);
+  destroy_bitmap (kid_walk_08);
+  destroy_bitmap (kid_walk_09);
+  destroy_bitmap (kid_walk_10);
+  destroy_bitmap (kid_walk_11);
 }
 
 void

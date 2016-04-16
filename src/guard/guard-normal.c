@@ -73,19 +73,19 @@ void
 unload_guard_normal (void)
 {
   /* guard */
-  al_destroy_bitmap (guard_normal_00);
+  destroy_bitmap (guard_normal_00);
 
   /* fat guard */
-  al_destroy_bitmap (fat_guard_normal_00);
+  destroy_bitmap (fat_guard_normal_00);
 
   /* vizier */
-  al_destroy_bitmap (vizier_normal_00);
+  destroy_bitmap (vizier_normal_00);
 
   /* skeleton */
-  al_destroy_bitmap (skeleton_normal_00);
+  destroy_bitmap (skeleton_normal_00);
 
   /* shadow */
-  al_destroy_bitmap (shadow_normal_00);
+  destroy_bitmap (shadow_normal_00);
 }
 
 void
