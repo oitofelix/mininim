@@ -171,6 +171,7 @@ int max_int (int a, int b);
 int min_int (int a, int b);
 unsigned char add_char (unsigned char a, signed char b);
 int int_to_range (int i, int min, int max);
+float dist_cart (float x0, float y0, float x1, float y1);
 
 /* variables */
 extern int mr_w, mr_h;

@@ -158,13 +158,16 @@ play_anim (void (*draw_callback) (void),
       switch (event.mouse.button) {
       case 1: enter_exit_editor (); break;
       case 3:
-        if (edit != EDIT_NONE)
-          room_view = current_kid->f.c.room; break;
+        if (edit != EDIT_NONE) {
+          room_view = current_kid->f.c.room;
+          mr_center_room (room_view);
+        }
+        break;
       default: break;
       }
 
-      struct coord c; get_mouse_coord (&c);
-      printf ("%i,%i,%i\n", c.room, c.x, c.y);
+      /* struct coord c; get_mouse_coord (&c); */
+      /* printf ("%i,%i,%i\n", c.room, c.x, c.y); */
       break;
     case ALLEGRO_EVENT_MOUSE_AXES:
       if (edit == EDIT_NONE) break;
@@ -187,10 +190,10 @@ play_anim (void (*draw_callback) (void),
       if (flip_gamepad_vertical) dz *= -1;
       if (flip_gamepad_horizontal) dw *= -1;
 
-      if (dz < 0) while (dz++ < 0) room_view = roomd_n0 (room_view, BELOW);
-      else if (dz > 0) while (dz-- > 0) room_view = roomd_n0 (room_view, ABOVE);
-      if (dw < 0) while (dw++ < 0) room_view = roomd_n0 (room_view, LEFT);
-      else if (dw > 0) while (dw-- > 0) room_view = roomd_n0 (room_view, RIGHT);
+      if (dz < 0) while (dz++ < 0) mr_view_trans (BELOW);
+      else if (dz > 0) while (dz-- > 0) mr_view_trans (ABOVE);
+      if (dw < 0) while (dw++ < 0) mr_view_trans (LEFT);
+      else if (dw > 0) while (dw-- > 0) mr_view_trans (RIGHT);
       break;
     case ALLEGRO_EVENT_KEY_CHAR:
       key = event;
@@ -203,7 +206,7 @@ play_anim (void (*draw_callback) (void),
         if (mr_w > 1) mr_w--;
         if (mr_h > 1) mr_h--;
         set_multi_room (mr_w, mr_h);
-        mr_center_room (room_view);
+        mr_center_room (mr.room);
         update_wall_cache (em, vm);
         xasprintf (&text, "MULTI-ROOM %ix%i", mr_w, mr_h);
         draw_bottom_text (NULL, text, 0);
@@ -220,7 +223,7 @@ play_anim (void (*draw_callback) (void),
           mr_w--;
           mr_h--;
         } else {
-          mr_center_room (room_view);
+          mr_center_room (mr.room);
           update_wall_cache (em, vm);
           xasprintf (&text, "MULTI-ROOM %ix%i", mr_w, mr_h);
           draw_bottom_text (NULL, text, 0);
@@ -238,7 +241,7 @@ play_anim (void (*draw_callback) (void),
                && was_key_pressed (ALLEGRO_KEY_H, 0, 0, true))
               || (flip_gamepad_horizontal
                   && was_key_pressed (ALLEGRO_KEY_J, 0, 0, true))))
-        mr.room = roomd_n0 (mr.room, LEFT);
+        mr_view_trans (LEFT);
 
       /* J: view room at right (H if flipped horizontally) */
       if (! active_menu
@@ -246,7 +249,7 @@ play_anim (void (*draw_callback) (void),
                && was_key_pressed (ALLEGRO_KEY_J, 0, 0, true))
               || (flip_gamepad_horizontal
                   && was_key_pressed (ALLEGRO_KEY_H, 0, 0, true))))
-        mr.room = roomd_n0 (mr.room, RIGHT);
+        mr_view_trans (RIGHT);
 
       /* U: view room above (N if flipped vertically) */
       if (! active_menu
@@ -254,7 +257,7 @@ play_anim (void (*draw_callback) (void),
                && was_key_pressed (ALLEGRO_KEY_U, 0, 0, true))
               || (flip_gamepad_vertical
                   && was_key_pressed (ALLEGRO_KEY_N, 0, 0, true))))
-        mr.room = roomd_n0 (mr.room, ABOVE);
+        mr_view_trans (ABOVE);
 
       /* N: view room below (U if flipped vertically) */
       if (! active_menu
@@ -262,7 +265,7 @@ play_anim (void (*draw_callback) (void),
                && was_key_pressed (ALLEGRO_KEY_N, 0, 0, true))
               || (flip_gamepad_vertical
                   && was_key_pressed (ALLEGRO_KEY_U, 0, 0, true))))
-        mr.room = roomd_n0 (mr.room, BELOW);
+        mr_view_trans (BELOW);
 
       /* SHIFT+B: enable/disable room drawing */
       if (was_key_pressed (ALLEGRO_KEY_B, 0, ALLEGRO_KEYMOD_SHIFT, true))

@@ -1441,3 +1441,11 @@ int_to_range (int i, int min, int max)
   else if (i <= min) return min;
   else return i;
 }
+
+float
+dist_cart (float x0, float y0, float x1, float y1)
+{
+  int dx = x0 - x1;
+  int dy = y0 - y1;
+  return sqrt (dx * dx + dy * dy);
+}

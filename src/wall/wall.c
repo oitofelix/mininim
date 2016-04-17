@@ -285,12 +285,17 @@ update_wall_cache_pos (struct pos *p, enum em em, enum vm vm)
   int x, y;
   if (con (p)->fg != WALL) return;
   struct pos np; npos (p, &np);
-  if (! mr_coord (np.room, -1, &x, &y)) return;
-  int room_view_bkp = room_view;
-  room_view = np.room;
-  draw_wall_base (mr.cell[x][y].wall, p, em, vm);
-  draw_wall_left (mr.cell[x][y].wall, p, em, vm);
-  room_view = room_view_bkp;
+
+  for (y = mr.h - 1; y >= 0; y--)
+    for (x = 0; x < mr.w; x++)
+      if (mr.cell[x][y].room == np.room
+          || (np.room == 0 && mr.cell[x][y].room < 0)) {
+        int room_view_bkp = room_view;
+        room_view = np.room;
+        draw_wall_base (mr.cell[x][y].wall, p, em, vm);
+        draw_wall_left (mr.cell[x][y].wall, p, em, vm);
+        room_view = room_view_bkp;
+      }
 }
 
 void

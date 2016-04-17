@@ -150,6 +150,9 @@ mr_center_room (int room)
   mr.room = room;
 
   int x, y, lc = 0, c = 0;
+  float ld = INFINITY;
+  int cx = mr.w / 2.0;
+  int cy = mr.h / 2.0;
   int lx = mr.x;
   int ly = mr.y;
   for (y = mr.h - 1; y >= 0; y--)
@@ -158,16 +161,52 @@ mr_center_room (int room)
       mr.y = y;
       mr_map_rooms ();
       c = mr_count_rooms ();
-      if (c > lc) {
+      int d = dist_cart (x, y, cx, cy);
+      if (c >= lc && (c > lc || d <= ld)) {
         lx = x;
         ly = y;
         lc = c;
+        ld = d;
       }
     }
 
   mr.x = lx;
   mr.y = ly;
 }
+
+void
+mr_view_trans (enum dir d)
+{
+  int x, y, dx = +0, dy = +0;
+
+  for (y = mr.h - 1; y >= 0; y--)
+    for (x = 0; x < mr.w; x++) {
+      int r = mr.cell[x][y].room;
+      if (r <= 0) continue;
+      r = roomd (r, d);
+      if (r) {
+       mr.room = r;
+       mr.x = x;
+       mr.y = y;
+       return;
+      }
+    }
+
+  switch (d) {
+  case RIGHT:
+    if (mr.x > 0) dx = -1; break;
+  case LEFT:
+    if (mr.x < mr.w - 1) dx = +1; break;
+  case BELOW:
+    if (mr.y > 0) dy = -1; break;
+  case ABOVE:
+    if (mr.y < mr.h - 1) dy = +1; break;
+  }
+
+  mr.x += dx;
+  mr.y += dy;
+}
+
 
 static int last_level;
 static int last_mr_room, last_mr_x, last_mr_y;

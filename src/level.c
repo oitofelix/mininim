@@ -432,8 +432,10 @@ process_keys (void)
     kid_resurrect (current_kid);
 
   /* HOME: camera on kid */
-  if (was_key_pressed (ALLEGRO_KEY_HOME, 0, 0, true))
+  if (was_key_pressed (ALLEGRO_KEY_HOME, 0, 0, true)) {
     room_view = current_kid->f.c.room;
+    mr_center_room (room_view);
+  }
 
   /* A: alternate between kid and its shadows */
   if (! active_menu
