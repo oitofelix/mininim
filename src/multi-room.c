@@ -144,15 +144,36 @@ mr_count_rooms (void)
   return c;
 }
 
+int
+mr_count_no_rooms_above (void)
+{
+  int x, y, c = 0;
+  for (y = 0; y < mr.h; y++) {
+    for (x = 0; x < mr.w; x++)
+      if (mr.cell[x][y].room > 0) return c;
+    c++;
+  }
+  return c;
+}
+
+int
+mr_count_no_rooms_below (void)
+{
+  int x, y, c = 0;
+  for (y = mr.h - 1; y >= 0 ; y--) {
+    for (x = 0; x < mr.w; x++)
+      if (mr.cell[x][y].room > 0) return c;
+    c++;
+  }
+  return c;
+}
+
 void
 mr_center_room (int room)
 {
   mr.room = room;
 
-  int x, y, lc = 0, c = 0;
-  float ld = INFINITY;
-  int cx = mr.w / 2.0;
-  int cy = mr.h / 2.0;
+  int x, y, lc = 0, c = 0, ld = INT_MAX;
   int lx = mr.x;
   int ly = mr.y;
   for (y = mr.h - 1; y >= 0; y--)
@@ -161,8 +182,10 @@ mr_center_room (int room)
       mr.y = y;
       mr_map_rooms ();
       c = mr_count_rooms ();
-      int d = dist_cart (x, y, cx, cy);
-      if (c >= lc && (c > lc || d <= ld)) {
+      int ca = mr_count_no_rooms_above ();
+      int cb = mr_count_no_rooms_below ();
+      int d = abs (ca - cb);
+      if (c >= lc && (c > lc || d < ld)) {
         lx = x;
         ly = y;
         lc = c;
@@ -209,7 +232,7 @@ mr_view_trans (enum dir d)
 
 
 static int last_level;
-static int last_mr_room, last_mr_x, last_mr_y;
+static int last_mr_room, last_mr_x, last_mr_y, last_mr_w, last_mr_h;
 static enum em last_em;
 static enum vm last_vm;
 static int last_hgc;
@@ -227,6 +250,8 @@ draw_multi_rooms (void)
       || mr.room != last_mr_room
       || mr.x != last_mr_x
       || mr.y != last_mr_y
+      || mr.w != last_mr_w
+      || mr.h != last_mr_h
       || em != last_em
       || vm != last_vm
       || hgc != last_hgc
@@ -240,6 +265,8 @@ draw_multi_rooms (void)
     last_mr_room = mr.room;
     last_mr_x = mr.x;
     last_mr_y = mr.y;
+    last_mr_w = mr.w;
+    last_mr_h = mr.h;
     last_level = level.number;
   }
 
@@ -262,6 +289,14 @@ draw_multi_rooms (void)
     }
 
   draw_bitmap (wall_cache, screen, 0, 0, 0);
+
+  /* al_hold_bitmap_drawing (false); */
+
+  /* int x0 = ORIGINAL_WIDTH * mr.x; */
+  /* int y0 = ORIGINAL_HEIGHT * mr.y; */
+  /* int x1 = x0 + ORIGINAL_WIDTH; */
+  /* int y1 = y0 + ORIGINAL_HEIGHT; */
+  /* draw_rectangle (screen, x0, y0, x1, y1, RED, 3); */
 
   mr.dx = mr.dy = -1;
 }

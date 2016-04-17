@@ -75,6 +75,7 @@ init_video (void)
   bottom_text_timer = create_timer (1.0 / SCRIPT_HZ);
 
   al_init_font_addon ();
+  al_hold_bitmap_drawing (false);
   builtin_font = al_create_builtin_font ();
   if (! builtin_font)
     error (-1, 0, "%s (void): cannot create builtin font", __func__);
@@ -251,6 +252,15 @@ draw_bitmap_region (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to, float sx, float sy
 {
   set_target_bitmap (to);
   al_draw_bitmap_region (from, sx, sy, sw, sh, dx, dy, flags);
+}
+
+void
+draw_rectangle (ALLEGRO_BITMAP *to, float x1, float y1,
+                float x2, float y2, ALLEGRO_COLOR color,
+                float thickness)
+{
+  set_target_bitmap (to);
+  al_draw_rectangle (x1, y1, x2 + 1, y2 + 1, color, thickness);
 }
 
 void

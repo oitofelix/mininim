@@ -403,6 +403,35 @@ process_keys (void)
   if (was_key_pressed (ALLEGRO_KEY_Y, 0, ALLEGRO_KEYMOD_CTRL, true))
     ui_undo_pass (&undo, +1, NULL);
 
+  /* [: decrease multi-room resolution */
+  if (was_key_pressed (ALLEGRO_KEY_OPENBRACE, 0, 0, true)
+      && ! cutscene) {
+    if (mr_w > 1) mr_w--;
+    if (mr_h > 1) mr_h--;
+    set_multi_room (mr_w, mr_h);
+    mr_center_room (mr.room);
+    xasprintf (&text, "MULTI-ROOM %ix%i", mr_w, mr_h);
+    draw_bottom_text (NULL, text, 0);
+    al_free (text);
+  }
+
+  /* ]: increase multi-room resolution */
+  if (was_key_pressed (ALLEGRO_KEY_CLOSEBRACE, 0, 0, true)
+      && ! cutscene) {
+    mr_w++;
+    mr_h++;
+    if (! set_multi_room (mr_w, mr_h)) {
+      draw_bottom_text (NULL, "VIDEO CARD LIMIT REACHED", 0);
+      mr_w--;
+      mr_h--;
+    } else {
+      mr_center_room (mr.room);
+      xasprintf (&text, "MULTI-ROOM %ix%i", mr_w, mr_h);
+      draw_bottom_text (NULL, text, 0);
+      al_free (text);
+    }
+  }
+
   /* ESC: pause game */
   if (step_one_cycle) {
     step_one_cycle = false;

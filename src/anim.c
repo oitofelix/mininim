@@ -200,37 +200,6 @@ play_anim (void (*draw_callback) (void),
 
       char *text = NULL;
 
-      /* [: decrease multi-room resolution */
-      if (was_key_pressed (ALLEGRO_KEY_OPENBRACE, 0, 0, true)
-          && ! cutscene) {
-        if (mr_w > 1) mr_w--;
-        if (mr_h > 1) mr_h--;
-        set_multi_room (mr_w, mr_h);
-        mr_center_room (mr.room);
-        update_wall_cache (em, vm);
-        xasprintf (&text, "MULTI-ROOM %ix%i", mr_w, mr_h);
-        draw_bottom_text (NULL, text, 0);
-        al_free (text);
-      }
-
-      /* ]: increase multi-room resolution */
-      if (was_key_pressed (ALLEGRO_KEY_CLOSEBRACE, 0, 0, true)
-          && ! cutscene) {
-        mr_w++;
-        mr_h++;
-        if (! set_multi_room (mr_w, mr_h)) {
-          draw_bottom_text (NULL, "VIDEO CARD LIMIT REACHED", 0);
-          mr_w--;
-          mr_h--;
-        } else {
-          mr_center_room (mr.room);
-          update_wall_cache (em, vm);
-          xasprintf (&text, "MULTI-ROOM %ix%i", mr_w, mr_h);
-          draw_bottom_text (NULL, text, 0);
-          al_free (text);
-        }
-      }
-
       /* F8: enable/disable level editor */
       if (was_key_pressed (ALLEGRO_KEY_F8, 0, 0, true))
         enter_exit_editor ();
