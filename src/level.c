@@ -222,7 +222,8 @@ prepare_con_at_pos (struct pos *p)
   }
 
   switch (con (p)->bg) {
-  case BALCONY: compute_stars_position (room_view, room_view); break;
+    /* TODO: make this computation restrict to the affected position */
+  case BALCONY: compute_stars_position (); break;
   default: break;
   }
 }
@@ -233,7 +234,8 @@ prepare_room (int room)
   if (! is_room_adjacent (room_view, room)) return;
   update_wall_cache (em, vm);
   create_mirror_bitmaps (room_view, room_view);
-  compute_stars_position (room_view, room_view);
+  /* TODO: make this computation restrict to the affected room */
+  compute_stars_position ();
 }
 
 void
@@ -911,7 +913,7 @@ level_undo (struct diffset *diffset, int dir, char *prefix)
   apply_to_diff_pos (&diffset->diff[(dir >= 0) ? i + 1 : i], register_con_at_pos);
   update_wall_cache (em, vm);
   create_mirror_bitmaps (room_view, room_view);
-  compute_stars_position (room_view, room_view);
+  compute_stars_position ();
 
   xasprintf (&undo_msg, "%s %s: %s", prefix, dir_str, text);
   editor_msg (undo_msg, 24);

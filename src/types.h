@@ -52,6 +52,11 @@ struct rect {
   int w, h;
 };
 
+struct star {
+  int x, y;
+  int color;
+};
+
 struct multi_room {
   int w, h;
   int x, y;
@@ -63,6 +68,14 @@ struct multi_room {
     ALLEGRO_BITMAP *wall;
     bool done;
     int room;
+
+    struct stars_bitmap {
+      ALLEGRO_BITMAP *b;
+      struct coord c;
+    } stars_bitmap[FLOORS + 2][PLACES + 1];
+
+    struct star star[FLOORS + 2][PLACES + 1][STARS];
+
   } **cell;
 };
 
@@ -368,11 +381,6 @@ struct audio_sample {
 typedef bool (*confg_set) (enum confg);
 
 typedef void (*room_callback_f) (int, int);
-
-struct star {
-  int x, y;
-  int color;
-};
 
 enum wall_correlation {
   SWS, SWW, WWS, WWW

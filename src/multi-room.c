@@ -132,6 +132,10 @@ mr_map_rooms (void)
   mr_map_room_adj (mr.room, mr.x, mr.y);
   while (next_multi_room_cell (&x, &y))
     mr_map_room_adj (mr.cell[x][y].room, x, y);
+  for (x = 0; x < mr.w; x++)
+    for (y = 0; y < mr.h; y++) {
+      if (mr.cell[x][y].room < 0) mr.cell[x][y].room = 0;
+    }
 }
 
 int
@@ -282,16 +286,14 @@ draw_multi_rooms (void)
       || hue != last_hue
       || level.number != last_level) {
     update_wall_cache (em, vm);
-    last_em = em;
-    last_vm = vm;
-    last_hgc = hgc;
-    last_hue = hue;
-    last_mr_room = mr.room;
-    last_mr_x = mr.x;
-    last_mr_y = mr.y;
-    last_mr_w = mr.w;
-    last_mr_h = mr.h;
-    last_level = level.number;
+  }
+
+  if (mr.room != last_mr_room
+      || mr.x != last_mr_x
+      || mr.y != last_mr_y
+      || mr.w != last_mr_w
+      || mr.h != last_mr_h) {
+    compute_stars_position ();
   }
 
   if (mouse_pos.room != last_mouse_pos.room
@@ -327,6 +329,17 @@ draw_multi_rooms (void)
   }
 
   mr.dx = mr.dy = -1;
+
+  last_em = em;
+  last_vm = vm;
+  last_hgc = hgc;
+  last_hue = hue;
+  last_mr_room = mr.room;
+  last_mr_x = mr.x;
+  last_mr_y = mr.y;
+  last_mr_w = mr.w;
+  last_mr_h = mr.h;
+  last_level = level.number;
 }
 
 bool

@@ -19,13 +19,6 @@
 
 #include "mininim.h"
 
-static struct stars_bitmap {
-  ALLEGRO_BITMAP *b;
-  struct coord c;
-} stars_bitmap[FLOORS + 2][PLACES + 1];
-
-static struct star star[FLOORS + 2][PLACES + 1][STARS];
-
 static enum vm last_vm = -1;
 
 void draw_star (struct star *s, struct stars_bitmap *sb, enum vm vm);
@@ -41,21 +34,21 @@ void
 load_stars (void)
 {
   /* callbacks */
-  register_room_callback (compute_stars_position);
+  /* register_room_callback (compute_stars_position); */
 }
 
 void
 unload_stars (void)
 {
   /* callbacks */
-  remove_room_callback (compute_stars_position);
+  /* remove_room_callback (compute_stars_position); */
 }
 
 void
-compute_stars_position (int last_room, int room)
+compute_stars_position_for_cell (int x, int y)
 {
   struct pos p;
-  p.room = room;
+  p.room = mr.cell[x][y].room;
 
   int i, min_x = INT_MAX, min_y = INT_MAX,
     max_x = INT_MIN, max_y = INT_MIN;
@@ -63,7 +56,7 @@ compute_stars_position (int last_room, int room)
   for (p.floor = FLOORS; p.floor >= -1; p.floor--)
     for (p.place = -1; p.place < PLACES; p.place++) {
       struct stars_bitmap *sb =
-        &stars_bitmap[p.floor + 1][p.place + 1];
+        &mr.cell[x][y].stars_bitmap[p.floor + 1][p.place + 1];
       if (sb->b) {
         destroy_bitmap (sb->b);
         sb->b = NULL;
@@ -71,7 +64,7 @@ compute_stars_position (int last_room, int room)
       if (con (&p)->bg != BALCONY) continue;
 
       for (i = 0; i < STARS; i++) {
-        struct star *s = &star[p.floor + 1][p.place + 1][i];
+        struct star *s = &mr.cell[x][y].star[p.floor + 1][p.place + 1][i];
         star_coord (&p, i, s);
         min_x = min_int (min_x, s->x);
         min_y = min_int (min_y, s->y);
@@ -82,11 +75,21 @@ compute_stars_position (int last_room, int room)
 
       sb->b = create_bitmap (max_x - min_x + 1, max_y - min_y + 1);
       clear_bitmap (sb->b, TRANSPARENT_COLOR);
-      sb->c.room = room;
+      sb->c.room = mr.cell[x][y].room;
       sb->c.x = min_x;
       sb->c.y = min_y;
 
-      redraw_stars_bitmap (star[p.floor + 1][p.place + 1], sb, STARS, vm);
+      redraw_stars_bitmap (mr.cell[x][y].star[p.floor + 1][p.place + 1], sb, STARS, vm);
+    }
+}
+
+void
+compute_stars_position (void)
+{
+  int x, y;
+  for (y = mr.h - 1; y >= 0; y--)
+    for (x = 0; x < mr.w; x++) {
+      compute_stars_position_for_cell (x, y);
     }
 }
 
@@ -201,13 +204,13 @@ draw_balcony_stars (ALLEGRO_BITMAP *bitmap, struct pos *p,
   if (con (p)->bg != BALCONY) return;
 
   if (vm != last_vm) {
-    redraw_stars_bitmap (star[p->floor + 1][p->place + 1],
-                         &stars_bitmap [p->floor + 1][p->place + 1], STARS, vm);
+    redraw_stars_bitmap (mr.cell[mr.dx][mr.dy].star[p->floor + 1][p->place + 1],
+                         &mr.cell[mr.dx][mr.dy].stars_bitmap [p->floor + 1][p->place + 1], STARS, vm);
     last_vm = vm;
   }
 
-  draw_stars (bitmap, star[p->floor + 1][p->place + 1],
-              &stars_bitmap [p->floor + 1][p->place + 1], STARS, vm);
+  draw_stars (bitmap, mr.cell[mr.dx][mr.dy].star[p->floor + 1][p->place + 1],
+              &mr.cell[mr.dx][mr.dy].stars_bitmap[p->floor + 1][p->place + 1], STARS, vm);
 }
 
 static struct star *

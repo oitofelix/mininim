@@ -26,6 +26,6 @@ void unload_stars (void);
 void draw_princess_room_stars (ALLEGRO_BITMAP *bitmap, enum vm vm);
 void draw_balcony_stars (ALLEGRO_BITMAP *bitmap, struct pos *p,
                          enum vm vm);
-void compute_stars_position (int last_room, int room);
+void compute_stars_position (void);
 
 #endif	/* MININIM_STARS_H */
