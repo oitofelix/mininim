@@ -195,12 +195,36 @@ mr_center_room (int room)
 
   mr.x = lx;
   mr.y = ly;
+
+  mr.select_cycles = SELECT_CYCLES;
+}
+
+void
+mr_select_trans (enum dir d)
+{
+  int dx = +0, dy = +0;
+  switch (d) {
+  case LEFT: dx = -1; break;
+  case RIGHT: dx = +1; break;
+  case ABOVE: dy = -1; break;
+  case BELOW: dy = +1; break;
+  }
+
+  int r = roomd (mr.room, d);
+  if (r) {
+    mr.room = r;
+    nmr_coord (mr.x + dx, mr.y + dy, &mr.x, &mr.y);
+  }
+
+  mr.select_cycles = SELECT_CYCLES;
 }
 
 void
 mr_view_trans (enum dir d)
 {
   int x, y, dx = +0, dy = +0;
+
+  mr.select_cycles = 0;
 
   for (y = mr.h - 1; y >= 0; y--)
     for (x = 0; x < mr.w; x++) {
@@ -290,13 +314,17 @@ draw_multi_rooms (void)
 
   draw_bitmap (wall_cache, screen, 0, 0, 0);
 
-  /* al_hold_bitmap_drawing (false); */
+  if (mr.select_cycles > 0) {
+    al_hold_bitmap_drawing (false);
 
-  /* int x0 = ORIGINAL_WIDTH * mr.x; */
-  /* int y0 = ORIGINAL_HEIGHT * mr.y; */
-  /* int x1 = x0 + ORIGINAL_WIDTH; */
-  /* int y1 = y0 + ORIGINAL_HEIGHT; */
-  /* draw_rectangle (screen, x0, y0, x1, y1, RED, 3); */
+    int x0 = ORIGINAL_WIDTH * mr.x;
+    int y0 = ROOM_HEIGHT * mr.y + 3;
+    int x1 = x0 + ORIGINAL_WIDTH;
+    int y1 = y0 + ROOM_HEIGHT;
+    draw_rectangle (screen, x0, y0, x1, y1, RED, 1);
+
+    mr.select_cycles--;
+  }
 
   mr.dx = mr.dy = -1;
 }
@@ -370,4 +398,30 @@ mr_coord (int room, enum dir dir, int *rx, int *ry)
       }
 
   return false;
+}
+
+bool
+ui_set_multi_room (int dw, int dh)
+{
+  char *text;
+
+  if (mr.w + dw < 1 || mr.h + dh < 1) {
+    xasprintf (&text, "MULTI-ROOM %ix%i", mr_w, mr_h);
+    draw_bottom_text (NULL, text, 0);
+    al_free (text);
+    return false;
+  }
+
+  if (! set_multi_room (mr.w + dw, mr.h + dh)) {
+    draw_bottom_text (NULL, "VIDEO CARD LIMIT REACHED", 0);
+    return false;
+  }
+
+  mr_w = mr.w;
+  mr_h = mr.h;
+  mr_center_room (mr.room);
+  xasprintf (&text, "MULTI-ROOM %ix%i", mr_w, mr_h);
+  draw_bottom_text (NULL, text, 0);
+  al_free (text);
+  return true;
 }

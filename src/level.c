@@ -366,8 +366,9 @@ compute_level (void)
     room_view = current_kid->f.c.room;
 
     if (! is_kid_visible ()) {
-      mr_coord (prev_room, current_kid->f.c.xd, &mr.x, &mr.y);
-      mr.room = room_view;
+      mr_coord (current_kid->f.c.prev_room, current_kid->f.c.xd, &mr.x, &mr.y);
+      mr.room = current_kid->f.c.room;
+      mr.select_cycles = 0;
     }
   }
 
@@ -405,32 +406,33 @@ process_keys (void)
 
   /* [: decrease multi-room resolution */
   if (was_key_pressed (ALLEGRO_KEY_OPENBRACE, 0, 0, true)
-      && ! cutscene) {
-    if (mr_w > 1) mr_w--;
-    if (mr_h > 1) mr_h--;
-    set_multi_room (mr_w, mr_h);
-    mr_center_room (mr.room);
-    xasprintf (&text, "MULTI-ROOM %ix%i", mr_w, mr_h);
-    draw_bottom_text (NULL, text, 0);
-    al_free (text);
-  }
+      && ! cutscene)
+    ui_set_multi_room (-1, -1);
 
   /* ]: increase multi-room resolution */
   if (was_key_pressed (ALLEGRO_KEY_CLOSEBRACE, 0, 0, true)
-      && ! cutscene) {
-    mr_w++;
-    mr_h++;
-    if (! set_multi_room (mr_w, mr_h)) {
-      draw_bottom_text (NULL, "VIDEO CARD LIMIT REACHED", 0);
-      mr_w--;
-      mr_h--;
-    } else {
-      mr_center_room (mr.room);
-      xasprintf (&text, "MULTI-ROOM %ix%i", mr_w, mr_h);
-      draw_bottom_text (NULL, text, 0);
-      al_free (text);
-    }
-  }
+      && ! cutscene)
+    ui_set_multi_room (+1, +1);
+
+  /* [: decrease multi-room width resolution */
+  if (was_key_pressed (ALLEGRO_KEY_OPENBRACE, 0, ALLEGRO_KEYMOD_CTRL, true)
+      && ! cutscene)
+    ui_set_multi_room (-1, +0);
+
+  /* ]: increase multi-room resolution */
+  if (was_key_pressed (ALLEGRO_KEY_CLOSEBRACE, 0, ALLEGRO_KEYMOD_CTRL, true)
+      && ! cutscene)
+    ui_set_multi_room (+1, +0);
+
+  /* [: decrease multi-room width resolution */
+  if (was_key_pressed (ALLEGRO_KEY_OPENBRACE, 0, ALLEGRO_KEYMOD_ALT, true)
+      && ! cutscene)
+    ui_set_multi_room (+0, -1);
+
+  /* ]: increase multi-room resolution */
+  if (was_key_pressed (ALLEGRO_KEY_CLOSEBRACE, 0, ALLEGRO_KEYMOD_ALT, true)
+      && ! cutscene)
+    ui_set_multi_room (+0, +1);
 
   /* ESC: pause game */
   if (step_one_cycle) {
@@ -474,6 +476,7 @@ process_keys (void)
     } while (current_kid->type != KID || ! current_kid->controllable);
     current_kid_id = current_kid->id;
     room_view = current_kid->f.c.room;
+    mr_center_room (room_view);
   }
 
   /* K: kill enemy */
@@ -528,11 +531,13 @@ process_keys (void)
   /* C: show direct coordinates */
   if (! active_menu
       && was_key_pressed (ALLEGRO_KEY_C, 0, 0, true)) {
-    int s = room_view;
-    int l = roomd (room_view, LEFT);
-    int r = roomd (room_view, RIGHT);
-    int a = roomd (room_view, ABOVE);
-    int b = roomd (room_view, BELOW);
+    int s = mr.room;
+    int l = roomd (s, LEFT);
+    int r = roomd (s, RIGHT);
+    int a = roomd (s, ABOVE);
+    int b = roomd (s, BELOW);
+
+    mr.select_cycles = SELECT_CYCLES;
 
     xasprintf (&text, "S%i L%i R%i A%i B%i", s, l, r, a, b);
     draw_bottom_text (NULL, text, 0);
@@ -541,12 +546,14 @@ process_keys (void)
 
   /* SHIFT+C: show indirect coordinates */
   if (was_key_pressed (ALLEGRO_KEY_C, 0, ALLEGRO_KEYMOD_SHIFT, true)) {
-    int a = roomd (room_view, ABOVE);
-    int b = roomd (room_view, BELOW);
+    int a = roomd (mr.room, ABOVE);
+    int b = roomd (mr.room, BELOW);
     int al = roomd (a, LEFT);
     int ar = roomd (a, RIGHT);
     int bl = roomd (b, LEFT);
     int br = roomd (b, RIGHT);
+
+    mr.select_cycles = SELECT_CYCLES;
 
     xasprintf (&text, "LV%i AL%i AR%i BL%i BR%i",
                level.number, al, ar, bl, br);

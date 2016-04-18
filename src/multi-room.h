@@ -29,9 +29,11 @@ bool is_kid_visible (void);
 bool set_multi_room (int w, int h);
 void mr_map_rooms (void);
 void mr_center_room (int room);
+void mr_select_trans (enum dir d);
 void mr_view_trans (enum dir d);
 void draw_multi_rooms (void);
 void nmr_coord (int x, int y, int *rx, int *ry);
 bool mr_coord (int room0, enum dir dir, int *rx, int *ry);
+bool ui_set_multi_room (int dw, int dh);
 
 #endif	/* MININIM_MULTI_ROOM_H */

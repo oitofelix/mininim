@@ -65,6 +65,8 @@
 #define CYCLE_TO_EFFECT_DURATION(x) ((x) * (EFFECT_HZ / SCRIPT_HZ))
 #define SECS_TO_SCYCLES(x) ((x) * SCRIPT_HZ)
 
+#define SELECT_CYCLES (3 * SCRIPT_HZ)
+
 #define CHOPPER_WAIT 10
 #define CHOPPER_MAX_STEP 5
 

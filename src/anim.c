@@ -204,36 +204,68 @@ play_anim (void (*draw_callback) (void),
       if (was_key_pressed (ALLEGRO_KEY_F8, 0, 0, true))
         enter_exit_editor ();
 
-      /* H: view room at left (J if flipped horizontally) */
+      /* H: select room at left (J if flipped horizontally) */
       if (! active_menu
           && ((! flip_gamepad_horizontal
                && was_key_pressed (ALLEGRO_KEY_H, 0, 0, true))
               || (flip_gamepad_horizontal
                   && was_key_pressed (ALLEGRO_KEY_J, 0, 0, true))))
-        mr_view_trans (LEFT);
+        mr_select_trans (LEFT);
 
-      /* J: view room at right (H if flipped horizontally) */
+      /* J: select room at right (H if flipped horizontally) */
       if (! active_menu
           && ((! flip_gamepad_horizontal
                && was_key_pressed (ALLEGRO_KEY_J, 0, 0, true))
               || (flip_gamepad_horizontal
                   && was_key_pressed (ALLEGRO_KEY_H, 0, 0, true))))
-        mr_view_trans (RIGHT);
+        mr_select_trans (RIGHT);
 
-      /* U: view room above (N if flipped vertically) */
+      /* U: select room above (N if flipped vertically) */
       if (! active_menu
           && ((! flip_gamepad_vertical
                && was_key_pressed (ALLEGRO_KEY_U, 0, 0, true))
               || (flip_gamepad_vertical
                   && was_key_pressed (ALLEGRO_KEY_N, 0, 0, true))))
-        mr_view_trans (ABOVE);
+        mr_select_trans (ABOVE);
 
-      /* N: view room below (U if flipped vertically) */
+      /* N: select room below (U if flipped vertically) */
       if (! active_menu
           && ((! flip_gamepad_vertical
                && was_key_pressed (ALLEGRO_KEY_N, 0, 0, true))
               || (flip_gamepad_vertical
                   && was_key_pressed (ALLEGRO_KEY_U, 0, 0, true))))
+        mr_select_trans (BELOW);
+
+      /* SHIFT+H: multi-room view to left (J if flipped horizontally) */
+      if (! active_menu
+          && ((! flip_gamepad_horizontal
+               && was_key_pressed (ALLEGRO_KEY_H, 0, ALLEGRO_KEYMOD_SHIFT, true))
+              || (flip_gamepad_horizontal
+                  && was_key_pressed (ALLEGRO_KEY_J, 0, ALLEGRO_KEYMOD_SHIFT, true))))
+        mr_view_trans (LEFT);
+
+      /* SHIFT+J: multi-room view to right (H if flipped horizontally) */
+      if (! active_menu
+          && ((! flip_gamepad_horizontal
+               && was_key_pressed (ALLEGRO_KEY_J, 0, ALLEGRO_KEYMOD_SHIFT, true))
+              || (flip_gamepad_horizontal
+                  && was_key_pressed (ALLEGRO_KEY_H, 0, ALLEGRO_KEYMOD_SHIFT, true))))
+        mr_view_trans (RIGHT);
+
+      /* SHIFT+U: multi-room view above (N if flipped vertically) */
+      if (! active_menu
+          && ((! flip_gamepad_vertical
+               && was_key_pressed (ALLEGRO_KEY_U, 0, ALLEGRO_KEYMOD_SHIFT, true))
+              || (flip_gamepad_vertical
+                  && was_key_pressed (ALLEGRO_KEY_N, 0, ALLEGRO_KEYMOD_SHIFT, true))))
+        mr_view_trans (ABOVE);
+
+      /* SHIFT+N: multi-room view below (U if flipped vertically) */
+      if (! active_menu
+          && ((! flip_gamepad_vertical
+               && was_key_pressed (ALLEGRO_KEY_N, 0, ALLEGRO_KEYMOD_SHIFT, true))
+              || (flip_gamepad_vertical
+                  && was_key_pressed (ALLEGRO_KEY_U, 0, ALLEGRO_KEYMOD_SHIFT, true))))
         mr_view_trans (BELOW);
 
       /* SHIFT+B: enable/disable room drawing */

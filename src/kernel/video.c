@@ -260,7 +260,7 @@ draw_rectangle (ALLEGRO_BITMAP *to, float x1, float y1,
                 float thickness)
 {
   set_target_bitmap (to);
-  al_draw_rectangle (x1, y1, x2 + 1, y2 + 1, color, thickness);
+  al_draw_rectangle (x1 + 1, y1, x2, y2, color, thickness);
 }
 
 void

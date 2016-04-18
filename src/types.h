@@ -57,6 +57,7 @@ struct multi_room {
   int x, y;
   int dx, dy;
   int room;
+  int select_cycles;
   struct multi_room_cell {
     ALLEGRO_BITMAP *screen;
     ALLEGRO_BITMAP *wall;
