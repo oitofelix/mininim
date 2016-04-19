@@ -19,9 +19,12 @@
 
 #include "mininim.h"
 
+/* TODO: make volume distance recalculation algorithms multi-room
+   aware.  Until then the volume is absolute wherever its source may
+   be. */
+
 static struct audio_sample *audio_sample;
 static size_t audio_sample_nmemb;
-static int last_room_view;
 
 bool audio_enabled = true;
 float volume = 1.0;
@@ -123,10 +126,8 @@ play_sample (ALLEGRO_SAMPLE *sample, int room)
 void
 play_samples (void)
 {
-  /* return; */
-
   clear_played_samples ();
-  adjust_samples_volume ();
+  /* adjust_samples_volume (); */
 
   size_t i;
   for (i = 0; i < audio_sample_nmemb; i++) {
@@ -138,7 +139,7 @@ play_samples (void)
         error (-1, 0, "%s: cannot attach sample instance to mixer (%p, %p)",
                 __func__, as->sample, as->instance);
 
-      as->volume = get_adjusted_sample_volume (as);
+      /* as->volume = get_adjusted_sample_volume (as); */
       al_set_sample_instance_gain (as->instance, as->volume);
 
       if (! al_play_sample_instance (as->instance))
@@ -232,20 +233,17 @@ adjust_samples_volume (void)
     struct audio_sample *as = &audio_sample[i];
     as->volume = get_adjusted_sample_volume (as);
   }
-  last_room_view = room_view;
 }
 
 float
 get_adjusted_sample_volume (struct audio_sample *as)
 {
-  if (as->volume >= 0 && last_room_view == room_view)
-    return as->volume;
-
   if (as->room < 0) return 1.0;
-  int d = room_dist (room_view, as->room, 10);
-  if (d == 0) d = 1;
-  if (d <= 10) return 1.0 / d;
-  else return 0;
+  /* int d = room_dist (room_view, as->room, 10); */
+  /* if (d == 0) d = 1; */
+  /* if (d <= 10) return 1.0 / d; */
+  if (is_room_visible (as->room)) return 1.0;
+  else return 0.5;
 }
 
 void

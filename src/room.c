@@ -19,10 +19,6 @@
 
 #include "mininim.h"
 
-static int last_room;
-static room_callback_f *room_callback;
-static size_t room_callback_nmemb;
-
 void
 load_room (void)
 {
@@ -143,43 +139,11 @@ draw_bitmap_regionc (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
 }
 
 void
-register_room_callback (room_callback_f f)
-{
-  room_callback =
-    add_to_array (&f, 1, room_callback, &room_callback_nmemb,
-                  room_callback_nmemb, sizeof (f));
-}
-
-void
-remove_room_callback (room_callback_f f)
-{
-  size_t i;
-  for (i = 0; i < room_callback_nmemb; i++)
-    if (room_callback[i] == f) {
-      room_callback =
-        remove_from_array (room_callback, &room_callback_nmemb, i, 1, sizeof (*f));
-      if (i > 0) i--;
-      break;
-    }
-}
-
-void
-run_room_callbacks (int room)
-{
-  if (room == last_room) return;
-  size_t i;
-  for (i = 0; i < room_callback_nmemb; i++)
-    room_callback[i] (last_room, room);
-}
-
-void
 draw_room (ALLEGRO_BITMAP *bitmap, int room,
            enum em em, enum vm vm)
 {
   struct pos p;
   p.room = room;
-
-  last_room = room;
 
   for (p.floor = FLOORS; p.floor >= -1; p.floor--)
     for (p.place = -1; p.place < PLACES; p.place++)
