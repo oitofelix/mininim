@@ -32,8 +32,10 @@ destroy_multi_room (void)
     for (x = 0; x < mr.w; x++) {
       for (y = 0; y < mr.h; y++) destroy_bitmap (mr.cell[x][y].screen);
       al_free (mr.cell[x]);
+      al_free (mr.last.cell[x]);
     }
     al_free (mr.cell);
+    al_free (mr.last.cell);
   };
 
   destroy_bitmap (screen);
@@ -66,8 +68,10 @@ set_multi_room (int w, int h)
 
   int x, y;
   mr.cell = xcalloc (w, sizeof (* mr.cell));
+  mr.last.cell = xcalloc (w, sizeof (* mr.last.cell));
   for (x = 0; x < w; x++) {
     mr.cell[x] = xcalloc (h, sizeof (** mr.cell));
+    mr.last.cell[x] = xcalloc (h, sizeof (** mr.last.cell));
     for (y = 0; y < h; y++) {
       int x0 = ORIGINAL_WIDTH * x;
       int y0 = ROOM_HEIGHT * y;
@@ -258,14 +262,38 @@ mr_view_trans (enum dir d)
   mr.y += dy;
 }
 
+bool
+has_mr_view_changed (void)
+{
+  if (mr.w != mr.last.w || mr.h != mr.last.h) return true;
 
-static int last_level;
-static int last_mr_room, last_mr_x, last_mr_y, last_mr_w, last_mr_h;
-static enum em last_em;
-static enum vm last_vm;
-static int last_hgc;
-static enum hue last_hue;
-struct pos last_mouse_pos;
+  int x, y;
+  for (y = mr.h - 1; y >= 0; y--)
+    for (x = 0; x < mr.w; x++)
+      if (mr.last.cell[x][y].room != mr.cell[x][y].room)
+        return true;
+
+  return false;
+}
+
+void
+mr_update_last_settings (void)
+{
+  int x, y;
+  for (y = mr.h - 1; y >= 0; y--)
+    for (x = 0; x < mr.w; x++)
+      mr.last.cell[x][y].room = mr.cell[x][y].room;
+
+  mr.last.w = mr.w;
+  mr.last.h = mr.h;
+
+  mr.last.level = level.number;
+  mr.last.em = em;
+  mr.last.vm = vm;
+  mr.last.hgc = hgc;
+  mr.last.hue = hue;
+  mr.last.mouse_pos = mouse_pos;
+}
 
 void
 draw_multi_rooms (void)
@@ -275,35 +303,24 @@ draw_multi_rooms (void)
   mr_map_rooms ();
 
   if (anim_cycle == 0
-      || mr.room != last_mr_room
-      || mr.x != last_mr_x
-      || mr.y != last_mr_y
-      || mr.w != last_mr_w
-      || mr.h != last_mr_h
-      || em != last_em
-      || vm != last_vm
-      || hgc != last_hgc
-      || hue != last_hue
-      || level.number != last_level) {
+      || has_mr_view_changed ()
+      || em != mr.last.em
+      || vm != mr.last.vm
+      || hgc != mr.last.hgc
+      || hue != mr.last.hue
+      || level.number != mr.last.level) {
     update_wall_cache (em, vm);
   }
 
-  if (mr.room != last_mr_room
-      || mr.x != last_mr_x
-      || mr.y != last_mr_y
-      || mr.w != last_mr_w
-      || mr.h != last_mr_h) {
-    compute_stars_position ();
-  }
+  if (has_mr_view_changed ()) generate_stars ();
 
-  if (mouse_pos.room != last_mouse_pos.room
-      || mouse_pos.floor != last_mouse_pos.floor
-      || mouse_pos.place != last_mouse_pos.place) {
+  if (mouse_pos.room != mr.last.mouse_pos.room
+      || mouse_pos.floor != mr.last.mouse_pos.floor
+      || mouse_pos.place != mr.last.mouse_pos.place) {
     if (is_valid_pos (&mouse_pos))
       update_wall_cache_pos (&mouse_pos, em, vm);
-    if (is_valid_pos (&last_mouse_pos))
-      update_wall_cache_pos (&last_mouse_pos, em, vm);
-    last_mouse_pos = mouse_pos;
+    if (is_valid_pos (&mr.last.mouse_pos))
+      update_wall_cache_pos (&mr.last.mouse_pos, em, vm);
   }
 
   for (y = mr.h - 1; y >= 0; y--)
@@ -330,30 +347,26 @@ draw_multi_rooms (void)
 
   mr.dx = mr.dy = -1;
 
-  last_em = em;
-  last_vm = vm;
-  last_hgc = hgc;
-  last_hue = hue;
-  last_mr_room = mr.room;
-  last_mr_x = mr.x;
-  last_mr_y = mr.y;
-  last_mr_w = mr.w;
-  last_mr_h = mr.h;
-  last_level = level.number;
+  mr_update_last_settings ();
+}
+
+bool
+is_room_visible (int room)
+{
+  int x, y;
+  for (x = 0; x < mr.w; x++)
+    for (y = 0; y < mr.h; y++)
+      if (mr.cell[x][y].room == room)
+        return true;
+
+  return false;
 }
 
 bool
 is_kid_visible (void)
 {
   struct anim *k = get_anim_by_id (current_kid_id);
-
-  int x, y;
-  for (x = 0; x < mr.w; x++)
-    for (y = 0; y < mr.h; y++)
-      if (mr.cell[x][y].room == k->f.c.room)
-        return true;
-
-  return false;
+  return is_room_visible (k->f.c.room);
 }
 
 void

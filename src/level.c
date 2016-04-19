@@ -213,7 +213,7 @@ destroy_cons (void)
 void
 prepare_con_at_pos (struct pos *p)
 {
-  if (p->room != room_view) return;
+  if (! is_room_visible (p->room)) return;
 
   switch (con (p)->fg) {
   case WALL: update_wall_cache (em, vm); break;
@@ -222,8 +222,7 @@ prepare_con_at_pos (struct pos *p)
   }
 
   switch (con (p)->bg) {
-    /* TODO: make this computation restrict to the affected position */
-  case BALCONY: compute_stars_position (); break;
+  case BALCONY: generate_stars (); break;
   default: break;
   }
 }
@@ -234,8 +233,7 @@ prepare_room (int room)
   if (! is_room_adjacent (room_view, room)) return;
   update_wall_cache (em, vm);
   create_mirror_bitmaps (room_view, room_view);
-  /* TODO: make this computation restrict to the affected room */
-  compute_stars_position ();
+  generate_stars ();
 }
 
 void
@@ -913,7 +911,7 @@ level_undo (struct diffset *diffset, int dir, char *prefix)
   apply_to_diff_pos (&diffset->diff[(dir >= 0) ? i + 1 : i], register_con_at_pos);
   update_wall_cache (em, vm);
   create_mirror_bitmaps (room_view, room_view);
-  compute_stars_position ();
+  generate_stars ();
 
   xasprintf (&undo_msg, "%s %s: %s", prefix, dir_str, text);
   editor_msg (undo_msg, 24);

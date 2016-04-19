@@ -1134,6 +1134,7 @@ main (int _argc, char **_argv)
   if (skip_title) goto play_game;
 
  restart_game:
+  set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
   clear_bitmap (screen, BLACK);
   clear_bitmap (uscreen, TRANSPARENT_COLOR);
   cutscene_started = false;

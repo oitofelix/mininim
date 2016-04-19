@@ -57,26 +57,51 @@ struct star {
   int color;
 };
 
+enum em {
+  DUNGEON = 0, PALACE = 1,
+};
+
+enum hue {
+  HUE_NONE = 0, HUE_GREEN = 1, HUE_GRAY = 2, HUE_YELLOW = 3,
+  HUE_BLUE = 4,
+};
+
 struct multi_room {
   int w, h;
   int x, y;
   int dx, dy;
   int room;
   int select_cycles;
+
   struct multi_room_cell {
     ALLEGRO_BITMAP *screen;
     ALLEGRO_BITMAP *wall;
     bool done;
     int room;
 
-    struct stars_bitmap {
+    struct stars {
       ALLEGRO_BITMAP *b;
       struct coord c;
-    } stars_bitmap[FLOORS + 2][PLACES + 1];
-
-    struct star star[FLOORS + 2][PLACES + 1][STARS];
+      struct star *s;
+      size_t count;
+    } stars[FLOORS + 2][PLACES + 1];
 
   } **cell;
+
+  struct {
+    int w, h;
+
+    int level;
+    enum em em;
+    enum vm vm;
+    int hgc;
+    enum hue hue;
+    struct pos mouse_pos;
+
+   struct {
+      int room;
+    } **cell;
+  } last;
 };
 
 enum carpet_design {
@@ -124,13 +149,9 @@ struct level {
   enum dir start_dir;
   bool has_sword;
 
-  enum em {
-    DUNGEON = 0, PALACE = 1,
-  } em;
+  enum em em;
 
-  enum hue {
-    HUE_NONE = 0, HUE_GREEN = 1, HUE_GRAY = 2, HUE_YELLOW = 3, HUE_BLUE = 4,
-  } hue;
+  enum hue hue;
 
   struct room_linking {
     int l, r, a, b;

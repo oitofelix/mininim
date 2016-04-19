@@ -25,6 +25,7 @@ extern struct multi_room mr;
 extern int mr_room, mr_x, mr_y;
 
 /* functions */
+bool is_room_visible (int room);
 bool is_kid_visible (void);
 bool set_multi_room (int w, int h);
 void mr_map_rooms (void);
