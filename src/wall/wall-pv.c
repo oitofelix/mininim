@@ -19,10 +19,7 @@
 
 #include "mininim.h"
 
-static ALLEGRO_COLOR wall_color_array[3][4][11];
-
 static ALLEGRO_COLOR wall_color (int i);
-static void compute_wall_color_array (int last_room, int room);
 static void draw_wall_brick (ALLEGRO_BITMAP *bitmap, struct pos *p,
                                 int row, int col);
 static struct rect *wall_brick_rect (struct pos *p, int row, int col,
@@ -30,7 +27,6 @@ static struct rect *wall_brick_rect (struct pos *p, int row, int col,
 static ALLEGRO_BITMAP *wall_mark (int i);
 static struct frame *wall_mark_frame (struct pos *p, int i,
                                              struct frame *f);
-
 
 /* palace vga */
 ALLEGRO_BITMAP *pv_wall_mark_00, *pv_wall_mark_01, *pv_wall_mark_02,
@@ -57,9 +53,6 @@ load_wall_pv (void)
   pv_wall_mark_12 = load_bitmap (PV_WALL_MARK_12);
   pv_wall_mark_13 = load_bitmap (PV_WALL_MARK_13);
   pv_wall_mark_14 = load_bitmap (PV_WALL_MARK_14);
-
-  /* callbacks */
-  register_room_callback (compute_wall_color_array);
 }
 
 void
@@ -81,9 +74,6 @@ unload_wall_pv (void)
   destroy_bitmap (pv_wall_mark_12);
   destroy_bitmap (pv_wall_mark_13);
   destroy_bitmap (pv_wall_mark_14);
-
-  /* callbacks */
-  remove_room_callback (compute_wall_color_array);
 }
 
 void
@@ -121,7 +111,7 @@ draw_wall_brick (ALLEGRO_BITMAP *bitmap, struct pos *p,
   f0.flip = f1.flip = 0;
 
   struct pos np; npos (p, &np);
-  ALLEGRO_COLOR c = wall_color_array[np.floor][row][np.place + col];
+  ALLEGRO_COLOR c = mr.cell[mr.dx][mr.dy].wall_color[np.floor][row][np.place + col];
   /* c = compute_wall_color (p, row, col); */
   c = apply_hue_color (c);
   if (peq (p, &mouse_pos)) c = selection_palette (c);
@@ -155,14 +145,14 @@ wall_color (int i)
 }
 
 void
-compute_wall_color_array (int last_room, int room)
+generate_wall_colors_for_cell (int x, int y)
 {
 	uint32_t orand_seed;
 	int floor, row, col;
 	int ocolor, bcolor, color;
 
 	orand_seed = random_seed;
-	random_seed = room;
+	random_seed = mr.cell[x][y].room;
 	prandom(1);
 
 	for (floor = 0; floor < 3; floor++) {
@@ -174,7 +164,7 @@ compute_wall_color_array (int last_room, int room)
 				do {
 					color = bcolor + prandom (3);
 				} while (color == ocolor);
-				wall_color_array[floor][row][col] =
+				mr.cell[x][y].wall_color[floor][row][col] =
           wall_color (color);
 				ocolor = color;
 			}
@@ -182,6 +172,15 @@ compute_wall_color_array (int last_room, int room)
 	}
 
 	random_seed = orand_seed;
+}
+
+void
+generate_wall_colors (void)
+{
+  int x, y;
+  for (y = mr.h - 1; y >= 0; y--)
+    for (x = 0; x < mr.w; x++)
+      generate_wall_colors_for_cell (x, y);
 }
 
 ALLEGRO_COLOR

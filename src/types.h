@@ -87,6 +87,8 @@ struct multi_room {
     } stars[FLOORS + 2][PLACES + 1];
 
     ALLEGRO_BITMAP *mirror[FLOORS + 2][PLACES + 1];
+
+    ALLEGRO_COLOR wall_color[3][4][11];
   } **cell;
 
   struct {

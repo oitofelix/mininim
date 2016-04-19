@@ -269,6 +269,8 @@ update_wall_cache (enum em em, enum vm vm)
       p.room = mr.cell[x][y].room;
       p.room = (p.room > 0) ? p.room : 0;
       room_view = p.room;
+      mr.dx = x;
+      mr.dy = y;
       for (p.floor = FLOORS; p.floor >= -1; p.floor--)
         for (p.place = -1; p.place < PLACES; p.place++) {
           if (con (&p)->fg != WALL) continue;

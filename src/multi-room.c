@@ -302,6 +302,12 @@ draw_multi_rooms (void)
 
   mr_map_rooms ();
 
+  if (em == PALACE && vm == VGA
+      && (has_mr_view_changed ()
+          || em != mr.last.em
+          || vm != mr.last.vm))
+    generate_wall_colors ();
+
   if (anim_cycle == 0
       || has_mr_view_changed ()
       || em != mr.last.em

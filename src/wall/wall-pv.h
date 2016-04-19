@@ -43,5 +43,7 @@ void draw_wall_pv (ALLEGRO_BITMAP *bitmap, struct pos *p);
 void draw_wall_base_pv (ALLEGRO_BITMAP *bitmap, struct pos *p);
 void draw_wall_left_pv (ALLEGRO_BITMAP *bitmap, struct pos *p);
 ALLEGRO_COLOR compute_wall_color (struct pos *p, int row, int col);
+void generate_wall_colors_for_cell (int x, int y);
+void generate_wall_colors (void);
 
 #endif	/* MININIM_WALL_PV_H */
