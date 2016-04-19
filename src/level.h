@@ -46,7 +46,6 @@ void display_remaining_time (void);
 void display_skill (struct anim *k);
 void pause_game (void);
 void unpause_game (void);
-void draw_level_room (ALLEGRO_BITMAP *bitmap, int room);
 
 /* not used */
 void apply_to_diff_pos (struct diff *d, void (*func) (struct pos *p));

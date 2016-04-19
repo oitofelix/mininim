@@ -21,6 +21,7 @@
 #define MININIM_MULTI_ROOM_H
 
 /* variables */
+extern ALLEGRO_BITMAP *cache;
 extern struct multi_room mr;
 extern int mr_room, mr_x, mr_y;
 
@@ -37,5 +38,9 @@ void draw_multi_rooms (void);
 void nmr_coord (int x, int y, int *rx, int *ry);
 bool mr_coord (int room0, enum dir dir, int *rx, int *ry);
 bool ui_set_multi_room (int dw, int dh);
+void update_cache (enum em em, enum vm vm);
+void update_cache_pos (struct pos *p, enum em em, enum vm vm);
+void register_changed_pos (struct pos *p);
+struct pos *get_changed_pos (struct pos *p);
 
 #endif	/* MININIM_MULTI_ROOM_H */

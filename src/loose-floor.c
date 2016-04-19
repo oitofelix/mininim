@@ -329,8 +329,14 @@ compute_loose_floors (void)
   for (i = 0; i < loose_floor_nmemb; i++) {
     struct loose_floor *l = &loose_floor[i];
     switch (l->action) {
-    case SHAKE_LOOSE_FLOOR: compute_loose_floor_shake (l); break;
-    case RELEASE_LOOSE_FLOOR: compute_loose_floor_release (l); break;
+    case SHAKE_LOOSE_FLOOR:
+      compute_loose_floor_shake (l);
+      register_changed_pos (&l->p);
+      break;
+    case RELEASE_LOOSE_FLOOR:
+      compute_loose_floor_release (l);
+      register_changed_pos (&l->p);
+      break;
     case FALL_LOOSE_FLOOR: compute_loose_floor_fall (l); break;
     default: break;
     }
@@ -540,10 +546,11 @@ compute_loose_floor_fall (struct loose_floor *l)
       l->f.b = get_correct_falling_loose_floor_bitmap (dv_broken_floor);
       l->p = fpmbo_f;
       l->i = 0;
-      register_con_undo (&undo, &fpmbo_f,
+      register_con_undo (&undo, &l->p,
                          NO_FLOOR, IGNORE, IGNORE,
                          false, false, false, false,
                          "LOOSE FLOOR CHAIN RELEASE");
+      register_changed_pos (&l->p);
       must_sort = true;
       play_sample (broken_floor_sample, p.room);
       alert_guards (&p);

@@ -19,9 +19,6 @@
 
 #include "mininim.h"
 
-/* wall cache */
-ALLEGRO_BITMAP *wall_cache;
-
 /* dungeon cga */
 ALLEGRO_BITMAP *dc_wall_face, *dc_wall_face_top;
 
@@ -255,57 +252,11 @@ draw_wall_face (ALLEGRO_BITMAP *bitmap, struct pos *p,
 }
 
 void
-update_wall_cache (enum em em, enum vm vm)
-{
-  int x, y;
-  struct pos p;
-
-  int room_view_bkp = room_view;
-
-  clear_bitmap (wall_cache, TRANSPARENT_COLOR);
-
-  for (y = mr.h - 1; y >= 0; y--)
-    for (x = 0; x < mr.w; x++) {
-      p.room = mr.cell[x][y].room;
-      p.room = (p.room > 0) ? p.room : 0;
-      room_view = p.room;
-      mr.dx = x;
-      mr.dy = y;
-      for (p.floor = FLOORS; p.floor >= -1; p.floor--)
-        for (p.place = -1; p.place < PLACES; p.place++) {
-          if (con (&p)->fg != WALL) continue;
-          draw_wall_base (mr.cell[x][y].wall, &p, em, vm);
-          draw_wall_left (mr.cell[x][y].wall, &p, em, vm);
-        }
-    }
-  room_view = room_view_bkp;
-}
-
-void
-update_wall_cache_pos (struct pos *p, enum em em, enum vm vm)
-{
-  int x, y;
-  if (con (p)->fg != WALL) return;
-  struct pos np; npos (p, &np);
-
-  for (y = mr.h - 1; y >= 0; y--)
-    for (x = 0; x < mr.w; x++)
-      if (mr.cell[x][y].room == np.room
-          || (np.room == 0 && mr.cell[x][y].room < 0)) {
-        int room_view_bkp = room_view;
-        room_view = np.room;
-        draw_wall_base (mr.cell[x][y].wall, p, em, vm);
-        draw_wall_left (mr.cell[x][y].wall, p, em, vm);
-        room_view = room_view_bkp;
-      }
-}
-
-void
 draw_wall_left_cache (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   struct pos pv; pos2room (p, room_view, &pv);
   struct coord c; wall_coord (&pv, &c);
-  draw_bitmap_regionc (mr.cell[mr.dx][mr.dy].wall, bitmap, c.x, c.y,
+  draw_bitmap_regionc (mr.cell[mr.dx][mr.dy].cache, bitmap, c.x, c.y,
                        PLACE_WIDTH, PLACE_HEIGHT - 3, &c, 0);
 }
 
@@ -314,7 +265,7 @@ draw_wall_base_cache (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   struct pos pv; pos2room (p, room_view, &pv);
   struct coord c; wall_base_coord (&pv, &c);
-  draw_bitmap_regionc (mr.cell[mr.dx][mr.dy].wall, bitmap, c.x, c.y,
+  draw_bitmap_regionc (mr.cell[mr.dx][mr.dy].cache, bitmap, c.x, c.y,
                        PLACE_WIDTH, 3, &c, 0);
 }
 

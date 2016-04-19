@@ -19,9 +19,33 @@
 
 #include "mininim.h"
 
+ALLEGRO_BITMAP *cache;
+
 struct multi_room mr;
 
-int mr_room, mr_x, mr_y;
+struct pos *changed_pos = NULL;
+size_t changed_pos_nmemb = 0;
+
+void
+register_changed_pos (struct pos *p)
+{
+  struct pos np; npos (p, &np);
+
+  if (get_changed_pos (&np)) return;
+
+  changed_pos =
+    add_to_array (&np, 1, changed_pos, &changed_pos_nmemb,
+                  changed_pos_nmemb, sizeof (np));
+
+  qsort (changed_pos, changed_pos_nmemb, sizeof (np), (comparison_fn_t) cpos);
+}
+
+struct pos *
+get_changed_pos (struct pos *p)
+{
+  return bsearch (p, changed_pos, changed_pos_nmemb, sizeof (* p),
+                  (comparison_fn_t) cpos);
+}
 
 static void
 destroy_multi_room (void)
@@ -41,7 +65,7 @@ destroy_multi_room (void)
   destroy_bitmap (screen);
   destroy_bitmap (effect_buffer);
   destroy_bitmap (black_screen);
-  destroy_bitmap (wall_cache);
+  destroy_bitmap (cache);
 }
 
 bool
@@ -61,10 +85,13 @@ set_multi_room (int w, int h)
   mr.h = h;
   mr.w = w;
 
+  set_target_backbuffer (display);
+  al_set_new_bitmap_flags (ALLEGRO_VIDEO_BITMAP);
+
   screen = create_bitmap (sw, sh);
   effect_buffer = create_bitmap (sw, sh);
   black_screen = create_bitmap (sw, sh);
-  wall_cache = create_bitmap (sw, sh);
+  cache = create_bitmap (sw, sh);
 
   int x, y;
   mr.cell = xcalloc (w, sizeof (* mr.cell));
@@ -78,7 +105,7 @@ set_multi_room (int w, int h)
       int sw = ORIGINAL_WIDTH;
       int sh = ORIGINAL_HEIGHT - (y < h - 1 ? 8 : 0);
       mr.cell[x][y].screen = al_create_sub_bitmap (screen, x0, y0, sw, sh);
-      mr.cell[x][y].wall = al_create_sub_bitmap (wall_cache, x0, y0, sw, sh);
+      mr.cell[x][y].cache = al_create_sub_bitmap (cache, x0, y0, sw, sh);
     }
   }
 
@@ -296,6 +323,116 @@ mr_update_last_settings (void)
 }
 
 void
+draw_animated_background (ALLEGRO_BITMAP *bitmap, int room)
+{
+  int room_view_bkp = room_view;
+  room_view = room;
+
+  struct pos p;
+  p.room = room_view;
+
+  for (p.floor = FLOORS; p.floor >= -1; p.floor--)
+    for (p.place = -1; p.place < PLACES; p.place++) {
+      draw_fire (bitmap, &p, vm);
+      draw_balcony_stars (bitmap, &p, vm);
+    }
+
+  for (p.floor = FLOORS; p.floor >= 0; p.floor--)
+    for (p.place = -1; p.place < PLACES; p.place++)
+      draw_no_floor_selection (bitmap, &p);
+
+  room_view = room_view_bkp;
+}
+
+void
+draw_animated_foreground (ALLEGRO_BITMAP *bitmap, int room)
+{
+  int room_view_bkp = room_view;
+  room_view = room;
+
+  struct pos p;
+  p.room = room_view;
+
+  for (p.floor = FLOORS; p.floor >= -1; p.floor--)
+    for (p.place = -1; p.place < PLACES; p.place++) {
+      if (con (&p)->fg != MIRROR) continue;
+      update_mirror_bitmap (bitmap, &p);
+      draw_mirror (bitmap, &p, em, vm);
+    }
+
+  /* loose_floor_fall_debug (); */
+
+  for (p.floor = FLOORS; p.floor >= -1; p.floor--)
+    for (p.place = -1; p.place < PLACES; p.place++) {
+      draw_falling_loose_floor (bitmap, &p, em, vm);
+    }
+
+  draw_anims (bitmap, em, vm);
+
+  for (p.floor = FLOORS; p.floor >= -1; p.floor--)
+    for (p.place = -1; p.place < PLACES; p.place++) {
+      draw_potion (bitmap, &p, em, vm);
+      if (is_sword (&p)) draw_sword (bitmap, &p, vm);
+    }
+
+  room_view = room_view_bkp;
+}
+
+void
+update_cache (enum em em, enum vm vm)
+{
+  int x, y;
+
+  int room_view_bkp = room_view;
+
+  clear_bitmap (cache, TRANSPARENT_COLOR);
+
+  for (y = mr.h - 1; y >= 0; y--)
+    for (x = 0; x < mr.w; x++) {
+      room_view = mr.cell[x][y].room;
+      mr.dx = x;
+      mr.dy = y;
+      draw_room (mr.cell[x][y].cache, room_view, em, vm);
+    }
+
+  room_view = room_view_bkp;
+}
+
+void
+update_cache_pos (struct pos *p, enum em em, enum vm vm)
+{
+  int x, y;
+  struct pos np; npos (p, &np);
+
+  int room_view_bkp = room_view;
+
+  struct pos pl; prel (p, &pl, +0, -1);
+  struct pos pbl; prel (p, &pbl, +1, -1);
+
+  for (y = mr.h - 1; y >= 0; y--)
+    for (x = 0; x < mr.w; x++)
+      if (mr.cell[x][y].room == np.room) {
+        room_view = np.room;
+        mr.dx = x;
+        mr.dy = y;
+        set_target_bitmap (mr.cell[x][y].cache);
+        al_set_clipping_rectangle (PLACE_WIDTH * np.place, PLACE_HEIGHT * np.floor + 3,
+                                   2 * PLACE_WIDTH - 6, PLACE_HEIGHT);
+        al_clear_to_color (BLACK);
+
+        draw_conbg (mr.cell[x][y].cache, p, em, vm);
+
+        draw_confg_right (mr.cell[x][y].cache, &pbl, em, vm, false);
+        draw_confg_right (mr.cell[x][y].cache, &pl, em, vm, false);
+        draw_confg (mr.cell[x][y].cache, p, em, vm, true);
+
+        al_reset_clipping_rectangle ();
+      }
+
+  room_view = room_view_bkp;
+}
+
+void
 draw_multi_rooms (void)
 {
   int x, y;
@@ -308,16 +445,6 @@ draw_multi_rooms (void)
           || vm != mr.last.vm))
     generate_wall_colors ();
 
-  if (anim_cycle == 0
-      || has_mr_view_changed ()
-      || em != mr.last.em
-      || vm != mr.last.vm
-      || hgc != mr.last.hgc
-      || hue != mr.last.hue
-      || level.number != mr.last.level) {
-    update_wall_cache (em, vm);
-  }
-
   if (has_mr_view_changed ()) {
     generate_stars ();
     generate_mirrors_reflex ();
@@ -327,20 +454,43 @@ draw_multi_rooms (void)
       || mouse_pos.floor != mr.last.mouse_pos.floor
       || mouse_pos.place != mr.last.mouse_pos.place) {
     if (is_valid_pos (&mouse_pos))
-      update_wall_cache_pos (&mouse_pos, em, vm);
+      update_cache_pos (&mouse_pos, em, vm);
     if (is_valid_pos (&mr.last.mouse_pos))
-      update_wall_cache_pos (&mr.last.mouse_pos, em, vm);
+      update_cache_pos (&mr.last.mouse_pos, em, vm);
   }
+
+  if (anim_cycle == 0
+      || has_mr_view_changed ()
+      || em != mr.last.em
+      || vm != mr.last.vm
+      || hgc != mr.last.hgc
+      || hue != mr.last.hue
+      || level.number != mr.last.level) {
+    update_cache (em, vm);
+  }
+
+  size_t i;
+  for (i = 0; i < changed_pos_nmemb; i++)
+    update_cache_pos (&changed_pos[i], em, vm);
+  destroy_array ((void **) &changed_pos, &changed_pos_nmemb);
+
+  clear_bitmap (screen, BLACK);
 
   for (y = mr.h - 1; y >= 0; y--)
     for (x = 0; x < mr.w; x++) {
       mr.dx = x;
       mr.dy = y;
-      draw_level_room (mr.cell[x][y].screen, mr.cell[x][y].room > 0
-                       ? mr.cell[x][y].room : 0);
+      draw_animated_background (mr.cell[x][y].screen, mr.cell[x][y].room);
     }
 
-  draw_bitmap (wall_cache, screen, 0, 0, 0);
+  if (! no_room_drawing) draw_bitmap (cache, screen, 0, 0, 0);
+
+  for (y = mr.h - 1; y >= 0; y--)
+    for (x = 0; x < mr.w; x++) {
+      mr.dx = x;
+      mr.dy = y;
+      draw_animated_foreground (mr.cell[x][y].screen, mr.cell[x][y].room);
+    }
 
   if (mr.select_cycles > 0) {
     al_hold_bitmap_drawing (false);

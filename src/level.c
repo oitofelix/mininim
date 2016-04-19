@@ -216,7 +216,7 @@ prepare_con_at_pos (struct pos *p)
   if (! is_room_visible (p->room)) return;
 
   switch (con (p)->fg) {
-  case WALL: update_wall_cache (em, vm); break;
+  case WALL: update_cache (em, vm); break;
   case MIRROR: generate_mirrors_reflex (); break;
   default: break;
   }
@@ -231,7 +231,7 @@ void
 prepare_room (int room)
 {
   if (! is_room_adjacent (room_view, room)) return;
-  update_wall_cache (em, vm);
+  update_cache (em, vm);
   generate_mirrors_reflex ();
   generate_stars ();
 }
@@ -697,54 +697,6 @@ process_keys (void)
     ? current_kid->id : -1;
 }
 
-void
-draw_level_room (ALLEGRO_BITMAP *bitmap, int room)
-{
-  int room_view_bkp = room_view;
-  room_view = room;
-
-  clear_bitmap (bitmap, BLACK);
-
-  struct pos p;
-  p.room = room_view;
-
-  for (p.floor = FLOORS; p.floor >= -1; p.floor--)
-    for (p.place = -1; p.place < PLACES; p.place++) {
-      draw_fire (bitmap, &p, vm);
-      draw_balcony_stars (bitmap, &p, vm);
-    }
-
-  for (p.floor = FLOORS; p.floor >= 0; p.floor--)
-    for (p.place = -1; p.place < PLACES; p.place++)
-      draw_no_floor_selection (bitmap, &p);
-
-  if (! no_room_drawing) draw_room (bitmap, room_view, em, vm);
-
-  for (p.floor = FLOORS; p.floor >= -1; p.floor--)
-    for (p.place = -1; p.place < PLACES; p.place++) {
-      if (con (&p)->fg != MIRROR) continue;
-      update_mirror_bitmap (bitmap, &p);
-      if (! no_room_drawing) draw_mirror (bitmap, &p, em, vm);
-    }
-
-  /* loose_floor_fall_debug (); */
-
-  for (p.floor = FLOORS; p.floor >= -1; p.floor--)
-    for (p.place = -1; p.place < PLACES; p.place++) {
-      draw_falling_loose_floor (bitmap, &p, em, vm);
-    }
-
-  draw_anims (bitmap, em, vm);
-
-  for (p.floor = FLOORS; p.floor >= -1; p.floor--)
-    for (p.place = -1; p.place < PLACES; p.place++) {
-      draw_potion (bitmap, &p, em, vm);
-      if (is_sword (&p)) draw_sword (bitmap, &p, vm);
-    }
-
-  room_view = room_view_bkp;
-}
-
 static void
 draw_level (void)
 {
@@ -907,7 +859,7 @@ level_undo (struct diffset *diffset, int dir, char *prefix)
   apply_to_diff_pos (&diffset->diff[(dir >= 0) ? i + 1 : i], destroy_con_at_pos);
   apply_diffset_diff (diffset, &level, sizeof (level), dir, &text);
   apply_to_diff_pos (&diffset->diff[(dir >= 0) ? i + 1 : i], register_con_at_pos);
-  update_wall_cache (em, vm);
+  update_cache (em, vm);
   generate_mirrors_reflex ();
   generate_stars ();
 
