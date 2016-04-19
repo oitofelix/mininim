@@ -19,8 +19,6 @@
 
 #include "mininim.h"
 
-static ALLEGRO_BITMAP *mirror_bitmap[FLOORS + 2][PLACES + 1];
-
 /* dungeon cga */
 ALLEGRO_BITMAP *dc_mirror;
 
@@ -62,9 +60,6 @@ load_mirror (void)
 
   /* palace vga */
   pv_mirror = load_bitmap (PV_MIRROR);
-
-  /* callbacks */
-  register_room_callback (create_mirror_bitmaps);
 }
 
 void
@@ -87,9 +82,6 @@ unload_mirror (void)
 
   /* palace vga */
   destroy_bitmap (pv_mirror);
-
-  /* callbacks */
-  remove_room_callback (create_mirror_bitmaps);
 }
 
 void
@@ -142,19 +134,18 @@ uncross_mirrors (void)
 }
 
 void
-create_mirror_bitmaps (int last_room, int room)
+generate_mirrors_reflex_for_cell (int x, int y)
 {
   struct coord c;
   struct pos p;
-  p.room = room;
+  p.room = mr.cell[x][y].room;
 
   for (p.floor = FLOORS; p.floor >= -1; p.floor--)
     for (p.place = -1; p.place < PLACES; p.place++) {
-      ALLEGRO_BITMAP **b = &mirror_bitmap[p.floor + 1][p.place + 1];
-      if (*b) {
-        destroy_bitmap (*b);
-        *b = NULL;
-      }
+      ALLEGRO_BITMAP **b = &mr.cell[x][y].mirror[p.floor + 1][p.place + 1];
+      destroy_bitmap (*b);
+      *b = NULL;
+
       if (con (&p)->fg != MIRROR) continue;
 
       mirror_coord (&p, &c);
@@ -165,11 +156,20 @@ create_mirror_bitmaps (int last_room, int room)
 }
 
 void
+generate_mirrors_reflex (void)
+{
+  int x, y;
+  for (y = mr.h - 1; y >= 0; y--)
+    for (x = 0; x < mr.w; x++)
+      generate_mirrors_reflex_for_cell (x, y);
+}
+
+void
 update_mirror_bitmap (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   struct coord c;
 
-  ALLEGRO_BITMAP *b = mirror_bitmap[p->floor + 1][p->place + 1];
+  ALLEGRO_BITMAP *b = mr.cell[mr.dx][mr.dy].mirror[p->floor + 1][p->place + 1];
   if (! b) return;
 
   struct rect r = new_rect (p->room, p->place * PLACE_WIDTH + 6,
@@ -219,7 +219,7 @@ draw_mirror (ALLEGRO_BITMAP *bitmap, struct pos *p,
   if (peq (p, &mouse_pos))
     mirror = apply_palette (mirror, selection_palette);
 
-  ALLEGRO_BITMAP *b = mirror_bitmap[p->floor + 1][p->place + 1];
+  ALLEGRO_BITMAP *b = mr.cell[mr.dx][mr.dy].mirror[p->floor + 1][p->place + 1];
   if (b) draw_bitmapc (b, bitmap, mirror_reflex_coord (p, &c), 0);
   draw_bitmapc (mirror, bitmap, mirror_coord (p, &c), 0);
 }
@@ -254,7 +254,7 @@ draw_mirror_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
   if (peq (p, &mouse_pos))
     mirror = apply_palette (mirror, selection_palette);
 
-  ALLEGRO_BITMAP *b = mirror_bitmap[p->floor + 1][p->place + 1];
+  ALLEGRO_BITMAP *b = mr.cell[mr.dx][mr.dy].mirror[p->floor + 1][p->place + 1];
   if (b) draw_bitmapc (b, bitmap, mirror_reflex_coord (p, &c), 0);
 
   int h = al_get_bitmap_height (mirror);

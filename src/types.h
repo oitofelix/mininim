@@ -86,6 +86,7 @@ struct multi_room {
       size_t count;
     } stars[FLOORS + 2][PLACES + 1];
 
+    ALLEGRO_BITMAP *mirror[FLOORS + 2][PLACES + 1];
   } **cell;
 
   struct {

@@ -312,7 +312,10 @@ draw_multi_rooms (void)
     update_wall_cache (em, vm);
   }
 
-  if (has_mr_view_changed ()) generate_stars ();
+  if (has_mr_view_changed ()) {
+    generate_stars ();
+    generate_mirrors_reflex ();
+  }
 
   if (mouse_pos.room != mr.last.mouse_pos.room
       || mouse_pos.floor != mr.last.mouse_pos.floor
