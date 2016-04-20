@@ -96,9 +96,9 @@ register_con_undo (struct undo *u, struct pos *p,
 {
   struct con c;
 
-  c.fg = (fg != IGNORE) ? fg : con (p)->fg;
-  c.bg = (bg != IGNORE) ? bg : con (p)->bg;
-  c.ext = (ext != IGNORE) ? (union conext) ext : con (p)->ext;
+  c.fg = (fg != MIGNORE) ? fg : con (p)->fg;
+  c.bg = (bg != MIGNORE) ? bg : con (p)->bg;
+  c.ext = (ext != MIGNORE) ? (union conext) ext : con (p)->ext;
 
   /* if (! memcmp (con (p), &c, sizeof (c))) return; */
 

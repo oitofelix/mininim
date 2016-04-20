@@ -396,7 +396,7 @@ compute_loose_floor_release (struct loose_floor *l)
   case 9: l->state = 2; l->i++; break;
   case 10:
     register_con_undo (&undo, &l->p,
-                       NO_FLOOR, IGNORE, IGNORE,
+                       NO_FLOOR, MIGNORE, MIGNORE,
                        false, false, false, false,
                        "LOOSE FLOOR RELEASE");
     l->state = 2;
@@ -547,7 +547,7 @@ compute_loose_floor_fall (struct loose_floor *l)
       l->p = p;
       l->i = 0;
       register_con_undo (&undo, &p,
-                         NO_FLOOR, IGNORE, IGNORE,
+                         NO_FLOOR, MIGNORE, MIGNORE,
                          false, false, false, false,
                          "LOOSE FLOOR CHAIN RELEASE");
       must_sort = true;
@@ -568,7 +568,7 @@ compute_loose_floor_fall (struct loose_floor *l)
       && con (&p)->fg != OPENER_FLOOR
       && con (&p)->fg != CLOSER_FLOOR) {
     register_con_undo (&undo, &p,
-                       BROKEN_FLOOR, IGNORE, IGNORE,
+                       BROKEN_FLOOR, MIGNORE, MIGNORE,
                        false, false, false, false,
                        "LOOSE FLOOR BREAKING");
   }

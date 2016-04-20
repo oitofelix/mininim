@@ -20,7 +20,8 @@
 #ifndef MININIM_TYPES_H
 #define MININIM_TYPES_H
 
-/* video mode */
+typedef int (* m_comparison_fn_t) (const void *, const void *);
+
 enum vm {
   CGA, EGA, VGA,
 };

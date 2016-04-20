@@ -401,7 +401,7 @@ editor (void)
     case 'W':
       if (con (&p)->fg == WALL) break;
       register_con_undo (&undo, &p,
-                         WALL, IGNORE, IGNORE,
+                         WALL, MIGNORE, MIGNORE,
                          true, false, true, true,
                          "WALL");
       break;
@@ -409,14 +409,14 @@ editor (void)
     case 'C':
       if (con (&p)->fg == CHOPPER) break;
       register_con_undo (&undo, &p,
-                         CHOPPER, IGNORE, IGNORE,
+                         CHOPPER, MIGNORE, MIGNORE,
                          true, true, true, true,
                          "CHOPPER");
       break;
     case 'M':
       if (con (&p)->fg == MIRROR) break;
       register_con_undo (&undo, &p,
-                         MIRROR, IGNORE, IGNORE,
+                         MIRROR, MIGNORE, MIGNORE,
                          true, true, true, true,
                          "MIRROR");
       break;
@@ -458,7 +458,7 @@ editor (void)
     }
 
     register_con_undo (&undo, &p,
-                       fg, IGNORE, IGNORE,
+                       fg, MIGNORE, MIGNORE,
                        true, true, false, true,
                        "FLOOR");
     break;
@@ -484,7 +484,7 @@ editor (void)
     }
 
     register_con_undo (&undo, &p,
-                       fg, IGNORE, IGNORE,
+                       fg, MIGNORE, MIGNORE,
                        true, false, false, true,
                        "PILLAR");
     break;
@@ -512,7 +512,7 @@ editor (void)
     }
 
     register_con_undo (&undo, &p,
-                       fg, IGNORE, IGNORE,
+                       fg, MIGNORE, MIGNORE,
                        true, true, false, true,
                        "DOOR");
     break;
@@ -536,7 +536,7 @@ editor (void)
     }
 
     register_con_undo (&undo, &p,
-                       fg, IGNORE, IGNORE,
+                       fg, MIGNORE, MIGNORE,
                        true, false, false, true,
                        "CARPET");
     break;
@@ -562,7 +562,7 @@ editor (void)
     }
 
     register_con_undo (&undo, &p,
-                       fg, IGNORE, IGNORE,
+                       fg, MIGNORE, MIGNORE,
                        true, false, false, true,
                        "ARCH");
     break;
@@ -593,7 +593,7 @@ editor (void)
     }
 
     register_con_undo (&undo, &p,
-                       IGNORE, bg, IGNORE,
+                       MIGNORE, bg, MIGNORE,
                        false, false, (bg == BALCONY), true,
                        "BACKGROUND");
     break;
@@ -628,7 +628,7 @@ editor (void)
       }
 
       register_con_undo (&undo, &p,
-                         IGNORE, IGNORE, ext.item,
+                         MIGNORE, MIGNORE, ext.item,
                          false, false, false, true,
                          "ITEM EXTENSION");
       break;
@@ -643,7 +643,7 @@ editor (void)
       }
 
       register_con_undo (&undo, &p,
-                         IGNORE, IGNORE, b0,
+                         MIGNORE, MIGNORE, b0,
                          true, true, false, true,
                          "CAN'T FALL EXTENSION");
       break;
@@ -676,7 +676,7 @@ editor (void)
       }
 
       register_con_undo (&undo, &p,
-                         IGNORE, IGNORE, b ? r | 0x80 : r & ~ 0x80,
+                         MIGNORE, MIGNORE, b ? r | 0x80 : r & ~ 0x80,
                          true, true, false, true,
                          "STEP EXTENSION");
       break;
@@ -696,7 +696,7 @@ editor (void)
       }
 
       register_con_undo (&undo, &p,
-                         IGNORE, IGNORE, ext.design,
+                         MIGNORE, MIGNORE, ext.design,
                          false, false, false, true,
                          "DESIGN EXTENSION");
       break;
@@ -718,7 +718,7 @@ editor (void)
       }
 
       register_con_undo (&undo, &p,
-                         IGNORE, IGNORE, ext.design,
+                         MIGNORE, MIGNORE, ext.design,
                          false, false, false, true,
                          "DESIGN EXTENSION");
       break;
@@ -1510,7 +1510,7 @@ menu_step_ext (struct pos *p, int min, int max)
   }
 
   register_con_undo (&undo, p,
-                     IGNORE, IGNORE, r,
+                     MIGNORE, MIGNORE, r,
                      true, true, false, true,
                      "STEP EXTENSION");
   return c;
@@ -1529,7 +1529,7 @@ menu_event_ext (struct pos *p)
   }
 
   register_con_undo (&undo, p,
-                     IGNORE, IGNORE, r,
+                     MIGNORE, MIGNORE, r,
                      true, true, false, true,
                      "EVENT EXTENSION");
   return c;

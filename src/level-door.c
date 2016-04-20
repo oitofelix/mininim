@@ -206,7 +206,7 @@ break_level_door (struct pos *p)
   d->broken = true;
   register_con_undo
     (&undo, p,
-     IGNORE, IGNORE, -abs (con (p)->ext.step) - 1,
+     MIGNORE, MIGNORE, -abs (con (p)->ext.step) - 1,
      false, false, false, false, "LOOSE FLOOR BREAKING");
 }
 

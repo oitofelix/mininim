@@ -206,7 +206,7 @@ break_opener_floor (struct pos *p)
   o->broken = true;
   register_con_undo
     (&undo, p,
-     IGNORE, IGNORE, -abs (con (p)->ext.event) - 1,
+     MIGNORE, MIGNORE, -abs (con (p)->ext.event) - 1,
      false, false, false, false, "LOOSE FLOOR BREAKING");
 }
 

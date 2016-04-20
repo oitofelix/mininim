@@ -193,7 +193,7 @@ physics_out (struct anim *k)
   if (k->i == 0) {
     k->item = con (&k->item_pos)->ext.item;
     register_con_undo (&undo, &k->item_pos,
-                       IGNORE, IGNORE, NO_ITEM,
+                       MIGNORE, MIGNORE, NO_ITEM,
                        false, false, false, false, "CONSUME ITEM");
   }
 }

@@ -37,14 +37,14 @@ register_changed_pos (struct pos *p)
     add_to_array (&np, 1, changed_pos, &changed_pos_nmemb,
                   changed_pos_nmemb, sizeof (np));
 
-  qsort (changed_pos, changed_pos_nmemb, sizeof (np), (comparison_fn_t) cpos);
+  qsort (changed_pos, changed_pos_nmemb, sizeof (np), (m_comparison_fn_t) cpos);
 }
 
 struct pos *
 get_changed_pos (struct pos *p)
 {
   return bsearch (p, changed_pos, changed_pos_nmemb, sizeof (* p),
-                  (comparison_fn_t) cpos);
+                  (m_comparison_fn_t) cpos);
 }
 
 static void
