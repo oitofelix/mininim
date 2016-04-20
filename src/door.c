@@ -231,6 +231,7 @@ compute_doors (void)
         }
         d->i--;
         d->wait = DOOR_WAIT;
+        register_changed_pos (&d->p);
       }
       break;
     case CLOSE_DOOR:
@@ -240,6 +241,7 @@ compute_doors (void)
           play_sample (door_close_sample, d->p.room);
           d->i++;
           d->noise = false;
+          register_changed_pos (&d->p);
         }
       } else if (d->i == DOOR_MAX_STEP) {
         play_sample (door_end_sample, d->p.room);
@@ -252,6 +254,7 @@ compute_doors (void)
       if (d->i < DOOR_MAX_STEP) {
         int r = 11 - (d->i % 12);
         d->i += r ? r : 12;
+        register_changed_pos (&d->p);
         if (d->i >= DOOR_MAX_STEP) {
           d->i = DOOR_MAX_STEP;
           alert_guards (&d->p);

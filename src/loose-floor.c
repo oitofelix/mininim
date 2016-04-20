@@ -544,21 +544,20 @@ compute_loose_floor_fall (struct loose_floor *l)
       must_remove = true;
       l->f = nf;
       l->f.b = get_correct_falling_loose_floor_bitmap (dv_broken_floor);
-      l->p = fpmbo_f;
+      l->p = p;
       l->i = 0;
-      register_con_undo (&undo, &l->p,
+      register_con_undo (&undo, &p,
                          NO_FLOOR, IGNORE, IGNORE,
                          false, false, false, false,
                          "LOOSE FLOOR CHAIN RELEASE");
-      register_changed_pos (&l->p);
       must_sort = true;
       play_sample (broken_floor_sample, p.room);
       alert_guards (&p);
       return;
-    case OPENER_FLOOR: break_opener_floor (&fpmbo_f); break;
-    case CLOSER_FLOOR: break_closer_floor (&fpmbo_f); break;
-    case SPIKES_FLOOR: break_spikes_floor (&fpmbo_f); break;
-    case LEVEL_DOOR: break_level_door (&fpmbo_f); break;
+    case OPENER_FLOOR: break_opener_floor (&p); break;
+    case CLOSER_FLOOR: break_closer_floor (&p); break;
+    case SPIKES_FLOOR: break_spikes_floor (&p); break;
+    case LEVEL_DOOR: break_level_door (&p); break;
     default: break;
     }
   }

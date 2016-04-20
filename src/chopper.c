@@ -362,16 +362,29 @@ compute_choppers (void)
       if ((c->wait-- <= 0 && should_chomp (&c->p)
            && (anim_cycle % CHOPPER_WAIT) ==
            prandom_pos (&c->p, CHOPPER_WAIT - 1))
-          || c->activate) c->i++; break;
+          || c->activate) {
+        c->i++;
+        register_changed_pos (&c->p);
+      }
+      break;
     case 1: c->i++;
       if (c->alert) {
         alert_guards (&c->p);
         c->alert = false;
       }
-      play_sample (chopper_sample, c->p.room); break;
-    case 2: c->i++; break;
-    case 3: c->i++; break;
+      play_sample (chopper_sample, c->p.room);
+      register_changed_pos (&c->p);
+      break;
+    case 2:
+      c->i++;
+      register_changed_pos (&c->p);
+      break;
+    case 3:
+      c->i++;
+      register_changed_pos (&c->p);
+      break;
     case 4: c->i = 0; c->wait = CHOPPER_WAIT; c->activate = false;
+      register_changed_pos (&c->p);
       break;
     }
 

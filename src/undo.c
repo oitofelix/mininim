@@ -129,6 +129,8 @@ register_con_undo (struct undo *u, struct pos *p,
   *con (p) = d->f;
   if (should_register) register_con_at_pos (p);
   if (should_prepare) prepare_con_at_pos (p);
+
+  register_changed_pos (p);
 }
 
 void
@@ -138,6 +140,7 @@ con_undo (struct con_undo *d, int dir)
   *con (&d->p) = (dir >= 0) ? d->f : d->b;
   register_con_at_pos (&d->p);
   prepare_con_at_pos (&d->p);
+  register_changed_pos (&d->p);
 }
 
 /*********************/

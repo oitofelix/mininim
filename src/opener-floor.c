@@ -192,7 +192,10 @@ press_opener_floor (struct pos *p)
 {
   struct opener_floor *o = opener_floor_at_pos (p);
   if (! o) return;
-  o->pressed = true;
+  if (! o->pressed) {
+    o->pressed = true;
+    register_changed_pos (p);
+  }
 }
 
 void
@@ -212,7 +215,10 @@ unpress_opener_floors (void)
 {
   size_t i;
   for (i = 0; i < opener_floor_nmemb; i++)
-    opener_floor[i].pressed = false;
+    if (opener_floor[i].pressed) {
+      opener_floor[i].pressed = false;
+      register_changed_pos (&opener_floor[i].p);
+    }
 }
 
 void

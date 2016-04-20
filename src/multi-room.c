@@ -401,33 +401,123 @@ update_cache (enum em em, enum vm vm)
 void
 update_cache_pos (struct pos *p, enum em em, enum vm vm)
 {
+  static bool recursive = false;
+
   int x, y;
-  struct pos np; npos (p, &np);
 
   int room_view_bkp = room_view;
 
-  struct pos pl; prel (p, &pl, +0, -1);
   struct pos pbl; prel (p, &pbl, +1, -1);
+  struct pos pb; prel (p, &pb, +1, +0);
+  struct pos pbr; prel (p, &pbr, +1, +1);
+
+  struct pos pl; prel (p, &pl, +0, -1);
+  struct pos pr; prel (p, &pr, +0, +1);
+
+  struct pos pa; prel (p, &pa, -1, +0);
+  struct pos pal; prel (p, &pal, -1, -1);
+  struct pos par; prel (p, &par, -1, +1);
+
+  bool is_displayed = false;
 
   for (y = mr.h - 1; y >= 0; y--)
     for (x = 0; x < mr.w; x++)
-      if (mr.cell[x][y].room == np.room) {
-        room_view = np.room;
+      if (mr.cell[x][y].room == p->room) {
+        room_view = p->room;
         mr.dx = x;
         mr.dy = y;
+
+        int cx, cy, cw, ch;
+        switch (con (p)->fg) {
+        default:
+          cx = PLACE_WIDTH * p->place;
+          cy = PLACE_HEIGHT * p->floor - 10;
+          cw = 2 * PLACE_WIDTH;
+          ch = PLACE_HEIGHT + 3 + 10;
+          break;
+        }
+
         set_target_bitmap (mr.cell[x][y].cache);
-        al_set_clipping_rectangle (PLACE_WIDTH * np.place, PLACE_HEIGHT * np.floor + 3,
-                                   2 * PLACE_WIDTH - 6, PLACE_HEIGHT);
-        al_clear_to_color (BLACK);
+        al_set_clipping_rectangle (cx, cy, cw, ch);
+        al_clear_to_color (TRANSPARENT_COLOR);
 
+        draw_conbg (mr.cell[x][y].cache, &pbl, em, vm);
+        draw_conbg (mr.cell[x][y].cache, &pb, em, vm);
+        draw_conbg (mr.cell[x][y].cache, &pbr, em, vm);
+
+        draw_conbg (mr.cell[x][y].cache, &pl, em, vm);
         draw_conbg (mr.cell[x][y].cache, p, em, vm);
+        draw_conbg (mr.cell[x][y].cache, &pr, em, vm);
 
-        draw_confg_right (mr.cell[x][y].cache, &pbl, em, vm, false);
+        draw_conbg (mr.cell[x][y].cache, &pal, em, vm);
+        draw_conbg (mr.cell[x][y].cache, &pa, em, vm);
+        draw_conbg (mr.cell[x][y].cache, &par, em, vm);
+
+        draw_confg_right (mr.cell[x][y].cache, &pbl, em, vm, true);
+        draw_confg_right (mr.cell[x][y].cache, &pb, em, vm, true);
         draw_confg_right (mr.cell[x][y].cache, &pl, em, vm, false);
+
         draw_confg (mr.cell[x][y].cache, p, em, vm, true);
 
+        draw_confg_right (mr.cell[x][y].cache, &pal, em, vm, false);
+        draw_confg (mr.cell[x][y].cache, &pa, em, vm, false);
+        draw_confg_base (mr.cell[x][y].cache, &par, em, vm);
+        draw_confg_left (mr.cell[x][y].cache, &par, em, vm, false);
+
         al_reset_clipping_rectangle ();
+        al_hold_bitmap_drawing (false);
+        is_displayed = true;
       }
+
+  if (! recursive && is_displayed && p->place == PLACES - 1) {
+    struct pos p0;
+    p0.room = roomd (p->room, RIGHT);
+    p0.floor = p->floor;
+    p0.place = -1;
+    recursive = true;
+    update_cache_pos (&p0, em, vm);
+    recursive = false;
+  }
+
+  if (! recursive && is_displayed && p->place == -1) {
+    struct pos p0;
+    p0.room = roomd (p->room, LEFT);
+    p0.floor = p->floor;
+    p0.place = PLACES - 1;
+    recursive = true;
+    update_cache_pos (&p0, em, vm);
+    recursive = false;
+  }
+
+  if (! recursive && is_displayed && p->floor == FLOORS - 1) {
+    struct pos p0;
+    p0.room = roomd (p->room, BELOW);
+    p0.floor = -1;
+    p0.place = p->place;
+    recursive = true;
+    update_cache_pos (&p0, em, vm);
+    recursive = false;
+  }
+
+  /* if (! recursive && p->floor == FLOORS) { */
+  /*   struct pos p0; */
+  /*   p0.room = roomd (p->room, BELOW); */
+  /*   p0.floor = 0; */
+  /*   p0.place = p->place; */
+  /*   recursive = true; */
+  /*   update_cache_pos (&p0, em, vm); */
+  /*   recursive = false; */
+  /* } */
+
+  if (! recursive && is_displayed && p->floor == -1) {
+    struct pos p0;
+    p0.room = roomd (p->room, ABOVE);
+    p0.floor = FLOORS - 1;
+    p0.place = p->place;
+    recursive = true;
+    update_cache_pos (&p0, em, vm);
+    recursive = false;
+  }
 
   room_view = room_view_bkp;
 }
@@ -470,8 +560,10 @@ draw_multi_rooms (void)
   }
 
   size_t i;
-  for (i = 0; i < changed_pos_nmemb; i++)
+  for (i = 0; i < changed_pos_nmemb; i++) {
+    /* printf ("%i,%i,%i\n", changed_pos[i].room, changed_pos[i].floor, changed_pos[i].place); */
     update_cache_pos (&changed_pos[i], em, vm);
+  }
   destroy_array ((void **) &changed_pos, &changed_pos_nmemb);
 
   clear_bitmap (screen, BLACK);

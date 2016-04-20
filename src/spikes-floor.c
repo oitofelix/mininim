@@ -416,20 +416,52 @@ compute_spikes_floors (void)
         s->i++;
         s->wait = 12;
         s->state = 1;
-      } else s->state = 0;
+        register_changed_pos (&s->p);
+      } else if (s->state != 0) {
+        s->state = 0;
+        register_changed_pos (&s->p);
+      }
       break;
-    case 1: s->i++; s->state = 2; break;
-    case 2: s->i++; s->state = 3; break;
-    case 3: s->i++; s->state = 4; break;
+    case 1:
+      s->i++;
+      s->state = 2;
+      register_changed_pos (&s->p);
+      break;
+    case 2:
+      s->i++;
+      s->state = 3;
+      register_changed_pos (&s->p);
+      break;
+    case 3:
+      s->i++;
+      s->state = 4;
+      register_changed_pos (&s->p);
+      break;
     case 4: if (! should_spikes_raise (&s->p)) {
         if (s->wait-- == 0) {
           s->i++;
           s->state = 3;
-        } else s->state = 5;
-      } else s->state = 5;
+          register_changed_pos (&s->p);
+        } else {
+          s->state = 5;
+          register_changed_pos (&s->p);
+        }
+      } else {
+        s->state = 5;
+        register_changed_pos (&s->p);
+      }
       break;
-    case 5: s->i++; s->state = 2; break;
-    case 6: s->i = 0; s->state = 1; s->activate = false; break;
+    case 5:
+      s->i++;
+      s->state = 2;
+      register_changed_pos (&s->p);
+      break;
+    case 6:
+      s->i = 0;
+      s->state = 1;
+      s->activate = false;
+      register_changed_pos (&s->p);
+      break;
     }
 
     /* spike kid */

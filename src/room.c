@@ -373,7 +373,7 @@ draw_confg_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case CARPET: case TCARPET:
     draw_confg_base (bitmap, &par, em, vm);
     draw_confg_left (bitmap, &par, em, vm, true);
-    draw_falling_loose_floor (bitmap, &par, em, vm);
+    /* draw_falling_loose_floor (bitmap, &par, em, vm); */
     break;
   default: break;
   }
