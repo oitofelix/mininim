@@ -268,7 +268,7 @@ play_anim (void (*draw_callback) (void),
                   && was_key_pressed (ALLEGRO_KEY_U, 0, ALLEGRO_KEYMOD_SHIFT, true))))
         mr_view_trans (BELOW);
 
-      /* ALT+H: multi-room view to left (J if flipped horizontally) */
+      /* ALT+H: multi-room page view to left (J if flipped horizontally) */
       if (! active_menu
           && ((! flip_gamepad_horizontal
                && was_key_pressed (ALLEGRO_KEY_H, 0, ALLEGRO_KEYMOD_ALT, true))
@@ -276,7 +276,7 @@ play_anim (void (*draw_callback) (void),
                   && was_key_pressed (ALLEGRO_KEY_J, 0, ALLEGRO_KEYMOD_ALT, true))))
         mr_view_page_trans (LEFT);
 
-      /* ALT+J: multi-room view to right (H if flipped horizontally) */
+      /* ALT+J: multi-room page view to right (H if flipped horizontally) */
       if (! active_menu
           && ((! flip_gamepad_horizontal
                && was_key_pressed (ALLEGRO_KEY_J, 0, ALLEGRO_KEYMOD_ALT, true))
@@ -284,7 +284,7 @@ play_anim (void (*draw_callback) (void),
                   && was_key_pressed (ALLEGRO_KEY_H, 0, ALLEGRO_KEYMOD_ALT, true))))
         mr_view_page_trans (RIGHT);
 
-      /* ALT+U: multi-room view above (N if flipped vertically) */
+      /* ALT+U: multi-room page view above (N if flipped vertically) */
       if (! active_menu
           && ((! flip_gamepad_vertical
                && was_key_pressed (ALLEGRO_KEY_U, 0, ALLEGRO_KEYMOD_ALT, true))
@@ -292,7 +292,7 @@ play_anim (void (*draw_callback) (void),
                   && was_key_pressed (ALLEGRO_KEY_N, 0, ALLEGRO_KEYMOD_ALT, true))))
         mr_view_page_trans (ABOVE);
 
-      /* ALT+N: multi-room view below (U if flipped vertically) */
+      /* ALT+N: multi-room page view below (U if flipped vertically) */
       if (! active_menu
           && ((! flip_gamepad_vertical
                && was_key_pressed (ALLEGRO_KEY_N, 0, ALLEGRO_KEYMOD_ALT, true))

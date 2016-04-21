@@ -575,7 +575,7 @@ update_cache_pos (struct pos *p, enum em em, enum vm vm)
         con_caching = false;
       }
 
-  /* printf ("%i,%i,%i\n", p->room, p->floor, p->place); */
+  /* if (is_room_visible (p->room)) printf ("%i,%i,%i\n", p->room, p->floor, p->place); */
 
   if (! recursive && p->place == -1) {
     struct pos p0;
@@ -591,6 +591,16 @@ update_cache_pos (struct pos *p, enum em em, enum vm vm)
     struct pos p0;
     p0.room = roomd (p->room, ABOVE);
     p0.floor = FLOORS - 1;
+    p0.place = p->place;
+    recursive = true;
+    update_cache_pos (&p0, em, vm);
+    recursive = false;
+  }
+
+  if (! recursive && p->floor == 0) {
+    struct pos p0;
+    p0.room = roomd (p->room, ABOVE);
+    p0.floor = FLOORS;
     p0.place = p->place;
     recursive = true;
     update_cache_pos (&p0, em, vm);
@@ -661,7 +671,7 @@ update_cache_pos (struct pos *p, enum em em, enum vm vm)
     recursive = false;
   }
 
-  /* if (! recursive) printf ("----------------------------\n"); */
+  /* if (is_room_visible (p->room) && ! recursive) printf ("----------------------------\n"); */
 
   room_view = room_view_bkp;
 }

@@ -69,7 +69,7 @@ get_mouse_coord (struct coord *c)
   }
 
   c->x = x % ORIGINAL_WIDTH;
-  c->y = (y - 3) % ROOM_HEIGHT;
+  c->y = ((y - 3) % ROOM_HEIGHT) + 3;
 
   return c;
 }
@@ -82,7 +82,7 @@ get_mouse_pos (struct pos *p)
 
   int ry = c.y % PLACE_HEIGHT;
 
-  pos_mr (&c, p);
+  posf (&c, p);
 
   if (edit == EDIT_NONE) {
     *p = (struct pos) {-1,-1,-1};
