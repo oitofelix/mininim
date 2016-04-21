@@ -763,14 +763,9 @@ draw_multi_rooms (void)
 
   if (mr.select_cycles > 0) {
     al_hold_bitmap_drawing (false);
-
-    int x0 = ORIGINAL_WIDTH * mr.x;
-    int y0 = ROOM_HEIGHT * mr.y + 3;
-    int x1 = x0 + ORIGINAL_WIDTH;
-    int y1 = y0 + ROOM_HEIGHT;
-    draw_rectangle (mr.cell[mr.x][mr.y].screen, x0, y0, x1, y1, RED,
-                    max_int (mr.w, mr.h));
-
+    int t = max_int (mr.w, mr.h);
+    draw_rectangle (mr.cell[mr.x][mr.y].screen, 0, 3, ORIGINAL_WIDTH - t,
+                    3 + ROOM_HEIGHT - t, RED, t);
     mr.select_cycles--;
   }
 
