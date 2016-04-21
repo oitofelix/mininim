@@ -254,19 +254,23 @@ draw_wall_face (ALLEGRO_BITMAP *bitmap, struct pos *p,
 void
 draw_wall_left_cache (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
-  struct pos pv; pos2room (p, room_view, &pv);
-  struct coord c; wall_coord (&pv, &c);
-  draw_bitmap_regionc (mr.cell[mr.dx][mr.dy].cache, bitmap, c.x, c.y,
-                       PLACE_WIDTH, PLACE_HEIGHT - 3, &c, 0);
+  struct coord c; wall_coord (p, &c);
+  int x, y;
+  if (mr_coord (p->room, -1, &x, &y))
+    draw_bitmap_regionc (mr.cell[x][y].cache, bitmap, c.x, c.y,
+                         PLACE_WIDTH, PLACE_HEIGHT - 3, &c, 0);
+  else draw_wall_left (bitmap, p, em, vm);
 }
 
 void
 draw_wall_base_cache (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
-  struct pos pv; pos2room (p, room_view, &pv);
-  struct coord c; wall_base_coord (&pv, &c);
-  draw_bitmap_regionc (mr.cell[mr.dx][mr.dy].cache, bitmap, c.x, c.y,
-                       PLACE_WIDTH, 3, &c, 0);
+  struct coord c; wall_base_coord (p, &c);
+  int x, y;
+  if (mr_coord (p->room, -1, &x, &y))
+    draw_bitmap_regionc (mr.cell[x][y].cache, bitmap, c.x, c.y,
+                         PLACE_WIDTH, 3, &c, 0);
+  else draw_wall_base (bitmap, p, em, vm);
 }
 
 enum wall_correlation

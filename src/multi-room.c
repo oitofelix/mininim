@@ -20,6 +20,7 @@
 #include "mininim.h"
 
 ALLEGRO_BITMAP *cache;
+bool con_caching;
 
 struct multi_room mr;
 
@@ -387,6 +388,8 @@ update_cache (enum em em, enum vm vm)
 
   clear_bitmap (cache, TRANSPARENT_COLOR);
 
+  con_caching = true;
+
   for (y = mr.h - 1; y >= 0; y--)
     for (x = 0; x < mr.w; x++) {
       room_view = mr.cell[x][y].room;
@@ -394,6 +397,8 @@ update_cache (enum em em, enum vm vm)
       mr.dy = y;
       draw_room (mr.cell[x][y].cache, room_view, em, vm);
     }
+
+  con_caching = false;
 
   room_view = room_view_bkp;
 }
@@ -418,11 +423,9 @@ update_cache_pos (struct pos *p, enum em em, enum vm vm)
   struct pos pal; prel (p, &pal, -1, -1);
   struct pos par; prel (p, &par, -1, +1);
 
-  bool is_displayed = false;
-
   for (y = mr.h - 1; y >= 0; y--)
     for (x = 0; x < mr.w; x++)
-      if (mr.cell[x][y].room == p->room) {
+      if (p->room && mr.cell[x][y].room == p->room) {
         room_view = p->room;
         mr.dx = x;
         mr.dy = y;
@@ -440,6 +443,8 @@ update_cache_pos (struct pos *p, enum em em, enum vm vm)
         set_target_bitmap (mr.cell[x][y].cache);
         al_set_clipping_rectangle (cx, cy, cw, ch);
         al_clear_to_color (TRANSPARENT_COLOR);
+
+        con_caching = true;
 
         draw_conbg (mr.cell[x][y].cache, &pbl, em, vm);
         draw_conbg (mr.cell[x][y].cache, &pb, em, vm);
@@ -459,27 +464,19 @@ update_cache_pos (struct pos *p, enum em em, enum vm vm)
 
         draw_confg (mr.cell[x][y].cache, p, em, vm, true);
 
-        draw_confg_right (mr.cell[x][y].cache, &pal, em, vm, false);
-        draw_confg (mr.cell[x][y].cache, &pa, em, vm, false);
+        draw_confg_right (mr.cell[x][y].cache, &pal, em, vm, true);
+        draw_confg (mr.cell[x][y].cache, &pa, em, vm, true);
         draw_confg_base (mr.cell[x][y].cache, &par, em, vm);
         draw_confg_left (mr.cell[x][y].cache, &par, em, vm, false);
 
         al_reset_clipping_rectangle ();
         al_hold_bitmap_drawing (false);
-        is_displayed = true;
+        con_caching = false;
       }
 
-  if (! recursive && is_displayed && p->place == PLACES - 1) {
-    struct pos p0;
-    p0.room = roomd (p->room, RIGHT);
-    p0.floor = p->floor;
-    p0.place = -1;
-    recursive = true;
-    update_cache_pos (&p0, em, vm);
-    recursive = false;
-  }
+  /* printf ("%i,%i,%i\n", p->room, p->floor, p->place); */
 
-  if (! recursive && is_displayed && p->place == -1) {
+  if (! recursive && p->place == -1) {
     struct pos p0;
     p0.room = roomd (p->room, LEFT);
     p0.floor = p->floor;
@@ -489,7 +486,27 @@ update_cache_pos (struct pos *p, enum em em, enum vm vm)
     recursive = false;
   }
 
-  if (! recursive && is_displayed && p->floor == FLOORS - 1) {
+  if (! recursive && p->floor == -1) {
+    struct pos p0;
+    p0.room = roomd (p->room, ABOVE);
+    p0.floor = FLOORS - 1;
+    p0.place = p->place;
+    recursive = true;
+    update_cache_pos (&p0, em, vm);
+    recursive = false;
+  }
+
+  if (! recursive && p->place == PLACES - 1) {
+    struct pos p0;
+    p0.room = roomd (p->room, RIGHT);
+    p0.floor = p->floor;
+    p0.place = -1;
+    recursive = true;
+    update_cache_pos (&p0, em, vm);
+    recursive = false;
+  }
+
+  if (! recursive && p->floor == FLOORS - 1) {
     struct pos p0;
     p0.room = roomd (p->room, BELOW);
     p0.floor = -1;
@@ -499,25 +516,51 @@ update_cache_pos (struct pos *p, enum em em, enum vm vm)
     recursive = false;
   }
 
-  /* if (! recursive && p->floor == FLOORS) { */
-  /*   struct pos p0; */
-  /*   p0.room = roomd (p->room, BELOW); */
-  /*   p0.floor = 0; */
-  /*   p0.place = p->place; */
-  /*   recursive = true; */
-  /*   update_cache_pos (&p0, em, vm); */
-  /*   recursive = false; */
-  /* } */
-
-  if (! recursive && is_displayed && p->floor == -1) {
+  if (! recursive && p->floor == -1 && p->place == -1) {
     struct pos p0;
     p0.room = roomd (p->room, ABOVE);
+    p0.room = roomd (p0.room, LEFT);
     p0.floor = FLOORS - 1;
-    p0.place = p->place;
+    p0.place = PLACES - 1;
     recursive = true;
     update_cache_pos (&p0, em, vm);
     recursive = false;
   }
+
+  if (! recursive && p->floor == -1 && p->place == PLACES - 1) {
+    struct pos p0;
+    p0.room = roomd (p->room, ABOVE);
+    p0.room = roomd (p0.room, RIGHT);
+    p0.floor = FLOORS - 1;
+    p0.place = -1;
+    recursive = true;
+    update_cache_pos (&p0, em, vm);
+    recursive = false;
+  }
+
+  if (! recursive && p->floor == FLOORS - 1 && p->place == -1) {
+    struct pos p0;
+    p0.room = roomd (p->room, LEFT);
+    p0.room = roomd (p0.room, BELOW);
+    p0.floor = -1;
+    p0.place = PLACES - 1;
+    recursive = true;
+    update_cache_pos (&p0, em, vm);
+    recursive = false;
+  }
+
+  if (! recursive && p->floor == FLOORS - 1 && p->place == PLACES - 1) {
+    struct pos p0;
+    p0.room = roomd (p->room, BELOW);
+    p0.room = roomd (p0.room, RIGHT);
+    p0.floor = -1;
+    p0.place = -1;
+    recursive = true;
+    update_cache_pos (&p0, em, vm);
+    recursive = false;
+  }
+
+  /* if (! recursive) printf ("----------------------------\n"); */
 
   room_view = room_view_bkp;
 }
@@ -570,6 +613,7 @@ draw_multi_rooms (void)
 
   for (y = mr.h - 1; y >= 0; y--)
     for (x = 0; x < mr.w; x++) {
+      if (! mr.cell[x][y].room) continue;
       mr.dx = x;
       mr.dy = y;
       draw_animated_background (mr.cell[x][y].screen, mr.cell[x][y].room);
@@ -579,6 +623,7 @@ draw_multi_rooms (void)
 
   for (y = mr.h - 1; y >= 0; y--)
     for (x = 0; x < mr.w; x++) {
+      if (! mr.cell[x][y].room) continue;
       mr.dx = x;
       mr.dy = y;
       draw_animated_foreground (mr.cell[x][y].screen, mr.cell[x][y].room);

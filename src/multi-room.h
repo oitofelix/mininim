@@ -22,6 +22,7 @@
 
 /* variables */
 extern ALLEGRO_BITMAP *cache;
+extern bool con_caching;
 extern struct multi_room mr;
 extern int mr_room, mr_x, mr_y;
 

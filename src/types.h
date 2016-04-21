@@ -538,9 +538,9 @@ struct spikes_floor {
   bool activate;
 };
 
-/*******
- * UNDO
- *******/
+/********
+ * UNDO *
+ ********/
 
 typedef void (*undo_f) (void *data, int dir);
 

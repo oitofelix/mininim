@@ -50,6 +50,7 @@ play_level (struct level *lv)
   death_timer = create_timer (1.0 / 12);
 
  start:
+  free_undo (&undo);
   cutscene = false;
   game_paused = false;
   level = *lv;

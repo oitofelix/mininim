@@ -37,6 +37,17 @@ register_undo (struct undo *u, void *data, undo_f f, char *desc)
   u->pass[u->current].desc = desc;
 }
 
+void
+free_undo (struct undo *u)
+{
+  size_t i;
+  for (i = 0; i < u->count; i++)
+    al_free (u->pass[i].data);
+
+  u->count = 0;
+  u->current = -1;
+}
+
 bool
 can_undo (struct undo *u, int dir)
 {

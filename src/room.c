@@ -213,7 +213,10 @@ draw_confg_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case PILLAR: draw_floor_base (bitmap, &pv, em, vm); break;
   case BIG_PILLAR_BOTTOM: draw_floor_base (bitmap, &pv, em, vm); break;
   case BIG_PILLAR_TOP: break;
-  case WALL: draw_wall_base (bitmap, &pv, em, vm); break;
+  case WALL:
+    if (con_caching) draw_wall_base (bitmap, &pv, em, vm);
+    else draw_wall_base_cache (bitmap, &pv);
+    break;
   case DOOR: draw_floor_base (bitmap, &pv, em, vm); break;
   case LEVEL_DOOR: draw_floor_base (bitmap, &pv, em, vm); break;
   case CHOPPER: draw_floor_base (bitmap, &pv, em, vm); break;
@@ -261,7 +264,10 @@ draw_confg_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
     draw_big_pillar_bottom_left (bitmap, &pv, em, vm); break;
   case BIG_PILLAR_TOP:
     draw_big_pillar_top_left (bitmap, &pv, em, vm); break;
-  case WALL: draw_wall_left (bitmap, &pv, em, vm); break;
+  case WALL:
+    if (con_caching) draw_wall_left (bitmap, &pv, em, vm);
+    else draw_wall_left_cache (bitmap, &pv);
+    break;
   case DOOR: draw_door_left (bitmap, &pv, em, vm); break;
   case LEVEL_DOOR: draw_level_door_left (bitmap, &pv, em, vm); break;
   case CHOPPER: draw_chopper_left (bitmap, &pv, em, vm); break;
@@ -406,8 +412,7 @@ draw_confg_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
     draw_big_pillar_bottom_fg (bitmap, &pv, em, vm); break;
   case BIG_PILLAR_TOP:
     draw_big_pillar_top_left (bitmap, &pv, em, vm); break;
-  case WALL:
-    draw_wall_left_cache (bitmap, &pv); break;
+  case WALL: draw_wall_left_cache (bitmap, &pv); break;
   case DOOR: draw_door_fg (bitmap, &pv, f, em, vm); break;
   case LEVEL_DOOR: draw_level_door_fg (bitmap, &pv, f, em, vm); break;
   case CHOPPER: draw_chopper_fg (bitmap, &pv, em, vm); break;
