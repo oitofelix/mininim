@@ -192,8 +192,8 @@ draw_confg_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
                  enum em em, enum vm vm)
 {
   struct pos pv; pos2room (p, room_view, &pv);
-  if (pv.floor < -1 || pv.floor > FLOORS
-      || pv.place < -1 || pv.place > PLACES) return;
+  /* if (pv.floor < -1 || pv.floor > FLOORS */
+  /*     || pv.place < -1 || pv.place > PLACES) return; */
 
   /* if (con (p)->fg != WALL) pv = *p; */
   pv = *p;
@@ -239,8 +239,8 @@ draw_confg_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
                  enum em em, enum vm vm, bool redraw)
 {
   struct pos pv; pos2room (p, room_view, &pv);
-  if (pv.floor < -1 || pv.floor > FLOORS
-      || pv.place < -1 || pv.place > PLACES) return;
+  /* if (pv.floor < -1 || pv.floor > FLOORS */
+  /*     || pv.place < -1 || pv.place > PLACES) return; */
 
   /* if (con (p)->fg != WALL) pv = *p; */
   pv = *p;
@@ -313,8 +313,8 @@ draw_confg_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
                   enum em em, enum vm vm, bool redraw)
 {
   struct pos pv; pos2room (p, room_view, &pv);
-  if (pv.floor < -1 || pv.floor > FLOORS
-      || pv.place < -1 || pv.place >= PLACES) return;
+  /* if (pv.floor < -1 || pv.floor > FLOORS */
+  /*     || pv.place < -1 || pv.place >= PLACES) return; */
 
   pv = *p;
 
@@ -390,8 +390,8 @@ draw_confg_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
                enum em em, enum vm vm, struct frame *f)
 {
   struct pos pv; pos2room (p, room_view, &pv);
-  if (pv.floor < -1 || pv.floor > FLOORS
-      || pv.place < -1 || pv.place > PLACES) return;
+  /* if (pv.floor < -1 || pv.floor > FLOORS */
+  /*     || pv.place < -1 || pv.place > PLACES) return; */
 
   /* if (con (p)->fg != WALL) pv = *p; */
   pv = *p;

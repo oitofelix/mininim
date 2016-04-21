@@ -147,14 +147,14 @@ wall_color (int i)
 }
 
 void
-generate_wall_colors_for_cell (int x, int y)
+generate_wall_colors_for_room (int room, ALLEGRO_COLOR wall_color_array[3][4][11])
 {
 	uint32_t orand_seed;
 	int floor, row, col;
 	int ocolor, bcolor, color;
 
 	orand_seed = random_seed;
-	random_seed = mr.cell[x][y].room;
+	random_seed = room;
 	prandom(1);
 
 	for (floor = 0; floor < 3; floor++) {
@@ -166,8 +166,7 @@ generate_wall_colors_for_cell (int x, int y)
 				do {
 					color = bcolor + prandom (3);
 				} while (color == ocolor);
-				mr.cell[x][y].wall_color[floor][row][col] =
-          wall_color (color);
+				wall_color_array[floor][row][col] = wall_color (color);
 				ocolor = color;
 			}
 		}
@@ -182,7 +181,8 @@ generate_wall_colors (void)
   int x, y;
   for (y = mr.h - 1; y >= 0; y--)
     for (x = 0; x < mr.w; x++)
-      generate_wall_colors_for_cell (x, y);
+      if (mr.cell[x][y].room) generate_wall_colors_for_room (mr.cell[x][y].room, mr.cell[x][y].wall_color);
+      else memcpy (mr.cell[x][y].wall_color, room0_wall_color, sizeof (room0_wall_color));
 }
 
 ALLEGRO_COLOR

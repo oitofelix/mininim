@@ -19,8 +19,10 @@
 
 #include "mininim.h"
 
-ALLEGRO_BITMAP *cache;
+ALLEGRO_BITMAP *cache, *room0;
 bool con_caching;
+
+ALLEGRO_COLOR room0_wall_color[3][4][11];
 
 struct multi_room mr;
 
@@ -180,28 +182,60 @@ mr_count_rooms (void)
   return c;
 }
 
-int
-mr_count_no_rooms_above (void)
+bool
+mr_topmost_cell (int *rx, int *ry)
 {
-  int x, y, c = 0;
-  for (y = 0; y < mr.h; y++) {
+  int x, y;
+  for (y = 0; y < mr.h; y++)
     for (x = 0; x < mr.w; x++)
-      if (mr.cell[x][y].room > 0) return c;
-    c++;
-  }
-  return c;
+      if (mr.cell[x][y].room > 0) {
+        *rx = x, *ry = y;
+        return true;
+      }
+
+  return false;
 }
 
-int
-mr_count_no_rooms_below (void)
+bool
+mr_leftmost_cell (int *rx, int *ry)
 {
-  int x, y, c = 0;
-  for (y = mr.h - 1; y >= 0 ; y--) {
-    for (x = 0; x < mr.w; x++)
-      if (mr.cell[x][y].room > 0) return c;
-    c++;
-  }
-  return c;
+  int x, y;
+  for (x = 0; x < mr.w; x++)
+    for (y = 0; y < mr.h; y++)
+      if (mr.cell[x][y].room > 0) {
+        *rx = x, *ry = y;
+        return true;
+      }
+
+  return false;
+}
+
+bool
+mr_bottommost_cell (int *rx, int *ry)
+{
+  int x, y;
+  for (y = mr.h - 1; y >= 0; y--)
+    for (x = mr.w - 1; x >= 0; x--)
+      if (mr.cell[x][y].room > 0) {
+        *rx = x, *ry = y;
+        return true;
+      }
+
+  return false;
+}
+
+bool
+mr_rightmost_cell (int *rx, int *ry)
+{
+  int x, y;
+  for (x = mr.w - 1; x >= 0; x--)
+    for (y = mr.h - 1; y >= 0; y--)
+      if (mr.cell[x][y].room > 0) {
+        *rx = x, *ry = y;
+        return true;
+      }
+
+  return false;
 }
 
 void
@@ -218,8 +252,11 @@ mr_center_room (int room)
       mr.y = y;
       mr_map_rooms ();
       c = mr_count_rooms ();
-      int ca = mr_count_no_rooms_above ();
-      int cb = mr_count_no_rooms_below ();
+      int cx, cy;
+      mr_topmost_cell (&cx, &cy);
+      int ca = cy;
+      mr_bottommost_cell (&cx, &cy);
+      int cb = (mr.h - 1) - cy;
       int d = abs (ca - cb);
       if (c >= lc && (c > lc || d < ld)) {
         lx = x;
@@ -288,6 +325,48 @@ mr_view_trans (enum dir d)
 
   mr.x += dx;
   mr.y += dy;
+}
+
+void
+mr_view_page_trans (enum dir d)
+{
+  int x, y;
+  mr.select_cycles = 0;
+
+  switch (d) {
+  case RIGHT:
+    mr_rightmost_cell (&x, &y);
+    mr.room = mr.cell[x][y].room;
+    mr.x = 0;
+    mr.y = y;
+    mr_map_rooms ();
+    mr_view_trans (RIGHT);
+    break;
+  case LEFT:
+    mr_leftmost_cell (&x, &y);
+    mr.room = mr.cell[x][y].room;
+    mr.x = mr.w - 1;
+    mr.y = y;
+    mr_map_rooms ();
+    mr_view_trans (LEFT);
+    break;
+  case BELOW:
+    mr_bottommost_cell (&x, &y);
+    mr.room = mr.cell[x][y].room;
+    mr.x = x;
+    mr.y = 0;
+    mr_map_rooms ();
+    mr_view_trans (BELOW);
+    break;
+  case ABOVE:
+    mr_topmost_cell (&x, &y);
+    mr.room = mr.cell[x][y].room;
+    mr.x = x;
+    mr.y = mr.h - 1;
+    mr_map_rooms ();
+    mr_view_trans (ABOVE);
+    break;
+  }
 }
 
 bool
@@ -380,6 +459,26 @@ draw_animated_foreground (ALLEGRO_BITMAP *bitmap, int room)
 }
 
 void
+update_room0_cache (enum em em, enum vm vm)
+{
+  int room_view_bkp = room_view;
+
+  con_caching = true;
+
+  if (room0) clear_bitmap (room0, TRANSPARENT_COLOR);
+  else room0 = create_bitmap (ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
+
+  room_view = 0;
+  mr.dx = 0;
+  mr.dy = 0;
+  draw_room (room0, room_view, em, vm);
+
+  con_caching = false;
+
+  room_view = room_view_bkp;
+}
+
+void
 update_cache (enum em em, enum vm vm)
 {
   int x, y;
@@ -392,10 +491,12 @@ update_cache (enum em em, enum vm vm)
 
   for (y = mr.h - 1; y >= 0; y--)
     for (x = 0; x < mr.w; x++) {
-      room_view = mr.cell[x][y].room;
-      mr.dx = x;
-      mr.dy = y;
-      draw_room (mr.cell[x][y].cache, room_view, em, vm);
+      if (mr.cell[x][y].room) {
+        room_view = mr.cell[x][y].room;
+        mr.dx = x;
+        mr.dy = y;
+        draw_room (mr.cell[x][y].cache, room_view, em, vm);
+      } else draw_bitmap (room0, mr.cell[x][y].cache, 0, 0, 0);
     }
 
   con_caching = false;
@@ -572,6 +673,10 @@ draw_multi_rooms (void)
 
   mr_map_rooms ();
 
+  if (anim_cycle == 0) {
+    generate_wall_colors_for_room (0, room0_wall_color);
+  }
+
   if (em == PALACE && vm == VGA
       && (has_mr_view_changed ()
           || em != mr.last.em
@@ -590,6 +695,14 @@ draw_multi_rooms (void)
       update_cache_pos (&mouse_pos, em, vm);
     if (is_valid_pos (&mr.last.mouse_pos))
       update_cache_pos (&mr.last.mouse_pos, em, vm);
+  }
+
+  if (anim_cycle == 0
+      || em != mr.last.em
+      || vm != mr.last.vm
+      || hgc != mr.last.hgc
+      || hue != mr.last.hue) {
+    update_room0_cache (em, vm);
   }
 
   if (anim_cycle == 0

@@ -21,7 +21,8 @@
 #define MININIM_MULTI_ROOM_H
 
 /* variables */
-extern ALLEGRO_BITMAP *cache;
+extern ALLEGRO_BITMAP *cache, *room0;
+extern ALLEGRO_COLOR room0_wall_color[3][4][11];
 extern bool con_caching;
 extern struct multi_room mr;
 extern int mr_room, mr_x, mr_y;
@@ -32,13 +33,19 @@ bool is_kid_visible (void);
 bool has_mr_view_changed (void);
 bool set_multi_room (int w, int h);
 void mr_map_rooms (void);
+bool mr_topmost_cell (int *rx, int *ry);
+bool mr_leftmost_cell (int *rx, int *ry);
+bool mr_bottommost_cell (int *rx, int *ry);
+bool mr_rightmost_cell (int *rx, int *ry);
 void mr_center_room (int room);
 void mr_select_trans (enum dir d);
 void mr_view_trans (enum dir d);
+void mr_view_page_trans (enum dir d);
 void draw_multi_rooms (void);
 void nmr_coord (int x, int y, int *rx, int *ry);
 bool mr_coord (int room0, enum dir dir, int *rx, int *ry);
 bool ui_set_multi_room (int dw, int dh);
+void update_room0_cache (enum em em, enum vm vm);
 void update_cache (enum em em, enum vm vm);
 void update_cache_pos (struct pos *p, enum em em, enum vm vm);
 void register_changed_pos (struct pos *p);
