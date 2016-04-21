@@ -80,9 +80,9 @@ get_mouse_pos (struct pos *p)
   struct coord c;
   get_mouse_coord (&c);
 
-  int ry = c.y % PLACE_HEIGHT;
+  int ry = (c.y - 3) % PLACE_HEIGHT;
 
-  posf (&c, p);
+  pos_gen (&c, p, 0, 3);
 
   if (edit == EDIT_NONE) {
     *p = (struct pos) {-1,-1,-1};
@@ -95,8 +95,7 @@ get_mouse_pos (struct pos *p)
   case WALL: case PILLAR: case BIG_PILLAR_TOP:
   case BIG_PILLAR_BOTTOM: case ARCH_BOTTOM:
   case ARCH_TOP_MID: case ARCH_TOP_SMALL:
-  case ARCH_TOP_LEFT: case ARCH_TOP_RIGHT:
-    break;
+  case ARCH_TOP_LEFT: case ARCH_TOP_RIGHT: break;
   default:
     if (is_arch_top (prel (p, &p0, +0, -1)))
       break;

@@ -549,12 +549,6 @@ posf (struct coord *c, struct pos *p)
 }
 
 struct pos *
-pos_mr (struct coord *c, struct pos *p)
-{
-  return pos_gen (c, p, 0, 0);
-}
-
-struct pos *
 prel (struct pos *p, struct pos *pr, int floor, int place)
 {
   *pr = *p;

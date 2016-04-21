@@ -462,19 +462,20 @@ void
 update_room0_cache (enum em em, enum vm vm)
 {
   int room_view_bkp = room_view;
-
+  room_view = 0;
+  struct pos mouse_pos_bkp = mouse_pos;
+  mouse_pos.room = -1;
   con_caching = true;
 
   if (room0) clear_bitmap (room0, TRANSPARENT_COLOR);
   else room0 = create_bitmap (ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
 
-  room_view = 0;
   mr.dx = 0;
   mr.dy = 0;
   draw_room (room0, room_view, em, vm);
 
   con_caching = false;
-
+  mouse_pos = mouse_pos_bkp;
   room_view = room_view_bkp;
 }
 
