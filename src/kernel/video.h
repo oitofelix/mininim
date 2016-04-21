@@ -69,7 +69,8 @@ ALLEGRO_COLOR hgc_palette (ALLEGRO_COLOR c);
 
 /* variables */
 extern ALLEGRO_DISPLAY *display;
-extern ALLEGRO_BITMAP *screen, *uscreen;
+/* extern ALLEGRO_BITMAP *screen; */
+extern ALLEGRO_BITMAP *uscreen;
 extern ALLEGRO_BITMAP *effect_buffer;
 extern ALLEGRO_BITMAP *black_screen;
 extern ALLEGRO_TIMER *video_timer;

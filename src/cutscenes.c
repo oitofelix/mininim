@@ -367,6 +367,7 @@ title_anim (void)
     if (! is_video_effect_started ()) i = 0; break;
   }
 
+  ALLEGRO_BITMAP *screen = mr.cell[0][0].screen;
   if (i >= 11 && i <= 26) draw_princess_room (screen, vm);
   else draw_title_screen (screen, i, vm);
 }
@@ -420,6 +421,7 @@ cutscene_01_05_11_anim (void)
     break;
   }
 
+  ALLEGRO_BITMAP *screen = mr.cell[0][0].screen;
   if (i < 2 || is_video_effect_started ())
     draw_princess_room (screen, vm);
 }
@@ -480,6 +482,7 @@ cutscene_11_little_time_left_anim (void)
     break;
   }
 
+  ALLEGRO_BITMAP *screen = mr.cell[0][0].screen;
   if (i < 3 || is_video_effect_started ())
     draw_princess_room (screen, vm);
 }
@@ -541,6 +544,7 @@ cutscene_03_anim (void)
     break;
   }
 
+  ALLEGRO_BITMAP *screen = mr.cell[0][0].screen;
   if (i < 2 || is_video_effect_started ())
     draw_princess_room (screen, vm);
 }
@@ -617,6 +621,7 @@ cutscene_07_anim (void)
     break;
   }
 
+  ALLEGRO_BITMAP *screen = mr.cell[0][0].screen;
   if (i < 4 || is_video_effect_started ())
     draw_princess_room (screen, vm);
 }
@@ -701,6 +706,7 @@ cutscene_08_anim (void)
     break;
   }
 
+  ALLEGRO_BITMAP *screen = mr.cell[0][0].screen;
   if (i < 5 || is_video_effect_started ())
     draw_princess_room (screen, vm);
 }
@@ -835,6 +841,7 @@ cutscene_14_anim (void)
     break;
   }
 
+  ALLEGRO_BITMAP *screen = mr.cell[0][0].screen;
   if (i < 5 || (i == 5 && is_video_effect_started ()))
     draw_princess_room (screen, vm);
   else draw_ending_screen (screen, i, vm);
@@ -881,6 +888,7 @@ cutscene_out_of_time_anim (void)
     break;
   }
 
+  ALLEGRO_BITMAP *screen = mr.cell[0][0].screen;
   if (i < 2 || is_video_effect_started ())
     draw_princess_room (screen, vm);
 }

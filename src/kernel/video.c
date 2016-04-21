@@ -20,7 +20,8 @@
 #include "mininim.h"
 
 ALLEGRO_DISPLAY *display;
-ALLEGRO_BITMAP *screen, *uscreen;
+/* ALLEGRO_BITMAP *screen; */
+ALLEGRO_BITMAP *uscreen;
 ALLEGRO_TIMER *video_timer;
 int screen_flags = 0;
 bool hgc;
@@ -63,6 +64,8 @@ init_video (void)
   al_set_display_icon (display, icon);
 
   set_multi_room (1, 1);
+  effect_buffer = create_bitmap (ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
+  black_screen = create_bitmap (ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
   uscreen = create_bitmap (ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
 
   int flags = al_get_new_bitmap_flags ();
@@ -89,7 +92,7 @@ void
 finalize_video (void)
 {
   destroy_bitmap (icon);
-  destroy_bitmap (screen);
+  /* destroy_bitmap (screen); */
   destroy_bitmap (uscreen);
   destroy_bitmap (effect_buffer);
   destroy_bitmap (black_screen);
@@ -236,7 +239,7 @@ void
 convert_mask_to_alpha (ALLEGRO_BITMAP *bitmap, ALLEGRO_COLOR mask_color)
 {
   al_hold_bitmap_drawing (false);
-  al_convert_mask_to_alpha (screen, BLACK);
+  al_convert_mask_to_alpha (bitmap, mask_color);
 }
 
 void
@@ -368,15 +371,35 @@ flip_display (ALLEGRO_BITMAP *bitmap)
   int w = al_get_display_width (display);
   int h = al_get_display_height (display);
 
-  int bw = al_get_bitmap_width (bitmap);
-  int bh = al_get_bitmap_height (bitmap);
-
   int uw = al_get_bitmap_width (uscreen);
   int uh = al_get_bitmap_height (uscreen);
 
   set_target_backbuffer (display);
   al_clear_to_color (BLACK);
-  al_draw_scaled_bitmap (bitmap, 0, 0, bw, bh, 0, 0, w, h, screen_flags);
+
+  if (bitmap) {
+    int bw = al_get_bitmap_width (bitmap);
+    int bh = al_get_bitmap_height (bitmap);
+    al_draw_scaled_bitmap (bitmap, 0, 0, bw, bh, 0, 0, w, h, screen_flags);
+  } else {
+    int x, y;
+    int tw = ORIGINAL_WIDTH * mr.w;
+    int th = ROOM_HEIGHT * mr.h + 11;
+
+    for (y = mr.h - 1; y >= 0; y--)
+      for (x = 0; x < mr.w; x++) {
+        ALLEGRO_BITMAP *screen = mr.cell[x][y].screen;
+        int sw = al_get_bitmap_width (screen);
+        int sh = al_get_bitmap_height (screen);
+        float dx = ((ORIGINAL_WIDTH * x) * (w - 1)) / (float) tw;
+        float dy = ((ROOM_HEIGHT * y) * (h - 1)) / (float) th;
+        float dw = (sw * w) / (float) tw;
+        float dh = (sh * h) / (float) th;
+        al_draw_scaled_bitmap (mr.cell[x][y].screen, 0, 0, sw, sh,
+                               dx, dy, dw, dh, screen_flags);
+      }
+  }
+
   al_draw_scaled_bitmap (uscreen, 0, 0, uw, uh, 0, 0, w, h, 0);
   al_hold_bitmap_drawing (false);
   al_flip_display ();
@@ -438,6 +461,8 @@ draw_pattern (ALLEGRO_BITMAP *bitmap, int ox, int oy, int w, int h,
 void
 start_video_effect (enum video_effect_type type, int duration)
 {
+  ALLEGRO_BITMAP *screen = mr.cell[0][0].screen;
+
   video_effect.type = type;
   video_effect.duration = duration;
   clear_bitmap (effect_buffer, BLACK);
@@ -449,6 +474,8 @@ start_video_effect (enum video_effect_type type, int duration)
 void
 stop_video_effect (void)
 {
+  ALLEGRO_BITMAP *screen = mr.cell[0][0].screen;
+
   if (! al_get_timer_started (video_timer)) return;
   video_effect.type = VIDEO_NO_EFFECT;
   al_stop_timer (video_timer);
@@ -469,8 +496,10 @@ is_video_effect_started (void)
 void
 show (void)
 {
+  ALLEGRO_BITMAP *screen = mr.cell[0][0].screen;
+
   switch (video_effect.type) {
-  case VIDEO_NO_EFFECT: flip_display (screen); return;
+  case VIDEO_NO_EFFECT: flip_display (NULL); return;
   case VIDEO_OFF: return;
   default: break;
   }

@@ -934,6 +934,6 @@ loose_floor_fall_debug (void)
             cv.room, cv.x, cv.y,
             peq (&l->p, &pv),
             cpos (&l->p, &pv));
-    draw_falling_loose_floor (screen, &loose_floor[i].p, em, vm);
+    draw_falling_loose_floor (mr.cell[mr.dx][mr.dy].screen, &loose_floor[i].p, em, vm);
   }
 }

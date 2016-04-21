@@ -21,7 +21,8 @@
 #define MININIM_MULTI_ROOM_H
 
 /* variables */
-extern ALLEGRO_BITMAP *cache, *room0;
+/* extern ALLEGRO_BITMAP *cache; */
+extern ALLEGRO_BITMAP *room0;
 extern ALLEGRO_COLOR room0_wall_color[3][4][11];
 extern bool con_caching;
 extern struct multi_room mr;

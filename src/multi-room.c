@@ -19,7 +19,8 @@
 
 #include "mininim.h"
 
-ALLEGRO_BITMAP *cache, *room0;
+/* ALLEGRO_BITMAP *cache */
+ALLEGRO_BITMAP *room0;
 bool con_caching;
 
 ALLEGRO_COLOR room0_wall_color[3][4][11];
@@ -57,7 +58,10 @@ destroy_multi_room (void)
 
   if (mr.cell) {
     for (x = 0; x < mr.w; x++) {
-      for (y = 0; y < mr.h; y++) destroy_bitmap (mr.cell[x][y].screen);
+      for (y = 0; y < mr.h; y++) {
+        destroy_bitmap (mr.cell[x][y].screen);
+        destroy_bitmap (mr.cell[x][y].cache);
+      }
       al_free (mr.cell[x]);
       al_free (mr.last.cell[x]);
     }
@@ -65,10 +69,10 @@ destroy_multi_room (void)
     al_free (mr.last.cell);
   };
 
-  destroy_bitmap (screen);
-  destroy_bitmap (effect_buffer);
-  destroy_bitmap (black_screen);
-  destroy_bitmap (cache);
+  /* destroy_bitmap (screen); */
+  /* destroy_bitmap (effect_buffer); */
+  /* destroy_bitmap (black_screen); */
+  /* destroy_bitmap (cache); */
 }
 
 bool
@@ -76,12 +80,12 @@ set_multi_room (int w, int h)
 {
   if (w == mr.w && h == mr.h) return true;
 
-  int sw = ORIGINAL_WIDTH * w;
-  int sh = ROOM_HEIGHT * h + 11;
+  /* int sw = ORIGINAL_WIDTH * w; */
+  /* int sh = ROOM_HEIGHT * h + 11; */
 
-  ALLEGRO_BITMAP *b = create_bitmap (sw, sh);
-  if (! b) return false;
-  destroy_bitmap (b);
+  /* ALLEGRO_BITMAP *b = create_bitmap (sw, sh); */
+  /* if (! b) return false; */
+  /* destroy_bitmap (b); */
 
   destroy_multi_room ();
 
@@ -91,10 +95,10 @@ set_multi_room (int w, int h)
   set_target_backbuffer (display);
   al_set_new_bitmap_flags (ALLEGRO_VIDEO_BITMAP);
 
-  screen = create_bitmap (sw, sh);
-  effect_buffer = create_bitmap (sw, sh);
-  black_screen = create_bitmap (sw, sh);
-  cache = create_bitmap (sw, sh);
+  /* screen = create_bitmap (sw, sh); */
+  /* effect_buffer = create_bitmap (sw, sh); */
+  /* black_screen = create_bitmap (sw, sh); */
+  /* cache = create_bitmap (sw, sh); */
 
   int x, y;
   mr.cell = xcalloc (w, sizeof (* mr.cell));
@@ -103,12 +107,14 @@ set_multi_room (int w, int h)
     mr.cell[x] = xcalloc (h, sizeof (** mr.cell));
     mr.last.cell[x] = xcalloc (h, sizeof (** mr.last.cell));
     for (y = 0; y < h; y++) {
-      int x0 = ORIGINAL_WIDTH * x;
-      int y0 = ROOM_HEIGHT * y;
+      /* int x0 = ORIGINAL_WIDTH * x; */
+      /* int y0 = ROOM_HEIGHT * y; */
       int sw = ORIGINAL_WIDTH;
       int sh = ORIGINAL_HEIGHT - (y < h - 1 ? 8 : 0);
-      mr.cell[x][y].screen = al_create_sub_bitmap (screen, x0, y0, sw, sh);
-      mr.cell[x][y].cache = al_create_sub_bitmap (cache, x0, y0, sw, sh);
+      mr.cell[x][y].screen = al_create_bitmap (sw, sh);
+      mr.cell[x][y].cache = al_create_bitmap (sw, sh);
+      /* mr.cell[x][y].screen = al_create_sub_bitmap (screen, x0, y0, sw, sh); */
+      /* mr.cell[x][y].cache = al_create_sub_bitmap (cache, x0, y0, sw, sh); */
     }
   }
 
@@ -486,8 +492,6 @@ update_cache (enum em em, enum vm vm)
 
   int room_view_bkp = room_view;
 
-  clear_bitmap (cache, TRANSPARENT_COLOR);
-
   con_caching = true;
 
   for (y = mr.h - 1; y >= 0; y--)
@@ -496,6 +500,7 @@ update_cache (enum em em, enum vm vm)
         room_view = mr.cell[x][y].room;
         mr.dx = x;
         mr.dy = y;
+        clear_bitmap (mr.cell[x][y].cache, TRANSPARENT_COLOR);
         draw_room (mr.cell[x][y].cache, room_view, em, vm);
       } else draw_bitmap (room0, mr.cell[x][y].cache, 0, 0, 0);
     }
@@ -733,17 +738,20 @@ draw_multi_rooms (void)
   }
   destroy_array ((void **) &changed_pos, &changed_pos_nmemb);
 
-  clear_bitmap (screen, BLACK);
-
   for (y = mr.h - 1; y >= 0; y--)
     for (x = 0; x < mr.w; x++) {
+      clear_bitmap (mr.cell[x][y].screen, BLACK);
+
       if (! mr.cell[x][y].room) continue;
       mr.dx = x;
       mr.dy = y;
       draw_animated_background (mr.cell[x][y].screen, mr.cell[x][y].room);
     }
 
-  if (! no_room_drawing) draw_bitmap (cache, screen, 0, 0, 0);
+  if (! no_room_drawing)
+    for (y = mr.h - 1; y >= 0; y--)
+      for (x = 0; x < mr.w; x++)
+        draw_bitmap (mr.cell[x][y].cache, mr.cell[x][y].screen, 0, 0, 0);
 
   for (y = mr.h - 1; y >= 0; y--)
     for (x = 0; x < mr.w; x++) {
@@ -760,7 +768,8 @@ draw_multi_rooms (void)
     int y0 = ROOM_HEIGHT * mr.y + 3;
     int x1 = x0 + ORIGINAL_WIDTH;
     int y1 = y0 + ROOM_HEIGHT;
-    draw_rectangle (screen, x0, y0, x1, y1, RED, 1);
+    draw_rectangle (mr.cell[mr.x][mr.y].screen, x0, y0, x1, y1, RED,
+                    max_int (mr.w, mr.h));
 
     mr.select_cycles--;
   }

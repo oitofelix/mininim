@@ -294,10 +294,10 @@ editor (void)
   case EDIT_GUARD_SKILL_REFRACTION:
   case EDIT_GUARD_SKILL_EXTRA_LIFE:
   case EDIT_GUARD_LIVES:
-    draw_start_guards (screen, vm);
+    draw_start_guards (mr.cell[mr.x][mr.y].screen, vm);
     break;
   case EDIT_KID:
-    draw_start_kid (screen, vm);
+    draw_start_kid (mr.cell[mr.x][mr.y].screen, vm);
     break;
   default: break;
  }
