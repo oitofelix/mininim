@@ -417,8 +417,8 @@ compute_choppers (void)
         a->p = c->p;
         a->death_reason = CHOPPER_DEATH;
         if (a->id == current_kid_id) {
-          video_effect.color = get_flicker_blood_color ();
-          start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
+          mr.flicker = 2;
+          mr.color = get_flicker_blood_color ();
         }
         if (a->type == SKELETON)
           play_sample (skeleton_sample, a->f.c.room);

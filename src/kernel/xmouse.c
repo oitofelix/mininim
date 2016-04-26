@@ -49,10 +49,8 @@ get_mouse_coord (struct coord *c)
 {
   int w = al_get_display_width (display);
   int h = al_get_display_height (display);
-  int sw = ORIGINAL_WIDTH * mr.w;
-  int sh = ROOM_HEIGHT * mr.h + 11;
-  /* int sw = al_get_bitmap_width (screen); */
-  /* int sh = al_get_bitmap_height (screen); */
+  int sw, sh;
+  mr_get_resolution (&sw, &sh);
 
   al_get_mouse_state (&mouse_state);
   int x = (mouse_state.x * (sw - 1)) / w;

@@ -509,8 +509,8 @@ compute_loose_floor_fall (struct loose_floor *l)
       play_sample (hit_wall_sample, kpmt.room);
       alert_guards (&kpmt);
       if (a->id == current_kid_id) {
-        video_effect.color = get_flicker_blood_color ();
-        start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
+        mr.flicker = 2;
+        mr.color = get_flicker_blood_color ();
       }
       if (a->current_lives <= 0) {
         a->p = kpmt;

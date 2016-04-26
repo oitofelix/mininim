@@ -1135,7 +1135,8 @@ main (int _argc, char **_argv)
 
  restart_game:
   set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
-  /* clear_bitmap (screen, BLACK); */
+  set_multi_room (1, 1);
+  clear_bitmap (mr.cell[0][0].screen, BLACK);
   clear_bitmap (uscreen, TRANSPARENT_COLOR);
   cutscene_started = false;
   stop_all_samples ();

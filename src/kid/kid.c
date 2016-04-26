@@ -440,8 +440,8 @@ increase_kid_current_lives (struct anim *k)
     if (! is_playing_sample (small_life_potion_sample))
       play_sample (small_life_potion_sample, -1);
     if (k->id == current_kid_id) {
-      video_effect.color = get_flicker_blood_color ();
-      start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.3));
+      mr.flicker = 8;
+      mr.color = get_flicker_blood_color ();
     }
   }
 }
@@ -458,8 +458,8 @@ increase_kid_total_lives (struct anim *k)
   if (! is_playing_sample (big_life_potion_sample))
     play_sample (big_life_potion_sample, -1);
   if (k->id == current_kid_id) {
-    video_effect.color = get_flicker_blood_color ();
-    start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.3));
+    mr.flicker = 8;
+    mr.color = get_flicker_blood_color ();
   }
 }
 
@@ -471,8 +471,8 @@ float_kid (struct anim *k)
   if (! is_playing_sample (floating_sample))
     k->sample = play_sample (floating_sample, -1);
   if (k->id == current_kid_id) {
-    video_effect.color = get_flicker_float_color ();
-    start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.3));
+    mr.flicker = 8;
+    mr.color = get_flicker_float_color ();
   }
 }
 

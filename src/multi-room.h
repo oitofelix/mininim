@@ -21,7 +21,6 @@
 #define MININIM_MULTI_ROOM_H
 
 /* variables */
-/* extern ALLEGRO_BITMAP *cache; */
 extern ALLEGRO_BITMAP *room0;
 extern ALLEGRO_COLOR room0_wall_color[3][4][11];
 extern bool con_caching;
@@ -33,6 +32,7 @@ bool is_room_visible (int room);
 bool is_kid_visible (void);
 bool has_mr_view_changed (void);
 bool set_multi_room (int w, int h);
+void mr_get_resolution (int *w, int *h);
 void mr_map_rooms (void);
 bool mr_topmost_cell (int *rx, int *ry);
 bool mr_leftmost_cell (int *rx, int *ry);

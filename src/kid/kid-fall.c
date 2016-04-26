@@ -250,8 +250,8 @@ physics_in (struct anim *k)
         k->uncouch_slowly = true;
       }
       if (k->id == current_kid_id) {
-        video_effect.color = get_flicker_blood_color ();
-        start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
+        mr.flicker = 2;
+        mr.color = get_flicker_blood_color ();
       }
     } else if (k->i > 3
                && ! al_get_timer_started (k->floating)) {

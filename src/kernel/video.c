@@ -20,7 +20,6 @@
 #include "mininim.h"
 
 ALLEGRO_DISPLAY *display;
-/* ALLEGRO_BITMAP *screen; */
 ALLEGRO_BITMAP *uscreen;
 ALLEGRO_TIMER *video_timer;
 int screen_flags = 0;
@@ -121,7 +120,7 @@ create_bitmap (int w, int h)
   set_target_backbuffer (display);
   ALLEGRO_BITMAP *bitmap = al_create_bitmap (w, h);
   if (! bitmap) {
-    error (0, 0, "%s (%i, %i): cannot create bitmap", __func__, w, h);
+    error (-1, 0, "%s (%i, %i): cannot create bitmap", __func__, w, h);
     return NULL;
   }
   validate_bitmap_for_mingw (bitmap);
@@ -383,8 +382,8 @@ flip_display (ALLEGRO_BITMAP *bitmap)
     al_draw_scaled_bitmap (bitmap, 0, 0, bw, bh, 0, 0, w, h, screen_flags);
   } else {
     int x, y;
-    int tw = ORIGINAL_WIDTH * mr.w;
-    int th = ROOM_HEIGHT * mr.h + 11;
+    int tw, th;
+    mr_get_resolution (&tw, &th);
 
     for (y = mr.h - 1; y >= 0; y--)
       for (x = 0; x < mr.w; x++) {

@@ -68,24 +68,12 @@ destroy_multi_room (void)
     al_free (mr.cell);
     al_free (mr.last.cell);
   };
-
-  /* destroy_bitmap (screen); */
-  /* destroy_bitmap (effect_buffer); */
-  /* destroy_bitmap (black_screen); */
-  /* destroy_bitmap (cache); */
 }
 
 bool
 set_multi_room (int w, int h)
 {
   if (w == mr.w && h == mr.h) return true;
-
-  /* int sw = ORIGINAL_WIDTH * w; */
-  /* int sh = ROOM_HEIGHT * h + 11; */
-
-  /* ALLEGRO_BITMAP *b = create_bitmap (sw, sh); */
-  /* if (! b) return false; */
-  /* destroy_bitmap (b); */
 
   destroy_multi_room ();
 
@@ -95,11 +83,6 @@ set_multi_room (int w, int h)
   set_target_backbuffer (display);
   al_set_new_bitmap_flags (ALLEGRO_VIDEO_BITMAP);
 
-  /* screen = create_bitmap (sw, sh); */
-  /* effect_buffer = create_bitmap (sw, sh); */
-  /* black_screen = create_bitmap (sw, sh); */
-  /* cache = create_bitmap (sw, sh); */
-
   int x, y;
   mr.cell = xcalloc (w, sizeof (* mr.cell));
   mr.last.cell = xcalloc (w, sizeof (* mr.last.cell));
@@ -107,18 +90,23 @@ set_multi_room (int w, int h)
     mr.cell[x] = xcalloc (h, sizeof (** mr.cell));
     mr.last.cell[x] = xcalloc (h, sizeof (** mr.last.cell));
     for (y = 0; y < h; y++) {
-      /* int x0 = ORIGINAL_WIDTH * x; */
-      /* int y0 = ROOM_HEIGHT * y; */
       int sw = ORIGINAL_WIDTH;
       int sh = ORIGINAL_HEIGHT - (y < h - 1 ? 8 : 0);
-      mr.cell[x][y].screen = al_create_bitmap (sw, sh);
-      mr.cell[x][y].cache = al_create_bitmap (sw, sh);
-      /* mr.cell[x][y].screen = al_create_sub_bitmap (screen, x0, y0, sw, sh); */
-      /* mr.cell[x][y].cache = al_create_sub_bitmap (cache, x0, y0, sw, sh); */
+      mr.cell[x][y].screen = create_bitmap (sw, sh);
+      mr.cell[x][y].cache = create_bitmap (sw, sh);
+      clear_bitmap (mr.cell[x][y].screen, BLACK);
+      clear_bitmap (mr.cell[x][y].cache, BLACK);
     }
   }
 
   return true;
+}
+
+void
+mr_get_resolution (int *w, int *h)
+{
+  *w = ORIGINAL_WIDTH * mr.w;
+  *h = ROOM_HEIGHT * mr.h + 11;
 }
 
 void
@@ -263,7 +251,11 @@ mr_center_room (int room)
       int ca = cy;
       mr_bottommost_cell (&cx, &cy);
       int cb = (mr.h - 1) - cy;
-      int d = abs (ca - cb);
+      mr_leftmost_cell (&cx, &cy);
+      int cl = cx;
+      mr_rightmost_cell (&cx, &cy);
+      int cr = (mr.w - 1) - cx;;
+      int d = abs (ca - cb) + abs (cl - cr);
       if (c >= lc && (c > lc || d < ld)) {
         lx = x;
         ly = y;
@@ -530,6 +522,10 @@ update_cache_pos (struct pos *p, enum em em, enum vm vm)
   struct pos pal; prel (p, &pal, -1, -1);
   struct pos par; prel (p, &par, -1, +1);
 
+  struct pos parr; prel (&par, &parr, +0, +1);
+  struct pos prr; prel (&pr, &prr, +0, +1);
+  struct pos pbrr; prel (&pbr, &pbrr, +0, +1);
+
   for (y = mr.h - 1; y >= 0; y--)
     for (x = 0; x < mr.w; x++)
       if (p->room && mr.cell[x][y].room == p->room) {
@@ -575,6 +571,10 @@ update_cache_pos (struct pos *p, enum em em, enum vm vm)
         draw_confg (mr.cell[x][y].cache, &pa, em, vm, true);
         draw_confg_base (mr.cell[x][y].cache, &par, em, vm);
         draw_confg_left (mr.cell[x][y].cache, &par, em, vm, false);
+
+        draw_confg_left (mr.cell[x][y].cache, &parr, em, vm, false);
+        draw_confg_left (mr.cell[x][y].cache, &prr, em, vm, false);
+        draw_confg_left (mr.cell[x][y].cache, &pbrr, em, vm, false);
 
         al_reset_clipping_rectangle ();
         al_hold_bitmap_drawing (false);
@@ -740,13 +740,16 @@ draw_multi_rooms (void)
 
   for (y = mr.h - 1; y >= 0; y--)
     for (x = 0; x < mr.w; x++) {
-      clear_bitmap (mr.cell[x][y].screen, BLACK);
+      clear_bitmap (mr.cell[x][y].screen, (mr.flicker > 0 && mr.flicker % 2)
+                    ? mr.color : BLACK);
 
       if (! mr.cell[x][y].room) continue;
       mr.dx = x;
       mr.dy = y;
       draw_animated_background (mr.cell[x][y].screen, mr.cell[x][y].room);
     }
+
+  if (mr.flicker > 0) mr.flicker--;
 
   if (! no_room_drawing)
     for (y = mr.h - 1; y >= 0; y--)

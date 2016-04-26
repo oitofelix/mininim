@@ -464,8 +464,8 @@ legacy_level_special_events (void)
       /* any harm caused to the shadow reflects to the kid */
       if (ks->action == guard_hit && ks->i == 0
           && is_attacking (k)) {
-        video_effect.color = get_flicker_blood_color ();
-        start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
+        mr.flicker = 2;
+        mr.color = get_flicker_blood_color ();
         play_sample (harm_sample, k->f.c.room);
         k->splash = true;
         k->current_lives--;
@@ -475,8 +475,8 @@ legacy_level_special_events (void)
       /* any harm caused to the kid reflects to the shadow */
       if (k->action == kid_sword_hit && k->i == 0
           && is_attacking (ks)) {
-        video_effect.color = get_flicker_blood_color ();
-        start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.1));
+        mr.flicker = 2;
+        mr.color = get_flicker_blood_color ();
         play_sample (guard_hit_sample, ks->f.c.room);
         ks->splash = true;
         ks->current_lives--;
@@ -500,8 +500,8 @@ legacy_level_special_events (void)
           && is_instance_of_sample (k->sample, success_suspense_sample)
           && get_sample_position (k->sample) >= 3.3
           && ! ks->invisible) {
-        video_effect.color = WHITE;
-        start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.3));
+        mr.flicker = 8;
+        mr.color = WHITE;
         ks->invisible = true;
       }
 
@@ -537,8 +537,8 @@ legacy_level_special_events (void)
         k->f.dir = (k->f.dir == LEFT) ? RIGHT : LEFT;
         kid_turn_run (k);
         k->current_lives = ++k->total_lives;
-        video_effect.color = WHITE;
-        start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.3));
+        mr.flicker = 8;
+        mr.color = WHITE;
       }
       /* while the merge doesn't happen and neither the shadow nor the
          kid are in fight mode, the shadow's movements mirror the
@@ -610,8 +610,8 @@ legacy_level_special_events (void)
          the play timer and display the remaining time */
       if (v->current_lives <= 0
           && ! played_vizier_death_sample) {
-        video_effect.color = WHITE;
-        start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.8));
+        mr.flicker = 12;
+        mr.color = WHITE;
         stop_sample (k->sample, meet_vizier_sample);
         k->sample = play_sample (vizier_death_sample, -1);
         played_vizier_death_sample = true;

@@ -73,6 +73,8 @@ struct multi_room {
   int dx, dy;
   int room;
   int select_cycles;
+  int flicker;
+  ALLEGRO_COLOR color;
 
   struct multi_room_cell {
     ALLEGRO_BITMAP *screen;

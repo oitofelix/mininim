@@ -114,8 +114,8 @@ physics_out (struct anim *k)
   /* sound */
   if (k->i == 0 && k->wait == 5) {
     if (k->id == current_kid_id) {
-      video_effect.color = get_flicker_raise_sword_color ();
-      start_video_effect (VIDEO_FLICKERING, SECS_TO_VCYCLES (0.5));
+      mr.flicker = 8;
+      mr.color = get_flicker_raise_sword_color ();
     }
     play_sample (glory_sample, k->f.c.room);
   }
