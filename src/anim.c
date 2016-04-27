@@ -131,7 +131,7 @@ play_anim (void (*draw_callback) (void),
       memset (&key, 0, sizeof (key));
       break;
     case ALLEGRO_EVENT_DISPLAY_RESIZE:
-      display_resized = true;
+      force_full_redraw = true;
       show ();
       acknowledge_resize ();
       break;
@@ -304,10 +304,6 @@ play_anim (void (*draw_callback) (void),
                   && was_key_pressed (ALLEGRO_KEY_U, 0, ALLEGRO_KEYMOD_ALT, true))))
         mr_view_page_trans (BELOW);
 
-      /* SHIFT+B: enable/disable room drawing */
-      if (was_key_pressed (ALLEGRO_KEY_B, 0, ALLEGRO_KEYMOD_SHIFT, true))
-        no_room_drawing = ! no_room_drawing;
-
       /* CTRL+R: restart game */
       if (was_key_pressed (ALLEGRO_KEY_R, 0, ALLEGRO_KEYMOD_CTRL, true))
         quit_anim = RESTART_GAME;
@@ -335,7 +331,7 @@ play_anim (void (*draw_callback) (void),
       /* F: enable/disable fullscreen mode */
       if (! active_menu
           && was_key_pressed (ALLEGRO_KEY_F, 0, 0, true)) {
-        display_resized = true;
+        force_full_redraw = true;
         char *boolean;
         if (is_fullscreen ()) {
           al_set_display_flag (display, ALLEGRO_FULLSCREEN_WINDOW, false);

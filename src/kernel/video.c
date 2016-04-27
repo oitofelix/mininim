@@ -19,7 +19,7 @@
 
 #include "mininim.h"
 
-bool display_resized;
+bool force_full_redraw;
 int redraw_bottom;
 ALLEGRO_DISPLAY *display;
 ALLEGRO_BITMAP *uscreen;
@@ -378,7 +378,7 @@ flip_display (ALLEGRO_BITMAP *bitmap)
   int uh = al_get_bitmap_height (uscreen);
 
   set_target_backbuffer (display);
-  /* al_clear_to_color (BLACK); */
+  if (force_full_redraw) al_clear_to_color (BLACK);
 
   if (bitmap) {
     int bw = al_get_bitmap_width (bitmap);
@@ -399,12 +399,13 @@ flip_display (ALLEGRO_BITMAP *bitmap)
         float dy = ((ROOM_HEIGHT * y) * h) / (float) th;
         float dw = (sw * w) / (float) tw;
         float dh = (sh * h) / (float) th;
+        if (! mr.cell[x][y].room && no_room_drawing) continue;
         if (mr_view_changed
             || mr.cell[x][y].room
-            || display_resized
             || mr.last.display_width != w
             || mr.last.display_height != h
-            || (dy + dh - 1 >= h - 1 - 8 && redraw_bottom))
+            || (dy + dh - 1 >= h - 1 - 8 && redraw_bottom)
+            || force_full_redraw)
           al_draw_scaled_bitmap (screen, 0, 0, sw, sh, dx, dy, dw, dh, screen_flags);
       }
   }
@@ -413,7 +414,7 @@ flip_display (ALLEGRO_BITMAP *bitmap)
   al_hold_bitmap_drawing (false);
   al_flip_display ();
 
-  display_resized = false;
+  force_full_redraw = false;
   if (redraw_bottom > 0) redraw_bottom--;
 }
 

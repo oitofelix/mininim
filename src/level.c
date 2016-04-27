@@ -435,6 +435,12 @@ process_keys (void)
       && ! cutscene)
     ui_set_multi_room (+0, +1);
 
+  /* SHIFT+B: enable/disable room drawing */
+  if (was_key_pressed (ALLEGRO_KEY_B, 0, ALLEGRO_KEYMOD_SHIFT, true)) {
+    no_room_drawing = ! no_room_drawing;
+    force_full_redraw = true;
+  }
+
   /* ESC: pause game */
   if (step_one_cycle) {
     step_one_cycle = false;
