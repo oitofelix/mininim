@@ -104,6 +104,8 @@ struct multi_room {
     enum hue hue;
     struct pos mouse_pos;
 
+    int display_width, display_height;
+
    struct {
       int room;
     } **cell;

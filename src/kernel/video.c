@@ -19,6 +19,8 @@
 
 #include "mininim.h"
 
+bool display_resized;
+int redraw_bottom;
 ALLEGRO_DISPLAY *display;
 ALLEGRO_BITMAP *uscreen;
 ALLEGRO_TIMER *video_timer;
@@ -287,7 +289,8 @@ draw_bottom_text (ALLEGRO_BITMAP *bitmap, char *text, int priority)
   static int cur_priority = INT_MIN;
 
   if (bitmap == NULL && priority < cur_priority
-      && al_get_timer_count (bottom_text_timer) < BOTTOM_TEXT_DURATION) return;
+      && al_get_timer_count (bottom_text_timer) < BOTTOM_TEXT_DURATION)
+    return;
 
   if (text) {
     if (current_text) al_free (current_text);
@@ -295,12 +298,13 @@ draw_bottom_text (ALLEGRO_BITMAP *bitmap, char *text, int priority)
     al_set_timer_count (bottom_text_timer, 0);
     al_start_timer (bottom_text_timer);
     cur_priority = priority;
-  } else if (al_get_timer_count (bottom_text_timer) >= BOTTOM_TEXT_DURATION
+  } else if ((al_get_timer_started (bottom_text_timer)
+              && al_get_timer_count (bottom_text_timer) >= BOTTOM_TEXT_DURATION)
              || ! bitmap) {
     al_stop_timer (bottom_text_timer);
     cur_priority = INT_MIN;
-  }
-  else if (al_get_timer_started (bottom_text_timer)) {
+    redraw_bottom = 2;
+  } else if (al_get_timer_started (bottom_text_timer)) {
     ALLEGRO_COLOR bg_color;
 
     switch (vm) {
@@ -374,7 +378,7 @@ flip_display (ALLEGRO_BITMAP *bitmap)
   int uh = al_get_bitmap_height (uscreen);
 
   set_target_backbuffer (display);
-  al_clear_to_color (BLACK);
+  /* al_clear_to_color (BLACK); */
 
   if (bitmap) {
     int bw = al_get_bitmap_width (bitmap);
@@ -387,21 +391,30 @@ flip_display (ALLEGRO_BITMAP *bitmap)
 
     for (y = mr.h - 1; y >= 0; y--)
       for (x = 0; x < mr.w; x++) {
-        ALLEGRO_BITMAP *screen = mr.cell[x][y].screen;
+        ALLEGRO_BITMAP *screen = (mr.cell[x][y].room || (mr.w == 1 && mr.h == 1))
+                                  ? mr.cell[x][y].screen : mr.cell[x][y].cache;
         int sw = al_get_bitmap_width (screen);
         int sh = al_get_bitmap_height (screen);
-        float dx = ((ORIGINAL_WIDTH * x) * (w - 1)) / (float) tw;
-        float dy = ((ROOM_HEIGHT * y) * (h - 1)) / (float) th;
+        float dx = ((ORIGINAL_WIDTH * x) * w) / (float) tw;
+        float dy = ((ROOM_HEIGHT * y) * h) / (float) th;
         float dw = (sw * w) / (float) tw;
         float dh = (sh * h) / (float) th;
-        al_draw_scaled_bitmap (mr.cell[x][y].screen, 0, 0, sw, sh,
-                               dx, dy, dw, dh, screen_flags);
+        if (mr_view_changed
+            || mr.cell[x][y].room
+            || display_resized
+            || mr.last.display_width != w
+            || mr.last.display_height != h
+            || (dy + dh - 1 >= h - 1 - 8 && redraw_bottom))
+          al_draw_scaled_bitmap (screen, 0, 0, sw, sh, dx, dy, dw, dh, screen_flags);
       }
   }
 
   al_draw_scaled_bitmap (uscreen, 0, 0, uw, uh, 0, 0, w, h, 0);
   al_hold_bitmap_drawing (false);
   al_flip_display ();
+
+  display_resized = false;
+  if (redraw_bottom > 0) redraw_bottom--;
 }
 
 void

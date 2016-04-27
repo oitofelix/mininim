@@ -261,6 +261,9 @@ draw_wall_left_cache (ALLEGRO_BITMAP *bitmap, struct pos *p)
   if (mr_coord (np.room, -1, &x, &y))
     draw_bitmap_regionc (mr.cell[x][y].cache, bitmap, nc.x, nc.y,
                          PLACE_WIDTH, PLACE_HEIGHT - 3, &c, 0);
+  else if (mr_coord (p->room, -1, &x, &y))
+    draw_bitmap_regionc (mr.cell[x][y].cache, bitmap, c.x, c.y,
+                         PLACE_WIDTH, PLACE_HEIGHT - 3, &c, 0);
   else draw_wall_left (bitmap, p, em, vm);
 }
 
@@ -273,6 +276,9 @@ draw_wall_base_cache (ALLEGRO_BITMAP *bitmap, struct pos *p)
   int x, y;
   if (mr_coord (np.room, -1, &x, &y))
     draw_bitmap_regionc (mr.cell[x][y].cache, bitmap, nc.x, nc.y,
+                         PLACE_WIDTH, 3, &c, 0);
+  else if (mr_coord (p->room, -1, &x, &y))
+    draw_bitmap_regionc (mr.cell[x][y].cache, bitmap, c.x, c.y,
                          PLACE_WIDTH, 3, &c, 0);
   else draw_wall_base (bitmap, p, em, vm);
 }

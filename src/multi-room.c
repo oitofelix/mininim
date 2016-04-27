@@ -19,13 +19,13 @@
 
 #include "mininim.h"
 
-/* ALLEGRO_BITMAP *cache */
 ALLEGRO_BITMAP *room0;
 bool con_caching;
 
 ALLEGRO_COLOR room0_wall_color[3][4][11];
 
 struct multi_room mr;
+bool mr_view_changed;
 
 struct pos *changed_pos = NULL;
 size_t changed_pos_nmemb = 0;
@@ -398,6 +398,8 @@ mr_update_last_settings (void)
   mr.last.hgc = hgc;
   mr.last.hue = hue;
   mr.last.mouse_pos = mouse_pos;
+  mr.last.display_width = al_get_display_width (display);
+  mr.last.display_height = al_get_display_height (display);
 }
 
 void
@@ -689,17 +691,19 @@ draw_multi_rooms (void)
 
   mr_map_rooms ();
 
+  mr_view_changed = has_mr_view_changed ();
+
   if (anim_cycle == 0) {
     generate_wall_colors_for_room (0, room0_wall_color);
   }
 
   if (em == PALACE && vm == VGA
-      && (has_mr_view_changed ()
+      && (mr_view_changed
           || em != mr.last.em
           || vm != mr.last.vm))
     generate_wall_colors ();
 
-  if (has_mr_view_changed ()) {
+  if (mr_view_changed) {
     generate_stars ();
     generate_mirrors_reflex ();
   }
@@ -722,7 +726,7 @@ draw_multi_rooms (void)
   }
 
   if (anim_cycle == 0
-      || has_mr_view_changed ()
+      || mr_view_changed
       || em != mr.last.em
       || vm != mr.last.vm
       || hgc != mr.last.hgc
@@ -753,8 +757,10 @@ draw_multi_rooms (void)
 
   if (! no_room_drawing)
     for (y = mr.h - 1; y >= 0; y--)
-      for (x = 0; x < mr.w; x++)
-        draw_bitmap (mr.cell[x][y].cache, mr.cell[x][y].screen, 0, 0, 0);
+      for (x = 0; x < mr.w; x++) {
+        if (mr.cell[x][y].room)
+          draw_bitmap (mr.cell[x][y].cache, mr.cell[x][y].screen, 0, 0, 0);
+      }
 
   for (y = mr.h - 1; y >= 0; y--)
     for (x = 0; x < mr.w; x++) {

@@ -100,10 +100,12 @@ play_anim (void (*draw_callback) (void),
 
         kid_debug ();
 
-        if (is_video_effect_started ()) {
-          effect_counter--;
-          show ();
-        } else show ();
+        if (anim_cycle > 0) {
+          if (is_video_effect_started ()) {
+            effect_counter--;
+            show ();
+          } else show ();
+        }
 
         if (! pause_anim
             || was_key_pressed (ALLEGRO_KEY_ESCAPE, 0,
@@ -119,6 +121,7 @@ play_anim (void (*draw_callback) (void),
         drop_all_events_from_source
           (event_queue, get_timer_event_source (timer));
         al_set_timer_count (timer, 0);
+
       } else if (event.timer.source == video_timer) {
         show ();
         /* drop_all_events_from_source */
@@ -128,8 +131,9 @@ play_anim (void (*draw_callback) (void),
       memset (&key, 0, sizeof (key));
       break;
     case ALLEGRO_EVENT_DISPLAY_RESIZE:
-      acknowledge_resize ();
+      display_resized = true;
       show ();
+      acknowledge_resize ();
       break;
     case ALLEGRO_EVENT_DISPLAY_EXPOSE:
       show ();
@@ -331,6 +335,7 @@ play_anim (void (*draw_callback) (void),
       /* F: enable/disable fullscreen mode */
       if (! active_menu
           && was_key_pressed (ALLEGRO_KEY_F, 0, 0, true)) {
+        display_resized = true;
         char *boolean;
         if (is_fullscreen ()) {
           al_set_display_flag (display, ALLEGRO_FULLSCREEN_WINDOW, false);

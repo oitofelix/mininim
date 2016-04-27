@@ -679,9 +679,9 @@ process_keys (void)
         if (t >= 252 && t % 12 == 0)
           play_sample (press_key_sample, -1);
         xasprintf (&text, "Press Button to Continue");
-        draw_bottom_text (NULL, text, 0);
+        draw_bottom_text (NULL, text, -2);
         al_free (text);
-      } else if (! active_menu) draw_bottom_text (NULL, "", 0);
+      } else if (! active_menu) draw_bottom_text (NULL, "", -2);
 
       if ((key.keyboard.keycode || button != -1)
           && ! was_menu_key_pressed ())
@@ -691,7 +691,7 @@ process_keys (void)
              && ! game_paused) {
     al_stop_timer (death_timer);
     al_set_timer_count (death_timer, 0);
-    draw_bottom_text (NULL, NULL, 0);
+    draw_bottom_text (NULL, NULL, -2);
   }
 
   camera_follow_kid = (current_kid->f.c.room == room_view)
@@ -761,8 +761,10 @@ display_skill (struct anim *k)
 static void
 draw_lives (ALLEGRO_BITMAP *bitmap, struct anim *k, enum vm vm)
 {
-  if (al_get_timer_started (bottom_text_timer)
-      && al_get_timer_count (bottom_text_timer) < BOTTOM_TEXT_DURATION)
+  if ((al_get_timer_started (bottom_text_timer)
+       && al_get_timer_count (bottom_text_timer) < BOTTOM_TEXT_DURATION)
+      || game_paused
+      || edit != EDIT_NONE)
     return;
 
   if (k->f.c.room == room_view) {

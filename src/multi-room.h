@@ -26,6 +26,7 @@ extern ALLEGRO_COLOR room0_wall_color[3][4][11];
 extern bool con_caching;
 extern struct multi_room mr;
 extern int mr_room, mr_x, mr_y;
+extern bool mr_view_changed;
 
 /* functions */
 bool is_room_visible (int room);
@@ -51,5 +52,6 @@ void update_cache (enum em em, enum vm vm);
 void update_cache_pos (struct pos *p, enum em em, enum vm vm);
 void register_changed_pos (struct pos *p);
 struct pos *get_changed_pos (struct pos *p);
+void mr_update_last_settings (void);
 
 #endif	/* MININIM_MULTI_ROOM_H */

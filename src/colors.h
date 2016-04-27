@@ -132,11 +132,11 @@
 #define C_TEXT_LINE_COLOR (al_map_rgb (0, 0, 0))
 #define V_TEXT_LINE_COLOR (al_map_rgb (0, 0, 0))
 
-#define V_LIVES_RECT_COLOR (al_map_rgba (0, 0, 0, 170))
+#define V_LIVES_RECT_COLOR (al_map_rgb (0, 0, 0))
 #define C_LIVES_RECT_COLOR (al_map_rgb (0, 0, 0))
 #define E_LIVES_RECT_COLOR (al_map_rgb (0, 0, 0))
 
-#define V_MSG_LINE_COLOR (al_map_rgba (0, 0, 0, 192))
+#define V_MSG_LINE_COLOR (al_map_rgb (0, 0, 0))
 #define E_MSG_LINE_COLOR (al_map_rgb (0, 0, 0))
 #define C_MSG_LINE_COLOR (al_map_rgb (0, 0, 0))
 

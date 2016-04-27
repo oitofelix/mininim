@@ -68,6 +68,8 @@ ALLEGRO_BITMAP *get_cached_palette (ALLEGRO_BITMAP *bitmap, palette p);
 ALLEGRO_COLOR hgc_palette (ALLEGRO_COLOR c);
 
 /* variables */
+extern bool display_resized;
+extern int redraw_bottom;
 extern ALLEGRO_DISPLAY *display;
 extern ALLEGRO_BITMAP *uscreen;
 extern ALLEGRO_BITMAP *effect_buffer;
