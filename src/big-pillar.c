@@ -267,6 +267,7 @@ draw_big_pillar_top (ALLEGRO_BITMAP *bitmap, struct pos *p,
   draw_floor_base (bitmap, p, em, vm);
   draw_big_pillar_top_left (bitmap, p, em, vm);
   draw_big_pillar_top_right (bitmap, p, em, vm);
+  draw_big_pillar_top_top (bitmap, p, em, vm);
 }
 
 void
@@ -306,8 +307,42 @@ void
 draw_big_pillar_top_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
                            enum em em, enum vm vm)
 {
-  ALLEGRO_BITMAP *big_pillar_top_right = NULL,
-    *big_pillar_top_right_top = NULL;
+  ALLEGRO_BITMAP *big_pillar_top_right = NULL;
+
+  switch (em) {
+  case DUNGEON:
+    switch (vm) {
+    case CGA: big_pillar_top_right = dc_big_pillar_top_right; break;
+    case EGA: big_pillar_top_right = de_big_pillar_top_right; break;
+    case VGA: big_pillar_top_right = dv_big_pillar_top_right; break;
+    }
+    break;
+  case PALACE:
+    switch (vm) {
+    case CGA: big_pillar_top_right = pc_big_pillar_top_right; break;
+    case EGA: big_pillar_top_right = pe_big_pillar_top_right; break;
+    case VGA: big_pillar_top_right = pv_big_pillar_top_right; break;
+    }
+    break;
+  }
+
+  if (vm == VGA)
+    big_pillar_top_right = apply_hue_palette (big_pillar_top_right);
+  if (hgc)
+    big_pillar_top_right = apply_palette (big_pillar_top_right, hgc_palette);
+  if (peq (p, &mouse_pos))
+    big_pillar_top_right = apply_palette (big_pillar_top_right, selection_palette);
+
+  struct coord c;
+  draw_bitmapc (big_pillar_top_right, bitmap,
+                big_pillar_top_right_coord (p, &c), 0);
+}
+
+void
+draw_big_pillar_top_top (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                         enum em em, enum vm vm)
+{
+  ALLEGRO_BITMAP *big_pillar_top_right_top = NULL;
 
   pos2coord_f big_pillar_top_right_top_coord = NULL;
 
@@ -315,57 +350,31 @@ draw_big_pillar_top_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case DUNGEON:
     big_pillar_top_right_top_coord = d_big_pillar_top_right_top_coord;
     switch (vm) {
-    case CGA:
-      big_pillar_top_right = dc_big_pillar_top_right;
-      big_pillar_top_right_top = dc_big_pillar_top_right_top;
-      break;
-    case EGA:
-      big_pillar_top_right = de_big_pillar_top_right;
-      big_pillar_top_right_top = de_big_pillar_top_right_top;
-      break;
-    case VGA:
-      big_pillar_top_right = dv_big_pillar_top_right;
-      big_pillar_top_right_top = dv_big_pillar_top_right_top;
-      break;
+    case CGA: big_pillar_top_right_top = dc_big_pillar_top_right_top; break;
+    case EGA: big_pillar_top_right_top = de_big_pillar_top_right_top; break;
+    case VGA: big_pillar_top_right_top = dv_big_pillar_top_right_top; break;
     }
     break;
   case PALACE:
     big_pillar_top_right_top_coord = p_big_pillar_top_right_top_coord;
     switch (vm) {
-    case CGA:
-      big_pillar_top_right = pc_big_pillar_top_right;
-      big_pillar_top_right_top = pc_big_pillar_top_right_top;
-      break;
-    case EGA:
-      big_pillar_top_right = pe_big_pillar_top_right;
-      big_pillar_top_right_top = pe_big_pillar_top_right_top;
-      break;
-    case VGA:
-      big_pillar_top_right = pv_big_pillar_top_right;
-      big_pillar_top_right_top = pv_big_pillar_top_right_top;
-      break;
+    case CGA: big_pillar_top_right_top = pc_big_pillar_top_right_top; break;
+    case EGA: big_pillar_top_right_top = pe_big_pillar_top_right_top; break;
+    case VGA: big_pillar_top_right_top = pv_big_pillar_top_right_top; break;
     }
     break;
   }
 
-  if (vm == VGA) {
-    big_pillar_top_right = apply_hue_palette (big_pillar_top_right);
+  if (vm == VGA)
     big_pillar_top_right_top = apply_hue_palette (big_pillar_top_right_top);
-  }
 
-  if (hgc) {
-    big_pillar_top_right = apply_palette (big_pillar_top_right, hgc_palette);
+  if (hgc)
     big_pillar_top_right_top = apply_palette (big_pillar_top_right_top, hgc_palette);
-  }
 
-  if (peq (p, &mouse_pos)) {
-    big_pillar_top_right = apply_palette (big_pillar_top_right, selection_palette);
+  if (peq (p, &mouse_pos))
     big_pillar_top_right_top = apply_palette (big_pillar_top_right_top, selection_palette);
-  }
 
   struct coord c;
-  draw_bitmapc (big_pillar_top_right, bitmap,
-                big_pillar_top_right_coord (p, &c), 0);
   draw_bitmapc (big_pillar_top_right_top, bitmap,
                 big_pillar_top_right_top_coord (p, &c), 0);
 }

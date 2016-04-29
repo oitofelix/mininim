@@ -82,6 +82,7 @@ draw_wall_pv (ALLEGRO_BITMAP *bitmap, struct pos *p)
   draw_wall_base_pv (bitmap, p);
   draw_wall_left_pv (bitmap, p);
   draw_wall_right (bitmap, p, PALACE, VGA);
+  draw_wall_top (bitmap, p, PALACE, VGA);
 }
 
 void

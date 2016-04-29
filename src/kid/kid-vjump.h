@@ -47,6 +47,7 @@ void load_kid_vjump (void);
 void unload_kid_vjump (void);
 void kid_vjump (struct anim *k);
 bool is_kid_vjump (struct frame *f);
+bool is_kid_vjump_touching_above (struct frame *f);
 
 ALLEGRO_BITMAP *kid_vjump_00, *kid_vjump_01, *kid_vjump_02,
   *kid_vjump_03, *kid_vjump_04, *kid_vjump_05, *kid_vjump_06,

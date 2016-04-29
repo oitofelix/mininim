@@ -63,6 +63,8 @@ static void draw_www_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
                            enum em em, enum vm vm);
 static void draw_randomization (ALLEGRO_BITMAP *bitmap, struct pos *p,
                                 enum em em, enum vm vm);
+static void draw_base_randomization (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                                     enum em em, enum vm vm);
 static void draw_random_block (ALLEGRO_BITMAP *bitmap, struct pos *p,
                                enum em em, enum vm vm);
 static void draw_divider_00 (ALLEGRO_BITMAP *bitmap, struct pos *p,
@@ -183,6 +185,7 @@ draw_wall_depedv (ALLEGRO_BITMAP *bitmap, struct pos *p,
   draw_wall_base_depedv (bitmap, p, em, vm);
   draw_wall_left_depedv (bitmap, p, em, vm);
   draw_wall_right (bitmap, p, em, vm);
+  draw_wall_top (bitmap, p, em, vm);
 }
 
 void
@@ -198,6 +201,7 @@ draw_wall_base_depedv (ALLEGRO_BITMAP *bitmap, struct pos *p,
     error (-1, 0, "%s: unknown wall correlation (%i, %i. %i)",
            __func__, p->room, p->floor, p->place);
   }
+  draw_base_randomization (bitmap, p, em, vm);
 }
 
 void
@@ -424,6 +428,53 @@ draw_randomization (ALLEGRO_BITMAP *bitmap, struct pos *p,
         draw_left_mark (bitmap, p, prandom (4), vm);
     }
     break;
+  default:
+    error (-1, 0, "%s: unknown wall correlation (%i)", __func__, wc);
+  }
+
+  unseedp ();
+}
+
+void
+draw_base_randomization (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                         enum em em, enum vm vm)
+{
+  ALLEGRO_BITMAP *wall_narrow_divider = NULL,
+    *wall_wide_divider = NULL;
+
+  if (vm == VGA) {
+    wall_narrow_divider = apply_hue_palette (dv_wall_narrow_divider);
+    wall_wide_divider = apply_hue_palette (dv_wall_wide_divider);
+  } else if (em == DUNGEON) {
+    wall_narrow_divider = de_wall_narrow_divider;
+    wall_wide_divider = de_wall_wide_divider;
+  } else {
+    wall_narrow_divider = pe_wall_narrow_divider;
+    wall_wide_divider = pe_wall_wide_divider;
+  }
+
+  if (peq (p, &mouse_pos)) {
+    wall_narrow_divider = apply_palette (wall_narrow_divider, selection_palette);
+    wall_wide_divider = apply_palette (wall_wide_divider, selection_palette);
+  }
+
+  seedp (p);
+  prandom (1);
+  r0 = prandom(1);
+  r1 = prandom(4);
+  r2 = prandom(1);
+  r3 = prandom(4);
+
+  wall_divider_00 = r2 ? wall_narrow_divider : wall_wide_divider;
+  wall_divider_01 = r0 ? wall_narrow_divider : wall_wide_divider;
+
+  enum wall_correlation wc = wall_correlation (p);
+
+  switch (wc) {
+  case WWW: draw_divider_00 (bitmap, p, em, vm); break;
+  case SWS: break;
+  case SWW: break;
+  case WWS: draw_divider_00 (bitmap, p, em, vm); break;
   default:
     error (-1, 0, "%s: unknown wall correlation (%i)", __func__, wc);
   }

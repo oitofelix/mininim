@@ -183,7 +183,7 @@ bool
 is_kid_climb (struct frame *f)
 {
   int i;
-  for (i = 2; i < 10; i++)
+  for (i = 0; i < 10; i++)
     if (f->b == kid_climb_frameset[i].frame) return true;
   return false;
 }

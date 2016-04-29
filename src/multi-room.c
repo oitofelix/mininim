@@ -539,9 +539,9 @@ update_cache_pos (struct pos *p, enum em em, enum vm vm)
         switch (con (p)->fg) {
         default:
           cx = PLACE_WIDTH * p->place;
-          cy = PLACE_HEIGHT * p->floor - 10;
+          cy = PLACE_HEIGHT * p->floor - 13;
           cw = 2 * PLACE_WIDTH;
-          ch = PLACE_HEIGHT + 3 + 10;
+          ch = PLACE_HEIGHT + 3 + 13;
           break;
         }
 
@@ -564,10 +564,17 @@ update_cache_pos (struct pos *p, enum em em, enum vm vm)
         draw_conbg (mr.cell[x][y].cache, &par, em, vm);
 
         draw_confg_right (mr.cell[x][y].cache, &pbl, em, vm, true);
+        draw_confg_top (mr.cell[x][y].cache, &pbl, em, vm, true);
         draw_confg_right (mr.cell[x][y].cache, &pb, em, vm, true);
+        draw_confg_top (mr.cell[x][y].cache, &pb, em, vm, true);
+
         draw_confg_right (mr.cell[x][y].cache, &pl, em, vm, false);
+        draw_confg_top (mr.cell[x][y].cache, &pl, em, vm, false);
 
         draw_confg (mr.cell[x][y].cache, p, em, vm, true);
+
+        draw_confg_base (mr.cell[x][y].cache, &pr, em, vm);
+        draw_confg_left (mr.cell[x][y].cache, &pr, em, vm, true);
 
         draw_confg_right (mr.cell[x][y].cache, &pal, em, vm, true);
         draw_confg (mr.cell[x][y].cache, &pa, em, vm, true);
@@ -641,6 +648,17 @@ update_cache_pos (struct pos *p, enum em em, enum vm vm)
     p0.room = roomd (p0.room, LEFT);
     p0.floor = FLOORS - 1;
     p0.place = PLACES - 1;
+    recursive = true;
+    update_cache_pos (&p0, em, vm);
+    recursive = false;
+  }
+
+  if (! recursive && p->floor == 0 && p->place == PLACES - 1) {
+    struct pos p0;
+    p0.room = roomd (p->room, ABOVE);
+    p0.room = roomd (p0.room, RIGHT);
+    p0.floor = FLOORS;
+    p0.place = -1;
     recursive = true;
     update_cache_pos (&p0, em, vm);
     recursive = false;
@@ -723,6 +741,7 @@ draw_multi_rooms (void)
       || hgc != mr.last.hgc
       || hue != mr.last.hue) {
     update_room0_cache (em, vm);
+    force_full_redraw = true;
   }
 
   if (anim_cycle == 0
@@ -757,10 +776,9 @@ draw_multi_rooms (void)
 
   if (! no_room_drawing)
     for (y = mr.h - 1; y >= 0; y--)
-      for (x = 0; x < mr.w; x++) {
+      for (x = 0; x < mr.w; x++)
         if (mr.cell[x][y].room)
           draw_bitmap (mr.cell[x][y].cache, mr.cell[x][y].screen, 0, 0, 0);
-      }
 
   for (y = mr.h - 1; y >= 0; y--)
     for (x = 0; x < mr.w; x++) {

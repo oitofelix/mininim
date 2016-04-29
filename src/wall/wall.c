@@ -185,13 +185,58 @@ draw_wall_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
 }
 
 void
+draw_wall_top (ALLEGRO_BITMAP *bitmap, struct pos *p,
+               enum em em, enum vm vm)
+{
+  switch (wall_correlation (p)) {
+  case SWS: draw_wall_face_top (bitmap, p, em, vm); break;
+  case SWW: break;
+  case WWS: draw_wall_face_top (bitmap, p, em, vm); break;
+  case WWW: break;
+  default:
+    error (-1, 0, "%s: unknown wall correlation (%i, %i. %i)",
+           __func__, p->room, p->floor, p->place);
+  }
+}
+
+void
 draw_wall_face (ALLEGRO_BITMAP *bitmap, struct pos *p,
                 enum em em, enum vm vm)
 {
-  pos2coord_f wall_face_top_coord = NULL;
+  ALLEGRO_BITMAP *wall_face = NULL;
 
-  ALLEGRO_BITMAP *wall_face = NULL,
-    *wall_face_top = NULL;
+  switch (em) {
+  case DUNGEON:
+    switch (vm) {
+    case CGA: wall_face = dc_wall_face; break;
+    case EGA: wall_face = de_wall_face; break;
+    case VGA: wall_face = dv_wall_face; break;
+    }
+    break;
+  case PALACE:
+    switch (vm) {
+    case CGA: wall_face = pc_wall_face; break;
+    case EGA: wall_face = pe_wall_face; break;
+    case VGA: wall_face = pv_wall_face; break;
+    }
+    break;
+  }
+
+  if (vm == VGA) wall_face = apply_hue_palette (wall_face);
+  if (hgc) wall_face = apply_palette (wall_face, hgc_palette);
+  if (peq (p, &mouse_pos))
+    wall_face = apply_palette (wall_face, selection_palette);
+
+  struct coord c;
+  draw_bitmapc (wall_face, bitmap, wall_face_coord (p, &c), 0);
+}
+
+void
+draw_wall_face_top (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                    enum em em, enum vm vm)
+{
+  pos2coord_f wall_face_top_coord = NULL;
+  ALLEGRO_BITMAP *wall_face_top = NULL;
 
   switch (em) {
   case DUNGEON:
@@ -199,55 +244,28 @@ draw_wall_face (ALLEGRO_BITMAP *bitmap, struct pos *p,
     switch (vm) {
     case CGA:
       wall_face_top_coord = dc_wall_face_top_coord;
-      wall_face = dc_wall_face;
       wall_face_top = dc_wall_face_top;
       break;
-    case EGA:
-      wall_face = de_wall_face;
-      wall_face_top = de_wall_face_top;
-      break;
-    case VGA:
-      wall_face = dv_wall_face;
-      wall_face_top = dv_wall_face_top;
-      break;
+    case EGA: wall_face_top = de_wall_face_top; break;
+    case VGA: wall_face_top = dv_wall_face_top; break;
     }
     break;
   case PALACE:
     wall_face_top_coord = p_wall_face_top_coord;
     switch (vm) {
-    case CGA:
-      wall_face = pc_wall_face;
-      wall_face_top = pc_wall_face_top;
-      break;
-    case EGA:
-      wall_face = pe_wall_face;
-      wall_face_top = pe_wall_face_top;
-      break;
-    case VGA:
-      wall_face = pv_wall_face;
-      wall_face_top = pv_wall_face_top;
-      break;
+    case CGA: wall_face_top = pc_wall_face_top; break;
+    case EGA: wall_face_top = pe_wall_face_top; break;
+    case VGA: wall_face_top = pv_wall_face_top; break;
     }
     break;
   }
 
-  if (vm == VGA) {
-    wall_face = apply_hue_palette (wall_face);
-    wall_face_top = apply_hue_palette (wall_face_top);
-  }
-
-  if (hgc) {
-    wall_face = apply_palette (wall_face, hgc_palette);
-    wall_face_top = apply_palette (wall_face_top, hgc_palette);
-  }
-
-  if (peq (p, &mouse_pos)) {
-    wall_face = apply_palette (wall_face, selection_palette);
+  if (vm == VGA) wall_face_top = apply_hue_palette (wall_face_top);
+  if (hgc) wall_face_top = apply_palette (wall_face_top, hgc_palette);
+  if (peq (p, &mouse_pos))
     wall_face_top = apply_palette (wall_face_top, selection_palette);
-  }
 
   struct coord c;
-  draw_bitmapc (wall_face, bitmap, wall_face_coord (p, &c), 0);
   draw_bitmapc (wall_face_top, bitmap, wall_face_top_coord (p, &c), 0);
 }
 

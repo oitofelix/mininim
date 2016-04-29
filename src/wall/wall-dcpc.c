@@ -56,6 +56,7 @@ draw_wall_dcpc (ALLEGRO_BITMAP *bitmap, struct pos *p,
   draw_wall_base_dcpc (bitmap, p, em);
   draw_wall_left_dcpc (bitmap, p, em);
   draw_wall_right (bitmap, p, em, vm);
+  draw_wall_top (bitmap, p, em, vm);
 }
 
 void

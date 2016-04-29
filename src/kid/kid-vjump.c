@@ -250,7 +250,16 @@ bool
 is_kid_vjump (struct frame *f)
 {
   int i;
-  for (i = 0; i < KID_VJUMP_FRAMESET_NMEMB; i ++)
+  for (i = 0; i < KID_VJUMP_FRAMESET_NMEMB; i++)
+    if (f->b == kid_vjump_frameset[i].frame) return true;
+  return false;
+}
+
+bool
+is_kid_vjump_touching_above (struct frame *f)
+{
+  int i;
+  for (i = 12; i < 14; i++)
     if (f->b == kid_vjump_frameset[i].frame) return true;
   return false;
 }

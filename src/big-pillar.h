@@ -84,6 +84,8 @@ void draw_big_pillar_top_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
                                enum em em, enum vm vm);
 void draw_big_pillar_top_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
                                 enum em em, enum vm vm);
+void draw_big_pillar_top_top (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                              enum em em, enum vm vm);
 struct coord *big_pillar_bottom_left_coord (struct pos *p, struct coord *c);
 struct coord *big_pillar_bottom_right_coord (struct pos *p, struct coord *c);
 struct coord *big_pillar_top_left_coord (struct pos *p, struct coord *c);

@@ -378,7 +378,6 @@ flip_display (ALLEGRO_BITMAP *bitmap)
   int uh = al_get_bitmap_height (uscreen);
 
   set_target_backbuffer (display);
-  if (force_full_redraw) al_clear_to_color (BLACK);
 
   if (bitmap) {
     int bw = al_get_bitmap_width (bitmap);
@@ -391,16 +390,19 @@ flip_display (ALLEGRO_BITMAP *bitmap)
 
     for (y = mr.h - 1; y >= 0; y--)
       for (x = 0; x < mr.w; x++) {
-        ALLEGRO_BITMAP *screen = (mr.cell[x][y].room || (mr.w == 1 && mr.h == 1))
-                                  ? mr.cell[x][y].screen : mr.cell[x][y].cache;
+        ALLEGRO_BITMAP *screen =
+          (mr.cell[x][y].room || no_room_drawing
+           || cutscene || (mr.w == 1 && mr.h == 1))
+          ? mr.cell[x][y].screen : mr.cell[x][y].cache;
         int sw = al_get_bitmap_width (screen);
         int sh = al_get_bitmap_height (screen);
         float dx = ((ORIGINAL_WIDTH * x) * w) / (float) tw;
         float dy = ((ROOM_HEIGHT * y) * h) / (float) th;
         float dw = (sw * w) / (float) tw;
         float dh = (sh * h) / (float) th;
-        if (! mr.cell[x][y].room && no_room_drawing) continue;
+
         if (mr_view_changed
+            || cutscene
             || mr.cell[x][y].room
             || mr.last.display_width != w
             || mr.last.display_height != h

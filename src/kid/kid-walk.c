@@ -116,7 +116,7 @@ flow (struct anim *k)
 
     k->dcd = 0;
 
-    if (k->dc <= PLACE_WIDTH + 4 && k->ci.t != WALL) {
+    if (k->dc <= PLACE_WIDTH + 4 && k->ci.t != WALL && k->dc < k->df) {
       k->dcd = 9;
       k->dc -= k->dcd;
     }

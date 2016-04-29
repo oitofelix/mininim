@@ -83,15 +83,15 @@ strictly_traversable_cs (enum confg t)
 {
   return t == NO_FLOOR
     || t == BIG_PILLAR_TOP
-    || t == TCARPET;
+    || t == TCARPET
+    || arch_top_cs (t);
 }
 
 bool
 is_strictly_traversable (struct pos *p)
 {
   enum confg t = con (p)->fg;
-  return strictly_traversable_cs (t)
-    || arch_top_cs (t);
+  return strictly_traversable_cs (t);
 }
 
 bool

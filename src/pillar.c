@@ -130,6 +130,7 @@ draw_pillar (ALLEGRO_BITMAP *bitmap, struct pos *p,
   draw_floor_base (bitmap, p, em, vm);
   draw_pillar_left (bitmap, p, em, vm);
   draw_pillar_right (bitmap, p, em, vm);
+  draw_pillar_top (bitmap, p, em, vm);
 }
 
 void
@@ -168,64 +169,66 @@ void
 draw_pillar_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
                    enum em em, enum vm vm)
 {
-  ALLEGRO_BITMAP *pillar_right = NULL, *pillar_top = NULL;
+  ALLEGRO_BITMAP *pillar_right = NULL;
 
+  switch (em) {
+  case DUNGEON:
+    switch (vm) {
+    case CGA: pillar_right = dc_pillar_right; break;
+    case EGA: pillar_right = de_pillar_right; break;
+    case VGA: pillar_right = dv_pillar_right; break;
+    }
+    break;
+  case PALACE:
+    switch (vm) {
+    case CGA: pillar_right = pc_pillar_right; break;
+    case EGA: pillar_right = pe_pillar_right; break;
+    case VGA: pillar_right = pv_pillar_right; break;
+    }
+    break;
+  }
+
+  if (vm == VGA) pillar_right = apply_hue_palette (pillar_right);
+  if (hgc) pillar_right = apply_palette (pillar_right, hgc_palette);
+  if (peq (p, &mouse_pos))
+    pillar_right = apply_palette (pillar_right, selection_palette);
+
+  struct coord c;
+  draw_bitmapc (pillar_right, bitmap, pillar_right_coord (p, &c), 0);
+}
+
+void
+draw_pillar_top (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                 enum em em, enum vm vm)
+{
+  ALLEGRO_BITMAP *pillar_top = NULL;
   pos2coord_f pillar_top_coord = NULL;
 
   switch (em) {
   case DUNGEON:
     pillar_top_coord = d_pillar_top_coord;
     switch (vm) {
-    case CGA:
-      pillar_right = dc_pillar_right;
-      pillar_top = dc_pillar_top;
-      break;
-    case EGA:
-      pillar_right = de_pillar_right;
-      pillar_top = de_pillar_top;
-      break;
-    case VGA:
-      pillar_right = dv_pillar_right;
-      pillar_top = dv_pillar_top;
-      break;
+    case CGA: pillar_top = dc_pillar_top; break;
+    case EGA: pillar_top = de_pillar_top; break;
+    case VGA: pillar_top = dv_pillar_top; break;
     }
     break;
   case PALACE:
     pillar_top_coord = p_pillar_top_coord;
     switch (vm) {
-    case CGA:
-      pillar_right = pc_pillar_right;
-      pillar_top = pc_pillar_top;
-      break;
-    case EGA:
-      pillar_right = pe_pillar_right;
-      pillar_top = pe_pillar_top;
-      break;
-    case VGA:
-      pillar_right = pv_pillar_right;
-      pillar_top = pv_pillar_top;
-      break;
+    case CGA: pillar_top = pc_pillar_top; break;
+    case EGA: pillar_top = pe_pillar_top; break;
+    case VGA: pillar_top = pv_pillar_top; break;
     }
     break;
   }
 
-  if (vm == VGA) {
-    pillar_right = apply_hue_palette (pillar_right);
-    pillar_top = apply_hue_palette (pillar_top);
-  }
-
-  if (hgc) {
-    pillar_right = apply_palette (pillar_right, hgc_palette);
-    pillar_top = apply_palette (pillar_top, hgc_palette);
-  }
-
-  if (peq (p, &mouse_pos)) {
-    pillar_right = apply_palette (pillar_right, selection_palette);
+  if (vm == VGA) pillar_top = apply_hue_palette (pillar_top);
+  if (hgc) pillar_top = apply_palette (pillar_top, hgc_palette);
+  if (peq (p, &mouse_pos))
     pillar_top = apply_palette (pillar_top, selection_palette);
-  }
 
   struct coord c;
-  draw_bitmapc (pillar_right, bitmap, pillar_right_coord (p, &c), 0);
   draw_bitmapc (pillar_top, bitmap, pillar_top_coord (p, &c), 0);
 }
 

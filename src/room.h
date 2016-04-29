@@ -42,18 +42,22 @@ void draw_conbg (ALLEGRO_BITMAP *bitmap, struct pos *p,
                  enum em em, enum vm vm);
 void draw_confg (ALLEGRO_BITMAP *bitmap, struct pos *p,
                  enum em em, enum vm vm, bool redraw);
+void draw_confg_no_top (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                        enum em em, enum vm vm, bool redraw);
 void draw_confg_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
                       enum em em, enum vm vm);
 void draw_confg_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
                       enum em em, enum vm vm, bool redraw);
 void draw_confg_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
                        enum em em, enum vm vm, bool redraw);
-void draw_confg_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                    enum em em, enum vm vm, struct frame *f);
+void draw_confg_top (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                     enum em em, enum vm vm, bool redraw);
 void draw_room_anim_fg (ALLEGRO_BITMAP *bitmap,
                         enum em em, enum vm vm, struct anim *a);
-void draw_room_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                   enum em em, enum vm vm, struct frame *f);
+void draw_confg_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                    enum em em, enum vm vm, struct frame *f);
+/* void draw_room_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, */
+/*                    enum em em, enum vm vm, struct frame *f); */
 
 ALLEGRO_BITMAP *apply_hue_palette (ALLEGRO_BITMAP *bitmap);
 ALLEGRO_COLOR apply_hue_color (ALLEGRO_COLOR c);

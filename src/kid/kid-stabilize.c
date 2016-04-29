@@ -169,11 +169,11 @@ physics_in (struct anim *k)
   }
 
   /* collision */
-  /* if (is_colliding (&k->f, &k->fo, +0, false, &k->ci) */
-  /*     && ! k->collision) { */
-  /*   kid_stabilize_collision (k); */
-  /*   return false; */
-  /* } */
+  if (is_colliding (&k->f, &k->fo, +0, false, &k->ci)
+      && ! k->collision && k->ci.t != WALL) {
+    kid_stabilize_collision (k);
+    return false;
+  }
 
   return true;
 }
