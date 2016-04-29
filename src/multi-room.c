@@ -507,7 +507,7 @@ update_cache (enum em em, enum vm vm)
 void
 update_cache_pos (struct pos *p, enum em em, enum vm vm)
 {
-  static bool recursive = false;
+  static bool recursive = false, recursive_01 = false;
 
   int x, y;
 
@@ -591,6 +591,18 @@ update_cache_pos (struct pos *p, enum em em, enum vm vm)
       }
 
   /* if (is_room_visible (p->room)) printf ("%i,%i,%i\n", p->room, p->floor, p->place); */
+
+  bool depedv =
+    ((em == DUNGEON && vm == VGA)
+     || (em == DUNGEON && vm == EGA)
+     || (em == PALACE && vm == EGA))
+    && con (p)->fg == WALL;
+
+  if (! recursive_01 && depedv && con (&pl)->fg == WALL) {
+    recursive_01 = true;
+    update_cache_pos (&pl, em, vm);
+    recursive_01 = false;
+  }
 
   if (! recursive && p->place == -1) {
     struct pos p0;

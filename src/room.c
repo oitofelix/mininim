@@ -390,7 +390,7 @@ draw_confg_top (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (! redraw) return;
 
-  struct pos pa, par;
+  struct pos pa;
   prel (p, &pa, -1, +0);
 
   draw_confg_base (bitmap, &pa, em, vm);

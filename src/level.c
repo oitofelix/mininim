@@ -217,7 +217,7 @@ prepare_con_at_pos (struct pos *p)
   if (! is_room_visible (p->room)) return;
 
   switch (con (p)->fg) {
-  case WALL: update_cache (em, vm); break;
+  /* case WALL: update_cache_pos (p, em, vm); break; */
   case MIRROR: generate_mirrors_reflex (); break;
   default: break;
   }
