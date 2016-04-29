@@ -187,24 +187,24 @@ get_carpet_bitmaps (struct pos *p, enum em em, enum vm vm,
 
   switch (con (p)->ext.design) {
   case CARPET_00:
-    *carpet = carpet_00;
-    *carpet_top = carpet_top_00;
+    if (carpet) *carpet = carpet_00;
+    if (carpet_top) *carpet_top = carpet_top_00;
     break;
   case CARPET_01:
-    *carpet = carpet_01;
-    *carpet_top = carpet_top_01;
+    if (carpet) *carpet = carpet_01;
+    if (carpet_top) *carpet_top = carpet_top_01;
     break;
   case ARCH_CARPET_LEFT:
-    *carpet = NULL;
-    *carpet_top = NULL;
+    if (carpet) *carpet = NULL;
+    if (carpet_top) *carpet_top = NULL;
     break;
   case ARCH_CARPET_RIGHT_00:
-    *carpet = carpet_00;
-    *carpet_top = carpet_top_00;
+    if (carpet) *carpet = carpet_00;
+    if (carpet_top) *carpet_top = carpet_top_00;
     break;
   case ARCH_CARPET_RIGHT_01:
-    *carpet = carpet_01;
-    *carpet_top = carpet_top_01;
+    if (carpet) *carpet = carpet_01;
+    if (carpet_top) *carpet_top = carpet_top_01;
     break;
   }
 }
@@ -215,29 +215,39 @@ draw_carpet_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
 {
   struct coord c;
 
-  ALLEGRO_BITMAP *carpet = NULL, *carpet_top = NULL;
+  ALLEGRO_BITMAP *carpet = NULL;
 
   if (con (p)->ext.design == ARCH_CARPET_LEFT)
     draw_arch_top_left_end (bitmap, p, em, vm);
   else {
-    get_carpet_bitmaps (p, em, vm, &carpet, &carpet_top);
+    get_carpet_bitmaps (p, em, vm, &carpet, NULL);
 
-    if (vm == VGA) {
-      carpet = apply_hue_palette (carpet);
-      carpet_top = apply_hue_palette (carpet_top);
-    }
-
-    if (hgc) {
-      carpet = apply_palette (carpet, hgc_palette);
-      carpet_top = apply_palette (carpet_top, hgc_palette);
-    }
-
-    if (peq (p, &mouse_pos)) {
+    if (vm == VGA) carpet = apply_hue_palette (carpet);
+    if (hgc) carpet = apply_palette (carpet, hgc_palette);
+    if (peq (p, &mouse_pos))
       carpet = apply_palette (carpet, selection_palette);
-      carpet_top = apply_palette (carpet_top, selection_palette);
-    }
 
     draw_bitmapc (carpet, bitmap, carpet_coord (p, &c), 0);
+  }
+}
+
+void
+draw_carpet_top (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                  enum em em, enum vm vm)
+{
+  struct coord c;
+
+  ALLEGRO_BITMAP *carpet_top = NULL;
+
+  if (con (p)->ext.design == ARCH_CARPET_LEFT) return;
+  else {
+    get_carpet_bitmaps (p, em, vm, NULL, &carpet_top);
+
+    if (vm == VGA) carpet_top = apply_hue_palette (carpet_top);
+    if (hgc) carpet_top = apply_palette (carpet_top, hgc_palette);
+    if (peq (p, &mouse_pos))
+      carpet_top = apply_palette (carpet_top, selection_palette);
+
     draw_bitmapc (carpet_top, bitmap, carpet_top_coord (p, &c), 0);
   }
 }
@@ -246,44 +256,18 @@ void
 draw_carpet_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
                 struct frame *f, enum em em, enum vm vm)
 {
-  struct coord c;
+  struct pos pr; prel (p, &pr, +0, +1);
 
-  ALLEGRO_BITMAP *carpet = NULL, *carpet_top = NULL;
+  if (con (p)->fg == TCARPET)
+    draw_door_pole_base (bitmap, p, em, vm);
 
   draw_door_pole (bitmap, p, em, vm);
 
-  struct pos pr; prel (p, &pr, +0, +1);
+  if (should_draw_door_grid (p, f))
+    draw_carpet_right (bitmap, p, em, vm);
 
-  if (con (p)->ext.design == ARCH_CARPET_LEFT) {
-    draw_arch_top_left_end (bitmap, p, em, vm);
-
-    draw_confg_base (bitmap, &pr, em, vm);
-    draw_confg_left (bitmap, &pr, em, vm, true);
-  } else {
-    get_carpet_bitmaps (p, em, vm, &carpet, &carpet_top);
-
-    if (vm == VGA) {
-      carpet = apply_hue_palette (carpet);
-      carpet_top = apply_hue_palette (carpet_top);
-    }
-
-    if (hgc) {
-      carpet = apply_palette (carpet, hgc_palette);
-      carpet_top = apply_palette (carpet_top, hgc_palette);
-    }
-
-    if (peq (p, &mouse_pos)) {
-      carpet = apply_palette (carpet, selection_palette);
-      carpet_top = apply_palette (carpet_top, selection_palette);
-    }
-
-    if (! should_draw_door_grid (p, f)) return;
-
-    draw_bitmapc (carpet, bitmap, carpet_coord (p, &c), 0);
-
-    draw_confg_base (bitmap, &pr, em, vm);
-    draw_confg_left (bitmap, &pr, em, vm, true);
-  }
+  draw_confg_base (bitmap, &pr, em, vm);
+  draw_confg_left (bitmap, &pr, em, vm, true);
 }
 
 struct coord *

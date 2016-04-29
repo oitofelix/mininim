@@ -280,10 +280,7 @@ draw_confg_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
     if (con (p)->ext.design == ARCH_CARPET_RIGHT_00
         || con (p)->ext.design == ARCH_CARPET_RIGHT_01)
       draw_arch_top_right_end (bitmap, p, em, vm);
-    else {
-      draw_door_pole (bitmap, p, em, vm);
-      draw_door_pole_base (bitmap, p, em, vm);
-    }
+    else draw_door_pole (bitmap, p, em, vm);
     break;
   case MIRROR: draw_floor_left (bitmap, p, em, vm); break;
   default:
@@ -383,8 +380,8 @@ draw_confg_top (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case ARCH_TOP_SMALL: break;
   case ARCH_TOP_LEFT: break;
   case ARCH_TOP_RIGHT: break;
-  case CARPET: break;
-  case TCARPET: break;
+  case CARPET: draw_carpet_top (bitmap, p, em, vm); break;
+  case TCARPET: draw_carpet_top (bitmap, p, em, vm); break;
   case MIRROR: break;
   default:
     error (-1, 0, "%s: unknown foreground (%i)",
@@ -395,25 +392,31 @@ draw_confg_top (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   struct pos pa, par;
   prel (p, &pa, -1, +0);
-  prel (p, &par, -1, +1);
+
+  draw_confg_base (bitmap, &pa, em, vm);
+  draw_confg_right (bitmap, &pa, em, vm, true);
+
+  /* struct pos pa, par; */
+  /* prel (p, &pa, -1, +0); */
+  /* prel (p, &par, -1, +1); */
 
   /* above */
-  switch (con (p)->fg) {
-  case PILLAR: case WALL: case DOOR:
-    draw_confg_base (bitmap, &pa, em, vm);
-    draw_confg_right (bitmap, &pa, em, vm, true);
-    break;
-  default: break;
-  }
+  /* switch (con (p)->fg) { */
+  /* case PILLAR: case WALL: case DOOR: */
+  /* draw_confg_base (bitmap, &pa, em, vm); */
+  /* draw_confg_right (bitmap, &pa, em, vm, true); */
+  /*   break; */
+  /* default: break; */
+  /* } */
 
-  /* above right */
-  switch (con (p)->fg) {
-  case DOOR: case CARPET: case TCARPET:
-    draw_confg_base (bitmap, &par, em, vm);
-    draw_confg_left (bitmap, &par, em, vm, true);
-    break;
-  default: break;
-  }
+  /* /\* above right *\/ */
+  /* switch (con (p)->fg) { */
+  /* case DOOR: case CARPET: case TCARPET: */
+  /*   draw_confg_base (bitmap, &par, em, vm); */
+  /*   draw_confg_left (bitmap, &par, em, vm, true); */
+  /*   break; */
+  /* default: break; */
+  /* } */
 }
 
 void
