@@ -433,13 +433,6 @@ draw_animated_foreground (ALLEGRO_BITMAP *bitmap, int room)
   struct pos p;
   p.room = room_view;
 
-  for (p.floor = FLOORS; p.floor >= -1; p.floor--)
-    for (p.place = -1; p.place < PLACES; p.place++) {
-      if (con (&p)->fg != MIRROR) continue;
-      update_mirror_bitmap (bitmap, &p);
-      draw_mirror (bitmap, &p, em, vm);
-    }
-
   /* loose_floor_fall_debug (); */
 
   for (p.floor = FLOORS; p.floor >= -1; p.floor--)
@@ -733,10 +726,8 @@ draw_multi_rooms (void)
           || vm != mr.last.vm))
     generate_wall_colors ();
 
-  if (mr_view_changed) {
+  if (mr_view_changed)
     generate_stars ();
-    generate_mirrors_reflex ();
-  }
 
   if (mouse_pos.room != mr.last.mouse_pos.room
       || mouse_pos.floor != mr.last.mouse_pos.floor

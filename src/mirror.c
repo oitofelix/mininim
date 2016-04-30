@@ -134,67 +134,9 @@ uncross_mirrors (void)
 }
 
 void
-generate_mirrors_reflex_for_cell (int x, int y)
-{
-  struct coord c;
-  struct pos p;
-  p.room = mr.cell[x][y].room;
-
-  for (p.floor = FLOORS; p.floor >= -1; p.floor--)
-    for (p.place = -1; p.place < PLACES; p.place++) {
-      ALLEGRO_BITMAP **b = &mr.cell[x][y].mirror[p.floor + 1][p.place + 1];
-      destroy_bitmap (*b);
-      *b = NULL;
-
-      if (con (&p)->fg != MIRROR) continue;
-
-      mirror_coord (&p, &c);
-
-      *b = create_bitmap (MIRROR_BITMAP_W, MIRROR_BITMAP_H);
-      clear_bitmap (*b, TRANSPARENT_COLOR);
-    }
-}
-
-void
-generate_mirrors_reflex (void)
-{
-  int x, y;
-  for (y = mr.h - 1; y >= 0; y--)
-    for (x = 0; x < mr.w; x++)
-      generate_mirrors_reflex_for_cell (x, y);
-}
-
-void
-update_mirror_bitmap (ALLEGRO_BITMAP *bitmap, struct pos *p)
-{
-  struct coord c;
-
-  ALLEGRO_BITMAP *b = mr.cell[mr.dx][mr.dy].mirror[p->floor + 1][p->place + 1];
-  if (! b) return;
-
-  struct rect r = new_rect (p->room, p->place * PLACE_WIDTH + 6,
-                            p->floor * PLACE_HEIGHT + 6,
-                            19, 44);
-  draw_filled_rect (bitmap, &r, al_map_rgb (0, 0, 0));
-
-  int i;
-  for (i = 0; i < anima_nmemb; i++)
-    draw_anim_if_at_pos (bitmap, &anima[i], p, vm);
-
-  mirror_coord (p, &c);
-  draw_bitmap_region (bitmap, b, c.x + 22, c.y + 3,
-                      MIRROR_BITMAP_W, MIRROR_BITMAP_H, 0, 0,
-                      ALLEGRO_FLIP_HORIZONTAL);
-}
-
-void
 draw_mirror (ALLEGRO_BITMAP *bitmap, struct pos *p,
                  enum em em, enum vm vm)
 {
-  if (con (p)->fg != MIRROR) return;
-
-  struct coord c;
-
   ALLEGRO_BITMAP *mirror = NULL;
 
   switch (em) {
@@ -214,22 +156,41 @@ draw_mirror (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  /* make mirror black */
+  struct rect r;
+  r.c.room = p->room;
+  r.c.x = PLACE_WIDTH * p->place + 2;
+  r.c.y = PLACE_HEIGHT * p->floor + 3;
+  r.w = PLACE_WIDTH - 10;
+  r.h = PLACE_HEIGHT - 16;
+  draw_filled_rect (bitmap, &r, BLACK);
+
+  /* draw floor reflex */
+  struct pos pl; prel (p, &pl, +0, -1);
+  al_hold_bitmap_drawing (false);
+  al_set_target_bitmap (bitmap);
+  al_set_clipping_rectangle (PLACE_WIDTH * p->place + 2, PLACE_HEIGHT * p->floor,
+                             PLACE_WIDTH, PLACE_HEIGHT);
+  struct pos mouse_pos_bkp = mouse_pos;
+  mouse_pos.room = -1;
+  draw_floor_right (bitmap, &pl, em, vm);
+  mouse_pos = mouse_pos_bkp;
+  al_reset_clipping_rectangle ();
+
+  /* draw mirror properly */
   mirror = apply_hue_palette (mirror);
   if (hgc) mirror = apply_palette (mirror, hgc_palette);
   if (peq (p, &mouse_pos))
     mirror = apply_palette (mirror, selection_palette);
 
-  ALLEGRO_BITMAP *b = mr.cell[mr.dx][mr.dy].mirror[p->floor + 1][p->place + 1];
-  if (b) draw_bitmapc (b, bitmap, mirror_reflex_coord (p, &c), 0);
+  struct coord c;
   draw_bitmapc (mirror, bitmap, mirror_coord (p, &c), 0);
 }
 
 void
-draw_mirror_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
+draw_mirror_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f,
                 enum em em, enum vm vm)
 {
-  struct coord c;
-
   ALLEGRO_BITMAP *mirror = NULL;
 
   switch (em) {
@@ -249,14 +210,24 @@ draw_mirror_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
     break;
   }
 
+  /* draw anim */
+  al_hold_bitmap_drawing (false);
+  al_set_target_bitmap (bitmap);
+  al_set_clipping_rectangle (PLACE_WIDTH * p->place + 2, PLACE_HEIGHT * p->floor + 3,
+                             PLACE_WIDTH - 11, PLACE_HEIGHT - 9);
+  struct frame f0 = *f;
+  f0.flip ^= ALLEGRO_FLIP_HORIZONTAL;
+  f0.c.x = (2 * PLACE_WIDTH * p->place + 36) - (f->c.x + al_get_bitmap_width (f->b));
+  draw_frame (bitmap, &f0);
+  al_reset_clipping_rectangle ();
+
+  /* draw mirror properly */
   mirror = apply_hue_palette (mirror);
   if (hgc) mirror = apply_palette (mirror, hgc_palette);
   if (peq (p, &mouse_pos))
     mirror = apply_palette (mirror, selection_palette);
 
-  ALLEGRO_BITMAP *b = mr.cell[mr.dx][mr.dy].mirror[p->floor + 1][p->place + 1];
-  if (b) draw_bitmapc (b, bitmap, mirror_reflex_coord (p, &c), 0);
-
+  struct coord c;
   int h = al_get_bitmap_height (mirror);
   draw_bitmap_regionc (mirror, bitmap, 0, 0, 22, h, mirror_coord (p, &c), 0);
 }

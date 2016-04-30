@@ -93,7 +93,6 @@ void
 finalize_video (void)
 {
   destroy_bitmap (icon);
-  /* destroy_bitmap (screen); */
   destroy_bitmap (uscreen);
   destroy_bitmap (effect_buffer);
   destroy_bitmap (black_screen);

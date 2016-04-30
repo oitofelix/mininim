@@ -249,8 +249,10 @@ legacy_level_special_events (void)
         && exit_level_door->i == 0
         && room_view == 4
         && con (&mirror_pos)->fg != MIRROR) {
-      con (&mirror_pos)->fg = MIRROR;
-      register_mirror (&mirror_pos);
+      register_con_undo (&undo, &mirror_pos,
+                         MIRROR, MIGNORE, MIGNORE,
+                         true, true, true, true,
+                         "MIRROR");
       play_sample (suspense_sample, -1);
     }
 

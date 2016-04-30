@@ -45,15 +45,11 @@ int compare_mirrors (const void *o0, const void *o1);
 struct mirror *mirror_at_pos (struct pos *p);
 void remove_mirror (struct mirror *m);
 void uncross_mirrors (void);
-void update_mirror_bitmap (ALLEGRO_BITMAP *bitmap, struct pos *p);
 void draw_mirror (ALLEGRO_BITMAP *bitmap, struct pos *p,
                   enum em em, enum vm vm);
 void draw_mirror_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                     enum em em, enum vm vm);
+                     struct frame *f, enum em em, enum vm vm);
 struct coord *mirror_coord (struct pos *p, struct coord *c);
 struct coord *mirror_reflex_coord (struct pos *p, struct coord *c);
-void generate_mirrors_reflex_for_cell (int x, int y);
-void generate_mirrors_reflex (void);
-
 
 #endif	/* MININIM_MIRROR_H */

@@ -93,6 +93,7 @@ get_mouse_pos (struct pos *p)
   struct pos p0;
 
   switch (con (p)->fg) {
+  case MIRROR: case CHOPPER:
   case WALL: case PILLAR: case BIG_PILLAR_TOP:
   case BIG_PILLAR_BOTTOM: case ARCH_BOTTOM:
   case ARCH_TOP_MID: case ARCH_TOP_SMALL:

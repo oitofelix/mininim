@@ -585,8 +585,8 @@ draw_anims (ALLEGRO_BITMAP *bitmap, enum em em, enum vm vm)
   size_t i;
   for (i = 0; i < anima_nmemb; i++) {
     a = &anima[i];
-    if (a->invisible) continue;
     a->f.id = a;
+    if (a->invisible) continue;
 
     _ml (&a->f, &ml); pos (&ml, &pml);
     prel (&pml, &pmlr, 0, +1);

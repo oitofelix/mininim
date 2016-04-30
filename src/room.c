@@ -282,7 +282,10 @@ draw_confg_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
       draw_arch_top_right_end (bitmap, p, em, vm);
     else draw_door_pole (bitmap, p, em, vm);
     break;
-  case MIRROR: draw_floor_left (bitmap, p, em, vm); break;
+  case MIRROR:
+    draw_floor_left (bitmap, p, em, vm);
+    draw_mirror (bitmap, p, em, vm);
+    break;
   default:
     error (-1, 0, "%s: unknown foreground (%i)",
            __func__, con (p)->fg);
@@ -294,9 +297,6 @@ draw_confg_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
     struct pos pa; prel (p, &pa, -1, +0);
     draw_confg_base (bitmap, &pa, em, vm);
   }
-
-  if (con (p)->fg == MIRROR)
-    draw_mirror (bitmap, p, em, vm);
 }
 
 void
@@ -348,7 +348,6 @@ draw_confg_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
       && (wall_correlation (p) == SWW
           || wall_correlation (p) == WWW)) return;
 
-  /* right */
   draw_confg_base (bitmap, &pr, em, vm);
   draw_confg_left (bitmap, &pr, em, vm, true);
 }
@@ -390,11 +389,19 @@ draw_confg_top (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (! redraw) return;
 
-  struct pos pa;
+  struct pos pa, par;
   prel (p, &pa, -1, +0);
+  prel (p, &par, -1, +1);
 
   draw_confg_base (bitmap, &pa, em, vm);
   draw_confg_right (bitmap, &pa, em, vm, true);
+
+  if (con (&pa)->fg == WALL
+      && (wall_correlation (&pa) == SWW
+          || wall_correlation (&pa) == WWW)) {
+    draw_confg_base (bitmap, &par, em, vm);
+    draw_confg_left (bitmap, &par, em, vm, true);
+  }
 
   /* struct pos pa, par; */
   /* prel (p, &pa, -1, +0); */
@@ -515,11 +522,11 @@ draw_room_frame_fg (ALLEGRO_BITMAP *bitmap, enum em em, enum vm vm,
   if (con (&ptr)->fg == CHOPPER && ptr_p) draw_chopper_fg (bitmap, &ptr, em, vm);
 
   /* MIRROR */
-  if (con (&pbl)->fg == MIRROR) draw_mirror_fg (bitmap, &pbl, em, vm);
-  if (con (&pbr)->fg == MIRROR && pbr_p) draw_mirror_fg (bitmap, &pbr, em, vm);
-  if (con (&pm)->fg == MIRROR && pm_p) draw_mirror_fg (bitmap, &pm, em, vm);
-  if (con (&ptl)->fg == MIRROR && ptl_p) draw_mirror_fg (bitmap, &ptl, em, vm);
-  if (con (&ptr)->fg == MIRROR && ptr_p) draw_mirror_fg (bitmap, &ptr, em, vm);
+  if (con (&pbl)->fg == MIRROR) draw_mirror_fg (bitmap, &pbl, f, em, vm);
+  if (con (&pbr)->fg == MIRROR && pbr_p) draw_mirror_fg (bitmap, &pbr, f, em, vm);
+  if (con (&pm)->fg == MIRROR && pm_p) draw_mirror_fg (bitmap, &pm, f, em, vm);
+  if (con (&ptl)->fg == MIRROR && ptl_p) draw_mirror_fg (bitmap, &ptl, f, em, vm);
+  if (con (&ptr)->fg == MIRROR && ptr_p) draw_mirror_fg (bitmap, &ptr, f, em, vm);
 
   /* ARCH TOP MID */
   if (con (&pbl)->fg == ARCH_TOP_MID) draw_arch_top_mid (bitmap, &pbl, em, vm);
@@ -676,7 +683,7 @@ draw_confg_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case TCARPET:
     draw_door_pole_base (bitmap, p, em, vm);
     draw_carpet_fg (bitmap, p, f, em, vm); break;
-  case MIRROR: draw_mirror_fg (bitmap, p, em, vm); break;
+  case MIRROR: draw_mirror_fg (bitmap, p, f, em, vm); break;
   default:
     error (-1, 0, "%s: unknown foreground (%i)",
            __func__, con (p)->fg);

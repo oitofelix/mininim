@@ -216,12 +216,6 @@ prepare_con_at_pos (struct pos *p)
 {
   if (! is_room_visible (p->room)) return;
 
-  switch (con (p)->fg) {
-  /* case WALL: update_cache_pos (p, em, vm); break; */
-  case MIRROR: generate_mirrors_reflex (); break;
-  default: break;
-  }
-
   switch (con (p)->bg) {
   case BALCONY: generate_stars (); break;
   default: break;
@@ -232,8 +226,7 @@ void
 prepare_room (int room)
 {
   if (! is_room_adjacent (room_view, room)) return;
-  update_cache (em, vm);
-  generate_mirrors_reflex ();
+  /* update_cache (em, vm); */
   generate_stars ();
 }
 
@@ -881,8 +874,7 @@ level_undo (struct diffset *diffset, int dir, char *prefix)
   apply_to_diff_pos (&diffset->diff[(dir >= 0) ? i + 1 : i], destroy_con_at_pos);
   apply_diffset_diff (diffset, &level, sizeof (level), dir, &text);
   apply_to_diff_pos (&diffset->diff[(dir >= 0) ? i + 1 : i], register_con_at_pos);
-  update_cache (em, vm);
-  generate_mirrors_reflex ();
+  /* update_cache (em, vm); */
   generate_stars ();
 
   xasprintf (&undo_msg, "%s %s: %s", prefix, dir_str, text);
