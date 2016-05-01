@@ -210,11 +210,33 @@ draw_mirror_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f,
     break;
   }
 
+  /* make mirror black */
+  al_hold_bitmap_drawing (false);
+  struct rect r;
+  r.c.room = p->room;
+  r.c.x = PLACE_WIDTH * p->place + 2;
+  r.c.y = PLACE_HEIGHT * p->floor + 3;
+  r.w = 12;
+  r.h = PLACE_HEIGHT - 16;
+  draw_filled_rect (bitmap, &r, BLACK);
+
+  /* draw floor reflex */
+  struct pos pl; prel (p, &pl, +0, -1);
+  al_hold_bitmap_drawing (false);
+  al_set_target_bitmap (bitmap);
+  al_set_clipping_rectangle (PLACE_WIDTH * p->place + 2, PLACE_HEIGHT * p->floor,
+                             16, PLACE_HEIGHT);
+  struct pos mouse_pos_bkp = mouse_pos;
+  mouse_pos.room = -1;
+  draw_floor_right (bitmap, &pl, em, vm);
+  mouse_pos = mouse_pos_bkp;
+  al_reset_clipping_rectangle ();
+
   /* draw anim */
   al_hold_bitmap_drawing (false);
   al_set_target_bitmap (bitmap);
   al_set_clipping_rectangle (PLACE_WIDTH * p->place + 2, PLACE_HEIGHT * p->floor + 3,
-                             PLACE_WIDTH - 11, PLACE_HEIGHT - 9);
+                             16, PLACE_HEIGHT - 9);
   struct frame f0 = *f;
   f0.flip ^= ALLEGRO_FLIP_HORIZONTAL;
   f0.c.x = (2 * PLACE_WIDTH * p->place + 36) - (f->c.x + al_get_bitmap_width (f->b));
