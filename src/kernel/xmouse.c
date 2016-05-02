@@ -83,9 +83,8 @@ get_mouse_pos (struct pos *p)
   int ry = (c.y - 3) % PLACE_HEIGHT;
 
   pos_gen (&c, p, 0, 3);
-  struct pos np; npos (p, &np);
 
-  if (edit == EDIT_NONE || np.room == 0) {
+  if (edit == EDIT_NONE) {
     *p = (struct pos) {-1,-1,-1};
     return p;
   }
@@ -105,6 +104,12 @@ get_mouse_pos (struct pos *p)
     else if (ry >= 50) pos_gen (&c, p, 23 - 2.5 * (ry - 50), 3);
     else pos_gen (&c, p, 23, 3);
     break;
+  }
+
+  struct pos np; npos (p, &np);
+  if (! np.room) {
+    *p = (struct pos) {-1,-1,-1};
+    return p;
   }
 
   return p;

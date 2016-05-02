@@ -217,7 +217,7 @@ prepare_con_at_pos (struct pos *p)
   if (! is_room_visible (p->room)) return;
 
   switch (con (p)->bg) {
-  case BALCONY: generate_stars (); break;
+  case BALCONY: generate_stars_for_pos (p); break;
   default: break;
   }
 }
@@ -226,8 +226,8 @@ void
 prepare_room (int room)
 {
   if (! is_room_adjacent (room_view, room)) return;
-  /* update_cache (em, vm); */
-  generate_stars ();
+
+  generate_stars_for_room (room);
 }
 
 void
@@ -971,7 +971,7 @@ level_undo (struct diffset *diffset, int dir, char *prefix)
   apply_diffset_diff (diffset, &level, sizeof (level), dir, &text);
   apply_to_diff_pos (&diffset->diff[(dir >= 0) ? i + 1 : i], register_con_at_pos);
   /* update_cache (em, vm); */
-  generate_stars ();
+  /* generate_stars (); */
 
   xasprintf (&undo_msg, "%s %s: %s", prefix, dir_str, text);
   editor_msg (undo_msg, 24);

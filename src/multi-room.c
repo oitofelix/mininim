@@ -856,7 +856,7 @@ mr_coord (int room, enum dir dir, int *rx, int *ry)
   int x, y;
   for (x = 0; x < mr.w; x++)
     for (y = 0; y < mr.h; y++)
-      if (mr.cell[x][y].room == room) {
+      if (room && mr.cell[x][y].room == room) {
         switch (dir) {
         case LEFT:
           nmr_coord (x - 1, y, rx, ry);

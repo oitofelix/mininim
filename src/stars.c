@@ -39,46 +39,66 @@ unload_stars (void)
 }
 
 void
+generate_stars_for_pos (struct pos *p)
+{
+  struct pos np; npos (p, &np);
+  int x, y;
+  if (! mr_coord (np.room, -1, &x, &y)) return;
+
+  struct stars *stars = &mr.cell[x][y].stars[np.floor][np.place];
+  destroy_bitmap (stars->b);
+  stars->b = NULL;
+  if (stars->s) al_free (stars->s);
+  stars->s = NULL;
+  stars->count = 0;
+
+  if (con (&np)->bg != BALCONY) return;
+
+  stars->count = 3 + prandom_pos (&np, 5);
+  stars->s = xcalloc (stars->count, sizeof (* stars->s));
+
+  int i, min_x = INT_MAX, min_y = INT_MAX,
+    max_x = INT_MIN, max_y = INT_MIN;
+
+  for (i = 0; i < stars->count; i++) {
+    struct star *s = &stars->s[i];
+    star_coord (&np, i, s);
+    min_x = min_int (min_x, s->x);
+    min_y = min_int (min_y, s->y);
+    max_x = max_int (max_x, s->x);
+    max_y = max_int (max_y, s->y);
+    s->color = next_color (s->color);
+  }
+
+  stars->b = create_bitmap (max_x - min_x + 1, max_y - min_y + 1);
+  clear_bitmap (stars->b, TRANSPARENT_COLOR);
+  stars->c.room = np.room;
+  stars->c.x = min_x;
+  stars->c.y = min_y;
+
+  redraw_stars_bitmap (stars, vm);
+}
+
+void
+generate_stars_for_room (int room)
+{
+  struct pos p;
+  p.room = room;
+
+  for (p.floor = FLOORS; p.floor >= -1; p.floor--)
+    for (p.place = -1; p.place < PLACES; p.place++)
+      generate_stars_for_pos (&p);
+}
+
+void
 generate_stars_for_cell (int x, int y)
 {
   struct pos p;
   p.room = mr.cell[x][y].room;
 
   for (p.floor = FLOORS; p.floor >= -1; p.floor--)
-    for (p.place = -1; p.place < PLACES; p.place++) {
-      struct stars *stars = &mr.cell[x][y].stars[p.floor + 1][p.place + 1];
-      destroy_bitmap (stars->b);
-      stars->b = NULL;
-      if (stars->s) al_free (stars->s);
-      stars->s = NULL;
-      stars->count = 0;
-
-      if (con (&p)->bg != BALCONY) continue;
-
-      stars->count = 3 + prandom_pos (&p, 5);
-      stars->s = xcalloc (stars->count, sizeof (* stars->s));
-
-      int i, min_x = INT_MAX, min_y = INT_MAX,
-        max_x = INT_MIN, max_y = INT_MIN;
-
-      for (i = 0; i < stars->count; i++) {
-        struct star *s = &stars->s[i];
-        star_coord (&p, i, s);
-        min_x = min_int (min_x, s->x);
-        min_y = min_int (min_y, s->y);
-        max_x = max_int (max_x, s->x);
-        max_y = max_int (max_y, s->y);
-        s->color = next_color (s->color);
-      }
-
-      stars->b = create_bitmap (max_x - min_x + 1, max_y - min_y + 1);
-      clear_bitmap (stars->b, TRANSPARENT_COLOR);
-      stars->c.room = p.room;
-      stars->c.x = min_x;
-      stars->c.y = min_y;
-
-      redraw_stars_bitmap (stars, vm);
-    }
+    for (p.place = -1; p.place < PLACES; p.place++)
+      generate_stars_for_pos (&p);
 }
 
 void
@@ -87,7 +107,7 @@ generate_stars (void)
   int x, y;
   for (y = mr.h - 1; y >= 0; y--)
     for (x = 0; x < mr.w; x++)
-      generate_stars_for_cell (x, y);
+      if (mr.cell[x][y].room) generate_stars_for_cell (x, y);
 }
 
 static ALLEGRO_COLOR
@@ -129,6 +149,8 @@ next_color (int c)
 static void
 draw_stars (ALLEGRO_BITMAP *bitmap, struct stars *stars, enum vm vm)
 {
+  if (! stars->count) return;
+
   if (anim_cycle % 4 || game_paused) {
     draw_bitmapc (stars->b, bitmap, &stars->c, 0);
     return;
@@ -194,8 +216,11 @@ void
 draw_balcony_stars (ALLEGRO_BITMAP *bitmap, struct pos *p, enum vm vm)
 {
   if (con (p)->bg != BALCONY) return;
+  struct pos np; npos (p, &np);
 
-  struct stars *stars = &mr.cell[mr.dx][mr.dy].stars[p->floor + 1][p->place + 1];
+  if (! np.room) return;
+
+  struct stars *stars = &mr.cell[mr.dx][mr.dy].stars[np.floor][np.place];
 
   if (vm != mr.last.vm) redraw_stars_bitmap (stars, vm);
 
