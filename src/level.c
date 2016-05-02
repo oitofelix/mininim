@@ -434,6 +434,102 @@ process_keys (void)
     force_full_redraw = true;
   }
 
+  /* H: select room at left (J if flipped horizontally) */
+  if (! active_menu
+      && ((! flip_gamepad_horizontal
+           && was_key_pressed (ALLEGRO_KEY_H, 0, 0, true))
+          || (flip_gamepad_horizontal
+              && was_key_pressed (ALLEGRO_KEY_J, 0, 0, true))))
+    mr_select_trans (LEFT);
+
+  /* J: select room at right (H if flipped horizontally) */
+  if (! active_menu
+      && ((! flip_gamepad_horizontal
+           && was_key_pressed (ALLEGRO_KEY_J, 0, 0, true))
+          || (flip_gamepad_horizontal
+              && was_key_pressed (ALLEGRO_KEY_H, 0, 0, true))))
+    mr_select_trans (RIGHT);
+
+  /* U: select room above (N if flipped vertically) */
+  if (! active_menu
+      && ((! flip_gamepad_vertical
+           && was_key_pressed (ALLEGRO_KEY_U, 0, 0, true))
+          || (flip_gamepad_vertical
+              && was_key_pressed (ALLEGRO_KEY_N, 0, 0, true))))
+    mr_select_trans (ABOVE);
+
+  /* N: select room below (U if flipped vertically) */
+  if (! active_menu
+      && ((! flip_gamepad_vertical
+           && was_key_pressed (ALLEGRO_KEY_N, 0, 0, true))
+          || (flip_gamepad_vertical
+              && was_key_pressed (ALLEGRO_KEY_U, 0, 0, true))))
+    mr_select_trans (BELOW);
+
+  /* SHIFT+H: multi-room view to left (J if flipped horizontally) */
+  if (! active_menu
+      && ((! flip_gamepad_horizontal
+           && was_key_pressed (ALLEGRO_KEY_H, 0, ALLEGRO_KEYMOD_SHIFT, true))
+          || (flip_gamepad_horizontal
+              && was_key_pressed (ALLEGRO_KEY_J, 0, ALLEGRO_KEYMOD_SHIFT, true))))
+    mr_view_trans (LEFT);
+
+  /* SHIFT+J: multi-room view to right (H if flipped horizontally) */
+  if (! active_menu
+      && ((! flip_gamepad_horizontal
+           && was_key_pressed (ALLEGRO_KEY_J, 0, ALLEGRO_KEYMOD_SHIFT, true))
+          || (flip_gamepad_horizontal
+              && was_key_pressed (ALLEGRO_KEY_H, 0, ALLEGRO_KEYMOD_SHIFT, true))))
+    mr_view_trans (RIGHT);
+
+  /* SHIFT+U: multi-room view above (N if flipped vertically) */
+  if (! active_menu
+      && ((! flip_gamepad_vertical
+           && was_key_pressed (ALLEGRO_KEY_U, 0, ALLEGRO_KEYMOD_SHIFT, true))
+          || (flip_gamepad_vertical
+              && was_key_pressed (ALLEGRO_KEY_N, 0, ALLEGRO_KEYMOD_SHIFT, true))))
+    mr_view_trans (ABOVE);
+
+  /* SHIFT+N: multi-room view below (U if flipped vertically) */
+  if (! active_menu
+      && ((! flip_gamepad_vertical
+           && was_key_pressed (ALLEGRO_KEY_N, 0, ALLEGRO_KEYMOD_SHIFT, true))
+          || (flip_gamepad_vertical
+              && was_key_pressed (ALLEGRO_KEY_U, 0, ALLEGRO_KEYMOD_SHIFT, true))))
+    mr_view_trans (BELOW);
+
+  /* ALT+H: multi-room page view to left (J if flipped horizontally) */
+  if (! active_menu
+      && ((! flip_gamepad_horizontal
+           && was_key_pressed (ALLEGRO_KEY_H, 0, ALLEGRO_KEYMOD_ALT, true))
+          || (flip_gamepad_horizontal
+              && was_key_pressed (ALLEGRO_KEY_J, 0, ALLEGRO_KEYMOD_ALT, true))))
+    mr_view_page_trans (LEFT);
+
+  /* ALT+J: multi-room page view to right (H if flipped horizontally) */
+  if (! active_menu
+      && ((! flip_gamepad_horizontal
+           && was_key_pressed (ALLEGRO_KEY_J, 0, ALLEGRO_KEYMOD_ALT, true))
+          || (flip_gamepad_horizontal
+              && was_key_pressed (ALLEGRO_KEY_H, 0, ALLEGRO_KEYMOD_ALT, true))))
+    mr_view_page_trans (RIGHT);
+
+  /* ALT+U: multi-room page view above (N if flipped vertically) */
+  if (! active_menu
+      && ((! flip_gamepad_vertical
+           && was_key_pressed (ALLEGRO_KEY_U, 0, ALLEGRO_KEYMOD_ALT, true))
+          || (flip_gamepad_vertical
+              && was_key_pressed (ALLEGRO_KEY_N, 0, ALLEGRO_KEYMOD_ALT, true))))
+    mr_view_page_trans (ABOVE);
+
+  /* ALT+N: multi-room page view below (U if flipped vertically) */
+  if (! active_menu
+      && ((! flip_gamepad_vertical
+           && was_key_pressed (ALLEGRO_KEY_N, 0, ALLEGRO_KEYMOD_ALT, true))
+          || (flip_gamepad_vertical
+              && was_key_pressed (ALLEGRO_KEY_U, 0, ALLEGRO_KEYMOD_ALT, true))))
+    mr_view_page_trans (BELOW);
+
   /* ESC: pause game */
   if (step_one_cycle) {
     step_one_cycle = false;
