@@ -49,6 +49,9 @@ void draw_mirror (ALLEGRO_BITMAP *bitmap, struct pos *p,
                   enum em em, enum vm vm);
 void draw_mirror_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
                      struct frame *f, enum em em, enum vm vm);
+void draw_floor_reflex (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                        enum em em, enum vm vm);
+struct coord *floor_reflex_coord (struct pos *p, struct coord *c);
 struct coord *mirror_coord (struct pos *p, struct coord *c);
 struct coord *mirror_reflex_coord (struct pos *p, struct coord *c);
 

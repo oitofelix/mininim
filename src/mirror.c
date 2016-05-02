@@ -166,19 +166,10 @@ draw_mirror (ALLEGRO_BITMAP *bitmap, struct pos *p,
   draw_filled_rect (bitmap, &r, BLACK);
 
   /* draw floor reflex */
-  struct pos pl; prel (p, &pl, +0, -1);
-  al_hold_bitmap_drawing (false);
-  al_set_target_bitmap (bitmap);
-  al_set_clipping_rectangle (PLACE_WIDTH * p->place + 2, PLACE_HEIGHT * p->floor,
-                             PLACE_WIDTH, PLACE_HEIGHT);
-  struct pos mouse_pos_bkp = mouse_pos;
-  mouse_pos.room = -1;
-  draw_floor_right (bitmap, &pl, em, vm);
-  mouse_pos = mouse_pos_bkp;
-  al_reset_clipping_rectangle ();
+  draw_floor_reflex (bitmap, p, em, vm);
 
   /* draw mirror properly */
-  mirror = apply_hue_palette (mirror);
+  if (vm == VGA) mirror = apply_hue_palette (mirror);
   if (hgc) mirror = apply_palette (mirror, hgc_palette);
   if (peq (p, &mouse_pos))
     mirror = apply_palette (mirror, selection_palette);
@@ -216,21 +207,12 @@ draw_mirror_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f,
   r.c.room = p->room;
   r.c.x = PLACE_WIDTH * p->place + 2;
   r.c.y = PLACE_HEIGHT * p->floor + 3;
-  r.w = 12;
+  r.w = 13;
   r.h = PLACE_HEIGHT - 16;
   draw_filled_rect (bitmap, &r, BLACK);
 
   /* draw floor reflex */
-  struct pos pl; prel (p, &pl, +0, -1);
-  al_hold_bitmap_drawing (false);
-  al_set_target_bitmap (bitmap);
-  al_set_clipping_rectangle (PLACE_WIDTH * p->place + 2, PLACE_HEIGHT * p->floor,
-                             16, PLACE_HEIGHT);
-  struct pos mouse_pos_bkp = mouse_pos;
-  mouse_pos.room = -1;
-  draw_floor_right (bitmap, &pl, em, vm);
-  mouse_pos = mouse_pos_bkp;
-  al_reset_clipping_rectangle ();
+  draw_floor_reflex (bitmap, p, em, vm);
 
   /* draw anim */
   al_hold_bitmap_drawing (false);
@@ -244,7 +226,7 @@ draw_mirror_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f,
   al_reset_clipping_rectangle ();
 
   /* draw mirror properly */
-  mirror = apply_hue_palette (mirror);
+  if (vm == VGA) mirror = apply_hue_palette (mirror);
   if (hgc) mirror = apply_palette (mirror, hgc_palette);
   if (peq (p, &mouse_pos))
     mirror = apply_palette (mirror, selection_palette);
@@ -252,6 +234,50 @@ draw_mirror_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f,
   struct coord c;
   int h = al_get_bitmap_height (mirror);
   draw_bitmap_regionc (mirror, bitmap, 0, 0, 22, h, mirror_coord (p, &c), 0);
+}
+
+void
+draw_floor_reflex (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                   enum em em, enum vm vm)
+{
+  ALLEGRO_BITMAP *floor_right = NULL;
+
+  switch (em) {
+  case DUNGEON:
+    switch (vm) {
+    case CGA: floor_right = dc_floor_right; break;
+    case EGA: floor_right = de_floor_right; break;
+    case VGA: floor_right = dv_floor_right; break;
+    }
+    break;
+  case PALACE:
+    switch (vm) {
+    case CGA: floor_right = pc_floor_right; break;
+    case EGA: floor_right = pe_floor_right; break;
+    case VGA: floor_right = pv_floor_right; break;
+    }
+    break;
+  }
+
+  if (vm == VGA) floor_right = apply_hue_palette (floor_right);
+  if (hgc) floor_right = apply_palette (floor_right, hgc_palette);
+  if (peq (p, &mouse_pos))
+    floor_right = apply_palette (floor_right, selection_palette);
+
+  struct pos pl; prel (p, &pl, +0, -1);
+  struct coord c;
+  int h = al_get_bitmap_height (floor_right);
+  draw_bitmap_regionc (floor_right, bitmap, 0, 2, 17, h - 9,
+                       floor_reflex_coord (&pl, &c), 0);
+}
+
+struct coord *
+floor_reflex_coord (struct pos *p, struct coord *c)
+{
+  c->x = PLACE_WIDTH * (p->place + 1) + 2;
+  c->y = PLACE_HEIGHT * p->floor + 50;
+  c->room = p->room;
+  return c;
 }
 
 struct coord *
