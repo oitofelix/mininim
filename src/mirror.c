@@ -219,10 +219,12 @@ draw_mirror_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f,
   al_set_target_bitmap (bitmap);
   al_set_clipping_rectangle (PLACE_WIDTH * p->place + 2, PLACE_HEIGHT * p->floor + 3,
                              16, PLACE_HEIGHT - 9);
-  struct frame f0 = *f;
-  f0.flip ^= ALLEGRO_FLIP_HORIZONTAL;
-  f0.c.x = (2 * PLACE_WIDTH * p->place + 36) - (f->c.x + al_get_bitmap_width (f->b));
-  draw_frame (bitmap, &f0);
+  struct anim *a = f->id;
+  struct anim a0 = *a;
+  a0.f.flip ^= ALLEGRO_FLIP_HORIZONTAL;
+  a0.f.c.x = (2 * PLACE_WIDTH * p->place + 36)
+    - (a->f.c.x + al_get_bitmap_width (a->f.b));
+  draw_anim_frame (bitmap, &a0, vm);
   al_reset_clipping_rectangle ();
 
   /* draw mirror properly */
