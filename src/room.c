@@ -158,6 +158,8 @@ void
 draw_conbg (ALLEGRO_BITMAP *bitmap, struct pos *p,
             enum em em, enum vm vm)
 {
+  if (con (p)->fg == WALL) return;
+
   switch (con (p)->bg) {
   case NO_BG:
     if (em == PALACE) draw_bricks_02 (bitmap, p, em, vm); break;
@@ -953,12 +955,8 @@ apply_hue_color (ALLEGRO_COLOR c)
 void
 draw_no_floor_selection (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
-  enum conbg bg = con (p)->bg;
   if (peq (p, &mouse_pos)
-      && con (p)->fg == NO_FLOOR
-      && (bg == NO_BRICKS
-          || (em == DUNGEON && bg == NO_BG)
-          || (em == PALACE && bg == BRICKS_00))) {
+      && con (p)->fg == NO_FLOOR) {
     struct rect r = new_rect (p->room, p->place * PLACE_WIDTH + 25,
                               p->floor * PLACE_HEIGHT + 3,
                               PLACE_WIDTH, PLACE_HEIGHT - 16);

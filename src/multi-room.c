@@ -411,15 +411,16 @@ draw_animated_background (ALLEGRO_BITMAP *bitmap, int room)
   struct pos p;
   p.room = room_view;
 
-  for (p.floor = FLOORS; p.floor >= -1; p.floor--)
-    for (p.place = -1; p.place < PLACES; p.place++) {
-      draw_fire (bitmap, &p, vm);
-      draw_balcony_stars (bitmap, &p, vm);
-    }
-
   for (p.floor = FLOORS; p.floor >= 0; p.floor--)
     for (p.place = -1; p.place < PLACES; p.place++)
       draw_no_floor_selection (bitmap, &p);
+
+  for (p.floor = FLOORS; p.floor >= -1; p.floor--)
+    for (p.place = -1; p.place < PLACES; p.place++) {
+      if (con (&p)->fg == WALL) continue;
+      draw_fire (bitmap, &p, vm);
+      draw_balcony_stars (bitmap, &p, vm);
+    }
 
   room_view = room_view_bkp;
 }
