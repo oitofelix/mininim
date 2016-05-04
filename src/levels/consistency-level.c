@@ -33,18 +33,8 @@ play_consistency_level (int number)
 static void
 start (void)
 {
-  struct pos p;
-  if ((start_pos.room != 0
-       || start_pos.floor != 0
-       || start_pos.place != 0)
-      && start_pos.room <= LROOMS)
-    p = start_pos;
-  else p = (struct pos) {1,0,0};
-  create_anim (NULL, KID, &p, RIGHT);
   create_anim (&anima[0], 0, NULL, 0);
-  anima[0].controllable = true;
   anima[1].controllable = true;
-  room_view = p.room;
 }
 
 static void
@@ -217,4 +207,5 @@ next_consistency_level (int number)
   consistency_level.start = start;
   consistency_level.next_level = next_consistency_level;
   consistency_level.end = end;
+  consistency_level.start_pos = (struct pos) {1,0,0};
 }

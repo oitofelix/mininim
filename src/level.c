@@ -238,6 +238,7 @@ register_anims (void)
   if (is_valid_pos (&start_pos))
     kid_start_pos = start_pos;
   else kid_start_pos = level.start_pos;
+  room_view = kid_start_pos.room;
   int id = create_anim (NULL, KID, &kid_start_pos, level.start_dir);
   struct anim *k = &anima[id];
   k->total_lives = total_lives;
