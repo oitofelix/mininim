@@ -1224,7 +1224,6 @@ draw_loading_screen (void)
   draw_bitmap (icon, screen, x, y, 0);
   draw_text (screen, "Loading....", ORIGINAL_WIDTH / 2.0, ORIGINAL_HEIGHT / 2.0,
              ALLEGRO_ALIGN_CENTRE);
-  acknowledge_resize ();
   show ();
 }
 
