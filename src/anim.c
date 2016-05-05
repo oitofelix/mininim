@@ -46,7 +46,7 @@ play_anim (void (*draw_callback) (void),
   acknowledge_resize ();
   ALLEGRO_EVENT event;
   ALLEGRO_TIMER *timer = create_timer (1.0 / freq);
-  event_queue = create_event_queue ();
+  if (! event_queue) event_queue = create_event_queue ();
   al_register_event_source (event_queue, get_display_event_source (display));
   al_register_event_source (event_queue, get_keyboard_event_source ());
   al_register_event_source (event_queue, get_joystick_event_source ());

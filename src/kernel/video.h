@@ -60,6 +60,7 @@ bool is_video_effect_started (void);
 void show (void);
 void flip_display (ALLEGRO_BITMAP *bitmap);
 bool is_fullscreen (void);
+void process_display_events (void);
 
 /* palette */
 int compare_palette_caches (const void *pc0, const void *pc1);

@@ -572,7 +572,24 @@ show (void)
 }
 
 bool
-is_fullscreen ()
+is_fullscreen (void)
 {
   return al_get_display_flags (display) & ALLEGRO_FULLSCREEN_WINDOW;
+}
+
+void
+process_display_events (void)
+{
+  ALLEGRO_EVENT event;
+  while (al_get_next_event (event_queue, &event))
+    switch (event.type) {
+    case ALLEGRO_EVENT_DISPLAY_RESIZE:
+      acknowledge_resize ();
+      break;
+    case ALLEGRO_EVENT_DISPLAY_CLOSE:
+      quit_game ();
+      break;
+    }
+
+  show ();
 }
