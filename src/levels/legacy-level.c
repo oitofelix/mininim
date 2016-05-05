@@ -125,7 +125,10 @@ legacy_level_start (void)
     struct pos p = {2,0,6};
     if (level_3_checkpoint) {
       struct pos plf = {7,0,4};
-      con (&plf)->fg = NO_FLOOR;
+      register_con_undo (&undo, &plf,
+                         NO_FLOOR, MIGNORE, MIGNORE,
+                         true, true, false, true,
+                         "NO FLOOR");
       k->f.dir = (k->f.dir == LEFT) ? RIGHT : LEFT;
       place_frame (&k->f, &k->f, kid_normal_00, &p,
                    k->f.dir == LEFT ? +22 : +31, +15);
@@ -211,7 +214,10 @@ legacy_level_special_events (void)
         && pm.room == 1
         && (pm.place == 2 || pm.place == 3)
         && con (&skeleton_floor_pos)->fg == SKELETON_FLOOR) {
-      con (&skeleton_floor_pos)->fg = FLOOR;
+      register_con_undo (&undo, &skeleton_floor_pos,
+                         FLOOR, MIGNORE, MIGNORE,
+                         true, true, false, true,
+                         "FLOOR");
       skeleton_id = create_anim (NULL, SKELETON, &skeleton_floor_pos, LEFT);
       s = &anima[skeleton_id];
       get_legacy_skill (2, &s->skill);

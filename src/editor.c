@@ -460,7 +460,7 @@ editor (void)
     register_con_undo (&undo, &p,
                        fg, MIGNORE, MIGNORE,
                        true, true, false, true,
-                       "FLOOR");
+                       get_confg_name (fg));
     break;
   case EDIT_PILLAR:
     if (! is_valid_pos (&p)) {
@@ -486,7 +486,7 @@ editor (void)
     register_con_undo (&undo, &p,
                        fg, MIGNORE, MIGNORE,
                        true, false, false, true,
-                       "PILLAR");
+                       get_confg_name (fg));
     break;
   case EDIT_DOOR:
     if (! is_valid_pos (&p)) {
@@ -514,7 +514,7 @@ editor (void)
     register_con_undo (&undo, &p,
                        fg, MIGNORE, MIGNORE,
                        true, true, false, true,
-                       "DOOR");
+                       get_confg_name (fg));
     break;
   case EDIT_CARPET:
     if (! is_valid_pos (&p)) {
@@ -538,7 +538,7 @@ editor (void)
     register_con_undo (&undo, &p,
                        fg, MIGNORE, MIGNORE,
                        true, false, false, true,
-                       "CARPET");
+                       get_confg_name (fg));
     break;
   case EDIT_ARCH:
     if (! is_valid_pos (&p)) {
@@ -564,7 +564,7 @@ editor (void)
     register_con_undo (&undo, &p,
                        fg, MIGNORE, MIGNORE,
                        true, false, false, true,
-                       "ARCH");
+                       get_confg_name (fg));
     break;
   case EDIT_BG:
     if (! is_valid_pos (&p)) {
@@ -595,7 +595,7 @@ editor (void)
     register_con_undo (&undo, &p,
                        MIGNORE, bg, MIGNORE,
                        false, false, (bg == BALCONY), true,
-                       "BACKGROUND");
+                       get_conbg_name (bg));
     break;
   case EDIT_EXT:
     if (! is_valid_pos (&p)) {
@@ -630,7 +630,7 @@ editor (void)
       register_con_undo (&undo, &p,
                          MIGNORE, MIGNORE, ext.item,
                          false, false, false, true,
-                         "ITEM EXTENSION");
+                         get_item_name (ext.item));
       break;
     case LOOSE_FLOOR:
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
@@ -741,12 +741,12 @@ editor (void)
 
     free_ext_str = false;
 
-    fg_str = get_confg_name (&p);
-    bg_str = get_conbg_name (&p);
+    fg_str = get_confg_name (con (&p)->fg);
+    bg_str = get_conbg_name (con (&p)->bg);
 
     switch (con (&p)->fg) {
     case FLOOR:
-      ext_str = get_item_name (&p);
+      ext_str = get_item_name (con (&p)->ext.item);
       break;
     case LOOSE_FLOOR:
       ext_str = con (&p)->ext.cant_fall ? "CAN'T FALL" : "FALL";

@@ -1077,9 +1077,9 @@ activate_con (struct pos *p)
 }
 
 char *
-get_confg_name (struct pos *p)
+get_confg_name (enum confg t)
 {
-  switch (con (p)->fg) {
+  switch (t) {
   case NO_FLOOR: return "NO FLOOR";
   case FLOOR: return "FLOOR";
   case BROKEN_FLOOR: return "BROKEN FLOOR";
@@ -1110,9 +1110,9 @@ get_confg_name (struct pos *p)
 }
 
 char *
-get_conbg_name (struct pos *p)
+get_conbg_name (enum conbg t)
 {
-  switch (con (p)->bg) {
+  switch (t) {
   case NO_BG: return "NO BG";
   case BRICKS_00: return "BRICKS 00";
   case BRICKS_01: return "BRICKS 01";
@@ -1127,12 +1127,9 @@ get_conbg_name (struct pos *p)
 }
 
 char *
-get_item_name (struct pos *p)
+get_item_name (enum item t)
 {
-  /* only a normal floor can have items */
-  assert (con (p)->fg == FLOOR);
-
-  switch (con (p)->ext.item) {
+  switch (t) {
   case NO_ITEM: return "NO ITEM";
   case EMPTY_POTION: return "EMPTY POTION";
   case SMALL_LIFE_POTION: return "SMALL LIFE POTION";
