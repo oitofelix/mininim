@@ -181,6 +181,11 @@ kid_die_suddenly (struct anim *k)
 void
 kid_die (struct anim *k)
 {
+  if (k->action == kid_fall) {
+    k->current_lives = 0;
+    return;
+  }
+
   k->oaction = k->action;
   k->action = kid_die;
   k->f.flip = (k->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;

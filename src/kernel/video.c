@@ -20,9 +20,8 @@
 #include "mininim.h"
 
 bool force_full_redraw;
-int redraw_bottom;
 ALLEGRO_DISPLAY *display;
-ALLEGRO_BITMAP *uscreen;
+ALLEGRO_BITMAP *uscreen, *iscreen;
 ALLEGRO_TIMER *video_timer;
 int screen_flags = 0;
 bool hgc;
@@ -71,6 +70,7 @@ init_video (void)
   effect_buffer = create_bitmap (ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
   black_screen = create_bitmap (ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
   uscreen = create_bitmap (ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
+  iscreen = create_bitmap (display_width, display_height);
   clear_bitmap (uscreen, TRANSPARENT_COLOR);
 
   int flags = al_get_new_bitmap_flags ();
@@ -300,7 +300,6 @@ draw_bottom_text (ALLEGRO_BITMAP *bitmap, char *text, int priority)
              || ! bitmap) {
     al_stop_timer (bottom_text_timer);
     cur_priority = INT_MIN;
-    redraw_bottom = 2;
   } else if (al_get_timer_started (bottom_text_timer)) {
     ALLEGRO_COLOR bg_color;
 
@@ -375,14 +374,23 @@ flip_display (ALLEGRO_BITMAP *bitmap)
 
   int uw = al_get_bitmap_width (uscreen);
   int uh = al_get_bitmap_height (uscreen);
-
-  set_target_backbuffer (display);
-
+  
   if (bitmap) {
     int bw = al_get_bitmap_width (bitmap);
     int bh = al_get_bitmap_height (bitmap);
+    set_target_backbuffer (display);
     al_draw_scaled_bitmap (bitmap, 0, 0, bw, bh, 0, 0, w, h, screen_flags);
   } else {
+    int iw = al_get_bitmap_width (iscreen);
+    int ih = al_get_bitmap_height (iscreen);
+
+    if (iw != w || ih != h) {
+      destroy_bitmap (iscreen);
+      iscreen = clone_bitmap (al_get_backbuffer (display));
+    }
+
+    al_set_target_bitmap (iscreen);
+
     int x, y;
     int tw, th;
     mr_get_resolution (&tw, &th);
@@ -405,17 +413,18 @@ flip_display (ALLEGRO_BITMAP *bitmap)
             || mr.cell[x][y].room
             || mr.last.display_width != w
             || mr.last.display_height != h
-            || (dy + dh - 1 >= h - 1 - 8 && redraw_bottom)
             || force_full_redraw)
-          al_draw_scaled_bitmap (screen, 0, 0, sw, sh, dx, dy, dw, dh, screen_flags);
+          al_draw_scaled_bitmap (screen, 0, 0, sw, sh, dx, dy, dw, dh, 0);
       }
+
+    set_target_backbuffer (display);
+    al_draw_bitmap (iscreen, 0, 0, screen_flags);
   }
 
   al_draw_scaled_bitmap (uscreen, 0, 0, uw, uh, 0, 0, w, h, 0);
   al_flip_display ();
 
   force_full_redraw = false;
-  if (redraw_bottom > 0) redraw_bottom--;
 }
 
 void

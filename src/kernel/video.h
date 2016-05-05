@@ -70,9 +70,8 @@ ALLEGRO_COLOR hgc_palette (ALLEGRO_COLOR c);
 
 /* variables */
 extern bool force_full_redraw;
-extern int redraw_bottom;
 extern ALLEGRO_DISPLAY *display;
-extern ALLEGRO_BITMAP *uscreen;
+extern ALLEGRO_BITMAP *uscreen, *iscreen;
 extern ALLEGRO_BITMAP *effect_buffer;
 extern ALLEGRO_BITMAP *black_screen;
 extern ALLEGRO_TIMER *video_timer;

@@ -198,6 +198,9 @@ play_anim (void (*draw_callback) (void),
       else if (dz > 0) while (dz-- > 0) mr_view_trans (ABOVE);
       if (dw < 0) while (dw++ < 0) mr_view_trans (LEFT);
       else if (dw > 0) while (dw-- > 0) mr_view_trans (RIGHT);
+
+      draw_multi_rooms ();
+      force_full_redraw = true;
       break;
     case ALLEGRO_EVENT_KEY_CHAR:
       key = event;

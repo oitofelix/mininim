@@ -870,18 +870,6 @@ draw_lives (ALLEGRO_BITMAP *bitmap, struct anim *k, enum vm vm)
       ke = get_anim_by_id (k->enemy_id);
       if (ke) draw_guard_lives (bitmap, ke, vm);
     }
-
-    static int kid_current_lives = -1, enemy_current_lives = -1,
-      enemy_id = -1;
-
-    if (kid_current_lives != k->current_lives
-        || (ke && enemy_current_lives != ke->current_lives)
-        || enemy_id != k->enemy_id) {
-      redraw_bottom = true;
-      kid_current_lives = k->current_lives;
-      if (ke) enemy_current_lives = ke->current_lives;
-      enemy_id = k->enemy_id;
-    }
   }
 }
 
