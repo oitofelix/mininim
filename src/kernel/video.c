@@ -36,6 +36,7 @@ static ALLEGRO_FONT *builtin_font;
 int display_width = DISPLAY_WIDTH, display_height = DISPLAY_HEIGHT;
 ALLEGRO_BITMAP *icon;
 int effect_counter;
+void (*load_callback) (void);
 
 static struct palette_cache {
   ALLEGRO_BITMAP *ib, *ob;
@@ -54,6 +55,8 @@ init_video (void)
                             | ALLEGRO_WINDOWED | ALLEGRO_RESIZABLE
                             | ALLEGRO_GENERATE_EXPOSE_EVENTS);
 
+  al_set_new_display_option (ALLEGRO_SINGLE_BUFFER, 1, ALLEGRO_SUGGEST);
+
   display = al_create_display (display_width, display_height);
   if (! display) error (-1, 0, "%s (void): failed to initialize display", __func__);
 
@@ -68,6 +71,7 @@ init_video (void)
   effect_buffer = create_bitmap (ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
   black_screen = create_bitmap (ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
   uscreen = create_bitmap (ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
+  clear_bitmap (uscreen, TRANSPARENT_COLOR);
 
   int flags = al_get_new_bitmap_flags ();
   al_add_new_bitmap_flag (ALLEGRO_MEMORY_BITMAP);
@@ -335,6 +339,8 @@ load_bitmap (char *filename)
            __func__, filename);
 
   validate_bitmap_for_mingw (bitmap);
+
+  if (load_callback) load_callback ();
 
   return bitmap;
 }

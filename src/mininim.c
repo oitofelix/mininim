@@ -1115,14 +1115,16 @@ main (int _argc, char **_argv)
 
   al_inhibit_screensaver (inhibit_screensaver);
 
-  draw_loading_screen ();
-
   show_mouse_cursor ();
   set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_BUSY);
+
+  load_callback = draw_loading_screen;
 
   load_samples ();
   load_level ();
   load_cutscenes ();
+
+  load_callback = NULL;
 
   set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
 
@@ -1217,10 +1219,12 @@ draw_loading_screen (void)
   int w = al_get_bitmap_width (icon);
   int h = al_get_bitmap_height (icon);
   ALLEGRO_BITMAP *screen = mr.cell[0][0].screen;
+  clear_bitmap (screen, BLACK);
   draw_filled_rectangle (screen, x - 1, y - 1, x + w, y + h, WHITE);
   draw_bitmap (icon, screen, x, y, 0);
   draw_text (screen, "Loading....", ORIGINAL_WIDTH / 2.0, ORIGINAL_HEIGHT / 2.0,
              ALLEGRO_ALIGN_CENTRE);
+  acknowledge_resize ();
   show ();
 }
 

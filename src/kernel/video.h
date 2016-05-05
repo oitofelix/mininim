@@ -83,5 +83,6 @@ extern ALLEGRO_BITMAP *icon;
 extern ALLEGRO_TIMER *bottom_text_timer;
 extern bool is_display_focused;
 extern int effect_counter;
+extern void (*load_callback) (void);
 
 #endif	/* MININIM_VIDEO_H */

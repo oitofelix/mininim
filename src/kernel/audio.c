@@ -56,6 +56,8 @@ load_sample (char *filename)
     error (-1, 0, "%s (\"%s\"): cannot load sample",
            __func__, filename);
 
+  if (load_callback) load_callback ();
+
   return sample;
 }
 

@@ -303,10 +303,17 @@ mr_view_trans (enum dir d)
       if (r <= 0) continue;
       r = roomd (r, d);
       if (r) {
-       mr.room = r;
-       mr.x = x;
-       mr.y = y;
-       return;
+        int mr_x = mr.x, mr_y = mr.y;
+        mr.room = r;
+        mr.x = x;
+        mr.y = y;
+        mr_map_rooms ();
+        if (mr.cell[mr_x][mr_y].room) {
+          mr.x = mr_x;
+          mr.y = mr_y;
+          mr.room = mr.cell[mr_x][mr_y].room;
+        }
+        return;
       }
     }
 
