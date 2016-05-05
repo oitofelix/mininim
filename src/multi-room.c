@@ -587,7 +587,6 @@ update_cache_pos (struct pos *p, enum em em, enum vm vm)
         draw_confg_left (mr.cell[x][y].cache, &pbrr, em, vm, false);
 
         al_reset_clipping_rectangle ();
-        al_hold_bitmap_drawing (false);
         con_caching = false;
       }
 
@@ -800,7 +799,6 @@ draw_multi_rooms (void)
     }
 
   if (mr.select_cycles > 0) {
-    al_hold_bitmap_drawing (false);
     int t = max_int (mr.w, mr.h);
     draw_rectangle (mr.cell[mr.x][mr.y].screen, 0, 3, ORIGINAL_WIDTH - t,
                     3 + ROOM_HEIGHT - t, RED, t);

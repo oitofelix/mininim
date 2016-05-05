@@ -202,7 +202,6 @@ draw_mirror_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f,
   }
 
   /* make mirror black */
-  al_hold_bitmap_drawing (false);
   struct rect r;
   r.c.room = p->room;
   r.c.x = PLACE_WIDTH * p->place + 2;
@@ -215,7 +214,6 @@ draw_mirror_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f,
   draw_floor_reflex (bitmap, p, em, vm);
 
   /* draw anim */
-  al_hold_bitmap_drawing (false);
   al_set_target_bitmap (bitmap);
   al_set_clipping_rectangle (PLACE_WIDTH * p->place + 2, PLACE_HEIGHT * p->floor + 3,
                              16, PLACE_HEIGHT - 9);

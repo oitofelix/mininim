@@ -111,8 +111,6 @@ draw_wall_brick (ALLEGRO_BITMAP *bitmap, struct pos *p,
   struct frame f0, f1;
   f0.flip = f1.flip = 0;
 
-  al_hold_bitmap_drawing (false);
-
   struct pos np; npos (p, &np);
   ALLEGRO_COLOR c = mr.cell[mr.dx][mr.dy].wall_color[np.floor][row][np.place + col];
   /* c = compute_wall_color (p, row, col); */

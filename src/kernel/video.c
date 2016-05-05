@@ -83,7 +83,6 @@ init_video (void)
   bottom_text_timer = create_timer (1.0 / SCRIPT_HZ);
 
   al_init_font_addon ();
-  al_hold_bitmap_drawing (false);
   builtin_font = al_create_builtin_font ();
   if (! builtin_font)
     error (-1, 0, "%s (void): cannot create builtin font", __func__);
@@ -135,7 +134,6 @@ create_bitmap (int w, int h)
 void
 destroy_bitmap (ALLEGRO_BITMAP *bitmap)
 {
-  al_hold_bitmap_drawing (false);
   al_destroy_bitmap (bitmap);
 }
 
@@ -150,10 +148,7 @@ clone_bitmap (ALLEGRO_BITMAP *bitmap)
 void
 set_target_bitmap (ALLEGRO_BITMAP *bitmap)
 {
-  if (bitmap == al_get_target_bitmap ()) return;
-  al_hold_bitmap_drawing (false);
   al_set_target_bitmap (bitmap);
-  al_hold_bitmap_drawing (true);
 }
 
 void
@@ -242,7 +237,6 @@ color_eq (ALLEGRO_COLOR c0, ALLEGRO_COLOR c1)
 void
 convert_mask_to_alpha (ALLEGRO_BITMAP *bitmap, ALLEGRO_COLOR mask_color)
 {
-  al_hold_bitmap_drawing (false);
   al_convert_mask_to_alpha (bitmap, mask_color);
 }
 
@@ -418,7 +412,6 @@ flip_display (ALLEGRO_BITMAP *bitmap)
   }
 
   al_draw_scaled_bitmap (uscreen, 0, 0, uw, uh, 0, 0, w, h, 0);
-  al_hold_bitmap_drawing (false);
   al_flip_display ();
 
   force_full_redraw = false;
@@ -468,6 +461,7 @@ draw_pattern (ALLEGRO_BITMAP *bitmap, int ox, int oy, int w, int h,
               ALLEGRO_COLOR color_0, ALLEGRO_COLOR color_1)
 {
   int x, y;
+  clear_bitmap (memory_bitmap, TRANSPARENT_COLOR);
   draw_bitmap (bitmap, memory_bitmap, 0, 0, 0);
   set_target_bitmap (memory_bitmap);
   al_lock_bitmap (memory_bitmap, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_WRITEONLY);
