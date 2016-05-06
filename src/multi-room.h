@@ -53,5 +53,6 @@ void update_cache_pos (struct pos *p, enum em em, enum vm vm);
 void register_changed_pos (struct pos *p);
 struct pos *get_changed_pos (struct pos *p);
 void mr_update_last_settings (void);
+void multi_room_fit_hv (void);
 
 #endif	/* MININIM_MULTI_ROOM_H */

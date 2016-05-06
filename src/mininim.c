@@ -136,6 +136,7 @@ static struct argp_option options[] = {
   {"display-flip-mode", DISPLAY_FLIP_MODE_OPTION, "DISPLAY-FLIP-MODE", 0, "Select display flip mode.  Valid values for DISPLAY-FLIP-MODE are: NONE, VERTICAL, HORIZONTAL and VERTICAL-HORIZONTAL.  The default is NONE.  This can be changed in-game by the SHIFT+I key binding.", 0},
   {"mirror-mode", MIRROR_MODE_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable mirror mode.  In mirror mode the screen and the keyboard are flipped horizontally.  This is equivalent of specifying both the options --display-flip-mode=HORIZONTAL and --gamepad-flip-mode=HORIZONTAL.  The default is FALSE.  This can be changed in-game by the SHIFT+I and SHIFT+K key bindings for the display and keyboard, respectively.", 0},
   {"blind-mode", BLIND_MODE_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable blind mode.  In blind mode background and non-animated sprites are not drawn.  The default is FALSE.  This can be changed in-game by the SHIFT+B key binding.", 0},
+  {"multi-room", MULTI_ROOM_OPTION, "WxH", 0, "Set multi-room width and height to W and H, respectively.  The default is 2x2.  The values W and H are strictly positive integers and must be separated by an 'x'.  This can be changed in-game by the [ (decrement width and height), ] (increment width and height), CTRL+[ (decrement width), CTRL+] (increment width), ALT+[ (decrement height) and ALT+] (increment heigth) key bindings.", 0},
 
   /* Gamepad */
   {NULL, 0, NULL, 0, "Gamepad:", 0},
@@ -463,7 +464,7 @@ option_get_args (int key, char *arg, struct argp_state *state, char s, ...)
   for (i = 0; i < num_args; i++) {
     enum opt_arg_type type = va_arg (at, enum opt_arg_type);
 
-    char *str = strtok (i ? NULL : arg2, ",");
+    char *str = strtok (i ? NULL : arg2, &s);
     if (! str) {
       xasprintf (&estr, "Reason: less than %i arguments provided.", num_args);
       option_arg_error (key, arg, state, -1, estr);
@@ -574,6 +575,7 @@ parser (int key, char *arg, struct argp_state *state)
   struct int_range kcd_range = {0, 100};
   struct int_range window_position_range = {INT_MIN, INT_MAX};
   struct int_range window_dimensions_range = {1, INT_MAX};
+  struct int_range multi_room_range = {1, INT_MAX};
   struct float_range joystick_axis_threshold_range = {0.0,1.0};
   struct int_range joystick_button_threshold_range = {0, 32767};
   struct int_range joystick_axis_range = {0, INT_MAX};
@@ -807,6 +809,12 @@ parser (int key, char *arg, struct argp_state *state)
     e = option_get_args (key, arg, state, 'x', ARG_TYPE_INT, ARG_TYPE_INT, 0,
                          &display_width, &display_height,
                          &window_dimensions_range, &window_dimensions_range);
+    if (e) return e;
+    break;
+  case MULTI_ROOM_OPTION:
+    e = option_get_args (key, arg, state, 'x', ARG_TYPE_INT, ARG_TYPE_INT, 0,
+                         &mr_w, &mr_h,
+                         &multi_room_range, &multi_room_range);
     if (e) return e;
     break;
   case INHIBIT_SCREENSAVER_OPTION:

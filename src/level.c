@@ -391,6 +391,10 @@ process_keys (void)
     button = -1;
   }
 
+  /* M: change multi-room mode */
+  if (was_key_pressed (ALLEGRO_KEY_M, 0, 0, true))
+    multi_room_fit_hv ();
+
   /* CTRL+Z: undo */
   if (was_key_pressed (ALLEGRO_KEY_Z, 0, ALLEGRO_KEYMOD_CTRL, true))
     ui_undo_pass (&undo, -1, NULL);

@@ -911,3 +911,47 @@ ui_set_multi_room (int dw, int dh)
   al_free (text);
   return true;
 }
+
+void
+multi_room_fit_hv (void)
+{
+  int w = 1;
+  int h = 1;
+
+  int lc, c = 1;
+
+  bool should_repeat;
+
+ repeat:
+  should_repeat = false;
+
+  do {
+    lc = c;
+    /* mr.w++; */
+    /* mr_map_rooms (); */
+    set_multi_room (++w, h);
+    mr_center_room (mr.room);
+    /* mr_map_rooms (); */
+    c = mr_count_rooms ();
+    printf ("%i,%i,%i,%i\n", mr.room, w, h, c);
+    if (c > lc) should_repeat = true;
+  } while (c > lc);
+
+  do {
+    lc = c;
+    /* mr.h++; */
+    /* mr_map_rooms (); */
+    set_multi_room (w, ++h);
+    mr_center_room (mr.room);
+    /* mr_map_rooms (); */
+    c = mr_count_rooms ();
+    printf ("%i,%i,%i\n", w, h, c);
+    if (c > lc) should_repeat = true;
+  } while (c > lc);
+
+  if (should_repeat) goto repeat;
+
+  set_multi_room (w - 1, h - 1);
+  mr_center_room (mr.room);
+  /* printf ("%i,%i\n", w - 1, h - 1); */
+}
