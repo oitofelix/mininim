@@ -61,6 +61,7 @@ void show (void);
 void flip_display (ALLEGRO_BITMAP *bitmap);
 bool is_fullscreen (void);
 void process_display_events (void);
+void get_display_mode (int index, ALLEGRO_DISPLAY_MODE *mode);
 
 /* palette */
 int compare_palette_caches (const void *pc0, const void *pc1);
@@ -84,5 +85,6 @@ extern ALLEGRO_TIMER *bottom_text_timer;
 extern bool is_display_focused;
 extern int effect_counter;
 extern void (*load_callback) (void);
+extern int display_mode;
 
 #endif	/* MININIM_VIDEO_H */

@@ -82,6 +82,7 @@ static bool inhibit_screensaver = true;
 static error_t parser (int key, char *arg, struct argp_state *state);
 static void draw_loading_screen (void);
 static void print_paths (void);
+static void print_display_modes (void);
 static char *env_option_name (const char *option_name);
 static char *config_option_name (const char *option_name);
 static void get_paths (void);
@@ -149,11 +150,15 @@ static struct argp_option options[] = {
 
   {NULL, 0, NULL, OPTION_DOC, "The primary joystick's axis and button numbers are listed by the option '--joystick-info'.  You can find out the number of a particular axis or button by pressing it before invoking MININIM with that option.  If a stick, axis or button given to an option doesn't exist in the primary joystick, it's silently ignored.  The joystick can be activated and auto-calibrated in-game by the CTRL+J key binding.  Use this when hot-plugging a joystick or in case the joystick starts to behave oddly.  If your joystick is peculiar enough, proving the auto-calibration mechanism insufficient, the '--joystick-axis-threshold' and '--joystick-button-threshold' options may help.", 0},
 
-  /* Window */
-  {NULL, 0, NULL, 0, "Window:", 0},
-  {"fullscreen", FULLSCREEN_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable fullscreen mode.  In fullscreen mode the window spans the entire screen.  The default is FALSE.  This can be changed in-game by the F key binding.", 0},
+  /* Display */
+  {NULL, 0, NULL, 0, "Display:", 0},
+  {"display-mode", DISPLAY_MODE_OPTION, "M", 0, "Use display mode number M.  The default is -1 (desktop).  The valid integers list can be obtained using the option '--print-display-modes'.  This can be changed in-game by the D key binding, in case a non-desktop display mode is selected.", 0},
+  {"print-display-modes", PRINT_DISPLAY_MODES_OPTION, NULL, 0, "Print display modes and exit.", 0},
+  {"fullscreen", FULLSCREEN_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable fullscreen mode for desktop display mode, but ignored for other display modes.  In fullscreen mode the window spans the entire screen.  The default is FALSE.  This can be changed in-game by the F key binding.", 0},
   {"window-position", WINDOW_POSITION_OPTION, "X,Y", 0, "Place the window at screen coordinates X,Y.  The default is to let this choice to the window manager.  The values X and Y are integers and must be separated by a comma.", 0},
   {"window-dimensions", WINDOW_DIMENSIONS_OPTION, "WxH", 0, "Set window width and height to W and H, respectively.  The default is 640x400.  The values W and H are strictly positive integers and must be separated by an 'x'.", 0},
+
+  {NULL, 0, NULL, OPTION_DOC, "The desktop display mode (-1) uses the native desktop resolution and allows for windowed and fullscreen displays.  This is the default and most convenient setting in case the computer is fast enough.  Non-desktop display modes (>= 0) are all fullscreen and change the actual video resolution.  This may be useful for older computers in which the desktop display mode is prohibitively slow.  After the game has started it's not possible to alternate between desktop and non-desktop modes.  No window-related option takes effect for non-desktop display modes.  Changing non-desktop display modes in-game using the D key binding might cause video driver instability.", 0},
 
   /* Paths */
   {NULL, 0, NULL, 0, "Paths:", 0},
@@ -580,6 +585,7 @@ parser (int key, char *arg, struct argp_state *state)
   struct int_range joystick_button_threshold_range = {0, 32767};
   struct int_range joystick_axis_range = {0, INT_MAX};
   struct int_range joystick_button_range = {0, INT_MAX};
+  struct int_range display_mode_range = {-1, al_get_num_display_modes () - 1};
 
   switch (key) {
   case IGNORE_MAIN_CONFIG_OPTION:
@@ -789,6 +795,11 @@ parser (int key, char *arg, struct argp_state *state)
     if (e) return e;
     skill.counter_defense_prob = i - 1;
     break;
+  case DISPLAY_MODE_OPTION:
+    e = optval_to_int (&i, key, arg, state, &display_mode_range, 0);
+    if (e) return e;
+    display_mode = i;
+    break;
   case DATA_PATH_OPTION:
     xasprintf (&data_dir, "%s", arg);
     break;
@@ -822,6 +833,9 @@ parser (int key, char *arg, struct argp_state *state)
     break;
   case PRINT_PATHS_OPTION:
     print_paths ();
+    exit (0);
+  case PRINT_DISPLAY_MODES_OPTION:
+    print_display_modes ();
     exit (0);
   case SKIP_TITLE_OPTION:
     skip_title = optval_to_bool (arg);
@@ -1309,6 +1323,18 @@ print_paths (void)
   printf ("User documents: %s\n", user_documents_dir);
   printf ("User data: %s\n", user_data_dir);
   printf ("User settings: %s\n", user_settings_dir);
+}
+
+static void
+print_display_modes (void)
+{
+  printf ("Display Modes:\n");
+  printf ("\t-1: desktop settings\n");
+  int i, n = al_get_num_display_modes ();
+  for (i = 0; i < n ; i++) {
+    ALLEGRO_DISPLAY_MODE d; get_display_mode (i, &d);
+    printf ("\t% 2i: %ix%i %iHz\n", i, d.width, d.height, d.refresh_rate);
+  }
 }
 
 void *

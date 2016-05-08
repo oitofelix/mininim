@@ -36,6 +36,7 @@ int display_width = DISPLAY_WIDTH, display_height = DISPLAY_HEIGHT;
 ALLEGRO_BITMAP *icon;
 int effect_counter;
 void (*load_callback) (void);
+int display_mode = -1;
 
 static struct palette_cache {
   ALLEGRO_BITMAP *ib, *ob;
@@ -51,8 +52,19 @@ init_video (void)
             __func__);
 
   al_set_new_display_flags (al_get_new_display_flags ()
-                            | ALLEGRO_WINDOWED | ALLEGRO_RESIZABLE
+                            | (display_mode < 0 ? ALLEGRO_WINDOWED : ALLEGRO_FULLSCREEN)
+                            | ALLEGRO_RESIZABLE
                             | ALLEGRO_GENERATE_EXPOSE_EVENTS);
+
+  if (display_mode >= 0) {
+    ALLEGRO_DISPLAY_MODE d;
+    get_display_mode (display_mode, &d);
+    display_width = d.width;
+    display_height = d.height;
+    al_set_new_display_refresh_rate (d.refresh_rate);
+    al_set_new_display_flags (al_get_new_display_flags ()
+                              & ~ALLEGRO_FULLSCREEN_WINDOW);
+  }
 
   al_set_new_display_option (ALLEGRO_SINGLE_BUFFER, 1, ALLEGRO_SUGGEST);
 
@@ -374,7 +386,7 @@ flip_display (ALLEGRO_BITMAP *bitmap)
 
   int uw = al_get_bitmap_width (uscreen);
   int uh = al_get_bitmap_height (uscreen);
-  
+
   if (bitmap) {
     int bw = al_get_bitmap_width (bitmap);
     int bh = al_get_bitmap_height (bitmap);
@@ -428,10 +440,17 @@ flip_display (ALLEGRO_BITMAP *bitmap)
 }
 
 void
+get_display_mode (int index, ALLEGRO_DISPLAY_MODE *mode)
+{
+  if (! al_get_display_mode (index, mode))
+    error (-1, 0, "%s (%i, %p): cannot get display mode", __func__, index, mode);
+}
+
+void
 acknowledge_resize (void)
 {
   if (! al_acknowledge_resize (display))
-    error (-1, 0, "%s: cannot acknowledge display resize (%p)", __func__, display);
+    error (0, 0, "%s: cannot acknowledge display resize (%p)", __func__, display);
 }
 
 void

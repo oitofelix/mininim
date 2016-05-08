@@ -235,23 +235,51 @@ play_anim (void (*draw_callback) (void),
         al_free (text);
       }
 
+      /* D: change display mode */
+      if (! active_menu
+          && was_key_pressed (ALLEGRO_KEY_D, 0, 0, true)) {
+        if (display_mode < 0) draw_bottom_text (NULL, "DISPLAY MODE: DESKTOP", 0);
+        else {
+          int n = al_get_num_display_modes ();
+          if (n) {
+            int display_mode_bkp = display_mode;
+          next_display_mode:
+            display_mode = (display_mode + 1) % n;
+            int w = al_get_display_width (display);
+            int h = al_get_display_height (display);
+            ALLEGRO_DISPLAY_MODE d;
+            if (al_get_display_mode (display_mode, &d)) {
+              if (d.width == w && d.height == h
+                  && display_mode != display_mode_bkp)
+                goto next_display_mode;
+              al_resize_display (display, d.width, d.height);
+              xasprintf (&text, "DISPLAY MODE: %ix%i", d.width, d.height);
+              draw_bottom_text (NULL, text, 0);
+              al_free (text);
+            } else draw_bottom_text (NULL, "DISPLAY MODES QUERY FAILED", 0);
+          } else draw_bottom_text (NULL, "NO DISPLAY MODE AVAILABLE", 0);
+        }
+      }
+
       /* F: enable/disable fullscreen mode */
       if (! active_menu
           && was_key_pressed (ALLEGRO_KEY_F, 0, 0, true)) {
-        force_full_redraw = true;
-        char *boolean;
-        if (is_fullscreen ()) {
-          al_set_display_flag (display, ALLEGRO_FULLSCREEN_WINDOW, false);
-          boolean = "OFF";
-          show_mouse_cursor ();
-        } else {
-          al_set_display_flag (display, ALLEGRO_FULLSCREEN_WINDOW, true);
-          boolean = "ON";
-          hide_mouse_cursor ();
-        }
-        xasprintf (&text, "FULLSCREEN MODE %s", boolean);
-        draw_bottom_text (NULL, text, 0);
-        al_free (text);
+        if (display_mode < 0) {
+          force_full_redraw = true;
+          char *boolean;
+          if (is_fullscreen ()) {
+            al_set_display_flag (display, ALLEGRO_FULLSCREEN_WINDOW, false);
+            boolean = "OFF";
+            show_mouse_cursor ();
+          } else {
+            al_set_display_flag (display, ALLEGRO_FULLSCREEN_WINDOW, true);
+            boolean = "ON";
+            hide_mouse_cursor ();
+          }
+          xasprintf (&text, "FULLSCREEN MODE %s", boolean);
+          draw_bottom_text (NULL, text, 0);
+          al_free (text);
+        } else draw_bottom_text (NULL, "NON-DESKTOP MODE IS FULLSCREEN ONLY", 0);
       }
 
       /* SHIFT+I: flip screen */
