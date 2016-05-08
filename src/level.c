@@ -404,32 +404,32 @@ process_keys (void)
     ui_undo_pass (&undo, +1, NULL);
 
   /* [: decrease multi-room resolution */
-  if (was_key_pressed (ALLEGRO_KEY_OPENBRACE, 0, 0, true)
+  if (was_key_pressed (0, '[', 0, true)
       && ! cutscene)
     ui_set_multi_room (-1, -1);
 
   /* ]: increase multi-room resolution */
-  if (was_key_pressed (ALLEGRO_KEY_CLOSEBRACE, 0, 0, true)
+  if (was_key_pressed (0, ']', 0, true)
       && ! cutscene)
     ui_set_multi_room (+1, +1);
 
-  /* [: decrease multi-room width resolution */
-  if (was_key_pressed (ALLEGRO_KEY_OPENBRACE, 0, ALLEGRO_KEYMOD_CTRL, true)
+  /* CTRL+[: decrease multi-room width resolution */
+  if (was_key_pressed (0, 0x1B, ALLEGRO_KEYMOD_CTRL, true)
       && ! cutscene)
     ui_set_multi_room (-1, +0);
 
-  /* ]: increase multi-room resolution */
-  if (was_key_pressed (ALLEGRO_KEY_CLOSEBRACE, 0, ALLEGRO_KEYMOD_CTRL, true)
+  /* CTRL+]: increase multi-room resolution */
+  if (was_key_pressed (0, 0x1D, ALLEGRO_KEYMOD_CTRL, true)
       && ! cutscene)
     ui_set_multi_room (+1, +0);
 
-  /* [: decrease multi-room width resolution */
-  if (was_key_pressed (ALLEGRO_KEY_OPENBRACE, 0, ALLEGRO_KEYMOD_ALT, true)
+  /* ALT+[: decrease multi-room width resolution */
+  if (was_key_pressed (0, '[', ALLEGRO_KEYMOD_ALT, true)
       && ! cutscene)
     ui_set_multi_room (+0, -1);
 
-  /* ]: increase multi-room resolution */
-  if (was_key_pressed (ALLEGRO_KEY_CLOSEBRACE, 0, ALLEGRO_KEYMOD_ALT, true)
+  /* ALT+]: increase multi-room resolution */
+  if (was_key_pressed (0, ']', ALLEGRO_KEYMOD_ALT, true)
       && ! cutscene)
     ui_set_multi_room (+0, +1);
 
