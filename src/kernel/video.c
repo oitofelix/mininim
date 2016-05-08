@@ -449,7 +449,7 @@ get_display_mode (int index, ALLEGRO_DISPLAY_MODE *mode)
 void
 acknowledge_resize (void)
 {
-  if (! al_acknowledge_resize (display))
+  if (! al_acknowledge_resize (display) && ! is_fullscreen ())
     error (0, 0, "%s: cannot acknowledge display resize (%p)", __func__, display);
 }
 
@@ -602,7 +602,8 @@ show (void)
 bool
 is_fullscreen (void)
 {
-  return al_get_display_flags (display) & ALLEGRO_FULLSCREEN_WINDOW;
+  return (al_get_display_flags (display) & ALLEGRO_FULLSCREEN_WINDOW)
+    || (al_get_display_flags (display) & ALLEGRO_FULLSCREEN);
 }
 
 void

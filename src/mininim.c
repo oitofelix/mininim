@@ -1137,7 +1137,9 @@ main (int _argc, char **_argv)
 
   al_inhibit_screensaver (inhibit_screensaver);
 
-  show_mouse_cursor ();
+  if (is_fullscreen ()) hide_mouse_cursor ();
+  else show_mouse_cursor ();
+
   set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_BUSY);
 
   event_queue = create_event_queue ();
