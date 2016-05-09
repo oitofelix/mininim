@@ -1248,17 +1248,25 @@ give_dat_compat_preference (void)
 static void
 draw_loading_screen (void)
 {
-  int x = 138;
-  int y = 40;
-  int w = al_get_bitmap_width (icon);
-  int h = al_get_bitmap_height (icon);
-  ALLEGRO_BITMAP *screen = mr.cell[0][0].screen;
-  clear_bitmap (screen, BLACK);
-  draw_filled_rectangle (screen, x - 1, y - 1, x + w, y + h, WHITE);
-  draw_bitmap (icon, screen, x, y, 0);
-  draw_text (screen, "Loading....", ORIGINAL_WIDTH / 2.0, ORIGINAL_HEIGHT / 2.0,
-             ALLEGRO_ALIGN_CENTRE);
+  static bool first_time = true;
+
+  if (first_time) {
+    int x = 138;
+    int y = 40;
+    int w = al_get_bitmap_width (icon);
+    int h = al_get_bitmap_height (icon);
+    ALLEGRO_BITMAP *screen = mr.cell[0][0].screen;
+    clear_bitmap (screen, BLACK);
+    draw_filled_rectangle (screen, x - 1, y - 1, x + w, y + h, WHITE);
+    draw_bitmap (icon, screen, x, y, 0);
+    draw_text (screen, "Loading....", ORIGINAL_WIDTH / 2.0, ORIGINAL_HEIGHT / 2.0,
+               ALLEGRO_ALIGN_CENTRE);
+    show ();
+  }
+
   process_display_events ();
+
+  first_time = false;
 }
 
 static void
