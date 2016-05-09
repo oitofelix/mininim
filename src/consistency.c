@@ -19,28 +19,6 @@
 
 #include "mininim.h"
 
-static void fix_single_walls_at_place_0 (struct pos *p);
-static void fix_inaccessible_enclosure (struct pos *p);
-static void fix_loose_enclosure (struct pos *p);
-static void fix_rigid_con_no_floor_top (struct pos *p);
-static void fix_door_adjacent_to_wall_or_door (struct pos *p);
-static void fix_broken_floor_lacking_no_floor_on_top (struct pos *p);
-static void fix_skeleton_or_spikes_floor_with_no_or_loose_floor_at_left (struct pos *p);
-static void fix_adjacent_itens (struct pos *p);
-static void fix_item_on_non_normal_floor (struct pos *p);
-static void fix_sword_at_right_of_wall_or_door (struct pos *p);
-static void fix_door_lacking_opener (struct pos *p);
-static void fix_opener_or_closer_lacking_door (struct pos *p);
-static void fix_confg_which_should_not_have_conbg (struct pos *p);
-static void fix_partial_big_pillar (struct pos *p);
-
-void fix_enclosure (struct pos *p, enum dir dir);
-
-static bool is_there_event_handler (int e);
-static bool is_enclosure (struct pos *p, bool (*pred) (struct pos *p), enum dir dir);
-static bool is_inaccessible (struct pos *p);
-static bool is_loose (struct pos *p);
-
 void
 fix_level (void)
 {
@@ -117,7 +95,7 @@ fix_loose_enclosure (struct pos *p)
 
 /* consistency: rigid constructions (pillar, big pillar, wall, door, chopper) must
    have something non-traversable lying on it */
-static void
+void
 fix_rigid_con_no_floor_top (struct pos *p)
 {
   struct pos pa; prel (p, &pa, -1, 0);
@@ -133,7 +111,7 @@ fix_rigid_con_no_floor_top (struct pos *p)
 }
 
 /* consistency: doors should not face a wall nor another door */
-static void
+void
 fix_door_adjacent_to_wall_or_door (struct pos *p)
 {
   struct con *c = con (p);
@@ -151,7 +129,7 @@ fix_door_adjacent_to_wall_or_door (struct pos *p)
 }
 
 /* consistency: broken floors must have no construction above them */
-static void
+void
 fix_broken_floor_lacking_no_floor_on_top (struct pos *p)
 {
   struct con *c = con (p);
@@ -168,7 +146,7 @@ fix_broken_floor_lacking_no_floor_on_top (struct pos *p)
 /* consistency: skeleton and spikes floors can't be a hangable
    construction at left because there is no corner floor sprites to
    render the perspective when the kid is climbing them */
-static void
+void
 fix_skeleton_or_spikes_floor_with_no_or_loose_floor_at_left (struct pos *p)
 {
   struct con *c = con (p);
@@ -190,7 +168,7 @@ fix_skeleton_or_spikes_floor_with_no_or_loose_floor_at_left (struct pos *p)
 }
 
 /* consistency: itens can't be adjacent */
-static void
+void
 fix_adjacent_itens (struct pos *p)
 {
   struct con *c = con (p);
@@ -205,7 +183,7 @@ fix_adjacent_itens (struct pos *p)
 }
 
 /* consistency: itens can only lay in normal floors */
-static void
+void
 fix_item_on_non_normal_floor (struct pos *p)
 {
   struct con *c = con (p);
@@ -218,7 +196,7 @@ fix_item_on_non_normal_floor (struct pos *p)
 
 /* consistency: swords can't be placed on the right of walls or
    doors */
-static void
+void
 fix_sword_at_right_of_wall_or_door (struct pos *p)
 {
   struct con *c = con (p);
@@ -239,7 +217,7 @@ fix_sword_at_right_of_wall_or_door (struct pos *p)
 }
 
 /* consistency: doors should have an associated event and opener floor */
-static void
+void
 fix_door_lacking_opener (struct pos *p)
 {
   int i;
@@ -262,7 +240,7 @@ fix_door_lacking_opener (struct pos *p)
 
 /* consistency: opener and closer floors should have an associated
    event and door */
-static void
+void
 fix_opener_or_closer_lacking_door (struct pos *p)
 {
   struct con *c = con (p);
@@ -323,7 +301,7 @@ make_links_locally_consistent (int prev_room, int current_room)
     level.link[current_room].a = prev_room;
 }
 
-static bool
+bool
 is_there_event_handler (int e)
 {
   struct pos p;
@@ -357,7 +335,7 @@ fix_enclosure (struct pos *p, enum dir dir)
   }
 }
 
-static bool
+bool
 is_enclosure (struct pos *p, bool (*pred) (struct pos *p), enum dir dir)
 {
   int i;
@@ -376,7 +354,7 @@ is_enclosure (struct pos *p, bool (*pred) (struct pos *p), enum dir dir)
   return false;
 }
 
-static bool
+bool
 is_inaccessible (struct pos *p)
 {
   struct pos pa; prel (p, &pa, -1, +0);
@@ -385,7 +363,7 @@ is_inaccessible (struct pos *p)
     && ! is_traversable (&pa);
 }
 
-static bool
+bool
 is_loose (struct pos *p)
 {
   return con (p)->fg == LOOSE_FLOOR;
