@@ -259,6 +259,7 @@ mr_center_room (int room)
   mr.room = room;
 
   int x, y, lc = 0, c = 0, ld = INT_MAX;
+  float ldc = INFINITY;
   int lx = mr.x;
   int ly = mr.y;
   for (y = mr.h - 1; y >= 0; y--)
@@ -277,11 +278,13 @@ mr_center_room (int room)
       mr_rightmost_cell (&cx, &cy);
       int cr = (mr.w - 1) - cx;;
       int d = abs (ca - cb) + abs (cl - cr);
-      if (c >= lc && (c > lc || d < ld)) {
+      float dc = dist_cart (x, y, (mr.w - 1) / 2, (mr.h - 1) / 2);
+      if (c >= lc && (c > lc || d < ld || dc < ldc)) {
         lx = x;
         ly = y;
         lc = c;
         ld = d;
+        ldc = dc;
       }
     }
 

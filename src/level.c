@@ -352,7 +352,7 @@ compute_level (void)
 
   clear_anims_keyboard_state ();
 
-  if (! anim_cycle) mr_center_room (room_view);
+  /* if (! anim_cycle) mr_center_room (room_view); */
 
   if (current_kid->f.c.room != prev_room
       && current_kid->f.c.room != 0
@@ -391,7 +391,7 @@ process_keys (void)
     button = -1;
   }
 
-  /* M: change multi-room mode */
+  /* M: change multi-room fit mode */
   if (was_key_pressed (ALLEGRO_KEY_M, 0, 0, true)) {
     char *fit_str;
 
