@@ -66,7 +66,7 @@ play_level (struct level *lv)
   stop_all_samples ();
   if (level.start) level.start ();
 
-  anim_cycle = 0;
+  /* anim_cycle = 0; */
   last_auto_show_time = -1;
   current_kid_id = 0;
 
@@ -581,7 +581,7 @@ process_keys (void)
              && ! save_game_dialog_thread)
     unpause_game ();
 
-  if (game_paused) anim_cycle--;
+  /* if (game_paused) anim_cycle--; */
 
   /* R: resurrect kid */
   if (! active_menu
