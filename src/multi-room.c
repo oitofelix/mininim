@@ -482,6 +482,10 @@ draw_animated_foreground (ALLEGRO_BITMAP *bitmap, int room)
       if (is_sword (&p)) draw_sword (bitmap, &p, vm);
     }
 
+  for (p.floor = FLOORS; p.floor >= -1; p.floor--)
+    for (p.place = -1; p.place < PLACES; p.place++)
+      draw_box (bitmap, &p, vm);
+
   room_view = room_view_bkp;
 }
 

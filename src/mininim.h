@@ -161,6 +161,7 @@
 #include "debug.h"
 #include "undo.h"
 #include "multi-room.h"
+#include "box.h"
 
 /* functions */
 void *load_config_dialog (ALLEGRO_THREAD *thread, void *arg);

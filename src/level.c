@@ -297,6 +297,7 @@ load_level (void)
   load_kid ();
   load_guard ();
   load_mouse ();
+  load_box ();
 }
 
 void
@@ -309,6 +310,7 @@ unload_level (void)
   unload_kid ();
   unload_guard ();
   unload_mouse ();
+  unload_box ();
 }
 
 static void
@@ -392,7 +394,8 @@ process_keys (void)
   }
 
   /* M: change multi-room fit mode */
-  if (was_key_pressed (ALLEGRO_KEY_M, 0, 0, true)) {
+  if (was_key_pressed (ALLEGRO_KEY_M, 0, 0, true)
+      && ! active_menu) {
     char *fit_str;
 
     switch (mr.fit_mode) {

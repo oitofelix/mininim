@@ -958,8 +958,8 @@ draw_no_floor_selection (ALLEGRO_BITMAP *bitmap, struct pos *p)
   if (peq (p, &mouse_pos)
       && con (p)->fg == NO_FLOOR) {
     struct rect r = new_rect (p->room, p->place * PLACE_WIDTH + 25,
-                              p->floor * PLACE_HEIGHT + 3,
-                              PLACE_WIDTH, PLACE_HEIGHT - 16);
+                              p->floor * PLACE_HEIGHT - 13,
+                              PLACE_WIDTH, PLACE_HEIGHT);
     draw_filled_rect (bitmap, &r, NO_FLOOR_SELECTION_COLOR);
   }
 }
