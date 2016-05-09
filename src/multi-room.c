@@ -70,18 +70,18 @@ destroy_multi_room (void)
   };
 }
 
-bool
-set_multi_room (int w, int h)
+void
+redim_multi_room (int w, int h)
 {
-  if (w == mr.w && h == mr.h) return true;
-
   destroy_multi_room ();
 
-  mr.h = h;
   mr.w = w;
+  mr.h = h;
 
-  set_target_backbuffer (display);
-  al_set_new_bitmap_flags (ALLEGRO_VIDEO_BITMAP);
+  if (! cutscene && mr.fit_mode == MR_FIT_NONE) {
+    mr.fit_w = mr.w;
+    mr.fit_h = mr.h;
+  }
 
   int x, y;
   mr.cell = xcalloc (w, sizeof (* mr.cell));
@@ -90,16 +90,37 @@ set_multi_room (int w, int h)
     mr.cell[x] = xcalloc (h, sizeof (** mr.cell));
     mr.last.cell[x] = xcalloc (h, sizeof (** mr.last.cell));
     for (y = 0; y < h; y++) {
+      mr.cell[x][y].screen = NULL;
+      mr.cell[x][y].cache = NULL;
+    }
+  }
+}
+
+void
+create_multi_room_bitmaps (void)
+{
+  set_target_backbuffer (display);
+  al_set_new_bitmap_flags (ALLEGRO_VIDEO_BITMAP);
+
+  int x, y;
+  for (x = 0; x < mr.w; x++)
+    for (y = 0; y < mr.h; y++) {
       int sw = ORIGINAL_WIDTH;
-      int sh = ORIGINAL_HEIGHT - (y < h - 1 ? 8 : 0);
+      int sh = ORIGINAL_HEIGHT - (y < mr.h - 1 ? 8 : 0);
+      destroy_bitmap (mr.cell[x][y].screen);
+      destroy_bitmap (mr.cell[x][y].cache);
       mr.cell[x][y].screen = create_bitmap (sw, sh);
       mr.cell[x][y].cache = create_bitmap (sw, sh);
       clear_bitmap (mr.cell[x][y].screen, BLACK);
       clear_bitmap (mr.cell[x][y].cache, BLACK);
     }
-  }
+}
 
-  return true;
+void
+set_multi_room (int w, int h)
+{
+  redim_multi_room (w, h);
+  create_multi_room_bitmaps ();
 }
 
 void
@@ -170,8 +191,8 @@ int
 mr_count_rooms (void)
 {
   int x, y, c = 0;
-  for (y = mr.h - 1; y >= 0; y--)
-    for (x = 0; x < mr.w; x++)
+  for (x = 0; x < mr.w; x++)
+    for (y = 0; y < mr.h; y++)
       c += (mr.cell[x][y].room > 0) ? 1 : 0;
   return c;
 }
@@ -268,6 +289,8 @@ mr_center_room (int room)
   mr.y = ly;
 
   mr.select_cycles = SELECT_CYCLES;
+
+  mr_map_rooms ();
 }
 
 void
@@ -892,28 +915,24 @@ ui_set_multi_room (int dw, int dh)
   char *text;
 
   if (mr.w + dw < 1 || mr.h + dh < 1) {
-    xasprintf (&text, "MULTI-ROOM %ix%i", mr_w, mr_h);
+    xasprintf (&text, "MULTI-ROOM %ix%i", mr.w, mr.h);
     draw_bottom_text (NULL, text, 0);
     al_free (text);
     return false;
   }
 
-  if (! set_multi_room (mr.w + dw, mr.h + dh)) {
-    draw_bottom_text (NULL, "VIDEO CARD LIMIT REACHED", 0);
-    return false;
-  }
+  if (mr.w + dw != mr.w || mr.h + dh != mr.h)
+    set_multi_room (mr.w + dw, mr.h + dh);
 
-  mr_w = mr.w;
-  mr_h = mr.h;
   mr_center_room (mr.room);
-  xasprintf (&text, "MULTI-ROOM %ix%i", mr_w, mr_h);
+  xasprintf (&text, "MULTI-ROOM %ix%i", mr.w, mr.h);
   draw_bottom_text (NULL, text, 0);
   al_free (text);
   return true;
 }
 
 void
-multi_room_fit_hv (void)
+multi_room_fit_stretch (void)
 {
   int w = 1;
   int h = 1;
@@ -927,31 +946,59 @@ multi_room_fit_hv (void)
 
   do {
     lc = c;
-    /* mr.w++; */
-    /* mr_map_rooms (); */
-    set_multi_room (++w, h);
+    redim_multi_room (++w, h);
     mr_center_room (mr.room);
-    /* mr_map_rooms (); */
     c = mr_count_rooms ();
-    printf ("%i,%i,%i,%i\n", mr.room, w, h, c);
+    /* printf ("W: room: %i, width: %i, height: %i, count: %i\n", mr.room, mr.w, mr.h, c); */
     if (c > lc) should_repeat = true;
   } while (c > lc);
+  redim_multi_room (--w, h);
+  mr_center_room (mr.room);
 
   do {
     lc = c;
-    /* mr.h++; */
-    /* mr_map_rooms (); */
-    set_multi_room (w, ++h);
+    redim_multi_room (w, ++h);
     mr_center_room (mr.room);
-    /* mr_map_rooms (); */
     c = mr_count_rooms ();
-    printf ("%i,%i,%i\n", w, h, c);
+    /* printf ("H: room: %i, width: %i, height: %i, count: %i\n", mr.room, mr.w, mr.h, c); */
     if (c > lc) should_repeat = true;
   } while (c > lc);
+  redim_multi_room (w, --h);
+  mr_center_room (mr.room);
 
   if (should_repeat) goto repeat;
+}
 
-  set_multi_room (w - 1, h - 1);
+void
+multi_room_fit_ratio (void)
+{
+  multi_room_fit_stretch ();
+  if (mr.w < mr.h) redim_multi_room (mr.h, mr.h);
+  else if (mr.w > mr.h) redim_multi_room (mr.w, mr.w);
+}
+
+void
+apply_mr_fit_mode (void)
+{
+  int w, h;
+
+  switch (mr.fit_mode) {
+  case MR_FIT_NONE:
+    w = mr.fit_w;
+    h = mr.fit_h;
+    break;
+  case MR_FIT_STRETCH:
+    multi_room_fit_stretch ();
+    w = mr.w;
+    h = mr.h;
+    break;
+  case MR_FIT_RATIO:
+    multi_room_fit_ratio ();
+    w = mr.w;
+    h = mr.h;
+    break;
+  }
+
+  set_multi_room (w, h);
   mr_center_room (mr.room);
-  /* printf ("%i,%i\n", w - 1, h - 1); */
 }

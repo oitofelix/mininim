@@ -175,7 +175,6 @@ float dist_cart (float x0, float y0, float x1, float y1);
 void quit_game (void);
 
 /* variables */
-extern int mr_w, mr_h;
 extern enum level_module level_module;
 extern ALLEGRO_TIMER *play_time;
 extern enum vm vm;

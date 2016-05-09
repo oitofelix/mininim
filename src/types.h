@@ -75,6 +75,10 @@ struct multi_room {
   int select_cycles;
   int flicker;
   ALLEGRO_COLOR color;
+  enum mr_fit_mode {
+    MR_FIT_NONE, MR_FIT_STRETCH, MR_FIT_RATIO,
+  } fit_mode;
+  int fit_w, fit_h;
 
   struct multi_room_cell {
     ALLEGRO_BITMAP *screen;
@@ -438,7 +442,7 @@ enum options {
   JOYSTICK_AXIS_THRESHOLD_OPTION, JOYSTICK_BUTTON_THRESHOLD_OPTION,
   JOYSTICK_AXIS_OPTION, JOYSTICK_BUTTON_OPTION, JOYSTICK_INFO_OPTION,
   START_POS_OPTION, HUE_MODE_OPTION, CONVERT_LEVELS_OPTION, MULTI_ROOM_OPTION,
-  DISPLAY_MODE_OPTION,
+  DISPLAY_MODE_OPTION, MULTI_ROOM_FIT_MODE_OPTION,
 };
 
 enum level_module {

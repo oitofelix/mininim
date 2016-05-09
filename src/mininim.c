@@ -19,8 +19,6 @@
 
 #include "mininim.h"
 
-int mr_w = 2, mr_h = 2;
-
 enum level_module level_module;
 
 struct config_info {
@@ -138,6 +136,7 @@ static struct argp_option options[] = {
   {"mirror-mode", MIRROR_MODE_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable mirror mode.  In mirror mode the screen and the keyboard are flipped horizontally.  This is equivalent of specifying both the options --display-flip-mode=HORIZONTAL and --gamepad-flip-mode=HORIZONTAL.  The default is FALSE.  This can be changed in-game by the SHIFT+I and SHIFT+K key bindings for the display and keyboard, respectively.", 0},
   {"blind-mode", BLIND_MODE_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable blind mode.  In blind mode background and non-animated sprites are not drawn.  The default is FALSE.  This can be changed in-game by the SHIFT+B key binding.", 0},
   {"multi-room", MULTI_ROOM_OPTION, "WxH", 0, "Set multi-room width and height to W and H, respectively.  The default is 2x2.  The values W and H are strictly positive integers and must be separated by an 'x'.  This can be changed in-game by the [ (decrement width and height), ] (increment width and height), CTRL+[ (decrement width), CTRL+] (increment width), ALT+[ (decrement height) and ALT+] (increment heigth) key bindings.", 0},
+  {"multi-room-fit-mode", MULTI_ROOM_FIT_MODE_OPTION, "MULTI-ROOM-FIT-MODE", 0, "Select multi-room fit mode.  Valid values for MULTI-ROOM-FIT-MODE are: NONE, STRETCH and RATIO.  The default is NONE.  This can be changed in-game by the M key binding.", 0},
 
   /* Gamepad */
   {NULL, 0, NULL, 0, "Gamepad:", 0},
@@ -569,6 +568,8 @@ parser (int key, char *arg, struct argp_state *state)
   char *joystick_button_enum[] = {"UP", "RIGHT", "DOWN", "LEFT",
                                   "ENTER", "SHIFT", "TIME", "PAUSE", NULL};
 
+  char *multi_room_fit_mode_enum[] = {"NONE", "STRETCH", "RATIO", NULL};
+
   struct int_range total_lives_range = {1, 10};
   struct int_range start_level_range = {1, INT_MAX};
   struct int_range start_pos_room_range = {1, INT_MAX};
@@ -717,6 +718,15 @@ parser (int key, char *arg, struct argp_state *state)
     case 3: screen_flags = ALLEGRO_FLIP_VERTICAL | ALLEGRO_FLIP_HORIZONTAL; break;
     }
     break;
+  case MULTI_ROOM_FIT_MODE_OPTION:
+    e = optval_to_enum (&i, key, arg, state, multi_room_fit_mode_enum, 0);
+    if (e) return e;
+    switch (i) {
+    case 0: mr.fit_mode = MR_FIT_NONE; break;
+    case 1: mr.fit_mode = MR_FIT_STRETCH; break;
+    case 2: mr.fit_mode = MR_FIT_RATIO; break;
+    }
+    break;
   case GAMEPAD_FLIP_MODE_OPTION:
     e = optval_to_enum (&i, key, arg, state, gamepad_flip_mode_enum, 0);
     if (e) return e;
@@ -824,7 +834,7 @@ parser (int key, char *arg, struct argp_state *state)
     break;
   case MULTI_ROOM_OPTION:
     e = option_get_args (key, arg, state, 'x', ARG_TYPE_INT, ARG_TYPE_INT, 0,
-                         &mr_w, &mr_h,
+                         &mr.fit_w, &mr.fit_h,
                          &multi_room_range, &multi_room_range);
     if (e) return e;
     break;

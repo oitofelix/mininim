@@ -37,7 +37,10 @@ play_anim (void (*draw_callback) (void),
            int freq)
 {
   if (cutscene) set_multi_room (1, 1);
-  else set_multi_room (mr_w, mr_h);
+  else {
+    mr.room = room_view;
+    apply_mr_fit_mode ();
+  }
 
   quit_anim = NO_QUIT;
 

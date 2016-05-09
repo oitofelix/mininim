@@ -392,8 +392,30 @@ process_keys (void)
   }
 
   /* M: change multi-room mode */
-  if (was_key_pressed (ALLEGRO_KEY_M, 0, 0, true))
-    multi_room_fit_hv ();
+  if (was_key_pressed (ALLEGRO_KEY_M, 0, 0, true)) {
+    char *fit_str;
+
+    switch (mr.fit_mode) {
+    case MR_FIT_NONE:
+      mr.fit_mode = MR_FIT_STRETCH;
+      fit_str = "STRETCH";
+      break;
+    case MR_FIT_STRETCH:
+      mr.fit_mode = MR_FIT_RATIO;
+      fit_str = "RATIO";
+      break;
+    case VGA:
+      mr.fit_mode = MR_FIT_NONE;
+      fit_str = "NONE";
+      break;
+    }
+
+    apply_mr_fit_mode ();
+
+    xasprintf (&text, "MR FIT MODE: %s", fit_str);
+    draw_bottom_text (NULL, text, 0);
+    al_free (text);
+  }
 
   /* CTRL+Z: undo */
   if (was_key_pressed (ALLEGRO_KEY_Z, 0, ALLEGRO_KEYMOD_CTRL, true))

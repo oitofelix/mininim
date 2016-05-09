@@ -32,7 +32,9 @@ extern bool mr_view_changed;
 bool is_room_visible (int room);
 bool is_kid_visible (void);
 bool has_mr_view_changed (void);
-bool set_multi_room (int w, int h);
+void redim_multi_room (int w, int h);
+void create_multi_room_bitmaps (void);
+void set_multi_room (int w, int h);
 void mr_get_resolution (int *w, int *h);
 void mr_map_rooms (void);
 bool mr_topmost_cell (int *rx, int *ry);
@@ -53,6 +55,8 @@ void update_cache_pos (struct pos *p, enum em em, enum vm vm);
 void register_changed_pos (struct pos *p);
 struct pos *get_changed_pos (struct pos *p);
 void mr_update_last_settings (void);
-void multi_room_fit_hv (void);
+void multi_room_fit_stretch (void);
+void multi_room_fit_ratio (void);
+void apply_mr_fit_mode (void);
 
 #endif	/* MININIM_MULTI_ROOM_H */

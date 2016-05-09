@@ -78,6 +78,11 @@ init_video (void)
   icon = load_bitmap (ICON);
   al_set_display_icon (display, icon);
 
+  cutscene = true;
+  if (mr.fit_w == 0 && mr.fit_h == 0) {
+    mr.fit_w = 2;
+    mr.fit_h = 2;
+  }
   set_multi_room (1, 1);
   effect_buffer = create_bitmap (ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
   black_screen = create_bitmap (ORIGINAL_WIDTH, ORIGINAL_HEIGHT);

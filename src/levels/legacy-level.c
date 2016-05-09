@@ -152,17 +152,6 @@ legacy_level_start (void)
     struct anim *v = get_anim_by_id (1);
     v->fight = false;
   }
-
-  /* temporary placement for test */
-  /* if (level.number == 4) { */
-  /*   /\* kid *\/ */
-  /*   struct pos p = {4,1,5}; */
-  /*   k->f.dir = RIGHT; */
-  /*   place_frame (&k->f, &k->f, kid_normal_00, &p, */
-  /*                k->f.dir == LEFT ? +22 : +31, +15); */
-  /*   k->action = kid_normal; */
-  /*   room_view = p.room; */
-  /* } */
 }
 
 void
