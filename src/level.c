@@ -419,7 +419,8 @@ process_keys (void)
     ui_set_multi_room (-1, +0);
 
   /* CTRL+]: increase multi-room resolution */
-  if (was_key_pressed (0, 0x1D, ALLEGRO_KEYMOD_CTRL, true)
+  if ((was_key_pressed (0, 0x1D, ALLEGRO_KEYMOD_CTRL, true)
+       || was_key_pressed (0, 0x1C, ALLEGRO_KEYMOD_CTRL, true))
       && ! cutscene)
     ui_set_multi_room (+1, +0);
 
