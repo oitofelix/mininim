@@ -279,7 +279,9 @@ mr_center_room (int room)
       int cr = (mr.w - 1) - cx;;
       int d = abs (ca - cb) + abs (cl - cr);
       float dc = dist_cart (x, y, (mr.w - 1) / 2, (mr.h - 1) / 2);
-      if (c >= lc && (c > lc || d < ld || dc < ldc)) {
+      if (c > lc
+          || (c == lc && d < ld)
+          || (c == lc && d == ld && dc < ldc)) {
         lx = x;
         ly = y;
         lc = c;
