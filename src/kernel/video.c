@@ -404,9 +404,6 @@ flip_display (ALLEGRO_BITMAP *bitmap)
     if (iw != w || ih != h) {
       destroy_bitmap (iscreen);
       iscreen = clone_bitmap (al_get_backbuffer (display));
-      force_full_redraw = true;
-      set_target_backbuffer (display);
-      al_clear_to_color (BLACK);
     }
 
     al_set_target_bitmap (iscreen);

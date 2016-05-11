@@ -500,8 +500,9 @@ update_room0_cache (enum em em, enum vm vm)
   mouse_pos.room = -1;
   con_caching = true;
 
-  if (room0) clear_bitmap (room0, TRANSPARENT_COLOR);
-  else room0 = create_bitmap (ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
+  if (! room0) room0 = create_bitmap (ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
+
+  clear_bitmap (room0, TRANSPARENT_COLOR);
 
   mr.dx = 0;
   mr.dy = 0;
