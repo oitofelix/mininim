@@ -399,6 +399,9 @@ exchange_pos (struct pos *p0, struct pos *p1, bool prepare, bool invert_dir)
   exchange_guard_pos (p0, p1, invert_dir);
   exchange_kid_start_pos (p0, p1, invert_dir);
   exchange_anim_pos (p0, p1, invert_dir);
+
+  register_changed_pos (p0);
+  register_changed_pos (p1);
 }
 
 void
