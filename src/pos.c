@@ -259,6 +259,10 @@ nframe (struct frame *f, struct coord *c)
   if (nml.room == nmr.room
       || (f->c.room != nml.room
           && f->c.room != nmr.room)) {
+    if ((f->dir == LEFT && ! nml.room)
+        || (f->dir == RIGHT && ! nmr.room))
+        return c;
+
     *c = (f->dir == LEFT) ? nml : nmr;
     int dx = (f->dir == LEFT) ? +3 : -3;
     c->x -= d.w / 2 - dx;
