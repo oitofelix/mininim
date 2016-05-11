@@ -23,8 +23,10 @@
 extern bool coord_wa;
 
 /* types */
+int *xroomd_ptr (struct level *l, int room, enum dir dir);
 int *roomd_ptr (int room, enum dir dir);
 int roomd (int room, enum dir dir);
+int xroomd (struct level *l, int room, enum dir dir);
 int roomd_n0 (int room, enum dir dir);
 bool is_room_adjacent (int room0, int room1);
 void link_room (int room0, int room1, enum dir dir);
@@ -33,6 +35,7 @@ int min_room_dist (struct room_dist room[], int *dmax);
 bool coord_eq (struct coord *_c0, struct coord *_c1);
 struct coord *ncoord (struct coord *c, struct coord *nc);
 bool is_valid_pos (struct pos *p);
+struct pos *xnpos (struct level *l, struct pos *p, struct pos *np);
 struct pos *npos (struct pos *p, struct pos *np);
 struct coord *nframe (struct frame *f, struct coord *c);
 struct pos *pos2room (struct pos *p, int room, struct pos *pv);

@@ -22,23 +22,35 @@
 bool coord_wa;
 
 int *
-roomd_ptr (int room, enum dir dir)
+xroomd_ptr (struct level *l, int room, enum dir dir)
 {
   switch (dir) {
-  case LEFT: return &level.link[room].l;
-  case RIGHT: return &level.link[room].r;
-  case ABOVE: return &level.link[room].a;
-  case BELOW: return &level.link[room].b;
+  case LEFT: return &l->link[room].l;
+  case RIGHT: return &l->link[room].r;
+  case ABOVE: return &l->link[room].a;
+  case BELOW: return &l->link[room].b;
   default:
     error (-1, 0, "%s: unknown direction (%i)", __func__, dir);
     return NULL;
   }
 }
 
+int *
+roomd_ptr (int room, enum dir dir)
+{
+  return xroomd_ptr (&level, room, dir);
+}
+
 int
 roomd (int room, enum dir dir)
 {
   return *roomd_ptr (room, dir);
+}
+
+int
+xroomd (struct level *l, int room, enum dir dir)
+{
+  return *xroomd_ptr (l, room, dir);
 }
 
 void
@@ -212,7 +224,7 @@ is_valid_pos (struct pos *p)
 }
 
 struct pos *
-npos (struct pos *p, struct pos *np)
+xnpos (struct level *l, struct pos *p, struct pos *np)
 {
   if (np != p) *np = *p;
 
@@ -223,24 +235,30 @@ npos (struct pos *p, struct pos *np)
 
     if (np->floor < 0) {
       np->floor += FLOORS;
-      np->room = roomd (np->room, ABOVE);
+      np->room = xroomd (l, np->room, ABOVE);
       m = true;
     } else if (np->floor >= FLOORS) {
       np->floor -= FLOORS;
-      np->room = roomd (np->room, BELOW);
+      np->room = xroomd (l, np->room, BELOW);
       m = true;
     } else if (np->place < 0) {
       np->place += PLACES;
-      np->room = roomd (np->room, LEFT);
+      np->room = xroomd (l, np->room, LEFT);
       m = true;
     } else if (np->place >= PLACES) {
       np->place -= PLACES;
-      np->room = roomd (np->room, RIGHT);
+      np->room = xroomd (l, np->room, RIGHT);
       m = true;
     }
   } while (m);
 
   return np;
+}
+
+struct pos *
+npos (struct pos *p, struct pos *np)
+{
+  return xnpos (&level, p, np);
 }
 
 struct coord *

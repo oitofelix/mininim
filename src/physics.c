@@ -22,7 +22,7 @@
 struct con *
 xcon (struct level *l, struct pos *p)
 {
-  struct pos np; npos (p, &np);
+  struct pos np; xnpos (l, p, &np);
   return &l->con[np.room][np.floor][np.place];
 }
 
