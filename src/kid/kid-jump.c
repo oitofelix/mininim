@@ -191,8 +191,10 @@ physics_in (struct anim *k)
   survey (_bf, pos, &nf, &nc, &pbf, &np);
   if ((is_strictly_traversable (&pbb)
        && is_strictly_traversable (&pmbo) && k->i <= 7)
-      || (k->i >= 10
-          && is_strictly_traversable (&pbf))) {
+      || (k->i >= 10 && k->i < 13
+          && is_strictly_traversable (&pbf))
+      || (k->i == 13 && is_strictly_traversable (&pbb))
+      || (k->i > 13 && is_strictly_traversable (&pmbo))) {
     kid_fall (k);
     return false;
   }
