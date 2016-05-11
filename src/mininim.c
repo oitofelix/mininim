@@ -1360,6 +1360,8 @@ print_display_modes (void)
 void *
 load_config_dialog (ALLEGRO_THREAD *thread, void *arg)
 {
+  show_mouse_cursor ();
+
   ALLEGRO_FILECHOOSER *dialog =
     create_native_file_dialog (user_home_dir, "Load configuration file",
                                "*.*", ALLEGRO_FILECHOOSER_FILE_MUST_EXIST);
@@ -1373,12 +1375,18 @@ load_config_dialog (ALLEGRO_THREAD *thread, void *arg)
 
   al_destroy_native_file_dialog (dialog);
   al_set_thread_should_stop (thread);
+
+  if (is_fullscreen ()) hide_mouse_cursor ();
+  else show_mouse_cursor ();
+
   return filename;
 }
 
 void *
 save_game_dialog (ALLEGRO_THREAD *thread, void *arg)
 {
+  show_mouse_cursor ();
+
   ALLEGRO_FILECHOOSER *dialog =
     create_native_file_dialog (user_home_dir, "Save game",
                                "*.*", ALLEGRO_FILECHOOSER_SAVE);
@@ -1403,6 +1411,10 @@ save_game_dialog (ALLEGRO_THREAD *thread, void *arg)
 
   al_destroy_native_file_dialog (dialog);
   al_set_thread_should_stop (thread);
+
+  if (is_fullscreen ()) hide_mouse_cursor ();
+  else show_mouse_cursor ();
+
   return filename;
 }
 
