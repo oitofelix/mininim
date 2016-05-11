@@ -40,6 +40,13 @@ crel (struct pos *p, int floor, int place)
   return con (prel (p, &pr, floor, place));
 }
 
+struct con *
+xcrel (struct level *l, struct pos *p, int floor, int place)
+{
+  struct pos pr;
+  return xcon (l, prel (p, &pr, floor, place));
+}
+
 bool
 is_frame_visible (struct frame *f)
 {
