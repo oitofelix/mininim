@@ -97,6 +97,10 @@ struct multi_room {
   } **cell;
 
   struct {
+    int x, y, room;
+  } drawn;
+
+  struct {
     int w, h;
 
     int level;
@@ -112,6 +116,13 @@ struct multi_room {
       int room;
     } **cell;
   } last;
+};
+
+struct mouse_coord {
+  struct coord c;
+  struct {
+    int w, h, x, y, room;
+  } mr;
 };
 
 enum carpet_design {

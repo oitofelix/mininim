@@ -398,6 +398,11 @@ flip_display (ALLEGRO_BITMAP *bitmap)
     set_target_backbuffer (display);
     al_draw_scaled_bitmap (bitmap, 0, 0, bw, bh, 0, 0, w, h, screen_flags);
   } else {
+    if (mr.x != mr.drawn.x
+        || mr.y != mr.drawn.y
+        || mr.room != mr.drawn.room)
+      draw_multi_rooms ();
+
     int iw = al_get_bitmap_width (iscreen);
     int ih = al_get_bitmap_height (iscreen);
 

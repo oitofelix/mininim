@@ -203,10 +203,6 @@ play_anim (void (*draw_callback) (void),
       if (dw < 0) while (dw++ < 0) mr_view_trans (LEFT);
       else if (dw > 0) while (dw-- > 0) mr_view_trans (RIGHT);
 
-      if (dz || dw) {
-        draw_multi_rooms ();
-        force_full_redraw = true;
-      }
       break;
     case ALLEGRO_EVENT_KEY_CHAR:
       key = event;
@@ -291,17 +287,25 @@ play_anim (void (*draw_callback) (void),
       /* SHIFT+I: flip screen */
       if (was_key_pressed (ALLEGRO_KEY_I, 0, ALLEGRO_KEYMOD_SHIFT, true)) {
         char *flip = "NONE";
+        ALLEGRO_MOUSE_STATE m;
+        al_get_mouse_state (&m);
+        int w = al_get_display_width (display);
+        int h = al_get_display_height (display);
         switch (screen_flags) {
         case 0:
+          al_set_mouse_xy (display, m.x, h - m.y);
           screen_flags = ALLEGRO_FLIP_VERTICAL;
           flip = "VERTICAL"; break;
         case ALLEGRO_FLIP_VERTICAL:
+          al_set_mouse_xy (display, w - m.x, h - m.y);
           screen_flags = ALLEGRO_FLIP_HORIZONTAL;
           flip = "HORIZONTAL"; break;
         case ALLEGRO_FLIP_HORIZONTAL:
+          al_set_mouse_xy (display, m.x, h - m.y);
           screen_flags = ALLEGRO_FLIP_VERTICAL | ALLEGRO_FLIP_HORIZONTAL;
           flip = "VERTICAL + HORIZONTAL"; break;
         case ALLEGRO_FLIP_VERTICAL | ALLEGRO_FLIP_HORIZONTAL:
+          al_set_mouse_xy (display, w - m.x, h - m.y);
           screen_flags = 0;
           break;
         }

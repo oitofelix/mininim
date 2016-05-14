@@ -750,6 +750,10 @@ update_cache_pos (struct pos *p, enum em em, enum vm vm)
 void
 draw_multi_rooms (void)
 {
+  mr.drawn.x = mr.x;
+  mr.drawn.y = mr.y;
+  mr.drawn.room = mr.room;
+
   int x, y;
 
   mr_map_rooms ();
@@ -931,10 +935,16 @@ ui_set_multi_room (int dw, int dh)
     return false;
   }
 
+  struct mouse_coord m;
+  get_mouse_coord (&m);
+
   if (mr.w + dw != mr.w || mr.h + dh != mr.h)
     set_multi_room (mr.w + dw, mr.h + dh);
 
   mr_center_room (mr.room);
+
+  set_mouse_coord (&m);
+
   xasprintf (&text, "MULTI-ROOM %ix%i", mr.w, mr.h);
   draw_bottom_text (NULL, text, 0);
   al_free (text);

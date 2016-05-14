@@ -27,7 +27,7 @@ static void mouse2guard (int i);
 static char menu_skill (char *prefix, int *skill, int max, enum edit up_edit);
 
 static int last_event;
-static struct coord last_mouse_coord;
+static struct mouse_coord last_mouse_coord;
 static struct pos last_event2floor_pos;
 static bool reciprocal_links, locally_unique_links,
   globally_unique_links;
@@ -817,8 +817,7 @@ editor (void)
     if (! is_valid_pos (&level.event[s].p)
         || ! is_door (&level.event[s].p)) {
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
-      struct coord c = {last_mouse_coord.room, 0, 0};
-      set_mouse_coord (&c);
+      al_set_mouse_xy (display, 0, 0);
     } else {
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
       set_mouse_pos (&level.event[s].p);
@@ -836,8 +835,7 @@ editor (void)
   case EDIT_EVENT2FLOOR:
     if (! is_valid_pos (&last_event2floor_pos)) {
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
-      struct coord c = {last_mouse_coord.room, 0, 0};
-      set_mouse_coord (&c);
+      al_set_mouse_xy (display, 0, 0);
     } else {
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
       set_mouse_pos (&last_event2floor_pos);
@@ -1017,13 +1015,13 @@ editor (void)
       struct room_linking l[ROOMS];
       memcpy (&l, &level.link, sizeof (l));
 
-      int room0 = last_mouse_coord.room;
+      int room0 = last_mouse_coord.c.room;
       int room1 = room_view;
 
       exchange_rooms (room0, room1);
 
       register_link_undo (&undo, l, "ROOM EXCHANGE");
-      last_mouse_coord.room = room1;
+      last_mouse_coord.c.room = room1;
       set_mouse_coord (&last_mouse_coord);
     }
     break;
@@ -1569,7 +1567,7 @@ menu_link (enum dir dir)
     struct room_linking l[ROOMS];
     memcpy (&l, &level.link, sizeof (l));
 
-    int room0 = last_mouse_coord.room;
+    int room0 = last_mouse_coord.c.room;
     int room1 = room_view;
 
     *roomd_ptr (room0, dir) = room1;
@@ -1603,8 +1601,7 @@ mouse2guard (int i)
   }
   else {
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
-    struct coord c = {last_mouse_coord.room, 0, 0};
-    set_mouse_coord (&c);
+    al_set_mouse_xy (display, 0, 0);
   }
 }
 
