@@ -1536,8 +1536,10 @@ menu_event_ext (struct pos *p)
 static char
 menu_select_room (enum edit up_edit, char *prefix)
 {
+  int room = mr.room;
   set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
-  char r = menu_int (&room_view, NULL, 0, ROOMS - 1, prefix, NULL);
+  char r = menu_int (&room, NULL, 0, ROOMS - 1, prefix, NULL);
+  set_mouse_room (room);
   switch (r) {
   case -1: edit = up_edit; set_mouse_coord (&last_mouse_coord); break;
   case 0: break;

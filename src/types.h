@@ -101,7 +101,7 @@ struct multi_room {
   } drawn;
 
   struct {
-    int w, h;
+    int w, h, x, y, room;
 
     int level;
     enum em em;
@@ -112,9 +112,9 @@ struct multi_room {
 
     int display_width, display_height;
 
-   struct {
-      int room;
-    } **cell;
+   /* struct { */
+   /*    int room; */
+   /*  } **cell; */
   } last;
 };
 

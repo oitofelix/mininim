@@ -45,13 +45,20 @@ get_mouse_event_source (void)
 }
 
 struct mouse_coord *
-get_mouse_coord (struct mouse_coord *m)
+get_mr_settings_for_mouse_coord (struct mouse_coord *m)
 {
   m->mr.w = mr.w;
   m->mr.h = mr.h;
   m->mr.x = mr.x;
   m->mr.y = mr.y;
   m->mr.room = mr.room;
+  return m;
+}
+
+struct mouse_coord *
+get_mouse_coord (struct mouse_coord *m)
+{
+  get_mr_settings_for_mouse_coord (m);
 
   int w = al_get_display_width (display);
   int h = al_get_display_height (display);
@@ -134,6 +141,9 @@ set_mouse_coord (struct mouse_coord *m)
       mr.x = m->mr.x;
       mr.y = m->mr.y;
       mr.room = m->mr.room;
+      mr_map_rooms ();
+      if (! mr_coord (m->c.room, -1, &x, &y))
+        mr_center_room (m->c.room);
     } else mr_center_room (m->c.room);
 
     x = mr.x;
@@ -187,6 +197,26 @@ set_mouse_pos (struct pos *p)
   m.mr.y = mr.y = y;
 
   set_mouse_coord (&m);
+}
+
+void
+set_mouse_room (int room)
+{
+  struct mouse_coord m;
+
+  int x, y;
+  if (mr_coord (room, -1, &x, &y)) {
+    mr.x = x;
+    mr.y = y;
+    mr.room = room;
+  }
+
+  get_mr_settings_for_mouse_coord (&m);
+  m.c.room = room;
+  m.c.x = ORIGINAL_WIDTH / 2;
+  m.c.y = ORIGINAL_HEIGHT / 2;
+  set_mouse_coord (&m);
+  mr.select_cycles = SELECT_CYCLES;
 }
 
 void

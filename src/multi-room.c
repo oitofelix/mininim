@@ -63,10 +63,10 @@ destroy_multi_room (void)
         destroy_bitmap (mr.cell[x][y].cache);
       }
       al_free (mr.cell[x]);
-      al_free (mr.last.cell[x]);
+      /* al_free (mr.last.cell[x]); */
     }
     al_free (mr.cell);
-    al_free (mr.last.cell);
+    /* al_free (mr.last.cell); */
   };
 }
 
@@ -85,10 +85,10 @@ redim_multi_room (int w, int h)
 
   int x, y;
   mr.cell = xcalloc (w, sizeof (* mr.cell));
-  mr.last.cell = xcalloc (w, sizeof (* mr.last.cell));
+  /* mr.last.cell = xcalloc (w, sizeof (* mr.last.cell)); */
   for (x = 0; x < w; x++) {
     mr.cell[x] = xcalloc (h, sizeof (** mr.cell));
-    mr.last.cell[x] = xcalloc (h, sizeof (** mr.last.cell));
+    /* mr.last.cell[x] = xcalloc (h, sizeof (** mr.last.cell)); */
     for (y = 0; y < h; y++) {
       mr.cell[x][y].screen = NULL;
       mr.cell[x][y].cache = NULL;
@@ -405,27 +405,33 @@ mr_view_page_trans (enum dir d)
 bool
 has_mr_view_changed (void)
 {
-  if (mr.w != mr.last.w || mr.h != mr.last.h) return true;
+  /* if (mr.w != mr.last.w || mr.h != mr.last.h) return true; */
 
-  int x, y;
-  for (y = mr.h - 1; y >= 0; y--)
-    for (x = 0; x < mr.w; x++)
-      if (mr.last.cell[x][y].room != mr.cell[x][y].room)
-        return true;
+  /* int x, y; */
+  /* for (y = mr.h - 1; y >= 0; y--) */
+  /*   for (x = 0; x < mr.w; x++) */
+  /*     if (mr.last.cell[x][y].room != mr.cell[x][y].room) */
+  /*       return true; */
 
-  return false;
+  /* return false; */
+
+  return mr.w != mr.last.w || mr.h != mr.last.h
+    || mr.cell[mr.last.x][mr.last.y].room != mr.last.room;
 }
 
 void
 mr_update_last_settings (void)
 {
-  int x, y;
-  for (y = mr.h - 1; y >= 0; y--)
-    for (x = 0; x < mr.w; x++)
-      mr.last.cell[x][y].room = mr.cell[x][y].room;
+  /* int x, y; */
+  /* for (y = mr.h - 1; y >= 0; y--) */
+  /*   for (x = 0; x < mr.w; x++) */
+  /*     mr.last.cell[x][y].room = mr.cell[x][y].room; */
 
   mr.last.w = mr.w;
   mr.last.h = mr.h;
+  mr.last.x = mr.x;
+  mr.last.y = mr.y;
+  mr.last.room = mr.room;
 
   mr.last.level = level.number;
   mr.last.em = em;
