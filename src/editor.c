@@ -901,6 +901,7 @@ editor (void)
     }
     break;
   case EDIT_ROOM:
+    mr.select_cycles = SELECT_CYCLES;
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
     switch (menu_enum (room_menu, "R>")) {
     case -1: case 1: edit = EDIT_MAIN; break;
@@ -956,6 +957,7 @@ editor (void)
     }
     break;
   case EDIT_ROOM_CON_EXCHANGE:
+    mr.select_cycles = SELECT_CYCLES;
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
     switch (menu_enum (con_exchange_menu, "RH>")) {
     case -1: case 1: edit = EDIT_ROOM; break;
@@ -975,6 +977,7 @@ editor (void)
     menu_select_room (EDIT_ROOM, "RJ>ROOM");
     break;
   case EDIT_LINK:
+    mr.select_cycles = SELECT_CYCLES;
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
     switch (menu_enum (link_menu, "RL>")) {
     case -1: case 1: edit = EDIT_ROOM; break;
@@ -1026,6 +1029,7 @@ editor (void)
     }
     break;
   case EDIT_LINKING_SETTINGS:
+    mr.select_cycles = SELECT_CYCLES;
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
     switch (menu_bool (linking_settings_menu, "RS>", false, &b0, &b1, &b2)) {
     case -1: edit = EDIT_ROOM; break;

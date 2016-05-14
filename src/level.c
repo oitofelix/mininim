@@ -592,7 +592,7 @@ process_keys (void)
   /* HOME: camera on kid */
   if (was_key_pressed (ALLEGRO_KEY_HOME, 0, 0, true)) {
     room_view = current_kid->f.c.room;
-    mr_center_room (room_view);
+    mr_focus_room (room_view);
   }
 
   /* A: alternate between kid and its shadows */

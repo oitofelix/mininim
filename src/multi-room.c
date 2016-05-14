@@ -25,7 +25,6 @@ bool con_caching;
 ALLEGRO_COLOR room0_wall_color[3][4][11];
 
 struct multi_room mr;
-bool mr_view_changed;
 
 struct pos *changed_pos = NULL;
 size_t changed_pos_nmemb = 0;
@@ -63,10 +62,10 @@ destroy_multi_room (void)
         destroy_bitmap (mr.cell[x][y].cache);
       }
       al_free (mr.cell[x]);
-      /* al_free (mr.last.cell[x]); */
+      al_free (mr.last.cell[x]);
     }
     al_free (mr.cell);
-    /* al_free (mr.last.cell); */
+    al_free (mr.last.cell);
   };
 }
 
@@ -85,10 +84,10 @@ redim_multi_room (int w, int h)
 
   int x, y;
   mr.cell = xcalloc (w, sizeof (* mr.cell));
-  /* mr.last.cell = xcalloc (w, sizeof (* mr.last.cell)); */
+  mr.last.cell = xcalloc (w, sizeof (* mr.last.cell));
   for (x = 0; x < w; x++) {
     mr.cell[x] = xcalloc (h, sizeof (** mr.cell));
-    /* mr.last.cell[x] = xcalloc (h, sizeof (** mr.last.cell)); */
+    mr.last.cell[x] = xcalloc (h, sizeof (** mr.last.cell));
     for (y = 0; y < h; y++) {
       mr.cell[x][y].screen = NULL;
       mr.cell[x][y].cache = NULL;
@@ -151,10 +150,14 @@ mr_map_room_adj (int r, int x, int y)
 
   mr.cell[x][y].room = r;
   mr.cell[x][y].done = true;
-  if (x > 0) mr.cell[x - 1][y].room = rl;
-  if (x < mr.w - 1) mr.cell[x + 1][y].room = rr;
-  if (y > 0) mr.cell[x][y - 1].room = ra;
-  if (y < mr.h - 1) mr.cell[x][y + 1].room = rb;
+  if (x > 0 && mr.cell[x - 1][y].room == -1)
+    mr.cell[x - 1][y].room = rl;
+  if (x < mr.w - 1 && mr.cell[x + 1][y].room == -1)
+    mr.cell[x + 1][y].room = rr;
+  if (y > 0 && mr.cell[x][y - 1].room == -1)
+    mr.cell[x][y - 1].room = ra;
+  if (y < mr.h - 1 && mr.cell[x][y + 1].room == -1)
+    mr.cell[x][y + 1].room = rb;
 }
 
 bool
@@ -299,6 +302,18 @@ mr_center_room (int room)
 }
 
 void
+mr_focus_room (int room)
+{
+  int x, y;
+  if (mr_coord (room, -1, &x, &y)) {
+    mr.x = x;
+    mr.y = y;
+    mr.room = room;
+  } else mr_center_room (room);
+  mr.select_cycles = SELECT_CYCLES;
+}
+
+void
 mr_select_trans (enum dir d)
 {
   int dx = +0, dy = +0;
@@ -405,27 +420,24 @@ mr_view_page_trans (enum dir d)
 bool
 has_mr_view_changed (void)
 {
-  /* if (mr.w != mr.last.w || mr.h != mr.last.h) return true; */
+  if (mr.w != mr.last.w || mr.h != mr.last.h) return true;
 
-  /* int x, y; */
-  /* for (y = mr.h - 1; y >= 0; y--) */
-  /*   for (x = 0; x < mr.w; x++) */
-  /*     if (mr.last.cell[x][y].room != mr.cell[x][y].room) */
-  /*       return true; */
+  int x, y;
+  for (y = mr.h - 1; y >= 0; y--)
+    for (x = 0; x < mr.w; x++)
+      if (mr.last.cell[x][y].room != mr.cell[x][y].room)
+        return true;
 
-  /* return false; */
-
-  return mr.w != mr.last.w || mr.h != mr.last.h
-    || mr.cell[mr.last.x][mr.last.y].room != mr.last.room;
+  return false;
 }
 
 void
 mr_update_last_settings (void)
 {
-  /* int x, y; */
-  /* for (y = mr.h - 1; y >= 0; y--) */
-  /*   for (x = 0; x < mr.w; x++) */
-  /*     mr.last.cell[x][y].room = mr.cell[x][y].room; */
+  int x, y;
+  for (y = mr.h - 1; y >= 0; y--)
+    for (x = 0; x < mr.w; x++)
+      mr.last.cell[x][y].room = mr.cell[x][y].room;
 
   mr.last.w = mr.w;
   mr.last.h = mr.h;
@@ -756,15 +768,13 @@ update_cache_pos (struct pos *p, enum em em, enum vm vm)
 void
 draw_multi_rooms (void)
 {
-  mr.drawn.x = mr.x;
-  mr.drawn.y = mr.y;
-  mr.drawn.room = mr.room;
-
   int x, y;
 
   mr_map_rooms ();
 
-  mr_view_changed = has_mr_view_changed ();
+  bool mr_view_changed = has_mr_view_changed ();
+
+  if (mr_view_changed) force_full_redraw = true;
 
   if (anim_cycle == 0) {
     generate_wall_colors_for_room (0, room0_wall_color);
@@ -920,8 +930,8 @@ mr_coord (int room, enum dir dir, int *rx, int *ry)
           nmr_coord (x, y + 1, rx, ry);
           return true;
         default:
-          *rx = x;
-          *ry = y;
+          if (rx) *rx = x;
+          if (ry) *ry = y;
           return true;
         }
       }
@@ -949,7 +959,8 @@ ui_set_multi_room (int dw, int dh)
 
   mr_center_room (mr.room);
 
-  set_mouse_coord (&m);
+  if (mr_coord (m.c.room, -1, NULL, NULL))
+    set_mouse_coord (&m);
 
   xasprintf (&text, "MULTI-ROOM %ix%i", mr.w, mr.h);
   draw_bottom_text (NULL, text, 0);

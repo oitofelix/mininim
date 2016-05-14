@@ -26,7 +26,6 @@ extern ALLEGRO_COLOR room0_wall_color[3][4][11];
 extern bool con_caching;
 extern struct multi_room mr;
 extern int mr_room, mr_x, mr_y;
-extern bool mr_view_changed;
 
 /* functions */
 bool is_room_visible (int room);
@@ -42,6 +41,7 @@ bool mr_leftmost_cell (int *rx, int *ry);
 bool mr_bottommost_cell (int *rx, int *ry);
 bool mr_rightmost_cell (int *rx, int *ry);
 void mr_center_room (int room);
+void mr_focus_room (int room);
 void mr_select_trans (enum dir d);
 void mr_view_trans (enum dir d);
 void mr_view_page_trans (enum dir d);

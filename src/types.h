@@ -97,10 +97,6 @@ struct multi_room {
   } **cell;
 
   struct {
-    int x, y, room;
-  } drawn;
-
-  struct {
     int w, h, x, y, room;
 
     int level;
@@ -112,9 +108,9 @@ struct multi_room {
 
     int display_width, display_height;
 
-   /* struct { */
-   /*    int room; */
-   /*  } **cell; */
+   struct {
+      int room;
+    } **cell;
   } last;
 };
 

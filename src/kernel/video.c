@@ -396,9 +396,12 @@ flip_display (ALLEGRO_BITMAP *bitmap)
     int bw = al_get_bitmap_width (bitmap);
     int bh = al_get_bitmap_height (bitmap);
     set_target_backbuffer (display);
-    al_draw_scaled_bitmap (bitmap, 0, 0, bw, bh, 0, 0, w, h, screen_flags);
+    al_draw_scaled_bitmap
+      (bitmap, 0, 0, bw, bh, 0, 0, w, h, screen_flags);
   } else {
-    if (mr.cell[mr.drawn.x][mr.drawn.y].room != mr.drawn.room) {
+    if (has_mr_view_changed ()
+        && ! cutscene
+        && ! no_room_drawing) {
       draw_multi_rooms ();
       force_full_redraw = true;
     }
@@ -420,8 +423,7 @@ flip_display (ALLEGRO_BITMAP *bitmap)
     for (y = mr.h - 1; y >= 0; y--)
       for (x = 0; x < mr.w; x++) {
         ALLEGRO_BITMAP *screen =
-          (mr.cell[x][y].room || no_room_drawing
-           || cutscene || (mr.w == 1 && mr.h == 1))
+          (mr.cell[x][y].room || no_room_drawing || cutscene)
           ? mr.cell[x][y].screen : mr.cell[x][y].cache;
         int sw = al_get_bitmap_width (screen);
         int sh = al_get_bitmap_height (screen);
@@ -430,13 +432,13 @@ flip_display (ALLEGRO_BITMAP *bitmap)
         float dw = (sw * w) / (float) tw;
         float dh = (sh * h) / (float) th;
 
-        if (mr_view_changed
-            || cutscene
+        if (cutscene
             || mr.cell[x][y].room
             || mr.last.display_width != w
             || mr.last.display_height != h
             || force_full_redraw)
-          al_draw_scaled_bitmap (screen, 0, 0, sw, sh, dx, dy, dw, dh, 0);
+          al_draw_scaled_bitmap
+            (screen, 0, 0, sw, sh, dx, dy, dw, dh, 0);
       }
 
     set_target_backbuffer (display);
