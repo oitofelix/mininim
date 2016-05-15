@@ -39,6 +39,8 @@ bool mr_topmost_cell (int *rx, int *ry);
 bool mr_leftmost_cell (int *rx, int *ry);
 bool mr_bottommost_cell (int *rx, int *ry);
 bool mr_rightmost_cell (int *rx, int *ry);
+struct mr_origin *mr_save_origin (struct mr_origin *o);
+void mr_restore_origin (struct mr_origin *o);
 void mr_map_room (int r, int x, int y);
 void mr_set_origin (int room, int x, int y);
 void mr_center_room (int room);

@@ -45,20 +45,9 @@ get_mouse_event_source (void)
 }
 
 struct mouse_coord *
-get_mr_settings_for_mouse_coord (struct mouse_coord *m)
-{
-  m->mr.w = mr.w;
-  m->mr.h = mr.h;
-  m->mr.x = mr.x;
-  m->mr.y = mr.y;
-  m->mr.room = mr.room;
-  return m;
-}
-
-struct mouse_coord *
 get_mouse_coord (struct mouse_coord *m)
 {
-  get_mr_settings_for_mouse_coord (m);
+  mr_save_origin (&m->mr);
 
   int w = al_get_display_width (display);
   int h = al_get_display_height (display);
@@ -137,14 +126,7 @@ set_mouse_coord (struct mouse_coord *m)
 
   int x, y;
 
-  if (mr_coord (m->mr.room, -1, &x, &y))
-    mr_set_origin (m->mr.room, x, y);
-
-  if (! mr_coord (m->c.room, -1, &x, &y)) {
-    if (m->mr.w == mr.w && m->mr.h == mr.h)
-      mr_set_origin (m->mr.room, m->mr.x, m->mr.y);
-    else mr_center_room (m->mr.room);
-  }
+  mr_restore_origin (&m->mr);
 
   if (! mr_coord (m->c.room, -1, &x, &y)) {
     mr_center_room (m->c.room);
@@ -210,7 +192,7 @@ set_mouse_room (int room)
   if (mr_coord (room, -1, &x, &y))
     mr_set_origin (room, x, y);
 
-  get_mr_settings_for_mouse_coord (&m);
+  mr_save_origin (&m.mr);
   m.c.room = room;
   m.c.x = ORIGINAL_WIDTH / 2;
   m.c.y = ORIGINAL_HEIGHT / 2;

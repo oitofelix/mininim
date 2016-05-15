@@ -279,6 +279,25 @@ mr_map_room (int r, int x, int y)
     mr.cell[x][y + 1].room = rb;
 }
 
+struct mr_origin *
+mr_save_origin (struct mr_origin *o)
+{
+  o->w = mr.w;
+  o->h = mr.h;
+  o->x = mr.x;
+  o->y = mr.y;
+  o->room = mr.room;
+  return o;
+}
+
+void
+mr_restore_origin (struct mr_origin *o)
+{
+  if (o->w == mr.w && o->h == mr.h)
+    mr_set_origin (o->room, o->x, o->y);
+  else mr_center_room (o->room);
+}
+
 void
 mr_set_origin (int room, int rx, int ry)
 {

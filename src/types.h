@@ -114,11 +114,13 @@ struct multi_room {
   } last;
 };
 
+struct mr_origin {
+  int w, h, x, y, room;
+};
+
 struct mouse_coord {
   struct coord c;
-  struct {
-    int w, h, x, y, room;
-  } mr;
+  struct mr_origin mr;
 };
 
 enum carpet_design {
