@@ -983,19 +983,19 @@ editor (void)
     switch (menu_enum (link_menu, "RL>")) {
     case -1: case 1: edit = EDIT_ROOM; break;
     case 'L':
-      get_mouse_coord (&last_mouse_coord);
+      mr_save_origin (&mr_origin);
       mr_focus_room (roomd (mr.room, LEFT));
       edit = EDIT_LINK_LEFT; break;
     case 'R':
-      get_mouse_coord (&last_mouse_coord);
+      mr_save_origin (&mr_origin);
       mr_focus_room (roomd (mr.room, RIGHT));
       edit = EDIT_LINK_RIGHT; break;
     case 'A':
-      get_mouse_coord (&last_mouse_coord);
+      mr_save_origin (&mr_origin);
       mr_focus_room (roomd (mr.room, ABOVE));
       edit = EDIT_LINK_ABOVE; break;
     case 'B':
-      get_mouse_coord (&last_mouse_coord);
+      mr_save_origin (&mr_origin);
       mr_focus_room (roomd (mr.room, BELOW));
       edit = EDIT_LINK_BELOW; break;
     }
@@ -1576,7 +1576,7 @@ menu_link (enum dir dir)
     struct room_linking l[ROOMS];
     memcpy (&l, &level.link, sizeof (l));
 
-    int room0 = last_mouse_coord.c.room;
+    int room0 = mr_origin.room;
     int room1 = mr.room;
 
     *roomd_ptr (room0, dir) = room1;
@@ -1593,7 +1593,7 @@ menu_link (enum dir dir)
     }
 
     register_link_undo (&undo, l, "LINK");
-    set_mouse_coord (&last_mouse_coord);
+    mr_restore_origin (&mr_origin);
   }
 
   return r;

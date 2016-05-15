@@ -61,5 +61,8 @@ void mr_update_last_settings (void);
 void multi_room_fit_stretch (void);
 void multi_room_fit_ratio (void);
 void apply_mr_fit_mode (void);
+bool mr_room_list_has_room (struct mr_room_list *l, int room);
+struct mr_room_list *mr_get_room_list (struct mr_room_list *l);
+int mr_count_uniq_rooms (void);
 
 #endif	/* MININIM_MULTI_ROOM_H */

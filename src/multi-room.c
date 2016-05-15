@@ -351,7 +351,7 @@ mr_view_trans (enum dir d)
 {
   int x, y, dx = +0, dy = +0;
 
-  mr.select_cycles = 0;
+  mr.select_cycles = SELECT_CYCLES;
 
   for (y = mr.h - 1; y >= 0; y--)
     for (x = 0; x < mr.w; x++) {
@@ -386,7 +386,8 @@ void
 mr_view_page_trans (enum dir d)
 {
   int x, y;
-  mr.select_cycles = 0;
+
+  mr.select_cycles = SELECT_CYCLES;
 
   switch (d) {
   case RIGHT:
@@ -963,6 +964,44 @@ ui_set_multi_room (int dw, int dh)
   return true;
 }
 
+bool
+mr_room_list_has_room (struct mr_room_list *l, int room)
+{
+  return bsearch (&room, l->room, l->nmemb, sizeof (room),
+                  (m_comparison_fn_t) cint);
+}
+
+struct mr_room_list *
+mr_get_room_list (struct mr_room_list *l)
+{
+  l->room = NULL;
+  l->nmemb = 0;
+
+  int x, y;
+  for (x = 0; x < mr.w; x++)
+    for (y = 0; y < mr.h; y++) {
+      int room = mr.cell[x][y].room;
+      if (room && ! mr_room_list_has_room (l, room)) {
+        l->room = add_to_array (&room, 1, l->room, &l->nmemb,
+                               l->nmemb, sizeof (*l->room));
+
+        qsort (l->room, l->nmemb, sizeof (*l->room),
+               (m_comparison_fn_t) cint);
+      }
+    }
+
+  return l;
+}
+
+int
+mr_count_uniq_rooms (void)
+{
+  struct mr_room_list l;
+  int c = mr_get_room_list (&l)->nmemb;
+  destroy_array ((void **) &l.room, &l.nmemb);
+  return c;
+}
+
 void
 multi_room_fit_stretch (void)
 {
@@ -971,18 +1010,18 @@ multi_room_fit_stretch (void)
 
   int lc, c = 1;
 
-  bool should_repeat;
+  bool has_new_rooms;
 
  repeat:
-  should_repeat = false;
+  has_new_rooms = false;
 
   do {
     lc = c;
     redim_multi_room (++w, h);
     mr_center_room (mr.room);
-    c = mr_count_rooms ();
+    c = mr_count_uniq_rooms ();
     /* printf ("W: room: %i, width: %i, height: %i, count: %i\n", mr.room, mr.w, mr.h, c); */
-    if (c > lc) should_repeat = true;
+    if (c > lc) has_new_rooms = true;
   } while (c > lc);
   redim_multi_room (--w, h);
   mr_center_room (mr.room);
@@ -991,14 +1030,14 @@ multi_room_fit_stretch (void)
     lc = c;
     redim_multi_room (w, ++h);
     mr_center_room (mr.room);
-    c = mr_count_rooms ();
+    c = mr_count_uniq_rooms ();
     /* printf ("H: room: %i, width: %i, height: %i, count: %i\n", mr.room, mr.w, mr.h, c); */
-    if (c > lc) should_repeat = true;
+    if (c > lc) has_new_rooms = true;
   } while (c > lc);
   redim_multi_room (w, --h);
   mr_center_room (mr.room);
 
-  if (should_repeat) goto repeat;
+  if (has_new_rooms) goto repeat;
 }
 
 void

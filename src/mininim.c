@@ -1508,6 +1508,14 @@ min_int (int a, int b)
   return (a < b) ? a : b;
 }
 
+int
+cint (int *x, int *y)
+{
+  if (*x < *y) return -1;
+  else if (*x > *y) return 1;
+  else return 0;
+}
+
 unsigned char
 add_char (unsigned char a, signed char b)
 {

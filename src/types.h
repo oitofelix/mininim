@@ -123,6 +123,11 @@ struct mouse_coord {
   struct mr_origin mr;
 };
 
+struct mr_room_list {
+  int *room;
+  size_t nmemb;
+};
+
 enum carpet_design {
   CARPET_00 = 0,
   CARPET_01 = 1,
