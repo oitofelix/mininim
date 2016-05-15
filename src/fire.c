@@ -90,7 +90,12 @@ draw_fire (ALLEGRO_BITMAP* bitmap, struct pos *p, enum vm vm)
   struct coord c;
   if (con (p)->bg != TORCH) return;
 
-  ALLEGRO_BITMAP *fire = get_fire_frame (prandom_pos_uniq (p, anim_cycle, 1, 8), vm);
+  ALLEGRO_BITMAP *fire =
+    get_fire_frame (prandom_pos_uniq (p, anim_cycle, 1, 8), vm);
+
+  if (peq (p, &mouse_pos))
+    fire = apply_palette (fire, selection_palette);
+
   int flip = prandom_pos (p, 1);
   fire_coord (p, &c);
   c.x -= flip;

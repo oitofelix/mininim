@@ -983,19 +983,19 @@ editor (void)
     case -1: case 1: edit = EDIT_ROOM; break;
     case 'L':
       get_mouse_coord (&last_mouse_coord);
-      room_view = roomd (room_view, LEFT);
+      mr_focus_room (roomd (mr.room, LEFT));
       edit = EDIT_LINK_LEFT; break;
     case 'R':
       get_mouse_coord (&last_mouse_coord);
-      room_view = roomd (room_view, RIGHT);
+      mr_focus_room (roomd (mr.room, RIGHT));
       edit = EDIT_LINK_RIGHT; break;
     case 'A':
       get_mouse_coord (&last_mouse_coord);
-      room_view = roomd (room_view, ABOVE);
+      mr_focus_room (roomd (mr.room, ABOVE));
       edit = EDIT_LINK_ABOVE; break;
     case 'B':
       get_mouse_coord (&last_mouse_coord);
-      room_view = roomd (room_view, BELOW);
+      mr_focus_room (roomd (mr.room, BELOW));
       edit = EDIT_LINK_BELOW; break;
     }
     break;
@@ -1543,9 +1543,13 @@ menu_select_room (enum edit up_edit, char *prefix)
   int room = mr.room;
   set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
   char r = menu_int (&room, NULL, 0, ROOMS - 1, prefix, NULL);
-  set_mouse_room (room);
+  /* set_mouse_room (room); */
+  mr_focus_room (room);
   switch (r) {
-  case -1: edit = up_edit; set_mouse_coord (&last_mouse_coord); break;
+  case -1: edit = up_edit;
+    set_mouse_coord (&last_mouse_coord);
+    /* mr_focus_room (last_mouse_coord.mr.room); */
+    break;
   case 0: break;
   case 1: edit = up_edit; break;
   }
@@ -1574,7 +1578,7 @@ menu_link (enum dir dir)
     memcpy (&l, &level.link, sizeof (l));
 
     int room0 = last_mouse_coord.c.room;
-    int room1 = room_view;
+    int room1 = mr.room;
 
     *roomd_ptr (room0, dir) = room1;
     if (reciprocal_links) make_reciprocal_link (room0, room1, dir);

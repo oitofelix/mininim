@@ -363,8 +363,9 @@ compute_level (void)
     room_view = current_kid->f.c.room;
 
     if (! is_kid_visible ()) {
-      mr_coord (current_kid->f.c.prev_room, current_kid->f.c.xd, &mr.x, &mr.y);
-      mr.room = current_kid->f.c.room;
+      mr_coord (current_kid->f.c.prev_room,
+                current_kid->f.c.xd, &mr.x, &mr.y);
+      mr_set_origin (current_kid->f.c.room, mr.x, mr.y);
       mr.select_cycles = 0;
     }
   }

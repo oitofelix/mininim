@@ -38,7 +38,7 @@ play_anim (void (*draw_callback) (void),
 {
   if (cutscene) set_multi_room (1, 1);
   else {
-    mr.room = room_view;
+    mr_set_origin (room_view, mr.x, mr.y);
     apply_mr_fit_mode ();
   }
 

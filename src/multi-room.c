@@ -140,26 +140,6 @@ clear_multi_room_cells (void)
     }
 }
 
-void
-mr_map_room_adj (int r, int x, int y)
-{
-  int rl = roomd (r, LEFT);
-  int rr = roomd (r, RIGHT);
-  int ra = roomd (r, ABOVE);
-  int rb = roomd (r, BELOW);
-
-  mr.cell[x][y].room = r;
-  mr.cell[x][y].done = true;
-  if (x > 0 && mr.cell[x - 1][y].room == -1)
-    mr.cell[x - 1][y].room = rl;
-  if (x < mr.w - 1 && mr.cell[x + 1][y].room == -1)
-    mr.cell[x + 1][y].room = rr;
-  if (y > 0 && mr.cell[x][y - 1].room == -1)
-    mr.cell[x][y - 1].room = ra;
-  if (y < mr.h - 1 && mr.cell[x][y + 1].room == -1)
-    mr.cell[x][y + 1].room = rb;
-}
-
 bool
 next_multi_room_cell (int *rx, int *ry)
 {
@@ -174,20 +154,6 @@ next_multi_room_cell (int *rx, int *ry)
       }
 
   return false;
-}
-
-void
-mr_map_rooms (void)
-{
-  int x, y;
-  clear_multi_room_cells ();
-  mr_map_room_adj (mr.room, mr.x, mr.y);
-  while (next_multi_room_cell (&x, &y))
-    mr_map_room_adj (mr.cell[x][y].room, x, y);
-  for (x = 0; x < mr.w; x++)
-    for (y = 0; y < mr.h; y++) {
-      if (mr.cell[x][y].room < 0) mr.cell[x][y].room = 0;
-    }
 }
 
 int
@@ -259,17 +225,13 @@ mr_rightmost_cell (int *rx, int *ry)
 void
 mr_center_room (int room)
 {
-  mr.room = room;
-
   int x, y, lc = 0, c = 0, ld = INT_MAX;
   float ldc = INFINITY;
   int lx = mr.x;
   int ly = mr.y;
   for (y = mr.h - 1; y >= 0; y--)
     for (x = 0; x < mr.w; x++) {
-      mr.x = x;
-      mr.y = y;
-      mr_map_rooms ();
+      mr_set_origin (room, x, y);
       c = mr_count_rooms ();
       int cx, cy;
       mr_topmost_cell (&cx, &cy);
@@ -293,23 +255,55 @@ mr_center_room (int room)
       }
     }
 
-  mr.x = lx;
-  mr.y = ly;
-
+  mr_set_origin (room, lx, ly);
   mr.select_cycles = SELECT_CYCLES;
+}
 
-  mr_map_rooms ();
+void
+mr_map_room (int r, int x, int y)
+{
+  int rl = roomd (r, LEFT);
+  int rr = roomd (r, RIGHT);
+  int ra = roomd (r, ABOVE);
+  int rb = roomd (r, BELOW);
+
+  mr.cell[x][y].room = r;
+  mr.cell[x][y].done = true;
+  if (x > 0 && mr.cell[x - 1][y].room == -1)
+    mr.cell[x - 1][y].room = rl;
+  if (x < mr.w - 1 && mr.cell[x + 1][y].room == -1)
+    mr.cell[x + 1][y].room = rr;
+  if (y > 0 && mr.cell[x][y - 1].room == -1)
+    mr.cell[x][y - 1].room = ra;
+  if (y < mr.h - 1 && mr.cell[x][y + 1].room == -1)
+    mr.cell[x][y + 1].room = rb;
+}
+
+void
+mr_set_origin (int room, int rx, int ry)
+{
+  mr.room = room;
+  mr.x = rx;
+  mr.y = ry;
+
+  int x, y;
+  clear_multi_room_cells ();
+  mr_map_room (mr.room, mr.x, mr.y);
+  while (next_multi_room_cell (&x, &y))
+    mr_map_room (mr.cell[x][y].room, x, y);
+  for (x = 0; x < mr.w; x++)
+    for (y = 0; y < mr.h; y++) {
+      if (mr.cell[x][y].room < 0) mr.cell[x][y].room = 0;
+    }
 }
 
 void
 mr_focus_room (int room)
 {
   int x, y;
-  if (mr_coord (room, -1, &x, &y)) {
-    mr.x = x;
-    mr.y = y;
-    mr.room = room;
-  } else mr_center_room (room);
+  if (mr_coord (room, -1, &x, &y))
+    mr_set_origin (room, x, y);
+  else mr_center_room (room);
   mr.select_cycles = SELECT_CYCLES;
 }
 
@@ -326,8 +320,8 @@ mr_select_trans (enum dir d)
 
   int r = roomd (mr.room, d);
   if (r) {
-    mr.room = r;
     nmr_coord (mr.x + dx, mr.y + dy, &mr.x, &mr.y);
+    mr_set_origin (r, mr.x, mr.y);
   }
 
   mr.select_cycles = SELECT_CYCLES;
@@ -347,15 +341,9 @@ mr_view_trans (enum dir d)
       r = roomd (r, d);
       if (r) {
         int mr_x = mr.x, mr_y = mr.y;
-        mr.room = r;
-        mr.x = x;
-        mr.y = y;
-        mr_map_rooms ();
-        if (mr.cell[mr_x][mr_y].room) {
-          mr.x = mr_x;
-          mr.y = mr_y;
-          mr.room = mr.cell[mr_x][mr_y].room;
-        }
+        mr_set_origin (r, x, y);
+        if (mr.cell[mr_x][mr_y].room)
+          mr_set_origin (mr.cell[mr_x][mr_y].room, mr_x, mr_y);
         return;
       }
     }
@@ -384,34 +372,22 @@ mr_view_page_trans (enum dir d)
   switch (d) {
   case RIGHT:
     mr_rightmost_cell (&x, &y);
-    mr.room = mr.cell[x][y].room;
-    mr.x = 0;
-    mr.y = y;
-    mr_map_rooms ();
+    mr_set_origin (mr.cell[x][y].room, 0, y);
     mr_view_trans (RIGHT);
     break;
   case LEFT:
     mr_leftmost_cell (&x, &y);
-    mr.room = mr.cell[x][y].room;
-    mr.x = mr.w - 1;
-    mr.y = y;
-    mr_map_rooms ();
+    mr_set_origin (mr.cell[x][y].room, mr.w - 1, y);
     mr_view_trans (LEFT);
     break;
   case BELOW:
     mr_bottommost_cell (&x, &y);
-    mr.room = mr.cell[x][y].room;
-    mr.x = x;
-    mr.y = 0;
-    mr_map_rooms ();
+    mr_set_origin (mr.cell[x][y].room, x, 0);
     mr_view_trans (BELOW);
     break;
   case ABOVE:
     mr_topmost_cell (&x, &y);
-    mr.room = mr.cell[x][y].room;
-    mr.x = x;
-    mr.y = mr.h - 1;
-    mr_map_rooms ();
+    mr_set_origin (mr.cell[x][y].room, x, mr.h - 1);
     mr_view_trans (ABOVE);
     break;
   }
@@ -770,7 +746,7 @@ draw_multi_rooms (void)
 {
   int x, y;
 
-  mr_map_rooms ();
+  mr_set_origin (mr.room, mr.x, mr.y);
 
   bool mr_view_changed = has_mr_view_changed ();
 

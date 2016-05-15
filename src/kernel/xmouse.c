@@ -136,16 +136,18 @@ set_mouse_coord (struct mouse_coord *m)
     return;
 
   int x, y;
-  if (! mr_coord (m->c.room, -1, &x, &y)) {
-    if (m->mr.w == mr.w && m->mr.h == mr.h) {
-      mr.x = m->mr.x;
-      mr.y = m->mr.y;
-      mr.room = m->mr.room;
-      mr_map_rooms ();
-      if (! mr_coord (m->c.room, -1, &x, &y))
-        mr_center_room (m->c.room);
-    } else mr_center_room (m->c.room);
 
+  if (mr_coord (m->mr.room, -1, &x, &y))
+    mr_set_origin (m->mr.room, x, y);
+
+  if (! mr_coord (m->c.room, -1, &x, &y)) {
+    if (m->mr.w == mr.w && m->mr.h == mr.h)
+      mr_set_origin (m->mr.room, m->mr.x, m->mr.y);
+    else mr_center_room (m->mr.room);
+  }
+
+  if (! mr_coord (m->c.room, -1, &x, &y)) {
+    mr_center_room (m->c.room);
     x = mr.x;
     y = mr.y;
   }
@@ -205,11 +207,8 @@ set_mouse_room (int room)
   struct mouse_coord m;
 
   int x, y;
-  if (mr_coord (room, -1, &x, &y)) {
-    mr.x = x;
-    mr.y = y;
-    mr.room = room;
-  }
+  if (mr_coord (room, -1, &x, &y))
+    mr_set_origin (room, x, y);
 
   get_mr_settings_for_mouse_coord (&m);
   m.c.room = room;
