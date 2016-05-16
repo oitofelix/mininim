@@ -64,10 +64,13 @@ get_mouse_coord (struct mouse_coord *m)
   if (screen_flags & ALLEGRO_FLIP_VERTICAL)
     y = sh - y;
 
-  if (y < 3 || y >= sh - 8 || x < 0 || x > sw - 1) m->c.room = -1;
+  if (y < 3 || y >= sh - 8 || x < 0 || x > sw - 1)
+    m->x = m->y = m->c.room = -1;
   else {
-    m->c.room = mr.cell[x / ORIGINAL_WIDTH][(y - 3) / ROOM_HEIGHT].room;
-    m->c.room = (m->c.room != -1) ? m->c.room : 0;
+    m->x = x / ORIGINAL_WIDTH;
+    m->y = (y - 3) / ROOM_HEIGHT;
+    m->c.room = mr.cell[m->x][m->y].room;
+    m->c.room = (m->c.room > 0) ? m->c.room : 0;
   }
 
   m->c.x = x % ORIGINAL_WIDTH;

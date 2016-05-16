@@ -45,6 +45,8 @@ void mr_map_room (int r, int x, int y);
 void mr_set_origin (int room, int x, int y);
 void mr_center_room (int room);
 void mr_focus_room (int room);
+void mr_focus_cell (int x, int y);
+void mr_focus_mouse (void);
 void mr_select_trans (enum dir d);
 void mr_view_trans (enum dir d);
 void mr_view_page_trans (enum dir d);

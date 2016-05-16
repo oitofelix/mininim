@@ -327,6 +327,23 @@ mr_focus_room (int room)
 }
 
 void
+mr_focus_cell (int x, int y)
+{
+  if (x < 0 || y < 0) return;
+  if (! mr.cell[x][y].room) return;
+  mr_set_origin (mr.cell[x][y].room, x, y);
+  mr.select_cycles = SELECT_CYCLES;
+}
+
+void
+mr_focus_mouse (void)
+{
+  struct mouse_coord m;
+  get_mouse_coord (&m);
+  mr_focus_cell (m.x, m.y);
+}
+
+void
 mr_select_trans (enum dir d)
 {
   int dx = +0, dy = +0;
@@ -635,7 +652,11 @@ update_cache_pos (struct pos *p, enum em em, enum vm vm)
 
         al_reset_clipping_rectangle ();
         con_caching = false;
+
+        goto end;
       }
+
+ end:;
 
   /* if (is_room_visible (p->room)) printf ("%i,%i,%i\n", p->room, p->floor, p->place); */
 
@@ -833,11 +854,25 @@ draw_multi_rooms (void)
 
   if (mr.flicker > 0) mr.flicker--;
 
+  struct mr_room_list l;
+  mr_get_room_list (&l);
+
+  int xm, ym;
   if (! no_room_drawing)
-    for (y = mr.h - 1; y >= 0; y--)
-      for (x = 0; x < mr.w; x++)
-        if (mr.cell[x][y].room)
-          draw_bitmap (mr.cell[x][y].cache, mr.cell[x][y].screen, 0, 0, 0);
+    for (i = 0; i < l.nmemb; i++) {
+      mr_coord (l.room[i], -1, &xm, &ym);
+      for (y = mr.h - 1; y >= 0; y--)
+        for (x = 0; x < mr.w; x++)
+          if (mr.cell[x][y].room == l.room[i])
+            draw_bitmap (mr.cell[xm][ym].cache,
+                         mr.cell[x][y].screen, 0, 0, 0);
+    }
+
+  /* if (! no_room_drawing) */
+  /*   for (y = mr.h - 1; y >= 0; y--) */
+  /*     for (x = 0; x < mr.w; x++) */
+  /*       if (mr.cell[x][y].room) */
+  /*         draw_bitmap (mr.cell[x][y].cache, mr.cell[x][y].screen, 0, 0, 0); */
 
   for (y = mr.h - 1; y >= 0; y--)
     for (x = 0; x < mr.w; x++) {
@@ -910,8 +945,8 @@ bool
 mr_coord (int room, enum dir dir, int *rx, int *ry)
 {
   int x, y;
-  for (x = 0; x < mr.w; x++)
-    for (y = 0; y < mr.h; y++)
+  for (y = mr.h - 1; y >= 0; y--)
+    for (x = 0; x < mr.w; x++)
       if (room && mr.cell[x][y].room == room) {
         switch (dir) {
         case LEFT:

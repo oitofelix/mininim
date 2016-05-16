@@ -121,6 +121,7 @@ struct mr_origin {
 struct mouse_coord {
   struct coord c;
   struct mr_origin mr;
+  int x, y;
 };
 
 struct mr_room_list {

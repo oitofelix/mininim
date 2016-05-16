@@ -903,7 +903,7 @@ editor (void)
   case EDIT_ROOM:
     mr.select_cycles = SELECT_CYCLES;
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
-    if (p.room > 0) mr_focus_room (p.room);
+    mr_focus_mouse ();
     switch (menu_enum (room_menu, "R>")) {
     case -1: case 1: edit = EDIT_MAIN; break;
     case 'J':
@@ -981,7 +981,7 @@ editor (void)
   case EDIT_LINK:
     mr.select_cycles = SELECT_CYCLES;
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
-    if (p.room > 0) mr_focus_room (p.room);
+    mr_focus_mouse ();
     switch (menu_enum (link_menu, "RL>")) {
     case -1: case 1: edit = EDIT_ROOM; break;
     case 'L':
@@ -1543,14 +1543,10 @@ menu_event_ext (struct pos *p)
 static char
 menu_select_room (enum edit up_edit, char *prefix)
 {
-  struct pos p;
-  if (get_mouse_pos (&p)->room > 0) mr_focus_room (p.room);
-
+  mr_focus_mouse ();
   int room = mr.room;
-
   set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
   char r = menu_int (&room, NULL, 0, ROOMS - 1, prefix, NULL);
-  mr_focus_room (room);
   switch (r) {
   case -1: edit = up_edit;
     set_mouse_coord (&last_mouse_coord);
