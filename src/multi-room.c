@@ -856,6 +856,8 @@ draw_multi_rooms (void)
   /* } */
 
   mr.dx = mr.dy = -1;
+
+  mr_update_last_settings ();
 }
 
 bool

@@ -471,8 +471,6 @@ flip_display (ALLEGRO_BITMAP *bitmap)
   al_flip_display ();
 
   force_full_redraw = false;
-
-  mr_update_last_settings ();
 }
 
 void
