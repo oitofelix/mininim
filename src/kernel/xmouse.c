@@ -201,7 +201,6 @@ set_mouse_room (int room)
   m.c.x = ORIGINAL_WIDTH / 2;
   m.c.y = ORIGINAL_HEIGHT / 2;
   set_mouse_coord (&m);
-  mr.select_cycles = SELECT_CYCLES;
 }
 
 void

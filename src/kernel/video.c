@@ -444,6 +444,14 @@ flip_display (ALLEGRO_BITMAP *bitmap)
     set_target_backbuffer (display);
     al_draw_bitmap (iscreen, 0, 0, screen_flags);
 
+    if ((mr.room != mr.last.room
+         || mr.x != mr.last.x
+         || mr.y != mr.last.y
+         || mr.w != mr.last.w
+         || mr.h != mr.last.h)
+        && ! cutscene)
+      mr.select_cycles = SELECT_CYCLES;
+
     if (mr.select_cycles > 0) {
       int x = mr.x;
       int y = mr.y;
@@ -463,6 +471,8 @@ flip_display (ALLEGRO_BITMAP *bitmap)
   al_flip_display ();
 
   force_full_redraw = false;
+
+  mr_update_last_settings ();
 }
 
 void
