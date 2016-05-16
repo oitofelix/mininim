@@ -28,7 +28,6 @@ static char menu_skill (char *prefix, int *skill, int max, enum edit up_edit);
 
 static int last_event;
 static struct mouse_coord last_mouse_coord;
-static struct mr_origin mr_origin;
 static struct pos last_event2floor_pos;
 static bool reciprocal_links, locally_unique_links,
   globally_unique_links;
@@ -904,10 +903,12 @@ editor (void)
   case EDIT_ROOM:
     mr.select_cycles = SELECT_CYCLES;
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
+    if (p.room > 0) mr_focus_room (p.room);
     switch (menu_enum (room_menu, "R>")) {
     case -1: case 1: edit = EDIT_MAIN; break;
     case 'J':
-      mr_save_origin (&mr_origin);
+      get_mouse_coord (&last_mouse_coord);
+      set_mouse_room (mr.room);
       edit = EDIT_JUMP_ROOM;
       break;
     case 'L': edit = EDIT_LINK; break;
@@ -980,23 +981,24 @@ editor (void)
   case EDIT_LINK:
     mr.select_cycles = SELECT_CYCLES;
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
+    if (p.room > 0) mr_focus_room (p.room);
     switch (menu_enum (link_menu, "RL>")) {
     case -1: case 1: edit = EDIT_ROOM; break;
     case 'L':
-      mr_save_origin (&mr_origin);
-      mr_focus_room (roomd (mr.room, LEFT));
+      get_mouse_coord (&last_mouse_coord);
+      set_mouse_room (roomd (mr.room, LEFT));
       edit = EDIT_LINK_LEFT; break;
     case 'R':
-      mr_save_origin (&mr_origin);
-      mr_focus_room (roomd (mr.room, RIGHT));
+      get_mouse_coord (&last_mouse_coord);
+      set_mouse_room (roomd (mr.room, RIGHT));
       edit = EDIT_LINK_RIGHT; break;
     case 'A':
-      mr_save_origin (&mr_origin);
-      mr_focus_room (roomd (mr.room, ABOVE));
+      get_mouse_coord (&last_mouse_coord);
+      set_mouse_room (roomd (mr.room, ABOVE));
       edit = EDIT_LINK_ABOVE; break;
     case 'B':
-      mr_save_origin (&mr_origin);
-      mr_focus_room (roomd (mr.room, BELOW));
+      get_mouse_coord (&last_mouse_coord);
+      set_mouse_room (roomd (mr.room, BELOW));
       edit = EDIT_LINK_BELOW; break;
     }
     break;
@@ -1541,16 +1543,21 @@ menu_event_ext (struct pos *p)
 static char
 menu_select_room (enum edit up_edit, char *prefix)
 {
+  struct pos p;
+  if (get_mouse_pos (&p)->room > 0) mr_focus_room (p.room);
+
   int room = mr.room;
+
   set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
   char r = menu_int (&room, NULL, 0, ROOMS - 1, prefix, NULL);
   mr_focus_room (room);
   switch (r) {
   case -1: edit = up_edit;
-    mr_restore_origin (&mr_origin);
+    set_mouse_coord (&last_mouse_coord);
     break;
   case 0: break;
   case 1: edit = up_edit; break;
+  default: set_mouse_room (room); break;
   }
   return r;
 }
@@ -1576,7 +1583,7 @@ menu_link (enum dir dir)
     struct room_linking l[ROOMS];
     memcpy (&l, &level.link, sizeof (l));
 
-    int room0 = mr_origin.room;
+    int room0 = last_mouse_coord.c.room;
     int room1 = mr.room;
 
     *roomd_ptr (room0, dir) = room1;
@@ -1593,7 +1600,7 @@ menu_link (enum dir dir)
     }
 
     register_link_undo (&undo, l, "LINK");
-    mr_restore_origin (&mr_origin);
+    set_mouse_coord (&last_mouse_coord);
   }
 
   return r;

@@ -955,8 +955,7 @@ apply_hue_color (ALLEGRO_COLOR c)
 void
 draw_no_floor_selection (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
-  if (peq (p, &mouse_pos)
-      && con (p)->fg == NO_FLOOR) {
+  if (peq (p, &mouse_pos)) {
     struct rect r = new_rect (p->room, p->place * PLACE_WIDTH + 25,
                               p->floor * PLACE_HEIGHT - 13,
                               PLACE_WIDTH, PLACE_HEIGHT);

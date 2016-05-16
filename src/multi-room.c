@@ -983,8 +983,7 @@ mr_get_room_list (struct mr_room_list *l)
       int room = mr.cell[x][y].room;
       if (room && ! mr_room_list_has_room (l, room)) {
         l->room = add_to_array (&room, 1, l->room, &l->nmemb,
-                               l->nmemb, sizeof (*l->room));
-
+                                l->nmemb, sizeof (*l->room));
         qsort (l->room, l->nmemb, sizeof (*l->room),
                (m_comparison_fn_t) cint);
       }
