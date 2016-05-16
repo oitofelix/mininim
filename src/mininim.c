@@ -1173,6 +1173,7 @@ main (int _argc, char **_argv)
   if (skip_title) goto play_game;
 
  restart_game:
+  cutscene = true;
   set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
   set_multi_room (1, 1);
   clear_bitmap (mr.cell[0][0].screen, BLACK);

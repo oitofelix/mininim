@@ -452,7 +452,7 @@ flip_display (ALLEGRO_BITMAP *bitmap)
         && ! cutscene)
       mr.select_cycles = SELECT_CYCLES;
 
-    if (mr.select_cycles > 0) {
+    if (mr.select_cycles > 0 && ! cutscene) {
       int x = mr.x;
       int y = mr.y;
       ALLEGRO_BITMAP *screen = mr.cell[x][y].screen;
