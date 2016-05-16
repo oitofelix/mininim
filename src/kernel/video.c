@@ -443,6 +443,20 @@ flip_display (ALLEGRO_BITMAP *bitmap)
 
     set_target_backbuffer (display);
     al_draw_bitmap (iscreen, 0, 0, screen_flags);
+
+    if (mr.select_cycles > 0) {
+      int x = mr.x;
+      int y = mr.y;
+      ALLEGRO_BITMAP *screen = mr.cell[x][y].screen;
+      int sw = al_get_bitmap_width (screen);
+      int sh = al_get_bitmap_height (screen);
+      float dx = ((ORIGINAL_WIDTH * x) * w) / (float) tw;
+      float dy = ((ROOM_HEIGHT * y) * h) / (float) th;
+      float dw = (sw * w) / (float) tw;
+      float dh = (sh * h) / (float) th;
+      al_draw_rectangle (dx, dy, dx + dw, dy + dh, RED, 2);
+      mr.select_cycles--;
+    }
   }
 
   al_draw_scaled_bitmap (uscreen, 0, 0, uw, uh, 0, 0, w, h, 0);

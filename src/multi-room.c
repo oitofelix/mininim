@@ -847,12 +847,13 @@ draw_multi_rooms (void)
       draw_animated_foreground (mr.cell[x][y].screen, mr.cell[x][y].room);
     }
 
-  if (mr.select_cycles > 0) {
-    int t = max_int (mr.w, mr.h);
-    draw_rectangle (mr.cell[mr.x][mr.y].screen, 0, 3, ORIGINAL_WIDTH - t,
-                    3 + ROOM_HEIGHT - t, RED, t);
-    mr.select_cycles--;
-  }
+  /* if (mr.select_cycles > 0) { */
+  /*   int t = max_int (mr.w, mr.h); */
+  /*   draw_rectangle (mr.cell[mr.x][mr.y].screen, 0, 3, */
+  /*                   ORIGINAL_WIDTH - t, */
+  /*                   3 + ROOM_HEIGHT - t, RED, t); */
+  /*   mr.select_cycles--; */
+  /* } */
 
   mr.dx = mr.dy = -1;
 

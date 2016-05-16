@@ -128,6 +128,8 @@ set_mouse_coord (struct mouse_coord *m)
 
   mr_restore_origin (&m->mr);
 
+  if (! m->c.room) return;
+
   if (! mr_coord (m->c.room, -1, &x, &y)) {
     mr_center_room (m->c.room);
     x = mr.x;
@@ -155,6 +157,8 @@ set_mouse_coord (struct mouse_coord *m)
   if (! al_set_mouse_xy (display, mx, my))
     error (0, 0, "%s (%p): cannot set mouse xy coordinates (%i,%i)",
            __func__, m, mx, my);
+
+  mr.select_cycles = SELECT_CYCLES;
 }
 
 void
