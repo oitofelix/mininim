@@ -116,6 +116,81 @@ draw_bitmapc (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
   }
 
   draw_bitmap (from, to, nc.x, nc.y, flags);
+
+  if (cutscene || con_caching) return;
+
+  int x = nc.x;
+  int y = nc.y;
+  int room = nc.room;
+  int w = al_get_bitmap_width (from);
+  int h = al_get_bitmap_height (from);
+
+  struct coord mc;
+
+  if (room == roomd (room, LEFT)
+      && x < 0) {
+    mc = nc;
+    mc.x += PLACE_WIDTH * PLACES;
+    draw_bitmap (from, to, mc.x, mc.y, flags);
+  }
+
+  if (room == roomd (room, RIGHT)
+      && x + w - 1 >= PLACE_WIDTH * PLACES) {
+    mc = nc;
+    mc.x -= PLACE_WIDTH * PLACES;
+    draw_bitmap (from, to, mc.x, mc.y, flags);
+  }
+
+  if (room == roomd (room, ABOVE)
+      && y < 3) {
+    mc = nc;
+    mc.y += PLACE_HEIGHT * FLOORS;
+    draw_bitmap (from, to, mc.x, mc.y, flags);
+  }
+
+  if (room == roomd (room, BELOW)
+      && y + h - 1 >= PLACE_HEIGHT * FLOORS) {
+    mc = nc;
+    mc.y -= PLACE_HEIGHT * FLOORS;
+    draw_bitmap (from, to, mc.x, mc.y, flags);
+  }
+
+  if (room == roomd (room, LEFT) && x < 0
+      && room == roomd (room, ABOVE) && y < 3) {
+    mc = nc;
+    mc.x += PLACE_WIDTH * PLACES;
+    mc.y += PLACE_HEIGHT * FLOORS;
+    draw_bitmap (from, to, mc.x, mc.y, flags);
+  }
+
+  if (room == roomd (room, RIGHT)
+      && x + w - 1 >= PLACE_WIDTH * PLACES
+      && room == roomd (room, ABOVE) && y < 3) {
+    mc = nc;
+    mc.x -= PLACE_WIDTH * PLACES;
+    mc.y += PLACE_HEIGHT * FLOORS;
+    draw_bitmap (from, to, mc.x, mc.y, flags);
+  }
+
+  if (room == roomd (room, LEFT)
+      && x < 0
+      && room == roomd (room, BELOW)
+      && y + h - 1 >= PLACE_HEIGHT * FLOORS) {
+    mc = nc;
+    mc.x += PLACE_WIDTH * PLACES;
+    mc.y -= PLACE_HEIGHT * FLOORS;
+    draw_bitmap (from, to, mc.x, mc.y, flags);
+  }
+
+  if (room == roomd (room, RIGHT)
+      && x + w - 1 >= PLACE_WIDTH * PLACES
+      && room == roomd (room, BELOW)
+      && y + h - 1 >= PLACE_HEIGHT * FLOORS) {
+    mc = nc;
+    mc.x -= PLACE_WIDTH * PLACES;
+    mc.y -= PLACE_HEIGHT * FLOORS;
+    draw_bitmap (from, to, mc.x, mc.y, flags);
+  }
 }
 
 void
