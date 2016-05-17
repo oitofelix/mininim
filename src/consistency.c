@@ -473,21 +473,21 @@ exchange_rooms  (int room0, int room1)
   int r1ab = roomd (r1a, BELOW);
   int r1ba = roomd (r1b, ABOVE);
 
-  link_room (room0, r1l, LEFT);
-  if (r1lr == room1) link_room (r1l, room0, RIGHT);
-  link_room (room0, r1r, RIGHT);
-  if (r1rl == room1) link_room (r1r, room0, LEFT);
-  link_room (room0, r1a, ABOVE);
-  if (r1ab == room1) link_room (r1a, room0, BELOW);
-  link_room (room0, r1b, BELOW);
-  if (r1ba == room1) link_room (r1b, room0, ABOVE);
+  link_room (room0, r1l == room0 ? room1 : r1l, LEFT);
+  if (r1l != room0 && r1lr == room1) link_room (r1l, room0, RIGHT);
+  link_room (room0, r1r == room0 ? room1 : r1r, RIGHT);
+  if (r1r != room0 && r1rl == room1) link_room (r1r, room0, LEFT);
+  link_room (room0, r1a == room0 ? room1 : r1a, ABOVE);
+  if (r1a != room0 && r1ab == room1) link_room (r1a, room0, BELOW);
+  link_room (room0, r1b == room0 ? room1 : r1b, BELOW);
+  if (r1b != room0 && r1ba == room1) link_room (r1b, room0, ABOVE);
 
-  link_room (room1, r0l, LEFT);
-  if (r0lr == room0) link_room (r0l, room1, RIGHT);
-  link_room (room1, r0r, RIGHT);
-  if (r0rl == room0) link_room (r0r, room1, LEFT);
-  link_room (room1, r0a, ABOVE);
-  if (r0ab == room0) link_room (r0a, room1, BELOW);
-  link_room (room1, r0b, BELOW);
-  if (r0ba == room0) link_room (r0b, room1, ABOVE);
+  link_room (room1, r0l == room1 ? room0 : r0l, LEFT);
+  if (r0l != room1 && r0lr == room0) link_room (r0l, room1, RIGHT);
+  link_room (room1, r0r == room1 ? room0 : r0r, RIGHT);
+  if (r0r != room1 && r0rl == room0) link_room (r0r, room1, LEFT);
+  link_room (room1, r0a == room1 ? room0 : r0a, ABOVE);
+  if (r0a != room1 && r0ab == room0) link_room (r0a, room1, BELOW);
+  link_room (room1, r0b == room1 ? room0 : r0b, BELOW);
+  if (r0b != room1 && r0ba == room0) link_room (r0b, room1, ABOVE);
 }

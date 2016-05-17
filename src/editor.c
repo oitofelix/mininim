@@ -1022,7 +1022,7 @@ editor (void)
       memcpy (&l, &level.link, sizeof (l));
 
       int room0 = last_mouse_coord.c.room;
-      int room1 = room_view;
+      int room1 = mr.room;
 
       exchange_rooms (room0, room1);
 

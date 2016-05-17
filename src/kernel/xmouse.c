@@ -161,6 +161,10 @@ set_mouse_coord (struct mouse_coord *m)
     error (0, 0, "%s (%p): cannot set mouse xy coordinates (%i,%i)",
            __func__, m, mx, my);
 
+  do {
+    al_get_mouse_state (&mouse_state);
+  } while (mouse_state.x != mx || mouse_state.y != my);
+
   mr.select_cycles = SELECT_CYCLES;
 }
 

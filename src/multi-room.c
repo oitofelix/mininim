@@ -1042,37 +1042,34 @@ multi_room_fit_stretch (void)
 {
   int w = 1;
   int h = 1;
-
   int lc, c = 1;
 
-  bool has_new_rooms;
-
  repeat:
-  has_new_rooms = false;
-
   do {
     lc = c;
     redim_multi_room (++w, h);
     mr_center_room (mr.room);
     c = mr_count_uniq_rooms ();
-    /* printf ("W: room: %i, width: %i, height: %i, count: %i\n", mr.room, mr.w, mr.h, c); */
-    if (c > lc) has_new_rooms = true;
+    /* printf ("W: room: %i, width: %i, height: %i, count: %i\n", */
+    /*         mr.room, mr.w, mr.h, c); */
   } while (c > lc);
   redim_multi_room (--w, h);
   mr_center_room (mr.room);
+
+  int wc = c;
 
   do {
     lc = c;
     redim_multi_room (w, ++h);
     mr_center_room (mr.room);
     c = mr_count_uniq_rooms ();
-    /* printf ("H: room: %i, width: %i, height: %i, count: %i\n", mr.room, mr.w, mr.h, c); */
-    if (c > lc) has_new_rooms = true;
+    /* printf ("H: room: %i, width: %i, height: %i, count: %i\n", */
+    /*         mr.room, mr.w, mr.h, c); */
   } while (c > lc);
   redim_multi_room (w, --h);
   mr_center_room (mr.room);
 
-  if (has_new_rooms) goto repeat;
+  if (c > wc) goto repeat;
 }
 
 void
