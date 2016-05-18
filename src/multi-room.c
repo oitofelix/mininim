@@ -29,6 +29,9 @@ struct multi_room mr;
 struct pos *changed_pos = NULL;
 size_t changed_pos_nmemb = 0;
 
+int *changed_room = NULL;
+size_t changed_room_nmemb = 0;
+
 void
 register_changed_pos (struct pos *p)
 {
@@ -48,6 +51,39 @@ get_changed_pos (struct pos *p)
 {
   return bsearch (p, changed_pos, changed_pos_nmemb, sizeof (* p),
                   (m_comparison_fn_t) cpos);
+}
+
+void
+register_changed_room (int room)
+{
+  if (has_room_changed (room)) return;
+
+  changed_room =
+    add_to_array (&room, 1, changed_room, &changed_room_nmemb,
+                  changed_room_nmemb, sizeof (room));
+
+  qsort (changed_room, changed_room_nmemb, sizeof (room), (m_comparison_fn_t) cint);
+
+  struct pos p;
+  p.room = room;
+  p.floor = 0;
+  for (p.place = 0; p.place < PLACES; p.place++)
+    register_changed_pos (&p);
+
+  p.place = 0;
+  for (p.floor = 1; p.floor < FLOORS; p.floor++)
+    register_changed_pos (&p);
+
+  p.place = 9;
+  for (p.floor = 1; p.floor < FLOORS; p.floor++)
+    register_changed_pos (&p);
+}
+
+bool
+has_room_changed (int room)
+{
+  return bsearch (&room, changed_room, changed_room_nmemb, sizeof (room),
+                  (m_comparison_fn_t) cint);
 }
 
 static void
@@ -545,28 +581,41 @@ update_room0_cache (enum em em, enum vm vm)
 }
 
 void
-update_cache (enum em em, enum vm vm)
+update_cache_room (int room, enum em em, enum vm vm)
 {
   int x, y;
-
   int room_view_bkp = room_view;
-
   con_caching = true;
 
   for (y = mr.h - 1; y >= 0; y--)
-    for (x = 0; x < mr.w; x++) {
-      if (mr.cell[x][y].room) {
+    for (x = 0; x < mr.w; x++)
+      if (mr.cell[x][y].room == room) {
+        if (room) {
         room_view = mr.cell[x][y].room;
         mr.dx = x;
         mr.dy = y;
         clear_bitmap (mr.cell[x][y].cache, TRANSPARENT_COLOR);
         draw_room (mr.cell[x][y].cache, room_view, em, vm);
-      } else draw_bitmap (room0, mr.cell[x][y].cache, 0, 0, 0);
-    }
-
+        break;
+        } else draw_bitmap (room0, mr.cell[x][y].cache, 0, 0, 0);
+      }
   con_caching = false;
-
   room_view = room_view_bkp;
+}
+
+void
+update_cache (enum em em, enum vm vm)
+{
+  struct mr_room_list l;
+  mr_get_room_list (&l);
+
+  update_cache_room (0, em, vm);
+
+  size_t i;
+  for (i = 0; i < l.nmemb; i++)
+    update_cache_room (l.room[i], em, vm);
+
+  mr_destroy_room_list (&l);
 }
 
 void
@@ -663,8 +712,7 @@ update_cache_pos (struct pos *p, enum em em, enum vm vm)
   bool depedv =
     ((em == DUNGEON && vm == VGA)
      || (em == DUNGEON && vm == EGA)
-     || (em == PALACE && vm == EGA))
-    && con (p)->fg == WALL;
+     || (em == PALACE && vm == EGA));
 
   if (! recursive_01 && depedv && con (&pl)->fg == WALL) {
     recursive_01 = true;
@@ -835,11 +883,13 @@ draw_multi_rooms (void)
   }
 
   size_t i;
-  for (i = 0; i < changed_pos_nmemb; i++) {
-    /* printf ("%i,%i,%i\n", changed_pos[i].room, changed_pos[i].floor, changed_pos[i].place); */
+  for (i = 0; i < changed_pos_nmemb; i++)
     update_cache_pos (&changed_pos[i], em, vm);
-  }
   destroy_array ((void **) &changed_pos, &changed_pos_nmemb);
+
+  for (i = 0; i < changed_room_nmemb; i++)
+    update_cache_room (changed_room[i], em, vm);
+  destroy_array ((void **) &changed_room, &changed_room_nmemb);
 
   for (y = mr.h - 1; y >= 0; y--)
     for (x = 0; x < mr.w; x++) {
@@ -867,6 +917,8 @@ draw_multi_rooms (void)
             draw_bitmap (mr.cell[xm][ym].cache,
                          mr.cell[x][y].screen, 0, 0, 0);
     }
+
+  mr_destroy_room_list (&l);
 
   /* if (! no_room_drawing) */
   /*   for (y = mr.h - 1; y >= 0; y--) */
@@ -899,12 +951,7 @@ bool
 is_room_visible (int room)
 {
   int x, y;
-  for (x = 0; x < mr.w; x++)
-    for (y = 0; y < mr.h; y++)
-      if (mr.cell[x][y].room == room)
-        return true;
-
-  return false;
+  return mr_coord (room, -1, &x, &y);
 }
 
 bool
@@ -1028,12 +1075,18 @@ mr_get_room_list (struct mr_room_list *l)
   return l;
 }
 
+void
+mr_destroy_room_list (struct mr_room_list *l)
+{
+  destroy_array ((void **) &l->room, &l->nmemb);
+}
+
 int
 mr_count_uniq_rooms (void)
 {
   struct mr_room_list l;
   int c = mr_get_room_list (&l)->nmemb;
-  destroy_array ((void **) &l.room, &l.nmemb);
+  mr_destroy_room_list (&l);
   return c;
 }
 

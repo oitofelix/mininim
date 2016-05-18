@@ -185,6 +185,8 @@ exchange_pos_undo (struct exchange_pos_undo *d, int dir)
     p1 = &d->p0;
   }
   exchange_pos (p0, p1, d->prepare, d->invert_dir);
+  register_changed_pos (p0);
+  register_changed_pos (p1);
 }
 
 /*************/
@@ -214,6 +216,7 @@ room_undo (struct room_undo *d, int dir)
           ? &d->f : &d->b, FLOORS * PLACES * sizeof (struct con));
   register_room (d->room);
   prepare_room (d->room);
+  register_changed_room (d->room);
 }
 
 /*********/
@@ -266,6 +269,7 @@ h_room_con_exchange_undo (int *room, int dir)
       exchange_pos (&p0, &p1, false, true);
     }
   prepare_room (p0.room);
+  register_changed_room (*room);
 }
 
 /********************************/
@@ -292,6 +296,7 @@ v_room_con_exchange_undo (int *room, int dir)
       exchange_pos (&p0, &p1, false, false);
     }
   prepare_room (p0.room);
+  register_changed_room (*room);
 }
 
 /****************************/
@@ -340,6 +345,7 @@ random_room_con_exchange_undo (struct random_room_con_exchange_undo *d, int dir)
       }
 
   prepare_room (d->room);
+  register_changed_room (d->room);
 }
 
 /********/

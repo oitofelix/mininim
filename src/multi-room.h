@@ -59,12 +59,15 @@ void update_cache (enum em em, enum vm vm);
 void update_cache_pos (struct pos *p, enum em em, enum vm vm);
 void register_changed_pos (struct pos *p);
 struct pos *get_changed_pos (struct pos *p);
+void register_changed_room (int room);
+bool has_room_changed (int room);
 void mr_update_last_settings (void);
 void multi_room_fit_stretch (void);
 void multi_room_fit_ratio (void);
 void apply_mr_fit_mode (void);
 bool mr_room_list_has_room (struct mr_room_list *l, int room);
 struct mr_room_list *mr_get_room_list (struct mr_room_list *l);
+void mr_destroy_room_list (struct mr_room_list *l);
 int mr_count_uniq_rooms (void);
 
 #endif	/* MININIM_MULTI_ROOM_H */

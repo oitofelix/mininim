@@ -994,6 +994,7 @@ selection_palette (ALLEGRO_COLOR c)
   signed char d;
   if (vm == CGA && ! hgc) d = -128;
   else if (vm == CGA && hgc && em == DUNGEON) d = -96;
+  else if (vm == VGA && em == PALACE) d = +32;
   else d = +64;
 
   r = add_char (r, d);

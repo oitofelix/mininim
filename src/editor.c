@@ -908,7 +908,6 @@ editor (void)
     case -1: case 1: edit = EDIT_MAIN; break;
     case 'J':
       get_mouse_coord (&last_mouse_coord);
-      set_mouse_room (mr.room);
       edit = EDIT_JUMP_ROOM;
       break;
     case 'L': edit = EDIT_LINK; break;
@@ -921,40 +920,40 @@ editor (void)
       get_mouse_coord (&last_mouse_coord);
       edit = EDIT_ROOM_EXCHANGE; break;
     case 'A':
-      p0.room = room_view;
+      p0.room = mr.room;
       for (p0.floor = 0; p0.floor < FLOORS; p0.floor++)
         for (p0.place = 0; p0.place < PLACES; p0.place++) {
           room_buf[p0.floor][p0.place] =
             (struct con) {.fg = NO_FLOOR, .bg = NO_BG, .ext.step = 0};
         }
-      register_room_undo (&undo, room_view, room_buf, "CLEAR ROOM");
+      register_room_undo (&undo, mr.room, room_buf, "CLEAR ROOM");
       break;
     case 'R':
-      p0.room = room_view;
+      p0.room = mr.room;
       for (p0.floor = 0; p0.floor < FLOORS; p0.floor++)
         for (p0.place = 0; p0.place < PLACES; p0.place++)
           room_buf[p0.floor][p0.place] =
             (struct con) {.fg = prandom (ARCH_TOP_SMALL), .bg = prandom (BALCONY),
                           .ext.step = 0};
-      register_room_undo (&undo, room_view, room_buf, "RANDOM ROOM");
+      register_room_undo (&undo, mr.room, room_buf, "RANDOM ROOM");
       break;
     case 'D':
-      memcpy (&room_buf2, &level.con[room_view], sizeof (room_buf2));
-      p0.room = room_view;
+      memcpy (&room_buf2, &level.con[mr.room], sizeof (room_buf2));
+      p0.room = mr.room;
       for (p0.floor = 0; p0.floor < FLOORS; p0.floor++)
         for (p0.place = 0; p0.place < PLACES; p0.place++)
           decorate_pos (&p0);
-      memcpy (&room_buf, &level.con[room_view], sizeof (room_buf));
-      memcpy (&level.con[room_view], &room_buf2, sizeof (room_buf2));
-      register_room_undo (&undo, room_view, room_buf, "DECORATE ROOM");
+      memcpy (&room_buf, &level.con[mr.room], sizeof (room_buf));
+      memcpy (&level.con[mr.room], &room_buf2, sizeof (room_buf2));
+      register_room_undo (&undo, mr.room, room_buf, "DECORATE ROOM");
       break;
     case 'H': edit = EDIT_ROOM_CON_EXCHANGE; break;
     case 'C':
-      memcpy (&room_copy, &level.con[room_view], sizeof (room_copy));
+      memcpy (&room_copy, &level.con[mr.room], sizeof (room_copy));
       editor_msg ("COPIED", 12);
       break;
     case 'P':
-      register_room_undo (&undo, room_view, room_copy, "PASTE ROOM");
+      register_room_undo (&undo, mr.room, room_copy, "PASTE ROOM");
       break;
     }
     break;
@@ -964,13 +963,13 @@ editor (void)
     switch (menu_enum (con_exchange_menu, "RH>")) {
     case -1: case 1: edit = EDIT_ROOM; break;
     case 'H':
-      register_h_room_con_exchange_undo (&undo, room_view, "ROOM H.CON EXCHANGE");
+      register_h_room_con_exchange_undo (&undo, mr.room, "ROOM H.CON EXCHANGE");
       break;
     case 'V':
-      register_v_room_con_exchange_undo (&undo, room_view, "ROOM V.CON EXCHANGE");
+      register_v_room_con_exchange_undo (&undo, mr.room, "ROOM V.CON EXCHANGE");
       break;
     case 'R':
-      register_random_room_con_exchange_undo (&undo, room_view, false, false,
+      register_random_room_con_exchange_undo (&undo, mr.room, false, false,
                                               "ROOM RANDOM CON EXCHANGE");
       break;
     }

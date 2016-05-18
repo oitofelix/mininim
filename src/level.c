@@ -225,8 +225,6 @@ prepare_con_at_pos (struct pos *p)
 void
 prepare_room (int room)
 {
-  if (! is_room_adjacent (room_view, room)) return;
-
   generate_stars_for_room (room);
 }
 
@@ -590,11 +588,15 @@ process_keys (void)
       && is_kid_dead (&current_kid->f))
     kid_resurrect (current_kid);
 
-  /* HOME: camera on kid */
+  /* HOME: focus multi-room view on kid */
   if (was_key_pressed (ALLEGRO_KEY_HOME, 0, 0, true)) {
     room_view = current_kid->f.c.room;
     mr_focus_room (room_view);
   }
+
+  /* SHIFT+HOME: center multi-room view */
+  if (was_key_pressed (ALLEGRO_KEY_HOME, 0, ALLEGRO_KEYMOD_SHIFT, true))
+    mr_center_room (mr.room);
 
   /* A: alternate between kid and its shadows */
   if (! active_menu
