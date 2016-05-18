@@ -972,20 +972,6 @@ draw_multi_rooms (void)
   mr_update_last_settings ();
 }
 
-bool
-is_room_visible (int room)
-{
-  int x, y;
-  return mr_coord (room, -1, &x, &y);
-}
-
-bool
-is_kid_visible (void)
-{
-  struct anim *k = get_anim_by_id (current_kid_id);
-  return is_room_visible (k->f.c.room);
-}
-
 void
 nmr_coord (int x, int y, int *rx, int *ry)
 {
@@ -1182,4 +1168,77 @@ apply_mr_fit_mode (void)
 
   set_multi_room (w, h);
   mr_center_room (mr.room);
+}
+
+bool
+is_room_visible (int room)
+{
+  int x, y;
+  return mr_coord (room, -1, &x, &y);
+}
+
+bool
+is_kid_visible (void)
+{
+  struct anim *k = get_anim_by_id (current_kid_id);
+  return is_room_visible (k->f.c.room);
+}
+
+bool
+is_frame_visible_at_room (struct frame *f, int room)
+{
+  struct frame nf;
+  nf = *f;
+
+  frame2room (&nf, room, &nf.c);
+
+  struct coord tl, tr, bl, br;
+  _tl (&nf, &tl);
+  _tr (&nf, &tr);
+  _bl (&nf, &bl);
+  _br (&nf, &br);
+
+  if (nf.c.room == room &&
+      ((tl.x >= 0 && tl.x <= ORIGINAL_WIDTH
+        && tl.y >=0 && tl.y <= ORIGINAL_HEIGHT)
+       || (tr.x >= 0 && tr.x <= ORIGINAL_WIDTH
+           && tr.y >=0 && tr.y <= ORIGINAL_HEIGHT)
+       || (bl.x >= 0 && bl.x <= ORIGINAL_WIDTH
+           && bl.y >=0 && bl.y <= ORIGINAL_HEIGHT)
+       || (br.x >= 0 && br.x <= ORIGINAL_WIDTH
+           && br.y >=0 && br.y <= ORIGINAL_HEIGHT)))
+    return true;
+  else return false;
+}
+
+bool
+is_frame_visible (struct frame *f)
+{
+  int x, y;
+  for (y = mr.h - 1; y >= 0; y--)
+    for (x = 0; x < mr.w; x++)
+      if (mr.cell[x][y].room
+          && is_frame_visible_at_room (f, mr.cell[x][y].room))
+        return true;
+  return false;
+}
+
+bool
+is_pos_visible (struct pos *p)
+{
+  struct pos np; npos (p, &np);
+
+  if (is_room_visible (np.room)) return true;
+
+  int x, y;
+  for (y = mr.h - 1; y >= 0; y--)
+    if (mr.cell[0][y].room) {
+      struct pos p1;
+      p1.room = mr.cell[0][y].room;
+      p1.place = -1;
+      for (p1.floor = 0; p1.floor < FLOORS; p1.floor++)
+        if (peq (p, &p1)) return true;
+    }
+
+  return false;
 }

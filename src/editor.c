@@ -1050,15 +1050,15 @@ editor (void)
       register_start_pos_undo (&undo, &p, "START POSITION");
       break;
     case 'D':
-      if (! is_room_visible (level.start_pos.room)) {
-        editor_msg ("ROOM NOT VISIBLE", 12);
+      if (! is_pos_visible (&level.start_pos)) {
+        editor_msg ("START POS NOT VISIBLE", 12);
         break;
       }
       register_toggle_start_dir_undo (&undo, "START DIRECTION");
       break;
     case 'W':
-      if (! is_room_visible (level.start_pos.room)) {
-        editor_msg ("ROOM NOT VISIBLE", 12);
+      if (! is_pos_visible (&level.start_pos)) {
+        editor_msg ("START POS NOT VISIBLE", 12);
         break;
       }
       register_toggle_has_sword_undo (&undo, "HAS SWORD");
@@ -1234,8 +1234,8 @@ editor (void)
         editor_msg ("DISABLED GUARD", 12);
         break;
       }
-      if (! is_room_visible (g->p.room)) {
-        editor_msg ("ROOM NOT VISIBLE", 12);
+      if (! is_pos_visible (&g->p)) {
+        editor_msg ("START POS NOT VISIBLE", 12);
         break;
       }
       register_toggle_guard_start_dir_undo

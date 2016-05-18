@@ -25,8 +25,6 @@ struct con *xcon (struct level *l, struct pos *p);
 struct con *con (struct pos *p);
 struct con *crel (struct pos *p, int floor, int place);
 struct con *xcrel (struct level *l, struct pos *p, int floor, int place);
-bool is_frame_visible (struct frame *f);
-bool is_pos_visible (struct pos *p);
 bool is_strictly_traversable (struct pos *p);
 bool is_traversable (struct pos *p);
 bool is_pillar (struct pos *p);

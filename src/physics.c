@@ -48,44 +48,6 @@ xcrel (struct level *l, struct pos *p, int floor, int place)
 }
 
 bool
-is_frame_visible (struct frame *f)
-{
-  struct coord tl, tr, bl, br;
-
-  struct frame nf;
-  nf = *f;
-
-  frame2room (&nf, room_view, &nf.c);
-
-  _tl (&nf, &tl);
-  _tr (&nf, &tr);
-  _bl (&nf, &bl);
-  _br (&nf, &br);
-
-  if (tl.x >= ORIGINAL_WIDTH || tl.y >= ORIGINAL_HEIGHT
-      || tr.x < 0 || tr.y >= ORIGINAL_HEIGHT
-      || bl.x >= ORIGINAL_WIDTH || bl.y < 0
-      || br.x < 0 || br.y < 0) return false;
-  else return true;
-}
-
-bool
-is_pos_visible (struct pos *p)
-{
-  struct pos np; npos (p, &np);
-
-  if (np.room == room_view) return true;
-  if (np.room == roomd (room_view, LEFT) && np.place == PLACES - 1)
-    return true;
-  if (np.room == roomd (room_view, ABOVE) && np.floor == FLOORS - 1)
-    return true;
-  if (np.room == roomd (room_view, BELOW) && np.floor == 0)
-    return true;
-
-  return false;
-}
-
-bool
 strictly_traversable_cs (enum confg t)
 {
   return t == NO_FLOOR

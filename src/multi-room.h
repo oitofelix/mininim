@@ -27,9 +27,14 @@ extern bool con_caching;
 extern struct multi_room mr;
 extern int mr_room, mr_x, mr_y;
 
-/* functions */
+/* visibility functions */
+bool is_pos_visible (struct pos *p);
+bool is_frame_visible_at_room (struct frame *f, int room);
+bool is_frame_visible (struct frame *f);
 bool is_room_visible (int room);
 bool is_kid_visible (void);
+
+/* functions */
 bool has_mr_view_changed (void);
 void redim_multi_room (int w, int h);
 void create_multi_room_bitmaps (void);

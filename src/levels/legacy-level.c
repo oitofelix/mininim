@@ -242,7 +242,7 @@ legacy_level_special_events (void)
        the mirror appear */
     if (exit_level_door
         && exit_level_door->i == 0
-        && room_view == 4
+        && is_pos_visible (&mirror_pos)
         && con (&mirror_pos)->fg != MIRROR) {
       register_con_undo (&undo, &mirror_pos,
                          MIRROR, MIGNORE, MIGNORE,
@@ -273,7 +273,8 @@ legacy_level_special_events (void)
        from view */
     if (shadow_id != -1) {
       struct anim *ks = get_anim_by_id (shadow_id);
-      if (is_frame_visible (&ks->f)) ks->key.right = true;
+      if (is_frame_visible_at_room (&ks->f, mirror_pos.room))
+        ks->key.right = true;
       else {
         destroy_anim (ks);
         shadow_id = -1;
@@ -290,7 +291,7 @@ legacy_level_special_events (void)
     /* if there is a door sufficiently open, and a potion in room 24,
        and the camera is there, create a kid's shadow to drink the
        potion */
-    if (room_view == 24
+    if (is_pos_visible (&potion_pos)
         && shadow_id == -1
         && con (&door_pos)->fg == DOOR
         && is_potion (&potion_pos)
@@ -320,7 +321,8 @@ legacy_level_special_events (void)
         pos2room (&pm, 24, &pm);
         if (pm.place < potion_pos.place - 1) ks->key.right = true;
         else ks->key.shift = true;
-      } else if (is_frame_visible (&ks->f)) ks->key.left = true;
+      } else if (is_frame_visible_at_room (&ks->f, potion_pos.room))
+        ks->key.left = true;
       else {
         destroy_anim (ks);
         shadow_id = -1;
@@ -397,7 +399,7 @@ legacy_level_special_events (void)
       /* if enough cycles have passed since the start of the countdown
          and the camera is at room 16, make the mouse appear */
       if (al_get_timer_count (mouse_timer) >= 138
-          && room_view == 16) {
+          && is_room_visible (mouse_pos.room)) {
         al_destroy_timer (mouse_timer);
         mouse_timer = NULL;
         mouse_id = create_anim (NULL, MOUSE, &mouse_pos, RIGHT);
@@ -408,7 +410,7 @@ legacy_level_special_events (void)
 
     /* make the mouse disapear as soon as it goes out of view */
     if (m && m->action == mouse_run && m->f.dir == RIGHT
-        && ! is_frame_visible (&m->f)) {
+        && ! is_frame_visible_at_room (&m->f, mouse_pos.room)) {
         destroy_anim (m);
         mouse_id = -1;
     }
