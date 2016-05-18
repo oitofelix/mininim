@@ -277,31 +277,6 @@ editor (void)
   struct con room_buf[FLOORS][PLACES], room_buf2[FLOORS][PLACES];
   static struct skill skill_buf;
 
-  /* additional graphics */
-  switch (edit) {
-  case EDIT_GUARD:
-  case EDIT_GUARD_SELECT:
-  case EDIT_GUARD_SKILL:
-  case EDIT_SKILL_LEGACY_TEMPLATES:
-  case EDIT_GUARD_TYPE:
-  case EDIT_GUARD_STYLE:
-  case EDIT_GUARD_SKILL_ATTACK:
-  case EDIT_GUARD_SKILL_COUNTER_ATTACK:
-  case EDIT_GUARD_SKILL_DEFENSE:
-  case EDIT_GUARD_SKILL_COUNTER_DEFENSE:
-  case EDIT_GUARD_SKILL_ADVANCE:
-  case EDIT_GUARD_SKILL_RETURN:
-  case EDIT_GUARD_SKILL_REFRACTION:
-  case EDIT_GUARD_SKILL_EXTRA_LIFE:
-  case EDIT_GUARD_LIVES:
-    draw_start_guards (mr.cell[mr.x][mr.y].screen, vm);
-    break;
-  case EDIT_KID:
-    draw_start_kid (mr.cell[mr.x][mr.y].screen, vm);
-    break;
-  default: break;
- }
-
   /* display message if available */
   if (msg_cycles > 0 && msg && ! was_menu_return_pressed (false)) {
     msg_cycles--;
@@ -1075,15 +1050,15 @@ editor (void)
       register_start_pos_undo (&undo, &p, "START POSITION");
       break;
     case 'D':
-      if (room_view != level.start_pos.room) {
-        editor_msg ("NOT IN THIS ROOM", 12);
+      if (! is_room_visible (level.start_pos.room)) {
+        editor_msg ("ROOM NOT VISIBLE", 12);
         break;
       }
       register_toggle_start_dir_undo (&undo, "START DIRECTION");
       break;
     case 'W':
-      if (room_view != level.start_pos.room) {
-        editor_msg ("NOT IN THIS ROOM", 12);
+      if (! is_room_visible (level.start_pos.room)) {
+        editor_msg ("ROOM NOT VISIBLE", 12);
         break;
       }
       register_toggle_has_sword_undo (&undo, "HAS SWORD");
@@ -1259,8 +1234,8 @@ editor (void)
         editor_msg ("DISABLED GUARD", 12);
         break;
       }
-      if (room_view != g->p.room) {
-        editor_msg ("NOT IN THIS ROOM", 12);
+      if (! is_room_visible (g->p.room)) {
+        editor_msg ("ROOM NOT VISIBLE", 12);
         break;
       }
       register_toggle_guard_start_dir_undo

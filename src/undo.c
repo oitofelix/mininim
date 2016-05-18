@@ -383,7 +383,7 @@ register_start_pos_undo (struct undo *u, struct pos *p, char *desc)
 
   struct start_pos_undo *d = xmalloc (sizeof (* d));
   d->b = level.start_pos;
-  d->f = *p;
+  npos (p, &d->f);
   register_undo (u, d, (undo_f) start_pos_undo, desc);
   start_pos_undo (d, +1);
 }
@@ -441,7 +441,7 @@ register_guard_start_pos_undo (struct undo *u, int i, struct pos *p, char *desc)
   struct guard_start_pos_undo *d = xmalloc (sizeof (* d));
   d->i = i;
   d->b = g->p;
-  d->f = *p;
+  npos (p, &d->f);
   register_undo (u, d, (undo_f) guard_start_pos_undo, desc);
   guard_start_pos_undo (d, +1);
 }

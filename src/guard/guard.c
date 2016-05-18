@@ -650,12 +650,11 @@ draw_guard_frame (ALLEGRO_BITMAP *bitmap, struct anim *g, enum vm vm)
 void
 draw_start_guards (ALLEGRO_BITMAP *bitmap, enum vm vm)
 {
-  struct frame f;
-
   int i;
   for (i = 0; i < GUARDS; i++) {
     struct guard *g = &level.guard[i];
     if (g->type == NO_ANIM) continue;
+    struct frame f;
     f.c.room = g->p.room;
     f.b = get_guard_normal_bitmap (g->type);
     f.b = apply_guard_palette (f.b, g->type, g->style, vm);

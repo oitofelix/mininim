@@ -551,6 +551,31 @@ draw_animated_foreground (ALLEGRO_BITMAP *bitmap, int room)
       if (is_sword (&p)) draw_sword (bitmap, &p, vm);
     }
 
+  /* editor graphics */
+  switch (edit) {
+  case EDIT_GUARD:
+  case EDIT_GUARD_SELECT:
+  case EDIT_GUARD_SKILL:
+  case EDIT_SKILL_LEGACY_TEMPLATES:
+  case EDIT_GUARD_TYPE:
+  case EDIT_GUARD_STYLE:
+  case EDIT_GUARD_SKILL_ATTACK:
+  case EDIT_GUARD_SKILL_COUNTER_ATTACK:
+  case EDIT_GUARD_SKILL_DEFENSE:
+  case EDIT_GUARD_SKILL_COUNTER_DEFENSE:
+  case EDIT_GUARD_SKILL_ADVANCE:
+  case EDIT_GUARD_SKILL_RETURN:
+  case EDIT_GUARD_SKILL_REFRACTION:
+  case EDIT_GUARD_SKILL_EXTRA_LIFE:
+  case EDIT_GUARD_LIVES:
+    draw_start_guards (bitmap, vm);
+    break;
+  case EDIT_KID:
+    draw_start_kid (bitmap, vm);
+    break;
+  default: break;
+  }
+
   for (p.floor = FLOORS; p.floor >= -1; p.floor--)
     for (p.place = -1; p.place < PLACES; p.place++)
       draw_box (bitmap, &p, vm);
