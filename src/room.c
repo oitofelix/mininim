@@ -19,6 +19,8 @@
 
 #include "mininim.h"
 
+bool no_recursive_links_continuity;
+
 void
 load_room (void)
 {
@@ -117,7 +119,8 @@ draw_bitmapc (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
 
   draw_bitmap (from, to, nc.x, nc.y, flags);
 
-  if (cutscene || con_caching) return;
+  if (cutscene || con_caching
+      || no_recursive_links_continuity) return;
 
   int x = nc.x;
   int y = nc.y;

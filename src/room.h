@@ -21,7 +21,7 @@
 #define MININIM_ROOM_H
 
 /* variables */
-extern ALLEGRO_BITMAP *wall_cache;
+extern bool no_recursive_links_continuity;
 
 /* functions */
 void load_room (void);

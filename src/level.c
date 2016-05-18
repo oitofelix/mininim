@@ -444,18 +444,18 @@ process_keys (void)
       && ! cutscene)
     ui_set_multi_room (-1, +0);
 
-  /* CTRL+]: increase multi-room resolution */
+  /* CTRL+]: increase multi-room width resolution */
   if ((was_key_pressed (0, 0x1D, ALLEGRO_KEYMOD_CTRL, true)
        || was_key_pressed (0, 0x1C, ALLEGRO_KEYMOD_CTRL, true))
       && ! cutscene)
     ui_set_multi_room (+1, +0);
 
-  /* ALT+[: decrease multi-room width resolution */
+  /* ALT+[: decrease multi-room height resolution */
   if (was_key_pressed (0, '[', ALLEGRO_KEYMOD_ALT, true)
       && ! cutscene)
     ui_set_multi_room (+0, -1);
 
-  /* ALT+]: increase multi-room resolution */
+  /* ALT+]: increase multi-room height resolution */
   if (was_key_pressed (0, ']', ALLEGRO_KEYMOD_ALT, true)
       && ! cutscene)
     ui_set_multi_room (+0, +1);
@@ -894,6 +894,9 @@ draw_lives (ALLEGRO_BITMAP *bitmap, struct anim *k, enum vm vm)
       || edit != EDIT_NONE)
     return;
 
+  bool nrlc = no_recursive_links_continuity;
+  no_recursive_links_continuity = true;
+
   if (k->f.c.room == room_view) {
     draw_kid_lives (bitmap, k, vm);
     struct anim *ke = NULL;
@@ -902,6 +905,8 @@ draw_lives (ALLEGRO_BITMAP *bitmap, struct anim *k, enum vm vm)
       if (ke) draw_guard_lives (bitmap, ke, vm);
     }
   }
+
+  no_recursive_links_continuity = nrlc;
 }
 
 void
