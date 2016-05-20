@@ -28,7 +28,6 @@ bool hgc;
 ALLEGRO_TIMER *bottom_text_timer = NULL;
 bool is_display_focused = true;
 ALLEGRO_BITMAP *effect_buffer;
-static ALLEGRO_BITMAP *memory_bitmap;
 ALLEGRO_BITMAP *black_screen;
 struct video_effect video_effect = {.type = VIDEO_NO_EFFECT};
 static ALLEGRO_FONT *builtin_font;
@@ -90,11 +89,6 @@ init_video (void)
   iscreen = create_bitmap (display_width, display_height);
   clear_bitmap (uscreen, TRANSPARENT_COLOR);
 
-  int flags = al_get_new_bitmap_flags ();
-  al_add_new_bitmap_flag (ALLEGRO_MEMORY_BITMAP);
-  memory_bitmap = create_bitmap (ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
-  al_set_new_bitmap_flags (flags);
-
   video_timer = create_timer (1.0 / EFFECT_HZ);
 
   bottom_text_timer = create_timer (1.0 / SCRIPT_HZ);
@@ -116,7 +110,6 @@ finalize_video (void)
   destroy_bitmap (uscreen);
   destroy_bitmap (effect_buffer);
   destroy_bitmap (black_screen);
-  destroy_bitmap (memory_bitmap);
   al_destroy_font (builtin_font);
   al_destroy_timer (video_timer);
   al_destroy_display (display);
@@ -523,15 +516,13 @@ draw_pattern (ALLEGRO_BITMAP *bitmap, int ox, int oy, int w, int h,
               ALLEGRO_COLOR color_0, ALLEGRO_COLOR color_1)
 {
   int x, y;
-  clear_bitmap (memory_bitmap, TRANSPARENT_COLOR);
-  draw_bitmap (bitmap, memory_bitmap, 0, 0, 0);
-  set_target_bitmap (memory_bitmap);
-  al_lock_bitmap (memory_bitmap, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_WRITEONLY);
+  set_target_bitmap (bitmap);
+  al_lock_bitmap (bitmap, ALLEGRO_PIXEL_FORMAT_ANY,
+                  ALLEGRO_LOCK_WRITEONLY);
   for (y = oy; y < oy + h; y++)
     for (x = ox; x < ox + w; x++)
       al_put_pixel (x, y, (x % 2 != y % 2) ? color_0 : color_1);
-  al_unlock_bitmap (memory_bitmap);
-  draw_bitmap (memory_bitmap, bitmap, 0, 0, 0);
+  al_unlock_bitmap (bitmap);
 }
 
 void
