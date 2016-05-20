@@ -36,7 +36,6 @@ static ALLEGRO_TIMER *death_timer;
 static bool ignore_level_cutscene;
 
 bool no_room_drawing, game_paused, step_one_cycle;
-int room_view;
 int retry_level = -1;
 int anti_camera_room;
 int camera_follow_kid;
@@ -214,7 +213,7 @@ destroy_cons (void)
 void
 prepare_con_at_pos (struct pos *p)
 {
-  if (! is_room_visible (p->room)) return;
+  if (! is_pos_visible (p)) return;
 
   switch (con (p)->bg) {
   case BALCONY: generate_stars_for_pos (p); break;
@@ -225,7 +224,14 @@ prepare_con_at_pos (struct pos *p)
 void
 prepare_room (int room)
 {
+  if (! is_room_visible (room)) return;
   generate_stars_for_room (room);
+}
+
+void
+prepare_view (void)
+{
+  generate_stars ();
 }
 
 void
@@ -236,7 +242,7 @@ register_anims (void)
   if (is_valid_pos (&start_pos))
     kid_start_pos = start_pos;
   else kid_start_pos = level.start_pos;
-  room_view = kid_start_pos.room;
+  mr_center_room (kid_start_pos.room);
   int id = create_anim (NULL, KID, &kid_start_pos, level.start_dir);
   struct anim *k = &anima[id];
   k->total_lives = total_lives;
@@ -352,20 +358,17 @@ compute_level (void)
 
   clear_anims_keyboard_state ();
 
-  /* if (! anim_cycle) mr_center_room (room_view); */
-
   if (current_kid->f.c.room != prev_room
       && current_kid->f.c.room != 0
       && current_kid->f.c.room != anti_camera_room
       && camera_follow_kid == current_kid->id)  {
-    room_view = current_kid->f.c.room;
-
-    if (! is_kid_visible ()) {
+    if (! is_room_visible (current_kid->f.c.room)) {
       mr_coord (current_kid->f.c.prev_room,
                 current_kid->f.c.xd, &mr.x, &mr.y);
       mr_set_origin (current_kid->f.c.room, mr.x, mr.y);
-      mr.select_cycles = 0;
-    }
+    } else mr_focus_room (current_kid->f.c.room);
+
+    mr.select_cycles = 0;
   }
 
   if (level.special_events) level.special_events ();
@@ -589,10 +592,8 @@ process_keys (void)
     kid_resurrect (current_kid);
 
   /* HOME: focus multi-room view on kid */
-  if (was_key_pressed (ALLEGRO_KEY_HOME, 0, 0, true)) {
-    room_view = current_kid->f.c.room;
-    mr_focus_room (room_view);
-  }
+  if (was_key_pressed (ALLEGRO_KEY_HOME, 0, 0, true))
+    mr_focus_room (current_kid->f.c.room);
 
   /* SHIFT+HOME: center multi-room view */
   if (was_key_pressed (ALLEGRO_KEY_HOME, 0, ALLEGRO_KEYMOD_SHIFT, true))
@@ -605,8 +606,7 @@ process_keys (void)
       current_kid = &anima[(current_kid - anima + 1) % anima_nmemb];
     } while (current_kid->type != KID || ! current_kid->controllable);
     current_kid_id = current_kid->id;
-    room_view = current_kid->f.c.room;
-    mr_center_room (room_view);
+    mr_focus_room (current_kid->f.c.room);
   }
 
   /* K: kill enemy */
@@ -823,7 +823,7 @@ process_keys (void)
     draw_bottom_text (NULL, NULL, -2);
   }
 
-  camera_follow_kid = (current_kid->f.c.room == room_view)
+  camera_follow_kid = (current_kid->f.c.room == mr.room)
     ? current_kid->id : -1;
 }
 
@@ -899,7 +899,7 @@ draw_lives (ALLEGRO_BITMAP *bitmap, struct anim *k, enum vm vm)
   bool nrlc = no_recursive_links_continuity;
   no_recursive_links_continuity = true;
 
-  if (k->f.c.room == room_view) {
+  if (is_room_visible (k->f.c.room)) {
     draw_kid_lives (bitmap, k, vm);
     struct anim *ke = NULL;
     if (k->enemy_id != -1) {

@@ -21,7 +21,6 @@
 #define MININIM_LEVEL_H
 
 extern struct level level;
-extern int room_view;
 extern int retry_level;
 extern int camera_follow_kid;
 extern int anti_camera_room;
@@ -41,6 +40,7 @@ void destroy_room (int room);
 void destroy_cons (void);
 void prepare_con_at_pos (struct pos *p);
 void prepare_room (int room);
+void prepare_view (void);
 void register_anims (void);
 void display_remaining_time (void);
 void display_skill (struct anim *k);

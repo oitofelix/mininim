@@ -37,10 +37,7 @@ play_anim (void (*draw_callback) (void),
            int freq)
 {
   if (cutscene) set_multi_room (1, 1);
-  else {
-    mr_set_origin (room_view, 0, 0);
-    apply_mr_fit_mode ();
-  }
+  else apply_mr_fit_mode ();
 
   anim_cycle = 0;
   quit_anim = NO_QUIT;
@@ -166,10 +163,8 @@ play_anim (void (*draw_callback) (void),
       switch (event.mouse.button) {
       case 1: enter_exit_editor (); break;
       case 3:
-        if (edit != EDIT_NONE) {
-          room_view = current_kid->f.c.room;
-          mr_center_room (room_view);
-        }
+        if (edit != EDIT_NONE)
+          mr_focus_room (current_kid->f.c.room);
         break;
       default: break;
       }

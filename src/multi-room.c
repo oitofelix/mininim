@@ -25,6 +25,7 @@ bool con_caching;
 ALLEGRO_COLOR room0_wall_color[3][4][11];
 
 struct multi_room mr;
+int room_view;
 
 struct pos *changed_pos = NULL;
 size_t changed_pos_nmemb = 0;
@@ -1178,13 +1179,6 @@ is_room_visible (int room)
 }
 
 bool
-is_kid_visible (void)
-{
-  struct anim *k = get_anim_by_id (current_kid_id);
-  return is_room_visible (k->f.c.room);
-}
-
-bool
 is_frame_visible_at_room (struct frame *f, int room)
 {
   struct frame nf;
@@ -1230,7 +1224,7 @@ is_pos_visible (struct pos *p)
 
   if (is_room_visible (np.room)) return true;
 
-  int x, y;
+  int y;
   for (y = mr.h - 1; y >= 0; y--)
     if (mr.cell[0][y].room) {
       struct pos p1;

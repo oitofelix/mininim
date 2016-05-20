@@ -96,13 +96,13 @@ legacy_level_start (void)
 
   /* define camera's starting room */
   if (level.number == 7) {
-    room_view = 1;
+    mr_center_room (1);
     camera_follow_kid = -1;
   } else if (level.number == 13) {
-    room_view = 23;
+    mr_center_room (23);
     camera_follow_kid = -1;
   } else {
-    room_view = k->f.c.room;
+    mr_center_room (k->f.c.room);
     camera_follow_kid = k->id;
   }
 
@@ -132,7 +132,7 @@ legacy_level_start (void)
       k->f.dir = (k->f.dir == LEFT) ? RIGHT : LEFT;
       place_frame (&k->f, &k->f, kid_normal_00, &p,
                    k->f.dir == LEFT ? +22 : +31, +15);
-      room_view = 2;
+      mr_center_room (2);
     }
   }
 

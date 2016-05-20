@@ -20,11 +20,14 @@
 #ifndef MININIM_MULTI_ROOM_H
 #define MININIM_MULTI_ROOM_H
 
+/* #define room_view (mr.cell[mr.dx][mr.dy].room) */
+
 /* variables */
 extern ALLEGRO_BITMAP *room0;
 extern ALLEGRO_COLOR room0_wall_color[3][4][11];
 extern bool con_caching;
 extern struct multi_room mr;
+extern int room_view;
 extern int mr_room, mr_x, mr_y;
 
 /* visibility functions */
@@ -32,7 +35,6 @@ bool is_pos_visible (struct pos *p);
 bool is_frame_visible_at_room (struct frame *f, int room);
 bool is_frame_visible (struct frame *f);
 bool is_room_visible (int room);
-bool is_kid_visible (void);
 
 /* functions */
 bool has_mr_view_changed (void);

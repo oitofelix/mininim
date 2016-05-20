@@ -369,7 +369,7 @@ void
 link_undo (struct link_undo *d, int dir)
 {
   memcpy (&level.link, (dir >= 0) ? &d->f : &d->b, sizeof (d->f));
-  prepare_room (room_view);
+  prepare_view ();
 }
 
 /******************/
