@@ -241,7 +241,7 @@ float
 get_adjusted_sample_volume (struct audio_sample *as)
 {
   if (as->room < 0) return 1.0;
-  /* int d = room_dist (room_view, as->room, 10); */
+  /* int d = room_dist (mr.room, as->room, 10); */
   /* if (d == 0) d = 1; */
   /* if (d <= 10) return 1.0 / d; */
   if (is_room_visible (as->room)) return 1.0;

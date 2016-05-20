@@ -508,11 +508,10 @@ mr_update_last_settings (void)
 void
 draw_animated_background (ALLEGRO_BITMAP *bitmap, int room)
 {
-  int room_view_bkp = room_view;
   room_view = room;
 
   struct pos p;
-  p.room = room_view;
+  p.room = room;
 
   for (p.floor = FLOORS; p.floor >= 0; p.floor--)
     for (p.place = -1; p.place < PLACES; p.place++)
@@ -524,18 +523,15 @@ draw_animated_background (ALLEGRO_BITMAP *bitmap, int room)
       draw_fire (bitmap, &p, vm);
       draw_balcony_stars (bitmap, &p, vm);
     }
-
-  room_view = room_view_bkp;
 }
 
 void
 draw_animated_foreground (ALLEGRO_BITMAP *bitmap, int room)
 {
-  int room_view_bkp = room_view;
   room_view = room;
 
   struct pos p;
-  p.room = room_view;
+  p.room = room;
 
   /* loose_floor_fall_debug (); */
 
@@ -580,14 +576,11 @@ draw_animated_foreground (ALLEGRO_BITMAP *bitmap, int room)
   for (p.floor = FLOORS; p.floor >= -1; p.floor--)
     for (p.place = -1; p.place < PLACES; p.place++)
       draw_box (bitmap, &p, vm);
-
-  room_view = room_view_bkp;
 }
 
 void
 update_room0_cache (enum em em, enum vm vm)
 {
-  int room_view_bkp = room_view;
   room_view = 0;
   struct pos mouse_pos_bkp = mouse_pos;
   mouse_pos.room = -1;
@@ -599,18 +592,16 @@ update_room0_cache (enum em em, enum vm vm)
 
   mr.dx = 0;
   mr.dy = 0;
-  draw_room (room0, room_view, em, vm);
+  draw_room (room0, 0, em, vm);
 
   con_caching = false;
   mouse_pos = mouse_pos_bkp;
-  room_view = room_view_bkp;
 }
 
 void
 update_cache_room (int room, enum em em, enum vm vm)
 {
   int x, y;
-  int room_view_bkp = room_view;
   con_caching = true;
 
   for (y = mr.h - 1; y >= 0; y--)
@@ -621,12 +612,11 @@ update_cache_room (int room, enum em em, enum vm vm)
         mr.dx = x;
         mr.dy = y;
         clear_bitmap (mr.cell[x][y].cache, TRANSPARENT_COLOR);
-        draw_room (mr.cell[x][y].cache, room_view, em, vm);
+        draw_room (mr.cell[x][y].cache, mr.cell[x][y].room, em, vm);
         break;
         } else draw_bitmap (room0, mr.cell[x][y].cache, 0, 0, 0);
       }
   con_caching = false;
-  room_view = room_view_bkp;
 }
 
 void
@@ -650,8 +640,6 @@ update_cache_pos (struct pos *p, enum em em, enum vm vm)
   static bool recursive = false, recursive_01 = false;
 
   int x, y;
-
-  int room_view_bkp = room_view;
 
   struct pos pbl; prel (p, &pbl, +1, -1);
   struct pos pb; prel (p, &pb, +1, +0);
@@ -852,8 +840,6 @@ update_cache_pos (struct pos *p, enum em em, enum vm vm)
   }
 
   /* if (is_room_visible (p->room) && ! recursive) printf ("----------------------------\n"); */
-
-  room_view = room_view_bkp;
 }
 
 void
@@ -925,7 +911,8 @@ draw_multi_rooms (void)
       if (! mr.cell[x][y].room) continue;
       mr.dx = x;
       mr.dy = y;
-      draw_animated_background (mr.cell[x][y].screen, mr.cell[x][y].room);
+      draw_animated_background (mr.cell[x][y].screen,
+                                mr.cell[x][y].room);
     }
 
   if (mr.flicker > 0) mr.flicker--;
@@ -967,8 +954,6 @@ draw_multi_rooms (void)
   /*                   3 + ROOM_HEIGHT - t, RED, t); */
   /*   mr.select_cycles--; */
   /* } */
-
-  mr.dx = mr.dy = -1;
 
   mr_update_last_settings ();
 }

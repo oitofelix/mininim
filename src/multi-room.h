@@ -20,8 +20,6 @@
 #ifndef MININIM_MULTI_ROOM_H
 #define MININIM_MULTI_ROOM_H
 
-/* #define room_view (mr.cell[mr.dx][mr.dy].room) */
-
 /* variables */
 extern ALLEGRO_BITMAP *room0;
 extern ALLEGRO_COLOR room0_wall_color[3][4][11];
