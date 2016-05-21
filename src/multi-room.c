@@ -354,6 +354,58 @@ mr_set_origin (int room, int rx, int ry)
 }
 
 void
+mr_stabilize_origin (struct mr_origin *o, enum dir d)
+{
+  int x, y, i;
+  if (mr.cell[o->x][o->y].room) {
+    mr_set_origin (mr.cell[o->x][o->y].room,
+                   o->x, o->y);
+    return;
+  }
+
+  switch (d) {
+  case LEFT:
+    for (i = 0; o->x + i < mr.w; i++)
+      if (mr.cell[o->x + i][o->y].room) {
+        mr_set_origin (mr.cell[o->x + i][o->y].room,
+                       o->x + i, o->y);
+        return;
+      }
+    break;
+  case RIGHT:
+    for (i = 0; o->x - i >= 0; i++)
+      if (mr.cell[o->x - i][o->y].room) {
+        mr_set_origin (mr.cell[o->x - i][o->y].room,
+                       o->x - i, o->y);
+        return;
+      }
+    break;
+  case ABOVE:
+    for (i = 0; o->y + i < mr.h; i++)
+      if (mr.cell[o->x][o->y + i].room) {
+        mr_set_origin (mr.cell[o->x][o->y + i].room,
+                       o->x, o->y + i);
+        return;
+      }
+    break;
+  case BELOW:
+    for (i = 0; o->y - i >= 0; i++)
+      if (mr.cell[o->x][o->y - i].room) {
+        mr_set_origin (mr.cell[o->x][o->y - i].room,
+                       o->x, o->y - i);
+        return;
+      }
+    break;
+  default: assert (false); break;
+  }
+
+  if (mr_coord (o->room, -1, &x, &y)) {
+    mr_set_origin (o->room, x, y);
+    return;
+  }
+}
+
+void
 mr_focus_room (int room)
 {
   int x, y;
@@ -407,16 +459,17 @@ mr_view_trans (enum dir d)
 
   mr.select_cycles = SELECT_CYCLES;
 
+  struct mr_origin o;
+  mr_save_origin (&o);
+
   for (y = mr.h - 1; y >= 0; y--)
     for (x = 0; x < mr.w; x++) {
       int r = mr.cell[x][y].room;
       if (r <= 0) continue;
       r = roomd (r, d);
       if (r) {
-        int mr_x = mr.x, mr_y = mr.y;
         mr_set_origin (r, x, y);
-        if (mr.cell[mr_x][mr_y].room)
-          mr_set_origin (mr.cell[mr_x][mr_y].room, mr_x, mr_y);
+        mr_stabilize_origin (&o, d);
         return;
       }
     }
@@ -432,8 +485,10 @@ mr_view_trans (enum dir d)
     if (mr.y < mr.h - 1) dy = +1; break;
   }
 
-  mr.x += dx;
-  mr.y += dy;
+  mr_set_origin (mr.room, mr.x + dx, mr.y + dy);
+  mr_stabilize_origin (&o, d);
+
+  return;
 }
 
 void
@@ -442,6 +497,9 @@ mr_view_page_trans (enum dir d)
   int x, y;
 
   mr.select_cycles = SELECT_CYCLES;
+
+  struct mr_origin o;
+  mr_save_origin (&o);
 
   switch (d) {
   case RIGHT:
@@ -465,6 +523,8 @@ mr_view_page_trans (enum dir d)
     mr_view_trans (ABOVE);
     break;
   }
+
+  mr_stabilize_origin (&o, d);
 }
 
 bool

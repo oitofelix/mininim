@@ -74,5 +74,6 @@ bool mr_room_list_has_room (struct mr_room_list *l, int room);
 struct mr_room_list *mr_get_room_list (struct mr_room_list *l);
 void mr_destroy_room_list (struct mr_room_list *l);
 int mr_count_uniq_rooms (void);
+void mr_stabilize_origin (struct mr_origin *o, enum dir d);
 
 #endif	/* MININIM_MULTI_ROOM_H */
