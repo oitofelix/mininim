@@ -236,8 +236,6 @@ void
 draw_conbg (ALLEGRO_BITMAP *bitmap, struct pos *p,
             enum em em, enum vm vm)
 {
-  if (con (p)->fg == WALL) return;
-
   switch (con (p)->bg) {
   case NO_BG:
     if (em == PALACE) draw_bricks_02 (bitmap, p, em, vm); break;
