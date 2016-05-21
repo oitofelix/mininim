@@ -278,7 +278,7 @@ editor (void)
   static struct skill skill_buf;
 
   /* display message if available */
-  if (msg_cycles > 0 && msg && ! was_menu_return_pressed (false)) {
+  if (msg_cycles > 0 && msg && ! key.keyboard.keycode) {
     msg_cycles--;
     draw_bottom_text (NULL, msg, 0);
     memset (&key, 0, sizeof (key));
@@ -1122,6 +1122,7 @@ editor (void)
       level = *vanilla_level;
       destroy_cons ();
       register_cons ();
+      update_cache (em, vm);
       break;
     }
     al_free (str);

@@ -42,8 +42,6 @@ play_anim (void (*draw_callback) (void),
   anim_cycle = 0;
   quit_anim = NO_QUIT;
 
-  struct anim *current_kid;
-
   acknowledge_resize ();
   ALLEGRO_EVENT event;
   ALLEGRO_TIMER *timer = create_timer (1.0 / freq);
@@ -158,13 +156,11 @@ play_anim (void (*draw_callback) (void),
       button = event.joystick.button;
       break;
     case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
-      current_kid = get_anim_by_id (current_kid_id);
-
       switch (event.mouse.button) {
       case 1: enter_exit_editor (); break;
       case 3:
         if (edit != EDIT_NONE)
-          mr_focus_room (current_kid->f.c.room);
+          mr_center_room (mr.room);
         break;
       default: break;
       }
