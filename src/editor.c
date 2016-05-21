@@ -933,19 +933,22 @@ editor (void)
     }
     break;
   case EDIT_ROOM_CON_EXCHANGE:
+    mr_focus_mouse ();
     mr.select_cycles = SELECT_CYCLES;
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
     switch (menu_enum (con_exchange_menu, "RH>")) {
     case -1: case 1: edit = EDIT_ROOM; break;
     case 'H':
-      register_h_room_con_exchange_undo (&undo, mr.room, "ROOM H.CON EXCHANGE");
+      register_h_room_con_exchange_undo
+        (&undo, mr.room, "ROOM H.CON EXCHANGE");
       break;
     case 'V':
-      register_v_room_con_exchange_undo (&undo, mr.room, "ROOM V.CON EXCHANGE");
+      register_v_room_con_exchange_undo
+        (&undo, mr.room, "ROOM V.CON EXCHANGE");
       break;
     case 'R':
-      register_random_room_con_exchange_undo (&undo, mr.room, false, false,
-                                              "ROOM RANDOM CON EXCHANGE");
+      register_random_room_con_exchange_undo
+        (&undo, mr.room, false, false, "ROOM RANDOM CON EXCHANGE");
       break;
     }
     break;
@@ -1002,13 +1005,16 @@ editor (void)
 
       register_link_undo (&undo, l, "ROOM EXCHANGE");
       last_mouse_coord.c.room = room1;
+      last_mouse_coord.mr.room = room1;
       set_mouse_coord (&last_mouse_coord);
     }
     break;
   case EDIT_LINKING_SETTINGS:
+    mr_focus_mouse ();
     mr.select_cycles = SELECT_CYCLES;
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
-    switch (menu_bool (linking_settings_menu, "RS>", false, &b0, &b1, &b2)) {
+    switch (menu_bool (linking_settings_menu, "RS>", false, &b0,
+                       &b1, &b2)) {
     case -1: edit = EDIT_ROOM; break;
     case 0: break;
     case 1:

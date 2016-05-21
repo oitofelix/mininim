@@ -139,6 +139,14 @@ set_mouse_coord (struct mouse_coord *m)
     y = mr.y;
   }
 
+  struct mouse_coord m0;
+  get_mouse_coord (&m0);
+  if (m0.x >= 0 && m0.y >= 0 &&
+      mr.cell[m0.x][m0.y].room == m->c.room) {
+    x = m0.x;
+    y = m0.y;
+  }
+
   int tw, th;
   mr_get_resolution (&tw, &th);
 
