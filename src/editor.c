@@ -994,6 +994,8 @@ editor (void)
   case EDIT_ROOM_EXCHANGE:
     r = menu_select_room (EDIT_ROOM, "RX>ROOM");
 
+    mr.room_select = last_mouse_coord.c.room;
+
     if (r == 1) {
       struct room_linking l[ROOMS];
       memcpy (&l, &level.link, sizeof (l));
@@ -1007,7 +1009,8 @@ editor (void)
       last_mouse_coord.c.room = room1;
       last_mouse_coord.mr.room = room1;
       set_mouse_coord (&last_mouse_coord);
-    }
+      mr.room_select = -1;
+    } else if (r == -1) mr.room_select = -1;
     break;
   case EDIT_LINKING_SETTINGS:
     mr_focus_mouse ();
@@ -1555,6 +1558,8 @@ menu_link (enum dir dir)
   char r = menu_select_room (EDIT_LINK, prefix);
   al_free (prefix);
 
+  mr.room_select = last_mouse_coord.c.room;
+
   if (r == 1) {
     struct room_linking l[ROOMS];
     memcpy (&l, &level.link, sizeof (l));
@@ -1577,7 +1582,8 @@ menu_link (enum dir dir)
 
     register_link_undo (&undo, l, "LINK");
     set_mouse_coord (&last_mouse_coord);
-  }
+    mr.room_select = -1;
+  } else if (r == -1) mr.room_select = -1;
 
   return r;
 }

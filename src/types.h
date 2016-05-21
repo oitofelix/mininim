@@ -80,6 +80,8 @@ struct multi_room {
   } fit_mode;
   int fit_w, fit_h;
 
+  int room_select;
+
   struct multi_room_cell {
     ALLEGRO_BITMAP *screen;
     ALLEGRO_BITMAP *cache;

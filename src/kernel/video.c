@@ -377,6 +377,23 @@ hgc_palette (ALLEGRO_COLOR c)
 }
 
 void
+draw_mr_select_rect (int x, int y, ALLEGRO_COLOR color)
+{
+  int w = al_get_display_width (display);
+  int h = al_get_display_height (display);
+  int tw, th; mr_get_resolution (&tw, &th);
+
+  ALLEGRO_BITMAP *screen = mr.cell[x][y].screen;
+  int sw = al_get_bitmap_width (screen);
+  int sh = al_get_bitmap_height (screen);
+  float dx = ((ORIGINAL_WIDTH * x) * w) / (float) tw;
+  float dy = ((ROOM_HEIGHT * y) * h) / (float) th;
+  float dw = (sw * w) / (float) tw;
+  float dh = (sh * h) / (float) th;
+  al_draw_rectangle (dx, dy, dx + dw, dy + dh, color, 2);
+}
+
+void
 flip_display (ALLEGRO_BITMAP *bitmap)
 {
   int w = al_get_display_width (display);
@@ -437,6 +454,12 @@ flip_display (ALLEGRO_BITMAP *bitmap)
     set_target_backbuffer (display);
     al_draw_bitmap (iscreen, 0, 0, screen_flags);
 
+    if (mr.room_select > 0 && ! cutscene)
+      for (y = mr.h - 1; y >= 0; y--)
+        for (x = 0; x < mr.w; x++)
+          if (mr.cell[x][y].room == mr.room_select)
+            draw_mr_select_rect (x, y, GREEN);
+
     if ((mr.room != mr.last.room
          || mr.x != mr.last.x
          || mr.y != mr.last.y
@@ -446,16 +469,7 @@ flip_display (ALLEGRO_BITMAP *bitmap)
       mr.select_cycles = SELECT_CYCLES;
 
     if (mr.select_cycles > 0 && ! cutscene) {
-      int x = mr.x;
-      int y = mr.y;
-      ALLEGRO_BITMAP *screen = mr.cell[x][y].screen;
-      int sw = al_get_bitmap_width (screen);
-      int sh = al_get_bitmap_height (screen);
-      float dx = ((ORIGINAL_WIDTH * x) * w) / (float) tw;
-      float dy = ((ROOM_HEIGHT * y) * h) / (float) th;
-      float dw = (sw * w) / (float) tw;
-      float dh = (sh * h) / (float) th;
-      al_draw_rectangle (dx, dy, dx + dw, dy + dh, RED, 2);
+      draw_mr_select_rect (mr.x, mr.y, RED);
       mr.select_cycles--;
     }
   }
