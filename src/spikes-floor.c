@@ -375,11 +375,9 @@ break_spikes_floor (struct pos *p)
 {
   struct spikes_floor *s = spikes_floor_at_pos (p);
   if (! s) return;
-  /* s->p.room = -1; */
-  remove_spikes_floor (s);
   if (s->murdered_anim != -1)
     anim_die_suddenly (get_anim_by_id (s->murdered_anim));
-  /* sort_spikes_floors (); */
+  remove_spikes_floor (s);
 }
 
 void
