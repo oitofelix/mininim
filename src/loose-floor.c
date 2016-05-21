@@ -615,13 +615,13 @@ draw_falling_loose_floor (ALLEGRO_BITMAP *bitmap, struct pos *p,
   if (! l) return;
 
   if (l->action == FALL_LOOSE_FLOOR) {
+    struct frame f = l->f;
+    frame2room (&f, room_view, &f.c);
     struct coord tr, br;
     struct pos fptr, nfptr, fpbr, nfpbr;
-    frame2room (&l->f, room_view, &l->f.c);
-    survey (_tr, posf, &l->f, &tr, &fptr, &nfptr);
-    survey (_br, posf, &l->f, &br, &fpbr, &nfpbr);
-    l->f.b = get_correct_falling_loose_floor_bitmap (l->f.b);
-    struct frame f = l->f;
+    survey (_tr, posf, &f, &tr, &fptr, &nfptr);
+    survey (_br, posf, &f, &br, &fpbr, &nfpbr);
+    f.b = get_correct_falling_loose_floor_bitmap (f.b);
     if (vm == VGA) f.b = apply_hue_palette (f.b);
     if (hgc) f.b = apply_palette (f.b, hgc_palette);
     draw_frame (bitmap, &f);

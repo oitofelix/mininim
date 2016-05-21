@@ -62,7 +62,8 @@ remove_from_array (void *base, size_t *nmemb, size_t index, size_t count, size_t
   assert (size > 0);
 
   /* Make array contiguous */
-  memmove ((char *) base + (index * size), (char *) base + (index + count) * size,
+  memmove ((char *) base + index * size,
+           (char *) base + (index + count) * size,
            (*nmemb - index - count) * size);
 
   /* Decrement array member counter */
