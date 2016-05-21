@@ -309,6 +309,9 @@ unload_spikes_floor (void)
 void
 register_spikes_floor (struct pos *p)
 {
+  assert (con (p)->fg == SPIKES_FLOOR
+          && spikes_floor_at_pos (p) == NULL);
+
   struct spikes_floor s;
 
   s.p = *p;

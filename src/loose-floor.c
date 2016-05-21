@@ -251,6 +251,9 @@ create_loose_floor_01_bitmap (enum em em, enum vm vm)
 void
 register_loose_floor (struct pos *p)
 {
+  assert (con (p)->fg == LOOSE_FLOOR
+          && loose_floor_at_pos (p) == NULL);
+
   struct loose_floor l;
 
   l.p = *p;

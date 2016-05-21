@@ -165,6 +165,9 @@ unload_door (void)
 void
 register_door (struct pos *p)
 {
+  assert (con (p)->fg == DOOR
+          && door_at_pos (p) == NULL);
+
   struct door d;
 
   d.p = *p;

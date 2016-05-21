@@ -117,6 +117,9 @@ unload_opener_floor (void)
 void
 register_opener_floor (struct pos *p)
 {
+  assert (con (p)->fg == OPENER_FLOOR
+          && opener_floor_at_pos (p) == NULL);
+
   struct opener_floor o;
 
   int event = con (p)->ext.event;

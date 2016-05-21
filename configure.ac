@@ -69,6 +69,9 @@ no)  debug=false ;;
 esac],[debug=false])
 AM_CONDITIONAL([DEBUG], [test x$debug = xtrue])
 
+AS_IF([[test x$debug != xtrue]],
+  [AC_DEFINE([NDEBUG], [1], [Make assert macro do nothing.])])
+
 # Optimizations option
 AC_ARG_ENABLE([optimizations],
 [AS_HELP_STRING([--enable-optimizations],[Turn on optimizations])],

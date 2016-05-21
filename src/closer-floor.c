@@ -117,6 +117,9 @@ unload_closer_floor (void)
 void
 register_closer_floor (struct pos *p)
 {
+  assert (con (p)->fg == CLOSER_FLOOR
+          && closer_floor_at_pos (p) == NULL);
+
   struct closer_floor c;
 
   int event = con (p)->ext.event;

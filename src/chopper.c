@@ -280,6 +280,9 @@ unload_chopper (void)
 void
 register_chopper (struct pos *p)
 {
+  assert (con (p)->fg == CHOPPER
+          && chopper_at_pos (p) == NULL);
+
   struct chopper c;
 
   int step = con (p)->ext.step & 0x7F;

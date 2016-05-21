@@ -159,6 +159,9 @@ unload_level_door (void)
 void
 register_level_door (struct pos *p)
 {
+  assert (con (p)->fg == LEVEL_DOOR
+          && level_door_at_pos (p) == NULL);
+
   struct level_door d;
 
   int step = con (p)->ext.step;
