@@ -468,6 +468,7 @@ float_kid (struct anim *k)
 {
   al_set_timer_count (k->floating, 0);
   al_start_timer (k->floating);
+  stop_sample (k->sample, scream_sample);
   if (! is_playing_sample (floating_sample))
     k->sample = play_sample (floating_sample, -1);
   if (k->id == current_kid_id) {
