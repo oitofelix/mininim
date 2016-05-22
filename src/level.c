@@ -32,7 +32,7 @@ struct undo undo;
 
 static char *undo_msg;
 static int last_auto_show_time;
-static ALLEGRO_TIMER *death_timer;
+static uint64_t death_timer;
 static bool ignore_level_cutscene;
 
 bool no_room_drawing, game_paused, step_one_cycle;
@@ -46,7 +46,6 @@ play_level (struct level *lv)
 {
   char *text;
   vanilla_level = lv;
-  death_timer = create_timer (1.0 / 12);
 
  start:
   free_undo (&undo);
@@ -64,15 +63,13 @@ play_level (struct level *lv)
 
   stop_all_samples ();
   play_time_stopped = false;
+  death_timer = 0;
 
   if (level.start) level.start ();
 
   /* anim_cycle = 0; */
   last_auto_show_time = -1;
   current_kid_id = 0;
-
-  al_stop_timer (death_timer);
-  al_set_timer_count (death_timer, 0);
 
   if (retry_level != level.number)
     start_level_time = play_time;
@@ -785,12 +782,10 @@ process_keys (void)
   struct anim *k = get_anim_by_id (0);
   if (k->current_lives <= 0
       && ! game_paused) {
-    al_start_timer (death_timer);
-    int64_t t = al_get_timer_count (death_timer);
+    death_timer++;
+    if (death_timer < 12) k->sample = NULL;
 
-    if (t < 12) k->sample = NULL;
-
-    if (t >= 12 && ! k->sample) {
+    if (death_timer >= 12 && ! k->sample) {
       ALLEGRO_SAMPLE *sample;
       switch (k->death_reason) {
       case SHADOW_FIGHT_DEATH: sample = success_suspense_sample; break;
@@ -800,14 +795,14 @@ process_keys (void)
       k->sample = play_sample (sample, -1);
     }
 
-    if (t < 60 && ! active_menu) {
+    if (death_timer < 60 && ! active_menu) {
       key.keyboard.keycode = 0;
       button = -1;
     }
 
-    if (t >= 60) {
-      if ((t < 240 || t % 12 < 8) && ! active_menu) {
-        if (t >= 252 && t % 12 == 0)
+    if (death_timer >= 60) {
+      if ((death_timer < 240 || death_timer % 12 < 8) && ! active_menu) {
+        if (death_timer >= 252 && death_timer % 12 == 0)
           play_sample (press_key_sample, -1);
         xasprintf (&text, "Press Button to Continue");
         draw_bottom_text (NULL, text, -2);
@@ -818,10 +813,8 @@ process_keys (void)
           && ! was_menu_key_pressed ())
         quit_anim = RESTART_LEVEL;
     }
-  } else if (al_get_timer_started (death_timer)
-             && ! game_paused) {
-    al_stop_timer (death_timer);
-    al_set_timer_count (death_timer, 0);
+  } else if (death_timer && ! game_paused) {
+    death_timer = 0;
     draw_bottom_text (NULL, NULL, -2);
   }
 
