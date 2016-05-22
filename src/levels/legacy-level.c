@@ -25,7 +25,7 @@ static int shadow_id;
 static int skeleton_id;
 static bool played_sample;
 static struct level_door *exit_level_door;
-static ALLEGRO_TIMER *mouse_timer;
+static uint64_t mouse_timer;
 static int mouse_id;
 static bool coming_from_12;
 static bool shadow_merged;
@@ -63,8 +63,7 @@ legacy_level_start (void)
   played_sample = false;
   shadow_id = mouse_id = skeleton_id = -1;
   stop_all_samples ();
-  al_destroy_timer (mouse_timer);
-  mouse_timer = NULL;
+  mouse_timer = 0;
   exit_level_door = get_exit_level_door (0);
   anti_camera_room = -1;
   shadow_merged = false;
@@ -138,9 +137,6 @@ legacy_level_start (void)
       mr_center_room (2);
     }
   }
-
-  /* in the eighth level */
-  if (level.number == 8) mouse_timer = create_timer (1.0 / 12);
 
   /* in the tenth level unflip the screen vertically, (helpful if the
      kid has not drank the potion that would do it on its own) */
@@ -391,24 +387,18 @@ legacy_level_special_events (void)
 
     if (mouse_id != -1) m = get_anim_by_id (mouse_id);
 
-    if (mouse_timer) {
-      /* if the exit level door is open and the kid is at room 16,
-         start counting (or continue if started already) for the mouse
-         arrival */
-      if (exit_level_door && exit_level_door->i == 0 &&
-          k->f.c.room == 16) al_start_timer (mouse_timer);
-      else al_stop_timer (mouse_timer);
+    /* if the exit level door is open and the kid is at room 16,
+       start counting (or continue if started already) for the mouse
+       arrival */
+    if (exit_level_door && exit_level_door->i == 0 &&
+        k->f.c.room == 16 && mouse_timer <= 138) mouse_timer++;
 
-      /* if enough cycles have passed since the start of the countdown
-         and the camera is at room 16, make the mouse appear */
-      if (al_get_timer_count (mouse_timer) >= 138
-          && is_room_visible (mouse_pos.room)) {
-        al_destroy_timer (mouse_timer);
-        mouse_timer = NULL;
-        mouse_id = create_anim (NULL, MOUSE, &mouse_pos, RIGHT);
-        m = &anima[mouse_id];
-        m->f.flip = ALLEGRO_FLIP_HORIZONTAL;
-      }
+    /* if enough cycles have passed since the start of the countdown
+       and the camera is at room 16, make the mouse appear */
+    if (mouse_timer == 138 && is_room_visible (mouse_pos.room)) {
+      mouse_id = create_anim (NULL, MOUSE, &mouse_pos, RIGHT);
+      m = &anima[mouse_id];
+      m->f.flip = ALLEGRO_FLIP_HORIZONTAL;
     }
 
     /* make the mouse disapear as soon as it goes out of view */
