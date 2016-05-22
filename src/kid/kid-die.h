@@ -43,6 +43,7 @@ void kid_die_suddenly (struct anim *k);
 bool is_kid_dead (struct frame *f);
 bool is_kid_chopped (struct frame *f);
 void kill_kid_shadows (struct anim *k);
+void kid_die_properly (struct anim *k);
 
 extern ALLEGRO_BITMAP *kid_die_00, *kid_die_01, *kid_die_02,
   *kid_die_03, *kid_die_04, *kid_die_05;

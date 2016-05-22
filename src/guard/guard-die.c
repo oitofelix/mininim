@@ -282,6 +282,11 @@ get_guard_die_spiked_bitmap (enum anim_type t)
 void
 guard_die_spiked (struct anim *g)
 {
+  if (con (&g->p)->fg != SPIKES_FLOOR) {
+    guard_die_properly (g);
+    return;
+  }
+
   g->oaction = g->action;
   g->action = guard_die_spiked;
   g->f.flip = (g->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
@@ -291,6 +296,7 @@ guard_die_spiked (struct anim *g)
     g->splash = true;
     g->death_reason = SPIKES_DEATH;
 
+    assert (con (&g->p)->fg == SPIKES_FLOOR);
     struct spikes_floor *s = spikes_floor_at_pos (&g->p);
     s->i = 4;
     s->state = 5;
@@ -333,6 +339,11 @@ get_guard_die_chopped_bitmap (enum anim_type t)
 void
 guard_die_chopped (struct anim *g)
 {
+  if (con (&g->p)->fg != CHOPPER) {
+    guard_die_properly (g);
+    return;
+  }
+
   g->oaction = g->action;
   g->action = guard_die_chopped;
   g->f.flip = (g->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
@@ -368,6 +379,12 @@ guard_die_chopped (struct anim *g)
 void
 guard_die_suddenly (struct anim *g)
 {
+  if (con (&g->p)->fg == SPIKES_FLOOR
+      || con (&g->p)->fg == CHOPPER) {
+    guard_die_properly (g);
+    return;
+  }
+
   g->oaction = g->action;
   g->action = guard_die_suddenly;
   g->f.flip = (g->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
@@ -489,6 +506,16 @@ physics_out (struct anim *g)
   else if (g->i == 4) update_depressible_floor (g, 0, -27);
   else if (g->i == 5) update_depressible_floor (g, -12, -28);
   else keep_depressible_floor (g);
+}
+
+void
+guard_die_properly (struct anim *g)
+{
+  switch (con (&g->p)->fg) {
+  case SPIKES_FLOOR: guard_die_spiked (g); break;
+  case CHOPPER: guard_die_chopped (g); break;
+  default: guard_die_suddenly (g); break;
+  }
 }
 
 bool

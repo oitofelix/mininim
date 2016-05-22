@@ -85,6 +85,7 @@ bool is_guard_dead (struct frame *f);
 bool is_guard_chopped (struct frame *f);
 struct frameset *get_guard_die_frameset (enum anim_type t);
 ALLEGRO_BITMAP *get_guard_die_spiked_bitmap (enum anim_type t);
+void guard_die_properly (struct anim *g);
 
 /* guard */
 extern ALLEGRO_BITMAP *guard_die_00, *guard_die_01, *guard_die_02,
