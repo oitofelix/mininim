@@ -635,6 +635,14 @@ is_anim_fall (struct frame *f)
     || is_guard_fall (f);
 }
 
+bool
+is_fightable_anim (struct anim *a)
+{
+  return a->type == KID || a->type == SHADOW
+    || a->type == GUARD || a->type == FAT_GUARD
+    || a->type == SKELETON || a->type == VIZIER;
+}
+
 void
 anim_die_suddenly (struct anim *a)
 {

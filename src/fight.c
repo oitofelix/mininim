@@ -25,7 +25,11 @@ are_valid_opponents (struct anim *k0, struct anim *k1)
   /* no one fights oneself */
   if (k0->id == k1->id) return false;
 
-  /* anyone trying to fight the kid is fair game */
+  /* non-fightable characters can't fight */
+  if (! is_fightable_anim (k0) || ! is_fightable_anim (k1))
+    return false;
+
+  /* anyone fightable trying to fight the kid is fair game */
   if (k0->id == 0 || k1->id == 0) return true;
 
   return false;
@@ -34,6 +38,9 @@ are_valid_opponents (struct anim *k0, struct anim *k1)
 void
 leave_fight_logic (struct anim *k)
 {
+  /* non-fightable characters don't fight */
+  if (! is_fightable_anim (k)) return;
+
   /* controllables don't forget, they let this to the
      non-controllable */
   if (k->controllable) return;
@@ -98,6 +105,9 @@ leave_fight_logic (struct anim *k)
 void
 enter_fight_logic (struct anim *k)
 {
+  /* non-fightable characters don't fight */
+  if (! is_fightable_anim (k)) return;
+
   /* has an enemy, no need to get another */
   if (k->enemy_id != -1 && k->enemy_aware) return;
 
@@ -143,6 +153,9 @@ enter_fight_logic (struct anim *k)
 void
 fight_ai (struct anim *k)
 {
+  /* non-fightable characters don't fight */
+  if (! is_fightable_anim (k)) return;
+
   /* controllables and non-fighters doesn't need AI to fight */
   if (k->controllable || ! k->fight) return;
 
@@ -930,7 +943,8 @@ fight_turn_controllable (struct anim *k)
   int i;
   for (i = 0; i < anima_nmemb; i++) {
     struct anim *a = &anima[i];
-    if (a->enemy_id != k->id) continue;
+    if (a->enemy_id != k->id || ! is_fightable_anim (a))
+      continue;
     int de = dist_enemy (a);
     if (de < d) {
       d = de;

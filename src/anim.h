@@ -41,6 +41,7 @@ void clear_anims_keyboard_state (void);
 bool is_anim_dead (struct frame *f);
 bool is_anim_chopped (struct frame *f);
 bool is_anim_fall (struct frame *f);
+bool is_fightable_anim (struct anim *a);
 void anim_die_suddenly (struct anim *a);
 void anim_die_spiked (struct anim *a);
 void anim_die_chopped (struct anim *a);
