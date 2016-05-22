@@ -116,7 +116,6 @@ create_kid (struct anim *k0, struct anim *k1, struct pos *p, enum dir dir)
   if (k0) {
     k1->shadow_of = k0->id;
     k1->shadow = true;
-    k1->floating = create_timer (1.0);
   } else {
     k1->shadow_of = -1;
     k1->f.b = kid_normal_00;
@@ -125,7 +124,6 @@ create_kid (struct anim *k0, struct anim *k1, struct pos *p, enum dir dir)
     k1->item_pos.room = -1;
     k1->total_lives = KID_INITIAL_TOTAL_LIVES;
     k1->current_lives = KID_INITIAL_CURRENT_LIVES;
-    k1->floating = create_timer (1.0);
     k1->fight = true;
     k1->enemy_id = -1;
     k1->skill.counter_attack_prob = -1;
@@ -149,7 +147,6 @@ destroy_kid (struct anim *k)
       if (a->type == KID && a->controllable)
         current_kid_id = a->id;
     }
-  al_destroy_timer (k->floating);
 }
 
 palette
@@ -468,8 +465,7 @@ void
 float_kid (struct anim *k)
 {
   if (k->current_lives <= 0 && ! is_kid_fall (&k->f)) return;
-  al_set_timer_count (k->floating, 0);
-  al_start_timer (k->floating);
+  k->float_timer = 1;
   stop_sample (k->sample, scream_sample);
   if (! is_playing_sample (floating_sample))
     k->sample = play_sample (floating_sample, -1);

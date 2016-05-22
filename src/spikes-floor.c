@@ -479,7 +479,7 @@ compute_spikes_floors (void)
                    || is_kid_stop_run (&a->f)
                    || is_kid_run_jump_running (&a->f)))
               || (is_kid_couch (&a->f) && a->fall && a->i < 3
-                  && ! al_get_timer_started (a->floating))
+                  && ! a->float_timer)
               || (is_kid_jump_landing (&a->f) && a->i <= 13)
               || is_kid_run_jump_landing (&a->f))) {
         a->p = s->p;

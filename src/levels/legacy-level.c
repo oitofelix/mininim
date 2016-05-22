@@ -510,7 +510,6 @@ legacy_level_special_events (void)
       /* if the kid keep his sword, the shadow does the same */
       if (k->action == kid_keep_sword && ks->type == SHADOW) {
         ks->type = KID;
-        ks->floating = create_timer (1.0);
         ks->controllable = true;
         kid_keep_sword (ks);
         place_on_the_ground (&ks->f, &ks->f.c);
@@ -521,7 +520,6 @@ legacy_level_special_events (void)
          shadow becomes offensive again too */
       if (k->action == kid_take_sword && ks->type == KID) {
         ks->type = SHADOW;
-        al_destroy_timer (ks->floating);
         ks->controllable = false;
         guard_normal (ks);
         place_on_the_ground (&ks->f, &ks->f.c);

@@ -352,7 +352,7 @@ struct anim {
   struct skill skill;
   int refraction;
 
-  ALLEGRO_TIMER *floating;
+  uint64_t float_timer;
   ALLEGRO_SAMPLE_INSTANCE *sample;
 
   int dc, df, dl, dcl, dch, dcd;

@@ -103,11 +103,11 @@ physics_in (struct anim *k)
 
   bool hang_back = ((k->f.dir == LEFT) ? k->key.right : k->key.left)
     && ! k->key.up && k->key.shift
-    && (k->i < 9 || al_get_timer_started (k->floating))
+    && (k->i < 9 || k->float_timer)
     && k->current_lives > 0;
 
   bool hang_front = k->key.shift && ! hang_back
-    && (k->i < 9 || al_get_timer_started (k->floating))
+    && (k->i < 9 || k->float_timer)
     && k->current_lives > 0;
 
   int dir = (k->f.dir == LEFT) ? -1 : +1;
@@ -161,13 +161,12 @@ physics_in (struct anim *k)
   }
 
   /* floating */
-  if (al_get_timer_started (k->floating)) {
-    if (al_get_timer_count (k->floating) < 16) {
+  if (k->float_timer) {
+    if (k->float_timer++ < SEC2CYC (16)) {
       k->fo.dx = -1;
       k->fo.dy = +3;
-    }
-    else {
-      al_stop_timer (k->floating);
+    } else {
+      k->float_timer = 0;
       k->i = (k->i > 4) ? 4 : k->i;
     }
   }
@@ -206,7 +205,7 @@ physics_in (struct anim *k)
   fo.dx = kid_fall_frameset[k->i > 4 ? 4 : k->i].dx;
   fo.dy = kid_fall_frameset[k->i > 4 ? 4 : k->i].dy;
 
-  if (al_get_timer_started (k->floating)) fo.dy = 14;
+  if (k->float_timer) fo.dy = 14;
   else {
     if (k->i > 0) k->fo.dx = -k->inertia;
     if (k->i > 4) {
@@ -238,7 +237,7 @@ physics_in (struct anim *k)
 
     if (k->i >= 8 && ! k->immortal
         && ! k->fall_immune
-        && ! al_get_timer_started (k->floating)) {
+        && ! k->float_timer) {
       k->hurt = true;
       k->splash = true;
       k->current_lives--;
@@ -253,8 +252,7 @@ physics_in (struct anim *k)
         mr.flicker = 2;
         mr.color = get_flicker_blood_color ();
       }
-    } else if (k->i > 3
-               && ! al_get_timer_started (k->floating)) {
+    } else if (k->i > 3 && ! k->float_timer) {
       play_sample (hit_ground_sample, k->f.c.room);
       k->hurt = false;
     } else k->hurt = false;
@@ -291,7 +289,7 @@ physics_out (struct anim *k)
 
   /* sound */
   if (k->i == 10
-      && ! al_get_timer_started (k->floating)
+      && ! k->float_timer
       && k->current_lives > 0)
     k->sample = play_sample (scream_sample, k->f.c.room);
 }
