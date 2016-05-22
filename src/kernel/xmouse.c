@@ -55,6 +55,8 @@ get_mouse_coord (struct mouse_coord *m)
   mr_get_resolution (&sw, &sh);
 
   al_get_mouse_state (&mouse_state);
+  m->sx = mouse_state.x;
+  m->sy = mouse_state.y;
   int x = (mouse_state.x * (sw - 1)) / w;
   int y = (mouse_state.y * (sh - 1)) / h;
 
@@ -131,7 +133,10 @@ set_mouse_coord (struct mouse_coord *m)
 
   mr_restore_origin (&m->mr);
 
-  if (! m->c.room) return;
+  if (! m->c.room) {
+    al_set_mouse_xy (display, m->sx, m->sy);
+    return;
+  }
 
   if (! mr_coord (m->c.room, -1, &x, &y)) {
     mr_center_room (m->c.room);
@@ -216,6 +221,14 @@ set_mouse_room (int room)
   m.c.x = ORIGINAL_WIDTH / 2;
   m.c.y = ORIGINAL_HEIGHT / 2;
   set_mouse_coord (&m);
+
+  if (! room) {
+    mr_center_room (0);
+    mr.select_cycles = 0;
+    int w = al_get_display_width (display);
+    int h = al_get_display_height (display);
+    al_set_mouse_xy (display, w / 2, h / 2);
+  }
 }
 
 void

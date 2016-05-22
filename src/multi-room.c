@@ -356,53 +356,20 @@ mr_set_origin (int room, int rx, int ry)
 void
 mr_stabilize_origin (struct mr_origin *o, enum dir d)
 {
-  int x, y, i;
-  if (mr.cell[o->x][o->y].room) {
-    mr_set_origin (mr.cell[o->x][o->y].room,
-                   o->x, o->y);
-    return;
-  }
+  int x, y, tx, ty;
+  float ld, cd = INFINITY;
+  for (x = 0; x < mr.w; x++)
+    for (y = 0; y < mr.h; y++)
+      if (mr.cell[x][y].room) {
+        ld = dist_cart (x, y, o->x, o->y);
+        if (ld < cd) {
+          tx = x;
+          ty = y;
+          cd = ld;
+        }
+      }
 
-  switch (d) {
-  case LEFT:
-    for (i = 0; o->x + i < mr.w; i++)
-      if (mr.cell[o->x + i][o->y].room) {
-        mr_set_origin (mr.cell[o->x + i][o->y].room,
-                       o->x + i, o->y);
-        return;
-      }
-    break;
-  case RIGHT:
-    for (i = 0; o->x - i >= 0; i++)
-      if (mr.cell[o->x - i][o->y].room) {
-        mr_set_origin (mr.cell[o->x - i][o->y].room,
-                       o->x - i, o->y);
-        return;
-      }
-    break;
-  case ABOVE:
-    for (i = 0; o->y + i < mr.h; i++)
-      if (mr.cell[o->x][o->y + i].room) {
-        mr_set_origin (mr.cell[o->x][o->y + i].room,
-                       o->x, o->y + i);
-        return;
-      }
-    break;
-  case BELOW:
-    for (i = 0; o->y - i >= 0; i++)
-      if (mr.cell[o->x][o->y - i].room) {
-        mr_set_origin (mr.cell[o->x][o->y - i].room,
-                       o->x, o->y - i);
-        return;
-      }
-    break;
-  default: assert (false); break;
-  }
-
-  if (mr_coord (o->room, -1, &x, &y)) {
-    mr_set_origin (o->room, x, y);
-    return;
-  }
+  mr_set_origin (mr.cell[tx][ty].room, tx, ty);
 }
 
 void
