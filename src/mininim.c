@@ -54,8 +54,8 @@ char *resources_dir,
 char *levels_dat_compat_filename;
 
 ALLEGRO_THREAD *load_config_dialog_thread, *save_game_dialog_thread;
-
-ALLEGRO_TIMER *play_time;
+uint64_t play_time;
+bool play_time_stopped;
 enum vm vm = VGA;
 enum em em = DUNGEON;
 bool force_em = false;
@@ -788,12 +788,12 @@ parser (int key, char *arg, struct argp_state *state)
   case TIME_LIMIT_OPTION:
     e = optval_to_int (&i, key, arg, state, &time_limit_range, 0);
     if (e) return e;
-    time_limit = i;
+    time_limit = SEC2CYC (i);
     break;
   case START_TIME_OPTION:
     e = optval_to_int (&i, key, arg, state, &start_time_range, 0);
     if (e) return e;
-    start_time = i;
+    start_time = SEC2CYC (i);
     break;
   case KCA_OPTION:
     e = optval_to_int (&i, key, arg, state, &kca_range, 0);
@@ -1197,9 +1197,7 @@ main (int _argc, char **_argv)
   total_lives = initial_total_lives;
   current_lives = initial_current_lives;
 
-  if (! play_time) play_time = create_timer (1.0);
-  al_set_timer_count (play_time, start_time);
-  al_start_timer (play_time);
+  play_time = start_time;
 
   give_dat_compat_preference ();
 

@@ -178,7 +178,8 @@ void quit_game (void);
 
 /* variables */
 extern enum level_module level_module;
-extern ALLEGRO_TIMER *play_time;
+extern uint64_t play_time;
+extern bool play_time_stopped;
 extern enum vm vm;
 extern enum gm gm;
 extern enum em em;

@@ -63,6 +63,8 @@ play_level (struct level *lv)
   register_anims ();
 
   stop_all_samples ();
+  play_time_stopped = false;
+
   if (level.start) level.start ();
 
   /* anim_cycle = 0; */
@@ -73,7 +75,7 @@ play_level (struct level *lv)
   al_set_timer_count (death_timer, 0);
 
   if (retry_level != level.number)
-    start_level_time = al_get_timer_count (play_time);
+    start_level_time = play_time;
 
   if (! force_em) em = level.em;
   if (! force_hue) hue = level.hue;
@@ -379,6 +381,8 @@ compute_level (void)
   compute_doors ();
   compute_level_doors ();
   compute_choppers ();
+
+  if (! play_time_stopped) play_time++;
 }
 
 static void
@@ -567,7 +571,6 @@ process_keys (void)
   if (step_one_cycle) {
     step_one_cycle = false;
     game_paused = true;
-    al_stop_timer (play_time);
   }
 
   if (was_key_pressed (ALLEGRO_KEY_ESCAPE, 0, 0, true)
@@ -575,7 +578,6 @@ process_keys (void)
     if (game_paused) {
       step_one_cycle = true;
       game_paused = false;
-      al_start_timer (play_time);
     } else pause_game ();
   } else if (game_paused
              && (! active_menu || ! was_menu_key_pressed ())
@@ -700,18 +702,18 @@ process_keys (void)
   /* +: increment and display remaining time */
   if (! active_menu
       && was_key_pressed (ALLEGRO_KEY_EQUALS, 0, ALLEGRO_KEYMOD_SHIFT, true)) {
-    int t = time_limit - al_get_timer_count (play_time);
-    int d = t > 60 ? -60 : -1;
-    al_add_timer_count (play_time, d);
+    int t = time_limit - play_time;
+    int d = t > SEC2CYC (60) ? SEC2CYC (-60) : SEC2CYC (-1);
+    play_time += d;
     display_remaining_time ();
   }
 
   /* -: decrement and display remaining time */
   if (! active_menu
       && was_key_pressed (ALLEGRO_KEY_MINUS, 0, 0, true)) {
-    int t = time_limit - al_get_timer_count (play_time);
-    int d = t > 60 ? +60 : +1;
-    al_add_timer_count (play_time, d);
+    int t = time_limit - play_time;
+    int d = t > SEC2CYC (60) ? SEC2CYC (+60) : SEC2CYC (+1);
+    play_time += d;
     display_remaining_time ();
   }
 
@@ -835,17 +837,18 @@ draw_level (void)
   draw_lives (uscreen, get_anim_by_id (current_kid_id), vm);
 
   /* automatic remaining time display */
-  int rem_time = time_limit - al_get_timer_count (play_time);
-  if ((rem_time % (5 * 60) == 0
+  int rem_time = time_limit - play_time;
+  if ((rem_time % SEC2CYC (5 * 60) == 0
        && last_auto_show_time != rem_time
-       && anim_cycle > 720)
+       && anim_cycle > SEC2CYC (720))
       || (auto_rem_time_1st_cycle >= 0
           && last_auto_show_time != rem_time
           && anim_cycle >= auto_rem_time_1st_cycle
           && anim_cycle <= auto_rem_time_1st_cycle + 6)
-      || rem_time <= 60) {
+      || rem_time <= SEC2CYC (60)) {
     display_remaining_time ();
-    if (rem_time <= 60 && rem_time != last_auto_show_time)
+    if (rem_time <= SEC2CYC (60) && rem_time % SEC2CYC (1) == 0
+        && ! play_time_stopped)
       play_sample (press_key_sample, -1);
     last_auto_show_time = rem_time;
   }
@@ -859,11 +862,11 @@ void
 display_remaining_time (void)
 {
   char *text;
-  int t = time_limit - al_get_timer_count (play_time);
+  int t = time_limit - play_time;
   if (t < 0) t = 0;
-  int m = t / 60 + ((t % 60) ? 1 : 0);
-  if (t > 60) xasprintf (&text, "%i MINUTES LEFT", m);
-  else xasprintf (&text, "%i SECONDS LEFT", t);
+  int m = t / SEC2CYC (60) + ((t % SEC2CYC (60)) ? 1 : 0);
+  if (t > SEC2CYC (60)) xasprintf (&text, "%i MINUTES LEFT", m);
+  else xasprintf (&text, "%i SECONDS LEFT", CYC2SEC (t));
   draw_bottom_text (NULL, text, 0);
   al_free (text);
 }
@@ -917,7 +920,6 @@ pause_game (void)
   memset (&key, 0, sizeof (key));
   button = -1;
   game_paused = true;
-  al_stop_timer (play_time);
 }
 
 void
@@ -927,7 +929,6 @@ unpause_game (void)
   draw_bottom_text (NULL, NULL, 0);
   memset (&key, 0, sizeof (key));
   button = -1;
-  al_start_timer (play_time);
 }
 
 /************************************/

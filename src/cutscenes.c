@@ -352,13 +352,13 @@ title_anim (void)
     }
     break;
   case 28:
-    if (! wait_anim (SECS_TO_SCYCLES (5))) {
+    if (! wait_anim (SEC2CYC (5))) {
       start_video_effect (VIDEO_ROLL_RIGHT, SECS_TO_VCYCLES (0.5));
       i++;
     }
     break;
   case 29:
-    if (! wait_anim (SECS_TO_SCYCLES (3))) {
+    if (! wait_anim (SEC2CYC (3))) {
       start_video_effect (VIDEO_FADE_OUT, SECS_TO_VCYCLES (1));
       i++;
     }
@@ -490,7 +490,7 @@ cutscene_11_little_time_left_anim (void)
 void
 cutscene_11_anim (void)
 {
-  if (al_get_timer_count (play_time) >= (92 * time_limit) / 100)
+  if (play_time >= (92 * time_limit) / 100)
     cutscene_11_little_time_left_anim ();
   else cutscene_01_05_11_anim ();
 }

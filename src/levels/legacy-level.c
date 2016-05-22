@@ -106,6 +106,9 @@ legacy_level_start (void)
     camera_follow_kid = k->id;
   }
 
+  /* if in level 14 stop the timer */
+  if (level.number == 14) play_time_stopped = true;
+
   /* in the first level */
   if (level.number == 1) {
     /* activate tile, usually to close the opened door in the starting
@@ -614,7 +617,7 @@ legacy_level_special_events (void)
         stop_sample (k->sample, meet_vizier_sample);
         k->sample = play_sample (vizier_death_sample, -1);
         played_vizier_death_sample = true;
-        al_stop_timer (play_time);
+        play_time_stopped = true;
         display_remaining_time ();
       }
 
