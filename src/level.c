@@ -798,7 +798,7 @@ process_keys (void)
       k->sample = play_sample (sample, -1);
     }
 
-    if (t < 60) {
+    if (t < 60 && ! active_menu) {
       key.keyboard.keycode = 0;
       button = -1;
     }
