@@ -144,7 +144,7 @@ void
 play_title (void)
 {
   cutscene = true;
-  play_anim (title_anim, NULL, 10);
+  play_anim (title_anim, NULL);
 }
 
 static void
@@ -601,7 +601,7 @@ cutscene_07_anim (void)
     break;
   case 2:
     mouse.action (&mouse);
-    if (get_sample_position (si) >= 5.5) {
+    if (mouse.f.c.x >= 320) {
       princess_uncouch (&princess);
       i++;
     }
@@ -674,8 +674,8 @@ cutscene_08_anim (void)
     if (get_sample_position (si) >= 1) i++;
     break;
   case 2:
-    mouse.action (&mouse);
-    if (get_sample_position (si) >= 2.5) {
+    if (mouse.f.c.x >= 204) mouse.action (&mouse);
+    if (mouse.f.c.x <= 290) {
       princess_couch (&princess);
       i++;
     }
@@ -767,7 +767,7 @@ cutscene_14_anim (void)
     break;
   case 1:
     kid.action (&kid);
-    if (get_sample_position (si) >= 1) {
+    if (kid.f.c.x <= 235) {
       kid.key.left = false;
       i++;
     }

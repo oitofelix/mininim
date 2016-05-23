@@ -255,7 +255,8 @@ was_key_pressed (int keycode, int unichar, unsigned int modifiers,
   if ((keycode == key.keyboard.keycode && unichar <= 0
        && modifiers == key.keyboard.modifiers)
       || (unichar == key.keyboard.unichar && unichar > 0
-          && modifiers == key.keyboard.modifiers)) {
+          && (modifiers == key.keyboard.modifiers
+              || modifiers == -1))) {
     if (consume) memset (&key, 0, sizeof (key));
     return true;
   } else return false;

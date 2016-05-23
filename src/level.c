@@ -86,7 +86,7 @@ play_level (struct level *lv)
     al_free (text);
   }
 
-  play_anim (draw_level, compute_level, 12);
+  play_anim (draw_level, compute_level);
 
   switch (quit_anim) {
   case NO_QUIT: break;
@@ -108,7 +108,7 @@ play_level (struct level *lv)
       cutscene = true;
       stop_video_effect ();
       stop_all_samples ();
-      play_anim (level.cutscene, NULL, 10);
+      play_anim (level.cutscene, NULL);
       stop_video_effect ();
       stop_all_samples ();
 
@@ -129,7 +129,7 @@ play_level (struct level *lv)
     cutscene = true;
     stop_video_effect ();
     stop_all_samples ();
-    play_anim (cutscene_out_of_time_anim, NULL, 10);
+    play_anim (cutscene_out_of_time_anim, NULL);
     stop_video_effect ();
     stop_all_samples ();
     goto restart_game;

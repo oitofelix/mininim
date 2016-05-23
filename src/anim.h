@@ -22,8 +22,8 @@
 
 /* functions */
 void play_anim (void (*draw_callback) (void),
-                void (*compute_callback) (void),
-                int freq);
+                void (*compute_callback) (void));
+void ui_change_anim_freq (int f);
 
 
 int create_anim (struct anim *a0, enum anim_type t,
@@ -80,5 +80,7 @@ extern bool next_frame_inv; /* invert draw_anim offset interpretation  */
 extern bool cutscene; /* don't apply physics if set */
 extern uint64_t anim_cycle;
 extern ALLEGRO_EVENT_QUEUE *event_queue;
+extern ALLEGRO_TIMER *timer;
+extern int anim_freq;
 
 #endif	/* MININIM_ANIM_H */

@@ -25,6 +25,8 @@ bool pause_anim;
 bool cutscene;
 bool next_frame_inv;
 uint64_t anim_cycle;
+ALLEGRO_TIMER *timer;
+int anim_freq = SCRIPT_HZ;
 
 ALLEGRO_EVENT_QUEUE *event_queue;
 
@@ -33,8 +35,7 @@ size_t anima_nmemb;
 
 void
 play_anim (void (*draw_callback) (void),
-           void (*compute_callback) (void),
-           int freq)
+           void (*compute_callback) (void))
 {
   if (cutscene) set_multi_room (1, 1);
   else apply_mr_fit_mode ();
@@ -44,7 +45,7 @@ play_anim (void (*draw_callback) (void),
 
   acknowledge_resize ();
   ALLEGRO_EVENT event;
-  ALLEGRO_TIMER *timer = create_timer (1.0 / freq);
+  timer = create_timer (anim_freq > 0 ? 1.0 / anim_freq : -anim_freq + 2);
   if (! event_queue) event_queue = create_event_queue ();
   al_register_event_source (event_queue, get_display_event_source (display));
   al_register_event_source (event_queue, get_keyboard_event_source ());
@@ -199,6 +200,14 @@ play_anim (void (*draw_callback) (void),
       key = event;
 
       char *text = NULL;
+
+      /* (: decrease time frequency */
+      if (was_key_pressed (0, '(', -1, true))
+        ui_change_anim_freq (anim_freq - 1);
+
+      /* ): increase time frenquency */
+      if (was_key_pressed (0, ')', -1, true))
+        ui_change_anim_freq (anim_freq + 1);
 
       /* F8: enable/disable level editor */
       if (was_key_pressed (ALLEGRO_KEY_F8, 0, 0, true))
@@ -410,6 +419,18 @@ play_anim (void (*draw_callback) (void),
   }
 
   al_stop_timer (timer);
+}
+
+void
+ui_change_anim_freq (int f)
+{
+  char *text;
+  anim_freq = f;
+  al_set_timer_speed (timer, f > 0 ? 1.0 / f : -f + 2);
+  if (anim_freq > 0) xasprintf (&text, "TIME FREQ: %iHz", anim_freq);
+  else xasprintf (&text, "TIME FREQ: 1/%iHz", -anim_freq + 2);
+  draw_bottom_text (NULL, text, 0);
+  al_free (text);
 }
 
 
