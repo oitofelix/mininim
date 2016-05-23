@@ -23,9 +23,9 @@ bool force_full_redraw;
 ALLEGRO_DISPLAY *display;
 ALLEGRO_BITMAP *uscreen, *iscreen;
 ALLEGRO_TIMER *video_timer;
+uint64_t bottom_text_timer;
 int screen_flags = 0;
 bool hgc;
-ALLEGRO_TIMER *bottom_text_timer = NULL;
 bool is_display_focused = true;
 ALLEGRO_BITMAP *effect_buffer;
 ALLEGRO_BITMAP *black_screen;
@@ -90,8 +90,6 @@ init_video (void)
   clear_bitmap (uscreen, TRANSPARENT_COLOR);
 
   video_timer = create_timer (1.0 / EFFECT_HZ);
-
-  bottom_text_timer = create_timer (1.0 / SCRIPT_HZ);
 
   al_init_font_addon ();
   builtin_font = al_create_builtin_font ();
@@ -296,21 +294,19 @@ draw_bottom_text (ALLEGRO_BITMAP *bitmap, char *text, int priority)
   static int cur_priority = INT_MIN;
 
   if (bitmap == NULL && priority < cur_priority
-      && al_get_timer_count (bottom_text_timer) < BOTTOM_TEXT_DURATION)
+      && bottom_text_timer < BOTTOM_TEXT_DURATION)
     return;
 
   if (text) {
     if (current_text) al_free (current_text);
     xasprintf (&current_text, "%s", text);
-    al_set_timer_count (bottom_text_timer, 0);
-    al_start_timer (bottom_text_timer);
+    bottom_text_timer = 1;
     cur_priority = priority;
-  } else if ((al_get_timer_started (bottom_text_timer)
-              && al_get_timer_count (bottom_text_timer) >= BOTTOM_TEXT_DURATION)
+  } else if (bottom_text_timer > BOTTOM_TEXT_DURATION
              || ! bitmap) {
-    al_stop_timer (bottom_text_timer);
+    bottom_text_timer = 0;
     cur_priority = INT_MIN;
-  } else if (al_get_timer_started (bottom_text_timer)) {
+  } else if (bottom_text_timer) {
     ALLEGRO_COLOR bg_color;
 
     switch (vm) {

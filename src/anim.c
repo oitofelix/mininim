@@ -26,7 +26,7 @@ bool cutscene;
 bool next_frame_inv;
 uint64_t anim_cycle;
 ALLEGRO_TIMER *timer;
-int anim_freq = SCRIPT_HZ;
+int anim_freq = SCRIPT_HZ_DEFAULT;
 
 ALLEGRO_EVENT_QUEUE *event_queue;
 
@@ -117,6 +117,7 @@ play_anim (void (*draw_callback) (void),
           if (! game_paused) anim_cycle++;
         }
         if (! cutscene) editor ();
+        if (bottom_text_timer) bottom_text_timer++;
         draw_bottom_text (uscreen, NULL, 0);
         drop_all_events_from_source
           (event_queue, get_timer_event_source (timer));

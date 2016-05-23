@@ -886,12 +886,6 @@ display_skill (struct anim *k)
 static void
 draw_lives (ALLEGRO_BITMAP *bitmap, struct anim *k, enum vm vm)
 {
-  if ((al_get_timer_started (bottom_text_timer)
-       && al_get_timer_count (bottom_text_timer) < BOTTOM_TEXT_DURATION)
-      || game_paused
-      || edit != EDIT_NONE)
-    return;
-
   bool nrlc = no_recursive_links_continuity;
   no_recursive_links_continuity = true;
 
