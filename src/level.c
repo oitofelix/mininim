@@ -397,8 +397,8 @@ process_keys (void)
   }
 
   /* M: change multi-room fit mode */
-  if (was_key_pressed (ALLEGRO_KEY_M, 0, 0, true)
-      && ! active_menu) {
+  if (! active_menu &&
+      was_key_pressed (ALLEGRO_KEY_M, 0, 0, true)) {
     char *fit_str;
 
     switch (mr.fit_mode) {
