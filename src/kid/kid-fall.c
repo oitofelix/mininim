@@ -98,7 +98,7 @@ static bool
 physics_in (struct anim *k)
 {
   struct coord nc;
-  struct pos np, ptf, ptb, pbb, pbf, pmt,
+  struct pos np, pbb, pbf, pmt,
     npmbo, npmbo_nf;
   struct frame nf;
   struct frame_offset fo;
