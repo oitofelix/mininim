@@ -114,17 +114,17 @@ get_joystick_v_axis (void)
 void
 calibrate_joystick (void)
 {
-  al_reconfigure_joysticks();
+  al_reconfigure_joysticks ();
   joystick = al_get_joystick (0);
   if (joystick) {
     joystick_h_center = get_joystick_h_axis ();
     joystick_v_center = get_joystick_v_axis ();
     joystick_shift_released = get_joystick_button (joystick_shift_button);
-    joystick_up_released = get_joystick_button(joystick_up_button);
-    joystick_right_released = get_joystick_button(joystick_right_button);
-    joystick_down_released = get_joystick_button(joystick_down_button);
-    joystick_left_released = get_joystick_button(joystick_left_button);
-    joystick_enter_released = get_joystick_button(joystick_enter_button);
+    joystick_up_released = get_joystick_button (joystick_up_button);
+    joystick_right_released = get_joystick_button (joystick_right_button);
+    joystick_down_released = get_joystick_button (joystick_down_button);
+    joystick_left_released = get_joystick_button (joystick_left_button);
+    joystick_enter_released = get_joystick_button (joystick_enter_button);
   }
 }
 

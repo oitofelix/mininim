@@ -697,13 +697,20 @@ uncollide (struct frame *f, struct frame_offset *fo,
            struct frame_offset *_fo, int dx,
            int reverse, struct collision_info *ci)
 {
-  *_fo = *fo;
+  struct frame_offset fo0 = *fo;
+  struct frame_offset fo1 = *fo;
 
-  int inc = reverse ? -1 : +1;
+  /* int inc = reverse ? -1 : +1; */
 
-  while (is_colliding (f, _fo, dx, reverse, ci)
-         && abs (_fo->dx) <= PLACE_WIDTH)
-    _fo->dx += inc;
+  while (is_colliding (f, &fo0, dx, reverse, ci)
+         && abs (fo0.dx) <= PLACE_WIDTH)
+    fo0.dx++;
+
+  while (is_colliding (f, &fo1, dx, reverse, ci)
+         && abs (fo1.dx) <= PLACE_WIDTH)
+    fo1.dx--;
+
+  *_fo = (abs (fo0.dx) < abs (fo1.dx)) ? fo0 : fo1;
 
   return _fo;
 }
@@ -864,38 +871,40 @@ can_hang (struct frame *f, bool reverse, struct pos *hang_pos)
 
   nframe (&_f, &_f.c);
 
-  struct coord tf; _tf (&_f, &tf);
+  struct coord tb; _tb (&_f, &tb);
 
-  struct coord mf, m, mba;
-  struct pos pmf, npmf, pm, npm, pmba, npmba;
-  survey (_mf, pos, &_f, &mf, &pmf, &npmf);
-  survey (_m, pos, &_f, &m, &pm, &npm);
-  survey (_mba, pos, &_f, &mba, &pmba, &npmba);
+  struct coord bf, mbo, bb;
+  struct pos pbf, npbf, pmbo, npmbo, pbb, npbb, pbbb;
+  survey (_bf, pos, &_f, &bf, &pbf, &npbf);
+  survey (_mbo, pos, &_f, &mbo, &pmbo, &npmbo);
+  survey (_bb, pos, &_f, &bb, &pbb, &npbb);
+  prel (&pbb, &pbbb, +0, (_f.dir == LEFT) ? +1 : -1);
 
-  bool hmf = is_hangable_pos (&pmf, _f.dir);
-  bool hm = is_hangable_pos (&pm, _f.dir);
-  bool hmba = is_hangable_pos (&pmba, _f.dir);
+  bool hbf = is_hangable_pos (&pbf, _f.dir);
+  bool hmbo = is_hangable_pos (&pmbo, _f.dir);
+  bool hbb = is_hangable_pos (&pbb, _f.dir);
+  bool hbbb = is_hangable_pos (&pbbb, _f.dir);
 
-  if (! hmf && ! hm && ! hmba)
+  if (! hbf && ! hmbo && ! hbb && !hbbb)
     return false;
 
-  if (hmf) *hang_pos = pmf;
-  if (hm) *hang_pos = pm;
-  if (hmba) *hang_pos = pmba;
+  if (hbbb) *hang_pos = pbbb;
+  if (hbb) *hang_pos = pbb;
+  if (hmbo) *hang_pos = pmbo;
+  if (hbf) *hang_pos = pbf;
 
   pos2room (hang_pos, _f.c.room, hang_pos);
 
   /* for fall */
   struct coord ch;
-  int dir = (_f.dir == LEFT) ? 0 : 1;
-  ch.x = PLACE_WIDTH * (hang_pos->place + dir) + 7 + 8 * dir;
-  ch.y = PLACE_HEIGHT * hang_pos->floor - 6;
+  ch.x = PLACE_WIDTH * (hang_pos->place + 1) - 1;
+  ch.y = PLACE_HEIGHT * hang_pos->floor;
 
-  double d = dist_coord (&tf, &ch);
+  float d = dist_coord (&tb, &ch);
 
-  /* printf ("dist_coord = %f\n", d); */
+  if (! reverse) printf ("dist_coord = %f\n", d);
 
-  if (is_kid_fall (&_f) && d > 20) return false;
+  if (is_kid_fall (&_f) && d > 25) return false;
 
   return true;
 }

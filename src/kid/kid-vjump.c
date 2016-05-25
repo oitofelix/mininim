@@ -159,15 +159,17 @@ physics_in (struct anim *k)
 {
   struct coord nc, tf; struct pos np, ptf, ptr, pmt, pm, pmf, pmba;
 
+  survey (_m, pos, &k->f, &nc, &pm, &np);
+
   /* collision */
   if (is_colliding (&k->f, &k->fo, +0, false, &k->ci)
+      && pm.floor == k->ci.p.floor
       && (k->ci.t == MIRROR
           || ((k->ci.t == CARPET || k->ci.t == DOOR)
               && k->f.dir == RIGHT)))
-    k->f.c.x += (k->f.dir == LEFT) ? +4 : -4;
+    uncollide (&k->f, &k->fo, &k->fo, +0, false, &k->ci);
 
   /* fall */
-  survey (_m, pos, &k->f, &nc, &pm, &np);
   survey (_mf, pos, &k->f, &nc, &pmf, &np);
   survey (_mba, pos, &k->f, &nc, &pmba, &np);
   if (is_strictly_traversable (&pm)
@@ -184,7 +186,7 @@ physics_in (struct anim *k)
   struct pos pmta; prel (&pmt, &pmta, -1, 0);
   if (k->i == 12 && k->j == 1
       && (! is_strictly_traversable (&ptra)
-          || ! is_strictly_traversable (&pmta)))
+          && ! is_strictly_traversable (&pmta)))
     k->hit_ceiling = true;
 
   /* hang */

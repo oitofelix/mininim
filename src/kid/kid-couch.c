@@ -232,7 +232,7 @@ physics_in (struct anim *k)
   } else if (is_colliding (&k->f, &k->fo, +2, false, &k->ci)
              && k->ci.t == MIRROR) {
     if (k->i <= 2)
-      k->f.c.x += (k->f.dir == LEFT) ? +4 : -4;
+      uncollide (&k->f, &k->fo, &k->fo, +2, false, &k->ci);
     else {
       kid_stabilize_collision (k);
       return false;

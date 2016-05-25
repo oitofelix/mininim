@@ -700,8 +700,8 @@ process_keys (void)
   if (! active_menu
       && was_key_pressed (ALLEGRO_KEY_EQUALS, 0, ALLEGRO_KEYMOD_SHIFT, true)) {
     int t = time_limit - play_time;
-    int d = t > SEC2CYC (60) ? SEC2CYC (-60) : SEC2CYC (-1);
-    play_time += d;
+    int d = t > SEC2CYC (60) ? SEC2CYC (+60) : SEC2CYC (+1);
+    time_limit += d;
     display_remaining_time ();
   }
 
@@ -709,8 +709,8 @@ process_keys (void)
   if (! active_menu
       && was_key_pressed (ALLEGRO_KEY_MINUS, 0, 0, true)) {
     int t = time_limit - play_time;
-    int d = t > SEC2CYC (60) ? SEC2CYC (+60) : SEC2CYC (+1);
-    play_time += d;
+    int d = t > SEC2CYC (60) ? SEC2CYC (-60) : SEC2CYC (-1);
+    time_limit += d;
     display_remaining_time ();
   }
 

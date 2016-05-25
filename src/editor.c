@@ -1033,20 +1033,7 @@ editor (void)
     switch (menu_enum (kid_menu, "K>")) {
     case -1: case 1: edit = EDIT_MAIN; break;
     case 'P':
-      if (! is_valid_pos (&p)) {
-        editor_msg ("SELECT CONSTRUCTION", 12);
-        break;
-      }
-      k = get_anim_by_id (current_kid_id);
-      if (! k) {
-        editor_msg ("NO LIVE INSTANCE", 12);
-        break;
-      }
-      kid_resurrect (k);
-      place_frame (&k->f, &k->f, kid_normal_00, &p,
-                   k->f.dir == LEFT ? +22 : +28, +15);
-      kid_normal (k);
-      update_depressible_floor (k, -4, -10);
+      ui_place_kid (&p);
       break;
     case 'J':
       set_mouse_pos (&level.start_pos);
@@ -1631,4 +1618,23 @@ editor_msg (char *m, uint64_t cycles)
     msg = m;
   }
   draw_bottom_text (NULL, m, 0);
+}
+
+void
+ui_place_kid (struct pos *p)
+{
+  if (! is_valid_pos (p)) {
+    editor_msg ("SELECT CONSTRUCTION", 12);
+    return;
+  }
+  struct anim *k = get_anim_by_id (current_kid_id);
+  if (! k) {
+    editor_msg ("NO LIVE INSTANCE", 12);
+    return;
+  }
+  kid_resurrect (k);
+  place_frame (&k->f, &k->f, kid_normal_00, p,
+               k->f.dir == LEFT ? +22 : +28, +15);
+  kid_normal (k);
+  update_depressible_floor (k, -4, -10);
 }

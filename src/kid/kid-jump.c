@@ -115,7 +115,7 @@ flow (struct anim *k)
   struct coord nc; struct pos np, pm, ptf;
 
   if (k->oaction != kid_jump)
-    k->i = -1, k->misstep = k->hang = false;
+    k->i = -1, k->collision = k->misstep = k->hang = false;
 
   bool hang_front = ((k->f.dir == LEFT) ? k->key.left : k->key.right)
     && ! k->key.up && k->key.shift;
@@ -192,7 +192,8 @@ physics_in (struct anim *k)
   if ((is_strictly_traversable (&pbb)
        && is_strictly_traversable (&pmbo) && k->i < 7)
       || (k->i >= 10 && k->i < 13
-          && is_strictly_traversable (&pbf))
+          && is_strictly_traversable (&pbf)
+          && is_strictly_traversable (&pmbo))
       || (k->i >= 13 && is_strictly_traversable (&pmbo))) {
     kid_fall (k);
     return false;

@@ -34,6 +34,7 @@ void load_kid_fall (void);
 void unload_kid_fall (void);
 void kid_fall (struct anim *k);
 bool is_kid_fall (struct frame *f);
+void place_kid_in_initial_fall (struct anim *k);
 
 extern ALLEGRO_BITMAP *kid_fall_00, *kid_fall_01, *kid_fall_02,
   *kid_fall_03, *kid_fall_04;

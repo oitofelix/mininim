@@ -30,5 +30,6 @@ void enter_editor (void);
 void exit_editor (void);
 void enter_exit_editor (void);
 void editor_msg (char *m, uint64_t cycles);
+void ui_place_kid (struct pos *p);
 
 #endif	/* MININIM_EDITOR_H */

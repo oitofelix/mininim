@@ -673,6 +673,12 @@ draw_room_anim_fg_sub (ALLEGRO_BITMAP *bitmap,
       draw_confg_base (bitmap, &ptr, em, vm);
       draw_confg_left (bitmap, &ptr, em, vm, true);
     }
+
+    if (! peq (&ptl, &ptr) && ! peq (&ptl, &pbr)) {
+      draw_confg_base (bitmap, &ptl, em, vm);
+      draw_confg_left (bitmap, &ptl, em, vm, true);
+      draw_confg_right (bitmap, &ptl, em, vm, true);
+    }
   }
 
   /* CLIMBING STAIRS */

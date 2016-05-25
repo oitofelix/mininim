@@ -101,7 +101,7 @@ flow (struct anim *k)
   struct coord nc; struct pos np, pm, ptf;
 
   if (k->oaction != kid_run_jump)
-    k->i = -1, k->hang = false, k->crossing_mirror = false, k->sample = NULL;
+    k->i = -1, k->collision = k->hang = k->crossing_mirror = false, k->sample = NULL;
 
   bool hang_front = ((k->f.dir == LEFT) ? k->key.left : k->key.right)
     && ! k->key.up && k->key.shift;

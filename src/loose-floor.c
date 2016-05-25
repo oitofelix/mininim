@@ -252,7 +252,8 @@ void
 register_loose_floor (struct pos *p)
 {
   assert (con (p)->fg == LOOSE_FLOOR
-          && loose_floor_at_pos (p) == NULL);
+          && (loose_floor_at_pos (p) == NULL
+              || loose_floor_at_pos (p)->action == FALL_LOOSE_FLOOR));
 
   struct loose_floor l;
 

@@ -162,7 +162,7 @@ play_anim (void (*draw_callback) (void),
       case 1: enter_exit_editor (); break;
       case 3:
         if (edit != EDIT_NONE)
-          mr_center_room (mr.room);
+          ui_place_kid (&mouse_pos);
         break;
       default: break;
       }

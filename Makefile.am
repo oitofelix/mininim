@@ -105,7 +105,7 @@ mininim_SOURCES = src/mininim.c src/mininim.h src/constants.h					\
 ${mininim_OBJECTS}: ${top_builddir}/src/mininim.h.gch
 
 ${top_builddir}/src/mininim.h.gch: ${mininim_SOURCES:%.c=${srcdir}/%.h}
-	$(AM_V_CC) $(COMPILE) -o $@ -c $<
+	$(AM_V_CC) $(COMPILE) ${AM_CFLAGS} -o $@ -c $<
 
 CLEANFILES = ${top_builddir}/src/mininim.h.gch
 

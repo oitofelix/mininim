@@ -57,6 +57,8 @@ flow (struct anim *k)
   struct pos np, pbf, pmt;
   survey (_bf, pos, &k->f, &nc, &pbf, &np);
 
+  k->collision = false;
+
   bool turn = ((k->f.dir == RIGHT) && k->key.left)
     || ((k->f.dir == LEFT) && k->key.right);
   bool walk = ((k->f.dir == RIGHT) && k->key.right && k->key.shift)
