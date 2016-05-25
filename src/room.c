@@ -654,7 +654,7 @@ draw_room_anim_fg_sub (ALLEGRO_BITMAP *bitmap,
                        enum em em, enum vm vm, struct anim *a)
 {
   struct coord nc;
-  struct pos p, np, pbl, pbr, pm, ptl, ptr;
+  struct pos p, np, pbl, pbr, pm, ptl, ptr, pbr2, ptr2;
 
   struct frame *f = &a->f;
 
@@ -664,20 +664,29 @@ draw_room_anim_fg_sub (ALLEGRO_BITMAP *bitmap,
   survey (_tl, posf, f, &nc, &ptl, &np);
   survey (_tr, posf, f, &nc, &ptr, &np);
 
+  survey (_br, pos, f, &nc, &pbr2, &np);
+  survey (_tr, pos, f, &nc, &ptr2, &np);
+
   /* FALLING */
   if (is_anim_fall (f)) {
-    draw_confg_base (bitmap, &pbr, em, vm);
-    draw_confg_left (bitmap, &pbr, em, vm, true);
+    if (a->i < 2) {
+      draw_confg_base (bitmap, &pbr, em, vm);
+      draw_confg_left (bitmap, &pbr, em, vm, true);
+    }
 
     if (! peq (&pbr, &ptr)) {
       draw_confg_base (bitmap, &ptr, em, vm);
       draw_confg_left (bitmap, &ptr, em, vm, true);
     }
 
-    if (! peq (&ptl, &ptr) && ! peq (&ptl, &pbr)) {
-      draw_confg_base (bitmap, &ptl, em, vm);
-      draw_confg_left (bitmap, &ptl, em, vm, true);
-      draw_confg_right (bitmap, &ptl, em, vm, true);
+    if (! peq (&pbr2, &ptr2)) {
+      /* draw_confg_base (bitmap, &pbr2, em, vm); */
+      /* draw_confg_left (bitmap, &pbr2, em, vm, true); */
+      /* draw_confg_right (bitmap, &pbr2, em, vm, true); */
+
+      draw_confg_base (bitmap, &ptr2, em, vm);
+      draw_confg_left (bitmap, &ptr2, em, vm, true);
+      draw_confg_right (bitmap, &ptr2, em, vm, true);
     }
   }
 

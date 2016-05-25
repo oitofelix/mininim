@@ -120,44 +120,17 @@ physics_in (struct anim *k)
   if (k->oaction == kid_jump && k->j == 10) {
     k->fo.dx = -4;
     k->fo.dy = +8;
-  } else if (k->oaction == kid_jump)
-    k->fo.dx = -16;
-  else if (k->oaction == kid_run_jump && k->j == 10) {
+  } else if (k->oaction == kid_run_jump && k->j == 10) {
     k->fo.dx = -8;
     k->fo.dy = +4;
-  } else if (k->oaction == kid_run_jump)
-    k->fo.dx = -12;
-  else if (k->oaction == kid_normal)
-    k->fo.dx = -4;
-  else if (k->oaction == kid_turn_run)
+  } else if (k->oaction == kid_turn_run)
     k->fo.dx = +20;
-  else if (k->oaction == kid_walk) {
-    k->fo.dx = -8;
-    k->fo.dy = +4;
-  } else if (k->oaction == kid_start_run)
-    k->fo.dx = -18;
-  else if (k->oaction == kid_run)
-    k->fo.dx = -14;
-  else if (k->oaction == kid_stop_run)
-    k->fo.dx = -12;
-  else if (k->oaction == kid_take_sword)
-    k->fo.dx = -12;
-  else if (k->oaction == kid_sword_walkf)
-    k->fo.dx = -18;
-  else if (k->oaction == kid_sword_walkb)
-    k->fo.dx = +18;
-  else if (k->oaction == kid_sword_hit) {
-    place_kid_in_initial_fall (k);
-  } else if (k->oaction == kid_sword_normal) {
-    if (is_strictly_traversable (&pbf))
-      k->fo.dx = -18;
-    else if (is_strictly_traversable (&pbb))
-      k->fo.dx = +18;
-  } else if (k->oaction == kid_couch && ! k->collision)
-    k->fo.dx = -10;
   else if (k->collision) {
     k->collision = false;
     k->f.c.x += dir * 16;
+  } else if (k->i == 0) {
+    place_kid_in_initial_fall (k);
+    k->inertia = 0;
   }
 
   /* fall speed */
@@ -339,6 +312,6 @@ place_kid_in_initial_fall (struct anim *k)
   if (fall_pos.room != - 1)
     place_frame (&k->f, &k->f, kid_fall_frameset[0].frame,
                  &fall_pos,
-                 (k->f.dir == LEFT) ? +20 : +16,
-                 (k->f.dir == LEFT) ? 23 : 23);
+                 (k->f.dir == LEFT) ? +24 : +10,
+                 (k->f.dir == LEFT) ? 18 : 18);
 }

@@ -700,8 +700,6 @@ uncollide (struct frame *f, struct frame_offset *fo,
   struct frame_offset fo0 = *fo;
   struct frame_offset fo1 = *fo;
 
-  /* int inc = reverse ? -1 : +1; */
-
   while (is_colliding (f, &fo0, dx, reverse, ci)
          && abs (fo0.dx) <= PLACE_WIDTH)
     fo0.dx++;
@@ -902,9 +900,9 @@ can_hang (struct frame *f, bool reverse, struct pos *hang_pos)
 
   float d = dist_coord (&tb, &ch);
 
-  if (! reverse) printf ("dist_coord = %f\n", d);
+  /* if (! reverse) printf ("dist_coord = %f\n", d); */
 
-  if (is_kid_fall (&_f) && d > 25) return false;
+  if (is_kid_fall (&_f) && d > 16) return false;
 
   return true;
 }
