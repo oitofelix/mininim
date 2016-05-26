@@ -82,6 +82,17 @@ no)  optimizations=false ;;
 esac],[optimizations=false])
 AM_CONDITIONAL([OPTIMIZATIONS], [test x$optimizations = xtrue])
 
+# Profiling option
+AC_ARG_ENABLE([profiling],
+[AS_HELP_STRING([--enable-profiling], [Turn on profiling])],
+[case "${enableval}" in
+yes) profiling=true ;;
+no)  profiling=false ;;
+*) AC_MSG_ERROR([bad value ${enableval} for --enable-profiling]) ;;
+esac],[profiling=false])
+AM_CONDITIONAL([PROFILING], [test x$profiling = xtrue])
+
+
 
 
 ################################

@@ -131,6 +131,10 @@ if OPTIMIZATIONS
  CFLAGS += -O3 -march=native
 endif
 
+if PROFILING
+ CFLAGS += -O0 -pg --coverage
+endif
+
 LIBS = -lm ${ALLEGRO_LIBS} ${ALLEGRO_IMAGE_LIBS}										\
   ${ALLEGRO_AUDIO_LIBS} ${ALLEGRO_ACODEC_LIBS} ${ALLEGRO_FONT_LIBS}	\
   ${ALLEGRO_PRIMITIVES_LIBS} ${ALLEGRO_DIALOG_LIBS} ${mingw_ldadd}
