@@ -125,10 +125,12 @@ physics_in (struct anim *k)
     k->fo.dy = +4;
   } else if (k->oaction == kid_turn_run)
     k->fo.dx = +20;
-  else if (k->collision) {
+  else if (k->oaction == kid_couch && k->collision) {
     k->collision = false;
     k->f.c.x += dir * 16;
-  } else if (k->i == 0) {
+  } else if (k->i == 0
+             && k->oaction != kid_hang_free
+             && k->oaction != kid_hang_wall) {
     place_kid_in_initial_fall (k);
     k->inertia = 0;
   }
@@ -203,8 +205,7 @@ physics_in (struct anim *k)
   next_frame (&k->f, &nf, &fo);
   survey (_mbo, pos, &nf, &nc, &np, &npmbo_nf);
 
-  if (
-      /* k->i > 0 && */
+  if (k->i > 1 &&
       ! is_strictly_traversable (&npmbo)
       && npmbo.floor != npmbo_nf.floor) {
     k->inertia = k->cinertia = 0;

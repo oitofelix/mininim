@@ -654,7 +654,8 @@ draw_room_anim_fg_sub (ALLEGRO_BITMAP *bitmap,
                        enum em em, enum vm vm, struct anim *a)
 {
   struct coord nc;
-  struct pos p, np, pbl, pbr, pm, ptl, ptr, pbr2, ptr2;
+  struct pos p, np, pbl, pbr, pm, ptl, ptr,
+    ptl2, pbr2, ptr2;
 
   struct frame *f = &a->f;
 
@@ -665,6 +666,7 @@ draw_room_anim_fg_sub (ALLEGRO_BITMAP *bitmap,
   survey (_tr, posf, f, &nc, &ptr, &np);
 
   survey (_br, pos, f, &nc, &pbr2, &np);
+  survey (_tl, pos, f, &nc, &ptl2, &np);
   survey (_tr, pos, f, &nc, &ptr2, &np);
 
   /* FALLING */
@@ -680,10 +682,6 @@ draw_room_anim_fg_sub (ALLEGRO_BITMAP *bitmap,
     }
 
     if (! peq (&pbr2, &ptr2)) {
-      /* draw_confg_base (bitmap, &pbr2, em, vm); */
-      /* draw_confg_left (bitmap, &pbr2, em, vm, true); */
-      /* draw_confg_right (bitmap, &pbr2, em, vm, true); */
-
       draw_confg_base (bitmap, &ptr2, em, vm);
       draw_confg_left (bitmap, &ptr2, em, vm, true);
       draw_confg_right (bitmap, &ptr2, em, vm, true);
@@ -697,7 +695,12 @@ draw_room_anim_fg_sub (ALLEGRO_BITMAP *bitmap,
   if (is_kid_vjump_touching_above (f)) {
     if (! is_strictly_traversable (&ptl))
       draw_confg_no_top (bitmap, &ptl, em, vm, true);
-    if (! peq (&ptr, &ptl) && ! is_strictly_traversable (&ptr))
+
+    if (! peq (&ptl2, &ptl) && ! is_strictly_traversable (&ptl2))
+      draw_confg_no_top (bitmap, &ptl2, em, vm, true);
+
+    if (! peq (&ptr, &ptl) && ! peq (&ptr, &ptl2)
+        && ! is_strictly_traversable (&ptr))
       draw_confg_no_top (bitmap, &ptr, em, vm, true);
   }
 

@@ -101,7 +101,7 @@ flow (struct anim *k)
   struct coord nc; struct pos np, pm, ptf;
 
   if (k->oaction != kid_run_jump)
-    k->i = -1, k->collision = k->hang = k->crossing_mirror = false, k->sample = NULL;
+    k->i = -1, k->hang = k->crossing_mirror = false, k->sample = NULL;
 
   bool hang_front = ((k->f.dir == LEFT) ? k->key.left : k->key.right)
     && ! k->key.up && k->key.shift;
@@ -114,7 +114,7 @@ flow (struct anim *k)
   /* hang front */
   survey (_m, pos, &k->f, &nc, &pm, &np);
   survey (_tf, pos, &k->f, &nc, &ptf, &np);
-  if (hang_front && k->i >= 6  && k->i <= 9
+  if (hang_front && k->i >= 5  && k->i <= 9
       && (is_hangable_pos (&pm, k->f.dir)
           || is_hangable_pos (&ptf, k->f.dir))) {
     if (is_hangable_pos (&pm, k->f.dir)) k->hang_pos = pm;
@@ -128,7 +128,7 @@ flow (struct anim *k)
 
   /* hang back */
   survey (_tf, pos, &k->f, &nc, &ptf, &np);
-  if (k->i >= 6 && k->i <= 9
+  if (k->i >= 5 && k->i <= 9
       && hang_back && is_hangable_pos (&ptf, back_dir)) {
     k->hang_pos = ptf;
     pos2room (&k->hang_pos, k->f.c.room, &k->hang_pos);
@@ -220,7 +220,7 @@ bool
 is_kid_run_jump_running (struct frame *f)
 {
   int i;
-  for (i = 0; i < 5; i++)
+  for (i = 0; i < 4; i++)
     if (f->b == kid_run_jump_frameset[i].frame) return true;
   return false;
 }
