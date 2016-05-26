@@ -721,7 +721,8 @@ draw_room_anim_fg_sub (ALLEGRO_BITMAP *bitmap,
     if (! is_strictly_traversable (&ptl))
       draw_confg_no_top (bitmap, &ptl, em, vm, true);
 
-    if (! peq (&ptl2, &ptl) && ! is_strictly_traversable (&ptl2)) {
+    if (! peq (&ptl2, &ptl) && ! is_strictly_traversable (&ptl2)
+        && ! is_strictly_traversable (&ptl)) {
       draw_confg_base (bitmap, &ptl2, em, vm);
       draw_confg_right (bitmap, &ptl2, em, vm, true);
     }
@@ -772,9 +773,16 @@ draw_room_anim_fg_sub (ALLEGRO_BITMAP *bitmap,
   draw_room_frame_fg (bitmap, em, vm, f);
 
   /* xframe */
-  if (! a->xf.b) return;
-  struct frame xf; xframe_frame (&a->f, &a->xf, &xf);
-  draw_room_frame_fg (bitmap, em, vm, &xf);
+  if (a->xf.b) {
+    struct frame xf; xframe_frame (&a->f, &a->xf, &xf);
+    draw_room_frame_fg (bitmap, em, vm, &xf);
+  }
+
+  /* splash */
+  if (a->splash) {
+    struct frame sf; splash_frame (&a->f, &sf);
+    draw_room_frame_fg (bitmap, em, vm, &sf);
+  }
 }
 
 void

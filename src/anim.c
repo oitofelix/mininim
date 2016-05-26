@@ -838,6 +838,15 @@ xframe_frame (struct frame *f, struct frame_offset *xf, struct frame *nf)
   return nf;
 }
 
+struct frame *
+splash_frame (struct frame *f, struct frame *nf)
+{
+  *nf = *f;
+  nf->b = v_kid_splash;
+  splash_coord (f, &nf->c);
+  return nf;
+}
+
 void
 select_frame (struct anim *a, struct frameset *fs, int i)
 {

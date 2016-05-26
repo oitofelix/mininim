@@ -61,6 +61,7 @@ struct coord *xframe_coord (struct frame *f, struct frame_offset *xf,
                             struct coord *c);
 struct frame *xframe_frame (struct frame *f, struct frame_offset *xf,
                             struct frame *nf);
+struct frame *splash_frame (struct frame *f, struct frame *nf);
 struct frame *next_frame (struct frame *f, struct frame *nf,
                           struct frame_offset *fo);
 struct frame *prev_frame (struct frame *f, struct frame *pf);
