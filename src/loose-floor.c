@@ -629,10 +629,21 @@ draw_falling_loose_floor (ALLEGRO_BITMAP *bitmap, struct pos *p,
     if (vm == VGA) f.b = apply_hue_palette (f.b);
     if (hgc) f.b = apply_palette (f.b, hgc_palette);
     draw_frame (bitmap, &f);
+
+    int w = al_get_bitmap_width (f.b);
+    int h = al_get_bitmap_height (f.b);
+
+    set_target_bitmap (bitmap);
+    al_hold_bitmap_drawing (true);
+    al_set_clipping_rectangle (f.c.x, f.c.y, w, h);
+
     draw_confg_base (bitmap, &fptr, em, vm);
     draw_confg_left (bitmap, &fptr, em, vm, true);
     draw_confg_base (bitmap, &fpbr, em, vm);
     draw_confg_left (bitmap, &fpbr, em, vm, true);
+
+    al_hold_bitmap_drawing (false);
+    al_reset_clipping_rectangle ();
   } else return;
 }
 

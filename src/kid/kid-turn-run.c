@@ -116,9 +116,10 @@ physics_in (struct anim *k)
 
   /* collision */
   if (is_colliding (&k->f, &k->fo, +0, 2, &k->ci)) {
-    k->f.dir = (k->f.dir == LEFT) ? RIGHT : LEFT;
-    kid_stabilize_collision (k);
-    return false;
+    uncollide (&k->f, &k->fo, &k->fo, +0, 2, &k->ci);
+    /* k->f.dir = (k->f.dir == LEFT) ? RIGHT : LEFT; */
+    /* kid_stabilize_collision (k); */
+    /* return false; */
   }
 
   /* fall */

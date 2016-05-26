@@ -57,6 +57,8 @@ void draw_room_anim_fg (ALLEGRO_BITMAP *bitmap,
                         enum em em, enum vm vm, struct anim *a);
 void draw_confg_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
                     enum em em, enum vm vm, struct frame *f);
+void draw_room_frame_fg (ALLEGRO_BITMAP *bitmap, enum em em,
+                         enum vm vm, struct frame *f);
 /* void draw_room_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, */
 /*                    enum em em, enum vm vm, struct frame *f); */
 

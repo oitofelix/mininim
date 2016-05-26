@@ -110,7 +110,8 @@ flow (struct anim *k)
     if (is_strictly_traversable (prel (&k->hang_pos, &np, +0, dir))
         && k->i <= 4) {
       place_frame (&k->f, &k->f, kid_fall_frameset[0].frame,
-                   &k->hang_pos, (k->f.dir == LEFT) ? -16 : PLACE_WIDTH + 16, +12);
+                   &k->hang_pos, (k->f.dir == LEFT)
+                   ? -10 : PLACE_WIDTH + 10, +12);
       kid_fall (k);
       return false;
     }
