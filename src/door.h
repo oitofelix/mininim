@@ -95,6 +95,8 @@ void draw_door_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
                      enum em em, enum vm vm);
 void draw_door_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
                       enum em em, enum vm vm);
+void draw_door_top (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                    enum em em, enum vm vm);
 void draw_door_pole (ALLEGRO_BITMAP *bitmap, struct pos *p,
                      enum em em, enum vm vm);
 void draw_door_pole_base (ALLEGRO_BITMAP *bitmap, struct pos *p,

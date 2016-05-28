@@ -197,7 +197,7 @@ press_opener_floor (struct pos *p)
   if (! o) return;
   if (! o->pressed) {
     o->pressed = true;
-    register_changed_pos (p);
+    register_changed_pos (p, CHPOS_PRESS_OPENER_FLOOR);
   }
 }
 
@@ -220,7 +220,7 @@ unpress_opener_floors (void)
   for (i = 0; i < opener_floor_nmemb; i++)
     if (opener_floor[i].pressed) {
       opener_floor[i].pressed = false;
-      register_changed_pos (&opener_floor[i].p);
+      register_changed_pos (&opener_floor[i].p, CHPOS_UNPRESS_OPENER_FLOOR);
     }
 }
 

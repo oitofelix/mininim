@@ -454,7 +454,7 @@ draw_confg_top (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case BIG_PILLAR_BOTTOM: break;
   case BIG_PILLAR_TOP: draw_big_pillar_top_top (bitmap, p, em, vm); break;
   case WALL: draw_wall_top (bitmap, p, em, vm); break;
-  case DOOR: break;
+  case DOOR: draw_door_top (bitmap, p, em, vm); break;
   case LEVEL_DOOR: break;
   case CHOPPER: break;
   case ARCH_BOTTOM: break;

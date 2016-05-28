@@ -199,7 +199,7 @@ press_closer_floor (struct pos *p)
   if (c->broken) return;
   if (! c->pressed) {
     c->pressed = true;
-    register_changed_pos (p);
+    register_changed_pos (p, CHPOS_PRESS_CLOSER_FLOOR);
   }
 }
 
@@ -223,7 +223,7 @@ unpress_closer_floors (void)
   for (i = 0; i < closer_floor_nmemb; i++)
     if (closer_floor[i].pressed) {
       closer_floor[i].pressed = false;
-      register_changed_pos (&closer_floor[i].p);
+      register_changed_pos (&closer_floor[i].p, CHPOS_UNPRESS_CLOSER_FLOOR);
     }
 }
 

@@ -335,11 +335,11 @@ compute_loose_floors (void)
     switch (l->action) {
     case SHAKE_LOOSE_FLOOR:
       compute_loose_floor_shake (l);
-      register_changed_pos (&l->p);
+      register_changed_pos (&l->p, CHPOS_SHAKE_LOOSE_FLOOR);
       break;
     case RELEASE_LOOSE_FLOOR:
       compute_loose_floor_release (l);
-      register_changed_pos (&l->p);
+      register_changed_pos (&l->p, CHPOS_RELEASE_LOOSE_FLOOR);
       break;
     case FALL_LOOSE_FLOOR: compute_loose_floor_fall (l); break;
     default: break;

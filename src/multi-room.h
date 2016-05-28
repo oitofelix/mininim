@@ -61,9 +61,11 @@ bool mr_coord (int room0, enum dir dir, int *rx, int *ry);
 bool ui_set_multi_room (int dw, int dh);
 void update_room0_cache (enum em em, enum vm vm);
 void update_cache (enum em em, enum vm vm);
-void update_cache_pos (struct pos *p, enum em em, enum vm vm);
-void register_changed_pos (struct pos *p);
-struct pos *get_changed_pos (struct pos *p);
+void update_cache_pos (struct pos *p, enum changed_pos_reason reason,
+                       enum em em, enum vm vm);
+int c_changed_pos (struct changed_pos *cp0, struct changed_pos *cp1);
+void register_changed_pos (struct pos *p, enum changed_pos_reason reason);
+struct changed_pos *get_changed_pos (struct changed_pos *cp);
 void register_changed_room (int room);
 bool has_room_changed (int room);
 void mr_update_last_settings (void);

@@ -300,7 +300,7 @@ compute_doors (void)
         }
         d->i--;
         d->wait = DOOR_WAIT;
-        register_changed_pos (&d->p);
+        register_changed_pos (&d->p, CHPOS_OPEN_DOOR);
       }
       break;
     case CLOSE_DOOR:
@@ -310,7 +310,7 @@ compute_doors (void)
           play_sample (door_close_sample, d->p.room);
           d->i++;
           d->noise = false;
-          register_changed_pos (&d->p);
+          register_changed_pos (&d->p, CHPOS_CLOSE_DOOR);
         }
       } else if (d->i == DOOR_MAX_STEP) {
         play_sample (door_end_sample, d->p.room);
@@ -323,7 +323,7 @@ compute_doors (void)
       if (d->i < DOOR_MAX_STEP) {
         int r = 11 - (d->i % 12);
         d->i += r ? r : 12;
-        register_changed_pos (&d->p);
+        register_changed_pos (&d->p, CHPOS_ABRUPTLY_CLOSE_DOOR);
         if (d->i >= DOOR_MAX_STEP) {
           d->i = DOOR_MAX_STEP;
           alert_guards (&d->p);
@@ -509,6 +509,68 @@ draw_door_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
   draw_bitmapc (door_right, bitmap, door_right_coord (p, &c), 0);
   draw_bitmapc (door_top, bitmap, door_top_coord (p, &c), 0);
   draw_door_grid (bitmap, p, d->i, em, vm);
+}
+
+void
+draw_door_top (ALLEGRO_BITMAP *bitmap, struct pos *p,
+               enum em em, enum vm vm)
+{
+  ALLEGRO_BITMAP *door_top = NULL,
+    *door_grid = NULL;
+
+  switch (em) {
+  case DUNGEON:
+    switch (vm) {
+    case CGA:
+      door_top = dc_door_top;
+      door_grid = dc_door_grid;
+      break;
+    case EGA:
+      door_top = de_door_top;
+      door_grid = de_door_grid;
+      break;
+    case VGA:
+      door_top = dv_door_top;
+      door_grid = dv_door_grid;
+      break;
+    }
+    break;
+  case PALACE:
+    switch (vm) {
+    case CGA:
+      door_top = pc_door_top;
+      door_grid = pc_door_grid;
+      break;
+    case EGA:
+      door_top = pe_door_top;
+      door_grid = pe_door_grid;
+      break;
+    case VGA:
+      door_top = pv_door_top;
+      door_grid = pv_door_grid;
+      break;
+    }
+    break;
+  }
+
+  if (vm == VGA) {
+    door_top = apply_hue_palette (door_top);
+    door_grid = apply_hue_palette (door_grid);
+  }
+
+  if (hgc) {
+   door_top = apply_palette (door_top, hgc_palette);
+   door_grid = apply_palette (door_grid, hgc_palette);
+  }
+
+  if (peq (p, &mouse_pos)) {
+    door_top = apply_palette (door_top, selection_palette);
+    door_grid = apply_palette (door_grid, selection_palette);
+  }
+
+  struct coord c;
+  draw_bitmapc (door_top, bitmap, door_top_coord (p, &c), 0);
+  draw_bitmapc (door_grid, bitmap, door_grid_coord_base (p, &c), 0);
 }
 
 void

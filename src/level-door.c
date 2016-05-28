@@ -232,7 +232,7 @@ compute_level_doors (void)
       }
       if (d->i > 0) {
         d->i--;
-        register_changed_pos (&d->p);
+        register_changed_pos (&d->p, CHPOS_OPEN_LEVEL_DOOR);
       }
       else d->action = NO_LEVEL_DOOR_ACTION;
       break;
@@ -244,7 +244,7 @@ compute_level_doors (void)
       if (d->i < LEVEL_DOOR_MAX_STEP) {
         int r = 14 - (d->i % 15);
         d->i += r ? r : 15;
-        register_changed_pos (&d->p);
+        register_changed_pos (&d->p, CHPOS_CLOSE_LEVEL_DOOR);
         if (d->i >= LEVEL_DOOR_MAX_STEP) {
           d->i = LEVEL_DOOR_MAX_STEP;
           d->action = NO_LEVEL_DOOR_ACTION;
