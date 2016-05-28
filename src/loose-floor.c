@@ -634,7 +634,6 @@ draw_falling_loose_floor (ALLEGRO_BITMAP *bitmap, struct pos *p,
     int h = al_get_bitmap_height (f.b);
 
     set_target_bitmap (bitmap);
-    al_hold_bitmap_drawing (true);
     al_set_clipping_rectangle (f.c.x, f.c.y, w, h);
 
     draw_confg_base (bitmap, &fptr, em, vm);
@@ -642,7 +641,6 @@ draw_falling_loose_floor (ALLEGRO_BITMAP *bitmap, struct pos *p,
     draw_confg_base (bitmap, &fpbr, em, vm);
     draw_confg_left (bitmap, &fpbr, em, vm, true);
 
-    al_hold_bitmap_drawing (false);
     al_reset_clipping_rectangle ();
   } else return;
 }

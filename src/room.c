@@ -224,7 +224,6 @@ draw_room (ALLEGRO_BITMAP *bitmap, int room,
   p.room = room;
 
   set_target_bitmap (bitmap);
-  al_hold_bitmap_drawing (true);
 
   for (p.floor = FLOORS; p.floor >= -1; p.floor--)
     for (p.place = -1; p.place < PLACES; p.place++)
@@ -233,8 +232,6 @@ draw_room (ALLEGRO_BITMAP *bitmap, int room,
   for (p.floor = FLOORS; p.floor >= -1; p.floor--)
     for (p.place = -1; p.place <= PLACES; p.place++)
       draw_confg (bitmap, &p, em, vm, false);
-
-  al_hold_bitmap_drawing (false);
 }
 
 void
@@ -533,7 +530,6 @@ draw_room_frame_fg (ALLEGRO_BITMAP *bitmap, enum em em, enum vm vm,
   int h = al_get_bitmap_height (f->b);
 
   set_target_bitmap (bitmap);
-  al_hold_bitmap_drawing (true);
   al_set_clipping_rectangle (c.x, c.y, w, h);
 
   /* SPIKES FLOOR */
@@ -662,7 +658,6 @@ draw_room_frame_fg (ALLEGRO_BITMAP *bitmap, enum em em, enum vm vm,
   if (con (&ptl)->fg == TCARPET && ptl_p) draw_carpet_fg (bitmap, &ptl, f, em, vm);
   if (con (&ptr)->fg == TCARPET && ptr_p) draw_carpet_fg (bitmap, &ptr, f, em, vm);
 
-  al_hold_bitmap_drawing (false);
   al_reset_clipping_rectangle ();
 }
 
@@ -691,7 +686,6 @@ draw_room_anim_fg_sub (ALLEGRO_BITMAP *bitmap,
   survey (_tr, pos, f, &nc, &ptr2, &np);
 
   set_target_bitmap (bitmap);
-  al_hold_bitmap_drawing (true);
   al_set_clipping_rectangle (c.x, c.y, w, h);
 
   /* FALLING */
@@ -767,7 +761,6 @@ draw_room_anim_fg_sub (ALLEGRO_BITMAP *bitmap,
     }
   }
 
-  al_hold_bitmap_drawing (false);
   al_reset_clipping_rectangle ();
 
   draw_room_frame_fg (bitmap, em, vm, f);
