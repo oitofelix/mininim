@@ -576,6 +576,16 @@ struct spikes_floor {
   bool activate;
 };
 
+struct chopper {
+  struct pos p;
+  int i;
+  int wait;
+  bool blood;
+  bool activate;
+  bool inactive;
+  bool alert;
+};
+
 /********
  * UNDO *
  ********/

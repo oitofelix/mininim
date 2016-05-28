@@ -293,6 +293,7 @@ register_chopper (struct pos *p)
   c.blood = con (p)->ext.step & 0x80;
   c.inactive = (step > 0);
   c.alert = false;
+  c.activate = false;
 
   chopper =
     add_to_array (&c, 1, chopper, &chopper_nmemb, chopper_nmemb, sizeof (c));

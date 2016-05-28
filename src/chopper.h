@@ -99,17 +99,6 @@
 #define CHOPPER_BLOOD_03 "data/chopper/blood-03.png"
 #define CHOPPER_BLOOD_04 "data/chopper/blood-04.png"
 
-/* types */
-struct chopper {
-  struct pos p;
-  int i;
-  int wait;
-  bool blood;
-  bool activate;
-  bool inactive;
-  bool alert;
-};
-
 /* variables */
 extern struct chopper *chopper;
 extern size_t chopper_nmemb;
