@@ -172,7 +172,9 @@ uninstall-local:
 ACLOCAL_AMFLAGS = -I gnulib/m4 -I build-aux
 SUBDIRS = gnulib
 if !mingw_build
+if MAKEINFO
 SUBDIRS += doc
+endif
 endif
 EXTRA_DIST = ${top_level_doc} ChangeLog data
 

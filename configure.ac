@@ -245,83 +245,63 @@ AC_ARG_VAR([MAKEINFO], [Texinfo `makeinfo' program])
 
 ### Check for `makeinfo'.
 AC_PATH_PROG([MAKEINFO], [makeinfo])
+AM_CONDITIONAL([MAKEINFO], [test x$MAKEINFO = x])
 
+# Check for GNU Texinfo program `makeinfo'.
 
-AS_CASE([$host],
+### Define GNU Texinfo minimal version.
+m4_define([TEXINFO_MINVER], 5.1)
 
-# MinGW
-[*-*-mingw*],,
+# If GNU Texinfo was not found and you are not building from a VCS
+# checkout, warn the user about what the lack of that optional
+# dependence means.
+AS_IF([[test x$MAKEINFO = x]],
+  AC_MSG_WARN(
+[[GNU Texinfo not found.  It is required at least version ]]TEXINFO_MINVER.
+[[You can find it at https://gnu.org/software/texinfo/.]]
+[[It will not be possible to rebuild the Info documentation
+nor generate any other documentation format.]]))
 
-# Default
-  [
+### If `makeinfo' was found, test whether its version is at least
+### TEXINFO_MINVER.
+AS_IF([[test x$MAKEINFO != x]],
+  # Put `makeinfo' version in variable `texinfo_version'.
+  [[texinfo_version=`$MAKEINFO --version |
+      $SED -n '1s/^.* \(@<:@@<:@:digit:@:>@.@:>@*\)$/\1/p'`]]
 
-  # Check for GNU Texinfo program `makeinfo'.
+  # If `makeinfo' version is less than TEXINFO_VER, print an error
+  # message and abort when building from VCS checkout or warn the user
+  # otherwise.
+  AS_VERSION_COMPARE([[$texinfo_version]], TEXINFO_MINVER,
+    [AC_MSG_WARN(
+[[GNU Texinfo is too old.  It is required at least version ]]TEXINFO_MINVER.
+[[You can find it at https://gnu.org/software/texinfo/.]]
+[[It will not be possible to rebuild the Info documentation
+nor generate any other documentation format.]])]))
 
-  ### Define GNU Texinfo minimal version.
-  m4_define([TEXINFO_MINVER], 5.1)
+AM_MISSING_PROG([MAKEINFO], [makeinfo])
 
-  # Check for GNU Texinfo existence.  If not building from a VCS
-  # checkout, GNU Texinfo is not required.
-  AS_IF([[test x$MAKEINFO = x && test x$VCS = xy]],
-    AC_MSG_ERROR(
-  [[GNU Texinfo not found.  It is required at least version ]]TEXINFO_MINVER.
-  [[You can find it at https://gnu.org/software/texinfo/.]]))
+### Declare `HELP2MAN' as a precious variable.
+AC_ARG_VAR([HELP2MAN], ['help2man' program])
 
-  # If GNU Texinfo was not found and you are not building from a VCS
-  # checkout, warn the user about what the lack of that optional
-  # dependence means.
-  AS_IF([[test x$MAKEINFO = x]],
-    AC_MSG_WARN(
-  [[GNU Texinfo not found.  It is required at least version ]]TEXINFO_MINVER.
-  [[You can find it at https://gnu.org/software/texinfo/.]]
-  [[It will not be possible to rebuild the Info documentation
-  nor generate any other documentation format.]]))
+### Check for `help2man'.
+AC_PATH_PROG([HELP2MAN], [help2man])
+AM_CONDITIONAL([HELP2MAN], [test x$HELP2MAN = x])
 
-  ### If `makeinfo' was found, test whether its version is at least
-  ### TEXINFO_MINVER.
-  AS_IF([[test x$MAKEINFO != x]],
-    # Put `makeinfo' version in variable `texinfo_version'.
-    [[texinfo_version=`$MAKEINFO --version |
-        $SED -n '1s/^.* \(@<:@@<:@:digit:@:>@.@:>@*\)$/\1/p'`]]
+# Check for GNU help2man existence.  If not building from a VCS
+# checkout, it is not required.
+AS_IF([[test x$HELP2MAN = x]],
+  AC_MSG_WARN(
+[[GNU help2man not found.  You can get it at https://gnu.org/software/help2man/.]]))
 
-    # If `makeinfo' version is less than TEXINFO_VER, print an error
-    # message and abort when building from VCS checkout or warn the user
-    # otherwise.
-    AS_VERSION_COMPARE([[$texinfo_version]], TEXINFO_MINVER,
-      [AS_IF([test x$VCS = xy ],
-        AC_MSG_ERROR(
-  [[GNU Texinfo is too old.  It is required at least version ]]TEXINFO_MINVER.
-  [[You can find it at https://gnu.org/software/texinfo/.]]),
-        AC_MSG_WARN(
-  [[GNU Texinfo is too old.  It is required at least version ]]TEXINFO_MINVER.
-  [[You can find it at https://gnu.org/software/texinfo/.]]
-  [[It will not be possible to rebuild the Info documentation
-  nor generate any other documentation format.]]))]))
+# Check for GNU help2man existence.  It should only be used if not
+# cross-compiling.
+AS_IF([[test $cross_compiling = no]],
+  [AM_MISSING_PROG([HELP2MAN], [help2man])], HELP2MAN=:)
 
-  AM_MISSING_PROG([MAKEINFO], [makeinfo])
+# rsync is needed to fetch PO files from 'translationproject.org'.
+AM_MISSING_PROG([RSYNC], [rsync])
 
-
-  ### Declare `HELP2MAN' as a precious variable.
-  AC_ARG_VAR([HELP2MAN], ['help2man' program])
-
-  ### Check for `help2man'.
-  AC_PATH_PROG([HELP2MAN], [help2man])
-
-  # Check for GNU help2man existence.  If not building from a VCS
-  # checkout, it is not required.
-  AS_IF([[test x$HELP2MAN = x && test x$VCS = xy]],
-    AC_MSG_ERROR(
-  [[GNU help2man not found.  You can get it at https://gnu.org/software/help2man/.]]))
-
-  # Check for GNU help2man existence.  It should only be used if not
-  # cross-compiling.
-  AS_IF([[test $cross_compiling = no]],
-    [AM_MISSING_PROG([HELP2MAN], [help2man])], HELP2MAN=:)
-
-  # rsync is needed to fetch PO files from 'translationproject.org'.
-  AM_MISSING_PROG([RSYNC], [rsync])
-
-])
 
 
 

@@ -375,16 +375,19 @@ The development sources are available through VCS:
 @end display
 
 If you are getting the sources from the VCS (or change
-@file{configure.ac}), you'll need to have Automake, Autoconf and
-help2man installed to (re)build.
-
-Building from sources should be quite straightforward, provided you
-install the Allegro@tie{}5 development libraries using your distribution’s
-package manager.  If you use an apt based distribution (Debian, Ubuntu,
-@enddots{}) you can do this by invoking the command:
+@file{configure.ac}), you'll need to have @strong{Automake} and
+@strong{Autoconf} to (re)build the configuration script.  To build the
+binary @strong{GCC}, @strong{GNU Make}, @strong{gnulib}, and
+@strong{Allegro 5} (>= 5.0.9) development library are necessary as well.
+For building the documentation you'll need @strong{Texinfo}, @strong{TeX
+Live} and @strong{help2man}.  All these should be available from your
+distribution's package manager.  If you use an apt based distribution
+(Debian, Ubuntu, @enddots{}) you can do this by invoking the command:
 
 @example
-sudo apt-get install '^liballegro.*5-dev$'
+sudo apt-get install automake autoconf gcc make gnulib liballegro5-dev \
+liballegro-image5-dev liballegro-audio5-dev liballegro-acodec5-dev \
+liballegro-dialog5-dev texinfo texlive texlive-generic-recommended help2man
 @end example
 
 When building the sources, the usual incantation @code{./bootstrap &&

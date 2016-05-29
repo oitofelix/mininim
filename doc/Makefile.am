@@ -29,7 +29,9 @@ include ../documentation.am
 # Automake directives #
 #######################
 
+if HELP2MAN
 SUBDIRS = man
+endif
 
 TEXI2DVI := ${TEXI2DVI} ${texinfo_includes}
 
