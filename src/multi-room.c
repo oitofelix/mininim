@@ -700,6 +700,11 @@ update_cache_pos (struct pos *p, enum changed_pos_reason reason,
         switch (reason) {
         case CHPOS_MOUSE_SELECT:
         case CHPOS_MOUSE_DESELECT:
+          draw_conbg (mr.cell[x][y].cache, p, em, vm);
+
+          if (con (p)->fg == LEVEL_DOOR)
+            draw_confg (mr.cell[x][y].cache, &pl, em, vm, true);
+
           draw_confg (mr.cell[x][y].cache, p, em, vm, true);
           break;
         case CHPOS_OPEN_DOOR:
@@ -737,7 +742,8 @@ update_cache_pos (struct pos *p, enum changed_pos_reason reason,
 
           for (p0.floor = p->floor + 1; p0.floor >= p->floor - 1; p0.floor--)
             for (p0.place = p->place - 1; p0.place <= p->place + 1; p0.place++)
-              draw_confg (mr.cell[x][y].cache, &p0, em, vm, true);
+              draw_confg (mr.cell[x][y].cache, &p0, em, vm,
+                          p0.place == p->place + 1 || p0.floor == p->floor - 1);
 
           break;
         }
