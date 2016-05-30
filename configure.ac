@@ -245,7 +245,7 @@ AC_ARG_VAR([MAKEINFO], [Texinfo `makeinfo' program])
 
 ### Check for `makeinfo'.
 AC_PATH_PROG([MAKEINFO], [makeinfo])
-AM_CONDITIONAL([MAKEINFO], [test x$MAKEINFO = x])
+AM_CONDITIONAL([MAKEINFO], [test x$MAKEINFO != x])
 
 # Check for GNU Texinfo program `makeinfo'.
 
@@ -286,7 +286,7 @@ AC_ARG_VAR([HELP2MAN], ['help2man' program])
 
 ### Check for `help2man'.
 AC_PATH_PROG([HELP2MAN], [help2man])
-AM_CONDITIONAL([HELP2MAN], [test x$HELP2MAN = x])
+AM_CONDITIONAL([HELP2MAN], [test x$HELP2MAN != x])
 
 # Check for GNU help2man existence.  If not building from a VCS
 # checkout, it is not required.
