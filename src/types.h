@@ -513,6 +513,7 @@ struct closer_floor {
   struct pos p;
   int event;
   bool pressed;
+  bool prev_pressed;
   bool noise;
   bool broken;
   bool unresponsive;
@@ -564,6 +565,7 @@ struct opener_floor {
   struct pos p;
   int event;
   bool pressed;
+  bool prev_pressed;
   bool noise;
   bool broken;
 };

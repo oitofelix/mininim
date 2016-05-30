@@ -698,6 +698,10 @@ update_cache_pos (struct pos *p, enum changed_pos_reason reason,
         struct door *d;
 
         switch (reason) {
+        case CHPOS_MOUSE_SELECT:
+        case CHPOS_MOUSE_DESELECT:
+          draw_confg (mr.cell[x][y].cache, p, em, vm, true);
+          break;
         case CHPOS_OPEN_DOOR:
         case CHPOS_CLOSE_DOOR:
         case CHPOS_ABRUPTLY_CLOSE_DOOR:

@@ -197,9 +197,11 @@ press_closer_floor (struct pos *p)
   struct closer_floor *c = closer_floor_at_pos (p);
   if (! c) return;
   if (c->broken) return;
-  if (! c->pressed) {
-    c->pressed = true;
+  c->pressed = true;
+
+  if (! c->prev_pressed) {
     register_changed_pos (p, CHPOS_PRESS_CLOSER_FLOOR);
+    c->prev_pressed = true;
   }
 }
 
@@ -220,11 +222,16 @@ void
 unpress_closer_floors (void)
 {
   size_t i;
-  for (i = 0; i < closer_floor_nmemb; i++)
-    if (closer_floor[i].pressed) {
+  for (i = 0; i < closer_floor_nmemb; i++) {
+    if (closer_floor[i].prev_pressed !=
+        closer_floor[i].pressed)
+      register_changed_pos (&closer_floor[i].p,
+                            CHPOS_UNPRESS_CLOSER_FLOOR);
+
+      closer_floor[i].prev_pressed =
+        closer_floor[i].pressed;
       closer_floor[i].pressed = false;
-      register_changed_pos (&closer_floor[i].p, CHPOS_UNPRESS_CLOSER_FLOOR);
-    }
+  }
 }
 
 void
