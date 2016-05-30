@@ -74,15 +74,14 @@ unload_room (void)
   unload_mirror ();
 }
 
-struct rect
-new_rect (int room, int x, int y, int w, int h)
+struct rect *
+new_rect (struct rect *r, int room, int x, int y, int w, int h)
 {
-  struct rect r;
-  r.c.room = room;
-  r.c.x = x;
-  r.c.y = y;
-  r.w = w;
-  r.h = h;
+  r->c.room = room;
+  r->c.x = x;
+  r->c.y = y;
+  r->w = w;
+  r->h = h;
   return r;
 }
 
@@ -99,6 +98,17 @@ draw_filled_rect (ALLEGRO_BITMAP *to, struct rect *r,
 
   draw_filled_rectangle (to, nc.x, nc.y, nc.x + r->w - 1,
                          nc.y + r->h - 1, color);
+}
+
+void
+clear_rect_to_color (ALLEGRO_BITMAP *to, struct rect *r,
+                     ALLEGRO_COLOR color)
+{
+  int op, src, dst;
+  al_get_blender (&op, &src, &dst);
+  al_set_blender (ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ZERO);
+  draw_filled_rect (to, r, color);
+  al_set_blender (op, src, dst);
 }
 
 void
@@ -1160,9 +1170,10 @@ void
 draw_no_floor_selection (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   if (peq (p, &mouse_pos)) {
-    struct rect r = new_rect (p->room, p->place * PLACE_WIDTH + 25,
-                              p->floor * PLACE_HEIGHT - 13,
-                              PLACE_WIDTH, PLACE_HEIGHT);
+    struct rect r;
+    new_rect (&r, p->room, p->place * PLACE_WIDTH + 25,
+              p->floor * PLACE_HEIGHT - 13,
+              PLACE_WIDTH, PLACE_HEIGHT);
     draw_filled_rect (bitmap, &r, NO_FLOOR_SELECTION_COLOR);
   }
 }

@@ -694,10 +694,10 @@ draw_guard_lives (ALLEGRO_BITMAP *bitmap, struct anim *g, enum vm vm)
 
   int i;
   struct coord c;
-  struct rect r =
-    new_rect (room_view, ORIGINAL_WIDTH - 7 * current_lives,
-              ORIGINAL_HEIGHT - 8, 7 * current_lives,
-              ORIGINAL_HEIGHT - 1);
+  struct rect r;
+  new_rect (&r, room_view, ORIGINAL_WIDTH - 7 * current_lives,
+            ORIGINAL_HEIGHT - 8, 7 * current_lives,
+            ORIGINAL_HEIGHT - 1);
 
   ALLEGRO_COLOR bg_color;
 

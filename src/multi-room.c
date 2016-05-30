@@ -682,20 +682,10 @@ update_cache_pos (struct pos *p, enum changed_pos_reason reason,
 
   int x, y;
 
-  struct pos pbl; prel (p, &pbl, +1, -1);
+  struct pos p0;
+
   struct pos pb; prel (p, &pb, +1, +0);
-  struct pos pbr; prel (p, &pbr, +1, +1);
-
   struct pos pl; prel (p, &pl, +0, -1);
-  struct pos pr; prel (p, &pr, +0, +1);
-
-  struct pos pa; prel (p, &pa, -1, +0);
-  struct pos pal; prel (p, &pal, -1, -1);
-  struct pos par; prel (p, &par, -1, +1);
-
-  struct pos parr; prel (&par, &parr, +0, +1);
-  struct pos prr; prel (&pr, &prr, +0, +1);
-  struct pos pbrr; prel (&pbr, &pbrr, +0, +1);
 
   for (y = mr.h - 1; y >= 0; y--)
     for (x = 0; x < mr.w; x++)
@@ -704,8 +694,7 @@ update_cache_pos (struct pos *p, enum changed_pos_reason reason,
         mr.dx = x;
         mr.dy = y;
         con_caching = true;
-        set_target_bitmap (mr.cell[x][y].cache);
-        int cx, cy, cw, ch;
+        struct rect r;
         struct door *d;
 
         switch (reason) {
@@ -714,13 +703,13 @@ update_cache_pos (struct pos *p, enum changed_pos_reason reason,
         case CHPOS_ABRUPTLY_CLOSE_DOOR:
           d = door_at_pos (p);
 
-          cx = PLACE_WIDTH * (p->place + 1);
-          cy = PLACE_HEIGHT * p->floor - 6;
-          cw = 24;
-          ch = 18 + d->i + 1;
+          int ch = 18 + d->i + 1;
 
-          al_set_clipping_rectangle (cx, cy, cw, ch);
-          al_clear_to_color (TRANSPARENT_COLOR);
+          new_rect (&r, p->room,
+                    PLACE_WIDTH * (p->place + 1),
+                    PLACE_HEIGHT * p->floor - 6,
+                    24, ch);
+          clear_rect_to_color (mr.cell[x][y].cache, &r, TRANSPARENT_COLOR);
 
           draw_conbg (mr.cell[x][y].cache, p, em, vm);
 
@@ -730,52 +719,25 @@ update_cache_pos (struct pos *p, enum changed_pos_reason reason,
           draw_confg_right (mr.cell[x][y].cache, p, em, vm, true);
           break;
         default:
-          cx = PLACE_WIDTH * p->place;
-          cy = PLACE_HEIGHT * p->floor - 13;
-          cw = 2 * PLACE_WIDTH;
-          ch = PLACE_HEIGHT + 3 + 13;
+          new_rect (&r, p->room,
+                    PLACE_WIDTH * p->place,
+                    PLACE_HEIGHT * p->floor - 13,
+                    2 * PLACE_WIDTH, PLACE_HEIGHT + 3 + 13);
+          clear_rect_to_color (mr.cell[x][y].cache, &r, TRANSPARENT_COLOR);
 
-          al_set_clipping_rectangle (cx, cy, cw, ch);
-          al_clear_to_color (TRANSPARENT_COLOR);
+          p0.room = p->room;
 
-          draw_conbg (mr.cell[x][y].cache, &pbl, em, vm);
-          draw_conbg (mr.cell[x][y].cache, &pb, em, vm);
-          draw_conbg (mr.cell[x][y].cache, &pbr, em, vm);
+          for (p0.floor = p->floor + 1; p0.floor >= p->floor - 1; p0.floor--)
+            for (p0.place = p->place - 1; p0.place <= p->place + 1; p0.place++)
+              draw_conbg (mr.cell[x][y].cache, &p0, em, vm);
 
-          draw_conbg (mr.cell[x][y].cache, &pl, em, vm);
-          draw_conbg (mr.cell[x][y].cache, p, em, vm);
-          draw_conbg (mr.cell[x][y].cache, &pr, em, vm);
-
-          draw_conbg (mr.cell[x][y].cache, &pal, em, vm);
-          draw_conbg (mr.cell[x][y].cache, &pa, em, vm);
-          draw_conbg (mr.cell[x][y].cache, &par, em, vm);
-
-          draw_confg_right (mr.cell[x][y].cache, &pbl, em, vm, true);
-          draw_confg_top (mr.cell[x][y].cache, &pbl, em, vm, true);
-          draw_confg_right (mr.cell[x][y].cache, &pb, em, vm, true);
-          draw_confg_top (mr.cell[x][y].cache, &pb, em, vm, true);
-
-          draw_confg_right (mr.cell[x][y].cache, &pl, em, vm, false);
-          draw_confg_top (mr.cell[x][y].cache, &pl, em, vm, false);
-
-          draw_confg (mr.cell[x][y].cache, p, em, vm, true);
-
-          draw_confg_base (mr.cell[x][y].cache, &pr, em, vm);
-          draw_confg_left (mr.cell[x][y].cache, &pr, em, vm, true);
-
-          draw_confg_right (mr.cell[x][y].cache, &pal, em, vm, true);
-          draw_confg (mr.cell[x][y].cache, &pa, em, vm, true);
-          draw_confg_base (mr.cell[x][y].cache, &par, em, vm);
-          draw_confg_left (mr.cell[x][y].cache, &par, em, vm, false);
-
-          draw_confg_left (mr.cell[x][y].cache, &parr, em, vm, false);
-          draw_confg_left (mr.cell[x][y].cache, &prr, em, vm, false);
-          draw_confg_left (mr.cell[x][y].cache, &pbrr, em, vm, false);
+          for (p0.floor = p->floor + 1; p0.floor >= p->floor - 1; p0.floor--)
+            for (p0.place = p->place - 1; p0.place <= p->place + 1; p0.place++)
+              draw_confg (mr.cell[x][y].cache, &p0, em, vm, true);
 
           break;
         }
 
-        al_reset_clipping_rectangle ();
         con_caching = false;
         goto end;
       }

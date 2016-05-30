@@ -161,11 +161,9 @@ draw_mirror (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   /* make mirror black */
   struct rect r;
-  r.c.room = p->room;
-  r.c.x = PLACE_WIDTH * p->place + 2;
-  r.c.y = PLACE_HEIGHT * p->floor + 3;
-  r.w = PLACE_WIDTH - 10;
-  r.h = PLACE_HEIGHT - 16;
+  new_rect (&r, p->room, PLACE_WIDTH * p->place + 2,
+            PLACE_HEIGHT * p->floor + 3,
+            PLACE_WIDTH - 10, PLACE_HEIGHT - 16);
   draw_filled_rect (bitmap, &r, BLACK);
 
   /* draw floor reflex */
@@ -206,11 +204,9 @@ draw_mirror_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f,
 
   /* make mirror black */
   struct rect r;
-  r.c.room = p->room;
-  r.c.x = PLACE_WIDTH * p->place + 2;
-  r.c.y = PLACE_HEIGHT * p->floor + 3;
-  r.w = 13;
-  r.h = PLACE_HEIGHT - 16;
+  new_rect (&r, p->room, PLACE_WIDTH * p->place + 2,
+            PLACE_HEIGHT * p->floor + 3,
+            13, PLACE_HEIGHT - 16);
   draw_filled_rect (bitmap, &r, BLACK);
 
   /* draw floor reflex */
