@@ -410,6 +410,9 @@ compute_spikes_floors (void)
       /* remove_spikes_floor (s); i--; */
       continue;
     }
+
+    int state = s->state;
+
     switch (s->i) {
     case 0: if (should_spikes_raise (&s->p) || s->activate) {
         alert_guards (&s->p);
@@ -417,53 +420,42 @@ compute_spikes_floors (void)
         s->i++;
         s->wait = 12;
         s->state = 1;
-        register_changed_pos (&s->p, CHPOS_SPIKES);
-      } else if (s->state != 0) {
-        s->state = 0;
-        register_changed_pos (&s->p, CHPOS_SPIKES);
-      }
+      } else if (s->state != 0) s->state = 0;
       break;
     case 1:
       s->i++;
       s->state = 2;
-      register_changed_pos (&s->p, CHPOS_SPIKES);
       break;
     case 2:
       s->i++;
       s->state = 3;
-      register_changed_pos (&s->p, CHPOS_SPIKES);
       break;
     case 3:
       s->i++;
       s->state = 4;
-      register_changed_pos (&s->p, CHPOS_SPIKES);
       break;
     case 4: if (! should_spikes_raise (&s->p)) {
         if (s->wait-- == 0) {
           s->i++;
           s->state = 3;
-          register_changed_pos (&s->p, CHPOS_SPIKES);
-        } else {
-          s->state = 5;
-          register_changed_pos (&s->p, CHPOS_SPIKES);
-        }
+        } else s->state = 5;
       } else {
         s->state = 5;
-        register_changed_pos (&s->p, CHPOS_SPIKES);
       }
       break;
     case 5:
       s->i++;
       s->state = 2;
-      register_changed_pos (&s->p, CHPOS_SPIKES);
       break;
     case 6:
       s->i = 0;
       s->state = 1;
       s->activate = false;
-      register_changed_pos (&s->p, CHPOS_SPIKES);
       break;
     }
+
+    if (state != s->state)
+      register_changed_pos (&s->p, CHPOS_SPIKES);
 
     /* spike kid */
     for (j = 0; j < anima_nmemb; j++) {

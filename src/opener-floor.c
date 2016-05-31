@@ -212,7 +212,9 @@ break_opener_floor (struct pos *p)
   register_con_undo
     (&undo, p,
      MIGNORE, MIGNORE, -abs (con (p)->ext.event) - 1,
-     false, false, false, false, "LOOSE FLOOR BREAKING");
+     false, false, false, false,
+     CHPOS_BREAK_OPENER_FLOOR,
+     "LOOSE FLOOR BREAKING");
 }
 
 void
@@ -220,15 +222,21 @@ unpress_opener_floors (void)
 {
   size_t i;
   for (i = 0; i < opener_floor_nmemb; i++) {
-    if (opener_floor[i].prev_pressed !=
-        opener_floor[i].pressed)
-      register_changed_pos (&opener_floor[i].p,
-                            CHPOS_UNPRESS_OPENER_FLOOR);
-
     opener_floor[i].prev_pressed =
       opener_floor[i].pressed;
     opener_floor[i].pressed = false;
   }
+}
+
+void
+register_changed_opener_floors (void)
+{
+  size_t i;
+  for (i = 0; i < opener_floor_nmemb; i++)
+    if (opener_floor[i].prev_pressed !=
+        opener_floor[i].pressed)
+      register_changed_pos (&opener_floor[i].p,
+                            CHPOS_UNPRESS_OPENER_FLOOR);
 }
 
 void

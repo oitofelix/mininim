@@ -684,8 +684,15 @@ update_cache_pos (struct pos *p, enum changed_pos_reason reason,
 
   struct pos p0;
 
+  struct pos pbl; prel (p, &pbl, +1, -1);
   struct pos pb; prel (p, &pb, +1, +0);
+  struct pos pbr; prel (p, &pbr, +1, +1);
   struct pos pl; prel (p, &pl, +0, -1);
+  struct pos pr; prel (p, &pr, +0, +1);
+  struct pos par; prel (p, &par, -1, +1);
+
+  /* if (! recursive) */
+  /*   printf ("%i,%i,%i,%i\n", p->room, p->floor, p->place, reason); */
 
   for (y = mr.h - 1; y >= 0; y--)
     for (x = 0; x < mr.w; x++)
@@ -698,13 +705,69 @@ update_cache_pos (struct pos *p, enum changed_pos_reason reason,
         struct door *d;
 
         switch (reason) {
+        case CHPOS_NONE: break;
+        case CHPOS_UNHIDE_FLOOR:
         case CHPOS_MOUSE_SELECT:
         case CHPOS_MOUSE_DESELECT:
-          draw_conbg (mr.cell[x][y].cache, p, em, vm);
+          draw_conbg (mr.cell[x][y].cache, p, em, vm, true);
+          break;
+        case CHPOS_SHAKE_LOOSE_FLOOR:
+        case CHPOS_RELEASE_LOOSE_FLOOR:
+        /* case CHPOS_PRESS_OPENER_FLOOR: */
+        /* case CHPOS_UNPRESS_OPENER_FLOOR: */
 
-          if (con (p)->fg == LEVEL_DOOR)
-            draw_confg (mr.cell[x][y].cache, &pl, em, vm, true);
+        /* case CHPOS_PRESS_CLOSER_FLOOR: */
+        /* case CHPOS_UNPRESS_CLOSER_FLOOR: */
+          new_rect (&r, p->room,
+                    PLACE_WIDTH * p->place,
+                    PLACE_HEIGHT * p->floor + 49,
+                    57, 17);
+          clear_rect_to_color (mr.cell[x][y].cache, &r, TRANSPARENT_COLOR);
 
+          if (con (&pbl)->fg == LEVEL_DOOR || con (&pbl)->bg == BALCONY)
+            draw_conbg (mr.cell[x][y].cache, &pbl, em, vm, true);
+          if (con (&pb)->fg == LEVEL_DOOR || con (&pb)->bg == BALCONY)
+            draw_conbg (mr.cell[x][y].cache, &pb, em, vm, true);
+          if (con (&pbr)->fg == LEVEL_DOOR || con (&pbr)->bg == BALCONY)
+            draw_conbg (mr.cell[x][y].cache, &pbr, em, vm, true);
+
+          draw_conbg (mr.cell[x][y].cache, &pl, em, vm, true);
+          draw_conbg (mr.cell[x][y].cache, p, em, vm, true);
+
+          break;
+        case CHPOS_LOOSE_FLOOR_FALL:
+        case CHPOS_CHAIN_RELEASE_LOOSE_FLOOR:
+          new_rect (&r, p->room,
+                    PLACE_WIDTH * p->place,
+                    PLACE_HEIGHT * p->floor + 49,
+                    57, 17);
+          clear_rect_to_color (mr.cell[x][y].cache, &r, TRANSPARENT_COLOR);
+
+          if (con (&pbl)->fg == LEVEL_DOOR || con (&pbl)->bg == BALCONY)
+            draw_conbg (mr.cell[x][y].cache, &pbl, em, vm, true);
+          if (con (&pb)->fg == LEVEL_DOOR || con (&pb)->bg == BALCONY)
+            draw_conbg (mr.cell[x][y].cache, &pb, em, vm, true);
+          if (con (&pbr)->fg == LEVEL_DOOR || con (&pbr)->bg == BALCONY)
+            draw_conbg (mr.cell[x][y].cache, &pbr, em, vm, true);
+
+          draw_confg_top (mr.cell[x][y].cache, &pbl, em, vm, true);
+          draw_conbg (mr.cell[x][y].cache, &pl, em, vm, true);
+          draw_conbg (mr.cell[x][y].cache, p, em, vm, true);
+          draw_confg_base (mr.cell[x][y].cache, &pr, em, vm);
+          draw_confg_left (mr.cell[x][y].cache, &pr, em, vm, true);
+          break;
+        case CHPOS_BREAK_LOOSE_FLOOR:
+        case CHPOS_BREAK_OPENER_FLOOR:
+        case CHPOS_BREAK_CLOSER_FLOOR:
+        case CHPOS_BREAK_LEVEL_DOOR:
+          new_rect (&r, p->room,
+                    PLACE_WIDTH * p->place,
+                    PLACE_HEIGHT * p->floor + 50,
+                    57, 16);
+          clear_rect_to_color (mr.cell[x][y].cache, &r, TRANSPARENT_COLOR);
+
+          draw_confg_top (mr.cell[x][y].cache, &pb, em, vm, true);
+          draw_confg_right (mr.cell[x][y].cache, &pl, em, vm, true);
           draw_confg (mr.cell[x][y].cache, p, em, vm, true);
           break;
         case CHPOS_OPEN_DOOR:
@@ -720,30 +783,24 @@ update_cache_pos (struct pos *p, enum changed_pos_reason reason,
                     24, ch);
           clear_rect_to_color (mr.cell[x][y].cache, &r, TRANSPARENT_COLOR);
 
-          draw_conbg (mr.cell[x][y].cache, p, em, vm);
+          draw_conbg (mr.cell[x][y].cache, p, em, vm, true);
 
           if (ch > PLACE_HEIGHT - 3)
             draw_confg_top (mr.cell[x][y].cache, &pb, em, vm, true);
 
-          draw_confg_right (mr.cell[x][y].cache, p, em, vm, true);
           break;
         default:
           new_rect (&r, p->room,
-                    PLACE_WIDTH * p->place,
-                    PLACE_HEIGHT * p->floor - 13,
-                    2 * PLACE_WIDTH, PLACE_HEIGHT + 3 + 13);
+                    PLACE_WIDTH * p->place - 1,
+                    PLACE_HEIGHT * p->floor - 17,
+                    2 * PLACE_WIDTH + 1, PLACE_HEIGHT + 3 + 17);
           clear_rect_to_color (mr.cell[x][y].cache, &r, TRANSPARENT_COLOR);
 
           p0.room = p->room;
 
           for (p0.floor = p->floor + 1; p0.floor >= p->floor - 1; p0.floor--)
-            for (p0.place = p->place - 1; p0.place <= p->place + 1; p0.place++)
-              draw_conbg (mr.cell[x][y].cache, &p0, em, vm);
-
-          for (p0.floor = p->floor + 1; p0.floor >= p->floor - 1; p0.floor--)
-            for (p0.place = p->place - 1; p0.place <= p->place + 1; p0.place++)
-              draw_confg (mr.cell[x][y].cache, &p0, em, vm,
-                          p0.place == p->place + 1 || p0.floor == p->floor - 1);
+            for (p0.place = p->place - 2; p0.place <= p->place + 1; p0.place++)
+              draw_conbg (mr.cell[x][y].cache, &p0, em, vm, true);
 
           break;
         }

@@ -379,6 +379,9 @@ compute_level (void)
   compute_level_doors ();
   compute_choppers ();
 
+  register_changed_opener_floors ();
+  register_changed_closer_floors ();
+
   if (! play_time_stopped) play_time++;
 }
 

@@ -335,11 +335,9 @@ compute_loose_floors (void)
     switch (l->action) {
     case SHAKE_LOOSE_FLOOR:
       compute_loose_floor_shake (l);
-      register_changed_pos (&l->p, CHPOS_SHAKE_LOOSE_FLOOR);
       break;
     case RELEASE_LOOSE_FLOOR:
       compute_loose_floor_release (l);
-      register_changed_pos (&l->p, CHPOS_RELEASE_LOOSE_FLOOR);
       break;
     case FALL_LOOSE_FLOOR: compute_loose_floor_fall (l); break;
     default: break;
@@ -364,6 +362,8 @@ compute_loose_floors (void)
 void
 compute_loose_floor_shake (struct loose_floor *l)
 {
+  int prev_state = l->state;
+
   switch (l->i) {
   case 0: l->state = 1;
     /* alert_guards (&l->p); */
@@ -374,6 +374,9 @@ compute_loose_floor_shake (struct loose_floor *l)
   case 3: l->state = 0;
     l->action = NO_LOOSE_FLOOR_ACTION; l->i = 0; break;
   }
+
+  if (prev_state != l->state)
+    register_changed_pos (&l->p, CHPOS_SHAKE_LOOSE_FLOOR);
 }
 
 void
@@ -383,6 +386,9 @@ compute_loose_floor_release (struct loose_floor *l)
     l->state = 0;
     return;
   }
+
+  int prev_state = l->state;
+
   switch (l->i) {
   case 0: l->state = 1;
     alert_guards (&l->p);
@@ -402,6 +408,7 @@ compute_loose_floor_release (struct loose_floor *l)
     register_con_undo (&undo, &l->p,
                        NO_FLOOR, MIGNORE, MIGNORE,
                        false, false, false, false,
+                       CHPOS_LOOSE_FLOOR_FALL,
                        "LOOSE FLOOR RELEASE");
     l->state = 2;
     l->i = 0;
@@ -411,6 +418,9 @@ compute_loose_floor_release (struct loose_floor *l)
     l->f.b = get_correct_falling_loose_floor_bitmap (l->f.b);
     break;
   }
+
+  if (prev_state != l->state)
+    register_changed_pos (&l->p, CHPOS_RELEASE_LOOSE_FLOOR);
 }
 
 ALLEGRO_BITMAP *
@@ -554,6 +564,7 @@ compute_loose_floor_fall (struct loose_floor *l)
       register_con_undo (&undo, &p,
                          NO_FLOOR, MIGNORE, MIGNORE,
                          false, false, false, false,
+                         CHPOS_CHAIN_RELEASE_LOOSE_FLOOR,
                          "LOOSE FLOOR CHAIN RELEASE");
       must_sort = true;
       play_sample (broken_floor_sample, p.room);
@@ -575,6 +586,7 @@ compute_loose_floor_fall (struct loose_floor *l)
     register_con_undo (&undo, &p,
                        BROKEN_FLOOR, MIGNORE, MIGNORE,
                        false, false, false, false,
+                       CHPOS_BREAK_LOOSE_FLOOR,
                        "LOOSE FLOOR BREAKING");
   }
   shake_loose_floor_row (&p);

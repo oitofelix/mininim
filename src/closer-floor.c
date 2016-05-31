@@ -215,7 +215,9 @@ break_closer_floor (struct pos *p)
   register_con_undo
     (&undo, p,
      MIGNORE, MIGNORE, -abs (con (p)->ext.event) - 1,
-     false, false, false, false, "LOOSE FLOOR BREAKING");
+     false, false, false, false,
+     CHPOS_BREAK_CLOSER_FLOOR,
+     "LOOSE FLOOR BREAKING");
 }
 
 void
@@ -223,15 +225,21 @@ unpress_closer_floors (void)
 {
   size_t i;
   for (i = 0; i < closer_floor_nmemb; i++) {
+    closer_floor[i].prev_pressed =
+      closer_floor[i].pressed;
+    closer_floor[i].pressed = false;
+  }
+}
+
+void
+register_changed_closer_floors (void)
+{
+  size_t i;
+  for (i = 0; i < closer_floor_nmemb; i++)
     if (closer_floor[i].prev_pressed !=
         closer_floor[i].pressed)
       register_changed_pos (&closer_floor[i].p,
                             CHPOS_UNPRESS_CLOSER_FLOOR);
-
-      closer_floor[i].prev_pressed =
-        closer_floor[i].pressed;
-      closer_floor[i].pressed = false;
-  }
 }
 
 void

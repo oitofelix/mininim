@@ -130,6 +130,7 @@ legacy_level_start (void)
       register_con_undo (&undo, &plf,
                          NO_FLOOR, MIGNORE, MIGNORE,
                          true, true, false, true,
+                         CHPOS_LOOSE_FLOOR_FALL,
                          "NO FLOOR");
       k->f.dir = (k->f.dir == LEFT) ? RIGHT : LEFT;
       place_frame (&k->f, &k->f, kid_normal_00, &p,
@@ -205,7 +206,7 @@ legacy_level_special_events (void)
       register_con_undo (&undo, &skeleton_floor_pos,
                          FLOOR, MIGNORE, MIGNORE,
                          true, true, false, true,
-                         "FLOOR");
+                         -1, "FLOOR");
       skeleton_id = create_anim (NULL, SKELETON, &skeleton_floor_pos, LEFT);
       s = &anima[skeleton_id];
       get_legacy_skill (2, &s->skill);
@@ -246,7 +247,7 @@ legacy_level_special_events (void)
       register_con_undo (&undo, &mirror_pos,
                          MIRROR, MIGNORE, MIGNORE,
                          true, true, true, true,
-                         "MIRROR");
+                         -1, "MIRROR");
       play_sample (suspense_sample, -1);
     }
 

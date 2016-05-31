@@ -229,11 +229,9 @@ draw_room (ALLEGRO_BITMAP *bitmap, int room,
   struct pos p;
   p.room = room;
 
-  set_target_bitmap (bitmap);
-
   for (p.floor = FLOORS; p.floor >= -1; p.floor--)
     for (p.place = -1; p.place < PLACES; p.place++)
-      draw_conbg (bitmap, &p, em, vm);
+      draw_conbg (bitmap, &p, em, vm, false);
 
   for (p.floor = FLOORS; p.floor >= -1; p.floor--)
     for (p.place = -1; p.place <= PLACES; p.place++)
@@ -242,11 +240,12 @@ draw_room (ALLEGRO_BITMAP *bitmap, int room,
 
 void
 draw_conbg (ALLEGRO_BITMAP *bitmap, struct pos *p,
-            enum em em, enum vm vm)
+            enum em em, enum vm vm, bool redraw)
 {
   switch (con (p)->bg) {
   case NO_BG:
-    if (em == PALACE) draw_bricks_02 (bitmap, p, em, vm); break;
+    if (em == PALACE) draw_bricks_02 (bitmap, p, em, vm);
+    break;
   case BRICKS_00: draw_bricks_00 (bitmap, p, em, vm); break;
   case BRICKS_01: draw_bricks_01 (bitmap, p, em, vm); break;
   case BRICKS_02: draw_bricks_02 (bitmap, p, em, vm); break;
@@ -262,6 +261,28 @@ draw_conbg (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (con (p)->fg == LEVEL_DOOR)
     draw_level_door (bitmap, p, em, vm);
+
+  if (! redraw) return;
+
+  struct pos pr; prel (p, &pr, +0, +1);
+
+  if (con (&pr)->fg == LEVEL_DOOR || con (&pr)->bg == BALCONY)
+    draw_conbg (bitmap, &pr, em, vm, true);
+
+  draw_confg (bitmap, p, em, vm, true);
+  draw_confg_left (bitmap, &pr, em, vm, true);
+
+  if (con (p)->fg == LEVEL_DOOR || con (p)->bg == BALCONY) {
+    struct pos pal; prel (p, &pal, -1, -1);
+    struct pos pa; prel (p, &pa, -1, +0);
+    struct pos par; prel (p, &par, -1, +1);
+
+    draw_conbg (bitmap, &pal, em, vm, true);
+    draw_conbg (bitmap, &pa, em, vm, true);
+
+    draw_confg_base (bitmap, &par, em, vm);
+    draw_confg_left (bitmap, &par, em, vm, true);
+  }
 }
 
 void
@@ -286,7 +307,7 @@ draw_confg_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
                  enum em em, enum vm vm)
 {
   switch (con (p)->fg) {
-  case NO_FLOOR: break;
+  case NO_FLOOR: return;
   case FLOOR: draw_floor_base (bitmap, p, em, vm); break;
   case BROKEN_FLOOR: draw_floor_base (bitmap, p, em, vm); break;
   case SKELETON_FLOOR: draw_floor_base (bitmap, p, em, vm); break;
@@ -295,11 +316,10 @@ draw_confg_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case OPENER_FLOOR: draw_opener_floor_base (bitmap, p, em, vm); break;
   case CLOSER_FLOOR: draw_closer_floor_base (bitmap, p, em, vm); break;
   case STUCK_FLOOR: draw_pressed_closer_floor_base (bitmap, p, em, vm); break;
-  case HIDDEN_FLOOR:
-    if (peq (p, &mouse_pos)) draw_floor_base (bitmap, p, em, vm); break;
+  case HIDDEN_FLOOR: return;
   case PILLAR: draw_floor_base (bitmap, p, em, vm); break;
   case BIG_PILLAR_BOTTOM: draw_floor_base (bitmap, p, em, vm); break;
-  case BIG_PILLAR_TOP: break;
+  case BIG_PILLAR_TOP: return;
   case WALL:
     if (con_caching) draw_wall_base (bitmap, p, em, vm);
     else draw_wall_base_cache (bitmap, p);
@@ -308,10 +328,10 @@ draw_confg_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case LEVEL_DOOR: draw_floor_base (bitmap, p, em, vm); break;
   case CHOPPER: draw_floor_base (bitmap, p, em, vm); break;
   case ARCH_BOTTOM: draw_floor_base (bitmap, p, em, vm); break;
-  case ARCH_TOP_MID: break;
-  case ARCH_TOP_SMALL: break;
-  case ARCH_TOP_LEFT: break;
-  case ARCH_TOP_RIGHT: break;
+  case ARCH_TOP_MID: return;
+  case ARCH_TOP_SMALL: return;
+  case ARCH_TOP_LEFT: return;
+  case ARCH_TOP_RIGHT: return;
   case CARPET: draw_floor_base (bitmap, p, em, vm); break;
   case TCARPET: draw_door_pole_base (bitmap, p, em, vm); break;
   case MIRROR: draw_floor_base (bitmap, p, em, vm); break;
@@ -328,7 +348,7 @@ draw_confg_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
   struct pos pl; prel (p, &pl, +0, -1);
 
   switch (con (p)->fg) {
-  case NO_FLOOR: break;
+  case NO_FLOOR: return;
   case FLOOR: draw_floor_left (bitmap, p, em, vm); break;
   case BROKEN_FLOOR: draw_broken_floor_left (bitmap, p, em, vm); break;
   case SKELETON_FLOOR: draw_skeleton_floor_left (bitmap, p, em, vm); break;
@@ -337,8 +357,7 @@ draw_confg_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case OPENER_FLOOR: draw_opener_floor_left (bitmap, p, em, vm); break;
   case CLOSER_FLOOR: draw_closer_floor_left (bitmap, p, em, vm); break;
   case STUCK_FLOOR: draw_pressed_closer_floor_left (bitmap, p, em, vm); break;
-  case HIDDEN_FLOOR:
-    if (peq (p, &mouse_pos)) draw_floor_left (bitmap, p, em, vm); break;
+  case HIDDEN_FLOOR: return;
   case PILLAR: draw_pillar_left (bitmap, p, em, vm); break;
   case BIG_PILLAR_BOTTOM:
     draw_big_pillar_bottom_left (bitmap, p, em, vm); break;
@@ -390,7 +409,7 @@ draw_confg_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
                   enum em em, enum vm vm, bool redraw)
 {
   switch (con (p)->fg) {
-  case NO_FLOOR: break;
+  case NO_FLOOR: return;
   case FLOOR: draw_floor_right (bitmap, p, em, vm); break;
   case BROKEN_FLOOR: draw_broken_floor_right (bitmap, p, em, vm); break;
   case SKELETON_FLOOR: draw_skeleton_floor_right (bitmap, p, em, vm); break;
@@ -399,8 +418,7 @@ draw_confg_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case OPENER_FLOOR: draw_opener_floor_right (bitmap, p, em, vm); break;
   case CLOSER_FLOOR: draw_closer_floor_right (bitmap, p, em, vm); break;
   case STUCK_FLOOR: draw_pressed_closer_floor_right (bitmap, p, em, vm); break;
-  case HIDDEN_FLOOR:
-    if (peq (p, &mouse_pos)) draw_floor_right (bitmap, p, em, vm); break;
+  case HIDDEN_FLOOR: return;
   case PILLAR: draw_pillar_right (bitmap, p, em, vm); break;
   case BIG_PILLAR_BOTTOM:
     draw_big_pillar_bottom_right (bitmap, p, em, vm); break;
@@ -411,10 +429,10 @@ draw_confg_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case LEVEL_DOOR: draw_level_door_right (bitmap, p, em, vm); break;
   case CHOPPER: draw_floor_right (bitmap, p, em, vm); break;
   case ARCH_BOTTOM: draw_floor_right (bitmap, p, em, vm); break;
-  case ARCH_TOP_MID: break;
-  case ARCH_TOP_SMALL: break;
-  case ARCH_TOP_LEFT: break;
-  case ARCH_TOP_RIGHT: break;
+  case ARCH_TOP_MID: return;
+  case ARCH_TOP_SMALL: return;
+  case ARCH_TOP_LEFT: return;
+  case ARCH_TOP_RIGHT: return;
   case CARPET: draw_carpet_right (bitmap, p, em, vm); break;
   case TCARPET: draw_carpet_right (bitmap, p, em, vm); break;
   case MIRROR: draw_floor_right (bitmap, p, em, vm); break;
@@ -443,31 +461,31 @@ draw_confg_top (ALLEGRO_BITMAP *bitmap, struct pos *p,
                 enum em em, enum vm vm, bool redraw)
 {
   switch (con (p)->fg) {
-  case NO_FLOOR: break;
-  case FLOOR: break;
-  case BROKEN_FLOOR: break;
-  case SKELETON_FLOOR: break;
-  case LOOSE_FLOOR: break;
-  case SPIKES_FLOOR: break;
-  case OPENER_FLOOR: break;
-  case CLOSER_FLOOR: break;
-  case STUCK_FLOOR: break;
-  case HIDDEN_FLOOR: break;
+  case NO_FLOOR: return;
+  case FLOOR: return;
+  case BROKEN_FLOOR: return;
+  case SKELETON_FLOOR: return;
+  case LOOSE_FLOOR: return;
+  case SPIKES_FLOOR: return;
+  case OPENER_FLOOR: return;
+  case CLOSER_FLOOR: return;
+  case STUCK_FLOOR: return;
+  case HIDDEN_FLOOR: return;
   case PILLAR: draw_pillar_top (bitmap, p, em, vm); break;
-  case BIG_PILLAR_BOTTOM: break;
+  case BIG_PILLAR_BOTTOM: return;
   case BIG_PILLAR_TOP: draw_big_pillar_top_top (bitmap, p, em, vm); break;
   case WALL: draw_wall_top (bitmap, p, em, vm); break;
   case DOOR: draw_door_top (bitmap, p, em, vm); break;
-  case LEVEL_DOOR: break;
-  case CHOPPER: break;
-  case ARCH_BOTTOM: break;
-  case ARCH_TOP_MID: break;
-  case ARCH_TOP_SMALL: break;
-  case ARCH_TOP_LEFT: break;
-  case ARCH_TOP_RIGHT: break;
+  case LEVEL_DOOR: return;
+  case CHOPPER: return;
+  case ARCH_BOTTOM: return;
+  case ARCH_TOP_MID: return;
+  case ARCH_TOP_SMALL: return;
+  case ARCH_TOP_LEFT: return;
+  case ARCH_TOP_RIGHT: return;
   case CARPET: draw_carpet_top (bitmap, p, em, vm); break;
   case TCARPET: draw_carpet_top (bitmap, p, em, vm); break;
-  case MIRROR: break;
+  case MIRROR: return;
   default:
     error (-1, 0, "%s: unknown foreground (%i)",
            __func__, con (p)->fg);
@@ -475,41 +493,14 @@ draw_confg_top (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (! redraw) return;
 
-  struct pos pa, par;
-  prel (p, &pa, -1, +0);
-  prel (p, &par, -1, +1);
+  struct pos pa; prel (p, &pa, -1, +0);
+  struct pos par; prel (p, &par, -1, +1);
 
   draw_confg_base (bitmap, &pa, em, vm);
   draw_confg_right (bitmap, &pa, em, vm, true);
 
-  if (con (&pa)->fg == WALL
-      && (wall_correlation (&pa) == SWW
-          || wall_correlation (&pa) == WWW)) {
-    draw_confg_base (bitmap, &par, em, vm);
-    draw_confg_left (bitmap, &par, em, vm, true);
-  }
-
-  /* struct pos pa, par; */
-  /* prel (p, &pa, -1, +0); */
-  /* prel (p, &par, -1, +1); */
-
-  /* above */
-  /* switch (con (p)->fg) { */
-  /* case PILLAR: case WALL: case DOOR: */
-  /* draw_confg_base (bitmap, &pa, em, vm); */
-  /* draw_confg_right (bitmap, &pa, em, vm, true); */
-  /*   break; */
-  /* default: break; */
-  /* } */
-
-  /* /\* above right *\/ */
-  /* switch (con (p)->fg) { */
-  /* case DOOR: case CARPET: case TCARPET: */
-  /*   draw_confg_base (bitmap, &par, em, vm); */
-  /*   draw_confg_left (bitmap, &par, em, vm, true); */
-  /*   break; */
-  /* default: break; */
-  /* } */
+  draw_confg_base (bitmap, &par, em, vm);
+  draw_confg_left (bitmap, &par, em, vm, true);
 }
 
 void
@@ -696,10 +687,8 @@ draw_room_anim_fg_sub (ALLEGRO_BITMAP *bitmap,
 
   /* FALLING */
   if (is_anim_fall (f)) {
-    if (a->i < 2) {
-      draw_confg_base (bitmap, &pbr, em, vm);
-      draw_confg_left (bitmap, &pbr, em, vm, true);
-    }
+    draw_confg_base (bitmap, &pbr, em, vm);
+    draw_confg_left (bitmap, &pbr, em, vm, true);
 
     if (! peq (&pbr, &ptr)) {
       draw_confg_base (bitmap, &ptr, em, vm);
@@ -869,16 +858,16 @@ draw_confg_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
                enum em em, enum vm vm, struct frame *f)
 {
   switch (con (p)->fg) {
-  case NO_FLOOR: break;
-  case FLOOR: break;
+  case NO_FLOOR: return;
+  case FLOOR: return;
   case BROKEN_FLOOR: draw_broken_floor_fg (bitmap, p, em, vm); break;
-  case SKELETON_FLOOR: break;
-  case LOOSE_FLOOR: break;
+  case SKELETON_FLOOR: return;
+  case LOOSE_FLOOR: return;
   case SPIKES_FLOOR: draw_spikes_fg (bitmap, p, em, vm); break;
   case OPENER_FLOOR: draw_opener_floor_fg (bitmap, p, em, vm); break;
   case CLOSER_FLOOR: draw_closer_floor_fg (bitmap, p, em, vm); break;
-  case STUCK_FLOOR: break;
-  case HIDDEN_FLOOR: break;
+  case STUCK_FLOOR: return;
+  case HIDDEN_FLOOR: return;
   case PILLAR: draw_pillar_fg (bitmap, p, em, vm); break;
   case BIG_PILLAR_BOTTOM:
     draw_big_pillar_bottom_fg (bitmap, p, em, vm); break;

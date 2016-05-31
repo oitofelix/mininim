@@ -316,7 +316,7 @@ editor (void)
       register_con_undo (&undo, &p,
                          NO_FLOOR, NO_BG, NO_ITEM,
                          true, false, false, true,
-                         "CLEAR CON");
+                         -1, "CLEAR CON");
       break;
     case 'R':
       register_con_undo (&undo, &p,
@@ -324,7 +324,7 @@ editor (void)
                          prandom (BALCONY),
                          0,
                          true, true, true, true,
-                         "RANDOM CON");
+                         -1, "RANDOM CON");
       break;
     case 'H': edit = EDIT_CON_EXCHANGE; break;
     case 'C':
@@ -334,7 +334,7 @@ editor (void)
     case 'P':
       register_con_undo (&undo, &p,
                          con_copy.fg, con_copy.bg, con_copy.ext.step,
-                         true, true, true, true, "PASTE CON");
+                         true, true, true, true, -1, "PASTE CON");
       break;
     }
     break;
@@ -378,7 +378,7 @@ editor (void)
       register_con_undo (&undo, &p,
                          WALL, MIGNORE, MIGNORE,
                          true, false, true, true,
-                         "WALL");
+                         -1, "WALL");
       break;
     case 'D': edit = EDIT_DOOR; break;
     case 'C':
@@ -386,14 +386,14 @@ editor (void)
       register_con_undo (&undo, &p,
                          CHOPPER, MIGNORE, MIGNORE,
                          true, true, true, true,
-                         "CHOPPER");
+                         -1, "CHOPPER");
       break;
     case 'M':
       if (con (&p)->fg == MIRROR) break;
       register_con_undo (&undo, &p,
                          MIRROR, MIGNORE, MIGNORE,
                          true, true, true, true,
-                         "MIRROR");
+                         -1, "MIRROR");
       break;
     case 'R': edit = EDIT_CARPET; break;
     case 'A': edit = EDIT_ARCH; break;
@@ -435,7 +435,7 @@ editor (void)
     register_con_undo (&undo, &p,
                        fg, MIGNORE, MIGNORE,
                        true, true, false, true,
-                       get_confg_name (fg));
+                       -1, get_confg_name (fg));
     break;
   case EDIT_PILLAR:
     if (! is_valid_pos (&p)) {
@@ -461,7 +461,7 @@ editor (void)
     register_con_undo (&undo, &p,
                        fg, MIGNORE, MIGNORE,
                        true, false, false, true,
-                       get_confg_name (fg));
+                       -1, get_confg_name (fg));
     break;
   case EDIT_DOOR:
     if (! is_valid_pos (&p)) {
@@ -489,7 +489,7 @@ editor (void)
     register_con_undo (&undo, &p,
                        fg, MIGNORE, MIGNORE,
                        true, true, false, true,
-                       get_confg_name (fg));
+                       -1, get_confg_name (fg));
     break;
   case EDIT_CARPET:
     if (! is_valid_pos (&p)) {
@@ -513,7 +513,7 @@ editor (void)
     register_con_undo (&undo, &p,
                        fg, MIGNORE, MIGNORE,
                        true, false, false, true,
-                       get_confg_name (fg));
+                       -1, get_confg_name (fg));
     break;
   case EDIT_ARCH:
     if (! is_valid_pos (&p)) {
@@ -539,7 +539,7 @@ editor (void)
     register_con_undo (&undo, &p,
                        fg, MIGNORE, MIGNORE,
                        true, false, false, true,
-                       get_confg_name (fg));
+                       -1, get_confg_name (fg));
     break;
   case EDIT_BG:
     if (! is_valid_pos (&p)) {
@@ -570,7 +570,7 @@ editor (void)
     register_con_undo (&undo, &p,
                        MIGNORE, bg, MIGNORE,
                        false, false, (bg == BALCONY), true,
-                       get_conbg_name (bg));
+                       -1, get_conbg_name (bg));
     break;
   case EDIT_EXT:
     if (! is_valid_pos (&p)) {
@@ -605,7 +605,7 @@ editor (void)
       register_con_undo (&undo, &p,
                          MIGNORE, MIGNORE, ext.item,
                          false, false, false, true,
-                         get_item_name (ext.item));
+                         CHPOS_NONE, get_item_name (ext.item));
       break;
     case LOOSE_FLOOR:
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
@@ -620,7 +620,7 @@ editor (void)
       register_con_undo (&undo, &p,
                          MIGNORE, MIGNORE, b0,
                          true, true, false, true,
-                         "CAN'T FALL EXTENSION");
+                         CHPOS_NONE, "CAN'T FALL EXTENSION");
       break;
     case SPIKES_FLOOR:
       menu_step_ext (&p, 0, SPIKES_FLOOR_MAX_STEP);
@@ -653,7 +653,7 @@ editor (void)
       register_con_undo (&undo, &p,
                          MIGNORE, MIGNORE, b ? r | 0x80 : r & ~ 0x80,
                          true, true, false, true,
-                         "STEP EXTENSION");
+                         CHPOS_CHOPPER, "STEP EXTENSION");
       break;
     case CARPET:
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
@@ -673,7 +673,7 @@ editor (void)
       register_con_undo (&undo, &p,
                          MIGNORE, MIGNORE, ext.design,
                          false, false, false, true,
-                         "DESIGN EXTENSION");
+                         CHPOS_CARPET_DESIGN, "DESIGN EXTENSION");
       break;
     case TCARPET:
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
@@ -695,7 +695,7 @@ editor (void)
       register_con_undo (&undo, &p,
                          MIGNORE, MIGNORE, ext.design,
                          false, false, false, true,
-                         "DESIGN EXTENSION");
+                         CHPOS_CARPET_DESIGN, "DESIGN EXTENSION");
       break;
     default:
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
@@ -1488,7 +1488,7 @@ menu_step_ext (struct pos *p, int min, int max)
   register_con_undo (&undo, p,
                      MIGNORE, MIGNORE, r,
                      true, true, false, true,
-                     "STEP EXTENSION");
+                     CHPOS_STEP, "STEP EXTENSION");
   return c;
 }
 
@@ -1507,7 +1507,7 @@ menu_event_ext (struct pos *p)
   register_con_undo (&undo, p,
                      MIGNORE, MIGNORE, r,
                      true, true, false, true,
-                     "EVENT EXTENSION");
+                     CHPOS_NONE, "EVENT EXTENSION");
   return c;
 }
 

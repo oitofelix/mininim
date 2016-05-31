@@ -65,6 +65,7 @@ void remove_opener_floor (struct opener_floor *o);
 void press_opener_floor (struct pos *p);
 void break_opener_floor (struct pos *p);
 void unpress_opener_floors (void);
+void register_changed_opener_floors (void);
 void compute_opener_floors (void);
 void draw_opener_floor (ALLEGRO_BITMAP *bitmap, struct pos *p,
                         enum em em, enum vm vm);

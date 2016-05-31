@@ -210,7 +210,9 @@ break_level_door (struct pos *p)
   register_con_undo
     (&undo, p,
      MIGNORE, MIGNORE, -abs (con (p)->ext.step) - 1,
-     false, false, false, false, "LOOSE FLOOR BREAKING");
+     false, false, false, false,
+     CHPOS_BREAK_LEVEL_DOOR,
+     "LOOSE FLOOR BREAKING");
 }
 
 void

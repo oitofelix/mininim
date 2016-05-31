@@ -65,6 +65,7 @@ void remove_closer_floor (struct closer_floor *c);
 void press_closer_floor (struct pos *p);
 void break_closer_floor (struct pos *p);
 void unpress_closer_floors (void);
+void register_changed_closer_floors (void);
 void compute_closer_floors (void);
 void draw_closer_floor (ALLEGRO_BITMAP *bitmap, struct pos *p,
                         enum em em, enum vm vm);

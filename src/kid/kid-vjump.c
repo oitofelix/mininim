@@ -236,7 +236,7 @@ physics_out (struct anim *k)
   else keep_depressible_floor (k);
 
   /* ceiling loose floor shaking and release */
-  if (k->i == 13 && k->hit_ceiling) {
+  if (k->i == 12 && k->hit_ceiling) {
     ctb = survey (_tb, pos, &k->f, &nc, &ptb, &np)->fg;
     ctf = survey (_tf, pos, &k->f, &nc, &ptf, &np)->fg;
     shake_loose_floor_row (&ptb);
@@ -246,7 +246,7 @@ physics_out (struct anim *k)
 
   /* loose floor shaking */
   survey (_mbo, pos, &k->f, &nc, &pmbo, &np);
-  if (k->i == 17) shake_loose_floor_row (&pmbo);
+  if (k->i == 16) shake_loose_floor_row (&pmbo);
 }
 
 bool

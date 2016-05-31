@@ -103,7 +103,8 @@ void
 register_con_undo (struct undo *u, struct pos *p,
                    enum confg fg, enum conbg bg, int ext,
                    bool should_destroy, bool should_register, bool should_prepare,
-                   bool ignore_intermediate, char *desc)
+                   bool ignore_intermediate, enum changed_pos_reason reason,
+                   char *desc)
 {
   struct con c;
 
@@ -141,7 +142,7 @@ register_con_undo (struct undo *u, struct pos *p,
   if (should_register) register_con_at_pos (p);
   if (should_prepare) prepare_con_at_pos (p);
 
-  register_changed_pos (p, -1);
+  register_changed_pos (p, reason);
 }
 
 void

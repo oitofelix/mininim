@@ -130,7 +130,8 @@ physics_in (struct anim *k)
     k->f.c.x += dir * 16;
   } else if (k->i == 0
              && k->oaction != kid_hang_free
-             && k->oaction != kid_hang_wall) {
+             && k->oaction != kid_hang_wall
+             && k->oaction != kid_climb) {
     place_kid_in_initial_fall (k);
     k->inertia = 0;
   }

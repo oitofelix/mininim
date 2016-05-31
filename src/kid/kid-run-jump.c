@@ -111,12 +111,16 @@ flow (struct anim *k)
 
   int back_dir = (k->f.dir == LEFT) ? RIGHT : LEFT;
 
+  int dir = (k->f.dir == LEFT) ? -1 : +1;
+
   /* hang front */
   survey (_m, pos, &k->f, &nc, &pm, &np);
   survey (_tf, pos, &k->f, &nc, &ptf, &np);
   if (hang_front && k->i >= 5  && k->i <= 9
       && (is_hangable_pos (&pm, k->f.dir)
-          || is_hangable_pos (&ptf, k->f.dir))) {
+          || (is_hangable_pos (&ptf, k->f.dir)
+              && crel (&ptf, +0, dir)->fg == WALL
+              && k->i < 9))) {
     if (is_hangable_pos (&pm, k->f.dir)) k->hang_pos = pm;
     else if (is_hangable_pos (&ptf, k->f.dir)) k->hang_pos = ptf;
     pos2room (&k->hang_pos, k->f.c.room, &k->hang_pos);

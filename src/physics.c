@@ -1017,7 +1017,9 @@ unhide_hidden_floor (struct pos *p)
     register_con_undo
       (&undo, p,
        FLOOR, MIGNORE, MIGNORE,
-       false, false, false, false, "UNHIDE FLOOR");
+       false, false, false, false,
+       CHPOS_UNHIDE_FLOOR,
+       "UNHIDE FLOOR");
   }
 }
 

@@ -30,7 +30,8 @@ void ui_undo_pass (struct undo *u, int dir, char *prefix);
 void register_con_undo (struct undo *u, struct pos *p,
                         enum confg fg, enum conbg bg, int ext,
                         bool destroy, bool register, bool prepare,
-                        bool ignore_intermediate, char *desc);
+                        bool ignore_intermediate, enum changed_pos_reason reason,
+                        char *desc);
 void con_undo (struct con_undo *d, int dir);
 
 /* EXCHANGE POS */

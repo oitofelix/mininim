@@ -515,62 +515,11 @@ void
 draw_door_top (ALLEGRO_BITMAP *bitmap, struct pos *p,
                enum em em, enum vm vm)
 {
-  ALLEGRO_BITMAP *door_top = NULL,
-    *door_grid = NULL;
-
-  switch (em) {
-  case DUNGEON:
-    switch (vm) {
-    case CGA:
-      door_top = dc_door_top;
-      door_grid = dc_door_grid;
-      break;
-    case EGA:
-      door_top = de_door_top;
-      door_grid = de_door_grid;
-      break;
-    case VGA:
-      door_top = dv_door_top;
-      door_grid = dv_door_grid;
-      break;
-    }
-    break;
-  case PALACE:
-    switch (vm) {
-    case CGA:
-      door_top = pc_door_top;
-      door_grid = pc_door_grid;
-      break;
-    case EGA:
-      door_top = pe_door_top;
-      door_grid = pe_door_grid;
-      break;
-    case VGA:
-      door_top = pv_door_top;
-      door_grid = pv_door_grid;
-      break;
-    }
-    break;
-  }
-
-  if (vm == VGA) {
-    door_top = apply_hue_palette (door_top);
-    door_grid = apply_hue_palette (door_grid);
-  }
-
-  if (hgc) {
-   door_top = apply_palette (door_top, hgc_palette);
-   door_grid = apply_palette (door_grid, hgc_palette);
-  }
-
-  if (peq (p, &mouse_pos)) {
-    door_top = apply_palette (door_top, selection_palette);
-    door_grid = apply_palette (door_grid, selection_palette);
-  }
-
-  struct coord c;
-  draw_bitmapc (door_top, bitmap, door_top_coord (p, &c), 0);
-  draw_bitmapc (door_grid, bitmap, door_grid_coord_base (p, &c), 0);
+  set_target_bitmap (bitmap);
+  al_set_clipping_rectangle (PLACE_WIDTH * p->place, PLACE_HEIGHT * p->floor + 3,
+                             24, 18);
+  draw_door_right (bitmap, p, em, vm);
+  al_reset_clipping_rectangle ();
 }
 
 void
