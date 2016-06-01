@@ -1,5 +1,7 @@
 # MININIM
-The Advanced Prince of Persia Engine (a childhood dream)
+**The Advanced Prince of Persia Engine (a childhood dream)**
+
+![MININIM](http://oitofelix.github.io/mininim/mininim.png)
 
 - Homepage: http://oitofelix.github.io/mininim/
 - Forum: http://forum.princed.org/viewforum.php?f=127
