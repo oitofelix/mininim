@@ -148,7 +148,7 @@ physics_in (struct anim *k)
 
   /* floating */
   if (k->float_timer) {
-    if (k->float_timer++ < SEC2CYC (16)) {
+    if (k->float_timer < SEC2CYC (16)) {
       k->fo.dx = -1;
       k->fo.dy = +3;
     } else {
