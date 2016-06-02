@@ -711,6 +711,7 @@ update_cache_pos (struct pos *p, enum changed_pos_reason reason,
         case CHPOS_MOUSE_DESELECT:
         case CHPOS_CLOSE_LEVEL_DOOR:
         case CHPOS_CARPET_DESIGN:
+        case CHPOS_WALL:
           draw_conbg (mr.cell[x][y].cache, p, em, vm, true);
           break;
         case CHPOS_SHAKE_LOOSE_FLOOR:
@@ -861,7 +862,7 @@ update_cache_pos (struct pos *p, enum changed_pos_reason reason,
 
   if (! recursive_01 && depedv && con (&pl)->fg == WALL) {
     recursive_01 = true;
-    update_cache_pos (&pl, reason, em, vm);
+    update_cache_pos (&pl, CHPOS_WALL, em, vm);
     recursive_01 = false;
   }
 
