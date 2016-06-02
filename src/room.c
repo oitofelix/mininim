@@ -273,10 +273,12 @@ draw_conbg (ALLEGRO_BITMAP *bitmap, struct pos *p,
   draw_confg_left (bitmap, &pr, em, vm, true);
 
   if (con (p)->fg == LEVEL_DOOR || con (p)->bg == BALCONY) {
+    struct pos pl; prel (p, &pl, +0, -1);
     struct pos pal; prel (p, &pal, -1, -1);
     struct pos pa; prel (p, &pa, -1, +0);
     struct pos par; prel (p, &par, -1, +1);
 
+    draw_confg (bitmap, &pl, em, vm, true);
     draw_conbg (bitmap, &pal, em, vm, true);
     draw_conbg (bitmap, &pa, em, vm, true);
 
