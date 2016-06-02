@@ -621,6 +621,7 @@ editor (void)
                          MIGNORE, MIGNORE, b0,
                          true, true, false, true,
                          CHPOS_NONE, "CAN'T FALL EXTENSION");
+
       break;
     case SPIKES_FLOOR:
       menu_step_ext (&p, 0, SPIKES_FLOOR_MAX_STEP);
@@ -1485,10 +1486,26 @@ menu_step_ext (struct pos *p, int min, int max)
     edit = EDIT_CON; return c;
   }
 
+  enum changed_pos_reason reason;
+
+  switch (con (p)->fg) {
+  case SPIKES_FLOOR:
+    reason = CHPOS_SPIKES;
+    break;
+  case DOOR:
+    reason = CHPOS_OPEN_DOOR;
+    break;
+  case LEVEL_DOOR:
+    reason = CHPOS_OPEN_LEVEL_DOOR;
+    break;
+  default: assert (false);
+  }
+
   register_con_undo (&undo, p,
                      MIGNORE, MIGNORE, r,
                      true, true, false, true,
-                     CHPOS_STEP, "STEP EXTENSION");
+                     reason, "STEP EXTENSION");
+
   return c;
 }
 

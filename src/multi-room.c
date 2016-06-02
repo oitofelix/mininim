@@ -709,6 +709,8 @@ update_cache_pos (struct pos *p, enum changed_pos_reason reason,
         case CHPOS_UNHIDE_FLOOR:
         case CHPOS_MOUSE_SELECT:
         case CHPOS_MOUSE_DESELECT:
+        case CHPOS_CLOSE_LEVEL_DOOR:
+        case CHPOS_CARPET_DESIGN:
           draw_conbg (mr.cell[x][y].cache, p, em, vm, true);
           break;
         case CHPOS_SHAKE_LOOSE_FLOOR:
@@ -796,14 +798,38 @@ update_cache_pos (struct pos *p, enum changed_pos_reason reason,
             draw_confg_top (mr.cell[x][y].cache, &pb, em, vm, true);
 
           break;
+        case CHPOS_OPEN_LEVEL_DOOR:
+          new_rect (&r, p->room,
+                    PLACE_WIDTH * p->place + 7,
+                    PLACE_HEIGHT * p->floor - 1,
+                    48, 51);
+          clear_rect_to_color (mr.cell[x][y].cache, &r, TRANSPARENT_COLOR);
 
-        /* case CHPOS_OPEN_LEVEL_DOOR: */
-        /* case CHPOS_CLOSE_LEVEL_DOOR: */
-        /* case CHPOS_SPIKES: */
-        /* case CHPOS_CHOPPER: */
-        /* case CHPOS_CARPET_DESIGN: */
-        /* case CHPOS_STEP: */
+          draw_conbg (mr.cell[x][y].cache, p, em, vm, true);
 
+          break;
+        case CHPOS_SPIKES:
+          new_rect (&r, p->room,
+                    PLACE_WIDTH * p->place + 7,
+                    PLACE_HEIGHT * p->floor + 34,
+                    40, 16);
+          clear_rect_to_color (mr.cell[x][y].cache, &r, TRANSPARENT_COLOR);
+
+          draw_conbg (mr.cell[x][y].cache, &pl, em, vm, true);
+          draw_conbg (mr.cell[x][y].cache, p, em, vm, true);
+
+          break;
+        case CHPOS_CHOPPER:
+          new_rect (&r, p->room,
+                    PLACE_WIDTH * p->place,
+                    PLACE_HEIGHT * p->floor + 3,
+                    27, 60);
+          clear_rect_to_color (mr.cell[x][y].cache, &r, TRANSPARENT_COLOR);
+
+          draw_conbg (mr.cell[x][y].cache, &pl, em, vm, true);
+          draw_conbg (mr.cell[x][y].cache, p, em, vm, true);
+
+          break;
         default:
           new_rect (&r, p->room,
                     PLACE_WIDTH * p->place - 1,

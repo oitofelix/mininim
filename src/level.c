@@ -207,6 +207,7 @@ destroy_cons (void)
   destroy_array ((void **) &door, &door_nmemb);
   destroy_array ((void **) &level_door, &level_door_nmemb);
   destroy_array ((void **) &chopper, &chopper_nmemb);
+  destroy_array ((void **) &mirror, &mirror_nmemb);
 }
 
 void

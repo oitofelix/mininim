@@ -38,6 +38,11 @@
 /* palace vga */
 #define PV_MIRROR "data/mirror/pv.png"
 
+/* variables */
+extern struct mirror *mirror;
+extern size_t mirror_nmemb;
+
+/* functions */
 void load_mirror (void);
 void unload_mirror (void);
 void register_mirror (struct pos *p);
