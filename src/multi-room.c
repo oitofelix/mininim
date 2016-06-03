@@ -813,7 +813,7 @@ update_cache_pos (struct pos *p, enum changed_pos_reason reason,
           new_rect (&r, p->room,
                     PLACE_WIDTH * p->place + 7,
                     PLACE_HEIGHT * p->floor + 34,
-                    40, 16);
+                    40, 24);
           clear_rect_to_color (mr.cell[x][y].cache, &r, TRANSPARENT_COLOR);
 
           draw_conbg (mr.cell[x][y].cache, &pl, em, vm, true);
