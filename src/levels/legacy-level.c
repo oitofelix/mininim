@@ -252,22 +252,23 @@ legacy_level_special_events (void)
     }
 
     /* if the kid is crossing the mirror, make his shadow appear */
-    if (con (&mirror_pos)->fg == MIRROR) {
-      struct mirror *m = mirror_at_pos (&mirror_pos);
-      if (m->kid_crossing == k->id
-          && shadow_id == -1) {
-        k->current_lives = 1;
-        int id = create_anim (k, 0, NULL, 0);
-        struct anim *ks = &anima[id];
-        ks->shadow = true;
-        ks->fight = false;
-        ks->f.dir = (ks->f.dir == LEFT) ? RIGHT : LEFT;
-        ks->controllable = false;
-        ks->dont_draw_lives = true;
-        ks->immortal = true;
-        shadow_id = id;
-      }
-    }
+    struct mirror *m;
+    if (con (&mirror_pos)->fg == MIRROR
+        && (m = mirror_at_pos (&mirror_pos))
+        && m->kid_crossing == k->id
+        && shadow_id == -1) {
+      k->current_lives = 1;
+      int id = create_anim (k, 0, NULL, 0);
+      struct anim *ks = &anima[id];
+      ks->fight = false;
+      ks->f.dir = (ks->f.dir == LEFT) ? RIGHT : LEFT;
+      ks->f.flip ^= ALLEGRO_FLIP_HORIZONTAL;
+      ks->controllable = false;
+      ks->dont_draw_lives = true;
+      ks->immortal = true;
+      ks->shadow = true;
+      shadow_id = id;
+    } else m = NULL;
 
     /* make the kid's shadow run to the right until he disappears
        from view */
