@@ -516,8 +516,9 @@ draw_door_top (ALLEGRO_BITMAP *bitmap, struct pos *p,
                enum em em, enum vm vm)
 {
   set_target_bitmap (bitmap);
-  al_set_clipping_rectangle (PLACE_WIDTH * p->place, PLACE_HEIGHT * p->floor + 3,
-                             24, 18);
+  al_set_clipping_rectangle (PLACE_WIDTH * (p->place + 1),
+                             PLACE_HEIGHT * p->floor - 12,
+                             25, 15);
   draw_door_right (bitmap, p, em, vm);
   al_reset_clipping_rectangle ();
 }
