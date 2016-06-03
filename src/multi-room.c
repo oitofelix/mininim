@@ -765,8 +765,8 @@ update_cache_pos (struct pos *p, enum changed_pos_reason reason,
         case CHPOS_BREAK_LEVEL_DOOR:
           new_rect (&r, p->room,
                     PLACE_WIDTH * p->place,
-                    PLACE_HEIGHT * p->floor + 44,
-                    57, 22);
+                    PLACE_HEIGHT * p->floor + 35,
+                    57, 31);
           clear_rect_to_color (mr.cell[x][y].cache, &r, TRANSPARENT_COLOR);
 
           if (con (&pbl)->fg == LEVEL_DOOR || con (&pbl)->bg == BALCONY)
