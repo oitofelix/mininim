@@ -3,13 +3,14 @@
 
 ![MININIM](http://oitofelix.github.io/mininim/mininim.png)
 
-[![GAME PLAY DEMO](https://img.youtube.com/vi/i8kXFLuZ8Io/0.jpg)](https://www.youtube.com/watch?v=i8kXFLuZ8Io)
-
 - Homepage: http://oitofelix.github.io/mininim/
 - Forum: http://forum.princed.org/viewforum.php?f=127
 - IRC: irc://irc.freenode.net/mininim
 - VCS: http://github.com/oitofelix/mininim/
 
+## Game play demo
+
+[![GAME PLAY DEMO](https://img.youtube.com/vi/i8kXFLuZ8Io/0.jpg)](https://www.youtube.com/watch?v=i8kXFLuZ8Io)
 
 ## Building
 
