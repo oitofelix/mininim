@@ -517,8 +517,13 @@ get_flicker_float_color (void)
 void
 kid_debug (void)
 {
+  struct anim *current_kid = get_anim_by_id (current_kid_id);
+
   /* begin kid hack */
-  if (! cutscene) {
+  if (was_key_pressed (ALLEGRO_KEY_DELETE, 0, 0, true)) current_kid->f.c.x--;
+  if (was_key_pressed (ALLEGRO_KEY_PGDN, 0, 0, true)) current_kid->f.c.x++;
+
+  if (! cutscene && was_key_pressed (ALLEGRO_KEY_F1, 0, 0, true)) {
     /* static int px = 0; */
     /* static int py = 0; */
     /* if (a_key) px--; */
@@ -530,12 +535,9 @@ kid_debug (void)
 
     /* printf ("x = %i, y = %i, floor = %i, place = %i\n", px, py, (py -3) / 63, (px - 15) / 32); */
 
-    struct anim *current_kid = get_anim_by_id (current_kid_id);
-
     struct coord bf; struct pos pbf, npbf;
     survey (_bf, pos, &current_kid->f, &bf, &pbf, &npbf);
-    if (was_key_pressed (ALLEGRO_KEY_DELETE, 0, 0, true)) current_kid->f.c.x--;
-    if (was_key_pressed (ALLEGRO_KEY_PGDN, 0, 0, true)) current_kid->f.c.x++;
+
     int dn = dist_next_place (&current_kid->f, _bf, pos, 0, false);
     int dp = dist_next_place (&current_kid->f, _bf, pos, 0, true);
     /* int dc = dist_collision (&current_kid->f, false, &current_kid->ci) + 4; */
@@ -546,7 +548,7 @@ kid_debug (void)
     int dcl = dist_con (&current_kid->f, _bf, pos, -4, false, CLOSER_FLOOR);
     int dch = dist_chopper (&current_kid->f, false);
     int de = dist_enemy (current_kid);
-    if (was_key_pressed (ALLEGRO_KEY_F1, 0, 0, true))
+
       printf ("\
 f = %i, p = %i, dn = %i, dp = %i, dc = %i, dcb = %i, df = %i, dl = %i, dcl = %i, dch = %i, de = %i\n",
               pbf.floor, pbf.place, dn, dp, dc, dcb, df, dl, dcl, dch, de);

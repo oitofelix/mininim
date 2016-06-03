@@ -98,7 +98,7 @@ play_anim (void (*draw_callback) (void),
         if (was_key_pressed (ALLEGRO_KEY_ESCAPE, 0, ALLEGRO_KEYMOD_CTRL, true))
           pause_anim = false;
 
-        /* kid_debug (); */
+        kid_debug ();
 
         if (anim_cycle > 0) {
           if (is_video_effect_started ()) {
