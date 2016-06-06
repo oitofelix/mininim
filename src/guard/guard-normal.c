@@ -110,7 +110,8 @@ flow (struct anim *g)
   bool vigilant = g->key.enter;
 
   if (g->oaction == guard_normal
-      && g->current_lives <= 0) {
+      && g->current_lives <= 0
+      && anim_cycle > 0) {
     survey (_mt, pos, &g->f, &nc, &pmt, &np);
     g->p = pmt;
     guard_die (g);
@@ -118,7 +119,8 @@ flow (struct anim *g)
   }
 
   if (g->oaction == guard_normal
-      && vigilant) {
+      && vigilant
+      && anim_cycle > 0) {
     guard_vigilant (g);
     return false;
   }
