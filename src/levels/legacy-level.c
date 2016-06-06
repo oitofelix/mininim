@@ -163,16 +163,12 @@ legacy_level_special_events (void)
 
   /* in the first animation cycle */
   if (anim_cycle == 0 || anim_cycle == 1) {
-    /* close any level door in the starting room */
-    struct pos p;
-    p.room = k->f.c.room;
-    for (p.floor = 0; p.floor < FLOORS; p.floor++)
-      for (p.place = -1; p.place < PLACES; p.place++)
-        if (con (&p)->fg == LEVEL_DOOR) {
-          struct level_door *ld = level_door_at_pos (&p);
-          if (anim_cycle == 0) ld->i = 0;
-          if (anim_cycle == 1) ld->action = CLOSE_LEVEL_DOOR;
-        }
+    /* close level door the kid came from */
+    if (con (&level.start_pos)->fg == LEVEL_DOOR) {
+      struct level_door *ld = level_door_at_pos (&level.start_pos);
+      if (anim_cycle == 0) ld->i = 0;
+      if (anim_cycle == 1) ld->action = CLOSE_LEVEL_DOOR;
+    }
   }
 
   /* in the first level, first try, play the suspense sound */
