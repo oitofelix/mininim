@@ -252,7 +252,7 @@ raise_skeleton (struct anim *s)
   s->f.flip = (s->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
   if (s->oaction != raise_skeleton) {
-    play_sample (skeleton_sample, s->f.c.room);
+    play_sample (skeleton_sample, NULL, s->id);
     place_frame (&s->f, &s->f, skeleton_die_frameset[2].frame,
                  &s->p, (s->f.dir == LEFT) ? +12 : +0, +43);
     s->i = 2;
@@ -303,13 +303,14 @@ guard_die_spiked (struct anim *g)
     s->inactive = true;
     s->murdered_anim = g->id;
 
-    if (g->type == SKELETON) play_sample (skeleton_sample, g->f.c.room);
-    else play_sample (spiked_sample, g->f.c.room);
+    if (g->type == SKELETON)
+      play_sample (skeleton_sample, NULL, g->id);
+    else play_sample (spiked_sample, NULL, g->id);
 
     struct anim *ke = get_anim_by_id (g->oenemy_id);
     if (ke && ke->id == current_kid_id
         && g->death_reason != SHADOW_FIGHT_DEATH)
-      play_sample (glory_sample, ke->f.c.room);
+      play_sample (glory_sample, NULL, ke->id);
     g->oenemy_id = -1;
 
     if (ke) upgrade_skill (&ke->skill, &g->skill);
@@ -367,7 +368,7 @@ guard_die_chopped (struct anim *g)
     struct anim *ke = get_anim_by_id (g->oenemy_id);
     if (ke && ke->id == current_kid_id
         && g->death_reason != SHADOW_FIGHT_DEATH)
-      play_sample (glory_sample, ke->f.c.room);
+      play_sample (glory_sample, NULL, ke->id);
     g->oenemy_id = -1;
 
     if (ke) upgrade_skill (&ke->skill, &g->skill);
@@ -403,7 +404,7 @@ guard_die_suddenly (struct anim *g)
     struct anim *ke = get_anim_by_id (g->oenemy_id);
     if (ke && ke->id == current_kid_id
         && g->death_reason != SHADOW_FIGHT_DEATH)
-      play_sample (glory_sample, ke->f.c.room);
+      play_sample (glory_sample, NULL, ke->id);
     g->oenemy_id = -1;
 
     if (ke) upgrade_skill (&ke->skill, &g->skill);
@@ -450,12 +451,13 @@ flow (struct anim *g)
                  &g->p, (g->f.dir == LEFT)
                  ? +13 : +21, (g->type == SHADOW) ? +18 : +17);
     g->i = -1, g->j = 0;
-    if (g->type == SKELETON) play_sample (skeleton_sample, g->f.c.room);
+    if (g->type == SKELETON)
+      play_sample (skeleton_sample, NULL, g->id);
 
     struct anim *ke = get_anim_by_id (g->oenemy_id);
     if (ke && ke->id == current_kid_id
         && g->death_reason != SHADOW_FIGHT_DEATH)
-      play_sample (glory_sample, ke->f.c.room);
+      play_sample (glory_sample, NULL, ke->id);
     g->oenemy_id = -1;
 
     if (ke) upgrade_skill (&ke->skill, &g->skill);

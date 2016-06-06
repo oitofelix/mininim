@@ -79,7 +79,7 @@ void
 kid_stabilize_collision (struct anim *k)
 {
   if (k->action != kid_stabilize)
-    play_sample (hit_wall_sample, k->f.c.room);
+    play_sample (hit_wall_sample, NULL, k->id);
   k->action = kid_stabilize_collision;
   place_frame (&k->f, &k->f, kid_stabilize_frameset[0].frame,
                &k->ci.p, (k->f.dir == LEFT)
@@ -91,7 +91,7 @@ void
 kid_stabilize_back_collision (struct anim *k)
 {
   if (k->action != kid_stabilize)
-    play_sample (hit_wall_sample, k->f.c.room);
+    play_sample (hit_wall_sample, NULL, k->id);
   k->action = kid_stabilize_back_collision;
   place_frame (&k->f, &k->f, kid_stabilize_frameset[0].frame,
                &k->ci.p, (k->f.dir == LEFT)

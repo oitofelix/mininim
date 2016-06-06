@@ -172,7 +172,7 @@ title_anim (void)
     break;
   case 1:
     if (! is_video_effect_started ()) {
-      si = play_sample (main_theme_sample, -1);
+      si = play_sample (main_theme_sample, NULL, -1);
       i++;
     }
     break;
@@ -194,7 +194,7 @@ title_anim (void)
   case 7:
     if (! is_playing_sample_instance (si)) {
       start_video_effect (VIDEO_ROLL_RIGHT, SEC2EFF (0.5));
-      si = play_sample (in_the_absence_sample, -1);
+      si = play_sample (in_the_absence_sample, NULL, -1);
       i++;
     }
     break;
@@ -236,19 +236,19 @@ title_anim (void)
     break;
   case 11:
     if (! is_video_effect_started ()) {
-      si = play_sample (princess_waiting_sample, -1);
+      si = play_sample (princess_waiting_sample, NULL, -1);
       i++;
     }
     break;
   case 12:
     if (! is_playing_sample_instance (si)) {
-      si = play_sample (door_close_sample, -1);
+      si = play_sample (door_close_sample, NULL, -1);
       i++;
     }
     break;
   case 13:
     if (! is_playing_sample_instance (si)) {
-      si = play_sample (creaking_door_sample, -1);
+      si = play_sample (creaking_door_sample, NULL, -1);
       i++;
     }
     break;
@@ -261,7 +261,7 @@ title_anim (void)
   case 15:
     princess.action (&princess);
     if (princess.f.b == princess_normal_00) {
-      si = play_sample (vizier_and_princess_sample, -1);
+      si = play_sample (vizier_and_princess_sample, NULL, -1);
       jaffar_walk (&jaffar);
       i++;
     }
@@ -313,7 +313,7 @@ title_anim (void)
   case 22:
     jaffar.action (&jaffar);
     if (jaffar.f.b == jaffar_normal_00) {
-      si = play_sample (marry_jaffar_sample, -1);
+      si = play_sample (marry_jaffar_sample, NULL, -1);
       i++;
     }
     break;
@@ -405,7 +405,7 @@ cutscene_01_05_11_anim (void)
     clock_type = get_clock_by_time_left ();
 
     start_video_effect (VIDEO_FADE_IN, SEC2EFF (1));
-    si = play_sample (cutscene_01_03_05_11_sample, -1);
+    si = play_sample (cutscene_01_03_05_11_sample, NULL, -1);
     i++;
     break;
   case 1:
@@ -459,7 +459,7 @@ cutscene_11_little_time_left_anim (void)
     clock_type = get_clock_by_time_left ();
 
     start_video_effect (VIDEO_FADE_IN, SEC2EFF (1));
-    si = play_sample (cutscene_11_little_time_left_sample, -1);
+    si = play_sample (cutscene_11_little_time_left_sample, NULL, -1);
     i++;
     break;
   case 1:
@@ -528,7 +528,7 @@ cutscene_03_anim (void)
     clock_type = get_clock_by_time_left ();
 
     start_video_effect (VIDEO_FADE_IN, SEC2EFF (1));
-    si = play_sample (cutscene_01_03_05_11_sample, -1);
+    si = play_sample (cutscene_01_03_05_11_sample, NULL, -1);
     i++;
     break;
   case 1:
@@ -590,7 +590,7 @@ cutscene_07_anim (void)
     clock_type = get_clock_by_time_left ();
 
     start_video_effect (VIDEO_FADE_IN, SEC2EFF (1));
-    si = play_sample (cutscene_07_08_sample, -1);
+    si = play_sample (cutscene_07_08_sample, NULL, -1);
     i++;
     break;
   case 1:
@@ -667,7 +667,7 @@ cutscene_08_anim (void)
     clock_type = get_clock_by_time_left ();
 
     start_video_effect (VIDEO_FADE_IN, SEC2EFF (1));
-    si = play_sample (cutscene_07_08_sample, -1);
+    si = play_sample (cutscene_07_08_sample, NULL, -1);
     i++;
     break;
   case 1:
@@ -762,7 +762,7 @@ cutscene_14_anim (void)
     clock_type = -1;
 
     start_video_effect (VIDEO_FADE_IN, SEC2EFF (1));
-    si = play_sample (cutscene_14_sample, -1);
+    si = play_sample (cutscene_14_sample, NULL, -1);
     i++;
     break;
   case 1:
@@ -800,7 +800,7 @@ cutscene_14_anim (void)
     if (! is_playing_sample_instance (si)
         && ! is_video_effect_started ()) {
       start_video_effect (VIDEO_FADE_IN, SEC2EFF (1));
-      si = play_sample (happy_end_sample, -1);
+      si = play_sample (happy_end_sample, NULL, -1);
       key.keyboard.keycode = 0;
       button = -1;
       i++;
@@ -872,7 +872,7 @@ cutscene_out_of_time_anim (void)
     clock_type = get_clock_by_time_left ();
 
     start_video_effect (VIDEO_FADE_IN, SEC2EFF (1));
-    si = play_sample (cutscene_out_of_time_sample, -1);
+    si = play_sample (cutscene_out_of_time_sample, NULL, -1);
     i++;
     break;
   case 1:

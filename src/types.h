@@ -375,7 +375,6 @@ struct anim {
   int refraction;
 
   uint64_t float_timer;
-  ALLEGRO_SAMPLE_INSTANCE *sample;
 
   int dc, df, dl, dcl, dch, dcd;
 
@@ -445,7 +444,8 @@ struct audio_sample {
   ALLEGRO_SAMPLE_INSTANCE *instance;
   bool played;
   uint64_t anim_cycle;
-  int room;
+  struct pos p;
+  int anim_id;
   float volume;
 };
 

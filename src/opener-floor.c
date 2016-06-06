@@ -253,7 +253,7 @@ compute_opener_floors (void)
     if (o->pressed || o->broken) {
       if (! o->noise) {
         alert_guards (&o->p);
-        play_sample (opener_floor_sample, o->p.room);
+        play_sample (opener_floor_sample, &o->p, -1);
         o->noise = true;
       }
       open_door (o->event);

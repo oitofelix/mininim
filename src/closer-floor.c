@@ -256,7 +256,7 @@ compute_closer_floors (void)
     if (c->pressed && ! c->unresponsive) {
       if (! c->noise) {
         alert_guards (&c->p);
-        play_sample (closer_floor_sample, c->p.room);
+        play_sample (closer_floor_sample, &c->p, -1);
         c->noise = true;
       }
       close_door (c->event);

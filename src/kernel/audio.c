@@ -92,27 +92,26 @@ get_default_mixer (void)
 }
 
 ALLEGRO_SAMPLE_INSTANCE *
-play_sample (ALLEGRO_SAMPLE *sample, int room)
+play_sample (ALLEGRO_SAMPLE *sample, struct pos *p, int anim_id)
 {
-  size_t i;
-
   /* do nothing if the same sample has been played with less than a
-     drawing cycle of difference in the same room */
-  for (i = 0; i < audio_sample_nmemb; i++) {
-    struct audio_sample *as = &audio_sample[i];
-    if (as->sample == sample
-        && as->anim_cycle == anim_cycle
-        && as->room == room)
-      return as->instance;
-  }
+     drawing cycle of difference in the same pos by the same animation
+     id */
+  struct audio_sample *asp;
+  asp = get_sample (sample, p, anim_id);
+  if (asp && asp->anim_cycle == anim_cycle)
+    return asp->instance;
 
   struct audio_sample as;
   as.played = false;
   as.sample = sample;
   as.instance = al_create_sample_instance (sample);
   as.anim_cycle = anim_cycle;
-  as.room = room;
+  as.anim_id = anim_id;
   as.volume = -1;
+
+  if (p) npos (p, &as.p);
+  else p = NULL;
 
   if (! as.instance)
     error (-1, 0, "%s (%p): cannot create sample instance", __func__, sample);
@@ -240,12 +239,13 @@ adjust_samples_volume (void)
 float
 get_adjusted_sample_volume (struct audio_sample *as)
 {
-  if (as->room < 0) return 1.0;
-  /* int d = room_dist (mr.room, as->room, 10); */
+  return 1.0;
+  /* if (! as->p) return 1.0; */
+  /* int d = room_dist (mr.room, as->p.room, 10); */
   /* if (d == 0) d = 1; */
   /* if (d <= 10) return 1.0 / d; */
-  if (is_room_visible (as->room)) return 1.0;
-  else return 0.5;
+  /* if (is_room_visible (as->p.room)) return 1.0; */
+  /* else return 0.5; */
 }
 
 void
@@ -255,16 +255,25 @@ stop_all_samples (void)
     remove_sample (&audio_sample[0]);
 }
 
-void
-stop_sample (ALLEGRO_SAMPLE_INSTANCE *si,
-             ALLEGRO_SAMPLE *s)
+struct audio_sample *
+get_sample (ALLEGRO_SAMPLE *sample, struct pos *p, int anim_id)
 {
-  struct audio_sample *as = get_audio_sample (si);
-  if (! as) return;
+  size_t i;
+  for (i = 0; i < audio_sample_nmemb; i++) {
+    struct audio_sample *as = &audio_sample[i];
+    if ((! sample || as->sample == sample)
+        && (! p || peq (p, &as->p))
+        && (anim_id < 0 || anim_id == as->anim_id))
+      return as;
+  }
+  return NULL;
+}
 
-  if (s && as->sample != s) return;
-
-  remove_sample (as);
+void
+stop_sample (ALLEGRO_SAMPLE *sample, struct pos *p, int anim_id)
+{
+  struct audio_sample *as = get_sample (sample, p, anim_id);
+  if (as) remove_sample (as);
 }
 
 bool

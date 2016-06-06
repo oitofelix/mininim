@@ -87,7 +87,7 @@ void compute_loose_floor_shake (struct loose_floor *l);
 void compute_loose_floor_release (struct loose_floor *l);
 void compute_loose_floor_fall (struct loose_floor *l);
 void shake_loose_floor_row (struct pos *p);
-void sample_random_loose_floor (int room);
+void sample_random_loose_floor (struct pos *p);
 ALLEGRO_BITMAP *get_correct_falling_loose_floor_bitmap (ALLEGRO_BITMAP *b);
 void draw_loose_floor (ALLEGRO_BITMAP *bitmap, struct pos *p,
                        enum em em, enum vm vm);

@@ -173,7 +173,7 @@ legacy_level_special_events (void)
 
   /* in the first level, first try, play the suspense sound */
   if (level.number == 1 && anim_cycle == 12 && retry_level != 1)
-    play_sample (suspense_sample, -1);
+    play_sample (suspense_sample, NULL, -1);
 
   /* in the third level */
   if (level.number == 3) {
@@ -244,7 +244,7 @@ legacy_level_special_events (void)
                          MIRROR, MIGNORE, MIGNORE,
                          true, true, true, true,
                          -1, "MIRROR");
-      play_sample (suspense_sample, -1);
+      play_sample (suspense_sample, &mirror_pos, -1);
     }
 
     /* if the kid is crossing the mirror, make his shadow appear */
@@ -352,7 +352,7 @@ legacy_level_special_events (void)
     /* when kid enters room 1, play the suspense sound */
     if (k->f.c.room == 1
         && ! played_sample) {
-      play_sample (suspense_sample, -1);
+      play_sample (suspense_sample, NULL, k->id);
       played_sample = true;
     }
 
@@ -442,8 +442,9 @@ legacy_level_special_events (void)
     } else if (shadow_id != -1) ks = get_anim_by_id (shadow_id);
 
     /* if shadow has appeared but not merged yet */
+    struct audio_sample *as;
     if (ks) {
-      ks->death_reason = k->death_reason = SHADOW_FIGHT_DEATH;
+      k->death_reason = ks->death_reason = SHADOW_FIGHT_DEATH;
       survey (_m, pos, &ks->f, &ms, &pms, &np);
       survey (_m, pos, &k->f, &m, &pm, &np);
       ks->p = pms;
@@ -456,7 +457,7 @@ legacy_level_special_events (void)
           && is_attacking (k)) {
         mr.flicker = 2;
         mr.color = get_flicker_blood_color ();
-        play_sample (harm_sample, k->f.c.room);
+        play_sample (harm_sample, NULL, k->id);
         k->splash = true;
         k->current_lives--;
         kid_sword_hit (k);
@@ -467,7 +468,7 @@ legacy_level_special_events (void)
           && is_attacking (ks)) {
         mr.flicker = 2;
         mr.color = get_flicker_blood_color ();
-        play_sample (guard_hit_sample, ks->f.c.room);
+        play_sample (guard_hit_sample, NULL, ks->id);
         ks->splash = true;
         ks->current_lives--;
         guard_hit (ks);
@@ -486,9 +487,10 @@ legacy_level_special_events (void)
       }
 
       /* make the shadow disappear when the kid is dead */
+      struct audio_sample *as;
       if (k->current_lives <= 0
-          && is_instance_of_sample (k->sample, success_suspense_sample)
-          && get_sample_position (k->sample) >= 3.3
+          && (as = get_sample (success_suspense_sample, NULL, k->id))
+          && get_sample_position (as->instance) >= 3.3
           && ! ks->invisible) {
         mr.flicker = 8;
         mr.color = WHITE;
@@ -521,7 +523,7 @@ legacy_level_special_events (void)
         shadow_id = -1; ks = NULL;
         shadow_merged = true;
         k = get_anim_by_id (current_kid_id);
-        k->sample = play_sample (success_sample, -1);
+        play_sample (success_sample, NULL, k->id);
         k->f.dir = (k->f.dir == LEFT) ? RIGHT : LEFT;
         kid_turn_run (k);
         k->current_lives = ++k->total_lives;
@@ -541,8 +543,8 @@ legacy_level_special_events (void)
       /* if the shadow and the kid has merged, one overlaps each other
          making them glow intermittently */
     } else if (shadow_merged
-               && is_instance_of_sample (k->sample, success_sample)
-               && is_playing_sample_instance (k->sample))
+               && (as = get_sample (success_sample, NULL, k->id))
+               && is_playing_sample_instance (as->instance))
       k->shadow = (anim_cycle % 2);
     /* after the success music has finished to play, the kid goes
        normal again */
@@ -584,14 +586,14 @@ legacy_level_special_events (void)
       if (k->f.c.room == v->f.c.room
           && v->action == guard_normal
           && ! met_jaffar) {
-        k->sample = play_sample (meet_vizier_sample, -1);
+        play_sample (meet_vizier_sample, NULL, k->id);
         met_jaffar = true;
       }
 
       /* put the vizier in vigilance */
-      if (k->sample
-          && is_instance_of_sample (k->sample, meet_vizier_sample)
-          && get_sample_position (k->sample) >= 2.2)
+      struct audio_sample *as;
+      if ((as = get_sample (meet_vizier_sample, NULL, k->id))
+          && get_sample_position (as->instance) >= 2.2)
         v->fight = true;
 
       /* when the vizier dies do some video effect, play a tune, stop
@@ -600,8 +602,8 @@ legacy_level_special_events (void)
           && ! played_vizier_death_sample) {
         mr.flicker = 12;
         mr.color = WHITE;
-        stop_sample (k->sample, meet_vizier_sample);
-        k->sample = play_sample (vizier_death_sample, -1);
+        stop_sample (meet_vizier_sample, NULL, k->id);
+        play_sample (vizier_death_sample, NULL, k->id);
         played_vizier_death_sample = true;
         play_time_stopped = true;
         display_remaining_time ();
@@ -638,13 +640,13 @@ legacy_level_end (struct pos *p)
 
   /* end music samples to play per level */
   if (! played_sample) {
-    stop_sample (k->sample, floating_sample);
+    stop_sample (floating_sample, NULL, k->id);
     switch (level.number) {
     case 1: case 2: case 3: case 5: case 6: case 7:
     case 8: case 9: case 10: case 11: case 12:
-      si = play_sample (success_sample, -1); break;
+      si = play_sample (success_sample, NULL, k->id); break;
     case 4:
-      si = play_sample (success_suspense_sample, -1); break;
+      si = play_sample (success_suspense_sample, NULL, k->id); break;
     case 13: break;
     }
     played_sample = true;

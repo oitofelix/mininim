@@ -117,7 +117,7 @@ physics_out (struct anim *k)
       mr.flicker = 8;
       mr.color = get_flicker_raise_sword_color ();
     }
-    play_sample (glory_sample, k->f.c.room);
+    play_sample (glory_sample, NULL, k->id);
   }
 
   /* consume sword */

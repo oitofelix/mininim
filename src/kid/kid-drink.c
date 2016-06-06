@@ -131,7 +131,7 @@ flow (struct anim *k)
       k->current_lives--;
       k->splash = true;
       if (k->current_lives == 0) k->death_reason = POTION_DEATH;
-      play_sample (harm_sample, k->f.c.room);
+      play_sample (harm_sample, NULL, k->id);
       if (k->id == current_kid_id) {
         mr.flicker = 2;
         mr.color = get_flicker_blood_color ();
@@ -143,7 +143,7 @@ flow (struct anim *k)
       k->current_lives = 0;
       k->splash = true;
       k->death_reason = POTION_DEATH;
-      play_sample (harm_sample, k->f.c.room);
+      play_sample (harm_sample, NULL, k->id);
       if (k->id == current_kid_id) {
         mr.flicker = 2;
         mr.color = get_flicker_blood_color ();
@@ -187,7 +187,7 @@ physics_out (struct anim *k)
   keep_depressible_floor (k);
 
   /* sound */
-  if (k->i == 7 && ! k->reverse) play_sample (drink_sample, k->f.c.room);
+  if (k->i == 7 && ! k->reverse) play_sample (drink_sample, NULL, k->id);
 
   /* consume bottle */
   if (k->i == 0) {

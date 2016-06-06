@@ -367,10 +367,10 @@ compute_loose_floor_shake (struct loose_floor *l)
   switch (l->i) {
   case 0: l->state = 1;
     /* alert_guards (&l->p); */
-    sample_random_loose_floor (l->p.room); l->i++; break;
+    sample_random_loose_floor (&l->p); l->i++; break;
   case 1: l->state = 0; l->i++; break;
   case 2: l->state = 2;
-    sample_random_loose_floor (l->p.room); l->i++; break;
+    sample_random_loose_floor (&l->p); l->i++; break;
   case 3: l->state = 0;
     l->action = NO_LOOSE_FLOOR_ACTION; l->i = 0; break;
   }
@@ -392,16 +392,16 @@ compute_loose_floor_release (struct loose_floor *l)
   switch (l->i) {
   case 0: l->state = 1;
     alert_guards (&l->p);
-    sample_random_loose_floor (l->p.room); l->i++; break;
+    sample_random_loose_floor (&l->p); l->i++; break;
   case 1: l->state = 0; l->i++; break;
   case 2: l->state = 2;
-    sample_random_loose_floor (l->p.room); l->i++; break;
+    sample_random_loose_floor (&l->p); l->i++; break;
   case 3: l->state = 2; l->i++; break;
   case 4: l->state = 0; l->i++; break;
   case 5: l->state = 0; l->i++; break;
   case 6: l->state = 0; l->i++; break;
   case 7: l->state = 2;
-    sample_random_loose_floor (l->p.room); l->i++; break;
+    sample_random_loose_floor (&l->p); l->i++; break;
   case 8: l->state = 2; l->i++; break;
   case 9: l->state = 2; l->i++; break;
   case 10:
@@ -521,7 +521,7 @@ compute_loose_floor_fall (struct loose_floor *l)
       /* ensure kid doesn't couch in thin air (might occur when hit
          while jumping, for example) */
       place_on_the_ground (&a->f, &a->f.c);
-      play_sample (hit_wall_sample, kpmt.room);
+      play_sample (hit_wall_sample, NULL, a->id);
       alert_guards (&kpmt);
       if (a->id == current_kid_id) {
         mr.flicker = 2;
@@ -567,7 +567,7 @@ compute_loose_floor_fall (struct loose_floor *l)
                          CHPOS_CHAIN_RELEASE_LOOSE_FLOOR,
                          "LOOSE FLOOR CHAIN RELEASE");
       must_sort = true;
-      play_sample (broken_floor_sample, p.room);
+      play_sample (broken_floor_sample, &p, -1);
       alert_guards (&p);
       return;
     case OPENER_FLOOR: break_opener_floor (&p); break;
@@ -593,7 +593,7 @@ compute_loose_floor_fall (struct loose_floor *l)
   l->p.room = -1;
   must_remove = true;
   must_sort = true;
-  play_sample (broken_floor_sample, p.room);
+  play_sample (broken_floor_sample, &p, -1);
   alert_guards (&p);
 }
 
@@ -614,12 +614,12 @@ shake_loose_floor_row (struct pos *p)
 }
 
 void
-sample_random_loose_floor (int room)
+sample_random_loose_floor (struct pos *p)
 {
   switch (prandom (2)) {
-  case 0: play_sample (loose_floor_00_sample, room);
-  case 1: play_sample (loose_floor_01_sample, room);
-  case 2: play_sample (loose_floor_02_sample, room);
+  case 0: play_sample (loose_floor_00_sample, p, -1);
+  case 1: play_sample (loose_floor_01_sample, p, -1);
+  case 2: play_sample (loose_floor_02_sample, p, -1);
   }
 }
 

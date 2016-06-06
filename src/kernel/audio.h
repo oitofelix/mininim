@@ -27,7 +27,7 @@ ALLEGRO_SAMPLE *load_sample (char *filename);
 void enable_audio (bool b);
 void set_mixer_gain (ALLEGRO_MIXER *mixer, float new_gain);
 ALLEGRO_MIXER *get_default_mixer (void);
-ALLEGRO_SAMPLE_INSTANCE *play_sample (ALLEGRO_SAMPLE *sample, int room);
+ALLEGRO_SAMPLE_INSTANCE *play_sample (ALLEGRO_SAMPLE *sample, struct pos *p, int id);
 void play_samples (void);
 int compare_samples (const void *s0, const void *s1);
 struct audio_sample *get_audio_sample (ALLEGRO_SAMPLE_INSTANCE *si);
@@ -38,7 +38,8 @@ void remove_sample (struct audio_sample *s);
 void clear_played_samples (void);
 void adjust_samples_volume (void);
 float get_adjusted_sample_volume (struct audio_sample *as);
-void stop_sample (ALLEGRO_SAMPLE_INSTANCE *si, ALLEGRO_SAMPLE *s);
+struct audio_sample *get_sample (ALLEGRO_SAMPLE *sample, struct pos *p, int anim_id);
+void stop_sample (ALLEGRO_SAMPLE *sample, struct pos *p, int id);
 void stop_all_samples (void);
 bool is_instance_of_sample (ALLEGRO_SAMPLE_INSTANCE *si,
                             ALLEGRO_SAMPLE *s);

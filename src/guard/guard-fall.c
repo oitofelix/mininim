@@ -295,11 +295,11 @@ physics_in (struct anim *g)
 
       if (g->current_lives > 0) g->uncouch_slowly = true;
     } else if (g->i > 3) {
-      play_sample (hit_ground_sample, g->f.c.room);
+      play_sample (hit_ground_sample, NULL, g->id);
       g->hurt = false;
     } else g->hurt = false;
 
-    stop_sample (g->sample, scream_sample);
+    stop_sample (scream_sample, NULL, g->id);
 
     survey (_mt, pos, &g->f, &nc, &pmt, &np);
     g->p = pmt;
@@ -308,7 +308,7 @@ physics_in (struct anim *g)
         && ! spikes_floor_at_pos (&pmt)->inactive)
       guard_die_spiked (g);
     else if (g->current_lives <= 0) {
-      play_sample (hit_ground_fatal_sample, g->f.c.room);
+      play_sample (hit_ground_fatal_sample, NULL, g->id);
       guard_die_suddenly (g);
       g->death_reason = FALL_DEATH;
     } else {
@@ -332,7 +332,7 @@ physics_out (struct anim *g)
   /* sound */
   if (g->i == 10
       && g->current_lives > 0)
-    g->sample = play_sample (scream_sample, g->f.c.room);
+    play_sample (scream_sample, NULL, g->id);
 }
 
 bool

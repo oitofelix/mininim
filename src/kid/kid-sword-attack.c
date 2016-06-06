@@ -183,7 +183,7 @@ static void
 physics_out (struct anim *k)
 {
   /* sound */
-  if (k->i == 3) play_sample (sword_attack_sample, k->f.c.room);
+  if (k->i == 3) play_sample (sword_attack_sample, NULL, k->id);
 
   /* depressible floors */
   if (k->i == 2) update_depressible_floor (k, -8, -40);

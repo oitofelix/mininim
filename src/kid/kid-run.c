@@ -169,9 +169,9 @@ physics_out (struct anim *k)
 
   /* sound */
   if (k->oaction == kid_run_jump)
-    play_sample (step_sample, k->f.c.room);
+    play_sample (step_sample, NULL, k->id);
   if (k->i == 2 || k->i == 6)
-    play_sample (step_sample, k->f.c.room);
+    play_sample (step_sample, NULL, k->id);
 }
 
 bool

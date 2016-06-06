@@ -437,7 +437,7 @@ increase_kid_current_lives (struct anim *k)
 
   k->current_lives++;
   if (! is_playing_sample (small_life_potion_sample))
-    play_sample (small_life_potion_sample, -1);
+    play_sample (small_life_potion_sample, NULL, k->id);
   if (k->id == current_kid_id) {
     mr.flicker = 8;
     mr.color = get_flicker_blood_color ();
@@ -454,7 +454,7 @@ increase_kid_total_lives (struct anim *k)
   if (k->total_lives < 10) k->total_lives++;
   k->current_lives = k->total_lives;
   if (! is_playing_sample (big_life_potion_sample))
-    play_sample (big_life_potion_sample, -1);
+    play_sample (big_life_potion_sample, NULL, k->id);
   if (k->id == current_kid_id) {
     mr.flicker = 8;
     mr.color = get_flicker_blood_color ();
@@ -466,9 +466,9 @@ float_kid (struct anim *k)
 {
   if (k->current_lives <= 0 && ! is_kid_fall (&k->f)) return;
   k->float_timer = 1;
-  stop_sample (k->sample, scream_sample);
+  stop_sample (scream_sample, NULL, k->id);
   if (! is_playing_sample (floating_sample))
-    k->sample = play_sample (floating_sample, -1);
+    play_sample (floating_sample, NULL, k->id);
   if (k->id == current_kid_id) {
     mr.flicker = 8;
     mr.color = get_flicker_float_color ();

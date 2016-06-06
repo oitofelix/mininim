@@ -621,7 +621,7 @@ process_keys (void)
     struct anim *ke = get_anim_by_id (current_kid->enemy_id);
     if (ke) {
       ke->current_lives = 0;
-      play_sample (guard_hit_sample, ke->f.c.room);
+      play_sample (guard_hit_sample, NULL, ke->id);
     }
   }
 
@@ -790,16 +790,16 @@ process_keys (void)
   if (k->current_lives <= 0
       && ! game_paused) {
     death_timer++;
-    if (death_timer < 12) k->sample = NULL;
 
-    if (death_timer >= 12 && ! k->sample) {
+    if (death_timer == 12) {
       ALLEGRO_SAMPLE *sample;
       switch (k->death_reason) {
       case SHADOW_FIGHT_DEATH: sample = success_suspense_sample; break;
       case FIGHT_DEATH: sample = fight_death_sample; break;
       default: sample = death_sample; break;
       }
-      k->sample = play_sample (sample, -1);
+      stop_sample (success_sample, NULL, k->id);
+      play_sample (sample, NULL, k->id);
     }
 
     if (death_timer < 60 && ! active_menu) {
@@ -810,7 +810,7 @@ process_keys (void)
     if (death_timer >= 60) {
       if ((death_timer < 240 || death_timer % 12 < 8) && ! active_menu) {
         if (death_timer >= 252 && death_timer % 12 == 0)
-          play_sample (press_key_sample, -1);
+          play_sample (press_key_sample, NULL, -1);
         xasprintf (&text, "Press Button to Continue");
         draw_bottom_text (NULL, text, -2);
         al_free (text);
@@ -849,7 +849,7 @@ draw_level (void)
     display_remaining_time ();
     if (rem_time <= SEC2CYC (60) && rem_time % SEC2CYC (1) == 0
         && ! play_time_stopped)
-      play_sample (press_key_sample, -1);
+      play_sample (press_key_sample, NULL, -1);
     last_auto_show_time = rem_time;
   }
   if (rem_time <= 0) quit_anim = OUT_OF_TIME;

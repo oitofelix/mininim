@@ -62,7 +62,7 @@ flow (struct anim *k)
   /* hang back */
   if (k->i == 4 && k->reverse
       && hang_back && is_hangable_pos (&k->hang_pos, back_dir)) {
-    play_sample (hang_on_fall_sample, k->f.c.room);
+    play_sample (hang_on_fall_sample, NULL, k->id);
     kid_turn (k);
     return false;
   }
@@ -134,5 +134,5 @@ physics_out (struct anim *k)
   /* sound */
   if (! k->reverse && k->i == 4 && k->key.shift && ! k->key.up
       && ! k->hang_limit)
-    play_sample (hit_wall_sample, k->f.c.room);
+    play_sample (hit_wall_sample, NULL, k->id);
 }

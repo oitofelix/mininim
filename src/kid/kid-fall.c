@@ -171,8 +171,8 @@ physics_in (struct anim *k)
   if (k->i > 4 && can_hang (&k->f, false, &k->hang_pos)
       && hang_front && ! k->hang_limit) {
     k->hit_by_loose_floor = false;
-    stop_sample (k->sample, scream_sample);
-    play_sample (hang_on_fall_sample, k->f.c.room);
+    stop_sample (scream_sample, NULL, k->id);
+    play_sample (hang_on_fall_sample, NULL, k->id);
     kid_hang (k);
     return false;
   }
@@ -181,8 +181,8 @@ physics_in (struct anim *k)
   if (k->i > 4 && can_hang (&k->f, true, &k->hang_pos)
       && hang_back && ! k->hang_limit) {
     k->hit_by_loose_floor = false;
-    stop_sample (k->sample, scream_sample);
-    play_sample (hang_on_fall_sample, k->f.c.room);
+    stop_sample (scream_sample, NULL, k->id);
+    play_sample (hang_on_fall_sample, NULL, k->id);
     kid_turn (k);
     return false;
   }
@@ -232,7 +232,7 @@ physics_in (struct anim *k)
       if (k->i >= 10) k->current_lives = 0;
 
       if (k->current_lives > 0) {
-        play_sample (hit_ground_harm_sample, k->f.c.room);
+        play_sample (hit_ground_harm_sample, NULL, k->id);
         k->uncouch_slowly = true;
       }
       if (k->id == current_kid_id) {
@@ -240,25 +240,25 @@ physics_in (struct anim *k)
         mr.color = get_flicker_blood_color ();
       }
     } else if (k->i > 3 && ! k->float_timer) {
-      play_sample (hit_ground_sample, k->f.c.room);
+      play_sample (hit_ground_sample, NULL, k->id);
       k->hurt = false;
     } else k->hurt = false;
 
     survey (_mt, pos, &k->f, &nc, &pmt, &np);
     if (k->current_lives <= 0) {
-      stop_sample (k->sample, scream_sample);
+      stop_sample (scream_sample, NULL, k->id);
       k->p = pmt;
       if (con (&pmt)->fg == SPIKES_FLOOR
           && ! spikes_floor_at_pos (&pmt)->inactive)
         kid_die_spiked (k);
       else {
-        play_sample (hit_ground_fatal_sample, k->f.c.room);
+        play_sample (hit_ground_fatal_sample, NULL, k->id);
         kid_die_suddenly (k);
         k->death_reason = FALL_DEATH;
       }
     }
     else {
-      stop_sample (k->sample, scream_sample);
+      stop_sample (scream_sample, NULL, k->id);
       kid_couch (k);
     }
 
@@ -278,7 +278,7 @@ physics_out (struct anim *k)
   if (k->i == 10
       && ! k->float_timer
       && k->current_lives > 0)
-    k->sample = play_sample (scream_sample, k->f.c.room);
+    play_sample (scream_sample, NULL, k->id);
 }
 
 bool
