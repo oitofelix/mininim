@@ -57,10 +57,16 @@ strictly_traversable_cs (enum confg t)
 }
 
 bool
+xis_strictly_traversable (struct level *l, struct pos *p)
+{
+  enum confg t = xcon (l, p)->fg;
+  return strictly_traversable_cs (t);
+}
+
+bool
 is_strictly_traversable (struct pos *p)
 {
-  enum confg t = con (p)->fg;
-  return strictly_traversable_cs (t);
+  return xis_strictly_traversable (&level, p);
 }
 
 bool
@@ -96,11 +102,22 @@ is_rigid_con (struct pos *p)
 }
 
 bool
+is_carpet_cs (enum confg t)
+{
+  return t == CARPET || t == TCARPET;
+}
+
+bool
+xis_carpet (struct level *l, struct pos *p)
+{
+  enum confg t = xcon (l, p)->fg;
+  return is_carpet_cs (t);
+}
+
+bool
 is_carpet (struct pos *p)
 {
-  enum confg t = con (p)->fg;
-  return t == CARPET
-    || t == TCARPET;
+  return xis_carpet (&level, p);
 }
 
 bool
@@ -817,9 +834,8 @@ dist_fall (struct frame *f, bool reverse)
 
 
 bool
-is_hangable_con (struct pos *p, enum dir d)
+is_hangable_cs (enum confg t, enum dir d)
 {
-  enum confg t = con (p)->fg;
   return t == FLOOR
     || t == BROKEN_FLOOR
     || t == LOOSE_FLOOR
@@ -843,21 +859,27 @@ is_hangable_con (struct pos *p, enum dir d)
 }
 
 bool
-is_hangable_pos (struct pos *p, enum dir d)
+xis_hangable_pos (struct level *l, struct pos *p, enum dir d)
 {
   int dir = (d == LEFT) ? -1 : +1;
   struct pos ph; prel (p, &ph, -1, dir);
+  struct con *ch = xcon (l, &ph);
   struct pos pa; prel (p, &pa, -1, 0);
   struct pos pr; prel (p, &pr, +0, +1);
-  /* struct con *ca = con (&pa); */
-  struct con *cr = con (&pr);
+  struct con *cr = xcon (l, &pr);
 
-  return is_hangable_con (&ph, d)
-    && is_strictly_traversable (&pa)
+  return is_hangable_cs (ch->fg, d)
+    && xis_strictly_traversable (l, &pa)
     && ! (d == RIGHT && cr->fg == CHOPPER)
-    && ! (d == RIGHT && con (&pr)->fg == MIRROR)
-    && ! (d == RIGHT && is_carpet (p))
-    && ! (d == RIGHT && is_carpet (&pa));
+    && ! (d == RIGHT && cr->fg == MIRROR)
+    && ! (d == RIGHT && xis_carpet (l, p))
+    && ! (d == RIGHT && xis_carpet (l, &pa));
+}
+
+bool
+is_hangable_pos (struct pos *p, enum dir d)
+{
+  return xis_hangable_pos (&level, p, d);
 }
 
 bool

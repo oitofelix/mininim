@@ -25,10 +25,13 @@ struct con *xcon (struct level *l, struct pos *p);
 struct con *con (struct pos *p);
 struct con *crel (struct pos *p, int floor, int place);
 struct con *xcrel (struct level *l, struct pos *p, int floor, int place);
+bool xis_strictly_traversable (struct level *l, struct pos *p);
 bool is_strictly_traversable (struct pos *p);
 bool is_traversable (struct pos *p);
 bool is_pillar (struct pos *p);
 bool is_rigid_con (struct pos *p);
+bool is_carpet_cs (enum confg t);
+bool xis_carpet (struct level *l, struct pos *p);
 bool is_carpet (struct pos *p);
 bool is_arch_top (struct pos *p);
 bool strictly_traversable_cs (enum confg t);
@@ -80,7 +83,8 @@ uncollide (struct frame *f, struct frame_offset *fo,
            int reverse, struct collision_info *ci);
 
 
-bool is_hangable_con (struct pos *p, enum dir d);
+bool is_hangable_cs (enum confg t, enum dir d);
+bool xis_hangable_pos (struct level *l, struct pos *p, enum dir d);
 bool is_hangable_pos (struct pos *p, enum dir d);
 bool can_hang (struct frame *f, bool reverse, struct pos *hang_pos);
 struct pos *get_hanged_pos (struct pos *hang_pos, enum dir d, struct pos *p);
