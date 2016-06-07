@@ -431,11 +431,13 @@ legacy_level_special_events (void)
       ks = &anima[shadow_id];
       ks->fight = true;
       ks->controllable = false;
-      ks->action = guard_fall;
       ks->refraction = 12;
       ks->current_lives = k->current_lives;
       ks->total_lives = k->total_lives;
+      ks->action = guard_normal;
+      ks->f.dir = RIGHT;
       get_legacy_skill (3, &ks->skill);
+      guard_fall (ks);
       struct frameset *frameset = get_guard_fall_frameset (ks->type);
       place_frame (&ks->f, &ks->f, frameset[0].frame, &shadow_pos,
                    +9, +15);
