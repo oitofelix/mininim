@@ -525,6 +525,7 @@ legacy_level_special_events (void)
         k = get_anim_by_id (current_kid_id);
         play_sample (success_sample, NULL, k->id);
         k->f.dir = (k->f.dir == LEFT) ? RIGHT : LEFT;
+        place_on_the_ground (&k->f, &k->f.c);
         kid_turn_run (k);
         k->current_lives = ++k->total_lives;
         mr.flicker = 8;
