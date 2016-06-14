@@ -433,7 +433,7 @@ frame2room (struct frame *f, int room, struct coord *cv)
 
   if (cv->room == room) return cv;
 
-  ncoord (cv, cv);
+  /* ncoord (cv, cv); */
 
   struct coord tl = *cv;
   struct coord tr = *cv;

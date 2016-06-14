@@ -643,7 +643,8 @@ process_keys (void)
       && was_key_pressed (ALLEGRO_KEY_K, 0, 0, true)) {
     struct anim *ke = get_anim_by_id (current_kid->enemy_id);
     if (ke) {
-      ke->current_lives = 0;
+      get_pos (ke, &ke->p, NULL);
+      anim_die (ke);
       play_sample (guard_hit_sample, NULL, ke->id);
     }
   }

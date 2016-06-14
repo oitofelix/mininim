@@ -211,7 +211,7 @@ fight_ai (struct anim *k)
           || is_kid_run (&ke->f))) {
     place_at_distance (&k->f, _tf, &ke->f, _tf, 10, k->f.dir, &ke->f.c);
     place_on_the_ground (&ke->f, &ke->f.c);
-    kid_stabilize (ke);
+    kid_take_sword (ke);
   }
 
   /* if the enemy is on the back, turn */
@@ -823,7 +823,7 @@ get_pos (struct anim *k, struct pos *p, struct coord *m)
 {
   struct coord nc;
   struct pos np;
-  survey (_m, pos, &k->f, m, &np, &np);
+  if (m) survey (_m, pos, &k->f, m, &np, &np);
 
   struct anim *ke = get_anim_by_id (k->enemy_id);
   if (ke && ke->f.dir == LEFT)
@@ -925,11 +925,10 @@ is_safe_to_follow (struct anim *k0, struct anim *k1, enum dir dir)
     int d = (dir == LEFT) ? -1 : +1;
     if (peq (&pk, &k0->enemy_pos)) return true;
     prel (&k0->enemy_pos, &pke, +0, -1 * d);
-  }
-
-  if (peq (&p0, &k0->enemy_pos)
-      && ! (is_seeing (k0, k1, LEFT)
-            || is_seeing (k0, k1, RIGHT))) return false;
+  } else if (peq (&p0, &k0->enemy_pos)
+             && ! (is_seeing (k0, k1, LEFT)
+                   || is_seeing (k0, k1, RIGHT)))
+    return false;
 
   first_confg (&pk, &pke, dangerous_cs, &p);
   if (is_valid_pos (&p)) return false;
@@ -937,7 +936,9 @@ is_safe_to_follow (struct anim *k0, struct anim *k1, enum dir dir)
   first_confg (&pk, &pke, door_cs, &p);
   if (! is_valid_pos (&p)) return true;
   else return tf.y > door_grid_tip_y (&p) - 10
-         || door_at_pos (&p)->action == OPEN_DOOR;
+         || (door_at_pos (&p)->action == OPEN_DOOR
+             && (k0->f.dir != RIGHT || ! peq (&p, &p0))
+             && (k0->f.dir != LEFT || ! peqr (&p, &p0, +0, -1)));
 }
 
 void
