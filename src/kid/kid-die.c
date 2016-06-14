@@ -73,6 +73,7 @@ unload_kid_die (void)
 void
 kid_resurrect (struct anim *k)
 {
+  if (! is_kid_dead (&k->f)) return;
   struct coord nc; struct pos np, pm;
   survey (_m, pos, &k->f, &nc, &pm, &np);
   k->current_lives = k->total_lives;
@@ -81,9 +82,12 @@ kid_resurrect (struct anim *k)
   place_frame (&k->f, &k->f, kid_normal_00,
                &pm, k->f.dir == LEFT ? +16 : +16, +15);
   reset_murder_spikes_floor (k->id);
+  if (con (&k->p)->fg == CLOSER_FLOOR)
+    closer_floor_at_pos (&k->p)->unresponsive = false;
   stop_sample (death_sample, NULL, k->id);
   stop_sample (fight_death_sample, NULL, k->id);
   stop_sample (success_suspense_sample, NULL, k->id);
+  k->sword_immune = 16;
 }
 
 void
@@ -174,6 +178,9 @@ kid_die_suddenly (struct anim *k)
     kill_kid_shadows (k);
   }
 
+  if (con (&k->p)->fg == CLOSER_FLOOR)
+    closer_floor_at_pos (&k->p)->unresponsive = true;
+
   k->xf.b = NULL;
 
   k->hit_by_loose_floor = false;
@@ -223,6 +230,9 @@ flow (struct anim *k)
     k->i = -1, k->j = 0;
     k->xf.b = NULL;
   }
+
+  if (con (&k->p)->fg == CLOSER_FLOOR)
+    closer_floor_at_pos (&k->p)->unresponsive = true;
 
   k->current_lives = 0;
 

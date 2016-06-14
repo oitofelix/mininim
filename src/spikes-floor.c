@@ -406,11 +406,6 @@ compute_spikes_floors (void)
 
     if (s->inactive) continue;
 
-    if (s->p.room == -1) {
-      /* remove_spikes_floor (s); i--; */
-      continue;
-    }
-
     int state = s->state;
 
     switch (s->i) {
@@ -792,55 +787,55 @@ draw_spikes_fg_00 (ALLEGRO_BITMAP *bitmap, struct pos *p,
 struct coord *
 d_spikes_left_00_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * p->place;
-  c->y = PLACE_HEIGHT * p->floor + 51;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * p->place,
+               PLACE_HEIGHT * p->floor + 51);
 }
 
 struct coord *
 p_spikes_left_00_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * p->place;
-  c->y = PLACE_HEIGHT * p->floor + 49;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * p->place,
+               PLACE_HEIGHT * p->floor + 49);
 }
 
 struct coord *
 d_spikes_right_00_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * (p->place + 1);
-  c->y = PLACE_HEIGHT * p->floor + 53;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * (p->place + 1),
+               PLACE_HEIGHT * p->floor + 53);
 }
 
 struct coord *
 p_spikes_right_00_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * (p->place + 1);
-  c->y = PLACE_HEIGHT * p->floor + 49;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * (p->place + 1),
+               PLACE_HEIGHT * p->floor + 49);
 }
 
 struct coord *
 d_spikes_fg_00_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * p->place;
-  c->y = PLACE_HEIGHT * p->floor + 56;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * p->place,
+               PLACE_HEIGHT * p->floor + 56);
 }
 
 struct coord *
 p_spikes_fg_00_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * p->place;
-  c->y = PLACE_HEIGHT * p->floor + 54;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * p->place,
+               PLACE_HEIGHT * p->floor + 54);
 }
 
 void
@@ -959,55 +954,55 @@ draw_spikes_fg_01 (ALLEGRO_BITMAP *bitmap, struct pos *p,
 struct coord *
 d_spikes_left_01_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * p->place;
-  c->y = PLACE_HEIGHT * p->floor + 41;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * p->place,
+               PLACE_HEIGHT * p->floor + 41);
 }
 
 struct coord *
 p_spikes_left_01_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * p->place;
-  c->y = PLACE_HEIGHT * p->floor + 42;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * p->place,
+               PLACE_HEIGHT * p->floor + 42);
 }
 
 struct coord *
 d_spikes_right_01_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * (p->place + 1);
-  c->y = PLACE_HEIGHT * p->floor + 41;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * (p->place + 1),
+               PLACE_HEIGHT * p->floor + 41);
 }
 
 struct coord *
 p_spikes_right_01_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * (p->place + 1);
-  c->y = PLACE_HEIGHT * p->floor + 44;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * (p->place + 1),
+               PLACE_HEIGHT * p->floor + 44);
 }
 
 struct coord *
 d_spikes_fg_01_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * p->place;
-  c->y = PLACE_HEIGHT * p->floor + 48;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * p->place,
+               PLACE_HEIGHT * p->floor + 48);
 }
 
 struct coord *
 p_spikes_fg_01_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * p->place;
-  c->y = PLACE_HEIGHT * p->floor + 48;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * p->place,
+               PLACE_HEIGHT * p->floor + 48);
 }
 
 void
@@ -1126,55 +1121,55 @@ draw_spikes_fg_02 (ALLEGRO_BITMAP *bitmap, struct pos *p,
 struct coord *
 d_spikes_left_02_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * p->place;
-  c->y = PLACE_HEIGHT * p->floor + 34;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * p->place,
+               PLACE_HEIGHT * p->floor + 34);
 }
 
 struct coord *
 p_spikes_left_02_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * p->place;
-  c->y = PLACE_HEIGHT * p->floor + 34;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * p->place,
+               PLACE_HEIGHT * p->floor + 34);
 }
 
 struct coord *
 d_spikes_right_02_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * (p->place + 1);
-  c->y = PLACE_HEIGHT * p->floor + 41;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * (p->place + 1),
+               PLACE_HEIGHT * p->floor + 41);
 }
 
 struct coord *
 p_spikes_right_02_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * (p->place + 1);
-  c->y = PLACE_HEIGHT * p->floor + 41;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * (p->place + 1),
+               PLACE_HEIGHT * p->floor + 41);
 }
 
 struct coord *
 d_spikes_fg_02_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * p->place;
-  c->y = PLACE_HEIGHT * p->floor + 37;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * p->place,
+               PLACE_HEIGHT * p->floor + 37);
 }
 
 struct coord *
 p_spikes_fg_02_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * p->place;
-  c->y = PLACE_HEIGHT * p->floor + 37;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * p->place,
+               PLACE_HEIGHT * p->floor + 37);
 }
 
 void
@@ -1293,55 +1288,55 @@ draw_spikes_fg_03 (ALLEGRO_BITMAP *bitmap, struct pos *p,
 struct coord *
 d_spikes_left_03_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * p->place;
-  c->y = PLACE_HEIGHT * p->floor + 35;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * p->place,
+               PLACE_HEIGHT * p->floor + 35);
 }
 
 struct coord *
 p_spikes_left_03_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * p->place;
-  c->y = PLACE_HEIGHT * p->floor + 35;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * p->place,
+               PLACE_HEIGHT * p->floor + 35);
 }
 
 struct coord *
 d_spikes_right_03_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * (p->place + 1);
-  c->y = PLACE_HEIGHT * p->floor + 36;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * (p->place + 1),
+               PLACE_HEIGHT * p->floor + 36);
 }
 
 struct coord *
 p_spikes_right_03_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * (p->place + 1);
-  c->y = PLACE_HEIGHT * p->floor + 36;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * (p->place + 1),
+               PLACE_HEIGHT * p->floor + 36);
 }
 
 struct coord *
 d_spikes_fg_03_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * p->place;
-  c->y = PLACE_HEIGHT * p->floor + 38;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * p->place,
+               PLACE_HEIGHT * p->floor + 38);
 }
 
 struct coord *
 p_spikes_fg_03_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * p->place;
-  c->y = PLACE_HEIGHT * p->floor + 38;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * p->place,
+               PLACE_HEIGHT * p->floor + 38);
 }
 
 void
@@ -1460,53 +1455,53 @@ draw_spikes_fg_04 (ALLEGRO_BITMAP *bitmap, struct pos *p,
 struct coord *
 d_spikes_left_04_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * p->place;
-  c->y = PLACE_HEIGHT * p->floor + 35;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * p->place,
+               PLACE_HEIGHT * p->floor + 35);
 }
 
 struct coord *
 p_spikes_left_04_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * p->place;
-  c->y = PLACE_HEIGHT * p->floor + 35;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * p->place,
+               PLACE_HEIGHT * p->floor + 35);
 }
 
 struct coord *
 d_spikes_right_04_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * (p->place + 1);
-  c->y = PLACE_HEIGHT * p->floor + 37;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * (p->place + 1),
+               PLACE_HEIGHT * p->floor + 37);
 }
 
 struct coord *
 p_spikes_right_04_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * (p->place + 1);
-  c->y = PLACE_HEIGHT * p->floor + 37;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * (p->place + 1),
+               PLACE_HEIGHT * p->floor + 37);
 }
 
 struct coord *
 d_spikes_fg_04_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * p->place;
-  c->y = PLACE_HEIGHT * p->floor + 40;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * p->place,
+               PLACE_HEIGHT * p->floor + 40);
 }
 
 struct coord *
 p_spikes_fg_04_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * p->place;
-  c->y = PLACE_HEIGHT * p->floor + 39;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * p->place,
+               PLACE_HEIGHT * p->floor + 39);
 }

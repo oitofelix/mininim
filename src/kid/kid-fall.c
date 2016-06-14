@@ -215,10 +215,10 @@ physics_in (struct anim *k)
     /* pos2view (&pbf, &pbf); */
     k->fo.b = kid_couch_frameset[0].frame;
     k->fo.dx = k->fo.dy = 0;
-    k->f.c.room = pbf.room;
-    k->f.c.y = PLACE_HEIGHT * pbf.floor + 27;
-    k->f.c.x += dir * 4;
     k->f.b = kid_couch_frameset[0].frame;
+    new_coord (&k->f.c, k->f.c.l, pbf.room,
+               k->f.c.x + dir * 4,
+               PLACE_HEIGHT * pbf.floor + 27);
 
     shake_loose_floor_row (&pbf);
 
@@ -302,7 +302,7 @@ place_kid_in_initial_fall (struct anim *k)
   survey (_mbo, pos, &k->f, &nc, &pmbo, &np);
   survey (_bb, pos, &k->f, &nc, &pbb, &np);
 
-  fall_pos.room = -1;
+  invalid_pos (&fall_pos);
 
   if (is_strictly_traversable (&pmbo))
     fall_pos = pmbo;
@@ -311,7 +311,7 @@ place_kid_in_initial_fall (struct anim *k)
   else if (is_strictly_traversable (&pbb))
     fall_pos = pbb;
 
-  if (fall_pos.room != - 1)
+  if (is_valid_pos (&fall_pos))
     place_frame (&k->f, &k->f, kid_fall_frameset[0].frame,
                  &fall_pos,
                  (k->f.dir == LEFT) ? +24 : +10,

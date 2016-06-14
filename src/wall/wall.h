@@ -68,7 +68,7 @@ enum wall_correlation wall_correlation (struct pos *p);
 struct coord *wall_base_coord (struct pos *p, struct coord *c);
 struct coord *wall_coord (struct pos *p, struct coord *c);
 struct coord *wall_face_coord (struct pos *p, struct coord *c);
-struct coord *dc_wall_face_top_coord (struct pos *p, struct coord *c);
+struct coord *dce_wall_face_top_coord (struct pos *p, struct coord *c);
 struct coord *d_wall_face_top_coord (struct pos *p, struct coord *c);
 struct coord *p_wall_face_top_coord (struct pos *p, struct coord *c);
 

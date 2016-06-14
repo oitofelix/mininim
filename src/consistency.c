@@ -20,10 +20,9 @@
 #include "mininim.h"
 
 void
-fix_level (void)
+fix_level (struct level *l)
 {
-  struct pos p;
-
+  struct pos p; new_pos (&p, l, -1, -1, -1);
   for (p.room = 0; p.room < ROOMS; p.room++)
     for (p.floor = 0; p.floor < FLOORS; p.floor++)
       for (p.place = 0; p.place < PLACES; p.place++) {
@@ -226,8 +225,8 @@ fix_door_lacking_opener (struct pos *p)
   if (c->fg == DOOR
       || c->fg == LEVEL_DOOR) {
     for (i = 0; i < EVENTS; i++)
-      if (peq (&level.event[i].p, p)
-          && is_there_event_handler (i)) return;
+      if (peq (&p->l->event[i].p, p)
+          && is_there_event_handler (p->l, i)) return;
 
     /* fprintf (stderr, "%s: replaced %s by %s at pos (%i, %i, %i)\n", */
     /*          __func__, "DOOR", "FLOOR", p->room, p->floor, p->place); */
@@ -248,9 +247,9 @@ fix_opener_or_closer_lacking_door (struct pos *p)
       || c->fg == CLOSER_FLOOR) {
     int i = c->ext.event;
     do {
-      if (con (&level.event[i].p)->fg == DOOR
-          || con (&level.event[i].p)->fg == LEVEL_DOOR) return;
-    } while (level.event[i++].next && i < EVENTS);
+      if (con (&p->l->event[i].p)->fg == DOOR
+          || con (&p->l->event[i].p)->fg == LEVEL_DOOR) return;
+    } while (p->l->event[i++].next && i < EVENTS);
 
     /* fprintf (stderr, "%s: replaced %s (event %i) by %s at pos (%i, %i, %i)\n", */
     /*          __func__, c->fg == OPENER_FLOOR ? "OPENER_FLOOR" : "CLOSER_FLOOR", */
@@ -289,24 +288,23 @@ fix_partial_big_pillar (struct pos *p)
 }
 
 void
-make_links_locally_consistent (int prev_room, int current_room)
+make_links_locally_consistent (struct level *l, int prev_room, int current_room)
 {
-  if (roomd (prev_room, LEFT) == current_room)
-    level.link[current_room].r = prev_room;
-  else if (roomd (prev_room, RIGHT) == current_room)
-    level.link[current_room].l = prev_room;
-  else if (roomd (prev_room, ABOVE) == current_room)
-    level.link[current_room].b = prev_room;
-  else if (roomd (prev_room, BELOW) == current_room)
-    level.link[current_room].a = prev_room;
+  if (roomd (l, prev_room, LEFT) == current_room)
+    l->link[current_room].r = prev_room;
+  else if (roomd (l, prev_room, RIGHT) == current_room)
+    l->link[current_room].l = prev_room;
+  else if (roomd (l, prev_room, ABOVE) == current_room)
+    l->link[current_room].b = prev_room;
+  else if (roomd (l, prev_room, BELOW) == current_room)
+    l->link[current_room].a = prev_room;
 }
 
 bool
-is_there_event_handler (int e)
+is_there_event_handler (struct level *l, int e)
 {
-  struct pos p;
   int i = 0;
-
+  struct pos p; new_pos (&p, l, -1, -1, -1);
   for (p.room = 1; p.room < ROOMS; p.room++)
     for (p.floor = 0; p.floor < FLOORS; p.floor++)
       for (p.place = 0; p.place < PLACES; p.place++) {
@@ -314,7 +312,7 @@ is_there_event_handler (int e)
           i = con (&p)->ext.event;
           do {
             if (i == e) return true;
-          } while (level.event[i++].next && i < EVENTS);
+          } while (p.l->event[i++].next && i < EVENTS);
         }
       }
   return false;
@@ -370,16 +368,14 @@ is_loose (struct pos *p)
 }
 
 void
-fix_legacy_room_above_zero_with_traversable_at_bottom (void)
+fix_legacy_room_above_zero_with_traversable_at_bottom (struct level *l)
 {
-  struct pos p;
-
   /* fix rooms above room 0 that have traversable cons at the
      bottom */
-  p.floor = 2;
+  struct pos p; new_pos (&p, l, -1, 2, -1);
   for (p.room = 1; p.room < LROOMS; p.room++)
     for (p.place = 0; p.place < PLACES; p.place++) {
-      if (roomd (p.room, BELOW) != 0) continue;
+      if (roomd (p.l, p.room, BELOW) != 0) continue;
       if (is_traversable (&p))
         con (&p)->fg = SPIKES_FLOOR;
     }
@@ -392,102 +388,102 @@ fix_legacy_room_above_zero_with_traversable_at_bottom (void)
  ****************/
 
 void
-make_reciprocal_link (int room0, int room1, enum dir dir)
+make_reciprocal_link (struct level *l, int room0, int room1, enum dir dir)
 {
-  link_room (room0, room1, dir);
-  link_room (room1, room0, opposite_dir (dir));
+  link_room (l, room0, room1, dir);
+  link_room (l, room1, room0, opposite_dir (dir));
 }
 
 void
-make_link_locally_unique (int room, enum dir dir)
+make_link_locally_unique (struct level *l, int room, enum dir dir)
 {
-  if (dir != LEFT && roomd (room, LEFT) == roomd (room, dir))
-    link_room (room, 0, LEFT);
-  if (dir != RIGHT && roomd (room, RIGHT) == roomd (room, dir))
-    link_room (room, 0, RIGHT);
-  if (dir != ABOVE && roomd (room, ABOVE) == roomd (room, dir))
-    link_room (room, 0, ABOVE);
-  if (dir != BELOW && roomd (room, BELOW) == roomd (room, dir))
-    link_room (room, 0, BELOW);
+  if (dir != LEFT && roomd (l, room, LEFT) == roomd (l, room, dir))
+    link_room (l, room, 0, LEFT);
+  if (dir != RIGHT && roomd (l, room, RIGHT) == roomd (l, room, dir))
+    link_room (l, room, 0, RIGHT);
+  if (dir != ABOVE && roomd (l, room, ABOVE) == roomd (l, room, dir))
+    link_room (l, room, 0, ABOVE);
+  if (dir != BELOW && roomd (l, room, BELOW) == roomd (l, room, dir))
+    link_room (l, room, 0, BELOW);
 }
 
 void
-make_link_globally_unique (int room, enum dir dir)
+make_link_globally_unique (struct level *l, int room, enum dir dir)
 {
   int i;
   for (i = 1; i < ROOMS; i++) {
-    if (room != i && roomd (i, dir) == roomd (room, dir))
-      link_room (i, 0, dir);
+    if (room != i && roomd (l, i, dir) == roomd (l, room, dir))
+      link_room (l, i, 0, dir);
   }
 }
 
 void
-make_semi_consistent_link (int room0, int room1, enum dir dir)
+make_semi_consistent_link (struct level *l, int room0, int room1, enum dir dir)
 {
-  make_reciprocal_link (room0, room1, dir);
+  make_reciprocal_link (l, room0, room1, dir);
 
-  make_link_locally_unique (room0, dir);
-  make_link_locally_unique (room1, opposite_dir (dir));
+  make_link_locally_unique (l, room0, dir);
+  make_link_locally_unique (l, room1, opposite_dir (dir));
 
-  make_link_globally_unique (room0, dir);
-  make_link_globally_unique (room1, opposite_dir (dir));
+  make_link_globally_unique (l, room0, dir);
+  make_link_globally_unique (l, room1, opposite_dir (dir));
 }
 
 void
-make_link_adjacency_bound (int room, enum dir dir)
+make_link_adjacency_bound (struct level *l, int room, enum dir dir)
 {
-  int r = roomd (room, dir);
+  int r = roomd (l, room, dir);
   int dir0 = perpendicular_dir (dir, 0);
   int dir1 = perpendicular_dir (dir, 1);
 
-  int room0a = roomd (room, dir0);
-  int room0b = roomd (r, dir0);
+  int room0a = roomd (l, room, dir0);
+  int room0b = roomd (l, r, dir0);
 
-  int room1a = roomd (room, dir1);
-  int room1b = roomd (r, dir1);
+  int room1a = roomd (l, room, dir1);
+  int room1b = roomd (l, r, dir1);
 
-  make_semi_consistent_link (room0a, room0b, dir);
-  make_semi_consistent_link (room1a, room1b, dir);
+  make_semi_consistent_link (l, room0a, room0b, dir);
+  make_semi_consistent_link (l, room1a, room1b, dir);
 }
 
 void
-exchange_rooms  (int room0, int room1)
+exchange_rooms  (struct level *l, int room0, int room1)
 {
-  int r0l = roomd (room0, LEFT);
-  int r0r = roomd (room0, RIGHT);
-  int r0a = roomd (room0, ABOVE);
-  int r0b = roomd (room0, BELOW);
+  int r0l = roomd (l, room0, LEFT);
+  int r0r = roomd (l, room0, RIGHT);
+  int r0a = roomd (l, room0, ABOVE);
+  int r0b = roomd (l, room0, BELOW);
 
-  int r0lr = roomd (r0l, RIGHT);
-  int r0rl = roomd (r0r, LEFT);
-  int r0ab = roomd (r0a, BELOW);
-  int r0ba = roomd (r0b, ABOVE);
+  int r0lr = roomd (l, r0l, RIGHT);
+  int r0rl = roomd (l, r0r, LEFT);
+  int r0ab = roomd (l, r0a, BELOW);
+  int r0ba = roomd (l, r0b, ABOVE);
 
-  int r1l = roomd (room1, LEFT);
-  int r1r = roomd (room1, RIGHT);
-  int r1a = roomd (room1, ABOVE);
-  int r1b = roomd (room1, BELOW);
+  int r1l = roomd (l, room1, LEFT);
+  int r1r = roomd (l, room1, RIGHT);
+  int r1a = roomd (l, room1, ABOVE);
+  int r1b = roomd (l, room1, BELOW);
 
-  int r1lr = roomd (r1l, RIGHT);
-  int r1rl = roomd (r1r, LEFT);
-  int r1ab = roomd (r1a, BELOW);
-  int r1ba = roomd (r1b, ABOVE);
+  int r1lr = roomd (l, r1l, RIGHT);
+  int r1rl = roomd (l, r1r, LEFT);
+  int r1ab = roomd (l, r1a, BELOW);
+  int r1ba = roomd (l, r1b, ABOVE);
 
-  link_room (room0, r1l == room0 ? room1 : r1l, LEFT);
-  if (r1l != room0 && r1lr == room1) link_room (r1l, room0, RIGHT);
-  link_room (room0, r1r == room0 ? room1 : r1r, RIGHT);
-  if (r1r != room0 && r1rl == room1) link_room (r1r, room0, LEFT);
-  link_room (room0, r1a == room0 ? room1 : r1a, ABOVE);
-  if (r1a != room0 && r1ab == room1) link_room (r1a, room0, BELOW);
-  link_room (room0, r1b == room0 ? room1 : r1b, BELOW);
-  if (r1b != room0 && r1ba == room1) link_room (r1b, room0, ABOVE);
+  link_room (l, room0, r1l == room0 ? room1 : r1l, LEFT);
+  if (r1l != room0 && r1lr == room1) link_room (l, r1l, room0, RIGHT);
+  link_room (l, room0, r1r == room0 ? room1 : r1r, RIGHT);
+  if (r1r != room0 && r1rl == room1) link_room (l, r1r, room0, LEFT);
+  link_room (l, room0, r1a == room0 ? room1 : r1a, ABOVE);
+  if (r1a != room0 && r1ab == room1) link_room (l, r1a, room0, BELOW);
+  link_room (l, room0, r1b == room0 ? room1 : r1b, BELOW);
+  if (r1b != room0 && r1ba == room1) link_room (l, r1b, room0, ABOVE);
 
-  link_room (room1, r0l == room1 ? room0 : r0l, LEFT);
-  if (r0l != room1 && r0lr == room0) link_room (r0l, room1, RIGHT);
-  link_room (room1, r0r == room1 ? room0 : r0r, RIGHT);
-  if (r0r != room1 && r0rl == room0) link_room (r0r, room1, LEFT);
-  link_room (room1, r0a == room1 ? room0 : r0a, ABOVE);
-  if (r0a != room1 && r0ab == room0) link_room (r0a, room1, BELOW);
-  link_room (room1, r0b == room1 ? room0 : r0b, BELOW);
-  if (r0b != room1 && r0ba == room0) link_room (r0b, room1, ABOVE);
+  link_room (l, room1, r0l == room1 ? room0 : r0l, LEFT);
+  if (r0l != room1 && r0lr == room0) link_room (l, r0l, room1, RIGHT);
+  link_room (l, room1, r0r == room1 ? room0 : r0r, RIGHT);
+  if (r0r != room1 && r0rl == room0) link_room (l, r0r, room1, LEFT);
+  link_room (l, room1, r0a == room1 ? room0 : r0a, ABOVE);
+  if (r0a != room1 && r0ab == room0) link_room (l, r0a, room1, BELOW);
+  link_room (l, room1, r0b == room1 ? room0 : r0b, BELOW);
+  if (r0b != room1 && r0ba == room0) link_room (l, r0b, room1, ABOVE);
 }

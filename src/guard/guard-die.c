@@ -307,7 +307,8 @@ guard_die_spiked (struct anim *g)
       play_sample (skeleton_sample, NULL, g->id);
     else play_sample (spiked_sample, NULL, g->id);
 
-    struct anim *ke = get_anim_by_id (g->oenemy_id);
+    struct anim *ke = get_anim_by_id (g->enemy_id);
+    if (! ke) ke = get_anim_by_id (g->oenemy_id);
     if (ke && ke->id == current_kid_id
         && g->death_reason != SHADOW_FIGHT_DEATH)
       play_sample (glory_sample, NULL, ke->id);
@@ -365,7 +366,8 @@ guard_die_chopped (struct anim *g)
   place_frame (&g->f, &g->f, bitmap, &g->p, dx, dy);
 
   if (g->oaction != guard_die_chopped) {
-    struct anim *ke = get_anim_by_id (g->oenemy_id);
+    struct anim *ke = get_anim_by_id (g->enemy_id);
+    if (! ke) ke = get_anim_by_id (g->oenemy_id);
     if (ke && ke->id == current_kid_id
         && g->death_reason != SHADOW_FIGHT_DEATH)
       play_sample (glory_sample, NULL, ke->id);
@@ -401,17 +403,18 @@ guard_die_suddenly (struct anim *g)
                ? +9 : +4, dy);
 
   if (g->oaction != guard_die_suddenly) {
-    struct anim *ke = get_anim_by_id (g->oenemy_id);
+    struct anim *ke = get_anim_by_id (g->enemy_id);
+    if (! ke) ke = get_anim_by_id (g->oenemy_id);
     if (ke && ke->id == current_kid_id
         && g->death_reason != SHADOW_FIGHT_DEATH)
       play_sample (glory_sample, NULL, ke->id);
     g->oenemy_id = -1;
 
     if (ke) upgrade_skill (&ke->skill, &g->skill);
-
-    if (con (&g->p)->fg == CLOSER_FLOOR)
-      closer_floor_at_pos (&g->p)->unresponsive = true;
   }
+
+  if (con (&g->p)->fg == CLOSER_FLOOR)
+    closer_floor_at_pos (&g->p)->unresponsive = true;
 
   g->xf.b = NULL;
 
@@ -454,7 +457,8 @@ flow (struct anim *g)
     if (g->type == SKELETON)
       play_sample (skeleton_sample, NULL, g->id);
 
-    struct anim *ke = get_anim_by_id (g->oenemy_id);
+    struct anim *ke = get_anim_by_id (g->enemy_id);
+    if (! ke) ke = get_anim_by_id (g->oenemy_id);
     if (ke && ke->id == current_kid_id
         && g->death_reason != SHADOW_FIGHT_DEATH)
       play_sample (glory_sample, NULL, ke->id);
@@ -462,11 +466,11 @@ flow (struct anim *g)
 
     if (ke) upgrade_skill (&ke->skill, &g->skill);
 
-    if (con (&g->p)->fg == CLOSER_FLOOR)
-      closer_floor_at_pos (&g->p)->unresponsive = true;
-
     g->xf.b = NULL;
   }
+
+  if (con (&g->p)->fg == CLOSER_FLOOR)
+    closer_floor_at_pos (&g->p)->unresponsive = true;
 
   g->current_lives = 0;
 

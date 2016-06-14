@@ -51,7 +51,7 @@ ALLEGRO_BITMAP *pv_loose_floor_left_00, *pv_loose_floor_right_00,
 
 struct loose_floor *loose_floor = NULL;
 size_t loose_floor_nmemb = 0;
-static bool must_sort, must_remove;
+static bool must_sort;
 
 void
 load_loose_floor (void)
@@ -263,13 +263,12 @@ register_loose_floor (struct pos *p)
   l.action = NO_LOOSE_FLOOR_ACTION;
   l.state = 0;
   l.cant_fall = con (p)->ext.cant_fall;
+  l.remove = false;
 
   struct coord c; floor_left_coord (p, &c);
   l.f.b = get_correct_falling_loose_floor_bitmap (dv_loose_floor_01);
-  l.f.c.room = p->room;
-  l.f.c.x = c.x;
-  l.f.c.y = c.y + 3;
   l.f.flip = 0;
+  new_coord (&l.f.c, p->l, p->room, c.x, c.y + 3);
 
   loose_floor =
     add_to_array (&l, 1, loose_floor, &loose_floor_nmemb,
@@ -325,13 +324,13 @@ release_loose_floor (struct pos *p)
 void
 compute_loose_floors (void)
 {
-  size_t i;
+  int i;
 
   must_sort = false;
-  must_remove = false;
 
   for (i = 0; i < loose_floor_nmemb; i++) {
     struct loose_floor *l = &loose_floor[i];
+
     switch (l->action) {
     case SHAKE_LOOSE_FLOOR:
       compute_loose_floor_shake (l);
@@ -342,21 +341,15 @@ compute_loose_floors (void)
     case FALL_LOOSE_FLOOR: compute_loose_floor_fall (l); break;
     default: break;
     }
+
+    if (l->remove) {
+      must_sort = true;
+      remove_loose_floor (l);
+      i--;
+    }
   }
 
   if (must_sort) sort_loose_floors ();
-
-  if (must_remove) {
-    if (! must_sort) sort_loose_floors ();
-    for (i = 0; i < loose_floor_nmemb; i++) {
-      struct loose_floor *l = &loose_floor[i];
-      if (l->p.room == -1) {
-        remove_loose_floor (l);
-        if (i > 0) i--;
-      }
-      else break;
-    }
-  }
 }
 
 void
@@ -555,8 +548,7 @@ compute_loose_floor_fall (struct loose_floor *l)
     switch (fcmbo_f) {
     case LOOSE_FLOOR: /* loose floor isn't ground */
       m = loose_floor_at_pos (&fpmbo_f);
-      if (m) m->p.room = -1;
-      must_remove = true;
+      if (m) m->remove = true;
       l->f = nf;
       l->f.b = get_correct_falling_loose_floor_bitmap (dv_broken_floor);
       l->p = p;
@@ -566,7 +558,6 @@ compute_loose_floor_fall (struct loose_floor *l)
                          false, false, false, false,
                          CHPOS_CHAIN_RELEASE_LOOSE_FLOOR,
                          "LOOSE FLOOR CHAIN RELEASE");
-      must_sort = true;
       play_sample (broken_floor_sample, &p, -1);
       alert_guards (&p);
       return;
@@ -590,9 +581,7 @@ compute_loose_floor_fall (struct loose_floor *l)
                        "LOOSE FLOOR BREAKING");
   }
   shake_loose_floor_row (&p);
-  l->p.room = -1;
-  must_remove = true;
-  must_sort = true;
+  l->remove = true;
   play_sample (broken_floor_sample, &p, -1);
   alert_guards (&p);
 }
@@ -929,19 +918,19 @@ draw_loose_floor_01_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
 struct coord *
 loose_floor_left_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * p->place;
-  c->y = PLACE_HEIGHT * p->floor + 50 - 1;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * p->place,
+               PLACE_HEIGHT * p->floor + 50 - 1);
 }
 
 struct coord *
 loose_floor_right_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * (p->place + 1);
-  c->y = PLACE_HEIGHT * p->floor + 50 - 1;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * (p->place + 1),
+               PLACE_HEIGHT * p->floor + 50 - 1);
 }
 
 void

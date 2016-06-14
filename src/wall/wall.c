@@ -240,14 +240,17 @@ draw_wall_face_top (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   switch (em) {
   case DUNGEON:
-    wall_face_top_coord = d_wall_face_top_coord;
     switch (vm) {
     case CGA:
-      wall_face_top_coord = dc_wall_face_top_coord;
+      wall_face_top_coord = dce_wall_face_top_coord;
       wall_face_top = dc_wall_face_top;
       break;
-    case EGA: wall_face_top = de_wall_face_top; break;
-    case VGA: wall_face_top = dv_wall_face_top; break;
+    case EGA:
+      wall_face_top_coord = dce_wall_face_top_coord;
+      wall_face_top = de_wall_face_top; break;
+    case VGA:
+      wall_face_top_coord = d_wall_face_top_coord;
+      wall_face_top = dv_wall_face_top; break;
     }
     break;
   case PALACE:
@@ -334,53 +337,53 @@ wall_correlation (struct pos *p)
 struct coord *
 wall_base_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * p->place;
-  c->y = PLACE_HEIGHT * (p->floor + 1);
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * p->place,
+               PLACE_HEIGHT * (p->floor + 1));
 }
 
 struct coord *
 wall_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * p->place;
-  c->y = PLACE_HEIGHT * p->floor + 3;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * p->place,
+               PLACE_HEIGHT * p->floor + 3);
 }
 
 struct coord *
 wall_face_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * (p->place + 1);
-  c->y = PLACE_HEIGHT * p->floor + 3;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * (p->place + 1),
+               PLACE_HEIGHT * p->floor + 3);
 }
 
 struct coord *
-dc_wall_face_top_coord (struct pos *p, struct coord *c)
+dce_wall_face_top_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * (p->place + 1);
-  c->y = PLACE_HEIGHT * p->floor - 10;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * (p->place + 1),
+               PLACE_HEIGHT * p->floor - 10);
 }
 
 struct coord *
 d_wall_face_top_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * (p->place + 1);
-  c->y = PLACE_HEIGHT * p->floor - 9;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * (p->place + 1),
+               PLACE_HEIGHT * p->floor - 9);
 }
 
 struct coord *
 p_wall_face_top_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * (p->place + 1);
-  c->y = PLACE_HEIGHT * p->floor - 10;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * (p->place + 1),
+               PLACE_HEIGHT * p->floor - 10);
 }

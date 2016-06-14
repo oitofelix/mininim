@@ -116,7 +116,7 @@ flow (struct anim *k)
   else if (k->i == 10 && k->reverse) k->i = 7;
   else {
     kid_normal (k);
-    k->item_pos.room = -1;
+    invalid_pos (&k->item_pos);
     return false;
   }
 

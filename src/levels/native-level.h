@@ -25,9 +25,9 @@ void play_native_level (int number);
 void next_native_level (int number);
 void load_native_level (int number, struct level *l);
 bool save_native_level (struct level *l, char *filename);
-char *get_confg_str (struct level *l, struct pos *p);
-char *get_conbg_str (struct level *l, struct pos *p);
-char *get_conext_str (struct level *l, struct pos *p);
+char *get_confg_str (struct pos *p);
+char *get_conbg_str (struct pos *p);
+char *get_conext_str (struct pos *p);
 
 /* variables */
 extern struct level native_level;

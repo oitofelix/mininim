@@ -58,7 +58,8 @@ next_consistency_level (int number)
   memset (lv, 0, sizeof (*lv));
 
   /* generate room 0 (delimiter room) */
-  p.room = 0;
+  new_pos (&p, lv, 0, -1, -1);
+
   for (p.floor = 0; p.floor < FLOORS; p.floor++)
     for (p.place = 0; p.place < PLACES; p.place++) {
       struct con *c = &lv->con[p.room][p.floor][p.place];
@@ -197,15 +198,12 @@ next_consistency_level (int number)
     }
   }
 
-  /* fix level */
-  level = consistency_level;
-  for (i = 0; i < 2; i++) fix_level ();
-  consistency_level = level;
+  for (i = 0; i < 2; i++) fix_level (&consistency_level);
 
   consistency_level.number = number;
   consistency_level.nominal_number = number;
   consistency_level.start = start;
   consistency_level.next_level = next_consistency_level;
   consistency_level.end = end;
-  consistency_level.start_pos = (struct pos) {1,0,0};
+  new_pos (&consistency_level.start_pos, &consistency_level, 1, 0, 0);
 }

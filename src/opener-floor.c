@@ -246,17 +246,13 @@ compute_opener_floors (void)
 
   for (i = 0; i < opener_floor_nmemb; i++) {
     struct opener_floor *o = &opener_floor[i];
-    if (o->p.room == -1) {
-      /* remove_opener_floor (o); i--; */
-      continue;
-    }
     if (o->pressed || o->broken) {
       if (! o->noise) {
         alert_guards (&o->p);
         play_sample (opener_floor_sample, &o->p, -1);
         o->noise = true;
       }
-      open_door (o->event);
+      open_door (o->p.l, o->event);
     } else o->noise = false;
   }
 }
@@ -448,17 +444,17 @@ draw_unpressed_opener_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
 struct coord *
 unpressed_opener_floor_left_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * p->place;
-  c->y = PLACE_HEIGHT * p->floor + 50 - 1;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * p->place,
+               PLACE_HEIGHT * p->floor + 50 - 1);
 }
 
 struct coord *
 unpressed_opener_floor_right_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * (p->place + 1);
-  c->y = PLACE_HEIGHT * p->floor + 50 - 1;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * (p->place + 1),
+               PLACE_HEIGHT * p->floor + 50 - 1);
 }

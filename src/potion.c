@@ -291,37 +291,37 @@ is_potion (struct pos *p)
 struct coord *
 small_potion_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * (p->place + 1) - 10;
-  c->y = PLACE_HEIGHT * p->floor + 49;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * (p->place + 1) - 10,
+               PLACE_HEIGHT * p->floor + 49);
 }
 
 struct coord *
 small_potion_bubble_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * (p->place + 1) - 7;
-  c->y = PLACE_HEIGHT * p->floor + 40;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * (p->place + 1) - 7,
+               PLACE_HEIGHT * p->floor + 40);
 }
 
 struct coord *
 big_potion_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * (p->place + 1) - 10;
-  c->y = PLACE_HEIGHT * p->floor + 45;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * (p->place + 1) - 10,
+               PLACE_HEIGHT * p->floor + 45);
 }
 
 struct coord *
 big_potion_bubble_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * (p->place + 1) - 7;
-  c->y = PLACE_HEIGHT * p->floor + 36;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * (p->place + 1) - 7,
+               PLACE_HEIGHT * p->floor + 36);
 }
 
 ALLEGRO_COLOR

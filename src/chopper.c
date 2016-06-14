@@ -356,10 +356,6 @@ compute_choppers (void)
 
     if (c->inactive) continue;
 
-    if (c->p.room == -1) {
-      /* remove_chopper (d); i--; */
-      continue;
-    }
     switch (c->i) {
     case 0:
       if (! c->alert) c->alert = ! should_chomp (&c->p);
@@ -855,55 +851,55 @@ draw_fg_05 (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chopper *ch,
 struct coord *
 chopper_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * p->place;
-  c->y = PLACE_HEIGHT * p->floor + 3;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * p->place,
+               PLACE_HEIGHT * p->floor + 3);
 }
 
 struct coord *
 blood_01_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * p->place + 12;
-  c->y = PLACE_HEIGHT * p->floor + 48;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * p->place + 12,
+               PLACE_HEIGHT * p->floor + 48);
 }
 
 struct coord *
 blood_02_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * p->place + 12;
-  c->y = PLACE_HEIGHT * p->floor + 39;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * p->place + 12,
+               PLACE_HEIGHT * p->floor + 39);
 }
 
 struct coord *
 blood_03_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * p->place + 12;
-  c->y = PLACE_HEIGHT * p->floor + 28;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * p->place + 12,
+               PLACE_HEIGHT * p->floor + 28);
 }
 
 struct coord *
 blood_04_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * p->place + 12;
-  c->y = PLACE_HEIGHT * p->floor + 32;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * p->place + 12,
+               PLACE_HEIGHT * p->floor + 32);
 }
 
 struct coord *
 blood_05_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * p->place + 12;
-  c->y = PLACE_HEIGHT * p->floor + 52;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * p->place + 12,
+               PLACE_HEIGHT * p->floor + 52);
 }
 
 ALLEGRO_COLOR

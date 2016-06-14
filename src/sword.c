@@ -196,7 +196,7 @@ draw_sword (ALLEGRO_BITMAP *bitmap, struct pos *p, enum vm vm)
     shiny_sword = apply_palette (shiny_sword, hgc_palette);
   }
 
-  if (edit == EDIT_KID && peq (p, &level.start_pos)) {
+  if (edit == EDIT_KID && peq (p, &p->l->start_pos)) {
     normal_sword = apply_palette (normal_sword, start_anim_palette);
     shiny_sword = apply_palette (shiny_sword, start_anim_palette);
   }
@@ -220,8 +220,8 @@ is_sword (struct pos *p)
 struct coord *
 sword_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * p->place;
-  c->y = PLACE_HEIGHT * p->floor + 50;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * p->place,
+               PLACE_HEIGHT * p->floor + 50);
 }

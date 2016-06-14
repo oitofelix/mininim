@@ -81,7 +81,7 @@ struct level_door *level_door_at_pos (struct pos *p);
 void remove_level_door (struct level_door *d);
 void break_level_door (struct pos *p);
 void compute_level_doors (void);
-struct level_door *get_exit_level_door (int n);
+struct level_door *get_exit_level_door (struct level *l, int n);
 void draw_level_door (ALLEGRO_BITMAP *bitmap, struct pos *p,
                       enum em em, enum vm vm);
 void draw_level_door_front (ALLEGRO_BITMAP *bitmap, struct pos *p, int i,

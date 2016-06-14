@@ -356,7 +356,7 @@ editor (void)
       register_exchange_pos_undo (&undo, &p, &p0, true, false, "V. EXCHANGE CON");
       break;
     case 'R':
-      random_pos (&p0);
+      random_pos (&global_level, &p0);
       p0.room = p.room;
       register_exchange_pos_undo (&undo, &p, &p0, true, false, "R. EXCHANGE CON");
       break;
@@ -774,31 +774,31 @@ editor (void)
     case 'F':
       edit = EDIT_EVENT2FLOOR;
       get_mouse_coord (&last_mouse_coord);
-      last_event2floor_pos = (struct pos) {-1,-1,-1};
+      invalid_pos (&last_event2floor_pos);
       t = last_event;
       next_pos_by_pred (&last_event2floor_pos, 0, is_event_at_pos, &t);
       break;
     case 'R':
       edit = EDIT_DOOR2EVENT;
-      p0 = (struct pos) {-1,-1,-1};
+      invalid_pos (&p0);
       break;
     case 'S':
       edit = EDIT_EVENT_SET;
       s = last_event;
-      b = level.event[last_event].next;
+      b = global_level.event[last_event].next;
       break;
     }
     break;
   case EDIT_EVENT2DOOR:
-    if (! is_valid_pos (&level.event[s].p)
-        || ! is_door (&level.event[s].p)) {
+    if (! is_valid_pos (&global_level.event[s].p)
+        || ! is_door (&global_level.event[s].p)) {
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       al_set_mouse_xy (display, 0, 0);
     } else {
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
-      set_mouse_pos (&level.event[s].p);
+      set_mouse_pos (&global_level.event[s].p);
     }
-    b = level.event[s].next;
+    b = global_level.event[s].next;
     switch (menu_int (&s, &b, 0, EVENTS - 1, "ED>EVENT", "N")) {
     case -1: set_mouse_coord (&last_mouse_coord); edit = EDIT_EVENT; break;
     case 0: break;
@@ -827,7 +827,7 @@ editor (void)
       if (s) {
         if (t + s >= 0 && t + s < EVENTS) {
           t += s;
-          last_event2floor_pos = (struct pos) {-1,-1,-1};
+          invalid_pos (&last_event2floor_pos);
         } else s = 0;
       }
       if (s || r)
@@ -896,7 +896,7 @@ editor (void)
       get_mouse_coord (&last_mouse_coord);
       edit = EDIT_ROOM_EXCHANGE; break;
     case 'A':
-      p0.room = mr.room;
+      new_pos (&p0, &global_level, mr.room, -1, -1);
       for (p0.floor = 0; p0.floor < FLOORS; p0.floor++)
         for (p0.place = 0; p0.place < PLACES; p0.place++) {
           room_buf[p0.floor][p0.place] =
@@ -905,7 +905,7 @@ editor (void)
       register_room_undo (&undo, mr.room, room_buf, "CLEAR ROOM");
       break;
     case 'R':
-      p0.room = mr.room;
+      new_pos (&p0, &global_level, mr.room, -1, -1);
       for (p0.floor = 0; p0.floor < FLOORS; p0.floor++)
         for (p0.place = 0; p0.place < PLACES; p0.place++)
           room_buf[p0.floor][p0.place] =
@@ -914,18 +914,18 @@ editor (void)
       register_room_undo (&undo, mr.room, room_buf, "RANDOM ROOM");
       break;
     case 'D':
-      memcpy (&room_buf2, &level.con[mr.room], sizeof (room_buf2));
-      p0.room = mr.room;
+      memcpy (&room_buf2, &global_level.con[mr.room], sizeof (room_buf2));
+      new_pos (&p0, &global_level, mr.room, -1, -1);
       for (p0.floor = 0; p0.floor < FLOORS; p0.floor++)
         for (p0.place = 0; p0.place < PLACES; p0.place++)
           decorate_pos (&p0);
-      memcpy (&room_buf, &level.con[mr.room], sizeof (room_buf));
-      memcpy (&level.con[mr.room], &room_buf2, sizeof (room_buf2));
+      memcpy (&room_buf, &global_level.con[mr.room], sizeof (room_buf));
+      memcpy (&global_level.con[mr.room], &room_buf2, sizeof (room_buf2));
       register_room_undo (&undo, mr.room, room_buf, "DECORATE ROOM");
       break;
     case 'H': edit = EDIT_ROOM_CON_EXCHANGE; break;
     case 'C':
-      memcpy (&room_copy, &level.con[mr.room], sizeof (room_copy));
+      memcpy (&room_copy, &global_level.con[mr.room], sizeof (room_copy));
       editor_msg ("COPIED", 12);
       break;
     case 'P':
@@ -964,19 +964,19 @@ editor (void)
     case -1: case 1: edit = EDIT_ROOM; break;
     case 'L':
       get_mouse_coord (&last_mouse_coord);
-      set_mouse_room (roomd (mr.room, LEFT));
+      set_mouse_room (roomd (&global_level, mr.room, LEFT));
       edit = EDIT_LINK_LEFT; break;
     case 'R':
       get_mouse_coord (&last_mouse_coord);
-      set_mouse_room (roomd (mr.room, RIGHT));
+      set_mouse_room (roomd (&global_level, mr.room, RIGHT));
       edit = EDIT_LINK_RIGHT; break;
     case 'A':
       get_mouse_coord (&last_mouse_coord);
-      set_mouse_room (roomd (mr.room, ABOVE));
+      set_mouse_room (roomd (&global_level, mr.room, ABOVE));
       edit = EDIT_LINK_ABOVE; break;
     case 'B':
       get_mouse_coord (&last_mouse_coord);
-      set_mouse_room (roomd (mr.room, BELOW));
+      set_mouse_room (roomd (&global_level, mr.room, BELOW));
       edit = EDIT_LINK_BELOW; break;
     }
     break;
@@ -999,12 +999,12 @@ editor (void)
 
     if (r == 1) {
       struct room_linking l[ROOMS];
-      memcpy (&l, &level.link, sizeof (l));
+      memcpy (&l, &global_level.link, sizeof (l));
 
       int room0 = last_mouse_coord.c.room;
       int room1 = mr.room;
 
-      exchange_rooms (room0, room1);
+      exchange_rooms (&global_level, room0, room1);
 
       register_link_undo (&undo, l, "ROOM EXCHANGE");
       last_mouse_coord.c.room = room1;
@@ -1037,7 +1037,7 @@ editor (void)
       ui_place_kid (&p);
       break;
     case 'J':
-      set_mouse_pos (&level.start_pos);
+      set_mouse_pos (&global_level.start_pos);
       break;
     case 'S':
       if (! is_valid_pos (&p)) {
@@ -1047,14 +1047,14 @@ editor (void)
       register_start_pos_undo (&undo, &p, "START POSITION");
       break;
     case 'D':
-      if (! is_pos_visible (&level.start_pos)) {
+      if (! is_pos_visible (&global_level.start_pos)) {
         editor_msg ("START POS NOT VISIBLE", 12);
         break;
       }
       register_toggle_start_dir_undo (&undo, "START DIRECTION");
       break;
     case 'W':
-      if (! is_pos_visible (&level.start_pos)) {
+      if (! is_pos_visible (&global_level.start_pos)) {
         editor_msg ("START POS NOT VISIBLE", 12);
         break;
       }
@@ -1064,24 +1064,24 @@ editor (void)
     break;
   case EDIT_LEVEL:
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
-    xasprintf (&str, "L%i>", level.number);
+    xasprintf (&str, "L%i>", global_level.number);
     switch (menu_enum (level_menu, str)) {
     case -1: case 1: edit = EDIT_MAIN; break;
     case 'N': edit = EDIT_NOMINAL_NUMBER;
-      s = level.nominal_number;
+      s = global_level.nominal_number;
       break;
     case 'E': edit = EDIT_ENVIRONMENT;
       b = em;
-      b0 = (level.em == DUNGEON) ? true : false;
-      b1 = (level.em == PALACE) ? true : false;
+      b0 = (global_level.em == DUNGEON) ? true : false;
+      b1 = (global_level.em == PALACE) ? true : false;
       break;
     case 'H': edit = EDIT_HUE;
       b = hue;
-      b0 = (level.hue == HUE_NONE) ? true : false;
-      b1 = (level.hue == HUE_GREEN) ? true : false;
-      b2 = (level.hue == HUE_GRAY) ? true : false;
-      b3 = (level.hue == HUE_YELLOW) ? true : false;
-      b4 = (level.hue == HUE_BLUE) ? true : false;
+      b0 = (global_level.hue == HUE_NONE) ? true : false;
+      b1 = (global_level.hue == HUE_GREEN) ? true : false;
+      b2 = (global_level.hue == HUE_GRAY) ? true : false;
+      b3 = (global_level.hue == HUE_YELLOW) ? true : false;
+      b4 = (global_level.hue == HUE_BLUE) ? true : false;
       break;
     case 'S':
       xasprintf (&d, "%sdata/levels/", user_data_dir);
@@ -1091,15 +1091,15 @@ editor (void)
         al_free (d);
         goto save_failed;
       }
-      xasprintf (&f, "%s%02d.mim", d, level.number);
-      if (! save_native_level (&level, f)) {
+      xasprintf (&f, "%s%02d.mim", d, global_level.number);
+      if (! save_native_level (&global_level, f)) {
         error (0, al_get_errno (), "%s (%s): failed to save native level file",
                __func__, f);
         al_free (f);
         al_free (d);
         goto save_failed;
       }
-      *vanilla_level = level;
+      copy_level (vanilla_level, &global_level);
       editor_msg ("LEVEL HAS BEEN SAVED", 18);
       break;
     save_failed:
@@ -1107,7 +1107,7 @@ editor (void)
       break;
     case 'L':
       editor_msg ("LEVEL RELOADED", 18);
-      level = *vanilla_level;
+      copy_level (&global_level, vanilla_level);
       destroy_cons ();
       register_cons ();
       update_cache (em, vm);
@@ -1117,13 +1117,13 @@ editor (void)
    break;
   case EDIT_NOMINAL_NUMBER:
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
-    xasprintf (&str, "L%iN>N.NUMBER", level.number);
-    switch (menu_int (&level.nominal_number, NULL, 0, INT_MAX, str, NULL)) {
-    case -1: edit = EDIT_LEVEL; level.nominal_number = s; break;
+    xasprintf (&str, "L%iN>N.NUMBER", global_level.number);
+    switch (menu_int (&global_level.nominal_number, NULL, 0, INT_MAX, str, NULL)) {
+    case -1: edit = EDIT_LEVEL; global_level.nominal_number = s; break;
     case 0: break;
     case 1:
       edit = EDIT_LEVEL;
-      register_int_undo (&undo, &level.nominal_number, s, (undo_f) int_undo,
+      register_int_undo (&undo, &global_level.nominal_number, s, (undo_f) int_undo,
                          "LEVEL NOMINAL NUMBER");
       break;
     default: break;
@@ -1132,58 +1132,58 @@ editor (void)
     break;
   case EDIT_ENVIRONMENT:
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
-    xasprintf (&str, "L%iE>", level.number);
+    xasprintf (&str, "L%iE>", global_level.number);
     b0 = b1 = false;
-    if (level.em == DUNGEON) b0 = true;
-    if (level.em == PALACE) b1 = true;
-    em = level.em;
+    if (global_level.em == DUNGEON) b0 = true;
+    if (global_level.em == PALACE) b1 = true;
+    em = global_level.em;
     switch (menu_bool (environment_menu, str, true, &b0, &b1)) {
-    case -1: edit = EDIT_LEVEL; level.em = b; em = b; break;
+    case -1: edit = EDIT_LEVEL; global_level.em = b; em = b; break;
     case 0: break;
     case 1:
       edit = EDIT_LEVEL;
-      register_int_undo (&undo, (int *) &level.em, b, (undo_f) level_environment_undo,
+      register_int_undo (&undo, (int *) &global_level.em, b, (undo_f) level_environment_undo,
                          "LEVEL ENVIRONMENT");
       break;
     default:
-      if (b0) level.em = DUNGEON;
-      if (b1) level.em = PALACE;
-      em = level.em;
+      if (b0) global_level.em = DUNGEON;
+      if (b1) global_level.em = PALACE;
+      em = global_level.em;
       break;
     }
     al_free (str);
     break;
   case EDIT_HUE:
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
-    xasprintf (&str, "L%iH>", level.number);
+    xasprintf (&str, "L%iH>", global_level.number);
     b0 = b1 = b2 = b3 = b4 = 0;
-    if (level.hue == HUE_NONE) b0 = true;
-    if (level.hue == HUE_GREEN) b1 = true;
-    if (level.hue == HUE_GRAY) b2 = true;
-    if (level.hue == HUE_YELLOW) b3 = true;
-    if (level.hue == HUE_BLUE) b4 = true;
-    hue = level.hue;
+    if (global_level.hue == HUE_NONE) b0 = true;
+    if (global_level.hue == HUE_GREEN) b1 = true;
+    if (global_level.hue == HUE_GRAY) b2 = true;
+    if (global_level.hue == HUE_YELLOW) b3 = true;
+    if (global_level.hue == HUE_BLUE) b4 = true;
+    hue = global_level.hue;
     switch (menu_bool (hue_menu, str, true, &b0, &b1, &b2, &b3, &b4)) {
-    case -1: edit = EDIT_LEVEL; level.hue = b; hue = b; break;
+    case -1: edit = EDIT_LEVEL; global_level.hue = b; hue = b; break;
     case 0: break;
     case 1:
       edit = EDIT_LEVEL;
-      register_int_undo (&undo, (int *) &level.hue, b, (undo_f) level_hue_undo,
+      register_int_undo (&undo, (int *) &global_level.hue, b, (undo_f) level_hue_undo,
                          "LEVEL HUE");
       break;
     default:
-      if (b0) level.hue = HUE_NONE;
-      if (b1) level.hue = HUE_GREEN;
-      if (b2) level.hue = HUE_GRAY;
-      if (b3) level.hue = HUE_YELLOW;
-      if (b4) level.hue = HUE_BLUE;
-      hue = level.hue;
+      if (b0) global_level.hue = HUE_NONE;
+      if (b1) global_level.hue = HUE_GREEN;
+      if (b2) global_level.hue = HUE_GRAY;
+      if (b3) global_level.hue = HUE_YELLOW;
+      if (b4) global_level.hue = HUE_BLUE;
+      hue = global_level.hue;
       break;
     }
     al_free (str);
     break;
   case EDIT_GUARD:
-    g = &level.guard[guard_index];
+    g = &global_level.guard[guard_index];
     set_system_mouse_cursor (is_guard_by_type (g->type)
                              ? ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT
                              : ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
@@ -1287,7 +1287,7 @@ editor (void)
     break;
   case EDIT_GUARD_SKILL:
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
-    g = &level.guard[guard_index];
+    g = &global_level.guard[guard_index];
     xasprintf (&str, "G%iK>", guard_index);
     c = menu_enum (skill_menu, str);
     if (! c) break;
@@ -1323,7 +1323,7 @@ editor (void)
     break;
   case EDIT_SKILL_LEGACY_TEMPLATES:
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
-    g = &level.guard[guard_index];
+    g = &global_level.guard[guard_index];
     xasprintf (&str, "G%iKL>L.SKILL", guard_index);
     c = menu_int (&s, NULL, 0, 11, str, NULL);
     if (! c) break;
@@ -1390,10 +1390,10 @@ editor (void)
     break;
   case EDIT_GUARD_TYPE:
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
-    g = &level.guard[guard_index];
+    g = &global_level.guard[guard_index];
     if (! is_guard_by_type (g->type)
         && g->p.room == 0 && g->p.floor == 0 && g->p.place == 0)
-      g->p.room = g->p.floor = g->p.place = -1;
+      invalid_pos (&g->p);
     xasprintf (&str, "G%iT>", guard_index);
     b0 = b1 = b2 = b3 = b4 = b5 = 0;
     if (g->type == NO_ANIM) b0 = true;
@@ -1427,7 +1427,7 @@ editor (void)
     break;
   case EDIT_GUARD_STYLE:
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
-    g = &level.guard[guard_index];
+    g = &global_level.guard[guard_index];
     xasprintf (&str, "G%iY>STYLE", guard_index);
     switch (menu_int (&g->style, NULL, 0, 7, str, NULL)) {
     case -1: edit = EDIT_GUARD; g->style = b; break;
@@ -1567,22 +1567,24 @@ menu_link (enum dir dir)
 
   if (r == 1) {
     struct room_linking l[ROOMS];
-    memcpy (&l, &level.link, sizeof (l));
+    memcpy (&l, &global_level.link, sizeof (l));
 
     int room0 = last_mouse_coord.c.room;
     int room1 = mr.room;
 
-    *roomd_ptr (room0, dir) = room1;
-    if (reciprocal_links) make_reciprocal_link (room0, room1, dir);
+    *roomd_ptr (&global_level, room0, dir) = room1;
+    if (reciprocal_links) make_reciprocal_link (&global_level, room0, room1, dir);
 
     if (locally_unique_links) {
-      make_link_locally_unique (room0, dir);
-      if (reciprocal_links) make_link_locally_unique (room1, opposite_dir (dir));
+      make_link_locally_unique (&global_level, room0, dir);
+      if (reciprocal_links)
+        make_link_locally_unique (&global_level, room1, opposite_dir (dir));
     }
 
     if (globally_unique_links) {
-      make_link_globally_unique (room0, dir);
-      if (reciprocal_links) make_link_globally_unique (room1, opposite_dir (dir));
+      make_link_globally_unique (&global_level, room0, dir);
+      if (reciprocal_links)
+        make_link_globally_unique (&global_level, room1, opposite_dir (dir));
     }
 
     register_link_undo (&undo, l, "LINK");
@@ -1596,7 +1598,7 @@ menu_link (enum dir dir)
 static void
 mouse2guard (int i)
 {
-  struct guard *g = &level.guard[i];
+  struct guard *g = &global_level.guard[i];
   if (is_guard_by_type (g->type)
       && is_valid_pos (&g->p)) {
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);

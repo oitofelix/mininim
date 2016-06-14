@@ -22,72 +22,58 @@
 bool coord_wa;
 
 int *
-xroomd_ptr (struct level *l, int room, enum dir dir)
+roomd_ptr (struct level *l, int room, enum dir dir)
 {
   switch (dir) {
   case LEFT: return &l->link[room].l;
   case RIGHT: return &l->link[room].r;
   case ABOVE: return &l->link[room].a;
   case BELOW: return &l->link[room].b;
-  default:
-    error (-1, 0, "%s: unknown direction (%i)", __func__, dir);
-    return NULL;
+  default: assert (false); return NULL;
   }
 }
 
-int *
-roomd_ptr (int room, enum dir dir)
-{
-  return xroomd_ptr (&level, room, dir);
-}
-
 int
-roomd (int room, enum dir dir)
+roomd (struct level *l, int room, enum dir dir)
 {
-  return *roomd_ptr (room, dir);
-}
-
-int
-xroomd (struct level *l, int room, enum dir dir)
-{
-  return *xroomd_ptr (l, room, dir);
+  return *roomd_ptr (l, room, dir);
 }
 
 void
-link_room (int room0, int room1, enum dir dir)
+link_room (struct level *l, int room0, int room1, enum dir dir)
 {
-  if (room0) *roomd_ptr (room0, dir) = room1;
+  if (room0) *roomd_ptr (l, room0, dir) = room1;
 }
 
 int
-roomd_n0 (int room, enum dir dir)
+roomd_n0 (struct level *l, int room, enum dir dir)
 {
-  int r = roomd (room, dir);
+  int r = roomd (l, room, dir);
   return r ? r : room;
 }
 
 bool
-is_room_adjacent (int room0, int room1)
+is_room_adjacent (struct level *l, int room0, int room1)
 {
   return room0 == room1
-    || roomd (room0, LEFT) == room1
-    || roomd (room0, RIGHT) == room1
-    || roomd (room0, ABOVE) == room1
-    || roomd (room0, BELOW) == room1;
+    || roomd (l, room0, LEFT) == room1
+    || roomd (l, room0, RIGHT) == room1
+    || roomd (l, room0, ABOVE) == room1
+    || roomd (l, room0, BELOW) == room1;
 }
 
 int
-room_dist (int r0, int r1, int max)
+room_dist (struct level *lv, int r0, int r1, int max)
 {
   struct room_dist room[ROOMS];
 
   /* begin optimization block */
   if (r0 == r1) return 0;
 
-  if (roomd (r0, LEFT) == r1
-      || roomd (r0, RIGHT) == r1
-      || roomd (r0, BELOW) == r1
-      || roomd (r0, ABOVE) == r1)
+  if (roomd (lv, r0, LEFT) == r1
+      || roomd (lv, r0, RIGHT) == r1
+      || roomd (lv, r0, BELOW) == r1
+      || roomd (lv, r0, ABOVE) == r1)
     return 1;
   /* end optimization block */
 
@@ -106,10 +92,10 @@ room_dist (int r0, int r1, int max)
     if (u == r1) break;
     room[u].visited = true;
 
-    int l = roomd (u, LEFT);
-    int r = roomd (u, RIGHT);
-    int b = roomd (u, BELOW);
-    int a = roomd (u, ABOVE);
+    int l = roomd (lv, u, LEFT);
+    int r = roomd (lv, u, RIGHT);
+    int b = roomd (lv, u, BELOW);
+    int a = roomd (lv, u, ABOVE);
 
     room[l].dist = min_int (room[l].dist, room[u].dist + 1);
     room[r].dist = min_int (room[r].dist, room[u].dist + 1);
@@ -144,17 +130,45 @@ min_room_dist (struct room_dist room[], int *dmax)
 bool
 coord_eq (struct coord *_c0, struct coord *_c1)
 {
+  assert (is_valid_coord (_c0) && is_valid_coord (_c1));
+
   struct coord c0, c1;
   ncoord (_c0, &c0);
   ncoord (_c1, &c1);
 
-  return c0.room == c1.room && c0.x == c1.x
+  return c0.l == c1.l
+    && c0.room == c1.room
+    && c0.x == c1.x
     && c0.y == c1.y;
+}
+
+struct coord *
+new_coord (struct coord *c, struct level *l, int room, int x, int y)
+{
+  c->l = l;
+  c->room = room;
+  c->x = x;
+  c->y = y;
+  return c;
+}
+
+struct coord *
+invalid_coord (struct coord *c)
+{
+  return new_coord (c, NULL, -1, -1, -1);
+}
+
+bool
+is_valid_coord (struct coord *c)
+{
+  return cutscene || (c->l && c->room >= 0 && c->room < ROOMS);
 }
 
 struct coord *
 ncoord (struct coord *c, struct coord *nc)
 {
+  assert (is_valid_coord (c));
+
   if (nc != c) *nc = *c;
 
   bool m;
@@ -163,49 +177,31 @@ ncoord (struct coord *c, struct coord *nc)
     m = false;
 
     int ra, rb, rl, rr;
-    /* int rab, rba, rlr, rrl; */
 
-    ra = roomd (nc->room, ABOVE);
-    rb = roomd (nc->room, BELOW);
-    rl = roomd (nc->room, LEFT);
-    rr = roomd (nc->room, RIGHT);
+    ra = roomd (nc->l, nc->room, ABOVE);
+    rb = roomd (nc->l, nc->room, BELOW);
+    rl = roomd (nc->l, nc->room, LEFT);
+    rr = roomd (nc->l, nc->room, RIGHT);
 
-    /* rab = roomd (ra, BELOW); */
-    /* rba = roomd (rb, ABOVE); */
-    /* rlr = roomd (rl, RIGHT); */
-    /* rrl = roomd (rr, LEFT); */
-
-    if (nc->x < 0
-               /* && (rl != nc->room || coord_wa) */
-               /* && rlr == nc->room */
-               ) {
+    if (nc->x < 0) {
       nc->x += PLACE_WIDTH * PLACES;
       nc->prev_room = nc->room;
       nc->room = rl;
       nc->xd = LEFT;
       m = true;
-    } else if (nc->x >= PLACE_WIDTH * PLACES
-               /* && (rr != nc->room || coord_wa) */
-               /* && rrl == nc->room */
-               ) {
+    } else if (nc->x >= PLACE_WIDTH * PLACES) {
       nc->x -= PLACE_WIDTH * PLACES;
       nc->prev_room = nc->room;
       nc->room = rr;
       nc->xd = RIGHT;
       m = true;
-    } else if (nc->y < 0
-        /* && (ra != nc->room || coord_wa) */
-        /* && rab == nc->room */
-        ) {
+    } else if (nc->y < 0) {
       nc->y += PLACE_HEIGHT * FLOORS;
       nc->prev_room = nc->room;
       nc->room = ra;
       nc->xd = ABOVE;
       m = true;
-    } else if (nc->y >= PLACE_HEIGHT * FLOORS + 11
-               /* && (rb != nc->room || coord_wa) */
-               /* && rba == nc->room */
-               ) {
+    } else if (nc->y >= PLACE_HEIGHT * FLOORS + 11) {
       nc->y -= PLACE_HEIGHT * FLOORS;
       nc->prev_room = nc->room;
       nc->room = rb;
@@ -217,15 +213,33 @@ ncoord (struct coord *c, struct coord *nc)
   return nc;
 }
 
-bool
-is_valid_pos (struct pos *p)
+struct pos *
+new_pos (struct pos *p, struct level *l, int room, int floor, int place)
 {
-  return p->room >= 0 && p->room < ROOMS;
+  p->l = l;
+  p->room = room;
+  p->floor = floor;
+  p->place = place;
+  return p;
 }
 
 struct pos *
-xnpos (struct level *l, struct pos *p, struct pos *np)
+invalid_pos (struct pos *p)
 {
+  return new_pos (p, NULL, -1, -1, -1);
+}
+
+bool
+is_valid_pos (struct pos *p)
+{
+  return cutscene || (p->l && p->room >= 0 && p->room < ROOMS);
+}
+
+struct pos *
+npos (struct pos *p, struct pos *np)
+{
+  assert (is_valid_pos (p));
+
   if (np != p) *np = *p;
 
   bool m;
@@ -235,30 +249,24 @@ xnpos (struct level *l, struct pos *p, struct pos *np)
 
     if (np->floor < 0) {
       np->floor += FLOORS;
-      np->room = xroomd (l, np->room, ABOVE);
+      np->room = roomd (np->l, np->room, ABOVE);
       m = true;
     } else if (np->floor >= FLOORS) {
       np->floor -= FLOORS;
-      np->room = xroomd (l, np->room, BELOW);
+      np->room = roomd (np->l, np->room, BELOW);
       m = true;
     } else if (np->place < 0) {
       np->place += PLACES;
-      np->room = xroomd (l, np->room, LEFT);
+      np->room = roomd (np->l, np->room, LEFT);
       m = true;
     } else if (np->place >= PLACES) {
       np->place -= PLACES;
-      np->room = xroomd (l, np->room, RIGHT);
+      np->room = roomd (np->l, np->room, RIGHT);
       m = true;
     }
   } while (m);
 
   return np;
-}
-
-struct pos *
-npos (struct pos *p, struct pos *np)
-{
-  return xnpos (&level, p, np);
 }
 
 struct coord *
@@ -307,10 +315,10 @@ pos2room (struct pos *p, int room, struct pos *pv)
 
   int ra, rb, rl, rr;
 
-  ra = roomd (room, ABOVE);
-  rb = roomd (room, BELOW);
-  rl = roomd (room, LEFT);
-  rr = roomd (room, RIGHT);
+  ra = roomd (pv->l, room, ABOVE);
+  rb = roomd (pv->l, room, BELOW);
+  rl = roomd (pv->l, room, LEFT);
+  rr = roomd (pv->l, room, RIGHT);
 
   if (rb == pv->room) {
     pb.floor += FLOORS;
@@ -367,15 +375,15 @@ coord2room (struct coord *c, int room, struct coord *cv)
   int ra, rb, rl, rr;
   int rab, rba, rlr, rrl;
 
-  ra = roomd (room, ABOVE);
-  rb = roomd (room, BELOW);
-  rl = roomd (room, LEFT);
-  rr = roomd (room, RIGHT);
+  ra = roomd (cv->l, room, ABOVE);
+  rb = roomd (cv->l, room, BELOW);
+  rl = roomd (cv->l, room, LEFT);
+  rr = roomd (cv->l, room, RIGHT);
 
-  rab = roomd (ra, BELOW);
-  rba = roomd (rb, ABOVE);
-  rlr = roomd (rl, RIGHT);
-  rrl = roomd (rr, LEFT);
+  rab = roomd (cv->l, ra, BELOW);
+  rba = roomd (cv->l, rb, ABOVE);
+  rlr = roomd (cv->l, rl, RIGHT);
+  rrl = roomd (cv->l, rr, LEFT);
 
   if (rb == cv->room
       && rba == room) {
@@ -422,9 +430,10 @@ struct coord *
 frame2room (struct frame *f, int room, struct coord *cv)
 {
   *cv = f->c;
-  ncoord (cv, cv);
 
   if (cv->room == room) return cv;
+
+  ncoord (cv, cv);
 
   struct coord tl = *cv;
   struct coord tr = *cv;
@@ -508,13 +517,13 @@ coord4draw (struct coord *c, int room, struct coord *cv)
   bool m = false;
 
   if (cv->y < 11 &&
-      roomd (room, BELOW) == cv->room
+      roomd (cv->l, room, BELOW) == cv->room
       && room != cv->room) {
     cv->y += PLACE_HEIGHT * FLOORS;
     cv->room = room;
     m = true;
   } else if (cv->y >= PLACE_HEIGHT * FLOORS
-             && roomd (room, ABOVE) == cv->room
+             && roomd (cv->l, room, ABOVE) == cv->room
              && room != cv->room) {
     cv->y -= PLACE_HEIGHT * FLOORS;
     cv->room = room;
@@ -540,22 +549,17 @@ coord_mod (struct coord *c)
 struct pos *
 pos_gen (struct coord *c, struct pos *p, int dx, int dy)
 {
-  p->room = c->room;
-  /* p->place = (c->x - dx) / PLACE_WIDTH; */
-  /* p->floor = (c->y - dy) / PLACE_HEIGHT; */
+  int floor, place;
 
-  /* if (c->x < dx) p->place = -1; */
-  /* if (c->y < dy) p->floor = -1; */
+  if (c->x >= dx) place = (c->x - dx) / PLACE_WIDTH;
+  else if (0 <= c->x && c->x < dx) place = -1;
+  else place = -(((dx - c->x - 1) / PLACE_WIDTH) + 1);
 
-  if (c->x >= dx) p->place = (c->x - dx) / PLACE_WIDTH;
-  else if (0 <= c->x && c->x < dx) p->place = -1;
-  else p->place = -(((dx - c->x - 1) / PLACE_WIDTH) + 1);
+  if (c->y >= dy) floor = (c->y - dy) / PLACE_HEIGHT;
+  else if (0 <= c->y && c->y < dy) floor = -1;
+  else floor = -(((dy - c->y - 1) / PLACE_HEIGHT) + 1);
 
-  if (c->y >= dy) p->floor = (c->y - dy) / PLACE_HEIGHT;
-  else if (0 <= c->y && c->y < dy) p->floor = -1;
-  else p->floor = -(((dy - c->y - 1) / PLACE_HEIGHT) + 1);
-
-  return p;
+  return new_pos (p, c->l, c->room, floor, place);
 }
 
 struct pos *
@@ -594,7 +598,9 @@ cpos (struct pos *p0, struct pos *p1)
   /* else if (np0.place > np1.place) return 1; */
   /* else return 0; */
 
-  if (np0.room < np1.room) return -1;
+  if (np0.l < np1.l) return -1;
+  else if (np0.l > np1.l) return 1;
+  else if (np0.room < np1.room) return -1;
   else if (np0.room > np1.room) return 1;
   else if (np0.place < np1.place) return -1;
   else if (np0.place > np1.place) return 1;
@@ -610,7 +616,9 @@ ccoord (struct coord *c0, struct coord *c1)
   ncoord (c0, &nc0);
   ncoord (c1, &nc1);
 
-  if (nc0.room < nc1.room) return -1;
+  if (nc0.l < nc1.l) return -1;
+  else if (nc0.l > nc1.l) return 1;
+  else if (nc0.room < nc1.room) return -1;
   else if (nc0.room > nc1.room) return 1;
   else if (nc0.y < nc1.y) return 1;
   else if (nc0.y > nc1.y) return -1;
@@ -622,20 +630,17 @@ ccoord (struct coord *c0, struct coord *c1)
 bool
 peq (struct pos *p0, struct pos *p1)
 {
-  if (p0->room < 0 || p1->room < 0)
-    return false;
-
-  /* optimization: sufficient condition */
-  if (p0->room == p1->room
-      && p0->floor == p1->floor
-      && p0->place == p1->place) return true;
-
   struct pos np0, np1;
+
+  if (! is_valid_pos (p0) || ! is_valid_pos (p1))
+    return false;
 
   npos (p0, &np0);
   npos (p1, &np1);
 
-  return np0.room == np1.room && np0.floor == np1.floor
+  return np0.l == np1.l
+    && np0.room == np1.room
+    && np0.floor == np1.floor
     && np0.place == np1.place;
 }
 
@@ -649,28 +654,20 @@ peqr (struct pos *p0, struct pos *p1, int floor, int place)
 struct pos *
 reflect_pos_h (struct pos *p0, struct pos *p1)
 {
-  p1->room = p0->room;
-  p1->floor = p0->floor;
-  p1->place = (PLACES - 1) - p0->place;
-  return p1;
+  return new_pos (p1, p0->l, p0->room, p0->floor, (PLACES - 1) - p0->place);
 }
 
 struct pos *
 reflect_pos_v (struct pos *p0, struct pos *p1)
 {
-  p1->room = p0->room;
-  p1->floor = (FLOORS - 1) - p0->floor;
-  p1->place = p0->place;
-  return p1;
+  return new_pos (p1, p0->l, p0->room, (FLOORS - 1) - p0->floor, p0->place);
 }
 
 struct pos *
-random_pos (struct pos *p)
+random_pos (struct level *l, struct pos *p)
 {
-  p->room = prandom (ROOMS - 1);
-  p->floor = prandom (FLOORS - 1);
-  p->place = prandom (PLACES - 1);
-  return p;
+  return new_pos (p, l, prandom (ROOMS - 1), prandom (FLOORS - 1),
+                  prandom (PLACES - 1));
 }
 
 double
@@ -689,9 +686,9 @@ place_frame (struct frame *f, struct frame *nf, ALLEGRO_BITMAP *b,
   *nf = *f;
   pos2room (p, f->c.room, &pv);
   nf->b = b;
-  nf->c.room = pv.room;
-  nf->c.x = PLACE_WIDTH * pv.place + dx;
-  nf->c.y = PLACE_HEIGHT * pv.floor + dy;
+  new_coord (&nf->c, pv.l, pv.room,
+             PLACE_WIDTH * pv.place + dx,
+             PLACE_HEIGHT * pv.floor + dy);
   return nf;
 }
 
@@ -722,7 +719,6 @@ opposite_dir (enum dir dir)
   case ABOVE: return BELOW;
   case BELOW: return ABOVE;
   }
-
   return LEFT;
 }
 
@@ -735,7 +731,6 @@ perpendicular_dir (enum dir dir, int n)
   case ABOVE: return n ? LEFT : RIGHT;
   case BELOW: return n ? LEFT : RIGHT;
   }
-
   return LEFT;
 }
 
@@ -756,10 +751,10 @@ dim (struct frame *f, struct dim *d)
 struct coord *
 con_m (struct pos *p, struct coord *c)
 {
-  c->room = p->room;
-  c->x = PLACE_WIDTH * p->place + 15 + PLACE_WIDTH / 2;
-  c->y = PLACE_HEIGHT * p->floor + 3 + PLACE_HEIGHT / 2;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * p->place + 15 + PLACE_WIDTH / 2,
+               PLACE_HEIGHT * p->floor + 3 + PLACE_HEIGHT / 2);
 }
 
 
@@ -772,10 +767,10 @@ struct coord *
 _m (struct frame *f, struct coord *c)
 {
   struct dim d; dim (f, &d);
-  c->room = f->c.room;
-  c->x = d.x + d.w / 2;
-  c->y = d.y + d.h / 2;
-  return c;
+  return
+    new_coord (c, f->c.l, f->c.room,
+               d.x + d.w / 2,
+               d.y + d.h / 2);
 }
 
 /* <->
@@ -787,10 +782,10 @@ struct coord *
 _mt (struct frame *f, struct coord *c)
 {
   struct dim d; dim (f, &d);
-  c->room = f->c.room;
-  c->x = d.x + d.w / 2;
-  c->y = d.y;
-  return c;
+  return
+    new_coord (c, f->c.l, f->c.room,
+               d.x + d.w / 2,
+               d.y);
 }
 
 /* <->
@@ -802,10 +797,10 @@ struct coord *
 _mbo (struct frame *f, struct coord *c)
 {
   struct dim d; dim (f, &d);
-  c->room = f->c.room;
-  c->x = d.x + d.w / 2;
-  c->y = d.y + d.h - 1;
-  return c;
+  return
+    new_coord (c, f->c.l, f->c.room,
+               d.x + d.w / 2,
+               d.y + d.h - 1);
 }
 
 /* <->
@@ -817,10 +812,10 @@ struct coord *
 _ml (struct frame *f, struct coord *c)
 {
   struct dim d; dim (f, &d);
-  c->room = f->c.room;
-  c->x = d.x;
-  c->y = d.y + d.h / 2;
-  return c;
+  return
+    new_coord (c, f->c.l, f->c.room,
+               d.x,
+               d.y + d.h / 2);
 }
 
 /* <->
@@ -832,10 +827,10 @@ struct coord *
 _mr (struct frame *f, struct coord *c)
 {
   struct dim d; dim (f, &d);
-  c->room = f->c.room;
-  c->x = d.x + d.w - 1;
-  c->y = d.y + d.h / 2;
-  return c;
+  return
+    new_coord (c, f->c.l, f->c.room,
+               d.x + d.w - 1,
+               d.y + d.h / 2);
 }
 
 /* <-- -->
@@ -847,10 +842,10 @@ struct coord *
 _mf (struct frame *f, struct coord *c)
 {
   struct dim d; dim (f, &d);
-  c->room = f->c.room;
-  c->x = d.fx;
-  c->y = d.y + d.h / 2;
-  return c;
+  return
+    new_coord (c, f->c.l, f->c.room,
+               d.fx,
+               d.y + d.h / 2);
 }
 
 /* <-- -->
@@ -862,10 +857,10 @@ struct coord *
 _mba (struct frame *f, struct coord *c)
 {
   struct dim d; dim (f, &d);
-  c->room = f->c.room;
-  c->x = d.bx;
-  c->y = d.y + d.h / 2;
-  return c;
+  return
+    new_coord (c, f->c.l, f->c.room,
+               d.bx,
+               d.y + d.h / 2);
 }
 
 /* <->
@@ -877,10 +872,10 @@ struct coord *
 _tl (struct frame *f, struct coord *c)
 {
   struct dim d; dim (f, &d);
-  c->room = f->c.room;
-  c->x = d.x;
-  c->y = d.y;
-  return c;
+  return
+    new_coord (c, f->c.l, f->c.room,
+               d.x,
+               d.y);
 }
 
 /* <->
@@ -892,10 +887,10 @@ struct coord *
 _tr (struct frame *f, struct coord *c)
 {
   struct dim d; dim (f, &d);
-  c->room = f->c.room;
-  c->x = d.x + d.w - 1;
-  c->y = d.y;
-  return c;
+  return
+    new_coord (c, f->c.l, f->c.room,
+               d.x + d.w - 1,
+               d.y);
 }
 
 /* <-- -->
@@ -907,10 +902,10 @@ struct coord *
 _tf (struct frame *f, struct coord *c)
 {
   struct dim d; dim (f, &d);
-  c->room = f->c.room;
-  c->x = d.fx;
-  c->y = d.y;
-  return c;
+  return
+    new_coord (c, f->c.l, f->c.room,
+               d.fx,
+               d.y);
 }
 
 /* <-- -->
@@ -922,10 +917,10 @@ struct coord *
 _tb (struct frame *f, struct coord *c)
 {
   struct dim d; dim (f, &d);
-  c->room = f->c.room;
-  c->x = d.bx;
-  c->y = d.y;
-  return c;
+  return
+    new_coord (c, f->c.l, f->c.room,
+               d.bx,
+               d.y);
 }
 
 /* <->
@@ -937,10 +932,10 @@ struct coord *
 _bl (struct frame *f, struct coord *c)
 {
   struct dim d; dim (f, &d);
-  c->room = f->c.room;
-  c->x = d.x;
-  c->y = d.y + d.h - 1;
-  return c;
+  return
+    new_coord (c, f->c.l, f->c.room,
+               d.x,
+               d.y + d.h - 1);
 }
 
 /* <->
@@ -952,10 +947,10 @@ struct coord *
 _br (struct frame *f, struct coord *c)
 {
   struct dim d; dim (f, &d);
-  c->room = f->c.room;
-  c->x = d.x + d.w - 1;
-  c->y = d.y + d.h - 1;
-  return c;
+  return
+    new_coord (c, f->c.l, f->c.room,
+               d.x + d.w - 1,
+               d.y + d.h - 1);
 }
 
 /* <-- -->
@@ -967,10 +962,10 @@ struct coord *
 _bf (struct frame *f, struct coord *c)
 {
   struct dim d; dim (f, &d);
-  c->room = f->c.room;
-  c->x = d.fx;
-  c->y = d.y + d.h -1;
-  return c;
+  return
+    new_coord (c, f->c.l, f->c.room,
+               d.fx,
+               d.y + d.h - 1);
 }
 
 /* <-- -->
@@ -982,10 +977,10 @@ struct coord *
 _bb (struct frame *f, struct coord *c)
 {
   struct dim d; dim (f, &d);
-  c->room = f->c.room;
-  c->x = d.bx;
-  c->y = d.y + d.h -1;
-  return c;
+  return
+    new_coord (c, f->c.l, f->c.room,
+               d.bx,
+               d.y + d.h - 1);
 }
 
 struct con *
@@ -1040,6 +1035,7 @@ place_at_pos (struct frame *f, coord_f cf, struct pos *p, struct coord *c)
   int dx = _c.x - tl.x;
   int dy = _c.y - tl.y;
 
+  c->l = p->l;
   c->room = p->room;
   c->x = PLACE_WIDTH * p->place + 30 - dx;
   c->y = PLACE_HEIGHT * p->floor + 34 - dy;

@@ -119,10 +119,10 @@ draw_princess_room_fire (ALLEGRO_BITMAP *bitmap, enum vm vm)
 struct coord *
 fire_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * (p->place + 1) + 8;
-  c->y = PLACE_HEIGHT * p->floor + 5;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * (p->place + 1) + 8,
+               PLACE_HEIGHT * p->floor + 5);
 }
 
 static ALLEGRO_COLOR

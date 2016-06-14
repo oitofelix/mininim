@@ -20,7 +20,7 @@
 #ifndef MININIM_LEVEL_H
 #define MININIM_LEVEL_H
 
-extern struct level level;
+extern struct level global_level;
 extern int retry_level;
 extern int camera_follow_kid;
 extern int anti_camera_room;
@@ -31,6 +31,7 @@ extern struct undo undo;
 
 void load_level (void);
 void unload_level (void);
+struct level *copy_level (struct level *ld, struct level *ls);
 void play_level (struct level *level);
 void register_con_at_pos (struct pos *p);
 void register_room (int room);

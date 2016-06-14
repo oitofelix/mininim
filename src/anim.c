@@ -355,7 +355,7 @@ play_anim (void (*draw_callback) (void),
           case HUE_GREEN: hue = HUE_GRAY; em_str = "GRAY"; break;
           case HUE_GRAY: hue = HUE_YELLOW; em_str = "YELLOW"; break;
           case HUE_YELLOW: hue = HUE_BLUE; em_str = "BLUE"; break;
-          case HUE_BLUE: hue = level.hue;
+          case HUE_BLUE: hue = global_level.hue;
             em_str = "ORIGINAL"; force_hue = false; break;
           }
         } else {
@@ -374,7 +374,7 @@ play_anim (void (*draw_callback) (void),
         if (force_em) {
           switch (em) {
           case DUNGEON: em = PALACE; em_str = "PALACE"; break;
-          case PALACE: em = level.em;
+          case PALACE: em = global_level.em;
             em_str = "ORIGINAL"; force_em = false; break;
           }
         } else {
@@ -449,9 +449,9 @@ create_anim (struct anim *a0, enum anim_type t, struct pos *p, enum dir dir)
     a.type = t;
     a.original_type = t;
     a.f.dir = dir;
-    a.f.c.room = p->room;
+    new_coord (&a.f.c, p->l, p->room, -1, -1);
     a.controllable = false;
-    a.enemy_pos = (struct pos) {-1,-1,-1};
+    a.enemy_pos = (struct pos) {NULL, -1,-1,-1};
   }
 
   a.id = i;
@@ -587,7 +587,7 @@ compare_anims (const void *_a0, const void *_a1)
     if (a0->id < a1->id) return -1;
     if (a0->id > a1->id) return 1;
   } else {
-    struct coord o = {tr0.room,0,ORIGINAL_HEIGHT};
+    struct coord o = {tr0.l, tr0.room, 0, ORIGINAL_HEIGHT};
 
     double d0 = dist_coord (&o, &tr0);
     double d1 = dist_coord (&o, &tr1);
@@ -792,10 +792,10 @@ splash_coord (struct frame *f, struct coord *c)
   int h = al_get_bitmap_height (v_kid_splash);
   int fw = al_get_bitmap_width (f->b);
   int fh = al_get_bitmap_height (f->b);
-  c->x = f->c.x + (fw / 2) - (w / 2);
-  c->y = f->c.y + (fh / 2) - (h / 2);
-  c->room = f->c.room;
-  return c;
+  return
+    new_coord (c, f->c.l, f->c.room,
+               f->c.x + (fw / 2) - (w / 2),
+               f->c.y + (fh / 2) - (h / 2));
 }
 
 
@@ -823,10 +823,10 @@ xframe_coord (struct frame *f, struct frame_offset *xf, struct coord *c)
 {
   int w = al_get_bitmap_width (xf->b);
   _tf (f, c);
-  c->x += (f->dir == LEFT) ? xf->dx : -xf->dx - w + 1;
-  c->y += xf->dy;
-  c->room = f->c.room;
-  return c;
+  return
+    new_coord (c, f->c.l, f->c.room,
+               c->x + ((f->dir == LEFT) ? xf->dx : -xf->dx - w + 1),
+               c->y + xf->dy);
 }
 
 struct frame *

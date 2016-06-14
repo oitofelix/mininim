@@ -199,35 +199,36 @@ struct rect *
 wall_brick_rect (struct pos *p, int row, int col,
                  struct rect *r)
 {
-  r->c.room = p->room;
-  r->c.x = PLACE_WIDTH * p->place;
-  r->c.y = PLACE_HEIGHT * p->floor + 3;
+  int x, y, w, h;
+
+  x = PLACE_WIDTH * p->place;
+  y = PLACE_HEIGHT * p->floor + 3;
 
   switch (row) {
   case 0:
-    r->w = PLACE_WIDTH;
-    r->h = 20;
+    w = PLACE_WIDTH;
+    h = 20;
     break;
   case 1:
-    r->c.y += 20;
-    r->c.x += 16 * (col % 2);
-    r->w = 16;
-    r->h = 21;
+    y += 20;
+    x += 16 * (col % 2);
+    w = 16;
+    h = 21;
     break;
   case 2:
-    r->c.y += 41;
-    r->c.x += 8 * (col % 2);
-    r->w = (col % 2) ? 24 : 8;
-    r->h = 19;
+    y += 41;
+    x += 8 * (col % 2);
+    w = (col % 2) ? 24 : 8;
+    h = 19;
     break;
   case 3:
-    r->c.y += 60;
-    r->w = PLACE_WIDTH;
-    r->h = 3;
+    y += 60;
+    w = PLACE_WIDTH;
+    h = 3;
     break;
   }
 
-  return r;
+  return new_rect (r, p->room, x, y, w, h);
 }
 
 ALLEGRO_BITMAP *
@@ -257,35 +258,37 @@ struct frame *
 wall_mark_frame (struct pos *p, int i, struct frame *f)
 {
   int r = prandom_seq_pos (p, i, 1, 2);
-  f->c.room = p->room;
+  int x, y;
 
   switch (i) {
   case 0:
     f->b = wall_mark (r);
-    f->c.x = PLACE_WIDTH * (p->place + 1) - 8;
-    f->c.y = PLACE_HEIGHT * p->floor + 3;
+    x = PLACE_WIDTH * (p->place + 1) - 8;
+    y = PLACE_HEIGHT * p->floor + 3;
     break;
   case 1:
     f->b = wall_mark (r + 3);
-    f->c.x = PLACE_WIDTH * p->place;
-    f->c.y = PLACE_HEIGHT * p->floor + 17;
+    x = PLACE_WIDTH * p->place;
+    y = PLACE_HEIGHT * p->floor + 17;
     break;
   case 2:
     f->b = wall_mark (r + 6);
-    f->c.x = PLACE_WIDTH * p->place;
-    f->c.y = PLACE_HEIGHT * p->floor + 38;
+    x = PLACE_WIDTH * p->place;
+    y = PLACE_HEIGHT * p->floor + 38;
     break;
   case 3:
     f->b = wall_mark (r + 9);
-    f->c.x = PLACE_WIDTH * p->place;
-    f->c.y = PLACE_HEIGHT * p->floor + 58;
+    x = PLACE_WIDTH * p->place;
+    y = PLACE_HEIGHT * p->floor + 58;
     break;
   case 4:
     f->b = wall_mark (r + 12);
-    f->c.x = PLACE_WIDTH * p->place;
-    f->c.y = PLACE_HEIGHT * p->floor + 63;
+    x = PLACE_WIDTH * p->place;
+    y = PLACE_HEIGHT * p->floor + 63;
     break;
   }
+
+  new_coord (&f->c, p->l, p->room, x, y);
 
   return f;
 }

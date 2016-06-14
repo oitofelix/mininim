@@ -653,7 +653,7 @@ draw_start_guards (ALLEGRO_BITMAP *bitmap, enum vm vm)
 {
   int i;
   for (i = 0; i < GUARDS; i++) {
-    struct guard *g = &level.guard[i];
+    struct guard *g = &global_level.guard[i];
     if (g->type == NO_ANIM) continue;
     struct frame f;
     f.c.room = g->p.room;
@@ -733,10 +733,10 @@ draw_guard_lives (ALLEGRO_BITMAP *bitmap, struct anim *g, enum vm vm)
 static struct coord *
 guard_life_coord (int i, struct coord *c)
 {
-  c->x = ORIGINAL_WIDTH - 7 * (i + 1) + 1;
-  c->y = 194;
-  c->room = room_view;
-  return c;
+  return
+    new_coord (c, NULL, room_view,
+               ORIGINAL_WIDTH - 7 * (i + 1) + 1,
+               194);
 }
 
 static ALLEGRO_COLOR

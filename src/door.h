@@ -85,8 +85,8 @@ void register_door (struct pos *p);
 int compare_doors (const void *d0, const void *d1);
 struct door *door_at_pos (struct pos *p);
 void remove_door (struct door *d);
-void open_door (int e);
-void close_door (int e);
+void open_door (struct level *l, int e);
+void close_door (struct level *l, int e);
 void compute_doors (void);
 int door_grid_tip_y (struct pos *p);
 void draw_door (ALLEGRO_BITMAP *bitmap, struct pos *p,

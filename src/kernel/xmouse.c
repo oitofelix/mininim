@@ -66,9 +66,12 @@ get_mouse_coord (struct mouse_coord *m)
   if (screen_flags & ALLEGRO_FLIP_VERTICAL)
     y = sh - y;
 
-  if (y < 3 || y >= sh - 8 || x < 0 || x > sw - 1)
-    m->x = m->y = m->c.room = -1;
-  else {
+  m->c.l = &global_level;
+
+  if (y < 3 || y >= sh - 8 || x < 0 || x > sw - 1) {
+    m->x = m->y = -1;
+    invalid_coord (&m->c);
+  } else {
     m->x = x / ORIGINAL_WIDTH;
     m->y = (y - 3) / ROOM_HEIGHT;
     m->c.room = mr.cell[m->x][m->y].room;
@@ -87,12 +90,17 @@ get_mouse_pos (struct pos *p)
   struct mouse_coord m;
   get_mouse_coord (&m);
 
+  if (! is_valid_coord (&m.c)) {
+    invalid_pos (p);
+    return p;
+  }
+
   int ry = (m.c.y - 3) % PLACE_HEIGHT;
 
   pos_gen (&m.c, p, 0, 3);
 
   if (edit == EDIT_NONE) {
-    *p = (struct pos) {-1,-1,-1};
+    invalid_pos (p);
     return p;
   }
 
@@ -115,7 +123,7 @@ get_mouse_pos (struct pos *p)
 
   struct pos np; npos (p, &np);
   if (! np.room) {
-    *p = (struct pos) {-1,-1,-1};
+    invalid_pos (p);
     return p;
   }
 
@@ -217,9 +225,7 @@ set_mouse_room (int room)
     mr_set_origin (room, x, y);
 
   mr_save_origin (&m.mr);
-  m.c.room = room;
-  m.c.x = ORIGINAL_WIDTH / 2;
-  m.c.y = ORIGINAL_HEIGHT / 2;
+  new_coord (&m.c, &global_level, room, ORIGINAL_WIDTH / 2, ORIGINAL_HEIGHT / 2);
   set_mouse_coord (&m);
 
   if (! room) {

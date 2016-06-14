@@ -278,10 +278,6 @@ compute_doors (void)
 
   for (i = 0; i < door_nmemb; i++) {
     struct door *d = &door[i];
-    if (d->p.room == -1) {
-      /* remove_door (d); i--; */
-      continue;
-    }
     switch (d->action) {
     case OPEN_DOOR:
       if (d->i == 0 && d->wait == 0) d->action = CLOSE_DOOR;
@@ -342,7 +338,7 @@ compute_doors (void)
 }
 
 void
-open_door (int e)
+open_door (struct level *l, int e)
 {
   struct pos *p;
 
@@ -350,7 +346,7 @@ open_door (int e)
   struct level_door *ld;
 
   do {
-    p = &level.event[e].p;
+    p = &l->event[e].p;
     switch (con (p)->fg) {
     case DOOR:
       d = door_at_pos (p);
@@ -366,11 +362,11 @@ open_door (int e)
     default:
       break;
     }
-  } while (level.event[e++].next);
+  } while (l->event[e++].next);
 }
 
 void
-close_door (int e)
+close_door (struct level *l, int e)
 {
   struct pos *p;
 
@@ -378,7 +374,7 @@ close_door (int e)
   struct level_door *ld;
 
   do {
-    p = &level.event[e].p;
+    p = &l->event[e].p;
     switch (con (p)->fg) {
     case DOOR:
       d = door_at_pos (p);
@@ -393,7 +389,7 @@ close_door (int e)
     default:
       break;
     }
-  } while (level.event[e++].next);
+  } while (l->event[e++].next);
 }
 
 int
@@ -761,20 +757,20 @@ xdraw_door_grid (ALLEGRO_BITMAP *bitmap, struct pos *p, int i,
 struct coord *
 door_grid_coord_base (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * (p->place + 1);
-  c->y = PLACE_HEIGHT * p->floor - 6;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * (p->place + 1),
+               PLACE_HEIGHT * p->floor - 6);
 }
 
 struct coord *
 door_grid_coord (struct pos *p, struct coord *c, int j, int i)
 {
   int r = i % 8;
-  c->x = PLACE_WIDTH * (p->place + 1);
-  c->y = PLACE_HEIGHT * p->floor - 6 + j * 8 + r + 1;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * (p->place + 1),
+               PLACE_HEIGHT * p->floor - 6 + j * 8 + r + 1);
 }
 
 struct coord *
@@ -782,53 +778,53 @@ door_grid_tip_coord (struct pos *p, struct coord *c, int i)
 {
   int r = i % 8;
   int q = i / 8;
-  c->x = PLACE_WIDTH * (p->place + 1);
-  c->y = PLACE_HEIGHT * p->floor + 2 + q * 8 + r + 1;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * (p->place + 1),
+               PLACE_HEIGHT * p->floor + 2 + q * 8 + r + 1);
 }
 
 struct coord *
 door_pole_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * p->place + 24;
-  c->y = PLACE_HEIGHT * p->floor + 3;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * p->place + 24,
+               PLACE_HEIGHT * p->floor + 3);
 }
 
 struct coord *
 door_pole_base_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * p->place + 24;
-  c->y = PLACE_HEIGHT * (p->floor + 1) - 1;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * p->place + 24,
+               PLACE_HEIGHT * (p->floor + 1) - 1);
 }
 
 struct coord *
 door_left_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * p->place;
-  c->y = PLACE_HEIGHT * p->floor + 3;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * p->place,
+               PLACE_HEIGHT * p->floor + 3);
 }
 
 struct coord *
 door_right_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * (p->place + 1);
-  c->y = PLACE_HEIGHT * p->floor + 3;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * (p->place + 1),
+               PLACE_HEIGHT * p->floor + 3);
 }
 
 struct coord *
 door_top_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * (p->place + 1);
-  c->y = PLACE_HEIGHT * p->floor - 10;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * (p->place + 1),
+               PLACE_HEIGHT * p->floor - 10);
 }

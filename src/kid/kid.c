@@ -121,7 +121,7 @@ create_kid (struct anim *k0, struct anim *k1, struct pos *p, enum dir dir)
     k1->f.b = kid_normal_00;
     k1->fo.b = kid_normal_00;
     k1->action = kid_normal;
-    k1->item_pos.room = -1;
+    invalid_pos (&k1->item_pos);
     k1->total_lives = KID_INITIAL_TOTAL_LIVES;
     k1->current_lives = KID_INITIAL_CURRENT_LIVES;
     k1->fight = true;
@@ -215,19 +215,19 @@ draw_start_kid (ALLEGRO_BITMAP *bitmap, enum vm vm)
 {
   /* kid */
   struct frame f;
-  f.c.room = level.start_pos.room;
+  f.c.room = global_level.start_pos.room;
   palette pal = get_kid_palette (vm);
   f.b = kid_normal_00;
   f.b = apply_palette (f.b, pal);
   if (hgc) f.b = apply_palette (f.b, hgc_palette);
   f.b = apply_palette (f.b, start_anim_palette);
-  f.flip = (level.start_dir == LEFT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
-  place_frame (&f, &f, f.b, &level.start_pos,
-               level.start_dir == LEFT ? +28 : +22, +15);
+  f.flip = (global_level.start_dir == LEFT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
+  place_frame (&f, &f, f.b, &global_level.start_pos,
+               global_level.start_dir == LEFT ? +28 : +22, +15);
   draw_frame (bitmap, &f);
 
   /* sword */
-  if (level.has_sword) draw_sword (bitmap, &level.start_pos, vm);
+  if (global_level.has_sword) draw_sword (bitmap, &global_level.start_pos, vm);
 }
 
 ALLEGRO_COLOR
@@ -344,9 +344,10 @@ c_palette (ALLEGRO_COLOR c)
 void
 place_kid (struct anim *k, int room, int floor, int place)
 {
-  struct pos p;
   enum confg tl, tr;
 
+  struct pos p;
+  new_pos (&p, k->f.c.l, -1, -1, -1);
   for (p.room = room; p.room < ROOMS; p.room++)
     for (p.floor = floor; p.floor < FLOORS; p.floor++)
       for (p.place = place; p.place < PLACES; p.place++)
@@ -423,10 +424,10 @@ draw_kid_lives (ALLEGRO_BITMAP *bitmap, struct anim *k,
 static struct coord *
 kid_life_coord (int i, struct coord *c)
 {
-  c->x = 7 * i;
-  c->y = 194;
-  c->room = room_view;
-  return c;
+  return
+    new_coord (c, NULL, room_view,
+               7 * i,
+               194);
 }
 
 void

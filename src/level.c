@@ -26,7 +26,7 @@ static void process_keys (void);
 static void draw_lives (ALLEGRO_BITMAP *bitmap, struct anim *k, enum vm vm);
 
 struct level *vanilla_level;
-struct level level;
+struct level global_level;
 
 struct undo undo;
 
@@ -41,6 +41,17 @@ int anti_camera_room;
 int camera_follow_kid;
 int auto_rem_time_1st_cycle = 24;
 
+struct level *
+copy_level (struct level *ld, struct level *ls)
+{
+  size_t i;
+  *ld = *ls;
+  ld->start_pos.l = ld;
+  for (i = 0; i < EVENTS; i++) ld->event[i].p.l = ld;
+  for (i = 0; i < GUARDS; i++) ld->guard[i].p.l = ld;
+  return ld;
+}
+
 void
 play_level (struct level *lv)
 {
@@ -51,12 +62,12 @@ play_level (struct level *lv)
   free_undo (&undo);
   cutscene = false;
   game_paused = false;
-  level = *lv;
+  copy_level (&global_level, lv);
 
   if (level_module == LEGACY_LEVEL_MODULE
       || level_module == PLV_LEVEL_MODULE
       || level_module == DAT_LEVEL_MODULE)
-    fix_legacy_room_above_zero_with_traversable_at_bottom ();
+    fix_legacy_room_above_zero_with_traversable_at_bottom (&global_level);
 
   register_cons ();
   register_anims ();
@@ -65,23 +76,23 @@ play_level (struct level *lv)
   play_time_stopped = false;
   death_timer = 0;
 
-  if (level.start) level.start ();
+  if (global_level.start) global_level.start ();
 
   /* anim_cycle = 0; */
   last_auto_show_time = -1;
   current_kid_id = 0;
 
-  if (retry_level != level.number)
+  if (retry_level != global_level.number)
     start_level_time = play_time;
 
-  if (! force_em) em = level.em;
-  if (! force_hue) hue = level.hue;
+  if (! force_em) em = global_level.em;
+  if (! force_hue) hue = global_level.hue;
 
   edit = EDIT_MAIN;
   exit_editor ();
 
-  if (level.nominal_number >= 0) {
-    xasprintf (&text, "LEVEL %i", level.nominal_number);
+  if (global_level.nominal_number >= 0) {
+    xasprintf (&text, "LEVEL %i", global_level.nominal_number);
     draw_bottom_text (NULL, text, 0);
     al_free (text);
   }
@@ -91,7 +102,7 @@ play_level (struct level *lv)
   switch (quit_anim) {
   case NO_QUIT: break;
   case RESTART_LEVEL:
-    retry_level = level.number;
+    retry_level = global_level.number;
     destroy_anims ();
     destroy_cons ();
     draw_bottom_text (NULL, NULL, 0);
@@ -101,14 +112,14 @@ play_level (struct level *lv)
     destroy_anims ();
     destroy_cons ();
     int d = (quit_anim == PREVIOUS_LEVEL) ? -1 : +1;
-    if (level.next_level) level.next_level (level.number + d);
+    if (global_level.next_level) global_level.next_level (global_level.number + d);
     draw_bottom_text (NULL, NULL, 0);
-    if (level.cutscene && ! ignore_level_cutscene) {
+    if (global_level.cutscene && ! ignore_level_cutscene) {
       cutscene_started = false;
       cutscene = true;
       stop_video_effect ();
       stop_all_samples ();
-      play_anim (level.cutscene, NULL);
+      play_anim (global_level.cutscene, NULL);
       stop_video_effect ();
       stop_all_samples ();
 
@@ -156,8 +167,7 @@ register_con_at_pos (struct pos *p)
 void
 register_room (int room)
 {
-  struct pos p;
-  p.room = room;
+  struct pos p; new_pos (&p, &global_level, room, -1, -1);
   for (p.floor = 0; p.floor < FLOORS; p.floor++)
     for (p.place = 0; p.place < PLACES; p.place++)
       register_con_at_pos (&p);
@@ -191,7 +201,7 @@ void
 destroy_room (int room)
 {
   struct pos p;
-  p.room = room;
+  new_pos (&p, &global_level, room, -1, -1);
   for (p.floor = 0; p.floor < FLOORS; p.floor++)
     for (p.place = 0; p.place < PLACES; p.place++)
       destroy_con_at_pos (&p);
@@ -241,21 +251,21 @@ register_anims (void)
   struct pos kid_start_pos;
   if (is_valid_pos (&start_pos))
     kid_start_pos = start_pos;
-  else kid_start_pos = level.start_pos;
+  else kid_start_pos = global_level.start_pos;
   mr_center_room (kid_start_pos.room);
-  int id = create_anim (NULL, KID, &kid_start_pos, level.start_dir);
+  int id = create_anim (NULL, KID, &kid_start_pos, global_level.start_dir);
   struct anim *k = &anima[id];
   k->total_lives = total_lives;
   k->skill = skill;
   k->current_lives = total_lives;
   k->controllable = true;
   k->immortal = immortal_mode;
-  k->has_sword = level.has_sword;
+  k->has_sword = global_level.has_sword;
 
   /* create guards */
   int i;
   for (i = 0; i < GUARDS; i++) {
-    struct guard *g = &level.guard[i];
+    struct guard *g = &global_level.guard[i];
     struct anim *a;
     int id;
     switch (g->type) {
@@ -370,11 +380,24 @@ compute_level (void)
                 current_kid->f.c.xd, &mr.x, &mr.y);
       mr_set_origin (current_kid->f.c.room, mr.x, mr.y);
     } else mr_focus_room (current_kid->f.c.room);
-
     mr.select_cycles = 0;
   }
 
-  if (level.special_events) level.special_events ();
+  struct anim *ke;
+  if (mr.w > 1
+      && current_kid->f.c.room != 0
+      && current_kid->f.c.room != anti_camera_room
+      && camera_follow_kid == current_kid->id
+      && (ke = get_anim_by_id (current_kid->enemy_id))
+      && ! is_room_visible (ke->f.c.room)) {
+    if (ke->f.c.room == roomd (&global_level, current_kid->f.c.room, LEFT))
+      mr_view_trans (LEFT);
+    else if (ke->f.c.room == roomd (&global_level, current_kid->f.c.room, RIGHT))
+      mr_view_trans (RIGHT);
+    mr_focus_room (current_kid->f.c.room);
+  }
+
+  if (global_level.special_events) global_level.special_events ();
 
   compute_closer_floors ();
   compute_opener_floors ();
@@ -668,10 +691,10 @@ process_keys (void)
   if (! active_menu
       && was_key_pressed (ALLEGRO_KEY_C, 0, 0, true)) {
     int s = mr.room;
-    int l = roomd (s, LEFT);
-    int r = roomd (s, RIGHT);
-    int a = roomd (s, ABOVE);
-    int b = roomd (s, BELOW);
+    int l = roomd (&global_level, s, LEFT);
+    int r = roomd (&global_level, s, RIGHT);
+    int a = roomd (&global_level, s, ABOVE);
+    int b = roomd (&global_level, s, BELOW);
 
     mr.select_cycles = SELECT_CYCLES;
 
@@ -682,17 +705,17 @@ process_keys (void)
 
   /* SHIFT+C: show indirect coordinates */
   if (was_key_pressed (ALLEGRO_KEY_C, 0, ALLEGRO_KEYMOD_SHIFT, true)) {
-    int a = roomd (mr.room, ABOVE);
-    int b = roomd (mr.room, BELOW);
-    int al = roomd (a, LEFT);
-    int ar = roomd (a, RIGHT);
-    int bl = roomd (b, LEFT);
-    int br = roomd (b, RIGHT);
+    int a = roomd (&global_level, mr.room, ABOVE);
+    int b = roomd (&global_level, mr.room, BELOW);
+    int al = roomd (&global_level, a, LEFT);
+    int ar = roomd (&global_level, a, RIGHT);
+    int bl = roomd (&global_level, b, LEFT);
+    int br = roomd (&global_level, b, RIGHT);
 
     mr.select_cycles = SELECT_CYCLES;
 
     xasprintf (&text, "LV%i AL%i AR%i BL%i BR%i",
-               level.number, al, ar, bl, br);
+               global_level.number, al, ar, bl, br);
     draw_bottom_text (NULL, text, 0);
     al_free (text);
   }
@@ -808,7 +831,8 @@ process_keys (void)
     }
 
     if (death_timer >= 60) {
-      if ((death_timer < 240 || death_timer % 12 < 8) && ! active_menu) {
+      if ((death_timer < 240 || death_timer % 12 < 8)
+          && ! active_menu) {
         if (death_timer >= 252 && death_timer % 12 == 0)
           play_sample (press_key_sample, NULL, -1);
         xasprintf (&text, "Press Button to Continue");
@@ -932,9 +956,9 @@ unpause_game (void)
 void
 apply_to_diff_pos (struct diff *d, void (*func) (struct pos *p))
 {
-  size_t base = ((uint8_t *) &level.con[0][0][0]) - ((uint8_t *) &level);
-  size_t end = ((uint8_t *) &level.con[ROOMS - 1][FLOORS - 1][PLACES - 1])
-    - ((uint8_t *) &level);
+  size_t base = ((uint8_t *) &global_level.con[0][0][0]) - ((uint8_t *) &global_level);
+  size_t end = ((uint8_t *) &global_level.con[ROOMS - 1][FLOORS - 1][PLACES - 1])
+    - ((uint8_t *) &global_level);
 
   size_t i, j;
   for (i = 0; i < d->count; i++) {
@@ -943,7 +967,7 @@ apply_to_diff_pos (struct diff *d, void (*func) (struct pos *p))
 
     size_t base_con = d->line[i].offset - base;
 
-    struct pos prev_p = {-1,-1,-1};
+    struct pos prev_p; invalid_pos (&prev_p);
     for (j = 0; j < d->line[i].count; j++) {
       struct pos p;
       size_t qr = (base_con + j * d->unit_size)
@@ -956,9 +980,7 @@ apply_to_diff_pos (struct diff *d, void (*func) (struct pos *p))
 
       size_t qp = rf / sizeof (struct con);
 
-      p.room = qr;
-      p.floor = qf;
-      p.place = qp;
+      new_pos (&p, &global_level, qr, qf, qp);
 
       if (! peq (&p, &prev_p)) {
         /* printf ("%s: %i,%i,%i\n", */
@@ -990,7 +1012,7 @@ level_undo (struct diffset *diffset, int dir, char *prefix)
   size_t i = diffset->current;
 
   apply_to_diff_pos (&diffset->diff[(dir >= 0) ? i + 1 : i], destroy_con_at_pos);
-  apply_diffset_diff (diffset, &level, sizeof (level), dir, &text);
+  apply_diffset_diff (diffset, &global_level, sizeof (global_level), dir, &text);
   apply_to_diff_pos (&diffset->diff[(dir >= 0) ? i + 1 : i], register_con_at_pos);
   /* update_cache (em, vm); */
   /* generate_stars (); */

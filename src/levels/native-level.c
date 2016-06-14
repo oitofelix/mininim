@@ -114,7 +114,8 @@ load_native_level (int number, struct level *l)
     v = al_get_config_value (c, NULL, k);
     al_free (k);
     if (! v) break;
-    g->p.room = 0, g->p.floor = 0, g->p.place = 0, g->dir = LEFT;
+    new_pos (&g->p, NULL, 0, 0, 0);
+    g->dir = LEFT;
     sscanf (v, "%i %i %i %i", &g->p.room, &g->p.floor, &g->p.place,
             (int *) &g->dir);
 
@@ -156,7 +157,7 @@ load_native_level (int number, struct level *l)
   }
 
   /* CONSTRUCTIONS */
-  struct pos p;
+  struct pos p; new_pos (&p, l, -1, -1, -1);
   for (p.room = 0;; p.room++)
     for (p.floor = 0; p.floor < FLOORS; p.floor++)
       for (p.place = 0; p.place < PLACES; p.place++) {
@@ -165,9 +166,9 @@ load_native_level (int number, struct level *l)
         v = al_get_config_value (c, NULL, k);
         al_free (k);
         if (! v) goto end_con_loop;
-        sscanf (v, "%i %i %i", (int *) &xcon(l, &p)->fg,
-                (int *) &xcon (l, &p)->bg,
-                (int *) &xcon (l, &p)->ext);
+        sscanf (v, "%i %i %i", (int *) &con(&p)->fg,
+                (int *) &con (&p)->bg,
+                (int *) &con (&p)->ext);
       }
  end_con_loop:
 
@@ -261,14 +262,14 @@ save_native_level (struct level *l, char *filename)
   }
 
   /* CONSTRUCTIONS */
-  struct pos p;
+  struct pos p; new_pos (&p, l, -1, -1, -1);
   for (p.room = 0; p.room < ROOMS; p.room++)
     for (p.floor = 0; p.floor < FLOORS; p.floor++)
       for (p.place = 0; p.place < PLACES; p.place++) {
         /* Cr f p=f b e */
         xasprintf (&k, "C%i %i %i", p.room, p.floor, p.place);
-        xasprintf (&v, "%i %i %i", xcon (l, &p)->fg,
-                   xcon (l, &p)->bg, xcon (l, &p)->ext);
+        xasprintf (&v, "%i %i %i", con (&p)->fg,
+                   con (&p)->bg, con (&p)->ext);
         al_set_config_value (c, NULL, k, v);
         al_free (k);
         al_free (v);
@@ -280,9 +281,9 @@ save_native_level (struct level *l, char *filename)
 }
 
 char *
-get_confg_str (struct level *l, struct pos *p)
+get_confg_str (struct pos *p)
 {
-  switch (xcon (l, p)->fg) {
+  switch (con (p)->fg) {
   case NO_FLOOR: return "NO_FLOOR";
   case FLOOR: return "FLOOR";
   case BROKEN_FLOOR: return "BROKEN_FLOOR";
@@ -313,9 +314,9 @@ get_confg_str (struct level *l, struct pos *p)
 }
 
 char *
-get_conbg_str (struct level *l, struct pos *p)
+get_conbg_str (struct pos *p)
 {
-  switch (xcon (l, p)->bg) {
+  switch (con (p)->bg) {
   case NO_BG: return "NO_BG";
   case BRICKS_00: return "BRICKS_00";
   case BRICKS_01: return "BRICKS_01";
@@ -330,13 +331,13 @@ get_conbg_str (struct level *l, struct pos *p)
 }
 
 char *
-get_conext_str (struct level *l, struct pos *p)
+get_conext_str (struct pos *p)
 {
   char *s = NULL;
 
-  switch (xcon (l, p)->fg) {
+  switch (con (p)->fg) {
   case FLOOR:
-    switch (xcon (l, p)->ext.item) {
+    switch (con (p)->ext.item) {
     case NO_ITEM: xasprintf (&s, "NO_ITEM"); break;
     case EMPTY_POTION: xasprintf (&s, "EMPTY_POTION"); break;
     case SMALL_LIFE_POTION: xasprintf (&s, "SMALL_LIFE_POTION"); break;
@@ -350,16 +351,16 @@ get_conext_str (struct level *l, struct pos *p)
     }
     break;
   case LOOSE_FLOOR:
-    xasprintf (&s, "%s", xcon (l, p)->ext.cant_fall ? "CANT_FALL" : "FALL");
+    xasprintf (&s, "%s", con (p)->ext.cant_fall ? "CANT_FALL" : "FALL");
     break;
   case SPIKES_FLOOR: case DOOR: case LEVEL_DOOR: case CHOPPER:
-    xasprintf (&s, "%i", xcon (l, p)->ext.step);
+    xasprintf (&s, "%i", con (p)->ext.step);
     break;
   case OPENER_FLOOR: case CLOSER_FLOOR:
-    xasprintf (&s, "%i", xcon (l, p)->ext.event);
+    xasprintf (&s, "%i", con (p)->ext.event);
     break;
   case CARPET:
-    switch (xcon (l, p)->ext.design) {
+    switch (con (p)->ext.design) {
     case CARPET_00: s = "CARPET_00"; break;
     case CARPET_01: s = "CARPET_01"; break;
     case ARCH_CARPET_LEFT: s = "ARCH_CARPET_LEFT"; break;
@@ -367,7 +368,7 @@ get_conext_str (struct level *l, struct pos *p)
     if (s) xasprintf (&s, "%s", s);
     break;
   case TCARPET:
-    switch (xcon (l, p)->ext.design) {
+    switch (con (p)->ext.design) {
     case CARPET_00: s = "CARPET_00"; break;
     case CARPET_01: s = "CARPET_01"; break;
     case ARCH_CARPET_RIGHT_00: s = "ARCH_CARPET_RIGHT_00"; break;

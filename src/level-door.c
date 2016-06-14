@@ -170,7 +170,7 @@ register_level_door (struct pos *p)
   d.broken = (step < 0);
   d.i = (step < 0) ? -step - 1 : step;
   d.action = NO_LEVEL_DOOR_ACTION;
-  d.no_stairs = peq (p, &level.start_pos);
+  d.no_stairs = peq (p, &p->l->start_pos);
 
   level_door =
     add_to_array (&d, 1, level_door, &level_door_nmemb, level_door_nmemb, sizeof (d));
@@ -222,10 +222,6 @@ compute_level_doors (void)
 
   for (i = 0; i < level_door_nmemb; i++) {
     struct level_door *d = &level_door[i];
-    if (d->p.room == -1) {
-      /* remove_level_door (d); i--; */
-      continue;
-    }
     switch (d->action) {
     case OPEN_LEVEL_DOOR:
       if (d->i % 5 == 2 && d->i > 2) {
@@ -261,15 +257,14 @@ compute_level_doors (void)
 }
 
 struct level_door *
-get_exit_level_door (int n)
+get_exit_level_door (struct level *l, int n)
 {
   int i;
   for (i = 0; i < level_door_nmemb; i++) {
     struct level_door *d = &level_door[i];
-    if (! peq (&d->p, &level.start_pos)
+    if (! peq (&d->p, &l->start_pos)
         && n-- == 0) return d;
   }
-
   return NULL;
 }
 
@@ -510,108 +505,108 @@ draw_level_door_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
 struct coord *
 level_door_front_coord_base (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * p->place + 8;
-  c->y = PLACE_HEIGHT * p->floor - 1;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * p->place + 8,
+               PLACE_HEIGHT * p->floor - 1);
 }
 
 struct coord *
 level_door_front_coord (struct pos *p, struct coord *c, int j, int i)
 {
   int r = (i + 1) % 4;
-  c->x = PLACE_WIDTH * p->place + 8;
-  c->y = PLACE_HEIGHT * p->floor - 1 + j * 4 + r + 1;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * p->place + 8,
+               PLACE_HEIGHT * p->floor - 1 + j * 4 + r + 1);
 }
 
 struct coord *
 d_level_door_top_left_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * p->place;
-  c->y = PLACE_HEIGHT * p->floor - 13;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * p->place,
+               PLACE_HEIGHT * p->floor - 13);
 }
 
 struct coord *
 p_level_door_top_left_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * p->place;
-  c->y = PLACE_HEIGHT * p->floor - 10;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * p->place,
+               PLACE_HEIGHT * p->floor - 10);
 }
 
 struct coord *
 d_level_door_top_right_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * (p->place + 1);
-  c->y = PLACE_HEIGHT * p->floor - 13;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * (p->place + 1),
+               PLACE_HEIGHT * p->floor - 13);
 }
 
 struct coord *
 p_level_door_top_right_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * (p->place + 1);
-  c->y = PLACE_HEIGHT * p->floor - 10;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * (p->place + 1),
+               PLACE_HEIGHT * p->floor - 10);
 }
 
 struct coord *
 d_level_door_bottom_left_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * p->place + 1;
-  c->y = PLACE_HEIGHT * p->floor + 3;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * p->place + 1,
+               PLACE_HEIGHT * p->floor + 3);
 }
 
 struct coord *
 p_level_door_bottom_left_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * p->place - 1;
-  c->y = PLACE_HEIGHT * p->floor + 3;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * p->place - 1,
+               PLACE_HEIGHT * p->floor + 3);
 }
 
 struct coord *
 d_level_door_bottom_right_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * (p->place + 1) + 17;
-  c->y = PLACE_HEIGHT * p->floor + 3;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * (p->place + 1) + 17,
+               PLACE_HEIGHT * p->floor + 3);
 }
 
 struct coord *
 p_level_door_bottom_right_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * (p->place + 1) + 23;
-  c->y = PLACE_HEIGHT * p->floor + 3;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * (p->place + 1) + 23,
+               PLACE_HEIGHT * p->floor + 3);
 }
 
 struct coord *
 level_door_floor_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * p->place + 8;
-  c->y = PLACE_HEIGHT * p->floor + 46;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * p->place + 8,
+               PLACE_HEIGHT * p->floor + 46);
 }
 
 struct coord *
 level_door_stairs_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * p->place + 8;
-  c->y = PLACE_HEIGHT * p->floor + 1;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * p->place + 8,
+               PLACE_HEIGHT * p->floor + 1);
 }

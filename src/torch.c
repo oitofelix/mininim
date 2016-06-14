@@ -116,8 +116,8 @@ draw_torch (ALLEGRO_BITMAP *bitmap, struct pos *p,
 struct coord *
 torch_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * (p->place + 1);
-  c->y = PLACE_HEIGHT * p->floor + 23;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * (p->place + 1),
+               PLACE_HEIGHT * p->floor + 23);
 }

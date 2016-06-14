@@ -84,7 +84,7 @@ flow (struct anim *k)
   else if (k->i < 3) k->i++;
   else {
     kid_keep_sword (k);
-    k->item_pos.room = -1;
+    invalid_pos (&k->item_pos);
     k->has_sword = true;
     return false;
   }

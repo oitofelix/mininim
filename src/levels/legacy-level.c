@@ -64,7 +64,7 @@ legacy_level_start (void)
   shadow_id = mouse_id = skeleton_id = -1;
   stop_all_samples ();
   mouse_timer = 0;
-  exit_level_door = get_exit_level_door (0);
+  exit_level_door = get_exit_level_door (&global_level, 0);
   anti_camera_room = -1;
   shadow_merged = false;
   met_jaffar = false;
@@ -80,7 +80,7 @@ legacy_level_start (void)
   else k->current_lives = total_lives;
 
   /* make the kid turn as appropriate */
-  switch (level.number) {
+  switch (global_level.number) {
   case 1:
     k->f.dir = (k->f.dir == LEFT) ? RIGHT : LEFT;
     k->i = -1; k->action = kid_turn;
@@ -88,16 +88,16 @@ legacy_level_start (void)
   case 13:
     k->f.dir = (k->f.dir == LEFT) ? RIGHT : LEFT;
     k->i = -1; k->action = kid_run;
-    frame2room (&k->f, roomd (23, RIGHT), &k->f.c);
+    frame2room (&k->f, roomd (k->f.c.l, 23, RIGHT), &k->f.c);
     break;
   default: k->i = -1; k->action = kid_turn; break;
   }
 
   /* define camera's starting room */
-  if (level.number == 7) {
+  if (global_level.number == 7) {
     mr_center_room (1);
     camera_follow_kid = -1;
-  } else if (level.number == 13) {
+  } else if (global_level.number == 13) {
     mr_center_room (23);
     camera_follow_kid = -1;
   } else {
@@ -106,27 +106,27 @@ legacy_level_start (void)
   }
 
   /* if in level 14 stop the timer */
-  if (level.number == 14) play_time_stopped = true;
+  if (global_level.number == 14) play_time_stopped = true;
 
   /* in the first level */
-  if (level.number == 1) {
+  if (global_level.number == 1) {
     /* activate tile, usually to close the opened door in the starting
        room */
-    struct pos p = {5,0,2};
+    struct pos p; new_pos (&p, &global_level, 5, 0, 2);
     activate_con (&p);
     /* if it's the first try make kid wait before uncouching */
     if (retry_level != 1) k->uncouch_slowly = true;
   }
 
   /* in the third level */
-  if (level.number == 3) {
+  if (global_level.number == 3) {
     /* if it's the first time playing the checkpoint hasn't been
        reached yet */
     if (retry_level != 3) level_3_checkpoint = false;
     /* if the checkpoint has been reached, respawn there */
-    struct pos p = {2,0,6};
+    struct pos p; new_pos (&p, &global_level, 2, 0, 6);
     if (level_3_checkpoint) {
-      struct pos plf = {7,0,4};
+      struct pos plf; new_pos (&plf, &global_level, 7, 0, 4);
       register_con_undo (&undo, &plf,
                          NO_FLOOR, MIGNORE, MIGNORE,
                          true, true, false, true,
@@ -141,14 +141,14 @@ legacy_level_start (void)
 
   /* in the tenth level unflip the screen vertically, (helpful if the
      kid has not drank the potion that would do it on its own) */
-  if (level.number == 10) screen_flags &= ~ ALLEGRO_FLIP_VERTICAL;
+  if (global_level.number == 10) screen_flags &= ~ ALLEGRO_FLIP_VERTICAL;
 
   /* level 13 adjustements */
   coming_from_12 = false;
-  if (level.number == 13 && retry_level == 13)
-    level.nominal_number = 12;
+  if (global_level.number == 13 && retry_level == 13)
+    global_level.nominal_number = 12;
 
-  if (level.number == 13) {
+  if (global_level.number == 13) {
     struct anim *v = get_anim_by_id (1);
     v->fight = false;
   }
@@ -164,22 +164,22 @@ legacy_level_special_events (void)
   /* in the first animation cycle */
   if (anim_cycle == 0 || anim_cycle == 1) {
     /* close level door the kid came from */
-    if (con (&level.start_pos)->fg == LEVEL_DOOR) {
-      struct level_door *ld = level_door_at_pos (&level.start_pos);
+    if (con (&global_level.start_pos)->fg == LEVEL_DOOR) {
+      struct level_door *ld = level_door_at_pos (&global_level.start_pos);
       if (anim_cycle == 0) ld->i = 0;
       if (anim_cycle == 1) ld->action = CLOSE_LEVEL_DOOR;
     }
   }
 
   /* in the first level, first try, play the suspense sound */
-  if (level.number == 1 && anim_cycle == 12 && retry_level != 1)
+  if (global_level.number == 1 && anim_cycle == 12 && retry_level != 1)
     play_sample (suspense_sample, NULL, -1);
 
   /* in the third level */
-  if (level.number == 3) {
+  if (global_level.number == 3) {
 
     /* level 3 checkpoint */
-    p = (struct pos) {2,0,8};
+    new_pos (&p, &global_level, 2, 0, 8);
     survey (_m, pos, &k->f, &nc, &pm, &np);
     if (peq (&pm, &p)) {
       level_3_checkpoint = true;
@@ -192,7 +192,8 @@ legacy_level_special_events (void)
 
     /* raise the skeleton as soon as the exit door is open and the
        kid reaches the second place of the room 1 */
-    struct pos skeleton_floor_pos = {1,1,5};
+    struct pos skeleton_floor_pos;
+    new_pos (&skeleton_floor_pos, &global_level, 1, 1, 5);
     survey (_m, pos, &k->f, &nc, &pm, &np);
     if (exit_level_door
         && exit_level_door->i == 0
@@ -220,7 +221,7 @@ legacy_level_special_events (void)
     s = get_anim_by_id (skeleton_id);
     if (s) {
       survey (_m, pos, &s->f, &nc, &pm, &np);
-      p = (struct pos) {3,1,4};
+      new_pos (&p, &global_level, 3, 1, 4);
       if (s->f.c.room == 3 && pm.floor == 0
           && is_guard_fall (&s->f)) {
         s->f.dir = RIGHT;
@@ -231,8 +232,8 @@ legacy_level_special_events (void)
   }
 
   /* in the fourth level */
-  if (level.number == 4) {
-    struct pos mirror_pos = {4,0,4};
+  if (global_level.number == 4) {
+    struct pos mirror_pos; new_pos (&mirror_pos, &global_level, 4, 0, 4);
 
     /* if the level door is open and the camera is on room 4, make
        the mirror appear */
@@ -280,10 +281,10 @@ legacy_level_special_events (void)
   }
 
   /* in the fifth level */
-  if (level.number == 5) {
-    struct pos door_pos = (struct pos) {24,0,1};
-    struct pos potion_pos = (struct pos) {24,0,3};
-    struct pos shadow_pos = (struct pos) {24,0,-1};
+  if (global_level.number == 5) {
+    struct pos door_pos; new_pos (&door_pos, &global_level, 24, 0, 1);
+    struct pos potion_pos; new_pos (&potion_pos, &global_level, 24, 0, 3);
+    struct pos shadow_pos; new_pos (&shadow_pos, &global_level, 24, 0, -1);
 
     /* if there is a door sufficiently open, and a potion in room 24,
        and the camera is there, create a kid's shadow to drink the
@@ -328,13 +329,13 @@ legacy_level_special_events (void)
   }
 
   /* in the sixth level */
-  if (level.number == 6) {
+  if (global_level.number == 6) {
     struct anim *ks;
-    anti_camera_room = roomd (1, BELOW);
+    anti_camera_room = roomd (&global_level, 1, BELOW);
 
     /* create kid's shadow to wait for kid at room 1 */
     if (shadow_id == -1) {
-      struct pos shadow_pos = (struct pos) {1,1,1};
+      struct pos shadow_pos; new_pos (&shadow_pos, &global_level, 1, 1, 1);
       int id = create_anim (k, 0, NULL, 0);
       ks = &anima[id];
       ks->fight = false;
@@ -358,7 +359,7 @@ legacy_level_special_events (void)
 
     /* if kid opens the door and jumps to reach the other side of room
        1, make his shadow step over the closer floor */
-    struct pos door_pos = (struct pos) {1,1,2};
+    struct pos door_pos; new_pos (&door_pos, &global_level, 1, 1, 2);
     if (k->f.c.room == 1
         && k->action == kid_run_jump
         && k->i == 7
@@ -370,7 +371,7 @@ legacy_level_special_events (void)
 
     /* when kid falls from room 1 to the room below it, quit to the
        next level */
-    if (k->f.c.room == roomd (1, BELOW)) {
+    if (k->f.c.room == roomd (&global_level, 1, BELOW)) {
       total_lives = k->total_lives;
       current_lives = k->current_lives;
       skill = k->skill;
@@ -379,8 +380,8 @@ legacy_level_special_events (void)
   }
 
   /* in the eighth level */
-  if (level.number == 8) {
-    struct pos mouse_pos = {16,0,12};
+  if (global_level.number == 8) {
+    struct pos mouse_pos; new_pos (&mouse_pos, &global_level, 16, 0, 12);
     struct anim *m = NULL;
 
     if (mouse_id != -1) m = get_anim_by_id (mouse_id);
@@ -408,15 +409,16 @@ legacy_level_special_events (void)
   }
 
   /* in the twelfth level */
-  if (level.number == 12) {
-    struct pos sword_pos = {15,0,1};
-    struct pos first_hidden_floor_pos = {2,0,7};
+  if (global_level.number == 12) {
+    struct pos sword_pos; new_pos (&sword_pos, &global_level, 15, 0, 1);
+    struct pos first_hidden_floor_pos;
+    new_pos (&first_hidden_floor_pos, &global_level, 2, 0, 7);
     anti_camera_room = 23;
     struct anim *ks = NULL;
 
     /* make the sword in room 15 disappear (kid's shadow has it) when
        the kid leaves room 18 to the right */
-    if (k->f.c.room == roomd (18, RIGHT)
+    if (k->f.c.room == roomd (&global_level, 18, RIGHT)
         && con (&sword_pos)->ext.item == SWORD)
       con (&sword_pos)->ext.item = NO_ITEM;
 
@@ -426,7 +428,8 @@ legacy_level_special_events (void)
         && con (&sword_pos)->ext.item != SWORD
         && pm.room == 15 && pm.floor == 0 && pm.place < 6
         && ! shadow_merged) {
-      struct pos shadow_pos = (struct pos) {roomd (15, ABOVE),2,1};
+      struct pos shadow_pos;
+      new_pos (&shadow_pos, &global_level, roomd (&global_level, 15, ABOVE), 2, 1);
       shadow_id = create_anim (NULL, SHADOW, &shadow_pos, RIGHT);
       ks = &anima[shadow_id];
       ks->fight = true;
@@ -558,7 +561,7 @@ legacy_level_special_events (void)
     if (shadow_merged
         && k->f.c.room == 2
         && con (&first_hidden_floor_pos)->fg == NO_FLOOR)
-      for (p = (struct pos) {2,0,-4}; p.place < PLACES;
+      for (new_pos (&p, &global_level, 2, 0, -4); p.place < PLACES;
            prel (&p, &p, +0, +1))
         if (con (&p)->fg == NO_FLOOR) con (&p)->fg = HIDDEN_FLOOR;
 
@@ -573,11 +576,11 @@ legacy_level_special_events (void)
   }
 
   /* in the thirteenth level */
-  if (level.number == 13) {
+  if (global_level.number == 13) {
 
     /* make the top loose floors fall spontaneously */
     if (k->f.c.room == 16 || k->f.c.room == 23) {
-      struct pos p = (struct pos) {k->f.c.room,-1,0};
+      struct pos p; new_pos (&p, &global_level, k->f.c.room, -1, 0);
       p.place = prandom (9);
       activate_con (&p);
     }
@@ -614,7 +617,7 @@ legacy_level_special_events (void)
 
       /* after vizier's death activate certain tile in order to open
          the exit level door */
-      struct pos p = {24,0,0};
+      struct pos p; new_pos (&p, &global_level, 24, 0, 0);
       if (v->current_lives <= 0
           && k->f.c.room != v->f.c.room)
         activate_con (&p);
@@ -622,7 +625,7 @@ legacy_level_special_events (void)
   }
 
   /* in the fourteenth level */
-  if (level.number == 14) {
+  if (global_level.number == 14) {
     anti_camera_room = 5;
 
     /* when the kid enters room 5, go to the next level */
@@ -644,7 +647,7 @@ legacy_level_end (struct pos *p)
   /* end music samples to play per level */
   if (! played_sample) {
     stop_sample (floating_sample, NULL, k->id);
-    switch (level.number) {
+    switch (global_level.number) {
     case 1: case 2: case 3: case 5: case 6: case 7:
     case 8: case 9: case 10: case 11: case 12:
       si = play_sample (success_sample, NULL, k->id); break;
@@ -695,6 +698,7 @@ void
 interpret_legacy_level (int number)
 {
   struct pos p;
+  new_pos (&p, &legacy_level, -1, -1, -1);
 
   memset (&legacy_level, 0, sizeof (legacy_level));
   legacy_level.number = number;
@@ -733,7 +737,7 @@ interpret_legacy_level (int number)
   }
 
   /* enable npos to be used from now on */
-  memcpy (&level.link, &legacy_level.link, sizeof (level.link));
+  memcpy (&global_level.link, &legacy_level.link, sizeof (global_level.link));
 
   /* FORETABLE and BACKTABLE: ok */
   for (p.room = 1; p.room <= LROOMS; p.room++)
@@ -924,10 +928,10 @@ interpret_legacy_level (int number)
   int i;
   for (i = 0; i < LEVENTS; i++) {
     struct level_event *e = &legacy_level.event[i];
-    e->p.room = (lv.door_2[i] >> 3) | ((lv.door_1[i] & 0x60) >> 5);
     int l = lv.door_1[i] & 0x1F;
-    e->p.floor = l / PLACES;
-    e->p.place = l % PLACES;
+    new_pos (&e->p, &legacy_level,
+             (lv.door_2[i] >> 3) | ((lv.door_1[i] & 0x60) >> 5),
+             l / PLACES, l % PLACES);
     if (get_tile (&e->p) == LT_EXIT_LEFT) e->p.place++;
     e->next = lv.door_1[i] & 0x80 ? false : true;
   }
@@ -962,9 +966,9 @@ interpret_legacy_level (int number)
     }
 
     /* LOCATION: ok */
-    g->p.room = i + 1;
-    g->p.floor = lv.guard_location[i] / PLACES;
-    g->p.place = lv.guard_location[i] % PLACES;
+    new_pos (&g->p, &legacy_level, i + 1,
+             lv.guard_location[i] / PLACES,
+             lv.guard_location[i] % PLACES);
 
     /* DIRECTION: ok */
     g->dir = lv.guard_direction[i] ? LEFT : RIGHT;

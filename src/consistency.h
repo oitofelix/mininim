@@ -20,9 +20,9 @@
 #ifndef MININIM_CONSISTENCY_H
 #define MININIM_CONSISTENCY_H
 
-void fix_level (void);
-void make_links_locally_consistent (int prev_room, int current_room);
-void fix_legacy_room_above_zero_with_traversable_at_bottom (void);
+void fix_level (struct level *l);
+void make_links_locally_consistent (struct level *l, int prev_room, int current_room);
+void fix_legacy_room_above_zero_with_traversable_at_bottom (struct level *l);
 
 void fix_single_walls_at_place_0 (struct pos *p);
 void fix_inaccessible_enclosure (struct pos *p);
@@ -41,7 +41,7 @@ void fix_partial_big_pillar (struct pos *p);
 
 void fix_enclosure (struct pos *p, enum dir dir);
 
-bool is_there_event_handler (int e);
+bool is_there_event_handler (struct level *l, int e);
 bool is_enclosure (struct pos *p, bool (*pred) (struct pos *p), enum dir dir);
 bool is_inaccessible (struct pos *p);
 bool is_loose (struct pos *p);
@@ -49,11 +49,11 @@ bool is_loose (struct pos *p);
 
 
 /* room linking */
-void make_reciprocal_link (int room0, int room1, enum dir dir);
-void make_link_locally_unique (int room, enum dir dir);
-void make_link_globally_unique (int room, enum dir dir);
-void make_semi_consistent_link (int room0, int room1, enum dir dir);
-void make_link_adjacency_bound (int room, enum dir dir);
-void exchange_rooms  (int room0, int room1);
+void make_reciprocal_link (struct level *l, int room0, int room1, enum dir dir);
+void make_link_locally_unique (struct level *l, int room, enum dir dir);
+void make_link_globally_unique (struct level *l, int room, enum dir dir);
+void make_semi_consistent_link (struct level *l, int room0, int room1, enum dir dir);
+void make_link_adjacency_bound (struct level *l, int room, enum dir dir);
+void exchange_rooms  (struct level *l, int room0, int room1);
 
 #endif	/* MININIM_CONSISTENCY_H */

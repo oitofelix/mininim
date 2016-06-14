@@ -29,6 +29,10 @@ are_valid_opponents (struct anim *k0, struct anim *k1)
   if (! is_fightable_anim (k0) || ! is_fightable_anim (k1))
     return false;
 
+  /* non-fighters don't fight */
+  if (! k0->fight || ! k1->fight)
+    return false;
+
   /* anyone fightable trying to fight the kid is fair game */
   if (k0->id == 0 || k1->id == 0) return true;
 
@@ -38,6 +42,12 @@ are_valid_opponents (struct anim *k0, struct anim *k1)
 void
 leave_fight_logic (struct anim *k)
 {
+  /* dead character doesn't fight */
+  if (k->current_lives <= 0) {
+    forget_enemy (k);
+    return;
+  }
+
   /* non-fightable characters don't fight */
   if (! is_fightable_anim (k)) return;
 
@@ -50,12 +60,6 @@ leave_fight_logic (struct anim *k)
 
   /* non-fighter doesn't fight */
   if (! k->fight) return;
-
-  /* dead character doesn't fight */
-  if (k->current_lives <= 0) {
-    forget_enemy (k);
-    return;
-  }
 
   /* character that went upstairs doesn't fight */
   if (is_kid_stairs (&k->f)) {
@@ -91,6 +95,7 @@ leave_fight_logic (struct anim *k)
   get_pos (ke, &pe, &nc);
   pos2room (&pe, p.room, &pe);
   if (! is_seeing (k, ke, k->f.dir)
+      && ! is_near (k, ke)
       && ! is_safe_to_follow (k, ke, k->f.dir)
       && ! (is_on_back (k, ke) && is_seeing (k, ke, odir)
             && p.floor == pe.floor)
@@ -328,6 +333,8 @@ fight_ai (struct anim *k)
 void
 fight_mechanics (struct anim *k)
 {
+  if (k->sword_immune > 0) k->sword_immune--;
+
   struct anim *ke = get_anim_by_id (k->enemy_id);
 
   if (! ke || ke->enemy_id != k->id) return;
@@ -400,8 +407,9 @@ fight_inversion_mechanics (struct anim *k, struct anim *ke)
     struct anim *kl = (k->f.dir == LEFT) ? k : ke;
     struct anim *kr = (k->f.dir == RIGHT) ? k : ke;
 
-    int i = 0;
-    while (is_in_range (k, ke, INVERSION_RANGE)) {
+    int i = 0, j = 0;
+    while (is_in_range (k, ke, INVERSION_RANGE)
+           || j++ < 4) {
       if (i++ % 2) kl->f.c.x++;
       else kr->f.c.x--;
     }
@@ -685,6 +693,7 @@ is_seeing (struct anim *k0, struct anim *k1, enum dir dir)
 
   pos2room (&p1, p0.room, &p1);
   coord2room (&m1, p0.room, &m1);
+  coord2room (&m0, p0.room, &m0);
 
   if (dir == LEFT) {
     if (is_opaque_at_left (&p0)) return false;
@@ -704,7 +713,8 @@ is_seeing (struct anim *k0, struct anim *k1, enum dir dir)
 
   first_confg (&pk, &pke, opaque_cs, &p);
 
-  return p0.room == p1.room && m1.room == m0.room
+  return p0.room == p1.room
+    && m1.room == m0.room
     && p1.floor == p0.floor
     && ! (dir == LEFT && m1.x > m0.x)
     && ! (dir == RIGHT && m1.x < m0.x)
@@ -811,15 +821,25 @@ door_cs (enum confg t)
 struct pos *
 get_pos (struct anim *k, struct pos *p, struct coord *m)
 {
+  struct coord nc;
   struct pos np;
-  survey (_m, pos, &k->f, m, &np, p);
+  survey (_m, pos, &k->f, m, &np, &np);
 
-  if (is_kid_hang_or_climb (&k->f)
-      || (is_kid_vjump (&k->f) && k->hang)) {
-    *p = k->hang_pos;
-    con_m (p, m);
-    return p;
-  }
+  struct anim *ke = get_anim_by_id (k->enemy_id);
+  if (ke && ke->f.dir == LEFT)
+    survey (_mr, pos, &k->f, &nc, &np, p);
+  else if (ke && ke->f.dir == RIGHT)
+    survey (_ml, pos, &k->f, &nc, &np, p);
+  else survey (_m, pos, &k->f, &nc, &np, p);
+
+  return p;
+
+  /* if (is_kid_hang_or_climb (&k->f) */
+  /*     || (is_kid_vjump (&k->f) && k->hang)) { */
+  /*   *p = k->hang_pos; */
+  /*   con_m (p, m); */
+  /*   return p; */
+  /* } */
 
   /* while (p->room != m->room && con (p)->fg != DOOR) { */
   /*   if (p->room == roomd (m->room, LEFT)) p->place++; */
@@ -829,8 +849,6 @@ get_pos (struct anim *k, struct pos *p, struct coord *m)
   /*   else break; */
   /*   npos (p, p); */
   /* } */
-
-  return p;
 }
 
 bool
@@ -914,10 +932,10 @@ is_safe_to_follow (struct anim *k0, struct anim *k1, enum dir dir)
             || is_seeing (k0, k1, RIGHT))) return false;
 
   first_confg (&pk, &pke, dangerous_cs, &p);
-  if (p.room != -1) return false;
+  if (is_valid_pos (&p)) return false;
 
   first_confg (&pk, &pke, door_cs, &p);
-  if (p.room == -1) return true;
+  if (! is_valid_pos (&p)) return true;
   else return tf.y > door_grid_tip_y (&p) - 10
          || door_at_pos (&p)->action == OPEN_DOOR;
 }

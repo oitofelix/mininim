@@ -198,55 +198,55 @@ draw_bricks_03 (ALLEGRO_BITMAP *bitmap, struct pos *p,
 struct coord *
 d_bricks_coord_01 (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * (p->place + 1) + 1;
-  c->y = PLACE_HEIGHT * p->floor + 16;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * (p->place + 1) + 1,
+               PLACE_HEIGHT * p->floor + 16);
 }
 
 struct coord *
 p_bricks_coord_01 (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * (p->place + 1);
-  c->y = PLACE_HEIGHT * p->floor + 29;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * (p->place + 1),
+               PLACE_HEIGHT * p->floor + 29);
 }
 
 struct coord *
 d_bricks_coord_02 (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * (p->place + 1) + 2;
-  c->y = PLACE_HEIGHT * p->floor + 21;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * (p->place + 1) + 2,
+               PLACE_HEIGHT * p->floor + 21);
 }
 
 struct coord *
 p_bricks_coord_02 (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * (p->place + 1);
-  c->y = PLACE_HEIGHT * p->floor + 26;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * (p->place + 1),
+               PLACE_HEIGHT * p->floor + 26);
 }
 
 struct coord *
 d_bricks_coord_03 (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * (p->place + 1) + 4;
-  c->y = PLACE_HEIGHT * p->floor + 11;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * (p->place + 1) + 4,
+               PLACE_HEIGHT * p->floor + 11);
 }
 
 struct coord *
 d_bricks_coord_04 (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * (p->place + 1) + 4;
-  c->y = PLACE_HEIGHT * p->floor + 10;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * (p->place + 1) + 4,
+               PLACE_HEIGHT * p->floor + 10);
 }
 
 static ALLEGRO_COLOR

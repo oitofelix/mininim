@@ -79,7 +79,8 @@ register_changed_room (int room)
   qsort (changed_room, changed_room_nmemb, sizeof (room), (m_comparison_fn_t) cint);
 
   struct pos p;
-  p.room = room;
+  new_pos (&p, &global_level, room, -1, -1);
+
   p.floor = 0;
   for (p.place = 0; p.place < PLACES; p.place++)
     register_changed_pos (&p, -1);
@@ -312,10 +313,10 @@ mr_center_room (int room)
 void
 mr_map_room (int r, int x, int y)
 {
-  int rl = roomd (r, LEFT);
-  int rr = roomd (r, RIGHT);
-  int ra = roomd (r, ABOVE);
-  int rb = roomd (r, BELOW);
+  int rl = roomd (&global_level, r, LEFT);
+  int rr = roomd (&global_level, r, RIGHT);
+  int ra = roomd (&global_level, r, ABOVE);
+  int rb = roomd (&global_level, r, BELOW);
 
   mr.cell[x][y].room = r;
   mr.cell[x][y].done = true;
@@ -423,7 +424,7 @@ mr_select_trans (enum dir d)
   case BELOW: dy = +1; break;
   }
 
-  int r = roomd (mr.room, d);
+  int r = roomd (&global_level, mr.room, d);
   if (r) {
     nmr_coord (mr.x + dx, mr.y + dy, &mr.x, &mr.y);
     mr_set_origin (r, mr.x, mr.y);
@@ -446,7 +447,7 @@ mr_view_trans (enum dir d)
     for (x = 0; x < mr.w; x++) {
       int r = mr.cell[x][y].room;
       if (r <= 0) continue;
-      r = roomd (r, d);
+      r = roomd (&global_level, r, d);
       if (r) {
         mr_set_origin (r, x, y);
         mr_stabilize_origin (&o, d);
@@ -535,7 +536,7 @@ mr_update_last_settings (void)
   mr.last.y = mr.y;
   mr.last.room = mr.room;
 
-  mr.last.level = level.number;
+  mr.last.level = global_level.number;
   mr.last.em = em;
   mr.last.vm = vm;
   mr.last.hgc = hgc;
@@ -550,8 +551,7 @@ draw_animated_background (ALLEGRO_BITMAP *bitmap, int room)
 {
   room_view = room;
 
-  struct pos p;
-  p.room = room;
+  struct pos p; new_pos (&p, &global_level, room, -1, -1);
 
   for (p.floor = FLOORS; p.floor >= 0; p.floor--)
     for (p.place = -1; p.place < PLACES; p.place++)
@@ -570,8 +570,7 @@ draw_animated_foreground (ALLEGRO_BITMAP *bitmap, int room)
 {
   room_view = room;
 
-  struct pos p;
-  p.room = room;
+  struct pos p; new_pos (&p, &global_level, room, -1, -1);
 
   /* loose_floor_fall_debug (); */
 
@@ -623,7 +622,7 @@ update_room0_cache (enum em em, enum vm vm)
 {
   room_view = 0;
   struct pos mouse_pos_bkp = mouse_pos;
-  mouse_pos.room = -1;
+  invalid_pos (&mouse_pos);
   con_caching = true;
 
   if (! room0) room0 = create_bitmap (ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
@@ -682,7 +681,7 @@ update_cache_pos (struct pos *p, enum changed_pos_reason reason,
 
   int x, y;
 
-  struct pos p0;
+  struct pos p0; p0 = *p;
 
   struct pos pbl; prel (p, &pbl, +1, -1);
   struct pos pb; prel (p, &pb, +1, +0);
@@ -838,8 +837,6 @@ update_cache_pos (struct pos *p, enum changed_pos_reason reason,
                     2 * PLACE_WIDTH + 1, PLACE_HEIGHT + 3 + 17);
           clear_rect_to_color (mr.cell[x][y].cache, &r, TRANSPARENT_COLOR);
 
-          p0.room = p->room;
-
           for (p0.floor = p->floor + 1; p0.floor >= p->floor - 1; p0.floor--)
             for (p0.place = p->place - 2; p0.place <= p->place + 1; p0.place++)
               draw_conbg (mr.cell[x][y].cache, &p0, em, vm, true);
@@ -867,8 +864,7 @@ update_cache_pos (struct pos *p, enum changed_pos_reason reason,
   }
 
   if (! recursive && p->place == -1) {
-    struct pos p0;
-    p0.room = roomd (p->room, LEFT);
+    p0.room = roomd (&global_level, p->room, LEFT);
     p0.floor = p->floor;
     p0.place = PLACES - 1;
     recursive = true;
@@ -877,8 +873,7 @@ update_cache_pos (struct pos *p, enum changed_pos_reason reason,
   }
 
   if (! recursive && p->floor == -1) {
-    struct pos p0;
-    p0.room = roomd (p->room, ABOVE);
+    p0.room = roomd (&global_level, p->room, ABOVE);
     p0.floor = FLOORS - 1;
     p0.place = p->place;
     recursive = true;
@@ -887,8 +882,7 @@ update_cache_pos (struct pos *p, enum changed_pos_reason reason,
   }
 
   if (! recursive && p->floor == 0) {
-    struct pos p0;
-    p0.room = roomd (p->room, ABOVE);
+    p0.room = roomd (&global_level, p->room, ABOVE);
     p0.floor = FLOORS;
     p0.place = p->place;
     recursive = true;
@@ -897,8 +891,7 @@ update_cache_pos (struct pos *p, enum changed_pos_reason reason,
   }
 
   if (! recursive && p->place == PLACES - 1) {
-    struct pos p0;
-    p0.room = roomd (p->room, RIGHT);
+    p0.room = roomd (&global_level, p->room, RIGHT);
     p0.floor = p->floor;
     p0.place = -1;
     recursive = true;
@@ -907,8 +900,7 @@ update_cache_pos (struct pos *p, enum changed_pos_reason reason,
   }
 
   if (! recursive && p->floor == FLOORS - 1) {
-    struct pos p0;
-    p0.room = roomd (p->room, BELOW);
+    p0.room = roomd (&global_level, p->room, BELOW);
     p0.floor = -1;
     p0.place = p->place;
     recursive = true;
@@ -917,9 +909,8 @@ update_cache_pos (struct pos *p, enum changed_pos_reason reason,
   }
 
   if (! recursive && p->floor == -1 && p->place == -1) {
-    struct pos p0;
-    p0.room = roomd (p->room, ABOVE);
-    p0.room = roomd (p0.room, LEFT);
+    p0.room = roomd (&global_level, p->room, ABOVE);
+    p0.room = roomd (&global_level, p0.room, LEFT);
     p0.floor = FLOORS - 1;
     p0.place = PLACES - 1;
     recursive = true;
@@ -928,9 +919,8 @@ update_cache_pos (struct pos *p, enum changed_pos_reason reason,
   }
 
   if (! recursive && p->floor == 0 && p->place == PLACES - 1) {
-    struct pos p0;
-    p0.room = roomd (p->room, ABOVE);
-    p0.room = roomd (p0.room, RIGHT);
+    p0.room = roomd (&global_level, p->room, ABOVE);
+    p0.room = roomd (&global_level, p0.room, RIGHT);
     p0.floor = FLOORS;
     p0.place = -1;
     recursive = true;
@@ -939,9 +929,8 @@ update_cache_pos (struct pos *p, enum changed_pos_reason reason,
   }
 
   if (! recursive && p->floor == -1 && p->place == PLACES - 1) {
-    struct pos p0;
-    p0.room = roomd (p->room, ABOVE);
-    p0.room = roomd (p0.room, RIGHT);
+    p0.room = roomd (&global_level, p->room, ABOVE);
+    p0.room = roomd (&global_level, p0.room, RIGHT);
     p0.floor = FLOORS - 1;
     p0.place = -1;
     recursive = true;
@@ -950,9 +939,8 @@ update_cache_pos (struct pos *p, enum changed_pos_reason reason,
   }
 
   if (! recursive && p->floor == FLOORS - 1 && p->place == -1) {
-    struct pos p0;
-    p0.room = roomd (p->room, LEFT);
-    p0.room = roomd (p0.room, BELOW);
+    p0.room = roomd (&global_level, p->room, LEFT);
+    p0.room = roomd (&global_level, p0.room, BELOW);
     p0.floor = -1;
     p0.place = PLACES - 1;
     recursive = true;
@@ -961,9 +949,8 @@ update_cache_pos (struct pos *p, enum changed_pos_reason reason,
   }
 
   if (! recursive && p->floor == FLOORS - 1 && p->place == PLACES - 1) {
-    struct pos p0;
-    p0.room = roomd (p->room, BELOW);
-    p0.room = roomd (p0.room, RIGHT);
+    p0.room = roomd (&global_level, p->room, BELOW);
+    p0.room = roomd (&global_level, p0.room, RIGHT);
     p0.floor = -1;
     p0.place = -1;
     recursive = true;
@@ -1022,7 +1009,7 @@ draw_multi_rooms (void)
       || vm != mr.last.vm
       || hgc != mr.last.hgc
       || hue != mr.last.hue
-      || level.number != mr.last.level) {
+      || global_level.number != mr.last.level) {
     update_cache (em, vm);
   }
 
@@ -1345,7 +1332,7 @@ is_pos_visible (struct pos *p)
   for (y = mr.h - 1; y >= 0; y--)
     if (mr.cell[0][y].room) {
       struct pos p1;
-      p1.room = mr.cell[0][y].room;
+      new_pos (&p1, p->l, mr.cell[0][y].room, -1, -1);
       p1.place = -1;
       for (p1.floor = 0; p1.floor < FLOORS; p1.floor++)
         if (peq (p, &p1)) return true;

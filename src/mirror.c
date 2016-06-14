@@ -274,26 +274,26 @@ draw_floor_reflex (ALLEGRO_BITMAP *bitmap, struct pos *p,
 struct coord *
 floor_reflex_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * (p->place + 1) + 2;
-  c->y = PLACE_HEIGHT * p->floor + 50;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * (p->place + 1) + 2,
+               PLACE_HEIGHT * p->floor + 50);
 }
 
 struct coord *
 mirror_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * p->place - 3;
-  c->y = PLACE_HEIGHT * p->floor + 3;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * p->place - 3,
+               PLACE_HEIGHT * p->floor + 3);
 }
 
 struct coord *
 mirror_reflex_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * p->place + 3;
-  c->y = PLACE_HEIGHT * p->floor + 6;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * p->place + 3,
+               PLACE_HEIGHT * p->floor + 6);
 }

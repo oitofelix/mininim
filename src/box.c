@@ -78,10 +78,10 @@ draw_box (ALLEGRO_BITMAP* bitmap, struct pos *p, enum vm vm)
 struct coord *
 box_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * p->place;
-  c->y = PLACE_HEIGHT * p->floor - 13;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * p->place,
+               PLACE_HEIGHT * p->floor - 13);
 }
 
 static ALLEGRO_COLOR

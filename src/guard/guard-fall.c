@@ -376,7 +376,7 @@ place_in_initial_fall (struct anim *g)
   prel (&pmt, &pmtf, +0, dirf);
   prel (&pmt, &pmtb, +0, dirb);
 
-  fall_pos.room = -1;
+  invalid_pos (&fall_pos);
 
   if (is_strictly_traversable (&pmt)) fall_pos = pmt;
   else if (is_strictly_traversable (&pmtf)) fall_pos = pmtf;
@@ -384,7 +384,7 @@ place_in_initial_fall (struct anim *g)
 
   struct frameset *frameset = get_guard_fall_frameset (g->type);
 
-  if (fall_pos.room != - 1)
+  if (is_valid_pos (&fall_pos))
     place_frame (&g->f, &g->f, frameset[0].frame,
                  &fall_pos,
                  (g->f.dir == LEFT) ? PLACE_WIDTH - 12 : +6,

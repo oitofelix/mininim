@@ -72,9 +72,7 @@ generate_stars_for_pos (struct pos *p)
 
   stars->b = create_bitmap (max_x - min_x + 1, max_y - min_y + 1);
   clear_bitmap (stars->b, TRANSPARENT_COLOR);
-  stars->c.room = np.room;
-  stars->c.x = min_x;
-  stars->c.y = min_y;
+  new_coord (&stars->c, np.l, np.room, min_x, min_y);
 
   redraw_stars_bitmap (stars, vm);
 }
@@ -82,9 +80,7 @@ generate_stars_for_pos (struct pos *p)
 void
 generate_stars_for_room (int room)
 {
-  struct pos p;
-  p.room = room;
-
+  struct pos p; new_pos (&p, &global_level, room, -1, -1);
   for (p.floor = FLOORS; p.floor >= -1; p.floor--)
     for (p.place = -1; p.place < PLACES; p.place++)
       generate_stars_for_pos (&p);
@@ -93,9 +89,7 @@ generate_stars_for_room (int room)
 void
 generate_stars_for_cell (int x, int y)
 {
-  struct pos p;
-  p.room = mr.cell[x][y].room;
-
+  struct pos p; new_pos (&p, &global_level, mr.cell[x][y].room, -1, -1);
   for (p.floor = FLOORS; p.floor >= -1; p.floor--)
     for (p.place = -1; p.place < PLACES; p.place++)
       generate_stars_for_pos (&p);

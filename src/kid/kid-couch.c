@@ -160,7 +160,7 @@ flow (struct anim *k)
       && ! k->collision
       && ! k->fall
       && ! k->hit_by_loose_floor
-      && k->item_pos.room == -1
+      && ! is_valid_pos (&k->item_pos)
       && is_hangable_pos (&ph, k->f.dir)
       && dist_next_place (&k->f, _tf, pos, 0, true) <= 27
       && ! (ctf == DOOR && k->f.dir == LEFT
@@ -176,12 +176,12 @@ flow (struct anim *k)
     return false;
   }
 
-  if (k->i == 2 && k->item_pos.room != -1
+  if (k->i == 2 && is_valid_pos (&k->item_pos)
       && ! k->collision && ! k->fall) {
     if (is_potion (&k->item_pos)) kid_drink (k);
     else if (is_sword (&k->item_pos)) kid_raise_sword (k);
     else {
-      k->item_pos.room = -1; goto no_item;
+      invalid_pos (&k->item_pos); goto no_item;
     }
     return false;
   }

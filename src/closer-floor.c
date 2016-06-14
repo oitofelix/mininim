@@ -249,17 +249,13 @@ compute_closer_floors (void)
 
   for (i = 0; i < closer_floor_nmemb; i++) {
     struct closer_floor *c = &closer_floor[i];
-    if (c->p.room == -1) {
-      /* remove_closer_floor (c); i--; */
-      continue;
-    }
     if (c->pressed && ! c->unresponsive) {
       if (! c->noise) {
         alert_guards (&c->p);
         play_sample (closer_floor_sample, &c->p, -1);
         c->noise = true;
       }
-      close_door (c->event);
+      close_door (c->p.l, c->event);
     } else c->noise = false;
   }
 }
@@ -524,17 +520,17 @@ draw_unpressed_closer_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
 struct coord *
 pressed_closer_floor_left_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * p->place;
-  c->y = PLACE_HEIGHT * p->floor + 51;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * p->place,
+               PLACE_HEIGHT * p->floor + 51);
 }
 
 struct coord *
 pressed_closer_floor_right_coord (struct pos *p, struct coord *c)
 {
-  c->x = PLACE_WIDTH * (p->place + 1);
-  c->y = PLACE_HEIGHT * p->floor + 51;
-  c->room = p->room;
-  return c;
+  return
+    new_coord (c, p->l, p->room,
+               PLACE_WIDTH * (p->place + 1),
+               PLACE_HEIGHT * p->floor + 51);
 }
