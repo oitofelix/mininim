@@ -206,10 +206,7 @@ fight_ai (struct anim *k)
   if (is_near (k, ke)
       && ! is_in_fight_mode (ke)
       && ! ke->immortal
-      && ke->f.dir != k->f.dir
-      && (is_kid_run_jump (&ke->f)
-          || is_kid_jump_air (&ke->f)
-          || is_kid_run (&ke->f))) {
+      && ke->f.dir != k->f.dir) {
     place_on_the_ground (&ke->f, &ke->f.c);
     kid_take_sword (ke);
   }
