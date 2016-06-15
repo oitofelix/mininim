@@ -114,8 +114,8 @@ void
 kid_couch_suddenly (struct anim *k)
 {
   k->action = kid_couch_suddenly;
-  struct coord nc; struct pos np, pmt;
-  survey (_mt, pos, &k->f, &nc, &pmt, &np);
+  struct pos pmt;
+  survey (_mt, pos, &k->f, NULL, &pmt, NULL);
   place_frame (&k->f, &k->f, kid_couch_frameset[0].frame,
                &pmt, (k->f.dir == LEFT)
                ? 24 : 18, +27);
@@ -125,7 +125,7 @@ kid_couch_suddenly (struct anim *k)
 static bool
 flow (struct anim *k)
 {
-  struct coord nc; struct pos np, ptf, pbf;
+  struct pos ptf, pbf;
   enum confg ctf;
 
   if (k->oaction != kid_couch) {
@@ -153,8 +153,8 @@ flow (struct anim *k)
 
   /* unclimb */
   int dir = (k->f.dir == LEFT) ? +1 : -1;
-  ctf = survey (_tf, pos, &k->f, &nc, &ptf, &np)->fg;
-  survey (_bf, pos, &k->f, &nc, &pbf, &np);
+  ctf = survey (_tf, pos, &k->f, NULL, &ptf, NULL)->fg;
+  survey (_bf, pos, &k->f, NULL, &pbf, NULL);
   struct pos ph; prel (&pbf, &ph, +1, dir);
   if (k->i == -1
       && ! k->collision
@@ -217,7 +217,7 @@ flow (struct anim *k)
 static bool
 physics_in (struct anim *k)
 {
-  struct coord nc; struct pos np, pm;
+  struct pos pm, pma;
   enum confg cm;
 
   /* collision */
@@ -243,9 +243,9 @@ physics_in (struct anim *k)
 
 
   /* fall */
-  cm = survey (_m, pos, &k->f, &nc, &pm, &np)->fg;
+  cm = survey (_m, pos, &k->f, NULL, &pm, NULL)->fg;
   struct loose_floor *l =
-    loose_floor_at_pos (prel (&pm, &np, -1, +0));
+    loose_floor_at_pos (prel (&pm, &pma, -1, +0));
   if ((is_strictly_traversable (&pm)
        || (l && l->action == FALL_LOOSE_FLOOR && cm == LOOSE_FLOOR))
       && ! (k->fall && k->i == 0)) {

@@ -142,7 +142,7 @@ flow (struct anim *k)
 static bool
 physics_in (struct anim *k)
 {
-  struct coord nc; struct pos np, pbf, pbb;
+  struct pos pbf, pbb;
 
   /* collision */
   /* if (! k->hang && kid_door_split_collision (k)) return false; */
@@ -151,8 +151,8 @@ physics_in (struct anim *k)
     k->f.c.x += (k->f.dir == LEFT) ? +4 : -4;
 
   /* fall */
-  survey (_bf, pos, &k->f, &nc, &pbf, &np);
-  survey (_bb, pos, &k->f, &nc, &pbb, &np);
+  survey (_bf, pos, &k->f, NULL, &pbf, NULL);
+  survey (_bb, pos, &k->f, NULL, &pbb, NULL);
   if (! k->hang
       && is_strictly_traversable (&pbf)
       && is_strictly_traversable (&pbb)) {

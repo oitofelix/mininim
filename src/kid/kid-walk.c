@@ -98,11 +98,11 @@ kid_walk (struct anim *k)
 static bool
 flow (struct anim *k)
 {
-  struct coord nc; struct pos np, pbf, pmbo;
+  struct pos pbf, pmbo;
 
   if (k->oaction != kid_walk) {
-    survey (_bf, pos, &k->f, &nc, &pbf, &np);
-    survey (_mbo, pos, &k->f, &nc, &pmbo, &np);
+    survey (_bf, pos, &k->f, NULL, &pbf, NULL);
+    survey (_mbo, pos, &k->f, NULL, &pmbo, NULL);
     if (is_traversable (&pbf)
         || con (&pbf)->fg == CLOSER_FLOOR) k->p = pmbo;
     else k->p = pbf;
@@ -221,14 +221,14 @@ flow (struct anim *k)
 static bool
 physics_in (struct anim *k)
 {
-  struct coord nc; struct pos np, pmbo, pbb;
+  struct pos pmbo, pbb;
 
   /* inertia */
   k->inertia = k->cinertia = 0;
 
   /* fall */
-  survey (_mbo, pos, &k->f, &nc, &pmbo, &np);
-  survey (_bb, pos, &k->f, &nc, &pbb, &np);
+  survey (_mbo, pos, &k->f, NULL, &pmbo, NULL);
+  survey (_bb, pos, &k->f, NULL, &pbb, NULL);
   if (k->walk == -1
       && ((k->i < 6 && is_strictly_traversable (&pbb))
           || (k->i >= 6 && is_strictly_traversable (&pmbo)))) {

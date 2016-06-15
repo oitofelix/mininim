@@ -183,9 +183,10 @@ fight_ai (struct anim *k)
   enum dir odir = (k->f.dir == LEFT) ? RIGHT : LEFT;
 
   /* get positions */
-  struct coord nc; struct pos p, pe;
-  get_pos (k, &p, &nc);
-  get_pos (ke, &pe, &nc);
+  struct pos p, pe;
+  survey (_m, pos, &k->f, NULL, &p, NULL);
+  survey ((k->f.dir == LEFT) ? _mr : _ml,
+          pos, &ke->f, NULL, &pe, NULL);
   pos2room (&pe, p.room, &pe);
 
   /* remember the place the enemy was last seen */
@@ -209,7 +210,6 @@ fight_ai (struct anim *k)
       && (is_kid_run_jump (&ke->f)
           || is_kid_jump_air (&ke->f)
           || is_kid_run (&ke->f))) {
-    place_at_distance (&k->f, _tf, &ke->f, _tf, 10, k->f.dir, &ke->f.c);
     place_on_the_ground (&ke->f, &ke->f.c);
     kid_take_sword (ke);
   }
@@ -392,7 +392,9 @@ fight_inversion_mechanics (struct anim *k, struct anim *ke)
       && is_in_fight_mode (k)
       && is_in_fight_mode (ke)
       && ! is_sword_hit (k)
-      && ! is_sword_hit (ke)) {
+      && ! is_sword_hit (ke)
+      && (! is_attacking (k) || k->i < 2)
+      && (! is_attacking (ke) || ke->i < 2)) {
     struct coord c;
     c = k->f.c;
     k->f.c = ke->f.c;
@@ -455,8 +457,8 @@ bool
 is_in_range (struct anim *k0, struct anim *k1, int r)
 {
   struct coord m0, m1; struct pos p0, p1;
-  get_pos (k0, &p0, &m0);
-  get_pos (k1, &p1, &m1);
+  survey (_m, pos, &k0->f, &m0, &p0, NULL);
+  survey (_m, pos, &k1->f, &m1, &p1, NULL);
   coord2room (&m1, m0.room, &m1);
 
   return m1.room == m0.room
@@ -467,8 +469,8 @@ is_in_range (struct anim *k0, struct anim *k1, int r)
 enum confg
 fight_crel (struct anim *k, int floor, int place)
 {
-  struct coord nc; struct pos np, pm;
-  survey (_m, pos, &k->f, &nc, &pm, &np);
+  struct pos pm;
+  survey (_m, pos, &k->f, NULL, &pm, NULL);
 
   /* place sign indicates direction in relation to k orientation */
   int dir = (k->f.dir == LEFT) ? -1 : +1;
@@ -688,8 +690,9 @@ bool
 is_seeing (struct anim *k0, struct anim *k1, enum dir dir)
 {
   struct coord m0, m1; struct pos p, p0, p1, pk, pke;
-  get_pos (k0, &p0, &m0);
-  get_pos (k1, &p1, &m1);
+  survey (_m, pos, &k0->f, &m0, &p0, NULL);
+  survey ((k0->f.dir == LEFT) ? _mr : _ml,
+          pos, &k1->f, &m1, &p1, NULL);
 
   pos2room (&p1, p0.room, &p1);
   coord2room (&m1, p0.room, &m1);
@@ -724,9 +727,10 @@ is_seeing (struct anim *k0, struct anim *k1, enum dir dir)
 bool
 is_hearing (struct anim *k0, struct anim *k1)
 {
-  struct coord nc; struct pos p0, p1;
-  get_pos (k0, &p0, &nc);
-  get_pos (k1, &p1, &nc);
+  struct pos p0, p1;
+  survey (_m, pos, &k0->f, NULL, &p0, NULL);
+  survey ((k0->f.dir == LEFT) ? _mr : _ml,
+          pos, &k1->f, NULL, &p1, NULL);
 
   pos2room (&p1, p0.room, &p1);
 
@@ -744,8 +748,8 @@ is_hearing (struct anim *k0, struct anim *k1)
 bool
 is_pos_on_back (struct anim *k, struct pos *p)
 {
-  struct coord nc; struct pos pm, pv;
-  get_pos (k, &pm, &nc);
+  struct pos pm, pv;
+  survey (_m, pos, &k->f, NULL, &pm, NULL);
 
   pos2room (p, pm.room, &pv);
 
@@ -771,9 +775,9 @@ is_on_back (struct anim *k0, struct anim *k1)
 bool
 is_near (struct anim *k0, struct anim *k1)
 {
-  struct coord m0, m1; struct pos np, p0, p1;
-  survey (_m, pos, &k0->f, &m0, &p0, &np);
-  survey (_m, pos, &k1->f, &m1, &p1, &np);
+  struct coord m0, m1; struct pos p0, p1;
+  survey (_m, pos, &k0->f, &m0, &p0, NULL);
+  survey (_m, pos, &k1->f, &m1, &p1, NULL);
 
   _m (&k0->f, &m0);
   _m (&k1->f, &m1);
@@ -816,39 +820,6 @@ bool
 door_cs (enum confg t)
 {
   return t == DOOR;
-}
-
-struct pos *
-get_pos (struct anim *k, struct pos *p, struct coord *m)
-{
-  struct coord nc;
-  struct pos np;
-  if (m) survey (_m, pos, &k->f, m, &np, &np);
-
-  struct anim *ke = get_anim_by_id (k->enemy_id);
-  if (ke && ke->f.dir == LEFT)
-    survey (_mr, pos, &k->f, &nc, &np, p);
-  else if (ke && ke->f.dir == RIGHT)
-    survey (_ml, pos, &k->f, &nc, &np, p);
-  else survey (_m, pos, &k->f, &nc, &np, p);
-
-  return p;
-
-  /* if (is_kid_hang_or_climb (&k->f) */
-  /*     || (is_kid_vjump (&k->f) && k->hang)) { */
-  /*   *p = k->hang_pos; */
-  /*   con_m (p, m); */
-  /*   return p; */
-  /* } */
-
-  /* while (p->room != m->room && con (p)->fg != DOOR) { */
-  /*   if (p->room == roomd (m->room, LEFT)) p->place++; */
-  /*   else if (p->room == roomd (m->room, RIGHT)) p->place--; */
-  /*   else if (p->room == roomd (m->room, ABOVE)) p->floor++; */
-  /*   else if (p->room == roomd (m->room, BELOW)) p->floor--; */
-  /*   else break; */
-  /*   npos (p, p); */
-  /* } */
 }
 
 bool
@@ -946,9 +917,14 @@ void
 fight_turn (struct anim *k)
 {
   k->f.dir = (k->f.dir == LEFT) ? RIGHT : LEFT;
+  k->f.flip ^= ALLEGRO_FLIP_HORIZONTAL;
 
   if (! is_in_fight_mode (k)) enter_fight_mode (k);
-  else anim_walkb (k);
+  else {
+    struct anim a = *k;
+    anim_walkb (&a);
+    if (! is_anim_fall (&a.f)) *k = a;
+  }
 }
 
 void
@@ -980,9 +956,9 @@ fight_turn_controllable (struct anim *k)
 
   ke = get_anim_by_id (k->enemy_id);
   if (ke) {
-    struct coord nc; struct pos p, pe;
-    get_pos (k, &p, &nc);
-    get_pos (ke, &pe, &nc);
+    struct pos p, pe;
+    survey (_m, pos, &k->f, NULL, &p, NULL);
+    survey (_m, pos, &ke->f, NULL, &pe, NULL);
     if (is_on_back (k, ke) && is_in_fight_mode (k)
         && p.floor == pe.floor)
       fight_turn (k);
@@ -1027,8 +1003,8 @@ fight_hit (struct anim *k, struct anim *ke)
   k->current_lives--;
 
   int d = (k->f.dir == LEFT) ? +1 : -1;
-  struct coord nc; struct pos np, pb;
-  survey (_m, pos, &k->f, &nc, &k->p, &np);
+  struct pos pb;
+  survey (_m, pos, &k->f, NULL, &k->p, NULL);
 
   /* ensure anim doesn't die within a wall */
   if (con (&k->p)->fg == WALL) {
@@ -1064,10 +1040,10 @@ fight_hit (struct anim *k, struct anim *ke)
 bool
 fight_door_split_collision (struct anim *a)
 {
-  struct coord nc, tl; struct pos np, ptl, ptr;
+  struct coord tl; struct pos ptl, ptr;
 
-  survey (_tl, pos, &a->f, &tl, &ptl, &np);
-  survey (_tr, pos, &a->f, &nc, &ptr, &np);
+  survey (_tl, pos, &a->f, &tl, &ptl, NULL);
+  survey (_tr, pos, &a->f, NULL, &ptr, NULL);
 
   int dtl = dist_next_place (&a->f, _tl, pos, +0, a->f.dir == LEFT);
   int dtr = dist_next_place (&a->f, _tr, pos, +0, a->f.dir == RIGHT);

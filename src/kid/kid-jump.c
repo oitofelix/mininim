@@ -112,7 +112,7 @@ kid_jump (struct anim *k)
 static bool
 flow (struct anim *k)
 {
-  struct coord nc; struct pos np, pm, ptf;
+  struct pos pm, ptf;
 
   if (k->oaction != kid_jump)
     k->i = -1, k->misstep = k->hang = false;
@@ -128,8 +128,8 @@ flow (struct anim *k)
   int dir = (k->f.dir == LEFT) ? -1 : +1;
 
   /* hang front */
-  survey (_m, pos, &k->f, &nc, &pm, &np);
-  survey (_tf, pos, &k->f, &nc, &ptf, &np);
+  survey (_m, pos, &k->f, NULL, &pm, NULL);
+  survey (_tf, pos, &k->f, NULL, &ptf, NULL);
   if (k->i >= 7 && k->i <= 10 && hang_front
       && (is_hangable_pos (&pm, k->f.dir)
           || (is_hangable_pos (&ptf, k->f.dir)
@@ -145,7 +145,7 @@ flow (struct anim *k)
   }
 
   /* hang back */
-  survey (_tf, pos, &k->f, &nc, &ptf, &np);
+  survey (_tf, pos, &k->f, NULL, &ptf, NULL);
   if (k->i >= 7 && k->i <= 10
       && hang_back && is_hangable_pos (&ptf, back_dir)) {
     k->hang_pos = ptf;
@@ -174,7 +174,7 @@ flow (struct anim *k)
 static bool
 physics_in (struct anim *k)
 {
-  struct coord nc; struct pos np, pbb, pmbo, pbf;
+  struct pos pbb, pmbo, pbf;
   struct frame nf;
 
   /* inertia */
@@ -190,9 +190,9 @@ physics_in (struct anim *k)
 
   /* fall */
   next_frame (&k->f, &nf, &k->fo);
-  survey (_bb, pos, &nf, &nc, &pbb, &np);
-  survey (_mbo, pos, &nf, &nc, &pmbo, &np);
-  survey (_bf, pos, &nf, &nc, &pbf, &np);
+  survey (_bb, pos, &nf, NULL, &pbb, NULL);
+  survey (_mbo, pos, &nf, NULL, &pmbo, NULL);
+  survey (_bf, pos, &nf, NULL, &pbf, NULL);
   if ((is_strictly_traversable (&pbb)
        && is_strictly_traversable (&pmbo) && k->i < 7)
       || (k->i >= 10 && k->i < 13
@@ -209,7 +209,7 @@ physics_in (struct anim *k)
 static void
 physics_out (struct anim *k)
 {
-  struct coord nc; struct pos np, pmbo;
+  struct pos pmbo;
 
   /* depressible floors */
   if (k->i == 8) clear_depressible_floor (k);
@@ -218,7 +218,7 @@ physics_out (struct anim *k)
   else keep_depressible_floor (k);
 
   /* loose floor shaking */
-  survey (_mbo, pos, &k->f, &nc, &pmbo, &np);
+  survey (_mbo, pos, &k->f, NULL, &pmbo, NULL);
   if (k->i == 12) shake_loose_floor_row (&pmbo);
 
   /* sound */

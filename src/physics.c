@@ -311,8 +311,8 @@ exchange_anim_pos (struct pos *p0, struct pos *p1, bool invert_dir)
   for (i = 0; i < anima_nmemb; i++) {
     struct anim *a = &anima[i];
 
-    struct coord m; struct pos np, p;
-    survey (_m, pos, &a->f, &m, &p, &np);
+    struct pos p;
+    survey (_m, pos, &a->f, NULL, &p, NULL);
 
     if (peq (&p, p0)) {
       place_at_pos (&a->f, _m, p1, &a->f.c);
@@ -470,16 +470,14 @@ dist_next_place (struct frame *f, coord_f cf, pos_f pf,
 
   int i = 0;
 
-  struct coord nc;
   struct pos np, _np;
-
-  survey (cf, pf, &_f, &nc, &np, &np);
+  survey (cf, pf, &_f, NULL, NULL, &np);
 
   do {
     i += inc;
     _f.c.x += inc;
     nframe (&_f, &_f.c);
-    survey (cf, pf, &_f, &nc, &_np, &_np);
+    survey (cf, pf, &_f, NULL, NULL, &_np);
   } while (np.place == _np.place
            && abs (i) < PLACE_WIDTH);
 
@@ -500,7 +498,7 @@ is_colliding_cf (struct frame *f, struct frame_offset *fo, int dx,
                  int reverse, struct collision_info *ci,
                  coord_f cf)
 {
-  struct coord nc, tf; struct pos np, pcf, _pcf, pocf, p, pl, pr;
+  struct coord tf; struct pos pcf, _pcf, pocf, p, pl, pr;
 
   struct frame _f = *f, nf;
 
@@ -517,10 +515,10 @@ is_colliding_cf (struct frame *f, struct frame_offset *fo, int dx,
 
   coord_f ocf = opposite_cf (cf);
 
-  survey (cf, pos, &_f, &nc, &_pcf, &np);
-  survey (cf, pos, &nf, &nc, &pcf, &np);
-  survey (ocf, pos, &nf, &nc, &pocf, &np);
-  survey (_tf, pos, &nf, &tf, &np, &np);
+  survey (cf, pos, &_f, NULL, &_pcf, NULL);
+  survey (cf, pos, &nf, NULL, &pcf, NULL);
+  survey (ocf, pos, &nf, NULL, &pocf, NULL);
+  _tf (&nf, &tf);
 
   if (pcf.room != _pcf.room) pos2room (&pcf, _f.c.room, &pcf);
   if (pocf.room != pcf.room) pos2room (&pocf, pcf.room, &pocf);
@@ -718,8 +716,8 @@ is_on_con (struct frame *f, coord_f cf, pos_f pf,
   int r = reverse ? -1 : 1;
   int dir = (_f.dir == LEFT) ? r * -1: r * +1;
 
-  struct coord c; struct pos p, np;
-  survey (cf, pf, &_f, &c, &p, &np);
+  struct pos p;
+  survey (cf, pf, &_f, NULL, &p, NULL);
 
   return dn <= min_dist && crel (&p, 0, dir)->fg == t;
 }
@@ -773,12 +771,12 @@ dist_chopper (struct frame *f, bool reverse)
 {
   if (cutscene) return PLACE_WIDTH + 1;
 
-  struct coord nc; struct pos np, ptf, ptfr;
+  struct pos ptf, ptfr;
 
   struct frame _f = *f;
   if (reverse) _f.dir = (_f.dir == LEFT) ? RIGHT : LEFT;
 
-  enum confg ctf = survey (_tf, pos, &_f, &nc, &ptf, &np)->fg;
+  enum confg ctf = survey (_tf, pos, &_f, NULL, &ptf, NULL)->fg;
   prel (&ptf, &ptfr, +0, +1);
   enum confg ctfr = con (&ptfr)->fg;
 
@@ -872,11 +870,10 @@ can_hang (struct frame *f, bool reverse, struct pos *hang_pos)
 
   struct coord tb; _tb (&_f, &tb);
 
-  struct coord bf, mbo, bb;
-  struct pos pbf, npbf, pmbo, npmbo, pbb, npbb, pbbb;
-  survey (_bf, pos, &_f, &bf, &pbf, &npbf);
-  survey (_mbo, pos, &_f, &mbo, &pmbo, &npmbo);
-  survey (_bb, pos, &_f, &bb, &pbb, &npbb);
+  struct pos pbf, pmbo, pbb, pbbb;
+  survey (_bf, pos, &_f, NULL, &pbf, NULL);
+  survey (_mbo, pos, &_f, NULL, &pmbo, NULL);
+  survey (_bb, pos, &_f, NULL, &pbb, NULL);
   prel (&pbb, &pbbb, +0, (_f.dir == LEFT) ? +1 : -1);
 
   bool hbf = is_hangable_pos (&pbf, _f.dir);

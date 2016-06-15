@@ -202,8 +202,7 @@ guard_vigilant (struct anim *g)
 static bool
 flow (struct anim *g)
 {
-  struct coord nc;
-  struct pos np, pmt;
+  struct pos pmt;
 
   bool normal = g->key.down;
   bool walkf = ((g->f.dir == RIGHT) && g->key.right)
@@ -235,7 +234,7 @@ flow (struct anim *g)
 
     /* death */
     if (g->current_lives <= 0) {
-      survey (_mt, pos, &g->f, &nc, &pmt, &np);
+      survey (_mt, pos, &g->f, NULL, &pmt, NULL);
       g->p = pmt;
       guard_die (g);
       return false;
@@ -278,16 +277,16 @@ flow (struct anim *g)
 static bool
 physics_in (struct anim *g)
 {
-  struct coord nc; struct pos np, ptf, pmbo, pbb;
+  struct pos ptf, pmbo, pbb;
 
   /* collision */
   uncollide (&g->f, &g->fo, &g->fo, +0, true, &g->ci);
   if (fight_door_split_collision (g)) return false;
 
   /* fall */
-  survey (_tf, pos, &g->f, &nc, &ptf, &np);
-  survey (_mbo, pos, &g->f, &nc, &pmbo, &np);
-  survey (_bb, pos, &g->f, &nc, &pbb, &np);
+  survey (_tf, pos, &g->f, NULL, &ptf, NULL);
+  survey (_mbo, pos, &g->f, NULL, &pmbo, NULL);
+  survey (_bb, pos, &g->f, NULL, &pbb, NULL);
   if (is_strictly_traversable (&ptf)
       || is_strictly_traversable (&pmbo)
       /* || is_strictly_traversable (&pbb) */

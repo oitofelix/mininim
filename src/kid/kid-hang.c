@@ -180,8 +180,8 @@ is_kid_hanging_at_pos (struct frame *f, struct pos *p)
 {
   pos_f pf = (f->dir == LEFT) ? posf : pos;
 
-  struct coord bb; struct pos pbb, npbb, pr;
-  survey (_bb, pf, f, &bb, &pbb, &npbb);
+  struct pos pbb, pr;
+  survey (_bb, pf, f, NULL, &pbb, NULL);
 
   int dir = (f->dir == LEFT) ? -1 : +1;
   return (is_kid_hang_or_climb (f)

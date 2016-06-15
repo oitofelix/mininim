@@ -157,8 +157,8 @@ legacy_level_start (void)
 void
 legacy_level_special_events (void)
 {
-  struct pos np, p, pm, pms;
-  struct coord nc, m, ms;
+  struct pos p, pm, pms;
+  struct coord m, ms;
   struct anim *k = get_anim_by_id (current_kid_id);
 
   /* in the first animation cycle */
@@ -180,7 +180,7 @@ legacy_level_special_events (void)
 
     /* level 3 checkpoint */
     new_pos (&p, &global_level, 2, 0, 8);
-    survey (_m, pos, &k->f, &nc, &pm, &np);
+    survey (_m, pos, &k->f, NULL, &pm, NULL);
     if (peq (&pm, &p)) {
       level_3_checkpoint = true;
       total_lives = k->total_lives;
@@ -194,7 +194,7 @@ legacy_level_special_events (void)
        kid reaches the second place of the room 1 */
     struct pos skeleton_floor_pos;
     new_pos (&skeleton_floor_pos, &global_level, 1, 1, 5);
-    survey (_m, pos, &k->f, &nc, &pm, &np);
+    survey (_m, pos, &k->f, NULL, &pm, NULL);
     if (exit_level_door
         && exit_level_door->i == 0
         && pm.room == 1
@@ -220,7 +220,7 @@ legacy_level_special_events (void)
        the screen waiting for the kid */
     s = get_anim_by_id (skeleton_id);
     if (s) {
-      survey (_m, pos, &s->f, &nc, &pm, &np);
+      survey (_m, pos, &s->f, NULL, &pm, NULL);
       new_pos (&p, &global_level, 3, 1, 4);
       if (s->f.c.room == 3 && pm.floor == 0
           && is_guard_fall (&s->f)) {
@@ -315,7 +315,7 @@ legacy_level_special_events (void)
     if (shadow_id != -1) {
       struct anim *ks = get_anim_by_id (shadow_id);
       if (is_potion (&potion_pos)) {
-        survey (_m, pos, &ks->f, &nc, &pm, &np);
+        survey (_m, pos, &ks->f, NULL, &pm, NULL);
         pos2room (&pm, 24, &pm);
         if (pm.place < potion_pos.place - 1) ks->key.right = true;
         else ks->key.shift = true;
@@ -423,7 +423,7 @@ legacy_level_special_events (void)
       con (&sword_pos)->ext.item = NO_ITEM;
 
     /* make shadow fall in kid's front */
-    survey (_m, pos, &k->f, &nc, &pm, &np);
+    survey (_m, pos, &k->f, NULL, &pm, NULL);
     if (shadow_id == -1
         && con (&sword_pos)->ext.item != SWORD
         && pm.room == 15 && pm.floor == 0 && pm.place < 6
@@ -450,8 +450,8 @@ legacy_level_special_events (void)
     struct audio_sample *as;
     if (ks) {
       k->death_reason = ks->death_reason = SHADOW_FIGHT_DEATH;
-      survey (_m, pos, &ks->f, &ms, &pms, &np);
-      survey (_m, pos, &k->f, &m, &pm, &np);
+      survey (_m, pos, &ks->f, &ms, &pms, NULL);
+      survey (_m, pos, &k->f, &m, &pm, NULL);
       ks->p = pms;
       k->p = pm;
 

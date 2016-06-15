@@ -101,8 +101,8 @@ flow (struct anim *k)
 
   if (jump && k->f.b != kid_run_jump_frameset[10].frame) {
     /* platform edge detection */
-    struct coord mf, cm; struct pos np, pmf;
-    survey (_mf, pos, &k->f, &mf, &pmf, &np);
+    struct coord mf, cm; struct pos pmf;
+    survey (_mf, pos, &k->f, &mf, &pmf, NULL);
     int dir = (k->f.dir == LEFT) ? -1 : +1;
     struct pos p;
     prel (&pmf, &p, +0, dir * 2);
@@ -136,7 +136,7 @@ flow (struct anim *k)
 static bool
 physics_in (struct anim *k)
 {
-  struct coord nc; struct pos np, ptf;
+  struct pos ptf;
 
   /* inertia */
   k->inertia = 0;
@@ -149,7 +149,7 @@ physics_in (struct anim *k)
   }
 
   /* fall */
-  survey (_tf, pos, &k->f, &nc, &ptf, &np);
+  survey (_tf, pos, &k->f, NULL, &ptf, NULL);
   if (is_strictly_traversable (&ptf)) {
     kid_fall (k);
     return false;

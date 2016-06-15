@@ -327,14 +327,13 @@ bool
 should_chomp (struct pos *p)
 {
   int i;
-  struct coord nc;
-  struct pos np, pm, _p;
+  struct pos pm, _p;
 
   for (i = 0; i < anima_nmemb; i++) {
     struct anim *a = &anima[i];
     if (a->type != KID
         || (is_anim_dead (&a->f) && ! a->id == 0)) continue;
-    survey (_m, pos, &a->f, &nc, &pm, &np);
+    survey (_m, pos, &a->f, NULL, &pm, NULL);
     int inc = p->place < pm.place ? +1 : -1;
     if (p->room == pm.room && p->floor == pm.floor) {
       for (_p = *p; _p.place != pm.place; _p.place += inc)
@@ -397,9 +396,9 @@ compute_choppers (void)
           || is_anim_fall (&a->f)
           || a->immortal
           || a->chopper_immune) continue;
-      struct coord nc; struct pos np, pbf, pbb;
-      survey (_bf, pos, &a->f, &nc, &pbf, &np);
-      survey (_bb, pos, &a->f, &nc, &pbb, &np);
+      struct pos pbf, pbb;
+      survey (_bf, pos, &a->f, NULL, &pbf, NULL);
+      survey (_bb, pos, &a->f, NULL, &pbb, NULL);
       pos2room (&pbf, c->p.room, &pbf);
       pos2room (&pbb, c->p.room, &pbb);
       if ((((pbf.room == c->p.room

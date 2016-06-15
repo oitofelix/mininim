@@ -611,12 +611,12 @@ draw_door_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f,
 bool
 should_draw_door_grid (struct pos *p, struct frame *f)
 {
-  struct coord nc; struct pos np, pl, pa, pmt, ptb;
+  struct pos pl, pa, pmt, ptb;
 
   struct pos *hang_pos = &((struct anim *)f->id)->hang_pos;
 
-  survey (_mt, pos, f, &nc, &pmt, &np);
-  survey (_tb, pos, f, &nc, &ptb, &np);
+  survey (_mt, pos, f, NULL, &pmt, NULL);
+  survey (_tb, pos, f, NULL, &ptb, NULL);
 
   prel (p, &pl, +0, -1);
   prel (p, &pa, -1, +0);

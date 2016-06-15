@@ -192,8 +192,8 @@ draw_broken_floor_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
   int i;
   for (i = 0; i < anima_nmemb; i++) {
     struct anim *a = &anima[i];
-    struct coord nc; struct pos np, pmt;
-    survey (_mt, pos, &a->f, &nc, &pmt, &np);
+    struct pos pmt;
+    survey (_mt, pos, &a->f, NULL, &pmt, NULL);
     if (peq (&pmt, p) && is_anim_dead (&a->f)) return;
   }
 

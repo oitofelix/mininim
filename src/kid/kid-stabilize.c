@@ -156,14 +156,14 @@ flow (struct anim *k)
 static bool
 physics_in (struct anim *k)
 {
-  struct coord nc; struct pos np, pmbo, pbb;
+  struct pos pmbo, pbb;
 
   /* inertia */
   k->inertia = k->cinertia = 0;
 
   /* fall */
-  survey (_mbo, pos, &k->f, &nc, &pmbo, &np);
-  survey (_bb, pos, &k->f, &nc, &pbb, &np);
+  survey (_mbo, pos, &k->f, NULL, &pmbo, NULL);
+  survey (_bb, pos, &k->f, NULL, &pbb, NULL);
   if (is_strictly_traversable (&pmbo)
       && is_strictly_traversable (&pbb)) {
     kid_fall (k);

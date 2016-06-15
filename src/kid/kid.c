@@ -560,10 +560,10 @@ f = %i, p = %i, dn = %i, dp = %i, dc = %i, dcb = %i, df = %i, dl = %i, dcl = %i,
 bool
 kid_door_split_collision (struct anim *k)
 {
-  struct coord nc, tf; struct pos np, ptb, ptf;
+  struct coord tf; struct pos ptb, ptf;
 
-  survey (_tb, pos, &k->f, &nc, &ptb, &np);
-  survey (_tf, pos, &k->f, &tf, &ptf, &np);
+  survey (_tb, pos, &k->f, NULL, &ptb, NULL);
+  survey (_tf, pos, &k->f, &tf, &ptf, NULL);
 
   int dntb = dist_next_place (&k->f, _tb, pos, +0, false);
   int dptf = dist_next_place (&k->f, _tf, pos, +0, true);

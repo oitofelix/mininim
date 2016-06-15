@@ -97,9 +97,7 @@ flow (struct anim *k)
 static bool
 physics_in (struct anim *k)
 {
-  struct coord nc;
-  struct pos np, pbb, pbf, pmt,
-    npmbo, npmbo_nf;
+  struct pos pbb, pbf, pmt, npmbo, npmbo_nf;
   struct frame nf;
   struct frame_offset fo;
 
@@ -114,8 +112,8 @@ physics_in (struct anim *k)
 
   int dir = (k->f.dir == LEFT) ? -1 : +1;
 
-  survey (_bf, pos, &k->f, &nc, &pbf, &np);
-  survey (_bb, pos, &k->f, &nc, &pbb, &np);
+  survey (_bf, pos, &k->f, NULL, &pbf, NULL);
+  survey (_bb, pos, &k->f, NULL, &pbb, NULL);
 
   if (k->oaction == kid_jump && k->j == 10) {
     k->fo.dx = -4;
@@ -202,16 +200,16 @@ physics_in (struct anim *k)
     fo.dy += 8;
   }
 
-  survey (_mbo, pos, &k->f, &nc, &np, &npmbo);
+  survey (_mbo, pos, &k->f, NULL, NULL, &npmbo);
   next_frame (&k->f, &nf, &fo);
-  survey (_mbo, pos, &nf, &nc, &np, &npmbo_nf);
+  survey (_mbo, pos, &nf, NULL, NULL, &npmbo_nf);
 
   if (k->i > 1 &&
       ! is_strictly_traversable (&npmbo)
       && npmbo.floor != npmbo_nf.floor) {
     k->inertia = k->cinertia = 0;
 
-    survey (_bf, pos, &k->f, &nc, &pbf, &np);
+    survey (_bf, pos, &k->f, NULL, &pbf, NULL);
     /* pos2view (&pbf, &pbf); */
     k->fo.b = kid_couch_frameset[0].frame;
     k->fo.dx = k->fo.dy = 0;
@@ -244,7 +242,7 @@ physics_in (struct anim *k)
       k->hurt = false;
     } else k->hurt = false;
 
-    survey (_mt, pos, &k->f, &nc, &pmt, &np);
+    survey (_mt, pos, &k->f, NULL, &pmt, NULL);
     if (k->current_lives <= 0) {
       stop_sample (scream_sample, NULL, k->id);
       k->p = pmt;
@@ -294,13 +292,12 @@ is_kid_fall (struct frame *f)
 void
 place_kid_in_initial_fall (struct anim *k)
 {
-  struct coord nc;
-  struct pos np, pbf, pmbo, pbb;
+  struct pos pbf, pmbo, pbb;
   struct pos fall_pos;
 
-  survey (_bf, pos, &k->f, &nc, &pbf, &np);
-  survey (_mbo, pos, &k->f, &nc, &pmbo, &np);
-  survey (_bb, pos, &k->f, &nc, &pbb, &np);
+  survey (_bf, pos, &k->f, NULL, &pbf, NULL);
+  survey (_mbo, pos, &k->f, NULL, &pmbo, NULL);
+  survey (_bb, pos, &k->f, NULL, &pbb, NULL);
 
   invalid_pos (&fall_pos);
 

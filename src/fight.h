@@ -44,7 +44,6 @@ bool is_at_hit_frame (struct anim *k);
 void put_at_defense_frame (struct anim *k);
 void put_at_attack_frame (struct anim *k);
 bool opaque_cs (enum confg t);
-struct pos *get_pos (struct anim *k, struct pos *p, struct coord *m);
 bool is_seeing (struct anim *k0, struct anim *k1, enum dir dir);
 bool is_hearing (struct anim *k0, struct anim *k1);
 bool is_on_back (struct anim *k0, struct anim *k1);

@@ -104,15 +104,14 @@ guard_normal (struct anim *g)
 static bool
 flow (struct anim *g)
 {
-  struct coord nc;
-  struct pos np, pmt;
+  struct pos pmt;
 
   bool vigilant = g->key.enter;
 
   if (g->oaction == guard_normal
       && g->current_lives <= 0
       && anim_cycle > 0) {
-    survey (_mt, pos, &g->f, &nc, &pmt, &np);
+    survey (_mt, pos, &g->f, NULL, &pmt, NULL);
     g->p = pmt;
     guard_die (g);
     return false;
@@ -139,14 +138,14 @@ flow (struct anim *g)
 static bool
 physics_in (struct anim *g)
 {
-  struct coord nc; struct pos np, pmbo, pbb;
+  struct pos pmbo, pbb;
 
   /* inertia */
   g->inertia = g->cinertia = 0;
 
   /* fall */
-  survey (_mbo, pos, &g->f, &nc, &pmbo, &np);
-  survey (_bb, pos, &g->f, &nc, &pbb, &np);
+  survey (_mbo, pos, &g->f, NULL, &pmbo, NULL);
+  survey (_bb, pos, &g->f, NULL, &pbb, NULL);
   if (is_strictly_traversable (&pmbo)
       && is_strictly_traversable (&pbb)) {
     guard_fall (g);

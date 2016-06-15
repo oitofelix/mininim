@@ -98,7 +98,7 @@ kid_run_jump (struct anim *k)
 static bool
 flow (struct anim *k)
 {
-  struct coord nc; struct pos np, pm, ptf;
+  struct pos pm, ptf;
 
   if (k->oaction != kid_run_jump)
     k->i = -1, k->hang = k->crossing_mirror = false;
@@ -114,8 +114,8 @@ flow (struct anim *k)
   int dir = (k->f.dir == LEFT) ? -1 : +1;
 
   /* hang front */
-  survey (_m, pos, &k->f, &nc, &pm, &np);
-  survey (_tf, pos, &k->f, &nc, &ptf, &np);
+  survey (_m, pos, &k->f, NULL, &pm, NULL);
+  survey (_tf, pos, &k->f, NULL, &ptf, NULL);
   if (hang_front && k->i >= 5  && k->i <= 9
       && (is_hangable_pos (&pm, k->f.dir)
           || (is_hangable_pos (&ptf, k->f.dir)
@@ -131,7 +131,7 @@ flow (struct anim *k)
   }
 
   /* hang back */
-  survey (_tf, pos, &k->f, &nc, &ptf, &np);
+  survey (_tf, pos, &k->f, NULL, &ptf, NULL);
   if (k->i >= 5 && k->i <= 9
       && hang_back && is_hangable_pos (&ptf, back_dir)) {
     k->hang_pos = ptf;
@@ -155,7 +155,7 @@ flow (struct anim *k)
 static bool
 physics_in (struct anim *k)
 {
-  struct coord nc; struct pos np, pbf;
+  struct pos pbf;
 
   /* inertia */
   if (k->i < 6 || k->i > 10) k->inertia = 3;
@@ -181,7 +181,7 @@ physics_in (struct anim *k)
   }
 
   /* fall */
-  survey (_bf, pos, &k->f, &nc, &pbf, &np);
+  survey (_bf, pos, &k->f, NULL, &pbf, NULL);
   if ((is_strictly_traversable (&pbf) && k->i < 4)
       || (is_strictly_traversable (&pbf) && k->i > 9)) {
     kid_fall (k);
@@ -194,7 +194,7 @@ physics_in (struct anim *k)
 static void
 physics_out (struct anim *k)
 {
-  struct coord nc; struct pos pmbo, np;
+  struct pos pmbo;
 
   /* depressible floors */
   if (k->i == 0) update_depressible_floor (k, -4, -10);
@@ -204,7 +204,7 @@ physics_out (struct anim *k)
   else keep_depressible_floor (k);
 
   /* loose floor shaking */
-  survey (_mbo, pos, &k->f, &nc, &pmbo, &np);
+  survey (_mbo, pos, &k->f, NULL, &pmbo, NULL);
   if (k->i == 10) shake_loose_floor_row (&pmbo);
 
   /* sound */

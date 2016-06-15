@@ -399,7 +399,7 @@ void
 compute_spikes_floors (void)
 {
   size_t i, j;
-  struct coord nc; struct pos pm, np;
+  struct pos pm;
 
   for (i = 0; i < spikes_floor_nmemb; i++) {
     struct spikes_floor *s = &spikes_floor[i];
@@ -458,7 +458,7 @@ compute_spikes_floors (void)
       if (is_kid_dead (&a->f)
           || a->immortal
           || a->spikes_immune) continue;
-      survey (_m, pos, &a->f, &nc, &pm, &np);
+      survey (_m, pos, &a->f, NULL, &pm, NULL);
       if (peq (&pm, &s->p)
           && (((s->state >= 2 && s->state <= 4)
                && (is_kid_start_run (&a->f)
@@ -493,15 +493,14 @@ bool
 should_spikes_raise (struct pos *p)
 {
   int i;
-  struct coord nc;
-  struct pos np, pmf, pm, pmba;
+  struct pos pmf, pm, pmba;
 
   for (i = 0; i < anima_nmemb; i++) {
     struct anim *a = &anima[i];
     if (is_anim_dead (&a->f)) continue;
-    survey (_mf, pos, &a->f, &nc, &pmf, &np);
-    survey (_m, pos, &a->f, &nc, &pm, &np);
-    survey (_mba, pos, &a->f, &nc, &pmba, &np);
+    survey (_mf, pos, &a->f, NULL, &pmf, NULL);
+    survey (_m, pos, &a->f, NULL, &pm, NULL);
+    survey (_mba, pos, &a->f, NULL, &pmba, NULL);
 
     if (should_spikes_raise_for_pos (p, &pmf)
         || should_spikes_raise_for_pos (p, &pm)

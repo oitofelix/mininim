@@ -157,9 +157,9 @@ flow (struct anim *k)
 static bool
 physics_in (struct anim *k)
 {
-  struct coord nc, tf; struct pos np, ptf, ptr, pmt, pm, pmf, pmba;
+  struct coord tf; struct pos ptf, ptfb, ptr, pmt, pm, pmf, pmba;
 
-  survey (_m, pos, &k->f, &nc, &pm, &np);
+  survey (_m, pos, &k->f, NULL, &pm, NULL);
 
   /* collision */
   if (is_colliding (&k->f, &k->fo, +0, false, &k->ci)
@@ -170,8 +170,8 @@ physics_in (struct anim *k)
     uncollide (&k->f, &k->fo, &k->fo, +0, false, &k->ci);
 
   /* fall */
-  survey (_mf, pos, &k->f, &nc, &pmf, &np);
-  survey (_mba, pos, &k->f, &nc, &pmba, &np);
+  survey (_mf, pos, &k->f, NULL, &pmf, NULL);
+  survey (_mba, pos, &k->f, NULL, &pmba, NULL);
   if (is_strictly_traversable (&pm)
       && is_strictly_traversable (&pmf)
       && is_strictly_traversable (&pmba)) {
@@ -180,8 +180,8 @@ physics_in (struct anim *k)
   }
 
   /* ceiling hit */
-  survey (_tr, pos, &k->f, &nc, &ptr, &np);
-  survey (_mt, pos, &k->f, &nc, &pmt, &np);
+  survey (_tr, pos, &k->f, NULL, &ptr, NULL);
+  survey (_mt, pos, &k->f, NULL, &pmt, NULL);
   struct pos ptra; prel (&ptr, &ptra, -1, 0);
   struct pos pmta; prel (&pmt, &pmta, -1, 0);
   if (k->i == 12 && k->j == 1
@@ -191,9 +191,9 @@ physics_in (struct anim *k)
 
   /* hang */
   int dir = (k->f.dir == LEFT) ? +1 : -1;
-  survey (_tf, pos, &k->f, &tf, &ptf, &np);
+  survey (_tf, pos, &k->f, &tf, &ptf, NULL);
   if (k->i == 0
-      && is_hangable_pos (prel (&ptf, &np, 0, dir), k->f.dir)
+      && is_hangable_pos (prel (&ptf, &ptfb, 0, dir), k->f.dir)
       && ! (con (&ptf)->fg == DOOR
             && k->f.dir == LEFT
             && tf.y <= door_grid_tip_y (&ptf) - 10)) {
@@ -217,7 +217,7 @@ physics_in (struct anim *k)
 static void
 physics_out (struct anim *k)
 {
-  struct coord nc; struct pos np, ptf, ptb, pmbo;
+  struct pos ptf, ptb, pmbo;
   enum confg ctf, ctb;
 
  /* depressible floors */
@@ -237,15 +237,15 @@ physics_out (struct anim *k)
 
   /* ceiling loose floor shaking and release */
   if (k->i == 12 && k->hit_ceiling) {
-    ctb = survey (_tb, pos, &k->f, &nc, &ptb, &np)->fg;
-    ctf = survey (_tf, pos, &k->f, &nc, &ptf, &np)->fg;
+    ctb = survey (_tb, pos, &k->f, NULL, &ptb, NULL)->fg;
+    ctf = survey (_tf, pos, &k->f, NULL, &ptf, NULL)->fg;
     shake_loose_floor_row (&ptb);
     if (ctb == LOOSE_FLOOR) release_loose_floor (&ptb);
     if (ctf == LOOSE_FLOOR) release_loose_floor (&ptf);
   }
 
   /* loose floor shaking */
-  survey (_mbo, pos, &k->f, &nc, &pmbo, &np);
+  survey (_mbo, pos, &k->f, NULL, &pmbo, NULL);
   if (k->i == 16) shake_loose_floor_row (&pmbo);
 }
 

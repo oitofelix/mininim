@@ -224,15 +224,15 @@ flow (struct anim *g)
 static bool
 physics_in (struct anim *g)
 {
-  struct coord nc; struct pos np, pbf, pmbo, pbb;
+  struct pos pbf, pmbo, pbb;
 
   /* collision */
   uncollide (&g->f, &g->fo, &g->fo, +0, false, &g->ci);
 
   /* fall */
-  survey (_bf, pos, &g->f, &nc, &pbf, &np);
-  survey (_mbo, pos, &g->f, &nc, &pmbo, &np);
-  survey (_bb, pos, &g->f, &nc, &pbb, &np);
+  survey (_bf, pos, &g->f, NULL, &pbf, NULL);
+  survey (_mbo, pos, &g->f, NULL, &pmbo, NULL);
+  survey (_bb, pos, &g->f, NULL, &pbb, NULL);
   if (is_strictly_traversable (&pbf)
       || is_strictly_traversable (&pmbo)
       /* || is_strictly_traversable (&pbb) */

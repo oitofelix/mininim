@@ -1000,31 +1000,33 @@ survey (coord_f cf, pos_f pf, struct frame *f,
   return con (npos (pf (cf (f, c), p), np));
 }
 
-/* #define survey(coord_f,pos_f,f,c,p,np) (con (npos ((pos_f) ((coord_f) ((f), (c)), (p)), (np)))) */
-
-
 struct con *
 surveyo (coord_f cf, int dx, int dy, pos_f pf, struct frame *f,
          struct coord *c, struct pos *p, struct pos *np)
 {
   int dir = (f->dir == LEFT) ? +1 : -1;
 
-  struct coord _c;
-  cf (f, &_c);
-  _c.x += dir * dx;
-  _c.y += dy;
-  *c = _c;
-  pf (c, p);
-  npos (p, np);
-  return con (np);
+  struct coord c0; struct pos p0, np0;
+
+  if (! c) c = &c0;
+  if (! p) p = &p0;
+  if (! np) np = &np0;
+
+  if (! pf) pf = pos;
+
+  cf (f, c);
+  c->x += dir * dx;
+  c->y += dy;
+
+  return con (npos (pf (c, p), np));
 }
 
 struct coord *
 place_on_the_ground (struct frame *f, struct coord *c)
 {
-  struct coord mbo; struct pos np, pmbo;
+  struct coord mbo; struct pos pmbo;
   *c = f->c;
-  survey (_mbo, pos, f, &mbo, &pmbo, &np);
+  survey (_mbo, pos, f, &mbo, &pmbo, NULL);
   f->c.y += (PLACE_HEIGHT * pmbo.floor + 55) - mbo.y;
   return c;
 }

@@ -85,10 +85,10 @@ flow (struct anim *k)
 static bool
 physics_in (struct anim *k)
 {
-  struct coord nc; struct pos np, pmba;
+  struct pos pmba;
 
   /* fall */
-  survey (_mba, pos, &k->f, &nc, &pmba, &np);
+  survey (_mba, pos, &k->f, NULL, &pmba, NULL);
   if (is_strictly_traversable (&pmba)) {
     kid_fall (k);
     return false;
@@ -100,13 +100,13 @@ physics_in (struct anim *k)
 static void
 physics_out (struct anim *k)
 {
-  struct coord nc; struct pos pmbo, np;
+  struct pos pmbo;
 
   /* depressible floors */
   keep_depressible_floor (k);
 
   /* loose floor shaking */
-  survey (_mbo, pos, &k->f, &nc, &pmbo, &np);
+  survey (_mbo, pos, &k->f, NULL, &pmbo, NULL);
   if (k->i == 8) shake_loose_floor_row (&pmbo);
 
   /* sound */

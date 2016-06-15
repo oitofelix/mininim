@@ -722,7 +722,7 @@ update_cache_pos (struct pos *p, enum changed_pos_reason reason,
           new_rect (&r, p->room,
                     PLACE_WIDTH * p->place,
                     PLACE_HEIGHT * p->floor + 49,
-                    57, 17);
+                    58, 17);
           clear_rect_to_color (mr.cell[x][y].cache, &r, TRANSPARENT_COLOR);
 
           if (con (&pbl)->fg == LEVEL_DOOR || con (&pbl)->bg == BALCONY)
@@ -742,7 +742,7 @@ update_cache_pos (struct pos *p, enum changed_pos_reason reason,
           new_rect (&r, p->room,
                     PLACE_WIDTH * p->place,
                     PLACE_HEIGHT * p->floor + 49,
-                    57, 17);
+                    58, 17);
           clear_rect_to_color (mr.cell[x][y].cache, &r, TRANSPARENT_COLOR);
 
           if (con (&pbl)->fg == LEVEL_DOOR || con (&pbl)->bg == BALCONY)

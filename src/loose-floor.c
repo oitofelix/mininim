@@ -491,14 +491,14 @@ compute_loose_floor_fall (struct loose_floor *l)
   /* hit character */
   int i;
   for (i = 0; i < anima_nmemb; i++) {
-    struct coord kmt, ambo_f, ambo_nf; struct pos np, kpmt;
+    struct coord kmt, ambo_f, ambo_nf; struct pos kpmt;
     struct anim *a = &anima[i];
     if (is_anim_dead (&a->f)
         || is_anim_fall (&a->f)
         || a->immortal
         || a->loose_floor_immune)
       continue;
-    survey (_mt, pos, &a->f, &kmt, &kpmt, &np);
+    survey (_mt, pos, &a->f, &kmt, &kpmt, NULL);
     coord2room (&mbo_f, kpmt.room, &ambo_f);
     coord2room (&mbo_nf, kpmt.room, &ambo_nf);
     if (peq (&nfpmbo_f, &kpmt)

@@ -93,13 +93,13 @@ flow (struct anim *k)
 static bool
 physics_in (struct anim *k)
 {
-  struct coord tf; struct pos np, ptf;
+  struct pos ptf;
 
   /* collision */
   uncollide (&k->f, &k->fo, &k->fo, +14, false, &k->ci);
 
   /* fall */
-  survey (_tf, pos, &k->f, &tf, &ptf, &np);
+  survey (_tf, pos, &k->f, NULL, &ptf, NULL);
   if (is_strictly_traversable (&ptf)) {
     kid_fall (k);
     return false;

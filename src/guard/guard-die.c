@@ -233,8 +233,8 @@ unload_guard_die (void)
 void
 guard_resurrect (struct anim *g)
 {
-  struct coord nc; struct pos np, pm;
-  survey (_m, pos, &g->f, &nc, &pm, &np);
+  struct pos pm;
+  survey (_m, pos, &g->f, NULL, &pm, NULL);
   g->current_lives = g->total_lives;
   g->death_reason = NO_DEATH;
   g->action = guard_normal;
@@ -421,9 +421,8 @@ guard_die_suddenly (struct anim *g)
   g->hit_by_loose_floor = false;
 
   /* fall */
-  struct coord nc;
-  struct pos np, pm;
-  survey (_m, pos, &g->f, &nc, &pm, &np);
+  struct pos pm;
+  survey (_m, pos, &g->f, NULL, &pm, NULL);
   if (is_strictly_traversable (&pm)) {
     guard_fall (g);
     return;
@@ -490,9 +489,8 @@ static bool
 physics_in (struct anim *g)
 {
   /* fall */
-  struct coord nc;
-  struct pos np, pm;
-  survey (_m, pos, &g->f, &nc, &pm, &np);
+  struct pos pm;
+  survey (_m, pos, &g->f, NULL, &pm, NULL);
   if (is_strictly_traversable (&pm)) {
     guard_fall (g);
     return false;

@@ -53,9 +53,8 @@ kid_normal (struct anim *k)
 static bool
 flow (struct anim *k)
 {
-  struct coord nc;
-  struct pos np, pbf, pmt;
-  survey (_bf, pos, &k->f, &nc, &pbf, &np);
+  struct pos pbf, pmt;
+  survey (_bf, pos, &k->f, NULL, &pbf, NULL);
 
   k->collision = false;
 
@@ -73,7 +72,7 @@ flow (struct anim *k)
   bool raise_sword = is_sword (&pbf) && k->key.shift;
   bool take_sword = k->key.enter && k->has_sword;
 
-  survey (_mt, pos, &k->f, &nc, &pmt, &np);
+  survey (_mt, pos, &k->f, NULL, &pmt, NULL);
   bool stairs = k->key.up && ! k->key.left && ! k->key.right
     && con (&pmt)->fg == LEVEL_DOOR
     && level_door_at_pos (&pmt)->i == 0
@@ -81,7 +80,7 @@ flow (struct anim *k)
 
   if (k->oaction == kid_normal
       && k->current_lives <= 0) {
-    survey (_mt, pos, &k->f, &nc, &pmt, &np);
+    survey (_mt, pos, &k->f, NULL, &pmt, NULL);
     k->p = pmt;
     kid_die (k);
     return false;
@@ -165,7 +164,7 @@ flow (struct anim *k)
 static bool
 physics_in (struct anim *k)
 {
-  struct coord nc; struct pos np, pmbo, pbb;
+  struct pos pmbo, pbb;
 
   /* inertia */
   k->inertia = k->cinertia = 0;
@@ -174,8 +173,8 @@ physics_in (struct anim *k)
   if (kid_door_split_collision (k)) return false;
 
   /* fall */
-  survey (_mbo, pos, &k->f, &nc, &pmbo, &np);
-  survey (_bb, pos, &k->f, &nc, &pbb, &np);
+  survey (_mbo, pos, &k->f, NULL, &pmbo, NULL);
+  survey (_bb, pos, &k->f, NULL, &pbb, NULL);
   if (is_strictly_traversable (&pmbo)
       && is_strictly_traversable (&pbb)) {
     kid_fall (k);

@@ -144,18 +144,18 @@ flow (struct anim *k)
 static bool
 physics_in (struct anim *k)
 {
-  struct coord nc; struct pos np, ptf;
+  struct pos ptf;
   enum confg ctf;
 
   /* fall */
-  survey (_tf, pos, &k->f, &nc, &ptf, &np);
+  survey (_tf, pos, &k->f, NULL, &ptf, NULL);
   if (is_strictly_traversable (&ptf)) {
     kid_fall (k);
     return false;
   }
 
   /* door collision */
-  ctf = survey (_tf, pos, &k->f, &nc, &ptf, &np)->fg;
+  ctf = survey (_tf, pos, &k->f, NULL, &ptf, NULL)->fg;
   if (k->i == 3 && ctf == DOOR && k->f.dir == LEFT
       && door_at_pos (&ptf)->i > DOOR_CLIMB_LIMIT) {
     if (k->wait == 0) {

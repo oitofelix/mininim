@@ -99,6 +99,4 @@ struct coord *place_at_distance (struct frame *f0, coord_f cf0,
 struct coord *
 place_at_pos (struct frame *f, coord_f cf, struct pos *p, struct coord *c);
 
-/* #define survey(coord_f,pos_f,f,c,p,np) (con (npos ((pos_f) ((coord_f) ((f), (c)), (p)), (np)))) */
-
 #endif	/* MININIM_POSITION_H */
