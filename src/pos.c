@@ -984,6 +984,26 @@ _bb (struct frame *f, struct coord *c)
 }
 
 struct con *
+survey (coord_f cf, pos_f pf, struct frame *f,
+        struct coord *c, struct pos *p, struct pos *np)
+{
+  assert (cf && f && (c || (pf && p) || (pf && np)));
+
+  struct coord c0; struct pos p0, np0;
+
+  if (! c) c = &c0;
+  if (! p) p = &p0;
+  if (! np) np = &np0;
+
+  if (! pf) pf = pos;
+
+  return con (npos (pf (cf (f, c), p), np));
+}
+
+/* #define survey(coord_f,pos_f,f,c,p,np) (con (npos ((pos_f) ((coord_f) ((f), (c)), (p)), (np)))) */
+
+
+struct con *
 surveyo (coord_f cf, int dx, int dy, pos_f pf, struct frame *f,
          struct coord *c, struct pos *p, struct pos *np)
 {

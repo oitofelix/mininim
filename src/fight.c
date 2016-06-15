@@ -90,9 +90,9 @@ leave_fight_logic (struct anim *k)
 
   /* if the enemy is not reachable, forget about him */
   enum dir odir = (k->f.dir == LEFT) ? RIGHT : LEFT;
-  struct coord nc; struct pos p, pe;
-  get_pos (k, &p, &nc);
-  get_pos (ke, &pe, &nc);
+  struct pos p, pe;
+  survey (_m, pos, &k->f, NULL, &p, NULL);
+  survey (_m, pos, &ke->f, NULL, &pe, NULL);
   pos2room (&pe, p.room, &pe);
   if (! is_seeing (k, ke, k->f.dir)
       && ! is_near (k, ke)
@@ -877,9 +877,10 @@ is_safe_at_left (struct pos *p)
 bool
 is_safe_to_follow (struct anim *k0, struct anim *k1, enum dir dir)
 {
-  struct coord tf, nc; struct pos p0, p, p1, pke, pk;
-  get_pos (k0, &p0, &nc);
-  get_pos (k1, &p1, &nc);
+  struct coord tf; struct pos p0, p, p1, pke, pk;
+  survey (_m, pos, &k0->f, NULL, &p0, NULL);
+  survey ((k0->f.dir == LEFT) ? _mr : _ml,
+          pos, &k1->f, NULL, &p1, NULL);
   _tf (&k0->f, &tf);
 
   pos2room (&p1, p0.room, &p1);
