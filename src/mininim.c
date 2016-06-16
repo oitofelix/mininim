@@ -116,8 +116,8 @@ static struct argp_option options[] = {
 
   /* Time */
   {NULL, 0, NULL, 0, "Time:", 0},
-  {"time-limit", TIME_LIMIT_OPTION, "N", 0, "Set the time limit to complete the game to N seconds.  The default is 3600 (1 hour).  Valid integers range from 1 to INT_MAX.  This can be changed in-game by the + and - key bindings.", 0},
-  {"start-time", START_TIME_OPTION, "N", 0, "Set the play time counter to N seconds.  The default is 0.  Valid integers range from 0 to INT_MAX.", 0},
+  {"time-limit", TIME_LIMIT_OPTION, "N", 0, "Set the time limit to complete the game to N cycles.  The default is 43200 (1 hour at 12 Hz).  Valid integers range from 1 to INT_MAX.  This can be changed in-game by the + and - key bindings.", 0},
+  {"start-time", START_TIME_OPTION, "N", 0, "Set the play time counter to N cycles.  The default is 0.  Valid integers range from 0 to INT_MAX.", 0},
   {"time-frequency", TIME_FREQUENCY_OPTION, "N", 0, "Set the time frequency to N Hz in case N > 0, or to 1 / (-N + 2) Hz in case N <= 0.  The default is 12Hz.  Valid integers range from INT_MIN to INT_MAX.  This can be changed in-game by the ( and ) key bindings.", 0},
 
   /* Skills */
@@ -788,12 +788,12 @@ parser (int key, char *arg, struct argp_state *state)
   case TIME_LIMIT_OPTION:
     e = optval_to_int (&i, key, arg, state, &time_limit_range, 0);
     if (e) return e;
-    time_limit = SEC2CYC (i);
+    time_limit = i;
     break;
   case START_TIME_OPTION:
     e = optval_to_int (&i, key, arg, state, &start_time_range, 0);
     if (e) return e;
-    start_time = SEC2CYC (i);
+    start_time = i;
     break;
   case TIME_FREQUENCY_OPTION:
     e = optval_to_int (&i, key, arg, state, &time_frequency_range, 0);

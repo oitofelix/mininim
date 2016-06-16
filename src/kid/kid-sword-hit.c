@@ -121,7 +121,8 @@ physics_in (struct anim *k)
   survey (_bb, pos, &k->f, NULL, &pbb, NULL);
   if (is_strictly_traversable (&pbf)
       || is_strictly_traversable (&pmbo)
-      || is_strictly_traversable (&pbb)) {
+      /* || is_strictly_traversable (&pbb) */
+      ) {
     k->xf.b = NULL;
     kid_fall (k);
     return false;

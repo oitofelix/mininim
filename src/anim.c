@@ -451,7 +451,7 @@ create_anim (struct anim *a0, enum anim_type t, struct pos *p, enum dir dir)
     a.f.dir = dir;
     new_coord (&a.f.c, p->l, p->room, -1, -1);
     a.controllable = false;
-    a.enemy_pos = (struct pos) {NULL, -1,-1,-1};
+    invalid_pos (&a.enemy_pos);
   }
 
   a.id = i;

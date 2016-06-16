@@ -185,17 +185,19 @@ fight_ai (struct anim *k)
   /* get positions */
   struct pos p, pe;
   survey (_m, pos, &k->f, NULL, &p, NULL);
-  survey ((k->f.dir == LEFT) ? _mr : _ml,
+  survey ((k->f.dir != ke->f.dir) ? _m : _mba,
           pos, &ke->f, NULL, &pe, NULL);
   pos2room (&pe, p.room, &pe);
 
   /* remember the place the enemy was last seen */
   if (pe.room == p.room && pe.floor == p.floor)
     k->enemy_pos = pe;
-  else if (pe.floor > p.floor && ! is_strictly_traversable (&k->enemy_pos))
+  else if (pe.floor > p.floor && is_valid_pos (&k->enemy_pos)
+           && ! is_strictly_traversable (&k->enemy_pos))
     k->enemy_pos.place = pe.place;
 
-  if (is_strictly_traversable (&k->enemy_pos)) {
+  if (is_valid_pos (&k->enemy_pos)
+      && is_strictly_traversable (&k->enemy_pos)) {
     struct pos pp;
     int d = (p.place < k->enemy_pos.place) ? -1 : +1;
     while (is_strictly_traversable (prel (&k->enemy_pos, &pp, +0, d)))
@@ -686,14 +688,32 @@ is_opaque_at_right (struct pos *p)
 bool
 is_seeing (struct anim *k0, struct anim *k1, enum dir dir)
 {
-  struct coord m0, m1; struct pos p, p0, p1, pk, pke;
+  struct coord m0, m1, mt1, mb1; struct pos p, p0, p1, pk, pke;
   survey (_m, pos, &k0->f, &m0, &p0, NULL);
-  survey ((k0->f.dir == LEFT) ? _mr : _ml,
-          pos, &k1->f, &m1, &p1, NULL);
 
-  pos2room (&p1, p0.room, &p1);
-  coord2room (&m1, p0.room, &m1);
+  coord_f cf;
+  if (is_kid_climb (&k1->f) || is_anim_fall (&k1->f)) {
+    coord2room (_mt (&k1->f, &mt1), m0.room, &mt1);
+    coord2room (_m (&k1->f, &m1), m0.room, &m1);
+    coord2room (_mbo (&k1->f, &mb1), m0.room, &mb1);
+
+    double dt, dm, db;
+    dt = (mt1.room == m0.room) ? dist_coord (&m0, &mt1) : INFINITY;
+    dm = (m1.room == m0.room) ? dist_coord (&m0, &m1) : INFINITY;
+    db = (mb1.room == m0.room) ? dist_coord (&m0, &mb1) : INFINITY;
+
+    if (dt <= dm && dt <= db)
+      cf = (k0->f.dir == LEFT) ? _tr : _tl;
+    else if (db <= dt && db <= dm)
+      cf = (k0->f.dir == LEFT) ? _br : _bl;
+    else cf = (k0->f.dir == LEFT) ? _mr : _ml;
+  } else cf = (k0->f.dir == LEFT) ? _mr : _ml;
+
+  survey (cf, pos, &k1->f, &m1, NULL, NULL);
+
   coord2room (&m0, p0.room, &m0);
+  coord2room (&m1, p0.room, &m1);
+  pos (&m1, &p1);
 
   if (dir == LEFT) {
     if (is_opaque_at_left (&p0)) return false;
@@ -918,9 +938,11 @@ fight_turn (struct anim *k)
 
   if (! is_in_fight_mode (k)) enter_fight_mode (k);
   else {
+    struct pos p;
     struct anim a = *k;
     anim_walkb (&a);
-    if (! is_anim_fall (&a.f)) *k = a;
+    survey (_bb, pos, &a.f, NULL, &p, NULL);
+    if (! is_strictly_traversable (&p)) *k = a;
   }
 }
 

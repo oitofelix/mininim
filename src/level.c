@@ -85,6 +85,8 @@ play_level (struct level *lv)
   if (retry_level != global_level.number)
     start_level_time = play_time;
 
+  play_time = start_level_time;
+
   if (! force_em) em = global_level.em;
   if (! force_hue) hue = global_level.hue;
 
@@ -390,11 +392,14 @@ compute_level (void)
       && camera_follow_kid == current_kid->id
       && (ke = get_anim_by_id (current_kid->enemy_id))
       && ! is_room_visible (ke->f.c.room)) {
-    if (ke->f.c.room == roomd (&global_level, current_kid->f.c.room, LEFT))
+    if (ke->f.c.room == roomd (&global_level, current_kid->f.c.room, LEFT)) {
       mr_view_trans (LEFT);
-    else if (ke->f.c.room == roomd (&global_level, current_kid->f.c.room, RIGHT))
+      mr_focus_room (current_kid->f.c.room);
+    }
+    else if (ke->f.c.room == roomd (&global_level, current_kid->f.c.room, RIGHT)) {
       mr_view_trans (RIGHT);
-    mr_focus_room (current_kid->f.c.room);
+      mr_focus_room (current_kid->f.c.room);
+    }
   }
 
   if (global_level.special_events) global_level.special_events ();
@@ -616,8 +621,7 @@ process_keys (void)
 
   /* R: resurrect kid */
   if (! active_menu
-      && was_key_pressed (ALLEGRO_KEY_R, 0, 0, true)
-      && is_kid_dead (&current_kid->f))
+      && was_key_pressed (ALLEGRO_KEY_R, 0, 0, true))
     kid_resurrect (current_kid);
 
   /* HOME: focus multi-room view on kid */

@@ -73,7 +73,7 @@ unload_kid_die (void)
 void
 kid_resurrect (struct anim *k)
 {
-  if (! is_kid_dead (&k->f)) return;
+  if (k->current_lives > 0) return;
   struct pos pm;
   survey (_m, pos, &k->f, NULL, &pm, NULL);
   k->current_lives = k->total_lives;

@@ -230,9 +230,10 @@ physics_in (struct anim *g)
   survey (_bf, pos, &g->f, NULL, &pbf, NULL);
   survey (_mbo, pos, &g->f, NULL, &pmbo, NULL);
   survey (_bb, pos, &g->f, NULL, &pbb, NULL);
-  if (is_strictly_traversable (&pbf)
-      || is_strictly_traversable (&pmbo)
-      || is_strictly_traversable (&pbb)) {
+  if (/* is_strictly_traversable (&pbf) */
+      is_strictly_traversable (&pmbo)
+      /* || is_strictly_traversable (&pbb) */
+      ) {
     g->xf.b = NULL;
     guard_fall (g);
     return false;

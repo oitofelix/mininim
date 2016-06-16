@@ -692,7 +692,7 @@ draw_room_anim_fg_sub (ALLEGRO_BITMAP *bitmap,
       draw_confg_left (bitmap, &ptr, em, vm, true);
     }
 
-    if (! peq (&pbr2, &ptr2)) {
+    if (! peq (&pbr2, &ptr2) && is_floor (&ptr2)) {
       draw_confg_base (bitmap, &ptr2, em, vm);
       draw_confg_left (bitmap, &ptr2, em, vm, true);
       draw_confg_right (bitmap, &ptr2, em, vm, true);
