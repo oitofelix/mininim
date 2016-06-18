@@ -228,6 +228,7 @@ unpress_closer_floors (void)
     closer_floor[i].prev_pressed =
       closer_floor[i].pressed;
     closer_floor[i].pressed = false;
+    closer_floor[i].unresponsive = false;
   }
 }
 

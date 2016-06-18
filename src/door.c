@@ -613,7 +613,9 @@ should_draw_door_grid (struct pos *p, struct frame *f)
 {
   struct pos pl, pa, pmt, ptb;
 
-  struct pos *hang_pos = &((struct anim *)f->id)->hang_pos;
+  struct anim *a = (struct anim *) f->id;
+
+  struct pos *hang_pos = &a->hang_pos;
 
   survey (_mt, pos, f, NULL, &pmt, NULL);
   survey (_tb, pos, f, NULL, &ptb, NULL);

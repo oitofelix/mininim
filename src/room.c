@@ -507,6 +507,7 @@ draw_room_frame_fg (ALLEGRO_BITMAP *bitmap, enum em em, enum vm vm,
                     struct frame *f)
 {
   struct pos pbl, pbr, pm, ptl, ptr;
+  struct pos pbl2, pbr2, pm2, ptl2, ptr2;
 
   survey (_bl, posf, f, NULL, &pbl, NULL);
   survey (_br, posf, f, NULL, &pbr, NULL);
@@ -514,10 +515,21 @@ draw_room_frame_fg (ALLEGRO_BITMAP *bitmap, enum em em, enum vm vm,
   survey (_tl, posf, f, NULL, &ptl, NULL);
   survey (_tr, posf, f, NULL, &ptr, NULL);
 
+  survey (_bl, pos, f, NULL, &pbl2, NULL);
+  survey (_br, pos, f, NULL, &pbr2, NULL);
+  survey (_m, pos, f, NULL, &pm2, NULL);
+  survey (_tl, pos, f, NULL, &ptl2, NULL);
+  survey (_tr, pos, f, NULL, &ptr2, NULL);
+
   bool pbr_p = ! peq (&pbr, &pbl);
   bool pm_p = ! peq (&pm, &pbr) && ! peq (&pm, &pbl);
   bool ptl_p = ! peq (&ptl, &pm) && ! peq (&ptl, &pbr) && ! peq (&ptl, &pbl);
   bool ptr_p = ! peq (&ptr, &ptl) && ! peq (&ptr, &pm) && ! peq (&ptr, &pbr) && ! peq (&ptr, &pbl);
+
+  bool pbr2_p = ! peq (&pbr2, &pbl2);
+  bool pm2_p = ! peq (&pm2, &pbr2) && ! peq (&pm2, &pbl2);
+  bool ptl2_p = ! peq (&ptl2, &pm2) && ! peq (&ptl2, &pbr2) && ! peq (&ptl2, &pbl2);
+  bool ptr2_p = ! peq (&ptr2, &ptl2) && ! peq (&ptr2, &pm2) && ! peq (&ptr2, &pbr2) && ! peq (&ptr2, &pbl2);
 
   struct coord c; frame2room (f, room_view, &c);
 
@@ -591,11 +603,11 @@ draw_room_frame_fg (ALLEGRO_BITMAP *bitmap, enum em em, enum vm vm,
   if (con (&ptr)->fg == WALL && ptr_p) draw_wall_left_cache (bitmap, &ptr);
 
   /* DOOR */
-  if (con (&pbl)->fg == DOOR) draw_door_fg (bitmap, &pbl, f, em, vm);
-  if (con (&pbr)->fg == DOOR && pbr_p) draw_door_fg (bitmap, &pbr, f, em, vm);
-  if (con (&pm)->fg == DOOR && pm_p) draw_door_fg (bitmap, &pm, f, em, vm);
-  if (con (&ptl)->fg == DOOR && ptl_p) draw_door_fg (bitmap, &ptl, f, em, vm);
-  if (con (&ptr)->fg == DOOR && ptr_p) draw_door_fg (bitmap, &ptr, f, em, vm);
+  if (con (&pbl2)->fg == DOOR) draw_door_fg (bitmap, &pbl2, f, em, vm);
+  if (con (&pbr2)->fg == DOOR && pbr2_p) draw_door_fg (bitmap, &pbr2, f, em, vm);
+  if (con (&pm2)->fg == DOOR && pm2_p) draw_door_fg (bitmap, &pm2, f, em, vm);
+  if (con (&ptl2)->fg == DOOR && ptl2_p) draw_door_fg (bitmap, &ptl2, f, em, vm);
+  if (con (&ptr2)->fg == DOOR && ptr2_p) draw_door_fg (bitmap, &ptr2, f, em, vm);
 
   /* CHOPPER */
   if (con (&pbl)->fg == CHOPPER) draw_chopper_fg (bitmap, &pbl, em, vm);
@@ -640,18 +652,18 @@ draw_room_frame_fg (ALLEGRO_BITMAP *bitmap, enum em em, enum vm vm,
   if (con (&ptr)->fg == ARCH_TOP_RIGHT && ptr_p) draw_arch_top_right (bitmap, &ptr, em, vm);
 
   /* CARPET */
-  if (con (&pbl)->fg == CARPET) draw_carpet_fg (bitmap, &pbl, f, em, vm);
-  if (con (&pbr)->fg == CARPET && pbr_p) draw_carpet_fg (bitmap, &pbr, f, em, vm);
-  if (con (&pm)->fg == CARPET && pm_p) draw_carpet_fg (bitmap, &pm, f, em, vm);
-  if (con (&ptl)->fg == CARPET && ptl_p) draw_carpet_fg (bitmap, &ptl, f, em, vm);
-  if (con (&ptr)->fg == CARPET && ptr_p) draw_carpet_fg (bitmap, &ptr, f, em, vm);
+  if (con (&pbl2)->fg == CARPET) draw_carpet_fg (bitmap, &pbl2, f, em, vm);
+  if (con (&pbr2)->fg == CARPET && pbr2_p) draw_carpet_fg (bitmap, &pbr2, f, em, vm);
+  if (con (&pm2)->fg == CARPET && pm2_p) draw_carpet_fg (bitmap, &pm2, f, em, vm);
+  if (con (&ptl2)->fg == CARPET && ptl2_p) draw_carpet_fg (bitmap, &ptl2, f, em, vm);
+  if (con (&ptr2)->fg == CARPET && ptr2_p) draw_carpet_fg (bitmap, &ptr2, f, em, vm);
 
   /* TCARPET */
-  if (con (&pbl)->fg == TCARPET) draw_carpet_fg (bitmap, &pbl, f, em, vm);
-  if (con (&pbr)->fg == TCARPET && pbr_p) draw_carpet_fg (bitmap, &pbr, f, em, vm);
-  if (con (&pm)->fg == TCARPET && pm_p) draw_carpet_fg (bitmap, &pm, f, em, vm);
-  if (con (&ptl)->fg == TCARPET && ptl_p) draw_carpet_fg (bitmap, &ptl, f, em, vm);
-  if (con (&ptr)->fg == TCARPET && ptr_p) draw_carpet_fg (bitmap, &ptr, f, em, vm);
+  if (con (&pbl2)->fg == TCARPET) draw_carpet_fg (bitmap, &pbl2, f, em, vm);
+  if (con (&pbr2)->fg == TCARPET && pbr2_p) draw_carpet_fg (bitmap, &pbr2, f, em, vm);
+  if (con (&pm2)->fg == TCARPET && pm2_p) draw_carpet_fg (bitmap, &pm2, f, em, vm);
+  if (con (&ptl2)->fg == TCARPET && ptl2_p) draw_carpet_fg (bitmap, &ptl2, f, em, vm);
+  if (con (&ptr2)->fg == TCARPET && ptr2_p) draw_carpet_fg (bitmap, &ptr2, f, em, vm);
 
   al_reset_clipping_rectangle ();
 }

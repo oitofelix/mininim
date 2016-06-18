@@ -865,6 +865,9 @@ is_safe_at_left (struct pos *p)
 bool
 is_safe_to_follow (struct anim *k0, struct anim *k1, enum dir dir)
 {
+  /* not aware of enemy position */
+  if (! is_valid_pos (&k0->enemy_pos)) return false;
+
   struct coord tf; struct pos p0, p, p1, pke, pk;
   survey (_m, pos, &k0->f, NULL, &p0, NULL);
   survey ((k0->f.dir == LEFT) ? _mr : _ml,
@@ -1041,11 +1044,13 @@ fight_hit (struct anim *k, struct anim *ke)
     ke->alert_cycle = anim_cycle;
   } else anim_sword_hit (k);
 
-  if (! is_colliding (&k->f, &k->fo, +PLACE_WIDTH, ke->f.dir != k->f.dir, &k->ci)) {
+  if (! is_colliding (&k->f, &k->fo, +PLACE_WIDTH,
+                      ke->f.dir != k->f.dir, &k->ci)) {
     if (is_strictly_traversable (&pb)) {
       place_at_pos (&k->f, _m, &pb, &k->f.c);
       anim_fall (k);
-    } else place_at_distance (&ke->f, _tf, &k->f, _tf, 10, ke->f.dir, &k->f.c);
+    } else place_at_distance (&ke->f, _tf, &k->f, _tf, +0,
+                              ke->f.dir, &k->f.c);
   }
 
   k->splash = true;

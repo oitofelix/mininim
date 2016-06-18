@@ -658,12 +658,6 @@ legacy_level_end (struct pos *p)
     played_sample = true;
   }
 
-  /* the kid must keep the total lives and skills obtained for the
-     next level */
-  total_lives = k->total_lives;
-  current_lives = k->current_lives;
-  skill = k->skill;
-
   if (! is_playing_sample_instance (si)) quit_anim = NEXT_LEVEL;
 }
 

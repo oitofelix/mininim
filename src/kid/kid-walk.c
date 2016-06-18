@@ -114,6 +114,12 @@ flow (struct anim *k)
     k->dcl = dist_con (&k->f, _bf, pos, -4, false, CLOSER_FLOOR);
     k->dch = dist_chopper (&k->f, false);
 
+    struct pos pf;
+    prel (&k->p, &pf, +0, (k->f.dir == LEFT) ? -1 : +1);
+    if (k->dcl < PLACE_WIDTH + 1 && con (&pf)->fg == CLOSER_FLOOR
+        && closer_floor_at_pos (&pf)->broken)
+      k->dcl = PLACE_WIDTH + 1;
+
     k->dcd = 0;
 
     if (k->dc <= PLACE_WIDTH + 4 && k->ci.t != WALL && k->dc < k->df) {
@@ -243,10 +249,10 @@ static void
 physics_out (struct anim *k)
 {
   /* depressible floors */
-  if (k->walk == -1) {
-    if (k->i == 6) update_depressible_floor (k, -3, -5);
-    else if (k->i == 7) update_depressible_floor (k, 0, -6);
-    else if (k->i == 10) update_depressible_floor (k, -4, -10);
-    else keep_depressible_floor (k);
-  } else keep_depressible_floor (k);
+  int dx = 0;
+  if (k->walk != -1) dx = -4;
+  if (k->i == 6) update_depressible_floor (k, -3 + dx, -5);
+  else if (k->i == 7) update_depressible_floor (k, 0 + dx, -6);
+  else if (k->i == 10) update_depressible_floor (k, -4 + dx, -10);
+  else keep_depressible_floor (k);
 }

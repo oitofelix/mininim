@@ -101,6 +101,8 @@ play_level (struct level *lv)
 
   play_anim (draw_level, compute_level);
 
+  struct anim *k = get_anim_by_id (current_kid_id);
+
   switch (quit_anim) {
   case NO_QUIT: break;
   case RESTART_LEVEL:
@@ -111,6 +113,14 @@ play_level (struct level *lv)
    goto start;
   case PREVIOUS_LEVEL:
   case NEXT_LEVEL:
+    /* the kid must keep the total lives and skills obtained for the
+       next level */
+    if (quit_anim == NEXT_LEVEL) {
+      total_lives = k->total_lives;
+      current_lives = k->current_lives;
+      skill = k->skill;
+    }
+
     destroy_anims ();
     destroy_cons ();
     int d = (quit_anim == PREVIOUS_LEVEL) ? -1 : +1;

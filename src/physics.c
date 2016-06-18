@@ -957,9 +957,13 @@ update_depressible_floor (struct anim *a, int dx0, int dx1)
   c1.x += dir * dx1;
   pos (&c1, &p1);
 
+  if (a->current_lives <= 0 && con (&p0)->fg == CLOSER_FLOOR)
+    closer_floor_at_pos (&p0)->unresponsive = true;
   press_depressible_floor (&p0);
   a->df_pos[0] = p0;
 
+  if (a->current_lives <= 0 && con (&p1)->fg == CLOSER_FLOOR)
+    closer_floor_at_pos (&p1)->unresponsive = true;
   press_depressible_floor (&p1);
   a->df_pos[1] = p1;
 }

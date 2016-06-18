@@ -395,7 +395,9 @@ compute_choppers (void)
       if (a->type == MOUSE
           || is_anim_fall (&a->f)
           || a->immortal
-          || a->chopper_immune) continue;
+          || a->chopper_immune
+          || (a->action == kid_walk && a->walk != -1))
+        continue;
       struct pos pbf, pbb;
       survey (_bf, pos, &a->f, NULL, &pbf, NULL);
       survey (_bb, pos, &a->f, NULL, &pbb, NULL);

@@ -127,6 +127,7 @@ physics_in (struct anim *k)
     k->collision = false;
     k->f.c.x += dir * 16;
   } else if (k->i == 0
+             && k->oaction != kid_normal
              && k->oaction != kid_hang_free
              && k->oaction != kid_hang_wall
              && k->oaction != kid_climb) {

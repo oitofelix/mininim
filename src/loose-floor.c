@@ -531,7 +531,8 @@ compute_loose_floor_fall (struct loose_floor *l)
 
   /* fall */
   if (is_strictly_traversable (&fpmbo_f)
-      || peq (&fpmbo_f, &fpmbo_nf)) {
+      || (peq (&fpmbo_f, &fpmbo_nf)
+          && (fpmbo_nf.floor + 1) * PLACE_HEIGHT - mbo_nf.y > 8)) {
     /* the floor hit a rigid structure */
     if (is_rigid_con (&fpmbo_nf)) prel (&fpmbo_nf, &p, -1, 0);
     /* the floor continue to fall */

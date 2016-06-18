@@ -413,9 +413,6 @@ guard_die_suddenly (struct anim *g)
     if (ke) upgrade_skill (&ke->skill, &g->skill);
   }
 
-  if (con (&g->p)->fg == CLOSER_FLOOR)
-    closer_floor_at_pos (&g->p)->unresponsive = true;
-
   g->xf.b = NULL;
 
   g->hit_by_loose_floor = false;
@@ -467,9 +464,6 @@ flow (struct anim *g)
 
     g->xf.b = NULL;
   }
-
-  if (con (&g->p)->fg == CLOSER_FLOOR)
-    closer_floor_at_pos (&g->p)->unresponsive = true;
 
   g->current_lives = 0;
 
