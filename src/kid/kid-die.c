@@ -250,7 +250,7 @@ physics_in (struct anim *k)
 
   /* fall */
   struct pos pm;
-  survey (_m, posf, &k->f, NULL, &pm, NULL);
+  survey (_m, pos, &k->f, NULL, &pm, NULL);
   if (is_strictly_traversable (&pm)) {
     kid_fall (k);
     return false;

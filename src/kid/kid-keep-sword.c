@@ -105,8 +105,7 @@ flow (struct anim *k)
       kid_normal (k);
       k->keep_sword_fast = false;
       return false;
-    }
-    else {
+    } else {
       /* kid turn will invert kid's direction */
       k->f.dir = (k->f.dir == RIGHT) ? LEFT : RIGHT;
       kid_turn (k);

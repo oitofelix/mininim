@@ -208,7 +208,8 @@ fight_ai (struct anim *k)
   if (is_near (k, ke)
       && ! is_in_fight_mode (ke)
       && ! ke->immortal
-      && ke->f.dir != k->f.dir) {
+      && ke->f.dir != k->f.dir
+      && ke->current_lives > 0) {
     place_on_the_ground (&ke->f, &ke->f.c);
     kid_take_sword (ke);
   }
@@ -238,6 +239,7 @@ fight_ai (struct anim *k)
   /* if the enemy is trying to bypass, attack him */
   if (! is_in_fight_mode (ke)
       && ke->f.dir != k->f.dir
+      && ke->current_lives > 0
       && ((is_kid_run (&ke->f)
            && is_in_range (k, ke, 3 * PLACE_WIDTH - 4))
           || (is_kid_run_jump (&ke->f)
@@ -302,7 +304,8 @@ fight_ai (struct anim *k)
           && (k->type != KID || ke->i == 0)
           && (k->type == KID || ke->i == 1))
       && (prandom (99) <= k->skill.defense_prob
-          || k->refraction > 0)) {
+          || k->refraction > 0)
+      && ke->current_lives > 0) {
     fight_defense (k);
     if (is_safe_to_attack (k)) fight_attack (k);
     else if (is_safe_to_walkb (k)) fight_walkb (k);
@@ -320,6 +323,7 @@ fight_ai (struct anim *k)
   /* in attack range, if not being attacked, attack (with probability,
      unless the enemy is not in fight mode, then attack immediately) */
   if (! is_attacking (ke)
+      && ke->current_lives > 0
       && is_in_range (k, ke, ATTACK_RANGE)
       && (prandom (99) <= k->skill.attack_prob
           || ! is_in_fight_mode (ke))) {
@@ -422,12 +426,16 @@ consider_enemy (struct anim *k0, struct anim *k1)
 {
   k0->enemy_id = k1->id;
   k0->enemy_aware = true;
+  k0->enemy_refraction = 12;
   k1->enemy_id = k0->id;
 }
 
 void
 forget_enemy (struct anim *k)
 {
+  if (--k->enemy_refraction > 0) return;
+  else k->enemy_refraction = 0;
+
   struct anim *ke = get_anim_by_id (k->enemy_id);
   if (ke) {
     ke->oenemy_id = ke->enemy_id;

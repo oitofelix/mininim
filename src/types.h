@@ -388,6 +388,7 @@ struct anim {
 
   int enemy_id, oenemy_id;
   bool enemy_aware;
+  int enemy_refraction;
 
   bool dont_draw_lives;
 

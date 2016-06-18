@@ -65,7 +65,8 @@ flow (struct anim *k)
   bool walkb = ((k->f.dir == RIGHT) && k->key.left)
     || ((k->f.dir == LEFT) && k->key.right);
 
-  k->keep_sword_fast = k->enemy_id != -1;
+  struct anim *ke = get_anim_by_id (k->enemy_id);
+  k->keep_sword_fast = (k->enemy_id != -1 && ke->current_lives > 0);
 
   if (k->oaction != kid_sword_normal) k->i = -1;
 
