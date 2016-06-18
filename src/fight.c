@@ -909,7 +909,8 @@ is_safe_to_follow (struct anim *k0, struct anim *k1, enum dir dir)
     if (peqr (&k0->enemy_pos, &p0, +0, -1)) return true;
     prel (&p0, &pk, +0, -1);
     prel (&k0->enemy_pos, &pke, +0, +1);
-    if (con (&pk)->fg == DOOR && tf.y <= door_grid_tip_y (&pk) - 10)
+    if (con (&pk)->fg == DOOR
+        && tf.y <= door_grid_tip_y (&pk) - 10)
       return false;
   } else {
     if (! is_safe_at_right (&p0, &k0->f)) return false;
@@ -917,7 +918,8 @@ is_safe_to_follow (struct anim *k0, struct anim *k1, enum dir dir)
     if (peqr (&k0->enemy_pos, &p0, +0, +1)) return true;
     prel (&p0, &pk, +0, +1);
     prel (&k0->enemy_pos, &pke, +0, -1);
-    if (con (&p0)->fg == DOOR && tf.y <= door_grid_tip_y (&p0) - 10)
+    if (con (&p0)->fg == DOOR
+        && tf.y <= door_grid_tip_y (&p0) - 10)
       return false;
   }
 
@@ -939,7 +941,8 @@ is_safe_to_follow (struct anim *k0, struct anim *k1, enum dir dir)
 
   first_confg (&pk, &pke, door_cs, &p);
   if (! is_valid_pos (&p)) return true;
-  else return door_at_pos (&p)->action == OPEN_DOOR;
+  else return door_at_pos (&p)->action == OPEN_DOOR
+         || tf.y > door_grid_tip_y (&p) - 10;
 }
 
 void
