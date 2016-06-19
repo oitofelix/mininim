@@ -263,11 +263,11 @@ draw_carpet_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   draw_door_pole (bitmap, p, em, vm);
 
-  if (should_draw_door_grid (p, f))
+  if (should_draw_door_grid (p, f)) {
     draw_carpet_right (bitmap, p, em, vm);
-
-  draw_confg_base (bitmap, &pr, em, vm);
-  draw_confg_left (bitmap, &pr, em, vm, true);
+    draw_confg_base (bitmap, &pr, em, vm);
+    draw_confg_left (bitmap, &pr, em, vm, true);
+  }
 }
 
 struct coord *
