@@ -414,7 +414,6 @@ compute_choppers (void)
           && (! is_anim_dead (&a->f) || ! is_anim_chopped (&a->f))) {
         if (a->type != SKELETON) c->blood = true;
         a->splash = true;
-        a->current_lives = 0;
         a->p = c->p;
         a->death_reason = CHOPPER_DEATH;
         if (a->id == current_kid_id) {

@@ -563,6 +563,12 @@ pos_gen (struct coord *c, struct pos *p, int dx, int dy)
 }
 
 struct pos *
+posb (struct coord *c, struct pos *p)
+{
+  return pos_gen (c, p, 23, 3);
+}
+
+struct pos *
 pos (struct coord *c, struct pos *p)
 {
   return pos_gen (c, p, 15, 3);

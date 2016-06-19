@@ -49,6 +49,7 @@ bool coord4draw (struct coord *c, int room, struct coord *cv);
 int pos_mod (struct pos *p0, struct pos *p1);
 int coord_mod (struct coord *c);
 struct pos *pos_gen (struct coord *c, struct pos *p, int dx, int dy);
+struct pos *posb (struct coord *c, struct pos *p);
 struct pos *pos (struct coord *c, struct pos *p);
 struct pos *posf (struct coord *c, struct pos *p);
 struct pos *prel (struct pos *p, struct pos *pr, int floor, int place);

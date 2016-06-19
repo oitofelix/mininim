@@ -463,7 +463,6 @@ compute_spikes_floors (void)
           && (((s->state >= 2 && s->state <= 4)
                && (is_kid_start_run (&a->f)
                    || is_kid_run (&a->f)
-                   || is_kid_stop_run (&a->f)
                    || is_kid_run_jump_running (&a->f)))
               || (is_kid_couch (&a->f) && a->fall && a->i < 3
                   && ! a->float_timer)

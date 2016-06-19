@@ -80,6 +80,7 @@ create_guard (struct anim *g0, struct anim *g1, struct pos *p, enum dir dir)
     g1->has_sword = true;
     g1->skill.counter_attack_prob = -1;
     g1->skill.counter_defense_prob = -1;
+    g1->glory_sample = false;
 
     if (g1->type == SHADOW) g1->shadow = true;
 

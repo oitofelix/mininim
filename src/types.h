@@ -407,6 +407,8 @@ struct anim {
     SPIKES_DEATH, CHOPPER_DEATH, FIGHT_DEATH, SHADOW_FIGHT_DEATH
   } death_reason;
 
+  bool glory_sample;
+
   /* depressible floor */
   struct pos df_pos[2];
   struct pos df_posb[2];

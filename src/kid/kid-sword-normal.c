@@ -66,7 +66,9 @@ flow (struct anim *k)
     || ((k->f.dir == LEFT) && k->key.right);
 
   struct anim *ke = get_anim_by_id (k->enemy_id);
-  k->keep_sword_fast = (k->enemy_id != -1 && ke->current_lives > 0);
+  k->keep_sword_fast = (k->enemy_id != -1
+                        && ke->current_lives > 0
+                        && ! is_anim_fall (&ke->f));
 
   if (k->oaction != kid_sword_normal) k->i = -1;
 

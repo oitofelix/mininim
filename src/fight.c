@@ -1060,8 +1060,9 @@ fight_hit (struct anim *k, struct anim *ke)
     if (is_strictly_traversable (&pb)) {
       place_at_pos (&k->f, _m, &pb, &k->f.c);
       anim_fall (k);
-    } else place_at_distance (&ke->f, _tf, &k->f, _tf, +0,
-                              ke->f.dir, &k->f.c);
+    } else if (is_near (k, ke))
+      place_at_distance (&ke->f, _tf, &k->f, _tf, +0,
+                         ke->f.dir, &k->f.c);
   }
 
   k->splash = true;
