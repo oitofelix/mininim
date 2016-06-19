@@ -1002,7 +1002,7 @@ restore_depressible_floor (struct anim *a)
 void
 press_depressible_floor (struct pos *p)
 {
-  if (! is_valid_pos (p)) return;
+  if (cutscene || ! is_valid_pos (p)) return;
 
   switch (con (p)->fg) {
   case OPENER_FLOOR: press_opener_floor (p); break;

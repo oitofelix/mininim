@@ -186,7 +186,8 @@ physics_in (struct anim *k)
   struct pos pmta; prel (&pmt, &pmta, -1, 0);
   if (k->i == 12 && k->j == 1
       && (! is_strictly_traversable (&ptra)
-          && ! is_strictly_traversable (&pmta)))
+          && ! is_strictly_traversable (&pmta))
+      && ! k->hang)
     k->hit_ceiling = true;
 
   /* hang */
