@@ -324,7 +324,7 @@ release_loose_floor (struct pos *p)
 void
 compute_loose_floors (void)
 {
-  int i;
+  size_t i;
 
   must_sort = false;
 
@@ -341,11 +341,15 @@ compute_loose_floors (void)
     case FALL_LOOSE_FLOOR: compute_loose_floor_fall (l); break;
     default: break;
     }
+  }
 
+ again:
+  for (i = 0; i < loose_floor_nmemb; i++) {
+    struct loose_floor *l = &loose_floor[i];
     if (l->remove) {
       must_sort = true;
       remove_loose_floor (l);
-      i--;
+      goto again;
     }
   }
 
@@ -507,14 +511,12 @@ compute_loose_floor_fall (struct loose_floor *l)
         && ! a->hit_by_loose_floor
         && ! is_kid_hang_or_climb (&a->f)
         && ! is_kid_fall (&a->f)) {
-      a->hit_by_loose_floor = true;
       a->splash = true;
       a->current_lives--;
       a->uncouch_slowly = true;
       /* ensure kid doesn't couch in thin air (might occur when hit
          while jumping, for example) */
       place_on_the_ground (&a->f, &a->f.c);
-      play_sample (hit_wall_sample, NULL, a->id);
       alert_guards (&kpmt);
       if (a->id == current_kid_id) {
         mr.flicker = 2;
@@ -524,8 +526,11 @@ compute_loose_floor_fall (struct loose_floor *l)
         a->p = kpmt;
         anim_die_suddenly (a);
         a->death_reason = LOOSE_FLOOR_DEATH;
+      } else if (a->type == KID) {
+        a->hit_by_loose_floor = true;
+        play_sample (hit_wall_sample, NULL, a->id);
+        kid_couch (a);
       }
-      else if (a->type == KID) kid_couch (a);
     }
   }
 
