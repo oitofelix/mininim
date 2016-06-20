@@ -98,10 +98,7 @@ leave_fight_logic (struct anim *k)
       && ! is_near (k, ke)
       && ! is_safe_to_follow (k, ke, k->f.dir)
       && ! (is_on_back (k, ke) && is_seeing (k, ke, odir)
-            && p.floor == pe.floor)
-      /* && ! is_safe_to_follow (k, ke, LEFT) */
-      /* && ! is_safe_to_follow (k, ke, RIGHT) */
-      ) {
+            && p.floor == pe.floor)) {
     forget_enemy (k);
     return;
   }
@@ -205,11 +202,13 @@ fight_ai (struct anim *k)
   }
 
   /* prevent enemy from passing through */
-  if (is_near (k, ke)
+  if (ke->type == KID
+      && is_near (k, ke)
       && ! is_in_fight_mode (ke)
       && ! ke->immortal
       && ke->f.dir != k->f.dir
-      && ke->current_lives > 0) {
+      && ke->current_lives > 0
+      && is_there_enough_room_to_fight (ke)) {
     place_on_the_ground (&ke->f, &ke->f.c);
     kid_take_sword (ke);
   }
@@ -260,9 +259,7 @@ fight_ai (struct anim *k)
           || ! (is_kid_run (&ke->f)
                 || is_kid_run_jump (&ke->f)
                 || is_kid_jump (&ke->f)))
-      && is_safe_to_follow (k, ke, k->f.dir)
-      /* && is_safe_to_walkf (k) */
-      ) {
+      && is_safe_to_follow (k, ke, k->f.dir)) {
     fight_walkf (k);
     return;
   }
@@ -276,7 +273,6 @@ fight_ai (struct anim *k)
   if (is_in_range (k, ke, FIGHT_RANGE)
       && ! is_in_range (k, ke, ATTACK_RANGE)
       && is_safe_to_follow (k, ke, k->f.dir)
-      /* && is_safe_to_walkf (k) */
       && (prandom (99) <= k->skill.advance_prob
           || ! is_in_fight_mode (ke))
       && ! is_attacking (ke)
@@ -510,12 +506,14 @@ is_in_fight_mode (struct anim *k)
     || k->action == kid_sword_attack
     || k->action == kid_sword_defense
     || k->action == kid_take_sword
+    || k->action == kid_sword_hit
 
     || k->action == guard_vigilant
     || k->action == guard_walkf
     || k->action == guard_walkb
     || k->action == guard_attack
-    || k->action == guard_defense;
+    || k->action == guard_defense
+    || k->action == guard_hit;;
 }
 
 bool
@@ -817,14 +815,14 @@ bool
 is_safe_to_walkb (struct anim *k)
 {
   int df = dist_fall (&k->f, true);
-  return (df > PLACE_WIDTH);
+  return (df > PLACE_WIDTH) && is_there_enough_room_to_fight (k);
 }
 
 bool
 is_safe_to_attack (struct anim *k)
 {
   int df = dist_fall (&k->f, false);
-  return df > PLACE_WIDTH;
+  return df > PLACE_WIDTH && is_there_enough_room_to_fight (k);
 }
 
 bool
@@ -945,19 +943,28 @@ is_safe_to_follow (struct anim *k0, struct anim *k1, enum dir dir)
          || tf.y > door_grid_tip_y (&p) - 10;
 }
 
+bool
+is_there_enough_room_to_fight (struct anim *k)
+{
+  return dist_collision (&k->f, false, &k->ci) > PLACE_WIDTH
+    || dist_collision (&k->f, true, &k->ci) > PLACE_WIDTH;
+}
+
 void
 fight_turn (struct anim *k)
 {
   k->f.dir = (k->f.dir == LEFT) ? RIGHT : LEFT;
   k->f.flip ^= ALLEGRO_FLIP_HORIZONTAL;
 
-  if (! is_in_fight_mode (k)) enter_fight_mode (k);
+  if (! is_in_fight_mode (k)
+      && is_there_enough_room_to_fight (k)) enter_fight_mode (k);
   else {
     struct pos p;
     struct anim a = *k;
     anim_walkb (&a);
     survey (_bb, pos, &a.f, NULL, &p, NULL);
-    if (! is_strictly_traversable (&p)) *k = a;
+    if (! is_strictly_traversable (&p)
+        && is_there_enough_room_to_fight (k)) *k = a;
   }
 }
 
@@ -1048,13 +1055,6 @@ fight_hit (struct anim *k, struct anim *ke)
 
   prel (&k->p, &pb, 0, d);
 
-  if (k->current_lives <= 0 || ! is_in_fight_mode (k)) {
-    forget_enemy (ke);
-    anim_die (k);
-    k->death_reason = FIGHT_DEATH;
-    ke->alert_cycle = anim_cycle;
-  } else anim_sword_hit (k);
-
   if (! is_colliding (&k->f, &k->fo, +PLACE_WIDTH,
                       ke->f.dir != k->f.dir, &k->ci)) {
     if (is_strictly_traversable (&pb)) {
@@ -1064,6 +1064,13 @@ fight_hit (struct anim *k, struct anim *ke)
       place_at_distance (&ke->f, _tf, &k->f, _tf, +0,
                          ke->f.dir, &k->f.c);
   }
+
+  if (k->current_lives <= 0 || ! is_in_fight_mode (k)) {
+    forget_enemy (ke);
+    if (! is_anim_fall (&k->f)) anim_die (k);
+    k->death_reason = FIGHT_DEATH;
+    ke->alert_cycle = anim_cycle;
+  } else if (! is_anim_fall (&k->f)) anim_sword_hit (k);
 
   k->splash = true;
 

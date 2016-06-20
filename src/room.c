@@ -694,6 +694,19 @@ draw_room_anim_fg_sub (ALLEGRO_BITMAP *bitmap,
   set_target_bitmap (bitmap);
   al_set_clipping_rectangle (c.x, c.y, w, h);
 
+  /* SWORD */
+  if (con (&pm)->fg == CARPET
+      && a->f.dir == RIGHT
+      && a->xf.b) {
+    struct coord c2;
+    int w2 = al_get_bitmap_width (a->xf.b);
+    int h2 = al_get_bitmap_height (a->xf.b);
+    xframe_coord (&a->f, &a->xf, &c2);
+    al_set_clipping_rectangle (c2.x, c2.y, w2, h2);
+    draw_confg_right (bitmap, &pm, em, vm, true);
+    al_set_clipping_rectangle (c.x, c.y, w, h);
+  }
+
   /* FALLING */
   if (is_anim_fall (f)) {
     draw_confg_base (bitmap, &pbr, em, vm);

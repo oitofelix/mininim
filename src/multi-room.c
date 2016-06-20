@@ -753,6 +753,7 @@ update_cache_pos (struct pos *p, enum changed_pos_reason reason,
             draw_conbg (mr.cell[x][y].cache, &pbr, em, vm, true);
 
           draw_confg_top (mr.cell[x][y].cache, &pbl, em, vm, true);
+          draw_confg_top (mr.cell[x][y].cache, &pb, em, vm, true);
           draw_conbg (mr.cell[x][y].cache, &pl, em, vm, true);
           draw_conbg (mr.cell[x][y].cache, p, em, vm, true);
           draw_confg_base (mr.cell[x][y].cache, &pr, em, vm);

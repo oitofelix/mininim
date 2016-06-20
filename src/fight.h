@@ -54,6 +54,7 @@ bool is_safe_to_attack (struct anim *k);
 bool is_safe_to_turn (struct anim *k);
 bool dangerous_cs (enum confg t);
 bool is_safe_to_follow (struct anim *k0, struct anim *k1, enum dir dir);
+bool is_there_enough_room_to_fight (struct anim *k);
 void fight_turn (struct anim *k);
 void fight_turn_controllable (struct anim *k);
 void fight_defense (struct anim *k);
