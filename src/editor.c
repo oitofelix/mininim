@@ -1655,5 +1655,5 @@ ui_place_kid (struct pos *p)
   place_frame (&k->f, &k->f, kid_normal_00, p,
                k->f.dir == LEFT ? +22 : +28, +15);
   kid_normal (k);
-  update_depressible_floor (k, -4, -10);
+  if (! game_paused) update_depressible_floor (k, -4, -10);
 }
