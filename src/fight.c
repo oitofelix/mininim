@@ -1060,9 +1060,8 @@ fight_hit (struct anim *k, struct anim *ke)
     if (is_strictly_traversable (&pb)) {
       place_at_pos (&k->f, _m, &pb, &k->f.c);
       anim_fall (k);
-    } else if (is_near (k, ke))
-      place_at_distance (&ke->f, _tf, &k->f, _tf, +0,
-                         ke->f.dir, &k->f.c);
+    } else place_at_distance (&ke->f, _tf, &k->f, _tf, +8,
+                              ke->f.dir, &k->f.c);
   }
 
   if (k->current_lives <= 0 || ! is_in_fight_mode (k)) {
