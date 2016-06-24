@@ -61,10 +61,10 @@ get_mouse_coord (struct mouse_coord *m)
   int y = (mouse_state.y * (sh - 1)) / h;
 
   if (screen_flags & ALLEGRO_FLIP_HORIZONTAL)
-    x = sw - x;
+    x = (sw - 1) - x;
 
   if (screen_flags & ALLEGRO_FLIP_VERTICAL)
-    y = sh - y;
+    y = (sh - 1) - y;
 
   m->c.l = &global_level;
 
@@ -173,10 +173,10 @@ set_mouse_coord (struct mouse_coord *m)
   my = min_int (my, h - 1);
 
   if (screen_flags & ALLEGRO_FLIP_HORIZONTAL)
-    mx = w - mx;
+    mx = (w - 1) - mx;
 
   if (screen_flags & ALLEGRO_FLIP_VERTICAL)
-    my = h - my;
+    my = (h - 1) - my;
 
   if (! al_set_mouse_xy (display, mx, my))
     error (0, 0, "%s (%p): cannot set mouse xy coordinates (%i,%i)",

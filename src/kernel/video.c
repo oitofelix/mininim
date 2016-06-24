@@ -450,11 +450,18 @@ flip_display (ALLEGRO_BITMAP *bitmap)
     set_target_backbuffer (display);
     al_draw_bitmap (iscreen, 0, 0, screen_flags);
 
-    if (mr.room_select > 0 && ! cutscene)
+    if (mr.room_select > 0 && ! cutscene
+        && edit != EDIT_NONE)
       for (y = mr.h - 1; y >= 0; y--)
         for (x = 0; x < mr.w; x++)
-          if (mr.cell[x][y].room == mr.room_select)
-            draw_mr_select_rect (x, y, GREEN);
+          if (mr.cell[x][y].room == mr.room_select) {
+            int rx = x, ry = y;
+            if (screen_flags & ALLEGRO_FLIP_HORIZONTAL)
+              rx = (mr.w - 1) - x;
+            if (screen_flags & ALLEGRO_FLIP_VERTICAL)
+              ry = (mr.h - 1) - y;
+            draw_mr_select_rect (rx, ry, GREEN);
+          }
 
     if ((mr.room != mr.last.room
          || mr.x != mr.last.x
@@ -464,8 +471,14 @@ flip_display (ALLEGRO_BITMAP *bitmap)
         && ! cutscene)
       mr.select_cycles = SELECT_CYCLES;
 
-    if (mr.select_cycles > 0 && ! cutscene) {
-      draw_mr_select_rect (mr.x, mr.y, RED);
+    if (mr.select_cycles > 0 && ! cutscene
+        && edit != EDIT_NONE) {
+      int rx = mr.x, ry = mr.y;
+      if (screen_flags & ALLEGRO_FLIP_HORIZONTAL)
+        rx = (mr.w - 1) - mr.x;
+      if (screen_flags & ALLEGRO_FLIP_VERTICAL)
+        ry = (mr.h - 1) - mr.y;
+      draw_mr_select_rect (rx, ry, RED);
       mr.select_cycles--;
     }
   }
