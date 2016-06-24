@@ -1043,9 +1043,9 @@ fight_hit (struct anim *k, struct anim *ke)
 
   k->current_lives--;
 
-  int d = (k->f.dir == LEFT) ? +1 : -1;
+  /* int d = (k->f.dir == LEFT) ? +1 : -1; */
   struct pos pb;
-  survey (_m, pos, &k->f, NULL, &k->p, NULL);
+  survey (_bb, pos, &k->f, NULL, &k->p, NULL);
 
   /* ensure anim doesn't die within a wall */
   if (con (&k->p)->fg == WALL) {
@@ -1053,15 +1053,19 @@ fight_hit (struct anim *k, struct anim *ke)
     else if (crel (&k->p, +0, -1)->fg != WALL) k->p.place--;
   }
 
-  prel (&k->p, &pb, 0, d);
+  /* prel (&k->p, &pb, 0, d); */
+  pb = k->p;
 
   if (! is_colliding (&k->f, &k->fo, +PLACE_WIDTH,
                       ke->f.dir != k->f.dir, &k->ci)) {
     if (is_strictly_traversable (&pb)) {
       place_at_pos (&k->f, _m, &pb, &k->f.c);
       anim_fall (k);
-    } else place_at_distance (&ke->f, _tf, &k->f, _tf, +8,
-                              ke->f.dir, &k->f.c);
+    } else if (is_in_range (ke, k, PLACE_WIDTH))
+      place_at_distance (&ke->f, _tf, &k->f, _tf, +0,
+                         ke->f.dir, &k->f.c);
+    else place_at_distance (&ke->f, _tf, &k->f, _tf, +10,
+                            ke->f.dir, &k->f.c);
   }
 
   if (k->current_lives <= 0 || ! is_in_fight_mode (k)) {
