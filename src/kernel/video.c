@@ -471,8 +471,7 @@ flip_display (ALLEGRO_BITMAP *bitmap)
         && ! cutscene)
       mr.select_cycles = SELECT_CYCLES;
 
-    if (mr.select_cycles > 0 && ! cutscene
-        && edit != EDIT_NONE) {
+    if (mr.select_cycles > 0 && ! cutscene) {
       int rx = mr.x, ry = mr.y;
       if (screen_flags & ALLEGRO_FLIP_HORIZONTAL)
         rx = (mr.w - 1) - mr.x;
