@@ -25,6 +25,7 @@ ALLEGRO_BITMAP *uscreen, *iscreen;
 ALLEGRO_TIMER *video_timer;
 uint64_t bottom_text_timer;
 int screen_flags = 0;
+int potion_flags = 0;
 bool hgc;
 bool is_display_focused = true;
 ALLEGRO_BITMAP *effect_buffer;
@@ -398,12 +399,14 @@ flip_display (ALLEGRO_BITMAP *bitmap)
   int uw = al_get_bitmap_width (uscreen);
   int uh = al_get_bitmap_height (uscreen);
 
+  int flags = screen_flags | potion_flags;
+
   if (bitmap) {
     int bw = al_get_bitmap_width (bitmap);
     int bh = al_get_bitmap_height (bitmap);
     set_target_backbuffer (display);
     al_draw_scaled_bitmap
-      (bitmap, 0, 0, bw, bh, 0, 0, w, h, screen_flags);
+      (bitmap, 0, 0, bw, bh, 0, 0, w, h, flags);
   } else {
     if (has_mr_view_changed ()
         && ! cutscene
@@ -448,7 +451,7 @@ flip_display (ALLEGRO_BITMAP *bitmap)
       }
 
     set_target_backbuffer (display);
-    al_draw_bitmap (iscreen, 0, 0, screen_flags);
+    al_draw_bitmap (iscreen, 0, 0, flags);
 
     if (mr.room_select > 0 && ! cutscene
         && edit != EDIT_NONE)
@@ -456,9 +459,9 @@ flip_display (ALLEGRO_BITMAP *bitmap)
         for (x = 0; x < mr.w; x++)
           if (mr.cell[x][y].room == mr.room_select) {
             int rx = x, ry = y;
-            if (screen_flags & ALLEGRO_FLIP_HORIZONTAL)
+            if (flags & ALLEGRO_FLIP_HORIZONTAL)
               rx = (mr.w - 1) - x;
-            if (screen_flags & ALLEGRO_FLIP_VERTICAL)
+            if (flags & ALLEGRO_FLIP_VERTICAL)
               ry = (mr.h - 1) - y;
             draw_mr_select_rect (rx, ry, GREEN);
           }
@@ -473,9 +476,9 @@ flip_display (ALLEGRO_BITMAP *bitmap)
 
     if (mr.select_cycles > 0 && ! cutscene) {
       int rx = mr.x, ry = mr.y;
-      if (screen_flags & ALLEGRO_FLIP_HORIZONTAL)
+      if (flags & ALLEGRO_FLIP_HORIZONTAL)
         rx = (mr.w - 1) - mr.x;
-      if (screen_flags & ALLEGRO_FLIP_VERTICAL)
+      if (flags & ALLEGRO_FLIP_VERTICAL)
         ry = (mr.h - 1) - mr.y;
       draw_mr_select_rect (rx, ry, RED);
       mr.select_cycles--;

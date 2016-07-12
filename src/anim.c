@@ -292,6 +292,7 @@ play_anim (void (*draw_callback) (void),
         al_get_mouse_state (&m);
         int w = al_get_display_width (display);
         int h = al_get_display_height (display);
+        potion_flags = 0;
         switch (screen_flags) {
         case 0:
           al_set_mouse_xy (display, m.x, h - m.y);

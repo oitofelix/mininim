@@ -77,7 +77,7 @@ extern ALLEGRO_BITMAP *effect_buffer;
 extern ALLEGRO_BITMAP *black_screen;
 extern ALLEGRO_TIMER *video_timer;
 extern struct video_effect video_effect;
-extern int screen_flags;
+extern int screen_flags, potion_flags;
 extern bool hgc;
 extern int display_width, display_height;
 extern ALLEGRO_BITMAP *icon;

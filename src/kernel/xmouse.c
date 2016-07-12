@@ -60,10 +60,12 @@ get_mouse_coord (struct mouse_coord *m)
   int x = (mouse_state.x * (sw - 1)) / w;
   int y = (mouse_state.y * (sh - 1)) / h;
 
-  if (screen_flags & ALLEGRO_FLIP_HORIZONTAL)
+  int flags = screen_flags | potion_flags;
+
+  if (flags & ALLEGRO_FLIP_HORIZONTAL)
     x = (sw - 1) - x;
 
-  if (screen_flags & ALLEGRO_FLIP_VERTICAL)
+  if (flags & ALLEGRO_FLIP_VERTICAL)
     y = (sh - 1) - y;
 
   m->c.l = &global_level;
@@ -172,10 +174,12 @@ set_mouse_coord (struct mouse_coord *m)
   mx = min_int (mx, w - 1);
   my = min_int (my, h - 1);
 
-  if (screen_flags & ALLEGRO_FLIP_HORIZONTAL)
+  int flags = screen_flags | potion_flags;
+
+  if (flags & ALLEGRO_FLIP_HORIZONTAL)
     mx = (w - 1) - mx;
 
-  if (screen_flags & ALLEGRO_FLIP_VERTICAL)
+  if (flags & ALLEGRO_FLIP_VERTICAL)
     my = (h - 1) - my;
 
   if (! al_set_mouse_xy (display, mx, my))
