@@ -360,6 +360,7 @@ open_door (struct level *l, int e)
       ld->action = OPEN_LEVEL_DOOR;
       break;
     default:
+      activate_con (p);
       break;
     }
   } while (l->event[e++].next);
@@ -387,6 +388,7 @@ close_door (struct level *l, int e)
       ld->action = CLOSE_LEVEL_DOOR;
       break;
     default:
+      activate_con (p);
       break;
     }
   } while (l->event[e++].next);

@@ -226,7 +226,7 @@ new_pos (struct pos *p, struct level *l, int room, int floor, int place)
 struct pos *
 invalid_pos (struct pos *p)
 {
-  return new_pos (p, NULL, -1, -1, -1);
+  return new_pos (p, &global_level, -1, -1, -1);
 }
 
 bool

@@ -168,9 +168,9 @@ editor (void)
      {0}};
 
   struct menu_item event_menu[] =
-    {{'D', "EVENT->DOOR<"},
+    {{'C', "EVENT->CON<"},
      {'F', "EVENT->FLOOR<"},
-     {'R', "DOOR->EVENT<"},
+     {'R', "CON->EVENT<"},
      {'S', "SET EVENT<"},
      {0}};
 
@@ -766,8 +766,8 @@ editor (void)
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
     switch (menu_enum (event_menu, "E>")) {
     case -1: case 1: edit = EDIT_MAIN; break;
-    case 'D':
-      edit = EDIT_EVENT2DOOR;
+    case 'C':
+      edit = EDIT_EVENT2CON;
       get_mouse_coord (&last_mouse_coord);
       s = last_event;
       break;
@@ -779,7 +779,7 @@ editor (void)
       next_pos_by_pred (&last_event2floor_pos, 0, is_event_at_pos, &t);
       break;
     case 'R':
-      edit = EDIT_DOOR2EVENT;
+      edit = EDIT_CON2EVENT;
       invalid_pos (&p0);
       break;
     case 'S':
@@ -789,9 +789,8 @@ editor (void)
       break;
     }
     break;
-  case EDIT_EVENT2DOOR:
-    if (! is_valid_pos (&global_level.event[s].p)
-        || ! is_door (&global_level.event[s].p)) {
+  case EDIT_EVENT2CON:
+    if (! is_valid_pos (&global_level.event[s].p)) {
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       al_set_mouse_xy (display, 0, 0);
     } else {
@@ -835,10 +834,10 @@ editor (void)
       break;
     }
     break;
-  case EDIT_DOOR2EVENT:
-    if (! is_valid_pos (&p) || ! is_door (&p)) {
+  case EDIT_CON2EVENT:
+    if (! is_valid_pos (&p)) {
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
-      editor_msg ("SELECT DOOR", 1);
+      editor_msg ("SELECT CONSTRUCTION", 1);
       if (was_menu_return_pressed (true)) edit = EDIT_EVENT;
       t = -1;
     } else {
@@ -859,9 +858,9 @@ editor (void)
     }
     break;
   case EDIT_EVENT_SET:
-    if (! is_valid_pos (&p) || ! is_door (&p)) {
+    if (! is_valid_pos (&p)) {
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
-      editor_msg ("SELECT DOOR", 1);
+      editor_msg ("SELECT CONSTRUCTION", 1);
       if (was_menu_return_pressed (true)) edit = EDIT_EVENT;
     } else {
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
