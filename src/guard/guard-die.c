@@ -456,9 +456,9 @@ static bool
 flow (struct anim *g)
 {
   if (g->oaction != guard_die) {
-    place_frame (&g->f, &g->f, guard_die_frameset[0].frame,
-                 &g->p, (g->f.dir == LEFT)
-                 ? +13 : +21, (g->type == SHADOW) ? +18 : +17);
+    /* place_frame (&g->f, &g->f, guard_die_frameset[0].frame, */
+    /*              &g->p, (g->f.dir == LEFT) */
+    /*              ? +13 : +21, (g->type == SHADOW) ? +18 : +17); */
     g->i = -1, g->j = 0;
     if (g->type == SKELETON)
       play_sample (skeleton_sample, NULL, g->id);

@@ -44,6 +44,7 @@ leave_fight_logic (struct anim *k)
 {
   /* dead character doesn't fight */
   if (k->current_lives <= 0) {
+    k->enemy_refraction = 0;
     forget_enemy (k);
     return;
   }
@@ -72,12 +73,14 @@ leave_fight_logic (struct anim *k)
 
   /* if the enemy doesn't exist, forget about it */
   if (! ke) {
+    k->enemy_refraction = 0;
     forget_enemy (k);
     return;
   }
 
   /* if the enemy is dead no need to worry about him */
   if (ke->current_lives <= 0) {
+    k->enemy_refraction = 0;
     forget_enemy (k);
     return;
   }
@@ -320,6 +323,7 @@ fight_ai (struct anim *k)
   /* in attack range, if not being attacked, attack (with probability,
      unless the enemy is not in fight mode, then attack immediately) */
   if (! is_attacking (ke)
+      && ! (is_kid_climb (&ke->f) && ke->i >= 1)
       && ke->current_lives > 0
       && is_in_range (k, ke, ATTACK_RANGE)
       && (prandom (99) <= k->skill.attack_prob
@@ -1005,9 +1009,11 @@ fight_turn_controllable (struct anim *k)
     struct pos p, pe;
     survey (_m, pos, &k->f, NULL, &p, NULL);
     survey (_m, pos, &ke->f, NULL, &pe, NULL);
+    pos2room (&pe, p.room, &pe);
     if (is_on_back (k, ke)
         && is_in_fight_mode (k)
         && is_in_fight_mode (ke)
+        && p.room == pe.room
         && p.floor == pe.floor)
       fight_turn (k);
   }
@@ -1044,6 +1050,7 @@ fight_hit (struct anim *k, struct anim *ke)
 {
   if (k->immortal || k->sword_immune) return;
   if (k->current_lives <= 0) return;
+  if (is_anim_fall (&k->f)) return;
 
   place_on_the_ground (&k->f, &k->f.c);
   k->xf.b = NULL;

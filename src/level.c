@@ -399,6 +399,7 @@ compute_level (void)
 
   struct anim *ke;
   if (mr.w > 1
+      && current_kid->current_lives > 0
       && current_kid->f.c.room != 0
       && current_kid->f.c.room != anti_camera_room
       && camera_follow_kid == current_kid->id
@@ -407,8 +408,7 @@ compute_level (void)
     if (ke->f.c.room == roomd (&global_level, current_kid->f.c.room, LEFT)) {
       mr_view_trans (LEFT);
       mr_focus_room (current_kid->f.c.room);
-    }
-    else if (ke->f.c.room == roomd (&global_level, current_kid->f.c.room, RIGHT)) {
+    } else if (ke->f.c.room == roomd (&global_level, current_kid->f.c.room, RIGHT)) {
       mr_view_trans (RIGHT);
       mr_focus_room (current_kid->f.c.room);
     }

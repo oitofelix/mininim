@@ -218,9 +218,9 @@ static bool
 flow (struct anim *k)
 {
   if (k->oaction != kid_die) {
-    place_frame (&k->f, &k->f, kid_die_frameset[0].frame,
-                 &k->p, (k->f.dir == LEFT)
-                 ? +13 : +21, +18);
+    /* place_frame (&k->f, &k->f, kid_die_frameset[0].frame, */
+    /*              &k->p, (k->f.dir == LEFT) */
+    /*              ? +13 : +21, +18); */
     k->i = -1, k->j = 0;
     k->xf.b = NULL;
   }
