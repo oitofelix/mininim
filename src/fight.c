@@ -111,7 +111,8 @@ enter_fight_logic (struct anim *k)
   if (! is_fightable_anim (k)) return;
 
   /* has an enemy, no need to get another */
-  if (k->enemy_id != -1 && k->enemy_aware) return;
+  if (k->enemy_id != -1 && k->enemy_aware
+      && k->enemy_refraction < 0) return;
 
   /* dead character doesn't fight */
   if (k->current_lives <= 0) return;
@@ -422,15 +423,17 @@ consider_enemy (struct anim *k0, struct anim *k1)
 {
   k0->enemy_id = k1->id;
   k0->enemy_aware = true;
-  k0->enemy_refraction = 12;
-  k1->enemy_id = k0->id;
+  k0->enemy_refraction = -1;
 }
 
 void
 forget_enemy (struct anim *k)
 {
-  if (--k->enemy_refraction > 0) return;
-  else k->enemy_refraction = 0;
+  if (k->enemy_refraction > 0) return;
+  else if (k->enemy_refraction < 0) {
+    k->enemy_refraction = ENEMY_REFRACTION_TIME;
+    return;
+  }
 
   struct anim *ke = get_anim_by_id (k->enemy_id);
   if (ke) {
@@ -493,6 +496,8 @@ dist_enemy (struct anim *k)
   struct coord m0, m1;
   _m (&k->f, &m0);
   _m (&f1, &m1);
+
+  if (m0.room != m1.room) return INT_MAX;
 
   return abs (m1.x - m0.x);
 }
@@ -1000,7 +1005,9 @@ fight_turn_controllable (struct anim *k)
     struct pos p, pe;
     survey (_m, pos, &k->f, NULL, &p, NULL);
     survey (_m, pos, &ke->f, NULL, &pe, NULL);
-    if (is_on_back (k, ke) && is_in_fight_mode (k)
+    if (is_on_back (k, ke)
+        && is_in_fight_mode (k)
+        && is_in_fight_mode (ke)
         && p.floor == pe.floor)
       fight_turn (k);
   }

@@ -376,8 +376,10 @@ compute_level (void)
   for (i = 0; i < anima_nmemb; i++) anima[i].action (&anima[i]);
   for (i = 0; i < anima_nmemb; i++) fight_mechanics (&anima[i]);
 
-  for (i = 0; i < anima_nmemb; i++)
+  for (i = 0; i < anima_nmemb; i++) {
     if (anima[i].float_timer) anima[i].float_timer++;
+    if (anima[i].enemy_refraction > 0) anima[i].enemy_refraction--;
+  }
 
   fight_turn_controllable (current_kid);
 
