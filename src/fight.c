@@ -450,8 +450,9 @@ forget_enemy (struct anim *k)
     ke->oenemy_id = ke->enemy_id;
     ke->enemy_id = -1;
     ke->enemy_aware = false;
+
+    k->oenemy_id = k->enemy_id;
   }
-  k->oenemy_id = k->enemy_id;
   k->enemy_id = -1;
   k->enemy_aware = false;
 }
@@ -476,6 +477,7 @@ is_in_range (struct anim *k0, struct anim *k1, int r)
   survey (_m, pos, &k0->f, &m0, &p0, NULL);
   survey (_m, pos, &k1->f, &m1, &p1, NULL);
   coord2room (&m1, m0.room, &m1);
+  pos2room (&p1, p0.room, &p1);
 
   return m1.room == m0.room
     && p1.floor == p0.floor
@@ -528,7 +530,7 @@ is_in_fight_mode (struct anim *k)
     || k->action == guard_walkb
     || k->action == guard_attack
     || k->action == guard_defense
-    || k->action == guard_hit;;
+    || k->action == guard_hit;
 }
 
 bool
@@ -1061,11 +1063,12 @@ fight_hit (struct anim *k, struct anim *ke)
   place_on_the_ground (&k->f, &k->f.c);
   k->xf.b = NULL;
 
-  k->current_lives--;
+  if (! is_in_fight_mode (k)) k->current_lives = 0;
+  else k->current_lives--;
 
-  /* int d = (k->f.dir == LEFT) ? +1 : -1; */
+  int d = (k->f.dir == LEFT) ? +1 : -1;
   struct pos pb;
-  survey (_bb, pos, &k->f, NULL, &k->p, NULL);
+  survey (_m, pos, &k->f, NULL, &k->p, NULL);
 
   /* ensure anim doesn't die within a wall */
   if (con (&k->p)->fg == WALL) {
@@ -1073,8 +1076,8 @@ fight_hit (struct anim *k, struct anim *ke)
     else if (crel (&k->p, +0, -1)->fg != WALL) k->p.place--;
   }
 
-  /* prel (&k->p, &pb, 0, d); */
-  pb = k->p;
+  prel (&k->p, &pb, 0, d);
+  /* pb = k->p; */
 
   if (! is_colliding (&k->f, &k->fo, +PLACE_WIDTH,
                       ke->f.dir != k->f.dir, &k->ci)) {
@@ -1088,12 +1091,15 @@ fight_hit (struct anim *k, struct anim *ke)
                             ke->f.dir, &k->f.c);
   }
 
-  if (k->current_lives <= 0 || ! is_in_fight_mode (k)) {
-    forget_enemy (ke);
-    if (! is_anim_fall (&k->f)) anim_die (k);
-    k->death_reason = FIGHT_DEATH;
-    ke->alert_cycle = anim_cycle;
-  } else if (! is_anim_fall (&k->f)) anim_sword_hit (k);
+  if (! is_anim_fall (&k->f)) {
+    if (k->current_lives <= 0) {
+      /* forget_enemy (ke); */
+      k->current_lives = 0;
+      k->death_reason = FIGHT_DEATH;
+      ke->alert_cycle = anim_cycle;
+      anim_die (k);
+    } else anim_sword_hit (k);
+  }
 
   k->splash = true;
 

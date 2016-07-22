@@ -259,7 +259,7 @@ raise_skeleton (struct anim *s)
   }
 
   if (s->i-- == 0) {
-    guard_vigilant (s);
+    guard_normal (s);
     return;
   }
 
@@ -314,6 +314,7 @@ guard_die_spiked (struct anim *g)
       play_sample (glory_sample, NULL, ke->id);
       g->glory_sample = true;
     }
+
     g->oenemy_id = -1;
 
     if (ke) upgrade_skill (&ke->skill, &g->skill);
