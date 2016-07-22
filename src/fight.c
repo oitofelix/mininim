@@ -210,6 +210,7 @@ fight_ai (struct anim *k)
       && is_near (k, ke)
       && ! is_in_fight_mode (ke)
       && ! ke->immortal
+      && ! (is_kid_climb (&ke->f) && ke->i <= 7)
       && ke->f.dir != k->f.dir
       && ke->current_lives > 0
       && is_there_enough_room_to_fight (ke)) {
