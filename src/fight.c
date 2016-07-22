@@ -64,6 +64,7 @@ leave_fight_logic (struct anim *k)
 
   /* character that went upstairs doesn't fight */
   if (is_kid_stairs (&k->f)) {
+    k->enemy_refraction = 0;
     forget_enemy (k);
     return;
   }
@@ -87,6 +88,7 @@ leave_fight_logic (struct anim *k)
 
   /* if the enemy went up stairs, forget about him */
   if (is_kid_stairs (&ke->f)) {
+    k->enemy_refraction = 0;
     forget_enemy (k);
     return;
   }
@@ -242,6 +244,7 @@ fight_ai (struct anim *k)
 
   /* if the enemy is trying to bypass, attack him */
   if (! is_in_fight_mode (ke)
+      && ! is_kid_stairs (&ke->f)
       && ke->f.dir != k->f.dir
       && ke->current_lives > 0
       && ! is_on_back (k, ke)
@@ -259,6 +262,7 @@ fight_ai (struct anim *k)
   /* stays at least in the fight range.  Advance, unless the enemy is
      not running towards you */
   if (! is_in_range (k, ke, FIGHT_RANGE)
+      && ! is_kid_stairs (&ke->f)
       && (ke->f.dir == k->f.dir
           || p.room != pe.room
           || p.floor != pe.floor
@@ -278,6 +282,7 @@ fight_ai (struct anim *k)
      then go immediately) */
   if (is_in_range (k, ke, FIGHT_RANGE)
       && ! is_in_range (k, ke, ATTACK_RANGE)
+      && ! is_kid_stairs (&ke->f)
       && is_safe_to_follow (k, ke, k->f.dir)
       && (prandom (99) <= k->skill.advance_prob
           || ! is_in_fight_mode (ke))
@@ -303,6 +308,7 @@ fight_ai (struct anim *k)
      elsewhere) */
   if (is_in_range (k, ke, ATTACK_RANGE)
       && ! is_on_back (k, ke)
+      && ! is_kid_stairs (&ke->f)
       && (is_attacking (ke)
           && (k->type != KID || ke->i == 0)
           && (k->type == KID || ke->i == 1))
@@ -327,6 +333,7 @@ fight_ai (struct anim *k)
      unless the enemy is not in fight mode, then attack immediately) */
   if (! is_attacking (ke)
       && ! is_on_back (k, ke)
+      && ! is_kid_stairs (&ke->f)
       && ! (is_kid_climb (&ke->f) && ke->i >= 1)
       && ke->current_lives > 0
       && is_in_range (k, ke, ATTACK_RANGE)
@@ -1058,7 +1065,8 @@ fight_hit (struct anim *k, struct anim *ke)
 {
   if (k->immortal || k->sword_immune) return;
   if (k->current_lives <= 0) return;
-  if (is_anim_fall (&k->f)) return;
+  if (is_anim_fall (&k->f) || is_kid_stairs (&k->f))
+    return;
 
   place_on_the_ground (&k->f, &k->f.c);
   k->xf.b = NULL;
