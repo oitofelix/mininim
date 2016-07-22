@@ -244,6 +244,7 @@ fight_ai (struct anim *k)
   if (! is_in_fight_mode (ke)
       && ke->f.dir != k->f.dir
       && ke->current_lives > 0
+      && ! is_on_back (k, ke)
       && ((is_kid_run (&ke->f)
            && is_in_range (k, ke, 3 * PLACE_WIDTH - 4))
           || (is_kid_run_jump (&ke->f)
@@ -301,6 +302,7 @@ fight_ai (struct anim *k)
      probability) and counter attack (with probability handled
      elsewhere) */
   if (is_in_range (k, ke, ATTACK_RANGE)
+      && ! is_on_back (k, ke)
       && (is_attacking (ke)
           && (k->type != KID || ke->i == 0)
           && (k->type == KID || ke->i == 1))
@@ -324,6 +326,7 @@ fight_ai (struct anim *k)
   /* in attack range, if not being attacked, attack (with probability,
      unless the enemy is not in fight mode, then attack immediately) */
   if (! is_attacking (ke)
+      && ! is_on_back (k, ke)
       && ! (is_kid_climb (&ke->f) && ke->i >= 1)
       && ke->current_lives > 0
       && is_in_range (k, ke, ATTACK_RANGE)
@@ -372,9 +375,11 @@ fight_mechanics (struct anim *k)
   /*         ke->attack_defended, ke->i, k->key.up); */
 
   if (! ke->attack_defended && is_at_hit_frame (ke)
+      && ! is_on_back (ke, k)
       && is_in_range (k, ke, HIT_RANGE)) fight_hit (k, ke);
   else if (ke->hurt_enemy_in_counter_attack
            && is_at_hit_frame (ke)
+           && ! is_on_back (ke, k)
            && is_in_range (k, ke, HIT_RANGE)) fight_hit (k, ke);
   else if (ke->attack_defended == 1 && is_at_defendable_attack_frame (ke)) {
     if (is_in_range (k, ke, HIT_RANGE + 4)) {
@@ -719,11 +724,11 @@ is_seeing (struct anim *k0, struct anim *k1, enum dir dir)
     db = (mb1.room == m0.room) ? dist_coord (&m0, &mb1) : INFINITY;
 
     if (dt <= dm && dt <= db)
-      cf = (k0->f.dir == LEFT) ? _tr : _tl;
+      cf = (dir == LEFT) ? _tr : _tl;
     else if (db <= dt && db <= dm)
-      cf = (k0->f.dir == LEFT) ? _br : _bl;
-    else cf = (k0->f.dir == LEFT) ? _mr : _ml;
-  } else cf = (k0->f.dir == LEFT) ? _mr : _ml;
+      cf = (dir == LEFT) ? _br : _bl;
+    else cf = (dir == LEFT) ? _mr : _ml;
+  } else cf = (dir == LEFT) ? _mr : _ml;
 
   survey (cf, pos, &k1->f, &m1, NULL, NULL);
 
