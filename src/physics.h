@@ -35,6 +35,10 @@ bool traversable_cs (enum confg t);
 bool arch_top_cs (enum confg t);
 bool is_door (struct pos *p);
 bool is_floor (struct pos *p);
+bool is_item_fg (struct pos *p);
+bool is_potion_ext (struct pos *p);
+bool is_potion (struct pos *p);
+bool is_sword (struct pos *p);
 struct pos *first_confg (struct pos *p0, struct pos *p1,
                          confg_set cs, struct pos *p);
 struct pos *next_pos_by_pred (struct pos *p, int dir,

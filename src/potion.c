@@ -272,20 +272,8 @@ draw_potion (ALLEGRO_BITMAP *bitmap, struct pos *p,
   draw_bitmapc (bubble, bitmap, &bubble_coord,
                 r ? ALLEGRO_FLIP_HORIZONTAL : 0);
   unseedp ();
-}
 
-bool
-is_potion (struct pos *p)
-{
-  return con (p)->fg == FLOOR
-    && (con (p)->ext.item == EMPTY_POTION
-        || con (p)->ext.item == SMALL_LIFE_POTION
-        || con (p)->ext.item == BIG_LIFE_POTION
-        || con (p)->ext.item == SMALL_POISON_POTION
-        || con (p)->ext.item == BIG_POISON_POTION
-        || con (p)->ext.item == FLOAT_POTION
-        || con (p)->ext.item == FLIP_POTION
-        || con (p)->ext.item == ACTIVATION_POTION);
+  draw_confg_fg (bitmap, p, em, vm, NULL);
 }
 
 struct coord *
@@ -294,7 +282,7 @@ small_potion_coord (struct pos *p, struct coord *c)
   return
     new_coord (c, p->l, p->room,
                PLACE_WIDTH * (p->place + 1) - 10,
-               PLACE_HEIGHT * p->floor + 49);
+               PLACE_HEIGHT * p->floor + 47);
 }
 
 struct coord *
@@ -303,7 +291,7 @@ small_potion_bubble_coord (struct pos *p, struct coord *c)
   return
     new_coord (c, p->l, p->room,
                PLACE_WIDTH * (p->place + 1) - 7,
-               PLACE_HEIGHT * p->floor + 40);
+               PLACE_HEIGHT * p->floor + 38);
 }
 
 struct coord *
@@ -312,7 +300,7 @@ big_potion_coord (struct pos *p, struct coord *c)
   return
     new_coord (c, p->l, p->room,
                PLACE_WIDTH * (p->place + 1) - 10,
-               PLACE_HEIGHT * p->floor + 45);
+               PLACE_HEIGHT * p->floor + 43);
 }
 
 struct coord *
@@ -321,7 +309,7 @@ big_potion_bubble_coord (struct pos *p, struct coord *c)
   return
     new_coord (c, p->l, p->room,
                PLACE_WIDTH * (p->place + 1) - 7,
-               PLACE_HEIGHT * p->floor + 36);
+               PLACE_HEIGHT * p->floor + 34);
 }
 
 ALLEGRO_COLOR

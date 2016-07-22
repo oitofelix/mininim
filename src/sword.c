@@ -208,13 +208,8 @@ draw_sword (ALLEGRO_BITMAP *bitmap, struct pos *p, enum vm vm)
   draw_bitmapc (sword, bitmap, sword_coord (p, &c),
                 prandom (1) ? ALLEGRO_FLIP_HORIZONTAL : 0);
   unseedp ();
-}
 
-bool
-is_sword (struct pos *p)
-{
-  return con (p)->fg == FLOOR
-    && con (p)->ext.item == SWORD;
+  draw_confg_fg (bitmap, p, em, vm, NULL);
 }
 
 struct coord *

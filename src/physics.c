@@ -133,6 +133,46 @@ is_floor (struct pos *p)
     || t == HIDDEN_FLOOR;
 }
 
+bool
+is_item_fg (struct pos *p)
+{
+  enum confg t = con (p)->fg;
+  return t == FLOOR
+    || t == BROKEN_FLOOR
+    || t == SKELETON_FLOOR
+    || t == STUCK_FLOOR
+    || t == HIDDEN_FLOOR
+    || t == PILLAR
+    || t == BIG_PILLAR_BOTTOM
+    || t == ARCH_BOTTOM;
+}
+
+bool
+is_potion_ext (struct pos *p)
+{
+  enum item t = con (p)->ext.item;
+  return t == EMPTY_POTION
+    || t == SMALL_LIFE_POTION
+    || t == BIG_LIFE_POTION
+    || t == SMALL_POISON_POTION
+    || t == BIG_POISON_POTION
+    || t == FLOAT_POTION
+    || t == FLIP_POTION
+    || t == ACTIVATION_POTION;
+}
+
+bool
+is_potion (struct pos *p)
+{
+  return is_item_fg (p) && is_potion_ext (p);
+}
+
+bool
+is_sword (struct pos *p)
+{
+  return is_item_fg (p) && con (p)->ext.item == SWORD;
+}
+
 struct pos *
 first_confg (struct pos *p0, struct pos *p1, confg_set cs, struct pos *p)
 {

@@ -581,7 +581,7 @@ compute_loose_floor_fall (struct loose_floor *l)
       && con (&p)->fg != OPENER_FLOOR
       && con (&p)->fg != CLOSER_FLOOR) {
     register_con_undo (&undo, &p,
-                       BROKEN_FLOOR, MIGNORE, MIGNORE,
+                       BROKEN_FLOOR, MIGNORE, NO_ITEM,
                        false, false, false, false,
                        CHPOS_BREAK_LOOSE_FLOOR,
                        "LOOSE FLOOR BREAKING");

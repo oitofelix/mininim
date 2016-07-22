@@ -580,7 +580,9 @@ editor (void)
     }
 
     switch (con (&p)->fg) {
-    case FLOOR:
+    case FLOOR: case BROKEN_FLOOR: case SKELETON_FLOOR:
+    case STUCK_FLOOR: case HIDDEN_FLOOR: case PILLAR:
+    case BIG_PILLAR_BOTTOM: case ARCH_BOTTOM:
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
       c = menu_enum (items_menu, "CE>");
       if (! c) break;
