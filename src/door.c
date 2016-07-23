@@ -355,6 +355,9 @@ open_door (struct level *l, int e, uint64_t priority, bool stay_open)
     case DOOR:
       d = door_at_pos (p);
       if (! d) continue;
+      if (d->action == STAY_OPEN_DOOR
+          || (d->action == NO_DOOR_ACTION && d->i == 0))
+          continue;
       if (d->priority <= priority) {
         d->action = stay_open ? STAY_OPEN_DOOR : OPEN_DOOR;
         d->wait = DOOR_WAIT;
