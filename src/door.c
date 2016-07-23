@@ -241,6 +241,7 @@ register_door (struct pos *p)
   d.action = NO_DOOR_ACTION;
   d.wait = DOOR_WAIT;
   d.noise = false;
+  d.priority = 0;
 
   door =
     add_to_array (&d, 1, door, &door_nmemb, door_nmemb, sizeof (d));
@@ -280,7 +281,10 @@ compute_doors (void)
     struct door *d = &door[i];
     switch (d->action) {
     case OPEN_DOOR:
-      if (d->i == 0 && d->wait == 0) d->action = CLOSE_DOOR;
+    case STAY_OPEN_DOOR:
+      if (d->i == 0 && d->wait == 0
+          && d->action != STAY_OPEN_DOOR)
+        d->action = CLOSE_DOOR;
       else if (d->i == 0 && d->wait > 0) {
         if (! d->noise) {
           play_sample (door_end_sample, &d->p, -1);
@@ -338,7 +342,7 @@ compute_doors (void)
 }
 
 void
-open_door (struct level *l, int e)
+open_door (struct level *l, int e, uint64_t priority, bool stay_open)
 {
   struct pos *p;
 
@@ -351,13 +355,19 @@ open_door (struct level *l, int e)
     case DOOR:
       d = door_at_pos (p);
       if (! d) continue;
-      d->action = OPEN_DOOR;
-      d->wait = DOOR_WAIT;
+      if (d->priority <= priority) {
+        d->action = stay_open ? STAY_OPEN_DOOR : OPEN_DOOR;
+        d->wait = DOOR_WAIT;
+        d->priority = priority;
+      }
       break;
     case LEVEL_DOOR:
       ld = level_door_at_pos (p);
       if (! ld) continue;
-      ld->action = OPEN_LEVEL_DOOR;
+      if (ld->priority <= priority) {
+        ld->action = OPEN_LEVEL_DOOR;
+        ld->priority = priority;
+      }
       break;
     default:
       activate_con (p);
@@ -367,7 +377,7 @@ open_door (struct level *l, int e)
 }
 
 void
-close_door (struct level *l, int e)
+close_door (struct level *l, int e, uint64_t priority)
 {
   struct pos *p;
 
@@ -380,12 +390,18 @@ close_door (struct level *l, int e)
     case DOOR:
       d = door_at_pos (p);
       if (! d) continue;
-      d->action = ABRUPTLY_CLOSE_DOOR;
+      if (d->priority <= priority) {
+        d->action = ABRUPTLY_CLOSE_DOOR;
+        d->priority = priority;
+      }
       break;
     case LEVEL_DOOR:
       ld = level_door_at_pos (p);
       if (! ld) continue;
-      ld->action = CLOSE_LEVEL_DOOR;
+      if (ld->priority <= priority) {
+        ld->action = CLOSE_LEVEL_DOOR;
+        ld->priority = priority;
+      }
       break;
     default:
       activate_con (p);

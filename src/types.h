@@ -534,16 +534,19 @@ struct closer_floor {
   bool noise;
   bool broken;
   bool unresponsive;
+  uint64_t priority;
 };
 
 struct door {
   struct pos p;
   int i;
   enum {
-    NO_DOOR_ACTION, OPEN_DOOR, CLOSE_DOOR, ABRUPTLY_CLOSE_DOOR,
+    NO_DOOR_ACTION, OPEN_DOOR, STAY_OPEN_DOOR,
+    CLOSE_DOOR, ABRUPTLY_CLOSE_DOOR,
   } action;
   int wait;
   bool noise;
+  uint64_t priority;
 };
 
 struct level_door {
@@ -554,6 +557,7 @@ struct level_door {
     NO_LEVEL_DOOR_ACTION, OPEN_LEVEL_DOOR, CLOSE_LEVEL_DOOR,
   } action;
   bool no_stairs;
+  uint64_t priority;
 };
 
 struct loose_floor {
@@ -586,6 +590,7 @@ struct opener_floor {
   bool prev_pressed;
   bool noise;
   bool broken;
+  uint64_t priority;
 };
 
 struct spikes_floor {

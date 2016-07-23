@@ -171,6 +171,7 @@ register_level_door (struct pos *p)
   d.i = (step < 0) ? -step - 1 : step;
   d.action = NO_LEVEL_DOOR_ACTION;
   d.no_stairs = peq (p, &p->l->start_pos);
+  d.priority = 0;
 
   level_door =
     add_to_array (&d, 1, level_door, &level_door_nmemb, level_door_nmemb, sizeof (d));

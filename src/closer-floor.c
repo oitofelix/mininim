@@ -130,6 +130,7 @@ register_closer_floor (struct pos *p)
   c.noise = (event < 0);
   c.broken = (event < 0);
   c.unresponsive = false;
+  c.priority = 0;
 
   closer_floor =
     add_to_array (&c, 1, closer_floor, &closer_floor_nmemb,
@@ -202,6 +203,7 @@ press_closer_floor (struct pos *p)
   if (! c->prev_pressed) {
     register_changed_pos (p, CHPOS_PRESS_CLOSER_FLOOR);
     c->prev_pressed = true;
+    c->priority = anim_cycle;
   }
 }
 
@@ -211,7 +213,7 @@ break_closer_floor (struct pos *p)
   struct closer_floor *c = closer_floor_at_pos (p);
   if (! c) return;
   c->broken = true;
-  c->pressed = true;
+  close_door (c->p.l, c->event, anim_cycle);
   register_con_undo
     (&undo, p,
      MIGNORE, MIGNORE, -abs (con (p)->ext.event) - 1,
@@ -250,13 +252,13 @@ compute_closer_floors (void)
 
   for (i = 0; i < closer_floor_nmemb; i++) {
     struct closer_floor *c = &closer_floor[i];
-    if (c->pressed && ! c->unresponsive) {
+    if (c->pressed && ! c->broken && ! c->unresponsive) {
       if (! c->noise) {
         alert_guards (&c->p);
         play_sample (closer_floor_sample, &c->p, -1);
         c->noise = true;
       }
-      close_door (c->p.l, c->event);
+      close_door (c->p.l, c->event, c->priority);
     } else c->noise = false;
   }
 }

@@ -129,6 +129,7 @@ register_opener_floor (struct pos *p)
   o.pressed = (event < 0);
   o.noise = (event < 0);
   o.broken = (event < 0);
+  o.priority = 0;
 
   opener_floor =
     add_to_array (&o, 1, opener_floor, &opener_floor_nmemb,
@@ -195,11 +196,13 @@ press_opener_floor (struct pos *p)
 {
   struct opener_floor *o = opener_floor_at_pos (p);
   if (! o) return;
+  if (o->broken) return;
   o->pressed = true;
 
   if (! o->prev_pressed) {
      register_changed_pos (p, CHPOS_PRESS_OPENER_FLOOR);
      o->prev_pressed = true;
+     o->priority = anim_cycle;
   }
 }
 
@@ -209,6 +212,7 @@ break_opener_floor (struct pos *p)
   struct opener_floor *o = opener_floor_at_pos (p);
   if (! o) return;
   o->broken = true;
+  open_door (o->p.l, o->event, anim_cycle, true);
   register_con_undo
     (&undo, p,
      MIGNORE, MIGNORE, -abs (con (p)->ext.event) - 1,
@@ -246,13 +250,13 @@ compute_opener_floors (void)
 
   for (i = 0; i < opener_floor_nmemb; i++) {
     struct opener_floor *o = &opener_floor[i];
-    if (o->pressed || o->broken) {
+    if (o->pressed && ! o->broken) {
       if (! o->noise) {
         alert_guards (&o->p);
         play_sample (opener_floor_sample, &o->p, -1);
         o->noise = true;
       }
-      open_door (o->p.l, o->event);
+      open_door (o->p.l, o->event, o->priority, false);
     } else o->noise = false;
   }
 }
