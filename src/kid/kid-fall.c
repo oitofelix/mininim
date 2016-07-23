@@ -121,9 +121,10 @@ physics_in (struct anim *k)
   } else if (k->oaction == kid_run_jump && k->j == 10) {
     k->fo.dx = -8;
     k->fo.dy = +4;
-  } else if (k->oaction == kid_turn_run)
-    k->fo.dx = +20;
-  else if (k->oaction == kid_couch && k->collision) {
+  } else if (k->oaction == kid_turn_run) {
+    if (k->float_timer) k->f.c.x -= dir * 24;
+    else k->fo.dx = +20;
+  } else if (k->oaction == kid_couch && k->collision) {
     k->collision = false;
     k->f.c.x += dir * 16;
   } else if (k->i == 0
@@ -148,8 +149,8 @@ physics_in (struct anim *k)
   /* floating */
   if (k->float_timer) {
     if (k->float_timer < SEC2CYC (16)) {
-      k->fo.dx = -1;
-      k->fo.dy = +3;
+      k->fo.dx = -2;
+      k->fo.dy = +5;
     } else {
       k->float_timer = 0;
       k->i = (k->i > 4) ? 4 : k->i;
