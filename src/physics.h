@@ -35,6 +35,7 @@ bool traversable_cs (enum confg t);
 bool arch_top_cs (enum confg t);
 bool is_door (struct pos *p);
 bool is_floor (struct pos *p);
+bool is_floor_like (struct pos *p);
 bool is_item_fg (struct pos *p);
 bool is_potion_ext (struct pos *p);
 bool is_potion (struct pos *p);

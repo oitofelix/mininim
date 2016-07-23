@@ -121,8 +121,7 @@ bool
 is_floor (struct pos *p)
 {
   enum confg t = con (p)->fg;
-  return t == NO_FLOOR
-    || t == FLOOR
+  return t == FLOOR
     || t == BROKEN_FLOOR
     || t == SKELETON_FLOOR
     || t == LOOSE_FLOOR
@@ -131,6 +130,21 @@ is_floor (struct pos *p)
     || t == CLOSER_FLOOR
     || t == STUCK_FLOOR
     || t == HIDDEN_FLOOR;
+}
+
+bool
+is_floor_like (struct pos *p)
+{
+  enum confg t = con (p)->fg;
+  return is_floor (p)
+    || t == PILLAR
+    || t == BIG_PILLAR_BOTTOM
+    || t == DOOR
+    || t == LEVEL_DOOR
+    || t == CHOPPER
+    || t == MIRROR
+    || t == CARPET
+    || t == ARCH_BOTTOM;
 }
 
 bool
@@ -434,6 +448,7 @@ decorate_pos (struct pos *p)
   if (c->bg != WINDOW
       && c->bg != BALCONY) {
     if (is_floor (p)
+        || c->fg == NO_FLOOR
         || c->fg == CHOPPER
         || c->fg == MIRROR
         || c->fg == ARCH_BOTTOM) {
