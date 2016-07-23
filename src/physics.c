@@ -247,11 +247,11 @@ bool
 is_event_at_pos (struct pos *p, void *data)
 {
   int *event = (int *) data;
+  enum confg t = con (p)->fg;
+  int e = con (p)->ext.event;
 
-  return
-    (con (p)->fg == OPENER_FLOOR
-     || con (p)->fg == CLOSER_FLOOR)
-    && con (p)->ext.event == *event;
+  return (t == OPENER_FLOOR || t == CLOSER_FLOOR)
+    && (e == *event || e == -*event - 1);
 }
 
 int
