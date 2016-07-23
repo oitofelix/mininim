@@ -1123,6 +1123,7 @@ get_legacy_skill (int i, struct skill *skill)
 static enum ltile
 get_tile (struct pos *p)
 {
+  if (! is_valid_pos (p)) return LT_NULL;
   struct pos np; npos (p, &np);
   return lv.foretable[np.room - 1][np.floor][np.place] & 0x1F;
 }
