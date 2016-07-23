@@ -1212,7 +1212,8 @@ multi_room_fit_stretch (void)
 {
   int w = 1;
   int h = 1;
-  int lc, c = 1;
+  int lc = 1, c = 1;
+  int wc = 1, hc = 1;
 
  repeat:
   do {
@@ -1226,7 +1227,8 @@ multi_room_fit_stretch (void)
   redim_multi_room (--w, h);
   mr_center_room (mr.room);
 
-  int wc = c;
+  if (c < hc) return;
+  wc = c;
 
   do {
     lc = c;
@@ -1239,7 +1241,9 @@ multi_room_fit_stretch (void)
   redim_multi_room (w, --h);
   mr_center_room (mr.room);
 
-  if (c > wc) goto repeat;
+  hc = c;
+
+  if (hc > wc) goto repeat;
 }
 
 void

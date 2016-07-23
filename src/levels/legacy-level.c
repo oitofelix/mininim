@@ -730,9 +730,6 @@ interpret_legacy_level (int number)
     legacy_level.link[p.room].b = lv.link[p.room - 1][LD_BELOW];
   }
 
-  /* enable npos to be used from now on */
-  memcpy (&global_level.link, &legacy_level.link, sizeof (global_level.link));
-
   /* FORETABLE and BACKTABLE: ok */
   for (p.room = 1; p.room <= LROOMS; p.room++)
     for (p.floor = 0; p.floor < FLOORS; p.floor++)
