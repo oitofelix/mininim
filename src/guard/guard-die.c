@@ -306,18 +306,10 @@ guard_die_spiked (struct anim *g)
       play_sample (skeleton_sample, NULL, g->id);
     else play_sample (spiked_sample, NULL, g->id);
 
-    struct anim *ke = get_anim_by_id (g->enemy_id);
-    if (! ke) ke = get_anim_by_id (g->oenemy_id);
-    if (ke && ke->id == current_kid_id
-        && ! g->glory_sample
-        && g->death_reason != SHADOW_FIGHT_DEATH) {
-      play_sample (glory_sample, NULL, ke->id);
+    if (! g->glory_sample) {
+      play_sample (glory_sample, NULL, g->id);
       g->glory_sample = true;
     }
-
-    g->oenemy_id = -1;
-
-    if (ke) upgrade_skill (&ke->skill, &g->skill);
   }
 
   g->current_lives = 0;
@@ -368,19 +360,10 @@ guard_die_chopped (struct anim *g)
   ALLEGRO_BITMAP *bitmap = get_guard_die_chopped_bitmap (g->type);
   place_frame (&g->f, &g->f, bitmap, &g->p, dx, dy);
 
-  if (g->oaction != guard_die_chopped) {
-    struct anim *ke = get_anim_by_id (g->enemy_id);
-    if (! ke) ke = get_anim_by_id (g->oenemy_id);
-    if (ke && ke->id == current_kid_id
-        && ! g->glory_sample
-        && g->death_reason != SHADOW_FIGHT_DEATH) {
-      play_sample (glory_sample, NULL, ke->id);
-      g->glory_sample = true;
-    }
-
-    g->oenemy_id = -1;
-
-    if (ke) upgrade_skill (&ke->skill, &g->skill);
+  if (g->oaction != guard_die_chopped
+      && ! g->glory_sample) {
+    play_sample (glory_sample, NULL, g->id);
+    g->glory_sample = true;
   }
 
   g->current_lives = 0;
@@ -408,19 +391,10 @@ guard_die_suddenly (struct anim *g)
                &g->p, (g->f.dir == LEFT)
                ? +9 : +4, dy);
 
-  if (g->oaction != guard_die_suddenly) {
-    struct anim *ke = get_anim_by_id (g->enemy_id);
-    if (! ke) ke = get_anim_by_id (g->oenemy_id);
-    if (ke && ke->id == current_kid_id
-        && ! g->glory_sample
-        && g->death_reason != SHADOW_FIGHT_DEATH) {
-      play_sample (glory_sample, NULL, ke->id);
-      g->glory_sample = true;
-    }
-
-    g->oenemy_id = -1;
-
-    if (ke) upgrade_skill (&ke->skill, &g->skill);
+  if (g->oaction != guard_die_suddenly
+      && ! g->glory_sample) {
+    play_sample (glory_sample, NULL, g->id);
+    g->glory_sample = true;
   }
 
   g->current_lives = 0;
@@ -464,18 +438,10 @@ flow (struct anim *g)
     if (g->type == SKELETON)
       play_sample (skeleton_sample, NULL, g->id);
 
-    struct anim *ke = get_anim_by_id (g->enemy_id);
-    if (! ke) ke = get_anim_by_id (g->oenemy_id);
-    if (ke && ke->id == current_kid_id
-        && ! g->glory_sample
-        && g->death_reason != SHADOW_FIGHT_DEATH) {
-      play_sample (glory_sample, NULL, ke->id);
+    if (! g->glory_sample) {
+      play_sample (glory_sample, NULL, g->id);
       g->glory_sample = true;
     }
-
-    g->oenemy_id = -1;
-
-    if (ke) upgrade_skill (&ke->skill, &g->skill);
 
     g->xf.b = NULL;
   }

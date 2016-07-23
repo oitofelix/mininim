@@ -439,6 +439,7 @@ legacy_level_special_events (void)
       ks->total_lives = k->total_lives;
       ks->action = guard_normal;
       ks->f.dir = RIGHT;
+      ks->glory_sample = true;
       get_legacy_skill (3, &ks->skill);
       guard_fall (ks);
       struct frameset *frameset = get_guard_fall_frameset (ks->type);

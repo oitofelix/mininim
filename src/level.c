@@ -310,6 +310,7 @@ register_anims (void)
     a->total_lives = g->total_lives + g->skill.extra_life;
     a->current_lives = g->total_lives;
     a->style = g->style;
+    if (a->total_lives == 0) a->glory_sample = true;
   }
 }
 

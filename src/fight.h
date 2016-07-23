@@ -67,6 +67,7 @@ bool fight_door_split_collision (struct anim *a);
 void alert_guards (struct pos *p);
 
 struct skill *get_perfect_skill (struct skill *fp);
-struct skill *upgrade_skill (struct skill *s0, struct skill *s1);
+struct skill *upgrade_skill (struct skill *s0, struct skill *s1,
+                             int total_lives);
 
 #endif	/* MININIM_FIGHT_H */

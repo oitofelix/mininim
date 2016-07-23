@@ -52,10 +52,6 @@ leave_fight_logic (struct anim *k)
   /* non-fightable characters don't fight */
   if (! is_fightable_anim (k)) return;
 
-  /* controllables don't forget, they let this to the
-     non-controllable */
-  if (k->controllable) return;
-
   /* no enemy, no need to forget */
   if (k->enemy_id == -1) return;
 
@@ -269,7 +265,8 @@ fight_ai (struct anim *k)
           || ! (is_kid_run (&ke->f)
                 || is_kid_run_jump (&ke->f)
                 || is_kid_jump (&ke->f)))
-      && is_safe_to_follow (k, ke, k->f.dir)) {
+      && is_safe_to_follow (k, ke, k->f.dir)
+      && k->enemy_refraction < 0) {
     fight_walkf (k);
     return;
   }
@@ -446,20 +443,14 @@ consider_enemy (struct anim *k0, struct anim *k1)
 void
 forget_enemy (struct anim *k)
 {
-  if (k->enemy_refraction > 0) return;
-  else if (k->enemy_refraction < 0) {
-    k->enemy_refraction = ENEMY_REFRACTION_TIME;
-    return;
+  if (is_guard (k)) {
+    if (k->enemy_refraction > 0) return;
+    else if (k->enemy_refraction < 0) {
+      k->enemy_refraction = ENEMY_REFRACTION_TIME;
+      return;
+    }
   }
 
-  struct anim *ke = get_anim_by_id (k->enemy_id);
-  if (ke) {
-    ke->oenemy_id = ke->enemy_id;
-    ke->enemy_id = -1;
-    ke->enemy_aware = false;
-
-    k->oenemy_id = k->enemy_id;
-  }
   k->enemy_id = -1;
   k->enemy_aware = false;
 }
@@ -1074,6 +1065,9 @@ fight_hit (struct anim *k, struct anim *ke)
   if (! is_in_fight_mode (k)) k->current_lives = 0;
   else k->current_lives--;
 
+  if (! is_guard (ke))
+    upgrade_skill (&ke->skill, &k->skill, k->total_lives);
+
   int d = (k->f.dir == LEFT) ? +1 : -1;
   struct pos pb;
   survey (_m, pos, &k->f, NULL, &k->p, NULL);
@@ -1101,7 +1095,6 @@ fight_hit (struct anim *k, struct anim *ke)
 
   if (! is_anim_fall (&k->f)) {
     if (k->current_lives <= 0) {
-      /* forget_enemy (ke); */
       k->current_lives = 0;
       k->death_reason = FIGHT_DEATH;
       ke->alert_cycle = anim_cycle;
@@ -1163,20 +1156,18 @@ get_perfect_skill (struct skill *skill)
 }
 
 struct skill *
-upgrade_skill (struct skill *s0, struct skill *s1)
+upgrade_skill (struct skill *s0, struct skill *s1, int total_lives)
 {
   int ca = (s1->attack_prob + s1->counter_attack_prob) / 2;
   int cd = (s1->defense_prob + s1->counter_defense_prob) / 2;
 
   if (s0->counter_attack_prob < ca)
-    s0->counter_attack_prob = (s0->counter_attack_prob + ca) / 2;
-  else if (s0->counter_attack_prob < 99)
-    s0->counter_attack_prob += 1;
+    s0->counter_attack_prob +=
+      (ca - s0->counter_attack_prob) / (2 * total_lives);
 
   if (s0->counter_defense_prob < cd)
-    s0->counter_defense_prob = (s0->counter_defense_prob + cd) / 2;
-  else if (s0->counter_defense_prob < 99)
-    s0->counter_defense_prob += 1;
+    s0->counter_defense_prob +=
+      (cd - s0->counter_defense_prob) / (2 * total_lives);
 
   return s0;
 }
