@@ -163,6 +163,9 @@ fight_ai (struct anim *k)
   /* controllables and non-fighters doesn't need AI to fight */
   if (k->controllable || ! k->fight) return;
 
+  /* if forgetting about an enemy, no need to fight */
+  if (k->enemy_refraction > 0) return;
+
   /* without an enemy or awareness, no need to fight */
   if (k->enemy_id == -1 || ! k->enemy_aware) {
     if (is_in_fight_mode (k)) leave_fight_mode (k);
@@ -265,8 +268,7 @@ fight_ai (struct anim *k)
           || ! (is_kid_run (&ke->f)
                 || is_kid_run_jump (&ke->f)
                 || is_kid_jump (&ke->f)))
-      && is_safe_to_follow (k, ke, k->f.dir)
-      && k->enemy_refraction < 0) {
+      && is_safe_to_follow (k, ke, k->f.dir)) {
     fight_walkf (k);
     return;
   }
