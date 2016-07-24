@@ -684,7 +684,7 @@ update_cache_pos (struct pos *p, enum changed_pos_reason reason,
     for (y = mr.h - 1; y >= 0; y--)
       for (x = 0; x < mr.w; x++)
         if (mr.cell[x][y].room == q.room)
-          for (q.floor = 0; q.floor <= FLOORS; q.floor++)
+          for (q.floor = FLOORS; q.floor >= -1; q.floor--)
             for (q.place = -1; q.place < PLACES; q.place++)
               if (peq (&q, p)) {
                 struct pos p0; p0 = q;
