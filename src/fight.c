@@ -445,12 +445,10 @@ consider_enemy (struct anim *k0, struct anim *k1)
 void
 forget_enemy (struct anim *k)
 {
-  if (is_guard (k)) {
-    if (k->enemy_refraction > 0) return;
-    else if (k->enemy_refraction < 0) {
-      k->enemy_refraction = ENEMY_REFRACTION_TIME;
-      return;
-    }
+  if (k->enemy_refraction > 0) return;
+  else if (k->enemy_refraction < 0) {
+    k->enemy_refraction = ENEMY_REFRACTION_TIME;
+    return;
   }
 
   k->enemy_id = -1;
