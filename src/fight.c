@@ -1069,6 +1069,7 @@ fight_hit (struct anim *k, struct anim *ke)
   int d = (k->f.dir == LEFT) ? +1 : -1;
   struct pos pb;
   survey (_m, pos, &k->f, NULL, &k->p, NULL);
+  prel (&k->p, &pb, 0, d);
 
   /* ensure anim doesn't die within a wall */
   if (con (&k->p)->fg == WALL) {
@@ -1076,12 +1077,9 @@ fight_hit (struct anim *k, struct anim *ke)
     else if (crel (&k->p, +0, -1)->fg != WALL) k->p.place--;
   }
 
-  prel (&k->p, &pb, 0, d);
-  /* pb = k->p; */
-
   if (! is_colliding (&k->f, &k->fo, +PLACE_WIDTH,
                       ke->f.dir != k->f.dir, &k->ci)) {
-    if (is_strictly_traversable (&pb)) {
+    if (k->current_lives <= 0 && is_strictly_traversable (&pb)) {
       place_at_pos (&k->f, _m, &pb, &k->f.c);
       anim_fall (k);
     } else if (is_in_range (ke, k, PLACE_WIDTH))
