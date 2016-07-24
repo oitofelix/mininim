@@ -387,7 +387,6 @@ struct anim {
   int sword_immune;
 
   int enemy_id;
-  bool enemy_aware;
   int enemy_refraction;
 
   bool dont_draw_lives;

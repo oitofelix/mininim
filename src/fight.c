@@ -112,8 +112,8 @@ enter_fight_logic (struct anim *k)
   if (! is_fightable_anim (k)) return;
 
   /* has an enemy, no need to get another */
-  if (k->enemy_id != -1 && k->enemy_aware
-      && k->enemy_refraction < 0) return;
+  if (k->enemy_id != -1 && k->enemy_refraction < 0)
+    return;
 
   /* dead character doesn't fight */
   if (k->current_lives <= 0) return;
@@ -167,7 +167,7 @@ fight_ai (struct anim *k)
   if (k->enemy_refraction > 0) return;
 
   /* without an enemy or awareness, no need to fight */
-  if (k->enemy_id == -1 || ! k->enemy_aware) {
+  if (k->enemy_id == -1) {
     if (is_in_fight_mode (k)) leave_fight_mode (k);
     return;
   }
@@ -438,7 +438,6 @@ void
 consider_enemy (struct anim *k0, struct anim *k1)
 {
   k0->enemy_id = k1->id;
-  k0->enemy_aware = true;
   k0->enemy_refraction = -1;
 }
 
@@ -452,7 +451,6 @@ forget_enemy (struct anim *k)
   }
 
   k->enemy_id = -1;
-  k->enemy_aware = false;
 }
 
 void

@@ -943,7 +943,8 @@ draw_lives (ALLEGRO_BITMAP *bitmap, struct anim *k, enum vm vm)
     struct anim *ke = NULL;
     if (k->enemy_id != -1) {
       ke = get_anim_by_id (k->enemy_id);
-      if (ke) draw_guard_lives (bitmap, ke, vm);
+      if (ke && ke->enemy_id == k->id)
+        draw_guard_lives (bitmap, ke, vm);
     }
   }
 
