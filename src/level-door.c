@@ -264,6 +264,7 @@ get_exit_level_door (struct level *l, int n)
   for (i = 0; i < level_door_nmemb; i++) {
     struct level_door *d = &level_door[i];
     if (! peq (&d->p, &l->start_pos)
+        && d->i == 0
         && n-- == 0) return d;
   }
   return NULL;

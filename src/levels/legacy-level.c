@@ -24,7 +24,6 @@ static int level_3_checkpoint;
 static int shadow_id;
 static int skeleton_id;
 static bool played_sample;
-static struct level_door *exit_level_door;
 static uint64_t mouse_timer;
 static int mouse_id;
 static bool coming_from_12;
@@ -64,7 +63,6 @@ legacy_level_start (void)
   shadow_id = mouse_id = skeleton_id = -1;
   stop_all_samples ();
   mouse_timer = 0;
-  exit_level_door = get_exit_level_door (&global_level, 0);
   anti_camera_room = -1;
   shadow_merged = false;
   met_jaffar = false;
@@ -195,11 +193,10 @@ legacy_level_special_events (void)
     struct pos skeleton_floor_pos;
     new_pos (&skeleton_floor_pos, &global_level, 1, 1, 5);
     survey (_m, pos, &k->f, NULL, &pm, NULL);
-    if (exit_level_door
-        && exit_level_door->i == 0
-        && pm.room == 1
+    if (pm.room == 1
         && (pm.place == 2 || pm.place == 3)
-        && con (&skeleton_floor_pos)->fg == SKELETON_FLOOR) {
+        && con (&skeleton_floor_pos)->fg == SKELETON_FLOOR
+        && get_exit_level_door (&global_level, 0)) {
       register_con_undo (&undo, &skeleton_floor_pos,
                          FLOOR, MIGNORE, MIGNORE,
                          true, true, false, true,
@@ -237,10 +234,9 @@ legacy_level_special_events (void)
 
     /* if the level door is open and the camera is on room 4, make
        the mirror appear */
-    if (exit_level_door
-        && exit_level_door->i == 0
-        && is_pos_visible (&mirror_pos)
-        && con (&mirror_pos)->fg != MIRROR) {
+    if (is_pos_visible (&mirror_pos)
+        && con (&mirror_pos)->fg != MIRROR
+        && get_exit_level_door (&global_level, 0)) {
       register_con_undo (&undo, &mirror_pos,
                          MIRROR, MIGNORE, MIGNORE,
                          true, true, true, true,
@@ -389,8 +385,8 @@ legacy_level_special_events (void)
     /* if the exit level door is open and the kid is at room 16,
        start counting (or continue if started already) for the mouse
        arrival */
-    if (exit_level_door && exit_level_door->i == 0 &&
-        k->f.c.room == 16 && mouse_timer <= 138) mouse_timer++;
+    if (k->f.c.room == 16 && mouse_timer <= 138
+        && get_exit_level_door (&global_level, 0)) mouse_timer++;
 
     /* if enough cycles have passed since the start of the countdown
        and the camera is at room 16, make the mouse appear */
