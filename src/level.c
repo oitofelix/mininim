@@ -37,7 +37,6 @@ static bool ignore_level_cutscene;
 
 bool no_room_drawing, game_paused, step_one_cycle;
 int retry_level = -1;
-int anti_camera_room;
 int camera_follow_kid;
 int auto_rem_time_1st_cycle = 24;
 
@@ -388,7 +387,6 @@ compute_level (void)
 
   if (current_kid->f.c.room != prev_room
       && current_kid->f.c.room != 0
-      && current_kid->f.c.room != anti_camera_room
       && camera_follow_kid == current_kid->id)  {
     if (! is_room_visible (current_kid->f.c.room)) {
       mr_coord (current_kid->f.c.prev_room,
@@ -402,7 +400,6 @@ compute_level (void)
   if (mr.w > 1
       && current_kid->current_lives > 0
       && current_kid->f.c.room != 0
-      && current_kid->f.c.room != anti_camera_room
       && camera_follow_kid == current_kid->id
       && (ke = get_anim_by_id (current_kid->enemy_id))
       && ! is_room_visible (ke->f.c.room)) {

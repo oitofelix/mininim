@@ -63,7 +63,6 @@ legacy_level_start (void)
   shadow_id = mouse_id = skeleton_id = -1;
   stop_all_samples ();
   mouse_timer = 0;
-  anti_camera_room = -1;
   shadow_merged = false;
   met_jaffar = false;
   played_vizier_death_sample = false;
@@ -327,7 +326,6 @@ legacy_level_special_events (void)
   /* in the sixth level */
   if (global_level.number == 6) {
     struct anim *ks;
-    anti_camera_room = roomd (&global_level, 1, BELOW);
 
     /* create kid's shadow to wait for kid at room 1 */
     if (shadow_id == -1) {
@@ -368,6 +366,7 @@ legacy_level_special_events (void)
     /* when kid falls from room 1 to the room below it, quit to the
        next level */
     if (k->f.c.room == roomd (&global_level, 1, BELOW)
+        && k->f.c.prev_room == 1
         && k->f.c.xd == BELOW) {
       total_lives = k->total_lives;
       current_lives = k->current_lives;
@@ -410,7 +409,6 @@ legacy_level_special_events (void)
     struct pos sword_pos; new_pos (&sword_pos, &global_level, 15, 0, 1);
     struct pos first_hidden_floor_pos;
     new_pos (&first_hidden_floor_pos, &global_level, 2, 0, 7);
-    anti_camera_room = 23;
     struct anim *ks = NULL;
 
     /* make the sword in room 15 disappear (kid's shadow has it) when
@@ -624,8 +622,6 @@ legacy_level_special_events (void)
 
   /* in the fourteenth level */
   if (global_level.number == 14) {
-    anti_camera_room = 5;
-
     /* when the kid enters room 5, go to the next level */
     if (k->f.c.room == 5) {
       total_lives = k->total_lives;
