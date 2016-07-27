@@ -238,6 +238,7 @@ guard_resurrect (struct anim *g)
   g->current_lives = g->total_lives;
   g->death_reason = NO_DEATH;
   g->action = guard_normal;
+  g->glory_sample = false;
   place_frame (&g->f, &g->f, get_guard_normal_bitmap (g->type),
                &pm, g->f.dir == LEFT ? +16 : +22, +14);
   place_on_the_ground (&g->f, &g->f.c);

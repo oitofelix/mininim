@@ -106,6 +106,13 @@ flow (struct anim *k)
       kid_sword_walkb (k);
       return false;
     }
+
+    /* no space for fight */
+    if (dist_collision (&k->f, false, &k->ci) <= PLACE_WIDTH
+        && dist_collision (&k->f, true, &k->ci) <= PLACE_WIDTH) {
+      kid_keep_sword (k);
+      return false;
+    }
   }
 
   k->fo.b = kid_sword_normal_00;

@@ -257,6 +257,14 @@ flow (struct anim *g)
       guard_defense (g);
       return false;
     }
+
+    /* no space for fight */
+    if (g->i == 2
+        && dist_collision (&g->f, false, &g->ci) <= PLACE_WIDTH
+        && dist_collision (&g->f, true, &g->ci) <= PLACE_WIDTH) {
+      guard_normal (g);
+      return false;
+    }
   }
 
   struct frameset *frameset = get_guard_vigilant_frameset (g->type);

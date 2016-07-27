@@ -119,6 +119,8 @@ flow (struct anim *g)
 
   if (g->oaction == guard_normal
       && vigilant
+      && (dist_collision (&g->f, false, &g->ci) > PLACE_WIDTH
+          || dist_collision (&g->f, true, &g->ci) > PLACE_WIDTH)
       && anim_cycle > 0) {
     guard_vigilant (g);
     return false;

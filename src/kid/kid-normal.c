@@ -158,6 +158,8 @@ flow (struct anim *k)
   if (k->f.b == kid_drink_frameset[7].frame) k->fo.dx = +0;
   if (k->f.b == kid_keep_sword_frameset[9].frame) k->fo.dx = +2;
 
+  k->xf.b = NULL;
+
   return true;
 }
 

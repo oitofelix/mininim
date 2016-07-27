@@ -621,6 +621,7 @@ put_at_defense_frame (struct anim *k)
     } else select_xframe (&k->xf, sword_frameset, 14);
 
     k->action = kid_sword_defense;
+    uncollide (&k->f, &k->fo, &k->fo, +0, true, &k->ci);
     next_frame (&k->f, &k->f, &k->fo);
     break;
   case GUARD:
@@ -632,6 +633,7 @@ put_at_defense_frame (struct anim *k)
     select_frame (k, frameset, 0);
     select_xframe (&k->xf, sword_frameset, 11);
     k->action = guard_defense;
+    uncollide (&k->f, &k->fo, &k->fo, +0, true, &k->ci);
     next_frame (&k->f, &k->f, &k->fo);
     break;
   }
@@ -664,6 +666,7 @@ put_at_attack_frame (struct anim *k)
     select_xframe (&k->xf, sword_frameset, 17);
     k->xf.dx = -21;
     k->xf.dy = +11;
+    uncollide (&k->f, &k->fo, &k->fo, +8, false, &k->ci);
     next_frame (&k->f, &k->f, &k->fo);
     break;
   case GUARD:
@@ -678,10 +681,10 @@ put_at_attack_frame (struct anim *k)
     select_xframe (&k->xf, sword_frameset, 8);
     k->xf.dx = -13;
     k->xf.dy = -14;
+    uncollide (&k->f, &k->fo, &k->fo, +8, false, &k->ci);
     next_frame (&k->f, &k->f, &k->fo);
     break;
   }
-
 }
 
 bool
