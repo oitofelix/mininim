@@ -584,7 +584,7 @@ draw_animated_foreground (ALLEGRO_BITMAP *bitmap, int room)
   for (p.floor = FLOORS; p.floor >= -1; p.floor--)
     for (p.place = -1; p.place < PLACES; p.place++) {
       draw_potion (bitmap, &p, em, vm);
-      if (is_sword (&p)) draw_sword (bitmap, &p, vm);
+      if (is_sword (&p)) draw_sword (bitmap, &p, vm, false);
     }
 
   /* editor graphics */

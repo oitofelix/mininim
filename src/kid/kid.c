@@ -227,7 +227,7 @@ draw_start_kid (ALLEGRO_BITMAP *bitmap, enum vm vm)
   draw_frame (bitmap, &f);
 
   /* sword */
-  if (global_level.has_sword) draw_sword (bitmap, &global_level.start_pos, vm);
+  if (global_level.has_sword) draw_sword (bitmap, &global_level.start_pos, vm, true);
 }
 
 ALLEGRO_COLOR

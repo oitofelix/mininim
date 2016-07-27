@@ -170,7 +170,7 @@ init_sword_frameset (void)
 }
 
 void
-draw_sword (ALLEGRO_BITMAP *bitmap, struct pos *p, enum vm vm)
+draw_sword (ALLEGRO_BITMAP *bitmap, struct pos *p, enum vm vm, bool start_pos)
 {
   ALLEGRO_BITMAP *normal_sword = NULL,
     *shiny_sword = NULL;
@@ -196,20 +196,19 @@ draw_sword (ALLEGRO_BITMAP *bitmap, struct pos *p, enum vm vm)
     shiny_sword = apply_palette (shiny_sword, hgc_palette);
   }
 
-  if (edit == EDIT_KID && peq (p, &p->l->start_pos)) {
+  if (start_pos) {
     normal_sword = apply_palette (normal_sword, start_anim_palette);
     shiny_sword = apply_palette (shiny_sword, start_anim_palette);
   }
 
   struct coord c;
-  /* if (! is_sword (p)) return; */
   ALLEGRO_BITMAP *sword = anim_cycle % 60 ? normal_sword : shiny_sword;
   seedp (p);
   draw_bitmapc (sword, bitmap, sword_coord (p, &c),
                 prandom (1) ? ALLEGRO_FLIP_HORIZONTAL : 0);
   unseedp ();
 
-  draw_confg_fg (bitmap, p, em, vm, NULL);
+  if (! start_pos) draw_confg_fg (bitmap, p, em, vm, NULL);
 }
 
 struct coord *
