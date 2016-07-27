@@ -145,7 +145,7 @@ draw_stars (ALLEGRO_BITMAP *bitmap, struct stars *stars, enum vm vm)
 {
   if (! stars->count) return;
 
-  if (anim_cycle % 4 || game_paused) {
+  if (anim_cycle % 4 || is_game_paused ()) {
     draw_bitmapc (stars->b, bitmap, &stars->c, 0);
     return;
   }

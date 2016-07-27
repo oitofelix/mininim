@@ -347,7 +347,7 @@ compute_level (void)
 
   process_keys ();
 
-  if (game_paused) return;
+  if (is_game_paused ()) return;
 
   /* this condition is necessary to honor any floor press the start
      level function might have */
@@ -620,11 +620,11 @@ process_keys (void)
 
   if (was_key_pressed (ALLEGRO_KEY_ESCAPE, 0, 0, true)
       || was_button_pressed (joystick_pause_button, true)) {
-    if (game_paused) {
+    if (is_game_paused ()) {
       step_one_cycle = true;
       game_paused = false;
     } else pause_game ();
-  } else if (game_paused
+  } else if (is_game_paused ()
              && (! active_menu || ! was_menu_key_pressed ())
              && (key.keyboard.keycode || button != -1)
              && ! save_game_dialog_thread)
@@ -829,7 +829,7 @@ process_keys (void)
   /* Restart level after death */
   struct anim *k = get_anim_by_id (0);
   if (k->current_lives <= 0
-      && ! game_paused) {
+      && ! is_game_paused ()) {
     death_timer++;
 
     if (death_timer == 12) {
@@ -862,7 +862,7 @@ process_keys (void)
           && ! was_menu_key_pressed ())
         quit_anim = RESTART_LEVEL;
     }
-  } else if (death_timer && ! game_paused) {
+  } else if (death_timer && ! is_game_paused ()) {
     death_timer = 0;
     draw_bottom_text (NULL, NULL, -2);
   }
@@ -896,7 +896,7 @@ draw_level (void)
   }
   if (rem_time <= 0) quit_anim = OUT_OF_TIME;
 
-  if (game_paused && ! active_menu)
+  if (is_game_paused () && ! active_menu)
     draw_bottom_text (NULL, "GAME PAUSED", -1);
 }
 
@@ -966,6 +966,12 @@ unpause_game (void)
   draw_bottom_text (NULL, NULL, 0);
   memset (&key, 0, sizeof (key));
   button = -1;
+}
+
+bool
+is_game_paused (void)
+{
+  return anim_cycle > 0 && game_paused;
 }
 
 /************************************/

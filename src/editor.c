@@ -1470,7 +1470,7 @@ exit_editor (void)
   reset_menu ();
   set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
   if (is_fullscreen ()) hide_mouse_cursor ();
-  if (game_paused)
+  if (is_game_paused ())
     draw_bottom_text (NULL, "GAME PAUSED", 0);
   else draw_bottom_text (NULL, NULL, 0);
 }
@@ -1656,5 +1656,5 @@ ui_place_kid (struct pos *p)
   place_frame (&k->f, &k->f, kid_normal_00, p,
                k->f.dir == LEFT ? +22 : +28, +15);
   kid_normal (k);
-  if (! game_paused) update_depressible_floor (k, -4, -10);
+  if (! is_game_paused ()) update_depressible_floor (k, -4, -10);
 }

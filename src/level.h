@@ -47,6 +47,7 @@ void display_remaining_time (void);
 void display_skill (struct anim *k);
 void pause_game (void);
 void unpause_game (void);
+bool is_game_paused (void);
 
 /* not used */
 void apply_to_diff_pos (struct diff *d, void (*func) (struct pos *p));

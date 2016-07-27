@@ -53,6 +53,7 @@ play_anim (void (*draw_callback) (void),
   al_register_event_source (event_queue, get_mouse_event_source ());
   al_register_event_source (event_queue, get_timer_event_source (video_timer));
   al_register_event_source (event_queue, get_timer_event_source (timer));
+  al_flush_event_queue (event_queue);
   al_start_timer (timer);
 
   while (! quit_anim) {
@@ -114,7 +115,8 @@ play_anim (void (*draw_callback) (void),
           clear_bitmap (uscreen, TRANSPARENT_COLOR);
           draw_callback ();
           play_samples ();
-          if (! game_paused) anim_cycle++;
+          if (! is_game_paused ())
+            anim_cycle++;
         }
         if (! cutscene) editor ();
         if (bottom_text_timer) bottom_text_timer++;
