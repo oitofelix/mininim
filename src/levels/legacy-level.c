@@ -367,7 +367,8 @@ legacy_level_special_events (void)
 
     /* when kid falls from room 1 to the room below it, quit to the
        next level */
-    if (k->f.c.room == roomd (&global_level, 1, BELOW)) {
+    if (k->f.c.room == roomd (&global_level, 1, BELOW)
+        && k->f.c.xd == BELOW) {
       total_lives = k->total_lives;
       current_lives = k->current_lives;
       skill = k->skill;
