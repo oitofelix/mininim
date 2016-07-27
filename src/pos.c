@@ -171,10 +171,17 @@ ncoord (struct coord *c, struct coord *nc)
 
   if (nc != c) *nc = *c;
 
-  bool m, allow_weak;
+  bool m, allow_weak, allow_zero;
 
   do {
-    m = allow_weak = false;
+    bool nl = nc->x < 0;
+    bool nr = nc->x >= PLACE_WIDTH * PLACES;
+    bool na = nc->y < 0;
+    bool nb = nc->y >= PLACE_HEIGHT * FLOORS + 11;
+
+    if (! nl && ! nr && ! na && ! nb) break;
+
+    m = allow_weak = allow_zero = false;
 
     int ra, rb, rl, rr;
     ra = roomd (nc->l, nc->room, ABOVE);
@@ -189,29 +196,29 @@ ncoord (struct coord *c, struct coord *nc)
     rrl = roomd (nc->l, rr, LEFT);
 
   retry:
-    if (nc->x < 0
-        && (rlr == nc->room || allow_weak)) {
+    if (nl && (rlr == nc->room || allow_weak)
+        && (rl != 0 || allow_zero)) {
       nc->x += PLACE_WIDTH * PLACES;
       nc->prev_room = nc->room;
       nc->room = rl;
       nc->xd = LEFT;
       m = true;
-    } else if (nc->x >= PLACE_WIDTH * PLACES
-               && (rrl == nc->room || allow_weak)) {
+    } else if (nr && (rrl == nc->room || allow_weak)
+               && (rr != 0 || allow_zero)) {
       nc->x -= PLACE_WIDTH * PLACES;
       nc->prev_room = nc->room;
       nc->room = rr;
       nc->xd = RIGHT;
       m = true;
-    } else if (nc->y < 0
-               && (rab == nc->room || allow_weak)) {
+    } else if (na && (rab == nc->room || allow_weak)
+               && (ra != 0 || allow_zero)) {
       nc->y += PLACE_HEIGHT * FLOORS;
       nc->prev_room = nc->room;
       nc->room = ra;
       nc->xd = ABOVE;
       m = true;
-    } else if (nc->y >= PLACE_HEIGHT * FLOORS + 11
-               && (rba == nc->room || allow_weak)) {
+    } else if (nb && (rba == nc->room || allow_weak)
+               && (rb != 0 || allow_zero)) {
       nc->y -= PLACE_HEIGHT * FLOORS;
       nc->prev_room = nc->room;
       nc->room = rb;
@@ -224,6 +231,10 @@ ncoord (struct coord *c, struct coord *nc)
       goto retry;
     }
 
+    if (! m && ! allow_zero) {
+      allow_zero = true;
+      goto retry;
+    }
   } while (m);
 
   return nc;
