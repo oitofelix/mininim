@@ -171,43 +171,59 @@ ncoord (struct coord *c, struct coord *nc)
 
   if (nc != c) *nc = *c;
 
-  bool m;
+  bool m, allow_weak;
 
   do {
-    m = false;
+    m = allow_weak = false;
 
     int ra, rb, rl, rr;
-
     ra = roomd (nc->l, nc->room, ABOVE);
     rb = roomd (nc->l, nc->room, BELOW);
     rl = roomd (nc->l, nc->room, LEFT);
     rr = roomd (nc->l, nc->room, RIGHT);
 
-    if (nc->x < 0) {
+    int rab, rba, rlr, rrl;
+    rab = roomd (nc->l, ra, BELOW);
+    rba = roomd (nc->l, rb, ABOVE);
+    rlr = roomd (nc->l, rl, RIGHT);
+    rrl = roomd (nc->l, rr, LEFT);
+
+  retry:
+    if (nc->x < 0
+        && (rlr == nc->room || allow_weak)) {
       nc->x += PLACE_WIDTH * PLACES;
       nc->prev_room = nc->room;
       nc->room = rl;
       nc->xd = LEFT;
       m = true;
-    } else if (nc->x >= PLACE_WIDTH * PLACES) {
+    } else if (nc->x >= PLACE_WIDTH * PLACES
+               && (rrl == nc->room || allow_weak)) {
       nc->x -= PLACE_WIDTH * PLACES;
       nc->prev_room = nc->room;
       nc->room = rr;
       nc->xd = RIGHT;
       m = true;
-    } else if (nc->y < 0) {
+    } else if (nc->y < 0
+               && (rab == nc->room || allow_weak)) {
       nc->y += PLACE_HEIGHT * FLOORS;
       nc->prev_room = nc->room;
       nc->room = ra;
       nc->xd = ABOVE;
       m = true;
-    } else if (nc->y >= PLACE_HEIGHT * FLOORS + 11) {
+    } else if (nc->y >= PLACE_HEIGHT * FLOORS + 11
+               && (rba == nc->room || allow_weak)) {
       nc->y -= PLACE_HEIGHT * FLOORS;
       nc->prev_room = nc->room;
       nc->room = rb;
       nc->xd = BELOW;
       m = true;
     }
+
+    if (! m && ! allow_weak) {
+      allow_weak = true;
+      goto retry;
+    }
+
   } while (m);
 
   return nc;
