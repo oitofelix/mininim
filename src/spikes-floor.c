@@ -307,6 +307,30 @@ unload_spikes_floor (void)
 }
 
 void
+init_spikes_floor (struct pos *p, struct spikes_floor *s)
+{
+  s->p = *p;
+  s->wait = SPIKES_WAIT;
+  s->murdered_anim = -1;
+  s->activate = false;
+
+  switch (con (p)->ext.step) {
+  case 0: s->i = 0; s->state = 0; break;
+  case 1: s->i = 1; s->state = 1; break;
+  case 2: s->i = 2; s->state = 2; break;
+  case 3: s->i = 3; s->state = 3; break;
+  case 4: s->i = 4; s->state = 4; break;
+  case 5: s->i = 4; s->state = 5; break;
+  case 6: s->i = 5; s->state = 3; break;
+  case 7: s->i = 6; s->state = 2; break;
+  case 8: s->i = 0; s->state = 1; break;
+  case 9: s->i = 0; s->state = 0; break;
+  }
+
+  s->inactive = (con (p)->ext.step != 0);
+}
+
+void
 register_spikes_floor (struct pos *p)
 {
   assert (con (p)->fg == SPIKES_FLOOR
@@ -314,25 +338,7 @@ register_spikes_floor (struct pos *p)
 
   struct spikes_floor s;
 
-  s.p = *p;
-  s.wait = SPIKES_WAIT;
-  s.murdered_anim = -1;
-  s.activate = false;
-
-  switch (con (p)->ext.step) {
-  case 0: s.i = 0; s.state = 0; break;
-  case 1: s.i = 1; s.state = 1; break;
-  case 2: s.i = 2; s.state = 2; break;
-  case 3: s.i = 3; s.state = 3; break;
-  case 4: s.i = 4; s.state = 4; break;
-  case 5: s.i = 4; s.state = 5; break;
-  case 6: s.i = 5; s.state = 3; break;
-  case 7: s.i = 6; s.state = 2; break;
-  case 8: s.i = 0; s.state = 1; break;
-  case 9: s.i = 0; s.state = 0; break;
-  }
-
-  s.inactive = (con (p)->ext.step != 0);
+  init_spikes_floor (p, &s);
 
   spikes_floor =
     add_to_array (&s, 1, spikes_floor, &spikes_floor_nmemb,
@@ -389,8 +395,9 @@ reset_murder_spikes_floor (int id) {
   for (i = 0; i < spikes_floor_nmemb; i++) {
     struct spikes_floor *s = &spikes_floor[i];
     if (s->murdered_anim == id) {
-      s->murdered_anim = -1;
-      s->inactive = false;
+      init_spikes_floor (&s->p, s);
+      register_changed_pos (&s->p, CHPOS_SPIKES);
+      return;
     }
   }
 }
@@ -404,65 +411,66 @@ compute_spikes_floors (void)
   for (i = 0; i < spikes_floor_nmemb; i++) {
     struct spikes_floor *s = &spikes_floor[i];
 
-    if (s->inactive) continue;
+    if (! s->inactive) {
+      int state = s->state;
 
-    int state = s->state;
-
-    switch (s->i) {
-    case 0: if (should_spikes_raise (&s->p) || s->activate) {
-        alert_guards (&s->p);
-        play_sample (spikes_sample, &s->p, -1);
-        s->i++;
-        s->wait = 12;
-        s->state = 1;
-      } else if (s->state != 0) s->state = 0;
-      break;
-    case 1:
-      s->i++;
-      s->state = 2;
-      break;
-    case 2:
-      s->i++;
-      s->state = 3;
-      break;
-    case 3:
-      s->i++;
-      s->state = 4;
-      break;
-    case 4: if (! should_spikes_raise (&s->p)) {
-        if (s->wait-- == 0) {
+      switch (s->i) {
+      case 0: if (should_spikes_raise (&s->p) || s->activate) {
+          alert_guards (&s->p);
+          play_sample (spikes_sample, &s->p, -1);
           s->i++;
-          s->state = 3;
-        } else s->state = 5;
-      } else {
-        s->state = 5;
+          s->wait = 12;
+          s->state = 1;
+        } else if (s->state != 0) s->state = 0;
+        break;
+      case 1:
+        s->i++;
+        s->state = 2;
+        break;
+      case 2:
+        s->i++;
+        s->state = 3;
+        break;
+      case 3:
+        s->i++;
+        s->state = 4;
+        break;
+      case 4: if (! should_spikes_raise (&s->p)) {
+          if (s->wait-- == 0) {
+            s->i++;
+            s->state = 3;
+          } else s->state = 5;
+        } else {
+          s->state = 5;
+        }
+        break;
+      case 5:
+        s->i++;
+        s->state = 2;
+        break;
+      case 6:
+        s->i = 0;
+        s->state = 1;
+        s->activate = false;
+        break;
       }
-      break;
-    case 5:
-      s->i++;
-      s->state = 2;
-      break;
-    case 6:
-      s->i = 0;
-      s->state = 1;
-      s->activate = false;
-      break;
-    }
 
-    if (state != s->state)
-      register_changed_pos (&s->p, CHPOS_SPIKES);
+      if (state != s->state)
+        register_changed_pos (&s->p, CHPOS_SPIKES);
+    }
 
     /* spike kid */
     for (j = 0; j < anima_nmemb; j++) {
       struct anim *a = &anima[j];
       if (is_kid_dead (&a->f)
           || a->immortal
-          || a->spikes_immune) continue;
+          || a->spikes_immune
+          || con (&s->p)->ext.step >= 5) continue;
       survey (_m, pos, &a->f, NULL, &pm, NULL);
       if (peq (&pm, &s->p)
-          && (((s->state >= 2 && s->state <= 4)
-               && (is_kid_start_run (&a->f)
-                   || is_kid_run (&a->f)
+          && ((((s->state >= 2 && s->state <= 4)
+                || con (&s->p)->ext.step > 0)
+               && (is_kid_run (&a->f)
                    || is_kid_run_jump_running (&a->f)))
               || (is_kid_couch (&a->f) && a->fall && a->i < 3
                   && ! a->float_timer)
@@ -470,6 +478,7 @@ compute_spikes_floors (void)
               || is_kid_run_jump_landing (&a->f))) {
         a->p = s->p;
         anim_die_spiked (a);
+        register_changed_pos (&s->p, CHPOS_SPIKES);
       }
     }
   }

@@ -141,6 +141,7 @@ extern size_t spikes_floor_nmemb;
 /* functions */
 void load_spikes_floor (void);
 void unload_spikes_floor (void);
+void init_spikes_floor (struct pos *p, struct spikes_floor *s);
 void register_spikes_floor (struct pos *p);
 void sort_spikes_floors (void);
 int compare_spikes_floors (const void *s0, const void *s1);
