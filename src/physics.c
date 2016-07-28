@@ -955,7 +955,7 @@ can_hang (struct frame *f, bool reverse, struct pos *hang_pos)
 
   /* if (! reverse) printf ("dist_coord = %f\n", d); */
 
-  if (is_kid_fall (&_f) && d > 17) return false;
+  if (is_kid_fall (&_f) && d > 18) return false;
 
   return true;
 }
