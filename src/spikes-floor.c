@@ -833,7 +833,7 @@ p_spikes_fg_00_coord (struct pos *p, struct coord *c)
   return
     new_coord (c, p->l, p->room,
                PLACE_WIDTH * p->place,
-               PLACE_HEIGHT * p->floor + 54);
+               PLACE_HEIGHT * p->floor + 55);
 }
 
 void
