@@ -259,9 +259,7 @@ flow (struct anim *g)
     }
 
     /* no space for fight */
-    if (g->i == 2
-        && dist_collision (&g->f, false, &g->ci) <= PLACE_WIDTH
-        && dist_collision (&g->f, true, &g->ci) <= PLACE_WIDTH) {
+    if (g->i == 2 && ! is_there_enough_room_to_fight (g)) {
       guard_normal (g);
       return false;
     }

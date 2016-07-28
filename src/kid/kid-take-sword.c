@@ -78,7 +78,13 @@ kid_take_sword (struct anim *k)
 static bool
 flow (struct anim *k)
 {
-  if (k->oaction != kid_take_sword) k->i = -1;
+  if (k->oaction != kid_take_sword) {
+    k->i = -1;
+    if (! k->has_sword) {
+      kid_normal (k);
+      return false;
+    }
+  }
 
   if (k->i == 3) {
     kid_sword_normal (k);

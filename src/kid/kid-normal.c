@@ -139,9 +139,7 @@ flow (struct anim *k)
       return false;
     }
 
-    if (take_sword
-        && (dist_collision (&k->f, false, &k->ci) > PLACE_WIDTH
-            || dist_collision (&k->f, true, &k->ci) > PLACE_WIDTH)) {
+    if (take_sword && is_there_enough_room_to_fight (k)) {
       kid_take_sword (k);
       return false;
     }

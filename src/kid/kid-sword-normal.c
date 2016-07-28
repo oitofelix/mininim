@@ -108,8 +108,7 @@ flow (struct anim *k)
     }
 
     /* no space for fight */
-    if (dist_collision (&k->f, false, &k->ci) <= PLACE_WIDTH
-        && dist_collision (&k->f, true, &k->ci) <= PLACE_WIDTH) {
+    if (! is_there_enough_room_to_fight (k)) {
       kid_keep_sword (k);
       return false;
     }

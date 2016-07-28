@@ -216,7 +216,14 @@ fight_ai (struct anim *k)
       && ke->current_lives > 0
       && is_there_enough_room_to_fight (ke)) {
     place_on_the_ground (&ke->f, &ke->f.c);
-    kid_take_sword (ke);
+    if (ke->has_sword) kid_take_sword (ke);
+    else if (ke->action != kid_normal
+             && ke->action != kid_stabilize
+             && ke->i >= 4) {
+      int dir = (ke->f.dir == LEFT) ? -1 : +1;
+      ke->f.c.x -= dir * 12;
+      kid_stabilize (ke);
+    }
   }
 
   /* if the enemy is on the back, turn */
