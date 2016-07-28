@@ -87,7 +87,10 @@ kid_run (struct anim *k)
 static bool
 flow (struct anim *k)
 {
-  if (k->oaction != kid_run) k->i = -1;
+  if (k->oaction != kid_run) {
+    k->i = -1;
+    k->edge_detection = false;
+  }
 
   bool stop = ! ((k->f.dir == RIGHT) ? k->key.right : k->key.left);
   bool couch = k->key.down;
@@ -112,7 +115,7 @@ flow (struct anim *k)
            && dist_coord (&mf, &cm) > 2 * PLACE_WIDTH - 3)) {
       kid_run_jump (k);
       return false;
-    }
+    } else k->edge_detection = true;
   }
 
   if ((stop && k->f.b != kid_run_jump_frameset[10].frame)) {

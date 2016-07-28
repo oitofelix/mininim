@@ -182,7 +182,8 @@ physics_in (struct anim *k)
 
   /* fall */
   survey (_bf, pos, &k->f, NULL, &pbf, NULL);
-  if ((is_strictly_traversable (&pbf) && k->i < 4)
+  if ((is_strictly_traversable (&pbf) && k->i < 4
+       && ! k->edge_detection)
       || (is_strictly_traversable (&pbf) && k->i > 9)) {
     kid_fall (k);
     return false;
