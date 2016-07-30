@@ -1,6 +1,8 @@
 # MININIM
 **The Advanced Prince of Persia Engine (a childhood dream)**
 
+[![Codewake](https://www.codewake.com/badges/ask_question_flat_square.svg)](https://www.codewake.com/p/mininim)
+
 ![MININIM](http://oitofelix.github.io/mininim/mininim.png)
 
 - [Homepage](http://oitofelix.github.io/mininim/)
