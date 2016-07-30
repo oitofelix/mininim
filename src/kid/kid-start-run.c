@@ -130,7 +130,7 @@ physics_in (struct anim *k)
 
   /* inertia */
   k->inertia = 0;
-  k->cinertia = 2;
+  k->cinertia = 4;
 
   /* collision */
   if (is_colliding (&k->f, &k->fo, +0, false, &k->ci)) {

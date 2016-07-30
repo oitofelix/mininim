@@ -805,6 +805,7 @@ update_cache_pos (struct pos *p, enum changed_pos_reason reason,
                             48, 51);
                   clear_rect_to_color (mr.cell[x][y].cache, &r, TRANSPARENT_COLOR);
 
+                  draw_conbg (mr.cell[x][y].cache, &pl, em, vm, true);
                   draw_conbg (mr.cell[x][y].cache, &q, em, vm, true);
 
                   break;

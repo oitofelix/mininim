@@ -162,7 +162,7 @@ flow (struct anim *k)
       && ! k->hit_by_loose_floor
       && ! is_valid_pos (&k->item_pos)
       && is_hangable_pos (&ph, k->f.dir)
-      && dist_next_place (&k->f, _tf, pos, 0, true) <= 27
+      && dist_next_place (&k->f, _tf, pos, 0, true) <= 24
       && ! (ctf == DOOR && k->f.dir == LEFT
             && door_at_pos (&ptf)->i > DOOR_CLIMB_LIMIT)) {
     pos2room (&ph, k->f.c.room, &k->hang_pos);
@@ -217,12 +217,25 @@ flow (struct anim *k)
 static bool
 physics_in (struct anim *k)
 {
-  struct pos pm, pma;
+  struct pos p, pm, pma;
   enum confg cm;
+
+  bool couch_jump = k->key.down
+    && ((k->f.dir == LEFT && k->key.left)
+        || (k->f.dir == RIGHT && k->key.right))
+    && k->i <= 2;
 
   /* collision */
   if (is_colliding (&k->f, &k->fo, +0, false, &k->ci)
-      && k->ci.t != MIRROR) {
+      && k->ci.t == DOOR
+      && prel (&k->ci.p, &p, +0, k->f.dir == LEFT ? +0 : -1)
+      && door_at_pos (&p)->i >= 32
+      && couch_jump) {
+    kid_stabilize_collision (k);
+    return false;
+  } else if (is_colliding (&k->f, &k->fo, +0, false, &k->ci)
+             && k->ci.t != MIRROR
+             && (! couch_jump || k->ci.t != DOOR)) {
     if (k->i <= 2 && k->fall)
       uncollide (&k->f, &k->fo, &k->fo, +0, false, &k->ci);
     else {
@@ -239,7 +252,8 @@ physics_in (struct anim *k)
     }
   }
 
-  if (! k->fall && kid_door_split_collision (k)) return false;
+  if (! k->fall && ! couch_jump && kid_door_split_collision (k))
+    return false;
 
 
   /* fall */
