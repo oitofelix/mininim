@@ -65,14 +65,21 @@ editor (void)
      {'I', "INFO"},
      {'A', "CLEAR"},
      {'R', "RANDOM"},
-     {'H', "EXCHANGE CONS"},
+     {'M', "MIRROR>"},
      {'C', "COPY"},
      {'P', "PASTE"},
      {0}};
 
-  struct menu_item con_exchange_menu[] =
+  struct menu_item mirror_menu[] =
+    {{'C', "CONSTRUCTIONS>"},
+     {'L', "LINKS>"},
+     {'B', "CONS+LINKS>"},
+     {0}};
+
+  struct menu_item mirror_dir_menu[] =
     {{'H', "HORIZONTAL"},
      {'V', "VERTICAL"},
+     {'B', "HORIZONTAL+VERTICAL"},
      {'R', "RANDOM"},
      {0}};
 
@@ -182,7 +189,7 @@ editor (void)
      {'A', "CLEAR"},
      {'R', "RANDOM"},
      {'D', "DECORATION"},
-     {'H', "EXCHANGE CONS"},
+     {'M', "MIRROR>"},
      {'C', "COPY"},
      {'P', "PASTE"},
      {0}};
@@ -212,6 +219,7 @@ editor (void)
     {{'N', "NOMINAL NUMBER"},
      {'E', "ENVIRONMENT<"},
      {'H', "HUE<"},
+     {'M', "MIRROR>"},
      {'S', "SAVE LEVEL"},
      {'L', "RELOAD LEVEL"},
      {0}};
@@ -270,6 +278,9 @@ editor (void)
   char *fg_str = NULL, *bg_str = NULL, *ext_str = NULL;
   bool free_ext_str;
   char *str = NULL, c, *f, *d;
+  int i;
+
+  struct room_linking l[ROOMS];
 
   enum confg fg;
   enum conbg bg;
@@ -326,7 +337,7 @@ editor (void)
                          true, true, true, true,
                          -1, "RANDOM CON");
       break;
-    case 'H': edit = EDIT_CON_EXCHANGE; break;
+    case 'M': edit = EDIT_MIRROR_CON; break;
     case 'C':
       con_copy = *con (&p);
       editor_msg ("COPIED", 12);
@@ -338,27 +349,32 @@ editor (void)
       break;
     }
     break;
-  case EDIT_CON_EXCHANGE:
+  case EDIT_MIRROR_CON:
     if (! is_valid_pos (&p)) {
       editor_msg ("SELECT CONSTRUCTION", 1);
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       break;
     }
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
-    switch (menu_enum (con_exchange_menu, "CH>")) {
+    switch (menu_enum (mirror_dir_menu, "CM>")) {
     case -1: case 1: edit = EDIT_CON; break;
     case 'H':
       reflect_pos_h (&p, &p0);
-      register_exchange_pos_undo (&undo, &p, &p0, true, true, "H. EXCHANGE CON");
+      register_mirror_pos_undo (&undo, &p, &p0, true, true, "MIRROR CON H.");
       break;
     case 'V':
       reflect_pos_v (&p, &p0);
-      register_exchange_pos_undo (&undo, &p, &p0, true, false, "V. EXCHANGE CON");
+      register_mirror_pos_undo (&undo, &p, &p0, true, false, "MIRROR CON V.");
+      break;
+    case 'B':
+      reflect_pos_h (&p, &p0);
+      reflect_pos_v (&p0, &p0);
+      register_mirror_pos_undo (&undo, &p, &p0, true, true, "MIRROR CON H+V.");
       break;
     case 'R':
       random_pos (&global_level, &p0);
       p0.room = p.room;
-      register_exchange_pos_undo (&undo, &p, &p0, true, false, "R. EXCHANGE CON");
+      register_mirror_pos_undo (&undo, &p, &p0, true, false, "MIRROR CON R.");
       break;
     }
     break;
@@ -924,7 +940,7 @@ editor (void)
       memcpy (&global_level.con[mr.room], &room_buf2, sizeof (room_buf2));
       register_room_undo (&undo, mr.room, room_buf, "DECORATE ROOM");
       break;
-    case 'H': edit = EDIT_ROOM_CON_EXCHANGE; break;
+    case 'M': edit = EDIT_ROOM_MIRROR; break;
     case 'C':
       memcpy (&room_copy, &global_level.con[mr.room], sizeof (room_copy));
       editor_msg ("COPIED", 12);
@@ -934,23 +950,107 @@ editor (void)
       break;
     }
     break;
-  case EDIT_ROOM_CON_EXCHANGE:
+  case EDIT_ROOM_MIRROR:
     mr_focus_mouse ();
     mr.select_cycles = SELECT_CYCLES;
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
-    switch (menu_enum (con_exchange_menu, "RH>")) {
+    switch (menu_enum (mirror_menu, "RM>")) {
     case -1: case 1: edit = EDIT_ROOM; break;
+    case 'C': edit = EDIT_ROOM_MIRROR_CONS; break;
+    case 'L': edit = EDIT_ROOM_MIRROR_LINKS; break;
+    case 'B': edit = EDIT_ROOM_MIRROR_BOTH; break;
+    }
+    break;
+  case EDIT_ROOM_MIRROR_CONS:
+    mr_focus_mouse ();
+    mr.select_cycles = SELECT_CYCLES;
+    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
+    switch (menu_enum (mirror_dir_menu, "RMC>")) {
+    case -1: case 1: edit = EDIT_ROOM_MIRROR; break;
     case 'H':
-      register_h_room_con_exchange_undo
-        (&undo, mr.room, "ROOM H.CON EXCHANGE");
+      register_h_room_mirror_con_undo
+        (&undo, mr.room, "ROOM MIRROR CONS H.");
       break;
     case 'V':
-      register_v_room_con_exchange_undo
-        (&undo, mr.room, "ROOM V.CON EXCHANGE");
+      register_v_room_mirror_con_undo
+        (&undo, mr.room, "ROOM MIRROR CONS V.");
+      break;
+    case 'B':
+      register_h_room_mirror_con_undo
+        (&undo, mr.room, NULL);
+      register_v_room_mirror_con_undo
+        (&undo, mr.room, "ROOM MIRROR CONS H+V.");
       break;
     case 'R':
-      register_random_room_con_exchange_undo
-        (&undo, mr.room, false, false, "ROOM RANDOM CON EXCHANGE");
+      register_random_room_mirror_con_undo
+        (&undo, mr.room, false, false, "ROOM MIRROR CONS R.");
+      break;
+    }
+    break;
+  case EDIT_ROOM_MIRROR_LINKS:
+    mr_focus_mouse ();
+    mr.select_cycles = SELECT_CYCLES;
+    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
+    switch (menu_enum (mirror_dir_menu, "RML>")) {
+    case -1: case 1: edit = EDIT_ROOM_MIRROR; break;
+    case 'H':
+      memcpy (&l, &global_level.link, sizeof (l));
+      editor_mirror_link (mr.room, LEFT, RIGHT);
+      register_link_undo (&undo, l, "ROOM MIRROR LINKS H.");
+      break;
+    case 'V':
+      memcpy (&l, &global_level.link, sizeof (l));
+      editor_mirror_link (mr.room, ABOVE, BELOW);
+      register_link_undo (&undo, l, "ROOM MIRROR LINKS V.");
+      break;
+    case 'B':
+      memcpy (&l, &global_level.link, sizeof (l));
+      editor_mirror_link (mr.room, LEFT, RIGHT);
+      editor_mirror_link (mr.room, ABOVE, BELOW);
+      register_link_undo (&undo, l, "ROOM MIRROR LINKS H+V.");
+      break;
+    case 'R':
+      memcpy (&l, &global_level.link, sizeof (l));
+      editor_mirror_link (mr.room, random_dir (), random_dir ());
+      register_link_undo (&undo, l, "ROOM MIRROR LINKS R.");
+      break;
+    }
+    break;
+  case EDIT_ROOM_MIRROR_BOTH:
+    mr_focus_mouse ();
+    mr.select_cycles = SELECT_CYCLES;
+    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
+    switch (menu_enum (mirror_dir_menu, "RMB>")) {
+    case -1: case 1: edit = EDIT_ROOM_MIRROR; break;
+    case 'H':
+      register_h_room_mirror_con_undo (&undo, mr.room, NULL);
+      memcpy (&l, &global_level.link, sizeof (l));
+      editor_mirror_link (mr.room, LEFT, RIGHT);
+      register_link_undo (&undo, l, "ROOM MIRROR CONS+LINKS H.");
+      break;
+    case 'V':
+      register_v_room_mirror_con_undo
+        (&undo, mr.room, NULL);
+      memcpy (&l, &global_level.link, sizeof (l));
+      editor_mirror_link (mr.room, ABOVE, BELOW);
+      register_link_undo (&undo, l, "ROOM MIRROR CONS+LINKS V.");
+      break;
+    case 'B':
+      register_h_room_mirror_con_undo
+        (&undo, mr.room, NULL);
+      register_v_room_mirror_con_undo
+        (&undo, mr.room, NULL);
+      memcpy (&l, &global_level.link, sizeof (l));
+      editor_mirror_link (mr.room, LEFT, RIGHT);
+      editor_mirror_link (mr.room, ABOVE, BELOW);
+      register_link_undo (&undo, l, "ROOM MIRROR CONS+LINKS H+V.");
+      break;
+    case 'R':
+      register_random_room_mirror_con_undo
+        (&undo, mr.room, false, false, NULL);
+      memcpy (&l, &global_level.link, sizeof (l));
+      editor_mirror_link (mr.room, random_dir (), random_dir ());
+      register_link_undo (&undo, l, "ROOM MIRROR CONS+LINKS R.");
       break;
     }
     break;
@@ -999,7 +1099,6 @@ editor (void)
     mr.room_select = last_mouse_coord.c.room;
 
     if (r == 1) {
-      struct room_linking l[ROOMS];
       memcpy (&l, &global_level.link, sizeof (l));
 
       int room0 = last_mouse_coord.c.room;
@@ -1084,6 +1183,7 @@ editor (void)
       b3 = (global_level.hue == HUE_YELLOW) ? true : false;
       b4 = (global_level.hue == HUE_BLUE) ? true : false;
       break;
+    case 'M': edit = EDIT_LEVEL_MIRROR; break;
     case 'S':
       xasprintf (&d, "%sdata/levels/", user_data_dir);
       if (! al_make_directory (d)) {
@@ -1116,6 +1216,136 @@ editor (void)
     }
     al_free (str);
    break;
+  case EDIT_LEVEL_MIRROR:
+    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
+    xasprintf (&str, "L%iM>", global_level.number);
+    switch (menu_enum (mirror_menu, str)) {
+    case -1: case 1: edit = EDIT_LEVEL; break;
+    case 'C': edit = EDIT_LEVEL_MIRROR_CONS; break;
+    case 'L': edit = EDIT_LEVEL_MIRROR_LINKS; break;
+    case 'B': edit = EDIT_LEVEL_MIRROR_BOTH; break;
+    }
+    al_free (str);
+    break;
+  case EDIT_LEVEL_MIRROR_CONS:
+    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
+    xasprintf (&str, "L%iMC>", global_level.number);
+    switch (menu_enum (mirror_dir_menu, str)) {
+    case -1: case 1: edit = EDIT_LEVEL_MIRROR; break;
+    case 'H':
+      for (i = 1; i < ROOMS; i++)
+        register_h_room_mirror_con_undo
+          (&undo, i, (i == ROOMS - 1) ? "LEVEL MIRROR CONS H." : NULL);
+      break;
+    case 'V':
+      for (i = 1; i < ROOMS; i++)
+        register_v_room_mirror_con_undo
+          (&undo, i, (i == ROOMS - 1) ? "LEVEL MIRROR CONS V." : NULL);
+      break;
+    case 'B':
+      for (i = 1; i < ROOMS; i++) {
+        register_h_room_mirror_con_undo (&undo, i, NULL);
+        register_v_room_mirror_con_undo
+          (&undo, i, (i == ROOMS - 1) ? "LEVEL MIRROR CONS H+V." : NULL);
+      }
+      break;
+    case 'R':
+      for (i = 1; i < ROOMS; i++)
+        register_random_room_mirror_con_undo
+          (&undo, i, false, false,
+           (i == ROOMS - 1) ? "LEVEL MIRROR CONS R." : NULL);
+      break;
+    }
+    al_free (str);
+    break;
+  case EDIT_LEVEL_MIRROR_LINKS:
+    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
+    xasprintf (&str, "L%iML>", global_level.number);
+    switch (menu_enum (mirror_dir_menu, str)) {
+    case -1: case 1: edit = EDIT_LEVEL_MIRROR; break;
+    case 'H':
+      for (i = 1; i < ROOMS; i++) {
+        memcpy (&l, &global_level.link, sizeof (l));
+        mirror_link (&global_level, i, LEFT, RIGHT);
+        register_link_undo (&undo, l, (i == ROOMS - 1)
+                            ? "LEVEL MIRROR LINKS H." : NULL);
+      }
+      break;
+    case 'V':
+      for (i = 1; i < ROOMS; i++) {
+        memcpy (&l, &global_level.link, sizeof (l));
+        mirror_link (&global_level, i, ABOVE, BELOW);
+        register_link_undo (&undo, l, (i == ROOMS - 1)
+                            ? "LEVEL MIRROR LINKS V." : NULL);
+      }
+      break;
+    case 'B':
+      for (i = 1; i < ROOMS; i++) {
+        memcpy (&l, &global_level.link, sizeof (l));
+        mirror_link (&global_level, i, LEFT, RIGHT);
+        mirror_link (&global_level, i, ABOVE, BELOW);
+        register_link_undo (&undo, l, (i == ROOMS - 1)
+                            ? "LEVEL MIRROR LINKS H+V." : NULL);
+      }
+      break;
+    case 'R':
+      for (i = 1; i < ROOMS; i++) {
+        memcpy (&l, &global_level.link, sizeof (l));
+        mirror_link (&global_level, i, random_dir (), random_dir ());
+        register_link_undo (&undo, l, (i == ROOMS - 1)
+                            ? "LEVEL MIRROR LINKS R." : NULL);
+      }
+      break;
+    }
+    al_free (str);
+    break;
+  case EDIT_LEVEL_MIRROR_BOTH:
+    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
+    xasprintf (&str, "L%iMB>", global_level.number);
+    switch (menu_enum (mirror_dir_menu, str)) {
+    case -1: case 1: edit = EDIT_LEVEL_MIRROR; break;
+    case 'H':
+      for (i = 1; i < ROOMS; i++) {
+        register_h_room_mirror_con_undo (&undo, i, NULL);
+        memcpy (&l, &global_level.link, sizeof (l));
+        mirror_link (&global_level, i, LEFT, RIGHT);
+        register_link_undo (&undo, l, (i == ROOMS - 1)
+                            ? "LEVEL MIRROR CONS+LINKS H." : NULL);
+      }
+      break;
+    case 'V':
+      for (i = 1; i < ROOMS; i++) {
+        register_v_room_mirror_con_undo (&undo, i, NULL);
+        memcpy (&l, &global_level.link, sizeof (l));
+        mirror_link (&global_level, i, ABOVE, BELOW);
+        register_link_undo (&undo, l, (i == ROOMS - 1)
+                            ? "LEVEL MIRROR CONS+LINKS V." : NULL);
+      }
+      break;
+    case 'B':
+      for (i = 1; i < ROOMS; i++) {
+        register_h_room_mirror_con_undo (&undo, i, NULL);
+        register_v_room_mirror_con_undo (&undo, i, NULL);
+        memcpy (&l, &global_level.link, sizeof (l));
+        mirror_link (&global_level, i, LEFT, RIGHT);
+        mirror_link (&global_level, i, ABOVE, BELOW);
+        register_link_undo (&undo, l, (i == ROOMS - 1)
+                            ? "LEVEL MIRROR CONS+LINKS H+V." : NULL);
+      }
+      break;
+    case 'R':
+      for (i = 1; i < ROOMS; i++) {
+        register_random_room_mirror_con_undo
+          (&undo, i, false, false, NULL);
+        memcpy (&l, &global_level.link, sizeof (l));
+        mirror_link (&global_level, i, random_dir (), random_dir ());
+        register_link_undo (&undo, l, (i == ROOMS - 1)
+                            ? "LEVEL MIRROR CONS+LINKS R." : NULL);
+      }
+      break;
+    }
+    al_free (str);
+    break;
   case EDIT_NOMINAL_NUMBER:
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
     xasprintf (&str, "L%iN>N.NUMBER", global_level.number);
@@ -1569,25 +1799,7 @@ menu_link (enum dir dir)
   if (r == 1) {
     struct room_linking l[ROOMS];
     memcpy (&l, &global_level.link, sizeof (l));
-
-    int room0 = last_mouse_coord.c.room;
-    int room1 = mr.room;
-
-    *roomd_ptr (&global_level, room0, dir) = room1;
-    if (reciprocal_links) make_reciprocal_link (&global_level, room0, room1, dir);
-
-    if (locally_unique_links) {
-      make_link_locally_unique (&global_level, room0, dir);
-      if (reciprocal_links)
-        make_link_locally_unique (&global_level, room1, opposite_dir (dir));
-    }
-
-    if (globally_unique_links) {
-      make_link_globally_unique (&global_level, room0, dir);
-      if (reciprocal_links)
-        make_link_globally_unique (&global_level, room1, opposite_dir (dir));
-    }
-
+    editor_link (last_mouse_coord.c.room, mr.room, dir);
     register_link_undo (&undo, l, "LINK");
     set_mouse_coord (&last_mouse_coord);
     mr.room_select = -1;
@@ -1657,4 +1869,32 @@ ui_place_kid (struct pos *p)
                k->f.dir == LEFT ? +22 : +26, +15);
   kid_normal (k);
   if (! is_game_paused ()) update_depressible_floor (k, -4, -10);
+}
+
+void
+editor_link (int room0, int room1, enum dir dir)
+{
+  *roomd_ptr (&global_level, room0, dir) = room1;
+  if (reciprocal_links) make_reciprocal_link (&global_level, room0, room1, dir);
+
+  if (locally_unique_links) {
+    make_link_locally_unique (&global_level, room0, dir);
+    if (reciprocal_links)
+      make_link_locally_unique (&global_level, room1, opposite_dir (dir));
+  }
+
+  if (globally_unique_links) {
+    make_link_globally_unique (&global_level, room0, dir);
+    if (reciprocal_links)
+      make_link_globally_unique (&global_level, room1, opposite_dir (dir));
+  }
+}
+
+void
+editor_mirror_link (int room, enum dir dir0, enum dir dir1)
+{
+  int r0 = roomd (&global_level, room, dir0);
+  int r1 = roomd (&global_level, room, dir1);
+  editor_link (room, r0, dir1);
+  editor_link (room, r1, dir0);
 }

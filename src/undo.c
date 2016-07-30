@@ -63,10 +63,21 @@ undo_pass (struct undo *u, int dir, char **desc)
     desc = NULL;
     return false;
   }
-  if (dir >= 0) u->current++;
-  u->pass[u->current].f (u->pass[u->current].data, dir);
-  if (desc) *desc = u->pass[u->current].desc;
-  if (dir < 0) u->current--;
+
+  if (dir >= 0) {
+    do {
+      u->current++;
+      u->pass[u->current].f (u->pass[u->current].data, dir);
+    } while (! u->pass[u->current].desc);
+    if (desc) *desc = u->pass[u->current].desc;
+  } else {
+    if (desc) *desc = u->pass[u->current].desc;
+    do {
+      u->pass[u->current].f (u->pass[u->current].data, dir);
+      u->current--;
+    } while (! u->pass[u->current].desc);
+  }
+
   return true;
 }
 
@@ -155,27 +166,27 @@ con_undo (struct con_undo *d, int dir)
   register_changed_pos (&d->p, -1);
 }
 
-/*********************/
-/* EXCHANGE POS UNDO */
-/*********************/
+/*******************/
+/* MIRROR POS UNDO */
+/*******************/
 
 void
-register_exchange_pos_undo (struct undo *u, struct pos *p0, struct pos *p1,
-                            bool prepare, bool invert_dir, char *desc)
+register_mirror_pos_undo (struct undo *u, struct pos *p0, struct pos *p1,
+                          bool prepare, bool invert_dir, char *desc)
 {
   if (peq (p0, p1)) return;
 
-  struct exchange_pos_undo *d = xmalloc (sizeof (struct exchange_pos_undo));
+  struct mirror_pos_undo *d = xmalloc (sizeof (struct mirror_pos_undo));
   d->p0 = *p0;
   d->p1 = *p1;
   d->prepare = prepare;
   d->invert_dir = invert_dir;
-  register_undo (u, d, (undo_f) exchange_pos_undo, desc);
-  exchange_pos_undo (d, +1);
+  register_undo (u, d, (undo_f) mirror_pos_undo, desc);
+  mirror_pos_undo (d, +1);
 }
 
 void
-exchange_pos_undo (struct exchange_pos_undo *d, int dir)
+mirror_pos_undo (struct mirror_pos_undo *d, int dir)
 {
   struct pos *p0, *p1;
   if (dir >=0) {
@@ -185,7 +196,7 @@ exchange_pos_undo (struct exchange_pos_undo *d, int dir)
     p0 = &d->p1;
     p1 = &d->p0;
   }
-  exchange_pos (p0, p1, d->prepare, d->invert_dir);
+  mirror_pos (p0, p1, d->prepare, d->invert_dir);
   register_changed_pos (p0, -1);
   register_changed_pos (p1, -1);
 }
@@ -246,70 +257,70 @@ event_undo (struct event_undo *d, int dir)
   d->f.p.l->event[d->e] = (dir >= 0) ? d->f : d->b;
 }
 
-/********************************/
-/* HORIZONTAL ROOM CON EXCHANGE */
-/********************************/
+/*******************************/
+/* HORIZONTAL ROOM CONS MIRROR */
+/*******************************/
 
 void
-register_h_room_con_exchange_undo (struct undo *u, int _room, char *desc)
+register_h_room_mirror_con_undo (struct undo *u, int _room, char *desc)
 {
   int *room = xmalloc (sizeof (* room));
   *room = _room;
-  register_undo (u, room, (undo_f) h_room_con_exchange_undo, desc);
-  h_room_con_exchange_undo (room, +1);
+  register_undo (u, room, (undo_f) h_room_mirror_con_undo, desc);
+  h_room_mirror_con_undo (room, +1);
 }
 
 void
-h_room_con_exchange_undo (int *room, int dir)
+h_room_mirror_con_undo (int *room, int dir)
 {
   struct pos p0, p1;
   new_pos (&p0, &global_level, *room, -1, -1);
   for (p0.floor = 0; p0.floor < FLOORS; p0.floor++)
     for (p0.place = 0; p0.place < PLACES / 2; p0.place++) {
       reflect_pos_h (&p0, &p1);
-      exchange_pos (&p0, &p1, false, true);
+      mirror_pos (&p0, &p1, false, true);
     }
   prepare_room (p0.room);
   register_changed_room (*room);
 }
 
-/********************************/
-/* VERTICAL ROOM CON EXCHANGE */
-/********************************/
+/*****************************/
+/* VERTICAL ROOM CONS MIRROR */
+/*****************************/
 
 void
-register_v_room_con_exchange_undo (struct undo *u, int _room, char *desc)
+register_v_room_mirror_con_undo (struct undo *u, int _room, char *desc)
 {
   int *room = xmalloc (sizeof (* room));
   *room = _room;
-  register_undo (u, room, (undo_f) v_room_con_exchange_undo, desc);
-  v_room_con_exchange_undo (room, +1);
+  register_undo (u, room, (undo_f) v_room_mirror_con_undo, desc);
+  v_room_mirror_con_undo (room, +1);
 }
 
 void
-v_room_con_exchange_undo (int *room, int dir)
+v_room_mirror_con_undo (int *room, int dir)
 {
   struct pos p0, p1;
   new_pos (&p0, &global_level, *room, -1, -1);
   for (p0.floor = 0; p0.floor < FLOORS / 2; p0.floor++)
     for (p0.place = 0; p0.place < PLACES; p0.place++) {
       reflect_pos_v (&p0, &p1);
-      exchange_pos (&p0, &p1, false, false);
+      mirror_pos (&p0, &p1, false, false);
     }
   prepare_room (p0.room);
   register_changed_room (*room);
 }
 
-/****************************/
-/* RANDOM ROOM CON EXCHANGE */
-/****************************/
+/***************************/
+/* RANDOM ROOM CONS MIRROR */
+/***************************/
 
 void
-register_random_room_con_exchange_undo (struct undo *u, int _room,
-                                        bool prepare, bool invert_dir,
-                                        char *desc)
+register_random_room_mirror_con_undo (struct undo *u, int _room,
+                                      bool prepare, bool invert_dir,
+                                      char *desc)
 {
-  struct random_room_con_exchange_undo *d = xmalloc (sizeof (* d));
+  struct random_room_mirror_con_undo *d = xmalloc (sizeof (* d));
   d->room = _room;
   d->prepare = prepare;
   d->invert_dir = invert_dir;
@@ -319,13 +330,13 @@ register_random_room_con_exchange_undo (struct undo *u, int _room,
     for (p.place = 0; p.place < PLACES; p.place++)
       random_pos (&global_level, &d->p[p.floor][p.place]);
 
-  register_undo (u, d, (undo_f) random_room_con_exchange_undo, desc);
+  register_undo (u, d, (undo_f) random_room_mirror_con_undo, desc);
 
-  random_room_con_exchange_undo (d, +1);
+  random_room_mirror_con_undo (d, +1);
 }
 
 void
-random_room_con_exchange_undo (struct random_room_con_exchange_undo *d, int dir)
+random_room_mirror_con_undo (struct random_room_mirror_con_undo *d, int dir)
 {
   struct pos p0, p1;
   new_pos (&p0, &global_level, d->room, -1, -1);
@@ -335,14 +346,14 @@ random_room_con_exchange_undo (struct random_room_con_exchange_undo *d, int dir)
       for (p0.place = 0; p0.place < PLACES; p0.place++) {
         p1 = d->p[p0.floor][p0.place];
         p1.room = d->room;
-        exchange_pos (&p0, &p1, d->prepare, d->invert_dir);
+        mirror_pos (&p0, &p1, d->prepare, d->invert_dir);
       }
   else
     for (p0.floor = FLOORS - 1; p0.floor >= 0; p0.floor--)
       for (p0.place = PLACES - 1; p0.place >= 0; p0.place--) {
         p1 = d->p[p0.floor][p0.place];
         p1.room = d->room;
-        exchange_pos (&p1, &p0, d->prepare, d->invert_dir);
+        mirror_pos (&p1, &p0, d->prepare, d->invert_dir);
       }
 
   prepare_room (d->room);

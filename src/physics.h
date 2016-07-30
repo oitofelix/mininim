@@ -52,7 +52,7 @@ void exchange_event_pos (struct pos *p0, struct pos *p1);
 void exchange_guard_pos (struct pos *p0, struct pos *p1, bool invert_dir);
 void exchange_kid_start_pos (struct pos *p0, struct pos *p1, bool invert_dir);
 void exchange_anim_pos (struct pos *p0, struct pos *p1, bool invert_dir);
-void exchange_pos (struct pos *p0, struct pos *p1, bool prepare, bool invert_dir);
+void mirror_pos (struct pos *p0, struct pos *p1, bool prepare, bool invert_dir);
 void decorate_pos (struct pos *p);
 enum con_diff con_diff (struct con *c0, struct con *c1);
 

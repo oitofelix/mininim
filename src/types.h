@@ -510,7 +510,9 @@ enum edit {
   EDIT_GUARD_SKILL_COUNTER_DEFENSE, EDIT_GUARD_SKILL_ADVANCE, EDIT_GUARD_SKILL_RETURN,
   EDIT_GUARD_SKILL_REFRACTION, EDIT_GUARD_SKILL_EXTRA_LIFE, EDIT_GUARD_LIVES,
   EDIT_GUARD_TYPE, EDIT_GUARD_STYLE, EDIT_SKILL_LEGACY_TEMPLATES,
-  EDIT_NOMINAL_NUMBER, EDIT_CON_EXCHANGE, EDIT_ROOM_CON_EXCHANGE,
+  EDIT_NOMINAL_NUMBER, EDIT_MIRROR_CON, EDIT_ROOM_MIRROR, EDIT_ROOM_MIRROR_CONS,
+  EDIT_ROOM_MIRROR_LINKS, EDIT_ROOM_MIRROR_BOTH, EDIT_LEVEL_MIRROR,
+  EDIT_LEVEL_MIRROR_CONS, EDIT_LEVEL_MIRROR_LINKS, EDIT_LEVEL_MIRROR_BOTH,
 };
 
 struct menu_item {
@@ -633,7 +635,7 @@ struct con_undo {
   struct pos p;
 };
 
-struct exchange_pos_undo {
+struct mirror_pos_undo {
   struct pos p0, p1;
   bool prepare, invert_dir;
 };
@@ -648,7 +650,7 @@ struct event_undo {
   struct level_event b, f;
 };
 
-struct random_room_con_exchange_undo {
+struct random_room_mirror_con_undo {
   struct pos p[FLOORS][PLACES];
   int room;
   bool prepare, invert_dir;

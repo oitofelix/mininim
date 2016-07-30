@@ -34,10 +34,10 @@ void register_con_undo (struct undo *u, struct pos *p,
                         char *desc);
 void con_undo (struct con_undo *d, int dir);
 
-/* EXCHANGE POS */
-void register_exchange_pos_undo (struct undo *u, struct pos *p0, struct pos *p1,
+/* MIRROR POS */
+void register_mirror_pos_undo (struct undo *u, struct pos *p0, struct pos *p1,
                                  bool prepare, bool invert_dir, char *desc);
-void exchange_pos_undo (struct exchange_pos_undo *d, int dir);
+void mirror_pos_undo (struct mirror_pos_undo *d, int dir);
 
 /* ROOM */
 void register_room_undo (struct undo *u, int room, struct con c[FLOORS][PLACES],
@@ -50,19 +50,19 @@ register_event_undo (struct undo *u, int e, struct pos *p, bool next,
                      char *desc);
 void event_undo (struct event_undo *d, int dir);
 
-/* HORIZONTAL ROOM CON EXCHANGE */
-void register_h_room_con_exchange_undo (struct undo *u, int _room, char *desc);
-void h_room_con_exchange_undo (int *room, int dir);
+/* HORIZONTAL ROOM CONS MIRROR */
+void register_h_room_mirror_con_undo (struct undo *u, int _room, char *desc);
+void h_room_mirror_con_undo (int *room, int dir);
 
-/* VERTICAL ROOM CON EXCHANGE */
-void register_v_room_con_exchange_undo (struct undo *u, int _room, char *desc);
-void v_room_con_exchange_undo (int *room, int dir);
+/* VERTICAL ROOM CONS MIRROR */
+void register_v_room_mirror_con_undo (struct undo *u, int _room, char *desc);
+void v_room_mirror_con_undo (int *room, int dir);
 
-/* RANDOM ROOM CON EXCHANGE */
-void register_random_room_con_exchange_undo (struct undo *u, int _room,
+/* RANDOM ROOM CON MIRROR */
+void register_random_room_mirror_con_undo (struct undo *u, int _room,
                                              bool prepare, bool invert_dir,
                                              char *desc);
-void random_room_con_exchange_undo (struct random_room_con_exchange_undo *d, int dir);
+void random_room_mirror_con_undo (struct random_room_mirror_con_undo *d, int dir);
 
 /* LINK */
 void register_link_undo (struct undo *u, struct room_linking l[ROOMS],

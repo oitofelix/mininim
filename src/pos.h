@@ -28,6 +28,7 @@ int roomd (struct level *l, int room, enum dir dir);
 int roomd_n0 (struct level *l, int room, enum dir dir);
 bool is_room_adjacent (struct level *l, int room0, int room1);
 void link_room (struct level *l, int room0, int room1, enum dir dir);
+void mirror_link (struct level *l, int room, enum dir dir0, enum dir dir1);
 int room_dist (struct level *l, int r0, int r1, int max);
 int min_room_dist (struct room_dist room[], int *dmax);
 struct coord *new_coord (struct coord *c, struct level *l, int room, int x, int y);
@@ -60,6 +61,9 @@ bool peqr (struct pos *p0, struct pos *p1, int floor, int place);
 struct pos *reflect_pos_h (struct pos *p0, struct pos *p1);
 struct pos *reflect_pos_v (struct pos *p0, struct pos *p1);
 struct pos *random_pos (struct level *l, struct pos *p);
+struct pos *get_new_rel_pos (struct pos *old_src, struct pos *old_dest,
+                             struct pos *new_src, struct pos *new_dest);
+enum dir random_dir (void);
 double dist_coord (struct coord *a, struct coord *b);
 struct frame *place_frame (struct frame *f, struct frame *nf,
                            ALLEGRO_BITMAP *b, struct pos *p,

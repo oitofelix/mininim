@@ -45,6 +45,15 @@ link_room (struct level *l, int room0, int room1, enum dir dir)
   if (room0) *roomd_ptr (l, room0, dir) = room1;
 }
 
+void
+mirror_link (struct level *l, int room, enum dir dir0, enum dir dir1)
+{
+  int r0 = roomd (l, room, dir0);
+  int r1 = roomd (l, room, dir1);
+  link_room (l, room, r0, dir1);
+  link_room (l, room, r1, dir0);
+}
+
 int
 roomd_n0 (struct level *l, int room, enum dir dir)
 {
@@ -701,6 +710,38 @@ random_pos (struct level *l, struct pos *p)
 {
   return new_pos (p, l, prandom (ROOMS - 1), prandom (FLOORS - 1),
                   prandom (PLACES - 1));
+}
+
+struct pos *
+get_new_rel_pos (struct pos *old_src, struct pos *old_dest,
+                 struct pos *new_src, struct pos *new_dest)
+{
+
+  struct pos nold_src; npos (old_src, &nold_src);
+  struct pos nold_dest; npos (old_dest, &nold_dest);
+  struct pos nnew_src; npos (new_src, &nnew_src);
+
+  pos2room (&nold_dest, nold_src.room, &nold_dest);
+  if (nold_dest.room != nold_src.room)
+    return invalid_pos (new_dest);
+
+  new_pos (new_dest, nnew_src.l, nnew_src.room,
+           nnew_src.floor + (nold_dest.floor - nold_src.floor),
+           nnew_src.place + (nold_dest.place - nold_src.place));
+
+  return npos (new_dest, new_dest);
+}
+
+enum dir
+random_dir (void)
+{
+  switch (prandom (3)) {
+  case 0: return LEFT;
+  case 1: return RIGHT;
+  case 2: return ABOVE;
+  case 3: return BELOW;
+  default: assert (false);
+  }
 }
 
 double

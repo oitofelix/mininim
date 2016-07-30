@@ -361,7 +361,7 @@ void
 exchange_anim_pos (struct pos *p0, struct pos *p1, bool invert_dir)
 {
   if (peq (p0, p1)) return;
-  int i;
+  int i, j;
   for (i = 0; i < anima_nmemb; i++) {
     struct anim *a = &anima[i];
 
@@ -371,6 +371,12 @@ exchange_anim_pos (struct pos *p0, struct pos *p1, bool invert_dir)
     if (peq (&p, p0)) {
       place_at_pos (&a->f, _m, p1, &a->f.c);
       place_on_the_ground (&a->f, &a->f.c);
+      for (j = 0; j < 2; j++) {
+        if (is_valid_pos (&a->df_pos[j]))
+          get_new_rel_pos (&p, &a->df_pos[j], p1, &a->df_pos[j]);
+        if (is_valid_pos (&a->df_posb[j]))
+          get_new_rel_pos (&p, &a->df_posb[j], p1, &a->df_posb[j]);
+      }
       if (invert_dir) {
         a->f.dir = (a->f.dir == LEFT) ? RIGHT : LEFT;
         a->f.flip ^= ALLEGRO_FLIP_HORIZONTAL;
@@ -378,6 +384,12 @@ exchange_anim_pos (struct pos *p0, struct pos *p1, bool invert_dir)
     } else if (peq (&p, p1)) {
       place_at_pos (&a->f, _m, p0, &a->f.c);
       place_on_the_ground (&a->f, &a->f.c);
+      for (j = 0; j < 2; j++) {
+        if (is_valid_pos (&a->df_pos[j]))
+          get_new_rel_pos (&p, &a->df_pos[j], p0, &a->df_pos[j]);
+        if (is_valid_pos (&a->df_posb[j]))
+          get_new_rel_pos (&p, &a->df_posb[j], p0, &a->df_posb[j]);
+      }
       if (invert_dir) {
         a->f.dir = (a->f.dir == LEFT) ? RIGHT : LEFT;
         a->f.flip ^= ALLEGRO_FLIP_HORIZONTAL;
@@ -387,7 +399,7 @@ exchange_anim_pos (struct pos *p0, struct pos *p1, bool invert_dir)
 }
 
 void
-exchange_pos (struct pos *p0, struct pos *p1, bool prepare, bool invert_dir)
+mirror_pos (struct pos *p0, struct pos *p1, bool prepare, bool invert_dir)
 {
   if (peq (p0, p1)) return;
   struct con con0 = *con (p0);
