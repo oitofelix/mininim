@@ -802,20 +802,19 @@ dist_collision (struct frame *f, int reverse,
   _fo.b = _f.b;
   _fo.dx = _fo.dy = 0;
 
-  if (reverse) _f.dir = (_f.dir == LEFT) ? RIGHT : LEFT;
-
+  int r = (reverse) ? -1 : + 1;
   int dir = (_f.dir == LEFT) ? -1 : +1;
 
   if (! is_colliding (&_f, &_fo, dx, reverse, ci))
     while (! is_colliding (&_f, &_fo, dx, reverse, ci)
            && i < PLACE_WIDTH + 1) {
-      _f.c.x += dir;
+      _f.c.x += r * dir;
       i++;
     }
   else
     while (is_colliding (&_f, &_fo, dx, reverse, ci)
            && -i < PLACE_WIDTH + 1) {
-      _f.c.x -= dir;
+      _f.c.x -= r * dir;
       i--;
     }
 
