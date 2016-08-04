@@ -73,6 +73,7 @@ unload_kid_die (void)
 void
 kid_resurrect (struct anim *k)
 {
+  k->sword_immune = 16;
   if (k->current_lives > 0) return;
   struct pos pm;
   survey (_m, pos, &k->f, NULL, &pm, NULL);
@@ -85,7 +86,6 @@ kid_resurrect (struct anim *k)
   stop_sample (death_sample, NULL, k->id);
   stop_sample (fight_death_sample, NULL, k->id);
   stop_sample (success_suspense_sample, NULL, k->id);
-  k->sword_immune = 16;
 }
 
 void

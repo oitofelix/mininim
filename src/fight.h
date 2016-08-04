@@ -38,6 +38,7 @@ bool is_attacking (struct anim *k);
 bool is_defending (struct anim *k);
 bool is_walking (struct anim *k);
 bool is_walkingf (struct anim *k);
+bool is_walkingb (struct anim *k);
 bool is_sword_hit (struct anim *k);
 bool is_at_defendable_attack_frame (struct anim *k);
 bool is_at_hit_frame (struct anim *k);
@@ -64,6 +65,10 @@ void fight_walkb (struct anim *k);
 void fight_hit (struct anim *k, struct anim *ke);
 enum confg fight_crel (struct anim *k, int floor, int place);
 bool fight_door_split_collision (struct anim *a);
+void backoff_from_range (struct anim *k0, struct anim *k1, int r,
+                         bool only_k1);
+void get_in_range (struct anim *k0, struct anim *k1, int r,
+                   bool only_k1);
 void alert_guards (struct pos *p);
 
 struct skill *get_perfect_skill (struct skill *fp);

@@ -100,40 +100,29 @@ flow (struct anim *k)
     /*           k->f.c.x - k->of.c.x, k->i, k->f.b); */
 
     k->i = -1;
-    k->attack_defended = 0;
-    k->counter_attacked = 0;
-    k->counter_defense = 0;
     k->of = k->f;
   }
 
   if (k->oaction == kid_sword_defense) k->i = 0;
 
-  if (k->i < 6 && k->counter_defense == 2) {
+  if (k->i < 6 && k->i_counter_defended == 2) {
     k->i = 6;
     k->f = k->of;
   }
 
   if (k->i == 7) {
-    k->attack_defended = 0;
-    k->counter_defense = 0;
-    k->counter_attacked = 0;
-    k->hurt_enemy_in_counter_attack = false;
     kid_sword_defense (k);
     return false;
   } else if (k->i == 6
-             && k->counter_defense != 2) {
-    k->attack_defended = 0;
-    k->counter_defense = 0;
-    k->counter_attacked = 0;
-    k->hurt_enemy_in_counter_attack = false;
+             && k->i_counter_defended != 2) {
     kid_sword_normal (k);
     return false;
   }
 
-  if (k->i == 3 && k->attack_defended)
+  if (k->i == 3 && k->enemy_defended_my_attack)
     k->f.c.x += (k->f.dir == LEFT) ? +9 : -9;
 
-  if (k->i == 2 && k->attack_defended)
+  if (k->i == 2 && k->enemy_defended_my_attack)
     k->i = 3;
 
   if (k->i == -1) k->j = 1;
@@ -149,7 +138,7 @@ flow (struct anim *k)
   if (k->i == 1) k->xf.b = NULL;
   if (k->i == 3) k->xf.dx = -21, k->xf.dy = +7;
   if (k->i == 4) {
-    if (k->attack_defended) k->fo.dx = -1;
+    if (k->enemy_defended_my_attack) k->fo.dx = -1;
     k->xf.dx = -7, k->xf.dy = +17;
   }
 

@@ -55,7 +55,6 @@ flow (struct anim *k)
 {
   struct pos pmt;
 
-  bool keep_sword = k->key.down;
   bool defense = k->key.up && ! k->key.shift
     && ! k->key.left && ! k->key.right;
   bool attack = k->key.shift && ! k->key.up
@@ -65,10 +64,20 @@ flow (struct anim *k)
   bool walkb = ((k->f.dir == RIGHT) && k->key.left)
     || ((k->f.dir == LEFT) && k->key.right);
 
+  k->enemy_defended_my_attack = 0;
+  k->enemy_counter_attacked_myself = 0;
+  k->i_counter_defended = 0;
+  k->hurt_enemy_in_counter_attack = false;
+  k->attack_range_far = false;
+  k->attack_range_near = false;
+
   struct anim *ke = get_anim_by_id (k->enemy_id);
   k->keep_sword_fast = (k->enemy_id != -1
                         && ke->current_lives > 0
                         && ! is_anim_fall (&ke->f));
+
+  bool keep_sword = k->key.down
+    && (! ke || ! is_in_range (k, ke, ATTACK_RANGE));
 
   if (k->oaction != kid_sword_normal) k->i = -1;
 

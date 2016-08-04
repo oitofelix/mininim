@@ -182,17 +182,28 @@ guard_defense (struct anim *g)
 static bool
 flow (struct anim *g)
 {
-  if (g->oaction != guard_defense) g->i = -1;
+  if (g->oaction != guard_defense) {
+    g->i = -1;
+
+    struct anim *ge = get_anim_by_id (g->enemy_id);
+    if (ge && g->i_counter_defended)
+      ge->enemy_defended_my_attack = 1;
+
+    g->enemy_defended_my_attack = 0;
+    g->i_counter_defended = 0;
+    g->enemy_counter_attacked_myself = 0;
+    g->hurt_enemy_in_counter_attack = false;
+  }
 
   struct anim *ke = get_anim_by_id (g->enemy_id);
   if (g->i == 1) {
     guard_attack (g);
     return false;
-  } else if (g->i == 0 && ke && ke->attack_defended == 2
-           && ke->counter_attacked != 2) {
+  } else if (g->i == 0 && ke && ke->enemy_defended_my_attack == 2
+           && ke->enemy_counter_attacked_myself != 2) {
     guard_walkb (g);
     return false;
-  } else if (g->i == 0 && ! (ke && ke->attack_defended == 2)) {
+  } else if (g->i == 0 && ! (ke && ke->enemy_defended_my_attack == 2)) {
     guard_vigilant (g);
     return false;
   }

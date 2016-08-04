@@ -372,8 +372,8 @@ struct anim {
     invisible, has_sword, hurt, controllable, fight, crossing_mirror,
     edge_detection;
 
-  int attack_defended, counter_attacked, counter_defense;
-  bool hurt_enemy_in_counter_attack;
+  int enemy_defended_my_attack, enemy_counter_attacked_myself, i_counter_defended;
+  bool attack_range_far, attack_range_near, hurt_enemy_in_counter_attack;
 
   struct skill skill;
   int refraction;

@@ -76,17 +76,29 @@ kid_sword_defense (struct anim *k)
 static bool
 flow (struct anim *k)
 {
-  if (k->oaction != kid_sword_defense) k->i = -1;
+  if (k->oaction != kid_sword_defense) {
+    k->i = -1;
+
+    struct anim *ke = get_anim_by_id (k->enemy_id);
+    if (ke && k->i_counter_defended)
+      ke->enemy_defended_my_attack = 1;
+
+    k->enemy_defended_my_attack = 0;
+    k->i_counter_defended = 0;
+    k->enemy_counter_attacked_myself = 0;
+    k->hurt_enemy_in_counter_attack = false;
+  }
 
   struct anim *ke = get_anim_by_id (k->enemy_id);
   if (k->i == 2) {
     kid_sword_attack (k);
     return false;
-  } else if (k->i == 1 && ke && ke->attack_defended == 2
-           && ke->counter_attacked != 2) {
+  } else if (k->i == 1 && ke && ke->enemy_defended_my_attack == 2
+           && ke->enemy_counter_attacked_myself != 2) {
     kid_sword_walkb (k);
     return false;
-  } else if (k->i == 1 && ! (ke && ke->attack_defended == 2)) {
+  } else if (k->i == 1
+             && ! (ke && ke->enemy_defended_my_attack == 2)) {
     kid_sword_normal (k);
     return false;
   }

@@ -335,40 +335,29 @@ flow (struct anim *g)
     /*           g->f.c.x - g->of.c.x, g->i, g->f.b); */
 
     g->i = -1;
-    g->attack_defended = 0;
-    g->counter_attacked = 0;
-    g->counter_defense = 0;
     g->of = g->f;
   }
 
   if (g->oaction == guard_defense) g->i = 1;
 
-  if (g->i < 7 && g->counter_defense == 2) {
+  if (g->i < 7 && g->i_counter_defended == 2) {
     g->i = 7;
     /* g->f = g->of; */
   }
 
   if (g->i == 9) {
-    g->attack_defended = 0;
-    g->counter_defense = 0;
-    g->counter_attacked = 0;
-    g->hurt_enemy_in_counter_attack = false;
     guard_defense (g);
     return false;
   } else if (g->i == 7
-             && g->counter_defense != 2) {
-    g->attack_defended = 0;
-    g->counter_defense = 0;
-    g->counter_attacked = 0;
-    g->hurt_enemy_in_counter_attack = false;
+             && g->i_counter_defended != 2) {
     guard_vigilant (g);
     return false;
   }
 
-  if (g->i == 4 && g->attack_defended)
+  if (g->i == 4 && g->enemy_defended_my_attack)
     g->f.c.x += (g->f.dir == LEFT) ? +9 : -9;
 
-  if (g->i == 3 && g->attack_defended)
+  if (g->i == 3 && g->enemy_defended_my_attack)
     g->i = 4;
 
   struct frameset *frameset = get_guard_attack_frameset (g->type);
@@ -391,7 +380,7 @@ flow (struct anim *g)
   if (g->j == 7) g->xf.dx = +0, g->xf.dy = +23;
   if (g->j == 10) g->xf.dx = -10, g->xf.dy = +16;
 
-  if (g->i == 5 && g->attack_defended) g->fo.dx = -2;
+  if (g->i == 5 && g->enemy_defended_my_attack) g->fo.dx = -2;
 
   if (g->type == SKELETON) g->xf.dy += -3;
   if (g->type == SHADOW) g->xf.dy += -2;

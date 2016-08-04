@@ -1003,7 +1003,7 @@ get_legacy_skill (int i, struct skill *skill)
     skill->defense_prob = 58;
     skill->counter_defense_prob = 23;
     skill->advance_prob = 77;
-    skill->return_prob = -1;
+    skill->return_prob = 21;
     skill->refraction = 16;
     skill->extra_life = 0;
     break;
@@ -1013,7 +1013,7 @@ get_legacy_skill (int i, struct skill *skill)
     skill->defense_prob = 58;
     skill->counter_defense_prob = 23;
     skill->advance_prob = 77;
-    skill->return_prob = -1;
+    skill->return_prob = 21;
     skill->refraction = 16;
     skill->extra_life = 0;
     break;
@@ -1023,7 +1023,7 @@ get_legacy_skill (int i, struct skill *skill)
     skill->defense_prob = 77;
     skill->counter_defense_prob = 38;
     skill->advance_prob = 77;
-    skill->return_prob = -1;
+    skill->return_prob = 21;
     skill->refraction = 16;
     skill->extra_life = 0;
     break;
@@ -1053,7 +1053,7 @@ get_legacy_skill (int i, struct skill *skill)
     skill->defense_prob = 77;
     skill->counter_defense_prob = 38;
     skill->advance_prob = 77;
-    skill->return_prob = -1;
+    skill->return_prob = 21;
     skill->refraction = 8;
     skill->extra_life = 0;
     break;
@@ -1063,7 +1063,7 @@ get_legacy_skill (int i, struct skill *skill)
     skill->defense_prob = 97;
     skill->counter_defense_prob = 97;
     skill->advance_prob = -1;
-    skill->return_prob = -1;
+    skill->return_prob = 99;
     skill->refraction = 8;
     skill->extra_life = 0;
     break;
@@ -1073,7 +1073,7 @@ get_legacy_skill (int i, struct skill *skill)
     skill->defense_prob = -1;
     skill->counter_defense_prob = -1;
     skill->advance_prob = -1;
-    skill->return_prob = -1;
+    skill->return_prob = 99;
     skill->refraction = 0;
     skill->extra_life = 0;
     break;
@@ -1093,7 +1093,7 @@ get_legacy_skill (int i, struct skill *skill)
     skill->defense_prob = 99;
     skill->counter_defense_prob = 99;
     skill->advance_prob = 38;
-    skill->return_prob = -1;
+    skill->return_prob = 60;
     skill->refraction = 0;
     skill->extra_life = 0;
     break;
@@ -1103,7 +1103,7 @@ get_legacy_skill (int i, struct skill *skill)
     skill->defense_prob = 99;
     skill->counter_defense_prob = 68;
     skill->advance_prob = 38;
-    skill->return_prob = -1;
+    skill->return_prob = 60;
     skill->refraction = 0;
     skill->extra_life = 0;
   }

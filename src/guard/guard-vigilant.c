@@ -214,6 +214,13 @@ flow (struct anim *g)
   bool attack = g->key.shift && ! g->key.up
     && ! g->key.left && ! g->key.right;
 
+  g->enemy_defended_my_attack = 0;
+  g->enemy_counter_attacked_myself = 0;
+  g->i_counter_defended = 0;
+  g->hurt_enemy_in_counter_attack = false;
+  g->attack_range_far = false;
+  g->attack_range_near = false;
+
   if (g->oaction != guard_vigilant) g->i = -1;
 
   if (g->oaction == guard_vigilant) {
