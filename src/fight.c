@@ -230,7 +230,8 @@ fight_ai (struct anim *k)
 
   /* if the enemy is on the back, turn */
   if (is_on_back (k, ke) && is_seeing (k, ke, odir)
-      && p.floor == pe.floor) {
+      && p.floor == pe.floor
+      && ! is_in_range (k, ke, INVERSION_RANGE)) {
     if (is_safe_to_turn (k)) fight_turn (k);
     else if (is_safe_to_walkb (k)) fight_walkb (k);
     return;
@@ -439,7 +440,9 @@ fight_inversion_mechanics (struct anim *k, struct anim *ke)
       && is_in_fight_mode (k)
       && is_in_fight_mode (ke)
       && ! is_sword_hit (k)
-      && ! is_sword_hit (ke)) {
+      && ! is_sword_hit (ke)
+      && (! is_attacking (k) || k->i > 4)
+      && (! is_attacking (ke) || k->i >4)) {
     struct coord c;
     c = k->f.c;
     k->f.c = ke->f.c;
@@ -1048,6 +1051,7 @@ fight_turn_controllable (struct anim *k)
     survey (_m, pos, &ke->f, NULL, &pe, NULL);
     pos2room (&pe, p.room, &pe);
     if (is_on_back (k, ke)
+        && ! is_in_range (k, ke, INVERSION_RANGE)
         && is_in_fight_mode (k)
         && is_in_fight_mode (ke)
         && p.room == pe.room
@@ -1099,10 +1103,15 @@ fight_hit (struct anim *k, struct anim *ke)
   if (! is_guard (ke))
     upgrade_skill (&ke->skill, &k->skill, k->total_lives);
 
-  if (is_in_fight_mode (k)) {
-    backoff_from_range (ke, k, ATTACK_RANGE - 20, true);
-    get_in_range (k, ke, ATTACK_RANGE - 10, false);
-  }
+  if (k->current_lives <= 0) {
+    k->current_lives = 0;
+    k->death_reason = FIGHT_DEATH;
+    ke->alert_cycle = anim_cycle;
+    anim_die (k);
+  } else anim_sword_hit (k);
+
+  backoff_from_range (ke, k, ATTACK_RANGE - 20, true);
+  get_in_range (k, ke, ATTACK_RANGE - 10, false);
 
   int d = (k->f.dir == LEFT) ? +1 : -1;
   struct pos pb;
@@ -1118,32 +1127,6 @@ fight_hit (struct anim *k, struct anim *ke)
   if (k->current_lives <= 0 && is_strictly_traversable (&pb)) {
     place_at_pos (&k->f, _m, &pb, &k->f.c);
     anim_fall (k);
-  }
-
-  /* if (! is_colliding (&k->f, &k->fo, +PLACE_WIDTH, */
-  /*                     ke->f.dir != k->f.dir, &k->ci)) { */
-  /*   if (k->current_lives <= 0 && is_strictly_traversable (&pb)) { */
-  /*     place_at_pos (&k->f, _m, &pb, &k->f.c); */
-  /*     anim_fall (k); */
-  /*   } else if (is_in_range (ke, k, PLACE_WIDTH)) */
-  /*     place_at_distance (&ke->f, _tf, &k->f, _tf, +0, */
-  /*                        ke->f.dir, &k->f.c); */
-  /*   else place_at_distance (&ke->f, _tf, &k->f, _tf, +10, */
-  /*                           ke->f.dir, &k->f.c); */
-  /* } */
-
-  if (! is_anim_fall (&k->f)) {
-    if (is_attacking (k))
-      k->f.c.x += (k->f.dir == LEFT) ? +10 : -10;
-    else if (is_kid_run_jump (&k->f))
-      k->f.c.x += (k->f.dir == LEFT) ? +10 : -10;
-
-    if (k->current_lives <= 0) {
-      k->current_lives = 0;
-      k->death_reason = FIGHT_DEATH;
-      ke->alert_cycle = anim_cycle;
-      anim_die (k);
-    } else anim_sword_hit (k);
   }
 
   k->splash = true;
