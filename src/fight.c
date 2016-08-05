@@ -442,7 +442,7 @@ fight_inversion_mechanics (struct anim *k, struct anim *ke)
       && ! is_sword_hit (k)
       && ! is_sword_hit (ke)
       && (! is_attacking (k) || k->i > 4)
-      && (! is_attacking (ke) || k->i >4)) {
+      && (! is_attacking (ke) || k->i > 4)) {
     struct coord c;
     c = k->f.c;
     k->f.c = ke->f.c;

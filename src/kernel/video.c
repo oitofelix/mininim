@@ -453,8 +453,7 @@ flip_display (ALLEGRO_BITMAP *bitmap)
     set_target_backbuffer (display);
     al_draw_bitmap (iscreen, 0, 0, flags);
 
-    if (mr.room_select > 0 && ! cutscene
-        && edit != EDIT_NONE)
+    if (mr.room_select > 0 && ! cutscene)
       for (y = mr.h - 1; y >= 0; y--)
         for (x = 0; x < mr.w; x++)
           if (mr.cell[x][y].room == mr.room_select) {

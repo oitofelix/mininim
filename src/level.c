@@ -406,11 +406,16 @@ compute_level (void)
     if (ke->f.c.room == roomd (&global_level, current_kid->f.c.room, LEFT)) {
       mr_view_trans (LEFT);
       mr_focus_room (current_kid->f.c.room);
+      mr.room_select = ke->f.c.room;
     } else if (ke->f.c.room == roomd (&global_level, current_kid->f.c.room, RIGHT)) {
       mr_view_trans (RIGHT);
       mr_focus_room (current_kid->f.c.room);
+      mr.room_select = ke->f.c.room;
     }
-  }
+  } else if (mr.room_select > 0
+             && (mr.select_cycles == 0
+                 || mr.room != current_kid->f.c.room))
+    mr.room_select = -1;
 
   if (global_level.special_events) global_level.special_events ();
 

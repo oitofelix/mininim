@@ -1703,6 +1703,7 @@ exit_editor (void)
   if (is_game_paused ())
     draw_bottom_text (NULL, "GAME PAUSED", 0);
   else draw_bottom_text (NULL, NULL, 0);
+  mr.room_select = -1;
 }
 
 static char
