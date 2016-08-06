@@ -62,6 +62,7 @@ play_level (struct level *lv)
   cutscene = false;
   game_paused = false;
   copy_level (&global_level, lv);
+  if (mirror_level) mirror_level_h (&global_level, false, false, false, false);
 
   if (level_module == LEGACY_LEVEL_MODULE
       || level_module == PLV_LEVEL_MODULE

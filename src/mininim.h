@@ -194,6 +194,7 @@ extern struct pos start_pos;
 extern int start_level_time;
 extern int time_limit;
 extern struct skill skill;
+extern bool mirror_level;
 extern char *resources_dir,
   *temp_dir,
   *user_home_dir,

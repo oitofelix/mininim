@@ -923,6 +923,7 @@ interpret_legacy_level (int number)
 
   /* START POSITION: ok */
   struct pos *sp = &legacy_level.start_pos;
+  sp->l = &legacy_level;
   sp->room = lv.start_position[0];
   sp->floor = lv.start_position[1] / PLACES;
   sp->place = lv.start_position[1] % PLACES;

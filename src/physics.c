@@ -335,7 +335,7 @@ exchange_guard_pos (struct pos *p0, struct pos *p1, bool invert_dir)
       p1->l->guard[i].p = *p1;
       if (invert_dir)
         p1->l->guard[i].dir = (p1->l->guard[i].dir == LEFT) ? RIGHT : LEFT;
-    } else if (peq (&p1->l->event[i].p, p1)) {
+    } else if (peq (&p1->l->guard[i].p, p1)) {
       p0->l->guard[i].p = *p0;
       if (invert_dir)
         p0->l->guard[i].dir = (p0->l->guard[i].dir == LEFT) ? RIGHT : LEFT;
@@ -399,17 +399,22 @@ exchange_anim_pos (struct pos *p0, struct pos *p1, bool invert_dir)
 }
 
 void
-mirror_pos (struct pos *p0, struct pos *p1, bool prepare, bool invert_dir)
+mirror_pos (struct pos *p0, struct pos *p1, bool destroy, bool register_con,
+            bool prepare, bool register_change, bool invert_dir)
 {
   if (peq (p0, p1)) return;
   struct con con0 = *con (p0);
   struct con con1 = *con (p1);
-  destroy_con_at_pos (p0);
-  destroy_con_at_pos (p1);
+  if (destroy) {
+    destroy_con_at_pos (p0);
+    destroy_con_at_pos (p1);
+  }
   *con (p0) = con1;
   *con (p1) = con0;
-  register_con_at_pos (p0);
-  register_con_at_pos (p1);
+  if (register_con) {
+    register_con_at_pos (p0);
+    register_con_at_pos (p1);
+  }
   if (prepare) {
     prepare_con_at_pos (p0);
     prepare_con_at_pos (p1);
@@ -419,8 +424,10 @@ mirror_pos (struct pos *p0, struct pos *p1, bool prepare, bool invert_dir)
   exchange_kid_start_pos (p0, p1, invert_dir);
   exchange_anim_pos (p0, p1, invert_dir);
 
-  register_changed_pos (p0, -1);
-  register_changed_pos (p1, -1);
+  if (register_change) {
+    register_changed_pos (p0, -1);
+    register_changed_pos (p1, -1);
+  }
 }
 
 void
@@ -519,6 +526,33 @@ con_diff (struct con *c0, struct con *c1)
     return CON_DIFF_EXT;
 
   return CON_DIFF_MIXED;
+}
+
+struct level *
+mirror_room_h (struct level *l, int room, bool destroy,
+               bool register_con, bool prepare, bool register_change)
+{
+  struct pos p0, p1;
+  new_pos (&p0, l, room, -1, -1);
+  for (p0.floor = 0; p0.floor < FLOORS; p0.floor++)
+    for (p0.place = 0; p0.place < PLACES / 2; p0.place++) {
+      reflect_pos_h (&p0, &p1);
+      mirror_pos (&p0, &p1, destroy, register_con, prepare,
+                  register_change, true);
+    }
+  return l;
+}
+
+struct level *
+mirror_level_h (struct level *l, bool destroy, bool register_con,
+                bool prepare, bool register_change)
+{
+  int i;
+  for (i = 1; i < ROOMS; i++) {
+    mirror_room_h (l, i, destroy, register_con, prepare, register_change);
+    mirror_link (l, i, LEFT, RIGHT);
+  }
+  return l;
 }
 
 

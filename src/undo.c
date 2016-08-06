@@ -196,7 +196,7 @@ mirror_pos_undo (struct mirror_pos_undo *d, int dir)
     p0 = &d->p1;
     p1 = &d->p0;
   }
-  mirror_pos (p0, p1, d->prepare, d->invert_dir);
+  mirror_pos (p0, p1, true, true, d->prepare, true, d->invert_dir);
   register_changed_pos (p0, -1);
   register_changed_pos (p1, -1);
 }
@@ -273,14 +273,8 @@ register_h_room_mirror_con_undo (struct undo *u, int _room, char *desc)
 void
 h_room_mirror_con_undo (int *room, int dir)
 {
-  struct pos p0, p1;
-  new_pos (&p0, &global_level, *room, -1, -1);
-  for (p0.floor = 0; p0.floor < FLOORS; p0.floor++)
-    for (p0.place = 0; p0.place < PLACES / 2; p0.place++) {
-      reflect_pos_h (&p0, &p1);
-      mirror_pos (&p0, &p1, false, true);
-    }
-  prepare_room (p0.room);
+  mirror_room_h (&global_level, *room, true, true, false, false);
+  prepare_room (*room);
   register_changed_room (*room);
 }
 
@@ -305,7 +299,7 @@ v_room_mirror_con_undo (int *room, int dir)
   for (p0.floor = 0; p0.floor < FLOORS / 2; p0.floor++)
     for (p0.place = 0; p0.place < PLACES; p0.place++) {
       reflect_pos_v (&p0, &p1);
-      mirror_pos (&p0, &p1, false, false);
+      mirror_pos (&p0, &p1, true, true, false, false, false);
     }
   prepare_room (p0.room);
   register_changed_room (*room);
@@ -346,14 +340,14 @@ random_room_mirror_con_undo (struct random_room_mirror_con_undo *d, int dir)
       for (p0.place = 0; p0.place < PLACES; p0.place++) {
         p1 = d->p[p0.floor][p0.place];
         p1.room = d->room;
-        mirror_pos (&p0, &p1, d->prepare, d->invert_dir);
+        mirror_pos (&p0, &p1, true, true, d->prepare, false, d->invert_dir);
       }
   else
     for (p0.floor = FLOORS - 1; p0.floor >= 0; p0.floor--)
       for (p0.place = PLACES - 1; p0.place >= 0; p0.place--) {
         p1 = d->p[p0.floor][p0.place];
         p1.room = d->room;
-        mirror_pos (&p1, &p0, d->prepare, d->invert_dir);
+        mirror_pos (&p1, &p0, true, true, d->prepare, false, d->invert_dir);
       }
 
   prepare_room (d->room);
