@@ -1207,11 +1207,8 @@ editor (void)
       editor_msg ("LEVEL SAVE FAILED", 18);
       break;
     case 'L':
+      while (undo_pass (&undo, -1, NULL));
       editor_msg ("LEVEL RELOADED", 18);
-      copy_level (&global_level, vanilla_level);
-      destroy_cons ();
-      register_cons ();
-      update_cache (em, vm);
       break;
     }
     al_free (str);

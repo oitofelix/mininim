@@ -792,16 +792,21 @@ uncollide (struct frame *f, struct frame_offset *fo,
 {
   struct frame_offset fo0 = *fo;
   struct frame_offset fo1 = *fo;
+  int i0 = 0, i1 = 0;
 
   while (is_colliding (f, &fo0, dx, reverse, ci)
-         && abs (fo0.dx) <= PLACE_WIDTH)
+         && abs (fo0.dx) <= PLACE_WIDTH) {
     fo0.dx++;
+    i0++;
+  }
 
   while (is_colliding (f, &fo1, dx, reverse, ci)
-         && abs (fo1.dx) <= PLACE_WIDTH)
+         && abs (fo1.dx) <= PLACE_WIDTH) {
     fo1.dx--;
+    i1++;
+  }
 
-  *_fo = (abs (fo0.dx) < abs (fo1.dx)) ? fo0 : fo1;
+  *_fo = (i0 < i1) ? fo0 : fo1;
 
   return _fo;
 }

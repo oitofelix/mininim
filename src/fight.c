@@ -308,13 +308,12 @@ fight_ai (struct anim *k)
      elsewhere) */
   if (is_in_range (k, ke, ATTACK_RANGE + 16)
       && ! is_on_back (k, ke)
-      && is_attacking (ke)
+      && (is_attacking (ke) && ke->i == 0)
       && (prandom (99) <= k->skill.defense_prob
           || k->refraction > 0)
       && ke->current_lives > 0) {
     fight_defense (k);
-    if (is_safe_to_attack (k)) fight_attack (k);
-    else if (is_safe_to_walkb (k)) fight_walkb (k);
+    fight_attack (k);
     return;
   }
 
@@ -323,6 +322,7 @@ fight_ai (struct anim *k)
   if (is_in_range (k, ke, ATTACK_RANGE + 16)
       && is_attacking (k)) {
     fight_defense (k);
+    fight_attack (k);
     return;
   }
 
@@ -558,7 +558,10 @@ is_attacking (struct anim *k)
 {
   if (! k) return false;
   else return k->action == kid_sword_attack
-         || k->action == guard_attack;
+         || k->action == guard_attack
+         || ((k->action == kid_sword_normal
+              || k->action == guard_vigilant)
+             && k->key.shift && ! k->key.up);
 }
 
 bool
@@ -1153,15 +1156,25 @@ fight_door_split_collision (struct anim *a)
       && ptr.place > ptl.place
       && tl.y <= door_grid_tip_y (&ptl) - 10) {
     if (dtl < dtr) {
-     a->f.c.x += dtl;
-      if (a->f.dir == RIGHT) anim_walkf (a);
-      else anim_walkb (a);
-      return true;
+      a->f.c.x += dtl;
+      if (a->f.dir == RIGHT
+          && ! is_colliding (&a->f, &a->fo, +8, false, &a->ci)) {
+        anim_walkf (a);
+        return true;
+      } else if (! is_colliding (&a->f, &a->fo, +8, true, &a->ci)) {
+        anim_walkb (a);
+        return true;
+      }
     } else {
       a->f.c.x -= dtr;
-      if (a->f.dir == LEFT) anim_walkf (a);
-      else anim_walkb (a);
-      return true;
+      if (a->f.dir == LEFT
+          && ! is_colliding (&a->f, &a->fo, +8, false, &a->ci)) {
+        anim_walkf (a);
+        return true;
+      } else if (! is_colliding (&a->f, &a->fo, +8, true, &a->ci)) {
+        anim_walkb (a);
+        return true;
+      }
     }
   }
 

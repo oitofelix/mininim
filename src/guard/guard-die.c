@@ -464,6 +464,9 @@ flow (struct anim *g)
 static bool
 physics_in (struct anim *g)
 {
+  /* collision */
+  uncollide (&g->f, &g->fo, &g->fo, +0, true, &g->ci);
+
   /* fall */
   struct pos pm;
   survey (_m, pos, &g->f, NULL, &pm, NULL);
