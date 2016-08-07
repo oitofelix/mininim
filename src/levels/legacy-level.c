@@ -820,7 +820,7 @@ interpret_legacy_level (int number)
           break;
         case LG_TAPEST:         /* ok */
           switch (b) {
-          case LM_TAPEST_WITH_LATTICE: c->ext.design = ARCH_CARPET_LEFT; break;
+          case LM_TAPEST_WITH_LATTICE: c->ext.design = ARCH_CARPET_LEFT_00; break;
           case LM_TAPEST_ALTERNATIVE_DESIGN: c->ext.design = CARPET_00; break;
           case LM_TAPEST_NORMAL: c->ext.design = CARPET_01; break;
           case LM_TAPEST_BLACK: break; /* needless */
@@ -847,7 +847,7 @@ interpret_legacy_level (int number)
           break;
         case LG_TTOP:           /* ok */
           switch (b) {
-          case LM_TTOP_WITH_LATTICE: c->ext.design = ARCH_CARPET_LEFT; break;
+          case LM_TTOP_WITH_LATTICE: c->ext.design = ARCH_CARPET_LEFT_00; break;
           case LM_TTOP_ALTERNATIVE_DESIGN:
             c->ext.design = get_tile (&pl) == LT_LATTICE_SUPPORT ?
               ARCH_CARPET_RIGHT_00 : CARPET_00; break;

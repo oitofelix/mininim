@@ -393,6 +393,32 @@ exchange_anim_pos (struct pos *p0, struct pos *p1, bool invert_dir)
 }
 
 void
+invert_con_dir (struct pos *p)
+{
+  struct con *c = con (p);
+
+  switch (c->fg) {
+  case CARPET: case TCARPET:
+    if (c->ext.design == ARCH_CARPET_LEFT_00)
+      c->ext.design = ARCH_CARPET_RIGHT_00;
+    else if (c->ext.design == ARCH_CARPET_LEFT_01)
+      c->ext.design = ARCH_CARPET_RIGHT_01;
+    else if (c->ext.design == ARCH_CARPET_RIGHT_00)
+      c->ext.design = ARCH_CARPET_LEFT_00;
+    else if (c->ext.design == ARCH_CARPET_RIGHT_01)
+      c->ext.design = ARCH_CARPET_LEFT_01;
+    break;
+  case ARCH_TOP_LEFT:
+    c->fg = ARCH_TOP_RIGHT;
+    break;
+  case ARCH_TOP_RIGHT:
+    c->fg = ARCH_TOP_LEFT;
+    break;
+  default: break;
+  }
+}
+
+void
 mirror_pos (struct pos *p0, struct pos *p1, bool destroy, bool register_con,
             bool prepare, bool register_change, bool invert_dir)
 {
@@ -412,6 +438,10 @@ mirror_pos (struct pos *p0, struct pos *p1, bool destroy, bool register_con,
   if (prepare) {
     prepare_con_at_pos (p0);
     prepare_con_at_pos (p1);
+  }
+  if (invert_dir) {
+    invert_con_dir (p0);
+    invert_con_dir (p1);
   }
   exchange_event_pos (p0, p1);
   exchange_guard_pos (p0, p1, invert_dir);

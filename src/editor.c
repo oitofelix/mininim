@@ -83,6 +83,17 @@ editor (void)
      {'R', "RANDOM"},
      {0}};
 
+  struct menu_item mirror_con_menu[] =
+    {{'H', "HORIZONTAL"},
+     {'V', "VERTICAL"},
+     {'B', "HORIZONTAL+VERTICAL"},
+     {'R', "RANDOM"},
+     {'A', "LEFT"},
+     {'D', "RIGHT"},
+     {'W', "ABOVE"},
+     {'S', "BELOW"},
+     {0}};
+
   struct menu_item fg_menu[] =
     {{'F', "FLOOR>"},
      {'P', "PILLAR>"},
@@ -356,7 +367,7 @@ editor (void)
       break;
     }
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
-    switch (menu_enum (mirror_dir_menu, "CM>")) {
+    switch (menu_enum (mirror_con_menu, "CM>")) {
     case -1: case 1: edit = EDIT_CON; break;
     case 'H':
       reflect_pos_h (&p, &p0);
@@ -375,6 +386,22 @@ editor (void)
       random_pos (&global_level, &p0);
       p0.room = p.room;
       register_mirror_pos_undo (&undo, &p, &p0, true, false, "MIRROR CON R.");
+      break;
+    case 'A':
+      prel (&p, &p0, +0, -1);
+      register_mirror_pos_undo (&undo, &p, &p0, true, false, "MIRROR CON LEFT");
+      break;
+    case 'D':
+      prel (&p, &p0, +0, +1);
+      register_mirror_pos_undo (&undo, &p, &p0, true, false, "MIRROR CON RIGHT");
+      break;
+    case 'W':
+      prel (&p, &p0, -1, +0);
+      register_mirror_pos_undo (&undo, &p, &p0, true, false, "MIRROR CON ABOVE");
+      break;
+    case 'S':
+      prel (&p, &p0, +1, +0);
+      register_mirror_pos_undo (&undo, &p, &p0, true, false, "MIRROR CON BELOW");
       break;
     }
     break;
@@ -686,7 +713,7 @@ editor (void)
       switch (c) {
       case '0': ext.design = CARPET_00; break;
       case '1': ext.design = CARPET_01; break;
-      case 'A': ext.design = ARCH_CARPET_LEFT; break;
+      case 'A': ext.design = ARCH_CARPET_LEFT_00; break;
       }
 
       register_con_undo (&undo, &p,
@@ -706,7 +733,7 @@ editor (void)
       switch (c) {
       case '0': ext.design = CARPET_00; break;
       case '1': ext.design = CARPET_01; break;
-      case 'A': ext.design = ARCH_CARPET_LEFT; break;
+      case 'A': ext.design = ARCH_CARPET_LEFT_00; break;
       case 'B': ext.design = ARCH_CARPET_RIGHT_00; break;
       case 'C': ext.design = ARCH_CARPET_RIGHT_01; break;
       }
@@ -757,7 +784,8 @@ editor (void)
       switch (con (&p)->ext.design) {
       case CARPET_00: ext_str = "CARPET 00"; break;
       case CARPET_01: ext_str = "CARPET 01"; break;
-      case ARCH_CARPET_LEFT: ext_str = "ARCH CARPET LEFT"; break;
+      case ARCH_CARPET_LEFT_00: ext_str = "ARCH CARPET LEFT 00"; break;
+      case ARCH_CARPET_LEFT_01: ext_str = "ARCH CARPET LEFT 01"; break;
       default: ext_str = "UNKNOWN EXTENSION"; break;
       }
       break;
@@ -767,7 +795,8 @@ editor (void)
       case CARPET_01: ext_str = "CARPET 01"; break;
       case ARCH_CARPET_RIGHT_00: ext_str = "ARCH CARPET RIGHT 00"; break;
       case ARCH_CARPET_RIGHT_01: ext_str = "ARCH CARPET RIGHT 01"; break;
-      case ARCH_CARPET_LEFT: ext_str = "ARCH CARPET LEFT"; break;
+      case ARCH_CARPET_LEFT_00: ext_str = "ARCH CARPET LEFT 00"; break;
+      case ARCH_CARPET_LEFT_01: ext_str = "ARCH CARPET LEFT 01"; break;
       default: ext_str = "UNKNOWN EXTENSION"; break;
       }
       break;

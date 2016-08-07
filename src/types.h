@@ -160,9 +160,10 @@ struct mr_room_list {
 enum carpet_design {
   CARPET_00 = 0,
   CARPET_01 = 1,
-  ARCH_CARPET_LEFT = 2,
-  ARCH_CARPET_RIGHT_00 = 3,
-  ARCH_CARPET_RIGHT_01 = 4,
+  ARCH_CARPET_LEFT_00 = 2,
+  ARCH_CARPET_LEFT_01 = 3,
+  ARCH_CARPET_RIGHT_00 = 4,
+  ARCH_CARPET_RIGHT_01 = 5,
 };
 
 enum gm {

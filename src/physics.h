@@ -52,6 +52,7 @@ void exchange_event_pos (struct pos *p0, struct pos *p1);
 void exchange_guard_pos (struct pos *p0, struct pos *p1, bool invert_dir);
 void exchange_kid_start_pos (struct pos *p0, struct pos *p1, bool invert_dir);
 void exchange_anim_pos (struct pos *p0, struct pos *p1, bool invert_dir);
+void invert_con_dir (struct pos *p);
 void mirror_pos (struct pos *p0, struct pos *p1, bool destroy, bool register_con,
                  bool prepare, bool register_change, bool invert_dir);
 void decorate_pos (struct pos *p);

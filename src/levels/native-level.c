@@ -363,7 +363,8 @@ get_conext_str (struct pos *p)
     switch (con (p)->ext.design) {
     case CARPET_00: s = "CARPET_00"; break;
     case CARPET_01: s = "CARPET_01"; break;
-    case ARCH_CARPET_LEFT: s = "ARCH_CARPET_LEFT"; break;
+    case ARCH_CARPET_LEFT_00: s = "ARCH_CARPET_LEFT_00"; break;
+    case ARCH_CARPET_LEFT_01: s = "ARCH_CARPET_LEFT_01"; break;
     }
     if (s) xasprintf (&s, "%s", s);
     break;
@@ -373,7 +374,8 @@ get_conext_str (struct pos *p)
     case CARPET_01: s = "CARPET_01"; break;
     case ARCH_CARPET_RIGHT_00: s = "ARCH_CARPET_RIGHT_00"; break;
     case ARCH_CARPET_RIGHT_01: s = "ARCH_CARPET_RIGHT_01"; break;
-    case ARCH_CARPET_LEFT: s = "ARCH_CARPET_LEFT"; break;
+    case ARCH_CARPET_LEFT_00: s = "ARCH_CARPET_LEFT_00"; break;
+    case ARCH_CARPET_LEFT_01: s = "ARCH_CARPET_LEFT_01"; break;
     }
     if (s) xasprintf (&s, "%s", s);
     break;

@@ -194,7 +194,7 @@ get_carpet_bitmaps (struct pos *p, enum em em, enum vm vm,
     if (carpet) *carpet = carpet_01;
     if (carpet_top) *carpet_top = carpet_top_01;
     break;
-  case ARCH_CARPET_LEFT:
+  case ARCH_CARPET_LEFT_00: case ARCH_CARPET_LEFT_01:
     if (carpet) *carpet = NULL;
     if (carpet_top) *carpet_top = NULL;
     break;
@@ -217,7 +217,8 @@ draw_carpet_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   ALLEGRO_BITMAP *carpet = NULL;
 
-  if (con (p)->ext.design == ARCH_CARPET_LEFT)
+  if (con (p)->ext.design == ARCH_CARPET_LEFT_00
+      || con (p)->ext.design == ARCH_CARPET_LEFT_01)
     draw_arch_top_left_end (bitmap, p, em, vm);
   else {
     get_carpet_bitmaps (p, em, vm, &carpet, NULL);
@@ -239,7 +240,8 @@ draw_carpet_top (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   ALLEGRO_BITMAP *carpet_top = NULL;
 
-  if (con (p)->ext.design == ARCH_CARPET_LEFT) return;
+  if (con (p)->ext.design == ARCH_CARPET_LEFT_00
+      || con (p)->ext.design == ARCH_CARPET_LEFT_01) return;
   else {
     get_carpet_bitmaps (p, em, vm, NULL, &carpet_top);
 

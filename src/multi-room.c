@@ -708,8 +708,16 @@ update_cache_pos (struct pos *p, enum changed_pos_reason reason,
                 case CHPOS_MOUSE_SELECT:
                 case CHPOS_MOUSE_DESELECT:
                 case CHPOS_CLOSE_LEVEL_DOOR:
-                case CHPOS_CARPET_DESIGN:
                 case CHPOS_WALL:
+                  draw_conbg (mr.cell[x][y].cache, &q, em, vm, true);
+                  break;
+                case CHPOS_CARPET_DESIGN:
+                  new_rect (&r, q.room,
+                            PLACE_WIDTH * q.place,
+                            PLACE_HEIGHT * q.floor + 3,
+                            64, 50);
+                  clear_rect_to_color (mr.cell[x][y].cache, &r, TRANSPARENT_COLOR);
+
                   draw_conbg (mr.cell[x][y].cache, &q, em, vm, true);
                   break;
                 case CHPOS_SHAKE_LOOSE_FLOOR:
