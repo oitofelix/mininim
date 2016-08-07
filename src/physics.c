@@ -377,10 +377,7 @@ exchange_anim_pos (struct pos *p0, struct pos *p1, bool invert_dir)
         if (is_valid_pos (&a->df_posb[j]))
           get_new_rel_pos (&p, &a->df_posb[j], p1, &a->df_posb[j]);
       }
-      if (invert_dir) {
-        a->f.dir = (a->f.dir == LEFT) ? RIGHT : LEFT;
-        a->f.flip ^= ALLEGRO_FLIP_HORIZONTAL;
-      }
+      if (invert_dir) invert_frame_dir (&a->f, &a->f);
     } else if (peq (&p, p1)) {
       place_at_pos (&a->f, _m, p0, &a->f.c);
       place_on_the_ground (&a->f, &a->f.c);
@@ -390,10 +387,7 @@ exchange_anim_pos (struct pos *p0, struct pos *p1, bool invert_dir)
         if (is_valid_pos (&a->df_posb[j]))
           get_new_rel_pos (&p, &a->df_posb[j], p0, &a->df_posb[j]);
       }
-      if (invert_dir) {
-        a->f.dir = (a->f.dir == LEFT) ? RIGHT : LEFT;
-        a->f.flip ^= ALLEGRO_FLIP_HORIZONTAL;
-      }
+      if (invert_dir) invert_frame_dir (&a->f, &a->f);
     }
   }
 }
@@ -922,9 +916,6 @@ is_hangable_cs (enum confg t, enum dir d)
   return t == FLOOR
     || t == BROKEN_FLOOR
     || t == LOOSE_FLOOR
-    /* || (t == LOOSE_FLOOR */
-    /*     && loose_floor_at_pos (p)->action */
-    /*     != RELEASE_LOOSE_FLOOR) */
     || t == SKELETON_FLOOR
     || t == SPIKES_FLOOR
     || t == OPENER_FLOOR
@@ -950,9 +941,12 @@ is_hangable_pos (struct pos *p, enum dir d)
   struct pos pa; prel (p, &pa, -1, 0);
   struct pos pr; prel (p, &pr, +0, +1);
   struct con *cr = con (&pr);
+  struct con *c = con (p);
 
   return is_hangable_cs (ch->fg, d)
     && is_strictly_traversable (&pa)
+    && ! (d == LEFT && c->fg == CHOPPER)
+    && ! (d == LEFT && c->fg == MIRROR)
     && ! (d == RIGHT && cr->fg == CHOPPER)
     && ! (d == RIGHT && cr->fg == MIRROR)
     && ! (d == RIGHT && is_carpet (p))

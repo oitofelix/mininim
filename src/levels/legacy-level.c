@@ -253,8 +253,7 @@ legacy_level_special_events (void)
       int id = create_anim (k, 0, NULL, 0);
       struct anim *ks = &anima[id];
       ks->fight = false;
-      ks->f.dir = (ks->f.dir == LEFT) ? RIGHT : LEFT;
-      ks->f.flip ^= ALLEGRO_FLIP_HORIZONTAL;
+      invert_frame_dir (&ks->f, &ks->f);
       ks->controllable = false;
       ks->dont_draw_lives = true;
       ks->immortal = true;

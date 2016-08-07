@@ -214,18 +214,20 @@ fight_ai (struct anim *k)
       && ! (is_kid_climb (&ke->f) && ke->i <= 7)
       && ke->f.dir != k->f.dir
       && ke->current_lives > 0
-      && is_there_enough_room_to_fight (ke)) {
-    if (ke->has_sword) {
-      place_on_the_ground (&ke->f, &ke->f.c);
-      kid_take_sword (ke);
-    }
-    /* else if (ke->action != kid_normal */
-    /*          && ke->action != kid_stabilize */
-    /*          && ke->i >= 4) { */
-    /*   int dir = (ke->f.dir == LEFT) ? -1 : +1; */
-    /*   ke->f.c.x -= dir * 12; */
-    /*   kid_stabilize (ke); */
-    /* } */
+      && is_there_enough_room_to_fight (ke)
+      && ke->has_sword) {
+    place_on_the_ground (&ke->f, &ke->f.c);
+    kid_take_sword (ke);
+  }
+
+  /* prevent enemy from hiding near */
+  if (ke->type == KID
+      && is_in_range (k, ke, INVERSION_RANGE)
+      && ! is_in_fight_mode (ke)
+      && ke->current_lives > 0) {
+    if (is_safe_to_walkb (k)) fight_walkb (k);
+    else if (is_safe_to_turn (k)) fight_turn (k);
+    return;
   }
 
   /* if the enemy is on the back, turn */
@@ -253,6 +255,7 @@ fight_ai (struct anim *k)
 
   /* if the enemy is trying to bypass, attack him */
   if (! is_in_fight_mode (ke)
+      && ! ke->has_sword
       && ! is_kid_stairs (&ke->f)
       && ke->f.dir != k->f.dir
       && ke->current_lives > 0
@@ -411,7 +414,9 @@ fight_mechanics (struct anim *k)
   if (! ke->enemy_defended_my_attack && is_at_hit_frame (ke)
       && ! is_on_back (ke, k)
       && (ke->attack_range_far || ! is_in_fight_mode (k))
-      && is_in_range (k, ke, HIT_RANGE + 4)) fight_hit (k, ke);
+      && ((is_in_range (k, ke, HIT_RANGE + 4) && is_in_fight_mode (k))
+          || (is_in_range (k, ke, ATTACK_RANGE) && ! is_in_fight_mode (k))))
+    fight_hit (k, ke);
   else if (ke->hurt_enemy_in_counter_attack
            && is_at_hit_frame (ke)
            && ! is_on_back (ke, k)) fight_hit (k, ke);
@@ -419,8 +424,8 @@ fight_mechanics (struct anim *k)
            && is_at_defendable_attack_frame (ke)) {
     if (is_in_range (k, ke, HIT_RANGE + 8)
         || is_defending (k)) {
-      backoff_from_range (k, ke, ATTACK_RANGE - 20, false);
-      get_in_range (k, ke, ATTACK_RANGE - 6, false);
+      backoff_from_range (ke, k, ATTACK_RANGE - 20, false, false);
+      get_in_range (ke, k, ATTACK_RANGE - 6, false, false);
       put_at_attack_frame (ke);
       put_at_defense_frame (k);
     } else ke->enemy_defended_my_attack = false;
@@ -454,7 +459,7 @@ fight_inversion_mechanics (struct anim *k, struct anim *ke)
     fight_turn (k);
     fight_turn (ke);
 
-    backoff_from_range (k, ke, INVERSION_RANGE + 4, false);
+    backoff_from_range (ke, k, INVERSION_RANGE + 4, false, false);
   }
 }
 
@@ -867,7 +872,10 @@ bool
 is_safe_to_walkb (struct anim *k)
 {
   int df = dist_fall (&k->f, true);
-  return (df > PLACE_WIDTH) && is_there_enough_room_to_fight (k);
+  int dc = dist_collision (&k->f, true, &k->ci);
+  return df > PLACE_WIDTH
+    && dc > 4
+    && is_there_enough_room_to_fight (k);
 }
 
 bool
@@ -1005,14 +1013,14 @@ is_there_enough_room_to_fight (struct anim *k)
 void
 fight_turn (struct anim *k)
 {
-  k->f.dir = (k->f.dir == LEFT) ? RIGHT : LEFT;
-  k->f.flip ^= ALLEGRO_FLIP_HORIZONTAL;
+  invert_frame_dir (&k->f, &k->f);
 
   if (! is_in_fight_mode (k)
       && is_there_enough_room_to_fight (k)) enter_fight_mode (k);
   else {
     struct pos p;
     struct anim a = *k;
+    a.i = -1;
     anim_walkb (&a);
     survey (_bb, pos, &a.f, NULL, &p, NULL);
     if (! is_strictly_traversable (&p)
@@ -1113,8 +1121,8 @@ fight_hit (struct anim *k, struct anim *ke)
     anim_die (k);
   } else anim_sword_hit (k);
 
-  backoff_from_range (ke, k, ATTACK_RANGE - 20, true);
-  get_in_range (k, ke, ATTACK_RANGE - 10, false);
+  backoff_from_range (ke, k, ATTACK_RANGE - 20, true, false);
+  get_in_range (ke, k, ATTACK_RANGE - 10, false, false);
 
   int d = (k->f.dir == LEFT) ? +1 : -1;
   struct pos pb;
@@ -1183,16 +1191,15 @@ fight_door_split_collision (struct anim *a)
 
 void
 backoff_from_range (struct anim *k0, struct anim *k1, int r,
-                    bool only_k1)
+                    bool only_k1, bool k1_dominant)
 {
-  struct anim *kl, *kr;
-  if (k0->f.dir == opposite_dir (k1->f.dir)) {
-    kl = (k0->f.dir == LEFT) ? k0 : k1;
-    kr = (k0->f.dir == RIGHT) ? k0 : k1;
-  } else {
-    kl = (k0->f.c.x > k1->f.c.x) ? k0 : k1;
-    kr = (k0->f.c.x < k1->f.c.x) ? k0 : k1;
-  }
+  struct anim *kd, *ks, *kl, *kr;
+
+  kd = k1_dominant ? k1 : k0;
+  ks = k1_dominant ? k0 : k1;
+
+  kl = (kd->f.dir == LEFT) ? kd : ks;
+  kr = (kd->f.dir == RIGHT) ? kd : ks;
 
   int i = 0;
   while (is_in_range (k0, k1, r)) {
@@ -1210,16 +1217,15 @@ backoff_from_range (struct anim *k0, struct anim *k1, int r,
 
 void
 get_in_range (struct anim *k0, struct anim *k1, int r,
-              bool only_k1)
+              bool only_k1, bool k1_dominant)
 {
-  struct anim *kl, *kr;
-  if (k0->f.dir == opposite_dir (k1->f.dir)) {
-    kl = (k0->f.dir == LEFT) ? k0 : k1;
-    kr = (k0->f.dir == RIGHT) ? k0 : k1;
-  } else {
-    kl = (k0->f.c.x > k1->f.c.x) ? k0 : k1;
-    kr = (k0->f.c.x < k1->f.c.x) ? k0 : k1;
-  }
+  struct anim *kd, *ks, *kl, *kr;
+
+  kd = k1_dominant ? k1 : k0;
+  ks = k1_dominant ? k0 : k1;
+
+  kl = (kd->f.dir == LEFT) ? kd : ks;
+  kr = (kd->f.dir == RIGHT) ? kd : ks;
 
   int i = 0;
   while (! is_in_range (k0, k1, r)) {
@@ -1275,8 +1281,7 @@ alert_guards (struct pos *p)
     if (is_guard (g) && is_pos_on_back (g, p)
         && g->current_lives > 0 && g->enemy_id == -1
         && abs (anim_cycle - g->alert_cycle) > 24) {
-      g->f.dir = (g->f.dir == LEFT) ? RIGHT : LEFT;
-      g->f.flip ^= ALLEGRO_FLIP_HORIZONTAL;
+      invert_frame_dir (&g->f, &g->f);
       g->alert_cycle = anim_cycle;
     }
   }

@@ -792,6 +792,7 @@ opposite_dir (enum dir dir)
   case RIGHT: return LEFT;
   case ABOVE: return BELOW;
   case BELOW: return ABOVE;
+  default: assert (false);
   }
   return LEFT;
 }

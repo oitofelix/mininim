@@ -908,6 +908,20 @@ frame_eq (struct frame *f0, struct frame *f1)
     && f0->flip == f1->flip;
 }
 
+struct frame *
+invert_frame_dir (struct frame *f0, struct frame *f1)
+{
+  *f1 = *f0;
+  enum dir d = f1->dir;
+  f1->dir = opposite_dir (d);
+  if (d == LEFT || d == RIGHT)
+    f1->flip ^= ALLEGRO_FLIP_HORIZONTAL;
+  else if (d == ABOVE || d == BELOW)
+    f1->flip ^= ALLEGRO_FLIP_VERTICAL;
+  else assert (false);
+  return f1;
+}
+
 bool
 wait_anim (int cycles)
 {

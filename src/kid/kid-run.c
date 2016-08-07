@@ -154,6 +154,7 @@ physics_in (struct anim *k)
   /* fall */
   survey (_tf, pos, &k->f, NULL, &ptf, NULL);
   if (is_strictly_traversable (&ptf)) {
+    play_sample (step_sample, NULL, k->id);
     kid_fall (k);
     return false;
   }

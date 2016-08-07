@@ -517,7 +517,8 @@ counterpart).  With a @emph{step} of 0 or 128, it gets activated as soon
 as the kid is in the same room and floor and there is no wall in
 between.  It doesn't get activated by guards, but can kill them as well.
 Other @emph{steps} make it permanently inactive.  The chopper nullifies
-the @emph{hangable at left} property of its top construction.
+the @emph{hangable at left (right resp.)} property of its top (top left
+resp.) construction.
 
 @multitable @columnfractions .20 .40 .40
   @headitem Code @tab Dungeon @tab Palace
@@ -536,7 +537,8 @@ The @dfn{mirror} reflects the kid's image and prevents him from passing
 trough, except if he is able to perform a running jump, whatever the
 side.  It's @emph{semi-collidable} at left, @emph{hangable at right},
 @emph{rigid} and uses no extension.  The mirror nullifies the
-@emph{hangable at left} property of its top construction.
+@emph{hangable at left (right resp.)} property of its top (top left
+resp.) construction.
 
 @multitable @columnfractions .20 .40 .40
   @headitem Code @tab Dungeon @tab Palace

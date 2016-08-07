@@ -74,6 +74,7 @@ void
 kid_resurrect (struct anim *k)
 {
   k->sword_immune = 16;
+  k->invisible = false;
   if (k->current_lives > 0) return;
   struct pos pm;
   survey (_m, pos, &k->f, NULL, &pm, NULL);

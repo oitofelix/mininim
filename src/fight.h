@@ -66,9 +66,9 @@ void fight_hit (struct anim *k, struct anim *ke);
 enum confg fight_crel (struct anim *k, int floor, int place);
 bool fight_door_split_collision (struct anim *a);
 void backoff_from_range (struct anim *k0, struct anim *k1, int r,
-                         bool only_k1);
+                         bool only_k1, bool k1_dominant);
 void get_in_range (struct anim *k0, struct anim *k1, int r,
-                   bool only_k1);
+                   bool only_k1, bool k1_dominant);
 void alert_guards (struct pos *p);
 
 struct skill *get_perfect_skill (struct skill *fp);

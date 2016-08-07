@@ -233,6 +233,8 @@ unload_guard_die (void)
 void
 guard_resurrect (struct anim *g)
 {
+  g->invisible = false;
+  if (g->current_lives > 0) return;
   struct pos pm;
   survey (_m, pos, &g->f, NULL, &pm, NULL);
   g->current_lives = g->total_lives;

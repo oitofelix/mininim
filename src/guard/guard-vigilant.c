@@ -282,8 +282,6 @@ flow (struct anim *g)
   if (g->type == SKELETON) g->xf.dy += -3;
   if (g->type == SHADOW) g->xf.dy += -2;
 
-  if (g->refraction > 0) g->refraction--;
-
   return true;
 }
 

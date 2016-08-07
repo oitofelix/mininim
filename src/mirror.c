@@ -219,7 +219,7 @@ draw_mirror_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f,
      16, PLACE_HEIGHT - 9);
   struct anim *a = f->id;
   struct anim a0 = *a;
-  a0.f.flip ^= ALLEGRO_FLIP_HORIZONTAL;
+  invert_frame_dir (&a0.f, &a0.f);
   a0.f.c.x = (2 * PLACE_WIDTH * p->place + 36)
     - (a->f.c.x + al_get_bitmap_width (a->f.b));
   draw_anim_frame (bitmap, &a0, vm);
