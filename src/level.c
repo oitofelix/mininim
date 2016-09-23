@@ -33,12 +33,13 @@ struct undo undo;
 static char *undo_msg;
 static int last_auto_show_time;
 static uint64_t death_timer;
-static bool ignore_level_cutscene;
 
 bool no_room_drawing, game_paused, step_one_cycle;
 int retry_level = -1;
 int camera_follow_kid;
 int auto_rem_time_1st_cycle = 24;
+int next_level;
+bool ignore_level_cutscene;
 
 struct level *
 copy_level (struct level *ld, struct level *ls)
@@ -111,11 +112,10 @@ play_level (struct level *lv)
     destroy_cons ();
     draw_bottom_text (NULL, NULL, 0);
    goto start;
-  case PREVIOUS_LEVEL:
   case NEXT_LEVEL:
     /* the kid must keep the total lives and skills obtained for the
        next level */
-    if (quit_anim == NEXT_LEVEL) {
+    if (next_level > global_level.number) {
       total_lives = k->total_lives;
       current_lives = k->current_lives;
       skill = k->skill;
@@ -123,8 +123,8 @@ play_level (struct level *lv)
 
     destroy_anims ();
     destroy_cons ();
-    int d = (quit_anim == PREVIOUS_LEVEL) ? -1 : +1;
-    if (global_level.next_level) global_level.next_level (global_level.number + d);
+    if (global_level.next_level)
+      global_level.next_level (next_level);
     draw_bottom_text (NULL, NULL, 0);
     if (global_level.cutscene && ! ignore_level_cutscene) {
       cutscene_started = false;
@@ -700,13 +700,15 @@ process_keys (void)
   /* SHIFT+L: warp to next level */
   if (was_key_pressed (ALLEGRO_KEY_L, 0, ALLEGRO_KEYMOD_SHIFT, true)) {
     ignore_level_cutscene = true;
+    next_level = global_level.number + 1;
     quit_anim = NEXT_LEVEL;
   }
 
   /* SHIFT+M: warp to previous level */
   if (was_key_pressed (ALLEGRO_KEY_M, 0, ALLEGRO_KEYMOD_SHIFT, true)) {
     ignore_level_cutscene = true;
-    quit_anim = PREVIOUS_LEVEL;
+    quit_anim = NEXT_LEVEL;
+    next_level = global_level.number - 1;
   }
 
   /* C: show direct coordinates */

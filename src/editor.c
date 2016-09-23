@@ -227,10 +227,11 @@ editor (void)
      {0}};
 
   struct menu_item level_menu[] =
-    {{'N', "NOMINAL NUMBER"},
+    {{'J', "JUMP TO LEVEL<"},
+     {'M', "MIRROR>"},
+     {'N', "NOMINAL NUMBER"},
      {'E', "ENVIRONMENT<"},
      {'H', "HUE<"},
-     {'M', "MIRROR>"},
      {'S', "SAVE LEVEL"},
      {'L', "RELOAD LEVEL"},
      {0}};
@@ -285,6 +286,7 @@ editor (void)
   struct anim *k;
   static struct guard *g;
   static struct pos p0;
+  static int level;
 
   char *fg_str = NULL, *bg_str = NULL, *ext_str = NULL;
   bool free_ext_str;
@@ -1196,6 +1198,10 @@ editor (void)
     xasprintf (&str, "L%i>", global_level.number);
     switch (menu_enum (level_menu, str)) {
     case -1: case 1: edit = EDIT_MAIN; break;
+    case 'J': edit = EDIT_LEVEL_JUMP;
+      level = global_level.number;
+      break;
+    case 'M': edit = EDIT_LEVEL_MIRROR; break;
     case 'N': edit = EDIT_NOMINAL_NUMBER;
       s = global_level.nominal_number;
       break;
@@ -1212,7 +1218,6 @@ editor (void)
       b3 = (global_level.hue == HUE_YELLOW) ? true : false;
       b4 = (global_level.hue == HUE_BLUE) ? true : false;
       break;
-    case 'M': edit = EDIT_LEVEL_MIRROR; break;
     case 'S':
       xasprintf (&d, "%sdata/levels/", user_data_dir);
       if (! al_make_directory (d)) {
@@ -1242,6 +1247,20 @@ editor (void)
     }
     al_free (str);
    break;
+  case EDIT_LEVEL_JUMP:
+    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
+    char r = menu_int (&level, NULL, 1, LEVELS, "LJ>LEVEL", NULL);
+    switch (r) {
+    case -1: edit = EDIT_LEVEL; break;
+    case 0: break;
+    case 1:
+      next_level = level;
+      ignore_level_cutscene = true;
+      quit_anim = NEXT_LEVEL;
+      break;
+    default: break;
+    }
+    break;
   case EDIT_LEVEL_MIRROR:
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
     xasprintf (&str, "L%iM>", global_level.number);
