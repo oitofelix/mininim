@@ -81,16 +81,12 @@ register_changed_room (int room)
   struct pos p;
   new_pos (&p, &global_level, room, -1, -1);
 
-  p.floor = 0;
-  for (p.place = 0; p.place < PLACES; p.place++)
-    register_changed_pos (&p, -1);
-
   p.place = 0;
-  for (p.floor = 1; p.floor < FLOORS; p.floor++)
+  for (p.floor = 0; p.floor < FLOORS; p.floor++)
     register_changed_pos (&p, -1);
 
   p.place = 9;
-  for (p.floor = 1; p.floor < FLOORS; p.floor++)
+  for (p.floor = 0; p.floor < FLOORS; p.floor++)
     register_changed_pos (&p, -1);
 }
 
@@ -686,7 +682,7 @@ update_cache_pos (struct pos *p, enum changed_pos_reason reason,
         if (mr.cell[x][y].room == q.room)
           for (q.floor = FLOORS; q.floor >= -1; q.floor--)
             for (q.place = -1; q.place < PLACES; q.place++)
-              if (peq (&q, p)) {
+              if (peq (&q, p) && ! has_room_changed (q.room)) {
                 struct pos p0; p0 = q;
 
                 struct pos pbl; prel (&q, &pbl, +1, -1);
@@ -924,10 +920,13 @@ draw_multi_rooms (void)
     if (depedv && con (&pl)->fg == WALL)
       update_cache_pos (&pl, CHPOS_WALL, em, vm);
   }
-  destroy_array ((void **) &changed_pos, &changed_pos_nmemb);
 
   for (i = 0; i < changed_room_nmemb; i++)
     update_cache_room (changed_room[i], em, vm);
+
+  /* kept together so update_cache_pos and update_cache_room can
+     access each other's arrays */
+  destroy_array ((void **) &changed_pos, &changed_pos_nmemb);
   destroy_array ((void **) &changed_room, &changed_room_nmemb);
 
   for (y = mr.h - 1; y >= 0; y--)

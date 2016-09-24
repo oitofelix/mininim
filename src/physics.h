@@ -57,6 +57,7 @@ void mirror_pos (struct pos *p0, struct pos *p1, bool destroy, bool register_con
                  bool prepare, bool register_change, bool invert_dir);
 void decorate_pos (struct pos *p);
 enum con_diff con_diff (struct con *c0, struct con *c1);
+struct level *clear_room (struct level *l, int room, char *desc);
 struct level *mirror_room_h (struct level *l, int room, bool destroy,
                              bool register_con, bool prepare, bool register_change);
 struct level *mirror_level_h (struct level *l, bool destroy, bool register_con,

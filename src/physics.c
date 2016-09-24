@@ -553,6 +553,21 @@ con_diff (struct con *c0, struct con *c1)
 }
 
 struct level *
+clear_room (struct level *l, int room, char *desc)
+{
+  struct con room_buf[FLOORS][PLACES];
+  struct pos p;
+  new_pos (&p, l, room, -1, -1);
+  for (p.floor = 0; p.floor < FLOORS; p.floor++)
+    for (p.place = 0; p.place < PLACES; p.place++) {
+      room_buf[p.floor][p.place] =
+        (struct con) {.fg = NO_FLOOR, .bg = NO_BG, .ext.step = 0};
+    }
+  register_room_undo (&undo, room, room_buf, desc);
+  return l;
+}
+
+struct level *
 mirror_room_h (struct level *l, int room, bool destroy,
                bool register_con, bool prepare, bool register_change)
 {

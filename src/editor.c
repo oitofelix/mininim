@@ -194,10 +194,10 @@ editor (void)
      {0}};
 
   struct menu_item room_menu[] =
-    {{'J', "JUMP TO ROOM<"},
+    {{'J', "JUMP<"},
      {'L', "ROOM LINKING>"},
      {'S', "LINKING SETTINGS<"},
-     {'X', "EXCHANGE ROOM<"},
+     {'X', "EXCHANGE<"},
      {'A', "CLEAR"},
      {'R', "RANDOM"},
      {'D', "DECORATION"},
@@ -228,8 +228,9 @@ editor (void)
      {0}};
 
   struct menu_item level_menu[] =
-    {{'J', "JUMP TO LEVEL<"},
-     {'X', "EXCHANGE LEVEL<"},
+    {{'J', "JUMP<"},
+     {'X', "EXCHANGE<"},
+     {'A', "CLEAR"},
      {'M', "MIRROR>"},
      {'N', "NOMINAL NUMBER"},
      {'E', "ENVIRONMENT<"},
@@ -945,13 +946,7 @@ editor (void)
       get_mouse_coord (&last_mouse_coord);
       edit = EDIT_ROOM_EXCHANGE; break;
     case 'A':
-      new_pos (&p0, &global_level, mr.room, -1, -1);
-      for (p0.floor = 0; p0.floor < FLOORS; p0.floor++)
-        for (p0.place = 0; p0.place < PLACES; p0.place++) {
-          room_buf[p0.floor][p0.place] =
-            (struct con) {.fg = NO_FLOOR, .bg = NO_BG, .ext.step = 0};
-        }
-      register_room_undo (&undo, mr.room, room_buf, "CLEAR ROOM");
+      clear_room (&global_level, mr.room, "CLEAR ROOM");
       break;
     case 'R':
       new_pos (&p0, &global_level, mr.room, -1, -1);
@@ -1205,6 +1200,11 @@ editor (void)
     case 'J': edit = EDIT_LEVEL_JUMP;
       next_level = global_level.n;
       break;
+    case 'A':
+      for (i = 1; i < ROOMS; i++)
+        clear_room (&global_level, i, (i == ROOMS - 1)
+                    ? "CLEAR LEVEL" : NULL);
+      break;
     case 'M': edit = EDIT_LEVEL_MIRROR; break;
     case 'N': edit = EDIT_NOMINAL_NUMBER;
       s = global_level.nominal_n;
@@ -1226,6 +1226,8 @@ editor (void)
       if (save_level (&global_level)) {
         copy_level (&vanilla_level, &global_level);
         editor_msg ("LEVEL HAS BEEN SAVED", 18);
+        if (level_module != NATIVE_LEVEL_MODULE)
+          error (0, 0, "saved level can only be recalled using the native level module");
       } else editor_msg ("LEVEL SAVE FAILED", 18);
       break;
     case 'L':
@@ -1236,13 +1238,16 @@ editor (void)
     al_free (str);
    break;
   case EDIT_LEVEL_JUMP:
-    if (menu_select_level (EDIT_LEVEL, "LJ>LEVEL") == 1) {
+    xasprintf (&str, "L%iJ>LEVEL", global_level.n);
+    if (menu_select_level (EDIT_LEVEL, str) == 1) {
       ignore_level_cutscene = true;
       quit_anim = NEXT_LEVEL;
     }
+    al_free (str);
     break;
   case EDIT_LEVEL_EXCHANGE:
-    if (menu_select_level (EDIT_LEVEL, "LX>LEVEL") == 1) {
+    xasprintf (&str, "L%iX>LEVEL", global_level.n);
+    if (menu_select_level (EDIT_LEVEL, str) == 1) {
       if (global_level.next_level)
         global_level.next_level (&vanilla_level, next_level);
 
@@ -1257,8 +1262,12 @@ editor (void)
       save_level (&global_level);
       save_level (&vanilla_level);
 
+      if (level_module != NATIVE_LEVEL_MODULE)
+        error (0, 0, "level exchange can only be recalled using the native level module");
+
       quit_anim = RESTART_LEVEL;
     }
+    al_free (str);
     break;
   case EDIT_LEVEL_MIRROR:
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
