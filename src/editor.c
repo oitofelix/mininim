@@ -231,6 +231,7 @@ editor (void)
     {{'J', "JUMP<"},
      {'X', "EXCHANGE<"},
      {'A', "CLEAR"},
+     {'R', "RANDOM"},
      {'M', "MIRROR>"},
      {'N', "NOMINAL NUMBER"},
      {'E', "ENVIRONMENT<"},
@@ -949,13 +950,7 @@ editor (void)
       clear_room (&global_level, mr.room, "CLEAR ROOM");
       break;
     case 'R':
-      new_pos (&p0, &global_level, mr.room, -1, -1);
-      for (p0.floor = 0; p0.floor < FLOORS; p0.floor++)
-        for (p0.place = 0; p0.place < PLACES; p0.place++)
-          room_buf[p0.floor][p0.place] =
-            (struct con) {.fg = prandom (ARCH_TOP_SMALL), .bg = prandom (BALCONY),
-                          .ext.step = 0};
-      register_room_undo (&undo, mr.room, room_buf, "RANDOM ROOM");
+      randomize_room (&global_level, mr.room, "RANDOM ROOM");
       break;
     case 'D':
       memcpy (&room_buf2, &global_level.con[mr.room], sizeof (room_buf2));
@@ -1204,6 +1199,11 @@ editor (void)
       for (i = 1; i < ROOMS; i++)
         clear_room (&global_level, i, (i == ROOMS - 1)
                     ? "CLEAR LEVEL" : NULL);
+      break;
+    case 'R':
+      for (i = 1; i < ROOMS; i++)
+        randomize_room (&global_level, i, (i == ROOMS - 1)
+                        ? "RANDOM LEVEL" : NULL);
       break;
     case 'M': edit = EDIT_LEVEL_MIRROR; break;
     case 'N': edit = EDIT_NOMINAL_NUMBER;

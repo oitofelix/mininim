@@ -85,7 +85,7 @@ register_changed_room (int room)
   for (p.floor = 0; p.floor < FLOORS; p.floor++)
     register_changed_pos (&p, -1);
 
-  p.place = 9;
+  p.place = PLACES - 1;
   for (p.floor = 0; p.floor < FLOORS; p.floor++)
     register_changed_pos (&p, -1);
 }
