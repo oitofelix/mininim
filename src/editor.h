@@ -33,5 +33,6 @@ void editor_msg (char *m, uint64_t cycles);
 void ui_place_kid (struct pos *p);
 void editor_link (int room0, int room1, enum dir dir);
 void editor_mirror_link (int room, enum dir dir0, enum dir dir1);
+bool save_level (struct level *l);
 
 #endif	/* MININIM_EDITOR_H */

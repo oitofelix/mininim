@@ -22,6 +22,7 @@
 static char menu_step_ext (struct pos *p, int min, int max);
 static char menu_event_ext (struct pos *p);
 static char menu_select_room (enum edit up_edit, char *prefix);
+static char menu_select_level (enum edit up_edit, char *prefix);
 static char menu_link (enum dir dir);
 static void mouse2guard (int i);
 static char menu_skill (char *prefix, int *skill, int max, enum edit up_edit);
@@ -228,6 +229,7 @@ editor (void)
 
   struct menu_item level_menu[] =
     {{'J', "JUMP TO LEVEL<"},
+     {'X', "EXCHANGE LEVEL<"},
      {'M', "MIRROR>"},
      {'N', "NOMINAL NUMBER"},
      {'E', "ENVIRONMENT<"},
@@ -286,11 +288,10 @@ editor (void)
   struct anim *k;
   static struct guard *g;
   static struct pos p0;
-  static int level;
 
   char *fg_str = NULL, *bg_str = NULL, *ext_str = NULL;
   bool free_ext_str;
-  char *str = NULL, c, *f, *d;
+  char *str = NULL, c;
   int i;
 
   struct room_linking l[ROOMS];
@@ -1198,8 +1199,9 @@ editor (void)
     xasprintf (&str, "L%i>", global_level.number);
     switch (menu_enum (level_menu, str)) {
     case -1: case 1: edit = EDIT_MAIN; break;
+    case 'X': edit = EDIT_LEVEL_EXCHANGE; break;
     case 'J': edit = EDIT_LEVEL_JUMP;
-      level = global_level.number;
+      next_level = global_level.number;
       break;
     case 'M': edit = EDIT_LEVEL_MIRROR; break;
     case 'N': edit = EDIT_NOMINAL_NUMBER;
@@ -1219,26 +1221,10 @@ editor (void)
       b4 = (global_level.hue == HUE_BLUE) ? true : false;
       break;
     case 'S':
-      xasprintf (&d, "%sdata/levels/", user_data_dir);
-      if (! al_make_directory (d)) {
-        error (0, al_get_errno (), "%s (%s): failed to create native level directory",
-               __func__, d);
-        al_free (d);
-        goto save_failed;
-      }
-      xasprintf (&f, "%s%02d.mim", d, global_level.number);
-      if (! save_native_level (&global_level, f)) {
-        error (0, al_get_errno (), "%s (%s): failed to save native level file",
-               __func__, f);
-        al_free (f);
-        al_free (d);
-        goto save_failed;
-      }
-      copy_level (vanilla_level, &global_level);
-      editor_msg ("LEVEL HAS BEEN SAVED", 18);
-      break;
-    save_failed:
-      editor_msg ("LEVEL SAVE FAILED", 18);
+      if (save_level (&global_level)) {
+        copy_level (vanilla_level, &global_level);
+        editor_msg ("LEVEL HAS BEEN SAVED", 18);
+      } else editor_msg ("LEVEL SAVE FAILED", 18);
       break;
     case 'L':
       while (undo_pass (&undo, -1, NULL));
@@ -1248,17 +1234,18 @@ editor (void)
     al_free (str);
    break;
   case EDIT_LEVEL_JUMP:
-    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
-    char r = menu_int (&level, NULL, 1, LEVELS, "LJ>LEVEL", NULL);
-    switch (r) {
-    case -1: edit = EDIT_LEVEL; break;
-    case 0: break;
-    case 1:
-      next_level = level;
+    if (menu_select_level (EDIT_LEVEL, "LJ>LEVEL") == 1) {
       ignore_level_cutscene = true;
       quit_anim = NEXT_LEVEL;
-      break;
-    default: break;
+    }
+    break;
+  case EDIT_LEVEL_EXCHANGE:
+    if (menu_select_level (EDIT_LEVEL, "LX>LEVEL") == 1) {
+      /* if (global_level.next_level) */
+      /*   global_level.next_level (next_level); */
+
+      /* copy_level (vanilla_level, &global_level); */
+      /* editor_msg ("LEVEL HAS BEEN SAVED", 18); */
     }
     break;
   case EDIT_LEVEL_MIRROR:
@@ -1824,6 +1811,20 @@ menu_select_room (enum edit up_edit, char *prefix)
 }
 
 static char
+menu_select_level (enum edit up_edit, char *prefix)
+{
+  set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
+  char r = menu_int (&next_level, NULL, 1, LEVELS, prefix, NULL);
+  switch (r) {
+  case -1: edit = up_edit; break;
+  case 0: break;
+  case 1: edit = up_edit; break;
+  default: break;
+  }
+  return r;
+}
+
+static char
 menu_link (enum dir dir)
 {
   set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
@@ -1943,4 +1944,28 @@ editor_mirror_link (int room, enum dir dir0, enum dir dir1)
   int r1 = roomd (&global_level, room, dir1);
   editor_link (room, r0, dir1);
   editor_link (room, r1, dir0);
+}
+
+bool
+save_level (struct level *l)
+{
+  char *f, *d;
+  xasprintf (&d, "%sdata/levels/", user_data_dir);
+  if (! al_make_directory (d)) {
+    error (0, al_get_errno (),
+           "%s (%s): failed to create native level directory",
+           __func__, d);
+    al_free (d);
+    return false;
+  }
+  xasprintf (&f, "%s%02d.mim", d, l->number);
+  if (! save_native_level (l, f)) {
+    error (0, al_get_errno (),
+           "%s (%s): failed to save native level file",
+           __func__, f);
+    al_free (f);
+    al_free (d);
+    return false;
+  }
+  return true;
 }
