@@ -20,25 +20,18 @@
 #include "mininim.h"
 
 void
-play_plv_level (int number)
+next_plv_level (struct level *l, int n)
 {
-  next_plv_level (number);
-  play_level (&legacy_level);
+  if (n < 1) n = 14;
+  else if (n > 14) n = 1;
+  load_plv_level (l, n);
 }
 
 void
-next_plv_level (int number)
-{
-  if (number < 1) number = 14;
-  else if (number > 14) number = 1;
-  load_plv_level (number);
-}
-
-void
-load_plv_level (int number)
+load_plv_level (struct level *l, int n)
 {
   char *filename;
-  xasprintf (&filename, "data/plv-levels/%02d.plv", number);
+  xasprintf (&filename, "data/plv-levels/%02d.plv", n);
 
   int8_t *plv =
     load_resource (filename, (load_resource_f) load_file);
@@ -50,8 +43,8 @@ load_plv_level (int number)
 
   memcpy (&lv, plv + 19, sizeof (lv));
 
-  interpret_legacy_level (number);
-  legacy_level.next_level = next_plv_level;
+  interpret_legacy_level (l, n);
+  l->next_level = next_plv_level;
 
   al_free (plv);
 }

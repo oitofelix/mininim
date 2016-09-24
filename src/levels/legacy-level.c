@@ -19,7 +19,6 @@
 
 #include "mininim.h"
 
-struct level legacy_level;
 static int level_3_checkpoint;
 static int shadow_id;
 static int skeleton_id;
@@ -46,14 +45,7 @@ struct legacy_level lv;
 static enum ltile get_tile (struct pos *p);
 static enum lgroup get_group (enum ltile t);
 
-static void load_legacy_level (int number);
-
-void
-play_legacy_level (int number)
-{
-  next_legacy_level (number);
-  play_level (&legacy_level);
-}
+static void load_legacy_level_file (int n);
 
 void
 legacy_level_start (void)
@@ -77,7 +69,7 @@ legacy_level_start (void)
   else k->current_lives = total_lives;
 
   /* make the kid turn as appropriate */
-  switch (global_level.number) {
+  switch (global_level.n) {
   case 1:
     k->f.dir = (k->f.dir == LEFT) ? RIGHT : LEFT;
     k->i = -1; k->action = kid_turn;
@@ -91,10 +83,10 @@ legacy_level_start (void)
   }
 
   /* define camera's starting room */
-  if (global_level.number == 7) {
+  if (global_level.n == 7) {
     mr_center_room (1);
     camera_follow_kid = -1;
-  } else if (global_level.number == 13) {
+  } else if (global_level.n == 13) {
     mr_center_room (23);
     camera_follow_kid = -1;
   } else {
@@ -103,10 +95,10 @@ legacy_level_start (void)
   }
 
   /* if in level 14 stop the timer */
-  if (global_level.number == 14) play_time_stopped = true;
+  if (global_level.n == 14) play_time_stopped = true;
 
   /* in the first level */
-  if (global_level.number == 1) {
+  if (global_level.n == 1) {
     /* activate tile, usually to close the opened door in the starting
        room */
     struct pos p; new_pos (&p, &global_level, 5, 0, 2);
@@ -116,7 +108,7 @@ legacy_level_start (void)
   }
 
   /* in the third level */
-  if (global_level.number == 3) {
+  if (global_level.n == 3) {
     /* if it's the first time playing the checkpoint hasn't been
        reached yet */
     if (retry_level != 3) level_3_checkpoint = false;
@@ -138,14 +130,14 @@ legacy_level_start (void)
 
   /* in the tenth level unflip the screen vertically, (helpful if the
      kid has not drank the potion that would do it on its own) */
-  if (global_level.number == 10) screen_flags &= ~ ALLEGRO_FLIP_VERTICAL;
+  if (global_level.n == 10) screen_flags &= ~ ALLEGRO_FLIP_VERTICAL;
 
   /* level 13 adjustements */
   coming_from_12 = false;
-  if (global_level.number == 13 && retry_level == 13)
-    global_level.nominal_number = 12;
+  if (global_level.n == 13 && retry_level == 13)
+    global_level.nominal_n = 12;
 
-  if (global_level.number == 13) {
+  if (global_level.n == 13) {
     struct anim *v = get_anim_by_id (1);
     v->fight = false;
   }
@@ -169,11 +161,11 @@ legacy_level_special_events (void)
   }
 
   /* in the first level, first try, play the suspense sound */
-  if (global_level.number == 1 && anim_cycle == 12 && retry_level != 1)
+  if (global_level.n == 1 && anim_cycle == 12 && retry_level != 1)
     play_sample (suspense_sample, NULL, -1);
 
   /* in the third level */
-  if (global_level.number == 3) {
+  if (global_level.n == 3) {
 
     /* level 3 checkpoint */
     new_pos (&p, &global_level, 2, 0, 8);
@@ -228,7 +220,7 @@ legacy_level_special_events (void)
   }
 
   /* in the fourth level */
-  if (global_level.number == 4) {
+  if (global_level.n == 4) {
     struct pos mirror_pos; new_pos (&mirror_pos, &global_level, 4, 0, 4);
 
     /* if the level door is open and the camera is on room 4, make
@@ -275,7 +267,7 @@ legacy_level_special_events (void)
   }
 
   /* in the fifth level */
-  if (global_level.number == 5) {
+  if (global_level.n == 5) {
     struct pos door_pos; new_pos (&door_pos, &global_level, 24, 0, 1);
     struct pos potion_pos; new_pos (&potion_pos, &global_level, 24, 0, 3);
     struct pos shadow_pos; new_pos (&shadow_pos, &global_level, 24, 0, -1);
@@ -323,7 +315,7 @@ legacy_level_special_events (void)
   }
 
   /* in the sixth level */
-  if (global_level.number == 6) {
+  if (global_level.n == 6) {
     struct anim *ks;
 
     /* create kid's shadow to wait for kid at room 1 */
@@ -375,7 +367,7 @@ legacy_level_special_events (void)
   }
 
   /* in the eighth level */
-  if (global_level.number == 8) {
+  if (global_level.n == 8) {
     struct pos mouse_pos; new_pos (&mouse_pos, &global_level, 16, 0, 12);
     struct anim *m = NULL;
 
@@ -404,7 +396,7 @@ legacy_level_special_events (void)
   }
 
   /* in the twelfth level */
-  if (global_level.number == 12) {
+  if (global_level.n == 12) {
     struct pos sword_pos; new_pos (&sword_pos, &global_level, 15, 0, 1);
     struct pos first_hidden_floor_pos;
     new_pos (&first_hidden_floor_pos, &global_level, 2, 0, 7);
@@ -571,7 +563,7 @@ legacy_level_special_events (void)
   }
 
   /* in the thirteenth level */
-  if (global_level.number == 13) {
+  if (global_level.n == 13) {
 
     /* make the top loose floors fall spontaneously */
     if (k->f.c.room == 16 || k->f.c.room == 23) {
@@ -620,7 +612,7 @@ legacy_level_special_events (void)
   }
 
   /* in the fourteenth level */
-  if (global_level.number == 14) {
+  if (global_level.n == 14) {
     /* when the kid enters room 5, go to the next level */
     if (k->f.c.room == 5) {
       total_lives = k->total_lives;
@@ -640,7 +632,7 @@ legacy_level_end (struct pos *p)
   /* end music samples to play per level */
   if (! played_sample) {
     stop_sample (floating_sample, NULL, k->id);
-    switch (global_level.number) {
+    switch (global_level.n) {
     case 1: case 2: case 3: case 5: case 6: case 7:
     case 8: case 9: case 10: case 11: case 12:
       si = play_sample (success_sample, NULL, k->id); break;
@@ -655,18 +647,19 @@ legacy_level_end (struct pos *p)
 }
 
 void
-next_legacy_level (int number)
+next_legacy_level (struct level *l, int n)
 {
-  if (number < 1) number = 14;
-  else if (number > 14) number = 1;
-  load_legacy_level (number);
+  if (n < 1) n = 14;
+  else if (n > 14) n = 1;
+  load_legacy_level_file (n);
+  interpret_legacy_level (l, n);
 }
 
 static void
-load_legacy_level (int number)
+load_legacy_level_file (int n)
 {
   char *filename;
-  xasprintf (&filename, "data/legacy-levels/%02d", number);
+  xasprintf (&filename, "data/legacy-levels/%02d", n);
 
   ALLEGRO_FILE *lvf =
     load_resource (filename, (load_resource_f) xfopen_r);
@@ -677,57 +670,55 @@ load_legacy_level (int number)
   al_fread (lvf, &lv, sizeof (lv));
   al_fclose (lvf);
   al_free (filename);
-
-  interpret_legacy_level (number);
 }
 
 void
-interpret_legacy_level (int number)
+interpret_legacy_level (struct level *l, int n)
 {
   struct pos p;
-  new_pos (&p, &legacy_level, -1, -1, -1);
+  new_pos (&p, l, -1, -1, -1);
 
-  memset (&legacy_level, 0, sizeof (legacy_level));
-  legacy_level.number = number;
-  if (number == 12 || number == 13) {
-    if (coming_from_12) legacy_level.nominal_number = -1;
-    else legacy_level.nominal_number = 12;
-  } else if (number == 14) legacy_level.nominal_number = -1;
-  else legacy_level.nominal_number = number;
-  legacy_level.start = legacy_level_start;
-  legacy_level.special_events = legacy_level_special_events;
-  legacy_level.end = legacy_level_end;
-  legacy_level.next_level = next_legacy_level;
-  memcpy (&legacy_level.con[0], &room_0, sizeof (room_0));
+  memset (l, 0, sizeof (*l));
+  l->n = n;
+  if (n == 12 || n == 13) {
+    if (coming_from_12) l->nominal_n = -1;
+    else l->nominal_n = 12;
+  } else if (n == 14) l->nominal_n = -1;
+  else l->nominal_n = n;
+  l->start = legacy_level_start;
+  l->special_events = legacy_level_special_events;
+  l->end = legacy_level_end;
+  l->next_level = next_legacy_level;
+  memcpy (&l->con[0], &room_0, sizeof (room_0));
 
   /* CUTSCENES: ok */
-  switch (number) {
+  switch (n) {
   default: break;
-  case 1: legacy_level.cutscene = cutscene_01_05_11_anim; break;
-  case 3: legacy_level.cutscene = cutscene_03_anim; break;
-  case 5: legacy_level.cutscene = cutscene_01_05_11_anim; break;
-  case 7: legacy_level.cutscene = cutscene_07_anim; break;
-  case 8: legacy_level.cutscene = cutscene_08_anim; break;
-  case 11: legacy_level.cutscene = cutscene_11_anim; break;
-  case 14: legacy_level.cutscene = cutscene_14_anim; break;
+  case 1: l->cutscene = cutscene_01_05_11_anim; break;
+  case 3: l->cutscene = cutscene_03_anim; break;
+  case 5: l->cutscene = cutscene_01_05_11_anim; break;
+  case 7: l->cutscene = cutscene_07_anim; break;
+  case 8: l->cutscene = cutscene_08_anim; break;
+  case 11: l->cutscene = cutscene_11_anim; break;
+  case 14: l->cutscene = cutscene_14_anim; break;
   }
 
   /* SWORD: ok */
-  legacy_level.has_sword = (number != 1);
+  l->has_sword = (n != 1);
 
   /* LINKS: ok */
   for (p.room = 1; p.room <= LROOMS; p.room++) {
-    legacy_level.link[p.room].l = lv.link[p.room - 1][LD_LEFT];
-    legacy_level.link[p.room].r = lv.link[p.room - 1][LD_RIGHT];
-    legacy_level.link[p.room].a = lv.link[p.room - 1][LD_ABOVE];
-    legacy_level.link[p.room].b = lv.link[p.room - 1][LD_BELOW];
+    l->link[p.room].l = lv.link[p.room - 1][LD_LEFT];
+    l->link[p.room].r = lv.link[p.room - 1][LD_RIGHT];
+    l->link[p.room].a = lv.link[p.room - 1][LD_ABOVE];
+    l->link[p.room].b = lv.link[p.room - 1][LD_BELOW];
   }
 
   /* FORETABLE and BACKTABLE: ok */
   for (p.room = 1; p.room <= LROOMS; p.room++)
     for (p.floor = 0; p.floor < FLOORS; p.floor++)
       for (p.place = 0; p.place < PLACES; p.place++) {
-        struct con *c = &legacy_level.con[p.room][p.floor][p.place];
+        struct con *c = &l->con[p.room][p.floor][p.place];
 
         uint8_t f = lv.foretable[p.room - 1][p.floor][p.place];
         uint8_t b = lv.backtable[p.room - 1][p.floor][p.place];
@@ -771,7 +762,7 @@ interpret_legacy_level (int number)
         case LT_NULL: break;    /* needless */
         default:
           error (-1, 0, "%s: unknown tile group (%i) at position (%i, %i, %i, %i)",
-                 __func__, t, number, p.room, p.floor, p.place);
+                 __func__, t, n, p.room, p.floor, p.place);
         }
 
         /* printf ("(%i, %i, %i): TILE!!!\n", */
@@ -904,36 +895,36 @@ interpret_legacy_level (int number)
         case LG_EVENT: c->ext.event = b; break; /* ok */
         default:
           error (-1, 0, "%s: unknown tile group (%i) at position (%i, %i, %i, %i)",
-                 __func__, g, number, p.room, p.floor, p.place);
+                 __func__, g, n, p.room, p.floor, p.place);
         }
       }
 
   /* EVENTS: ok */
   int i;
   for (i = 0; i < LEVENTS; i++) {
-    struct level_event *e = &legacy_level.event[i];
-    int l = lv.door_1[i] & 0x1F;
-    new_pos (&e->p, &legacy_level,
+    struct level_event *e = &l->event[i];
+    int ld = lv.door_1[i] & 0x1F;
+    new_pos (&e->p, l,
              (lv.door_2[i] >> 3) | ((lv.door_1[i] & 0x60) >> 5),
-             l / PLACES, l % PLACES);
+             ld / PLACES, ld % PLACES);
     if (get_tile (&e->p) == LT_EXIT_LEFT) e->p.place++;
     e->next = lv.door_1[i] & 0x80 ? false : true;
   }
 
   /* START POSITION: ok */
-  struct pos *sp = &legacy_level.start_pos;
-  sp->l = &legacy_level;
+  struct pos *sp = &l->start_pos;
+  sp->l = l;
   sp->room = lv.start_position[0];
   sp->floor = lv.start_position[1] / PLACES;
   sp->place = lv.start_position[1] % PLACES;
 
   /* START DIRECTION: ok */
-  enum dir *sd = &legacy_level.start_dir;
+  enum dir *sd = &l->start_dir;
   *sd = lv.start_position[2] ? LEFT : RIGHT;
 
   /* GUARD LOCATION, DIRECTION, SKILL and COLOR: ok */
   for (i = 0; i < LROOMS; i++) {
-    struct guard *g = &legacy_level.guard[i + 1];
+    struct guard *g = &l->guard[i + 1];
 
     if (lv.guard_location[i] > 29) {
       g->type = NO_ANIM;
@@ -941,7 +932,7 @@ interpret_legacy_level (int number)
     }
 
     /* TYPE AND STYLE: ok */
-    switch (number) {
+    switch (n) {
     case 3: g->type = SKELETON; g->style = 0; break;
     case 6: g->type = FAT_GUARD; g->style = 1; break;
     case 12: g->type = SHADOW; g->style = 0; break;
@@ -951,7 +942,7 @@ interpret_legacy_level (int number)
     }
 
     /* LOCATION: ok */
-    new_pos (&g->p, &legacy_level, i + 1,
+    new_pos (&g->p, l, i + 1,
              lv.guard_location[i] / PLACES,
              lv.guard_location[i] % PLACES);
 
@@ -960,26 +951,26 @@ interpret_legacy_level (int number)
 
     /* SKILL: ok */
     get_legacy_skill (lv.guard_skill[i], &g->skill);
-    g->total_lives = life_table[number];
+    g->total_lives = life_table[n];
 
     /* printf ("(%i, %i, %i), style: %i\n", */
     /*         g->p.room, g->p.floor, g->p.place, g->style); */
   }
 
   /* define the enviroment mode based on the level */
-  switch (legacy_level.number) {
+  switch (l->n) {
   case 4: case 5: case 6: case 10: case 11: case 14:
-    legacy_level.em = PALACE; break;
-  default: legacy_level.em = DUNGEON; break;
+    l->em = PALACE; break;
+  default: l->em = DUNGEON; break;
   }
 
   /* define hue palettes based on the level */
-  switch (number) {
-  default: legacy_level.hue = HUE_NONE; break;
-  case 3: case 7: legacy_level.hue = HUE_GREEN; break;
-  case 8: case 9: legacy_level.hue = HUE_GRAY; break;
-  case 12: case 13: legacy_level.hue = HUE_YELLOW; break;
-  case 14: legacy_level.hue = HUE_BLUE; break;
+  switch (n) {
+  default: l->hue = HUE_NONE; break;
+  case 3: case 7: l->hue = HUE_GREEN; break;
+  case 8: case 9: l->hue = HUE_GRAY; break;
+  case 12: case 13: l->hue = HUE_YELLOW; break;
+  case 14: l->hue = HUE_BLUE; break;
   }
 }
 

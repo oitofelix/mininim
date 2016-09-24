@@ -21,15 +21,11 @@
 #define MININIM_NATIVE_LEVEL_H
 
 /* functions */
-void play_native_level (int number);
-void next_native_level (int number);
-void load_native_level (int number, struct level *l);
+void next_native_level (struct level *l, int n);
+void load_native_level (struct level *l, int n);
 bool save_native_level (struct level *l, char *filename);
 char *get_confg_str (struct pos *p);
 char *get_conbg_str (struct pos *p);
 char *get_conext_str (struct pos *p);
-
-/* variables */
-extern struct level native_level;
 
 #endif	/* MININIM_NATIVE_LEVEL_H */

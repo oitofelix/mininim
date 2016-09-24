@@ -21,11 +21,11 @@
 #define MININIM_LEVEL_H
 
 extern struct level global_level;
+extern struct level vanilla_level;
 extern int retry_level;
 extern int camera_follow_kid;
 extern int auto_rem_time_1st_cycle;
 extern bool no_room_drawing, game_paused, step_one_cycle;
-extern struct level *vanilla_level;
 extern struct undo undo;
 extern int next_level;
 extern bool ignore_level_cutscene;

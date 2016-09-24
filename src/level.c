@@ -25,7 +25,7 @@ static void compute_level (void);
 static void process_keys (void);
 static void draw_lives (ALLEGRO_BITMAP *bitmap, struct anim *k, enum vm vm);
 
-struct level *vanilla_level;
+struct level vanilla_level;
 struct level global_level;
 
 struct undo undo;
@@ -56,7 +56,6 @@ void
 play_level (struct level *lv)
 {
   char *text;
-  vanilla_level = lv;
 
  start:
   free_undo (&undo);
@@ -83,7 +82,7 @@ play_level (struct level *lv)
   last_auto_show_time = -1;
   current_kid_id = 0;
 
-  if (retry_level != global_level.number)
+  if (retry_level != global_level.n)
     start_level_time = play_time;
 
   play_time = start_level_time;
@@ -94,8 +93,8 @@ play_level (struct level *lv)
   edit = EDIT_MAIN;
   exit_editor ();
 
-  if (global_level.nominal_number >= 0) {
-    xasprintf (&text, "LEVEL %i", global_level.nominal_number);
+  if (global_level.nominal_n >= 0) {
+    xasprintf (&text, "LEVEL %i", global_level.nominal_n);
     draw_bottom_text (NULL, text, 0);
     al_free (text);
   }
@@ -107,7 +106,7 @@ play_level (struct level *lv)
   switch (quit_anim) {
   case NO_QUIT: break;
   case RESTART_LEVEL:
-    retry_level = global_level.number;
+    retry_level = global_level.n;
     destroy_anims ();
     destroy_cons ();
     draw_bottom_text (NULL, NULL, 0);
@@ -115,7 +114,7 @@ play_level (struct level *lv)
   case NEXT_LEVEL:
     /* the kid must keep the total lives and skills obtained for the
        next level */
-    if (next_level > global_level.number) {
+    if (next_level > global_level.n) {
       total_lives = k->total_lives;
       current_lives = k->current_lives;
       skill = k->skill;
@@ -124,7 +123,7 @@ play_level (struct level *lv)
     destroy_anims ();
     destroy_cons ();
     if (global_level.next_level)
-      global_level.next_level (next_level);
+      global_level.next_level (lv, next_level);
     draw_bottom_text (NULL, NULL, 0);
     if (global_level.cutscene && ! ignore_level_cutscene) {
       cutscene_started = false;
@@ -700,7 +699,7 @@ process_keys (void)
   /* SHIFT+L: warp to next level */
   if (was_key_pressed (ALLEGRO_KEY_L, 0, ALLEGRO_KEYMOD_SHIFT, true)) {
     ignore_level_cutscene = true;
-    next_level = global_level.number + 1;
+    next_level = global_level.n + 1;
     quit_anim = NEXT_LEVEL;
   }
 
@@ -708,7 +707,7 @@ process_keys (void)
   if (was_key_pressed (ALLEGRO_KEY_M, 0, ALLEGRO_KEYMOD_SHIFT, true)) {
     ignore_level_cutscene = true;
     quit_anim = NEXT_LEVEL;
-    next_level = global_level.number - 1;
+    next_level = global_level.n - 1;
   }
 
   /* C: show direct coordinates */
@@ -739,7 +738,7 @@ process_keys (void)
     mr.select_cycles = SELECT_CYCLES;
 
     xasprintf (&text, "LV%i AL%i AR%i BL%i BR%i",
-               global_level.number, al, ar, bl, br);
+               global_level.n, al, ar, bl, br);
     draw_bottom_text (NULL, text, 0);
     al_free (text);
   }

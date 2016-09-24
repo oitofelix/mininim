@@ -536,7 +536,7 @@ mr_update_last_settings (void)
   mr.last.y = mr.y;
   mr.last.room = mr.room;
 
-  mr.last.level = global_level.number;
+  mr.last.level = global_level.n;
   mr.last.em = em;
   mr.last.vm = vm;
   mr.last.hgc = hgc;
@@ -908,7 +908,7 @@ draw_multi_rooms (void)
       || vm != mr.last.vm
       || hgc != mr.last.hgc
       || hue != mr.last.hue
-      || global_level.number != mr.last.level) {
+      || global_level.n != mr.last.level) {
     update_cache (em, vm);
   }
 

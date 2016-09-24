@@ -177,6 +177,9 @@ menu_int (int *v, int *b, int min, int max, char *pref_int, char *pref_bool)
 
   char *str;
 
+  if (*v < min) *v = min;
+  if (*v > max) *v = max;
+
   if (b) {
     if (max == INT_MAX) xasprintf (&str, "%s %i->:%i %s",
                                    pref_int, min, *v, *b ? pref_bool : "-");

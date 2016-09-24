@@ -1196,16 +1196,18 @@ editor (void)
     break;
   case EDIT_LEVEL:
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
-    xasprintf (&str, "L%i>", global_level.number);
+    xasprintf (&str, "L%i>", global_level.n);
     switch (menu_enum (level_menu, str)) {
     case -1: case 1: edit = EDIT_MAIN; break;
-    case 'X': edit = EDIT_LEVEL_EXCHANGE; break;
+    case 'X': edit = EDIT_LEVEL_EXCHANGE;
+      next_level = global_level.n;
+      break;
     case 'J': edit = EDIT_LEVEL_JUMP;
-      next_level = global_level.number;
+      next_level = global_level.n;
       break;
     case 'M': edit = EDIT_LEVEL_MIRROR; break;
     case 'N': edit = EDIT_NOMINAL_NUMBER;
-      s = global_level.nominal_number;
+      s = global_level.nominal_n;
       break;
     case 'E': edit = EDIT_ENVIRONMENT;
       b = em;
@@ -1222,7 +1224,7 @@ editor (void)
       break;
     case 'S':
       if (save_level (&global_level)) {
-        copy_level (vanilla_level, &global_level);
+        copy_level (&vanilla_level, &global_level);
         editor_msg ("LEVEL HAS BEEN SAVED", 18);
       } else editor_msg ("LEVEL SAVE FAILED", 18);
       break;
@@ -1241,16 +1243,26 @@ editor (void)
     break;
   case EDIT_LEVEL_EXCHANGE:
     if (menu_select_level (EDIT_LEVEL, "LX>LEVEL") == 1) {
-      /* if (global_level.next_level) */
-      /*   global_level.next_level (next_level); */
+      if (global_level.next_level)
+        global_level.next_level (&vanilla_level, next_level);
 
-      /* copy_level (vanilla_level, &global_level); */
-      /* editor_msg ("LEVEL HAS BEEN SAVED", 18); */
+      int n = vanilla_level.n;
+      int nominal_n = vanilla_level.nominal_n;
+
+      vanilla_level.n = global_level.n;
+      vanilla_level.nominal_n = global_level.nominal_n;
+      global_level.n = n;
+      global_level.nominal_n = nominal_n;
+
+      save_level (&global_level);
+      save_level (&vanilla_level);
+
+      quit_anim = RESTART_LEVEL;
     }
     break;
   case EDIT_LEVEL_MIRROR:
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
-    xasprintf (&str, "L%iM>", global_level.number);
+    xasprintf (&str, "L%iM>", global_level.n);
     switch (menu_enum (mirror_menu, str)) {
     case -1: case 1: edit = EDIT_LEVEL; break;
     case 'C': edit = EDIT_LEVEL_MIRROR_CONS; break;
@@ -1261,7 +1273,7 @@ editor (void)
     break;
   case EDIT_LEVEL_MIRROR_CONS:
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
-    xasprintf (&str, "L%iMC>", global_level.number);
+    xasprintf (&str, "L%iMC>", global_level.n);
     switch (menu_enum (mirror_dir_menu, str)) {
     case -1: case 1: edit = EDIT_LEVEL_MIRROR; break;
     case 'H':
@@ -1292,7 +1304,7 @@ editor (void)
     break;
   case EDIT_LEVEL_MIRROR_LINKS:
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
-    xasprintf (&str, "L%iML>", global_level.number);
+    xasprintf (&str, "L%iML>", global_level.n);
     switch (menu_enum (mirror_dir_menu, str)) {
     case -1: case 1: edit = EDIT_LEVEL_MIRROR; break;
     case 'H':
@@ -1333,7 +1345,7 @@ editor (void)
     break;
   case EDIT_LEVEL_MIRROR_BOTH:
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
-    xasprintf (&str, "L%iMB>", global_level.number);
+    xasprintf (&str, "L%iMB>", global_level.n);
     switch (menu_enum (mirror_dir_menu, str)) {
     case -1: case 1: edit = EDIT_LEVEL_MIRROR; break;
     case 'H':
@@ -1380,13 +1392,13 @@ editor (void)
     break;
   case EDIT_NOMINAL_NUMBER:
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
-    xasprintf (&str, "L%iN>N.NUMBER", global_level.number);
-    switch (menu_int (&global_level.nominal_number, NULL, 0, INT_MAX, str, NULL)) {
-    case -1: edit = EDIT_LEVEL; global_level.nominal_number = s; break;
+    xasprintf (&str, "L%iN>N.NUMBER", global_level.n);
+    switch (menu_int (&global_level.nominal_n, NULL, 0, INT_MAX, str, NULL)) {
+    case -1: edit = EDIT_LEVEL; global_level.nominal_n = s; break;
     case 0: break;
     case 1:
       edit = EDIT_LEVEL;
-      register_int_undo (&undo, &global_level.nominal_number, s, (undo_f) int_undo,
+      register_int_undo (&undo, &global_level.nominal_n, s, (undo_f) int_undo,
                          "LEVEL NOMINAL NUMBER");
       break;
     default: break;
@@ -1395,7 +1407,7 @@ editor (void)
     break;
   case EDIT_ENVIRONMENT:
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
-    xasprintf (&str, "L%iE>", global_level.number);
+    xasprintf (&str, "L%iE>", global_level.n);
     b0 = b1 = false;
     if (global_level.em == DUNGEON) b0 = true;
     if (global_level.em == PALACE) b1 = true;
@@ -1418,7 +1430,7 @@ editor (void)
     break;
   case EDIT_HUE:
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
-    xasprintf (&str, "L%iH>", global_level.number);
+    xasprintf (&str, "L%iH>", global_level.n);
     b0 = b1 = b2 = b3 = b4 = 0;
     if (global_level.hue == HUE_NONE) b0 = true;
     if (global_level.hue == HUE_GREEN) b1 = true;
@@ -1944,28 +1956,4 @@ editor_mirror_link (int room, enum dir dir0, enum dir dir1)
   int r1 = roomd (&global_level, room, dir1);
   editor_link (room, r0, dir1);
   editor_link (room, r1, dir0);
-}
-
-bool
-save_level (struct level *l)
-{
-  char *f, *d;
-  xasprintf (&d, "%sdata/levels/", user_data_dir);
-  if (! al_make_directory (d)) {
-    error (0, al_get_errno (),
-           "%s (%s): failed to create native level directory",
-           __func__, d);
-    al_free (d);
-    return false;
-  }
-  xasprintf (&f, "%s%02d.mim", d, l->number);
-  if (! save_native_level (l, f)) {
-    error (0, al_get_errno (),
-           "%s (%s): failed to save native level file",
-           __func__, f);
-    al_free (f);
-    al_free (d);
-    return false;
-  }
-  return true;
 }

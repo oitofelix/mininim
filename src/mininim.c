@@ -623,48 +623,12 @@ parser (int key, char *arg, struct argp_state *state)
     break;
   case CONVERT_LEVELS_OPTION:
     give_dat_compat_preference ();
-    void (*next_level_f) (int);
-    struct level *l;
-    char *f, *d;
-    switch (level_module) {
-    case NATIVE_LEVEL_MODULE: default:
-      next_level_f = next_native_level;
-      l = &native_level;
-      break;
-    case LEGACY_LEVEL_MODULE:
-      next_level_f = next_legacy_level;
-      l = &legacy_level;
-      break;
-    case PLV_LEVEL_MODULE:
-      next_level_f = next_plv_level;
-      l = &legacy_level;
-      break;
-    case DAT_LEVEL_MODULE:
-      next_level_f = next_dat_level;
-      l = &legacy_level;
-      break;
-    case CONSISTENCY_LEVEL_MODULE:
-      next_level_f = next_consistency_level;
-      l = &consistency_level;
-      break;
-    }
-
-    xasprintf (&d, "%sdata/levels/", user_data_dir);
-    if (! al_make_directory (d))
-        error (-1, al_get_errno (), "%s (%s): failed to create native level directory",
-               __func__, d);
-
     for (i = 1; i <= 14; i++) {
-      next_level_f (i);
-      if (mirror_level) mirror_level_h (l, false, false, false, false);
-      xasprintf (&f, "%s%02d.mim", d, i);
-      if (! save_native_level (l, f))
-        error (-1, al_get_errno (), "%s (%s): failed to save native level file",
-               __func__, f);
-      al_free (f);
+      level_module_next_level (&vanilla_level, i);
+      if (mirror_level)
+        mirror_level_h (&vanilla_level, false, false, false, false);
+      if (! save_level (&vanilla_level)) exit (-1);
     }
-    al_free (d);
-
     exit (0);
     break;
   case MIRROR_LEVEL_OPTION:
@@ -1213,23 +1177,8 @@ main (int _argc, char **_argv)
 
   give_dat_compat_preference ();
 
-  switch (level_module) {
-  case NATIVE_LEVEL_MODULE: default:
-    play_native_level (start_level);
-    break;
-  case LEGACY_LEVEL_MODULE:
-    play_legacy_level (start_level);
-    break;
-  case PLV_LEVEL_MODULE:
-    play_plv_level (start_level);
-    break;
-  case DAT_LEVEL_MODULE:
-    play_dat_level (start_level);
-    break;
-  case CONSISTENCY_LEVEL_MODULE:
-    play_consistency_level (start_level);
-    break;
-  }
+  level_module_next_level (&vanilla_level, start_level);
+  play_level (&vanilla_level);
 
   if (quit_anim == RESTART_GAME) goto restart_game;
 
@@ -1480,7 +1429,7 @@ save_game (char *filename)
   char *start_level_str, *start_time_str,
     *total_lives_str, *kca_str, *kcd_str;
 
-  xasprintf (&start_level_str, "%i", global_level.number);
+  xasprintf (&start_level_str, "%i", global_level.n);
   xasprintf (&start_time_str, "%i", start_level_time);
   xasprintf (&total_lives_str, "%i", total_lives);
   xasprintf (&kca_str, "%i", skill.counter_attack_prob + 1);
@@ -1549,4 +1498,50 @@ dist_cart (float x0, float y0, float x1, float y1)
   int dx = x0 - x1;
   int dy = y0 - y1;
   return sqrt (dx * dx + dy * dy);
+}
+
+void
+level_module_next_level (struct level *l, int n)
+{
+  switch (level_module) {
+  case NATIVE_LEVEL_MODULE: default:
+    next_native_level (l, n);
+    break;
+  case LEGACY_LEVEL_MODULE:
+    next_legacy_level (l, n);
+    break;
+  case PLV_LEVEL_MODULE:
+    next_plv_level (l, n);
+    break;
+  case DAT_LEVEL_MODULE:
+    next_dat_level (l, n);
+    break;
+  case CONSISTENCY_LEVEL_MODULE:
+    next_consistency_level (l, n);
+    break;
+  }
+}
+
+bool
+save_level (struct level *l)
+{
+  char *f, *d;
+  xasprintf (&d, "%sdata/levels/", user_data_dir);
+  if (! al_make_directory (d)) {
+    error (0, al_get_errno (),
+           "%s (%s): failed to create native level directory",
+           __func__, d);
+    al_free (d);
+    return false;
+  }
+  xasprintf (&f, "%s%02d.mim", d, l->n);
+  if (! save_native_level (l, f)) {
+    error (0, al_get_errno (),
+           "%s (%s): failed to save native level file",
+           __func__, f);
+    al_free (f);
+    al_free (d);
+    return false;
+  }
+  return true;
 }

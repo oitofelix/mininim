@@ -247,8 +247,9 @@ fix_opener_or_closer_lacking_door (struct pos *p)
       || c->fg == CLOSER_FLOOR) {
     int i = c->ext.event;
     do {
-      if (con (&p->l->event[i].p)->fg == DOOR
-          || con (&p->l->event[i].p)->fg == LEVEL_DOOR) return;
+      if (is_valid_pos (&p->l->event[i].p)
+          && (con (&p->l->event[i].p)->fg == DOOR
+              || con (&p->l->event[i].p)->fg == LEVEL_DOOR)) return;
     } while (p->l->event[i++].next && i < EVENTS);
 
     /* fprintf (stderr, "%s: replaced %s (event %i) by %s at pos (%i, %i, %i)\n", */

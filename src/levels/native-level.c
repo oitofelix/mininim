@@ -19,28 +19,19 @@
 
 #include "mininim.h"
 
-struct level native_level;
-
 void
-play_native_level (int number)
+next_native_level (struct level *l, int n)
 {
-  next_native_level (number);
-  play_level (&native_level);
+  if (n < 1) n = 14;
+  else if (n > 14) n = 1;
+  load_native_level (l, n);
 }
 
 void
-next_native_level (int number)
-{
-  if (number < 1) number = 14;
-  else if (number > 14) number = 1;
-  load_native_level (number, &native_level);
-}
-
-void
-load_native_level (int number, struct level *l)
+load_native_level (struct level *l, int n)
 {
   char *filename;
-  xasprintf (&filename, "data/levels/%02d.mim", number);
+  xasprintf (&filename, "data/levels/%02d.mim", n);
 
   ALLEGRO_CONFIG *c =
     load_resource (filename, (load_resource_f) al_load_config_file);
@@ -56,14 +47,14 @@ load_native_level (int number, struct level *l)
 
   memset (l, 0, sizeof (*l));
 
-  l->number = number;
+  l->n = n;
   l->start = legacy_level_start;
   l->special_events = legacy_level_special_events;
   l->end = legacy_level_end;
   l->next_level = next_native_level;
 
   /* CUTSCENES: ok */
-  switch (number) {
+  switch (n) {
   default: break;
   case 1: l->cutscene = cutscene_01_05_11_anim; break;
   case 3: l->cutscene = cutscene_03_anim; break;
@@ -76,9 +67,9 @@ load_native_level (int number, struct level *l)
 
   /* NOMINAL NUMBER */
   /* N=n */
-  l->nominal_number = number;
+  l->nominal_n = n;
   v = al_get_config_value (c, NULL, "N");
-  if (v) sscanf (v, "%i", &l->nominal_number);
+  if (v) sscanf (v, "%i", &l->nominal_n);
 
   /* START POSITION AND DIRECTION */
   /* P=r f p d s */
@@ -187,7 +178,7 @@ save_native_level (struct level *l, char *filename)
 
   /* NOMINAL NUMBER */
   /* N=n */
-  xasprintf (&v, "%i", l->nominal_number);
+  xasprintf (&v, "%i", l->nominal_n);
   al_set_config_value (c, NULL, "N", v);
   al_free (v);
 

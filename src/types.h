@@ -194,10 +194,10 @@ struct level {
   void (*start) (void);
   void (*special_events) (void);
   void (*end) (struct pos *p);
-  void (*next_level) (int);
+  void (*next_level) (struct level *l, int n);
   void (*cutscene) (void);
-  int number;
-  int nominal_number;
+  int n;
+  int nominal_n;
 
   struct pos start_pos;
   enum dir start_dir;

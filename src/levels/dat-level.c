@@ -20,22 +20,15 @@
 #include "mininim.h"
 
 void
-play_dat_level (int number)
+next_dat_level (struct level *l, int n)
 {
-  next_dat_level (number);
-  play_level (&legacy_level);
+  if (n < 1) n = 14;
+  else if (n > 14) n = 1;
+  load_dat_level (l, n);
 }
 
 void
-next_dat_level (int number)
-{
-  if (number < 1) number = 14;
-  else if (number > 14) number = 1;
-  load_dat_level (number);
-}
-
-void
-load_dat_level (int number)
+load_dat_level (struct level *l, int n)
 {
   char *filename;
   xasprintf (&filename, levels_dat_filename);
@@ -50,15 +43,15 @@ load_dat_level (int number)
 
   int8_t *offset;
   int16_t size;
-  dat_getres (dat, 2000 + number, &offset, &size);
+  dat_getres (dat, 2000 + n, &offset, &size);
 
   if (! offset)
     error (-1, 0, "incorrect format for dat level file %s", filename);
 
   memcpy (&lv, offset, sizeof (lv));
 
-  interpret_legacy_level (number);
-  legacy_level.next_level = next_dat_level;
+  interpret_legacy_level (l, n);
+  l->next_level = next_dat_level;
 
   al_free (dat);
 }

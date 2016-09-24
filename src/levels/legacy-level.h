@@ -119,13 +119,11 @@ enum lm_exit {
 void legacy_level_start (void);
 void legacy_level_special_events (void);
 void legacy_level_end (struct pos *p);
-void next_legacy_level (int number);
-void play_legacy_level (int number);
-void interpret_legacy_level (int number);
+void next_legacy_level (struct level *l, int n);
+void interpret_legacy_level (struct level *l, int n);
 struct skill *get_legacy_skill (int i, struct skill *skill);
 
 /* variables */
 extern struct legacy_level lv;
-extern struct level legacy_level;
 
 #endif	/* MININIM_LEGACY_LEVEL_H */

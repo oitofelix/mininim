@@ -19,16 +19,8 @@
 
 #include "mininim.h"
 
-struct level consistency_level;
 static void start (void);
 static void end (struct pos *p);
-
-void
-play_consistency_level (int number)
-{
-  next_consistency_level (number);
-  play_level (&consistency_level);
-}
 
 static void
 start (void)
@@ -44,16 +36,14 @@ end (struct pos *p)
 }
 
 void
-next_consistency_level (int number)
+next_consistency_level (struct level *lv, int n)
 {
   int i;
   struct pos p;
 
-  random_seed = number;
+  random_seed = n;
   /* random_seed = time (NULL); */
   /* printf ("LEVEL NUMBER: %u\n", random_seed); */
-
-  struct level *lv = &consistency_level;
 
   memset (lv, 0, sizeof (*lv));
 
@@ -198,12 +188,12 @@ next_consistency_level (int number)
     }
   }
 
-  for (i = 0; i < 2; i++) fix_level (&consistency_level);
+  for (i = 0; i < 2; i++) fix_level (lv);
 
-  consistency_level.number = number;
-  consistency_level.nominal_number = number;
-  consistency_level.start = start;
-  consistency_level.next_level = next_consistency_level;
-  consistency_level.end = end;
-  new_pos (&consistency_level.start_pos, &consistency_level, 1, 0, 0);
+  lv->n = n;
+  lv->nominal_n = n;
+  lv->start = start;
+  lv->next_level = next_consistency_level;
+  lv->end = end;
+  new_pos (&lv->start_pos, lv, 1, 0, 0);
 }
