@@ -680,8 +680,9 @@ peq (struct pos *p0, struct pos *p1)
   npos (p0, &np0);
   npos (p1, &np1);
 
-  return np0.l == np1.l
-    && np0.room == np1.room
+  return
+    /* np0.l == np1.l && */
+    np0.room == np1.room
     && np0.floor == np1.floor
     && np0.place == np1.place;
 }

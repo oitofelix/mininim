@@ -44,6 +44,17 @@ void register_room_undo (struct undo *u, int room, struct con c[FLOORS][PLACES],
                          char *desc);
 void room_undo (struct room_undo *d, int dir);
 
+/* LEVEL */
+void register_level_undo (struct undo *u, struct level *l,
+                          char *desc);
+void level_undo (struct level_undo *d, int dir);
+
+/* LEVEL EXCHANGE */
+void register_level_exchange_undo (struct undo *u, int n,
+                                   char *desc);
+void level_exchange_undo (int *d, int dir);
+
+
 /* EVENT */
 void
 register_event_undo (struct undo *u, int e, struct pos *p, bool next,

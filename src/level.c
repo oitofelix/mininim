@@ -52,6 +52,93 @@ copy_level (struct level *ld, struct level *ls)
   return ld;
 }
 
+bool
+skill_eq (struct skill *s0, struct skill *s1)
+{
+  return s0->attack_prob == s1->attack_prob
+    && s0->counter_attack_prob == s1->counter_attack_prob
+    && s0->defense_prob == s1->defense_prob
+    && s0->counter_defense_prob == s1->counter_defense_prob
+    && s0->advance_prob == s1->advance_prob
+    && s0->return_prob == s1->return_prob
+    && s0->refraction == s1->refraction
+    && s0->extra_life == s1->extra_life;
+}
+
+bool
+room_linking_eq (struct room_linking *rl0, struct room_linking *rl1)
+{
+  return rl0->l == rl1->l
+    && rl0->r == rl1->r
+    && rl0->a == rl1->a
+    && rl0->b == rl1->b;
+}
+
+bool
+level_event_eq (struct level_event *le0, struct level_event *le1)
+{
+  return peq (&le0->p, &le1->p)
+    && le0->next == le1->next;
+}
+
+bool
+guard_eq (struct guard *g0, struct guard *g1)
+{
+  return g0->type == g1->type
+    && peq (&g0->p, &g1->p)
+    && g0->dir == g1->dir
+    && skill_eq (&g0->skill, &g1->skill)
+    && g0->total_lives == g1->total_lives
+    && g0->style == g1->style;
+}
+
+bool
+con_eq (struct con *c0, struct con *c1)
+{
+  return c0->fg == c1->fg
+    && c0->bg == c1->bg
+    && c0->ext.item == c1->ext.item;
+}
+
+bool
+level_eq (struct level *l0, struct level *l1)
+{
+  if (l0->start != l1->start
+      || l0->special_events != l1->special_events
+      || l0->end != l1->end
+      || l0->next_level != l1->next_level
+      || l0->cutscene != l1->cutscene
+      || ! peq (&l0->start_pos, &l1->start_pos)
+      || l0->start_dir != l1->start_dir
+      || l0->has_sword != l1->has_sword
+      || l0->em != l1->em
+      || l1->hue != l1->hue)
+    return false;
+
+  size_t i;
+  for (i = 0; i < ROOMS; i++)
+    if (! room_linking_eq (&l0->link[i], &l1->link[i]))
+      return false;
+
+  for (i = 0; i < EVENTS; i++)
+    if (! level_event_eq (&l0->event[i], &l1->event[i]))
+      return false;
+
+  for (i = 0; i < GUARDS; i++)
+    if (! guard_eq (&l0->guard[i], &l1->guard[i]))
+      return false;
+
+  struct pos p;
+  for (p.room = 0; p.room < ROOMS; p.room++)
+    for (p.floor = 0; p.floor < FLOORS; p.floor++)
+      for (p.place = 0; p.place < PLACES; p.place++)
+        if (! con_eq (&l0->con[p.room][p.floor][p.place],
+                      &l1->con[p.room][p.floor][p.place]))
+          return false;
+
+  return true;
+}
+
 void
 play_level (struct level *lv)
 {
@@ -1024,7 +1111,7 @@ apply_to_diff_pos (struct diff *d, void (*func) (struct pos *p))
 }
 
 void
-level_undo (struct diffset *diffset, int dir, char *prefix)
+diff_level_undo (struct diffset *diffset, int dir, char *prefix)
 {
   char *text;
   char *dir_str = (dir >= 0) ? "REDO" : "UNDO";

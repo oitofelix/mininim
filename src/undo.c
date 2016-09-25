@@ -236,6 +236,76 @@ room_undo (struct room_undo *d, int dir)
   register_changed_room (d->room);
 }
 
+/**************/
+/* LEVEL UNDO */
+/**************/
+
+void
+register_level_undo (struct undo *u, struct level *l, char *desc)
+{
+  if (level_eq (&global_level, l)) return;
+
+  struct level_undo *d = xmalloc (sizeof (struct level_undo));
+  copy_level (&d->b, &global_level);
+  copy_level (&d->f, l);
+  d->f.n = global_level.n;
+  d->f.nominal_n = global_level.nominal_n;
+  register_undo (u, d, (undo_f) level_undo, desc);
+  level_undo (d, +1);
+}
+
+void
+level_undo (struct level_undo *d, int dir)
+{
+  destroy_cons ();
+  copy_level (&global_level, (dir >= 0) ? &d->f : &d->b);
+  register_cons ();
+  em = global_level.em;
+  hue = global_level.hue;
+  mr.full_update = true;
+}
+
+/***********************/
+/* LEVEL EXCHANGE UNDO */
+/***********************/
+
+void
+register_level_exchange_undo (struct undo *u, int n, char *desc)
+{
+  if (global_level.n == n) return;
+
+  int *d = xmalloc (sizeof (* d));
+  *d = n;
+  register_undo (u, d, (undo_f) level_exchange_undo, desc);
+  level_exchange_undo (d, +1);
+}
+
+void
+level_exchange_undo (int *d, int dir)
+{
+  global_level.next_level (&vanilla_level, *d);
+
+  int n = vanilla_level.n;
+  int nominal_n = vanilla_level.nominal_n;
+
+  vanilla_level.n = global_level.n;
+  vanilla_level.nominal_n = global_level.nominal_n;
+  global_level.n = n;
+  global_level.nominal_n = nominal_n;
+
+  save_level (&global_level);
+  save_level (&vanilla_level);
+
+  copy_level (&global_level, &vanilla_level);
+
+  destroy_cons ();
+  register_cons ();
+  em = global_level.em;
+  hue = global_level.hue;
+  mr.full_update = true;
+}
+
+
 /*********/
 /* EVENT */
 /*********/

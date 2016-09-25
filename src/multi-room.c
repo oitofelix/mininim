@@ -541,6 +541,8 @@ mr_update_last_settings (void)
   mr.last.mouse_pos = mouse_pos;
   mr.last.display_width = al_get_display_width (display);
   mr.last.display_height = al_get_display_height (display);
+
+  mr.full_update = false;
 }
 
 void
@@ -864,21 +866,22 @@ draw_multi_rooms (void)
 
   mr_set_origin (mr.room, mr.x, mr.y);
 
-  bool mr_view_changed = has_mr_view_changed ();
+  bool mr_full_update = has_mr_view_changed ()
+    || mr.full_update;
 
-  if (mr_view_changed) force_full_redraw = true;
+  if (mr_full_update) force_full_redraw = true;
 
   if (anim_cycle == 0) {
     generate_wall_colors_for_room (0, room0_wall_color);
   }
 
   if (em == PALACE && vm == VGA
-      && (mr_view_changed
+      && (mr_full_update
           || em != mr.last.em
           || vm != mr.last.vm))
     generate_wall_colors ();
 
-  if (mr_view_changed)
+  if (mr_full_update)
     generate_stars ();
 
   if (mouse_pos.room != mr.last.mouse_pos.room
@@ -899,36 +902,39 @@ draw_multi_rooms (void)
     force_full_redraw = true;
   }
 
+  size_t i;
+
   if (anim_cycle == 0
-      || mr_view_changed
+      || mr_full_update
       || em != mr.last.em
       || vm != mr.last.vm
       || hgc != mr.last.hgc
       || hue != mr.last.hue
       || global_level.n != mr.last.level) {
     update_cache (em, vm);
+  } else {
+    bool depedv =
+      ((em == DUNGEON && vm == VGA)
+       || (em == DUNGEON && vm == EGA)
+       || (em == PALACE && vm == EGA));
+
+    /* update cache pos */
+    for (i = 0; i < changed_pos_nmemb; i++) {
+      update_cache_pos (&changed_pos[i].p, changed_pos[i].reason, em, vm);
+      struct pos pl; prel (&changed_pos[i].p, &pl, +0, -1);
+      if (depedv && con (&pl)->fg == WALL)
+        update_cache_pos (&pl, CHPOS_WALL, em, vm);
+    }
+
+    /* update cache room */
+    for (i = 0; i < changed_room_nmemb; i++)
+      update_cache_room (changed_room[i], em, vm);
+
+    /* kept together so update_cache_pos and update_cache_room can
+       access each other's arrays */
+    destroy_array ((void **) &changed_pos, &changed_pos_nmemb);
+    destroy_array ((void **) &changed_room, &changed_room_nmemb);
   }
-
-  bool depedv =
-    ((em == DUNGEON && vm == VGA)
-     || (em == DUNGEON && vm == EGA)
-     || (em == PALACE && vm == EGA));
-
-  size_t i;
-  for (i = 0; i < changed_pos_nmemb; i++) {
-    update_cache_pos (&changed_pos[i].p, changed_pos[i].reason, em, vm);
-    struct pos pl; prel (&changed_pos[i].p, &pl, +0, -1);
-    if (depedv && con (&pl)->fg == WALL)
-      update_cache_pos (&pl, CHPOS_WALL, em, vm);
-  }
-
-  for (i = 0; i < changed_room_nmemb; i++)
-    update_cache_room (changed_room[i], em, vm);
-
-  /* kept together so update_cache_pos and update_cache_room can
-     access each other's arrays */
-  destroy_array ((void **) &changed_pos, &changed_pos_nmemb);
-  destroy_array ((void **) &changed_room, &changed_room_nmemb);
 
   for (y = mr.h - 1; y >= 0; y--)
     for (x = 0; x < mr.w; x++) {
@@ -960,12 +966,6 @@ draw_multi_rooms (void)
 
   mr_destroy_room_list (&l);
 
-  /* if (! no_room_drawing) */
-  /*   for (y = mr.h - 1; y >= 0; y--) */
-  /*     for (x = 0; x < mr.w; x++) */
-  /*       if (mr.cell[x][y].room) */
-  /*         draw_bitmap (mr.cell[x][y].cache, mr.cell[x][y].screen, 0, 0, 0); */
-
   for (y = mr.h - 1; y >= 0; y--)
     for (x = 0; x < mr.w; x++) {
       if (! mr.cell[x][y].room) continue;
@@ -973,14 +973,6 @@ draw_multi_rooms (void)
       mr.dy = y;
       draw_animated_foreground (mr.cell[x][y].screen, mr.cell[x][y].room);
     }
-
-  /* if (mr.select_cycles > 0) { */
-  /*   int t = max_int (mr.w, mr.h); */
-  /*   draw_rectangle (mr.cell[mr.x][mr.y].screen, 0, 3, */
-  /*                   ORIGINAL_WIDTH - t, */
-  /*                   3 + ROOM_HEIGHT - t, RED, t); */
-  /*   mr.select_cycles--; */
-  /* } */
 
   mr_update_last_settings ();
 }

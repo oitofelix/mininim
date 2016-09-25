@@ -50,8 +50,19 @@ void pause_game (void);
 void unpause_game (void);
 bool is_game_paused (void);
 
+/* struct level related */
+
+bool skill_eq (struct skill *s0, struct skill *s1);
+bool room_linking_eq (struct room_linking *rl0,
+                      struct room_linking *rl1);
+bool level_event_eq (struct level_event *le0,
+                     struct level_event *le1);
+bool guard_eq (struct guard *g0, struct guard *g1);
+bool con_eq (struct con *c0, struct con *c1);
+bool level_eq (struct level *l0, struct level *l1);
+
 /* not used */
 void apply_to_diff_pos (struct diff *d, void (*func) (struct pos *p));
-void level_undo (struct diffset *diffset, int dir, char *prefix);
+void diff_level_undo (struct diffset *diffset, int dir, char *prefix);
 
 #endif	/* MININIM_LEVEL_H */

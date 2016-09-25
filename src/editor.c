@@ -37,6 +37,7 @@ static int guard_index;
 static int b, r, s, t, min, max;
 static struct con con_copy;
 static struct con room_copy[FLOORS][PLACES];
+static struct level level_copy;
 static char *msg;
 static uint64_t msg_cycles;
 
@@ -234,6 +235,8 @@ editor (void)
      {'R', "RANDOM"},
      {'D', "DECORATION"},
      {'M', "MIRROR>"},
+     {'C', "COPY"},
+     {'P', "PASTE"},
      {'N', "NOMINAL NUMBER"},
      {'E', "ENVIRONMENT<"},
      {'H', "HUE<"},
@@ -1182,8 +1185,13 @@ editor (void)
     xasprintf (&str, "L%i>", global_level.n);
     switch (menu_enum (level_menu, str)) {
     case -1: case 1: edit = EDIT_MAIN; break;
-    case 'X': edit = EDIT_LEVEL_EXCHANGE;
-      next_level = global_level.n;
+    case 'X':
+      if (level_module != NATIVE_LEVEL_MODULE)
+        editor_msg ("NATIVE LEVEL MODULE ONLY", 18);
+      else {
+        edit = EDIT_LEVEL_EXCHANGE;
+        next_level = global_level.n;
+      }
       break;
     case 'J': edit = EDIT_LEVEL_JUMP;
       next_level = global_level.n;
@@ -1204,6 +1212,13 @@ editor (void)
                        ? "DECORATE LEVEL" : NULL);
       break;
     case 'M': edit = EDIT_LEVEL_MIRROR; break;
+    case 'C':
+      copy_level (&level_copy, &global_level);
+      editor_msg ("COPIED", 12);
+      break;
+    case 'P':
+      register_level_undo (&undo, &level_copy, "PASTE LEVEL");
+      break;
     case 'N': edit = EDIT_NOMINAL_NUMBER;
       s = global_level.nominal_n;
       break;
@@ -1221,11 +1236,11 @@ editor (void)
       b4 = (global_level.hue == HUE_BLUE) ? true : false;
       break;
     case 'S':
-      if (save_level (&global_level)) {
+      if (level_module != NATIVE_LEVEL_MODULE)
+        editor_msg ("NATIVE LEVEL MODULE ONLY", 18);
+      else if (save_level (&global_level)) {
         copy_level (&vanilla_level, &global_level);
         editor_msg ("LEVEL HAS BEEN SAVED", 18);
-        if (level_module != NATIVE_LEVEL_MODULE)
-          error (0, 0, "saved level can only be recalled using the native level module");
       } else editor_msg ("LEVEL SAVE FAILED", 18);
       break;
     case 'L':
@@ -1237,7 +1252,8 @@ editor (void)
    break;
   case EDIT_LEVEL_JUMP:
     xasprintf (&str, "L%iJ>LEVEL", global_level.n);
-    if (menu_select_level (EDIT_LEVEL, str) == 1) {
+    if (menu_select_level (EDIT_LEVEL, str) == 1
+        && next_level != global_level.n) {
       ignore_level_cutscene = true;
       quit_anim = NEXT_LEVEL;
     }
@@ -1245,26 +1261,9 @@ editor (void)
     break;
   case EDIT_LEVEL_EXCHANGE:
     xasprintf (&str, "L%iX>LEVEL", global_level.n);
-    if (menu_select_level (EDIT_LEVEL, str) == 1) {
-      if (global_level.next_level)
-        global_level.next_level (&vanilla_level, next_level);
-
-      int n = vanilla_level.n;
-      int nominal_n = vanilla_level.nominal_n;
-
-      vanilla_level.n = global_level.n;
-      vanilla_level.nominal_n = global_level.nominal_n;
-      global_level.n = n;
-      global_level.nominal_n = nominal_n;
-
-      save_level (&global_level);
-      save_level (&vanilla_level);
-
-      if (level_module != NATIVE_LEVEL_MODULE)
-        error (0, 0, "level exchange can only be recalled using the native level module");
-
-      quit_anim = RESTART_LEVEL;
-    }
+    if (menu_select_level (EDIT_LEVEL, str) == 1
+        && next_level != global_level.n)
+      register_level_exchange_undo (&undo, next_level, "LEVEL EXCHANGE");
     al_free (str);
     break;
   case EDIT_LEVEL_MIRROR:

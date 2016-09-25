@@ -104,8 +104,8 @@ struct multi_room {
     MR_FIT_NONE, MR_FIT_STRETCH, MR_FIT_RATIO,
   } fit_mode;
   int fit_w, fit_h;
-
   int room_select;
+  bool full_update;
 
   struct multi_room_cell {
     ALLEGRO_BITMAP *screen;
@@ -645,6 +645,10 @@ struct mirror_pos_undo {
 struct room_undo {
   int room;
   struct con b[FLOORS][PLACES], f[FLOORS][PLACES];
+};
+
+struct level_undo {
+  struct level b; struct level f;
 };
 
 struct event_undo {
