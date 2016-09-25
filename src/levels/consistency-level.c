@@ -32,6 +32,7 @@ start (void)
 static void
 end (struct pos *p)
 {
+  next_level = global_level.n + 1;
   quit_anim = NEXT_LEVEL;
 }
 

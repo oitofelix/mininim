@@ -804,8 +804,8 @@ process_keys (void)
   /* SHIFT+M: warp to previous level */
   if (was_key_pressed (ALLEGRO_KEY_M, 0, ALLEGRO_KEYMOD_SHIFT, true)) {
     ignore_level_cutscene = true;
-    quit_anim = NEXT_LEVEL;
     next_level = global_level.n - 1;
+    quit_anim = NEXT_LEVEL;
   }
 
   /* C: show direct coordinates */

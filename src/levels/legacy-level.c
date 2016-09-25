@@ -354,6 +354,7 @@ legacy_level_special_events (void)
       total_lives = k->total_lives;
       current_lives = k->current_lives;
       skill = k->skill;
+      next_level = global_level.n + 1;
       quit_anim = NEXT_LEVEL;
     }
   }
@@ -550,6 +551,7 @@ legacy_level_special_events (void)
       total_lives = k->total_lives;
       current_lives = k->current_lives;
       skill = k->skill;
+      next_level = global_level.n + 1;
       quit_anim = NEXT_LEVEL;
     }
   }
@@ -610,6 +612,7 @@ legacy_level_special_events (void)
       total_lives = k->total_lives;
       current_lives = k->current_lives;
       skill = k->skill;
+      next_level = global_level.n + 1;
       quit_anim = NEXT_LEVEL;
     }
   }
@@ -635,7 +638,10 @@ legacy_level_end (struct pos *p)
     played_sample = true;
   }
 
-  if (! is_playing_sample_instance (si)) quit_anim = NEXT_LEVEL;
+  if (! is_playing_sample_instance (si)) {
+    next_level = global_level.n + 1;
+    quit_anim = NEXT_LEVEL;
+  }
 }
 
 void
