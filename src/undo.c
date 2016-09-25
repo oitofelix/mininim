@@ -22,7 +22,11 @@
 void
 register_undo (struct undo *u, void *data, undo_f f, char *desc)
 {
-  if (! u->pass || ! u->count) u->current = -1;
+  if (! u->pass || ! u->count || u->current == -1) {
+    u->pass = NULL;
+    u->count = 0;
+    u->current = -1;
+  }
 
   size_t i;
   for (i = u->current + 1; i < u->count; i++)
@@ -44,6 +48,7 @@ free_undo (struct undo *u)
   for (i = 0; i < u->count; i++)
     al_free (u->pass[i].data);
 
+  u->pass = NULL;
   u->count = 0;
   u->current = -1;
 }

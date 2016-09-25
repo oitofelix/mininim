@@ -151,8 +151,9 @@ create_multi_room_bitmaps (void)
   int x, y;
   for (x = 0; x < mr.w; x++)
     for (y = 0; y < mr.h; y++) {
-      int sw = ORIGINAL_WIDTH;
-      int sh = ORIGINAL_HEIGHT - (y < mr.h - 1 ? 8 : 0);
+      int sw = cutscene ? CUTSCENE_WIDTH : ORIGINAL_WIDTH;
+      int sh = cutscene ? CUTSCENE_HEIGHT : ORIGINAL_HEIGHT
+        - (y < mr.h - 1 ? 8 : 0);
       destroy_bitmap (mr.cell[x][y].screen);
       destroy_bitmap (mr.cell[x][y].cache);
       mr.cell[x][y].screen = create_bitmap (sw, sh);
@@ -172,8 +173,8 @@ set_multi_room (int w, int h)
 void
 mr_get_resolution (int *w, int *h)
 {
-  *w = ORIGINAL_WIDTH * mr.w;
-  *h = ROOM_HEIGHT * mr.h + 11;
+  *w = cutscene ? CUTSCENE_WIDTH : ORIGINAL_WIDTH * mr.w;
+  *h = cutscene ? CUTSCENE_HEIGHT : ROOM_HEIGHT * mr.h + 11;
 }
 
 void

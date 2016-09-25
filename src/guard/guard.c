@@ -696,9 +696,9 @@ draw_guard_lives (ALLEGRO_BITMAP *bitmap, struct anim *g, enum vm vm)
   int i;
   struct coord c;
   struct rect r;
-  new_rect (&r, room_view, ORIGINAL_WIDTH - 7 * current_lives,
-            ORIGINAL_HEIGHT - 8, 7 * current_lives,
-            ORIGINAL_HEIGHT - 1);
+  new_rect (&r, room_view, CUTSCENE_WIDTH - 7 * current_lives,
+            CUTSCENE_HEIGHT - 8, 7 * current_lives,
+            CUTSCENE_HEIGHT - 1);
 
   ALLEGRO_COLOR bg_color;
 
@@ -735,8 +735,8 @@ guard_life_coord (int i, struct coord *c)
 {
   return
     new_coord (c, NULL, room_view,
-               ORIGINAL_WIDTH - 7 * (i + 1) + 1,
-               194);
+               CUTSCENE_WIDTH - 7 * (i + 1) + 1,
+               CUTSCENE_HEIGHT - 6);
 }
 
 static ALLEGRO_COLOR

@@ -62,7 +62,7 @@ play_anim (void (*draw_callback) (void),
     case ALLEGRO_EVENT_TIMER:
       if (event.timer.source == timer) {
         /* update mouse pos */
-        get_mouse_pos (&mouse_pos);
+        if (! cutscene) get_mouse_pos (&mouse_pos);
 
         /* load configuration */
         if (load_config_dialog_thread

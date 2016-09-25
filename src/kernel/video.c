@@ -32,7 +32,7 @@ ALLEGRO_BITMAP *effect_buffer;
 ALLEGRO_BITMAP *black_screen;
 struct video_effect video_effect = {.type = VIDEO_NO_EFFECT};
 static ALLEGRO_FONT *builtin_font;
-int display_width = DISPLAY_WIDTH, display_height = DISPLAY_HEIGHT;
+int display_width, display_height;
 ALLEGRO_BITMAP *icon;
 int effect_counter;
 void (*load_callback) (void);
@@ -55,6 +55,9 @@ init_video (void)
                             | (display_mode < 0 ? ALLEGRO_WINDOWED : ALLEGRO_FULLSCREEN)
                             | ALLEGRO_RESIZABLE
                             | ALLEGRO_GENERATE_EXPOSE_EVENTS);
+
+  display_width = DISPLAY_WIDTH;
+  display_height = DISPLAY_HEIGHT;
 
   if (display_mode >= 0) {
     ALLEGRO_DISPLAY_MODE d;
@@ -84,9 +87,9 @@ init_video (void)
     mr.fit_h = 2;
   }
   set_multi_room (1, 1);
-  effect_buffer = create_bitmap (ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
-  black_screen = create_bitmap (ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
-  uscreen = create_bitmap (ORIGINAL_WIDTH, ORIGINAL_HEIGHT);
+  effect_buffer = create_bitmap (CUTSCENE_WIDTH, CUTSCENE_HEIGHT);
+  black_screen = create_bitmap (CUTSCENE_WIDTH, CUTSCENE_HEIGHT);
+  uscreen = create_bitmap (CUTSCENE_WIDTH, CUTSCENE_HEIGHT);
   iscreen = create_bitmap (display_width, display_height);
   clear_bitmap (uscreen, TRANSPARENT_COLOR);
 
@@ -317,11 +320,11 @@ draw_bottom_text (ALLEGRO_BITMAP *bitmap, char *text, int priority)
     }
 
     set_target_bitmap (bitmap);
-    al_draw_filled_rectangle (0, ORIGINAL_HEIGHT - 8,
-                              ORIGINAL_WIDTH, ORIGINAL_HEIGHT,
+    al_draw_filled_rectangle (0, CUTSCENE_HEIGHT - 8,
+                              CUTSCENE_WIDTH, CUTSCENE_HEIGHT,
                               bg_color);
     draw_text (bitmap, current_text,
-               ORIGINAL_WIDTH / 2.0, ORIGINAL_HEIGHT - 7,
+               CUTSCENE_WIDTH / 2.0, CUTSCENE_HEIGHT - 7,
                ALLEGRO_ALIGN_CENTRE);
   }
 }

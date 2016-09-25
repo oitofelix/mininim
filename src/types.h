@@ -286,8 +286,8 @@ struct level {
 };
 
 struct legacy_level {
-  uint8_t foretable[LROOMS][FLOORS][PLACES];
-  uint8_t backtable[LROOMS][FLOORS][PLACES];
+  uint8_t foretable[LROOMS][LFLOORS][LPLACES];
+  uint8_t backtable[LROOMS][LFLOORS][LPLACES];
   uint8_t door_1[LEVENTS];
   uint8_t door_2[LEVENTS];
   uint8_t link[LROOMS][4];

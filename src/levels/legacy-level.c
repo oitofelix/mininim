@@ -32,14 +32,6 @@ static bool played_vizier_death_sample;
 
 static int life_table[] = {4, 3, 3, 3, 3, 4, 5, 4, 4, 5, 5, 5, 4, 6, 0, 0};
 
-static struct con room_0[FLOORS][PLACES] =
-  {{{WALL}, {WALL}, {WALL}, {WALL}, {WALL},
-    {WALL}, {WALL}, {WALL}, {WALL}, {WALL}},
-   {{WALL}, {WALL}, {WALL}, {WALL}, {WALL},
-    {WALL}, {WALL}, {WALL}, {WALL}, {WALL}},
-   {{WALL}, {WALL}, {WALL}, {WALL}, {WALL},
-    {WALL}, {WALL}, {WALL}, {WALL}, {WALL}}};
-
 struct legacy_level lv;
 
 static enum ltile get_tile (struct pos *p);
@@ -689,7 +681,6 @@ interpret_legacy_level (struct level *l, int n)
   l->special_events = legacy_level_special_events;
   l->end = legacy_level_end;
   l->next_level = next_legacy_level;
-  memcpy (&l->con[0], &room_0, sizeof (room_0));
 
   /* CUTSCENES: ok */
   switch (n) {
@@ -707,18 +698,20 @@ interpret_legacy_level (struct level *l, int n)
   l->has_sword = (n != 1);
 
   /* LINKS: ok */
+  l->link[0].l = l->link[0].r = l->link[0].a = l->link[0].b = 0;
   for (p.room = 1; p.room <= LROOMS; p.room++) {
-    l->link[p.room].l = lv.link[p.room - 1][LD_LEFT];
-    l->link[p.room].r = lv.link[p.room - 1][LD_RIGHT];
-    l->link[p.room].a = lv.link[p.room - 1][LD_ABOVE];
-    l->link[p.room].b = lv.link[p.room - 1][LD_BELOW];
+    l->link[p.room % ROOMS].l = lv.link[p.room - 1][LD_LEFT] % ROOMS;
+    l->link[p.room % ROOMS].r = lv.link[p.room - 1][LD_RIGHT] % ROOMS;
+    l->link[p.room % ROOMS].a = lv.link[p.room - 1][LD_ABOVE] % ROOMS;
+    l->link[p.room % ROOMS].b = lv.link[p.room - 1][LD_BELOW] % ROOMS;
   }
 
   /* FORETABLE and BACKTABLE: ok */
   for (p.room = 1; p.room <= LROOMS; p.room++)
-    for (p.floor = 0; p.floor < FLOORS; p.floor++)
-      for (p.place = 0; p.place < PLACES; p.place++) {
-        struct con *c = &l->con[p.room][p.floor][p.place];
+    for (p.floor = 0; p.floor < LFLOORS; p.floor++)
+      for (p.place = 0; p.place < LPLACES; p.place++) {
+        struct pos p0 = p; p0.room %= ROOMS;
+        struct con *c = con (&p0);
 
         uint8_t f = lv.foretable[p.room - 1][p.floor][p.place];
         uint8_t b = lv.backtable[p.room - 1][p.floor][p.place];
@@ -902,11 +895,11 @@ interpret_legacy_level (struct level *l, int n)
   /* EVENTS: ok */
   int i;
   for (i = 0; i < LEVENTS; i++) {
-    struct level_event *e = &l->event[i];
+    struct level_event *e = &l->event[i % EVENTS];
     int ld = lv.door_1[i] & 0x1F;
     new_pos (&e->p, l,
-             (lv.door_2[i] >> 3) | ((lv.door_1[i] & 0x60) >> 5),
-             ld / PLACES, ld % PLACES);
+             ((lv.door_2[i] >> 3) | ((lv.door_1[i] & 0x60) >> 5)) % ROOMS,
+             ld / LPLACES, ld % LPLACES);
     if (get_tile (&e->p) == LT_EXIT_LEFT) e->p.place++;
     e->next = lv.door_1[i] & 0x80 ? false : true;
   }
@@ -914,9 +907,9 @@ interpret_legacy_level (struct level *l, int n)
   /* START POSITION: ok */
   struct pos *sp = &l->start_pos;
   sp->l = l;
-  sp->room = lv.start_position[0];
-  sp->floor = lv.start_position[1] / PLACES;
-  sp->place = lv.start_position[1] % PLACES;
+  sp->room = lv.start_position[0] % ROOMS;
+  sp->floor = lv.start_position[1] / LPLACES;
+  sp->place = lv.start_position[1] % LPLACES;
 
   /* START DIRECTION: ok */
   enum dir *sd = &l->start_dir;
@@ -924,7 +917,7 @@ interpret_legacy_level (struct level *l, int n)
 
   /* GUARD LOCATION, DIRECTION, SKILL and COLOR: ok */
   for (i = 0; i < LROOMS; i++) {
-    struct guard *g = &l->guard[i + 1];
+    struct guard *g = &l->guard[(i + 1) % GUARDS];
 
     if (lv.guard_location[i] > 29) {
       g->type = NO_ANIM;
@@ -942,9 +935,9 @@ interpret_legacy_level (struct level *l, int n)
     }
 
     /* LOCATION: ok */
-    new_pos (&g->p, l, i + 1,
-             lv.guard_location[i] / PLACES,
-             lv.guard_location[i] % PLACES);
+    new_pos (&g->p, l, (i + 1) % ROOMS,
+             lv.guard_location[i] / LPLACES,
+             lv.guard_location[i] % LPLACES);
 
     /* DIRECTION: ok */
     g->dir = lv.guard_direction[i] ? LEFT : RIGHT;
@@ -972,6 +965,12 @@ interpret_legacy_level (struct level *l, int n)
   case 12: case 13: l->hue = HUE_YELLOW; break;
   case 14: l->hue = HUE_BLUE; break;
   }
+
+  /* Generate room 0 */
+  p.room = 0;
+  for (p.floor = 0; p.floor < FLOORS; p.floor++)
+    for (p.place = 0; p.place < PLACES; p.place++)
+      con (&p)->fg = WALL;
 }
 
 struct skill *

@@ -388,8 +388,8 @@ draw_kid_lives (ALLEGRO_BITMAP *bitmap, struct anim *k,
   int i;
   struct coord c;
   struct rect r;
-  new_rect (&r, room_view, 0, ORIGINAL_HEIGHT - 8,
-            7 * total_lives, ORIGINAL_HEIGHT - 1);
+  new_rect (&r, room_view, 0, CUTSCENE_HEIGHT - 8,
+            7 * total_lives, CUTSCENE_HEIGHT - 1);
 
   ALLEGRO_COLOR bg_color;
 
@@ -425,9 +425,7 @@ static struct coord *
 kid_life_coord (int i, struct coord *c)
 {
   return
-    new_coord (c, NULL, room_view,
-               7 * i,
-               194);
+    new_coord (c, NULL, room_view, 7 * i, CUTSCENE_HEIGHT - 6);
 }
 
 void

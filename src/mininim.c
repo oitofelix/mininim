@@ -1229,7 +1229,7 @@ draw_loading_screen (void)
     clear_bitmap (screen, BLACK);
     draw_filled_rectangle (screen, x - 1, y - 1, x + w, y + h, WHITE);
     draw_bitmap (icon, screen, x, y, 0);
-    draw_text (screen, "Loading....", ORIGINAL_WIDTH / 2.0, ORIGINAL_HEIGHT / 2.0,
+    draw_text (screen, "Loading....", CUTSCENE_WIDTH / 2.0, CUTSCENE_HEIGHT / 2.0,
                ALLEGRO_ALIGN_CENTRE);
     show ();
   }
