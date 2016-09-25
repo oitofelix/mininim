@@ -140,6 +140,17 @@ level_eq (struct level *l0, struct level *l1)
 }
 
 void
+replace_playing_level (struct level *l)
+{
+  destroy_cons ();
+  copy_level (&global_level, l);
+  register_cons ();
+  em = global_level.em;
+  hue = global_level.hue;
+  mr.full_update = true;
+}
+
+void
 play_level (struct level *lv)
 {
   char *text;

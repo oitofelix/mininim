@@ -543,6 +543,10 @@ mr_update_last_settings (void)
   mr.last.display_height = al_get_display_height (display);
 
   mr.full_update = false;
+  if (mr.busy) {
+    mr.busy = false;
+    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
+  }
 }
 
 void
@@ -860,6 +864,14 @@ update_cache_pos (struct pos *p, enum changed_pos_reason reason,
 }
 
 void
+mr_busy (void)
+{
+  if (mr.busy) return;
+  mr.busy = true;
+  set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_BUSY);
+}
+
+void
 draw_multi_rooms (void)
 {
   int x, y;
@@ -869,7 +881,10 @@ draw_multi_rooms (void)
   bool mr_full_update = has_mr_view_changed ()
     || mr.full_update;
 
-  if (mr_full_update) force_full_redraw = true;
+  if (mr_full_update) {
+    mr_busy ();
+    force_full_redraw = true;
+  }
 
   if (anim_cycle == 0) {
     generate_wall_colors_for_room (0, room0_wall_color);
@@ -1157,6 +1172,8 @@ void
 apply_mr_fit_mode (void)
 {
   int w, h;
+
+  mr_busy ();
 
   switch (mr.fit_mode) {
   case MR_FIT_NONE:

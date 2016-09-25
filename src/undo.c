@@ -257,12 +257,7 @@ register_level_undo (struct undo *u, struct level *l, char *desc)
 void
 level_undo (struct level_undo *d, int dir)
 {
-  destroy_cons ();
-  copy_level (&global_level, (dir >= 0) ? &d->f : &d->b);
-  register_cons ();
-  em = global_level.em;
-  hue = global_level.hue;
-  mr.full_update = true;
+  replace_playing_level ((dir >= 0) ? &d->f : &d->b);
 }
 
 /***********************/
@@ -296,13 +291,7 @@ level_exchange_undo (int *d, int dir)
   save_level (&global_level);
   save_level (&vanilla_level);
 
-  copy_level (&global_level, &vanilla_level);
-
-  destroy_cons ();
-  register_cons ();
-  em = global_level.em;
-  hue = global_level.hue;
-  mr.full_update = true;
+  replace_playing_level (&vanilla_level);
 }
 
 

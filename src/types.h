@@ -106,6 +106,7 @@ struct multi_room {
   int fit_w, fit_h;
   int room_select;
   bool full_update;
+  bool busy;
 
   struct multi_room_cell {
     ALLEGRO_BITMAP *screen;
