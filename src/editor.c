@@ -232,6 +232,7 @@ editor (void)
      {'X', "EXCHANGE<"},
      {'A', "CLEAR"},
      {'R', "RANDOM"},
+     {'D', "DECORATION"},
      {'M', "MIRROR>"},
      {'N', "NOMINAL NUMBER"},
      {'E', "ENVIRONMENT<"},
@@ -301,7 +302,6 @@ editor (void)
   enum confg fg;
   enum conbg bg;
   union conext ext;
-  struct con room_buf[FLOORS][PLACES], room_buf2[FLOORS][PLACES];
   static struct skill skill_buf;
 
   /* display message if available */
@@ -953,14 +953,7 @@ editor (void)
       randomize_room (&global_level, mr.room, "RANDOM ROOM");
       break;
     case 'D':
-      memcpy (&room_buf2, &global_level.con[mr.room], sizeof (room_buf2));
-      new_pos (&p0, &global_level, mr.room, -1, -1);
-      for (p0.floor = 0; p0.floor < FLOORS; p0.floor++)
-        for (p0.place = 0; p0.place < PLACES; p0.place++)
-          decorate_pos (&p0);
-      memcpy (&room_buf, &global_level.con[mr.room], sizeof (room_buf));
-      memcpy (&global_level.con[mr.room], &room_buf2, sizeof (room_buf2));
-      register_room_undo (&undo, mr.room, room_buf, "DECORATE ROOM");
+      decorate_room (&global_level, mr.room, "DECORATE ROOM");
       break;
     case 'M': edit = EDIT_ROOM_MIRROR; break;
     case 'C':
@@ -1204,6 +1197,11 @@ editor (void)
       for (i = 1; i < ROOMS; i++)
         randomize_room (&global_level, i, (i == ROOMS - 1)
                         ? "RANDOM LEVEL" : NULL);
+      break;
+    case 'D':
+      for (i = 1; i < ROOMS; i++)
+        decorate_room (&global_level, i, (i == ROOMS - 1)
+                       ? "DECORATE LEVEL" : NULL);
       break;
     case 'M': edit = EDIT_LEVEL_MIRROR; break;
     case 'N': edit = EDIT_NOMINAL_NUMBER;

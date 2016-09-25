@@ -55,7 +55,8 @@ void exchange_anim_pos (struct pos *p0, struct pos *p1, bool invert_dir);
 void invert_con_dir (struct pos *p);
 void mirror_pos (struct pos *p0, struct pos *p1, bool destroy, bool register_con,
                  bool prepare, bool register_change, bool invert_dir);
-void decorate_pos (struct pos *p);
+struct pos *decorate_pos (struct pos *p);
+struct level *decorate_room (struct level *l, int room, char *desc);
 enum con_diff con_diff (struct con *c0, struct con *c1);
 struct level *clear_room (struct level *l, int room, char *desc);
 struct level *randomize_room (struct level *l, int room, char *desc);

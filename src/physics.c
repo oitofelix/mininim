@@ -454,7 +454,7 @@ mirror_pos (struct pos *p0, struct pos *p1, bool destroy, bool register_con,
   }
 }
 
-void
+struct pos *
 decorate_pos (struct pos *p)
 {
   struct con *c = con (p);
@@ -532,6 +532,24 @@ decorate_pos (struct pos *p)
     default: break;
     }
   }
+
+  return p;
+}
+
+struct level *
+decorate_room (struct level *l, int room, char *desc)
+{
+  struct con room_buf[FLOORS][PLACES], room_buf2[FLOORS][PLACES];
+  struct pos p;
+  memcpy (&room_buf2, &l->con[room], sizeof (room_buf2));
+  new_pos (&p, l, room, -1, -1);
+  for (p.floor = 0; p.floor < FLOORS; p.floor++)
+    for (p.place = 0; p.place < PLACES; p.place++)
+      decorate_pos (&p);
+  memcpy (&room_buf, &l->con[room], sizeof (room_buf));
+  memcpy (&l->con[room], &room_buf2, sizeof (room_buf2));
+  register_room_undo (&undo, room, room_buf, desc);
+  return l;
 }
 
 enum con_diff
