@@ -73,11 +73,13 @@ flow (struct anim *k)
 
   struct anim *ke = get_anim_by_id (k->enemy_id);
   k->keep_sword_fast = (k->enemy_id != -1
+                        && ke->enemy_id == k->id
                         && ke->current_lives > 0
                         && ! is_anim_fall (&ke->f));
 
-  bool keep_sword = k->key.down
-    && (! ke || ! is_in_range (k, ke, ATTACK_RANGE));
+  bool keep_sword =
+    (k->key.down && (! ke || ! is_in_range (k, ke, ATTACK_RANGE)))
+    || (k->auto_taken_sword && (! ke || ke->enemy_id != k->id));
 
   if (k->oaction != kid_sword_normal) k->i = -1;
 

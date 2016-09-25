@@ -79,6 +79,7 @@ static bool
 flow (struct anim *k)
 {
   if (k->oaction != kid_take_sword) {
+    k->auto_taken_sword = false;
     k->i = -1;
     if (! k->has_sword) {
       kid_normal (k);

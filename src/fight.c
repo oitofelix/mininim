@@ -218,6 +218,7 @@ fight_ai (struct anim *k)
       && ke->has_sword) {
     place_on_the_ground (&ke->f, &ke->f.c);
     kid_take_sword (ke);
+    ke->auto_taken_sword = true;
   }
 
   /* prevent enemy from hiding near */
@@ -1006,8 +1007,8 @@ is_safe_to_follow (struct anim *k0, struct anim *k1, enum dir dir)
 bool
 is_there_enough_room_to_fight (struct anim *k)
 {
-  return dist_collision (&k->f, false, &k->ci) > PLACE_WIDTH
-    || dist_collision (&k->f, true, &k->ci) > PLACE_WIDTH;
+  return dist_collision (&k->f, false, &k->ci) > PLACE_WIDTH - 16
+    || dist_collision (&k->f, true, &k->ci) > PLACE_WIDTH - 16;
 }
 
 void

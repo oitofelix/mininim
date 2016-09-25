@@ -372,7 +372,7 @@ struct anim {
     just_hanged, hang, hang_limit, misstep, uncouch_slowly,
     keep_sword_fast, turn, shadow, splash, hit_by_loose_floor,
     invisible, has_sword, hurt, controllable, fight, crossing_mirror,
-    edge_detection;
+    edge_detection, auto_taken_sword;
 
   int enemy_defended_my_attack, enemy_counter_attacked_myself, i_counter_defended;
   bool attack_range_far, attack_range_near, hurt_enemy_in_counter_attack;
