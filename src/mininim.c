@@ -431,8 +431,9 @@ option_get_args (int key, char *arg, struct argp_state *state, char s, ...)
   va_list ap, at, av, as, ar, atype, aval, arange;
   int i;
   error_t retval;
-  char *arg2;
+  char *arg2, *s2;
   xasprintf (&arg2, "%s", arg);
+  xasprintf (&s2, "%c", s);
   char *estr;
 
   /* initialize argument lists */
@@ -471,7 +472,7 @@ option_get_args (int key, char *arg, struct argp_state *state, char s, ...)
   for (i = 0; i < num_args; i++) {
     enum opt_arg_type type = va_arg (at, enum opt_arg_type);
 
-    char *str = strtok (i ? NULL : arg2, &s);
+    char *str = strtok (i ? NULL : arg2, s2);
     if (! str) {
       xasprintf (&estr, "Reason: less than %i arguments provided.", num_args);
       option_arg_error (key, arg, state, -1, estr);
@@ -516,6 +517,7 @@ option_get_args (int key, char *arg, struct argp_state *state, char s, ...)
   va_end (aval);
   va_end (arange);
   al_free (arg2);
+  al_free (s2);
   return retval;
 }
 
