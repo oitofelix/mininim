@@ -125,7 +125,7 @@ load_native_level (struct level *l, int n)
   }
 
   /* LINKS */
-  for (i = 0;; i++) {
+  for (i = 1;; i++) {
     /* Li=l r a b */
     struct room_linking *r = &l->link[i];
     xasprintf (&k, "L%i", i);
@@ -149,7 +149,7 @@ load_native_level (struct level *l, int n)
 
   /* CONSTRUCTIONS */
   struct pos p; new_pos (&p, l, -1, -1, -1);
-  for (p.room = 0;; p.room++)
+  for (p.room = 1;; p.room++)
     for (p.floor = 0; p.floor < FLOORS; p.floor++)
       for (p.place = 0; p.place < PLACES; p.place++) {
         /* Cr f p=f b e */
@@ -173,8 +173,8 @@ save_native_level (struct level *l, char *filename)
   char *k, *v;
   int i;
 
-  /* MININIM LEVEL FILE */
-  al_add_config_comment (c, NULL, "MININIM LEVEL FILE");
+  /* MININIM <version> LEVEL FILE */
+  al_add_config_comment (c, NULL, "MININIM " VERSION " LEVEL FILE");
 
   /* NOMINAL NUMBER */
   /* N=n */
@@ -231,7 +231,7 @@ save_native_level (struct level *l, char *filename)
   }
 
   /* LINKS */
-  for (i = 0; i < ROOMS; i++) {
+  for (i = 1; i < ROOMS; i++) {
     /* Li=l r a b */
     struct room_linking *r = &l->link[i];
     xasprintf (&k, "L%i", i);
@@ -254,7 +254,7 @@ save_native_level (struct level *l, char *filename)
 
   /* CONSTRUCTIONS */
   struct pos p; new_pos (&p, l, -1, -1, -1);
-  for (p.room = 0; p.room < ROOMS; p.room++)
+  for (p.room = 1; p.room < ROOMS; p.room++)
     for (p.floor = 0; p.floor < FLOORS; p.floor++)
       for (p.place = 0; p.place < PLACES; p.place++) {
         /* Cr f p=f b e */

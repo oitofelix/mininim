@@ -25,10 +25,10 @@ int *
 roomd_ptr (struct level *l, int room, enum dir dir)
 {
   switch (dir) {
-  case LEFT: return &l->link[room].l;
-  case RIGHT: return &l->link[room].r;
-  case ABOVE: return &l->link[room].a;
-  case BELOW: return &l->link[room].b;
+  case LEFT: return &l->link[room % ROOMS].l;
+  case RIGHT: return &l->link[room % ROOMS].r;
+  case ABOVE: return &l->link[room % ROOMS].a;
+  case BELOW: return &l->link[room % ROOMS].b;
   default: assert (false); return NULL;
   }
 }
@@ -36,13 +36,13 @@ roomd_ptr (struct level *l, int room, enum dir dir)
 int
 roomd (struct level *l, int room, enum dir dir)
 {
-  return *roomd_ptr (l, room, dir);
+  return *roomd_ptr (l, room, dir) % ROOMS;
 }
 
 void
 link_room (struct level *l, int room0, int room1, enum dir dir)
 {
-  if (room0) *roomd_ptr (l, room0, dir) = room1;
+  if (room0) *roomd_ptr (l, room0, dir) = room1 % ROOMS;
 }
 
 void
@@ -170,7 +170,9 @@ invalid_coord (struct coord *c)
 bool
 is_valid_coord (struct coord *c)
 {
-  return cutscene || (c->l && c->room >= 0 && c->room < ROOMS);
+  return cutscene || (c->l && c->room >= 0
+                      /* && c->room < ROOMS */
+                      );
 }
 
 struct coord *
@@ -268,7 +270,9 @@ invalid_pos (struct pos *p)
 bool
 is_valid_pos (struct pos *p)
 {
-  return cutscene || (p->l && p->room >= 0 && p->room < ROOMS);
+  return cutscene || (p->l && p->room >= 0
+                      /* && p->room < ROOMS */
+                      );
 }
 
 struct pos *
@@ -279,6 +283,8 @@ npos (struct pos *p, struct pos *np)
   if (np != p) *np = *p;
 
   bool m;
+
+  np->room %= ROOMS;
 
   do {
     m = false;

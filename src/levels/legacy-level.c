@@ -704,12 +704,11 @@ interpret_legacy_level (struct level *l, int n)
   l->has_sword = (n != 1);
 
   /* LINKS: ok */
-  l->link[0].l = l->link[0].r = l->link[0].a = l->link[0].b = 0;
   for (p.room = 1; p.room <= LROOMS; p.room++) {
-    l->link[p.room % ROOMS].l = lv.link[p.room - 1][LD_LEFT] % ROOMS;
-    l->link[p.room % ROOMS].r = lv.link[p.room - 1][LD_RIGHT] % ROOMS;
-    l->link[p.room % ROOMS].a = lv.link[p.room - 1][LD_ABOVE] % ROOMS;
-    l->link[p.room % ROOMS].b = lv.link[p.room - 1][LD_BELOW] % ROOMS;
+    link_room (l, p.room, lv.link[p.room - 1][LD_LEFT], LEFT);
+    link_room (l, p.room, lv.link[p.room - 1][LD_RIGHT], RIGHT);
+    link_room (l, p.room, lv.link[p.room - 1][LD_ABOVE], ABOVE);
+    link_room (l, p.room, lv.link[p.room - 1][LD_BELOW], BELOW);
   }
 
   /* FORETABLE and BACKTABLE: ok */
@@ -904,7 +903,7 @@ interpret_legacy_level (struct level *l, int n)
     struct level_event *e = &l->event[i % EVENTS];
     int ld = lv.door_1[i] & 0x1F;
     new_pos (&e->p, l,
-             ((lv.door_2[i] >> 3) | ((lv.door_1[i] & 0x60) >> 5)) % ROOMS,
+             (lv.door_2[i] >> 3) | ((lv.door_1[i] & 0x60) >> 5),
              ld / LPLACES, ld % LPLACES);
     if (get_tile (&e->p) == LT_EXIT_LEFT) e->p.place++;
     e->next = lv.door_1[i] & 0x80 ? false : true;
@@ -913,7 +912,7 @@ interpret_legacy_level (struct level *l, int n)
   /* START POSITION: ok */
   struct pos *sp = &l->start_pos;
   sp->l = l;
-  sp->room = lv.start_position[0] % ROOMS;
+  sp->room = lv.start_position[0];
   sp->floor = lv.start_position[1] / LPLACES;
   sp->place = lv.start_position[1] % LPLACES;
 
@@ -941,7 +940,7 @@ interpret_legacy_level (struct level *l, int n)
     }
 
     /* LOCATION: ok */
-    new_pos (&g->p, l, (i + 1) % ROOMS,
+    new_pos (&g->p, l, (i + 1),
              lv.guard_location[i] / LPLACES,
              lv.guard_location[i] % LPLACES);
 
@@ -971,12 +970,6 @@ interpret_legacy_level (struct level *l, int n)
   case 12: case 13: l->hue = HUE_YELLOW; break;
   case 14: l->hue = HUE_BLUE; break;
   }
-
-  /* Generate room 0 */
-  p.room = 0;
-  for (p.floor = 0; p.floor < FLOORS; p.floor++)
-    for (p.place = 0; p.place < PLACES; p.place++)
-      con (&p)->fg = WALL;
 }
 
 struct skill *

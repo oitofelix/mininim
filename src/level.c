@@ -162,10 +162,8 @@ play_level (struct level *lv)
   copy_level (&global_level, lv);
   if (mirror_level) mirror_level_h (&global_level, false, false, false, false);
 
-  if (level_module == LEGACY_LEVEL_MODULE
-      || level_module == PLV_LEVEL_MODULE
-      || level_module == DAT_LEVEL_MODULE)
-    fix_legacy_room_above_zero_with_traversable_at_bottom (&global_level);
+  fix_room_0 (&global_level);
+  fix_room_above_zero_with_traversable_at_bottom (&global_level);
 
   register_cons ();
   register_anims ();

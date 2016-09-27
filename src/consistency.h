@@ -22,7 +22,8 @@
 
 void fix_level (struct level *l);
 void make_links_locally_consistent (struct level *l, int prev_room, int current_room);
-void fix_legacy_room_above_zero_with_traversable_at_bottom (struct level *l);
+void fix_room_0 (struct level *l);
+void fix_room_above_zero_with_traversable_at_bottom (struct level *l);
 
 void fix_single_walls_at_place_0 (struct pos *p);
 void fix_inaccessible_enclosure (struct pos *p);

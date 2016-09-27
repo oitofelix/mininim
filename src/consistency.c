@@ -369,12 +369,26 @@ is_loose (struct pos *p)
 }
 
 void
-fix_legacy_room_above_zero_with_traversable_at_bottom (struct level *l)
+fix_room_0 (struct level *l)
+{
+  link_room (l, 0, 0, LEFT);
+  link_room (l, 0, 0, RIGHT);
+  link_room (l, 0, 0, ABOVE);
+  link_room (l, 0, 0, BELOW);
+
+  struct pos p; new_pos (&p, l, 0, -1, -1);
+  for (p.floor = 0; p.floor < FLOORS; p.floor++)
+    for (p.place = 0; p.place < PLACES; p.place++)
+      *con (&p) = (struct con) {.fg = WALL, .bg = NO_BG, .ext.item = 0};
+}
+
+void
+fix_room_above_zero_with_traversable_at_bottom (struct level *l)
 {
   /* fix rooms above room 0 that have traversable cons at the
      bottom */
   struct pos p; new_pos (&p, l, -1, 2, -1);
-  for (p.room = 1; p.room < LROOMS; p.room++)
+  for (p.room = 1; p.room < ROOMS; p.room++)
     for (p.place = 0; p.place < PLACES; p.place++) {
       if (roomd (p.l, p.room, BELOW) != 0) continue;
       if (is_traversable (&p))

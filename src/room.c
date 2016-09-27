@@ -251,9 +251,7 @@ draw_conbg (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case TORCH: draw_torch (bitmap, p, em, vm); break;
   case WINDOW: draw_window (bitmap, p, em, vm); break;
   case BALCONY: draw_balcony (bitmap, p, em, vm); break;
-  default:
-    error (-1, 0, "%s: unknown background (%i)",
-           __func__, con (p)->bg);
+  default: assert (false);
   }
 
   if (con (p)->fg == LEVEL_DOOR)
@@ -334,9 +332,7 @@ draw_confg_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case CARPET: draw_floor_base (bitmap, p, em, vm); break;
   case TCARPET: draw_door_pole_base (bitmap, p, em, vm); break;
   case MIRROR: draw_floor_base (bitmap, p, em, vm); break;
-  default:
-    error (-1, 0, "%s: unknown foreground (%i)",
-           __func__, con (p)->fg);
+  default: assert (false);
   }
 }
 
@@ -390,9 +386,7 @@ draw_confg_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
     draw_floor_left (bitmap, p, em, vm);
     draw_mirror (bitmap, p, em, vm);
     break;
-  default:
-    error (-1, 0, "%s: unknown foreground (%i)",
-           __func__, con (p)->fg);
+  default: assert (false);
   }
 
   if (! redraw) return;
@@ -435,9 +429,7 @@ draw_confg_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case CARPET: draw_carpet_right (bitmap, p, em, vm); break;
   case TCARPET: draw_carpet_right (bitmap, p, em, vm); break;
   case MIRROR: draw_floor_right (bitmap, p, em, vm); break;
-  default:
-    error (-1, 0, "%s: unknown foreground (%i)",
-           __func__, con (p)->fg);
+  default: assert (false);
   }
 
   if (! redraw) return;
@@ -485,9 +477,7 @@ draw_confg_top (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case CARPET: draw_carpet_top (bitmap, p, em, vm); break;
   case TCARPET: draw_carpet_top (bitmap, p, em, vm); break;
   case MIRROR: return;
-  default:
-    error (-1, 0, "%s: unknown foreground (%i)",
-           __func__, con (p)->fg);
+  default: assert (false);
   }
 
   if (! redraw) return;
@@ -910,9 +900,7 @@ draw_confg_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
     draw_door_pole_base (bitmap, p, em, vm);
     draw_carpet_fg (bitmap, p, f, em, vm); break;
   case MIRROR: draw_mirror_fg (bitmap, p, f, em, vm); break;
-  default:
-    error (-1, 0, "%s: unknown foreground (%i)",
-           __func__, con (p)->fg);
+  default: assert (false);
   }
 }
 
