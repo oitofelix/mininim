@@ -64,7 +64,8 @@ editor (void)
     {{'F', "FOREGROUND>"},
      {'B', "BACKGROUND>"},
      {'E', "EXTENSION*"},
-     {'I', "INFO"},
+     {'I', "NOMINAL INFO"},
+     {'N', "NUMERICAL INFO"},
      {'A', "CLEAR"},
      {'R', "RANDOM"},
      {'M', "MIRROR>"},
@@ -333,6 +334,7 @@ editor (void)
     if (! is_valid_pos (&p)) {
       editor_msg ("SELECT CONSTRUCTION", 1);
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
+      if (was_menu_return_pressed (true)) edit = EDIT_MAIN;
       break;
     }
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
@@ -341,7 +343,8 @@ editor (void)
     case 'F': edit = EDIT_FG; break;
     case 'B': edit = EDIT_BG; break;
     case 'E': edit = EDIT_EXT; break;
-    case 'I': edit = EDIT_INFO; break;
+    case 'I': edit = EDIT_NOMINAL_INFO; break;
+    case 'N': edit = EDIT_NUMERICAL_INFO; break;
     case 'A':
       register_con_undo (&undo, &p,
                          NO_FLOOR, NO_BG, NO_ITEM,
@@ -371,6 +374,7 @@ editor (void)
   case EDIT_MIRROR_CON:
     if (! is_valid_pos (&p)) {
       editor_msg ("SELECT CONSTRUCTION", 1);
+      if (was_menu_return_pressed (true)) edit = EDIT_CON;
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       break;
     }
@@ -417,6 +421,7 @@ editor (void)
     if (! is_valid_pos (&p)) {
       editor_msg ("SELECT CONSTRUCTION", 1);
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
+      if (was_menu_return_pressed (true)) edit = EDIT_CON;
       break;
     }
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
@@ -454,6 +459,7 @@ editor (void)
     if (! is_valid_pos (&p)) {
       editor_msg ("SELECT CONSTRUCTION", 1);
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
+      if (was_menu_return_pressed (true)) edit = EDIT_FG;
       break;
     }
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
@@ -492,6 +498,7 @@ editor (void)
     if (! is_valid_pos (&p)) {
       editor_msg ("SELECT CONSTRUCTION", 1);
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
+      if (was_menu_return_pressed (true)) edit = EDIT_FG;
       break;
     }
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
@@ -518,6 +525,7 @@ editor (void)
     if (! is_valid_pos (&p)) {
       editor_msg ("SELECT CONSTRUCTION", 1);
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
+      if (was_menu_return_pressed (true)) edit = EDIT_FG;
       break;
     }
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
@@ -546,6 +554,7 @@ editor (void)
     if (! is_valid_pos (&p)) {
       editor_msg ("SELECT CONSTRUCTION", 1);
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
+      if (was_menu_return_pressed (true)) edit = EDIT_FG;
       break;
     }
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
@@ -570,6 +579,7 @@ editor (void)
     if (! is_valid_pos (&p)) {
       editor_msg ("SELECT CONSTRUCTION", 1);
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
+      if (was_menu_return_pressed (true)) edit = EDIT_FG;
       break;
     }
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
@@ -596,6 +606,7 @@ editor (void)
     if (! is_valid_pos (&p)) {
       editor_msg ("SELECT CONSTRUCTION", 1);
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
+      if (was_menu_return_pressed (true)) edit = EDIT_CON;
       break;
     }
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
@@ -627,6 +638,7 @@ editor (void)
     if (! is_valid_pos (&p)) {
       editor_msg ("SELECT CONSTRUCTION", 1);
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
+      if (was_menu_return_pressed (true)) edit = EDIT_CON;
       break;
     }
 
@@ -758,15 +770,15 @@ editor (void)
       break;
     }
     break;
-  case EDIT_INFO:
+  case EDIT_NOMINAL_INFO:
+    if (was_menu_return_pressed (true)) edit = EDIT_CON;
+
     if (! is_valid_pos (&p)) {
       editor_msg ("SELECT CONSTRUCTION", 1);
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       break;
     }
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
-
-    if (was_menu_return_pressed (true)) edit = EDIT_CON;
 
     free_ext_str = false;
 
@@ -817,6 +829,24 @@ editor (void)
     draw_bottom_text (NULL, str, 0);
     al_free (str);
     if (free_ext_str) al_free (ext_str);
+
+    break;
+  case EDIT_NUMERICAL_INFO:
+    if (was_menu_return_pressed (true)) edit = EDIT_CON;
+
+    if (! is_valid_pos (&p)) {
+      editor_msg ("SELECT CONSTRUCTION", 1);
+      set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
+      break;
+    }
+    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
+
+    npos (&p, &p0);
+    xasprintf (&str, "[%i,%i,%i,%i](%i,%i,%i)",
+               global_level.n, p0.room, p0.floor, p0.place,
+               con (&p)->fg, con (&p)->bg, con (&p)->ext.item);
+    draw_bottom_text (NULL, str, 0);
+    al_free (str);
 
     break;
   case EDIT_EVENT:
