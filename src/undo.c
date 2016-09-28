@@ -565,7 +565,9 @@ void
 guard_skill_undo (struct guard_skill_undo *d, int dir)
 {
   struct guard *g = &global_level.guard[d->i];
-  memcpy (&g->skill, (dir >= 0) ? &d->f_skill : &d->b_skill, sizeof (g->skill));
+  g->skill = (dir >= 0) ? d->f_skill : d->b_skill;
+  struct anim *a = get_guard_anim_by_level_id (d->i);
+  if (a) a->skill = g->skill;
 }
 
 /***************/
