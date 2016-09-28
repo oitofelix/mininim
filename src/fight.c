@@ -215,7 +215,10 @@ fight_ai (struct anim *k)
       && ke->f.dir != k->f.dir
       && ke->current_lives > 0
       && is_there_enough_room_to_fight (ke)
-      && ke->has_sword) {
+      && ke->has_sword
+      && ! is_kid_fall (&ke->f)
+      && ! is_kid_hang (&ke->f)
+      && is_safe_to_attack (ke)) {
     place_on_the_ground (&ke->f, &ke->f.c);
     kid_take_sword (ke);
     ke->auto_taken_sword = true;
