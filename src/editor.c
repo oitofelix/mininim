@@ -774,7 +774,9 @@ editor (void)
     bg_str = get_conbg_name (con (&p)->bg);
 
     switch (con (&p)->fg) {
-    case FLOOR:
+    case FLOOR: case BROKEN_FLOOR: case SKELETON_FLOOR:
+    case STUCK_FLOOR: case HIDDEN_FLOOR: case PILLAR:
+    case BIG_PILLAR_BOTTOM: case ARCH_BOTTOM:
       ext_str = get_item_name (con (&p)->ext.item);
       break;
     case LOOSE_FLOOR:
