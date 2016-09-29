@@ -314,7 +314,7 @@ init_spikes_floor (struct pos *p, struct spikes_floor *s)
   s->murdered_anim = -1;
   s->activate = false;
 
-  switch (con (p)->ext.step) {
+  switch (ext (p)) {
   case 0: s->i = 0; s->state = 0; break;
   case 1: s->i = 1; s->state = 1; break;
   case 2: s->i = 2; s->state = 2; break;
@@ -327,7 +327,7 @@ init_spikes_floor (struct pos *p, struct spikes_floor *s)
   case 9: s->i = 0; s->state = 0; break;
   }
 
-  s->inactive = (con (p)->ext.step != 0);
+  s->inactive = (ext (p) != 0);
 }
 
 void
@@ -465,11 +465,11 @@ compute_spikes_floors (void)
       if (is_kid_dead (&a->f)
           || a->immortal
           || a->spikes_immune
-          || con (&s->p)->ext.step >= 5) continue;
+          || ext (&s->p) >= 5) continue;
       survey (_m, pos, &a->f, NULL, &pm, NULL);
       if (peq (&pm, &s->p)
           && ((((s->state >= 2 && s->state <= 4)
-                || con (&s->p)->ext.step > 0)
+                || ext (&s->p) > 0)
                && (is_kid_run (&a->f)
                    || is_kid_run_jump_running (&a->f)))
               || (is_kid_couch (&a->f) && a->fall && a->i < 3

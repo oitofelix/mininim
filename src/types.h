@@ -158,15 +158,6 @@ struct mr_room_list {
   size_t nmemb;
 };
 
-enum carpet_design {
-  CARPET_00 = 0,
-  CARPET_01 = 1,
-  ARCH_CARPET_LEFT_00 = 2,
-  ARCH_CARPET_LEFT_01 = 3,
-  ARCH_CARPET_RIGHT_00 = 4,
-  ARCH_CARPET_RIGHT_01 = 5,
-};
-
 enum gm {
   ORIGINAL_GM, GUARD_GM, FAT_GUARD_GM, VIZIER_GM, SKELETON_GM, SHADOW_GM
 };
@@ -253,6 +244,7 @@ struct level {
       ARCH_TOP_RIGHT = 22,
       ARCH_TOP_MID = 23,
       ARCH_TOP_SMALL = 24,
+      CONFGS
     } fg;
     enum conbg {
       NO_BG = 0,
@@ -264,27 +256,37 @@ struct level {
       TORCH = 6,
       WINDOW = 7,
       BALCONY = 8,
+      CONBGS
     } bg;
-    union conext {
-      int event;
-      int design;
-      int step;
-      int cant_fall;
-      enum item {
-        NO_ITEM = 0,
-        EMPTY_POTION = 1,
-        SMALL_LIFE_POTION = 2,
-        BIG_LIFE_POTION = 3,
-        SMALL_POISON_POTION = 4,
-        BIG_POISON_POTION = 5,
-        FLOAT_POTION = 6,
-        FLIP_POTION = 7,
-        ACTIVATION_POTION = 8,
-        SWORD = 9,
-      } item;
-    } ext;
+
+    int ext;
+
   } con[ROOMS][FLOORS][PLACES];
 };
+
+enum carpet_design {
+  CARPET_00 = 0,
+  CARPET_01 = 1,
+  ARCH_CARPET_LEFT_00 = 2,
+  ARCH_CARPET_LEFT_01 = 3,
+  ARCH_CARPET_RIGHT_00 = 4,
+  ARCH_CARPET_RIGHT_01 = 5,
+  CARPET_DESIGNS
+} carpet_design;
+
+enum item {
+  NO_ITEM = 0,
+  EMPTY_POTION = 1,
+  SMALL_LIFE_POTION = 2,
+  BIG_LIFE_POTION = 3,
+  SMALL_POISON_POTION = 4,
+  BIG_POISON_POTION = 5,
+  FLOAT_POTION = 6,
+  FLIP_POTION = 7,
+  ACTIVATION_POTION = 8,
+  SWORD = 9,
+  ITEMS
+} item;
 
 struct legacy_level {
   uint8_t foretable[LROOMS][LFLOORS][LPLACES];
@@ -516,7 +518,8 @@ enum edit {
   EDIT_NOMINAL_NUMBER, EDIT_MIRROR_CON, EDIT_ROOM_MIRROR, EDIT_ROOM_MIRROR_CONS,
   EDIT_ROOM_MIRROR_LINKS, EDIT_ROOM_MIRROR_BOTH, EDIT_LEVEL_MIRROR,
   EDIT_LEVEL_MIRROR_CONS, EDIT_LEVEL_MIRROR_LINKS, EDIT_LEVEL_MIRROR_BOTH,
-  EDIT_LEVEL_JUMP, EDIT_LEVEL_EXCHANGE, EDIT_NUMERICAL_INFO
+  EDIT_LEVEL_JUMP, EDIT_LEVEL_EXCHANGE, EDIT_NUMERICAL_INFO, EDIT_NUMERICAL_FG,
+  EDIT_NUMERICAL_BG, EDIT_NUMERICAL_EXT,
 };
 
 struct menu_item {

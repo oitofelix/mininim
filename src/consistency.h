@@ -33,8 +33,6 @@ void fix_door_adjacent_to_wall_or_door (struct pos *p);
 void fix_broken_floor_lacking_no_floor_on_top (struct pos *p);
 void fix_skeleton_or_spikes_floor_with_no_or_loose_floor_at_left (struct pos *p);
 void fix_adjacent_itens (struct pos *p);
-void fix_item_on_non_normal_floor (struct pos *p);
-void fix_sword_at_right_of_wall_or_door (struct pos *p);
 void fix_door_lacking_opener (struct pos *p);
 void fix_opener_or_closer_lacking_door (struct pos *p);
 void fix_confg_which_should_not_have_conbg (struct pos *p);

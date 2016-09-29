@@ -103,7 +103,7 @@ void draw_door_pole_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
                           enum em em, enum vm vm);
 void draw_door_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f,
                    enum em em, enum vm vm);
-void generate_door_grid_cache (ALLEGRO_BITMAP *cache[DOOR_MAX_STEP + 1],
+void generate_door_grid_cache (ALLEGRO_BITMAP *cache[DOOR_STEPS],
                                enum em em, enum vm vm);
 void draw_door_grid_cache (ALLEGRO_BITMAP *bitmap, ALLEGRO_BITMAP *door_grid,
                            ALLEGRO_BITMAP *door_grid_tip, int i);

@@ -36,8 +36,6 @@ fix_level (struct level *l)
         fix_broken_floor_lacking_no_floor_on_top (&p);
         fix_skeleton_or_spikes_floor_with_no_or_loose_floor_at_left (&p);
         fix_adjacent_itens (&p);
-        fix_item_on_non_normal_floor (&p);
-        fix_sword_at_right_of_wall_or_door (&p);
         fix_confg_which_should_not_have_conbg (&p);
         fix_partial_big_pillar (&p);
       }
@@ -170,49 +168,17 @@ fix_skeleton_or_spikes_floor_with_no_or_loose_floor_at_left (struct pos *p)
 void
 fix_adjacent_itens (struct pos *p)
 {
-  struct con *c = con (p);
-  struct con *cl = crel (p, 0, -1);
-  struct con *cr = crel (p, 0, +1);
+  enum confg f = fg (p);
+  enum confg fl = fg_rel (p, 0, -1);
+  enum confg fr = fg_rel (p, 0, +1);
+
+  int el = ext_rel (p, 0, -1);
+  int er = ext_rel (p, 0, +1);
 
   /* item's perspective (symmetrical) */
-  if (((cl->fg == FLOOR && cl->ext.item != NO_ITEM)
-       || (cr->fg == FLOOR && cr->ext.item != NO_ITEM))
-      && c->fg != OPENER_FLOOR
-      && c->fg != CLOSER_FLOOR) c->ext.item = NO_ITEM;
-}
-
-/* consistency: itens can only lay in normal floors */
-void
-fix_item_on_non_normal_floor (struct pos *p)
-{
-  struct con *c = con (p);
-
-  /* non-no-floor's perspective (symmetrical) */
-  if (c->fg != FLOOR
-      && c->fg != OPENER_FLOOR
-      && c->fg != CLOSER_FLOOR) c->ext.item = NO_ITEM;
-}
-
-/* consistency: swords can't be placed on the right of walls or
-   doors */
-void
-fix_sword_at_right_of_wall_or_door (struct pos *p)
-{
-  struct con *c = con (p);
-  struct con *cl = crel (p, 0, -1);
-  struct con *cr = crel (p, 0, +1);
-
-  /* sword's perspective */
-  if (c->fg == FLOOR
-      && c->ext.item == SWORD
-      && (cl->fg == WALL
-          || cl->fg == DOOR)) c->ext.item = NO_ITEM;
-
-  /* wall and door's perspective  */
-  if ((c->fg == WALL
-       || c->fg == DOOR)
-      && cr->fg == FLOOR
-      && cr->ext.item == SWORD) c->ext.item = NO_ITEM;
+  if (((is_item_fg_cs (fl) && el != NO_ITEM)
+       || (is_item_fg_cs (fr) && er != NO_ITEM))
+      && is_item_fg_cs (f)) set_ext (p, NO_ITEM);
 }
 
 /* consistency: doors should have an associated event and opener floor */
@@ -221,9 +187,9 @@ fix_door_lacking_opener (struct pos *p)
 {
   int i;
 
-  struct con *c = con (p);
-  if (c->fg == DOOR
-      || c->fg == LEVEL_DOOR) {
+  enum confg f = fg (p);
+
+  if (f == DOOR || f == LEVEL_DOOR) {
     for (i = 0; i < EVENTS; i++)
       if (peq (&p->l->event[i].p, p)
           && is_there_event_handler (p->l, i)) return;
@@ -231,9 +197,7 @@ fix_door_lacking_opener (struct pos *p)
     /* fprintf (stderr, "%s: replaced %s by %s at pos (%i, %i, %i)\n", */
     /*          __func__, "DOOR", "FLOOR", p->room, p->floor, p->place); */
 
-    c->fg = FLOOR;
-    c->bg = NO_BG;
-    c->ext.item = NO_ITEM;
+    set_con (p, FLOOR, NO_BG, NO_ITEM);
   }
 }
 
@@ -242,23 +206,21 @@ fix_door_lacking_opener (struct pos *p)
 void
 fix_opener_or_closer_lacking_door (struct pos *p)
 {
-  struct con *c = con (p);
-  if (c->fg == OPENER_FLOOR
-      || c->fg == CLOSER_FLOOR) {
-    int i = c->ext.event;
+  enum confg f = fg (p);
+
+  if (f == OPENER_FLOOR || f == CLOSER_FLOOR) {
+    int i = ext (p);
     do {
       if (is_valid_pos (&p->l->event[i].p)
-          && (con (&p->l->event[i].p)->fg == DOOR
-              || con (&p->l->event[i].p)->fg == LEVEL_DOOR)) return;
+          && (fg (&p->l->event[i].p) == DOOR
+              || fg (&p->l->event[i].p) == LEVEL_DOOR)) return;
     } while (p->l->event[i++].next && i < EVENTS);
 
     /* fprintf (stderr, "%s: replaced %s (event %i) by %s at pos (%i, %i, %i)\n", */
     /*          __func__, c->fg == OPENER_FLOOR ? "OPENER_FLOOR" : "CLOSER_FLOOR", */
     /*          c->ext.event, "FLOOR", p->room, p->floor, p->place); */
 
-    c->fg = FLOOR;
-    c->bg = NO_BG;
-    c->ext.item = NO_ITEM;
+    set_con (p, FLOOR, NO_BG, NO_ITEM);
   }
 }
 
@@ -309,8 +271,8 @@ is_there_event_handler (struct level *l, int e)
   for (p.room = 1; p.room < ROOMS; p.room++)
     for (p.floor = 0; p.floor < FLOORS; p.floor++)
       for (p.place = 0; p.place < PLACES; p.place++) {
-        if (con (&p)->fg == OPENER_FLOOR) {
-          i = con (&p)->ext.event;
+        if (fg (&p) == OPENER_FLOOR) {
+          i = ext (&p);
           do {
             if (i == e) return true;
           } while (p.l->event[i++].next && i < EVENTS);
@@ -327,10 +289,8 @@ fix_enclosure (struct pos *p, enum dir dir)
   struct pos q;
 
   for (i = d, prel (p, &q, 0, i); abs (i) < PLACES; i += d, prel (p, &q, 0, i)) {
-    if (con (&q)->fg == WALL) break;
-    con (&q)->fg = WALL;
-    con (&q)->bg = NO_BG;
-    con (&q)->ext.item = NO_ITEM;
+    if (fg (&q) == WALL) break;
+    set_con (&q, WALL, NO_BG, NO_ITEM);
   }
 }
 
@@ -379,7 +339,7 @@ fix_room_0 (struct level *l)
   struct pos p; new_pos (&p, l, 0, -1, -1);
   for (p.floor = 0; p.floor < FLOORS; p.floor++)
     for (p.place = 0; p.place < PLACES; p.place++)
-      *con (&p) = (struct con) {.fg = WALL, .bg = NO_BG, .ext.item = 0};
+      set_con (&p, WALL, NO_BG, 0);
 }
 
 void

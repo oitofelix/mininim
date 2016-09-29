@@ -164,7 +164,7 @@ register_level_door (struct pos *p)
 
   struct level_door d;
 
-  int step = con (p)->ext.step;
+  int step = ext (p);
 
   d.p = *p;
   d.broken = (step < 0);
@@ -210,7 +210,7 @@ break_level_door (struct pos *p)
   d->broken = true;
   register_con_undo
     (&undo, p,
-     MIGNORE, MIGNORE, -abs (con (p)->ext.step) - 1,
+     MIGNORE, MIGNORE, -d->i - 1,
      false, false, false, false,
      CHPOS_BREAK_LEVEL_DOOR,
      "LOOSE FLOOR BREAKING");
@@ -226,7 +226,7 @@ compute_level_doors (void)
     switch (d->action) {
     case OPEN_LEVEL_DOOR:
       if (d->i % 5 == 2 && d->i > 2) {
-        if (d->i == LEVEL_DOOR_MAX_STEP - 1) alert_guards (&d->p);
+        if (d->i == LEVEL_DOOR_STEPS - 2) alert_guards (&d->p);
         play_sample (level_door_open_sample, &d->p, -1);
       }
       if (d->i > 0) {
@@ -240,12 +240,12 @@ compute_level_doors (void)
         alert_guards (&d->p);
         play_sample (level_door_open_sample, &d->p, -1);
       }
-      if (d->i < LEVEL_DOOR_MAX_STEP) {
+      if (d->i < LEVEL_DOOR_STEPS - 1) {
         int r = 14 - (d->i % 15);
         d->i += r ? r : 15;
         register_changed_pos (&d->p, CHPOS_CLOSE_LEVEL_DOOR);
-        if (d->i >= LEVEL_DOOR_MAX_STEP) {
-          d->i = LEVEL_DOOR_MAX_STEP;
+        if (d->i >= LEVEL_DOOR_STEPS - 1) {
+          d->i = LEVEL_DOOR_STEPS - 1;
           d->action = NO_LEVEL_DOOR_ACTION;
           play_sample (level_door_close_sample, &d->p, -1);
         }
@@ -446,7 +446,7 @@ draw_level_door_front (ALLEGRO_BITMAP *bitmap, struct pos *p, int i,
                        enum em em, enum vm vm)
 {
   i = i < 0 ? 0 : i;
-  i = i > LEVEL_DOOR_MAX_STEP ? LEVEL_DOOR_MAX_STEP : i;
+  i = i > LEVEL_DOOR_STEPS - 1 ? LEVEL_DOOR_STEPS - 1 : i;
 
   ALLEGRO_BITMAP *level_door_front = NULL;
 

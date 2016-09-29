@@ -122,7 +122,7 @@ register_closer_floor (struct pos *p)
 
   struct closer_floor c;
 
-  int event = con (p)->ext.event;
+  int event = ext (p);
 
   c.p = *p;
   c.event = (event < 0) ? -event - 1 : event;
@@ -216,7 +216,7 @@ break_closer_floor (struct pos *p)
   close_door (c->p.l, c->event, anim_cycle);
   register_con_undo
     (&undo, p,
-     MIGNORE, MIGNORE, -abs (con (p)->ext.event) - 1,
+     MIGNORE, MIGNORE, -c->event - 1,
      false, false, false, false,
      CHPOS_BREAK_CLOSER_FLOOR,
      "LOOSE FLOOR BREAKING");

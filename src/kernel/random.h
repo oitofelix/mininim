@@ -25,6 +25,7 @@ extern uint32_t random_seed;
 
 /* functions */
 int prandom(int max);
+int prandom_max (void);
 int prandom_uniq (uint32_t seed, int length, int max);
 int prandom_pos_uniq (struct pos *p, int i, int length, int max);
 int prandom_pos (struct pos *p, int max);

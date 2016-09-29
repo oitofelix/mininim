@@ -280,18 +280,18 @@ unload_chopper (void)
 void
 register_chopper (struct pos *p)
 {
-  assert (con (p)->fg == CHOPPER
-          && chopper_at_pos (p) == NULL);
+  assert (fg (p) == CHOPPER && chopper_at_pos (p) == NULL);
 
   struct chopper c;
 
-  int step = con (p)->ext.step & 0x7F;
+  int step = ext (p);
+  int abs_step = (step >= 0) ? step : -step - 1;
 
   c.p = *p;
-  c.i = step % CHOPPER_MAX_STEP;
+  c.i = (abs_step % (CHOPPER_STEPS - 1));
   c.wait = CHOPPER_WAIT;
-  c.blood = con (p)->ext.step & 0x80;
-  c.inactive = (step > 0);
+  c.blood = (step < 0);
+  c.inactive = (abs_step % CHOPPER_STEPS != 0);
   c.alert = false;
   c.activate = false;
 
@@ -337,7 +337,7 @@ should_chomp (struct pos *p)
     int inc = p->place < pm.place ? +1 : -1;
     if (p->room == pm.room && p->floor == pm.floor) {
       for (_p = *p; _p.place != pm.place; _p.place += inc)
-        if (con (&_p)->fg == WALL) return false;
+        if (fg (&_p) == WALL) return false;
       return true;
     }
   }

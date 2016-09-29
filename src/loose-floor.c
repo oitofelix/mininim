@@ -262,7 +262,7 @@ register_loose_floor (struct pos *p)
   l.resist = LOOSE_FLOOR_RESISTENCE;
   l.action = NO_LOOSE_FLOOR_ACTION;
   l.state = 0;
-  l.cant_fall = con (p)->ext.cant_fall;
+  l.cant_fall = ext (p);
   l.remove = false;
 
   struct coord c; floor_left_coord (p, &c);

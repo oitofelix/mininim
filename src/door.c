@@ -22,32 +22,32 @@
 /* dungeon cga */
 ALLEGRO_BITMAP *dc_door_left, *dc_door_right, *dc_door_pole, *dc_door_pole_base,
   *dc_door_top, *dc_door_grid, *dc_door_grid_tip;
-ALLEGRO_BITMAP *dc_door_grid_cache[DOOR_MAX_STEP + 1];
+ALLEGRO_BITMAP *dc_door_grid_cache[DOOR_STEPS];
 
 /* palace cga */
 ALLEGRO_BITMAP *pc_door_left, *pc_door_right, *pc_door_pole, *pc_door_pole_base,
   *pc_door_top, *pc_door_grid, *pc_door_grid_tip;
-ALLEGRO_BITMAP *pc_door_grid_cache[DOOR_MAX_STEP + 1];
+ALLEGRO_BITMAP *pc_door_grid_cache[DOOR_STEPS];
 
 /* dungeon ega */
 ALLEGRO_BITMAP *de_door_left, *de_door_right, *de_door_pole, *de_door_pole_base,
   *de_door_top, *de_door_grid, *de_door_grid_tip;
-ALLEGRO_BITMAP *de_door_grid_cache[DOOR_MAX_STEP + 1];
+ALLEGRO_BITMAP *de_door_grid_cache[DOOR_STEPS];
 
 /* palace ega */
 ALLEGRO_BITMAP *pe_door_left, *pe_door_right, *pe_door_pole, *pe_door_pole_base,
   *pe_door_top, *pe_door_grid, *pe_door_grid_tip;
-ALLEGRO_BITMAP *pe_door_grid_cache[DOOR_MAX_STEP + 1];
+ALLEGRO_BITMAP *pe_door_grid_cache[DOOR_STEPS];
 
 /* dungeon vga */
 ALLEGRO_BITMAP *dv_door_left, *dv_door_right, *dv_door_pole, *dv_door_pole_base,
   *dv_door_top, *dv_door_grid, *dv_door_grid_tip;
-ALLEGRO_BITMAP *dv_door_grid_cache[DOOR_MAX_STEP + 1];
+ALLEGRO_BITMAP *dv_door_grid_cache[DOOR_STEPS];
 
 /* palace vga */
 ALLEGRO_BITMAP *pv_door_left, *pv_door_right, *pv_door_pole, *pv_door_pole_base,
   *pv_door_top, *pv_door_grid, *pv_door_grid_tip;
-ALLEGRO_BITMAP *pv_door_grid_cache[DOOR_MAX_STEP + 1];
+ALLEGRO_BITMAP *pv_door_grid_cache[DOOR_STEPS];
 
 struct door *door = NULL;
 size_t door_nmemb = 0;
@@ -175,7 +175,7 @@ unload_door (void)
 }
 
 void
-generate_door_grid_cache (ALLEGRO_BITMAP *cache[DOOR_MAX_STEP + 1],
+generate_door_grid_cache (ALLEGRO_BITMAP *cache[DOOR_STEPS],
                           enum em em, enum vm vm)
 {
   ALLEGRO_BITMAP *door_grid = NULL,
@@ -221,7 +221,7 @@ generate_door_grid_cache (ALLEGRO_BITMAP *cache[DOOR_MAX_STEP + 1],
   int h1 = al_get_bitmap_height (door_grid_tip);
 
   int i;
-  for (i = 0; i <= DOOR_MAX_STEP; i++) {
+  for (i = 0; i < DOOR_STEPS; i++) {
     cache[i] = create_bitmap (w, h0 + h1 + i);
     clear_bitmap (cache[i], TRANSPARENT_COLOR);
     draw_door_grid_cache (cache[i], door_grid, door_grid_tip, i);
@@ -231,13 +231,12 @@ generate_door_grid_cache (ALLEGRO_BITMAP *cache[DOOR_MAX_STEP + 1],
 void
 register_door (struct pos *p)
 {
-  assert (con (p)->fg == DOOR
-          && door_at_pos (p) == NULL);
+  assert (fg (p) == DOOR && door_at_pos (p) == NULL);
 
   struct door d;
 
   d.p = *p;
-  d.i = con (p)->ext.step;
+  d.i = ext (p);
   d.action = NO_DOOR_ACTION;
   d.wait = DOOR_WAIT;
   d.noise = false;
@@ -295,7 +294,7 @@ compute_doors (void)
       }
       else if (d->i > 0) {
         if (d->i % 2 == 0) {
-          if (d->i == DOOR_MAX_STEP - 1) alert_guards (&d->p);
+          if (d->i == DOOR_STEPS - 2) alert_guards (&d->p);
           play_sample (door_open_sample, &d->p, -1);
         }
         d->i--;
@@ -304,7 +303,7 @@ compute_doors (void)
       }
       break;
     case CLOSE_DOOR:
-      if (d->i < DOOR_MAX_STEP) {
+      if (d->i < DOOR_STEPS - 1) {
         if (d->wait++ % 4 == 0) {
           if (d->i == 0) alert_guards (&d->p);
           play_sample (door_close_sample, &d->p, -1);
@@ -312,7 +311,7 @@ compute_doors (void)
           d->noise = false;
           register_changed_pos (&d->p, CHPOS_CLOSE_DOOR);
         }
-      } else if (d->i == DOOR_MAX_STEP) {
+      } else if (d->i == DOOR_STEPS - 1) {
         play_sample (door_end_sample, &d->p, -1);
         d->action = NO_DOOR_ACTION;
         d->wait = DOOR_WAIT;
@@ -320,12 +319,12 @@ compute_doors (void)
       }
       break;
     case ABRUPTLY_CLOSE_DOOR:
-      if (d->i < DOOR_MAX_STEP) {
+      if (d->i < DOOR_STEPS - 1) {
         int r = 11 - (d->i % 12);
         d->i += r ? r : 12;
         register_changed_pos (&d->p, CHPOS_ABRUPTLY_CLOSE_DOOR);
-        if (d->i >= DOOR_MAX_STEP) {
-          d->i = DOOR_MAX_STEP;
+        if (d->i >= DOOR_STEPS - 1) {
+          d->i = DOOR_STEPS - 1;
           alert_guards (&d->p);
           play_sample (door_abruptly_close_sample, &d->p, -1);
         }
@@ -351,7 +350,7 @@ open_door (struct level *l, int e, uint64_t priority, bool stay_open)
 
   do {
     p = &l->event[e].p;
-    switch (con (p)->fg) {
+    switch (fg (p)) {
     case DOOR:
       d = door_at_pos (p);
       if (! d) continue;
@@ -389,7 +388,7 @@ close_door (struct level *l, int e, uint64_t priority)
 
   do {
     p = &l->event[e].p;
-    switch (con (p)->fg) {
+    switch (fg (p)) {
     case DOOR:
       d = door_at_pos (p);
       if (! d) continue;

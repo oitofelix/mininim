@@ -32,6 +32,14 @@ prandom (int max)
 }
 
 int
+prandom_max (void)
+{
+  return prandom (1)
+    ? prandom (INT_MAX - 1)
+    : -prandom (INT_MAX - 1) - 1;
+}
+
+int
 prandom_uniq (uint32_t seed, int period, int max)
 {
   uint32_t random_seed_backup = random_seed;

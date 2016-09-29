@@ -180,17 +180,25 @@ menu_int (int *v, int *b, int min, int max, char *pref_int, char *pref_bool)
   if (*v < min) *v = min;
   if (*v > max) *v = max;
 
-  if (b) {
-    if (max == INT_MAX) xasprintf (&str, "%s %i->:%i %s",
-                                   pref_int, min, *v, *b ? pref_bool : "-");
-    else xasprintf (&str, "%s %i-%i:%i %s",
-                    pref_int, min, max, *v, *b ? pref_bool : "-");
-  } else {
-    if (max == INT_MAX) xasprintf (&str, "%s %i->:%i", pref_int, min, *v);
-    else xasprintf (&str, "%s %i-%i:%i", pref_int, min, max, *v);
-  }
+  char *b_str, *min_str, *max_str;
+
+  if (b) xasprintf (&b_str, " %s", *b ? pref_bool : "-");
+  else xasprintf (&b_str, "%s", "");
+
+  if (min == INT_MIN) xasprintf (&min_str, "%s", "<");
+  else xasprintf (&min_str, "%i", min);
+
+  if (max == INT_MAX) xasprintf (&max_str, "%s", ">");
+  else xasprintf (&max_str, "%i", max);
+
+  xasprintf (&str, "%s %s-%s:%i%s",
+             pref_int, min_str, max_str, *v, b_str);
 
   draw_bottom_text (NULL, str, 0);
+
+  al_free (b_str);
+  al_free (min_str);
+  al_free (max_str);
   al_free (str);
 
   int c = toupper (key.keyboard.unichar);
@@ -292,6 +300,7 @@ was_menu_key_pressed (void)
   case 'U': case 'V': case 'W': case 'X': case 'Y': case 'Z':
   case '?': case '-': case '_': case '+': case '=': case '\\':
   case ' ': case '/': case ',': case '.': case '<': case '>':
+  case '#':
     return true;
   }
 

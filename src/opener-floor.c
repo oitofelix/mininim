@@ -122,7 +122,7 @@ register_opener_floor (struct pos *p)
 
   struct opener_floor o;
 
-  int event = con (p)->ext.event;
+  int event = ext (p);
 
   o.p = *p;
   o.event = (event < 0) ? -event - 1 : event;
@@ -215,7 +215,7 @@ break_opener_floor (struct pos *p)
   open_door (o->p.l, o->event, anim_cycle, true);
   register_con_undo
     (&undo, p,
-     MIGNORE, MIGNORE, -abs (con (p)->ext.event) - 1,
+     MIGNORE, MIGNORE, -o->event - 1,
      false, false, false, false,
      CHPOS_BREAK_OPENER_FLOOR,
      "LOOSE FLOOR BREAKING");

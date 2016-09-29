@@ -200,7 +200,7 @@ draw_potion (ALLEGRO_BITMAP *bitmap, struct pos *p,
   palette bubble_palette = NULL;
 
   seedp (p);
-  enum item item = con (p)->ext.item;
+  enum item item = ext (p);
 
   switch (item) {
   case EMPTY_POTION:

@@ -748,6 +748,7 @@ random_dir (void)
   case 2: return ABOVE;
   case 3: return BELOW;
   default: assert (false);
+    return LEFT;
   }
 }
 

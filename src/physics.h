@@ -23,6 +23,28 @@
 /* functions */
 struct con *con (struct pos *p);
 struct con *crel (struct pos *p, int floor, int place);
+
+enum conbg bg_val (enum conbg b);
+enum confg fg_val (enum confg f);
+int ext_val (enum confg f, int e);
+struct con *con_val (struct con *c, enum confg f,
+                     enum conbg b, int e);
+struct con *random_con (struct con *c);
+struct pos *set_con (struct pos *p, enum confg f,
+                     enum conbg b, int e);
+
+enum conbg bg (struct pos *p);
+enum confg fg (struct pos *p);
+int ext (struct pos *p);
+
+enum conbg set_bg (struct pos *p, enum conbg b);
+enum confg set_fg (struct pos *p, enum confg f);
+int set_ext (struct pos *p, int e);
+
+enum confg bg_rel (struct pos *p, int floor, int place);
+enum confg fg_rel (struct pos *p, int floor, int place);
+int ext_rel (struct pos *p, int floor, int place);
+
 bool is_strictly_traversable (struct pos *p);
 bool is_traversable (struct pos *p);
 bool is_pillar (struct pos *p);
@@ -36,6 +58,7 @@ bool arch_top_cs (enum confg t);
 bool is_door (struct pos *p);
 bool is_floor (struct pos *p);
 bool is_floor_like (struct pos *p);
+bool is_item_fg_cs (enum confg t);
 bool is_item_fg (struct pos *p);
 bool is_potion_ext (struct pos *p);
 bool is_potion (struct pos *p);

@@ -239,7 +239,7 @@ void
 draw_conbg (ALLEGRO_BITMAP *bitmap, struct pos *p,
             enum em em, enum vm vm, bool redraw)
 {
-  switch (con (p)->bg) {
+  switch (bg (p)) {
   case NO_BG:
     if (em == PALACE) draw_bricks_02 (bitmap, p, em, vm);
     break;
@@ -251,7 +251,7 @@ draw_conbg (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case TORCH: draw_torch (bitmap, p, em, vm); break;
   case WINDOW: draw_window (bitmap, p, em, vm); break;
   case BALCONY: draw_balcony (bitmap, p, em, vm); break;
-  default: assert (false);
+  default: assert (false); break;
   }
 
   if (con (p)->fg == LEVEL_DOOR)
@@ -303,7 +303,7 @@ void
 draw_confg_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
                  enum em em, enum vm vm)
 {
-  switch (con (p)->fg) {
+  switch (fg (p)) {
   case NO_FLOOR: return;
   case FLOOR: draw_floor_base (bitmap, p, em, vm); break;
   case BROKEN_FLOOR: draw_floor_base (bitmap, p, em, vm); break;
@@ -332,7 +332,7 @@ draw_confg_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case CARPET: draw_floor_base (bitmap, p, em, vm); break;
   case TCARPET: draw_door_pole_base (bitmap, p, em, vm); break;
   case MIRROR: draw_floor_base (bitmap, p, em, vm); break;
-  default: assert (false);
+  default: assert (false); break;
   }
 }
 
@@ -341,8 +341,9 @@ draw_confg_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
                  enum em em, enum vm vm, bool redraw)
 {
   struct pos pl; prel (p, &pl, +0, -1);
+  enum carpet_design d;
 
-  switch (con (p)->fg) {
+  switch (fg (p)) {
   case NO_FLOOR: return;
   case FLOOR: draw_floor_left (bitmap, p, em, vm); break;
   case BROKEN_FLOOR: draw_broken_floor_left (bitmap, p, em, vm); break;
@@ -377,8 +378,8 @@ draw_confg_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
     draw_door_pole (bitmap, p, em, vm);
     break;
   case TCARPET:
-    if (con (p)->ext.design == ARCH_CARPET_RIGHT_00
-        || con (p)->ext.design == ARCH_CARPET_RIGHT_01)
+    d = ext (p);
+    if (d == ARCH_CARPET_RIGHT_00 || d == ARCH_CARPET_RIGHT_01)
       draw_arch_top_right_end (bitmap, p, em, vm);
     else draw_door_pole (bitmap, p, em, vm);
     break;
@@ -386,7 +387,7 @@ draw_confg_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
     draw_floor_left (bitmap, p, em, vm);
     draw_mirror (bitmap, p, em, vm);
     break;
-  default: assert (false);
+  default: assert (false); break;
   }
 
   if (! redraw) return;
@@ -401,7 +402,7 @@ void
 draw_confg_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
                   enum em em, enum vm vm, bool redraw)
 {
-  switch (con (p)->fg) {
+  switch (fg (p)) {
   case NO_FLOOR: return;
   case FLOOR: draw_floor_right (bitmap, p, em, vm); break;
   case BROKEN_FLOOR: draw_broken_floor_right (bitmap, p, em, vm); break;
@@ -429,7 +430,7 @@ draw_confg_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case CARPET: draw_carpet_right (bitmap, p, em, vm); break;
   case TCARPET: draw_carpet_right (bitmap, p, em, vm); break;
   case MIRROR: draw_floor_right (bitmap, p, em, vm); break;
-  default: assert (false);
+  default: assert (false); break;
   }
 
   if (! redraw) return;
@@ -451,7 +452,7 @@ void
 draw_confg_top (ALLEGRO_BITMAP *bitmap, struct pos *p,
                 enum em em, enum vm vm, bool redraw)
 {
-  switch (con (p)->fg) {
+  switch (fg (p)) {
   case NO_FLOOR: return;
   case FLOOR: return;
   case BROKEN_FLOOR: return;
@@ -477,7 +478,7 @@ draw_confg_top (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case CARPET: draw_carpet_top (bitmap, p, em, vm); break;
   case TCARPET: draw_carpet_top (bitmap, p, em, vm); break;
   case MIRROR: return;
-  default: assert (false);
+  default: assert (false); break;
   }
 
   if (! redraw) return;
@@ -869,7 +870,7 @@ void
 draw_confg_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
                enum em em, enum vm vm, struct frame *f)
 {
-  switch (con (p)->fg) {
+  switch (fg (p)) {
   case NO_FLOOR: return;
   case FLOOR: return;
   case BROKEN_FLOOR: draw_broken_floor_fg (bitmap, p, em, vm); break;
@@ -900,7 +901,7 @@ draw_confg_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
     draw_door_pole_base (bitmap, p, em, vm);
     draw_carpet_fg (bitmap, p, f, em, vm); break;
   case MIRROR: draw_mirror_fg (bitmap, p, f, em, vm); break;
-  default: assert (false);
+  default: assert (false); break;
   }
 }
 

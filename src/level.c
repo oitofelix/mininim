@@ -95,9 +95,9 @@ guard_eq (struct guard *g0, struct guard *g1)
 bool
 con_eq (struct con *c0, struct con *c1)
 {
-  return c0->fg == c1->fg
-    && c0->bg == c1->bg
-    && c0->ext.item == c1->ext.item;
+  return fg_val (c0->fg) == fg_val (c1->fg)
+    && bg_val (c0->bg) == bg_val (c1->bg)
+    && ext_val (c0->fg, c0->ext) == ext_val (c1->fg, c1->ext);
 }
 
 bool

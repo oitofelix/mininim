@@ -67,20 +67,18 @@ next_consistency_level (struct level *lv, int n)
     for (p.floor = 0; p.floor < FLOORS; p.floor++)
       for (p.place = 0; p.place < PLACES; p.place++) {
         struct con *c = &lv->con[p.room][p.floor][p.place];
-        c->fg = prandom (TCARPET);
-        do {
-          c->bg = prandom (WINDOW);
-        } while (c->bg == NO_BRICKS);
-        c->ext.item = prandom (SWORD);
+        c->fg = prandom_max ();
+        c->bg = prandom_max ();
+        c->ext = prandom_max ();
 
-        int r = prandom (255);
-        if (c->fg == OPENER_FLOOR
-            || c->fg == CLOSER_FLOOR) c->ext.event = r;
-        if (c->fg == DOOR
-            || c->fg == LEVEL_DOOR) {
-          lv->event[r].p = p;
-          lv->event[r].next = prandom (1);
-        }
+        /* int r = prandom (255); */
+        /* if (c->fg == OPENER_FLOOR */
+        /*     || c->fg == CLOSER_FLOOR) c->ext.event = r; */
+        /* if (c->fg == DOOR */
+        /*     || c->fg == LEVEL_DOOR) { */
+        /*   lv->event[r].p = p; */
+        /*   lv->event[r].next = prandom (1); */
+        /* } */
 
       }
   }
