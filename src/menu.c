@@ -182,7 +182,7 @@ menu_int (int *v, int *b, int min, int max, char *pref_int, char *pref_bool)
 
   char *b_str, *min_str, *max_str;
 
-  if (b) xasprintf (&b_str, " %s", *b ? pref_bool : "-");
+  if (b && pref_bool) xasprintf (&b_str, " %s", *b ? pref_bool : "-");
   else xasprintf (&b_str, "%s", "");
 
   if (min == INT_MIN) xasprintf (&min_str, "%s", "<");

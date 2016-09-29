@@ -315,23 +315,18 @@ draw_wall_base_cache (ALLEGRO_BITMAP *bitmap, struct pos *p)
 enum wall_correlation
 wall_correlation (struct pos *p)
 {
-  if (con (p)->fg != WALL)
-    error (-1, 0, "%s: requested wall correlation on non-wall (%i, %i, %i)",
-           __func__, p->room, p->floor, p->place);
+  if (fg (p) != WALL) assert (false);
 
-  if (crel (p, 0, -1)->fg != WALL
-      && crel (p, 0, +1)->fg != WALL) return SWS;
-  else if (crel (p, 0, -1)->fg != WALL
-           && crel (p, 0, +1)->fg == WALL) return SWW;
-  else if (crel (p, 0, -1)->fg == WALL
-           && crel (p, 0, +1)->fg != WALL) return WWS;
-  else if (crel (p, 0, -1)->fg == WALL
-           && crel (p, 0, +1)->fg == WALL) return WWW;
-  else
-    error (-1, 0, "%s: unknown wall correlation (%i, %i. %i)",
-           __func__, p->room, p->floor, p->place);
+  enum confg fl = fg_rel (p, 0, -1);
+  enum confg fr = fg_rel (p, 0, +1);
 
-  return -1;
+  if (fl != WALL && fr != WALL) return SWS;
+  else if (fl != WALL && fr == WALL) return SWW;
+  else if (fl == WALL && fr != WALL) return WWS;
+  else if (fl == WALL && fr == WALL) return WWW;
+  else assert (false);
+
+  return WWW;
 }
 
 struct coord *

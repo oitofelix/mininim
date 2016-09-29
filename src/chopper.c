@@ -284,14 +284,16 @@ register_chopper (struct pos *p)
 
   struct chopper c;
 
-  int step = ext (p);
-  int abs_step = (step >= 0) ? step : -step - 1;
-
   c.p = *p;
-  c.i = (abs_step % (CHOPPER_STEPS - 1));
+
+  int n, f;
+  typed_int (ext (p), CHOPPER_STEPS, CHOPPER_FASES, &n, &f);
+
+  c.i = n % (CHOPPER_STEPS - 1);
+  c.blood = f;
+  c.inactive = (n != 0);
+
   c.wait = CHOPPER_WAIT;
-  c.blood = (step < 0);
-  c.inactive = (abs_step % CHOPPER_STEPS != 0);
   c.alert = false;
   c.activate = false;
 

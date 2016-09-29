@@ -285,7 +285,7 @@ get_guard_die_spiked_bitmap (enum anim_type t)
 void
 guard_die_spiked (struct anim *g)
 {
-  if (con (&g->p)->fg != SPIKES_FLOOR) {
+  if (fg (&g->p) != SPIKES_FLOOR) {
     guard_die_properly (g);
     return;
   }
@@ -298,7 +298,7 @@ guard_die_spiked (struct anim *g)
     g->splash = true;
     g->death_reason = SPIKES_DEATH;
 
-    assert (con (&g->p)->fg == SPIKES_FLOOR);
+    assert (fg (&g->p) == SPIKES_FLOOR);
     struct spikes_floor *s = spikes_floor_at_pos (&g->p);
     s->i = 4;
     s->state = 5;
@@ -341,7 +341,7 @@ get_guard_die_chopped_bitmap (enum anim_type t)
 void
 guard_die_chopped (struct anim *g)
 {
-  if (con (&g->p)->fg != CHOPPER) {
+  if (fg (&g->p) != CHOPPER) {
     guard_die_properly (g);
     return;
   }
@@ -376,8 +376,8 @@ guard_die_chopped (struct anim *g)
 void
 guard_die_suddenly (struct anim *g)
 {
-  if (con (&g->p)->fg == SPIKES_FLOOR
-      || con (&g->p)->fg == CHOPPER) {
+  enum confg f = fg (&g->p);
+  if ( f == SPIKES_FLOOR || f == CHOPPER) {
     guard_die_properly (g);
     return;
   }
@@ -496,7 +496,7 @@ physics_out (struct anim *g)
 void
 guard_die_properly (struct anim *g)
 {
-  switch (con (&g->p)->fg) {
+  switch (fg (&g->p)) {
   case SPIKES_FLOOR: guard_die_spiked (g); break;
   case CHOPPER: guard_die_chopped (g); break;
   default: guard_die_suddenly (g); break;

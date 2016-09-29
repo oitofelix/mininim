@@ -153,7 +153,8 @@ flow (struct anim *k)
 
   /* unclimb */
   int dir = (k->f.dir == LEFT) ? +1 : -1;
-  ctf = survey (_tf, pos, &k->f, NULL, &ptf, NULL)->fg;
+  survey (_tf, pos, &k->f, NULL, &ptf, NULL);
+  ctf = fg (&ptf);
   survey (_bf, pos, &k->f, NULL, &pbf, NULL);
   struct pos ph; prel (&pbf, &ph, +1, dir);
   if (k->i == -1
@@ -257,7 +258,8 @@ physics_in (struct anim *k)
 
 
   /* fall */
-  cm = survey (_m, pos, &k->f, NULL, &pm, NULL)->fg;
+  survey (_m, pos, &k->f, NULL, &pm, NULL);
+  cm = fg (&pm);
   struct loose_floor *l =
     loose_floor_at_pos (prel (&pm, &pma, -1, +0));
   if ((is_strictly_traversable (&pm)

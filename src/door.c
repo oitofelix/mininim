@@ -349,7 +349,7 @@ open_door (struct level *l, int e, uint64_t priority, bool stay_open)
   struct level_door *ld;
 
   do {
-    p = &l->event[e].p;
+    p = &event (l, e)->p;
     switch (fg (p)) {
     case DOOR:
       d = door_at_pos (p);
@@ -375,7 +375,7 @@ open_door (struct level *l, int e, uint64_t priority, bool stay_open)
       activate_con (p);
       break;
     }
-  } while (l->event[e++].next);
+  } while (event (l, e++)->next);
 }
 
 void
@@ -387,7 +387,7 @@ close_door (struct level *l, int e, uint64_t priority)
   struct level_door *ld;
 
   do {
-    p = &l->event[e].p;
+    p = &event (l, e)->p;
     switch (fg (p)) {
     case DOOR:
       d = door_at_pos (p);
@@ -409,7 +409,7 @@ close_door (struct level *l, int e, uint64_t priority)
       activate_con (p);
       break;
     }
-  } while (l->event[e++].next);
+  } while (event (l, e++)->next);
 }
 
 int

@@ -248,7 +248,7 @@ physics_in (struct anim *k)
     if (k->current_lives <= 0) {
       stop_sample (scream_sample, NULL, k->id);
       k->p = pmt;
-      if (con (&pmt)->fg == SPIKES_FLOOR
+      if (fg (&pmt) == SPIKES_FLOOR
           && ! spikes_floor_at_pos (&pmt)->inactive)
         kid_die_spiked (k);
       else {

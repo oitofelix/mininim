@@ -52,7 +52,7 @@ generate_stars_for_pos (struct pos *p)
   stars->s = NULL;
   stars->count = 0;
 
-  if (con (&np)->bg != BALCONY) return;
+  if (bg (&np) != BALCONY) return;
 
   stars->count = 3 + prandom_pos (&np, 5);
   stars->s = xcalloc (stars->count, sizeof (* stars->s));
@@ -209,7 +209,7 @@ draw_princess_room_stars (ALLEGRO_BITMAP *bitmap, enum vm vm)
 void
 draw_balcony_stars (ALLEGRO_BITMAP *bitmap, struct pos *p, enum vm vm)
 {
-  if (con (p)->bg != BALCONY) return;
+  if (bg (p) != BALCONY) return;
   struct pos np; npos (p, &np);
 
   if (! np.room) return;

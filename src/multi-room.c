@@ -562,7 +562,7 @@ draw_animated_background (ALLEGRO_BITMAP *bitmap, int room)
 
   for (p.floor = FLOORS; p.floor >= -1; p.floor--)
     for (p.place = -1; p.place < PLACES; p.place++) {
-      if (con (&p)->fg == WALL) continue;
+      if (fg (&p) == WALL) continue;
       draw_fire (bitmap, &p, vm);
       draw_balcony_stars (bitmap, &p, vm);
     }
@@ -735,11 +735,11 @@ update_cache_pos (struct pos *p, enum changed_pos_reason reason,
                             58, 17);
                   clear_rect_to_color (mr.cell[x][y].cache, &r, TRANSPARENT_COLOR);
 
-                  if (con (&pbl)->fg == LEVEL_DOOR || con (&pbl)->bg == BALCONY)
+                  if (fg (&pbl) == LEVEL_DOOR || bg (&pbl) == BALCONY)
                     draw_conbg (mr.cell[x][y].cache, &pbl, em, vm, true);
-                  if (con (&pb)->fg == LEVEL_DOOR || con (&pb)->bg == BALCONY)
+                  if (fg (&pb) == LEVEL_DOOR || bg (&pb) == BALCONY)
                     draw_conbg (mr.cell[x][y].cache, &pb, em, vm, true);
-                  if (con (&pbr)->fg == LEVEL_DOOR || con (&pbr)->bg == BALCONY)
+                  if (fg (&pbr) == LEVEL_DOOR || bg (&pbr) == BALCONY)
                     draw_conbg (mr.cell[x][y].cache, &pbr, em, vm, true);
 
                   draw_confg_top (mr.cell[x][y].cache, &pb, em, vm, true);
@@ -755,11 +755,11 @@ update_cache_pos (struct pos *p, enum changed_pos_reason reason,
                             58, 17);
                   clear_rect_to_color (mr.cell[x][y].cache, &r, TRANSPARENT_COLOR);
 
-                  if (con (&pbl)->fg == LEVEL_DOOR || con (&pbl)->bg == BALCONY)
+                  if (fg (&pbl) == LEVEL_DOOR || bg (&pbl) == BALCONY)
                     draw_conbg (mr.cell[x][y].cache, &pbl, em, vm, true);
-                  if (con (&pb)->fg == LEVEL_DOOR || con (&pb)->bg == BALCONY)
+                  if (fg (&pb) == LEVEL_DOOR || bg (&pb) == BALCONY)
                     draw_conbg (mr.cell[x][y].cache, &pb, em, vm, true);
-                  if (con (&pbr)->fg == LEVEL_DOOR || con (&pbr)->bg == BALCONY)
+                  if (fg (&pbr) == LEVEL_DOOR || bg (&pbr) == BALCONY)
                     draw_conbg (mr.cell[x][y].cache, &pbr, em, vm, true);
 
                   draw_confg_top (mr.cell[x][y].cache, &pbl, em, vm, true);
@@ -779,11 +779,11 @@ update_cache_pos (struct pos *p, enum changed_pos_reason reason,
                             57, 31);
                   clear_rect_to_color (mr.cell[x][y].cache, &r, TRANSPARENT_COLOR);
 
-                  if (con (&pbl)->fg == LEVEL_DOOR || con (&pbl)->bg == BALCONY)
+                  if (fg (&pbl) == LEVEL_DOOR || bg (&pbl) == BALCONY)
                     draw_conbg (mr.cell[x][y].cache, &pbl, em, vm, true);
-                  if (con (&pb)->fg == LEVEL_DOOR || con (&pb)->bg == BALCONY)
+                  if (fg (&pb) == LEVEL_DOOR || bg (&pb) == BALCONY)
                     draw_conbg (mr.cell[x][y].cache, &pb, em, vm, true);
-                  if (con (&pbr)->fg == LEVEL_DOOR || con (&pbr)->bg == BALCONY)
+                  if (fg (&pbr) == LEVEL_DOOR || bg (&pbr) == BALCONY)
                     draw_conbg (mr.cell[x][y].cache, &pbr, em, vm, true);
 
                   draw_confg_top (mr.cell[x][y].cache, &pb, em, vm, true);
@@ -937,7 +937,7 @@ draw_multi_rooms (void)
     for (i = 0; i < changed_pos_nmemb; i++) {
       update_cache_pos (&changed_pos[i].p, changed_pos[i].reason, em, vm);
       struct pos pl; prel (&changed_pos[i].p, &pl, +0, -1);
-      if (depedv && con (&pl)->fg == WALL)
+      if (depedv && fg (&pl) == WALL)
         update_cache_pos (&pl, CHPOS_WALL, em, vm);
     }
 

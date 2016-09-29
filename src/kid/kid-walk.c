@@ -103,8 +103,8 @@ flow (struct anim *k)
   if (k->oaction != kid_walk) {
     survey (_bf, pos, &k->f, NULL, &pbf, NULL);
     survey (_mbo, pos, &k->f, NULL, &pmbo, NULL);
-    if (is_traversable (&pbf)
-        || con (&pbf)->fg == CLOSER_FLOOR) k->p = pmbo;
+    if (is_traversable (&pbf) || fg (&pbf) == CLOSER_FLOOR)
+      k->p = pmbo;
     else k->p = pbf;
     k->i = k->walk = -1;
 
@@ -116,7 +116,7 @@ flow (struct anim *k)
 
     struct pos pf;
     prel (&k->p, &pf, +0, (k->f.dir == LEFT) ? -1 : +1);
-    if (k->dcl < PLACE_WIDTH + 1 && con (&pf)->fg == CLOSER_FLOOR
+    if (k->dcl < PLACE_WIDTH + 1 && fg (&pf) == CLOSER_FLOOR
         && closer_floor_at_pos (&pf)->broken)
       k->dcl = PLACE_WIDTH + 1;
 
@@ -142,7 +142,7 @@ flow (struct anim *k)
     else k->confg = FLOOR;
   }
 
-  if (k->i == -1 && con (&k->p)->fg != LOOSE_FLOOR) {
+  if (k->i == -1 && fg (&k->p) != LOOSE_FLOOR) {
     if (k->dc < 4) {
       kid_normal (k);
       return false;

@@ -74,7 +74,7 @@ flow (struct anim *k)
 
   survey (_mt, pos, &k->f, NULL, &pmt, NULL);
   bool stairs = k->key.up && ! k->key.left && ! k->key.right
-    && con (&pmt)->fg == LEVEL_DOOR
+    && fg (&pmt) == LEVEL_DOOR
     && level_door_at_pos (&pmt)->i == 0
     && k == get_anim_by_id (0);
 

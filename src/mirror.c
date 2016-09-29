@@ -87,7 +87,7 @@ unload_mirror (void)
 void
 register_mirror (struct pos *p)
 {
-  assert (con (p)->fg == MIRROR
+  assert (fg (p) == MIRROR
           && mirror_at_pos (p) == NULL);
 
   struct mirror m;

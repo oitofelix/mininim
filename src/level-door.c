@@ -159,16 +159,17 @@ unload_level_door (void)
 void
 register_level_door (struct pos *p)
 {
-  assert (con (p)->fg == LEVEL_DOOR
+  assert (fg (p) == LEVEL_DOOR
           && level_door_at_pos (p) == NULL);
 
   struct level_door d;
 
-  int step = ext (p);
+  int n, f;
+  typed_int (ext (p), LEVEL_DOOR_STEPS, LEVEL_DOOR_FASES, &n, &f);
 
   d.p = *p;
-  d.broken = (step < 0);
-  d.i = (step < 0) ? -step - 1 : step;
+  d.broken = f;
+  d.i = n;
   d.action = NO_LEVEL_DOOR_ACTION;
   d.no_stairs = peq (p, &p->l->start_pos);
   d.priority = 0;
@@ -210,7 +211,7 @@ break_level_door (struct pos *p)
   d->broken = true;
   register_con_undo
     (&undo, p,
-     MIGNORE, MIGNORE, -d->i - 1,
+     MIGNORE, MIGNORE, d->i + LEVEL_DOOR_STEPS,
      false, false, false, false,
      CHPOS_BREAK_LEVEL_DOOR,
      "LOOSE FLOOR BREAKING");

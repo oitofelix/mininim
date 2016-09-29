@@ -263,7 +263,7 @@ draw_carpet_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
 {
   struct pos pr; prel (p, &pr, +0, +1);
 
-  if (con (p)->fg == TCARPET)
+  if (fg (p) == TCARPET)
     draw_door_pole_base (bitmap, p, em, vm);
 
   draw_door_pole (bitmap, p, em, vm);

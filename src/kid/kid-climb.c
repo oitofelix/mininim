@@ -132,7 +132,7 @@ flow (struct anim *k)
      if it's not a door */
   if (k->f.dir == LEFT && k->fo.dx != 0
       && k->i % 2
-      && con (&hanged_pos)->fg != DOOR)
+      && fg (&hanged_pos) != DOOR)
     k->fo.dx += 1;
 
   if (k->i == 3 && k->wait < DOOR_WAIT_LOOK)
@@ -155,7 +155,8 @@ physics_in (struct anim *k)
   }
 
   /* door collision */
-  ctf = survey (_tf, pos, &k->f, NULL, &ptf, NULL)->fg;
+  survey (_tf, pos, &k->f, NULL, &ptf, NULL);
+  ctf = fg (&ptf);
   if (k->i == 3 && ctf == DOOR && k->f.dir == LEFT
       && door_at_pos (&ptf)->i > DOOR_CLIMB_LIMIT) {
     if (k->wait == 0) {

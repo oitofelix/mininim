@@ -133,7 +133,7 @@ flow (struct anim *k)
   if (k->i >= 7 && k->i <= 10 && hang_front
       && (is_hangable_pos (&pm, k->f.dir)
           || (is_hangable_pos (&ptf, k->f.dir)
-              && crel (&ptf, +0, dir)->fg == WALL
+              && fg_rel (&ptf, +0, dir) == WALL
               && k->i < 9))) {
     if (is_hangable_pos (&pm, k->f.dir)) k->hang_pos = pm;
     else if (is_hangable_pos (&ptf, k->f.dir)) k->hang_pos = ptf;

@@ -287,7 +287,7 @@ draw_floor_corner_00 (ALLEGRO_BITMAP *bitmap, struct pos *p,
     floor_corner_00 = apply_palette (floor_corner_00, selection_palette);
 
   struct coord c; floor_corner_00_coord (p, &c);
-  if (con (p)->fg == CLOSER_FLOOR) c.y += 1;
+  if (fg (p) == CLOSER_FLOOR) c.y += 1;
   draw_bitmapc (floor_corner_00, bitmap, &c, 0);
 }
 
@@ -320,7 +320,7 @@ draw_floor_corner_01 (ALLEGRO_BITMAP *bitmap, struct pos *p,
     floor_corner_01 = apply_palette (floor_corner_01, selection_palette);
 
   struct coord c; floor_corner_01_coord (p, &c);
-  if (con (p)->fg == CLOSER_FLOOR) c.y += 1;
+  if (fg (p) == CLOSER_FLOOR) c.y += 1;
   draw_bitmapc (floor_corner_01, bitmap, &c, 0);
 }
 
@@ -353,7 +353,7 @@ draw_floor_corner_02 (ALLEGRO_BITMAP *bitmap, struct pos *p,
     floor_corner_02 = apply_palette (floor_corner_02, selection_palette);
 
   struct coord c; floor_corner_02_coord (p, &c);
-  if (con (p)->fg == CLOSER_FLOOR) c.y += 1;
+  if (fg (p) == CLOSER_FLOOR) c.y += 1;
   draw_bitmapc (floor_corner_02, bitmap, &c, 0);
 }
 

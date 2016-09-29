@@ -138,7 +138,7 @@ load_native_level (struct level *l, int n)
   /* EVENTS */
   for (i = 0;; i++) {
     /* Ei=r f p n*/
-    struct level_event *e = &l->event[i];
+    struct level_event *e = event (l, i);
     xasprintf (&k, "E%i", i);
     v = al_get_config_value (c, NULL, k);
     al_free (k);
@@ -244,7 +244,7 @@ save_native_level (struct level *l, char *filename)
   /* EVENTS */
   for (i = 0; i < EVENTS; i++) {
     /* Ei=r f p n */
-    struct level_event *e = &l->event[i];
+    struct level_event *e = event (l, i);
     xasprintf (&k, "E%i", i);
     xasprintf (&v, "%i %i %i %i", e->p.room, e->p.floor, e->p.place, e->next);
     al_set_config_value (c, NULL, k, v);

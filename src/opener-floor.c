@@ -117,18 +117,19 @@ unload_opener_floor (void)
 void
 register_opener_floor (struct pos *p)
 {
-  assert (con (p)->fg == OPENER_FLOOR
+  assert (fg (p) == OPENER_FLOOR
           && opener_floor_at_pos (p) == NULL);
 
   struct opener_floor o;
 
-  int event = ext (p);
+  int n, f;
+  typed_int (ext (p), EVENTS, 2, &n, &f);
 
   o.p = *p;
-  o.event = (event < 0) ? -event - 1 : event;
-  o.pressed = (event < 0);
-  o.noise = (event < 0);
-  o.broken = (event < 0);
+  o.event = n;
+  o.pressed = f;
+  o.noise = f;
+  o.broken = f;
   o.priority = 0;
 
   opener_floor =
@@ -215,7 +216,7 @@ break_opener_floor (struct pos *p)
   open_door (o->p.l, o->event, anim_cycle, true);
   register_con_undo
     (&undo, p,
-     MIGNORE, MIGNORE, -o->event - 1,
+     MIGNORE, MIGNORE, o->event + EVENTS,
      false, false, false, false,
      CHPOS_BREAK_OPENER_FLOOR,
      "LOOSE FLOOR BREAKING");

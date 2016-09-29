@@ -145,7 +145,7 @@ legacy_level_special_events (void)
   /* in the first animation cycle */
   if (anim_cycle == 0 || anim_cycle == 1) {
     /* close level door the kid came from */
-    if (con (&global_level.start_pos)->fg == LEVEL_DOOR) {
+    if (fg (&global_level.start_pos) == LEVEL_DOOR) {
       struct level_door *ld = level_door_at_pos (&global_level.start_pos);
       if (anim_cycle == 0) ld->i = 0;
       if (anim_cycle == 1) ld->action = CLOSE_LEVEL_DOOR;
@@ -178,7 +178,7 @@ legacy_level_special_events (void)
     survey (_m, pos, &k->f, NULL, &pm, NULL);
     if (pm.room == 1
         && (pm.place == 2 || pm.place == 3)
-        && con (&skeleton_floor_pos)->fg == SKELETON_FLOOR
+        && fg (&skeleton_floor_pos) == SKELETON_FLOOR
         && get_exit_level_door (&global_level, 0)) {
       register_con_undo (&undo, &skeleton_floor_pos,
                          FLOOR, MIGNORE, MIGNORE,
@@ -218,7 +218,7 @@ legacy_level_special_events (void)
     /* if the level door is open and the camera is on room 4, make
        the mirror appear */
     if (is_pos_visible (&mirror_pos)
-        && con (&mirror_pos)->fg != MIRROR
+        && fg (&mirror_pos) != MIRROR
         && get_exit_level_door (&global_level, 0)) {
       register_con_undo (&undo, &mirror_pos,
                          MIRROR, MIGNORE, MIGNORE,
@@ -229,7 +229,7 @@ legacy_level_special_events (void)
 
     /* if the kid is crossing the mirror, make his shadow appear */
     struct mirror *m;
-    if (con (&mirror_pos)->fg == MIRROR
+    if (fg (&mirror_pos) == MIRROR
         && (m = mirror_at_pos (&mirror_pos))
         && m->kid_crossing == k->id
         && shadow_id == -1) {
@@ -269,7 +269,7 @@ legacy_level_special_events (void)
        potion */
     if (is_pos_visible (&potion_pos)
         && shadow_id == -1
-        && con (&door_pos)->fg == DOOR
+        && fg (&door_pos) == DOOR
         && is_potion (&potion_pos)
         && door_at_pos (&door_pos)->i <= 25) {
       int id = create_anim (k, 0, NULL, 0);
@@ -340,7 +340,7 @@ legacy_level_special_events (void)
     if (k->f.c.room == 1
         && k->action == kid_run_jump
         && k->i == 7
-        && con (&door_pos)->fg == DOOR
+        && fg (&door_pos) == DOOR
         && door_at_pos (&door_pos)->i < DOOR_STEPS - 1) {
       ks->key.right = true;
       ks->key.shift = true;
@@ -540,10 +540,10 @@ legacy_level_special_events (void)
        the kid has merged */
     if (shadow_merged
         && k->f.c.room == 2
-        && con (&first_hidden_floor_pos)->fg == NO_FLOOR)
+        && fg (&first_hidden_floor_pos) == NO_FLOOR)
       for (new_pos (&p, &global_level, 2, 0, -4); p.place < PLACES;
            prel (&p, &p, +0, +1))
-        if (con (&p)->fg == NO_FLOOR) con (&p)->fg = HIDDEN_FLOOR;
+        if (fg (&p) == NO_FLOOR) set_fg (&p, HIDDEN_FLOOR);
 
     /* when the kid enters room 23, go to the next level */
     if (k->f.c.room == 23) {
@@ -893,7 +893,8 @@ interpret_legacy_level (struct level *l, int n)
           case LM_CHOMP_EXTRA_OPEN: step = 4; break;
           case LM_STUCK_OPEN: step = 5; break;
           }
-          if (b & 0x80) set_ext (&p, -step - 1); /* bloody status */
+          if (b & 0x80)
+            set_ext (&p, step + CHOPPER_STEPS); /* bloody status */
           break;
         case LG_WALL:           /* ok */
           switch (b) {
@@ -931,7 +932,7 @@ interpret_legacy_level (struct level *l, int n)
   /* EVENTS: ok */
   int i;
   for (i = 0; i < LEVENTS; i++) {
-    struct level_event *e = &l->event[i % EVENTS];
+    struct level_event *e = event (l, i);
     int ld = lv.door_1[i] & 0x1F;
     new_pos (&e->p, l,
              (lv.door_2[i] >> 3) | ((lv.door_1[i] & 0x60) >> 5),

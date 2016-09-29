@@ -254,20 +254,20 @@ draw_conbg (ALLEGRO_BITMAP *bitmap, struct pos *p,
   default: assert (false); break;
   }
 
-  if (con (p)->fg == LEVEL_DOOR)
+  if (fg (p) == LEVEL_DOOR)
     draw_level_door (bitmap, p, em, vm);
 
   if (! redraw) return;
 
   struct pos pr; prel (p, &pr, +0, +1);
 
-  if (con (&pr)->fg == LEVEL_DOOR || con (&pr)->bg == BALCONY)
+  if (fg (&pr) == LEVEL_DOOR || bg (&pr) == BALCONY)
     draw_conbg (bitmap, &pr, em, vm, true);
 
   draw_confg (bitmap, p, em, vm, true);
   draw_confg_left (bitmap, &pr, em, vm, true);
 
-  if (con (p)->fg == LEVEL_DOOR || con (p)->bg == BALCONY) {
+  if (fg (p) == LEVEL_DOOR || bg (p) == BALCONY) {
     struct pos pl; prel (p, &pl, +0, -1);
     struct pos pal; prel (p, &pal, -1, -1);
     struct pos pa; prel (p, &pa, -1, +0);
@@ -392,7 +392,7 @@ draw_confg_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   if (! redraw) return;
 
-  if (con (p)->fg == ARCH_BOTTOM) {
+  if (fg (p) == ARCH_BOTTOM) {
     struct pos pa; prel (p, &pa, -1, +0);
     draw_confg_base (bitmap, &pa, em, vm);
   }
@@ -439,7 +439,7 @@ draw_confg_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
   prel (p, &pr, +0, +1);
   prel (p, &pa, -1, +0);
 
-  if (con (p)->fg == DOOR) {
+  if (fg (p) == DOOR) {
     draw_confg_base (bitmap, &pa, em, vm);
     draw_confg_right (bitmap, &pa, em, vm, true);
   }
@@ -530,131 +530,148 @@ draw_room_frame_fg (ALLEGRO_BITMAP *bitmap, enum em em, enum vm vm,
   set_target_bitmap (bitmap);
   al_set_clipping_rectangle (c.x, c.y, w, h);
 
+  enum confg fbl = fg (&pbl);
+  enum confg fbr = fg (&pbr);
+  enum confg fm = fg (&pm);
+  enum confg ftl = fg (&ptl);
+  enum confg ftr = fg (&ptr);
+
+  enum confg fbl2 = fg (&pbl2);
+  enum confg fbr2 = fg (&pbr2);
+  enum confg fm2 = fg (&pm2);
+  enum confg ftl2 = fg (&ptl2);
+  enum confg ftr2 = fg (&ptr2);
+
   /* SPIKES FLOOR */
-  if (con (&pbl)->fg == SPIKES_FLOOR) draw_spikes_fg (bitmap, &pbl, em, vm);
-  if (con (&pbr)->fg == SPIKES_FLOOR && pbr_p) draw_spikes_fg (bitmap, &pbr, em, vm);
-  if (con (&pm)->fg == SPIKES_FLOOR && pm_p) draw_spikes_fg (bitmap, &pm, em, vm);
-  if (con (&ptl)->fg == SPIKES_FLOOR && ptl_p) draw_spikes_fg (bitmap, &ptl, em, vm);
-  if (con (&ptr)->fg == SPIKES_FLOOR && ptr_p) draw_spikes_fg (bitmap, &ptr, em, vm);
+  if (fbl == SPIKES_FLOOR) draw_spikes_fg (bitmap, &pbl, em, vm);
+  if (fbr == SPIKES_FLOOR && pbr_p) draw_spikes_fg (bitmap, &pbr, em, vm);
+  if (fm == SPIKES_FLOOR && pm_p) draw_spikes_fg (bitmap, &pm, em, vm);
+  if (ftl == SPIKES_FLOOR && ptl_p) draw_spikes_fg (bitmap, &ptl, em, vm);
+  if (ftr == SPIKES_FLOOR && ptr_p) draw_spikes_fg (bitmap, &ptr, em, vm);
 
   /* BROKEN FLOOR */
-  if (con (&pbl)->fg == BROKEN_FLOOR) draw_broken_floor_fg (bitmap, &pbl, em, vm);
-  if (con (&pbr)->fg == BROKEN_FLOOR && pbr_p) draw_broken_floor_fg (bitmap, &pbr, em, vm);
-  if (con (&pm)->fg == BROKEN_FLOOR && pm_p) draw_broken_floor_fg (bitmap, &pm, em, vm);
-  if (con (&ptl)->fg == BROKEN_FLOOR && ptl_p) draw_broken_floor_fg (bitmap, &ptl, em, vm);
-  if (con (&ptr)->fg == BROKEN_FLOOR && ptr_p) draw_broken_floor_fg (bitmap, &ptr, em, vm);
+  if (fbl == BROKEN_FLOOR) draw_broken_floor_fg (bitmap, &pbl, em, vm);
+  if (fbr == BROKEN_FLOOR && pbr_p) draw_broken_floor_fg (bitmap, &pbr, em, vm);
+  if (fm == BROKEN_FLOOR && pm_p) draw_broken_floor_fg (bitmap, &pm, em, vm);
+  if (ftl == BROKEN_FLOOR && ptl_p) draw_broken_floor_fg (bitmap, &ptl, em, vm);
+  if (ftr == BROKEN_FLOOR && ptr_p) draw_broken_floor_fg (bitmap, &ptr, em, vm);
 
   /* OPENER FLOOR */
-  if (con (&pbl)->fg == OPENER_FLOOR) draw_opener_floor_fg (bitmap, &pbl, em, vm);
-  if (con (&pbr)->fg == OPENER_FLOOR && pbr_p) draw_opener_floor_fg (bitmap, &pbr, em, vm);
-  if (con (&pm)->fg == OPENER_FLOOR && pm_p) draw_opener_floor_fg (bitmap, &pm, em, vm);
-  if (con (&ptl)->fg == OPENER_FLOOR && ptl_p) draw_opener_floor_fg (bitmap, &ptl, em, vm);
-  if (con (&ptr)->fg == OPENER_FLOOR && ptr_p) draw_opener_floor_fg (bitmap, &ptr, em, vm);
+  if (fbl == OPENER_FLOOR) draw_opener_floor_fg (bitmap, &pbl, em, vm);
+  if (fbr == OPENER_FLOOR && pbr_p) draw_opener_floor_fg (bitmap, &pbr, em, vm);
+  if (fm == OPENER_FLOOR && pm_p) draw_opener_floor_fg (bitmap, &pm, em, vm);
+  if (ftl == OPENER_FLOOR && ptl_p) draw_opener_floor_fg (bitmap, &ptl, em, vm);
+  if (ftr == OPENER_FLOOR && ptr_p) draw_opener_floor_fg (bitmap, &ptr, em, vm);
 
   /* CLOSER FLOOR */
-  if (con (&pbl)->fg == CLOSER_FLOOR) draw_closer_floor_fg (bitmap, &pbl, em, vm);
-  if (con (&pbr)->fg == CLOSER_FLOOR && pbr_p) draw_closer_floor_fg (bitmap, &pbr, em, vm);
-  if (con (&pm)->fg == CLOSER_FLOOR && pm_p) draw_closer_floor_fg (bitmap, &pm, em, vm);
-  if (con (&ptl)->fg == CLOSER_FLOOR && ptl_p) draw_closer_floor_fg (bitmap, &ptl, em, vm);
-  if (con (&ptr)->fg == CLOSER_FLOOR && ptr_p) draw_closer_floor_fg (bitmap, &ptr, em, vm);
+  if (fbl == CLOSER_FLOOR) draw_closer_floor_fg (bitmap, &pbl, em, vm);
+  if (fbr == CLOSER_FLOOR && pbr_p) draw_closer_floor_fg (bitmap, &pbr, em, vm);
+  if (fm == CLOSER_FLOOR && pm_p) draw_closer_floor_fg (bitmap, &pm, em, vm);
+  if (ftl == CLOSER_FLOOR && ptl_p) draw_closer_floor_fg (bitmap, &ptl, em, vm);
+  if (ftr == CLOSER_FLOOR && ptr_p) draw_closer_floor_fg (bitmap, &ptr, em, vm);
 
   /* PILLAR */
-  if (con (&pbl)->fg == PILLAR) draw_pillar_fg (bitmap, &pbl, em, vm);
-  if (con (&pbr)->fg == PILLAR && pbr_p) draw_pillar_fg (bitmap, &pbr, em, vm);
-  if (con (&pm)->fg == PILLAR && pm_p) draw_pillar_fg (bitmap, &pm, em, vm);
-  if (con (&ptl)->fg == PILLAR && ptl_p) draw_pillar_fg (bitmap, &ptl, em, vm);
-  if (con (&ptr)->fg == PILLAR && ptr_p) draw_pillar_fg (bitmap, &ptr, em, vm);
+  if (fbl == PILLAR) draw_pillar_fg (bitmap, &pbl, em, vm);
+  if (fbr == PILLAR && pbr_p) draw_pillar_fg (bitmap, &pbr, em, vm);
+  if (fm == PILLAR && pm_p) draw_pillar_fg (bitmap, &pm, em, vm);
+  if (ftl == PILLAR && ptl_p) draw_pillar_fg (bitmap, &ptl, em, vm);
+  if (ftr == PILLAR && ptr_p) draw_pillar_fg (bitmap, &ptr, em, vm);
 
   /* BIG PILLAR BOTTOM */
-  if (con (&pbl)->fg == BIG_PILLAR_BOTTOM) draw_big_pillar_bottom_fg (bitmap, &pbl, em, vm);
-  if (con (&pbr)->fg == BIG_PILLAR_BOTTOM && pbr_p) draw_big_pillar_bottom_fg (bitmap, &pbr, em, vm);
-  if (con (&pm)->fg == BIG_PILLAR_BOTTOM && pm_p) draw_big_pillar_bottom_fg (bitmap, &pm, em, vm);
-  if (con (&ptl)->fg == BIG_PILLAR_BOTTOM && ptl_p) draw_big_pillar_bottom_fg (bitmap, &ptl, em, vm);
-  if (con (&ptr)->fg == BIG_PILLAR_BOTTOM && ptr_p) draw_big_pillar_bottom_fg (bitmap, &ptr, em, vm);
+  if (fbl == BIG_PILLAR_BOTTOM)
+    draw_big_pillar_bottom_fg (bitmap, &pbl, em, vm);
+  if (fbr == BIG_PILLAR_BOTTOM && pbr_p)
+    draw_big_pillar_bottom_fg (bitmap, &pbr, em, vm);
+  if (fm == BIG_PILLAR_BOTTOM && pm_p)
+    draw_big_pillar_bottom_fg (bitmap, &pm, em, vm);
+  if (ftl == BIG_PILLAR_BOTTOM && ptl_p)
+    draw_big_pillar_bottom_fg (bitmap, &ptl, em, vm);
+  if (ftr == BIG_PILLAR_BOTTOM && ptr_p)
+    draw_big_pillar_bottom_fg (bitmap, &ptr, em, vm);
 
   /* BIG PILLAR TOP */
-  if (con (&pbl)->fg == BIG_PILLAR_TOP) draw_big_pillar_top_left (bitmap, &pbl, em, vm);
-  if (con (&pbr)->fg == BIG_PILLAR_TOP && pbr_p) draw_big_pillar_top_left (bitmap, &pbr, em, vm);
-  if (con (&pm)->fg == BIG_PILLAR_TOP && pm_p) draw_big_pillar_top_left (bitmap, &pm, em, vm);
-  if (con (&ptl)->fg == BIG_PILLAR_TOP && ptl_p) draw_big_pillar_top_left (bitmap, &ptl, em, vm);
-  if (con (&ptr)->fg == BIG_PILLAR_TOP && ptr_p) draw_big_pillar_top_left (bitmap, &ptr, em, vm);
+  if (fbl == BIG_PILLAR_TOP) draw_big_pillar_top_left (bitmap, &pbl, em, vm);
+  if (fbr == BIG_PILLAR_TOP && pbr_p) draw_big_pillar_top_left (bitmap, &pbr, em, vm);
+  if (fm == BIG_PILLAR_TOP && pm_p) draw_big_pillar_top_left (bitmap, &pm, em, vm);
+  if (ftl == BIG_PILLAR_TOP && ptl_p) draw_big_pillar_top_left (bitmap, &ptl, em, vm);
+  if (ftr == BIG_PILLAR_TOP && ptr_p) draw_big_pillar_top_left (bitmap, &ptr, em, vm);
 
   /* ARCH BOTTOM */
-  if (con (&pbl)->fg == ARCH_BOTTOM) draw_arch_bottom_fg (bitmap, &pbl, em, vm);
-  if (con (&pbr)->fg == ARCH_BOTTOM && pbr_p) draw_arch_bottom_fg (bitmap, &pbr, em, vm);
-  if (con (&pm)->fg == ARCH_BOTTOM && pm_p) draw_arch_bottom_fg (bitmap, &pm, em, vm);
-  if (con (&ptl)->fg == ARCH_BOTTOM && ptl_p) draw_arch_bottom_fg (bitmap, &ptl, em, vm);
-  if (con (&ptr)->fg == ARCH_BOTTOM && ptr_p) draw_arch_bottom_fg (bitmap, &ptr, em, vm);
+  if (fbl == ARCH_BOTTOM) draw_arch_bottom_fg (bitmap, &pbl, em, vm);
+  if (fbr == ARCH_BOTTOM && pbr_p) draw_arch_bottom_fg (bitmap, &pbr, em, vm);
+  if (fm == ARCH_BOTTOM && pm_p) draw_arch_bottom_fg (bitmap, &pm, em, vm);
+  if (ftl == ARCH_BOTTOM && ptl_p) draw_arch_bottom_fg (bitmap, &ptl, em, vm);
+  if (ftr == ARCH_BOTTOM && ptr_p) draw_arch_bottom_fg (bitmap, &ptr, em, vm);
 
   /* WALL */
-  if (con (&pbl)->fg == WALL) draw_wall_left_cache (bitmap, &pbl);
-  if (con (&pbr)->fg == WALL && pbr_p) draw_wall_left_cache (bitmap, &pbr);
-  if (con (&pm)->fg == WALL && pm_p) draw_wall_left_cache (bitmap, &pm);
-  if (con (&ptl)->fg == WALL && ptl_p) draw_wall_left_cache (bitmap, &ptl);
-  if (con (&ptr)->fg == WALL && ptr_p) draw_wall_left_cache (bitmap, &ptr);
+  if (fbl == WALL) draw_wall_left_cache (bitmap, &pbl);
+  if (fbr == WALL && pbr_p) draw_wall_left_cache (bitmap, &pbr);
+  if (fm == WALL && pm_p) draw_wall_left_cache (bitmap, &pm);
+  if (ftl == WALL && ptl_p) draw_wall_left_cache (bitmap, &ptl);
+  if (ftr == WALL && ptr_p) draw_wall_left_cache (bitmap, &ptr);
 
   /* DOOR */
-  if (con (&pbl2)->fg == DOOR) draw_door_fg (bitmap, &pbl2, f, em, vm);
-  if (con (&pbr2)->fg == DOOR && pbr2_p) draw_door_fg (bitmap, &pbr2, f, em, vm);
-  if (con (&pm2)->fg == DOOR && pm2_p) draw_door_fg (bitmap, &pm2, f, em, vm);
-  if (con (&ptl2)->fg == DOOR && ptl2_p) draw_door_fg (bitmap, &ptl2, f, em, vm);
-  if (con (&ptr2)->fg == DOOR && ptr2_p) draw_door_fg (bitmap, &ptr2, f, em, vm);
+  if (fbl2 == DOOR) draw_door_fg (bitmap, &pbl2, f, em, vm);
+  if (fbr2 == DOOR && pbr2_p) draw_door_fg (bitmap, &pbr2, f, em, vm);
+  if (fm2 == DOOR && pm2_p) draw_door_fg (bitmap, &pm2, f, em, vm);
+  if (ftl2 == DOOR && ptl2_p) draw_door_fg (bitmap, &ptl2, f, em, vm);
+  if (ftr2 == DOOR && ptr2_p) draw_door_fg (bitmap, &ptr2, f, em, vm);
 
   /* CHOPPER */
-  if (con (&pbl)->fg == CHOPPER) draw_chopper_fg (bitmap, &pbl, em, vm);
-  if (con (&pbr)->fg == CHOPPER && pbr_p) draw_chopper_fg (bitmap, &pbr, em, vm);
-  if (con (&pm)->fg == CHOPPER && pm_p) draw_chopper_fg (bitmap, &pm, em, vm);
-  if (con (&ptl)->fg == CHOPPER && ptl_p) draw_chopper_fg (bitmap, &ptl, em, vm);
-  if (con (&ptr)->fg == CHOPPER && ptr_p) draw_chopper_fg (bitmap, &ptr, em, vm);
+  if (fbl == CHOPPER) draw_chopper_fg (bitmap, &pbl, em, vm);
+  if (fbr == CHOPPER && pbr_p) draw_chopper_fg (bitmap, &pbr, em, vm);
+  if (fm == CHOPPER && pm_p) draw_chopper_fg (bitmap, &pm, em, vm);
+  if (ftl == CHOPPER && ptl_p) draw_chopper_fg (bitmap, &ptl, em, vm);
+  if (ftr == CHOPPER && ptr_p) draw_chopper_fg (bitmap, &ptr, em, vm);
 
   /* MIRROR */
-  if (con (&pbl)->fg == MIRROR) draw_mirror_fg (bitmap, &pbl, f, em, vm);
-  if (con (&pbr)->fg == MIRROR && pbr_p) draw_mirror_fg (bitmap, &pbr, f, em, vm);
-  if (con (&pm)->fg == MIRROR && pm_p) draw_mirror_fg (bitmap, &pm, f, em, vm);
-  if (con (&ptl)->fg == MIRROR && ptl_p) draw_mirror_fg (bitmap, &ptl, f, em, vm);
-  if (con (&ptr)->fg == MIRROR && ptr_p) draw_mirror_fg (bitmap, &ptr, f, em, vm);
+  if (fbl == MIRROR) draw_mirror_fg (bitmap, &pbl, f, em, vm);
+  if (fbr == MIRROR && pbr_p) draw_mirror_fg (bitmap, &pbr, f, em, vm);
+  if (fm == MIRROR && pm_p) draw_mirror_fg (bitmap, &pm, f, em, vm);
+  if (ftl == MIRROR && ptl_p) draw_mirror_fg (bitmap, &ptl, f, em, vm);
+  if (ftr == MIRROR && ptr_p) draw_mirror_fg (bitmap, &ptr, f, em, vm);
 
   /* ARCH TOP MID */
-  if (con (&pbl)->fg == ARCH_TOP_MID) draw_arch_top_mid (bitmap, &pbl, em, vm);
-  if (con (&pbr)->fg == ARCH_TOP_MID && pbr_p) draw_arch_top_mid (bitmap, &pbr, em, vm);
-  if (con (&pm)->fg == ARCH_TOP_MID && pm_p) draw_arch_top_mid (bitmap, &pm, em, vm);
-  if (con (&ptl)->fg == ARCH_TOP_MID && ptl_p) draw_arch_top_mid (bitmap, &ptl, em, vm);
-  if (con (&ptr)->fg == ARCH_TOP_MID && ptr_p) draw_arch_top_mid (bitmap, &ptr, em, vm);
+  if (fbl == ARCH_TOP_MID) draw_arch_top_mid (bitmap, &pbl, em, vm);
+  if (fbr == ARCH_TOP_MID && pbr_p) draw_arch_top_mid (bitmap, &pbr, em, vm);
+  if (fm == ARCH_TOP_MID && pm_p) draw_arch_top_mid (bitmap, &pm, em, vm);
+  if (ftl == ARCH_TOP_MID && ptl_p) draw_arch_top_mid (bitmap, &ptl, em, vm);
+  if (ftr == ARCH_TOP_MID && ptr_p) draw_arch_top_mid (bitmap, &ptr, em, vm);
 
   /* ARCH TOP SMALL */
-  if (con (&pbl)->fg == ARCH_TOP_SMALL) draw_arch_top_small (bitmap, &pbl, em, vm);
-  if (con (&pbr)->fg == ARCH_TOP_SMALL && pbr_p) draw_arch_top_small (bitmap, &pbr, em, vm);
-  if (con (&pm)->fg == ARCH_TOP_SMALL && pm_p) draw_arch_top_small (bitmap, &pm, em, vm);
-  if (con (&ptl)->fg == ARCH_TOP_SMALL && ptl_p) draw_arch_top_small (bitmap, &ptl, em, vm);
-  if (con (&ptr)->fg == ARCH_TOP_SMALL && ptr_p) draw_arch_top_small (bitmap, &ptr, em, vm);
+  if (fbl == ARCH_TOP_SMALL) draw_arch_top_small (bitmap, &pbl, em, vm);
+  if (fbr == ARCH_TOP_SMALL && pbr_p) draw_arch_top_small (bitmap, &pbr, em, vm);
+  if (fm == ARCH_TOP_SMALL && pm_p) draw_arch_top_small (bitmap, &pm, em, vm);
+  if (ftl == ARCH_TOP_SMALL && ptl_p) draw_arch_top_small (bitmap, &ptl, em, vm);
+  if (ftr == ARCH_TOP_SMALL && ptr_p) draw_arch_top_small (bitmap, &ptr, em, vm);
 
   /* ARCH TOP LEFT */
-  if (con (&pbl)->fg == ARCH_TOP_LEFT) draw_arch_top_left (bitmap, &pbl, em, vm);
-  if (con (&pbr)->fg == ARCH_TOP_LEFT && pbr_p) draw_arch_top_left (bitmap, &pbr, em, vm);
-  if (con (&pm)->fg == ARCH_TOP_LEFT && pm_p) draw_arch_top_left (bitmap, &pm, em, vm);
-  if (con (&ptl)->fg == ARCH_TOP_LEFT && ptl_p) draw_arch_top_left (bitmap, &ptl, em, vm);
-  if (con (&ptr)->fg == ARCH_TOP_LEFT && ptr_p) draw_arch_top_left (bitmap, &ptr, em, vm);
+  if (fbl == ARCH_TOP_LEFT) draw_arch_top_left (bitmap, &pbl, em, vm);
+  if (fbr == ARCH_TOP_LEFT && pbr_p) draw_arch_top_left (bitmap, &pbr, em, vm);
+  if (fm == ARCH_TOP_LEFT && pm_p) draw_arch_top_left (bitmap, &pm, em, vm);
+  if (ftl == ARCH_TOP_LEFT && ptl_p) draw_arch_top_left (bitmap, &ptl, em, vm);
+  if (ftr == ARCH_TOP_LEFT && ptr_p) draw_arch_top_left (bitmap, &ptr, em, vm);
 
   /* ARCH TOP RIGHT */
-  if (con (&pbl)->fg == ARCH_TOP_RIGHT) draw_arch_top_right (bitmap, &pbl, em, vm);
-  if (con (&pbr)->fg == ARCH_TOP_RIGHT && pbr_p) draw_arch_top_right (bitmap, &pbr, em, vm);
-  if (con (&pm)->fg == ARCH_TOP_RIGHT && pm_p) draw_arch_top_right (bitmap, &pm, em, vm);
-  if (con (&ptl)->fg == ARCH_TOP_RIGHT && ptl_p) draw_arch_top_right (bitmap, &ptl, em, vm);
-  if (con (&ptr)->fg == ARCH_TOP_RIGHT && ptr_p) draw_arch_top_right (bitmap, &ptr, em, vm);
+  if (fbl == ARCH_TOP_RIGHT) draw_arch_top_right (bitmap, &pbl, em, vm);
+  if (fbr == ARCH_TOP_RIGHT && pbr_p) draw_arch_top_right (bitmap, &pbr, em, vm);
+  if (fm == ARCH_TOP_RIGHT && pm_p) draw_arch_top_right (bitmap, &pm, em, vm);
+  if (ftl == ARCH_TOP_RIGHT && ptl_p) draw_arch_top_right (bitmap, &ptl, em, vm);
+  if (ftr == ARCH_TOP_RIGHT && ptr_p) draw_arch_top_right (bitmap, &ptr, em, vm);
 
   /* CARPET */
-  if (con (&pbl2)->fg == CARPET) draw_carpet_fg (bitmap, &pbl2, f, em, vm);
-  if (con (&pbr2)->fg == CARPET && pbr2_p) draw_carpet_fg (bitmap, &pbr2, f, em, vm);
-  if (con (&pm2)->fg == CARPET && pm2_p) draw_carpet_fg (bitmap, &pm2, f, em, vm);
-  if (con (&ptl2)->fg == CARPET && ptl2_p) draw_carpet_fg (bitmap, &ptl2, f, em, vm);
-  if (con (&ptr2)->fg == CARPET && ptr2_p) draw_carpet_fg (bitmap, &ptr2, f, em, vm);
+  if (fbl2 == CARPET) draw_carpet_fg (bitmap, &pbl2, f, em, vm);
+  if (fbr2 == CARPET && pbr2_p) draw_carpet_fg (bitmap, &pbr2, f, em, vm);
+  if (fm2 == CARPET && pm2_p) draw_carpet_fg (bitmap, &pm2, f, em, vm);
+  if (ftl2 == CARPET && ptl2_p) draw_carpet_fg (bitmap, &ptl2, f, em, vm);
+  if (ftr2 == CARPET && ptr2_p) draw_carpet_fg (bitmap, &ptr2, f, em, vm);
 
   /* TCARPET */
-  if (con (&pbl2)->fg == TCARPET) draw_carpet_fg (bitmap, &pbl2, f, em, vm);
-  if (con (&pbr2)->fg == TCARPET && pbr2_p) draw_carpet_fg (bitmap, &pbr2, f, em, vm);
-  if (con (&pm2)->fg == TCARPET && pm2_p) draw_carpet_fg (bitmap, &pm2, f, em, vm);
-  if (con (&ptl2)->fg == TCARPET && ptl2_p) draw_carpet_fg (bitmap, &ptl2, f, em, vm);
-  if (con (&ptr2)->fg == TCARPET && ptr2_p) draw_carpet_fg (bitmap, &ptr2, f, em, vm);
+  if (fbl2 == TCARPET) draw_carpet_fg (bitmap, &pbl2, f, em, vm);
+  if (fbr2 == TCARPET && pbr2_p) draw_carpet_fg (bitmap, &pbr2, f, em, vm);
+  if (fm2 == TCARPET && pm2_p) draw_carpet_fg (bitmap, &pm2, f, em, vm);
+  if (ftl2 == TCARPET && ptl2_p) draw_carpet_fg (bitmap, &ptl2, f, em, vm);
+  if (ftr2 == TCARPET && ptr2_p) draw_carpet_fg (bitmap, &ptr2, f, em, vm);
 
   al_reset_clipping_rectangle ();
 }
@@ -686,7 +703,7 @@ draw_room_anim_fg_sub (ALLEGRO_BITMAP *bitmap,
   al_set_clipping_rectangle (c.x, c.y, w, h);
 
   /* SWORD */
-  if (con (&pm)->fg == CARPET
+  if (fg (&pm) == CARPET
       && a->f.dir == RIGHT
       && a->xf.b) {
     struct coord c2;
@@ -748,10 +765,11 @@ draw_room_anim_fg_sub (ALLEGRO_BITMAP *bitmap,
     get_hanged_pos (&a->hang_pos, f->dir, &p);
     draw_confg_base (bitmap, &p, em, vm);
 
-    if (con (&p)->fg != BROKEN_FLOOR
-        && (con (&p)->fg != OPENER_FLOOR
+    enum confg fo = fg (&p);
+    if (fo != BROKEN_FLOOR
+        && (fo != OPENER_FLOOR
             || ! opener_floor_at_pos (&p)->broken)
-        && (con (&p)->fg != CLOSER_FLOOR
+        && (fo != CLOSER_FLOOR
             || ! closer_floor_at_pos (&p)->broken)) {
       if (f->b == kid_climb_00
           || f->b == kid_climb_01

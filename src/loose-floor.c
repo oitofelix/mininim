@@ -251,7 +251,7 @@ create_loose_floor_01_bitmap (enum em em, enum vm vm)
 void
 register_loose_floor (struct pos *p)
 {
-  assert (con (p)->fg == LOOSE_FLOOR
+  assert (fg (p) == LOOSE_FLOOR
           && (loose_floor_at_pos (p) == NULL
               || loose_floor_at_pos (p)->action == FALL_LOOSE_FLOOR));
 
@@ -487,7 +487,8 @@ compute_loose_floor_fall (struct loose_floor *l)
   struct coord mbo_f, mbo_nf;
   struct pos fpmbo_f, nfpmbo_f, fpmbo_nf, nfpmbo_nf;
   enum confg fcmbo_f;
-  fcmbo_f = survey (_mbo, posf, &l->f, &mbo_f, &fpmbo_f, &nfpmbo_f)->fg;
+  survey (_mbo, posf, &l->f, &mbo_f, &fpmbo_f, &nfpmbo_f);
+  fcmbo_f = fg (&fpmbo_f);
   survey (_mbo, posf, &nf, &mbo_nf, &fpmbo_nf, &nfpmbo_nf);
 
   struct pos p;
@@ -577,9 +578,8 @@ compute_loose_floor_fall (struct loose_floor *l)
 
   /* reach here only if the floor hit a rigid structure or the
      ground */
-  if (con (&p)->fg != LEVEL_DOOR
-      && con (&p)->fg != OPENER_FLOOR
-      && con (&p)->fg != CLOSER_FLOOR) {
+  enum confg f = fg (&p);
+  if (f != LEVEL_DOOR && f != OPENER_FLOOR && f != CLOSER_FLOOR) {
     register_con_undo (&undo, &p,
                        BROKEN_FLOOR, MIGNORE, NO_ITEM,
                        false, false, false, false,
@@ -599,7 +599,7 @@ shake_loose_floor_row (struct pos *p)
 
   struct loose_floor *l;
   for (_p.place = PLACES - 1; _p.place >= -1; _p.place--)
-    if (con (&_p)->fg == LOOSE_FLOOR) {
+    if (fg (&_p) == LOOSE_FLOOR) {
       l = loose_floor_at_pos (&_p);
       if (l->action == NO_LOOSE_FLOOR_ACTION) {
         l->action = SHAKE_LOOSE_FLOOR;

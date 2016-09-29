@@ -23,6 +23,9 @@
 extern bool coord_wa;
 
 /* types */
+int typed_int (int i, int n, int f, int *nr, int *nf);
+int room_val (int r);
+
 int *roomd_ptr (struct level *l, int room, enum dir dir);
 int roomd (struct level *l, int room, enum dir dir);
 int roomd_n0 (struct level *l, int room, enum dir dir);
@@ -91,10 +94,10 @@ struct coord *_br (struct frame *f, struct coord *c);
 struct coord *_bf (struct frame *f, struct coord *c);
 struct coord *_bb (struct frame *f, struct coord *c);
 
-struct con *
+void
 survey (coord_f cf, pos_f pf, struct frame *f,
         struct coord *c, struct pos *p, struct pos *np);
-struct con *
+void
 surveyo (coord_f cf, int dx, int dy, pos_f pf, struct frame *f,
          struct coord *c, struct pos *p, struct pos *np);
 struct coord *place_on_the_ground (struct frame *f, struct coord *c);

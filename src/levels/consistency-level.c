@@ -48,16 +48,7 @@ next_consistency_level (struct level *lv, int n)
 
   memset (lv, 0, sizeof (*lv));
 
-  /* generate room 0 (delimiter room) */
-  new_pos (&p, lv, 0, -1, -1);
-
-  for (p.floor = 0; p.floor < FLOORS; p.floor++)
-    for (p.place = 0; p.place < PLACES; p.place++) {
-      struct con *c = &lv->con[p.room][p.floor][p.place];
-      c->fg = WALL;
-      c->bg = NO_BG;
-    }
-
+  new_pos (&p, lv, -1, -1, -1);
   for (p.room = 1; p.room < ROOMS; p.room++) {
     lv->link[p.room].l = 0;
     lv->link[p.room].r = 0;
@@ -70,16 +61,6 @@ next_consistency_level (struct level *lv, int n)
         c->fg = prandom_max ();
         c->bg = prandom_max ();
         c->ext = prandom_max ();
-
-        /* int r = prandom (255); */
-        /* if (c->fg == OPENER_FLOOR */
-        /*     || c->fg == CLOSER_FLOOR) c->ext.event = r; */
-        /* if (c->fg == DOOR */
-        /*     || c->fg == LEVEL_DOOR) { */
-        /*   lv->event[r].p = p; */
-        /*   lv->event[r].next = prandom (1); */
-        /* } */
-
       }
   }
 

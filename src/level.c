@@ -47,7 +47,7 @@ copy_level (struct level *ld, struct level *ls)
   size_t i;
   *ld = *ls;
   ld->start_pos.l = ld;
-  for (i = 0; i < EVENTS; i++) ld->event[i].p.l = ld;
+  for (i = 0; i < EVENTS; i++) event (ld, i)->p.l = ld;
   for (i = 0; i < GUARDS; i++) ld->guard[i].p.l = ld;
   return ld;
 }
@@ -121,7 +121,7 @@ level_eq (struct level *l0, struct level *l1)
       return false;
 
   for (i = 0; i < EVENTS; i++)
-    if (! level_event_eq (&l0->event[i], &l1->event[i]))
+    if (! level_event_eq (event (l0, i), event (l1, i)))
       return false;
 
   for (i = 0; i < GUARDS; i++)
@@ -258,7 +258,7 @@ play_level (struct level *lv)
 void
 register_con_at_pos (struct pos *p)
 {
-  switch (con (p)->fg) {
+  switch (fg (p)) {
   case LOOSE_FLOOR: register_loose_floor (p); break;
   case OPENER_FLOOR: register_opener_floor (p); break;
   case CLOSER_FLOOR: register_closer_floor (p); break;
@@ -291,7 +291,7 @@ register_cons (void)
 void
 destroy_con_at_pos (struct pos *p)
 {
-  switch (con (p)->fg) {
+  switch (fg (p)) {
   case LOOSE_FLOOR: remove_loose_floor (loose_floor_at_pos (p)); break;
   case OPENER_FLOOR: remove_opener_floor (opener_floor_at_pos (p)); break;
   case CLOSER_FLOOR: remove_closer_floor (closer_floor_at_pos (p)); break;
@@ -332,7 +332,7 @@ prepare_con_at_pos (struct pos *p)
 {
   if (! is_pos_visible (p)) return;
 
-  switch (con (p)->bg) {
+  switch (bg (p)) {
   case BALCONY: generate_stars_for_pos (p); break;
   default: break;
   }

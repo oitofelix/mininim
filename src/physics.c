@@ -34,61 +34,55 @@ crel (struct pos *p, int floor, int place)
 }
 
 enum conbg
-bg_val (enum conbg b)
+bg_val (int b)
 {
-  return abs (b % CONBGS);
+  return typed_int (b, CONBGS, 1, NULL, NULL);
 }
 
 enum confg
-fg_val (enum confg f)
+fg_val (int f)
 {
-  return abs (f % CONFGS);
+  return typed_int (f, CONFGS, 1, NULL, NULL);
 }
 
 int
-ext_val (enum confg f, int e)
+ext_val (int f, int e)
 {
   switch (fg_val (f)) {
   case FLOOR: case BROKEN_FLOOR: case SKELETON_FLOOR:
   case STUCK_FLOOR: case HIDDEN_FLOOR: case PILLAR:
   case BIG_PILLAR_BOTTOM: case ARCH_BOTTOM:
-    return abs (e % ITEMS);
+    return typed_int (e, ITEMS, 1, NULL, NULL);
 
   case LOOSE_FLOOR:
-    return abs (e % 2);
+    return typed_int (e, LOOSE_FLOOR_STEPS, LOOSE_FLOOR_FASES, NULL, NULL);
 
   case SPIKES_FLOOR:
-    return abs (e % SPIKES_STEPS);
+    return typed_int (e, SPIKES_STEPS, SPIKES_FASES, NULL, NULL);
 
   case OPENER_FLOOR:
   case CLOSER_FLOOR:
-    return (e < 0)
-      ? -((-e - 1) % EVENTS) - 1
-      : e % EVENTS;
+    return typed_int (e, EVENTS, 2, NULL, NULL);
 
   case DOOR:
-    return abs (e % DOOR_STEPS);
+    return typed_int (e, DOOR_STEPS, DOOR_FASES, NULL, NULL);
 
   case LEVEL_DOOR:
-    return (e < 0)
-      ? -((-e - 1) % LEVEL_DOOR_STEPS) - 1
-      : e % LEVEL_DOOR_STEPS;
+    return typed_int (e, LEVEL_DOOR_STEPS, LEVEL_DOOR_FASES, NULL, NULL);
 
   case CHOPPER:
-    return (e < 0)
-      ? -((-e - 1) % CHOPPER_STEPS) - 1
-      : e % CHOPPER_STEPS;
+    return typed_int (e, CHOPPER_STEPS, CHOPPER_FASES, NULL, NULL);
 
   case CARPET:
   case TCARPET:
-    return abs (e % CARPET_DESIGNS);
+    return typed_int (e, CARPET_DESIGNS, 1, NULL, NULL);
 
   default: return e;
   }
 }
 
 struct con *
-con_val (struct con *c, enum confg f, enum conbg b, int e)
+con_val (struct con *c, int f, int b, int e)
 {
   c->fg = fg_val (f);
   c->bg = bg_val (b);
@@ -106,7 +100,7 @@ random_con (struct con *c)
 }
 
 struct pos *
-set_con (struct pos *p, enum confg f, enum conbg b, int e)
+set_con (struct pos *p, int f, int b, int e)
 {
   set_fg (p, f);
   set_bg (p, b);
@@ -134,13 +128,13 @@ ext (struct pos *p)
 }
 
 enum conbg
-set_bg (struct pos *p, enum conbg b)
+set_bg (struct pos *p, int b)
 {
   return con (p)->bg = bg_val (b);
 }
 
 enum confg
-set_fg (struct pos *p, enum confg f)
+set_fg (struct pos *p, int f)
 {
   return con (p)->fg = fg_val (f);
 }
@@ -169,6 +163,31 @@ ext_rel (struct pos *p, int floor, int place)
 {
   struct con *c = crel (p, floor, place);
   return ext_val (c->fg, c->ext);
+}
+
+enum conbg
+set_bg_rel (struct pos *p, int floor, int place, int b)
+{
+  return crel (p, floor, place)->bg = bg_val (b);
+}
+
+enum confg
+set_fg_rel (struct pos *p, int floor, int place, int f)
+{
+  return crel (p, floor, place)->fg = fg_val (f);
+}
+
+int
+set_ext_rel (struct pos *p, int floor, int place, int e)
+{
+  struct con *c = crel (p, floor, place);
+  return c->ext = ext_val (c->fg, e);
+}
+
+struct level_event *
+event (struct level *l, int e)
+{
+  return &l->event[typed_int (e, EVENTS, 1, NULL, NULL)];
 }
 
 bool
@@ -453,7 +472,7 @@ bool
 is_pos_at_event (int e, void *_p)
 {
   struct pos *p = (struct pos *) _p;
-  return peq (&p->l->event[e].p, p);
+  return peq (&event (p->l, e)->p, p);
 }
 
 void
@@ -462,10 +481,10 @@ exchange_event_pos (struct pos *p0, struct pos *p1)
   if (peq (p0, p1)) return;
   int i;
   for (i = 0; i < EVENTS; i++)
-    if (peq (&p0->l->event[i].p, p0))
-      p1->l->event[i].p = *p1;
-    else if (peq (&p1->l->event[i].p, p1))
-      p0->l->event[i].p = *p0;
+    if (peq (&event (p0->l, i)->p, p0))
+      event (p1->l, i)->p = *p1;
+    else if (peq (&event (p1->l, i)->p, p1))
+      event (p0->l, i)->p = *p0;
 }
 
 void
@@ -865,7 +884,7 @@ is_colliding_cf (struct frame *f, struct frame_offset *fo, int dx,
   if (_f.dir == LEFT && pcf.place <= _pcf.place
       && _f.c.room != roomd (_f.c.l, _f.c.room, LEFT))
     for (p = _pcf; p.place >= pcf.place; prel (&p, &p, +0, -1))
-      if (con (&p)->fg == WALL) {
+      if (fg (&p) == WALL) {
         wall_collision = true;
         ci->p = p;
         break;
@@ -874,13 +893,13 @@ is_colliding_cf (struct frame *f, struct frame_offset *fo, int dx,
   if (_f.dir == RIGHT && pcf.place >= _pcf.place
       && _f.c.room != roomd (_f.c.l, _f.c.room, RIGHT))
     for (p = _pcf; p.place <= pcf.place; prel (&p, &p, +0, +1))
-      if (con (&p)->fg == WALL) {
+      if (fg (&p) == WALL) {
         wall_collision = true;
         ci->p = p;
         break;
       }
 
-  if (con (&pcf)->fg == WALL) {
+  if (fg (&pcf) == WALL) {
     wall_collision = true;
     ci->p = pcf;
   }
@@ -891,7 +910,7 @@ is_colliding_cf (struct frame *f, struct frame_offset *fo, int dx,
   if (_f.dir == LEFT && pcf.place < _pcf.place
       && _f.c.room != roomd (_f.c.l, _f.c.room, LEFT))
     for (prel (&_pcf, &p, +0, -1); p.place >= pcf.place; prel (&p, &p, +0, -1))
-      if (con (&p)->fg == DOOR
+      if (fg (&p) == DOOR
           && tf.y <= door_grid_tip_y (&p) - 10) {
         door_collision = true;
         ci->p = p;
@@ -902,7 +921,7 @@ is_colliding_cf (struct frame *f, struct frame_offset *fo, int dx,
       && _f.c.room != roomd (_f.c.l, _f.c.room, RIGHT))
     for (prel (&_pcf, &p, +0, +1); p.place <= pcf.place; prel (&p, &p, +0, +1)) {
       prel (&p, &pl, +0, -1);
-      if (con (&pl)->fg == DOOR
+      if (fg (&pl) == DOOR
           && tf.y <= door_grid_tip_y (&pl) - 10) {
         door_collision = true;
         ci->p = p;
@@ -910,14 +929,14 @@ is_colliding_cf (struct frame *f, struct frame_offset *fo, int dx,
       }
     }
 
-  if (con (&pcf)->fg == DOOR
+  if (fg (&pcf) == DOOR
       && pcf.place < pocf.place
       && tf.y <= door_grid_tip_y (&pcf) - 10) {
     door_collision = true;
     ci->p = pcf;
   }
 
-  if (con (&pocf)->fg == DOOR
+  if (fg (&pocf) == DOOR
       && pocf.place < pcf.place
       && tf.y <= door_grid_tip_y (&pocf) - 10) {
     door_collision = true;
@@ -966,7 +985,7 @@ is_colliding_cf (struct frame *f, struct frame_offset *fo, int dx,
       && _f.c.room != roomd (_f.c.l, _f.c.room, LEFT))
     for (prel (&_pcf, &p, +0, -1); p.place >= pcf.place; prel (&p, &p, +0, -1)) {
       prel (&p, &pr, +0, +1);
-      if (con (&pr)->fg == MIRROR) {
+      if (fg (&pr) == MIRROR) {
         mirror_collision = true;
         ci->p = p;
         break;
@@ -976,20 +995,20 @@ is_colliding_cf (struct frame *f, struct frame_offset *fo, int dx,
   if (_f.dir == RIGHT && pcf.place > _pcf.place
       && _f.c.room != roomd (_f.c.l, _f.c.room, RIGHT))
     for (prel (&_pcf, &p, +0, +1); p.place <= pcf.place; prel (&p, &p, +0, +1)) {
-      if (con (&p)->fg == MIRROR) {
+      if (fg (&p) == MIRROR) {
         mirror_collision = true;
         ci->p = p;
         break;
       }
     }
 
-  if (con (&pocf)->fg == MIRROR
+  if (fg (&pocf) == MIRROR
       && pcf.place < pocf.place) {
     mirror_collision = true;
     prel (&pocf, &ci->p, +0, -1);
   }
 
-  if (con (&pcf)->fg == MIRROR
+  if (fg (&pcf) == MIRROR
       && pocf.place < pcf.place) {
     mirror_collision = true;
     ci->p = pcf;
@@ -1047,7 +1066,7 @@ is_on_con (struct frame *f, coord_f cf, pos_f pf,
   struct pos p;
   survey (cf, pf, &_f, NULL, &p, NULL);
 
-  return dn <= min_dist && crel (&p, 0, dir)->fg == t;
+  return dn <= min_dist && fg_rel (&p, 0, dir) == t;
 }
 
 int
@@ -1103,9 +1122,10 @@ dist_chopper (struct frame *f, bool reverse)
   struct frame _f = *f;
   if (reverse) _f.dir = (_f.dir == LEFT) ? RIGHT : LEFT;
 
-  enum confg ctf = survey (_tf, pos, &_f, NULL, &ptf, NULL)->fg;
+  survey (_tf, pos, &_f, NULL, &ptf, NULL);
+  enum confg ctf = fg (&ptf);
   prel (&ptf, &ptfr, +0, +1);
-  enum confg ctfr = con (&ptfr)->fg;
+  enum confg ctfr = fg (&ptfr);
 
   if (_f.dir == LEFT && ctf == CHOPPER)
     return dist_next_place (&_f, _tf, pos, +0, false);
@@ -1169,19 +1189,18 @@ bool
 is_hangable_pos (struct pos *p, enum dir d)
 {
   int dir = (d == LEFT) ? -1 : +1;
-  struct pos ph; prel (p, &ph, -1, dir);
-  struct con *ch = con (&ph);
-  struct pos pa; prel (p, &pa, -1, 0);
-  struct pos pr; prel (p, &pr, +0, +1);
-  struct con *cr = con (&pr);
-  struct con *c = con (p);
 
-  return is_hangable_cs (ch->fg, d)
+  enum confg f = fg (p);
+  enum confg fr = fg_rel (p, +0, +1);
+
+  struct pos pa; prel (p, &pa, -1, 0);
+
+  return is_hangable_cs (fg_rel (p, -1, dir), d)
     && is_strictly_traversable (&pa)
-    && ! (d == LEFT && c->fg == CHOPPER)
-    && ! (d == LEFT && c->fg == MIRROR)
-    && ! (d == RIGHT && cr->fg == CHOPPER)
-    && ! (d == RIGHT && cr->fg == MIRROR)
+    && ! (d == LEFT && f == CHOPPER)
+    && ! (d == LEFT && f == MIRROR)
+    && ! (d == RIGHT && fr == CHOPPER)
+    && ! (d == RIGHT && fr == MIRROR)
     && ! (d == RIGHT && is_carpet (p))
     && ! (d == RIGHT && is_carpet (&pa));
 }
@@ -1245,7 +1264,7 @@ enum confg
 get_hanged_con (struct pos *hang_pos, enum dir d)
 {
   struct pos p;
-  return con (get_hanged_pos (hang_pos, d, &p))->fg;
+  return fg (get_hanged_pos (hang_pos, d, &p));
 }
 
 bool
@@ -1259,7 +1278,7 @@ is_hang_pos_free (struct pos *hang_pos, enum dir d)
 {
   int dir = (d == LEFT) ? -1 : +1;
   struct pos ptf; prel (hang_pos, &ptf, 0, dir);
-  enum confg ctf = con (&ptf)->fg;
+  enum confg ctf = fg (&ptf);
   return ! (ctf == WALL || (ctf == DOOR && d == LEFT)
             || (is_carpet (&ptf) && d == LEFT));
 }
@@ -1284,12 +1303,12 @@ update_depressible_floor (struct anim *a, int dx0, int dx1)
   c1.x += dir * dx1;
   pos (&c1, &p1);
 
-  if (a->current_lives <= 0 && con (&p0)->fg == CLOSER_FLOOR)
+  if (a->current_lives <= 0 && fg (&p0) == CLOSER_FLOOR)
     closer_floor_at_pos (&p0)->unresponsive = true;
   press_depressible_floor (&p0);
   a->df_pos[0] = p0;
 
-  if (a->current_lives <= 0 && con (&p1)->fg == CLOSER_FLOOR)
+  if (a->current_lives <= 0 && fg (&p1) == CLOSER_FLOOR)
     closer_floor_at_pos (&p1)->unresponsive = true;
   press_depressible_floor (&p1);
   a->df_pos[1] = p1;

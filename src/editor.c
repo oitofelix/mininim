@@ -19,8 +19,8 @@
 
 #include "mininim.h"
 
-static char menu_step_ext (struct pos *p, int min, int max);
-static char menu_event_ext (struct pos *p);
+static char menu_int_ext (struct pos *p, int steps, int fases,
+                          char *prefix, char *b_str, char *undo_ext);
 static char menu_select_room (enum edit up_edit, char *prefix);
 static char menu_select_level (enum edit up_edit, char *prefix);
 static char menu_link (enum dir dir);
@@ -34,7 +34,7 @@ static bool reciprocal_links, locally_unique_links,
   globally_unique_links;
 static bool b0, b1, b2, b3, b4, b5;
 static int guard_index;
-static int bb, r, s, t, min, max;
+static int bb, r, s, t;
 static struct con con_copy;
 static struct con room_copy[FLOORS][PLACES];
 static struct level level_copy;
@@ -435,7 +435,7 @@ editor (void)
     case 'F': edit = EDIT_FLOOR; break;
     case 'P': edit = EDIT_PILLAR; break;
     case 'W':
-      if (con (&p)->fg == WALL) break;
+      if (fg (&p) == WALL) break;
       register_con_undo (&undo, &p,
                          WALL, MIGNORE, MIGNORE,
                          true, false, true, true,
@@ -443,14 +443,14 @@ editor (void)
       break;
     case 'D': edit = EDIT_DOOR; break;
     case 'C':
-      if (con (&p)->fg == CHOPPER) break;
+      if (fg (&p) == CHOPPER) break;
       register_con_undo (&undo, &p,
                          CHOPPER, MIGNORE, MIGNORE,
                          true, true, true, true,
                          -1, "CHOPPER");
       break;
     case 'M':
-      if (con (&p)->fg == MIRROR) break;
+      if (fg (&p) == MIRROR) break;
       register_con_undo (&undo, &p,
                          MIRROR, MIGNORE, MIGNORE,
                          true, true, true, true,
@@ -468,7 +468,7 @@ editor (void)
       break;
     }
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
-    i = con (&p)->fg;
+    i = fg (&p);
     switch (menu_int (&i, NULL, INT_MIN, INT_MAX, "CF#>FG #", NULL)) {
     case -1: edit = EDIT_FG; break;
     case 0: break;
@@ -496,10 +496,9 @@ editor (void)
       edit = EDIT_FG; break;
     }
 
-    if ((c == 'L' && con (&p)->fg == LOOSE_FLOOR)
-        || (c == 'P' && con (&p)->fg == SPIKES_FLOOR)
-        || (c == 'O' && con (&p)->fg == OPENER_FLOOR)
-        || (c == 'C' && con (&p)->fg == CLOSER_FLOOR))
+    f = fg (&p);
+    if ((c == 'L' && f == LOOSE_FLOOR) || (c == 'P' && f == SPIKES_FLOOR)
+        || (c == 'O' && f == OPENER_FLOOR) || (c == 'C' && f == CLOSER_FLOOR))
       break;
 
     switch (c) {
@@ -562,8 +561,8 @@ editor (void)
       edit = EDIT_FG; break;
     }
 
-    if ((c == 'D' && con (&p)->fg == DOOR)
-        || (c == 'L' && con (&p)->fg == LEVEL_DOOR))
+    f = fg (&p);
+    if ((c == 'D' && f == DOOR) || (c == 'L' && f == LEVEL_DOOR))
       break;
 
     switch (c) {
@@ -669,7 +668,7 @@ editor (void)
       break;
     }
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
-    i = con (&p)->bg;
+    i = bg (&p);
     switch (menu_int (&i, NULL, INT_MIN, INT_MAX, "CB#>BG #", NULL)) {
     case -1: edit = EDIT_BG; break;
     case 0: break;
@@ -690,7 +689,7 @@ editor (void)
       break;
     }
 
-    switch (con (&p)->fg) {
+    switch (fg (&p)) {
     case FLOOR: case BROKEN_FLOOR: case SKELETON_FLOOR:
     case STUCK_FLOOR: case HIDDEN_FLOOR: case PILLAR:
     case BIG_PILLAR_BOTTOM: case ARCH_BOTTOM:
@@ -737,37 +736,25 @@ editor (void)
 
       break;
     case SPIKES_FLOOR:
-      menu_step_ext (&p, 0, SPIKES_STEPS - 1);
+      menu_int_ext (&p, SPIKES_STEPS, SPIKES_FASES,
+                    "CE>STEP", NULL, "STEP EXTENSION");
       break;
     case OPENER_FLOOR:
     case CLOSER_FLOOR:
-      menu_event_ext (&p);
+      menu_int_ext (&p, EVENTS, 2,
+                    "CE>EVENT", "B", "EVENT EXTENSION");
       break;
     case DOOR:
-      menu_step_ext (&p, 0, DOOR_STEPS - 1);
+      menu_int_ext (&p, DOOR_STEPS, DOOR_FASES,
+                    "CE>STEP", NULL, "STEP EXTENSION");
       break;
     case LEVEL_DOOR:
-      menu_step_ext (&p, -LEVEL_DOOR_STEPS, LEVEL_DOOR_STEPS - 1);
+      menu_int_ext (&p, LEVEL_DOOR_STEPS, LEVEL_DOOR_FASES,
+                    "CE>STEP", "B", "STEP EXTENSION");
       break;
     case CHOPPER:
-      set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
-      r = ext (&p);
-      bb = (r < 0);
-      min = bb ? -6 : 0;
-      max = bb ? -1 : 5;
-      s = menu_int (&r, &bb, min, max, "CE>STEP", "B");
-      if (! s) break;
-
-      if (s == -1 || s == 1) {
-        edit = EDIT_CON; break;
-      }
-
-      if ((bb && r >= 0) || (! bb && r < 0)) r = -r - 1;
-
-      register_con_undo (&undo, &p,
-                         MIGNORE, MIGNORE, r,
-                         true, true, false, true,
-                         CHPOS_CHOPPER, "STEP EXTENSION");
+      menu_int_ext (&p, CHOPPER_STEPS, CHOPPER_FASES,
+                    "CE>STEP", "B", "STEP EXTENSION");
       break;
     case CARPET:
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
@@ -851,12 +838,13 @@ editor (void)
 
     free_ext_str = false;
 
-    fg_str = get_confg_name (con (&p)->fg);
-    bg_str = get_conbg_name (con (&p)->bg);
+    f = fg (&p);
+    fg_str = get_confg_name (f);
+    bg_str = get_conbg_name (bg (&p));
 
     e = ext (&p);
 
-    switch (con (&p)->fg) {
+    switch (f) {
     case FLOOR: case BROKEN_FLOOR: case SKELETON_FLOOR:
     case STUCK_FLOOR: case HIDDEN_FLOOR: case PILLAR:
     case BIG_PILLAR_BOTTOM: case ARCH_BOTTOM:
@@ -915,7 +903,7 @@ editor (void)
     npos (&p, &p0);
     xasprintf (&str, "[%i,%i,%i,%i](%i,%i,%i)",
                global_level.n, p0.room, p0.floor, p0.place,
-               con (&p)->fg, con (&p)->bg, ext (&p));
+               fg (&p), bg (&p), ext (&p));
     draw_bottom_text (NULL, str, 0);
     al_free (str);
 
@@ -943,19 +931,19 @@ editor (void)
     case 'S':
       edit = EDIT_EVENT_SET;
       s = last_event;
-      bb = global_level.event[last_event].next;
+      bb = event (&global_level, last_event)->next;
       break;
     }
     break;
   case EDIT_EVENT2CON:
-    if (! is_valid_pos (&global_level.event[s].p)) {
+    if (! is_valid_pos (&event (&global_level, s)->p)) {
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       al_set_mouse_xy (display, 0, 0);
     } else {
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
-      set_mouse_pos (&global_level.event[s].p);
+      set_mouse_pos (&event (&global_level, s)->p);
     }
-    bb = global_level.event[s].next;
+    bb = event (&global_level, s)->next;
     switch (menu_int (&s, &bb, 0, EVENTS - 1, "ED>EVENT", "N")) {
     case -1: set_mouse_coord (&last_mouse_coord); edit = EDIT_EVENT; break;
     case 0: break;
@@ -1861,56 +1849,49 @@ exit_editor (void)
 }
 
 static char
-menu_step_ext (struct pos *p, int min, int max)
+menu_int_ext (struct pos *p, int steps, int fases,
+              char *prefix, char *b_str, char *undo_str)
 {
   set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
-  int r = ext (p);
-  char c = menu_int (&r, NULL, min, max, "CE>STEP", NULL);
+  r = typed_int (ext (p), steps, fases, NULL, &bb);
+  char c = menu_int (&r, &bb, 0, steps * fases - 1, prefix, b_str);
   if (! c) return c;
 
   if (c == -1 || c == 1) {
     edit = EDIT_CON; return c;
   }
 
-  enum changed_pos_reason reason;
+  if (c == ' ') r += steps;
 
-  switch (con (p)->fg) {
-  case SPIKES_FLOOR:
-    reason = CHPOS_SPIKES;
-    break;
-  case DOOR:
-    reason = CHPOS_OPEN_DOOR;
-    break;
-  case LEVEL_DOOR:
-    reason = CHPOS_OPEN_LEVEL_DOOR;
-    break;
-  default: assert (false); break;
-  }
+  enum changed_pos_reason reason = -1;
 
-  register_con_undo (&undo, p,
-                     MIGNORE, MIGNORE, r,
-                     true, true, false, true,
-                     reason, "STEP EXTENSION");
-
-  return c;
-}
-
-static char
-menu_event_ext (struct pos *p)
-{
-  set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
-  int r = ext (p);
-  char c = menu_int (&r, NULL, -EVENTS, EVENTS - 1, "CE>EVENT", NULL);
-  if (! c) return c;
-
-  if (c == -1 || c == 1) {
-    edit = EDIT_CON; return c;
-  }
+  /* switch (fg (p)) { */
+  /* case SPIKES_FLOOR: */
+  /*   reason = CHPOS_SPIKES; */
+  /*   break; */
+  /* case DOOR: */
+  /*   reason = CHPOS_OPEN_DOOR; */
+  /*   break; */
+  /* case LEVEL_DOOR: */
+  /*   reason = CHPOS_OPEN_LEVEL_DOOR; */
+  /*   break; */
+  /* case CHOPPER: */
+  /*   reason = CHPOS_CHOPPER; */
+  /*   break; */
+  /* case OPENER_FLOOR: */
+  /*   reason = CHPOS_BREAK_OPENER_FLOOR; */
+  /*   break; */
+  /* case CLOSER_FLOOR: */
+  /*   reason = CHPOS_BREAK_CLOSER_FLOOR; */
+  /*   break; */
+  /* default: assert (false); break; */
+  /* } */
 
   register_con_undo (&undo, p,
                      MIGNORE, MIGNORE, r,
                      true, true, false, true,
-                     CHPOS_NONE, "EVENT EXTENSION");
+                     reason, undo_str);
+
   return c;
 }
 

@@ -92,7 +92,7 @@ kid_resurrect (struct anim *k)
 void
 kid_die_spiked (struct anim *k)
 {
-  if (con (&k->p)->fg != SPIKES_FLOOR) {
+  if (fg (&k->p) != SPIKES_FLOOR) {
     kid_die_properly (k);
     return;
   }
@@ -106,7 +106,7 @@ kid_die_spiked (struct anim *k)
     k->splash = true;
     k->death_reason = SPIKES_DEATH;
 
-    assert (con (&k->p)->fg == SPIKES_FLOOR);
+    assert (fg (&k->p) == SPIKES_FLOOR);
     struct spikes_floor *s = spikes_floor_at_pos (&k->p);
     s->i = 4;
     s->state = 5;
@@ -133,7 +133,7 @@ kid_die_spiked (struct anim *k)
 void
 kid_die_chopped (struct anim *k)
 {
-  if (con (&k->p)->fg != CHOPPER) {
+  if (fg (&k->p) != CHOPPER) {
     kid_die_properly (k);
     return;
   }
@@ -157,8 +157,8 @@ kid_die_chopped (struct anim *k)
 void
 kid_die_suddenly (struct anim *k)
 {
-  if (con (&k->p)->fg == SPIKES_FLOOR
-      || con (&k->p)->fg == CHOPPER) {
+  enum confg f = fg (&k->p);
+  if (f == SPIKES_FLOOR || f == CHOPPER) {
     kid_die_properly (k);
     return;
   }
@@ -312,7 +312,7 @@ kill_kid_shadows (struct anim *k)
 void
 kid_die_properly (struct anim *k)
 {
-  switch (con (&k->p)->fg) {
+  switch (fg (&k->p)) {
   case SPIKES_FLOOR: kid_die_spiked (k); break;
   case CHOPPER: kid_die_chopped (k); break;
   default: kid_die_suddenly (k); break;

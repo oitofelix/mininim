@@ -195,7 +195,7 @@ physics_in (struct anim *k)
   survey (_tf, pos, &k->f, &tf, &ptf, NULL);
   if (k->i == 0
       && is_hangable_pos (prel (&ptf, &ptfb, 0, dir), k->f.dir)
-      && ! (con (&ptf)->fg == DOOR
+      && ! (fg (&ptf) == DOOR
             && k->f.dir == LEFT
             && tf.y <= door_grid_tip_y (&ptf) - 10)) {
     prel (&ptf, &k->hang_pos, 0, dir);
@@ -204,7 +204,7 @@ physics_in (struct anim *k)
     k->hang = true;
   } else if (k->i == 0 && can_hang (&k->f, false, &k->hang_pos)
              && ! is_hang_pos_critical (&k->hang_pos)
-             && (k->f.dir == LEFT || con (&k->hang_pos)->fg != DOOR)) {
+             && (k->f.dir == LEFT || fg (&k->hang_pos) != DOOR)) {
     k->fo.dx -= 0; k->hang = true;
   }
 
@@ -238,8 +238,10 @@ physics_out (struct anim *k)
 
   /* ceiling loose floor shaking and release */
   if (k->i == 12 && k->hit_ceiling) {
-    ctb = survey (_tb, pos, &k->f, NULL, &ptb, NULL)->fg;
-    ctf = survey (_tf, pos, &k->f, NULL, &ptf, NULL)->fg;
+    survey (_tb, pos, &k->f, NULL, &ptb, NULL);
+    ctb = fg (&ptb);
+    survey (_tf, pos, &k->f, NULL, &ptf, NULL);
+    ctf = fg (&ptf);
     shake_loose_floor_row (&ptb);
     if (ctb == LOOSE_FLOOR) release_loose_floor (&ptb);
     if (ctf == LOOSE_FLOOR) release_loose_floor (&ptf);

@@ -88,7 +88,7 @@ void
 draw_fire (ALLEGRO_BITMAP* bitmap, struct pos *p, enum vm vm)
 {
   struct coord c;
-  if (con (p)->bg != TORCH) return;
+  if (bg (p) != TORCH) return;
 
   ALLEGRO_BITMAP *fire =
     get_fire_frame (prandom_pos_uniq (p, anim_cycle, 1, 8), vm);

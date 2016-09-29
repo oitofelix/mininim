@@ -117,18 +117,19 @@ unload_closer_floor (void)
 void
 register_closer_floor (struct pos *p)
 {
-  assert (con (p)->fg == CLOSER_FLOOR
+  assert (fg (p) == CLOSER_FLOOR
           && closer_floor_at_pos (p) == NULL);
 
   struct closer_floor c;
 
-  int event = ext (p);
+  int n, f;
+  typed_int (ext (p), EVENTS, 2, &n, &f);
 
   c.p = *p;
-  c.event = (event < 0) ? -event - 1 : event;
-  c.pressed = (event < 0);
-  c.noise = (event < 0);
-  c.broken = (event < 0);
+  c.event = n;
+  c.pressed = f;
+  c.noise = f;
+  c.broken = f;
   c.unresponsive = false;
   c.priority = 0;
 
@@ -216,7 +217,7 @@ break_closer_floor (struct pos *p)
   close_door (c->p.l, c->event, anim_cycle);
   register_con_undo
     (&undo, p,
-     MIGNORE, MIGNORE, -c->event - 1,
+     MIGNORE, MIGNORE, c->event + EVENTS,
      false, false, false, false,
      CHPOS_BREAK_CLOSER_FLOOR,
      "LOOSE FLOOR BREAKING");

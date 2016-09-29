@@ -21,14 +21,33 @@
 
 bool coord_wa;
 
+int
+typed_int (int i, int n, int f, int *nr, int *nf)
+{
+  int u = abs (i);
+  int ut = ((u / n) % f) * n + u % n;
+  int t = (i >= 0 || ut == 0) ? ut : n * f - ut;
+
+  if (nr) *nr = t % n;
+  if (nf) *nf = (t / n) % f;
+
+  return t;
+}
+
+int
+room_val (int r)
+{
+  return typed_int (r, ROOMS, 1, NULL, NULL);
+}
+
 int *
 roomd_ptr (struct level *l, int room, enum dir dir)
 {
   switch (dir) {
-  case LEFT: return &l->link[room % ROOMS].l;
-  case RIGHT: return &l->link[room % ROOMS].r;
-  case ABOVE: return &l->link[room % ROOMS].a;
-  case BELOW: return &l->link[room % ROOMS].b;
+  case LEFT: return &l->link[room_val (room)].l;
+  case RIGHT: return &l->link[room_val (room)].r;
+  case ABOVE: return &l->link[room_val (room)].a;
+  case BELOW: return &l->link[room_val (room)].b;
   default: assert (false); return NULL;
   }
 }
@@ -36,13 +55,13 @@ roomd_ptr (struct level *l, int room, enum dir dir)
 int
 roomd (struct level *l, int room, enum dir dir)
 {
-  return *roomd_ptr (l, room, dir) % ROOMS;
+  return room_val (*roomd_ptr (l, room, dir));
 }
 
 void
 link_room (struct level *l, int room0, int room1, enum dir dir)
 {
-  if (room0) *roomd_ptr (l, room0, dir) = room1 % ROOMS;
+  if (room0) *roomd_ptr (l, room0, dir) = room_val (room1);
 }
 
 void
@@ -284,7 +303,7 @@ npos (struct pos *p, struct pos *np)
 
   bool m;
 
-  np->room %= ROOMS;
+  np->room = room_val (np->room);
 
   do {
     m = false;
@@ -1066,7 +1085,7 @@ _bb (struct frame *f, struct coord *c)
                d.y + d.h - 1);
 }
 
-struct con *
+void
 survey (coord_f cf, pos_f pf, struct frame *f,
         struct coord *c, struct pos *p, struct pos *np)
 {
@@ -1080,10 +1099,10 @@ survey (coord_f cf, pos_f pf, struct frame *f,
 
   if (! pf) pf = pos;
 
-  return con (npos (pf (cf (f, c), p), np));
+  npos (pf (cf (f, c), p), np);
 }
 
-struct con *
+void
 surveyo (coord_f cf, int dx, int dy, pos_f pf, struct frame *f,
          struct coord *c, struct pos *p, struct pos *np)
 {
@@ -1101,7 +1120,7 @@ surveyo (coord_f cf, int dx, int dy, pos_f pf, struct frame *f,
   c->x += dir * dx;
   c->y += dy;
 
-  return con (npos (pf (c, p), np));
+  npos (pf (c, p), np);
 }
 
 struct coord *

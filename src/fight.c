@@ -521,7 +521,7 @@ fight_crel (struct anim *k, int floor, int place)
 
   /* place sign indicates direction in relation to k orientation */
   int dir = (k->f.dir == LEFT) ? -1 : +1;
-  return crel (&pm, floor, dir * place)->fg;
+  return fg_rel (&pm, floor, dir * place);
 }
 
 int
@@ -741,14 +741,14 @@ opaque_cs (enum confg t)
 bool
 is_opaque_at_left (struct pos *p)
 {
-  enum confg t = con (p)->fg;
+  enum confg t = fg (p);
   return t == WALL || t == MIRROR;
 }
 
 bool
 is_opaque_at_right (struct pos *p)
 {
-  enum confg t = con (p)->fg;
+  enum confg t = fg (p);
   return t == WALL || t == CARPET || t == TCARPET;
 }
 
@@ -912,7 +912,7 @@ door_cs (enum confg t)
 bool
 is_safe_at_right (struct pos *p, struct frame *f)
 {
-  enum confg t = con (p)->fg;
+  enum confg t = fg (p);
 
   struct coord tf;
   _tf (f, &tf);
@@ -927,7 +927,7 @@ is_safe_at_right (struct pos *p, struct frame *f)
 bool
 is_safe_at_left (struct pos *p)
 {
-  enum confg t = con (p)->fg;
+  enum confg t = fg (p);
 
   return t != WALL && t != CHOPPER && t != MIRROR;
 }
@@ -971,7 +971,7 @@ is_safe_to_follow (struct anim *k0, struct anim *k1, enum dir dir)
     if (peqr (&k0->enemy_pos, &p0, +0, -1)) return true;
     prel (&p0, &pk, +0, -1);
     prel (&k0->enemy_pos, &pke, +0, +1);
-    if (con (&pk)->fg == DOOR
+    if (fg (&pk) == DOOR
         && tf.y <= door_grid_tip_y (&pk) - 10)
       return false;
   } else {
@@ -980,7 +980,7 @@ is_safe_to_follow (struct anim *k0, struct anim *k1, enum dir dir)
     if (peqr (&k0->enemy_pos, &p0, +0, +1)) return true;
     prel (&p0, &pk, +0, +1);
     prel (&k0->enemy_pos, &pke, +0, -1);
-    if (con (&p0)->fg == DOOR
+    if (fg (&p0) == DOOR
         && tf.y <= door_grid_tip_y (&p0) - 10)
       return false;
   }
@@ -988,7 +988,7 @@ is_safe_to_follow (struct anim *k0, struct anim *k1, enum dir dir)
   /* enemy went down */
   if (is_traversable (&k0->enemy_pos)) {
     prel (&k0->enemy_pos, &pke, +1, +0);
-    if (is_traversable (&pke) || con (&pke)->fg == SPIKES_FLOOR)
+    if (is_traversable (&pke) || fg (&pke) == SPIKES_FLOOR)
       return false;
     int d = (dir == LEFT) ? -1 : +1;
     if (peq (&pk, &k0->enemy_pos)) return true;
@@ -1134,9 +1134,9 @@ fight_hit (struct anim *k, struct anim *ke)
   prel (&k->p, &pb, 0, d);
 
   /* ensure anim doesn't die within a wall */
-  if (con (&k->p)->fg == WALL) {
-    if (crel (&k->p, +0, +1)->fg != WALL) k->p.place++;
-    else if (crel (&k->p, +0, -1)->fg != WALL) k->p.place--;
+  if (fg (&k->p) == WALL) {
+    if (fg_rel (&k->p, +0, +1) != WALL) k->p.place++;
+    else if (fg_rel (&k->p, +0, -1) != WALL) k->p.place--;
   }
 
   if (k->current_lives <= 0 && is_strictly_traversable (&pb)) {
@@ -1164,7 +1164,7 @@ fight_door_split_collision (struct anim *a)
   int dtl = dist_next_place (&a->f, _tl, pos, +0, a->f.dir == LEFT);
   int dtr = dist_next_place (&a->f, _tr, pos, +0, a->f.dir == RIGHT);
 
-  if (con (&ptl)->fg == DOOR
+  if (fg (&ptl) == DOOR
       && ptr.place > ptl.place
       && tl.y <= door_grid_tip_y (&ptl) - 10) {
     if (dtl < dtr) {

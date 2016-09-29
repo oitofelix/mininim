@@ -350,15 +350,15 @@ place_kid (struct anim *k, int room, int floor, int place)
   new_pos (&p, k->f.c.l, -1, -1, -1);
   for (p.room = room; p.room < ROOMS; p.room++)
     for (p.floor = floor; p.floor < FLOORS; p.floor++)
-      for (p.place = place; p.place < PLACES; p.place++)
-        if (con (&p)->fg == FLOOR
-            || con (&p)->fg == BROKEN_FLOOR
-            || con (&p)->fg == SKELETON_FLOOR
-            || con (&p)->fg == DOOR) goto end;
+      for (p.place = place; p.place < PLACES; p.place++) {
+        enum confg f = fg (&p);
+        if (f == FLOOR || f == BROKEN_FLOOR
+            || f == SKELETON_FLOOR || f == DOOR) goto end;
+      }
 
  end:
-  tl = crel (&p, 0, -1)->fg;
-  tr = crel (&p, 0, +1)->fg;
+  tl = fg_rel (&p, 0, -1);
+  tr = fg_rel (&p, 0, +1);
 
   if (k->f.dir == LEFT
       && tl == WALL
@@ -567,7 +567,7 @@ kid_door_split_collision (struct anim *k)
   int dptf = dist_next_place (&k->f, _tf, pos, +0, true);
 
   if (k->f.dir == RIGHT
-      && con (&ptb)->fg == DOOR
+      && fg (&ptb) == DOOR
       && tf.y <= door_grid_tip_y (&ptb) - 10
       && dntb >= 7 && dntb <= 16) {
     prel (&ptb, &k->ci.p, +0, +1);
@@ -576,7 +576,7 @@ kid_door_split_collision (struct anim *k)
   }
 
   if (k->f.dir == RIGHT
-      && con (&ptb)->fg == DOOR
+      && fg (&ptb) == DOOR
       && tf.y <= door_grid_tip_y (&ptb) - 10
       && dntb <= 6) {
     k->ci.p = ptb;
@@ -585,7 +585,7 @@ kid_door_split_collision (struct anim *k)
   }
 
   if (k->f.dir == LEFT
-      && con (&ptf)->fg == DOOR
+      && fg (&ptf) == DOOR
       && tf.y <= door_grid_tip_y (&ptf) - 10
       && dptf <= 11) {
     k->ci.p = ptf;
@@ -594,7 +594,7 @@ kid_door_split_collision (struct anim *k)
   }
 
   if (k->f.dir == LEFT
-      && con (&ptf)->fg == DOOR
+      && fg (&ptf) == DOOR
       && tf.y <= door_grid_tip_y (&ptf) - 10
       && dptf >= 12 && dptf <= 18) {
     prel (&ptf, &k->ci.p, +0, +1);

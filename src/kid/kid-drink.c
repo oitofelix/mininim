@@ -105,7 +105,7 @@ kid_drink (struct anim *k)
 static bool
 flow (struct anim *k)
 {
-  struct pos p;
+  struct pos p; new_pos (&p, &global_level, -1, -1, -1);
 
   if (k->oaction != kid_drink)
     k->i = -1, k->wait = 4, k->reverse = false;

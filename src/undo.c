@@ -117,16 +117,16 @@ ui_undo_pass (struct undo *u, int dir, char *prefix)
 
 void
 register_con_undo (struct undo *u, struct pos *p,
-                   enum confg fg, enum conbg bg, int ext,
+                   enum confg f, enum conbg b, int e,
                    bool should_destroy, bool should_register, bool should_prepare,
                    bool ignore_intermediate, enum changed_pos_reason reason,
                    char *desc)
 {
   struct con c;
 
-  c.fg = (fg != MIGNORE) ? fg : con (p)->fg;
-  c.bg = (bg != MIGNORE) ? bg : con (p)->bg;
-  c.ext = (ext != MIGNORE) ? ext : con (p)->ext;
+  c.fg = (f != MIGNORE) ? fg_val (f) : fg (p);
+  c.bg = (b != MIGNORE) ? bg_val (b) : bg (p);
+  c.ext = (e != MIGNORE) ? ext_val (c.fg, e) : ext (p);
 
   /* if (! memcmp (con (p), &c, sizeof (c))) return; */
 
@@ -303,12 +303,12 @@ void
 register_event_undo (struct undo *u, int e, struct pos *p, bool next,
                      char *desc)
 {
-  if (peq (&p->l->event[e].p, p)
-      && p->l->event[e].next == next) return;
+  struct level_event *le = event (p->l, e);
+  if (peq (&le->p, p) && le->next == next) return;
 
   struct event_undo *d = xmalloc (sizeof (struct event_undo));
   d->e = e;
-  d->b = p->l->event[e];
+  d->b = *event (p->l, e);
   d->f.p = *p;
   d->f.next = next;
   register_undo (u, d, (undo_f) event_undo, desc);
@@ -318,7 +318,7 @@ register_event_undo (struct undo *u, int e, struct pos *p, bool next,
 void
 event_undo (struct event_undo *d, int dir)
 {
-  d->f.p.l->event[d->e] = (dir >= 0) ? d->f : d->b;
+  *event (d->f.p.l, d->e) = (dir >= 0) ? d->f : d->b;
 }
 
 /*******************************/

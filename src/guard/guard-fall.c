@@ -303,7 +303,7 @@ physics_in (struct anim *g)
     survey (_mt, pos, &g->f, NULL, &pmt, NULL);
     g->p = pmt;
 
-    if (con (&pmt)->fg == SPIKES_FLOOR
+    if (fg (&pmt) == SPIKES_FLOOR
         && ! spikes_floor_at_pos (&pmt)->inactive)
       guard_die_spiked (g);
     else if (g->current_lives <= 0) {

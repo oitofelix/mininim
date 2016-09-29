@@ -333,7 +333,7 @@ init_spikes_floor (struct pos *p, struct spikes_floor *s)
 void
 register_spikes_floor (struct pos *p)
 {
-  assert (con (p)->fg == SPIKES_FLOOR
+  assert (fg (p) == SPIKES_FLOOR
           && spikes_floor_at_pos (p) == NULL);
 
   struct spikes_floor s;
