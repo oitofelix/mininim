@@ -19,15 +19,15 @@
 
 #include "mininim.h"
 
-void
+struct level *
 next_plv_level (struct level *l, int n)
 {
   if (n < 1) n = 14;
   else if (n > 14) n = 1;
-  load_plv_level (l, n);
+  return load_plv_level (l, n);
 }
 
-void
+struct level *
 load_plv_level (struct level *l, int n)
 {
   char *filename;
@@ -36,8 +36,10 @@ load_plv_level (struct level *l, int n)
   int8_t *plv =
     load_resource (filename, (load_resource_f) load_file);
 
-  if (! plv)
-    error (-1, 0, "cannot read plv level file %s", filename);
+  if (! plv) {
+    error (0, 0, "cannot read plv level file %s", filename);
+    return NULL;
+  }
 
   al_free (filename);
 
@@ -47,4 +49,5 @@ load_plv_level (struct level *l, int n)
   l->next_level = next_plv_level;
 
   al_free (plv);
+  return l;
 }

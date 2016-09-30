@@ -19,15 +19,15 @@
 
 #include "mininim.h"
 
-void
+struct level *
 next_native_level (struct level *l, int n)
 {
   if (n < 1) n = 14;
   else if (n > 14) n = 1;
-  load_native_level (l, n);
+  return load_native_level (l, n);
 }
 
-void
+struct level *
 load_native_level (struct level *l, int n)
 {
   char *filename;
@@ -36,8 +36,10 @@ load_native_level (struct level *l, int n)
   ALLEGRO_CONFIG *c =
     load_resource (filename, (load_resource_f) al_load_config_file);
 
-  if (! c)
-    error (-1, 0, "cannot read native level file %s", filename);
+  if (! c) {
+    error (0, 0, "cannot read native level file %s", filename);
+    return NULL;
+  }
 
   al_free (filename);
 
@@ -164,6 +166,8 @@ load_native_level (struct level *l, int n)
  end_con_loop:
 
   al_destroy_config (c);
+
+  return l;
 }
 
 bool

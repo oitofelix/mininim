@@ -37,7 +37,7 @@ struct legacy_level lv;
 static enum ltile get_tile (struct pos *p);
 static enum lgroup get_group (enum ltile t);
 
-static void load_legacy_level_file (int n);
+static struct legacy_level *load_legacy_level_file (int n);
 
 void
 legacy_level_start (void)
@@ -645,16 +645,16 @@ legacy_level_end (struct pos *p)
   }
 }
 
-void
+struct level *
 next_legacy_level (struct level *l, int n)
 {
   if (n < 1) n = 14;
   else if (n > 14) n = 1;
-  load_legacy_level_file (n);
-  interpret_legacy_level (l, n);
+  if (! load_legacy_level_file (n)) return NULL;
+  return interpret_legacy_level (l, n);
 }
 
-static void
+static struct legacy_level *
 load_legacy_level_file (int n)
 {
   char *filename;
@@ -663,15 +663,18 @@ load_legacy_level_file (int n)
   ALLEGRO_FILE *lvf =
     load_resource (filename, (load_resource_f) xfopen_r);
 
-  if (! lvf)
-    error (-1, 0, "cannot read legacy level file %s", filename);
+  if (! lvf) {
+    error (0, 0, "cannot read legacy level file %s", filename);
+    return NULL;
+  }
 
   al_fread (lvf, &lv, sizeof (lv));
   al_fclose (lvf);
   al_free (filename);
+  return &lv;
 }
 
-void
+struct level *
 interpret_legacy_level (struct level *l, int n)
 {
   struct pos p;
@@ -776,7 +779,7 @@ interpret_legacy_level (struct level *l, int n)
           set_bg (&p, TORCH); break;
         case LT_NULL: break;    /* needless */
         default:
-          error (-1, 0, "%s: unknown tile group (%i) at position (%i, %i, %i, %i)",
+          error (0, 0, "%s: unknown tile group (%i) at position (%i, %i, %i, %i)",
                  __func__, t, n, p.room, p.floor, p.place);
         }
 
@@ -925,7 +928,7 @@ interpret_legacy_level (struct level *l, int n)
         case LG_EVENT:
           set_ext (&p, b); break; /* ok */
         default:
-          error (-1, 0, "%s: unknown tile group (%i) at position (%i, %i, %i, %i)",
+          error (0, 0, "%s: unknown tile group (%i) at position (%i, %i, %i, %i)",
                  __func__, g, n, p.room, p.floor, p.place);
         }
       }
@@ -1003,6 +1006,8 @@ interpret_legacy_level (struct level *l, int n)
   case 12: case 13: l->hue = HUE_YELLOW; break;
   case 14: l->hue = HUE_BLUE; break;
   }
+
+  return l;
 }
 
 struct skill *
@@ -1163,7 +1168,7 @@ get_group (enum ltile t)
   case LT_EXIT_LEFT: case LT_EXIT_RIGHT: return LG_EXIT;
   case LT_DROP_BUTTON: case LT_RAISE_BUTTON: return LG_EVENT;
   default:
-    error (-1, 0, "%s: unknown tile (%i)", __func__, t);
+    error (0, 0, "%s: unknown tile (%i)", __func__, t);
   }
   return LG_NONE;
 }

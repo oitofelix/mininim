@@ -26,7 +26,7 @@ void
 init_mouse (void)
 {
   if (! al_install_mouse ())
-    error (-1, 0, "%s (void): cannot install mouse", __func__);
+    error (0, 0, "%s (void): cannot install mouse", __func__);
 }
 
 void
@@ -40,7 +40,7 @@ get_mouse_event_source (void)
 {
   ALLEGRO_EVENT_SOURCE *event_source = al_get_mouse_event_source ();
   if (! event_source)
-    error (-1, 0, "%s: failed to get mouse event source", __func__);
+    error (0, 0, "%s: failed to get mouse event source", __func__);
   return event_source;
 }
 

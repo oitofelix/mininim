@@ -25,7 +25,7 @@ create_config (void)
   ALLEGRO_CONFIG *config = al_create_config ();
 
   if (! config)
-    error (-1, 0, "%s (void): failed to create configuration",
+    error (0, 0, "%s (void): failed to create configuration",
            __func__);
 
   return config;
@@ -37,7 +37,7 @@ load_config_file (const char *filename)
   ALLEGRO_CONFIG *config = al_load_config_file (filename);
 
   if (! config)
-    error (-1, 0, "%s (%s): failed to load configuration file",
+    error (0, 0, "%s (%s): failed to load configuration file",
            __func__, filename);
 
   return config;
@@ -49,7 +49,7 @@ load_config_file_f (ALLEGRO_FILE *file)
   ALLEGRO_CONFIG *config = al_load_config_file_f (file);
 
   if (! config)
-    error (-1, 0, "%s (%p): failed to load configuration file",
+    error (0, 0, "%s (%p): failed to load configuration file",
            __func__, file);
 
   return config;
@@ -59,7 +59,7 @@ void
 save_config_file (const char *filename, const ALLEGRO_CONFIG *config)
 {
   if (! al_save_config_file (filename, config))
-    error (-1, 0, "%s (%s, %p): failed to save configuration file",
+    error (0, 0, "%s (%s, %p): failed to save configuration file",
            __func__, filename, config);
 }
 
@@ -67,7 +67,7 @@ void
 save_config_file_f (ALLEGRO_FILE *file, const ALLEGRO_CONFIG *config)
 {
   if (! al_save_config_file_f (file, config))
-    error (-1, 0, "%s (%p, %p): failed to save configuration file",
+    error (0, 0, "%s (%p, %p): failed to save configuration file",
            __func__, file, config);
 }
 
@@ -78,7 +78,7 @@ merge_config (const ALLEGRO_CONFIG *cfg1,
   ALLEGRO_CONFIG *config = al_merge_config (cfg1, cfg2);
 
   if (! config)
-    error (-1, 0, "%s (%p, %p): failed to merge configurations",
+    error (0, 0, "%s (%p, %p): failed to merge configurations",
            __func__, cfg1, cfg2);
 
   return config;

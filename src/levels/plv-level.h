@@ -20,7 +20,7 @@
 #ifndef MININIM_PLV_LEVEL_H
 #define MININIM_PLV_LEVEL_H
 
-void next_plv_level (struct level *l, int n);
-void load_plv_level (struct level *l, int n);
+struct level *next_plv_level (struct level *l, int n);
+struct level *load_plv_level (struct level *l, int n);
 
 #endif	/* MININIM_PLV_LEVEL_H */

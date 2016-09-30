@@ -186,7 +186,7 @@ struct level {
   void (*start) (void);
   void (*special_events) (void);
   void (*end) (struct pos *p);
-  void (*next_level) (struct level *l, int n);
+  struct level *(*next_level) (struct level *l, int n);
   void (*cutscene) (void);
   int n;
   int nominal_n;

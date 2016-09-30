@@ -362,7 +362,7 @@ void
 save_bitmap (char *filename, ALLEGRO_BITMAP *bitmap)
 {
   if (! al_save_bitmap (filename, bitmap))
-    error (-1, 0, "%s: cannot save bitmap file '%s'",
+    error (0, 0, "%s: cannot save bitmap file '%s'",
            __func__, filename);
 }
 
@@ -497,7 +497,7 @@ void
 get_display_mode (int index, ALLEGRO_DISPLAY_MODE *mode)
 {
   if (! al_get_display_mode (index, mode))
-    error (-1, 0, "%s (%i, %p): cannot get display mode", __func__, index, mode);
+    error (0, 0, "%s (%i, %p): cannot get display mode", __func__, index, mode);
 }
 
 void
@@ -643,9 +643,7 @@ show (void)
   case VIDEO_ROLL_RIGHT:
     draw_roll_right (screen, effect_buffer, video_effect.duration, effect_counter);
     break;
-  default:
-    error (-1, 0, "%s (void): unknown video effect type (%i)",
-           __func__, video_effect.type);
+  default: assert (false); break;
   }
 
   flip_display (effect_buffer);

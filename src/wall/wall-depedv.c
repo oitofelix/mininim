@@ -197,9 +197,7 @@ draw_wall_base_depedv (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case SWW: draw_sww_base (bitmap, p, em, vm); break;
   case WWS: draw_wws_base (bitmap, p, em, vm); break;
   case WWW: draw_www_base (bitmap, p, em, vm); break;
-  default:
-    error (-1, 0, "%s: unknown wall correlation (%i, %i. %i)",
-           __func__, p->room, p->floor, p->place);
+  default: assert (false); break;
   }
   draw_base_randomization (bitmap, p, em, vm);
 }
@@ -213,9 +211,7 @@ draw_wall_left_depedv (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case SWW: draw_sww_left (bitmap, p, em, vm); break;
   case WWS: draw_wws_left (bitmap, p, em, vm); break;
   case WWW: draw_www_left (bitmap, p, em, vm); break;
-  default:
-    error (-1, 0, "%s: unknown wall correlation (%i, %i. %i)",
-           __func__, p->room, p->floor, p->place);
+  default: assert (false); break;
   }
   draw_randomization (bitmap, p, em, vm);
 }
@@ -428,8 +424,7 @@ draw_randomization (ALLEGRO_BITMAP *bitmap, struct pos *p,
         draw_left_mark (bitmap, p, prandom (4), vm);
     }
     break;
-  default:
-    error (-1, 0, "%s: unknown wall correlation (%i)", __func__, wc);
+  default: assert (false); break;
   }
 
   unseedp ();
@@ -475,8 +470,7 @@ draw_base_randomization (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case SWS: break;
   case SWW: break;
   case WWS: draw_divider_00 (bitmap, p, em, vm); break;
-  default:
-    error (-1, 0, "%s: unknown wall correlation (%i)", __func__, wc);
+  default: assert (false); break;
   }
 
   unseedp ();

@@ -62,10 +62,10 @@ void
 init_gamepad (void)
 {
   if (! al_install_keyboard ())
-    error (-1, 0, "%s (void): cannot install keyboard", __func__);
+    error (0, 0, "%s (void): cannot install keyboard", __func__);
 
   if (! al_install_joystick ())
-    error (-1, 0, "%s (void): cannot install joystick", __func__);
+    error (0, 0, "%s (void): cannot install joystick", __func__);
 
   calibrate_joystick ();
 }
@@ -133,7 +133,7 @@ get_keyboard_event_source (void)
 {
   ALLEGRO_EVENT_SOURCE *event_source = al_get_keyboard_event_source ();
   if (! event_source)
-    error (-1, 0, "%s: failed to get keyboard event source", __func__);
+    error (0, 0, "%s: failed to get keyboard event source", __func__);
   return event_source;
 }
 
@@ -142,7 +142,7 @@ get_joystick_event_source (void)
 {
   ALLEGRO_EVENT_SOURCE *event_source = al_get_joystick_event_source ();
   if (! event_source)
-    error (-1, 0, "%s: failed to get joystick event source", __func__);
+    error (0, 0, "%s: failed to get joystick event source", __func__);
   return event_source;
 }
 

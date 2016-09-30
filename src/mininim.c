@@ -884,10 +884,7 @@ parser (int key, char *arg, struct argp_state *state)
     }
     break;
   case JOYSTICK_INFO_OPTION:
-    if (joystick_info ()) {
-      error (-1, 0, "Joystick not found");
-      exit (-1);
-    }
+    if (joystick_info ()) error (-1, 0, "Joystick not found");
     exit (0);
     break;
   case ARGP_KEY_ARG:
@@ -1179,7 +1176,8 @@ main (int _argc, char **_argv)
 
   give_dat_compat_preference ();
 
-  level_module_next_level (&vanilla_level, start_level);
+  if (! level_module_next_level (&vanilla_level, start_level))
+    exit (-1);
   play_level (&vanilla_level);
 
   if (quit_anim == RESTART_GAME) goto restart_game;
@@ -1502,24 +1500,24 @@ dist_cart (float x0, float y0, float x1, float y1)
   return sqrt (dx * dx + dy * dy);
 }
 
-void
+struct level *
 level_module_next_level (struct level *l, int n)
 {
   switch (level_module) {
   case NATIVE_LEVEL_MODULE: default:
-    next_native_level (l, n);
+    return next_native_level (l, n);
     break;
   case LEGACY_LEVEL_MODULE:
-    next_legacy_level (l, n);
+    return next_legacy_level (l, n);
     break;
   case PLV_LEVEL_MODULE:
-    next_plv_level (l, n);
+    return next_plv_level (l, n);
     break;
   case DAT_LEVEL_MODULE:
-    next_dat_level (l, n);
+    return next_dat_level (l, n);
     break;
   case CONSISTENCY_LEVEL_MODULE:
-    next_consistency_level (l, n);
+    return next_consistency_level (l, n);
     break;
   }
 }

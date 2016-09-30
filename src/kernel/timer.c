@@ -23,7 +23,7 @@ ALLEGRO_TIMER *
 create_timer (double speed_secs)
 {
   ALLEGRO_TIMER *timer =  al_create_timer (speed_secs);
-  if (! timer) error (-1, 0, "%s: failed to create timer (%f)", __func__, speed_secs);
+  if (! timer) error (0, 0, "%s: failed to create timer (%f)", __func__, speed_secs);
   return timer;
 }
 
@@ -32,6 +32,6 @@ get_timer_event_source (ALLEGRO_TIMER *timer)
 {
   ALLEGRO_EVENT_SOURCE *event_source = al_get_timer_event_source (timer);
   if (! event_source)
-    error (-1, 0, "%s: failed to get timer event source (%p)", __func__,  timer);
+    error (0, 0, "%s: failed to get timer event source (%p)", __func__,  timer);
   return event_source;
 }

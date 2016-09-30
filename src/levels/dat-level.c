@@ -19,15 +19,15 @@
 
 #include "mininim.h"
 
-void
+struct level *
 next_dat_level (struct level *l, int n)
 {
   if (n < 1) n = 14;
   else if (n > 14) n = 1;
-  load_dat_level (l, n);
+  return load_dat_level (l, n);
 }
 
-void
+struct level *
 load_dat_level (struct level *l, int n)
 {
   char *filename;
@@ -36,8 +36,10 @@ load_dat_level (struct level *l, int n)
   int8_t *dat =
     load_resource (filename, (load_resource_f) load_file);
 
-  if (! dat)
-    error (-1, 0, "cannot read dat level file %s", filename);
+  if (! dat) {
+    error (0, 0, "cannot read dat level file %s", filename);
+    return NULL;
+  }
 
   al_free (filename);
 
@@ -45,8 +47,10 @@ load_dat_level (struct level *l, int n)
   int16_t size;
   dat_getres (dat, 2000 + n, &offset, &size);
 
-  if (! offset)
-    error (-1, 0, "incorrect format for dat level file %s", filename);
+  if (! offset) {
+    error (0, 0, "incorrect format for dat level file %s", filename);
+    return NULL;
+  }
 
   memcpy (&lv, offset, sizeof (lv));
 
@@ -54,4 +58,5 @@ load_dat_level (struct level *l, int n)
   l->next_level = next_dat_level;
 
   al_free (dat);
+  return l;
 }

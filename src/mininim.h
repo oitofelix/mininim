@@ -175,7 +175,7 @@ unsigned char add_char (unsigned char a, signed char b);
 int int_to_range (int i, int min, int max);
 float dist_cart (float x0, float y0, float x1, float y1);
 void quit_game (void);
-void level_module_next_level (struct level *l, int n);
+struct level *level_module_next_level (struct level *l, int n);
 bool save_level (struct level *l);
 
 /* variables */

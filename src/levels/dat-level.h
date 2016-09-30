@@ -20,7 +20,7 @@
 #ifndef MININIM_DAT_LEVEL_H
 #define MININIM_DAT_LEVEL_H
 
-void next_dat_level (struct level *l, int n);
-void load_dat_level (struct level *l, int n);
+struct level *next_dat_level (struct level *l, int n);
+struct level *load_dat_level (struct level *l, int n);
 
 #endif	/* MININIM_DAT_LEVEL_H */

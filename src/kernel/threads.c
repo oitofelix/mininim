@@ -24,7 +24,7 @@ create_thread (thread_f thread_func, void *arg)
 {
   ALLEGRO_THREAD *thread = al_create_thread (thread_func, arg);
   if (! thread)
-    error (-1, 0, "%s (%p, %p): failed to create thread",
+    error (0, 0, "%s (%p, %p): failed to create thread",
            __func__, thread_func, arg);
   return thread;
 }
@@ -34,7 +34,7 @@ create_mutex (void)
 {
   ALLEGRO_MUTEX *mutex = al_create_mutex ();
   if (! mutex)
-    error (-1, 0, "%s (void): failed to create mutex",
+    error (0, 0, "%s (void): failed to create mutex",
            __func__);
   return mutex;
 }
@@ -44,7 +44,7 @@ create_mutex_recursive (void)
 {
   ALLEGRO_MUTEX *mutex = al_create_mutex_recursive ();
   if (! mutex)
-    error (-1, 0, "%s (void): failed to create recursive mutex",
+    error (0, 0, "%s (void): failed to create recursive mutex",
            __func__);
   return mutex;
 }
@@ -54,7 +54,7 @@ create_cond (void)
 {
   ALLEGRO_COND *cond = al_create_cond ();
   if (! cond)
-    error (-1, 0, "%s (void): failed to create condition variable",
+    error (0, 0, "%s (void): failed to create condition variable",
            __func__);
   return cond;
 }

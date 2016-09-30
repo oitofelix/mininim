@@ -54,7 +54,7 @@ xcalloc (size_t count, size_t n)
 
   void *ptr = al_calloc (count, n);
   if (! ptr)
-    error (-1, 0, "%s (%u, %u): cannot allocat memory", __func__,
+    error (-1, 0, "%s (%u, %u): cannot allocate memory", __func__,
            (unsigned int) count,
            (unsigned int) n);
   return ptr;

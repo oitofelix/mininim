@@ -23,7 +23,7 @@ void
 init_dialog (void)
 {
   if (! al_init_native_dialog_addon())
-    error (-1, 0, "%s (void): failed to initialize dialog addon",
+    error (0, 0, "%s (void): failed to initialize dialog addon",
            __func__);
 }
 
@@ -43,7 +43,7 @@ create_native_file_dialog (char const *initial_path,
     al_create_native_file_dialog (initial_path, title, patterns, mode);
 
   if (! dialog)
-    error (-1, 0, "%s (%s, %s, %s, %i): failed to create native file dialog",
+    error (0, 0, "%s (%s, %s, %s, %i): failed to create native file dialog",
            __func__, initial_path, title, patterns, mode);
 
   return dialog;
@@ -58,7 +58,7 @@ show_native_file_dialog (ALLEGRO_DISPLAY *display,
      al_show_native_file_dialog directly. */
 
   if (! al_show_native_file_dialog (display, dialog))
-    error (-1, 0, "%s (%p, %p): failed to show native file dialog",
+    error (0, 0, "%s (%p, %p): failed to show native file dialog",
            __func__, display, dialog);
 }
 
@@ -68,7 +68,7 @@ open_native_text_log (char const *title, int flags)
   ALLEGRO_TEXTLOG *textlog = al_open_native_text_log (title, flags);
 
   /* if (! textlog) */
-  /*   error (-1, 0, "%s (%s, %i): failed to open native text log dialog", */
+  /*   error (0, 0, "%s (%s, %i): failed to open native text log dialog", */
   /*          __func__, title, flags); */
 
   return textlog;
@@ -81,7 +81,7 @@ get_native_text_log_event_source (ALLEGRO_TEXTLOG *textlog)
     al_get_native_text_log_event_source (textlog);
 
   if (! event_source)
-    error (-1, 0, "%s (%p): failed to get native text log dialog event source",
+    error (0, 0, "%s (%p): failed to get native text log dialog event source",
            __func__, textlog);
 
   return event_source;

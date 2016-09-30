@@ -23,7 +23,7 @@ ALLEGRO_EVENT_QUEUE *
 create_event_queue (void)
 {
   ALLEGRO_EVENT_QUEUE *queue = al_create_event_queue ();
-  if (! queue) error (-1, 0, "%s: failed to create queue", __func__);
+  if (! queue) error (0, 0, "%s: failed to create queue", __func__);
   return queue;
 }
 
@@ -39,6 +39,6 @@ void
 emit_user_event (ALLEGRO_EVENT_SOURCE *src, ALLEGRO_EVENT *event)
 {
   if (! al_emit_user_event (src, event, NULL))
-    error (-1, 0, "%s (%p, %p): event source not registered with any queue",
+    error (0, 0, "%s (%p, %p): event source not registered with any queue",
             __func__, src, event);
 }

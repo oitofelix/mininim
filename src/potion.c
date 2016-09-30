@@ -144,8 +144,7 @@ get_bubble_frame (int i)
   case 4: return bubble_04;
   case 5: return bubble_05;
   case 6: return bubble_06;
-  default:
-    error (-1, 0, "%s (%i): unknown bubble frame", __func__, i);
+  default: assert (false); break;
   }
 
   return NULL;
@@ -219,9 +218,7 @@ draw_potion (ALLEGRO_BITMAP *bitmap, struct pos *p,
     big_potion_coord (p, &bottle_coord);
     big_potion_bubble_coord (p, &bubble_coord);
     break;
-  default:
-    error (-1, 0, "%s (%i): unknown potion type", __func__, item);
-    break;
+  default: assert (false); break;
   }
 
   palette life_palette = NULL, poison_palette = NULL,
@@ -257,9 +254,7 @@ draw_potion (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case FLOAT_POTION: bubble_palette = float_palette; break;
   case FLIP_POTION: bubble_palette = flip_palette; break;
   case ACTIVATION_POTION: bubble_palette = poison_palette; break;
-  default:
-    error (-1, 0, "%s (%i): unknown potion type", __func__, item);
-    break;
+  default: assert (false); break;
   }
 
   if (hgc) bottle = apply_palette (bottle, hgc_palette);

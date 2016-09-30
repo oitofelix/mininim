@@ -21,8 +21,8 @@
 #define MININIM_NATIVE_LEVEL_H
 
 /* functions */
-void next_native_level (struct level *l, int n);
-void load_native_level (struct level *l, int n);
+struct level *next_native_level (struct level *l, int n);
+struct level *load_native_level (struct level *l, int n);
 bool save_native_level (struct level *l, char *filename);
 char *get_confg_str (struct pos *p);
 char *get_conbg_str (struct pos *p);

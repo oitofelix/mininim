@@ -36,32 +36,33 @@ end (struct pos *p)
   quit_anim = NEXT_LEVEL;
 }
 
-void
-next_consistency_level (struct level *lv, int n)
+struct level *
+next_consistency_level (struct level *l, int n)
 {
   random_seed = n;
   /* random_seed = time (NULL); */
   /* printf ("LEVEL NUMBER: %u\n", random_seed); */
 
-  randomize_memory (lv, sizeof (*lv));
+  randomize_memory (l, sizeof (*l));
 
   size_t i;
-  random_pos (lv, &lv->start_pos);
+  random_pos (l, &l->start_pos);
   for (i = 0; i < EVENTS; i++)
-    random_pos (lv, &event (lv, i)->p);
+    random_pos (l, &event (l, i)->p);
   for (i = 0; i < GUARDS; i++)
-    random_pos (lv, &guard (lv, i)->p);
+    random_pos (l, &guard (l, i)->p);
 
-  /* for (i = 0; i < 2; i++) fix_level (lv); */
+  /* for (i = 0; i < 2; i++) fix_level (l); */
 
-  lv->n = n;
-  lv->nominal_n = n;
-  lv->start = start;
-  lv->special_events = NULL;
-  lv->end = end;
-  lv->next_level = next_consistency_level;
-  lv->cutscene = NULL;
+  l->n = n;
+  l->nominal_n = n;
+  l->start = start;
+  l->special_events = NULL;
+  l->end = end;
+  l->next_level = next_consistency_level;
+  l->cutscene = NULL;
 
-  lv->em = DUNGEON;
-  lv->hue = HUE_NONE;
+  l->em = DUNGEON;
+  l->hue = HUE_NONE;
+  return l;
 }

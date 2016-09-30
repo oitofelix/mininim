@@ -21,6 +21,6 @@
 #define MININIM_CONSISTENCY_LEVEL_H
 
 /* functions */
-void next_consistency_level (struct level *l, int n);
+struct level *next_consistency_level (struct level *l, int n);
 
 #endif	/* MININIM_CONSISTENCY_LEVEL_H */

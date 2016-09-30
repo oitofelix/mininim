@@ -178,9 +178,7 @@ draw_wall_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case SWW: break;
   case WWS: draw_wall_face (bitmap, p, em, vm); break;
   case WWW: break;
-  default:
-    error (-1, 0, "%s: unknown wall correlation (%i, %i. %i)",
-           __func__, p->room, p->floor, p->place);
+  default: assert (false); break;
   }
 }
 
@@ -193,9 +191,7 @@ draw_wall_top (ALLEGRO_BITMAP *bitmap, struct pos *p,
   case SWW: break;
   case WWS: draw_wall_face_top (bitmap, p, em, vm); break;
   case WWW: break;
-  default:
-    error (-1, 0, "%s: unknown wall correlation (%i, %i. %i)",
-           __func__, p->room, p->floor, p->place);
+  default: assert (false); break;
   }
 }
 
