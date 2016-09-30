@@ -260,7 +260,7 @@ get_sample (ALLEGRO_SAMPLE *sample, uint64_t anim_cycle,
   for (i = 0; i < audio_sample_nmemb; i++) {
     struct audio_sample *as = &audio_sample[i];
     if ((! sample || as->sample == sample)
-        && (anim_cycle == 0 || abs (anim_cycle - as->anim_cycle) < 3)
+        && (anim_cycle == 0 || abs (anim_cycle - as->anim_cycle) < 2)
         && (! p || peq (p, &as->p))
         && (anim_id < 0 || anim_id == as->anim_id))
       return as;
