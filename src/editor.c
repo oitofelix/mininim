@@ -642,8 +642,11 @@ editor (void)
       edit = EDIT_CON; break;
     }
 
+    if (c == '#') {
+      edit = EDIT_NUMERICAL_BG; break;
+    }
+
     switch (c) {
-    case '#': edit = EDIT_NUMERICAL_BG; break;
     case 'N': b = NO_BRICKS; break;
     case 'G': b = NO_BG; break;
     case '0': b = BRICKS_00; break;

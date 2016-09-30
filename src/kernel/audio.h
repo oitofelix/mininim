@@ -33,12 +33,13 @@ int compare_samples (const void *s0, const void *s1);
 struct audio_sample *get_audio_sample (ALLEGRO_SAMPLE_INSTANCE *si);
 double get_sample_position (ALLEGRO_SAMPLE_INSTANCE *si);
 bool is_playing_sample_instance (struct ALLEGRO_SAMPLE_INSTANCE *si);
-ALLEGRO_SAMPLE_INSTANCE *is_playing_sample (struct ALLEGRO_SAMPLE *s);
+struct audio_sample *is_playing_sample (struct ALLEGRO_SAMPLE *s);
 void remove_sample (struct audio_sample *s);
 void clear_played_samples (void);
 void adjust_samples_volume (void);
 float get_adjusted_sample_volume (struct audio_sample *as);
-struct audio_sample *get_sample (ALLEGRO_SAMPLE *sample, struct pos *p, int anim_id);
+struct audio_sample *get_sample (ALLEGRO_SAMPLE *sample, uint64_t anim_cycle,
+                                 struct pos *p, int anim_id);
 void stop_sample (ALLEGRO_SAMPLE *sample, struct pos *p, int id);
 void stop_all_samples (void);
 bool is_instance_of_sample (ALLEGRO_SAMPLE_INSTANCE *si,

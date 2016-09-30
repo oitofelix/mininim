@@ -172,7 +172,7 @@ physics_in (struct anim *k)
     else kid_couch_collision (k);
     return false;
   } else if (cross_mirror) {
-    if (! get_sample (mirror_sample, NULL, k->id))
+    if (! get_sample (mirror_sample, 0, NULL, k->id))
       play_sample (mirror_sample, NULL, k->id);
     struct pos p; prel (&k->ci.p, &p, +0, k->f.dir == LEFT
                         ? +1 : +0);

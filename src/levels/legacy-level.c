@@ -474,7 +474,8 @@ legacy_level_special_events (void)
       /* make the shadow disappear when the kid is dead */
       struct audio_sample *as;
       if (k->current_lives <= 0
-          && (as = get_sample (success_suspense_sample, NULL, k->id))
+          && (as = get_sample (success_suspense_sample,
+                               0, NULL, k->id))
           && get_sample_position (as->instance) >= 3.3
           && ! ks->invisible) {
         mr.flicker = 8;
@@ -529,7 +530,7 @@ legacy_level_special_events (void)
       /* if the shadow and the kid has merged, one overlaps each other
          making them glow intermittently */
     } else if (shadow_merged
-               && (as = get_sample (success_sample, NULL, k->id))
+               && (as = get_sample (success_sample, 0, NULL, k->id))
                && is_playing_sample_instance (as->instance))
       k->shadow = (anim_cycle % 2);
     /* after the success music has finished to play, the kid goes
@@ -579,7 +580,7 @@ legacy_level_special_events (void)
 
       /* put the vizier in vigilance */
       struct audio_sample *as;
-      if ((as = get_sample (meet_vizier_sample, NULL, k->id))
+      if ((as = get_sample (meet_vizier_sample, 0, NULL, k->id))
           && get_sample_position (as->instance) >= 2.2)
         v->fight = true;
 

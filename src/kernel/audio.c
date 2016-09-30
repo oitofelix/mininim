@@ -94,15 +94,9 @@ get_default_mixer (void)
 ALLEGRO_SAMPLE_INSTANCE *
 play_sample (ALLEGRO_SAMPLE *sample, struct pos *p, int anim_id)
 {
-  /* do nothing if the same sample has been played with less than a
-     drawing cycle of difference in the same pos by the same animation
-     id */
-  /* struct audio_sample *asp; */
-  /* asp = get_sample (sample, p, anim_id); */
-  /* if (asp && asp->anim_cycle == anim_cycle) */
-  /*   return asp->instance; */
-  ALLEGRO_SAMPLE_INSTANCE *si = is_playing_sample (sample);
-  if (si) return si;
+  /* do nothing if the same sample has been played */
+  struct audio_sample *asp = get_sample (sample, anim_cycle, NULL, -1);
+  if (asp) return asp->instance;
 
   struct audio_sample as;
   as.played = false;
@@ -192,7 +186,7 @@ is_playing_sample_instance (struct ALLEGRO_SAMPLE_INSTANCE *si)
   else return false;
 }
 
-ALLEGRO_SAMPLE_INSTANCE *
+struct audio_sample *
 is_playing_sample (struct ALLEGRO_SAMPLE *s)
 {
   size_t i;
@@ -200,7 +194,7 @@ is_playing_sample (struct ALLEGRO_SAMPLE *s)
     struct audio_sample *as = &audio_sample[i];
     if (s == as->sample
         && is_playing_sample_instance (as->instance))
-      return as->instance;
+      return as;
   }
   return NULL;
 }
@@ -259,12 +253,14 @@ stop_all_samples (void)
 }
 
 struct audio_sample *
-get_sample (ALLEGRO_SAMPLE *sample, struct pos *p, int anim_id)
+get_sample (ALLEGRO_SAMPLE *sample, uint64_t anim_cycle,
+            struct pos *p, int anim_id)
 {
   size_t i;
   for (i = 0; i < audio_sample_nmemb; i++) {
     struct audio_sample *as = &audio_sample[i];
     if ((! sample || as->sample == sample)
+        && (anim_cycle == 0 || abs (anim_cycle - as->anim_cycle) < 3)
         && (! p || peq (p, &as->p))
         && (anim_id < 0 || anim_id == as->anim_id))
       return as;
@@ -275,7 +271,7 @@ get_sample (ALLEGRO_SAMPLE *sample, struct pos *p, int anim_id)
 void
 stop_sample (ALLEGRO_SAMPLE *sample, struct pos *p, int anim_id)
 {
-  struct audio_sample *as = get_sample (sample, p, anim_id);
+  struct audio_sample *as = get_sample (sample, 0, p, anim_id);
   if (as) remove_sample (as);
 }
 

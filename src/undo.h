@@ -28,7 +28,7 @@ void ui_undo_pass (struct undo *u, int dir, char *prefix);
 
 /* CON */
 void register_con_undo (struct undo *u, struct pos *p,
-                        enum confg f, enum conbg b, int e,
+                        int f, int b, int e,
                         bool destroy, bool register, bool prepare,
                         bool ignore_intermediate, enum changed_pos_reason reason,
                         char *desc);
