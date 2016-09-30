@@ -115,7 +115,8 @@ physics_in (struct anim *k)
   survey (_bf, pos, &k->f, NULL, &pbf, NULL);
   survey (_bb, pos, &k->f, NULL, &pbb, NULL);
 
-  if (k->oaction == kid_jump && k->j == 10) {
+  if (k->oaction == kid_jump
+      && (k->j == 10 || k->j == 11)) {
     k->fo.dx = -4;
     k->fo.dy = +8;
   } else if (k->oaction == kid_run_jump && k->j == 10) {

@@ -175,7 +175,6 @@ static bool
 physics_in (struct anim *k)
 {
   struct pos pbb, pmbo, pbf;
-  struct frame nf;
 
   /* inertia */
   if (k->i >= 8 && k->i <= 10) k->inertia = 5;
@@ -189,16 +188,14 @@ physics_in (struct anim *k)
   }
 
   /* fall */
-  next_frame (&k->f, &nf, &k->fo);
-  survey (_bb, pos, &nf, NULL, &pbb, NULL);
-  survey (_mbo, pos, &nf, NULL, &pmbo, NULL);
-  survey (_bf, pos, &nf, NULL, &pbf, NULL);
+  survey (_bb, pos, &k->f, NULL, &pbb, NULL);
+  survey (_mbo, pos, &k->f, NULL, &pmbo, NULL);
+  survey (_bf, pos, &k->f, NULL, &pbf, NULL);
   if ((is_strictly_traversable (&pbb)
-       && is_strictly_traversable (&pmbo) && k->i < 7)
-      || (k->i >= 10 && k->i < 13
-          && is_strictly_traversable (&pbf)
-          && is_strictly_traversable (&pmbo))
-      || (k->i >= 13 && is_strictly_traversable (&pmbo))) {
+       && is_strictly_traversable (&pmbo) && k->i <= 6)
+      || (is_strictly_traversable (&pbf)
+          && is_strictly_traversable (&pmbo)
+          && k->i >= 10)) {
     kid_fall (k);
     return false;
   }
