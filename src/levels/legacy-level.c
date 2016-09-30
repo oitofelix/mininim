@@ -760,7 +760,7 @@ interpret_legacy_level (struct level *l, int n)
           set_ext (&p, SWORD); break;
         case LT_BALCONY_LEFT:
           set_fg (&p, FLOOR);
-          set_ext (&p, NO_BRICKS); break;
+          set_bg (&p, NO_BRICKS); break;
         case LT_BALCONY_RIGHT: set_fg (&p, FLOOR);
           set_bg (&p, BALCONY); break;
         case LT_LATTICE_PILLAR: set_fg (&p, ARCH_BOTTOM); break;
