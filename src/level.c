@@ -48,8 +48,38 @@ copy_level (struct level *ld, struct level *ls)
   *ld = *ls;
   ld->start_pos.l = ld;
   for (i = 0; i < EVENTS; i++) event (ld, i)->p.l = ld;
-  for (i = 0; i < GUARDS; i++) ld->guard[i].p.l = ld;
+  for (i = 0; i < GUARDS; i++) guard (ld, i)->p.l = ld;
   return ld;
+}
+
+struct level *
+normalize_level (struct level *l)
+{
+  size_t i;
+
+  fix_room_0 (l);
+  fix_room_above_zero_with_traversable_at_bottom (l);
+
+  if (l->start_dir != LEFT && l->start_dir != RIGHT)
+    l->start_dir = LEFT;
+  l->start_pos.l = l;
+  npos (&l->start_pos, &l->start_pos);
+
+  for (i = 0; i < EVENTS; i++) {
+    struct level_event *e = event (l, i);
+    e->p.l = l;
+    npos (&e->p, &e->p);
+  }
+
+  for (i = 0; i < GUARDS; i++) {
+    struct guard *g = guard (l, i);
+    g->p.l = l;
+    if (g->dir != LEFT && g->dir != RIGHT)
+      g->dir = LEFT;
+    g->style = typed_int (g->style, 8, 1, NULL, NULL);
+    npos (&g->p, &g->p);
+  }
+  return l;
 }
 
 bool
@@ -68,10 +98,10 @@ skill_eq (struct skill *s0, struct skill *s1)
 bool
 room_linking_eq (struct room_linking *rl0, struct room_linking *rl1)
 {
-  return rl0->l == rl1->l
-    && rl0->r == rl1->r
-    && rl0->a == rl1->a
-    && rl0->b == rl1->b;
+  return room_val (rl0->l) == room_val (rl1->l)
+    && room_val (rl0->r) == room_val (rl1->r)
+    && room_val (rl0->a) == room_val (rl1->a)
+    && room_val (rl0->b) == room_val (rl1->b);
 }
 
 bool
@@ -117,7 +147,7 @@ level_eq (struct level *l0, struct level *l1)
 
   size_t i;
   for (i = 0; i < ROOMS; i++)
-    if (! room_linking_eq (&l0->link[i], &l1->link[i]))
+    if (! room_linking_eq (llink (l0, i), llink (l1, i)))
       return false;
 
   for (i = 0; i < EVENTS; i++)
@@ -125,7 +155,7 @@ level_eq (struct level *l0, struct level *l1)
       return false;
 
   for (i = 0; i < GUARDS; i++)
-    if (! guard_eq (&l0->guard[i], &l1->guard[i]))
+    if (! guard_eq (guard (l0, i), guard (l1, i)))
       return false;
 
   struct pos p;
@@ -162,8 +192,7 @@ play_level (struct level *lv)
   copy_level (&global_level, lv);
   if (mirror_level) mirror_level_h (&global_level, false, false, false, false);
 
-  fix_room_0 (&global_level);
-  fix_room_above_zero_with_traversable_at_bottom (&global_level);
+  normalize_level (&global_level);
 
   register_cons ();
   register_anims ();
@@ -372,16 +401,16 @@ register_anims (void)
   /* create guards */
   int i;
   for (i = 0; i < GUARDS; i++) {
-    struct guard *g = &global_level.guard[i];
+    struct guard *g = guard (&global_level, i);
     struct anim *a;
     int id;
     switch (g->type) {
-    case NO_ANIM: default: continue;
+    case NO_ANIM: continue;
     case KID:
       id = create_anim (NULL, KID, &g->p, g->dir);
       anima[id].shadow = true;
       break;
-    case GUARD:
+    case GUARD: default:
       id = create_anim (NULL, GUARD, &g->p, g->dir);
       break;
     case FAT_GUARD:

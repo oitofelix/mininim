@@ -54,5 +54,6 @@ void make_link_globally_unique (struct level *l, int room, enum dir dir);
 void make_semi_consistent_link (struct level *l, int room0, int room1, enum dir dir);
 void make_link_adjacency_bound (struct level *l, int room, enum dir dir);
 void exchange_rooms  (struct level *l, int room0, int room1);
+void circular_linking (struct level *lv);
 
 #endif	/* MININIM_CONSISTENCY_H */

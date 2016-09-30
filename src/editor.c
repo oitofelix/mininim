@@ -1556,7 +1556,7 @@ editor (void)
     al_free (str);
     break;
   case EDIT_GUARD:
-    g = &global_level.guard[guard_index];
+    g = guard (&global_level, guard_index);
     set_system_mouse_cursor (is_guard_by_type (g->type)
                              ? ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT
                              : ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
@@ -1660,7 +1660,7 @@ editor (void)
     break;
   case EDIT_GUARD_SKILL:
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
-    g = &global_level.guard[guard_index];
+    g = guard (&global_level, guard_index);
     xasprintf (&str, "G%iK>", guard_index);
     c = menu_enum (skill_menu, str);
     if (! c) break;
@@ -1696,7 +1696,7 @@ editor (void)
     break;
   case EDIT_SKILL_LEGACY_TEMPLATES:
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
-    g = &global_level.guard[guard_index];
+    g = guard (&global_level, guard_index);
     xasprintf (&str, "G%iKL>L.SKILL", guard_index);
     c = menu_int (&s, NULL, 0, 11, str, NULL);
     if (! c) break;
@@ -1763,7 +1763,7 @@ editor (void)
     break;
   case EDIT_GUARD_TYPE:
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
-    g = &global_level.guard[guard_index];
+    g = guard (&global_level, guard_index);
     if (! is_guard_by_type (g->type)
         && g->p.room == 0 && g->p.floor == 0 && g->p.place == 0)
       invalid_pos (&g->p);
@@ -1800,7 +1800,7 @@ editor (void)
     break;
   case EDIT_GUARD_STYLE:
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
-    g = &global_level.guard[guard_index];
+    g = guard (&global_level, guard_index);
     xasprintf (&str, "G%iY>STYLE", guard_index);
     switch (menu_int (&g->style, NULL, 0, 7, str, NULL)) {
     case -1: edit = EDIT_GUARD; g->style = bb; break;
@@ -1961,7 +1961,7 @@ menu_link (enum dir dir)
 static void
 mouse2guard (int i)
 {
-  struct guard *g = &global_level.guard[i];
+  struct guard *g = guard (&global_level, i);
   if (is_guard_by_type (g->type)
       && is_valid_pos (&g->p)) {
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);

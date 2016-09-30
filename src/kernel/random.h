@@ -33,5 +33,6 @@ void seedp (struct pos *p);
 void unseedp (void);
 int prandom_seq (uint32_t seed, int n, int p, int max);
 int prandom_seq_pos (struct pos *p, int n, int pr, int max);
+void *randomize_memory (void *_ptr, size_t size);
 
 #endif	/* MININIM_RANDOM_H */

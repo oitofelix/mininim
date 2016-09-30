@@ -190,6 +190,18 @@ event (struct level *l, int e)
   return &l->event[typed_int (e, EVENTS, 1, NULL, NULL)];
 }
 
+struct guard *
+guard (struct level *l, int g)
+{
+  return &l->guard[typed_int (g, GUARDS, 1, NULL, NULL)];
+}
+
+struct room_linking *
+llink (struct level *l, int r)
+{
+  return &l->link[room_val (r)];
+}
+
 bool
 strictly_traversable_cs (enum confg t)
 {
@@ -493,14 +505,14 @@ exchange_guard_pos (struct pos *p0, struct pos *p1, bool invert_dir)
   if (peq (p0, p1)) return;
   int i;
   for (i = 0; i < GUARDS; i++)
-    if (peq (&p0->l->guard[i].p, p0)) {
-      p1->l->guard[i].p = *p1;
+    if (peq (&guard (p0->l, i)->p, p0)) {
+      guard (p1->l, i)->p = *p1;
       if (invert_dir)
-        p1->l->guard[i].dir = (p1->l->guard[i].dir == LEFT) ? RIGHT : LEFT;
-    } else if (peq (&p1->l->guard[i].p, p1)) {
-      p0->l->guard[i].p = *p0;
+        guard (p1->l, i)->dir = (guard (p1->l, i)->dir == LEFT) ? RIGHT : LEFT;
+    } else if (peq (&guard (p1->l, i)->p, p1)) {
+      guard (p0->l, i)->p = *p0;
       if (invert_dir)
-        p0->l->guard[i].dir = (p0->l->guard[i].dir == LEFT) ? RIGHT : LEFT;
+        guard (p0->l, i)->dir = (guard (p0->l, i)->dir == LEFT) ? RIGHT : LEFT;
     }
 }
 

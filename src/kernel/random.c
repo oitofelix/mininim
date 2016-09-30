@@ -130,3 +130,12 @@ prandom_seq_pos (struct pos *p, int n, int pr, int max)
   return prandom_seq (np.room + np.floor * PLACES + np.place,
                       n, pr, max);
 }
+
+void *
+randomize_memory (void *_ptr, size_t size)
+{
+  uint8_t *ptr = _ptr; size_t i;
+  for (i = 0; i < size; i++)
+    ptr[i] = prandom (UINT8_MAX);
+  return _ptr;
+}

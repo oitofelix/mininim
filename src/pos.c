@@ -24,9 +24,8 @@ bool coord_wa;
 int
 typed_int (int i, int n, int f, int *nr, int *nf)
 {
-  int u = abs (i);
-  int ut = ((u / n) % f) * n + u % n;
-  int t = (i >= 0 || ut == 0) ? ut : n * f - ut;
+  int u = abs (i) % (n * f);
+  int t = (i >= 0 || u == 0) ? u : n * f - u;
 
   if (nr) *nr = t % n;
   if (nf) *nf = (t / n) % f;
@@ -44,10 +43,10 @@ int *
 roomd_ptr (struct level *l, int room, enum dir dir)
 {
   switch (dir) {
-  case LEFT: return &l->link[room_val (room)].l;
-  case RIGHT: return &l->link[room_val (room)].r;
-  case ABOVE: return &l->link[room_val (room)].a;
-  case BELOW: return &l->link[room_val (room)].b;
+  case LEFT: return &llink (l, room)->l;
+  case RIGHT: return &llink (l, room)->r;
+  case ABOVE: return &llink (l, room)->a;
+  case BELOW: return &llink (l, room)->b;
   default: assert (false); return NULL;
   }
 }
@@ -197,7 +196,7 @@ is_valid_coord (struct coord *c)
 struct coord *
 ncoord (struct coord *c, struct coord *nc)
 {
-  assert (is_valid_coord (c));
+  /* assert (is_valid_coord (c)); */
 
   if (nc != c) *nc = *c;
 
@@ -297,7 +296,7 @@ is_valid_pos (struct pos *p)
 struct pos *
 npos (struct pos *p, struct pos *np)
 {
-  assert (is_valid_pos (p));
+  /* assert (is_valid_pos (p)); */
 
   if (np != p) *np = *p;
 
@@ -734,7 +733,7 @@ reflect_pos_v (struct pos *p0, struct pos *p1)
 struct pos *
 random_pos (struct level *l, struct pos *p)
 {
-  return new_pos (p, l, prandom (ROOMS - 1), prandom (FLOORS - 1),
+  return new_pos (p, l, prandom (ROOMS - 2) + 1, prandom (FLOORS - 1),
                   prandom (PLACES - 1));
 }
 

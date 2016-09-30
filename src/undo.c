@@ -506,7 +506,7 @@ toggle_has_sword_undo (struct start_pos_undo *d, int dir)
 void
 register_guard_start_pos_undo (struct undo *u, int i, struct pos *p, char *desc)
 {
-  struct guard *g = &p->l->guard[i];
+  struct guard *g = guard (p->l, i);
   if (peq (p, &g->p)) return;
 
   struct guard_start_pos_undo *d = xmalloc (sizeof (* d));
@@ -521,7 +521,7 @@ void
 guard_start_pos_undo (struct guard_start_pos_undo *d, int dir)
 {
   struct pos p = (dir >= 0) ? d->f : d->b;
-  p.l->guard[d->i].p = p;
+  guard (p.l, d->i)->p = p;
 }
 
 /********************************/
@@ -540,7 +540,8 @@ register_toggle_guard_start_dir_undo (struct undo *u, int i, char *desc)
 void
 toggle_guard_start_dir_undo (int *d, int dir)
 {
-  global_level.guard[*d].dir = (global_level.guard[*d].dir == LEFT) ? RIGHT : LEFT;
+  guard (&global_level, *d)->dir =
+    (guard (&global_level, *d)->dir == LEFT) ? RIGHT : LEFT;
 }
 
 /***************/
@@ -550,7 +551,7 @@ toggle_guard_start_dir_undo (int *d, int dir)
 void
 register_guard_skill_undo (struct undo *u, int i, struct skill *s, char *desc)
 {
-  struct guard *g = &global_level.guard[i];
+  struct guard *g = guard (&global_level, i);
   if (! memcmp (s, &g->skill, sizeof (* s))) return;
 
   struct guard_skill_undo *d = xmalloc (sizeof (* d));
@@ -564,7 +565,7 @@ register_guard_skill_undo (struct undo *u, int i, struct skill *s, char *desc)
 void
 guard_skill_undo (struct guard_skill_undo *d, int dir)
 {
-  struct guard *g = &global_level.guard[d->i];
+  struct guard *g = guard (&global_level, d->i);
   g->skill = (dir >= 0) ? d->f_skill : d->b_skill;
   struct anim *a = get_guard_anim_by_level_id (d->i);
   if (a) a->skill = g->skill;
@@ -577,7 +578,7 @@ guard_skill_undo (struct guard_skill_undo *d, int dir)
 void
 register_guard_lives_undo (struct undo *u, int i, int l, char *desc)
 {
-  struct guard *g = &global_level.guard[i];
+  struct guard *g = guard (&global_level, i);
   if (g->total_lives == l) return;
 
   struct indexed_int_undo *d = xmalloc (sizeof (* d));
@@ -591,7 +592,7 @@ register_guard_lives_undo (struct undo *u, int i, int l, char *desc)
 void
 guard_lives_undo (struct indexed_int_undo *d, int dir)
 {
-  struct guard *g = &global_level.guard[d->i];
+  struct guard *g = guard (&global_level, d->i);
   g->total_lives = (dir >= 0) ? d->f : d->b;
 }
 
@@ -602,7 +603,7 @@ guard_lives_undo (struct indexed_int_undo *d, int dir)
 void
 register_guard_type_undo (struct undo *u, int i, enum anim_type t, char *desc)
 {
-  struct guard *g = &global_level.guard[i];
+  struct guard *g = guard (&global_level, i);
   if (g->type == t) return;
 
   struct indexed_int_undo *d = xmalloc (sizeof (* d));
@@ -616,7 +617,7 @@ register_guard_type_undo (struct undo *u, int i, enum anim_type t, char *desc)
 void
 guard_type_undo (struct indexed_int_undo *d, int dir)
 {
-  struct guard *g = &global_level.guard[d->i];
+  struct guard *g = guard (&global_level, d->i);
   g->type = (dir >= 0) ? d->f : d->b;
 }
 
@@ -627,7 +628,7 @@ guard_type_undo (struct indexed_int_undo *d, int dir)
 void
 register_guard_style_undo (struct undo *u, int i, int s, char *desc)
 {
-  struct guard *g = &global_level.guard[i];
+  struct guard *g = guard (&global_level, i);
   if (g->style == s) return;
 
   struct indexed_int_undo *d = xmalloc (sizeof (* d));
@@ -641,7 +642,7 @@ register_guard_style_undo (struct undo *u, int i, int s, char *desc)
 void
 guard_style_undo (struct indexed_int_undo *d, int dir)
 {
-  struct guard *g = &global_level.guard[d->i];
+  struct guard *g = guard (&global_level, d->i);
   g->style = (dir >= 0) ? d->f : d->b;
 }
 

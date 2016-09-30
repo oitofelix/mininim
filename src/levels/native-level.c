@@ -88,7 +88,7 @@ load_native_level (struct level *l, int n)
 
   /* GUARDS */
   for (i = 0;; i++) {
-    struct guard *g = &l->guard[i];
+    struct guard *g = guard (l, i);
 
     /* GUARD TYPE AND STYLE */
     /* GiT=t s */
@@ -127,7 +127,7 @@ load_native_level (struct level *l, int n)
   /* LINKS */
   for (i = 1;; i++) {
     /* Li=l r a b */
-    struct room_linking *r = &l->link[i];
+    struct room_linking *r = llink (l, i);
     xasprintf (&k, "L%i", i);
     v = al_get_config_value (c, NULL, k);
     al_free (k);
@@ -198,7 +198,7 @@ save_native_level (struct level *l, char *filename)
 
   /* GUARDS */
   for (i = 0; i < GUARDS; i++) {
-    struct guard *g = &l->guard[i];
+    struct guard *g = guard (l, i);
 
     /* GUARD TYPE AND STYLE */
     /* GiT=t s */
@@ -233,7 +233,7 @@ save_native_level (struct level *l, char *filename)
   /* LINKS */
   for (i = 1; i < ROOMS; i++) {
     /* Li=l r a b */
-    struct room_linking *r = &l->link[i];
+    struct room_linking *r = llink (l, i);
     xasprintf (&k, "L%i", i);
     xasprintf (&v, "%i %i %i %i", r->l, r->r, r->a, r->b);
     al_set_config_value (c, NULL, k, v);

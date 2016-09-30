@@ -51,6 +51,8 @@ int set_ext_rel (struct pos *p, int floor,
                  int place, int e);
 
 struct level_event *event (struct level *l, int e);
+struct guard *guard (struct level *l, int g);
+struct room_linking *llink (struct level *l, int r);
 
 bool is_strictly_traversable (struct pos *p);
 bool is_traversable (struct pos *p);

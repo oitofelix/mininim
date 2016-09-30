@@ -375,7 +375,8 @@ open_door (struct level *l, int e, uint64_t priority, bool stay_open)
       activate_con (p);
       break;
     }
-  } while (event (l, e++)->next);
+  } while (event (l, e++)->next
+           && e < EVENTS);
 }
 
 void
@@ -409,7 +410,8 @@ close_door (struct level *l, int e, uint64_t priority)
       activate_con (p);
       break;
     }
-  } while (event (l, e++)->next);
+  } while (event (l, e++)->next
+           && e < EVENTS);
 }
 
 int

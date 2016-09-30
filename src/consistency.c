@@ -253,14 +253,14 @@ fix_partial_big_pillar (struct pos *p)
 void
 make_links_locally_consistent (struct level *l, int prev_room, int current_room)
 {
-  if (roomd (l, prev_room, LEFT) == current_room)
-    l->link[current_room].r = prev_room;
+  if (roomd (l, prev_room, LEFT) == room_val (current_room))
+    llink (l, current_room)->r = room_val (prev_room);
   else if (roomd (l, prev_room, RIGHT) == current_room)
-    l->link[current_room].l = prev_room;
+    llink (l, current_room)->l = room_val (prev_room);
   else if (roomd (l, prev_room, ABOVE) == current_room)
-    l->link[current_room].b = prev_room;
+    llink (l, current_room)->b = room_val (prev_room);
   else if (roomd (l, prev_room, BELOW) == current_room)
-    l->link[current_room].a = prev_room;
+    llink (l, current_room)->a = room_val (prev_room);
 }
 
 bool
@@ -461,4 +461,113 @@ exchange_rooms  (struct level *l, int room0, int room1)
   if (r0a != room1 && r0ab == room0) link_room (l, r0a, room1, BELOW);
   link_room (l, room1, r0b == room1 ? room0 : r0b, BELOW);
   if (r0b != room1 && r0ba == room0) link_room (l, r0b, room1, ABOVE);
+}
+
+void
+circular_linking (struct level *lv)
+{
+  int room, a, b, l, r, al, bl, ar, br, la, ra, lb, rb;
+
+  llink (lv, 1)->l = 2;
+  llink (lv, 2)->r = 1;
+
+  struct pos p; new_pos (&p, lv, -1, -1, -1);
+  for (p.room = 3; p.room < ROOMS; p.room++) {
+    for (room = 1; room < ROOMS; room++) {
+      if (p.room == room) continue;
+
+      if (! llink (lv, room)->l) {
+        llink (lv, room)->l = p.room;
+        llink (lv, p.room)->r = room;
+
+        a = llink (lv, room)->a;
+        if (a) {
+          al = llink (lv, a)->l;
+          if (al) {
+            llink (lv, p.room)->a = al;
+            llink (lv, al)->b = p.room;
+          }
+        }
+
+        b = llink (lv, room)->b;
+        if (b) {
+          bl = llink (lv, b)->l;
+          if (bl) {
+            llink (lv, p.room)->b = bl;
+            llink (lv, bl)->a = p.room;
+          }
+        }
+
+        break;
+      } else if (! llink (lv, room)->r) {
+        llink (lv, room)->r = p.room;
+        llink (lv, p.room)->l = room;
+
+        a = llink (lv, room)->a;
+        if (a) {
+          ar = llink (lv, a)->r;
+          if (ar) {
+            llink (lv, p.room)->a = ar;
+            llink (lv, ar)->b = p.room;
+          }
+        }
+
+        b = llink (lv, room)->b;
+        if (b) {
+          br = llink (lv, b)->r;
+          if (br) {
+            llink (lv, p.room)->b = br;
+            llink (lv, br)->a = p.room;
+          }
+        }
+
+        break;
+      } else if (! llink (lv, room)->a) {
+        llink (lv, room)->a = p.room;
+        llink (lv, p.room)->b = room;
+
+        l = llink (lv, room)->l;
+        if (l) {
+          la = llink (lv, l)->a;
+          if (la) {
+            llink (lv, p.room)->l = la;
+            llink (lv, la)->r = p.room;
+          }
+        }
+
+        r = llink (lv, room)->r;
+        if (r) {
+          ra = llink (lv, r)->a;
+          if (ra) {
+            llink (lv, p.room)->r = ra;
+            llink (lv, ra)->l = p.room;
+          }
+        }
+        break;
+      } else if (! llink (lv, room)->b) {
+        llink (lv, room)->b = p.room;
+        llink (lv, p.room)->a = room;
+
+        l = llink (lv, room)->l;
+        if (l) {
+          lb = llink (lv, l)->b;
+          if (lb) {
+            llink (lv, p.room)->l = lb;
+            llink (lv, lb)->r = p.room;
+          }
+        }
+
+        r = llink (lv, room)->r;
+        if (r) {
+          rb = llink (lv, r)->b;
+          if (rb) {
+            llink (lv, p.room)->r = rb;
+            llink (lv, rb)->l = p.room;
+          }
+        }
+
+        break;
+      }
+    }
+  }
 }

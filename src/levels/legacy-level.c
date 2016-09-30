@@ -954,7 +954,7 @@ interpret_legacy_level (struct level *l, int n)
 
   /* GUARD LOCATION, DIRECTION, SKILL and COLOR: ok */
   for (i = 0; i < LROOMS; i++) {
-    struct guard *g = &l->guard[(i + 1) % GUARDS];
+    struct guard *g = guard (l, i + 1);
 
     if (lv.guard_location[i] > 29) {
       g->type = NO_ANIM;

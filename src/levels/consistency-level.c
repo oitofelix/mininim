@@ -39,141 +39,29 @@ end (struct pos *p)
 void
 next_consistency_level (struct level *lv, int n)
 {
-  int i;
-  struct pos p;
-
   random_seed = n;
   /* random_seed = time (NULL); */
   /* printf ("LEVEL NUMBER: %u\n", random_seed); */
 
-  memset (lv, 0, sizeof (*lv));
+  randomize_memory (lv, sizeof (*lv));
 
-  new_pos (&p, lv, -1, -1, -1);
-  for (p.room = 1; p.room < ROOMS; p.room++) {
-    lv->link[p.room].l = 0;
-    lv->link[p.room].r = 0;
-    lv->link[p.room].a = 0;
-    lv->link[p.room].b = 0;
+  size_t i;
+  random_pos (lv, &lv->start_pos);
+  for (i = 0; i < EVENTS; i++)
+    random_pos (lv, &event (lv, i)->p);
+  for (i = 0; i < GUARDS; i++)
+    random_pos (lv, &guard (lv, i)->p);
 
-    for (p.floor = 0; p.floor < FLOORS; p.floor++)
-      for (p.place = 0; p.place < PLACES; p.place++) {
-        struct con *c = &lv->con[p.room][p.floor][p.place];
-        c->fg = prandom_max ();
-        c->bg = prandom_max ();
-        c->ext = prandom_max ();
-      }
-  }
-
-  int room, a, b, l, r, al, bl, ar, br, la, ra, lb, rb;
-
-  lv->link[1].l = 2;
-  lv->link[2].r = 1;
-
-  for (p.room = 3; p.room < ROOMS; p.room++) {
-    for (room = 1; room < ROOMS; room++) {
-      if (p.room == room) continue;
-
-      if (! lv->link[room].l) {
-        lv->link[room].l = p.room;
-        lv->link[p.room].r = room;
-
-        a = lv->link[room].a;
-        if (a) {
-          al = lv->link[a].l;
-          if (al) {
-            lv->link[p.room].a = al;
-            lv->link[al].b = p.room;
-          }
-        }
-
-        b = lv->link[room].b;
-        if (b) {
-          bl = lv->link[b].l;
-          if (bl) {
-            lv->link[p.room].b = bl;
-            lv->link[bl].a = p.room;
-          }
-        }
-
-        break;
-      } else if (! lv->link[room].r) {
-        lv->link[room].r = p.room;
-        lv->link[p.room].l = room;
-
-        a = lv->link[room].a;
-        if (a) {
-          ar = lv->link[a].r;
-          if (ar) {
-            lv->link[p.room].a = ar;
-            lv->link[ar].b = p.room;
-          }
-        }
-
-        b = lv->link[room].b;
-        if (b) {
-          br = lv->link[b].r;
-          if (br) {
-            lv->link[p.room].b = br;
-            lv->link[br].a = p.room;
-          }
-        }
-
-        break;
-      } else if (! lv->link[room].a) {
-        lv->link[room].a = p.room;
-        lv->link[p.room].b = room;
-
-        l = lv->link[room].l;
-        if (l) {
-          la = lv->link[l].a;
-          if (la) {
-            lv->link[p.room].l = la;
-            lv->link[la].r = p.room;
-          }
-        }
-
-        r = lv->link[room].r;
-        if (r) {
-          ra = lv->link[r].a;
-          if (ra) {
-            lv->link[p.room].r = ra;
-            lv->link[ra].l = p.room;
-          }
-        }
-        break;
-      } else if (! lv->link[room].b) {
-        lv->link[room].b = p.room;
-        lv->link[p.room].a = room;
-
-        l = lv->link[room].l;
-        if (l) {
-          lb = lv->link[l].b;
-          if (lb) {
-            lv->link[p.room].l = lb;
-            lv->link[lb].r = p.room;
-          }
-        }
-
-        r = lv->link[room].r;
-        if (r) {
-          rb = lv->link[r].b;
-          if (rb) {
-            lv->link[p.room].r = rb;
-            lv->link[rb].l = p.room;
-          }
-        }
-
-        break;
-      }
-    }
-  }
-
-  for (i = 0; i < 2; i++) fix_level (lv);
+  /* for (i = 0; i < 2; i++) fix_level (lv); */
 
   lv->n = n;
   lv->nominal_n = n;
   lv->start = start;
-  lv->next_level = next_consistency_level;
+  lv->special_events = NULL;
   lv->end = end;
-  new_pos (&lv->start_pos, lv, 1, 0, 0);
+  lv->next_level = next_consistency_level;
+  lv->cutscene = NULL;
+
+  lv->em = DUNGEON;
+  lv->hue = HUE_NONE;
 }

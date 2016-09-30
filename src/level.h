@@ -33,6 +33,8 @@ extern bool ignore_level_cutscene;
 void load_level (void);
 void unload_level (void);
 struct level *copy_level (struct level *ld, struct level *ls);
+struct level *normalize_level (struct level *l);
+
 void replace_playing_level (struct level *l);
 void play_level (struct level *level);
 void register_con_at_pos (struct pos *p);

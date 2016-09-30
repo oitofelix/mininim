@@ -97,10 +97,12 @@ play_sample (ALLEGRO_SAMPLE *sample, struct pos *p, int anim_id)
   /* do nothing if the same sample has been played with less than a
      drawing cycle of difference in the same pos by the same animation
      id */
-  struct audio_sample *asp;
-  asp = get_sample (sample, p, anim_id);
-  if (asp && asp->anim_cycle == anim_cycle)
-    return asp->instance;
+  /* struct audio_sample *asp; */
+  /* asp = get_sample (sample, p, anim_id); */
+  /* if (asp && asp->anim_cycle == anim_cycle) */
+  /*   return asp->instance; */
+  ALLEGRO_SAMPLE_INSTANCE *si = is_playing_sample (sample);
+  if (si) return si;
 
   struct audio_sample as;
   as.played = false;
@@ -190,16 +192,17 @@ is_playing_sample_instance (struct ALLEGRO_SAMPLE_INSTANCE *si)
   else return false;
 }
 
-bool
+ALLEGRO_SAMPLE_INSTANCE *
 is_playing_sample (struct ALLEGRO_SAMPLE *s)
 {
   size_t i;
   for (i = 0; i < audio_sample_nmemb; i++) {
     struct audio_sample *as = &audio_sample[i];
     if (s == as->sample
-        && is_playing_sample_instance (as->instance)) return true;
+        && is_playing_sample_instance (as->instance))
+      return as->instance;
   }
-  return false;
+  return NULL;
 }
 
 void
