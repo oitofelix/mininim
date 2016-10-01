@@ -409,7 +409,7 @@ compute_loose_floor_release (struct loose_floor *l)
                        "LOOSE FLOOR RELEASE");
     l->state = 2;
     l->i = 0;
-    l->f.id = &l->f;
+    l->f.parent.frame = &l->f;
     l->action = FALL_LOOSE_FLOOR;
     l->resist = LOOSE_FLOOR_RESISTENCE;
     l->f.b = get_correct_falling_loose_floor_bitmap (l->f.b);
@@ -530,7 +530,8 @@ compute_loose_floor_fall (struct loose_floor *l)
       } else if (a->type == KID) {
         a->hit_by_loose_floor = true;
         play_sample (hit_wall_sample, NULL, a->id);
-        kid_couch (a);
+        a->action = kid_couch;
+        a->i = -1;
       }
     }
   }

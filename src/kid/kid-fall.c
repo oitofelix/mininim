@@ -132,7 +132,8 @@ physics_in (struct anim *k)
              && k->oaction != kid_normal
              && k->oaction != kid_hang_free
              && k->oaction != kid_hang_wall
-             && k->oaction != kid_climb) {
+             && k->oaction != kid_climb
+             && k->oaction != kid_couch) {
     place_kid_in_initial_fall (k);
     k->inertia = 0;
   }

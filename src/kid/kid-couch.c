@@ -201,10 +201,10 @@ flow (struct anim *k)
   if (k->i != 2 || (! k->key.down && k->wait-- <= 0))
     k->i++;
 
-  if (k->i == 1 && k->wait > 0 &&
-      ((k->fall == true && k->hurt)
-       || k->hit_by_loose_floor))
-    k->i = 2;
+  /* if (k->i == 1 && k->wait > 0 && */
+  /*     (/\* (k->fall && k->hurt) || *\/ */
+  /*      k->hit_by_loose_floor)) */
+  /*   k->i = 2; */
 
   select_frame (k, kid_couch_frameset, k->i);
 

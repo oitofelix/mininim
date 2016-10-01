@@ -57,6 +57,7 @@ flow (struct anim *k)
   survey (_bf, pos, &k->f, NULL, &pbf, NULL);
 
   k->collision = false;
+  k->hit_by_loose_floor = false;
 
   bool turn = ((k->f.dir == RIGHT) && k->key.left)
     || ((k->f.dir == LEFT) && k->key.right);
