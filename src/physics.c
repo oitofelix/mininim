@@ -77,7 +77,7 @@ ext_val (int f, int e)
   case TCARPET:
     return typed_int (e, CARPET_DESIGNS, 1, NULL, NULL);
 
-  default: return e;
+  default: return 0;
   }
 }
 

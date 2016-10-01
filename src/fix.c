@@ -37,7 +37,7 @@ fix_con (struct pos *p)
     set_fg (p, FLOOR);
 
   /* con at left of non-visible collidable con at left -> wall */
-  if (np.place == 9 && f != WALL && fr == WALL)
+  if (np.place == PLACES - 1 && f != WALL && fr == WALL)
     set_fg (p, WALL);
 
   return p;
