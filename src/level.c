@@ -58,7 +58,7 @@ normalize_level (struct level *l)
   size_t i;
 
   fix_room_0 (l);
-  fix_room_above_zero_with_traversable_at_bottom (l);
+  fix_traversable_above_room_0 (l);
 
   if (l->start_dir != LEFT && l->start_dir != RIGHT)
     l->start_dir = LEFT;

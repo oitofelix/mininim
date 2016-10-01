@@ -300,7 +300,7 @@ was_menu_key_pressed (void)
   case 'U': case 'V': case 'W': case 'X': case 'Y': case 'Z':
   case '?': case '-': case '_': case '+': case '=': case '\\':
   case ' ': case '/': case ',': case '.': case '<': case '>':
-  case '#':
+  case '#': case '!':
     return true;
   }
 

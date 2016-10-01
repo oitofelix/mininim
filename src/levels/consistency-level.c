@@ -52,8 +52,6 @@ next_consistency_level (struct level *l, int n)
   for (i = 0; i < GUARDS; i++)
     random_pos (l, &guard (l, i)->p);
 
-  /* for (i = 0; i < 2; i++) fix_level (l); */
-
   l->n = n;
   l->nominal_n = n;
   l->start = start;

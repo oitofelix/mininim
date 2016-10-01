@@ -24,6 +24,7 @@ void register_undo (struct undo *u, void *data, undo_f f, char *desc);
 void free_undo (struct undo *u);
 bool can_undo (struct undo *u, int dir);
 bool undo_pass (struct undo *u, int dir, char **desc);
+void end_undo_set (struct undo *u, char *desc);
 void ui_undo_pass (struct undo *u, int dir, char *prefix);
 
 /* CON */

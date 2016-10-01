@@ -27,9 +27,14 @@ struct con *crel (struct pos *p, int floor, int place);
 enum conbg bg_val (int b);
 enum confg fg_val (int f);
 int ext_val (int f, int e);
-struct con *con_val (struct con *c, int f, int b, int e);
-struct con *random_con (struct con *c);
+struct pos *clear_con (struct pos *p);
+struct pos *random_con (struct pos *p);
+struct pos *decorate_con (struct pos *p);
 struct pos *set_con (struct pos *p, int f, int b, int e);
+struct pos * apply_to_pos (struct pos *p, pos_trans f, char *desc);
+struct level *apply_to_room (struct level *l, int room,
+                             struct pos * (*f) (struct pos *),
+                             char *desc);
 
 enum conbg bg (struct pos *p);
 enum confg fg (struct pos *p);
@@ -87,11 +92,7 @@ void exchange_anim_pos (struct pos *p0, struct pos *p1, bool invert_dir);
 void invert_con_dir (struct pos *p);
 void mirror_pos (struct pos *p0, struct pos *p1, bool destroy, bool register_con,
                  bool prepare, bool register_change, bool invert_dir);
-struct pos *decorate_pos (struct pos *p);
-struct level *decorate_room (struct level *l, int room, char *desc);
 enum con_diff con_diff (struct con *c0, struct con *c1);
-struct level *clear_room (struct level *l, int room, char *desc);
-struct level *randomize_room (struct level *l, int room, char *desc);
 struct level *mirror_room_h (struct level *l, int room, bool destroy,
                              bool register_con, bool prepare, bool register_change);
 struct level *mirror_level_h (struct level *l, bool destroy, bool register_con,

@@ -1,5 +1,5 @@
 /*
-  consistency.h -- consistency module;
+  fix.h -- fix module;
 
   Copyright (C) 2015, 2016 Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
 
@@ -17,33 +17,26 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MININIM_CONSISTENCY_H
-#define MININIM_CONSISTENCY_H
+#ifndef MININIM_FIX_H
+#define MININIM_FIX_H
 
-void fix_level (struct level *l);
+struct pos *fix_con (struct pos *p);
+
+/* -------------------------------------- */
+
 void make_links_locally_consistent (struct level *l, int prev_room, int current_room);
 void fix_room_0 (struct level *l);
-void fix_room_above_zero_with_traversable_at_bottom (struct level *l);
+void fix_traversable_above_room_0 (struct level *l);
 
-void fix_single_walls_at_place_0 (struct pos *p);
-void fix_inaccessible_enclosure (struct pos *p);
-void fix_loose_enclosure (struct pos *p);
-void fix_rigid_con_no_floor_top (struct pos *p);
-void fix_door_adjacent_to_wall_or_door (struct pos *p);
-void fix_broken_floor_lacking_no_floor_on_top (struct pos *p);
-void fix_skeleton_or_spikes_floor_with_no_or_loose_floor_at_left (struct pos *p);
-void fix_adjacent_itens (struct pos *p);
-void fix_door_lacking_opener (struct pos *p);
-void fix_opener_or_closer_lacking_door (struct pos *p);
-void fix_confg_which_should_not_have_conbg (struct pos *p);
-void fix_partial_big_pillar (struct pos *p);
-
-void fix_enclosure (struct pos *p, enum dir dir);
+struct pos *fix_door_adjacent_to_wall_or_door (struct pos *p);
+struct pos *fix_skeleton_or_spikes_floor_with_no_or_loose_floor_at_left (struct pos *p);
+struct pos *fix_adjacent_itens (struct pos *p);
+struct pos *fix_door_lacking_opener (struct pos *p);
+struct pos *fix_opener_or_closer_lacking_door (struct pos *p);
+struct pos *fix_confg_which_should_not_have_conbg (struct pos *p);
+struct pos *fix_partial_big_pillar (struct pos *p);
 
 bool is_there_event_handler (struct level *l, int e);
-bool is_enclosure (struct pos *p, bool (*pred) (struct pos *p), enum dir dir);
-bool is_inaccessible (struct pos *p);
-bool is_loose (struct pos *p);
 
 
 
@@ -56,4 +49,4 @@ void make_link_adjacency_bound (struct level *l, int room, enum dir dir);
 void exchange_rooms  (struct level *l, int room0, int room1);
 void circular_linking (struct level *lv);
 
-#endif	/* MININIM_CONSISTENCY_H */
+#endif	/* MININIM_FIX_H */

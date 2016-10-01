@@ -73,7 +73,7 @@
 #include "chopper.h"
 #include "clock.h"
 #include "closer-floor.h"
-#include "consistency.h"
+#include "fix.h"
 #include "cutscenes.h"
 #include "door.h"
 #include "fight.h"

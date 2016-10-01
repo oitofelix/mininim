@@ -87,6 +87,12 @@ undo_pass (struct undo *u, int dir, char **desc)
 }
 
 void
+end_undo_set (struct undo *u, char *desc)
+{
+  u->pass[u->current].desc = desc;
+}
+
+void
 ui_undo_pass (struct undo *u, int dir, char *prefix)
 {
   char *text;

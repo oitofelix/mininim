@@ -426,6 +426,7 @@ typedef struct pos *(*pos_f) (struct coord *, struct pos *);
 typedef struct coord *(*pos2coord_f) (struct pos *, struct coord *);
 typedef bool (*pos_pred) (struct pos *, void *);
 typedef bool (*int_pred) (int, void *);
+typedef struct pos * (*pos_trans) (struct pos *);
 
 struct room_dist {
   int dist;

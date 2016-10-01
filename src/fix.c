@@ -1,5 +1,5 @@
 /*
-  consistency.c -- consistency module;
+  fix.c -- fix module;
 
   Copyright (C) 2015, 2016 Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
 
@@ -19,96 +19,36 @@
 
 #include "mininim.h"
 
-void
-fix_level (struct level *l)
-{
-  struct pos p; new_pos (&p, l, -1, -1, -1);
-  for (p.room = 0; p.room < ROOMS; p.room++)
-    for (p.floor = 0; p.floor < FLOORS; p.floor++)
-      for (p.place = 0; p.place < PLACES; p.place++) {
-        fix_door_lacking_opener (&p);
-        fix_opener_or_closer_lacking_door (&p);
-        fix_single_walls_at_place_0 (&p);
-        fix_inaccessible_enclosure (&p);
-        fix_loose_enclosure (&p);
-        fix_rigid_con_no_floor_top (&p);
-        fix_door_adjacent_to_wall_or_door (&p);
-        fix_broken_floor_lacking_no_floor_on_top (&p);
-        fix_skeleton_or_spikes_floor_with_no_or_loose_floor_at_left (&p);
-        fix_adjacent_itens (&p);
-        fix_confg_which_should_not_have_conbg (&p);
-        fix_partial_big_pillar (&p);
-      }
-}
-
-/* Important: the corrections bellow are all made for two perspectives
-   (but just one when symmetrical), because we don't assume levels
-   have consistent linking (if room A is at left from room B's
-   perspective, it doesn't imply room B is necessarily at right from
-   room A's perspective).  If this wasn't the case, we would get an
-   inconsistent behavior, because the correction algorithms would only
-   work from the perspective of the corrected room, and not
-   necessairly from any other adjacent rooms.  Summarizing: without
-   consistent linking the space is relative, and we shoud account for
-   this. */
-
-/* consistency: wall can't be single at place 0, otherwise the kid
-   disappears from view behind it, or him might view room 0, what may
-   lead to several problems, room on-demand local linking consistent
-   resolution being one example */
-void
-fix_single_walls_at_place_0 (struct pos *p)
+struct pos *
+fix_con (struct pos *p)
 {
   enum confg f = fg (p);
-  enum confg fl = fg_rel (p, 0, -1);
   enum confg fr = fg_rel (p, 0, +1);
-
+  enum confg fb = fg_rel (p, -1, 0);
   struct pos np; npos (p, &np);
-
-  /* wall's perspective */
-  if (np.place == 0 && f == WALL && fl != WALL)
-    set_fg_rel (p, 0, -1, WALL);
-
-  /* wall left's perspective */
-  if (np.place == 9 && f != WALL && fr == WALL)
-    set_fg (p, WALL);
-}
-
-/* consistency: walls should delimit accessible places or walls */
-void
-fix_inaccessible_enclosure (struct pos *p)
-{
-  if (is_enclosure (p, is_inaccessible, LEFT)) fix_enclosure (p, LEFT);
-  if (is_enclosure (p, is_inaccessible, RIGHT)) fix_enclosure (p, RIGHT);
-}
-
-/* consistency: walls delimiting only loose floors are not valid */
-void
-fix_loose_enclosure (struct pos *p)
-{
-  if (is_enclosure (p, is_loose, LEFT)) fix_enclosure (p, LEFT);
-  if (is_enclosure (p, is_loose, RIGHT)) fix_enclosure (p, RIGHT);
-}
-
-/* consistency: rigid constructions (pillar, big pillar, wall, door, chopper) must
-   have something non-traversable lying on it */
-void
-fix_rigid_con_no_floor_top (struct pos *p)
-{
-  struct pos pa; prel (p, &pa, -1, 0);
-
-  /* rigid construction's perspective */
-  if (is_rigid_con (p) && is_traversable (&pa))
-    set_fg (&pa, FLOOR);
-
-  /* traversable's perspective */
   struct pos pb; prel (p, &pb, +1, 0);
+
+  /* traversable on top of rigid con -> floor */
   if (is_traversable (p) && is_rigid_con (&pb))
     set_fg (p, FLOOR);
+
+  /* broken floor below non no floor -> floor */
+  if (f == BROKEN_FLOOR && fb != NO_FLOOR)
+    set_fg (p, FLOOR);
+
+  /* con at left of non-visible collidable con at left -> wall */
+  if (np.place == 9 && f != WALL && fr == WALL)
+    set_fg (p, WALL);
+
+  return p;
 }
 
-/* consistency: doors should not face a wall nor another door */
-void
+/* ------------------------------------------------------------------- */
+
+
+
+/* fix: doors should not face a wall nor another door */
+struct pos *
 fix_door_adjacent_to_wall_or_door (struct pos *p)
 {
   enum confg f = fg (p);
@@ -123,29 +63,14 @@ fix_door_adjacent_to_wall_or_door (struct pos *p)
   /* WALL's perspective */
   if (f == WALL && (fr == DOOR || fl == DOOR))
     set_fg (p, FLOOR);
+
+  return p;
 }
 
-/* consistency: broken floors must have no construction above them */
-void
-fix_broken_floor_lacking_no_floor_on_top (struct pos *p)
-{
-  enum confg f = fg (p);
-  enum confg fa = fg_rel (p, -1, 0);
-  enum confg fb = fg_rel (p, +1, 0);
-
-  /* broken floor's perspective */
-  if (f == BROKEN_FLOOR && fa != NO_FLOOR)
-    set_fg (p, FLOOR);
-
-  /* non-no-floor's perspective */
-  if (f != NO_FLOOR && fb == BROKEN_FLOOR)
-    set_fg_rel (p, +1, 0, FLOOR);
-}
-
-/* consistency: skeleton and spikes floors can't be a hangable
+/* fix: skeleton and spikes floors can't be a hangable
    construction at left because there is no corner floor sprites to
    render the perspective when the kid is climbing them */
-void
+struct pos *
 fix_skeleton_or_spikes_floor_with_no_or_loose_floor_at_left (struct pos *p)
 {
   enum confg f = fg (p);
@@ -162,10 +87,12 @@ fix_skeleton_or_spikes_floor_with_no_or_loose_floor_at_left (struct pos *p)
   if (is_hangable_pos (p, RIGHT)
       && (t == SKELETON_FLOOR || t == SPIKES_FLOOR))
     set_fg_rel (p, -1, +0, FLOOR);
+
+  return p;
 }
 
-/* consistency: itens can't be adjacent */
-void
+/* fix: itens can't be adjacent */
+struct pos *
 fix_adjacent_itens (struct pos *p)
 {
   enum confg f = fg (p);
@@ -179,10 +106,12 @@ fix_adjacent_itens (struct pos *p)
   if (((is_item_fg_cs (fl) && el != NO_ITEM)
        || (is_item_fg_cs (fr) && er != NO_ITEM))
       && is_item_fg_cs (f)) set_ext (p, NO_ITEM);
+
+  return p;
 }
 
-/* consistency: doors should have an associated event and opener floor */
-void
+/* fix: doors should have an associated event and opener floor */
+struct pos *
 fix_door_lacking_opener (struct pos *p)
 {
   int i;
@@ -192,18 +121,20 @@ fix_door_lacking_opener (struct pos *p)
   if (f == DOOR || f == LEVEL_DOOR) {
     for (i = 0; i < EVENTS; i++)
       if (peq (&event (p->l, i)->p, p)
-          && is_there_event_handler (p->l, i)) return;
+          && is_there_event_handler (p->l, i)) return p;
 
     /* fprintf (stderr, "%s: replaced %s by %s at pos (%i, %i, %i)\n", */
     /*          __func__, "DOOR", "FLOOR", p->room, p->floor, p->place); */
 
     set_con (p, FLOOR, NO_BG, NO_ITEM);
   }
+
+  return p;
 }
 
-/* consistency: opener and closer floors should have an associated
+/* fix: opener and closer floors should have an associated
    event and door */
-void
+struct pos *
 fix_opener_or_closer_lacking_door (struct pos *p)
 {
   enum confg f = fg (p);
@@ -214,7 +145,8 @@ fix_opener_or_closer_lacking_door (struct pos *p)
     do {
       le = event (p->l, i);
       if (is_valid_pos (&le->p)
-          && (fg (&le->p) == DOOR || fg (&le->p) == LEVEL_DOOR)) return;
+          && (fg (&le->p) == DOOR || fg (&le->p) == LEVEL_DOOR))
+        return p;
     } while (le->next && ++i < EVENTS);
 
     /* fprintf (stderr, "%s: replaced %s (event %i) by %s at pos (%i, %i, %i)\n", */
@@ -223,22 +155,26 @@ fix_opener_or_closer_lacking_door (struct pos *p)
 
     set_con (p, FLOOR, NO_BG, NO_ITEM);
   }
+
+  return p;
 }
 
-/* consistency: wall, pillars, big pillars, doors and level doors shouldn't have
+/* fix: wall, pillars, big pillars, doors and level doors shouldn't have
    background */
-void
+struct pos *
 fix_confg_which_should_not_have_conbg (struct pos *p)
 {
   enum confg f = fg (p);
   if (f == WALL || f == PILLAR || f == BIG_PILLAR_TOP || f == BIG_PILLAR_BOTTOM
       || f == DOOR || f == LEVEL_DOOR)
     set_bg (p, NO_BG);
+
+  return p;
 }
 
-/* consistency: big pillar bottom must have big pillar top over it and
+/* fix: big pillar bottom must have big pillar top over it and
    vice-versa */
-void
+struct pos *
 fix_partial_big_pillar (struct pos *p)
 {
   enum confg f = fg (p);
@@ -248,6 +184,8 @@ fix_partial_big_pillar (struct pos *p)
   if ((f == BIG_PILLAR_BOTTOM && fa != BIG_PILLAR_TOP)
       || (f == BIG_PILLAR_TOP && fb != BIG_PILLAR_BOTTOM))
     set_fg (p, FLOOR);
+
+  return p;
 }
 
 void
@@ -282,53 +220,6 @@ is_there_event_handler (struct level *l, int e)
 }
 
 void
-fix_enclosure (struct pos *p, enum dir dir)
-{
-  int i;
-  int d = (dir == LEFT) ? -1 : +1;
-  struct pos q;
-
-  for (i = d, prel (p, &q, 0, i); abs (i) < PLACES; i += d, prel (p, &q, 0, i)) {
-    if (fg (&q) == WALL) break;
-    set_con (&q, WALL, NO_BG, NO_ITEM);
-  }
-}
-
-bool
-is_enclosure (struct pos *p, bool (*pred) (struct pos *p), enum dir dir)
-{
-  int i;
-  int d = (dir == LEFT) ? -1 : +1;
-  struct pos q;
-
-  if (fg (p) == WALL)
-    for (i = d, prel (p, &q, 0, i); abs (i) < PLACES; i += d, prel (p, &q, 0, i)) {
-      if (fg (&q) == WALL) {
-        if (abs (i) >= 2) return true;
-        else return false;
-      }
-
-      if (! pred (&q)) return false;
-    }
-  return false;
-}
-
-bool
-is_inaccessible (struct pos *p)
-{
-  struct pos pa; prel (p, &pa, -1, +0);
-
-  return ! is_traversable (p)
-    && ! is_traversable (&pa);
-}
-
-bool
-is_loose (struct pos *p)
-{
-  return fg (p) == LOOSE_FLOOR;
-}
-
-void
 fix_room_0 (struct level *l)
 {
   link_room (l, 0, 0, LEFT);
@@ -342,11 +233,11 @@ fix_room_0 (struct level *l)
       set_con (&p, WALL, NO_BG, 0);
 }
 
+/* fix rooms above room 0 in case they have traversable cons at the
+   bottom */
 void
-fix_room_above_zero_with_traversable_at_bottom (struct level *l)
+fix_traversable_above_room_0 (struct level *l)
 {
-  /* fix rooms above room 0 that have traversable cons at the
-     bottom */
   struct pos p; new_pos (&p, l, -1, 2, -1);
   for (p.room = 1; p.room < ROOMS; p.room++)
     for (p.place = 0; p.place < PLACES; p.place++) {

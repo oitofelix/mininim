@@ -81,22 +81,19 @@ ext_val (int f, int e)
   }
 }
 
-struct con *
-con_val (struct con *c, int f, int b, int e)
+struct pos *
+clear_con (struct pos *p)
 {
-  c->fg = fg_val (f);
-  c->bg = bg_val (b);
-  c->ext = ext_val (f, e);
-  return c;
+  set_con (p, NO_FLOOR, NO_BG, 0);
+  return p;
 }
 
-struct con *
-random_con (struct con *c)
+struct pos *
+random_con (struct pos *p)
 {
-  return
-    con_val (c, prandom (CONFGS - 1),
-             prandom (CONBGS - 1),
-             prandom_max ());
+  set_con (p, prandom (CONFGS - 1), prandom (CONBGS - 1),
+           prandom_max ());
+  return p;
 }
 
 struct pos *
@@ -629,7 +626,7 @@ mirror_pos (struct pos *p0, struct pos *p1, bool destroy, bool register_con,
 }
 
 struct pos *
-decorate_pos (struct pos *p)
+decorate_con (struct pos *p)
 {
   struct pos np;
 
@@ -718,16 +715,30 @@ decorate_pos (struct pos *p)
   return p;
 }
 
+struct pos *
+apply_to_pos (struct pos *p, pos_trans f, char *desc)
+{
+  struct con c0, c1;
+  c0 = *con (p);
+  f (p);
+  c1 = *con (p);
+  *con (p) = c0;
+  register_con_undo (&undo, p,
+                     c1.fg, c1.bg, c1.ext,
+                     true, true, true, true,
+                     -1, desc);
+  return p;
+}
+
 struct level *
-decorate_room (struct level *l, int room, char *desc)
+apply_to_room (struct level *l, int room, pos_trans f, char *desc)
 {
   struct con room_buf[FLOORS][PLACES], room_buf2[FLOORS][PLACES];
-  struct pos p;
   memcpy (&room_buf2, &l->con[room], sizeof (room_buf2));
-  new_pos (&p, l, room, -1, -1);
+  struct pos p; new_pos (&p, l, room, -1, -1);
   for (p.floor = 0; p.floor < FLOORS; p.floor++)
     for (p.place = 0; p.place < PLACES; p.place++)
-      decorate_pos (&p);
+      f (&p);
   memcpy (&room_buf, &l->con[room], sizeof (room_buf));
   memcpy (&l->con[room], &room_buf2, sizeof (room_buf2));
   register_room_undo (&undo, room, room_buf, desc);
@@ -758,32 +769,6 @@ con_diff (struct con *c0, struct con *c1)
     return CON_DIFF_EXT;
 
   return CON_DIFF_MIXED;
-}
-
-struct level *
-clear_room (struct level *l, int room, char *desc)
-{
-  struct con room_buf[FLOORS][PLACES];
-  struct pos p;
-  new_pos (&p, l, room, -1, -1);
-  for (p.floor = 0; p.floor < FLOORS; p.floor++)
-    for (p.place = 0; p.place < PLACES; p.place++)
-      con_val (&room_buf[p.floor][p.place], NO_FLOOR, NO_BG, 0);
-  register_room_undo (&undo, room, room_buf, desc);
-  return l;
-}
-
-struct level *
-randomize_room (struct level *l, int room, char *desc)
-{
-  struct con room_buf[FLOORS][PLACES];
-  struct pos p;
-  new_pos (&p, l, room, -1, -1);
-  for (p.floor = 0; p.floor < FLOORS; p.floor++)
-    for (p.place = 0; p.place < PLACES; p.place++)
-      random_con (&room_buf[p.floor][p.place]);
-  register_room_undo (&undo, room, room_buf, desc);
-  return l;
 }
 
 struct level *

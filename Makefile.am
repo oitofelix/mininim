@@ -32,8 +32,8 @@ bin_PROGRAMS = mininim
 mininim_SOURCES = src/mininim.c src/mininim.h src/constants.h					\
 		src/types.h src/colors.h src/anim.c src/anim.h src/pos.c					\
 		src/pos.h src/physics.c src/physics.h src/level.c src/level.h			\
-		src/consistency.c src/consistency.h src/stars.c src/stars.h				\
-		src/floor.c src/floor.h src/broken-floor.c src/broken-floor.h			\
+		src/fix.c src/fix.h src/stars.c src/stars.h src/floor.c						\
+		src/floor.h src/broken-floor.c src/broken-floor.h									\
 		src/skeleton-floor.c src/skeleton-floor.h src/loose-floor.c				\
 		src/loose-floor.h src/opener-floor.c src/opener-floor.h						\
 		src/closer-floor.c src/closer-floor.h src/spikes-floor.c					\

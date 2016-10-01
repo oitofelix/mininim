@@ -69,9 +69,11 @@ editor (void)
      {'N', "NUMERICAL INFO"},
      {'A', "CLEAR"},
      {'R', "RANDOM"},
+     {'D', "DECORATION"},
      {'M', "MIRROR>"},
      {'C', "COPY"},
      {'P', "PASTE"},
+     {'!', "FIX"},
      {0}};
 
   struct menu_item mirror_menu[] =
@@ -209,6 +211,7 @@ editor (void)
      {'M', "MIRROR>"},
      {'C', "COPY"},
      {'P', "PASTE"},
+     {'!', "FIX"},
      {0}};
 
   struct menu_item link_menu[] =
@@ -246,6 +249,7 @@ editor (void)
      {'H', "HUE<"},
      {'S', "SAVE LEVEL"},
      {'L', "RELOAD LEVEL"},
+     {'!', "FIX"},
      {0}};
 
   struct menu_item environment_menu[] =
@@ -309,7 +313,6 @@ editor (void)
   enum confg f;
   enum conbg b;
   int e;
-  struct con co;
   static struct skill skill_buf;
 
   /* display message if available */
@@ -319,6 +322,9 @@ editor (void)
     memset (&key, 0, sizeof (key));
     menu_help = 0;
     return;
+  } else if (msg_cycles > 0 && msg) {
+    msg_cycles = 0;
+    memset (&key, 0, sizeof (key));
   } else msg_cycles = 0;
 
   switch (edit) {
@@ -351,17 +357,13 @@ editor (void)
     case 'I': edit = EDIT_NOMINAL_INFO; break;
     case 'N': edit = EDIT_NUMERICAL_INFO; break;
     case 'A':
-      register_con_undo (&undo, &p,
-                         NO_FLOOR, NO_BG, NO_ITEM,
-                         true, false, false, true,
-                         -1, "CLEAR CON");
+      apply_to_pos (&p, clear_con, "CLEAR CON");
       break;
     case 'R':
-      random_con (&co);
-      register_con_undo (&undo, &p,
-                         co.fg, co.bg, co.ext,
-                         true, true, true, true,
-                         -1, "RANDOM CON");
+      apply_to_pos (&p, random_con, "RANDOM CON");
+      break;
+    case 'D':
+      apply_to_pos (&p, decorate_con, "DECORATE CON");
       break;
     case 'M': edit = EDIT_MIRROR_CON; break;
     case 'C':
@@ -372,6 +374,9 @@ editor (void)
       register_con_undo (&undo, &p,
                          con_copy.fg, con_copy.bg, con_copy.ext,
                          true, true, true, true, -1, "PASTE CON");
+      break;
+    case '!':
+      apply_to_pos (&p, fix_con, "FIX CON");
       break;
     }
     break;
@@ -1044,13 +1049,16 @@ editor (void)
       get_mouse_coord (&last_mouse_coord);
       edit = EDIT_ROOM_EXCHANGE; break;
     case 'A':
-      clear_room (&global_level, mr.room, "CLEAR ROOM");
+      apply_to_room (&global_level, mr.room, clear_con,
+                     "CLEAR ROOM");
       break;
     case 'R':
-      randomize_room (&global_level, mr.room, "RANDOM ROOM");
+      apply_to_room (&global_level, mr.room, random_con,
+                     "RANDOM ROOM");
       break;
     case 'D':
-      decorate_room (&global_level, mr.room, "DECORATE ROOM");
+      apply_to_room (&global_level, mr.room, decorate_con,
+                     "DECORATE ROOM");
       break;
     case 'M': edit = EDIT_ROOM_MIRROR; break;
     case 'C':
@@ -1059,6 +1067,9 @@ editor (void)
       break;
     case 'P':
       register_room_undo (&undo, mr.room, room_copy, "PASTE ROOM");
+      break;
+    case '!':
+      apply_to_room (&global_level, mr.room, fix_con, "FIX ROOM");
       break;
     }
     break;
@@ -1292,18 +1303,18 @@ editor (void)
       break;
     case 'A':
       for (i = 1; i < ROOMS; i++)
-        clear_room (&global_level, i, (i == ROOMS - 1)
-                    ? "CLEAR LEVEL" : NULL);
+        apply_to_room (&global_level, i, clear_con, NULL);
+      end_undo_set (&undo, "CLEAR LEVEL");
       break;
     case 'R':
       for (i = 1; i < ROOMS; i++)
-        randomize_room (&global_level, i, (i == ROOMS - 1)
-                        ? "RANDOM LEVEL" : NULL);
+        apply_to_room (&global_level, i, random_con, NULL);
+      end_undo_set (&undo, "RANDOM LEVEL");
       break;
     case 'D':
       for (i = 1; i < ROOMS; i++)
-        decorate_room (&global_level, i, (i == ROOMS - 1)
-                       ? "DECORATE LEVEL" : NULL);
+        apply_to_room (&global_level, i, decorate_con, NULL);
+      end_undo_set (&undo, "DECORATE LEVEL");
       break;
     case 'M': edit = EDIT_LEVEL_MIRROR; break;
     case 'C':
@@ -1340,6 +1351,11 @@ editor (void)
     case 'L':
       while (undo_pass (&undo, -1, NULL));
       editor_msg ("LEVEL RELOADED", 18);
+      break;
+    case '!':
+      for (i = 1; i < ROOMS; i++)
+        apply_to_room (&global_level, i, fix_con, NULL);
+      end_undo_set (&undo, "FIX LEVEL");
       break;
     }
     al_free (str);
@@ -1378,26 +1394,26 @@ editor (void)
     case -1: case 1: edit = EDIT_LEVEL_MIRROR; break;
     case 'H':
       for (i = 1; i < ROOMS; i++)
-        register_h_room_mirror_con_undo
-          (&undo, i, (i == ROOMS - 1) ? "LEVEL MIRROR CONS H." : NULL);
+        register_h_room_mirror_con_undo (&undo, i, NULL);
+      end_undo_set (&undo, "LEVEL MIRROR CONS H.");
       break;
     case 'V':
       for (i = 1; i < ROOMS; i++)
-        register_v_room_mirror_con_undo
-          (&undo, i, (i == ROOMS - 1) ? "LEVEL MIRROR CONS V." : NULL);
+        register_v_room_mirror_con_undo (&undo, i, NULL);
+      end_undo_set (&undo, "LEVEL MIRROR CONS V.");
       break;
     case 'B':
       for (i = 1; i < ROOMS; i++) {
         register_h_room_mirror_con_undo (&undo, i, NULL);
-        register_v_room_mirror_con_undo
-          (&undo, i, (i == ROOMS - 1) ? "LEVEL MIRROR CONS H+V." : NULL);
+        register_v_room_mirror_con_undo (&undo, i, NULL);
       }
+      end_undo_set (&undo, "LEVEL MIRROR CONS H+V.");
       break;
     case 'R':
       for (i = 1; i < ROOMS; i++)
         register_random_room_mirror_con_undo
-          (&undo, i, false, false,
-           (i == ROOMS - 1) ? "LEVEL MIRROR CONS R." : NULL);
+          (&undo, i, false, false, NULL);
+      end_undo_set (&undo, "LEVEL MIRROR CONS R.");
       break;
     }
     al_free (str);
@@ -1411,34 +1427,34 @@ editor (void)
       for (i = 1; i < ROOMS; i++) {
         memcpy (&l, &global_level.link, sizeof (l));
         mirror_link (&global_level, i, LEFT, RIGHT);
-        register_link_undo (&undo, l, (i == ROOMS - 1)
-                            ? "LEVEL MIRROR LINKS H." : NULL);
+        register_link_undo (&undo, l, NULL);
       }
+      end_undo_set (&undo, "LEVEL MIRROR LINKS H.");
       break;
     case 'V':
       for (i = 1; i < ROOMS; i++) {
         memcpy (&l, &global_level.link, sizeof (l));
         mirror_link (&global_level, i, ABOVE, BELOW);
-        register_link_undo (&undo, l, (i == ROOMS - 1)
-                            ? "LEVEL MIRROR LINKS V." : NULL);
+        register_link_undo (&undo, l, NULL);
       }
+      end_undo_set (&undo, "LEVEL MIRROR LINKS V.");
       break;
     case 'B':
       for (i = 1; i < ROOMS; i++) {
         memcpy (&l, &global_level.link, sizeof (l));
         mirror_link (&global_level, i, LEFT, RIGHT);
         mirror_link (&global_level, i, ABOVE, BELOW);
-        register_link_undo (&undo, l, (i == ROOMS - 1)
-                            ? "LEVEL MIRROR LINKS H+V." : NULL);
+        register_link_undo (&undo, l, NULL);
       }
+      end_undo_set (&undo, "LEVEL MIRROR LINKS H+V.");
       break;
     case 'R':
       for (i = 1; i < ROOMS; i++) {
         memcpy (&l, &global_level.link, sizeof (l));
         mirror_link (&global_level, i, random_dir (), random_dir ());
-        register_link_undo (&undo, l, (i == ROOMS - 1)
-                            ? "LEVEL MIRROR LINKS R." : NULL);
+        register_link_undo (&undo, l, NULL);
       }
+      end_undo_set (&undo, "LEVEL MIRROR LINKS R.");
       break;
     }
     al_free (str);
@@ -1453,18 +1469,18 @@ editor (void)
         register_h_room_mirror_con_undo (&undo, i, NULL);
         memcpy (&l, &global_level.link, sizeof (l));
         mirror_link (&global_level, i, LEFT, RIGHT);
-        register_link_undo (&undo, l, (i == ROOMS - 1)
-                            ? "LEVEL MIRROR CONS+LINKS H." : NULL);
+        register_link_undo (&undo, l, NULL);
       }
+      end_undo_set (&undo, "LEVEL MIRROR CONS+LINKS H.");
       break;
     case 'V':
       for (i = 1; i < ROOMS; i++) {
         register_v_room_mirror_con_undo (&undo, i, NULL);
         memcpy (&l, &global_level.link, sizeof (l));
         mirror_link (&global_level, i, ABOVE, BELOW);
-        register_link_undo (&undo, l, (i == ROOMS - 1)
-                            ? "LEVEL MIRROR CONS+LINKS V." : NULL);
+        register_link_undo (&undo, l, NULL);
       }
+      end_undo_set (&undo, "LEVEL MIRROR CONS+LINKS V.");
       break;
     case 'B':
       for (i = 1; i < ROOMS; i++) {
@@ -1473,9 +1489,9 @@ editor (void)
         memcpy (&l, &global_level.link, sizeof (l));
         mirror_link (&global_level, i, LEFT, RIGHT);
         mirror_link (&global_level, i, ABOVE, BELOW);
-        register_link_undo (&undo, l, (i == ROOMS - 1)
-                            ? "LEVEL MIRROR CONS+LINKS H+V." : NULL);
+        register_link_undo (&undo, l, NULL);
       }
+      end_undo_set (&undo, "LEVEL MIRROR CONS+LINKS H+V.");
       break;
     case 'R':
       for (i = 1; i < ROOMS; i++) {
@@ -1483,9 +1499,9 @@ editor (void)
           (&undo, i, false, false, NULL);
         memcpy (&l, &global_level.link, sizeof (l));
         mirror_link (&global_level, i, random_dir (), random_dir ());
-        register_link_undo (&undo, l, (i == ROOMS - 1)
-                            ? "LEVEL MIRROR CONS+LINKS R." : NULL);
+        register_link_undo (&undo, l, NULL);
       }
+      end_undo_set (&undo, "LEVEL MIRROR CONS+LINKS R.");
       break;
     }
     al_free (str);
