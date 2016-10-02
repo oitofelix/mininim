@@ -255,7 +255,7 @@ raise_skeleton (struct anim *s)
   s->f.flip = (s->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
   if (s->oaction != raise_skeleton) {
-    play_sample (skeleton_sample, NULL, s->id);
+    play_audio (&skeleton_audio, NULL, s->id);
     place_frame (&s->f, &s->f, skeleton_die_frameset[2].frame,
                  &s->p, (s->f.dir == LEFT) ? +12 : +0, +43);
     s->i = 2;
@@ -306,11 +306,11 @@ guard_die_spiked (struct anim *g)
     s->murdered_anim = g->id;
 
     if (g->type == SKELETON)
-      play_sample (skeleton_sample, NULL, g->id);
-    else play_sample (spiked_sample, NULL, g->id);
+      play_audio (&skeleton_audio, NULL, g->id);
+    else play_audio (&spiked_audio, NULL, g->id);
 
     if (! g->glory_sample) {
-      play_sample (glory_sample, NULL, g->id);
+      play_audio (&glory_audio, NULL, g->id);
       g->glory_sample = true;
     }
   }
@@ -365,7 +365,7 @@ guard_die_chopped (struct anim *g)
 
   if (g->oaction != guard_die_chopped
       && ! g->glory_sample) {
-    play_sample (glory_sample, NULL, g->id);
+    play_audio (&glory_audio, NULL, g->id);
     g->glory_sample = true;
   }
 
@@ -396,7 +396,7 @@ guard_die_suddenly (struct anim *g)
 
   if (g->oaction != guard_die_suddenly
       && ! g->glory_sample) {
-    play_sample (glory_sample, NULL, g->id);
+    play_audio (&glory_audio, NULL, g->id);
     g->glory_sample = true;
   }
 
@@ -439,10 +439,10 @@ flow (struct anim *g)
     /*              ? +13 : +21, (g->type == SHADOW) ? +18 : +17); */
     g->i = -1, g->j = 0;
     if (g->type == SKELETON)
-      play_sample (skeleton_sample, NULL, g->id);
+      play_audio (&skeleton_audio, NULL, g->id);
 
     if (! g->glory_sample) {
-      play_sample (glory_sample, NULL, g->id);
+      play_audio (&glory_audio, NULL, g->id);
       g->glory_sample = true;
     }
 

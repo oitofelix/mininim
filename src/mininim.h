@@ -92,7 +92,7 @@
 #include "potion.h"
 #include "princess.h"
 #include "room.h"
-#include "samples.h"
+#include "audio-data.h"
 #include "skeleton-floor.h"
 #include "spikes-floor.h"
 #include "stars.h"

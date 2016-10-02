@@ -647,7 +647,7 @@ void
 put_at_defense_frame (struct anim *k)
 {
   struct frameset *frameset;
-  play_sample (sword_defense_sample, NULL, k->id);
+  play_audio (&sword_defense_audio, NULL, k->id);
 
   switch (k->type) {
   case NO_ANIM: default: break;
@@ -1149,8 +1149,8 @@ fight_hit (struct anim *k, struct anim *ke)
   if (k->id == current_kid_id) {
     mr.flicker = 2;
     mr.color = get_flicker_blood_color ();
-    play_sample (harm_sample, NULL, k->id);
-  } else play_sample (guard_hit_sample, NULL, k->id);
+    play_audio (&harm_audio, NULL, k->id);
+  } else play_audio (&guard_hit_audio, NULL, k->id);
 }
 
 bool

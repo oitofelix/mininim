@@ -529,7 +529,7 @@ compute_loose_floor_fall (struct loose_floor *l)
         a->death_reason = LOOSE_FLOOR_DEATH;
       } else if (a->type == KID) {
         a->hit_by_loose_floor = true;
-        play_sample (hit_wall_sample, NULL, a->id);
+        play_audio (&hit_wall_audio, NULL, a->id);
         a->action = kid_couch;
         a->i = -1;
       }
@@ -566,7 +566,7 @@ compute_loose_floor_fall (struct loose_floor *l)
                          false, false, false, false,
                          CHPOS_CHAIN_RELEASE_LOOSE_FLOOR,
                          "LOOSE FLOOR CHAIN RELEASE");
-      play_sample (broken_floor_sample, &p, -1);
+      play_audio (&broken_floor_audio, &p, -1);
       alert_guards (&p);
       return;
     case OPENER_FLOOR: break_opener_floor (&p); break;
@@ -589,7 +589,7 @@ compute_loose_floor_fall (struct loose_floor *l)
   }
   shake_loose_floor_row (&p);
   l->remove = true;
-  play_sample (broken_floor_sample, &p, -1);
+  play_audio (&broken_floor_audio, &p, -1);
   alert_guards (&p);
 }
 
@@ -613,9 +613,9 @@ void
 sample_random_loose_floor (struct pos *p)
 {
   switch (prandom (2)) {
-  case 0: play_sample (loose_floor_00_sample, p, -1);
-  case 1: play_sample (loose_floor_01_sample, p, -1);
-  case 2: play_sample (loose_floor_02_sample, p, -1);
+  case 0: play_audio (&loose_floor_00_audio, p, -1);
+  case 1: play_audio (&loose_floor_01_audio, p, -1);
+  case 2: play_audio (&loose_floor_02_audio, p, -1);
   }
 }
 

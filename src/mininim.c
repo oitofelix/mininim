@@ -1131,7 +1131,7 @@ main (int _argc, char **_argv)
 
   load_callback = draw_loading_screen;
 
-  load_samples ();
+  load_audio_data ();
   load_level ();
   load_cutscenes ();
 
@@ -1153,7 +1153,7 @@ main (int _argc, char **_argv)
   clear_bitmap (mr.cell[0][0].screen, BLACK);
   clear_bitmap (uscreen, TRANSPARENT_COLOR);
   cutscene_started = false;
-  stop_all_samples ();
+  stop_audio_instances ();
 
   /* /\* begin test *\/ */
   /* cutscene = true; */
@@ -1164,7 +1164,7 @@ main (int _argc, char **_argv)
   play_title ();
   stop_video_effect ();
   if (quit_anim == QUIT_GAME) quit_game ();
-  stop_all_samples ();
+  stop_audio_instances ();
 
  play_game:
   cutscene = false;
@@ -1192,7 +1192,7 @@ quit_game (void)
 {
   unload_level ();
   unload_cutscenes ();
-  unload_samples ();
+  unload_audio_data ();
 
   finalize_video ();
   finalize_audio ();

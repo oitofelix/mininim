@@ -151,7 +151,7 @@ static void
 title_anim (void)
 {
   static int i;
-  static ALLEGRO_SAMPLE_INSTANCE *si = NULL;
+  static union audio_instance_data ai_data;
 
   if (! cutscene_started) {
     i = 0; key.keyboard.keycode = 0; button = -1; cutscene_started = true;
@@ -172,34 +172,34 @@ title_anim (void)
     break;
   case 1:
     if (! is_video_effect_started ()) {
-      si = play_sample (main_theme_sample, NULL, -1);
+      ai_data = play_audio (&main_theme_audio, NULL, -1);
       i++;
     }
     break;
   case 2:
-    if (get_sample_position (si) >= 2.2) i++;
+    if (get_audio_instance_position (ai_data) >= 2.2) i++;
     break;
   case 3:
-    if (get_sample_position (si) >= 5.4) i++;
+    if (get_audio_instance_position (ai_data) >= 5.4) i++;
     break;
   case 4:
-    if (get_sample_position (si) >= 6.8) i++;
+    if (get_audio_instance_position (ai_data) >= 6.8) i++;
     break;
   case 5:
-    if (get_sample_position (si) >= 11.0) i++;
+    if (get_audio_instance_position (ai_data) >= 11.0) i++;
     break;
   case 6:
-    if (get_sample_position (si) >= 15.2) i++;
+    if (get_audio_instance_position (ai_data) >= 15.2) i++;
     break;
   case 7:
-    if (! is_playing_sample_instance (si)) {
+    if (! is_playing_audio_instance (ai_data)) {
       start_video_effect (VIDEO_ROLL_RIGHT, SEC2EFF (0.5));
-      si = play_sample (in_the_absence_sample, NULL, -1);
+      ai_data = play_audio (&in_the_absence_audio, NULL, -1);
       i++;
     }
     break;
   case 8:
-    if (get_sample_position (si) >= 11.0) {
+    if (get_audio_instance_position (ai_data) >= 11.0) {
       start_video_effect (VIDEO_FADE_OUT, SEC2EFF (1));
       i++;
     }
@@ -207,7 +207,7 @@ title_anim (void)
   case 9:
     if (! is_video_effect_started ()) i++; break;
   case 10:
-    if (! is_playing_sample_instance (si)) {
+    if (! is_playing_audio_instance (ai_data)) {
       princess.f.c.x = 142;
       princess.f.c.y = 124;
       princess.f.b = princess_normal_00;
@@ -236,24 +236,24 @@ title_anim (void)
     break;
   case 11:
     if (! is_video_effect_started ()) {
-      si = play_sample (princess_waiting_sample, NULL, -1);
+      ai_data = play_audio (&princess_waiting_audio, NULL, -1);
       i++;
     }
     break;
   case 12:
-    if (! is_playing_sample_instance (si)) {
-      si = play_sample (door_close_sample, NULL, -1);
+    if (! is_playing_audio_instance (ai_data)) {
+      ai_data = play_audio (&door_close_audio, NULL, -1);
       i++;
     }
     break;
   case 13:
-    if (! is_playing_sample_instance (si)) {
-      si = play_sample (creaking_door_sample, NULL, -1);
+    if (! is_playing_audio_instance (ai_data)) {
+      ai_data = play_audio (&creaking_door_audio, NULL, -1);
       i++;
     }
     break;
   case 14:
-    if (! is_playing_sample_instance (si)) {
+    if (! is_playing_audio_instance (ai_data)) {
       princess_turn (&princess);
       i++;
     }
@@ -261,14 +261,14 @@ title_anim (void)
   case 15:
     princess.action (&princess);
     if (princess.f.b == princess_normal_00) {
-      si = play_sample (vizier_and_princess_sample, NULL, -1);
+      ai_data = play_audio (&vizier_and_princess_audio, NULL, -1);
       jaffar_walk (&jaffar);
       i++;
     }
     break;
   case 16:
     jaffar.action (&jaffar);
-    if (get_sample_position (si) >= 4.0 && jaffar.f.b == jaffar_normal_00) {
+    if (get_audio_instance_position (ai_data) >= 4.0 && jaffar.f.b == jaffar_normal_00) {
       jaffar.repeat = 5;
       jaffar_walk (&jaffar);
       i++;
@@ -276,7 +276,7 @@ title_anim (void)
     break;
   case 17:
     jaffar.action (&jaffar);
-    if (get_sample_position (si) >= 12.5 && jaffar.f.b == jaffar_normal_00) {
+    if (get_audio_instance_position (ai_data) >= 12.5 && jaffar.f.b == jaffar_normal_00) {
       jaffar_open_arms (&jaffar);
       i++;
     }
@@ -313,12 +313,12 @@ title_anim (void)
   case 22:
     jaffar.action (&jaffar);
     if (jaffar.f.b == jaffar_normal_00) {
-      si = play_sample (marry_jaffar_sample, NULL, -1);
+      ai_data = play_audio (&marry_jaffar_audio, NULL, -1);
       i++;
     }
     break;
   case 23:
-    if (get_sample_position (si) >= 1.0) {
+    if (get_audio_instance_position (ai_data) >= 1.0) {
       jaffar.repeat = 6;
       jaffar_turn_walk (&jaffar);
       i++;
@@ -326,7 +326,7 @@ title_anim (void)
     break;
   case 24:
     jaffar.action (&jaffar);
-    if (get_sample_position (si) >= 4.0) {
+    if (get_audio_instance_position (ai_data) >= 4.0) {
       princess_look_down (&princess);
       i++;
     }
@@ -346,7 +346,7 @@ title_anim (void)
     }
     break;
   case 27:
-    if (! is_playing_sample_instance (si)) {
+    if (! is_playing_audio_instance (ai_data)) {
       start_video_effect (VIDEO_ROLL_RIGHT, SEC2EFF (0.5));
       i++;
     }
@@ -376,7 +376,7 @@ void
 cutscene_01_05_11_anim (void)
 {
   static int i;
-  static ALLEGRO_SAMPLE_INSTANCE *si = NULL;
+  static union audio_instance_data ai_data;
 
   if (! cutscene_started) {
     i = 0; key.keyboard.keycode = 0; button = -1; cutscene_started = true;
@@ -405,18 +405,18 @@ cutscene_01_05_11_anim (void)
     clock_type = get_clock_by_time_left ();
 
     start_video_effect (VIDEO_FADE_IN, SEC2EFF (1));
-    si = play_sample (cutscene_01_03_05_11_sample, NULL, -1);
+    ai_data = play_audio (&cutscene_01_03_05_11_audio, NULL, -1);
     i++;
     break;
   case 1:
-    if (get_sample_position (si) >= 5.5
+    if (get_audio_instance_position (ai_data) >= 5.5
         && ! is_video_effect_started ()) {
       start_video_effect (VIDEO_FADE_OUT, SEC2EFF (1));
       i++;
     }
     break;
   case 2:
-    if (! is_playing_sample_instance (si)
+    if (! is_playing_audio_instance (ai_data)
         && ! is_video_effect_started ()) quit_anim = true;
     break;
   }
@@ -430,7 +430,7 @@ void
 cutscene_11_little_time_left_anim (void)
 {
   static int i;
-  static ALLEGRO_SAMPLE_INSTANCE *si = NULL;
+  static union audio_instance_data ai_data;
 
   if (! cutscene_started) {
     i = 0; key.keyboard.keycode = 0; button = -1; cutscene_started = true;
@@ -459,25 +459,25 @@ cutscene_11_little_time_left_anim (void)
     clock_type = get_clock_by_time_left ();
 
     start_video_effect (VIDEO_FADE_IN, SEC2EFF (1));
-    si = play_sample (cutscene_11_little_time_left_sample, NULL, -1);
+    ai_data = play_audio (&cutscene_11_little_time_left_audio, NULL, -1);
     i++;
     break;
   case 1:
-    if (get_sample_position (si) >= 2.5) {
+    if (get_audio_instance_position (ai_data) >= 2.5) {
       princess_turn (&princess);
       i++;
     }
     break;
   case 2:
     princess.action (&princess);
-    if (get_sample_position (si) >= 5.5
+    if (get_audio_instance_position (ai_data) >= 5.5
         && ! is_video_effect_started ()) {
       start_video_effect (VIDEO_FADE_OUT, SEC2EFF (1));
       i++;
     }
     break;
   case 3:
-    if (! is_playing_sample_instance (si)
+    if (! is_playing_audio_instance (ai_data)
         && ! is_video_effect_started ()) quit_anim = true;
     break;
   }
@@ -499,7 +499,7 @@ void
 cutscene_03_anim (void)
 {
   static int i;
-  static ALLEGRO_SAMPLE_INSTANCE *si = NULL;
+  static union audio_instance_data ai_data;
 
   if (! cutscene_started) {
     i = 0; key.keyboard.keycode = 0; button = -1; cutscene_started = true;
@@ -528,18 +528,18 @@ cutscene_03_anim (void)
     clock_type = get_clock_by_time_left ();
 
     start_video_effect (VIDEO_FADE_IN, SEC2EFF (1));
-    si = play_sample (cutscene_01_03_05_11_sample, NULL, -1);
+    ai_data = play_audio (&cutscene_01_03_05_11_audio, NULL, -1);
     i++;
     break;
   case 1:
-    if (get_sample_position (si) >= 5.5
+    if (get_audio_instance_position (ai_data) >= 5.5
         && ! is_video_effect_started ()) {
       start_video_effect (VIDEO_FADE_OUT, SEC2EFF (1));
       i++;
     }
     break;
   case 2:
-    if (! is_playing_sample_instance (si)
+    if (! is_playing_audio_instance (ai_data)
         && ! is_video_effect_started ()) quit_anim = true;
     break;
   }
@@ -553,7 +553,7 @@ void
 cutscene_07_anim (void)
 {
   static int i;
-  static ALLEGRO_SAMPLE_INSTANCE *si = NULL;
+  static union audio_instance_data ai_data;
 
   if (! cutscene_started) {
     i = 0; key.keyboard.keycode = 0; button = -1; cutscene_started = true;
@@ -590,11 +590,11 @@ cutscene_07_anim (void)
     clock_type = get_clock_by_time_left ();
 
     start_video_effect (VIDEO_FADE_IN, SEC2EFF (1));
-    si = play_sample (cutscene_07_08_sample, NULL, -1);
+    ai_data = play_audio (&cutscene_07_08_audio, NULL, -1);
     i++;
     break;
   case 1:
-    if (get_sample_position (si) >= 3.5) {
+    if (get_audio_instance_position (ai_data) >= 3.5) {
       mouse_normal (&mouse);
       i++;
     }
@@ -609,14 +609,14 @@ cutscene_07_anim (void)
   case 3:
     mouse.action (&mouse);
     princess.action (&princess);
-    if (get_sample_position (si) >= 7.5
+    if (get_audio_instance_position (ai_data) >= 7.5
         && ! is_video_effect_started ()) {
       start_video_effect (VIDEO_FADE_OUT, SEC2EFF (1));
       i++;
     }
     break;
   case 4:
-    if (! is_playing_sample_instance (si)
+    if (! is_playing_audio_instance (ai_data)
         && ! is_video_effect_started ()) quit_anim = true;
     break;
   }
@@ -630,7 +630,7 @@ void
 cutscene_08_anim (void)
 {
   static int i;
-  static ALLEGRO_SAMPLE_INSTANCE *si = NULL;
+  static union audio_instance_data ai_data;
 
   if (! cutscene_started) {
     i = 0; key.keyboard.keycode = 0; button = -1; cutscene_started = true;
@@ -667,11 +667,11 @@ cutscene_08_anim (void)
     clock_type = get_clock_by_time_left ();
 
     start_video_effect (VIDEO_FADE_IN, SEC2EFF (1));
-    si = play_sample (cutscene_07_08_sample, NULL, -1);
+    ai_data = play_audio (&cutscene_07_08_audio, NULL, -1);
     i++;
     break;
   case 1:
-    if (get_sample_position (si) >= 1) i++;
+    if (get_audio_instance_position (ai_data) >= 1) i++;
     break;
   case 2:
     if (mouse.f.c.x >= 204) mouse.action (&mouse);
@@ -693,7 +693,7 @@ cutscene_08_anim (void)
     break;
   case 4:
     princess.action (&princess);
-    if (get_sample_position (si) >= 7.5
+    if (get_audio_instance_position (ai_data) >= 7.5
         && ! is_video_effect_started ()) {
       start_video_effect (VIDEO_FADE_OUT, SEC2EFF (1));
       i++;
@@ -701,7 +701,7 @@ cutscene_08_anim (void)
     break;
   case 5:
     princess.action (&princess);
-    if (! is_playing_sample_instance (si)
+    if (! is_playing_audio_instance (ai_data)
         && ! is_video_effect_started ()) quit_anim = true;
     break;
   }
@@ -715,7 +715,7 @@ void
 cutscene_14_anim (void)
 {
   static int i;
-  static ALLEGRO_SAMPLE_INSTANCE *si = NULL;
+  static union audio_instance_data ai_data;
 
   if (! cutscene_started) {
     i = 0; key.keyboard.keycode = 0; button = -1; cutscene_started = true;
@@ -762,7 +762,7 @@ cutscene_14_anim (void)
     clock_type = -1;
 
     start_video_effect (VIDEO_FADE_IN, SEC2EFF (1));
-    si = play_sample (cutscene_14_sample, NULL, -1);
+    ai_data = play_audio (&cutscene_14_audio, NULL, -1);
     i++;
     break;
   case 1:
@@ -789,7 +789,7 @@ cutscene_14_anim (void)
     break;
   case 4:
     princess.action (&princess);
-    if (get_sample_position (si) >= 10
+    if (get_audio_instance_position (ai_data) >= 10
         && ! is_video_effect_started ()) {
       start_video_effect (VIDEO_FADE_OUT, SEC2EFF (1));
       i++;
@@ -797,38 +797,38 @@ cutscene_14_anim (void)
     break;
   case 5:
     princess.action (&princess);
-    if (! is_playing_sample_instance (si)
+    if (! is_playing_audio_instance (ai_data)
         && ! is_video_effect_started ()) {
       start_video_effect (VIDEO_FADE_IN, SEC2EFF (1));
-      si = play_sample (happy_end_sample, NULL, -1);
+      ai_data = play_audio (&happy_end_audio, NULL, -1);
       key.keyboard.keycode = 0;
       button = -1;
       i++;
     }
     break;
   case 6:
-    if (get_sample_position (si) >= 26) {
+    if (get_audio_instance_position (ai_data) >= 26) {
       start_video_effect (VIDEO_ROLL_RIGHT, SEC2EFF (1));
       i++;
     }
     break;
   case 7:
-    if (get_sample_position (si) >= 52) {
+    if (get_audio_instance_position (ai_data) >= 52) {
       start_video_effect (VIDEO_ROLL_RIGHT, SEC2EFF (1));
       i++;
     }
     break;
   case 8:
-    if (get_sample_position (si) >= 80) {
+    if (get_audio_instance_position (ai_data) >= 80) {
       start_video_effect (VIDEO_ROLL_RIGHT, SEC2EFF (1));
       i++;
     }
     break;
   case 9:
-    if (get_sample_position (si) >= 111.1) i++;
+    if (get_audio_instance_position (ai_data) >= 111.1) i++;
     break;
   case 10:
-    if (! is_playing_sample_instance (si)) {
+    if (! is_playing_audio_instance (ai_data)) {
       start_video_effect (VIDEO_FADE_OUT, SEC2EFF (1));
       i++;
     }
@@ -851,7 +851,7 @@ void
 cutscene_out_of_time_anim (void)
 {
   static int i;
-  static ALLEGRO_SAMPLE_INSTANCE *si = NULL;
+  static union audio_instance_data ai_data;
 
   if (! cutscene_started) {
     i = 0; key.keyboard.keycode = 0; button = -1; cutscene_started = true;
@@ -872,18 +872,18 @@ cutscene_out_of_time_anim (void)
     clock_type = get_clock_by_time_left ();
 
     start_video_effect (VIDEO_FADE_IN, SEC2EFF (1));
-    si = play_sample (cutscene_out_of_time_sample, NULL, -1);
+    ai_data = play_audio (&cutscene_out_of_time_audio, NULL, -1);
     i++;
     break;
   case 1:
-    if (get_sample_position (si) >= 12
+    if (get_audio_instance_position (ai_data) >= 12
         && ! is_video_effect_started ()) {
       start_video_effect (VIDEO_FADE_OUT, SEC2EFF (1));
       i++;
     }
     break;
   case 2:
-    if (! is_playing_sample_instance (si)
+    if (! is_playing_audio_instance (ai_data)
         && ! is_video_effect_started ()) quit_anim = RESTART_GAME;
     break;
   }

@@ -197,7 +197,7 @@ play_level (struct level *lv)
   register_cons ();
   register_anims ();
 
-  stop_all_samples ();
+  stop_audio_instances ();
   play_time_stopped = false;
   death_timer = 0;
 
@@ -254,10 +254,10 @@ play_level (struct level *lv)
       cutscene_started = false;
       cutscene = true;
       stop_video_effect ();
-      stop_all_samples ();
+      stop_audio_instances ();
       play_anim (global_level.cutscene, NULL);
       stop_video_effect ();
-      stop_all_samples ();
+      stop_audio_instances ();
 
       if (quit_anim == RESTART_GAME) goto restart_game;
     }
@@ -275,10 +275,10 @@ play_level (struct level *lv)
     cutscene_started = false;
     cutscene = true;
     stop_video_effect ();
-    stop_all_samples ();
+    stop_audio_instances ();
     play_anim (cutscene_out_of_time_anim, NULL);
     stop_video_effect ();
-    stop_all_samples ();
+    stop_audio_instances ();
     goto restart_game;
     break;
   }
@@ -790,7 +790,7 @@ process_keys (void)
     if (ke) {
       survey (_m, pos, &ke->f, NULL, &ke->p, NULL);
       anim_die (ke);
-      play_sample (guard_hit_sample, NULL, ke->id);
+      play_audio (&guard_hit_audio, NULL, ke->id);
     }
   }
 
@@ -963,14 +963,14 @@ process_keys (void)
     death_timer++;
 
     if (death_timer == 12) {
-      ALLEGRO_SAMPLE *sample;
+      struct audio_source *as;
       switch (k->death_reason) {
-      case SHADOW_FIGHT_DEATH: sample = success_suspense_sample; break;
-      case FIGHT_DEATH: sample = fight_death_sample; break;
-      default: sample = death_sample; break;
+      case SHADOW_FIGHT_DEATH: as = &success_suspense_audio; break;
+      case FIGHT_DEATH: as = &fight_death_audio; break;
+      default: as = &death_audio; break;
       }
-      stop_sample (success_sample, NULL, k->id);
-      play_sample (sample, NULL, k->id);
+      stop_audio_instance (&success_audio, NULL, k->id);
+      play_audio (as, NULL, k->id);
     }
 
     if (death_timer < 60 && ! active_menu) {
@@ -982,7 +982,7 @@ process_keys (void)
       if ((death_timer < 240 || death_timer % 12 < 8)
           && ! active_menu) {
         if (death_timer >= 252 && death_timer % 12 == 0)
-          play_sample (press_key_sample, NULL, -1);
+          play_audio (&press_key_audio, NULL, -1);
         xasprintf (&text, "Press Button to Continue");
         draw_bottom_text (NULL, text, -2);
         al_free (text);
@@ -1021,7 +1021,7 @@ draw_level (void)
     display_remaining_time ();
     if (rem_time <= SEC2CYC (60) && rem_time % SEC2CYC (1) == 0
         && ! play_time_stopped)
-      play_sample (press_key_sample, NULL, -1);
+      play_audio (&press_key_audio, NULL, -1);
     last_auto_show_time = rem_time;
   }
   if (rem_time <= 0) quit_anim = OUT_OF_TIME;

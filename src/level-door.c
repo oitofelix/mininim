@@ -228,7 +228,7 @@ compute_level_doors (void)
     case OPEN_LEVEL_DOOR:
       if (d->i % 5 == 2 && d->i > 2) {
         if (d->i == LEVEL_DOOR_STEPS - 2) alert_guards (&d->p);
-        play_sample (level_door_open_sample, &d->p, -1);
+        play_audio (&level_door_open_audio, &d->p, -1);
       }
       if (d->i > 0) {
         d->i--;
@@ -239,7 +239,7 @@ compute_level_doors (void)
     case CLOSE_LEVEL_DOOR:
       if (d->i == 0) {
         alert_guards (&d->p);
-        play_sample (level_door_open_sample, &d->p, -1);
+        play_audio (&level_door_open_audio, &d->p, -1);
       }
       if (d->i < LEVEL_DOOR_STEPS - 1) {
         int r = 14 - (d->i % 15);
@@ -248,7 +248,7 @@ compute_level_doors (void)
         if (d->i >= LEVEL_DOOR_STEPS - 1) {
           d->i = LEVEL_DOOR_STEPS - 1;
           d->action = NO_LEVEL_DOOR_ACTION;
-          play_sample (level_door_close_sample, &d->p, -1);
+          play_audio (&level_door_close_audio, &d->p, -1);
         }
       }
       break;

@@ -23,27 +23,31 @@
 /* functions */
 void init_audio (void);
 void finalize_audio (void);
-ALLEGRO_SAMPLE *load_sample (char *filename);
 void enable_audio (bool b);
 void set_mixer_gain (ALLEGRO_MIXER *mixer, float new_gain);
 ALLEGRO_MIXER *get_default_mixer (void);
-ALLEGRO_SAMPLE_INSTANCE *play_sample (ALLEGRO_SAMPLE *sample, struct pos *p, int id);
-void play_samples (void);
-int compare_samples (const void *s0, const void *s1);
-struct audio_sample *get_audio_sample (ALLEGRO_SAMPLE_INSTANCE *si);
-double get_sample_position (ALLEGRO_SAMPLE_INSTANCE *si);
-bool is_playing_sample_instance (struct ALLEGRO_SAMPLE_INSTANCE *si);
-struct audio_sample *is_playing_sample (struct ALLEGRO_SAMPLE *s);
-void remove_sample (struct audio_sample *s);
-void clear_played_samples (void);
-void adjust_samples_volume (void);
-float get_adjusted_sample_volume (struct audio_sample *as);
-struct audio_sample *get_sample (ALLEGRO_SAMPLE *sample, uint64_t anim_cycle,
-                                 struct pos *p, int anim_id);
-void stop_sample (ALLEGRO_SAMPLE *sample, struct pos *p, int id);
-void stop_all_samples (void);
-bool is_instance_of_sample (ALLEGRO_SAMPLE_INSTANCE *si,
-                            ALLEGRO_SAMPLE *s);
+struct audio_source *load_audio (struct audio_source *as,
+                                 enum audio_type, char *filename);
+union audio_instance_data play_audio (struct audio_source *as,
+                                      struct pos *p, int anim_id);
+int compare_audio_instances (const void *_ai0, const void *_ai1);
+struct audio_instance *get_audio_instance (union audio_instance_data data);
+struct audio_instance *search_audio_instance (struct audio_source *as,
+                                              uint64_t anim_cycle,
+                                              struct pos *p, int anim_id);
+void play_audio_instances (void);
+void clear_played_audio_instances (void);
+double get_audio_instance_position (union audio_instance_data data);
+bool is_playing_audio_instance (union audio_instance_data data);
+struct audio_instance *is_playing_audio_source (struct audio_source *as);
+void destroy_audio (struct audio_source *as);
+void remove_audio_instance (struct audio_instance *ai);
+void adjust_audio_instances_volume (void);
+float get_adjusted_audio_instance_volume (struct audio_instance *ai);
+void stop_audio_instances (void);
+void stop_audio_instance (struct audio_source *as, struct pos *p, int anim_id);
+bool is_instance_of_audio_source (union audio_instance_data data,
+                                  struct audio_source *as);
 
 /* variables */
 extern bool audio_enabled;

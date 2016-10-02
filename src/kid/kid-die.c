@@ -84,9 +84,9 @@ kid_resurrect (struct anim *k)
   place_frame (&k->f, &k->f, kid_normal_00,
                &pm, k->f.dir == LEFT ? +16 : +16, +15);
   reset_murder_spikes_floor (k->id);
-  stop_sample (death_sample, NULL, k->id);
-  stop_sample (fight_death_sample, NULL, k->id);
-  stop_sample (success_suspense_sample, NULL, k->id);
+  stop_audio_instance (&death_audio, NULL, k->id);
+  stop_audio_instance (&fight_death_audio, NULL, k->id);
+  stop_audio_instance (&success_suspense_audio, NULL, k->id);
 }
 
 void
@@ -117,7 +117,7 @@ kid_die_spiked (struct anim *k)
       mr.flicker = 2;
       mr.color = get_flicker_blood_color ();
     }
-    play_sample (spiked_sample, NULL, k->id);
+    play_audio (&spiked_audio, NULL, k->id);
   }
 
   if (k->oaction != kid_die_spiked) {

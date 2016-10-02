@@ -125,7 +125,7 @@ flow (struct anim *k)
     else if (is_hangable_pos (&ptf, k->f.dir)) k->hang_pos = ptf;
     pos2room (&k->hang_pos, k->f.c.room, &k->hang_pos);
     k->hang = true;
-    play_sample (hang_on_fall_sample, NULL, k->id);
+    play_audio (&hang_on_fall_audio, NULL, k->id);
     kid_hang (k);
     return false;
   }
@@ -137,7 +137,7 @@ flow (struct anim *k)
     k->hang_pos = ptf;
     pos2room (&k->hang_pos, k->f.c.room, &k->hang_pos);
     k->hang = true;
-    play_sample (hang_on_fall_sample, NULL, k->id);
+    play_audio (&hang_on_fall_audio, NULL, k->id);
     kid_turn (k);
     return false;
   }
@@ -172,8 +172,8 @@ physics_in (struct anim *k)
     else kid_couch_collision (k);
     return false;
   } else if (cross_mirror) {
-    if (! get_sample (mirror_sample, 0, NULL, k->id))
-      play_sample (mirror_sample, NULL, k->id);
+    if (! search_audio_instance (&mirror_audio, 0, NULL, k->id))
+      play_audio (&mirror_audio, NULL, k->id);
     struct pos p; prel (&k->ci.p, &p, +0, k->f.dir == LEFT
                         ? +1 : +0);
     mirror_at_pos (&p)->kid_crossing = k->id;
@@ -209,7 +209,7 @@ physics_out (struct anim *k)
   if (k->i == 10) shake_loose_floor_row (&pmbo);
 
   /* sound */
-  if (k->i == 0 || k->i == 4) play_sample (step_sample, NULL, k->id);
+  if (k->i == 0 || k->i == 4) play_audio (&step_audio, NULL, k->id);
 }
 
 bool

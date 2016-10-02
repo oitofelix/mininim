@@ -114,7 +114,7 @@ play_anim (void (*draw_callback) (void),
           if (compute_callback) compute_callback ();
           clear_bitmap (uscreen, TRANSPARENT_COLOR);
           draw_callback ();
-          play_samples ();
+          play_audio_instances ();
           if (! is_game_paused ())
             anim_cycle++;
         }

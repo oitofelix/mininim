@@ -45,15 +45,16 @@ mininim_SOURCES = src/mininim.c src/mininim.h src/constants.h					\
 		src/carpet.h src/mirror.c src/mirror.h src/room.c src/room.h			\
 		src/fire.c src/fire.h src/potion.c src/potion.h src/sword.c				\
 		src/sword.h src/clock.c src/clock.h src/princess.c src/princess.h	\
-		src/jaffar.c src/jaffar.h src/mouse.c src/mouse.h src/samples.c		\
-		src/samples.h src/cutscenes.c src/cutscenes.h src/fight.c					\
-		src/fight.h src/dat.c src/dat.h src/wall/wall.c src/wall/wall.h		\
-		src/wall/wall-depedv.c src/wall/wall-depedv.h src/wall/wall-pv.c	\
-		src/wall/wall-pv.h src/wall/wall-dcpc.c src/wall/wall-dcpc.h			\
-		src/kid/kid.c src/kid/kid.h src/kid/kid-normal.c									\
-		src/kid/kid-normal.h src/kid/kid-walk.c src/kid/kid-walk.h				\
-		src/kid/kid-start-run.c src/kid/kid-start-run.h src/kid/kid-run.c	\
-		src/kid/kid-run.h src/kid/kid-stop-run.c src/kid/kid-stop-run.h		\
+		src/jaffar.c src/jaffar.h src/mouse.c src/mouse.h									\
+		src/audio-data.c src/audio-data.h src/cutscenes.c src/cutscenes.h	\
+		src/fight.c src/fight.h src/dat.c src/dat.h src/wall/wall.c				\
+		src/wall/wall.h src/wall/wall-depedv.c src/wall/wall-depedv.h			\
+		src/wall/wall-pv.c src/wall/wall-pv.h src/wall/wall-dcpc.c				\
+		src/wall/wall-dcpc.h src/kid/kid.c src/kid/kid.h									\
+		src/kid/kid-normal.c src/kid/kid-normal.h src/kid/kid-walk.c			\
+		src/kid/kid-walk.h src/kid/kid-start-run.c												\
+		src/kid/kid-start-run.h src/kid/kid-run.c src/kid/kid-run.h				\
+		src/kid/kid-stop-run.c src/kid/kid-stop-run.h											\
 		src/kid/kid-turn-run.c src/kid/kid-turn-run.h src/kid/kid-couch.c	\
 		src/kid/kid-couch.h src/kid/kid-turn.c src/kid/kid-turn.h					\
 		src/kid/kid-stabilize.c src/kid/kid-stabilize.h										\

@@ -23,8 +23,10 @@
    aware.  Until then the volume is absolute wherever its source may
    be. */
 
-static struct audio_sample *audio_sample;
-static size_t audio_sample_nmemb;
+static struct audio_instance *audio_instance;
+static size_t audio_instance_nmemb;
+
+static ALLEGRO_AUDIO_STREAM *load_audio_stream (char *filename);
 
 bool audio_enabled = true;
 float volume = 1.0;
@@ -36,7 +38,7 @@ init_audio (void)
     error (0, 0, "%s (void): cannot initialize audio", __func__);
   if (! al_init_acodec_addon ())
     error (0, 0, "%s (void): cannot initialize audio codecs", __func__);
-  if (! al_reserve_samples (16))
+  if (! al_reserve_samples (RESERVED_AUDIO_SAMPLES))
     error (0, 0, "%s (void): cannot reserve audio samples", __func__);
 }
 
@@ -44,21 +46,6 @@ void
 finalize_audio (void)
 {
   al_uninstall_audio ();
-}
-
-ALLEGRO_SAMPLE *
-load_sample (char *filename)
-{
-  ALLEGRO_SAMPLE *sample =
-    load_resource (filename, (load_resource_f) al_load_sample);
-
-  if (! sample)
-    error (0, 0, "%s (\"%s\"): cannot load sample",
-           __func__, filename);
-
-  if (load_callback) load_callback ();
-
-  return sample;
 }
 
 void
@@ -91,194 +78,318 @@ get_default_mixer (void)
   return mixer;
 }
 
-ALLEGRO_SAMPLE_INSTANCE *
-play_sample (ALLEGRO_SAMPLE *sample, struct pos *p, int anim_id)
+static ALLEGRO_AUDIO_STREAM *
+load_audio_stream (char *filename)
 {
-  /* do nothing if the same sample has been played */
-  struct audio_sample *asp = get_sample (sample, anim_cycle, NULL, -1);
-  if (asp) return asp->instance;
-
-  struct audio_sample as;
-  as.played = false;
-  as.sample = sample;
-  as.instance = al_create_sample_instance (sample);
-  as.anim_cycle = anim_cycle;
-  as.anim_id = anim_id;
-  as.volume = -1;
-
-  if (p) npos (p, &as.p);
-  else p = NULL;
-
-  if (! as.instance)
-    error (0, 0, "%s (%p): cannot create sample instance", __func__, sample);
-
-  audio_sample =
-    add_to_array (&as, 1, audio_sample, &audio_sample_nmemb,
-                  audio_sample_nmemb, sizeof (as));
-
-  qsort (audio_sample, audio_sample_nmemb, sizeof (as), compare_samples);
-  return as.instance;
+  ALLEGRO_MIXER *mixer = get_default_mixer ();
+  unsigned int freq = al_get_mixer_frequency(mixer);
+  return al_load_audio_stream (filename, 2, (float) freq
+                               / (float) SCRIPT_HZ_DEFAULT);
 }
 
-void
-play_samples (void)
+struct audio_source *
+load_audio (struct audio_source *as, enum audio_type audio_type,
+            char *filename)
 {
-  clear_played_samples ();
-  /* adjust_samples_volume (); */
-
-  size_t i;
-  for (i = 0; i < audio_sample_nmemb; i++) {
-    struct audio_sample *as = &audio_sample[i];
-    if (! as->played) {
-      ALLEGRO_MIXER *mixer = get_default_mixer ();
-
-      if (! al_attach_sample_instance_to_mixer(as->instance, mixer))
-        error (0, 0, "%s: cannot attach sample instance to mixer (%p, %p)",
-                __func__, as->sample, as->instance);
-
-      /* as->volume = get_adjusted_sample_volume (as); */
-      al_set_sample_instance_gain (as->instance, as->volume);
-
-      if (! al_play_sample_instance (as->instance))
-        error (0, 0, "%s: cannot play sample instance (%p, %p)",
-                __func__, as->sample, as->instance);
-
-      as->played = true;
-    } else al_set_sample_instance_gain (as->instance, as->volume);
+  switch (audio_type) {
+  case AUDIO_SAMPLE:
+    as->data.sample =
+      load_resource (filename, (load_resource_f) al_load_sample);
+    if (! as->data.sample) {
+      error (0, 0, "%s (\"%s\"): cannot load sample",
+             __func__, filename);
+      return NULL;
+    }
+    break;
+  case AUDIO_STREAM:
+    xasprintf (&as->data.stream, "%s", filename);
+    break;
+  default: assert (false); break;
   }
+
+  as->type = audio_type;
+
+  if (load_callback) load_callback ();
+
+  return as;
+}
+
+union audio_instance_data
+play_audio (struct audio_source *as, struct pos *p, int anim_id)
+{
+  /* do nothing if the same sample has been played in a near cycle */
+  struct audio_instance *sai =
+    search_audio_instance (as, anim_cycle, NULL, -1);
+  if (sai) return sai->data;
+
+  struct audio_instance ai;
+
+  ai.source = as;
+  ai.played = false;
+  ai.anim_cycle = anim_cycle;
+  ai.anim_id = anim_id;
+  ai.volume = -1;
+
+  if (p) npos (p, &ai.p);
+  else p = NULL;
+
+  switch (as->type) {
+  case AUDIO_SAMPLE:
+    ai.data.sample = al_create_sample_instance (as->data.sample);
+    if (! ai.data.sample) {
+      error (0, 0, "%s (%p): cannot create sample instance",
+             __func__, as->data.sample);
+      return (union audio_instance_data) {.sample = NULL};
+    }
+    break;
+  case AUDIO_STREAM:
+    ai.data.stream =
+      load_resource
+      (as->data.stream, (load_resource_f) load_audio_stream);
+    if (! ai.data.stream) {
+      error (0, 0, "%s (\"%s\"): cannot load audio stream", __func__,
+             as->data.stream);
+      return (union audio_instance_data) {.stream = NULL};
+    }
+    break;
+  default: assert (false); break;
+  }
+
+  audio_instance =
+    add_to_array (&ai, 1, audio_instance, &audio_instance_nmemb,
+                  audio_instance_nmemb, sizeof (ai));
+
+  qsort (audio_instance, audio_instance_nmemb, sizeof (ai), compare_audio_instances);
+
+  return ai.data;
 }
 
 int
-compare_samples (const void *s0, const void *s1)
+compare_audio_instances (const void *_ai0, const void *_ai1)
 {
-  struct audio_sample *_s0 = (struct audio_sample *) s0;
-  struct audio_sample *_s1 = (struct audio_sample *) s1;
+  struct audio_instance *ai0 = (struct audio_instance *) _ai0;
+  struct audio_instance *ai1 = (struct audio_instance *) _ai1;
 
-  if (_s0->instance < _s1->instance) return -1;
-  else if (_s0->instance > _s1->instance) return 1;
+  void *d0 = ai0->data.sample;
+  void *d1 = ai1->data.sample;
+
+  if (d0 < d1) return -1;
+  else if (d0 > d1) return 1;
   else return 0;
 }
 
-struct audio_sample *
-get_audio_sample (ALLEGRO_SAMPLE_INSTANCE *si)
+struct audio_instance *
+get_audio_instance (union audio_instance_data data)
 {
-  struct audio_sample as;
-  as.instance = si;
-  return bsearch (&as, audio_sample, audio_sample_nmemb, sizeof (as),
-                  compare_samples);
+  struct audio_instance ai;
+  ai.data = data;
+  return bsearch (&ai, audio_instance, audio_instance_nmemb, sizeof (ai),
+                  compare_audio_instances);
 }
 
-double
-get_sample_position (ALLEGRO_SAMPLE_INSTANCE *si)
-{
-  struct audio_sample *as = get_audio_sample (si);
-  if (! as) return INFINITY;
-  else if (! as->played) return 0;
-  else if (! al_get_sample_instance_playing (si)) return INFINITY;
-  else return (double) al_get_sample_instance_position (si) /
-         (double) al_get_sample_instance_frequency (si);
-}
-
-bool
-is_playing_sample_instance (struct ALLEGRO_SAMPLE_INSTANCE *si)
-{
-  if (isfinite (get_sample_position (si))) return true;
-  else return false;
-}
-
-struct audio_sample *
-is_playing_sample (struct ALLEGRO_SAMPLE *s)
+struct audio_instance *
+search_audio_instance (struct audio_source *as, uint64_t anim_cycle,
+                       struct pos *p, int anim_id)
 {
   size_t i;
-  for (i = 0; i < audio_sample_nmemb; i++) {
-    struct audio_sample *as = &audio_sample[i];
-    if (s == as->sample
-        && is_playing_sample_instance (as->instance))
-      return as;
+  for (i = 0; i < audio_instance_nmemb; i++) {
+    struct audio_instance *ai = &audio_instance[i];
+    if ((! as
+         || (as->type == AUDIO_SAMPLE
+             && as->data.sample == ai->source->data.sample)
+         || (as->type == AUDIO_STREAM
+             && as->data.stream == ai->source->data.stream))
+        && (anim_cycle == 0 || abs (anim_cycle - ai->anim_cycle) < 2)
+        && (! p || peq (p, &ai->p))
+        && (anim_id < 0 || anim_id == ai->anim_id))
+      return ai;
   }
   return NULL;
 }
 
 void
-remove_sample (struct audio_sample *s)
+play_audio_instances (void)
 {
-  al_destroy_sample_instance (s->instance);
-  size_t i =  s - audio_sample;
-  audio_sample =
-    remove_from_array (audio_sample, &audio_sample_nmemb, i, 1, sizeof (*s));
-  if (audio_sample_nmemb == 0) audio_sample = NULL;
-}
+  clear_played_audio_instances ();
+  /* adjust_samples_volume (); */
 
-void
-clear_played_samples (void)
-{
   size_t i;
-  for (i = 0; i < audio_sample_nmemb; i++) {
-    struct audio_sample *as = &audio_sample[i];
-    if (as->played
-        && ! al_get_sample_instance_playing (as->instance)) {
-      remove_sample (as);
-      if (i > 0) i--;
+  for (i = 0; i < audio_instance_nmemb; i++) {
+    struct audio_instance *ai = &audio_instance[i];
+
+    switch (ai->source->type) {
+    case AUDIO_SAMPLE:
+      al_set_sample_instance_gain (ai->data.sample, ai->volume);
+      break;
+    case AUDIO_STREAM:
+      al_set_audio_stream_gain (ai->data.stream, ai->volume);
+      break;
+    }
+
+    if (! ai->played) {
+      ALLEGRO_MIXER *mixer = get_default_mixer ();
+
+      ai->played = true;
+      /* ai->volume = get_adjusted_sample_volume (ai); */
+
+      switch (ai->source->type) {
+      case AUDIO_SAMPLE:
+        al_set_sample_instance_gain (ai->data.sample, ai->volume);
+        if (! al_attach_sample_instance_to_mixer
+            (ai->data.sample, mixer))
+          error (0, 0, "%s: cannot attach sample instance to mixer (%p, %p)",
+                 __func__, ai->source->data.sample, ai->data.sample);
+        if (! al_play_sample_instance (ai->data.sample))
+          error (0, 0, "%s: cannot play sample instance (%p, %p)",
+                 __func__, ai->source->data.sample, ai->data.sample);
+        break;
+      case AUDIO_STREAM:
+        al_set_audio_stream_gain (ai->data.stream, ai->volume);
+        if (! al_attach_audio_stream_to_mixer (ai->data.stream, mixer))
+          error (0, 0, "%s: cannot attach audio stream to mixer (%p, %p)",
+                 __func__, ai->source->data.stream, ai->data.stream);
+        break;
+      }
     }
   }
 }
 
 void
-adjust_samples_volume (void)
+clear_played_audio_instances (void)
 {
   size_t i;
-  for (i = 0; i < audio_sample_nmemb; i++) {
-    struct audio_sample *as = &audio_sample[i];
-    as->volume = get_adjusted_sample_volume (as);
+ again:
+  for (i = 0; i < audio_instance_nmemb; i++) {
+    struct audio_instance *ai = &audio_instance[i];
+    if (ai->played
+        && ((ai->source->type == AUDIO_SAMPLE
+             && ! al_get_sample_instance_playing (ai->data.sample))
+            || (ai->source->type == AUDIO_STREAM
+                && ! al_get_audio_stream_playing (ai->data.stream)))) {
+      remove_audio_instance (ai);
+      goto again;
+    }
   }
 }
 
-float
-get_adjusted_sample_volume (struct audio_sample *as)
+double
+get_audio_instance_position (union audio_instance_data data)
 {
-  return 1.0;
-  /* if (! as->p) return 1.0; */
-  /* int d = room_dist (mr.room, as->p.room, 10); */
-  /* if (d == 0) d = 1; */
-  /* if (d <= 10) return 1.0 / d; */
-  /* if (is_room_visible (as->p.room)) return 1.0; */
-  /* else return 0.5; */
+  struct audio_instance *ai = get_audio_instance (data);
+  if (! ai) return INFINITY;
+  else if (! ai->played) return 0;
+  else if ((ai->source->type == AUDIO_SAMPLE
+            && ! al_get_sample_instance_playing (ai->data.sample))
+           || (ai->source->type == AUDIO_STREAM
+               && ! al_get_audio_stream_playing (ai->data.stream)))
+           return INFINITY;
+  else switch (ai->source->type) {
+    case AUDIO_SAMPLE:
+      return (double) al_get_sample_instance_position (ai->data.sample) /
+        (double) al_get_sample_instance_frequency (ai->data.sample);
+    case AUDIO_STREAM:
+      return al_get_audio_stream_position_secs (ai->data.stream);
+    default: assert (false); break;
+  }
 }
 
-void
-stop_all_samples (void)
+bool
+is_playing_audio_instance (union audio_instance_data data)
 {
-  while (audio_sample_nmemb)
-    remove_sample (&audio_sample[0]);
+  if (isfinite (get_audio_instance_position (data))) return true;
+  else return false;
 }
 
-struct audio_sample *
-get_sample (ALLEGRO_SAMPLE *sample, uint64_t anim_cycle,
-            struct pos *p, int anim_id)
+struct audio_instance *
+is_playing_audio_source (struct audio_source *as)
 {
   size_t i;
-  for (i = 0; i < audio_sample_nmemb; i++) {
-    struct audio_sample *as = &audio_sample[i];
-    if ((! sample || as->sample == sample)
-        && (anim_cycle == 0 || abs (anim_cycle - as->anim_cycle) < 2)
-        && (! p || peq (p, &as->p))
-        && (anim_id < 0 || anim_id == as->anim_id))
-      return as;
+  for (i = 0; i < audio_instance_nmemb; i++) {
+    struct audio_instance *ai = &audio_instance[i];
+    if (((as->type == AUDIO_SAMPLE
+          && as->data.sample == ai->source->data.sample)
+         || (as->type == AUDIO_STREAM
+             && as->data.stream == ai->source->data.stream))
+        && is_playing_audio_instance (ai->data))
+      return ai;
   }
   return NULL;
 }
 
 void
-stop_sample (ALLEGRO_SAMPLE *sample, struct pos *p, int anim_id)
+destroy_audio (struct audio_source *as)
 {
-  struct audio_sample *as = get_sample (sample, 0, p, anim_id);
-  if (as) remove_sample (as);
+  switch (as->type) {
+  case AUDIO_SAMPLE:
+    al_destroy_sample (as->data.sample);
+    break;
+  case AUDIO_STREAM:
+    al_free (as->data.stream);
+    break;
+  default: assert (false); break;
+  }
+}
+
+void
+remove_audio_instance (struct audio_instance *ai)
+{
+  switch (ai->source->type) {
+  case AUDIO_SAMPLE:
+    al_destroy_sample_instance (ai->data.sample);
+    break;
+  case AUDIO_STREAM:
+    al_destroy_audio_stream (ai->data.stream);
+    break;
+  default: assert (false); break;
+  }
+
+  size_t i =  ai - audio_instance;
+  audio_instance =
+    remove_from_array (audio_instance, &audio_instance_nmemb, i, 1, sizeof (*ai));
+
+  if (audio_instance_nmemb == 0) audio_instance = NULL;
+}
+
+void
+adjust_audio_instances_volume (void)
+{
+  size_t i;
+  for (i = 0; i < audio_instance_nmemb; i++) {
+    struct audio_instance *ai = &audio_instance[i];
+    ai->volume = get_adjusted_audio_instance_volume (ai);
+  }
+}
+
+float
+get_adjusted_audio_instance_volume (struct audio_instance *ai)
+{
+  return 1.0;
+  /* if (! ai->p) return 1.0; */
+  /* int d = room_dist (mr.room, ai->p.room, 10); */
+  /* if (d == 0) d = 1; */
+  /* if (d <= 10) return 1.0 / d; */
+  /* if (is_room_visible (ai->p.room)) return 1.0; */
+  /* else return 0.5; */
+}
+
+void
+stop_audio_instances (void)
+{
+  while (audio_instance_nmemb)
+    remove_audio_instance (&audio_instance[0]);
+}
+
+void
+stop_audio_instance (struct audio_source *as, struct pos *p, int anim_id)
+{
+  struct audio_instance *ai = search_audio_instance (as, 0, p, anim_id);
+  if (ai) remove_audio_instance (ai);
 }
 
 bool
-is_instance_of_sample (ALLEGRO_SAMPLE_INSTANCE *si,
-             ALLEGRO_SAMPLE *s)
+is_instance_of_audio_source (union audio_instance_data data,
+                             struct audio_source *as)
 {
-  struct audio_sample *as = get_audio_sample (si);
-  return si && s && as && as->sample == s;
+  struct audio_instance *ai = get_audio_instance (data);
+  return as && ai && as == ai->source;
 }

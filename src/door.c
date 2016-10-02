@@ -286,7 +286,7 @@ compute_doors (void)
         d->action = CLOSE_DOOR;
       else if (d->i == 0 && d->wait > 0) {
         if (! d->noise) {
-          play_sample (door_end_sample, &d->p, -1);
+          play_audio (&door_end_audio, &d->p, -1);
           d->noise = true;
         }
 
@@ -295,7 +295,7 @@ compute_doors (void)
       else if (d->i > 0) {
         if (d->i % 2 == 0) {
           if (d->i == DOOR_STEPS - 2) alert_guards (&d->p);
-          play_sample (door_open_sample, &d->p, -1);
+          play_audio (&door_open_audio, &d->p, -1);
         }
         d->i--;
         d->wait = DOOR_WAIT;
@@ -306,13 +306,13 @@ compute_doors (void)
       if (d->i < DOOR_STEPS - 1) {
         if (d->wait++ % 4 == 0) {
           if (d->i == 0) alert_guards (&d->p);
-          play_sample (door_close_sample, &d->p, -1);
+          play_audio (&door_close_audio, &d->p, -1);
           d->i++;
           d->noise = false;
           register_changed_pos (&d->p, CHPOS_CLOSE_DOOR);
         }
       } else if (d->i == DOOR_STEPS - 1) {
-        play_sample (door_end_sample, &d->p, -1);
+        play_audio (&door_end_audio, &d->p, -1);
         d->action = NO_DOOR_ACTION;
         d->wait = DOOR_WAIT;
         d->noise = false;
@@ -326,7 +326,7 @@ compute_doors (void)
         if (d->i >= DOOR_STEPS - 1) {
           d->i = DOOR_STEPS - 1;
           alert_guards (&d->p);
-          play_sample (door_abruptly_close_sample, &d->p, -1);
+          play_audio (&door_abruptly_close_audio, &d->p, -1);
         }
       } else {
         d->action = NO_DOOR_ACTION;

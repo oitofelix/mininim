@@ -455,9 +455,25 @@ enum quit_anim {
   QUIT_GAME, OUT_OF_TIME
 };
 
-struct audio_sample {
-  ALLEGRO_SAMPLE *sample;
-  ALLEGRO_SAMPLE_INSTANCE *instance;
+struct audio_source {
+  union {
+    ALLEGRO_SAMPLE *sample;
+    char *stream;
+  } data;
+
+  enum audio_type {
+    AUDIO_SAMPLE, AUDIO_STREAM
+  } type;
+};
+
+struct audio_instance {
+  struct audio_source *source;
+
+  union audio_instance_data {
+    ALLEGRO_SAMPLE_INSTANCE *sample;
+    ALLEGRO_AUDIO_STREAM *stream;
+  } data;
+
   bool played;
   uint64_t anim_cycle;
   struct pos p;

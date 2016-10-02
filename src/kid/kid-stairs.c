@@ -137,7 +137,7 @@ physics_out (struct anim *k)
   else keep_depressible_floor (k);
 
   /* sound */
-  if (k->j % 4 == 0) play_sample (step_sample, NULL, k->id);
+  if (k->j % 4 == 0) play_audio (&step_audio, NULL, k->id);
 }
 
 bool

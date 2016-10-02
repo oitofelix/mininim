@@ -373,7 +373,7 @@ compute_choppers (void)
         alert_guards (&c->p);
         c->alert = false;
       }
-      play_sample (chopper_sample, &c->p, -1);
+      play_audio (&chopper_audio, &c->p, -1);
       register_changed_pos (&c->p, CHPOS_CHOPPER);
       break;
     case 2:
@@ -423,8 +423,8 @@ compute_choppers (void)
           mr.color = get_flicker_blood_color ();
         }
         if (a->type == SKELETON)
-          play_sample (skeleton_sample, &c->p, -1);
-        else play_sample (chopped_sample, &c->p, -1);
+          play_audio (&skeleton_audio, &c->p, -1);
+        else play_audio (&chopped_audio, &c->p, -1);
         anim_die_chopped (a);
       }
     }

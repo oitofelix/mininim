@@ -36,7 +36,7 @@ fix_con (struct pos *p)
   if (f == BROKEN_FLOOR && fb != NO_FLOOR)
     set_fg (p, FLOOR);
 
-  /* con at left of non-visible collidable con at left -> wall */
+  /* con at left of non-visible wall -> wall */
   if (np.place == PLACES - 1 && f != WALL && fr == WALL)
     set_fg (p, WALL);
 
