@@ -276,7 +276,7 @@ title_anim (void)
     break;
   case 17:
     jaffar.action (&jaffar);
-    if (get_audio_instance_position (ai_data) >= 12.5 && jaffar.f.b == jaffar_normal_00) {
+    if (get_audio_instance_position (ai_data) >= 13 && jaffar.f.b == jaffar_normal_00) {
       jaffar_open_arms (&jaffar);
       i++;
     }
