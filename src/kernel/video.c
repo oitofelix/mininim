@@ -545,7 +545,7 @@ draw_pattern (ALLEGRO_BITMAP *bitmap, int ox, int oy, int w, int h,
   int x, y;
   set_target_bitmap (bitmap);
   al_lock_bitmap (bitmap, ALLEGRO_PIXEL_FORMAT_ANY,
-                  ALLEGRO_LOCK_WRITEONLY);
+                  ALLEGRO_LOCK_READWRITE);
   for (y = oy; y < oy + h; y++)
     for (x = ox; x < ox + w; x++)
       al_put_pixel (x, y, (x % 2 != y % 2) ? color_0 : color_1);
