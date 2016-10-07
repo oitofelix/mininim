@@ -203,7 +203,6 @@ play_level (struct level *lv)
 
   if (global_level.start) global_level.start ();
 
-  /* anim_cycle = 0; */
   last_auto_show_time = -1;
   current_kid_id = 0;
 

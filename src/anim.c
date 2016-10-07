@@ -423,6 +423,7 @@ play_anim (void (*draw_callback) (void),
   }
 
   al_stop_timer (timer);
+  anim_cycle = 0;
 }
 
 void
