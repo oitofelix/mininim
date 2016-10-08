@@ -228,13 +228,23 @@ static bool
 flow (struct anim *g)
 {
   if (g->oaction != guard_hit) {
+    survey (_m, pos, &g->f, NULL, &g->p, NULL);
     g->i = -1;
     g->j = 0;
     g->refraction = g->skill.refraction;
   }
 
   if (g->i == 4) {
-    guard_vigilant (g);
+    int d = (g->f.dir == LEFT) ? +1 : -1;
+    struct pos pb;
+    prel (&g->p, &pb, 0, d);
+
+    if (g->current_lives > 0) guard_vigilant (g);
+    else if (is_strictly_traversable (&pb)) {
+        place_at_pos (&g->f, _m, &pb, &g->f.c);
+        guard_fall (g);
+    } else guard_die (g);
+
     return false;
   }
 

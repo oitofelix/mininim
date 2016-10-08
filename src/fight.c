@@ -218,6 +218,8 @@ fight_ai (struct anim *k)
       && ke->has_sword
       && ! is_kid_fall (&ke->f)
       && ! is_kid_hang (&ke->f)
+      && ! is_kid_jump_air (&ke->f)
+      && ! is_kid_run_jump_air (&ke->f)
       && is_safe_to_attack (ke)) {
     place_on_the_ground (&ke->f, &ke->f.c);
     kid_take_sword (ke);
@@ -1118,13 +1120,6 @@ fight_hit (struct anim *k, struct anim *ke)
   if (! is_guard (ke))
     upgrade_skill (&ke->skill, &k->skill, k->total_lives);
 
-  if (k->current_lives <= 0) {
-    k->current_lives = 0;
-    k->death_reason = FIGHT_DEATH;
-    ke->alert_cycle = anim_cycle;
-    anim_die (k);
-  } else anim_sword_hit (k);
-
   backoff_from_range (ke, k, ATTACK_RANGE - 20, true, false);
   get_in_range (ke, k, ATTACK_RANGE - 10, false, false);
 
@@ -1133,15 +1128,17 @@ fight_hit (struct anim *k, struct anim *ke)
   survey (_m, pos, &k->f, NULL, &k->p, NULL);
   prel (&k->p, &pb, 0, d);
 
+  if (k->current_lives <= 0 && ! is_strictly_traversable (&pb)) {
+    k->current_lives = 0;
+    k->death_reason = FIGHT_DEATH;
+    ke->alert_cycle = anim_cycle;
+    anim_die (k);
+  } else anim_sword_hit (k);
+
   /* ensure anim doesn't die within a wall */
   if (fg (&k->p) == WALL) {
     if (fg_rel (&k->p, +0, +1) != WALL) k->p.place++;
     else if (fg_rel (&k->p, +0, -1) != WALL) k->p.place--;
-  }
-
-  if (k->current_lives <= 0 && is_strictly_traversable (&pb)) {
-    place_at_pos (&k->f, _m, &pb, &k->f.c);
-    anim_fall (k);
   }
 
   k->splash = true;

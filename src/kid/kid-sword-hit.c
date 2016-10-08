@@ -82,12 +82,22 @@ static bool
 flow (struct anim *k)
 {
   if (k->oaction != kid_sword_hit) {
+    survey (_m, pos, &k->f, NULL, &k->p, NULL);
     k->i = -1;
     k->j = 0;
   }
 
   if (k->i == 4) {
-    kid_sword_normal (k);
+    int d = (k->f.dir == LEFT) ? +1 : -1;
+    struct pos pb;
+    prel (&k->p, &pb, 0, d);
+
+    if (k->current_lives > 0) kid_sword_normal (k);
+    else if (is_strictly_traversable (&pb)) {
+        place_at_pos (&k->f, _m, &pb, &k->f.c);
+        kid_fall (k);
+    } else kid_die (k);
+
     return false;
   }
 
@@ -100,6 +110,7 @@ flow (struct anim *k)
   if (k->i == 4) k->j = 17;
 
   select_xframe (&k->xf, sword_frameset, k->j);
+  if (! k->has_sword) k->xf.b = NULL;
 
   if (k->i == 0) k->xf.dx = -12, k->xf.dy = +2;
   if (k->i == 1) k->xf.dy += -2;
