@@ -67,6 +67,7 @@ bool is_potentially_collidable_at_left (struct pos *p);
 bool potentially_collidable_at_right_cs (enum confg t);
 bool is_potentially_collidable_at_right (struct pos *p);
 bool is_collidable_at_right (struct pos *p, struct frame *f);
+bool is_shockwave_medium (struct pos *p);
 bool is_pillar (struct pos *p);
 bool is_rigid_con (struct pos *p);
 bool carpet_cs (enum confg t);

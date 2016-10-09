@@ -300,6 +300,16 @@ is_potentially_collidable_at_right (struct pos *p)
 }
 
 bool
+is_shockwave_medium (struct pos *p)
+{
+  enum confg f = fg (p);
+  return ! is_strictly_traversable (p)
+    && f != WALL
+    && (f != LOOSE_FLOOR ||
+        loose_floor_at_pos (p)->action != SHAKE_LOOSE_FLOOR);
+}
+
+bool
 is_pillar (struct pos *p)
 {
   enum confg t = fg (p);

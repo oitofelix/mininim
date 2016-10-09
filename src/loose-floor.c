@@ -596,12 +596,22 @@ compute_loose_floor_fall (struct loose_floor *l)
 void
 shake_loose_floor_row (struct pos *p)
 {
-  struct pos _p = *p;
+  struct pos ps;
 
-  struct loose_floor *l;
-  for (_p.place = PLACES - 1; _p.place >= -1; _p.place--)
-    if (fg (&_p) == LOOSE_FLOOR) {
-      l = loose_floor_at_pos (&_p);
+  for (ps = *p; is_shockwave_medium (&ps)
+         && abs (p->place - ps.place) < SHOCKWAVE_RADIUS; ps.place--)
+    if (fg (&ps) == LOOSE_FLOOR) {
+      struct loose_floor *l = loose_floor_at_pos (&ps);
+      if (l->action == NO_LOOSE_FLOOR_ACTION) {
+        l->action = SHAKE_LOOSE_FLOOR;
+        l->i = 0;
+      }
+    }
+
+  for (prel (p, &ps, +0, +1); is_shockwave_medium (&ps)
+         && abs (p->place - ps.place) < SHOCKWAVE_RADIUS; ps.place++)
+    if (fg (&ps) == LOOSE_FLOOR) {
+      struct loose_floor *l = loose_floor_at_pos (&ps);
       if (l->action == NO_LOOSE_FLOOR_ACTION) {
         l->action = SHAKE_LOOSE_FLOOR;
         l->i = 0;
