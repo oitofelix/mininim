@@ -177,8 +177,14 @@ save_native_level (struct level *l, char *filename)
   char *k, *v;
   int i;
 
-  /* MININIM <version> LEVEL FILE */
-  al_add_config_comment (c, NULL, "MININIM " VERSION " LEVEL FILE");
+  /* MININIM LEVEL FILE */
+  al_add_config_comment (c, NULL, "MININIM LEVEL FILE");
+
+  /* ENGINE VERSION */
+  /* V=n */
+  xasprintf (&v, "%s", VERSION);
+  al_set_config_value (c, NULL, "V", v);
+  al_free (v);
 
   /* NOMINAL NUMBER */
   /* N=n */
