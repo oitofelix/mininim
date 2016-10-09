@@ -178,7 +178,7 @@ static struct argp_option options[] = {
   {0},
 };
 
-static const char *doc = "MININIM: The Advanced Prince of Persia Engine\n(a childhood dream)\v\
+static const char *doc = "MININIM: The Advanced Prince of Persia Engine (a childhood dream) [" VERSION "]\v\
 Long option names are case sensitive.  Option values are case insensitive.   Both can be partially specified as long as they are kept unambiguous.  BOOLEAN is an integer equating to 0, or any sub-string (including the null string) of 'FALSE', 'OFF' or 'NO' to disable the respective feature, and any other value (even no string at all) to enable it.  For any non-specified option the documented default applies.  Integers can be specified in any of the formats defined by the C language.  Key bindings references are based on the default mapping.\n\n\
 The legacy command line interface present in versions 1.0, 1.3 and 1.4 of the original game is supported for the sake of compatibility with software that use it.  Legacy level and video non-option arguments are honored, while all others are currently ignored silently.  The legacy arguments can't be used by other configuration method besides the command line.";
 
@@ -1200,7 +1200,7 @@ quit_game (void)
   finalize_dialog ();
   finalize_mouse ();
 
-  fprintf (stderr, "MININIM: Hope you enjoyed it!\n");
+  fprintf (stderr, "MININIM " VERSION ": Hope you enjoyed it!\n");
 
   exit (0);
 }
@@ -1230,6 +1230,11 @@ draw_loading_screen (void)
     draw_filled_rectangle (screen, x - 1, y - 1, x + w, y + h, WHITE);
     draw_bitmap (icon, screen, x, y, 0);
     draw_text (screen, "Loading....", CUTSCENE_WIDTH / 2.0, CUTSCENE_HEIGHT / 2.0,
+               ALLEGRO_ALIGN_CENTRE);
+    al_draw_filled_rectangle (0, CUTSCENE_HEIGHT - 8,
+                              CUTSCENE_WIDTH, CUTSCENE_HEIGHT,
+                              BLUE);
+    draw_text (screen, "MININIM " VERSION, CUTSCENE_WIDTH / 2.0, CUTSCENE_HEIGHT - 7,
                ALLEGRO_ALIGN_CENTRE);
     show ();
   }
