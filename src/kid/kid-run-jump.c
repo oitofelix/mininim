@@ -101,7 +101,7 @@ flow (struct anim *k)
   struct pos pm, ptf;
 
   if (k->oaction != kid_run_jump)
-    k->i = -1, k->hang = k->crossing_mirror = false;
+    k->i = -1, k->hang = false;
 
   bool hang_front = ((k->f.dir == LEFT) ? k->key.left : k->key.right)
     && ! k->key.up && k->key.shift;
@@ -162,23 +162,20 @@ physics_in (struct anim *k)
   else k->inertia = 5;
 
   /* collision */
-  bool colliding =
-    is_colliding (&k->f, &k->fo, +0, false, &k->ci);
-  bool cross_mirror =
-    k->ci.t == MIRROR && k->i >= 5 && k->i <= 8;
-
-  if (colliding && ! cross_mirror && ! k->crossing_mirror) {
+  if (is_colliding (&k->f, &k->fo, +0, false, &k->ci)) {
     if (k->i < 6) kid_stabilize_collision (k);
     else kid_couch_collision (k);
     return false;
-  } else if (cross_mirror) {
-    if (! search_audio_instance (&mirror_audio, 0, NULL, k->id))
-      play_audio (&mirror_audio, NULL, k->id);
-    struct pos p; prel (&k->ci.p, &p, +0, k->f.dir == LEFT
-                        ? +1 : +0);
-    mirror_at_pos (&p)->kid_crossing = k->id;
-    k->crossing_mirror = true;
   }
+
+  /* play crossing mirror sample */
+  if (is_valid_pos (&k->ci.con_p)
+      && ! is_valid_pos (&k->ci.kid_p)
+      && fg (&k->ci.con_p) == MIRROR) {
+    if (! k->crossing_mirror)
+      play_audio (&mirror_audio, NULL, k->id);
+    k->crossing_mirror = true;
+  } else k->crossing_mirror = false;
 
   /* fall */
   survey (_bf, pos, &k->f, NULL, &pbf, NULL);
@@ -234,7 +231,7 @@ bool
 is_kid_run_jump_air (struct frame *f)
 {
   int i;
-  for (i = 5; i < 9; i++)
+  for (i = 4; i < 10; i++)
     if (f->b == kid_run_jump_frameset[i].frame) return true;
   return false;
 }

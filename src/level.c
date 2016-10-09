@@ -477,7 +477,6 @@ compute_level (void)
   if (anim_cycle > 0) {
     unpress_opener_floors ();
     unpress_closer_floors ();
-    uncross_mirrors ();
   }
 
   struct anim *current_kid = get_anim_by_id (current_kid_id);

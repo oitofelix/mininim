@@ -231,7 +231,8 @@ legacy_level_special_events (void)
     struct mirror *m;
     if (fg (&mirror_pos) == MIRROR
         && (m = mirror_at_pos (&mirror_pos))
-        && m->kid_crossing == k->id
+        && k->crossing_mirror
+        && peq (&k->ci.con_p, &mirror_pos)
         && shadow_id == -1) {
       k->current_lives = 1;
       int id = create_anim (k, 0, NULL, 0);

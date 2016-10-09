@@ -147,7 +147,7 @@ physics_in (struct anim *k)
   /* collision */
   /* if (! k->hang && kid_door_split_collision (k)) return false; */
   if (is_colliding (&k->f, &k->fo, +0, false, &k->ci)
-      && (k->ci.t == DOOR && k->f.dir == RIGHT))
+      && (fg (&k->ci.con_p) == DOOR && k->f.dir == RIGHT))
     k->f.c.x += (k->f.dir == LEFT) ? +4 : -4;
 
   /* fall */

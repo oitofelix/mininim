@@ -24,7 +24,7 @@ fix_con (struct pos *p)
 {
   enum confg f = fg (p);
   enum confg fr = fg_rel (p, 0, +1);
-  enum confg fb = fg_rel (p, -1, 0);
+  enum confg fa = fg_rel (p, -1, 0);
   struct pos np; npos (p, &np);
   struct pos pb; prel (p, &pb, +1, 0);
 
@@ -33,7 +33,7 @@ fix_con (struct pos *p)
     set_fg (p, FLOOR);
 
   /* broken floor below non no floor -> floor */
-  if (f == BROKEN_FLOOR && fb != NO_FLOOR)
+  if (f == BROKEN_FLOOR && fa != NO_FLOOR)
     set_fg (p, FLOOR);
 
   /* con at left of non-visible wall -> wall */
@@ -103,9 +103,9 @@ fix_adjacent_itens (struct pos *p)
   int er = ext_rel (p, 0, +1);
 
   /* item's perspective (symmetrical) */
-  if (((is_item_fg_cs (fl) && el != NO_ITEM)
-       || (is_item_fg_cs (fr) && er != NO_ITEM))
-      && is_item_fg_cs (f)) set_ext (p, NO_ITEM);
+  if (((item_fg_cs (fl) && el != NO_ITEM)
+       || (item_fg_cs (fr) && er != NO_ITEM))
+      && item_fg_cs (f)) set_ext (p, NO_ITEM);
 
   return p;
 }

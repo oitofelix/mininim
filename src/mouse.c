@@ -169,7 +169,7 @@ mouse_run (struct anim *m)
   m->dl = dist_con (&m->f, _bf, pos, -4, false, LOOSE_FLOOR);
 
   if (is_colliding (&m->f, &m->fo, m->dc, false, &m->ci)
-      && m->ci.t == DOOR)
+      && fg (&m->ci.con_p) == DOOR)
     m->dc = PLACE_WIDTH + 1;
   if (! cutscene && (m->dc < 12 || m->df < 12 || m->dl < 12)) {
     mouse_normal (m);

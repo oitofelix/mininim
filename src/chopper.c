@@ -329,19 +329,13 @@ bool
 should_chomp (struct pos *p)
 {
   int i;
-  struct pos pm, _p;
 
   for (i = 0; i < anima_nmemb; i++) {
     struct anim *a = &anima[i];
     if (a->type != KID
         || (is_anim_dead (&a->f) && ! a->id == 0)) continue;
-    survey (_m, pos, &a->f, NULL, &pm, NULL);
-    int inc = p->place < pm.place ? +1 : -1;
-    if (p->room == pm.room && p->floor == pm.floor) {
-      for (_p = *p; _p.place != pm.place; _p.place += inc)
-        if (fg (&_p) == WALL) return false;
+    if (is_pos_seeing (p, a, LEFT) || is_pos_seeing (p, a, RIGHT))
       return true;
-    }
   }
 
   return false;
@@ -394,11 +388,13 @@ compute_choppers (void)
     /* chomp kid */
     for (j = 0; j < anima_nmemb; j++) {
       struct anim *a = &anima[j];
+      struct pos pl; prel (&c->p, &pl, +0, -1);
       if (a->type == MOUSE
           || is_anim_fall (&a->f)
           || a->immortal
           || a->chopper_immune
-          || (a->action == kid_walk && a->walk != -1))
+          || (a->action == kid_walk && a->walk != -1)
+          || is_collidable_at_right (&pl, &a->f))
         continue;
       struct pos pbf, pbb;
       survey (_bf, pos, &a->f, NULL, &pbf, NULL);

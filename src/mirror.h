@@ -49,7 +49,6 @@ void register_mirror (struct pos *p);
 int compare_mirrors (const void *o0, const void *o1);
 struct mirror *mirror_at_pos (struct pos *p);
 void remove_mirror (struct mirror *m);
-void uncross_mirrors (void);
 void draw_mirror (ALLEGRO_BITMAP *bitmap, struct pos *p,
                   enum em em, enum vm vm);
 void draw_mirror_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,

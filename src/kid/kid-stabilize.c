@@ -82,7 +82,7 @@ kid_stabilize_collision (struct anim *k)
     play_audio (&hit_wall_audio, NULL, k->id);
   k->action = kid_stabilize_collision;
   place_frame (&k->f, &k->f, kid_stabilize_frameset[0].frame,
-               &k->ci.p, (k->f.dir == LEFT)
+               &k->ci.kid_p, (k->f.dir == LEFT)
                ? PLACE_WIDTH + 18 : -PLACE_WIDTH + 24, +17);
   kid_stabilize (k);
 }
@@ -94,7 +94,7 @@ kid_stabilize_back_collision (struct anim *k)
     play_audio (&hit_wall_audio, NULL, k->id);
   k->action = kid_stabilize_back_collision;
   place_frame (&k->f, &k->f, kid_stabilize_frameset[0].frame,
-               &k->ci.p, (k->f.dir == LEFT)
+               &k->ci.kid_p, (k->f.dir == LEFT)
                ? -PLACE_WIDTH + 24 : PLACE_WIDTH + 18, +17);
   kid_stabilize (k);
 }
@@ -172,7 +172,7 @@ physics_in (struct anim *k)
 
   /* collision */
   if (is_colliding (&k->f, &k->fo, +0, false, &k->ci)
-      && ! k->collision && k->ci.t != WALL) {
+      && ! k->collision && fg (&k->ci.con_p) != WALL) {
     kid_stabilize_collision (k);
     return false;
   }

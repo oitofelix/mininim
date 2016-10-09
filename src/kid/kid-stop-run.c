@@ -110,7 +110,7 @@ physics_in (struct anim *k)
 
   /* collision */
   if (is_colliding (&k->f, &k->fo, +0, false, &k->ci)) {
-    if (k->i < 2 || k->ci.t != WALL) {
+    if (k->i < 2 || fg (&k->ci.con_p) != WALL) {
       uncollide (&k->f, &k->fo, &k->fo, +0, false, &k->ci);
       /* kid_stabilize_collision (k); */
       /* return false; */

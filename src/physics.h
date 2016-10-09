@@ -61,9 +61,15 @@ struct room_linking *llink (struct level *l, int r);
 
 bool is_strictly_traversable (struct pos *p);
 bool is_traversable (struct pos *p);
+bool is_collidable_at_left (struct pos *p, struct frame *f);
+bool potentially_collidable_at_left_cs (enum confg t);
+bool is_potentially_collidable_at_left (struct pos *p);
+bool potentially_collidable_at_right_cs (enum confg t);
+bool is_potentially_collidable_at_right (struct pos *p);
+bool is_collidable_at_right (struct pos *p, struct frame *f);
 bool is_pillar (struct pos *p);
 bool is_rigid_con (struct pos *p);
-bool is_carpet_cs (enum confg t);
+bool carpet_cs (enum confg t);
 bool is_carpet (struct pos *p);
 bool is_arch_top (struct pos *p);
 bool strictly_traversable_cs (enum confg t);
@@ -72,7 +78,7 @@ bool arch_top_cs (enum confg t);
 bool is_door (struct pos *p);
 bool is_floor (struct pos *p);
 bool is_floor_like (struct pos *p);
-bool is_item_fg_cs (enum confg t);
+bool item_fg_cs (enum confg t);
 bool is_item_fg (struct pos *p);
 bool is_potion_ext (struct pos *p);
 bool is_potion (struct pos *p);
@@ -126,7 +132,7 @@ uncollide (struct frame *f, struct frame_offset *fo,
            int reverse, struct collision_info *ci);
 
 
-bool is_hangable_cs (enum confg t, enum dir d);
+bool hangable_cs (enum confg t, enum dir d);
 bool is_hangable_pos (struct pos *p, enum dir d);
 bool can_hang (struct frame *f, bool reverse, struct pos *hang_pos);
 struct pos *get_hanged_pos (struct pos *hang_pos, enum dir d, struct pos *p);

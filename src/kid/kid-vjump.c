@@ -157,17 +157,18 @@ flow (struct anim *k)
 static bool
 physics_in (struct anim *k)
 {
-  struct coord tf; struct pos ptf, ptfb, ptr, pmt, pm, pmf, pmba;
+  struct pos ptf, ptfb, ptr, pmt, pm, pmf, pmba;
 
   survey (_m, pos, &k->f, NULL, &pm, NULL);
 
   /* collision */
   if (is_colliding (&k->f, &k->fo, +0, false, &k->ci)
-      && pm.floor == k->ci.p.floor
-      && (k->ci.t == MIRROR
-          || ((k->ci.t == CARPET || k->ci.t == DOOR)
-              && k->f.dir == RIGHT)))
-    uncollide (&k->f, &k->fo, &k->fo, +0, false, &k->ci);
+      && pm.floor == k->ci.kid_p.floor) {
+    enum confg f = fg (&k->ci.con_p);
+    if (f == MIRROR ||
+        ((f == CARPET || f == DOOR) && k->f.dir == RIGHT))
+      uncollide (&k->f, &k->fo, &k->fo, +0, false, &k->ci);
+  }
 
   /* fall */
   survey (_mf, pos, &k->f, NULL, &pmf, NULL);
@@ -192,12 +193,12 @@ physics_in (struct anim *k)
 
   /* hang */
   int dir = (k->f.dir == LEFT) ? +1 : -1;
-  survey (_tf, pos, &k->f, &tf, &ptf, NULL);
+  survey (_tf, pos, &k->f, NULL, &ptf, NULL);
   if (k->i == 0
       && is_hangable_pos (prel (&ptf, &ptfb, 0, dir), k->f.dir)
       && ! (fg (&ptf) == DOOR
             && k->f.dir == LEFT
-            && tf.y <= door_grid_tip_y (&ptf) - 10)) {
+            && is_collidable_at_right (&ptf, &k->f))) {
     prel (&ptf, &k->hang_pos, 0, dir);
     pos2room (&k->hang_pos, k->f.c.room, &k->hang_pos);
     k->fo.dx += is_hang_pos_critical (&k->hang_pos) ? -12 : -3;

@@ -229,6 +229,77 @@ is_traversable (struct pos *p)
 }
 
 bool
+is_collidable_at_left (struct pos *p, struct frame *f)
+{
+  struct chopper *c;
+
+  switch (fg (p)) {
+  case WALL:
+    return true;
+  case CHOPPER:
+    c = chopper_at_pos (p);
+    if (! c->inactive) return false;
+    switch (c->i) {
+    case 0: case 4:
+      return false;
+    case 1:
+      if (f && is_kid_run_jump_air (f))
+        return false;
+      else return true;
+    case 2: case 3:
+      return true;
+    default: false;
+    }
+  case MIRROR:
+    if (f && is_kid_run_jump_air (f))
+      return false;
+    else return true;
+  default: return false;
+  }
+}
+
+bool
+potentially_collidable_at_left_cs (enum confg t)
+{
+  return t == WALL  || t == CHOPPER || t == MIRROR;
+}
+
+bool
+is_potentially_collidable_at_left (struct pos *p)
+{
+  return potentially_collidable_at_left_cs (fg (p));
+}
+
+bool
+is_collidable_at_right (struct pos *p, struct frame *f)
+{
+  struct coord tf;
+  switch (fg (p)) {
+  case WALL: case TCARPET: case CARPET:
+    return true;
+  case DOOR:
+    if (f && _tf (f, &tf)
+        && tf.y <= door_grid_tip_y (p) - DOOR_GRID_TIP_THRESHOLD)
+      return true;
+    else return false;
+  default: return false;
+  }
+}
+
+bool
+potentially_collidable_at_right_cs (enum confg t)
+{
+  return t == WALL  || t == DOOR
+    || t == TCARPET || t == CARPET;
+}
+
+bool
+is_potentially_collidable_at_right (struct pos *p)
+{
+  return potentially_collidable_at_right_cs (fg (p));
+}
+
+bool
 is_pillar (struct pos *p)
 {
   enum confg t = fg (p);
@@ -248,7 +319,7 @@ is_rigid_con (struct pos *p)
 }
 
 bool
-is_carpet_cs (enum confg t)
+carpet_cs (enum confg t)
 {
   return t == CARPET || t == TCARPET;
 }
@@ -257,7 +328,7 @@ bool
 is_carpet (struct pos *p)
 {
   enum confg t = fg (p);
-  return is_carpet_cs (t);
+  return carpet_cs (t);
 }
 
 bool
@@ -314,7 +385,7 @@ is_floor_like (struct pos *p)
 }
 
 bool
-is_item_fg_cs (enum confg t)
+item_fg_cs (enum confg t)
 {
   return t == FLOOR
     || t == BROKEN_FLOOR
@@ -329,7 +400,7 @@ is_item_fg_cs (enum confg t)
 bool
 is_item_fg (struct pos *p)
 {
-  return is_item_fg_cs (fg (p));
+  return item_fg_cs (fg (p));
 }
 
 bool
@@ -867,165 +938,98 @@ is_colliding_cf (struct frame *f, struct frame_offset *fo, int dx,
   if (pcf.room != _pcf.room) pos2room (&pcf, _f.c.room, &pcf);
   if (pocf.room != pcf.room) pos2room (&pocf, pcf.room, &pocf);
 
-  bool wall_collision = false;
-  bool door_collision = false;
-  bool carpet_collision = false;
-  bool mirror_collision = false;
+  invalid_pos (&ci->kid_p);
+  invalid_pos (&ci->con_p);
+
+  /* collidable at left */
+
+  if (_f.dir == LEFT && pcf.place < _pcf.place
+      && _f.c.room != roomd (_f.c.l, _f.c.room, LEFT))
+    for (prel (&_pcf, &p, +0, -1); p.place >= pcf.place;
+         prel (&p, &p, +0, -1)) {
+      prel (&p, &pr, +0, +1);
+      if (is_potentially_collidable_at_left (&pr)) {
+        ci->con_p = pr;
+        if (is_collidable_at_left (&pr, &_f)) {
+          ci->kid_p = p;
+          break;
+        }
+      }
+    }
+
+  if (_f.dir == RIGHT && pcf.place > _pcf.place
+      && _f.c.room != roomd (_f.c.l, _f.c.room, RIGHT))
+    for (prel (&_pcf, &p, +0, +1); p.place <= pcf.place;
+         prel (&p, &p, +0, +1))
+      if (is_potentially_collidable_at_left (&p)) {
+        ci->con_p = p;
+        if (is_collidable_at_left (&p, &_f)) {
+          ci->kid_p = p;
+          break;
+        }
+      }
+
+  if (is_potentially_collidable_at_left (&pocf)
+      && pcf.place < pocf.place) {
+    ci->con_p = pocf;
+    if (is_collidable_at_left (&pocf, &_f))
+      prel (&pocf, &ci->kid_p, +0, -1);
+  }
+
+  if (is_potentially_collidable_at_left (&pcf)
+      && pocf.place < pcf.place) {
+    ci->con_p = pcf;
+    if (is_collidable_at_left (&pcf, &_f))
+      ci->kid_p = pcf;
+  }
+
+  /* collidable at right */
+
+  if (_f.dir == LEFT && pcf.place < _pcf.place
+      && _f.c.room != roomd (_f.c.l, _f.c.room, LEFT))
+    for (prel (&_pcf, &p, +0, -1); p.place >= pcf.place;
+         prel (&p, &p, +0, -1))
+      if (is_potentially_collidable_at_right (&p)) {
+        ci->con_p = p;
+        if (is_collidable_at_right (&p, &_f)) {
+          ci->kid_p = p;
+          break;
+        }
+      }
+
+  if (_f.dir == RIGHT && pcf.place > _pcf.place
+      && _f.c.room != roomd (_f.c.l, _f.c.room, RIGHT))
+    for (prel (&_pcf, &p, +0, +1); p.place <= pcf.place;
+         prel (&p, &p, +0, +1)) {
+      prel (&p, &pl, +0, -1);
+      if (is_potentially_collidable_at_right (&pl)) {
+        ci->con_p = pl;
+        if (is_collidable_at_right (&pl, &_f)) {
+          ci->kid_p = p;
+          break;
+        }
+      }
+    }
+
+  if (is_potentially_collidable_at_right (&pcf)
+      && pcf.place < pocf.place) {
+    ci->con_p = pcf;
+    if (is_collidable_at_right (&pcf, &_f))
+      ci->kid_p = pcf;
+  }
+
+  if (is_potentially_collidable_at_right (&pocf)
+      && pocf.place < pcf.place) {
+    ci->con_p = pocf;
+    if (is_collidable_at_right (&pocf, &_f))
+      prel (&pocf, &ci->kid_p, +0, +1);
+  }
 
   /* printf ("_pcf: (%i,%i,%i); pcf: (%i,%i,%i)\n", */
   /*         _pcf.room, _pcf.floor, _pcf.place, */
   /*         pcf.room, pcf.floor, pcf.place); */
 
-  /* wall */
-
-  if (_f.dir == LEFT && pcf.place <= _pcf.place
-      && _f.c.room != roomd (_f.c.l, _f.c.room, LEFT))
-    for (p = _pcf; p.place >= pcf.place; prel (&p, &p, +0, -1))
-      if (fg (&p) == WALL) {
-        wall_collision = true;
-        ci->p = p;
-        break;
-      }
-
-  if (_f.dir == RIGHT && pcf.place >= _pcf.place
-      && _f.c.room != roomd (_f.c.l, _f.c.room, RIGHT))
-    for (p = _pcf; p.place <= pcf.place; prel (&p, &p, +0, +1))
-      if (fg (&p) == WALL) {
-        wall_collision = true;
-        ci->p = p;
-        break;
-      }
-
-  if (fg (&pcf) == WALL) {
-    wall_collision = true;
-    ci->p = pcf;
-  }
-
-
-  /* door */
-
-  if (_f.dir == LEFT && pcf.place < _pcf.place
-      && _f.c.room != roomd (_f.c.l, _f.c.room, LEFT))
-    for (prel (&_pcf, &p, +0, -1); p.place >= pcf.place; prel (&p, &p, +0, -1))
-      if (fg (&p) == DOOR
-          && tf.y <= door_grid_tip_y (&p) - 10) {
-        door_collision = true;
-        ci->p = p;
-        break;
-      }
-
-  if (_f.dir == RIGHT && pcf.place > _pcf.place
-      && _f.c.room != roomd (_f.c.l, _f.c.room, RIGHT))
-    for (prel (&_pcf, &p, +0, +1); p.place <= pcf.place; prel (&p, &p, +0, +1)) {
-      prel (&p, &pl, +0, -1);
-      if (fg (&pl) == DOOR
-          && tf.y <= door_grid_tip_y (&pl) - 10) {
-        door_collision = true;
-        ci->p = p;
-        break;
-      }
-    }
-
-  if (fg (&pcf) == DOOR
-      && pcf.place < pocf.place
-      && tf.y <= door_grid_tip_y (&pcf) - 10) {
-    door_collision = true;
-    ci->p = pcf;
-  }
-
-  if (fg (&pocf) == DOOR
-      && pocf.place < pcf.place
-      && tf.y <= door_grid_tip_y (&pocf) - 10) {
-    door_collision = true;
-    prel (&pocf, &ci->p, +0, +1);
-  }
-
-
-  /* carpet */
-
-  if (_f.dir == LEFT && pcf.place < _pcf.place
-      && _f.c.room != roomd (_f.c.l, _f.c.room, LEFT))
-    for (prel (&_pcf, &p, +0, -1); p.place >= pcf.place; prel (&p, &p, +0, -1))
-      if (is_carpet (&p)) {
-        carpet_collision = true;
-        ci->p = p;
-        break;
-      }
-
-  if (_f.dir == RIGHT && pcf.place > _pcf.place
-      && _f.c.room != roomd (_f.c.l, _f.c.room, RIGHT))
-    for (prel (&_pcf, &p, +0, +1); p.place <= pcf.place; prel (&p, &p, +0, +1)) {
-      prel (&p, &pl, +0, -1);
-      if (is_carpet (&pl)) {
-        carpet_collision = true;
-        ci->p = p;
-        break;
-      }
-    }
-
-  if (is_carpet (&pcf)
-      && pcf.place < pocf.place) {
-    carpet_collision = true;
-    ci->p = pcf;
-  }
-
-  if (is_carpet (&pocf)
-      && pocf.place < pcf.place) {
-    carpet_collision = true;
-    prel (&pocf, &ci->p, +0, +1);
-  }
-
-
-  /* mirror */
-
-  if (_f.dir == LEFT && pcf.place < _pcf.place
-      && _f.c.room != roomd (_f.c.l, _f.c.room, LEFT))
-    for (prel (&_pcf, &p, +0, -1); p.place >= pcf.place; prel (&p, &p, +0, -1)) {
-      prel (&p, &pr, +0, +1);
-      if (fg (&pr) == MIRROR) {
-        mirror_collision = true;
-        ci->p = p;
-        break;
-      }
-    }
-
-  if (_f.dir == RIGHT && pcf.place > _pcf.place
-      && _f.c.room != roomd (_f.c.l, _f.c.room, RIGHT))
-    for (prel (&_pcf, &p, +0, +1); p.place <= pcf.place; prel (&p, &p, +0, +1)) {
-      if (fg (&p) == MIRROR) {
-        mirror_collision = true;
-        ci->p = p;
-        break;
-      }
-    }
-
-  if (fg (&pocf) == MIRROR
-      && pcf.place < pocf.place) {
-    mirror_collision = true;
-    prel (&pocf, &ci->p, +0, -1);
-  }
-
-  if (fg (&pcf) == MIRROR
-      && pocf.place < pcf.place) {
-    mirror_collision = true;
-    ci->p = pcf;
-  }
-
-  ci->t = NO_FLOOR;
-  if (wall_collision) ci->t = WALL;
-  if (door_collision) ci->t = DOOR;
-  if (carpet_collision) ci->t = CARPET;
-  if (mirror_collision) ci->t = MIRROR;
-
-  /* if (wall_collision || door_collision || carpet_collision || mirror_collision) */
-  /*   pos2room (&ci->p, _f.c.room, &ci->p); */
-
-  /* if (door_collision) printf ("DOOR COLLISION!\n"); */
-  /* if (wall_collision) printf ("WALL COLLISION!\n"); */
-  /* if (carpet_collision) printf ("CARPET COLLISION!\n"); */
-  /* if (mirror_collision) printf ("MIRROR COLLISION!\n"); */
-
-  return wall_collision || door_collision || carpet_collision || mirror_collision;
+  return is_valid_pos (&ci->kid_p);
 }
 
 struct frame_offset *
@@ -1161,7 +1165,7 @@ dist_fall (struct frame *f, bool reverse)
 
 
 bool
-is_hangable_cs (enum confg t, enum dir d)
+hangable_cs (enum confg t, enum dir d)
 {
   return t == FLOOR
     || t == BROKEN_FLOOR
@@ -1192,7 +1196,7 @@ is_hangable_pos (struct pos *p, enum dir d)
 
   struct pos pa; prel (p, &pa, -1, 0);
 
-  return is_hangable_cs (fg_rel (p, -1, dir), d)
+  return hangable_cs (fg_rel (p, -1, dir), d)
     && is_strictly_traversable (&pa)
     && ! (d == LEFT && f == CHOPPER)
     && ! (d == LEFT && f == MIRROR)

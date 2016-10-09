@@ -558,46 +558,46 @@ f = %i, p = %i, dn = %i, dp = %i, dc = %i, dcb = %i, df = %i, dl = %i, dcl = %i,
 bool
 kid_door_split_collision (struct anim *k)
 {
-  struct coord tf; struct pos ptb, ptf;
+  struct pos ptb, ptf;
 
   survey (_tb, pos, &k->f, NULL, &ptb, NULL);
-  survey (_tf, pos, &k->f, &tf, &ptf, NULL);
+  survey (_tf, pos, &k->f, NULL, &ptf, NULL);
 
   int dntb = dist_next_place (&k->f, _tb, pos, +0, false);
   int dptf = dist_next_place (&k->f, _tf, pos, +0, true);
 
   if (k->f.dir == RIGHT
       && fg (&ptb) == DOOR
-      && tf.y <= door_grid_tip_y (&ptb) - 10
+      && is_collidable_at_right (&ptb, &k->f)
       && dntb >= 7 && dntb <= 16) {
-    prel (&ptb, &k->ci.p, +0, +1);
+    prel (&ptb, &k->ci.kid_p, +0, +1);
     kid_stabilize_collision (k);
     return true;
   }
 
   if (k->f.dir == RIGHT
       && fg (&ptb) == DOOR
-      && tf.y <= door_grid_tip_y (&ptb) - 10
+      && is_collidable_at_right (&ptb, &k->f)
       && dntb <= 6) {
-    k->ci.p = ptb;
+    k->ci.kid_p = ptb;
     kid_stabilize_back_collision (k);
     return true;
   }
 
   if (k->f.dir == LEFT
       && fg (&ptf) == DOOR
-      && tf.y <= door_grid_tip_y (&ptf) - 10
+      && is_collidable_at_right (&ptf, &k->f)
       && dptf <= 11) {
-    k->ci.p = ptf;
+    k->ci.kid_p = ptf;
     kid_stabilize_collision (k);
     return true;
   }
 
   if (k->f.dir == LEFT
       && fg (&ptf) == DOOR
-      && tf.y <= door_grid_tip_y (&ptf) - 10
+      && is_collidable_at_right (&ptf, &k->f)
       && dptf >= 12 && dptf <= 18) {
-    prel (&ptf, &k->ci.p, +0, +1);
+    prel (&ptf, &k->ci.kid_p, +0, +1);
     kid_stabilize_back_collision (k);
     return true;
   }

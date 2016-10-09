@@ -93,7 +93,6 @@ register_mirror (struct pos *p)
   struct mirror m;
 
   m.p = *p;
-  m.kid_crossing = -1;
 
   mirror =
     add_to_array (&m, 1, mirror, &mirror_nmemb,
@@ -126,14 +125,6 @@ remove_mirror (struct mirror *m)
   size_t i =  m - mirror;
   mirror =
     remove_from_array (mirror, &mirror_nmemb, i, 1, sizeof (*m));
-}
-
-void
-uncross_mirrors (void)
-{
-  size_t i;
-  for (i = 0; i < mirror_nmemb; i++)
-    mirror[i].kid_crossing = -1;
 }
 
 void

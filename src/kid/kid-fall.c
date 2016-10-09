@@ -163,8 +163,7 @@ physics_in (struct anim *k)
   /* printf ("inertia: %i\n", k->inertia); */
 
   /* collision */
-  if (is_colliding (&k->f, &k->fo, +0, false, &k->ci)
-      && (k->ci.t != MIRROR || ! k->crossing_mirror)) {
+  if (is_colliding (&k->f, &k->fo, +0, false, &k->ci)) {
     k->inertia = 0;
     k->fo.dx = +0;
     uncollide (&k->f, &k->fo, &k->fo, +0, false, &k->ci);

@@ -122,7 +122,10 @@ flow (struct anim *k)
 
     k->dcd = 0;
 
-    if (k->dc <= PLACE_WIDTH + 4 && k->ci.t != WALL && k->dc < k->df) {
+    if (k->dc <= PLACE_WIDTH + 4
+        && (! is_valid_pos (&k->ci.con_p)
+            || fg (&k->ci.con_p) != WALL)
+        && k->dc < k->df) {
       k->dcd = 9;
       k->dc -= k->dcd;
     }
@@ -138,7 +141,9 @@ flow (struct anim *k)
     else if (k->df <= PLACE_WIDTH) k->confg = NO_FLOOR;
     else if (k->dl <= PLACE_WIDTH) k->confg = LOOSE_FLOOR;
     else if (k->dcl <= PLACE_WIDTH) k->confg = CLOSER_FLOOR;
-    else if (k->dc <= PLACE_WIDTH + 4) k->confg = k->ci.t;
+    else if (k->dc <= PLACE_WIDTH + 4
+             && is_valid_pos (&k->ci.con_p))
+      k->confg = fg (&k->ci.con_p);
     else k->confg = FLOOR;
   }
 

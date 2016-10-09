@@ -362,8 +362,7 @@ struct anim {
   struct frame_offset xf;
 
   struct collision_info {
-    enum confg t;
-    struct pos p;
+    struct pos kid_p, con_p;
   } ci;
 
   struct gamepad_state key;
@@ -609,7 +608,6 @@ struct loose_floor {
 
 struct mirror {
   struct pos p;
-  int kid_crossing;
 };
 
 struct opener_floor {

@@ -104,7 +104,7 @@ kid_couch_collision (struct anim *k)
 {
   k->action = kid_couch_collision;
   place_frame (&k->f, &k->f, kid_couch_frameset[0].frame,
-               &k->ci.p, (k->f.dir == LEFT)
+               &k->ci.kid_p, (k->f.dir == LEFT)
                ? +PLACE_WIDTH + 24 : -PLACE_WIDTH + 18, +27);
   kid_couch (k);
   play_audio (&hit_wall_audio, NULL, k->id);
@@ -228,15 +228,15 @@ physics_in (struct anim *k)
 
   /* collision */
   if (is_colliding (&k->f, &k->fo, +0, false, &k->ci)
-      && k->ci.t == DOOR
-      && prel (&k->ci.p, &p, +0, k->f.dir == LEFT ? +0 : -1)
+      && fg (&k->ci.con_p) == DOOR
+      && prel (&k->ci.kid_p, &p, +0, k->f.dir == LEFT ? +0 : -1)
       && door_at_pos (&p)->i >= 32
       && couch_jump) {
     kid_stabilize_collision (k);
     return false;
   } else if (is_colliding (&k->f, &k->fo, +0, false, &k->ci)
-             && k->ci.t != MIRROR
-             && (! couch_jump || k->ci.t != DOOR)) {
+             && fg (&k->ci.con_p) != MIRROR
+             && (! couch_jump || fg (&k->ci.con_p) != DOOR)) {
     if (k->i <= 2 && k->fall)
       uncollide (&k->f, &k->fo, &k->fo, +0, false, &k->ci);
     else {
@@ -244,7 +244,7 @@ physics_in (struct anim *k)
       return false;
     }
   } else if (is_colliding (&k->f, &k->fo, +2, false, &k->ci)
-             && k->ci.t == MIRROR) {
+             && fg (&k->ci.con_p) == MIRROR) {
     if (k->i <= 2)
       uncollide (&k->f, &k->fo, &k->fo, +2, false, &k->ci);
     else {

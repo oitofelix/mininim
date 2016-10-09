@@ -60,7 +60,8 @@ next_consistency_level (struct level *l, int n)
   l->next_level = next_consistency_level;
   l->cutscene = NULL;
 
-  l->em = DUNGEON;
+  l->em = prandom (1) ? DUNGEON : PALACE;
   l->hue = HUE_NONE;
+  l->has_sword = true;
   return l;
 }
