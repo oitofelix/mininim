@@ -192,7 +192,7 @@ title_anim (void)
     if (get_audio_instance_position (ai_data) >= 15.2) i++;
     break;
   case 7:
-    if (! is_playing_audio_instance (ai_data)) {
+    if (! is_audio_instance_playing (ai_data)) {
       start_video_effect (VIDEO_ROLL_RIGHT, SEC2EFF (0.5));
       ai_data = play_audio (&in_the_absence_audio, NULL, -1);
       i++;
@@ -207,7 +207,7 @@ title_anim (void)
   case 9:
     if (! is_video_effect_started ()) i++; break;
   case 10:
-    if (! is_playing_audio_instance (ai_data)) {
+    if (! is_audio_instance_playing (ai_data)) {
       princess.f.c.x = 142;
       princess.f.c.y = 124;
       princess.f.b = princess_normal_00;
@@ -241,19 +241,19 @@ title_anim (void)
     }
     break;
   case 12:
-    if (! is_playing_audio_instance (ai_data)) {
+    if (! is_audio_instance_playing (ai_data)) {
       ai_data = play_audio (&door_close_audio, NULL, -1);
       i++;
     }
     break;
   case 13:
-    if (! is_playing_audio_instance (ai_data)) {
+    if (! is_audio_instance_playing (ai_data)) {
       ai_data = play_audio (&creaking_door_audio, NULL, -1);
       i++;
     }
     break;
   case 14:
-    if (! is_playing_audio_instance (ai_data)) {
+    if (! is_audio_instance_playing (ai_data)) {
       princess_turn (&princess);
       i++;
     }
@@ -346,7 +346,7 @@ title_anim (void)
     }
     break;
   case 27:
-    if (! is_playing_audio_instance (ai_data)) {
+    if (! is_audio_instance_playing (ai_data)) {
       start_video_effect (VIDEO_ROLL_RIGHT, SEC2EFF (0.5));
       i++;
     }
@@ -416,7 +416,7 @@ cutscene_01_05_11_anim (void)
     }
     break;
   case 2:
-    if (! is_playing_audio_instance (ai_data)
+    if (! is_audio_instance_playing (ai_data)
         && ! is_video_effect_started ()) quit_anim = true;
     break;
   }
@@ -477,7 +477,7 @@ cutscene_11_little_time_left_anim (void)
     }
     break;
   case 3:
-    if (! is_playing_audio_instance (ai_data)
+    if (! is_audio_instance_playing (ai_data)
         && ! is_video_effect_started ()) quit_anim = true;
     break;
   }
@@ -539,7 +539,7 @@ cutscene_03_anim (void)
     }
     break;
   case 2:
-    if (! is_playing_audio_instance (ai_data)
+    if (! is_audio_instance_playing (ai_data)
         && ! is_video_effect_started ()) quit_anim = true;
     break;
   }
@@ -616,7 +616,7 @@ cutscene_07_anim (void)
     }
     break;
   case 4:
-    if (! is_playing_audio_instance (ai_data)
+    if (! is_audio_instance_playing (ai_data)
         && ! is_video_effect_started ()) quit_anim = true;
     break;
   }
@@ -701,7 +701,7 @@ cutscene_08_anim (void)
     break;
   case 5:
     princess.action (&princess);
-    if (! is_playing_audio_instance (ai_data)
+    if (! is_audio_instance_playing (ai_data)
         && ! is_video_effect_started ()) quit_anim = true;
     break;
   }
@@ -797,7 +797,7 @@ cutscene_14_anim (void)
     break;
   case 5:
     princess.action (&princess);
-    if (! is_playing_audio_instance (ai_data)
+    if (! is_audio_instance_playing (ai_data)
         && ! is_video_effect_started ()) {
       start_video_effect (VIDEO_FADE_IN, SEC2EFF (1));
       ai_data = play_audio (&happy_end_audio, NULL, -1);
@@ -828,7 +828,7 @@ cutscene_14_anim (void)
     if (get_audio_instance_position (ai_data) >= 111.1) i++;
     break;
   case 10:
-    if (! is_playing_audio_instance (ai_data)) {
+    if (! is_audio_instance_playing (ai_data)) {
       start_video_effect (VIDEO_FADE_OUT, SEC2EFF (1));
       i++;
     }
@@ -883,7 +883,7 @@ cutscene_out_of_time_anim (void)
     }
     break;
   case 2:
-    if (! is_playing_audio_instance (ai_data)
+    if (! is_audio_instance_playing (ai_data)
         && ! is_video_effect_started ()) quit_anim = RESTART_GAME;
     break;
   }

@@ -533,7 +533,7 @@ legacy_level_special_events (void)
     } else if (shadow_merged
                && (ai = search_audio_instance (&success_audio, 0,
                                                NULL, k->id))
-               && is_playing_audio_instance (ai->data))
+               && is_audio_instance_playing (ai->data))
       k->shadow = (anim_cycle % 2);
     /* after the success music has finished to play, the kid goes
        normal again */
@@ -644,7 +644,7 @@ legacy_level_end (struct pos *p)
     played_sample = true;
   }
 
-  if (! is_playing_audio_instance (ai_data)) {
+  if (! is_audio_instance_playing (ai_data)) {
     next_level = global_level.n + 1;
     quit_anim = NEXT_LEVEL;
   }

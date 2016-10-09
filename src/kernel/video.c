@@ -483,7 +483,7 @@ flip_display (ALLEGRO_BITMAP *bitmap)
       if (flags & ALLEGRO_FLIP_VERTICAL)
         ry = (mr.h - 1) - mr.y;
       draw_mr_select_rect (rx, ry, RED);
-      mr.select_cycles--;
+      if (! pause_anim) mr.select_cycles--;
     }
   }
 
@@ -598,52 +598,54 @@ show (void)
   default: break;
   }
 
-  if (++effect_counter >= video_effect.duration + 2) {
-    effect_counter = 0;
-    stop_video_effect ();
-    return;
-  }
+  if (! pause_anim) {
+    if (++effect_counter >= video_effect.duration + 2) {
+      effect_counter = 0;
+      stop_video_effect ();
+      return;
+    }
 
-  switch (video_effect.type) {
-  case VIDEO_FLICKERING:
-    if (effect_counter % 2 && effect_counter < video_effect.duration) {
-      clear_bitmap (effect_buffer, video_effect.color);
-      convert_mask_to_alpha (screen, BLACK);
-    } else clear_bitmap (effect_buffer, BLACK);
-    draw_bitmap (screen, effect_buffer, 0, 0, 0);
-    break;
-  case VIDEO_FADE_IN:
-    switch (vm) {
-    case CGA: case EGA:
-      draw_shutter (screen, effect_buffer, video_effect.duration / 4, effect_counter);
-      if (effect_counter >= video_effect.duration / 4)
-        effect_counter += video_effect.duration;
+    switch (video_effect.type) {
+    case VIDEO_FLICKERING:
+      if (effect_counter % 2 && effect_counter < video_effect.duration) {
+        clear_bitmap (effect_buffer, video_effect.color);
+        convert_mask_to_alpha (screen, BLACK);
+      } else clear_bitmap (effect_buffer, BLACK);
+      draw_bitmap (screen, effect_buffer, 0, 0, 0);
       break;
-    case VGA:
-      draw_fade (screen, effect_buffer, 1 - (float) effect_counter
-                 / (float) video_effect.duration);
+    case VIDEO_FADE_IN:
+      switch (vm) {
+      case CGA: case EGA:
+        draw_shutter (screen, effect_buffer, video_effect.duration / 4, effect_counter);
+        if (effect_counter >= video_effect.duration / 4)
+          effect_counter += video_effect.duration;
+        break;
+      case VGA:
+        draw_fade (screen, effect_buffer, 1 - (float) effect_counter
+                   / (float) video_effect.duration);
+        break;
+      }
       break;
+    case VIDEO_FADE_OUT:
+      switch (vm) {
+      case CGA: case EGA:
+        draw_shutter (black_screen, effect_buffer, video_effect.duration / 4,
+                      effect_counter);
+        if (effect_counter >= video_effect.duration / 4)
+          effect_counter += video_effect.duration;
+        break;
+      case VGA:
+        draw_fade (screen, effect_buffer, (float) effect_counter
+                   / (float) video_effect.duration);
+        break;
+      }
+      if (effect_counter + 1 >= video_effect.duration) clear_bitmap (effect_buffer, BLACK);
+      break;
+    case VIDEO_ROLL_RIGHT:
+      draw_roll_right (screen, effect_buffer, video_effect.duration, effect_counter);
+      break;
+    default: assert (false); break;
     }
-    break;
-  case VIDEO_FADE_OUT:
-    switch (vm) {
-    case CGA: case EGA:
-      draw_shutter (black_screen, effect_buffer, video_effect.duration / 4,
-                    effect_counter);
-      if (effect_counter >= video_effect.duration / 4)
-        effect_counter += video_effect.duration;
-      break;
-    case VGA:
-      draw_fade (screen, effect_buffer, (float) effect_counter
-                 / (float) video_effect.duration);
-      break;
-    }
-    if (effect_counter + 1 >= video_effect.duration) clear_bitmap (effect_buffer, BLACK);
-    break;
-  case VIDEO_ROLL_RIGHT:
-    draw_roll_right (screen, effect_buffer, video_effect.duration, effect_counter);
-    break;
-  default: assert (false); break;
   }
 
   flip_display (effect_buffer);

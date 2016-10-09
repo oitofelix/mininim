@@ -54,7 +54,28 @@ char *resources_dir,
 
 char *levels_dat_compat_filename;
 
-ALLEGRO_THREAD *load_config_dialog_thread, *save_game_dialog_thread;
+ALLEGRO_THREAD *load_config_dialog_thread, *save_game_dialog_thread,
+  *save_picture_dialog_thread;
+
+struct dialog load_config_dialog = {
+  .title = "Load configuration file",
+  .patterns = "*.*",
+  .mode = ALLEGRO_FILECHOOSER_FILE_MUST_EXIST,
+};
+
+struct dialog save_game_dialog = {
+  .title = "Save game",
+  .patterns = "*.SAV",
+  .mode = ALLEGRO_FILECHOOSER_SAVE,
+};
+
+struct dialog save_picture_dialog = {
+  .title = "Save picture",
+  .patterns = "image/png",
+  .mode = ALLEGRO_FILECHOOSER_SAVE
+  | ALLEGRO_FILECHOOSER_PICTURES,
+};
+
 uint64_t play_time;
 bool play_time_stopped;
 enum vm vm = VGA;
@@ -1294,6 +1315,11 @@ get_paths (void)
 
   /* get legacy LEVELS.DAT compatibility path */
   xasprintf (&levels_dat_compat_filename, "LEVELS.DAT");
+
+  /* get dialogs initial paths */
+  xasprintf (&load_config_dialog.initial_path, "%s", user_settings_dir);
+  xasprintf (&save_game_dialog.initial_path, "%s", user_settings_dir);
+  xasprintf (&save_picture_dialog.initial_path, "%s", user_documents_dir);
 }
 
 static void
@@ -1323,55 +1349,20 @@ print_display_modes (void)
 }
 
 void *
-load_config_dialog (ALLEGRO_THREAD *thread, void *arg)
+dialog_thread (ALLEGRO_THREAD *thread, void *arg)
 {
+  struct dialog *d = arg;
   show_mouse_cursor ();
 
   ALLEGRO_FILECHOOSER *dialog =
-    create_native_file_dialog (user_home_dir, "Load configuration file",
-                               "*.*", ALLEGRO_FILECHOOSER_FILE_MUST_EXIST);
+    create_native_file_dialog (d->initial_path, d->title,
+                               d->patterns, d->mode);
   al_show_native_file_dialog (display, dialog);
 
   char *filename = NULL;
   if (al_get_native_file_dialog_count (dialog)) {
     filename = (char *) al_get_native_file_dialog_path (dialog, 0);
     xasprintf (&filename, "%s", filename);
-  }
-
-  al_destroy_native_file_dialog (dialog);
-  al_set_thread_should_stop (thread);
-
-  if (is_fullscreen ()) hide_mouse_cursor ();
-  else show_mouse_cursor ();
-
-  return filename;
-}
-
-void *
-save_game_dialog (ALLEGRO_THREAD *thread, void *arg)
-{
-  show_mouse_cursor ();
-
-  ALLEGRO_FILECHOOSER *dialog =
-    create_native_file_dialog (user_home_dir, "Save game",
-                               "*.*", ALLEGRO_FILECHOOSER_SAVE);
-  al_show_native_file_dialog (display, dialog);
-
-  char *filename = NULL;
-  if (al_get_native_file_dialog_count (dialog)) {
-    filename = (char *) al_get_native_file_dialog_path (dialog, 0);
-
-    int r = 1;
-    if (al_filename_exists (filename))
-      r = al_show_native_message_box
-        (display, "Warning",
-         "File already exists!",
-         "Do you want to overwrite it?",
-         NULL,
-         ALLEGRO_MESSAGEBOX_WARN | ALLEGRO_MESSAGEBOX_YES_NO);
-
-    if (r == 1) xasprintf (&filename, "%s", filename);
-    else filename = NULL;
   }
 
   al_destroy_native_file_dialog (dialog);

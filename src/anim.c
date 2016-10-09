@@ -73,7 +73,8 @@ play_anim (void (*draw_callback) (void),
           load_config_dialog_thread = NULL;
           if (filename) {
             ALLEGRO_TEXTLOG *textlog = load_config (filename);
-            al_free (filename);
+            al_free (load_config_dialog.initial_path);
+            load_config_dialog.initial_path = filename;
             if (textlog)
               al_register_event_source
                 (event_queue, get_native_text_log_event_source (textlog));
@@ -87,26 +88,47 @@ play_anim (void (*draw_callback) (void),
           al_join_thread (save_game_dialog_thread, (void *) &filename);
           al_destroy_thread (save_game_dialog_thread);
           save_game_dialog_thread = NULL;
-          unpause_game ();
+          pause_animation (false);
           if (filename) {
             save_game (filename);
-            al_free (filename);
+            al_free (save_game_dialog.initial_path);
+            save_game_dialog.initial_path = filename;
           }
         }
 
+        /* save picture */
+        if (save_picture_dialog_thread
+            && al_get_thread_should_stop (save_picture_dialog_thread)) {
+          char *filename;
+          al_join_thread (save_picture_dialog_thread, (void *) &filename);
+          al_destroy_thread (save_picture_dialog_thread);
+          save_picture_dialog_thread = NULL;
+          if (filename) {
+            char *error_str = al_save_bitmap (filename, al_get_backbuffer (display))
+              ? "PICTURE HAS BEEN SAVED"
+              : "PICTURE SAVE FAILED";
+            draw_bottom_text (NULL, error_str, 0);
+            al_free (save_picture_dialog.initial_path);
+            save_picture_dialog.initial_path = filename;
+          }
+          pause_animation (false);
+        }
+
         if (was_key_pressed (ALLEGRO_KEY_ESCAPE, 0, ALLEGRO_KEYMOD_ALT, false))
-          pause_anim = true;
+          pause_animation (true);
         if (was_key_pressed (ALLEGRO_KEY_ESCAPE, 0, ALLEGRO_KEYMOD_CTRL, true))
-          pause_anim = false;
+          pause_animation (false);
 
         kid_debug ();
 
-        if (anim_cycle > 0) {
-          if (is_video_effect_started ()) {
-            effect_counter--;
-            show ();
-          } else show ();
-        }
+        /* if (anim_cycle > 0) { */
+        /*   if (is_video_effect_started ()) { */
+        /*     effect_counter--; */
+        /*     show (); */
+        /*   } else show (); */
+        /* } */
+
+        if (anim_cycle > 0) show ();
 
         if (! pause_anim
             || was_key_pressed (ALLEGRO_KEY_ESCAPE, 0,
@@ -117,10 +139,10 @@ play_anim (void (*draw_callback) (void),
           play_audio_instances ();
           if (! is_game_paused ())
             anim_cycle++;
+          if (! cutscene) editor ();
+          if (bottom_text_timer) bottom_text_timer++;
+          draw_bottom_text (uscreen, NULL, 0);
         }
-        if (! cutscene) editor ();
-        if (bottom_text_timer) bottom_text_timer++;
-        draw_bottom_text (uscreen, NULL, 0);
         drop_all_events_from_source
           (event_queue, get_timer_event_source (timer));
         al_set_timer_count (timer, 0);
@@ -160,6 +182,8 @@ play_anim (void (*draw_callback) (void),
       button = event.joystick.button;
       break;
     case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
+      if (pause_anim) break;
+
       switch (event.mouse.button) {
       case 1: enter_exit_editor (); break;
       case 3:
@@ -173,6 +197,7 @@ play_anim (void (*draw_callback) (void),
       /* printf ("%i,%i,%i\n", c.room, c.x, c.y); */
       break;
     case ALLEGRO_EVENT_MOUSE_AXES:
+      if (pause_anim) break;
       if (edit == EDIT_NONE) break;
       int dz = event.mouse.dz;  /* vertical */
       int dw = event.mouse.dw;  /* horizontal */
@@ -200,6 +225,7 @@ play_anim (void (*draw_callback) (void),
 
       break;
     case ALLEGRO_EVENT_KEY_CHAR:
+      if (pause_anim) break;
       key = event;
 
       char *text = NULL;
@@ -414,8 +440,17 @@ play_anim (void (*draw_callback) (void),
       if (was_key_pressed (ALLEGRO_KEY_L, 0, ALLEGRO_KEYMOD_CTRL, true)
           && ! load_config_dialog_thread) {
         load_config_dialog_thread =
-          create_thread (load_config_dialog, NULL);
+          create_thread (dialog_thread, &load_config_dialog);
         al_start_thread (load_config_dialog_thread);
+      }
+
+      /* PRINTSCREEN: save picture */
+      if (was_key_pressed (ALLEGRO_KEY_PRINTSCREEN, 0, ALLEGRO_KEYMOD_CTRL, true)
+          && ! save_picture_dialog_thread) {
+        save_picture_dialog_thread =
+          create_thread (dialog_thread, &save_picture_dialog);
+        al_start_thread (save_picture_dialog_thread);
+        pause_animation (true);
       }
 
       break;
@@ -424,6 +459,13 @@ play_anim (void (*draw_callback) (void),
 
   al_stop_timer (timer);
   anim_cycle = 0;
+}
+
+void
+pause_animation (bool val)
+{
+  pause_anim = val;
+  pause_audio_instances (val);
 }
 
 void

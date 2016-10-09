@@ -749,12 +749,12 @@ process_keys (void)
     if (is_game_paused ()) {
       step_one_cycle = true;
       game_paused = false;
-    } else pause_game ();
+    } else pause_game (true);
   } else if (is_game_paused ()
              && (! active_menu || ! was_menu_key_pressed ())
              && (key.keyboard.keycode || button != -1)
              && ! save_game_dialog_thread)
-    unpause_game ();
+    pause_game (false);
 
   /* if (game_paused) anim_cycle--; */
 
@@ -949,9 +949,9 @@ process_keys (void)
   if (was_key_pressed (ALLEGRO_KEY_G, 0, ALLEGRO_KEYMOD_CTRL, true)
       && ! save_game_dialog_thread) {
     save_game_dialog_thread =
-      create_thread (save_game_dialog, NULL);
+      create_thread (dialog_thread, &save_game_dialog);
     al_start_thread (save_game_dialog_thread);
-    pause_game ();
+    pause_animation (true);
   }
 
   /* Restart level after death */
@@ -1080,20 +1080,12 @@ draw_lives (ALLEGRO_BITMAP *bitmap, struct anim *k, enum vm vm)
 }
 
 void
-pause_game (void)
+pause_game (bool val)
 {
+  if (! val) draw_bottom_text (NULL, NULL, 0);
   memset (&key, 0, sizeof (key));
   button = -1;
-  game_paused = true;
-}
-
-void
-unpause_game (void)
-{
-  game_paused = false;
-  draw_bottom_text (NULL, NULL, 0);
-  memset (&key, 0, sizeof (key));
-  button = -1;
+  game_paused = val;
 }
 
 bool

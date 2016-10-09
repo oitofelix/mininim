@@ -135,6 +135,7 @@ play_audio (struct audio_source *as, struct pos *p, int anim_id)
 
   switch (as->type) {
   case AUDIO_SAMPLE:
+    ai.position.sample = 0;
     ai.data.sample = al_create_sample_instance (as->data.sample);
     if (! ai.data.sample) {
       error (0, 0, "%s (%p): cannot create sample instance",
@@ -143,6 +144,7 @@ play_audio (struct audio_source *as, struct pos *p, int anim_id)
     }
     break;
   case AUDIO_STREAM:
+    ai.position.stream = 0;
     ai.data.stream =
       load_resource
       (as->data.stream, (load_resource_f) load_audio_stream);
@@ -254,6 +256,68 @@ play_audio_instances (void)
   }
 }
 
+bool
+pause_audio_instance (union audio_instance_data data, bool val)
+{
+  struct audio_instance *ai = get_audio_instance (data);
+
+  if (! is_audio_instance_playing (ai->data))
+    return false;
+
+  if (val) {
+    switch (ai->source->type) {
+    case AUDIO_SAMPLE:
+      if (! al_get_sample_instance_playing (ai->data.sample))
+        return true;
+      ai->position.sample =
+        al_get_sample_instance_position (ai->data.sample);
+      return
+        al_set_sample_instance_playing (ai->data.sample, false);
+      break;
+    case AUDIO_STREAM:
+      if (! al_get_audio_stream_playing (ai->data.stream))
+        return true;
+      ai->position.stream =
+        al_get_audio_stream_position_secs (ai->data.stream);
+      return al_set_audio_stream_playing (ai->data.stream, false);
+      break;
+    default: assert (false);
+    }
+  } else {
+    switch (ai->source->type) {
+    case AUDIO_SAMPLE:
+      if (al_get_sample_instance_playing (ai->data.sample))
+        return true;
+      al_set_sample_instance_position (ai->data.sample,
+                                       ai->position.sample);
+      ai->position.sample = 0;
+      return
+        al_set_sample_instance_playing (ai->data.sample, true);
+      break;
+    case AUDIO_STREAM:
+      if (al_get_audio_stream_playing (ai->data.stream))
+        return true;
+      ai->position.stream = 0;
+      /* al_seek_audio_stream_secs (ai->data.stream, */
+      /*                            ai->position.stream); */
+      return
+        al_set_audio_stream_playing (ai->data.stream, true);
+      break;
+    default: assert (false);
+    }
+  }
+}
+
+void
+pause_audio_instances (bool val)
+{
+  size_t i;
+  for (i = 0; i < audio_instance_nmemb; i++) {
+    struct audio_instance *ai = &audio_instance[i];
+    pause_audio_instance (ai->data, val);
+  }
+}
+
 void
 clear_played_audio_instances (void)
 {
@@ -261,11 +325,7 @@ clear_played_audio_instances (void)
  again:
   for (i = 0; i < audio_instance_nmemb; i++) {
     struct audio_instance *ai = &audio_instance[i];
-    if (ai->played
-        && ((ai->source->type == AUDIO_SAMPLE
-             && ! al_get_sample_instance_playing (ai->data.sample))
-            || (ai->source->type == AUDIO_STREAM
-                && ! al_get_audio_stream_playing (ai->data.stream)))) {
+    if (! is_audio_instance_playing (ai->data)) {
       remove_audio_instance (ai);
       goto again;
     }
@@ -279,10 +339,13 @@ get_audio_instance_position (union audio_instance_data data)
   if (! ai) return INFINITY;
   else if (! ai->played) return 0;
   else if ((ai->source->type == AUDIO_SAMPLE
+            && al_get_sample_instance_position (ai->data.sample) == 0
+            && ai->position.sample == 0
             && ! al_get_sample_instance_playing (ai->data.sample))
            || (ai->source->type == AUDIO_STREAM
-               && ! al_get_audio_stream_playing (ai->data.stream)))
-           return INFINITY;
+               && al_get_audio_stream_position_secs (ai->data.stream)
+               >= al_get_audio_stream_length_secs (ai->data.stream)))
+    return INFINITY;
   else switch (ai->source->type) {
     case AUDIO_SAMPLE:
       return (double) al_get_sample_instance_position (ai->data.sample) /
@@ -294,14 +357,26 @@ get_audio_instance_position (union audio_instance_data data)
 }
 
 bool
-is_playing_audio_instance (union audio_instance_data data)
+is_audio_instance_playing (union audio_instance_data data)
 {
-  if (isfinite (get_audio_instance_position (data))) return true;
-  else return false;
+  return isfinite (get_audio_instance_position (data));
+}
+
+bool
+is_audio_instance_paused (union audio_instance_data data)
+{
+  struct audio_instance *ai = get_audio_instance (data);
+  return
+    is_audio_instance_playing (data)
+    && ((ai->source->type == AUDIO_SAMPLE
+         && ai->position.sample > 0
+         && ! al_get_sample_instance_playing (ai->data.sample))
+        || (ai->source->type == AUDIO_STREAM
+            && ! al_get_audio_stream_playing (ai->data.stream)));
 }
 
 struct audio_instance *
-is_playing_audio_source (struct audio_source *as)
+is_audio_source_playing (struct audio_source *as)
 {
   size_t i;
   for (i = 0; i < audio_instance_nmemb; i++) {
@@ -310,7 +385,7 @@ is_playing_audio_source (struct audio_source *as)
           && as->data.sample == ai->source->data.sample)
          || (as->type == AUDIO_STREAM
              && as->data.stream == ai->source->data.stream))
-        && is_playing_audio_instance (ai->data))
+        && is_audio_instance_playing (ai->data))
       return ai;
   }
   return NULL;

@@ -36,10 +36,13 @@ struct audio_instance *search_audio_instance (struct audio_source *as,
                                               uint64_t anim_cycle,
                                               struct pos *p, int anim_id);
 void play_audio_instances (void);
+bool pause_audio_instance (union audio_instance_data data, bool val);
+void pause_audio_instances (bool val);
 void clear_played_audio_instances (void);
 double get_audio_instance_position (union audio_instance_data data);
-bool is_playing_audio_instance (union audio_instance_data data);
-struct audio_instance *is_playing_audio_source (struct audio_source *as);
+bool is_audio_instance_playing (union audio_instance_data data);
+bool is_audio_instance_paused (union audio_instance_data data);
+struct audio_instance *is_audio_source_playing (struct audio_source *as);
 void destroy_audio (struct audio_source *as);
 void remove_audio_instance (struct audio_instance *ai);
 void adjust_audio_instances_volume (void);

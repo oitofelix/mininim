@@ -435,7 +435,7 @@ increase_kid_current_lives (struct anim *k)
       || k->current_lives >= k->total_lives) return;
 
   k->current_lives++;
-  if (! is_playing_audio_source (&small_life_potion_audio))
+  if (! is_audio_source_playing (&small_life_potion_audio))
     play_audio (&small_life_potion_audio, NULL, k->id);
   if (k->id == current_kid_id) {
     mr.flicker = 8;
@@ -452,7 +452,7 @@ increase_kid_total_lives (struct anim *k)
 
   if (k->total_lives < 10) k->total_lives++;
   k->current_lives = k->total_lives;
-  if (! is_playing_audio_source (&big_life_potion_audio))
+  if (! is_audio_source_playing (&big_life_potion_audio))
     play_audio (&big_life_potion_audio, NULL, k->id);
   if (k->id == current_kid_id) {
     mr.flicker = 8;
@@ -466,7 +466,7 @@ float_kid (struct anim *k)
   if (k->current_lives <= 0 && ! is_kid_fall (&k->f)) return;
   k->float_timer = 1;
   stop_audio_instance (&scream_audio, NULL, k->id);
-  if (! is_playing_audio_source (&floating_audio))
+  if (! is_audio_source_playing (&floating_audio))
     play_audio (&floating_audio, NULL, k->id);
   if (k->id == current_kid_id) {
     mr.flicker = 8;

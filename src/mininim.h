@@ -164,8 +164,7 @@
 #include "box.h"
 
 /* functions */
-void *load_config_dialog (ALLEGRO_THREAD *thread, void *arg);
-void *save_game_dialog (ALLEGRO_THREAD *thread, void *arg);
+void *dialog_thread (ALLEGRO_THREAD *thread, void *arg);
 ALLEGRO_TEXTLOG *load_config (char *filename);
 void save_game (char *filename);
 int max_int (int a, int b);
@@ -210,6 +209,9 @@ extern char *resources_dir,
   *levels_dat_filename;
 
 extern ALLEGRO_THREAD *load_config_dialog_thread,
-  *save_game_dialog_thread;
+  *save_game_dialog_thread, *save_picture_dialog_thread;
+
+extern struct dialog load_config_dialog, save_game_dialog,
+  save_picture_dialog;
 
 #endif	/* MININIM_MININIM_H */

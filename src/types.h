@@ -473,6 +473,11 @@ struct audio_instance {
     ALLEGRO_AUDIO_STREAM *stream;
   } data;
 
+  union audio_position {
+    unsigned int sample;
+    double stream;
+  } position;
+
   bool played;
   uint64_t anim_cycle;
   struct pos p;
@@ -548,6 +553,11 @@ struct menu_item {
 
 enum con_diff {
   CON_DIFF_NO_DIFF, CON_DIFF_FG, CON_DIFF_BG, CON_DIFF_EXT, CON_DIFF_MIXED,
+};
+
+struct dialog {
+  char *initial_path, *title, *patterns;
+  int mode;
 };
 
 /****************

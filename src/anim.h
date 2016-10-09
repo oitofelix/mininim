@@ -23,6 +23,7 @@
 /* functions */
 void play_anim (void (*draw_callback) (void),
                 void (*compute_callback) (void));
+void pause_animation (bool val);
 void ui_change_anim_freq (int f);
 
 
@@ -75,6 +76,7 @@ ALLEGRO_COLOR start_anim_palette (ALLEGRO_COLOR c);
 
 
 /* variables */
+extern bool pause_anim;
 extern struct anim *anima;
 extern size_t anima_nmemb;
 extern enum quit_anim quit_anim; /* set to true to quit animation */

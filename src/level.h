@@ -49,8 +49,7 @@ void prepare_view (void);
 void register_anims (void);
 void display_remaining_time (void);
 void display_skill (struct anim *k);
-void pause_game (void);
-void unpause_game (void);
+void pause_game (bool val);
 bool is_game_paused (void);
 
 /* struct level related */
