@@ -121,14 +121,8 @@ play_anim (void (*draw_callback) (void),
 
         kid_debug ();
 
-        /* if (anim_cycle > 0) { */
-        /*   if (is_video_effect_started ()) { */
-        /*     effect_counter--; */
-        /*     show (); */
-        /*   } else show (); */
-        /* } */
-
-        if (anim_cycle > 0) show ();
+        if (anim_cycle > 0 && ! is_video_effect_started ())
+	  show ();
 
         if (! pause_anim
             || was_key_pressed (ALLEGRO_KEY_ESCAPE, 0,

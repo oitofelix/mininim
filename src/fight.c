@@ -1116,9 +1116,6 @@ fight_hit (struct anim *k, struct anim *ke)
   if (! is_guard (ke))
     upgrade_skill (&ke->skill, &k->skill, k->total_lives);
 
-  backoff_from_range (ke, k, ATTACK_RANGE - 20, true, false);
-  get_in_range (ke, k, ATTACK_RANGE - 10, false, false);
-
   int d = (k->f.dir == LEFT) ? +1 : -1;
   struct pos pb;
   survey (_m, pos, &k->f, NULL, &k->p, NULL);
@@ -1130,6 +1127,9 @@ fight_hit (struct anim *k, struct anim *ke)
     ke->alert_cycle = anim_cycle;
     anim_die (k);
   } else anim_sword_hit (k);
+
+  backoff_from_range (ke, k, ATTACK_RANGE - 20, true, false);
+  get_in_range (ke, k, ATTACK_RANGE - 10, false, false);
 
   /* ensure anim doesn't die within a wall */
   if (fg (&k->p) == WALL) {
