@@ -56,8 +56,8 @@ init_video (void)
                             | ALLEGRO_RESIZABLE
                             | ALLEGRO_GENERATE_EXPOSE_EVENTS);
 
-  display_width = DISPLAY_WIDTH;
-  display_height = DISPLAY_HEIGHT;
+  display_width = display_width ? display_width : DISPLAY_WIDTH;
+  display_height = display_height ? display_height : DISPLAY_HEIGHT;
 
   if (display_mode >= 0) {
     ALLEGRO_DISPLAY_MODE d;
