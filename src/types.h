@@ -61,6 +61,15 @@ struct star {
   int color;
 };
 
+struct pixel_coord {
+  int x, y;
+};
+
+struct bitmap_rcoord {
+  ALLEGRO_BITMAP *b;
+  struct pixel_coord tl, tr, bl, br, mt, mbo, ml, mr, m;
+};
+
 enum em {
   DUNGEON = 0, PALACE = 1,
 };

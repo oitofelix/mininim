@@ -100,6 +100,14 @@ survey (coord_f cf, pos_f pf, struct frame *f,
 void
 surveyo (coord_f cf, int dx, int dy, pos_f pf, struct frame *f,
          struct coord *c, struct pos *p, struct pos *np);
+
+bool is_pixel_transparent (ALLEGRO_BITMAP *bitmap, int x, int y);
+int compare_bitmap_rcoords (const void *_c0, const void *_c1);
+struct bitmap_rcoord *get_cached_bitmap_rcoord (ALLEGRO_BITMAP *b,
+                                                struct bitmap_rcoord *c);
+struct bitmap_rcoord *bitmap_rcoord (ALLEGRO_BITMAP *b,
+                                     struct bitmap_rcoord *c);
+
 struct coord *place_on_the_ground (struct frame *f, struct coord *c);
 struct coord *place_at_distance (struct frame *f0, coord_f cf0,
                                  struct frame *f1, coord_f cf1,

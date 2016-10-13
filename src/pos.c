@@ -19,6 +19,9 @@
 
 #include "mininim.h"
 
+static struct bitmap_rcoord *bitmap_rcoord_cache;
+static size_t bitmap_rcoord_cache_nmemb;
+
 bool coord_wa;
 
 int
@@ -1120,6 +1123,118 @@ surveyo (coord_f cf, int dx, int dy, pos_f pf, struct frame *f,
   c->y += dy;
 
   npos (pf (c, p), np);
+}
+
+bool
+is_pixel_transparent (ALLEGRO_BITMAP *bitmap, int x, int y)
+{
+  ALLEGRO_COLOR c = al_get_pixel (bitmap, x, y);
+  unsigned char r, g, b, a;
+  al_unmap_rgba (c, &r, &g, &b, &a);
+  return a < 255;
+}
+
+int
+compare_bitmap_rcoords (const void *_c0, const void *_c1)
+{
+  struct bitmap_rcoord *c0 = (struct bitmap_rcoord *) _c0;
+  struct bitmap_rcoord *c1 = (struct bitmap_rcoord *) _c1;
+
+  if (c0->b < c1->b) return -1;
+  else if (c0->b > c1->b) return 1;
+  else return 0;
+}
+
+struct bitmap_rcoord *
+get_cached_bitmap_rcoord (ALLEGRO_BITMAP *b, struct bitmap_rcoord *c)
+{
+  struct bitmap_rcoord cs, *csr;
+  cs.b = b;
+
+  csr = bsearch (&cs, bitmap_rcoord_cache, bitmap_rcoord_cache_nmemb, sizeof (cs),
+                 compare_bitmap_rcoords);
+
+  if (csr) {
+    *c = *csr;
+    return c;
+  } else return NULL;
+}
+
+struct bitmap_rcoord *
+bitmap_rcoord (ALLEGRO_BITMAP *b, struct bitmap_rcoord *c)
+{
+  if (! b) return NULL;
+
+  struct bitmap_rcoord *cached = get_cached_bitmap_rcoord (b, c);
+  if (cached) return c;
+
+  c->b = b;
+  int w = al_get_bitmap_width (b);
+  int h = al_get_bitmap_height (b);
+  al_lock_bitmap (b, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READONLY);
+
+  /* top left */
+  for (c->tl.y = 0; c->tl.y < h; c->tl.y++)
+    for (c->tl.x = 0; c->tl.x < w; c->tl.x++)
+      if (! is_pixel_transparent (b, c->tl.x, c->tl.y)) goto end_tl;
+ end_tl:
+  c->tl.x = (c->tl.x < w) ? c->tl.x : 0;
+  c->tl.y = (c->tl.y < h) ? c->tl.y : 0;
+
+  /* top right */
+  for (c->tr.y = 0; c->tr.y < h; c->tr.y++)
+    for (c->tr.x = w - 1; c->tr.x >= 0; c->tr.x--)
+      if (! is_pixel_transparent (b, c->tr.x, c->tr.y)) goto end_tr;
+ end_tr:
+  c->tr.x = (c->tr.x >= 0) ? c->tr.x : 0;
+  c->tr.y = (c->tr.y < h) ? c->tr.y : 0;
+
+  /* bottom left */
+  for (c->bl.y = h - 1; c->bl.y >= 0; c->bl.y--)
+    for (c->bl.x = 0; c->bl.x < w; c->bl.x++)
+      if (! is_pixel_transparent (b, c->bl.x, c->bl.y)) goto end_bl;
+ end_bl:
+  c->bl.x = (c->bl.x < w) ? c->bl.x : 0;
+  c->bl.y = (c->bl.y >= 0) ? c->bl.y : 0;
+
+  /* bottom right */
+  for (c->br.y = h - 1; c->br.y >= 0; c->br.y--)
+    for (c->br.x = w - 1; c->br.x >= 0; c->br.x--)
+      if (! is_pixel_transparent (b, c->br.x, c->br.y)) goto end_br;
+ end_br:
+  c->br.x = (c->br.x >= 0) ? c->br.x : 0;
+  c->br.y = (c->br.y >= 0) ? c->br.y : 0;
+
+  /* mid top */
+  c->mt.x = (c->tl.x + c->tr.x) / 2;
+  c->mt.y = (c->tl.y + c->tr.y) / 2;
+
+  /* mid bottom */
+  c->mbo.x = (c->bl.x + c->br.x) / 2;
+  c->mbo.y = (c->bl.y + c->br.y) / 2;
+
+  /* mid left */
+  c->ml.x = (c->tl.x + c->bl.x) / 2;
+  c->ml.y = (c->tl.y + c->bl.y) / 2;
+
+  /* mid right */
+  c->mr.x = (c->tr.x + c->br.x) / 2;
+  c->mr.y = (c->tr.y + c->br.y) / 2;
+
+  /* mid */
+  c->m.x = (c->ml.x + c->mr.x) / 2;
+  c->m.y = (c->ml.y + c->mr.y) / 2;
+
+  al_unlock_bitmap (b);
+
+  bitmap_rcoord_cache =
+    add_to_array (c, 1, bitmap_rcoord_cache, &bitmap_rcoord_cache_nmemb,
+                  bitmap_rcoord_cache_nmemb, sizeof (*c));
+
+  qsort (bitmap_rcoord_cache, bitmap_rcoord_cache_nmemb, sizeof (*c),
+         compare_bitmap_rcoords);
+
+  return c;
 }
 
 struct coord *
