@@ -530,8 +530,7 @@ compute_loose_floor_fall (struct loose_floor *l)
       } else if (a->type == KID) {
         a->hit_by_loose_floor = true;
         play_audio (&hit_wall_audio, NULL, a->id);
-        a->action = kid_couch;
-        a->i = -1;
+        a->next_action = kid_couch;
       }
     }
   }

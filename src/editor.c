@@ -299,7 +299,6 @@ editor (void)
      {0}};
 
   struct pos p = mouse_pos;
-  struct anim *k;
   static struct guard *g;
   static struct pos p0;
 
@@ -1257,7 +1256,7 @@ editor (void)
     switch (menu_enum (kid_menu, "K>")) {
     case -1: case 1: edit = EDIT_MAIN; break;
     case 'P':
-      ui_place_kid (&p);
+      ui_place_kid (get_anim_by_id (current_kid_id), &p);
       break;
     case 'J':
       set_mouse_pos (&global_level.start_pos);
@@ -1585,25 +1584,7 @@ editor (void)
     case 'G': edit = EDIT_GUARD_SELECT;
       s = guard_index; get_mouse_coord (&last_mouse_coord); break;
     case 'P':
-      if (! is_guard_by_type (g->type)) {
-        editor_msg ("DISABLED GUARD", 12);
-        break;
-      }
-      if (! is_valid_pos (&p)) {
-        editor_msg ("SELECT CONSTRUCTION", 12);
-        break;
-      }
-      k = get_guard_anim_by_level_id (guard_index);
-      if (! k) {
-        editor_msg ("NO LIVE INSTANCE", 12);
-        break;
-      }
-      guard_resurrect (k);
-      place_frame (&k->f, &k->f, get_guard_normal_bitmap (k->type), &p,
-                   k->f.dir == LEFT ? +16 : +22, +14);
-      place_on_the_ground (&k->f, &k->f.c);
-      guard_normal (k);
-      update_depressible_floor (k, -7, -26);
+      ui_place_guard (get_guard_anim_by_level_id (guard_index), &p);
       break;
     case 'S':
       if (! is_guard_by_type (g->type)) {
@@ -2022,13 +2003,12 @@ editor_msg (char *m, uint64_t cycles)
 }
 
 void
-ui_place_kid (struct pos *p)
+ui_place_kid (struct anim *k, struct pos *p)
 {
   if (! is_valid_pos (p)) {
     editor_msg ("SELECT CONSTRUCTION", 12);
     return;
   }
-  struct anim *k = get_anim_by_id (current_kid_id);
   if (! k) {
     editor_msg ("NO LIVE INSTANCE", 12);
     return;
@@ -2038,6 +2018,29 @@ ui_place_kid (struct pos *p)
                k->f.dir == LEFT ? +24 : +26, +15);
   kid_normal (k);
   if (! is_game_paused ()) update_depressible_floor (k, -4, -10);
+}
+
+void
+ui_place_guard (struct anim *g, struct pos *p)
+{
+  if (! is_guard_by_type (g->type)) {
+    editor_msg ("DISABLED GUARD", 12);
+    return;
+  }
+  if (! is_valid_pos (p)) {
+    editor_msg ("SELECT CONSTRUCTION", 12);
+    return;
+  }
+  if (! g) {
+    editor_msg ("NO LIVE INSTANCE", 12);
+    return;
+  }
+  guard_resurrect (g);
+  place_frame (&g->f, &g->f, get_guard_normal_bitmap (g->type), p,
+               g->f.dir == LEFT ? +16 : +22, +14);
+  place_on_the_ground (&g->f, &g->f.c);
+  guard_normal (g);
+  if (! is_game_paused ()) update_depressible_floor (g, -7, -26);
 }
 
 void

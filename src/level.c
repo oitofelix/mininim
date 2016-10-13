@@ -496,7 +496,12 @@ compute_level (void)
   for (i = 0; i < anima_nmemb; i++) enter_fight_logic (&anima[i]);
   for (i = 0; i < anima_nmemb; i++) leave_fight_logic (&anima[i]);
   for (i = 0; i < anima_nmemb; i++) fight_ai (&anima[i]);
-  for (i = 0; i < anima_nmemb; i++) anima[i].action (&anima[i]);
+  for (i = 0; i < anima_nmemb; i++) {
+    if (anima[i].next_action) {
+      anima[i].next_action (&anima[i]);
+      anima[i].next_action = NULL;
+    } else anima[i].action (&anima[i]);
+  }
   for (i = 0; i < anima_nmemb; i++) fight_mechanics (&anima[i]);
 
   for (i = 0; i < anima_nmemb; i++) {

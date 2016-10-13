@@ -233,6 +233,7 @@ unload_guard_die (void)
 void
 guard_resurrect (struct anim *g)
 {
+  g->splash = false;
   g->invisible = false;
   if (g->current_lives > 0) return;
   struct pos pm;
@@ -304,6 +305,7 @@ guard_die_spiked (struct anim *g)
     s->state = 5;
     s->inactive = true;
     s->murdered_anim = g->id;
+    register_changed_pos (&s->p, CHPOS_SPIKES);
 
     if (g->type == SKELETON)
       play_audio (&skeleton_audio, NULL, g->id);

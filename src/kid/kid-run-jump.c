@@ -168,15 +168,6 @@ physics_in (struct anim *k)
     return false;
   }
 
-  /* play crossing mirror sample */
-  if (is_valid_pos (&k->ci.con_p)
-      && ! is_valid_pos (&k->ci.kid_p)
-      && fg (&k->ci.con_p) == MIRROR) {
-    if (! k->crossing_mirror)
-      play_audio (&mirror_audio, NULL, k->id);
-    k->crossing_mirror = true;
-  } else k->crossing_mirror = false;
-
   /* fall */
   survey (_bf, pos, &k->f, NULL, &pbf, NULL);
   if ((is_strictly_traversable (&pbf) && k->i < 4
@@ -231,7 +222,7 @@ bool
 is_kid_run_jump_air (struct frame *f)
 {
   int i;
-  for (i = 4; i < 10; i++)
+  for (i = 4; i < 9; i++)
     if (f->b == kid_run_jump_frameset[i].frame) return true;
   return false;
 }

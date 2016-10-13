@@ -61,18 +61,11 @@ legacy_level_start (void)
   else k->current_lives = total_lives;
 
   /* make the kid turn as appropriate */
-  switch (global_level.n) {
-  case 1:
+  if (global_level.n == 13) {
     k->f.dir = (k->f.dir == LEFT) ? RIGHT : LEFT;
-    k->i = -1; k->action = kid_turn;
-    break;
-  case 13:
-    k->f.dir = (k->f.dir == LEFT) ? RIGHT : LEFT;
-    k->i = -1; k->action = kid_run;
+    k->next_action = kid_run;
     frame2room (&k->f, roomd (k->f.c.l, 23, RIGHT), &k->f.c);
-    break;
-  default: k->i = -1; k->action = kid_turn; break;
-  }
+  } else k->next_action = kid_turn;
 
   /* define camera's starting room */
   if (global_level.n == 7) {
@@ -231,7 +224,7 @@ legacy_level_special_events (void)
     struct mirror *m;
     if (fg (&mirror_pos) == MIRROR
         && (m = mirror_at_pos (&mirror_pos))
-        && k->crossing_mirror
+        && is_valid_pos (&k->cross_mirror_p)
         && peq (&k->ci.con_p, &mirror_pos)
         && shadow_id == -1) {
       k->current_lives = 1;

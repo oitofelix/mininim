@@ -182,7 +182,7 @@ play_anim (void (*draw_callback) (void),
       case 1: enter_exit_editor (); break;
       case 3:
         if (edit != EDIT_NONE)
-          ui_place_kid (&mouse_pos);
+          ui_place_kid (get_anim_by_id (current_kid_id), &mouse_pos);
         break;
       default: break;
       }

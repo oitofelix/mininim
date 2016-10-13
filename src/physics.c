@@ -251,7 +251,9 @@ is_collidable_at_left (struct pos *p, struct frame *f)
     default: false;
     }
   case MIRROR:
-    if (f && is_kid_run_jump_air (f))
+    if ((f && is_kid_run_jump_air (f))
+        || (f->parent.anim
+            && is_valid_pos (&f->parent.anim->cross_mirror_p)))
       return false;
     else return true;
   default: return false;
@@ -1038,6 +1040,18 @@ is_colliding_cf (struct frame *f, struct frame_offset *fo, int dx,
   /* printf ("_pcf: (%i,%i,%i); pcf: (%i,%i,%i)\n", */
   /*         _pcf.room, _pcf.floor, _pcf.place, */
   /*         pcf.room, pcf.floor, pcf.place); */
+
+  /* crossing mirror */
+  struct anim *a = f->parent.anim;
+  if (a && is_valid_pos (&ci->con_p)
+      && ! is_valid_pos (&ci->kid_p)
+      && fg (&ci->con_p) == MIRROR
+      && (! is_valid_pos (&a->cross_mirror_p)
+          || peq (&a->cross_mirror_p, &ci->con_p))) {
+    if (! is_valid_pos (&a->cross_mirror_p))
+      play_audio (&mirror_audio, NULL, a->id);
+    a->cross_mirror_p = ci->con_p;
+  } else invalid_pos (&a->cross_mirror_p);
 
   return is_valid_pos (&ci->kid_p);
 }

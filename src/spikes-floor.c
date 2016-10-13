@@ -406,7 +406,6 @@ void
 compute_spikes_floors (void)
 {
   size_t i, j;
-  struct pos pm;
 
   for (i = 0; i < spikes_floor_nmemb; i++) {
     struct spikes_floor *s = &spikes_floor[i];
@@ -466,19 +465,21 @@ compute_spikes_floors (void)
           || a->immortal
           || a->spikes_immune
           || ext (&s->p) >= 5) continue;
-      survey (_m, pos, &a->f, NULL, &pm, NULL);
-      if (peq (&pm, &s->p)
+      struct pos pbf, pmbo;
+      survey (_bf, pos, &a->f, NULL, &pbf, NULL);
+      survey (_mbo, pos, &a->f, NULL, &pmbo, NULL);
+      if ((peq (&pmbo, &s->p) && peq (&pbf, &s->p))
           && ((((s->state >= 2 && s->state <= 4)
                 || ext (&s->p) > 0)
                && (is_kid_run (&a->f)
                    || is_kid_run_jump_running (&a->f)))
               || (is_kid_couch (&a->f) && a->fall && a->i < 3
                   && ! a->float_timer)
-              || (is_kid_jump_landing (&a->f) && a->i <= 13)
+              || (is_kid_jump (&a->f) && a->i >= 10 && a->i <= 12)
               || is_kid_run_jump_landing (&a->f))) {
         a->p = s->p;
-        anim_die_spiked (a);
-        register_changed_pos (&s->p, CHPOS_SPIKES);
+        if (is_kid_couch (&a->f) && a->fall) anim_die_spiked (a);
+        else a->next_action = anim_die_spiked;
       }
     }
   }
@@ -501,18 +502,20 @@ bool
 should_spikes_raise (struct pos *p)
 {
   int i;
-  struct pos pmf, pm, pmba;
+  struct pos pml, pm, pmr;
 
   for (i = 0; i < anima_nmemb; i++) {
     struct anim *a = &anima[i];
     if (is_anim_dead (&a->f)) continue;
-    survey (_mf, pos, &a->f, NULL, &pmf, NULL);
+    survey (_ml, pos, &a->f, NULL, &pml, NULL);
     survey (_m, pos, &a->f, NULL, &pm, NULL);
-    survey (_mba, pos, &a->f, NULL, &pmba, NULL);
+    survey (_mr, pos, &a->f, NULL, &pmr, NULL);
 
-    if (should_spikes_raise_for_pos (p, &pmf)
+    if ((should_spikes_raise_for_pos (p, &pml)
+         && ! is_collidable_at_left (&pm, &a->f))
         || should_spikes_raise_for_pos (p, &pm)
-        || should_spikes_raise_for_pos (p, &pmba))
+        || (should_spikes_raise_for_pos (p, &pmr)
+            && ! is_collidable_at_right (&pm, &a->f)))
       return true;
   }
 

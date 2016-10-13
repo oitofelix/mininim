@@ -157,6 +157,6 @@ physics_in (struct anim *g)
 static void
 physics_out (struct anim *g)
 {
-  /* depressible floors */
-  update_depressible_floor (g, -7, -26);
+  /* /\* depressible floors *\/ */
+  /* update_depressible_floor (g, -7, -26); */
 }

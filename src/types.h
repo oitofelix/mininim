@@ -369,13 +369,14 @@ struct anim {
 
   ACTION oaction;
   ACTION action;
+  ACTION next_action;
   ACTION hang_caller;
   int i, j, wait, repeat, cinertia, inertia, walk,
     total_lives, current_lives;
   bool reverse, collision, fall, hit_ceiling,
     just_hanged, hang, hang_limit, misstep, uncouch_slowly,
     keep_sword_fast, turn, shadow, splash, hit_by_loose_floor,
-    invisible, has_sword, hurt, controllable, fight, crossing_mirror,
+    invisible, has_sword, hurt, controllable, fight,
     edge_detection, auto_taken_sword;
 
   int enemy_defended_my_attack, enemy_counter_attacked_myself, i_counter_defended;
@@ -406,7 +407,7 @@ struct anim {
 
   uint64_t alert_cycle;
 
-  struct pos p, item_pos, hang_pos, enemy_pos;
+  struct pos p, item_pos, hang_pos, enemy_pos, cross_mirror_p;
 
   enum death_reason {
     NO_DEATH, FALL_DEATH, LOOSE_FLOOR_DEATH, POTION_DEATH,

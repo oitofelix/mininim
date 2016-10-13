@@ -73,6 +73,7 @@ unload_kid_die (void)
 void
 kid_resurrect (struct anim *k)
 {
+  k->splash = false;
   k->sword_immune = 16;
   k->invisible = false;
   if (k->current_lives > 0) return;
@@ -112,6 +113,7 @@ kid_die_spiked (struct anim *k)
     s->state = 5;
     s->inactive = true;
     s->murdered_anim = k->id;
+    register_changed_pos (&s->p, CHPOS_SPIKES);
 
     if (k->id == current_kid_id) {
       mr.flicker = 2;

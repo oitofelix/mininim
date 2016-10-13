@@ -421,7 +421,7 @@ compute_choppers (void)
         if (a->type == SKELETON)
           play_audio (&skeleton_audio, &c->p, -1);
         else play_audio (&chopped_audio, &c->p, -1);
-        anim_die_chopped (a);
+        a->next_action = anim_die_chopped;
       }
     }
   }
