@@ -225,6 +225,7 @@ generate_door_grid_cache (ALLEGRO_BITMAP *cache[DOOR_STEPS],
     cache[i] = create_bitmap (w, h0 + h1 + i);
     clear_bitmap (cache[i], TRANSPARENT_COLOR);
     draw_door_grid_cache (cache[i], door_grid, door_grid_tip, i);
+    validate_bitmap_for_mingw (cache[i]);
   }
 }
 
