@@ -232,6 +232,7 @@ bool
 is_collidable_at_left (struct pos *p, struct frame *f)
 {
   struct chopper *c;
+  struct anim *a;
 
   switch (fg (p)) {
   case WALL:
@@ -252,8 +253,8 @@ is_collidable_at_left (struct pos *p, struct frame *f)
     }
   case MIRROR:
     if ((f && is_kid_run_jump_air (f))
-        || (f->parent.anim
-            && is_valid_pos (&f->parent.anim->cross_mirror_p)))
+        || ((a = get_anim_by_id (f->parent_id))
+            && is_valid_pos (&a->cross_mirror_p)))
       return false;
     else return true;
   default: return false;
@@ -1042,7 +1043,7 @@ is_colliding_cf (struct frame *f, struct frame_offset *fo, int dx,
   /*         pcf.room, pcf.floor, pcf.place); */
 
   /* crossing mirror */
-  struct anim *a = f->parent.anim;
+  struct anim *a = get_anim_by_id (f->parent_id);
   if (a && is_valid_pos (&ci->con_p)
       && ! is_valid_pos (&ci->kid_p)
       && fg (&ci->con_p) == MIRROR

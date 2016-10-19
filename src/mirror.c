@@ -208,7 +208,7 @@ draw_mirror_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f,
   al_set_clipping_rectangle
     (PLACE_WIDTH * p->place + 2, PLACE_HEIGHT * p->floor + 3,
      16, PLACE_HEIGHT - 9);
-  struct anim *a = f->parent.anim;
+  struct anim *a = get_anim_by_id (f->parent_id);
   struct anim a0 = *a;
   invert_frame_dir (&a0.f, &a0.f);
   a0.f.c.x = (2 * PLACE_WIDTH * p->place + 36)
