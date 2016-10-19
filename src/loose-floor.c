@@ -409,7 +409,7 @@ compute_loose_floor_release (struct loose_floor *l)
                        "LOOSE FLOOR RELEASE");
     l->state = 2;
     l->i = 0;
-    l->f.parent.frame = &l->f;
+    l->f.parent_id = -1;
     l->action = FALL_LOOSE_FLOOR;
     l->resist = LOOSE_FLOOR_RESISTENCE;
     l->f.b = get_correct_falling_loose_floor_bitmap (l->f.b);

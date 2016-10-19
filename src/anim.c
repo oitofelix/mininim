@@ -495,6 +495,7 @@ create_anim (struct anim *a0, enum anim_type t, struct pos *p, enum dir dir)
   }
 
   a.id = i;
+  a.f.parent_id = i;
   a.level_id = -1;
 
   switch (a.type) {
@@ -510,7 +511,6 @@ create_anim (struct anim *a0, enum anim_type t, struct pos *p, enum dir dir)
   }
 
   anima = add_to_array (&a, 1, anima, &anima_nmemb, i, sizeof (a));
-  anima[i].f.parent.anim = &anima[i];
   return i;
 }
 
@@ -583,7 +583,6 @@ draw_anims (ALLEGRO_BITMAP *bitmap, enum em em, enum vm vm)
   size_t i;
   for (i = 0; i < anima_nmemb; i++) {
     a = &anima[i];
-    a->f.parent.anim = a;
     if (a->invisible) continue;
 
     _ml (&a->f, &ml); pos (&ml, &pml);

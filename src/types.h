@@ -349,10 +349,7 @@ struct anim {
   int level_id;
 
   struct frame {
-    union {
-      struct anim *anim;
-      struct frame *frame;
-    } parent;
+    int parent_id;
     struct coord c;
     ALLEGRO_BITMAP *b;
     struct coord oc;

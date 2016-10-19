@@ -738,7 +738,7 @@ draw_room_anim_fg_sub (ALLEGRO_BITMAP *bitmap,
   /* VERTICAL JUMP */
   if (is_kid_vjump_touching_above (f)
       && (f->dir == LEFT
-          || f->parent.anim->hit_ceiling)) {
+          || a->hit_ceiling)) {
     if (! is_strictly_traversable (&ptl))
       draw_confg_no_top (bitmap, &ptl, em, vm, true);
 
@@ -755,7 +755,7 @@ draw_room_anim_fg_sub (ALLEGRO_BITMAP *bitmap,
     }
   } else if (is_kid_vjump_touching_above (f)
              && (f->dir == RIGHT
-                 && ! f->parent.anim->hit_ceiling)) {
+                 && ! a->hit_ceiling)) {
     if (! is_strictly_traversable (&ptr))
       draw_confg_no_top (bitmap, &ptr, em, vm, true);
   }
