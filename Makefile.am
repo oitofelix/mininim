@@ -149,7 +149,7 @@ if mingw_build
   # AM_CFLAGS += -mwindows
 endif
 SUFFIXES = .rc
-WINDRES = windres
+WINDRES = ${host}-windres
 %.rc.$(OBJEXT): %.rc
 	$(WINDRES) $(WINDRESFLAGS) -o $@ $<
 

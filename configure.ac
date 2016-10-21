@@ -70,7 +70,8 @@ esac],[debug=false])
 AM_CONDITIONAL([DEBUG], [test x$debug = xtrue])
 
 AS_IF([[test x$debug != xtrue]],
-  [AC_DEFINE([NDEBUG], [1], [Make assert macro do nothing.])])
+  [AC_DEFINE([NDEBUG], [1], [Make assert macro do nothing.])],
+  [debug_sufix=-debug])
 
 # Optimizations option
 AC_ARG_ENABLE([optimizations],
@@ -118,46 +119,35 @@ AC_PROG_CC
 gl_EARLY
 gl_INIT
 
-mingw_dir=/c/mingw
-allegro_ver=5.0.10
-dumb_ver=0.9.3
-flac_ver=1.2.1
-freetype_ver=2.4.8
-vorbis_ver=1.3.2
-ogg_ver=1.2.1
-zlib_ver=1.2.5
-openal_ver=1.14
 allegro_minver=5.0.9
 
-AM_CONDITIONAL([mingw_build], [expr "x$build_os" : "xmingw"])
+AM_CONDITIONAL([mingw_build], [expr "x$host_os" : "xmingw"])
 
 # Check for Allegro library and its addons
 AS_CASE([$host],
 
 # MinGW
 [*-*-mingw*],
-  [ALLEGRO_CFLAGS="-I${mingw_dir}/include"
-   ALLEGRO_LIBS="-lallegro-${allegro_ver}-static-mt"
+  [ALLEGRO_CFLAGS=""
+   ALLEGRO_LIBS="-lallegro${debug_sufix}"
    ALLEGRO_IMAGE_CFLAGS="${ALLEGRO_CFLAGS}"
-   ALLEGRO_IMAGE_LIBS="-lallegro_image-${allegro_ver}-static-mt ${ALLEGRO_LIBS}"
+   ALLEGRO_IMAGE_LIBS="-lallegro_image${debug_sufix} ${ALLEGRO_LIBS}"
    ALLEGRO_AUDIO_CFLAGS="${ALLEGRO_CFLAGS}"
-   ALLEGRO_AUDIO_LIBS="-lallegro_audio-${allegro_ver}-static-mt ${ALLEGRO_LIBS}"
+   ALLEGRO_AUDIO_LIBS="-lallegro_audio${debug_sufix} ${ALLEGRO_LIBS}"
    ALLEGRO_ACODEC_CFLAGS="${ALLEGRO_CFLAGS}"
-   ALLEGRO_ACODEC_LIBS="-lallegro_acodec-${allegro_ver}-static-mt ${ALLEGRO_AUDIO_LIBS}"
+   ALLEGRO_ACODEC_LIBS="-lallegro_acodec${debug_sufix} ${ALLEGRO_AUDIO_LIBS}"
    ALLEGRO_FONT_CFLAGS="${ALLEGRO_CFLAGS}"
-   ALLEGRO_FONT_LIBS="-lallegro_font-${allegro_ver}-static-mt ${ALLEGRO_LIBS}"
+   ALLEGRO_FONT_LIBS="-lallegro_font${debug_sufix} ${ALLEGRO_LIBS}"
    ALLEGRO_PRIMITIVES_CFLAGS="${ALLEGRO_CFLAGS}"
-   ALLEGRO_PRIMITIVES_LIBS="-lallegro_primitives-${allegro_ver}-static-mt ${ALLEGRO_LIBS}"
+   ALLEGRO_PRIMITIVES_LIBS="-lallegro_primitives${debug_sufix} ${ALLEGRO_LIBS}"
    ALLEGRO_DIALOG_CFLAGS="${ALLEGRO_CFLAGS}"
-   ALLEGRO_DIALOG_LIBS="-lallegro_dialog-${allegro_ver}-static-mt ${ALLEGRO_LIBS}"
-   mingw_ldadd="-ldumb-${dumb_ver}-static-mt \
-      -lFLAC-${flac_ver}-static-mt \
-      -lfreetype-${freetype_ver}-static-mt \
-      -lvorbisfile-${vorbis_ver}-static-mt \
-      -lvorbis-${vorbis_ver}-static-mt \
-      -logg-${ogg_ver}-static-mt \
-      -lzlib-${zlib_ver}-static-mt \
-      -lopenal-${openal_ver}-static-mt \
+   ALLEGRO_DIALOG_LIBS="-lallegro_dialog${debug_sufix} ${ALLEGRO_LIBS}"
+   mingw_ldadd="-lFLAC \
+      -lfreetype \
+      -lvorbisfile \
+      -lvorbis \
+      -logg \
+      -lz \
       -lgdiplus \
       -luuid \
       -lkernel32 \

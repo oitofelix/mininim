@@ -306,6 +306,8 @@ pause_audio_instance (union audio_instance_data data, bool val)
     default: assert (false);
     }
   }
+
+  return false;
 }
 
 void
@@ -354,6 +356,8 @@ get_audio_instance_position (union audio_instance_data data)
       return al_get_audio_stream_position_secs (ai->data.stream);
     default: assert (false); break;
   }
+
+  return INFINITY;
 }
 
 bool
