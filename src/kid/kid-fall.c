@@ -218,7 +218,7 @@ physics_in (struct anim *k)
     k->fo.dx = k->fo.dy = 0;
     k->f.b = kid_couch_frameset[0].frame;
     new_coord (&k->f.c, k->f.c.l, pbf.room,
-               k->f.c.x + dir * 4,
+               k->f.c.x + dir * 0,
                PLACE_HEIGHT * pbf.floor + 27);
 
     shake_loose_floor_row (&pbf);
@@ -314,6 +314,6 @@ place_kid_in_initial_fall (struct anim *k)
   if (is_valid_pos (&fall_pos))
     place_frame (&k->f, &k->f, kid_fall_frameset[0].frame,
                  &fall_pos,
-                 (k->f.dir == LEFT) ? +24 : +10,
+                 (k->f.dir == LEFT) ? +20 : +14,
                  (k->f.dir == LEFT) ? 18 : 18);
 }
