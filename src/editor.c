@@ -2015,7 +2015,7 @@ ui_place_kid (struct anim *k, struct pos *p)
   }
   kid_resurrect (k);
   place_frame (&k->f, &k->f, kid_normal_00, p,
-               k->f.dir == LEFT ? +24 : +26, +15);
+               k->f.dir == LEFT ? +22 : +28, +15);
   kid_normal (k);
   if (! is_game_paused ()) update_depressible_floor (k, -4, -10);
 }
