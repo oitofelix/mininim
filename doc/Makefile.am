@@ -63,7 +63,7 @@ mininim_TEXINFOS = \
 	release/latest-news.texi \
   release/todo-items.texi
 
-EXTRA_DIST = mininim-figures
+EXTRA_DIST = mininim-figures mininim.pdf
 
 mininim.info:
 	touch mininim.info
