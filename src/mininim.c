@@ -652,6 +652,9 @@ parser (int key, char *arg, struct argp_state *state)
         mirror_level_h (&vanilla_level, false, false, false, false);
       if (! save_level (&vanilla_level)) exit (-1);
     }
+    fprintf (stderr, "\
+Levels have been converted using module %s into native format at\n\
+%s\n", level_module_str (level_module), user_data_dir);
     exit (0);
     break;
   case MIRROR_LEVEL_OPTION:
@@ -1515,6 +1518,23 @@ level_module_next_level (struct level *l, int n)
   case CONSISTENCY_LEVEL_MODULE:
     return next_consistency_level (l, n);
     break;
+  }
+}
+
+char *
+level_module_str (enum level_module m)
+{
+  switch (m) {
+  case NATIVE_LEVEL_MODULE: default:
+    return "NATIVE";
+  case LEGACY_LEVEL_MODULE:
+    return "LEGACY";
+  case PLV_LEVEL_MODULE:
+    return "PLV";
+  case DAT_LEVEL_MODULE:
+    return "DAT";
+  case CONSISTENCY_LEVEL_MODULE:
+    return "CONSISTENCY";
   }
 }
 

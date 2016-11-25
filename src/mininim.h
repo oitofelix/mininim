@@ -175,6 +175,7 @@ int int_to_range (int i, int min, int max);
 float dist_cart (float x0, float y0, float x1, float y1);
 void quit_game (void);
 struct level *level_module_next_level (struct level *l, int n);
+char *level_module_str (enum level_module m);
 bool save_level (struct level *l);
 
 /* variables */
