@@ -726,12 +726,16 @@ interpret_legacy_level (struct level *l, int n)
         uint8_t b = lv.backtable[p.room - 1][p.floor][p.place];
 
         bool mlf = f & 0x20 ? true : false; /* loose floor modifier */
+        int r = f >> 6;
         enum ltile t = get_tile (&p);
         enum lgroup g = get_group (t);
 
         switch (t) {
         case LT_EMPTY: set_fg (&p, NO_FLOOR); break;
-        case LT_FLOOR: set_fg (&p, FLOOR); break;
+        case LT_FLOOR:
+          if (r == LFLOOR_HIDDEN) set_fg (&p, HIDDEN_FLOOR);
+          else set_fg (&p, FLOOR);
+          break;
         case LT_SPIKES: set_fg (&p, SPIKES_FLOOR); break;
         case LT_PILLAR: set_fg (&p, PILLAR); break;
         case LT_GATE: set_fg (&p, DOOR);
@@ -864,6 +868,8 @@ interpret_legacy_level (struct level *l, int n)
           case LM_POTION_INVERT: set_ext (&p, FLIP_POTION); break;
           case LM_POTION_POISON: set_ext (&p, SMALL_POISON_POTION); break;
           case LM_POTION_OPEN: set_ext (&p, ACTIVATION_POTION); break;
+          case LM_POTION_SHADOW: break;
+          case LM_POTION_BIG_POISON: set_ext (&p, BIG_POISON_POTION); break;
           }
           break;
         case LG_TTOP:           /* ok */
