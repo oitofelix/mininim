@@ -66,6 +66,7 @@ editor (void)
      {'#', "NUMERICAL EXTENSION<"},
      {'K', "FAKE>"},
      {'-', "UNFAKE"},
+     {'+', "FG<->FAKE"},
      {'I', "NOMINAL INFO"},
      {'N', "NUMERICAL INFO"},
      {'A', "CLEAR CON"},
@@ -363,7 +364,12 @@ editor (void)
     case '-':
       register_con_undo (&undo, &p,
                          MIGNORE, MIGNORE, MIGNORE, NO_FAKE,
-                         NULL, false, "UNFAKE");
+                         NULL, true, "UNFAKE");
+      break;
+    case '+':
+      register_con_undo (&undo, &p,
+                         fake (&p), MIGNORE, MIGNORE, fg (&p),
+                         NULL, true, "FG<->FAKE");
       break;
     case 'I': edit = EDIT_NOMINAL_INFO; break;
     case 'N': edit = EDIT_NUMERICAL_INFO; break;

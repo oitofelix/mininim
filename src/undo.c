@@ -150,8 +150,6 @@ register_con_undo (struct undo *u, struct pos *p,
 
   if (c.fg == c.fake) c.fake = -1;
 
-  /* if (! memcmp (con (p), &c, sizeof (c))) return; */
-
   struct con_undo *prev_data = u->count
     ? (struct con_undo *) u->pass[u->current].data
     : NULL;
@@ -162,9 +160,10 @@ register_con_undo (struct undo *u, struct pos *p,
       && prev_data
       && u->pass[u->current].f == (undo_f) con_undo
       && peq (&prev_data->p, p)
-      && cd == con_diff (&prev_data->b, &prev_data->f)
-      && cd != CON_DIFF_MIXED
-      && cd != CON_DIFF_NO_DIFF)
+      && ((cd == con_diff (&prev_data->b, &prev_data->f)
+           && cd != CON_DIFF_MIXED
+           && cd != CON_DIFF_NO_DIFF)
+          || ! memcmp (&prev_data->b, &c, sizeof (c))))
     undo_pass (u, -1, NULL);
 
   if (! memcmp (con (p), &c, sizeof (c))) return;
