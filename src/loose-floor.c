@@ -655,6 +655,7 @@ draw_falling_loose_floor (ALLEGRO_BITMAP *bitmap, struct pos *p,
     if (hgc) f.b = apply_palette (f.b, hgc_palette);
     push_drawn_rectangle (bitmap);
     draw_frame (bitmap, &f);
+    draw_confg (bitmap, p, em, vm);
     redraw_drawn_rectangle (pop_drawn_rectangle (), p, em, vm);
   } else return;
 }

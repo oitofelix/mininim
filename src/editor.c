@@ -2018,7 +2018,8 @@ editor_msg (char *m, uint64_t cycles)
     msg_cycles = cycles;
     msg = m;
     draw_bottom_text (NULL, m, 0);
-  }
+  } else if (edit == EDIT_NONE)
+    draw_bottom_text (NULL, m, 0);
 }
 
 void
