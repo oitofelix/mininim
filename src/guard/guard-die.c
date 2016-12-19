@@ -295,17 +295,21 @@ guard_die_spiked (struct anim *g)
   g->action = guard_die_spiked;
   g->f.flip = (g->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
+  assert (fg (&g->p) == SPIKES_FLOOR);
+  struct spikes_floor *s = spikes_floor_at_pos (&g->p);
+
+  if (s->i != 4 || s->state !=5) {
+    s->i = 4;
+    s->state = 5;
+    register_changed_pos (&g->p);
+  }
+
   if (g->oaction != guard_die_spiked) {
     g->splash = true;
     g->death_reason = SPIKES_DEATH;
 
-    assert (fg (&g->p) == SPIKES_FLOOR);
-    struct spikes_floor *s = spikes_floor_at_pos (&g->p);
-    s->i = 4;
-    s->state = 5;
     s->inactive = true;
     s->murdered_anim = g->id;
-    register_changed_pos (&g->p);
 
     if (g->type == SKELETON)
       play_audio (&skeleton_audio, NULL, g->id);

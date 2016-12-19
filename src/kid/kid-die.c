@@ -102,18 +102,22 @@ kid_die_spiked (struct anim *k)
   k->action = kid_die_spiked;
   k->f.flip = (k->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
+  assert (fg (&k->p) == SPIKES_FLOOR);
+  struct spikes_floor *s = spikes_floor_at_pos (&k->p);
+
+  if (s->i != 4 || s->state !=5) {
+    s->i = 4;
+    s->state = 5;
+    register_changed_pos (&k->p);
+  }
+
   if (k->oaction != kid_die_spiked) {
     k->current_lives = 0;
     k->splash = true;
     k->death_reason = SPIKES_DEATH;
 
-    assert (fg (&k->p) == SPIKES_FLOOR);
-    struct spikes_floor *s = spikes_floor_at_pos (&k->p);
-    s->i = 4;
-    s->state = 5;
     s->inactive = true;
     s->murdered_anim = k->id;
-    register_changed_pos (&s->p);
 
     if (k->id == current_kid_id) {
       mr.flicker = 2;
