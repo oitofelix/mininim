@@ -29,8 +29,10 @@ register_undo (struct undo *u, void *data, undo_f f, char *desc)
   }
 
   size_t i;
-  for (i = u->current + 1; i < u->count; i++)
+  for (i = u->current + 1; i < u->count; i++) {
     al_free (u->pass[i].data);
+    al_free (u->pass[i].desc);
+  }
 
   u->count = u->current + 2;
   u->pass = xrealloc (u->pass, u->count * sizeof (* u->pass));
@@ -38,15 +40,20 @@ register_undo (struct undo *u, void *data, undo_f f, char *desc)
 
   u->pass[u->current].data = data;
   u->pass[u->current].f = f;
-  u->pass[u->current].desc = desc;
+  if (desc) xasprintf (&u->pass[u->current].desc, "%s", desc);
+  else u->pass[u->current].desc = NULL;
+
+  if (editor_register && desc) editor_msg (desc, editor_register);
 }
 
 void
 free_undo (struct undo *u)
 {
   size_t i;
-  for (i = 0; i < u->count; i++)
+  for (i = 0; i < u->count; i++) {
     al_free (u->pass[i].data);
+    al_free (u->pass[i].desc);
+  }
 
   u->pass = NULL;
   u->count = 0;
@@ -89,7 +96,10 @@ undo_pass (struct undo *u, int dir, char **desc)
 void
 end_undo_set (struct undo *u, char *desc)
 {
-  u->pass[u->current].desc = desc;
+  if (desc) {
+    xasprintf (&u->pass[u->current].desc, "%s", desc);
+    if (editor_register) editor_msg (desc, editor_register);
+  } else u->pass[u->current].desc = NULL;
 }
 
 void
@@ -106,7 +116,7 @@ ui_undo_pass (struct undo *u, int dir, char *prefix)
   if (! b) {
     if (prefix) xasprintf (&undo_msg, "NO FURTHER %s %s", prefix, dir_str);
     else xasprintf (&undo_msg, "NO FURTHER %s", dir_str);
-    editor_msg (undo_msg, 24);
+    editor_msg (undo_msg, EDITOR_CYCLES_3);
     return;
   }
 
@@ -114,7 +124,7 @@ ui_undo_pass (struct undo *u, int dir, char *prefix)
 
   if (prefix) xasprintf (&undo_msg, "%s %s: %s", prefix, dir_str, text);
   else xasprintf (&undo_msg, "%s: %s", dir_str, text);
-  editor_msg (undo_msg, 24);
+  editor_msg (undo_msg, EDITOR_CYCLES_3);
 }
 
 /*********************/
@@ -123,9 +133,9 @@ ui_undo_pass (struct undo *u, int dir, char *prefix)
 
 void
 register_con_undo (struct undo *u, struct pos *p,
-                   int f, int b, int e,
-                   bool should_destroy, bool should_register, bool should_prepare,
-                   bool ignore_intermediate, enum changed_pos_reason reason,
+                   int f, int b, int e, int ff,
+                   union con_state *cs,
+                   bool ignore_intermediate,
                    char *desc)
 {
   struct con c;
@@ -133,6 +143,12 @@ register_con_undo (struct undo *u, struct pos *p,
   c.fg = (f != MIGNORE) ? fg_val (f) : fg (p);
   c.bg = (b != MIGNORE) ? bg_val (b) : bg (p);
   c.ext = (e != MIGNORE) ? ext_val (c.fg, e) : ext (p);
+
+  if (ff != MIGNORE && ff != NO_FAKE) c.fake = fg_val (ff);
+  else if (ff == NO_FAKE) c.fake = ff;
+  else c.fake = con (p)->fake;
+
+  if (c.fg == c.fake) c.fake = -1;
 
   /* if (! memcmp (con (p), &c, sizeof (c))) return; */
 
@@ -157,24 +173,35 @@ register_con_undo (struct undo *u, struct pos *p,
   d->p = *p;
   d->b = *con (p);
   d->f = c;
+
+  copy_to_con_state (&d->bs, p);
+
+  if (should_destroy (&d->b, &d->f))
+    destroy_con_at_pos (&d->p);
+  *con (&d->p) = d->f;
+
+  if (cs) {
+    d->fs = *cs;
+    copy_from_con_state (p, cs);
+  } else copy_to_con_state (&d->fs, p);
+
   register_undo (u, d, (undo_f) con_undo, desc);
 
-  if (should_destroy) destroy_con_at_pos (p);
-  *con (p) = d->f;
-  if (should_register) register_con_at_pos (p);
-  if (should_prepare) prepare_con_at_pos (p);
-
-  register_changed_pos (p, reason);
+  register_changed_pos (p);
 }
 
 void
 con_undo (struct con_undo *d, int dir)
 {
-  destroy_con_at_pos (&d->p);
+  /* copy_to_con_state ((dir >= 0) ? &d->bs : &d->fs, &d->p); */
+
+  if (should_destroy (&d->b, &d->f))
+    destroy_con_at_pos (&d->p);
   *con (&d->p) = (dir >= 0) ? d->f : d->b;
-  register_con_at_pos (&d->p);
-  prepare_con_at_pos (&d->p);
-  register_changed_pos (&d->p, -1);
+
+  copy_from_con_state (&d->p, (dir >= 0) ? &d->fs : &d->bs);
+
+  register_changed_pos (&d->p);
 }
 
 /*******************/
@@ -183,14 +210,13 @@ con_undo (struct con_undo *d, int dir)
 
 void
 register_mirror_pos_undo (struct undo *u, struct pos *p0, struct pos *p1,
-                          bool prepare, bool invert_dir, char *desc)
+                          bool invert_dir, char *desc)
 {
   if (peq (p0, p1)) return;
 
   struct mirror_pos_undo *d = xmalloc (sizeof (struct mirror_pos_undo));
   d->p0 = *p0;
   d->p1 = *p1;
-  d->prepare = prepare;
   d->invert_dir = invert_dir;
   register_undo (u, d, (undo_f) mirror_pos_undo, desc);
   mirror_pos_undo (d, +1);
@@ -207,39 +233,7 @@ mirror_pos_undo (struct mirror_pos_undo *d, int dir)
     p0 = &d->p1;
     p1 = &d->p0;
   }
-  mirror_pos (p0, p1, true, true, d->prepare, true, d->invert_dir);
-  register_changed_pos (p0, -1);
-  register_changed_pos (p1, -1);
-}
-
-/*************/
-/* ROOM UNDO */
-/*************/
-
-void
-register_room_undo (struct undo *u, int room, struct con c[FLOORS][PLACES],
-                    char *desc)
-{
-  if (! memcmp (&global_level.con[room], c, FLOORS * PLACES * sizeof (struct con)))
-    return;
-
-  struct room_undo *d = xmalloc (sizeof (struct room_undo));
-  d->room = room;
-  memcpy (&d->b, &global_level.con[room], sizeof (d->b));
-  memcpy (&d->f, c, sizeof (d->f));
-  register_undo (u, d, (undo_f) room_undo, desc);
-  room_undo (d, +1);
-}
-
-void
-room_undo (struct room_undo *d, int dir)
-{
-  destroy_room (d->room);
-  memcpy (&global_level.con[d->room], (dir >= 0)
-          ? &d->f : &d->b, FLOORS * PLACES * sizeof (struct con));
-  register_room (d->room);
-  prepare_room (d->room);
-  register_changed_room (d->room);
+  mirror_pos (p0, p1, d->invert_dir);
 }
 
 /**************/
@@ -343,9 +337,7 @@ register_h_room_mirror_con_undo (struct undo *u, int _room, char *desc)
 void
 h_room_mirror_con_undo (int *room, int dir)
 {
-  mirror_room_h (&global_level, *room, true, true, false, false);
-  prepare_room (*room);
-  register_changed_room (*room);
+  mirror_room_h (&global_level, *room);
 }
 
 /*****************************/
@@ -369,9 +361,8 @@ v_room_mirror_con_undo (int *room, int dir)
   for (p0.floor = 0; p0.floor < FLOORS / 2; p0.floor++)
     for (p0.place = 0; p0.place < PLACES; p0.place++) {
       reflect_pos_v (&p0, &p1);
-      mirror_pos (&p0, &p1, true, true, false, false, false);
+      mirror_pos (&p0, &p1, false);
     }
-  prepare_room (p0.room);
   register_changed_room (*room);
 }
 
@@ -381,12 +372,11 @@ v_room_mirror_con_undo (int *room, int dir)
 
 void
 register_random_room_mirror_con_undo (struct undo *u, int _room,
-                                      bool prepare, bool invert_dir,
+                                      bool invert_dir,
                                       char *desc)
 {
   struct random_room_mirror_con_undo *d = xmalloc (sizeof (* d));
   d->room = _room;
-  d->prepare = prepare;
   d->invert_dir = invert_dir;
 
   struct pos p;
@@ -410,17 +400,16 @@ random_room_mirror_con_undo (struct random_room_mirror_con_undo *d, int dir)
       for (p0.place = 0; p0.place < PLACES; p0.place++) {
         p1 = d->p[p0.floor][p0.place];
         p1.room = d->room;
-        mirror_pos (&p0, &p1, true, true, d->prepare, false, d->invert_dir);
+        mirror_pos (&p0, &p1, d->invert_dir);
       }
   else
     for (p0.floor = FLOORS - 1; p0.floor >= 0; p0.floor--)
       for (p0.place = PLACES - 1; p0.place >= 0; p0.place--) {
         p1 = d->p[p0.floor][p0.place];
         p1.room = d->room;
-        mirror_pos (&p1, &p0, true, true, d->prepare, false, d->invert_dir);
+        mirror_pos (&p1, &p0, d->invert_dir);
       }
 
-  prepare_room (d->room);
   register_changed_room (d->room);
 }
 
@@ -445,7 +434,6 @@ void
 link_undo (struct link_undo *d, int dir)
 {
   memcpy (&global_level.link, (dir >= 0) ? &d->f : &d->b, sizeof (d->f));
-  prepare_view ();
 }
 
 /******************/

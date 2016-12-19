@@ -39,7 +39,7 @@ menu_opt (struct menu_item *menu, char *prefix)
 
   active_menu = true;
 
-  if (! menu_help) draw_bottom_text (NULL, prefix, 0);
+  if (! menu_help) editor_msg (prefix, EDITOR_CYCLES_0);
 
   if (key.keyboard.unichar > 0
       && key.keyboard.keycode != ALLEGRO_KEY_BACKSPACE
@@ -70,9 +70,9 @@ menu_opt (struct menu_item *menu, char *prefix)
   }
 
   if (menu_help == 1)
-    draw_bottom_text (NULL, "PRESS KEY FOR HELP", 0);
+    editor_msg ("PRESS KEY FOR HELP", EDITOR_CYCLES_0);
   if (menu_help == 2 && --help_cycles)
-    draw_bottom_text (NULL, menu[help_item].desc, 0);
+    editor_msg (menu[help_item].desc, EDITOR_CYCLES_0);
   else if (menu_help == 2) menu_help = 0;
 
   c = 0;
@@ -194,7 +194,7 @@ menu_int (int *v, int *b, int min, int max, char *pref_int, char *pref_bool)
   xasprintf (&str, "%s %s-%s:%i%s",
              pref_int, min_str, max_str, *v, b_str);
 
-  draw_bottom_text (NULL, str, 0);
+  editor_msg (str, EDITOR_CYCLES_0);
 
   al_free (b_str);
   al_free (min_str);
@@ -253,7 +253,7 @@ menu_list (int *dir0, int *dir1, int index, int min, int max, char *prefix)
     xasprintf (&str, "%s NONE %s%s", prefix,
                dir0 ? "-+" : "", dir1 ? "<>" : "");
 
-  draw_bottom_text (NULL, str, 0);
+  editor_msg (str, EDITOR_CYCLES_0);
   al_free (str);
 
   int c = toupper (key.keyboard.unichar);

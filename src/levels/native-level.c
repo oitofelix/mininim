@@ -154,14 +154,14 @@ load_native_level (struct level *l, int n)
   for (p.room = 1;; p.room++)
     for (p.floor = 0; p.floor < FLOORS; p.floor++)
       for (p.place = 0; p.place < PLACES; p.place++) {
-        /* Cr f p=f b e */
+        /* Cr f p=f b e ff */
         xasprintf (&k, "C%i %i %i", p.room, p.floor, p.place);
         v = al_get_config_value (c, NULL, k);
         al_free (k);
         if (! v) goto end_con_loop;
-        int f, b, e;
-        sscanf (v, "%i %i %i", (int *) &f, &b, &e);
-        set_con (&p, f, b, e);
+        int f, b, e, ff;
+        sscanf (v, "%i %i %i %i", (int *) &f, &b, &e, &ff);
+        set_con (&p, f, b, e, ff);
       }
  end_con_loop:
 
@@ -267,9 +267,10 @@ save_native_level (struct level *l, char *filename)
   for (p.room = 1; p.room < ROOMS; p.room++)
     for (p.floor = 0; p.floor < FLOORS; p.floor++)
       for (p.place = 0; p.place < PLACES; p.place++) {
-        /* Cr f p=f b e */
+        /* Cr f p=f b e ff */
         xasprintf (&k, "C%i %i %i", p.room, p.floor, p.place);
-        xasprintf (&v, "%i %i %i", fg (&p), bg (&p), ext (&p));
+        xasprintf (&v, "%i %i %i %i", fg (&p), bg (&p),
+                   ext (&p), con (&p)->fake);
         al_set_config_value (c, NULL, k, v);
         al_free (k);
         al_free (v);

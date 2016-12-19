@@ -169,27 +169,35 @@ init_sword_frameset (void)
           SWORD_FRAMESET_NMEMB * sizeof (struct frameset));
 }
 
+ALLEGRO_BITMAP *
+sword_bitmap (enum vm vm)
+{
+  switch (vm) {
+  case CGA: return c_normal_sword;
+  case EGA: return e_normal_sword;
+  case VGA: return v_normal_sword;
+  }
+  assert (false);
+  return NULL;
+}
+
+ALLEGRO_BITMAP *
+shiny_sword_bitmap (enum vm vm)
+{
+  switch (vm) {
+  case CGA: return c_shiny_sword;
+  case EGA: return e_shiny_sword;
+  case VGA: return v_shiny_sword;
+  }
+  assert (false);
+  return NULL;
+}
+
 void
 draw_sword (ALLEGRO_BITMAP *bitmap, struct pos *p, enum vm vm, bool start_pos)
 {
-  ALLEGRO_BITMAP *normal_sword = NULL,
-    *shiny_sword = NULL;
-
-  switch (vm) {
-  case CGA:
-    normal_sword = c_normal_sword;
-    shiny_sword = c_shiny_sword;
-    break;
-    break;
-  case EGA:
-    normal_sword = e_normal_sword;
-    shiny_sword = e_shiny_sword;
-    break;
-  case VGA:
-    normal_sword = v_normal_sword;
-    shiny_sword = v_shiny_sword;
-    break;
-  }
+  ALLEGRO_BITMAP *normal_sword = sword_bitmap (vm),
+    *shiny_sword = shiny_sword_bitmap (vm);
 
   if (hgc) {
     normal_sword = apply_palette (normal_sword, hgc_palette);
@@ -208,7 +216,13 @@ draw_sword (ALLEGRO_BITMAP *bitmap, struct pos *p, enum vm vm, bool start_pos)
                 prandom (1) ? ALLEGRO_FLIP_HORIZONTAL : 0);
   unseedp ();
 
-  if (! start_pos) draw_confg_fg (bitmap, p, em, vm, NULL);
+  if (! start_pos) {
+    push_clipping_rectangle (bitmap, c.x, c.y,
+                             al_get_bitmap_width (sword),
+                             al_get_bitmap_height (sword));
+    draw_confg_fg (bitmap, p, em, vm, NULL);
+    pop_clipping_rectangle ();
+  }
 }
 
 struct coord *
@@ -218,4 +232,13 @@ sword_coord (struct pos *p, struct coord *c)
     new_coord (c, p->l, p->room,
                PLACE_WIDTH * p->place,
                PLACE_HEIGHT * p->floor + 50);
+}
+
+bool
+is_sword_frame (struct frame *f)
+{
+  int i;
+  for (i = 0; i < SWORD_FRAMESET_NMEMB; i++)
+    if (f->b == sword_frameset[i].frame) return true;
+  return false;
 }

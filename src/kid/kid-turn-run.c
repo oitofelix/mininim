@@ -115,10 +115,12 @@ physics_in (struct anim *k)
   k->inertia = k->cinertia = 0;
 
   /* collision */
-  uncollide (&k->f, &k->fo, &k->fo, +0, 2, &k->ci);
+  next_frame_inv = true;
+  uncollide (&k->f, &k->fo, _bb, +0, -2, &k->fo, NULL);
+  next_frame_inv = false;
 
   /* fall */
-  survey (_tb, pos, &k->f, NULL, &ptb, NULL);
+  surveyo (_tb, -2, +0, pos, &k->f, NULL, &ptb, NULL);
   if (is_strictly_traversable (&ptb)) {
     kid_fall (k);
     return false;

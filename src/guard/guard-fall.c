@@ -273,8 +273,7 @@ physics_in (struct anim *g)
     g->inertia = g->cinertia = 0;
 
     /* collision */
-    uncollide (&g->f, &g->fo, &g->fo, +0, false, &g->ci);
-    uncollide (&g->f, &g->fo, &g->fo, +0, true, &g->ci);
+    uncollide (&g->f, &g->fo, _bf, -8, +0, &g->fo, NULL);
 
     survey (_bf, pos, &g->f, NULL, &pbf, NULL);
     /* pos2view (&pbf, &pbf); */

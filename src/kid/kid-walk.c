@@ -108,7 +108,7 @@ flow (struct anim *k)
     else k->p = pbf;
     k->i = k->walk = -1;
 
-    k->dc = dist_collision (&k->f, false, &k->ci) + 4;
+    k->dc = dist_collision (&k->f, _bf, -4, -4, &k->ci);
     k->df = dist_fall (&k->f, false);
     k->dl = dist_con (&k->f, _bf, pos, -4, false, LOOSE_FLOOR);
     k->dcl = dist_con (&k->f, _bf, pos, -4, false, CLOSER_FLOOR);
@@ -122,11 +122,16 @@ flow (struct anim *k)
 
     k->dcd = 0;
 
-    if (k->dc <= PLACE_WIDTH + 4
-        && (! is_valid_pos (&k->ci.con_p)
-            || fg (&k->ci.con_p) != WALL)
-        && k->dc < k->df) {
+    if (k->dc <= PLACE_WIDTH
+        && k->f.dir == RIGHT) {
       k->dcd = 9;
+      k->dc -= k->dcd;
+    }
+
+    if (k->dc <= PLACE_WIDTH
+        && k->f.dir == LEFT
+        && fg (&k->ci.con_p) == MIRROR) {
+      k->dcd = 5;
       k->dc -= k->dcd;
     }
 
@@ -141,14 +146,14 @@ flow (struct anim *k)
     else if (k->df <= PLACE_WIDTH) k->confg = NO_FLOOR;
     else if (k->dl <= PLACE_WIDTH) k->confg = LOOSE_FLOOR;
     else if (k->dcl <= PLACE_WIDTH) k->confg = CLOSER_FLOOR;
-    else if (k->dc <= PLACE_WIDTH + 4
+    else if (k->dc <= PLACE_WIDTH
              && is_valid_pos (&k->ci.con_p))
       k->confg = fg (&k->ci.con_p);
     else k->confg = FLOOR;
   }
 
   if (k->i == -1 && fg (&k->p) != LOOSE_FLOOR) {
-    if (k->dc < 4) {
+    if (k->dc <= 5) {
       kid_normal (k);
       return false;
     }
@@ -185,18 +190,17 @@ flow (struct anim *k)
   else if (k->i == 3 && k->walk == 1) k->i = 8;
   else if (k->i == 4 && k->walk == 2) k->i = 6;
   else if (k->i == 5 && k->walk == 3) k->i = 6;
-  else if (k->i == 11){
+  else if (k->i == 11) {
     if (k->walk != -1) {
-      /* printf ("dcd: %i\n", k->dcd); */
+      /* printf ("confg: %s\n", get_confg_name (k->confg)); */
 
       if (k->confg == CHOPPER)
         place_frame (&k->f, &k->f, kid_normal_00, &k->p,
                      (k->f.dir == LEFT) ? +15
                      : PLACE_WIDTH + 3, +15);
-      else if (k->confg == DOOR
-               && k->f.dir == RIGHT)
-        place_frame (&k->f, &k->f, kid_normal_00, &k->p,
-                     PLACE_WIDTH + 5 - k->dcd, +15);
+      /* else if (k->confg == MIRROR && k->f.dir == LEFT) */
+      /*   place_frame (&k->f, &k->f, kid_normal_00, &k->p, */
+      /*                +16 + k->dcd, +15); */
       else place_frame (&k->f, &k->f, kid_normal_00, &k->p,
                         (k->f.dir == LEFT) ? +11 + k->dcd
                         : PLACE_WIDTH + 7 - k->dcd, +15);

@@ -27,44 +27,72 @@ ALLEGRO_COLOR room0_wall_color[3][4][11];
 struct multi_room mr;
 int room_view;
 
-struct changed_pos *changed_pos = NULL;
+struct pos *changed_pos = NULL;
 size_t changed_pos_nmemb = 0;
 
 int *changed_room = NULL;
 size_t changed_room_nmemb = 0;
 
 void
-register_changed_pos (struct pos *p, enum changed_pos_reason reason)
+optimize_changed_pos (void)
+{
+  if (changed_pos_nmemb < FLOORS * PLACES) return;
+  size_t total = 0;
+  struct pos p; new_pos (&p, &global_level, -1, -1, -1);
+  for (p.room = 1; p.room < ROOMS; p.room++) {
+    int per_room = 0;
+    if (has_room_changed (p.room)) continue;
+    for (p.floor = 0; p.floor < FLOORS; p.floor++)
+      for (p.place = 0; p.place < PLACES; p.place++) {
+        if (get_changed_pos (&p)
+            && ++per_room > OPTIMIZE_CHANGED_POS_THRESHOLD) {
+          register_changed_room (p.room);
+          goto next_room;
+        }
+        if (++total > changed_pos_nmemb) return;
+      }
+  next_room:;
+  }
+}
+
+void
+register_changed_pos (struct pos *p)
 {
   struct pos np; npos (p, &np);
 
-  struct changed_pos cp;
-  cp.p = np;
-  cp.reason = reason;
-
-  if (get_changed_pos (&cp)) return;
+  if (get_changed_pos (&np)) return;
 
   changed_pos =
-    add_to_array (&cp, 1, changed_pos, &changed_pos_nmemb,
+    add_to_array (&np, 1, changed_pos, &changed_pos_nmemb,
                   changed_pos_nmemb, sizeof (*changed_pos));
 
   qsort (changed_pos, changed_pos_nmemb, sizeof (*changed_pos),
-         (m_comparison_fn_t) c_changed_pos);
+         (m_comparison_fn_t) cpos);
 }
 
-struct changed_pos *
-get_changed_pos (struct changed_pos *cp)
+struct pos *
+get_changed_pos (struct pos *p)
 {
-  return bsearch (cp, changed_pos, changed_pos_nmemb, sizeof (*cp),
-                  (m_comparison_fn_t) c_changed_pos);
+  return bsearch (p, changed_pos, changed_pos_nmemb, sizeof (*p),
+                  (m_comparison_fn_t) cpos);
 }
 
-int
-c_changed_pos (struct changed_pos *cp0, struct changed_pos *cp1)
+struct pos *
+get_changed_pos_by_room (int room)
 {
-  int c = cpos (&cp0->p, &cp1->p);
-  if (c) return c;
-  else return cint ((int *) &cp0->reason, (int *) &cp1->reason);
+  struct pos p;
+  p.room = room;
+
+  return bsearch (&p, changed_pos, changed_pos_nmemb, sizeof (p),
+                  (m_comparison_fn_t) cpos_by_room);
+}
+
+void
+remove_changed_pos (struct pos *p)
+{
+  size_t i =  p - changed_pos;
+  changed_pos =
+    remove_from_array (changed_pos, &changed_pos_nmemb, i, 1, sizeof (*p));
 }
 
 void
@@ -76,18 +104,20 @@ register_changed_room (int room)
     add_to_array (&room, 1, changed_room, &changed_room_nmemb,
                   changed_room_nmemb, sizeof (room));
 
-  qsort (changed_room, changed_room_nmemb, sizeof (room), (m_comparison_fn_t) cint);
+  qsort (changed_room, changed_room_nmemb, sizeof (room),
+         (m_comparison_fn_t) cint);
 
   struct pos p;
   new_pos (&p, &global_level, room, -1, -1);
 
   p.place = 0;
   for (p.floor = 0; p.floor < FLOORS; p.floor++)
-    register_changed_pos (&p, -1);
+    register_changed_pos (&p);
 
   p.place = PLACES - 1;
   for (p.floor = 0; p.floor < FLOORS; p.floor++)
-    register_changed_pos (&p, -1);
+    register_changed_pos (&p);
+
 }
 
 bool
@@ -562,7 +592,7 @@ draw_animated_background (ALLEGRO_BITMAP *bitmap, int room)
 
   for (p.floor = FLOORS; p.floor >= -1; p.floor--)
     for (p.place = -1; p.place < PLACES; p.place++) {
-      if (fg (&p) == WALL) continue;
+      if (fake (&p) == WALL) continue;
       draw_fire (bitmap, &p, vm);
       draw_balcony_stars (bitmap, &p, vm);
     }
@@ -677,10 +707,9 @@ update_cache (enum em em, enum vm vm)
 }
 
 void
-update_cache_pos (struct pos *p, enum changed_pos_reason reason,
-                  enum em em, enum vm vm)
+update_cache_pos (struct pos *p, enum em em, enum vm vm)
 {
-  struct pos q; q = *p;
+  struct pos q = *p;
   int x, y;
 
   for (q.room = 1; q.room < ROOMS; q.room++) {
@@ -690,171 +719,35 @@ update_cache_pos (struct pos *p, enum changed_pos_reason reason,
           for (q.floor = FLOORS; q.floor >= -1; q.floor--)
             for (q.place = -1; q.place < PLACES; q.place++)
               if (peq (&q, p) && ! has_room_changed (q.room)) {
-                struct pos p0; p0 = q;
-
-                struct pos pbl; prel (&q, &pbl, +1, -1);
-                struct pos pb; prel (&q, &pb, +1, +0);
-                struct pos pbr; prel (&q, &pbr, +1, +1);
-                struct pos pl; prel (&q, &pl, +0, -1);
-                struct pos pr; prel (&q, &pr, +0, +1);
+                ALLEGRO_BITMAP *bitmap = mr.cell[x][y].cache;
 
                 room_view = q.room;
                 mr.dx = x;
                 mr.dy = y;
                 con_caching = true;
-                struct rect r;
-                struct door *d;
 
-                switch (reason) {
-                case CHPOS_NONE: break;
-                case CHPOS_UNHIDE_FLOOR:
-                case CHPOS_MOUSE_SELECT:
-                case CHPOS_MOUSE_DESELECT:
-                case CHPOS_CLOSE_LEVEL_DOOR:
-                case CHPOS_WALL:
-                  draw_conbg (mr.cell[x][y].cache, &q, em, vm, true);
-                  break;
-                case CHPOS_CARPET_DESIGN:
-                  new_rect (&r, q.room,
-                            PLACE_WIDTH * q.place,
-                            PLACE_HEIGHT * q.floor + 3,
-                            64, 50);
-                  clear_rect_to_color (mr.cell[x][y].cache, &r, TRANSPARENT_COLOR);
+                push_clipping_rectangle
+                  (bitmap,
+                   PLACE_WIDTH * q.place - 1,
+                   PLACE_HEIGHT * q.floor - 17,
+                   2 * PLACE_WIDTH + 1, PLACE_HEIGHT + 3 + 17);
 
-                  draw_conbg (mr.cell[x][y].cache, &q, em, vm, true);
-                  break;
-                case CHPOS_SHAKE_LOOSE_FLOOR:
-                case CHPOS_RELEASE_LOOSE_FLOOR:
-                case CHPOS_PRESS_OPENER_FLOOR:
-                case CHPOS_UNPRESS_OPENER_FLOOR:
-                case CHPOS_PRESS_CLOSER_FLOOR:
-                case CHPOS_UNPRESS_CLOSER_FLOOR:
-                  new_rect (&r, q.room,
-                            PLACE_WIDTH * q.place,
-                            PLACE_HEIGHT * q.floor + 49,
-                            58, 17);
-                  clear_rect_to_color (mr.cell[x][y].cache, &r, TRANSPARENT_COLOR);
+                clear_bitmap (bitmap, TRANSPARENT_COLOR);
 
-                  if (fg (&pbl) == LEVEL_DOOR || bg (&pbl) == BALCONY)
-                    draw_conbg (mr.cell[x][y].cache, &pbl, em, vm, true);
-                  if (fg (&pb) == LEVEL_DOOR || bg (&pb) == BALCONY)
-                    draw_conbg (mr.cell[x][y].cache, &pb, em, vm, true);
-                  if (fg (&pbr) == LEVEL_DOOR || bg (&pbr) == BALCONY)
-                    draw_conbg (mr.cell[x][y].cache, &pbr, em, vm, true);
+                struct pos p0 = q;
+                for (p0.floor = q.floor + 1; p0.floor >= q.floor - 1;
+                     p0.floor--)
+                  for (p0.place = q.place - 2; p0.place <= q.place + 1;
+                       p0.place++)
+                    draw_conbg (bitmap, &p0, em, vm);
 
-                  draw_confg_top (mr.cell[x][y].cache, &pb, em, vm, true);
-                  draw_conbg (mr.cell[x][y].cache, &pl, em, vm, true);
-                  draw_conbg (mr.cell[x][y].cache, &q, em, vm, true);
+                for (p0.floor = q.floor + 1; p0.floor >= q.floor - 1;
+                     p0.floor--)
+                  for (p0.place = q.place - 2; p0.place <= q.place + 1;
+                       p0.place++)
+                    draw_confg (bitmap, &p0, em, vm);
 
-                  break;
-                case CHPOS_LOOSE_FLOOR_FALL:
-                case CHPOS_CHAIN_RELEASE_LOOSE_FLOOR:
-                  new_rect (&r, q.room,
-                            PLACE_WIDTH * q.place,
-                            PLACE_HEIGHT * q.floor + 49,
-                            58, 17);
-                  clear_rect_to_color (mr.cell[x][y].cache, &r, TRANSPARENT_COLOR);
-
-                  if (fg (&pbl) == LEVEL_DOOR || bg (&pbl) == BALCONY)
-                    draw_conbg (mr.cell[x][y].cache, &pbl, em, vm, true);
-                  if (fg (&pb) == LEVEL_DOOR || bg (&pb) == BALCONY)
-                    draw_conbg (mr.cell[x][y].cache, &pb, em, vm, true);
-                  if (fg (&pbr) == LEVEL_DOOR || bg (&pbr) == BALCONY)
-                    draw_conbg (mr.cell[x][y].cache, &pbr, em, vm, true);
-
-                  draw_confg_top (mr.cell[x][y].cache, &pbl, em, vm, true);
-                  draw_confg_top (mr.cell[x][y].cache, &pb, em, vm, true);
-                  draw_conbg (mr.cell[x][y].cache, &pl, em, vm, true);
-                  draw_conbg (mr.cell[x][y].cache, &q, em, vm, true);
-                  draw_confg_base (mr.cell[x][y].cache, &pr, em, vm);
-                  draw_confg_left (mr.cell[x][y].cache, &pr, em, vm, true);
-                  break;
-                case CHPOS_BREAK_LOOSE_FLOOR:
-                case CHPOS_BREAK_OPENER_FLOOR:
-                case CHPOS_BREAK_CLOSER_FLOOR:
-                case CHPOS_BREAK_LEVEL_DOOR:
-                  new_rect (&r, q.room,
-                            PLACE_WIDTH * q.place,
-                            PLACE_HEIGHT * q.floor + 35,
-                            57, 31);
-                  clear_rect_to_color (mr.cell[x][y].cache, &r, TRANSPARENT_COLOR);
-
-                  if (fg (&pbl) == LEVEL_DOOR || bg (&pbl) == BALCONY)
-                    draw_conbg (mr.cell[x][y].cache, &pbl, em, vm, true);
-                  if (fg (&pb) == LEVEL_DOOR || bg (&pb) == BALCONY)
-                    draw_conbg (mr.cell[x][y].cache, &pb, em, vm, true);
-                  if (fg (&pbr) == LEVEL_DOOR || bg (&pbr) == BALCONY)
-                    draw_conbg (mr.cell[x][y].cache, &pbr, em, vm, true);
-
-                  draw_confg_top (mr.cell[x][y].cache, &pb, em, vm, true);
-                  draw_conbg (mr.cell[x][y].cache, &pl, em, vm, true);
-                  draw_conbg (mr.cell[x][y].cache, &q, em, vm, true);
-                  break;
-                case CHPOS_OPEN_DOOR:
-                case CHPOS_CLOSE_DOOR:
-                case CHPOS_ABRUPTLY_CLOSE_DOOR:
-                  d = door_at_pos (&q);
-
-                  int ch = 18 + d->i + 1;
-
-                  new_rect (&r, q.room,
-                            PLACE_WIDTH * (q.place + 1),
-                            PLACE_HEIGHT * q.floor - 6,
-                            24, ch);
-                  clear_rect_to_color (mr.cell[x][y].cache, &r, TRANSPARENT_COLOR);
-
-                  draw_conbg (mr.cell[x][y].cache, &q, em, vm, true);
-
-                  if (ch > PLACE_HEIGHT - 3)
-                    draw_confg_top (mr.cell[x][y].cache, &pb, em, vm, true);
-
-                  break;
-                case CHPOS_OPEN_LEVEL_DOOR:
-                  new_rect (&r, q.room,
-                            PLACE_WIDTH * q.place + 7,
-                            PLACE_HEIGHT * q.floor - 1,
-                            48, 51);
-                  clear_rect_to_color (mr.cell[x][y].cache, &r, TRANSPARENT_COLOR);
-
-                  draw_conbg (mr.cell[x][y].cache, &pl, em, vm, true);
-                  draw_conbg (mr.cell[x][y].cache, &q, em, vm, true);
-
-                  break;
-                case CHPOS_SPIKES:
-                  new_rect (&r, q.room,
-                            PLACE_WIDTH * q.place + 7,
-                            PLACE_HEIGHT * q.floor + 34,
-                            40, 24);
-                  clear_rect_to_color (mr.cell[x][y].cache, &r, TRANSPARENT_COLOR);
-
-                  draw_conbg (mr.cell[x][y].cache, &pl, em, vm, true);
-                  draw_conbg (mr.cell[x][y].cache, &q, em, vm, true);
-
-                  break;
-                case CHPOS_CHOPPER:
-                  new_rect (&r, q.room,
-                            PLACE_WIDTH * q.place,
-                            PLACE_HEIGHT * q.floor + 3,
-                            27, 60);
-                  clear_rect_to_color (mr.cell[x][y].cache, &r, TRANSPARENT_COLOR);
-
-                  draw_conbg (mr.cell[x][y].cache, &pl, em, vm, true);
-                  draw_conbg (mr.cell[x][y].cache, &q, em, vm, true);
-
-                  break;
-                default:
-                  new_rect (&r, q.room,
-                            PLACE_WIDTH * q.place - 1,
-                            PLACE_HEIGHT * q.floor - 17,
-                            2 * PLACE_WIDTH + 1, PLACE_HEIGHT + 3 + 17);
-                  clear_rect_to_color (mr.cell[x][y].cache, &r, TRANSPARENT_COLOR);
-
-                  for (p0.floor = q.floor + 1; p0.floor >= q.floor - 1; p0.floor--)
-                    for (p0.place = q.place - 2; p0.place <= q.place + 1; p0.place++)
-                      draw_conbg (mr.cell[x][y].cache, &p0, em, vm, true);
-
-                  break;
-                }
+                pop_clipping_rectangle ();
 
                 con_caching = false;
                 goto next_room;
@@ -896,16 +789,14 @@ draw_multi_rooms (void)
           || vm != mr.last.vm))
     generate_wall_colors ();
 
-  if (mr_full_update)
-    generate_stars ();
-
   if (mouse_pos.room != mr.last.mouse_pos.room
       || mouse_pos.floor != mr.last.mouse_pos.floor
       || mouse_pos.place != mr.last.mouse_pos.place) {
     if (is_valid_pos (&mouse_pos))
-      update_cache_pos (&mouse_pos, CHPOS_MOUSE_SELECT, em, vm);
+      register_changed_pos (&mouse_pos);
+
     if (is_valid_pos (&mr.last.mouse_pos))
-      update_cache_pos (&mr.last.mouse_pos, CHPOS_MOUSE_DESELECT, em, vm);
+      register_changed_pos (&mr.last.mouse_pos);
   }
 
   if (anim_cycle == 0
@@ -933,12 +824,15 @@ draw_multi_rooms (void)
        || (em == DUNGEON && vm == EGA)
        || (em == PALACE && vm == EGA));
 
+    /* optmize changed pos list */
+    optimize_changed_pos ();
+
     /* update cache pos */
     for (i = 0; i < changed_pos_nmemb; i++) {
-      update_cache_pos (&changed_pos[i].p, changed_pos[i].reason, em, vm);
-      struct pos pl; prel (&changed_pos[i].p, &pl, +0, -1);
-      if (depedv && fg (&pl) == WALL)
-        update_cache_pos (&pl, CHPOS_WALL, em, vm);
+      update_cache_pos (&changed_pos[i], em, vm);
+      struct pos pl; prel (&changed_pos[i], &pl, +0, -1);
+      if (depedv && fake (&pl) == WALL)
+        update_cache_pos (&pl, em, vm);
     }
 
     /* update cache room */

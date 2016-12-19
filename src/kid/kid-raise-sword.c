@@ -123,8 +123,6 @@ physics_out (struct anim *k)
   /* consume sword */
   if (k->i == 0)
     register_con_undo (&undo, &k->item_pos,
-                       MIGNORE, MIGNORE, NO_ITEM,
-                       false, false, false, false,
-                       CHPOS_NONE,
-                       "CONSUME SWORD");
+                       MIGNORE, MIGNORE, NO_ITEM, MIGNORE,
+                       NULL, false, "CONSUME SWORD");
 }

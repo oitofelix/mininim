@@ -115,7 +115,7 @@ flow (struct anim *k)
   if (k->oaction != kid_vjump)
     k->i = -1, k->j = 0,
       k->just_hanged = k->hit_ceiling =
-      k->hang = k->misstep = false;
+      k->hit_ceiling_fake = k->hang = k->misstep = false;
 
   if (k->i == 12 && k->hang) {
     kid_hang (k);
@@ -157,18 +157,14 @@ flow (struct anim *k)
 static bool
 physics_in (struct anim *k)
 {
-  struct pos ptf, ptfb, ptr, pmt, pm, pmf, pmba;
+  struct pos ptf, ptfb, ptr, pm, pmf, pmba;
 
   survey (_m, pos, &k->f, NULL, &pm, NULL);
 
   /* collision */
-  if (is_colliding (&k->f, &k->fo, +0, false, &k->ci)
-      && pm.floor == k->ci.kid_p.floor) {
-    enum confg f = fg (&k->ci.con_p);
-    if (f == MIRROR ||
-        ((f == CARPET || f == DOOR) && k->f.dir == RIGHT))
-      uncollide (&k->f, &k->fo, &k->fo, +0, false, &k->ci);
-  }
+  if (uncollide (&k->f, &k->fo, _bf, +0, +0, NULL, &k->ci)
+      && fg (&k->ci.con_p) == MIRROR)
+    uncollide (&k->f, &k->fo, _bf, +0, +0, &k->fo, &k->ci);
 
   /* fall */
   survey (_mf, pos, &k->f, NULL, &pmf, NULL);
@@ -181,37 +177,43 @@ physics_in (struct anim *k)
   }
 
   /* ceiling hit */
-  survey (_tr, pos, &k->f, NULL, &ptr, NULL);
-  survey (_mt, pos, &k->f, NULL, &pmt, NULL);
+  surveyo (_tr, -4, +0, pos, &k->f, NULL, &ptr, NULL);
   struct pos ptra; prel (&ptr, &ptra, -1, 0);
-  struct pos pmta; prel (&pmt, &pmta, -1, 0);
-  if (k->i == 12 && k->j == 1
-      && (! is_strictly_traversable (&ptra)
-          && ! is_strictly_traversable (&pmta))
-      && ! k->hang)
-    k->hit_ceiling = true;
+  if (k->i == 12 && k->j == 1) {
+    k->hit_ceiling_fake = ! is_strictly_traversable_fake (&ptra);
+    k->hit_ceiling = ! is_strictly_traversable (&ptra) && ! k->hang;
+  }
 
   /* hang */
   int dir = (k->f.dir == LEFT) ? +1 : -1;
-  survey (_tf, pos, &k->f, NULL, &ptf, NULL);
+  surveyo (_tf, -4, +0, pos, &k->f, NULL, &ptf, NULL);
+  prel (&ptf, &ptfb, 0, dir);
   if (k->i == 0
-      && is_hangable_pos (prel (&ptf, &ptfb, 0, dir), k->f.dir)
-      && ! (fg (&ptf) == DOOR
-            && k->f.dir == LEFT
-            && is_collidable_at_right (&ptf, &k->f))) {
+      && is_hangable_pos (&ptfb, k->f.dir)
+      /* && ! (fg (&ptf) == DOOR */
+      /*       && k->f.dir == LEFT */
+      /*       && is_collidable_at_right (&ptf, &k->f)) */
+      && is_immediately_accessible_pos (&ptfb, &ptf, &k->f)) {
     prel (&ptf, &k->hang_pos, 0, dir);
     pos2room (&k->hang_pos, k->f.c.room, &k->hang_pos);
-    k->fo.dx += is_hang_pos_critical (&k->hang_pos) ? -12 : -3;
+    k->fo.dx += is_hang_pos_critical (&k->hang_pos) ? -12 : -1;
     k->hang = true;
-  } else if (k->i == 0 && can_hang (&k->f, false, &k->hang_pos)
-             && ! is_hang_pos_critical (&k->hang_pos)
-             && (k->f.dir == LEFT || fg (&k->hang_pos) != DOOR)) {
+  } else if (k->i == 0
+             && is_hangable_pos (&ptf, k->f.dir)
+             /* && can_hang (&k->f, false, &k->hang_pos) */
+             /* && ! is_hang_pos_critical (&k->hang_pos) */
+             /* && (k->f.dir == LEFT || fg (&k->hang_pos) != DOOR) */
+             /* && uncollide (&k->f, &k->fo, NULL, +0, */
+             /*               false, &k->ci) != UNCOLLIDE_FRONT */
+             ) {
+    k->hang_pos = ptf;
+    pos2room (&k->hang_pos, k->f.c.room, &k->hang_pos);
     k->fo.dx -= 0; k->hang = true;
   }
 
   if (k->i == 0 && k->hang)
     place_frame (&k->f, &k->f, kid_vjump_frameset[0].frame,
-                 &k->hang_pos, (k->f.dir == LEFT) ? +14 : PLACE_WIDTH + 5, +16);
+                 &k->hang_pos, (k->f.dir == LEFT) ? +16 : +37, +16);
 
   return true;
 }

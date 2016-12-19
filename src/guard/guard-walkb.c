@@ -211,7 +211,7 @@ physics_in (struct anim *g)
   struct pos pmbo;
 
   /* collision */
-  uncollide (&g->f, &g->fo, &g->fo, +0, true, &g->ci);
+  uncollide_back_fight (g);
 
   /* fall */
   survey (_mbo, pos, &g->f, NULL, &pmbo, NULL);

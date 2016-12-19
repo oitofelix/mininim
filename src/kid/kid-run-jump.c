@@ -113,14 +113,16 @@ flow (struct anim *k)
 
   int dir = (k->f.dir == LEFT) ? -1 : +1;
 
-  /* hang front */
   survey (_m, pos, &k->f, NULL, &pm, NULL);
   survey (_tf, pos, &k->f, NULL, &ptf, NULL);
+
+  /* hang front */
   if (hang_front && k->i >= 5  && k->i <= 9
       && (is_hangable_pos (&pm, k->f.dir)
           || (is_hangable_pos (&ptf, k->f.dir)
               && fg_rel (&ptf, +0, dir) == WALL
-              && k->i < 9))) {
+              && k->i < 9))
+      && is_immediately_accessible_pos (&ptf, &pm, &k->f)) {
     if (is_hangable_pos (&pm, k->f.dir)) k->hang_pos = pm;
     else if (is_hangable_pos (&ptf, k->f.dir)) k->hang_pos = ptf;
     pos2room (&k->hang_pos, k->f.c.room, &k->hang_pos);
@@ -131,9 +133,9 @@ flow (struct anim *k)
   }
 
   /* hang back */
-  survey (_tf, pos, &k->f, NULL, &ptf, NULL);
   if (k->i >= 5 && k->i <= 9
-      && hang_back && is_hangable_pos (&ptf, back_dir)) {
+      && hang_back && is_hangable_pos (&ptf, back_dir)
+      && is_immediately_accessible_pos (&ptf, &pm, &k->f)) {
     k->hang_pos = ptf;
     pos2room (&k->hang_pos, k->f.c.room, &k->hang_pos);
     k->hang = true;
@@ -162,11 +164,24 @@ physics_in (struct anim *k)
   else k->inertia = 5;
 
   /* collision */
-  if (is_colliding (&k->f, &k->fo, +0, false, &k->ci)) {
+  int dx = k->i < 6 ? +0 : -8;
+
+  /* crossing mirror */
+  if ((k->i >= 4 && k->i <= 8)
+      && uncollide (&k->f, &k->fo, _bf, dx, dx, NULL, &k->ci)
+      && fg (&k->ci.con_p) == MIRROR) {
+    if ((! is_valid_pos (&k->cross_mirror_p)
+         || ! peq (&k->cross_mirror_p, &k->ci.con_p))) {
+      play_audio (&mirror_audio, NULL, k->id);
+      k->cross_mirror_p = k->ci.con_p;
+    }
+  } else if (! is_valid_pos (&k->cross_mirror_p)
+             && uncollide (&k->f, &k->fo, _bf, dx, dx, NULL, &k->ci)) {
+    invalid_pos (&k->cross_mirror_p);
     if (k->i < 6) kid_stabilize_collision (k);
     else kid_couch_collision (k);
     return false;
-  }
+  } else invalid_pos (&k->cross_mirror_p);
 
   /* fall */
   survey (_bf, pos, &k->f, NULL, &pbf, NULL);

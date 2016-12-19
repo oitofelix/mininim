@@ -20,71 +20,71 @@
 #ifndef MININIM_AUDIO_DATA_H
 #define MININIM_AUDIO_DATA_H
 
-/* samples */
-#define STEP_AUDIO "data/audio/sample/step.ogg"
-#define HIT_GROUND_AUDIO "data/audio/sample/hit-ground.ogg"
-#define HIT_GROUND_HARM_AUDIO "data/audio/sample/hit-ground-harm.ogg"
-#define HIT_GROUND_FATAL_AUDIO "data/audio/sample/hit-ground-fatal.ogg"
-#define HIT_WALL_AUDIO "data/audio/sample/hit-wall.ogg"
-#define HANG_ON_FALL_AUDIO "data/audio/sample/hang-on-fall.ogg"
-#define DRINK_AUDIO "data/audio/sample/drink.ogg"
-#define TAKE_SWORD_AUDIO "data/audio/sample/take-sword.ogg"
-#define SWORD_ATTACK_AUDIO "data/audio/sample/sword-attack.ogg"
-#define HARM_AUDIO "data/audio/sample/harm.ogg"
-#define SCREAM_AUDIO "data/audio/sample/scream.ogg"
-#define SPIKED_AUDIO "data/audio/sample/spiked.ogg"
-#define CHOPPED_AUDIO "data/audio/sample/chopped.ogg"
-#define PRESS_KEY_AUDIO "data/audio/sample/press-key.ogg"
-#define MIRROR_AUDIO "data/audio/sample/mirror.ogg"
-#define SWORD_DEFENSE_AUDIO "data/audio/sample/sword-defense.ogg"
-#define CHOPPER_AUDIO "data/audio/sample/chopper.ogg"
-#define DOOR_OPEN_AUDIO "data/audio/sample/door-open.ogg"
-#define DOOR_CLOSE_AUDIO "data/audio/sample/door-close.ogg"
-#define DOOR_END_AUDIO "data/audio/sample/door-end.ogg"
-#define DOOR_ABRUPTLY_CLOSE_AUDIO "data/audio/sample/door-abruptly-close.ogg"
-#define GUARD_HIT_AUDIO "data/audio/sample/guard-hit.ogg"
-#define SKELETON_AUDIO "data/audio/sample/skeleton.ogg"
-#define LEVEL_DOOR_OPEN_AUDIO "data/audio/sample/level-door-open.ogg"
-#define LEVEL_DOOR_CLOSE_AUDIO "data/audio/sample/level-door-close.ogg"
-#define CLOSER_FLOOR_AUDIO "data/audio/sample/closer-floor.ogg"
-#define LOOSE_FLOOR_00_AUDIO "data/audio/sample/loose-floor-00.ogg"
-#define LOOSE_FLOOR_01_AUDIO "data/audio/sample/loose-floor-01.ogg"
-#define LOOSE_FLOOR_02_AUDIO "data/audio/sample/loose-floor-02.ogg"
-#define BROKEN_FLOOR_AUDIO "data/audio/sample/broken-floor.ogg"
-#define SPIKES_AUDIO "data/audio/sample/spikes.ogg"
-#define OPENER_FLOOR_AUDIO "data/audio/sample/opener-floor.ogg"
-#define CREAKING_DOOR_AUDIO "data/audio/sample/creaking-door.ogg"
-
-/* streams */
-#define MAIN_THEME_AUDIO "data/audio/stream/main-theme.ogg"
-#define CUTSCENE_01_03_05_11_AUDIO "data/audio/stream/cutscene-01-03-05-11.ogg"
-#define CUTSCENE_07_08_AUDIO "data/audio/stream/cutscene-07-08.ogg"
-#define CUTSCENE_14_AUDIO "data/audio/stream/cutscene-14.ogg"
-#define CUTSCENE_11_LITTLE_TIME_LEFT_AUDIO "data/audio/stream/cutscene-11-little-time-left.ogg"
-#define CUTSCENE_OUT_OF_TIME_AUDIO "data/audio/stream/cutscene-out-of-time.ogg"
-#define BIG_LIFE_POTION_AUDIO "data/audio/stream/big-life-potion.ogg"
-#define DEATH_AUDIO "data/audio/stream/death.ogg"
-#define FIGHT_DEATH_AUDIO "data/audio/stream/fight-death.ogg"
-#define VIZIER_DEATH_AUDIO "data/audio/stream/vizier-death.ogg"
-#define FLOATING_AUDIO "data/audio/stream/floating.ogg"
-#define GLORY_AUDIO "data/audio/stream/glory.ogg"
-#define HAPPY_END_AUDIO "data/audio/stream/happy-end.ogg"
-#define IN_THE_ABSENCE_AUDIO "data/audio/stream/in-the-absence.ogg"
-#define MARRY_JAFFAR_AUDIO "data/audio/stream/marry-jaffar.ogg"
-#define MEET_VIZIER_AUDIO "data/audio/stream/meet-vizier.ogg"
-#define PRINCESS_WAITING_AUDIO "data/audio/stream/princess-waiting.ogg"
-#define VIZIER_AND_PRINCESS_AUDIO "data/audio/stream/vizier-and-princess.ogg"
-#define SMALL_LIFE_POTION_AUDIO "data/audio/stream/small-life-potion.ogg"
-#define SUCCESS_AUDIO "data/audio/stream/success.ogg"
-#define SUCCESS_SUSPENSE_AUDIO "data/audio/stream/success-suspense.ogg"
-#define SUSPENSE_AUDIO "data/audio/stream/suspense.ogg"
+/* audio data */
+#define BIG_LIFE_POTION_AUDIO "data/audio/big-life-potion.ogg"
+#define STEP_AUDIO "data/audio/step.ogg"
+#define HIT_GROUND_AUDIO "data/audio/hit-ground.ogg"
+#define HIT_GROUND_HARM_AUDIO "data/audio/hit-ground-harm.ogg"
+#define HIT_GROUND_FATAL_AUDIO "data/audio/hit-ground-fatal.ogg"
+#define HIT_WALL_AUDIO "data/audio/hit-wall.ogg"
+#define HANG_ON_FALL_AUDIO "data/audio/hang-on-fall.ogg"
+#define DRINK_AUDIO "data/audio/drink.ogg"
+#define TAKE_SWORD_AUDIO "data/audio/take-sword.ogg"
+#define SWORD_ATTACK_AUDIO "data/audio/sword-attack.ogg"
+#define HARM_AUDIO "data/audio/harm.ogg"
+#define SCREAM_AUDIO "data/audio/scream.ogg"
+#define SPIKED_AUDIO "data/audio/spiked.ogg"
+#define CHOPPED_AUDIO "data/audio/chopped.ogg"
+#define PRESS_KEY_AUDIO "data/audio/press-key.ogg"
+#define MIRROR_AUDIO "data/audio/mirror.ogg"
+#define SWORD_DEFENSE_AUDIO "data/audio/sword-defense.ogg"
+#define CHOPPER_AUDIO "data/audio/chopper.ogg"
+#define DOOR_OPEN_AUDIO "data/audio/door-open.ogg"
+#define DOOR_CLOSE_AUDIO "data/audio/door-close.ogg"
+#define DOOR_END_AUDIO "data/audio/door-end.ogg"
+#define DOOR_ABRUPTLY_CLOSE_AUDIO "data/audio/door-abruptly-close.ogg"
+#define GUARD_HIT_AUDIO "data/audio/guard-hit.ogg"
+#define SKELETON_AUDIO "data/audio/skeleton.ogg"
+#define LEVEL_DOOR_OPEN_AUDIO "data/audio/level-door-open.ogg"
+#define LEVEL_DOOR_CLOSE_AUDIO "data/audio/level-door-close.ogg"
+#define CLOSER_FLOOR_AUDIO "data/audio/closer-floor.ogg"
+#define LOOSE_FLOOR_00_AUDIO "data/audio/loose-floor-00.ogg"
+#define LOOSE_FLOOR_01_AUDIO "data/audio/loose-floor-01.ogg"
+#define LOOSE_FLOOR_02_AUDIO "data/audio/loose-floor-02.ogg"
+#define BROKEN_FLOOR_AUDIO "data/audio/broken-floor.ogg"
+#define SPIKES_AUDIO "data/audio/spikes.ogg"
+#define OPENER_FLOOR_AUDIO "data/audio/opener-floor.ogg"
+#define CREAKING_DOOR_AUDIO "data/audio/creaking-door.ogg"
+#define DEATH_AUDIO "data/audio/death.ogg"
+#define MAIN_THEME_AUDIO "data/audio/main-theme.ogg"
+#define CUTSCENE_01_03_05_11_AUDIO "data/audio/cutscene-01-03-05-11.ogg"
+#define CUTSCENE_07_08_AUDIO "data/audio/cutscene-07-08.ogg"
+#define CUTSCENE_14_AUDIO "data/audio/cutscene-14.ogg"
+#define CUTSCENE_11_LITTLE_TIME_LEFT_AUDIO "data/audio/cutscene-11-little-time-left.ogg"
+#define CUTSCENE_OUT_OF_TIME_AUDIO "data/audio/cutscene-out-of-time.ogg"
+#define FIGHT_DEATH_AUDIO "data/audio/fight-death.ogg"
+#define VIZIER_DEATH_AUDIO "data/audio/vizier-death.ogg"
+#define FLOATING_AUDIO "data/audio/floating.ogg"
+#define GLORY_AUDIO "data/audio/glory.ogg"
+#define HAPPY_END_AUDIO "data/audio/happy-end.ogg"
+#define IN_THE_ABSENCE_AUDIO "data/audio/in-the-absence.ogg"
+#define MARRY_JAFFAR_AUDIO "data/audio/marry-jaffar.ogg"
+#define MEET_VIZIER_AUDIO "data/audio/meet-vizier.ogg"
+#define PRINCESS_WAITING_AUDIO "data/audio/princess-waiting.ogg"
+#define VIZIER_AND_PRINCESS_AUDIO "data/audio/vizier-and-princess.ogg"
+#define SMALL_LIFE_POTION_AUDIO "data/audio/small-life-potion.ogg"
+#define SUCCESS_AUDIO "data/audio/success.ogg"
+#define SUCCESS_SUSPENSE_AUDIO "data/audio/success-suspense.ogg"
+#define SUSPENSE_AUDIO "data/audio/suspense.ogg"
 
 /* functions */
 void load_audio_data (void);
 void unload_audio_data (void);
 
-/* samples */
-extern struct audio_source step_audio,
+/* audio variables */
+extern struct audio_source
+  big_life_potion_audio,
+  step_audio,
   hit_ground_audio,
   hit_ground_harm_audio,
   hit_ground_fatal_audio,
@@ -116,17 +116,14 @@ extern struct audio_source step_audio,
   broken_floor_audio,
   spikes_audio,
   opener_floor_audio,
-  creaking_door_audio;
-
-/* streams */
-extern struct audio_source main_theme_audio,
+  death_audio,
+  creaking_door_audio,
+  main_theme_audio,
   cutscene_01_03_05_11_audio,
   cutscene_07_08_audio,
   cutscene_14_audio,
   cutscene_11_little_time_left_audio,
   cutscene_out_of_time_audio,
-  big_life_potion_audio,
-  death_audio,
   fight_death_audio,
   vizier_death_audio,
   floating_audio,

@@ -120,7 +120,7 @@ flow (struct anim *k)
     || ((k->f.dir == LEFT) && k->key.left && k->key.up);
   bool couch = k->key.down;
 
-  int dc = dist_collision (&k->f, false, &k->ci);
+  int dc = dist_collision (&k->f, _bf, +0, +0, &k->ci);
   int df = dist_fall (&k->f, false);
 
   if (k->i >= 0 && ! k->collision) {
@@ -171,11 +171,8 @@ physics_in (struct anim *k)
   }
 
   /* collision */
-  if (is_colliding (&k->f, &k->fo, +0, false, &k->ci)
-      && ! k->collision && fg (&k->ci.con_p) != WALL) {
-    kid_stabilize_collision (k);
-    return false;
-  }
+  if (! k->collision)
+    uncollide (&k->f, &k->fo, _bf, -12, -4, &k->fo, NULL);
 
   return true;
 }

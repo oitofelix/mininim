@@ -117,12 +117,6 @@ flow (struct anim *k)
       kid_sword_walkb (k);
       return false;
     }
-
-    /* no space for fight */
-    if (! is_there_enough_room_to_fight (k)) {
-      kid_keep_sword (k);
-      return false;
-    }
   }
 
   k->fo.b = kid_sword_normal_00;
@@ -144,8 +138,7 @@ physics_in (struct anim *k)
   struct pos pmbo;
 
   /* collision */
-  uncollide (&k->f, &k->fo, &k->fo, +0, true, &k->ci);
-  if (fight_door_split_collision (k)) return false;
+  uncollide_static_fight (k);
 
   /* fall */
   survey (_mbo, pos, &k->f, NULL, &pmbo, NULL);

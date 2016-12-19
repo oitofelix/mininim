@@ -105,7 +105,7 @@ kid_couch_collision (struct anim *k)
   k->action = kid_couch_collision;
   place_frame (&k->f, &k->f, kid_couch_frameset[0].frame,
                &k->ci.kid_p, (k->f.dir == LEFT)
-               ? +PLACE_WIDTH + 24 : -PLACE_WIDTH + 18, +27);
+               ? +50 : -14, +27);
   kid_couch (k);
   play_audio (&hit_wall_audio, NULL, k->id);
 }
@@ -218,7 +218,7 @@ flow (struct anim *k)
 static bool
 physics_in (struct anim *k)
 {
-  struct pos p, pm, pma;
+  struct pos pm, pma;
   enum confg cm;
 
   bool couch_jump = k->key.down
@@ -227,35 +227,14 @@ physics_in (struct anim *k)
     && k->i <= 2;
 
   /* collision */
-  if (is_colliding (&k->f, &k->fo, +0, false, &k->ci)
-      && fg (&k->ci.con_p) == DOOR
-      && prel (&k->ci.kid_p, &p, +0, k->f.dir == LEFT ? +0 : -1)
-      && door_at_pos (&p)->i >= 32
-      && couch_jump) {
-    kid_stabilize_collision (k);
-    return false;
-  } else if (is_colliding (&k->f, &k->fo, +0, false, &k->ci)
-             && fg (&k->ci.con_p) != MIRROR
-             && (! couch_jump || fg (&k->ci.con_p) != DOOR)) {
-    if (k->i <= 2 && k->fall)
-      uncollide (&k->f, &k->fo, &k->fo, +0, false, &k->ci);
-    else {
-      kid_stabilize_collision (k);
-      return false;
-    }
-  } else if (is_colliding (&k->f, &k->fo, +2, false, &k->ci)
-             && fg (&k->ci.con_p) == MIRROR) {
-    if (k->i <= 2)
-      uncollide (&k->f, &k->fo, &k->fo, +2, false, &k->ci);
-    else {
-      kid_stabilize_collision (k);
-      return false;
-    }
-  }
-
-  if (! k->fall && ! couch_jump && kid_door_split_collision (k))
-    return false;
-
+  if (k->f.dir == LEFT
+      && uncollide (&k->f, &k->fo, _bf, +0, +0, NULL, &k->ci)
+      && fg (&k->ci.con_p) == MIRROR)
+    uncollide (&k->f, &k->fo, _bf, +0, +0, &k->fo, &k->ci);
+  else if (! is_item (&k->item_pos))
+           uncollide (&k->f, &k->fo, _bf, COLLISION_FRONT_LEFT_NORMAL,
+                      COLLISION_FRONT_RIGHT_NORMAL, &k->fo, NULL);
+  if (k->key.down && ! couch_jump) uncollide_static_kid_normal (k);
 
   /* fall */
   survey (_m, pos, &k->f, NULL, &pm, NULL);

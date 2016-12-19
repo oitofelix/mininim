@@ -83,6 +83,8 @@ void load_door (void);
 void unload_door (void);
 void register_door (struct pos *p);
 int compare_doors (const void *d0, const void *d1);
+struct door *copy_door (struct door *to,
+                        struct door *from);
 struct door *door_at_pos (struct pos *p);
 void remove_door (struct door *d);
 void open_door (struct level *l, int e, uint64_t priority, bool stay_open);
@@ -103,14 +105,15 @@ void draw_door_pole_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
                           enum em em, enum vm vm);
 void draw_door_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f,
                    enum em em, enum vm vm);
+ALLEGRO_BITMAP *door_grid_bitmap (int i, enum em em, enum vm vm);
 void generate_door_grid_cache (ALLEGRO_BITMAP *cache[DOOR_STEPS],
                                enum em em, enum vm vm);
+void destroy_door_grid_cache (ALLEGRO_BITMAP *cache[DOOR_STEPS]);
 void draw_door_grid_cache (ALLEGRO_BITMAP *bitmap, ALLEGRO_BITMAP *door_grid,
                            ALLEGRO_BITMAP *door_grid_tip, int i);
 void draw_door_grid (ALLEGRO_BITMAP *bitmap, struct pos *p, int i,
-                     enum em em, enum vm vm);
-void xdraw_door_grid (ALLEGRO_BITMAP *bitmap, struct pos *p, int i,
-                      enum em em, enum vm vm);
+                     int w, bool top, enum em em, enum vm vm);
+
 bool should_draw_door_grid (struct pos *p, struct frame *f);
 struct coord *door_grid_coord_base (struct pos *p, struct coord *c);
 struct coord *door_grid_coord (struct pos *p, struct coord *c, int j, int i);

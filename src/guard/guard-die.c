@@ -305,7 +305,7 @@ guard_die_spiked (struct anim *g)
     s->state = 5;
     s->inactive = true;
     s->murdered_anim = g->id;
-    register_changed_pos (&s->p, CHPOS_SPIKES);
+    register_changed_pos (&g->p);
 
     if (g->type == SKELETON)
       play_audio (&skeleton_audio, NULL, g->id);
@@ -469,7 +469,7 @@ static bool
 physics_in (struct anim *g)
 {
   /* collision */
-  uncollide (&g->f, &g->fo, &g->fo, +0, true, &g->ci);
+  uncollide (&g->f, &g->fo, _bb, +0, +0, &g->fo, NULL);
 
   /* fall */
   struct pos pm;

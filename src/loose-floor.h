@@ -76,9 +76,12 @@ extern size_t loose_floor_nmemb;
 void load_loose_floor (void);
 void unload_loose_floor (void);
 ALLEGRO_BITMAP *create_loose_floor_01_bitmap (enum em em, enum vm vm);
+struct loose_floor *init_loose_floor (struct pos *p, struct loose_floor *l);
 void register_loose_floor (struct pos *p);
 void sort_loose_floors (void);
 int compare_loose_floors (const void *l0, const void *l1);
+struct loose_floor *copy_loose_floor (struct loose_floor *to,
+                                      struct loose_floor *from);
 struct loose_floor * loose_floor_at_pos (struct pos *p);
 void remove_loose_floor (struct loose_floor *l);
 void release_loose_floor (struct pos *p);

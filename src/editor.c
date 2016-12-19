@@ -35,21 +35,20 @@ static bool reciprocal_links, locally_unique_links,
 static bool b0, b1, b2, b3, b4, b5;
 static int guard_index;
 static int bb, r, s, t;
-static struct con con_copy;
-static struct con room_copy[FLOORS][PLACES];
+static struct con_copy con_copy;
+static struct room_copy room_copy;
 static struct level level_copy;
 static char *msg;
 static uint64_t msg_cycles;
 
 enum edit edit;
 enum edit last_edit = EDIT_MAIN;
+uint64_t editor_register;
 
 void
 editor (void)
 {
   if (edit == EDIT_NONE) return;
-
-  active_menu = true;
 
   struct menu_item main_menu[] =
     {{'C', "CONSTRUCTION>"},
@@ -65,15 +64,17 @@ editor (void)
      {'B', "BACKGROUND>"},
      {'E', "EXTENSION*"},
      {'#', "NUMERICAL EXTENSION<"},
+     {'K', "FAKE>"},
+     {'-', "UNFAKE"},
      {'I', "NOMINAL INFO"},
      {'N', "NUMERICAL INFO"},
-     {'A', "CLEAR"},
-     {'R', "RANDOM"},
-     {'D', "DECORATION"},
+     {'A', "CLEAR CON"},
+     {'R', "RANDOMIZE CON"},
+     {'D', "DECORATE CON"},
      {'M', "MIRROR>"},
-     {'C', "COPY"},
-     {'P', "PASTE"},
-     {'!', "FIX"},
+     {'C', "COPY CON"},
+     {'P', "PASTE CON"},
+     {'!', "FIX CON"},
      {0}};
 
   struct menu_item mirror_menu[] =
@@ -205,13 +206,13 @@ editor (void)
      {'L', "ROOM LINKING>"},
      {'S', "LINKING SETTINGS<"},
      {'X', "EXCHANGE<"},
-     {'A', "CLEAR"},
-     {'R', "RANDOM"},
-     {'D', "DECORATION"},
+     {'A', "CLEAR ROOM"},
+     {'R', "RANDOMIZE ROOM"},
+     {'D', "DECORATE ROOM"},
      {'M', "MIRROR>"},
-     {'C', "COPY"},
-     {'P', "PASTE"},
-     {'!', "FIX"},
+     {'C', "COPY ROOM"},
+     {'P', "PASTE ROOM"},
+     {'!', "FIX ROOM"},
      {0}};
 
   struct menu_item link_menu[] =
@@ -238,18 +239,18 @@ editor (void)
   struct menu_item level_menu[] =
     {{'J', "JUMP<"},
      {'X', "EXCHANGE<"},
-     {'A', "CLEAR"},
-     {'R', "RANDOM"},
-     {'D', "DECORATION"},
+     {'A', "CLEAR LEVEL"},
+     {'R', "RANDOMIZE LEVEL"},
+     {'D', "DECORATE LEVEL"},
      {'M', "MIRROR>"},
-     {'C', "COPY"},
-     {'P', "PASTE"},
+     {'C', "COPY LEVEL"},
+     {'P', "PASTE LEVEL"},
      {'N', "NOMINAL NUMBER"},
      {'E', "ENVIRONMENT<"},
      {'H', "HUE<"},
      {'S', "SAVE LEVEL"},
      {'L', "RELOAD LEVEL"},
-     {'!', "FIX"},
+     {'!', "FIX LEVEL"},
      {0}};
 
   struct menu_item environment_menu[] =
@@ -301,8 +302,9 @@ editor (void)
   struct pos p = mouse_pos;
   static struct guard *g;
   static struct pos p0;
+  static bool fake_fg;
 
-  char *fg_str = NULL, *bg_str = NULL, *ext_str = NULL;
+  char *fg_str = NULL, *bg_str = NULL, *ext_str = NULL, *fake_str = NULL;
   bool free_ext_str;
   char *str = NULL, c;
   int i;
@@ -315,16 +317,18 @@ editor (void)
   static struct skill skill_buf;
 
   /* display message if available */
-  if (msg_cycles > 0 && msg && ! key.keyboard.keycode) {
-    msg_cycles--;
+  if (msg_cycles > EDITOR_CYCLES_0 && msg
+      && (key.keyboard.keycode == ALLEGRO_KEY_BACKSPACE
+          || key.keyboard.unichar == '/')) {
+    msg_cycles = 0;
     draw_bottom_text (NULL, msg, 0);
     memset (&key, 0, sizeof (key));
     menu_help = 0;
-    return;
-  } else if (msg_cycles > 0 && msg) {
-    msg_cycles = 0;
-    memset (&key, 0, sizeof (key));
-  } else msg_cycles = 0;
+ } else if (msg_cycles > 0 && msg) msg_cycles--;
+  else msg_cycles = 0;
+
+  editor_register = EDITOR_CYCLES_3;
+  active_menu = true;
 
   switch (edit) {
   case EDIT_NONE: break;
@@ -341,7 +345,7 @@ editor (void)
     break;
   case EDIT_CON:
     if (! is_valid_pos (&p)) {
-      editor_msg ("SELECT CONSTRUCTION", 1);
+      editor_msg ("SELECT CONSTRUCTION", EDITOR_CYCLES_0);
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       if (was_menu_return_pressed (true)) edit = EDIT_MAIN;
       break;
@@ -349,30 +353,36 @@ editor (void)
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
     switch (menu_enum (con_menu, "C>")) {
     case -1: case 1: edit = EDIT_MAIN; break;
-    case 'F': edit = EDIT_FG; break;
+    case 'F': edit = EDIT_FG;
+      fake_fg = false; break;
     case 'B': edit = EDIT_BG; break;
     case 'E': edit = EDIT_EXT; break;
     case '#': edit = EDIT_NUMERICAL_EXT; break;
+    case 'K': edit = EDIT_FG;
+      fake_fg = true; break;
+    case '-':
+      register_con_undo (&undo, &p,
+                         MIGNORE, MIGNORE, MIGNORE, NO_FAKE,
+                         NULL, false, "UNFAKE");
+      break;
     case 'I': edit = EDIT_NOMINAL_INFO; break;
     case 'N': edit = EDIT_NUMERICAL_INFO; break;
     case 'A':
       apply_to_pos (&p, clear_con, "CLEAR CON");
       break;
     case 'R':
-      apply_to_pos (&p, random_con, "RANDOM CON");
+      apply_to_pos (&p, random_con, "RANDOMIZE CON");
       break;
     case 'D':
       apply_to_pos (&p, decorate_con, "DECORATE CON");
       break;
     case 'M': edit = EDIT_MIRROR_CON; break;
     case 'C':
-      con_copy = *con (&p);
-      editor_msg ("COPIED", 12);
+      copy_con (&con_copy, &p);
+      editor_msg ("COPY CON", EDITOR_CYCLES_3);
       break;
     case 'P':
-      register_con_undo (&undo, &p,
-                         con_copy.fg, con_copy.bg, con_copy.ext,
-                         true, true, true, true, -1, "PASTE CON");
+      paste_con (&p, &con_copy, "PASTE CON");
       break;
     case '!':
       apply_to_pos (&p, fix_con, "FIX CON");
@@ -381,7 +391,7 @@ editor (void)
     break;
   case EDIT_MIRROR_CON:
     if (! is_valid_pos (&p)) {
-      editor_msg ("SELECT CONSTRUCTION", 1);
+      editor_msg ("SELECT CONSTRUCTION", EDITOR_CYCLES_0);
       if (was_menu_return_pressed (true)) edit = EDIT_CON;
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       break;
@@ -391,74 +401,83 @@ editor (void)
     case -1: case 1: edit = EDIT_CON; break;
     case 'H':
       reflect_pos_h (&p, &p0);
-      register_mirror_pos_undo (&undo, &p, &p0, true, true, "MIRROR CON H.");
+      register_mirror_pos_undo (&undo, &p, &p0, true, "MIRROR CON H.");
       break;
     case 'V':
       reflect_pos_v (&p, &p0);
-      register_mirror_pos_undo (&undo, &p, &p0, true, false, "MIRROR CON V.");
+      register_mirror_pos_undo (&undo, &p, &p0, false, "MIRROR CON V.");
       break;
     case 'B':
       reflect_pos_h (&p, &p0);
       reflect_pos_v (&p0, &p0);
-      register_mirror_pos_undo (&undo, &p, &p0, true, true, "MIRROR CON H+V.");
+      register_mirror_pos_undo (&undo, &p, &p0, true, "MIRROR CON H+V.");
       break;
     case 'R':
       random_pos (&global_level, &p0);
       p0.room = p.room;
-      register_mirror_pos_undo (&undo, &p, &p0, true, false, "MIRROR CON R.");
+      register_mirror_pos_undo (&undo, &p, &p0, false, "MIRROR CON R.");
       break;
     case 'A':
       prel (&p, &p0, +0, -1);
-      register_mirror_pos_undo (&undo, &p, &p0, true, false, "MIRROR CON LEFT");
+      register_mirror_pos_undo (&undo, &p, &p0, false, "MIRROR CON LEFT");
       break;
     case 'D':
       prel (&p, &p0, +0, +1);
-      register_mirror_pos_undo (&undo, &p, &p0, true, false, "MIRROR CON RIGHT");
+      register_mirror_pos_undo (&undo, &p, &p0, false, "MIRROR CON RIGHT");
       break;
     case 'W':
       prel (&p, &p0, -1, +0);
-      register_mirror_pos_undo (&undo, &p, &p0, true, false, "MIRROR CON ABOVE");
+      register_mirror_pos_undo (&undo, &p, &p0, false, "MIRROR CON ABOVE");
       break;
     case 'S':
       prel (&p, &p0, +1, +0);
-      register_mirror_pos_undo (&undo, &p, &p0, true, false, "MIRROR CON BELOW");
+      register_mirror_pos_undo (&undo, &p, &p0, false, "MIRROR CON BELOW");
       break;
     }
     break;
   case EDIT_FG:
     if (! is_valid_pos (&p)) {
-      editor_msg ("SELECT CONSTRUCTION", 1);
+      editor_msg ("SELECT CONSTRUCTION", EDITOR_CYCLES_0);
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       if (was_menu_return_pressed (true)) edit = EDIT_CON;
       break;
     }
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
-    switch (menu_enum (fg_menu, "CF>")) {
+    switch (menu_enum (fg_menu, fake_fg ? "CK>" : "CF>")) {
     case -1: case 1: edit = EDIT_CON; break;
     case '#': edit = EDIT_NUMERICAL_FG; break;
     case 'F': edit = EDIT_FLOOR; break;
     case 'P': edit = EDIT_PILLAR; break;
     case 'W':
-      if (fg (&p) == WALL) break;
+      if ((! fake_fg && fg (&p) == WALL)
+          || (fake_fg && fake (&p) == WALL)) break;
       register_con_undo (&undo, &p,
-                         WALL, MIGNORE, MIGNORE,
-                         true, false, true, true,
-                         -1, "WALL");
+                         ! fake_fg ? WALL : MIGNORE,
+                         MIGNORE, MIGNORE,
+                         fake_fg ? WALL : MIGNORE,
+                         NULL, true,
+                         fake_fg ? "FAKE WALL" : "WALL");
       break;
     case 'D': edit = EDIT_DOOR; break;
     case 'C':
-      if (fg (&p) == CHOPPER) break;
+      if ((! fake_fg == EDIT_FG && fg (&p) == CHOPPER)
+          || (fake_fg && fake (&p) == CHOPPER)) break;
       register_con_undo (&undo, &p,
-                         CHOPPER, MIGNORE, MIGNORE,
-                         true, true, true, true,
-                         -1, "CHOPPER");
+                         ! fake_fg ? CHOPPER : MIGNORE,
+                         MIGNORE, MIGNORE,
+                         fake_fg ? CHOPPER : MIGNORE,
+                         NULL, true,
+                         fake_fg ? "FAKE CHOPPER" : "CHOPPER");
       break;
     case 'M':
-      if (fg (&p) == MIRROR) break;
+      if ((! fake_fg && fg (&p) == MIRROR)
+          || (fake_fg && fake (&p) == MIRROR)) break;
       register_con_undo (&undo, &p,
-                         MIRROR, MIGNORE, MIGNORE,
-                         true, true, true, true,
-                         -1, "MIRROR");
+                         ! fake_fg ? MIRROR : MIGNORE,
+                         MIGNORE, MIGNORE,
+                         fake_fg ? MIRROR : MIGNORE,
+                         NULL, true,
+                         fake_fg ? "FAKE MIRROR" : "MIRROR");
       break;
     case 'R': edit = EDIT_CARPET; break;
     case 'A': edit = EDIT_ARCH; break;
@@ -466,41 +485,44 @@ editor (void)
     break;
   case EDIT_NUMERICAL_FG:
     if (! is_valid_pos (&p)) {
-      editor_msg ("SELECT CONSTRUCTION", 1);
+      editor_msg ("SELECT CONSTRUCTION", EDITOR_CYCLES_0);
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       if (was_menu_return_pressed (true)) edit = EDIT_FG;
       break;
     }
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
-    i = fg (&p);
-    switch (menu_int (&i, NULL, INT_MIN, INT_MAX, "CF#>FG #", NULL)) {
+    i = fake_fg ? fake (&p): fg (&p);
+    switch (menu_int (&i, NULL, INT_MIN, INT_MAX,
+                      fake_fg ? "CK#>FG #" : "CF#>FG #", NULL)) {
     case -1: edit = EDIT_FG; break;
     case 0: break;
     case 1: edit = EDIT_FG; break;
     default:
       register_con_undo (&undo, &p,
-                         i, MIGNORE, MIGNORE,
-                         true, true, true, true,
-                         -1, "# FG");
+                         ! fake_fg ? i : MIGNORE,
+                         MIGNORE, MIGNORE,
+                         fake_fg ? i : MIGNORE,
+                         NULL, true,
+                         fake_fg ? "FAKE # FG" : "# FG");
       break;
     }
     break;
   case EDIT_FLOOR:
     if (! is_valid_pos (&p)) {
-      editor_msg ("SELECT CONSTRUCTION", 1);
+      editor_msg ("SELECT CONSTRUCTION", EDITOR_CYCLES_0);
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       if (was_menu_return_pressed (true)) edit = EDIT_FG;
       break;
     }
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
-    c = menu_enum (floor_menu, "CFF>");
+    c = menu_enum (floor_menu, fake_fg ? "CKF>" : "CFF>");
     if (! c) break;
 
     if (c == -1 || c == 1) {
       edit = EDIT_FG; break;
     }
 
-    f = fg (&p);
+    f = fake_fg ? fake (&p) : fg (&p);
     if ((c == 'L' && f == LOOSE_FLOOR) || (c == 'P' && f == SPIKES_FLOOR)
         || (c == 'O' && f == OPENER_FLOOR) || (c == 'C' && f == CLOSER_FLOOR))
       break;
@@ -518,20 +540,23 @@ editor (void)
     case 'H': f = HIDDEN_FLOOR; break;
     }
 
+    xasprintf (&str, "%s%s", fake_fg ? "FAKE " : "", get_confg_name (f));
     register_con_undo (&undo, &p,
-                       f, MIGNORE, MIGNORE,
-                       true, true, false, true,
-                       -1, get_confg_name (f));
+                       ! fake_fg ? f : MIGNORE,
+                       MIGNORE, MIGNORE,
+                       fake_fg ? f : MIGNORE,
+                       NULL, true, str);
+    al_free (str);
     break;
   case EDIT_PILLAR:
     if (! is_valid_pos (&p)) {
-      editor_msg ("SELECT CONSTRUCTION", 1);
+      editor_msg ("SELECT CONSTRUCTION", EDITOR_CYCLES_0);
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       if (was_menu_return_pressed (true)) edit = EDIT_FG;
       break;
     }
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
-    c = menu_enum (pillar_menu, "CFP>");
+    c = menu_enum (pillar_menu, fake_fg ? "CKP>" : "CFP>");
     if (! c) break;
 
     if (c == -1 || c == 1) {
@@ -545,27 +570,30 @@ editor (void)
     case 'A': f = ARCH_BOTTOM; break;
     }
 
+    xasprintf (&str, "%s%s", fake_fg ? "FAKE " : "", get_confg_name (f));
     register_con_undo (&undo, &p,
-                       f, MIGNORE, MIGNORE,
-                       true, false, false, true,
-                       -1, get_confg_name (f));
+                       ! fake_fg ? f : MIGNORE,
+                       MIGNORE, MIGNORE,
+                       fake_fg ? f : MIGNORE,
+                       NULL, true, str);
+    al_free (str);
     break;
   case EDIT_DOOR:
     if (! is_valid_pos (&p)) {
-      editor_msg ("SELECT CONSTRUCTION", 1);
+      editor_msg ("SELECT CONSTRUCTION", EDITOR_CYCLES_0);
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       if (was_menu_return_pressed (true)) edit = EDIT_FG;
       break;
     }
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
-    c = menu_enum (door_menu, "CFD>");
+    c = menu_enum (door_menu, fake_fg ? "CKD>" : "CFD>");
     if (! c) break;
 
     if (c == -1 || c == 1) {
       edit = EDIT_FG; break;
     }
 
-    f = fg (&p);
+    f = fake_fg ? fake (&p) : fg (&p);
     if ((c == 'D' && f == DOOR) || (c == 'L' && f == LEVEL_DOOR))
       break;
 
@@ -574,20 +602,23 @@ editor (void)
     case 'L': f = LEVEL_DOOR; break;
     }
 
+    xasprintf (&str, "%s%s", fake_fg ? "FAKE " : "", get_confg_name (f));
     register_con_undo (&undo, &p,
-                       f, MIGNORE, MIGNORE,
-                       true, true, false, true,
-                       -1, get_confg_name (f));
+                       ! fake_fg ? f : MIGNORE,
+                       MIGNORE, MIGNORE,
+                       fake_fg ? f : MIGNORE,
+                       NULL, true, str);
+    al_free (str);
     break;
   case EDIT_CARPET:
     if (! is_valid_pos (&p)) {
-      editor_msg ("SELECT CONSTRUCTION", 1);
+      editor_msg ("SELECT CONSTRUCTION", EDITOR_CYCLES_0);
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       if (was_menu_return_pressed (true)) edit = EDIT_FG;
       break;
     }
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
-    c = menu_enum (carpet_menu, "CFR>");
+    c = menu_enum (carpet_menu, fake_fg ? "CKR>" :"CFR>");
     if (! c) break;
 
     if (c == -1 || c == 1) {
@@ -599,20 +630,23 @@ editor (void)
     case 'T': f = TCARPET; break;
     }
 
+    xasprintf (&str, "%s%s", fake_fg ? "FAKE " : "", get_confg_name (f));
     register_con_undo (&undo, &p,
-                       f, MIGNORE, MIGNORE,
-                       true, false, false, true,
-                       -1, get_confg_name (f));
+                       ! fake_fg ? f : MIGNORE,
+                       MIGNORE, MIGNORE,
+                       fake_fg ? f : MIGNORE,
+                       NULL, true, str);
+    al_free (str);
     break;
   case EDIT_ARCH:
     if (! is_valid_pos (&p)) {
-      editor_msg ("SELECT CONSTRUCTION", 1);
+      editor_msg ("SELECT CONSTRUCTION", EDITOR_CYCLES_0);
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       if (was_menu_return_pressed (true)) edit = EDIT_FG;
       break;
     }
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
-    c = menu_enum (arch_menu, "CFA>");
+    c = menu_enum (arch_menu, fake_fg ? "CKA>" : "CFA>");
     if (! c) break;
 
     if (c == -1 || c == 1) {
@@ -626,14 +660,17 @@ editor (void)
     case 'R': f = ARCH_TOP_RIGHT; break;
     }
 
+    xasprintf (&str, "%s%s", fake_fg ? "FAKE " : "", get_confg_name (f));
     register_con_undo (&undo, &p,
-                       f, MIGNORE, MIGNORE,
-                       true, false, false, true,
-                       -1, get_confg_name (f));
+                       ! fake_fg ? f : MIGNORE,
+                       MIGNORE, MIGNORE,
+                       fake_fg ? f : MIGNORE,
+                       NULL, true, str);
+    al_free (str);
     break;
   case EDIT_BG:
     if (! is_valid_pos (&p)) {
-      editor_msg ("SELECT CONSTRUCTION", 1);
+      editor_msg ("SELECT CONSTRUCTION", EDITOR_CYCLES_0);
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       if (was_menu_return_pressed (true)) edit = EDIT_CON;
       break;
@@ -663,13 +700,12 @@ editor (void)
     }
 
     register_con_undo (&undo, &p,
-                       MIGNORE, b, MIGNORE,
-                       false, false, (b == BALCONY), true,
-                       -1, get_conbg_name (b));
+                       MIGNORE, b, MIGNORE, MIGNORE,
+                       NULL, true, get_conbg_name (b));
     break;
   case EDIT_NUMERICAL_BG:
     if (! is_valid_pos (&p)) {
-      editor_msg ("SELECT CONSTRUCTION", 1);
+      editor_msg ("SELECT CONSTRUCTION", EDITOR_CYCLES_0);
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       if (was_menu_return_pressed (true)) edit = EDIT_BG;
       break;
@@ -682,15 +718,14 @@ editor (void)
     case 1: edit = EDIT_BG; break;
     default:
       register_con_undo (&undo, &p,
-                         MIGNORE, i, MIGNORE,
-                         true, true, true, true,
-                         -1, "# BG");
+                         MIGNORE, i, MIGNORE, MIGNORE,
+                         NULL, true, "# BG");
       break;
     }
     break;
   case EDIT_EXT:
     if (! is_valid_pos (&p)) {
-      editor_msg ("SELECT CONSTRUCTION", 1);
+      editor_msg ("SELECT CONSTRUCTION", EDITOR_CYCLES_0);
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       if (was_menu_return_pressed (true)) edit = EDIT_CON;
       break;
@@ -722,9 +757,8 @@ editor (void)
       }
 
       register_con_undo (&undo, &p,
-                         MIGNORE, MIGNORE, e,
-                         false, false, false, true,
-                         CHPOS_NONE, get_item_name (e));
+                         MIGNORE, MIGNORE, e, MIGNORE,
+                         NULL, true, get_item_name (e));
       break;
     case LOOSE_FLOOR:
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
@@ -737,9 +771,8 @@ editor (void)
       }
 
       register_con_undo (&undo, &p,
-                         MIGNORE, MIGNORE, b0,
-                         true, true, false, true,
-                         CHPOS_NONE, "CAN'T FALL EXTENSION");
+                         MIGNORE, MIGNORE, b0, MIGNORE,
+                         NULL, true, "CAN'T FALL EXTENSION");
 
       break;
     case SPIKES_FLOOR:
@@ -779,9 +812,8 @@ editor (void)
       }
 
       register_con_undo (&undo, &p,
-                         MIGNORE, MIGNORE, e,
-                         false, false, false, true,
-                         CHPOS_CARPET_DESIGN, "DESIGN EXTENSION");
+                         MIGNORE, MIGNORE, e, MIGNORE,
+                         NULL, true, "DESIGN EXTENSION");
       break;
     case TCARPET:
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
@@ -801,9 +833,8 @@ editor (void)
       }
 
       register_con_undo (&undo, &p,
-                         MIGNORE, MIGNORE, e,
-                         false, false, false, true,
-                         CHPOS_CARPET_DESIGN, "DESIGN EXTENSION");
+                         MIGNORE, MIGNORE, e, MIGNORE,
+                         NULL, true, "DESIGN EXTENSION");
       break;
     default:
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
@@ -814,7 +845,7 @@ editor (void)
     break;
   case EDIT_NUMERICAL_EXT:
     if (! is_valid_pos (&p)) {
-      editor_msg ("SELECT CONSTRUCTION", 1);
+      editor_msg ("SELECT CONSTRUCTION", EDITOR_CYCLES_0);
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       if (was_menu_return_pressed (true)) edit = EDIT_CON;
       break;
@@ -827,9 +858,8 @@ editor (void)
     case 1: edit = EDIT_CON; break;
     default:
       register_con_undo (&undo, &p,
-                         MIGNORE, MIGNORE, i,
-                         true, true, true, true,
-                         -1, "# EXT");
+                         MIGNORE, MIGNORE, i, MIGNORE,
+                         NULL, true, "# EXT");
       break;
     }
     break;
@@ -837,7 +867,7 @@ editor (void)
     if (was_menu_return_pressed (true)) edit = EDIT_CON;
 
     if (! is_valid_pos (&p)) {
-      editor_msg ("SELECT CONSTRUCTION", 1);
+      editor_msg ("SELECT CONSTRUCTION", EDITOR_CYCLES_0);
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       break;
     }
@@ -848,6 +878,7 @@ editor (void)
     f = fg (&p);
     fg_str = get_confg_name (f);
     bg_str = get_conbg_name (bg (&p));
+    fake_str = is_fake (&p) ? get_confg_name (fake (&p)) : NULL;
 
     e = ext (&p);
 
@@ -891,7 +922,9 @@ editor (void)
     default: ext_str = "NO EXTENSION"; break;
     }
 
-    xasprintf (&str, "%s/%s/%s", fg_str, bg_str, ext_str);
+    if (is_fake (&p))
+      xasprintf (&str, "%s/%s/%s/%s", fg_str, bg_str, ext_str, fake_str);
+    else xasprintf (&str, "%s/%s/%s", fg_str, bg_str, ext_str);
     draw_bottom_text (NULL, str, 0);
     al_free (str);
     if (free_ext_str) al_free (ext_str);
@@ -901,16 +934,16 @@ editor (void)
     if (was_menu_return_pressed (true)) edit = EDIT_CON;
 
     if (! is_valid_pos (&p)) {
-      editor_msg ("SELECT CONSTRUCTION", 1);
+      editor_msg ("SELECT CONSTRUCTION", EDITOR_CYCLES_0);
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       break;
     }
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
 
     npos (&p, &p0);
-    xasprintf (&str, "[%i,%i,%i,%i](%i,%i,%i)",
+    xasprintf (&str, "[%i,%i,%i,%i](%i,%i,%i,%i)",
                global_level.n, p0.room, p0.floor, p0.place,
-               fg (&p), bg (&p), ext (&p));
+               fg (&p), bg (&p), ext (&p), is_fake (&p) ? fake (&p) : -1);
     draw_bottom_text (NULL, str, 0);
     al_free (str);
 
@@ -990,7 +1023,7 @@ editor (void)
   case EDIT_CON2EVENT:
     if (! is_valid_pos (&p)) {
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
-      editor_msg ("SELECT CONSTRUCTION", 1);
+      editor_msg ("SELECT CONSTRUCTION", EDITOR_CYCLES_0);
       if (was_menu_return_pressed (true)) edit = EDIT_EVENT;
       t = -1;
     } else {
@@ -1013,7 +1046,7 @@ editor (void)
   case EDIT_EVENT_SET:
     if (! is_valid_pos (&p)) {
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
-      editor_msg ("SELECT CONSTRUCTION", 1);
+      editor_msg ("SELECT CONSTRUCTION", EDITOR_CYCLES_0);
       if (was_menu_return_pressed (true)) edit = EDIT_EVENT;
     } else {
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
@@ -1053,7 +1086,7 @@ editor (void)
       break;
     case 'R':
       apply_to_room (&global_level, mr.room, random_con,
-                     "RANDOM ROOM");
+                     "RANDOMIZE ROOM");
       break;
     case 'D':
       apply_to_room (&global_level, mr.room, decorate_con,
@@ -1061,11 +1094,11 @@ editor (void)
       break;
     case 'M': edit = EDIT_ROOM_MIRROR; break;
     case 'C':
-      memcpy (&room_copy, &global_level.con[mr.room], sizeof (room_copy));
-      editor_msg ("COPIED", 12);
+      copy_room (&room_copy, &global_level, mr.room);
+      editor_msg ("COPY ROOM", EDITOR_CYCLES_3);
       break;
     case 'P':
-      register_room_undo (&undo, mr.room, room_copy, "PASTE ROOM");
+      paste_room (&global_level, mr.room, &room_copy, "PASTE ROOM");
       break;
     case '!':
       apply_to_room (&global_level, mr.room, fix_con, "FIX ROOM");
@@ -1105,7 +1138,7 @@ editor (void)
       break;
     case 'R':
       register_random_room_mirror_con_undo
-        (&undo, mr.room, false, false, "ROOM MIRROR CONS R.");
+        (&undo, mr.room, false, "ROOM MIRROR CONS R.");
       break;
     }
     break;
@@ -1169,7 +1202,7 @@ editor (void)
       break;
     case 'R':
       register_random_room_mirror_con_undo
-        (&undo, mr.room, false, false, NULL);
+        (&undo, mr.room, false, NULL);
       memcpy (&l, &global_level.link, sizeof (l));
       editor_mirror_link (mr.room, random_dir (), random_dir ());
       register_link_undo (&undo, l, "ROOM MIRROR CONS+LINKS R.");
@@ -1263,21 +1296,21 @@ editor (void)
       break;
     case 'S':
       if (! is_valid_pos (&p)) {
-        editor_msg ("SELECT CONSTRUCTION", 12);
+        editor_msg ("SELECT CONSTRUCTION", EDITOR_CYCLES_1);
         break;
       }
       register_start_pos_undo (&undo, &p, "START POSITION");
       break;
     case 'D':
       if (! is_pos_visible (&global_level.start_pos)) {
-        editor_msg ("START POS NOT VISIBLE", 12);
+        editor_msg ("START POS NOT VISIBLE", EDITOR_CYCLES_1);
         break;
       }
       register_toggle_start_dir_undo (&undo, "START DIRECTION");
       break;
     case 'W':
       if (! is_pos_visible (&global_level.start_pos)) {
-        editor_msg ("START POS NOT VISIBLE", 12);
+        editor_msg ("START POS NOT VISIBLE", EDITOR_CYCLES_1);
         break;
       }
       register_toggle_has_sword_undo (&undo, "HAS SWORD");
@@ -1291,7 +1324,7 @@ editor (void)
     case -1: case 1: edit = EDIT_MAIN; break;
     case 'X':
       if (level_module != NATIVE_LEVEL_MODULE)
-        editor_msg ("NATIVE LEVEL MODULE ONLY", 18);
+        editor_msg ("NATIVE LEVEL MODULE ONLY", EDITOR_CYCLES_2);
       else {
         edit = EDIT_LEVEL_EXCHANGE;
         next_level = global_level.n;
@@ -1308,7 +1341,7 @@ editor (void)
     case 'R':
       for (i = 1; i < ROOMS; i++)
         apply_to_room (&global_level, i, random_con, NULL);
-      end_undo_set (&undo, "RANDOM LEVEL");
+      end_undo_set (&undo, "RANDOMIZE LEVEL");
       break;
     case 'D':
       for (i = 1; i < ROOMS; i++)
@@ -1318,7 +1351,7 @@ editor (void)
     case 'M': edit = EDIT_LEVEL_MIRROR; break;
     case 'C':
       copy_level (&level_copy, &global_level);
-      editor_msg ("COPIED", 12);
+      editor_msg ("COPY LEVEL", EDITOR_CYCLES_3);
       break;
     case 'P':
       register_level_undo (&undo, &level_copy, "PASTE LEVEL");
@@ -1341,15 +1374,15 @@ editor (void)
       break;
     case 'S':
       if (level_module != NATIVE_LEVEL_MODULE)
-        editor_msg ("NATIVE LEVEL MODULE ONLY", 18);
+        editor_msg ("NATIVE LEVEL MODULE ONLY", EDITOR_CYCLES_2);
       else if (save_level (&global_level)) {
         copy_level (&vanilla_level, &global_level);
-        editor_msg ("LEVEL HAS BEEN SAVED", 18);
-      } else editor_msg ("LEVEL SAVE FAILED", 18);
+        editor_msg ("LEVEL HAS BEEN SAVED", EDITOR_CYCLES_2);
+      } else editor_msg ("LEVEL SAVE FAILED", EDITOR_CYCLES_2);
       break;
     case 'L':
       while (undo_pass (&undo, -1, NULL));
-      editor_msg ("LEVEL RELOADED", 18);
+      editor_msg ("LEVEL RELOADED", EDITOR_CYCLES_2);
       break;
     case '!':
       for (i = 1; i < ROOMS; i++)
@@ -1411,7 +1444,7 @@ editor (void)
     case 'R':
       for (i = 1; i < ROOMS; i++)
         register_random_room_mirror_con_undo
-          (&undo, i, false, false, NULL);
+          (&undo, i, false, NULL);
       end_undo_set (&undo, "LEVEL MIRROR CONS R.");
       break;
     }
@@ -1495,7 +1528,7 @@ editor (void)
     case 'R':
       for (i = 1; i < ROOMS; i++) {
         register_random_room_mirror_con_undo
-          (&undo, i, false, false, NULL);
+          (&undo, i, false, NULL);
         memcpy (&l, &global_level.link, sizeof (l));
         mirror_link (&global_level, i, random_dir (), random_dir ());
         register_link_undo (&undo, l, NULL);
@@ -1588,25 +1621,26 @@ editor (void)
       break;
     case 'S':
       if (! is_guard_by_type (g->type)) {
-        editor_msg ("DISABLED GUARD", 12);
+        editor_msg ("DISABLED GUARD", EDITOR_CYCLES_1);
         break;
       }
       if (! is_valid_pos (&p)) {
-        editor_msg ("SELECT CONSTRUCTION", 12);
+        editor_msg ("SELECT CONSTRUCTION", EDITOR_CYCLES_1);
         break;
       }
-      register_guard_start_pos_undo (&undo, guard_index, &p, "GUARD START POSITION");
+      register_guard_start_pos_undo (&undo, guard_index, &p,
+                                     "GUARD START POSITION");
       break;
     case 'J':
       get_mouse_coord (&last_mouse_coord);
       mouse2guard (guard_index); break;
     case 'D':
       if (! is_guard_by_type (g->type)) {
-        editor_msg ("DISABLED GUARD", 12);
+        editor_msg ("DISABLED GUARD", EDITOR_CYCLES_1);
         break;
       }
       if (! is_pos_visible (&g->p)) {
-        editor_msg ("START POS NOT VISIBLE", 12);
+        editor_msg ("START POS NOT VISIBLE", EDITOR_CYCLES_1);
         break;
       }
       register_toggle_guard_start_dir_undo
@@ -1614,13 +1648,13 @@ editor (void)
       break;
     case 'K':
       if (! is_guard_by_type (g->type)) {
-        editor_msg ("DISABLED GUARD", 12);
+        editor_msg ("DISABLED GUARD", EDITOR_CYCLES_1);
         break;
       }
       edit = EDIT_GUARD_SKILL; break;
     case 'L':
       if (! is_guard_by_type (g->type)) {
-        editor_msg ("DISABLED GUARD", 12);
+        editor_msg ("DISABLED GUARD", EDITOR_CYCLES_1);
         break;
       }
       edit = EDIT_GUARD_LIVES;
@@ -1636,7 +1670,7 @@ editor (void)
       break;
     case 'Y':
       if (! is_guard_by_type (g->type)) {
-        editor_msg ("DISABLED GUARD", 12);
+        editor_msg ("DISABLED GUARD", EDITOR_CYCLES_1);
         break;
       }
       edit = EDIT_GUARD_STYLE;
@@ -1716,43 +1750,51 @@ editor (void)
     al_free (str);
     break;
   case EDIT_GUARD_SKILL_ATTACK:
-    c = menu_skill ("KA>ATTACK", &g->skill.attack_prob, 100, EDIT_GUARD_SKILL);
+    c = menu_skill ("KA>ATTACK", &g->skill.attack_prob, 100,
+                    EDIT_GUARD_SKILL);
     if (c == 1)
       register_guard_skill_undo (&undo, guard_index, &skill_buf,
                                  "GUARD ATTACK SKILL");
     break;
   case EDIT_GUARD_SKILL_COUNTER_ATTACK:
-    c = menu_skill ("KB>C.ATTACK", &g->skill.counter_attack_prob, 100, EDIT_GUARD_SKILL);
+    c = menu_skill ("KB>C.ATTACK", &g->skill.counter_attack_prob, 100,
+                    EDIT_GUARD_SKILL);
     if (c == 1) register_guard_skill_undo (&undo, guard_index, &skill_buf,
                                            "GUARD COUNTER ATTACK SKILL");
     break;
   case EDIT_GUARD_SKILL_DEFENSE:
-    c = menu_skill ("KD>DEFENSE", &g->skill.defense_prob, 100, EDIT_GUARD_SKILL);
+    c = menu_skill ("KD>DEFENSE", &g->skill.defense_prob, 100,
+                    EDIT_GUARD_SKILL);
     if (c == 1) register_guard_skill_undo (&undo, guard_index, &skill_buf,
                                            "GUARD DEFENSE SKILL");
     break;
   case EDIT_GUARD_SKILL_COUNTER_DEFENSE:
-    c = menu_skill ("KE>C.DEFENSE", &g->skill.counter_defense_prob, 100, EDIT_GUARD_SKILL);
+    c = menu_skill ("KE>C.DEFENSE", &g->skill.counter_defense_prob, 100,
+                    EDIT_GUARD_SKILL);
     if (c == 1) register_guard_skill_undo (&undo, guard_index, &skill_buf,
                                            "GUARD COUNTER DEFENSE SKILL");
     break;
   case EDIT_GUARD_SKILL_ADVANCE:
-    c = menu_skill ("KV>ADVANCE", &g->skill.advance_prob, 100, EDIT_GUARD_SKILL);
+    c = menu_skill ("KV>ADVANCE", &g->skill.advance_prob, 100,
+                    EDIT_GUARD_SKILL);
     if (c == 1) register_guard_skill_undo (&undo, guard_index, &skill_buf,
                                            "GUARD ADVANCE SKILL");
     break;
   case EDIT_GUARD_SKILL_RETURN:
-    c = menu_skill ("KR>RETURN", &g->skill.return_prob, 100, EDIT_GUARD_SKILL);
+    c = menu_skill ("KR>RETURN", &g->skill.return_prob, 100,
+                    EDIT_GUARD_SKILL);
     if (c == 1) register_guard_skill_undo (&undo, guard_index, &skill_buf,
                                            "GUARD RETURN SKILL");
     break;
   case EDIT_GUARD_SKILL_REFRACTION:
-    c = menu_skill ("KF>REFRACTION", &g->skill.refraction, INT_MAX, EDIT_GUARD_SKILL);
+    c = menu_skill ("KF>REFRACTION", &g->skill.refraction, INT_MAX,
+                    EDIT_GUARD_SKILL);
     if (c == 1) register_guard_skill_undo (&undo, guard_index, &skill_buf,
                                              "GUARD REFRACTION SKILL");
     break;
   case EDIT_GUARD_SKILL_EXTRA_LIFE:
-    c = menu_skill ("KX>EXT.LIFE", &g->skill.extra_life, INT_MAX, EDIT_GUARD_SKILL);
+    c = menu_skill ("KX>EXT.LIFE", &g->skill.extra_life, INT_MAX,
+                    EDIT_GUARD_SKILL);
     if (c == 1) register_guard_skill_undo (&undo, guard_index, &skill_buf,
                                            "GUARD EXTRA LIFE SKILL");
     break;
@@ -1814,6 +1856,8 @@ editor (void)
     al_free (str);
     break;
   }
+
+  editor_register = EDITOR_CYCLES_NONE;
 }
 
 void
@@ -1863,34 +1907,9 @@ menu_int_ext (struct pos *p, int steps, int fases,
 
   if (c == ' ') r += steps;
 
-  enum changed_pos_reason reason = -1;
-
-  /* switch (fg (p)) { */
-  /* case SPIKES_FLOOR: */
-  /*   reason = CHPOS_SPIKES; */
-  /*   break; */
-  /* case DOOR: */
-  /*   reason = CHPOS_OPEN_DOOR; */
-  /*   break; */
-  /* case LEVEL_DOOR: */
-  /*   reason = CHPOS_OPEN_LEVEL_DOOR; */
-  /*   break; */
-  /* case CHOPPER: */
-  /*   reason = CHPOS_CHOPPER; */
-  /*   break; */
-  /* case OPENER_FLOOR: */
-  /*   reason = CHPOS_BREAK_OPENER_FLOOR; */
-  /*   break; */
-  /* case CLOSER_FLOOR: */
-  /*   reason = CHPOS_BREAK_CLOSER_FLOOR; */
-  /*   break; */
-  /* default: assert (false); break; */
-  /* } */
-
   register_con_undo (&undo, p,
-                     MIGNORE, MIGNORE, r,
-                     true, true, false, true,
-                     reason, undo_str);
+                     MIGNORE, MIGNORE, r, MIGNORE,
+                     NULL, true, undo_str);
 
   return c;
 }
@@ -1995,22 +2014,22 @@ menu_skill (char *prefix, int *skill, int max, enum edit up_edit)
 void
 editor_msg (char *m, uint64_t cycles)
 {
-  if (edit != EDIT_NONE) {
+  if (edit != EDIT_NONE && cycles >= msg_cycles) {
     msg_cycles = cycles;
     msg = m;
+    draw_bottom_text (NULL, m, 0);
   }
-  draw_bottom_text (NULL, m, 0);
 }
 
 void
 ui_place_kid (struct anim *k, struct pos *p)
 {
   if (! is_valid_pos (p)) {
-    editor_msg ("SELECT CONSTRUCTION", 12);
+    editor_msg ("SELECT CONSTRUCTION", EDITOR_CYCLES_1);
     return;
   }
   if (! k) {
-    editor_msg ("NO LIVE INSTANCE", 12);
+    editor_msg ("NO LIVE INSTANCE", EDITOR_CYCLES_1);
     return;
   }
   kid_resurrect (k);
@@ -2024,15 +2043,15 @@ void
 ui_place_guard (struct anim *g, struct pos *p)
 {
   if (! is_guard_by_type (g->type)) {
-    editor_msg ("DISABLED GUARD", 12);
+    editor_msg ("DISABLED GUARD", EDITOR_CYCLES_1);
     return;
   }
   if (! is_valid_pos (p)) {
-    editor_msg ("SELECT CONSTRUCTION", 12);
+    editor_msg ("SELECT CONSTRUCTION", EDITOR_CYCLES_1);
     return;
   }
   if (! g) {
-    editor_msg ("NO LIVE INSTANCE", 12);
+    editor_msg ("NO LIVE INSTANCE", EDITOR_CYCLES_1);
     return;
   }
   guard_resurrect (g);

@@ -23,6 +23,7 @@
 /* variables */
 extern enum edit edit;
 extern enum edit last_edit;
+extern uint64_t editor_register;
 
 /* functions */
 void editor (void);

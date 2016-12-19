@@ -30,7 +30,6 @@ struct level global_level;
 
 struct undo undo;
 
-static char *undo_msg;
 static int last_auto_show_time;
 static uint64_t death_timer;
 
@@ -174,7 +173,6 @@ replace_playing_level (struct level *l)
 {
   destroy_cons ();
   copy_level (&global_level, l);
-  register_cons ();
   em = global_level.em;
   hue = global_level.hue;
   mr.full_update = true;
@@ -190,11 +188,10 @@ play_level (struct level *lv)
   cutscene = false;
   game_paused = false;
   copy_level (&global_level, lv);
-  if (mirror_level) mirror_level_h (&global_level, false, false, false, false);
+  if (mirror_level) mirror_level_h (&global_level);
 
   normalize_level (&global_level);
 
-  register_cons ();
   register_anims ();
 
   stop_audio_instances ();
@@ -283,37 +280,58 @@ play_level (struct level *lv)
   }
 }
 
-void
-register_con_at_pos (struct pos *p)
+void *
+con_struct_at_pos (struct pos *p)
 {
   switch (fg (p)) {
-  case LOOSE_FLOOR: register_loose_floor (p); break;
-  case OPENER_FLOOR: register_opener_floor (p); break;
-  case CLOSER_FLOOR: register_closer_floor (p); break;
-  case SPIKES_FLOOR: register_spikes_floor (p); break;
-  case DOOR: register_door (p); break;
-  case LEVEL_DOOR: register_level_door (p); break;
-  case CHOPPER: register_chopper (p); break;
-  case MIRROR: register_mirror (p); break;
+  case LOOSE_FLOOR: return loose_floor_at_pos (p);
+  case OPENER_FLOOR: return opener_floor_at_pos (p);
+  case CLOSER_FLOOR: return closer_floor_at_pos (p);
+  case SPIKES_FLOOR: return spikes_floor_at_pos (p);;
+  case DOOR: return door_at_pos (p);
+  case LEVEL_DOOR: return level_door_at_pos (p);
+  case CHOPPER: return chopper_at_pos (p);
+  default: return NULL;
+  }
+}
+
+bool
+should_destroy (struct con *c0, struct con *c1)
+{
+  return fg_val (c0->fg) == fg_val (c1->fg)
+    && ext_val (c0->fg, c0->ext) != ext_val (c1->fg, c1->ext);
+}
+
+void
+copy_to_con_state (union con_state *to, struct pos *from_pos)
+{
+  void *from = con_struct_at_pos (from_pos);
+  switch (fg (from_pos)) {
+  case LOOSE_FLOOR: copy_loose_floor (&to->loose_floor, from); break;
+  case OPENER_FLOOR: copy_opener_floor (&to->opener_floor, from); break;
+  case CLOSER_FLOOR: copy_closer_floor (&to->closer_floor, from); break;
+  case SPIKES_FLOOR: copy_spikes_floor (&to->spikes_floor, from); break;
+  case DOOR: copy_door (&to->door, from); break;
+  case LEVEL_DOOR: copy_level_door (&to->level_door, from); break;
+  case CHOPPER: copy_chopper (&to->chopper, from); break;
   default: break;
   }
 }
 
 void
-register_room (int room)
+copy_from_con_state (struct pos *to_pos, union con_state *from)
 {
-  struct pos p; new_pos (&p, &global_level, room, -1, -1);
-  for (p.floor = 0; p.floor < FLOORS; p.floor++)
-    for (p.place = 0; p.place < PLACES; p.place++)
-      register_con_at_pos (&p);
-}
-
-void
-register_cons (void)
-{
-  int room;
-  for (room = 0; room < ROOMS; room++)
-    register_room (room);
+  void *to = con_struct_at_pos (to_pos);
+  switch (fg (to_pos)) {
+  case LOOSE_FLOOR: copy_loose_floor (to, &from->loose_floor); break;
+  case OPENER_FLOOR: copy_opener_floor (to, &from->opener_floor); break;
+  case CLOSER_FLOOR: copy_closer_floor (to, &from->closer_floor); break;
+  case SPIKES_FLOOR: copy_spikes_floor (to, &from->spikes_floor); break;
+  case DOOR: copy_door (to, &from->door); break;
+  case LEVEL_DOOR: copy_level_door (to, &from->level_door); break;
+  case CHOPPER: copy_chopper (to, &from->chopper); break;
+  default: break;
+  }
 }
 
 void
@@ -327,19 +345,8 @@ destroy_con_at_pos (struct pos *p)
   case DOOR: remove_door (door_at_pos (p)); break;
   case LEVEL_DOOR: remove_level_door (level_door_at_pos (p)); break;
   case CHOPPER: remove_chopper (chopper_at_pos (p)); break;
-  case MIRROR: remove_mirror (mirror_at_pos (p)); break;
   default: break;
   }
-}
-
-void
-destroy_room (int room)
-{
-  struct pos p;
-  new_pos (&p, &global_level, room, -1, -1);
-  for (p.floor = 0; p.floor < FLOORS; p.floor++)
-    for (p.place = 0; p.place < PLACES; p.place++)
-      destroy_con_at_pos (&p);
 }
 
 void
@@ -353,30 +360,6 @@ destroy_cons (void)
   destroy_array ((void **) &level_door, &level_door_nmemb);
   destroy_array ((void **) &chopper, &chopper_nmemb);
   destroy_array ((void **) &mirror, &mirror_nmemb);
-}
-
-void
-prepare_con_at_pos (struct pos *p)
-{
-  if (! is_pos_visible (p)) return;
-
-  switch (bg (p)) {
-  case BALCONY: generate_stars_for_pos (p); break;
-  default: break;
-  }
-}
-
-void
-prepare_room (int room)
-{
-  if (! is_room_visible (room)) return;
-  generate_stars_for_room (room);
-}
-
-void
-prepare_view (void)
-{
-  generate_stars ();
 }
 
 void
@@ -1097,76 +1080,4 @@ bool
 is_game_paused (void)
 {
   return anim_cycle > 0 && game_paused;
-}
-
-/************************************/
-/* NOT USED ALTERNATIVE UNDO METHOD */
-/************************************/
-
-void
-apply_to_diff_pos (struct diff *d, void (*func) (struct pos *p))
-{
-  size_t base = ((uint8_t *) &global_level.con[0][0][0]) - ((uint8_t *) &global_level);
-  size_t end = ((uint8_t *) &global_level.con[ROOMS - 1][FLOORS - 1][PLACES - 1])
-    - ((uint8_t *) &global_level);
-
-  size_t i, j;
-  for (i = 0; i < d->count; i++) {
-    if (d->line[i].offset < base) continue;
-    if (d->line[i].offset > end) continue;
-
-    size_t base_con = d->line[i].offset - base;
-
-    struct pos prev_p; invalid_pos (&prev_p);
-    for (j = 0; j < d->line[i].count; j++) {
-      struct pos p;
-      size_t qr = (base_con + j * d->unit_size)
-        / (sizeof (struct con) * PLACES * FLOORS);
-      size_t rr = (base_con + j * d->unit_size)
-        % (sizeof (struct con) * PLACES * FLOORS);
-
-      size_t qf = rr / (sizeof (struct con) * PLACES);
-      size_t rf = rr % (sizeof (struct con) * PLACES);
-
-      size_t qp = rf / sizeof (struct con);
-
-      new_pos (&p, &global_level, qr, qf, qp);
-
-      if (! peq (&p, &prev_p)) {
-        /* printf ("%s: %i,%i,%i\n", */
-        /*         (func == destroy_con_at_pos) ? "destroy" : "register", */
-        /*         p.room, p.floor, p.place); */
-        func (&p);
-        prev_p = p;
-      }
-    }
-  }
-}
-
-void
-diff_level_undo (struct diffset *diffset, int dir, char *prefix)
-{
-  char *text;
-  char *dir_str = (dir >= 0) ? "REDO" : "UNDO";
-
-  bool b = can_apply_diffset (diffset, dir);
-
-  if (undo_msg) al_free (undo_msg);
-
-  if (! b) {
-    xasprintf (&undo_msg, "NO FURTHER %s %s", prefix, dir_str);
-    editor_msg (undo_msg, 24);
-    return;
-  }
-
-  size_t i = diffset->current;
-
-  apply_to_diff_pos (&diffset->diff[(dir >= 0) ? i + 1 : i], destroy_con_at_pos);
-  apply_diffset_diff (diffset, &global_level, sizeof (global_level), dir, &text);
-  apply_to_diff_pos (&diffset->diff[(dir >= 0) ? i + 1 : i], register_con_at_pos);
-  /* update_cache (em, vm); */
-  /* generate_stars (); */
-
-  xasprintf (&undo_msg, "%s %s: %s", prefix, dir_str, text);
-  editor_msg (undo_msg, 24);
 }

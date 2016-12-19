@@ -79,26 +79,14 @@ enum hue {
   HUE_BLUE = 4,
 };
 
-struct changed_pos {
-  struct pos p;
-  enum changed_pos_reason {
-    CHPOS_NONE,
-    CHPOS_OPEN_DOOR, CHPOS_CLOSE_DOOR, CHPOS_ABRUPTLY_CLOSE_DOOR,
-    CHPOS_OPEN_LEVEL_DOOR, CHPOS_CLOSE_LEVEL_DOOR,
-    CHPOS_BREAK_LEVEL_DOOR,
-    CHPOS_SHAKE_LOOSE_FLOOR, CHPOS_RELEASE_LOOSE_FLOOR,
-    CHPOS_LOOSE_FLOOR_FALL, CHPOS_CHAIN_RELEASE_LOOSE_FLOOR,
-    CHPOS_BREAK_LOOSE_FLOOR,
-    CHPOS_PRESS_OPENER_FLOOR, CHPOS_UNPRESS_OPENER_FLOOR,
-    CHPOS_BREAK_OPENER_FLOOR,
-    CHPOS_PRESS_CLOSER_FLOOR, CHPOS_UNPRESS_CLOSER_FLOOR,
-    CHPOS_BREAK_CLOSER_FLOOR,
-    CHPOS_UNHIDE_FLOOR,
-    CHPOS_SPIKES, CHPOS_CHOPPER,
-    CHPOS_CARPET_DESIGN,
-    CHPOS_MOUSE_SELECT, CHPOS_MOUSE_DESELECT,
-    CHPOS_WALL
-  } reason;
+struct drawn_rectangle {
+  ALLEGRO_BITMAP *bitmap;
+  int x, y, w, h;
+};
+
+struct clipping_rectangle {
+  ALLEGRO_BITMAP *bitmap;
+  int x, y, w, h;
 };
 
 struct multi_room {
@@ -227,6 +215,7 @@ struct level {
   } guard[GUARDS];
 
   struct con {
+
     enum confg {
       NO_FLOOR = 0,
       FLOOR = 1,
@@ -255,6 +244,7 @@ struct level {
       ARCH_TOP_SMALL = 24,
       CONFGS
     } fg;
+
     enum conbg {
       NO_BG = 0,
       BRICKS_00 = 1,
@@ -269,6 +259,8 @@ struct level {
     } bg;
 
     int ext;
+
+    int fake;
 
   } con[ROOMS][FLOORS][PLACES];
 };
@@ -296,6 +288,10 @@ enum item {
   SWORD = 9,
   ITEMS
 } item;
+
+enum should_draw {
+  SHOULD_DRAW_NONE, SHOULD_DRAW_PART, SHOULD_DRAW_FULL,
+};
 
 struct legacy_level {
   uint8_t foretable[LROOMS][LFLOORS][LPLACES];
@@ -379,7 +375,7 @@ struct anim {
   ACTION hang_caller;
   int i, j, wait, repeat, cinertia, inertia, walk,
     total_lives, current_lives;
-  bool reverse, collision, fall, hit_ceiling,
+  bool reverse, collision, fall, hit_ceiling, hit_ceiling_fake,
     just_hanged, hang, hang_limit, misstep, uncouch_slowly,
     keep_sword_fast, turn, shadow, splash, hit_by_loose_floor,
     invisible, has_sword, hurt, controllable, fight,
@@ -559,7 +555,8 @@ struct menu_item {
 };
 
 enum con_diff {
-  CON_DIFF_NO_DIFF, CON_DIFF_FG, CON_DIFF_BG, CON_DIFF_EXT, CON_DIFF_MIXED,
+  CON_DIFF_NO_DIFF, CON_DIFF_FG, CON_DIFF_BG,
+  CON_DIFF_EXT, CON_DIFF_FAKE, CON_DIFF_MIXED,
 };
 
 struct dialog {
@@ -611,7 +608,6 @@ struct loose_floor {
   int resist;
   int state;
   bool cant_fall;
-  bool remove;
 
   enum {
     NO_LOOSE_FLOOR_ACTION,
@@ -621,10 +617,6 @@ struct loose_floor {
   } action;
 
   struct frame f;
-};
-
-struct mirror {
-  struct pos p;
 };
 
 struct opener_floor {
@@ -672,19 +664,25 @@ struct undo {
   int current;
 };
 
+union con_state {
+  struct closer_floor closer_floor;
+  struct opener_floor opener_floor;
+  struct spikes_floor spikes_floor;
+  struct loose_floor loose_floor;
+  struct level_door level_door;
+  struct door door;
+  struct chopper chopper;
+};
+
 struct con_undo {
   struct con b, f;
+  union con_state bs, fs;
   struct pos p;
 };
 
 struct mirror_pos_undo {
   struct pos p0, p1;
-  bool prepare, invert_dir;
-};
-
-struct room_undo {
-  int room;
-  struct con b[FLOORS][PLACES], f[FLOORS][PLACES];
+  bool invert_dir;
 };
 
 struct level_undo {
@@ -699,7 +697,7 @@ struct event_undo {
 struct random_room_mirror_con_undo {
   struct pos p[FLOORS][PLACES];
   int room;
-  bool prepare, invert_dir;
+  bool invert_dir;
 };
 
 struct link_undo {
@@ -726,6 +724,17 @@ struct indexed_int_undo {
 
 struct int_undo {
   int *i, b, f;
+};
+
+/* misc */
+
+struct con_copy {
+  struct con c;
+  union con_state cs;
+};
+
+struct room_copy {
+  struct con_copy c[FLOORS][PLACES];
 };
 
 #endif	/* MININIM_TYPES_H */

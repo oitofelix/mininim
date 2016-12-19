@@ -177,28 +177,34 @@ unload_arch (void)
   destroy_bitmap (pv_arch_top_top);
 }
 
-void
-draw_arch_bottom (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                  enum em em, enum vm vm)
+ALLEGRO_BITMAP *
+arch_bottom_bitmap (enum em em, enum vm vm)
 {
-  ALLEGRO_BITMAP *arch_bottom = NULL;
-
   switch (em) {
   case DUNGEON:
     switch (vm) {
-    case CGA: arch_bottom = dc_arch_bottom; break;
-    case EGA: arch_bottom = de_arch_bottom; break;
-    case VGA: arch_bottom = dv_arch_bottom; break;
+    case CGA: return dc_arch_bottom;
+    case EGA: return de_arch_bottom;
+    case VGA: return dv_arch_bottom;
     }
     break;
   case PALACE:
     switch (vm) {
-    case CGA: arch_bottom = pc_arch_bottom; break;
-    case EGA: arch_bottom = pe_arch_bottom; break;
-    case VGA: arch_bottom = pv_arch_bottom; break;
+    case CGA: return pc_arch_bottom;
+    case EGA: return pe_arch_bottom;
+    case VGA: return pv_arch_bottom;
     }
     break;
   }
+  assert (false);
+  return NULL;
+}
+
+void
+draw_arch_bottom (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                  enum em em, enum vm vm)
+{
+  ALLEGRO_BITMAP *arch_bottom = arch_bottom_bitmap (em, vm);
 
   if (vm == VGA) arch_bottom = apply_hue_palette (arch_bottom);
   if (hgc) arch_bottom = apply_palette (arch_bottom, hgc_palette);
@@ -213,9 +219,9 @@ void
 draw_arch_bottom_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
                      enum em em, enum vm vm)
 {
-  struct pos pa; prel (p, &pa, -1, +0);
+  push_drawn_rectangle (bitmap);
   draw_arch_bottom (bitmap, p, em, vm);
-  draw_confg_base (bitmap, &pa, em, vm);
+  redraw_drawn_rectangle (pop_drawn_rectangle (), p, em, vm);
 }
 
 void
@@ -351,38 +357,6 @@ draw_arch_top_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
 }
 
 void
-draw_arch_top_left_end (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                        enum em em, enum vm vm)
-{
-  ALLEGRO_BITMAP *arch_top_left_end = NULL;
-
-  switch (em) {
-  case DUNGEON:
-    switch (vm) {
-    case CGA: arch_top_left_end = dc_arch_top_left_end; break;
-    case EGA: arch_top_left_end = de_arch_top_left_end; break;
-    case VGA: arch_top_left_end = dv_arch_top_left_end; break;
-    }
-    break;
-  case PALACE:
-    switch (vm) {
-    case CGA: arch_top_left_end = pc_arch_top_left_end; break;
-    case EGA: arch_top_left_end = pe_arch_top_left_end; break;
-    case VGA: arch_top_left_end = pv_arch_top_left_end; break;
-    }
-    break;
-  }
-
-  if (vm == VGA) arch_top_left_end = apply_hue_palette (arch_top_left_end);
-  if (hgc) arch_top_left_end = apply_palette (arch_top_left_end, hgc_palette);
-  if (peq (p, &mouse_pos))
-    arch_top_left_end = apply_palette (arch_top_left_end, selection_palette);
-
-  struct coord c;
-  draw_bitmapc (arch_top_left_end, bitmap, arch_top_left_end_coord (p, &c), 0);
-}
-
-void
 draw_arch_top_right_end (ALLEGRO_BITMAP *bitmap, struct pos *p,
                     enum em em, enum vm vm)
 {
@@ -470,14 +444,5 @@ arch_top_top_coord (struct pos *p, struct coord *c)
   return
     new_coord (c, p->l, p->room,
                PLACE_WIDTH * p->place,
-               PLACE_HEIGHT * p->floor + 3);
-}
-
-struct coord *
-arch_top_left_end_coord (struct pos *p, struct coord *c)
-{
-  return
-    new_coord (c, p->l, p->room,
-               PLACE_WIDTH * (p->place + 1),
                PLACE_HEIGHT * p->floor + 3);
 }

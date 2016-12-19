@@ -117,15 +117,12 @@ unload_closer_floor (void)
 void
 register_closer_floor (struct pos *p)
 {
-  assert (fg (p) == CLOSER_FLOOR
-          && closer_floor_at_pos (p) == NULL);
-
   struct closer_floor c;
 
   int n, f;
   typed_int (ext (p), EVENTS, 2, &n, &f);
 
-  c.p = *p;
+  npos (p, &c.p);
   c.event = n;
   c.pressed = f;
   c.noise = f;
@@ -149,13 +146,35 @@ compare_closer_floors (const void *c0, const void *c1)
 }
 
 struct closer_floor *
+copy_closer_floor (struct closer_floor *to, struct closer_floor *from)
+{
+  struct pos p = to->p;
+  *to = *from;
+  to->p = p;
+  return to;
+}
+
+struct closer_floor *
 closer_floor_at_pos (struct pos *p)
 {
   struct closer_floor c;
   c.p = *p;
 
-  return bsearch (&c, closer_floor, closer_floor_nmemb, sizeof (c),
-                  compare_closer_floors);
+  struct closer_floor *cc;
+
+ search:
+  cc = bsearch (&c, closer_floor, closer_floor_nmemb, sizeof (c),
+                compare_closer_floors);
+
+  if (cc && fg (p) != CLOSER_FLOOR) {
+    remove_closer_floor (cc);
+    return NULL;
+  } else if (! cc && fg (p) == CLOSER_FLOOR) {
+    register_closer_floor (p);
+    goto search;
+  }
+
+  return cc;
 }
 
 struct closer_floor *
@@ -202,7 +221,7 @@ press_closer_floor (struct pos *p)
   c->pressed = true;
 
   if (! c->prev_pressed) {
-    register_changed_pos (p, CHPOS_PRESS_CLOSER_FLOOR);
+    register_changed_pos (&c->p);
     c->prev_pressed = true;
     c->priority = anim_cycle;
   }
@@ -213,14 +232,12 @@ break_closer_floor (struct pos *p)
 {
   struct closer_floor *c = closer_floor_at_pos (p);
   if (! c) return;
-  c->broken = true;
   close_door (c->p.l, c->event, anim_cycle);
   register_con_undo
     (&undo, p,
-     MIGNORE, MIGNORE, c->event + EVENTS,
-     false, false, false, false,
-     CHPOS_BREAK_CLOSER_FLOOR,
-     "LOOSE FLOOR BREAKING");
+     MIGNORE, MIGNORE, c->event + EVENTS, MIGNORE,
+     NULL, false, "LOOSE FLOOR BREAKING");
+  c->broken = true;
 }
 
 void
@@ -239,17 +256,25 @@ void
 register_changed_closer_floors (void)
 {
   size_t i;
-  for (i = 0; i < closer_floor_nmemb; i++)
-    if (closer_floor[i].prev_pressed !=
-        closer_floor[i].pressed)
-      register_changed_pos (&closer_floor[i].p,
-                            CHPOS_UNPRESS_CLOSER_FLOOR);
+  for (i = 0; i < closer_floor_nmemb; i++) {
+    struct closer_floor *c = &closer_floor[i];
+    if (c->prev_pressed != c->pressed)
+      register_changed_pos (&c->p);
+  }
 }
 
 void
 compute_closer_floors (void)
 {
   size_t i;
+
+  for (i = 0; i < closer_floor_nmemb;) {
+    struct closer_floor *c = &closer_floor[i];
+    if (fg (&c->p) == CLOSER_FLOOR) {
+      i++; continue;
+    }
+    remove_closer_floor (c);
+  }
 
   for (i = 0; i < closer_floor_nmemb; i++) {
     struct closer_floor *c = &closer_floor[i];
@@ -268,6 +293,11 @@ void
 draw_closer_floor (ALLEGRO_BITMAP *bitmap, struct pos *p,
                    enum em em, enum vm vm)
 {
+  if (is_fake (p)) {
+    draw_unpressed_closer_floor (bitmap, p, em, vm);
+    return;
+  }
+
   struct closer_floor *c = closer_floor_at_pos (p);
   if (! c) return;
 
@@ -284,6 +314,11 @@ void
 draw_closer_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
                         enum em em, enum vm vm)
 {
+  if (is_fake (p)) {
+    draw_unpressed_closer_floor_base (bitmap, p, em, vm);
+    return;
+  }
+
   struct closer_floor *c = closer_floor_at_pos (p);
   if (! c) return;
 
@@ -300,6 +335,11 @@ void
 draw_closer_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
                         enum em em, enum vm vm)
 {
+  if (is_fake (p)) {
+    draw_floor_left (bitmap, p, em, vm);
+    return;
+  }
+
   struct closer_floor *c = closer_floor_at_pos (p);
   if (! c) return;
 
@@ -316,6 +356,11 @@ void
 draw_closer_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
                          enum em em, enum vm vm)
 {
+  if (is_fake (p)) {
+    draw_floor_right (bitmap, p, em, vm);
+    return;
+  }
+
   struct closer_floor *c = closer_floor_at_pos (p);
   if (! c) return;
 
@@ -332,6 +377,8 @@ void
 draw_closer_floor_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
                       enum em em, enum vm vm)
 {
+  if (is_fake (p)) return;
+
   struct closer_floor *c = closer_floor_at_pos (p);
   if (! c) return;
 

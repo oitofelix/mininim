@@ -85,49 +85,6 @@ unload_mirror (void)
 }
 
 void
-register_mirror (struct pos *p)
-{
-  assert (fg (p) == MIRROR
-          && mirror_at_pos (p) == NULL);
-
-  struct mirror m;
-
-  m.p = *p;
-
-  mirror =
-    add_to_array (&m, 1, mirror, &mirror_nmemb,
-                  mirror_nmemb, sizeof (m));
-
-  qsort (mirror, mirror_nmemb, sizeof (m),
-         compare_mirrors);
-}
-
-int
-compare_mirrors (const void *o0, const void *o1)
-{
-  return cpos (&((struct mirror *) o0)->p,
-               &((struct mirror *) o1)->p);
-}
-
-struct mirror *
-mirror_at_pos (struct pos *p)
-{
-  struct mirror m;
-  m.p = *p;
-
-  return bsearch (&m, mirror, mirror_nmemb, sizeof (m),
-                  compare_mirrors);
-}
-
-void
-remove_mirror (struct mirror *m)
-{
-  size_t i =  m - mirror;
-  mirror =
-    remove_from_array (mirror, &mirror_nmemb, i, 1, sizeof (*m));
-}
-
-void
 draw_mirror (ALLEGRO_BITMAP *bitmap, struct pos *p,
                  enum em em, enum vm vm)
 {
@@ -203,18 +160,20 @@ draw_mirror_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f,
   /* draw floor reflex */
   draw_floor_reflex (bitmap, p, em, vm);
 
+  ignore_clipping_rectangle_intersection = true;
   /* draw anim */
-  al_set_target_bitmap (bitmap);
-  al_set_clipping_rectangle
-    (PLACE_WIDTH * p->place + 2, PLACE_HEIGHT * p->floor + 3,
-     16, PLACE_HEIGHT - 9);
-  struct anim *a = get_anim_by_id (f->parent_id);
-  struct anim a0 = *a;
-  invert_frame_dir (&a0.f, &a0.f);
-  a0.f.c.x = (2 * PLACE_WIDTH * p->place + 36)
-    - (a->f.c.x + al_get_bitmap_width (a->f.b));
-  draw_anim_frame (bitmap, &a0, vm);
-  al_reset_clipping_rectangle ();
+  if (f) {
+    push_clipping_rectangle (bitmap, PLACE_WIDTH * p->place + 2,
+                             PLACE_HEIGHT * p->floor + 3,
+                             16, PLACE_HEIGHT - 9);
+    struct anim *a = get_anim_by_id (f->parent_id);
+    struct anim a0 = *a;
+    invert_frame_dir (&a0.f, &a0.f);
+    a0.f.c.x = (2 * PLACE_WIDTH * p->place + 36)
+      - (a->f.c.x + al_get_bitmap_width (a->f.b));
+    draw_anim_frame (bitmap, &a0, vm);
+    pop_clipping_rectangle ();
+  }
 
   /* draw mirror properly */
   if (vm == VGA) mirror = apply_hue_palette (mirror);
@@ -224,7 +183,11 @@ draw_mirror_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f,
 
   struct coord c;
   int h = al_get_bitmap_height (mirror);
+  push_reset_clipping_rectangle (bitmap);
   draw_bitmap_regionc (mirror, bitmap, 0, 0, 22, h, mirror_coord (p, &c), 0);
+  pop_clipping_rectangle ();
+
+  ignore_clipping_rectangle_intersection = false;
 }
 
 void

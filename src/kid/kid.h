@@ -51,7 +51,6 @@ ALLEGRO_COLOR get_flicker_blood_color (void);
 ALLEGRO_COLOR get_flicker_raise_sword_color (void);
 ALLEGRO_COLOR get_flicker_float_color (void);
 void kid_debug (void);
-bool kid_door_split_collision (struct anim *k);
 void place_kid (struct anim *k, int room, int floor, int place);
 
 /* variables */

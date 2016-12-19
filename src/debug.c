@@ -47,3 +47,9 @@ save_guard_bitmaps (enum vm vm)
     for (style = 0; style <= 7; style++)
       save_guard_bitmap (type, style, vm);
 }
+
+void
+debug_pos (struct pos *p)
+{
+  printf ("(%i,%i,%i)\n", p->room, p->floor, p->place);
+}

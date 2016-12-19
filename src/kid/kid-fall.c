@@ -123,7 +123,7 @@ physics_in (struct anim *k)
     k->fo.dx = -8;
     k->fo.dy = +4;
   } else if (k->oaction == kid_turn_run) {
-    k->f.c.x -= dir * 24;
+    k->fo.dx = +18;
   } else if (k->oaction == kid_couch && k->collision) {
     k->collision = false;
     k->f.c.x += dir * 16;
@@ -162,11 +162,7 @@ physics_in (struct anim *k)
   /* printf ("inertia: %i\n", k->inertia); */
 
   /* collision */
-  if (is_colliding (&k->f, &k->fo, -4, false, &k->ci)) {
-    /* k->inertia = 0; */
-    /* k->fo.dx = +0; */
-    uncollide (&k->f, &k->fo, &k->fo, -4, false, &k->ci);
-  }
+  uncollide (&k->f, &k->fo, _bf, -8, +0, &k->fo, NULL);
 
   /* hang front */
   if (k->i > 4 && can_hang (&k->f, false, &k->hang_pos)

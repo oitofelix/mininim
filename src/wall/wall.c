@@ -174,9 +174,9 @@ draw_wall_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
                     enum em em, enum vm vm)
 {
   switch (wall_correlation (p)) {
-  case SWS: draw_wall_face (bitmap, p, em, vm); break;
+  case SWS: draw_wall_face (bitmap, p, FULL_WIDTH, em, vm); break;
   case SWW: break;
-  case WWS: draw_wall_face (bitmap, p, em, vm); break;
+  case WWS: draw_wall_face (bitmap, p, FULL_WIDTH, em, vm); break;
   case WWW: break;
   default: assert (false); break;
   }
@@ -187,36 +187,42 @@ draw_wall_top (ALLEGRO_BITMAP *bitmap, struct pos *p,
                enum em em, enum vm vm)
 {
   switch (wall_correlation (p)) {
-  case SWS: draw_wall_face_top (bitmap, p, em, vm); break;
+  case SWS: draw_wall_face_top (bitmap, p, FULL_WIDTH, em, vm); break;
   case SWW: break;
-  case WWS: draw_wall_face_top (bitmap, p, em, vm); break;
+  case WWS: draw_wall_face_top (bitmap, p, FULL_WIDTH, em, vm); break;
   case WWW: break;
   default: assert (false); break;
   }
 }
 
-void
-draw_wall_face (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                enum em em, enum vm vm)
+ALLEGRO_BITMAP *
+wall_face_bitmap (enum em em, enum vm vm)
 {
-  ALLEGRO_BITMAP *wall_face = NULL;
-
   switch (em) {
   case DUNGEON:
     switch (vm) {
-    case CGA: wall_face = dc_wall_face; break;
-    case EGA: wall_face = de_wall_face; break;
-    case VGA: wall_face = dv_wall_face; break;
+    case CGA: return dc_wall_face;
+    case EGA: return de_wall_face;
+    case VGA: return dv_wall_face;
     }
     break;
   case PALACE:
     switch (vm) {
-    case CGA: wall_face = pc_wall_face; break;
-    case EGA: wall_face = pe_wall_face; break;
-    case VGA: wall_face = pv_wall_face; break;
+    case CGA: return pc_wall_face;
+    case EGA: return pe_wall_face;
+    case VGA: return pv_wall_face;
     }
     break;
   }
+  assert (false);
+  return NULL;
+}
+
+void
+draw_wall_face (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                int w, enum em em, enum vm vm)
+{
+  ALLEGRO_BITMAP *wall_face = wall_face_bitmap (em, vm);
 
   if (vm == VGA) wall_face = apply_hue_palette (wall_face);
   if (hgc) wall_face = apply_palette (wall_face, hgc_palette);
@@ -224,12 +230,15 @@ draw_wall_face (ALLEGRO_BITMAP *bitmap, struct pos *p,
     wall_face = apply_palette (wall_face, selection_palette);
 
   struct coord c;
-  draw_bitmapc (wall_face, bitmap, wall_face_coord (p, &c), 0);
+  draw_bitmap_regionc (wall_face, bitmap, 0, 0,
+                       w < 0 ? al_get_bitmap_width (wall_face) : w,
+                       al_get_bitmap_height (wall_face),
+                       wall_face_coord (p, &c), 0);
 }
 
 void
 draw_wall_face_top (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                    enum em em, enum vm vm)
+                    int w, enum em em, enum vm vm)
 {
   pos2coord_f wall_face_top_coord = NULL;
   ALLEGRO_BITMAP *wall_face_top = NULL;
@@ -265,7 +274,10 @@ draw_wall_face_top (ALLEGRO_BITMAP *bitmap, struct pos *p,
     wall_face_top = apply_palette (wall_face_top, selection_palette);
 
   struct coord c;
-  draw_bitmapc (wall_face_top, bitmap, wall_face_top_coord (p, &c), 0);
+  draw_bitmap_regionc (wall_face_top, bitmap, 0, 0,
+                        w < 0 ? al_get_bitmap_width (wall_face_top) : w,
+                        al_get_bitmap_height (wall_face_top),
+                        wall_face_top_coord (p, &c), 0);
 }
 
 void
@@ -308,13 +320,58 @@ draw_wall_base_cache (ALLEGRO_BITMAP *bitmap, struct pos *p)
   else draw_wall_base (bitmap, p, em, vm);
 }
 
+enum should_draw
+should_draw_face (struct pos *p, struct frame *f)
+{
+  if (! f) return false;
+
+  struct pos ptr, ptl;
+  surveyo (_tr, -4, +10, pos, f, NULL, &ptr, NULL);
+  surveyo (_tl, -14, +10, pos, f, NULL, &ptl, NULL);
+
+  if (is_fake (p)) return SHOULD_DRAW_PART;
+  else if (is_sword_frame (f))
+    return SHOULD_DRAW_NONE;
+  else if (peq (&ptr, p) || peq (&ptl, p))
+    return SHOULD_DRAW_FULL;
+  else return SHOULD_DRAW_NONE;
+}
+
+void
+draw_wall_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f,
+              enum em em, enum vm vm)
+{
+  draw_wall_base_cache (bitmap, p);
+  draw_wall_left_cache (bitmap, p);
+
+  struct pos par; prel (p, &par, -1, +1);
+  struct pos pr; prel (p, &pr, +0, +1);
+
+  switch (should_draw_face (p, f)) {
+  case SHOULD_DRAW_FULL:
+    push_drawn_rectangle (bitmap);
+    draw_confg_right (bitmap, p, em, vm);
+    draw_confg_top (bitmap, p, em, vm);
+    redraw_drawn_rectangle (pop_drawn_rectangle (), p, em, vm);
+    break;
+  case SHOULD_DRAW_PART:
+    push_drawn_rectangle (bitmap);
+    draw_wall_face (bitmap, p, WALL_FG_WIDTH, em, vm);
+    if (fake (&par) == NO_FLOOR)
+      draw_wall_face_top (bitmap, p, WALL_FG_WIDTH, em, vm);
+    redraw_drawn_rectangle (pop_drawn_rectangle (), p, em, vm);
+    break;
+  case SHOULD_DRAW_NONE: default: break;
+  }
+}
+
 enum wall_correlation
 wall_correlation (struct pos *p)
 {
-  if (fg (p) != WALL) assert (false);
+  if (fake (p) != WALL) assert (false);
 
-  enum confg fl = fg_rel (p, 0, -1);
-  enum confg fr = fg_rel (p, 0, +1);
+  enum confg fl = fake_rel (p, 0, -1);
+  enum confg fr = fake_rel (p, 0, +1);
 
   if (fl != WALL && fr != WALL) return SWS;
   else if (fl != WALL && fr == WALL) return SWW;

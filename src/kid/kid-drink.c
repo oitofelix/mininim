@@ -194,9 +194,7 @@ physics_out (struct anim *k)
   if (k->i == 0) {
     k->item = ext (&k->item_pos);
     register_con_undo (&undo, &k->item_pos,
-                       MIGNORE, MIGNORE, NO_ITEM,
-                       false, false, false, false,
-                       CHPOS_NONE,
-                       "CONSUME POTION");
+                       MIGNORE, MIGNORE, NO_ITEM, MIGNORE,
+                       NULL, false, "CONSUME POTION");
   }
 }

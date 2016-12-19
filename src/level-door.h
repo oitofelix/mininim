@@ -77,17 +77,27 @@ void load_level_door (void);
 void unload_level_door (void);
 void register_level_door (struct pos *p);
 int compare_level_doors (const void *d0, const void *d1);
+struct level_door *copy_level_door (struct level_door *to,
+                                    struct level_door *from);
 struct level_door *level_door_at_pos (struct pos *p);
 void remove_level_door (struct level_door *d);
+int fake_door_step (struct pos *p);
+bool fake_door_stairs (struct pos *p);
 void break_level_door (struct pos *p);
 void compute_level_doors (void);
 struct level_door *get_exit_level_door (struct level *l, int n);
 void draw_level_door (ALLEGRO_BITMAP *bitmap, struct pos *p,
                       enum em em, enum vm vm);
+void generate_level_door_front_cache (ALLEGRO_BITMAP *cache[LEVEL_DOOR_STEPS],
+                                      enum em em, enum vm vm);
+void destroy_level_door_front_cache (ALLEGRO_BITMAP *cache[LEVEL_DOOR_STEPS]);
+ALLEGRO_BITMAP *level_door_front_bitmap (int i, enum em em, enum vm vm);
 void draw_level_door_front (ALLEGRO_BITMAP *bitmap, struct pos *p, int i,
                             enum em em, enum vm vm);
-void draw_level_door_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f,
-                         enum em em, enum vm vm);
+void xdraw_level_door_front (ALLEGRO_BITMAP *bitmap, struct pos *p, int i,
+                             enum em em, enum vm vm);
+void draw_level_door_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                         struct frame *f, enum em em, enum vm vm);
 void draw_level_door_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
                            enum em em, enum vm vm);
 void draw_level_door_right (ALLEGRO_BITMAP *bitmap, struct pos *p,

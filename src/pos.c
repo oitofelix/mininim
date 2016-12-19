@@ -679,6 +679,12 @@ cpos (struct pos *p0, struct pos *p1)
 }
 
 int
+cpos_by_room (struct pos *p0, struct pos *p1)
+{
+  return p0->room - p1->room;
+}
+
+int
 ccoord (struct coord *c0, struct coord *c1)
 {
   struct coord nc0, nc1;
@@ -1087,6 +1093,42 @@ _bb (struct frame *f, struct coord *c)
                d.y + d.h - 1);
 }
 
+struct coord *
+cf_rel (coord_f cf, struct frame *f, struct coord *c, int dx, int dy)
+{
+  int dir;
+
+  if (cf == _mf || cf == _tf || cf == _bf)
+    dir = (f->dir == LEFT) ? -1 : +1;
+  else if (cf == _mba || cf == _tb || cf == _bb)
+    dir = (f->dir == LEFT) ? +1 : -1;
+  else if (cf == _ml || cf == _tl || cf == _bl)
+    dir = -1;
+  else if (cf == _mr || cf == _tr || cf == _br)
+    dir = +1;
+  else assert (false);
+
+  cf (f, c);
+  c->x += dir * dx;
+  c->y += dy;
+
+  return c;
+}
+
+int
+cf_inc (struct frame *f, coord_f cf)
+{
+  if (cf == _mf || cf == _tf || cf == _bf)
+    return -1;
+  else if (cf == _mba || cf == _tb || cf == _bb)
+    return +1;
+  else if (cf == _ml || cf == _tl || cf == _bl)
+    return f->dir == LEFT ? -1 : +1;
+  else if (cf == _mr || cf == _tr || cf == _br)
+    return f->dir == LEFT ? +1 : -1;
+  else assert (false);
+}
+
 void
 survey (coord_f cf, pos_f pf, struct frame *f,
         struct coord *c, struct pos *p, struct pos *np)
@@ -1108,7 +1150,7 @@ void
 surveyo (coord_f cf, int dx, int dy, pos_f pf, struct frame *f,
          struct coord *c, struct pos *p, struct pos *np)
 {
-  int dir = (f->dir == LEFT) ? +1 : -1;
+  assert (cf && f && (c || (pf && p) || (pf && np)));
 
   struct coord c0; struct pos p0, np0;
 
@@ -1118,9 +1160,7 @@ surveyo (coord_f cf, int dx, int dy, pos_f pf, struct frame *f,
 
   if (! pf) pf = pos;
 
-  cf (f, c);
-  c->x += dir * dx;
-  c->y += dy;
+  cf_rel (cf, f, c, dx, dy);
 
   npos (pf (c, p), np);
 }

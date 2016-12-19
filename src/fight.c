@@ -214,7 +214,6 @@ fight_ai (struct anim *k)
       && ! (is_kid_climb (&ke->f) && ke->i <= 7)
       && ke->f.dir != k->f.dir
       && ke->current_lives > 0
-      && is_there_enough_room_to_fight (ke)
       && ke->has_sword
       && ! is_kid_fall (&ke->f)
       && ! is_kid_hang (&ke->f)
@@ -667,7 +666,7 @@ put_at_defense_frame (struct anim *k)
     } else select_xframe (&k->xf, sword_frameset, 14);
 
     k->action = kid_sword_defense;
-    uncollide (&k->f, &k->fo, &k->fo, +0, true, &k->ci);
+    uncollide_back_fight (k);
     next_frame (&k->f, &k->f, &k->fo);
     break;
   case GUARD:
@@ -679,7 +678,7 @@ put_at_defense_frame (struct anim *k)
     select_frame (k, frameset, 0);
     select_xframe (&k->xf, sword_frameset, 11);
     k->action = guard_defense;
-    uncollide (&k->f, &k->fo, &k->fo, +0, true, &k->ci);
+    uncollide_back_fight (k);
     next_frame (&k->f, &k->f, &k->fo);
     break;
   }
@@ -713,7 +712,7 @@ put_at_attack_frame (struct anim *k)
     select_xframe (&k->xf, sword_frameset, 17);
     k->xf.dx = -21;
     k->xf.dy = +11;
-    uncollide (&k->f, &k->fo, &k->fo, +8, false, &k->ci);
+    uncollide_back_fight (k);
     next_frame (&k->f, &k->f, &k->fo);
     break;
   case GUARD:
@@ -728,7 +727,7 @@ put_at_attack_frame (struct anim *k)
     select_xframe (&k->xf, sword_frameset, 8);
     k->xf.dx = -13;
     k->xf.dy = -14;
-    uncollide (&k->f, &k->fo, &k->fo, +8, false, &k->ci);
+    uncollide_back_fight (k);
     next_frame (&k->f, &k->f, &k->fo);
     break;
   }
@@ -785,7 +784,7 @@ is_pos_seeing (struct pos *p0, struct anim *k1, enum dir dir)
     else cf = (dir == LEFT) ? _mr : _ml;
   } else cf = (dir == LEFT) ? _mr : _ml;
 
-  survey (cf, pos, &k1->f, &m1, NULL, NULL);
+  surveyo (cf, -8, +0, pos, &k1->f, &m1, NULL, NULL);
 
   coord2room (&m0, p0->room, &m0);
   coord2room (&m1, p0->room, &m1);
@@ -885,17 +884,15 @@ bool
 is_safe_to_walkb (struct anim *k)
 {
   int df = dist_fall (&k->f, true);
-  int dc = dist_collision (&k->f, true, &k->ci);
-  return df > PLACE_WIDTH
-    && dc > 4
-    && is_there_enough_room_to_fight (k);
+  int dc = dist_collision (&k->f, _bb, +0, +0, &k->ci);
+  return df > PLACE_WIDTH && dc > 4;
 }
 
 bool
 is_safe_to_attack (struct anim *k)
 {
   int df = dist_fall (&k->f, false);
-  return df > PLACE_WIDTH && is_there_enough_room_to_fight (k);
+  return df > PLACE_WIDTH;
 }
 
 bool
@@ -1008,8 +1005,8 @@ is_safe_to_follow (struct anim *k0, struct anim *k1, enum dir dir)
 bool
 is_there_enough_room_to_fight (struct anim *k)
 {
-  return dist_collision (&k->f, false, &k->ci) > PLACE_WIDTH - 16
-    || dist_collision (&k->f, true, &k->ci) > PLACE_WIDTH - 16;
+  return dist_collision (&k->f, _bf, +0, +0, &k->ci) > PLACE_WIDTH - 16
+    || dist_collision (&k->f, _bb, +0, +0, &k->ci) > PLACE_WIDTH - 16;
 }
 
 void
@@ -1017,8 +1014,8 @@ fight_turn (struct anim *k)
 {
   invert_frame_dir (&k->f, &k->f);
 
-  if (! is_in_fight_mode (k)
-      && is_there_enough_room_to_fight (k)) enter_fight_mode (k);
+  if (! is_in_fight_mode (k))
+    enter_fight_mode (k);
   else {
     struct pos p;
     struct anim a = *k;
@@ -1026,7 +1023,7 @@ fight_turn (struct anim *k)
     anim_walkb (&a);
     survey (_bb, pos, &a.f, NULL, &p, NULL);
     if (! is_strictly_traversable (&p)
-        && is_there_enough_room_to_fight (k)) *k = a;
+        && is_there_enough_room_to_fight (&a)) *k = a;
   }
 }
 
@@ -1128,13 +1125,9 @@ fight_hit (struct anim *k, struct anim *ke)
     anim_die (k);
   } else anim_sword_hit (k);
 
-  backoff_from_range (ke, k, ATTACK_RANGE - 20, true, false);
-  get_in_range (ke, k, ATTACK_RANGE - 10, false, false);
-
-  /* ensure anim doesn't die within a wall */
-  if (fg (&k->p) == WALL) {
-    if (fg_rel (&k->p, +0, +1) != WALL) k->p.place++;
-    else if (fg_rel (&k->p, +0, -1) != WALL) k->p.place--;
+  if (is_in_fight_mode (k)) {
+    backoff_from_range (ke, k, ATTACK_RANGE - 20, true, false);
+    get_in_range (ke, k, ATTACK_RANGE - 10, false, false);
   }
 
   k->splash = true;
@@ -1144,46 +1137,6 @@ fight_hit (struct anim *k, struct anim *ke)
     mr.color = get_flicker_blood_color ();
     play_audio (&harm_audio, NULL, k->id);
   } else play_audio (&guard_hit_audio, NULL, k->id);
-}
-
-bool
-fight_door_split_collision (struct anim *a)
-{
-  struct coord tl; struct pos ptl, ptr;
-
-  survey (_tl, pos, &a->f, &tl, &ptl, NULL);
-  survey (_tr, pos, &a->f, NULL, &ptr, NULL);
-
-  int dtl = dist_next_place (&a->f, _tl, pos, +0, a->f.dir == LEFT);
-  int dtr = dist_next_place (&a->f, _tr, pos, +0, a->f.dir == RIGHT);
-
-  if (fg (&ptl) == DOOR
-      && ptr.place > ptl.place
-      && is_collidable_at_right (&ptl, &a->f)) {
-    if (dtl < dtr) {
-      a->f.c.x += dtl;
-      if (a->f.dir == RIGHT
-          && ! is_colliding (&a->f, &a->fo, +8, false, &a->ci)) {
-        anim_walkf (a);
-        return true;
-      } else if (! is_colliding (&a->f, &a->fo, +8, true, &a->ci)) {
-        anim_walkb (a);
-        return true;
-      }
-    } else {
-      a->f.c.x -= dtr;
-      if (a->f.dir == LEFT
-          && ! is_colliding (&a->f, &a->fo, +8, false, &a->ci)) {
-        anim_walkf (a);
-        return true;
-      } else if (! is_colliding (&a->f, &a->fo, +8, true, &a->ci)) {
-        anim_walkb (a);
-        return true;
-      }
-    }
-  }
-
-  return false;
 }
 
 void
@@ -1199,16 +1152,21 @@ backoff_from_range (struct anim *k0, struct anim *k1, int r,
   kr = (kd->f.dir == RIGHT) ? kd : ks;
 
   int i = 0;
-  while (is_in_range (k0, k1, r)) {
-    bool cl = is_colliding (&kl->f, &kl->fo, +0, true, &kl->ci)
-      || (kl == k0 && only_k1);
-    bool cr = is_colliding (&kr->f, &kr->fo, +0, true, &kr->ci)
-      || (kr == k0 && only_k1);
+  while (is_in_range (k0, k1, r) && i <= (only_k1 ? 2 : 1) * r) {
+    bool cl = kl == k0 && only_k1;
+    bool cr = kr == k0 && only_k1;
 
     if (cl && cr) break;
 
-    if (i++ % 2 && ! cl) kl->f.c.x++;
-    else if (! cr) kr->f.c.x--;
+    if (i++ % 2 && ! cl) {
+     kl->fo.dx = +1;
+     uncollide_back_fight (kl);
+     next_frame (&kl->f, &kl->f, &kl->fo);
+    } else if (! cr) {
+     kr->fo.dx = +1;
+     uncollide_back_fight (kr);
+     next_frame (&kr->f, &kr->f, &kr->fo);
+    }
   }
 }
 
@@ -1225,16 +1183,22 @@ get_in_range (struct anim *k0, struct anim *k1, int r,
   kr = (kd->f.dir == RIGHT) ? kd : ks;
 
   int i = 0;
-  while (! is_in_range (k0, k1, r)) {
-    bool cl = is_colliding (&kl->f, &kl->fo, +0, false, &kl->ci)
-      || (kl == k0 && only_k1);
-    bool cr = is_colliding (&kr->f, &kr->fo, +0, false, &kr->ci)
-      || (kr == k0 && only_k1);
+  while (! is_in_range (k0, k1, r) && i <= (only_k1 ? 2 : 1) * r) {
+    bool cl = kl == k0 && only_k1;
+    bool cr = kr == k0 && only_k1;
 
     if (cl && cr) break;
 
-    if (i++ % 2 && ! cl) kl->f.c.x--;
-    else if (! cr) kr->f.c.x++;
+    if (i++ % 2 && ! cl) {
+      kl->fo.dx = -1;
+      uncollide_front_fight (kl);
+      next_frame (&kl->f, &kl->f, &kl->fo);
+      kl->fo.dx = 0;
+    } else if (! cr) {
+      kr->fo.dx = -1;
+      uncollide_front_fight (kr);
+      next_frame (&kr->f, &kr->f, &kr->fo);
+    }
   }
 }
 

@@ -127,14 +127,16 @@ flow (struct anim *k)
 
   int dir = (k->f.dir == LEFT) ? -1 : +1;
 
-  /* hang front */
   survey (_m, pos, &k->f, NULL, &pm, NULL);
   survey (_tf, pos, &k->f, NULL, &ptf, NULL);
+
+  /* hang front */
   if (k->i >= 7 && k->i <= 10 && hang_front
       && (is_hangable_pos (&pm, k->f.dir)
           || (is_hangable_pos (&ptf, k->f.dir)
               && fg_rel (&ptf, +0, dir) == WALL
-              && k->i < 9))) {
+              && k->i < 9))
+      && is_immediately_accessible_pos (&ptf, &pm, &k->f)) {
     if (is_hangable_pos (&pm, k->f.dir)) k->hang_pos = pm;
     else if (is_hangable_pos (&ptf, k->f.dir)) k->hang_pos = ptf;
     pos2room (&k->hang_pos, k->f.c.room, &k->hang_pos);
@@ -145,9 +147,9 @@ flow (struct anim *k)
   }
 
   /* hang back */
-  survey (_tf, pos, &k->f, NULL, &ptf, NULL);
   if (k->i >= 7 && k->i <= 10
-      && hang_back && is_hangable_pos (&ptf, back_dir)) {
+      && hang_back && is_hangable_pos (&ptf, back_dir)
+      && is_immediately_accessible_pos (&ptf, &pm, &k->f)) {
     k->hang_pos = ptf;
     pos2room (&k->hang_pos, k->f.c.room, &k->hang_pos);
     k->hang = true;
@@ -181,7 +183,10 @@ physics_in (struct anim *k)
   else k->inertia = 0;
 
   /* collision */
-  if (is_colliding (&k->f, &k->fo, +0, false, &k->ci)) {
+  int dx = k->i < 7 || k->i > 10
+    ? +0
+    : k->f.dir == LEFT ? -8 : -4;
+  if (uncollide (&k->f, &k->fo, _bf, dx, dx, NULL, &k->ci)) {
     if (k->i < 7 || k->i > 10) kid_stabilize_collision (k);
     else kid_couch_collision (k);
     return false;

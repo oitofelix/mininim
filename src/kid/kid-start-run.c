@@ -133,14 +133,14 @@ physics_in (struct anim *k)
   k->cinertia = 4;
 
   /* collision */
-  if (is_colliding (&k->f, &k->fo, +0, false, &k->ci)) {
+  if (uncollide (&k->f, &k->fo, _bf, -4, -4, NULL, &k->ci)) {
     kid_stabilize_collision (k);
     return false;
   }
 
   /* fall */
   survey (_mbo, pos, &k->f, NULL, &pmbo, NULL);
-  survey (_tf, pos, &k->f, NULL, &ptf, NULL);
+  surveyo (_tf, -4, +0, pos, &k->f, NULL, &ptf, NULL);
   if (is_strictly_traversable (&pmbo)
       || is_strictly_traversable (&ptf)) {
     kid_fall (k);

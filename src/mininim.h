@@ -51,7 +51,7 @@
 #include "video.h"
 #include "event.h"
 #include "gamepad.h"
-#include "xmouse.h"
+#include "pointer.h"
 #include "memory.h"
 #include "random.h"
 #include "timer.h"

@@ -93,8 +93,8 @@ mininim_SOURCES = src/mininim.c src/mininim.h src/constants.h					\
 		src/kernel/timer.h src/kernel/event.c src/kernel/event.h					\
 		src/kernel/video.c src/kernel/video.h src/kernel/audio.c					\
 		src/kernel/audio.h src/kernel/memory.c src/kernel/memory.h				\
-		src/kernel/gamepad.c src/kernel/gamepad.h src/kernel/xmouse.c			\
-		src/kernel/xmouse.h src/kernel/random.c src/kernel/random.h				\
+		src/kernel/gamepad.c src/kernel/gamepad.h src/kernel/pointer.c		\
+		src/kernel/pointer.h src/kernel/random.c src/kernel/random.h			\
 		src/kernel/array.c src/kernel/array.h src/kernel/xstdio.c					\
 		src/kernel/xstdio.h src/kernel/file.c src/kernel/file.h						\
 		src/kernel/dialog.c src/kernel/dialog.h src/kernel/threads.c			\

@@ -306,10 +306,10 @@ unload_spikes_floor (void)
   destroy_bitmap (pv_spikes_fg_04);
 }
 
-void
+struct spikes_floor *
 init_spikes_floor (struct pos *p, struct spikes_floor *s)
 {
-  s->p = *p;
+  npos (p, &s->p);
   s->wait = SPIKES_WAIT;
   s->murdered_anim = -1;
   s->activate = false;
@@ -328,14 +328,13 @@ init_spikes_floor (struct pos *p, struct spikes_floor *s)
   }
 
   s->inactive = (ext (p) != 0);
+
+  return s;
 }
 
 void
 register_spikes_floor (struct pos *p)
 {
-  assert (fg (p) == SPIKES_FLOOR
-          && spikes_floor_at_pos (p) == NULL);
-
   struct spikes_floor s;
 
   init_spikes_floor (p, &s);
@@ -362,13 +361,35 @@ compare_spikes_floors (const void *s0, const void *s1)
 }
 
 struct spikes_floor *
+copy_spikes_floor (struct spikes_floor *to, struct spikes_floor *from)
+{
+  struct pos p = to->p;
+  *to = *from;
+  to->p = p;
+  return to;
+}
+
+struct spikes_floor *
 spikes_floor_at_pos (struct pos *p)
 {
   struct spikes_floor s;
   s.p = *p;
 
-  return bsearch (&s, spikes_floor, spikes_floor_nmemb, sizeof (s),
-                  compare_spikes_floors);
+  struct spikes_floor *ss;
+
+ search:
+  ss = bsearch (&s, spikes_floor, spikes_floor_nmemb, sizeof (s),
+                compare_spikes_floors);
+
+  if (ss && fg (p) != SPIKES_FLOOR) {
+    remove_spikes_floor (ss);
+    return NULL;
+  } else if (! ss && fg (p) == SPIKES_FLOOR) {
+    register_spikes_floor (p);
+    goto search;
+  }
+
+  return ss;
 }
 
 void
@@ -396,7 +417,7 @@ reset_murder_spikes_floor (int id) {
     struct spikes_floor *s = &spikes_floor[i];
     if (s->murdered_anim == id) {
       init_spikes_floor (&s->p, s);
-      register_changed_pos (&s->p, CHPOS_SPIKES);
+      register_changed_pos (&s->p);
       return;
     }
   }
@@ -406,6 +427,14 @@ void
 compute_spikes_floors (void)
 {
   size_t i, j;
+
+  for (i = 0; i < spikes_floor_nmemb;) {
+    struct spikes_floor *s = &spikes_floor[i];
+    if (fg (&s->p) == SPIKES_FLOOR) {
+      i++; continue;
+    }
+    remove_spikes_floor (s);
+  }
 
   for (i = 0; i < spikes_floor_nmemb; i++) {
     struct spikes_floor *s = &spikes_floor[i];
@@ -455,7 +484,7 @@ compute_spikes_floors (void)
       }
 
       if (state != s->state)
-        register_changed_pos (&s->p, CHPOS_SPIKES);
+        register_changed_pos (&s->p);
     }
 
     /* spike kid */
@@ -526,6 +555,12 @@ void
 draw_spikes_floor (ALLEGRO_BITMAP *bitmap, struct pos *p,
                    enum em em, enum vm vm)
 {
+  if (is_fake (p)) {
+    draw_spikes_floor_floor (bitmap, p, em, vm);
+    draw_spikes (bitmap, p, NULL, em, vm);
+    return;
+  }
+
   struct spikes_floor *s = spikes_floor_at_pos (p);
   if (! s) return;
 
@@ -537,6 +572,12 @@ void
 draw_spikes_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
                         enum em em, enum vm vm)
 {
+  if (is_fake (p)) {
+    draw_spikes_floor_floor_left (bitmap, p, em, vm);
+    draw_spikes_left (bitmap, p, NULL, em, vm);
+    return;
+  }
+
   struct spikes_floor *s = spikes_floor_at_pos (p);
   if (! s) return;
 
@@ -548,6 +589,12 @@ void
 draw_spikes_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
                          enum em em, enum vm vm)
 {
+  if (is_fake (p)) {
+    draw_spikes_floor_floor_right (bitmap, p, em, vm);
+    draw_spikes_right (bitmap, p, NULL, em, vm);
+    return;
+  }
+
   struct spikes_floor *s = spikes_floor_at_pos (p);
   if (! s) return;
 
@@ -640,7 +687,7 @@ void
 draw_spikes_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
                   struct spikes_floor *s, enum em em, enum vm vm)
 {
-  switch (s->state) {
+  switch (s ? s->state : abs (ext (p)) % 6) {
   case 0: break;
   case 1: draw_spikes_left_00 (bitmap, p, em, vm); break;
   case 2: draw_spikes_left_01 (bitmap, p, em, vm); break;
@@ -654,7 +701,7 @@ void
 draw_spikes_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
                    struct spikes_floor *s, enum em em, enum vm vm)
 {
-  switch (s->state) {
+  switch (s ? s->state : abs (ext (p)) % 6) {
   case 0: break;
   case 1: draw_spikes_right_00 (bitmap, p, em, vm); break;
   case 2: draw_spikes_right_01 (bitmap, p, em, vm); break;
@@ -668,6 +715,18 @@ void
 draw_spikes_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
                 enum em em, enum vm vm)
 {
+  if (is_fake (p)) {
+    switch (abs (ext (p)) % 6) {
+    case 0: break;
+    case 1: draw_spikes_fg_00 (bitmap, p, em, vm); break;
+    case 2: draw_spikes_fg_01 (bitmap, p, em, vm); break;
+    case 3: draw_spikes_fg_02 (bitmap, p, em, vm); break;
+    case 4: draw_spikes_fg_03 (bitmap, p, em, vm); break;
+    case 5: draw_spikes_fg_04 (bitmap, p, em, vm); break;
+    }
+    return;
+  }
+
   struct spikes_floor *s = spikes_floor_at_pos (p);
   if (! s) return;
 

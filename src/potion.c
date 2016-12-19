@@ -268,7 +268,16 @@ draw_potion (ALLEGRO_BITMAP *bitmap, struct pos *p,
                 r ? ALLEGRO_FLIP_HORIZONTAL : 0);
   unseedp ();
 
+  push_clipping_rectangle (bitmap, bottle_coord.x,
+                           bottle_coord.y,
+                           al_get_bitmap_width (bottle),
+                           al_get_bitmap_height (bottle));
+  merge_clipping_rectangle (bitmap, bubble_coord.x,
+                            bubble_coord.y,
+                            al_get_bitmap_width (bubble),
+                            al_get_bitmap_height (bubble));
   draw_confg_fg (bitmap, p, em, vm, NULL);
+  pop_clipping_rectangle ();
 }
 
 struct coord *

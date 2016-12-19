@@ -113,7 +113,7 @@ kid_die_spiked (struct anim *k)
     s->state = 5;
     s->inactive = true;
     s->murdered_anim = k->id;
-    register_changed_pos (&s->p, CHPOS_SPIKES);
+    register_changed_pos (&s->p);
 
     if (k->id == current_kid_id) {
       mr.flicker = 2;
@@ -244,7 +244,7 @@ static bool
 physics_in (struct anim *k)
 {
   /* collision */
-  uncollide (&k->f, &k->fo, &k->fo, +0, true, &k->ci);
+  uncollide (&k->f, &k->fo, _bb, +0, +0, &k->fo, NULL);
 
   /* fall */
   struct pos pm;

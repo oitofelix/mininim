@@ -58,6 +58,7 @@ struct pos *pos (struct coord *c, struct pos *p);
 struct pos *posf (struct coord *c, struct pos *p);
 struct pos *prel (struct pos *p, struct pos *pr, int floor, int place);
 int cpos (struct pos *p0, struct pos *p1);
+int cpos_by_room (struct pos *p0, struct pos *p1);
 int ccoord (struct coord *c0, struct coord *c1);
 bool peq (struct pos *p0, struct pos *p1);
 bool peqr (struct pos *p0, struct pos *p1, int floor, int place);
@@ -93,6 +94,10 @@ struct coord *_bl (struct frame *f, struct coord *c);
 struct coord *_br (struct frame *f, struct coord *c);
 struct coord *_bf (struct frame *f, struct coord *c);
 struct coord *_bb (struct frame *f, struct coord *c);
+
+struct coord *
+cf_rel (coord_f cf, struct frame *f, struct coord *c, int dx, int dy);
+int cf_inc (struct frame *f, coord_f cf);
 
 void
 survey (coord_f cf, pos_f pf, struct frame *f,

@@ -649,7 +649,7 @@ parser (int key, char *arg, struct argp_state *state)
     for (i = 1; i <= 14; i++) {
       level_module_next_level (&vanilla_level, i);
       if (mirror_level)
-        mirror_level_h (&vanilla_level, false, false, false, false);
+        mirror_level_h (&vanilla_level);
       if (! save_level (&vanilla_level)) exit (-1);
     }
     fprintf (stderr, "\

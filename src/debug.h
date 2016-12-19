@@ -22,5 +22,6 @@
 
 void save_guard_bitmap (enum anim_type type, int style, enum vm vm);
 void save_guard_bitmaps (enum vm vm);
+void debug_pos (struct pos *p);
 
 #endif	/* MININIM_DEBUG_H */

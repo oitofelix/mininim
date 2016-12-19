@@ -34,7 +34,7 @@ init_kid_turn_frameset (void)
   struct frameset frameset[KID_TURN_FRAMESET_NMEMB] =
     {{kid_turn_00,+2,0},{kid_turn_01,+1,0},
      {kid_turn_02,-3,0},{kid_turn_03,+0,+0}};
-
+  /* -3 */
   memcpy (&kid_turn_frameset, &frameset,
           KID_TURN_FRAMESET_NMEMB * sizeof (struct frameset));
 }
@@ -95,7 +95,7 @@ flow (struct anim *k)
   bool couch = k->key.down;
 
   if (k->i == 3) {
-    int dc = dist_collision (&k->f, false, &k->ci);
+    int dc = dist_collision (&k->f, _bf, +0, +0, &k->ci);
     int df = dist_fall (&k->f, false);
 
     if (k->hang) kid_hang (k);
@@ -145,10 +145,19 @@ physics_in (struct anim *k)
   struct pos pbf, pbb;
 
   /* collision */
-  /* if (! k->hang && kid_door_split_collision (k)) return false; */
-  if (is_colliding (&k->f, &k->fo, +0, false, &k->ci)
-      && (fg (&k->ci.con_p) == DOOR && k->f.dir == RIGHT))
-    k->f.c.x += (k->f.dir == LEFT) ? +4 : -4;
+  bool turn = ((k->f.dir == RIGHT) && k->key.left)
+    || ((k->f.dir == LEFT) && k->key.right);
+
+  next_frame_inv = true;
+  if (turn) uncollide_static
+              (&k->f, &k->fo, _bf,
+               COLLISION_FRONT_LEFT_NORMAL,
+               COLLISION_FRONT_RIGHT_NORMAL,
+               _bb,
+               COLLISION_BACK_LEFT_NORMAL,
+               COLLISION_BACK_RIGHT_NORMAL,
+               &k->fo);
+  next_frame_inv = false;
 
   /* fall */
   survey (_bf, pos, &k->f, NULL, &pbf, NULL);

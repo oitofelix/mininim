@@ -164,11 +164,11 @@ mouse_run (struct anim *m)
   m->action = mouse_run;
   m->f.flip = (m->f.dir == LEFT) ? 0 : ALLEGRO_FLIP_HORIZONTAL;
 
-  m->dc = dist_collision (&m->f, false, &m->ci) + 4;
+  m->dc = dist_collision (&m->f, _bf, -4, -4, &m->ci);
   m->df = dist_fall (&m->f, false);
   m->dl = dist_con (&m->f, _bf, pos, -4, false, LOOSE_FLOOR);
 
-  if (is_colliding (&m->f, &m->fo, m->dc, false, &m->ci)
+  if (uncollide (&m->f, &m->fo, _bf, m->dc, m->dc, NULL, &m->ci)
       && fg (&m->ci.con_p) == DOOR)
     m->dc = PLACE_WIDTH + 1;
   if (! cutscene && (m->dc < 12 || m->df < 12 || m->dl < 12)) {

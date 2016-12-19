@@ -57,12 +57,15 @@ void draw_wall_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
 void draw_wall_top (ALLEGRO_BITMAP *bitmap, struct pos *p,
                     enum em em, enum vm vm);
 void draw_wall_face (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                     enum em, enum vm vm);
+                     int w, enum em, enum vm vm);
 void draw_wall_face_top (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                         enum em em, enum vm vm);
+                         int w, enum em em, enum vm vm);
+enum should_draw should_draw_face (struct pos *p, struct frame *f);
 
 void draw_wall_left_cache (ALLEGRO_BITMAP *bitmap, struct pos *p);
 void draw_wall_base_cache (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_wall_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f,
+                   enum em em, enum vm vm);
 
 enum wall_correlation wall_correlation (struct pos *p);
 struct coord *wall_base_coord (struct pos *p, struct coord *c);

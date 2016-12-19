@@ -248,27 +248,30 @@ create_loose_floor_01_bitmap (enum em em, enum vm vm)
   return bitmap;
 }
 
+struct loose_floor *
+init_loose_floor (struct pos *p, struct loose_floor *l)
+{
+  npos (p, &l->p);
+  l->i = 0;
+  l->resist = LOOSE_FLOOR_RESISTENCE;
+  l->action = NO_LOOSE_FLOOR_ACTION;
+  l->state = 0;
+  l->cant_fall = ext (p);
+
+  struct coord c; floor_left_coord (p, &c);
+  l->f.b = get_correct_falling_loose_floor_bitmap (dv_loose_floor_01);
+  l->f.flip = 0;
+  new_coord (&l->f.c, p->l, p->room, c.x, c.y + 3);
+
+  return l;
+}
+
 void
 register_loose_floor (struct pos *p)
 {
-  assert (fg (p) == LOOSE_FLOOR
-          && (loose_floor_at_pos (p) == NULL
-              || loose_floor_at_pos (p)->action == FALL_LOOSE_FLOOR));
-
   struct loose_floor l;
 
-  l.p = *p;
-  l.i = 0;
-  l.resist = LOOSE_FLOOR_RESISTENCE;
-  l.action = NO_LOOSE_FLOOR_ACTION;
-  l.state = 0;
-  l.cant_fall = ext (p);
-  l.remove = false;
-
-  struct coord c; floor_left_coord (p, &c);
-  l.f.b = get_correct_falling_loose_floor_bitmap (dv_loose_floor_01);
-  l.f.flip = 0;
-  new_coord (&l.f.c, p->l, p->room, c.x, c.y + 3);
+  init_loose_floor (p, &l);
 
   loose_floor =
     add_to_array (&l, 1, loose_floor, &loose_floor_nmemb,
@@ -292,13 +295,33 @@ compare_loose_floors (const void *l0, const void *l1)
 }
 
 struct loose_floor *
+copy_loose_floor (struct loose_floor *to, struct loose_floor *from)
+{
+  /* loose floor has no useful state to preserve */
+  return to;
+}
+
+struct loose_floor *
 loose_floor_at_pos (struct pos *p)
 {
   struct loose_floor l;
   l.p = *p;
 
-  return bsearch (&l, loose_floor, loose_floor_nmemb, sizeof (l),
+  struct loose_floor *ll;
+
+ search:
+    ll = bsearch (&l, loose_floor, loose_floor_nmemb, sizeof (l),
                   compare_loose_floors);
+
+  if (ll && ll->action != FALL_LOOSE_FLOOR && fg (p) != LOOSE_FLOOR) {
+    remove_loose_floor (ll);
+    return NULL;
+  } else if (! ll && fg (p) == LOOSE_FLOOR) {
+    register_loose_floor (p);
+    goto search;
+  }
+
+  return ll;
 }
 
 void
@@ -328,6 +351,14 @@ compute_loose_floors (void)
 
   must_sort = false;
 
+  for (i = 0; i < loose_floor_nmemb;) {
+    struct loose_floor *l = &loose_floor[i];
+    if (fg (&l->p) == LOOSE_FLOOR || l->action == FALL_LOOSE_FLOOR) {
+      i++; continue;
+    }
+    remove_loose_floor (l);
+  }
+
   for (i = 0; i < loose_floor_nmemb; i++) {
     struct loose_floor *l = &loose_floor[i];
 
@@ -340,16 +371,6 @@ compute_loose_floors (void)
       break;
     case FALL_LOOSE_FLOOR: compute_loose_floor_fall (l); break;
     default: break;
-    }
-  }
-
- again:
-  for (i = 0; i < loose_floor_nmemb; i++) {
-    struct loose_floor *l = &loose_floor[i];
-    if (l->remove) {
-      must_sort = true;
-      remove_loose_floor (l);
-      goto again;
     }
   }
 
@@ -373,7 +394,7 @@ compute_loose_floor_shake (struct loose_floor *l)
   }
 
   if (prev_state != l->state)
-    register_changed_pos (&l->p, CHPOS_SHAKE_LOOSE_FLOOR);
+    register_changed_pos (&l->p);
 }
 
 void
@@ -403,10 +424,8 @@ compute_loose_floor_release (struct loose_floor *l)
   case 9: l->state = 2; l->i++; break;
   case 10:
     register_con_undo (&undo, &l->p,
-                       NO_FLOOR, MIGNORE, MIGNORE,
-                       false, false, false, false,
-                       CHPOS_LOOSE_FLOOR_FALL,
-                       "LOOSE FLOOR RELEASE");
+                       NO_FLOOR, MIGNORE, MIGNORE, MIGNORE,
+                       NULL, false, "LOOSE FLOOR RELEASE");
     l->state = 2;
     l->i = 0;
     l->f.parent_id = -1;
@@ -417,7 +436,7 @@ compute_loose_floor_release (struct loose_floor *l)
   }
 
   if (prev_state != l->state)
-    register_changed_pos (&l->p, CHPOS_RELEASE_LOOSE_FLOOR);
+    register_changed_pos (&l->p);
 }
 
 ALLEGRO_BITMAP *
@@ -550,21 +569,16 @@ compute_loose_floor_fall (struct loose_floor *l)
     }
     /* the floor hit the ground */
   } else {
-    struct loose_floor *m;
     p = fpmbo_f;
     switch (fcmbo_f) {
     case LOOSE_FLOOR: /* loose floor isn't ground */
-      m = loose_floor_at_pos (&fpmbo_f);
-      if (m) m->remove = true;
       l->f = nf;
       l->f.b = get_correct_falling_loose_floor_bitmap (dv_broken_floor);
       l->p = p;
       l->i = 0;
       register_con_undo (&undo, &p,
-                         NO_FLOOR, MIGNORE, MIGNORE,
-                         false, false, false, false,
-                         CHPOS_CHAIN_RELEASE_LOOSE_FLOOR,
-                         "LOOSE FLOOR CHAIN RELEASE");
+                         NO_FLOOR, MIGNORE, MIGNORE, MIGNORE,
+                         NULL, false, "LOOSE FLOOR CHAIN RELEASE");
       play_audio (&broken_floor_audio, &p, -1);
       alert_guards (&p);
       return;
@@ -581,13 +595,11 @@ compute_loose_floor_fall (struct loose_floor *l)
   enum confg f = fg (&p);
   if (f != LEVEL_DOOR && f != OPENER_FLOOR && f != CLOSER_FLOOR) {
     register_con_undo (&undo, &p,
-                       BROKEN_FLOOR, MIGNORE, NO_ITEM,
-                       false, false, false, false,
-                       CHPOS_BREAK_LOOSE_FLOOR,
-                       "LOOSE FLOOR BREAKING");
+                       BROKEN_FLOOR, MIGNORE, NO_ITEM, MIGNORE,
+                       NULL, false, "LOOSE FLOOR BREAKING");
   }
   shake_loose_floor_row (&p);
-  l->remove = true;
+  l->action = NO_LOOSE_FLOOR_ACTION;
   play_audio (&broken_floor_audio, &p, -1);
   alert_guards (&p);
 }
@@ -638,27 +650,12 @@ draw_falling_loose_floor (ALLEGRO_BITMAP *bitmap, struct pos *p,
   if (l->action == FALL_LOOSE_FLOOR) {
     struct frame f = l->f;
     frame2room (&f, room_view, &f.c);
-    struct coord tr, br;
-    struct pos fptr, nfptr, fpbr, nfpbr;
-    survey (_tr, posf, &f, &tr, &fptr, &nfptr);
-    survey (_br, posf, &f, &br, &fpbr, &nfpbr);
     f.b = get_correct_falling_loose_floor_bitmap (f.b);
     if (vm == VGA) f.b = apply_hue_palette (f.b);
     if (hgc) f.b = apply_palette (f.b, hgc_palette);
+    push_drawn_rectangle (bitmap);
     draw_frame (bitmap, &f);
-
-    int w = al_get_bitmap_width (f.b);
-    int h = al_get_bitmap_height (f.b);
-
-    set_target_bitmap (bitmap);
-    al_set_clipping_rectangle (f.c.x, f.c.y, w, h);
-
-    draw_confg_base (bitmap, &fptr, em, vm);
-    draw_confg_left (bitmap, &fptr, em, vm, true);
-    draw_confg_base (bitmap, &fpbr, em, vm);
-    draw_confg_left (bitmap, &fpbr, em, vm, true);
-
-    al_reset_clipping_rectangle ();
+    redraw_drawn_rectangle (pop_drawn_rectangle (), p, em, vm);
   } else return;
 }
 
@@ -666,6 +663,15 @@ void
 draw_loose_floor (ALLEGRO_BITMAP *bitmap, struct pos *p,
                   enum em em, enum vm vm)
 {
+  if (is_fake (p)) {
+    switch (abs (ext (p)) % 3) {
+    case 0: draw_floor (bitmap, p, em, vm); break;
+    case 1: draw_loose_floor_00 (bitmap, p, em, vm); break;
+    case 2: draw_loose_floor_01 (bitmap, p, em, vm); break;
+    }
+    return;
+  }
+
   struct loose_floor *l = loose_floor_at_pos (p);
   if (! l) return;
 
@@ -683,6 +689,15 @@ void
 draw_loose_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
                        enum em em, enum vm vm)
 {
+  if (is_fake (p)) {
+    switch (abs (ext (p)) % 3) {
+    case 0: draw_floor_base (bitmap, p, em, vm); break;
+    case 1: draw_loose_floor_00_base (bitmap, p, em, vm); break;
+    case 2: draw_loose_floor_01_base (bitmap, p, em, vm); break;
+    }
+    return;
+  }
+
   struct loose_floor *l = loose_floor_at_pos (p);
   if (! l) return;
 
@@ -697,6 +712,15 @@ void
 draw_loose_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
                        enum em em, enum vm vm)
 {
+  if (is_fake (p)) {
+    switch (abs (ext (p)) % 3) {
+    case 0: draw_floor_left (bitmap, p, em, vm); break;
+    case 1: draw_loose_floor_00_left (bitmap, p, em, vm); break;
+    case 2: draw_loose_floor_01_left (bitmap, p, em, vm); break;
+    }
+    return;
+  }
+
   struct loose_floor *l = loose_floor_at_pos (p);
   if (! l) return;
 
@@ -711,6 +735,15 @@ void
 draw_loose_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
                         enum em em, enum vm vm)
 {
+  if (is_fake (p)) {
+    switch (abs (ext (p)) % 3) {
+    case 0: draw_floor_right (bitmap, p, em, vm); break;
+    case 1: draw_loose_floor_00_right (bitmap, p, em, vm); break;
+    case 2: draw_loose_floor_01_right (bitmap, p, em, vm); break;
+    }
+    return;
+  }
+
   struct loose_floor *l = loose_floor_at_pos (p);
   if (! l) return;
 
@@ -965,6 +998,7 @@ loose_floor_fall_debug (void)
             cv.room, cv.x, cv.y,
             peq (&l->p, &pv),
             cpos (&l->p, &pv));
-    draw_falling_loose_floor (mr.cell[mr.dx][mr.dy].screen, &loose_floor[i].p, em, vm);
+    draw_falling_loose_floor (mr.cell[mr.dx][mr.dy].screen, &loose_floor[i].p,
+                              em, vm);
   }
 }

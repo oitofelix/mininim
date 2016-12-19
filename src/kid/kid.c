@@ -516,11 +516,11 @@ get_flicker_float_color (void)
 void
 kid_debug (void)
 {
-  struct anim *current_kid = get_anim_by_id (current_kid_id);
+  struct anim *k = get_anim_by_id (current_kid_id);
 
   /* begin kid hack */
-  if (was_key_pressed (ALLEGRO_KEY_DELETE, 0, 0, true)) current_kid->f.c.x--;
-  if (was_key_pressed (ALLEGRO_KEY_PGDN, 0, 0, true)) current_kid->f.c.x++;
+  if (was_key_pressed (ALLEGRO_KEY_DELETE, 0, 0, true)) k->f.c.x--;
+  if (was_key_pressed (ALLEGRO_KEY_PGDN, 0, 0, true)) k->f.c.x++;
 
   if (! cutscene && was_key_pressed (ALLEGRO_KEY_F1, 0, 0, true)) {
     /* static int px = 0; */
@@ -535,72 +535,27 @@ kid_debug (void)
     /* printf ("x = %i, y = %i, floor = %i, place = %i\n", px, py, (py -3) / 63, (px - 15) / 32); */
 
     struct coord bf; struct pos pbf, npbf;
-    survey (_bf, pos, &current_kid->f, &bf, &pbf, &npbf);
+    survey (_bf, pos, &k->f, &bf, &pbf, &npbf);
 
-    int dn = dist_next_place (&current_kid->f, _bf, pos, 0, false);
-    int dp = dist_next_place (&current_kid->f, _bf, pos, 0, true);
-    /* int dc = dist_collision (&current_kid->f, false, &current_kid->ci) + 4; */
-    int dc = dist_collision (&current_kid->f, false, &current_kid->ci);
-    int dcb = dist_collision (&current_kid->f, true, &current_kid->ci);
-    int df = dist_fall (&current_kid->f, false);
-    int dl = dist_con (&current_kid->f, _bf, pos, -4, false, LOOSE_FLOOR);
-    int dcl = dist_con (&current_kid->f, _bf, pos, -4, false, CLOSER_FLOOR);
-    int dch = dist_chopper (&current_kid->f, false);
-    int de = dist_enemy (current_kid);
+    struct pos ptf;
+    survey (_tf, pos, &k->f, NULL, &ptf, NULL);
+    struct pos pm;
+    survey (_m, pos, &k->f, NULL, &pm, NULL);
+
+    int dn = dist_next_place (&k->f, _tb, pos, 0, false);
+    int dp = dist_next_place (&k->f, _tf, pos, 0, true);
+    int dc = dist_collision (&k->f, _bf, -4, -4, &k->ci);
+    int dcb = dist_collision (&k->f, _bb, +0, +0, &k->ci);
+    int df = dist_fall (&k->f, false);
+    int dl = dist_con (&k->f, _bf, pos, -4, false, LOOSE_FLOOR);
+    int dcl = dist_con (&k->f, _bf, pos, -4, false, CLOSER_FLOOR);
+    int dch = dist_chopper (&k->f, false);
+    int de = dist_enemy (k);
 
       printf ("\
 f = %i, p = %i, dn = %i, dp = %i, dc = %i, dcb = %i, df = %i, dl = %i, dcl = %i, dch = %i, de = %i\n",
               pbf.floor, pbf.place, dn, dp, dc, dcb, df, dl, dcl, dch, de);
+
   }
   /* end kid hack */
-}
-
-bool
-kid_door_split_collision (struct anim *k)
-{
-  struct pos ptb, ptf;
-
-  survey (_tb, pos, &k->f, NULL, &ptb, NULL);
-  survey (_tf, pos, &k->f, NULL, &ptf, NULL);
-
-  int dntb = dist_next_place (&k->f, _tb, pos, +0, false);
-  int dptf = dist_next_place (&k->f, _tf, pos, +0, true);
-
-  if (k->f.dir == RIGHT
-      && fg (&ptb) == DOOR
-      && is_collidable_at_right (&ptb, &k->f)
-      && dntb >= 7 && dntb <= 16) {
-    prel (&ptb, &k->ci.kid_p, +0, +1);
-    kid_stabilize_collision (k);
-    return true;
-  }
-
-  if (k->f.dir == RIGHT
-      && fg (&ptb) == DOOR
-      && is_collidable_at_right (&ptb, &k->f)
-      && dntb <= 6) {
-    k->ci.kid_p = ptb;
-    kid_stabilize_back_collision (k);
-    return true;
-  }
-
-  if (k->f.dir == LEFT
-      && fg (&ptf) == DOOR
-      && is_collidable_at_right (&ptf, &k->f)
-      && dptf <= 11) {
-    k->ci.kid_p = ptf;
-    kid_stabilize_collision (k);
-    return true;
-  }
-
-  if (k->f.dir == LEFT
-      && fg (&ptf) == DOOR
-      && is_collidable_at_right (&ptf, &k->f)
-      && dptf >= 12 && dptf <= 18) {
-    prel (&ptf, &k->ci.kid_p, +0, +1);
-    kid_stabilize_back_collision (k);
-    return true;
-  }
-
-  return false;
 }

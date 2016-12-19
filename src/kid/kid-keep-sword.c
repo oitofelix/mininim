@@ -134,7 +134,7 @@ static bool
 physics_in (struct anim *k)
 {
   /* collision */
-  uncollide (&k->f, &k->fo, &k->fo, +0, true, &k->ci);
+  uncollide (&k->f, &k->fo, _bb, +5, +0, &k->fo, NULL);
 
   return true;
 }

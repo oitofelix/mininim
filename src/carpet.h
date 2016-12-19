@@ -59,9 +59,9 @@
 void load_carpet (void);
 void unload_carpet (void);
 void draw_carpet_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                        enum em em, enum vm vm);
+                        int w, enum em em, enum vm vm);
 void draw_carpet_top (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                      enum em em, enum vm vm);
+                      int w, enum em em, enum vm vm);
 void draw_carpet_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
                      struct frame *f, enum em em, enum vm vm);
 struct coord *carpet_coord (struct pos *p, struct coord *c);

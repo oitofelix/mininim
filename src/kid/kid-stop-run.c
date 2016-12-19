@@ -109,21 +109,14 @@ physics_in (struct anim *k)
   k->cinertia = 6;
 
   /* collision */
-  struct pos pml, pmr;
-  survey (_ml, pos, &k->f, NULL, &pml, NULL);
-  survey (_mr, pos, &k->f, NULL, &pmr, NULL);
-
-  if (is_colliding (&k->f, &k->fo, +0, false, &k->ci)) {
-    if ((k->f.dir == LEFT
-         && is_collidable_at_left (&pmr, &k->f))
-        || (k->f.dir == RIGHT
-            && is_collidable_at_right (&pml, &k->f))) {
-      kid_stabilize_collision (k);
-      return false;
-    } else if (k->i < 2 || fg (&k->ci.con_p) != WALL)
-      uncollide (&k->f, &k->fo, &k->fo, +0, false, &k->ci);
-    else uncollide (&k->f, &k->fo, &k->fo, -4, false, &k->ci);
-  }
+  if (k->f.dir == LEFT
+      && uncollide (&k->f, &k->fo, _bf, +0, +0, NULL, &k->ci)
+      && fg (&k->ci.con_p) == MIRROR)
+    uncollide (&k->f, &k->fo, _bf, +4, +0, &k->fo, &k->ci);
+  else uncollide (&k->f, &k->fo, _bf,
+                  COLLISION_FRONT_LEFT_NORMAL + k->i <= 2 ? -4 : 0,
+                  COLLISION_FRONT_RIGHT_NORMAL,
+                  &k->fo, NULL);
 
   /* fall */
   survey (_tf, pos, &k->f, NULL, &ptf, NULL);

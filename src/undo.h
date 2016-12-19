@@ -29,21 +29,16 @@ void ui_undo_pass (struct undo *u, int dir, char *prefix);
 
 /* CON */
 void register_con_undo (struct undo *u, struct pos *p,
-                        int f, int b, int e,
-                        bool destroy, bool register, bool prepare,
-                        bool ignore_intermediate, enum changed_pos_reason reason,
+                        int f, int b, int e, int ff,
+                        union con_state *cs,
+                        bool ignore_intermediate,
                         char *desc);
 void con_undo (struct con_undo *d, int dir);
 
 /* MIRROR POS */
 void register_mirror_pos_undo (struct undo *u, struct pos *p0, struct pos *p1,
-                                 bool prepare, bool invert_dir, char *desc);
+                               bool invert_dir, char *desc);
 void mirror_pos_undo (struct mirror_pos_undo *d, int dir);
-
-/* ROOM */
-void register_room_undo (struct undo *u, int room, struct con c[FLOORS][PLACES],
-                         char *desc);
-void room_undo (struct room_undo *d, int dir);
 
 /* LEVEL */
 void register_level_undo (struct undo *u, struct level *l,
@@ -72,8 +67,8 @@ void v_room_mirror_con_undo (int *room, int dir);
 
 /* RANDOM ROOM CON MIRROR */
 void register_random_room_mirror_con_undo (struct undo *u, int _room,
-                                             bool prepare, bool invert_dir,
-                                             char *desc);
+                                           bool invert_dir,
+                                           char *desc);
 void random_room_mirror_con_undo (struct random_room_mirror_con_undo *d, int dir);
 
 /* LINK */

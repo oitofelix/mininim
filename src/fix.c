@@ -126,7 +126,7 @@ fix_door_lacking_opener (struct pos *p)
     /* fprintf (stderr, "%s: replaced %s by %s at pos (%i, %i, %i)\n", */
     /*          __func__, "DOOR", "FLOOR", p->room, p->floor, p->place); */
 
-    set_con (p, FLOOR, NO_BG, NO_ITEM);
+    set_con (p, FLOOR, NO_BG, NO_ITEM, NO_FAKE);
   }
 
   return p;
@@ -153,7 +153,7 @@ fix_opener_or_closer_lacking_door (struct pos *p)
     /*          __func__, fg (p) == OPENER_FLOOR ? "OPENER_FLOOR" : "CLOSER_FLOOR", */
     /*          ext (p), "FLOOR", p->room, p->floor, p->place); */
 
-    set_con (p, FLOOR, NO_BG, NO_ITEM);
+    set_con (p, FLOOR, NO_BG, NO_ITEM, NO_FAKE);
   }
 
   return p;
@@ -230,7 +230,7 @@ fix_room_0 (struct level *l)
   struct pos p; new_pos (&p, l, 0, -1, -1);
   for (p.floor = 0; p.floor < FLOORS; p.floor++)
     for (p.place = 0; p.place < PLACES; p.place++)
-      set_con (&p, WALL, NO_BG, 0);
+      set_con (&p, WALL, NO_BG, NO_ITEM, NO_FAKE);
 }
 
 /* fix rooms above room 0 in case they have traversable cons at the

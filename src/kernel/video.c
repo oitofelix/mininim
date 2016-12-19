@@ -44,6 +44,13 @@ static struct palette_cache {
 } *palette_cache = NULL;
 static size_t palette_cache_nmemb = 0;
 
+static struct drawn_rectangle drawn_rectangle_stack[DRAWN_RECTANGLE_STACK_NMEMB_MAX];
+static size_t drawn_rectangle_stack_nmemb;
+
+static struct clipping_rectangle clipping_rectangle_stack[CLIPPING_RECTANGLE_STACK_NMEMB_MAX];
+static size_t clipping_rectangle_stack_nmemb;
+bool ignore_clipping_rectangle_intersection;
+
 void
 init_video (void)
 {
@@ -253,17 +260,28 @@ convert_mask_to_alpha (ALLEGRO_BITMAP *bitmap, ALLEGRO_COLOR mask_color)
 }
 
 void
-draw_bitmap (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to, float dx, float dy, int flags)
+draw_bitmap (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
+             float dx, float dy, int flags)
 {
-  set_target_bitmap (to);
-  al_draw_bitmap (from, dx, dy, flags);
+  draw_bitmap_region (from, to, 0, 0,
+                      al_get_bitmap_width (from),
+                      al_get_bitmap_height (from),
+                      dx, dy, flags);
 }
 
 void
-draw_bitmap_region (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to, float sx, float sy,
-                    float sw, float sh, float dx, float dy, int flags)
+draw_bitmap_region (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
+                    float sx, float sy, float sw, float sh,
+                    float dx, float dy, int flags)
 {
+  merge_drawn_rectangle (to, dx, dy, sw, sh);
   set_target_bitmap (to);
+
+  int cx, cy, cw, ch;
+  al_get_clipping_rectangle (&cx, &cy, &cw, &ch);
+
+  if (cw <= 0 || ch <= 0) return;
+
   al_draw_bitmap_region (from, sx, sy, sw, sh, dx, dy, flags);
 }
 
@@ -296,13 +314,23 @@ draw_bottom_text (ALLEGRO_BITMAP *bitmap, char *text, int priority)
 {
   static char *current_text = NULL;
   static int cur_priority = INT_MIN;
+  static int text_offset = 0;
+  static int dir = 0;
+  static uint64_t cycle = 0;
 
   if (bitmap == NULL && priority < cur_priority
       && bottom_text_timer < BOTTOM_TEXT_DURATION)
     return;
 
   if (text) {
-    if (current_text) al_free (current_text);
+    if (current_text) {
+      if (strcmp (text, current_text)) {
+        text_offset = 0;
+        dir = 0;
+        cycle = 0;
+      }
+      al_free (current_text);
+    }
     xasprintf (&current_text, "%s", text);
     bottom_text_timer = 1;
     cur_priority = priority;
@@ -319,11 +347,31 @@ draw_bottom_text (ALLEGRO_BITMAP *bitmap, char *text, int priority)
     case VGA: bg_color = V_MSG_LINE_COLOR; break;
     }
 
+    if (strlen (current_text) > BOTTOM_TEXT_MAX_LENGTH) {
+      if (cycle++ % 2) {
+        if (dir % 2) {
+          if (strlen (current_text + text_offset) > BOTTOM_TEXT_MAX_LENGTH)
+            text_offset++;
+          else
+            dir = (dir + 1) % 2;
+        } else {
+          if (text_offset > 0)
+            text_offset--;
+          else
+            dir = (dir + 1) % 2;
+        }
+      }
+    }
+
+    char str[BOTTOM_TEXT_MAX_LENGTH + 1];
+    strncpy (str, current_text + text_offset, BOTTOM_TEXT_MAX_LENGTH);
+    str[BOTTOM_TEXT_MAX_LENGTH] = '\0';
+
     set_target_bitmap (bitmap);
     al_draw_filled_rectangle (0, CUTSCENE_HEIGHT - 8,
                               CUTSCENE_WIDTH, CUTSCENE_HEIGHT,
                               bg_color);
-    draw_text (bitmap, current_text,
+    draw_text (bitmap, str,
                CUTSCENE_WIDTH / 2.0, CUTSCENE_HEIGHT - 7,
                ALLEGRO_ALIGN_CENTRE);
   }
@@ -675,4 +723,222 @@ process_display_events (void)
       quit_game ();
       break;
     }
+}
+
+bool
+intersection_rectangle (int x0, int y0, int w0, int h0,
+                        int x1, int y1, int w1, int h1,
+                        int *xrp, int *yrp, int *wrp, int *hrp)
+{
+  if (w0 <= 0 || h0 <= 0 || w1 <= 0 || h1 <= 0) {
+    *xrp = 0;
+    *yrp = 0;
+    *wrp = 0;
+    *hrp = 0;
+    return false;
+  }
+
+  int xr = max_int (x0, x1);
+  int yr = max_int (y0, y1);
+
+  int x0b = x0 + w0 - 1;
+  int y0b = y0 + h0 - 1;
+  int x1b = x1 + w1 - 1;
+  int y1b = y1 + h1 - 1;
+
+  int xrb = min_int (x0b, x1b);
+  int yrb = min_int (y0b, y1b);
+
+  int wr = xrb - xr + 1;
+  int hr = yrb - yr + 1;
+
+  *xrp = xr;
+  *yrp = yr;
+  *wrp = wr > 0 ? wr : 0;
+  *hrp = hr > 0 ? hr : 0;
+
+  return wr > 0 && hr > 0;
+}
+
+bool
+union_rectangle (int x0, int y0, int w0, int h0,
+                 int x1, int y1, int w1, int h1,
+                 int *xrp, int *yrp, int *wrp, int *hrp)
+{
+  if ((w0 <= 0 || h0 <= 0) && (w1 > 0 && h1 > 0)) {
+    *xrp = x1;
+    *yrp = y1;
+    *wrp = w1;
+    *hrp = h1;
+    return true;
+  } else if ((w1 <= 0 || h1 <= 0) && (w0 > 0 && h0 > 0)) {
+    *xrp = x0;
+    *yrp = y0;
+    *wrp = w0;
+    *hrp = h0;
+    return true;
+  } else if ((w0 <= 0 || h0 <= 0) && (w1 <= 0 && h1 <= 0)) {
+    *xrp = 0;
+    *yrp = 0;
+    *wrp = 0;
+    *hrp = 0;
+    return false;
+  }
+
+  int xr = min_int (x0, x1);
+  int yr = min_int (y0, y1);
+
+  int x0b = x0 + w0 - 1;
+  int y0b = y0 + h0 - 1;
+  int x1b = x1 + w1 - 1;
+  int y1b = y1 + h1 - 1;
+
+  int xrb = max_int (x0b, x1b);
+  int yrb = max_int (y0b, y1b);
+
+  int wr = xrb - xr + 1;
+  int hr = yrb - yr + 1;
+
+  *xrp = xr;
+  *yrp = yr;
+  *wrp = wr > 0 ? wr : 0;
+  *hrp = hr > 0 ? hr : 0;
+
+  return wr > 0 && hr > 0;
+}
+
+struct drawn_rectangle *
+push_drawn_rectangle (ALLEGRO_BITMAP *bitmap)
+{
+  assert (drawn_rectangle_stack_nmemb < DRAWN_RECTANGLE_STACK_NMEMB_MAX);
+
+  /* push onto stack */
+  size_t i = drawn_rectangle_stack_nmemb;
+  drawn_rectangle_stack[i].bitmap = bitmap;
+  drawn_rectangle_stack[i].x = 0;
+  drawn_rectangle_stack[i].y = 0;
+  drawn_rectangle_stack[i].w = 0;
+  drawn_rectangle_stack[i].h = 0;
+  drawn_rectangle_stack_nmemb++;
+
+  return &drawn_rectangle_stack[i];
+}
+
+struct drawn_rectangle *
+get_drawn_rectangle (ALLEGRO_BITMAP *bitmap)
+{
+  int i;
+  for (i = drawn_rectangle_stack_nmemb - 1;
+       i >= 0 && drawn_rectangle_stack[i].bitmap != bitmap; i--);
+  if (i < 0) return NULL;
+  return &drawn_rectangle_stack[i];
+}
+
+struct drawn_rectangle *
+merge_drawn_rectangle (ALLEGRO_BITMAP *bitmap, int x, int y, int w, int h)
+{
+  struct drawn_rectangle *dr = get_drawn_rectangle (bitmap);
+  if (! dr) return NULL;
+  union_rectangle (dr->x, dr->y, dr->w, dr->h,
+                   x, y, w, h,
+                   &dr->x, &dr->y, &dr->w, &dr->h);
+  return dr;
+}
+
+struct drawn_rectangle *
+pop_drawn_rectangle (void)
+{
+  assert (drawn_rectangle_stack_nmemb > 0);
+  drawn_rectangle_stack_nmemb--;
+  return &drawn_rectangle_stack[drawn_rectangle_stack_nmemb];
+}
+
+void
+push_clipping_rectangle (ALLEGRO_BITMAP *bitmap, int x, int y, int w, int h)
+{
+  assert (clipping_rectangle_stack_nmemb < CLIPPING_RECTANGLE_STACK_NMEMB_MAX);
+
+  set_target_bitmap (bitmap);
+
+  /* save current */
+  int cx, cy, cw, ch;
+  al_get_clipping_rectangle (&cx, &cy, &cw, &ch);
+  size_t i = clipping_rectangle_stack_nmemb;
+  clipping_rectangle_stack[i].bitmap = bitmap;
+  clipping_rectangle_stack[i].x = cx;
+  clipping_rectangle_stack[i].y = cy;
+  clipping_rectangle_stack[i].w = cw;
+  clipping_rectangle_stack[i].h = ch;
+  clipping_rectangle_stack_nmemb++;
+
+  /* intersection */
+  if (! ignore_clipping_rectangle_intersection)
+    intersection_rectangle (x, y, w, h,
+                            cx, cy, cw, ch,
+                            &x, &y, &w, &h);
+
+  /* set new */
+  al_set_clipping_rectangle (x, y, w, h);
+}
+
+void
+push_reset_clipping_rectangle (ALLEGRO_BITMAP *bitmap)
+{
+  int w = bitmap ? al_get_bitmap_width (bitmap) : 0;
+  int h = bitmap ? al_get_bitmap_height (bitmap) : 0;
+  push_clipping_rectangle (bitmap, 0, 0, w, h);
+}
+
+bool
+merge_clipping_rectangle (ALLEGRO_BITMAP *bitmap, int x, int y, int w, int h)
+{
+  assert (clipping_rectangle_stack_nmemb > 0);
+
+  int i;
+  for (i = clipping_rectangle_stack_nmemb - 1;
+       i >= 0 && clipping_rectangle_stack[i].bitmap != bitmap; i--);
+  if (i < 0) return false;
+
+  set_target_bitmap (clipping_rectangle_stack[i].bitmap);
+
+  /* get current */
+  int cx, cy, cw, ch;
+  al_get_clipping_rectangle (&cx, &cy, &cw, &ch);
+
+  /* union */
+  int xr, yr, wr, hr;
+  union_rectangle (x, y, w, h,
+                   cx, cy, cw, ch,
+                   &xr, &yr, &wr, &hr);
+
+  /* intersection */
+  if (! ignore_clipping_rectangle_intersection) {
+    int xs = clipping_rectangle_stack[i].x;
+    int ys = clipping_rectangle_stack[i].y;
+    int ws = clipping_rectangle_stack[i].w;
+    int hs = clipping_rectangle_stack[i].h;
+    intersection_rectangle (xr, yr, wr, hr,
+                            xs, ys, ws, hs,
+                            &xr, &yr, &wr, &hr);
+  }
+
+  /* set new */
+  al_set_clipping_rectangle (xr, yr, wr, hr);
+  return true;
+}
+
+void
+pop_clipping_rectangle (void)
+{
+  assert (clipping_rectangle_stack_nmemb > 0);
+
+  size_t i = clipping_rectangle_stack_nmemb - 1;
+  ALLEGRO_BITMAP *bitmap = clipping_rectangle_stack[i].bitmap;
+  int x = clipping_rectangle_stack[i].x;
+  int y = clipping_rectangle_stack[i].y;
+  int w = clipping_rectangle_stack[i].w;
+  int h = clipping_rectangle_stack[i].h;
+  set_target_bitmap (bitmap);
+  al_set_clipping_rectangle (x, y, w, h);
+  clipping_rectangle_stack_nmemb--;
 }

@@ -59,6 +59,8 @@ void load_opener_floor (void);
 void unload_opener_floor (void);
 void register_opener_floor (struct pos *p);
 int compare_opener_floors (const void *o0, const void *o1);
+struct opener_floor *copy_opener_floor (struct opener_floor *to,
+                                        struct opener_floor *from);
 struct opener_floor *opener_floor_at_pos (struct pos *p);
 struct opener_floor *opener_floor_by_event (struct pos *p, int event, int dir);
 void remove_opener_floor (struct opener_floor *o);

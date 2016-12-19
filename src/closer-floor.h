@@ -59,6 +59,8 @@ void load_closer_floor (void);
 void unload_closer_floor (void);
 void register_closer_floor (struct pos *p);
 int compare_closer_floors (const void *c0, const void *c1);
+struct closer_floor *copy_closer_floor (struct closer_floor *to,
+                                        struct closer_floor *from);
 struct closer_floor * closer_floor_at_pos (struct pos *p);
 struct closer_floor *closer_floor_by_event (struct pos *p, int event, int dir);
 void remove_closer_floor (struct closer_floor *c);

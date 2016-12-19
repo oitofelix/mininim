@@ -37,15 +37,12 @@ struct level *normalize_level (struct level *l);
 
 void replace_playing_level (struct level *l);
 void play_level (struct level *level);
-void register_con_at_pos (struct pos *p);
-void register_room (int room);
-void register_cons (void);
+void *con_struct_at_pos (struct pos *p);
+bool should_destroy (struct con *c0, struct con *c1);
+void copy_to_con_state (union con_state *to, struct pos *from_pos);
+void copy_from_con_state (struct pos *to_pos, union con_state *from);
 void destroy_con_at_pos (struct pos *p);
-void destroy_room (int room);
 void destroy_cons (void);
-void prepare_con_at_pos (struct pos *p);
-void prepare_room (int room);
-void prepare_view (void);
 void register_anims (void);
 void display_remaining_time (void);
 void display_skill (struct anim *k);
@@ -62,9 +59,5 @@ bool level_event_eq (struct level_event *le0,
 bool guard_eq (struct guard *g0, struct guard *g1);
 bool con_eq (struct con *c0, struct con *c1);
 bool level_eq (struct level *l0, struct level *l1);
-
-/* not used */
-void apply_to_diff_pos (struct diff *d, void (*func) (struct pos *p));
-void diff_level_undo (struct diffset *diffset, int dir, char *prefix);
 
 #endif	/* MININIM_LEVEL_H */

@@ -146,13 +146,13 @@ physics_in (struct anim *k)
   k->cinertia = 6;
 
   /* collision */
-  if (is_colliding (&k->f, &k->fo, +0, false, &k->ci)) {
+  if (uncollide (&k->f, &k->fo, _bf, -4, -4, NULL, &k->ci)) {
     kid_stabilize_collision (k);
     return false;
   }
 
   /* fall */
-  survey (_tf, pos, &k->f, NULL, &ptf, NULL);
+  surveyo (_tf, -4, +0, pos, &k->f, NULL, &ptf, NULL);
   if (is_strictly_traversable (&ptf)) {
     play_audio (&step_audio, NULL, k->id);
     kid_fall (k);

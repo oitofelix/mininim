@@ -117,15 +117,12 @@ unload_opener_floor (void)
 void
 register_opener_floor (struct pos *p)
 {
-  assert (fg (p) == OPENER_FLOOR
-          && opener_floor_at_pos (p) == NULL);
-
   struct opener_floor o;
 
   int n, f;
   typed_int (ext (p), EVENTS, 2, &n, &f);
 
-  o.p = *p;
+  npos (p, &o.p);
   o.event = n;
   o.pressed = f;
   o.noise = f;
@@ -148,13 +145,35 @@ compare_opener_floors (const void *o0, const void *o1)
 }
 
 struct opener_floor *
+copy_opener_floor (struct opener_floor *to, struct opener_floor *from)
+{
+  struct pos p = to->p;
+  *to = *from;
+  to->p = p;
+  return to;
+}
+
+struct opener_floor *
 opener_floor_at_pos (struct pos *p)
 {
   struct opener_floor o;
   o.p = *p;
 
-  return bsearch (&o, opener_floor, opener_floor_nmemb, sizeof (o),
-                  compare_opener_floors);
+  struct opener_floor *oo;
+
+ search:
+  oo = bsearch (&o, opener_floor, opener_floor_nmemb, sizeof (o),
+                compare_opener_floors);
+
+  if (oo && fg (p) != OPENER_FLOOR) {
+    remove_opener_floor (oo);
+    return NULL;
+  } else if (! oo && fg (p) == OPENER_FLOOR) {
+    register_opener_floor (p);
+    goto search;
+  }
+
+  return oo;
 }
 
 struct opener_floor *
@@ -201,9 +220,9 @@ press_opener_floor (struct pos *p)
   o->pressed = true;
 
   if (! o->prev_pressed) {
-     register_changed_pos (p, CHPOS_PRESS_OPENER_FLOOR);
-     o->prev_pressed = true;
-     o->priority = anim_cycle;
+    register_changed_pos (&o->p);
+    o->prev_pressed = true;
+    o->priority = anim_cycle;
   }
 }
 
@@ -212,14 +231,12 @@ break_opener_floor (struct pos *p)
 {
   struct opener_floor *o = opener_floor_at_pos (p);
   if (! o) return;
-  o->broken = true;
   open_door (o->p.l, o->event, anim_cycle, true);
   register_con_undo
     (&undo, p,
-     MIGNORE, MIGNORE, o->event + EVENTS,
-     false, false, false, false,
-     CHPOS_BREAK_OPENER_FLOOR,
-     "LOOSE FLOOR BREAKING");
+     MIGNORE, MIGNORE, o->event + EVENTS, MIGNORE,
+     NULL, false, "LOOSE FLOOR BREAKING");
+  o->broken = true;
 }
 
 void
@@ -237,17 +254,25 @@ void
 register_changed_opener_floors (void)
 {
   size_t i;
-  for (i = 0; i < opener_floor_nmemb; i++)
-    if (opener_floor[i].prev_pressed !=
-        opener_floor[i].pressed)
-      register_changed_pos (&opener_floor[i].p,
-                            CHPOS_UNPRESS_OPENER_FLOOR);
+  for (i = 0; i < opener_floor_nmemb; i++) {
+    struct opener_floor *o = &opener_floor[i];
+    if (o->prev_pressed != o->pressed)
+      register_changed_pos (&o->p);
+  }
 }
 
 void
 compute_opener_floors (void)
 {
   size_t i;
+
+  for (i = 0; i < opener_floor_nmemb;) {
+    struct opener_floor *o = &opener_floor[i];
+    if (fg (&o->p) == OPENER_FLOOR) {
+      i++; continue;
+    }
+    remove_opener_floor (o);
+  }
 
   for (i = 0; i < opener_floor_nmemb; i++) {
     struct opener_floor *o = &opener_floor[i];
@@ -266,6 +291,11 @@ void
 draw_opener_floor (ALLEGRO_BITMAP *bitmap, struct pos *p,
                    enum em em, enum vm vm)
 {
+  if (is_fake (p)) {
+    draw_unpressed_opener_floor (bitmap, p, em, vm);
+    return;
+  }
+
   struct opener_floor *o = opener_floor_at_pos (p);
   if (! o) return;
 
@@ -282,6 +312,11 @@ void
 draw_opener_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
                         enum em em, enum vm vm)
 {
+  if (is_fake (p)) {
+    draw_unpressed_opener_floor_base (bitmap, p, em, vm);
+    return;
+  }
+
   struct opener_floor *o = opener_floor_at_pos (p);
   if (! o) return;
 
@@ -298,6 +333,11 @@ void
 draw_opener_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
                         enum em em, enum vm vm)
 {
+  if (is_fake (p)) {
+    draw_unpressed_opener_floor_left (bitmap, p, em, vm);
+    return;
+  }
+
   struct opener_floor *o = opener_floor_at_pos (p);
   if (! o) return;
 
@@ -314,6 +354,11 @@ void
 draw_opener_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
                          enum em em, enum vm vm)
 {
+  if (is_fake (p)) {
+    draw_unpressed_opener_floor_right (bitmap, p, em, vm);
+    return;
+  }
+
   struct opener_floor *o = opener_floor_at_pos (p);
   if (! o) return;
 
@@ -330,6 +375,8 @@ void
 draw_opener_floor_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
                       enum em em, enum vm vm)
 {
+  if (is_fake (p)) return;
+
   struct opener_floor *o = opener_floor_at_pos (p);
   if (! o) return;
 

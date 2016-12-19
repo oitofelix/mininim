@@ -69,6 +69,27 @@ ALLEGRO_BITMAP *apply_palette (ALLEGRO_BITMAP *bitmap, palette p);
 ALLEGRO_BITMAP *get_cached_palette (ALLEGRO_BITMAP *bitmap, palette p);
 ALLEGRO_COLOR hgc_palette (ALLEGRO_COLOR c);
 
+/* drawn and clipping rectangle */
+bool intersection_rectangle (int x0, int y0, int w0, int h0,
+                             int x1, int y1, int w1, int h1,
+                             int *xrp, int *yrp, int *wrp, int *hrp);
+bool union_rectangle (int x0, int y0, int w0, int h0,
+                      int x1, int y1, int w1, int h1,
+                      int *xrp, int *yrp, int *wrp, int *hrp);
+
+struct drawn_rectangle *push_drawn_rectangle (ALLEGRO_BITMAP *bitmap);
+struct drawn_rectangle *get_drawn_rectangle (ALLEGRO_BITMAP *bitmap);
+struct drawn_rectangle *merge_drawn_rectangle (ALLEGRO_BITMAP *bitmap,
+                                               int x, int y, int w, int h);
+struct drawn_rectangle *pop_drawn_rectangle (void);
+
+void push_clipping_rectangle (ALLEGRO_BITMAP *bitmap,
+                              int x, int y, int w, int h);
+void push_reset_clipping_rectangle (ALLEGRO_BITMAP *bitmap);
+bool merge_clipping_rectangle (ALLEGRO_BITMAP *bitmap, int x, int y,
+                               int w, int h);
+void pop_clipping_rectangle (void);
+
 /* variables */
 extern bool force_full_redraw;
 extern ALLEGRO_DISPLAY *display;
@@ -86,5 +107,6 @@ extern bool is_display_focused;
 extern int effect_counter;
 extern void (*load_callback) (void);
 extern int display_mode;
+extern bool ignore_clipping_rectangle_intersection;
 
 #endif	/* MININIM_VIDEO_H */

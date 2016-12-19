@@ -39,8 +39,30 @@ unload_stars (void)
 }
 
 void
-generate_stars_for_pos (struct pos *p)
+free_stars (struct pos *p)
 {
+  if (bg (p) == BALCONY) return;
+
+  struct pos np; npos (p, &np);
+  int x, y;
+  if (! mr_coord (np.room, -1, &x, &y)) return;
+
+  struct stars *stars = &mr.cell[x][y].stars[np.floor][np.place];
+
+  if (! stars->b || ! stars->s || ! stars->count) return;
+
+  destroy_bitmap (stars->b);
+  stars->b = NULL;
+  if (stars->s) al_free (stars->s);
+  stars->s = NULL;
+  stars->count = 0;
+}
+
+void
+generate_stars (struct pos *p)
+{
+  if (bg (p) != BALCONY) return;
+
   struct pos np; npos (p, &np);
   int x, y;
   if (! mr_coord (np.room, -1, &x, &y)) return;
@@ -51,8 +73,6 @@ generate_stars_for_pos (struct pos *p)
   if (stars->s) al_free (stars->s);
   stars->s = NULL;
   stars->count = 0;
-
-  if (bg (&np) != BALCONY) return;
 
   stars->count = 3 + prandom_pos (&np, 5);
   stars->s = xcalloc (stars->count, sizeof (* stars->s));
@@ -75,33 +95,6 @@ generate_stars_for_pos (struct pos *p)
   new_coord (&stars->c, np.l, np.room, min_x, min_y);
 
   redraw_stars_bitmap (stars, vm);
-}
-
-void
-generate_stars_for_room (int room)
-{
-  struct pos p; new_pos (&p, &global_level, room, -1, -1);
-  for (p.floor = FLOORS; p.floor >= -1; p.floor--)
-    for (p.place = -1; p.place < PLACES; p.place++)
-      generate_stars_for_pos (&p);
-}
-
-void
-generate_stars_for_cell (int x, int y)
-{
-  struct pos p; new_pos (&p, &global_level, mr.cell[x][y].room, -1, -1);
-  for (p.floor = FLOORS; p.floor >= -1; p.floor--)
-    for (p.place = -1; p.place < PLACES; p.place++)
-      generate_stars_for_pos (&p);
-}
-
-void
-generate_stars (void)
-{
-  int x, y;
-  for (y = mr.h - 1; y >= 0; y--)
-    for (x = 0; x < mr.w; x++)
-      if (mr.cell[x][y].room) generate_stars_for_cell (x, y);
 }
 
 static ALLEGRO_COLOR
@@ -215,6 +208,9 @@ draw_balcony_stars (ALLEGRO_BITMAP *bitmap, struct pos *p, enum vm vm)
   if (! np.room) return;
 
   struct stars *stars = &mr.cell[mr.dx][mr.dy].stars[np.floor][np.place];
+
+  if (! stars->b || ! stars->s || ! stars->count)
+    generate_stars (p);
 
   if (vm != mr.last.vm) redraw_stars_bitmap (stars, vm);
 

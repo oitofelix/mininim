@@ -39,22 +39,27 @@ void draw_filled_rect (ALLEGRO_BITMAP *to, struct rect *r,
 void clear_rect_to_color (ALLEGRO_BITMAP *to, struct rect *r,
                           ALLEGRO_COLOR color);
 
+void redraw_drawn_rectangle (struct drawn_rectangle *dr, struct pos *p,
+                             enum em em, enum vm vm);
+
 void draw_room (ALLEGRO_BITMAP *bitmap, int room,
                 enum em em, enum vm vm);
+void draw_con (ALLEGRO_BITMAP *bitmap, struct pos *p,
+               enum em em, enum vm vm);
 void draw_conbg (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                 enum em em, enum vm vm, bool redraw);
+                 enum em em, enum vm vm);
 void draw_confg (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                 enum em em, enum vm vm, bool redraw);
+                 enum em em, enum vm vm);
 void draw_confg_no_top (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                        enum em em, enum vm vm, bool redraw);
+                        enum em em, enum vm vm);
 void draw_confg_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
                       enum em em, enum vm vm);
 void draw_confg_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                      enum em em, enum vm vm, bool redraw);
+                      enum em em, enum vm vm);
 void draw_confg_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                       enum em em, enum vm vm, bool redraw);
+                       enum em em, enum vm vm);
 void draw_confg_top (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                     enum em em, enum vm vm, bool redraw);
+                     enum em em, enum vm vm);
 void draw_room_anim_fg (ALLEGRO_BITMAP *bitmap,
                         enum em em, enum vm vm, struct anim *a);
 void draw_confg_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,

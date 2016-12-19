@@ -72,7 +72,15 @@ bool frame_eq (struct frame *f0, struct frame *f1);
 struct frame *invert_frame_dir (struct frame *f0, struct frame *f1);
 bool wait_anim (int cycles);
 ALLEGRO_COLOR start_anim_palette (ALLEGRO_COLOR c);
-
+bool uncollide_static_neutral (struct anim *a);
+bool uncollide_static_kid_normal (struct anim *a);
+bool uncollide_static_fall (struct anim *a);
+bool uncollide_static_die (struct anim *a);
+bool uncollide_static_fight (struct anim *a);
+bool is_colliding_front_fight (struct anim *a);
+bool is_colliding_back_fight (struct anim *a);
+bool uncollide_front_fight (struct anim *a);
+bool uncollide_back_fight (struct anim *a);
 
 
 /* variables */

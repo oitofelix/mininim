@@ -119,7 +119,6 @@ flow (struct anim *g)
 
   if (g->oaction == guard_normal
       && vigilant
-      && is_there_enough_room_to_fight (g)
       && anim_cycle > 0) {
     guard_vigilant (g);
     return false;
@@ -140,6 +139,9 @@ static bool
 physics_in (struct anim *g)
 {
   struct pos pmbo;
+
+  /* collision */
+  uncollide_static_neutral (g);
 
   /* inertia */
   g->inertia = g->cinertia = 0;

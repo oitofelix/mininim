@@ -1,5 +1,5 @@
 /*
-  xmouse.h -- xmouse module;
+  pointer.h -- pointer module;
 
   Copyright (C) 2015, 2016 Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
 
@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MININIM_XMOUSE_H
-#define MININIM_XMOUSE_H
+#ifndef MININIM_POINTER_H
+#define MININIM_POINTER_H
 
 /* variables */
 extern struct pos mouse_pos;
@@ -36,4 +36,4 @@ void set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR id);
 void show_mouse_cursor (void);
 void hide_mouse_cursor (void);
 
-#endif	/* MININIM_XMOUSE_H */
+#endif	/* MININIM_POINTER_H */

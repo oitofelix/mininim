@@ -119,7 +119,7 @@ flow (struct anim *k)
     }
 
     if (run) {
-      if (dist_collision (&k->f, false, &k->ci) + 4 < 29)
+      if (dist_collision (&k->f, _bf, -4, -4, &k->ci) < 29)
         kid_walk (k);
       else kid_start_run (k);
       return false;
@@ -140,7 +140,7 @@ flow (struct anim *k)
       return false;
     }
 
-    if (take_sword && is_there_enough_room_to_fight (k)) {
+    if (take_sword) {
       kid_take_sword (k);
       return false;
     }
@@ -171,7 +171,7 @@ physics_in (struct anim *k)
   k->inertia = k->cinertia = 0;
 
   /* collision */
-  if (kid_door_split_collision (k)) return false;
+  uncollide_static_kid_normal (k);
 
   /* fall */
   survey (_mbo, pos, &k->f, NULL, &pmbo, NULL);

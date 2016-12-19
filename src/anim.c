@@ -573,7 +573,6 @@ draw_anim_frame (ALLEGRO_BITMAP *bitmap, struct anim *a, enum vm vm)
 void
 draw_anims (ALLEGRO_BITMAP *bitmap, enum em em, enum vm vm)
 {
-  struct coord ml; struct pos pml, pmlr, pmlra;
   struct anim *a;
 
   /* coord_wa = true; */
@@ -584,15 +583,7 @@ draw_anims (ALLEGRO_BITMAP *bitmap, enum em em, enum vm vm)
   for (i = 0; i < anima_nmemb; i++) {
     a = &anima[i];
     if (a->invisible) continue;
-
-    _ml (&a->f, &ml); pos (&ml, &pml);
-    prel (&pml, &pmlr, 0, +1);
-    prel (&pml, &pmlra, -1, +1);
-
     draw_anim_frame (bitmap, a, vm);
-
-    draw_falling_loose_floor (bitmap, &pmlr, em, vm);
-    draw_falling_loose_floor (bitmap, &pmlra, em, vm);
     draw_room_anim_fg (bitmap, em, vm, a);
   }
 
@@ -837,6 +828,84 @@ splash_coord (struct frame *f, struct coord *c)
                f->c.y + (fh / 2) - (h / 2));
 }
 
+bool
+uncollide_static_neutral (struct anim *a)
+{
+  return uncollide_static (&a->f, &a->fo, _bf, 0, 0, _bb, 0, 0,
+                           &a->fo);
+}
+
+bool
+uncollide_static_kid_normal (struct anim *a)
+{
+  return uncollide_static (&a->f, &a->fo, _bf,
+                           COLLISION_FRONT_LEFT_NORMAL,
+                           COLLISION_FRONT_RIGHT_NORMAL,
+                           _bb,
+                           COLLISION_BACK_LEFT_NORMAL,
+                           COLLISION_BACK_RIGHT_NORMAL,
+                           &a->fo);
+}
+
+bool
+uncollide_static_fight (struct anim *a)
+{
+  return uncollide_static (&a->f, &a->fo, _bf,
+                           COLLISION_FRONT_LEFT_FIGHT,
+                           COLLISION_FRONT_RIGHT_FIGHT,
+                           _bb,
+                           COLLISION_BACK_LEFT_FIGHT,
+                           COLLISION_BACK_RIGHT_FIGHT,
+                           &a->fo);
+}
+
+bool
+is_colliding_front_fight (struct anim *a)
+{
+  return uncollide (&a->f, &a->fo, _bf,
+                    COLLISION_FRONT_LEFT_FIGHT,
+                    COLLISION_FRONT_RIGHT_FIGHT,
+                    NULL, &a->ci);
+}
+
+bool
+is_colliding_back_fight (struct anim *a)
+{
+  return uncollide (&a->f, &a->fo, _bb,
+                    COLLISION_BACK_LEFT_FIGHT,
+                    COLLISION_BACK_RIGHT_FIGHT,
+                    NULL, &a->ci);
+}
+
+bool
+uncollide_front_fight (struct anim *a)
+{
+  bool uf = uncollide (&a->f, &a->fo, _bf,
+                       COLLISION_FRONT_LEFT_FIGHT,
+                       COLLISION_FRONT_RIGHT_FIGHT,
+                       &a->fo, NULL);
+
+  bool ub = uncollide (&a->f, &a->fo, _bb,
+                       COLLISION_BACK_LEFT_FIGHT,
+                       COLLISION_BACK_RIGHT_FIGHT,
+                       &a->fo, NULL);
+  return uf || ub;
+}
+
+bool
+uncollide_back_fight (struct anim *a)
+{
+  bool ub = uncollide (&a->f, &a->fo, _bb,
+                       COLLISION_BACK_LEFT_FIGHT,
+                       COLLISION_BACK_RIGHT_FIGHT,
+                       &a->fo, NULL);
+
+  bool uf = uncollide (&a->f, &a->fo, _bf,
+                       COLLISION_FRONT_LEFT_FIGHT,
+                       COLLISION_FRONT_RIGHT_FIGHT,
+                       &a->fo, NULL);
+  return ub || uf;
+}
 
 
 

@@ -107,10 +107,8 @@ legacy_level_start (void)
     if (level_3_checkpoint) {
       struct pos plf; new_pos (&plf, &global_level, 7, 0, 4);
       register_con_undo (&undo, &plf,
-                         NO_FLOOR, MIGNORE, MIGNORE,
-                         true, true, false, true,
-                         CHPOS_LOOSE_FLOOR_FALL,
-                         "NO FLOOR");
+                         NO_FLOOR, MIGNORE, MIGNORE, MIGNORE,
+                         NULL, true, "NO FLOOR");
       k->f.dir = (k->f.dir == LEFT) ? RIGHT : LEFT;
       place_frame (&k->f, &k->f, kid_normal_00, &p,
                    k->f.dir == LEFT ? +22 : +31, +15);
@@ -179,9 +177,8 @@ legacy_level_special_events (void)
         && fg (&skeleton_floor_pos) == SKELETON_FLOOR
         && get_exit_level_door (&global_level, 0)) {
       register_con_undo (&undo, &skeleton_floor_pos,
-                         FLOOR, MIGNORE, MIGNORE,
-                         true, true, false, true,
-                         -1, "FLOOR");
+                         FLOOR, MIGNORE, MIGNORE, MIGNORE,
+                         NULL, true, "FLOOR");
       skeleton_id = create_anim (NULL, SKELETON, &skeleton_floor_pos, LEFT);
       s = &anima[skeleton_id];
       get_legacy_skill (2, &s->skill);
@@ -219,18 +216,15 @@ legacy_level_special_events (void)
         && fg (&mirror_pos) != MIRROR
         && get_exit_level_door (&global_level, 0)) {
       register_con_undo (&undo, &mirror_pos,
-                         MIRROR, MIGNORE, MIGNORE,
-                         true, true, true, true,
-                         -1, "MIRROR");
+                         MIRROR, MIGNORE, MIGNORE, MIGNORE,
+                         NULL, true, "MIRROR");
       play_audio (&suspense_audio, &mirror_pos, -1);
     }
 
     /* if the kid is crossing the mirror, make his shadow appear */
-    struct mirror *m;
     if (fg (&mirror_pos) == MIRROR
-        && (m = mirror_at_pos (&mirror_pos))
         && is_valid_pos (&k->cross_mirror_p)
-        && peq (&k->ci.con_p, &mirror_pos)
+        && peq (&k->cross_mirror_p, &mirror_pos)
         && shadow_id == -1) {
       k->current_lives = 1;
       int id = create_anim (k, 0, NULL, 0);
@@ -242,7 +236,7 @@ legacy_level_special_events (void)
       ks->immortal = true;
       ks->shadow = true;
       shadow_id = id;
-    } else m = NULL;
+    }
 
     /* make the kid's shadow run to the right until he disappears
        from view */
@@ -730,6 +724,8 @@ interpret_legacy_level (struct level *l, int n)
         enum ltile t = get_tile (&p);
         enum lgroup g = get_group (t);
 
+        set_fake (&p, NO_FAKE);
+
         switch (t) {
         case LT_EMPTY: set_fg (&p, NO_FLOOR); break;
         case LT_FLOOR:
@@ -801,7 +797,8 @@ interpret_legacy_level (struct level *l, int n)
         case LG_FREE:           /* ok */
           switch (b) {
           case LM_FREE_NOTHING_DUNGEON_BLUE_LINE_PALACE: /* ok */
-            set_bg (&p, (t == LT_EMPTY) ? NO_BRICKS : NO_BG); break;
+            set_bg (&p, (t == LT_EMPTY) ? NO_BRICKS : NO_BG);
+            break;
           case LM_FREE_SPOT1_DUNGEON_NO_BLUE_LINE_PALACE: /* ok */
             set_bg (&p, (t == LT_EMPTY) ? BRICKS_02 : BRICKS_00);
             break;
@@ -809,9 +806,35 @@ interpret_legacy_level (struct level *l, int n)
             set_bg (&p, (t == LT_EMPTY) ? BRICKS_03 : BRICKS_01);
             break;
           case LM_FREE_WINDOW:
-            set_bg (&p, WINDOW); break;
+            set_bg (&p, WINDOW);
+            break;
+          case LM_FREE_EMPTY_FAKE_FLOOR_NOTHING_DUNGEON_BLUE_LINE_PALACE: /* ok */
+            set_bg (&p, (t != LT_EMPTY) ? NO_BRICKS : NO_BG);
+            set_fake (&p, FLOOR);
+            break;
+          case LM_FREE_FAKE_WALL_MARK: /* ok */
+            set_bg (&p, NO_BG);
+            set_fake (&p, WALL);
+            break;
+          case LM_FREE_FLOOR_FAKE_EMPTY_NOTHING_DUNGEON_NOTHING_PALACE: /* ok */
+            set_bg (&p, (t != LT_EMPTY) ? NO_BRICKS : NO_BG);
+            set_fake (&p, NO_FLOOR);
+            break;
+          case LM_FREE_EMPTY_FAKE_FLOOR_SPOT1_DUNGEON_NO_BLUE_LINE_PALACE: /* ok */
+            set_bg (&p, (t != LT_EMPTY) ? BRICKS_02 : BRICKS_00);
+            set_fake (&p, FLOOR);
+            break;
+          case LM_FREE_FAKE_WALL_NO_MARK: /* ok */
+            set_bg (&p, NO_BRICKS);
+            set_fake (&p, WALL);
+            break;
+          case LM_FREE_FLOOR_FAKE_EMPTY_SPOT1_DUNGEON_BLUE_LINE_PALACE: /* ok */
+            set_bg (&p, (t != LT_EMPTY) ? BRICKS_02 : BRICKS_00);
+            set_fake (&p, NO_FLOOR);
+            break;
           case LM_FREE_SPOT3_DUNGEON_BLUE_LINE_PALACE: /* ok */
-            set_bg (&p, (t == LT_EMPTY) ? NO_BRICKS : NO_BG); break;
+            set_bg (&p, (t == LT_EMPTY) ? NO_BRICKS : NO_BG);
+            break;
           }
           break;
         case LG_SPIKE:          /* ok */
@@ -868,8 +891,8 @@ interpret_legacy_level (struct level *l, int n)
           case LM_POTION_INVERT: set_ext (&p, FLIP_POTION); break;
           case LM_POTION_POISON: set_ext (&p, SMALL_POISON_POTION); break;
           case LM_POTION_OPEN: set_ext (&p, ACTIVATION_POTION); break;
-          case LM_POTION_SHADOW: break;
-          case LM_POTION_BIG_POISON: set_ext (&p, BIG_POISON_POTION); break;
+          case LM_POTION_STRONG_POISON:
+            set_ext (&p, BIG_POISON_POTION); break;
           }
           break;
         case LG_TTOP:           /* ok */
@@ -915,6 +938,22 @@ interpret_legacy_level (struct level *l, int n)
             set_bg (&p, NO_BG); break;
           case LM_WALL_NO_MARK:
             set_bg (&p, NO_BRICKS); break;
+          case LM_WALL_FAKE_FLOOR_NOTHING_DUNGEON_BLUE_LINE_PALACE: /* ok */
+            set_bg (&p, (t == LT_EMPTY) ? NO_BRICKS : NO_BG);
+            set_fake (&p, FLOOR);
+            break;
+          case LM_WALL_FAKE_EMPTY_NOTHING_DUNGEON_NOTHING_PALACE: /* ok */
+            set_bg (&p, (t != LT_EMPTY) ? NO_BRICKS : NO_BG);
+            set_fake (&p, NO_FLOOR);
+            break;
+          case LM_WALL_FAKE_FLOOR_SPOT1_DUNGEON_NO_BLUE_LINE_PALACE: /* ok */
+            set_bg (&p, (t == LT_EMPTY) ? BRICKS_02 : BRICKS_00);
+            set_fake (&p, FLOOR);
+            break;
+          case LM_WALL_FAKE_EMPTY_SPOT1_DUNGEON_BLUE_LINE_PALACE: /* ok */
+            set_bg (&p, (t != LT_EMPTY) ? BRICKS_02 : BRICKS_00);
+            set_fake (&p, NO_FLOOR);
+            break;
           }
           break;
         case LG_EXIT:           /* ok */

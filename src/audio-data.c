@@ -19,8 +19,9 @@
 
 #include "mininim.h"
 
-/* samples */
-struct audio_source step_audio,
+/* audio */
+struct audio_source big_life_potion_audio,
+  step_audio,
   hit_ground_audio,
   hit_ground_harm_audio,
   hit_ground_fatal_audio,
@@ -52,16 +53,13 @@ struct audio_source step_audio,
   broken_floor_audio,
   spikes_audio,
   opener_floor_audio,
-  creaking_door_audio;
-
-/* streams */
-struct audio_source main_theme_audio,
+  creaking_door_audio,
+  main_theme_audio,
   cutscene_01_03_05_11_audio,
   cutscene_07_08_audio,
   cutscene_14_audio,
   cutscene_11_little_time_left_audio,
   cutscene_out_of_time_audio,
-  big_life_potion_audio,
   death_audio,
   fight_death_audio,
   vizier_death_audio,
@@ -81,7 +79,7 @@ struct audio_source main_theme_audio,
 void
 load_audio_data (void)
 {
-  /* samples */
+  load_audio (&big_life_potion_audio, AUDIO_SAMPLE, BIG_LIFE_POTION_AUDIO);
   load_audio (&step_audio, AUDIO_SAMPLE, STEP_AUDIO);
   load_audio (&hit_ground_audio, AUDIO_SAMPLE, HIT_GROUND_AUDIO);
   load_audio (&hit_ground_harm_audio, AUDIO_SAMPLE, HIT_GROUND_HARM_AUDIO);
@@ -115,8 +113,6 @@ load_audio_data (void)
   load_audio (&spikes_audio, AUDIO_SAMPLE, SPIKES_AUDIO);
   load_audio (&opener_floor_audio, AUDIO_SAMPLE, OPENER_FLOOR_AUDIO);
   load_audio (&creaking_door_audio, AUDIO_SAMPLE, CREAKING_DOOR_AUDIO);
-
-  /* streams */
   load_audio (&main_theme_audio, AUDIO_STREAM, MAIN_THEME_AUDIO);
   load_audio (&cutscene_01_03_05_11_audio, AUDIO_STREAM, CUTSCENE_01_03_05_11_AUDIO);
   load_audio (&cutscene_07_08_audio, AUDIO_STREAM, CUTSCENE_07_08_AUDIO);
@@ -124,28 +120,27 @@ load_audio_data (void)
   load_audio (&cutscene_11_little_time_left_audio, AUDIO_STREAM,
               CUTSCENE_11_LITTLE_TIME_LEFT_AUDIO);
   load_audio (&cutscene_out_of_time_audio, AUDIO_STREAM, CUTSCENE_OUT_OF_TIME_AUDIO);
-  load_audio (&big_life_potion_audio, AUDIO_STREAM, BIG_LIFE_POTION_AUDIO);
-  load_audio (&death_audio, AUDIO_STREAM, DEATH_AUDIO);
-  load_audio (&fight_death_audio, AUDIO_STREAM, FIGHT_DEATH_AUDIO);
-  load_audio (&vizier_death_audio, AUDIO_STREAM, VIZIER_DEATH_AUDIO);
+  load_audio (&death_audio, AUDIO_SAMPLE, DEATH_AUDIO);
+  load_audio (&fight_death_audio, AUDIO_SAMPLE, FIGHT_DEATH_AUDIO);
+  load_audio (&vizier_death_audio, AUDIO_SAMPLE, VIZIER_DEATH_AUDIO);
   load_audio (&floating_audio, AUDIO_STREAM, FLOATING_AUDIO);
-  load_audio (&glory_audio, AUDIO_STREAM, GLORY_AUDIO);
+  load_audio (&glory_audio, AUDIO_SAMPLE, GLORY_AUDIO);
   load_audio (&happy_end_audio, AUDIO_STREAM, HAPPY_END_AUDIO);
   load_audio (&in_the_absence_audio, AUDIO_STREAM, IN_THE_ABSENCE_AUDIO);
   load_audio (&marry_jaffar_audio, AUDIO_STREAM, MARRY_JAFFAR_AUDIO);
-  load_audio (&meet_vizier_audio, AUDIO_STREAM, MEET_VIZIER_AUDIO);
+  load_audio (&meet_vizier_audio, AUDIO_SAMPLE, MEET_VIZIER_AUDIO);
   load_audio (&princess_waiting_audio, AUDIO_STREAM, PRINCESS_WAITING_AUDIO);
-  load_audio (&small_life_potion_audio, AUDIO_STREAM, SMALL_LIFE_POTION_AUDIO);
+  load_audio (&small_life_potion_audio, AUDIO_SAMPLE, SMALL_LIFE_POTION_AUDIO);
   load_audio (&success_audio, AUDIO_STREAM, SUCCESS_AUDIO);
   load_audio (&success_suspense_audio, AUDIO_STREAM, SUCCESS_SUSPENSE_AUDIO);
-  load_audio (&suspense_audio, AUDIO_STREAM, SUSPENSE_AUDIO);
+  load_audio (&suspense_audio, AUDIO_SAMPLE, SUSPENSE_AUDIO);
   load_audio (&vizier_and_princess_audio, AUDIO_STREAM, VIZIER_AND_PRINCESS_AUDIO);
 }
 
 void
 unload_audio_data (void)
 {
-  /* samples */
+  destroy_audio (&big_life_potion_audio);
   destroy_audio (&step_audio);
   destroy_audio (&hit_ground_audio);
   destroy_audio (&hit_ground_harm_audio);
@@ -179,15 +174,12 @@ unload_audio_data (void)
   destroy_audio (&spikes_audio);
   destroy_audio (&opener_floor_audio);
   destroy_audio (&creaking_door_audio);
-
-  /* streams */
   destroy_audio (&main_theme_audio);
   destroy_audio (&cutscene_01_03_05_11_audio);
   destroy_audio (&cutscene_07_08_audio);
   destroy_audio (&cutscene_14_audio);
   destroy_audio (&cutscene_11_little_time_left_audio);
   destroy_audio (&cutscene_out_of_time_audio);
-  destroy_audio (&big_life_potion_audio);
   destroy_audio (&death_audio);
   destroy_audio (&fight_death_audio);
   destroy_audio (&vizier_death_audio);

@@ -264,12 +264,6 @@ flow (struct anim *g)
       guard_defense (g);
       return false;
     }
-
-    /* no space for fight */
-    if (g->i == 2 && ! is_there_enough_room_to_fight (g)) {
-      guard_normal (g);
-      return false;
-    }
   }
 
   struct frameset *frameset = get_guard_vigilant_frameset (g->type);
@@ -291,8 +285,7 @@ physics_in (struct anim *g)
   struct pos pmbo;
 
   /* collision */
-  uncollide (&g->f, &g->fo, &g->fo, +0, true, &g->ci);
-  if (fight_door_split_collision (g)) return false;
+  uncollide_static_fight (g);
 
   /* fall */
   survey (_mbo, pos, &g->f, NULL, &pmbo, NULL);
