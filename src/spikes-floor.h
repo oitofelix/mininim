@@ -151,7 +151,6 @@ struct spikes_floor *copy_spikes_floor (struct spikes_floor *to,
 struct spikes_floor * spikes_floor_at_pos (struct pos *p);
 void remove_spikes_floor (struct spikes_floor *s);
 void break_spikes_floor (struct pos *p);
-void reset_murder_spikes_floor (int id);
 void compute_spikes_floors (void);
 bool should_spikes_raise_for_pos (struct pos *p, struct pos *pk);
 bool should_spikes_raise (struct pos *p);

@@ -504,12 +504,14 @@ editor (void)
     case 0: break;
     case 1: edit = EDIT_FG; break;
     default:
+      editor_register = EDITOR_CYCLES_NONE;
       register_con_undo (&undo, &p,
                          ! fake_fg ? i : MIGNORE,
                          MIGNORE, MIGNORE,
                          fake_fg ? i : MIGNORE,
                          NULL, true,
                          fake_fg ? "FAKE # FG" : "# FG");
+      editor_register = EDITOR_CYCLES_3;
       break;
     }
     break;
@@ -723,9 +725,11 @@ editor (void)
     case 0: break;
     case 1: edit = EDIT_BG; break;
     default:
+      editor_register = EDITOR_CYCLES_NONE;
       register_con_undo (&undo, &p,
                          MIGNORE, i, MIGNORE, MIGNORE,
                          NULL, true, "# BG");
+      editor_register = EDITOR_CYCLES_3;
       break;
     }
     break;
@@ -863,9 +867,11 @@ editor (void)
     case 0: break;
     case 1: edit = EDIT_CON; break;
     default:
+      editor_register = EDITOR_CYCLES_NONE;
       register_con_undo (&undo, &p,
                          MIGNORE, MIGNORE, i, MIGNORE,
                          NULL, true, "# EXT");
+      editor_register = EDITOR_CYCLES_3;
       break;
     }
     break;
@@ -1913,9 +1919,11 @@ menu_int_ext (struct pos *p, int steps, int fases,
 
   if (c == ' ') r += steps;
 
+  editor_register = EDITOR_CYCLES_NONE;
   register_con_undo (&undo, p,
                      MIGNORE, MIGNORE, r, MIGNORE,
                      NULL, true, undo_str);
+  editor_register = EDITOR_CYCLES_3;
 
   return c;
 }

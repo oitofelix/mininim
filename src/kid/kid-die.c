@@ -84,7 +84,8 @@ kid_resurrect (struct anim *k)
   k->action = kid_normal;
   place_frame (&k->f, &k->f, kid_normal_00,
                &pm, k->f.dir == LEFT ? +16 : +16, +15);
-  reset_murder_spikes_floor (k->id);
+  if (fg (&k->p) == SPIKES_FLOOR)
+    spikes_floor_at_pos (&k->p)->inactive = false;
   stop_audio_instance (&death_audio, NULL, k->id);
   stop_audio_instance (&fight_death_audio, NULL, k->id);
   stop_audio_instance (&success_suspense_audio, NULL, k->id);
@@ -105,9 +106,10 @@ kid_die_spiked (struct anim *k)
   assert (fg (&k->p) == SPIKES_FLOOR);
   struct spikes_floor *s = spikes_floor_at_pos (&k->p);
 
-  if (s->i != 4 || s->state !=5) {
+  if (s->i != 4 || s->state != 5 || ! s->inactive) {
     s->i = 4;
     s->state = 5;
+    s->inactive = true;
     register_changed_pos (&k->p);
   }
 
@@ -115,9 +117,6 @@ kid_die_spiked (struct anim *k)
     k->current_lives = 0;
     k->splash = true;
     k->death_reason = SPIKES_DEATH;
-
-    s->inactive = true;
-    s->murdered_anim = k->id;
 
     if (k->id == current_kid_id) {
       mr.flicker = 2;

@@ -544,6 +544,17 @@ get_anim_by_id (int id)
 }
 
 struct anim *
+get_anim_dead_at_pos (struct pos *p)
+{
+  int i;
+  for (i = 0; i < anima_nmemb; i++)
+    if (anima[i].current_lives <= 0
+        && peq (&anima[i].p, p))
+      return &anima[i];
+  return NULL;
+}
+
+struct anim *
 get_guard_anim_by_level_id (int id)
 {
   int i;

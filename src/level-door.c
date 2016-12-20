@@ -537,6 +537,7 @@ draw_level_door_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f,
   draw_bitmapc (level_door_bottom, bitmap,
                 level_door_bottom_right_coord (p, &c), 0);
   draw_level_door_front (bitmap, p, fake_level_door_step (p), em, vm);
+  draw_confg (bitmap, p, em, vm);
   redraw_drawn_rectangle (pop_drawn_rectangle (), p, em, vm);
 }
 

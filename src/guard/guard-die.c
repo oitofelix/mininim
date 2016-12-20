@@ -245,7 +245,8 @@ guard_resurrect (struct anim *g)
   place_frame (&g->f, &g->f, get_guard_normal_bitmap (g->type),
                &pm, g->f.dir == LEFT ? +16 : +22, +14);
   place_on_the_ground (&g->f, &g->f.c);
-  reset_murder_spikes_floor (g->id);
+  if (fg (&g->p) == SPIKES_FLOOR)
+    spikes_floor_at_pos (&g->p)->inactive = false;
 }
 
 void
@@ -298,18 +299,16 @@ guard_die_spiked (struct anim *g)
   assert (fg (&g->p) == SPIKES_FLOOR);
   struct spikes_floor *s = spikes_floor_at_pos (&g->p);
 
-  if (s->i != 4 || s->state !=5) {
+  if (s->i != 4 || s->state != 5 || ! s->inactive) {
     s->i = 4;
     s->state = 5;
+    s->inactive = true;
     register_changed_pos (&g->p);
   }
 
   if (g->oaction != guard_die_spiked) {
     g->splash = true;
     g->death_reason = SPIKES_DEATH;
-
-    s->inactive = true;
-    s->murdered_anim = g->id;
 
     if (g->type == SKELETON)
       play_audio (&skeleton_audio, NULL, g->id);

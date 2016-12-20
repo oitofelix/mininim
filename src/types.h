@@ -633,7 +633,6 @@ struct spikes_floor {
   struct pos p;
   int i, wait, state;
   bool inactive;
-  int murdered_anim;
   bool activate;
 };
 

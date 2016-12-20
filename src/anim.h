@@ -32,6 +32,7 @@ int create_anim (struct anim *a0, enum anim_type t,
 void destroy_anim (struct anim *a);
 void destroy_anims (void);
 struct anim *get_anim_by_id (int id);
+struct anim *get_anim_dead_at_pos (struct pos *p);
 struct anim *get_guard_anim_by_level_id (int id);
 void draw_anim_frame (ALLEGRO_BITMAP *bitmap, struct anim *a, enum vm vm);
 void draw_anims (ALLEGRO_BITMAP *bitmap, enum em em, enum vm vm);
