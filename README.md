@@ -10,7 +10,9 @@
 
 ## Game play demo
 
-[![GAME PLAY DEMO](https://img.youtube.com/vi/i8kXFLuZ8Io/0.jpg)](https://www.youtube.com/watch?v=i8kXFLuZ8Io)
+[![MININIM multi-room features](https://img.youtube.com/vi/i8kXFLuZ8Io/0.jpg)](https://www.youtube.com/watch?v=i8kXFLuZ8Io)
+
+[![MININIM fake constructions - fake wall](https://img.youtube.com/vi/UFBaBVS7Kc8/0.jpg)](https://www.youtube.com/watch?v=UFBaBVS7Kc8)
 
 ## Building
 
