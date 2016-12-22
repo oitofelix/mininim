@@ -162,7 +162,7 @@ physics_in (struct anim *k)
   /* printf ("inertia: %i\n", k->inertia); */
 
   /* collision */
-  uncollide (&k->f, &k->fo, _bf, -8, +0, &k->fo, NULL);
+  uncollide (&k->f, &k->fo, _bf, -8, -4, &k->fo, NULL);
 
   /* hang front */
   if (k->i > 4 && can_hang (&k->f, false, &k->hang_pos)
