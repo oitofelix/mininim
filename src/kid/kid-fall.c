@@ -175,7 +175,8 @@ physics_in (struct anim *k)
   }
 
   /* hang back */
-  if (k->i > 4 && can_hang (&k->f, true, &k->hang_pos)
+  if (movements == NATIVE_MOVEMENTS
+      && k->i > 4 && can_hang (&k->f, true, &k->hang_pos)
       && hang_back && ! k->hang_limit) {
     k->hit_by_loose_floor = false;
     stop_audio_instance (&scream_audio, NULL, k->id);

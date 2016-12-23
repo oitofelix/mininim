@@ -62,7 +62,8 @@ flow (struct anim *k)
   int back_dir = (k->f.dir == LEFT) ? RIGHT : LEFT;
 
     /* hang back */
-  if (k->i >= 7
+  if (movements == NATIVE_MOVEMENTS
+      && k->i >= 7
       && hang_back && is_hangable_pos (&k->hang_pos, back_dir)) {
     play_audio (&hang_on_fall_audio, NULL, k->id);
     kid_turn (k);

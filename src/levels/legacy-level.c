@@ -144,7 +144,7 @@ legacy_level_special_events (void)
 
     invalid_pos (&p);
 
-    if (semantics == LEGACY)
+    if (semantics == LEGACY_SEMANTICS)
       first_level_door_in_room_pos (global_level.start_pos.room, &p);
     else if (fg (&global_level.start_pos) == LEVEL_DOOR)
       p = global_level.start_pos;

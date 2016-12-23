@@ -209,6 +209,7 @@ extern char *resources_dir,
   *config_filename,
   *levels_dat_filename;
 extern enum semantics semantics;
+extern enum movements movements;
 
 extern ALLEGRO_THREAD *load_config_dialog_thread,
   *save_game_dialog_thread, *save_picture_dialog_thread;

@@ -60,7 +60,8 @@ flow (struct anim *k)
   int back_dir = (k->f.dir == LEFT) ? RIGHT : LEFT;
 
   /* hang back */
-  if (k->i == 4 && k->reverse
+  if (movements == NATIVE_MOVEMENTS
+      && k->i == 4 && k->reverse
       && hang_back && is_hangable_pos (&k->hang_pos, back_dir)) {
     play_audio (&hang_on_fall_audio, NULL, k->id);
     kid_turn (k);
@@ -73,7 +74,8 @@ flow (struct anim *k)
     if (is_strictly_traversable (&k->hang_pos)) {
       place_frame (&k->f, &k->f, kid_fall_frameset[0].frame,
                    &k->hang_pos,
-                   (k->f.dir == LEFT) ? +10 : +22, +4);
+                   /* +10, +22 */
+                   (k->f.dir == LEFT) ? +14 : +18, +4);
       kid_fall (k);
       k->hang_limit = false;
       return false;

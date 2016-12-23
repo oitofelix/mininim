@@ -217,8 +217,8 @@ fight_ai (struct anim *k)
       && ke->has_sword
       && ! is_kid_fall (&ke->f)
       && ! is_kid_hang (&ke->f)
-      && ! is_kid_jump_air (&ke->f)
-      && ! is_kid_run_jump_air (&ke->f)
+      /* && ! is_kid_jump_air (&ke->f) */
+      /* && ! is_kid_run_jump_air (&ke->f) */
       && is_safe_to_attack (ke)) {
     place_on_the_ground (&ke->f, &ke->f.c);
     kid_take_sword (ke);
@@ -756,8 +756,14 @@ is_opaque_at_right (struct pos *p)
 bool
 is_anim_seeing (struct anim *k0, struct anim *k1, enum dir dir)
 {
-  struct pos p; survey (_m, pos, &k0->f, NULL, &p, NULL);
-  return is_pos_seeing (&p, k1, dir);
+  struct pos p0; survey (_m, pos, &k0->f, NULL, &p0, NULL);
+  struct pos p1; survey (_m, pos, &k1->f, NULL, &p1, NULL);
+  if (semantics == LEGACY_SEMANTICS) {
+    if (k0->enemy_id == k1->id)
+      return is_pos_seeing (&p0, k1, dir);
+    else return is_pos_seeing (&p0, k1, dir)
+           && p0.room == p1.room;
+  } else return is_pos_seeing (&p0, k1, dir);
 }
 
 bool

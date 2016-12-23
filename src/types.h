@@ -379,7 +379,7 @@ struct anim {
     just_hanged, hang, hang_limit, misstep, uncouch_slowly,
     keep_sword_fast, turn, shadow, splash, hit_by_loose_floor,
     invisible, has_sword, hurt, controllable, fight,
-    edge_detection, auto_taken_sword;
+    edge_detection, auto_taken_sword, constrained_turn_run;
 
   int enemy_defended_my_attack, enemy_counter_attacked_myself, i_counter_defended;
   bool attack_range_far, attack_range_near, hurt_enemy_in_counter_attack;
@@ -509,7 +509,11 @@ enum opt_arg_type {
 };
 
 enum semantics {
-  NATIVE, LEGACY,
+  NATIVE_SEMANTICS, LEGACY_SEMANTICS,
+};
+
+enum movements {
+  NATIVE_MOVEMENTS, LEGACY_MOVEMENTS,
 };
 
 enum options {
@@ -526,7 +530,7 @@ enum options {
   JOYSTICK_AXIS_OPTION, JOYSTICK_BUTTON_OPTION, JOYSTICK_INFO_OPTION,
   START_POS_OPTION, HUE_MODE_OPTION, CONVERT_LEVELS_OPTION, MULTI_ROOM_OPTION,
   DISPLAY_MODE_OPTION, MULTI_ROOM_FIT_MODE_OPTION, TIME_FREQUENCY_OPTION,
-  MIRROR_LEVEL_OPTION, SEMANTICS_OPTION,
+  MIRROR_LEVEL_OPTION, SEMANTICS_OPTION, MOVEMENTS_OPTION,
 };
 
 enum level_module {

@@ -1106,7 +1106,9 @@ cf_rel (coord_f cf, struct frame *f, struct coord *c, int dx, int dy)
     dir = -1;
   else if (cf == _mr || cf == _tr || cf == _br)
     dir = +1;
-  else assert (false);
+  else if (f->dir == LEFT)
+    dir = -1;
+  else dir = +1;
 
   cf (f, c);
   c->x += dir * dx;

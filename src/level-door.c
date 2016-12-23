@@ -237,7 +237,7 @@ register_level_door (struct pos *p)
   d.action = NO_LEVEL_DOOR_ACTION;
   d.priority = 0;
 
-  if (semantics == LEGACY) {
+  if (semantics == LEGACY_SEMANTICS) {
     struct pos q;
     if (first_level_door_in_room_pos (p->l->start_pos.room, &q)
         && peq (&q, p))

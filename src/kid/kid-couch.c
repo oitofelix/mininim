@@ -231,9 +231,9 @@ physics_in (struct anim *k)
       && uncollide (&k->f, &k->fo, _bf, +0, +0, NULL, &k->ci)
       && fg (&k->ci.con_p) == MIRROR)
     uncollide (&k->f, &k->fo, _bf, +0, +0, &k->fo, &k->ci);
-  else if (! is_item (&k->item_pos))
-           uncollide (&k->f, &k->fo, _bf, COLLISION_FRONT_LEFT_NORMAL,
-                      COLLISION_FRONT_RIGHT_NORMAL, &k->fo, NULL);
+  else if (! is_valid_pos (&k->item_pos))
+    uncollide (&k->f, &k->fo, _bf, COLLISION_FRONT_LEFT_NORMAL,
+               COLLISION_FRONT_RIGHT_NORMAL, &k->fo, NULL);
   if (k->key.down && ! couch_jump) uncollide_static_kid_normal (k);
 
   /* fall */

@@ -451,7 +451,7 @@ close_door (struct level *l, int e, uint64_t priority)
       ld = level_door_at_pos (p);
       if (! ld) continue;
       if (ld->priority <= priority) {
-        ld->action = semantics == LEGACY
+        ld->action = semantics == LEGACY_SEMANTICS
           ? OPEN_LEVEL_DOOR : CLOSE_LEVEL_DOOR;
         ld->priority = priority;
       }

@@ -416,6 +416,10 @@ register_anims (void)
     a->skill = g->skill;
     a->total_lives = g->total_lives + g->skill.extra_life;
     a->current_lives = g->total_lives;
+    if (global_level.n == 3 && semantics == LEGACY_SEMANTICS) {
+      a->total_lives = a->current_lives = INT_MAX;
+      a->dont_draw_lives = true;
+    }
     a->style = g->style;
     if (a->total_lives == 0) a->glory_sample = true;
   }
