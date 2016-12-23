@@ -1104,6 +1104,8 @@ fight_hit (struct anim *k, struct anim *ke)
   if (is_anim_fall (&k->f) || is_kid_stairs (&k->f))
     return;
 
+  bool should_adjust_distance = is_in_fight_mode (k);
+
   place_on_the_ground (&k->f, &k->f.c);
   k->xf.b = NULL;
 
@@ -1125,7 +1127,7 @@ fight_hit (struct anim *k, struct anim *ke)
     anim_die (k);
   } else anim_sword_hit (k);
 
-  if (is_in_fight_mode (k)) {
+  if (should_adjust_distance) {
     backoff_from_range (ke, k, ATTACK_RANGE - 20, true, false);
     get_in_range (ke, k, ATTACK_RANGE - 10, false, false);
   }

@@ -235,8 +235,15 @@ register_level_door (struct pos *p)
   d.broken = f;
   d.i = n;
   d.action = NO_LEVEL_DOOR_ACTION;
-  d.no_stairs = peq (p, &p->l->start_pos);
   d.priority = 0;
+
+  if (semantics == LEGACY) {
+    struct pos q;
+    if (first_level_door_in_room_pos (p->l->start_pos.room, &q)
+        && peq (&q, p))
+      d.no_stairs = true;
+    else d.no_stairs = false;
+  } else d.no_stairs = peq (p, &p->l->start_pos);
 
   level_door =
     add_to_array (&d, 1, level_door, &level_door_nmemb, level_door_nmemb, sizeof (d));
@@ -378,6 +385,19 @@ get_exit_level_door (struct level *l, int n)
         && d->i == 0
         && n-- == 0) return d;
   }
+  return NULL;
+}
+
+struct pos *
+first_level_door_in_room_pos (int room, struct pos *p_ret)
+{
+  struct pos p; new_pos (&p, &global_level, room, -1, -1);
+  for (p.floor = 0; p.floor < FLOORS; p.floor++)
+    for (p.place = 0; p.place < PLACES; p.place++)
+      if (fg (&p) == LEVEL_DOOR) {
+        *p_ret = p;
+        return p_ret;
+      }
   return NULL;
 }
 

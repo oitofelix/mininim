@@ -86,6 +86,7 @@ bool fake_door_stairs (struct pos *p);
 void break_level_door (struct pos *p);
 void compute_level_doors (void);
 struct level_door *get_exit_level_door (struct level *l, int n);
+struct pos *first_level_door_in_room_pos (int room, struct pos *p_ret);
 void draw_level_door (ALLEGRO_BITMAP *bitmap, struct pos *p,
                       enum em em, enum vm vm);
 void generate_level_door_front_cache (ALLEGRO_BITMAP *cache[LEVEL_DOOR_STEPS],

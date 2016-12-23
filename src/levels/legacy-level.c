@@ -140,9 +140,18 @@ legacy_level_special_events (void)
 
   /* in the first animation cycle */
   if (anim_cycle == 0 || anim_cycle == 1) {
+    struct level_door *ld = NULL;
+
+    invalid_pos (&p);
+
+    if (semantics == LEGACY)
+      first_level_door_in_room_pos (global_level.start_pos.room, &p);
+    else if (fg (&global_level.start_pos) == LEVEL_DOOR)
+      p = global_level.start_pos;
+
     /* close level door the kid came from */
-    if (fg (&global_level.start_pos) == LEVEL_DOOR) {
-      struct level_door *ld = level_door_at_pos (&global_level.start_pos);
+    if (is_valid_pos (&p)) {
+      ld = level_door_at_pos (&p);
       if (anim_cycle == 0) ld->i = 0;
       if (anim_cycle == 1) ld->action = CLOSE_LEVEL_DOOR;
     }

@@ -187,6 +187,7 @@ play_level (struct level *lv)
   free_undo (&undo);
   cutscene = false;
   game_paused = false;
+  potion_flags = 0;
   copy_level (&global_level, lv);
   if (mirror_level) mirror_level_h (&global_level);
 

@@ -92,6 +92,8 @@ struct pos start_pos = {NULL, -1,-1,-1};
 int time_limit = TIME_LIMIT;
 int start_time = START_TIME;
 int start_level_time;
+enum semantics semantics;
+
 struct skill skill = {.counter_attack_prob = INITIAL_KCA,
                       .counter_defense_prob = INITIAL_KCD};
 static bool sound_disabled_cmd;
@@ -193,6 +195,7 @@ static struct argp_option options[] = {
   {"sound", SOUND_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable sound.  The default is TRUE.  This can be changed in-game by the CTRL+S key binding.", 0},
   {"skip-title", SKIP_TITLE_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Skip title screen.  The default is FALSE.", 0},
   {"inhibit-screensaver", INHIBIT_SCREENSAVER_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Prevent the system screensaver from starting up.  The default is TRUE.", 0},
+  {"semantics", SEMANTICS_OPTION, "SEMANTICS", 0, "Select semantics.  Valid values for SEMANTICS are: NATIVE and LEGACY.  The default is NATIVE.  A semantics determines in an abstract sense the meaning and behavior of game elements.  Currently it's used to make legacy level sets which depend on the original semantics finishable.", 0},
 
   /* Help */
   {NULL, 0, NULL, 0, "Help:", -1},
@@ -596,6 +599,8 @@ parser (int key, char *arg, struct argp_state *state)
 
   char *multi_room_fit_mode_enum[] = {"NONE", "STRETCH", "RATIO", NULL};
 
+  char *semantics_enum[] = {"NATIVE", "LEGACY", NULL};
+
   struct int_range total_lives_range = {1, 10};
   struct int_range start_level_range = {1, INT_MAX};
   struct int_range start_pos_room_range = {1, INT_MAX};
@@ -910,6 +915,14 @@ Levels have been converted using module %s into native format at\n\
   case JOYSTICK_INFO_OPTION:
     if (joystick_info ()) error (-1, 0, "Joystick not found");
     exit (0);
+    break;
+  case SEMANTICS_OPTION:
+    e = optval_to_enum (&i, key, arg, state, semantics_enum, 0);
+    if (e) return e;
+    switch (i) {
+    case 0: semantics = NATIVE; break;
+    case 1: semantics = LEGACY; break;
+    }
     break;
   case ARGP_KEY_ARG:
     /* cheat */
