@@ -1129,6 +1129,7 @@ cf_inc (struct frame *f, coord_f cf)
   else if (cf == _mr || cf == _tr || cf == _br)
     return f->dir == LEFT ? +1 : -1;
   else assert (false);
+  return 0;
 }
 
 void

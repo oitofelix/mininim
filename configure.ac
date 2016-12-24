@@ -70,7 +70,7 @@ esac],[debug=false])
 AM_CONDITIONAL([DEBUG], [test x$debug = xtrue])
 
 AS_IF([[test x$debug != xtrue]],
-  [AC_DEFINE([NDEBUG], [1], [Make assert macro do nothing.])],
+  [AC_DEFINE([NDEBUG], [1], [Define to 1 to disable assert macro.])],
   [debug_sufix=-debug])
 
 # Optimizations option
@@ -128,6 +128,8 @@ AS_CASE([$host],
 
 # MinGW
 [*-*-mingw*],
+  AC_DEFINE([MINGW_BUILD], [true], [Define to 1 if this build is targeting MinGW.])
+
   [ALLEGRO_CFLAGS=""
    ALLEGRO_LIBS="-lallegro${debug_sufix}"
    ALLEGRO_IMAGE_CFLAGS="${ALLEGRO_CFLAGS}"

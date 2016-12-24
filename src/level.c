@@ -749,8 +749,6 @@ process_keys (void)
              && ! save_game_dialog_thread)
     pause_game (false);
 
-  /* if (game_paused) anim_cycle--; */
-
   /* R: resurrect kid */
   if (! active_menu
       && was_key_pressed (ALLEGRO_KEY_R, 0, 0, true))

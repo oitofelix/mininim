@@ -159,8 +159,13 @@ destroy_bitmap (ALLEGRO_BITMAP *bitmap)
 ALLEGRO_BITMAP *
 clone_bitmap (ALLEGRO_BITMAP *bitmap)
 {
+  set_target_backbuffer (display);
   ALLEGRO_BITMAP *new_bitmap = al_clone_bitmap (bitmap);
-  if (! new_bitmap) error (-1, 0, "%s (%p): cannot clone bitmap", __func__, bitmap);
+  if (! new_bitmap) {
+    error (-1, 0, "%s (%p): cannot clone bitmap", __func__, bitmap);
+    return NULL;
+  }
+  validate_bitmap_for_mingw (new_bitmap);
   return new_bitmap;
 }
 
@@ -551,8 +556,14 @@ get_display_mode (int index, ALLEGRO_DISPLAY_MODE *mode)
 void
 acknowledge_resize (void)
 {
-  if (! al_acknowledge_resize (display) && ! is_fullscreen ())
-    error (0, 0, "%s: cannot acknowledge display resize (%p)", __func__, display);
+  bool acknowledged;
+
+  if (MINGW_BUILD) acknowledged = true;
+  else acknowledged = al_acknowledge_resize (display);
+
+  if (! acknowledged  && ! is_fullscreen ())
+    error (0, 0, "%s: cannot acknowledge display resize (%p)",
+           __func__, display);
 }
 
 void

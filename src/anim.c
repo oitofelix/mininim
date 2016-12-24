@@ -44,6 +44,7 @@ play_anim (void (*draw_callback) (void),
   quit_anim = NO_QUIT;
 
   acknowledge_resize ();
+
   ALLEGRO_EVENT event;
   timer = create_timer (anim_freq > 0 ? 1.0 / anim_freq : -anim_freq + 2);
   if (! event_queue) event_queue = create_event_queue ();
@@ -438,8 +439,8 @@ play_anim (void (*draw_callback) (void),
         al_start_thread (load_config_dialog_thread);
       }
 
-      /* PRINTSCREEN: save picture */
-      if (was_key_pressed (ALLEGRO_KEY_PRINTSCREEN, 0, ALLEGRO_KEYMOD_CTRL, true)
+      /* CTRL+P: save picture */
+      if (was_key_pressed (ALLEGRO_KEY_P, 0, ALLEGRO_KEYMOD_CTRL, true)
           && ! save_picture_dialog_thread) {
         save_picture_dialog_thread =
           create_thread (dialog_thread, &save_picture_dialog);
