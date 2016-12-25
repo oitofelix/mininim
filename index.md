@@ -90,8 +90,8 @@ The following additional features are planned to be implemented soon.
 
 - Legacy semantics (in progress)
 - Fully compliance to the Standard Item Specification
-- Save state
 - Replay recording
+- Save state
 - Dynamic number of levels, rooms, guards and events
 - Guile scripting
 - Network play
@@ -106,7 +106,9 @@ The following additional features are planned to be implemented soon.
 
 [![MININIM multi-room features](https://img.youtube.com/vi/i8kXFLuZ8Io/0.jpg)](https://www.youtube.com/watch?v=i8kXFLuZ8Io)
 
-Notice that animations and multi-room support have been further improved.
+Notice that animations, physics, level editor, multi-room support and
+other features have been further improved since this video was
+recorded.
 
 
 ### Download
@@ -167,29 +169,21 @@ best place to obtain help is at its
 - `CTRL+J`: calibrate joystick
 - `CTRL+L`: load configuration
 - `CTRL+P`: save picture
-
-
 - `F9`: change hue palette
 - `F10`: change guard mode
 - `F11`: change environment mode
 - `F12`: change video mdoe
-
-
 - `D`: change display mode
 - `F`: enable/disable fullscreen (desktop mode)
 - `SHIFT+I`: flip screen
 - `SHIFT+K`: flip gamepad
 - `SHIFT+B`: enable/disable room drawing
-
-
 - `ESC`: pause game
 - `SPACE`: display remaining time
 - `+`: increment remaining time
 - `-`: decrement remaining time
 - `(`: decrease time frequency
 - `)`: increase time frequency
-
-
 - `R`: resurrect kid
 - `A`: alternate between kid and its shadows
 - `K`: kill current enemy
@@ -197,15 +191,11 @@ best place to obtain help is at its
 - `SHIFT+S`: increment kid's current lives
 - `SHIFT+T`: increment kid's total lives
 - `SHIFT+W`: float kid
-
-
 - `TAB`: display skill
 - `CTRL+=`: increment counter attack skill
 - `CTRL+-`: decrement counter attack skill
 - `ALT+=`: increment counter defense skill
 - `ALT+-`: decrement counter defense skill
-
-
 - `F8`: enable/disable level editor
 - `CTRL+Z`: undo level modification
 - `CTRL+Y`: redo level modification
@@ -213,8 +203,6 @@ best place to obtain help is at its
 - `SHIFT+M`: warp to previous level
 - `C`: show direct coordinates
 - `SHIFT+C`: show indirect coordinates
-
-
 - `HOME`: focus multi-room view on kid
 - `SHIFT+HOME`: center multi-room view
 - `M`: change multi-room fit mode
