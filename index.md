@@ -50,7 +50,8 @@ Licence) as published by the FSF — with no Invariant Sections; either
 version 1.3, or (at your option) any later version.
 
 MININIM features various improvements over the original game, too many
-to make an exhaustive list here.  Some of its noteworthy features are:
+to make an exhaustive list here.  Some of its noteworthy features
+currently implemented are:
 
 - Portable to modern operating systems
 - Generalized multi-room support
@@ -62,14 +63,14 @@ to make an exhaustive list here.  Some of its noteworthy features are:
 - Improved battle system based on upgradable skills, arbitrary number
   of simultaneous fighters and smarter enemy AI
 - Any type of guard per level, styles applicable to any guard type and
-  guard skills fine-tuned per guard.
-- Sword can be drawn at will, but it draws and keeps it automatically
-  when appropriate.
+  guard skills fine-tuned per guard
+- Sword can be drawn at will, but it is drawn and kept automatically
+  when appropriate
 - Real-time responsiveness, higher world interaction accuracy, more
   stable animations, smoother collision and robust physics
-- Single pressing transition commands
 - New useful movements: normal jump hang, normal jump turn, running
-  jump hang, running jump turn, hanging fall, hanging turn,
+  jump hang, running jump turn, hanging fall, hanging turn, falling
+  turn, take sword anywhere
 - Complete level editor based on non-intrusive mode-line menus and
   mouse selection
 - Unlimited undo/redo for level changes
@@ -82,11 +83,13 @@ to make an exhaustive list here.  Some of its noteworthy features are:
   constructions
 - Generalized fake constructions
 - Rich set of itemmizable constructions and items
-- Support for triggering of any tile
+- Supports triggering of any tile
 - Screenshot capturing
 
 The following additional features are planned to be implemented soon.
 
+- Legacy semantics (in progress)
+- Fully compliance to the Standard Item Specification
 - Save state
 - Replay recording
 - Dynamic number of levels, rooms, guards and events
@@ -94,24 +97,16 @@ The following additional features are planned to be implemented soon.
 - Network play
 - Back in time
 - Arbitrary resolution graphics set support
+- On-the-fly multiple sound set support
 - Level generator
 - Android, iOS, Mac OS X ports
-
-
-### Links
-
-- [Homepage](http://oitofelix.github.io/mininim/)
-- [Forum](http://forum.princed.org/viewforum.php?f=127)
-- [IRC channel](irc://irc.freenode.net/mininim)
-- [Bug reporting](https://github.com/oitofelix/mininim/issues)
-- [VCS](https://github.com/oitofelix/mininim)
 
 
 ### Game play
 
 [![MININIM multi-room features](https://img.youtube.com/vi/i8kXFLuZ8Io/0.jpg)](https://www.youtube.com/watch?v=i8kXFLuZ8Io)
 
-[![MININIM fake constructions - fake wall](https://img.youtube.com/vi/UFBaBVS7Kc8/0.jpg)](https://www.youtube.com/watch?v=UFBaBVS7Kc8)
+Notice that animations and multi-room support have been further improved.
 
 
 ### Download
@@ -120,15 +115,18 @@ MININIM is under constant and fast development.  It uses a rolling
 release scheme, meaning that updated versions are often released as
 soon as new features have been implemented or bugs have been fixed.
 This way the latest developments are always available to an wider
-audience.
+audience.  Notice that its version number reflects the date of
+release.
 
 Its user's manual (in PDF format) is bundled in the hope that it might
 be useful, but keep in mind that it lags far behind the current
-development stage of MININIM and thus doesn't describe many features
-thereof accurately or at all.  The author plans to update MININIM's
-documentation in a definitive manner when MININIM reaches reasonable
-feature-set stability.  In case you'd like to help in maintaining the
-documentation, you're very welcome!
+development stage of MININIM and thus doesn't describe several
+features thereof accurately or at all.  The author plans to update
+MININIM's documentation in a definitive manner when MININIM reaches
+reasonable feature-set stability.  In case you'd like to help in
+speeding up this process by maintaining its documentation, you're very
+welcome!  Please, contact the MININIM community at its
+[forum](http://forum.princed.org/viewforum.php?f=127).
 
 
 **Windows**
@@ -170,10 +168,12 @@ best place to obtain help is at its
 - `CTRL+L`: load configuration
 - `CTRL+P`: save picture
 
+
 - `F9`: change hue palette
 - `F10`: change guard mode
 - `F11`: change environment mode
 - `F12`: change video mdoe
+
 
 - `D`: change display mode
 - `F`: enable/disable fullscreen (desktop mode)
@@ -181,12 +181,14 @@ best place to obtain help is at its
 - `SHIFT+K`: flip gamepad
 - `SHIFT+B`: enable/disable room drawing
 
+
 - `ESC`: pause game
 - `SPACE`: display remaining time
 - `+`: increment remaining time
 - `-`: decrement remaining time
 - `(`: decrease time frequency
 - `)`: increase time frequency
+
 
 - `R`: resurrect kid
 - `A`: alternate between kid and its shadows
@@ -196,11 +198,13 @@ best place to obtain help is at its
 - `SHIFT+T`: increment kid's total lives
 - `SHIFT+W`: float kid
 
+
 - `TAB`: display skill
 - `CTRL+=`: increment counter attack skill
 - `CTRL+-`: decrement counter attack skill
 - `ALT+=`: increment counter defense skill
 - `ALT+-`: decrement counter defense skill
+
 
 - `F8`: enable/disable level editor
 - `CTRL+Z`: undo level modification
@@ -209,6 +213,7 @@ best place to obtain help is at its
 - `SHIFT+M`: warp to previous level
 - `C`: show direct coordinates
 - `SHIFT+C`: show indirect coordinates
+
 
 - `HOME`: focus multi-room view on kid
 - `SHIFT+HOME`: center multi-room view
@@ -240,6 +245,14 @@ best place to obtain help is at its
 - `ALT+N`: move multi-room view one page below (above if flipped
   vertically)
 
+
+### Links
+
+- [Homepage](http://oitofelix.github.io/mininim/)
+- [Forum](http://forum.princed.org/viewforum.php?f=127)
+- [IRC channel](irc://irc.freenode.net/mininim)
+- [Bug reporting](https://github.com/oitofelix/mininim/issues)
+- [VCS](https://github.com/oitofelix/mininim)
 
 
 ### Support MININIM development
