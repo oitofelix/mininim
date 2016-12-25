@@ -159,7 +159,7 @@ physics_in (struct anim *k)
 
   /* inertia */
   if (k->i < 6 || k->i > 10) k->inertia = 3;
-  else k->inertia = 5;
+  else k->inertia = 7;
 
   /* collision */
   int dx = k->i < 6 ? +0 : -8;

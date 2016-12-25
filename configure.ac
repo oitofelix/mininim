@@ -128,7 +128,7 @@ AS_CASE([$host],
 
 # MinGW
 [*-*-mingw*],
-  AC_DEFINE([MINGW_BUILD], [true], [Define to 1 if this build is targeting MinGW.])
+  AC_DEFINE([MINGW_BUILD], [1], [Define to 1 if this build is targeting MinGW.])
 
   [ALLEGRO_CFLAGS=""
    ALLEGRO_LIBS="-lallegro${debug_sufix}"
@@ -168,6 +168,8 @@ AS_CASE([$host],
       -lstdc++"],
 
 # Default
+  AC_DEFINE([MINGW_BUILD], [0], [Define to 1 if this build is targeting MinGW.])
+
  [PKG_CHECK_MODULES([ALLEGRO],
   [allegro-5 >= $allegro_minver],,
   [PKG_CHECK_MODULES([ALLEGRO],
