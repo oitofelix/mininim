@@ -50,31 +50,196 @@ Licence) as published by the FSF — with no Invariant Sections; either
 version 1.3, or (at your option) any later version.
 
 MININIM features various improvements over the original game, too many
-to make an exhaustive list here.  Some of its noteworthy advantages
-are:
+to make an exhaustive list here.  Some of its noteworthy features are:
 
-- Portable to modern operating systems.
-- Video, environment, hue and guard modes may be selected on-the-fly.
-- Mirror mode (inverts screen and gamepad axis horizontally).
-- Joystick mapping and threshold configuration.
+- Portable to modern operating systems
+- Generalized multi-room support
+- Video, environment, hue and guard modes may be selected on-the-fly
+- Screen mirroring mode (inverts screen and gamepad axis horizontally)
+- Level mirroring mode (completely inverts level constructions
+  horizontally on-the-fly)
+- Joystick mapping and threshold configuration
 - Improved battle system based on upgradable skills, arbitrary number
-  of simultaneous fighters and smarter enemy AI.
-- Real-time responsiveness, higher world interaction accuracy and
-  more stable animations.
-- New useful movements.
-- Volume of sounds based on distance from the source.
-- Integrated configuration system using multiple back-ends.
-- Capability of loading level files in multiple formats.
+  of simultaneous fighters and smarter enemy AI
+- Any type of guard per level, styles applicable to any guard type and
+  guard skills fine-tuned per guard.
+- Sword can be drawn at will, but it draws and keeps it automatically
+  when appropriate.
+- Real-time responsiveness, higher world interaction accuracy, more
+  stable animations, smoother collision and robust physics
+- Single pressing transition commands
+- New useful movements: normal jump hang, normal jump turn, running
+  jump hang, running jump turn, hanging fall, hanging turn,
+- Complete level editor based on non-intrusive mode-line menus and
+  mouse selection
+- Unlimited undo/redo for level changes
+- Integrated configuration system using multiple back-ends
+- Native (fully expressive) level format
+- Capability of loading level files in multiple formats: native,
+  legacy, PLV and DAT
+- Consistency level generator module
+- Arbitrary combinations of foreground and background for
+  constructions
+- Generalized fake constructions
+- Rich set of itemmizable constructions and items
+- Support for triggering of any tile
+- Screenshot capturing
+
+The following additional features are planned to be implemented soon.
+
+- Save state
+- Replay recording
+- Dynamic number of levels, rooms, guards and events
+- Guile scripting
+- Network play
+- Back in time
+- Arbitrary resolution graphics set support
+- Level generator
+- Android, iOS, Mac OS X ports
 
 
 ### Links
 
 - [Homepage](http://oitofelix.github.io/mininim/)
-- [Atom feed](http://oitofelix.github.io/feed.xml)
 - [Forum](http://forum.princed.org/viewforum.php?f=127)
 - [IRC channel](irc://irc.freenode.net/mininim)
 - [Bug reporting](https://github.com/oitofelix/mininim/issues)
 - [VCS](https://github.com/oitofelix/mininim)
+
+
+### Game play
+
+[![MININIM multi-room features](https://img.youtube.com/vi/i8kXFLuZ8Io/0.jpg)](https://www.youtube.com/watch?v=i8kXFLuZ8Io)
+
+[![MININIM fake constructions - fake wall](https://img.youtube.com/vi/UFBaBVS7Kc8/0.jpg)](https://www.youtube.com/watch?v=UFBaBVS7Kc8)
+
+
+### Download
+
+MININIM is under constant and fast development.  It uses a rolling
+release scheme, meaning that updated versions are often released as
+soon as new features have been implemented or bugs have been fixed.
+This way the latest developments are always available to an wider
+audience.
+
+Its user's manual (in PDF format) is bundled in the hope that it might
+be useful, but keep in mind that it lags far behind the current
+development stage of MININIM and thus doesn't describe many features
+thereof accurately or at all.  The author plans to update MININIM's
+documentation in a definitive manner when MININIM reaches reasonable
+feature-set stability.  In case you'd like to help in maintaining the
+documentation, you're very welcome!
+
+
+**Windows**
+
+   If you are under Microsoft Windows a MinGW build is readily
+available.  No installation is required, just extract the zip archive
+and run ‘mininim.exe’.
+
+[mininim-201612251709.zip](https://github.com/oitofelix/mininim/files/672293/mininim-201612251709.zip)
+
+
+**GNU/Linux**
+
+  If you use GNU/Linux, you have to clone its
+[VCS repository](https://github.com/oitofelix/mininim) and build it
+yourself.  It should be quite straightforward --- just follow the
+advice given at its GitHub page.
+
+
+### Using MININIM
+
+This briefly describes how to access most currently implemented
+MININIM features.  You can have access to other features using the
+command-line.  Use `mininim --help` for a complete list of the
+available options.  In case you have any question about MININIM, the
+best place to obtain help is at its
+[forum](http://forum.princed.org/viewforum.php?f=127).
+
+
+**Key bindings**
+
+- `CTRL+R`: restart game
+- `CTRL+A`: restart level
+- `CTRL+G`: save game
+- `CTRL+Q`: quit game
+- `CTRL+V`: show MININIM version
+- `CTRL+S`: enable/disable sound
+- `CTRL+J`: calibrate joystick
+- `CTRL+L`: load configuration
+- `CTRL+P`: save picture
+
+- `F9`: change hue palette
+- `F10`: change guard mode
+- `F11`: change environment mode
+- `F12`: change video mdoe
+
+- `D`: change display mode
+- `F`: enable/disable fullscreen (desktop mode)
+- `SHIFT+I`: flip screen
+- `SHIFT+K`: flip gamepad
+- `SHIFT+B`: enable/disable room drawing
+
+- `ESC`: pause game
+- `SPACE`: display remaining time
+- `+`: increment remaining time
+- `-`: decrement remaining time
+- `(`: decrease time frequency
+- `)`: increase time frequency
+
+- `R`: resurrect kid
+- `A`: alternate between kid and its shadows
+- `K`: kill current enemy
+- `I`: enable/disable immortal mode
+- `SHIFT+S`: increment kid's current lives
+- `SHIFT+T`: increment kid's total lives
+- `SHIFT+W`: float kid
+
+- `TAB`: display skill
+- `CTRL+=`: increment counter attack skill
+- `CTRL+-`: decrement counter attack skill
+- `ALT+=`: increment counter defense skill
+- `ALT+-`: decrement counter defense skill
+
+- `F8`: enable/disable level editor
+- `CTRL+Z`: undo level modification
+- `CTRL+Y`: redo level modification
+- `SHIFT+L`: warp to next level
+- `SHIFT+M`: warp to previous level
+- `C`: show direct coordinates
+- `SHIFT+C`: show indirect coordinates
+
+- `HOME`: focus multi-room view on kid
+- `SHIFT+HOME`: center multi-room view
+- `M`: change multi-room fit mode
+- `[`: decrease multi-room resolution
+- `]`: increase multi-room resolution
+- `CTRL+[`: decrease multi-room width resolution
+- `CTRL+]`: increase multi-room width resolution
+- `ALT+[`: decrease multi-room height resolution
+- `ALT+]`: increase multi-room height resolution
+- `H`: select room at left (right if flipped horizontally)
+- `J`: select room at right (left if flipped horizontally)
+- `U`: select room above (below if flipped vertically)
+- `N`: select room below (above if flipped vertically)
+- `SHIFT+H`: move multi-room view one cell to left (right if flipped
+  horizontally)
+- `SHIFT+J`: move multi-room view one cell to right (left if flipped
+  horizontally)
+- `SHIFT+U`: move multi-room view one cell above (below if flipped
+  vertically)
+- `SHIFT+N`: move multi-room view one cell below (above if flipped
+  vertically)
+- `ALT+H`: move multi-room view one page to left (right if flipped
+  horizontally)
+- `ALT+J`: move multi-room view one page to right (left if flipped
+  horizontally)
+- `ALT+U`: move multi-room view one page above (below if flipped
+  vertically)
+- `ALT+N`: move multi-room view one page below (above if flipped
+  vertically)
+
 
 
 ### Support MININIM development
@@ -91,243 +256,6 @@ support.
 
 [__PLEASE, SUPPORT MININIM DEVELOPMENT!__](/funding.html)
 
-
-### Game play
-
-The image below links to a game play demonstration in the animated PNG
-(APNG) format.  This format was chosen because it produces perfect
-image quality with sizes __much smaller__ than the common general
-video formats.  It may not work with all browsers.
-
-<div>
-<a href="{{ page.base_local }}{{ site.baseurl }}/game-play.html"
-alt="Game play" title="Click here to watch a game play (APNG format).">
-<img src="{{ page.base_local }}{{ site.baseurl }}/game-play-thumb.png">
-</a>
-</div>
-
-
-### Download
-
-
-**User’s Manual**
-
-   If you just want to have a look in the latest release documentation,
-you can download the manual in PDF format separately.
-
-   [mininim-0.10.pdf](https://github.com/oitofelix/mininim/releases/download/v0.10/mininim-0.10.pdf)
-
-
-**Windows**
-
-   If you are under Microsoft Windows a MinGW build is readily
-available.  No installation is required, just extract the zip archive
-and run ‘mininim.exe’.  The PDF manual is bundled as well.
-
-   [mininim-0.10-win32.zip](https://github.com/oitofelix/mininim/releases/download/v0.10/mininim-0.10-win32.zip)
-
-
-**GNU/Linux**
-
-   If you use GNU/Linux, you have to build from source.  This should be
-quite straightforward, provided you install the Allegro 5 development
-libraries using your distribution’s package manager.  If you use an apt
-based distribution (Debian, Ubuntu, ...)  you can do this by invoking
-the command:
-
-     sudo apt-get install '^liballegro.*5-dev$'
-
-   When building the sources, the usual incantation ‘./configure &&
-make’ is often enough.  The installation step (‘make install’) is
-optional as MININIM is able to run directly from its source directory
-(provided you don’t make a ‘VPATH’ build, in which case you need to
-specify the _data path_.  See the ‘--data-path’ option).
-
-Here are the compressed sources and a GPG detached signature:
-
-- [mininim-0.10.tar.gz](https://github.com/oitofelix/mininim/releases/download/v0.10/mininim-0.10.tar.gz)
-- [mininim-0.10.tar.gz.sig](https://github.com/oitofelix/mininim/releases/download/v0.10/mininim-0.10.tar.gz.sig)
-
-
-Use the ‘.sig’ file to verify that the corresponding file (without the
-‘.sig’ suffix) is intact.  First, be sure to download both the ‘.sig’
-file and the corresponding tarball.  Then, run this command:
-
-     gpg --verify mininim-0.10.tar.gz.sig
-
-If that command fails because you don’t have the required public key,
-then run this command to import it:
-
-     gpg --recv-keys 0x28D618AF --keyserver hkp://keys.gnupg.net
-
-and rerun the ‘gpg --verify’ command.
-
-This release is signed by _Bruno Félix Rezende Ribeiro_.  His key
-fingerprint is ‘7CB1 208C 7336 56B7 5962 2500 27B9 C6FD 28D6 18AF’.
-
-This release was bootstrapped with the following tools:
-
-- GNU Autoconf 2.69
-- GNU Automake 1.14.1
-- GNU Texinfo 5.2
-
-
-### MININIM 0.10 (March 01, 2016)
-
-**Features:**
-
-- Joystick support.  To use a joystick just plug it in and press
-‘CTRL+J’ to enable and auto-calibrate it on the fly.  See the manual
-for the default mapping.  If the default mapping doesn’t suit you or
-your joystick, you can use the options ‘--joystick-axis’,
-‘-joystick-button’ and ‘--joystick-info’ to define a new mapping.  In
-case your joystick is ill-behaved the ‘--joystick-axis-threshold’ and
-‘--joystick-button-threshold’ options may help.  Using a joystick
-doesn’t disable the keyboard — you can use both interchangeably.
-
-- Classic numeric keypad control.  This is always enabled, and can be
-used along the two other input methods (arrow keys and joystick).  The
-original game manual used to refer to this as the standard input
-method.
-
-- Apoplexy level editor integration.  Just copy MININIM’s executable
-along with any dlls (if under _Windows_) and its ‘data’ directory to
-apoplexy’s ‘prince/’ directory, rename the executable to ‘prince.exe’
-(‘prince’ if under _GNU/Linux_) and make sure there is a ‘LEVELS.DAT’
-file there, and you are ready to go.  Apoplexy will invoke MININIM as
-a drop-in replacement for the original engine.
-
-- Hue coloring support.  This makes the engine able to render VGA
-color schemes like the 1.3 and 1.4 versions of the original game.
-That’s the default.  You can force particular hue modes by using the
-‘--hue-mode’ option or the ‘F9’ key binding.  To revert to the
-previous and classic behavior use ‘--hue-mode=NONE’.
-
-- Support for reading legacy PoP 1 ‘LEVELS.DAT’ file using the option
-‘--legacy-level=DAT’.  Put the ‘LEVELS.DAT’ file inside
-‘data/dat-levels/’ directory and use that option.
-
-- Support for reading legacy PoP 1 PLV extended level files using the
-option ‘--legacy-level=PLV’.  Put the ‘00.plv’..‘15.plv’ PLV files
-inside ‘data/plv-levels/’ and use that option.
-
-- Command line legacy compatibility for the sake of applications which
-use it.  Used by apoplexy.
-
-- ‘LEVELS.DAT’ legacy loading behavior compatibility for the sake of
-applications that rely on it.  Used by apoplexy.  Just put the
-‘LEVELS.DAT’ file in the same directory as the ‘mininim’ executable
-and preference will be given to it, over the legacy level files under
-the ‘dat/legacy-levels/’ directory.
-
-- Kid start position can be specified using the ‘--start-pos’ option.
-Very useful for placing the kid in a specific place for tests.  To
-start with the kid in level 12, room 15, floor 0 and place 7, invoke
-MININIM with the options ‘--start-level=12 --start-pos=15,0,7’.
-
-- Disable screensaver by default.
-
-- Guards have infallible defense in refraction periods, for longer
-and more dramatic battles.
-
-- Shadow in legacy level 12 has the same total/current life points as
-the kid, and life points are taken off one at a time, for a longer and
-more dramatic battle.
-
-- ‘--keyboard-flip-mode’ option renamed to ‘--gamepad-flip-mode’,
-since now it applies to joysticks as well.
-
-**Bug fixes:**
-
-All the bugs the author knew about at the time of this release have
-been fixed.  If you’ve found a bug or annoyance in the previous
-version, chances are it has been fixed, as well.  ;-)
-
-- Spurious wall collision occurs in kid’s stabilization movement.
-
-- Kid can’t hang on a ledge after a long floating fall.
-
-- Kid’s _run_ movement after a _running turn_ starts one frame off.
-
-- In some circumstances the kid is unable to reach the other end
-after a jump, as if a force field prevented him from landing there.
-
-- Kid dies after just touching guards.
-
-- Guards spuriously attack thin air while trying to prevent the kid
-from bypassing them.
-
-- While in counter attack and counter defense mode kid defends even
-if too far from the guard, when he could otherwise let the guard
-strike only thin air.
-
-- Restarting the game while it’s paused causes it to get stuck in a
-paused state after the title screen.
-
-- It’s hard to perform 3-tile running jumps because MININIM is
-lacking platform edge detection.
-
-- Kid doesn’t stumble on guards, in case he manages to pass through
-them without being hit.
-
-- Guards continue to advance towards the kid, even when he is running
-towards them.
-
-- Guard mode changing doesn’t work for guards that died falling,
-spiked or chopped.
-
-- Kid can’t battle properly against more than one guard at once.
-
-- Shadow death music in level 12 plays in a row if reviving kid with
-R repeatedly in a short period of time.
-
-- Legacy level rooms above room 0 may have traversable constructions
-at bottom over room 0’s walls.
-
-- In legacy level 12 shadow appears sooner than expected if the kid
-manages to enter room 15 from below after exiting room 18 to the
-right.
-
-- Guards turn too quickly when their attention is grabbed from
-opposite directions in a short period of time.
-
-- Drawing glitches occur in several situations involving two
-characters near each other.
-
-- Fight mode collision detection is ill-behaved for kid and guards.
-
-- Game doesn’t pause while saving.
-
-- In some cases of death after fight, the normal death tune is played
-along the fight one.
-
-- Falling close to door makes kid collide and stabilize standing,
-instead of crouching.
-
-- Guard chasing logic has flaws and corner cases that result in
-counter-intuitive guard behavior in certain situations.
-
-- If the kid is exactly 27 pixels from falling, walking to the very
-edge and then from there again doesn’t trigger a misstep.
-
-- Turning close to door at its left causes a spurious collision.
-
-- Game saves should store the remaining time of when kid first enters
-the level, not of when the game is saved.
-
-- Simple jump might fall earlier than expected.
-
-
-### To do
-
-The following additional features are planned to be implemented
-eventually.
-
-- Native level format
-- Level editor
-- Level generator module
-- Guile scripting
-- Network play
 
 
 <hr>
