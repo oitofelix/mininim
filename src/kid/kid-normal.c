@@ -53,8 +53,7 @@ kid_normal (struct anim *k)
 static bool
 flow (struct anim *k)
 {
-  struct pos pbf, pmt;
-  survey (_bf, pos, &k->f, NULL, &pbf, NULL);
+  struct pos pmt;
 
   k->collision = false;
   k->hit_by_loose_floor = false;
@@ -69,9 +68,18 @@ flow (struct anim *k)
     || ((k->f.dir == LEFT) && k->key.left && k->key.up);
   bool couch = k->key.down;
   bool vjump = k->key.up;
-  bool drink = is_potion (&pbf) && k->key.shift;
-  bool raise_sword = is_sword (&pbf) && k->key.shift;
   bool take_sword = k->key.enter && k->has_sword;
+
+  /* acquire item */
+  invalid_pos (&k->item_pos);
+  if (k->key.shift) {
+    struct pos pbf; survey (_bf, pos, &k->f, NULL, &pbf, NULL);
+    struct pos pbf2; survey (_bf, posf, &k->f, NULL, &pbf2, NULL);
+    if (is_potion (&pbf) || is_sword (&pbf))
+      k->item_pos = pbf;
+    else if (is_potion (&pbf2) || is_sword (&pbf2))
+      k->item_pos = pbf2;
+  }
 
   survey (_mt, pos, &k->f, NULL, &pmt, NULL);
   bool stairs = k->key.up && ! k->key.left && ! k->key.right
@@ -125,17 +133,11 @@ flow (struct anim *k)
       return false;
     }
 
-    if (drink) {
-      k->item_pos = pbf;
-      place_frame (&k->f, &k->f, kid_couch_frameset[0].frame,
-                   &k->item_pos, (k->f.dir == LEFT)
-                   ? PLACE_WIDTH + 3 : +9, +27);
-      kid_couch (k);
-      return false;
-    }
-
-    if (raise_sword) {
-      k->item_pos = pbf;
+    if (is_valid_pos (&k->item_pos)) {
+      if (is_potion (&k->item_pos))
+        place_frame (&k->f, &k->f, kid_couch_frameset[0].frame,
+                     &k->item_pos, (k->f.dir == LEFT)
+                     ? PLACE_WIDTH + 3 : +9, +27);
       kid_couch (k);
       return false;
     }
