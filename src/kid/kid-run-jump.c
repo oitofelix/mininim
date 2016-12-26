@@ -167,7 +167,8 @@ physics_in (struct anim *k)
   /* crossing mirror */
   if ((k->i >= 4 && k->i <= 8)
       && uncollide (&k->f, &k->fo, _bf, dx, dx, NULL, &k->ci)
-      && fg (&k->ci.con_p) == MIRROR) {
+      && fg (&k->ci.con_p) == MIRROR
+      && ! is_collidable_at_right (&k->ci.kid_p, &k->f)) {
     if ((! is_valid_pos (&k->cross_mirror_p)
          || ! peq (&k->cross_mirror_p, &k->ci.con_p))) {
       play_audio (&mirror_audio, NULL, k->id);

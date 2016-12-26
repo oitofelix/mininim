@@ -481,7 +481,8 @@ compute_spikes_floors (void)
       if (is_kid_dead (&a->f)
           || a->immortal
           || a->spikes_immune
-          || ext (&s->p) >= 5) continue;
+          || ext (&s->p) >= 5
+          || get_anim_dead_at_pos (&s->p)) continue;
       struct pos pbf, pmbo;
       survey (_bf, pos, &a->f, NULL, &pbf, NULL);
       survey (_mbo, pos, &a->f, NULL, &pmbo, NULL);
