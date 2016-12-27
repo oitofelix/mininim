@@ -8,12 +8,12 @@ BEGIN
     BEGIN
       VALUE "CompanyName", "oitofelix"
       VALUE "FileDescription", "MININIM: The Advanced Prince of Persia Engine (a childhood dream)"
-      VALUE "FileVersion", "0.9"
+      VALUE "FileVersion", "1.0"
       VALUE "InternalName", "mininim"
       VALUE "LegalCopyright", "Bruno Félix Rezende Ribeiro"
       VALUE "OriginalFilename", "mininim.exe"
       VALUE "ProductName", "MININIM"
-      VALUE "ProductVersion", "0.9"
+      VALUE "ProductVersion", "1.0"
     END
   END
 
