@@ -22,8 +22,7 @@
 struct level *
 next_native_level (struct level *l, int n)
 {
-  if (n < 1) n = 14;
-  else if (n > 14) n = 1;
+  n = validate_legacy_level_number (n);
   return load_native_level (l, n);
 }
 
@@ -159,7 +158,7 @@ load_native_level (struct level *l, int n)
         v = al_get_config_value (c, NULL, k);
         al_free (k);
         if (! v) goto end_con_loop;
-        int f, b, e, ff;
+        int f = 0, b = 0, e = 0, ff = -1;
         sscanf (v, "%i %i %i %i", (int *) &f, &b, &e, &ff);
         set_con (&p, f, b, e, ff);
       }

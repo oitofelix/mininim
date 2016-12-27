@@ -101,7 +101,8 @@ mininim_SOURCES = src/mininim.c src/mininim.h src/constants.h					\
 		src/kernel/threads.h src/kernel/xconfig.c src/kernel/xconfig.h		\
 		src/kernel/diff.c src/kernel/diff.h src/menu.c src/menu.h					\
 		src/editor.c src/editor.h src/debug.c src/debug.h src/undo.c			\
-		src/undo.h src/multi-room.c src/multi-room.h src/box.c src/box.h
+		src/undo.h src/multi-room.c src/multi-room.h src/box.c src/box.h	\
+		src/replay.c src/replay.h
 
 ${mininim_OBJECTS}: ${top_builddir}/src/mininim.h.gch
 

@@ -94,6 +94,7 @@ int start_time = START_TIME;
 int start_level_time;
 enum semantics semantics;
 enum movements movements;
+bool title_demo = false;
 
 struct skill skill = {.counter_attack_prob = INITIAL_KCA,
                       .counter_defense_prob = INITIAL_KCD};
@@ -134,8 +135,8 @@ static struct argp_option options[] = {
   {NULL, 0, NULL, 0, "Level:", 0},
   {"level-module", LEVEL_MODULE_OPTION, "LEVEL-MODULE", 0, "Select level module.  A level module determines a way to generate consecutive levels for use by the engine.  Valid values for LEVEL-MODULE are: NATIVE, LEGACY, PLV, DAT and CONSISTENCY.  NATIVE is the module designed to read the native format that supports all features.  LEGACY is the module designed to read the original PoP 1 raw level files.  PLV is the module designed to read the original PoP 1 PLV extended level files.  DAT is the module designed to read the original PoP 1 LEVELS.DAT file.  CONSISTENCY is the module designed to generate random-corrected levels for accessing the engine robustness.  The default is NATIVE.", 0},
   {"convert-levels", CONVERT_LEVELS_OPTION, NULL, 0, "Batch convert levels 1 to 14 accessible by the current level module to the native format and exit.  The levels are saved in the user data directory, where they take precedence over levels in every other location.  When using this option there is no point in using any other options besides '--level-module' and '--mirror-level', both of which must occur before this to take effect.  You can accomplish a similar result in-game on a per level basis by using the 'E>LS' command.  Notice that in that case any changes made to the level by special events (or otherwise) before you trigger the save command will be retained.", 0},
-  {"start-level", START_LEVEL_OPTION, "N", 0, "Make the kid start at level N.  The default is 1.  Valid integers range from 1 to INT_MAX.  This can be changed in-game by the SHIFT+L and SHIFT+M key binding.", 0},
-  {"start-pos", START_POS_OPTION, "R,F,P", 0, "Make the kid start at room R, floor F and place P. The default is to let this decision to the level module.  R is an integer ranging from 1 to INT_MAX, F is an integer ranging from 0 to 2 and P is an integer ranging from 0 to 9.", 0},
+  {"start-level", START_LEVEL_OPTION, "N", 0, "Make the kid start at level N.  The default is 1.  Valid integers range from 0 to INT_MAX.  This can be changed in-game by the SHIFT+L and SHIFT+M key binding.", 0},
+  {"start-pos", START_POS_OPTION, "R,F,P", 0, "Make the kid start at room R, floor F and place P. The default is to let this decision to the level module.  R is an integer ranging from 1 to INT_MAX, F is an integer ranging from 0 to 2 and P is an integer ranging from 0 to 9.  This option has no effect on replays.", 0},
   {"mirror-level", MIRROR_LEVEL_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable level mirroring.  This option causes every level to be fully mirrored (cons+links) in the horizontal direction after they have been loaded by the active level module.  The default is FALSE.  You can accomplish a similar result in-game on a per level basis by using the 'E>LMBH' command.  See also the '--mirror-mode' option.", 0},
   {NULL, 0, NULL, OPTION_DOC, "If the option '--level-module' is not given and there is a LEVELS.DAT file in the working directory, the DAT level module is automatically used to load that file.  This is a compatibility measure for applications which depend upon this legacy behavior.", 0},
   {NULL, 0, NULL, OPTION_DOC, "", 0},
@@ -157,7 +158,7 @@ static struct argp_option options[] = {
   {NULL, 0, NULL, 0, "Rendering:", 0},
   {"video-mode", VIDEO_MODE_OPTION, "VIDEO-MODE", 0, "Select video mode.  Valid values for VIDEO-MODE are: VGA, EGA, CGA and HGC.  The default is VGA.  This can be changed in-game by the F12 key binding.", 0},
   {"environment-mode", ENVIRONMENT_MODE_OPTION, "ENVIRONMENT-MODE", 0, "Select environment mode.  Valid values for ENVIRONMENT-MODE are: ORIGINAL, DUNGEON and PALACE.  The ORIGINAL value gives level modules autonomy in this choice for each particular level. This is the default.  This can be changed in-game by the F11 key binding.", 0},
-  {"guard-mode", GUARD_MODE_OPTION, "GUARD-MODE", 0, "Select guard mode.  Valid values for GUARD-MODE are: ORIGINAL, GUARD, FAT-GUARD, VIZIER, SKELETON and SHADOW.  The ORIGINAL value gives level modules autonomy in this choice for each particular guard.  This is the default.  This can be changed in-game by the F10 key binding.", 0},
+  {"guard-mode", GUARD_MODE_OPTION, "GUARD-MODE", 0, "Select guard mode.  Valid values for GUARD-MODE are: ORIGINAL, GUARD, FAT-GUARD, VIZIER, SKELETON and SHADOW.  The ORIGINAL value gives level modules autonomy in this choice for each particular guard.  This is the default.  This can be changed in-game by the F10 key binding.  This option has no effect on replays.", 0},
 {"hue-mode", HUE_MODE_OPTION, "HUE-MODE", 0, "Select hue mode.  Valid values for HUE-MODE are: ORIGINAL, NONE, GREEN, GRAY, YELLOW and BLUE.  The ORIGINAL value gives level modules autonomy in this choice for each particular level.  This is the default.  For the classic behavior of the first version of the original game use NONE.  This can be changed in-game by the F9 key binding.", 0},
   {"display-flip-mode", DISPLAY_FLIP_MODE_OPTION, "DISPLAY-FLIP-MODE", 0, "Select display flip mode.  Valid values for DISPLAY-FLIP-MODE are: NONE, VERTICAL, HORIZONTAL and VERTICAL-HORIZONTAL.  The default is NONE.  This can be changed in-game by the SHIFT+I key binding.", 0},
   {"mirror-mode", MIRROR_MODE_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable mirror mode.  In mirror mode the screen and the keyboard are flipped horizontally.  This is equivalent of specifying both the options --display-flip-mode=HORIZONTAL and --gamepad-flip-mode=HORIZONTAL.  The default is FALSE.  This can be changed in-game by the SHIFT+I and SHIFT+K key bindings for the display and keyboard, respectively.  See also the '--mirror-level' option.", 0},
@@ -198,6 +199,8 @@ static struct argp_option options[] = {
   {"inhibit-screensaver", INHIBIT_SCREENSAVER_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Prevent the system screensaver from starting up.  The default is TRUE.", 0},
   {"semantics", SEMANTICS_OPTION, "SEMANTICS", 0, "Select semantics.  Valid values for SEMANTICS are: NATIVE and LEGACY.  The default is NATIVE.  A semantics determines in an abstract sense the meaning and behavior of game elements.  Currently it's used to make legacy level sets which depend on the original semantics finishable.", 0},
   {"movements", MOVEMENTS_OPTION, "MOVEMENTS", 0, "Select movements.  Valid values for MOVEMENTS are: NATIVE and LEGACY.  The default is NATIVE.  This determines the set of movements the kid can perform.", 0},
+  {"replay", REPLAY_OPTION, "FILE", 0, "Load replay FILE and play it.  This can be done in-game by the F7 key binding.", 0},
+  {"record-replay", RECORD_REPLAY_OPTION, NULL, 0, "Starts recording replay countdown at game beginning.  Use this in conjunction with '--start-level' to start recording a given level.  This can be done in-game by the ALT+F7 key binding.", 0},
 
   /* Help */
   {NULL, 0, NULL, 0, "Help:", -1},
@@ -606,7 +609,7 @@ parser (int key, char *arg, struct argp_state *state)
   char *movements_enum[] = {"NATIVE", "LEGACY", NULL};
 
   struct int_range total_lives_range = {1, 10};
-  struct int_range start_level_range = {1, INT_MAX};
+  struct int_range start_level_range = {0, INT_MAX};
   struct int_range start_pos_room_range = {1, INT_MAX};
   struct int_range start_pos_floor_range = {0, 2};
   struct int_range start_pos_place_range = {0, 9};
@@ -936,6 +939,20 @@ Levels have been converted using module %s into native format at\n\
     case 1: movements = LEGACY_MOVEMENTS; break;
     }
     break;
+  case REPLAY_OPTION:
+    if (! load_replay (&replay, arg))
+      error (-1, 0, "replay loading of '%s' failed", arg);
+    level_start_replay_mode = PLAY_REPLAY;
+    next_level = replay.start_level;
+    skip_title = true;
+    recording_replay_countdown = -1;
+    break;
+  case RECORD_REPLAY_OPTION:
+    level_start_replay_mode = NO_REPLAY;
+    next_level = 0;
+    skip_title = false;
+    prepare_for_recording_replay ();
+    break;
   case ARGP_KEY_ARG:
     /* cheat */
     if (! strcasecmp ("MEGAHIT", arg)) break;
@@ -1203,6 +1220,7 @@ main (int _argc, char **_argv)
   clear_bitmap (uscreen, TRANSPARENT_COLOR);
   cutscene_started = false;
   stop_audio_instances ();
+  stop_video_effect ();
 
   /* /\* begin test *\/ */
   /* cutscene = true; */
@@ -1210,12 +1228,35 @@ main (int _argc, char **_argv)
   /* exit (0); */
   /* /\* end test *\/ */
 
+  title_demo = true;
+
   play_title ();
+
+  stop_audio_instances ();
   stop_video_effect ();
   if (quit_anim == QUIT_GAME) quit_game ();
+
+  if (! title_demo) goto play_game;
+
+  struct replay *replay_ptr =
+    load_resource ("data/replays/title.mrp", (load_resource_f) xload_replay);
+  if (replay_ptr) {
+    level_start_replay_mode = PLAY_REPLAY;
+    if (! next_legacy_level (&vanilla_level, replay.start_level))
+      exit (-1);
+    play_level (&vanilla_level);
+  }
+
   stop_audio_instances ();
+  stop_video_effect ();
+  if (quit_anim == QUIT_GAME) quit_game ();
+
+  if (! title_demo) goto play_game;
+
+  goto restart_game;
 
  play_game:
+  title_demo = false;
   cutscene = false;
   game_paused = false;
   total_lives = initial_total_lives;
@@ -1225,7 +1266,8 @@ main (int _argc, char **_argv)
 
   give_dat_compat_preference ();
 
-  if (! level_module_next_level (&vanilla_level, start_level))
+  int level = next_level ? next_level : start_level;
+  if (! level_module_next_level (&vanilla_level, level))
     exit (-1);
   play_level (&vanilla_level);
 
@@ -1348,6 +1390,8 @@ get_paths (void)
   xasprintf (&load_config_dialog.initial_path, "%s", user_settings_dir);
   xasprintf (&save_game_dialog.initial_path, "%s", user_settings_dir);
   xasprintf (&save_picture_dialog.initial_path, "%s", user_documents_dir);
+  xasprintf (&save_replay_dialog.initial_path, "%s", user_data_dir);
+  xasprintf (&load_replay_dialog.initial_path, "%s", user_data_dir);
 }
 
 static void
@@ -1453,6 +1497,7 @@ save_game (char *filename)
   char *start_level_str, *start_time_str,
     *total_lives_str, *kca_str, *kcd_str;
 
+  /* TODO: add time mode (limited/unlimited) when implemented */
   xasprintf (&start_level_str, "%i", global_level.n);
   xasprintf (&start_time_str, "%i", start_level_time);
   xasprintf (&total_lives_str, "%i", total_lives);
@@ -1468,7 +1513,7 @@ save_game (char *filename)
 
   char *error_str = al_save_config_file (filename, config)
     ? "GAME HAS BEEN SAVED"
-    : "GAME SAVE FAILED";
+    : "GAME SAVING FAILED";
 
   draw_bottom_text (NULL, error_str, 0);
 

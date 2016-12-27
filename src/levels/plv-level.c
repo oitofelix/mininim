@@ -22,8 +22,7 @@
 struct level *
 next_plv_level (struct level *l, int n)
 {
-  if (n < 1) n = 14;
-  else if (n > 14) n = 1;
+  n = validate_legacy_level_number (n);
   return load_plv_level (l, n);
 }
 

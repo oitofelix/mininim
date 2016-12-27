@@ -29,6 +29,7 @@ extern bool no_room_drawing, game_paused, step_one_cycle;
 extern struct undo undo;
 extern int next_level;
 extern bool ignore_level_cutscene;
+extern uint64_t death_timer;
 
 void load_level (void);
 void unload_level (void);

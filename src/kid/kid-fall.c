@@ -123,7 +123,7 @@ physics_in (struct anim *k)
     k->fo.dx = -8;
     k->fo.dy = +4;
   } else if (k->oaction == kid_turn_run) {
-    k->fo.dx = +18;
+    k->fo.dx = +20;
   } else if (k->oaction == kid_couch && k->collision) {
     k->collision = false;
     k->f.c.x += dir * 16;

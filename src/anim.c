@@ -62,6 +62,9 @@ play_anim (void (*draw_callback) (void),
     switch (event.type) {
     case ALLEGRO_EVENT_TIMER:
       if (event.timer.source == timer) {
+        /* replay handler */
+        start_recording_replay (2);
+
         /* update mouse pos */
         if (! cutscene) get_mouse_pos (&mouse_pos);
 
@@ -107,13 +110,19 @@ play_anim (void (*draw_callback) (void),
           if (filename) {
             char *error_str = al_save_bitmap (filename, al_get_backbuffer (display))
               ? "PICTURE HAS BEEN SAVED"
-              : "PICTURE SAVE FAILED";
+              : "PICTURE SAVING FAILED";
             draw_bottom_text (NULL, error_str, 0);
             al_free (save_picture_dialog.initial_path);
             save_picture_dialog.initial_path = filename;
           }
           pause_animation (false);
         }
+
+        /* save replay */
+        handle_save_replay_thread (0);
+
+        /* load replay */
+        handle_load_replay_thread (0);
 
         if (was_key_pressed (ALLEGRO_KEY_ESCAPE, 0, ALLEGRO_KEYMOD_ALT, false))
           pause_animation (true);
@@ -282,7 +291,7 @@ play_anim (void (*draw_callback) (void),
               xasprintf (&text, "DISPLAY MODE: %ix%i", d.width, d.height);
               draw_bottom_text (NULL, text, 0);
               al_free (text);
-            } else draw_bottom_text (NULL, "DISPLAY MODES QUERY FAILED", 0);
+            } else draw_bottom_text (NULL, "DISPLAY MODES QUERYING FAILED", 0);
           } else draw_bottom_text (NULL, "NO DISPLAY MODE AVAILABLE", 0);
         }
       }
@@ -448,9 +457,43 @@ play_anim (void (*draw_callback) (void),
         pause_animation (true);
       }
 
+      /* ALT+F7: start/stop replay recording */
+      if ((replay_mode != PLAY_REPLAY
+           && was_key_pressed (ALLEGRO_KEY_F7, 0, ALLEGRO_KEYMOD_ALT, true))
+          || ((replay_mode == RECORD_REPLAY || recording_replay_countdown > 0)
+              && was_key_pressed (ALLEGRO_KEY_F7, 0, 0, true))) {
+        if (replay_mode == RECORD_REPLAY) create_save_replay_thread ();
+        else if (recording_replay_countdown < 0)
+          prepare_for_recording_replay ();
+        else {
+          draw_bottom_text (NULL, "REPLAY RECORDING ABORTED", 2);
+          recording_replay_countdown = -1;
+        }
+      }
+
+      /* F7: load replay/stop replaying */
+      if ((replay_mode != RECORD_REPLAY
+           && was_key_pressed (ALLEGRO_KEY_F7, 0, 0, true))
+          || (replay_mode == PLAY_REPLAY
+              && was_key_pressed
+              (ALLEGRO_KEY_F7, 0, ALLEGRO_KEYMOD_ALT, true))) {
+        if (replay_mode == PLAY_REPLAY) stop_replaying (0);
+        else create_load_replay_thread ();
+      }
+
       break;
     }
   }
+
+  if (replay_mode == RECORD_REPLAY) {
+    create_save_replay_thread ();
+    while (! al_get_thread_should_stop (save_replay_dialog_thread)) {
+      process_display_events ();
+      al_rest (0.01);
+    }
+    handle_save_replay_thread (1);
+  } else if (replay_mode == PLAY_REPLAY)
+    stop_replaying (1);
 
   al_stop_timer (timer);
   anim_cycle = 0;

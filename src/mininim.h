@@ -162,6 +162,7 @@
 #include "undo.h"
 #include "multi-room.h"
 #include "box.h"
+#include "replay.h"
 
 /* functions */
 void *dialog_thread (ALLEGRO_THREAD *thread, void *arg);
@@ -210,6 +211,7 @@ extern char *resources_dir,
   *levels_dat_filename;
 extern enum semantics semantics;
 extern enum movements movements;
+extern bool title_demo;
 
 extern ALLEGRO_THREAD *load_config_dialog_thread,
   *save_game_dialog_thread, *save_picture_dialog_thread;

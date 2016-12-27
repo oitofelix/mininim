@@ -23,15 +23,16 @@
 static void draw_level (void);
 static void compute_level (void);
 static void process_keys (void);
+static void process_death (void);
 static void draw_lives (ALLEGRO_BITMAP *bitmap, struct anim *k, enum vm vm);
 
+/* variables */
 struct level vanilla_level;
 struct level global_level;
 
 struct undo undo;
 
 static int last_auto_show_time;
-static uint64_t death_timer;
 
 bool no_room_drawing, game_paused, step_one_cycle;
 int retry_level = -1;
@@ -39,6 +40,7 @@ int camera_follow_kid;
 int auto_rem_time_1st_cycle = 24;
 int next_level;
 bool ignore_level_cutscene;
+uint64_t death_timer;
 
 struct level *
 copy_level (struct level *ld, struct level *ls)
@@ -189,6 +191,9 @@ play_level (struct level *lv)
   game_paused = false;
   potion_flags = 0;
   copy_level (&global_level, lv);
+
+  set_replay_mode_at_level_start (&replay);
+
   if (mirror_level) mirror_level_h (&global_level);
 
   normalize_level (&global_level);
@@ -213,11 +218,11 @@ play_level (struct level *lv)
   if (! force_hue) hue = global_level.hue;
 
   edit = EDIT_MAIN;
-  exit_editor ();
+  exit_editor (-1);
 
-  if (global_level.nominal_n >= 0) {
+  if (! title_demo && global_level.nominal_n >= 0) {
     xasprintf (&text, "LEVEL %i", global_level.nominal_n);
-    draw_bottom_text (NULL, text, 0);
+    draw_bottom_text (NULL, text, -1);
     al_free (text);
   }
 
@@ -247,7 +252,8 @@ play_level (struct level *lv)
     if (global_level.next_level)
       global_level.next_level (lv, next_level);
     draw_bottom_text (NULL, NULL, 0);
-    if (global_level.cutscene && ! ignore_level_cutscene) {
+    if (global_level.cutscene && ! ignore_level_cutscene
+        && next_level == global_level.n + 1) {
       cutscene_started = false;
       cutscene = true;
       stop_video_effect ();
@@ -262,6 +268,7 @@ play_level (struct level *lv)
     goto start;
   case RESTART_GAME:
   restart_game:
+    next_level = 0;
     retry_level = -1;
     destroy_anims ();
     destroy_cons ();
@@ -368,7 +375,7 @@ register_anims (void)
 {
   /* create kid */
   struct pos kid_start_pos;
-  if (is_valid_pos (&start_pos))
+  if (is_valid_pos (&start_pos) && replay_mode == NO_REPLAY)
     kid_start_pos = start_pos;
   else kid_start_pos = global_level.start_pos;
   mr_center_room (kid_start_pos.room);
@@ -457,6 +464,11 @@ compute_level (void)
   size_t i;
 
   process_keys ();
+  process_death ();
+
+  struct anim *k = get_anim_by_id (current_kid_id);
+  camera_follow_kid = (k->f.c.room == mr.room)
+    ? k->id : -1;
 
   if (is_game_paused ()) return;
 
@@ -467,9 +479,7 @@ compute_level (void)
     unpress_closer_floors ();
   }
 
-  struct anim *current_kid = get_anim_by_id (current_kid_id);
-
-  int prev_room = current_kid->f.c.room;
+  int prev_room = k->f.c.room;
 
   for (i = 0; i < anima_nmemb; i++) {
     struct anim *a = &anima[i];
@@ -479,7 +489,7 @@ compute_level (void)
 
   compute_loose_floors ();
 
-  get_gamepad_state (&current_kid->key);
+  replay_gamepad_update (k, &replay, anim_cycle);
 
   for (i = 0; i < anima_nmemb; i++) enter_fight_logic (&anima[i]);
   for (i = 0; i < anima_nmemb; i++) leave_fight_logic (&anima[i]);
@@ -498,40 +508,40 @@ compute_level (void)
     if (anima[i].refraction > 0) anima[i].refraction--;
   }
 
-  fight_turn_controllable (current_kid);
+  fight_turn_controllable (k);
 
   clear_anims_keyboard_state ();
 
-  if (current_kid->f.c.room != prev_room
-      && current_kid->f.c.room != 0
-      && camera_follow_kid == current_kid->id)  {
-    if (! is_room_visible (current_kid->f.c.room)) {
-      mr_coord (current_kid->f.c.prev_room,
-                current_kid->f.c.xd, &mr.x, &mr.y);
-      mr_set_origin (current_kid->f.c.room, mr.x, mr.y);
-    } else mr_focus_room (current_kid->f.c.room);
+  if (k->f.c.room != prev_room
+      && k->f.c.room != 0
+      && camera_follow_kid == k->id)  {
+    if (! is_room_visible (k->f.c.room)) {
+      mr_coord (k->f.c.prev_room,
+                k->f.c.xd, &mr.x, &mr.y);
+      mr_set_origin (k->f.c.room, mr.x, mr.y);
+    } else mr_focus_room (k->f.c.room);
     mr.select_cycles = 0;
   }
 
   struct anim *ke;
   if (mr.w > 1
-      && current_kid->current_lives > 0
-      && current_kid->f.c.room != 0
-      && camera_follow_kid == current_kid->id
-      && (ke = get_anim_by_id (current_kid->enemy_id))
+      && k->current_lives > 0
+      && k->f.c.room != 0
+      && camera_follow_kid == k->id
+      && (ke = get_anim_by_id (k->enemy_id))
       && ! is_room_visible (ke->f.c.room)) {
-    if (ke->f.c.room == roomd (&global_level, current_kid->f.c.room, LEFT)) {
+    if (ke->f.c.room == roomd (&global_level, k->f.c.room, LEFT)) {
       mr_view_trans (LEFT);
-      mr_focus_room (current_kid->f.c.room);
+      mr_focus_room (k->f.c.room);
       mr.room_select = ke->f.c.room;
-    } else if (ke->f.c.room == roomd (&global_level, current_kid->f.c.room, RIGHT)) {
+    } else if (ke->f.c.room == roomd (&global_level, k->f.c.room, RIGHT)) {
       mr_view_trans (RIGHT);
-      mr_focus_room (current_kid->f.c.room);
+      mr_focus_room (k->f.c.room);
       mr.room_select = ke->f.c.room;
     }
   } else if (mr.room_select > 0
              && (mr.select_cycles == 0
-                 || mr.room != current_kid->f.c.room))
+                 || mr.room != k->f.c.room))
     mr.room_select = -1;
 
   if (global_level.special_events) global_level.special_events ();
@@ -552,9 +562,11 @@ compute_level (void)
 static void
 process_keys (void)
 {
-  char *text = NULL;
+  if (title_demo) return;
 
-  struct anim *current_kid = get_anim_by_id (current_kid_id);
+  struct anim *k = get_anim_by_id (current_kid_id);
+
+  char *text = NULL;
 
   /* clear the keyboard buffer at the first cycle, so any key pressed
      on the title doesn't trigger any action */
@@ -591,12 +603,16 @@ process_keys (void)
   }
 
   /* CTRL+Z: undo */
-  if (was_key_pressed (ALLEGRO_KEY_Z, 0, ALLEGRO_KEYMOD_CTRL, true))
-    ui_undo_pass (&undo, -1, NULL);
+  if (was_key_pressed (ALLEGRO_KEY_Z, 0, ALLEGRO_KEYMOD_CTRL, true)) {
+    if (replay_mode == NO_REPLAY) ui_undo_pass (&undo, -1, NULL);
+    else print_replay_mode (0);
+  }
 
   /* CTRL+Y: redo */
-  if (was_key_pressed (ALLEGRO_KEY_Y, 0, ALLEGRO_KEYMOD_CTRL, true))
-    ui_undo_pass (&undo, +1, NULL);
+  if (was_key_pressed (ALLEGRO_KEY_Y, 0, ALLEGRO_KEYMOD_CTRL, true)) {
+    if (replay_mode == NO_REPLAY) ui_undo_pass (&undo, +1, NULL);
+    else print_replay_mode (0);
+  }
 
   /* [: decrease multi-room resolution */
   if (was_key_pressed (0, '[', 0, true)
@@ -751,12 +767,14 @@ process_keys (void)
 
   /* R: resurrect kid */
   if (! active_menu
-      && was_key_pressed (ALLEGRO_KEY_R, 0, 0, true))
-    kid_resurrect (current_kid);
+      && was_key_pressed (ALLEGRO_KEY_R, 0, 0, true)) {
+    if (replay_mode == NO_REPLAY) kid_resurrect (k);
+    else print_replay_mode (0);
+  }
 
   /* HOME: focus multi-room view on kid */
   if (was_key_pressed (ALLEGRO_KEY_HOME, 0, 0, true))
-    mr_focus_room (current_kid->f.c.room);
+    mr_focus_room (k->f.c.room);
 
   /* SHIFT+HOME: center multi-room view */
   if (was_key_pressed (ALLEGRO_KEY_HOME, 0, ALLEGRO_KEYMOD_SHIFT, true))
@@ -766,45 +784,56 @@ process_keys (void)
   if (! active_menu
       && was_key_pressed (ALLEGRO_KEY_A, 0, 0, true)) {
     do {
-      current_kid = &anima[(current_kid - anima + 1) % anima_nmemb];
-    } while (current_kid->type != KID || ! current_kid->controllable);
-    current_kid_id = current_kid->id;
-    mr_focus_room (current_kid->f.c.room);
+      k = &anima[(k - anima + 1) % anima_nmemb];
+    } while (k->type != KID || ! k->controllable);
+    current_kid_id = k->id;
+    mr_focus_room (k->f.c.room);
   }
 
   /* K: kill enemy */
   if (! active_menu
       && was_key_pressed (ALLEGRO_KEY_K, 0, 0, true)) {
-    struct anim *ke = get_anim_by_id (current_kid->enemy_id);
-    if (ke) {
-      survey (_m, pos, &ke->f, NULL, &ke->p, NULL);
-      anim_die (ke);
-      play_audio (&guard_hit_audio, NULL, ke->id);
-    }
+    if (replay_mode == NO_REPLAY) {
+      struct anim *ke = get_anim_by_id (k->enemy_id);
+      if (ke) {
+        survey (_m, pos, &ke->f, NULL, &ke->p, NULL);
+        anim_die (ke);
+        play_audio (&guard_hit_audio, NULL, ke->id);
+      }
+    } else print_replay_mode (0);
   }
 
   /* I: enable/disable immortal mode */
   if (! active_menu
       && was_key_pressed (ALLEGRO_KEY_I, 0, 0, true)) {
-    immortal_mode = ! immortal_mode;
-    current_kid->immortal = immortal_mode;
-    xasprintf (&text, "%s MODE", immortal_mode
-               ? "IMMORTAL" : "MORTAL");
-    draw_bottom_text (NULL, text, 0);
-    al_free (text);
+    if (replay_mode == NO_REPLAY) {
+      immortal_mode = ! immortal_mode;
+      k->immortal = immortal_mode;
+      xasprintf (&text, "%s MODE", immortal_mode
+                 ? "IMMORTAL" : "MORTAL");
+      draw_bottom_text (NULL, text, 0);
+      al_free (text);
+    } else print_replay_mode (0);
   }
 
   /* SHIFT+S: incremet kid current lives */
-  if (was_key_pressed (ALLEGRO_KEY_S, 0, ALLEGRO_KEYMOD_SHIFT, true))
-    increase_kid_current_lives (current_kid);
+  if (was_key_pressed (ALLEGRO_KEY_S, 0, ALLEGRO_KEYMOD_SHIFT, true)) {
+    if (replay_mode == NO_REPLAY)
+      increase_kid_current_lives (k);
+    else print_replay_mode (0);
+  }
 
   /* SHIFT+T: incremet kid total lives */
-  if (was_key_pressed (ALLEGRO_KEY_T, 0, ALLEGRO_KEYMOD_SHIFT, true))
-    increase_kid_total_lives (current_kid);
+  if (was_key_pressed (ALLEGRO_KEY_T, 0, ALLEGRO_KEYMOD_SHIFT, true)) {
+    if (replay_mode == NO_REPLAY) increase_kid_total_lives (k);
+    else print_replay_mode (0);
+  }
 
   /* SHIFT+W: float kid */
-  if (was_key_pressed (ALLEGRO_KEY_W, 0, ALLEGRO_KEYMOD_SHIFT, true))
-    float_kid (current_kid);
+  if (was_key_pressed (ALLEGRO_KEY_W, 0, ALLEGRO_KEYMOD_SHIFT, true)) {
+    if (replay_mode == NO_REPLAY) float_kid (k);
+    else print_replay_mode (0);
+  }
 
   /* CTRL+A: restart level */
   if (was_key_pressed (ALLEGRO_KEY_A, 0, ALLEGRO_KEYMOD_CTRL, true))
@@ -866,74 +895,88 @@ process_keys (void)
   /* +: increment and display remaining time */
   if (! active_menu
       && was_key_pressed (ALLEGRO_KEY_EQUALS, 0, ALLEGRO_KEYMOD_SHIFT, true)) {
-    int t = time_limit - play_time;
-    int d = t > SEC2CYC (60) ? SEC2CYC (+60) : SEC2CYC (+1);
-    time_limit += d;
-    display_remaining_time ();
+    if (replay_mode == NO_REPLAY) {
+      int t = time_limit - play_time;
+      int d = t > SEC2CYC (60) ? SEC2CYC (+60) : SEC2CYC (+1);
+      time_limit += d;
+      display_remaining_time ();
+    } else print_replay_mode (0);
   }
 
   /* -: decrement and display remaining time */
   if (! active_menu
       && was_key_pressed (ALLEGRO_KEY_MINUS, 0, 0, true)) {
-    int t = time_limit - play_time;
-    int d = t > SEC2CYC (60) ? SEC2CYC (-60) : SEC2CYC (-1);
-    time_limit += d;
-    display_remaining_time ();
+    if (replay_mode == NO_REPLAY) {
+      int t = time_limit - play_time;
+      int d = t > SEC2CYC (60) ? SEC2CYC (-60) : SEC2CYC (-1);
+      time_limit += d;
+      display_remaining_time ();
+    } else print_replay_mode (0);
   }
 
   /* TAB: display skill */
   if (was_key_pressed (ALLEGRO_KEY_TAB, 0, 0, true))
-    display_skill (current_kid);
+    display_skill (k);
 
   /* CTRL+=: increment counter attack skill */
   if (was_key_pressed (ALLEGRO_KEY_EQUALS, 0, ALLEGRO_KEYMOD_CTRL, true)) {
-    if (current_kid->skill.counter_attack_prob < 99)
-      current_kid->skill.counter_attack_prob++;
-    display_skill (current_kid);
+    if (replay_mode == NO_REPLAY) {
+      if (k->skill.counter_attack_prob < 99)
+        k->skill.counter_attack_prob++;
+      display_skill (k);
+    } else print_replay_mode (0);
   }
 
   /* CTRL+-: decrement counter attack skill */
   if (was_key_pressed (ALLEGRO_KEY_MINUS, 0, ALLEGRO_KEYMOD_CTRL, true)) {
-    if (current_kid->skill.counter_attack_prob > -1)
-      current_kid->skill.counter_attack_prob--;
-    display_skill (current_kid);
+    if (replay_mode == NO_REPLAY) {
+      if (k->skill.counter_attack_prob > -1)
+        k->skill.counter_attack_prob--;
+      display_skill (k);
+    } else print_replay_mode (0);
   }
 
   /* ALT+=: increment counter defense skill */
   if (was_key_pressed (ALLEGRO_KEY_EQUALS, 0, ALLEGRO_KEYMOD_ALT, true)) {
-    if (current_kid->skill.counter_defense_prob < 99)
-      current_kid->skill.counter_defense_prob++;
-    display_skill (current_kid);
+    if (replay_mode == NO_REPLAY) {
+      if (k->skill.counter_defense_prob < 99)
+        k->skill.counter_defense_prob++;
+      display_skill (k);
+    } else print_replay_mode (0);
   }
 
   /* ALT+-: decrement counter defense skill */
   if (was_key_pressed (ALLEGRO_KEY_MINUS, 0, ALLEGRO_KEYMOD_ALT, true)) {
-    if (current_kid->skill.counter_defense_prob > -1)
-      current_kid->skill.counter_defense_prob--;
-    display_skill (current_kid);
+    if (replay_mode == NO_REPLAY) {
+      if (k->skill.counter_defense_prob > -1)
+        k->skill.counter_defense_prob--;
+      display_skill (k);
+    } else print_replay_mode (0);
   }
 
   /* F10: change guard mode */
   if (was_key_pressed (ALLEGRO_KEY_F10, 0, 0, true)) {
-    char *gm_str = NULL;
+    if (replay_mode == NO_REPLAY) {
+      char *gm_str = NULL;
 
-    /* get next guard mode */
-    switch (gm) {
-    case ORIGINAL_GM: gm = GUARD_GM, gm_str = "GUARD"; break;
-    case GUARD_GM: gm = FAT_GUARD_GM, gm_str = "FAT GUARD"; break;
-    case FAT_GUARD_GM: gm = VIZIER_GM, gm_str = "VIZIER"; break;
-    case VIZIER_GM: gm = SKELETON_GM, gm_str = "SKELETON"; break;
-    case SKELETON_GM: gm = SHADOW_GM, gm_str = "SHADOW"; break;
-    case SHADOW_GM: gm = ORIGINAL_GM, gm_str = "ORIGINAL"; break;
-    }
+      /* get next guard mode */
+      switch (gm) {
+      case ORIGINAL_GM: gm = GUARD_GM, gm_str = "GUARD"; break;
+      case GUARD_GM: gm = FAT_GUARD_GM, gm_str = "FAT GUARD"; break;
+      case FAT_GUARD_GM: gm = VIZIER_GM, gm_str = "VIZIER"; break;
+      case VIZIER_GM: gm = SKELETON_GM, gm_str = "SKELETON"; break;
+      case SKELETON_GM: gm = SHADOW_GM, gm_str = "SHADOW"; break;
+      case SHADOW_GM: gm = ORIGINAL_GM, gm_str = "ORIGINAL"; break;
+      }
 
-    /* apply next guard mode */
-    int i;
-    for (i = 0; i < anima_nmemb; i++) apply_guard_mode (&anima[i], gm);
+      /* apply next guard mode */
+      int i;
+      for (i = 0; i < anima_nmemb; i++) apply_guard_mode (&anima[i], gm);
 
-    xasprintf (&text, "GUARD MODE: %s", gm_str);
-    draw_bottom_text (NULL, text, 0);
-    al_free (text);
+      xasprintf (&text, "GUARD MODE: %s", gm_str);
+      draw_bottom_text (NULL, text, 0);
+      al_free (text);
+    } else print_replay_mode (0);
   }
 
   /* CTRL+G: save game */
@@ -944,9 +987,14 @@ process_keys (void)
     al_start_thread (save_game_dialog_thread);
     pause_animation (true);
   }
+}
+
+static void
+process_death (void)
+{
+  struct anim *k = get_anim_by_id (current_kid_id);
 
   /* Restart level after death */
-  struct anim *k = get_anim_by_id (0);
   if (k->current_lives <= 0
       && ! is_game_paused ()) {
     death_timer++;
@@ -967,11 +1015,12 @@ process_keys (void)
       button = -1;
     }
 
-    if (death_timer >= 60) {
+    if (death_timer >= 60 && ! title_demo) {
       if ((death_timer < 240 || death_timer % 12 < 8)
           && ! active_menu) {
         if (death_timer >= 252 && death_timer % 12 == 0)
           play_audio (&press_key_audio, NULL, -1);
+        char *text;
         xasprintf (&text, "Press Button to Continue");
         draw_bottom_text (NULL, text, -2);
         al_free (text);
@@ -985,10 +1034,8 @@ process_keys (void)
     death_timer = 0;
     draw_bottom_text (NULL, NULL, -2);
   }
-
-  camera_follow_kid = (current_kid->f.c.room == mr.room)
-    ? current_kid->id : -1;
 }
+
 
 static void
 draw_level (void)
@@ -998,22 +1045,24 @@ draw_level (void)
   draw_lives (uscreen, get_anim_by_id (current_kid_id), vm);
 
   /* automatic remaining time display */
-  int rem_time = time_limit - play_time;
-  if ((rem_time % SEC2CYC (5 * 60) == 0
-       && last_auto_show_time != rem_time
-       && anim_cycle > SEC2CYC (720))
-      || (auto_rem_time_1st_cycle >= 0
-          && last_auto_show_time != rem_time
-          && anim_cycle >= auto_rem_time_1st_cycle
-          && anim_cycle <= auto_rem_time_1st_cycle + 6)
-      || rem_time <= SEC2CYC (60)) {
-    display_remaining_time ();
-    if (rem_time <= SEC2CYC (60) && rem_time % SEC2CYC (1) == 0
-        && ! play_time_stopped)
-      play_audio (&press_key_audio, NULL, -1);
-    last_auto_show_time = rem_time;
+  if (! title_demo) {
+    int rem_time = time_limit - play_time;
+    if ((rem_time % SEC2CYC (5 * 60) == 0
+         && last_auto_show_time != rem_time
+         && anim_cycle > SEC2CYC (720))
+        || (auto_rem_time_1st_cycle >= 0
+            && last_auto_show_time != rem_time
+            && anim_cycle >= auto_rem_time_1st_cycle
+            && anim_cycle <= auto_rem_time_1st_cycle + 6)
+        || rem_time <= SEC2CYC (60)) {
+      display_remaining_time ();
+      if (rem_time <= SEC2CYC (60) && rem_time % SEC2CYC (1) == 0
+          && ! play_time_stopped)
+        play_audio (&press_key_audio, NULL, -1);
+      last_auto_show_time = rem_time;
+    }
+    if (rem_time <= 0) quit_anim = OUT_OF_TIME;
   }
-  if (rem_time <= 0) quit_anim = OUT_OF_TIME;
 
   if (is_game_paused () && ! active_menu)
     draw_bottom_text (NULL, "GAME PAUSED", -1);
@@ -1028,7 +1077,7 @@ display_remaining_time (void)
   int m = t / SEC2CYC (60) + ((t % SEC2CYC (60)) ? 1 : 0);
   if (t > SEC2CYC (60)) xasprintf (&text, "%i MINUTES LEFT", m);
   else xasprintf (&text, "%i SECONDS LEFT", CYC2SEC (t));
-  draw_bottom_text (NULL, text, 0);
+  draw_bottom_text (NULL, text, -1);
   al_free (text);
 }
 

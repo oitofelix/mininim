@@ -214,15 +214,18 @@ fight_ai (struct anim *k)
       && ! (is_kid_climb (&ke->f) && ke->i <= 7)
       && ke->f.dir != k->f.dir
       && ke->current_lives > 0
-      && ke->has_sword
       && ! is_kid_fall (&ke->f)
       && ! is_kid_hang (&ke->f)
-      /* && ! is_kid_jump_air (&ke->f) */
-      /* && ! is_kid_run_jump_air (&ke->f) */
       && is_safe_to_attack (ke)) {
-    place_on_the_ground (&ke->f, &ke->f.c);
-    kid_take_sword (ke);
-    ke->auto_taken_sword = true;
+    if (ke->has_sword) {
+      place_on_the_ground (&ke->f, &ke->f.c);
+      kid_take_sword (ke);
+      ke->auto_taken_sword = true;
+    } else if (is_attacking (k) && ! ke->sword_immune) {
+      k->i = 3;
+      place_on_the_ground (&ke->f, &ke->f.c);
+      fight_hit (ke, k);
+    }
   }
 
   /* prevent enemy from hiding near */
@@ -1110,8 +1113,6 @@ fight_hit (struct anim *k, struct anim *ke)
   if (is_anim_fall (&k->f) || is_kid_stairs (&k->f))
     return;
 
-  bool should_adjust_distance = is_in_fight_mode (k);
-
   place_on_the_ground (&k->f, &k->f.c);
   k->xf.b = NULL;
 
@@ -1133,7 +1134,7 @@ fight_hit (struct anim *k, struct anim *ke)
     anim_die (k);
   } else anim_sword_hit (k);
 
-  if (should_adjust_distance) {
+  if (k->f.dir != ke->f.dir) {
     backoff_from_range (ke, k, ATTACK_RANGE - 20, true, false);
     get_in_range (ke, k, ATTACK_RANGE - 10, false, false);
   }

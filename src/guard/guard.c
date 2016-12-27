@@ -96,7 +96,7 @@ create_guard (struct anim *g0, struct anim *g1, struct pos *p, enum dir dir)
 void
 apply_guard_mode (struct anim *g, enum gm gm)
 {
-  if (! is_guard (g)) return;
+  if (! is_guard (g) || replay_mode != NO_REPLAY) return;
   switch (gm) {
   case ORIGINAL_GM: g->type = g->original_type; break;
   case GUARD_GM: g->type = GUARD; break;

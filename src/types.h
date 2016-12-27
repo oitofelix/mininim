@@ -179,6 +179,10 @@ struct gamepad_state {
   bool up, down, left, right, shift, enter;
 };
 
+enum replay_mode {
+  NO_REPLAY, RECORD_REPLAY, PLAY_REPLAY
+};
+
 struct level {
   void (*start) (void);
   void (*special_events) (void);
@@ -509,11 +513,11 @@ enum opt_arg_type {
 };
 
 enum semantics {
-  NATIVE_SEMANTICS, LEGACY_SEMANTICS,
+  NATIVE_SEMANTICS = 0, LEGACY_SEMANTICS = 1,
 };
 
 enum movements {
-  NATIVE_MOVEMENTS, LEGACY_MOVEMENTS,
+  NATIVE_MOVEMENTS = 0, LEGACY_MOVEMENTS = 1,
 };
 
 enum options {
@@ -530,7 +534,8 @@ enum options {
   JOYSTICK_AXIS_OPTION, JOYSTICK_BUTTON_OPTION, JOYSTICK_INFO_OPTION,
   START_POS_OPTION, HUE_MODE_OPTION, CONVERT_LEVELS_OPTION, MULTI_ROOM_OPTION,
   DISPLAY_MODE_OPTION, MULTI_ROOM_FIT_MODE_OPTION, TIME_FREQUENCY_OPTION,
-  MIRROR_LEVEL_OPTION, SEMANTICS_OPTION, MOVEMENTS_OPTION,
+  MIRROR_LEVEL_OPTION, SEMANTICS_OPTION, MOVEMENTS_OPTION, REPLAY_OPTION,
+  RECORD_REPLAY_OPTION,
 };
 
 enum level_module {

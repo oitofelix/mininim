@@ -94,14 +94,16 @@ legacy_level_start (void)
     struct pos p; new_pos (&p, &global_level, 5, 0, 2);
     activate_con (&p);
     /* if it's the first try make kid wait before uncouching */
-    if (retry_level != 1) k->uncouch_slowly = true;
+    if (retry_level != 1 || replay_mode != NO_REPLAY)
+      k->uncouch_slowly = true;
   }
 
   /* in the third level */
   if (global_level.n == 3) {
     /* if it's the first time playing the checkpoint hasn't been
        reached yet */
-    if (retry_level != 3) level_3_checkpoint = false;
+    if (retry_level != 3 || replay_mode != NO_REPLAY)
+      level_3_checkpoint = false;
     /* if the checkpoint has been reached, respawn there */
     struct pos p; new_pos (&p, &global_level, 2, 0, 6);
     if (level_3_checkpoint) {
@@ -122,7 +124,8 @@ legacy_level_start (void)
 
   /* level 13 adjustements */
   coming_from_12 = false;
-  if (global_level.n == 13 && retry_level == 13)
+  if (global_level.n == 13 && retry_level == 13
+      && replay_mode == NO_REPLAY)
     global_level.nominal_n = 12;
 
   if (global_level.n == 13) {
@@ -137,6 +140,21 @@ legacy_level_special_events (void)
   struct pos p, pm, pms;
   struct coord m, ms;
   struct anim *k = get_anim_by_id (current_kid_id);
+
+  /* title demo */
+  if (title_demo) {
+    if (key.keyboard.keycode || button != -1) {
+      stop_replaying (0);
+      quit_anim = RESTART_GAME;
+      title_demo = false;
+      return;
+    } else if (death_timer >= 108) {
+      stop_replaying (0);
+      quit_anim = RESTART_GAME;
+      title_demo = true;
+      return;
+    }
+  }
 
   /* in the first animation cycle */
   if (anim_cycle == 0 || anim_cycle == 1) {
@@ -158,7 +176,8 @@ legacy_level_special_events (void)
   }
 
   /* in the first level, first try, play the suspense sound */
-  if (global_level.n == 1 && anim_cycle == 12 && retry_level != 1)
+  if (global_level.n == 1 && anim_cycle == 12
+      && (retry_level != 1 || replay_mode != NO_REPLAY))
     play_audio (&suspense_audio, NULL, -1);
 
   /* in the third level */
@@ -651,11 +670,23 @@ legacy_level_end (struct pos *p)
   }
 }
 
+int
+validate_legacy_level_number (int n)
+{
+  if (title_demo) {
+    if (n < 0) n = 14;
+    else if (n > 14) n = 0;
+  } else {
+    if (n < 1) n = 14;
+    else if (n > 14) n = 1;
+  }
+  return n;
+}
+
 struct level *
 next_legacy_level (struct level *l, int n)
 {
-  if (n < 1) n = 14;
-  else if (n > 14) n = 1;
+  n = validate_legacy_level_number (n);
   if (! load_legacy_level_file (n)) return NULL;
   return interpret_legacy_level (l, n);
 }

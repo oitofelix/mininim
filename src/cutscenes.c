@@ -157,9 +157,9 @@ title_anim (void)
     i = 0; key.keyboard.keycode = 0; button = -1; cutscene_started = true;
   }
 
-  if (key.keyboard.keycode
-      || button != -1) {
+  if (key.keyboard.keycode || button != -1) {
     quit_anim = true;
+    title_demo = false;
     return;
   }
 
@@ -358,13 +358,8 @@ title_anim (void)
     }
     break;
   case 29:
-    if (! wait_anim (SEC2CYC (3))) {
-      start_video_effect (VIDEO_FADE_OUT, SEC2EFF (1));
-      i++;
-    }
+    if (! wait_anim (SEC2CYC (3))) quit_anim = true;
     break;
-  case 30:
-    if (! is_video_effect_started ()) i = 0; break;
   }
 
   ALLEGRO_BITMAP *screen = mr.cell[0][0].screen;
