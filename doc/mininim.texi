@@ -78,6 +78,21 @@
 @author Bruno Félix Rezende Ribeiro <@email{oitofelix@@gnu.org}>
 @page
 @vskip 0pt plus 1filll
+
+@cartouche
+@strong{WARNING:} This user's manual is bundled with the game package in
+the hope that it might be useful, but keep in mind that it lags far
+behind the current development stage of MININIM and thus doesn't
+describe several features thereof accurately or at all. The author plans
+to update MININIM's documentation in a definitive manner when MININIM
+reaches reasonable feature-set stability. In case you'd like to help in
+speeding up this process by maintaining this documentation, you're very
+welcome!  Please, contact the MININIM community at its forum
+(@url{@value{forumUrl}}).
+@end cartouche
+
+@vskip 0pt plus 1filll
+
 @insertcopying
 @end titlepage
 
