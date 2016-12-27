@@ -85,17 +85,18 @@ currently implemented are:
 - Rich set of itemmizable constructions and items
 - Supports triggering of any tile
 - Screenshot capturing
+- Replays
+
 
 The following additional features are planned to be implemented soon.
 
 - Legacy semantics (in progress)
-- Fully compliance to the Standard Item Specification
-- Replay recording
+- Full compliance with the Standard Item Specification
 - Save state
 - Dynamic number of levels, rooms, guards and events
 - Guile scripting
 - Network play
-- Back in time
+- Rewind time
 - Arbitrary resolution graphics set support
 - On-the-fly multiple sound set support
 - Level generator
@@ -137,7 +138,7 @@ welcome!  Please, contact the MININIM community at its
 available.  No installation is required, just extract the zip archive
 and run ‘mininim.exe’.
 
-[mininim-201612251709.zip](https://github.com/oitofelix/mininim/files/672293/mininim-201612251709.zip)
+[mininim-201612272335-win32.zip](https://github.com/oitofelix/mininim/files/674791/mininim-201612272335-win32.zip)
 
 
 **GNU/Linux**
@@ -169,6 +170,8 @@ best place to obtain help is at its
 - `CTRL+J`: calibrate joystick
 - `CTRL+L`: load configuration
 - `CTRL+P`: save picture
+- `F7`: load replay
+- `ALT+F7`: record replay
 - `F9`: change hue palette
 - `F10`: change guard mode
 - `F11`: change environment mode
