@@ -95,6 +95,7 @@ int start_level_time;
 enum semantics semantics;
 enum movements movements;
 bool title_demo;
+bool simulation;
 
 struct skill skill = {.counter_attack_prob = INITIAL_KCA,
                       .counter_defense_prob = INITIAL_KCD};
@@ -187,6 +188,13 @@ static struct argp_option options[] = {
 
   {NULL, 0, NULL, OPTION_DOC, "The desktop display mode (-1) uses the native desktop resolution and allows for windowed and fullscreen displays.  This is the default and most convenient setting in case the computer is fast enough.  Non-desktop display modes (>= 0) are all fullscreen and change the actual video resolution.  This may be useful for older computers in which the desktop display mode is prohibitively slow.  After the game has started it's not possible to alternate between desktop and non-desktop modes.  No window-related option takes effect for non-desktop display modes.  Changing non-desktop display modes in-game using the D key binding might cause video driver instability.", 0},
 
+  /* replays */
+  {NULL, 0, NULL, 0, "Replays", 0},
+  {"replay", REPLAY_OPTION, "FILE", 0, "Load replay FILE and play it.  This can be done in-game by the F7 key binding.", 0},
+  {"record-replay", RECORD_REPLAY_OPTION, NULL, 0, "Starts recording replay countdown at game beginning.  Use this in conjunction with '--start-level' to start recording a given level.  This can be done in-game by the ALT+F7 key binding.", 0},
+  {"simulate-replay", SIMULATE_REPLAY_OPTION, "FILE", 0, "Load replay FILE and simulate it to check whether it's complete.  In affirmative case, the 'Final' field lists arguments intended to be used for continuing the game from where the replay left.  This option also prints the information given by '--replay-info'.", 0},
+  {"replay-info", REPLAY_INFO_OPTION, "FILE", 0, "Print information about replay FILE and exit.  The 'Initial' field lists arguments intended to be used for recording another replay file with the same initial conditions.", 0},
+
   /* Paths */
   {NULL, 0, NULL, 0, "Paths:", 0},
   {"data-path", DATA_PATH_OPTION, "PATH", 0, "Set data path to PATH.  Normally, the data files are looked for in the user data directory, then in the current working directory, then in the resources directory, and finally in the system data directory.  If this option is given, after looking in the user data directory the data files are looked for in PATH.", 0},
@@ -199,8 +207,6 @@ static struct argp_option options[] = {
   {"inhibit-screensaver", INHIBIT_SCREENSAVER_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Prevent the system screensaver from starting up.  The default is TRUE.", 0},
   {"semantics", SEMANTICS_OPTION, "SEMANTICS", 0, "Select semantics.  Valid values for SEMANTICS are: NATIVE and LEGACY.  The default is NATIVE.  A semantics determines in an abstract sense the meaning and behavior of game elements.  Currently it's used to make legacy level sets which depend on the original semantics finishable.", 0},
   {"movements", MOVEMENTS_OPTION, "MOVEMENTS", 0, "Select movements.  Valid values for MOVEMENTS are: NATIVE and LEGACY.  The default is NATIVE.  This determines the set of movements the kid can perform.", 0},
-  {"replay", REPLAY_OPTION, "FILE", 0, "Load replay FILE and play it.  This can be done in-game by the F7 key binding.", 0},
-  {"record-replay", RECORD_REPLAY_OPTION, NULL, 0, "Starts recording replay countdown at game beginning.  Use this in conjunction with '--start-level' to start recording a given level.  This can be done in-game by the ALT+F7 key binding.", 0},
 
   /* Help */
   {NULL, 0, NULL, 0, "Help:", -1},
@@ -942,20 +948,24 @@ Levels have been converted using module %s into native format at\n\
     }
     break;
   case REPLAY_OPTION:
-    if (! load_replay (&replay, arg))
-      error (-1, 0, "replay loading of '%s' failed", arg);
-    level_start_replay_mode = PLAY_REPLAY;
-    next_level = replay.start_level;
-    min_legacy_level = min_int (min_legacy_level, replay.start_level);
-    max_legacy_level = max_int (max_legacy_level, replay.start_level);
+    command_line_load_replay (&replay, arg);
     skip_title = true;
-    recording_replay_countdown = -1;
     break;
   case RECORD_REPLAY_OPTION:
     level_start_replay_mode = NO_REPLAY;
     next_level = -1;
     skip_title = false;
     prepare_for_recording_replay ();
+    break;
+  case SIMULATE_REPLAY_OPTION:
+    command_line_load_replay (&replay, arg);
+    simulation = true;
+    break;
+  case REPLAY_INFO_OPTION:
+    if (! load_replay (&replay, arg))
+      error (-1, 0, "replay loading of '%s' failed", arg);
+    print_replay_info (&replay);
+    exit (0);
     break;
   case ARGP_KEY_ARG:
     /* cheat */
@@ -1214,7 +1224,7 @@ main (int _argc, char **_argv)
   /* exit (0); */
   /* --------------- */
 
-  if (skip_title) goto play_game;
+  if (skip_title || simulation) goto play_game;
 
  restart_game:
   cutscene = true;
@@ -1298,7 +1308,7 @@ quit_game (void)
   finalize_dialog ();
   finalize_mouse ();
 
-  fprintf (stderr, "MININIM " VERSION ": Hope you enjoyed it!\n");
+  fprintf (stderr, "MININIM: Hope you enjoyed it!\n");
 
   exit (0);
 }
@@ -1313,8 +1323,14 @@ give_dat_compat_preference (void)
   }
 }
 
-static void
+void
 draw_loading_screen (void)
+{
+  draw_logo_screen ("Loading...");
+}
+
+void
+draw_logo_screen (char *text)
 {
   static bool first_time = true;
 
@@ -1327,12 +1343,13 @@ draw_loading_screen (void)
     clear_bitmap (screen, BLACK);
     draw_filled_rectangle (screen, x - 1, y - 1, x + w, y + h, WHITE);
     draw_bitmap (icon, screen, x, y, 0);
-    draw_text (screen, "Loading....", CUTSCENE_WIDTH / 2.0, CUTSCENE_HEIGHT / 2.0,
+    draw_text (screen, text, CUTSCENE_WIDTH / 2.0, CUTSCENE_HEIGHT / 2.0,
                ALLEGRO_ALIGN_CENTRE);
     al_draw_filled_rectangle (0, CUTSCENE_HEIGHT - 8,
                               CUTSCENE_WIDTH, CUTSCENE_HEIGHT,
                               BLUE);
-    draw_text (screen, "MININIM " VERSION, CUTSCENE_WIDTH / 2.0, CUTSCENE_HEIGHT - 7,
+    draw_text (screen, "MININIM " VERSION, CUTSCENE_WIDTH / 2.0,
+               CUTSCENE_HEIGHT - 7,
                ALLEGRO_ALIGN_CENTRE);
     show ();
   }
@@ -1614,6 +1631,26 @@ level_module_str (enum level_module m)
     return "DAT";
   case CONSISTENCY_LEVEL_MODULE:
     return "CONSISTENCY";
+  }
+}
+
+char *
+movements_str (enum movements m)
+{
+  switch (m) {
+  case LEGACY_MOVEMENTS: return "LEGACY";
+  case NATIVE_MOVEMENTS: return "NATIVE";
+  default: assert (false);
+  }
+}
+
+char *
+semantics_str (enum semantics m)
+{
+  switch (m) {
+  case LEGACY_SEMANTICS: return "LEGACY";
+  case NATIVE_SEMANTICS: return "NATIVE";
+  default: assert (false);
   }
 }
 

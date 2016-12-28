@@ -38,14 +38,16 @@ void unpack_replay_config (uint32_t pc);
 uint8_t pack_gamepad_state (struct gamepad_state *gs);
 struct gamepad_state *unpack_gamepad_state (struct gamepad_state *gs,
                                             uint8_t pgs);
-struct replay *push_replay_gamepad_state (struct replay *replay,
-                                          struct gamepad_state *gs);
+struct replay *store_replay_gamepad_state (struct replay *replay,
+                                           struct gamepad_state *gs,
+                                           uint64_t cycle);
 struct gamepad_state *get_replay_gamepad_state (struct gamepad_state *gs,
                                                 struct replay *replay,
                                                 size_t i);
 bool save_replay (char *filename, struct replay *replay);
 struct replay *load_replay (struct replay *replay_ret, char *filename);
 struct replay *xload_replay (char *filename);
+struct replay *command_line_load_replay (struct replay *replay, char *filename);
 void free_replay (struct replay *replay);
 void prepare_for_recording_replay (void);
 void start_recording_replay (int priority);
@@ -58,6 +60,8 @@ void set_replay_mode_at_level_start (struct replay *replay);
 void replay_gamepad_update (struct anim *a, struct replay *replay,
                             uint64_t cycle);
 void print_replay_mode (int priority);
+void print_replay_info (struct replay *replay);
+void print_final_options_state (struct replay *replay);
 
 /* variables */
 extern struct replay replay;

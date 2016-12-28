@@ -117,6 +117,9 @@ load_audio (struct audio_source *as, enum audio_type audio_type,
 union audio_instance_data
 play_audio (struct audio_source *as, struct pos *p, int anim_id)
 {
+  /* on simulation, do nothing */
+  if (simulation) return (union audio_instance_data) {NULL};
+
   /* do nothing if the same sample has been played in a near cycle */
   struct audio_instance *sai =
     search_audio_instance (as, anim_cycle, NULL, -1);

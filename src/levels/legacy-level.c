@@ -543,7 +543,7 @@ legacy_level_special_events (void)
          kid are in fight mode, the shadow's movements mirror the
          kid's */
       else if (ks->type == KID) {
-        get_gamepad_state (&ks->key);
+        replay_gamepad_update (ks, &replay, anim_cycle);
         bool l = ks->key.left;
         bool r = ks->key.right;
         ks->key.left = r;

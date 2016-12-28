@@ -84,15 +84,16 @@ unpack_gamepad_state (struct gamepad_state *gs, uint8_t pgs)
 }
 
 struct replay *
-push_replay_gamepad_state (struct replay *replay,
-                           struct gamepad_state *gs)
+store_replay_gamepad_state (struct replay *replay,
+                            struct gamepad_state *gs,
+                            uint64_t cycle)
 {
-  size_t i = replay->packed_gamepad_state_nmemb++;
+  replay->packed_gamepad_state_nmemb = cycle + 1;
   replay->packed_gamepad_state =
     xrealloc (replay->packed_gamepad_state,
               replay->packed_gamepad_state_nmemb
               * sizeof (* replay->packed_gamepad_state));
-  replay->packed_gamepad_state[i] = pack_gamepad_state (gs);
+  replay->packed_gamepad_state[cycle] = pack_gamepad_state (gs);
   return replay;
 }
 
@@ -243,6 +244,19 @@ struct replay *
 xload_replay (char *filename)
 {
   return load_replay (&replay, filename);
+}
+
+struct replay *
+command_line_load_replay (struct replay *replay, char *filename)
+{
+  if (! load_replay (replay, filename))
+    error (-1, 0, "replay loading of '%s' failed", filename);
+  level_start_replay_mode = PLAY_REPLAY;
+  next_level = replay->start_level;
+  min_legacy_level = min_int (min_legacy_level, replay->start_level);
+  max_legacy_level = max_int (max_legacy_level, replay->start_level);
+  recording_replay_countdown = -1;
+  return replay;
 }
 
 void
@@ -410,7 +424,7 @@ replay_gamepad_update (struct anim *a, struct replay *replay, uint64_t cycle)
   } else get_gamepad_state (&a->key);
 
   if (replay_mode == RECORD_REPLAY && a->current_lives > 0)
-    push_replay_gamepad_state (replay, &a->key);
+    store_replay_gamepad_state (replay, &a->key, cycle);
 }
 
 void
@@ -424,4 +438,54 @@ print_replay_mode (int priority)
     draw_bottom_text (NULL, "REPLAYING", priority); break;
   case NO_REPLAY: default: break;
   }
+}
+
+void
+print_replay_info (struct replay *replay)
+{
+  printf ("Signature: %s\n"
+          "Version: %u\n"
+          "Initial: --mirror-level=%s --immortal-mode=%s"
+          " --movements=%s --semantics=%s --start-level=%u"
+          " --start-time=%u --time_limit=%i --total_lives=%u"
+          " --kca=%u --kcd=%u\n"
+          "Random seed: %u\n"
+          "Cycles: %lu\n",
+          REPLAY_FILE_SIGNATURE,
+          replay->version,
+          replay->packed_boolean_config & PACKED_CONFIG_MIRROR_LEVEL_BIT
+          ? "TRUE" : "FALSE",
+          replay->packed_boolean_config & PACKED_CONFIG_IMMORTAL_MODE_BIT
+          ? "TRUE" : "FALSE",
+          movements_str (replay->movements),
+          semantics_str (replay->semantics),
+          replay->start_level,
+          replay->start_time,
+          replay->time_limit,
+          replay->total_lives,
+          replay->kca,
+          replay->kcd,
+          replay->random_seed,
+          replay->packed_gamepad_state_nmemb);
+}
+
+void
+print_final_options_state (struct replay *replay)
+{
+  struct anim *k = get_anim_by_id (current_kid_id);
+
+  printf ("Final: --mirror-level=%s --immortal-mode=%s"
+          " --movements=%s --semantics=%s --start-level=%u"
+          " --start-time=%lu --time_limit=%i --total_lives=%u"
+          " --kca=%i --kcd=%i\n",
+          mirror_level ? "TRUE" : "FALSE",
+          immortal_mode ? "TRUE" : "FALSE",
+          movements_str (movements),
+          semantics_str (semantics),
+          replay->start_level + 1,
+          play_time,
+          replay->time_limit,
+          total_lives,
+          k->skill.counter_attack_prob + 1,
+          k->skill.counter_defense_prob + 1);
 }

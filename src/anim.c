@@ -108,7 +108,8 @@ play_anim (void (*draw_callback) (void),
           al_destroy_thread (save_picture_dialog_thread);
           save_picture_dialog_thread = NULL;
           if (filename) {
-            char *error_str = al_save_bitmap (filename, al_get_backbuffer (display))
+            char *error_str = al_save_bitmap
+              (filename, al_get_backbuffer (display))
               ? "PICTURE HAS BEEN SAVED"
               : "PICTURE SAVING FAILED";
             draw_bottom_text (NULL, error_str, 0);
@@ -124,15 +125,17 @@ play_anim (void (*draw_callback) (void),
         /* load replay */
         handle_load_replay_thread (0);
 
-        if (was_key_pressed (ALLEGRO_KEY_ESCAPE, 0, ALLEGRO_KEYMOD_ALT, false))
+        if (was_key_pressed
+            (ALLEGRO_KEY_ESCAPE, 0, ALLEGRO_KEYMOD_ALT, false))
           pause_animation (true);
-        if (was_key_pressed (ALLEGRO_KEY_ESCAPE, 0, ALLEGRO_KEYMOD_CTRL, true))
+        if (was_key_pressed
+            (ALLEGRO_KEY_ESCAPE, 0, ALLEGRO_KEYMOD_CTRL, true))
           pause_animation (false);
 
         kid_debug ();
 
         if (anim_cycle > 0 && ! is_video_effect_started ())
-	  show ();
+          show ();
 
         if (! pause_anim
             || was_key_pressed (ALLEGRO_KEY_ESCAPE, 0,

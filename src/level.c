@@ -227,7 +227,37 @@ play_level (struct level *lv)
     al_free (text);
   }
 
-  play_anim (draw_level, compute_level);
+  quit_anim = NO_QUIT;
+  if (simulation)
+    while (! quit_anim) {
+      draw_logo_screen ("Simulating...");
+      if (replay_mode == PLAY_REPLAY
+          && anim_cycle >= replay.packed_gamepad_state_nmemb + 720) {
+        struct anim *k = get_anim_by_id (current_kid_id);
+        print_replay_info (&replay);
+        printf ("Complete: NO\n");
+        printf ("Reason: %s\n", k->current_lives > 0 ? "STUCK" : "DEAD");
+        print_final_options_state (&replay);
+        exit (-1);
+      }
+      compute_level ();
+      anim_cycle++;
+    }
+  else play_anim (draw_level, compute_level);
+
+  if (simulation && replay_mode == PLAY_REPLAY
+      && quit_anim != OUT_OF_TIME) {
+    print_replay_info (&replay);
+    printf ("Complete: YES\n");
+    print_final_options_state (&replay);
+    exit (0);
+  } else if (simulation && replay_mode == PLAY_REPLAY) {
+    print_replay_info (&replay);
+    printf ("Complete: NO\n");
+    printf ("Reason: OUT OF TIME\n");
+    print_final_options_state (&replay);
+    exit (-1);
+  }
 
   struct anim *k = get_anim_by_id (current_kid_id);
 

@@ -177,7 +177,10 @@ float dist_cart (float x0, float y0, float x1, float y1);
 void quit_game (void);
 struct level *level_module_next_level (struct level *l, int n);
 char *level_module_str (enum level_module m);
+char *movements_str (enum movements m);
+char *semantics_str (enum semantics m);
 bool save_level (struct level *l);
+void draw_logo_screen (char *text);
 
 /* variables */
 extern enum level_module level_module;
@@ -212,6 +215,7 @@ extern char *resources_dir,
 extern enum semantics semantics;
 extern enum movements movements;
 extern bool title_demo;
+extern bool simulation;
 
 extern ALLEGRO_THREAD *load_config_dialog_thread,
   *save_game_dialog_thread, *save_picture_dialog_thread;
