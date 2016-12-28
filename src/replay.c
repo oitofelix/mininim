@@ -449,7 +449,7 @@ print_replay_info (struct replay *replay)
           " --movements=%s --semantics=%s --start-level=%u"
           " --start-time=%u --time_limit=%i --total_lives=%u"
           " --kca=%u --kcd=%u\n"
-          "Random seed: %u\n"
+          "Random seed: 0x%X\n"
           "Cycles: %lu\n",
           REPLAY_FILE_SIGNATURE,
           replay->version,
