@@ -138,7 +138,7 @@ welcome!  Please, contact the MININIM community at its
 available.  No installation is required, just extract the zip archive
 and run ‘mininim.exe’.
 
-[mininim-201612281424-win32.zip](https://github.com/oitofelix/mininim/files/675696/mininim-201612281424-win32.zip)
+[mininim-201612281424-win32.zip](https://github.com/oitofelix/mininim/releases/download/v201612281424/mininim-201612281424-win32.zip)
 
 
 **GNU/Linux**
