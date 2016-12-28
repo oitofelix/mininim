@@ -19,6 +19,9 @@
 
 #include "mininim.h"
 
+int min_legacy_level = 1;
+int max_legacy_level = 14;
+
 static int level_3_checkpoint;
 static int shadow_id;
 static int skeleton_id;
@@ -145,13 +148,11 @@ legacy_level_special_events (void)
   if (title_demo) {
     if (key.keyboard.keycode || button != -1) {
       stop_replaying (0);
-      quit_anim = RESTART_GAME;
-      title_demo = false;
+      quit_anim = CUTSCENE_KEY_PRESS;
       return;
-    } else if (death_timer >= 108) {
+    } else if (anim_cycle >= replay.packed_gamepad_state_nmemb + 108) {
       stop_replaying (0);
-      quit_anim = RESTART_GAME;
-      title_demo = true;
+      quit_anim = CUTSCENE_END;
       return;
     }
   }
@@ -673,13 +674,8 @@ legacy_level_end (struct pos *p)
 int
 validate_legacy_level_number (int n)
 {
-  if (title_demo) {
-    if (n < 0) n = 14;
-    else if (n > 14) n = 0;
-  } else {
-    if (n < 1) n = 14;
-    else if (n > 14) n = 1;
-  }
+  if (n < min_legacy_level) n = max_legacy_level;
+  else if (n > max_legacy_level) n = min_legacy_level;
   return n;
 }
 

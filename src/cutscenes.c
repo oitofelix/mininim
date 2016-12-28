@@ -158,8 +158,7 @@ title_anim (void)
   }
 
   if (key.keyboard.keycode || button != -1) {
-    quit_anim = true;
-    title_demo = false;
+    quit_anim = CUTSCENE_KEY_PRESS;
     return;
   }
 
@@ -358,7 +357,7 @@ title_anim (void)
     }
     break;
   case 29:
-    if (! wait_anim (SEC2CYC (3))) quit_anim = true;
+    if (! wait_anim (SEC2CYC (3))) quit_anim = CUTSCENE_END;
     break;
   }
 
@@ -377,9 +376,8 @@ cutscene_01_05_11_anim (void)
     i = 0; key.keyboard.keycode = 0; button = -1; cutscene_started = true;
   }
 
-  if (key.keyboard.keycode
-      || button != -1) {
-    quit_anim = true;
+  if (key.keyboard.keycode || button != -1) {
+    quit_anim = CUTSCENE_KEY_PRESS;
     return;
   }
 
@@ -412,7 +410,7 @@ cutscene_01_05_11_anim (void)
     break;
   case 2:
     if (! is_audio_instance_playing (ai_data)
-        && ! is_video_effect_started ()) quit_anim = true;
+        && ! is_video_effect_started ()) quit_anim = CUTSCENE_END;
     break;
   }
 
@@ -431,9 +429,8 @@ cutscene_11_little_time_left_anim (void)
     i = 0; key.keyboard.keycode = 0; button = -1; cutscene_started = true;
   }
 
-  if (key.keyboard.keycode
-      || button != -1) {
-    quit_anim = true;
+  if (key.keyboard.keycode || button != -1) {
+    quit_anim = CUTSCENE_KEY_PRESS;
     return;
   }
 
@@ -473,7 +470,7 @@ cutscene_11_little_time_left_anim (void)
     break;
   case 3:
     if (! is_audio_instance_playing (ai_data)
-        && ! is_video_effect_started ()) quit_anim = true;
+        && ! is_video_effect_started ()) quit_anim = CUTSCENE_END;
     break;
   }
 
@@ -500,9 +497,8 @@ cutscene_03_anim (void)
     i = 0; key.keyboard.keycode = 0; button = -1; cutscene_started = true;
   }
 
-  if (key.keyboard.keycode
-      || button != -1) {
-    quit_anim = true;
+  if (key.keyboard.keycode || button != -1) {
+    quit_anim = CUTSCENE_KEY_PRESS;
     return;
   }
 
@@ -535,7 +531,7 @@ cutscene_03_anim (void)
     break;
   case 2:
     if (! is_audio_instance_playing (ai_data)
-        && ! is_video_effect_started ()) quit_anim = true;
+        && ! is_video_effect_started ()) quit_anim = CUTSCENE_END;
     break;
   }
 
@@ -554,9 +550,8 @@ cutscene_07_anim (void)
     i = 0; key.keyboard.keycode = 0; button = -1; cutscene_started = true;
   }
 
-  if (key.keyboard.keycode
-      || button != -1) {
-    quit_anim = true;
+  if (key.keyboard.keycode || button != -1) {
+    quit_anim = CUTSCENE_KEY_PRESS;
     return;
   }
 
@@ -612,7 +607,7 @@ cutscene_07_anim (void)
     break;
   case 4:
     if (! is_audio_instance_playing (ai_data)
-        && ! is_video_effect_started ()) quit_anim = true;
+        && ! is_video_effect_started ()) quit_anim = CUTSCENE_END;
     break;
   }
 
@@ -631,9 +626,8 @@ cutscene_08_anim (void)
     i = 0; key.keyboard.keycode = 0; button = -1; cutscene_started = true;
   }
 
-  if (key.keyboard.keycode
-      || button != -1) {
-    quit_anim = true;
+  if (key.keyboard.keycode || button != -1) {
+    quit_anim = CUTSCENE_KEY_PRESS;
     return;
   }
 
@@ -697,7 +691,7 @@ cutscene_08_anim (void)
   case 5:
     princess.action (&princess);
     if (! is_audio_instance_playing (ai_data)
-        && ! is_video_effect_started ()) quit_anim = true;
+        && ! is_video_effect_started ()) quit_anim = CUTSCENE_END;
     break;
   }
 
@@ -716,8 +710,7 @@ cutscene_14_anim (void)
     i = 0; key.keyboard.keycode = 0; button = -1; cutscene_started = true;
   }
 
-  if ((key.keyboard.keycode || button != -1)
-      && i > 5) {
+  if ((key.keyboard.keycode || button != -1) && i > 5) {
     quit_anim = RESTART_GAME;
     return;
   }
@@ -852,10 +845,11 @@ cutscene_out_of_time_anim (void)
     i = 0; key.keyboard.keycode = 0; button = -1; cutscene_started = true;
   }
 
-  /* if (key.keyboard.keycode) { */
-  /*   quit_anim = RESTART_GAME; */
-  /*   return; */
-  /* } */
+  if ((key.keyboard.keycode || button != -1)
+      && anim_cycle > SEC2CYC (3)) {
+    quit_anim = RESTART_GAME;
+    return;
+  }
 
   switch (i) {
   case 0:

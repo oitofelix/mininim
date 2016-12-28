@@ -25,7 +25,8 @@ struct replay {
   uint32_t packed_boolean_config;
   uint32_t movements;
   uint32_t semantics;
-  uint32_t start_level, start_time, total_lives, kca, kcd;
+  uint32_t start_level, start_time, time_limit,
+    total_lives, kca, kcd;
   uint32_t random_seed;
   uint8_t *packed_gamepad_state;
   uint64_t packed_gamepad_state_nmemb;

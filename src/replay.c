@@ -136,6 +136,9 @@ save_replay (char *filename, struct replay *replay)
   /* start time */
   if (al_fwrite32le (f, replay->start_time) != 4) return false;
 
+  /* time limit */
+  if (al_fwrite32le (f, replay->time_limit) != 4) return false;
+
   /* total lives */
   if (al_fwrite32le (f, replay->total_lives) != 4) return false;
 
@@ -201,6 +204,10 @@ load_replay (struct replay *replay_ret, char *filename)
   replay.start_time = al_fread32le (f);
   if (al_feof (f) || al_ferror (f)) return NULL;
 
+  /* time limit */
+  replay.time_limit = al_fread32le (f);
+  if (al_feof (f) || al_ferror (f)) return NULL;
+
   /* total lives */
   replay.total_lives = al_fread32le (f);
   if (al_feof (f) || al_ferror (f)) return NULL;
@@ -219,7 +226,7 @@ load_replay (struct replay *replay_ret, char *filename)
 
   /* packed gamepad state */
   replay.packed_gamepad_state_nmemb = al_fsize (f)
-    - (sizeof (REPLAY_FILE_SIGNATURE) + 10 * sizeof (uint32_t));
+    - (sizeof (REPLAY_FILE_SIGNATURE) + 11 * sizeof (uint32_t));
   if (replay.packed_gamepad_state_nmemb < 0) return NULL;
   replay.packed_gamepad_state =
     xmalloc (replay.packed_gamepad_state_nmemb);
@@ -337,6 +344,9 @@ handle_load_replay_thread (int priority)
       level_start_replay_mode = PLAY_REPLAY;
       quit_anim = NEXT_LEVEL;
       next_level = replay.start_level;
+      min_legacy_level = min_int (min_legacy_level, replay.start_level);
+      max_legacy_level = max_int (max_legacy_level, replay.start_level);
+      ignore_level_cutscene = true;
     }
   }
   pause_animation (false);
@@ -366,6 +376,7 @@ set_replay_mode_at_level_start (struct replay *replay)
     replay->semantics = semantics;
     replay->start_level = global_level.n;
     replay->start_time = start_level_time;
+    replay->time_limit = time_limit;
     replay->total_lives = total_lives;
     replay->kca = skill.counter_attack_prob + 1;
     replay->kcd = skill.counter_defense_prob + 1;
@@ -376,6 +387,7 @@ set_replay_mode_at_level_start (struct replay *replay)
     movements = replay->movements;
     semantics = replay->semantics;
     start_level_time = replay->start_time;
+    time_limit = replay->time_limit;
     total_lives = replay->total_lives;
     skill.counter_attack_prob = replay->kca - 1;
     skill.counter_defense_prob = replay->kcd - 1;

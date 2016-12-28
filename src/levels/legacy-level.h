@@ -146,5 +146,7 @@ struct skill *get_legacy_skill (int i, struct skill *skill);
 
 /* variables */
 extern struct legacy_level lv;
+extern int min_legacy_level;
+extern int max_legacy_level;
 
 #endif	/* MININIM_LEGACY_LEVEL_H */

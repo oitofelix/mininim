@@ -592,7 +592,7 @@ draw_room_anim_fg_sub (ALLEGRO_BITMAP *bitmap,
     push_clipping_rectangle (bitmap,
                              PLACE_WIDTH * ptr2.place,
                              PLACE_HEIGHT * ptr2.floor + 56,
-                             PLACE_WIDTH + 14,
+                             PLACE_WIDTH + 16,
                              PLACE_HEIGHT - 53);
 
     push_drawn_rectangle (bitmap);

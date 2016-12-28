@@ -1953,7 +1953,8 @@ static char
 menu_select_level (enum edit up_edit, char *prefix)
 {
   set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
-  char r = menu_int (&next_level, NULL, 1, LEVELS, prefix, NULL);
+  char r = menu_int (&next_level, NULL, min_legacy_level,
+                     max_legacy_level, prefix, NULL);
   switch (r) {
   case -1: edit = up_edit; break;
   case 0: break;

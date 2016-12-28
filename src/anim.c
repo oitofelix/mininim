@@ -458,10 +458,13 @@ play_anim (void (*draw_callback) (void),
       }
 
       /* ALT+F7: start/stop replay recording */
-      if ((replay_mode != PLAY_REPLAY
-           && was_key_pressed (ALLEGRO_KEY_F7, 0, ALLEGRO_KEYMOD_ALT, true))
-          || ((replay_mode == RECORD_REPLAY || recording_replay_countdown > 0)
-              && was_key_pressed (ALLEGRO_KEY_F7, 0, 0, true))) {
+      if (! title_demo
+          && ((replay_mode != PLAY_REPLAY
+               && was_key_pressed
+               (ALLEGRO_KEY_F7, 0, ALLEGRO_KEYMOD_ALT, true))
+              || ((replay_mode == RECORD_REPLAY
+                   || recording_replay_countdown > 0)
+                  && was_key_pressed (ALLEGRO_KEY_F7, 0, 0, true)))) {
         if (replay_mode == RECORD_REPLAY) create_save_replay_thread ();
         else if (recording_replay_countdown < 0)
           prepare_for_recording_replay ();
@@ -472,12 +475,13 @@ play_anim (void (*draw_callback) (void),
       }
 
       /* F7: load replay/stop replaying */
-      if ((replay_mode != RECORD_REPLAY
-           && was_key_pressed (ALLEGRO_KEY_F7, 0, 0, true))
-          || (replay_mode == PLAY_REPLAY
-              && was_key_pressed
-              (ALLEGRO_KEY_F7, 0, ALLEGRO_KEYMOD_ALT, true))) {
-        if (replay_mode == PLAY_REPLAY) stop_replaying (0);
+      if (! title_demo
+          && ((replay_mode != RECORD_REPLAY
+               && was_key_pressed (ALLEGRO_KEY_F7, 0, 0, true))
+              || (replay_mode == PLAY_REPLAY
+                  && was_key_pressed
+                  (ALLEGRO_KEY_F7, 0, ALLEGRO_KEYMOD_ALT, true)))) {
+        if (replay_mode == PLAY_REPLAY) stop_replaying (2);
         else create_load_replay_thread ();
       }
 

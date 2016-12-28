@@ -28,7 +28,6 @@
 
 #define MIGNORE (INT_MIN)
 
-#define LEVELS 14
 #define ROOMS 25
 #define FLOORS 3
 #define PLACES 10

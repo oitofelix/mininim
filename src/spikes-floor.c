@@ -526,7 +526,7 @@ should_spikes_raise (struct pos *p)
     struct anim *a = &anima[i];
     if (is_anim_dead (&a->f)) continue;
     survey (_ml, pos, &a->f, NULL, &pml, NULL);
-    survey (_m, pos, &a->f, NULL, &pm, NULL);
+    surveyo (_m, -2, +0, pos, &a->f, NULL, &pm, NULL);
     survey (_mr, pos, &a->f, NULL, &pmr, NULL);
 
     if ((should_spikes_raise_for_pos (p, &pml)

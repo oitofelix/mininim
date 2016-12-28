@@ -38,7 +38,7 @@ bool no_room_drawing, game_paused, step_one_cycle;
 int retry_level = -1;
 int camera_follow_kid;
 int auto_rem_time_1st_cycle = 24;
-int next_level;
+int next_level = -1;
 bool ignore_level_cutscene;
 uint64_t death_timer;
 
@@ -189,6 +189,7 @@ play_level (struct level *lv)
   free_undo (&undo);
   cutscene = false;
   game_paused = false;
+  ignore_level_cutscene = false;
   potion_flags = 0;
   copy_level (&global_level, lv);
 
@@ -231,14 +232,19 @@ play_level (struct level *lv)
   struct anim *k = get_anim_by_id (current_kid_id);
 
   switch (quit_anim) {
-  case NO_QUIT: break;
+  default:
+    destroy_anims ();
+    destroy_cons ();
+    break;
   case RESTART_LEVEL:
+  restart_level:
     retry_level = global_level.n;
     destroy_anims ();
     destroy_cons ();
     draw_bottom_text (NULL, NULL, 0);
    goto start;
   case NEXT_LEVEL:
+  next_level:
     /* the kid must keep the total lives and skills obtained for the
        next level */
     if (next_level > global_level.n) {
@@ -253,7 +259,7 @@ play_level (struct level *lv)
       global_level.next_level (lv, next_level);
     draw_bottom_text (NULL, NULL, 0);
     if (global_level.cutscene && ! ignore_level_cutscene
-        && next_level == global_level.n + 1) {
+        && next_level >= global_level.n + 1) {
       cutscene_started = false;
       cutscene = true;
       stop_video_effect ();
@@ -261,21 +267,22 @@ play_level (struct level *lv)
       play_anim (global_level.cutscene, NULL);
       stop_video_effect ();
       stop_audio_instances ();
-
-      if (quit_anim == RESTART_GAME) goto restart_game;
+      if (quit_anim == NEXT_LEVEL) goto next_level;
+      else if (quit_anim == RESTART_LEVEL) goto restart_level;
+      else if (quit_anim == RESTART_GAME) goto restart_game;
     }
-    ignore_level_cutscene = false;
     goto start;
   case RESTART_GAME:
   restart_game:
-    next_level = 0;
+    next_level = -1;
     retry_level = -1;
     destroy_anims ();
     destroy_cons ();
     draw_bottom_text (NULL, NULL, 0);
     break;
-  case QUIT_GAME: break;
   case OUT_OF_TIME:
+    destroy_anims ();
+    destroy_cons ();
     cutscene_started = false;
     cutscene = true;
     stop_video_effect ();
@@ -283,7 +290,9 @@ play_level (struct level *lv)
     play_anim (cutscene_out_of_time_anim, NULL);
     stop_video_effect ();
     stop_audio_instances ();
-    goto restart_game;
+    if (quit_anim == NEXT_LEVEL) goto next_level;
+    else if (quit_anim == RESTART_LEVEL) goto restart_level;
+    else if (quit_anim == RESTART_GAME) goto restart_game;
     break;
   }
 }
