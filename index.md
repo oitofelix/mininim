@@ -85,7 +85,7 @@ currently implemented are:
 - Rich set of itemmizable constructions and items
 - Supports triggering of any tile
 - Screenshot capturing
-- Replays
+- Replay recording, playing and simulation.
 
 
 The following additional features are planned to be implemented soon.
@@ -138,7 +138,7 @@ welcome!  Please, contact the MININIM community at its
 available.  No installation is required, just extract the zip archive
 and run ‘mininim.exe’.
 
-[mininim-201612280409-win32.zip](https://github.com/oitofelix/mininim/files/675028/mininim-201612280409-win32.zip)
+[mininim-201612281424-win32.zip](https://github.com/oitofelix/mininim/files/675696/mininim-201612281424-win32.zip)
 
 
 **GNU/Linux**
