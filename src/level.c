@@ -189,10 +189,8 @@ play_level (struct level *lv)
  start:
   if (random_seed == 0) prandom (0);
 
-  destroy_anims ();
-  destroy_cons ();
+  level_cleanup ();
 
-  free_undo (&undo);
   cutscene = false;
   game_paused = false;
   ignore_level_cutscene = false;
@@ -249,8 +247,7 @@ play_level (struct level *lv)
         replay.final_total_lives = k->total_lives;
         replay.final_kca = k->skill.counter_attack_prob + 1;
         replay.final_kcd = k->skill.counter_defense_prob + 1;
-        destroy_anims ();
-        destroy_cons ();
+        level_cleanup ();
         return;
       }
       /* while (anim_cycle == 986) { */
@@ -291,8 +288,7 @@ play_level (struct level *lv)
     replay.final_total_lives = k->total_lives;
     replay.final_kca = k->skill.counter_attack_prob + 1;
     replay.final_kcd = k->skill.counter_defense_prob + 1;
-    destroy_anims ();
-    destroy_cons ();
+    level_cleanup ();
     return;
   } else if (simulation && replay_mode == PLAY_REPLAY) {
     replay.complete = false;
@@ -300,21 +296,18 @@ play_level (struct level *lv)
     replay.final_total_lives = k->total_lives;
     replay.final_kca = k->skill.counter_attack_prob + 1;
     replay.final_kcd = k->skill.counter_defense_prob + 1;
-    destroy_anims ();
-    destroy_cons ();
+    level_cleanup ();
     return;
   }
 
   switch (quit_anim) {
   default:
-    destroy_anims ();
-    destroy_cons ();
+    level_cleanup ();
     break;
   case RESTART_LEVEL:
   restart_level:
     retry_level = global_level.n;
-    destroy_anims ();
-    destroy_cons ();
+    level_cleanup ();
     draw_bottom_text (NULL, NULL, 0);
    goto start;
   case NEXT_LEVEL:
@@ -327,8 +320,7 @@ play_level (struct level *lv)
       skill = k->skill;
     }
 
-    destroy_anims ();
-    destroy_cons ();
+    level_cleanup ();
     if (global_level.next_level)
       global_level.next_level (lv, next_level);
     draw_bottom_text (NULL, NULL, 0);
@@ -350,13 +342,11 @@ play_level (struct level *lv)
   restart_game:
     next_level = -1;
     retry_level = -1;
-    destroy_anims ();
-    destroy_cons ();
+    level_cleanup ();
     draw_bottom_text (NULL, NULL, 0);
     break;
   case OUT_OF_TIME:
-    destroy_anims ();
-    destroy_cons ();
+    level_cleanup ();
     cutscene_started = false;
     cutscene = true;
     stop_video_effect ();
@@ -545,6 +535,14 @@ register_anims (void)
     a->style = g->style;
     if (a->total_lives == 0) a->glory_sample = true;
   }
+}
+
+void
+level_cleanup (void)
+{
+  destroy_anims ();
+  destroy_cons ();
+  free_undo (&undo);
 }
 
 void

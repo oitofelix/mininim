@@ -237,6 +237,7 @@ break_closer_floor (struct pos *p)
     (&undo, p,
      MIGNORE, MIGNORE, c->event + EVENTS, MIGNORE,
      NULL, false, "LOOSE FLOOR BREAKING");
+  c = closer_floor_at_pos (p);
   c->broken = true;
 }
 

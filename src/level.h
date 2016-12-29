@@ -48,6 +48,7 @@ void register_con_at_pos (struct pos *p);
 void register_room (int room);
 void register_cons (void);
 void register_anims (void);
+void level_cleanup (void);
 void display_remaining_time (void);
 void display_skill (struct anim *k);
 void pause_game (bool val);

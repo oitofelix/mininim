@@ -236,6 +236,7 @@ break_opener_floor (struct pos *p)
     (&undo, p,
      MIGNORE, MIGNORE, o->event + EVENTS, MIGNORE,
      NULL, false, "LOOSE FLOOR BREAKING");
+  o = opener_floor_at_pos (p);
   o->broken = true;
 }
 

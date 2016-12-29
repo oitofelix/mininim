@@ -324,6 +324,7 @@ break_level_door (struct pos *p)
     (&undo, p,
      MIGNORE, MIGNORE, d->i + LEVEL_DOOR_STEPS, MIGNORE,
      NULL, false, "LOOSE FLOOR BREAKING");
+  d = level_door_at_pos (p);
   d->broken = true;
 }
 
