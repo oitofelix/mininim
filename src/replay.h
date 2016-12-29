@@ -25,11 +25,30 @@ struct replay {
   uint32_t packed_boolean_config;
   uint32_t movements;
   uint32_t semantics;
-  uint32_t start_level, start_time, time_limit,
-    total_lives, kca, kcd;
+
+  uint32_t start_level;
+  uint32_t start_time;
+  int32_t time_limit;
+  uint32_t total_lives;
+  uint32_t kca;
+  uint32_t kcd;
+
   uint32_t random_seed;
   uint8_t *packed_gamepad_state;
+
+  /* Fields below aren't properly part of the replay file format.
+     Used mainly for simulation. */
   uint64_t packed_gamepad_state_nmemb;
+  char *filename;
+  bool complete;
+  enum replay_incomplete {
+    REPLAY_INCOMPLETE_NO_REASON,
+    REPLAY_INCOMPLETE_STUCK, REPLAY_INCOMPLETE_DEAD,
+    REPLAY_INCOMPLETE_OUT_OF_TIME,
+  } reason;
+  uint32_t final_total_lives;
+  uint32_t final_kca;
+  uint32_t final_kcd;
 };
 
 /* funtions */
@@ -60,14 +79,18 @@ void set_replay_mode_at_level_start (struct replay *replay);
 void replay_gamepad_update (struct anim *a, struct replay *replay,
                             uint64_t cycle);
 void print_replay_mode (int priority);
+bool check_replay_chain_completion_and_validity (void);
+char *replay_incomplete_str (enum replay_incomplete ri);
 void print_replay_info (struct replay *replay);
-void print_final_options_state (struct replay *replay);
+void print_simulation_results (struct replay *replay);
 
 /* variables */
 extern struct replay replay;
 extern enum replay_mode level_start_replay_mode;
 extern enum replay_mode replay_mode;
 extern int64_t recording_replay_countdown;
+extern struct replay *replay_chain;
+extern size_t replay_chain_nmemb;
 
 extern ALLEGRO_THREAD *save_replay_dialog_thread,
   *load_replay_dialog_thread;

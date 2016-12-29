@@ -190,10 +190,10 @@ static struct argp_option options[] = {
 
   /* replays */
   {NULL, 0, NULL, 0, "Replays", 0},
-  {"replay", REPLAY_OPTION, "FILE", 0, "Load replay FILE and play it.  This can be done in-game by the F7 key binding.", 0},
+  {"replay", REPLAY_OPTION, "FILE", 0, "Load replay FILE and play it.  This can be done in-game by the F7 key binding.  Notice you can use '--time-frequency' and its related key bindings to control the playback speed.", 0},
   {"record-replay", RECORD_REPLAY_OPTION, NULL, 0, "Starts recording replay countdown at game beginning.  Use this in conjunction with '--start-level' to start recording a given level.  This can be done in-game by the ALT+F7 key binding.", 0},
-  {"simulate-replay", SIMULATE_REPLAY_OPTION, "FILE", 0, "Load replay FILE and simulate it to check whether it's complete.  In affirmative case, the 'Final' field lists arguments intended to be used for continuing the game from where the replay left.  This option also prints the information given by '--replay-info'.", 0},
-  {"replay-info", REPLAY_INFO_OPTION, "FILE", 0, "Print information about replay FILE and exit.  The 'Initial' field lists arguments intended to be used for recording another replay file with the same initial conditions.", 0},
+  {"simulate-replay", SIMULATE_REPLAY_OPTION, "FILE", 0, "Add replay FILE to the chain of replays to simulate and check for completion and validity.  Replay files should be explicitly specified in the appropriate order, one for each instance of this option.  For each replay in the chain a simulation summary is printed.  In case there is any invalid sequent pair in the chain, their incompatible options are printed between their simulation summaries.  For any complete replay summary, its 'final' field lists arguments intended to be used for continuing the game from where its respective replay ends.  If the entire chain of replays is complete and all sequent pairs valid MININIM exits with status zero or non-zero otherwise.", 0},
+  {"replay-info", REPLAY_INFO_OPTION, "FILE", 0, "Print information about replay FILE and exit.  The 'initial' field lists arguments intended to be used for recording another replay file with the same initial conditions.", 0},
 
   /* Paths */
   {NULL, 0, NULL, 0, "Paths:", 0},
@@ -958,13 +958,19 @@ Levels have been converted using module %s into native format at\n\
     prepare_for_recording_replay ();
     break;
   case SIMULATE_REPLAY_OPTION:
-    command_line_load_replay (&replay, arg);
+    replay_chain = xrealloc (replay_chain, ++replay_chain_nmemb
+                             * sizeof (* replay_chain));
+    if (! load_replay (&replay_chain[replay_chain_nmemb - 1], arg))
+      error (-1, 0, "failed to load replay '%s'", arg);
+    level_start_replay_mode = PLAY_REPLAY;
     simulation = true;
     break;
   case REPLAY_INFO_OPTION:
     if (! load_replay (&replay, arg))
-      error (-1, 0, "replay loading of '%s' failed", arg);
+      error (-1, 0, "failed to load replay '%s'", arg);
+    HLINE;
     print_replay_info (&replay);
+    HLINE;
     exit (0);
     break;
   case ARGP_KEY_ARG:
@@ -1224,7 +1230,11 @@ main (int _argc, char **_argv)
   /* exit (0); */
   /* --------------- */
 
-  if (skip_title || simulation) goto play_game;
+  give_dat_compat_preference ();
+
+  if (simulation && level_start_replay_mode == PLAY_REPLAY)
+    return check_replay_chain_completion_and_validity () ? 0 : -1;
+  else if (skip_title) goto play_game;
 
  restart_game:
   cutscene = true;
@@ -1278,10 +1288,7 @@ main (int _argc, char **_argv)
   game_paused = false;
   total_lives = initial_total_lives;
   current_lives = initial_current_lives;
-
   play_time = start_time;
-
-  give_dat_compat_preference ();
 
   int level = next_level >= 0 ? next_level : start_level;
   if (! level_module_next_level (&vanilla_level, level))

@@ -21,6 +21,9 @@
 
 struct replay replay;
 
+struct replay *replay_chain;
+size_t replay_chain_nmemb;
+
 enum replay_mode level_start_replay_mode;
 enum replay_mode replay_mode;
 
@@ -235,6 +238,9 @@ load_replay (struct replay *replay_ret, char *filename)
             replay.packed_gamepad_state_nmemb);
   if (al_feof (f) || al_ferror (f)) return NULL;
 
+  /* filename */
+  xasprintf (&replay.filename, "%s", filename);
+
   *replay_ret = replay;
 
   return replay_ret;
@@ -250,7 +256,7 @@ struct replay *
 command_line_load_replay (struct replay *replay, char *filename)
 {
   if (! load_replay (replay, filename))
-    error (-1, 0, "replay loading of '%s' failed", filename);
+    error (-1, 0, "failed to load replay '%s'", filename);
   level_start_replay_mode = PLAY_REPLAY;
   next_level = replay->start_level;
   min_legacy_level = min_int (min_legacy_level, replay->start_level);
@@ -264,6 +270,8 @@ free_replay (struct replay *replay)
 {
   if (replay->packed_gamepad_state)
     al_free (replay->packed_gamepad_state);
+  if (replay->filename)
+    al_free (replay->filename);
   memset (replay, 0, sizeof (* replay));
 }
 
@@ -379,8 +387,6 @@ stop_replaying (int priority)
 void
 set_replay_mode_at_level_start (struct replay *replay)
 {
-  if (random_seed == 0) prandom (0);
-
   replay_mode = level_start_replay_mode;
 
   switch (replay_mode) {
@@ -440,17 +446,100 @@ print_replay_mode (int priority)
   }
 }
 
+bool
+check_replay_chain_completion_and_validity (void)
+{
+  size_t i;
+  bool valid_chain = true;
+  bool complete_replays = true;
+
+  for (i = 0; i < replay_chain_nmemb; i++) {
+    HLINE;
+
+    bool valid_chain_next;
+    valid_chain_next = true;
+
+    if (i > 0) {
+      if (replay_chain[i].start_level != replay.start_level + 1) {
+        printf ("INVALID: --start-level\n");
+        valid_chain_next = false;
+      }
+
+      if (replay_chain[i].start_time <
+          replay.start_time + replay.packed_gamepad_state_nmemb) {
+        printf ("INVALID: --start-time\n");
+        valid_chain_next = false;
+      }
+
+      if (replay_chain[i].time_limit > replay.time_limit) {
+        printf ("INVALID: --time-limit\n");
+        valid_chain_next = false;
+      }
+
+      if (replay_chain[i].total_lives > replay.final_total_lives) {
+        printf ("INVALID: --total-lives\n");
+        valid_chain_next = false;
+      }
+
+      if (replay_chain[i].kca > replay.final_kca) {
+        printf ("INVALID: --kca\n");
+        valid_chain_next = false;
+      }
+
+      if (replay_chain[i].kcd > replay.final_kcd) {
+        printf ("INVALID: --kcd\n");
+        valid_chain_next = false;
+      }
+    }
+
+    if (valid_chain && ! valid_chain_next)
+      valid_chain = false;
+
+    free_replay (&replay);
+    replay = replay_chain[i];
+
+    if (! valid_chain_next) HLINE;
+    print_replay_info (&replay);
+
+    min_legacy_level = min_int (min_legacy_level, replay.start_level);
+    max_legacy_level = max_int (max_legacy_level, replay.start_level);
+    if (! level_module_next_level (&vanilla_level, replay.start_level))
+      exit (-1);
+    play_level (&vanilla_level);
+
+    CLINE;
+    print_simulation_results (&replay);
+
+    if (! replay.complete) complete_replays = false;
+  }
+
+  HLINE;
+  return complete_replays && valid_chain;
+}
+
+char *
+replay_incomplete_str (enum replay_incomplete ri)
+{
+  switch (ri) {
+  default: return "NONE";
+  case REPLAY_INCOMPLETE_STUCK: return "STUCK";
+  case REPLAY_INCOMPLETE_DEAD: return "DEAD";
+  case REPLAY_INCOMPLETE_OUT_OF_TIME: return "OUT OF TIME";
+  }
+}
+
 void
 print_replay_info (struct replay *replay)
 {
-  printf ("Signature: %s\n"
+  printf ("File: %s\n"
+          "Signature: %s\n"
           "Version: %u\n"
-          "Initial: --mirror-level=%s --immortal-mode=%s"
-          " --movements=%s --semantics=%s --start-level=%u"
-          " --start-time=%u --time_limit=%i --total_lives=%u"
-          " --kca=%u --kcd=%u\n"
+          "Initial: --mirror-level=%s --immortal-mode=%s --movements=%s \\\n"
+          "  --semantics=%s --start-level=%u --start-time=%u --time-limit=%i \\\n"
+          "  --total-lives=%u --kca=%u --kcd=%u\n"
           "Random seed: 0x%X\n"
           "Cycles: %lu\n",
+          replay->filename,
           REPLAY_FILE_SIGNATURE,
           replay->version,
           replay->packed_boolean_config & PACKED_CONFIG_MIRROR_LEVEL_BIT
@@ -470,22 +559,25 @@ print_replay_info (struct replay *replay)
 }
 
 void
-print_final_options_state (struct replay *replay)
+print_simulation_results (struct replay *replay)
 {
-  struct anim *k = get_anim_by_id (current_kid_id);
-
-  printf ("Final: --mirror-level=%s --immortal-mode=%s"
-          " --movements=%s --semantics=%s --start-level=%u"
-          " --start-time=%lu --time_limit=%i --total_lives=%u"
-          " --kca=%i --kcd=%i\n",
-          mirror_level ? "TRUE" : "FALSE",
-          immortal_mode ? "TRUE" : "FALSE",
-          movements_str (movements),
-          semantics_str (semantics),
+  printf ("Complete: %s\n"
+          "Reason: %s\n"
+          "Final: --mirror-level=%s --immortal-mode=%s --movements=%s \\\n"
+          "  --semantics=%s --start-level=%u --start-time=%lu --time-limit=%i \\\n"
+          "  --total-lives=%u --kca=%i --kcd=%i\n",
+          replay->complete ? "YES" : "NO",
+          replay_incomplete_str (replay->reason),
+          replay->packed_boolean_config & PACKED_CONFIG_MIRROR_LEVEL_BIT
+          ? "TRUE" : "FALSE",
+          replay->packed_boolean_config & PACKED_CONFIG_IMMORTAL_MODE_BIT
+          ? "TRUE" : "FALSE",
+          movements_str (replay->movements),
+          semantics_str (replay->semantics),
           replay->start_level + 1,
-          play_time,
+          replay->start_time + replay->packed_gamepad_state_nmemb,
           replay->time_limit,
-          total_lives,
-          k->skill.counter_attack_prob + 1,
-          k->skill.counter_defense_prob + 1);
+          replay->final_total_lives,
+          replay->final_kca,
+          replay->final_kcd);
 }

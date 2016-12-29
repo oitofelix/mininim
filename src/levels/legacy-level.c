@@ -23,6 +23,9 @@ int min_legacy_level = 1;
 int max_legacy_level = 14;
 
 static int level_3_checkpoint;
+static int checkpoint_total_lives;
+static int checkpoint_current_lives;
+static struct skill checkpoint_skill;
 static int shadow_id;
 static int skeleton_id;
 static bool played_sample;
@@ -118,6 +121,9 @@ legacy_level_start (void)
       place_frame (&k->f, &k->f, kid_normal_00, &p,
                    k->f.dir == LEFT ? +22 : +31, +15);
       mr_center_room (2);
+      k->total_lives = checkpoint_total_lives;
+      k->current_lives = checkpoint_current_lives;
+      k->skill = checkpoint_skill;
     }
   }
 
@@ -189,9 +195,9 @@ legacy_level_special_events (void)
     survey (_m, pos, &k->f, NULL, &pm, NULL);
     if (peq (&pm, &p)) {
       level_3_checkpoint = true;
-      total_lives = k->total_lives;
-      current_lives = k->current_lives;
-      skill = k->skill;
+      checkpoint_total_lives = k->total_lives;
+      checkpoint_current_lives = k->current_lives;
+      checkpoint_skill = k->skill;
     }
 
     struct anim *s = NULL;

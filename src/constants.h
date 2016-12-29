@@ -164,4 +164,7 @@
 #define PACKED_CONFIG_MIRROR_LEVEL_BIT (1 << 0)
 #define PACKED_CONFIG_IMMORTAL_MODE_BIT (1 << 1)
 
+#define HLINE printf ("===============================================================================\n")
+#define CLINE printf ("                                                                               \r")
+
 #endif	/* MININIM_CONSTANTS_H */

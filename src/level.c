@@ -186,12 +186,22 @@ play_level (struct level *lv)
   char *text;
 
  start:
+  if (random_seed == 0) prandom (0);
+
+  destroy_anims ();
+  destroy_cons ();
+
   free_undo (&undo);
   cutscene = false;
   game_paused = false;
   ignore_level_cutscene = false;
   potion_flags = 0;
   copy_level (&global_level, lv);
+
+  if (retry_level != global_level.n)
+    start_level_time = play_time;
+
+  play_time = start_level_time;
 
   set_replay_mode_at_level_start (&replay);
 
@@ -210,11 +220,6 @@ play_level (struct level *lv)
   last_auto_show_time = -1;
   current_kid_id = 0;
 
-  if (retry_level != global_level.n)
-    start_level_time = play_time;
-
-  play_time = start_level_time;
-
   if (! force_em) em = global_level.em;
   if (! force_hue) hue = global_level.hue;
 
@@ -228,38 +233,53 @@ play_level (struct level *lv)
   }
 
   quit_anim = NO_QUIT;
+  anim_cycle = 0;
   if (simulation)
     while (! quit_anim) {
-      draw_logo_screen ("Simulating...");
       if (replay_mode == PLAY_REPLAY
           && anim_cycle >= replay.packed_gamepad_state_nmemb + 720) {
         struct anim *k = get_anim_by_id (current_kid_id);
-        print_replay_info (&replay);
-        printf ("Complete: NO\n");
-        printf ("Reason: %s\n", k->current_lives > 0 ? "STUCK" : "DEAD");
-        print_final_options_state (&replay);
-        exit (-1);
+        replay.complete = false;
+        replay.reason = k->current_lives > 0
+          ? REPLAY_INCOMPLETE_STUCK : REPLAY_INCOMPLETE_DEAD;
+        replay.final_total_lives = k->total_lives;
+        replay.final_kca = k->skill.counter_attack_prob + 1;
+        replay.final_kcd = k->skill.counter_defense_prob + 1;
+        destroy_anims ();
+        destroy_cons ();
+        return;
       }
+      show ();
       compute_level ();
+      draw_level ();
       anim_cycle++;
+      printf ("Simulating: %lu%%\r",
+              (anim_cycle * 100) / replay.packed_gamepad_state_nmemb);
     }
   else play_anim (draw_level, compute_level);
 
+  struct anim *k = get_anim_by_id (current_kid_id);
+
   if (simulation && replay_mode == PLAY_REPLAY
       && quit_anim != OUT_OF_TIME) {
-    print_replay_info (&replay);
-    printf ("Complete: YES\n");
-    print_final_options_state (&replay);
-    exit (0);
+    replay.complete = true;
+    replay.reason = REPLAY_INCOMPLETE_NO_REASON;
+    replay.final_total_lives = k->total_lives;
+    replay.final_kca = k->skill.counter_attack_prob + 1;
+    replay.final_kcd = k->skill.counter_defense_prob + 1;
+    destroy_anims ();
+    destroy_cons ();
+    return;
   } else if (simulation && replay_mode == PLAY_REPLAY) {
-    print_replay_info (&replay);
-    printf ("Complete: NO\n");
-    printf ("Reason: OUT OF TIME\n");
-    print_final_options_state (&replay);
-    exit (-1);
+    replay.complete = false;
+    replay.reason = REPLAY_INCOMPLETE_OUT_OF_TIME;
+    replay.final_total_lives = k->total_lives;
+    replay.final_kca = k->skill.counter_attack_prob + 1;
+    replay.final_kcd = k->skill.counter_defense_prob + 1;
+    destroy_anims ();
+    destroy_cons ();
+    return;
   }
-
-  struct anim *k = get_anim_by_id (current_kid_id);
 
   switch (quit_anim) {
   default:

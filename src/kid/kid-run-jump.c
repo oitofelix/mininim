@@ -112,7 +112,7 @@ flow (struct anim *k)
   int back_dir = (k->f.dir == LEFT) ? RIGHT : LEFT;
 
   survey (_m, pos, &k->f, NULL, &pm, NULL);
-  surveyo (_m, +8, +0, pos, &k->f, NULL, &pmf, NULL);
+  surveyo (_m, +4, +0, pos, &k->f, NULL, &pmf, NULL);
   survey (_tf, pos, &k->f, NULL, &ptf, NULL);
 
   /* hang front */
