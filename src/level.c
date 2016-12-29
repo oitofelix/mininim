@@ -175,6 +175,7 @@ replace_playing_level (struct level *l)
 {
   destroy_cons ();
   copy_level (&global_level, l);
+  register_cons ();
   em = global_level.em;
   hue = global_level.hue;
   mr.full_update = true;
@@ -209,6 +210,7 @@ play_level (struct level *lv)
 
   normalize_level (&global_level);
 
+  register_cons ();
   register_anims ();
 
   stop_audio_instances ();
@@ -234,10 +236,12 @@ play_level (struct level *lv)
 
   quit_anim = NO_QUIT;
   anim_cycle = 0;
-  if (simulation)
+  if (simulation) {
+    apply_mr_fit_mode ();
+
     while (! quit_anim) {
       if (replay_mode == PLAY_REPLAY
-          && anim_cycle >= replay.packed_gamepad_state_nmemb + 720) {
+          && anim_cycle >= replay.packed_gamepad_state_nmemb + 72) {
         struct anim *k = get_anim_by_id (current_kid_id);
         replay.complete = false;
         replay.reason = k->current_lives > 0
@@ -249,14 +253,34 @@ play_level (struct level *lv)
         destroy_cons ();
         return;
       }
-      show ();
+      /* while (anim_cycle == 986) { */
+      /*   show (); */
+      /*   al_rest (0.1); */
+      /* } */
+      if (simulation_rendering) {
+        process_display_events (NULL);
+        if (anim_cycle > 0) show ();
+      } else {
+        cutscene = true;
+        process_display_events (draw_simulating_screen);
+        cutscene = false;
+      }
       compute_level ();
-      draw_level ();
+      if (simulation_rendering) {
+        int random_seed_before_draw;
+        random_seed_before_draw = random_seed;
+        draw_level ();
+        random_seed = random_seed_before_draw;
+        play_audio_instances ();
+      }
       anim_cycle++;
       printf ("Simulating: %lu%%\r",
               (anim_cycle * 100) / replay.packed_gamepad_state_nmemb);
+      fflush (NULL);
+      if (simulation_period > 0) al_rest (simulation_period);
+      /* debug_random_seed () */
     }
-  else play_anim (draw_level, compute_level);
+  } else play_anim (draw_level, compute_level);
 
   struct anim *k = get_anim_by_id (current_kid_id);
 
@@ -427,6 +451,38 @@ destroy_cons (void)
   destroy_array ((void **) &level_door, &level_door_nmemb);
   destroy_array ((void **) &chopper, &chopper_nmemb);
   destroy_array ((void **) &mirror, &mirror_nmemb);
+}
+
+void
+register_con_at_pos (struct pos *p)
+{
+  switch (fg (p)) {
+  case LOOSE_FLOOR: register_loose_floor (p); break;
+  case OPENER_FLOOR: register_opener_floor (p); break;
+  case CLOSER_FLOOR: register_closer_floor (p); break;
+  case SPIKES_FLOOR: register_spikes_floor (p); break;
+  case DOOR: register_door (p); break;
+  case LEVEL_DOOR: register_level_door (p); break;
+  case CHOPPER: register_chopper (p); break;
+  default: break;
+  }
+}
+
+void
+register_room (int room)
+{
+  struct pos p; new_pos (&p, &global_level, room, -1, -1);
+  for (p.floor = 0; p.floor < FLOORS; p.floor++)
+    for (p.place = 0; p.place < PLACES; p.place++)
+      register_con_at_pos (&p);
+}
+
+void
+register_cons (void)
+{
+  int room;
+  for (room = 0; room < ROOMS; room++)
+    register_room (room);
 }
 
 void

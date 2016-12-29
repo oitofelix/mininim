@@ -718,16 +718,18 @@ is_fullscreen (void)
 }
 
 void
-process_display_events (void)
+process_display_events (void (*draw_callback) (void))
 {
   ALLEGRO_EVENT event;
   while (al_get_next_event (event_queue, &event))
     switch (event.type) {
     case ALLEGRO_EVENT_DISPLAY_EXPOSE:
+      if (draw_callback) draw_callback ();
       show ();
       break;
     case ALLEGRO_EVENT_DISPLAY_RESIZE:
       acknowledge_resize ();
+      if (draw_callback) draw_callback ();
       show ();
       break;
     case ALLEGRO_EVENT_DISPLAY_CLOSE:

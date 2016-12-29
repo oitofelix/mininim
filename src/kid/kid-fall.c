@@ -110,8 +110,6 @@ physics_in (struct anim *k)
     && (k->i < 9 || k->float_timer)
     && k->current_lives > 0;
 
-  int dir = (k->f.dir == LEFT) ? -1 : +1;
-
   survey (_bf, pos, &k->f, NULL, &pbf, NULL);
   survey (_bb, pos, &k->f, NULL, &pbb, NULL);
 
@@ -126,9 +124,9 @@ physics_in (struct anim *k)
     k->fo.dx = +20;
   } else if (k->oaction == kid_couch && k->collision) {
     k->collision = false;
-    k->f.c.x += dir * 16;
+    k->fo.dx += -16;
   } else if (k->oaction == kid_couch) {
-    k->f.c.x += dir * 12;
+    k->fo.dx += -12;
   } else if (k->i == 0
              && k->oaction != kid_normal
              && k->oaction != kid_hang_free
@@ -216,7 +214,7 @@ physics_in (struct anim *k)
     k->fo.dx = k->fo.dy = 0;
     k->f.b = kid_couch_frameset[0].frame;
     new_coord (&k->f.c, k->f.c.l, pbf.room,
-               k->f.c.x + dir * 0,
+               k->f.c.x,
                PLACE_HEIGHT * pbf.floor + 27);
 
     shake_loose_floor_row (&pbf);

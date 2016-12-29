@@ -28,6 +28,7 @@ prandom (int max)
 {
 	if (! random_seed) random_seed = time (NULL);
 	random_seed = random_seed * 214013 + 2531011;
+  if (! random_seed) random_seed = 1;
 	return (random_seed >> 16) % (max + 1);
 }
 

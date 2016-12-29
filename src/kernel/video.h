@@ -60,7 +60,7 @@ bool is_video_effect_started (void);
 void show (void);
 void flip_display (ALLEGRO_BITMAP *bitmap);
 bool is_fullscreen (void);
-void process_display_events (void);
+void process_display_events (void (*draw_callback) (void));
 void get_display_mode (int index, ALLEGRO_DISPLAY_MODE *mode);
 
 /* palette */

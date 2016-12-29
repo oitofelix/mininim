@@ -671,7 +671,7 @@ legacy_level_end (struct pos *p)
     played_sample = true;
   }
 
-  if (! is_audio_instance_playing (ai_data)) {
+  if (! is_audio_instance_playing (ai_data) || simulation) {
     next_level = global_level.n + 1;
     quit_anim = NEXT_LEVEL;
   }

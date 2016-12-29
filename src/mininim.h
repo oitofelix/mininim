@@ -27,6 +27,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <float.h>
 #include <assert.h>
 #include <math.h>
 #include <time.h>
@@ -181,6 +182,7 @@ char *movements_str (enum movements m);
 char *semantics_str (enum semantics m);
 bool save_level (struct level *l);
 void draw_logo_screen (char *text);
+void draw_simulating_screen (void);
 
 /* variables */
 extern enum level_module level_module;
@@ -216,6 +218,8 @@ extern enum semantics semantics;
 extern enum movements movements;
 extern bool title_demo;
 extern bool simulation;
+extern bool simulation_rendering;
+extern float simulation_period;
 
 extern ALLEGRO_THREAD *load_config_dialog_thread,
   *save_game_dialog_thread, *save_picture_dialog_thread;

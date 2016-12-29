@@ -96,6 +96,8 @@ enum semantics semantics;
 enum movements movements;
 bool title_demo;
 bool simulation;
+bool simulation_rendering;
+float simulation_period;
 
 struct skill skill = {.counter_attack_prob = INITIAL_KCA,
                       .counter_defense_prob = INITIAL_KCD};
@@ -192,8 +194,10 @@ static struct argp_option options[] = {
   {NULL, 0, NULL, 0, "Replays", 0},
   {"replay", REPLAY_OPTION, "FILE", 0, "Load replay FILE and play it.  This can be done in-game by the F7 key binding.  Notice you can use '--time-frequency' and its related key bindings to control the playback speed.", 0},
   {"record-replay", RECORD_REPLAY_OPTION, NULL, 0, "Starts recording replay countdown at game beginning.  Use this in conjunction with '--start-level' to start recording a given level.  This can be done in-game by the ALT+F7 key binding.", 0},
-  {"simulate-replay", SIMULATE_REPLAY_OPTION, "FILE", 0, "Add replay FILE to the chain of replays to simulate and check for completion and validity.  Replay files should be explicitly specified in the appropriate order, one for each instance of this option.  For each replay in the chain a simulation summary is printed.  In case there is any invalid sequent pair in the chain, their incompatible options are printed between their simulation summaries.  For any complete replay summary, its 'final' field lists arguments intended to be used for continuing the game from where its respective replay ends.  If the entire chain of replays is complete and all sequent pairs valid MININIM exits with status zero or non-zero otherwise.", 0},
+  {"simulate-replay", SIMULATE_REPLAY_OPTION, "FILE", 0, "Add replay FILE to the chain of replays to simulate and check for completion and validity.  Replay files should be explicitly specified in the appropriate order, one for each instance of this option.  For each replay in the chain a simulation summary is printed.  In case there is any invalid sequent pairs in the chain, their incompatible options are printed between their simulation summaries.  For any complete replay summary, its 'final' field lists arguments intended to be used for continuing the game from where its respective replay ends.  If the entire chain of replays is complete and all sequent pairs valid, MININIM exits with status zero (non-zero otherwise).", 0},
   {"replay-info", REPLAY_INFO_OPTION, "FILE", 0, "Print information about replay FILE and exit.  The 'initial' field lists arguments intended to be used for recording another replay file with the same initial conditions.", 0},
+  {"simulation-rendering", SIMULATION_RENDERING_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable simulation rendering while simulating replay chains.  When enabled, this allows the user to see and hear what's going on inside a simulation.  It's specially useful when used with '--simulation-period'.  Notice that simulation rendering makes replay simulation orders of magnitude slower (even for a null simulation period), and thus should not be used for batch processing of replay chains.  If enabled, audio and rendering-related options are all honored.  The default is FALSE.", 0},
+  {"simulation-period", SIMULATION_PERIOD_OPTION, "F", 0, "Set the simulation period (time to wait between cycles) to F seconds.  Notice that 0.083 corresponds approximatelly to the 12Hz standard time frequency.  The default is 0.  Valid values are floating points ranging from 0 to FLT_MAX.", 0},
 
   /* Paths */
   {NULL, 0, NULL, 0, "Paths:", 0},
@@ -632,6 +636,7 @@ parser (int key, char *arg, struct argp_state *state)
   struct int_range joystick_axis_range = {0, INT_MAX};
   struct int_range joystick_button_range = {0, INT_MAX};
   struct int_range display_mode_range = {-1, al_get_num_display_modes () - 1};
+  struct float_range simulation_period_range = {0.0,FLT_MAX};
 
   switch (key) {
   case IGNORE_MAIN_CONFIG_OPTION:
@@ -973,6 +978,15 @@ Levels have been converted using module %s into native format at\n\
     HLINE;
     exit (0);
     break;
+  case SIMULATION_RENDERING_OPTION:
+    simulation_rendering = optval_to_bool (arg);
+    break;
+  case SIMULATION_PERIOD_OPTION:
+    e = optval_to_float (&float_val, key, arg, state,
+                         &simulation_period_range, 0);
+    if (e) return e;
+    simulation_period = float_val;
+    break;
   case ARGP_KEY_ARG:
     /* cheat */
     if (! strcasecmp ("MEGAHIT", arg)) break;
@@ -1232,8 +1246,10 @@ main (int _argc, char **_argv)
 
   give_dat_compat_preference ();
 
-  if (simulation && level_start_replay_mode == PLAY_REPLAY)
+  if (simulation && level_start_replay_mode == PLAY_REPLAY) {
+    draw_simulating_screen ();
     return check_replay_chain_completion_and_validity () ? 0 : -1;
+  }
   else if (skip_title) goto play_game;
 
  restart_game:
@@ -1315,7 +1331,8 @@ quit_game (void)
   finalize_dialog ();
   finalize_mouse ();
 
-  fprintf (stderr, "MININIM: Hope you enjoyed it!\n");
+  if (! simulation)
+    fprintf (stderr, "MININIM: Hope you enjoyed it!\n");
 
   exit (0);
 }
@@ -1333,37 +1350,38 @@ give_dat_compat_preference (void)
 void
 draw_loading_screen (void)
 {
-  draw_logo_screen ("Loading...");
+  static bool first_time = true;
+  if (first_time) draw_logo_screen ("Loading...");
+  process_display_events (NULL);
+  first_time = false;
+}
+
+void
+draw_simulating_screen (void)
+{
+  draw_logo_screen ("Simulating...");
 }
 
 void
 draw_logo_screen (char *text)
 {
-  static bool first_time = true;
-
-  if (first_time) {
-    int x = 138;
-    int y = 40;
-    int w = al_get_bitmap_width (icon);
-    int h = al_get_bitmap_height (icon);
-    ALLEGRO_BITMAP *screen = mr.cell[0][0].screen;
-    clear_bitmap (screen, BLACK);
-    draw_filled_rectangle (screen, x - 1, y - 1, x + w, y + h, WHITE);
-    draw_bitmap (icon, screen, x, y, 0);
-    draw_text (screen, text, CUTSCENE_WIDTH / 2.0, CUTSCENE_HEIGHT / 2.0,
-               ALLEGRO_ALIGN_CENTRE);
-    al_draw_filled_rectangle (0, CUTSCENE_HEIGHT - 8,
-                              CUTSCENE_WIDTH, CUTSCENE_HEIGHT,
-                              BLUE);
-    draw_text (screen, "MININIM " VERSION, CUTSCENE_WIDTH / 2.0,
-               CUTSCENE_HEIGHT - 7,
-               ALLEGRO_ALIGN_CENTRE);
-    show ();
-  }
-
-  process_display_events ();
-
-  first_time = false;
+  int x = 138;
+  int y = 40;
+  int w = al_get_bitmap_width (icon);
+  int h = al_get_bitmap_height (icon);
+  ALLEGRO_BITMAP *screen = mr.cell[0][0].screen;
+  clear_bitmap (screen, BLACK);
+  draw_filled_rectangle (screen, x - 1, y - 1, x + w, y + h, WHITE);
+  draw_bitmap (icon, screen, x, y, 0);
+  draw_text (screen, text, CUTSCENE_WIDTH / 2.0, CUTSCENE_HEIGHT / 2.0,
+             ALLEGRO_ALIGN_CENTRE);
+  al_draw_filled_rectangle (0, CUTSCENE_HEIGHT - 8,
+                            CUTSCENE_WIDTH, CUTSCENE_HEIGHT,
+                            BLUE);
+  draw_text (screen, "MININIM " VERSION, CUTSCENE_WIDTH / 2.0,
+             CUTSCENE_HEIGHT - 7,
+             ALLEGRO_ALIGN_CENTRE);
+  show ();
 }
 
 static void

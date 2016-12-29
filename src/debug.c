@@ -53,3 +53,9 @@ debug_pos (struct pos *p)
 {
   printf ("(%i,%i,%i)\n", p->room, p->floor, p->place);
 }
+
+void
+debug_random_seed (void)
+{
+  fprintf (stderr, "%lu 0x%X\n", anim_cycle, random_seed);
+}

@@ -142,7 +142,10 @@ play_anim (void (*draw_callback) (void),
                                 ALLEGRO_KEYMOD_ALT, true)) {
           if (compute_callback) compute_callback ();
           clear_bitmap (uscreen, TRANSPARENT_COLOR);
+          int random_seed_before_draw;
+          random_seed_before_draw = random_seed;
           draw_callback ();
+          random_seed = random_seed_before_draw;
           play_audio_instances ();
           if (! is_game_paused ())
             anim_cycle++;
@@ -495,7 +498,7 @@ play_anim (void (*draw_callback) (void),
   if (replay_mode == RECORD_REPLAY) {
     create_save_replay_thread ();
     while (! al_get_thread_should_stop (save_replay_dialog_thread)) {
-      process_display_events ();
+      process_display_events (NULL);
       al_rest (0.01);
     }
     handle_save_replay_thread (1);
