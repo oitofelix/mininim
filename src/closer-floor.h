@@ -57,6 +57,8 @@ extern size_t closer_floor_nmemb;
 /* functions */
 void load_closer_floor (void);
 void unload_closer_floor (void);
+struct closer_floor *init_closer_floor (struct pos *p,
+                                        struct closer_floor *c);
 void register_closer_floor (struct pos *p);
 int compare_closer_floors (const void *c0, const void *c1);
 struct closer_floor *copy_closer_floor (struct closer_floor *to,

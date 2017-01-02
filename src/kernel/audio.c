@@ -84,7 +84,7 @@ load_audio_stream (char *filename)
   ALLEGRO_MIXER *mixer = get_default_mixer ();
   unsigned int freq = al_get_mixer_frequency(mixer);
   return al_load_audio_stream (filename, 2, (float) freq
-                               / (float) SCRIPT_HZ_DEFAULT);
+                               / (float) DEFAULT_HZ);
 }
 
 struct audio_source *

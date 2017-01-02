@@ -114,20 +114,28 @@ unload_opener_floor (void)
   destroy_bitmap (pv_unpressed_opener_floor_right);
 }
 
+struct opener_floor *
+init_opener_floor (struct pos *p, struct opener_floor *o)
+{
+  int n, f;
+  typed_int (ext (p), EVENTS, 2, &n, &f);
+
+  npos (p, &o->p);
+  o->event = n;
+  o->pressed = f;
+  o->noise = f;
+  o->broken = f;
+  o->priority = 0;
+
+  return o;
+}
+
 void
 register_opener_floor (struct pos *p)
 {
   struct opener_floor o;
 
-  int n, f;
-  typed_int (ext (p), EVENTS, 2, &n, &f);
-
-  npos (p, &o.p);
-  o.event = n;
-  o.pressed = f;
-  o.noise = f;
-  o.broken = f;
-  o.priority = 0;
+  init_opener_floor (p, &o);
 
   opener_floor =
     add_to_array (&o, 1, opener_floor, &opener_floor_nmemb,
@@ -236,7 +244,6 @@ break_opener_floor (struct pos *p)
     (&undo, p,
      MIGNORE, MIGNORE, o->event + EVENTS, MIGNORE,
      NULL, false, "LOOSE FLOOR BREAKING");
-  o = opener_floor_at_pos (p);
   o->broken = true;
 }
 

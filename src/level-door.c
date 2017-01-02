@@ -223,27 +223,35 @@ destroy_level_door_front_cache (ALLEGRO_BITMAP *cache[LEVEL_DOOR_STEPS])
   for (i = 0; i < LEVEL_DOOR_STEPS; i++) destroy_bitmap (cache[i]);
 }
 
-void
-register_level_door (struct pos *p)
+struct level_door *
+init_level_door (struct pos *p, struct level_door *d)
 {
-  struct level_door d;
-
   int n, f;
   typed_int (ext (p), LEVEL_DOOR_STEPS, LEVEL_DOOR_FASES, &n, &f);
 
-  npos (p, &d.p);
-  d.broken = f;
-  d.i = n;
-  d.action = NO_LEVEL_DOOR_ACTION;
-  d.priority = 0;
+  npos (p, &d->p);
+  d->broken = f;
+  d->i = n;
+  d->action = NO_LEVEL_DOOR_ACTION;
+  d->priority = 0;
 
   if (semantics == LEGACY_SEMANTICS) {
     struct pos q;
     if (first_level_door_in_room_pos (p->l->start_pos.room, &q)
         && peq (&q, p))
-      d.no_stairs = true;
-    else d.no_stairs = false;
-  } else d.no_stairs = peq (p, &p->l->start_pos);
+      d->no_stairs = true;
+    else d->no_stairs = false;
+  } else d->no_stairs = peq (p, &p->l->start_pos);
+
+  return d;
+}
+
+void
+register_level_door (struct pos *p)
+{
+  struct level_door d;
+
+  init_level_door (p, &d);
 
   level_door =
     add_to_array (&d, 1, level_door, &level_door_nmemb, level_door_nmemb, sizeof (d));
@@ -324,7 +332,6 @@ break_level_door (struct pos *p)
     (&undo, p,
      MIGNORE, MIGNORE, d->i + LEVEL_DOOR_STEPS, MIGNORE,
      NULL, false, "LOOSE FLOOR BREAKING");
-  d = level_door_at_pos (p);
   d->broken = true;
 }
 

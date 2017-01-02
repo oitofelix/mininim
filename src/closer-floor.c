@@ -114,21 +114,30 @@ unload_closer_floor (void)
   destroy_bitmap (pv_pressed_closer_floor_right);
 }
 
+struct closer_floor *
+init_closer_floor (struct pos *p, struct closer_floor *c)
+{
+  int n, f;
+  typed_int (ext (p), EVENTS, 2, &n, &f);
+
+  npos (p, &c->p);
+  c->event = n;
+  c->pressed = f;
+  c->noise = f;
+  c->broken = f;
+  c->unresponsive = false;
+  c->priority = 0;
+
+  return c;
+}
+
+
 void
 register_closer_floor (struct pos *p)
 {
   struct closer_floor c;
 
-  int n, f;
-  typed_int (ext (p), EVENTS, 2, &n, &f);
-
-  npos (p, &c.p);
-  c.event = n;
-  c.pressed = f;
-  c.noise = f;
-  c.broken = f;
-  c.unresponsive = false;
-  c.priority = 0;
+  init_closer_floor (p, &c);
 
   closer_floor =
     add_to_array (&c, 1, closer_floor, &closer_floor_nmemb,
@@ -237,7 +246,6 @@ break_closer_floor (struct pos *p)
     (&undo, p,
      MIGNORE, MIGNORE, c->event + EVENTS, MIGNORE,
      NULL, false, "LOOSE FLOOR BREAKING");
-  c = closer_floor_at_pos (p);
   c->broken = true;
 }
 

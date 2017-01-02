@@ -248,17 +248,24 @@ fake_door_step (struct pos *p)
   return is_fake (p) ? fake_ext (p) : door_at_pos (p)->i;
 }
 
+struct door *
+init_door (struct pos *p, struct door *d)
+{
+  npos (p, &d->p);
+  d->i = ext (p);
+  d->action = NO_DOOR_ACTION;
+  d->wait = DOOR_WAIT;
+  d->noise = false;
+  d->priority = 0;
+  return d;
+}
+
 void
 register_door (struct pos *p)
 {
   struct door d;
 
-  npos (p, &d.p);
-  d.i = ext (p);
-  d.action = NO_DOOR_ACTION;
-  d.wait = DOOR_WAIT;
-  d.noise = false;
-  d.priority = 0;
+  init_door (p, &d);
 
   door =
     add_to_array (&d, 1, door, &door_nmemb, door_nmemb, sizeof (d));

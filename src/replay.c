@@ -507,7 +507,6 @@ check_replay_chain_completion_and_validity (void)
       exit (-1);
     play_level (&vanilla_level);
 
-    CLINE;
     print_simulation_results (&replay);
 
     if (! replay.complete) complete_replays = false;
@@ -556,12 +555,13 @@ print_replay_info (struct replay *replay)
           replay->kcd,
           replay->random_seed,
           replay->packed_gamepad_state_nmemb);
+  fflush (stdout);
 }
 
 void
 print_simulation_results (struct replay *replay)
 {
-  printf ("Complete: %s\n"
+  printf ("Complete: %s    \n"
           "Reason: %s\n"
           "Final: --mirror-level=%s --immortal-mode=%s --movements=%s \\\n"
           "  --semantics=%s --start-level=%u --start-time=%lu --time-limit=%i \\\n"
@@ -580,4 +580,5 @@ print_simulation_results (struct replay *replay)
           replay->final_total_lives,
           replay->final_kca,
           replay->final_kcd);
+  fflush (stdout);
 }

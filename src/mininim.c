@@ -196,7 +196,7 @@ static struct argp_option options[] = {
   {"record-replay", RECORD_REPLAY_OPTION, NULL, 0, "Starts recording replay countdown at game beginning.  Use this in conjunction with '--start-level' to start recording a given level.  This can be done in-game by the ALT+F7 key binding.", 0},
   {"simulate-replay", SIMULATE_REPLAY_OPTION, "FILE", 0, "Add replay FILE to the chain of replays to simulate and check for completion and validity.  Replay files should be explicitly specified in the appropriate order, one for each instance of this option.  For each replay in the chain a simulation summary is printed.  In case there is any invalid sequent pairs in the chain, their incompatible options are printed between their simulation summaries.  For any complete replay summary, its 'final' field lists arguments intended to be used for continuing the game from where its respective replay ends.  If the entire chain of replays is complete and all sequent pairs valid, MININIM exits with status zero (non-zero otherwise).", 0},
   {"replay-info", REPLAY_INFO_OPTION, "FILE", 0, "Print information about replay FILE and exit.  The 'initial' field lists arguments intended to be used for recording another replay file with the same initial conditions.", 0},
-  {"simulation-rendering", SIMULATION_RENDERING_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable simulation rendering while simulating replay chains.  When enabled, this allows the user to see and hear what's going on inside a simulation.  It's specially useful when used with '--simulation-period'.  Notice that simulation rendering makes replay simulation orders of magnitude slower (even for a null simulation period), and thus should not be used for batch processing of replay chains.  If enabled, audio and rendering-related options are all honored.  The default is FALSE.", 0},
+  {"simulation-rendering", SIMULATION_RENDERING_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable simulation rendering while simulating replay chains.  When enabled, this allows the user to see and hear what's going on inside a simulation.  It's specially useful when used with '--simulation-period'.  Notice that simulation rendering makes replay simulation orders of magnitude slower (even for a null simulation period), and thus should not be used for batch processing of replay chains.  If enabled, audio and rendering-related options are all honored as long as they are specified after '--simulate-replay' option.  The default is FALSE.", 0},
   {"simulation-period", SIMULATION_PERIOD_OPTION, "F", 0, "Set the simulation period (time to wait between cycles) to F seconds.  Notice that 0.083 corresponds approximatelly to the 12Hz standard time frequency.  The default is 0.  Valid values are floating points ranging from 0 to FLT_MAX.", 0},
 
   /* Paths */
@@ -969,6 +969,9 @@ Levels have been converted using module %s into native format at\n\
       error (-1, 0, "failed to load replay '%s'", arg);
     level_start_replay_mode = PLAY_REPLAY;
     simulation = true;
+    mr.fit_w = 1;
+    mr.fit_h = 1;
+    mr.fit_mode = MR_FIT_NONE;
     break;
   case REPLAY_INFO_OPTION:
     if (! load_replay (&replay, arg))

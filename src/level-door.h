@@ -75,6 +75,7 @@ extern size_t level_door_nmemb;
 /* functions */
 void load_level_door (void);
 void unload_level_door (void);
+struct level_door *init_level_door (struct pos *p, struct level_door *d);
 void register_level_door (struct pos *p);
 int compare_level_doors (const void *d0, const void *d1);
 struct level_door *copy_level_door (struct level_door *to,

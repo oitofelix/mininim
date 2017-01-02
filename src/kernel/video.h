@@ -45,7 +45,7 @@ void draw_rectangle (ALLEGRO_BITMAP *to, float x1, float y1,
                      float x2, float y2, ALLEGRO_COLOR color,
                      float thickness);
 void draw_text (ALLEGRO_BITMAP *bitmap, char const *text, float x, float y, int flags);
-void draw_bottom_text (ALLEGRO_BITMAP *bitmap, char *text, int priority);
+bool draw_bottom_text (ALLEGRO_BITMAP *bitmap, char *text, int priority);
 void acknowledge_resize (void);
 void draw_fade (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to, float factor);
 void draw_roll_right (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,

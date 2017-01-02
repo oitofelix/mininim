@@ -279,6 +279,9 @@ draw_bitmap_region (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
                     float sx, float sy, float sw, float sh,
                     float dx, float dy, int flags)
 {
+  /* on simulation, do nothing */
+  if (simulation && ! simulation_rendering && ! cutscene) return;
+
   merge_drawn_rectangle (to, dx, dy, sw, sh);
   set_target_bitmap (to);
 
@@ -314,7 +317,7 @@ draw_text (ALLEGRO_BITMAP *bitmap, char const *text, float x, float y, int flags
   al_draw_text (builtin_font, WHITE, x, y, flags, text);
 }
 
-void
+bool
 draw_bottom_text (ALLEGRO_BITMAP *bitmap, char *text, int priority)
 {
   static char *current_text = NULL;
@@ -325,7 +328,7 @@ draw_bottom_text (ALLEGRO_BITMAP *bitmap, char *text, int priority)
 
   if (bitmap == NULL && priority < cur_priority
       && bottom_text_timer < BOTTOM_TEXT_DURATION)
-    return;
+    return false;
 
   if (text) {
     if (current_text) {
@@ -380,6 +383,8 @@ draw_bottom_text (ALLEGRO_BITMAP *bitmap, char *text, int priority)
                CUTSCENE_WIDTH / 2.0, CUTSCENE_HEIGHT - 7,
                ALLEGRO_ALIGN_CENTRE);
   }
+
+  return true;
 }
 
 ALLEGRO_BITMAP *

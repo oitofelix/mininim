@@ -81,6 +81,7 @@ extern size_t door_nmemb;
 /* functions */
 void load_door (void);
 void unload_door (void);
+struct door *init_door (struct pos *p, struct door *d);
 void register_door (struct pos *p);
 int compare_doors (const void *d0, const void *d1);
 struct door *copy_door (struct door *to,

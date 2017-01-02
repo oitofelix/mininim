@@ -749,12 +749,12 @@ mirror_pos (struct pos *p0, struct pos *p1, bool invert_dir)
 
   con0 = *con (p0); copy_to_con_state (&cons0, p0);
   con1 = *con (p1); copy_to_con_state (&cons1, p1);
-  if (should_destroy (&con0, &con1)) {
-    destroy_con_at_pos (p0);
-    destroy_con_at_pos (p1);
-  }
   *con (p0) = con1; copy_from_con_state (p0, &cons1);
   *con (p1) = con0; copy_from_con_state (p1, &cons0);
+  if (should_init (&con0, &con1)) {
+    init_con_at_pos (p0);
+    init_con_at_pos (p1);
+  }
   if (invert_dir) {
     invert_con_dir (p0);
     invert_con_dir (p1);

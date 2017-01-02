@@ -82,9 +82,15 @@ void sort_loose_floors (void);
 int compare_loose_floors (const void *l0, const void *l1);
 struct loose_floor *copy_loose_floor (struct loose_floor *to,
                                       struct loose_floor *from);
-struct loose_floor * loose_floor_at_pos (struct pos *p);
+struct loose_floor *loose_floor_at_pos (struct pos *p);
+struct loose_floor *falling_loose_floor_at_pos (struct pos *p);
+bool should_remove_loose_floor (struct loose_floor *l);
 void remove_loose_floor (struct loose_floor *l);
+void no_action_loose_floor (struct pos *p);
+void shake_loose_floor (struct pos *p);
 void release_loose_floor (struct pos *p);
+void fall_loose_floor (struct pos *p);
+void break_loose_floor (struct pos *p);
 void compute_loose_floors (void);
 void compute_loose_floor_shake (struct loose_floor *l);
 void compute_loose_floor_release (struct loose_floor *l);

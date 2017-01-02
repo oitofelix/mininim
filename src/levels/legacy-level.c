@@ -31,10 +31,13 @@ static int skeleton_id;
 static bool played_sample;
 static uint64_t mouse_timer;
 static int mouse_id;
-static bool coming_from_12;
 static bool shadow_merged;
 static bool met_jaffar;
 static bool played_vizier_death_sample;
+static int glow_duration = -1;
+static int level_end_wait = -1;
+static int shadow_disappearance_wait = -1;
+static int vizier_vigilant_wait = -1;
 
 static int life_table[] = {4, 3, 3, 3, 3, 4, 5, 4, 4, 5, 5, 5, 4, 6, 0, 0};
 
@@ -56,15 +59,13 @@ legacy_level_start (void)
   shadow_merged = false;
   met_jaffar = false;
   played_vizier_death_sample = false;
-
-  if (coming_from_12) auto_rem_time_1st_cycle = -1;
-  else auto_rem_time_1st_cycle = 24;
+  level_end_wait = -1;
+  glow_duration = -1;
+  shadow_disappearance_wait = -1;
+  vizier_vigilant_wait = -1;
 
   /* get kid */
   struct anim *k = get_anim_by_id (0);
-
-  if (coming_from_12) k->current_lives = current_lives;
-  else k->current_lives = total_lives;
 
   /* make the kid turn as appropriate */
   if (global_level.n == 13) {
@@ -132,10 +133,9 @@ legacy_level_start (void)
   if (global_level.n == 10) screen_flags &= ~ ALLEGRO_FLIP_VERTICAL;
 
   /* level 13 adjustements */
-  coming_from_12 = false;
-  if (global_level.n == 13 && retry_level == 13
-      && replay_mode == NO_REPLAY)
-    global_level.nominal_n = 12;
+  if (global_level.n == 13 && retry_level != 13)
+    k->current_lives = current_lives;
+  else k->current_lives = total_lives;
 
   if (global_level.n == 13) {
     struct anim *v = get_anim_by_id (1);
@@ -455,7 +455,6 @@ legacy_level_special_events (void)
     } else if (shadow_id != -1) ks = get_anim_by_id (shadow_id);
 
     /* if shadow has appeared but not merged yet */
-    struct audio_instance *ai;
     if (ks) {
       k->death_reason = ks->death_reason = SHADOW_FIGHT_DEATH;
       survey (_m, pos, &ks->f, &ms, &pms, NULL);
@@ -491,20 +490,22 @@ legacy_level_special_events (void)
       if (ks->current_lives <= 0 && k->current_lives > 0) {
         k->splash = true;
         kid_die (k);
+        shadow_disappearance_wait = 4.5 * DEFAULT_HZ;
       }
 
       /* if the kid dies, the shadow dies */
       if (k->current_lives <= 0 && ks->current_lives > 0) {
         ks->splash = true;
         guard_die (ks);
+        shadow_disappearance_wait = 4.5 * DEFAULT_HZ;
       }
 
+      if (shadow_disappearance_wait > 0)
+        shadow_disappearance_wait--;
+
       /* make the shadow disappear when the kid is dead */
-      struct audio_instance *ai;
       if (k->current_lives <= 0
-          && (ai = search_audio_instance (&success_suspense_audio,
-                                          0, NULL, k->id))
-          && get_audio_instance_position (ai->data) >= 3.3
+          && shadow_disappearance_wait == 0
           && ! ks->invisible) {
         mr.flicker = 8;
         mr.color = WHITE;
@@ -532,7 +533,7 @@ legacy_level_special_events (void)
       /* if both, the kid and the shadow, are not in fight mode and
          get close enough, a merge happens */
       if (ks->type == KID && pms.room == pm.room && pms.floor == pm.floor
-          && abs (ms.x - m.x) <= 8) {
+          && abs (ms.x - m.x) <= 10) {
         destroy_anim (ks);
         shadow_id = -1; ks = NULL;
         shadow_merged = true;
@@ -544,6 +545,7 @@ legacy_level_special_events (void)
         k->current_lives = ++k->total_lives;
         mr.flicker = 8;
         mr.color = WHITE;
+        glow_duration = 12 * DEFAULT_HZ;
       }
       /* while the merge doesn't happen and neither the shadow nor the
          kid are in fight mode, the shadow's movements mirror the
@@ -557,11 +559,10 @@ legacy_level_special_events (void)
       }
       /* if the shadow and the kid has merged, one overlaps each other
          making them glow intermittently */
-    } else if (shadow_merged
-               && (ai = search_audio_instance (&success_audio, 0,
-                                               NULL, k->id))
-               && is_audio_instance_playing (ai->data))
+    } else if (shadow_merged && glow_duration > 0) {
+      glow_duration--;
       k->shadow = (anim_cycle % 2);
+    }
     /* after the success music has finished to play, the kid goes
        normal again */
     else if (shadow_merged) k->shadow = false;
@@ -577,7 +578,6 @@ legacy_level_special_events (void)
 
     /* when the kid enters room 23, go to the next level */
     if (k->f.c.room == 23) {
-      coming_from_12 = true;
       total_lives = k->total_lives;
       current_lives = k->current_lives;
       skill = k->skill;
@@ -605,13 +605,14 @@ legacy_level_special_events (void)
           && ! met_jaffar) {
         play_audio (&meet_vizier_audio, NULL, k->id);
         met_jaffar = true;
+        vizier_vigilant_wait = 2.2 * DEFAULT_HZ;
       }
 
+      if (vizier_vigilant_wait > 0)
+        vizier_vigilant_wait--;
+
       /* put the vizier in vigilance */
-      struct audio_instance *ai;
-      if ((ai = search_audio_instance (&meet_vizier_audio, 0,
-                                       NULL, k->id))
-          && get_audio_instance_position (ai->data) >= 2.2)
+      if (vizier_vigilant_wait == 0)
         v->fight = true;
 
       /* when the vizier dies do some video effect, play a tune, stop
@@ -624,7 +625,7 @@ legacy_level_special_events (void)
         play_audio (&vizier_death_audio, NULL, k->id);
         played_vizier_death_sample = true;
         play_time_stopped = true;
-        display_remaining_time ();
+        display_remaining_time (-2);
       }
 
       /* after vizier's death activate certain tile in order to open
@@ -653,25 +654,27 @@ void
 legacy_level_end (struct pos *p)
 {
   struct anim *k = get_anim_by_id (current_kid_id);
-  static union audio_instance_data ai_data
-    = (union audio_instance_data) {.stream = NULL};
 
   /* end music samples to play per level */
-  if (! played_sample) {
+  if (level_end_wait < 0) {
     stop_audio_instance (&floating_audio, NULL, k->id);
     switch (global_level.n) {
     case 1: case 2: case 3: case 5: case 6: case 7:
     case 8: case 9: case 10: case 11: case 12:
-      ai_data = play_audio (&success_audio, NULL, k->id); break;
+      play_audio (&success_audio, NULL, k->id);
+      level_end_wait = 12 * DEFAULT_HZ;
+      break;
     case 4:
-      ai_data = play_audio (&success_suspense_audio, NULL, k->id);
+      play_audio (&success_suspense_audio, NULL, k->id);
+      level_end_wait = 7 * DEFAULT_HZ;
       break;
     case 13: break;
     }
-    played_sample = true;
   }
 
-  if (! is_audio_instance_playing (ai_data) || simulation) {
+  if (level_end_wait > 0) level_end_wait--;
+
+  if (level_end_wait == 0) {
     next_level = global_level.n + 1;
     quit_anim = NEXT_LEVEL;
   }
@@ -721,10 +724,8 @@ interpret_legacy_level (struct level *l, int n)
 
   memset (l, 0, sizeof (*l));
   l->n = n;
-  if (n == 12 || n == 13) {
-    if (coming_from_12) l->nominal_n = -1;
-    else l->nominal_n = 12;
-  } else if (n == 14) l->nominal_n = -1;
+  if (n == 13) l->nominal_n = retry_level != 13 ? -1 : 12;
+  else if (n == 14) l->nominal_n = -1;
   else l->nominal_n = n;
   l->start = legacy_level_start;
   l->special_events = legacy_level_special_events;

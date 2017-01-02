@@ -183,23 +183,31 @@ unload_chopper (void)
   destroy_bitmap (chopper_blood_04);
 }
 
+struct chopper *
+init_chopper (struct pos *p, struct chopper *c)
+{
+  npos (p, &c->p);
+
+  int n, f;
+  typed_int (ext (p), CHOPPER_STEPS, CHOPPER_FASES, &n, &f);
+
+  c->i = n % (CHOPPER_STEPS - 1);
+  c->blood = f;
+  c->inactive = (n != 0);
+
+  c->wait = CHOPPER_WAIT;
+  c->alert = false;
+  c->activate = false;
+
+  return c;
+}
+
 void
 register_chopper (struct pos *p)
 {
   struct chopper c;
 
-  npos (p, &c.p);
-
-  int n, f;
-  typed_int (ext (p), CHOPPER_STEPS, CHOPPER_FASES, &n, &f);
-
-  c.i = n % (CHOPPER_STEPS - 1);
-  c.blood = f;
-  c.inactive = (n != 0);
-
-  c.wait = CHOPPER_WAIT;
-  c.alert = false;
-  c.activate = false;
+  init_chopper (p, &c);
 
   chopper =
     add_to_array (&c, 1, chopper, &chopper_nmemb, chopper_nmemb, sizeof (c));

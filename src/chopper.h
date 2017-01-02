@@ -76,6 +76,7 @@ extern size_t chopper_nmemb;
 /* functions */
 void load_chopper (void);
 void unload_chopper (void);
+struct chopper *init_chopper (struct pos *p, struct chopper *c);
 void register_chopper (struct pos *p);
 int compare_choppers (const void *d0, const void *d1);
 struct chopper *copy_chopper (struct chopper *to,

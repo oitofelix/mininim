@@ -32,12 +32,11 @@ struct level global_level;
 
 struct undo undo;
 
-static int last_auto_show_time;
+static uint64_t last_auto_show_time;
 
 bool no_room_drawing, game_paused, step_one_cycle;
 int retry_level = -1;
 int camera_follow_kid;
-int auto_rem_time_1st_cycle = 24;
 int next_level = -1;
 bool ignore_level_cutscene;
 uint64_t death_timer;
@@ -217,7 +216,7 @@ play_level (struct level *lv)
 
   if (global_level.start) global_level.start ();
 
-  last_auto_show_time = -1;
+  last_auto_show_time = 0;
   current_kid_id = 0;
 
   if (! force_em) em = global_level.em;
@@ -239,7 +238,7 @@ play_level (struct level *lv)
 
     while (! quit_anim) {
       if (replay_mode == PLAY_REPLAY
-          && anim_cycle >= replay.packed_gamepad_state_nmemb + 72) {
+          && anim_cycle >= replay.packed_gamepad_state_nmemb + 204) {
         struct anim *k = get_anim_by_id (current_kid_id);
         replay.complete = false;
         replay.reason = k->current_lives > 0
@@ -250,10 +249,12 @@ play_level (struct level *lv)
         level_cleanup ();
         return;
       }
-      /* while (anim_cycle == 986) { */
+      /* /\* ---- *\/ */
+      /* while (anim_cycle == 1039) { */
       /*   show (); */
       /*   al_rest (0.1); */
       /* } */
+      /* /\* ---- *\/ */
       if (simulation_rendering) {
         process_display_events (NULL);
         if (anim_cycle > 0) show ();
@@ -263,19 +264,17 @@ play_level (struct level *lv)
         cutscene = false;
       }
       compute_level ();
-      if (simulation_rendering) {
-        int random_seed_before_draw;
-        random_seed_before_draw = random_seed;
-        draw_level ();
-        random_seed = random_seed_before_draw;
-        play_audio_instances ();
-      }
+      clear_bitmap (uscreen, TRANSPARENT_COLOR);
+      uint32_t random_seed_before_draw;
+      random_seed_before_draw = random_seed;
+      draw_level ();
+      random_seed = random_seed_before_draw;
+      play_audio_instances ();
       anim_cycle++;
-      printf ("Simulating: %lu%%\r",
+      fprintf (stderr, "Simulating: %3lu%%\r",
               (anim_cycle * 100) / replay.packed_gamepad_state_nmemb);
-      fflush (NULL);
       if (simulation_period > 0) al_rest (simulation_period);
-      /* debug_random_seed () */
+      /* debug_random_seed (); */
     }
   } else play_anim (draw_level, compute_level);
 
@@ -377,7 +376,7 @@ con_struct_at_pos (struct pos *p)
 }
 
 bool
-should_destroy (struct con *c0, struct con *c1)
+should_init (struct con *c0, struct con *c1)
 {
   return fg_val (c0->fg) == fg_val (c1->fg)
     && ext_val (c0->fg, c0->ext) != ext_val (c1->fg, c1->ext);
@@ -411,6 +410,21 @@ copy_from_con_state (struct pos *to_pos, union con_state *from)
   case DOOR: copy_door (to, &from->door); break;
   case LEVEL_DOOR: copy_level_door (to, &from->level_door); break;
   case CHOPPER: copy_chopper (to, &from->chopper); break;
+  default: break;
+  }
+}
+
+void
+init_con_at_pos (struct pos *p)
+{
+  switch (fg (p)) {
+  case LOOSE_FLOOR: init_loose_floor (p, loose_floor_at_pos (p)); break;
+  case OPENER_FLOOR: init_opener_floor (p, opener_floor_at_pos (p)); break;
+  case CLOSER_FLOOR: init_closer_floor (p, closer_floor_at_pos (p)); break;
+  case SPIKES_FLOOR: init_spikes_floor (p, spikes_floor_at_pos (p)); break;
+  case DOOR: init_door (p, door_at_pos (p)); break;
+  case LEVEL_DOOR: init_level_door (p, level_door_at_pos (p)); break;
+  case CHOPPER: init_chopper (p, chopper_at_pos (p)); break;
   default: break;
   }
 }
@@ -1003,16 +1017,16 @@ process_keys (void)
   if (! active_menu
       && (was_key_pressed (ALLEGRO_KEY_SPACE, 0, 0, true)
           || was_button_pressed (joystick_time_button, true)))
-    display_remaining_time ();
+    display_remaining_time (0);
 
   /* +: increment and display remaining time */
   if (! active_menu
       && was_key_pressed (ALLEGRO_KEY_EQUALS, 0, ALLEGRO_KEYMOD_SHIFT, true)) {
     if (replay_mode == NO_REPLAY) {
       int t = time_limit - play_time;
-      int d = t > SEC2CYC (60) ? SEC2CYC (+60) : SEC2CYC (+1);
+      int d = t > (60 * DEFAULT_HZ) ? (+60 * DEFAULT_HZ) : (+1 * DEFAULT_HZ);
       time_limit += d;
-      display_remaining_time ();
+      display_remaining_time (0);
     } else print_replay_mode (0);
   }
 
@@ -1021,9 +1035,9 @@ process_keys (void)
       && was_key_pressed (ALLEGRO_KEY_MINUS, 0, 0, true)) {
     if (replay_mode == NO_REPLAY) {
       int t = time_limit - play_time;
-      int d = t > SEC2CYC (60) ? SEC2CYC (-60) : SEC2CYC (-1);
+      int d = t > (60 * DEFAULT_HZ) ? (-60 * DEFAULT_HZ) : (-1 * DEFAULT_HZ);
       time_limit += d;
-      display_remaining_time ();
+      display_remaining_time (0);
     } else print_replay_mode (0);
   }
 
@@ -1112,7 +1126,7 @@ process_death (void)
       && ! is_game_paused ()) {
     death_timer++;
 
-    if (death_timer == 12) {
+    if (death_timer == SEC2CYC (1)) {
       struct audio_source *as;
       switch (k->death_reason) {
       case SHADOW_FIGHT_DEATH: as = &success_suspense_audio; break;
@@ -1123,15 +1137,16 @@ process_death (void)
       play_audio (as, NULL, k->id);
     }
 
-    if (death_timer < 60 && ! active_menu) {
+    if (death_timer < SEC2CYC (5) && ! active_menu) {
       key.keyboard.keycode = 0;
       button = -1;
     }
 
-    if (death_timer >= 60 && ! title_demo) {
-      if ((death_timer < 240 || death_timer % 12 < 8)
+    if (death_timer >= SEC2CYC (5) && ! title_demo) {
+      if ((death_timer < SEC2CYC (20)
+           || death_timer % SEC2CYC (1) < (2 * SEC2CYC (1)) / 3)
           && ! active_menu) {
-        if (death_timer >= 252 && death_timer % 12 == 0)
+        if (death_timer >= SEC2CYC (21) && death_timer % SEC2CYC (1) == 0)
           play_audio (&press_key_audio, NULL, -1);
         char *text;
         xasprintf (&text, "Press Button to Continue");
@@ -1159,20 +1174,20 @@ draw_level (void)
 
   /* automatic remaining time display */
   if (! title_demo) {
-    int rem_time = time_limit - play_time;
-    if ((rem_time % SEC2CYC (5 * 60) == 0
-         && last_auto_show_time != rem_time
-         && anim_cycle > SEC2CYC (720))
-        || (auto_rem_time_1st_cycle >= 0
-            && last_auto_show_time != rem_time
-            && anim_cycle >= auto_rem_time_1st_cycle
-            && anim_cycle <= auto_rem_time_1st_cycle + 6)
-        || rem_time <= SEC2CYC (60)) {
-      display_remaining_time ();
-      if (rem_time <= SEC2CYC (60) && rem_time % SEC2CYC (1) == 0
+    uint64_t rem_time = time_limit - play_time;
+    uint64_t rem_time_sec = rem_time / DEFAULT_HZ;
+    uint64_t rem_time_min = (rem_time_sec / 60) + 1;
+    if ((rem_time_min % 5 == 0
+         && last_auto_show_time != rem_time_min)
+        || rem_time_sec <= 60
+        || (anim_cycle <= SEC2CYC (3)
+            && last_auto_show_time != rem_time_min)) {
+      if (rem_time_sec <= 60
+          && (rem_time + 1) % DEFAULT_HZ == 0
           && ! play_time_stopped)
         play_audio (&press_key_audio, NULL, -1);
-      last_auto_show_time = rem_time;
+      if (display_remaining_time (rem_time_sec <= 60 ? 0 : -2))
+        last_auto_show_time = rem_time_min;
     }
     if (rem_time <= 0) quit_anim = OUT_OF_TIME;
   }
@@ -1181,17 +1196,18 @@ draw_level (void)
     draw_bottom_text (NULL, "GAME PAUSED", -1);
 }
 
-void
-display_remaining_time (void)
+bool
+display_remaining_time (int priority)
 {
   char *text;
-  int t = time_limit - play_time;
+  int t = (time_limit - play_time) / DEFAULT_HZ;
   if (t < 0) t = 0;
-  int m = t / SEC2CYC (60) + ((t % SEC2CYC (60)) ? 1 : 0);
-  if (t > SEC2CYC (60)) xasprintf (&text, "%i MINUTES LEFT", m);
-  else xasprintf (&text, "%i SECONDS LEFT", CYC2SEC (t));
-  draw_bottom_text (NULL, text, -1);
+  int m = t / 60 + ((t % 60) ? 1 : 0);
+  if (t > 60) xasprintf (&text, "%i MINUTES LEFT", m);
+  else xasprintf (&text, "%i SECONDS LEFT", t);
+  bool shown = draw_bottom_text (NULL, text, priority);
   al_free (text);
+  return shown;
 }
 
 void

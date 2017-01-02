@@ -48,7 +48,10 @@ prandom_uniq (uint32_t seed, int period, int max)
   random_seed = seed - seed % period;
   int prev_random = prandom (max);
 
-  if (seed % period) return prev_random;
+  if (seed % period) {
+    random_seed = random_seed_backup;
+    return prev_random;
+  }
 
   random_seed = (seed - 1) - (seed - 1) % period;
   prev_random = prandom (max);

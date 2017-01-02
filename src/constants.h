@@ -78,13 +78,13 @@
 #define BOTTOM_TEXT_DURATION (3 * anim_freq)
 #define BOTTOM_TEXT_MAX_LENGTH (CUTSCENE_WIDTH / 8)
 
-#define TIME_LIMIT (3600 * SCRIPT_HZ_DEFAULT)
+#define TIME_LIMIT (3600 * DEFAULT_HZ)
 #define START_TIME 0
 
 #define INITIAL_KCA -1
 #define INITIAL_KCD -1
 
-#define SCRIPT_HZ_DEFAULT 12
+#define DEFAULT_HZ 12
 #define SEC2CYC(x) (anim_freq > 0 ? (x) * anim_freq : (x) / (-anim_freq + 2))
 #define CYC2SEC(x) (anim_freq > 0 ? (x) / anim_freq : (x) * (-anim_freq + 2))
 #define EFFECT_HZ 30
@@ -99,7 +99,7 @@
 #define CHOPPER_WAIT 10
 #define CHOPPER_FG_WIDTH 14
 
-#define DOOR_WAIT SEC2CYC (5)
+#define DOOR_WAIT (5 * DEFAULT_HZ)
 #define DOOR_CLIMB_LIMIT 40
 #define DOOR_WAIT_LOOK 4
 
@@ -114,7 +114,7 @@
 
 #define LOOSE_FLOOR_RESISTENCE 0
 
-#define SPIKES_WAIT SEC2CYC (1)
+#define SPIKES_WAIT (1 * DEFAULT_HZ)
 
 #define STARS_RANDOM_SEED 78234782
 #define STARS 7
@@ -164,7 +164,6 @@
 #define PACKED_CONFIG_MIRROR_LEVEL_BIT (1 << 0)
 #define PACKED_CONFIG_IMMORTAL_MODE_BIT (1 << 1)
 
-#define HLINE printf ("===============================================================================\n")
-#define CLINE printf ("                                                                               \r")
+#define HLINE printf ("===============================================================================\n"); fflush (stdout);
 
 #endif	/* MININIM_CONSTANTS_H */

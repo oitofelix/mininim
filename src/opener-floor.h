@@ -57,6 +57,8 @@ extern size_t opener_floor_nmemb;
 /* functions */
 void load_opener_floor (void);
 void unload_opener_floor (void);
+struct opener_floor *init_opener_floor (struct pos *p,
+                                        struct opener_floor *o);
 void register_opener_floor (struct pos *p);
 int compare_opener_floors (const void *o0, const void *o1);
 struct opener_floor *copy_opener_floor (struct opener_floor *to,

@@ -617,7 +617,7 @@ struct level_door {
 };
 
 struct loose_floor {
-  struct pos p;
+  struct pos p, original_pos;
   int i;
   int resist;
   int state;
@@ -628,6 +628,7 @@ struct loose_floor {
     SHAKE_LOOSE_FLOOR,
     RELEASE_LOOSE_FLOOR,
     FALL_LOOSE_FLOOR,
+    BROKEN_LOOSE_FLOOR,
   } action;
 
   struct frame f;

@@ -26,7 +26,8 @@ bool cutscene;
 bool next_frame_inv;
 uint64_t anim_cycle;
 ALLEGRO_TIMER *timer;
-int anim_freq = SCRIPT_HZ_DEFAULT;
+int anim_freq = DEFAULT_HZ;
+double anim_freq_real;
 
 ALLEGRO_EVENT_QUEUE *event_queue;
 
@@ -57,11 +58,17 @@ play_anim (void (*draw_callback) (void),
   al_flush_event_queue (event_queue);
   al_start_timer (timer);
 
+  double prev_time = al_get_time ();
+
   while (! quit_anim) {
     al_wait_for_event (event_queue, &event);
     switch (event.type) {
     case ALLEGRO_EVENT_TIMER:
       if (event.timer.source == timer) {
+        /* compute actual time frequency */
+        anim_freq_real = 1.0 / (al_get_time () - prev_time);
+        prev_time = al_get_time ();
+
         /* replay handler */
         start_recording_replay (2);
 
@@ -142,13 +149,14 @@ play_anim (void (*draw_callback) (void),
                                 ALLEGRO_KEYMOD_ALT, true)) {
           if (compute_callback) compute_callback ();
           clear_bitmap (uscreen, TRANSPARENT_COLOR);
-          int random_seed_before_draw;
+          uint32_t random_seed_before_draw;
           random_seed_before_draw = random_seed;
           draw_callback ();
           random_seed = random_seed_before_draw;
           play_audio_instances ();
           if (! is_game_paused ())
             anim_cycle++;
+          /* if (replay_mode == PLAY_REPLAY) debug_random_seed (); */
           if (! cutscene) editor ();
           if (bottom_text_timer) bottom_text_timer++;
           draw_bottom_text (uscreen, NULL, 0);
@@ -522,8 +530,10 @@ ui_change_anim_freq (int f)
   char *text;
   anim_freq = f;
   al_set_timer_speed (timer, f > 0 ? 1.0 / f : -f + 2);
-  if (anim_freq > 0) xasprintf (&text, "TIME FREQ: %iHz", anim_freq);
-  else xasprintf (&text, "TIME FREQ: 1/%iHz", -anim_freq + 2);
+  if (anim_freq > 0) xasprintf (&text, "TIME FREQ: %iHz",
+                                anim_freq, anim_freq_real);
+  else xasprintf (&text, "TIME FREQ: 1/%iHz",
+                  -anim_freq + 2, anim_freq_real);
   draw_bottom_text (NULL, text, 0);
   al_free (text);
 }
