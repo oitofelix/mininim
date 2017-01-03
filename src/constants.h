@@ -75,7 +75,7 @@
 #define KID_INITIAL_TOTAL_LIVES 3
 #define KID_INITIAL_CURRENT_LIVES 3
 #define KID_MINIMUM_LIVES_TO_BLINK 1
-#define BOTTOM_TEXT_DURATION (3 * anim_freq)
+#define BOTTOM_TEXT_DURATION (SEC2CYC (3))
 #define BOTTOM_TEXT_MAX_LENGTH (CUTSCENE_WIDTH / 8)
 
 #define TIME_LIMIT (3600 * DEFAULT_HZ)
@@ -84,11 +84,12 @@
 #define INITIAL_KCA -1
 #define INITIAL_KCD -1
 
-#define DEFAULT_HZ 12
-#define SEC2CYC(x) (anim_freq > 0 ? (x) * anim_freq : (x) / (-anim_freq + 2))
-#define CYC2SEC(x) (anim_freq > 0 ? (x) / anim_freq : (x) * (-anim_freq + 2))
-#define EFFECT_HZ 30
+#define SEC2CYC(x) (anim_freq > 0 ? (x) * anim_freq : (x) * DEFAULT_HZ)
+#define CYC2SEC(x) (anim_freq > 0 ? (x) / anim_freq : (x) / DEFAULT_HZ)
 #define SEC2EFF(x) ((x) * EFFECT_HZ)
+#define DEFAULT_HZ 12
+#define EFFECT_HZ 30
+#define UNLIMITED_HZ 10000
 
 #define SELECT_CYCLES (SEC2CYC (3))
 

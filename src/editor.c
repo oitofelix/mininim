@@ -1899,7 +1899,8 @@ exit_editor (int priority)
   msg = NULL;
   msg_cycles = 0;
   reset_menu ();
-  set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
+  if (! is_dedicatedly_replaying ())
+    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
   if (is_fullscreen ()) hide_mouse_cursor ();
   if (is_game_paused ())
     draw_bottom_text (NULL, "GAME PAUSED", priority);

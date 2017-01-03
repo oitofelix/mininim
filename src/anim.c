@@ -27,7 +27,7 @@ bool next_frame_inv;
 uint64_t anim_cycle;
 ALLEGRO_TIMER *timer;
 int anim_freq = DEFAULT_HZ;
-double anim_freq_real;
+int anim_freq_real;
 
 ALLEGRO_EVENT_QUEUE *event_queue;
 
@@ -47,7 +47,8 @@ play_anim (void (*draw_callback) (void),
   acknowledge_resize ();
 
   ALLEGRO_EVENT event;
-  timer = create_timer (anim_freq > 0 ? 1.0 / anim_freq : -anim_freq + 2);
+  anim_freq_real = anim_freq > 0 ? anim_freq : UNLIMITED_HZ;
+  timer = create_timer (anim_freq > 0 ? 1.0 / anim_freq : 1.0 / UNLIMITED_HZ);
   if (! event_queue) event_queue = create_event_queue ();
   al_register_event_source (event_queue, get_display_event_source (display));
   al_register_event_source (event_queue, get_keyboard_event_source ());
@@ -62,9 +63,23 @@ play_anim (void (*draw_callback) (void),
 
   while (! quit_anim) {
     al_wait_for_event (event_queue, &event);
+
     switch (event.type) {
     case ALLEGRO_EVENT_TIMER:
       if (event.timer.source == timer) {
+        /* detect incomplete replays */
+        if (replay_mode == PLAY_REPLAY
+            && anim_cycle >=
+            replay_chain[replay_index].packed_gamepad_state_nmemb + 204)
+          quit_anim = REPLAY_INCOMPLETE;
+
+        /* /\* ---- *\/ */
+        /* while (anim_cycle == 1039) { */
+        /*   show (); */
+        /*   al_rest (0.1); */
+        /* } */
+        /* /\* ---- *\/ */
+
         /* compute actual time frequency */
         anim_freq_real = 1.0 / (al_get_time () - prev_time);
         prev_time = al_get_time ();
@@ -76,55 +91,13 @@ play_anim (void (*draw_callback) (void),
         if (! cutscene) get_mouse_pos (&mouse_pos);
 
         /* load configuration */
-        if (load_config_dialog_thread
-            && al_get_thread_should_stop (load_config_dialog_thread)) {
-          char *filename;
-          al_join_thread (load_config_dialog_thread, (void *) &filename);
-          al_destroy_thread (load_config_dialog_thread);
-          load_config_dialog_thread = NULL;
-          if (filename) {
-            ALLEGRO_TEXTLOG *textlog = load_config (filename);
-            al_free (load_config_dialog.initial_path);
-            load_config_dialog.initial_path = filename;
-            if (textlog)
-              al_register_event_source
-                (event_queue, get_native_text_log_event_source (textlog));
-          }
-        }
+        handle_load_config_thread (0);
 
         /* save game */
-        if (save_game_dialog_thread
-            && al_get_thread_should_stop (save_game_dialog_thread)) {
-          char *filename;
-          al_join_thread (save_game_dialog_thread, (void *) &filename);
-          al_destroy_thread (save_game_dialog_thread);
-          save_game_dialog_thread = NULL;
-          pause_animation (false);
-          if (filename) {
-            save_game (filename);
-            al_free (save_game_dialog.initial_path);
-            save_game_dialog.initial_path = filename;
-          }
-        }
+        handle_save_game_thread (0);
 
         /* save picture */
-        if (save_picture_dialog_thread
-            && al_get_thread_should_stop (save_picture_dialog_thread)) {
-          char *filename;
-          al_join_thread (save_picture_dialog_thread, (void *) &filename);
-          al_destroy_thread (save_picture_dialog_thread);
-          save_picture_dialog_thread = NULL;
-          if (filename) {
-            char *error_str = al_save_bitmap
-              (filename, al_get_backbuffer (display))
-              ? "PICTURE HAS BEEN SAVED"
-              : "PICTURE SAVING FAILED";
-            draw_bottom_text (NULL, error_str, 0);
-            al_free (save_picture_dialog.initial_path);
-            save_picture_dialog.initial_path = filename;
-          }
-          pause_animation (false);
-        }
+        handle_save_picture_thread (0);
 
         /* save replay */
         handle_save_replay_thread (0);
@@ -141,7 +114,10 @@ play_anim (void (*draw_callback) (void),
 
         kid_debug ();
 
-        if (anim_cycle > 0 && ! is_video_effect_started ())
+        if (anim_cycle > 0 && ! is_video_effect_started ()
+            && (rendering == BOTH_RENDERING
+                || rendering == VIDEO_RENDERING
+                || update_replay_progress (NULL)))
           show ();
 
         if (! pause_anim
@@ -156,6 +132,15 @@ play_anim (void (*draw_callback) (void),
           play_audio_instances ();
           if (! is_game_paused ())
             anim_cycle++;
+
+          if (replay_mode == PLAY_REPLAY
+              && (rendering == BOTH_RENDERING
+                  || rendering == VIDEO_RENDERING)) {
+            int progress;
+            if (update_replay_progress (&progress))
+              fprintf (stderr, "%3i%%\r", progress);
+          }
+
           /* if (replay_mode == PLAY_REPLAY) debug_random_seed (); */
           if (! cutscene) editor ();
           if (bottom_text_timer) bottom_text_timer++;
@@ -166,7 +151,8 @@ play_anim (void (*draw_callback) (void),
         al_set_timer_count (timer, 0);
 
       } else if (event.timer.source == video_timer) {
-        show ();
+        if (rendering == BOTH_RENDERING || rendering == VIDEO_RENDERING)
+          show ();
         /* drop_all_events_from_source */
         /*   (event_queue, get_timer_event_source (video_timer)); */
         /* al_set_timer_count (video_timer, 0); */
@@ -506,12 +492,17 @@ play_anim (void (*draw_callback) (void),
   if (replay_mode == RECORD_REPLAY) {
     create_save_replay_thread ();
     while (! al_get_thread_should_stop (save_replay_dialog_thread)) {
-      process_display_events (NULL);
+      process_display_events ();
       al_rest (0.01);
     }
     handle_save_replay_thread (1);
-  } else if (replay_mode == PLAY_REPLAY)
-    stop_replaying (1);
+  }
+
+  if (replay_mode == PLAY_REPLAY) {
+    quit_anim = quit_anim == OUT_OF_TIME
+      ? REPLAY_OUT_OF_TIME
+      : REPLAY_COMPLETE;
+  }
 
   al_stop_timer (timer);
   anim_cycle = 0;
@@ -528,12 +519,12 @@ void
 ui_change_anim_freq (int f)
 {
   char *text;
+  f = f < 0 ? 0 : f;
+  f = f > UNLIMITED_HZ ? UNLIMITED_HZ : f;
   anim_freq = f;
-  al_set_timer_speed (timer, f > 0 ? 1.0 / f : -f + 2);
-  if (anim_freq > 0) xasprintf (&text, "TIME FREQ: %iHz",
-                                anim_freq, anim_freq_real);
-  else xasprintf (&text, "TIME FREQ: 1/%iHz",
-                  -anim_freq + 2, anim_freq_real);
+  al_set_timer_speed (timer, f > 0 ? 1.0 / f : 1.0 / UNLIMITED_HZ);
+  if (f > 0) xasprintf (&text, "TIME FREQ: %iHz", f);
+  else xasprintf (&text, "TIME FREQ: UNLIMITED", f);
   draw_bottom_text (NULL, text, 0);
   al_free (text);
 }

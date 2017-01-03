@@ -37,7 +37,7 @@ struct replay {
   uint8_t *packed_gamepad_state;
 
   /* Fields below aren't properly part of the replay file format.
-     Used mainly for simulation. */
+     Used mainly for replay results. */
   uint64_t packed_gamepad_state_nmemb;
   char *filename;
   bool complete;
@@ -52,6 +52,7 @@ struct replay {
 };
 
 /* funtions */
+struct replay *get_replay (void);
 uint32_t pack_replay_config (void);
 void unpack_replay_config (uint32_t pc);
 uint8_t pack_gamepad_state (struct gamepad_state *gs);
@@ -66,9 +67,12 @@ struct gamepad_state *get_replay_gamepad_state (struct gamepad_state *gs,
 bool save_replay (char *filename, struct replay *replay);
 struct replay *load_replay (struct replay *replay_ret, char *filename);
 struct replay *xload_replay (char *filename);
-struct replay *command_line_load_replay (struct replay *replay, char *filename);
 void free_replay (struct replay *replay);
+void free_replay_chain (void);
+struct replay *add_replay_file_to_replay_chain (char *filename);
+int compare_replays (const void *_r0, const void *_r1);
 void prepare_for_recording_replay (void);
+void prepare_for_playing_replay (size_t i);
 void start_recording_replay (int priority);
 void create_save_replay_thread (void);
 void handle_save_replay_thread (int priority);
@@ -79,18 +83,25 @@ void set_replay_mode_at_level_start (struct replay *replay);
 void replay_gamepad_update (struct anim *a, struct replay *replay,
                             uint64_t cycle);
 void print_replay_mode (int priority);
-bool check_replay_chain_completion_and_validity (void);
+bool check_valid_replay_chain_pair (struct replay *r0, struct replay *r1);
 char *replay_incomplete_str (enum replay_incomplete ri);
 void print_replay_info (struct replay *replay);
-void print_simulation_results (struct replay *replay);
+void print_replay_chain_info (void);
+void print_replay_results (struct replay *replay);
+bool update_replay_progress (int *progress_ret);
+bool is_dedicatedly_replaying (void);
 
 /* variables */
-extern struct replay replay;
+extern struct replay recorded_replay;
 extern enum replay_mode level_start_replay_mode;
 extern enum replay_mode replay_mode;
 extern int64_t recording_replay_countdown;
 extern struct replay *replay_chain;
 extern size_t replay_chain_nmemb;
+extern size_t replay_index;
+extern bool command_line_replay;
+extern bool valid_replay_chain;
+extern bool complete_replay_chain;
 
 extern ALLEGRO_THREAD *save_replay_dialog_thread,
   *load_replay_dialog_thread;

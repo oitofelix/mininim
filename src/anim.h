@@ -95,6 +95,6 @@ extern uint64_t anim_cycle;
 extern ALLEGRO_EVENT_QUEUE *event_queue;
 extern ALLEGRO_TIMER *timer;
 extern int anim_freq;
-extern double anim_freq_real;
+extern int anim_freq_real;
 
 #endif	/* MININIM_ANIM_H */

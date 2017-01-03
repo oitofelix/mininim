@@ -279,8 +279,8 @@ draw_bitmap_region (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
                     float sx, float sy, float sw, float sh,
                     float dx, float dy, int flags)
 {
-  /* on simulation, do nothing */
-  if (simulation && ! simulation_rendering && ! cutscene) return;
+  if (rendering == NONE_RENDERING || rendering == AUDIO_RENDERING)
+    return;
 
   merge_drawn_rectangle (to, dx, dy, sw, sh);
   set_target_bitmap (to);
@@ -298,6 +298,8 @@ draw_rectangle (ALLEGRO_BITMAP *to, float x1, float y1,
                 float x2, float y2, ALLEGRO_COLOR color,
                 float thickness)
 {
+  if (rendering == NONE_RENDERING || rendering == AUDIO_RENDERING)
+    return;
   set_target_bitmap (to);
   al_draw_rectangle (x1 + 1, y1, x2 + 1, y2, color, thickness);
 }
@@ -306,6 +308,8 @@ void
 draw_filled_rectangle (ALLEGRO_BITMAP *to, float x1, float y1,
                        float x2, float y2, ALLEGRO_COLOR color)
 {
+  if (rendering == NONE_RENDERING || rendering == AUDIO_RENDERING)
+    return;
   set_target_bitmap (to);
   al_draw_filled_rectangle (x1, y1, x2 + 1, y2 + 1, color);
 }
@@ -320,6 +324,9 @@ draw_text (ALLEGRO_BITMAP *bitmap, char const *text, float x, float y, int flags
 bool
 draw_bottom_text (ALLEGRO_BITMAP *bitmap, char *text, int priority)
 {
+  if (rendering == NONE_RENDERING || rendering == AUDIO_RENDERING)
+    return false;
+
   static char *current_text = NULL;
   static int cur_priority = INT_MIN;
   static int text_offset = 0;
@@ -457,9 +464,6 @@ flip_display (ALLEGRO_BITMAP *bitmap)
   int w = al_get_display_width (display);
   int h = al_get_display_height (display);
 
-  int uw = al_get_bitmap_width (uscreen);
-  int uh = al_get_bitmap_height (uscreen);
-
   int flags = screen_flags | potion_flags;
 
   if (bitmap) {
@@ -544,6 +548,9 @@ flip_display (ALLEGRO_BITMAP *bitmap)
       if (! pause_anim) mr.select_cycles--;
     }
   }
+
+  int uw = al_get_bitmap_width (uscreen);
+  int uh = al_get_bitmap_height (uscreen);
 
   al_draw_scaled_bitmap (uscreen, 0, 0, uw, uh, 0, 0, w, h, 0);
   al_flip_display ();
@@ -656,6 +663,24 @@ show (void)
 {
   ALLEGRO_BITMAP *screen = mr.cell[0][0].screen;
 
+  if (load_callback) {
+    enum rendering rendering_backup = rendering;
+    rendering = VIDEO_RENDERING;
+    draw_logo (screen, "Loading...");
+    flip_display (screen);
+    rendering = rendering_backup;
+    return;
+  }
+
+  if (is_dedicatedly_replaying ()) {
+    enum rendering rendering_backup = rendering;
+    rendering = VIDEO_RENDERING;
+    draw_replaying (screen);
+    flip_display (screen);
+    rendering = rendering_backup;
+    return;
+  }
+
   switch (video_effect.type) {
   case VIDEO_NO_EFFECT: flip_display (NULL); return;
   case VIDEO_OFF: return;
@@ -723,18 +748,16 @@ is_fullscreen (void)
 }
 
 void
-process_display_events (void (*draw_callback) (void))
+process_display_events (void)
 {
   ALLEGRO_EVENT event;
   while (al_get_next_event (event_queue, &event))
     switch (event.type) {
     case ALLEGRO_EVENT_DISPLAY_EXPOSE:
-      if (draw_callback) draw_callback ();
       show ();
       break;
     case ALLEGRO_EVENT_DISPLAY_RESIZE:
       acknowledge_resize ();
-      if (draw_callback) draw_callback ();
       show ();
       break;
     case ALLEGRO_EVENT_DISPLAY_CLOSE:
@@ -959,4 +982,34 @@ pop_clipping_rectangle (void)
   set_target_bitmap (bitmap);
   al_set_clipping_rectangle (x, y, w, h);
   clipping_rectangle_stack_nmemb--;
+}
+
+void
+draw_logo (ALLEGRO_BITMAP *bitmap, char *text)
+{
+  int x = 138;
+  int y = 40;
+  int w = al_get_bitmap_width (icon);
+  int h = al_get_bitmap_height (icon);
+  clear_bitmap (bitmap, BLACK);
+  draw_filled_rectangle (bitmap, x - 1, y - 1, x + w, y + h, WHITE);
+  draw_bitmap (icon, bitmap, x, y, 0);
+  draw_text (bitmap, text, CUTSCENE_WIDTH / 2.0, CUTSCENE_HEIGHT / 2.0,
+             ALLEGRO_ALIGN_CENTRE);
+  al_draw_filled_rectangle (0, CUTSCENE_HEIGHT - 8,
+                            CUTSCENE_WIDTH, CUTSCENE_HEIGHT,
+                            BLUE);
+  draw_text (bitmap, "MININIM " VERSION, CUTSCENE_WIDTH / 2.0,
+             CUTSCENE_HEIGHT - 7,
+             ALLEGRO_ALIGN_CENTRE);
+}
+
+void
+draw_replaying (ALLEGRO_BITMAP *bitmap)
+{
+  char *text;
+  int progress; update_replay_progress (&progress);
+  xasprintf (&text, "Replaying: %3lu%%", progress);
+  draw_logo (bitmap, text);
+  al_free (text);
 }

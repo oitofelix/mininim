@@ -19,10 +19,11 @@
 
 #include "mininim.h"
 
-struct replay replay;
+struct replay recorded_replay;
 
 struct replay *replay_chain;
 size_t replay_chain_nmemb;
+size_t replay_index;
 
 enum replay_mode level_start_replay_mode;
 enum replay_mode replay_mode;
@@ -31,6 +32,11 @@ ALLEGRO_THREAD *save_replay_dialog_thread,
   *load_replay_dialog_thread;
 
 int64_t recording_replay_countdown = -1;
+
+bool command_line_replay;
+
+bool valid_replay_chain = true;
+bool complete_replay_chain = true;
 
 struct dialog save_replay_dialog = {
   .title = "Save replay",
@@ -41,8 +47,19 @@ struct dialog save_replay_dialog = {
 struct dialog load_replay_dialog = {
   .title = "Load replay",
   .patterns = "*.MRP",
-  .mode = ALLEGRO_FILECHOOSER_FILE_MUST_EXIST,
+  .mode = ALLEGRO_FILECHOOSER_FILE_MUST_EXIST
+  | ALLEGRO_FILECHOOSER_MULTIPLE,
 };
+
+struct replay *
+get_replay (void)
+{
+  switch (replay_mode) {
+  case RECORD_REPLAY: return &recorded_replay;
+  case PLAY_REPLAY: return &replay_chain[replay_index];
+  case NO_REPLAY: default: return NULL;
+  }
+}
 
 uint32_t
 pack_boolean_replay_config (void)
@@ -173,6 +190,7 @@ struct replay *
 load_replay (struct replay *replay_ret, char *filename)
 {
   struct replay replay;
+  memset (&replay, 0, sizeof (replay));
 
   ALLEGRO_FILE *f = al_fopen (filename, "rb");
   if (! f) return NULL;
@@ -249,20 +267,7 @@ load_replay (struct replay *replay_ret, char *filename)
 struct replay *
 xload_replay (char *filename)
 {
-  return load_replay (&replay, filename);
-}
-
-struct replay *
-command_line_load_replay (struct replay *replay, char *filename)
-{
-  if (! load_replay (replay, filename))
-    error (-1, 0, "failed to load replay '%s'", filename);
-  level_start_replay_mode = PLAY_REPLAY;
-  next_level = replay->start_level;
-  min_legacy_level = min_int (min_legacy_level, replay->start_level);
-  max_legacy_level = max_int (max_legacy_level, replay->start_level);
-  recording_replay_countdown = -1;
-  return replay;
+  return add_replay_file_to_replay_chain (filename);
 }
 
 void
@@ -276,15 +281,73 @@ free_replay (struct replay *replay)
 }
 
 void
+free_replay_chain (void)
+{
+  size_t i;
+  for (i = 0; i < replay_chain_nmemb; i++)
+    free_replay (&replay_chain[i]);
+
+  al_free (replay_chain);
+  replay_chain = NULL;
+  replay_chain_nmemb = 0;
+  replay_index = 0;
+
+  valid_replay_chain = true;
+  complete_replay_chain = true;
+}
+
+struct replay *
+add_replay_file_to_replay_chain (char *filename)
+{
+  struct replay replay;
+  if (load_replay (&replay, filename)) {
+    replay_chain =
+      add_to_array (&replay, 1, replay_chain, &replay_chain_nmemb,
+                    replay_chain_nmemb, sizeof (replay));
+
+    qsort (replay_chain, replay_chain_nmemb, sizeof (replay),
+           compare_replays);
+
+    return replay_chain;
+  }
+  else return NULL;
+}
+
+int
+compare_replays (const void *_r0, const void *_r1)
+{
+  struct replay *r0 = (struct replay *) _r0;
+  struct replay *r1 = (struct replay *) _r1;
+  int l0 = r0->start_level;
+  int l1 = r1->start_level;
+  return cint (&l0, &l1);
+}
+
+void
 prepare_for_recording_replay (void)
 {
   recording_replay_countdown = SEC2CYC (3) - 1;
 }
 
 void
+prepare_for_playing_replay (size_t i)
+{
+  level_start_replay_mode = PLAY_REPLAY;
+  quit_anim = NEXT_LEVEL;
+  replay_index = i;
+  struct replay *replay = &replay_chain[i];
+  next_level = replay->start_level;
+  min_legacy_level = min_int (min_legacy_level, replay->start_level);
+  max_legacy_level = max_int (max_legacy_level, replay->start_level);
+  ignore_level_cutscene = true;
+  recording_replay_countdown = -1;
+}
+
+void
 start_recording_replay (int priority)
 {
-  if (recording_replay_countdown > 0) {
+  if (! command_line_replay &&
+      recording_replay_countdown > 0) {
     char *text;
     xasprintf (&text, "REPLAY RECORDING IN %i",
                CYC2SEC(recording_replay_countdown) + 1);
@@ -317,20 +380,25 @@ handle_save_replay_thread (int priority)
       || ! al_get_thread_should_stop (save_replay_dialog_thread))
     return;
 
-  char *filename;
-  al_join_thread (save_replay_dialog_thread, (void *) &filename);
+  ALLEGRO_FILECHOOSER *dialog;
+  al_join_thread (save_replay_dialog_thread, (void *) &dialog);
   al_destroy_thread (save_replay_dialog_thread);
   save_replay_dialog_thread = NULL;
+  char *filename = al_get_native_file_dialog_count (dialog) > 0
+    ? (char *) al_get_native_file_dialog_path (dialog, 0)
+    : NULL;
+  struct replay *replay = get_replay ();
   if (filename) {
-    char *error_str = save_replay (filename, &replay)
+    char *error_str = save_replay (filename, replay)
       ? "REPLAY HAS BEEN SAVED"
       : "REPLAY SAVING FAILED";
     draw_bottom_text (NULL, error_str, priority);
     al_free (save_replay_dialog.initial_path);
-    save_replay_dialog.initial_path = filename;
+    xasprintf (&save_replay_dialog.initial_path, "%s", filename);
   } else
     draw_bottom_text (NULL, "REPLAY RECORDING STOPPED", priority);
-  free_replay (&replay);
+  al_destroy_native_file_dialog (dialog);
+  free_replay (replay);
   pause_animation (false);
 }
 
@@ -350,36 +418,46 @@ handle_load_replay_thread (int priority)
       || ! al_get_thread_should_stop (load_replay_dialog_thread))
     return;
 
-  char *filename;
-  al_join_thread (load_replay_dialog_thread, (void *) &filename);
+  ALLEGRO_FILECHOOSER *dialog;
+  al_join_thread (load_replay_dialog_thread, (void *) &dialog);
   al_destroy_thread (load_replay_dialog_thread);
   load_replay_dialog_thread = NULL;
-  if (filename) {
-    bool success = load_replay (&replay, filename);
+  size_t i;
+  size_t n = al_get_native_file_dialog_count (dialog);
+
+  free_replay_chain ();
+
+  if (n > 0) {
+    for (i = 0; i < n; i++) {
+      char *filename = (char *) al_get_native_file_dialog_path (dialog, i);
+      add_replay_file_to_replay_chain (filename);
+    }
+
+    bool success = replay_chain_nmemb > 0;
+
     char *error_str = success
       ? "REPLAY HAS BEEN LOADED"
       : "REPLAY LOADING FAILED";
+
     draw_bottom_text (NULL, error_str, priority);
+
     al_free (load_replay_dialog.initial_path);
-    load_replay_dialog.initial_path = filename;
-    if (success) {
-      level_start_replay_mode = PLAY_REPLAY;
-      quit_anim = NEXT_LEVEL;
-      next_level = replay.start_level;
-      min_legacy_level = min_int (min_legacy_level, replay.start_level);
-      max_legacy_level = max_int (max_legacy_level, replay.start_level);
-      ignore_level_cutscene = true;
-    }
+    xasprintf (&load_replay_dialog.initial_path, "%s",
+               al_get_native_file_dialog_path (dialog, n - 1));
+
+    if (success) prepare_for_playing_replay (0);
   }
+
   pause_animation (false);
+  al_destroy_native_file_dialog (dialog);
 }
 
 void
 stop_replaying (int priority)
 {
+  free_replay_chain ();
   replay_mode = NO_REPLAY;
   level_start_replay_mode = NO_REPLAY;
-  free_replay (&replay);
   if (! title_demo)
     draw_bottom_text (NULL, "REPLAY STOPPED", priority);
 }
@@ -387,8 +465,6 @@ stop_replaying (int priority)
 void
 set_replay_mode_at_level_start (struct replay *replay)
 {
-  replay_mode = level_start_replay_mode;
-
   switch (replay_mode) {
   case RECORD_REPLAY:
     replay->packed_boolean_config = pack_boolean_replay_config ();
@@ -416,7 +492,7 @@ set_replay_mode_at_level_start (struct replay *replay)
   case NO_REPLAY: default: break;
   }
 
-  print_replay_mode (2);
+  print_replay_mode (0);
 }
 
 void
@@ -447,73 +523,41 @@ print_replay_mode (int priority)
 }
 
 bool
-check_replay_chain_completion_and_validity (void)
+check_valid_replay_chain_pair (struct replay *r0, struct replay *r1)
 {
-  size_t i;
-  bool valid_chain = true;
-  bool complete_replays = true;
+  bool valid = true;
 
-  for (i = 0; i < replay_chain_nmemb; i++) {
-    HLINE;
-
-    bool valid_chain_next;
-    valid_chain_next = true;
-
-    if (i > 0) {
-      if (replay_chain[i].start_level != replay.start_level + 1) {
-        printf ("INVALID: --start-level\n");
-        valid_chain_next = false;
-      }
-
-      if (replay_chain[i].start_time <
-          replay.start_time + replay.packed_gamepad_state_nmemb) {
-        printf ("INVALID: --start-time\n");
-        valid_chain_next = false;
-      }
-
-      if (replay_chain[i].time_limit > replay.time_limit) {
-        printf ("INVALID: --time-limit\n");
-        valid_chain_next = false;
-      }
-
-      if (replay_chain[i].total_lives > replay.final_total_lives) {
-        printf ("INVALID: --total-lives\n");
-        valid_chain_next = false;
-      }
-
-      if (replay_chain[i].kca > replay.final_kca) {
-        printf ("INVALID: --kca\n");
-        valid_chain_next = false;
-      }
-
-      if (replay_chain[i].kcd > replay.final_kcd) {
-        printf ("INVALID: --kcd\n");
-        valid_chain_next = false;
-      }
-    }
-
-    if (valid_chain && ! valid_chain_next)
-      valid_chain = false;
-
-    free_replay (&replay);
-    replay = replay_chain[i];
-
-    if (! valid_chain_next) HLINE;
-    print_replay_info (&replay);
-
-    min_legacy_level = min_int (min_legacy_level, replay.start_level);
-    max_legacy_level = max_int (max_legacy_level, replay.start_level);
-    if (! level_module_next_level (&vanilla_level, replay.start_level))
-      exit (-1);
-    play_level (&vanilla_level);
-
-    print_simulation_results (&replay);
-
-    if (! replay.complete) complete_replays = false;
+  if (r1->start_level != r0->start_level + 1) {
+    printf ("INVALID: --start-level\n");
+    valid = false;
   }
 
-  HLINE;
-  return complete_replays && valid_chain;
+  if (r1->start_time < r0->start_time + r0->packed_gamepad_state_nmemb) {
+    printf ("INVALID: --start-time\n");
+    valid = false;
+  }
+
+  if (r1->time_limit > r0->time_limit) {
+    printf ("INVALID: --time-limit\n");
+    valid = false;
+  }
+
+  if (r1->total_lives > r0->final_total_lives) {
+    printf ("INVALID: --total-lives\n");
+    valid = false;
+  }
+
+  if (r1->kca > r0->final_kca) {
+    printf ("INVALID: --kca\n");
+    valid = false;
+  }
+
+  if (r1->kcd > r0->final_kcd) {
+    printf ("INVALID: --kcd\n");
+    valid = false;
+  }
+
+  return valid;
 }
 
 char *
@@ -559,9 +603,9 @@ print_replay_info (struct replay *replay)
 }
 
 void
-print_simulation_results (struct replay *replay)
+print_replay_results (struct replay *replay)
 {
-  printf ("Complete: %s    \n"
+  printf ("Complete: %s\n"
           "Reason: %s\n"
           "Final: --mirror-level=%s --immortal-mode=%s --movements=%s \\\n"
           "  --semantics=%s --start-level=%u --start-time=%lu --time-limit=%i \\\n"
@@ -581,4 +625,40 @@ print_simulation_results (struct replay *replay)
           replay->final_kca,
           replay->final_kcd);
   fflush (stdout);
+}
+
+void
+print_replay_chain_info (void)
+{
+  size_t i;
+  for (i = 0; i < replay_chain_nmemb; i++) {
+    HLINE;
+    print_replay_info (&replay_chain[i]);
+  }
+  HLINE;
+}
+
+bool
+update_replay_progress (int *progress_ret)
+{
+  static int last_progress = -1;
+
+  struct replay *replay = get_replay ();
+
+  int progress = replay->packed_gamepad_state_nmemb
+    ? (anim_cycle * 100) / replay->packed_gamepad_state_nmemb
+    : 0;
+  progress = progress > 100 ? 100 : progress;
+
+  bool update = progress != last_progress;
+  last_progress = progress;
+  if (progress_ret) *progress_ret = progress;
+  return update;
+}
+
+bool
+is_dedicatedly_replaying (void)
+{
+  return replay_mode == PLAY_REPLAY
+    && (rendering == NONE_RENDERING || rendering == AUDIO_RENDERING);
 }

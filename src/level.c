@@ -33,6 +33,7 @@ struct level global_level;
 struct undo undo;
 
 static uint64_t last_auto_show_time;
+static bool level_number_shown;
 
 bool no_room_drawing, game_paused, step_one_cycle;
 int retry_level = -1;
@@ -183,8 +184,6 @@ replace_playing_level (struct level *l)
 void
 play_level (struct level *lv)
 {
-  char *text;
-
  start:
   if (random_seed == 0) prandom (0);
 
@@ -201,7 +200,10 @@ play_level (struct level *lv)
 
   play_time = start_level_time;
 
-  set_replay_mode_at_level_start (&replay);
+  /* replay setup */
+  replay_mode = level_start_replay_mode;
+  struct replay *replay = get_replay ();
+  set_replay_mode_at_level_start (replay);
 
   if (mirror_level) mirror_level_h (&global_level);
 
@@ -225,82 +227,56 @@ play_level (struct level *lv)
   edit = EDIT_MAIN;
   exit_editor (-1);
 
-  if (! title_demo && global_level.nominal_n >= 0) {
-    xasprintf (&text, "LEVEL %i", global_level.nominal_n);
-    draw_bottom_text (NULL, text, -1);
-    al_free (text);
+  level_number_shown = false;
+
+  if (replay_mode == PLAY_REPLAY) {
+    HLINE;
+
+    if (replay_index == 0) {
+      printf ("REPLAY CHAIN BEGINNING\n");
+      HLINE;
+    }
+
+    if (replay_index > 0 && ! check_valid_replay_chain_pair
+        (replay - 1, replay)) {
+      valid_replay_chain = false;
+      HLINE;
+    }
+
+    print_replay_info (replay);
   }
 
-  quit_anim = NO_QUIT;
-  anim_cycle = 0;
-  if (simulation) {
-    apply_mr_fit_mode ();
-
-    while (! quit_anim) {
-      if (replay_mode == PLAY_REPLAY
-          && anim_cycle >= replay.packed_gamepad_state_nmemb + 204) {
-        struct anim *k = get_anim_by_id (current_kid_id);
-        replay.complete = false;
-        replay.reason = k->current_lives > 0
-          ? REPLAY_INCOMPLETE_STUCK : REPLAY_INCOMPLETE_DEAD;
-        replay.final_total_lives = k->total_lives;
-        replay.final_kca = k->skill.counter_attack_prob + 1;
-        replay.final_kcd = k->skill.counter_defense_prob + 1;
-        level_cleanup ();
-        return;
-      }
-      /* /\* ---- *\/ */
-      /* while (anim_cycle == 1039) { */
-      /*   show (); */
-      /*   al_rest (0.1); */
-      /* } */
-      /* /\* ---- *\/ */
-      if (simulation_rendering) {
-        process_display_events (NULL);
-        if (anim_cycle > 0) show ();
-      } else {
-        cutscene = true;
-        process_display_events (draw_simulating_screen);
-        cutscene = false;
-      }
-      compute_level ();
-      clear_bitmap (uscreen, TRANSPARENT_COLOR);
-      uint32_t random_seed_before_draw;
-      random_seed_before_draw = random_seed;
-      draw_level ();
-      random_seed = random_seed_before_draw;
-      play_audio_instances ();
-      anim_cycle++;
-      fprintf (stderr, "Simulating: %3lu%%\r",
-              (anim_cycle * 100) / replay.packed_gamepad_state_nmemb);
-      if (simulation_period > 0) al_rest (simulation_period);
-      /* debug_random_seed (); */
-    }
-  } else play_anim (draw_level, compute_level);
+  play_anim (draw_level, compute_level);
 
   struct anim *k = get_anim_by_id (current_kid_id);
 
-  if (simulation && replay_mode == PLAY_REPLAY
-      && quit_anim != OUT_OF_TIME) {
-    replay.complete = true;
-    replay.reason = REPLAY_INCOMPLETE_NO_REASON;
-    replay.final_total_lives = k->total_lives;
-    replay.final_kca = k->skill.counter_attack_prob + 1;
-    replay.final_kcd = k->skill.counter_defense_prob + 1;
-    level_cleanup ();
-    return;
-  } else if (simulation && replay_mode == PLAY_REPLAY) {
-    replay.complete = false;
-    replay.reason = REPLAY_INCOMPLETE_OUT_OF_TIME;
-    replay.final_total_lives = k->total_lives;
-    replay.final_kca = k->skill.counter_attack_prob + 1;
-    replay.final_kcd = k->skill.counter_defense_prob + 1;
-    level_cleanup ();
-    return;
-  }
-
   switch (quit_anim) {
   default:
+    level_cleanup ();
+    break;
+  case REPLAY_OUT_OF_TIME:
+    replay->complete = false;
+    replay->reason = REPLAY_INCOMPLETE_OUT_OF_TIME;
+    replay->final_total_lives = k->total_lives;
+    replay->final_kca = k->skill.counter_attack_prob + 1;
+    replay->final_kcd = k->skill.counter_defense_prob + 1;
+    level_cleanup ();
+    break;
+  case REPLAY_INCOMPLETE:
+    replay->complete = false;
+    replay->reason = k->current_lives > 0
+      ? REPLAY_INCOMPLETE_STUCK : REPLAY_INCOMPLETE_DEAD;
+    replay->final_total_lives = k->total_lives;
+    replay->final_kca = k->skill.counter_attack_prob + 1;
+    replay->final_kcd = k->skill.counter_defense_prob + 1;
+    level_cleanup ();
+    break;
+  case REPLAY_COMPLETE:
+    replay->complete = true;
+    replay->reason = REPLAY_INCOMPLETE_NO_REASON;
+    replay->final_total_lives = k->total_lives;
+    replay->final_kca = k->skill.counter_attack_prob + 1;
+    replay->final_kcd = k->skill.counter_defense_prob + 1;
     level_cleanup ();
     break;
   case RESTART_LEVEL:
@@ -357,6 +333,23 @@ play_level (struct level *lv)
     else if (quit_anim == RESTART_LEVEL) goto restart_level;
     else if (quit_anim == RESTART_GAME) goto restart_game;
     break;
+  }
+
+  if (replay_mode == PLAY_REPLAY) {
+    if (! replay->complete) complete_replay_chain = false;
+    print_replay_results (replay);
+
+    if (replay_index == replay_chain_nmemb - 1) {
+      HLINE;
+      printf ("REPLAY CHAIN END\n");
+      HLINE;
+      stop_replaying (1);
+      if (command_line_replay)
+        exit (complete_replay_chain && valid_replay_chain ? 0 : 1);
+    } else
+      prepare_for_playing_replay (replay_index + 1);
+
+    goto next_level;
   }
 }
 
@@ -616,7 +609,8 @@ compute_level (void)
 
   compute_loose_floors ();
 
-  replay_gamepad_update (k, &replay, anim_cycle);
+  struct replay *replay = get_replay ();
+  replay_gamepad_update (k, replay, anim_cycle);
 
   for (i = 0; i < anima_nmemb; i++) enter_fight_logic (&anima[i]);
   for (i = 0; i < anima_nmemb; i++) leave_fight_logic (&anima[i]);
@@ -1172,6 +1166,16 @@ draw_level (void)
 
   draw_lives (uscreen, get_anim_by_id (current_kid_id), vm);
 
+  /* automatic level display */
+  if (! title_demo && global_level.nominal_n >= 0
+      && ! level_number_shown && anim_cycle <= SEC2CYC (10)) {
+    char *text;
+    xasprintf (&text, "LEVEL %i", global_level.nominal_n);
+    if (draw_bottom_text (NULL, text, -1))
+      level_number_shown = true;
+    al_free (text);
+  }
+
   /* automatic remaining time display */
   if (! title_demo) {
     uint64_t rem_time = time_limit - play_time;
@@ -1180,7 +1184,7 @@ draw_level (void)
     if ((rem_time_min % 5 == 0
          && last_auto_show_time != rem_time_min)
         || rem_time_sec <= 60
-        || (anim_cycle <= SEC2CYC (3)
+        || (anim_cycle <= SEC2CYC (10)
             && last_auto_show_time != rem_time_min)) {
       if (rem_time_sec <= 60
           && (rem_time + 1) % DEFAULT_HZ == 0

@@ -167,8 +167,8 @@
 
 /* functions */
 void *dialog_thread (ALLEGRO_THREAD *thread, void *arg);
-ALLEGRO_TEXTLOG *load_config (char *filename);
-void save_game (char *filename);
+bool load_config (char *filename, ALLEGRO_TEXTLOG *textlog, int priority);
+bool save_game (char *filename, int priority);
 int max_int (int a, int b);
 int min_int (int a, int b);
 int cint (int *x, int *y);
@@ -181,8 +181,9 @@ char *level_module_str (enum level_module m);
 char *movements_str (enum movements m);
 char *semantics_str (enum semantics m);
 bool save_level (struct level *l);
-void draw_logo_screen (char *text);
-void draw_simulating_screen (void);
+void handle_load_config_thread (int priority);
+void handle_save_game_thread (int priority);
+void handle_save_picture_thread (int priority);
 
 /* variables */
 extern enum level_module level_module;
@@ -217,9 +218,7 @@ extern char *resources_dir,
 extern enum semantics semantics;
 extern enum movements movements;
 extern bool title_demo;
-extern bool simulation;
-extern bool simulation_rendering;
-extern float simulation_period;
+extern enum rendering rendering;
 
 extern ALLEGRO_THREAD *load_config_dialog_thread,
   *save_game_dialog_thread, *save_picture_dialog_thread;

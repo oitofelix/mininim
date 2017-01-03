@@ -60,7 +60,8 @@ ALLEGRO_THREAD *load_config_dialog_thread, *save_game_dialog_thread,
 struct dialog load_config_dialog = {
   .title = "Load configuration file",
   .patterns = "*.*",
-  .mode = ALLEGRO_FILECHOOSER_FILE_MUST_EXIST,
+  .mode = ALLEGRO_FILECHOOSER_FILE_MUST_EXIST
+  | ALLEGRO_FILECHOOSER_MULTIPLE,
 };
 
 struct dialog save_game_dialog = {
@@ -95,19 +96,17 @@ int start_level_time;
 enum semantics semantics;
 enum movements movements;
 bool title_demo;
-bool simulation;
-bool simulation_rendering;
-float simulation_period;
+enum rendering rendering = BOTH_RENDERING;
 
 struct skill skill = {.counter_attack_prob = INITIAL_KCA,
                       .counter_defense_prob = INITIAL_KCD};
+static bool replay_info;
 static bool sound_disabled_cmd;
 static bool skip_title;
 static bool level_module_given;
 static bool inhibit_screensaver = true;
 
 static error_t parser (int key, char *arg, struct argp_state *state);
-static void draw_loading_screen (void);
 static void print_paths (void);
 static void print_display_modes (void);
 static char *env_option_name (const char *option_name);
@@ -124,7 +123,7 @@ static struct argp_option options[] = {
   /* Configuration */
   {NULL, 0, NULL, 0, "Configuration:", 0},
 
-  {"load-config", LOAD_CONFIG_OPTION, "FILE", 0, "Load configuration file FILE.  The options set in FILE have the same precedence as the equivalent command line options given at its place of occurrence.  This can be done in-game by the CTRL+L key binding.", 0},
+  {"load-config", LOAD_CONFIG_OPTION, "FILE", 0, "Load configuration file FILE.  The options set in FILE have the same precedence as the equivalent command line options given at its place of occurrence.  This can be done in-game using the CTRL+L key binding.", 0},
 
   {"ignore-main-config", IGNORE_MAIN_CONFIG_OPTION, NULL, 0, "Ignore main configuration file.  The default is to parse it at the very beginning of each run.", 0},
 
@@ -137,8 +136,8 @@ static struct argp_option options[] = {
   /* Level */
   {NULL, 0, NULL, 0, "Level:", 0},
   {"level-module", LEVEL_MODULE_OPTION, "LEVEL-MODULE", 0, "Select level module.  A level module determines a way to generate consecutive levels for use by the engine.  Valid values for LEVEL-MODULE are: NATIVE, LEGACY, PLV, DAT and CONSISTENCY.  NATIVE is the module designed to read the native format that supports all features.  LEGACY is the module designed to read the original PoP 1 raw level files.  PLV is the module designed to read the original PoP 1 PLV extended level files.  DAT is the module designed to read the original PoP 1 LEVELS.DAT file.  CONSISTENCY is the module designed to generate random-corrected levels for accessing the engine robustness.  The default is NATIVE.", 0},
-  {"convert-levels", CONVERT_LEVELS_OPTION, NULL, 0, "Batch convert levels 0 to 15 accessible by the current level module to the native format and exit.  The levels are saved in the user data directory, where they take precedence over levels in every other location.  When using this option there is no point in using any other options besides '--level-module' and '--mirror-level', both of which must occur before this to take effect.  You can accomplish a similar result in-game on a per level basis by using the 'E>LS' command.  Notice that in that case any changes made to the level by special events (or otherwise) before you trigger the save command will be retained.", 0},
-  {"start-level", START_LEVEL_OPTION, "N", 0, "Make the kid start at level N.  The default is 1.  Valid integers range from 0 to INT_MAX.  This can be changed in-game by the SHIFT+L and SHIFT+M key binding.", 0},
+  {"convert-levels", CONVERT_LEVELS_OPTION, NULL, OPTION_NO_USAGE, "Batch convert levels 0 to 15 accessible by the current level module to the native format and exit.  The levels are saved in the user data directory, where they take precedence over levels in every other location.  When using this option there is no point in using any other options besides '--level-module' and '--mirror-level', both of which must occur before this to take effect.  You can accomplish a similar result in-game on a per level basis by using the 'E>LS' command.  Notice that in that case any changes made to the level by special events (or otherwise) before you trigger the save command will be retained.", 0},
+  {"start-level", START_LEVEL_OPTION, "N", 0, "Make the kid start at level N.  The default is 1.  Valid integers range from 0 to INT_MAX.  This can be changed in-game using the SHIFT+L and SHIFT+M key bindings.", 0},
   {"start-pos", START_POS_OPTION, "R,F,P", 0, "Make the kid start at room R, floor F and place P. The default is to let this decision to the level module.  R is an integer ranging from 1 to INT_MAX, F is an integer ranging from 0 to 2 and P is an integer ranging from 0 to 9.  This option has no effect on replays.", 0},
   {"mirror-level", MIRROR_LEVEL_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable level mirroring.  This option causes every level to be fully mirrored (cons+links) in the horizontal direction after they have been loaded by the active level module.  The default is FALSE.  You can accomplish a similar result in-game on a per level basis by using the 'E>LMBH' command.  See also the '--mirror-mode' option.", 0},
   {NULL, 0, NULL, OPTION_DOC, "If the option '--level-module' is not given and there is a LEVELS.DAT file in the working directory, the DAT level module is automatically used to load that file.  This is a compatibility measure for applications which depend upon this legacy behavior.", 0},
@@ -146,45 +145,46 @@ static struct argp_option options[] = {
 
   /* Time */
   {NULL, 0, NULL, 0, "Time:", 0},
-  {"time-limit", TIME_LIMIT_OPTION, "N", 0, "Set the time limit to complete the game to N cycles.  The default is 43200 (1 hour at 12 Hz).  Valid integers range from 1 to INT_MAX.  This can be changed in-game by the + and - key bindings.", 0},
+  {"time-limit", TIME_LIMIT_OPTION, "N", 0, "Set the time limit to complete the game to N cycles.  The default is 43200 (1 hour at 12 Hz).  Valid integers range from 1 to INT_MAX.  This can be changed in-game using the + and - key bindings.", 0},
   {"start-time", START_TIME_OPTION, "N", 0, "Set the play time counter to N cycles.  The default is 0.  Valid integers range from 0 to INT_MAX.", 0},
-  {"time-frequency", TIME_FREQUENCY_OPTION, "N", 0, "Set the time frequency to N Hz in case N > 0, or to 1 / (-N + 2) Hz in case N <= 0.  The default is 12Hz.  Valid integers range from INT_MIN to INT_MAX.  This can be changed in-game by the ( and ) key bindings.", 0},
+  {"time-frequency", TIME_FREQUENCY_OPTION, "N", 0, "Set nominal time frequency to N Hz in case N > 0, or disable time frequency constraint for N = 0.  The default is 12Hz.  Valid integers range from 0 to UNLIMITED_HZ (usually 10000).  Notice that if N is too large for the system to keep up with, timed events may present incorrect duration.  Use 0 for fastest verification of replay chains.  This can be changed in-game using the ( and ) key bindings.", 0},
 
   /* Skills */
   {NULL, 0, NULL, 0, "Skills:", 0},
-  {"total-lives", TOTAL_LIVES_OPTION, "N", 0, "Make the kid start with N total lives.  The default is 3.  Valid integers range from 1 to 10.  This can be changed in-game by the SHIFT+T key binding.", 0},
-  {"kca", KCA_OPTION, "N", 0, "Set kid's counter attack skill to N.  The default is 0 (zero).  Valid integers range from 0 to 100.  This can be changed in-game by the CTRL+= and CTRL+- key bindings.", 0},
-  {"kcd", KCD_OPTION, "N", 0, "Set kid's counter defense skill to N.  The default is 0 (zero).  Valid integers range from 0 to 100.  This can be changed in-game by the ALT+= and ALT+- key bindings.", 0},
-  {"immortal-mode", IMMORTAL_MODE_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable immortal mode.  In immortal mode the kid can't be harmed.  The default is FALSE.  This can be changed in-game by the I key binding.", 0},
+  {"total-lives", TOTAL_LIVES_OPTION, "N", 0, "Make the kid start with N total lives.  The default is 3.  Valid integers range from 1 to 10.  This can be changed in-game using the SHIFT+T key binding.", 0},
+  {"kca", KCA_OPTION, "N", 0, "Set kid's counter attack skill to N.  The default is 0 (zero).  Valid integers range from 0 to 100.  This can be changed in-game using the CTRL+= and CTRL+- key bindings.", 0},
+  {"kcd", KCD_OPTION, "N", 0, "Set kid's counter defense skill to N.  The default is 0 (zero).  Valid integers range from 0 to 100.  This can be changed in-game using the ALT+= and ALT+- key bindings.", 0},
+  {"immortal-mode", IMMORTAL_MODE_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable immortal mode.  In immortal mode the kid can't be harmed.  The default is FALSE.  This can be changed in-game using the I key binding.", 0},
 
   /* Rendering */
   {NULL, 0, NULL, 0, "Rendering:", 0},
-  {"video-mode", VIDEO_MODE_OPTION, "VIDEO-MODE", 0, "Select video mode.  Valid values for VIDEO-MODE are: VGA, EGA, CGA and HGC.  The default is VGA.  This can be changed in-game by the F12 key binding.", 0},
-  {"environment-mode", ENVIRONMENT_MODE_OPTION, "ENVIRONMENT-MODE", 0, "Select environment mode.  Valid values for ENVIRONMENT-MODE are: ORIGINAL, DUNGEON and PALACE.  The ORIGINAL value gives level modules autonomy in this choice for each particular level. This is the default.  This can be changed in-game by the F11 key binding.", 0},
-  {"guard-mode", GUARD_MODE_OPTION, "GUARD-MODE", 0, "Select guard mode.  Valid values for GUARD-MODE are: ORIGINAL, GUARD, FAT-GUARD, VIZIER, SKELETON and SHADOW.  The ORIGINAL value gives level modules autonomy in this choice for each particular guard.  This is the default.  This can be changed in-game by the F10 key binding.  This option has no effect on replays.", 0},
-{"hue-mode", HUE_MODE_OPTION, "HUE-MODE", 0, "Select hue mode.  Valid values for HUE-MODE are: ORIGINAL, NONE, GREEN, GRAY, YELLOW and BLUE.  The ORIGINAL value gives level modules autonomy in this choice for each particular level.  This is the default.  For the classic behavior of the first version of the original game use NONE.  This can be changed in-game by the F9 key binding.", 0},
-  {"display-flip-mode", DISPLAY_FLIP_MODE_OPTION, "DISPLAY-FLIP-MODE", 0, "Select display flip mode.  Valid values for DISPLAY-FLIP-MODE are: NONE, VERTICAL, HORIZONTAL and VERTICAL-HORIZONTAL.  The default is NONE.  This can be changed in-game by the SHIFT+I key binding.", 0},
-  {"mirror-mode", MIRROR_MODE_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable mirror mode.  In mirror mode the screen and the keyboard are flipped horizontally.  This is equivalent of specifying both the options --display-flip-mode=HORIZONTAL and --gamepad-flip-mode=HORIZONTAL.  The default is FALSE.  This can be changed in-game by the SHIFT+I and SHIFT+K key bindings for the display and keyboard, respectively.  See also the '--mirror-level' option.", 0},
-  {"blind-mode", BLIND_MODE_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable blind mode.  In blind mode background and non-animated sprites are not drawn. The default is FALSE.  This can be changed in-game by the SHIFT+B key binding.", 0},
-  {"multi-room", MULTI_ROOM_OPTION, "WxH", 0, "Set multi-room width and height to W and H, respectively.  The default is 2x2.  The values W and H are strictly positive integers and must be separated by an 'x'.  This can be changed in-game by the [ (decrement width and height), ] (increment width and height), CTRL+[ (decrement width), CTRL+] (increment width), ALT+[ (decrement height) and ALT+] (increment heigth) key bindings.", 0},
-  {"multi-room-fit-mode", MULTI_ROOM_FIT_MODE_OPTION, "MULTI-ROOM-FIT-MODE", 0, "Select multi-room fit mode.  Valid values for MULTI-ROOM-FIT-MODE are: NONE, STRETCH and RATIO.  The default is NONE.  This can be changed in-game by the M key binding.", 0},
+  {"video-mode", VIDEO_MODE_OPTION, "VIDEO-MODE", 0, "Select video mode.  Valid values for VIDEO-MODE are: VGA, EGA, CGA and HGC.  The default is VGA.  This can be changed in-game using the F12 key binding.", 0},
+  {"environment-mode", ENVIRONMENT_MODE_OPTION, "ENVIRONMENT-MODE", 0, "Select environment mode.  Valid values for ENVIRONMENT-MODE are: ORIGINAL, DUNGEON and PALACE.  The ORIGINAL value gives level modules autonomy in this choice for each particular level. This is the default.  This can be changed in-game using the F11 key binding.", 0},
+  {"guard-mode", GUARD_MODE_OPTION, "GUARD-MODE", 0, "Select guard mode.  Valid values for GUARD-MODE are: ORIGINAL, GUARD, FAT-GUARD, VIZIER, SKELETON and SHADOW.  The ORIGINAL value gives level modules autonomy in this choice for each particular guard.  This is the default.  This can be changed in-game using the F10 key binding.  This option has no effect on replays.", 0},
+{"hue-mode", HUE_MODE_OPTION, "HUE-MODE", 0, "Select hue mode.  Valid values for HUE-MODE are: ORIGINAL, NONE, GREEN, GRAY, YELLOW and BLUE.  The ORIGINAL value gives level modules autonomy in this choice for each particular level.  This is the default.  For the classic behavior of the first version of the original game use NONE.  This can be changed in-game using the F9 key binding.", 0},
+  {"display-flip-mode", DISPLAY_FLIP_MODE_OPTION, "DISPLAY-FLIP-MODE", 0, "Select display flip mode.  Valid values for DISPLAY-FLIP-MODE are: NONE, VERTICAL, HORIZONTAL and VERTICAL-HORIZONTAL.  The default is NONE.  This can be changed in-game using the SHIFT+I key binding.", 0},
+  {"mirror-mode", MIRROR_MODE_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable mirror mode.  In mirror mode the screen and the keyboard are flipped horizontally.  This is equivalent of specifying both the options --display-flip-mode=HORIZONTAL and --gamepad-flip-mode=HORIZONTAL.  The default is FALSE.  This can be changed in-game using the SHIFT+I and SHIFT+K key bindings for the display and keyboard, respectively.  See also the '--mirror-level' option.", 0},
+  {"blind-mode", BLIND_MODE_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable blind mode.  In blind mode background and non-animated sprites are not drawn. The default is FALSE.  This can be changed in-game using the SHIFT+B key binding.", 0},
+  {"multi-room", MULTI_ROOM_OPTION, "WxH", 0, "Set multi-room width and height to W and H, respectively.  The default is 2x2.  The values W and H are strictly positive integers and must be separated by an 'x'.  This can be changed in-game using the [ (decrement width and height), ] (increment width and height), CTRL+[ (decrement width), CTRL+] (increment width), ALT+[ (decrement height) and ALT+] (increment heigth) key bindings.", 0},
+  {"multi-room-fit-mode", MULTI_ROOM_FIT_MODE_OPTION, "MULTI-ROOM-FIT-MODE", 0, "Select multi-room fit mode.  Valid values for MULTI-ROOM-FIT-MODE are: NONE, STRETCH and RATIO.  The default is NONE.  This can be changed in-game using the M key binding.", 0},
+  {"rendering", RENDERING_OPTION, "RENDERING-MODE", 0, "Select rendering mode.  Valid values for RENDERING-MODE are: BOTH, VIDEO, AUDIO and NONE.  The default is BOTH.  Notice that video rendering makes replays slower, thus consider using NONE for batch processing of replay chains.", 0},
 
   /* Gamepad */
   {NULL, 0, NULL, 0, "Gamepad:", 0},
-  {"gamepad-flip-mode", GAMEPAD_FLIP_MODE_OPTION, "GAMEPAD-FLIP-MODE", 0, "Select gamepad flip mode.  Valid values for GAMEPAD-FLIP-MODE are: NONE, VERTICAL, HORIZONTAL and VERTICAL-HORIZONTAL.  The default is NONE.  This can be changed in-game by the SHIFT+K key binding.                                ", 0},
+  {"gamepad-flip-mode", GAMEPAD_FLIP_MODE_OPTION, "GAMEPAD-FLIP-MODE", 0, "Select gamepad flip mode.  Valid values for GAMEPAD-FLIP-MODE are: NONE, VERTICAL, HORIZONTAL and VERTICAL-HORIZONTAL.  The default is NONE.  This can be changed in-game using the SHIFT+K key binding.                                ", 0},
   {"joystick-axis-threshold", JOYSTICK_AXIS_THRESHOLD_OPTION, "FUNC,VALUE", 0, "Set joystick threshold to VALUE for the axis mapped to FUNC.  Valid values for FUNC are H and V.   VALUE is a floating point ranging from 0.0 to 1.0.  The default VALUE for H is 0.1 and for Y is 0.8.", 0},
   {"joystick-button-threshold", JOYSTICK_BUTTON_THRESHOLD_OPTION, "FUNC,VALUE", 0, "Set joystick threshold to VALUE for the button mapped to FUNC.  Valid values for FUNC are: UP, RIGHT, DOWN, LEFT, ENTER, SHIFT.  VALUE is an integer ranging from 0 to 32767.  The default VALUE for any function is 100.", 0},
   {"joystick-axis", JOYSTICK_AXIS_OPTION, "FUNC,STICK,AXIS", 0, "Map function FUNC to joystick axis STICK,AXIS.  Valid values for FUNC are: H and V.  STICK,AXIS is a valid stick and axis pair.  The default STICK,AXIS for H is 0,0 and for V is 0,1.", 0},
   {"joystick-button", JOYSTICK_BUTTON_OPTION, "FUNC,BUTTON", 0, "Map function FUNC to joystick button BUTTON.  Valid values for FUNC are: UP, RIGHT, DOWN, LEFT, ENTER, SHIFT, TIME, PAUSE.  BUTTON is a valid joystick button number.  The default BUTTON values are 0, 1, 2, 3, 4, 5, 8 and 9, respectively.", 0},
-  {"joystick-info", JOYSTICK_INFO_OPTION, NULL, 0, "Print information about the primary joystick and exit.", 0},
+  {"joystick-info", JOYSTICK_INFO_OPTION, NULL, OPTION_NO_USAGE, "Print information about the primary joystick and exit.", 0},
 
   {NULL, 0, NULL, OPTION_DOC, "The primary joystick's axis and button numbers are listed by the option '--joystick-info'.  You can find out the number of a particular axis or button by pressing it before invoking MININIM with that option.  If a stick, axis or button given to an option doesn't exist in the primary joystick, it's silently ignored.  The joystick can be activated and auto-calibrated in-game by the CTRL+J key binding.  Use this when hot-plugging a joystick or in case the joystick starts to behave oddly.  If your joystick is peculiar enough, proving the auto-calibration mechanism insufficient, the '--joystick-axis-threshold' and '--joystick-button-threshold' options may help.", 0},
 
   /* Display */
   {NULL, 0, NULL, 0, "Display:", 0},
-  {"display-mode", DISPLAY_MODE_OPTION, "M", 0, "Use display mode number M.  The default is -1 (desktop).  The valid integers list can be obtained using the option '--print-display-modes'. This can be changed in-game by the D key binding, in case a non-desktop display mode is selected.", 0},
-  {"print-display-modes", PRINT_DISPLAY_MODES_OPTION, NULL, 0, "Print display modes and exit.", 0},
-  {"fullscreen", FULLSCREEN_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable fullscreen mode for desktop display mode, but ignored for other display modes.  In fullscreen mode the window spans the entire screen.  The default is FALSE.  This can be changed in-game by the F key binding.", 0},
+  {"display-mode", DISPLAY_MODE_OPTION, "M", 0, "Use display mode number M.  The default is -1 (desktop).  The valid integers list can be obtained using the option '--print-display-modes'. This can be changed in-game using the D key binding, in case a non-desktop display mode is selected.", 0},
+  {"print-display-modes", PRINT_DISPLAY_MODES_OPTION, NULL, OPTION_NO_USAGE, "Print display modes and exit.", 0},
+  {"fullscreen", FULLSCREEN_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable fullscreen mode for desktop display mode, but ignored for other display modes.  In fullscreen mode the window spans the entire screen.  The default is FALSE.  This can be changed in-game using the F key binding.", 0},
   {"window-position", WINDOW_POSITION_OPTION, "X,Y", 0, "Place the window at screen coordinates X,Y.  The default is to let this choice to the window manager.  The values X and Y are integers and must be separated by a comma.", 0},
   {"window-dimensions", WINDOW_DIMENSIONS_OPTION, "WxH", 0, "Set window width and height to W and H, respectively.  The default is 640x400.  The values W and H are strictly positive integers and must be separated by an 'x'.", 0},
 
@@ -192,39 +192,51 @@ static struct argp_option options[] = {
 
   /* replays */
   {NULL, 0, NULL, 0, "Replays", 0},
-  {"replay", REPLAY_OPTION, "FILE", 0, "Load replay FILE and play it.  This can be done in-game by the F7 key binding.  Notice you can use '--time-frequency' and its related key bindings to control the playback speed.", 0},
-  {"record-replay", RECORD_REPLAY_OPTION, NULL, 0, "Starts recording replay countdown at game beginning.  Use this in conjunction with '--start-level' to start recording a given level.  This can be done in-game by the ALT+F7 key binding.", 0},
-  {"simulate-replay", SIMULATE_REPLAY_OPTION, "FILE", 0, "Add replay FILE to the chain of replays to simulate and check for completion and validity.  Replay files should be explicitly specified in the appropriate order, one for each instance of this option.  For each replay in the chain a simulation summary is printed.  In case there is any invalid sequent pairs in the chain, their incompatible options are printed between their simulation summaries.  For any complete replay summary, its 'final' field lists arguments intended to be used for continuing the game from where its respective replay ends.  If the entire chain of replays is complete and all sequent pairs valid, MININIM exits with status zero (non-zero otherwise).", 0},
-  {"replay-info", REPLAY_INFO_OPTION, "FILE", 0, "Print information about replay FILE and exit.  The 'initial' field lists arguments intended to be used for recording another replay file with the same initial conditions.", 0},
-  {"simulation-rendering", SIMULATION_RENDERING_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable simulation rendering while simulating replay chains.  When enabled, this allows the user to see and hear what's going on inside a simulation.  It's specially useful when used with '--simulation-period'.  Notice that simulation rendering makes replay simulation orders of magnitude slower (even for a null simulation period), and thus should not be used for batch processing of replay chains.  If enabled, audio and rendering-related options are all honored as long as they are specified after '--simulate-replay' option.  The default is FALSE.", 0},
-  {"simulation-period", SIMULATION_PERIOD_OPTION, "F", 0, "Set the simulation period (time to wait between cycles) to F seconds.  Notice that 0.083 corresponds approximatelly to the 12Hz standard time frequency.  The default is 0.  Valid values are floating points ranging from 0 to FLT_MAX.", 0},
+  {"record-replay", RECORD_REPLAY_OPTION, NULL, 0, "Starts recording replay countdown at game beginning.  Use this in conjunction with '--start-level' to start recording a given level.  This can be done in-game using the ALT+F7 key binding.", 0},
+  {"replay-info", REPLAY_INFO_OPTION, NULL, OPTION_NO_USAGE, "Print information about all REPLAY files in replay chain and exit.  The 'initial' field of each replay summary lists arguments intended to be used for recording other replay files with same initial conditions.", 0},
+
+  {NULL, 0, NULL, OPTION_DOC, "\nUnless '--replay-info' is specified, REPLAY files given on command line are added to the replay chain in order to play and check for completion and sequence validity.  The replay chain is sorted by increasing level order before processing.  For each replay in the chain a replay summary is printed.  In case there is any invalid sequent pairs in the chain, their incompatible options are printed between their replay summaries.  For any complete replay summary, its 'final' field lists arguments intended to be used for continuing the game from where its respective replay ends.  If the replay chain is complete and valid, MININIM automatically exits with zero status (non-zero otherwise).  Replay chains can be played in-game using the F7 key binding.  One can use '--time-frequency' and its related key bindings to control the playback speed, in particular use '--time-frequency=0' and '--rendering=NONE' for the fastest batch processing of replays.", 0},
+
+  /* Compatibility */
+  {NULL, 0, NULL, 0, "Compatibility", 0},
+  {"semantics", SEMANTICS_OPTION, "SEMANTICS", 0, "Select semantics.  SEMANTICS determines the meaning and behavior of game elements.  Currently it's used to make legacy level sets which depend on the original semantics finishable.  Valid values for SEMANTICS are: NATIVE and LEGACY.  The default is NATIVE.  ", 0},
+  {"movements", MOVEMENTS_OPTION, "MOVEMENTS", 0, "Select movements.  MOVEMENTS determines the set of movements the kid can perform.  Valid values for MOVEMENTS are: NATIVE and LEGACY.  The default is NATIVE.", 0},
 
   /* Paths */
   {NULL, 0, NULL, 0, "Paths:", 0},
   {"data-path", DATA_PATH_OPTION, "PATH", 0, "Set data path to PATH.  Normally, the data files are looked for in the user data directory, then in the current working directory, then in the resources directory, and finally in the system data directory.  If this option is given, after looking in the user data directory the data files are looked for in PATH.", 0},
-  {"print-paths", PRINT_PATHS_OPTION, NULL, 0, "Print paths and exit.", 0},
+  {"print-paths", PRINT_PATHS_OPTION, NULL, OPTION_NO_USAGE, "Print paths and exit.", 0},
 
   /* Others */
   {NULL, 0, NULL, 0, "Others", 0},
-  {"sound", SOUND_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable sound.  The default is TRUE.  This can be changed in-game by the CTRL+S key binding.", 0},
+  {"sound", SOUND_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable sound.  The default is TRUE.  This can be changed in-game using the CTRL+S key binding.", 0},
   {"skip-title", SKIP_TITLE_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Skip title screen.  The default is FALSE.", 0},
   {"inhibit-screensaver", INHIBIT_SCREENSAVER_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Prevent the system screensaver from starting up.  The default is TRUE.", 0},
-  {"semantics", SEMANTICS_OPTION, "SEMANTICS", 0, "Select semantics.  Valid values for SEMANTICS are: NATIVE and LEGACY.  The default is NATIVE.  A semantics determines in an abstract sense the meaning and behavior of game elements.  Currently it's used to make legacy level sets which depend on the original semantics finishable.", 0},
-  {"movements", MOVEMENTS_OPTION, "MOVEMENTS", 0, "Select movements.  Valid values for MOVEMENTS are: NATIVE and LEGACY.  The default is NATIVE.  This determines the set of movements the kid can perform.", 0},
 
   /* Help */
   {NULL, 0, NULL, 0, "Help:", -1},
   {0},
 };
 
-static const char *doc = "MININIM: The Advanced Prince of Persia Engine (a childhood dream) [" VERSION "]\v\
-Long option names are case sensitive.  Option values are case insensitive.   Both can be partially specified as long as they are kept unambiguous.  BOOLEAN is an integer equating to 0, or any sub-string (including the null string) of 'FALSE', 'OFF' or 'NO' to disable the respective feature, and any other value (even no string at all) to enable it.  For any non-specified option the documented default applies.  Integers can be specified in any of the formats defined by the C language.  Key bindings references are based on the default mapping.\n\n\
+static const char doc[] = "\nMININIM is the Advanced Prince of Persia Engine --- a childhood dream, the free software implementation of Jordan Mechner's masterpiece game, developed from scratch by Bruno Félix Rezende Ribeiro (oitofelix). MININIM is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3, or (at your option) any later version.\n\n"
+  "In addition to being already a complete replacement for the original game with several improvements, MININIM aims to have detailed documentation on all matters concerning the original Prince of Persia world, ranging from its design concepts to the engine's practical use and development. MININIM documentation is free; you can redistribute it and/or modify it under the terms of the GNU FDL (Free Documentation Licence) as published by the FSF --- with no Invariant Sections; either version 1.3, or (at your option) any later version."
+  "\vLong option names are case sensitive.  Option values are case insensitive.   Both can be partially specified as long as they are kept unambiguous.  BOOLEAN is an integer equating to 0, or any sub-string (including the null string) of 'FALSE', 'OFF' or 'NO' to disable the respective feature, and any other value (even no string at all) to enable it.  For any non-specified option the documented default applies.  Numbers may be specified in any of the formats defined by the C language.  Key bindings references are based on the default mapping.\n\n\
 The legacy command line interface present in versions 1.0, 1.3 and 1.4 of the original game is supported for the sake of compatibility with software that use it.  Legacy level and video non-option arguments are honored, while all others are currently ignored silently.  The legacy arguments can't be used by other configuration method besides the command line.";
+
+static char args_doc[] = "\n"
+  "[REPLAY...]\n"
+  "--replay-info [REPLAY...]\n"
+  "--joystick-info\n"
+  "--print-display-modes\n"
+  "--print-paths\n"
+  "--level-module=LEVEL-MODULE --mirror-level=BOOLEAN --convert-levels";
 
 struct argp_child argp_child = { NULL };
 
-static struct argp pre_argp = {options, pre_parser, NULL, NULL, &argp_child, NULL, NULL};
-static struct argp argp = {options, parser, NULL, NULL, &argp_child, NULL, NULL};
+static struct argp pre_argp = {options, pre_parser, args_doc, doc,
+                               &argp_child, NULL, NULL};
+static struct argp argp = {options, parser, args_doc, doc,
+                           &argp_child, NULL, NULL};
 
 static char *
 key_to_option_name (int key, struct argp_state *state)
@@ -308,10 +320,12 @@ option_enum_value_error (int key, char *arg, struct argp_state *state,
 
   char *error_template = "%s'%s' %s '%s' argument %i.\n%s %s.";
   if (config_info->type == CI_CONFIGURATION_FILE
-      && state->flags & ARGP_SILENT)
+      && state->flags & ARGP_SILENT) {
     al_append_native_text_log (config_info->textlog, error_template,
                                config_file_prefix, arg, msg, option_name,
                                number, msg2, valid_values);
+    al_append_native_text_log (config_info->textlog, "\n");
+  }
   else argp_error (state, error_template,
                    config_file_prefix, arg, msg, option_name,
                    number, msg2, valid_values);
@@ -354,10 +368,12 @@ option_arg_error (int key, char *arg, struct argp_state *state, int number, char
   char *error_template = "%s'%s' %s '%s'%s.\n%s";
 
   if (config_info->type == CI_CONFIGURATION_FILE
-      && state->flags & ARGP_SILENT)
+      && state->flags & ARGP_SILENT) {
     al_append_native_text_log (config_info->textlog, error_template,
                                config_file_prefix, arg, msg, option_name,
                                argument_msg, estr);
+    al_append_native_text_log (config_info->textlog, "\n");
+  }
   else argp_error (state, error_template,
                    config_file_prefix, arg, msg, option_name,
                    argument_msg, estr);
@@ -618,6 +634,8 @@ parser (int key, char *arg, struct argp_state *state)
 
   char *movements_enum[] = {"NATIVE", "LEGACY", NULL};
 
+  char *rendering_enum[] = {"BOTH", "VIDEO", "AUDIO", "NONE", NULL};
+
   struct int_range total_lives_range = {1, 10};
   struct int_range start_level_range = {0, INT_MAX};
   struct int_range start_pos_room_range = {1, INT_MAX};
@@ -625,7 +643,7 @@ parser (int key, char *arg, struct argp_state *state)
   struct int_range start_pos_place_range = {0, 9};
   struct int_range time_limit_range = {1, INT_MAX};
   struct int_range start_time_range = {0, INT_MAX};
-  struct int_range time_frequency_range = {INT_MIN, INT_MAX};
+  struct int_range time_frequency_range = {0, UNLIMITED_HZ};
   struct int_range kca_range = {0, 100};
   struct int_range kcd_range = {0, 100};
   struct int_range window_position_range = {INT_MIN, INT_MAX};
@@ -636,7 +654,6 @@ parser (int key, char *arg, struct argp_state *state)
   struct int_range joystick_axis_range = {0, INT_MAX};
   struct int_range joystick_button_range = {0, INT_MAX};
   struct int_range display_mode_range = {-1, al_get_num_display_modes () - 1};
-  struct float_range simulation_period_range = {0.0,FLT_MAX};
 
   switch (key) {
   case IGNORE_MAIN_CONFIG_OPTION:
@@ -952,47 +969,35 @@ Levels have been converted using module %s into native format at\n\
     case 1: movements = LEGACY_MOVEMENTS; break;
     }
     break;
-  case REPLAY_OPTION:
-    command_line_load_replay (&replay, arg);
-    skip_title = true;
-    break;
   case RECORD_REPLAY_OPTION:
     level_start_replay_mode = NO_REPLAY;
     next_level = -1;
     skip_title = false;
     prepare_for_recording_replay ();
     break;
-  case SIMULATE_REPLAY_OPTION:
-    replay_chain = xrealloc (replay_chain, ++replay_chain_nmemb
-                             * sizeof (* replay_chain));
-    if (! load_replay (&replay_chain[replay_chain_nmemb - 1], arg))
-      error (-1, 0, "failed to load replay '%s'", arg);
-    level_start_replay_mode = PLAY_REPLAY;
-    simulation = true;
-    mr.fit_w = 1;
-    mr.fit_h = 1;
-    mr.fit_mode = MR_FIT_NONE;
-    break;
   case REPLAY_INFO_OPTION:
-    if (! load_replay (&replay, arg))
-      error (-1, 0, "failed to load replay '%s'", arg);
-    HLINE;
-    print_replay_info (&replay);
-    HLINE;
-    exit (0);
+    replay_info = true;
     break;
-  case SIMULATION_RENDERING_OPTION:
-    simulation_rendering = optval_to_bool (arg);
-    break;
-  case SIMULATION_PERIOD_OPTION:
-    e = optval_to_float (&float_val, key, arg, state,
-                         &simulation_period_range, 0);
+  case RENDERING_OPTION:
+    e = optval_to_enum (&i, key, arg, state, rendering_enum, 0);
     if (e) return e;
-    simulation_period = float_val;
+    switch (i) {
+    case 0: rendering = BOTH_RENDERING; break;
+    case 1: rendering = VIDEO_RENDERING; break;
+    case 2: rendering = AUDIO_RENDERING; break;
+    case 3: rendering = NONE_RENDERING; break;
+    }
     break;
   case ARGP_KEY_ARG:
+    if (add_replay_file_to_replay_chain (arg)) {
+      command_line_replay = true;
+      skip_title = true;
+      prepare_for_playing_replay (0);
+      break;
+    }
+
     /* cheat */
-    if (! strcasecmp ("MEGAHIT", arg)) break;
+    else if (! strcasecmp ("MEGAHIT", arg)) break;
     else if (! strcasecmp ("IMPROVED", arg)) break;
     else if (sscanf (arg, "%i", &i) == 1
              && i >= 1 && i <= INT_MAX) start_level = i;
@@ -1030,7 +1035,12 @@ Levels have been converted using module %s into native format at\n\
     else if (! strcasecmp ("DEMO", arg)) break;
     else if (! strcasecmp ("J", arg)) break;
 
-    else return ARGP_ERR_UNKNOWN;
+    else {
+      argp_error (state, "unrecognized non-option argument '%s'.\n"
+                  "That's not a valid replay file.\n"
+                  "That's not a legacy argument.", arg);
+      return ARGP_ERR_UNKNOWN;
+    }
     break;
   default:
     return ARGP_ERR_UNKNOWN;
@@ -1050,7 +1060,6 @@ version (FILE *stream, struct argp_state *state)
   fprintf (stream,
            "%s (%s) %s\n\n"	/* mininim (MININIM) a.b */
 
-           /* TRANSLATORS: Use "Félix" in place of "Fe'lix" */
            "Copyright (C) %s " PACKAGE_COPYRIGHT_HOLDER " <%s>\n\n"
 
            "%s\n\n" /* License GPLv3+... */
@@ -1063,8 +1072,7 @@ License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\n\
 This is free software: you are free to change and redistribute it.\n\
 There is NO WARRANTY, to the extent permitted by law.",
 
-           /* TRANSLATORS: Use "Félix" in place of "F'elix" */
-           "Written by Bruno Fe'lix Rezende Ribeiro.",
+           "Written by Bruno Félix Rezende Ribeiro.",
            allegro_major, allegro_minor, allegro_revision, allegro_release);
 }
 
@@ -1195,8 +1203,6 @@ main (int _argc, char **_argv)
   /* exit (0); */
 
   argp_program_version_hook = version;
-  argp.doc = doc;
-  pre_argp.doc = doc;
 
   /* pre parser */
   config_info.type = CI_COMMAND_LINE;
@@ -1215,6 +1221,13 @@ main (int _argc, char **_argv)
   config_info.type = CI_COMMAND_LINE;
   argp_parse (&argp, argc, argv, 0, NULL, &config_info);
 
+  if (replay_info) {
+    if (replay_chain_nmemb == 0)
+      error (-1, 0, "empty replay chain");
+    print_replay_chain_info ();
+    exit (0);
+  }
+
   init_video ();
   init_audio ();
   if (sound_disabled_cmd) enable_audio (false);
@@ -1232,7 +1245,8 @@ main (int _argc, char **_argv)
   event_queue = create_event_queue ();
   al_register_event_source (event_queue, get_display_event_source (display));
 
-  load_callback = draw_loading_screen;
+  load_callback = process_display_events;
+  show ();
 
   load_audio_data ();
   load_level ();
@@ -1249,11 +1263,7 @@ main (int _argc, char **_argv)
 
   give_dat_compat_preference ();
 
-  if (simulation && level_start_replay_mode == PLAY_REPLAY) {
-    draw_simulating_screen ();
-    return check_replay_chain_completion_and_validity () ? 0 : -1;
-  }
-  else if (skip_title) goto play_game;
+  if (skip_title) goto play_game;
 
  restart_game:
   cutscene = true;
@@ -1280,13 +1290,15 @@ main (int _argc, char **_argv)
 
   int min_legacy_level_bkp = min_legacy_level;
   int max_legacy_level_bkp = max_legacy_level;
+  free_replay_chain ();
   struct replay *replay_ptr =
     load_resource ("data/replays/title.mrp", (load_resource_f) xload_replay);
   if (replay_ptr) {
-    min_legacy_level = min_int (min_legacy_level, replay.start_level);
-    max_legacy_level = max_int (max_legacy_level, replay.start_level);
     level_start_replay_mode = PLAY_REPLAY;
-    if (! next_legacy_level (&vanilla_level, replay.start_level))
+    struct replay *replay = get_replay ();
+    min_legacy_level = min_int (min_legacy_level, replay->start_level);
+    max_legacy_level = max_int (max_legacy_level, replay->start_level);
+    if (! next_legacy_level (&vanilla_level, replay->start_level))
       exit (-1);
     title_demo = true;
     play_level (&vanilla_level);
@@ -1334,8 +1346,7 @@ quit_game (void)
   finalize_dialog ();
   finalize_mouse ();
 
-  if (! simulation)
-    fprintf (stderr, "MININIM: Hope you enjoyed it!\n");
+  fprintf (stderr, "MININIM: Hope you enjoyed it!\n");
 
   exit (0);
 }
@@ -1348,43 +1359,6 @@ give_dat_compat_preference (void)
     level_module = DAT_LEVEL_MODULE;
     levels_dat_filename = levels_dat_compat_filename;
   }
-}
-
-void
-draw_loading_screen (void)
-{
-  static bool first_time = true;
-  if (first_time) draw_logo_screen ("Loading...");
-  process_display_events (NULL);
-  first_time = false;
-}
-
-void
-draw_simulating_screen (void)
-{
-  draw_logo_screen ("Simulating...");
-}
-
-void
-draw_logo_screen (char *text)
-{
-  int x = 138;
-  int y = 40;
-  int w = al_get_bitmap_width (icon);
-  int h = al_get_bitmap_height (icon);
-  ALLEGRO_BITMAP *screen = mr.cell[0][0].screen;
-  clear_bitmap (screen, BLACK);
-  draw_filled_rectangle (screen, x - 1, y - 1, x + w, y + h, WHITE);
-  draw_bitmap (icon, screen, x, y, 0);
-  draw_text (screen, text, CUTSCENE_WIDTH / 2.0, CUTSCENE_HEIGHT / 2.0,
-             ALLEGRO_ALIGN_CENTRE);
-  al_draw_filled_rectangle (0, CUTSCENE_HEIGHT - 8,
-                            CUTSCENE_WIDTH, CUTSCENE_HEIGHT,
-                            BLUE);
-  draw_text (screen, "MININIM " VERSION, CUTSCENE_WIDTH / 2.0,
-             CUTSCENE_HEIGHT - 7,
-             ALLEGRO_ALIGN_CENTRE);
-  show ();
 }
 
 static void
@@ -1483,35 +1457,25 @@ dialog_thread (ALLEGRO_THREAD *thread, void *arg)
                                d->patterns, d->mode);
   al_show_native_file_dialog (display, dialog);
 
-  char *filename = NULL;
-  if (al_get_native_file_dialog_count (dialog)) {
-    filename = (char *) al_get_native_file_dialog_path (dialog, 0);
-    xasprintf (&filename, "%s", filename);
-  }
-
-  al_destroy_native_file_dialog (dialog);
   al_set_thread_should_stop (thread);
 
   if (is_fullscreen ()) hide_mouse_cursor ();
   else show_mouse_cursor ();
 
-  return filename;
+  return dialog;
 }
 
-ALLEGRO_TEXTLOG *
-load_config (char *filename)
+bool
+load_config (char *filename, ALLEGRO_TEXTLOG *textlog, int priority)
 {
   char **cargv = NULL;
   size_t cargc = 0;
   struct config_info config_info;
 
-  ALLEGRO_TEXTLOG *textlog =
-    open_native_text_log ("Configuration loading results",
-                          ALLEGRO_TEXTLOG_MONOSPACE);
-
-  al_append_native_text_log (textlog, "Loading %s...\n", filename);
-
-  get_config_args (&cargc, &cargv, options, filename);
+  if (get_config_args (&cargc, &cargv, options, filename)) {
+    al_append_native_text_log (textlog, "cannot load configuration file '%s'\n");
+    return false;
+  }
 
   config_info.type = CI_CONFIGURATION_FILE;
   config_info.filename = filename;
@@ -1530,20 +1494,11 @@ load_config (char *filename)
 
   destroy_array ((void **) &cargv, &cargc);
 
-  char *error_str;
-  if (! parse_error) {
-    al_close_native_text_log (textlog);
-    textlog = NULL;
-    error_str = "CONFIGURATION LOADED SUCCESSFULLY";
-  } else error_str = "CONFIGURATION LOADED WITH ERRORS";
-
-  draw_bottom_text (NULL, error_str, 0);
-
-  return textlog;
+  return ! parse_error;
 }
 
-void
-save_game (char *filename)
+bool
+save_game (char *filename, int priority)
 {
   ALLEGRO_CONFIG *config = create_config ();
   char *start_level_str, *start_time_str, *time_limit_str,
@@ -1564,11 +1519,13 @@ save_game (char *filename)
   al_set_config_value (config, NULL, "kca", kca_str);
   al_set_config_value (config, NULL, "kcd", kcd_str);
 
-  char *error_str = al_save_config_file (filename, config)
+  bool success = al_save_config_file (filename, config);
+
+  char *error_str = success
     ? "GAME HAS BEEN SAVED"
     : "GAME SAVING FAILED";
 
-  draw_bottom_text (NULL, error_str, 0);
+  draw_bottom_text (NULL, error_str, priority);
 
   al_destroy_config (config);
   al_free (start_level_str);
@@ -1577,6 +1534,105 @@ save_game (char *filename)
   al_free (total_lives_str);
   al_free (kca_str);
   al_free (kcd_str);
+
+  return success;
+}
+
+void
+handle_load_config_thread (int priority)
+{
+  if (! load_config_dialog_thread
+      || ! al_get_thread_should_stop (load_config_dialog_thread))
+    return;
+
+  ALLEGRO_FILECHOOSER *dialog;
+  al_join_thread (load_config_dialog_thread, (void *) &dialog);
+  al_destroy_thread (load_config_dialog_thread);
+  load_config_dialog_thread = NULL;
+  size_t i;
+  size_t n = al_get_native_file_dialog_count (dialog);
+  ALLEGRO_TEXTLOG *textlog = NULL;
+
+  if (n > 0) {
+    textlog =
+      open_native_text_log ("Configuration loading results",
+                            ALLEGRO_TEXTLOG_MONOSPACE);
+
+    bool success = true;
+    for (i = 0; i < n; i++) {
+      char *filename = (char *) al_get_native_file_dialog_path (dialog, i);
+      if (! load_config (filename, textlog, priority))
+        success = false;
+    }
+
+    char *error_str;
+    if (success) {
+      al_close_native_text_log (textlog);
+      error_str = "CONFIGURATION LOADED SUCCESSFULLY";
+    } else {
+      al_register_event_source
+        (event_queue, get_native_text_log_event_source (textlog));
+      error_str = "CONFIGURATION LOADED WITH ERRORS";
+    }
+
+    draw_bottom_text (NULL, error_str, priority);
+
+    al_free (load_config_dialog.initial_path);
+    xasprintf (&load_config_dialog.initial_path, "%s",
+               al_get_native_file_dialog_path (dialog, n - 1));
+  }
+
+  al_destroy_native_file_dialog (dialog);
+}
+
+void
+handle_save_game_thread (int priority)
+{
+  if (! save_game_dialog_thread
+      || ! al_get_thread_should_stop (save_game_dialog_thread))
+    return;
+
+  ALLEGRO_FILECHOOSER *dialog;
+  al_join_thread (save_game_dialog_thread, (void *) &dialog);
+  al_destroy_thread (save_game_dialog_thread);
+  save_game_dialog_thread = NULL;
+  char *filename = al_get_native_file_dialog_count (dialog) > 0
+    ? (char *) al_get_native_file_dialog_path (dialog, 0)
+    : NULL;
+  if (filename) {
+    save_game (filename, priority);
+    al_free (save_game_dialog.initial_path);
+    xasprintf (&save_game_dialog.initial_path, "%s", filename);
+  }
+  al_destroy_native_file_dialog (dialog);
+  pause_animation (false);
+}
+
+void
+handle_save_picture_thread (int priority)
+{
+  if (! save_picture_dialog_thread
+      || ! al_get_thread_should_stop (save_picture_dialog_thread))
+    return;
+
+  ALLEGRO_FILECHOOSER *dialog;
+  al_join_thread (save_picture_dialog_thread, (void *) &dialog);
+  al_destroy_thread (save_picture_dialog_thread);
+  save_picture_dialog_thread = NULL;
+  char *filename = al_get_native_file_dialog_count (dialog) > 0
+    ? (char *) al_get_native_file_dialog_path (dialog, 0)
+    : NULL;
+  if (filename) {
+    char *error_str = al_save_bitmap
+      (filename, al_get_backbuffer (display))
+      ? "PICTURE HAS BEEN SAVED"
+      : "PICTURE SAVING FAILED";
+    draw_bottom_text (NULL, error_str, priority);
+    al_free (save_picture_dialog.initial_path);
+    xasprintf (&save_picture_dialog.initial_path, "%s", filename);
+  }
+  al_destroy_native_file_dialog (dialog);
+  pause_animation (false);
 }
 
 int
@@ -1594,9 +1650,7 @@ min_int (int a, int b)
 int
 cint (int *x, int *y)
 {
-  if (*x < *y) return -1;
-  else if (*x > *y) return 1;
-  else return 0;
+  return *x - *y;
 }
 
 unsigned char

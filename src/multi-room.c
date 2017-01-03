@@ -573,7 +573,7 @@ mr_update_last_settings (void)
   mr.last.display_height = al_get_display_height (display);
 
   mr.full_update = false;
-  if (mr.busy) {
+  if (mr.busy && ! is_dedicatedly_replaying ()) {
     mr.busy = false;
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
   }
@@ -1068,6 +1068,12 @@ apply_mr_fit_mode (void)
   int w, h;
 
   mr_busy ();
+
+  if (rendering == NONE_RENDERING || rendering == AUDIO_RENDERING) {
+    mr.fit_w = 1;
+    mr.fit_h = 1;
+    mr.fit_mode = MR_FIT_NONE;
+  }
 
   switch (mr.fit_mode) {
   case MR_FIT_NONE:

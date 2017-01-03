@@ -117,8 +117,7 @@ load_audio (struct audio_source *as, enum audio_type audio_type,
 union audio_instance_data
 play_audio (struct audio_source *as, struct pos *p, int anim_id)
 {
-  /* on simulation, do nothing */
-  if (simulation && ! simulation_rendering)
+  if (rendering == NONE_RENDERING || rendering == VIDEO_RENDERING)
     return (union audio_instance_data) {NULL};
 
   /* do nothing if the same sample has been played in a near cycle */

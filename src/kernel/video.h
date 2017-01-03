@@ -60,7 +60,7 @@ bool is_video_effect_started (void);
 void show (void);
 void flip_display (ALLEGRO_BITMAP *bitmap);
 bool is_fullscreen (void);
-void process_display_events (void (*draw_callback) (void));
+void process_display_events (void);
 void get_display_mode (int index, ALLEGRO_DISPLAY_MODE *mode);
 
 /* palette */
@@ -89,6 +89,8 @@ void push_reset_clipping_rectangle (ALLEGRO_BITMAP *bitmap);
 bool merge_clipping_rectangle (ALLEGRO_BITMAP *bitmap, int x, int y,
                                int w, int h);
 void pop_clipping_rectangle (void);
+void draw_logo (ALLEGRO_BITMAP *bitmap, char *text);
+void draw_replaying (ALLEGRO_BITMAP *bitmap);
 
 /* variables */
 extern bool force_full_redraw;

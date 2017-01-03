@@ -152,11 +152,13 @@ legacy_level_special_events (void)
 
   /* title demo */
   if (title_demo) {
+    struct replay *replay = get_replay ();
+
     if (key.keyboard.keycode || button != -1) {
       stop_replaying (0);
       quit_anim = CUTSCENE_KEY_PRESS;
       return;
-    } else if (anim_cycle >= replay.packed_gamepad_state_nmemb + 108) {
+    } else if (anim_cycle >= replay->packed_gamepad_state_nmemb + 108) {
       stop_replaying (0);
       quit_anim = CUTSCENE_END;
       return;
@@ -551,7 +553,8 @@ legacy_level_special_events (void)
          kid are in fight mode, the shadow's movements mirror the
          kid's */
       else if (ks->type == KID) {
-        replay_gamepad_update (ks, &replay, anim_cycle);
+        struct replay *replay = get_replay ();
+        replay_gamepad_update (ks, replay, anim_cycle);
         bool l = ks->key.left;
         bool r = ks->key.right;
         ks->key.left = r;
