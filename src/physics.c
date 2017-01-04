@@ -997,6 +997,22 @@ is_immediately_accessible_pos (struct pos *to, struct pos *from,
     return ! is_collidable_at_right (from, f)
       && ! is_collidable_at_left (to, f);
 
+  if (peqr (to, from, +1, +0))
+    return is_strictly_traversable (from);
+
+  struct pos from_b;
+  prel (from, &from_b, +1, +0);
+
+  if (peqr (to, from, +1, -1))
+    return is_strictly_traversable (from)
+      && ! is_collidable_at_left (&from_b, f)
+      && ! is_collidable_at_right (to, f);
+
+  if (peqr (to, from, +1, +1))
+    return is_strictly_traversable (from)
+      && ! is_collidable_at_right (&from_b, f)
+      && ! is_collidable_at_left (to, f);
+
   return false;
 }
 
@@ -1040,7 +1056,7 @@ uncollide (struct frame *f, struct frame_offset *fo, coord_f cf,
     next_frame (f, &nf2, &nfo2);
     frame2room (&nf2, f->c.room, &nf2.c);
     inc = nf2.c.x > nf.c.x ? +1 : -1;
-  } else if (p.place > op.place){
+  } else if (p.place > op.place) {
     inc_pos = +1;
     struct frame nf2;
     struct frame_offset nfo2 = *fo;
@@ -1060,7 +1076,8 @@ uncollide (struct frame *f, struct frame_offset *fo, coord_f cf,
     next_frame (f, &nf, &nfo);
     frame2room (&nf, f->c.room, &nf.c);
     surveyo (cf, dx, +0, pos, &nf, NULL, &p, NULL);
-    p.floor = op.floor;
+    /* p.floor = op.floor; */
+    op.floor = p.floor;
     if (peqr (&pp, &p, +0, inc_pos)
         && ! is_immediately_accessible_pos (&pp, &p, &nf)) {
       if (inc_pos == -1) {

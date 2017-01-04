@@ -361,6 +361,7 @@ start_recording_replay (int priority)
     level_start_replay_mode = RECORD_REPLAY;
     quit_anim = RESTART_LEVEL;
     recording_replay_countdown = -1;
+    draw_bottom_text (NULL, NULL, priority);
   }
 }
 

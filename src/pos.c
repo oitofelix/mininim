@@ -796,8 +796,8 @@ place_frame (struct frame *f, struct frame *nf, ALLEGRO_BITMAP *b,
   pos2room (p, f->c.room, &pv);
   nf->b = b;
   new_coord (&nf->c, pv.l, pv.room,
-             PLACE_WIDTH * pv.place + dx,
-             PLACE_HEIGHT * pv.floor + dy);
+             dx == MIGNORE ? f->c.x : PLACE_WIDTH * pv.place + dx,
+             dy == MIGNORE ? f->c.y : PLACE_HEIGHT * pv.floor + dy);
   return nf;
 }
 

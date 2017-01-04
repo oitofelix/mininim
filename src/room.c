@@ -589,11 +589,13 @@ draw_room_anim_fg_sub (ALLEGRO_BITMAP *bitmap,
 
   /* FALLING */
   if (is_anim_fall (f)) {
+    int dy = is_fake (&ptr2) ? 56 : 49;
+
     push_clipping_rectangle (bitmap,
                              PLACE_WIDTH * ptr2.place,
-                             PLACE_HEIGHT * ptr2.floor + 56,
+                             PLACE_HEIGHT * ptr2.floor + dy,
                              PLACE_WIDTH + 16,
-                             PLACE_HEIGHT - 53);
+                             PLACE_HEIGHT - dy + 3);
 
     push_drawn_rectangle (bitmap);
 

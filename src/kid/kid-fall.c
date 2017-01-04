@@ -97,10 +97,6 @@ flow (struct anim *k)
 static bool
 physics_in (struct anim *k)
 {
-  struct pos pbb, pbf, pmt, npmbo, npmbo_nf;
-  struct frame nf;
-  struct frame_offset fo;
-
   bool hang_back = ((k->f.dir == LEFT) ? k->key.right : k->key.left)
     && ! k->key.up && k->key.shift
     && (k->i < 9 || k->float_timer)
@@ -109,9 +105,6 @@ physics_in (struct anim *k)
   bool hang_front = k->key.shift && ! hang_back
     && (k->i < 9 || k->float_timer)
     && k->current_lives > 0;
-
-  survey (_bf, pos, &k->f, NULL, &pbf, NULL);
-  survey (_bb, pos, &k->f, NULL, &pbb, NULL);
 
   if (k->oaction == kid_jump
       && (k->j == 10 || k->j == 11)) {
@@ -159,7 +152,7 @@ physics_in (struct anim *k)
 
   /* printf ("inertia: %i\n", k->inertia); */
 
-  /* collision */
+  /* /\* collision *\/ */
   uncollide (&k->f, &k->fo, _bf, -8, +0, &k->fo, NULL);
   uncollide (&k->f, &k->fo, _tf, -8, +0, &k->fo, NULL);
 
@@ -185,6 +178,8 @@ physics_in (struct anim *k)
   }
 
   /* land on ground */
+  struct frame_offset fo;
+
   fo.b = kid_fall_frameset[k->i > 4 ? 4 : k->i].frame;
   fo.dx = kid_fall_frameset[k->i > 4 ? 4 : k->i].dx;
   fo.dy = kid_fall_frameset[k->i > 4 ? 4 : k->i].dy;
@@ -199,13 +194,22 @@ physics_in (struct anim *k)
     fo.dy += 8;
   }
 
-  survey (_mbo, pos, &k->f, NULL, NULL, &npmbo);
+  struct pos pbf, pbf_nf, pmbo, pmbo_nf, pmt;
+  struct frame nf;
+  surveyo (_bf, -8, +0, pos, &k->f, NULL, &pbf, NULL);
+  surveyo (_mbo, +0, -8, pos, &k->f, NULL, &pmbo, NULL);
   next_frame (&k->f, &nf, &fo);
-  survey (_mbo, pos, &nf, NULL, NULL, &npmbo_nf);
+  surveyo (_bf, -8, +0, pos, &nf, NULL, &pbf_nf, NULL);
+  surveyo (_mbo, +0, -8, pos, &nf, NULL, &pmbo_nf, NULL);
+
+  if (! is_immediately_accessible_pos (&pbf_nf, &pbf, &k->f)) {
+    k->fo.dx = 0;
+    k->inertia = k->cinertia = 0;
+  }
 
   if (k->i > 1 &&
-      ! is_strictly_traversable (&npmbo)
-      && npmbo.floor != npmbo_nf.floor) {
+      ! is_strictly_traversable (&pmbo)
+      && pmbo.floor != pmbo_nf.floor) {
     k->inertia = k->cinertia = 0;
 
     survey (_bf, pos, &k->f, NULL, &pbf, NULL);

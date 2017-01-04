@@ -176,8 +176,11 @@ kid_die_suddenly (struct anim *k)
 
   if (k->oaction != kid_die_suddenly) {
     place_frame (&k->f, &k->f, kid_die_05,
-                 &k->p, (k->f.dir == LEFT)
-                 ? +9 : +4, +47);
+                 &k->p, MIGNORE, +47);
+
+    k->f.c.x += k->f.dir == LEFT ? -4 : 0;
+
+    survey (_m, pos, &k->f, NULL, &k->p, NULL);
 
     kill_kid_shadows (k);
   }

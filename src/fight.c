@@ -216,6 +216,10 @@ fight_ai (struct anim *k)
       && ke->current_lives > 0
       && ! is_kid_fall (&ke->f)
       && ! is_kid_hang (&ke->f)
+      && ! ((is_kid_jump (&ke->f)
+             || is_kid_run_jump (&ke->f))
+            && strictly_traversable_cs
+            (fight_crel (ke, _m, +0, +0)))
       && is_safe_to_attack (ke)) {
     if (ke->has_sword) {
       place_on_the_ground (&ke->f, &ke->f.c);
@@ -248,7 +252,7 @@ fight_ai (struct anim *k)
   }
 
   /* if too near to a wall, back off to have room for an attack */
-  if (fight_crel (k, +0, +1) == WALL
+  if (fight_crel (k, _m, +0, +1) == WALL
       && is_safe_to_walkb (k)) {
     fight_walkb (k);
     return;
@@ -518,14 +522,14 @@ is_in_range (struct anim *k0, struct anim *k1, int r)
 }
 
 enum confg
-fight_crel (struct anim *k, int floor, int place)
+fight_crel (struct anim *k, coord_f cf, int floor, int place)
 {
-  struct pos pm;
-  survey (_m, pos, &k->f, NULL, &pm, NULL);
+  struct pos p;
+  survey (cf, pos, &k->f, NULL, &p, NULL);
 
   /* place sign indicates direction in relation to k orientation */
   int dir = (k->f.dir == LEFT) ? -1 : +1;
-  return fg_rel (&pm, floor, dir * place);
+  return fg_rel (&p, floor, dir * place);
 }
 
 int

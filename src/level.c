@@ -868,24 +868,6 @@ process_keys (void)
               && was_key_pressed (ALLEGRO_KEY_U, 0, ALLEGRO_KEYMOD_ALT, true))))
     mr_view_page_trans (BELOW);
 
-  /* ESC: pause game */
-  if (step_one_cycle) {
-    step_one_cycle = false;
-    game_paused = true;
-  }
-
-  if (was_key_pressed (ALLEGRO_KEY_ESCAPE, 0, 0, true)
-      || was_button_pressed (joystick_pause_button, true)) {
-    if (is_game_paused ()) {
-      step_one_cycle = true;
-      game_paused = false;
-    } else pause_game (true);
-  } else if (is_game_paused ()
-             && (! active_menu || ! was_menu_key_pressed ())
-             && (key.keyboard.keycode || button != -1)
-             && ! save_game_dialog_thread)
-    pause_game (false);
-
   /* R: resurrect kid */
   if (! active_menu
       && was_key_pressed (ALLEGRO_KEY_R, 0, 0, true)) {
@@ -1112,6 +1094,24 @@ process_keys (void)
     al_start_thread (save_game_dialog_thread);
     pause_animation (true);
   }
+
+  /* ESC: pause game */
+  if (step_one_cycle) {
+    step_one_cycle = false;
+    game_paused = true;
+  }
+
+  if (was_key_pressed (ALLEGRO_KEY_ESCAPE, 0, 0, true)
+      || was_button_pressed (joystick_pause_button, true)) {
+    if (is_game_paused ()) {
+      step_one_cycle = true;
+      game_paused = false;
+    } else pause_game (true);
+  } else if (is_game_paused ()
+             && (! active_menu || ! was_menu_key_pressed ())
+             && (key.keyboard.keycode || button != -1)
+             && ! save_game_dialog_thread)
+    pause_game (false);
 }
 
 static void

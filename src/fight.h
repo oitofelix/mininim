@@ -64,7 +64,7 @@ void fight_attack (struct anim *k);
 void fight_walkf (struct anim *k);
 void fight_walkb (struct anim *k);
 void fight_hit (struct anim *k, struct anim *ke);
-enum confg fight_crel (struct anim *k, int floor, int place);
+enum confg fight_crel (struct anim *k, coord_f cf, int floor, int place);
 void backoff_from_range (struct anim *k0, struct anim *k1, int r,
                          bool only_k1, bool k1_dominant);
 void get_in_range (struct anim *k0, struct anim *k1, int r,
