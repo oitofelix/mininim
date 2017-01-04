@@ -260,7 +260,6 @@ play_level (struct level *lv)
     replay->final_total_lives = k->total_lives;
     replay->final_kca = k->skill.counter_attack_prob + 1;
     replay->final_kcd = k->skill.counter_defense_prob + 1;
-    level_cleanup ();
     break;
   case REPLAY_INCOMPLETE:
     replay->complete = false;
@@ -269,7 +268,6 @@ play_level (struct level *lv)
     replay->final_total_lives = k->total_lives;
     replay->final_kca = k->skill.counter_attack_prob + 1;
     replay->final_kcd = k->skill.counter_defense_prob + 1;
-    level_cleanup ();
     break;
   case REPLAY_COMPLETE:
     replay->complete = true;
@@ -277,7 +275,8 @@ play_level (struct level *lv)
     replay->final_total_lives = k->total_lives;
     replay->final_kca = k->skill.counter_attack_prob + 1;
     replay->final_kcd = k->skill.counter_defense_prob + 1;
-    level_cleanup ();
+    total_lives = k->total_lives;
+    skill = k->skill;
     break;
   case RESTART_LEVEL:
   restart_level:
@@ -287,14 +286,6 @@ play_level (struct level *lv)
    goto start;
   case NEXT_LEVEL:
   next_level:
-    /* the kid must keep the total lives and skills obtained for the
-       next level */
-    if (next_level > global_level.n) {
-      total_lives = k->total_lives;
-      current_lives = k->current_lives;
-      skill = k->skill;
-    }
-
     level_cleanup ();
     if (global_level.next_level)
       global_level.next_level (lv, next_level);
@@ -346,11 +337,19 @@ play_level (struct level *lv)
       int status = complete_replay_chain && valid_replay_chain
         ? 0 : 1;
       stop_replaying (1);
-      if (command_line_replay) exit (status);
-    } else
-      prepare_for_playing_replay (replay_index + 1);
 
-    goto next_level;
+      if (command_line_replay) exit (status);
+
+      switch (quit_anim) {
+      case REPLAY_OUT_OF_TIME: goto restart_game;
+      case REPLAY_INCOMPLETE: goto restart_level;
+      case REPLAY_COMPLETE: goto next_level;
+      default: assert (0); break;
+      }
+    } else {
+      prepare_for_playing_replay (replay_index + 1);
+      goto next_level;
+    }
   }
 }
 

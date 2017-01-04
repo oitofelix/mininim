@@ -678,6 +678,9 @@ legacy_level_end (struct pos *p)
   if (level_end_wait > 0) level_end_wait--;
 
   if (level_end_wait == 0) {
+    total_lives = k->total_lives;
+    current_lives = k->current_lives;
+    skill = k->skill;
     next_level = global_level.n + 1;
     quit_anim = NEXT_LEVEL;
   }

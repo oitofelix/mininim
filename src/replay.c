@@ -174,12 +174,13 @@ save_replay (char *filename, struct replay *replay)
 
   /* remove trailing null gamepad states */
   uint64_t *i = &replay->packed_gamepad_state_nmemb;
-  while (replay->packed_gamepad_state[*i - 1] == 0) (*i)--;
+  while (*i > 0 && replay->packed_gamepad_state[*i - 1] == 0)
+    (*i)--;
 
   /* packed gamepad state */
-  if (al_fwrite (f, replay->packed_gamepad_state,
-                 replay->packed_gamepad_state_nmemb)
-      != replay->packed_gamepad_state_nmemb) return false;
+  if (*i > 0
+      && al_fwrite (f, replay->packed_gamepad_state, *i) != *i)
+    return false;
 
   al_fclose (f);
 
@@ -250,11 +251,13 @@ load_replay (struct replay *replay_ret, char *filename)
   replay.packed_gamepad_state_nmemb = al_fsize (f)
     - (sizeof (REPLAY_FILE_SIGNATURE) + 11 * sizeof (uint32_t));
   if (replay.packed_gamepad_state_nmemb < 0) return NULL;
-  replay.packed_gamepad_state =
-    xmalloc (replay.packed_gamepad_state_nmemb);
-  al_fread (f, replay.packed_gamepad_state,
-            replay.packed_gamepad_state_nmemb);
-  if (al_feof (f) || al_ferror (f)) return NULL;
+  if (replay.packed_gamepad_state_nmemb > 0) {
+    replay.packed_gamepad_state =
+      xmalloc (replay.packed_gamepad_state_nmemb);
+    al_fread (f, replay.packed_gamepad_state,
+              replay.packed_gamepad_state_nmemb);
+    if (al_feof (f) || al_ferror (f)) return NULL;
+  }
 
   /* filename */
   xasprintf (&replay.filename, "%s", filename);
@@ -388,7 +391,7 @@ handle_save_replay_thread (int priority)
     ? (char *) al_get_native_file_dialog_path (dialog, 0)
     : NULL;
   struct replay *replay = &recorded_replay;
-  if (filename) {
+  if (filename && file_overwrite_dialog (filename)) {
     char *error_str = save_replay (filename, replay)
       ? "REPLAY HAS BEEN SAVED"
       : "REPLAY SAVING FAILED";
@@ -648,10 +651,9 @@ update_replay_progress (int *progress_ret)
 
   if (! replay) return false;
 
-  int total = replay->packed_gamepad_state_nmemb
-    + REPLAY_STUCK_THRESHOLD;
+  int total = replay->packed_gamepad_state_nmemb;
 
-  int progress = total ? (anim_cycle * 100) / total : 0;
+  int progress = total ? round ((anim_cycle * 100.0) / total) : 100;
 
   progress = progress > 100 ? 100 : progress;
 

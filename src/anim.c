@@ -70,10 +70,14 @@ play_anim (void (*draw_callback) (void),
         struct replay *replay = get_replay ();
 
         /* detect incomplete replays */
+        struct anim *k;
         if (! title_demo
             && replay_mode == PLAY_REPLAY
-            && anim_cycle >= replay->packed_gamepad_state_nmemb
-            + REPLAY_STUCK_THRESHOLD)
+            && (anim_cycle >= replay->packed_gamepad_state_nmemb
+                + REPLAY_STUCK_THRESHOLD
+                || ((k = get_anim_by_id (current_kid_id))
+                    && k->current_lives <= 0
+                    && death_timer >= SEC2CYC (8))))
           quit_anim = REPLAY_INCOMPLETE;
 
         /* /\* ---- *\/ */

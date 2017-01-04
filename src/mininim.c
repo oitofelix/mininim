@@ -1601,7 +1601,7 @@ handle_save_game_thread (int priority)
   char *filename = al_get_native_file_dialog_count (dialog) > 0
     ? (char *) al_get_native_file_dialog_path (dialog, 0)
     : NULL;
-  if (filename) {
+  if (filename && file_overwrite_dialog (filename)) {
     save_game (filename, priority);
     al_free (save_game_dialog.initial_path);
     xasprintf (&save_game_dialog.initial_path, "%s", filename);
@@ -1624,7 +1624,7 @@ handle_save_picture_thread (int priority)
   char *filename = al_get_native_file_dialog_count (dialog) > 0
     ? (char *) al_get_native_file_dialog_path (dialog, 0)
     : NULL;
-  if (filename) {
+  if (filename && file_overwrite_dialog (filename)) {
     char *error_str = al_save_bitmap
       (filename, al_get_backbuffer (display))
       ? "PICTURE HAS BEEN SAVED"

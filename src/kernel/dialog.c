@@ -86,3 +86,20 @@ get_native_text_log_event_source (ALLEGRO_TEXTLOG *textlog)
 
   return event_source;
 }
+
+bool
+file_overwrite_dialog (char *filename)
+{
+  if (MINGW_BUILD) return true;
+
+  if (al_filename_exists (filename)) {
+    int r = al_show_native_message_box
+      (display, "Warning",
+       "File already exists!",
+       "Do you want to overwrite it?",
+       NULL,
+       ALLEGRO_MESSAGEBOX_WARN | ALLEGRO_MESSAGEBOX_YES_NO);
+    return r == 1;
+  }
+  else return true;
+}

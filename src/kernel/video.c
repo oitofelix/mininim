@@ -677,7 +677,9 @@ show (void)
     flip_display (screen);
     rendering = rendering_backup;
     return;
-  } else if (rendering == NONE_RENDERING || rendering == AUDIO_RENDERING) {
+  } else if (! command_line_replay
+             && (rendering == NONE_RENDERING
+                 || rendering == AUDIO_RENDERING)) {
     enum rendering rendering_backup = rendering;
     rendering = VIDEO_RENDERING;
     clear_bitmap (screen, BLACK);

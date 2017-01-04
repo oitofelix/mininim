@@ -31,5 +31,6 @@ void show_native_file_dialog (ALLEGRO_DISPLAY *display,
                               ALLEGRO_FILECHOOSER *dialog);
 ALLEGRO_TEXTLOG *open_native_text_log (char const *title, int flags);
 ALLEGRO_EVENT_SOURCE *get_native_text_log_event_source (ALLEGRO_TEXTLOG *textlog);
+bool file_overwrite_dialog (char *filename);
 
 #endif	/* MININIM_DIALOG_H */
