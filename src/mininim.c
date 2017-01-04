@@ -1295,7 +1295,7 @@ main (int _argc, char **_argv)
     load_resource ("data/replays/title.mrp", (load_resource_f) xload_replay);
   if (replay_ptr) {
     level_start_replay_mode = PLAY_REPLAY;
-    struct replay *replay = get_replay ();
+    struct replay *replay = &replay_ptr[0];
     min_legacy_level = min_int (min_legacy_level, replay->start_level);
     max_legacy_level = max_int (max_legacy_level, replay->start_level);
     if (! next_legacy_level (&vanilla_level, replay->start_level))

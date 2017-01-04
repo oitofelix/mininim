@@ -67,10 +67,13 @@ play_anim (void (*draw_callback) (void),
     switch (event.type) {
     case ALLEGRO_EVENT_TIMER:
       if (event.timer.source == timer) {
+        struct replay *replay = get_replay ();
+
         /* detect incomplete replays */
-        if (replay_mode == PLAY_REPLAY
-            && anim_cycle >=
-            replay_chain[replay_index].packed_gamepad_state_nmemb + 204)
+        if (! title_demo
+            && replay_mode == PLAY_REPLAY
+            && anim_cycle >= replay->packed_gamepad_state_nmemb
+            + REPLAY_STUCK_THRESHOLD)
           quit_anim = REPLAY_INCOMPLETE;
 
         /* /\* ---- *\/ */
@@ -133,7 +136,8 @@ play_anim (void (*draw_callback) (void),
           if (! is_game_paused ())
             anim_cycle++;
 
-          if (replay_mode == PLAY_REPLAY
+          if (! title_demo
+              && replay_mode == PLAY_REPLAY
               && (rendering == BOTH_RENDERING
                   || rendering == VIDEO_RENDERING)) {
             int progress;
@@ -459,6 +463,7 @@ play_anim (void (*draw_callback) (void),
 
       /* ALT+F7: start/stop replay recording */
       if (! title_demo
+          && ! command_line_replay
           && ((replay_mode != PLAY_REPLAY
                && was_key_pressed
                (ALLEGRO_KEY_F7, 0, ALLEGRO_KEYMOD_ALT, true))
@@ -476,13 +481,18 @@ play_anim (void (*draw_callback) (void),
 
       /* F7: load replay/stop replaying */
       if (! title_demo
+          && ! command_line_replay
           && ((replay_mode != RECORD_REPLAY
                && was_key_pressed (ALLEGRO_KEY_F7, 0, 0, true))
               || (replay_mode == PLAY_REPLAY
                   && was_key_pressed
                   (ALLEGRO_KEY_F7, 0, ALLEGRO_KEYMOD_ALT, true)))) {
-        if (replay_mode == PLAY_REPLAY) stop_replaying (2);
-        else create_load_replay_thread ();
+        if (replay_mode == PLAY_REPLAY) {
+          HLINE;
+          printf ("REPLAY CHAIN ABORTED\n");
+          HLINE;
+          stop_replaying (2);
+        } else create_load_replay_thread ();
       }
 
       break;
@@ -498,7 +508,9 @@ play_anim (void (*draw_callback) (void),
     handle_save_replay_thread (1);
   }
 
-  if (replay_mode == PLAY_REPLAY) {
+  if (! title_demo
+      && replay_mode == PLAY_REPLAY
+      && quit_anim != REPLAY_INCOMPLETE) {
     quit_anim = quit_anim == OUT_OF_TIME
       ? REPLAY_OUT_OF_TIME
       : REPLAY_COMPLETE;

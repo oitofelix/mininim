@@ -229,7 +229,7 @@ play_level (struct level *lv)
 
   level_number_shown = false;
 
-  if (replay_mode == PLAY_REPLAY) {
+  if (! title_demo && replay_mode == PLAY_REPLAY) {
     HLINE;
 
     if (replay_index == 0) {
@@ -335,7 +335,7 @@ play_level (struct level *lv)
     break;
   }
 
-  if (replay_mode == PLAY_REPLAY) {
+  if (! title_demo && replay_mode == PLAY_REPLAY) {
     if (! replay->complete) complete_replay_chain = false;
     print_replay_results (replay);
 

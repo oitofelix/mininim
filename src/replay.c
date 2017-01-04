@@ -387,7 +387,7 @@ handle_save_replay_thread (int priority)
   char *filename = al_get_native_file_dialog_count (dialog) > 0
     ? (char *) al_get_native_file_dialog_path (dialog, 0)
     : NULL;
-  struct replay *replay = get_replay ();
+  struct replay *replay = &recorded_replay;
   if (filename) {
     char *error_str = save_replay (filename, replay)
       ? "REPLAY HAS BEEN SAVED"
@@ -456,10 +456,11 @@ void
 stop_replaying (int priority)
 {
   free_replay_chain ();
+  if (! title_demo
+      && replay_mode == PLAY_REPLAY)
+    draw_bottom_text (NULL, "REPLAY STOPPED", priority);
   replay_mode = NO_REPLAY;
   level_start_replay_mode = NO_REPLAY;
-  if (! title_demo)
-    draw_bottom_text (NULL, "REPLAY STOPPED", priority);
 }
 
 void
@@ -645,9 +646,13 @@ update_replay_progress (int *progress_ret)
 
   struct replay *replay = get_replay ();
 
-  int progress = replay->packed_gamepad_state_nmemb
-    ? (anim_cycle * 100) / replay->packed_gamepad_state_nmemb
-    : 0;
+  if (! replay) return false;
+
+  int total = replay->packed_gamepad_state_nmemb
+    + REPLAY_STUCK_THRESHOLD;
+
+  int progress = total ? (anim_cycle * 100) / total : 0;
+
   progress = progress > 100 ? 100 : progress;
 
   bool update = progress != last_progress;
