@@ -343,9 +343,10 @@ play_level (struct level *lv)
       HLINE;
       printf ("REPLAY CHAIN END\n");
       HLINE;
+      int status = complete_replay_chain && valid_replay_chain
+        ? 0 : 1;
       stop_replaying (1);
-      if (command_line_replay)
-        exit (complete_replay_chain && valid_replay_chain ? 0 : 1);
+      if (command_line_replay) exit (status);
     } else
       prepare_for_playing_replay (replay_index + 1);
 
