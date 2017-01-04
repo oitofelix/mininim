@@ -1254,6 +1254,8 @@ main (int _argc, char **_argv)
 
   load_callback = NULL;
 
+  show ();
+
   set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
 
   /* ----------------- */

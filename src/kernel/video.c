@@ -670,12 +670,17 @@ show (void)
     flip_display (screen);
     rendering = rendering_backup;
     return;
-  }
-
-  if (is_dedicatedly_replaying ()) {
+  } else if (is_dedicatedly_replaying ()) {
     enum rendering rendering_backup = rendering;
     rendering = VIDEO_RENDERING;
     draw_replaying (screen);
+    flip_display (screen);
+    rendering = rendering_backup;
+    return;
+  } else if (rendering == NONE_RENDERING || rendering == AUDIO_RENDERING) {
+    enum rendering rendering_backup = rendering;
+    rendering = VIDEO_RENDERING;
+    clear_bitmap (screen, BLACK);
     flip_display (screen);
     rendering = rendering_backup;
     return;

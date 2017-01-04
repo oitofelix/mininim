@@ -157,6 +157,7 @@ play_anim (void (*draw_callback) (void),
       } else if (event.timer.source == video_timer) {
         if (rendering == BOTH_RENDERING || rendering == VIDEO_RENDERING)
           show ();
+        else stop_video_effect ();
         /* drop_all_events_from_source */
         /*   (event_queue, get_timer_event_source (video_timer)); */
         /* al_set_timer_count (video_timer, 0); */
