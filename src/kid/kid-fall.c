@@ -184,23 +184,23 @@ physics_in (struct anim *k)
   fo.dx = kid_fall_frameset[k->i > 4 ? 4 : k->i].dx;
   fo.dy = kid_fall_frameset[k->i > 4 ? 4 : k->i].dy;
 
+  int speed = +21 + 3 * (k->i - 5);
   if (k->float_timer) fo.dy = 14;
   else {
     if (k->i > 0) fo.dx = -k->inertia;
-    if (k->i > 4) {
-      int speed = +21 + 3 * (k->i - 5);
+    if (k->i > 4)
       fo.dy = (speed > 33) ? 33 : speed;
-    }
     fo.dy += 8;
   }
 
   struct pos pbf, pbf_nf, pmbo, pmbo_nf, pmt;
   struct frame nf;
   surveyo (_bf, -8, +0, pos, &k->f, NULL, &pbf, NULL);
-  surveyo (_mbo, +0, -8, pos, &k->f, NULL, &pmbo, NULL);
+  surveyo (_mbo, +0, speed > 22 ? -8 : 0, pos, &k->f, NULL, NULL, &pmbo);
   next_frame (&k->f, &nf, &fo);
+  surveyo (_mbo, +0, speed > 22 ? -8 : 0, pos, &nf, NULL, NULL, &pmbo_nf);
   surveyo (_bf, -8, +0, pos, &nf, NULL, &pbf_nf, NULL);
-  surveyo (_mbo, +0, -8, pos, &nf, NULL, &pmbo_nf, NULL);
+
 
   if (! is_immediately_accessible_pos (&pbf_nf, &pbf, &k->f)) {
     k->fo.dx = 0;

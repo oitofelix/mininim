@@ -589,7 +589,9 @@ draw_room_anim_fg_sub (ALLEGRO_BITMAP *bitmap,
 
   /* FALLING */
   if (is_anim_fall (f)) {
-    int dy = is_fake (&ptr2) ? 56 : 49;
+    int dy;
+    if (is_strictly_traversable (&ptl2)) dy = 49;
+    else dy = 56;
 
     push_clipping_rectangle (bitmap,
                              PLACE_WIDTH * ptr2.place,
