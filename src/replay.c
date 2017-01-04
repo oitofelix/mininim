@@ -392,7 +392,7 @@ handle_save_replay_thread (int priority)
     ? (char *) al_get_native_file_dialog_path (dialog, 0)
     : NULL;
   struct replay *replay = &recorded_replay;
-  if (filename && file_overwrite_dialog (filename)) {
+  if (filename) {
     char *error_str = save_replay (filename, replay)
       ? "REPLAY HAS BEEN SAVED"
       : "REPLAY SAVING FAILED";

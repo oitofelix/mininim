@@ -1454,10 +1454,19 @@ dialog_thread (ALLEGRO_THREAD *thread, void *arg)
   struct dialog *d = arg;
   show_mouse_cursor ();
 
-  ALLEGRO_FILECHOOSER *dialog =
-    create_native_file_dialog (d->initial_path, d->title,
-                               d->patterns, d->mode);
-  al_show_native_file_dialog (display, dialog);
+  ALLEGRO_FILECHOOSER *dialog = NULL;
+
+  do {
+    if (dialog) al_destroy_native_file_dialog (dialog);
+
+    dialog = create_native_file_dialog (d->initial_path, d->title,
+                                        d->patterns, d->mode);
+
+    al_show_native_file_dialog (display, dialog);
+  } while (d->mode & ALLEGRO_FILECHOOSER_SAVE
+           && al_get_native_file_dialog_count (dialog)
+           && ! file_overwrite_dialog
+           ((char *) al_get_native_file_dialog_path (dialog, 0)));
 
   al_set_thread_should_stop (thread);
 
@@ -1601,7 +1610,7 @@ handle_save_game_thread (int priority)
   char *filename = al_get_native_file_dialog_count (dialog) > 0
     ? (char *) al_get_native_file_dialog_path (dialog, 0)
     : NULL;
-  if (filename && file_overwrite_dialog (filename)) {
+  if (filename) {
     save_game (filename, priority);
     al_free (save_game_dialog.initial_path);
     xasprintf (&save_game_dialog.initial_path, "%s", filename);
@@ -1624,7 +1633,7 @@ handle_save_picture_thread (int priority)
   char *filename = al_get_native_file_dialog_count (dialog) > 0
     ? (char *) al_get_native_file_dialog_path (dialog, 0)
     : NULL;
-  if (filename && file_overwrite_dialog (filename)) {
+  if (filename) {
     char *error_str = al_save_bitmap
       (filename, al_get_backbuffer (display))
       ? "PICTURE HAS BEEN SAVED"
