@@ -962,16 +962,20 @@ process_keys (void)
 
   /* SHIFT+L: warp to next level */
   if (was_key_pressed (ALLEGRO_KEY_L, 0, ALLEGRO_KEYMOD_SHIFT, true)) {
-    ignore_level_cutscene = true;
-    next_level = global_level.n + 1;
-    quit_anim = NEXT_LEVEL;
+    if (replay_mode == NO_REPLAY) {
+      ignore_level_cutscene = true;
+      next_level = global_level.n + 1;
+      quit_anim = NEXT_LEVEL;
+    } else print_replay_mode (0);
   }
 
   /* SHIFT+M: warp to previous level */
   if (was_key_pressed (ALLEGRO_KEY_M, 0, ALLEGRO_KEYMOD_SHIFT, true)) {
-    ignore_level_cutscene = true;
-    next_level = global_level.n - 1;
-    quit_anim = NEXT_LEVEL;
+    if (replay_mode == NO_REPLAY) {
+      ignore_level_cutscene = true;
+      next_level = global_level.n - 1;
+      quit_anim = NEXT_LEVEL;
+    } else print_replay_mode (0);
   }
 
   /* C: show direct coordinates */

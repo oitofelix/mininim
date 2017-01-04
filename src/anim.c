@@ -488,9 +488,7 @@ play_anim (void (*draw_callback) (void),
                   && was_key_pressed
                   (ALLEGRO_KEY_F7, 0, ALLEGRO_KEYMOD_ALT, true)))) {
         if (replay_mode == PLAY_REPLAY) {
-          HLINE;
-          printf ("REPLAY CHAIN ABORTED\n");
-          HLINE;
+          print_replay_chain_aborted ();
           stop_replaying (2);
         } else create_load_replay_thread ();
       }
@@ -509,11 +507,17 @@ play_anim (void (*draw_callback) (void),
   }
 
   if (! title_demo
-      && replay_mode == PLAY_REPLAY
-      && quit_anim != REPLAY_INCOMPLETE) {
-    quit_anim = quit_anim == OUT_OF_TIME
-      ? REPLAY_OUT_OF_TIME
-      : REPLAY_COMPLETE;
+      && replay_mode == PLAY_REPLAY) {
+    switch (quit_anim) {
+    case OUT_OF_TIME: quit_anim = REPLAY_OUT_OF_TIME; break;
+    case NEXT_LEVEL: quit_anim = REPLAY_COMPLETE; break;
+    case REPLAY_INCOMPLETE: break;
+    default:
+      print_replay_chain_aborted ();
+      stop_replaying (1);
+      if (command_line_replay) exit (-1);
+      break;
+    }
   }
 
   al_stop_timer (timer);

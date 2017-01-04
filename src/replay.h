@@ -90,6 +90,7 @@ void print_replay_chain_info (void);
 void print_replay_results (struct replay *replay);
 bool update_replay_progress (int *progress_ret);
 bool is_dedicatedly_replaying (void);
+void print_replay_chain_aborted (void);
 
 /* variables */
 extern struct replay recorded_replay;

@@ -667,3 +667,14 @@ is_dedicatedly_replaying (void)
   return replay_mode == PLAY_REPLAY
     && (rendering == NONE_RENDERING || rendering == AUDIO_RENDERING);
 }
+
+void
+print_replay_chain_aborted (void)
+{
+  if (! title_demo
+      && replay_mode == PLAY_REPLAY) {
+    HLINE;
+    printf ("REPLAY CHAIN ABORTED\n");
+    HLINE;
+  }
+}
