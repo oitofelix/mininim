@@ -194,7 +194,7 @@ static struct argp_option options[] = {
   {NULL, 0, NULL, 0, "Replays", 0},
   {"record-replay", RECORD_REPLAY_OPTION, NULL, 0, "Starts recording replay countdown at game beginning.  Use this in conjunction with '--start-level' to start recording a given level.  This can be done in-game using the ALT+F7 key binding.", 0},
   {"replay-info", REPLAY_INFO_OPTION, NULL, OPTION_NO_USAGE, "Print information about all REPLAY files in replay chain and exit.  The 'initial' field of each replay summary lists arguments intended to be used for recording other replay files with same initial conditions.", 0},
-  {"validate-replay-chain", VALIDATE_REPLAY_CHAIN_OPTION, "MODE", 0, "Validate replay chain.  Valid values for MODE are: NONE, READ and WRITE.  The default is NONE.  If MODE is READ, instead of reporting invalid sequent replay pairs, modify replay parameters just enough to validate pairs.  WRITE does the same, additionally updating replay files in case the resulting chain is complete and valid.", 0},
+  {"validate-replay-chain", VALIDATE_REPLAY_CHAIN_OPTION, "MODE", 0, "Validate replay chain.  Valid values for MODE are: NONE, READ and WRITE.  The default is NONE.  If MODE is READ, instead of reporting invalid sequent replay pairs, modify replay parameters just enough to validate pairs.  Notice that this requires consecutive replay levels to succeed.  WRITE does the same, additionally updating replay files in case the resulting chain is complete and valid.", 0},
 
   {NULL, 0, NULL, OPTION_DOC, "\nUnless '--replay-info' is specified, REPLAY files given on command line are added to the replay chain in order to play and check for completion and sequence validity.  The replay chain is sorted by increasing level order before processing.  For each replay in the chain a replay summary is printed.  Unless '--validate-replay-chain' is specified, in case there is any invalid sequent pairs in the chain, their incompatible options are printed between their replay summaries.  For any complete replay summary, its 'final' field lists arguments intended to be used for continuing the game from where its respective replay ends.  If the replay chain is complete and valid, MININIM automatically exits with zero status (non-zero otherwise).  Replay chains can be played in-game using the F7 key binding.  One can use '--time-frequency' and its related key bindings to control the playback speed, in particular use '--time-frequency=0' and '--rendering=NONE' for the fastest batch processing of replays.", 0},
 
@@ -1335,7 +1335,7 @@ main (int _argc, char **_argv)
   current_lives = initial_current_lives;
   start_level_time = start_time;
 
-  int level = next_level >= 0 ? next_level_number : start_level;
+  int level = next_level_number >= 0 ? next_level_number : start_level;
   if (! level_module_next_level (&vanilla_level, level))
     exit (-1);
   play_level (&vanilla_level);

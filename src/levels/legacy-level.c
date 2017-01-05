@@ -109,11 +109,11 @@ legacy_level_start (void)
   if (global_level.n == 3) {
     /* if it's the first time playing the checkpoint hasn't been
        reached yet */
-    if (retry_level != 3 || replay_mode != NO_REPLAY)
+    if (retry_level != 3 && replay_mode == NO_REPLAY)
       level_3_checkpoint = false;
     /* if the checkpoint has been reached, respawn there */
     struct pos p; new_pos (&p, &global_level, 2, 0, 6);
-    if (level_3_checkpoint) {
+    if (level_3_checkpoint && replay_mode == NO_REPLAY) {
       struct pos plf; new_pos (&plf, &global_level, 7, 0, 4);
       register_con_undo (&undo, &plf,
                          NO_FLOOR, MIGNORE, MIGNORE, MIGNORE,
@@ -195,7 +195,7 @@ legacy_level_special_events (void)
     /* level 3 checkpoint */
     new_pos (&p, &global_level, 2, 0, 8);
     survey (_m, pos, &k->f, NULL, &pm, NULL);
-    if (peq (&pm, &p)) {
+    if (peq (&pm, &p) && replay_mode == NO_REPLAY) {
       level_3_checkpoint = true;
       checkpoint_total_lives = k->total_lives;
       checkpoint_current_lives = k->current_lives;
@@ -653,7 +653,7 @@ legacy_level_end (struct pos *p)
       play_audio (&success_suspense_audio, NULL, k->id);
       level_end_wait = 7 * DEFAULT_HZ;
       break;
-    case 13: break;
+    case 13: level_end_wait = 0 * DEFAULT_HZ; break;
     }
   }
 

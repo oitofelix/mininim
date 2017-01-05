@@ -200,7 +200,6 @@ save_replay_chain (void)
       error (0, al_get_errno (), "failed to save replay file '%s'",
              replay->filename);
   }
-  fprintf (stderr, "MININIM: replay chain has been saved\n");
 }
 
 
@@ -429,7 +428,6 @@ create_load_replay_thread (void)
   load_replay_dialog_thread =
     create_thread (dialog_thread, &load_replay_dialog);
   al_start_thread (load_replay_dialog_thread);
-  pause_animation (true);
 }
 
 void
@@ -469,7 +467,6 @@ handle_load_replay_thread (int priority)
     if (success) prepare_for_playing_replay (0);
   }
 
-  pause_animation (false);
   al_destroy_native_file_dialog (dialog);
 }
 
@@ -554,11 +551,11 @@ check_valid_replay_chain_pair (struct replay *r0, struct replay *r1)
     switch (validate_replay_chain) {
     case READ_VALIDATE_REPLAY_CHAIN:
     case WRITE_VALIDATE_REPLAY_CHAIN:
-      printf ("CHANGED: --start-level %u --> %u\n",
-              r1->start_level, r0->start_level + 1);
-      r1->start_level = r0->start_level + 1;
-      changed = true;
-      break;
+      /* printf ("CHANGED: --start-level %u --> %u\n", */
+      /*         r1->start_level, r0->start_level + 1); */
+      /* r1->start_level = r0->start_level + 1; */
+      /* changed = true; */
+      /* break; */
     case NONE_VALIDATE_REPLAY_CHAIN: default:
       printf ("INVALID: --start-level\n");
       valid = false;

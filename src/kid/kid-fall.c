@@ -152,9 +152,12 @@ physics_in (struct anim *k)
 
   /* printf ("inertia: %i\n", k->inertia); */
 
-  /* /\* collision *\/ */
+  /* collision */
   uncollide (&k->f, &k->fo, _bf, -8, +0, &k->fo, NULL);
   uncollide (&k->f, &k->fo, _tf, -8, +0, &k->fo, NULL);
+
+  uncollide (&k->f, &k->fo, _bb, +0, +0, &k->fo, NULL);
+  uncollide (&k->f, &k->fo, _tb, +0, +0, &k->fo, NULL);
 
   /* hang front */
   if (k->i > 4 && can_hang (&k->f, false, &k->hang_pos)
@@ -200,7 +203,6 @@ physics_in (struct anim *k)
   next_frame (&k->f, &nf, &fo);
   surveyo (_mbo, +0, speed > 22 ? -8 : 0, pos, &nf, NULL, NULL, &pmbo_nf);
   surveyo (_bf, -8, +0, pos, &nf, NULL, &pbf_nf, NULL);
-
 
   if (! is_immediately_accessible_pos (&pbf_nf, &pbf, &k->f)) {
     k->fo.dx = 0;

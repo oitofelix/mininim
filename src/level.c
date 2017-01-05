@@ -197,7 +197,24 @@ play_level (struct level *lv)
 
   /* replay setup */
   replay_mode = level_start_replay_mode;
+
   struct replay *replay = get_replay ();
+
+  if (! title_demo && replay_mode == PLAY_REPLAY) {
+    HLINE;
+
+    if (replay_index == 0) {
+      printf ("REPLAY CHAIN BEGINNING\n");
+      HLINE;
+    }
+
+    if (replay_index > 0 && ! check_valid_replay_chain_pair
+        (replay - 1, replay))
+      valid_replay_chain = false;
+
+    print_replay_info (replay);
+  }
+
   set_replay_mode_at_level_start (replay);
 
   play_time = start_level_time;
@@ -225,21 +242,6 @@ play_level (struct level *lv)
   exit_editor (-1);
 
   level_number_shown = false;
-
-  if (! title_demo && replay_mode == PLAY_REPLAY) {
-    HLINE;
-
-    if (replay_index == 0) {
-      printf ("REPLAY CHAIN BEGINNING\n");
-      HLINE;
-    }
-
-    if (replay_index > 0 && ! check_valid_replay_chain_pair
-        (replay - 1, replay))
-      valid_replay_chain = false;
-
-    print_replay_info (replay);
-  }
 
   play_anim (draw_level, compute_level);
 
@@ -272,6 +274,7 @@ play_level (struct level *lv)
     replay->final_kcd = k->skill.counter_defense_prob + 1;
     total_lives = k->total_lives;
     skill = k->skill;
+    start_level_time = play_time;
     break;
   case RESTART_LEVEL:
   restart_level:
@@ -333,9 +336,12 @@ play_level (struct level *lv)
       int status = complete_replay_chain && valid_replay_chain
         ? 0 : 1;
 
-      if (status == 0 && validate_replay_chain
-          == WRITE_VALIDATE_REPLAY_CHAIN)
-        save_replay_chain ();
+      if (validate_replay_chain == WRITE_VALIDATE_REPLAY_CHAIN) {
+        if (status == 0) {
+          save_replay_chain ();
+          fprintf (stderr, "MININIM: replay chain VALID and COMPLETE!  Replay chain HAS been saved.\n");
+        } else fprintf (stderr, "MININIM: replay chain INVALID or INCOMPLETE!  Replay chain has NOT been saved.\n");
+      }
 
       stop_replaying (1);
 
