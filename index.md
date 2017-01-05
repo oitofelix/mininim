@@ -85,7 +85,7 @@ currently implemented are:
 - Rich set of itemmizable constructions and items
 - Supports triggering of any tile
 - Screenshot capturing
-- Replay recording, playing and simulation.
+- Replay recording, playing and chain validation.
 
 
 The following additional features are planned to be implemented soon.
@@ -103,13 +103,21 @@ The following additional features are planned to be implemented soon.
 - Android, iOS, Mac OS X ports
 
 
-### Game play
+### Media
 
 [![MININIM multi-room features](https://img.youtube.com/vi/i8kXFLuZ8Io/0.jpg)](https://www.youtube.com/watch?v=i8kXFLuZ8Io)
 
 Notice that animations, physics, level editor, multi-room support and
 other features have been further improved since this video was
 recorded.
+
+[PODebug](http://www.podebug.com/2016/08/029-recriando-prince-of-persia-dois-projetos-brasileiros/)
+has a podcast episode from august 2016 titled _Recriando Prince of
+Persia: Dois Projetos Brasileiros_ (Recreating Prince of Persia: Two
+Brazilian Projects) in which Bruno Félix (oitofelix) was invited to
+speak about MININIM.
+[Here's](http://feeds.soundcloud.com/stream/278619854-podebug-029-recriando-prince-of-persia-dois-projetos-brasileiros.mp3)
+a MP3 for download (Portuguese).
 
 
 ### Download
@@ -138,7 +146,7 @@ welcome!  Please, contact the MININIM community at its
 available.  No installation is required, just extract the zip archive
 and run ‘mininim.exe’.
 
-[mininim-201612281424-win32.zip](https://github.com/oitofelix/mininim/releases/download/v201612281424/mininim-201612281424-win32.zip)
+[mininim-201701051749-win32.zip](https://github.com/oitofelix/mininim/releases/download/v201701051749/mininim-201701051749-win32.zip)
 
 
 **GNU/Linux**
