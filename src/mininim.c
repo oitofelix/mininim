@@ -90,9 +90,9 @@ int initial_total_lives = KID_INITIAL_TOTAL_LIVES, total_lives;
 int initial_current_lives = KID_INITIAL_CURRENT_LIVES, current_lives;
 int start_level = 1;
 struct pos start_pos = {NULL, -1,-1,-1};
-int time_limit = TIME_LIMIT;
-int start_time = START_TIME;
-int start_level_time;
+uint64_t time_limit = TIME_LIMIT;
+uint64_t start_time = START_TIME;
+uint64_t start_level_time;
 enum semantics semantics;
 enum movements movements;
 bool title_demo;
@@ -194,8 +194,9 @@ static struct argp_option options[] = {
   {NULL, 0, NULL, 0, "Replays", 0},
   {"record-replay", RECORD_REPLAY_OPTION, NULL, 0, "Starts recording replay countdown at game beginning.  Use this in conjunction with '--start-level' to start recording a given level.  This can be done in-game using the ALT+F7 key binding.", 0},
   {"replay-info", REPLAY_INFO_OPTION, NULL, OPTION_NO_USAGE, "Print information about all REPLAY files in replay chain and exit.  The 'initial' field of each replay summary lists arguments intended to be used for recording other replay files with same initial conditions.", 0},
+  {"validate-replay-chain", VALIDATE_REPLAY_CHAIN_OPTION, "MODE", 0, "Validate replay chain.  Valid values for MODE are: NONE, READ and WRITE.  The default is NONE.  If MODE is READ, instead of reporting invalid sequent replay pairs, modify replay parameters just enough to validate pairs.  WRITE does the same, additionally updating replay files in case the resulting chain is complete and valid.", 0},
 
-  {NULL, 0, NULL, OPTION_DOC, "\nUnless '--replay-info' is specified, REPLAY files given on command line are added to the replay chain in order to play and check for completion and sequence validity.  The replay chain is sorted by increasing level order before processing.  For each replay in the chain a replay summary is printed.  In case there is any invalid sequent pairs in the chain, their incompatible options are printed between their replay summaries.  For any complete replay summary, its 'final' field lists arguments intended to be used for continuing the game from where its respective replay ends.  If the replay chain is complete and valid, MININIM automatically exits with zero status (non-zero otherwise).  Replay chains can be played in-game using the F7 key binding.  One can use '--time-frequency' and its related key bindings to control the playback speed, in particular use '--time-frequency=0' and '--rendering=NONE' for the fastest batch processing of replays.", 0},
+  {NULL, 0, NULL, OPTION_DOC, "\nUnless '--replay-info' is specified, REPLAY files given on command line are added to the replay chain in order to play and check for completion and sequence validity.  The replay chain is sorted by increasing level order before processing.  For each replay in the chain a replay summary is printed.  Unless '--validate-replay-chain' is specified, in case there is any invalid sequent pairs in the chain, their incompatible options are printed between their replay summaries.  For any complete replay summary, its 'final' field lists arguments intended to be used for continuing the game from where its respective replay ends.  If the replay chain is complete and valid, MININIM automatically exits with zero status (non-zero otherwise).  Replay chains can be played in-game using the F7 key binding.  One can use '--time-frequency' and its related key bindings to control the playback speed, in particular use '--time-frequency=0' and '--rendering=NONE' for the fastest batch processing of replays.", 0},
 
   /* Compatibility */
   {NULL, 0, NULL, 0, "Compatibility", 0},
@@ -636,6 +637,8 @@ parser (int key, char *arg, struct argp_state *state)
 
   char *rendering_enum[] = {"BOTH", "VIDEO", "AUDIO", "NONE", NULL};
 
+  char *validate_replay_chain_enum[] = {"NONE", "READ", "WRITE", NULL};
+
   struct int_range total_lives_range = {1, 10};
   struct int_range start_level_range = {0, INT_MAX};
   struct int_range start_pos_room_range = {1, INT_MAX};
@@ -971,7 +974,7 @@ Levels have been converted using module %s into native format at\n\
     break;
   case RECORD_REPLAY_OPTION:
     level_start_replay_mode = NO_REPLAY;
-    next_level = -1;
+    next_level_number = -1;
     skip_title = false;
     prepare_for_recording_replay ();
     break;
@@ -986,6 +989,15 @@ Levels have been converted using module %s into native format at\n\
     case 1: rendering = VIDEO_RENDERING; break;
     case 2: rendering = AUDIO_RENDERING; break;
     case 3: rendering = NONE_RENDERING; break;
+    }
+    break;
+  case VALIDATE_REPLAY_CHAIN_OPTION:
+    e = optval_to_enum (&i, key, arg, state, validate_replay_chain_enum, 0);
+    if (e) return e;
+    switch (i) {
+    case 0: validate_replay_chain = NONE_VALIDATE_REPLAY_CHAIN; break;
+    case 1: validate_replay_chain = READ_VALIDATE_REPLAY_CHAIN; break;
+    case 2: validate_replay_chain = WRITE_VALIDATE_REPLAY_CHAIN; break;
     }
     break;
   case ARGP_KEY_ARG:
@@ -1321,9 +1333,9 @@ main (int _argc, char **_argv)
   game_paused = false;
   total_lives = initial_total_lives;
   current_lives = initial_current_lives;
-  play_time = start_time;
+  start_level_time = start_time;
 
-  int level = next_level >= 0 ? next_level : start_level;
+  int level = next_level >= 0 ? next_level_number : start_level;
   if (! level_module_next_level (&vanilla_level, level))
     exit (-1);
   play_level (&vanilla_level);

@@ -1339,11 +1339,11 @@ editor (void)
         editor_msg ("NATIVE LEVEL MODULE ONLY", EDITOR_CYCLES_2);
       else {
         edit = EDIT_LEVEL_EXCHANGE;
-        next_level = global_level.n;
+        next_level_number = global_level.n;
       }
       break;
     case 'J': edit = EDIT_LEVEL_JUMP;
-      next_level = global_level.n;
+      next_level_number = global_level.n;
       break;
     case 'A':
       for (i = 1; i < ROOMS; i++)
@@ -1407,7 +1407,7 @@ editor (void)
   case EDIT_LEVEL_JUMP:
     xasprintf (&str, "L%iJ>LEVEL", global_level.n);
     if (menu_select_level (EDIT_LEVEL, str) == 1
-        && next_level != global_level.n) {
+        && next_level_number != global_level.n) {
       ignore_level_cutscene = true;
       quit_anim = NEXT_LEVEL;
     }
@@ -1416,8 +1416,9 @@ editor (void)
   case EDIT_LEVEL_EXCHANGE:
     xasprintf (&str, "L%iX>LEVEL", global_level.n);
     if (menu_select_level (EDIT_LEVEL, str) == 1
-        && next_level != global_level.n)
-      register_level_exchange_undo (&undo, next_level, "LEVEL EXCHANGE");
+        && next_level_number != global_level.n)
+      register_level_exchange_undo (&undo, next_level_number,
+                                    "LEVEL EXCHANGE");
     al_free (str);
     break;
   case EDIT_LEVEL_MIRROR:
@@ -1954,7 +1955,7 @@ static char
 menu_select_level (enum edit up_edit, char *prefix)
 {
   set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
-  char r = menu_int (&next_level, NULL, min_legacy_level,
+  char r = menu_int (&next_level_number, NULL, min_legacy_level,
                      max_legacy_level, prefix, NULL);
   switch (r) {
   case -1: edit = up_edit; break;

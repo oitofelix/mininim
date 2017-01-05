@@ -38,7 +38,7 @@ static bool level_number_shown;
 bool no_room_drawing, game_paused, step_one_cycle;
 int retry_level = -1;
 int camera_follow_kid;
-int next_level = -1;
+int next_level_number = -1;
 bool ignore_level_cutscene;
 uint64_t death_timer;
 
@@ -195,15 +195,12 @@ play_level (struct level *lv)
   potion_flags = 0;
   copy_level (&global_level, lv);
 
-  if (retry_level != global_level.n)
-    start_level_time = play_time;
-
-  play_time = start_level_time;
-
   /* replay setup */
   replay_mode = level_start_replay_mode;
   struct replay *replay = get_replay ();
   set_replay_mode_at_level_start (replay);
+
+  play_time = start_level_time;
 
   if (mirror_level) mirror_level_h (&global_level);
 
@@ -238,10 +235,8 @@ play_level (struct level *lv)
     }
 
     if (replay_index > 0 && ! check_valid_replay_chain_pair
-        (replay - 1, replay)) {
+        (replay - 1, replay))
       valid_replay_chain = false;
-      HLINE;
-    }
 
     print_replay_info (replay);
   }
@@ -288,10 +283,10 @@ play_level (struct level *lv)
   next_level:
     level_cleanup ();
     if (global_level.next_level)
-      global_level.next_level (lv, next_level);
+      global_level.next_level (lv, next_level_number);
     draw_bottom_text (NULL, NULL, 0);
     if (global_level.cutscene && ! ignore_level_cutscene
-        && next_level >= global_level.n + 1) {
+        && next_level_number >= global_level.n + 1) {
       cutscene_started = false;
       cutscene = true;
       stop_video_effect ();
@@ -306,7 +301,7 @@ play_level (struct level *lv)
     goto start;
   case RESTART_GAME:
   restart_game:
-    next_level = -1;
+    next_level_number = -1;
     retry_level = -1;
     level_cleanup ();
     draw_bottom_text (NULL, NULL, 0);
@@ -334,8 +329,14 @@ play_level (struct level *lv)
       HLINE;
       printf ("REPLAY CHAIN END\n");
       HLINE;
+
       int status = complete_replay_chain && valid_replay_chain
         ? 0 : 1;
+
+      if (status == 0 && validate_replay_chain
+          == WRITE_VALIDATE_REPLAY_CHAIN)
+        save_replay_chain ();
+
       stop_replaying (1);
 
       if (command_line_replay) exit (status);
@@ -946,7 +947,7 @@ process_keys (void)
   if (was_key_pressed (ALLEGRO_KEY_L, 0, ALLEGRO_KEYMOD_SHIFT, true)) {
     if (replay_mode == NO_REPLAY) {
       ignore_level_cutscene = true;
-      next_level = global_level.n + 1;
+      next_level_number = global_level.n + 1;
       quit_anim = NEXT_LEVEL;
     } else print_replay_mode (0);
   }
@@ -955,7 +956,7 @@ process_keys (void)
   if (was_key_pressed (ALLEGRO_KEY_M, 0, ALLEGRO_KEYMOD_SHIFT, true)) {
     if (replay_mode == NO_REPLAY) {
       ignore_level_cutscene = true;
-      next_level = global_level.n - 1;
+      next_level_number = global_level.n - 1;
       quit_anim = NEXT_LEVEL;
     } else print_replay_mode (0);
   }
@@ -1269,4 +1270,17 @@ bool
 is_game_paused (void)
 {
   return anim_cycle > 0 && game_paused;
+}
+
+void
+next_level (void)
+{
+  struct anim *k = get_anim_by_id (current_kid_id);
+
+  total_lives = k->total_lives;
+  current_lives = k->current_lives;
+  skill = k->skill;
+  start_level_time = play_time;
+  next_level_number = global_level.n + 1;
+  quit_anim = NEXT_LEVEL;
 }

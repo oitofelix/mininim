@@ -27,7 +27,7 @@ extern int camera_follow_kid;
 extern int auto_rem_time_1st_cycle;
 extern bool no_room_drawing, game_paused, step_one_cycle;
 extern struct undo undo;
-extern int next_level;
+extern int next_level_number;
 extern bool ignore_level_cutscene;
 extern uint64_t death_timer;
 
@@ -54,6 +54,7 @@ bool display_remaining_time (int priority);
 void display_skill (struct anim *k);
 void pause_game (bool val);
 bool is_game_paused (void);
+void next_level (void);
 
 /* struct level related */
 

@@ -38,6 +38,9 @@ bool command_line_replay;
 bool valid_replay_chain = true;
 bool complete_replay_chain = true;
 
+enum validate_replay_chain validate_replay_chain =
+  NONE_VALIDATE_REPLAY_CHAIN;
+
 struct dialog save_replay_dialog = {
   .title = "Save replay",
   .patterns = "*.MRP",
@@ -186,6 +189,20 @@ save_replay (char *filename, struct replay *replay)
 
   return true;
 }
+
+void
+save_replay_chain (void)
+{
+  size_t i;
+  for (i = 0; i < replay_chain_nmemb; i++) {
+    struct replay *replay = &replay_chain[i];
+    if (! save_replay (replay->filename, replay))
+      error (0, al_get_errno (), "failed to save replay file '%s'",
+             replay->filename);
+  }
+  fprintf (stderr, "MININIM: replay chain has been saved\n");
+}
+
 
 struct replay *
 load_replay (struct replay *replay_ret, char *filename)
@@ -339,7 +356,7 @@ prepare_for_playing_replay (size_t i)
   quit_anim = NEXT_LEVEL;
   replay_index = i;
   struct replay *replay = &replay_chain[i];
-  next_level = replay->start_level;
+  next_level_number = replay->start_level;
   min_legacy_level = min_int (min_legacy_level, replay->start_level);
   max_legacy_level = max_int (max_legacy_level, replay->start_level);
   ignore_level_cutscene = true;
@@ -531,36 +548,100 @@ bool
 check_valid_replay_chain_pair (struct replay *r0, struct replay *r1)
 {
   bool valid = true;
+  bool changed = false;
 
-  if (r1->start_level != r0->start_level + 1) {
-    printf ("INVALID: --start-level\n");
-    valid = false;
-  }
+  if (r1->start_level != r0->start_level + 1)
+    switch (validate_replay_chain) {
+    case READ_VALIDATE_REPLAY_CHAIN:
+    case WRITE_VALIDATE_REPLAY_CHAIN:
+      printf ("CHANGED: --start-level %u --> %u\n",
+              r1->start_level, r0->start_level + 1);
+      r1->start_level = r0->start_level + 1;
+      changed = true;
+      break;
+    case NONE_VALIDATE_REPLAY_CHAIN: default:
+      printf ("INVALID: --start-level\n");
+      valid = false;
+      break;
+    }
 
-  if (r1->start_time < r0->start_time + r0->packed_gamepad_state_nmemb) {
-    printf ("INVALID: --start-time\n");
-    valid = false;
-  }
+  if (r1->start_time < r0->start_time + r0->packed_gamepad_state_nmemb)
+    switch (validate_replay_chain) {
+    case READ_VALIDATE_REPLAY_CHAIN:
+    case WRITE_VALIDATE_REPLAY_CHAIN:
+      printf ("CHANGED: --start-time %u --> %u\n",
+              r1->start_time, r0->start_time
+              + (uint32_t) r0->packed_gamepad_state_nmemb);
+      r1->start_time = r0->start_time + r0->packed_gamepad_state_nmemb;
+      changed = true;
+      break;
+    case NONE_VALIDATE_REPLAY_CHAIN: default:
+      printf ("INVALID: --start-time\n");
+      valid = false;
+      break;
+    }
 
-  if (r1->time_limit > r0->time_limit) {
-    printf ("INVALID: --time-limit\n");
-    valid = false;
-  }
+  if (r1->time_limit > r0->time_limit)
+    switch (validate_replay_chain) {
+    case READ_VALIDATE_REPLAY_CHAIN:
+    case WRITE_VALIDATE_REPLAY_CHAIN:
+      printf ("CHANGED: --time-limit %i --> %i\n",
+              r1->time_limit, r0->time_limit);
+      r1->time_limit = r0->time_limit;
+      changed = true;
+      break;
+    case NONE_VALIDATE_REPLAY_CHAIN: default:
+      printf ("INVALID: --time-limit\n");
+      valid = false;
+      break;
+    }
 
-  if (r1->total_lives > r0->final_total_lives) {
-    printf ("INVALID: --total-lives\n");
-    valid = false;
-  }
+  if (r1->total_lives > r0->final_total_lives)
+    switch (validate_replay_chain) {
+    case READ_VALIDATE_REPLAY_CHAIN:
+    case WRITE_VALIDATE_REPLAY_CHAIN:
+      printf ("CHANGED: --total-lives %u --> %u\n",
+              r1->total_lives, r0->final_total_lives);
+      r1->total_lives = r0->final_total_lives;
+      changed = true;
+      break;
+    case NONE_VALIDATE_REPLAY_CHAIN: default:
+      printf ("INVALID: --total-lives\n");
+      valid = false;
+      break;
+    }
 
-  if (r1->kca > r0->final_kca) {
-    printf ("INVALID: --kca\n");
-    valid = false;
-  }
+  if (r1->kca > r0->final_kca)
+    switch (validate_replay_chain) {
+    case READ_VALIDATE_REPLAY_CHAIN:
+    case WRITE_VALIDATE_REPLAY_CHAIN:
+      printf ("CHANGED: --kca %u --> %u\n",
+              r1->kca, r0->final_kca);
+      r1->kca = r0->final_kca;
+      changed = true;
+      break;
+    case NONE_VALIDATE_REPLAY_CHAIN: default:
+      printf ("INVALID: --kca\n");
+      valid = false;
+      break;
+    }
 
-  if (r1->kcd > r0->final_kcd) {
-    printf ("INVALID: --kcd\n");
-    valid = false;
-  }
+  if (r1->kcd > r0->final_kcd)
+    switch (validate_replay_chain) {
+    case READ_VALIDATE_REPLAY_CHAIN:
+    case WRITE_VALIDATE_REPLAY_CHAIN:
+      printf ("CHANGED: --kcd %u --> %u\n",
+              r1->kcd, r0->final_kcd);
+      r1->kcd = r0->final_kcd;
+      changed = true;
+      break;
+    case NONE_VALIDATE_REPLAY_CHAIN: default:
+      printf ("INVALID: --kcd\n");
+      valid = false;
+      break;
+    }
+
+  if (! valid || changed) HLINE;
 
   return valid;
 }

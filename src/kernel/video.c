@@ -464,7 +464,11 @@ flip_display (ALLEGRO_BITMAP *bitmap)
   int w = al_get_display_width (display);
   int h = al_get_display_height (display);
 
-  int flags = screen_flags | potion_flags;
+  int flags;
+
+  if (rendering == NONE_RENDERING || rendering == AUDIO_RENDERING)
+    flags = 0;
+  else flags = screen_flags | potion_flags;
 
   if (bitmap) {
     int bw = al_get_bitmap_width (bitmap);
@@ -667,15 +671,15 @@ show (void)
     enum rendering rendering_backup = rendering;
     rendering = VIDEO_RENDERING;
     draw_logo (screen, "Loading...");
-    flip_display (screen);
     rendering = rendering_backup;
+    flip_display (screen);
     return;
   } else if (is_dedicatedly_replaying ()) {
     enum rendering rendering_backup = rendering;
     rendering = VIDEO_RENDERING;
     draw_replaying (screen);
-    flip_display (screen);
     rendering = rendering_backup;
+    flip_display (screen);
     return;
   } else if (! command_line_replay
              && (rendering == NONE_RENDERING
@@ -683,8 +687,8 @@ show (void)
     enum rendering rendering_backup = rendering;
     rendering = VIDEO_RENDERING;
     clear_bitmap (screen, BLACK);
-    flip_display (screen);
     rendering = rendering_backup;
+    flip_display (screen);
     return;
   }
 

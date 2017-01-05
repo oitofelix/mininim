@@ -65,6 +65,7 @@ struct gamepad_state *get_replay_gamepad_state (struct gamepad_state *gs,
                                                 struct replay *replay,
                                                 size_t i);
 bool save_replay (char *filename, struct replay *replay);
+void save_replay_chain (void);
 struct replay *load_replay (struct replay *replay_ret, char *filename);
 struct replay *xload_replay (char *filename);
 void free_replay (struct replay *replay);
@@ -103,6 +104,7 @@ extern size_t replay_index;
 extern bool command_line_replay;
 extern bool valid_replay_chain;
 extern bool complete_replay_chain;
+extern enum validate_replay_chain validate_replay_chain;
 
 extern ALLEGRO_THREAD *save_replay_dialog_thread,
   *load_replay_dialog_thread;

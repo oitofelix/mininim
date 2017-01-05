@@ -380,13 +380,7 @@ legacy_level_special_events (void)
        next level */
     if (k->f.c.room == roomd (&global_level, 1, BELOW)
         && k->f.c.prev_room == 1
-        && k->f.c.xd == BELOW) {
-      total_lives = k->total_lives;
-      current_lives = k->current_lives;
-      skill = k->skill;
-      next_level = global_level.n + 1;
-      quit_anim = NEXT_LEVEL;
-    }
+        && k->f.c.xd == BELOW) next_level ();
   }
 
   /* in the eighth level */
@@ -580,13 +574,7 @@ legacy_level_special_events (void)
         if (fg (&p) == NO_FLOOR) set_fg (&p, HIDDEN_FLOOR);
 
     /* when the kid enters room 23, go to the next level */
-    if (k->f.c.room == 23) {
-      total_lives = k->total_lives;
-      current_lives = k->current_lives;
-      skill = k->skill;
-      next_level = global_level.n + 1;
-      quit_anim = NEXT_LEVEL;
-    }
+    if (k->f.c.room == 23) next_level ();
   }
 
   /* in the thirteenth level */
@@ -643,13 +631,7 @@ legacy_level_special_events (void)
   /* in the fourteenth level */
   if (global_level.n == 14) {
     /* when the kid enters room 5, go to the next level */
-    if (k->f.c.room == 5) {
-      total_lives = k->total_lives;
-      current_lives = k->current_lives;
-      skill = k->skill;
-      next_level = global_level.n + 1;
-      quit_anim = NEXT_LEVEL;
-    }
+    if (k->f.c.room == 5) next_level ();
   }
 }
 
@@ -677,13 +659,7 @@ legacy_level_end (struct pos *p)
 
   if (level_end_wait > 0) level_end_wait--;
 
-  if (level_end_wait == 0) {
-    total_lives = k->total_lives;
-    current_lives = k->current_lives;
-    skill = k->skill;
-    next_level = global_level.n + 1;
-    quit_anim = NEXT_LEVEL;
-  }
+  if (level_end_wait == 0) next_level ();
 }
 
 int
