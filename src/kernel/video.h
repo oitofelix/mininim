@@ -90,7 +90,7 @@ void push_reset_clipping_rectangle (ALLEGRO_BITMAP *bitmap);
 bool merge_clipping_rectangle (ALLEGRO_BITMAP *bitmap, int x, int y,
                                int w, int h);
 void pop_clipping_rectangle (void);
-void draw_logo (ALLEGRO_BITMAP *bitmap, char *text);
+void draw_logo (ALLEGRO_BITMAP *bitmap, char *text0, char *text1);
 void draw_replaying (ALLEGRO_BITMAP *bitmap);
 
 /* variables */

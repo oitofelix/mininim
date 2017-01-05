@@ -671,7 +671,7 @@ show (void)
   if (load_callback) {
     enum rendering rendering_backup = rendering;
     rendering = VIDEO_RENDERING;
-    draw_logo (screen, "Loading...");
+    draw_logo (screen, "Loading...", NULL);
     rendering = rendering_backup;
     flip_display (screen);
     return;
@@ -997,17 +997,24 @@ pop_clipping_rectangle (void)
 }
 
 void
-draw_logo (ALLEGRO_BITMAP *bitmap, char *text)
+draw_logo (ALLEGRO_BITMAP *bitmap, char *text0, char *text1)
 {
-  int x = 138;
+  int x = 145;
   int y = 40;
   int w = al_get_bitmap_width (icon);
   int h = al_get_bitmap_height (icon);
   clear_bitmap (bitmap, BLACK);
   draw_filled_rectangle (bitmap, x - 1, y - 1, x + w, y + h, WHITE);
   draw_bitmap (icon, bitmap, x, y, 0);
-  draw_text (bitmap, text, CUTSCENE_WIDTH / 2.0, CUTSCENE_HEIGHT / 2.0,
-             ALLEGRO_ALIGN_CENTRE);
+
+  if (text0)
+    draw_text (bitmap, text0, CUTSCENE_WIDTH / 2.0, CUTSCENE_HEIGHT / 2.0,
+               ALLEGRO_ALIGN_CENTRE);
+
+  if (text1)
+    draw_text (bitmap, text1, CUTSCENE_WIDTH / 2.0,
+               CUTSCENE_HEIGHT / 2.0 + 16, ALLEGRO_ALIGN_CENTRE);
+
   al_draw_filled_rectangle (0, CUTSCENE_HEIGHT - 8,
                             CUTSCENE_WIDTH, CUTSCENE_HEIGHT,
                             BLUE);
@@ -1019,9 +1026,11 @@ draw_logo (ALLEGRO_BITMAP *bitmap, char *text)
 void
 draw_replaying (ALLEGRO_BITMAP *bitmap)
 {
-  char *text;
+  char *text0, *text1;
   int progress; update_replay_progress (&progress);
-  xasprintf (&text, "Replaying: %3lu%%", progress);
-  draw_logo (bitmap, text);
-  al_free (text);
+  xasprintf (&text0, "Level: %02u", global_level.n);
+  xasprintf (&text1, "Replaying: %3lu%%", progress);
+  draw_logo (bitmap, text0, text1);
+  al_free (text0);
+  al_free (text1);
 }
