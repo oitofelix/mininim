@@ -23,6 +23,7 @@
 /* random number generator seed */
 uint32_t random_seed = 0;
 static uint32_t random_seedb = 0;
+unsigned int mrandom_seed;
 
 int
 prandom (int max)
@@ -31,6 +32,16 @@ prandom (int max)
 	random_seed = random_seed * 214013 + 2531011;
   if (! random_seed) random_seed = 1;
 	return (random_seed >> 16) % (max + 1);
+}
+
+int
+mrandom (int max)
+{
+  if (! mrandom_seed) mrandom_seed = time (NULL);
+  srand (mrandom_seed);
+  mrandom_seed = rand ();
+  if (! mrandom_seed) mrandom_seed = 1;
+  return mrandom_seed % (max + 1);
 }
 
 int

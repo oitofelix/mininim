@@ -378,10 +378,10 @@ draw_randomization (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   seedp (p);
   prandom (1);
-  r0 = prandom(1);
-  r1 = prandom(4);
-  r2 = prandom(1);
-  r3 = prandom(4);
+  r0 = prandom (1);
+  r1 = prandom (4);
+  r2 = prandom (1);
+  r3 = prandom (4);
 
   wall_divider_00 = r2 ? wall_narrow_divider : wall_wide_divider;
   wall_divider_01 = r0 ? wall_narrow_divider : wall_wide_divider;
@@ -394,9 +394,9 @@ draw_randomization (ALLEGRO_BITMAP *bitmap, struct pos *p,
     draw_divider_01 (bitmap, p, em, vm);
     draw_divider_00 (bitmap, p, em, vm);
     if (em == DUNGEON) {
-      if (prandom(4) == 0)
+      if (prandom (4) == 0)
         draw_right_mark (bitmap, p, prandom (3), vm);
-      if (prandom(4) == 0)
+      if (prandom (4) == 0)
         draw_left_mark (bitmap, p, prandom (4), vm);
     }
     break;
@@ -409,9 +409,9 @@ draw_randomization (ALLEGRO_BITMAP *bitmap, struct pos *p,
       draw_random_block (bitmap, p, em, vm);
     draw_divider_01 (bitmap, p, em, vm);
     if (em == DUNGEON) {
-      if (prandom(4) == 0)
+      if (prandom (4) == 0)
         draw_right_mark (bitmap, p, prandom (3), vm);
-      if (prandom(4) == 0)
+      if (prandom (4) == 0)
         draw_left_mark (bitmap, p, prandom (3), vm);
     }
     break;
@@ -419,9 +419,9 @@ draw_randomization (ALLEGRO_BITMAP *bitmap, struct pos *p,
     draw_divider_01 (bitmap, p, em, vm);
     draw_divider_00 (bitmap, p, em, vm);
     if (em == DUNGEON) {
-      if (prandom(4) == 0)
+      if (prandom (4) == 0)
         draw_right_mark (bitmap, p, prandom (1) + 2, vm);
-      if (prandom(4) == 0)
+      if (prandom (4) == 0)
         draw_left_mark (bitmap, p, prandom (4), vm);
     }
     break;
@@ -456,10 +456,10 @@ draw_base_randomization (ALLEGRO_BITMAP *bitmap, struct pos *p,
 
   seedp (p);
   prandom (1);
-  r0 = prandom(1);
-  r1 = prandom(4);
-  r2 = prandom(1);
-  r3 = prandom(4);
+  r0 = prandom (1);
+  r1 = prandom (4);
+  r2 = prandom (1);
+  r3 = prandom (4);
 
   wall_divider_00 = r2 ? wall_narrow_divider : wall_wide_divider;
   wall_divider_01 = r0 ? wall_narrow_divider : wall_wide_divider;

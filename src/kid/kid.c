@@ -245,7 +245,7 @@ colorful_shadow_palette (ALLEGRO_COLOR c)
     case 2: return TBLUE_COLOR;
     }
 
-  switch (prandom (9)) {
+  switch (mrandom (9)) {
   case 0: return RRED_COLOR;
   case 1: return RGREEN_COLOR;
   case 2: return RBLUE_COLOR;

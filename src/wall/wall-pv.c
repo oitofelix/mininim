@@ -155,7 +155,7 @@ generate_wall_colors_for_room (int room, ALLEGRO_COLOR wall_color_array[3][4][11
 
 	orand_seed = random_seed;
 	random_seed = room;
-	prandom(1);
+	prandom (1);
 
 	for (floor = 0; floor < 3; floor++) {
 		for (row = 0; row < 4; row++) {

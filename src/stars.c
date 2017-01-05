@@ -129,7 +129,7 @@ next_color (int c)
 {
   switch (c) {
   case 0: case 2: return 1;
-  case 1: default: return prandom (1) ? 0 : 2;
+  case 1: default: return mrandom (1) ? 0 : 2;
   }
   return 1;
 }
@@ -144,7 +144,7 @@ draw_stars (ALLEGRO_BITMAP *bitmap, struct stars *stars, enum vm vm)
     return;
   }
 
-  int i = prandom (stars->count - 1);
+  int i = mrandom (stars->count - 1);
   stars->s[i].color = next_color (stars->s[i].color);
   draw_star (stars, i, vm);
   draw_bitmapc (stars->b, bitmap, &stars->c, 0);

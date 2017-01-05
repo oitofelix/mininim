@@ -134,9 +134,11 @@ play_anim (void (*draw_callback) (void),
           if (compute_callback) compute_callback ();
           clear_bitmap (uscreen, TRANSPARENT_COLOR);
           uint32_t random_seed_before_draw;
-          random_seed_before_draw = random_seed;
+          if (replay_mode != NO_REPLAY)
+            random_seed_before_draw = random_seed;
           draw_callback ();
-          random_seed = random_seed_before_draw;
+          if (replay_mode != NO_REPLAY)
+            random_seed = random_seed_before_draw;
           play_audio_instances ();
           if (! is_game_paused ())
             anim_cycle++;
