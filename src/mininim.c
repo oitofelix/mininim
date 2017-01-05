@@ -1,7 +1,8 @@
 /*
   mininim.c -- MININIM main module;
 
-  Copyright (C) 2015, 2016 Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
+  Copyright (C) 2015, 2016, 2017 Bruno Félix Rezende Ribeiro
+  <oitofelix@gnu.org>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -1078,7 +1079,7 @@ version (FILE *stream, struct argp_state *state)
            "%s\n\n" /* Written by... */
            "Using Allegro %i.%i.%i[%i].\n", /* Using Allegro... */
            PACKAGE, PACKAGE_NAME, VERSION,
-           "2015, 2016", "oitofelix@gnu.org",
+           "2015, 2016, 2017", "oitofelix@gnu.org",
            "\
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\n\
 This is free software: you are free to change and redistribute it.\n\

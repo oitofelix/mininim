@@ -1,0 +1,3 @@
+#!/bin/bash
+find src -name '*.c' -or -name '*.h' |
+    xargs sed -i "s/2015, 2016 Bruno Félix Rezende Ribeiro <oitofelix@gnu\.org>/2015, 2016, 2017 Bruno Félix Rezende Ribeiro\n  <oitofelix@gnu\.org>/"
