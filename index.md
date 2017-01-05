@@ -114,10 +114,15 @@ recorded.
 [PODebug](http://www.podebug.com/2016/08/029-recriando-prince-of-persia-dois-projetos-brasileiros/)
 has a podcast episode from august 2016 titled _Recriando Prince of
 Persia: Dois Projetos Brasileiros_ (Recreating Prince of Persia: Two
-Brazilian Projects) in which Bruno Félix (oitofelix) was invited to
-speak about MININIM.
+Brazilian Projects) for which Bruno Félix (oitofelix) was invited to
+talk about MININIM.
 [Here's](http://feeds.soundcloud.com/stream/278619854-podebug-029-recriando-prince-of-persia-dois-projetos-brasileiros.mp3)
 a MP3 for download (Portuguese).
+
+A Youtube playlist of a full walkthrough of the standard Prince of
+Persia legacy level set, using MININIM's replay capabilities is also
+[available](https://www.youtube.com/playlist?list=PLSibI2wnwb-Yf1bhWygaC-2Q8XcmJ8D0I)
+at oitofelix's channel.
 
 
 ### Download
