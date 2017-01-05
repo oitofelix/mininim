@@ -693,7 +693,7 @@ shake_loose_floor_row (struct pos *p)
 void
 sample_random_loose_floor (struct pos *p)
 {
-  switch (mrandom (2)) {
+  switch (prandom (2)) {
   case 0: play_audio (&loose_floor_00_audio, p, -1);
   case 1: play_audio (&loose_floor_01_audio, p, -1);
   case 2: play_audio (&loose_floor_02_audio, p, -1);
