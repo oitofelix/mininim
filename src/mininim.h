@@ -32,6 +32,7 @@
 #include <assert.h>
 #include <math.h>
 #include <time.h>
+#include <glob.h>
 #include "error.h"
 #include "argp.h"
 #include "progname.h"
