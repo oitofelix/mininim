@@ -194,9 +194,10 @@ legacy_level_special_events (void)
   if (global_level.n == 3) {
 
     /* level 3 checkpoint */
-    new_pos (&p, &global_level, 2, 0, 8);
-    survey (_m, pos, &k->f, NULL, &pm, NULL);
-    if (peq (&pm, &p) && replay_mode == NO_REPLAY) {
+    if (! level_3_checkpoint
+        && k->f.c.prev_room == 7
+        && k->f.c.xd == LEFT
+        && replay_mode == NO_REPLAY) {
       level_3_checkpoint = true;
       checkpoint_total_lives = k->total_lives;
       checkpoint_current_lives = k->current_lives;
