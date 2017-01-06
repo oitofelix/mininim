@@ -310,7 +310,9 @@ play_anim (void (*draw_callback) (void),
 
       /* F: enable/disable fullscreen mode */
       if (! active_menu
-          && was_key_pressed (ALLEGRO_KEY_F, 0, 0, true)) {
+          && (was_key_pressed (ALLEGRO_KEY_F, 0, 0, true)
+              || was_key_pressed (ALLEGRO_KEY_ENTER, 0,
+                                  ALLEGRO_KEYMOD_ALT, true))) {
         if (display_mode < 0) {
           force_full_redraw = true;
           char *boolean;
