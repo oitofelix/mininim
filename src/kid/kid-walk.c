@@ -153,7 +153,7 @@ flow (struct anim *k)
     else k->confg = FLOOR;
   }
 
-  if (k->i == -1 && fg (&k->p) != LOOSE_FLOOR) {
+  if (k->i == -1) {
     if (k->dc <= 5) {
       kid_normal (k);
       return false;
