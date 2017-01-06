@@ -614,10 +614,14 @@ draw_room_anim_fg_sub (ALLEGRO_BITMAP *bitmap,
 
   /* VERTICAL JUMP */
   if (is_kid_vjump_touching_above (f)) {
+    int dx;
+    if (f->dir == LEFT && is_strictly_traversable (&ptr2)) dx = PLACE_WIDTH;
+    else dx = 2 * PLACE_WIDTH;
+
     push_clipping_rectangle (bitmap,
                              PLACE_WIDTH * ptl2.place,
                              PLACE_HEIGHT * ptl2.floor + 56,
-                             2 * PLACE_WIDTH,
+                             dx,
                              PLACE_HEIGHT - 56 + 3);
 
     push_drawn_rectangle (bitmap);

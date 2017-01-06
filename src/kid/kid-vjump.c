@@ -148,6 +148,7 @@ flow (struct anim *k)
     k->fo.dx += -1;
     k->fo.dy += -1;
   }
+  if (k->i == 12 && k->hang) k->fo.dx = -2;
   if (k->i == 12 && k->j++ > 0)
     k->fo.dx = 0, k->fo.dy += 2 * k->j + 1;
   if (k->j == 4) k->j = 0;
