@@ -353,7 +353,6 @@ legacy_level_special_events (void)
       ks->controllable = false;
       ks->action = kid_normal;
       ks->dont_draw_lives = true;
-      ks->immortal = true;
       place_frame (&ks->f, &ks->f, kid_normal_00, &shadow_pos,
                    +9, +15);
       shadow_id = id;
@@ -368,12 +367,11 @@ legacy_level_special_events (void)
 
     /* if kid opens the door and jumps to reach the other side of room
        1, make his shadow step over the closer floor */
-    struct pos door_pos; new_pos (&door_pos, &global_level, 1, 1, 2);
+    survey (_m, pos, &k->f, NULL, &pm, NULL);
     if (k->f.c.room == 1
         && k->action == kid_run_jump
         && k->i == 7
-        && fg (&door_pos) == DOOR
-        && door_at_pos (&door_pos)->i < DOOR_STEPS - 1) {
+        && pm.place <= 5) {
       ks->key.right = true;
       ks->key.shift = true;
     }
