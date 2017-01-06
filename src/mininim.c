@@ -130,7 +130,7 @@ static struct argp_option options[] = {
 
   {"ignore-environment", IGNORE_ENVIRONMENT_OPTION, NULL, 0, "Ignore environment variables.  The default is to parse them after the main configuration file.", 0},
 
-  {NULL, 0, NULL, OPTION_DOC, "There are three methods of configuration: command line options, environment variables and configuration files.  For every command line option of the form 'x-y' there is an equivalent environment variable option 'MININIM_X_Y' and an equivalent configuration file option 'x y'.  The multiple methods of configuration are cumulative but command line options override any other, while environment variables override the main configuration file.  In any method applicable later options override earlier ones.  The option '--print-paths' shows, among other things, the expected file name of the main configuration file.", 0},
+  {NULL, 0, NULL, OPTION_DOC, "There are three methods of configuration: command line options, environment variables and configuration files.  For every command line option of the form 'x-y' there is an equivalent environment variable option 'MININIM_X_Y' and an equivalent configuration file option 'x y'.  The multiple methods of configuration are cumulative but command line options override any other, while environment variables override the main configuration file.  In any method applicable later options override earlier ones in case their effects are totally or partially conflicting.  The option '--print-paths' shows, among other things, the expected file name of the main configuration file.", 0},
 
   {NULL, 0, NULL, OPTION_DOC, "Notice that save files (CTRL+G) are a particular case of configuration files and should be loaded the same way.  When loaded in-game, configuration files take effect immediately, however some effects only become visible under certain conditions.  For instance save files show their effect only on game (re)start.", 0},
 
@@ -962,7 +962,10 @@ Levels have been converted using module %s into native format at\n\
     if (e) return e;
     switch (i) {
     case 0: semantics = NATIVE_SEMANTICS; break;
-    case 1: semantics = LEGACY_SEMANTICS; break;
+    case 1:
+      semantics = LEGACY_SEMANTICS;
+      mr.fit_w = mr.fit_h = 1;
+      break;
     }
     break;
   case MOVEMENTS_OPTION:
