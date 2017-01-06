@@ -431,10 +431,10 @@ legacy_level_special_events (void)
     survey (_m, pos, &k->f, NULL, &pm, NULL);
     if (shadow_id == -1
         && ext (&sword_pos) != SWORD
-        && pm.room == 15 && pm.floor == 0 && pm.place < 6
+        && pm.room == 15 && pm.place < 6
         && ! shadow_merged) {
       struct pos shadow_pos;
-      new_pos (&shadow_pos, &global_level, roomd (&global_level, 15, ABOVE), 2, 1);
+      new_pos (&shadow_pos, &global_level, 15, 0, 1);
       shadow_id = create_anim (NULL, SHADOW, &shadow_pos, RIGHT);
       ks = &anima[shadow_id];
       ks->fight = true;
@@ -449,7 +449,7 @@ legacy_level_special_events (void)
       guard_fall (ks);
       struct frameset *frameset = get_guard_fall_frameset (ks->type);
       place_frame (&ks->f, &ks->f, frameset[0].frame, &shadow_pos,
-                   +9, +15);
+                   +9, -20);
     } else if (shadow_id != -1) ks = get_anim_by_id (shadow_id);
 
     /* if shadow has appeared but not merged yet */

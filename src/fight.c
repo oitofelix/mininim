@@ -657,6 +657,7 @@ put_at_defense_frame (struct anim *k)
 {
   struct frameset *frameset;
   play_audio (&sword_defense_audio, NULL, k->id);
+  stop_audio_instance (&sword_attack_audio, NULL, k->enemy_id);
 
   switch (k->type) {
   case NO_ANIM: default: break;
