@@ -84,9 +84,6 @@ legacy_level_start (void)
   if (global_level.n == 7) {
     mr_center_room (1);
     camera_follow_kid = -1;
-  } else if (global_level.n == 13) {
-    mr_center_room (23);
-    camera_follow_kid = -1;
   } else {
     mr_center_room (k->f.c.room);
     camera_follow_kid = k->id;
