@@ -178,8 +178,8 @@ register_con_undo (struct undo *u, struct pos *p,
 
   *con (&d->p) = d->f;
 
-  if (should_init (&d->b, &d->f))
-    init_con_at_pos (&d->p);
+  /* if (should_init (&d->b, &d->f)) */
+  init_con_at_pos (&d->p);
 
   if (cs) {
     d->fs = *cs;
@@ -198,8 +198,8 @@ con_undo (struct con_undo *d, int dir)
 
   *con (&d->p) = (dir >= 0) ? d->f : d->b;
 
-  if (should_init (&d->b, &d->f))
-    init_con_at_pos (&d->p);
+  /* if (should_init (&d->b, &d->f)) */
+  init_con_at_pos (&d->p);
 
   copy_from_con_state (&d->p, (dir >= 0) ? &d->fs : &d->bs);
 
