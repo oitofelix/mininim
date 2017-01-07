@@ -132,19 +132,21 @@ physics_in (struct anim *k)
   }
 
   /* fall speed */
+  int speed;
+  if (k->i <= 4 || k->float_timer) speed = 0;
+  else speed = +21 + 3 * (k->i - 5);
+
   if (k->i > 0)
     k->fo.dx = -k->inertia;
-  if (k->i > 4) {
-    int speed = +21 + 3 * (k->i - 5);
+  if (k->i > 4)
     k->fo.dy = (speed > 33) ? 33 : speed;
-  }
 
   if (k->i == 4) k->fo.dx += +4;
 
   /* floating */
   if (k->float_timer) {
     if (k->float_timer < 192) {
-      k->fo.dx = -2;
+      k->fo.dx = -k->inertia / 2 - 2;
       k->fo.dy = +5;
     } else {
       k->float_timer = 0;
@@ -186,7 +188,6 @@ physics_in (struct anim *k)
   fo.dx = kid_fall_frameset[k->i > 4 ? 4 : k->i].dx;
   fo.dy = kid_fall_frameset[k->i > 4 ? 4 : k->i].dy;
 
-  int speed = +21 + 3 * (k->i - 5);
   if (k->float_timer) fo.dy = 14;
   else {
     if (k->i > 0) fo.dx = -k->inertia;

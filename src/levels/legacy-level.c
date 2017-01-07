@@ -72,7 +72,6 @@ legacy_level_start (void)
   if (global_level.n == 13) {
     k->f.dir = (k->f.dir == LEFT) ? RIGHT : LEFT;
     k->next_action = kid_run;
-    frame2room (&k->f, roomd (k->f.c.l, 23, RIGHT), &k->f.c);
   } else if (global_level.n == 1)
     k->next_action = kid_turn;
   else {
