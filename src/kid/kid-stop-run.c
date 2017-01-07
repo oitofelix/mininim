@@ -79,7 +79,10 @@ kid_stop_run (struct anim *k)
 static bool
 flow (struct anim *k)
 {
-  if (k->oaction != kid_stop_run) k->i = -1;
+  if (k->oaction != kid_stop_run) {
+    k->i = -1;
+    k->constrained_turn_run = false;
+  }
 
   bool turn_run = (k->f.dir == RIGHT) ? k->key.left : k->key.right;
   bool couch = k->key.down;
@@ -96,6 +99,15 @@ flow (struct anim *k)
   }
 
   select_frame (k, kid_stop_run_frameset, k->i + 1);
+
+  if (k->oaction == kid_start_run && turn_run && k->i == 0) {
+    struct pos ptf; surveyo (_tf, +0, +0, pos, &k->f, NULL, &ptf, NULL);
+    if (is_constrained_pos (&ptf, &k->f)) {
+      k->fo.dx += +12;
+      k->constrained_turn_run = true;
+    }
+  }
+
 
   return true;
 }

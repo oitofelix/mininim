@@ -1419,6 +1419,39 @@ is_hang_pos_free (struct pos *hang_pos, enum dir d)
 
 
 
+
+
+bool
+is_constrained_pos (struct pos *p, struct frame *f)
+{
+  struct pos p_1, p1, p2;
+  int d = f->dir == LEFT ? -1 : +1;
+  prel (p, &p_1, +0, d * -1);
+  prel (p, &p1, +0, d * +1);
+  prel (p, &p2, +0, d * +2);
+  return is_strictly_traversable (&p_1)
+    && ((f->dir == LEFT &&
+         ((! is_strictly_traversable (&p1)
+           && is_strictly_traversable (&p2))
+          || (! is_strictly_traversable (&p1)
+              && ! is_collidable_at_left (p, f)
+              && ! is_collidable_at_right (&p1, f)
+              && (is_collidable_at_left (&p1, f)
+                  || is_collidable_at_right (&p2, f)))))
+        || (f->dir == RIGHT &&
+            ((! is_strictly_traversable (&p1)
+              && is_strictly_traversable (&p2))
+             || (! is_strictly_traversable (&p1)
+                 && ! is_collidable_at_right (p, f)
+                 && ! is_collidable_at_left (&p1, f)
+                 && (is_collidable_at_right (&p1, f)
+                     || is_collidable_at_left (&p2, f))))));
+}
+
+
+
+
+
 
 void
 update_depressible_floor (struct anim *a, int dx0, int dx1)

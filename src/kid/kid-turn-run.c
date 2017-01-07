@@ -96,10 +96,7 @@ kid_turn_run (struct anim *k)
 static bool
 flow (struct anim *k)
 {
-  if (k->oaction != kid_turn_run) {
-    k->i = -1;
-    k->constrained_turn_run = false;
-  }
+  if (k->oaction != kid_turn_run) k->i = -1;
 
   if (k->i == 8) {
     kid_run (k);
@@ -124,15 +121,6 @@ physics_in (struct anim *k)
   next_frame_inv = false;
 
   /* fall */
-  if (semantics == LEGACY_SEMANTICS && k->i == 1) {
-    int dir = k->f.dir == LEFT ? +1 : -1;
-    surveyo (_tb, -8, +0, pos, &k->f, NULL, &ptb, NULL);
-    k->constrained_turn_run =
-      strictly_traversable_cs (fg_rel (&ptb, +0, dir))
-      && ! strictly_traversable_cs (fg_rel (&ptb, +0, -dir))
-      && strictly_traversable_cs (fg_rel (&ptb, +0, -dir * 2));
-  }
-
   surveyo (_tb, -2, +0, pos, &k->f, NULL, &ptb, NULL);
   if (! k->constrained_turn_run && is_strictly_traversable (&ptb)) {
     kid_fall (k);

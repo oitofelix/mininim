@@ -167,6 +167,12 @@ bool is_hang_pos_free (struct pos *hang_pos, enum dir d);
 
 
 
+bool is_constrained_pos (struct pos *p, struct frame *f);
+
+
+
+
+
 void update_depressible_floor (struct anim *a, int dx0, int dx1);
 void keep_depressible_floor (struct anim *a);
 void clear_depressible_floor (struct anim *a);

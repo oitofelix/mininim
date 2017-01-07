@@ -103,6 +103,10 @@ flow (struct anim *k)
     return false;
   }
 
+  if (k->i == -1 && jump && k->oaction == kid_turn_run
+      && k->constrained_turn_run)
+    k->f.c.x += k->f.dir == LEFT ? +4 : -4;
+
   if (jump && k->f.b != kid_run_jump_frameset[10].frame) {
     /* platform edge detection */
     struct coord mf, cm; struct pos pmf;
