@@ -100,6 +100,7 @@ flow (struct anim *k)
 
   select_frame (k, kid_stop_run_frameset, k->i + 1);
 
+  /* constrained turn run */
   if (k->oaction == kid_start_run && turn_run && k->i == 0) {
     struct pos ptf; surveyo (_tf, +0, +0, pos, &k->f, NULL, &ptf, NULL);
     if (is_constrained_pos (&ptf, &k->f)) {

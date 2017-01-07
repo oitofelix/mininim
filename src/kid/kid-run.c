@@ -103,9 +103,17 @@ flow (struct anim *k)
     return false;
   }
 
+  /* constrained turn run */
   if (k->i == -1 && jump && k->oaction == kid_turn_run
       && k->constrained_turn_run)
     k->f.c.x += k->f.dir == LEFT ? +4 : -4;
+
+  /* constrained run jump */
+  if (k->i == -1 && jump && k->oaction == kid_run_jump) {
+    struct pos ptf; surveyo (_tf, +0, +0, pos, &k->f, NULL, &ptf, NULL);
+    if (is_constrained_pos (&ptf, &k->f))
+      k->f.c.x += k->f.dir == LEFT ? +4 : -4;
+  }
 
   if (jump && k->f.b != kid_run_jump_frameset[10].frame) {
     /* platform edge detection */
