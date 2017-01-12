@@ -47,6 +47,10 @@
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_native_dialog.h>
 
+#ifndef DEBUG
+#define DEBUG 0
+#endif
+
 #include "constants.h"
 #include "types.h"
 #include "colors.h"

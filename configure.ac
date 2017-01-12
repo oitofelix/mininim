@@ -71,9 +71,9 @@ AM_CONDITIONAL([DEBUG], [test x$debug = xtrue])
 
 AS_IF([[test x$debug != xtrue]],
   [AC_DEFINE([NDEBUG], [1], [Define to 1 to disable assert macro.])]
-  [AC_DEFINE([DEBUG], [0], [Define to 0 for release builds.])],
+  [debug_suffix=-debug],
   [AC_DEFINE([DEBUG], [1], [Define to 1 for debug builds.])]
-  [debug_sufix=-debug])
+  [debug_suffix=-debug])
 
 # Optimizations option
 AC_ARG_ENABLE([optimizations],
@@ -133,19 +133,19 @@ AS_CASE([$host],
   AC_DEFINE([MINGW_BUILD], [1], [Define to 1 if this build is targeting MinGW.])
 
   [ALLEGRO_CFLAGS=""
-   ALLEGRO_LIBS="-lallegro${debug_sufix}"
+   ALLEGRO_LIBS="-lallegro${debug_suffix}"
    ALLEGRO_IMAGE_CFLAGS="${ALLEGRO_CFLAGS}"
-   ALLEGRO_IMAGE_LIBS="-lallegro_image${debug_sufix} ${ALLEGRO_LIBS}"
+   ALLEGRO_IMAGE_LIBS="-lallegro_image${debug_suffix} ${ALLEGRO_LIBS}"
    ALLEGRO_AUDIO_CFLAGS="${ALLEGRO_CFLAGS}"
-   ALLEGRO_AUDIO_LIBS="-lallegro_audio${debug_sufix} ${ALLEGRO_LIBS}"
+   ALLEGRO_AUDIO_LIBS="-lallegro_audio${debug_suffix} ${ALLEGRO_LIBS}"
    ALLEGRO_ACODEC_CFLAGS="${ALLEGRO_CFLAGS}"
-   ALLEGRO_ACODEC_LIBS="-lallegro_acodec${debug_sufix} ${ALLEGRO_AUDIO_LIBS}"
+   ALLEGRO_ACODEC_LIBS="-lallegro_acodec${debug_suffix} ${ALLEGRO_AUDIO_LIBS}"
    ALLEGRO_FONT_CFLAGS="${ALLEGRO_CFLAGS}"
-   ALLEGRO_FONT_LIBS="-lallegro_font${debug_sufix} ${ALLEGRO_LIBS}"
+   ALLEGRO_FONT_LIBS="-lallegro_font${debug_suffix} ${ALLEGRO_LIBS}"
    ALLEGRO_PRIMITIVES_CFLAGS="${ALLEGRO_CFLAGS}"
-   ALLEGRO_PRIMITIVES_LIBS="-lallegro_primitives${debug_sufix} ${ALLEGRO_LIBS}"
+   ALLEGRO_PRIMITIVES_LIBS="-lallegro_primitives${debug_suffix} ${ALLEGRO_LIBS}"
    ALLEGRO_DIALOG_CFLAGS="${ALLEGRO_CFLAGS}"
-   ALLEGRO_DIALOG_LIBS="-lallegro_dialog${debug_sufix} ${ALLEGRO_LIBS}"
+   ALLEGRO_DIALOG_LIBS="-lallegro_dialog${debug_suffix} ${ALLEGRO_LIBS}"
    mingw_ldadd="-lFLAC \
       -lfreetype \
       -lvorbisfile \
