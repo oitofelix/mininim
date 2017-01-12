@@ -422,6 +422,8 @@ load_bitmap (char *filename)
 void
 validate_bitmap_for_mingw (ALLEGRO_BITMAP *bitmap)
 {
+  if (! MINGW_BUILD) return;
+
   /* work around a bug (MinGW target), where bitmaps are loaded as
      black/transparent images */
   al_lock_bitmap(bitmap, ALLEGRO_PIXEL_FORMAT_ANY,
