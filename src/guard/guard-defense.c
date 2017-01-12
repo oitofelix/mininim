@@ -202,6 +202,7 @@ flow (struct anim *g)
     return false;
   } else if (g->i == 0 && ke && ke->enemy_defended_my_attack == 2
            && ke->enemy_counter_attacked_myself != 2) {
+    if (ke->i_initiated_attack) g->angry = 60;
     guard_walkb (g);
     return false;
   } else if (g->i == 0 && ! (ke && ke->enemy_defended_my_attack == 2)) {
@@ -233,14 +234,11 @@ flow (struct anim *g)
 static bool
 physics_in (struct anim *g)
 {
-  struct pos pmbo;
-
   /* collision */
   uncollide_back_fight (g);
 
   /* fall */
-  survey (_mbo, pos, &g->f, NULL, &pmbo, NULL);
-  if (is_strictly_traversable (&pmbo)) {
+  if (is_falling (&g->f, _mbo, +0, +0)) {
     g->xf.b = NULL;
     guard_fall (g);
     return false;

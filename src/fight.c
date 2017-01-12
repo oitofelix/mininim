@@ -224,8 +224,15 @@ fight_ai (struct anim *k)
       && is_safe_to_attack (ke)) {
     if (ke->has_sword) {
       place_on_the_ground (&ke->f, &ke->f.c);
+      if (k->f.dir != ke->f.dir) {
+        if (is_falling (&ke->f, _tb, +0, +0))
+          backoff_from_range (ke, k, FIGHT_RANGE, true, false);
+        else
+          backoff_from_range (k, ke, FIGHT_RANGE, true, false);
+      }
       kid_take_sword (ke);
       ke->auto_taken_sword = true;
+      ke->no_walkf_timer = 6;
     } else if (is_attacking (k) && ! ke->sword_immune) {
       k->i = 3;
       place_on_the_ground (&ke->f, &ke->f.c);
@@ -310,6 +317,7 @@ fight_ai (struct anim *k)
       && ! is_kid_stairs (&ke->f)
       && is_safe_to_follow (k, ke, k->f.dir)
       && (prandom (99) <= k->skill.advance_prob
+          || prandom (99) < k->angry
           || ! is_in_fight_mode (ke))
       && ! is_attacking (ke)
       && (! is_in_fight_mode (ke)
@@ -326,6 +334,7 @@ fight_ai (struct anim *k)
       && ! is_on_back (k, ke)
       && (is_attacking (ke) && ke->i == 0)
       && (prandom (99) <= k->skill.defense_prob
+          || prandom (99) < k->angry
           || k->refraction > 0)
       && ke->current_lives > 0) {
     fight_defense (k);
@@ -406,14 +415,16 @@ fight_mechanics (struct anim *k)
   if (! ke->enemy_counter_attacked_myself)
     ke->enemy_counter_attacked_myself =
       (ke->enemy_defended_my_attack && k->key.shift
-       && prandom (99) <= k->skill.counter_attack_prob
+       && (prandom (99) <= k->skill.counter_attack_prob
+           || prandom (99) < k->angry)
        && (ke->attack_range_near || k->attack_range_near)
        && ! walkb);
 
   if (! ke->i_counter_defended)
     ke->i_counter_defended =
       (ke->enemy_counter_attacked_myself && ke->key.up
-       && prandom (99) <= ke->skill.counter_defense_prob);
+       && (prandom (99) <= ke->skill.counter_defense_prob
+           || k->angry));
 
   if (! k->hurt_enemy_in_counter_attack)
     k->hurt_enemy_in_counter_attack =
@@ -656,8 +667,12 @@ void
 put_at_defense_frame (struct anim *k)
 {
   struct frameset *frameset;
+  struct anim *ke = get_anim_by_id (k->enemy_id);
+
   play_audio (&sword_defense_audio, NULL, k->id);
   stop_audio_instance (&sword_attack_audio, NULL, k->enemy_id);
+  kid_haptic (k, KID_HAPTIC_SWORD);
+  kid_haptic (ke, KID_HAPTIC_SWORD);
 
   switch (k->type) {
   case NO_ANIM: default: break;
@@ -667,7 +682,6 @@ put_at_defense_frame (struct anim *k)
 
     select_frame (k, kid_sword_defense_frameset, 1);
 
-    struct anim *ke = get_anim_by_id (k->enemy_id);
     if (ke->type == KID) {
       select_xframe (&k->xf, sword_frameset, 11);
       k->xf.dx = -13;
@@ -779,7 +793,7 @@ bool
 is_pos_seeing (struct pos *p0, struct anim *k1, enum dir dir)
 {
   struct coord m0, m1, mt1, mb1; struct pos p, p1, pk, pke;
-  con_m (p0, &m0);
+  con_coord (p0, _m, &m0);
 
   coord_f cf;
   if (is_kid_climb (&k1->f) || is_anim_fall (&k1->f)) {
@@ -1133,10 +1147,16 @@ fight_hit (struct anim *k, struct anim *ke)
   survey (_m, pos, &k->f, NULL, &k->p, NULL);
   prel (&k->p, &pb, 0, d);
 
+  if (is_attacking (k))
+    move_frame (&k->f, _tb, +0, -8, -8);
+
   if (k->current_lives <= 0 && ! is_strictly_traversable (&pb)) {
     k->current_lives = 0;
     k->death_reason = FIGHT_DEATH;
     ke->alert_cycle = anim_cycle;
+    /* prevent kid from passing through a collidable */
+    if (is_kid_hang (&k->f))
+      k->f.c.x += k->f.dir == LEFT ? +8 : -8;
     anim_die (k);
   } else anim_sword_hit (k);
 
@@ -1146,6 +1166,9 @@ fight_hit (struct anim *k, struct anim *ke)
   }
 
   k->splash = true;
+
+  kid_haptic (k, KID_HAPTIC_HARM);
+  kid_haptic (ke, KID_HAPTIC_HARM);
 
   if (k->id == current_kid_id) {
     mr.flicker = 2;
@@ -1165,6 +1188,10 @@ backoff_from_range (struct anim *k0, struct anim *k1, int r,
 
   kl = (kd->f.dir == LEFT) ? kd : ks;
   kr = (kd->f.dir == RIGHT) ? kd : ks;
+
+  /* necessary for preventing reminiscent values from interfering */
+  kl->fo.dy = +0;
+  kr->fo.dy = +0;
 
   int i = 0;
   while (is_in_range (k0, k1, r) && i <= (only_k1 ? 2 : 1) * r) {
@@ -1196,6 +1223,10 @@ get_in_range (struct anim *k0, struct anim *k1, int r,
 
   kl = (kd->f.dir == LEFT) ? kd : ks;
   kr = (kd->f.dir == RIGHT) ? kd : ks;
+
+  /* necessary for preventing reminiscent values from interfering */
+  kl->fo.dy = +0;
+  kr->fo.dy = +0;
 
   int i = 0;
   while (! is_in_range (k0, k1, r) && i <= (only_k1 ? 2 : 1) * r) {

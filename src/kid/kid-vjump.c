@@ -162,9 +162,7 @@ flow (struct anim *k)
 static bool
 physics_in (struct anim *k)
 {
-  struct pos ptf, ptfb, ptr, pm, pmf, pmba;
-
-  survey (_m, pos, &k->f, NULL, &pm, NULL);
+  struct pos ptf, ptfb, ptr;
 
   /* collision */
   if (uncollide (&k->f, &k->fo, _bf, +0, +0, NULL, &k->ci)
@@ -172,11 +170,9 @@ physics_in (struct anim *k)
     uncollide (&k->f, &k->fo, _bf, +0, +0, &k->fo, &k->ci);
 
   /* fall */
-  survey (_mf, pos, &k->f, NULL, &pmf, NULL);
-  survey (_mba, pos, &k->f, NULL, &pmba, NULL);
-  if (is_strictly_traversable (&pm)
-      && is_strictly_traversable (&pmf)
-      && is_strictly_traversable (&pmba)) {
+  if (is_falling (&k->f, _m, +0, +0)
+      && is_falling (&k->f, _mf, +0, +0)
+      && is_falling (&k->f, _mba, +0, +0)) {
     kid_fall (k);
     return false;
   }
@@ -251,8 +247,9 @@ physics_out (struct anim *k)
     survey (_tf, pos, &k->f, NULL, &ptf, NULL);
     ctf = fg (&ptf);
     shake_loose_floor_row (&ptb);
-    if (ctb == LOOSE_FLOOR) release_loose_floor (&ptb);
-    if (ctf == LOOSE_FLOOR) release_loose_floor (&ptf);
+    if (ctb == LOOSE_FLOOR) release_loose_floor (&ptb, k);
+    if (ctf == LOOSE_FLOOR) release_loose_floor (&ptf, k);
+    kid_haptic (k, KID_HAPTIC_COLLISION);
   }
 
   /* loose floor shaking */

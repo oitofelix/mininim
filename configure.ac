@@ -70,9 +70,10 @@ esac],[debug=false])
 AM_CONDITIONAL([DEBUG], [test x$debug = xtrue])
 
 AS_IF([[test x$debug != xtrue]],
-  [AC_DEFINE([NDEBUG], [1], [Define to 1 to disable assert macro.])],
-  dnl [debug_sufix=-debug]
-  )
+  [AC_DEFINE([NDEBUG], [1], [Define to 1 to disable assert macro.])]
+  [AC_DEFINE([DEBUG], [0], [Define to 0 for release builds.])],
+  [AC_DEFINE([DEBUG], [1], [Define to 1 for debug builds.])]
+  [debug_sufix=-debug])
 
 # Optimizations option
 AC_ARG_ENABLE([optimizations],

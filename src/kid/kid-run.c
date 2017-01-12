@@ -106,13 +106,13 @@ flow (struct anim *k)
   /* constrained turn run */
   if (k->i == -1 && jump && k->oaction == kid_turn_run
       && k->constrained_turn_run)
-    k->f.c.x += k->f.dir == LEFT ? +4 : -4;
+    move_frame (&k->f, _tb, +0, -4, -4);
 
   /* constrained run jump */
   if (k->i == -1 && jump && k->oaction == kid_run_jump) {
     struct pos ptf; surveyo (_tf, +0, +0, pos, &k->f, NULL, &ptf, NULL);
     if (is_constrained_pos (&ptf, &k->f))
-      k->f.c.x += k->f.dir == LEFT ? +4 : -4;
+      move_frame (&k->f, _tb, +0, -4, -4);
   }
 
   if (jump && k->f.b != kid_run_jump_frameset[10].frame) {
@@ -122,7 +122,7 @@ flow (struct anim *k)
     int dir = (k->f.dir == LEFT) ? -1 : +1;
     struct pos p;
     prel (&pmf, &p, +0, dir * 2);
-    con_m (&p, &cm);
+    con_coord (&p, _m, &cm);
     if (! (strictly_traversable_cs (fg_rel (&pmf, +0, dir * 2))
            && ! strictly_traversable_cs (fg_rel (&pmf, +0, dir))
            && dist_coord (&mf, &cm) > 2 * PLACE_WIDTH - 3)) {
@@ -152,8 +152,6 @@ flow (struct anim *k)
 static bool
 physics_in (struct anim *k)
 {
-  struct pos ptf;
-
   /* inertia */
   k->inertia = 0;
   k->cinertia = 6;
@@ -165,9 +163,9 @@ physics_in (struct anim *k)
   }
 
   /* fall */
-  surveyo (_tf, -4, +0, pos, &k->f, NULL, &ptf, NULL);
-  if (is_strictly_traversable (&ptf)) {
+  if (is_falling (&k->f, _tf, -4, -4)) {
     play_audio (&step_audio, NULL, k->id);
+    kid_haptic (k, KID_HAPTIC_STEP);
     kid_fall (k);
     return false;
   }
@@ -184,11 +182,16 @@ physics_out (struct anim *k)
   else if (k->i == 6) update_depressible_floor (k, -4, -11);
   else keep_depressible_floor (k);
 
-  /* sound */
-  if (k->oaction == kid_run_jump)
+  /* sound and haptic */
+  if (k->oaction == kid_run_jump) {
     play_audio (&step_audio, NULL, k->id);
-  if (k->i == 2 || k->i == 6)
+    kid_haptic (k, KID_HAPTIC_STEP);
+  }
+
+  if (k->i == 2 || k->i == 6) {
     play_audio (&step_audio, NULL, k->id);
+    kid_haptic (k, KID_HAPTIC_STEP);
+  }
 }
 
 bool

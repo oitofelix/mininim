@@ -122,6 +122,10 @@ struct level *mirror_level_h (struct level *l);
 
 bool is_immediately_accessible_pos (struct pos *to, struct pos *from,
                                     struct frame *f);
+struct frame *
+move_frame (struct frame *f, coord_f cf, int dx,
+            int move_left, int move_right);
+
 bool
 uncollide (struct frame *f, struct frame_offset *fo, coord_f cf,
            int left, int right,
@@ -168,7 +172,8 @@ bool is_hang_pos_free (struct pos *hang_pos, enum dir d);
 
 
 bool is_constrained_pos (struct pos *p, struct frame *f);
-
+bool is_in_front_open_level_door (struct frame *f, struct pos *p);
+bool is_falling (struct frame *f, coord_f cf, int dx0, int dx1);
 
 
 
@@ -178,7 +183,7 @@ void keep_depressible_floor (struct anim *a);
 void clear_depressible_floor (struct anim *a);
 void save_depressible_floor (struct anim *a);
 void restore_depressible_floor (struct anim *a);
-void press_depressible_floor (struct pos *p);
+void press_depressible_floor (struct pos *p, struct anim *a);
 void unhide_hidden_floor (struct pos *p);
 
 

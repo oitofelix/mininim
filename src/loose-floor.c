@@ -356,7 +356,7 @@ remove_loose_floor (struct loose_floor *l)
 }
 
 void
-release_loose_floor (struct pos *p)
+release_loose_floor (struct pos *p, struct anim *a)
 {
   struct loose_floor *l = loose_floor_at_pos (p);
   if (fg (p) == LOOSE_FLOOR
@@ -364,6 +364,7 @@ release_loose_floor (struct pos *p)
       && (l->action == NO_LOOSE_FLOOR_ACTION
           || l->action == SHAKE_LOOSE_FLOOR)
       && ! l->cant_fall) {
+    kid_haptic (a, KID_HAPTIC_COLLISION);
     l->action = RELEASE_LOOSE_FLOOR;
     l->i = 0;
   }
@@ -622,6 +623,7 @@ compute_loose_floor_fall (struct loose_floor *l)
         a->hit_by_loose_floor = true;
         play_audio (&hit_wall_audio, NULL, a->id);
         a->next_action = kid_couch;
+        kid_haptic (a, KID_HAPTIC_HARM);
       }
     }
   }
@@ -651,6 +653,8 @@ compute_loose_floor_fall (struct loose_floor *l)
       register_con_undo (&undo, &p,
                          NO_FLOOR, MIGNORE, MIGNORE, MIGNORE,
                          NULL, false, "LOOSE FLOOR CHAIN RELEASE");
+      kid_haptic_for_range (&p, _m, 3 * PLACE_WIDTH,
+                            KID_HAPTIC_LOOSE_FLOOR_BREAKING);
       play_audio (&broken_floor_audio, &p, -1);
       alert_guards (&p);
       return;
@@ -673,6 +677,8 @@ compute_loose_floor_fall (struct loose_floor *l)
   shake_loose_floor_row (&p);
   break_loose_floor (&l->original_pos);
   play_audio (&broken_floor_audio, &p, -1);
+  kid_haptic_for_range (&p, _m, 3 * PLACE_WIDTH,
+                        KID_HAPTIC_LOOSE_FLOOR_BREAKING);
   alert_guards (&p);
 }
 

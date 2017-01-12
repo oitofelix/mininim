@@ -65,6 +65,7 @@ flow (struct anim *k)
       && k->i == 4 && k->reverse
       && hang_back && is_hangable_pos (&k->hang_pos, back_dir)) {
     play_audio (&hang_on_fall_audio, NULL, k->id);
+    kid_haptic (k, KID_HAPTIC_HANG);
     kid_turn (k);
     return false;
   }
@@ -130,7 +131,7 @@ physics_out (struct anim *k)
   /* depressible floors */
   clear_depressible_floor (k);
   get_hanged_pos (&k->hang_pos, k->f.dir, &hanged_pos);
-  press_depressible_floor (&hanged_pos);
+  press_depressible_floor (&hanged_pos, k);
 
   /* sound */
   if (! k->reverse && k->i == 4 && k->key.shift && ! k->key.up

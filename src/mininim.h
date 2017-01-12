@@ -37,6 +37,8 @@
 #include "argp.h"
 #include "progname.h"
 
+#define ALLEGRO_UNSTABLE
+
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_audio.h>
@@ -173,6 +175,8 @@ bool load_config (char *filename, ALLEGRO_TEXTLOG *textlog, int priority);
 bool save_game (char *filename, int priority);
 int max_int (int a, int b);
 int min_int (int a, int b);
+double max_double (double a, double b);
+double min_double (double a, double b);
 int cint (int *x, int *y);
 unsigned char add_char (unsigned char a, signed char b);
 int int_to_range (int i, int min, int max);
@@ -222,6 +226,17 @@ extern enum semantics semantics;
 extern enum movements movements;
 extern bool title_demo;
 extern enum rendering rendering;
+
+/* screams */
+extern bool scream;
+extern bool kid_scream;
+extern bool guard_scream;
+extern bool fat_guard_scream;
+extern bool shadow_scream;
+extern bool skeleton_scream;
+extern bool vizier_scream;
+extern bool princess_scream;
+extern bool mouse_scream;
 
 extern ALLEGRO_THREAD *load_config_dialog_thread,
   *save_game_dialog_thread, *save_picture_dialog_thread;

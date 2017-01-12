@@ -86,11 +86,8 @@ flow (struct anim *k)
 static bool
 physics_in (struct anim *k)
 {
-  struct pos pmba;
-
   /* fall */
-  survey (_mba, pos, &k->f, NULL, &pmba, NULL);
-  if (is_strictly_traversable (&pmba)) {
+  if (is_falling (&k->f, _mba, +0, +0)) {
     kid_fall (k);
     return false;
   }
@@ -110,6 +107,9 @@ physics_out (struct anim *k)
   survey (_mbo, pos, &k->f, NULL, &pmbo, NULL);
   if (k->i == 8) shake_loose_floor_row (&pmbo);
 
-  /* sound */
-  if (k->i == 7) play_audio (&step_audio, NULL, k->id);
+  /* audio and haptic */
+  if (k->i == 7) {
+    play_audio (&step_audio, NULL, k->id);
+    kid_haptic (k, KID_HAPTIC_STEP);
+  }
 }

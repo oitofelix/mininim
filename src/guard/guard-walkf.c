@@ -225,14 +225,11 @@ flow (struct anim *g)
 static bool
 physics_in (struct anim *g)
 {
-  struct pos pmbo;
-
   /* collision */
   uncollide_front_fight (g);
 
   /* fall */
-  survey (_mbo, pos, &g->f, NULL, &pmbo, NULL);
-  if (is_strictly_traversable (&pmbo)) {
+  if (is_falling (&g->f, _mbo, +0, +0)) {
     g->xf.b = NULL;
     guard_fall (g);
     return false;

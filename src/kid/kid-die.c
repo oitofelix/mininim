@@ -122,6 +122,7 @@ kid_die_spiked (struct anim *k)
     if (k->id == current_kid_id) {
       mr.flicker = 2;
       mr.color = get_flicker_blood_color ();
+      kid_haptic (k, KID_HAPTIC_DEATH);
     }
     play_audio (&spiked_audio, NULL, k->id);
   }
@@ -148,7 +149,18 @@ kid_die_chopped (struct anim *k)
   k->action = kid_die_chopped;
   k->f.flip = (k->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  k->current_lives = 0;
+  if (k->oaction != kid_die_chopped) {
+    k->current_lives = 0;
+    k->splash = true;
+    k->death_reason = CHOPPER_DEATH;
+
+    if (k->id == current_kid_id) {
+      mr.flicker = 2;
+      mr.color = get_flicker_blood_color ();
+      kid_haptic (k, KID_HAPTIC_DEATH);
+    }
+    play_audio (&chopped_audio, NULL, k->id);
+  }
 
   if (k->oaction != kid_die_chopped) {
     place_frame (&k->f, &k->f, kid_die_chopped_00,
@@ -179,11 +191,13 @@ kid_die_suddenly (struct anim *k)
     place_frame (&k->f, &k->f, kid_die_05,
                  &k->p, MIGNORE, +47);
 
-    k->f.c.x += k->f.dir == LEFT ? -4 : 0;
+    move_frame (&k->f, _tf, +0, +4, +0);
 
     survey (_m, pos, &k->f, NULL, &k->p, NULL);
 
     kill_kid_shadows (k);
+
+    kid_haptic (k, KID_HAPTIC_DEATH);
   }
 
   k->xf.b = NULL;
@@ -191,9 +205,7 @@ kid_die_suddenly (struct anim *k)
   k->hit_by_loose_floor = false;
 
   /* fall */
-  struct pos pm;
-  survey (_m, pos, &k->f, NULL, &pm, NULL);
-  if (is_strictly_traversable (&pm)) {
+  if (is_falling (&k->f, _m, +0, +0)) {
     kid_fall (k);
     return;
   }
@@ -254,9 +266,7 @@ physics_in (struct anim *k)
   uncollide (&k->f, &k->fo, _bb, +0, +0, &k->fo, NULL);
 
   /* fall */
-  struct pos pm;
-  survey (_m, pos, &k->f, NULL, &pm, NULL);
-  if (is_strictly_traversable (&pm)) {
+  if (is_falling (&k->f, _m, +0, +0)) {
     kid_fall (k);
     return false;
   }
@@ -267,6 +277,9 @@ physics_in (struct anim *k)
 static void
 physics_out (struct anim *k)
 {
+  /* haptic */
+  if (k->i == 0) kid_haptic (k, KID_HAPTIC_DEATH);
+
   /* depressible floors */
   if (k->i == 0) update_depressible_floor (k, -5, -11);
   else if (k->i == 1) update_depressible_floor (k, -4, -11);

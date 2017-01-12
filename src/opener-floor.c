@@ -221,7 +221,7 @@ remove_opener_floor (struct opener_floor *o)
 }
 
 void
-press_opener_floor (struct pos *p)
+press_opener_floor (struct pos *p, struct anim *a)
 {
   struct opener_floor *o = opener_floor_at_pos (p);
   if (! o) return;
@@ -229,6 +229,7 @@ press_opener_floor (struct pos *p)
   o->pressed = true;
 
   if (! o->prev_pressed) {
+    kid_haptic (a, KID_HAPTIC_COLLISION);
     register_changed_pos (&o->p);
     o->prev_pressed = true;
     o->priority = anim_cycle;

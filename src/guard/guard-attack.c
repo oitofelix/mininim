@@ -337,6 +337,9 @@ flow (struct anim *g)
 
     g->i = -1;
     g->of = g->f;
+    g->angry = 0;
+    if (g->oaction == guard_vigilant)
+      g->i_initiated_attack = true;
   }
 
   if (g->oaction == guard_defense) g->i = 1;
@@ -356,7 +359,7 @@ flow (struct anim *g)
   }
 
   if (g->i == 4 && g->enemy_defended_my_attack)
-    g->f.c.x += (g->f.dir == LEFT) ? +9 : -9;
+    move_frame (&g->f, _tb, +0, -9, -9);
 
   if (g->i == 3 && g->enemy_defended_my_attack)
     g->i = 4;
@@ -392,14 +395,11 @@ flow (struct anim *g)
 static bool
 physics_in (struct anim *g)
 {
-  struct pos pmbo;
-
   /* collision */
   uncollide_front_fight (g);
 
   /* fall */
-  survey (_mbo, pos, &g->f, NULL, &pmbo, NULL);
-  if (is_strictly_traversable (&pmbo)) {
+  if (is_falling (&g->f, _mbo, +0, +0)) {
     g->xf.b = NULL;
     guard_fall (g);
     return false;

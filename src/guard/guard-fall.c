@@ -331,8 +331,43 @@ physics_out (struct anim *g)
 
   /* sound */
   if (g->i == 10
-      && g->current_lives > 0)
+      && g->current_lives > 0) {
     play_audio (&scream_audio, NULL, g->id);
+    if (scream)
+      switch (g->type) {
+      case GUARD:
+        if (! guard_scream) {
+          fprintf (stderr, "In MININIM, the guard screams...\n");
+          guard_scream = true;
+        }
+        break;
+      case FAT_GUARD:
+        if (! fat_guard_scream) {
+          fprintf (stderr, "In MININIM, the fat guard screams...\n");
+          fat_guard_scream = true;
+        }
+        break;
+      case VIZIER:
+        if (! vizier_scream) {
+          fprintf (stderr, "In MININIM, the vizier screams...\n");
+          vizier_scream = true;
+        }
+        break;
+      case SKELETON:
+        if (! skeleton_scream) {
+          fprintf (stderr, "In MININIM, the skeleton screams...\n");
+          skeleton_scream = true;
+        }
+        break;
+      case SHADOW:
+        if (! shadow_scream) {
+          fprintf (stderr, "In MININIM, the shadow screams...\n");
+          shadow_scream = true;
+        }
+        break;
+      default: break;
+      }
+  }
 }
 
 bool

@@ -44,13 +44,13 @@ enum validate_replay_chain validate_replay_chain =
 
 struct dialog save_replay_dialog = {
   .title = "Save replay",
-  .patterns = "*.MRP",
+  .patterns = "*.mrp;*.MRP",
   .mode = ALLEGRO_FILECHOOSER_SAVE,
 };
 
 struct dialog load_replay_dialog = {
   .title = "Load replay",
-  .patterns = "*.MRP",
+  .patterns = "*.mrp;*.MRP",
   .mode = ALLEGRO_FILECHOOSER_FILE_MUST_EXIST
   | ALLEGRO_FILECHOOSER_MULTIPLE,
 };
@@ -665,7 +665,7 @@ print_replay_info (struct replay *replay)
           "  --semantics=%s --start-level=%u --start-time=%u --time-limit=%i \\\n"
           "  --total-lives=%u --kca=%u --kcd=%u\n"
           "Random seed: 0x%X\n"
-          "Cycles: %lu\n",
+          "Cycles: %" PRIu64 "\n",
           replay->filename,
           REPLAY_FILE_SIGNATURE,
           replay->version,
@@ -692,7 +692,8 @@ print_replay_results (struct replay *replay)
   printf ("Complete: %s\n"
           "Reason: %s\n"
           "Final: --mirror-level=%s --immortal-mode=%s --movements=%s \\\n"
-          "  --semantics=%s --start-level=%u --start-time=%lu --time-limit=%i \\\n"
+          "  --semantics=%s --start-level=%u --start-time=%" PRIu64
+          " --time-limit=%i \\\n"
           "  --total-lives=%u --kca=%i --kcd=%i\n",
           replay->complete ? "YES" : "NO",
           replay_incomplete_str (replay->reason),

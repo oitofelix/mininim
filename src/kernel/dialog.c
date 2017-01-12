@@ -91,7 +91,9 @@ get_native_text_log_event_source (ALLEGRO_TEXTLOG *textlog)
 bool
 file_overwrite_dialog (char *filename)
 {
-  if (MINGW_BUILD) return true;
+  /* not needed currently by any port, but should be kept in case the
+     need arise */
+  return true;
 
   if (al_filename_exists (filename)) {
     int r = al_show_native_message_box

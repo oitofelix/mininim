@@ -632,9 +632,16 @@ compute_level (void)
   for (i = 0; i < anima_nmemb; i++) fight_mechanics (&anima[i]);
 
   for (i = 0; i < anima_nmemb; i++) {
-    if (anima[i].float_timer) anima[i].float_timer++;
-    if (anima[i].enemy_refraction > 0) anima[i].enemy_refraction--;
-    if (anima[i].refraction > 0) anima[i].refraction--;
+    struct anim *a = &anima[i];
+    if (a->float_timer && a->float_timer < 192) {
+      request_gamepad_rumble (0.5 * (sin (a->float_timer * 0.17) + 1),
+                              1.0 / DEFAULT_HZ);
+      a->float_timer++;
+    } else if (a->float_timer > 0) a->float_timer = 0;
+
+    if (a->enemy_refraction > 0) a->enemy_refraction--;
+    if (a->refraction > 0) a->refraction--;
+    if (a->no_walkf_timer > 0) a->no_walkf_timer--;
   }
 
   fight_turn_controllable (k);
@@ -1007,9 +1014,11 @@ process_keys (void)
           || was_button_pressed (joystick_time_button, true)))
     display_remaining_time (0);
 
-  /* +: increment and display remaining time */
+  /* +: increment time limit and display remaining time */
   if (! active_menu
-      && was_key_pressed (ALLEGRO_KEY_EQUALS, 0, ALLEGRO_KEYMOD_SHIFT, true)) {
+      && (was_key_pressed (ALLEGRO_KEY_EQUALS, 0, 0, true)
+          || was_key_pressed (ALLEGRO_KEY_EQUALS, 0,
+                              ALLEGRO_KEYMOD_SHIFT, true))) {
     if (replay_mode == NO_REPLAY) {
       int t = time_limit - play_time;
       int d = t > (60 * DEFAULT_HZ) ? (+60 * DEFAULT_HZ) : (+1 * DEFAULT_HZ);
@@ -1018,9 +1027,10 @@ process_keys (void)
     } else print_replay_mode (0);
   }
 
-  /* -: decrement and display remaining time */
+  /* -: decrement time limit and display remaining time */
   if (! active_menu
-      && was_key_pressed (ALLEGRO_KEY_MINUS, 0, 0, true)) {
+      && (was_key_pressed (ALLEGRO_KEY_MINUS, 0, 0, true)
+          || was_key_pressed (0, '_', ALLEGRO_KEYMOD_SHIFT, true))) {
     if (replay_mode == NO_REPLAY) {
       int t = time_limit - play_time;
       int d = t > (60 * DEFAULT_HZ) ? (-60 * DEFAULT_HZ) : (-1 * DEFAULT_HZ);
@@ -1152,8 +1162,10 @@ process_death (void)
       if ((death_timer < SEC2CYC (20)
            || death_timer % SEC2CYC (1) < (2 * SEC2CYC (1)) / 3)
           && ! active_menu) {
-        if (death_timer >= SEC2CYC (21) && death_timer % SEC2CYC (1) == 0)
+        if (death_timer >= SEC2CYC (21) && death_timer % SEC2CYC (1) == 0) {
           play_audio (&press_key_audio, NULL, -1);
+          kid_haptic (k, KID_HAPTIC_PRESS_ANY_KEY);
+        }
         char *text;
         xasprintf (&text, "Press Button to Continue");
         draw_bottom_text (NULL, text, -2);

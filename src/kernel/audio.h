@@ -49,7 +49,7 @@ void remove_audio_instance (struct audio_instance *ai);
 void adjust_audio_instances_volume (void);
 float get_adjusted_audio_instance_volume (struct audio_instance *ai);
 void stop_audio_instances (void);
-void stop_audio_instance (struct audio_source *as, struct pos *p, int anim_id);
+bool stop_audio_instance (struct audio_source *as, struct pos *p, int anim_id);
 bool is_instance_of_audio_source (union audio_instance_data data,
                                   struct audio_source *as);
 

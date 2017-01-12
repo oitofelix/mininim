@@ -434,6 +434,8 @@ compute_spikes_floors (void)
       switch (s->i) {
       case 0: if (should_spikes_raise (&s->p) || s->activate) {
           alert_guards (&s->p);
+          kid_haptic_for_range (&s->p, _m, 3 * PLACE_WIDTH,
+                                KID_HAPTIC_SPIKES);
           play_audio (&spikes_audio, &s->p, -1);
           s->i++;
           s->wait = 12;

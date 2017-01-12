@@ -145,7 +145,7 @@ physics_out (struct anim *k)
   /* depressible floors */
   clear_depressible_floor (k);
   get_hanged_pos (&k->hang_pos, k->f.dir, &hanged_pos);
-  press_depressible_floor (&hanged_pos);
+  press_depressible_floor (&hanged_pos, k);
 }
 
 bool

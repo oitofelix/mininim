@@ -107,6 +107,24 @@ physics_in (struct anim *k)
     && (k->i < 9 || k->float_timer)
     && k->current_lives > 0;
 
+  /* fall speed */
+  int inertia = k->inertia;
+
+  int speed;
+  if (k->i <= 4 || k->float_timer) speed = 0;
+  else speed = +21 + 3 * (k->i - 5);
+
+  if (k->float_timer && k->float_timer < 192) {
+    /* floating */
+    k->fo.dx = -k->inertia / 2 - 2;
+    k->fo.dy = +5;
+  } else {
+    if (k->float_timer) k->i = (k->i > 4) ? 4 : k->i;
+    if (k->i > 0) k->fo.dx = -k->inertia;
+    if (k->i > 4) k->fo.dy = (speed > 33) ? 33 : speed;
+    if (k->i == 4) k->fo.dx += +4;
+  }
+
   if (k->oaction == kid_jump
       && (k->j == 10 || k->j == 11)) {
     k->fo.dx = -4;
@@ -115,7 +133,7 @@ physics_in (struct anim *k)
     k->fo.dx = -8;
     k->fo.dy = +4;
   } else if (k->oaction == kid_turn_run) {
-    k->fo.dx = +20;
+    k->fo.dx = (k->float_timer > 0) ? +26 : +20;
     uncollide (&k->f, &k->fo, _bb, +0, +0, &k->fo, NULL);
   } else if (k->oaction == kid_couch && k->collision) {
     k->collision = false;
@@ -131,29 +149,6 @@ physics_in (struct anim *k)
     k->inertia = 0;
   }
 
-  /* fall speed */
-  int speed;
-  if (k->i <= 4 || k->float_timer) speed = 0;
-  else speed = +21 + 3 * (k->i - 5);
-
-  if (k->i > 0)
-    k->fo.dx = -k->inertia;
-  if (k->i > 4)
-    k->fo.dy = (speed > 33) ? 33 : speed;
-
-  if (k->i == 4) k->fo.dx += +4;
-
-  /* floating */
-  if (k->float_timer) {
-    if (k->float_timer < 192) {
-      k->fo.dx = -k->inertia / 2 - 2;
-      k->fo.dy = +5;
-    } else {
-      k->float_timer = 0;
-      k->i = (k->i > 4) ? 4 : k->i;
-    }
-  }
-
   /* printf ("inertia: %i\n", k->inertia); */
 
   /* collision */
@@ -166,6 +161,7 @@ physics_in (struct anim *k)
     k->hit_by_loose_floor = false;
     stop_audio_instance (&scream_audio, NULL, k->id);
     play_audio (&hang_on_fall_audio, NULL, k->id);
+    kid_haptic (k, KID_HAPTIC_HANG);
     kid_hang (k);
     return false;
   }
@@ -177,6 +173,7 @@ physics_in (struct anim *k)
     k->hit_by_loose_floor = false;
     stop_audio_instance (&scream_audio, NULL, k->id);
     play_audio (&hang_on_fall_audio, NULL, k->id);
+    kid_haptic (k, KID_HAPTIC_HANG);
     kid_turn (k);
     return false;
   }
@@ -204,24 +201,19 @@ physics_in (struct anim *k)
   surveyo (_mbo, +0, speed > 22 ? -8 : 0, pos, &nf, NULL, NULL, &pmbo_nf);
   surveyo (_bf, -8, +0, pos, &nf, NULL, &pbf_nf, NULL);
 
-  if (! is_immediately_accessible_pos (&pbf_nf, &pbf, &k->f)) {
-    k->fo.dx = 0;
-    k->inertia = k->cinertia = 0;
-  }
-
   if (k->i > 1 &&
       ! is_strictly_traversable (&pmbo)
       && pmbo.floor != pmbo_nf.floor) {
     k->inertia = k->cinertia = 0;
-
-    survey (_bf, pos, &k->f, NULL, &pbf, NULL);
-    /* pos2view (&pbf, &pbf); */
-    k->fo.b = kid_couch_frameset[0].frame;
     k->fo.dx = k->fo.dy = 0;
+    k->fo.b = kid_couch_frameset[0].frame;
     k->f.b = kid_couch_frameset[0].frame;
+    survey (_bf, pos, &k->f, NULL, &pbf, NULL);
     new_coord (&k->f.c, k->f.c.l, pbf.room,
                k->f.c.x,
                PLACE_HEIGHT * pbf.floor + 27);
+
+    move_frame (&k->f, _bf, -8, inertia, inertia);
 
     shake_loose_floor_row (&pbf);
 
@@ -236,6 +228,7 @@ physics_in (struct anim *k)
 
       if (k->current_lives > 0) {
         play_audio (&hit_ground_harm_audio, NULL, k->id);
+        kid_haptic (k, KID_HAPTIC_HARM);
         k->uncouch_slowly = true;
       }
       if (k->id == current_kid_id) {
@@ -244,6 +237,7 @@ physics_in (struct anim *k)
       }
     } else if (k->i > 3 && ! k->float_timer) {
       play_audio (&hit_ground_audio, NULL, k->id);
+      kid_haptic (k, KID_HAPTIC_STRONG_COLLISION);
       k->hurt = false;
     } else k->hurt = false;
 
@@ -266,6 +260,11 @@ physics_in (struct anim *k)
     }
 
     return false;
+  } else if (! is_immediately_accessible_pos (&pbf_nf, &pbf, &k->f)
+             && ! k->float_timer) {
+    k->fo.dx = 0;
+    k->inertia = k->cinertia = 0;
+    move_frame (&k->f, _bf, +0, -4, -4);
   }
 
   return true;
@@ -280,8 +279,16 @@ physics_out (struct anim *k)
   /* sound */
   if (k->i == 10
       && ! k->float_timer
-      && k->current_lives > 0)
+      && k->current_lives > 0) {
     play_audio (&scream_audio, NULL, k->id);
+    kid_haptic (k, KID_HAPTIC_SCREAM);
+    if (scream) {
+      if (! kid_scream) {
+        fprintf (stderr, "In MININIM, the kid screams...\n");
+        kid_scream = true;
+      }
+    }
+  }
 }
 
 bool

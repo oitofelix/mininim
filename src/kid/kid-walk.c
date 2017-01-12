@@ -237,20 +237,15 @@ flow (struct anim *k)
 static bool
 physics_in (struct anim *k)
 {
-  struct pos pmbo, pbb, pbf;
-
   /* inertia */
   k->inertia = k->cinertia = 0;
 
   /* fall */
-  survey (_bf, pos, &k->f, NULL, &pbf, NULL);
-  survey (_mbo, pos, &k->f, NULL, &pmbo, NULL);
-  survey (_bb, pos, &k->f, NULL, &pbb, NULL);
   if (k->walk == -1
-      && ((k->i < 6 && is_strictly_traversable (&pbb)
-           && is_strictly_traversable (&pmbo))
-          || (k->i >= 6 && is_strictly_traversable (&pmbo)
-              && is_strictly_traversable (&pbf)))) {
+      && ((k->i < 6 && is_falling (&k->f, _bb, +0, +0)
+           && is_falling (&k->f, _mbo, +0, +0))
+          || (k->i >= 6 && is_falling (&k->f, _mbo, +0, +0)
+              && is_falling (&k->f, _bf, +0, +0)))) {
     kid_fall (k);
     return false;
   }

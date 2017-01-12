@@ -110,8 +110,6 @@ flow (struct anim *k)
 static bool
 physics_in (struct anim *k)
 {
-  struct pos ptb;
-
   /* inertia */
   k->inertia = k->cinertia = 0;
 
@@ -121,8 +119,8 @@ physics_in (struct anim *k)
   next_frame_inv = false;
 
   /* fall */
-  surveyo (_tb, -2, +0, pos, &k->f, NULL, &ptb, NULL);
-  if (! k->constrained_turn_run && is_strictly_traversable (&ptb)) {
+  if (! k->constrained_turn_run && is_falling (&k->f, _tb, -4, +0)) {
+    if (k->i == 1) move_frame (&k->f, _tf, +0, +6, +6);
     kid_fall (k);
     return false;
   }
@@ -133,6 +131,9 @@ physics_in (struct anim *k)
 static void
 physics_out (struct anim *k)
 {
+  /* haptic */
+  request_gamepad_rumble (0.5 - k->i / 8, 1.0 / DEFAULT_HZ);
+
   /* depressible floors */
   if (k->i == 0) update_depressible_floor (k, -4, -27);
   else if (k->i == 1) update_depressible_floor (k, -9, -28);

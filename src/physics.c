@@ -1017,6 +1017,26 @@ is_immediately_accessible_pos (struct pos *to, struct pos *from,
   return false;
 }
 
+struct frame *
+move_frame (struct frame *f, coord_f cf, int dx, int move_left, int move_right)
+{
+  /* positive move_dx moves foward, negative move_dx moves backward */
+  struct pos p, np;
+  struct frame nf = *f;
+  int move_dx = nf.dir == LEFT ? move_left : move_right;
+  int inc = nf.dir == LEFT ? -1 : +1;
+  nf.c.x += inc * move_dx;
+  surveyo (cf, dx, +0, pos, f, NULL, &p, NULL);
+  surveyo (cf, dx, +0, pos, &nf, NULL, &np, NULL);
+  while (! is_immediately_accessible_pos (&np, &p, &nf)
+         && abs (nf.c.x - f->c.x) < ORIGINAL_WIDTH) {
+    nf.c.x += nf.c.x < f->c.x ? +1 : -1;
+    surveyo (cf, dx, +0, pos, &nf, NULL, &np, NULL);
+  }
+  *f = nf;
+  return f;
+}
+
 bool
 uncollide (struct frame *f, struct frame_offset *fo, coord_f cf,
            int left, int right,
@@ -1448,6 +1468,40 @@ is_constrained_pos (struct pos *p, struct frame *f)
                      || is_collidable_at_left (&p2, f))))));
 }
 
+bool
+is_in_front_open_level_door (struct frame *f, struct pos *p)
+{
+  struct pos ptr, ptl, p_ret;
+  surveyo (_tr, +8, 0, pos, f, NULL, &ptr, NULL);
+  surveyo (_tl, +8, 0, pos, f, NULL, &ptl, NULL);
+
+  if (fg (&ptr) == LEVEL_DOOR)
+    p_ret = ptr;
+  else if (fg (&ptl) == LEVEL_DOOR)
+    p_ret = ptl;
+  else invalid_pos (&p_ret);
+
+  if (is_valid_pos (&p_ret)) {
+    struct level_door *d =
+      level_door_at_pos (&p_ret);
+    if (d->action != CLOSE_LEVEL_DOOR && d->i <= 9) {
+      if (p) *p = p_ret;
+      return true;
+    }
+  }
+
+  return false;
+}
+
+bool
+is_falling (struct frame *f, coord_f cf, int dx0, int dx1)
+{
+  struct pos p0, p1;
+  if (dx0 != dx1) surveyo (cf, dx0, +0, pos, f, NULL, &p0, NULL);
+  surveyo (cf, dx1, +0, pos, f, NULL, &p1, NULL);
+  return (dx0 == dx1 || is_immediately_accessible_pos (&p1, &p0, f))
+    && is_strictly_traversable (&p1);
+}
 
 
 
@@ -1473,12 +1527,12 @@ update_depressible_floor (struct anim *a, int dx0, int dx1)
 
   if (a->current_lives <= 0 && fg (&p0) == CLOSER_FLOOR)
     closer_floor_at_pos (&p0)->unresponsive = true;
-  press_depressible_floor (&p0);
+  press_depressible_floor (&p0, a);
   a->df_pos[0] = p0;
 
   if (a->current_lives <= 0 && fg (&p1) == CLOSER_FLOOR)
     closer_floor_at_pos (&p1)->unresponsive = true;
-  press_depressible_floor (&p1);
+  press_depressible_floor (&p1, a);
   a->df_pos[1] = p1;
 }
 
@@ -1488,8 +1542,8 @@ keep_depressible_floor (struct anim *a)
   struct pos *p0 = &a->df_pos[0];
   struct pos *p1 = &a->df_pos[1];
 
-  press_depressible_floor (p0);
-  press_depressible_floor (p1);
+  press_depressible_floor (p0, a);
+  press_depressible_floor (p1, a);
 }
 
 void
@@ -1514,14 +1568,14 @@ restore_depressible_floor (struct anim *a)
 }
 
 void
-press_depressible_floor (struct pos *p)
+press_depressible_floor (struct pos *p, struct anim *a)
 {
   if (cutscene || ! is_valid_pos (p)) return;
 
   switch (fg (p)) {
-  case OPENER_FLOOR: press_opener_floor (p); break;
-  case CLOSER_FLOOR: press_closer_floor (p); break;
-  case LOOSE_FLOOR: release_loose_floor (p); break;
+  case OPENER_FLOOR: press_opener_floor (p, a); break;
+  case CLOSER_FLOOR: press_closer_floor (p, a); break;
+  case LOOSE_FLOOR: release_loose_floor (p, a); break;
   case HIDDEN_FLOOR: unhide_hidden_floor (p); break;
   default: break;
   }
@@ -1559,13 +1613,13 @@ activate_con (struct pos *p)
   case OPENER_FLOOR:
     o = opener_floor_at_pos (p);
     o->noise = true;
-    press_opener_floor (p); break;
+    press_opener_floor (p, NULL); break;
   case CLOSER_FLOOR:
     c = closer_floor_at_pos (p);
     c->noise = true;
-    press_closer_floor (p); break;
+    press_closer_floor (p, NULL); break;
   case HIDDEN_FLOOR: unhide_hidden_floor (p); break;
-  case LOOSE_FLOOR: release_loose_floor (p); break;
+  case LOOSE_FLOOR: release_loose_floor (p, NULL); break;
   case CHOPPER: chopper_at_pos (p)->activate = true; break;
   case LEVEL_DOOR: level_door_at_pos (p)->action = OPEN_LEVEL_DOOR;
     break;

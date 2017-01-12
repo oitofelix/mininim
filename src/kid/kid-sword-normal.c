@@ -60,8 +60,9 @@ flow (struct anim *k)
     && ! k->key.left && ! k->key.right;
   bool attack = k->key.shift && ! k->key.up
     && ! k->key.left && ! k->key.right;
-  bool walkf = ((k->f.dir == RIGHT) && k->key.right)
-    || ((k->f.dir == LEFT) && k->key.left);
+  bool walkf = ! k->no_walkf_timer
+    && (((k->f.dir == RIGHT) && k->key.right)
+        || ((k->f.dir == LEFT) && k->key.left));
   bool walkb = ((k->f.dir == RIGHT) && k->key.left)
     || ((k->f.dir == LEFT) && k->key.right);
 
@@ -82,7 +83,10 @@ flow (struct anim *k)
     (k->key.down && (! ke || ! is_in_range (k, ke, ATTACK_RANGE)))
     || (k->auto_taken_sword && (! ke || ke->enemy_id != k->id));
 
-  if (k->oaction != kid_sword_normal) k->i = -1;
+  if (k->oaction != kid_sword_normal) {
+    k->i = -1;
+    k->i_initiated_attack = false;
+  }
 
   if (k->oaction == kid_sword_normal
       && k->current_lives <= 0) {
@@ -136,14 +140,11 @@ flow (struct anim *k)
 static bool
 physics_in (struct anim *k)
 {
-  struct pos pmbo;
-
   /* collision */
   uncollide_static_fight (k);
 
   /* fall */
-  survey (_mbo, pos, &k->f, NULL, &pmbo, NULL);
-  if (is_strictly_traversable (&pmbo)) {
+  if (is_falling (&k->f, _mbo, +0, +0)) {
     k->xf.b = NULL;
     kid_fall (k);
     return false;

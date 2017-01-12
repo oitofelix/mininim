@@ -316,7 +316,9 @@ guard_die_spiked (struct anim *g)
     else play_audio (&spiked_audio, NULL, g->id);
 
     if (! g->glory_sample) {
+      struct anim *k = get_anim_by_id (g->enemy_id);
       play_audio (&glory_audio, NULL, g->id);
+      kid_haptic (k, KID_HAPTIC_SUCCESS);
       g->glory_sample = true;
     }
   }
@@ -371,7 +373,9 @@ guard_die_chopped (struct anim *g)
 
   if (g->oaction != guard_die_chopped
       && ! g->glory_sample) {
+    struct anim *k = get_anim_by_id (g->enemy_id);
     play_audio (&glory_audio, NULL, g->id);
+    kid_haptic (k, KID_HAPTIC_SUCCESS);
     g->glory_sample = true;
   }
 
@@ -402,7 +406,9 @@ guard_die_suddenly (struct anim *g)
 
   if (g->oaction != guard_die_suddenly
       && ! g->glory_sample) {
+    struct anim *k = get_anim_by_id (g->enemy_id);
     play_audio (&glory_audio, NULL, g->id);
+    kid_haptic (k, KID_HAPTIC_SUCCESS);
     g->glory_sample = true;
   }
 
@@ -412,9 +418,7 @@ guard_die_suddenly (struct anim *g)
   g->hit_by_loose_floor = false;
 
   /* fall */
-  struct pos pm;
-  survey (_m, pos, &g->f, NULL, &pm, NULL);
-  if (is_strictly_traversable (&pm)) {
+  if (is_falling (&g->f, _m, +0, +0)) {
     guard_fall (g);
     return;
   }
@@ -448,7 +452,9 @@ flow (struct anim *g)
       play_audio (&skeleton_audio, NULL, g->id);
 
     if (! g->glory_sample) {
+      struct anim *k = get_anim_by_id (g->enemy_id);
       play_audio (&glory_audio, NULL, g->id);
+      kid_haptic (k, KID_HAPTIC_SUCCESS);
       g->glory_sample = true;
     }
 
@@ -476,9 +482,7 @@ physics_in (struct anim *g)
   uncollide (&g->f, &g->fo, _bb, +0, +0, &g->fo, NULL);
 
   /* fall */
-  struct pos pm;
-  survey (_m, pos, &g->f, NULL, &pm, NULL);
-  if (is_strictly_traversable (&pm)) {
+  if (is_falling (&g->f, _m, +0, +0)) {
     guard_fall (g);
     return false;
   }

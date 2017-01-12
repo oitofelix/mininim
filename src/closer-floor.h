@@ -67,7 +67,7 @@ struct closer_floor *copy_closer_floor (struct closer_floor *to,
 struct closer_floor * closer_floor_at_pos (struct pos *p);
 struct closer_floor *closer_floor_by_event (struct pos *p, int event, int dir);
 void remove_closer_floor (struct closer_floor *c);
-void press_closer_floor (struct pos *p);
+void press_closer_floor (struct pos *p, struct anim *a);
 void break_closer_floor (struct pos *p);
 void unpress_closer_floors (void);
 void register_changed_closer_floors (void);

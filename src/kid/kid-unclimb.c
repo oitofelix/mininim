@@ -54,6 +54,8 @@ flow (struct anim *k)
 {
   struct pos hanged_pos;
 
+  if (k->i >= 4 && k->i <= 8)
+    request_gamepad_rumble (0.8, 1.0 / DEFAULT_HZ);
   if (k->oaction != kid_unclimb) k->i = 14;
   if (k->oaction == kid_climb) k->i = 3;
 
@@ -83,11 +85,8 @@ flow (struct anim *k)
 static bool
 physics_in (struct anim *k)
 {
-  struct pos ptf;
-
   /* fall */
-  survey (_tf, pos, &k->f, NULL, &ptf, NULL);
-  if (is_strictly_traversable (&ptf)) {
+  if (is_falling (&k->f, _tf, +0, +0)) {
     kid_fall (k);
     return false;
   }
@@ -103,5 +102,5 @@ physics_out (struct anim *k)
   /* depressible floors */
   clear_depressible_floor (k);
   get_hanged_pos (&k->hang_pos, k->f.dir, &hanged_pos);
-  press_depressible_floor (&hanged_pos);
+  press_depressible_floor (&hanged_pos, k);
 }

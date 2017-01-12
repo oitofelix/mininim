@@ -386,8 +386,13 @@ struct anim {
     invisible, has_sword, hurt, controllable, fight,
     edge_detection, auto_taken_sword, constrained_turn_run;
 
-  int enemy_defended_my_attack, enemy_counter_attacked_myself, i_counter_defended;
+  int enemy_defended_my_attack, enemy_counter_attacked_myself,
+    i_counter_defended;
+  bool i_initiated_attack;
   bool attack_range_far, attack_range_near, hurt_enemy_in_counter_attack;
+  int angry;
+
+  int no_walkf_timer;
 
   struct skill skill;
   int refraction;
@@ -547,7 +552,8 @@ enum options {
   DISPLAY_MODE_OPTION, MULTI_ROOM_FIT_MODE_OPTION, TIME_FREQUENCY_OPTION,
   MIRROR_LEVEL_OPTION, SEMANTICS_OPTION, MOVEMENTS_OPTION,
   RECORD_REPLAY_OPTION, REPLAY_INFO_OPTION, RENDERING_OPTION,
-  VALIDATE_REPLAY_CHAIN_OPTION,
+  VALIDATE_REPLAY_CHAIN_OPTION, GAMEPAD_RUMBLE_GAIN_OPTION, SCREAM_OPTION,
+  RANDOM_SEED_OPTION,
 };
 
 enum level_module {

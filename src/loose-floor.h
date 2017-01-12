@@ -89,7 +89,7 @@ bool should_remove_loose_floor (struct loose_floor *l);
 void remove_loose_floor (struct loose_floor *l);
 void no_action_loose_floor (struct pos *p);
 void shake_loose_floor (struct pos *p);
-void release_loose_floor (struct pos *p);
+void release_loose_floor (struct pos *p, struct anim *a);
 void fall_loose_floor (struct pos *p);
 void break_loose_floor (struct pos *p);
 void compute_loose_floors (void);

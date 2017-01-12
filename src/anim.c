@@ -62,6 +62,8 @@ play_anim (void (*draw_callback) (void),
 
   double prev_time = al_get_time ();
 
+  reset_haptic ();
+
   while (! quit_anim) {
     al_wait_for_event (event_queue, &event);
 
@@ -113,13 +115,6 @@ play_anim (void (*draw_callback) (void),
         /* load replay */
         handle_load_replay_thread (0);
 
-        if (was_key_pressed
-            (ALLEGRO_KEY_ESCAPE, 0, ALLEGRO_KEYMOD_ALT, false))
-          pause_animation (true);
-        if (was_key_pressed
-            (ALLEGRO_KEY_ESCAPE, 0, ALLEGRO_KEYMOD_CTRL, true))
-          pause_animation (false);
-
         kid_debug ();
 
         if (anim_cycle > 0 && ! is_video_effect_started ()
@@ -128,9 +123,7 @@ play_anim (void (*draw_callback) (void),
                 || update_replay_progress (NULL)))
           show ();
 
-        if (! pause_anim
-            || was_key_pressed (ALLEGRO_KEY_ESCAPE, 0,
-                                ALLEGRO_KEYMOD_ALT, true)) {
+        if (! pause_anim) {
           if (compute_callback) compute_callback ();
           clear_bitmap (uscreen, TRANSPARENT_COLOR);
           uint32_t random_seed_before_draw;
@@ -140,6 +133,8 @@ play_anim (void (*draw_callback) (void),
           if (replay_mode != NO_REPLAY)
             random_seed = random_seed_before_draw;
           play_audio_instances ();
+          if (! title_demo && replay_mode != PLAY_REPLAY)
+            execute_haptic ();
           if (! is_game_paused ())
             anim_cycle++;
 
@@ -384,12 +379,21 @@ play_anim (void (*draw_callback) (void),
         al_free (text);
       }
 
-      /* CTRL+J: calibrate joystick */
+      /* CTRL+J: joystick mode */
       if (was_key_pressed (ALLEGRO_KEY_J, 0, ALLEGRO_KEYMOD_CTRL, true)) {
+        char *joystick_str = joystick ? "CALIBRATED" : "MODE";
         calibrate_joystick ();
-        xasprintf (&text, "JOYSTICK %s", joystick ? "CALIBRATED" : "NOT FOUND");
+        gamepad_rumble (1.0, 0.6);
+        xasprintf (&text, "JOYSTICK %s", joystick
+                   ? joystick_str : "NOT FOUND");
         draw_bottom_text (NULL, text, 0);
         al_free (text);
+      }
+
+      /* CTRL+K: keyboard mode (disables joystick) */
+      if (was_key_pressed (ALLEGRO_KEY_K, 0, ALLEGRO_KEYMOD_CTRL, true)) {
+        disable_joystick ();
+        draw_bottom_text (NULL, "KEYBOARD MODE", 0);
       }
 
       /* F9: change hue palette */

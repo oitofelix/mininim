@@ -314,6 +314,7 @@ compute_choppers (void)
         c->alert = false;
       }
       play_audio (&chopper_audio, &c->p, -1);
+      kid_haptic_for_range (&c->p, _ml, 3 * PLACE_WIDTH, KID_HAPTIC_CHOPPER);
       register_changed_pos (&c->p);
       break;
     case 2:
@@ -361,10 +362,6 @@ compute_choppers (void)
         a->splash = true;
         a->p = c->p;
         a->death_reason = CHOPPER_DEATH;
-        if (a->id == current_kid_id) {
-          mr.flicker = 2;
-          mr.color = get_flicker_blood_color ();
-        }
         if (a->type == SKELETON)
           play_audio (&skeleton_audio, &c->p, -1);
         else play_audio (&chopped_audio, &c->p, -1);

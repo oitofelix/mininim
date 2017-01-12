@@ -860,12 +860,21 @@ dim (struct frame *f, struct dim *d)
 /* cons coordinates */
 
 struct coord *
-con_m (struct pos *p, struct coord *c)
+con_coord (struct pos *p, coord_f cf, struct coord *c)
 {
-  return
-    new_coord (c, p->l, p->room,
-               PLACE_WIDTH * p->place + 15 + PLACE_WIDTH / 2,
-               PLACE_HEIGHT * p->floor + 3 + PLACE_HEIGHT / 2);
+  static ALLEGRO_BITMAP *con_bitmap = NULL;
+
+  if (! con_bitmap)
+    con_bitmap = create_bitmap (PLACE_WIDTH, PLACE_HEIGHT);
+  struct frame f;
+
+  f.dir = LEFT;
+  f.b = con_bitmap;
+  new_coord (&f.c, p->l, p->room,
+             PLACE_WIDTH * p->place + 15,
+             PLACE_HEIGHT * p->floor + 3);
+  cf (&f, c);
+  return c;
 }
 
 
@@ -1284,10 +1293,12 @@ bitmap_rcoord (ALLEGRO_BITMAP *b, struct bitmap_rcoord *c)
 struct coord *
 place_on_the_ground (struct frame *f, struct coord *c)
 {
-  struct coord mbo; struct pos pmbo;
+  /* struct coord mbo; */
+  struct pos pmbo;
   *c = f->c;
-  survey (_mbo, pos, f, &mbo, &pmbo, NULL);
-  f->c.y += (PLACE_HEIGHT * pmbo.floor + 55) - mbo.y;
+  survey (_mbo, pos, f, /* &mbo */ NULL, &pmbo, NULL);
+  c->y = (PLACE_HEIGHT * pmbo.floor + 55) - al_get_bitmap_height (f->b);
+  /* f->c.y += (PLACE_HEIGHT * pmbo.floor + 55) - mbo.y; */
   return c;
 }
 

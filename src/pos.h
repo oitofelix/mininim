@@ -77,7 +77,8 @@ coord_f opposite_cf (coord_f cf);
 enum dir opposite_dir (enum dir dir);
 enum dir perpendicular_dir (enum dir dir, int n);
 
-struct coord *con_m (struct pos *p, struct coord *c);
+struct coord *
+con_coord (struct pos *p, coord_f cf, struct coord *c);
 
 struct dim *dim (struct frame *f, struct dim *d);
 struct coord *_m (struct frame *f, struct coord *c);

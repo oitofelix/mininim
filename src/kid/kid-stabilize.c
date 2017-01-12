@@ -79,8 +79,9 @@ kid_stabilize (struct anim *k)
 void
 kid_stabilize_collision (struct anim *k)
 {
-  if (k->action != kid_stabilize)
-    play_audio (&hit_wall_audio, NULL, k->id);
+  play_audio (&hit_wall_audio, NULL, k->id);
+  kid_haptic (k, KID_HAPTIC_COLLISION);
+
   k->action = kid_stabilize_collision;
   place_frame (&k->f, &k->f, kid_stabilize_frameset[0].frame,
                &k->ci.kid_p, (k->f.dir == LEFT)
@@ -91,8 +92,9 @@ kid_stabilize_collision (struct anim *k)
 void
 kid_stabilize_back_collision (struct anim *k)
 {
-  if (k->action != kid_stabilize)
-    play_audio (&hit_wall_audio, NULL, k->id);
+  play_audio (&hit_wall_audio, NULL, k->id);
+  kid_haptic (k, KID_HAPTIC_COLLISION);
+
   k->action = kid_stabilize_back_collision;
   place_frame (&k->f, &k->f, kid_stabilize_frameset[0].frame,
                &k->ci.kid_p, (k->f.dir == LEFT)
@@ -157,16 +159,12 @@ flow (struct anim *k)
 static bool
 physics_in (struct anim *k)
 {
-  struct pos pmbo, pbb;
-
   /* inertia */
   k->inertia = k->cinertia = 0;
 
   /* fall */
-  survey (_mbo, pos, &k->f, NULL, &pmbo, NULL);
-  survey (_bb, pos, &k->f, NULL, &pbb, NULL);
-  if (is_strictly_traversable (&pmbo)
-      && is_strictly_traversable (&pbb)) {
+  if (is_falling (&k->f, _mbo, +0, +0)
+      && is_falling (&k->f, _bb, +0, +0)) {
     kid_fall (k);
     return false;
   }

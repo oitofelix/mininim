@@ -462,11 +462,12 @@ stop_audio_instances (void)
     remove_audio_instance (&audio_instance[0]);
 }
 
-void
+bool
 stop_audio_instance (struct audio_source *as, struct pos *p, int anim_id)
 {
   struct audio_instance *ai = search_audio_instance (as, 0, p, anim_id);
   if (ai) remove_audio_instance (ai);
+  return ai;
 }
 
 bool

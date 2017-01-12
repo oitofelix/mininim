@@ -103,12 +103,14 @@ kid_couch (struct anim *k)
 void
 kid_couch_collision (struct anim *k)
 {
+  kid_haptic (k, KID_HAPTIC_STRONG_COLLISION);
+  play_audio (&hit_wall_audio, NULL, k->id);
+
   k->action = kid_couch_collision;
   place_frame (&k->f, &k->f, kid_couch_frameset[0].frame,
                &k->ci.kid_p, (k->f.dir == LEFT)
                ? +50 : -14, +27);
   kid_couch (k);
-  play_audio (&hit_wall_audio, NULL, k->id);
 }
 
 void
@@ -211,7 +213,12 @@ flow (struct anim *k)
 
   if (k->oaction == kid_climb) k->fo.dx += 7;
   if (k->i > 0 && k->i < 3) k->fo.dx -= k->cinertia;
-  if (k->cinertia > 0) k->cinertia--;
+  if (k->cinertia > 0) {
+    request_gamepad_rumble (0.5 - k->cinertia / 6,
+                            1.0 / DEFAULT_HZ);
+
+    k->cinertia--;
+  }
 
   return true;
 }
@@ -234,7 +241,8 @@ physics_in (struct anim *k)
     uncollide (&k->f, &k->fo, _bf, +0, +0, &k->fo, &k->ci);
   else if (! is_valid_pos (&k->item_pos))
     uncollide (&k->f, &k->fo, _bf, COLLISION_FRONT_LEFT_NORMAL,
-               COLLISION_FRONT_RIGHT_NORMAL, &k->fo, NULL);
+               COLLISION_FRONT_RIGHT_NORMAL,
+               &k->fo, NULL);
   if (k->key.down && ! couch_jump) uncollide_static_kid_normal (k);
 
   /* fall */
@@ -242,7 +250,7 @@ physics_in (struct anim *k)
   cm = fg (&pm);
   struct loose_floor *l =
     falling_loose_floor_at_pos (prel (&pm, &pma, -1, +0));
-  if ((is_strictly_traversable (&pm)
+  if ((is_falling (&k->f, _m, +0, +0)
        || (l && l->action == FALL_LOOSE_FLOOR && cm == LOOSE_FLOOR))
       && ! (k->fall && k->i == 0)) {
     kid_fall (k);

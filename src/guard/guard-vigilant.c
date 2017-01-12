@@ -222,7 +222,10 @@ flow (struct anim *g)
   g->attack_range_far = false;
   g->attack_range_near = false;
 
-  if (g->oaction != guard_vigilant) g->i = -1;
+  if (g->oaction != guard_vigilant) {
+    g->i = -1;
+    g->i_initiated_attack = false;
+  }
 
   if (g->oaction == guard_vigilant) {
 
@@ -283,14 +286,11 @@ flow (struct anim *g)
 static bool
 physics_in (struct anim *g)
 {
-  struct pos pmbo;
-
   /* collision */
   uncollide_static_fight (g);
 
   /* fall */
-  survey (_mbo, pos, &g->f, NULL, &pmbo, NULL);
-  if (is_strictly_traversable (&pmbo)) {
+  if (is_falling (&g->f, _mbo, +0, +0)) {
     guard_fall (g);
     return false;
   }

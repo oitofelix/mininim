@@ -137,8 +137,11 @@ physics_out (struct anim *k)
   if (k->i > 4) clear_depressible_floor (k);
   else keep_depressible_floor (k);
 
-  /* sound */
-  if (k->j % 4 == 0) play_audio (&step_audio, NULL, k->id);
+  /* sound and haptic */
+  if (k->j % 4 == 0) {
+    play_audio (&step_audio, NULL, k->id);
+    kid_haptic (k, KID_HAPTIC_STEP);
+  }
 }
 
 bool

@@ -67,7 +67,7 @@ struct opener_floor *copy_opener_floor (struct opener_floor *to,
 struct opener_floor *opener_floor_at_pos (struct pos *p);
 struct opener_floor *opener_floor_by_event (struct pos *p, int event, int dir);
 void remove_opener_floor (struct opener_floor *o);
-void press_opener_floor (struct pos *p);
+void press_opener_floor (struct pos *p, struct anim *a);
 void break_opener_floor (struct pos *p);
 void unpress_opener_floors (void);
 void register_changed_opener_floors (void);

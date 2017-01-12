@@ -20,6 +20,8 @@
 
 #include "mininim.h"
 
+static bool con_undo_ignore_state;
+
 void
 register_undo (struct undo *u, void *data, undo_f f, char *desc)
 {
@@ -164,8 +166,11 @@ register_con_undo (struct undo *u, struct pos *p,
       && ((cd == con_diff (&prev_data->b, &prev_data->f)
            && cd != CON_DIFF_MIXED
            && cd != CON_DIFF_NO_DIFF)
-          || ! memcmp (&prev_data->b, &c, sizeof (c))))
+          || ! memcmp (&prev_data->b, &c, sizeof (c)))) {
+    con_undo_ignore_state = true;
     undo_pass (u, -1, NULL);
+    con_undo_ignore_state = false;
+  }
 
   if (! memcmp (con (p), &c, sizeof (c))) return;
 
@@ -201,7 +206,8 @@ con_undo (struct con_undo *d, int dir)
   /* if (should_init (&d->b, &d->f)) */
   init_con_at_pos (&d->p);
 
-  copy_from_con_state (&d->p, (dir >= 0) ? &d->fs : &d->bs);
+  if (! con_undo_ignore_state)
+    copy_from_con_state (&d->p, (dir >= 0) ? &d->fs : &d->bs);
 
   register_changed_pos (&d->p);
 }

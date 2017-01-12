@@ -223,7 +223,7 @@ remove_closer_floor (struct closer_floor *c)
 }
 
 void
-press_closer_floor (struct pos *p)
+press_closer_floor (struct pos *p, struct anim *a)
 {
   struct closer_floor *c = closer_floor_at_pos (p);
   if (! c) return;
@@ -231,6 +231,7 @@ press_closer_floor (struct pos *p)
   c->pressed = true;
 
   if (! c->prev_pressed) {
+    kid_haptic (a, KID_HAPTIC_COLLISION);
     register_changed_pos (&c->p);
     c->prev_pressed = true;
     c->priority = anim_cycle;

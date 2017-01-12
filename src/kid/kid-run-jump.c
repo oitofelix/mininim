@@ -126,6 +126,7 @@ flow (struct anim *k)
     pos2room (&k->hang_pos, k->f.c.room, &k->hang_pos);
     k->hang = true;
     play_audio (&hang_on_fall_audio, NULL, k->id);
+    kid_haptic (k, KID_HAPTIC_HANG);
     kid_hang (k);
     return false;
   }
@@ -139,6 +140,7 @@ flow (struct anim *k)
     pos2room (&k->hang_pos, k->f.c.room, &k->hang_pos);
     k->hang = true;
     play_audio (&hang_on_fall_audio, NULL, k->id);
+    kid_haptic (k, KID_HAPTIC_HANG);
     kid_turn (k);
     return false;
   }
@@ -156,8 +158,6 @@ flow (struct anim *k)
 static bool
 physics_in (struct anim *k)
 {
-  struct pos pbf;
-
   /* inertia */
   if (k->i < 6 || k->i > 10) k->inertia = 3;
   else k->inertia = 7;
@@ -172,6 +172,7 @@ physics_in (struct anim *k)
       && ! is_collidable_at_right (&k->ci.kid_p, &k->f)) {
     if ((! is_valid_pos (&k->cross_mirror_p)
          || ! peq (&k->cross_mirror_p, &k->ci.con_p))) {
+      kid_haptic (k, KID_HAPTIC_CROSS_MIRROR);
       play_audio (&mirror_audio, NULL, k->id);
       k->cross_mirror_p = k->ci.con_p;
     }
@@ -184,10 +185,9 @@ physics_in (struct anim *k)
   } else invalid_pos (&k->cross_mirror_p);
 
   /* fall */
-  survey (_bf, pos, &k->f, NULL, &pbf, NULL);
-  if ((is_strictly_traversable (&pbf) && k->i < 4
+  if ((is_falling (&k->f, _bf, +0, +0) && k->i < 4
        && ! k->edge_detection)
-      || (is_strictly_traversable (&pbf) && k->i > 9)) {
+      || (is_falling (&k->f, _bf, +0, +0) && k->i > 9)) {
     kid_fall (k);
     return false;
   }
@@ -211,8 +211,11 @@ physics_out (struct anim *k)
   survey (_mbo, pos, &k->f, NULL, &pmbo, NULL);
   if (k->i == 10) shake_loose_floor_row (&pmbo);
 
-  /* sound */
-  if (k->i == 0 || k->i == 4) play_audio (&step_audio, NULL, k->id);
+  /* sound and haptic */
+  if (k->i == 0 || k->i == 1 || k->i == 4) {
+    play_audio (&step_audio, NULL, k->id);
+    kid_haptic (k, KID_HAPTIC_STEP);
+  }
 }
 
 bool

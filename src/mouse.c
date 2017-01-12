@@ -177,7 +177,16 @@ mouse_run (struct anim *m)
     return;
   }
 
-  if (m->oaction != mouse_run) m->i = -1;
+  if (m->oaction != mouse_run) {
+    m->i = -1;
+    if (scream && m->f.dir == RIGHT) {
+      if (! mouse_scream) {
+        play_audio (&scream_audio, NULL, m->id);
+        fprintf (stderr, "In MININIM, the mouse screams...\n");
+        mouse_scream = true;
+      }
+    }
+  }
 
   if (m->i == 1) m->i = 0;
   else m->i++;

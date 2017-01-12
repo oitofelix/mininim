@@ -143,8 +143,6 @@ flow (struct anim *k)
 static bool
 physics_in (struct anim *k)
 {
-  struct pos pbf, pbb;
-
   /* collision */
   bool turn = ((k->f.dir == RIGHT) && k->key.left)
     || ((k->f.dir == LEFT) && k->key.right);
@@ -161,11 +159,9 @@ physics_in (struct anim *k)
   next_frame_inv = false;
 
   /* fall */
-  survey (_bf, pos, &k->f, NULL, &pbf, NULL);
-  survey (_bb, pos, &k->f, NULL, &pbb, NULL);
   if (! k->hang
-      && is_strictly_traversable (&pbf)
-      && is_strictly_traversable (&pbb)) {
+      && is_falling (&k->f, _bf, +0, +0)
+      && is_falling (&k->f, _bb, +0, +0)) {
     kid_fall (k);
     return false;
   }

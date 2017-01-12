@@ -106,6 +106,9 @@ kid_climb (struct anim *k)
 static bool
 flow (struct anim *k)
 {
+  if (k->i <= 4)
+    request_gamepad_rumble (0.8, 1.0 / DEFAULT_HZ);
+
   if (k->oaction != kid_climb) {
     k->i = -1;
     k->wait = DOOR_WAIT_LOOK;
@@ -145,17 +148,15 @@ flow (struct anim *k)
 static bool
 physics_in (struct anim *k)
 {
-  struct pos ptf;
-  enum confg ctf;
-
   /* fall */
-  survey (_tf, pos, &k->f, NULL, &ptf, NULL);
-  if (is_strictly_traversable (&ptf)) {
+  if (is_falling (&k->f, _tf, +0, +0)) {
     kid_fall (k);
     return false;
   }
 
   /* door collision */
+  struct pos ptf;
+  enum confg ctf;
   survey (_tf, pos, &k->f, NULL, &ptf, NULL);
   ctf = fg (&ptf);
   if (k->i == 3 && ctf == DOOR && k->f.dir == LEFT
@@ -178,7 +179,7 @@ physics_out (struct anim *k)
   /* depressible floors */
   clear_depressible_floor (k);
   get_hanged_pos (&k->hang_pos, k->f.dir, &hanged_pos);
-  press_depressible_floor (&hanged_pos);
+  press_depressible_floor (&hanged_pos, k);
 }
 
 bool

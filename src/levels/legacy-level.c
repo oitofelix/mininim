@@ -26,6 +26,7 @@ int max_legacy_level = 14;
 static int level_3_checkpoint;
 static int checkpoint_total_lives;
 static int checkpoint_current_lives;
+static bool coming_from_12;
 static struct skill checkpoint_skill;
 static int shadow_id;
 static int skeleton_id;
@@ -130,9 +131,10 @@ legacy_level_start (void)
   if (global_level.n == 10) screen_flags &= ~ ALLEGRO_FLIP_VERTICAL;
 
   /* level 13 adjustements */
-  if (global_level.n == 13 && retry_level != 13)
-    k->current_lives = current_lives;
+  if (coming_from_12) k->current_lives = current_lives;
   else k->current_lives = total_lives;
+
+  coming_from_12 = false;
 
   if (global_level.n == 13) {
     struct anim *v = get_anim_by_id (1);
@@ -183,8 +185,10 @@ legacy_level_special_events (void)
 
   /* in the first level, first try, play the suspense sound */
   if (global_level.n == 1 && anim_cycle == 12
-      && (retry_level != 1 || replay_mode != NO_REPLAY))
+      && (retry_level != 1 || replay_mode != NO_REPLAY)) {
     play_audio (&suspense_audio, NULL, -1);
+    kid_haptic (k, KID_HAPTIC_LEGACY_COUCHING_START);
+  }
 
   /* in the third level */
   if (global_level.n == 3) {
@@ -254,6 +258,7 @@ legacy_level_special_events (void)
                          MIRROR, MIGNORE, MIGNORE, MIGNORE,
                          NULL, true, "MIRROR");
       play_audio (&suspense_audio, &mirror_pos, -1);
+      kid_haptic (k, KID_HAPTIC_LEGACY_MIRROR_APPEAR);
     }
 
     /* if the kid is crossing the mirror, make his shadow appear */
@@ -510,7 +515,7 @@ legacy_level_special_events (void)
         ks->controllable = true;
         kid_keep_sword (ks);
         place_on_the_ground (&ks->f, &ks->f.c);
-        ks->f.c.x += (ks->f.dir == LEFT) ? +8 : -8;
+        move_frame (&ks->f, _tb, +0, -8, -8);
       }
 
       /* if the kid change his mind and take the sword again, the
@@ -570,7 +575,10 @@ legacy_level_special_events (void)
         if (fg (&p) == NO_FLOOR) set_fg (&p, HIDDEN_FLOOR);
 
     /* when the kid enters room 23, go to the next level */
-    if (k->f.c.room == 23) next_level ();
+    if (k->f.c.room == 23) {
+      next_level ();
+      coming_from_12 = true;
+    }
   }
 
   /* in the thirteenth level */
@@ -643,10 +651,12 @@ legacy_level_end (struct pos *p)
     case 1: case 2: case 3: case 5: case 6: case 7:
     case 8: case 9: case 10: case 11: case 12:
       play_audio (&success_audio, NULL, k->id);
+      kid_haptic (k, KID_HAPTIC_SUCCESS);
       level_end_wait = 12 * DEFAULT_HZ;
       break;
     case 4:
       play_audio (&success_suspense_audio, NULL, k->id);
+      kid_haptic (k, KID_HAPTIC_SUCCESS);
       level_end_wait = 7 * DEFAULT_HZ;
       break;
     case 13: level_end_wait = 0 * DEFAULT_HZ; break;
@@ -702,7 +712,7 @@ interpret_legacy_level (struct level *l, int n)
 
   memset (l, 0, sizeof (*l));
   l->n = n;
-  if (n == 13) l->nominal_n = retry_level != 13 ? -1 : 12;
+  if (n == 13) l->nominal_n = 12;
   else if (n == 14) l->nominal_n = -1;
   else l->nominal_n = n;
   l->start = legacy_level_start;

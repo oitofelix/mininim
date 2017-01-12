@@ -84,9 +84,7 @@ flow (struct anim *k)
 
   survey (_mt, pos, &k->f, NULL, &pmt, NULL);
   bool stairs = k->key.up && ! k->key.left && ! k->key.right
-    && fg (&pmt) == LEVEL_DOOR
-    && level_door_at_pos (&pmt)->i == 0
-    && k == get_anim_by_id (0);
+    && is_in_front_open_level_door (&k->f, &k->p);
 
   if (k->oaction == kid_normal
       && k->current_lives <= 0) {
@@ -98,7 +96,6 @@ flow (struct anim *k)
 
   if (k->oaction == kid_normal) {
     if (stairs) {
-      k->p = pmt;
       kid_stairs (k);
       return false;
     }
@@ -168,8 +165,6 @@ flow (struct anim *k)
 static bool
 physics_in (struct anim *k)
 {
-  struct pos pmbo, pbb;
-
   /* inertia */
   k->inertia = k->cinertia = 0;
 
@@ -177,10 +172,8 @@ physics_in (struct anim *k)
   uncollide_static_kid_normal (k);
 
   /* fall */
-  survey (_mbo, pos, &k->f, NULL, &pmbo, NULL);
-  survey (_bb, pos, &k->f, NULL, &pbb, NULL);
-  if (is_strictly_traversable (&pmbo)
-      && is_strictly_traversable (&pbb)) {
+  if (is_falling (&k->f, _mbo, +0, +0)
+      && is_falling (&k->f, _bb, +0, +0)) {
     kid_fall (k);
     return false;
   }

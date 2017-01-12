@@ -23,7 +23,6 @@
 /* bitmaps */
 ALLEGRO_BITMAP *guard_life, *guard_splash;
 
-static struct coord *guard_life_coord (int i, struct coord *c);
 static ALLEGRO_COLOR c_shadow_life_palette (ALLEGRO_COLOR c);
 static ALLEGRO_COLOR e_shadow_life_palette (ALLEGRO_COLOR c);
 static ALLEGRO_COLOR v_shadow_life_palette (ALLEGRO_COLOR c);
@@ -694,13 +693,6 @@ draw_guard_lives (ALLEGRO_BITMAP *bitmap, struct anim *g, enum vm vm)
   int current_lives = (g->current_lives > 10)
     ? 10 : g->current_lives;
 
-  int i;
-  struct coord c;
-  struct rect r;
-  new_rect (&r, room_view, CUTSCENE_WIDTH - 7 * current_lives,
-            CUTSCENE_HEIGHT - 8, 7 * current_lives,
-            CUTSCENE_HEIGHT - 1);
-
   ALLEGRO_COLOR bg_color;
 
   switch (vm) {
@@ -709,7 +701,11 @@ draw_guard_lives (ALLEGRO_BITMAP *bitmap, struct anim *g, enum vm vm)
   case VGA: bg_color = V_LIVES_RECT_COLOR; break;
   }
 
-  draw_filled_rect (bitmap, &r, bg_color);
+  push_reset_clipping_rectangle (bitmap);
+
+  draw_filled_rectangle (bitmap, CUTSCENE_WIDTH - 7 * current_lives,
+                         CUTSCENE_HEIGHT - 8, CUTSCENE_WIDTH - 1,
+                         CUTSCENE_HEIGHT - 1, bg_color);
 
   ALLEGRO_BITMAP *life = guard_life;
   palette pal = NULL;
@@ -727,17 +723,17 @@ draw_guard_lives (ALLEGRO_BITMAP *bitmap, struct anim *g, enum vm vm)
 
   if (hgc) life = apply_palette (life, hgc_palette);
 
-  for (i = 0; i < current_lives; i++)
-    draw_bitmapc (life, bitmap, guard_life_coord (i, &c), 0);
-}
+  if (current_lives <= GUARD_MINIMUM_LIVES_TO_BLINK && anim_cycle % 2) {
+      pop_clipping_rectangle ();
+      return;
+  }
 
-static struct coord *
-guard_life_coord (int i, struct coord *c)
-{
-  return
-    new_coord (c, NULL, room_view,
-               CUTSCENE_WIDTH - 7 * (i + 1) + 1,
-               CUTSCENE_HEIGHT - 6);
+  int i;
+  for (i = 0; i < current_lives; i++)
+    draw_bitmap (life, bitmap, CUTSCENE_WIDTH - 7 * (i + 1) + 1,
+                 CUTSCENE_HEIGHT - 6, 0);
+
+  pop_clipping_rectangle ();
 }
 
 static ALLEGRO_COLOR

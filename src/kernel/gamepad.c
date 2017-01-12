@@ -59,6 +59,16 @@ int joystick_h_stick = 0,
   joystick_time_button = 8,
   joystick_pause_button = 9;
 
+#ifdef __al_included_allegro5_haptic_h
+static ALLEGRO_HAPTIC *joystick_haptic;
+static ALLEGRO_HAPTIC_EFFECT_ID **joystick_haptic_effect_id;
+static int joystick_max_haptic_effects;
+#endif
+
+double gamepad_rumble_gain = 1.0;
+static double gamepad_rumble_intensity;
+static double gamepad_rumble_duration;
+
 void
 init_gamepad (void)
 {
@@ -68,6 +78,11 @@ init_gamepad (void)
   if (! al_install_joystick ())
     error (0, 0, "%s (void): cannot install joystick", __func__);
 
+#ifdef __al_included_allegro5_haptic_h
+  if (! al_install_haptic ())
+    error (0, 0, "%s (void): cannot install haptic", __func__);
+#endif
+
   calibrate_joystick ();
 }
 
@@ -76,6 +91,10 @@ finalize_gamepad (void)
 {
   al_uninstall_keyboard ();
   al_uninstall_joystick ();
+
+#ifdef __al_included_allegro5_haptic_h
+  al_uninstall_haptic ();
+#endif
 }
 
 int
@@ -115,18 +134,63 @@ get_joystick_v_axis (void)
 void
 calibrate_joystick (void)
 {
+  disable_joystick ();
   al_reconfigure_joysticks ();
   joystick = al_get_joystick (0);
+
+  if (! joystick) return;
+
+  joystick_h_center = get_joystick_h_axis ();
+  joystick_v_center = get_joystick_v_axis ();
+  joystick_shift_released = get_joystick_button (joystick_shift_button);
+  joystick_up_released = get_joystick_button (joystick_up_button);
+  joystick_right_released = get_joystick_button (joystick_right_button);
+  joystick_down_released = get_joystick_button (joystick_down_button);
+  joystick_left_released = get_joystick_button (joystick_left_button);
+  joystick_enter_released = get_joystick_button (joystick_enter_button);
+
+#ifdef __al_included_allegro5_haptic_h
+  joystick_haptic = al_get_haptic_from_joystick (joystick);
+
+  if (! joystick_haptic) return;
+
+  joystick_max_haptic_effects =
+    min_int (al_get_max_haptic_effects (joystick_haptic),
+             JOYSTICK_MAX_HAPTIC_EFFECTS);
+
+  joystick_haptic_effect_id =
+    xcalloc (joystick_max_haptic_effects,
+             sizeof (* joystick_haptic_effect_id));
+#endif
+}
+
+void
+disable_joystick (void)
+{
   if (joystick) {
-    joystick_h_center = get_joystick_h_axis ();
-    joystick_v_center = get_joystick_v_axis ();
-    joystick_shift_released = get_joystick_button (joystick_shift_button);
-    joystick_up_released = get_joystick_button (joystick_up_button);
-    joystick_right_released = get_joystick_button (joystick_right_button);
-    joystick_down_released = get_joystick_button (joystick_down_button);
-    joystick_left_released = get_joystick_button (joystick_left_button);
-    joystick_enter_released = get_joystick_button (joystick_enter_button);
+    al_release_joystick (joystick);
+    joystick = NULL;
   }
+
+#ifdef __al_included_allegro5_haptic_h
+  if (joystick_haptic_effect_id) {
+    int i;
+    for (i = 0; i < joystick_max_haptic_effects; i++)
+      if (joystick_haptic_effect_id[i]) {
+        al_release_haptic_effect (joystick_haptic_effect_id[i]);
+        al_free (joystick_haptic_effect_id[i]);
+      }
+
+    al_free (joystick_haptic_effect_id);
+    joystick_haptic_effect_id = NULL;
+    joystick_max_haptic_effects = 0;
+  }
+
+  if (joystick_haptic) {
+    al_release_haptic (joystick_haptic);
+    joystick_haptic = NULL;
+  }
+#endif
 }
 
 ALLEGRO_EVENT_SOURCE *
@@ -216,6 +280,10 @@ joystick_info (void)
   int i, j;
 
   if (! al_is_joystick_installed ()) {
+#ifdef __al_included_allegro5_haptic_h
+    init_video ();
+    show_logo ("Querying joystick...", NULL);
+#endif
     init_gamepad ();
     calibrate_joystick ();
   }
@@ -244,6 +312,38 @@ joystick_info (void)
             joystick_state.button[i]);
   }
 
+#ifdef __al_included_allegro5_haptic_h
+  printf ("Haptic:");
+
+  if (al_is_joystick_haptic (joystick)) {
+    int c = al_get_haptic_capabilities (joystick_haptic);
+    if (c & ALLEGRO_HAPTIC_RUMBLE) printf (" RUMBLE");
+    if (c & ALLEGRO_HAPTIC_PERIODIC) printf (" PERIODIC");
+    if (c & ALLEGRO_HAPTIC_CONSTANT) printf (" CONSTANT");
+    if (c & ALLEGRO_HAPTIC_SPRING) printf (" SPRING");
+    if (c & ALLEGRO_HAPTIC_FRICTION) printf (" FRICTION");
+    if (c & ALLEGRO_HAPTIC_DAMPER) printf (" DAMPER");
+    if (c & ALLEGRO_HAPTIC_INERTIA) printf (" INERTIA");
+    if (c & ALLEGRO_HAPTIC_RAMP) printf (" RAMP");
+    if (c & ALLEGRO_HAPTIC_SQUARE) printf (" SQUARE");
+    if (c & ALLEGRO_HAPTIC_TRIANGLE) printf (" TRIANGLE");
+    if (c & ALLEGRO_HAPTIC_SINE) printf (" SINE");
+    if (c & ALLEGRO_HAPTIC_SAW_UP) printf (" SAW_UP");
+    if (c & ALLEGRO_HAPTIC_SAW_DOWN) printf (" SAW_DOWN");
+    if (c & ALLEGRO_HAPTIC_CUSTOM) printf (" CUSTOM");
+    if (c & ALLEGRO_HAPTIC_GAIN) printf (" GAIN");
+    if (c & ALLEGRO_HAPTIC_ANGLE) printf (" ANGLE");
+    if (c & ALLEGRO_HAPTIC_RADIUS) printf (" RADIUS");
+    if (c & ALLEGRO_HAPTIC_AZIMUTH) printf (" AZIMUTH");
+    if (c & ALLEGRO_HAPTIC_AUTOCENTER) printf (" AUTOCENTER");
+  } else printf (" NONE");
+
+  printf ("\n");
+
+  gamepad_rumble (1.0, 0.6);
+  al_rest (0.6);
+#endif
+
   return 0;
 }
 
@@ -270,4 +370,50 @@ was_button_pressed (int _button, bool consume)
     if (consume) button = -1;
     return true;
   } else return false;
+}
+
+void
+request_gamepad_rumble (double intensity, double duration)
+{
+  gamepad_rumble_intensity =
+    max_double (intensity, gamepad_rumble_intensity);
+  gamepad_rumble_duration =
+    max_double (duration, gamepad_rumble_duration);
+}
+
+void
+gamepad_rumble (double intensity, double duration)
+{
+#ifdef __al_included_allegro5_haptic_h
+  if (! joystick) return;
+  if (! joystick_haptic) return;
+  if (! joystick_haptic_effect_id) return;
+
+  static int i = 0;
+  if (joystick_haptic_effect_id[i])
+    al_release_haptic_effect (joystick_haptic_effect_id[i]);
+  else joystick_haptic_effect_id[i] =
+         xmalloc (sizeof (ALLEGRO_HAPTIC_EFFECT_ID));
+
+  if (al_rumble_haptic (joystick_haptic, intensity * gamepad_rumble_gain,
+                        duration, joystick_haptic_effect_id[i])) {
+    /* printf ("%i: %.2f/%.2f\n", i, intensity, duration); */
+    i = (i + 1) % joystick_max_haptic_effects;
+  }
+#endif
+}
+
+void
+execute_haptic (void)
+{
+  if (gamepad_rumble_intensity > 0 && gamepad_rumble_duration > 0)
+    gamepad_rumble (gamepad_rumble_intensity, gamepad_rumble_duration);
+  reset_haptic ();
+}
+
+void
+reset_haptic (void)
+{
+  gamepad_rumble_duration = 0;
+  gamepad_rumble_intensity = 0;
 }

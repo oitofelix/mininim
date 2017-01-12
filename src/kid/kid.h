@@ -53,6 +53,9 @@ ALLEGRO_COLOR get_flicker_raise_sword_color (void);
 ALLEGRO_COLOR get_flicker_float_color (void);
 void kid_debug (void);
 void place_kid (struct anim *k, int room, int floor, int place);
+void kid_haptic (struct anim *k, double duration);
+void kid_haptic_for_range (struct pos *p, coord_f cf, double r,
+                           double duration);
 
 /* variables */
 extern int current_kid_id;

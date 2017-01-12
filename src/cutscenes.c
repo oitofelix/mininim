@@ -297,6 +297,14 @@ title_anim (void)
   case 20:
     jaffar.action (&jaffar);
     if (jaffar.f.b == jaffar_raise_arms_06) {
+      if (scream) {
+        if (! princess_scream) {
+          play_audio (&scream_audio, NULL, princess.id);
+          fprintf (stderr, "In MININIM, the princess screams...\n");
+          princess_scream = true;
+        }
+      }
+
       video_effect.color = WHITE;
       start_video_effect (VIDEO_FLICKERING, SEC2EFF (1));
       clock_type = 0;
@@ -762,6 +770,14 @@ cutscene_14_anim (void)
     }
     break;
   case 2:
+    if (scream) {
+      if (! princess_scream) {
+        play_audio (&scream_audio, NULL, princess.id);
+        fprintf (stderr, "In MININIM, the princess screams...\n");
+        princess_scream = true;
+      }
+    }
+
     princess.action (&princess);
     if (princess.i < 8) kid.action (&kid);
     else kid.invisible = true;

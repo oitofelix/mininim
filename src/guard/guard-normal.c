@@ -139,8 +139,6 @@ flow (struct anim *g)
 static bool
 physics_in (struct anim *g)
 {
-  struct pos pmbo;
-
   /* collision */
   uncollide_static_neutral (g);
 
@@ -148,8 +146,7 @@ physics_in (struct anim *g)
   g->inertia = g->cinertia = 0;
 
   /* fall */
-  survey (_mbo, pos, &g->f, NULL, &pmbo, NULL);
-  if (is_strictly_traversable (&pmbo)) {
+  if (is_falling (&g->f, _mbo, +0, +0)) {
     guard_fall (g);
     return false;
   }

@@ -102,6 +102,8 @@ flow (struct anim *k)
 
     k->i = -1;
     k->of = k->f;
+    if (k->oaction == kid_sword_normal)
+      k->i_initiated_attack = true;
   }
 
   if (k->oaction == kid_sword_defense) k->i = 0;
@@ -121,7 +123,7 @@ flow (struct anim *k)
   }
 
   if (k->i == 3 && k->enemy_defended_my_attack)
-    k->f.c.x += (k->f.dir == LEFT) ? +9 : -9;
+    move_frame (&k->f, _tb, +0, -9, -9);
 
   if (k->i == 2 && k->enemy_defended_my_attack)
     k->i = 3;
@@ -149,14 +151,11 @@ flow (struct anim *k)
 static bool
 physics_in (struct anim *k)
 {
-  struct pos pmbo;
-
   /* collision */
   uncollide_front_fight (k);
 
   /* fall */
-  survey (_mbo, pos, &k->f, NULL, &pmbo, NULL);
-  if (is_strictly_traversable (&pmbo)) {
+  if (is_falling (&k->f, _mbo, +0, +0)) {
     k->xf.b = NULL;
     kid_fall (k);
     return false;

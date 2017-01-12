@@ -58,5 +58,5 @@ debug_pos (struct pos *p)
 void
 debug_random_seed (void)
 {
-  fprintf (stderr, "%lu 0x%X\n", anim_cycle, random_seed);
+  fprintf (stderr, "%" PRIu64 " 0x%X\n", anim_cycle, random_seed);
 }

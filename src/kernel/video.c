@@ -383,13 +383,18 @@ draw_bottom_text (ALLEGRO_BITMAP *bitmap, char *text, int priority)
     strncpy (str, current_text + text_offset, BOTTOM_TEXT_MAX_LENGTH);
     str[BOTTOM_TEXT_MAX_LENGTH] = '\0';
 
-    set_target_bitmap (bitmap);
-    al_draw_filled_rectangle (0, CUTSCENE_HEIGHT - 8,
-                              CUTSCENE_WIDTH, CUTSCENE_HEIGHT,
-                              bg_color);
+    push_reset_clipping_rectangle (bitmap);
+
+    draw_filled_rectangle (bitmap,
+                           0, CUTSCENE_HEIGHT - 8,
+                           CUTSCENE_WIDTH - 1, CUTSCENE_HEIGHT - 1,
+                           bg_color);
     draw_text (bitmap, str,
                CUTSCENE_WIDTH / 2.0, CUTSCENE_HEIGHT - 7,
                ALLEGRO_ALIGN_CENTRE);
+
+    pop_clipping_rectangle ();
+
   }
 
   return true;
@@ -669,27 +674,16 @@ show (void)
   ALLEGRO_BITMAP *screen = mr.cell[0][0].screen;
 
   if (load_callback) {
-    enum rendering rendering_backup = rendering;
-    rendering = VIDEO_RENDERING;
-    draw_logo (screen, "Loading...", NULL);
-    rendering = rendering_backup;
-    flip_display (screen);
+    show_logo ("Loading...", NULL);
     return;
   } else if (is_dedicatedly_replaying ()) {
-    enum rendering rendering_backup = rendering;
-    rendering = VIDEO_RENDERING;
-    draw_replaying (screen);
-    rendering = rendering_backup;
-    flip_display (screen);
+    show_logo_replaying ();
     return;
   } else if (! command_line_replay
              && (rendering == NONE_RENDERING
                  || rendering == AUDIO_RENDERING)) {
-    enum rendering rendering_backup = rendering;
-    rendering = VIDEO_RENDERING;
-    clear_bitmap (screen, BLACK);
-    rendering = rendering_backup;
-    flip_display (screen);
+    char *text1 = rendering == AUDIO_RENDERING ? "AUDIO" : "NONE";
+    show_logo ("RENDERING", text1);
     return;
   }
 
@@ -1024,13 +1018,26 @@ draw_logo (ALLEGRO_BITMAP *bitmap, char *text0, char *text1)
 }
 
 void
-draw_replaying (ALLEGRO_BITMAP *bitmap)
+show_logo_replaying (void)
 {
   char *text0, *text1;
   int progress; update_replay_progress (&progress);
   xasprintf (&text0, "Level: %02u", global_level.n);
   xasprintf (&text1, "Replaying: %3lu%%", progress);
-  draw_logo (bitmap, text0, text1);
+
+  show_logo (text0, text1);
+
   al_free (text0);
   al_free (text1);
+}
+
+void
+show_logo (char *text0, char* text1)
+{
+  ALLEGRO_BITMAP *screen = mr.cell[0][0].screen;
+  enum rendering rendering_backup = rendering;
+  rendering = VIDEO_RENDERING;
+  draw_logo (screen, text0, text1);
+  rendering = rendering_backup;
+  flip_display (screen);
 }

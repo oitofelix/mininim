@@ -60,20 +60,20 @@ ALLEGRO_THREAD *load_config_dialog_thread, *save_game_dialog_thread,
 
 struct dialog load_config_dialog = {
   .title = "Load configuration file",
-  .patterns = "*.*",
+  .patterns = "*.mcf;*.MCF",
   .mode = ALLEGRO_FILECHOOSER_FILE_MUST_EXIST
   | ALLEGRO_FILECHOOSER_MULTIPLE,
 };
 
 struct dialog save_game_dialog = {
   .title = "Save game",
-  .patterns = "*.SAV",
+  .patterns = "*.mcf;*.MCF",
   .mode = ALLEGRO_FILECHOOSER_SAVE,
 };
 
 struct dialog save_picture_dialog = {
   .title = "Save picture",
-  .patterns = "image/png",
+  .patterns = "*.png;*.PNG",
   .mode = ALLEGRO_FILECHOOSER_SAVE
   | ALLEGRO_FILECHOOSER_PICTURES,
 };
@@ -98,6 +98,17 @@ enum semantics semantics;
 enum movements movements;
 bool title_demo;
 enum rendering rendering = BOTH_RENDERING;
+
+/* screams */
+bool scream;
+bool kid_scream;
+bool guard_scream;
+bool fat_guard_scream;
+bool shadow_scream;
+bool skeleton_scream;
+bool vizier_scream;
+bool princess_scream;
+bool mouse_scream;
 
 struct skill skill = {.counter_attack_prob = INITIAL_KCA,
                       .counter_defense_prob = INITIAL_KCD};
@@ -152,7 +163,7 @@ static struct argp_option options[] = {
 
   /* Skills */
   {NULL, 0, NULL, 0, "Skills:", 0},
-  {"total-lives", TOTAL_LIVES_OPTION, "N", 0, "Make the kid start with N total lives.  The default is 3.  Valid integers range from 1 to 10.  This can be changed in-game using the SHIFT+T key binding.", 0},
+  {"total-lives", TOTAL_LIVES_OPTION, "N", 0, "Make the kid start with N total lives.  The default is 3.  Valid integers range from 1 to INT_MAX.  This can be changed in-game using the SHIFT+T key binding.  Notice that only a maximum of 10 lives are displayed in the bottom line.", 0},
   {"kca", KCA_OPTION, "N", 0, "Set kid's counter attack skill to N.  The default is 0 (zero).  Valid integers range from 0 to 100.  This can be changed in-game using the CTRL+= and CTRL+- key bindings.", 0},
   {"kcd", KCD_OPTION, "N", 0, "Set kid's counter defense skill to N.  The default is 0 (zero).  Valid integers range from 0 to 100.  This can be changed in-game using the ALT+= and ALT+- key bindings.", 0},
   {"immortal-mode", IMMORTAL_MODE_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable immortal mode.  In immortal mode the kid can't be harmed.  The default is FALSE.  This can be changed in-game using the I key binding.", 0},
@@ -177,7 +188,12 @@ static struct argp_option options[] = {
   {"joystick-button-threshold", JOYSTICK_BUTTON_THRESHOLD_OPTION, "FUNC,VALUE", 0, "Set joystick threshold to VALUE for the button mapped to FUNC.  Valid values for FUNC are: UP, RIGHT, DOWN, LEFT, ENTER, SHIFT.  VALUE is an integer ranging from 0 to 32767.  The default VALUE for any function is 100.", 0},
   {"joystick-axis", JOYSTICK_AXIS_OPTION, "FUNC,STICK,AXIS", 0, "Map function FUNC to joystick axis STICK,AXIS.  Valid values for FUNC are: H and V.  STICK,AXIS is a valid stick and axis pair.  The default STICK,AXIS for H is 0,0 and for V is 0,1.", 0},
   {"joystick-button", JOYSTICK_BUTTON_OPTION, "FUNC,BUTTON", 0, "Map function FUNC to joystick button BUTTON.  Valid values for FUNC are: UP, RIGHT, DOWN, LEFT, ENTER, SHIFT, TIME, PAUSE.  BUTTON is a valid joystick button number.  The default BUTTON values are 0, 1, 2, 3, 4, 5, 8 and 9, respectively.", 0},
-  {"joystick-info", JOYSTICK_INFO_OPTION, NULL, OPTION_NO_USAGE, "Print information about the primary joystick and exit.", 0},
+  {"joystick-info", JOYSTICK_INFO_OPTION, NULL, OPTION_NO_USAGE, "Print information about the primary joystick and exit.  Keep sticks/buttons pressed while invoking it to find out their respective assigned numbers.", 0},
+  {"gamepad-rumble-gain", GAMEPAD_RUMBLE_GAIN_OPTION, "F", 0, "Set gamepad haptic rumble gain to F.  This number is multiplied by the intensity of rumble effects in order to scale they down proportionally in case the default is too intense for the available gamepad.  It's implemented in software and thus the GAIN gamepad feature is not required.  The default is 1.0.  Valid floating values range from 0.0 (disables rumble) to 1.0 (default intensity).  This option has no effect on replays."
+#ifndef __al_included_allegro5_haptic_h
+   "\nWARNING: THIS BUILD DOES NOT SUPPORT HAPTICS."
+#endif
+   , 0},
 
   {NULL, 0, NULL, OPTION_DOC, "The primary joystick's axis and button numbers are listed by the option '--joystick-info'.  You can find out the number of a particular axis or button by pressing it before invoking MININIM with that option.  If a stick, axis or button given to an option doesn't exist in the primary joystick, it's silently ignored.  The joystick can be activated and auto-calibrated in-game by the CTRL+J key binding.  Use this when hot-plugging a joystick or in case the joystick starts to behave oddly.  If your joystick is peculiar enough, proving the auto-calibration mechanism insufficient, the '--joystick-axis-threshold' and '--joystick-button-threshold' options may help.", 0},
 
@@ -214,6 +230,10 @@ static struct argp_option options[] = {
   {"sound", SOUND_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable sound.  The default is TRUE.  This can be changed in-game using the CTRL+S key binding.", 0},
   {"skip-title", SKIP_TITLE_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Skip title screen.  The default is FALSE.", 0},
   {"inhibit-screensaver", INHIBIT_SCREENSAVER_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Prevent the system screensaver from starting up.  The default is TRUE.", 0},
+  {"random-seed", RANDOM_SEED_OPTION, "N", 0, "Set initial random seed to N.  If N is zero, the initial random seed is derived from current time.  This is the default.  Valid integers range from 0 to INT_MAX.  This option is potentially useful for debugging purposes.", 0},
+
+  /* Easter eggs */
+  {"scream", SCREAM_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL | OPTION_HIDDEN, "In MININIM, everybody screams!", 0},
 
   /* Help */
   {NULL, 0, NULL, 0, "Help:", -1},
@@ -640,7 +660,7 @@ parser (int key, char *arg, struct argp_state *state)
 
   char *validate_replay_chain_enum[] = {"NONE", "READ", "WRITE", NULL};
 
-  struct int_range total_lives_range = {1, 10};
+  struct int_range total_lives_range = {1, INT_MAX};
   struct int_range start_level_range = {0, INT_MAX};
   struct int_range start_pos_room_range = {1, INT_MAX};
   struct int_range start_pos_floor_range = {0, 2};
@@ -658,6 +678,8 @@ parser (int key, char *arg, struct argp_state *state)
   struct int_range joystick_axis_range = {0, INT_MAX};
   struct int_range joystick_button_range = {0, INT_MAX};
   struct int_range display_mode_range = {-1, al_get_num_display_modes () - 1};
+  struct float_range gamepad_rumble_intensity_range = {0.0,1.0};
+  struct int_range random_seed_range = {0, INT_MAX};
 
   switch (key) {
   case IGNORE_MAIN_CONFIG_OPTION:
@@ -792,6 +814,12 @@ Levels have been converted using module %s into native format at\n\
       flip_gamepad_horizontal = true;
       break;
     }
+    break;
+  case GAMEPAD_RUMBLE_GAIN_OPTION:
+    e = optval_to_float (&float_val, key, arg, state,
+                         &gamepad_rumble_intensity_range, 0);
+    if (e) return e;
+    gamepad_rumble_gain = float_val;
     break;
   case MIRROR_MODE_OPTION:
     if (optval_to_bool (arg)) {
@@ -1003,6 +1031,14 @@ Levels have been converted using module %s into native format at\n\
     case 1: validate_replay_chain = READ_VALIDATE_REPLAY_CHAIN; break;
     case 2: validate_replay_chain = WRITE_VALIDATE_REPLAY_CHAIN; break;
     }
+    break;
+  case SCREAM_OPTION:
+    scream = optval_to_bool (arg);
+    break;
+  case RANDOM_SEED_OPTION:
+    e = optval_to_int (&i, key, arg, state, &random_seed_range, 0);
+    if (e) return e;
+    random_seed = i;
     break;
   case ARGP_KEY_ARG:
     if (add_replay_file_to_replay_chain (arg)) {
@@ -1372,13 +1408,17 @@ quit_game (void)
   unload_cutscenes ();
   unload_audio_data ();
 
-  finalize_video ();
-  finalize_audio ();
-  finalize_gamepad ();
-  finalize_dialog ();
   finalize_mouse ();
+  finalize_dialog ();
+  finalize_gamepad ();
+  finalize_audio ();
+  finalize_video ();
 
-  fprintf (stderr, "MININIM: Hope you enjoyed it!\n");
+  if (scream && kid_scream && guard_scream
+      && fat_guard_scream && shadow_scream && skeleton_scream
+      && vizier_scream  && princess_scream && mouse_scream)
+    fprintf (stderr, "In MININIM, everybody screams!\n");
+  else fprintf (stderr, "MININIM: Hope you enjoyed it!\n");
 
   exit (0);
 }
@@ -1446,9 +1486,9 @@ get_paths (void)
 
   /* get dialogs initial paths */
   xasprintf (&load_config_dialog.initial_path, "%s", user_settings_dir);
-  xasprintf (&save_game_dialog.initial_path, "%s", user_settings_dir);
-  xasprintf (&save_picture_dialog.initial_path, "%s", user_documents_dir);
-  xasprintf (&save_replay_dialog.initial_path, "%s", user_data_dir);
+  xasprintf (&save_game_dialog.initial_path, "%s.mcf", user_settings_dir);
+  xasprintf (&save_picture_dialog.initial_path, "%s.png", user_documents_dir);
+  xasprintf (&save_replay_dialog.initial_path, "%s.mrp", user_data_dir);
   xasprintf (&load_replay_dialog.initial_path, "%s", user_data_dir);
 }
 
@@ -1765,6 +1805,7 @@ movements_str (enum movements m)
   case NATIVE_MOVEMENTS: return "NATIVE";
   default: assert (false);
   }
+  return NULL;
 }
 
 char *
@@ -1775,6 +1816,7 @@ semantics_str (enum semantics m)
   case NATIVE_SEMANTICS: return "NATIVE";
   default: assert (false);
   }
+  return NULL;
 }
 
 bool
@@ -1799,4 +1841,16 @@ save_level (struct level *l)
     return false;
   }
   return true;
+}
+
+double
+max_double (double a, double b)
+{
+  return (a > b) ? a : b;
+}
+
+double
+min_double (double a, double b)
+{
+  return (a < b) ? a : b;
 }

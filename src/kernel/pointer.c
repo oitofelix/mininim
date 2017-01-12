@@ -205,7 +205,7 @@ set_mouse_pos (struct pos *p)
   m.mr.h = mr.h;
   m.mr.room = mr.room = np.room;
 
-  con_m (&np, &m.c);
+  con_coord (&np, _m, &m.c);
 
   int x, y;
   if (! mr_coord (np.room, -1, &x, &y)) {

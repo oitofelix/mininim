@@ -24,7 +24,6 @@ int current_kid_id;
 
 ALLEGRO_BITMAP *v_kid_full_life, *v_kid_empty_life, *v_kid_splash;
 
-static struct coord *kid_life_coord (int i, struct coord *c);
 static ALLEGRO_COLOR v_palette (ALLEGRO_COLOR c);
 static ALLEGRO_COLOR e_palette (ALLEGRO_COLOR c);
 static ALLEGRO_COLOR c_palette (ALLEGRO_COLOR c);
@@ -378,19 +377,13 @@ draw_kid_lives (ALLEGRO_BITMAP *bitmap, struct anim *k,
                 enum vm vm)
 {
   if (k->dont_draw_lives) return;
-  if (k->current_lives <= 0 || k->current_lives > 10) return;
+  if (k->current_lives <= 0) return;
 
   int current_lives = (k->current_lives < 0) ? 0 : k->current_lives;
   current_lives = (k->current_lives > 10) ? 10 : k->current_lives;
 
   int total_lives = (k->total_lives < 0) ? 0 : k->total_lives;
   total_lives = (k->total_lives > 10) ? 10 : k->total_lives;
-
-  int i;
-  struct coord c;
-  struct rect r;
-  new_rect (&r, room_view, 0, CUTSCENE_HEIGHT - 8,
-            7 * total_lives, CUTSCENE_HEIGHT - 1);
 
   ALLEGRO_COLOR bg_color;
 
@@ -400,7 +393,11 @@ draw_kid_lives (ALLEGRO_BITMAP *bitmap, struct anim *k,
   case VGA: bg_color = V_LIVES_RECT_COLOR; break;
   }
 
-  draw_filled_rect (bitmap, &r, bg_color);
+  push_reset_clipping_rectangle (bitmap);
+
+  draw_filled_rectangle (bitmap, 0, CUTSCENE_HEIGHT - 8,
+                         7 * total_lives - 1,
+                         CUTSCENE_HEIGHT - 1, bg_color);
 
   ALLEGRO_BITMAP *empty = NULL,
     *full = NULL;
@@ -413,20 +410,19 @@ draw_kid_lives (ALLEGRO_BITMAP *bitmap, struct anim *k,
     full = apply_palette (full, hgc_palette);
   }
 
+  int i;
   for (i = 0; i < total_lives; i++)
-    draw_bitmapc (empty, bitmap, kid_life_coord (i, &c), 0);
+    draw_bitmap (empty, bitmap, 7 * i, CUTSCENE_HEIGHT - 6, 0);
 
-  if (current_lives <= KID_MINIMUM_LIVES_TO_BLINK && anim_cycle % 2) return;
+  if (current_lives <= KID_MINIMUM_LIVES_TO_BLINK && anim_cycle % 2) {
+      pop_clipping_rectangle ();
+      return;
+  }
 
   for (i = 0; i < current_lives; i++)
-    draw_bitmapc (full, bitmap, kid_life_coord (i, &c), 0);
-}
+    draw_bitmap (full, bitmap, 7 * i, CUTSCENE_HEIGHT - 6, 0);
 
-static struct coord *
-kid_life_coord (int i, struct coord *c)
-{
-  return
-    new_coord (c, NULL, room_view, 7 * i, CUTSCENE_HEIGHT - 6);
+  pop_clipping_rectangle ();
 }
 
 void
@@ -442,6 +438,8 @@ increase_kid_current_lives (struct anim *k)
     mr.flicker = 8;
     mr.color = get_flicker_blood_color ();
   }
+
+  kid_haptic (k, KID_HAPTIC_DRINK);
 }
 
 void
@@ -459,6 +457,8 @@ increase_kid_total_lives (struct anim *k)
     mr.flicker = 8;
     mr.color = get_flicker_blood_color ();
   }
+
+  kid_haptic (k, KID_HAPTIC_STRONG_DRINK);
 }
 
 void
@@ -467,8 +467,8 @@ float_kid (struct anim *k)
   if (k->current_lives <= 0 && ! is_kid_fall (&k->f)) return;
   k->float_timer = 1;
   stop_audio_instance (&scream_audio, NULL, k->id);
-  if (! is_audio_source_playing (&floating_audio))
-    play_audio (&floating_audio, NULL, k->id);
+  while (stop_audio_instance (&floating_audio, NULL, k->id));
+  play_audio (&floating_audio, NULL, k->id);
   if (k->id == current_kid_id) {
     mr.flicker = 8;
     mr.color = get_flicker_float_color ();
@@ -515,8 +515,31 @@ get_flicker_float_color (void)
 }
 
 void
+kid_haptic (struct anim *k, double cycles)
+{
+  if (! k || k->id != current_kid_id) return;
+  request_gamepad_rumble (1.0, cycles / DEFAULT_HZ);
+}
+
+void
+kid_haptic_for_range (struct pos *p, coord_f cf, double r, double cycles)
+{
+  struct anim *k = get_anim_by_id (current_kid_id);
+  struct pos pk;
+  struct coord ck, cp;
+  survey (_m, pos, &k->f, &ck, &pk, NULL);
+  con_coord (p, cf, &cp);
+  coord2room (&ck, cp.room, &ck);
+  if (pk.floor != p->floor) return;
+  int d = abs (ck.x - cp.x);
+  if (d < r) kid_haptic (k, (1.0 - (d / r)) * cycles);
+}
+
+void
 kid_debug (void)
 {
+  if (! DEBUG || cutscene) return;
+
   struct anim *k = get_anim_by_id (current_kid_id);
 
   /* begin kid hack */

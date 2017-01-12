@@ -116,8 +116,6 @@ flow (struct anim *k)
 static bool
 physics_in (struct anim *k)
 {
-  struct pos ptf;
-
   /* inertia */
   k->inertia = 0;
   k->cinertia = 6;
@@ -133,8 +131,7 @@ physics_in (struct anim *k)
                   &k->fo, NULL);
 
   /* fall */
-  survey (_tf, pos, &k->f, NULL, &ptf, NULL);
-  if (is_strictly_traversable (&ptf)) {
+  if (is_falling (&k->f, _tf, -4, -4)) {
     kid_fall (k);
     return false;
   }
@@ -150,8 +147,11 @@ physics_out (struct anim *k)
   else if (k->i == 2) update_depressible_floor (k, -2, -7);
   else keep_depressible_floor (k);
 
-  /* sound */
-  if (k->i == 1 || k->i == 3) play_audio (&step_audio, NULL, k->id);
+  /* sound and haptic */
+  if (k->i == 1 || k->i == 3) {
+    play_audio (&step_audio, NULL, k->id);
+    kid_haptic (k, KID_HAPTIC_STEP);
+  }
 }
 
 bool

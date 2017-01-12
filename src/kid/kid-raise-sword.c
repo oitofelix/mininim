@@ -119,6 +119,7 @@ physics_out (struct anim *k)
       mr.color = get_flicker_raise_sword_color ();
     }
     play_audio (&glory_audio, NULL, k->id);
+    kid_haptic (k, KID_HAPTIC_RAISE_SWORD);
   }
 
   /* consume sword */
