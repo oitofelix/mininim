@@ -301,6 +301,7 @@ play_level (struct level *lv)
       if (quit_anim == NEXT_LEVEL) goto next_level;
       else if (quit_anim == RESTART_LEVEL) goto restart_level;
       else if (quit_anim == RESTART_GAME) goto restart_game;
+      else if (quit_anim == QUIT_GAME) goto quit;
     }
     goto start;
   case RESTART_GAME:
@@ -322,8 +323,10 @@ play_level (struct level *lv)
     if (quit_anim == NEXT_LEVEL) goto next_level;
     else if (quit_anim == RESTART_LEVEL) goto restart_level;
     else if (quit_anim == RESTART_GAME) goto restart_game;
+    else if (quit_anim == QUIT_GAME) goto quit;
     break;
   }
+ quit:
 
   if (! title_demo && replay_mode == PLAY_REPLAY) {
     if (! replay->complete) complete_replay_chain = false;
