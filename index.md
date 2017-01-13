@@ -60,7 +60,7 @@ currently implemented are:
 - Level mirroring mode (completely inverts level constructions
   horizontally on-the-fly)
 - Joystick mapping and threshold configuration
-- Haptics completely integrated into game mechanics
+- Haptics fully integrated into game mechanics
 - Improved battle system based on upgradable skills, arbitrary number
   of simultaneous fighters and smarter enemy AI
 - Any type of guard per level, styles applicable to any guard type and
