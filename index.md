@@ -60,6 +60,7 @@ currently implemented are:
 - Level mirroring mode (completely inverts level constructions
   horizontally on-the-fly)
 - Joystick mapping and threshold configuration
+- Haptics completely integrated into game mechanics
 - Improved battle system based on upgradable skills, arbitrary number
   of simultaneous fighters and smarter enemy AI
 - Any type of guard per level, styles applicable to any guard type and
@@ -86,7 +87,7 @@ currently implemented are:
 - Supports triggering of any tile
 - Screenshot capturing
 - Replay recording, playing and chain validation.
-
+- In MININIM, everybody screams!
 
 The following additional features are planned to be implemented soon.
 
@@ -151,7 +152,7 @@ welcome!  Please, contact the MININIM community at its
 available.  No installation is required, just extract the zip archive
 and run ‘mininim.exe’.
 
-[mininim-201701051749-win32.zip](https://github.com/oitofelix/mininim/releases/download/v201701051749/mininim-201701051749-win32.zip)
+[mininim-201701122309-win32.zip](https://github.com/oitofelix/mininim/releases/download/v201701122309/mininim-201701122309-win32.zip)
 
 
 **GNU/Linux**
@@ -159,7 +160,11 @@ and run ‘mininim.exe’.
   If you use GNU/Linux, you have to clone its
 [VCS repository](https://github.com/oitofelix/mininim) and build it
 yourself.  It should be quite straightforward --- just follow the
-advice given at its GitHub page.
+advice given at its GitHub page.  If you are planning to build Allegro
+from source consider using
+[oitofelix's fork](https://github.com/oitofelix/allegro5) for best
+results.  It may have improvements brought to the library through
+MININIM.
 
 
 ### Using MININIM
@@ -180,7 +185,8 @@ best place to obtain help is at its
 - `CTRL+Q`: quit game
 - `CTRL+V`: show MININIM version
 - `CTRL+S`: enable/disable sound
-- `CTRL+J`: calibrate joystick
+- `CTRL+J`: joystick mode/calibrate joystick
+- `CTRL+K`: keyboard mode
 - `CTRL+L`: load configuration
 - `CTRL+P`: save picture
 - `F7`: load replay
@@ -190,28 +196,28 @@ best place to obtain help is at its
 - `F11`: change environment mode
 - `F12`: change video mdoe
 - `D`: change display mode
-- `F`: enable/disable fullscreen (desktop mode)
+- `F`/`ALT+ENTER`: enable/disable fullscreen (desktop mode)
 - `SHIFT+I`: flip screen
 - `SHIFT+K`: flip gamepad
 - `SHIFT+B`: enable/disable room drawing
 - `ESC`: pause game
 - `SPACE`: display remaining time
-- `+`: increment remaining time
-- `-`: decrement remaining time
+- `+`/`=`: increase time limit
+- `-`/`_`: decrease time limit
 - `(`: decrease time frequency
 - `)`: increase time frequency
 - `R`: resurrect kid
 - `A`: alternate between kid and its shadows
 - `K`: kill current enemy
 - `I`: enable/disable immortal mode
-- `SHIFT+S`: increment kid's current lives
-- `SHIFT+T`: increment kid's total lives
+- `SHIFT+S`: increase kid's current lives
+- `SHIFT+T`: increase kid's total lives
 - `SHIFT+W`: float kid
 - `TAB`: display skill
-- `CTRL+=`: increment counter attack skill
-- `CTRL+-`: decrement counter attack skill
-- `ALT+=`: increment counter defense skill
-- `ALT+-`: decrement counter defense skill
+- `CTRL+=`: increase counter attack skill
+- `CTRL+-`: decrease counter attack skill
+- `ALT+=`: increase counter defense skill
+- `ALT+-`: decrease counter defense skill
 - `F8`: enable/disable level editor
 - `CTRL+Z`: undo level modification
 - `CTRL+Y`: redo level modification
