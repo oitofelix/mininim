@@ -190,7 +190,7 @@ static struct argp_option options[] = {
   {"joystick-button", JOYSTICK_BUTTON_OPTION, "FUNC,BUTTON", 0, "Map function FUNC to joystick button BUTTON.  Valid values for FUNC are: UP, RIGHT, DOWN, LEFT, ENTER, SHIFT, TIME, PAUSE.  BUTTON is a valid joystick button number.  The default BUTTON values are 0, 1, 2, 3, 4, 5, 8 and 9, respectively.", 0},
   {"joystick-info", JOYSTICK_INFO_OPTION, NULL, OPTION_NO_USAGE, "Print information about the primary joystick and exit.  Keep sticks/buttons pressed while invoking it to find out their respective assigned numbers.", 0},
   {"gamepad-rumble-gain", GAMEPAD_RUMBLE_GAIN_OPTION, "F", 0, "Set gamepad haptic rumble gain to F.  This number is multiplied by the intensity of rumble effects in order to scale they down proportionally in case the default is too intense for the available gamepad.  It's implemented in software and thus the GAIN gamepad feature is not required.  The default is 1.0.  Valid floating values range from 0.0 (disables rumble) to 1.0 (default intensity).  This option has no effect on replays."
-#ifndef __al_included_allegro5_haptic_h
+#if HAPTIC_FEATURE
    "\nWARNING: THIS BUILD DOES NOT SUPPORT HAPTICS."
 #endif
    , 0},
@@ -201,11 +201,11 @@ static struct argp_option options[] = {
   {NULL, 0, NULL, 0, "Display:", 0},
   {"display-mode", DISPLAY_MODE_OPTION, "M", 0, "Use display mode number M.  The default is -1 (desktop).  The valid integers list can be obtained using the option '--print-display-modes'. This can be changed in-game using the D key binding, in case a non-desktop display mode is selected.", 0},
   {"print-display-modes", PRINT_DISPLAY_MODES_OPTION, NULL, OPTION_NO_USAGE, "Print display modes and exit.", 0},
-  {"fullscreen", FULLSCREEN_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable fullscreen mode for desktop display mode, but ignored for other display modes.  In fullscreen mode the window spans the entire screen.  The default is FALSE.  This can be changed in-game using the F key binding.", 0},
+  {"fullscreen", FULLSCREEN_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable full screen mode for desktop display mode, but ignored for other display modes.  In full screen mode the window spans the entire screen.  The default is FALSE.  This can be changed in-game using the F key binding.", 0},
   {"window-position", WINDOW_POSITION_OPTION, "X,Y", 0, "Place the window at screen coordinates X,Y.  The default is to let this choice to the window manager.  The values X and Y are integers and must be separated by a comma.", 0},
   {"window-dimensions", WINDOW_DIMENSIONS_OPTION, "WxH", 0, "Set window width and height to W and H, respectively.  The default is 640x400.  The values W and H are strictly positive integers and must be separated by an 'x'.", 0},
 
-  {NULL, 0, NULL, OPTION_DOC, "The desktop display mode (-1) uses the native desktop resolution and allows for windowed and fullscreen displays.  This is the default and most convenient setting in case the computer is fast enough.  Non-desktop display modes (>= 0) are all fullscreen and change the actual video resolution.  This may be useful for older computers in which the desktop display mode is prohibitively slow.  After the game has started it's not possible to alternate between desktop and non-desktop modes.  No window-related option takes effect for non-desktop display modes.  Changing non-desktop display modes in-game using the D key binding might cause video driver instability.", 0},
+  {NULL, 0, NULL, OPTION_DOC, "The desktop display mode (-1) uses the native desktop resolution and allows for windowed and full screen displays.  This is the default and most convenient setting in case the computer is fast enough.  Non-desktop display modes (>= 0) are all full screen and change the actual video resolution.  This may be useful for older computers in which the desktop display mode is prohibitively slow.  After the game has started it's not possible to alternate between desktop and non-desktop modes.  No window-related option takes effect for non-desktop display modes.  Changing non-desktop display modes in-game using the D key binding might cause video driver instability.", 0},
 
   /* replays */
   {NULL, 0, NULL, 0, "Replays", 0},
@@ -505,23 +505,13 @@ optval_to_enum (int *retval, int key, char *arg, struct argp_state *state,
 static error_t
 option_get_args (int key, char *arg, struct argp_state *state, char s, ...)
 {
-  va_list ap, at, av, as, ar, atype, aval, arange;
+  va_list ap, at, av, ar, atype, aval, arange;
   int i;
   error_t retval;
   char *arg2, *s2;
   xasprintf (&arg2, "%s", arg);
   xasprintf (&s2, "%c", s);
   char *estr;
-
-  /* initialize argument lists */
-  va_start (ap, s);
-  va_start (at, s);
-  va_start (av, s);
-  va_start (as, s);
-  va_start (ar, s);
-  va_start (atype, s);
-  va_start (aval, s);
-  va_start (arange, s);
 
   /* count number of arguments */
   int num_args = 0;
@@ -536,6 +526,7 @@ option_get_args (int key, char *arg, struct argp_state *state, char s, ...)
 
   /* set argument lists */
   va_start (atype, s);
+  va_end (ap);
   va_copy (ap, atype);
   for (i = 0; i <= num_args; i++) va_arg (ap, enum opt_arg_type);
   va_copy (aval, ap);
@@ -588,7 +579,6 @@ option_get_args (int key, char *arg, struct argp_state *state, char s, ...)
   va_end (ap);
   va_end (at);
   va_end (av);
-  va_end (as);
   va_end (ar);
   va_end (atype);
   va_end (aval);
@@ -1255,6 +1245,9 @@ main (int _argc, char **_argv)
   /* initialize Allegro */
   al_init ();
 
+  /* create primary event queue */
+  event_queue = create_event_queue ();
+
   /* get global paths */
   get_paths ();
 
@@ -1294,11 +1287,11 @@ main (int _argc, char **_argv)
     exit (0);
   }
 
+  init_dialog ();
   init_video ();
   init_audio ();
   if (sound_disabled_cmd) enable_audio (false);
   init_gamepad ();
-  init_dialog ();
   init_mouse ();
 
   al_inhibit_screensaver (inhibit_screensaver);
@@ -1307,9 +1300,6 @@ main (int _argc, char **_argv)
   else show_mouse_cursor ();
 
   set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_BUSY);
-
-  event_queue = create_event_queue ();
-  al_register_event_source (event_queue, get_display_event_source (display));
 
   load_callback = process_display_events;
   show ();
@@ -1330,6 +1320,8 @@ main (int _argc, char **_argv)
   /* --------------- */
 
   give_dat_compat_preference ();
+
+  enable_menu (true);
 
   if (skip_title) goto play_game;
 
@@ -1354,6 +1346,7 @@ main (int _argc, char **_argv)
   stop_audio_instances ();
   stop_video_effect ();
   if (quit_anim == QUIT_GAME) quit_game ();
+  else if (quit_anim == RESTART_GAME) goto restart_game;
   else if (quit_anim != CUTSCENE_END) goto play_game;
 
   int min_legacy_level_bkp = min_legacy_level;
@@ -1369,8 +1362,10 @@ main (int _argc, char **_argv)
     if (! next_legacy_level (&vanilla_level, replay->start_level))
       exit (-1);
     title_demo = true;
+    update_main_menu_replay_item ();
     play_level (&vanilla_level);
     title_demo = false;
+    update_main_menu_replay_item ();
   }
   min_legacy_level = min_legacy_level_bkp;
   max_legacy_level = max_legacy_level_bkp;
@@ -1378,6 +1373,7 @@ main (int _argc, char **_argv)
   stop_audio_instances ();
   stop_video_effect ();
   if (quit_anim == QUIT_GAME) quit_game ();
+  else if (quit_anim == RESTART_GAME) goto restart_game;
   else if (quit_anim != CUTSCENE_END) goto play_game;
 
   goto restart_game;
@@ -1409,10 +1405,10 @@ quit_game (void)
   unload_audio_data ();
 
   finalize_mouse ();
-  finalize_dialog ();
   finalize_gamepad ();
   finalize_audio ();
   finalize_video ();
+  finalize_dialog ();
 
   if (scream && kid_scream && guard_scream
       && fat_guard_scream && shadow_scream && skeleton_scream
@@ -1522,6 +1518,7 @@ void *
 dialog_thread (ALLEGRO_THREAD *thread, void *arg)
 {
   struct dialog *d = arg;
+  enable_menu (false);
   show_mouse_cursor ();
 
   ALLEGRO_FILECHOOSER *dialog = NULL;
@@ -1540,8 +1537,11 @@ dialog_thread (ALLEGRO_THREAD *thread, void *arg)
 
   al_set_thread_should_stop (thread);
 
-  if (is_fullscreen ()) hide_mouse_cursor ();
+  if (is_fullscreen () && ! is_showing_menu ())
+    hide_mouse_cursor ();
   else show_mouse_cursor ();
+
+  enable_menu (true);
 
   return dialog;
 }

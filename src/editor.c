@@ -1877,20 +1877,25 @@ editor (void)
 void
 enter_exit_editor (void)
 {
-  if (edit == EDIT_NONE) {
-    if (replay_mode == NO_REPLAY) enter_editor ();
-    else print_replay_mode (0);
-  }
+  if (edit == EDIT_NONE) enter_editor ();
   else exit_editor (0);
 }
 
 void
 enter_editor (void)
 {
-  if (cutscene) return;
-  edit = last_edit;
-  memset (&key, 0, sizeof (key));
-  show_mouse_cursor ();
+  if (cutscene) toggle_menu_visibility ();
+  else {
+    if (replay_mode == NO_REPLAY ) {
+      edit = last_edit;
+      memset (&key, 0, sizeof (key));
+      show_menu ();
+      show_mouse_cursor ();
+    } else  {
+      toggle_menu_visibility ();
+      print_replay_mode (0);
+    }
+  }
 }
 
 void
@@ -1903,11 +1908,12 @@ exit_editor (int priority)
   reset_menu ();
   if (! is_dedicatedly_replaying ())
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
-  if (is_fullscreen ()) hide_mouse_cursor ();
   if (is_game_paused ())
     draw_bottom_text (NULL, "GAME PAUSED", priority);
   else draw_bottom_text (NULL, NULL, priority);
   mr.room_select = -1;
+  hide_menu ();
+  if (is_fullscreen ()) hide_mouse_cursor ();
 }
 
 static char

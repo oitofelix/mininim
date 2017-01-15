@@ -347,6 +347,8 @@ void
 prepare_for_recording_replay (void)
 {
   recording_replay_countdown = SEC2CYC (3) - 1;
+  anim_freq = DEFAULT_HZ;
+  al_set_timer_speed (timer, 1.0 / DEFAULT_HZ);
 }
 
 void
@@ -445,9 +447,13 @@ handle_load_replay_thread (int priority)
   size_t i;
   size_t n = al_get_native_file_dialog_count (dialog);
 
-  free_replay_chain ();
-
   if (n > 0) {
+    struct replay *b_replay_chain = replay_chain;
+    size_t b_replay_chain_nmemb = replay_chain_nmemb;
+
+    replay_chain = NULL;
+    replay_chain_nmemb = 0;
+
     for (i = 0; i < n; i++) {
       char *filename = (char *) al_get_native_file_dialog_path (dialog, i);
       add_replay_file_to_replay_chain (filename);
@@ -465,7 +471,18 @@ handle_load_replay_thread (int priority)
     xasprintf (&load_replay_dialog.initial_path, "%s",
                al_get_native_file_dialog_path (dialog, n - 1));
 
-    if (success) prepare_for_playing_replay (0);
+    if (success) {
+      size_t i;
+      for (i = 0; i < b_replay_chain_nmemb; i++)
+        free_replay (&b_replay_chain[i]);
+      al_free (b_replay_chain);
+      valid_replay_chain = true;
+      complete_replay_chain = true;
+      prepare_for_playing_replay (0);
+    } else {
+      replay_chain = b_replay_chain;
+      replay_chain_nmemb = b_replay_chain_nmemb;
+    }
   }
 
   al_destroy_native_file_dialog (dialog);

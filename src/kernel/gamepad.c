@@ -59,7 +59,7 @@ int joystick_h_stick = 0,
   joystick_time_button = 8,
   joystick_pause_button = 9;
 
-#ifdef __al_included_allegro5_haptic_h
+#if HAPTIC_FEATURE
 static ALLEGRO_HAPTIC *joystick_haptic;
 static ALLEGRO_HAPTIC_EFFECT_ID **joystick_haptic_effect_id;
 static int joystick_max_haptic_effects;
@@ -75,10 +75,14 @@ init_gamepad (void)
   if (! al_install_keyboard ())
     error (0, 0, "%s (void): cannot install keyboard", __func__);
 
+  al_register_event_source (event_queue, get_keyboard_event_source ());
+
   if (! al_install_joystick ())
     error (0, 0, "%s (void): cannot install joystick", __func__);
 
-#ifdef __al_included_allegro5_haptic_h
+  al_register_event_source (event_queue, get_joystick_event_source ());
+
+#if HAPTIC_FEATURE
   if (! al_install_haptic ())
     error (0, 0, "%s (void): cannot install haptic", __func__);
 #endif
@@ -92,7 +96,7 @@ finalize_gamepad (void)
   al_uninstall_keyboard ();
   al_uninstall_joystick ();
 
-#ifdef __al_included_allegro5_haptic_h
+#if HAPTIC_FEATURE
   al_uninstall_haptic ();
 #endif
 }
@@ -149,7 +153,7 @@ calibrate_joystick (void)
   joystick_left_released = get_joystick_button (joystick_left_button);
   joystick_enter_released = get_joystick_button (joystick_enter_button);
 
-#ifdef __al_included_allegro5_haptic_h
+#if HAPTIC_FEATURE
   joystick_haptic = al_get_haptic_from_joystick (joystick);
 
   if (! joystick_haptic) return;
@@ -172,7 +176,7 @@ disable_joystick (void)
     joystick = NULL;
   }
 
-#ifdef __al_included_allegro5_haptic_h
+#if HAPTIC_FEATURE
   if (joystick_haptic_effect_id) {
     int i;
     for (i = 0; i < joystick_max_haptic_effects; i++)
@@ -280,7 +284,8 @@ joystick_info (void)
   int i, j;
 
   if (! al_is_joystick_installed ()) {
-#ifdef __al_included_allegro5_haptic_h
+#if HAPTIC_FEATURE
+    init_dialog ();
     init_video ();
     show_logo ("Querying joystick...", NULL);
 #endif
@@ -312,7 +317,7 @@ joystick_info (void)
             joystick_state.button[i]);
   }
 
-#ifdef __al_included_allegro5_haptic_h
+#if HAPTIC_FEATURE
   printf ("Haptic:");
 
   if (al_is_joystick_haptic (joystick)) {
@@ -384,7 +389,7 @@ request_gamepad_rumble (double intensity, double duration)
 void
 gamepad_rumble (double intensity, double duration)
 {
-#ifdef __al_included_allegro5_haptic_h
+#if HAPTIC_FEATURE
   if (! joystick) return;
   if (! joystick_haptic) return;
   if (! joystick_haptic_effect_id) return;

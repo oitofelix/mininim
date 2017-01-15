@@ -29,80 +29,79 @@ include documentation.am
 ###########
 
 bin_PROGRAMS = mininim
-mininim_SOURCES = src/mininim.c src/mininim.h src/constants.h					\
-		src/types.h src/colors.h src/anim.c src/anim.h src/pos.c					\
-		src/pos.h src/physics.c src/physics.h src/level.c src/level.h			\
-		src/fix.c src/fix.h src/stars.c src/stars.h src/floor.c						\
-		src/floor.h src/broken-floor.c src/broken-floor.h									\
-		src/skeleton-floor.c src/skeleton-floor.h src/loose-floor.c				\
-		src/loose-floor.h src/opener-floor.c src/opener-floor.h						\
-		src/closer-floor.c src/closer-floor.h src/spikes-floor.c					\
-		src/spikes-floor.h src/door.c src/door.h src/level-door.c					\
-		src/level-door.h src/pillar.c src/pillar.h src/big-pillar.c				\
-		src/big-pillar.h src/chopper.c src/chopper.h src/bricks.c					\
-		src/bricks.h src/torch.c src/torch.h src/window.c src/window.h		\
-		src/balcony.c src/balcony.h src/arch.c src/arch.h src/carpet.c		\
-		src/carpet.h src/mirror.c src/mirror.h src/room.c src/room.h			\
-		src/fire.c src/fire.h src/potion.c src/potion.h src/sword.c				\
-		src/sword.h src/clock.c src/clock.h src/princess.c src/princess.h	\
-		src/jaffar.c src/jaffar.h src/mouse.c src/mouse.h									\
-		src/audio-data.c src/audio-data.h src/cutscenes.c src/cutscenes.h	\
-		src/fight.c src/fight.h src/dat.c src/dat.h src/wall/wall.c				\
-		src/wall/wall.h src/wall/wall-depedv.c src/wall/wall-depedv.h			\
-		src/wall/wall-pv.c src/wall/wall-pv.h src/wall/wall-dcpc.c				\
-		src/wall/wall-dcpc.h src/kid/kid.c src/kid/kid.h									\
-		src/kid/kid-normal.c src/kid/kid-normal.h src/kid/kid-walk.c			\
-		src/kid/kid-walk.h src/kid/kid-start-run.c												\
-		src/kid/kid-start-run.h src/kid/kid-run.c src/kid/kid-run.h				\
-		src/kid/kid-stop-run.c src/kid/kid-stop-run.h											\
-		src/kid/kid-turn-run.c src/kid/kid-turn-run.h src/kid/kid-couch.c	\
-		src/kid/kid-couch.h src/kid/kid-turn.c src/kid/kid-turn.h					\
-		src/kid/kid-stabilize.c src/kid/kid-stabilize.h										\
-		src/kid/kid-jump.c src/kid/kid-jump.h src/kid/kid-vjump.c					\
-		src/kid/kid-vjump.h src/kid/kid-run-jump.c src/kid/kid-run-jump.h	\
-		src/kid/kid-misstep.c src/kid/kid-misstep.h src/kid/kid-hang.c		\
-		src/kid/kid-hang.h src/kid/kid-hang-wall.c												\
-		src/kid/kid-hang-wall.h src/kid/kid-hang-free.c										\
-		src/kid/kid-hang-free.h src/kid/kid-climb.c src/kid/kid-climb.h		\
-		src/kid/kid-unclimb.c src/kid/kid-unclimb.h src/kid/kid-fall.c		\
-		src/kid/kid-fall.h src/kid/kid-drink.c src/kid/kid-drink.h				\
-		src/kid/kid-raise-sword.c src/kid/kid-raise-sword.h								\
-		src/kid/kid-keep-sword.c src/kid/kid-keep-sword.h									\
-		src/kid/kid-take-sword.c src/kid/kid-take-sword.h									\
-		src/kid/kid-sword-normal.c src/kid/kid-sword-normal.h							\
-		src/kid/kid-sword-walkf.c src/kid/kid-sword-walkf.h								\
-		src/kid/kid-sword-walkb.c src/kid/kid-sword-walkb.h								\
-		src/kid/kid-sword-defense.c src/kid/kid-sword-defense.h						\
-		src/kid/kid-sword-attack.c src/kid/kid-sword-attack.h							\
-		src/kid/kid-sword-hit.c src/kid/kid-sword-hit.h src/kid/kid-die.c	\
-		src/kid/kid-die.h src/kid/kid-stairs.c src/kid/kid-stairs.h				\
-		src/guard/guard.c src/guard/guard.h src/guard/guard-normal.c			\
-		src/guard/guard-normal.h src/guard/guard-vigilant.c								\
-		src/guard/guard-vigilant.h src/guard/guard-hit.c									\
-		src/guard/guard-hit.h src/guard/guard-die.c src/guard/guard-die.h	\
-		src/guard/guard-fall.c src/guard/guard-fall.h											\
-		src/guard/guard-walkf.c src/guard/guard-walkf.h										\
-		src/guard/guard-walkb.c src/guard/guard-walkb.h										\
-		src/guard/guard-attack.c src/guard/guard-attack.h									\
-		src/guard/guard-defense.c src/guard/guard-defense.h								\
-		src/levels/native-level.c src/levels/native-level.h								\
-		src/levels/consistency-level.c src/levels/consistency-level.h			\
-		src/levels/legacy-level.c src/levels/legacy-level.h								\
-		src/levels/dat-level.c src/levels/dat-level.h											\
-		src/levels/plv-level.c src/levels/plv-level.h src/kernel/timer.c	\
-		src/kernel/timer.h src/kernel/event.c src/kernel/event.h					\
-		src/kernel/video.c src/kernel/video.h src/kernel/audio.c					\
-		src/kernel/audio.h src/kernel/memory.c src/kernel/memory.h				\
-		src/kernel/gamepad.c src/kernel/gamepad.h src/kernel/pointer.c		\
-		src/kernel/pointer.h src/kernel/random.c src/kernel/random.h			\
-		src/kernel/array.c src/kernel/array.h src/kernel/xstdio.c					\
-		src/kernel/xstdio.h src/kernel/file.c src/kernel/file.h						\
-		src/kernel/dialog.c src/kernel/dialog.h src/kernel/threads.c			\
-		src/kernel/threads.h src/kernel/xconfig.c src/kernel/xconfig.h		\
-		src/kernel/diff.c src/kernel/diff.h src/menu.c src/menu.h					\
-		src/editor.c src/editor.h src/debug.c src/debug.h src/undo.c			\
-		src/undo.h src/multi-room.c src/multi-room.h src/box.c src/box.h	\
-		src/replay.c src/replay.h
+mininim_SOURCES = src/mininim.c src/mininim.h src/compatibility.h			\
+  src/ui.c src/ui.h src/constants.h src/types.h src/colors.h					\
+  src/anim.c src/anim.h src/pos.c src/pos.h src/physics.c							\
+  src/physics.h src/level.c src/level.h src/fix.c src/fix.h						\
+  src/stars.c src/stars.h src/floor.c src/floor.h src/broken-floor.c	\
+  src/broken-floor.h src/skeleton-floor.c src/skeleton-floor.h				\
+  src/loose-floor.c src/loose-floor.h src/opener-floor.c							\
+  src/opener-floor.h src/closer-floor.c src/closer-floor.h						\
+  src/spikes-floor.c src/spikes-floor.h src/door.c src/door.h					\
+  src/level-door.c src/level-door.h src/pillar.c src/pillar.h					\
+  src/big-pillar.c src/big-pillar.h src/chopper.c src/chopper.h				\
+  src/bricks.c src/bricks.h src/torch.c src/torch.h src/window.c			\
+  src/window.h src/balcony.c src/balcony.h src/arch.c src/arch.h			\
+  src/carpet.c src/carpet.h src/mirror.c src/mirror.h src/room.c			\
+  src/room.h src/fire.c src/fire.h src/potion.c src/potion.h					\
+  src/sword.c src/sword.h src/clock.c src/clock.h src/princess.c			\
+  src/princess.h src/jaffar.c src/jaffar.h src/mouse.c src/mouse.h		\
+  src/audio-data.c src/audio-data.h src/cutscenes.c src/cutscenes.h		\
+  src/fight.c src/fight.h src/dat.c src/dat.h src/wall/wall.c					\
+  src/wall/wall.h src/wall/wall-depedv.c src/wall/wall-depedv.h				\
+  src/wall/wall-pv.c src/wall/wall-pv.h src/wall/wall-dcpc.c					\
+  src/wall/wall-dcpc.h src/kid/kid.c src/kid/kid.h										\
+  src/kid/kid-normal.c src/kid/kid-normal.h src/kid/kid-walk.c				\
+  src/kid/kid-walk.h src/kid/kid-start-run.c src/kid/kid-start-run.h	\
+  src/kid/kid-run.c src/kid/kid-run.h src/kid/kid-stop-run.c					\
+  src/kid/kid-stop-run.h src/kid/kid-turn-run.c												\
+  src/kid/kid-turn-run.h src/kid/kid-couch.c src/kid/kid-couch.h			\
+  src/kid/kid-turn.c src/kid/kid-turn.h src/kid/kid-stabilize.c				\
+  src/kid/kid-stabilize.h src/kid/kid-jump.c src/kid/kid-jump.h				\
+  src/kid/kid-vjump.c src/kid/kid-vjump.h src/kid/kid-run-jump.c			\
+  src/kid/kid-run-jump.h src/kid/kid-misstep.c src/kid/kid-misstep.h	\
+  src/kid/kid-hang.c src/kid/kid-hang.h src/kid/kid-hang-wall.c				\
+  src/kid/kid-hang-wall.h src/kid/kid-hang-free.c											\
+  src/kid/kid-hang-free.h src/kid/kid-climb.c src/kid/kid-climb.h			\
+  src/kid/kid-unclimb.c src/kid/kid-unclimb.h src/kid/kid-fall.c			\
+  src/kid/kid-fall.h src/kid/kid-drink.c src/kid/kid-drink.h					\
+  src/kid/kid-raise-sword.c src/kid/kid-raise-sword.h									\
+  src/kid/kid-keep-sword.c src/kid/kid-keep-sword.h										\
+  src/kid/kid-take-sword.c src/kid/kid-take-sword.h										\
+  src/kid/kid-sword-normal.c src/kid/kid-sword-normal.h								\
+  src/kid/kid-sword-walkf.c src/kid/kid-sword-walkf.h									\
+  src/kid/kid-sword-walkb.c src/kid/kid-sword-walkb.h									\
+  src/kid/kid-sword-defense.c src/kid/kid-sword-defense.h							\
+  src/kid/kid-sword-attack.c src/kid/kid-sword-attack.h								\
+  src/kid/kid-sword-hit.c src/kid/kid-sword-hit.h src/kid/kid-die.c		\
+  src/kid/kid-die.h src/kid/kid-stairs.c src/kid/kid-stairs.h					\
+  src/guard/guard.c src/guard/guard.h src/guard/guard-normal.c				\
+  src/guard/guard-normal.h src/guard/guard-vigilant.c									\
+  src/guard/guard-vigilant.h src/guard/guard-hit.c										\
+  src/guard/guard-hit.h src/guard/guard-die.c src/guard/guard-die.h		\
+  src/guard/guard-fall.c src/guard/guard-fall.h												\
+  src/guard/guard-walkf.c src/guard/guard-walkf.h											\
+  src/guard/guard-walkb.c src/guard/guard-walkb.h											\
+  src/guard/guard-attack.c src/guard/guard-attack.h										\
+  src/guard/guard-defense.c src/guard/guard-defense.h									\
+  src/levels/native-level.c src/levels/native-level.h									\
+  src/levels/consistency-level.c src/levels/consistency-level.h				\
+  src/levels/legacy-level.c src/levels/legacy-level.h									\
+  src/levels/dat-level.c src/levels/dat-level.h												\
+  src/levels/plv-level.c src/levels/plv-level.h src/kernel/timer.c		\
+  src/kernel/timer.h src/kernel/event.c src/kernel/event.h						\
+  src/kernel/video.c src/kernel/video.h src/kernel/audio.c						\
+  src/kernel/audio.h src/kernel/memory.c src/kernel/memory.h					\
+  src/kernel/gamepad.c src/kernel/gamepad.h src/kernel/pointer.c			\
+  src/kernel/pointer.h src/kernel/random.c src/kernel/random.h				\
+  src/kernel/array.c src/kernel/array.h src/kernel/xstdio.c						\
+  src/kernel/xstdio.h src/kernel/file.c src/kernel/file.h							\
+  src/kernel/dialog.c src/kernel/dialog.h src/kernel/threads.c				\
+  src/kernel/threads.h src/kernel/xconfig.c src/kernel/xconfig.h			\
+  src/kernel/diff.c src/kernel/diff.h src/menu.c src/menu.h						\
+  src/editor.c src/editor.h src/debug.c src/debug.h src/undo.c				\
+  src/undo.h src/multi-room.c src/multi-room.h src/box.c src/box.h		\
+  src/replay.c src/replay.h
 
 ${mininim_OBJECTS}: ${top_builddir}/src/mininim.h.gch
 

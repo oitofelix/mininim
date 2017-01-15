@@ -50,12 +50,6 @@ play_anim (void (*draw_callback) (void),
   ALLEGRO_EVENT event;
   anim_freq_real = anim_freq > 0 ? anim_freq : UNLIMITED_HZ;
   timer = create_timer (anim_freq > 0 ? 1.0 / anim_freq : 1.0 / UNLIMITED_HZ);
-  if (! event_queue) event_queue = create_event_queue ();
-  al_register_event_source (event_queue, get_display_event_source (display));
-  al_register_event_source (event_queue, get_keyboard_event_source ());
-  al_register_event_source (event_queue, get_joystick_event_source ());
-  al_register_event_source (event_queue, get_mouse_event_source ());
-  al_register_event_source (event_queue, get_timer_event_source (video_timer));
   al_register_event_source (event_queue, get_timer_event_source (timer));
   al_flush_event_queue (event_queue);
   al_start_timer (timer);
@@ -204,8 +198,15 @@ play_anim (void (*draw_callback) (void),
       default: break;
       }
 
-      /* struct coord c; get_mouse_coord (&c); */
-      /* printf ("%i,%i,%i\n", c.room, c.x, c.y); */
+      /* int w = al_get_display_width (display); */
+      /* int h = al_get_display_height (display); */
+      /* ALLEGRO_MOUSE_STATE mouse_state; */
+      /* al_get_mouse_state (&mouse_state); */
+      /* printf ("display: %i, %i; mouse: %i, %i\n", */
+      /*         w, h, mouse_state.x, mouse_state.y); */
+
+      /* struct mouse_coord mc; get_mouse_coord (&mc); */
+      /* printf ("%i,%i,%i\n", mc.c.room, mc.c.x, mc.c.y); */
       break;
     case ALLEGRO_EVENT_MOUSE_AXES:
       if (pause_anim) break;
@@ -235,11 +236,97 @@ play_anim (void (*draw_callback) (void),
       else if (dw > 0) while (dw-- > 0) mr_view_trans (RIGHT);
 
       break;
+
+
+
+    case ALLEGRO_EVENT_MENU_CLICK:
+      /********/
+      /* MENU */
+      /********/
+
+      switch (event.user.data1) {
+      case LOAD_GAME_MID:
+        ui_load_game ();
+        break;
+      case RESTART_GAME_MID:
+        ui_restart_game ();
+        break;
+      case LOAD_CONFIG_MID:
+        ui_load_config ();
+        break;
+      case QUIT_GAME_MID:
+        ui_quit_game ();
+        break;
+
+
+        /* REPLAY */
+      case PLAY_REPLAY_MID:
+        ui_play_replay ();
+        break;
+      case RECORD_REPLAY_MID:
+        ui_record_replay ();
+        break;
+
+
+        /* VIEW */
+      case FULL_SCREEN_MID:
+        ui_full_screen ();
+        break;
+      case SCREENSHOT_MID:
+        ui_screenshot ();
+        break;
+      default: break;
+      }
+      break;
+
+
+
     case ALLEGRO_EVENT_KEY_CHAR:
+      /****************/
+      /* KEY BINDINGS */
+      /****************/
+
       if (pause_anim) break;
       key = event;
 
       char *text = NULL;
+
+      /* CTRL+L: load game */
+      if (was_key_pressed (ALLEGRO_KEY_L, 0, ALLEGRO_KEYMOD_CTRL, true)
+          && ! load_config_dialog_thread)
+        ui_load_game ();
+
+      /* CTRL+P: screenshot */
+      if (was_key_pressed (ALLEGRO_KEY_P, 0, ALLEGRO_KEYMOD_CTRL, true)
+          && ! save_picture_dialog_thread)
+        ui_screenshot ();
+
+      /* ALT+F7: start/stop replay recording */
+      if (! command_line_replay
+          && (((title_demo || replay_mode != PLAY_REPLAY)
+               && was_key_pressed
+               (ALLEGRO_KEY_F7, 0, ALLEGRO_KEYMOD_ALT, true))
+              || ((replay_mode == RECORD_REPLAY
+                   || recording_replay_countdown > 0)
+                  && was_key_pressed (ALLEGRO_KEY_F7, 0, 0, true))))
+        ui_record_replay ();
+
+      /* F7: load replay/stop replaying */
+      if (! command_line_replay
+          && ((replay_mode != RECORD_REPLAY
+               && was_key_pressed (ALLEGRO_KEY_F7, 0, 0, true))
+              || (replay_mode == PLAY_REPLAY
+                  && was_key_pressed
+                  (ALLEGRO_KEY_F7, 0, ALLEGRO_KEYMOD_ALT, true))))
+        ui_play_replay ();
+
+      /* CTRL+R: restart game */
+      if (was_key_pressed (ALLEGRO_KEY_R, 0, ALLEGRO_KEYMOD_CTRL, true))
+        ui_restart_game ();
+
+      /* CTRL+Q: quit game */
+      if (was_key_pressed (ALLEGRO_KEY_Q, 0, ALLEGRO_KEYMOD_CTRL, true))
+        ui_quit_game ();
 
       /* (: decrease time frequency */
       if (was_key_pressed (0, '(', -1, true))
@@ -252,14 +339,6 @@ play_anim (void (*draw_callback) (void),
       /* F8: enable/disable level editor */
       if (was_key_pressed (ALLEGRO_KEY_F8, 0, 0, true))
         enter_exit_editor ();
-
-      /* CTRL+R: restart game */
-      if (was_key_pressed (ALLEGRO_KEY_R, 0, ALLEGRO_KEYMOD_CTRL, true))
-        quit_anim = RESTART_GAME;
-
-      /* CTRL+Q: quit game */
-      if (was_key_pressed (ALLEGRO_KEY_Q, 0, ALLEGRO_KEYMOD_CTRL, true))
-        quit_anim = QUIT_GAME;
 
       /* CTRL+V: show engine name and version */
       if (was_key_pressed (ALLEGRO_KEY_V, 0, ALLEGRO_KEYMOD_CTRL, true)) {
@@ -307,24 +386,8 @@ play_anim (void (*draw_callback) (void),
       if (! active_menu
           && (was_key_pressed (ALLEGRO_KEY_F, 0, 0, true)
               || was_key_pressed (ALLEGRO_KEY_ENTER, 0,
-                                  ALLEGRO_KEYMOD_ALT, true))) {
-        if (display_mode < 0) {
-          force_full_redraw = true;
-          char *boolean;
-          if (is_fullscreen ()) {
-            al_set_display_flag (display, ALLEGRO_FULLSCREEN_WINDOW, false);
-            boolean = "OFF";
-            show_mouse_cursor ();
-          } else {
-            al_set_display_flag (display, ALLEGRO_FULLSCREEN_WINDOW, true);
-            boolean = "ON";
-            hide_mouse_cursor ();
-          }
-          xasprintf (&text, "FULLSCREEN MODE %s", boolean);
-          draw_bottom_text (NULL, text, 0);
-          al_free (text);
-        } else draw_bottom_text (NULL, "NON-DESKTOP MODE IS FULLSCREEN ONLY", 0);
-      }
+                                  ALLEGRO_KEYMOD_ALT, true)))
+        ui_full_screen ();
 
       /* SHIFT+I: flip screen */
       if (was_key_pressed (ALLEGRO_KEY_I, 0, ALLEGRO_KEYMOD_SHIFT, true)) {
@@ -458,57 +521,20 @@ play_anim (void (*draw_callback) (void),
         al_free (text);
       }
 
-      /* CTRL+L: load configuration */
-      if (was_key_pressed (ALLEGRO_KEY_L, 0, ALLEGRO_KEYMOD_CTRL, true)
-          && ! load_config_dialog_thread) {
-        load_config_dialog_thread =
-          create_thread (dialog_thread, &load_config_dialog);
-        al_start_thread (load_config_dialog_thread);
-      }
-
-      /* CTRL+P: save picture */
-      if (was_key_pressed (ALLEGRO_KEY_P, 0, ALLEGRO_KEYMOD_CTRL, true)
-          && ! save_picture_dialog_thread) {
-        save_picture_dialog_thread =
-          create_thread (dialog_thread, &save_picture_dialog);
-        al_start_thread (save_picture_dialog_thread);
-        pause_animation (true);
-      }
-
-      /* ALT+F7: start/stop replay recording */
-      if (! title_demo
-          && ! command_line_replay
-          && ((replay_mode != PLAY_REPLAY
-               && was_key_pressed
-               (ALLEGRO_KEY_F7, 0, ALLEGRO_KEYMOD_ALT, true))
-              || ((replay_mode == RECORD_REPLAY
-                   || recording_replay_countdown > 0)
-                  && was_key_pressed (ALLEGRO_KEY_F7, 0, 0, true)))) {
-        if (replay_mode == RECORD_REPLAY) create_save_replay_thread ();
-        else if (recording_replay_countdown < 0)
-          prepare_for_recording_replay ();
-        else {
-          draw_bottom_text (NULL, "REPLAY RECORDING ABORTED", 2);
-          recording_replay_countdown = -1;
-        }
-      }
-
-      /* F7: load replay/stop replaying */
-      if (! title_demo
-          && ! command_line_replay
-          && ((replay_mode != RECORD_REPLAY
-               && was_key_pressed (ALLEGRO_KEY_F7, 0, 0, true))
-              || (replay_mode == PLAY_REPLAY
-                  && was_key_pressed
-                  (ALLEGRO_KEY_F7, 0, ALLEGRO_KEYMOD_ALT, true)))) {
-        if (replay_mode == PLAY_REPLAY) {
-          print_replay_chain_aborted ();
-          stop_replaying (2);
-        } else create_load_replay_thread ();
-      }
-
       break;
     }
+  }
+
+  if (replay_mode == NO_REPLAY && recording_replay_countdown >= 0) {
+    enable_menu (false);
+    while (recording_replay_countdown >= 0) {
+      al_rest (1.0 / DEFAULT_HZ);
+      start_recording_replay (2);
+      draw_bottom_text (uscreen, NULL, 0);
+      show ();
+      process_display_events ();
+    }
+    enable_menu (true);
   }
 
   if (replay_mode == RECORD_REPLAY) {

@@ -72,7 +72,6 @@ AM_CONDITIONAL([DEBUG], [test x$debug = xtrue])
 AS_IF([[test x$debug != xtrue]],
   [AC_DEFINE([NDEBUG], [1], [Define to 1 to disable assert macro.])]
   [debug_suffix=-debug],
-  [AC_DEFINE([DEBUG], [1], [Define to 1 for debug builds.])]
   [debug_suffix=-debug])
 
 # Optimizations option
@@ -130,8 +129,6 @@ AS_CASE([$host],
 
 # MinGW
 [*-*-mingw*],
-  AC_DEFINE([MINGW_BUILD], [1], [Define to 1 if this build is targeting MinGW.])
-
   [ALLEGRO_CFLAGS=""
    ALLEGRO_LIBS="-lallegro${debug_suffix}"
    ALLEGRO_IMAGE_CFLAGS="${ALLEGRO_CFLAGS}"
@@ -170,8 +167,6 @@ AS_CASE([$host],
       -lstdc++"],
 
 # Default
-  AC_DEFINE([MINGW_BUILD], [0], [Define to 1 if this build is targeting MinGW.])
-
  [PKG_CHECK_MODULES([ALLEGRO],
   [allegro-5 >= $allegro_minver],,
   [PKG_CHECK_MODULES([ALLEGRO],

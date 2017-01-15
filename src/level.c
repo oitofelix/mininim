@@ -246,6 +246,13 @@ play_level (struct level *lv)
 
   play_anim (draw_level, compute_level);
 
+  if (title_demo) {
+    if (quit_anim != RESTART_LEVEL && quit_anim != NEXT_LEVEL)
+      stop_replaying (0);
+    level_cleanup ();
+    return;
+  }
+
   struct anim *k = get_anim_by_id (current_kid_id);
 
   switch (quit_anim) {

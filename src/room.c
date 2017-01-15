@@ -690,6 +690,10 @@ draw_room_anim_fg_sub (ALLEGRO_BITMAP *bitmap,
                  || f->b == kid_climb_04) {
         dy = 53;
         w = 21;
+      } else {
+        /* shouldn't get here */
+        assert (false);
+        dy = 53;
       }
 
       push_clipping_rectangle (bitmap,

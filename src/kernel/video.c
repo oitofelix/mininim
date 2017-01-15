@@ -34,7 +34,7 @@ ALLEGRO_BITMAP *black_screen;
 struct video_effect video_effect = {.type = VIDEO_NO_EFFECT};
 static ALLEGRO_FONT *builtin_font;
 int display_width, display_height;
-ALLEGRO_BITMAP *icon;
+ALLEGRO_BITMAP *logo_icon;
 int effect_counter;
 void (*load_callback) (void);
 int display_mode = -1;
@@ -60,9 +60,11 @@ init_video (void)
             __func__);
 
   al_set_new_display_flags (al_get_new_display_flags ()
-                            | (display_mode < 0 ? ALLEGRO_WINDOWED : ALLEGRO_FULLSCREEN)
+                            | (display_mode < 0 ? ALLEGRO_WINDOWED
+                               : ALLEGRO_FULLSCREEN)
                             | ALLEGRO_RESIZABLE
-                            | ALLEGRO_GENERATE_EXPOSE_EVENTS);
+                            | ALLEGRO_GENERATE_EXPOSE_EVENTS
+                            | ALLEGRO_GTK_TOPLEVEL);
 
   display_width = display_width ? display_width : DISPLAY_WIDTH;
   display_height = display_height ? display_height : DISPLAY_HEIGHT;
@@ -82,12 +84,23 @@ init_video (void)
   display = al_create_display (display_width, display_height);
   if (! display) error (-1, 0, "%s (void): failed to initialize display", __func__);
 
+  al_register_event_source (event_queue, get_display_event_source (display));
+
   set_target_backbuffer (display);
-  al_set_new_bitmap_flags (ALLEGRO_VIDEO_BITMAP);
 
   al_set_window_title (display, WINDOW_TITLE);
-  icon = load_bitmap (ICON);
-  al_set_display_icon (display, icon);
+  logo_icon = load_bitmap (LOGO_ICON);
+  al_set_display_icon (display, logo_icon);
+
+  create_main_menu ();
+  select_main_menu ();
+  enable_menu (false);
+  if (! is_fullscreen ()) show_menu ();
+
+#if MENU_FEATURE
+  al_register_event_source
+    (event_queue, al_get_default_menu_event_source ());
+#endif
 
   cutscene = true;
   if (mr.fit_w == 0 && mr.fit_h == 0) {
@@ -103,6 +116,9 @@ init_video (void)
 
   video_timer = create_timer (1.0 / EFFECT_HZ);
 
+  al_register_event_source (event_queue,
+                            get_timer_event_source (video_timer));
+
   al_init_font_addon ();
   builtin_font = al_create_builtin_font ();
   if (! builtin_font)
@@ -116,7 +132,7 @@ init_video (void)
 void
 finalize_video (void)
 {
-  destroy_bitmap (icon);
+  destroy_bitmap (logo_icon);
   destroy_bitmap (uscreen);
   destroy_bitmap (effect_buffer);
   destroy_bitmap (black_screen);
@@ -138,17 +154,116 @@ get_display_event_source (ALLEGRO_DISPLAY *display)
   return event_source;
 }
 
+int
+memory_bitmap_flags (void)
+{
+  return
+    (al_get_new_bitmap_flags ()
+     & ~ALLEGRO_VIDEO_BITMAP
+     & ~ALLEGRO_CONVERT_BITMAP)
+    | ALLEGRO_MEMORY_BITMAP
+    | ALLEGRO_MIN_LINEAR
+    | ALLEGRO_MAG_LINEAR
+    | ALLEGRO_MIPMAP;
+}
+
+int
+video_bitmap_flags (void)
+{
+  return
+    al_get_new_bitmap_flags ()
+    & ~ALLEGRO_VIDEO_BITMAP
+    & ~ALLEGRO_MEMORY_BITMAP
+    & ~ALLEGRO_MIN_LINEAR
+    & ~ALLEGRO_MAG_LINEAR
+    & ~ALLEGRO_MIPMAP;
+}
+
+ALLEGRO_BITMAP *
+create_memory_bitmap (int w, int h)
+{
+  int flags = al_get_new_bitmap_flags ();
+  al_set_new_bitmap_flags (memory_bitmap_flags ());
+  ALLEGRO_BITMAP *bitmap = al_create_bitmap (w, h);
+  al_set_new_bitmap_flags (flags);
+  return bitmap;
+}
+
 ALLEGRO_BITMAP *
 create_bitmap (int w, int h)
 {
   set_target_backbuffer (display);
+  int flags = al_get_new_bitmap_flags ();
+  al_set_new_bitmap_flags (video_bitmap_flags ());
   ALLEGRO_BITMAP *bitmap = al_create_bitmap (w, h);
-  if (! bitmap) {
-    error (-1, 0, "%s (%i, %i): cannot create bitmap", __func__, w, h);
-    return NULL;
-  }
+  al_set_new_bitmap_flags (flags);
   validate_bitmap_for_mingw (bitmap);
   return bitmap;
+}
+
+ALLEGRO_BITMAP *
+load_memory_bitmap (char *filename)
+{
+  int flags = al_get_new_bitmap_flags ();
+  al_set_new_bitmap_flags (memory_bitmap_flags ());
+
+  ALLEGRO_BITMAP *bitmap =
+    load_resource (filename, (load_resource_f) al_load_bitmap);
+
+  al_set_new_bitmap_flags (flags);
+
+  return bitmap;
+}
+
+ALLEGRO_BITMAP *
+load_scaled_memory_bitmap (char *filename, int w, int h)
+{
+  ALLEGRO_BITMAP *bitmap = load_memory_bitmap (filename);
+  ALLEGRO_BITMAP *scaled_bitmap = create_memory_bitmap (w, h);
+  al_set_target_bitmap (scaled_bitmap);
+  al_clear_to_color (MINGW_BUILD ? WHITE : TRANSPARENT_COLOR);
+  al_draw_scaled_bitmap (bitmap, 0, 0,
+                         al_get_bitmap_width (bitmap),
+                         al_get_bitmap_height (bitmap),
+                         0, 0, w, h, 0);
+  al_destroy_bitmap (bitmap);
+  return scaled_bitmap;
+}
+
+ALLEGRO_BITMAP *
+load_bitmap (char *filename)
+{
+  int flags = al_get_new_bitmap_flags ();
+  al_set_new_bitmap_flags (video_bitmap_flags ());
+
+  set_target_backbuffer (display);
+
+  ALLEGRO_BITMAP *bitmap =
+    load_resource (filename, (load_resource_f) al_load_bitmap);
+
+  al_set_new_bitmap_flags (flags);
+
+  if (! bitmap)
+    error (-1, 0, "%s: cannot load bitmap file '%s'",
+           __func__, filename);
+
+  validate_bitmap_for_mingw (bitmap);
+
+  if (load_callback) load_callback ();
+
+  return bitmap;
+}
+
+void
+validate_bitmap_for_mingw (ALLEGRO_BITMAP *bitmap)
+{
+  if (! MINGW_BUILD) return;
+
+  /* work around a bug (MinGW target), where bitmaps are loaded as
+     black/transparent images */
+  al_lock_bitmap(bitmap, ALLEGRO_PIXEL_FORMAT_ANY,
+		 ALLEGRO_LOCK_READWRITE);
+  al_unlock_bitmap(bitmap);
 }
 
 void
@@ -400,37 +515,6 @@ draw_bottom_text (ALLEGRO_BITMAP *bitmap, char *text, int priority)
   return true;
 }
 
-ALLEGRO_BITMAP *
-load_bitmap (char *filename)
-{
-  set_target_backbuffer (display);
-
-  ALLEGRO_BITMAP *bitmap =
-    load_resource (filename, (load_resource_f) al_load_bitmap);
-
-  if (! bitmap)
-    error (-1, 0, "%s: cannot load bitmap file '%s'",
-           __func__, filename);
-
-  validate_bitmap_for_mingw (bitmap);
-
-  if (load_callback) load_callback ();
-
-  return bitmap;
-}
-
-void
-validate_bitmap_for_mingw (ALLEGRO_BITMAP *bitmap)
-{
-  if (! MINGW_BUILD) return;
-
-  /* work around a bug (MinGW target), where bitmaps are loaded as
-     black/transparent images */
-  al_lock_bitmap(bitmap, ALLEGRO_PIXEL_FORMAT_ANY,
-		 ALLEGRO_LOCK_READWRITE);
-  al_unlock_bitmap(bitmap);
-}
-
 void
 save_bitmap (char *filename, ALLEGRO_BITMAP *bitmap)
 {
@@ -582,8 +666,7 @@ acknowledge_resize (void)
 {
   bool acknowledged;
 
-  if (MINGW_BUILD) acknowledged = true;
-  else acknowledged = al_acknowledge_resize (display);
+  acknowledged = al_acknowledge_resize (display);
 
   if (! acknowledged  && ! is_fullscreen ())
     error (0, 0, "%s: cannot acknowledge display resize (%p)",
@@ -997,11 +1080,11 @@ draw_logo (ALLEGRO_BITMAP *bitmap, char *text0, char *text1)
 {
   int x = 145;
   int y = 40;
-  int w = al_get_bitmap_width (icon);
-  int h = al_get_bitmap_height (icon);
+  int w = al_get_bitmap_width (logo_icon);
+  int h = al_get_bitmap_height (logo_icon);
   clear_bitmap (bitmap, BLACK);
   draw_filled_rectangle (bitmap, x - 1, y - 1, x + w, y + h, WHITE);
-  draw_bitmap (icon, bitmap, x, y, 0);
+  draw_bitmap (logo_icon, bitmap, x, y, 0);
 
   if (text0)
     draw_text (bitmap, text0, CUTSCENE_WIDTH / 2.0, CUTSCENE_HEIGHT / 2.0,

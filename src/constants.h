@@ -22,7 +22,8 @@
 #define MININIM_CONSTANTS_H
 
 #define WINDOW_TITLE "MININIM: The Advanced Prince of Persia Engine (a childhood dream)"
-#define ICON "data/icons/mininim.png"
+#define LOGO_ICON "data/icons/mininim.png"
+#define SMALL_LOGO_ICON "data/icons/mininim-small.png"
 
 #define CLIPPING_RECTANGLE_STACK_NMEMB_MAX 10
 #define DRAWN_RECTANGLE_STACK_NMEMB_MAX 10

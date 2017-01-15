@@ -28,6 +28,8 @@ init_mouse (void)
 {
   if (! al_install_mouse ())
     error (0, 0, "%s (void): cannot install mouse", __func__);
+
+  al_register_event_source (event_queue, get_mouse_event_source ());
 }
 
 void

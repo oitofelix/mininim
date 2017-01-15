@@ -154,11 +154,9 @@ legacy_level_special_events (void)
     struct replay *replay = get_replay ();
 
     if (key.keyboard.keycode || button != -1) {
-      stop_replaying (0);
       quit_anim = CUTSCENE_KEY_PRESS;
       return;
     } else if (anim_cycle >= replay->packed_gamepad_state_nmemb + 108) {
-      stop_replaying (0);
       quit_anim = CUTSCENE_END;
       return;
     }

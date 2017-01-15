@@ -47,9 +47,7 @@
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_native_dialog.h>
 
-#ifndef DEBUG
-#define DEBUG 0
-#endif
+#include "compatibility.h"
 
 #include "constants.h"
 #include "types.h"
@@ -172,6 +170,8 @@
 #include "multi-room.h"
 #include "box.h"
 #include "replay.h"
+#include "ui.h"
+
 
 /* functions */
 void *dialog_thread (ALLEGRO_THREAD *thread, void *arg);
