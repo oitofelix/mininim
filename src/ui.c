@@ -21,140 +21,127 @@
 #include "mininim.h"
 
 #if MENU_FEATURE
+static ALLEGRO_MENU *append_menu;
+static int append_menu_index;
+
+static void start_menu (ALLEGRO_MENU *parent, uint16_t id);
+static bool menu_item (char const *title, uint16_t id, int flags,
+                ALLEGRO_BITMAP *icon, bool has_submenu);
+static void menu_separator (void);
+static void end_menu (void);
+#endif
+
+#if MENU_FEATURE
 ALLEGRO_MENU *main_menu;
-ALLEGRO_MENU *current_menu;
+
+static void menu_widget_pause (void);
+static void menu_widget_speed (void);
 #endif
 
-#if MENU_FEATURE
-ALLEGRO_MENU_INFO main_menu_info[] = {
-  ALLEGRO_START_OF_MENU ("&Game", GAME_MID),
-    ALLEGRO_START_OF_MENU ("&Load", LOAD_MID),
-    { "&Game... (Ctrl+L)", LOAD_GAME_MID, 0, NULL },
-    { "&Configuration... (Ctrl+L)", LOAD_CONFIG_MID, 0, NULL },
-    { "&Level file...", LOAD_LEVEL_FILE_MID,
-      ALLEGRO_MENU_ITEM_DISABLED, NULL },
-    ALLEGRO_END_OF_MENU,
-    ALLEGRO_START_OF_MENU ("&Save", SAVE_MID),
-    { "&Game... (Ctrl+G)", SAVE_GAME_MID, 0, NULL },
-    { "&Configuration...", SAVE_CONFIG_MID,
-      ALLEGRO_MENU_ITEM_DISABLED, NULL },
-    { "&Level file...", SAVE_LEVEL_FILE_MID,
-      ALLEGRO_MENU_ITEM_DISABLED, NULL },
-    ALLEGRO_END_OF_MENU,
-    ALLEGRO_MENU_SEPARATOR,
-    { "&Restart (Ctrl+R)", RESTART_GAME_MID, 0, NULL },
-    { "&Quit (Ctrl+Q)", QUIT_GAME_MID, 0, NULL },
-  ALLEGRO_END_OF_MENU,
-
-  ALLEGRO_START_OF_MENU ("&View", VIEW_MID),
-    { "&Full screen (F)", FULL_SCREEN_MID, 0, NULL },
-    { "&Screenshot... (Ctrl+P)", SCREENSHOT_MID, 0, NULL },
-  ALLEGRO_END_OF_MENU,
-
-  ALLEGRO_START_OF_MENU ("&Replay", REPLAY_MID),
-    { "&Play... (F7)", PLAY_REPLAY_MID, 0, NULL },
-    { "&Record... (ALT+F7)", RECORD_REPLAY_MID, 0, NULL },
-  ALLEGRO_END_OF_MENU,
-
-  ALLEGRO_START_OF_MENU ("&Help", HELP_MID),
-    { "&About", ABOUT_MID, 0, NULL },
-  ALLEGRO_END_OF_MENU,
-
-  ALLEGRO_END_OF_MENU
-};
-#endif
-
-ALLEGRO_BITMAP *
-load_menu_icon (char *filename)
-{
-  if (MINGW_BUILD) return load_scaled_memory_bitmap (filename, 13, 13);
-  else return load_scaled_memory_bitmap (filename, 16, 16);
-}
-
-void
-create_main_menu (void)
-{
-#if MENU_FEATURE
-  main_menu = al_build_menu (main_menu_info);
-
-  /* open */
-  al_set_menu_item_icon
-    (main_menu, LOAD_MID, load_menu_icon (OPEN_ICON));
-
-  /* save */
-  al_set_menu_item_icon
-    (main_menu, SAVE_MID, load_menu_icon (SAVE_ICON));
-
-  /* restart game */
-  al_set_menu_item_icon
-    (main_menu, RESTART_GAME_MID, load_menu_icon (RELOAD_ICON));
-
-  /* quit game */
-  al_set_menu_item_icon
-    (main_menu, QUIT_GAME_MID, load_menu_icon (QUIT_ICON));
-
-  /* full screen */
-  update_main_menu_full_screen_item ();
-
-  /* screenshot */
-  al_set_menu_item_icon
-    (main_menu, SCREENSHOT_MID, load_menu_icon (CAMERA_ICON));
-
-  /* replay */
-  update_main_menu_replay_item ();
-
-  /* about */
-  al_set_menu_item_icon
-    (main_menu, ABOUT_MID, load_menu_icon (SMALL_LOGO_ICON));
-#endif
-}
-
-void
-update_main_menu_full_screen_item (void)
-{
-#if MENU_FEATURE
-  if (is_fullscreen ()) {
-    al_set_menu_item_caption
-      (main_menu, FULL_SCREEN_MID, "&Windowed (F)");
-    al_set_menu_item_icon
-      (main_menu, FULL_SCREEN_MID, load_menu_icon (WINDOWS_ICON));
-  } else {
-    al_set_menu_item_caption
-      (main_menu, FULL_SCREEN_MID, "&Full screen (F)");
-    al_set_menu_item_icon
-      (main_menu, FULL_SCREEN_MID, load_menu_icon (FULL_SCREEN_ICON));
-  }
-#endif
-}
-
-void
-update_main_menu_replay_item (void)
-{
-  if (command_line_replay) {
-    int flags = al_get_menu_item_flags (main_menu, REPLAY_MID);
-    al_set_menu_item_flags (main_menu, REPLAY_MID,
-                            flags | ALLEGRO_MENU_ITEM_DISABLED);
-  } else {
-    /* play replay */
-    al_set_menu_item_icon
-      (main_menu, PLAY_REPLAY_MID, load_menu_icon (PLAY_ICON));
-
-    /* record replay */
-    al_set_menu_item_icon
-      (main_menu, RECORD_REPLAY_MID, load_menu_icon (RECORD_ICON));
-  }
-}
-
-void
-select_main_menu (void)
-{
-  current_menu = main_menu;
-}
 
 
 
 
 
+#if MENU_FEATURE
+void
+start_menu (ALLEGRO_MENU *parent, uint16_t id)
+{
+  if (id > 0) append_menu = al_find_menu (parent, id);
+  else append_menu = parent;
+  assert (append_menu);
+  append_menu_index = 0;
+}
+#endif
+
+#if MENU_FEATURE
+bool
+menu_item (char const *title, uint16_t id, int flags,
+           ALLEGRO_BITMAP *icon, bool has_submenu)
+{
+  ALLEGRO_MENU *submenu = al_find_menu (append_menu, id);;
+
+  if (has_submenu && ! submenu) {
+    submenu = al_create_menu ();
+    goto replace;
+  } else if (! has_submenu && submenu) {
+    submenu = NULL;
+    goto replace;
+  }
+
+  ALLEGRO_MENU *f_menu;
+  int f_index;
+
+  if (al_find_menu_item (append_menu, id, &f_menu, &f_index)) {
+    if (f_menu != append_menu || f_index != append_menu_index)
+      goto replace;
+
+    al_set_menu_item_caption (append_menu, -append_menu_index, title);
+    al_set_menu_item_flags (append_menu, -append_menu_index, flags);
+    al_set_menu_item_icon (append_menu, -append_menu_index, icon);
+
+    append_menu_index++;
+
+    return true;
+  }
+
+ replace:
+  al_remove_menu_item (append_menu, -append_menu_index);
+  return al_insert_menu_item (append_menu, -(append_menu_index++), title,
+                              id, flags, icon, submenu);
+}
+#endif
+
+#if MENU_FEATURE
+void
+menu_separator (void)
+{
+  menu_item ("", NO_MID, ALLEGRO_MENU_ITEM_DISABLED, NULL, false);
+}
+#endif
+
+#if MENU_FEATURE
+void
+end_menu (void)
+{
+  while (al_remove_menu_item (append_menu, -append_menu_index));
+}
+#endif
+
+ALLEGRO_BITMAP *
+micon (char *filename)
+{
+  if (MINGW_BUILD) return load_scaled_memory_bitmap (filename, 13, 13);
+  else return load_scaled_memory_bitmap (filename, 16, 16);
+}
+
+
+
+
+
+
+void
+show_menu (void)
+{
+#if MENU_FEATURE
+  if (display_mode < 0) {
+    al_set_display_menu (display, main_menu);
+    show_mouse_cursor ();
+  }
+#endif
+}
+
+void
+hide_menu (void)
+{
+#if MENU_FEATURE
+  if (is_fullscreen ()) {
+    al_remove_display_menu (display);
+    hide_mouse_cursor ();
+  }
+#endif
+}
+
 void
 toggle_menu_visibility (void)
 {
@@ -173,39 +160,257 @@ is_showing_menu (void)
 }
 
 void
-show_menu (void)
-{
-#if MENU_FEATURE
-  if (display_mode < 0) {
-    al_set_display_menu (display, current_menu);
-    show_mouse_cursor ();
-  }
-#endif
-}
-
-void
-hide_menu (void)
-{
-#if MENU_FEATURE
-  if (is_fullscreen ()) {
-    al_remove_display_menu (display);
-    hide_mouse_cursor ();
-  }
-#endif
-}
-
-#if MENU_FEATURE
-void
 enable_menu (bool enable)
 {
+#if MENU_FEATURE
   int i = 0;
-  while (al_get_menu_item_flags (current_menu, i--) != -1) {
+  while (al_get_menu_item_flags (main_menu, i--) != -1) {
     int flags;
     if (enable)
       flags &= ~ALLEGRO_MENU_ITEM_DISABLED;
     else flags |= ALLEGRO_MENU_ITEM_DISABLED;
-    al_set_menu_item_flags (current_menu, i + 1, flags);
+    al_set_menu_item_flags (main_menu, i + 1, flags);
   }
+#endif
+}
+
+
+
+
+
+void
+create_main_menu (void)
+{
+#if MENU_FEATURE
+  if (! main_menu) main_menu = al_create_menu ();
+  start_menu (main_menu, 0);
+  menu_item ("&Game", GAME_MID, 0, NULL, true);
+  menu_item ("&View", VIEW_MID, 0, NULL, true);
+  menu_item ("&Replay", REPLAY_MID, 0, NULL, true);
+  menu_item ("&Help", HELP_MID, 0, NULL, true);
+  end_menu ();
+
+  game_menu ();
+  view_menu ();
+  replay_menu ();
+  help_menu ();
+#endif
+}
+
+void
+game_menu (void)
+{
+#if MENU_FEATURE
+  start_menu (main_menu, GAME_MID);
+  menu_item ("&Load", LOAD_MID, 0, micon (OPEN_ICON), true);
+  menu_item ("&Save", SAVE_MID, 0, micon (SAVE_ICON), true);
+  menu_separator ();
+  menu_item ("&Restart (Ctrl+R)", RESTART_GAME_MID, 0,
+             micon (RELOAD_ICON), false);
+  menu_item ("&Quit (Ctrl+Q)", QUIT_GAME_MID, 0,
+             micon (QUIT_ICON), false);
+  end_menu ();
+
+  load_menu ();
+  save_menu ();
+#endif
+}
+
+void
+load_menu (void)
+{
+#if MENU_FEATURE
+  start_menu (main_menu, LOAD_MID);
+  menu_item ("&Game... (Ctrl+L)", LOAD_GAME_MID, 0, NULL, false);
+  menu_item ("&Configuration... (Ctrl+L)", LOAD_CONFIG_MID,
+             0, NULL, false);
+  menu_item ("&Level file...", LOAD_LEVEL_FILE_MID,
+             ALLEGRO_MENU_ITEM_DISABLED, NULL, false);
+  end_menu ();
+#endif
+}
+
+void
+save_menu (void)
+{
+#if MENU_FEATURE
+  start_menu (main_menu, SAVE_MID);
+  menu_item ("&Game... (Ctrl+G)", SAVE_GAME_MID, 0, NULL, false);
+  menu_item ("&Configuration...", SAVE_CONFIG_MID,
+             ALLEGRO_MENU_ITEM_DISABLED, NULL, false);
+  menu_item ("&Level file...", SAVE_LEVEL_FILE_MID,
+             ALLEGRO_MENU_ITEM_DISABLED, NULL, false);
+  end_menu ();
+#endif
+}
+
+void
+view_menu (void)
+{
+#if MENU_FEATURE
+  start_menu (main_menu, VIEW_MID);
+
+  menu_item (is_fullscreen () ? "&Windowed (F)" : "&Full screen (F)",
+             FULL_SCREEN_MID, 0,
+             is_fullscreen ()
+             ? micon (WINDOWS_ICON)
+             : micon (FULL_SCREEN_ICON), false);
+
+  menu_item ("&Screenshot... (Ctrl+P)", SCREENSHOT_MID, 0,
+             micon (CAMERA_ICON), false);
+
+  end_menu ();
+#endif
+}
+
+void
+replay_menu (void)
+{
+#if MENU_FEATURE
+  start_menu (main_menu, REPLAY_MID);
+
+  char *text;
+
+  if (recording_replay_countdown >= 0) goto record_replay;
+
+  if (title_demo) goto no_replay;
+
+  switch (replay_mode) {
+  case PLAY_REPLAY:
+    xasprintf (&text, "REPLAYING (%i/%i)", replay_index + 1,
+               replay_chain_nmemb);
+    menu_item
+      (text, NO_MID, ALLEGRO_MENU_ITEM_DISABLED,
+       micon (PLAY_ICON), false);
+    al_free (text);
+
+    menu_separator ();
+
+    menu_item
+      ("&Stop (F7)", PLAY_REPLAY_MID, 0, micon (STOP_ICON), false);
+
+    menu_item
+      ("Pre&vious (Shift+M)", PREVIOUS_REPLAY_MID,
+       replay_index > 0
+       ? 0 : ALLEGRO_MENU_ITEM_DISABLED,
+       micon (PREVIOUS_ICON), false);
+
+    menu_item
+      ("&Next (Shift+L)", NEXT_REPLAY_MID,
+       replay_index + 1 < replay_chain_nmemb
+       ? 0 : ALLEGRO_MENU_ITEM_DISABLED,
+       micon (NEXT_ICON), false);
+
+    menu_widget_pause ();
+
+    menu_widget_speed ();
+
+    break;
+  case RECORD_REPLAY: record_replay:
+
+    if (replay_mode == RECORD_REPLAY)
+      xasprintf (&text, "RECORDING");
+    else xasprintf (&text, "RECORDING IN %i",
+                    CYC2SEC(recording_replay_countdown) + 1);
+    menu_item
+      (text, NO_MID,
+       ALLEGRO_MENU_ITEM_DISABLED,
+       micon (RECORD_ICON), false);
+    al_free (text);
+
+    menu_separator ();
+
+    menu_item
+      (replay_mode == RECORD_REPLAY
+       ? "&Stop... (F7)" : "&Abort recording (F7)", RECORD_REPLAY_MID, 0,
+       replay_mode == RECORD_REPLAY
+       ? micon (STOP_ICON) : micon (EJECT_ICON), false);
+
+    menu_widget_pause ();
+
+    break;
+  default: assert (false);
+  case NO_REPLAY: no_replay:
+
+    menu_item
+      ("&Play... (F7)", PLAY_REPLAY_MID, 0,
+       micon (PLAY_ICON), false);
+
+    menu_item
+      ("&Record... (Alt+F7)", RECORD_REPLAY_MID, 0,
+       micon (RECORD_ICON), false);
+
+    menu_widget_pause ();
+
+    menu_widget_speed ();
+
+    break;
+  }
+
+  end_menu ();
+#endif
+}
+
+void
+help_menu (void)
+{
+#if MENU_FEATURE
+  start_menu (main_menu, HELP_MID);
+  menu_item ("&About", ABOUT_MID, 0, micon (SMALL_LOGO_ICON), false);
+  end_menu ();
+#endif
+}
+
+#if MENU_FEATURE
+void
+menu_widget_pause (void)
+{
+  menu_separator ();
+
+  menu_item
+    (is_game_paused ()
+     ? "&Continue" : "&Pause (Esc)", TOGGLE_PAUSE_GAME_MID,
+     (cutscene || title_demo || recording_replay_countdown >= 0)
+     ? ALLEGRO_MENU_ITEM_DISABLED : 0,
+     is_game_paused ()
+     ? micon (PLAY_ICON)
+     : micon (PAUSE_ICON), false);
+
+  menu_item
+    ("Next &frame (Esc)", NEXT_FRAME_MID,
+     (! is_game_paused () || cutscene || title_demo
+      || recording_replay_countdown >= 0)
+     ? ALLEGRO_MENU_ITEM_DISABLED : 0,
+     micon (FORWARD_ICON), false);
+}
+#endif
+
+#if MENU_FEATURE
+void
+menu_widget_speed (void)
+{
+  menu_separator ();
+
+  int flags = anim_freq > 0
+    ? ALLEGRO_MENU_ITEM_CHECKED
+    : ALLEGRO_MENU_ITEM_CHECKBOX;
+  flags |= (cutscene || title_demo) ? ALLEGRO_MENU_ITEM_DISABLED : 0;
+
+  menu_item
+    ("Speed cons&traint", TOGGLE_TIME_FREQUENCY_CONSTRAINT_MID,
+     flags, NULL, false);
+
+  menu_item
+    ("&Decrease speed [(]", DECREASE_TIME_FREQUENCY_MID,
+     (anim_freq <= 2 || cutscene || title_demo)
+     ? ALLEGRO_MENU_ITEM_DISABLED : 0,
+     micon (BACKWARD_ICON), false);
+
+  menu_item
+    ("&Increase speed [)]", INCREASE_TIME_FREQUENCY_MID,
+     (anim_freq == 0 || cutscene || title_demo)
+     ? ALLEGRO_MENU_ITEM_DISABLED: 0,
+     micon (FORWARD_ICON), false);
 }
 #endif
 
@@ -266,10 +471,12 @@ ui_full_screen (void)
     } else {
       al_set_display_flag (display, ALLEGRO_FULLSCREEN_WINDOW, true);
       boolean = "ON";
-      hide_mouse_cursor ();
-      hide_menu ();
+      if (edit == EDIT_NONE) {
+        hide_mouse_cursor ();
+        hide_menu ();
+      }
     }
-    update_main_menu_full_screen_item ();
+    view_menu ();
     xasprintf (&text, "FULL SCREEN MODE %s", boolean);
     draw_bottom_text (NULL, text, 0);
     al_free (text);
@@ -286,13 +493,98 @@ ui_play_replay (void)
 }
 
 void
+ui_previous_replay (void)
+{
+  quit_anim = REPLAY_PREVIOUS;
+}
+
+void
+ui_next_replay (void)
+{
+  quit_anim = REPLAY_NEXT;
+}
+
+void
 ui_record_replay (void)
 {
   if (replay_mode == RECORD_REPLAY) create_save_replay_thread ();
   else if (recording_replay_countdown < 0)
     prepare_for_recording_replay ();
   else {
-    draw_bottom_text (NULL, "REPLAY RECORDING ABORTED", 2);
+    draw_bottom_text (NULL, "RECORDING ABORTED", 2);
     recording_replay_countdown = -1;
+    replay_menu ();
   }
+}
+
+void
+ui_increase_time_frequency (void)
+{
+  if (anim_freq >= DEFAULT_HZ)
+    ui_change_anim_freq (DEFAULT_HZ * ((anim_freq / DEFAULT_HZ) + 1));
+  else ui_change_anim_freq (2 * ((anim_freq / 2) + 1));
+}
+
+void
+ui_decrease_time_frequency (void)
+{
+  if (anim_freq > DEFAULT_HZ)
+    ui_change_anim_freq (DEFAULT_HZ * (anim_freq / DEFAULT_HZ - 1));
+  else if (anim_freq > 2)
+    ui_change_anim_freq (2 * ((anim_freq / 2) - 1));
+}
+
+void
+ui_toggle_time_frequency_constraint (void)
+{
+  static int f = DEFAULT_HZ;
+
+  if (anim_freq > 0) {
+    f = anim_freq;
+    ui_change_anim_freq (0);
+  } else ui_change_anim_freq (f);
+}
+
+void
+ui_change_anim_freq (int f)
+{
+  char *text;
+  f = f < 0 ? 0 : f;
+  f = f > UNLIMITED_HZ ? UNLIMITED_HZ : f;
+  anim_freq = f;
+  al_set_timer_speed (timer, f > 0 ? 1.0 / f : 1.0 / UNLIMITED_HZ);
+  if (f > 0) {
+    xasprintf (&text, "TIME FREQ: %iHz", f);
+    draw_bottom_text (NULL, text, 0);
+    al_free (text);
+  }
+  replay_menu ();
+}
+
+void
+ui_toggle_pause_game (void)
+{
+  if (is_game_paused ()) pause_game (false);
+  else pause_game (true);
+  replay_menu ();
+}
+
+void
+ui_next_frame (void)
+{
+  step_cycle = 1;
+}
+
+void
+print_game_paused (int priority)
+{
+  char *text;
+
+  switch (replay_mode) {
+  case RECORD_REPLAY: text = "RECORDING PAUSED"; break;
+  case PLAY_REPLAY: text = "REPLAY PAUSED"; break;
+  case NO_REPLAY: default: text = "GAME PAUSED"; break;
+  }
+
+  draw_bottom_text (NULL, text, priority);
 }

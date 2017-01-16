@@ -1908,8 +1908,7 @@ exit_editor (int priority)
   reset_menu ();
   if (! is_dedicatedly_replaying ())
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
-  if (is_game_paused ())
-    draw_bottom_text (NULL, "GAME PAUSED", priority);
+  if (is_game_paused ()) print_game_paused (priority);
   else draw_bottom_text (NULL, NULL, priority);
   mr.room_select = -1;
   hide_menu ();

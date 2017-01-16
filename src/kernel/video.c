@@ -93,7 +93,6 @@ init_video (void)
   al_set_display_icon (display, logo_icon);
 
   create_main_menu ();
-  select_main_menu ();
   enable_menu (false);
   if (! is_fullscreen ()) show_menu ();
 
@@ -102,7 +101,7 @@ init_video (void)
     (event_queue, al_get_default_menu_event_source ());
 #endif
 
-  cutscene = true;
+  cutscene_mode (true);
   if (mr.fit_w == 0 && mr.fit_h == 0) {
     mr.fit_w = 2;
     mr.fit_h = 2;

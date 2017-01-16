@@ -1326,7 +1326,7 @@ main (int _argc, char **_argv)
   if (skip_title) goto play_game;
 
  restart_game:
-  cutscene = true;
+  cutscene_mode (true);
   set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
   set_multi_room (1, 1);
   clear_bitmap (mr.cell[0][0].screen, BLACK);
@@ -1336,7 +1336,7 @@ main (int _argc, char **_argv)
   stop_video_effect ();
 
   /* /\* begin test *\/ */
-  /* cutscene = true; */
+  /* cutscene_mode (true); */
   /* play_anim (cutscene_out_of_time_anim, NULL); */
   /* exit (0); */
   /* /\* end test *\/ */
@@ -1362,10 +1362,10 @@ main (int _argc, char **_argv)
     if (! next_legacy_level (&vanilla_level, replay->start_level))
       exit (-1);
     title_demo = true;
-    update_main_menu_replay_item ();
+    replay_menu ();
     play_level (&vanilla_level);
     title_demo = false;
-    update_main_menu_replay_item ();
+    replay_menu ();
   }
   min_legacy_level = min_legacy_level_bkp;
   max_legacy_level = max_legacy_level_bkp;
@@ -1379,7 +1379,7 @@ main (int _argc, char **_argv)
   goto restart_game;
 
  play_game:
-  cutscene = false;
+  cutscene_mode (false);
   game_paused = false;
   total_lives = initial_total_lives;
   current_lives = initial_current_lives;

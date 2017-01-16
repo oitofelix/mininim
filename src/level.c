@@ -36,7 +36,9 @@ struct undo undo;
 static uint64_t last_auto_show_time;
 static bool level_number_shown;
 
-bool no_room_drawing, game_paused, step_one_cycle;
+bool no_room_drawing;
+bool game_paused;
+int step_cycle = -1;
 int retry_level = -1;
 int camera_follow_kid;
 int next_level_number = -1;
@@ -190,7 +192,7 @@ play_level (struct level *lv)
 
   level_cleanup ();
 
-  cutscene = false;
+  cutscene_mode (false);
   game_paused = false;
   ignore_level_cutscene = false;
   potion_flags = 0;
@@ -209,8 +211,9 @@ play_level (struct level *lv)
       HLINE;
     }
 
-    if (replay_index > 0 && ! check_valid_replay_chain_pair
-        (replay - 1, replay))
+    if (just_skipped_replay > 0
+        || (just_skipped_replay == 0 && replay_index > 0
+            && ! check_valid_replay_chain_pair (replay - 1, replay)))
       valid_replay_chain = false;
 
     print_replay_info (replay);
@@ -239,8 +242,9 @@ play_level (struct level *lv)
   if (! force_em) em = global_level.em;
   if (! force_hue) hue = global_level.hue;
 
-  edit = EDIT_MAIN;
-  exit_editor (-1);
+  last_edit = EDIT_MAIN;
+  /* edit = EDIT_MAIN; */
+  /* exit_editor (-1); */
 
   level_number_shown = false;
 
@@ -299,7 +303,7 @@ play_level (struct level *lv)
     if (global_level.cutscene && ! ignore_level_cutscene
         && next_level_number >= global_level.n + 1) {
       cutscene_started = false;
-      cutscene = true;
+      cutscene_mode (true);
       stop_video_effect ();
       stop_audio_instances ();
       play_anim (global_level.cutscene, NULL);
@@ -321,7 +325,7 @@ play_level (struct level *lv)
   case OUT_OF_TIME:
     level_cleanup ();
     cutscene_started = false;
-    cutscene = true;
+    cutscene_mode (true);
     stop_video_effect ();
     stop_audio_instances ();
     play_anim (cutscene_out_of_time_anim, NULL);
@@ -337,15 +341,25 @@ play_level (struct level *lv)
 
   if (! title_demo && replay_mode == PLAY_REPLAY) {
     if (! replay->complete) complete_replay_chain = false;
-    print_replay_results (replay);
+    if (quit_anim == REPLAY_PREVIOUS
+        || quit_anim == REPLAY_NEXT) {
+      HLINE;
+      printf ("REPLAY SKIPPED\n");
+      just_skipped_replay = quit_anim == REPLAY_PREVIOUS ? -1 : +1;
+      replay_skipped = just_skipped_replay > 0;
+    } else {
+      print_replay_results (replay);
+      just_skipped_replay = 0;
+    }
 
-    if (replay_index == replay_chain_nmemb - 1) {
+    if (quit_anim != REPLAY_PREVIOUS
+        && replay_index == replay_chain_nmemb - 1) {
       HLINE;
       printf ("REPLAY CHAIN END\n");
       HLINE;
 
-      int status = complete_replay_chain && valid_replay_chain
-        ? 0 : 1;
+      int status = ! replay_skipped && complete_replay_chain
+        && valid_replay_chain ? 0 : 1;
 
       if (validate_replay_chain == WRITE_VALIDATE_REPLAY_CHAIN) {
         if (status == 0) {
@@ -365,7 +379,8 @@ play_level (struct level *lv)
       default: assert (0); break;
       }
     } else {
-      prepare_for_playing_replay (replay_index + 1);
+      int inc = quit_anim == REPLAY_PREVIOUS ? -1 : +1;
+      prepare_for_playing_replay (replay_index + inc);
       goto next_level;
     }
   }
@@ -973,6 +988,10 @@ process_keys (void)
       ignore_level_cutscene = true;
       next_level_number = global_level.n + 1;
       quit_anim = NEXT_LEVEL;
+    } else if (replay_mode == PLAY_REPLAY) {
+      if (replay_index + 1 < replay_chain_nmemb)
+        quit_anim = REPLAY_NEXT;
+      else draw_bottom_text (NULL, "NO NEXT REPLAY", 0);
     } else print_replay_mode (0);
   }
 
@@ -982,6 +1001,9 @@ process_keys (void)
       ignore_level_cutscene = true;
       next_level_number = global_level.n - 1;
       quit_anim = NEXT_LEVEL;
+    } else if (replay_mode == PLAY_REPLAY) {
+      if (replay_index > 0) quit_anim = REPLAY_PREVIOUS;
+      else draw_bottom_text (NULL, "NO PREVIOUS REPLAY", 0);
     } else print_replay_mode (0);
   }
 
@@ -1124,21 +1146,23 @@ process_keys (void)
   }
 
   /* ESC: pause game */
-  if (step_one_cycle) {
-    step_one_cycle = false;
+  if (step_cycle > 0) {
+    game_paused = false;
+    step_cycle--;
+  } else if (step_cycle == 0) {
     game_paused = true;
+    step_cycle = -1;
   }
 
   if (was_key_pressed (ALLEGRO_KEY_ESCAPE, 0, 0, true)
       || was_button_pressed (joystick_pause_button, true)) {
     if (is_game_paused ()) {
-      step_one_cycle = true;
+      step_cycle = 0;
       game_paused = false;
     } else pause_game (true);
   } else if (is_game_paused ()
              && (! active_menu || ! was_menu_key_pressed ())
-             && (key.keyboard.keycode || button != -1)
-             && ! save_game_dialog_thread)
+             && (key.keyboard.keycode || button != -1))
     pause_game (false);
 }
 
@@ -1230,8 +1254,7 @@ draw_level (void)
     if (rem_time <= 0) quit_anim = OUT_OF_TIME;
   }
 
-  if (is_game_paused () && ! active_menu)
-    draw_bottom_text (NULL, "GAME PAUSED", -1);
+  if (is_game_paused () && ! active_menu) print_game_paused (-1);
 }
 
 bool
@@ -1293,6 +1316,7 @@ pause_game (bool val)
   memset (&key, 0, sizeof (key));
   button = -1;
   game_paused = val;
+  replay_menu ();
 }
 
 bool

@@ -36,8 +36,10 @@ int64_t recording_replay_countdown = -1;
 
 bool command_line_replay;
 
-bool valid_replay_chain = true;
-bool complete_replay_chain = true;
+bool valid_replay_chain;
+bool complete_replay_chain;
+bool replay_skipped;
+int just_skipped_replay;
 
 enum validate_replay_chain validate_replay_chain =
   NONE_VALIDATE_REPLAY_CHAIN;
@@ -311,9 +313,6 @@ free_replay_chain (void)
   replay_chain = NULL;
   replay_chain_nmemb = 0;
   replay_index = 0;
-
-  valid_replay_chain = true;
-  complete_replay_chain = true;
 }
 
 struct replay *
@@ -346,9 +345,10 @@ compare_replays (const void *_r0, const void *_r1)
 void
 prepare_for_recording_replay (void)
 {
-  recording_replay_countdown = SEC2CYC (3) - 1;
+  recording_replay_countdown = SEC2CYC (5) - 1;
   anim_freq = DEFAULT_HZ;
-  al_set_timer_speed (timer, 1.0 / DEFAULT_HZ);
+  al_set_timer_speed (timer, 1.0 / anim_freq);
+  replay_menu ();
 }
 
 void
@@ -370,11 +370,16 @@ start_recording_replay (int priority)
 {
   if (! command_line_replay &&
       recording_replay_countdown > 0) {
-    char *text;
-    xasprintf (&text, "REPLAY RECORDING IN %i",
-               CYC2SEC(recording_replay_countdown) + 1);
-    draw_bottom_text (NULL, text, priority);
-    al_free (text);
+    int sec = CYC2SEC(recording_replay_countdown) + 1;
+    static int last_sec = 0;
+    if (last_sec != sec) {
+      char *text;
+      xasprintf (&text, "RECORDING IN %i", sec);
+      draw_bottom_text (NULL, text, priority);
+      al_free (text);
+      replay_menu ();
+      last_sec = sec;
+    }
     recording_replay_countdown--;
   } else if (recording_replay_countdown == 0) {
     level_start_replay_mode = RECORD_REPLAY;
@@ -419,10 +424,11 @@ handle_save_replay_thread (int priority)
     al_free (save_replay_dialog.initial_path);
     xasprintf (&save_replay_dialog.initial_path, "%s", filename);
   } else
-    draw_bottom_text (NULL, "REPLAY RECORDING STOPPED", priority);
+    draw_bottom_text (NULL, "RECORDING STOPPED", priority);
   al_destroy_native_file_dialog (dialog);
   free_replay (replay);
   pause_animation (false);
+  replay_menu ();
 }
 
 void
@@ -476,8 +482,6 @@ handle_load_replay_thread (int priority)
       for (i = 0; i < b_replay_chain_nmemb; i++)
         free_replay (&b_replay_chain[i]);
       al_free (b_replay_chain);
-      valid_replay_chain = true;
-      complete_replay_chain = true;
       prepare_for_playing_replay (0);
     } else {
       replay_chain = b_replay_chain;
@@ -497,11 +501,22 @@ stop_replaying (int priority)
     draw_bottom_text (NULL, "REPLAY STOPPED", priority);
   replay_mode = NO_REPLAY;
   level_start_replay_mode = NO_REPLAY;
+  anim_freq = DEFAULT_HZ;
+  al_set_timer_speed (timer, 1.0 / anim_freq);
+  replay_menu ();
 }
 
 void
 set_replay_mode_at_level_start (struct replay *replay)
 {
+  replay_menu ();
+
+  if (replay_index == 0) {
+    replay_skipped = false;
+    valid_replay_chain = true;
+    complete_replay_chain = true;
+  }
+
   switch (replay_mode) {
   case RECORD_REPLAY:
     replay->packed_boolean_config = pack_boolean_replay_config ();
@@ -552,7 +567,7 @@ print_replay_mode (int priority)
   if (title_demo) return;
   switch (replay_mode) {
   case RECORD_REPLAY:
-    draw_bottom_text (NULL, "RECORDING REPLAY", priority); break;
+    draw_bottom_text (NULL, "RECORDING", priority); break;
   case PLAY_REPLAY:
     draw_bottom_text (NULL, "REPLAYING", priority); break;
   case NO_REPLAY: default: break;

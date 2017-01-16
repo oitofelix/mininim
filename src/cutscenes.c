@@ -144,7 +144,7 @@ create_background_pattern_bitmap (ALLEGRO_COLOR c)
 void
 play_title (void)
 {
-  cutscene = true;
+  cutscene_mode (true);
   play_anim (title_anim, NULL);
 }
 

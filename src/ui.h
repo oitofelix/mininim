@@ -30,6 +30,13 @@
 #define CAMERA_ICON "data/icons/camera.png"
 #define PLAY_ICON "data/icons/play.png"
 #define RECORD_ICON "data/icons/record.png"
+#define STOP_ICON "data/icons/stop.png"
+#define EJECT_ICON "data/icons/eject.png"
+#define BACKWARD_ICON "data/icons/backward.png"
+#define FORWARD_ICON "data/icons/forward.png"
+#define PAUSE_ICON "data/icons/pause.png"
+#define PREVIOUS_ICON "data/icons/previous.png"
+#define NEXT_ICON "data/icons/next.png"
 
 enum main_menu {
   BASE_MID = 0,
@@ -52,7 +59,14 @@ enum main_menu {
 
   REPLAY_MID,
   PLAY_REPLAY_MID,
+  PREVIOUS_REPLAY_MID,
+  NEXT_REPLAY_MID,
   RECORD_REPLAY_MID,
+  TOGGLE_PAUSE_GAME_MID,
+  NEXT_FRAME_MID,
+  INCREASE_TIME_FREQUENCY_MID,
+  DECREASE_TIME_FREQUENCY_MID,
+  TOGGLE_TIME_FREQUENCY_CONSTRAINT_MID,
 
   VIEW_MID,
   FULL_SCREEN_MID,
@@ -60,14 +74,20 @@ enum main_menu {
 
   HELP_MID,
   ABOUT_MID,
+
+  /* Used for pure caption items  */
+  NO_MID,
 };
 
-ALLEGRO_BITMAP *load_menu_icon (char *filename);
+ALLEGRO_BITMAP *micon (char *filename);
 
 void create_main_menu (void);
-void update_main_menu_full_screen_item (void);
-void update_main_menu_replay_item (void);
-void select_main_menu (void);
+void game_menu (void);
+void load_menu (void);
+void save_menu (void);
+void view_menu (void);
+void replay_menu (void);
+void help_menu (void);
 
 void show_menu (void);
 void hide_menu (void);
@@ -84,8 +104,16 @@ void ui_full_screen (void);
 void ui_screenshot (void);
 
 void ui_play_replay (void);
+void ui_previous_replay (void);
+void ui_next_replay (void);
 void ui_record_replay (void);
+void ui_decrease_time_frequency (void);
+void ui_increase_time_frequency (void);
+void ui_toggle_time_frequency_constraint (void);
+void ui_change_anim_freq (int f);
+void ui_toggle_pause_game (void);
+void ui_next_frame (void);
 
-extern ALLEGRO_MENU_INFO main_menu_info[];
+void print_game_paused (int priority);
 
 #endif	/* MININIM_UI_H */

@@ -245,14 +245,16 @@ play_anim (void (*draw_callback) (void),
       /********/
 
       switch (event.user.data1) {
+
+        /* GAME */
       case LOAD_GAME_MID:
         ui_load_game ();
         break;
-      case RESTART_GAME_MID:
-        ui_restart_game ();
-        break;
       case LOAD_CONFIG_MID:
         ui_load_config ();
+        break;
+      case RESTART_GAME_MID:
+        ui_restart_game ();
         break;
       case QUIT_GAME_MID:
         ui_quit_game ();
@@ -263,8 +265,29 @@ play_anim (void (*draw_callback) (void),
       case PLAY_REPLAY_MID:
         ui_play_replay ();
         break;
+      case PREVIOUS_REPLAY_MID:
+        ui_previous_replay ();
+        break;
+      case NEXT_REPLAY_MID:
+        ui_next_replay ();
+        break;
       case RECORD_REPLAY_MID:
         ui_record_replay ();
+        break;
+      case TOGGLE_PAUSE_GAME_MID:
+        ui_toggle_pause_game ();
+        break;
+      case NEXT_FRAME_MID:
+        ui_next_frame ();
+        break;
+      case DECREASE_TIME_FREQUENCY_MID:
+        ui_decrease_time_frequency ();
+        break;
+      case INCREASE_TIME_FREQUENCY_MID:
+        ui_increase_time_frequency ();
+        break;
+      case TOGGLE_TIME_FREQUENCY_CONSTRAINT_MID:
+        ui_toggle_time_frequency_constraint ();
         break;
 
 
@@ -552,6 +575,8 @@ play_anim (void (*draw_callback) (void),
     case OUT_OF_TIME: quit_anim = REPLAY_OUT_OF_TIME; break;
     case NEXT_LEVEL: quit_anim = REPLAY_COMPLETE; break;
     case REPLAY_INCOMPLETE: break;
+    case REPLAY_PREVIOUS: break;
+    case REPLAY_NEXT: break;
     default:
       print_replay_chain_aborted ();
       stop_replaying (1);
@@ -572,18 +597,12 @@ pause_animation (bool val)
 }
 
 void
-ui_change_anim_freq (int f)
+cutscene_mode (bool val)
 {
-  char *text;
-  f = f < 0 ? 0 : f;
-  f = f > UNLIMITED_HZ ? UNLIMITED_HZ : f;
-  anim_freq = f;
-  al_set_timer_speed (timer, f > 0 ? 1.0 / f : 1.0 / UNLIMITED_HZ);
-  if (f > 0) xasprintf (&text, "TIME FREQ: %iHz", f);
-  else xasprintf (&text, "TIME FREQ: UNLIMITED", f);
-  draw_bottom_text (NULL, text, 0);
-  al_free (text);
+  cutscene = val;
+  replay_menu ();
 }
+
 
 
 
