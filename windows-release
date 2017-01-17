@@ -1,0 +1,70 @@
+#!/bin/bash
+
+set -e
+
+GCC_LIBS="stdc++-6 gcc_s_sjlj-1"
+ALLEGRO_DEP_LIBS="ogg-0 vorbis-0 vorbisfile-3 FLAC-8"
+ALLEGRO_LIBS="allegro allegro_acodec allegro_audio allegro_dialog \
+allegro_font allegro_image allegro_primitives"
+
+HOST=i686-w64-mingw32
+BUILD=x86_64-linux-gnu
+PREFIX=/usr/i686-w64-mingw32
+
+# build MININIM
+if [ -f Makefile ]; then make clean; fi
+mv build-aux/texinfo.tex{,.bkp}
+autoreconf --install --force
+mv build-aux/texinfo.tex{.bkp,}
+if [ "$1" != "--enable-debug" ]
+then ./configure --host=$HOST --build=$BUILD --prefix=$PREFIX
+else ./configure --host=$HOST --build=$BUILD --prefix=$PREFIX --enable-debug
+fi
+make -j4
+
+# determine version and release directory
+VERSION=$(grep -Po '#define VERSION "\K.*?(?=")' config.h)-win32
+if [ "$1" = "--enable-debug" ]; then VERSION=$VERSION-debug; fi
+RELEASE_DIR=release/mininim-$VERSION
+
+# create release directory
+mkdir -p $RELEASE_DIR
+
+# build documentation
+cd doc
+make mininim.pdf
+cd ..
+
+# copy MININIM executable, data and documentation
+cp -rv data mininim.exe doc/mininim.pdf $RELEASE_DIR
+
+# copy libs
+for f in $GCC_LIBS
+do cp -v /usr/lib/gcc/$HOST/4.9-win32/lib$f.dll $RELEASE_DIR
+done
+
+for f in $ALLEGRO_DEP_LIBS
+do cp -v /usr/$HOST/bin/lib$f.dll $RELEASE_DIR
+done
+
+for f in $ALLEGRO_LIBS
+do
+    # if [ "$1" != "--enable-debug" ]
+    # then cp -v /usr/$HOST/bin/$f-5.2.dll $RELEASE_DIR
+    # else cp -v /usr/$HOST/bin/$f-debug-5.2.dll $RELEASE_DIR
+    # fi
+# cp -v /usr/$HOST/bin/$f-5.2.dll $RELEASE_DIR
+cp -v /usr/$HOST/bin/$f-debug-5.2.dll $RELEASE_DIR
+done
+
+# copy Allegro configuration
+unix2dos -n allegro5.cfg $RELEASE_DIR/allegro5.cfg
+
+# strip them all
+if [ "$1" != "--enable-debug" ]; then $HOST-strip *.dll *.exe; fi
+
+# create package
+zip -9r $RELEASE_DIR $RELEASE_DIR
+
+# remove temporary release directory
+rm -rf $RELEASE_DIR

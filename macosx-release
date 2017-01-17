@@ -1,0 +1,77 @@
+#!/bin/bash
+
+set -e
+
+# build MININIM
+#if [ -f Makefile ]; then make clean; fi
+#mv build-aux/texinfo.tex{,.bkp}
+#autoreconf --install --force
+#mv build-aux/texinfo.tex{.bkp,}
+#./configure
+#make -j4
+
+# determine version and release directory
+VERSION=$(grep -Po '#define VERSION "\K.*?(?=")' config.h)-mac32
+RELEASE_DIR=release/mininim-$VERSION
+
+# create bundle directory structure
+rm -rf $RELEASE_DIR
+mkdir -p $RELEASE_DIR/MININIM.app/Contents/{MacOS,Resources}
+
+# build documentation
+cd doc
+make mininim.pdf
+cd ..
+
+tee $RELEASE_DIR/MININIM.app/Contents/Info.plist <<EOF > /dev/null
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>CFBundleGetInfoString</key>
+  <string>MININIM: The Advanced Prince of Persia Engine (a childhood dream)</string>
+  <key>CFBundleExecutable</key>
+  <string>mininim</string>
+  <key>CFBundleIdentifier</key>
+  <string>oitofelix</string>
+  <key>CFBundleName</key>
+  <string>mininim</string>
+  <key>CFBundleIconFile</key>
+  <string>mininim.icns</string>
+  <key>CFBundleShortVersionString</key>
+  <string>1.0</string>
+  <key>CFBundleInfoDictionaryVersion</key>
+  <string>6.0</string>
+  <key>CFBundlePackageType</key>
+  <string>APPL</string>
+  <key>IFMajorVersion</key>
+  <integer>1</integer>
+  <key>IFMinorVersion</key>
+  <integer>0</integer>
+</dict>
+</plist>
+EOF
+
+# copy documentation
+cp doc/mininim.pdf $RELEASE_DIR
+
+# copy MININIM icon
+cp data/icons/mininim.icns $RELEASE_DIR/MININIM.app/Contents/Resources
+
+# copy MININIM executable and Allegro configuration
+cp mininim allegro5.cfg $RELEASE_DIR/MININIM.app/Contents/MacOS
+
+# copy data
+cp -r data $RELEASE_DIR/MININIM.app/Contents/Resources
+
+# bundle application and libraries
+dylibbundler -od -b -x $RELEASE_DIR/MININIM.app/Contents/MacOS/mininim -d $RELEASE_DIR/MININIM.app/Contents/libs
+
+# strip binaries
+strip -x $RELEASE_DIR/MININIM.app/Contents/MacOS/mininim $RELEASE_DIR/MININIM.app/Contents/libs/*.dylib
+
+# create a dmg image
+hdiutil create -volname MININIM -format UDZO -imagekey zlib-level=9 -srcfolder $RELEASE_DIR -ov $RELEASE_DIR.dmg
+
+# remove temporary release
+rm -rf $RELEASE_DIR

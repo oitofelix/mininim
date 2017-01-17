@@ -114,6 +114,16 @@ gmon.out
 prince.gdb
 *.info
 /_site/
+release/
+
+# Mac OS X specific
+
+*~
+*.o
+.DS_Store
+.deps
+Makefile
+Makefile.in
 
 # Local Variables:
 # mode: conf-space
