@@ -37,6 +37,7 @@
 #define PAUSE_ICON "data/icons/pause.png"
 #define PREVIOUS_ICON "data/icons/previous.png"
 #define NEXT_ICON "data/icons/next.png"
+#define SCREEN_ICON "data/icons/screen.png"
 
 enum main_menu {
   BASE_MID = 0,
@@ -70,6 +71,9 @@ enum main_menu {
 
   VIEW_MID,
   FULL_SCREEN_MID,
+  FLIP_SCREEN_MID,
+  FLIP_SCREEN_VERTICAL_MID,
+  FLIP_SCREEN_HORIZONTAL_MID,
   SCREENSHOT_MID,
 
   HELP_MID,
@@ -80,12 +84,14 @@ enum main_menu {
 };
 
 ALLEGRO_BITMAP *micon (char *filename);
+ALLEGRO_BITMAP *micon_flags (char *filename, int flags);
 
 void create_main_menu (void);
 void game_menu (void);
 void load_menu (void);
 void save_menu (void);
 void view_menu (void);
+void screen_flip_menu (void);
 void replay_menu (void);
 void help_menu (void);
 
@@ -101,6 +107,7 @@ void ui_restart_game (void);
 void ui_quit_game (void);
 
 void ui_full_screen (void);
+void ui_flip_screen (int flags, bool correct_mouse);
 void ui_screenshot (void);
 
 void ui_play_replay (void);
@@ -113,7 +120,7 @@ void ui_toggle_time_frequency_constraint (void);
 void ui_change_anim_freq (int f);
 void ui_toggle_pause_game (void);
 void ui_next_frame (void);
-
 void print_game_paused (int priority);
+void ui_version (void);
 
 #endif	/* MININIM_UI_H */

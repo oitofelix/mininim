@@ -215,7 +215,7 @@ load_memory_bitmap (char *filename)
 }
 
 ALLEGRO_BITMAP *
-load_scaled_memory_bitmap (char *filename, int w, int h)
+load_scaled_memory_bitmap (char *filename, int w, int h, int flags)
 {
   ALLEGRO_BITMAP *bitmap = load_memory_bitmap (filename);
   ALLEGRO_BITMAP *scaled_bitmap = create_memory_bitmap (w, h);
@@ -224,7 +224,7 @@ load_scaled_memory_bitmap (char *filename, int w, int h)
   al_draw_scaled_bitmap (bitmap, 0, 0,
                          al_get_bitmap_width (bitmap),
                          al_get_bitmap_height (bitmap),
-                         0, 0, w, h, 0);
+                         0, 0, w, h, flags);
   al_destroy_bitmap (bitmap);
   return scaled_bitmap;
 }

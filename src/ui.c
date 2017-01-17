@@ -96,7 +96,10 @@ menu_item (char const *title, uint16_t id, int flags,
 void
 menu_separator (void)
 {
-  menu_item ("", NO_MID, ALLEGRO_MENU_ITEM_DISABLED, NULL, false);
+  if (MINGW_BUILD)
+    menu_item (NULL, NO_MID, 0, NULL, false);
+  else
+    menu_item ("", NO_MID, ALLEGRO_MENU_ITEM_DISABLED, NULL, false);
 }
 #endif
 
@@ -111,10 +114,16 @@ end_menu (void)
 ALLEGRO_BITMAP *
 micon (char *filename)
 {
-  if (MINGW_BUILD) return load_scaled_memory_bitmap (filename, 13, 13);
-  else return load_scaled_memory_bitmap (filename, 16, 16);
+  if (MINGW_BUILD) return load_scaled_memory_bitmap (filename, 13, 13, 0);
+  else return load_scaled_memory_bitmap (filename, 16, 16, 0);
 }
 
+ALLEGRO_BITMAP *
+micon_flags (char *filename, int flags)
+{
+  if (MINGW_BUILD) return load_scaled_memory_bitmap (filename, 13, 13, flags);
+  else return load_scaled_memory_bitmap (filename, 16, 16, flags);
+}
 
 
 
@@ -256,8 +265,33 @@ view_menu (void)
              ? micon (WINDOWS_ICON)
              : micon (FULL_SCREEN_ICON), false);
 
+  menu_item ("Fli&p screen (Shift+I)", FLIP_SCREEN_MID, 0,
+             micon_flags (SCREEN_ICON, ALLEGRO_FLIP_VERTICAL), true);
+
   menu_item ("&Screenshot... (Ctrl+P)", SCREENSHOT_MID, 0,
              micon (CAMERA_ICON), false);
+
+  end_menu ();
+
+  screen_flip_menu ();
+#endif
+}
+
+void
+screen_flip_menu (void)
+{
+#if MENU_FEATURE
+  start_menu (main_menu, FLIP_SCREEN_MID);
+
+  menu_item ("&Vertical", FLIP_SCREEN_VERTICAL_MID,
+             screen_flags & ALLEGRO_FLIP_VERTICAL
+             ? ALLEGRO_MENU_ITEM_CHECKED : ALLEGRO_MENU_ITEM_CHECKBOX,
+             NULL, false);
+
+  menu_item ("&Horizontal", FLIP_SCREEN_HORIZONTAL_MID,
+             screen_flags & ALLEGRO_FLIP_HORIZONTAL
+             ? ALLEGRO_MENU_ITEM_CHECKED : ALLEGRO_MENU_ITEM_CHECKBOX,
+             NULL, false);
 
   end_menu ();
 #endif
@@ -484,6 +518,49 @@ ui_full_screen (void)
 }
 
 void
+ui_flip_screen (int flags, bool correct_mouse)
+{
+  char *text, *flip;
+
+  if (correct_mouse) {
+    int w = al_get_display_width (display);
+    int h = al_get_display_height (display);
+
+    ALLEGRO_MOUSE_STATE m;
+
+    if ((screen_flags & ALLEGRO_FLIP_VERTICAL
+         && ! (flags & ALLEGRO_FLIP_VERTICAL))
+        || (! (screen_flags & ALLEGRO_FLIP_VERTICAL)
+            && flags & ALLEGRO_FLIP_VERTICAL)) {
+      al_get_mouse_state (&m);
+      al_set_mouse_xy (display, m.x, h - m.y);
+    }
+
+    if ((screen_flags & ALLEGRO_FLIP_HORIZONTAL
+         && ! (flags & ALLEGRO_FLIP_HORIZONTAL))
+        || (! (screen_flags & ALLEGRO_FLIP_HORIZONTAL)
+            && flags & ALLEGRO_FLIP_HORIZONTAL)) {
+      al_get_mouse_state (&m);
+      al_set_mouse_xy (display, w - m.x, m.y);
+    }
+  }
+
+  potion_flags = 0;
+  screen_flags = flags;
+  switch (screen_flags) {
+  case 0: flip = "NONE"; break;
+  case ALLEGRO_FLIP_VERTICAL: flip = "VERTICAL"; break;
+  case ALLEGRO_FLIP_HORIZONTAL: flip = "HORIZONTAL"; break;
+  case ALLEGRO_FLIP_VERTICAL | ALLEGRO_FLIP_HORIZONTAL:
+    flip = "VERTICAL + HORIZONTAL"; break;
+  default: assert (false); break;
+  }
+  xasprintf (&text, "SCREEN FLIP: %s", flip);
+  draw_bottom_text (NULL, text, 1);
+  al_free (text);
+}
+
+void
 ui_play_replay (void)
 {
   if (! title_demo && replay_mode == PLAY_REPLAY) {
@@ -587,4 +664,13 @@ print_game_paused (int priority)
   }
 
   draw_bottom_text (NULL, text, priority);
+}
+
+void
+ui_version (void)
+{
+  char *text;
+  xasprintf (&text, "MININIM %s", VERSION);
+  draw_bottom_text (NULL, text, 0);
+  al_free (text);
 }

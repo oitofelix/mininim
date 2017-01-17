@@ -243,8 +243,9 @@ play_level (struct level *lv)
   if (! force_hue) hue = global_level.hue;
 
   last_edit = EDIT_MAIN;
-  /* edit = EDIT_MAIN; */
-  /* exit_editor (-1); */
+
+  if (replay_mode != NO_REPLAY)
+    exit_editor (-1);
 
   level_number_shown = false;
 
