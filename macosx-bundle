@@ -1,0 +1,51 @@
+#!/bin/bash
+
+set -e
+
+if [ -f Makefile ]; then make clean; fi
+mv build-aux/texinfo.tex{,.bkp}
+autoreconf --install --force
+mv build-aux/texinfo.tex{.bkp,}
+./configure
+make -j4
+
+rm -rf dmg
+
+mkdir -p dmg/MININIM.app/Contents/{MacOS,Resources}
+
+tee dmg/MININIM.app/Contents/Info.plist <<EOF > /dev/null
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>CFBundleGetInfoString</key>
+  <string>MININIM: The Advanced Prince of Persia Engine (a childhood dream)</string>
+  <key>CFBundleExecutable</key>
+  <string>mininim</string>
+  <key>CFBundleIdentifier</key>
+  <string>oitofelix</string>
+  <key>CFBundleName</key>
+  <string>mininim</string>
+  <key>CFBundleIconFile</key>
+  <string>mininim.icns</string>
+  <key>CFBundleShortVersionString</key>
+  <string>1.0</string>
+  <key>CFBundleInfoDictionaryVersion</key>
+  <string>6.0</string>
+  <key>CFBundlePackageType</key>
+  <string>APPL</string>
+  <key>IFMajorVersion</key>
+  <integer>1</integer>
+  <key>IFMinorVersion</key>
+  <integer>0</integer>
+</dict>
+</plist>
+EOF
+
+cp data/icons/mininim.icns dmg/MININIM.app/Contents/Resources
+
+cp mininim dmg/MININIM.app/Contents/MacOS
+
+dylibbundler -od -b -x dmg/MININIM.app/Contents/MacOS/mininim -d dmg/MININIM.app/Contents/libs
+
+hdiutil create -volname MININIM -srcfolder dmg -ov -format UDZO MININIM.dmg
