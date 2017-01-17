@@ -467,7 +467,7 @@ editor (void)
       break;
     case 'D': edit = EDIT_DOOR; break;
     case 'C':
-      if ((! fake_fg == EDIT_FG && fg (&p) == CHOPPER)
+      if ((! fake_fg && fg (&p) == CHOPPER)
           || (fake_fg && fake (&p) == CHOPPER)) break;
       register_con_undo (&undo, &p,
                          ! fake_fg ? CHOPPER : MIGNORE,

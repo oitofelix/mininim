@@ -203,6 +203,12 @@ AS_CASE([$host],
     [allegro_primitives-5.0 >= $allegro_minver],,
     AC_MSG_ERROR([MININIM requires Allegro $allegro_minver (or superior) primitives addon]))])
 
+  PKG_CHECK_MODULES([ALLEGRO_MAIN],
+   [allegro_main-5 >= $allegro_minver],,
+   [PKG_CHECK_MODULES([ALLEGRO_MAIN],
+    [allegro_main-5.0 >= $allegro_minver],,
+    AC_MSG_ERROR([MININIM requires Allegro $allegro_minver (or superior) main addon]))])
+
   PKG_CHECK_MODULES([ALLEGRO_DIALOG],
    [allegro_dialog-5 >= $allegro_minver],,
     [PKG_CHECK_MODULES([ALLEGRO_DIALOG],
@@ -221,6 +227,8 @@ AC_SUBST([ALLEGRO_FONT_CFLAGS])
 AC_SUBST([ALLEGRO_FONT_LIBS])
 AC_SUBST([ALLEGRO_PRIMITIVES_CFLAGS])
 AC_SUBST([ALLEGRO_PRIMITIVES_LIBS])
+AC_SUBST([ALLEGRO_MAIN_CFLAGS])
+AC_SUBST([ALLEGRO_MAIN_LIBS])
 AC_SUBST([ALLEGRO_DIALOG_CFLAGS])
 AC_SUBST([ALLEGRO_DIALOG_LIBS])
 AC_SUBST([mingw_ldadd])
