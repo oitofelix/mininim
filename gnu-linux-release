@@ -17,9 +17,9 @@ cd ..
 
 # determine version and release directory
 if [ "$(arch)" = "i686" ]
-then bits=32
+then triplet=i386-linux-gnu; bits=32;
 elif [ "$(arch)" = "x86_64" ]
-then bits=64
+then triplet=x86_64-linux-gnu; bits=64;
 else exit 1
 fi
 
@@ -31,21 +31,46 @@ rm -rf $RELEASE_DIR
 mkdir -p $RELEASE_DIR/lib
 
 # copy MININIM executable
-cp mininim $RELEASE_DIR/lib
+cp mininim $RELEASE_DIR/lib/mininim-exec
 
 # copy libraries
-cp $(ldd mininim | grep -o '\W/[^ ]*') $RELEASE_DIR/lib
+function libdep () {
+    ldd "$@" | grep -o '\W/[^ ]*' | sort -u
+}
 
-# copy data
-cp -r data $RELEASE_DIR
+cp $(libdep mininim) $RELEASE_DIR/lib
+mv $RELEASE_DIR/lib/{ld-*,mininim}
+rm -f $RELEASE_DIR/lib/VBox*
+cp /usr/lib/$triplet/libGL.so.1 $RELEASE_DIR/lib
+cp $(libdep /usr/lib/$triplet/libGL.so.1) $RELEASE_DIR/lib
+cp -r /usr/lib/$triplet/gdk-pixbuf-2.0 $RELEASE_DIR/lib
+cp $(libdep /usr/lib/$triplet/gdk-pixbuf-2.0/2.10.0/loaders/*.so) $RELEASE_DIR/lib
+cp -r /usr/lib/$triplet/gtk-2.0 $RELEASE_DIR/lib
+cp $(libdep /usr/lib/$triplet/gtk-2.0/2.10.0/engines/*.so) $RELEASE_DIR/lib
+
+# generate gdk pixbuf cache
+cd $RELEASE_DIR
+export GDK_PIXBUF_MODULEDIR="lib/gdk-pixbuf-2.0/2.10.0/loaders"
+export GDK_PIXBUF_MODULE_FILE="lib/gdk-pixbuf-2.0/2.10.0/loaders.cache"
+lib/gdk-pixbuf-2.0/gdk-pixbuf-query-loaders > $GDK_PIXBUF_MODULE_FILE
+cd -
 
 # copy init script
 tee $RELEASE_DIR/mininim <<'EOF' > /dev/null
 #!/bin/bash
-mininim_path="$(dirname $(readlink -f $0))"
-"$mininim_path"/lib/ld-* --library-path "$mininim_path"/lib "$mininim_path"/lib/mininim "$@"
+app_path="$(dirname $(readlink -f $0))"
+loader="$app_path/lib/mininim --library-path $app_path/lib"
+export GDK_PIXBUF_MODULEDIR="${app_path}/lib/gdk-pixbuf-2.0/2.10.0/loaders"
+export GDK_PIXBUF_MODULE_FILE="${app_path}/lib/gdk-pixbuf-2.0/2.10.0/loaders.cache"
+export GTK_PATH="${app_path}/lib/gtk-2.0"
+"$loader" "$app_path/lib/mininim-exec" "$@"
 EOF
+
+# make it executable
 chmod +x $RELEASE_DIR/mininim
+
+# copy data
+cp -r data $RELEASE_DIR
 
 # copy documentation
 cp doc/mininim.pdf $RELEASE_DIR
@@ -54,7 +79,7 @@ cp doc/mininim.pdf $RELEASE_DIR
 cp allegro5.cfg $RELEASE_DIR/lib
 
 # strip binaries
-strip $RELEASE_DIR/lib/{*.so*,mininim}
+strip $RELEASE_DIR/lib/{*.so*,mininim-exec}
 
 # create package
 cd release
