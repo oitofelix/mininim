@@ -22,21 +22,22 @@ else ./configure --host=$HOST --build=$BUILD --prefix=$PREFIX --enable-debug
 fi
 make -j4
 
+# build documentation
+cd doc
+make mininim.pdf
+cd ..
+
 # determine version and release directory
 VERSION=$(grep -Po '#define VERSION "\K.*?(?=")' config.h)-win32
 if [ "$1" = "--enable-debug" ]; then VERSION=$VERSION-debug; fi
 RELEASE_DIR=release/mininim-$VERSION
 
 # create release directory
+rm -rf $RELEASE_DIR
 mkdir -p $RELEASE_DIR
 
-# build documentation
-cd doc
-make mininim.pdf
-cd ..
-
 # copy MININIM executable, data and documentation
-cp -rv data mininim.exe doc/mininim.pdf $RELEASE_DIR
+cp -r data mininim.exe doc/mininim.pdf $RELEASE_DIR
 
 # copy libs
 for f in $GCC_LIBS
@@ -61,7 +62,9 @@ done
 unix2dos -n allegro5.cfg $RELEASE_DIR/allegro5.cfg
 
 # strip them all
-if [ "$1" != "--enable-debug" ]; then $HOST-strip *.dll *.exe; fi
+if [ "$1" != "--enable-debug" ]
+then $HOST-strip $RELEASE_DIR/{*.dll,*.exe}
+fi
 
 # create package
 zip -9r $RELEASE_DIR $RELEASE_DIR

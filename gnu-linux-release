@@ -1,0 +1,58 @@
+#!/bin/bash
+
+set -e
+
+# build MININIM
+if [ -f Makefile ]; then make clean; fi
+mv build-aux/texinfo.tex{,.bkp}
+autoreconf --install --force
+mv build-aux/texinfo.tex{.bkp,}
+./configure
+make -j4
+
+# build documentation
+cd doc
+make mininim.pdf
+cd ..
+
+# determine version and release directory
+VERSION=$(grep -Po '#define VERSION "\K.*?(?=")' config.h)-gnu-linux32
+RELEASE_DIR=release/mininim-$VERSION
+
+# create directory structure
+rm -rf $RELEASE_DIR
+mkdir -p $RELEASE_DIR/lib
+
+# copy MININIM executable
+cp mininim $RELEASE_DIR/lib
+
+# copy libraries
+cp $(ldd mininim | grep -o '\W/[^ ]*') $RELEASE_DIR/lib
+
+# copy data
+cp -r data $RELEASE_DIR
+
+# copy init script
+tee $RELEASE_DIR/mininim <<'EOF' > /dev/null
+#!/bin/bash
+mininim_path="$(dirname $(readlink -f $0))"
+"$mininim_path"/lib/ld-* --library-path "$mininim_path"/lib "$mininim_path"/lib/mininim "$@"
+EOF
+chmod +x $RELEASE_DIR/mininim
+
+# copy documentation
+cp doc/mininim.pdf $RELEASE_DIR
+
+# copy Allegro configuration
+cp allegro5.cfg $RELEASE_DIR/lib
+
+# strip binaries
+strip $RELEASE_DIR/lib/{*.so*,mininim}
+
+# create package
+cd release
+tar -cf - ${RELEASE_DIR#release/} | xz -9e - > ${RELEASE_DIR#release/}.tar.xz
+cd ..
+
+# remove temporary release directory
+rm -rf $RELEASE_DIR
