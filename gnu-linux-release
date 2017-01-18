@@ -16,7 +16,14 @@ make mininim.pdf
 cd ..
 
 # determine version and release directory
-VERSION=$(grep -Po '#define VERSION "\K.*?(?=")' config.h)-gnu-linux32
+if [ "$(arch)" = "i686" ]
+then bits=32
+elif [ "$(arch)" = "x86_64" ]
+then bits=64
+else exit 1
+fi
+
+VERSION=$(grep -Po '#define VERSION "\K.*?(?=")' config.h)-gnu-linux$bits
 RELEASE_DIR=release/mininim-$VERSION
 
 # create directory structure
