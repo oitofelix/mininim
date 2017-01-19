@@ -345,7 +345,7 @@ compare_replays (const void *_r0, const void *_r1)
 void
 prepare_for_recording_replay (void)
 {
-  recording_replay_countdown = SEC2CYC (5) - 1;
+  recording_replay_countdown = SEC2CYC (3) - 1;
   anim_freq = DEFAULT_HZ;
   al_set_timer_speed (timer, 1.0 / anim_freq);
   replay_menu ();
@@ -377,7 +377,6 @@ start_recording_replay (int priority)
       xasprintf (&text, "RECORDING IN %i", sec);
       draw_bottom_text (NULL, text, priority);
       al_free (text);
-      replay_menu ();
       last_sec = sec;
     }
     recording_replay_countdown--;

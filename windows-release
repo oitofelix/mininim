@@ -67,7 +67,9 @@ then $HOST-strip $RELEASE_DIR/{*.dll,*.exe}
 fi
 
 # create package
-zip -9r $RELEASE_DIR $RELEASE_DIR
+cd release
+zip -9r ${RELEASE_DIR#release/} ${RELEASE_DIR#release/}
+cd ..
 
 # remove temporary release directory
 rm -rf $RELEASE_DIR

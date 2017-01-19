@@ -305,7 +305,9 @@ replay_menu (void)
 
   char *text;
 
-  if (recording_replay_countdown >= 0) goto record_replay;
+  if (recording_replay_countdown >= 0
+      || level_start_replay_mode == RECORD_REPLAY)
+    goto record_replay;
 
   if (title_demo) goto no_replay;
 
@@ -342,21 +344,16 @@ replay_menu (void)
     break;
   case RECORD_REPLAY: record_replay:
 
-    if (replay_mode == RECORD_REPLAY)
-      xasprintf (&text, "RECORDING");
-    else xasprintf (&text, "RECORDING IN %i",
-                    CYC2SEC(recording_replay_countdown) + 1);
-    menu_item
-      (text, NO_MID,
-       ALLEGRO_MENU_ITEM_DISABLED,
-       micon (RECORD_ICON), false);
-    al_free (text);
+    menu_item ("RECORDING", NO_MID,
+               ALLEGRO_MENU_ITEM_DISABLED,
+               micon (RECORD_ICON), false);
 
     menu_separator ();
 
     menu_item
-      (replay_mode == RECORD_REPLAY
-       ? "&Stop... (F7)" : "&Abort recording (F7)", RECORD_REPLAY_MID, 0,
+      (recording_replay_countdown >= 0
+       ? "&Abort recording (F7)" : "&Stop... (F7)",
+       RECORD_REPLAY_MID, 0,
        replay_mode == RECORD_REPLAY
        ? micon (STOP_ICON) : micon (EJECT_ICON), false);
 

@@ -26,7 +26,7 @@ dnl
 ##################
 
 # Release definitions;
-AC_INIT([MININIM], m4_esyscmd_s([date -u +%Y%m%d%H%M]),
+AC_INIT([MININIM], m4_esyscmd_s([date -u +%Y%m%d]),
 [oitofelix@gnu.org], [mininim],
 [http://oitofelix.freeshell.org/mininim/])
 AC_SUBST([PACKAGE_MAILING_LIST], [])
