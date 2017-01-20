@@ -60,9 +60,12 @@ tee $RELEASE_DIR/mininim <<'EOF' > /dev/null
 #!/bin/bash
 app_path="$(dirname $(readlink -f $0))"
 loader="$app_path/lib/mininim --library-path $app_path/lib"
+export GDK_NATIVE_WINDOWS=true
 export GDK_PIXBUF_MODULEDIR="${app_path}/lib/gdk-pixbuf-2.0/2.10.0/loaders"
 export GDK_PIXBUF_MODULE_FILE="${app_path}/lib/gdk-pixbuf-2.0/2.10.0/loaders.cache"
 export GTK_PATH="${app_path}/lib/gtk-2.0"
+export GTK_MODULES=
+export GTK_THEME=Adwaita
 "$loader" "$app_path/lib/mininim-exec" "$@"
 EOF
 
