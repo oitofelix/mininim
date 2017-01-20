@@ -59,7 +59,7 @@
 #endif
 
 /* Haptics */
-#ifdef __al_included_allegro5_haptic_h
+#if defined __al_included_allegro5_haptic_h && ! MACOSX_PORT
 #define HAPTIC_FEATURE true
 #else
 #define HAPTIC_FEATURE false

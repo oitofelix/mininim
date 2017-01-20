@@ -83,10 +83,8 @@ init_gamepad (void)
   al_register_event_source (event_queue, get_joystick_event_source ());
 
 #if HAPTIC_FEATURE
-  if (! MACOSX_PORT) {
-    if (! al_install_haptic ())
-      error (0, 0, "%s (void): cannot install haptic", __func__);
-  }
+  if (! al_install_haptic ())
+    error (0, 0, "%s (void): cannot install haptic", __func__);
 #endif
 
   calibrate_joystick ();
@@ -286,11 +284,11 @@ joystick_info (void)
   int i, j;
 
   if (! al_is_joystick_installed ()) {
-#if HAPTIC_FEATURE
-    init_dialog ();
-    init_video ();
-    show_logo ("Querying joystick...", NULL);
-#endif
+    if (HAPTIC_FEATURE && WINDOWS_PORT) {
+      init_dialog ();
+      init_video ();
+      show_logo ("Querying joystick...", NULL);
+    }
     init_gamepad ();
     calibrate_joystick ();
   }
