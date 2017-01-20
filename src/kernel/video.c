@@ -92,14 +92,14 @@ init_video (void)
   logo_icon = load_bitmap (LOGO_ICON);
   al_set_display_icon (display, logo_icon);
 
-  create_main_menu ();
-  enable_menu (false);
-  if (! is_fullscreen ()) show_menu ();
-
 #if MENU_FEATURE
   al_register_event_source
     (event_queue, al_get_default_menu_event_source ());
 #endif
+
+  create_main_menu ();
+  enable_menu (false);
+  if (! is_fullscreen ()) show_menu ();
 
   cutscene_mode (true);
   if (mr.fit_w == 0 && mr.fit_h == 0) {
@@ -107,6 +107,14 @@ init_video (void)
     mr.fit_h = 2;
   }
   set_multi_room (1, 1);
+
+  if (MACOSX_PORT) {
+    /* workaround to make Mac OS X render the title screen cutscene
+       properly */
+    acknowledge_resize ();
+    acknowledge_resize ();
+  }
+
   effect_buffer = create_bitmap (CUTSCENE_WIDTH, CUTSCENE_HEIGHT);
   black_screen = create_bitmap (CUTSCENE_WIDTH, CUTSCENE_HEIGHT);
   uscreen = create_bitmap (CUTSCENE_WIDTH, CUTSCENE_HEIGHT);
@@ -220,7 +228,7 @@ load_scaled_memory_bitmap (char *filename, int w, int h, int flags)
   ALLEGRO_BITMAP *bitmap = load_memory_bitmap (filename);
   ALLEGRO_BITMAP *scaled_bitmap = create_memory_bitmap (w, h);
   al_set_target_bitmap (scaled_bitmap);
-  al_clear_to_color (MINGW_BUILD ? WHITE : TRANSPARENT_COLOR);
+  al_clear_to_color (WINDOWS_PORT ? WHITE : TRANSPARENT_COLOR);
   al_draw_scaled_bitmap (bitmap, 0, 0,
                          al_get_bitmap_width (bitmap),
                          al_get_bitmap_height (bitmap),
@@ -256,7 +264,7 @@ load_bitmap (char *filename)
 void
 validate_bitmap_for_mingw (ALLEGRO_BITMAP *bitmap)
 {
-  if (! MINGW_BUILD) return;
+  if (! WINDOWS_PORT) return;
 
   /* work around a bug (MinGW target), where bitmaps are loaded as
      black/transparent images */

@@ -22,10 +22,22 @@
 #define MININIM_COMPATIBILITY_H
 
 /* Platform */
-#ifdef ALLEGRO_MINGW32
-#define MINGW_BUILD true
+#if defined ALLEGRO_UNIX || defined ALLEGRO_LINUX
+#define GNU_PORT true
 #else
-#define MINGW_BUILD false
+#define GNU_PORT false
+#endif
+
+#if defined ALLEGRO_MINGW32 || defined ALLEGRO_MSVC || defined ALLEGRO_BCC32
+#define WINDOWS_PORT true
+#else
+#define WINDOWS_PORT false
+#endif
+
+#if defined ALLEGRO_MACOSX || defined ALLEGRO_DARWIN
+#define MACOSX_PORT true
+#else
+#define MACOSX_PORT false
 #endif
 
 /* Non-debug build runtime checking */

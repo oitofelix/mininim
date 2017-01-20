@@ -1223,7 +1223,7 @@ main (int _argc, char **_argv)
   struct config_info config_info;
 
   /* glob command line for MinGW */
-  if (MINGW_BUILD) {
+  if (WINDOWS_PORT) {
     glob_t gl; memset (&gl, 0, sizeof (gl));
     size_t i;
     for (i = 0; i < _argc; i++) {

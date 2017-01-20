@@ -96,7 +96,7 @@ menu_item (char const *title, uint16_t id, int flags,
 void
 menu_separator (void)
 {
-  if (MINGW_BUILD)
+  if (WINDOWS_PORT)
     menu_item (NULL, NO_MID, 0, NULL, false);
   else
     menu_item ("", NO_MID, ALLEGRO_MENU_ITEM_DISABLED, NULL, false);
@@ -114,14 +114,14 @@ end_menu (void)
 ALLEGRO_BITMAP *
 micon (char *filename)
 {
-  if (MINGW_BUILD) return load_scaled_memory_bitmap (filename, 13, 13, 0);
+  if (WINDOWS_PORT) return load_scaled_memory_bitmap (filename, 13, 13, 0);
   else return load_scaled_memory_bitmap (filename, 16, 16, 0);
 }
 
 ALLEGRO_BITMAP *
 micon_flags (char *filename, int flags)
 {
-  if (MINGW_BUILD) return load_scaled_memory_bitmap (filename, 13, 13, flags);
+  if (WINDOWS_PORT) return load_scaled_memory_bitmap (filename, 13, 13, flags);
   else return load_scaled_memory_bitmap (filename, 16, 16, flags);
 }
 

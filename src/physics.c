@@ -286,7 +286,7 @@ is_collidable_at_left (struct pos *p, struct frame *f)
       else return true;
     case 2: case 3:
       return true;
-    default: false;
+    default: return false;
     }
   case MIRROR: return true;
   default: return false;
