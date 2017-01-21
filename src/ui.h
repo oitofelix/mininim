@@ -38,6 +38,7 @@
 #define PREVIOUS_ICON "data/icons/previous.png"
 #define NEXT_ICON "data/icons/next.png"
 #define SCREEN_ICON "data/icons/screen.png"
+#define RIGHT_ICON "data/icons/right.png"
 
 enum main_menu {
   BASE_MID = 0,
@@ -56,6 +57,7 @@ enum main_menu {
   SAVE_LEVEL_FILE_MID,
 
   RESTART_GAME_MID,
+  START_GAME_MID,
   QUIT_GAME_MID,
 
   REPLAY_MID,
@@ -104,6 +106,7 @@ void enable_menu (bool enable);
 void ui_load_game (void);
 void ui_load_config (void);
 void ui_restart_game (void);
+void ui_start_game (void);
 void ui_quit_game (void);
 
 void ui_full_screen (void);

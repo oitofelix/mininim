@@ -214,8 +214,9 @@ game_menu (void)
   menu_item ("&Load", LOAD_MID, 0, micon (OPEN_ICON), true);
   menu_item ("&Save", SAVE_MID, 0, micon (SAVE_ICON), true);
   menu_separator ();
-  menu_item ("&Restart (Ctrl+R)", RESTART_GAME_MID, 0,
-             micon (RELOAD_ICON), false);
+  menu_item (cutscene ? "Sta&rt (Enter)" : "&Restart (Ctrl+R)",
+             cutscene ? START_GAME_MID : RESTART_GAME_MID, 0,
+             cutscene ? micon (RIGHT_ICON) : micon (RELOAD_ICON), false);
   menu_item ("&Quit (Ctrl+Q)", QUIT_GAME_MID, 0,
              micon (QUIT_ICON), false);
   end_menu ();
@@ -479,6 +480,12 @@ void
 ui_restart_game (void)
 {
   quit_anim = RESTART_GAME;
+}
+
+void
+ui_start_game (void)
+{
+  quit_anim = CUTSCENE_KEY_PRESS;
 }
 
 void

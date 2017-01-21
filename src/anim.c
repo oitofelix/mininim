@@ -256,6 +256,9 @@ play_anim (void (*draw_callback) (void),
       case RESTART_GAME_MID:
         ui_restart_game ();
         break;
+      case START_GAME_MID:
+        ui_start_game ();
+        break;
       case QUIT_GAME_MID:
         ui_quit_game ();
         break;
@@ -592,6 +595,7 @@ void
 cutscene_mode (bool val)
 {
   cutscene = val;
+  game_menu ();
   replay_menu ();
 }
 
