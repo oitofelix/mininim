@@ -30,23 +30,34 @@ RELEASE_DIR=release/mininim-$VERSION
 rm -rf $RELEASE_DIR
 mkdir -p $RELEASE_DIR/lib
 
-# copy MININIM executable
-cp mininim $RELEASE_DIR/lib/mininim-exec
-
-# copy libraries
+# function to output library dependencies of executables
 function libdep () {
     ldd "$@" | grep -o '\W/[^ ]*' | sort -u
 }
 
+# copy MININIM executable
+cp mininim $RELEASE_DIR/lib/mininim-exec
 cp $(libdep mininim) $RELEASE_DIR/lib
+
+# rename loader
 mv $RELEASE_DIR/lib/{ld-*,mininim}
+
+# copy dri drivers
+cp -r /usr/lib/$triplet/dri $RELEASE_DIR/lib
+cp $(libdep $RELEASE_DIR/lib/dri/*.so) $RELEASE_DIR/lib
+
+# copy udev
+cp /lib/$triplet/libudev.so.1 $RELEASE_DIR/lib
+cp $(libdep $RELEASE_DIR/lib/libudev.so.1) $RELEASE_DIR/lib
+
+# Replace VirtualBox modules by libGL
 rm -f $RELEASE_DIR/lib/VBox*
 cp /usr/lib/$triplet/libGL.so.1 $RELEASE_DIR/lib
-cp $(libdep /usr/lib/$triplet/libGL.so.1) $RELEASE_DIR/lib
+cp $(libdep $RELEASE_DIR/lib/libGL.so.1) $RELEASE_DIR/lib
+
+# copy gdk pixbuf
 cp -r /usr/lib/$triplet/gdk-pixbuf-2.0 $RELEASE_DIR/lib
-cp $(libdep /usr/lib/$triplet/gdk-pixbuf-2.0/2.10.0/loaders/*.so) $RELEASE_DIR/lib
-cp -r /usr/lib/$triplet/gtk-2.0 $RELEASE_DIR/lib
-cp $(libdep /usr/lib/$triplet/gtk-2.0/2.10.0/engines/*.so) $RELEASE_DIR/lib
+cp $(libdep $RELEASE_DIR/lib/gdk-pixbuf-2.0/2.10.0/loaders/*.so) $RELEASE_DIR/lib
 
 # generate gdk pixbuf cache
 cd $RELEASE_DIR
@@ -55,18 +66,28 @@ export GDK_PIXBUF_MODULE_FILE="lib/gdk-pixbuf-2.0/2.10.0/loaders.cache"
 lib/gdk-pixbuf-2.0/gdk-pixbuf-query-loaders > $GDK_PIXBUF_MODULE_FILE
 cd -
 
+# copy gtk pixmap module
+mkdir -p $RELEASE_DIR/lib/gtk-2.0/2.10.0/engines
+cp /usr/lib/$triplet/gtk-2.0/2.10.0/engines/lib{pixmap,adwaita,murrine}.so \
+   $RELEASE_DIR/lib/gtk-2.0/2.10.0/engines
+cp $(libdep $RELEASE_DIR/lib/gtk-2.0/2.10.0/engines/*.so) $RELEASE_DIR/lib
+
 # copy init script
 tee $RELEASE_DIR/mininim <<'EOF' > /dev/null
 #!/bin/bash
 app_path="$(dirname $(readlink -f $0))"
-loader="$app_path/lib/mininim --library-path $app_path/lib"
-export GDK_NATIVE_WINDOWS=true
 export GDK_PIXBUF_MODULEDIR="${app_path}/lib/gdk-pixbuf-2.0/2.10.0/loaders"
 export GDK_PIXBUF_MODULE_FILE="${app_path}/lib/gdk-pixbuf-2.0/2.10.0/loaders.cache"
-export GTK_PATH="${app_path}/lib/gtk-2.0"
-export GTK_MODULES=
+export GDK_NATIVE_WINDOWS=1
+export GTK_PATH="${app_path}/lib/gtk-2.0/2.10.0/engines"
+export GTK_EXE_PREFIX="${app_path}"
 export GTK_THEME=Adwaita
-"$loader" "$app_path/lib/mininim-exec" "$@"
+unset GDK_RENDERING GDK_BACKEND
+unset GTK_MODULES GTK2_MODULES GTK3_MODULES
+unset GTK_IM_MODULE GTK_IM_MODULE_FILE
+unset GTK_RC_FILES GTK2_RC_FILES
+export LIBGL_DRIVERS_PATH="${app_path}/lib/dri"
+"$app_path/lib/mininim" --library-path "$app_path/lib" "$app_path/lib/mininim-exec" "$@"
 EOF
 
 # make it executable
@@ -82,7 +103,8 @@ cp doc/mininim.pdf $RELEASE_DIR
 cp allegro5.cfg $RELEASE_DIR/lib
 
 # strip binaries
-strip $RELEASE_DIR/lib/{*.so*,mininim-exec}
+strip $RELEASE_DIR/lib/mininim-exec
+strip $(find -name '*.so*')
 
 # create package
 cd release
