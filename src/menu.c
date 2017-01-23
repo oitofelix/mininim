@@ -42,12 +42,12 @@ menu_opt (struct menu_item *menu, char *prefix)
 
   if (! menu_help) editor_msg (prefix, EDITOR_CYCLES_0);
 
-  if (key.keyboard.unichar > 0
-      && key.keyboard.keycode != ALLEGRO_KEY_BACKSPACE
-      && key.keyboard.unichar != '/') {
+  if (was_any_key_pressed ()
+      && key.keycode != ALLEGRO_KEY_BACKSPACE
+      && key2char (&key) != '/') {
     if (menu_help == 1) {
       while (menu[i].key) {
-        if (menu[i].key == toupper (key.keyboard.unichar)) {
+        if (was_char_pressed (menu[i].key)) {
           menu_help = 2;
           help_cycles = 18;
           help_item = i;
@@ -55,19 +55,18 @@ menu_opt (struct menu_item *menu, char *prefix)
         }
         i++;
       }
-    }
-    else if (key.keyboard.unichar == '?') menu_help = 1;
+    } else if (was_char_pressed ('?')) menu_help = 1;
     else {
       while (menu[i].key) {
-        if (menu[i].key == toupper (key.keyboard.unichar)) {
+        if (was_char_pressed (menu[i].key)) {
           menu_help = 0;
-          memset (&key, 0, sizeof (key));
           return menu[i].key;
         }
         i++;
       }
     }
-    if (! menu[i].key && key.keyboard.unichar != '?') menu_help = 0;
+    if (! menu[i].key && ! was_char_pressed ('?'))
+      menu_help = 0;
   }
 
   if (menu_help == 1)
@@ -78,17 +77,16 @@ menu_opt (struct menu_item *menu, char *prefix)
 
   c = 0;
 
-  if (key.keyboard.keycode == ALLEGRO_KEY_BACKSPACE) {
+  if (was_key_pressed (0, ALLEGRO_KEY_BACKSPACE)) {
     if (menu_help == 0) c = 1;
     else menu_help = 0;
   }
 
-  if (key.keyboard.unichar == '/') {
+  if (was_char_pressed ('/')) {
     if (menu_help == 0) c = -1;
     else menu_help = 0;
   }
 
-  memset (&key, 0, sizeof (key));
   return c;
 }
 
@@ -202,12 +200,11 @@ menu_int (int *v, int *b, int min, int max, char *pref_int, char *pref_bool)
   al_free (max_str);
   al_free (str);
 
-  int c = toupper (key.keyboard.unichar);
-  int keycode = key.keyboard.keycode;
+  if (! was_any_key_pressed ()) return 0;
 
-  memset (&key, 0, sizeof (key));
+  int c = toupper (key2char (&key));
 
-  if (keycode == ALLEGRO_KEY_BACKSPACE) return 1;
+  if (was_key_pressed (0, ALLEGRO_KEY_BACKSPACE)) return 1;
 
   int r;
   switch (c) {
@@ -257,12 +254,11 @@ menu_list (int *dir0, int *dir1, int index, int min, int max, char *prefix)
   editor_msg (str, EDITOR_CYCLES_0);
   al_free (str);
 
-  int c = toupper (key.keyboard.unichar);
-  int keycode = key.keyboard.keycode;
+  if (! was_any_key_pressed ()) return 0;
 
-  memset (&key, 0, sizeof (key));
+  int c = toupper (key2char (&key));
 
-  if (keycode == ALLEGRO_KEY_BACKSPACE) return 1;
+  if (was_key_pressed (0, ALLEGRO_KEY_BACKSPACE)) return 1;
 
   switch (c) {
   case '-': case '_':
@@ -292,7 +288,9 @@ menu_list (int *dir0, int *dir1, int index, int min, int max, char *prefix)
 bool
 was_menu_key_pressed (void)
 {
-  switch (toupper (key.keyboard.unichar)) {
+  if (! was_any_key_pressed ()) return false;
+
+  switch (toupper (key2char (&key))) {
   case '0': case '1': case '2': case '3': case '4': case '5':
   case '6': case '7': case '8': case '9': case 'A': case 'B':
   case 'C': case 'D': case 'E': case 'F': case 'G': case 'H':
@@ -305,7 +303,7 @@ was_menu_key_pressed (void)
     return true;
   }
 
-  if (key.keyboard.keycode == ALLEGRO_KEY_BACKSPACE) return true;
+  if (was_key_pressed (0, ALLEGRO_KEY_BACKSPACE)) return true;
 
   return false;
 }
@@ -313,6 +311,6 @@ was_menu_key_pressed (void)
 bool
 was_menu_return_pressed (bool consume)
 {
-  return was_key_pressed (ALLEGRO_KEY_BACKSPACE, 0, 0, consume)
-    || was_key_pressed (0, '/', 0, consume);
+  return was_key_pressed (0, ALLEGRO_KEY_BACKSPACE)
+    || was_char_pressed ('/');
 }

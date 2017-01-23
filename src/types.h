@@ -23,6 +23,11 @@
 
 typedef int (* m_comparison_fn_t) (const void *, const void *);
 
+struct key {
+  int modifiers;
+  int keycode;
+};
+
 enum vm {
   CGA, EGA, VGA,
 };

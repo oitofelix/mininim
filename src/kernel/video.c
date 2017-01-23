@@ -28,7 +28,6 @@ uint64_t bottom_text_timer;
 int screen_flags = 0;
 int potion_flags = 0;
 bool hgc;
-bool is_display_focused = true;
 ALLEGRO_BITMAP *effect_buffer;
 ALLEGRO_BITMAP *black_screen;
 struct video_effect video_effect = {.type = VIDEO_NO_EFFECT};

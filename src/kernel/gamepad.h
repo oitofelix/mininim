@@ -21,19 +21,15 @@
 #ifndef MININIM_GAMEPAD_H
 #define MININIM_GAMEPAD_H
 
-#define IGNORED_KEYBOARD_MODIFIERS \
-  (ALLEGRO_KEYMOD_SCROLLLOCK | ALLEGRO_KEYMOD_NUMLOCK \
-   | ALLEGRO_KEYMOD_CAPSLOCK)
-
 /* variables */
 extern bool flip_gamepad_horizontal, flip_gamepad_vertical;
 
 /* keyboard */
 extern ALLEGRO_KEYBOARD_STATE keyboard_state;
-extern ALLEGRO_EVENT key;
+extern struct key key;
 
 /* joystick */
-extern int button;
+extern int joystick_button;
 extern ALLEGRO_JOYSTICK *joystick;
 extern ALLEGRO_JOYSTICK_STATE joystick_state;
 extern float joystick_h_threshold, joystick_v_threshold;
@@ -71,9 +67,14 @@ ALLEGRO_EVENT_SOURCE *get_keyboard_event_source (void);
 ALLEGRO_EVENT_SOURCE *get_joystick_event_source (void);
 struct gamepad_state *get_gamepad_state (struct gamepad_state *k);
 error_t joystick_info (void);
-bool was_key_pressed (int keycode, int unichar, unsigned int modifiers,
-                      bool consume);
-bool was_button_pressed (int _button, bool consume);
+bool is_mod_key (int keycode);
+int key2mod (int key);
+char key2char (struct key *key);
+int get_key_modifiers (void);
+bool was_key_pressed (int modifiers, int keycode);
+bool was_any_key_pressed (void);
+bool was_char_pressed (char c);
+bool was_joystick_button_pressed (int button);
 void gamepad_rumble (double intensity, double duration);
 void request_gamepad_rumble (double intensity, double duration);
 void execute_haptic (void);

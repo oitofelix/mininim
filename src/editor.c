@@ -320,11 +320,10 @@ editor (void)
 
   /* display message if available */
   if (msg_cycles > EDITOR_CYCLES_0 && msg
-      && (key.keyboard.keycode == ALLEGRO_KEY_BACKSPACE
-          || key.keyboard.unichar == '/')) {
+      && (was_key_pressed (0, ALLEGRO_KEY_BACKSPACE)
+          || was_char_pressed ('/'))) {
     msg_cycles = 0;
     draw_bottom_text (NULL, msg, 0);
-    memset (&key, 0, sizeof (key));
     menu_help = 0;
  } else if (msg_cycles > 0 && msg) msg_cycles--;
   else msg_cycles = 0;
@@ -1888,7 +1887,6 @@ enter_editor (void)
   else {
     if (replay_mode == NO_REPLAY ) {
       edit = last_edit;
-      memset (&key, 0, sizeof (key));
       show_menu ();
       show_mouse_cursor ();
     } else  {

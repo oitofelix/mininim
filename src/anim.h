@@ -27,6 +27,8 @@ void play_anim (void (*draw_callback) (void),
 void pause_animation (bool val);
 void cutscene_mode (bool val);
 
+
+
 
 int create_anim (struct anim *a0, enum anim_type t,
                  struct pos *p, enum dir dir);

@@ -543,10 +543,10 @@ kid_debug (void)
   struct anim *k = get_anim_by_id (current_kid_id);
 
   /* begin kid hack */
-  if (was_key_pressed (ALLEGRO_KEY_DELETE, 0, 0, true)) k->f.c.x--;
-  if (was_key_pressed (ALLEGRO_KEY_PGDN, 0, 0, true)) k->f.c.x++;
+  if (was_key_pressed (0, ALLEGRO_KEY_DELETE)) k->f.c.x--;
+  if (was_key_pressed (0, ALLEGRO_KEY_PGDN)) k->f.c.x++;
 
-  if (! cutscene && was_key_pressed (ALLEGRO_KEY_F1, 0, 0, true)) {
+  if (! cutscene && was_key_pressed (0, ALLEGRO_KEY_F1)) {
     /* static int px = 0; */
     /* static int py = 0; */
     /* if (a_key) px--; */

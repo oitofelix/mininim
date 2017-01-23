@@ -153,7 +153,7 @@ legacy_level_special_events (void)
   if (title_demo) {
     struct replay *replay = get_replay ();
 
-    if (key.keyboard.keycode || button != -1) {
+    if (was_any_key_pressed ()) {
       quit_anim = CUTSCENE_KEY_PRESS;
       return;
     } else if (anim_cycle >= replay->packed_gamepad_state_nmemb + 108) {

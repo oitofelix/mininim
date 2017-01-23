@@ -730,16 +730,9 @@ process_keys (void)
 
   char *text = NULL;
 
-  /* clear the keyboard buffer at the first cycle, so any key pressed
-     on the title doesn't trigger any action */
-  if (anim_cycle == 0) {
-    memset (&key, 0, sizeof (key));
-    button = -1;
-  }
-
   /* M: change multi-room fit mode */
   if (! active_menu &&
-      was_key_pressed (ALLEGRO_KEY_M, 0, 0, true)) {
+      was_key_pressed (0, ALLEGRO_KEY_M)) {
     char *fit_str;
 
     switch (mr.fit_mode) {
@@ -765,50 +758,49 @@ process_keys (void)
   }
 
   /* CTRL+Z: undo */
-  if (was_key_pressed (ALLEGRO_KEY_Z, 0, ALLEGRO_KEYMOD_CTRL, true)) {
+  if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_Z)) {
     if (replay_mode == NO_REPLAY) ui_undo_pass (&undo, -1, NULL);
     else print_replay_mode (0);
   }
 
   /* CTRL+Y: redo */
-  if (was_key_pressed (ALLEGRO_KEY_Y, 0, ALLEGRO_KEYMOD_CTRL, true)) {
+  if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_Y)) {
     if (replay_mode == NO_REPLAY) ui_undo_pass (&undo, +1, NULL);
     else print_replay_mode (0);
   }
 
   /* [: decrease multi-room resolution */
-  if (was_key_pressed (0, '[', 0, true)
+  if (was_key_pressed (0, ALLEGRO_KEY_OPENBRACE)
       && ! cutscene)
     ui_set_multi_room (-1, -1);
 
   /* ]: increase multi-room resolution */
-  if (was_key_pressed (0, ']', 0, true)
+  if (was_key_pressed (0, ALLEGRO_KEY_CLOSEBRACE)
       && ! cutscene)
     ui_set_multi_room (+1, +1);
 
   /* CTRL+[: decrease multi-room width resolution */
-  if (was_key_pressed (0, 0x1B, ALLEGRO_KEYMOD_CTRL, true)
+  if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_OPENBRACE)
       && ! cutscene)
     ui_set_multi_room (-1, +0);
 
   /* CTRL+]: increase multi-room width resolution */
-  if ((was_key_pressed (0, 0x1D, ALLEGRO_KEYMOD_CTRL, true)
-       || was_key_pressed (0, 0x1C, ALLEGRO_KEYMOD_CTRL, true))
+  if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_CLOSEBRACE)
       && ! cutscene)
     ui_set_multi_room (+1, +0);
 
   /* ALT+[: decrease multi-room height resolution */
-  if (was_key_pressed (0, '[', ALLEGRO_KEYMOD_ALT, true)
+  if (was_key_pressed (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_OPENBRACE)
       && ! cutscene)
     ui_set_multi_room (+0, -1);
 
   /* ALT+]: increase multi-room height resolution */
-  if (was_key_pressed (0, ']', ALLEGRO_KEYMOD_ALT, true)
+  if (was_key_pressed (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_CLOSEBRACE)
       && ! cutscene)
     ui_set_multi_room (+0, +1);
 
   /* SHIFT+B: enable/disable room drawing */
-  if (was_key_pressed (ALLEGRO_KEY_B, 0, ALLEGRO_KEYMOD_SHIFT, true)) {
+  if (was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_B)) {
     no_room_drawing = ! no_room_drawing;
     force_full_redraw = true;
   }
@@ -816,117 +808,117 @@ process_keys (void)
   /* H: select room at left (J if flipped horizontally) */
   if (! active_menu
       && ((! flip_gamepad_horizontal
-           && was_key_pressed (ALLEGRO_KEY_H, 0, 0, true))
+           && was_key_pressed (0, ALLEGRO_KEY_H))
           || (flip_gamepad_horizontal
-              && was_key_pressed (ALLEGRO_KEY_J, 0, 0, true))))
+              && was_key_pressed (0, ALLEGRO_KEY_J))))
     mr_select_trans (LEFT);
 
   /* J: select room at right (H if flipped horizontally) */
   if (! active_menu
       && ((! flip_gamepad_horizontal
-           && was_key_pressed (ALLEGRO_KEY_J, 0, 0, true))
+           && was_key_pressed (0, ALLEGRO_KEY_J))
           || (flip_gamepad_horizontal
-              && was_key_pressed (ALLEGRO_KEY_H, 0, 0, true))))
+              && was_key_pressed (0, ALLEGRO_KEY_H))))
     mr_select_trans (RIGHT);
 
   /* U: select room above (N if flipped vertically) */
   if (! active_menu
       && ((! flip_gamepad_vertical
-           && was_key_pressed (ALLEGRO_KEY_U, 0, 0, true))
+           && was_key_pressed (0, ALLEGRO_KEY_U))
           || (flip_gamepad_vertical
-              && was_key_pressed (ALLEGRO_KEY_N, 0, 0, true))))
+              && was_key_pressed (0, ALLEGRO_KEY_N))))
     mr_select_trans (ABOVE);
 
   /* N: select room below (U if flipped vertically) */
   if (! active_menu
       && ((! flip_gamepad_vertical
-           && was_key_pressed (ALLEGRO_KEY_N, 0, 0, true))
+           && was_key_pressed (0, ALLEGRO_KEY_N))
           || (flip_gamepad_vertical
-              && was_key_pressed (ALLEGRO_KEY_U, 0, 0, true))))
+              && was_key_pressed (0, ALLEGRO_KEY_U))))
     mr_select_trans (BELOW);
 
   /* SHIFT+H: multi-room view to left (J if flipped horizontally) */
   if (! active_menu
       && ((! flip_gamepad_horizontal
-           && was_key_pressed (ALLEGRO_KEY_H, 0, ALLEGRO_KEYMOD_SHIFT, true))
+           && was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_H))
           || (flip_gamepad_horizontal
-              && was_key_pressed (ALLEGRO_KEY_J, 0, ALLEGRO_KEYMOD_SHIFT, true))))
+              && was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_J))))
     mr_view_trans (LEFT);
 
   /* SHIFT+J: multi-room view to right (H if flipped horizontally) */
   if (! active_menu
       && ((! flip_gamepad_horizontal
-           && was_key_pressed (ALLEGRO_KEY_J, 0, ALLEGRO_KEYMOD_SHIFT, true))
+           && was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_J))
           || (flip_gamepad_horizontal
-              && was_key_pressed (ALLEGRO_KEY_H, 0, ALLEGRO_KEYMOD_SHIFT, true))))
+              && was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_H))))
     mr_view_trans (RIGHT);
 
   /* SHIFT+U: multi-room view above (N if flipped vertically) */
   if (! active_menu
       && ((! flip_gamepad_vertical
-           && was_key_pressed (ALLEGRO_KEY_U, 0, ALLEGRO_KEYMOD_SHIFT, true))
+           && was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_U))
           || (flip_gamepad_vertical
-              && was_key_pressed (ALLEGRO_KEY_N, 0, ALLEGRO_KEYMOD_SHIFT, true))))
+              && was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_N))))
     mr_view_trans (ABOVE);
 
   /* SHIFT+N: multi-room view below (U if flipped vertically) */
   if (! active_menu
       && ((! flip_gamepad_vertical
-           && was_key_pressed (ALLEGRO_KEY_N, 0, ALLEGRO_KEYMOD_SHIFT, true))
+           && was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_N))
           || (flip_gamepad_vertical
-              && was_key_pressed (ALLEGRO_KEY_U, 0, ALLEGRO_KEYMOD_SHIFT, true))))
+              && was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_U))))
     mr_view_trans (BELOW);
 
   /* ALT+H: multi-room page view to left (J if flipped horizontally) */
   if (! active_menu
       && ((! flip_gamepad_horizontal
-           && was_key_pressed (ALLEGRO_KEY_H, 0, ALLEGRO_KEYMOD_ALT, true))
+           && was_key_pressed (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_H))
           || (flip_gamepad_horizontal
-              && was_key_pressed (ALLEGRO_KEY_J, 0, ALLEGRO_KEYMOD_ALT, true))))
+              && was_key_pressed (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_J))))
     mr_view_page_trans (LEFT);
 
   /* ALT+J: multi-room page view to right (H if flipped horizontally) */
   if (! active_menu
       && ((! flip_gamepad_horizontal
-           && was_key_pressed (ALLEGRO_KEY_J, 0, ALLEGRO_KEYMOD_ALT, true))
+           && was_key_pressed (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_J))
           || (flip_gamepad_horizontal
-              && was_key_pressed (ALLEGRO_KEY_H, 0, ALLEGRO_KEYMOD_ALT, true))))
+              && was_key_pressed (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_H))))
     mr_view_page_trans (RIGHT);
 
   /* ALT+U: multi-room page view above (N if flipped vertically) */
   if (! active_menu
       && ((! flip_gamepad_vertical
-           && was_key_pressed (ALLEGRO_KEY_U, 0, ALLEGRO_KEYMOD_ALT, true))
+           && was_key_pressed (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_U))
           || (flip_gamepad_vertical
-              && was_key_pressed (ALLEGRO_KEY_N, 0, ALLEGRO_KEYMOD_ALT, true))))
+              && was_key_pressed (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_N))))
     mr_view_page_trans (ABOVE);
 
   /* ALT+N: multi-room page view below (U if flipped vertically) */
   if (! active_menu
       && ((! flip_gamepad_vertical
-           && was_key_pressed (ALLEGRO_KEY_N, 0, ALLEGRO_KEYMOD_ALT, true))
+           && was_key_pressed (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_N))
           || (flip_gamepad_vertical
-              && was_key_pressed (ALLEGRO_KEY_U, 0, ALLEGRO_KEYMOD_ALT, true))))
+              && was_key_pressed (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_U))))
     mr_view_page_trans (BELOW);
 
   /* R: resurrect kid */
   if (! active_menu
-      && was_key_pressed (ALLEGRO_KEY_R, 0, 0, true)) {
+      && was_key_pressed (0, ALLEGRO_KEY_R)) {
     if (replay_mode == NO_REPLAY) kid_resurrect (k);
     else print_replay_mode (0);
   }
 
   /* HOME: focus multi-room view on kid */
-  if (was_key_pressed (ALLEGRO_KEY_HOME, 0, 0, true))
+  if (was_key_pressed (0, ALLEGRO_KEY_HOME))
     mr_focus_room (k->f.c.room);
 
   /* SHIFT+HOME: center multi-room view */
-  if (was_key_pressed (ALLEGRO_KEY_HOME, 0, ALLEGRO_KEYMOD_SHIFT, true))
+  if (was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_HOME))
     mr_center_room (mr.room);
 
   /* A: alternate between kid and its shadows */
   if (! active_menu
-      && was_key_pressed (ALLEGRO_KEY_A, 0, 0, true)) {
+      && was_key_pressed (0, ALLEGRO_KEY_A)) {
     do {
       k = &anima[(k - anima + 1) % anima_nmemb];
     } while (k->type != KID || ! k->controllable);
@@ -936,7 +928,7 @@ process_keys (void)
 
   /* K: kill enemy */
   if (! active_menu
-      && was_key_pressed (ALLEGRO_KEY_K, 0, 0, true)) {
+      && was_key_pressed (0, ALLEGRO_KEY_K)) {
     if (replay_mode == NO_REPLAY) {
       struct anim *ke = get_anim_by_id (k->enemy_id);
       if (ke) {
@@ -949,7 +941,7 @@ process_keys (void)
 
   /* I: enable/disable immortal mode */
   if (! active_menu
-      && was_key_pressed (ALLEGRO_KEY_I, 0, 0, true)) {
+      && was_key_pressed (0, ALLEGRO_KEY_I)) {
     if (replay_mode == NO_REPLAY) {
       immortal_mode = ! immortal_mode;
       k->immortal = immortal_mode;
@@ -961,30 +953,30 @@ process_keys (void)
   }
 
   /* SHIFT+S: incremet kid current lives */
-  if (was_key_pressed (ALLEGRO_KEY_S, 0, ALLEGRO_KEYMOD_SHIFT, true)) {
+  if (was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_S)) {
     if (replay_mode == NO_REPLAY)
       increase_kid_current_lives (k);
     else print_replay_mode (0);
   }
 
   /* SHIFT+T: incremet kid total lives */
-  if (was_key_pressed (ALLEGRO_KEY_T, 0, ALLEGRO_KEYMOD_SHIFT, true)) {
+  if (was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_T)) {
     if (replay_mode == NO_REPLAY) increase_kid_total_lives (k);
     else print_replay_mode (0);
   }
 
   /* SHIFT+W: float kid */
-  if (was_key_pressed (ALLEGRO_KEY_W, 0, ALLEGRO_KEYMOD_SHIFT, true)) {
+  if (was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_W)) {
     if (replay_mode == NO_REPLAY) float_kid (k);
     else print_replay_mode (0);
   }
 
   /* CTRL+A: restart level */
-  if (was_key_pressed (ALLEGRO_KEY_A, 0, ALLEGRO_KEYMOD_CTRL, true))
+  if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_A))
     quit_anim = RESTART_LEVEL;
 
   /* SHIFT+L: warp to next level */
-  if (was_key_pressed (ALLEGRO_KEY_L, 0, ALLEGRO_KEYMOD_SHIFT, true)) {
+  if (was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_L)) {
     if (replay_mode == NO_REPLAY) {
       ignore_level_cutscene = true;
       next_level_number = global_level.n + 1;
@@ -997,7 +989,7 @@ process_keys (void)
   }
 
   /* SHIFT+M: warp to previous level */
-  if (was_key_pressed (ALLEGRO_KEY_M, 0, ALLEGRO_KEYMOD_SHIFT, true)) {
+  if (was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_M)) {
     if (replay_mode == NO_REPLAY) {
       ignore_level_cutscene = true;
       next_level_number = global_level.n - 1;
@@ -1010,7 +1002,7 @@ process_keys (void)
 
   /* C: show direct coordinates */
   if (! active_menu
-      && was_key_pressed (ALLEGRO_KEY_C, 0, 0, true)) {
+      && was_key_pressed (0, ALLEGRO_KEY_C)) {
     int s = mr.room;
     int l = roomd (&global_level, s, LEFT);
     int r = roomd (&global_level, s, RIGHT);
@@ -1025,7 +1017,7 @@ process_keys (void)
   }
 
   /* SHIFT+C: show indirect coordinates */
-  if (was_key_pressed (ALLEGRO_KEY_C, 0, ALLEGRO_KEYMOD_SHIFT, true)) {
+  if (was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_C)) {
     int a = roomd (&global_level, mr.room, ABOVE);
     int b = roomd (&global_level, mr.room, BELOW);
     int al = roomd (&global_level, a, LEFT);
@@ -1043,15 +1035,14 @@ process_keys (void)
 
   /* SPACE: display remaining time */
   if (! active_menu
-      && (was_key_pressed (ALLEGRO_KEY_SPACE, 0, 0, true)
-          || was_button_pressed (joystick_time_button, true)))
+      && (was_key_pressed (0, ALLEGRO_KEY_SPACE)
+          || was_joystick_button_pressed (joystick_time_button)))
     display_remaining_time (0);
 
   /* +: increment time limit and display remaining time */
   if (! active_menu
-      && (was_key_pressed (ALLEGRO_KEY_EQUALS, 0, 0, true)
-          || was_key_pressed (ALLEGRO_KEY_EQUALS, 0,
-                              ALLEGRO_KEYMOD_SHIFT, true))) {
+      && (was_key_pressed (0, ALLEGRO_KEY_EQUALS)
+          || was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_EQUALS))) {
     if (replay_mode == NO_REPLAY) {
       int t = time_limit - play_time;
       int d = t > (60 * DEFAULT_HZ) ? (+60 * DEFAULT_HZ) : (+1 * DEFAULT_HZ);
@@ -1062,8 +1053,8 @@ process_keys (void)
 
   /* -: decrement time limit and display remaining time */
   if (! active_menu
-      && (was_key_pressed (ALLEGRO_KEY_MINUS, 0, 0, true)
-          || was_key_pressed (0, '_', ALLEGRO_KEYMOD_SHIFT, true))) {
+      && (was_key_pressed (0, ALLEGRO_KEY_MINUS)
+          || was_char_pressed ('_'))) {
     if (replay_mode == NO_REPLAY) {
       int t = time_limit - play_time;
       int d = t > (60 * DEFAULT_HZ) ? (-60 * DEFAULT_HZ) : (-1 * DEFAULT_HZ);
@@ -1073,11 +1064,11 @@ process_keys (void)
   }
 
   /* TAB: display skill */
-  if (was_key_pressed (ALLEGRO_KEY_TAB, 0, 0, true))
+  if (was_key_pressed (0, ALLEGRO_KEY_TAB))
     display_skill (k);
 
   /* CTRL+=: increment counter attack skill */
-  if (was_key_pressed (ALLEGRO_KEY_EQUALS, 0, ALLEGRO_KEYMOD_CTRL, true)) {
+  if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_EQUALS)) {
     if (replay_mode == NO_REPLAY) {
       if (k->skill.counter_attack_prob < 99)
         k->skill.counter_attack_prob++;
@@ -1086,7 +1077,7 @@ process_keys (void)
   }
 
   /* CTRL+-: decrement counter attack skill */
-  if (was_key_pressed (ALLEGRO_KEY_MINUS, 0, ALLEGRO_KEYMOD_CTRL, true)) {
+  if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_MINUS)) {
     if (replay_mode == NO_REPLAY) {
       if (k->skill.counter_attack_prob > -1)
         k->skill.counter_attack_prob--;
@@ -1095,7 +1086,7 @@ process_keys (void)
   }
 
   /* ALT+=: increment counter defense skill */
-  if (was_key_pressed (ALLEGRO_KEY_EQUALS, 0, ALLEGRO_KEYMOD_ALT, true)) {
+  if (was_key_pressed (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_EQUALS)) {
     if (replay_mode == NO_REPLAY) {
       if (k->skill.counter_defense_prob < 99)
         k->skill.counter_defense_prob++;
@@ -1104,7 +1095,7 @@ process_keys (void)
   }
 
   /* ALT+-: decrement counter defense skill */
-  if (was_key_pressed (ALLEGRO_KEY_MINUS, 0, ALLEGRO_KEYMOD_ALT, true)) {
+  if (was_key_pressed (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_MINUS)) {
     if (replay_mode == NO_REPLAY) {
       if (k->skill.counter_defense_prob > -1)
         k->skill.counter_defense_prob--;
@@ -1113,7 +1104,7 @@ process_keys (void)
   }
 
   /* F10: change guard mode */
-  if (was_key_pressed (ALLEGRO_KEY_F10, 0, 0, true)) {
+  if (was_key_pressed (0, ALLEGRO_KEY_F10)) {
     if (replay_mode == NO_REPLAY) {
       char *gm_str = NULL;
 
@@ -1138,7 +1129,7 @@ process_keys (void)
   }
 
   /* CTRL+G: save game */
-  if (was_key_pressed (ALLEGRO_KEY_G, 0, ALLEGRO_KEYMOD_CTRL, true)
+  if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_G)
       && ! save_game_dialog_thread) {
     save_game_dialog_thread =
       create_thread (dialog_thread, &save_game_dialog);
@@ -1155,15 +1146,15 @@ process_keys (void)
     step_cycle = -1;
   }
 
-  if (was_key_pressed (ALLEGRO_KEY_ESCAPE, 0, 0, true)
-      || was_button_pressed (joystick_pause_button, true)) {
+  if (was_key_pressed (0, ALLEGRO_KEY_ESCAPE)
+      || was_joystick_button_pressed (joystick_pause_button)) {
     if (is_game_paused ()) {
       step_cycle = 0;
       game_paused = false;
     } else pause_game (true);
   } else if (is_game_paused ()
              && (! active_menu || ! was_menu_key_pressed ())
-             && (key.keyboard.keycode || button != -1))
+             && was_any_key_pressed ())
     pause_game (false);
 }
 
@@ -1188,11 +1179,6 @@ process_death (void)
       play_audio (as, NULL, k->id);
     }
 
-    if (death_timer < SEC2CYC (5) && ! active_menu) {
-      key.keyboard.keycode = 0;
-      button = -1;
-    }
-
     if (death_timer >= SEC2CYC (5) && ! title_demo) {
       if ((death_timer < SEC2CYC (20)
            || death_timer % SEC2CYC (1) < (2 * SEC2CYC (1)) / 3)
@@ -1207,8 +1193,7 @@ process_death (void)
         al_free (text);
       } else if (! active_menu) draw_bottom_text (NULL, "", -2);
 
-      if ((key.keyboard.keycode || button != -1)
-          && ! was_menu_key_pressed ())
+      if (was_any_key_pressed () && ! was_menu_key_pressed ())
         quit_anim = RESTART_LEVEL;
     }
   } else if (death_timer && ! is_game_paused ()) {
@@ -1314,8 +1299,6 @@ void
 pause_game (bool val)
 {
   if (! val) draw_bottom_text (NULL, NULL, 0);
-  memset (&key, 0, sizeof (key));
-  button = -1;
   game_paused = val;
   replay_menu ();
 }

@@ -26,8 +26,8 @@ bool flip_gamepad_horizontal, flip_gamepad_vertical;
 /* keyboard state */
 ALLEGRO_KEYBOARD_STATE keyboard_state;
 
-ALLEGRO_EVENT key; /* last key pressed */
-int button = -1;
+struct key key; /* last key pressed */
+int joystick_button = -1;
 
 ALLEGRO_JOYSTICK *joystick;
 ALLEGRO_JOYSTICK_STATE joystick_state;
@@ -352,27 +352,175 @@ joystick_info (void)
   return 0;
 }
 
-bool
-was_key_pressed (int keycode, int unichar, unsigned int modifiers,
-                 bool consume)
+int
+key2mod (int key)
 {
-  key.keyboard.modifiers &= ~ IGNORED_KEYBOARD_MODIFIERS;
+  switch (key) {
+  case ALLEGRO_KEY_LSHIFT:
+  case ALLEGRO_KEY_RSHIFT:
+    return ALLEGRO_KEYMOD_SHIFT;
+  case ALLEGRO_KEY_LCTRL:
+  case ALLEGRO_KEY_RCTRL:
+    return ALLEGRO_KEYMOD_CTRL;
+  case ALLEGRO_KEY_ALT:
+  case ALLEGRO_KEY_ALTGR:
+    return ALLEGRO_KEYMOD_ALT;
+  default: return 0;
+  }
+}
 
-  if ((keycode == key.keyboard.keycode && unichar <= 0
-       && modifiers == key.keyboard.modifiers)
-      || (unichar == key.keyboard.unichar && unichar > 0
-          && (modifiers == key.keyboard.modifiers
-              || modifiers == -1))) {
-    if (consume) memset (&key, 0, sizeof (key));
+bool
+is_mod_key (int key)
+{
+  int mod = key2mod (key);
+  return mod == ALLEGRO_KEYMOD_SHIFT
+    || mod == ALLEGRO_KEYMOD_CTRL
+    || mod ==ALLEGRO_KEYMOD_ALT;
+}
+
+char
+key2char (struct key *key)
+{
+  if (key->modifiers & ~ALLEGRO_KEYMOD_SHIFT)
+    return 0;
+
+  bool shift = (key->modifiers & ALLEGRO_KEYMOD_SHIFT)
+    && ! (key->modifiers & ALLEGRO_KEYMOD_CTRL)
+    && ! (key->modifiers & ALLEGRO_KEYMOD_ALT);
+
+  switch (key->keycode) {
+  case ALLEGRO_KEY_A: return shift ? 'A' : 'a';
+  case ALLEGRO_KEY_B: return shift ? 'B' : 'b';
+  case ALLEGRO_KEY_C: return shift ? 'C' : 'c';
+  case ALLEGRO_KEY_D: return shift ? 'D' : 'd';
+  case ALLEGRO_KEY_E: return shift ? 'E' : 'e';
+  case ALLEGRO_KEY_F: return shift ? 'F' : 'f';
+  case ALLEGRO_KEY_G: return shift ? 'G' : 'g';
+  case ALLEGRO_KEY_H: return shift ? 'H' : 'h';
+  case ALLEGRO_KEY_I: return shift ? 'I' : 'i';
+  case ALLEGRO_KEY_J: return shift ? 'J' : 'j';
+  case ALLEGRO_KEY_K: return shift ? 'K' : 'k';
+  case ALLEGRO_KEY_L: return shift ? 'L' : 'l';
+  case ALLEGRO_KEY_M: return shift ? 'M' : 'm';
+  case ALLEGRO_KEY_N: return shift ? 'N' : 'n';
+  case ALLEGRO_KEY_O: return shift ? 'O' : 'o';
+  case ALLEGRO_KEY_P: return shift ? 'P' : 'p';
+  case ALLEGRO_KEY_Q: return shift ? 'Q' : 'q';
+  case ALLEGRO_KEY_R: return shift ? 'R' : 'r';
+  case ALLEGRO_KEY_S: return shift ? 'S' : 's';
+  case ALLEGRO_KEY_T: return shift ? 'T' : 't';
+  case ALLEGRO_KEY_U: return shift ? 'U' : 'u';
+  case ALLEGRO_KEY_V: return shift ? 'V' : 'v';
+  case ALLEGRO_KEY_W: return shift ? 'W' : 'w';
+  case ALLEGRO_KEY_X: return shift ? 'X' : 'x';
+  case ALLEGRO_KEY_Y: return shift ? 'Y' : 'y';
+  case ALLEGRO_KEY_Z: return shift ? 'Z' : 'z';
+
+  case ALLEGRO_KEY_0: return shift ? ')' : '0';
+  case ALLEGRO_KEY_1: return shift ? '!' : '1';
+  case ALLEGRO_KEY_2: return shift ? '@' : '2';
+  case ALLEGRO_KEY_3: return shift ? '#' : '3';
+  case ALLEGRO_KEY_4: return shift ? '$' : '4';
+  case ALLEGRO_KEY_5: return shift ? '%' : '5';
+  case ALLEGRO_KEY_6: return shift ? '^' : '6';
+  case ALLEGRO_KEY_7: return shift ? '&' : '7';
+  case ALLEGRO_KEY_8: return shift ? '*' : '8';
+  case ALLEGRO_KEY_9: return shift ? '(' : '9';
+
+  case ALLEGRO_KEY_PAD_0: return '0';
+  case ALLEGRO_KEY_PAD_1: return '1';
+  case ALLEGRO_KEY_PAD_2: return '2';
+  case ALLEGRO_KEY_PAD_3: return '3';
+  case ALLEGRO_KEY_PAD_4: return '4';
+  case ALLEGRO_KEY_PAD_5: return '5';
+  case ALLEGRO_KEY_PAD_6: return '6';
+  case ALLEGRO_KEY_PAD_7: return '7';
+  case ALLEGRO_KEY_PAD_8: return '8';
+  case ALLEGRO_KEY_PAD_9: return '9';
+
+  case ALLEGRO_KEY_PAD_SLASH: return '/';
+  case ALLEGRO_KEY_PAD_ASTERISK: return '*';
+  case ALLEGRO_KEY_PAD_MINUS: return '-';
+  case ALLEGRO_KEY_PAD_PLUS: return '+';
+  case ALLEGRO_KEY_PAD_DELETE: return '.';
+  case ALLEGRO_KEY_PAD_ENTER: return '\r';
+  case ALLEGRO_KEY_PAD_EQUALS: return '=';
+
+  case ALLEGRO_KEY_ESCAPE: return 27;
+  case ALLEGRO_KEY_TILDE: return '~';
+  case ALLEGRO_KEY_MINUS: return shift ? '_' : '-';
+  case ALLEGRO_KEY_EQUALS: return shift ? '+' : '=';
+  case ALLEGRO_KEY_BACKSPACE: return '\b';
+  case ALLEGRO_KEY_TAB: return '\t';
+  case ALLEGRO_KEY_OPENBRACE: return shift ? '{' : '[';
+  case ALLEGRO_KEY_CLOSEBRACE: return shift ? '}' : ']';
+  case ALLEGRO_KEY_ENTER: return '\r';
+  case ALLEGRO_KEY_SEMICOLON: return shift ? ':' : ';';
+  case ALLEGRO_KEY_SEMICOLON2: return shift ? ':' : ';';
+  case ALLEGRO_KEY_QUOTE: return shift ? '~' : '\'';
+  case ALLEGRO_KEY_BACKSLASH: return shift ? '|' : '\\';
+  case ALLEGRO_KEY_BACKSLASH2: return shift ? '|' : '\\';
+  case ALLEGRO_KEY_COMMA: return shift ? '<' : ',';
+  case ALLEGRO_KEY_FULLSTOP: return shift ? '>' : '.';
+  case ALLEGRO_KEY_SLASH: return shift ? '?' : '/';
+  case ALLEGRO_KEY_SPACE: return ' ';
+  case ALLEGRO_KEY_DELETE: return 127;
+  case ALLEGRO_KEY_AT: return '@';
+  case ALLEGRO_KEY_CIRCUMFLEX: return '^';
+  case ALLEGRO_KEY_COLON2: return ':';
+  case ALLEGRO_KEY_BACKQUOTE: return '`';
+
+  default: return 0;
+  }
+}
+
+int
+get_key_modifiers (void)
+{
+  ALLEGRO_KEYBOARD_STATE ks;
+  al_get_keyboard_state (&ks);
+  return (al_key_down (&ks, ALLEGRO_KEY_LSHIFT)
+          || al_key_down (&ks, ALLEGRO_KEY_RSHIFT)
+          ? ALLEGRO_KEYMOD_SHIFT : 0)
+    | (al_key_down (&ks, ALLEGRO_KEY_LCTRL)
+       || al_key_down (&ks, ALLEGRO_KEY_RCTRL)
+       ? ALLEGRO_KEYMOD_CTRL : 0)
+    | (al_key_down (&ks, ALLEGRO_KEY_ALT)
+       || al_key_down (&ks, ALLEGRO_KEY_ALTGR)
+       ? ALLEGRO_KEYMOD_ALT : 0);
+}
+
+bool
+was_key_pressed (int modifiers, int keycode)
+{
+  if (key.modifiers == modifiers
+      && key.keycode == keycode) {
+    key.keycode = 0;
     return true;
   } else return false;
 }
 
 bool
-was_button_pressed (int _button, bool consume)
+was_char_pressed (char c)
 {
-  if (button == _button) {
-    if (consume) button = -1;
+  if (toupper (key2char (&key)) == c) {
+    key.keycode = 0;
+    return true;
+  } else return false;
+}
+
+bool
+was_any_key_pressed (void)
+{
+  return (key.keycode != 0)
+    || joystick_button != -1;
+}
+
+bool
+was_joystick_button_pressed (int button)
+{
+  if (joystick_button == button) {
+    joystick_button = -1;
     return true;
   } else return false;
 }

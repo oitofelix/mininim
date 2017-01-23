@@ -113,7 +113,6 @@ extern bool hgc;
 extern int display_width, display_height;
 extern ALLEGRO_BITMAP *logo_icon;
 extern uint64_t bottom_text_timer;
-extern bool is_display_focused;
 extern int effect_counter;
 extern void (*load_callback) (void);
 extern int display_mode;

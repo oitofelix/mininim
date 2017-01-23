@@ -1854,3 +1854,9 @@ min_double (double a, double b)
 {
   return (a < b) ? a : b;
 }
+
+bool
+equiv (bool a, bool b)
+{
+  return (a && b) || (! a && ! b);
+}

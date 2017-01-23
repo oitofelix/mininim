@@ -58,6 +58,9 @@ play_anim (void (*draw_callback) (void),
 
   reset_haptic ();
 
+  key.keycode = 0;
+  joystick_button = -1;
+
   while (! quit_anim) {
     al_wait_for_event (event_queue, &event);
 
@@ -150,6 +153,12 @@ play_anim (void (*draw_callback) (void),
           (event_queue, get_timer_event_source (timer));
         al_set_timer_count (timer, 0);
 
+      /* fprintf (stderr, "KEY DOWN: %i, %s, %c\n", key.modifiers, */
+      /*          al_keycode_to_name (key.keycode), */
+      /*          toupper (key2char (&key))); */
+
+        key.keycode = 0;
+        joystick_button = -1;
       } else if (event.timer.source == video_timer) {
         if (rendering == BOTH_RENDERING || rendering == VIDEO_RENDERING)
           show ();
@@ -158,7 +167,6 @@ play_anim (void (*draw_callback) (void),
         /*   (event_queue, get_timer_event_source (video_timer)); */
         /* al_set_timer_count (video_timer, 0); */
       }
-      memset (&key, 0, sizeof (key));
       break;
     case ALLEGRO_EVENT_DISPLAY_RESIZE:
       force_full_redraw = true;
@@ -169,10 +177,9 @@ play_anim (void (*draw_callback) (void),
       show ();
       break;
     case ALLEGRO_EVENT_DISPLAY_SWITCH_OUT:
-      is_display_focused = false;
+      al_clear_keyboard_state (event.display.source);
       break;
     case ALLEGRO_EVENT_DISPLAY_SWITCH_IN:
-      is_display_focused = true;
       break;
     case ALLEGRO_EVENT_DISPLAY_CLOSE:
       quit_anim = QUIT_GAME;
@@ -184,7 +191,7 @@ play_anim (void (*draw_callback) (void),
       calibrate_joystick ();
       break;
     case ALLEGRO_EVENT_JOYSTICK_BUTTON_DOWN:
-      button = event.joystick.button;
+      joystick_button = event.joystick.button;
       break;
     case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
       if (pause_anim) break;
@@ -318,71 +325,78 @@ play_anim (void (*draw_callback) (void),
 
 
 
-    case ALLEGRO_EVENT_KEY_CHAR:
+    case ALLEGRO_EVENT_KEY_DOWN:
+      if (! is_mod_key (event.keyboard.keycode))
+        key.keycode = event.keyboard.keycode;
+      key.modifiers = get_key_modifiers ();
+
+      /* fprintf (stderr, "KEY DOWN: %i, %s, %c\n", key.modifiers, */
+      /*          al_keycode_to_name (key.keycode), */
+      /*          toupper (key2char (&key))); */
+
+      if (key.keycode == 0) break;
+
       /****************/
       /* KEY BINDINGS */
       /****************/
 
       if (pause_anim) break;
-      key = event;
-
-      char *text = NULL;
 
       /* CTRL+L: load game */
-      if (was_key_pressed (ALLEGRO_KEY_L, 0, ALLEGRO_KEYMOD_CTRL, true)
-          && ! load_config_dialog_thread)
+      else if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_L)
+               && ! load_config_dialog_thread)
         ui_load_game ();
 
       /* CTRL+P: screenshot */
-      if (was_key_pressed (ALLEGRO_KEY_P, 0, ALLEGRO_KEYMOD_CTRL, true)
-          && ! save_picture_dialog_thread)
+      else if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_P)
+               && ! save_picture_dialog_thread)
         ui_screenshot ();
 
       /* ALT+F7: start/stop replay recording */
-      if (! command_line_replay
+      else if (! command_line_replay
           && (((title_demo || replay_mode != PLAY_REPLAY)
-               && was_key_pressed
-               (ALLEGRO_KEY_F7, 0, ALLEGRO_KEYMOD_ALT, true))
+               && was_key_pressed (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_F7))
               || ((replay_mode == RECORD_REPLAY
                    || recording_replay_countdown > 0)
-                  && was_key_pressed (ALLEGRO_KEY_F7, 0, 0, true))))
+                  && was_key_pressed (0, ALLEGRO_KEY_F7))))
         ui_record_replay ();
 
       /* F7: load replay/stop replaying */
-      if (! command_line_replay
+      else if (! command_line_replay
           && ((replay_mode != RECORD_REPLAY
-               && was_key_pressed (ALLEGRO_KEY_F7, 0, 0, true))
+               && was_key_pressed (0, ALLEGRO_KEY_F7))
               || (replay_mode == PLAY_REPLAY
                   && was_key_pressed
-                  (ALLEGRO_KEY_F7, 0, ALLEGRO_KEYMOD_ALT, true))))
+                  (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_F7))))
         ui_play_replay ();
 
       /* CTRL+R: restart game */
-      if (was_key_pressed (ALLEGRO_KEY_R, 0, ALLEGRO_KEYMOD_CTRL, true))
+      else if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_R))
         ui_restart_game ();
 
       /* CTRL+Q: quit game */
-      if (was_key_pressed (ALLEGRO_KEY_Q, 0, ALLEGRO_KEYMOD_CTRL, true))
+      else if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_Q))
         ui_quit_game ();
 
       /* (: decrease time frequency */
-      if (was_key_pressed (0, '(', -1, true))
+      else if (was_char_pressed ('('))
         ui_change_anim_freq (anim_freq - 1);
 
       /* ): increase time frenquency */
-      if (was_key_pressed (0, ')', -1, true))
+      else if (was_char_pressed (')'))
         ui_change_anim_freq (anim_freq + 1);
 
       /* F8: enable/disable level editor */
-      if (was_key_pressed (ALLEGRO_KEY_F8, 0, 0, true))
+      else if (was_key_pressed (0, ALLEGRO_KEY_F8))
         enter_exit_editor ();
 
       /* CTRL+V: show engine name and version */
-      if (was_key_pressed (ALLEGRO_KEY_V, 0, ALLEGRO_KEYMOD_CTRL, true))
+      else if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_V))
         ui_version ();
 
       /* CTRL+S: enable/disable sound */
-      if (was_key_pressed (ALLEGRO_KEY_S, 0, ALLEGRO_KEYMOD_CTRL, true)) {
+      else if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_S)) {
+        char *text;
         audio_enabled = ! audio_enabled;
         enable_audio (audio_enabled);
         xasprintf (&text, "SOUND %s", audio_enabled ? "ON" : "OFF");
@@ -391,9 +405,9 @@ play_anim (void (*draw_callback) (void),
       }
 
       /* D: change display mode */
-      if (! active_menu
-          && was_key_pressed (ALLEGRO_KEY_D, 0, 0, true)) {
-        if (display_mode < 0) draw_bottom_text (NULL, "DISPLAY MODE: DESKTOP", 0);
+      else if (! active_menu && was_key_pressed (0, ALLEGRO_KEY_D)) {
+        if (display_mode < 0)
+          draw_bottom_text (NULL, "DISPLAY MODE: DESKTOP", 0);
         else {
           int n = al_get_num_display_modes ();
           if (n) {
@@ -407,6 +421,7 @@ play_anim (void (*draw_callback) (void),
               if (d.width == w && d.height == h
                   && display_mode != display_mode_bkp)
                 goto next_display_mode;
+              char *text;
               al_resize_display (display, d.width, d.height);
               xasprintf (&text, "DISPLAY MODE: %ix%i", d.width, d.height);
               draw_bottom_text (NULL, text, 0);
@@ -417,14 +432,12 @@ play_anim (void (*draw_callback) (void),
       }
 
       /* F: enable/disable fullscreen mode */
-      if (! active_menu
-          && (was_key_pressed (ALLEGRO_KEY_F, 0, 0, true)
-              || was_key_pressed (ALLEGRO_KEY_ENTER, 0,
-                                  ALLEGRO_KEYMOD_ALT, true)))
+      else if ((! active_menu && was_key_pressed (0, ALLEGRO_KEY_F))
+               || was_key_pressed (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_ENTER))
         ui_full_screen ();
 
       /* SHIFT+I: flip screen */
-      if (was_key_pressed (ALLEGRO_KEY_I, 0, ALLEGRO_KEYMOD_SHIFT, true)) {
+      else if (was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_I)) {
         switch (screen_flags) {
         case 0: ui_flip_screen (ALLEGRO_FLIP_VERTICAL, true); break;
         case ALLEGRO_FLIP_VERTICAL:
@@ -439,7 +452,7 @@ play_anim (void (*draw_callback) (void),
       }
 
       /* SHIFT+K: flip gamepad */
-      if (was_key_pressed (ALLEGRO_KEY_K, 0, ALLEGRO_KEYMOD_SHIFT, true)) {
+      else if (was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_K)) {
         char *flip = "NONE";
         if (! flip_gamepad_vertical && ! flip_gamepad_horizontal) {
           flip_gamepad_vertical = true;
@@ -455,13 +468,15 @@ play_anim (void (*draw_callback) (void),
           flip_gamepad_vertical = false;
           flip_gamepad_horizontal = false;
         }
+        char *text;
         xasprintf (&text, "GAMEPAD FLIP: %s", flip);
         draw_bottom_text (NULL, text, 0);
         al_free (text);
       }
 
       /* CTRL+J: joystick mode */
-      if (was_key_pressed (ALLEGRO_KEY_J, 0, ALLEGRO_KEYMOD_CTRL, true)) {
+      else if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_J)) {
+        char *text;
         char *joystick_str = joystick ? "CALIBRATED" : "MODE";
         calibrate_joystick ();
         gamepad_rumble (1.0, 0.6);
@@ -472,13 +487,13 @@ play_anim (void (*draw_callback) (void),
       }
 
       /* CTRL+K: keyboard mode (disables joystick) */
-      if (was_key_pressed (ALLEGRO_KEY_K, 0, ALLEGRO_KEYMOD_CTRL, true)) {
+      else if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_K)) {
         disable_joystick ();
         draw_bottom_text (NULL, "KEYBOARD MODE", 0);
       }
 
       /* F9: change hue palette */
-      if (was_key_pressed (ALLEGRO_KEY_F9, 0, 0, true)) {
+      else if (was_key_pressed (0, ALLEGRO_KEY_F9)) {
         char *em_str = NULL;
 
         if (force_hue) {
@@ -494,13 +509,14 @@ play_anim (void (*draw_callback) (void),
           hue = HUE_NONE; em_str = "NONE"; force_hue = true;
         }
 
+        char *text;
         xasprintf (&text, "HUE MODE: %s", em_str);
         draw_bottom_text (NULL, text, 0);
         al_free (text);
       }
 
       /* F11: change environment mode */
-      if (was_key_pressed (ALLEGRO_KEY_F11, 0, 0, true)) {
+      else if (was_key_pressed (0, ALLEGRO_KEY_F11)) {
         char *em_str = NULL;
 
         if (force_em) {
@@ -513,13 +529,14 @@ play_anim (void (*draw_callback) (void),
           em = DUNGEON; em_str = "DUNGEON"; force_em = true;
         }
 
+        char *text;
         xasprintf (&text, "ENVIRONMENT MODE: %s", em_str);
         draw_bottom_text (NULL, text, 0);
         al_free (text);
       }
 
       /* F12: change video mode */
-      if (was_key_pressed (ALLEGRO_KEY_F12, 0, 0, true)) {
+      else if (was_key_pressed (0, ALLEGRO_KEY_F12)) {
         char *vm_str = NULL;
 
         switch (vm) {
@@ -534,6 +551,7 @@ play_anim (void (*draw_callback) (void),
         case VGA: vm = EGA; vm_str = "EGA"; break;
         }
 
+        char *text;
         xasprintf (&text, "VIDEO MODE: %s", vm_str);
         draw_bottom_text (NULL, text, 0);
         al_free (text);

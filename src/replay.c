@@ -371,14 +371,10 @@ start_recording_replay (int priority)
   if (! command_line_replay &&
       recording_replay_countdown > 0) {
     int sec = CYC2SEC(recording_replay_countdown) + 1;
-    static int last_sec = 0;
-    if (last_sec != sec) {
-      char *text;
-      xasprintf (&text, "RECORDING IN %i", sec);
-      draw_bottom_text (NULL, text, priority);
-      al_free (text);
-      last_sec = sec;
-    }
+    char *text;
+    xasprintf (&text, "RECORDING IN %i", sec);
+    draw_bottom_text (NULL, text, priority);
+    al_free (text);
     recording_replay_countdown--;
   } else if (recording_replay_countdown == 0) {
     level_start_replay_mode = RECORD_REPLAY;
