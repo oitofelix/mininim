@@ -173,10 +173,9 @@ enable_menu (bool enable)
 {
 #if MENU_FEATURE
   int i = 0;
-  while (al_get_menu_item_flags (main_menu, i--) != -1) {
-    int flags;
-    if (enable)
-      flags &= ~ALLEGRO_MENU_ITEM_DISABLED;
+  int flags;
+  while ((flags = al_get_menu_item_flags (main_menu, i--)) != -1) {
+    if (enable) flags &= ~ALLEGRO_MENU_ITEM_DISABLED;
     else flags |= ALLEGRO_MENU_ITEM_DISABLED;
     al_set_menu_item_flags (main_menu, i + 1, flags);
   }

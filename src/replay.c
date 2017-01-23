@@ -269,7 +269,6 @@ load_replay (struct replay *replay_ret, char *filename)
   /* packed gamepad state */
   replay.packed_gamepad_state_nmemb = al_fsize (f)
     - (sizeof (REPLAY_FILE_SIGNATURE) + 11 * sizeof (uint32_t));
-  if (replay.packed_gamepad_state_nmemb < 0) return NULL;
   if (replay.packed_gamepad_state_nmemb > 0) {
     replay.packed_gamepad_state =
       xmalloc (replay.packed_gamepad_state_nmemb);

@@ -55,7 +55,7 @@ enum confg set_fg (struct pos *p, int f);
 enum confg set_fake (struct pos *p, int ff);
 int set_ext (struct pos *p, int e);
 
-enum confg bg_rel (struct pos *p, int floor, int place);
+enum conbg bg_rel (struct pos *p, int floor, int place);
 enum confg fg_rel (struct pos *p, int floor, int place);
 enum confg fake_rel (struct pos *p, int floor, int place);
 int ext_rel (struct pos *p, int floor, int place);

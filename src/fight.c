@@ -141,7 +141,7 @@ enter_fight_logic (struct anim *k)
     /* if hearing the character on the back, turn */
     if (! k->controllable && is_hearing (k, a)
         && is_on_back (k, a)
-        && abs (anim_cycle - k->alert_cycle) > 24) {
+        && anim_cycle - k->alert_cycle > 24) {
       k->f.dir = (k->f.dir == LEFT) ? RIGHT : LEFT;
       k->alert_cycle = anim_cycle;
       return;
@@ -1287,7 +1287,7 @@ alert_guards (struct pos *p)
     struct anim *g = &anima[i];
     if (is_guard (g) && is_pos_on_back (g, p)
         && g->current_lives > 0 && g->enemy_id == -1
-        && abs (anim_cycle - g->alert_cycle) > 24) {
+        && anim_cycle - g->alert_cycle > 24) {
       invert_frame_dir (&g->f, &g->f);
       g->alert_cycle = anim_cycle;
     }

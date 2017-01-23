@@ -110,9 +110,9 @@ void
 draw_floor (ALLEGRO_BITMAP *bitmap, struct pos *p,
             enum em em, enum vm vm)
 {
-  draw_floor_base (bitmap, p, vm, em);
-  draw_floor_left (bitmap, p, vm, em);
-  draw_floor_right (bitmap, p, vm, em);
+  draw_floor_base (bitmap, p, em, vm);
+  draw_floor_left (bitmap, p, em, vm);
+  draw_floor_right (bitmap, p, em, vm);
 }
 
 void

@@ -167,7 +167,7 @@ set_ext (struct pos *p, int e)
   return c->ext = ext_val (c->fg, e);
 }
 
-enum confg
+enum conbg
 bg_rel (struct pos *p, int floor, int place)
 {
   return bg_val (crel (p, floor, place)->bg);
@@ -538,8 +538,7 @@ next_pos_by_pred (struct pos *p, int dir, pos_pred pred, void *data)
             return p;
           }
 
-        loop_prev:
-          q = q;
+        loop_prev:;
         }
   } else {
     goto loop_next;
@@ -552,8 +551,7 @@ next_pos_by_pred (struct pos *p, int dir, pos_pred pred, void *data)
             return p;
           }
 
-        loop_next:
-          q = q;
+        loop_next:;
         }
   }
 
@@ -589,8 +587,7 @@ next_int_by_pred (int *n, int dir, int min, int max,
         return m;
       }
 
-    loop_prev:
-      m = m;
+    loop_prev:;
     }
   } else {
     goto loop_next;
@@ -601,8 +598,7 @@ next_int_by_pred (int *n, int dir, int min, int max,
         return m;
       }
 
-    loop_next:
-      m = m;
+    loop_next:;
     }
   }
 

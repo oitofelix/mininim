@@ -205,7 +205,7 @@ search_audio_instance (struct audio_source *as, uint64_t anim_cycle,
              && as->data.sample == ai->source->data.sample)
          || (as->type == AUDIO_STREAM
              && as->data.stream == ai->source->data.stream))
-        && (anim_cycle == 0 || abs (anim_cycle - ai->anim_cycle) < 2)
+        && (anim_cycle == 0 || anim_cycle - ai->anim_cycle < 2)
         && (! p || peq (p, &ai->p))
         && (anim_id < 0 || anim_id == ai->anim_id))
       return ai;

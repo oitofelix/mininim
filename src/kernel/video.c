@@ -332,8 +332,8 @@ compare_palette_caches (const void *pc0, const void *pc1)
 
   if (p0->ib < p1->ib) return -1;
   else if (p0->ib > p1->ib) return 1;
-  else if (p0->pal < p1->pal) return -1;
-  else if (p0->pal > p1->pal) return 1;
+  else if ((void *) p0->pal < (void *) p1->pal) return -1;
+  else if ((void *) p0->pal > (void *) p1->pal) return 1;
   else return 0;
 }
 
