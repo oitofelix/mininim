@@ -270,7 +270,7 @@ should_chomp (struct pos *p)
   for (i = 0; i < anima_nmemb; i++) {
     struct anim *a = &anima[i];
     if (a->type != KID
-        || (is_anim_dead (&a->f) && ! a->id == 0)) continue;
+        || (is_anim_dead (&a->f) && a->id != 0)) continue;
     if (is_pos_seeing (p, a, LEFT) || is_pos_seeing (p, a, RIGHT))
       return true;
   }
