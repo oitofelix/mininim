@@ -87,6 +87,8 @@ init_video (void)
 
   set_target_backbuffer (display);
 
+  load_icons ();
+
   al_set_window_title (display, WINDOW_TITLE);
   logo_icon = load_bitmap (LOGO_ICON);
   al_set_display_icon (display, logo_icon);
@@ -222,9 +224,31 @@ load_memory_bitmap (char *filename)
 }
 
 ALLEGRO_BITMAP *
+clone_memory_bitmap (ALLEGRO_BITMAP *bitmap)
+{
+  int flags = al_get_new_bitmap_flags ();
+  al_set_new_bitmap_flags (memory_bitmap_flags ());
+
+  ALLEGRO_BITMAP *new_bitmap = al_clone_bitmap (bitmap);
+
+  al_set_new_bitmap_flags (flags);
+
+  return new_bitmap;
+}
+
+ALLEGRO_BITMAP *
 load_scaled_memory_bitmap (char *filename, int w, int h, int flags)
 {
   ALLEGRO_BITMAP *bitmap = load_memory_bitmap (filename);
+  ALLEGRO_BITMAP *scaled_bitmap =
+    clone_scaled_memory_bitmap (bitmap, w, h, flags);
+  al_destroy_bitmap (bitmap);
+  return scaled_bitmap;
+}
+
+ALLEGRO_BITMAP *
+clone_scaled_memory_bitmap (ALLEGRO_BITMAP *bitmap, int w, int h, int flags)
+{
   ALLEGRO_BITMAP *scaled_bitmap = create_memory_bitmap (w, h);
   al_set_target_bitmap (scaled_bitmap);
   al_clear_to_color (WINDOWS_PORT ? WHITE : TRANSPARENT_COLOR);
@@ -232,7 +256,6 @@ load_scaled_memory_bitmap (char *filename, int w, int h, int flags)
                          al_get_bitmap_width (bitmap),
                          al_get_bitmap_height (bitmap),
                          0, 0, w, h, flags);
-  al_destroy_bitmap (bitmap);
   return scaled_bitmap;
 }
 
@@ -281,13 +304,22 @@ destroy_bitmap (ALLEGRO_BITMAP *bitmap)
 ALLEGRO_BITMAP *
 clone_bitmap (ALLEGRO_BITMAP *bitmap)
 {
+  int flags = al_get_new_bitmap_flags ();
+  al_set_new_bitmap_flags (video_bitmap_flags ());
+
   set_target_backbuffer (display);
+
   ALLEGRO_BITMAP *new_bitmap = al_clone_bitmap (bitmap);
+
+  al_set_new_bitmap_flags (flags);
+
   if (! new_bitmap) {
     error (-1, 0, "%s (%p): cannot clone bitmap", __func__, bitmap);
     return NULL;
   }
+
   validate_bitmap_for_mingw (new_bitmap);
+
   return new_bitmap;
 }
 

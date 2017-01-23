@@ -32,8 +32,11 @@ ALLEGRO_BITMAP *create_memory_bitmap (int w, int h);
 ALLEGRO_BITMAP *create_bitmap (int w, int h);
 ALLEGRO_BITMAP *clone_bitmap (ALLEGRO_BITMAP *bitmap);
 ALLEGRO_BITMAP *load_memory_bitmap (char *filename);
+ALLEGRO_BITMAP *clone_memory_bitmap (ALLEGRO_BITMAP *bitmap);
 ALLEGRO_BITMAP *load_scaled_memory_bitmap (char *filename, int w, int h,
                                            int flags);
+ALLEGRO_BITMAP *clone_scaled_memory_bitmap (ALLEGRO_BITMAP *bitmap, int w,
+                                            int h, int flags);
 ALLEGRO_BITMAP *load_bitmap (char *filename);
 void validate_bitmap_for_mingw (ALLEGRO_BITMAP *bitmap);
 void save_bitmap (char *filename, ALLEGRO_BITMAP *bitmap);

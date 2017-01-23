@@ -1400,6 +1400,7 @@ main (int _argc, char **_argv)
 void
 quit_game (void)
 {
+  unload_icons ();
   unload_level ();
   unload_cutscenes ();
   unload_audio_data ();

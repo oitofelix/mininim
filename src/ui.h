@@ -85,8 +85,11 @@ enum main_menu {
   NO_MID,
 };
 
-ALLEGRO_BITMAP *micon (char *filename);
-ALLEGRO_BITMAP *micon_flags (char *filename, int flags);
+ALLEGRO_BITMAP *load_icon (char *filename);
+ALLEGRO_BITMAP *micon (ALLEGRO_BITMAP *bitmap);
+ALLEGRO_BITMAP *micon_flags (ALLEGRO_BITMAP *bitmap, int flags);
+void load_icons (void);
+void unload_icons (void);
 
 void create_main_menu (void);
 void game_menu (void);

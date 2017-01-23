@@ -38,6 +38,84 @@ static void menu_widget_pause (void);
 static void menu_widget_speed (void);
 #endif
 
+ALLEGRO_BITMAP *small_logo_icon,
+  *open_icon, *save_icon, *reload_icon, *quit_icon,
+  *full_screen_icon, *windows_icon, *camera_icon, *play_icon,
+  *record_icon, *stop_icon, *eject_icon, *backward_icon,
+  *forward_icon, *pause_icon, *previous_icon, *next_icon,
+  *screen_icon, *right_icon;
+
+
+
+
+ALLEGRO_BITMAP *
+load_icon (char *filename)
+{
+  if (WINDOWS_PORT) return load_scaled_memory_bitmap (filename, 13, 13, 0);
+  else return load_scaled_memory_bitmap (filename, 16, 16, 0);
+}
+
+ALLEGRO_BITMAP *
+micon (ALLEGRO_BITMAP *bitmap)
+{
+  return clone_memory_bitmap (bitmap);
+}
+
+ALLEGRO_BITMAP *
+micon_flags (ALLEGRO_BITMAP *bitmap, int flags)
+{
+  return clone_scaled_memory_bitmap
+    (bitmap, al_get_bitmap_width (bitmap),
+     al_get_bitmap_height (bitmap), flags);
+}
+
+void
+load_icons (void)
+{
+  small_logo_icon = load_icon (SMALL_LOGO_ICON);
+  open_icon = load_icon (OPEN_ICON);
+  save_icon = load_icon (SAVE_ICON);
+  reload_icon = load_icon (RELOAD_ICON);
+  quit_icon = load_icon (QUIT_ICON);
+  full_screen_icon = load_icon (FULL_SCREEN_ICON);
+  windows_icon = load_icon (WINDOWS_ICON);
+  camera_icon = load_icon (CAMERA_ICON);
+  play_icon = load_icon (PLAY_ICON);
+  record_icon = load_icon (RECORD_ICON);
+  stop_icon = load_icon (STOP_ICON);
+  eject_icon = load_icon (EJECT_ICON);
+  backward_icon = load_icon (BACKWARD_ICON);
+  forward_icon = load_icon (FORWARD_ICON);
+  pause_icon = load_icon (PAUSE_ICON);
+  previous_icon = load_icon (PREVIOUS_ICON);
+  next_icon = load_icon (NEXT_ICON);
+  screen_icon = load_icon (SCREEN_ICON);
+  right_icon = load_icon (RIGHT_ICON);
+}
+
+void
+unload_icons (void)
+{
+  destroy_bitmap (small_logo_icon);
+  destroy_bitmap (open_icon);
+  destroy_bitmap (save_icon);
+  destroy_bitmap (reload_icon);
+  destroy_bitmap (quit_icon);
+  destroy_bitmap (full_screen_icon);
+  destroy_bitmap (windows_icon);
+  destroy_bitmap (camera_icon);
+  destroy_bitmap (play_icon);
+  destroy_bitmap (record_icon);
+  destroy_bitmap (stop_icon);
+  destroy_bitmap (eject_icon);
+  destroy_bitmap (backward_icon);
+  destroy_bitmap (forward_icon);
+  destroy_bitmap (pause_icon);
+  destroy_bitmap (previous_icon);
+  destroy_bitmap (next_icon);
+  destroy_bitmap (screen_icon);
+  destroy_bitmap (right_icon);
+}
 
 
 
@@ -110,20 +188,6 @@ end_menu (void)
   while (al_remove_menu_item (append_menu, -append_menu_index));
 }
 #endif
-
-ALLEGRO_BITMAP *
-micon (char *filename)
-{
-  if (WINDOWS_PORT) return load_scaled_memory_bitmap (filename, 13, 13, 0);
-  else return load_scaled_memory_bitmap (filename, 16, 16, 0);
-}
-
-ALLEGRO_BITMAP *
-micon_flags (char *filename, int flags)
-{
-  if (WINDOWS_PORT) return load_scaled_memory_bitmap (filename, 13, 13, flags);
-  else return load_scaled_memory_bitmap (filename, 16, 16, flags);
-}
 
 
 
@@ -210,14 +274,14 @@ game_menu (void)
 {
 #if MENU_FEATURE
   start_menu (main_menu, GAME_MID);
-  menu_item ("&Load", LOAD_MID, 0, micon (OPEN_ICON), true);
-  menu_item ("&Save", SAVE_MID, 0, micon (SAVE_ICON), true);
+  menu_item ("&Load", LOAD_MID, 0, micon (open_icon), true);
+  menu_item ("&Save", SAVE_MID, 0, micon (save_icon), true);
   menu_separator ();
   menu_item (cutscene ? "Sta&rt (Enter)" : "&Restart (Ctrl+R)",
              cutscene ? START_GAME_MID : RESTART_GAME_MID, 0,
-             cutscene ? micon (RIGHT_ICON) : micon (RELOAD_ICON), false);
+             cutscene ? micon (right_icon) : micon (reload_icon), false);
   menu_item ("&Quit (Ctrl+Q)", QUIT_GAME_MID, 0,
-             micon (QUIT_ICON), false);
+             micon (quit_icon), false);
   end_menu ();
 
   load_menu ();
@@ -262,14 +326,14 @@ view_menu (void)
   menu_item (is_fullscreen () ? "&Windowed (F)" : "&Full screen (F)",
              FULL_SCREEN_MID, 0,
              is_fullscreen ()
-             ? micon (WINDOWS_ICON)
-             : micon (FULL_SCREEN_ICON), false);
+             ? micon (windows_icon)
+             : micon (full_screen_icon), false);
 
   menu_item ("Fli&p screen (Shift+I)", FLIP_SCREEN_MID, 0,
-             micon_flags (SCREEN_ICON, ALLEGRO_FLIP_VERTICAL), true);
+             micon_flags (screen_icon, ALLEGRO_FLIP_VERTICAL), true);
 
   menu_item ("&Screenshot... (Ctrl+P)", SCREENSHOT_MID, 0,
-             micon (CAMERA_ICON), false);
+             micon (camera_icon), false);
 
   end_menu ();
 
@@ -317,25 +381,25 @@ replay_menu (void)
                replay_chain_nmemb);
     menu_item
       (text, NO_MID, ALLEGRO_MENU_ITEM_DISABLED,
-       micon (PLAY_ICON), false);
+       micon (play_icon), false);
     al_free (text);
 
     menu_separator ();
 
     menu_item
-      ("&Stop (F7)", PLAY_REPLAY_MID, 0, micon (STOP_ICON), false);
+      ("&Stop (F7)", PLAY_REPLAY_MID, 0, micon (stop_icon), false);
 
     menu_item
       ("Pre&vious (Shift+M)", PREVIOUS_REPLAY_MID,
        replay_index > 0
        ? 0 : ALLEGRO_MENU_ITEM_DISABLED,
-       micon (PREVIOUS_ICON), false);
+       micon (previous_icon), false);
 
     menu_item
       ("&Next (Shift+L)", NEXT_REPLAY_MID,
        replay_index + 1 < replay_chain_nmemb
        ? 0 : ALLEGRO_MENU_ITEM_DISABLED,
-       micon (NEXT_ICON), false);
+       micon (next_icon), false);
 
     menu_widget_pause ();
 
@@ -346,7 +410,7 @@ replay_menu (void)
 
     menu_item ("RECORDING", NO_MID,
                ALLEGRO_MENU_ITEM_DISABLED,
-               micon (RECORD_ICON), false);
+               micon (record_icon), false);
 
     menu_separator ();
 
@@ -355,7 +419,7 @@ replay_menu (void)
        ? "&Abort recording (F7)" : "&Stop... (F7)",
        RECORD_REPLAY_MID, 0,
        replay_mode == RECORD_REPLAY
-       ? micon (STOP_ICON) : micon (EJECT_ICON), false);
+       ? micon (stop_icon) : micon (eject_icon), false);
 
     menu_widget_pause ();
 
@@ -365,11 +429,11 @@ replay_menu (void)
 
     menu_item
       ("&Play... (F7)", PLAY_REPLAY_MID, 0,
-       micon (PLAY_ICON), false);
+       micon (play_icon), false);
 
     menu_item
       ("&Record... (Alt+F7)", RECORD_REPLAY_MID, 0,
-       micon (RECORD_ICON), false);
+       micon (record_icon), false);
 
     menu_widget_pause ();
 
@@ -387,7 +451,7 @@ help_menu (void)
 {
 #if MENU_FEATURE
   start_menu (main_menu, HELP_MID);
-  menu_item ("&About", ABOUT_MID, 0, micon (SMALL_LOGO_ICON), false);
+  menu_item ("&About", ABOUT_MID, 0, micon (small_logo_icon), false);
   end_menu ();
 #endif
 }
@@ -404,15 +468,15 @@ menu_widget_pause (void)
      (cutscene || title_demo || recording_replay_countdown >= 0)
      ? ALLEGRO_MENU_ITEM_DISABLED : 0,
      is_game_paused ()
-     ? micon (PLAY_ICON)
-     : micon (PAUSE_ICON), false);
+     ? micon (play_icon)
+     : micon (pause_icon), false);
 
   menu_item
     ("Next &frame (Esc)", NEXT_FRAME_MID,
      (! is_game_paused () || cutscene || title_demo
       || recording_replay_countdown >= 0)
      ? ALLEGRO_MENU_ITEM_DISABLED : 0,
-     micon (FORWARD_ICON), false);
+     micon (forward_icon), false);
 }
 #endif
 
@@ -435,13 +499,13 @@ menu_widget_speed (void)
     ("&Decrease speed [(]", DECREASE_TIME_FREQUENCY_MID,
      (anim_freq <= 2 || cutscene || title_demo)
      ? ALLEGRO_MENU_ITEM_DISABLED : 0,
-     micon (BACKWARD_ICON), false);
+     micon (backward_icon), false);
 
   menu_item
     ("&Increase speed [)]", INCREASE_TIME_FREQUENCY_MID,
      (anim_freq == 0 || cutscene || title_demo)
      ? ALLEGRO_MENU_ITEM_DISABLED: 0,
-     micon (FORWARD_ICON), false);
+     micon (forward_icon), false);
 }
 #endif
 
