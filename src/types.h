@@ -32,6 +32,8 @@ enum vm {
   CGA, EGA, VGA,
 };
 
+#define HGC (VGA + 1)
+
 struct pos {
   struct level *l;
   int room, floor, place;

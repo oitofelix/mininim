@@ -1874,26 +1874,9 @@ editor (void)
 }
 
 void
-enter_exit_editor (void)
-{
-  if (edit == EDIT_NONE) enter_editor ();
-  else exit_editor (0);
-}
-
-void
 enter_editor (void)
 {
-  if (cutscene) toggle_menu_visibility ();
-  else {
-    if (replay_mode == NO_REPLAY ) {
-      edit = last_edit;
-      show_menu ();
-      show_mouse_cursor ();
-    } else  {
-      toggle_menu_visibility ();
-      print_replay_mode (0);
-    }
-  }
+  edit = last_edit;
 }
 
 void
@@ -1909,8 +1892,6 @@ exit_editor (int priority)
   if (is_game_paused ()) print_game_paused (priority);
   else draw_bottom_text (NULL, NULL, priority);
   mr.room_select = -1;
-  hide_menu ();
-  if (is_fullscreen ()) hide_mouse_cursor ();
 }
 
 static char

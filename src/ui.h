@@ -39,6 +39,7 @@
 #define NEXT_ICON "data/icons/next.png"
 #define SCREEN_ICON "data/icons/screen.png"
 #define RIGHT_ICON "data/icons/right.png"
+#define CARD_ICON "data/icons/card.png"
 
 enum main_menu {
   BASE_MID = 0,
@@ -72,6 +73,11 @@ enum main_menu {
   TOGGLE_TIME_FREQUENCY_CONSTRAINT_MID,
 
   VIEW_MID,
+  VIDEO_MODE_MID,
+  VGA_MID,
+  EGA_MID,
+  CGA_MID,
+  HGC_MID,
   FULL_SCREEN_MID,
   FLIP_SCREEN_MID,
   FLIP_SCREEN_VERTICAL_MID,
@@ -96,6 +102,7 @@ void game_menu (void);
 void load_menu (void);
 void save_menu (void);
 void view_menu (void);
+void video_mode_menu (void);
 void screen_flip_menu (void);
 void replay_menu (void);
 void help_menu (void);
@@ -106,6 +113,8 @@ bool is_showing_menu (void);
 void toggle_menu_visibility (void);
 void enable_menu (bool enable);
 
+void ui_editor (void);
+
 void ui_load_game (void);
 void ui_load_config (void);
 void ui_restart_game (void);
@@ -113,6 +122,7 @@ void ui_start_game (void);
 void ui_quit_game (void);
 
 void ui_full_screen (void);
+void ui_video_mode (enum vm new_vm);
 void ui_flip_screen (int flags, bool correct_mouse);
 void ui_screenshot (void);
 

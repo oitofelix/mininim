@@ -334,7 +334,7 @@ title_anim (void)
     break;
   case 24:
     jaffar.action (&jaffar);
-    if (get_audio_instance_position (ai_data) >= 4.0) {
+    if (get_audio_instance_position (ai_data) >= 3.0) {
       princess_look_down (&princess);
       i++;
     }

@@ -26,6 +26,8 @@ void play_anim (void (*draw_callback) (void),
                 void (*compute_callback) (void));
 void pause_animation (bool val);
 void cutscene_mode (bool val);
+void menu_mid (intptr_t mid);
+void anim_key_bindings (void);
 
 
 

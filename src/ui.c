@@ -26,7 +26,7 @@ static int append_menu_index;
 
 static void start_menu (ALLEGRO_MENU *parent, uint16_t id);
 static bool menu_item (char const *title, uint16_t id, int flags,
-                ALLEGRO_BITMAP *icon, bool has_submenu);
+                       ALLEGRO_BITMAP *icon, bool has_submenu);
 static void menu_separator (void);
 static void end_menu (void);
 #endif
@@ -43,7 +43,7 @@ ALLEGRO_BITMAP *small_logo_icon,
   *full_screen_icon, *windows_icon, *camera_icon, *play_icon,
   *record_icon, *stop_icon, *eject_icon, *backward_icon,
   *forward_icon, *pause_icon, *previous_icon, *next_icon,
-  *screen_icon, *right_icon;
+  *screen_icon, *right_icon, *card_icon;
 
 
 
@@ -91,6 +91,7 @@ load_icons (void)
   next_icon = load_icon (NEXT_ICON);
   screen_icon = load_icon (SCREEN_ICON);
   right_icon = load_icon (RIGHT_ICON);
+  card_icon = load_icon (CARD_ICON);
 }
 
 void
@@ -115,6 +116,7 @@ unload_icons (void)
   destroy_bitmap (next_icon);
   destroy_bitmap (screen_icon);
   destroy_bitmap (right_icon);
+  destroy_bitmap (card_icon);
 }
 
 
@@ -329,6 +331,9 @@ view_menu (void)
              ? micon (windows_icon)
              : micon (full_screen_icon), false);
 
+  menu_item ("&Video mode (F12)", VIDEO_MODE_MID, 0,
+             micon (card_icon), true);
+
   menu_item ("Fli&p screen (Shift+I)", FLIP_SCREEN_MID, 0,
              micon_flags (screen_icon, ALLEGRO_FLIP_VERTICAL), true);
 
@@ -337,7 +342,38 @@ view_menu (void)
 
   end_menu ();
 
+  video_mode_menu ();
   screen_flip_menu ();
+#endif
+}
+
+void
+video_mode_menu (void)
+{
+#if MENU_FEATURE
+  start_menu (main_menu, VIDEO_MODE_MID);
+
+  menu_item ("&VGA", VGA_MID,
+             vm == VGA ? ALLEGRO_MENU_ITEM_CHECKED
+             : ALLEGRO_MENU_ITEM_CHECKBOX,
+             NULL, false);
+
+  menu_item ("&EGA", EGA_MID,
+             vm == EGA ? ALLEGRO_MENU_ITEM_CHECKED
+             : ALLEGRO_MENU_ITEM_CHECKBOX,
+             NULL, false);
+
+  menu_item ("&CGA", CGA_MID,
+             (vm == CGA && ! hgc) ? ALLEGRO_MENU_ITEM_CHECKED
+             : ALLEGRO_MENU_ITEM_CHECKBOX,
+             NULL, false);
+
+  menu_item ("&HGC", HGC_MID,
+             (vm == CGA && hgc) ? ALLEGRO_MENU_ITEM_CHECKED
+             : ALLEGRO_MENU_ITEM_CHECKBOX,
+             NULL, false);
+
+  end_menu ();
 #endif
 }
 
@@ -515,6 +551,26 @@ menu_widget_speed (void)
 
 
 void
+ui_editor (void)
+{
+  if (edit == EDIT_NONE) {
+    if (cutscene) toggle_menu_visibility ();
+    else {
+      if (replay_mode == NO_REPLAY ) {
+        enter_editor ();
+        show_menu ();
+      } else  {
+        toggle_menu_visibility ();
+        print_replay_mode (0);
+      }
+    }
+  } else {
+    exit_editor (0);
+    hide_menu ();
+  }
+}
+
+void
 ui_load_game (void)
 {
   load_config_dialog_thread =
@@ -572,16 +628,38 @@ ui_full_screen (void)
     } else {
       al_set_display_flag (display, ALLEGRO_FULLSCREEN_WINDOW, true);
       boolean = "ON";
-      if (edit == EDIT_NONE) {
-        hide_mouse_cursor ();
-        hide_menu ();
-      }
+      if (edit == EDIT_NONE) hide_menu ();
     }
     view_menu ();
     xasprintf (&text, "FULL SCREEN MODE %s", boolean);
     draw_bottom_text (NULL, text, 0);
     al_free (text);
   } else draw_bottom_text (NULL, "NON-DESKTOP MODE IS FULL SCREEN ONLY", 0);
+}
+
+void
+ui_video_mode (enum vm new_vm)
+{
+  if (new_vm == HGC) {
+    vm = CGA; hgc = true;
+  } else {
+    vm = new_vm; hgc = false;
+  }
+
+  char *vm_str;
+
+  switch (vm) {
+  case VGA: vm_str = "VGA"; break;
+  case EGA: vm_str = "EGA"; break;
+  case CGA: vm_str = hgc ? "HGC" : "CGA"; break;
+  }
+
+  video_mode_menu ();
+
+  char *text;
+  xasprintf (&text, "VIDEO MODE: %s", vm_str);
+  draw_bottom_text (NULL, text, 0);
+  al_free (text);
 }
 
 void

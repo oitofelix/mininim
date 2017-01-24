@@ -30,7 +30,6 @@ extern uint64_t editor_register;
 void editor (void);
 void enter_editor (void);
 void exit_editor (int priority);
-void enter_exit_editor (void);
 void editor_msg (char *m, uint64_t cycles);
 void ui_place_kid (struct anim *k, struct pos *p);
 void ui_place_guard (struct anim *g, struct pos *p);
