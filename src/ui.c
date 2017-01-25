@@ -847,12 +847,12 @@ ui_save_setting (char *key, char *value)
   ALLEGRO_CONFIG_ENTRY *iterator;
   char const *entry = al_get_first_config_entry (config, NULL, &iterator);
 
-  do {
+  while (entry) {
     if (! strcasecmp (entry, key)) {
       al_remove_config_key (config, NULL, entry);
       entry = al_get_first_config_entry (config, NULL, &iterator);
     } else entry = al_get_next_config_entry (&iterator);
-  } while (entry);
+  }
 
   al_set_config_value (config, NULL, key, value);
 

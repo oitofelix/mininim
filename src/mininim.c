@@ -1226,7 +1226,7 @@ get_config_args (size_t *cargc, char ***cargv, struct argp_option *options,
   ALLEGRO_CONFIG_ENTRY *iterator;
   char const *entry = al_get_first_config_entry (config, NULL, &iterator);
 
-  do {
+  while (entry) {
     char *key = config2command_line_option_name (entry);
     if (! is_valid_option (key)) goto next;
 
@@ -1238,7 +1238,7 @@ get_config_args (size_t *cargc, char ***cargv, struct argp_option *options,
   next:
     al_free (key);
     entry = al_get_next_config_entry (&iterator);
-  } while (entry);
+  }
 
   al_destroy_config (config);
 
