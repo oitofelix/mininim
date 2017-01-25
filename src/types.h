@@ -28,11 +28,31 @@ struct key {
   int keycode;
 };
 
+/* video mode */
 enum vm {
   CGA, EGA, VGA,
 };
 
 #define HGC (VGA + 1)
+
+/* environment mode */
+enum em {
+  DUNGEON = 0, PALACE = 1,
+};
+
+#define ORIGINAL_ENV (PALACE + 1)
+
+enum hue {
+  HUE_NONE = 0, HUE_GREEN = 1, HUE_GRAY = 2, HUE_YELLOW = 3,
+  HUE_BLUE = 4,
+};
+
+#define HUE_ORIGINAL (HUE_BLUE + 1)
+
+/* gamepad mode */
+enum gpm {
+  KEYBOARD, JOYSTICK,
+};
 
 struct pos {
   struct level *l;
@@ -77,19 +97,6 @@ struct bitmap_rcoord {
   ALLEGRO_BITMAP *b;
   struct pixel_coord tl, tr, bl, br, mt, mbo, ml, mr, m;
 };
-
-enum em {
-  DUNGEON = 0, PALACE = 1,
-};
-
-#define ORIGINAL_ENV (PALACE + 1)
-
-enum hue {
-  HUE_NONE = 0, HUE_GREEN = 1, HUE_GRAY = 2, HUE_YELLOW = 3,
-  HUE_BLUE = 4,
-};
-
-#define HUE_ORIGINAL (HUE_BLUE + 1)
 
 struct drawn_rectangle {
   ALLEGRO_BITMAP *bitmap;
@@ -565,7 +572,7 @@ enum options {
   MIRROR_LEVEL_OPTION, SEMANTICS_OPTION, MOVEMENTS_OPTION,
   RECORD_REPLAY_OPTION, REPLAY_INFO_OPTION, RENDERING_OPTION,
   VALIDATE_REPLAY_CHAIN_OPTION, GAMEPAD_RUMBLE_GAIN_OPTION, SCREAM_OPTION,
-  RANDOM_SEED_OPTION,
+  RANDOM_SEED_OPTION, GAMEPAD_MODE_OPTION,
 };
 
 enum level_module {

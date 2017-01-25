@@ -27,6 +27,7 @@ extern enum edit last_edit;
 extern uint64_t editor_register;
 
 /* functions */
+bool can_edit (void);
 void editor (void);
 void enter_editor (void);
 void exit_editor (int priority);

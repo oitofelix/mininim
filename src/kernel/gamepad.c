@@ -104,7 +104,7 @@ finalize_gamepad (void)
 int
 get_joystick_button (int n)
 {
-  if (! joystick) return 0;
+  if (! joystick || gpm != JOYSTICK) return 0;
   int num_buttons = al_get_joystick_num_buttons (joystick);
   if (n >= num_buttons) return 0;
   al_get_joystick_state (joystick, &joystick_state);
@@ -114,7 +114,7 @@ get_joystick_button (int n)
 int
 get_joystick_axis (int stick, int axis)
 {
-  if (! joystick) return 0;
+  if (! joystick || gpm != JOYSTICK) return 0;
   int num_sticks = al_get_joystick_num_sticks (joystick);
   if (stick >= num_sticks) return 0;
   int num_axes = al_get_joystick_num_axes (joystick, stick);
@@ -135,14 +135,18 @@ get_joystick_v_axis (void)
   return get_joystick_axis (joystick_v_stick, joystick_v_axis);
 }
 
-void
+ALLEGRO_JOYSTICK *
 calibrate_joystick (void)
 {
-  disable_joystick ();
+  free_joystick ();
   al_reconfigure_joysticks ();
   joystick = al_get_joystick (0);
 
-  if (! joystick) return;
+  if (! joystick) {
+    gpm = KEYBOARD;
+    gamepad_menu ();
+    return NULL;
+  }
 
   joystick_h_center = get_joystick_h_axis ();
   joystick_v_center = get_joystick_v_axis ();
@@ -156,7 +160,10 @@ calibrate_joystick (void)
 #if HAPTIC_FEATURE
   joystick_haptic = al_get_haptic_from_joystick (joystick);
 
-  if (! joystick_haptic) return;
+  if (! joystick_haptic) {
+    gamepad_menu ();
+    return joystick;
+  }
 
   joystick_max_haptic_effects =
     min_int (al_get_max_haptic_effects (joystick_haptic),
@@ -166,10 +173,13 @@ calibrate_joystick (void)
     xcalloc (joystick_max_haptic_effects,
              sizeof (* joystick_haptic_effect_id));
 #endif
+
+  gamepad_menu ();
+  return joystick;
 }
 
 void
-disable_joystick (void)
+free_joystick (void)
 {
   if (joystick) {
     al_release_joystick (joystick);
@@ -538,7 +548,7 @@ void
 gamepad_rumble (double intensity, double duration)
 {
 #if HAPTIC_FEATURE
-  if (! joystick) return;
+  if (! joystick || gpm != JOYSTICK) return;
   if (! joystick_haptic) return;
   if (! joystick_haptic_effect_id) return;
 

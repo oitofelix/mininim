@@ -29,10 +29,13 @@ static bool menu_item (char const *title, uint16_t id, int flags,
                        ALLEGRO_BITMAP *icon, bool has_submenu);
 static bool menu_sitem (char const *title, uint16_t id, bool enabled,
                         ALLEGRO_BITMAP *icon);
-static bool menu_sub (char const *title, uint16_t id,
+static bool menu_ditem (bool first, char const *title0, char const *title1,
+                        uint16_t id0, uint16_t id1, bool enabled,
+                        ALLEGRO_BITMAP *icon0, ALLEGRO_BITMAP *icon1);
+static bool menu_sub (char const *title, uint16_t id, bool enabled,
                       ALLEGRO_BITMAP *icon);
-static bool menu_citem (char const *title, uint16_t id, bool checked,
-                        ALLEGRO_BITMAP *icon);
+static bool menu_citem (char const *title, uint16_t id, bool enabled,
+                        bool checked, ALLEGRO_BITMAP *icon);
 static void menu_sep (void);
 static void end_menu (void);
 #endif
@@ -52,7 +55,9 @@ ALLEGRO_BITMAP *small_logo_icon,
   *screen_icon, *right_icon, *card_icon, *dungeon_icon,
   *palace_icon, *green_icon, *gray_icon, *yellow_icon,
   *blue_icon, *black_icon, *vga_icon, *ega_icon, *cga_icon,
-  *hgc_icon, *vertical_icon, *horizontal_icon;
+  *hgc_icon, *vertical_icon, *horizontal_icon,
+  *keyboard_icon, *joystick_icon, *cancel_icon, *clock_icon,
+  *edit_icon, *joystick2_icon, *undo_icon, *redo_icon;
 
 
 
@@ -114,6 +119,14 @@ load_icons (void)
   hgc_icon = load_icon (HGC_ICON);
   vertical_icon = load_icon (VERTICAL_ICON);
   horizontal_icon = load_icon (HORIZONTAL_ICON);
+  keyboard_icon = load_icon (KEYBOARD_ICON);
+  joystick_icon = load_icon (JOYSTICK_ICON);
+  cancel_icon = load_icon (CANCEL_ICON);
+  clock_icon = load_icon (CLOCK_ICON);
+  edit_icon = load_icon (EDIT_ICON);
+  joystick2_icon = load_icon (JOYSTICK2_ICON);
+  undo_icon = load_icon (UNDO_ICON);
+  redo_icon = load_icon (REDO_ICON);
 }
 
 void
@@ -152,6 +165,14 @@ unload_icons (void)
   destroy_bitmap (hgc_icon);
   destroy_bitmap (vertical_icon);
   destroy_bitmap (horizontal_icon);
+  destroy_bitmap (keyboard_icon);
+  destroy_bitmap (joystick_icon);
+  destroy_bitmap (cancel_icon);
+  destroy_bitmap (clock_icon);
+  destroy_bitmap (edit_icon);
+  destroy_bitmap (joystick2_icon);
+  destroy_bitmap (undo_icon);
+  destroy_bitmap (redo_icon);
 }
 
 
@@ -223,19 +244,34 @@ menu_sitem (char const *title, uint16_t id, bool enabled,
 
 #if MENU_FEATURE
 bool
-menu_sub (char const *title, uint16_t id, ALLEGRO_BITMAP *icon)
+menu_ditem (bool first, char const *title0, char const *title1,
+            uint16_t id0, uint16_t id1, bool enabled,
+            ALLEGRO_BITMAP *icon0, ALLEGRO_BITMAP *icon1)
 {
-  return menu_item (title, id, 0, icon, true);
+  return menu_item (first ? title0 : title1,
+                    first ? id0 : id1,
+                    enabled ? 0 : ALLEGRO_MENU_ITEM_DISABLED,
+                    first ? icon0 : icon1, false);
 }
 #endif
 
 #if MENU_FEATURE
 bool
-menu_citem (char const *title, uint16_t id, bool checked,
+menu_sub (char const *title, uint16_t id, bool enabled, ALLEGRO_BITMAP *icon)
+{
+  return menu_item (title, id, enabled ? 0 : ALLEGRO_MENU_ITEM_DISABLED,
+                    icon, true);
+}
+#endif
+
+#if MENU_FEATURE
+bool
+menu_citem (char const *title, uint16_t id, bool enabled, bool checked,
             ALLEGRO_BITMAP *icon)
 {
-  bool r = menu_item (title, id, checked ? ALLEGRO_MENU_ITEM_CHECKED : 0,
-                      checked ? NULL : icon, false);
+  int flags = enabled ? 0 : ALLEGRO_MENU_ITEM_DISABLED;
+  flags |= checked ? ALLEGRO_MENU_ITEM_CHECKED : 0;
+  bool r = menu_item (title, id, flags, checked ? NULL : icon, false);
   if (checked) destroy_bitmap (icon);
   return r;
 }
@@ -327,15 +363,26 @@ create_main_menu (void)
 #if MENU_FEATURE
   if (! main_menu) main_menu = al_create_menu ();
   start_menu (main_menu, 0);
-  menu_sub ("&Game", GAME_MID, NULL);
-  menu_sub ("&View", VIEW_MID, NULL);
-  menu_sub ("&Replay", REPLAY_MID, NULL);
-  menu_sub ("&Help", HELP_MID, NULL);
+
+  menu_sub ("&Game", GAME_MID, true, NULL);
+
+  menu_sub ("&View", VIEW_MID, true, NULL);
+
+  menu_sub ("&Input", GAMEPAD_MID, true, NULL);
+
+  menu_sub ("&Replay", REPLAY_MID, true, NULL);
+
+  menu_sub ("&Editor", EDITOR_MID, can_edit (), NULL);
+
+  menu_sub ("&Help", HELP_MID, true, NULL);
+
   end_menu ();
 
   game_menu ();
   view_menu ();
+  gamepad_menu ();
   replay_menu ();
+  editor_menu ();
   help_menu ();
 #endif
 }
@@ -345,12 +392,13 @@ game_menu (void)
 {
 #if MENU_FEATURE
   start_menu (main_menu, GAME_MID);
-  menu_sub ("&Load", LOAD_MID, micon (open_icon));
-  menu_sub ("&Save", SAVE_MID, micon (save_icon));
+  menu_sub ("&Load", LOAD_MID, true, micon (open_icon));
+  menu_sub ("&Save", SAVE_MID, true, micon (save_icon));
   menu_sep ();
-  menu_sitem (cutscene ? "Sta&rt (Enter)" : "&Restart (Ctrl+R)",
-              cutscene ? START_GAME_MID : RESTART_GAME_MID, true,
-              cutscene ? micon (right_icon) : micon (reload_icon));
+  menu_ditem (cutscene || title_demo,
+              "Sta&rt (Enter)", "&Restart (Ctrl+R)",
+              START_GAME_MID, RESTART_GAME_MID, true,
+              micon (right_icon), micon (reload_icon));
   menu_sitem ("&Quit (Ctrl+Q)", QUIT_GAME_MID, true, micon (quit_icon));
   end_menu ();
 
@@ -389,19 +437,17 @@ view_menu (void)
 #if MENU_FEATURE
   start_menu (main_menu, VIEW_MID);
 
-  menu_sitem (is_fullscreen () ? "&Windowed (F)" : "&Fullscreen (F)",
-              FULL_SCREEN_MID, true,
-              is_fullscreen ()
-              ? micon (windows_icon)
-              : micon (full_screen_icon));
+  menu_ditem (is_fullscreen (), "&Windowed (F)", "&Fullscreen (F)",
+              FULL_SCREEN_MID, FULL_SCREEN_MID, true,
+              micon (windows_icon), micon (full_screen_icon));
 
-  menu_sub ("&Hue (F9)", HUE_MODE_MID, hue_icon (hue));
+  menu_sub ("&Hue (F9)", HUE_MODE_MID, true, hue_icon (hue));
 
-  menu_sub ("&Environment (F11)", ENVIRONMENT_MODE_MID, em_icon (em));
+  menu_sub ("&Environment (F11)", ENVIRONMENT_MODE_MID, true, em_icon (em));
 
-  menu_sub ("&Video (F12)", VIDEO_MODE_MID, vm_icon (vm));
+  menu_sub ("&Video (F12)", VIDEO_MODE_MID, true, vm_icon (vm));
 
-  menu_sub ("&Orientation (Shift+I)", FLIP_SCREEN_MID,
+  menu_sub ("&Orientation (Shift+I)", FLIP_SCREEN_MID, true,
             micon_flags (screen_icon, screen_flags));
 
   menu_sitem ("&Screenshot... (Ctrl+P)", SCREENSHOT_MID, true,
@@ -435,22 +481,22 @@ hue_mode_menu (void)
 #if MENU_FEATURE
   start_menu (main_menu, HUE_MODE_MID);
 
-  menu_citem ("&ORIGINAL", HUE_ORIGINAL_MID, ! force_hue,
+  menu_citem ("&ORIGINAL", HUE_ORIGINAL_MID, true, ! force_hue,
               hue_icon (global_level.hue));
 
-  menu_citem ("&NONE", HUE_NONE_MID, force_hue && hue == HUE_NONE,
+  menu_citem ("&NONE", HUE_NONE_MID, true, force_hue && hue == HUE_NONE,
               micon (black_icon));
 
-  menu_citem ("&GREEN", HUE_GREEN_MID, force_hue && hue == HUE_GREEN,
+  menu_citem ("&GREEN", HUE_GREEN_MID, true, force_hue && hue == HUE_GREEN,
               micon (green_icon));
 
-  menu_citem ("&GRAY", HUE_GRAY_MID, force_hue && hue == HUE_GRAY,
+  menu_citem ("&GRAY", HUE_GRAY_MID, true, force_hue && hue == HUE_GRAY,
               micon (gray_icon));
 
-  menu_citem ("&YELLOW", HUE_YELLOW_MID, force_hue && hue == HUE_YELLOW,
+  menu_citem ("&YELLOW", HUE_YELLOW_MID, true, force_hue && hue == HUE_YELLOW,
               micon (yellow_icon));
 
-  menu_citem ("&BLUE", HUE_BLUE_MID, force_hue && hue == HUE_BLUE,
+  menu_citem ("&BLUE", HUE_BLUE_MID, true, force_hue && hue == HUE_BLUE,
               micon (blue_icon));
 
   end_menu ();
@@ -473,13 +519,13 @@ environment_mode_menu (void)
 #if MENU_FEATURE
   start_menu (main_menu, ENVIRONMENT_MODE_MID);
 
-  menu_citem ("&ORIGINAL", ORIGINAL_ENV_MID, ! force_em,
+  menu_citem ("&ORIGINAL", ORIGINAL_ENV_MID, true, ! force_em,
               em_icon (global_level.em));
 
-  menu_citem ("&DUNGEON", DUNGEON_MID, force_em && em == DUNGEON,
+  menu_citem ("&DUNGEON", DUNGEON_MID, true, force_em && em == DUNGEON,
               micon (dungeon_icon));
 
-  menu_citem ("&PALACE", PALACE_MID, force_em && em == PALACE,
+  menu_citem ("&PALACE", PALACE_MID, true, force_em && em == PALACE,
               micon (palace_icon));
 
   end_menu ();
@@ -503,13 +549,13 @@ video_mode_menu (void)
 #if MENU_FEATURE
   start_menu (main_menu, VIDEO_MODE_MID);
 
-  menu_citem ("&VGA", VGA_MID, vm == VGA, micon (vga_icon));
+  menu_citem ("&VGA", VGA_MID, true, vm == VGA, micon (vga_icon));
 
-  menu_citem ("&EGA", EGA_MID, vm == EGA, micon (ega_icon));
+  menu_citem ("&EGA", EGA_MID, true, vm == EGA, micon (ega_icon));
 
-  menu_citem ("&CGA", CGA_MID, vm == CGA && ! hgc, micon (cga_icon));
+  menu_citem ("&CGA", CGA_MID, true, vm == CGA && ! hgc, micon (cga_icon));
 
-  menu_citem ("&HGC", HGC_MID, vm == CGA && hgc, micon (hgc_icon));
+  menu_citem ("&HGC", HGC_MID, true, vm == CGA && hgc, micon (hgc_icon));
 
   end_menu ();
 #endif
@@ -521,13 +567,56 @@ screen_flip_menu (void)
 #if MENU_FEATURE
   start_menu (main_menu, FLIP_SCREEN_MID);
 
-  menu_citem ("&Vertical", FLIP_SCREEN_VERTICAL_MID,
+  menu_citem ("&Vertical", FLIP_SCREEN_VERTICAL_MID, true,
               screen_flags & ALLEGRO_FLIP_VERTICAL,
               micon (vertical_icon));
 
-  menu_citem ("&Horizontal", FLIP_SCREEN_HORIZONTAL_MID,
+  menu_citem ("&Horizontal", FLIP_SCREEN_HORIZONTAL_MID, true,
               screen_flags & ALLEGRO_FLIP_HORIZONTAL,
               micon (horizontal_icon));
+
+  end_menu ();
+#endif
+}
+
+void
+gamepad_menu (void)
+{
+#if MENU_FEATURE
+  start_menu (main_menu, GAMEPAD_MID);
+
+  menu_sub ("&Device", GAMEPAD_DEVICE_MID, true, gamepad_device_icon (gpm));
+
+  menu_sitem ("&Calibrate (Ctrl+J)", GAMEPAD_CALIBRATE_MID,
+              gpm == JOYSTICK, micon (clock_icon));
+
+  end_menu ();
+
+  gamepad_device_menu ();
+#endif
+}
+
+ALLEGRO_BITMAP *
+gamepad_device_icon (enum gpm gpm)
+{
+  switch (gpm) {
+  case KEYBOARD: return micon (keyboard_icon); break;
+  case JOYSTICK: return micon (joystick_icon); break;
+  default: assert (false); return NULL; break;
+  }
+}
+
+void
+gamepad_device_menu (void)
+{
+#if MENU_FEATURE
+  start_menu (main_menu, GAMEPAD_DEVICE_MID);
+
+  menu_citem ("&Keyboard (Ctrl+K)", KEYBOARD_MODE_MID, true,
+              gpm == KEYBOARD, micon (keyboard_icon));
+
+  menu_citem ("&Joystick (Ctrl+J)", JOYSTICK_MODE_MID, joystick,
+              gpm == JOYSTICK, micon (joystick_icon));
 
   end_menu ();
 #endif
@@ -610,11 +699,36 @@ replay_menu (void)
 }
 
 void
+editor_menu (void)
+{
+#if MENU_FEATURE
+  start_menu (main_menu, EDITOR_MID);
+
+  menu_ditem (edit == EDIT_NONE, "&Edit (F8)", "&Play (F8)",
+              EDIT_MODE_MID, EDIT_MODE_MID,
+              can_edit (),
+              micon (edit_icon), micon (joystick2_icon));
+
+  menu_sitem ("&Undo (Ctrl+Z)", UNDO_MID,
+              can_edit () && can_undo (&undo, -1),
+              micon (undo_icon));
+
+  menu_sitem ("&Redo (Ctrl+Y)", REDO_MID,
+              can_edit () && can_undo (&undo, +1),
+              micon (redo_icon));
+
+  end_menu ();
+#endif
+}
+
+void
 help_menu (void)
 {
 #if MENU_FEATURE
   start_menu (main_menu, HELP_MID);
+
   menu_sitem ("&About", ABOUT_MID, true, micon (small_logo_icon));
+
   end_menu ();
 #endif
 }
@@ -645,14 +759,9 @@ menu_widget_speed (void)
 {
   menu_sep ();
 
-  int flags = anim_freq > 0
-    ? ALLEGRO_MENU_ITEM_CHECKED
-    : ALLEGRO_MENU_ITEM_CHECKBOX;
-  flags |= (cutscene || title_demo) ? ALLEGRO_MENU_ITEM_DISABLED : 0;
-
-  menu_item
+  menu_citem
     ("Speed cons&traint", TOGGLE_TIME_FREQUENCY_CONSTRAINT_MID,
-     flags, NULL, false);
+     ! cutscene && ! title_demo, anim_freq > 0, micon (cancel_icon));
 
   menu_sitem
     ("&Decrease speed [(]", DECREASE_TIME_FREQUENCY_MID,
@@ -695,36 +804,6 @@ menu_mid (intptr_t mid)
     break;
   case QUIT_GAME_MID:
     ui_quit_game ();
-    break;
-
-
-    /* REPLAY */
-  case PLAY_REPLAY_MID:
-    ui_play_replay ();
-    break;
-  case PREVIOUS_REPLAY_MID:
-    ui_previous_replay ();
-    break;
-  case NEXT_REPLAY_MID:
-    ui_next_replay ();
-    break;
-  case RECORD_REPLAY_MID:
-    ui_record_replay ();
-    break;
-  case TOGGLE_PAUSE_GAME_MID:
-    ui_toggle_pause_game ();
-    break;
-  case NEXT_FRAME_MID:
-    ui_next_frame ();
-    break;
-  case DECREASE_TIME_FREQUENCY_MID:
-    ui_decrease_time_frequency ();
-    break;
-  case INCREASE_TIME_FREQUENCY_MID:
-    ui_increase_time_frequency ();
-    break;
-  case TOGGLE_TIME_FREQUENCY_CONSTRAINT_MID:
-    ui_toggle_time_frequency_constraint ();
     break;
 
 
@@ -780,6 +859,61 @@ menu_mid (intptr_t mid)
   case SCREENSHOT_MID:
     ui_screenshot ();
     break;
+
+
+    /* GAMEPAD */
+  case KEYBOARD_MODE_MID:
+    ui_gamepad_mode (KEYBOARD);
+    break;
+  case JOYSTICK_MODE_MID:
+    ui_gamepad_mode (JOYSTICK);
+    break;
+  case GAMEPAD_CALIBRATE_MID:
+    ui_gamepad_mode (JOYSTICK);
+    break;
+
+
+    /* REPLAY */
+  case PLAY_REPLAY_MID:
+    ui_play_replay ();
+    break;
+  case PREVIOUS_REPLAY_MID:
+    ui_previous_replay ();
+    break;
+  case NEXT_REPLAY_MID:
+    ui_next_replay ();
+    break;
+  case RECORD_REPLAY_MID:
+    ui_record_replay ();
+    break;
+  case TOGGLE_PAUSE_GAME_MID:
+    ui_toggle_pause_game ();
+    break;
+  case NEXT_FRAME_MID:
+    ui_next_frame ();
+    break;
+  case DECREASE_TIME_FREQUENCY_MID:
+    ui_decrease_time_frequency ();
+    break;
+  case INCREASE_TIME_FREQUENCY_MID:
+    ui_increase_time_frequency ();
+    break;
+  case TOGGLE_TIME_FREQUENCY_CONSTRAINT_MID:
+    ui_toggle_time_frequency_constraint ();
+    break;
+
+
+    /* EDITOR */
+  case EDIT_MODE_MID:
+    ui_editor ();
+    break;
+  case UNDO_MID:
+    ui_undo_pass (&undo, -1, NULL);
+    break;
+  case REDO_MID:
+    ui_undo_pass (&undo, +1, NULL);
+    break;
+
 
     /* HELP */
   case ABOUT_MID:
@@ -934,23 +1068,13 @@ anim_key_bindings (void)
     al_free (text);
   }
 
-  /* CTRL+J: joystick mode */
-  else if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_J)) {
-    char *text;
-    char *joystick_str = joystick ? "CALIBRATED" : "MODE";
-    calibrate_joystick ();
-    gamepad_rumble (1.0, 0.6);
-    xasprintf (&text, "JOYSTICK %s", joystick
-               ? joystick_str : "NOT FOUND");
-    draw_bottom_text (NULL, text, 0);
-    al_free (text);
-  }
-
   /* CTRL+K: keyboard mode (disables joystick) */
-  else if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_K)) {
-    disable_joystick ();
-    draw_bottom_text (NULL, "KEYBOARD MODE", 0);
-  }
+  else if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_K))
+    ui_gamepad_mode (KEYBOARD);
+
+  /* CTRL+J: joystick mode */
+  else if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_J))
+    ui_gamepad_mode (JOYSTICK);
 
   /* F9: change hue palette */
   else if (was_key_pressed (0, ALLEGRO_KEY_F9)) {
@@ -1007,6 +1131,8 @@ ui_editor (void)
     exit_editor (0);
     hide_menu ();
   }
+
+  editor_menu ();
 }
 
 void
@@ -1238,6 +1364,39 @@ ui_flip_screen (int flags, bool correct_mouse)
 }
 
 void
+ui_gamepad_mode (enum gpm new_gpm)
+{
+  char *key = "GAMEPAD MODE";
+  char *value;
+
+  char *text;
+
+  switch (new_gpm) {
+  case KEYBOARD:
+    gpm = KEYBOARD;
+    draw_bottom_text (NULL, "KEYBOARD MODE", 0);
+    value = "KEYBOARD";
+    ui_save_setting (key, value);
+    break;
+  case JOYSTICK:
+    if (calibrate_joystick ()) {
+      xasprintf (&text, "JOYSTICK %s",
+                 gpm == JOYSTICK ? "CALIBRATED" : "MODE");
+      gpm = JOYSTICK;
+      value = "JOYSTICK";
+      ui_save_setting (key, value);
+      gamepad_rumble (1.0, 0.6);
+    } else xasprintf (&text, "JOYSTICK NOT FOUND");
+    draw_bottom_text (NULL, text, 0);
+    al_free (text);
+    break;
+  default: assert (false);
+  }
+
+  gamepad_menu ();
+}
+
+void
 ui_play_replay (void)
 {
   if (! title_demo && replay_mode == PLAY_REPLAY) {
@@ -1341,6 +1500,36 @@ print_game_paused (int priority)
   }
 
   draw_bottom_text (NULL, text, priority);
+}
+
+void
+ui_undo_pass (struct undo *u, int dir, char *prefix)
+{
+  if (replay_mode != NO_REPLAY) {
+    print_replay_mode (0);
+    return;
+  }
+
+  char *text;
+  char *dir_str = (dir >= 0) ? "REDO" : "UNDO";
+  static char *undo_msg = NULL;
+
+  bool b = can_undo (u, dir);
+
+  if (undo_msg) al_free (undo_msg);
+
+  if (! b) {
+    if (prefix) xasprintf (&undo_msg, "NO FURTHER %s %s", prefix, dir_str);
+    else xasprintf (&undo_msg, "NO FURTHER %s", dir_str);
+    editor_msg (undo_msg, EDITOR_CYCLES_3);
+    return;
+  }
+
+  undo_pass (u, dir, &text);
+
+  if (prefix) xasprintf (&undo_msg, "%s %s: %s", prefix, dir_str, text);
+  else xasprintf (&undo_msg, "%s: %s", dir_str, text);
+  editor_msg (undo_msg, EDITOR_CYCLES_3);
 }
 
 void

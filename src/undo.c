@@ -47,6 +47,8 @@ register_undo (struct undo *u, void *data, undo_f f, char *desc)
   else u->pass[u->current].desc = NULL;
 
   if (editor_register && desc) editor_msg (desc, editor_register);
+
+  if (desc) editor_menu ();
 }
 
 void
@@ -93,6 +95,8 @@ undo_pass (struct undo *u, int dir, char **desc)
     } while (! u->pass[u->current].desc);
   }
 
+  if (desc) editor_menu ();
+
   return true;
 }
 
@@ -105,30 +109,6 @@ end_undo_set (struct undo *u, char *desc)
   } else u->pass[u->current].desc = NULL;
 }
 
-void
-ui_undo_pass (struct undo *u, int dir, char *prefix)
-{
-  char *text;
-  char *dir_str = (dir >= 0) ? "REDO" : "UNDO";
-  static char *undo_msg = NULL;
-
-  bool b = can_undo (u, dir);
-
-  if (undo_msg) al_free (undo_msg);
-
-  if (! b) {
-    if (prefix) xasprintf (&undo_msg, "NO FURTHER %s %s", prefix, dir_str);
-    else xasprintf (&undo_msg, "NO FURTHER %s", dir_str);
-    editor_msg (undo_msg, EDITOR_CYCLES_3);
-    return;
-  }
-
-  undo_pass (u, dir, &text);
-
-  if (prefix) xasprintf (&undo_msg, "%s %s: %s", prefix, dir_str, text);
-  else xasprintf (&undo_msg, "%s: %s", dir_str, text);
-  editor_msg (undo_msg, EDITOR_CYCLES_3);
-}
 
 /*********************/
 /* CONSTRUCTION UNDO */

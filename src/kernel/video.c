@@ -93,6 +93,8 @@ init_video (void)
   logo_icon = load_bitmap (LOGO_ICON);
   al_set_display_icon (display, logo_icon);
 
+  cutscene = true;
+
 #if MENU_FEATURE
   al_register_event_source
     (event_queue, al_get_default_menu_event_source ());
@@ -102,7 +104,6 @@ init_video (void)
   enable_menu (false);
   if (! is_fullscreen ()) show_menu ();
 
-  cutscene_mode (true);
   if (mr.fit_w == 0 && mr.fit_h == 0) {
     mr.fit_w = 2;
     mr.fit_h = 2;

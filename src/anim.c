@@ -61,8 +61,7 @@ play_anim (void (*draw_callback) (void),
   key.keycode = 0;
   joystick_button = -1;
 
-  /* environment mode icon may change */
-  view_menu ();
+  create_main_menu ();
 
   while (! quit_anim) {
     al_wait_for_event (event_queue, &event);
@@ -282,7 +281,7 @@ play_anim (void (*draw_callback) (void),
       show ();
       process_display_events ();
     }
-    enable_menu (true);
+    create_main_menu ();
   }
 
   if (replay_mode == RECORD_REPLAY) {
@@ -327,6 +326,7 @@ cutscene_mode (bool val)
   cutscene = val;
   game_menu ();
   replay_menu ();
+  editor_menu ();
 }
 
 

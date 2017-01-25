@@ -82,6 +82,7 @@ uint64_t play_time;
 bool play_time_stopped;
 enum vm vm = VGA;
 enum em em = DUNGEON;
+enum gpm gpm = JOYSTICK;
 bool force_em = false;
 enum hue hue = HUE_NONE;
 bool force_hue = false;
@@ -184,7 +185,8 @@ static struct argp_option options[] = {
 
   /* Gamepad */
   {NULL, 0, NULL, 0, "Gamepad:", 0},
-  {"gamepad-flip-mode", GAMEPAD_FLIP_MODE_OPTION, "GAMEPAD-FLIP-MODE", 0, "Select gamepad flip mode.  Valid values for GAMEPAD-FLIP-MODE are: NONE, VERTICAL, HORIZONTAL and VERTICAL-HORIZONTAL.  The default is NONE.  This can be changed in-game using the SHIFT+K key binding.                                ", 0},
+  {"gamepad-mode", GAMEPAD_MODE_OPTION, "GAMEPAD-MODE", 0, "Select gamepad mode.  Valid values for GAMEPAD-MODE are: KEYBOARD and JOYSTICK.  The default is JOYSTICK.  If a joystick is not available, it falls back to KEYBOARD.  This can be changed in-game using the CTRL+K and CTRL+J key bindings.", 0},
+  {"gamepad-flip-mode", GAMEPAD_FLIP_MODE_OPTION, "GAMEPAD-FLIP-MODE", 0, "Select gamepad flip mode.  Valid values for GAMEPAD-FLIP-MODE are: NONE, VERTICAL, HORIZONTAL and VERTICAL-HORIZONTAL.  The default is NONE.  This can be changed in-game using the SHIFT+K key binding.", 0},
   {"joystick-axis-threshold", JOYSTICK_AXIS_THRESHOLD_OPTION, "FUNC,VALUE", 0, "Set joystick threshold to VALUE for the axis mapped to FUNC.  Valid values for FUNC are H and V.   VALUE is a floating point ranging from 0.0 to 1.0.  The default VALUE for H is 0.1 and for Y is 0.8.", 0},
   {"joystick-button-threshold", JOYSTICK_BUTTON_THRESHOLD_OPTION, "FUNC,VALUE", 0, "Set joystick threshold to VALUE for the button mapped to FUNC.  Valid values for FUNC are: UP, RIGHT, DOWN, LEFT, ENTER, SHIFT.  VALUE is an integer ranging from 0 to 32767.  The default VALUE for any function is 100.", 0},
   {"joystick-axis", JOYSTICK_AXIS_OPTION, "FUNC,STICK,AXIS", 0, "Map function FUNC to joystick axis STICK,AXIS.  Valid values for FUNC are: H and V.  STICK,AXIS is a valid stick and axis pair.  The default STICK,AXIS for H is 0,0 and for V is 0,1.", 0},
@@ -628,6 +630,8 @@ parser (int key, char *arg, struct argp_state *state)
   char *display_flip_mode_enum[] = {"NONE", "VERTICAL", "HORIZONTAL",
                                     "VERTICAL-HORIZONTAL", NULL};
 
+  char *gamepad_mode_enum[] = {"KEYBOARD", "JOYSTICK", NULL};
+
   char *gamepad_flip_mode_enum[] = {"NONE", "VERTICAL", "HORIZONTAL",
                                     "VERTICAL-HORIZONTAL", NULL};
 
@@ -782,6 +786,18 @@ Levels have been converted using module %s into native format at\n\
     case 0: mr.fit_mode = MR_FIT_NONE; break;
     case 1: mr.fit_mode = MR_FIT_STRETCH; break;
     case 2: mr.fit_mode = MR_FIT_RATIO; break;
+    }
+    break;
+  case GAMEPAD_MODE_OPTION:
+    e = optval_to_enum (&i, key, arg, state, gamepad_mode_enum, 0);
+    if (e) return e;
+    switch (i) {
+    case 0:
+      gpm = KEYBOARD;
+      break;
+    case 1:
+      gpm = JOYSTICK;
+      break;
     }
     break;
   case GAMEPAD_FLIP_MODE_OPTION:
@@ -1349,7 +1365,7 @@ main (int _argc, char **_argv)
 
   give_dat_compat_preference ();
 
-  enable_menu (true);
+  create_main_menu ();
 
   if (skip_title) goto play_game;
 
@@ -1390,10 +1406,8 @@ main (int _argc, char **_argv)
     if (! next_legacy_level (&vanilla_level, replay->start_level))
       exit (-1);
     title_demo = true;
-    replay_menu ();
     play_level (&vanilla_level);
     title_demo = false;
-    replay_menu ();
   }
   min_legacy_level = min_legacy_level_bkp;
   max_legacy_level = max_legacy_level_bkp;
@@ -1570,7 +1584,7 @@ dialog_thread (ALLEGRO_THREAD *thread, void *arg)
     hide_mouse_cursor ();
   else show_mouse_cursor ();
 
-  enable_menu (true);
+  create_main_menu ();
 
   return dialog;
 }

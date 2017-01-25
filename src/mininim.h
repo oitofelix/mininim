@@ -207,6 +207,7 @@ extern enum em em;
 extern bool force_em;
 extern enum hue hue;
 extern bool force_hue;
+extern enum gpm gpm;
 extern bool immortal_mode;
 extern int initial_total_lives, total_lives,
   initial_current_lives, current_lives;

@@ -758,16 +758,12 @@ process_keys (void)
   }
 
   /* CTRL+Z: undo */
-  if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_Z)) {
-    if (replay_mode == NO_REPLAY) ui_undo_pass (&undo, -1, NULL);
-    else print_replay_mode (0);
-  }
+  if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_Z))
+    ui_undo_pass (&undo, -1, NULL);
 
   /* CTRL+Y: redo */
-  if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_Y)) {
-    if (replay_mode == NO_REPLAY) ui_undo_pass (&undo, +1, NULL);
-    else print_replay_mode (0);
-  }
+  if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_Y))
+    ui_undo_pass (&undo, +1, NULL);
 
   /* [: decrease multi-room resolution */
   if (was_key_pressed (0, ALLEGRO_KEY_OPENBRACE)

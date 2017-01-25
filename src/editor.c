@@ -46,6 +46,12 @@ enum edit edit;
 enum edit last_edit = EDIT_MAIN;
 uint64_t editor_register;
 
+bool
+can_edit (void)
+{
+  return ! cutscene && ! title_demo && replay_mode == NO_REPLAY;
+}
+
 void
 editor (void)
 {

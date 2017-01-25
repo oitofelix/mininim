@@ -53,6 +53,14 @@
 #define HGC_ICON "data/icons/hgc.png"
 #define VERTICAL_ICON "data/icons/vertical.png"
 #define HORIZONTAL_ICON "data/icons/horizontal.png"
+#define KEYBOARD_ICON "data/icons/keyboard.png"
+#define JOYSTICK_ICON "data/icons/joystick.png"
+#define CANCEL_ICON "data/icons/cancel.png"
+#define CLOCK_ICON "data/icons/clock.png"
+#define EDIT_ICON "data/icons/edit.png"
+#define JOYSTICK2_ICON "data/icons/joystick2.png"
+#define UNDO_ICON "data/icons/undo.png"
+#define REDO_ICON "data/icons/redo.png"
 
 enum main_menu {
   BASE_MID = 0,
@@ -73,17 +81,6 @@ enum main_menu {
   RESTART_GAME_MID,
   START_GAME_MID,
   QUIT_GAME_MID,
-
-  REPLAY_MID,
-  PLAY_REPLAY_MID,
-  PREVIOUS_REPLAY_MID,
-  NEXT_REPLAY_MID,
-  RECORD_REPLAY_MID,
-  TOGGLE_PAUSE_GAME_MID,
-  NEXT_FRAME_MID,
-  INCREASE_TIME_FREQUENCY_MID,
-  DECREASE_TIME_FREQUENCY_MID,
-  TOGGLE_TIME_FREQUENCY_CONSTRAINT_MID,
 
   VIEW_MID,
   HUE_MODE_MID,
@@ -108,6 +105,28 @@ enum main_menu {
   FLIP_SCREEN_HORIZONTAL_MID,
   SCREENSHOT_MID,
 
+  GAMEPAD_MID,
+  GAMEPAD_DEVICE_MID,
+  KEYBOARD_MODE_MID,
+  JOYSTICK_MODE_MID,
+  GAMEPAD_CALIBRATE_MID,
+
+  REPLAY_MID,
+  PLAY_REPLAY_MID,
+  PREVIOUS_REPLAY_MID,
+  NEXT_REPLAY_MID,
+  RECORD_REPLAY_MID,
+  TOGGLE_PAUSE_GAME_MID,
+  NEXT_FRAME_MID,
+  INCREASE_TIME_FREQUENCY_MID,
+  DECREASE_TIME_FREQUENCY_MID,
+  TOGGLE_TIME_FREQUENCY_CONSTRAINT_MID,
+
+  EDITOR_MID,
+  EDIT_MODE_MID,
+  UNDO_MID,
+  REDO_MID,
+
   HELP_MID,
   ABOUT_MID,
 
@@ -122,6 +141,7 @@ void load_icons (void);
 void unload_icons (void);
 
 void create_main_menu (void);
+
 void game_menu (void);
 void load_menu (void);
 void save_menu (void);
@@ -134,7 +154,15 @@ void environment_mode_menu (void);
 ALLEGRO_BITMAP *vm_icon (enum vm vm);
 void video_mode_menu (void);
 void screen_flip_menu (void);
+
+void gamepad_menu (void);
+ALLEGRO_BITMAP *gamepad_device_icon (enum gpm gpm);
+void gamepad_device_menu (void);
+
 void replay_menu (void);
+
+void editor_menu (void);
+
 void help_menu (void);
 
 void show_menu (void);
@@ -161,6 +189,8 @@ void ui_video_mode (enum vm new_vm);
 void ui_flip_screen (int flags, bool correct_mouse);
 void ui_screenshot (void);
 
+void ui_gamepad_mode (enum gpm new_gpm);
+
 void ui_play_replay (void);
 void ui_previous_replay (void);
 void ui_next_replay (void);
@@ -172,6 +202,9 @@ void ui_change_anim_freq (int f);
 void ui_toggle_pause_game (void);
 void ui_next_frame (void);
 void print_game_paused (int priority);
+
+void ui_undo_pass (struct undo *u, int dir, char *prefix);
+
 void ui_version (void);
 
 error_t ui_save_setting (char *key, char *value);

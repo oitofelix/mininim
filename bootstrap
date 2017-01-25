@@ -1,7 +1,8 @@
 #!/bin/bash
 
 gnulib-tool --source-base=gnulib --m4-base=gnulib/m4 \
---aux-dir=gnulib/build-aux --import error vasprintf argp strcase strcasestr progname glob
+  --aux-dir=gnulib/build-aux --import error vasprintf argp strcase \
+  strcasestr progname glob
 
 mv build-aux/texinfo.tex{,.bkp}
 autoreconf --install --force
