@@ -82,6 +82,8 @@ enum em {
   DUNGEON = 0, PALACE = 1,
 };
 
+#define ORIGINAL_ENV (PALACE + 1)
+
 enum hue {
   HUE_NONE = 0, HUE_GREEN = 1, HUE_GRAY = 2, HUE_YELLOW = 3,
   HUE_BLUE = 4,

@@ -40,6 +40,8 @@
 #define SCREEN_ICON "data/icons/screen.png"
 #define RIGHT_ICON "data/icons/right.png"
 #define CARD_ICON "data/icons/card.png"
+#define DUNGEON_ICON "data/icons/dungeon.png"
+#define PALACE_ICON "data/icons/palace.png"
 
 enum main_menu {
   BASE_MID = 0,
@@ -73,6 +75,10 @@ enum main_menu {
   TOGGLE_TIME_FREQUENCY_CONSTRAINT_MID,
 
   VIEW_MID,
+  ENVIRONMENT_MODE_MID,
+  ORIGINAL_ENV_MID,
+  DUNGEON_MID,
+  PALACE_MID,
   VIDEO_MODE_MID,
   VGA_MID,
   EGA_MID,
@@ -102,6 +108,7 @@ void game_menu (void);
 void load_menu (void);
 void save_menu (void);
 void view_menu (void);
+void environment_mode_menu (void);
 void video_mode_menu (void);
 void screen_flip_menu (void);
 void replay_menu (void);
@@ -113,6 +120,9 @@ bool is_showing_menu (void);
 void toggle_menu_visibility (void);
 void enable_menu (bool enable);
 
+void menu_mid (intptr_t mid);
+void anim_key_bindings (void);
+
 void ui_editor (void);
 
 void ui_load_game (void);
@@ -122,6 +132,7 @@ void ui_start_game (void);
 void ui_quit_game (void);
 
 void ui_full_screen (void);
+void ui_environment_mode (enum em new_em);
 void ui_video_mode (enum vm new_vm);
 void ui_flip_screen (int flags, bool correct_mouse);
 void ui_screenshot (void);

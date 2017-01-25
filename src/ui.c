@@ -43,7 +43,8 @@ ALLEGRO_BITMAP *small_logo_icon,
   *full_screen_icon, *windows_icon, *camera_icon, *play_icon,
   *record_icon, *stop_icon, *eject_icon, *backward_icon,
   *forward_icon, *pause_icon, *previous_icon, *next_icon,
-  *screen_icon, *right_icon, *card_icon;
+  *screen_icon, *right_icon, *card_icon, *dungeon_icon,
+  *palace_icon;
 
 
 
@@ -92,6 +93,8 @@ load_icons (void)
   screen_icon = load_icon (SCREEN_ICON);
   right_icon = load_icon (RIGHT_ICON);
   card_icon = load_icon (CARD_ICON);
+  dungeon_icon = load_icon (DUNGEON_ICON);
+  palace_icon = load_icon (PALACE_ICON);
 }
 
 void
@@ -117,6 +120,8 @@ unload_icons (void)
   destroy_bitmap (screen_icon);
   destroy_bitmap (right_icon);
   destroy_bitmap (card_icon);
+  destroy_bitmap (dungeon_icon);
+  destroy_bitmap (palace_icon);
 }
 
 
@@ -331,19 +336,48 @@ view_menu (void)
              ? micon (windows_icon)
              : micon (full_screen_icon), false);
 
+  menu_item ("&Environment mode (F11)", ENVIRONMENT_MODE_MID, 0,
+             micon (em == DUNGEON ? dungeon_icon : palace_icon), true);
+
   menu_item ("&Video mode (F12)", VIDEO_MODE_MID, 0,
              micon (card_icon), true);
 
   menu_item ("Fli&p screen (Shift+I)", FLIP_SCREEN_MID, 0,
-             micon_flags (screen_icon, ALLEGRO_FLIP_VERTICAL), true);
+             micon_flags (screen_icon, screen_flags), true);
 
   menu_item ("&Screenshot... (Ctrl+P)", SCREENSHOT_MID, 0,
              micon (camera_icon), false);
 
   end_menu ();
 
+  environment_mode_menu ();
   video_mode_menu ();
   screen_flip_menu ();
+#endif
+}
+
+void
+environment_mode_menu (void)
+{
+#if MENU_FEATURE
+  start_menu (main_menu, ENVIRONMENT_MODE_MID);
+
+  menu_item ("&ORIGINAL", ORIGINAL_ENV_MID,
+             force_em ? ALLEGRO_MENU_ITEM_CHECKBOX
+             : ALLEGRO_MENU_ITEM_CHECKED,
+             NULL, false);
+
+  menu_item ("&DUNGEON", DUNGEON_MID,
+             (force_em && em == DUNGEON) ? ALLEGRO_MENU_ITEM_CHECKED
+             : ALLEGRO_MENU_ITEM_CHECKBOX,
+             NULL, false);
+
+  menu_item ("&PALACE", PALACE_MID,
+             (force_em && em == PALACE) ? ALLEGRO_MENU_ITEM_CHECKED
+             : ALLEGRO_MENU_ITEM_CHECKBOX,
+             NULL, false);
+
+  end_menu ();
 #endif
 }
 
@@ -551,6 +585,316 @@ menu_widget_speed (void)
 
 
 void
+menu_mid (intptr_t mid)
+{
+  /********/
+  /* MENU */
+  /********/
+
+  switch (mid) {
+
+    /* GAME */
+  case LOAD_GAME_MID:
+    ui_load_game ();
+    break;
+  case LOAD_CONFIG_MID:
+    ui_load_config ();
+    break;
+  case RESTART_GAME_MID:
+    ui_restart_game ();
+    break;
+  case START_GAME_MID:
+    ui_start_game ();
+    break;
+  case QUIT_GAME_MID:
+    ui_quit_game ();
+    break;
+
+
+    /* REPLAY */
+  case PLAY_REPLAY_MID:
+    ui_play_replay ();
+    break;
+  case PREVIOUS_REPLAY_MID:
+    ui_previous_replay ();
+    break;
+  case NEXT_REPLAY_MID:
+    ui_next_replay ();
+    break;
+  case RECORD_REPLAY_MID:
+    ui_record_replay ();
+    break;
+  case TOGGLE_PAUSE_GAME_MID:
+    ui_toggle_pause_game ();
+    break;
+  case NEXT_FRAME_MID:
+    ui_next_frame ();
+    break;
+  case DECREASE_TIME_FREQUENCY_MID:
+    ui_decrease_time_frequency ();
+    break;
+  case INCREASE_TIME_FREQUENCY_MID:
+    ui_increase_time_frequency ();
+    break;
+  case TOGGLE_TIME_FREQUENCY_CONSTRAINT_MID:
+    ui_toggle_time_frequency_constraint ();
+    break;
+
+
+    /* VIEW */
+  case FULL_SCREEN_MID:
+    ui_full_screen ();
+    break;
+  case ORIGINAL_ENV_MID:
+    ui_environment_mode (ORIGINAL_ENV);
+    break;
+  case DUNGEON_MID:
+    ui_environment_mode (DUNGEON);
+    break;
+  case PALACE_MID:
+    ui_environment_mode (PALACE);
+    break;
+  case VGA_MID:
+    ui_video_mode (VGA);
+    break;
+  case EGA_MID:
+    ui_video_mode (EGA);
+    break;
+  case CGA_MID:
+    ui_video_mode (CGA);
+    break;
+  case HGC_MID:
+    ui_video_mode (HGC);
+    break;
+  case FLIP_SCREEN_VERTICAL_MID:
+    ui_flip_screen (screen_flags ^ ALLEGRO_FLIP_VERTICAL, false);
+    break;
+  case FLIP_SCREEN_HORIZONTAL_MID:
+    ui_flip_screen (screen_flags ^ ALLEGRO_FLIP_HORIZONTAL, false);
+    break;
+  case SCREENSHOT_MID:
+    ui_screenshot ();
+    break;
+
+    /* HELP */
+  case ABOUT_MID:
+    ui_version ();
+    break;
+  default: break;
+  }
+}
+
+
+
+
+
+
+void
+anim_key_bindings (void)
+{
+  /****************/
+  /* KEY BINDINGS */
+  /****************/
+
+
+  /* CTRL+L: load game */
+  if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_L)
+      && ! load_config_dialog_thread)
+    ui_load_game ();
+
+  /* CTRL+P: screenshot */
+  else if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_P)
+           && ! save_picture_dialog_thread)
+    ui_screenshot ();
+
+  /* ALT+F7: start/stop replay recording */
+  else if (! command_line_replay
+           && (((title_demo || replay_mode != PLAY_REPLAY)
+                && was_key_pressed (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_F7))
+               || ((replay_mode == RECORD_REPLAY
+                    || recording_replay_countdown > 0)
+                   && was_key_pressed (0, ALLEGRO_KEY_F7))))
+    ui_record_replay ();
+
+  /* F7: load replay/stop replaying */
+  else if (! command_line_replay
+           && ((replay_mode != RECORD_REPLAY
+                && was_key_pressed (0, ALLEGRO_KEY_F7))
+               || (replay_mode == PLAY_REPLAY
+                   && was_key_pressed
+                   (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_F7))))
+    ui_play_replay ();
+
+  /* CTRL+R: restart game */
+  else if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_R))
+    ui_restart_game ();
+
+  /* CTRL+Q: quit game */
+  else if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_Q))
+    ui_quit_game ();
+
+  /* (: decrease time frequency */
+  else if (was_char_pressed ('('))
+    ui_change_anim_freq (anim_freq - 1);
+
+  /* ): increase time frenquency */
+  else if (was_char_pressed (')'))
+    ui_change_anim_freq (anim_freq + 1);
+
+  /* F8: enable/disable level editor */
+  else if (was_key_pressed (0, ALLEGRO_KEY_F8))
+    ui_editor ();
+
+  /* CTRL+V: show engine name and version */
+  else if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_V))
+    ui_version ();
+
+  /* CTRL+S: enable/disable sound */
+  else if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_S)) {
+    char *text;
+    audio_enabled = ! audio_enabled;
+    enable_audio (audio_enabled);
+    xasprintf (&text, "SOUND %s", audio_enabled ? "ON" : "OFF");
+    draw_bottom_text (NULL, text, 0);
+    al_free (text);
+  }
+
+  /* D: change display mode */
+  else if (! active_menu && was_key_pressed (0, ALLEGRO_KEY_D)) {
+    if (display_mode < 0)
+      draw_bottom_text (NULL, "DISPLAY MODE: DESKTOP", 0);
+    else {
+      int n = al_get_num_display_modes ();
+      if (n) {
+        int display_mode_bkp = display_mode;
+      next_display_mode:
+        display_mode = (display_mode + 1) % n;
+        int w = al_get_display_width (display);
+        int h = al_get_display_height (display);
+        ALLEGRO_DISPLAY_MODE d;
+        if (al_get_display_mode (display_mode, &d)) {
+          if (d.width == w && d.height == h
+              && display_mode != display_mode_bkp)
+            goto next_display_mode;
+          char *text;
+          al_resize_display (display, d.width, d.height);
+          xasprintf (&text, "DISPLAY MODE: %ix%i", d.width, d.height);
+          draw_bottom_text (NULL, text, 0);
+          al_free (text);
+        } else draw_bottom_text (NULL, "DISPLAY MODES QUERYING FAILED", 0);
+      } else draw_bottom_text (NULL, "NO DISPLAY MODE AVAILABLE", 0);
+    }
+  }
+
+  /* F: enable/disable fullscreen mode */
+  else if ((! active_menu && was_key_pressed (0, ALLEGRO_KEY_F))
+           || was_key_pressed (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_ENTER))
+    ui_full_screen ();
+
+  /* SHIFT+I: flip screen */
+  else if (was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_I)) {
+    switch (screen_flags) {
+    case 0: ui_flip_screen (ALLEGRO_FLIP_VERTICAL, true); break;
+    case ALLEGRO_FLIP_VERTICAL:
+      ui_flip_screen (ALLEGRO_FLIP_HORIZONTAL, true); break;
+    case ALLEGRO_FLIP_HORIZONTAL:
+      ui_flip_screen (ALLEGRO_FLIP_VERTICAL | ALLEGRO_FLIP_HORIZONTAL,
+                      true);
+      break;
+    case ALLEGRO_FLIP_VERTICAL | ALLEGRO_FLIP_HORIZONTAL:
+    default: ui_flip_screen (0, true); break;
+    }
+  }
+
+  /* SHIFT+K: flip gamepad */
+  else if (was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_K)) {
+    char *flip = "NONE";
+    if (! flip_gamepad_vertical && ! flip_gamepad_horizontal) {
+      flip_gamepad_vertical = true;
+      flip = "VERTICAL";
+    } else if (flip_gamepad_vertical && ! flip_gamepad_horizontal) {
+      flip_gamepad_vertical = false;
+      flip_gamepad_horizontal = true;
+      flip = "HORIZONTAL";
+    } else if (! flip_gamepad_vertical && flip_gamepad_horizontal) {
+      flip_gamepad_vertical = true;
+      flip = "VERTICAL + HORIZONTAL";
+    } else if (flip_gamepad_vertical && flip_gamepad_horizontal) {
+      flip_gamepad_vertical = false;
+      flip_gamepad_horizontal = false;
+    }
+    char *text;
+    xasprintf (&text, "GAMEPAD FLIP: %s", flip);
+    draw_bottom_text (NULL, text, 0);
+    al_free (text);
+  }
+
+  /* CTRL+J: joystick mode */
+  else if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_J)) {
+    char *text;
+    char *joystick_str = joystick ? "CALIBRATED" : "MODE";
+    calibrate_joystick ();
+    gamepad_rumble (1.0, 0.6);
+    xasprintf (&text, "JOYSTICK %s", joystick
+               ? joystick_str : "NOT FOUND");
+    draw_bottom_text (NULL, text, 0);
+    al_free (text);
+  }
+
+  /* CTRL+K: keyboard mode (disables joystick) */
+  else if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_K)) {
+    disable_joystick ();
+    draw_bottom_text (NULL, "KEYBOARD MODE", 0);
+  }
+
+  /* F9: change hue palette */
+  else if (was_key_pressed (0, ALLEGRO_KEY_F9)) {
+    char *em_str = NULL;
+
+    if (force_hue) {
+      switch (hue) {
+      case HUE_NONE: hue = HUE_GREEN; em_str = "GREEN"; break;
+      case HUE_GREEN: hue = HUE_GRAY; em_str = "GRAY"; break;
+      case HUE_GRAY: hue = HUE_YELLOW; em_str = "YELLOW"; break;
+      case HUE_YELLOW: hue = HUE_BLUE; em_str = "BLUE"; break;
+      case HUE_BLUE: hue = global_level.hue;
+        em_str = "ORIGINAL"; force_hue = false; break;
+      }
+    } else {
+      hue = HUE_NONE; em_str = "NONE"; force_hue = true;
+    }
+
+    char *text;
+    xasprintf (&text, "HUE MODE: %s", em_str);
+    draw_bottom_text (NULL, text, 0);
+    al_free (text);
+  }
+
+  /* F11: change environment mode */
+  else if (was_key_pressed (0, ALLEGRO_KEY_F11)) {
+    if (force_em) {
+      switch (em) {
+      case DUNGEON: ui_environment_mode (PALACE); break;
+      case PALACE: ui_environment_mode (ORIGINAL_ENV); break;
+      }
+    } else ui_environment_mode (DUNGEON);
+  }
+
+  /* F12: change video mode */
+  else if (was_key_pressed (0, ALLEGRO_KEY_F12))
+    switch (vm) {
+    case VGA: ui_video_mode (EGA); break;
+    case EGA: ui_video_mode (CGA); break;
+    case CGA: ui_video_mode (hgc ? VGA : HGC); break;
+    }
+}
+
+
+
+
+
+
+void
 ui_editor (void)
 {
   if (edit == EDIT_NONE) {
@@ -639,6 +983,38 @@ ui_full_screen (void)
 }
 
 void
+ui_environment_mode (enum em new_em)
+{
+  char *em_str = NULL;
+
+  switch (new_em) {
+  default: /* ORIGINAL_ENV */
+    force_em = false;
+    em = global_level.em;
+    em_str = "ORIGINAL";
+    break;
+  case DUNGEON:
+    force_em = true;
+    em = DUNGEON;
+    em_str = "DUNGEON";
+    break;
+  case PALACE:
+    force_em = true;
+    em = PALACE;
+    em_str = "PALACE";
+    break;
+  }
+
+  char *text;
+  xasprintf (&text, "ENVIRONMENT MODE: %s", em_str);
+  draw_bottom_text (NULL, text, 0);
+  al_free (text);
+
+  ui_save_setting ("ENVIRONMENT MODE", em_str);
+  view_menu ();
+}
+
+void
 ui_video_mode (enum vm new_vm)
 {
   if (new_vm == HGC) {
@@ -707,6 +1083,7 @@ ui_flip_screen (int flags, bool correct_mouse)
   draw_bottom_text (NULL, text, 1);
   al_free (text);
 
+  view_menu ();
   ui_save_setting ("DISPLAY FLIP MODE", flip_str);
 }
 
