@@ -42,6 +42,17 @@
 #define CARD_ICON "data/icons/card.png"
 #define DUNGEON_ICON "data/icons/dungeon.png"
 #define PALACE_ICON "data/icons/palace.png"
+#define GREEN_ICON "data/icons/green.png"
+#define GRAY_ICON "data/icons/gray.png"
+#define YELLOW_ICON "data/icons/yellow.png"
+#define BLUE_ICON "data/icons/blue.png"
+#define BLACK_ICON "data/icons/black.png"
+#define VGA_ICON "data/icons/vga.png"
+#define EGA_ICON "data/icons/ega.png"
+#define CGA_ICON "data/icons/cga.png"
+#define HGC_ICON "data/icons/hgc.png"
+#define VERTICAL_ICON "data/icons/vertical.png"
+#define HORIZONTAL_ICON "data/icons/horizontal.png"
 
 enum main_menu {
   BASE_MID = 0,
@@ -75,6 +86,13 @@ enum main_menu {
   TOGGLE_TIME_FREQUENCY_CONSTRAINT_MID,
 
   VIEW_MID,
+  HUE_MODE_MID,
+  HUE_ORIGINAL_MID,
+  HUE_NONE_MID,
+  HUE_GREEN_MID,
+  HUE_GRAY_MID,
+  HUE_YELLOW_MID,
+  HUE_BLUE_MID,
   ENVIRONMENT_MODE_MID,
   ORIGINAL_ENV_MID,
   DUNGEON_MID,
@@ -107,8 +125,13 @@ void create_main_menu (void);
 void game_menu (void);
 void load_menu (void);
 void save_menu (void);
+
 void view_menu (void);
+ALLEGRO_BITMAP *hue_icon (enum hue hue);
+void hue_mode_menu (void);
+ALLEGRO_BITMAP *em_icon (enum em em);
 void environment_mode_menu (void);
+ALLEGRO_BITMAP *vm_icon (enum vm vm);
 void video_mode_menu (void);
 void screen_flip_menu (void);
 void replay_menu (void);
@@ -132,6 +155,7 @@ void ui_start_game (void);
 void ui_quit_game (void);
 
 void ui_full_screen (void);
+void ui_hue_mode (enum hue new_hue);
 void ui_environment_mode (enum em new_em);
 void ui_video_mode (enum vm new_vm);
 void ui_flip_screen (int flags, bool correct_mouse);

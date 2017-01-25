@@ -89,6 +89,8 @@ enum hue {
   HUE_BLUE = 4,
 };
 
+#define HUE_ORIGINAL (HUE_BLUE + 1)
+
 struct drawn_rectangle {
   ALLEGRO_BITMAP *bitmap;
   int x, y, w, h;
