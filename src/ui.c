@@ -634,7 +634,7 @@ ui_full_screen (void)
     xasprintf (&text, "FULL SCREEN MODE %s", boolean);
     draw_bottom_text (NULL, text, 0);
     al_free (text);
-    ui_save_setting ("FULL SCREEN", boolean);
+    ui_save_setting ("FULLSCREEN", boolean);
   } else draw_bottom_text (NULL, "NON-DESKTOP MODE IS FULL SCREEN ONLY", 0);
 }
 
