@@ -139,4 +139,6 @@ void ui_next_frame (void);
 void print_game_paused (int priority);
 void ui_version (void);
 
+error_t ui_save_setting (char *key, char *value);
+
 #endif	/* MININIM_UI_H */

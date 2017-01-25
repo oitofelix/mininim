@@ -634,6 +634,7 @@ ui_full_screen (void)
     xasprintf (&text, "FULL SCREEN MODE %s", boolean);
     draw_bottom_text (NULL, text, 0);
     al_free (text);
+    ui_save_setting ("FULL SCREEN", boolean);
   } else draw_bottom_text (NULL, "NON-DESKTOP MODE IS FULL SCREEN ONLY", 0);
 }
 
@@ -660,13 +661,13 @@ ui_video_mode (enum vm new_vm)
   xasprintf (&text, "VIDEO MODE: %s", vm_str);
   draw_bottom_text (NULL, text, 0);
   al_free (text);
+
+  ui_save_setting ("VIDEO MODE", vm_str);
 }
 
 void
 ui_flip_screen (int flags, bool correct_mouse)
 {
-  char *text, *flip;
-
   if (correct_mouse) {
     int w = al_get_display_width (display);
     int h = al_get_display_height (display);
@@ -690,19 +691,23 @@ ui_flip_screen (int flags, bool correct_mouse)
     }
   }
 
+  char *text, *flip_str;
+
   potion_flags = 0;
   screen_flags = flags;
   switch (screen_flags) {
-  case 0: flip = "NONE"; break;
-  case ALLEGRO_FLIP_VERTICAL: flip = "VERTICAL"; break;
-  case ALLEGRO_FLIP_HORIZONTAL: flip = "HORIZONTAL"; break;
+  case 0: flip_str = "NONE"; break;
+  case ALLEGRO_FLIP_VERTICAL: flip_str = "VERTICAL"; break;
+  case ALLEGRO_FLIP_HORIZONTAL: flip_str = "HORIZONTAL"; break;
   case ALLEGRO_FLIP_VERTICAL | ALLEGRO_FLIP_HORIZONTAL:
-    flip = "VERTICAL + HORIZONTAL"; break;
+    flip_str = "VERTICAL-HORIZONTAL"; break;
   default: assert (false); break;
   }
-  xasprintf (&text, "SCREEN FLIP: %s", flip);
+  xasprintf (&text, "SCREEN FLIP: %s", flip_str);
   draw_bottom_text (NULL, text, 1);
   al_free (text);
+
+  ui_save_setting ("DISPLAY FLIP MODE", flip_str);
 }
 
 void
@@ -818,4 +823,45 @@ ui_version (void)
   xasprintf (&text, "MININIM %s", VERSION);
   draw_bottom_text (NULL, text, 0);
   al_free (text);
+}
+
+
+
+
+
+error_t
+ui_save_setting (char *key, char *value)
+{
+  ALLEGRO_CONFIG *config = NULL;
+
+  if (al_filename_exists (config_filename))
+    config = al_load_config_file (config_filename);
+  else {
+    if (! al_make_directory (user_settings_dir))
+      return al_get_errno ();
+    config = al_create_config ();
+  }
+
+  if (! config) return al_get_errno ();
+
+  ALLEGRO_CONFIG_ENTRY *iterator;
+  char const *entry = al_get_first_config_entry (config, NULL, &iterator);
+
+  do {
+    if (! strcasecmp (entry, key)) {
+      al_remove_config_key (config, NULL, entry);
+      entry = al_get_first_config_entry (config, NULL, &iterator);
+    } else entry = al_get_next_config_entry (&iterator);
+  } while (entry);
+
+  al_set_config_value (config, NULL, key, value);
+
+  if (! al_save_config_file (config_filename, config)) {
+    al_destroy_config (config);
+    return al_get_errno ();
+  }
+
+  al_destroy_config (config);
+
+  return 0;
 }

@@ -121,8 +121,9 @@ static bool inhibit_screensaver = true;
 static error_t parser (int key, char *arg, struct argp_state *state);
 static void print_paths (void);
 static void print_display_modes (void);
-static char *env_option_name (const char *option_name);
-static char *config_option_name (const char *option_name);
+static char *command_line2env_option_name (const char *option_name);
+static char *command_line2config_option_name (const char *option_name);
+static char *config2command_line_option_name (const char *option_name);
 static void get_paths (void);
 static error_t get_config_args (size_t *cargc, char ***cargv,
                                 struct argp_option *options,
@@ -276,9 +277,9 @@ key_to_option_name (int key, struct argp_state *state)
     if (options[i].key == key) {
       switch (config_info->type) {
       case CI_CONFIGURATION_FILE:
-        return config_option_name (options[i].name);
+        return command_line2config_option_name (options[i].name);
       case CI_ENVIRONMENT_VARIABLES:
-        return env_option_name (options[i].name);
+        return command_line2env_option_name (options[i].name);
       case CI_COMMAND_LINE:
         xasprintf (&option_name, "%s", options[i].name);
         return option_name;
@@ -1140,7 +1141,7 @@ repl_str_char (char *str, char a, char b)
 }
 
 static char *
-env_option_name (const char *option_name)
+command_line2env_option_name (const char *option_name)
 {
   char *env_opt_name;
   xasprintf (&env_opt_name, "MININIM_%s", option_name);
@@ -1163,7 +1164,7 @@ get_env_args (size_t *eargc, char ***eargv, struct argp_option *options)
          || options[i].doc != NULL
          || options[i].group != 0; i++) {
     if (! options[i].name) continue;
-    char *env_opt_name = env_option_name (options[i].name);
+    char *env_opt_name = command_line2env_option_name (options[i].name);
     char *env_opt_value = getenv (env_opt_name);
     if (env_opt_value) {
       char *option;
@@ -1176,25 +1177,29 @@ get_env_args (size_t *eargc, char ***eargv, struct argp_option *options)
 }
 
 static char *
-config_option_name (const char *option_name)
+command_line2config_option_name (const char *option_name)
 {
-  char *config_opt_name;
-  xasprintf (&config_opt_name, "%s", option_name);
-  tolower_str (config_opt_name);
-  repl_str_char (config_opt_name, '-', ' ');
-  return config_opt_name;
+  char *option;
+  xasprintf (&option, "%s", option_name);
+  toupper_str (option);
+  repl_str_char (option, '-', ' ');
+  return option;
 }
 
-static error_t
-get_config_args (size_t *cargc, char ***cargv, struct argp_option *options,
-                 char *filename)
+static char *
+config2command_line_option_name (const char *option_name)
+{
+  char *option;
+  xasprintf (&option, "%s", option_name);
+  tolower_str (option);
+  repl_str_char (option, ' ', '-');
+  return option;
+}
+
+bool
+is_valid_option (char *option)
 {
   size_t i;
-
-  *cargv = add_to_array (&argv[0], 1, *cargv, cargc, *cargc, sizeof (argv[0]));
-
-  ALLEGRO_CONFIG *config = al_load_config_file (filename);
-  if (! config) return al_get_errno ();
 
   for (i = 0; options[i].name != NULL
          || options[i].key != 0
@@ -1203,16 +1208,39 @@ get_config_args (size_t *cargc, char ***cargv, struct argp_option *options,
          || options[i].doc != NULL
          || options[i].group != 0; i++) {
     if (! options[i].name) continue;
-    char *config_opt_name = config_option_name (options[i].name);
-    const char *config_opt_value = al_get_config_value (config, NULL, config_opt_name);
-    if (config_opt_value) {
-      char *option;
-      xasprintf (&option, "--%s=%s", options[i].name, config_opt_value);
-      *cargv = add_to_array (&option, 1, *cargv, cargc, *cargc, sizeof (option));
-    }
-
-    al_free (config_opt_name);
+    if (! strcmp (options[i].name, option)) return true;
   }
+
+  return false;
+}
+
+static error_t
+get_config_args (size_t *cargc, char ***cargv, struct argp_option *options,
+                 char *filename)
+{
+  *cargv = add_to_array (&argv[0], 1, *cargv, cargc, *cargc, sizeof (argv[0]));
+
+  ALLEGRO_CONFIG *config = al_load_config_file (filename);
+  if (! config) return al_get_errno ();
+
+  ALLEGRO_CONFIG_ENTRY *iterator;
+  char const *entry = al_get_first_config_entry (config, NULL, &iterator);
+
+  do {
+    char *key = config2command_line_option_name (entry);
+    if (! is_valid_option (key)) goto next;
+
+    char const *value = al_get_config_value (config, NULL, entry);
+    char *option;
+    xasprintf (&option, "--%s=%s", key, value);
+    *cargv = add_to_array (&option, 1, *cargv, cargc, *cargc, sizeof (option));
+
+  next:
+    al_free (key);
+    entry = al_get_next_config_entry (&iterator);
+  } while (entry);
+
+  al_destroy_config (config);
 
   return 0;
 }
@@ -1476,7 +1504,7 @@ get_paths (void)
   al_destroy_path (exename_path);
 
   /* get config file name */
-  xasprintf (&config_filename, "%smininim.ini", user_settings_dir);
+  xasprintf (&config_filename, "%smininim.mcf", user_settings_dir);
 
   /* get legacy LEVELS.DAT compatibility path */
   xasprintf (&levels_dat_compat_filename, "LEVELS.DAT");
