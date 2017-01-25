@@ -110,13 +110,6 @@ init_video (void)
     mr.fit_h = 2;
   }
 
-  if (MACOSX_PORT) {
-    /* workaround to make Mac OS X render the title screen cutscene
-       properly */
-    acknowledge_resize ();
-    acknowledge_resize ();
-  }
-
   cutscene_screen = create_bitmap (CUTSCENE_WIDTH, CUTSCENE_HEIGHT);
   effect_buffer = create_bitmap (CUTSCENE_WIDTH, CUTSCENE_HEIGHT);
   black_screen = create_bitmap (CUTSCENE_WIDTH, CUTSCENE_HEIGHT);
@@ -137,6 +130,10 @@ init_video (void)
   if (! al_init_primitives_addon ())
     error (-1, 0, "%s (void): failed to initialize primitives addon",
            __func__);
+
+  /* workaround to make Mac OS X render the title screen cutscene
+     properly */
+  if (MACOSX_PORT) acknowledge_resize ();
 }
 
 void
