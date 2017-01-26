@@ -29,8 +29,7 @@ static size_t audio_instance_nmemb;
 
 static ALLEGRO_AUDIO_STREAM *load_audio_stream (char *filename);
 
-bool audio_enabled = true;
-float volume = 1.0;
+float audio_volume = 1.0;
 
 void
 init_audio (void)
@@ -41,6 +40,8 @@ init_audio (void)
     error (0, 0, "%s (void): cannot initialize audio codecs", __func__);
   if (! al_reserve_samples (RESERVED_AUDIO_SAMPLES))
     error (0, 0, "%s (void): cannot reserve audio samples", __func__);
+
+  set_audio_volume (audio_volume);
 }
 
 void
@@ -50,18 +51,11 @@ finalize_audio (void)
 }
 
 void
-enable_audio (bool b)
+set_audio_volume (float volume)
 {
   ALLEGRO_MIXER *mixer = get_default_mixer ();
-
-  if (b) {
-    audio_enabled = true;
-    set_mixer_gain (mixer, volume);
-  }
-  else {
-    audio_enabled = false;
-    set_mixer_gain (mixer, 0);
-  }
+  set_mixer_gain (mixer, volume);
+  audio_volume = volume;
 }
 
 void

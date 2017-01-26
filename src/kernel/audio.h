@@ -24,7 +24,7 @@
 /* functions */
 void init_audio (void);
 void finalize_audio (void);
-void enable_audio (bool b);
+void set_audio_volume (float volume);
 void set_mixer_gain (ALLEGRO_MIXER *mixer, float new_gain);
 ALLEGRO_MIXER *get_default_mixer (void);
 struct audio_source *load_audio (struct audio_source *as,
@@ -54,7 +54,6 @@ bool is_instance_of_audio_source (union audio_instance_data data,
                                   struct audio_source *as);
 
 /* variables */
-extern bool audio_enabled;
-extern float volume;
+extern float audio_volume;
 
 #endif	/* MININIM_AUDIO_H */

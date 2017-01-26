@@ -58,7 +58,8 @@ ALLEGRO_BITMAP *small_logo_icon,
   *hgc_icon, *vertical_icon, *horizontal_icon,
   *keyboard_icon, *joystick_icon, *cancel_icon, *clock_icon,
   *edit_icon, *joystick2_icon, *undo_icon, *redo_icon,
-  *screensaver_icon, *joystick3_icon;
+  *screensaver_icon, *joystick3_icon, *volume_off_icon,
+  *volume_low_icon, *volume_medium_icon, *volume_high_icon;
 
 
 
@@ -131,6 +132,10 @@ load_icons (void)
   redo_icon = load_icon (REDO_ICON);
   screensaver_icon = load_icon (SCREENSAVER_ICON);
   joystick3_icon = load_icon (JOYSTICK3_ICON);
+  volume_off_icon = load_icon (VOLUME_OFF_ICON);
+  volume_low_icon = load_icon (VOLUME_LOW_ICON);
+  volume_medium_icon = load_icon (VOLUME_MEDIUM_ICON);
+  volume_high_icon = load_icon (VOLUME_HIGH_ICON);
 }
 
 void
@@ -179,6 +184,10 @@ unload_icons (void)
   destroy_bitmap (redo_icon);
   destroy_bitmap (screensaver_icon);
   destroy_bitmap (joystick3_icon);
+  destroy_bitmap (volume_off_icon);
+  destroy_bitmap (volume_low_icon);
+  destroy_bitmap (volume_medium_icon);
+  destroy_bitmap (volume_high_icon);
 }
 
 
@@ -393,26 +402,48 @@ create_main_menu (void)
 #endif
 }
 
+ALLEGRO_BITMAP *
+volume_icon (float volume)
+{
+  if (volume == VOLUME_RANGE_MIN) return micon (volume_off_icon);
+  else if (volume < VOLUME_RANGE_LOW) return micon (volume_low_icon);
+  else if (volume < VOLUME_RANGE_MEDIUM) return micon (volume_medium_icon);
+  else if (volume <= VOLUME_RANGE_MAX) return micon (volume_high_icon);
+  else assert (false);
+  return NULL;
+}
+
 void
 game_menu (void)
 {
 #if MENU_FEATURE
   start_menu (main_menu, GAME_MID);
+
   menu_sub ("&Load", LOAD_MID, true, micon (open_icon));
+
   menu_sub ("&Save", SAVE_MID, true, micon (save_icon));
+
   menu_sep ();
+
   menu_citem ("&Mirror", MIRROR_MODE_MID, true,
               in_mirror_mode (), micon (horizontal_icon));
+
+  menu_sub ("&Volume", VOLUME_MID, true, volume_icon (audio_volume));
+
   menu_sep ();
+
   menu_ditem (cutscene || title_demo,
               "Sta&rt (Enter)", "&Restart (Ctrl+R)",
               START_GAME_MID, RESTART_GAME_MID, true,
               micon (right_icon), micon (reload_icon));
+
   menu_sitem ("&Quit (Ctrl+Q)", QUIT_GAME_MID, true, micon (quit_icon));
+
   end_menu ();
 
   load_menu ();
   save_menu ();
+  volume_menu ();
 #endif
 }
 
@@ -421,9 +452,13 @@ load_menu (void)
 {
 #if MENU_FEATURE
   start_menu (main_menu, LOAD_MID);
+
   menu_sitem ("&Game... (Ctrl+L)", LOAD_GAME_MID, true, NULL);
+
   menu_sitem ("&Configuration... (Ctrl+L)", LOAD_CONFIG_MID, true, NULL);
+
   menu_sitem ("&Level file...", LOAD_LEVEL_FILE_MID, false, NULL);
+
   end_menu ();
 #endif
 }
@@ -433,9 +468,42 @@ save_menu (void)
 {
 #if MENU_FEATURE
   start_menu (main_menu, SAVE_MID);
+
   menu_sitem ("&Game... (Ctrl+G)", SAVE_GAME_MID, true, NULL);
+
   menu_sitem ("&Configuration...", SAVE_CONFIG_MID, false, NULL);
+
   menu_sitem ("&Level file...", SAVE_LEVEL_FILE_MID, false, NULL);
+
+  end_menu ();
+#endif
+}
+
+void
+volume_menu (void)
+{
+#if MENU_FEATURE
+  start_menu (main_menu, VOLUME_MID);
+
+  menu_citem ("&Off", VOLUME_OFF_MID, true,
+              audio_volume == VOLUME_RANGE_MIN,
+              micon (volume_off_icon));
+
+  menu_citem ("&Low", VOLUME_LOW_MID, true,
+              audio_volume > VOLUME_RANGE_MIN
+              && audio_volume < VOLUME_RANGE_LOW,
+              micon (volume_low_icon));
+
+  menu_citem ("&Medium", VOLUME_MEDIUM_MID, true,
+              audio_volume >= VOLUME_RANGE_LOW
+              && audio_volume < VOLUME_RANGE_MEDIUM,
+              micon (volume_medium_icon));
+
+  menu_citem ("&High", VOLUME_HIGH_MID, true,
+              audio_volume >= VOLUME_RANGE_MEDIUM
+              && audio_volume <= VOLUME_RANGE_MAX,
+              micon (volume_high_icon));
+
   end_menu ();
 #endif
 }
@@ -832,6 +900,18 @@ menu_mid (intptr_t mid)
   case MIRROR_MODE_MID:
     ui_mirror_mode (! in_mirror_mode ());
     break;
+  case VOLUME_OFF_MID:
+    ui_audio_volume (VOLUME_OFF);
+    break;
+  case VOLUME_LOW_MID:
+    ui_audio_volume (VOLUME_LOW);
+    break;
+  case VOLUME_MEDIUM_MID:
+    ui_audio_volume (VOLUME_MEDIUM);
+    break;
+  case VOLUME_HIGH_MID:
+    ui_audio_volume (VOLUME_HIGH);
+    break;
   case RESTART_GAME_MID:
     ui_restart_game ();
     break;
@@ -1035,12 +1115,10 @@ anim_key_bindings (void)
 
   /* CTRL+S: enable/disable sound */
   else if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_S)) {
-    char *text;
-    audio_enabled = ! audio_enabled;
-    enable_audio (audio_enabled);
-    xasprintf (&text, "SOUND %s", audio_enabled ? "ON" : "OFF");
-    draw_bottom_text (NULL, text, 0);
-    al_free (text);
+    if (audio_volume == VOLUME_RANGE_MIN) ui_audio_volume (VOLUME_LOW);
+    else if (audio_volume < VOLUME_RANGE_LOW) ui_audio_volume (VOLUME_MEDIUM);
+    else if (audio_volume < VOLUME_RANGE_MEDIUM) ui_audio_volume (VOLUME_HIGH);
+    else if (audio_volume <= VOLUME_RANGE_MAX) ui_audio_volume (VOLUME_OFF);
   }
 
   /* F: enable/disable fullscreen mode */
@@ -1160,6 +1238,31 @@ ui_load_config (void)
   load_config_dialog_thread =
     create_thread (dialog_thread, &load_config_dialog);
   al_start_thread (load_config_dialog_thread);
+}
+
+void
+ui_audio_volume (float volume)
+{
+  char *key = "SOUND GAIN";
+  char *value;
+  xasprintf (&value, "%.1f", volume);
+
+  set_audio_volume (volume);
+
+  char *text;
+  char *status;
+  if (volume == VOLUME_RANGE_MIN) status = "OFF";
+  else if (volume < VOLUME_RANGE_LOW) status = "LOW";
+  else if (volume < VOLUME_RANGE_MEDIUM) status = "MEDIUM";
+  else if (volume <= VOLUME_RANGE_MAX) status = "HIGH";
+
+  xasprintf (&text, "SOUND %s", status);
+  draw_bottom_text (NULL, text, 0);
+  al_free (text);
+
+  ui_save_setting (key, value);
+  al_free (value);
+  game_menu ();
 }
 
 void

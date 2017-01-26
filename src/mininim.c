@@ -131,7 +131,6 @@ bool mouse_scream;
 struct skill skill = {.counter_attack_prob = INITIAL_KCA,
                       .counter_defense_prob = INITIAL_KCD};
 static bool replay_info;
-static bool sound_disabled_cmd;
 static bool skip_title;
 static bool level_module_given;
 
@@ -246,7 +245,7 @@ static struct argp_option options[] = {
 
   /* Others */
   {NULL, 0, NULL, 0, "Others", 0},
-  {"sound", SOUND_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable sound.  The default is TRUE.  This can be changed in-game using the CTRL+S key binding.", 0},
+  {"sound-gain", SOUND_GAIN_OPTION, "F", 0, "Set sound volume gain to F.  This number is multiplied by the volume of sound effects in order to scale they down proportionally in case the default is too loud for the user.  The default is 1.0.  Valid floating values range from 0.0 (disables sound) to 1.0 (default volume).  This can be changed in-game using the CTRL+S key binding.", 0},
   {"skip-title", SKIP_TITLE_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Skip title screen.  The default is FALSE.", 0},
   {"inhibit-screensaver", INHIBIT_SCREENSAVER_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Prevent the system screensaver from starting up.  The default is TRUE.", 0},
   {"random-seed", RANDOM_SEED_OPTION, "N", 0, "Set initial random seed to N.  If N is zero, the initial random seed is derived from current time.  This is the default.  Valid integers range from 0 to INT_MAX.  This option is potentially useful for debugging purposes.", 0},
@@ -689,8 +688,9 @@ parser (int key, char *arg, struct argp_state *state)
   struct int_range joystick_axis_range = {0, INT_MAX};
   struct int_range joystick_button_range = {0, INT_MAX};
   struct int_range display_mode_range = {-1, al_get_num_display_modes () - 1};
-  struct float_range gamepad_rumble_intensity_range = {0.0,1.0};
+  struct float_range gamepad_rumble_gain_range = {0.0,1.0};
   struct int_range random_seed_range = {0, INT_MAX};
+  struct float_range sound_gain_range = {0.0,1.0};
 
   switch (key) {
   case IGNORE_MAIN_CONFIG_OPTION:
@@ -782,8 +782,11 @@ Levels have been converted using module %s into native format at\n\
     case 5: gm = SHADOW_GM; break;
     }
     break;
-  case SOUND_OPTION:
-    sound_disabled_cmd = ! optval_to_bool (arg);
+  case SOUND_GAIN_OPTION:
+    e = optval_to_float (&float_val, key, arg, state,
+                         &sound_gain_range, 0);
+    if (e) return e;
+    audio_volume = float_val;
     break;
   case DISPLAY_FLIP_MODE_OPTION:
     e = optval_to_enum (&i, key, arg, state, display_flip_mode_enum, 0);
@@ -840,7 +843,7 @@ Levels have been converted using module %s into native format at\n\
     break;
   case GAMEPAD_RUMBLE_GAIN_OPTION:
     e = optval_to_float (&float_val, key, arg, state,
-                         &gamepad_rumble_intensity_range, 0);
+                         &gamepad_rumble_gain_range, 0);
     if (e) return e;
     gamepad_rumble_gain = float_val;
     break;
@@ -1342,7 +1345,6 @@ main (int _argc, char **_argv)
   init_dialog ();
   init_video ();
   init_audio ();
-  if (sound_disabled_cmd) enable_audio (false);
   init_gamepad ();
   init_mouse ();
 

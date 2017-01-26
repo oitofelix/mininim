@@ -63,6 +63,10 @@
 #define REDO_ICON "data/icons/redo.png"
 #define SCREENSAVER_ICON "data/icons/screensaver.png"
 #define JOYSTICK3_ICON "data/icons/joystick3.png"
+#define VOLUME_OFF_ICON "data/icons/volume-off.png"
+#define VOLUME_LOW_ICON "data/icons/volume-low.png"
+#define VOLUME_MEDIUM_ICON "data/icons/volume-medium.png"
+#define VOLUME_HIGH_ICON "data/icons/volume-high.png"
 
 enum main_menu {
   BASE_MID = 0,
@@ -78,6 +82,11 @@ enum main_menu {
   SAVE_CONFIG_MID,
   SAVE_LEVEL_FILE_MID,
   MIRROR_MODE_MID,
+  VOLUME_MID,
+  VOLUME_OFF_MID,
+  VOLUME_LOW_MID,
+  VOLUME_MEDIUM_MID,
+  VOLUME_HIGH_MID,
   RESTART_GAME_MID,
   START_GAME_MID,
   QUIT_GAME_MID,
@@ -146,9 +155,11 @@ void unload_icons (void);
 
 void create_main_menu (void);
 
+ALLEGRO_BITMAP *volume_icon (float volume);
 void game_menu (void);
 void load_menu (void);
 void save_menu (void);
+void volume_menu (void);
 
 void view_menu (void);
 ALLEGRO_BITMAP *hue_icon (enum hue hue);
@@ -183,6 +194,7 @@ void ui_editor (void);
 
 void ui_load_game (void);
 void ui_load_config (void);
+void ui_audio_volume (float volume);
 void ui_restart_game (void);
 void ui_start_game (void);
 void ui_quit_game (void);

@@ -34,6 +34,7 @@
 #include <math.h>
 #include <time.h>
 #include <glob.h>
+#include <locale.h>
 #include "error.h"
 #include "argp.h"
 #include "progname.h"

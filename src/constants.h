@@ -28,6 +28,16 @@
 #define OITOFELIX_FACE_BW "data/icons/oitofelix-face-bw.png"
 #define JOYSTICK_BIG_ICON "data/icons/joystick-big.png"
 
+#define VOLUME_RANGE_MIN 0.0
+#define VOLUME_RANGE_LOW 0.3
+#define VOLUME_RANGE_MEDIUM 0.6
+#define VOLUME_RANGE_MAX 1.0
+
+#define VOLUME_OFF 0.0
+#define VOLUME_LOW 0.2
+#define VOLUME_MEDIUM 0.5
+#define VOLUME_HIGH 1.0
+
 #define CLIPPING_RECTANGLE_STACK_NMEMB_MAX 10
 #define DRAWN_RECTANGLE_STACK_NMEMB_MAX 10
 
