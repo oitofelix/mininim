@@ -78,6 +78,7 @@ micon (ALLEGRO_BITMAP *bitmap)
 ALLEGRO_BITMAP *
 micon_flags (ALLEGRO_BITMAP *bitmap, int flags)
 {
+  if (! bitmap) return NULL;
   return clone_scaled_memory_bitmap
     (bitmap, al_get_bitmap_width (bitmap),
      al_get_bitmap_height (bitmap), flags);

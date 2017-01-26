@@ -90,8 +90,6 @@ init_video (void)
 
   set_target_backbuffer (display);
 
-  load_icons ();
-
   al_set_window_title (display, WINDOW_TITLE);
   logo_icon = load_bitmap (LOGO_ICON);
   al_set_display_icon (display, logo_icon);
@@ -230,6 +228,8 @@ load_memory_bitmap (char *filename)
 ALLEGRO_BITMAP *
 clone_memory_bitmap (ALLEGRO_BITMAP *bitmap)
 {
+  if (! bitmap) return NULL;
+
   int flags = al_get_new_bitmap_flags ();
   al_set_new_bitmap_flags (memory_bitmap_flags ());
 

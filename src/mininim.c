@@ -84,7 +84,9 @@ struct message_box about_dialog = {
   .text =
   "Copyright (C) " PACKAGE_COPYRIGHT_HOLDER " <oitofelix@gnu.org>\n\n"
 
-  "MININIM is free software under GPLv3+.  You are free to change and redistribute it.  There is NO WARRANTY, to the extent permitted by law.\n\n"
+  "MININIM is free software under GPLv3+.\n"
+  "You are free to change and redistribute it.\n"
+  "There is NO WARRANTY, to the extent permitted by law.\n\n"
 
   "Please, support MININIM development!\n"
   "http://oitofelix.github.io/funding.html",
@@ -1362,6 +1364,7 @@ main (int _argc, char **_argv)
   load_callback = process_display_events;
   show ();
 
+  load_icons ();
   load_oitofelix_face ();
   load_audio_data ();
   load_level ();
