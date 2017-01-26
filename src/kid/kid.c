@@ -110,6 +110,15 @@ unload_kid (void)
   destroy_bitmap (v_kid_splash);
 }
 
+struct pos *
+get_kid_start_pos (struct pos *p)
+{
+  if (is_valid_pos (&start_pos) && replay_mode == NO_REPLAY)
+    *p = start_pos;
+  else *p = global_level.start_pos;
+  return p;
+}
+
 struct anim *
 create_kid (struct anim *k0, struct anim *k1, struct pos *p, enum dir dir)
 {

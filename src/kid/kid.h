@@ -29,6 +29,7 @@
 /* functions */
 void load_kid (void);
 void unload_kid (void);
+struct pos *get_kid_start_pos (struct pos *p);
 struct anim *create_kid (struct anim *k0, struct anim *k1,
                          struct pos *p, enum dir dir);
 void destroy_kid (struct anim *k);

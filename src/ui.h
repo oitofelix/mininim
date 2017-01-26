@@ -67,6 +67,12 @@
 #define VOLUME_LOW_ICON "data/icons/volume-low.png"
 #define VOLUME_MEDIUM_ICON "data/icons/volume-medium.png"
 #define VOLUME_HIGH_ICON "data/icons/volume-high.png"
+#define GAME_ICON "data/icons/game.png"
+#define SETTINGS_ICON "data/icons/settings.png"
+#define ZOOM_NONE_ICON "data/icons/zoom-none.png"
+#define ZOOM_STRETCH_ICON "data/icons/zoom-stretch.png"
+#define ZOOM_RATIO_ICON "data/icons/zoom-ratio.png"
+#define VERTICAL_HORIZONTAL_ICON "data/icons/vertical-horizontal.png"
 
 enum main_menu {
   BASE_MID = 0,
@@ -92,6 +98,10 @@ enum main_menu {
   QUIT_GAME_MID,
 
   VIEW_MID,
+  ZOOM_FIT_MID,
+  ZOOM_NONE_MID,
+  ZOOM_STRETCH_MID,
+  ZOOM_RATIO_MID,
   HUE_MODE_MID,
   HUE_ORIGINAL_MID,
   HUE_NONE_MID,
@@ -162,17 +172,21 @@ void save_menu (void);
 void volume_menu (void);
 
 void view_menu (void);
+ALLEGRO_BITMAP *zoom_fit_icon (enum mr_fit_mode fit);
+void zoom_fit_menu (void);
 ALLEGRO_BITMAP *hue_icon (enum hue hue);
 void hue_mode_menu (void);
 ALLEGRO_BITMAP *em_icon (enum em em);
 void environment_mode_menu (void);
 ALLEGRO_BITMAP *vm_icon (enum vm vm);
 void video_mode_menu (void);
+ALLEGRO_BITMAP *flip_screen_icon (int flags);
 void screen_flip_menu (void);
 
 void gamepad_menu (void);
 ALLEGRO_BITMAP *gamepad_device_icon (enum gpm gpm);
 void gamepad_device_menu (void);
+ALLEGRO_BITMAP *flip_gamepad_icon (bool v, bool h);
 void flip_gamepad_menu (void);
 
 void replay_menu (void);
@@ -189,17 +203,20 @@ void enable_menu (bool enable);
 
 void menu_mid (intptr_t mid);
 void anim_key_bindings (void);
+void level_key_bindings (void);
 
 void ui_editor (void);
 
 void ui_load_game (void);
 void ui_load_config (void);
+void ui_save_game (void);
 void ui_audio_volume (float volume);
 void ui_restart_game (void);
 void ui_start_game (void);
 void ui_quit_game (void);
 
 void ui_full_screen (void);
+void ui_zoom_fit (enum mr_fit_mode fit);
 void ui_hue_mode (enum hue new_hue);
 void ui_environment_mode (enum em new_em);
 void ui_video_mode (enum vm new_vm);

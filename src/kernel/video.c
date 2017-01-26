@@ -109,6 +109,7 @@ init_video (void)
     mr.fit_w = 2;
     mr.fit_h = 2;
   }
+  set_multi_room (mr.fit_w, mr.fit_h);
 
   cutscene_screen = create_bitmap (CUTSCENE_WIDTH, CUTSCENE_HEIGHT);
   effect_buffer = create_bitmap (CUTSCENE_WIDTH, CUTSCENE_HEIGHT);

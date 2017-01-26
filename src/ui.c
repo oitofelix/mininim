@@ -59,7 +59,9 @@ ALLEGRO_BITMAP *small_logo_icon,
   *keyboard_icon, *joystick_icon, *cancel_icon, *clock_icon,
   *edit_icon, *joystick2_icon, *undo_icon, *redo_icon,
   *screensaver_icon, *joystick3_icon, *volume_off_icon,
-  *volume_low_icon, *volume_medium_icon, *volume_high_icon;
+  *volume_low_icon, *volume_medium_icon, *volume_high_icon,
+  *game_icon, *settings_icon, *zoom_none_icon, *zoom_stretch_icon,
+  *zoom_ratio_icon, *vertical_horizontal_icon;
 
 
 
@@ -136,6 +138,12 @@ load_icons (void)
   volume_low_icon = load_icon (VOLUME_LOW_ICON);
   volume_medium_icon = load_icon (VOLUME_MEDIUM_ICON);
   volume_high_icon = load_icon (VOLUME_HIGH_ICON);
+  game_icon = load_icon (GAME_ICON);
+  settings_icon = load_icon (SETTINGS_ICON);
+  zoom_none_icon = load_icon (ZOOM_NONE_ICON);
+  zoom_stretch_icon = load_icon (ZOOM_STRETCH_ICON);
+  zoom_ratio_icon = load_icon (ZOOM_RATIO_ICON);
+  vertical_horizontal_icon = load_icon (VERTICAL_HORIZONTAL_ICON);
 }
 
 void
@@ -188,6 +196,12 @@ unload_icons (void)
   destroy_bitmap (volume_low_icon);
   destroy_bitmap (volume_medium_icon);
   destroy_bitmap (volume_high_icon);
+  destroy_bitmap (game_icon);
+  destroy_bitmap (settings_icon);
+  destroy_bitmap (zoom_none_icon);
+  destroy_bitmap (zoom_stretch_icon);
+  destroy_bitmap (zoom_ratio_icon);
+  destroy_bitmap (vertical_horizontal_icon);
 }
 
 
@@ -428,7 +442,8 @@ game_menu (void)
   menu_citem ("&Mirror", MIRROR_MODE_MID, true,
               in_mirror_mode (), micon (horizontal_icon));
 
-  menu_sub ("&Volume", VOLUME_MID, true, volume_icon (audio_volume));
+  menu_sub ("&Volume (Ctrl+S)", VOLUME_MID, true,
+            volume_icon (audio_volume));
 
   menu_sep ();
 
@@ -453,9 +468,10 @@ load_menu (void)
 #if MENU_FEATURE
   start_menu (main_menu, LOAD_MID);
 
-  menu_sitem ("&Game... (Ctrl+L)", LOAD_GAME_MID, true, NULL);
+  menu_sitem ("&Game... (Ctrl+L)", LOAD_GAME_MID, true, micon (game_icon));
 
-  menu_sitem ("&Configuration... (Ctrl+L)", LOAD_CONFIG_MID, true, NULL);
+  menu_sitem ("&Configuration... (Ctrl+L)", LOAD_CONFIG_MID, true,
+              micon (settings_icon));
 
   menu_sitem ("&Level file...", LOAD_LEVEL_FILE_MID, false, NULL);
 
@@ -469,9 +485,10 @@ save_menu (void)
 #if MENU_FEATURE
   start_menu (main_menu, SAVE_MID);
 
-  menu_sitem ("&Game... (Ctrl+G)", SAVE_GAME_MID, true, NULL);
+  menu_sitem ("&Game... (Ctrl+G)", SAVE_GAME_MID, true, micon (game_icon));
 
-  menu_sitem ("&Configuration...", SAVE_CONFIG_MID, false, NULL);
+  menu_sitem ("&Configuration...", SAVE_CONFIG_MID, false,
+              micon (settings_icon));
 
   menu_sitem ("&Level file...", SAVE_LEVEL_FILE_MID, false, NULL);
 
@@ -518,6 +535,9 @@ view_menu (void)
               FULL_SCREEN_MID, FULL_SCREEN_MID, true,
               micon (windows_icon), micon (full_screen_icon));
 
+  menu_sub ("Zoom &Fit (M)", ZOOM_FIT_MID, ! cutscene && ! title_demo,
+            zoom_fit_icon (mr.fit_mode));
+
   menu_sub ("&Hue (F9)", HUE_MODE_MID, true, hue_icon (hue));
 
   menu_sub ("&Environment (F11)", ENVIRONMENT_MODE_MID, true, em_icon (em));
@@ -525,7 +545,7 @@ view_menu (void)
   menu_sub ("&Video (F12)", VIDEO_MODE_MID, true, vm_icon (vm));
 
   menu_sub ("&Flip (Shift+I)", FLIP_SCREEN_MID, true,
-            micon_flags (screen_icon, screen_flags));
+            flip_screen_icon (screen_flags));
 
   menu_citem ("Inhibit screensaver", INHIBIT_SCREENSAVER_MID, true,
               inhibit_screensaver, micon (screensaver_icon));
@@ -535,10 +555,41 @@ view_menu (void)
 
   end_menu ();
 
+  zoom_fit_menu ();
   hue_mode_menu ();
   environment_mode_menu ();
   video_mode_menu ();
   screen_flip_menu ();
+#endif
+}
+
+ALLEGRO_BITMAP *
+zoom_fit_icon (enum mr_fit_mode fit)
+{
+  switch (fit) {
+  case MR_FIT_NONE: return micon (zoom_none_icon); break;
+  case MR_FIT_STRETCH: return micon (zoom_stretch_icon); break;
+  case MR_FIT_RATIO: return micon (zoom_ratio_icon); break;
+  default: assert (false); return NULL; break;
+  }
+}
+
+void
+zoom_fit_menu (void)
+{
+#if MENU_FEATURE
+  start_menu (main_menu, ZOOM_FIT_MID);
+
+  menu_citem ("&None", ZOOM_NONE_MID, true,
+              mr.fit_mode == MR_FIT_NONE, micon (zoom_none_icon));
+
+  menu_citem ("&Stretch", ZOOM_STRETCH_MID, true,
+              mr.fit_mode == MR_FIT_STRETCH, micon (zoom_stretch_icon));
+
+  menu_citem ("&Ratio", ZOOM_RATIO_MID, true,
+              mr.fit_mode == MR_FIT_RATIO, micon (zoom_ratio_icon));
+
+  end_menu ();
 #endif
 }
 
@@ -641,6 +692,19 @@ video_mode_menu (void)
 #endif
 }
 
+ALLEGRO_BITMAP *
+flip_screen_icon (int flags)
+{
+  switch (flags) {
+  case 0: return micon (screen_icon);
+  case ALLEGRO_FLIP_VERTICAL: return micon (vertical_icon);
+  case ALLEGRO_FLIP_HORIZONTAL: return micon (horizontal_icon);
+  case ALLEGRO_FLIP_VERTICAL | ALLEGRO_FLIP_HORIZONTAL:
+    return micon (vertical_horizontal_icon);
+  default: assert (false); return NULL;
+  }
+}
+
 void
 screen_flip_menu (void)
 {
@@ -671,8 +735,8 @@ gamepad_menu (void)
               gpm == JOYSTICK, micon (clock_icon));
 
   menu_sub ("&Flip (Shift+K)", FLIP_GAMEPAD_MID, true,
-            micon_flags (joystick3_icon, bool2bitmap_flags
-                         (flip_gamepad_vertical, flip_gamepad_horizontal)));
+            flip_gamepad_icon (flip_gamepad_vertical,
+                               flip_gamepad_horizontal));
 
   end_menu ();
 
@@ -705,6 +769,17 @@ gamepad_device_menu (void)
 
   end_menu ();
 #endif
+}
+
+ALLEGRO_BITMAP *
+flip_gamepad_icon (bool v, bool h)
+{
+  if (! v && ! h) return micon (joystick3_icon);
+  else if (v && ! h) return micon (vertical_icon);
+  else if (! v && h) return micon (horizontal_icon);
+  else if (v && h) return micon (vertical_horizontal_icon);
+  else assert (false);
+  return NULL;
 }
 
 void
@@ -897,6 +972,9 @@ menu_mid (intptr_t mid)
   case LOAD_CONFIG_MID:
     ui_load_config ();
     break;
+  case SAVE_GAME_MID:
+    ui_save_game ();
+    break;
   case MIRROR_MODE_MID:
     ui_mirror_mode (! in_mirror_mode ());
     break;
@@ -926,6 +1004,15 @@ menu_mid (intptr_t mid)
     /* VIEW */
   case FULL_SCREEN_MID:
     ui_full_screen ();
+    break;
+  case ZOOM_NONE_MID:
+    ui_zoom_fit (MR_FIT_NONE);
+    break;
+  case ZOOM_STRETCH_MID:
+    ui_zoom_fit (MR_FIT_STRETCH);
+    break;
+  case ZOOM_RATIO_MID:
+    ui_zoom_fit (MR_FIT_RATIO);
     break;
   case HUE_ORIGINAL_MID:
     ui_hue_mode (HUE_ORIGINAL);
@@ -1059,7 +1146,6 @@ anim_key_bindings (void)
   /****************/
   /* KEY BINDINGS */
   /****************/
-
 
   /* CTRL+L: load game */
   if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_L)
@@ -1203,6 +1289,423 @@ anim_key_bindings (void)
 
 
 void
+level_key_bindings (void)
+{
+  if (title_demo) return;
+
+  struct anim *k = get_anim_by_id (current_kid_id);
+
+  char *text = NULL;
+
+  /* CTRL+G: save game */
+  if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_G)
+      && ! save_game_dialog_thread)
+    ui_save_game ();
+
+  /* CTRL+Z: undo */
+  else if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_Z))
+    ui_undo_pass (&undo, -1, NULL);
+
+  /* CTRL+Y: redo */
+  else if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_Y))
+    ui_undo_pass (&undo, +1, NULL);
+
+  /* M: change multi-room fit mode */
+  else if (! active_menu &&
+           was_key_pressed (0, ALLEGRO_KEY_M))
+    switch (mr.fit_mode) {
+    case MR_FIT_NONE: ui_zoom_fit (MR_FIT_STRETCH); break;
+    case MR_FIT_STRETCH: ui_zoom_fit (MR_FIT_RATIO); break;
+    case MR_FIT_RATIO: ui_zoom_fit (MR_FIT_NONE); break;
+    default: assert (false); break;
+    }
+
+  /* [: decrease multi-room resolution */
+  else if (was_key_pressed (0, ALLEGRO_KEY_OPENBRACE)
+           && ! cutscene)
+    ui_set_multi_room (-1, -1);
+
+  /* ]: increase multi-room resolution */
+  else if (was_key_pressed (0, ALLEGRO_KEY_CLOSEBRACE)
+           && ! cutscene)
+    ui_set_multi_room (+1, +1);
+
+  /* CTRL+[: decrease multi-room width resolution */
+  else if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_OPENBRACE)
+           && ! cutscene)
+    ui_set_multi_room (-1, +0);
+
+  /* CTRL+]: increase multi-room width resolution */
+  else if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_CLOSEBRACE)
+           && ! cutscene)
+    ui_set_multi_room (+1, +0);
+
+  /* ALT+[: decrease multi-room height resolution */
+  else if (was_key_pressed (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_OPENBRACE)
+           && ! cutscene)
+    ui_set_multi_room (+0, -1);
+
+  /* ALT+]: increase multi-room height resolution */
+  else if (was_key_pressed (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_CLOSEBRACE)
+           && ! cutscene)
+    ui_set_multi_room (+0, +1);
+
+  /* H: select room at left (J if flipped horizontally) */
+  else if (! active_menu
+           && ((! flip_gamepad_horizontal
+                && was_key_pressed (0, ALLEGRO_KEY_H))
+               || (flip_gamepad_horizontal
+                   && was_key_pressed (0, ALLEGRO_KEY_J))))
+    mr_select_trans (LEFT);
+
+  /* J: select room at right (H if flipped horizontally) */
+  else if (! active_menu
+           && ((! flip_gamepad_horizontal
+                && was_key_pressed (0, ALLEGRO_KEY_J))
+               || (flip_gamepad_horizontal
+                   && was_key_pressed (0, ALLEGRO_KEY_H))))
+    mr_select_trans (RIGHT);
+
+  /* U: select room above (N if flipped vertically) */
+  else if (! active_menu
+           && ((! flip_gamepad_vertical
+                && was_key_pressed (0, ALLEGRO_KEY_U))
+               || (flip_gamepad_vertical
+                   && was_key_pressed (0, ALLEGRO_KEY_N))))
+    mr_select_trans (ABOVE);
+
+  /* N: select room below (U if flipped vertically) */
+  else if (! active_menu
+           && ((! flip_gamepad_vertical
+                && was_key_pressed (0, ALLEGRO_KEY_N))
+               || (flip_gamepad_vertical
+                   && was_key_pressed (0, ALLEGRO_KEY_U))))
+    mr_select_trans (BELOW);
+
+  /* SHIFT+H: multi-room view to left (J if flipped horizontally) */
+  else if (! active_menu
+           && ((! flip_gamepad_horizontal
+                && was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_H))
+               || (flip_gamepad_horizontal
+                   && was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_J))))
+    mr_view_trans (LEFT);
+
+  /* SHIFT+J: multi-room view to right (H if flipped horizontally) */
+  else if (! active_menu
+           && ((! flip_gamepad_horizontal
+                && was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_J))
+               || (flip_gamepad_horizontal
+                   && was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_H))))
+    mr_view_trans (RIGHT);
+
+  /* SHIFT+U: multi-room view above (N if flipped vertically) */
+  else if (! active_menu
+           && ((! flip_gamepad_vertical
+                && was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_U))
+               || (flip_gamepad_vertical
+                   && was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_N))))
+    mr_view_trans (ABOVE);
+
+  /* SHIFT+N: multi-room view below (U if flipped vertically) */
+  else if (! active_menu
+           && ((! flip_gamepad_vertical
+                && was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_N))
+               || (flip_gamepad_vertical
+                   && was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_U))))
+    mr_view_trans (BELOW);
+
+  /* ALT+H: multi-room page view to left (J if flipped horizontally) */
+  else if (! active_menu
+           && ((! flip_gamepad_horizontal
+                && was_key_pressed (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_H))
+               || (flip_gamepad_horizontal
+                   && was_key_pressed (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_J))))
+    mr_view_page_trans (LEFT);
+
+  /* ALT+J: multi-room page view to right (H if flipped horizontally) */
+  else if (! active_menu
+           && ((! flip_gamepad_horizontal
+                && was_key_pressed (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_J))
+               || (flip_gamepad_horizontal
+                   && was_key_pressed (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_H))))
+    mr_view_page_trans (RIGHT);
+
+  /* ALT+U: multi-room page view above (N if flipped vertically) */
+  else if (! active_menu
+           && ((! flip_gamepad_vertical
+                && was_key_pressed (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_U))
+               || (flip_gamepad_vertical
+                   && was_key_pressed (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_N))))
+    mr_view_page_trans (ABOVE);
+
+  /* ALT+N: multi-room page view below (U if flipped vertically) */
+  else if (! active_menu
+           && ((! flip_gamepad_vertical
+                && was_key_pressed (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_N))
+               || (flip_gamepad_vertical
+                   && was_key_pressed (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_U))))
+    mr_view_page_trans (BELOW);
+
+  /* HOME: focus multi-room view on kid */
+  else if (was_key_pressed (0, ALLEGRO_KEY_HOME))
+    mr_focus_room (k->f.c.room);
+
+  /* SHIFT+HOME: center multi-room view */
+  else if (was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_HOME))
+    mr_center_room (mr.room);
+
+  /* SHIFT+B: enable/disable room drawing */
+  else if (was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_B)) {
+    no_room_drawing = ! no_room_drawing;
+    force_full_redraw = true;
+  }
+
+  /* R: resurrect kid */
+  else if (! active_menu
+           && was_key_pressed (0, ALLEGRO_KEY_R)) {
+    if (replay_mode == NO_REPLAY) kid_resurrect (k);
+    else print_replay_mode (0);
+  }
+
+  /* A: alternate between kid and its shadows */
+  else if (! active_menu
+           && was_key_pressed (0, ALLEGRO_KEY_A)) {
+    do {
+      k = &anima[(k - anima + 1) % anima_nmemb];
+    } while (k->type != KID || ! k->controllable);
+    current_kid_id = k->id;
+    mr_focus_room (k->f.c.room);
+  }
+
+  /* K: kill enemy */
+  else if (! active_menu
+           && was_key_pressed (0, ALLEGRO_KEY_K)) {
+    if (replay_mode == NO_REPLAY) {
+      struct anim *ke = get_anim_by_id (k->enemy_id);
+      if (ke) {
+        survey (_m, pos, &ke->f, NULL, &ke->p, NULL);
+        anim_die (ke);
+        play_audio (&guard_hit_audio, NULL, ke->id);
+      }
+    } else print_replay_mode (0);
+  }
+
+  /* I: enable/disable immortal mode */
+  else if (! active_menu
+           && was_key_pressed (0, ALLEGRO_KEY_I)) {
+    if (replay_mode == NO_REPLAY) {
+      immortal_mode = ! immortal_mode;
+      k->immortal = immortal_mode;
+      xasprintf (&text, "%s MODE", immortal_mode
+                 ? "IMMORTAL" : "MORTAL");
+      draw_bottom_text (NULL, text, 0);
+      al_free (text);
+    } else print_replay_mode (0);
+  }
+
+  /* SHIFT+S: incremet kid current lives */
+  else if (was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_S)) {
+    if (replay_mode == NO_REPLAY)
+      increase_kid_current_lives (k);
+    else print_replay_mode (0);
+  }
+
+  /* SHIFT+T: incremet kid total lives */
+  else if (was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_T)) {
+    if (replay_mode == NO_REPLAY) increase_kid_total_lives (k);
+    else print_replay_mode (0);
+  }
+
+  /* SHIFT+W: float kid */
+  else if (was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_W)) {
+    if (replay_mode == NO_REPLAY) float_kid (k);
+    else print_replay_mode (0);
+  }
+
+  /* CTRL+A: restart level */
+  else if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_A))
+    quit_anim = RESTART_LEVEL;
+
+  /* SHIFT+L: warp to next level */
+  else if (was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_L)) {
+    if (replay_mode == NO_REPLAY) {
+      ignore_level_cutscene = true;
+      next_level_number = global_level.n + 1;
+      quit_anim = NEXT_LEVEL;
+    } else if (replay_mode == PLAY_REPLAY) {
+      if (replay_index + 1 < replay_chain_nmemb)
+        quit_anim = REPLAY_NEXT;
+      else draw_bottom_text (NULL, "NO NEXT REPLAY", 0);
+    } else print_replay_mode (0);
+  }
+
+  /* SHIFT+M: warp to previous level */
+  else if (was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_M)) {
+    if (replay_mode == NO_REPLAY) {
+      ignore_level_cutscene = true;
+      next_level_number = global_level.n - 1;
+      quit_anim = NEXT_LEVEL;
+    } else if (replay_mode == PLAY_REPLAY) {
+      if (replay_index > 0) quit_anim = REPLAY_PREVIOUS;
+      else draw_bottom_text (NULL, "NO PREVIOUS REPLAY", 0);
+    } else print_replay_mode (0);
+  }
+
+  /* C: show direct coordinates */
+  else if (! active_menu
+           && was_key_pressed (0, ALLEGRO_KEY_C)) {
+    int s = mr.room;
+    int l = roomd (&global_level, s, LEFT);
+    int r = roomd (&global_level, s, RIGHT);
+    int a = roomd (&global_level, s, ABOVE);
+    int b = roomd (&global_level, s, BELOW);
+
+    mr.select_cycles = SELECT_CYCLES;
+
+    xasprintf (&text, "S%i L%i R%i A%i B%i", s, l, r, a, b);
+    draw_bottom_text (NULL, text, 0);
+    al_free (text);
+  }
+
+  /* SHIFT+C: show indirect coordinates */
+  else if (was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_C)) {
+    int a = roomd (&global_level, mr.room, ABOVE);
+    int b = roomd (&global_level, mr.room, BELOW);
+    int al = roomd (&global_level, a, LEFT);
+    int ar = roomd (&global_level, a, RIGHT);
+    int bl = roomd (&global_level, b, LEFT);
+    int br = roomd (&global_level, b, RIGHT);
+
+    mr.select_cycles = SELECT_CYCLES;
+
+    xasprintf (&text, "LV%i AL%i AR%i BL%i BR%i",
+               global_level.n, al, ar, bl, br);
+    draw_bottom_text (NULL, text, 0);
+    al_free (text);
+  }
+
+  /* SPACE: display remaining time */
+  else if (! active_menu
+           && (was_key_pressed (0, ALLEGRO_KEY_SPACE)
+               || was_joystick_button_pressed (joystick_time_button)))
+    display_remaining_time (0);
+
+  /* +: increment time limit and display remaining time */
+  else if (! active_menu
+           && (was_key_pressed (0, ALLEGRO_KEY_EQUALS)
+               || was_key_pressed (ALLEGRO_KEYMOD_SHIFT,
+                                   ALLEGRO_KEY_EQUALS))) {
+    if (replay_mode == NO_REPLAY) {
+      int t = time_limit - play_time;
+      int d = t > (60 * DEFAULT_HZ) ? (+60 * DEFAULT_HZ) : (+1 * DEFAULT_HZ);
+      time_limit += d;
+      display_remaining_time (0);
+    } else print_replay_mode (0);
+  }
+
+  /* -: decrement time limit and display remaining time */
+  else if (! active_menu
+           && (was_key_pressed (0, ALLEGRO_KEY_MINUS)
+               || was_char_pressed ('_'))) {
+    if (replay_mode == NO_REPLAY) {
+      int t = time_limit - play_time;
+      int d = t > (60 * DEFAULT_HZ) ? (-60 * DEFAULT_HZ) : (-1 * DEFAULT_HZ);
+      time_limit += d;
+      display_remaining_time (0);
+    } else print_replay_mode (0);
+  }
+
+  /* TAB: display skill */
+  else if (was_key_pressed (0, ALLEGRO_KEY_TAB))
+    display_skill (k);
+
+  /* CTRL+=: increment counter attack skill */
+  else if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_EQUALS)) {
+    if (replay_mode == NO_REPLAY) {
+      if (k->skill.counter_attack_prob < 99)
+        k->skill.counter_attack_prob++;
+      display_skill (k);
+    } else print_replay_mode (0);
+  }
+
+  /* CTRL+-: decrement counter attack skill */
+  else if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_MINUS)) {
+    if (replay_mode == NO_REPLAY) {
+      if (k->skill.counter_attack_prob > -1)
+        k->skill.counter_attack_prob--;
+      display_skill (k);
+    } else print_replay_mode (0);
+  }
+
+  /* ALT+=: increment counter defense skill */
+  else if (was_key_pressed (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_EQUALS)) {
+    if (replay_mode == NO_REPLAY) {
+      if (k->skill.counter_defense_prob < 99)
+        k->skill.counter_defense_prob++;
+      display_skill (k);
+    } else print_replay_mode (0);
+  }
+
+  /* ALT+-: decrement counter defense skill */
+  else if (was_key_pressed (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_MINUS)) {
+    if (replay_mode == NO_REPLAY) {
+      if (k->skill.counter_defense_prob > -1)
+        k->skill.counter_defense_prob--;
+      display_skill (k);
+    } else print_replay_mode (0);
+  }
+
+  /* F10: change guard mode */
+  else if (was_key_pressed (0, ALLEGRO_KEY_F10)) {
+    if (replay_mode == NO_REPLAY) {
+      char *gm_str = NULL;
+
+      /* get next guard mode */
+      switch (gm) {
+      case ORIGINAL_GM: gm = GUARD_GM, gm_str = "GUARD"; break;
+      case GUARD_GM: gm = FAT_GUARD_GM, gm_str = "FAT GUARD"; break;
+      case FAT_GUARD_GM: gm = VIZIER_GM, gm_str = "VIZIER"; break;
+      case VIZIER_GM: gm = SKELETON_GM, gm_str = "SKELETON"; break;
+      case SKELETON_GM: gm = SHADOW_GM, gm_str = "SHADOW"; break;
+      case SHADOW_GM: gm = ORIGINAL_GM, gm_str = "ORIGINAL"; break;
+      }
+
+      /* apply next guard mode */
+      int i;
+      for (i = 0; i < anima_nmemb; i++) apply_guard_mode (&anima[i], gm);
+
+      xasprintf (&text, "GUARD MODE: %s", gm_str);
+      draw_bottom_text (NULL, text, 0);
+      al_free (text);
+    } else print_replay_mode (0);
+  }
+
+  /* ESC: pause game */
+  if (step_cycle > 0) {
+    game_paused = false;
+    step_cycle--;
+  } else if (step_cycle == 0) {
+    game_paused = true;
+    step_cycle = -1;
+  }
+
+  if (was_key_pressed (0, ALLEGRO_KEY_ESCAPE)
+      || was_joystick_button_pressed (joystick_pause_button)) {
+    if (is_game_paused ()) {
+      step_cycle = 0;
+      game_paused = false;
+    } else pause_game (true);
+  } else if (is_game_paused ()
+             && (! active_menu || ! was_menu_key_pressed ())
+             && was_any_key_pressed ())
+    pause_game (false);
+}
+
+
+
+
+
+void
 ui_editor (void)
 {
   if (edit == EDIT_NONE) {
@@ -1238,6 +1741,15 @@ ui_load_config (void)
   load_config_dialog_thread =
     create_thread (dialog_thread, &load_config_dialog);
   al_start_thread (load_config_dialog_thread);
+}
+
+void
+ui_save_game (void)
+{
+  save_game_dialog_thread =
+    create_thread (dialog_thread, &save_game_dialog);
+  al_start_thread (save_game_dialog_thread);
+  pause_animation (true);
 }
 
 void
@@ -1316,6 +1828,41 @@ ui_full_screen (void)
     ui_save_setting (key, value);
     view_menu ();
   } else draw_bottom_text (NULL, "NON-DESKTOP MODE IS FULLSCREEN ONLY", 0);
+}
+
+void
+ui_zoom_fit (enum mr_fit_mode fit)
+{
+  char *key = "MULTI ROOM FIT MODE";
+  char *value;
+
+  switch (fit) {
+  case MR_FIT_NONE:
+    mr.fit_mode = MR_FIT_NONE;
+    value = "NONE";
+    break;
+  case MR_FIT_STRETCH:
+    mr.fit_mode = MR_FIT_STRETCH;
+    value = "STRETCH";
+    break;
+  case MR_FIT_RATIO:
+    mr.fit_mode = MR_FIT_RATIO;
+    value = "RATIO";
+    break;
+  default:
+    assert (false);
+    return;
+  }
+
+  apply_mr_fit_mode ();
+
+  char *text;
+  xasprintf (&text, "ZOOM FIT: %s", value);
+  draw_bottom_text (NULL, text, 0);
+  al_free (text);
+
+  ui_save_setting (key, value);
+  view_menu ();
 }
 
 void

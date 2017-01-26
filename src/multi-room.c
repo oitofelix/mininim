@@ -1076,6 +1076,11 @@ apply_mr_fit_mode (void)
     mr.fit_mode = MR_FIT_NONE;
   }
 
+  if (! mr.room) {
+    struct pos p; get_kid_start_pos (&p);
+    mr_center_room (p.room);
+  }
+
   switch (mr.fit_mode) {
   case MR_FIT_NONE:
     w = mr.fit_w;
