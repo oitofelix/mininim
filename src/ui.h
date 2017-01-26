@@ -61,23 +61,23 @@
 #define JOYSTICK2_ICON "data/icons/joystick2.png"
 #define UNDO_ICON "data/icons/undo.png"
 #define REDO_ICON "data/icons/redo.png"
+#define SCREENSAVER_ICON "data/icons/screensaver.png"
+#define JOYSTICK3_ICON "data/icons/joystick3.png"
 
 enum main_menu {
   BASE_MID = 0,
 
   /* real menu itens follow */
   GAME_MID,
-
   LOAD_MID,
   LOAD_GAME_MID,
   LOAD_CONFIG_MID,
   LOAD_LEVEL_FILE_MID,
-
   SAVE_MID,
   SAVE_GAME_MID,
   SAVE_CONFIG_MID,
   SAVE_LEVEL_FILE_MID,
-
+  MIRROR_MODE_MID,
   RESTART_GAME_MID,
   START_GAME_MID,
   QUIT_GAME_MID,
@@ -103,6 +103,7 @@ enum main_menu {
   FLIP_SCREEN_MID,
   FLIP_SCREEN_VERTICAL_MID,
   FLIP_SCREEN_HORIZONTAL_MID,
+  INHIBIT_SCREENSAVER_MID,
   SCREENSHOT_MID,
 
   GAMEPAD_MID,
@@ -110,6 +111,9 @@ enum main_menu {
   KEYBOARD_MODE_MID,
   JOYSTICK_MODE_MID,
   GAMEPAD_CALIBRATE_MID,
+  FLIP_GAMEPAD_MID,
+  FLIP_GAMEPAD_VERTICAL_MID,
+  FLIP_GAMEPAD_HORIZONTAL_MID,
 
   REPLAY_MID,
   PLAY_REPLAY_MID,
@@ -158,6 +162,7 @@ void screen_flip_menu (void);
 void gamepad_menu (void);
 ALLEGRO_BITMAP *gamepad_device_icon (enum gpm gpm);
 void gamepad_device_menu (void);
+void flip_gamepad_menu (void);
 
 void replay_menu (void);
 
@@ -186,10 +191,12 @@ void ui_full_screen (void);
 void ui_hue_mode (enum hue new_hue);
 void ui_environment_mode (enum em new_em);
 void ui_video_mode (enum vm new_vm);
-void ui_flip_screen (int flags, bool correct_mouse);
+void ui_flip_screen (int flags, bool correct_mouse, bool save_only);
+void ui_inhibit_screensaver (bool inhibit);
 void ui_screenshot (void);
 
 void ui_gamepad_mode (enum gpm new_gpm);
+void ui_flip_gamepad (bool v, bool h, bool save_only);
 
 void ui_play_replay (void);
 void ui_previous_replay (void);
@@ -208,6 +215,14 @@ void ui_undo_pass (struct undo *u, int dir, char *prefix);
 void ui_version (void);
 void ui_about_screen (bool value);
 
+void ui_next_display_mode (void);
+
 error_t ui_save_setting (char *key, char *value);
+
+
+
+void ui_mirror_mode (bool mirror);
+bool in_mirror_mode (void);
+void mirror_mode (bool mirror);
 
 #endif	/* MININIM_UI_H */

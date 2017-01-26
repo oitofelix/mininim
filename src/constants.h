@@ -26,6 +26,7 @@
 #define SMALL_LOGO_ICON "data/icons/mininim-small.png"
 #define OITOFELIX_FACE_GRAY "data/icons/oitofelix-face-gray.png"
 #define OITOFELIX_FACE_BW "data/icons/oitofelix-face-bw.png"
+#define JOYSTICK_BIG_ICON "data/icons/joystick-big.png"
 
 #define CLIPPING_RECTANGLE_STACK_NMEMB_MAX 10
 #define DRAWN_RECTANGLE_STACK_NMEMB_MAX 10

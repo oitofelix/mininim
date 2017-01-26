@@ -115,6 +115,7 @@ enum semantics semantics;
 enum movements movements;
 bool title_demo;
 enum rendering rendering = BOTH_RENDERING;
+bool inhibit_screensaver = true;
 
 /* screams */
 bool scream;
@@ -133,7 +134,6 @@ static bool replay_info;
 static bool sound_disabled_cmd;
 static bool skip_title;
 static bool level_module_given;
-static bool inhibit_screensaver = true;
 
 static error_t parser (int key, char *arg, struct argp_state *state);
 static void print_paths (void);
@@ -218,7 +218,7 @@ static struct argp_option options[] = {
 
   /* Display */
   {NULL, 0, NULL, 0, "Display:", 0},
-  {"display-mode", DISPLAY_MODE_OPTION, "M", 0, "Use display mode number M.  The default is -1 (desktop).  The valid integers list can be obtained using the option '--print-display-modes'. This can be changed in-game using the D key binding, in case a non-desktop display mode is selected.", 0},
+  {"display-mode", DISPLAY_MODE_OPTION, "M", 0, "Use display mode number M.  The default is -1 (desktop).  The valid integers list can be obtained using the option '--print-display-modes'. This can be changed in-game using the D key binding, in case a non-desktop display mode has been selected.", 0},
   {"print-display-modes", PRINT_DISPLAY_MODES_OPTION, NULL, OPTION_NO_USAGE, "Print display modes and exit.", 0},
   {"fullscreen", FULLSCREEN_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable fullscreen mode for desktop display mode, but ignored for other display modes.  In fullscreen mode the window spans the entire screen.  The default is FALSE.  This can be changed in-game using the F key binding.", 0},
   {"window-position", WINDOW_POSITION_OPTION, "X,Y", 0, "Place the window at screen coordinates X,Y.  The default is to let this choice to the window manager.  The values X and Y are integers and must be separated by a comma.", 0},
@@ -845,15 +845,7 @@ Levels have been converted using module %s into native format at\n\
     gamepad_rumble_gain = float_val;
     break;
   case MIRROR_MODE_OPTION:
-    if (optval_to_bool (arg)) {
-      flip_gamepad_vertical = false;
-      flip_gamepad_horizontal = true;
-      screen_flags = ALLEGRO_FLIP_HORIZONTAL;
-    } else {
-      flip_gamepad_vertical = false;
-      flip_gamepad_horizontal = false;
-      screen_flags = 0;
-    }
+    mirror_mode (optval_to_bool (arg));
     break;
   case BLIND_MODE_OPTION:
     no_room_drawing = optval_to_bool (arg);
@@ -1950,4 +1942,11 @@ bool
 equiv (bool a, bool b)
 {
   return (a && b) || (! a && ! b);
+}
+
+int
+bool2bitmap_flags (bool v, bool h)
+{
+  return (v ? ALLEGRO_FLIP_VERTICAL : 0)
+    | (h ? ALLEGRO_FLIP_HORIZONTAL : 0);
 }

@@ -198,6 +198,7 @@ void handle_load_config_thread (int priority);
 void handle_save_game_thread (int priority);
 void handle_save_picture_thread (int priority);
 void handle_message_box_thread (void);
+int bool2bitmap_flags (bool v, bool h);
 
 /* variables */
 extern enum level_module level_module;
@@ -235,6 +236,7 @@ extern enum semantics semantics;
 extern enum movements movements;
 extern bool title_demo;
 extern enum rendering rendering;
+extern bool inhibit_screensaver;
 
 /* screams */
 extern bool scream;

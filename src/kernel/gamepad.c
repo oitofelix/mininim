@@ -297,12 +297,17 @@ joystick_info (void)
     if (HAPTIC_FEATURE && WINDOWS_PORT) {
       init_dialog ();
       init_video ();
-      show_logo ("Querying joystick...", NULL, NULL);
+      ALLEGRO_BITMAP *joystick_big_icon =
+        load_bitmap (JOYSTICK_BIG_ICON);
+      show_logo ("Querying joystick...", NULL, joystick_big_icon);
+      destroy_bitmap (joystick_big_icon);
     }
     init_gamepad ();
     calibrate_joystick ();
   }
   if (! joystick) return ENXIO;
+
+  gpm = JOYSTICK;
 
   al_rest (0.1);
 

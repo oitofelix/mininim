@@ -57,7 +57,8 @@ ALLEGRO_BITMAP *small_logo_icon,
   *blue_icon, *black_icon, *vga_icon, *ega_icon, *cga_icon,
   *hgc_icon, *vertical_icon, *horizontal_icon,
   *keyboard_icon, *joystick_icon, *cancel_icon, *clock_icon,
-  *edit_icon, *joystick2_icon, *undo_icon, *redo_icon;
+  *edit_icon, *joystick2_icon, *undo_icon, *redo_icon,
+  *screensaver_icon, *joystick3_icon;
 
 
 
@@ -128,6 +129,8 @@ load_icons (void)
   joystick2_icon = load_icon (JOYSTICK2_ICON);
   undo_icon = load_icon (UNDO_ICON);
   redo_icon = load_icon (REDO_ICON);
+  screensaver_icon = load_icon (SCREENSAVER_ICON);
+  joystick3_icon = load_icon (JOYSTICK3_ICON);
 }
 
 void
@@ -174,6 +177,8 @@ unload_icons (void)
   destroy_bitmap (joystick2_icon);
   destroy_bitmap (undo_icon);
   destroy_bitmap (redo_icon);
+  destroy_bitmap (screensaver_icon);
+  destroy_bitmap (joystick3_icon);
 }
 
 
@@ -396,6 +401,9 @@ game_menu (void)
   menu_sub ("&Load", LOAD_MID, true, micon (open_icon));
   menu_sub ("&Save", SAVE_MID, true, micon (save_icon));
   menu_sep ();
+  menu_citem ("&Mirror", MIRROR_MODE_MID, true,
+              in_mirror_mode (), micon (horizontal_icon));
+  menu_sep ();
   menu_ditem (cutscene || title_demo,
               "Sta&rt (Enter)", "&Restart (Ctrl+R)",
               START_GAME_MID, RESTART_GAME_MID, true,
@@ -448,8 +456,11 @@ view_menu (void)
 
   menu_sub ("&Video (F12)", VIDEO_MODE_MID, true, vm_icon (vm));
 
-  menu_sub ("&Orientation (Shift+I)", FLIP_SCREEN_MID, true,
+  menu_sub ("&Flip (Shift+I)", FLIP_SCREEN_MID, true,
             micon_flags (screen_icon, screen_flags));
+
+  menu_citem ("Inhibit screensaver", INHIBIT_SCREENSAVER_MID, true,
+              inhibit_screensaver, micon (screensaver_icon));
 
   menu_sitem ("&Screenshot... (Ctrl+P)", SCREENSHOT_MID, true,
               micon (camera_icon));
@@ -591,9 +602,14 @@ gamepad_menu (void)
   menu_sitem ("&Calibrate (Ctrl+J)", GAMEPAD_CALIBRATE_MID,
               gpm == JOYSTICK, micon (clock_icon));
 
+  menu_sub ("&Flip (Shift+K)", FLIP_GAMEPAD_MID, true,
+            micon_flags (joystick3_icon, bool2bitmap_flags
+                         (flip_gamepad_vertical, flip_gamepad_horizontal)));
+
   end_menu ();
 
   gamepad_device_menu ();
+  flip_gamepad_menu ();
 #endif
 }
 
@@ -618,6 +634,22 @@ gamepad_device_menu (void)
 
   menu_citem ("&Joystick (Ctrl+J)", JOYSTICK_MODE_MID, joystick,
               gpm == JOYSTICK, micon (joystick_icon));
+
+  end_menu ();
+#endif
+}
+
+void
+flip_gamepad_menu (void)
+{
+#if MENU_FEATURE
+  start_menu (main_menu, FLIP_GAMEPAD_MID);
+
+  menu_citem ("&Vertical", FLIP_GAMEPAD_VERTICAL_MID, true,
+              flip_gamepad_vertical, micon (vertical_icon));
+
+  menu_citem ("&Horizontal", FLIP_GAMEPAD_HORIZONTAL_MID, true,
+              flip_gamepad_horizontal, micon (horizontal_icon));
 
   end_menu ();
 #endif
@@ -797,6 +829,9 @@ menu_mid (intptr_t mid)
   case LOAD_CONFIG_MID:
     ui_load_config ();
     break;
+  case MIRROR_MODE_MID:
+    ui_mirror_mode (! in_mirror_mode ());
+    break;
   case RESTART_GAME_MID:
     ui_restart_game ();
     break;
@@ -852,10 +887,13 @@ menu_mid (intptr_t mid)
     ui_video_mode (HGC);
     break;
   case FLIP_SCREEN_VERTICAL_MID:
-    ui_flip_screen (screen_flags ^ ALLEGRO_FLIP_VERTICAL, false);
+    ui_flip_screen (screen_flags ^ ALLEGRO_FLIP_VERTICAL, false, false);
     break;
   case FLIP_SCREEN_HORIZONTAL_MID:
-    ui_flip_screen (screen_flags ^ ALLEGRO_FLIP_HORIZONTAL, false);
+    ui_flip_screen (screen_flags ^ ALLEGRO_FLIP_HORIZONTAL, false, false);
+    break;
+  case INHIBIT_SCREENSAVER_MID:
+    ui_inhibit_screensaver (! inhibit_screensaver);
     break;
   case SCREENSHOT_MID:
     ui_screenshot ();
@@ -871,6 +909,12 @@ menu_mid (intptr_t mid)
     break;
   case GAMEPAD_CALIBRATE_MID:
     ui_gamepad_mode (JOYSTICK);
+    break;
+  case FLIP_GAMEPAD_VERTICAL_MID:
+    ui_flip_gamepad (! flip_gamepad_vertical, flip_gamepad_horizontal, false);
+    break;
+  case FLIP_GAMEPAD_HORIZONTAL_MID:
+    ui_flip_gamepad (flip_gamepad_vertical, ! flip_gamepad_horizontal, false);
     break;
 
 
@@ -999,33 +1043,6 @@ anim_key_bindings (void)
     al_free (text);
   }
 
-  /* D: change display mode */
-  else if (! active_menu && was_key_pressed (0, ALLEGRO_KEY_D)) {
-    if (display_mode < 0)
-      draw_bottom_text (NULL, "DISPLAY MODE: DESKTOP", 0);
-    else {
-      int n = al_get_num_display_modes ();
-      if (n) {
-        int display_mode_bkp = display_mode;
-      next_display_mode:
-        display_mode = (display_mode + 1) % n;
-        int w = al_get_display_width (display);
-        int h = al_get_display_height (display);
-        ALLEGRO_DISPLAY_MODE d;
-        if (al_get_display_mode (display_mode, &d)) {
-          if (d.width == w && d.height == h
-              && display_mode != display_mode_bkp)
-            goto next_display_mode;
-          char *text;
-          al_resize_display (display, d.width, d.height);
-          xasprintf (&text, "DISPLAY MODE: %ix%i", d.width, d.height);
-          draw_bottom_text (NULL, text, 0);
-          al_free (text);
-        } else draw_bottom_text (NULL, "DISPLAY MODES QUERYING FAILED", 0);
-      } else draw_bottom_text (NULL, "NO DISPLAY MODE AVAILABLE", 0);
-    }
-  }
-
   /* F: enable/disable fullscreen mode */
   else if ((! active_menu && was_key_pressed (0, ALLEGRO_KEY_F))
            || was_key_pressed (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_ENTER))
@@ -1034,39 +1051,28 @@ anim_key_bindings (void)
   /* SHIFT+I: flip screen */
   else if (was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_I)) {
     switch (screen_flags) {
-    case 0: ui_flip_screen (ALLEGRO_FLIP_VERTICAL, true); break;
+    case 0: ui_flip_screen (ALLEGRO_FLIP_VERTICAL, true, false); break;
     case ALLEGRO_FLIP_VERTICAL:
-      ui_flip_screen (ALLEGRO_FLIP_HORIZONTAL, true); break;
+      ui_flip_screen (ALLEGRO_FLIP_HORIZONTAL, true, false); break;
     case ALLEGRO_FLIP_HORIZONTAL:
       ui_flip_screen (ALLEGRO_FLIP_VERTICAL | ALLEGRO_FLIP_HORIZONTAL,
-                      true);
+                      true, false);
       break;
     case ALLEGRO_FLIP_VERTICAL | ALLEGRO_FLIP_HORIZONTAL:
-    default: ui_flip_screen (0, true); break;
+    default: ui_flip_screen (0, true, false); break;
     }
   }
 
   /* SHIFT+K: flip gamepad */
   else if (was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_K)) {
-    char *flip = "NONE";
-    if (! flip_gamepad_vertical && ! flip_gamepad_horizontal) {
-      flip_gamepad_vertical = true;
-      flip = "VERTICAL";
-    } else if (flip_gamepad_vertical && ! flip_gamepad_horizontal) {
-      flip_gamepad_vertical = false;
-      flip_gamepad_horizontal = true;
-      flip = "HORIZONTAL";
-    } else if (! flip_gamepad_vertical && flip_gamepad_horizontal) {
-      flip_gamepad_vertical = true;
-      flip = "VERTICAL + HORIZONTAL";
-    } else if (flip_gamepad_vertical && flip_gamepad_horizontal) {
-      flip_gamepad_vertical = false;
-      flip_gamepad_horizontal = false;
-    }
-    char *text;
-    xasprintf (&text, "GAMEPAD FLIP: %s", flip);
-    draw_bottom_text (NULL, text, 0);
-    al_free (text);
+    if (! flip_gamepad_vertical && ! flip_gamepad_horizontal)
+      ui_flip_gamepad (true, false, false);
+    else if (flip_gamepad_vertical && ! flip_gamepad_horizontal)
+      ui_flip_gamepad (false, true, false);
+    else if (! flip_gamepad_vertical && flip_gamepad_horizontal)
+      ui_flip_gamepad (true, true, false);
+    else if (flip_gamepad_vertical && flip_gamepad_horizontal)
+      ui_flip_gamepad (false, false, false);
   }
 
   /* CTRL+K: keyboard mode (disables joystick) */
@@ -1107,6 +1113,10 @@ anim_key_bindings (void)
     case EGA: ui_video_mode (CGA); break;
     case CGA: ui_video_mode (hgc ? VGA : HGC); break;
     }
+
+  /* D: change display mode */
+  else if (! active_menu && was_key_pressed (0, ALLEGRO_KEY_D))
+    ui_next_display_mode ();
 }
 
 
@@ -1316,10 +1326,23 @@ ui_video_mode (enum vm new_vm)
 }
 
 void
-ui_flip_screen (int flags, bool correct_mouse)
+ui_flip_screen (int flags, bool correct_mouse, bool save_only)
 {
   char *key = "DISPLAY FLIP MODE";
   char *value;
+
+  switch (flags) {
+  case 0: value = "NONE"; break;
+  case ALLEGRO_FLIP_VERTICAL: value = "VERTICAL"; break;
+  case ALLEGRO_FLIP_HORIZONTAL: value = "HORIZONTAL"; break;
+  case ALLEGRO_FLIP_VERTICAL | ALLEGRO_FLIP_HORIZONTAL:
+    value = "VERTICAL-HORIZONTAL"; break;
+  default: assert (false); break;
+  }
+
+  ui_save_setting (key, value);
+
+  if (save_only) return;
 
   if (correct_mouse) {
     int w = al_get_display_width (display);
@@ -1346,14 +1369,26 @@ ui_flip_screen (int flags, bool correct_mouse)
 
   potion_flags = 0;
   screen_flags = flags;
-  switch (screen_flags) {
-  case 0: value = "NONE"; break;
-  case ALLEGRO_FLIP_VERTICAL: value = "VERTICAL"; break;
-  case ALLEGRO_FLIP_HORIZONTAL: value = "HORIZONTAL"; break;
-  case ALLEGRO_FLIP_VERTICAL | ALLEGRO_FLIP_HORIZONTAL:
-    value = "VERTICAL-HORIZONTAL"; break;
-  default: assert (false); break;
-  }
+
+  char *text;
+  xasprintf (&text, "%s: %s", key, value);
+  draw_bottom_text (NULL, text, 1);
+  al_free (text);
+
+  ui_flip_gamepad (flip_gamepad_vertical, flip_gamepad_horizontal, true);
+  ui_save_setting ("MIRROR MODE", NULL);
+  game_menu ();
+  view_menu ();
+}
+
+void
+ui_inhibit_screensaver (bool inhibit)
+{
+  char *key = "INHIBIT SCREENSAVER";
+  char *value = inhibit ? "ON" : "OFF";
+
+  inhibit_screensaver = inhibit;
+  al_inhibit_screensaver (inhibit_screensaver);
 
   char *text;
   xasprintf (&text, "%s: %s", key, value);
@@ -1394,6 +1429,35 @@ ui_gamepad_mode (enum gpm new_gpm)
   default: assert (false);
   }
 
+  gamepad_menu ();
+}
+
+void
+ui_flip_gamepad (bool v, bool h, bool save_only)
+{
+  char *key = "GAMEPAD FLIP MODE";
+  char *value;
+
+  if (! v && ! h) value = "NONE";
+  else if (v && ! h) value = "VERTICAL";
+  else if (! v && h) value = "HORIZONTAL";
+  else if (v && h) value = "VERTICAL-HORIZONTAL";
+
+  ui_save_setting (key, value);
+
+  if (save_only) return;
+
+  flip_gamepad_vertical = v;
+  flip_gamepad_horizontal = h;
+
+  char *text;
+  xasprintf (&text, "%s: %s", key, value);
+  draw_bottom_text (NULL, text, 0);
+  al_free (text);
+
+  ui_flip_screen (screen_flags, false, true);
+  ui_save_setting ("MIRROR MODE", NULL);
+  game_menu ();
   gamepad_menu ();
 }
 
@@ -1561,6 +1625,40 @@ ui_about_screen (bool value)
   }
 }
 
+void
+ui_next_display_mode (void)
+{
+  char *key = "DISPLAY MODE";
+  char *value;
+
+  if (display_mode < 0)
+    draw_bottom_text (NULL, "DISPLAY MODE: DESKTOP", 0);
+  else {
+    int n = al_get_num_display_modes ();
+    if (n) {
+      int display_mode_bkp = display_mode;
+    next_display_mode:
+      display_mode = (display_mode + 1) % n;
+      int w = al_get_display_width (display);
+      int h = al_get_display_height (display);
+      ALLEGRO_DISPLAY_MODE d;
+      if (al_get_display_mode (display_mode, &d)) {
+        if (d.width == w && d.height == h
+            && display_mode != display_mode_bkp)
+          goto next_display_mode;
+        char *text;
+        al_resize_display (display, d.width, d.height);
+        xasprintf (&text, "%s: %ix%i", key, d.width, d.height);
+        draw_bottom_text (NULL, text, 0);
+        al_free (text);
+        xasprintf (&value, "%i", display_mode);
+        ui_save_setting (key, value);
+        al_free (value);
+      } else draw_bottom_text (NULL, "DISPLAY MODES QUERYING FAILED", 0);
+    } else draw_bottom_text (NULL, "NO DISPLAY MODE AVAILABLE", 0);
+  }
+}
+
 
 
 
@@ -1572,11 +1670,11 @@ ui_save_setting (char *key, char *value)
 
   if (al_filename_exists (config_filename))
     config = al_load_config_file (config_filename);
-  else {
+  else if (value) {
     if (! al_make_directory (user_settings_dir))
       return al_get_errno ();
     config = al_create_config ();
-  }
+  } else return 0;
 
   if (! config) return al_get_errno ();
 
@@ -1590,7 +1688,7 @@ ui_save_setting (char *key, char *value)
     } else entry = al_get_next_config_entry (&iterator);
   }
 
-  al_set_config_value (config, NULL, key, value);
+  if (value) al_set_config_value (config, NULL, key, value);
 
   if (! al_save_config_file (config_filename, config)) {
     al_destroy_config (config);
@@ -1600,4 +1698,50 @@ ui_save_setting (char *key, char *value)
   al_destroy_config (config);
 
   return 0;
+}
+
+
+
+
+
+bool
+in_mirror_mode (void)
+{
+  return ! flip_gamepad_vertical && flip_gamepad_horizontal
+    && screen_flags == ALLEGRO_FLIP_HORIZONTAL;
+}
+
+void
+mirror_mode (bool mirror)
+{
+  if (mirror) {
+    flip_gamepad_vertical = false;
+    flip_gamepad_horizontal = true;
+    screen_flags = ALLEGRO_FLIP_HORIZONTAL;
+  } else {
+    flip_gamepad_vertical = false;
+    flip_gamepad_horizontal = false;
+    screen_flags = 0;
+  }
+}
+
+void
+ui_mirror_mode (bool mirror)
+{
+  char *key = "MIRROR MODE";
+  char *value = mirror ? "ON" : "OFF";
+
+  mirror_mode (mirror);
+
+  char *text;
+  xasprintf (&text, "%s: %s", key, value);
+  draw_bottom_text (NULL, text, 0);
+  al_free (text);
+
+  ui_save_setting ("DISPLAY FLIP MODE", NULL);
+  ui_save_setting ("GAMEPAD FLIP MODE", NULL);
+  ui_save_setting (key, value);
+  game_menu ();
+  view_menu ();
+  gamepad_menu ();
 }
