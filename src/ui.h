@@ -206,6 +206,7 @@ void print_game_paused (int priority);
 void ui_undo_pass (struct undo *u, int dir, char *prefix);
 
 void ui_version (void);
+void ui_about_screen (bool value);
 
 error_t ui_save_setting (char *key, char *value);
 

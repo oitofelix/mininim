@@ -73,6 +73,15 @@ bool is_fullscreen (void);
 void process_display_events (void);
 void get_display_mode (int index, ALLEGRO_DISPLAY_MODE *mode);
 
+/* special screens */
+void draw_logo (ALLEGRO_BITMAP *bitmap, char *text0, char *text1,
+                ALLEGRO_BITMAP *icon);
+void show_logo (char *text0, char* text1, ALLEGRO_BITMAP *icon);
+void show_logo_replaying (void);
+void load_oitofelix_face (void);
+void unload_oitofelix_face (void);
+ALLEGRO_BITMAP *oitofelix_face (enum vm vm);
+
 /* palette */
 int compare_palette_caches (const void *pc0, const void *pc1);
 ALLEGRO_BITMAP *apply_palette (ALLEGRO_BITMAP *bitmap, palette p);
@@ -99,13 +108,11 @@ void push_reset_clipping_rectangle (ALLEGRO_BITMAP *bitmap);
 bool merge_clipping_rectangle (ALLEGRO_BITMAP *bitmap, int x, int y,
                                int w, int h);
 void pop_clipping_rectangle (void);
-void draw_logo (ALLEGRO_BITMAP *bitmap, char *text0, char *text1);
-void show_logo (char *text0, char* text1);
-void show_logo_replaying (void);
 
 /* variables */
 extern bool force_full_redraw;
 extern ALLEGRO_DISPLAY *display;
+extern ALLEGRO_BITMAP *cutscene_screen;
 extern ALLEGRO_BITMAP *uscreen, *iscreen;
 extern ALLEGRO_BITMAP *effect_buffer;
 extern ALLEGRO_BITMAP *black_screen;
@@ -120,5 +127,7 @@ extern int effect_counter;
 extern void (*load_callback) (void);
 extern int display_mode;
 extern bool ignore_clipping_rectangle_intersection;
+extern bool about_screen;
+extern ALLEGRO_BITMAP *oitofelix_face_gray, *oitofelix_face_bw;
 
 #endif	/* MININIM_VIDEO_H */

@@ -614,6 +614,11 @@ struct dialog {
   int mode;
 };
 
+struct message_box {
+  char *title, *heading, *text, *buttons;
+  int flags;
+};
+
 /****************
  * CONSTRUCTIONS
  ****************/

@@ -39,9 +39,6 @@ void
 play_anim (void (*draw_callback) (void),
            void (*compute_callback) (void))
 {
-  if (cutscene) set_multi_room (1, 1);
-  else apply_mr_fit_mode ();
-
   anim_cycle = 0;
   quit_anim = NO_QUIT;
 
@@ -98,6 +95,9 @@ play_anim (void (*draw_callback) (void),
 
         /* update mouse pos */
         if (! cutscene) get_mouse_pos (&mouse_pos);
+
+        /* message box */
+        handle_message_box_thread ();
 
         /* load configuration */
         handle_load_config_thread (0);
@@ -159,6 +159,10 @@ play_anim (void (*draw_callback) (void),
       /*          al_keycode_to_name (key.keycode), */
       /*          toupper (key2char (&key))); */
 
+        if (about_screen
+            && (was_any_key_pressed () || ! message_box_thread_id))
+          ui_about_screen (false);
+
         key.keycode = 0;
         joystick_button = -1;
       } else if (event.timer.source == video_timer) {
@@ -196,6 +200,11 @@ play_anim (void (*draw_callback) (void),
       joystick_button = event.joystick.button;
       break;
     case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
+      if (about_screen) {
+        ui_about_screen (false);
+        break;
+      }
+
       if (pause_anim) break;
 
       switch (event.mouse.button) {

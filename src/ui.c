@@ -917,7 +917,7 @@ menu_mid (intptr_t mid)
 
     /* HELP */
   case ABOUT_MID:
-    ui_version ();
+    ui_about_screen (true);
     break;
   default: break;
   }
@@ -1539,6 +1539,25 @@ ui_version (void)
   xasprintf (&text, "MININIM %s", VERSION);
   draw_bottom_text (NULL, text, 0);
   al_free (text);
+}
+
+void
+ui_about_screen (bool value)
+{
+  if (value) {
+    enable_menu (false);
+    if (! message_box_thread_id) {
+      message_box_thread_id =
+        create_thread (message_box_thread, &about_dialog);
+      al_start_thread (message_box_thread_id);
+    }
+    about_screen = true;
+    pause_animation (true);
+  } else if (! message_box_thread_id) {
+    about_screen = false;
+    pause_animation (false);
+    create_main_menu ();
+  }
 }
 
 

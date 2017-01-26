@@ -227,6 +227,8 @@ play_level (struct level *lv)
 
   normalize_level (&global_level);
 
+  apply_mr_fit_mode ();
+
   register_cons ();
   register_anims ();
 

@@ -28,6 +28,7 @@ uint64_t bottom_text_timer;
 int screen_flags = 0;
 int potion_flags = 0;
 bool hgc;
+ALLEGRO_BITMAP *cutscene_screen;
 ALLEGRO_BITMAP *effect_buffer;
 ALLEGRO_BITMAP *black_screen;
 struct video_effect video_effect = {.type = VIDEO_NO_EFFECT};
@@ -37,6 +38,8 @@ ALLEGRO_BITMAP *logo_icon;
 int effect_counter;
 void (*load_callback) (void);
 int display_mode = -1;
+bool about_screen;
+ALLEGRO_BITMAP *oitofelix_face_gray, *oitofelix_face_bw;
 
 static struct palette_cache {
   ALLEGRO_BITMAP *ib, *ob;
@@ -108,7 +111,6 @@ init_video (void)
     mr.fit_w = 2;
     mr.fit_h = 2;
   }
-  set_multi_room (1, 1);
 
   if (MACOSX_PORT) {
     /* workaround to make Mac OS X render the title screen cutscene
@@ -117,6 +119,7 @@ init_video (void)
     acknowledge_resize ();
   }
 
+  cutscene_screen = create_bitmap (CUTSCENE_WIDTH, CUTSCENE_HEIGHT);
   effect_buffer = create_bitmap (CUTSCENE_WIDTH, CUTSCENE_HEIGHT);
   black_screen = create_bitmap (CUTSCENE_WIDTH, CUTSCENE_HEIGHT);
   uscreen = create_bitmap (CUTSCENE_WIDTH, CUTSCENE_HEIGHT);
@@ -597,8 +600,8 @@ flip_display (ALLEGRO_BITMAP *bitmap)
 
   int flags;
 
-  if (rendering == NONE_RENDERING || rendering == AUDIO_RENDERING)
-    flags = 0;
+  if (rendering == NONE_RENDERING || rendering == AUDIO_RENDERING
+      || about_screen) flags = 0;
   else flags = screen_flags | potion_flags;
 
   if (bitmap) {
@@ -609,7 +612,6 @@ flip_display (ALLEGRO_BITMAP *bitmap)
       (bitmap, 0, 0, bw, bh, 0, 0, w, h, flags);
   } else {
     if (has_mr_view_changed ()
-        && ! cutscene
         && ! no_room_drawing) {
       draw_multi_rooms ();
       force_full_redraw = true;
@@ -632,7 +634,7 @@ flip_display (ALLEGRO_BITMAP *bitmap)
     for (y = mr.h - 1; y >= 0; y--)
       for (x = 0; x < mr.w; x++) {
         ALLEGRO_BITMAP *screen =
-          (mr.cell[x][y].room || no_room_drawing || cutscene)
+          (mr.cell[x][y].room || no_room_drawing)
           ? mr.cell[x][y].screen : mr.cell[x][y].cache;
         int sw = al_get_bitmap_width (screen);
         int sh = al_get_bitmap_height (screen);
@@ -641,8 +643,7 @@ flip_display (ALLEGRO_BITMAP *bitmap)
         float dw = (sw * w) / (float) tw;
         float dh = (sh * h) / (float) th;
 
-        if (cutscene
-            || mr.cell[x][y].room
+        if (mr.cell[x][y].room
             || mr.last.display_width != w
             || mr.last.display_height != h
             || force_full_redraw)
@@ -653,7 +654,7 @@ flip_display (ALLEGRO_BITMAP *bitmap)
     set_target_backbuffer (display);
     al_draw_bitmap (iscreen, 0, 0, flags);
 
-    if (mr.room_select > 0 && ! cutscene)
+    if (mr.room_select > 0)
       for (y = mr.h - 1; y >= 0; y--)
         for (x = 0; x < mr.w; x++)
           if (mr.cell[x][y].room == mr.room_select) {
@@ -665,15 +666,14 @@ flip_display (ALLEGRO_BITMAP *bitmap)
             draw_mr_select_rect (rx, ry, GREEN);
           }
 
-    if ((mr.room != mr.last.room
-         || mr.x != mr.last.x
-         || mr.y != mr.last.y
-         || mr.w != mr.last.w
-         || mr.h != mr.last.h)
-        && ! cutscene)
+    if (mr.room != mr.last.room
+        || mr.x != mr.last.x
+        || mr.y != mr.last.y
+        || mr.w != mr.last.w
+        || mr.h != mr.last.h)
       mr.select_cycles = SELECT_CYCLES;
 
-    if (mr.select_cycles > 0 && ! cutscene) {
+    if (mr.select_cycles > 0) {
       int rx = mr.x, ry = mr.y;
       if (flags & ALLEGRO_FLIP_HORIZONTAL)
         rx = (mr.w - 1) - mr.x;
@@ -684,10 +684,13 @@ flip_display (ALLEGRO_BITMAP *bitmap)
     }
   }
 
-  int uw = al_get_bitmap_width (uscreen);
-  int uh = al_get_bitmap_height (uscreen);
+  if (! about_screen) {
+    int uw = al_get_bitmap_width (uscreen);
+    int uh = al_get_bitmap_height (uscreen);
 
-  al_draw_scaled_bitmap (uscreen, 0, 0, uw, uh, 0, 0, w, h, 0);
+    al_draw_scaled_bitmap (uscreen, 0, 0, uw, uh, 0, 0, w, h, 0);
+  }
+
   al_flip_display ();
 
   force_full_redraw = false;
@@ -760,29 +763,25 @@ draw_pattern (ALLEGRO_BITMAP *bitmap, int ox, int oy, int w, int h,
 void
 start_video_effect (enum video_effect_type type, int duration)
 {
-  ALLEGRO_BITMAP *screen = mr.cell[0][0].screen;
-
   video_effect.type = type;
   video_effect.duration = duration;
   clear_bitmap (effect_buffer, BLACK);
   clear_bitmap (black_screen, BLACK);
-  draw_bitmap (screen, effect_buffer, 0, 0, 0);
+  draw_bitmap (cutscene_screen, effect_buffer, 0, 0, 0);
   al_start_timer (video_timer);
 }
 
 void
 stop_video_effect (void)
 {
-  ALLEGRO_BITMAP *screen = mr.cell[0][0].screen;
-
   if (! al_get_timer_started (video_timer)) return;
   video_effect.type = VIDEO_NO_EFFECT;
   al_stop_timer (video_timer);
   al_set_timer_count (video_timer, 0);
   drop_all_events_from_source
     (event_queue, get_timer_event_source (video_timer));
-  clear_bitmap (screen, BLACK);
-  draw_bitmap (effect_buffer, screen, 0, 0, 0);
+  clear_bitmap (cutscene_screen, BLACK);
+  draw_bitmap (effect_buffer, cutscene_screen, 0, 0, 0);
   effect_counter = 0;
 }
 
@@ -795,10 +794,8 @@ is_video_effect_started (void)
 void
 show (void)
 {
-  ALLEGRO_BITMAP *screen = mr.cell[0][0].screen;
-
   if (load_callback) {
-    show_logo ("Loading...", NULL);
+    show_logo ("Loading...", NULL, NULL);
     return;
   } else if (is_dedicatedly_replaying ()) {
     show_logo_replaying ();
@@ -807,12 +804,17 @@ show (void)
              && (rendering == NONE_RENDERING
                  || rendering == AUDIO_RENDERING)) {
     char *text1 = rendering == AUDIO_RENDERING ? "AUDIO" : "NONE";
-    show_logo ("RENDERING", text1);
+    show_logo ("RENDERING", text1, NULL);
+    return;
+  } else if (about_screen) {
+    show_logo ("http://oitofelix.github.io/mininim/",
+               "http://forum.princed.org/", oitofelix_face (vm));
     return;
   }
 
   switch (video_effect.type) {
-  case VIDEO_NO_EFFECT: flip_display (NULL); return;
+  case VIDEO_NO_EFFECT:
+    flip_display (cutscene ? cutscene_screen : NULL); return;
   case VIDEO_OFF: return;
   default: break;
   }
@@ -828,19 +830,19 @@ show (void)
     case VIDEO_FLICKERING:
       if (effect_counter % 2 && effect_counter < video_effect.duration) {
         clear_bitmap (effect_buffer, video_effect.color);
-        convert_mask_to_alpha (screen, BLACK);
+        convert_mask_to_alpha (cutscene_screen, BLACK);
       } else clear_bitmap (effect_buffer, BLACK);
-      draw_bitmap (screen, effect_buffer, 0, 0, 0);
+      draw_bitmap (cutscene_screen, effect_buffer, 0, 0, 0);
       break;
     case VIDEO_FADE_IN:
       switch (vm) {
       case CGA: case EGA:
-        draw_shutter (screen, effect_buffer, video_effect.duration / 4, effect_counter);
+        draw_shutter (cutscene_screen, effect_buffer, video_effect.duration / 4, effect_counter);
         if (effect_counter >= video_effect.duration / 4)
           effect_counter += video_effect.duration;
         break;
       case VGA:
-        draw_fade (screen, effect_buffer, 1 - (float) effect_counter
+        draw_fade (cutscene_screen, effect_buffer, 1 - (float) effect_counter
                    / (float) video_effect.duration);
         break;
       }
@@ -854,14 +856,14 @@ show (void)
           effect_counter += video_effect.duration;
         break;
       case VGA:
-        draw_fade (screen, effect_buffer, (float) effect_counter
+        draw_fade (cutscene_screen, effect_buffer, (float) effect_counter
                    / (float) video_effect.duration);
         break;
       }
       if (effect_counter + 1 >= video_effect.duration) clear_bitmap (effect_buffer, BLACK);
       break;
     case VIDEO_ROLL_RIGHT:
-      draw_roll_right (screen, effect_buffer, video_effect.duration, effect_counter);
+      draw_roll_right (cutscene_screen, effect_buffer, video_effect.duration, effect_counter);
       break;
     default: assert (false); break;
     }
@@ -1115,13 +1117,18 @@ pop_clipping_rectangle (void)
 }
 
 void
-draw_logo (ALLEGRO_BITMAP *bitmap, char *text0, char *text1)
+draw_logo (ALLEGRO_BITMAP *bitmap, char *text0, char *text1,
+           ALLEGRO_BITMAP *icon)
 {
   int x = 145;
   int y = 40;
   int w = al_get_bitmap_width (logo_icon);
   int h = al_get_bitmap_height (logo_icon);
+
+  push_reset_clipping_rectangle (bitmap);
+
   clear_bitmap (bitmap, BLACK);
+
   draw_filled_rectangle (bitmap, x - 1, y - 1, x + w, y + h, WHITE);
   draw_bitmap (logo_icon, bitmap, x, y, 0);
 
@@ -1133,12 +1140,18 @@ draw_logo (ALLEGRO_BITMAP *bitmap, char *text0, char *text1)
     draw_text (bitmap, text1, CUTSCENE_WIDTH / 2.0,
                CUTSCENE_HEIGHT / 2.0 + 16, ALLEGRO_ALIGN_CENTRE);
 
+  if (icon)
+    draw_bitmap (icon, bitmap, (CUTSCENE_WIDTH / 2.0)
+                 - (al_get_bitmap_width (icon) / 2.0) - 2, 136, 0);
+
   al_draw_filled_rectangle (0, CUTSCENE_HEIGHT - 8,
                             CUTSCENE_WIDTH, CUTSCENE_HEIGHT,
                             BLUE);
   draw_text (bitmap, "MININIM " VERSION, CUTSCENE_WIDTH / 2.0,
              CUTSCENE_HEIGHT - 7,
              ALLEGRO_ALIGN_CENTRE);
+
+  pop_clipping_rectangle ();
 }
 
 void
@@ -1149,19 +1162,43 @@ show_logo_replaying (void)
   xasprintf (&text0, "Level: %02u", global_level.n);
   xasprintf (&text1, "Replaying: %3lu%%", progress);
 
-  show_logo (text0, text1);
+  show_logo (text0, text1, NULL);
 
   al_free (text0);
   al_free (text1);
 }
 
 void
-show_logo (char *text0, char* text1)
+show_logo (char *text0, char* text1, ALLEGRO_BITMAP *icon)
 {
-  ALLEGRO_BITMAP *screen = mr.cell[0][0].screen;
   enum rendering rendering_backup = rendering;
   rendering = VIDEO_RENDERING;
-  draw_logo (screen, text0, text1);
+  draw_logo (cutscene_screen, text0, text1, icon);
   rendering = rendering_backup;
-  flip_display (screen);
+  flip_display (cutscene_screen);
+}
+
+void
+load_oitofelix_face (void)
+{
+  oitofelix_face_gray = load_bitmap (OITOFELIX_FACE_GRAY);
+  oitofelix_face_bw = load_bitmap (OITOFELIX_FACE_BW);
+}
+
+void
+unload_oitofelix_face (void)
+{
+  destroy_bitmap (oitofelix_face_gray);
+  destroy_bitmap (oitofelix_face_bw);
+}
+
+ALLEGRO_BITMAP *
+oitofelix_face (enum vm vm)
+{
+  switch (vm) {
+  case VGA: return oitofelix_face_gray;
+  case EGA: return oitofelix_face_gray;
+  case CGA: return oitofelix_face_bw;
+  default: assert (false); return NULL;
+  }
 }

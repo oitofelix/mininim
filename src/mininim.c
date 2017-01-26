@@ -56,7 +56,7 @@ char *resources_dir,
 char *levels_dat_compat_filename;
 
 ALLEGRO_THREAD *load_config_dialog_thread, *save_game_dialog_thread,
-  *save_picture_dialog_thread;
+  *save_picture_dialog_thread, *message_box_thread_id;
 
 struct dialog load_config_dialog = {
   .title = "Load configuration file",
@@ -76,6 +76,20 @@ struct dialog save_picture_dialog = {
   .patterns = "*.png;*.PNG",
   .mode = ALLEGRO_FILECHOOSER_SAVE
   | ALLEGRO_FILECHOOSER_PICTURES,
+};
+
+struct message_box about_dialog = {
+  .title = "About",
+  .heading = "MININIM " VERSION,
+  .text =
+  "Copyright (C) " PACKAGE_COPYRIGHT_HOLDER " <oitofelix@gnu.org>\n\n"
+
+  "MININIM is free software under GPLv3+.  You are free to change and redistribute it.  There is NO WARRANTY, to the extent permitted by law.\n\n"
+
+  "Please, support MININIM development!\n"
+  "http://oitofelix.github.io/funding.html",
+  .buttons = NULL,
+  .flags = 0,
 };
 
 uint64_t play_time;
@@ -1348,6 +1362,7 @@ main (int _argc, char **_argv)
   load_callback = process_display_events;
   show ();
 
+  load_oitofelix_face ();
   load_audio_data ();
   load_level ();
   load_cutscenes ();
@@ -1372,8 +1387,7 @@ main (int _argc, char **_argv)
  restart_game:
   cutscene_mode (true);
   set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
-  set_multi_room (1, 1);
-  clear_bitmap (mr.cell[0][0].screen, BLACK);
+  clear_bitmap (cutscene_screen, BLACK);
   clear_bitmap (uscreen, TRANSPARENT_COLOR);
   cutscene_started = false;
   stop_audio_instances ();
@@ -1446,6 +1460,7 @@ quit_game (void)
   unload_level ();
   unload_cutscenes ();
   unload_audio_data ();
+  unload_oitofelix_face ();
 
   finalize_mouse ();
   finalize_gamepad ();
@@ -1587,6 +1602,24 @@ dialog_thread (ALLEGRO_THREAD *thread, void *arg)
   create_main_menu ();
 
   return dialog;
+}
+
+void *
+message_box_thread (ALLEGRO_THREAD *thread, void *arg)
+{
+  struct message_box *d = arg;
+  show_mouse_cursor ();
+
+  al_show_native_message_box
+    (display, d->title, d->heading, d->text, d->buttons, d->flags);
+
+  al_set_thread_should_stop (thread);
+
+  if (is_fullscreen () && ! is_showing_menu ())
+    hide_mouse_cursor ();
+  else show_mouse_cursor ();
+
+  return NULL;
 }
 
 bool
@@ -1757,6 +1790,18 @@ handle_save_picture_thread (int priority)
   }
   al_destroy_native_file_dialog (dialog);
   pause_animation (false);
+}
+
+void
+handle_message_box_thread (void)
+{
+  if (! message_box_thread_id
+      || ! al_get_thread_should_stop (message_box_thread_id))
+    return;
+
+  al_join_thread (message_box_thread_id, NULL);
+  al_destroy_thread (message_box_thread_id);
+  message_box_thread_id = NULL;
 }
 
 int

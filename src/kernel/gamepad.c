@@ -297,7 +297,7 @@ joystick_info (void)
     if (HAPTIC_FEATURE && WINDOWS_PORT) {
       init_dialog ();
       init_video ();
-      show_logo ("Querying joystick...", NULL);
+      show_logo ("Querying joystick...", NULL, NULL);
     }
     init_gamepad ();
     calibrate_joystick ();
@@ -522,7 +522,7 @@ was_char_pressed (char c)
 bool
 was_any_key_pressed (void)
 {
-  return (key.keycode != 0)
+  return key.keycode != 0
     || joystick_button != -1;
 }
 

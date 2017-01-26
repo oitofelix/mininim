@@ -176,6 +176,7 @@
 
 /* functions */
 void *dialog_thread (ALLEGRO_THREAD *thread, void *arg);
+void *message_box_thread (ALLEGRO_THREAD *thread, void *arg);
 bool load_config (char *filename, ALLEGRO_TEXTLOG *textlog, int priority);
 bool save_game (char *filename, int priority);
 int max_int (int a, int b);
@@ -196,6 +197,7 @@ bool save_level (struct level *l);
 void handle_load_config_thread (int priority);
 void handle_save_game_thread (int priority);
 void handle_save_picture_thread (int priority);
+void handle_message_box_thread (void);
 
 /* variables */
 extern enum level_module level_module;
@@ -246,9 +248,12 @@ extern bool princess_scream;
 extern bool mouse_scream;
 
 extern ALLEGRO_THREAD *load_config_dialog_thread,
-  *save_game_dialog_thread, *save_picture_dialog_thread;
+  *save_game_dialog_thread, *save_picture_dialog_thread,
+  *message_box_thread_id;
 
 extern struct dialog load_config_dialog, save_game_dialog,
   save_picture_dialog;
+
+extern struct message_box about_dialog;
 
 #endif	/* MININIM_MININIM_H */
