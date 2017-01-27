@@ -63,7 +63,8 @@ ALLEGRO_BITMAP *small_logo_icon,
   *zoom_in_icon, *zoom_reset_icon, *heading_icon, *zoom_icon,
   *navigation_icon, *nav_select_icon, *nav_cell_icon, *nav_page_icon,
   *nav_left_icon, *nav_right_icon, *nav_above_icon, *nav_below_icon,
-  *nav_home_icon, *nav_center_icon, *compass_icon, *compass2_icon;
+  *nav_home_icon, *nav_center_icon, *compass_icon, *compass2_icon,
+  *drawing_icon;
 
 
 
@@ -163,6 +164,7 @@ load_icons (void)
   nav_center_icon = load_icon (NAV_CENTER_ICON);
   compass_icon = load_icon (COMPASS_ICON);
   compass2_icon = load_icon (COMPASS2_ICON);
+  drawing_icon = load_icon (DRAWING_ICON);
 }
 
 void
@@ -238,6 +240,7 @@ unload_icons (void)
   destroy_bitmap (nav_center_icon);
   destroy_bitmap (compass_icon);
   destroy_bitmap (compass2_icon);
+  destroy_bitmap (drawing_icon);
 }
 
 
@@ -602,6 +605,10 @@ view_menu (void)
   menu_citem ("Inhibit screensaver", INHIBIT_SCREENSAVER_MID, true,
               inhibit_screensaver, micon (screensaver_icon));
 
+  menu_citem ("Room &drawing (Shift+B)", ROOM_DRAWING_MID,
+              ! cutscene && ! title_demo,
+              ! no_room_drawing, micon (drawing_icon));
+
   menu_sitem ("&Screenshot... (Ctrl+P)", SCREENSHOT_MID, true,
               micon (camera_icon));
 
@@ -733,10 +740,10 @@ navigation_menu (void)
   menu_sub ("&Selection", NAV_SELECT_MID, true,
             micon (nav_select_icon));
 
-  menu_sub ("Scroll &Row", NAV_CELL_MID, true,
+  menu_sub ("Scroll &row", NAV_CELL_MID, true,
             micon (nav_cell_icon));
 
-  menu_sub ("Scroll &Page", NAV_PAGE_MID, true,
+  menu_sub ("Scroll &page", NAV_PAGE_MID, true,
             micon (nav_page_icon));
 
   struct anim *k = get_anim_by_id (current_kid_id);
@@ -1379,6 +1386,9 @@ menu_mid (intptr_t mid)
   case INHIBIT_SCREENSAVER_MID:
     ui_inhibit_screensaver (! inhibit_screensaver);
     break;
+  case ROOM_DRAWING_MID:
+    ui_room_drawing (no_room_drawing);
+    break;
   case SCREENSHOT_MID:
     ui_screenshot ();
     break;
@@ -1781,10 +1791,8 @@ level_key_bindings (void)
     ui_show_indirect_coordinates ();
 
   /* SHIFT+B: enable/disable room drawing */
-  else if (was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_B)) {
-    no_room_drawing = ! no_room_drawing;
-    force_full_redraw = true;
-  }
+  else if (was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_B))
+    ui_room_drawing (no_room_drawing);
 
   /* R: resurrect kid */
   else if (! active_menu
@@ -2391,7 +2399,7 @@ ui_flip_screen (int flags, bool correct_mouse, bool save_only)
 
   char *text;
   xasprintf (&text, "%s: %s", key, value);
-  draw_bottom_text (NULL, text, 1);
+  draw_bottom_text (NULL, text, 0);
   al_free (text);
 
   ui_flip_gamepad (flip_gamepad_vertical, flip_gamepad_horizontal, true);
@@ -2411,10 +2419,27 @@ ui_inhibit_screensaver (bool inhibit)
 
   char *text;
   xasprintf (&text, "%s: %s", key, value);
-  draw_bottom_text (NULL, text, 1);
+  draw_bottom_text (NULL, text, 0);
   al_free (text);
 
   ui_save_setting (key, value);
+  view_menu ();
+}
+
+void
+ui_room_drawing (bool draw)
+{
+  char *key = "ROOM DRAWING";
+  char *value = draw ? "ON" : "OFF";
+
+  no_room_drawing = ! draw;
+  force_full_redraw = true;
+
+  char *text;
+  xasprintf (&text, "%s: %s", key, value);
+  draw_bottom_text (NULL, text, 0);
+  al_free (text);
+
   view_menu ();
 }
 

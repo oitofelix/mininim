@@ -90,6 +90,7 @@
 #define NAV_CENTER_ICON "data/icons/nav-center.png"
 #define COMPASS_ICON "data/icons/compass.png"
 #define COMPASS2_ICON "data/icons/compass2.png"
+#define DRAWING_ICON "data/icons/drawing.png"
 
 enum main_menu {
   BASE_MID = 0,
@@ -170,6 +171,7 @@ enum main_menu {
   FLIP_SCREEN_VERTICAL_MID,
   FLIP_SCREEN_HORIZONTAL_MID,
   INHIBIT_SCREENSAVER_MID,
+  ROOM_DRAWING_MID,
   SCREENSHOT_MID,
 
   GAMEPAD_MID,
@@ -282,6 +284,7 @@ void ui_environment_mode (enum em new_em);
 void ui_video_mode (enum vm new_vm);
 void ui_flip_screen (int flags, bool correct_mouse, bool save_only);
 void ui_inhibit_screensaver (bool inhibit);
+void ui_room_drawing (bool draw);
 void ui_screenshot (void);
 
 void ui_gamepad_mode (enum gpm new_gpm);
