@@ -27,7 +27,7 @@ static int append_menu_index;
 static void start_menu (ALLEGRO_MENU *parent, uint16_t id);
 static bool menu_item (char const *title, uint16_t id, int flags,
                        ALLEGRO_BITMAP *icon, bool has_submenu);
-static bool menu_hitem (char const *title);
+static bool menu_hitem (char const *title, uint16_t id, bool enabled);
 static bool menu_sitem (char const *title, uint16_t id, bool enabled,
                         ALLEGRO_BITMAP *icon);
 static bool menu_ditem (bool first, char const *title0, char const *title1,
@@ -50,7 +50,7 @@ ALLEGRO_BITMAP *small_logo_icon,
   *full_screen_icon, *windows_icon, *camera_icon, *play_icon,
   *record_icon, *stop_icon, *eject_icon, *backward_icon,
   *forward_icon, *pause_icon, *previous_icon, *next_icon,
-  *screen_icon, *right_icon, *card_icon, *dungeon_icon,
+  *screen_icon, *right_icon, *dungeon_icon,
   *palace_icon, *green_icon, *gray_icon, *yellow_icon,
   *blue_icon, *black_icon, *vga_icon, *ega_icon, *cga_icon,
   *hgc_icon, *vertical_icon, *horizontal_icon,
@@ -60,7 +60,7 @@ ALLEGRO_BITMAP *small_logo_icon,
   *volume_low_icon, *volume_medium_icon, *volume_high_icon,
   *game_icon, *settings_icon, *zoom_none_icon, *zoom_stretch_icon,
   *zoom_ratio_icon, *vertical_horizontal_icon, *zoom_out_icon,
-  *zoom_in_icon, *zoom_reset_icon, *heading_icon, *zoom_icon,
+  *zoom_in_icon, *heading_icon, *zoom_icon,
   *navigation_icon, *nav_select_icon, *nav_cell_icon, *nav_page_icon,
   *nav_left_icon, *nav_right_icon, *nav_above_icon, *nav_below_icon,
   *nav_home_icon, *nav_center_icon, *compass_icon, *compass2_icon,
@@ -113,7 +113,6 @@ load_icons (void)
   next_icon = load_icon (NEXT_ICON);
   screen_icon = load_icon (SCREEN_ICON);
   right_icon = load_icon (RIGHT_ICON);
-  card_icon = load_icon (CARD_ICON);
   dungeon_icon = load_icon (DUNGEON_ICON);
   palace_icon = load_icon (PALACE_ICON);
   green_icon = load_icon (GREEN_ICON);
@@ -149,7 +148,6 @@ load_icons (void)
   vertical_horizontal_icon = load_icon (VERTICAL_HORIZONTAL_ICON);
   zoom_out_icon = load_icon (ZOOM_OUT_ICON);
   zoom_in_icon = load_icon (ZOOM_IN_ICON);
-  zoom_reset_icon = load_icon (ZOOM_RESET_ICON);
   heading_icon = load_icon (HEADING_ICON);
   zoom_icon = load_icon (ZOOM_ICON);
   navigation_icon = load_icon (NAVIGATION_ICON);
@@ -189,7 +187,6 @@ unload_icons (void)
   destroy_bitmap (next_icon);
   destroy_bitmap (screen_icon);
   destroy_bitmap (right_icon);
-  destroy_bitmap (card_icon);
   destroy_bitmap (dungeon_icon);
   destroy_bitmap (palace_icon);
   destroy_bitmap (green_icon);
@@ -225,7 +222,6 @@ unload_icons (void)
   destroy_bitmap (vertical_horizontal_icon);
   destroy_bitmap (zoom_out_icon);
   destroy_bitmap (zoom_in_icon);
-  destroy_bitmap (zoom_reset_icon);
   destroy_bitmap (heading_icon);
   destroy_bitmap (zoom_icon);
   destroy_bitmap (navigation_icon);
@@ -302,9 +298,9 @@ menu_item (char const *title, uint16_t id, int flags,
 
 #if MENU_FEATURE
 bool
-menu_hitem (char const *title)
+menu_hitem (char const *title, uint16_t id, bool enabled)
 {
-  return menu_item (title, NO_MID, ALLEGRO_MENU_ITEM_DISABLED,
+  return menu_item (title, id, enabled ? 0 : ALLEGRO_MENU_ITEM_DISABLED,
                     micon (heading_icon), false);
 }
 #endif
@@ -597,17 +593,19 @@ view_menu (void)
 
   menu_sub ("&Video (F12)", VIDEO_MODE_MID, true, vm_icon (vm));
 
-  menu_sep ();
-
   menu_sub ("&Flip (Shift+I)", FLIP_SCREEN_MID, true,
             flip_screen_icon (screen_flags));
 
-  menu_citem ("Inhibit screensaver", INHIBIT_SCREENSAVER_MID, true,
-              inhibit_screensaver, micon (screensaver_icon));
+  menu_sep ();
 
   menu_citem ("Room &drawing (Shift+B)", ROOM_DRAWING_MID,
               ! cutscene && ! title_demo,
               ! no_room_drawing, micon (drawing_icon));
+
+  menu_citem ("Inhibit screensaver", INHIBIT_SCREENSAVER_MID, true,
+              inhibit_screensaver, micon (screensaver_icon));
+
+  menu_sep ();
 
   menu_sitem ("&Screenshot... (Ctrl+P)", SCREENSHOT_MID, true,
               micon (camera_icon));
@@ -631,7 +629,9 @@ zoom_menu (void)
 
   char *text;
   xasprintf (&text, "MULTI-ROOM %ix%i", mr.w, mr.h);
-  menu_hitem (text);
+  menu_hitem (text, ZOOM_RESET_MID, ! cutscene && ! title_demo
+              && (mr.w != 2 || mr.h != 2
+                  || mr.fit_mode != MR_FIT_NONE));
   al_free (text);
 
   menu_sub ("&Fit (M)", ZOOM_FIT_MID, ! cutscene && ! title_demo,
@@ -643,12 +643,6 @@ zoom_menu (void)
 
   menu_sub ("&Out", ZOOM_OUT_MID, ! cutscene && ! title_demo,
             micon (zoom_out_icon));
-
-  menu_sitem ("&Reset", ZOOM_RESET_MID,
-              ! cutscene && ! title_demo
-              && (mr.w != 2 || mr.h != 2
-                  || mr.fit_mode != MR_FIT_NONE),
-              micon (zoom_reset_icon));
 
   end_menu ();
 
@@ -734,7 +728,7 @@ navigation_menu (void)
 
   char *text;
   xasprintf (&text, "ROOM %i", mr.room);
-  menu_hitem (text);
+  menu_hitem (text, NAV_CURRENT_ROOM_SELECT_MID, true);
   al_free (text);
 
   menu_sub ("&Selection", NAV_SELECT_MID, true,
@@ -1064,7 +1058,7 @@ replay_menu (void)
   case PLAY_REPLAY:
     xasprintf (&text, "REPLAYING (%i/%i)", replay_index + 1,
                replay_chain_nmemb);
-    menu_hitem (text);
+    menu_hitem (text, RESTART_REPLAY_LEVEL_MID, true);
     al_free (text);
 
     menu_sitem
@@ -1085,7 +1079,7 @@ replay_menu (void)
     break;
   case RECORD_REPLAY: record_replay:
 
-    menu_hitem ("RECORDING");
+    menu_hitem ("RECORDING", NO_MID, false);
 
     menu_sitem
       (recording_replay_countdown >= 0
@@ -1160,7 +1154,7 @@ pause_menu_widget (void)
   if (is_game_paused ()) {
     char *title;
     xasprintf (&title, "CYCLE: %i", anim_cycle);
-    menu_hitem (title);
+    menu_hitem (title, NO_MID, false);
     al_free (title);
   } else menu_sep ();
 
@@ -1185,21 +1179,21 @@ speed_menu_widget (void)
   if (anim_freq > 0) {
     char *title;
     xasprintf (&title, "FREQ: %iHz", anim_freq);
-    menu_hitem (title);
+    menu_hitem (title, RESET_TIME_FREQ_MID, anim_freq != DEFAULT_HZ);
     al_free (title);
   } else menu_sep ();
 
   menu_citem
-    ("Speed cons&traint", TOGGLE_TIME_FREQUENCY_CONSTRAINT_MID,
+    ("Speed cons&traint", TOGGLE_TIME_FREQ_CONSTRAINT_MID,
      ! cutscene && ! title_demo, anim_freq > 0, micon (cancel_icon));
 
   menu_sitem
-    ("&Decrease speed [(]", DECREASE_TIME_FREQUENCY_MID,
+    ("&Decrease speed [(]", DECREASE_TIME_FREQ_MID,
      anim_freq > 2 && ! cutscene && ! title_demo,
      micon (backward_icon));
 
   menu_sitem
-    ("&Increase speed [)]", INCREASE_TIME_FREQUENCY_MID,
+    ("&Increase speed [)]", INCREASE_TIME_FREQ_MID,
      anim_freq != 0 && ! cutscene && ! title_demo,
      micon (forward_icon));
 }
@@ -1289,6 +1283,9 @@ menu_mid (intptr_t mid)
   case ZOOM_RESET_MID:
     ui_zoom_fit (MR_FIT_NONE);
     ui_set_multi_room (2 - mr.w, 2 - mr.h);
+    break;
+  case NAV_CURRENT_ROOM_SELECT_MID:
+    mr.select_cycles = SELECT_CYCLES;
     break;
   case NAV_SELECT_LEFT_MID:
     mr_select_trans (LEFT);
@@ -1413,6 +1410,9 @@ menu_mid (intptr_t mid)
 
 
     /* REPLAY */
+  case RESTART_REPLAY_LEVEL_MID:
+    ui_restart_replay_level ();
+    break;
   case PLAY_REPLAY_MID:
     ui_play_replay ();
     break;
@@ -1431,13 +1431,16 @@ menu_mid (intptr_t mid)
   case NEXT_FRAME_MID:
     ui_next_frame ();
     break;
-  case DECREASE_TIME_FREQUENCY_MID:
+  case RESET_TIME_FREQ_MID:
+    ui_change_anim_freq (DEFAULT_HZ);
+    break;
+  case DECREASE_TIME_FREQ_MID:
     ui_decrease_time_frequency ();
     break;
-  case INCREASE_TIME_FREQUENCY_MID:
+  case INCREASE_TIME_FREQ_MID:
     ui_increase_time_frequency ();
     break;
-  case TOGGLE_TIME_FREQUENCY_CONSTRAINT_MID:
+  case TOGGLE_TIME_FREQ_CONSTRAINT_MID:
     ui_toggle_time_frequency_constraint ();
     break;
 
@@ -2512,6 +2515,12 @@ ui_play_replay (void)
     print_replay_chain_aborted ();
     stop_replaying (2);
   } else create_load_replay_thread ();
+}
+
+void
+ui_restart_replay_level (void)
+{
+  quit_anim = REPLAY_RESTART_LEVEL;
 }
 
 void

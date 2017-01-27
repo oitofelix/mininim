@@ -39,7 +39,6 @@
 #define NEXT_ICON "data/icons/next.png"
 #define SCREEN_ICON "data/icons/screen.png"
 #define RIGHT_ICON "data/icons/right.png"
-#define CARD_ICON "data/icons/card.png"
 #define DUNGEON_ICON "data/icons/dungeon.png"
 #define PALACE_ICON "data/icons/palace.png"
 #define GREEN_ICON "data/icons/green.png"
@@ -75,7 +74,6 @@
 #define VERTICAL_HORIZONTAL_ICON "data/icons/vertical-horizontal.png"
 #define ZOOM_OUT_ICON "data/icons/zoom-out.png"
 #define ZOOM_IN_ICON "data/icons/zoom-in.png"
-#define ZOOM_RESET_ICON "data/icons/zoom-reset.png"
 #define HEADING_ICON "data/icons/heading.png"
 #define ZOOM_ICON "data/icons/zoom.png"
 #define NAVIGATION_ICON "data/icons/navigation.png"
@@ -131,6 +129,7 @@ enum main_menu {
   ZOOM_IN_HORIZONTAL_MID,
   ZOOM_RESET_MID,
   NAV_MID,
+  NAV_CURRENT_ROOM_SELECT_MID,
   NAV_SELECT_MID,
   NAV_SELECT_LEFT_MID,
   NAV_SELECT_RIGHT_MID,
@@ -184,15 +183,17 @@ enum main_menu {
   FLIP_GAMEPAD_HORIZONTAL_MID,
 
   REPLAY_MID,
+  RESTART_REPLAY_LEVEL_MID,
   PLAY_REPLAY_MID,
   PREVIOUS_REPLAY_MID,
   NEXT_REPLAY_MID,
   RECORD_REPLAY_MID,
   TOGGLE_PAUSE_GAME_MID,
   NEXT_FRAME_MID,
-  INCREASE_TIME_FREQUENCY_MID,
-  DECREASE_TIME_FREQUENCY_MID,
-  TOGGLE_TIME_FREQUENCY_CONSTRAINT_MID,
+  RESET_TIME_FREQ_MID,
+  INCREASE_TIME_FREQ_MID,
+  DECREASE_TIME_FREQ_MID,
+  TOGGLE_TIME_FREQ_CONSTRAINT_MID,
 
   EDITOR_MID,
   EDIT_MODE_MID,
@@ -291,6 +292,7 @@ void ui_gamepad_mode (enum gpm new_gpm);
 void ui_flip_gamepad (bool v, bool h, bool save_only);
 
 void ui_play_replay (void);
+void ui_restart_replay_level (void);
 void ui_previous_replay (void);
 void ui_next_replay (void);
 void ui_record_replay (void);

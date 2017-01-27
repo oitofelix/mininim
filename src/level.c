@@ -290,6 +290,10 @@ play_level (struct level *lv)
     skill = k->skill;
     start_level_time = play_time;
     break;
+  case REPLAY_RESTART_LEVEL:
+    HLINE;
+    printf ("RESTART REPLAY LEVEL\n");
+    goto restart_level;
   case RESTART_LEVEL:
   restart_level:
     retry_level = global_level.n;

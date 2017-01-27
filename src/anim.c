@@ -310,6 +310,7 @@ play_anim (void (*draw_callback) (void),
     case REPLAY_INCOMPLETE: break;
     case REPLAY_PREVIOUS: break;
     case REPLAY_NEXT: break;
+    case REPLAY_RESTART_LEVEL: break;
     default:
       print_replay_chain_aborted ();
       stop_replaying (1);
