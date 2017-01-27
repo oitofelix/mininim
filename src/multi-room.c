@@ -380,6 +380,7 @@ mr_restore_origin (struct mr_origin *o)
 void
 mr_set_origin (int room, int rx, int ry)
 {
+  int old_mr_room = mr.room;
   mr.room = room;
   mr.x = rx;
   mr.y = ry;
@@ -393,6 +394,8 @@ mr_set_origin (int room, int rx, int ry)
     for (y = 0; y < mr.h; y++) {
       if (mr.cell[x][y].room < 0) mr.cell[x][y].room = 0;
     }
+
+  if (old_mr_room != mr.room) navigation_menu ();
 }
 
 void
@@ -496,8 +499,6 @@ mr_view_trans (enum dir d)
 
   mr_set_origin (mr.room, mr.x + dx, mr.y + dy);
   mr_stabilize_origin (&o, d);
-
-  return;
 }
 
 void

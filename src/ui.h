@@ -76,8 +76,20 @@
 #define ZOOM_OUT_ICON "data/icons/zoom-out.png"
 #define ZOOM_IN_ICON "data/icons/zoom-in.png"
 #define ZOOM_RESET_ICON "data/icons/zoom-reset.png"
-#define MULTIPLE_ICON "data/icons/multiple.png"
+#define HEADING_ICON "data/icons/heading.png"
 #define ZOOM_ICON "data/icons/zoom.png"
+#define NAVIGATION_ICON "data/icons/navigation.png"
+#define NAV_SELECT_ICON "data/icons/nav-select.png"
+#define NAV_CELL_ICON "data/icons/nav-cell.png"
+#define NAV_PAGE_ICON "data/icons/nav-page.png"
+#define NAV_LEFT_ICON "data/icons/nav-left.png"
+#define NAV_RIGHT_ICON "data/icons/nav-right.png"
+#define NAV_ABOVE_ICON "data/icons/nav-above.png"
+#define NAV_BELOW_ICON "data/icons/nav-below.png"
+#define NAV_HOME_ICON "data/icons/nav-home.png"
+#define NAV_CENTER_ICON "data/icons/nav-center.png"
+#define COMPASS_ICON "data/icons/compass.png"
+#define COMPASS2_ICON "data/icons/compass2.png"
 
 enum main_menu {
   BASE_MID = 0,
@@ -117,6 +129,26 @@ enum main_menu {
   ZOOM_IN_VERTICAL_MID,
   ZOOM_IN_HORIZONTAL_MID,
   ZOOM_RESET_MID,
+  NAV_MID,
+  NAV_SELECT_MID,
+  NAV_SELECT_LEFT_MID,
+  NAV_SELECT_RIGHT_MID,
+  NAV_SELECT_ABOVE_MID,
+  NAV_SELECT_BELOW_MID,
+  NAV_CELL_MID,
+  NAV_CELL_LEFT_MID,
+  NAV_CELL_RIGHT_MID,
+  NAV_CELL_ABOVE_MID,
+  NAV_CELL_BELOW_MID,
+  NAV_PAGE_MID,
+  NAV_PAGE_LEFT_MID,
+  NAV_PAGE_RIGHT_MID,
+  NAV_PAGE_ABOVE_MID,
+  NAV_PAGE_BELOW_MID,
+  NAV_HOME_MID,
+  NAV_CENTER_MID,
+  COORDINATES_MID,
+  INDIRECT_COORDINATES_MID,
   HUE_MODE_MID,
   HUE_ORIGINAL_MID,
   HUE_NONE_MID,
@@ -192,6 +224,10 @@ ALLEGRO_BITMAP *zoom_fit_icon (enum mr_fit_mode fit);
 void zoom_fit_menu (void);
 void zoom_out_menu (void);
 void zoom_in_menu (void);
+void navigation_menu (void);
+void nav_select_menu (void);
+void nav_cell_menu (void);
+void nav_page_menu (void);
 ALLEGRO_BITMAP *hue_icon (enum hue hue);
 void hue_mode_menu (void);
 ALLEGRO_BITMAP *em_icon (enum em em);
@@ -239,6 +275,8 @@ void ui_quit_game (void);
 void ui_full_screen (void);
 void ui_zoom_fit (enum mr_fit_mode fit);
 bool ui_set_multi_room (int dw, int dh);
+void ui_show_coordinates (void);
+void ui_show_indirect_coordinates (void);
 void ui_hue_mode (enum hue new_hue);
 void ui_environment_mode (enum em new_em);
 void ui_video_mode (enum vm new_vm);

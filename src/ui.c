@@ -27,6 +27,7 @@ static int append_menu_index;
 static void start_menu (ALLEGRO_MENU *parent, uint16_t id);
 static bool menu_item (char const *title, uint16_t id, int flags,
                        ALLEGRO_BITMAP *icon, bool has_submenu);
+static bool menu_hitem (char const *title);
 static bool menu_sitem (char const *title, uint16_t id, bool enabled,
                         ALLEGRO_BITMAP *icon);
 static bool menu_ditem (bool first, char const *title0, char const *title1,
@@ -59,7 +60,10 @@ ALLEGRO_BITMAP *small_logo_icon,
   *volume_low_icon, *volume_medium_icon, *volume_high_icon,
   *game_icon, *settings_icon, *zoom_none_icon, *zoom_stretch_icon,
   *zoom_ratio_icon, *vertical_horizontal_icon, *zoom_out_icon,
-  *zoom_in_icon, *zoom_reset_icon, *multiple_icon, *zoom_icon;
+  *zoom_in_icon, *zoom_reset_icon, *heading_icon, *zoom_icon,
+  *navigation_icon, *nav_select_icon, *nav_cell_icon, *nav_page_icon,
+  *nav_left_icon, *nav_right_icon, *nav_above_icon, *nav_below_icon,
+  *nav_home_icon, *nav_center_icon, *compass_icon, *compass2_icon;
 
 
 
@@ -145,8 +149,20 @@ load_icons (void)
   zoom_out_icon = load_icon (ZOOM_OUT_ICON);
   zoom_in_icon = load_icon (ZOOM_IN_ICON);
   zoom_reset_icon = load_icon (ZOOM_RESET_ICON);
-  multiple_icon = load_icon (MULTIPLE_ICON);
+  heading_icon = load_icon (HEADING_ICON);
   zoom_icon = load_icon (ZOOM_ICON);
+  navigation_icon = load_icon (NAVIGATION_ICON);
+  nav_select_icon = load_icon (NAV_SELECT_ICON);
+  nav_cell_icon = load_icon (NAV_CELL_ICON);
+  nav_page_icon = load_icon (NAV_PAGE_ICON);
+  nav_left_icon = load_icon (NAV_LEFT_ICON);
+  nav_right_icon = load_icon (NAV_RIGHT_ICON);
+  nav_above_icon = load_icon (NAV_ABOVE_ICON);
+  nav_below_icon = load_icon (NAV_BELOW_ICON);
+  nav_home_icon = load_icon (NAV_HOME_ICON);
+  nav_center_icon = load_icon (NAV_CENTER_ICON);
+  compass_icon = load_icon (COMPASS_ICON);
+  compass2_icon = load_icon (COMPASS2_ICON);
 }
 
 void
@@ -208,8 +224,20 @@ unload_icons (void)
   destroy_bitmap (zoom_out_icon);
   destroy_bitmap (zoom_in_icon);
   destroy_bitmap (zoom_reset_icon);
-  destroy_bitmap (multiple_icon);
+  destroy_bitmap (heading_icon);
   destroy_bitmap (zoom_icon);
+  destroy_bitmap (navigation_icon);
+  destroy_bitmap (nav_select_icon);
+  destroy_bitmap (nav_cell_icon);
+  destroy_bitmap (nav_page_icon);
+  destroy_bitmap (nav_left_icon);
+  destroy_bitmap (nav_right_icon);
+  destroy_bitmap (nav_above_icon);
+  destroy_bitmap (nav_below_icon);
+  destroy_bitmap (nav_home_icon);
+  destroy_bitmap (nav_center_icon);
+  destroy_bitmap (compass_icon);
+  destroy_bitmap (compass2_icon);
 }
 
 
@@ -266,6 +294,15 @@ menu_item (char const *title, uint16_t id, int flags,
   al_remove_menu_item (append_menu, -append_menu_index);
   return al_insert_menu_item (append_menu, -(append_menu_index++), title,
                               id, flags, icon, submenu);
+}
+#endif
+
+#if MENU_FEATURE
+bool
+menu_hitem (char const *title)
+{
+  return menu_item (title, NO_MID, ALLEGRO_MENU_ITEM_DISABLED,
+                    micon (heading_icon), false);
 }
 #endif
 
@@ -411,7 +448,7 @@ create_main_menu (void)
 
   menu_sub ("&Editor", EDITOR_MID, can_edit (), NULL);
 
-  menu_sub ("&Help", HELP_MID, true, NULL);
+  menu_sub ("Hel&p", HELP_MID, true, NULL);
 
   end_menu ();
 
@@ -546,6 +583,9 @@ view_menu (void)
   menu_sub ("&Zoom", ZOOM_MID, ! cutscene && ! title_demo,
             micon (zoom_icon));
 
+  menu_sub ("&Navigation", NAV_MID, ! cutscene && ! title_demo,
+            micon (navigation_icon));
+
   menu_sep ();
 
   menu_sub ("&Hue (F9)", HUE_MODE_MID, true, hue_icon (hue));
@@ -568,6 +608,7 @@ view_menu (void)
   end_menu ();
 
   zoom_menu ();
+  navigation_menu ();
   hue_mode_menu ();
   environment_mode_menu ();
   video_mode_menu ();
@@ -578,11 +619,12 @@ view_menu (void)
 void
 zoom_menu (void)
 {
+#if MENU_FEATURE
   start_menu (main_menu, ZOOM_MID);
 
   char *text;
   xasprintf (&text, "MULTI-ROOM %ix%i", mr.w, mr.h);
-  menu_sitem (text, NO_MID, false, micon (multiple_icon));
+  menu_hitem (text);
   al_free (text);
 
   menu_sub ("&Fit (M)", ZOOM_FIT_MID, ! cutscene && ! title_demo,
@@ -606,6 +648,7 @@ zoom_menu (void)
   zoom_fit_menu ();
   zoom_out_menu ();
   zoom_in_menu ();
+#endif
 }
 
 ALLEGRO_BITMAP *
@@ -671,6 +714,119 @@ zoom_in_menu (void)
 
   menu_sitem ("&Horizontal (Ctrl+[)", ZOOM_IN_HORIZONTAL_MID, mr.w > 1,
               micon (horizontal_icon));
+
+  end_menu ();
+#endif
+}
+
+void
+navigation_menu (void)
+{
+#if MENU_FEATURE
+  start_menu (main_menu, NAV_MID);
+
+  char *text;
+  xasprintf (&text, "ROOM %i", mr.room);
+  menu_hitem (text);
+  al_free (text);
+
+  menu_sub ("&Selection", NAV_SELECT_MID, true,
+            micon (nav_select_icon));
+
+  menu_sub ("&Cell", NAV_CELL_MID, true,
+            micon (nav_cell_icon));
+
+  menu_sub ("&Page", NAV_PAGE_MID, true,
+            micon (nav_page_icon));
+
+  struct anim *k = get_anim_by_id (current_kid_id);
+  menu_sitem ("&Home (Home)", NAV_HOME_MID,
+              k && k->f.c.room != mr.room,
+              micon (nav_home_icon));
+
+  menu_sitem ("&Center (Shift+Home)", NAV_CENTER_MID, true,
+              micon (nav_home_icon));
+
+  menu_sitem ("C&oordinates (C)", COORDINATES_MID, true,
+              micon (compass_icon));
+
+  menu_sitem ("&Indirect coordinates (Shift+C)",
+              INDIRECT_COORDINATES_MID, true,
+              micon (compass2_icon));
+
+  end_menu ();
+
+  nav_select_menu ();
+  nav_cell_menu ();
+  nav_page_menu ();
+#endif
+}
+
+void
+nav_select_menu (void)
+{
+#if MENU_FEATURE
+  start_menu (main_menu, NAV_SELECT_MID);
+
+  menu_sitem ("&Left (H)", NAV_SELECT_LEFT_MID,
+              roomd (&global_level, mr.room, LEFT),
+              micon (nav_left_icon));
+
+  menu_sitem ("&Above (U)", NAV_SELECT_ABOVE_MID,
+              roomd (&global_level, mr.room, ABOVE),
+              micon (nav_above_icon));
+
+  menu_sitem ("&Right (J)", NAV_SELECT_RIGHT_MID,
+              roomd (&global_level, mr.room, RIGHT),
+              micon (nav_right_icon));
+
+  menu_sitem ("&Below (N)", NAV_SELECT_BELOW_MID,
+              roomd (&global_level, mr.room, BELOW),
+              micon (nav_below_icon));
+
+  end_menu ();
+#endif
+}
+
+void
+nav_cell_menu (void)
+{
+#if MENU_FEATURE
+  start_menu (main_menu, NAV_CELL_MID);
+
+  menu_sitem ("&Left (Shift+H)", NAV_CELL_LEFT_MID, true,
+              micon (nav_left_icon));
+
+  menu_sitem ("&Above (Shift+U)", NAV_CELL_ABOVE_MID, true,
+              micon (nav_above_icon));
+
+  menu_sitem ("&Right (Shift+J)", NAV_CELL_RIGHT_MID, true,
+              micon (nav_right_icon));
+
+  menu_sitem ("&Below (Shift+N)", NAV_CELL_BELOW_MID, true,
+              micon (nav_below_icon));
+
+  end_menu ();
+#endif
+}
+
+void
+nav_page_menu (void)
+{
+#if MENU_FEATURE
+  start_menu (main_menu, NAV_PAGE_MID);
+
+  menu_sitem ("&Left (Alt+H)", NAV_PAGE_LEFT_MID, true,
+              micon (nav_left_icon));
+
+  menu_sitem ("&Above (Alt+U)", NAV_PAGE_ABOVE_MID, true,
+              micon (nav_above_icon));
+
+  menu_sitem ("&Right (Alt+J)", NAV_PAGE_RIGHT_MID, true,
+              micon (nav_right_icon));
+
+  menu_sitem ("&Below (Alt+N)", NAV_PAGE_BELOW_MID, true,
+              micon (nav_below_icon));
 
   end_menu ();
 #endif
@@ -901,10 +1057,8 @@ replay_menu (void)
   case PLAY_REPLAY:
     xasprintf (&text, "REPLAYING (%i/%i)", replay_index + 1,
                replay_chain_nmemb);
-    menu_sitem (text, NO_MID, false, micon (play_icon));
+    menu_hitem (text);
     al_free (text);
-
-    menu_sep ();
 
     menu_sitem
       ("&Stop (F7)", PLAY_REPLAY_MID, true, micon (stop_icon));
@@ -924,9 +1078,7 @@ replay_menu (void)
     break;
   case RECORD_REPLAY: record_replay:
 
-    menu_sitem ("RECORDING", NO_MID, false, micon (record_icon));
-
-    menu_sep ();
+    menu_hitem ("RECORDING");
 
     menu_sitem
       (recording_replay_countdown >= 0
@@ -998,7 +1150,12 @@ help_menu (void)
 void
 pause_menu_widget (void)
 {
-  menu_sep ();
+  if (is_game_paused ()) {
+    char *title;
+    xasprintf (&title, "CYCLE: %i", anim_cycle);
+    menu_hitem (title);
+    al_free (title);
+  } else menu_sep ();
 
   menu_sitem
     (is_game_paused ()
@@ -1018,7 +1175,12 @@ pause_menu_widget (void)
 void
 speed_menu_widget (void)
 {
-  menu_sep ();
+  if (anim_freq > 0) {
+    char *title;
+    xasprintf (&title, "FREQ: %iHz", anim_freq);
+    menu_hitem (title);
+    al_free (title);
+  } else menu_sep ();
 
   menu_citem
     ("Speed cons&traint", TOGGLE_TIME_FREQUENCY_CONSTRAINT_MID,
@@ -1120,6 +1282,54 @@ menu_mid (intptr_t mid)
   case ZOOM_RESET_MID:
     ui_zoom_fit (MR_FIT_NONE);
     ui_set_multi_room (2 - mr.w, 2 - mr.h);
+    break;
+  case NAV_SELECT_LEFT_MID:
+    mr_select_trans (LEFT);
+    break;
+  case NAV_SELECT_RIGHT_MID:
+    mr_select_trans (RIGHT);
+    break;
+  case NAV_SELECT_ABOVE_MID:
+    mr_select_trans (ABOVE);
+    break;
+  case NAV_SELECT_BELOW_MID:
+    mr_select_trans (BELOW);
+    break;
+  case NAV_CELL_LEFT_MID:
+    mr_view_trans (LEFT);
+    break;
+  case NAV_CELL_RIGHT_MID:
+    mr_view_trans (RIGHT);
+    break;
+  case NAV_CELL_ABOVE_MID:
+    mr_view_trans (ABOVE);
+    break;
+  case NAV_CELL_BELOW_MID:
+    mr_view_trans (BELOW);
+    break;
+  case NAV_PAGE_LEFT_MID:
+    mr_view_page_trans (LEFT);
+    break;
+  case NAV_PAGE_RIGHT_MID:
+    mr_view_page_trans (RIGHT);
+    break;
+  case NAV_PAGE_ABOVE_MID:
+    mr_view_page_trans (ABOVE);
+    break;
+  case NAV_PAGE_BELOW_MID:
+    mr_view_page_trans (BELOW);
+    break;
+  case NAV_HOME_MID:
+    mr_focus_room (get_anim_by_id (current_kid_id)->f.c.room);
+    break;
+  case NAV_CENTER_MID:
+    mr_center_room (mr.room);
+    break;
+  case COORDINATES_MID:
+    ui_show_coordinates ();
+    break;
+  case INDIRECT_COORDINATES_MID:
+    ui_show_indirect_coordinates ();
     break;
   case HUE_ORIGINAL_MID:
     ui_hue_mode (HUE_ORIGINAL);
@@ -1561,6 +1771,15 @@ level_key_bindings (void)
   else if (was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_HOME))
     mr_center_room (mr.room);
 
+  /* C: show direct coordinates */
+  else if (! active_menu
+           && was_key_pressed (0, ALLEGRO_KEY_C))
+    ui_show_coordinates ();
+
+  /* SHIFT+C: show indirect coordinates */
+  else if (was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_C))
+    ui_show_indirect_coordinates ();
+
   /* SHIFT+B: enable/disable room drawing */
   else if (was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_B)) {
     no_room_drawing = ! no_room_drawing;
@@ -1656,39 +1875,6 @@ level_key_bindings (void)
       if (replay_index > 0) quit_anim = REPLAY_PREVIOUS;
       else draw_bottom_text (NULL, "NO PREVIOUS REPLAY", 0);
     } else print_replay_mode (0);
-  }
-
-  /* C: show direct coordinates */
-  else if (! active_menu
-           && was_key_pressed (0, ALLEGRO_KEY_C)) {
-    int s = mr.room;
-    int l = roomd (&global_level, s, LEFT);
-    int r = roomd (&global_level, s, RIGHT);
-    int a = roomd (&global_level, s, ABOVE);
-    int b = roomd (&global_level, s, BELOW);
-
-    mr.select_cycles = SELECT_CYCLES;
-
-    xasprintf (&text, "S%i L%i R%i A%i B%i", s, l, r, a, b);
-    draw_bottom_text (NULL, text, 0);
-    al_free (text);
-  }
-
-  /* SHIFT+C: show indirect coordinates */
-  else if (was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_C)) {
-    int a = roomd (&global_level, mr.room, ABOVE);
-    int b = roomd (&global_level, mr.room, BELOW);
-    int al = roomd (&global_level, a, LEFT);
-    int ar = roomd (&global_level, a, RIGHT);
-    int bl = roomd (&global_level, b, LEFT);
-    int br = roomd (&global_level, b, RIGHT);
-
-    mr.select_cycles = SELECT_CYCLES;
-
-    xasprintf (&text, "LV%i AL%i AR%i BL%i BR%i",
-               global_level.n, al, ar, bl, br);
-    draw_bottom_text (NULL, text, 0);
-    al_free (text);
   }
 
   /* SPACE: display remaining time */
@@ -1794,6 +1980,7 @@ level_key_bindings (void)
   } else if (step_cycle == 0) {
     game_paused = true;
     step_cycle = -1;
+    replay_menu ();
   }
 
   if (was_key_pressed (0, ALLEGRO_KEY_ESCAPE)
@@ -2009,6 +2196,42 @@ ui_set_multi_room (int dw, int dh)
   view_menu ();
 
   return true;
+}
+
+void
+ui_show_coordinates (void)
+{
+  int s = mr.room;
+  int l = roomd (&global_level, s, LEFT);
+  int r = roomd (&global_level, s, RIGHT);
+  int a = roomd (&global_level, s, ABOVE);
+  int b = roomd (&global_level, s, BELOW);
+
+  mr.select_cycles = SELECT_CYCLES;
+
+  char *text;
+  xasprintf (&text, "S%i L%i R%i A%i B%i", s, l, r, a, b);
+  draw_bottom_text (NULL, text, 0);
+  al_free (text);
+}
+
+void
+ui_show_indirect_coordinates (void)
+{
+  int a = roomd (&global_level, mr.room, ABOVE);
+  int b = roomd (&global_level, mr.room, BELOW);
+  int al = roomd (&global_level, a, LEFT);
+  int ar = roomd (&global_level, a, RIGHT);
+  int bl = roomd (&global_level, b, LEFT);
+  int br = roomd (&global_level, b, RIGHT);
+
+  mr.select_cycles = SELECT_CYCLES;
+
+  char *text;
+  xasprintf (&text, "LV%i AL%i AR%i BL%i BR%i",
+             global_level.n, al, ar, bl, br);
+  draw_bottom_text (NULL, text, 0);
+  al_free (text);
 }
 
 void
