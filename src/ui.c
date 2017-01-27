@@ -733,10 +733,10 @@ navigation_menu (void)
   menu_sub ("&Selection", NAV_SELECT_MID, true,
             micon (nav_select_icon));
 
-  menu_sub ("&Cell", NAV_CELL_MID, true,
+  menu_sub ("Scroll &Row", NAV_CELL_MID, true,
             micon (nav_cell_icon));
 
-  menu_sub ("&Page", NAV_PAGE_MID, true,
+  menu_sub ("Scroll &Page", NAV_PAGE_MID, true,
             micon (nav_page_icon));
 
   struct anim *k = get_anim_by_id (current_kid_id);
@@ -744,7 +744,7 @@ navigation_menu (void)
               k && k->f.c.room != mr.room,
               micon (nav_home_icon));
 
-  menu_sitem ("&Center (Shift+Home)", NAV_CENTER_MID, true,
+  menu_sitem ("Cen&ter (Shift+Home)", NAV_CENTER_MID, true,
               micon (nav_home_icon));
 
   menu_sitem ("C&oordinates (C)", COORDINATES_MID, true,
