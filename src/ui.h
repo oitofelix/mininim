@@ -89,6 +89,9 @@
 #define COMPASS_ICON "data/icons/compass.png"
 #define COMPASS2_ICON "data/icons/compass2.png"
 #define DRAWING_ICON "data/icons/drawing.png"
+#define FIRST_ICON "data/icons/first.png"
+#define LAST_ICON "data/icons/last.png"
+#define JUMP_ICON "data/icons/jump.png"
 
 enum main_menu {
   BASE_MID = 0,
@@ -103,6 +106,9 @@ enum main_menu {
   SAVE_GAME_MID,
   SAVE_CONFIG_MID,
   SAVE_LEVEL_FILE_MID,
+  RESTART_LEVEL_MID,
+  PREVIOUS_LEVEL_MID,
+  NEXT_LEVEL_MID,
   MIRROR_MODE_MID,
   VOLUME_MID,
   VOLUME_OFF_MID,
@@ -183,10 +189,7 @@ enum main_menu {
   FLIP_GAMEPAD_HORIZONTAL_MID,
 
   REPLAY_MID,
-  RESTART_REPLAY_LEVEL_MID,
   PLAY_REPLAY_MID,
-  PREVIOUS_REPLAY_MID,
-  NEXT_REPLAY_MID,
   RECORD_REPLAY_MID,
   TOGGLE_PAUSE_GAME_MID,
   NEXT_FRAME_MID,
@@ -270,6 +273,9 @@ void ui_editor (void);
 void ui_load_game (void);
 void ui_load_config (void);
 void ui_save_game (void);
+void ui_restart_level (void);
+void ui_previous_level (void);
+void ui_next_level (void);
 void ui_audio_volume (float volume);
 void ui_restart_game (void);
 void ui_start_game (void);

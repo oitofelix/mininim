@@ -64,7 +64,7 @@ ALLEGRO_BITMAP *small_logo_icon,
   *navigation_icon, *nav_select_icon, *nav_cell_icon, *nav_page_icon,
   *nav_left_icon, *nav_right_icon, *nav_above_icon, *nav_below_icon,
   *nav_home_icon, *nav_center_icon, *compass_icon, *compass2_icon,
-  *drawing_icon;
+  *drawing_icon, *first_icon, *last_icon, *jump_icon;
 
 
 
@@ -163,6 +163,9 @@ load_icons (void)
   compass_icon = load_icon (COMPASS_ICON);
   compass2_icon = load_icon (COMPASS2_ICON);
   drawing_icon = load_icon (DRAWING_ICON);
+  first_icon = load_icon (FIRST_ICON);
+  last_icon = load_icon (LAST_ICON);
+  jump_icon = load_icon (JUMP_ICON);
 }
 
 void
@@ -237,6 +240,9 @@ unload_icons (void)
   destroy_bitmap (compass_icon);
   destroy_bitmap (compass2_icon);
   destroy_bitmap (drawing_icon);
+  destroy_bitmap (first_icon);
+  destroy_bitmap (last_icon);
+  destroy_bitmap (jump_icon);
 }
 
 
@@ -481,13 +487,35 @@ game_menu (void)
 
   menu_sub ("&Save", SAVE_MID, true, micon (save_icon));
 
-  menu_sep ();
+  if (cutscene || title_demo) menu_sep ();
+  else {
+    char *title;
+    xasprintf (&title, "LEVEL %i", global_level.n);
+    menu_hitem (title, NO_MID, false);
+    al_free (title);
+  }
 
-  menu_citem ("&Mirror", MIRROR_MODE_MID, true,
-              in_mirror_mode (), micon (horizontal_icon));
+  menu_sitem ("Restart &level (Ctrl+A)", RESTART_LEVEL_MID,
+              ! cutscene && ! title_demo,
+              micon (jump_icon));
+
+  menu_sitem ("&Next level (Shift+L)", NEXT_LEVEL_MID,
+              ! cutscene && ! title_demo
+              && global_level.n < 14,
+              micon (last_icon));
+
+  menu_sitem ("&Previous level (Shift+M)", PREVIOUS_LEVEL_MID,
+              ! cutscene && ! title_demo
+              && global_level.n > 1,
+              micon (first_icon));
+
+  menu_sep ();
 
   menu_sub ("&Volume (Ctrl+S)", VOLUME_MID, true,
             volume_icon (audio_volume));
+
+  menu_citem ("&Mirror", MIRROR_MODE_MID, true,
+              in_mirror_mode (), micon (horizontal_icon));
 
   menu_sep ();
 
@@ -1058,18 +1086,18 @@ replay_menu (void)
   case PLAY_REPLAY:
     xasprintf (&text, "REPLAYING (%i/%i)", replay_index + 1,
                replay_chain_nmemb);
-    menu_hitem (text, RESTART_REPLAY_LEVEL_MID, true);
+    menu_hitem (text, RESTART_LEVEL_MID, true);
     al_free (text);
 
     menu_sitem
       ("&Stop (F7)", PLAY_REPLAY_MID, true, micon (stop_icon));
 
     menu_sitem
-      ("Pre&vious (Shift+M)", PREVIOUS_REPLAY_MID,
+      ("Pre&vious (Shift+M)", PREVIOUS_LEVEL_MID,
        replay_index > 0, micon (previous_icon));
 
     menu_sitem
-      ("&Next (Shift+L)", NEXT_REPLAY_MID,
+      ("&Next (Shift+L)", NEXT_LEVEL_MID,
        replay_index + 1 < replay_chain_nmemb, micon (next_icon));
 
     pause_menu_widget ();
@@ -1222,6 +1250,15 @@ menu_mid (intptr_t mid)
     break;
   case SAVE_GAME_MID:
     ui_save_game ();
+    break;
+  case RESTART_LEVEL_MID:
+    ui_restart_level ();
+    break;
+  case PREVIOUS_LEVEL_MID:
+    ui_previous_level ();
+    break;
+  case NEXT_LEVEL_MID:
+    ui_next_level ();
     break;
   case MIRROR_MODE_MID:
     ui_mirror_mode (! in_mirror_mode ());
@@ -1410,17 +1447,8 @@ menu_mid (intptr_t mid)
 
 
     /* REPLAY */
-  case RESTART_REPLAY_LEVEL_MID:
-    ui_restart_replay_level ();
-    break;
   case PLAY_REPLAY_MID:
     ui_play_replay ();
-    break;
-  case PREVIOUS_REPLAY_MID:
-    ui_previous_replay ();
-    break;
-  case NEXT_REPLAY_MID:
-    ui_next_replay ();
     break;
   case RECORD_REPLAY_MID:
     ui_record_replay ();
@@ -1627,8 +1655,20 @@ level_key_bindings (void)
 
   char *text = NULL;
 
+  /* CTRL+A: restart level */
+  if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_A))
+    ui_restart_level ();
+
+  /* SHIFT+L: warp to next level */
+  else if (was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_L))
+    ui_next_level ();
+
+  /* SHIFT+M: warp to previous level */
+  else if (was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_M))
+    ui_previous_level ();
+
   /* CTRL+G: save game */
-  if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_G)
+  else if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_G)
       && ! save_game_dialog_thread)
     ui_save_game ();
 
@@ -1859,35 +1899,6 @@ level_key_bindings (void)
     else print_replay_mode (0);
   }
 
-  /* CTRL+A: restart level */
-  else if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_A))
-    quit_anim = RESTART_LEVEL;
-
-  /* SHIFT+L: warp to next level */
-  else if (was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_L)) {
-    if (replay_mode == NO_REPLAY) {
-      ignore_level_cutscene = true;
-      next_level_number = global_level.n + 1;
-      quit_anim = NEXT_LEVEL;
-    } else if (replay_mode == PLAY_REPLAY) {
-      if (replay_index + 1 < replay_chain_nmemb)
-        quit_anim = REPLAY_NEXT;
-      else draw_bottom_text (NULL, "NO NEXT REPLAY", 0);
-    } else print_replay_mode (0);
-  }
-
-  /* SHIFT+M: warp to previous level */
-  else if (was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_M)) {
-    if (replay_mode == NO_REPLAY) {
-      ignore_level_cutscene = true;
-      next_level_number = global_level.n - 1;
-      quit_anim = NEXT_LEVEL;
-    } else if (replay_mode == PLAY_REPLAY) {
-      if (replay_index > 0) quit_anim = REPLAY_PREVIOUS;
-      else draw_bottom_text (NULL, "NO PREVIOUS REPLAY", 0);
-    } else print_replay_mode (0);
-  }
-
   /* SPACE: display remaining time */
   else if (! active_menu
            && (was_key_pressed (0, ALLEGRO_KEY_SPACE)
@@ -2055,6 +2066,43 @@ ui_save_game (void)
     create_thread (dialog_thread, &save_game_dialog);
   al_start_thread (save_game_dialog_thread);
   pause_animation (true);
+}
+
+void
+ui_restart_level (void)
+{
+  if (replay_mode == NO_REPLAY)
+    quit_anim = RESTART_LEVEL;
+  else if (replay_mode == PLAY_REPLAY)
+    quit_anim = REPLAY_RESTART_LEVEL;
+  else print_replay_mode (0);
+}
+
+void
+ui_previous_level (void)
+{
+  if (replay_mode == NO_REPLAY) {
+    ignore_level_cutscene = true;
+    next_level_number = global_level.n - 1;
+    quit_anim = NEXT_LEVEL;
+  } else if (replay_mode == PLAY_REPLAY) {
+    if (replay_index > 0) quit_anim = REPLAY_PREVIOUS;
+    else draw_bottom_text (NULL, "NO PREVIOUS REPLAY", 0);
+  } else print_replay_mode (0);
+}
+
+void
+ui_next_level (void)
+{
+  if (replay_mode == NO_REPLAY) {
+    ignore_level_cutscene = true;
+    next_level_number = global_level.n + 1;
+    quit_anim = NEXT_LEVEL;
+  } else if (replay_mode == PLAY_REPLAY) {
+    if (replay_index + 1 < replay_chain_nmemb)
+      quit_anim = REPLAY_NEXT;
+    else draw_bottom_text (NULL, "NO NEXT REPLAY", 0);
+  } else print_replay_mode (0);
 }
 
 void
@@ -2515,24 +2563,6 @@ ui_play_replay (void)
     print_replay_chain_aborted ();
     stop_replaying (2);
   } else create_load_replay_thread ();
-}
-
-void
-ui_restart_replay_level (void)
-{
-  quit_anim = REPLAY_RESTART_LEVEL;
-}
-
-void
-ui_previous_replay (void)
-{
-  quit_anim = REPLAY_PREVIOUS;
-}
-
-void
-ui_next_replay (void)
-{
-  quit_anim = REPLAY_NEXT;
 }
 
 void
