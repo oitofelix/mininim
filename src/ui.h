@@ -73,6 +73,11 @@
 #define ZOOM_STRETCH_ICON "data/icons/zoom-stretch.png"
 #define ZOOM_RATIO_ICON "data/icons/zoom-ratio.png"
 #define VERTICAL_HORIZONTAL_ICON "data/icons/vertical-horizontal.png"
+#define ZOOM_OUT_ICON "data/icons/zoom-out.png"
+#define ZOOM_IN_ICON "data/icons/zoom-in.png"
+#define ZOOM_RESET_ICON "data/icons/zoom-reset.png"
+#define MULTIPLE_ICON "data/icons/multiple.png"
+#define ZOOM_ICON "data/icons/zoom.png"
 
 enum main_menu {
   BASE_MID = 0,
@@ -98,10 +103,20 @@ enum main_menu {
   QUIT_GAME_MID,
 
   VIEW_MID,
+  ZOOM_MID,
   ZOOM_FIT_MID,
   ZOOM_NONE_MID,
   ZOOM_STRETCH_MID,
   ZOOM_RATIO_MID,
+  ZOOM_OUT_MID,
+  ZOOM_OUT_BOTH_MID,
+  ZOOM_OUT_VERTICAL_MID,
+  ZOOM_OUT_HORIZONTAL_MID,
+  ZOOM_IN_MID,
+  ZOOM_IN_BOTH_MID,
+  ZOOM_IN_VERTICAL_MID,
+  ZOOM_IN_HORIZONTAL_MID,
+  ZOOM_RESET_MID,
   HUE_MODE_MID,
   HUE_ORIGINAL_MID,
   HUE_NONE_MID,
@@ -172,8 +187,11 @@ void save_menu (void);
 void volume_menu (void);
 
 void view_menu (void);
+void zoom_menu (void);
 ALLEGRO_BITMAP *zoom_fit_icon (enum mr_fit_mode fit);
 void zoom_fit_menu (void);
+void zoom_out_menu (void);
+void zoom_in_menu (void);
 ALLEGRO_BITMAP *hue_icon (enum hue hue);
 void hue_mode_menu (void);
 ALLEGRO_BITMAP *em_icon (enum em em);
@@ -201,6 +219,9 @@ bool is_showing_menu (void);
 void toggle_menu_visibility (void);
 void enable_menu (bool enable);
 
+void pause_menu_widget (void);
+void speed_menu_widget (void);
+
 void menu_mid (intptr_t mid);
 void anim_key_bindings (void);
 void level_key_bindings (void);
@@ -217,6 +238,7 @@ void ui_quit_game (void);
 
 void ui_full_screen (void);
 void ui_zoom_fit (enum mr_fit_mode fit);
+bool ui_set_multi_room (int dw, int dh);
 void ui_hue_mode (enum hue new_hue);
 void ui_environment_mode (enum em new_em);
 void ui_video_mode (enum vm new_vm);

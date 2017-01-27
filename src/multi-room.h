@@ -59,7 +59,6 @@ void mr_view_page_trans (enum dir d);
 void draw_multi_rooms (void);
 void nmr_coord (int x, int y, int *rx, int *ry);
 bool mr_coord (int room0, enum dir dir, int *rx, int *ry);
-bool ui_set_multi_room (int dw, int dh);
 void update_room0_cache (enum em em, enum vm vm);
 void update_cache (enum em em, enum vm vm);
 void update_cache_pos (struct pos *p, enum em em, enum vm vm);

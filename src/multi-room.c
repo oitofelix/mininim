@@ -945,35 +945,6 @@ mr_coord (int room, enum dir dir, int *rx, int *ry)
 }
 
 bool
-ui_set_multi_room (int dw, int dh)
-{
-  char *text;
-
-  if (mr.w + dw < 1 || mr.h + dh < 1) {
-    xasprintf (&text, "MULTI-ROOM %ix%i", mr.w, mr.h);
-    draw_bottom_text (NULL, text, 0);
-    al_free (text);
-    return false;
-  }
-
-  struct mouse_coord m;
-  get_mouse_coord (&m);
-
-  if (mr.w + dw != mr.w || mr.h + dh != mr.h)
-    set_multi_room (mr.w + dw, mr.h + dh);
-
-  mr_center_room (mr.room);
-
-  if (mr_coord (m.c.room, -1, NULL, NULL))
-    set_mouse_coord (&m);
-
-  xasprintf (&text, "MULTI-ROOM %ix%i", mr.w, mr.h);
-  draw_bottom_text (NULL, text, 0);
-  al_free (text);
-  return true;
-}
-
-bool
 mr_room_list_has_room (struct mr_room_list *l, int room)
 {
   return bsearch (&room, l->room, l->nmemb, sizeof (room),

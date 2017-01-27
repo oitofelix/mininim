@@ -42,9 +42,6 @@ static void end_menu (void);
 
 #if MENU_FEATURE
 ALLEGRO_MENU *main_menu;
-
-static void menu_widget_pause (void);
-static void menu_widget_speed (void);
 #endif
 
 ALLEGRO_BITMAP *small_logo_icon,
@@ -61,7 +58,8 @@ ALLEGRO_BITMAP *small_logo_icon,
   *screensaver_icon, *joystick3_icon, *volume_off_icon,
   *volume_low_icon, *volume_medium_icon, *volume_high_icon,
   *game_icon, *settings_icon, *zoom_none_icon, *zoom_stretch_icon,
-  *zoom_ratio_icon, *vertical_horizontal_icon;
+  *zoom_ratio_icon, *vertical_horizontal_icon, *zoom_out_icon,
+  *zoom_in_icon, *zoom_reset_icon, *multiple_icon, *zoom_icon;
 
 
 
@@ -144,6 +142,11 @@ load_icons (void)
   zoom_stretch_icon = load_icon (ZOOM_STRETCH_ICON);
   zoom_ratio_icon = load_icon (ZOOM_RATIO_ICON);
   vertical_horizontal_icon = load_icon (VERTICAL_HORIZONTAL_ICON);
+  zoom_out_icon = load_icon (ZOOM_OUT_ICON);
+  zoom_in_icon = load_icon (ZOOM_IN_ICON);
+  zoom_reset_icon = load_icon (ZOOM_RESET_ICON);
+  multiple_icon = load_icon (MULTIPLE_ICON);
+  zoom_icon = load_icon (ZOOM_ICON);
 }
 
 void
@@ -202,6 +205,11 @@ unload_icons (void)
   destroy_bitmap (zoom_stretch_icon);
   destroy_bitmap (zoom_ratio_icon);
   destroy_bitmap (vertical_horizontal_icon);
+  destroy_bitmap (zoom_out_icon);
+  destroy_bitmap (zoom_in_icon);
+  destroy_bitmap (zoom_reset_icon);
+  destroy_bitmap (multiple_icon);
+  destroy_bitmap (zoom_icon);
 }
 
 
@@ -535,14 +543,18 @@ view_menu (void)
               FULL_SCREEN_MID, FULL_SCREEN_MID, true,
               micon (windows_icon), micon (full_screen_icon));
 
-  menu_sub ("Zoom &Fit (M)", ZOOM_FIT_MID, ! cutscene && ! title_demo,
-            zoom_fit_icon (mr.fit_mode));
+  menu_sub ("&Zoom", ZOOM_MID, ! cutscene && ! title_demo,
+            micon (zoom_icon));
+
+  menu_sep ();
 
   menu_sub ("&Hue (F9)", HUE_MODE_MID, true, hue_icon (hue));
 
   menu_sub ("&Environment (F11)", ENVIRONMENT_MODE_MID, true, em_icon (em));
 
   menu_sub ("&Video (F12)", VIDEO_MODE_MID, true, vm_icon (vm));
+
+  menu_sep ();
 
   menu_sub ("&Flip (Shift+I)", FLIP_SCREEN_MID, true,
             flip_screen_icon (screen_flags));
@@ -555,12 +567,45 @@ view_menu (void)
 
   end_menu ();
 
-  zoom_fit_menu ();
+  zoom_menu ();
   hue_mode_menu ();
   environment_mode_menu ();
   video_mode_menu ();
   screen_flip_menu ();
 #endif
+}
+
+void
+zoom_menu (void)
+{
+  start_menu (main_menu, ZOOM_MID);
+
+  char *text;
+  xasprintf (&text, "MULTI-ROOM %ix%i", mr.w, mr.h);
+  menu_sitem (text, NO_MID, false, micon (multiple_icon));
+  al_free (text);
+
+  menu_sub ("&Fit (M)", ZOOM_FIT_MID, ! cutscene && ! title_demo,
+            zoom_fit_icon (mr.fit_mode));
+
+  menu_sub ("&In", ZOOM_IN_MID,
+            ! cutscene && ! title_demo && (mr.w > 1 || mr.h > 1),
+            micon (zoom_in_icon));
+
+  menu_sub ("&Out", ZOOM_OUT_MID, ! cutscene && ! title_demo,
+            micon (zoom_out_icon));
+
+  menu_sitem ("&Reset", ZOOM_RESET_MID,
+              ! cutscene && ! title_demo
+              && (mr.w != 2 || mr.h != 2
+                  || mr.fit_mode != MR_FIT_NONE),
+              micon (zoom_reset_icon));
+
+  end_menu ();
+
+  zoom_fit_menu ();
+  zoom_out_menu ();
+  zoom_in_menu ();
 }
 
 ALLEGRO_BITMAP *
@@ -588,6 +633,44 @@ zoom_fit_menu (void)
 
   menu_citem ("&Ratio", ZOOM_RATIO_MID, true,
               mr.fit_mode == MR_FIT_RATIO, micon (zoom_ratio_icon));
+
+  end_menu ();
+#endif
+}
+
+void
+zoom_out_menu (void)
+{
+#if MENU_FEATURE
+  start_menu (main_menu, ZOOM_OUT_MID);
+
+  menu_sitem ("&Both (])", ZOOM_OUT_BOTH_MID, true,
+              micon (vertical_horizontal_icon));
+
+  menu_sitem ("&Vertical (Alt+])", ZOOM_OUT_VERTICAL_MID, true,
+              micon (vertical_icon));
+
+  menu_sitem ("&Horizontal (Ctrl+])", ZOOM_OUT_HORIZONTAL_MID, true,
+              micon (horizontal_icon));
+
+  end_menu ();
+#endif
+}
+
+void
+zoom_in_menu (void)
+{
+#if MENU_FEATURE
+  start_menu (main_menu, ZOOM_IN_MID);
+
+  menu_sitem ("&Both ([)", ZOOM_IN_BOTH_MID, mr.w > 1 && mr.h > 1,
+              micon (vertical_horizontal_icon));
+
+  menu_sitem ("&Vertical (Alt+[)", ZOOM_IN_VERTICAL_MID, mr.h > 1,
+              micon (vertical_icon));
+
+  menu_sitem ("&Horizontal (Ctrl+[)", ZOOM_IN_HORIZONTAL_MID, mr.w > 1,
+              micon (horizontal_icon));
 
   end_menu ();
 #endif
@@ -734,6 +817,8 @@ gamepad_menu (void)
   menu_sitem ("&Calibrate (Ctrl+J)", GAMEPAD_CALIBRATE_MID,
               gpm == JOYSTICK, micon (clock_icon));
 
+  menu_sep ();
+
   menu_sub ("&Flip (Shift+K)", FLIP_GAMEPAD_MID, true,
             flip_gamepad_icon (flip_gamepad_vertical,
                                flip_gamepad_horizontal));
@@ -832,9 +917,9 @@ replay_menu (void)
       ("&Next (Shift+L)", NEXT_REPLAY_MID,
        replay_index + 1 < replay_chain_nmemb, micon (next_icon));
 
-    menu_widget_pause ();
+    pause_menu_widget ();
 
-    menu_widget_speed ();
+    speed_menu_widget ();
 
     break;
   case RECORD_REPLAY: record_replay:
@@ -850,7 +935,7 @@ replay_menu (void)
        replay_mode == RECORD_REPLAY
        ? micon (stop_icon) : micon (eject_icon));
 
-    menu_widget_pause ();
+    pause_menu_widget ();
 
     break;
   default: assert (false);
@@ -863,9 +948,9 @@ replay_menu (void)
       ("&Record... (Alt+F7)", RECORD_REPLAY_MID, true,
        micon (record_icon));
 
-    menu_widget_pause ();
+    pause_menu_widget ();
 
-    menu_widget_speed ();
+    speed_menu_widget ();
 
     break;
   }
@@ -911,7 +996,7 @@ help_menu (void)
 
 #if MENU_FEATURE
 void
-menu_widget_pause (void)
+pause_menu_widget (void)
 {
   menu_sep ();
 
@@ -931,7 +1016,7 @@ menu_widget_pause (void)
 
 #if MENU_FEATURE
 void
-menu_widget_speed (void)
+speed_menu_widget (void)
 {
   menu_sep ();
 
@@ -1013,6 +1098,28 @@ menu_mid (intptr_t mid)
     break;
   case ZOOM_RATIO_MID:
     ui_zoom_fit (MR_FIT_RATIO);
+    break;
+  case ZOOM_OUT_BOTH_MID:
+    ui_set_multi_room (+1, +1);
+    break;
+  case ZOOM_OUT_VERTICAL_MID:
+    ui_set_multi_room (+0, +1);
+    break;
+  case ZOOM_OUT_HORIZONTAL_MID:
+    ui_set_multi_room (+1, +0);
+    break;
+  case ZOOM_IN_BOTH_MID:
+    ui_set_multi_room (-1, -1);
+    break;
+  case ZOOM_IN_VERTICAL_MID:
+    ui_set_multi_room (+0, -1);
+    break;
+  case ZOOM_IN_HORIZONTAL_MID:
+    ui_set_multi_room (-1, +0);
+    break;
+  case ZOOM_RESET_MID:
+    ui_zoom_fit (MR_FIT_NONE);
+    ui_set_multi_room (2 - mr.w, 2 - mr.h);
     break;
   case HUE_ORIGINAL_MID:
     ui_hue_mode (HUE_ORIGINAL);
@@ -1863,6 +1970,45 @@ ui_zoom_fit (enum mr_fit_mode fit)
 
   ui_save_setting (key, value);
   view_menu ();
+}
+
+bool
+ui_set_multi_room (int dw, int dh)
+{
+  char *key = "MULTI ROOM";
+  char *value;
+
+  if (mr.w + dw < 1 || mr.h + dh < 1) {
+    char *text;
+    xasprintf (&text, "MULTI-ROOM %ix%i", mr.w, mr.h);
+    draw_bottom_text (NULL, text, 0);
+    al_free (text);
+    return false;
+  }
+
+  struct mouse_coord m;
+  get_mouse_coord (&m);
+
+  if (mr.w + dw != mr.w || mr.h + dh != mr.h)
+    set_multi_room (mr.w + dw, mr.h + dh);
+
+  mr_center_room (mr.room);
+
+  if (mr_coord (m.c.room, -1, NULL, NULL))
+    set_mouse_coord (&m);
+
+  char *text;
+  xasprintf (&text, "MULTI-ROOM %ix%i", mr.w, mr.h);
+  draw_bottom_text (NULL, text, 0);
+  al_free (text);
+
+  xasprintf (&value, "%ix%i", mr.w, mr.h);
+  ui_save_setting (key, value);
+  al_free (value);
+
+  view_menu ();
+
+  return true;
 }
 
 void
