@@ -64,7 +64,8 @@ ALLEGRO_BITMAP *small_logo_icon,
   *navigation_icon, *nav_select_icon, *nav_cell_icon, *nav_page_icon,
   *nav_left_icon, *nav_right_icon, *nav_above_icon, *nav_below_icon,
   *nav_home_icon, *nav_center_icon, *compass_icon, *compass2_icon,
-  *drawing_icon, *first_icon, *last_icon, *jump_icon;
+  *drawing_icon, *first_icon, *last_icon, *jump_icon, *original_icon,
+  *guard_icon, *fat_guard_icon, *vizier_icon, *skeleton_icon, *shadow_icon;
 
 
 
@@ -166,6 +167,12 @@ load_icons (void)
   first_icon = load_icon (FIRST_ICON);
   last_icon = load_icon (LAST_ICON);
   jump_icon = load_icon (JUMP_ICON);
+  original_icon = load_icon (ORIGINAL_ICON);
+  guard_icon = load_icon (GUARD_ICON);
+  fat_guard_icon = load_icon (FAT_GUARD_ICON);
+  vizier_icon = load_icon (VIZIER_ICON);
+  skeleton_icon = load_icon (SKELETON_ICON);
+  shadow_icon = load_icon (SHADOW_ICON);
 }
 
 void
@@ -243,6 +250,12 @@ unload_icons (void)
   destroy_bitmap (first_icon);
   destroy_bitmap (last_icon);
   destroy_bitmap (jump_icon);
+  destroy_bitmap (original_icon);
+  destroy_bitmap (guard_icon);
+  destroy_bitmap (fat_guard_icon);
+  destroy_bitmap (vizier_icon);
+  destroy_bitmap (skeleton_icon);
+  destroy_bitmap (shadow_icon);
 }
 
 
@@ -495,7 +508,7 @@ game_menu (void)
     al_free (title);
   }
 
-  menu_sitem ("Restart &level (Ctrl+A)", RESTART_LEVEL_MID,
+  menu_sitem ("Restart le&vel (Ctrl+A)", RESTART_LEVEL_MID,
               ! cutscene && ! title_demo,
               micon (jump_icon));
 
@@ -615,11 +628,17 @@ view_menu (void)
 
   menu_sep ();
 
-  menu_sub ("&Hue (F9)", HUE_MODE_MID, true, hue_icon (hue));
+  menu_sub ("&Video (F12)", VM_MID, true, vm_icon (vm));
 
-  menu_sub ("&Environment (F11)", ENVIRONMENT_MODE_MID, true, em_icon (em));
+  menu_sub ("&Environment (F11)", EM_MID,
+            ! cutscene && ! title_demo,
+            force_em ? em_icon (em) : micon (original_icon));
 
-  menu_sub ("&Video (F12)", VIDEO_MODE_MID, true, vm_icon (vm));
+  menu_sub ("&Hue (Alt+F11)", HUE_MODE_MID, ! cutscene && ! title_demo,
+            force_hue ? hue_icon (hue) : micon (original_icon));
+
+  menu_sub ("&Guard (Shift+F11)", GM_MID, ! cutscene && ! title_demo,
+            gm_icon (gm));
 
   menu_sub ("&Flip (Shift+I)", FLIP_SCREEN_MID, true,
             flip_screen_icon (screen_flags));
@@ -630,7 +649,7 @@ view_menu (void)
               ! cutscene && ! title_demo,
               ! no_room_drawing, micon (drawing_icon));
 
-  menu_citem ("Inhibit screensaver", INHIBIT_SCREENSAVER_MID, true,
+  menu_citem ("&Inhibit screensaver", INHIBIT_SCREENSAVER_MID, true,
               inhibit_screensaver, micon (screensaver_icon));
 
   menu_sep ();
@@ -643,8 +662,9 @@ view_menu (void)
   zoom_menu ();
   navigation_menu ();
   hue_mode_menu ();
-  environment_mode_menu ();
-  video_mode_menu ();
+  gm_menu ();
+  em_menu ();
+  vm_menu ();
   screen_flip_menu ();
 #endif
 }
@@ -880,23 +900,65 @@ hue_mode_menu (void)
 #if MENU_FEATURE
   start_menu (main_menu, HUE_MODE_MID);
 
-  menu_citem ("&ORIGINAL", HUE_ORIGINAL_MID, true, ! force_hue,
-              hue_icon (global_level.hue));
+  menu_citem ("&Original", HUE_ORIGINAL_MID, true, ! force_hue,
+              micon (original_icon));
 
-  menu_citem ("&NONE", HUE_NONE_MID, true, force_hue && hue == HUE_NONE,
+  menu_citem ("&None", HUE_NONE_MID, true, force_hue && hue == HUE_NONE,
               micon (black_icon));
 
-  menu_citem ("&GREEN", HUE_GREEN_MID, true, force_hue && hue == HUE_GREEN,
+  menu_citem ("&Green", HUE_GREEN_MID, true, force_hue && hue == HUE_GREEN,
               micon (green_icon));
 
-  menu_citem ("&GRAY", HUE_GRAY_MID, true, force_hue && hue == HUE_GRAY,
+  menu_citem ("G&ray", HUE_GRAY_MID, true, force_hue && hue == HUE_GRAY,
               micon (gray_icon));
 
-  menu_citem ("&YELLOW", HUE_YELLOW_MID, true, force_hue && hue == HUE_YELLOW,
+  menu_citem ("&Yellow", HUE_YELLOW_MID, true, force_hue && hue == HUE_YELLOW,
               micon (yellow_icon));
 
-  menu_citem ("&BLUE", HUE_BLUE_MID, true, force_hue && hue == HUE_BLUE,
+  menu_citem ("&Blue", HUE_BLUE_MID, true, force_hue && hue == HUE_BLUE,
               micon (blue_icon));
+
+  end_menu ();
+#endif
+}
+
+ALLEGRO_BITMAP *
+gm_icon (enum gm gm)
+{
+  switch (gm) {
+  case ORIGINAL_GM: return micon (original_icon); break;
+  case GUARD_GM: return micon (guard_icon); break;
+  case FAT_GUARD_GM: return micon (fat_guard_icon); break;
+  case VIZIER_GM: return micon (vizier_icon); break;
+  case SKELETON_GM: return micon (skeleton_icon); break;
+  case SHADOW_GM: return micon (shadow_icon); break;
+  default: assert (false); return NULL; break;
+  }
+}
+
+void
+gm_menu (void)
+{
+#if MENU_FEATURE
+  start_menu (main_menu, GM_MID);
+
+  menu_citem ("&Original", ORIGINAL_GM_MID, true,
+              gm == ORIGINAL_GM, gm_icon (ORIGINAL_GM));
+
+  menu_citem ("&Guard", GUARD_GM_MID, true,
+              gm == GUARD_GM, gm_icon (GUARD_GM));
+
+  menu_citem ("&Fat guard", FAT_GUARD_GM_MID, true,
+              gm == FAT_GUARD_GM, gm_icon (FAT_GUARD_GM));
+
+  menu_citem ("&Vizier", VIZIER_GM_MID, true,
+              gm == VIZIER_GM, gm_icon (VIZIER_GM));
+
+  menu_citem ("&Skeleton", SKELETON_GM_MID, true,
+              gm == SKELETON_GM, gm_icon (SKELETON_GM));
+
+  menu_citem ("S&hadow", SHADOW_GM_MID, true,
+              gm == SHADOW_GM, gm_icon (SHADOW_GM));
 
   end_menu ();
 #endif
@@ -913,18 +975,18 @@ em_icon (enum em em)
 }
 
 void
-environment_mode_menu (void)
+em_menu (void)
 {
 #if MENU_FEATURE
-  start_menu (main_menu, ENVIRONMENT_MODE_MID);
+  start_menu (main_menu, EM_MID);
 
-  menu_citem ("&ORIGINAL", ORIGINAL_ENV_MID, true, ! force_em,
-              em_icon (global_level.em));
+  menu_citem ("&Original", ORIGINAL_EM_MID, true, ! force_em,
+              micon (original_icon));
 
-  menu_citem ("&DUNGEON", DUNGEON_MID, true, force_em && em == DUNGEON,
+  menu_citem ("&Dungeon", DUNGEON_MID, true, force_em && em == DUNGEON,
               micon (dungeon_icon));
 
-  menu_citem ("&PALACE", PALACE_MID, true, force_em && em == PALACE,
+  menu_citem ("&Palace", PALACE_MID, true, force_em && em == PALACE,
               micon (palace_icon));
 
   end_menu ();
@@ -943,10 +1005,10 @@ vm_icon (enum vm vm)
 }
 
 void
-video_mode_menu (void)
+vm_menu (void)
 {
 #if MENU_FEATURE
-  start_menu (main_menu, VIDEO_MODE_MID);
+  start_menu (main_menu, VM_MID);
 
   menu_citem ("&VGA", VGA_MID, true, vm == VGA, micon (vga_icon));
 
@@ -1188,7 +1250,7 @@ pause_menu_widget (void)
 
   menu_sitem
     (is_game_paused ()
-     ? "&Continue" : "&Pause (Esc)", TOGGLE_PAUSE_GAME_MID,
+     ? "&Continue" : "Pau&se (Esc)", TOGGLE_PAUSE_GAME_MID,
      ! cutscene && ! title_demo && recording_replay_countdown < 0,
      is_game_paused () ? micon (play_icon) : micon (pause_icon));
 
@@ -1390,26 +1452,44 @@ menu_mid (intptr_t mid)
   case HUE_BLUE_MID:
     ui_hue_mode (HUE_BLUE);
     break;
-  case ORIGINAL_ENV_MID:
-    ui_environment_mode (ORIGINAL_ENV);
+  case ORIGINAL_GM_MID:
+    ui_gm (ORIGINAL_GM);
+    break;
+  case GUARD_GM_MID:
+    ui_gm (GUARD_GM);
+    break;
+  case FAT_GUARD_GM_MID:
+    ui_gm (FAT_GUARD_GM);
+    break;
+  case VIZIER_GM_MID:
+    ui_gm (VIZIER_GM);
+    break;
+  case SKELETON_GM_MID:
+    ui_gm (SKELETON_GM);
+    break;
+  case SHADOW_GM_MID:
+    ui_gm (SHADOW_GM);
+    break;
+  case ORIGINAL_EM_MID:
+    ui_em (ORIGINAL_EM);
     break;
   case DUNGEON_MID:
-    ui_environment_mode (DUNGEON);
+    ui_em (DUNGEON);
     break;
   case PALACE_MID:
-    ui_environment_mode (PALACE);
+    ui_em (PALACE);
     break;
   case VGA_MID:
-    ui_video_mode (VGA);
+    ui_vm (VGA);
     break;
   case EGA_MID:
-    ui_video_mode (EGA);
+    ui_vm (EGA);
     break;
   case CGA_MID:
-    ui_video_mode (CGA);
+    ui_vm (CGA);
     break;
   case HGC_MID:
-    ui_video_mode (HGC);
+    ui_vm (HGC);
     break;
   case FLIP_SCREEN_VERTICAL_MID:
     ui_flip_screen (screen_flags ^ ALLEGRO_FLIP_VERTICAL, false, false);
@@ -1605,8 +1685,8 @@ anim_key_bindings (void)
   else if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_J))
     ui_gamepad_mode (JOYSTICK);
 
-  /* F9: change hue palette */
-  else if (was_key_pressed (0, ALLEGRO_KEY_F9)) {
+  /* ALT+F11: change hue palette */
+  else if (was_key_pressed (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_F11)) {
     if (force_hue)
       switch (hue) {
       case HUE_NONE: ui_hue_mode (HUE_GREEN); break;
@@ -1622,18 +1702,18 @@ anim_key_bindings (void)
   else if (was_key_pressed (0, ALLEGRO_KEY_F11)) {
     if (force_em) {
       switch (em) {
-      case DUNGEON: ui_environment_mode (PALACE); break;
-      case PALACE: ui_environment_mode (ORIGINAL_ENV); break;
+      case DUNGEON: ui_em (PALACE); break;
+      case PALACE: ui_em (ORIGINAL_EM); break;
       }
-    } else ui_environment_mode (DUNGEON);
+    } else ui_em (DUNGEON);
   }
 
   /* F12: change video mode */
   else if (was_key_pressed (0, ALLEGRO_KEY_F12))
     switch (vm) {
-    case VGA: ui_video_mode (EGA); break;
-    case EGA: ui_video_mode (CGA); break;
-    case CGA: ui_video_mode (hgc ? VGA : HGC); break;
+    case VGA: ui_vm (EGA); break;
+    case EGA: ui_vm (CGA); break;
+    case CGA: ui_vm (hgc ? VGA : HGC); break;
     }
 
   /* D: change display mode */
@@ -1671,6 +1751,17 @@ level_key_bindings (void)
   else if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_G)
       && ! save_game_dialog_thread)
     ui_save_game ();
+
+  /* SHIFT+F11: change guard mode */
+  else if (was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_F11))
+      switch (gm) {
+      case ORIGINAL_GM: ui_gm (GUARD_GM); break;
+      case GUARD_GM: ui_gm (FAT_GUARD_GM); break;
+      case FAT_GUARD_GM: ui_gm (VIZIER_GM); break;
+      case VIZIER_GM: ui_gm (SKELETON_GM); break;
+      case SKELETON_GM: ui_gm (SHADOW_GM); break;
+      case SHADOW_GM: ui_gm (ORIGINAL_GM); break;
+      }
 
   /* CTRL+Z: undo */
   else if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_Z))
@@ -1967,31 +2058,6 @@ level_key_bindings (void)
       if (k->skill.counter_defense_prob > -1)
         k->skill.counter_defense_prob--;
       display_skill (k);
-    } else print_replay_mode (0);
-  }
-
-  /* F10: change guard mode */
-  else if (was_key_pressed (0, ALLEGRO_KEY_F10)) {
-    if (replay_mode == NO_REPLAY) {
-      char *gm_str = NULL;
-
-      /* get next guard mode */
-      switch (gm) {
-      case ORIGINAL_GM: gm = GUARD_GM, gm_str = "GUARD"; break;
-      case GUARD_GM: gm = FAT_GUARD_GM, gm_str = "FAT GUARD"; break;
-      case FAT_GUARD_GM: gm = VIZIER_GM, gm_str = "VIZIER"; break;
-      case VIZIER_GM: gm = SKELETON_GM, gm_str = "SKELETON"; break;
-      case SKELETON_GM: gm = SHADOW_GM, gm_str = "SHADOW"; break;
-      case SHADOW_GM: gm = ORIGINAL_GM, gm_str = "ORIGINAL"; break;
-      }
-
-      /* apply next guard mode */
-      int i;
-      for (i = 0; i < anima_nmemb; i++) apply_guard_mode (&anima[i], gm);
-
-      xasprintf (&text, "GUARD MODE: %s", gm_str);
-      draw_bottom_text (NULL, text, 0);
-      al_free (text);
     } else print_replay_mode (0);
   }
 
@@ -2342,13 +2408,64 @@ ui_hue_mode (enum hue new_hue)
 }
 
 void
-ui_environment_mode (enum em new_em)
+ui_gm (enum gm new_gm)
+{
+  if (replay_mode != NO_REPLAY) {
+    print_replay_mode (0);
+    return;
+  }
+
+  char *key = "GUARD MODE";
+  char *value;
+
+  switch (new_gm) {
+  case ORIGINAL_GM:
+    gm = ORIGINAL_GM;
+    value = "ORIGINAL";
+    break;
+  case GUARD_GM:
+    gm = GUARD_GM;
+    value = "GUARD";
+    break;
+  case FAT_GUARD_GM:
+    gm = FAT_GUARD_GM;
+    value = "FAT-GUARD";
+    break;
+  case VIZIER_GM:
+    gm = VIZIER_GM;
+    value = "VIZIER";
+    break;
+  case SKELETON_GM:
+    gm = SKELETON_GM;
+    value = "SKELETON";
+    break;
+  case SHADOW_GM:
+    gm = SHADOW_GM;
+    value = "SHADOW";
+    break;
+  }
+
+  /* apply next guard mode */
+  int i;
+  for (i = 0; i < anima_nmemb; i++) apply_guard_mode (&anima[i], gm);
+
+  char *text;
+  xasprintf (&text, "%s: %s", key, value);
+  draw_bottom_text (NULL, text, 0);
+  al_free (text);
+
+  ui_save_setting (key, value);
+  view_menu ();
+}
+
+void
+ui_em (enum em new_em)
 {
   char *key = "ENVIRONMENT MODE";
   char *value = NULL;
 
   switch (new_em) {
-  default: /* ORIGINAL_ENV */
+  default: /* ORIGINAL_EM */
     force_em = false;
     em = global_level.em;
     value = "ORIGINAL";
@@ -2375,7 +2492,7 @@ ui_environment_mode (enum em new_em)
 }
 
 void
-ui_video_mode (enum vm new_vm)
+ui_vm (enum vm new_vm)
 {
   char *key = "VIDEO MODE";
   char *value;
@@ -2392,7 +2509,7 @@ ui_video_mode (enum vm new_vm)
   case CGA: value = hgc ? "HGC" : "CGA"; break;
   }
 
-  video_mode_menu ();
+  vm_menu ();
 
   char *text;
   xasprintf (&text, "%s: %s", key, value);

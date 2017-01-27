@@ -92,6 +92,12 @@
 #define FIRST_ICON "data/icons/first.png"
 #define LAST_ICON "data/icons/last.png"
 #define JUMP_ICON "data/icons/jump.png"
+#define ORIGINAL_ICON "data/icons/original.png"
+#define GUARD_ICON "data/icons/guard.png"
+#define FAT_GUARD_ICON "data/icons/fat-guard.png"
+#define VIZIER_ICON "data/icons/vizier.png"
+#define SKELETON_ICON "data/icons/skeleton.png"
+#define SHADOW_ICON "data/icons/shadow.png"
 
 enum main_menu {
   BASE_MID = 0,
@@ -162,11 +168,18 @@ enum main_menu {
   HUE_GRAY_MID,
   HUE_YELLOW_MID,
   HUE_BLUE_MID,
-  ENVIRONMENT_MODE_MID,
-  ORIGINAL_ENV_MID,
+  GM_MID,
+  ORIGINAL_GM_MID,
+  GUARD_GM_MID,
+  FAT_GUARD_GM_MID,
+  VIZIER_GM_MID,
+  SKELETON_GM_MID,
+  SHADOW_GM_MID,
+  EM_MID,
+  ORIGINAL_EM_MID,
   DUNGEON_MID,
   PALACE_MID,
-  VIDEO_MODE_MID,
+  VM_MID,
   VGA_MID,
   EGA_MID,
   CGA_MID,
@@ -236,10 +249,12 @@ void nav_cell_menu (void);
 void nav_page_menu (void);
 ALLEGRO_BITMAP *hue_icon (enum hue hue);
 void hue_mode_menu (void);
+ALLEGRO_BITMAP *gm_icon (enum gm gm);
+void gm_menu (void);
 ALLEGRO_BITMAP *em_icon (enum em em);
-void environment_mode_menu (void);
+void em_menu (void);
 ALLEGRO_BITMAP *vm_icon (enum vm vm);
-void video_mode_menu (void);
+void vm_menu (void);
 ALLEGRO_BITMAP *flip_screen_icon (int flags);
 void screen_flip_menu (void);
 
@@ -287,8 +302,9 @@ bool ui_set_multi_room (int dw, int dh);
 void ui_show_coordinates (void);
 void ui_show_indirect_coordinates (void);
 void ui_hue_mode (enum hue new_hue);
-void ui_environment_mode (enum em new_em);
-void ui_video_mode (enum vm new_vm);
+void ui_gm (enum gm new_gm);
+void ui_em (enum em new_em);
+void ui_vm (enum vm new_vm);
 void ui_flip_screen (int flags, bool correct_mouse, bool save_only);
 void ui_inhibit_screensaver (bool inhibit);
 void ui_room_drawing (bool draw);

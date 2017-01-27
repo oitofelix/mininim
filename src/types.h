@@ -40,7 +40,7 @@ enum em {
   DUNGEON = 0, PALACE = 1,
 };
 
-#define ORIGINAL_ENV (PALACE + 1)
+#define ORIGINAL_EM (PALACE + 1)
 
 enum hue {
   HUE_NONE = 0, HUE_GREEN = 1, HUE_GRAY = 2, HUE_YELLOW = 3,
@@ -175,7 +175,7 @@ struct mr_room_list {
 };
 
 enum gm {
-  ORIGINAL_GM, GUARD_GM, FAT_GUARD_GM, VIZIER_GM, SKELETON_GM, SHADOW_GM
+  ORIGINAL_GM, GUARD_GM, FAT_GUARD_GM, VIZIER_GM, SKELETON_GM, SHADOW_GM,
 };
 
 enum anim_type {
