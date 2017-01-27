@@ -298,7 +298,7 @@ void ui_quit_game (void);
 
 void ui_full_screen (void);
 void ui_zoom_fit (enum mr_fit_mode fit);
-bool ui_set_multi_room (int dw, int dh);
+bool ui_set_multi_room (int dw, int dh, bool correct_mouse);
 void ui_show_coordinates (void);
 void ui_show_indirect_coordinates (void);
 void ui_hue_mode (enum hue new_hue);

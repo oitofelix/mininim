@@ -1362,26 +1362,26 @@ menu_mid (intptr_t mid)
     ui_zoom_fit (MR_FIT_RATIO);
     break;
   case ZOOM_OUT_BOTH_MID:
-    ui_set_multi_room (+1, +1);
+    ui_set_multi_room (+1, +1, false);
     break;
   case ZOOM_OUT_VERTICAL_MID:
-    ui_set_multi_room (+0, +1);
+    ui_set_multi_room (+0, +1, false);
     break;
   case ZOOM_OUT_HORIZONTAL_MID:
-    ui_set_multi_room (+1, +0);
+    ui_set_multi_room (+1, +0, false);
     break;
   case ZOOM_IN_BOTH_MID:
-    ui_set_multi_room (-1, -1);
+    ui_set_multi_room (-1, -1, false);
     break;
   case ZOOM_IN_VERTICAL_MID:
-    ui_set_multi_room (+0, -1);
+    ui_set_multi_room (+0, -1, false);
     break;
   case ZOOM_IN_HORIZONTAL_MID:
-    ui_set_multi_room (-1, +0);
+    ui_set_multi_room (-1, +0, false);
     break;
   case ZOOM_RESET_MID:
     ui_zoom_fit (MR_FIT_NONE);
-    ui_set_multi_room (2 - mr.w, 2 - mr.h);
+    ui_set_multi_room (2 - mr.w, 2 - mr.h, false);
     break;
   case NAV_CURRENT_ROOM_SELECT_MID:
     mr.select_cycles = SELECT_CYCLES;
@@ -1784,32 +1784,32 @@ level_key_bindings (void)
   /* [: decrease multi-room resolution */
   else if (was_key_pressed (0, ALLEGRO_KEY_OPENBRACE)
            && ! cutscene)
-    ui_set_multi_room (-1, -1);
+    ui_set_multi_room (-1, -1, true);
 
   /* ]: increase multi-room resolution */
   else if (was_key_pressed (0, ALLEGRO_KEY_CLOSEBRACE)
            && ! cutscene)
-    ui_set_multi_room (+1, +1);
+    ui_set_multi_room (+1, +1, true);
 
   /* CTRL+[: decrease multi-room width resolution */
   else if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_OPENBRACE)
            && ! cutscene)
-    ui_set_multi_room (-1, +0);
+    ui_set_multi_room (-1, +0, true);
 
   /* CTRL+]: increase multi-room width resolution */
   else if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_CLOSEBRACE)
            && ! cutscene)
-    ui_set_multi_room (+1, +0);
+    ui_set_multi_room (+1, +0, true);
 
   /* ALT+[: decrease multi-room height resolution */
   else if (was_key_pressed (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_OPENBRACE)
            && ! cutscene)
-    ui_set_multi_room (+0, -1);
+    ui_set_multi_room (+0, -1, true);
 
   /* ALT+]: increase multi-room height resolution */
   else if (was_key_pressed (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_CLOSEBRACE)
            && ! cutscene)
-    ui_set_multi_room (+0, +1);
+    ui_set_multi_room (+0, +1, true);
 
   /* H: select room at left (J if flipped horizontally) */
   else if (! active_menu
@@ -2285,7 +2285,7 @@ ui_zoom_fit (enum mr_fit_mode fit)
 }
 
 bool
-ui_set_multi_room (int dw, int dh)
+ui_set_multi_room (int dw, int dh, bool correct_mouse)
 {
   char *key = "MULTI ROOM";
   char *value;
@@ -2306,7 +2306,7 @@ ui_set_multi_room (int dw, int dh)
 
   mr_center_room (mr.room);
 
-  if (mr_coord (m.c.room, -1, NULL, NULL))
+  if (mr_coord (m.c.room, -1, NULL, NULL) && correct_mouse)
     set_mouse_coord (&m);
 
   char *text;
