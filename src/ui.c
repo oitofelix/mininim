@@ -65,7 +65,9 @@ ALLEGRO_BITMAP *small_logo_icon,
   *nav_left_icon, *nav_right_icon, *nav_above_icon, *nav_below_icon,
   *nav_home_icon, *nav_center_icon, *compass_icon, *compass2_icon,
   *drawing_icon, *first_icon, *last_icon, *jump_icon, *original_icon,
-  *guard_icon, *fat_guard_icon, *vizier_icon, *skeleton_icon, *shadow_icon;
+  *guard_icon, *fat_guard_icon, *vizier_icon, *skeleton_icon, *shadow_icon,
+  *resurrect_icon, *death_icon, *feather_icon, *angel_icon, *life_empty_icon,
+  *life_full_icon;
 
 
 
@@ -173,6 +175,12 @@ load_icons (void)
   vizier_icon = load_icon (VIZIER_ICON);
   skeleton_icon = load_icon (SKELETON_ICON);
   shadow_icon = load_icon (SHADOW_ICON);
+  resurrect_icon = load_icon (RESURRECT_ICON);
+  death_icon = load_icon (DEATH_ICON);
+  feather_icon = load_icon (FEATHER_ICON);
+  angel_icon = load_icon (ANGEL_ICON);
+  life_empty_icon = load_icon (LIFE_EMPTY_ICON);
+  life_full_icon = load_icon (LIFE_FULL_ICON);
 }
 
 void
@@ -256,6 +264,12 @@ unload_icons (void)
   destroy_bitmap (vizier_icon);
   destroy_bitmap (skeleton_icon);
   destroy_bitmap (shadow_icon);
+  destroy_bitmap (resurrect_icon);
+  destroy_bitmap (death_icon);
+  destroy_bitmap (feather_icon);
+  destroy_bitmap (angel_icon);
+  destroy_bitmap (life_empty_icon);
+  destroy_bitmap (life_full_icon);
 }
 
 
@@ -466,6 +480,8 @@ create_main_menu (void)
 
   menu_sub ("&Editor", EDITOR_MID, can_edit (), NULL);
 
+  menu_sub ("&Cheat", CHEAT_MID, can_edit (), NULL);
+
   menu_sub ("Hel&p", HELP_MID, true, NULL);
 
   end_menu ();
@@ -475,6 +491,7 @@ create_main_menu (void)
   gamepad_menu ();
   replay_menu ();
   editor_menu ();
+  cheat_menu ();
   help_menu ();
 #endif
 }
@@ -1146,7 +1163,7 @@ replay_menu (void)
 
   switch (replay_mode) {
   case PLAY_REPLAY:
-    xasprintf (&text, "REPLAYING (%i/%i)", replay_index + 1,
+    xasprintf (&text, "REPLAYING (%zu/%zu)", replay_index + 1,
                replay_chain_nmemb);
     menu_hitem (text, RESTART_LEVEL_MID, true);
     al_free (text);
@@ -1210,16 +1227,54 @@ editor_menu (void)
 
   menu_ditem (edit == EDIT_NONE, "&Edit (F8)", "&Play (F8)",
               EDIT_MODE_MID, EDIT_MODE_MID,
-              can_edit (),
-              micon (edit_icon), micon (joystick2_icon));
+              true, micon (edit_icon), micon (joystick2_icon));
 
   menu_sitem ("&Undo (Ctrl+Z)", UNDO_MID,
-              can_edit () && can_undo (&undo, -1),
-              micon (undo_icon));
+              can_undo (&undo, -1), micon (undo_icon));
 
   menu_sitem ("&Redo (Ctrl+Y)", REDO_MID,
-              can_edit () && can_undo (&undo, +1),
-              micon (redo_icon));
+              can_undo (&undo, +1), micon (redo_icon));
+
+  end_menu ();
+#endif
+}
+
+void
+cheat_menu (void)
+{
+#if MENU_FEATURE
+  start_menu (main_menu, CHEAT_MID);
+
+  struct anim *k = get_anim_by_id (current_kid_id);
+
+  menu_sitem ("&Kill enemy (K)", KILL_ENEMY_MID,
+              k && k->enemy_id > 0, micon (death_icon));
+
+  menu_sitem ("&Resurrect (R)", RESURRECT_MID,
+              k && k->current_lives <= 0,
+              micon (resurrect_icon));
+
+  menu_citem ("&Immortal (I)", IMMORTAL_MID, true, immortal_mode,
+              micon (angel_icon));
+
+  menu_sitem ("&Float (Shift+W)", FLOAT_MID,
+              k && (k->current_lives > 0 || is_kid_fall (&k->f))
+              && (k->float_timer == 0
+                  || k->float_timer >= REFLOAT_MENU_THRESHOLD),
+              micon (feather_icon));
+
+  menu_sitem ("Fill &single container (Shift+S)", FILL_LIFE_MID,
+              k && k->current_lives > 0
+              && k->current_lives < k->total_lives,
+              micon (life_empty_icon));
+
+  menu_sitem ((! k || k->total_lives < MAX_LIVES)
+              ? "&Add container (Shift+T)"
+              : "Fill &all containers (Shift+T)", ADD_LIFE_MID,
+              k && k->current_lives > 0
+              && (k->current_lives < k->total_lives
+                  || k->total_lives < MAX_LIVES),
+              micon (life_full_icon));
 
   end_menu ();
 #endif
@@ -1243,7 +1298,7 @@ pause_menu_widget (void)
 {
   if (is_game_paused ()) {
     char *title;
-    xasprintf (&title, "CYCLE: %i", anim_cycle);
+    xasprintf (&title, "CYCLE: %ju", anim_cycle);
     menu_hitem (title, NO_MID, false);
     al_free (title);
   } else menu_sep ();
@@ -1565,6 +1620,27 @@ menu_mid (intptr_t mid)
     break;
 
 
+    /* CHEAT */
+  case RESURRECT_MID:
+    ui_resurrect ();
+    break;
+  case KILL_ENEMY_MID:
+    ui_kill_enemy ();
+    break;
+  case FLOAT_MID:
+    ui_float ();
+    break;
+  case IMMORTAL_MID:
+    ui_immortal (! immortal_mode);
+    break;
+  case FILL_LIFE_MID:
+    ui_fill_life ();
+    break;
+  case ADD_LIFE_MID:
+    ui_add_life ();
+    break;
+
+
     /* HELP */
   case ABOUT_MID:
     ui_about_screen (true);
@@ -1730,10 +1806,6 @@ void
 level_key_bindings (void)
 {
   if (title_demo) return;
-
-  struct anim *k = get_anim_by_id (current_kid_id);
-
-  char *text = NULL;
 
   /* CTRL+A: restart level */
   if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_A))
@@ -1908,8 +1980,10 @@ level_key_bindings (void)
     mr_view_page_trans (BELOW);
 
   /* HOME: focus multi-room view on kid */
-  else if (was_key_pressed (0, ALLEGRO_KEY_HOME))
+  else if (was_key_pressed (0, ALLEGRO_KEY_HOME)) {
+    struct anim *k = get_anim_by_id (current_kid_id);
     mr_focus_room (k->f.c.room);
+  }
 
   /* SHIFT+HOME: center multi-room view */
   else if (was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_HOME))
@@ -1928,67 +2002,32 @@ level_key_bindings (void)
   else if (was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_B))
     ui_room_drawing (no_room_drawing);
 
-  /* R: resurrect kid */
-  else if (! active_menu
-           && was_key_pressed (0, ALLEGRO_KEY_R)) {
-    if (replay_mode == NO_REPLAY) kid_resurrect (k);
-    else print_replay_mode (0);
-  }
-
-  /* A: alternate between kid and its shadows */
-  else if (! active_menu
-           && was_key_pressed (0, ALLEGRO_KEY_A)) {
-    do {
-      k = &anima[(k - anima + 1) % anima_nmemb];
-    } while (k->type != KID || ! k->controllable);
-    current_kid_id = k->id;
-    mr_focus_room (k->f.c.room);
-  }
-
   /* K: kill enemy */
   else if (! active_menu
-           && was_key_pressed (0, ALLEGRO_KEY_K)) {
-    if (replay_mode == NO_REPLAY) {
-      struct anim *ke = get_anim_by_id (k->enemy_id);
-      if (ke) {
-        survey (_m, pos, &ke->f, NULL, &ke->p, NULL);
-        anim_die (ke);
-        play_audio (&guard_hit_audio, NULL, ke->id);
-      }
-    } else print_replay_mode (0);
-  }
+           && was_key_pressed (0, ALLEGRO_KEY_K))
+    ui_kill_enemy ();
+
+  /* R: resurrect kid */
+  else if (! active_menu
+           && was_key_pressed (0, ALLEGRO_KEY_R))
+    ui_resurrect ();
 
   /* I: enable/disable immortal mode */
   else if (! active_menu
-           && was_key_pressed (0, ALLEGRO_KEY_I)) {
-    if (replay_mode == NO_REPLAY) {
-      immortal_mode = ! immortal_mode;
-      k->immortal = immortal_mode;
-      xasprintf (&text, "%s MODE", immortal_mode
-                 ? "IMMORTAL" : "MORTAL");
-      draw_bottom_text (NULL, text, 0);
-      al_free (text);
-    } else print_replay_mode (0);
-  }
-
-  /* SHIFT+S: incremet kid current lives */
-  else if (was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_S)) {
-    if (replay_mode == NO_REPLAY)
-      increase_kid_current_lives (k);
-    else print_replay_mode (0);
-  }
-
-  /* SHIFT+T: incremet kid total lives */
-  else if (was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_T)) {
-    if (replay_mode == NO_REPLAY) increase_kid_total_lives (k);
-    else print_replay_mode (0);
-  }
+           && was_key_pressed (0, ALLEGRO_KEY_I))
+    ui_immortal (! immortal_mode);
 
   /* SHIFT+W: float kid */
-  else if (was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_W)) {
-    if (replay_mode == NO_REPLAY) float_kid (k);
-    else print_replay_mode (0);
-  }
+  else if (was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_W))
+    ui_float ();
+
+  /* SHIFT+S: incremet kid current lives */
+  else if (was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_S))
+    ui_fill_life ();
+
+  /* SHIFT+T: incremet kid total lives */
+  else if (was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_T))
+    ui_add_life ();
 
   /* SPACE: display remaining time */
   else if (! active_menu
@@ -2022,12 +2061,15 @@ level_key_bindings (void)
   }
 
   /* TAB: display skill */
-  else if (was_key_pressed (0, ALLEGRO_KEY_TAB))
+  else if (was_key_pressed (0, ALLEGRO_KEY_TAB)) {
+    struct anim *k = get_anim_by_id (current_kid_id);
     display_skill (k);
+  }
 
   /* CTRL+=: increment counter attack skill */
   else if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_EQUALS)) {
     if (replay_mode == NO_REPLAY) {
+      struct anim *k = get_anim_by_id (current_kid_id);
       if (k->skill.counter_attack_prob < 99)
         k->skill.counter_attack_prob++;
       display_skill (k);
@@ -2037,6 +2079,7 @@ level_key_bindings (void)
   /* CTRL+-: decrement counter attack skill */
   else if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_MINUS)) {
     if (replay_mode == NO_REPLAY) {
+      struct anim *k = get_anim_by_id (current_kid_id);
       if (k->skill.counter_attack_prob > -1)
         k->skill.counter_attack_prob--;
       display_skill (k);
@@ -2046,6 +2089,7 @@ level_key_bindings (void)
   /* ALT+=: increment counter defense skill */
   else if (was_key_pressed (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_EQUALS)) {
     if (replay_mode == NO_REPLAY) {
+      struct anim *k = get_anim_by_id (current_kid_id);
       if (k->skill.counter_defense_prob < 99)
         k->skill.counter_defense_prob++;
       display_skill (k);
@@ -2055,10 +2099,22 @@ level_key_bindings (void)
   /* ALT+-: decrement counter defense skill */
   else if (was_key_pressed (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_MINUS)) {
     if (replay_mode == NO_REPLAY) {
+      struct anim *k = get_anim_by_id (current_kid_id);
       if (k->skill.counter_defense_prob > -1)
         k->skill.counter_defense_prob--;
       display_skill (k);
     } else print_replay_mode (0);
+  }
+
+  /* A: alternate between kid and its shadows */
+  else if (! active_menu
+           && was_key_pressed (0, ALLEGRO_KEY_A)) {
+    struct anim *k;
+    do {
+      k = &anima[(k - anima + 1) % anima_nmemb];
+    } while (k->type != KID || ! k->controllable);
+    current_kid_id = k->id;
+    mr_focus_room (k->f.c.room);
   }
 
   /* ESC: pause game */
@@ -2153,7 +2209,7 @@ ui_previous_level (void)
     quit_anim = NEXT_LEVEL;
   } else if (replay_mode == PLAY_REPLAY) {
     if (replay_index > 0) quit_anim = REPLAY_PREVIOUS;
-    else draw_bottom_text (NULL, "NO PREVIOUS REPLAY", 0);
+    else ui_msg (0, "NO PREVIOUS REPLAY");
   } else print_replay_mode (0);
 }
 
@@ -2167,7 +2223,7 @@ ui_next_level (void)
   } else if (replay_mode == PLAY_REPLAY) {
     if (replay_index + 1 < replay_chain_nmemb)
       quit_anim = REPLAY_NEXT;
-    else draw_bottom_text (NULL, "NO NEXT REPLAY", 0);
+    else ui_msg (0, "NO NEXT REPLAY");
   } else print_replay_mode (0);
 }
 
@@ -2180,16 +2236,13 @@ ui_audio_volume (float volume)
 
   set_audio_volume (volume);
 
-  char *text;
   char *status;
   if (volume == VOLUME_RANGE_MIN) status = "OFF";
   else if (volume < VOLUME_RANGE_LOW) status = "LOW";
   else if (volume < VOLUME_RANGE_MEDIUM) status = "MEDIUM";
   else if (volume <= VOLUME_RANGE_MAX) status = "HIGH";
 
-  xasprintf (&text, "SOUND %s", status);
-  draw_bottom_text (NULL, text, 0);
-  al_free (text);
+  ui_msg (0, "SOUND %s", status);
 
   ui_save_setting (key, value);
   al_free (value);
@@ -2240,13 +2293,12 @@ ui_full_screen (void)
       value = "ON";
       if (edit == EDIT_NONE) hide_menu ();
     }
-    char *text;
-    xasprintf (&text, "%s: %s", key, value);
-    draw_bottom_text (NULL, text, 0);
-    al_free (text);
+
+    ui_msg (0, "%s: %s", key, value);
+
     ui_save_setting (key, value);
     view_menu ();
-  } else draw_bottom_text (NULL, "NON-DESKTOP MODE IS FULLSCREEN ONLY", 0);
+  } else ui_msg (0, "NON-DESKTOP MODE IS FULLSCREEN ONLY");
 }
 
 void
@@ -2275,10 +2327,7 @@ ui_zoom_fit (enum mr_fit_mode fit)
 
   apply_mr_fit_mode ();
 
-  char *text;
-  xasprintf (&text, "ZOOM FIT: %s", value);
-  draw_bottom_text (NULL, text, 0);
-  al_free (text);
+  ui_msg (0, "ZOOM FIT: %s", value);
 
   ui_save_setting (key, value);
   view_menu ();
@@ -2291,10 +2340,7 @@ ui_set_multi_room (int dw, int dh, bool correct_mouse)
   char *value;
 
   if (mr.w + dw < 1 || mr.h + dh < 1) {
-    char *text;
-    xasprintf (&text, "MULTI-ROOM %ix%i", mr.w, mr.h);
-    draw_bottom_text (NULL, text, 0);
-    al_free (text);
+    ui_msg (0, "MULTI-ROOM %ix%i", mr.w, mr.h);
     return false;
   }
 
@@ -2309,10 +2355,7 @@ ui_set_multi_room (int dw, int dh, bool correct_mouse)
   if (mr_coord (m.c.room, -1, NULL, NULL) && correct_mouse)
     set_mouse_coord (&m);
 
-  char *text;
-  xasprintf (&text, "MULTI-ROOM %ix%i", mr.w, mr.h);
-  draw_bottom_text (NULL, text, 0);
-  al_free (text);
+  ui_msg (0, "MULTI-ROOM %ix%i", mr.w, mr.h);
 
   xasprintf (&value, "%ix%i", mr.w, mr.h);
   ui_save_setting (key, value);
@@ -2334,10 +2377,7 @@ ui_show_coordinates (void)
 
   mr.select_cycles = SELECT_CYCLES;
 
-  char *text;
-  xasprintf (&text, "S%i L%i R%i A%i B%i", s, l, r, a, b);
-  draw_bottom_text (NULL, text, 0);
-  al_free (text);
+  ui_msg (0, "S%i L%i R%i A%i B%i", s, l, r, a, b);
 }
 
 void
@@ -2352,11 +2392,8 @@ ui_show_indirect_coordinates (void)
 
   mr.select_cycles = SELECT_CYCLES;
 
-  char *text;
-  xasprintf (&text, "LV%i AL%i AR%i BL%i BR%i",
-             global_level.n, al, ar, bl, br);
-  draw_bottom_text (NULL, text, 0);
-  al_free (text);
+  ui_msg (0, "LV%i AL%i AR%i BL%i BR%i",
+          global_level.n, al, ar, bl, br);
 }
 
 void
@@ -2398,10 +2435,7 @@ ui_hue_mode (enum hue new_hue)
     break;
   }
 
-  char *text;
-  xasprintf (&text, "%s: %s", key, value);
-  draw_bottom_text (NULL, text, 0);
-  al_free (text);
+  ui_msg (0, "%s: %s", key, value);
 
   ui_save_setting (key, value);
   view_menu ();
@@ -2449,10 +2483,7 @@ ui_gm (enum gm new_gm)
   int i;
   for (i = 0; i < anima_nmemb; i++) apply_guard_mode (&anima[i], gm);
 
-  char *text;
-  xasprintf (&text, "%s: %s", key, value);
-  draw_bottom_text (NULL, text, 0);
-  al_free (text);
+  ui_msg (0, "%s: %s", key, value);
 
   ui_save_setting (key, value);
   view_menu ();
@@ -2482,10 +2513,7 @@ ui_em (enum em new_em)
     break;
   }
 
-  char *text;
-  xasprintf (&text, "%s: %s", key, value);
-  draw_bottom_text (NULL, text, 0);
-  al_free (text);
+  ui_msg (0, "%s: %s", key, value);
 
   ui_save_setting (key, value);
   view_menu ();
@@ -2511,10 +2539,7 @@ ui_vm (enum vm new_vm)
 
   vm_menu ();
 
-  char *text;
-  xasprintf (&text, "%s: %s", key, value);
-  draw_bottom_text (NULL, text, 0);
-  al_free (text);
+  ui_msg (0, "%s: %s", key, value);
 
   ui_save_setting (key, value);
   view_menu ();
@@ -2565,10 +2590,7 @@ ui_flip_screen (int flags, bool correct_mouse, bool save_only)
   potion_flags = 0;
   screen_flags = flags;
 
-  char *text;
-  xasprintf (&text, "%s: %s", key, value);
-  draw_bottom_text (NULL, text, 0);
-  al_free (text);
+  ui_msg (0, "%s: %s", key, value);
 
   ui_flip_gamepad (flip_gamepad_vertical, flip_gamepad_horizontal, true);
   ui_save_setting ("MIRROR MODE", NULL);
@@ -2585,10 +2607,7 @@ ui_inhibit_screensaver (bool inhibit)
   inhibit_screensaver = inhibit;
   al_inhibit_screensaver (inhibit_screensaver);
 
-  char *text;
-  xasprintf (&text, "%s: %s", key, value);
-  draw_bottom_text (NULL, text, 0);
-  al_free (text);
+  ui_msg (0, "%s: %s", key, value);
 
   ui_save_setting (key, value);
   view_menu ();
@@ -2603,10 +2622,7 @@ ui_room_drawing (bool draw)
   no_room_drawing = ! draw;
   force_full_redraw = true;
 
-  char *text;
-  xasprintf (&text, "%s: %s", key, value);
-  draw_bottom_text (NULL, text, 0);
-  al_free (text);
+  ui_msg (0, "%s: %s", key, value);
 
   view_menu ();
 }
@@ -2617,26 +2633,22 @@ ui_gamepad_mode (enum gpm new_gpm)
   char *key = "GAMEPAD MODE";
   char *value;
 
-  char *text;
-
   switch (new_gpm) {
   case KEYBOARD:
     gpm = KEYBOARD;
-    draw_bottom_text (NULL, "KEYBOARD MODE", 0);
+    ui_msg (0, "KEYBOARD MODE");
     value = "KEYBOARD";
     ui_save_setting (key, value);
     break;
   case JOYSTICK:
     if (calibrate_joystick ()) {
-      xasprintf (&text, "JOYSTICK %s",
-                 gpm == JOYSTICK ? "CALIBRATED" : "MODE");
       gpm = JOYSTICK;
       value = "JOYSTICK";
       ui_save_setting (key, value);
       gamepad_rumble (1.0, 0.6);
-    } else xasprintf (&text, "JOYSTICK NOT FOUND");
-    draw_bottom_text (NULL, text, 0);
-    al_free (text);
+      ui_msg (0, "JOYSTICK %s",
+              gpm == JOYSTICK ? "CALIBRATED" : "MODE");
+    } else ui_msg (0, "JOYSTICK NOT FOUND");
     break;
   default: assert (false);
   }
@@ -2662,10 +2674,7 @@ ui_flip_gamepad (bool v, bool h, bool save_only)
   flip_gamepad_vertical = v;
   flip_gamepad_horizontal = h;
 
-  char *text;
-  xasprintf (&text, "%s: %s", key, value);
-  draw_bottom_text (NULL, text, 0);
-  al_free (text);
+  ui_msg (0, "%s: %s", key, value);
 
   ui_flip_screen (screen_flags, false, true);
   ui_save_setting ("MIRROR MODE", NULL);
@@ -2689,7 +2698,7 @@ ui_record_replay (void)
   else if (recording_replay_countdown < 0)
     prepare_for_recording_replay ();
   else {
-    draw_bottom_text (NULL, "RECORDING ABORTED", 2);
+    ui_msg (2, "RECORDING ABORTED");
     recording_replay_countdown = -1;
     replay_menu ();
   }
@@ -2726,16 +2735,11 @@ ui_toggle_time_frequency_constraint (void)
 void
 ui_change_anim_freq (int f)
 {
-  char *text;
   f = f < 0 ? 0 : f;
   f = f > UNLIMITED_HZ ? UNLIMITED_HZ : f;
   anim_freq = f;
   al_set_timer_speed (timer, f > 0 ? 1.0 / f : 1.0 / UNLIMITED_HZ);
-  if (f > 0) {
-    xasprintf (&text, "TIME FREQ: %iHz", f);
-    draw_bottom_text (NULL, text, 0);
-    al_free (text);
-  }
+  if (f > 0) ui_msg (0, "TIME FREQ: %iHz", f);
   replay_menu ();
 }
 
@@ -2764,7 +2768,7 @@ print_game_paused (int priority)
   case NO_REPLAY: default: text = "GAME PAUSED"; break;
   }
 
-  draw_bottom_text (NULL, text, priority);
+  ui_msg (priority, text);
 }
 
 void
@@ -2797,13 +2801,86 @@ ui_undo_pass (struct undo *u, int dir, char *prefix)
   editor_msg (undo_msg, EDITOR_CYCLES_3);
 }
 
+
+
+
+
+
+void
+ui_resurrect (void)
+{
+  if (replay_mode == NO_REPLAY) {
+    struct anim *k = get_anim_by_id (current_kid_id);
+    kid_resurrect (k);
+  } else print_replay_mode (0);
+}
+
+void
+ui_kill_enemy (void)
+{
+  if (replay_mode == NO_REPLAY) {
+    struct anim *k = get_anim_by_id (current_kid_id);
+    struct anim *ke = get_anim_by_id (k->enemy_id);
+    if (ke) {
+      survey (_m, pos, &ke->f, NULL, &ke->p, NULL);
+      anim_die (ke);
+      play_audio (&guard_hit_audio, NULL, ke->id);
+    }
+  } else print_replay_mode (0);
+}
+
+void
+ui_float (void)
+{
+  if (replay_mode == NO_REPLAY) {
+    struct anim *k = get_anim_by_id (current_kid_id);
+    float_kid (k);
+  } else print_replay_mode (0);
+}
+
+void
+ui_immortal (bool immortal)
+{
+  if (replay_mode == NO_REPLAY) {
+    char *key = "IMMORTAL MODE";
+    char *value = immortal ? "ON" : "OFF";
+    struct anim *k = get_anim_by_id (current_kid_id);
+    if (k->current_lives <= 0 && immortal) kid_resurrect (k);
+    immortal_mode = immortal;
+    k->immortal = immortal;
+    ui_msg (0, "%s: %s", key, value);
+    ui_save_setting (key, value);
+    cheat_menu ();
+  } else print_replay_mode (0);
+}
+
+void
+ui_fill_life (void)
+{
+  if (replay_mode == NO_REPLAY) {
+    struct anim *k = get_anim_by_id (current_kid_id);
+    increase_kid_current_lives (k);
+  } else print_replay_mode (0);
+}
+
+void
+ui_add_life (void)
+{
+  if (replay_mode == NO_REPLAY) {
+    struct anim *k = get_anim_by_id (current_kid_id);
+    increase_kid_total_lives (k);
+  }
+  else print_replay_mode (0);
+}
+
+
+
+
+
 void
 ui_version (void)
 {
-  char *text;
-  xasprintf (&text, "MININIM %s", VERSION);
-  draw_bottom_text (NULL, text, 0);
-  al_free (text);
+  ui_msg (0, "MININIM %s", VERSION);
 }
 
 void
@@ -2832,7 +2909,7 @@ ui_next_display_mode (void)
   char *value;
 
   if (display_mode < 0)
-    draw_bottom_text (NULL, "DISPLAY MODE: DESKTOP", 0);
+    ui_msg (0, "DISPLAY MODE: DESKTOP");
   else {
     int n = al_get_num_display_modes ();
     if (n) {
@@ -2846,16 +2923,13 @@ ui_next_display_mode (void)
         if (d.width == w && d.height == h
             && display_mode != display_mode_bkp)
           goto next_display_mode;
-        char *text;
         al_resize_display (display, d.width, d.height);
-        xasprintf (&text, "%s: %ix%i", key, d.width, d.height);
-        draw_bottom_text (NULL, text, 0);
-        al_free (text);
+        ui_msg (0, "%s: %ix%i", key, d.width, d.height);
         xasprintf (&value, "%i", display_mode);
         ui_save_setting (key, value);
         al_free (value);
-      } else draw_bottom_text (NULL, "DISPLAY MODES QUERYING FAILED", 0);
-    } else draw_bottom_text (NULL, "NO DISPLAY MODE AVAILABLE", 0);
+      } else ui_msg (0, "DISPLAY MODES QUERYING FAILED");
+    } else ui_msg (0, "NO DISPLAY MODE AVAILABLE");
   }
 }
 
@@ -2900,6 +2974,27 @@ ui_save_setting (char *key, char *value)
   return 0;
 }
 
+bool
+ui_msg (int priority, const char *template, ...)
+{
+  va_list ap;
+  va_start (ap, template);
+
+  char *text;
+  vasprintf (&text, template, ap);
+  bool r = draw_bottom_text (NULL, text, priority);
+  al_free (text);
+
+  va_end (ap);
+  return r;
+}
+
+bool
+ui_msg_clear (int priority)
+{
+  return draw_bottom_text (NULL, NULL, priority);
+}
+
 
 
 
@@ -2933,10 +3028,7 @@ ui_mirror_mode (bool mirror)
 
   mirror_mode (mirror);
 
-  char *text;
-  xasprintf (&text, "%s: %s", key, value);
-  draw_bottom_text (NULL, text, 0);
-  al_free (text);
+  ui_msg (0, "%s: %s", key, value);
 
   ui_save_setting ("DISPLAY FLIP MODE", NULL);
   ui_save_setting ("GAMEPAD FLIP MODE", NULL);

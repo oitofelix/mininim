@@ -280,7 +280,9 @@ get_gamepad_state (struct gamepad_state *k)
     || al_key_down (&keyboard_state, ALLEGRO_KEY_RSHIFT)
     || (get_joystick_button (joystick_shift_button) >
         joystick_shift_released + joystick_shift_threshold);
-  k->enter = al_key_down (&keyboard_state, ALLEGRO_KEY_ENTER)
+  k->enter =
+    (al_key_down (&keyboard_state, ALLEGRO_KEY_ENTER)
+     && ! get_key_modifiers ())
     || al_key_down (&keyboard_state, ALLEGRO_KEY_PAD_ENTER)
     || (get_joystick_button (joystick_enter_button) >
         joystick_enter_released + joystick_enter_threshold);

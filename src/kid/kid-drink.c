@@ -131,12 +131,13 @@ flow (struct anim *k)
           || k->poison_immune) break;
       k->current_lives--;
       k->splash = true;
-      if (k->current_lives == 0) k->death_reason = POTION_DEATH;
       play_audio (&harm_audio, NULL, k->id);
-      kid_haptic (k, KID_HAPTIC_HARM);
+      if (k->current_lives == 0) k->death_reason = POTION_DEATH;
       if (k->id == current_kid_id) {
         mr.flicker = 2;
         mr.color = get_flicker_blood_color ();
+        kid_haptic (k, KID_HAPTIC_HARM);
+        cheat_menu ();
       }
       break;
     case BIG_POISON_POTION:

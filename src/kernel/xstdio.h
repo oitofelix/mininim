@@ -21,6 +21,7 @@
 #ifndef MININIM_XSTDIO_H
 #define MININIM_XSTDIO_H
 
-int xasprintf (char **ptr, const char *template, ...);
+int xasprintf (char **ptr, const char *template, ...)
+  __attribute__ ((format (printf, 2, 3)));
 
 #endif	/* MININIM_XSTDIO_H */

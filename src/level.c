@@ -298,14 +298,14 @@ play_level (struct level *lv)
   restart_level:
     retry_level = global_level.n;
     level_cleanup ();
-    draw_bottom_text (NULL, NULL, 0);
+    ui_msg_clear (0);
    goto start;
   case NEXT_LEVEL:
   next_level:
     level_cleanup ();
     if (global_level.next_level)
       global_level.next_level (lv, next_level_number);
-    draw_bottom_text (NULL, NULL, 0);
+    ui_msg_clear (0);
     if (global_level.cutscene && ! ignore_level_cutscene
         && next_level_number >= global_level.n + 1) {
       cutscene_started = false;
@@ -326,7 +326,7 @@ play_level (struct level *lv)
     next_level_number = -1;
     retry_level = -1;
     level_cleanup ();
-    draw_bottom_text (NULL, NULL, 0);
+    ui_msg_clear (0);
     break;
   case OUT_OF_TIME:
     level_cleanup ();
@@ -660,10 +660,12 @@ compute_level (void)
 
   for (i = 0; i < anima_nmemb; i++) {
     struct anim *a = &anima[i];
-    if (a->float_timer && a->float_timer < 192) {
+    if (a->float_timer && a->float_timer < FLOAT_TIMER_MAX) {
       request_gamepad_rumble (0.5 * (sin (a->float_timer * 0.17) + 1),
                               1.0 / DEFAULT_HZ);
       a->float_timer++;
+      if (a->id == 0 && a->float_timer == REFLOAT_MENU_THRESHOLD)
+        cheat_menu ();
     } else if (a->float_timer > 0) a->float_timer = 0;
 
     if (a->enemy_refraction > 0) a->enemy_refraction--;
@@ -730,6 +732,8 @@ process_death (void)
   /* Restart level after death */
   if (k->current_lives <= 0
       && ! is_game_paused ()) {
+    if (! death_timer) cheat_menu ();
+
     death_timer++;
 
     if (death_timer == SEC2CYC (1)) {
@@ -751,18 +755,15 @@ process_death (void)
           play_audio (&press_key_audio, NULL, -1);
           kid_haptic (k, KID_HAPTIC_PRESS_ANY_KEY);
         }
-        char *text;
-        xasprintf (&text, "Press Button to Continue");
-        draw_bottom_text (NULL, text, -2);
-        al_free (text);
-      } else if (! active_menu) draw_bottom_text (NULL, "", -2);
+        ui_msg (-2, "Press Button to Continue");
+      } else if (! active_menu) ui_msg (-2, "%s", "");
 
       if (was_any_key_pressed () && ! was_menu_key_pressed ())
         quit_anim = RESTART_LEVEL;
     }
   } else if (death_timer && ! is_game_paused ()) {
     death_timer = 0;
-    draw_bottom_text (NULL, NULL, -2);
+    ui_msg_clear (-2);
   }
 }
 
@@ -776,13 +777,9 @@ draw_level (void)
 
   /* automatic level display */
   if (! title_demo && global_level.nominal_n >= 0
-      && ! level_number_shown && anim_cycle <= SEC2CYC (10)) {
-    char *text;
-    xasprintf (&text, "LEVEL %i", global_level.nominal_n);
-    if (draw_bottom_text (NULL, text, -1))
-      level_number_shown = true;
-    al_free (text);
-  }
+      && ! level_number_shown && anim_cycle <= SEC2CYC (10)
+      && ui_msg (-1, "LEVEL %i", global_level.nominal_n))
+    level_number_shown = true;
 
   /* automatic remaining time display */
   if (! title_demo) {
@@ -810,34 +807,30 @@ draw_level (void)
 bool
 display_remaining_time (int priority)
 {
-  char *text;
   int t = (time_limit - play_time) / DEFAULT_HZ;
   if (t < 0) t = 0;
   int m = t / 60 + ((t % 60) ? 1 : 0);
-  if (t > 60) xasprintf (&text, "%i MINUTES LEFT", m);
-  else xasprintf (&text, "%i SECONDS LEFT", t);
-  bool shown = draw_bottom_text (NULL, text, priority);
-  al_free (text);
-  return shown;
+  return t > 60
+    ? ui_msg (priority, "%i MINUTES LEFT", m)
+    : ui_msg (priority, "%i SECONDS LEFT", t);
 }
 
 void
 display_skill (struct anim *k)
 {
-  char *text;
   struct anim *ke = get_anim_by_id (k->enemy_id);
-  if (ke) xasprintf (&text, "KCA%i KCD%i A%i CA%i D%i CD%i",
-                      k->skill.counter_attack_prob + 1,
-                      k->skill.counter_defense_prob + 1,
-                      ke->skill.attack_prob + 1,
-                      ke->skill.counter_attack_prob + 1,
-                      ke->skill.defense_prob + 1,
-                      ke->skill.counter_defense_prob + 1);
-  else xasprintf (&text, "KCA%i KCD%i",
-                  k->skill.counter_attack_prob + 1,
-                  k->skill.counter_defense_prob + 1);
-  draw_bottom_text (NULL, text, 0);
-  al_free (text);
+  if (ke)
+    ui_msg (0, "KCA%i KCD%i A%i CA%i D%i CD%i",
+            k->skill.counter_attack_prob + 1,
+            k->skill.counter_defense_prob + 1,
+            ke->skill.attack_prob + 1,
+            ke->skill.counter_attack_prob + 1,
+            ke->skill.defense_prob + 1,
+            ke->skill.counter_defense_prob + 1);
+  else
+    ui_msg (0, "KCA%i KCD%i",
+            k->skill.counter_attack_prob + 1,
+            k->skill.counter_defense_prob + 1);
 }
 
 static void
@@ -862,7 +855,7 @@ draw_lives (ALLEGRO_BITMAP *bitmap, struct anim *k, enum vm vm)
 void
 pause_game (bool val)
 {
-  if (! val) draw_bottom_text (NULL, NULL, 0);
+  if (! val) ui_msg_clear (0);
   game_paused = val;
   replay_menu ();
 }

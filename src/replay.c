@@ -370,16 +370,13 @@ start_recording_replay (int priority)
   if (! command_line_replay &&
       recording_replay_countdown > 0) {
     int sec = CYC2SEC(recording_replay_countdown) + 1;
-    char *text;
-    xasprintf (&text, "RECORDING IN %i", sec);
-    draw_bottom_text (NULL, text, priority);
-    al_free (text);
+    ui_msg (priority, "RECORDING IN %i", sec);
     recording_replay_countdown--;
   } else if (recording_replay_countdown == 0) {
     level_start_replay_mode = RECORD_REPLAY;
     quit_anim = RESTART_LEVEL;
     recording_replay_countdown = -1;
-    draw_bottom_text (NULL, NULL, priority);
+    ui_msg_clear (priority);
   }
 }
 
@@ -414,11 +411,10 @@ handle_save_replay_thread (int priority)
     char *error_str = save_replay (filename, replay)
       ? "REPLAY HAS BEEN SAVED"
       : "REPLAY SAVING FAILED";
-    draw_bottom_text (NULL, error_str, priority);
+    ui_msg (priority, error_str);
     al_free (save_replay_dialog.initial_path);
     xasprintf (&save_replay_dialog.initial_path, "%s", filename);
-  } else
-    draw_bottom_text (NULL, "RECORDING STOPPED", priority);
+  } else ui_msg (priority, "RECORDING STOPPED");
   al_destroy_native_file_dialog (dialog);
   free_replay (replay);
   pause_animation (false);
@@ -465,7 +461,7 @@ handle_load_replay_thread (int priority)
       ? "REPLAY HAS BEEN LOADED"
       : "REPLAY LOADING FAILED";
 
-    draw_bottom_text (NULL, error_str, priority);
+    ui_msg (priority, error_str);
 
     al_free (load_replay_dialog.initial_path);
     xasprintf (&load_replay_dialog.initial_path, "%s",
@@ -492,7 +488,7 @@ stop_replaying (int priority)
   free_replay_chain ();
   if (! title_demo
       && replay_mode == PLAY_REPLAY)
-    draw_bottom_text (NULL, "REPLAY STOPPED", priority);
+    ui_msg (priority, "REPLAY STOPPED");
   replay_mode = NO_REPLAY;
   level_start_replay_mode = NO_REPLAY;
   anim_freq = DEFAULT_HZ;
@@ -548,7 +544,7 @@ replay_gamepad_update (struct anim *a, struct replay *replay, uint64_t cycle)
 
   if (replay_mode == PLAY_REPLAY) {
     if (! get_replay_gamepad_state (&a->key, replay, cycle) && ! title_demo)
-      draw_bottom_text (NULL, "NO FURTHER REPLAY DATA", -1);
+      ui_msg (-1, "NO FURTHER REPLAY DATA");
   } else get_gamepad_state (&a->key);
 
   if (replay_mode == RECORD_REPLAY && a->current_lives > 0)
@@ -560,10 +556,8 @@ print_replay_mode (int priority)
 {
   if (title_demo) return;
   switch (replay_mode) {
-  case RECORD_REPLAY:
-    draw_bottom_text (NULL, "RECORDING", priority); break;
-  case PLAY_REPLAY:
-    draw_bottom_text (NULL, "REPLAYING", priority); break;
+  case RECORD_REPLAY: ui_msg (priority, "RECORDING"); break;
+  case PLAY_REPLAY: ui_msg (priority, "REPLAYING"); break;
   case NO_REPLAY: default: break;
   }
 }
@@ -691,7 +685,7 @@ print_replay_info (struct replay *replay)
           "  --semantics=%s --start-level=%u --start-time=%u --time-limit=%i \\\n"
           "  --total-lives=%u --kca=%u --kcd=%u\n"
           "Random seed: 0x%X\n"
-          "Cycles: %" PRIu64 "\n",
+          "Cycles: %ju\n",
           replay->filename,
           REPLAY_FILE_SIGNATURE,
           replay->version,
@@ -718,7 +712,7 @@ print_replay_results (struct replay *replay)
   printf ("Complete: %s\n"
           "Reason: %s\n"
           "Final: --mirror-level=%s --immortal-mode=%s --movements=%s \\\n"
-          "  --semantics=%s --start-level=%u --start-time=%" PRIu64
+          "  --semantics=%s --start-level=%u --start-time=%ju"
           " --time-limit=%i \\\n"
           "  --total-lives=%u --kca=%i --kcd=%i\n",
           replay->complete ? "YES" : "NO",

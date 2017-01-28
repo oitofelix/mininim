@@ -98,11 +98,17 @@
 #define VIZIER_ICON "data/icons/vizier.png"
 #define SKELETON_ICON "data/icons/skeleton.png"
 #define SHADOW_ICON "data/icons/shadow.png"
+#define RESURRECT_ICON "data/icons/resurrect.png"
+#define DEATH_ICON "data/icons/death.png"
+#define FEATHER_ICON "data/icons/feather.png"
+#define ANGEL_ICON "data/icons/angel.png"
+#define LIFE_EMPTY_ICON "data/icons/life-empty.png"
+#define LIFE_FULL_ICON "data/icons/life-full.png"
 
 enum main_menu {
   BASE_MID = 0,
 
-  /* real menu itens follow */
+  /* real menu items follow */
   GAME_MID,
   LOAD_MID,
   LOAD_GAME_MID,
@@ -216,6 +222,14 @@ enum main_menu {
   UNDO_MID,
   REDO_MID,
 
+  CHEAT_MID,
+  RESURRECT_MID,
+  KILL_ENEMY_MID,
+  FLOAT_MID,
+  IMMORTAL_MID,
+  FILL_LIFE_MID,
+  ADD_LIFE_MID,
+
   HELP_MID,
   ABOUT_MID,
 
@@ -267,6 +281,8 @@ void flip_gamepad_menu (void);
 void replay_menu (void);
 
 void editor_menu (void);
+
+void cheat_menu (void);
 
 void help_menu (void);
 
@@ -328,12 +344,23 @@ void print_game_paused (int priority);
 
 void ui_undo_pass (struct undo *u, int dir, char *prefix);
 
+void ui_resurrect (void);
+void ui_kill_enemy (void);
+void ui_float (void);
+void ui_immortal (bool immortal);
+void ui_fill_life (void);
+void ui_add_life (void);
+
 void ui_version (void);
 void ui_about_screen (bool value);
 
 void ui_next_display_mode (void);
 
+
 error_t ui_save_setting (char *key, char *value);
+bool ui_msg (int priority, const char *template, ...)
+  __attribute__ ((format (printf, 2, 3)));
+bool ui_msg_clear (int priority);
 
 
 

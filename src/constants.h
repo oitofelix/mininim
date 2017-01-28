@@ -100,6 +100,11 @@
 #define INITIAL_KCA -1
 #define INITIAL_KCD -1
 
+#define FLOAT_TIMER_MAX 192
+#define REFLOAT_MENU_THRESHOLD (FLOAT_TIMER_MAX / 2)
+
+#define MAX_LIVES 10
+
 #define SEC2CYC(x) (anim_freq > 0 ? (x) * anim_freq : (x) * DEFAULT_HZ)
 #define CYC2SEC(x) (anim_freq > 0 ? (x) / anim_freq : (x) / DEFAULT_HZ)
 #define SEC2EFF(x) ((x) * EFFECT_HZ)

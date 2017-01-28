@@ -1158,7 +1158,7 @@ show_logo_replaying (void)
   char *text0, *text1;
   int progress; update_replay_progress (&progress);
   xasprintf (&text0, "Level: %02u", global_level.n);
-  xasprintf (&text1, "Replaying: %3lu%%", progress);
+  xasprintf (&text1, "Replaying: %3u%%", progress);
 
   show_logo (text0, text1, NULL);
 

@@ -329,7 +329,7 @@ editor (void)
       && (was_key_pressed (0, ALLEGRO_KEY_BACKSPACE)
           || was_char_pressed ('/'))) {
     msg_cycles = 0;
-    draw_bottom_text (NULL, msg, 0);
+    ui_msg (0, msg);
     menu_help = 0;
  } else if (msg_cycles > 0 && msg) msg_cycles--;
   else msg_cycles = 0;
@@ -854,7 +854,7 @@ editor (void)
       break;
     default:
       set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
-      draw_bottom_text (NULL, "NO EXTENSION", 0);
+      ui_msg (0, "NO EXTENSION");
       if (was_menu_return_pressed (true)) edit = EDIT_CON;
       break;
     }
@@ -941,12 +941,9 @@ editor (void)
     }
 
     if (is_fake (&p))
-      xasprintf (&str, "%s/%s/%s/%s", fg_str, bg_str, ext_str, fake_str);
-    else xasprintf (&str, "%s/%s/%s", fg_str, bg_str, ext_str);
-    draw_bottom_text (NULL, str, 0);
-    al_free (str);
+      ui_msg (0, "%s/%s/%s/%s", fg_str, bg_str, ext_str, fake_str);
+    else ui_msg (0, "%s/%s/%s", fg_str, bg_str, ext_str);
     if (free_ext_str) al_free (ext_str);
-
     break;
   case EDIT_NUMERICAL_INFO:
     if (was_menu_return_pressed (true)) edit = EDIT_CON;
@@ -959,12 +956,9 @@ editor (void)
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
 
     npos (&p, &p0);
-    xasprintf (&str, "[%i,%i,%i,%i](%i,%i,%i,%i)",
-               global_level.n, p0.room, p0.floor, p0.place,
-               fg (&p), bg (&p), ext (&p), is_fake (&p) ? fake (&p) : -1);
-    draw_bottom_text (NULL, str, 0);
-    al_free (str);
-
+    ui_msg (0, "[%i,%i,%i,%i](%i,%i,%i,%i)",
+            global_level.n, p0.room, p0.floor, p0.place,
+            fg (&p), bg (&p), ext (&p), is_fake (&p) ? fake (&p) : -1);
     break;
   case EDIT_EVENT:
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
@@ -1896,7 +1890,7 @@ exit_editor (int priority)
   if (! is_dedicatedly_replaying ())
     set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
   if (is_game_paused ()) print_game_paused (priority);
-  else draw_bottom_text (NULL, NULL, priority);
+  else ui_msg_clear (priority);
   mr.room_select = -1;
 }
 
@@ -2028,9 +2022,8 @@ editor_msg (char *m, uint64_t cycles)
   if (edit != EDIT_NONE && cycles >= msg_cycles) {
     msg_cycles = cycles;
     msg = m;
-    draw_bottom_text (NULL, m, 0);
-  } else if (edit == EDIT_NONE)
-    draw_bottom_text (NULL, m, 0);
+    ui_msg (0, m);
+  } else if (edit == EDIT_NONE) ui_msg (0, m);
 }
 
 void

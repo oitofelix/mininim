@@ -356,7 +356,7 @@ option_enum_value_error (int key, char *arg, struct argp_state *state,
   char *config_file_prefix;
   if (config_info->type == CI_CONFIGURATION_FILE)
     xasprintf (&config_file_prefix, "%s: ", config_info->filename);
-  else xasprintf (&config_file_prefix, "");
+  else xasprintf (&config_file_prefix, "%s", "");
 
   char *error_template = "%s'%s' %s '%s' argument %i.\n%s %s.";
   if (config_info->type == CI_CONFIGURATION_FILE
@@ -388,7 +388,7 @@ option_arg_error (int key, char *arg, struct argp_state *state, int number, char
 
   if (config_info->type == CI_CONFIGURATION_FILE)
     xasprintf (&config_file_prefix, "%s: ", config_info->filename);
-  else xasprintf (&config_file_prefix, "");
+  else xasprintf (&config_file_prefix, "%s", "");
 
   switch (config_info->type) {
   case CI_CONFIGURATION_FILE:
@@ -403,7 +403,7 @@ option_arg_error (int key, char *arg, struct argp_state *state, int number, char
   }
 
   if (number != -1) xasprintf (&argument_msg, " argument %i", number);
-  else xasprintf (&argument_msg, "");
+  else xasprintf (&argument_msg, "%s", "");
 
   char *error_template = "%s'%s' %s '%s'%s.\n%s";
 
@@ -1659,8 +1659,8 @@ save_game (char *filename, int priority)
     *total_lives_str, *kca_str, *kcd_str;
 
   xasprintf (&start_level_str, "%i", global_level.n);
-  xasprintf (&start_time_str, "%i", start_level_time);
-  xasprintf (&time_limit_str, "%i", time_limit);
+  xasprintf (&start_time_str, "%ju", start_level_time);
+  xasprintf (&time_limit_str, "%ju", time_limit);
   xasprintf (&total_lives_str, "%i", total_lives);
   xasprintf (&kca_str, "%i", skill.counter_attack_prob + 1);
   xasprintf (&kcd_str, "%i", skill.counter_defense_prob + 1);
@@ -1679,7 +1679,7 @@ save_game (char *filename, int priority)
     ? "GAME HAS BEEN SAVED"
     : "GAME SAVING FAILED";
 
-  draw_bottom_text (NULL, error_str, priority);
+  ui_msg (priority, error_str);
 
   al_destroy_config (config);
   al_free (start_level_str);
@@ -1729,7 +1729,7 @@ handle_load_config_thread (int priority)
       error_str = "CONFIGURATION LOADED WITH ERRORS";
     }
 
-    draw_bottom_text (NULL, error_str, priority);
+    ui_msg (priority, error_str);
 
     al_free (load_config_dialog.initial_path);
     xasprintf (&load_config_dialog.initial_path, "%s",
@@ -1781,7 +1781,7 @@ handle_save_picture_thread (int priority)
       (filename, al_get_backbuffer (display))
       ? "PICTURE HAS BEEN SAVED"
       : "PICTURE SAVING FAILED";
-    draw_bottom_text (NULL, error_str, priority);
+    ui_msg (priority, error_str);
     al_free (save_picture_dialog.initial_path);
     xasprintf (&save_picture_dialog.initial_path, "%s", filename);
   }

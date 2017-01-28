@@ -623,7 +623,10 @@ compute_loose_floor_fall (struct loose_floor *l)
         a->hit_by_loose_floor = true;
         play_audio (&hit_wall_audio, NULL, a->id);
         a->next_action = kid_couch;
-        kid_haptic (a, KID_HAPTIC_HARM);
+        if (a->id == current_kid_id) {
+          kid_haptic (a, KID_HAPTIC_HARM);
+          cheat_menu ();
+        }
       }
     }
   }

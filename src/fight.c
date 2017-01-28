@@ -490,8 +490,11 @@ fight_inversion_mechanics (struct anim *k, struct anim *ke)
 void
 consider_enemy (struct anim *k0, struct anim *k1)
 {
+  int old_k0_enemy_id = k0->enemy_id;
   k0->enemy_id = k1->id;
   k0->enemy_refraction = -1;
+  if (old_k0_enemy_id != k1->id)
+    cheat_menu ();
 }
 
 void
@@ -503,7 +506,10 @@ forget_enemy (struct anim *k)
     return;
   }
 
+  int old_k_enemy_id = k->enemy_id;
   k->enemy_id = -1;
+  if (old_k_enemy_id != -1)
+    cheat_menu ();
 }
 
 void
@@ -1174,6 +1180,7 @@ fight_hit (struct anim *k, struct anim *ke)
     mr.flicker = 2;
     mr.color = get_flicker_blood_color ();
     play_audio (&harm_audio, NULL, k->id);
+    cheat_menu ();
   } else play_audio (&guard_hit_audio, NULL, k->id);
 }
 

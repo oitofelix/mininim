@@ -90,6 +90,7 @@ kid_resurrect (struct anim *k)
   stop_audio_instance (&death_audio, NULL, k->id);
   stop_audio_instance (&fight_death_audio, NULL, k->id);
   stop_audio_instance (&success_suspense_audio, NULL, k->id);
+  cheat_menu ();
 }
 
 void

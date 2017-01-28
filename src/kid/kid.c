@@ -449,12 +449,13 @@ increase_kid_current_lives (struct anim *k)
   }
 
   kid_haptic (k, KID_HAPTIC_DRINK);
+  cheat_menu ();
 }
 
 void
 increase_kid_total_lives (struct anim *k)
 {
-  if ((k->total_lives >= 10 && k->current_lives >= k->total_lives)
+  if ((k->total_lives >= MAX_LIVES && k->current_lives >= k->total_lives)
       || k->current_lives <= 0)
     return;
 
@@ -468,6 +469,7 @@ increase_kid_total_lives (struct anim *k)
   }
 
   kid_haptic (k, KID_HAPTIC_STRONG_DRINK);
+  cheat_menu ();
 }
 
 void
@@ -482,6 +484,7 @@ float_kid (struct anim *k)
     mr.flicker = 8;
     mr.color = get_flicker_float_color ();
   }
+  cheat_menu ();
 }
 
 ALLEGRO_COLOR
