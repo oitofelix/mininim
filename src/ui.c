@@ -63,7 +63,7 @@ ALLEGRO_BITMAP *small_logo_icon,
   *zoom_in_icon, *heading_icon, *zoom_icon,
   *navigation_icon, *nav_select_icon, *nav_cell_icon, *nav_page_icon,
   *nav_left_icon, *nav_right_icon, *nav_above_icon, *nav_below_icon,
-  *nav_home_icon, *nav_center_icon, *compass_icon, *compass2_icon,
+  *nav_home_icon, *repeat_icon, *compass_icon, *compass2_icon,
   *drawing_icon, *first_icon, *last_icon, *jump_icon, *original_icon,
   *guard_icon, *fat_guard_icon, *vizier_icon, *skeleton_icon, *shadow_icon,
   *resurrect_icon, *death_icon, *feather_icon, *angel_icon, *life_empty_icon,
@@ -162,7 +162,7 @@ load_icons (void)
   nav_above_icon = load_icon (NAV_ABOVE_ICON);
   nav_below_icon = load_icon (NAV_BELOW_ICON);
   nav_home_icon = load_icon (NAV_HOME_ICON);
-  nav_center_icon = load_icon (NAV_CENTER_ICON);
+  repeat_icon = load_icon (REPEAT_ICON);
   compass_icon = load_icon (COMPASS_ICON);
   compass2_icon = load_icon (COMPASS2_ICON);
   drawing_icon = load_icon (DRAWING_ICON);
@@ -251,7 +251,7 @@ unload_icons (void)
   destroy_bitmap (nav_above_icon);
   destroy_bitmap (nav_below_icon);
   destroy_bitmap (nav_home_icon);
-  destroy_bitmap (nav_center_icon);
+  destroy_bitmap (repeat_icon);
   destroy_bitmap (compass_icon);
   destroy_bitmap (compass2_icon);
   destroy_bitmap (drawing_icon);
@@ -516,28 +516,6 @@ game_menu (void)
   menu_sub ("&Load", LOAD_MID, true, micon (open_icon));
 
   menu_sub ("&Save", SAVE_MID, true, micon (save_icon));
-
-  if (cutscene || title_demo) menu_sep ();
-  else {
-    char *title;
-    xasprintf (&title, "LEVEL %i", global_level.n);
-    menu_hitem (title, NO_MID, false);
-    al_free (title);
-  }
-
-  menu_sitem ("Restart le&vel (Ctrl+A)", RESTART_LEVEL_MID,
-              ! cutscene && ! title_demo,
-              micon (jump_icon));
-
-  menu_sitem ("&Next level (Shift+L)", NEXT_LEVEL_MID,
-              ! cutscene && ! title_demo
-              && global_level.n < 14,
-              micon (last_icon));
-
-  menu_sitem ("&Previous level (Shift+M)", PREVIOUS_LEVEL_MID,
-              ! cutscene && ! title_demo
-              && global_level.n > 1,
-              micon (first_icon));
 
   menu_sep ();
 
@@ -811,7 +789,7 @@ navigation_menu (void)
               micon (nav_home_icon));
 
   menu_sitem ("Cen&ter (Shift+Home)", NAV_CENTER_MID, true,
-              micon (nav_home_icon));
+              micon (repeat_icon));
 
   menu_sitem ("C&oordinates (C)", COORDINATES_MID, true,
               micon (compass_icon));
@@ -1165,19 +1143,13 @@ replay_menu (void)
   case PLAY_REPLAY:
     xasprintf (&text, "REPLAYING (%zu/%zu)", replay_index + 1,
                replay_chain_nmemb);
-    menu_hitem (text, RESTART_LEVEL_MID, true);
+    menu_hitem (text, NO_MID, false);
     al_free (text);
 
     menu_sitem
       ("&Stop (F7)", PLAY_REPLAY_MID, true, micon (stop_icon));
 
-    menu_sitem
-      ("Pre&vious (Shift+M)", PREVIOUS_LEVEL_MID,
-       replay_index > 0, micon (previous_icon));
-
-    menu_sitem
-      ("&Next (Shift+L)", NEXT_LEVEL_MID,
-       replay_index + 1 < replay_chain_nmemb, micon (next_icon));
+    skip_level_widget ();
 
     pause_menu_widget ();
 
@@ -1207,6 +1179,8 @@ replay_menu (void)
     menu_sitem
       ("&Record... (Alt+F7)", RECORD_REPLAY_MID, true,
        micon (record_icon));
+
+    skip_level_widget ();
 
     pause_menu_widget ();
 
@@ -1292,10 +1266,43 @@ help_menu (void)
 #endif
 }
 
-#if MENU_FEATURE
+void
+skip_level_widget (void)
+{
+  if (cutscene || title_demo) menu_sep ();
+  else {
+    char *title;
+    xasprintf (&title, "LEVEL %i", global_level.n);
+    menu_hitem (title, NO_MID, false);
+    al_free (title);
+  }
+
+  menu_sitem ("R&epeat (Ctrl+A)", RESTART_LEVEL_MID,
+              replay_mode == PLAY_REPLAY && ! title_demo
+              ? true
+              : ! cutscene && ! title_demo,
+              micon (repeat_icon));
+
+  menu_sitem
+    ("&Next (Shift+L)", NEXT_LEVEL_MID,
+     replay_mode == PLAY_REPLAY && ! title_demo
+     ? replay_index + 1 < replay_chain_nmemb
+     : ! cutscene && ! title_demo && global_level.n < 14,
+     micon (next_icon));
+
+  menu_sitem
+    ("Pre&vious (Shift+M)", PREVIOUS_LEVEL_MID,
+     replay_mode == PLAY_REPLAY && ! title_demo
+     ? replay_index > 0
+     : ! cutscene && ! title_demo && global_level.n > 1,
+     micon (previous_icon));
+
+}
+
 void
 pause_menu_widget (void)
 {
+#if MENU_FEATURE
   if (is_game_paused ()) {
     char *title;
     xasprintf (&title, "CYCLE: %ju", anim_cycle);
@@ -1314,14 +1321,14 @@ pause_menu_widget (void)
      is_game_paused () && ! cutscene && ! title_demo
      && recording_replay_countdown < 0,
      micon (forward_icon));
-}
 #endif
+}
 
-#if MENU_FEATURE
 void
 speed_menu_widget (void)
 {
-  if (anim_freq > 0) {
+#if MENU_FEATURE
+  if (! cutscene && ! title_demo && anim_freq > 0) {
     char *title;
     xasprintf (&title, "FREQ: %iHz", anim_freq);
     menu_hitem (title, RESET_TIME_FREQ_MID, anim_freq != DEFAULT_HZ);
@@ -1341,8 +1348,8 @@ speed_menu_widget (void)
     ("&Increase speed [)]", INCREASE_TIME_FREQ_MID,
      anim_freq != 0 && ! cutscene && ! title_demo,
      micon (forward_icon));
-}
 #endif
+}
 
 
 

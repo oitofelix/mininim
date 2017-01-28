@@ -85,7 +85,7 @@
 #define NAV_ABOVE_ICON "data/icons/nav-above.png"
 #define NAV_BELOW_ICON "data/icons/nav-below.png"
 #define NAV_HOME_ICON "data/icons/nav-home.png"
-#define NAV_CENTER_ICON "data/icons/nav-center.png"
+#define REPEAT_ICON "data/icons/repeat.png"
 #define COMPASS_ICON "data/icons/compass.png"
 #define COMPASS2_ICON "data/icons/compass2.png"
 #define DRAWING_ICON "data/icons/drawing.png"
@@ -292,6 +292,7 @@ bool is_showing_menu (void);
 void toggle_menu_visibility (void);
 void enable_menu (bool enable);
 
+void skip_level_widget (void);
 void pause_menu_widget (void);
 void speed_menu_widget (void);
 
