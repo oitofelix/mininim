@@ -25,18 +25,29 @@ static ALLEGRO_MENU *append_menu;
 static int append_menu_index;
 
 static void start_menu (ALLEGRO_MENU *parent, uint16_t id);
-static bool menu_item (char const *title, uint16_t id, int flags,
-                       ALLEGRO_BITMAP *icon, bool has_submenu);
-static bool menu_hitem (char const *title, uint16_t id, bool enabled);
-static bool menu_sitem (char const *title, uint16_t id, bool enabled,
-                        ALLEGRO_BITMAP *icon);
-static bool menu_ditem (bool first, char const *title0, char const *title1,
-                        uint16_t id0, uint16_t id1, bool enabled,
-                        ALLEGRO_BITMAP *icon0, ALLEGRO_BITMAP *icon1);
-static bool menu_sub (char const *title, uint16_t id, bool enabled,
-                      ALLEGRO_BITMAP *icon);
-static bool menu_citem (char const *title, uint16_t id, bool enabled,
-                        bool checked, ALLEGRO_BITMAP *icon);
+static bool vmenu_item (uint16_t id, int flags, ALLEGRO_BITMAP *icon,
+                        bool has_submenu, char const *title_template,
+                        va_list ap);
+static bool menu_item (uint16_t id, int flags, ALLEGRO_BITMAP *icon,
+                       bool has_submenu, char const *title_template, ...)
+  __attribute__ ((format (printf, 5, 6)));
+static bool menu_hitem (uint16_t id, bool enabled,
+                        char const *title_template, ...)
+  __attribute__ ((format (printf, 3, 4)));
+static bool menu_sitem (uint16_t id, bool enabled, ALLEGRO_BITMAP *icon,
+                        char const *title_template, ...)
+  __attribute__ ((format (printf, 4, 5)));
+static bool menu_ditem (bool first, uint16_t id0, uint16_t id1, bool enabled,
+                        ALLEGRO_BITMAP *icon0, ALLEGRO_BITMAP *icon1,
+                        char const *title_template0,
+                        char const *title_template1, ...)
+  __attribute__ ((format (printf, 8, 9)));
+static bool menu_sub (uint16_t id, bool enabled, ALLEGRO_BITMAP *icon,
+                      char const *title_template, ...)
+  __attribute__ ((format (printf, 4, 5)));
+static bool menu_citem (uint16_t id, bool enabled, bool checked,
+                        ALLEGRO_BITMAP *icon, char const *title_template, ...)
+  __attribute__ ((format (printf, 5, 6)));
 static void menu_sep (void);
 static void end_menu (void);
 #endif
@@ -77,21 +88,6 @@ load_icon (char *filename)
 {
   if (WINDOWS_PORT) return load_scaled_memory_bitmap (filename, 13, 13, 0);
   else return load_scaled_memory_bitmap (filename, 16, 16, 0);
-}
-
-ALLEGRO_BITMAP *
-micon (ALLEGRO_BITMAP *bitmap)
-{
-  return clone_memory_bitmap (bitmap);
-}
-
-ALLEGRO_BITMAP *
-micon_flags (ALLEGRO_BITMAP *bitmap, int flags)
-{
-  if (! bitmap) return NULL;
-  return clone_scaled_memory_bitmap
-    (bitmap, al_get_bitmap_width (bitmap),
-     al_get_bitmap_height (bitmap), flags);
 }
 
 void
@@ -289,9 +285,12 @@ start_menu (ALLEGRO_MENU *parent, uint16_t id)
 
 #if MENU_FEATURE
 bool
-menu_item (char const *title, uint16_t id, int flags,
-           ALLEGRO_BITMAP *icon, bool has_submenu)
+vmenu_item (uint16_t id, int flags, ALLEGRO_BITMAP *icon,
+            bool has_submenu, char const *title_template, va_list ap)
 {
+  char *title = NULL;
+  if (title_template) vasprintf (&title, title_template, ap);
+
   ALLEGRO_MENU *submenu = al_find_menu (append_menu, id);;
 
   if (has_submenu && ! submenu) {
@@ -314,8 +313,11 @@ menu_item (char const *title, uint16_t id, int flags,
         != (flags & ~ALLEGRO_MENU_ITEM_DISABLED)) goto replace;
 
     al_set_menu_item_caption (append_menu, -append_menu_index, title);
+    if (title_template) al_free (title);
+
     al_set_menu_item_flags (append_menu, -append_menu_index, flags);
-    al_set_menu_item_icon (append_menu, -append_menu_index, icon);
+    al_set_menu_item_icon (append_menu, -append_menu_index,
+                           clone_memory_bitmap (icon));
 
     append_menu_index++;
 
@@ -324,61 +326,99 @@ menu_item (char const *title, uint16_t id, int flags,
 
  replace:
   al_remove_menu_item (append_menu, -append_menu_index);
-  return al_insert_menu_item (append_menu, -(append_menu_index++), title,
-                              id, flags, icon, submenu);
+  bool r = al_insert_menu_item (append_menu, -(append_menu_index++), title,
+                                id, flags, clone_memory_bitmap (icon),
+                                submenu);
+  if (title_template) al_free (title);
+  return r;
 }
 #endif
 
 #if MENU_FEATURE
 bool
-menu_hitem (char const *title, uint16_t id, bool enabled)
+menu_item (uint16_t id, int flags, ALLEGRO_BITMAP *icon,
+           bool has_submenu, char const *title_template, ...)
 {
-  return menu_item (title, id, enabled ? 0 : ALLEGRO_MENU_ITEM_DISABLED,
-                    micon (heading_icon), false);
+  va_list ap;
+  va_start (ap, title_template);
+  bool r = vmenu_item (id, flags, icon, has_submenu, title_template, ap);
+  va_end (ap);
+  return r;
 }
 #endif
 
 #if MENU_FEATURE
 bool
-menu_sitem (char const *title, uint16_t id, bool enabled,
-            ALLEGRO_BITMAP *icon)
+menu_hitem (uint16_t id, bool enabled, char const *title_template, ...)
 {
-  return menu_item (title, id, enabled ? 0 : ALLEGRO_MENU_ITEM_DISABLED,
-                    icon, false);
+  va_list ap;
+  va_start (ap, title_template);
+  bool r = vmenu_item (id, enabled ? 0 : ALLEGRO_MENU_ITEM_DISABLED,
+                       heading_icon, false, title_template, ap);
+  va_end (ap);
+  return r;
 }
 #endif
 
 #if MENU_FEATURE
 bool
-menu_ditem (bool first, char const *title0, char const *title1,
-            uint16_t id0, uint16_t id1, bool enabled,
-            ALLEGRO_BITMAP *icon0, ALLEGRO_BITMAP *icon1)
+menu_sitem (uint16_t id, bool enabled, ALLEGRO_BITMAP *icon,
+            char const *title_template, ...)
 {
-  return menu_item (first ? title0 : title1,
-                    first ? id0 : id1,
-                    enabled ? 0 : ALLEGRO_MENU_ITEM_DISABLED,
-                    first ? icon0 : icon1, false);
+  va_list ap;
+  va_start (ap, title_template);
+  bool r = vmenu_item (id, enabled ? 0 : ALLEGRO_MENU_ITEM_DISABLED,
+                       icon, false, title_template, ap);
+  va_end (ap);
+  return r;
 }
 #endif
 
 #if MENU_FEATURE
 bool
-menu_sub (char const *title, uint16_t id, bool enabled, ALLEGRO_BITMAP *icon)
+menu_ditem (bool first, uint16_t id0, uint16_t id1, bool enabled,
+            ALLEGRO_BITMAP *icon0, ALLEGRO_BITMAP *icon1,
+            char const *title_template0, char const *title_template1, ...)
 {
-  return menu_item (title, id, enabled ? 0 : ALLEGRO_MENU_ITEM_DISABLED,
-                    icon, true);
+  va_list ap;
+  va_start (ap, title_template1);
+  bool r = vmenu_item (first ? id0 : id1,
+                       enabled ? 0 : ALLEGRO_MENU_ITEM_DISABLED,
+                       first ? icon0 : icon1, false,
+                       first ? title_template0 : title_template1,
+                       ap);
+  va_end (ap);
+  return r;
 }
 #endif
 
 #if MENU_FEATURE
 bool
-menu_citem (char const *title, uint16_t id, bool enabled, bool checked,
-            ALLEGRO_BITMAP *icon)
+menu_sub (uint16_t id, bool enabled, ALLEGRO_BITMAP *icon,
+          char const *title_template, ...)
+{
+  va_list ap;
+  va_start (ap, title_template);
+  bool r = vmenu_item (id, enabled ? 0 : ALLEGRO_MENU_ITEM_DISABLED,
+                       icon, true, title_template, ap);
+  va_end (ap);
+  return r;
+}
+#endif
+
+#if MENU_FEATURE
+bool
+menu_citem (uint16_t id, bool enabled, bool checked, ALLEGRO_BITMAP *icon,
+            char const *title_template, ...)
 {
   int flags = enabled ? 0 : ALLEGRO_MENU_ITEM_DISABLED;
   flags |= checked ? ALLEGRO_MENU_ITEM_CHECKED : 0;
-  bool r = menu_item (title, id, flags, checked ? NULL : icon, false);
-  if (checked) destroy_bitmap (icon);
+
+  va_list ap;
+  va_start (ap, title_template);
+  bool r = vmenu_item (id, flags, checked ? NULL : icon, false,
+                       title_template, ap);
+  va_end (ap);
   return r;
 }
 #endif
@@ -387,10 +427,9 @@ menu_citem (char const *title, uint16_t id, bool enabled, bool checked,
 void
 menu_sep (void)
 {
-  if (WINDOWS_PORT)
-    menu_item (NULL, NO_MID, 0, NULL, false);
-  else
-    menu_item ("", NO_MID, ALLEGRO_MENU_ITEM_DISABLED, NULL, false);
+  if (WINDOWS_PORT) menu_item (NO_MID, 0, NULL, false, NULL);
+  else menu_item (NO_MID, ALLEGRO_MENU_ITEM_DISABLED,
+                  NULL, false, "%s", "");
 }
 #endif
 
@@ -470,19 +509,19 @@ create_main_menu (void)
   if (! main_menu) main_menu = al_create_menu ();
   start_menu (main_menu, 0);
 
-  menu_sub ("&Game", GAME_MID, true, NULL);
+  menu_sub (GAME_MID, true, NULL, "&Game");
 
-  menu_sub ("&View", VIEW_MID, true, NULL);
+  menu_sub (VIEW_MID, true, NULL, "&View");
 
-  menu_sub ("&Input", GAMEPAD_MID, true, NULL);
+  menu_sub (GAMEPAD_MID, true, NULL, "&Input");
 
-  menu_sub ("&Replay", REPLAY_MID, true, NULL);
+  menu_sub (REPLAY_MID, true, NULL, "&Replay");
 
-  menu_sub ("&Editor", EDITOR_MID, can_edit (), NULL);
+  menu_sub (EDITOR_MID, can_edit (), NULL, "&Editor");
 
-  menu_sub ("&Cheat", CHEAT_MID, can_edit (), NULL);
+  menu_sub (CHEAT_MID, can_edit (), NULL, "&Cheat");
 
-  menu_sub ("Hel&p", HELP_MID, true, NULL);
+  menu_sub (HELP_MID, true, NULL, "Hel&p");
 
   end_menu ();
 
@@ -499,10 +538,10 @@ create_main_menu (void)
 ALLEGRO_BITMAP *
 volume_icon (float volume)
 {
-  if (volume == VOLUME_RANGE_MIN) return micon (volume_off_icon);
-  else if (volume < VOLUME_RANGE_LOW) return micon (volume_low_icon);
-  else if (volume < VOLUME_RANGE_MEDIUM) return micon (volume_medium_icon);
-  else if (volume <= VOLUME_RANGE_MAX) return micon (volume_high_icon);
+  if (volume == VOLUME_RANGE_MIN) return volume_off_icon;
+  else if (volume < VOLUME_RANGE_LOW) return volume_low_icon;
+  else if (volume < VOLUME_RANGE_MEDIUM) return volume_medium_icon;
+  else if (volume <= VOLUME_RANGE_MAX) return volume_high_icon;
   else assert (false);
   return NULL;
 }
@@ -513,26 +552,26 @@ game_menu (void)
 #if MENU_FEATURE
   start_menu (main_menu, GAME_MID);
 
-  menu_sub ("&Load", LOAD_MID, true, micon (open_icon));
+  menu_sub (LOAD_MID, true, open_icon, "&Load");
 
-  menu_sub ("&Save", SAVE_MID, true, micon (save_icon));
+  menu_sub (SAVE_MID, true, save_icon, "&Save");
 
   menu_sep ();
 
-  menu_sub ("&Volume (Ctrl+S)", VOLUME_MID, true,
-            volume_icon (audio_volume));
+  menu_sub (VOLUME_MID, true, volume_icon (audio_volume),
+            "&Volume (Ctrl+S)");
 
-  menu_citem ("&Mirror", MIRROR_MODE_MID, true,
-              in_mirror_mode (), micon (horizontal_icon));
+  menu_citem (MIRROR_MODE_MID, true, in_mirror_mode (), horizontal_icon,
+              "&Mirror");
 
   menu_sep ();
 
   menu_ditem (cutscene || title_demo,
-              "Sta&rt (Enter)", "&Restart (Ctrl+R)",
               START_GAME_MID, RESTART_GAME_MID, true,
-              micon (right_icon), micon (reload_icon));
+              right_icon, reload_icon,
+              "Sta&rt (Enter)", "&Restart (Ctrl+R)");
 
-  menu_sitem ("&Quit (Ctrl+Q)", QUIT_GAME_MID, true, micon (quit_icon));
+  menu_sitem (QUIT_GAME_MID, true, quit_icon, "&Quit (Ctrl+Q)");
 
   end_menu ();
 
@@ -548,12 +587,12 @@ load_menu (void)
 #if MENU_FEATURE
   start_menu (main_menu, LOAD_MID);
 
-  menu_sitem ("&Game... (Ctrl+L)", LOAD_GAME_MID, true, micon (game_icon));
+  menu_sitem (LOAD_GAME_MID, true, game_icon, "&Game... (Ctrl+L)");
 
-  menu_sitem ("&Configuration... (Ctrl+L)", LOAD_CONFIG_MID, true,
-              micon (settings_icon));
+  menu_sitem (LOAD_CONFIG_MID, true, settings_icon,
+              "&Configuration... (Ctrl+L)");
 
-  menu_sitem ("&Level file...", LOAD_LEVEL_FILE_MID, false, NULL);
+  menu_sitem (LOAD_LEVEL_FILE_MID, false, NULL, "&Level file...");
 
   end_menu ();
 #endif
@@ -565,12 +604,12 @@ save_menu (void)
 #if MENU_FEATURE
   start_menu (main_menu, SAVE_MID);
 
-  menu_sitem ("&Game... (Ctrl+G)", SAVE_GAME_MID, true, micon (game_icon));
+  menu_sitem (SAVE_GAME_MID, true, game_icon, "&Game... (Ctrl+G)");
 
-  menu_sitem ("&Configuration...", SAVE_CONFIG_MID, false,
-              micon (settings_icon));
+  menu_sitem (SAVE_CONFIG_MID, false, settings_icon,
+              "&Configuration...");
 
-  menu_sitem ("&Level file...", SAVE_LEVEL_FILE_MID, false, NULL);
+  menu_sitem (SAVE_LEVEL_FILE_MID, false, NULL, "&Level file...");
 
   end_menu ();
 #endif
@@ -582,24 +621,24 @@ volume_menu (void)
 #if MENU_FEATURE
   start_menu (main_menu, VOLUME_MID);
 
-  menu_citem ("&Off", VOLUME_OFF_MID, true,
+  menu_citem (VOLUME_OFF_MID, true,
               audio_volume == VOLUME_RANGE_MIN,
-              micon (volume_off_icon));
+              volume_off_icon, "&Off");
 
-  menu_citem ("&Low", VOLUME_LOW_MID, true,
+  menu_citem (VOLUME_LOW_MID, true,
               audio_volume > VOLUME_RANGE_MIN
               && audio_volume < VOLUME_RANGE_LOW,
-              micon (volume_low_icon));
+              volume_low_icon, "&Low");
 
-  menu_citem ("&Medium", VOLUME_MEDIUM_MID, true,
+  menu_citem (VOLUME_MEDIUM_MID, true,
               audio_volume >= VOLUME_RANGE_LOW
               && audio_volume < VOLUME_RANGE_MEDIUM,
-              micon (volume_medium_icon));
+              volume_medium_icon, "&Medium");
 
-  menu_citem ("&High", VOLUME_HIGH_MID, true,
+  menu_citem (VOLUME_HIGH_MID, true,
               audio_volume >= VOLUME_RANGE_MEDIUM
               && audio_volume <= VOLUME_RANGE_MAX,
-              micon (volume_high_icon));
+              volume_high_icon, "&High");
 
   end_menu ();
 #endif
@@ -611,46 +650,44 @@ view_menu (void)
 #if MENU_FEATURE
   start_menu (main_menu, VIEW_MID);
 
-  menu_ditem (is_fullscreen (), "&Windowed (F)", "&Fullscreen (F)",
-              FULL_SCREEN_MID, FULL_SCREEN_MID, true,
-              micon (windows_icon), micon (full_screen_icon));
+  menu_ditem (is_fullscreen (), FULL_SCREEN_MID, FULL_SCREEN_MID, true,
+              windows_icon, full_screen_icon,
+              "&Windowed (F)", "&Fullscreen (F)");
 
-  menu_sub ("&Zoom", ZOOM_MID, ! cutscene && ! title_demo,
-            micon (zoom_icon));
+  menu_sub (ZOOM_MID, ! cutscene && ! title_demo, zoom_icon, "&Zoom");
 
-  menu_sub ("&Navigation", NAV_MID, ! cutscene && ! title_demo,
-            micon (navigation_icon));
-
-  menu_sep ();
-
-  menu_sub ("&Video (F12)", VM_MID, true, vm_icon (vm));
-
-  menu_sub ("&Environment (F11)", EM_MID,
-            ! cutscene && ! title_demo,
-            force_em ? em_icon (em) : micon (original_icon));
-
-  menu_sub ("&Hue (Alt+F11)", HUE_MODE_MID, ! cutscene && ! title_demo,
-            force_hue ? hue_icon (hue) : micon (original_icon));
-
-  menu_sub ("&Guard (Shift+F11)", GM_MID, ! cutscene && ! title_demo,
-            gm_icon (gm));
-
-  menu_sub ("&Flip (Shift+I)", FLIP_SCREEN_MID, true,
-            flip_screen_icon (screen_flags));
+  menu_sub (NAV_MID, ! cutscene && ! title_demo, navigation_icon,
+            "&Navigation");
 
   menu_sep ();
 
-  menu_citem ("Room &drawing (Shift+B)", ROOM_DRAWING_MID,
-              ! cutscene && ! title_demo,
-              ! no_room_drawing, micon (drawing_icon));
+  menu_sub (VM_MID, true, vm_icon (vm), "&Video (F12)");
 
-  menu_citem ("&Inhibit screensaver", INHIBIT_SCREENSAVER_MID, true,
-              inhibit_screensaver, micon (screensaver_icon));
+  menu_sub (EM_MID, ! cutscene && ! title_demo,
+            force_em ? em_icon (em) : original_icon, "&Environment (F11)");
+
+  menu_sub (HUE_MODE_MID, ! cutscene && ! title_demo,
+            force_hue ? hue_icon (hue) : original_icon, "&Hue (Alt+F11)");
+
+  menu_sub (GM_MID, ! cutscene && ! title_demo, gm_icon (gm),
+            "&Guard (Shift+F11)");
+
+  menu_sub (FLIP_SCREEN_MID, true, flip_screen_icon (screen_flags),
+            "&Flip (Shift+I)");
 
   menu_sep ();
 
-  menu_sitem ("&Screenshot... (Ctrl+P)", SCREENSHOT_MID, true,
-              micon (camera_icon));
+  menu_citem (ROOM_DRAWING_MID, ! cutscene && ! title_demo,
+              ! no_room_drawing, drawing_icon,
+              "Room &drawing (Shift+B)");
+
+  menu_citem (INHIBIT_SCREENSAVER_MID, true,
+              inhibit_screensaver, screensaver_icon,
+              "&Inhibit screensaver");
+
+  menu_sep ();
+
+  menu_sitem (SCREENSHOT_MID, true, camera_icon, "&Screenshot... (Ctrl+P)");
 
   end_menu ();
 
@@ -670,22 +707,20 @@ zoom_menu (void)
 #if MENU_FEATURE
   start_menu (main_menu, ZOOM_MID);
 
-  char *text;
-  xasprintf (&text, "MULTI-ROOM %ix%i", mr.w, mr.h);
-  menu_hitem (text, ZOOM_RESET_MID, ! cutscene && ! title_demo
+  menu_hitem (ZOOM_RESET_MID, ! cutscene && ! title_demo
               && (mr.w != 2 || mr.h != 2
-                  || mr.fit_mode != MR_FIT_NONE));
-  al_free (text);
+                  || mr.fit_mode != MR_FIT_NONE),
+              "MULTI-ROOM %ix%i", mr.w, mr.h);
 
-  menu_sub ("&Fit (M)", ZOOM_FIT_MID, ! cutscene && ! title_demo,
-            zoom_fit_icon (mr.fit_mode));
+  menu_sub (ZOOM_FIT_MID, ! cutscene && ! title_demo,
+            zoom_fit_icon (mr.fit_mode), "&Fit (M)");
 
-  menu_sub ("&In", ZOOM_IN_MID,
+  menu_sub (ZOOM_IN_MID,
             ! cutscene && ! title_demo && (mr.w > 1 || mr.h > 1),
-            micon (zoom_in_icon));
+            zoom_in_icon, "&In");
 
-  menu_sub ("&Out", ZOOM_OUT_MID, ! cutscene && ! title_demo,
-            micon (zoom_out_icon));
+  menu_sub (ZOOM_OUT_MID, ! cutscene && ! title_demo, zoom_out_icon,
+            "&Out");
 
   end_menu ();
 
@@ -699,9 +734,9 @@ ALLEGRO_BITMAP *
 zoom_fit_icon (enum mr_fit_mode fit)
 {
   switch (fit) {
-  case MR_FIT_NONE: return micon (zoom_none_icon); break;
-  case MR_FIT_STRETCH: return micon (zoom_stretch_icon); break;
-  case MR_FIT_RATIO: return micon (zoom_ratio_icon); break;
+  case MR_FIT_NONE: return zoom_none_icon; break;
+  case MR_FIT_STRETCH: return zoom_stretch_icon; break;
+  case MR_FIT_RATIO: return zoom_ratio_icon; break;
   default: assert (false); return NULL; break;
   }
 }
@@ -712,14 +747,17 @@ zoom_fit_menu (void)
 #if MENU_FEATURE
   start_menu (main_menu, ZOOM_FIT_MID);
 
-  menu_citem ("&None", ZOOM_NONE_MID, true,
-              mr.fit_mode == MR_FIT_NONE, micon (zoom_none_icon));
+  menu_citem (ZOOM_NONE_MID, true,
+              mr.fit_mode == MR_FIT_NONE, zoom_none_icon,
+              "&None");
 
-  menu_citem ("&Stretch", ZOOM_STRETCH_MID, true,
-              mr.fit_mode == MR_FIT_STRETCH, micon (zoom_stretch_icon));
+  menu_citem (ZOOM_STRETCH_MID, true,
+              mr.fit_mode == MR_FIT_STRETCH, zoom_stretch_icon,
+              "&Stretch");
 
-  menu_citem ("&Ratio", ZOOM_RATIO_MID, true,
-              mr.fit_mode == MR_FIT_RATIO, micon (zoom_ratio_icon));
+  menu_citem (ZOOM_RATIO_MID, true,
+              mr.fit_mode == MR_FIT_RATIO, zoom_ratio_icon,
+              "&Ratio");
 
   end_menu ();
 #endif
@@ -731,14 +769,14 @@ zoom_out_menu (void)
 #if MENU_FEATURE
   start_menu (main_menu, ZOOM_OUT_MID);
 
-  menu_sitem ("&Both (])", ZOOM_OUT_BOTH_MID, true,
-              micon (vertical_horizontal_icon));
+  menu_sitem (ZOOM_OUT_BOTH_MID, true, vertical_horizontal_icon,
+              "&Both (])");
 
-  menu_sitem ("&Vertical (Alt+])", ZOOM_OUT_VERTICAL_MID, true,
-              micon (vertical_icon));
+  menu_sitem (ZOOM_OUT_VERTICAL_MID, true, vertical_icon,
+              "&Vertical (Alt+])");
 
-  menu_sitem ("&Horizontal (Ctrl+])", ZOOM_OUT_HORIZONTAL_MID, true,
-              micon (horizontal_icon));
+  menu_sitem (ZOOM_OUT_HORIZONTAL_MID, true, horizontal_icon,
+              "&Horizontal (Ctrl+])");
 
   end_menu ();
 #endif
@@ -750,14 +788,14 @@ zoom_in_menu (void)
 #if MENU_FEATURE
   start_menu (main_menu, ZOOM_IN_MID);
 
-  menu_sitem ("&Both ([)", ZOOM_IN_BOTH_MID, mr.w > 1 && mr.h > 1,
-              micon (vertical_horizontal_icon));
+  menu_sitem (ZOOM_IN_BOTH_MID, mr.w > 1 && mr.h > 1,
+              vertical_horizontal_icon, "&Both ([)");
 
-  menu_sitem ("&Vertical (Alt+[)", ZOOM_IN_VERTICAL_MID, mr.h > 1,
-              micon (vertical_icon));
+  menu_sitem (ZOOM_IN_VERTICAL_MID, mr.h > 1, vertical_icon,
+              "&Vertical (Alt+[)");
 
-  menu_sitem ("&Horizontal (Ctrl+[)", ZOOM_IN_HORIZONTAL_MID, mr.w > 1,
-              micon (horizontal_icon));
+  menu_sitem (ZOOM_IN_HORIZONTAL_MID, mr.w > 1,
+              horizontal_icon, "&Horizontal (Ctrl+[)");
 
   end_menu ();
 #endif
@@ -769,34 +807,24 @@ navigation_menu (void)
 #if MENU_FEATURE
   start_menu (main_menu, NAV_MID);
 
-  char *text;
-  xasprintf (&text, "ROOM %i", mr.room);
-  menu_hitem (text, NAV_CURRENT_ROOM_SELECT_MID, true);
-  al_free (text);
+  menu_hitem (NAV_CURRENT_ROOM_SELECT_MID, true, "ROOM %i", mr.room);
 
-  menu_sub ("&Selection", NAV_SELECT_MID, true,
-            micon (nav_select_icon));
+  menu_sub (NAV_SELECT_MID, true, nav_select_icon, "&Selection");
 
-  menu_sub ("Scroll &row", NAV_CELL_MID, true,
-            micon (nav_cell_icon));
+  menu_sub (NAV_CELL_MID, true, nav_cell_icon, "Scroll &row");
 
-  menu_sub ("Scroll &page", NAV_PAGE_MID, true,
-            micon (nav_page_icon));
+  menu_sub (NAV_PAGE_MID, true, nav_page_icon, "Scroll &page");
 
   struct anim *k = get_anim_by_id (current_kid_id);
-  menu_sitem ("&Home (Home)", NAV_HOME_MID,
-              k && k->f.c.room != mr.room,
-              micon (nav_home_icon));
+  menu_sitem (NAV_HOME_MID, k && k->f.c.room != mr.room,
+              nav_home_icon, "&Home (Home)");
 
-  menu_sitem ("Cen&ter (Shift+Home)", NAV_CENTER_MID, true,
-              micon (repeat_icon));
+  menu_sitem (NAV_CENTER_MID, true, repeat_icon, "Cen&ter (Shift+Home)");
 
-  menu_sitem ("C&oordinates (C)", COORDINATES_MID, true,
-              micon (compass_icon));
+  menu_sitem (COORDINATES_MID, true, compass_icon, "C&oordinates (C)");
 
-  menu_sitem ("&Indirect coordinates (Shift+C)",
-              INDIRECT_COORDINATES_MID, true,
-              micon (compass2_icon));
+  menu_sitem (INDIRECT_COORDINATES_MID, true, compass2_icon,
+              "&Indirect coordinates (Shift+C)");
 
   end_menu ();
 
@@ -812,21 +840,21 @@ nav_select_menu (void)
 #if MENU_FEATURE
   start_menu (main_menu, NAV_SELECT_MID);
 
-  menu_sitem ("&Left (H)", NAV_SELECT_LEFT_MID,
+  menu_sitem (NAV_SELECT_LEFT_MID,
               roomd (&global_level, mr.room, LEFT),
-              micon (nav_left_icon));
+              nav_left_icon, "&Left (H)");
 
-  menu_sitem ("&Above (U)", NAV_SELECT_ABOVE_MID,
+  menu_sitem (NAV_SELECT_ABOVE_MID,
               roomd (&global_level, mr.room, ABOVE),
-              micon (nav_above_icon));
+              nav_above_icon, "&Above (U)");
 
-  menu_sitem ("&Right (J)", NAV_SELECT_RIGHT_MID,
+  menu_sitem (NAV_SELECT_RIGHT_MID,
               roomd (&global_level, mr.room, RIGHT),
-              micon (nav_right_icon));
+              nav_right_icon, "&Right (J)");
 
-  menu_sitem ("&Below (N)", NAV_SELECT_BELOW_MID,
+  menu_sitem (NAV_SELECT_BELOW_MID,
               roomd (&global_level, mr.room, BELOW),
-              micon (nav_below_icon));
+              nav_below_icon, "&Below (N)");
 
   end_menu ();
 #endif
@@ -838,17 +866,17 @@ nav_cell_menu (void)
 #if MENU_FEATURE
   start_menu (main_menu, NAV_CELL_MID);
 
-  menu_sitem ("&Left (Shift+H)", NAV_CELL_LEFT_MID, true,
-              micon (nav_left_icon));
+  menu_sitem (NAV_CELL_LEFT_MID, true,
+              nav_left_icon, "&Left (Shift+H)");
 
-  menu_sitem ("&Above (Shift+U)", NAV_CELL_ABOVE_MID, true,
-              micon (nav_above_icon));
+  menu_sitem (NAV_CELL_ABOVE_MID, true,
+              nav_above_icon, "&Above (Shift+U)");
 
-  menu_sitem ("&Right (Shift+J)", NAV_CELL_RIGHT_MID, true,
-              micon (nav_right_icon));
+  menu_sitem (NAV_CELL_RIGHT_MID, true,
+              nav_right_icon, "&Right (Shift+J)");
 
-  menu_sitem ("&Below (Shift+N)", NAV_CELL_BELOW_MID, true,
-              micon (nav_below_icon));
+  menu_sitem (NAV_CELL_BELOW_MID, true,
+              nav_below_icon, "&Below (Shift+N)");
 
   end_menu ();
 #endif
@@ -860,17 +888,17 @@ nav_page_menu (void)
 #if MENU_FEATURE
   start_menu (main_menu, NAV_PAGE_MID);
 
-  menu_sitem ("&Left (Alt+H)", NAV_PAGE_LEFT_MID, true,
-              micon (nav_left_icon));
+  menu_sitem (NAV_PAGE_LEFT_MID, true,
+              nav_left_icon, "&Left (Alt+H)");
 
-  menu_sitem ("&Above (Alt+U)", NAV_PAGE_ABOVE_MID, true,
-              micon (nav_above_icon));
+  menu_sitem (NAV_PAGE_ABOVE_MID, true,
+              nav_above_icon, "&Above (Alt+U)");
 
-  menu_sitem ("&Right (Alt+J)", NAV_PAGE_RIGHT_MID, true,
-              micon (nav_right_icon));
+  menu_sitem (NAV_PAGE_RIGHT_MID, true,
+              nav_right_icon, "&Right (Alt+J)");
 
-  menu_sitem ("&Below (Alt+N)", NAV_PAGE_BELOW_MID, true,
-              micon (nav_below_icon));
+  menu_sitem (NAV_PAGE_BELOW_MID, true,
+              nav_below_icon, "&Below (Alt+N)");
 
   end_menu ();
 #endif
@@ -880,11 +908,11 @@ ALLEGRO_BITMAP *
 hue_icon (enum hue hue)
 {
   switch (hue) {
-  case HUE_NONE: return micon (black_icon); break;
-  case HUE_GREEN: return micon (green_icon); break;
-  case HUE_GRAY: return micon (gray_icon); break;
-  case HUE_YELLOW: return micon (yellow_icon); break;
-  case HUE_BLUE: return micon (blue_icon); break;
+  case HUE_NONE: return black_icon; break;
+  case HUE_GREEN: return green_icon; break;
+  case HUE_GRAY: return gray_icon; break;
+  case HUE_YELLOW: return yellow_icon; break;
+  case HUE_BLUE: return blue_icon; break;
   default: assert (false); return NULL; break;
   }
 }
@@ -895,23 +923,23 @@ hue_mode_menu (void)
 #if MENU_FEATURE
   start_menu (main_menu, HUE_MODE_MID);
 
-  menu_citem ("&Original", HUE_ORIGINAL_MID, true, ! force_hue,
-              micon (original_icon));
+  menu_citem (HUE_ORIGINAL_MID, true, ! force_hue,
+              original_icon, "&Original");
 
-  menu_citem ("&None", HUE_NONE_MID, true, force_hue && hue == HUE_NONE,
-              micon (black_icon));
+  menu_citem (HUE_NONE_MID, true, force_hue && hue == HUE_NONE,
+              black_icon, "&None");
 
-  menu_citem ("&Green", HUE_GREEN_MID, true, force_hue && hue == HUE_GREEN,
-              micon (green_icon));
+  menu_citem (HUE_GREEN_MID, true, force_hue && hue == HUE_GREEN,
+              green_icon, "&Green");
 
-  menu_citem ("G&ray", HUE_GRAY_MID, true, force_hue && hue == HUE_GRAY,
-              micon (gray_icon));
+  menu_citem (HUE_GRAY_MID, true, force_hue && hue == HUE_GRAY,
+              gray_icon, "G&ray");
 
-  menu_citem ("&Yellow", HUE_YELLOW_MID, true, force_hue && hue == HUE_YELLOW,
-              micon (yellow_icon));
+  menu_citem (HUE_YELLOW_MID, true, force_hue && hue == HUE_YELLOW,
+              yellow_icon, "&Yellow");
 
-  menu_citem ("&Blue", HUE_BLUE_MID, true, force_hue && hue == HUE_BLUE,
-              micon (blue_icon));
+  menu_citem (HUE_BLUE_MID, true, force_hue && hue == HUE_BLUE,
+              blue_icon, "&Blue");
 
   end_menu ();
 #endif
@@ -921,12 +949,12 @@ ALLEGRO_BITMAP *
 gm_icon (enum gm gm)
 {
   switch (gm) {
-  case ORIGINAL_GM: return micon (original_icon); break;
-  case GUARD_GM: return micon (guard_icon); break;
-  case FAT_GUARD_GM: return micon (fat_guard_icon); break;
-  case VIZIER_GM: return micon (vizier_icon); break;
-  case SKELETON_GM: return micon (skeleton_icon); break;
-  case SHADOW_GM: return micon (shadow_icon); break;
+  case ORIGINAL_GM: return original_icon; break;
+  case GUARD_GM: return guard_icon; break;
+  case FAT_GUARD_GM: return fat_guard_icon; break;
+  case VIZIER_GM: return vizier_icon; break;
+  case SKELETON_GM: return skeleton_icon; break;
+  case SHADOW_GM: return shadow_icon; break;
   default: assert (false); return NULL; break;
   }
 }
@@ -937,23 +965,23 @@ gm_menu (void)
 #if MENU_FEATURE
   start_menu (main_menu, GM_MID);
 
-  menu_citem ("&Original", ORIGINAL_GM_MID, true,
-              gm == ORIGINAL_GM, gm_icon (ORIGINAL_GM));
+  menu_citem (ORIGINAL_GM_MID, true, gm == ORIGINAL_GM,
+              gm_icon (ORIGINAL_GM), "&Original");
 
-  menu_citem ("&Guard", GUARD_GM_MID, true,
-              gm == GUARD_GM, gm_icon (GUARD_GM));
+  menu_citem (GUARD_GM_MID, true, gm == GUARD_GM,
+              gm_icon (GUARD_GM), "&Guard");
 
-  menu_citem ("&Fat guard", FAT_GUARD_GM_MID, true,
-              gm == FAT_GUARD_GM, gm_icon (FAT_GUARD_GM));
+  menu_citem (FAT_GUARD_GM_MID, true, gm == FAT_GUARD_GM,
+              gm_icon (FAT_GUARD_GM), "&Fat guard");
 
-  menu_citem ("&Vizier", VIZIER_GM_MID, true,
-              gm == VIZIER_GM, gm_icon (VIZIER_GM));
+  menu_citem (VIZIER_GM_MID, true, gm == VIZIER_GM,
+              gm_icon (VIZIER_GM), "&Vizier");
 
-  menu_citem ("&Skeleton", SKELETON_GM_MID, true,
-              gm == SKELETON_GM, gm_icon (SKELETON_GM));
+  menu_citem (SKELETON_GM_MID, true, gm == SKELETON_GM,
+              gm_icon (SKELETON_GM), "&Skeleton");
 
-  menu_citem ("S&hadow", SHADOW_GM_MID, true,
-              gm == SHADOW_GM, gm_icon (SHADOW_GM));
+  menu_citem (SHADOW_GM_MID, true, gm == SHADOW_GM,
+              gm_icon (SHADOW_GM), "S&hadow");
 
   end_menu ();
 #endif
@@ -963,8 +991,8 @@ ALLEGRO_BITMAP *
 em_icon (enum em em)
 {
   switch (em) {
-  case DUNGEON: return micon (dungeon_icon); break;
-  case PALACE: return micon (palace_icon); break;
+  case DUNGEON: return dungeon_icon; break;
+  case PALACE: return palace_icon; break;
   default: assert (false); return NULL; break;
   }
 }
@@ -975,14 +1003,14 @@ em_menu (void)
 #if MENU_FEATURE
   start_menu (main_menu, EM_MID);
 
-  menu_citem ("&Original", ORIGINAL_EM_MID, true, ! force_em,
-              micon (original_icon));
+  menu_citem (ORIGINAL_EM_MID, true, ! force_em, original_icon,
+              "&Original");
 
-  menu_citem ("&Dungeon", DUNGEON_MID, true, force_em && em == DUNGEON,
-              micon (dungeon_icon));
+  menu_citem (DUNGEON_MID, true, force_em && em == DUNGEON, dungeon_icon,
+              "&Dungeon");
 
-  menu_citem ("&Palace", PALACE_MID, true, force_em && em == PALACE,
-              micon (palace_icon));
+  menu_citem (PALACE_MID, true, force_em && em == PALACE, palace_icon,
+              "&Palace");
 
   end_menu ();
 #endif
@@ -992,9 +1020,9 @@ ALLEGRO_BITMAP *
 vm_icon (enum vm vm)
 {
   switch (vm) {
-  case VGA: return micon (vga_icon); break;
-  case EGA: return micon (ega_icon); break;
-  case CGA: return micon (hgc ? hgc_icon : cga_icon); break;
+  case VGA: return vga_icon; break;
+  case EGA: return ega_icon; break;
+  case CGA: return hgc ? hgc_icon : cga_icon; break;
   default: assert (false); return NULL; break;
   }
 }
@@ -1005,13 +1033,13 @@ vm_menu (void)
 #if MENU_FEATURE
   start_menu (main_menu, VM_MID);
 
-  menu_citem ("&VGA", VGA_MID, true, vm == VGA, micon (vga_icon));
+  menu_citem (VGA_MID, true, vm == VGA, vga_icon, "&VGA");
 
-  menu_citem ("&EGA", EGA_MID, true, vm == EGA, micon (ega_icon));
+  menu_citem (EGA_MID, true, vm == EGA, ega_icon, "&EGA");
 
-  menu_citem ("&CGA", CGA_MID, true, vm == CGA && ! hgc, micon (cga_icon));
+  menu_citem (CGA_MID, true, vm == CGA && ! hgc, cga_icon, "&CGA");
 
-  menu_citem ("&HGC", HGC_MID, true, vm == CGA && hgc, micon (hgc_icon));
+  menu_citem (HGC_MID, true, vm == CGA && hgc, hgc_icon, "&HGC");
 
   end_menu ();
 #endif
@@ -1021,11 +1049,11 @@ ALLEGRO_BITMAP *
 flip_screen_icon (int flags)
 {
   switch (flags) {
-  case 0: return micon (screen_icon);
-  case ALLEGRO_FLIP_VERTICAL: return micon (vertical_icon);
-  case ALLEGRO_FLIP_HORIZONTAL: return micon (horizontal_icon);
+  case 0: return screen_icon;
+  case ALLEGRO_FLIP_VERTICAL: return vertical_icon;
+  case ALLEGRO_FLIP_HORIZONTAL: return horizontal_icon;
   case ALLEGRO_FLIP_VERTICAL | ALLEGRO_FLIP_HORIZONTAL:
-    return micon (vertical_horizontal_icon);
+    return vertical_horizontal_icon;
   default: assert (false); return NULL;
   }
 }
@@ -1036,13 +1064,13 @@ screen_flip_menu (void)
 #if MENU_FEATURE
   start_menu (main_menu, FLIP_SCREEN_MID);
 
-  menu_citem ("&Vertical", FLIP_SCREEN_VERTICAL_MID, true,
+  menu_citem (FLIP_SCREEN_VERTICAL_MID, true,
               screen_flags & ALLEGRO_FLIP_VERTICAL,
-              micon (vertical_icon));
+              vertical_icon, "&Vertical");
 
-  menu_citem ("&Horizontal", FLIP_SCREEN_HORIZONTAL_MID, true,
+  menu_citem (FLIP_SCREEN_HORIZONTAL_MID, true,
               screen_flags & ALLEGRO_FLIP_HORIZONTAL,
-              micon (horizontal_icon));
+              horizontal_icon, "&Horizontal");
 
   end_menu ();
 #endif
@@ -1054,16 +1082,17 @@ gamepad_menu (void)
 #if MENU_FEATURE
   start_menu (main_menu, GAMEPAD_MID);
 
-  menu_sub ("&Device", GAMEPAD_DEVICE_MID, true, gamepad_device_icon (gpm));
+  menu_sub (GAMEPAD_DEVICE_MID, true, gamepad_device_icon (gpm), "&Device");
 
-  menu_sitem ("&Calibrate (Ctrl+J)", GAMEPAD_CALIBRATE_MID,
-              gpm == JOYSTICK, micon (clock_icon));
+  menu_sitem (GAMEPAD_CALIBRATE_MID, gpm == JOYSTICK, clock_icon,
+              "&Calibrate (Ctrl+J)");
 
   menu_sep ();
 
-  menu_sub ("&Flip (Shift+K)", FLIP_GAMEPAD_MID, true,
+  menu_sub (FLIP_GAMEPAD_MID, true,
             flip_gamepad_icon (flip_gamepad_vertical,
-                               flip_gamepad_horizontal));
+                               flip_gamepad_horizontal),
+            "&Flip (Shift+K)");
 
   end_menu ();
 
@@ -1076,8 +1105,8 @@ ALLEGRO_BITMAP *
 gamepad_device_icon (enum gpm gpm)
 {
   switch (gpm) {
-  case KEYBOARD: return micon (keyboard_icon); break;
-  case JOYSTICK: return micon (joystick_icon); break;
+  case KEYBOARD: return keyboard_icon; break;
+  case JOYSTICK: return joystick_icon; break;
   default: assert (false); return NULL; break;
   }
 }
@@ -1088,11 +1117,11 @@ gamepad_device_menu (void)
 #if MENU_FEATURE
   start_menu (main_menu, GAMEPAD_DEVICE_MID);
 
-  menu_citem ("&Keyboard (Ctrl+K)", KEYBOARD_MODE_MID, true,
-              gpm == KEYBOARD, micon (keyboard_icon));
+  menu_citem (KEYBOARD_MODE_MID, true, gpm == KEYBOARD, keyboard_icon,
+              "&Keyboard (Ctrl+K)");
 
-  menu_citem ("&Joystick (Ctrl+J)", JOYSTICK_MODE_MID, joystick,
-              gpm == JOYSTICK, micon (joystick_icon));
+  menu_citem (JOYSTICK_MODE_MID, joystick, gpm == JOYSTICK, joystick_icon,
+              "&Joystick (Ctrl+J)");
 
   end_menu ();
 #endif
@@ -1101,10 +1130,10 @@ gamepad_device_menu (void)
 ALLEGRO_BITMAP *
 flip_gamepad_icon (bool v, bool h)
 {
-  if (! v && ! h) return micon (joystick3_icon);
-  else if (v && ! h) return micon (vertical_icon);
-  else if (! v && h) return micon (horizontal_icon);
-  else if (v && h) return micon (vertical_horizontal_icon);
+  if (! v && ! h) return joystick3_icon;
+  else if (v && ! h) return vertical_icon;
+  else if (! v && h) return horizontal_icon;
+  else if (v && h) return vertical_horizontal_icon;
   else assert (false);
   return NULL;
 }
@@ -1115,11 +1144,11 @@ flip_gamepad_menu (void)
 #if MENU_FEATURE
   start_menu (main_menu, FLIP_GAMEPAD_MID);
 
-  menu_citem ("&Vertical", FLIP_GAMEPAD_VERTICAL_MID, true,
-              flip_gamepad_vertical, micon (vertical_icon));
+  menu_citem (FLIP_GAMEPAD_VERTICAL_MID, true, flip_gamepad_vertical,
+              vertical_icon, "&Vertical");
 
-  menu_citem ("&Horizontal", FLIP_GAMEPAD_HORIZONTAL_MID, true,
-              flip_gamepad_horizontal, micon (horizontal_icon));
+  menu_citem (FLIP_GAMEPAD_HORIZONTAL_MID, true, flip_gamepad_horizontal,
+              horizontal_icon, "&Horizontal");
 
   end_menu ();
 #endif
@@ -1131,8 +1160,6 @@ replay_menu (void)
 #if MENU_FEATURE
   start_menu (main_menu, REPLAY_MID);
 
-  char *text;
-
   if (recording_replay_countdown >= 0
       || level_start_replay_mode == RECORD_REPLAY)
     goto record_replay;
@@ -1141,13 +1168,10 @@ replay_menu (void)
 
   switch (replay_mode) {
   case PLAY_REPLAY:
-    xasprintf (&text, "REPLAYING (%zu/%zu)", replay_index + 1,
-               replay_chain_nmemb);
-    menu_hitem (text, NO_MID, false);
-    al_free (text);
+    menu_hitem (NO_MID, false, "REPLAYING (%zu/%zu)",
+                replay_index + 1, replay_chain_nmemb);
 
-    menu_sitem
-      ("&Stop (F7)", PLAY_REPLAY_MID, true, micon (stop_icon));
+    menu_sitem (PLAY_REPLAY_MID, true, stop_icon, "&Stop (F7)");
 
     skip_level_widget ();
 
@@ -1158,14 +1182,14 @@ replay_menu (void)
     break;
   case RECORD_REPLAY: record_replay:
 
-    menu_hitem ("RECORDING", NO_MID, false);
+    menu_hitem (NO_MID, false, "RECORDING");
 
     menu_sitem
-      (recording_replay_countdown >= 0
-       ? "&Abort recording (F7)" : "&Stop... (F7)",
-       RECORD_REPLAY_MID, true,
+      (RECORD_REPLAY_MID, true,
        replay_mode == RECORD_REPLAY
-       ? micon (stop_icon) : micon (eject_icon));
+       ? stop_icon : eject_icon,
+       recording_replay_countdown >= 0
+       ? "&Abort recording (F7)" : "&Stop... (F7)");
 
     pause_menu_widget ();
 
@@ -1173,12 +1197,10 @@ replay_menu (void)
   default: assert (false);
   case NO_REPLAY: no_replay:
 
-    menu_sitem
-      ("&Play... (F7)", PLAY_REPLAY_MID, true, micon (play_icon));
+    menu_sitem (PLAY_REPLAY_MID, true, play_icon, "&Play... (F7)");
 
-    menu_sitem
-      ("&Record... (Alt+F7)", RECORD_REPLAY_MID, true,
-       micon (record_icon));
+    menu_sitem (RECORD_REPLAY_MID, true, record_icon,
+                "&Record... (Alt+F7)");
 
     skip_level_widget ();
 
@@ -1199,15 +1221,16 @@ editor_menu (void)
 #if MENU_FEATURE
   start_menu (main_menu, EDITOR_MID);
 
-  menu_ditem (edit == EDIT_NONE, "&Edit (F8)", "&Play (F8)",
+  menu_ditem (edit == EDIT_NONE,
               EDIT_MODE_MID, EDIT_MODE_MID,
-              true, micon (edit_icon), micon (joystick2_icon));
+              true, edit_icon, joystick2_icon,
+              "&Edit (F8)", "&Play (F8)");
 
-  menu_sitem ("&Undo (Ctrl+Z)", UNDO_MID,
-              can_undo (&undo, -1), micon (undo_icon));
+  menu_sitem (UNDO_MID, can_undo (&undo, -1), undo_icon,
+              "&Undo (Ctrl+Z)");
 
-  menu_sitem ("&Redo (Ctrl+Y)", REDO_MID,
-              can_undo (&undo, +1), micon (redo_icon));
+  menu_sitem (REDO_MID, can_undo (&undo, +1), redo_icon,
+              "&Redo (Ctrl+Y)");
 
   end_menu ();
 #endif
@@ -1221,34 +1244,32 @@ cheat_menu (void)
 
   struct anim *k = get_anim_by_id (current_kid_id);
 
-  menu_sitem ("&Kill enemy (K)", KILL_ENEMY_MID,
-              k && k->enemy_id > 0, micon (death_icon));
+  menu_sitem (KILL_ENEMY_MID, k && k->enemy_id > 0,
+              death_icon, "&Kill enemy (K)");
 
-  menu_sitem ("&Resurrect (R)", RESURRECT_MID,
-              k && k->current_lives <= 0,
-              micon (resurrect_icon));
+  menu_sitem (RESURRECT_MID, k && k->current_lives <= 0,
+              resurrect_icon, "&Resurrect (R)");
 
-  menu_citem ("&Immortal (I)", IMMORTAL_MID, true, immortal_mode,
-              micon (angel_icon));
+  menu_citem (IMMORTAL_MID, true, immortal_mode, angel_icon,
+              "&Immortal (I)");
 
-  menu_sitem ("&Float (Shift+W)", FLOAT_MID,
-              k && (k->current_lives > 0 || is_kid_fall (&k->f))
+  menu_sitem (FLOAT_MID, k && (k->current_lives > 0 || is_kid_fall (&k->f))
               && (k->float_timer == 0
                   || k->float_timer >= REFLOAT_MENU_THRESHOLD),
-              micon (feather_icon));
+              feather_icon, "&Float (Shift+W)");
 
-  menu_sitem ("Fill &single container (Shift+S)", FILL_LIFE_MID,
-              k && k->current_lives > 0
+  menu_sitem (FILL_LIFE_MID, k && k->current_lives > 0
               && k->current_lives < k->total_lives,
-              micon (life_empty_icon));
+              life_empty_icon, "Fill &single container (Shift+S)");
 
-  menu_sitem ((! k || k->total_lives < MAX_LIVES)
-              ? "&Add container (Shift+T)"
-              : "Fill &all containers (Shift+T)", ADD_LIFE_MID,
+  menu_sitem (ADD_LIFE_MID,
               k && k->current_lives > 0
               && (k->current_lives < k->total_lives
                   || k->total_lives < MAX_LIVES),
-              micon (life_full_icon));
+              life_full_icon,
+              (! k || k->total_lives < MAX_LIVES)
+              ? "&Add container (Shift+T)"
+              : "Fill &all containers (Shift+T)");
 
   end_menu ();
 #endif
@@ -1260,7 +1281,7 @@ help_menu (void)
 #if MENU_FEATURE
   start_menu (main_menu, HELP_MID);
 
-  menu_sitem ("&About", ABOUT_MID, true, micon (small_logo_icon));
+  menu_sitem (ABOUT_MID, true, small_logo_icon, "&About");
 
   end_menu ();
 #endif
@@ -1270,57 +1291,45 @@ void
 skip_level_widget (void)
 {
   if (cutscene || title_demo) menu_sep ();
-  else {
-    char *title;
-    xasprintf (&title, "LEVEL %i", global_level.n);
-    menu_hitem (title, NO_MID, false);
-    al_free (title);
-  }
+  else menu_hitem (NO_MID, false, "LEVEL %i", global_level.n);
 
-  menu_sitem ("R&epeat (Ctrl+A)", RESTART_LEVEL_MID,
-              replay_mode == PLAY_REPLAY && ! title_demo
+  menu_sitem (RESTART_LEVEL_MID, replay_mode == PLAY_REPLAY && ! title_demo
               ? true
               : ! cutscene && ! title_demo,
-              micon (repeat_icon));
+              repeat_icon, "R&epeat (Ctrl+A)");
 
   menu_sitem
-    ("&Next (Shift+L)", NEXT_LEVEL_MID,
-     replay_mode == PLAY_REPLAY && ! title_demo
+    (NEXT_LEVEL_MID, replay_mode == PLAY_REPLAY && ! title_demo
      ? replay_index + 1 < replay_chain_nmemb
      : ! cutscene && ! title_demo && global_level.n < 14,
-     micon (next_icon));
+     next_icon, "&Next (Shift+L)");
 
   menu_sitem
-    ("Pre&vious (Shift+M)", PREVIOUS_LEVEL_MID,
-     replay_mode == PLAY_REPLAY && ! title_demo
+    (PREVIOUS_LEVEL_MID, replay_mode == PLAY_REPLAY && ! title_demo
      ? replay_index > 0
      : ! cutscene && ! title_demo && global_level.n > 1,
-     micon (previous_icon));
-
+     previous_icon, "Pre&vious (Shift+M)");
 }
 
 void
 pause_menu_widget (void)
 {
 #if MENU_FEATURE
-  if (is_game_paused ()) {
-    char *title;
-    xasprintf (&title, "CYCLE: %ju", anim_cycle);
-    menu_hitem (title, NO_MID, false);
-    al_free (title);
-  } else menu_sep ();
+  if (is_game_paused ())
+    menu_hitem (NO_MID, false, "CYCLE: %ju", anim_cycle);
+  else menu_sep ();
 
   menu_sitem
-    (is_game_paused ()
-     ? "&Continue" : "Pau&se (Esc)", TOGGLE_PAUSE_GAME_MID,
+    (TOGGLE_PAUSE_GAME_MID,
      ! cutscene && ! title_demo && recording_replay_countdown < 0,
-     is_game_paused () ? micon (play_icon) : micon (pause_icon));
+     is_game_paused () ? play_icon : pause_icon,
+     is_game_paused () ? "&Continue" : "Pau&se (Esc)");
 
   menu_sitem
-    ("Next &frame (Esc)", NEXT_FRAME_MID,
+    (NEXT_FRAME_MID,
      is_game_paused () && ! cutscene && ! title_demo
      && recording_replay_countdown < 0,
-     micon (forward_icon));
+     forward_icon, "Next &frame (Esc)");
 #endif
 }
 
@@ -1328,26 +1337,23 @@ void
 speed_menu_widget (void)
 {
 #if MENU_FEATURE
-  if (! cutscene && ! title_demo && anim_freq > 0) {
-    char *title;
-    xasprintf (&title, "FREQ: %iHz", anim_freq);
-    menu_hitem (title, RESET_TIME_FREQ_MID, anim_freq != DEFAULT_HZ);
-    al_free (title);
-  } else menu_sep ();
+  if (! cutscene && ! title_demo && anim_freq > 0)
+    menu_hitem (RESET_TIME_FREQ_MID, anim_freq != DEFAULT_HZ,
+                "FREQ: %iHz", anim_freq);
+  else menu_sep ();
 
   menu_citem
-    ("Speed cons&traint", TOGGLE_TIME_FREQ_CONSTRAINT_MID,
-     ! cutscene && ! title_demo, anim_freq > 0, micon (cancel_icon));
+    (TOGGLE_TIME_FREQ_CONSTRAINT_MID,
+     ! cutscene && ! title_demo, anim_freq > 0, cancel_icon,
+     "Speed cons&traint");
 
   menu_sitem
-    ("&Decrease speed [(]", DECREASE_TIME_FREQ_MID,
-     anim_freq > 2 && ! cutscene && ! title_demo,
-     micon (backward_icon));
+    (DECREASE_TIME_FREQ_MID, anim_freq > 2 && ! cutscene && ! title_demo,
+     backward_icon, "&Decrease speed [(]");
 
   menu_sitem
-    ("&Increase speed [)]", INCREASE_TIME_FREQ_MID,
-     anim_freq != 0 && ! cutscene && ! title_demo,
-     micon (forward_icon));
+    (INCREASE_TIME_FREQ_MID, anim_freq != 0 && ! cutscene && ! title_demo,
+     forward_icon, "&Increase speed [)]");
 #endif
 }
 
@@ -2649,12 +2655,13 @@ ui_gamepad_mode (enum gpm new_gpm)
     break;
   case JOYSTICK:
     if (calibrate_joystick ()) {
+      enum gpm old_gpm = gpm;
       gpm = JOYSTICK;
       value = "JOYSTICK";
       ui_save_setting (key, value);
       gamepad_rumble (1.0, 0.6);
       ui_msg (0, "JOYSTICK %s",
-              gpm == JOYSTICK ? "CALIBRATED" : "MODE");
+              old_gpm == JOYSTICK ? "CALIBRATED" : "MODE");
     } else ui_msg (0, "JOYSTICK NOT FOUND");
     break;
   default: assert (false);

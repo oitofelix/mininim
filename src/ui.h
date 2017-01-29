@@ -238,8 +238,6 @@ enum main_menu {
 };
 
 ALLEGRO_BITMAP *load_icon (char *filename);
-ALLEGRO_BITMAP *micon (ALLEGRO_BITMAP *bitmap);
-ALLEGRO_BITMAP *micon_flags (ALLEGRO_BITMAP *bitmap, int flags);
 void load_icons (void);
 void unload_icons (void);
 
