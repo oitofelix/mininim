@@ -82,6 +82,7 @@ build-aux/*
 !build-aux/ncftpput
 !build-aux/texinfo.tex
 !build-aux/pkg.m4
+!build-aux/config.rpath
 
 # Ignore all Autotools configuration-time files.
 
