@@ -347,7 +347,6 @@ prepare_for_recording_replay (void)
   recording_replay_countdown = SEC2CYC (3) - 1;
   anim_freq = DEFAULT_HZ;
   al_set_timer_speed (timer, 1.0 / anim_freq);
-  play_menu ();
 }
 
 void
@@ -418,7 +417,6 @@ handle_save_replay_thread (int priority)
   al_destroy_native_file_dialog (dialog);
   free_replay (replay);
   pause_animation (false);
-  play_menu ();
 }
 
 void
@@ -493,14 +491,11 @@ stop_replaying (int priority)
   level_start_replay_mode = NO_REPLAY;
   anim_freq = DEFAULT_HZ;
   al_set_timer_speed (timer, 1.0 / anim_freq);
-  play_menu ();
 }
 
 void
 set_replay_mode_at_level_start (struct replay *replay)
 {
-  play_menu ();
-
   if (replay_index == 0) {
     replay_skipped = false;
     valid_replay_chain = true;

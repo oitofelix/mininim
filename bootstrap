@@ -1,8 +1,13 @@
 #!/bin/bash
 
 gnulib-tool --source-base=gnulib --m4-base=gnulib/m4 \
-  --aux-dir=gnulib/build-aux --import error vasprintf argp strcase \
-  strcasestr progname glob unistd
+--aux-dir=gnulib/build-aux --import stdio stdlib system-posix \
+printf-posix fprintf-posix dprintf-posix vdprintf-posix vfprintf-posix \
+sprintf-posix vsprintf-posix snprintf-posix vsnprintf-posix \
+vasprintf-posix obstack-printf-posix strdup-posix malloc-gnu \
+pipe-posix calloc-gnu realloc-gnu strerror_r-posix fnmatch-gnu \
+getopt-gnu getpass-gnu error argp strcase strcasestr progname glob \
+unistd nonblocking sigpipe
 
 mv build-aux/texinfo.tex{,.bkp}
 autoreconf --install --force

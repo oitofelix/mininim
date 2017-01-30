@@ -1,5 +1,5 @@
 /*
-  menu.h -- menu module;
+  bmenu.h -- bottom menu module;
 
   Copyright (C) 2015, 2016, 2017 Bruno Félix Rezende Ribeiro
   <oitofelix@gnu.org>
@@ -18,21 +18,21 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MININIM_MENU_H
-#define MININIM_MENU_H
+#ifndef MININIM_BMENU_H
+#define MININIM_BMENU_H
 
 /* variable */
 extern bool active_menu;
-extern int menu_help;
+extern int bmenu_help;
 
 /* functions */
 void reset_menu (void);
-char menu_opt (struct menu_item *menu, char *prefix);
-char menu_enum (struct menu_item *menu, char *prefix);
-char menu_bool (struct menu_item *menu, char *prefix, bool exclusive, ...);
-char menu_int (int *v, int *b, int min, int max, char *pref_int, char *pref_bool);
-char menu_list (int *dir0, int *dir1, int index, int min, int max, char *prefix);
-bool was_menu_key_pressed (void);
-bool was_menu_return_pressed (bool consume);
+char bmenu_opt (struct bmenu_item *menu, char *prefix);
+char bmenu_enum (struct bmenu_item *menu, char *prefix);
+char bmenu_bool (struct bmenu_item *menu, char *prefix, bool exclusive, ...);
+char bmenu_int (int *v, int *b, int min, int max, char *pref_int, char *pref_bool);
+char bmenu_list (int *dir0, int *dir1, int index, int min, int max, char *prefix);
+bool was_bmenu_key_pressed (void);
+bool was_bmenu_return_pressed (bool consume);
 
-#endif	/* MININIM_MENU_H */
+#endif	/* MININIM_BMENU_H */

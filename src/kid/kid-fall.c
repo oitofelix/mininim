@@ -229,10 +229,7 @@ physics_in (struct anim *k)
       if (k->current_lives > 0) {
         play_audio (&hit_ground_harm_audio, NULL, k->id);
         k->uncouch_slowly = true;
-        if (k->id == current_kid_id) {
-          kid_haptic (k, KID_HAPTIC_HARM);
-          cheat_menu ();
-        }
+        kid_haptic (k, KID_HAPTIC_HARM);
       }
       if (k->id == current_kid_id) {
         mr.flicker = 2;

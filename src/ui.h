@@ -134,9 +134,6 @@ enum main_menu {
   SAVE_GAME_MID,
   SAVE_CONFIG_MID,
   SAVE_LEVEL_FILE_MID,
-  RESTART_LEVEL_MID,
-  PREVIOUS_LEVEL_MID,
-  NEXT_LEVEL_MID,
   MIRROR_MODE_MID,
   VOLUME_MID,
   VOLUME_OFF_MID,
@@ -226,6 +223,24 @@ enum main_menu {
   PLAY_MID,
   PLAY_REPLAY_MID,
   RECORD_REPLAY_MID,
+  JUMP_TO_LEVEL_MID,
+  LEVEL_1_MID,
+  LEVEL_2_MID,
+  LEVEL_3_MID,
+  LEVEL_4_MID,
+  LEVEL_5_MID,
+  LEVEL_6_MID,
+  LEVEL_7_MID,
+  LEVEL_8_MID,
+  LEVEL_9_MID,
+  LEVEL_10_MID,
+  LEVEL_11_MID,
+  LEVEL_12_MID,
+  LEVEL_13_MID,
+  LEVEL_14_MID,
+  RESTART_LEVEL_MID,
+  PREVIOUS_LEVEL_MID,
+  NEXT_LEVEL_MID,
   TIME_MID,
   SKILLS_MID,
   TOGGLE_PAUSE_GAME_MID,
@@ -257,140 +272,37 @@ enum main_menu {
   NO_MID,
 };
 
-ALLEGRO_BITMAP *load_icon (char *filename);
+/* functions */
 void load_icons (void);
 void unload_icons (void);
 
-void create_main_menu (void);
+void main_menu (void);
 
-ALLEGRO_BITMAP *volume_icon (float volume);
-void game_menu (void);
-void load_menu (void);
-void save_menu (void);
-void volume_menu (void);
-
-void view_menu (void);
-void zoom_menu (void);
-ALLEGRO_BITMAP *zoom_fit_icon (enum mr_fit_mode fit);
-void zoom_fit_menu (void);
-void zoom_out_menu (void);
-void zoom_in_menu (void);
-void navigation_menu (void);
-void nav_select_menu (void);
-void nav_cell_menu (void);
-void nav_page_menu (void);
-ALLEGRO_BITMAP *hue_icon (enum hue hue);
-void hue_mode_menu (void);
-ALLEGRO_BITMAP *gm_icon (enum gm gm);
-void gm_menu (void);
-ALLEGRO_BITMAP *em_icon (enum em em);
-void em_menu (void);
-ALLEGRO_BITMAP *vm_icon (enum vm vm);
-void vm_menu (void);
-ALLEGRO_BITMAP *flip_screen_icon (int flags);
-void screen_flip_menu (void);
-
-void gamepad_menu (void);
-ALLEGRO_BITMAP *gamepad_device_icon (enum gpm gpm);
-void gamepad_device_menu (void);
-ALLEGRO_BITMAP *flip_gamepad_icon (bool v, bool h);
-void flip_gamepad_menu (void);
-
-void play_menu (void);
-
-void editor_menu (void);
-
-void cheat_menu (void);
-
-void help_menu (void);
-
-void show_menu (void);
-void hide_menu (void);
-bool is_showing_menu (void);
-void toggle_menu_visibility (void);
-void enable_menu (bool enable);
-
-void skip_level_widget (void);
-void statistics_widget (void);
-void pause_menu_widget (void);
-void speed_menu_widget (void);
+void ui_about_screen (bool value);
+void ui_editor (void);
 
 void menu_mid (intptr_t mid);
 void anim_key_bindings (void);
 void level_key_bindings (void);
 
-void ui_editor (void);
+void show_menu (void);
+void hide_menu (void);
+bool is_showing_menu (void);
+void toggle_menu_visibility (void);
 
-void ui_load_game (void);
-void ui_load_config (void);
-void ui_save_game (void);
-void ui_audio_volume (float volume);
-void ui_restart_game (void);
-void ui_start_game (void);
-void ui_quit_game (void);
+void mirror_mode (bool mirror);
+bool in_mirror_mode (void);
 
-void ui_full_screen (void);
-void ui_zoom_fit (enum mr_fit_mode fit);
-bool ui_set_multi_room (int dw, int dh, bool correct_mouse);
-void ui_show_coordinates (void);
-void ui_show_indirect_coordinates (void);
-void ui_hue_mode (enum hue new_hue);
-void ui_gm (enum gm new_gm);
-void ui_em (enum em new_em);
-void ui_vm (enum vm new_vm);
-void ui_flip_screen (int flags, bool correct_mouse, bool save_only);
-void ui_inhibit_screensaver (bool inhibit);
-void ui_room_drawing (bool draw);
-void ui_screenshot (void);
-
-void ui_gamepad_mode (enum gpm new_gpm);
-void ui_flip_gamepad (bool v, bool h, bool save_only);
-
-void ui_play_replay (void);
-void ui_record_replay (void);
-void ui_restart_level (void);
-void ui_previous_level (void);
-void ui_next_level (void);
-void ui_time (void);
-void ui_skills (void);
-void ui_decrease_time_frequency (void);
-void ui_increase_time_frequency (void);
-void ui_toggle_time_frequency_constraint (void);
-void ui_change_anim_freq (int f);
-void ui_toggle_pause_game (void);
-void ui_next_frame (void);
+bool display_remaining_time (int priority);
 void print_game_paused (int priority);
 
-void ui_undo_pass (struct undo *u, int dir, char *prefix);
-
-void ui_resurrect (void);
-void ui_kill_enemy (void);
-void ui_float (void);
-void ui_immortal (bool immortal);
-void ui_fill_life (void);
-void ui_add_life (void);
-void ui_change_time (int m);
-
-void ui_version (void);
-void ui_about_screen (bool value);
-
-void ui_next_display_mode (void);
-
-
 void ui_save_setting (char *key, char *value);
 bool ui_msg (int priority, const char *template, ...)
   __attribute__ ((format (printf, 2, 3)));
 bool ui_msg_clear (int priority);
 
 
-
-void ui_mirror_mode (bool mirror);
-bool in_mirror_mode (void);
-void mirror_mode (bool mirror);
-
-
-
-bool display_remaining_time (int priority);
-void display_skill (struct anim *k);
+/* variables */
+bool main_menu_enabled;
 
 #endif	/* MININIM_UI_H */

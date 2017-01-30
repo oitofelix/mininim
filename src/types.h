@@ -603,7 +603,7 @@ enum edit {
   EDIT_NUMERICAL_BG, EDIT_NUMERICAL_EXT,
 };
 
-struct menu_item {
+struct bmenu_item {
   char key;
   char *desc;
 };

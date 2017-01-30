@@ -1,5 +1,5 @@
 /*
-  menu.c -- menu module;
+  bmenu.c -- bottom menu module;
 
   Copyright (C) 2015, 2016, 2017 Bruno Félix Rezende Ribeiro
   <oitofelix@gnu.org>
@@ -21,129 +21,129 @@
 #include "mininim.h"
 
 bool active_menu;
-int menu_help;
+int bmenu_help;
 static uint64_t help_cycles;
 static size_t help_item;
 
 void
 reset_menu (void)
 {
-  menu_help = 0;
+  bmenu_help = 0;
   active_menu = false;
 }
 
 char
-menu_opt (struct menu_item *menu, char *prefix)
+bmenu_opt (struct bmenu_item *menu, char *prefix)
 {
   size_t i = 0;
   char c;
 
   active_menu = true;
 
-  if (! menu_help) editor_msg (prefix, EDITOR_CYCLES_0);
+  if (! bmenu_help) editor_msg (prefix, EDITOR_CYCLES_0);
 
   if (was_any_key_pressed ()
       && key.keycode != ALLEGRO_KEY_BACKSPACE
       && key2char (&key) != '/') {
-    if (menu_help == 1) {
+    if (bmenu_help == 1) {
       while (menu[i].key) {
         if (was_char_pressed (menu[i].key)) {
-          menu_help = 2;
+          bmenu_help = 2;
           help_cycles = 18;
           help_item = i;
           break;
         }
         i++;
       }
-    } else if (was_char_pressed ('?')) menu_help = 1;
+    } else if (was_char_pressed ('?')) bmenu_help = 1;
     else {
       while (menu[i].key) {
         if (was_char_pressed (menu[i].key)) {
-          menu_help = 0;
+          bmenu_help = 0;
           return menu[i].key;
         }
         i++;
       }
     }
     if (! menu[i].key && ! was_char_pressed ('?'))
-      menu_help = 0;
+      bmenu_help = 0;
   }
 
-  if (menu_help == 1)
+  if (bmenu_help == 1)
     editor_msg ("PRESS KEY FOR HELP", EDITOR_CYCLES_0);
-  if (menu_help == 2 && --help_cycles)
+  if (bmenu_help == 2 && --help_cycles)
     editor_msg (menu[help_item].desc, EDITOR_CYCLES_0);
-  else if (menu_help == 2) menu_help = 0;
+  else if (bmenu_help == 2) bmenu_help = 0;
 
   c = 0;
 
   if (was_key_pressed (0, ALLEGRO_KEY_BACKSPACE)) {
-    if (menu_help == 0) c = 1;
-    else menu_help = 0;
+    if (bmenu_help == 0) c = 1;
+    else bmenu_help = 0;
   }
 
   if (was_char_pressed ('/')) {
-    if (menu_help == 0) c = -1;
-    else menu_help = 0;
+    if (bmenu_help == 0) c = -1;
+    else bmenu_help = 0;
   }
 
   return c;
 }
 
 char
-menu_enum (struct menu_item *menu, char *prefix)
+bmenu_enum (struct bmenu_item *menu, char *prefix)
 {
   int i = 0;
-  char *menu_str = NULL, *tmp_str = NULL;
+  char *bmenu_str = NULL, *tmp_str = NULL;
   while (menu[i].key) {
-    if (menu_str) {
-      tmp_str = menu_str;
-      xasprintf (&menu_str, "%s%c", menu_str, menu[i].key);
+    if (bmenu_str) {
+      tmp_str = bmenu_str;
+      xasprintf (&bmenu_str, "%s%c", bmenu_str, menu[i].key);
     } else {
-      xasprintf (&menu_str, "%s%c", prefix ? prefix : "", menu[i].key);
+      xasprintf (&bmenu_str, "%s%c", prefix ? prefix : "", menu[i].key);
     }
     if (tmp_str) al_free (tmp_str);
     i++;
   }
-  if (menu_str) {
-    tmp_str = menu_str;
-    xasprintf (&menu_str, "%s%c", menu_str, '?');
+  if (bmenu_str) {
+    tmp_str = bmenu_str;
+    xasprintf (&bmenu_str, "%s%c", bmenu_str, '?');
   }
   if (tmp_str) al_free (tmp_str);
-  char c = menu_opt (menu, menu_str);
-  al_free (menu_str);
+  char c = bmenu_opt (menu, bmenu_str);
+  al_free (bmenu_str);
   return c;
 }
 
 char
-menu_bool (struct menu_item *menu, char *prefix, bool exclusive, ...)
+bmenu_bool (struct bmenu_item *menu, char *prefix, bool exclusive, ...)
 {
   va_list ap;
   va_start (ap, exclusive);
 
   int i = 0;
-  char *menu_str = NULL, *tmp_str = NULL;
+  char *bmenu_str = NULL, *tmp_str = NULL;
   while (menu[i].key) {
     bool *b = va_arg (ap, bool *);
-    if (menu_str) {
-      tmp_str = menu_str;
-      xasprintf (&menu_str, "%s%c%c", menu_str,
+    if (bmenu_str) {
+      tmp_str = bmenu_str;
+      xasprintf (&bmenu_str, "%s%c%c", bmenu_str,
                  menu[i].key, *b ? '*' : '-');
     } else {
-      xasprintf (&menu_str, "%s%c%c", prefix ? prefix : "",
+      xasprintf (&bmenu_str, "%s%c%c", prefix ? prefix : "",
                  menu[i].key, *b ? '*' : '-');
     }
     if (tmp_str) al_free (tmp_str);
     i++;
   }
-  if (menu_str) {
-    tmp_str = menu_str;
-    xasprintf (&menu_str, "%s%c", menu_str, '?');
+  if (bmenu_str) {
+    tmp_str = bmenu_str;
+    xasprintf (&bmenu_str, "%s%c", bmenu_str, '?');
   }
   va_end (ap);
 
   if (tmp_str) al_free (tmp_str);
-  char c = menu_opt (menu, menu_str);
+  char c = bmenu_opt (menu, bmenu_str);
 
   if (c > 1) {
     i = 0;
@@ -165,12 +165,12 @@ menu_bool (struct menu_item *menu, char *prefix, bool exclusive, ...)
     va_end (ap);
   }
 
-  al_free (menu_str);
+  al_free (bmenu_str);
   return c;
 }
 
 char
-menu_int (int *v, int *b, int min, int max, char *pref_int, char *pref_bool)
+bmenu_int (int *v, int *b, int min, int max, char *pref_int, char *pref_bool)
 {
   active_menu = true;
 
@@ -238,7 +238,7 @@ menu_int (int *v, int *b, int min, int max, char *pref_int, char *pref_bool)
 }
 
 char
-menu_list (int *dir0, int *dir1, int index, int min, int max, char *prefix)
+bmenu_list (int *dir0, int *dir1, int index, int min, int max, char *prefix)
 {
   active_menu = true;
 
@@ -286,7 +286,7 @@ menu_list (int *dir0, int *dir1, int index, int min, int max, char *prefix)
 }
 
 bool
-was_menu_key_pressed (void)
+was_bmenu_key_pressed (void)
 {
   if (! was_any_key_pressed ()) return false;
 
@@ -309,7 +309,7 @@ was_menu_key_pressed (void)
 }
 
 bool
-was_menu_return_pressed (bool consume)
+was_bmenu_return_pressed (bool consume)
 {
   return was_key_pressed (0, ALLEGRO_KEY_BACKSPACE)
     || was_char_pressed ('/');

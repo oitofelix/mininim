@@ -47,8 +47,6 @@ register_undo (struct undo *u, void *data, undo_f f, char *desc)
   else u->pass[u->current].desc = NULL;
 
   if (editor_register && desc) editor_msg (desc, editor_register);
-
-  if (desc) editor_menu ();
 }
 
 void
@@ -94,8 +92,6 @@ undo_pass (struct undo *u, int dir, char **desc)
       u->current--;
     } while (! u->pass[u->current].desc);
   }
-
-  if (desc) editor_menu ();
 
   return true;
 }

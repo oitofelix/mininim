@@ -59,14 +59,15 @@ play_anim (void (*draw_callback) (void),
   key.keycode = 0;
   joystick_button = -1;
 
-  create_main_menu ();
-
   while (! quit_anim) {
     al_wait_for_event (event_queue, &event);
 
     switch (event.type) {
     case ALLEGRO_EVENT_TIMER:
       if (event.timer.source == timer) {
+        /* update main menu */
+        main_menu ();
+
         struct replay *replay = get_replay ();
 
         /* detect incomplete replays */
@@ -283,7 +284,8 @@ play_anim (void (*draw_callback) (void),
   }
 
   if (replay_mode == NO_REPLAY && recording_replay_countdown >= 0) {
-    enable_menu (false);
+    main_menu_enabled = false;
+    main_menu ();
     while (recording_replay_countdown >= 0) {
       al_rest (1.0 / DEFAULT_HZ);
       start_recording_replay (2);
@@ -291,7 +293,7 @@ play_anim (void (*draw_callback) (void),
       show ();
       process_display_events ();
     }
-    create_main_menu ();
+    main_menu_enabled = true;
   }
 
   if (replay_mode == RECORD_REPLAY) {
@@ -335,9 +337,6 @@ void
 cutscene_mode (bool val)
 {
   cutscene = val;
-  game_menu ();
-  play_menu ();
-  editor_menu ();
 }
 
 

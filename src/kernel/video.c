@@ -98,13 +98,11 @@ init_video (void)
 
   cutscene = true;
 
-#if MENU_FEATURE
   al_register_event_source
     (event_queue, al_get_default_menu_event_source ());
-#endif
 
-  create_main_menu ();
-  enable_menu (false);
+  main_menu_enabled = false;
+  main_menu ();
   if (! is_fullscreen ()) show_menu ();
 
   if (mr.fit_w == 0 && mr.fit_h == 0) {
@@ -390,6 +388,38 @@ apply_palette (ALLEGRO_BITMAP *bitmap, palette p)
          compare_palette_caches);
 
   return rbitmap;
+}
+
+bool
+bitmap_heq (ALLEGRO_BITMAP *b0, ALLEGRO_BITMAP *b1)
+{
+  al_lock_bitmap (b0, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READONLY);
+  al_lock_bitmap (b1, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READONLY);
+
+  int b0_w = al_get_bitmap_width (b0);
+  int b0_h = al_get_bitmap_height (b0);
+  int b0_m = min_int (b0_w, b0_h);
+
+  int b1_w = al_get_bitmap_width (b1);
+  int b1_h = al_get_bitmap_height (b1);
+  int b1_m = min_int (b1_w, b1_h);
+
+  int l = min_int (b0_m, b1_m);
+
+  int i;
+  for (i = 0; i < l; i++) {
+    ALLEGRO_COLOR c0 = al_get_pixel (b0, i, i);
+    ALLEGRO_COLOR c1 = al_get_pixel (b1, i, i);
+    if (! color_eq (c0, c1)) {
+      al_unlock_bitmap (b0);
+      al_unlock_bitmap (b1);
+      return false;
+    }
+  }
+
+  al_unlock_bitmap (b0);
+  al_unlock_bitmap (b1);
+  return true;
 }
 
 bool

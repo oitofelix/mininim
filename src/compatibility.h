@@ -48,12 +48,6 @@
 #endif
 
 /* Menu */
-#ifdef ALLEGRO_START_OF_MENU
-#define MENU_FEATURE true
-#else
-#define MENU_FEATURE false
-#endif
-
 #ifndef ALLEGRO_GTK_TOPLEVEL
 #define ALLEGRO_GTK_TOPLEVEL 0
 #endif

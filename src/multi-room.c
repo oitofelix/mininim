@@ -394,8 +394,6 @@ mr_set_origin (int room, int rx, int ry)
     for (y = 0; y < mr.h; y++) {
       if (mr.cell[x][y].room < 0) mr.cell[x][y].room = 0;
     }
-
-  if (old_mr_room != mr.room) navigation_menu ();
 }
 
 void

@@ -39,6 +39,7 @@ ALLEGRO_BITMAP *clone_scaled_memory_bitmap (ALLEGRO_BITMAP *bitmap, int w,
 ALLEGRO_BITMAP *load_bitmap (char *filename);
 void validate_bitmap_for_mingw (ALLEGRO_BITMAP *bitmap);
 void save_bitmap (char *filename, ALLEGRO_BITMAP *bitmap);
+bool bitmap_heq (ALLEGRO_BITMAP *b0, ALLEGRO_BITMAP *b1);
 bool color_eq (ALLEGRO_COLOR c0, ALLEGRO_COLOR c1);
 void set_target_bitmap (ALLEGRO_BITMAP *bitmap);
 void set_target_backbuffer (ALLEGRO_DISPLAY *display);

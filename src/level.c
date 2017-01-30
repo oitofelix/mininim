@@ -668,8 +668,6 @@ compute_level (void)
       request_gamepad_rumble (0.5 * (sin (a->float_timer * 0.17) + 1),
                               1.0 / DEFAULT_HZ);
       a->float_timer++;
-      if (a->id == 0 && a->float_timer == REFLOAT_MENU_THRESHOLD)
-        cheat_menu ();
     } else if (a->float_timer > 0) a->float_timer = 0;
 
     if (a->enemy_refraction > 0) a->enemy_refraction--;
@@ -736,8 +734,6 @@ process_death (void)
   /* Restart level after death */
   if (k->current_lives <= 0
       && ! is_game_paused ()) {
-    if (! death_timer) cheat_menu ();
-
     death_timer++;
 
     if (death_timer == SEC2CYC (1)) {
@@ -762,7 +758,7 @@ process_death (void)
         ui_msg (-2, "Press Button to Continue");
       } else if (! active_menu) ui_msg (-2, "%s", "");
 
-      if (was_any_key_pressed () && ! was_menu_key_pressed ())
+      if (was_any_key_pressed () && ! was_bmenu_key_pressed ())
         quit_anim = RESTART_LEVEL;
     }
   } else if (death_timer && ! is_game_paused ()) {
@@ -799,10 +795,8 @@ draw_level (void)
           && (rem_time + 1) % DEFAULT_HZ == 0
           && ! play_time_stopped)
         play_audio (&press_key_audio, NULL, -1);
-      if (display_remaining_time (rem_time_sec <= 60 ? 0 : -2)) {
-        if (rem_time == 60 * DEFAULT_HZ) cheat_menu ();
+      if (display_remaining_time (rem_time_sec <= 60 ? 0 : -2))
         last_auto_show_time = rem_time_min;
-      }
     }
     if (rem_time <= 0) quit_anim = OUT_OF_TIME;
   }
@@ -834,7 +828,6 @@ pause_game (bool val)
 {
   if (! val) ui_msg_clear (0);
   game_paused = val;
-  play_menu ();
 }
 
 bool

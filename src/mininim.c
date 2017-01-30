@@ -1433,7 +1433,8 @@ main (int _argc, char **_argv)
 
   give_dat_compat_preference ();
 
-  create_main_menu ();
+  main_menu_enabled = true;
+  main_menu ();
 
   if (skip_title) goto play_game;
 
@@ -1644,7 +1645,7 @@ void *
 dialog_thread (ALLEGRO_THREAD *thread, void *arg)
 {
   struct dialog *d = arg;
-  enable_menu (false);
+  main_menu_enabled = false;
   al_show_mouse_cursor (display);
 
   ALLEGRO_FILECHOOSER *dialog = NULL;
@@ -1667,7 +1668,7 @@ dialog_thread (ALLEGRO_THREAD *thread, void *arg)
     al_hide_mouse_cursor (display);
   else al_show_mouse_cursor (display);
 
-  create_main_menu ();
+  main_menu_enabled = true;
 
   return dialog;
 }

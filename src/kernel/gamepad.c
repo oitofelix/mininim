@@ -144,7 +144,6 @@ calibrate_joystick (void)
 
   if (! joystick) {
     gpm = KEYBOARD;
-    gamepad_menu ();
     return NULL;
   }
 
@@ -160,10 +159,7 @@ calibrate_joystick (void)
 #if HAPTIC_FEATURE
   joystick_haptic = al_get_haptic_from_joystick (joystick);
 
-  if (! joystick_haptic) {
-    gamepad_menu ();
-    return joystick;
-  }
+  if (! joystick_haptic) return joystick;
 
   joystick_max_haptic_effects =
     min_int (al_get_max_haptic_effects (joystick_haptic),
@@ -174,7 +170,6 @@ calibrate_joystick (void)
              sizeof (* joystick_haptic_effect_id));
 #endif
 
-  gamepad_menu ();
   return joystick;
 }
 

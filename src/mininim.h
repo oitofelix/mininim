@@ -37,8 +37,13 @@
 #include <locale.h>
 #include <errno.h>
 #include <unistd.h>
+#include <getopt.h>
+#include <signal.h>
 #include "error.h"
 #include "argp.h"
+#include "fnmatch.h"
+#include "getpass.h"
+#include "nonblocking.h"
 #include "progname.h"
 
 #define ALLEGRO_UNSTABLE
@@ -165,7 +170,7 @@
 #include "wall-depedv.h"
 #include "wall-pv.h"
 
-#include "menu.h"
+#include "bmenu.h"
 #include "editor.h"
 #include "debug.h"
 #include "undo.h"
