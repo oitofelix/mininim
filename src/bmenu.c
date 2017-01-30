@@ -98,16 +98,16 @@ bmenu_enum (struct bmenu_item *menu, char *prefix)
   while (menu[i].key) {
     if (bmenu_str) {
       tmp_str = bmenu_str;
-      xasprintf (&bmenu_str, "%s%c", bmenu_str, menu[i].key);
+      bmenu_str = xasprintf ("%s%c", bmenu_str, menu[i].key);
     } else {
-      xasprintf (&bmenu_str, "%s%c", prefix ? prefix : "", menu[i].key);
+      bmenu_str = xasprintf ("%s%c", prefix ? prefix : "", menu[i].key);
     }
     if (tmp_str) al_free (tmp_str);
     i++;
   }
   if (bmenu_str) {
     tmp_str = bmenu_str;
-    xasprintf (&bmenu_str, "%s%c", bmenu_str, '?');
+    bmenu_str = xasprintf ("%s%c", bmenu_str, '?');
   }
   if (tmp_str) al_free (tmp_str);
   char c = bmenu_opt (menu, bmenu_str);
@@ -127,10 +127,10 @@ bmenu_bool (struct bmenu_item *menu, char *prefix, bool exclusive, ...)
     bool *b = va_arg (ap, bool *);
     if (bmenu_str) {
       tmp_str = bmenu_str;
-      xasprintf (&bmenu_str, "%s%c%c", bmenu_str,
+      bmenu_str = xasprintf ("%s%c%c", bmenu_str,
                  menu[i].key, *b ? '*' : '-');
     } else {
-      xasprintf (&bmenu_str, "%s%c%c", prefix ? prefix : "",
+      bmenu_str = xasprintf ("%s%c%c", prefix ? prefix : "",
                  menu[i].key, *b ? '*' : '-');
     }
     if (tmp_str) al_free (tmp_str);
@@ -138,7 +138,7 @@ bmenu_bool (struct bmenu_item *menu, char *prefix, bool exclusive, ...)
   }
   if (bmenu_str) {
     tmp_str = bmenu_str;
-    xasprintf (&bmenu_str, "%s%c", bmenu_str, '?');
+    bmenu_str = xasprintf ("%s%c", bmenu_str, '?');
   }
   va_end (ap);
 
@@ -181,16 +181,16 @@ bmenu_int (int *v, int *b, int min, int max, char *pref_int, char *pref_bool)
 
   char *b_str, *min_str, *max_str;
 
-  if (b && pref_bool) xasprintf (&b_str, " %s", *b ? pref_bool : "-");
-  else xasprintf (&b_str, "%s", "");
+  if (b && pref_bool) b_str = xasprintf (" %s", *b ? pref_bool : "-");
+  else b_str = xasprintf ("%s", "");
 
-  if (min == INT_MIN) xasprintf (&min_str, "%s", "<");
-  else xasprintf (&min_str, "%i", min);
+  if (min == INT_MIN) min_str = xasprintf ("%s", "<");
+  else min_str = xasprintf ("%i", min);
 
-  if (max == INT_MAX) xasprintf (&max_str, "%s", ">");
-  else xasprintf (&max_str, "%i", max);
+  if (max == INT_MAX) max_str = xasprintf ("%s", ">");
+  else max_str = xasprintf ("%i", max);
 
-  xasprintf (&str, "%s %s-%s:%i%s",
+  str = xasprintf ("%s %s-%s:%i%s",
              pref_int, min_str, max_str, *v, b_str);
 
   editor_msg (str, EDITOR_CYCLES_0);
@@ -216,7 +216,7 @@ bmenu_int (int *v, int *b, int min, int max, char *pref_int, char *pref_bool)
     break;
   case '0': case '1': case '2': case '3': case '4': case '5':
   case '6': case '7': case '8': case '9':
-    xasprintf (&str, "%i%c", *v, c);
+    str = xasprintf ("%i%c", *v, c);
     if (sscanf (str, "%d", &r) != 1) r = *v;
     al_free (str);
     *v = int_to_range (r, min, max);
@@ -245,10 +245,10 @@ bmenu_list (int *dir0, int *dir1, int index, int min, int max, char *prefix)
   char *str;
 
   if (index >= min && index <= max)
-    xasprintf (&str, "%s %i %s%s", prefix, index,
+    str = xasprintf ("%s %i %s%s", prefix, index,
                dir0 ? "-+" : "", dir1 ? "<>" : "");
   else
-    xasprintf (&str, "%s NONE %s%s", prefix,
+    str = xasprintf ("%s NONE %s%s", prefix,
                dir0 ? "-+" : "", dir1 ? "<>" : "");
 
   editor_msg (str, EDITOR_CYCLES_0);

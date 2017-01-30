@@ -31,7 +31,7 @@ struct level *
 load_plv_level (struct level *l, int n)
 {
   char *filename;
-  xasprintf (&filename, "data/plv-levels/%02d.plv", n);
+  filename = xasprintf ("data/plv-levels/%02d.plv", n);
 
   int8_t *plv =
     load_resource (filename, (load_resource_f) load_file);

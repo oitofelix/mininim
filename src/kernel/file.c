@@ -31,14 +31,14 @@ load_resource (char *filename, load_resource_f lrf)
 
   /* user data path */
   if (! resource) {
-    xasprintf (&user_data_path_filename, "%s/%s", user_data_dir, filename);
+    user_data_path_filename = xasprintf ("%s/%s", user_data_dir, filename);
     resource = lrf (user_data_path_filename);
     al_free (user_data_path_filename);
   }
 
   /* data path */
   if (data_dir && ! resource) {
-    xasprintf (&data_path_filename, "%s/%s", data_dir, filename);
+    data_path_filename = xasprintf ("%s/%s", data_dir, filename);
     resource = lrf (data_path_filename);
     al_free (data_path_filename);
   }
@@ -48,14 +48,14 @@ load_resource (char *filename, load_resource_f lrf)
 
   /* resources path */
   if (! resource) {
-    xasprintf (&resources_path_filename, "%s/%s", resources_dir, filename);
+    resources_path_filename = xasprintf ("%s/%s", resources_dir, filename);
     resource = lrf (resources_path_filename);
     al_free (resources_path_filename);
   }
 
   /* system data path */
   if (! resource) {
-    xasprintf (&system_data_path_filename, "%s/%s", system_data_dir, filename);
+    system_data_path_filename = xasprintf ("%s/%s", system_data_dir, filename);
     resource = lrf (system_data_path_filename);
     al_free (system_data_path_filename);
   }

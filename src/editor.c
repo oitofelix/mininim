@@ -554,7 +554,7 @@ editor (void)
     case 'H': f = HIDDEN_FLOOR; break;
     }
 
-    xasprintf (&str, "%s%s", fake_fg ? "FAKE " : "", get_confg_name (f));
+    str = xasprintf ("%s%s", fake_fg ? "FAKE " : "", get_confg_name (f));
     register_con_undo (&undo, &p,
                        ! fake_fg ? f : MIGNORE,
                        MIGNORE, MIGNORE,
@@ -584,7 +584,7 @@ editor (void)
     case 'A': f = ARCH_BOTTOM; break;
     }
 
-    xasprintf (&str, "%s%s", fake_fg ? "FAKE " : "", get_confg_name (f));
+    str = xasprintf ("%s%s", fake_fg ? "FAKE " : "", get_confg_name (f));
     register_con_undo (&undo, &p,
                        ! fake_fg ? f : MIGNORE,
                        MIGNORE, MIGNORE,
@@ -616,7 +616,7 @@ editor (void)
     case 'L': f = LEVEL_DOOR; break;
     }
 
-    xasprintf (&str, "%s%s", fake_fg ? "FAKE " : "", get_confg_name (f));
+    str = xasprintf ("%s%s", fake_fg ? "FAKE " : "", get_confg_name (f));
     register_con_undo (&undo, &p,
                        ! fake_fg ? f : MIGNORE,
                        MIGNORE, MIGNORE,
@@ -644,7 +644,7 @@ editor (void)
     case 'T': f = TCARPET; break;
     }
 
-    xasprintf (&str, "%s%s", fake_fg ? "FAKE " : "", get_confg_name (f));
+    str = xasprintf ("%s%s", fake_fg ? "FAKE " : "", get_confg_name (f));
     register_con_undo (&undo, &p,
                        ! fake_fg ? f : MIGNORE,
                        MIGNORE, MIGNORE,
@@ -674,7 +674,7 @@ editor (void)
     case 'R': f = ARCH_TOP_RIGHT; break;
     }
 
-    xasprintf (&str, "%s%s", fake_fg ? "FAKE " : "", get_confg_name (f));
+    str = xasprintf ("%s%s", fake_fg ? "FAKE " : "", get_confg_name (f));
     register_con_undo (&undo, &p,
                        ! fake_fg ? f : MIGNORE,
                        MIGNORE, MIGNORE,
@@ -910,11 +910,11 @@ editor (void)
       ext_str = e ? "CAN'T FALL" : "FALL";
       break;
     case SPIKES_FLOOR: case DOOR: case LEVEL_DOOR: case CHOPPER:
-      xasprintf (&ext_str, "%i", e);
+      ext_str = xasprintf ("%i", e);
       free_ext_str = true;
       break;
     case OPENER_FLOOR: case CLOSER_FLOOR:
-      xasprintf (&ext_str, "%i", e);
+      ext_str = xasprintf ("%i", e);
       free_ext_str = true;
       break;
     case CARPET:
@@ -1331,7 +1331,7 @@ editor (void)
     break;
   case EDIT_LEVEL:
     al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
-    xasprintf (&str, "L%i>", global_level.n);
+    str = xasprintf ("L%i>", global_level.n);
     switch (bmenu_enum (level_menu, str)) {
     case -1: case 1: edit = EDIT_MAIN; break;
     case 'X':
@@ -1405,7 +1405,7 @@ editor (void)
     al_free (str);
    break;
   case EDIT_LEVEL_JUMP:
-    xasprintf (&str, "L%iJ>LEVEL", global_level.n);
+    str = xasprintf ("L%iJ>LEVEL", global_level.n);
     if (bmenu_select_level (EDIT_LEVEL, str) == 1
         && next_level_number != global_level.n) {
       ignore_level_cutscene = true;
@@ -1414,7 +1414,7 @@ editor (void)
     al_free (str);
     break;
   case EDIT_LEVEL_EXCHANGE:
-    xasprintf (&str, "L%iX>LEVEL", global_level.n);
+    str = xasprintf ("L%iX>LEVEL", global_level.n);
     if (bmenu_select_level (EDIT_LEVEL, str) == 1
         && next_level_number != global_level.n)
       register_level_exchange_undo (&undo, next_level_number,
@@ -1423,7 +1423,7 @@ editor (void)
     break;
   case EDIT_LEVEL_MIRROR:
     al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
-    xasprintf (&str, "L%iM>", global_level.n);
+    str = xasprintf ("L%iM>", global_level.n);
     switch (bmenu_enum (mirror_menu, str)) {
     case -1: case 1: edit = EDIT_LEVEL; break;
     case 'C': edit = EDIT_LEVEL_MIRROR_CONS; break;
@@ -1434,7 +1434,7 @@ editor (void)
     break;
   case EDIT_LEVEL_MIRROR_CONS:
     al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
-    xasprintf (&str, "L%iMC>", global_level.n);
+    str = xasprintf ("L%iMC>", global_level.n);
     switch (bmenu_enum (mirror_dir_menu, str)) {
     case -1: case 1: edit = EDIT_LEVEL_MIRROR; break;
     case 'H':
@@ -1465,7 +1465,7 @@ editor (void)
     break;
   case EDIT_LEVEL_MIRROR_LINKS:
     al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
-    xasprintf (&str, "L%iML>", global_level.n);
+    str = xasprintf ("L%iML>", global_level.n);
     switch (bmenu_enum (mirror_dir_menu, str)) {
     case -1: case 1: edit = EDIT_LEVEL_MIRROR; break;
     case 'H':
@@ -1506,7 +1506,7 @@ editor (void)
     break;
   case EDIT_LEVEL_MIRROR_BOTH:
     al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
-    xasprintf (&str, "L%iMB>", global_level.n);
+    str = xasprintf ("L%iMB>", global_level.n);
     switch (bmenu_enum (mirror_dir_menu, str)) {
     case -1: case 1: edit = EDIT_LEVEL_MIRROR; break;
     case 'H':
@@ -1553,7 +1553,7 @@ editor (void)
     break;
   case EDIT_NOMINAL_NUMBER:
     al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
-    xasprintf (&str, "L%iN>N.NUMBER", global_level.n);
+    str = xasprintf ("L%iN>N.NUMBER", global_level.n);
     switch (bmenu_int (&global_level.nominal_n, NULL, 0, INT_MAX, str, NULL)) {
     case -1: edit = EDIT_LEVEL; global_level.nominal_n = s; break;
     case 0: break;
@@ -1568,7 +1568,7 @@ editor (void)
     break;
   case EDIT_ENVIRONMENT:
     al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
-    xasprintf (&str, "L%iE>", global_level.n);
+    str = xasprintf ("L%iE>", global_level.n);
     b0 = b1 = false;
     if (global_level.em == DUNGEON) b0 = true;
     if (global_level.em == PALACE) b1 = true;
@@ -1592,7 +1592,7 @@ editor (void)
     break;
   case EDIT_HUE:
     al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
-    xasprintf (&str, "L%iH>", global_level.n);
+    str = xasprintf ("L%iH>", global_level.n);
     b0 = b1 = b2 = b3 = b4 = 0;
     if (global_level.hue == HUE_NONE) b0 = true;
     if (global_level.hue == HUE_GREEN) b1 = true;
@@ -1624,7 +1624,7 @@ editor (void)
     al_set_system_mouse_cursor (display, is_guard_by_type (g->type)
                              ? ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT
                              : ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
-    xasprintf (&str, "G%i>", guard_index);
+    str = xasprintf ("G%i>", guard_index);
     switch (bmenu_enum (guard_menu, str)) {
     case -1: case 1: edit = EDIT_MAIN; break;
     case 'G': edit = EDIT_GUARD_SELECT;
@@ -1693,7 +1693,7 @@ editor (void)
     break;
   case EDIT_GUARD_SELECT:
     mouse2guard (s);
-    xasprintf (&str, "G%iG>GUARD", guard_index);
+    str = xasprintf ("G%iG>GUARD", guard_index);
     switch (bmenu_int (&s, NULL, 0, GUARDS - 1, str, NULL)) {
     case -1: edit = EDIT_GUARD;
       set_mouse_coord (&last_mouse_coord); break;
@@ -1708,7 +1708,7 @@ editor (void)
   case EDIT_GUARD_SKILL:
     al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
     g = guard (&global_level, guard_index);
-    xasprintf (&str, "G%iK>", guard_index);
+    str = xasprintf ("G%iK>", guard_index);
     c = bmenu_enum (skill_menu, str);
     if (! c) break;
 
@@ -1744,7 +1744,7 @@ editor (void)
   case EDIT_SKILL_LEGACY_TEMPLATES:
     al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
     g = guard (&global_level, guard_index);
-    xasprintf (&str, "G%iKL>L.SKILL", guard_index);
+    str = xasprintf ("G%iKL>L.SKILL", guard_index);
     c = bmenu_int (&s, NULL, 0, 11, str, NULL);
     if (! c) break;
     switch (c) {
@@ -1822,7 +1822,7 @@ editor (void)
     if (! is_guard_by_type (g->type)
         && g->p.room == 0 && g->p.floor == 0 && g->p.place == 0)
       invalid_pos (&g->p);
-    xasprintf (&str, "G%iT>", guard_index);
+    str = xasprintf ("G%iT>", guard_index);
     b0 = b1 = b2 = b3 = b4 = b5 = 0;
     if (g->type == NO_ANIM) b0 = true;
     if (g->type == GUARD) b1 = true;
@@ -1856,7 +1856,7 @@ editor (void)
   case EDIT_GUARD_STYLE:
     al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
     g = guard (&global_level, guard_index);
-    xasprintf (&str, "G%iY>STYLE", guard_index);
+    str = xasprintf ("G%iY>STYLE", guard_index);
     switch (bmenu_int (&g->style, NULL, 0, 7, str, NULL)) {
     case -1: edit = EDIT_GUARD; g->style = bb; break;
     case 0: break;
@@ -1964,7 +1964,7 @@ bmenu_link (enum dir dir)
   case BELOW: c = 'B'; break;
   }
 
-  xasprintf (&prefix, "RL%c>ROOM", c);
+  prefix = xasprintf ("RL%c>ROOM", c);
   char r = bmenu_select_room (EDIT_LINK, prefix);
   al_free (prefix);
 
@@ -2002,7 +2002,7 @@ bmenu_skill (char *prefix, int *skill, int max, enum edit up_edit)
 {
   al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
   char *str;
-  xasprintf (&str, "G%i%s", guard_index, prefix);
+  str = xasprintf ("G%i%s", guard_index, prefix);
   int a = (max <= 100) ? *skill + 1 : *skill;
   char c = bmenu_int (&a, NULL, 0, max, str, NULL);
   *skill = (max <= 100) ? a - 1 : a;

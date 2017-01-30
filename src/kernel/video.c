@@ -519,7 +519,7 @@ draw_bottom_text (ALLEGRO_BITMAP *bitmap, char *text, int priority)
       }
       al_free (current_text);
     }
-    xasprintf (&current_text, "%s", text);
+    current_text = xasprintf ("%s", text);
     bottom_text_timer = 1;
     cur_priority = priority;
   } else if (bottom_text_timer > BOTTOM_TEXT_DURATION
@@ -1162,8 +1162,8 @@ show_logo_replaying (void)
 {
   char *text0, *text1;
   int progress; update_replay_progress (&progress);
-  xasprintf (&text0, "Level: %02u", global_level.n);
-  xasprintf (&text1, "Replaying: %3u%%", progress);
+  text0 = xasprintf ("Level: %02u", global_level.n);
+  text1 = xasprintf ("Replaying: %3u%%", progress);
 
   show_logo (text0, text1, NULL);
 

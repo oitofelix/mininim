@@ -305,7 +305,7 @@ key_to_option_name (int key, struct argp_state *state)
       case CI_ENVIRONMENT_VARIABLES:
         return command_line2env_option_name (options[i].name);
       case CI_COMMAND_LINE:
-        xasprintf (&option_name, "%s", options[i].name);
+        option_name = xasprintf ("%s", options[i].name);
         return option_name;
       }
     }
@@ -323,20 +323,20 @@ option_enum_value_error (int key, char *arg, struct argp_state *state,
 
   switch (config_info->type) {
   case CI_CONFIGURATION_FILE:
-    xasprintf
-      (&msg, "%s", invalid
+    msg = xasprintf
+      ("%s", invalid
        ? "is invalid for the configuration file option"
        : "is ambiguous for the configuration file option");
     break;
   case CI_ENVIRONMENT_VARIABLES:
-    xasprintf
-      (&msg, "%s", invalid
+    msg = xasprintf
+      ("%s", invalid
        ? "is invalid for the environment variable option"
        : "is ambiguous for the environment variable option");
     break;
   case CI_COMMAND_LINE:
-    xasprintf
-      (&msg, "%s", invalid
+    msg = xasprintf
+      ("%s", invalid
        ? "is invalid for the command line option"
        : "is ambiguous for the command line option");
     break;
@@ -350,20 +350,20 @@ option_enum_value_error (int key, char *arg, struct argp_state *state,
     if (strcasestr (enum_vals[i], prefix) == enum_vals[i]) {
       char *tmpstr = valid_values;
       if (! valid_values)
-        xasprintf (&valid_values, "'%s'", enum_vals[i]);
+        valid_values = xasprintf ("'%s'", enum_vals[i]);
       else
-        xasprintf (&valid_values, "%s, '%s'", valid_values, enum_vals[i]);
+        valid_values = xasprintf ("%s, '%s'", valid_values, enum_vals[i]);
       if (tmpstr) al_free (tmpstr);
     }
 
   char *msg2;
-  if (invalid) xasprintf (&msg2, "%s", "Valid values are:");
-  else xasprintf (&msg2, "Valid values starting with '%s' are:", arg);
+  if (invalid) msg2 = xasprintf ("%s", "Valid values are:");
+  else msg2 = xasprintf ("Valid values starting with '%s' are:", arg);
 
   char *config_file_prefix;
   if (config_info->type == CI_CONFIGURATION_FILE)
-    xasprintf (&config_file_prefix, "%s: ", config_info->filename);
-  else xasprintf (&config_file_prefix, "%s", "");
+    config_file_prefix = xasprintf ("%s: ", config_info->filename);
+  else config_file_prefix = xasprintf ("%s", "");
 
   char *error_template = "%s'%s' %s '%s' argument %i.\n%s %s.";
   if (config_info->type == CI_CONFIGURATION_FILE
@@ -392,8 +392,8 @@ option_arg_error (int key, char *arg, struct argp_state *state, int number, char
   char *argument_msg;
 
   if (config_info->type == CI_CONFIGURATION_FILE)
-    xasprintf (&config_file_prefix, "%s: ", config_info->filename);
-  else xasprintf (&config_file_prefix, "%s", "");
+    config_file_prefix = xasprintf ("%s: ", config_info->filename);
+  else config_file_prefix = xasprintf ("%s", "");
 
   switch (config_info->type) {
   case CI_CONFIGURATION_FILE:
@@ -407,8 +407,8 @@ option_arg_error (int key, char *arg, struct argp_state *state, int number, char
     break;
   }
 
-  if (number != -1) xasprintf (&argument_msg, " argument %i", number);
-  else xasprintf (&argument_msg, "%s", "");
+  if (number != -1) argument_msg = xasprintf (" argument %i", number);
+  else argument_msg = xasprintf ("%s", "");
 
   char *error_template = "%s'%s' %s '%s'%s.\n%s";
 
@@ -457,7 +457,8 @@ optval_to_int (int *retval, int key, char *arg, struct argp_state *state,
   }
 
   if (i < r->a || i > r->b) {
-    xasprintf (&estr, "Reason: argument is not in the range [%i,%i].", r->a, r->b);
+    estr = xasprintf ("Reason: argument is not in the range [%i,%i].",
+                      r->a, r->b);
     option_arg_error (key, arg, state, number, estr);
     al_free (estr);
     return EINVAL;
@@ -480,7 +481,8 @@ optval_to_float (float *retval, int key, char *arg, struct argp_state *state,
   }
 
   if (f < r->a || f > r->b) {
-    xasprintf (&estr, "Reason: argument is not in the range [%f,%f].", r->a, r->b);
+    estr = xasprintf ("Reason: argument is not in the range [%f,%f].",
+                      r->a, r->b);
     option_arg_error (key, arg, state, number, estr);
     al_free (estr);
     return EINVAL;
@@ -530,8 +532,8 @@ option_get_args (int key, char *arg, struct argp_state *state, char s, ...)
   int i;
   error_t retval;
   char *arg2, *s2;
-  xasprintf (&arg2, "%s", arg);
-  xasprintf (&s2, "%c", s);
+  arg2 = xasprintf ("%s", arg);
+  s2 = xasprintf ("%c", s);
   char *estr;
 
   /* count number of arguments */
@@ -563,7 +565,7 @@ option_get_args (int key, char *arg, struct argp_state *state, char s, ...)
 
     char *str = strtok (i ? NULL : arg2, s2);
     if (! str) {
-      xasprintf (&estr, "Reason: less than %i arguments provided.", num_args);
+      estr = xasprintf ("Reason: less than %i arguments provided.", num_args);
       option_arg_error (key, arg, state, -1, estr);
       al_free (estr);
       retval = EINVAL;
@@ -909,7 +911,7 @@ Levels have been converted using module %s into native format at\n\
     display_mode = i;
     break;
   case DATA_PATH_OPTION:
-    xasprintf (&data_dir, "%s", arg);
+    data_dir = xasprintf ("%s", arg);
     break;
   case FULLSCREEN_OPTION:
     if (optval_to_bool (arg))
@@ -1175,7 +1177,7 @@ char *
 command_line2env_option_name (const char *option_name)
 {
   char *option;
-  xasprintf (&option, ENV_OPTION_PREFIX "%s", option_name);
+  option = xasprintf (ENV_OPTION_PREFIX "%s", option_name);
   toupper_str (option);
   repl_str_char (option, '-', '_');
   return option;
@@ -1187,7 +1189,7 @@ env2command_line_option_name (const char *option_name)
   if (memcmp (option_name, ENV_OPTION_PREFIX, sizeof (ENV_OPTION_PREFIX) - 1))
     return NULL;
   char *option;
-  xasprintf (&option, "%s", option_name + sizeof (ENV_OPTION_PREFIX) - 1);
+  option = xasprintf ("%s", option_name + sizeof (ENV_OPTION_PREFIX) - 1);
   tolower_str (option);
   repl_str_char (option, '_', '-');
   return option;
@@ -1196,7 +1198,7 @@ env2command_line_option_name (const char *option_name)
 void
 config_str2key_value (const char *str, char **key, char **value)
 {
-  xasprintf (key, "%s", str);
+  *key = xasprintf ("%s", str);
   repl_str_char (*key, '=', '\0');
   *value = *key + strlen (*key) + 1;
 }
@@ -1204,7 +1206,7 @@ config_str2key_value (const char *str, char **key, char **value)
 void
 get_env_args (size_t *eargc, char ***eargv, struct argp_option *options)
 {
-  char *argv0; xasprintf (&argv0, "%s", argv[0]);
+  char *argv0; argv0 = xasprintf ("%s", argv[0]);
   *eargv = add_to_array (&argv0, 1, *eargv, eargc, *eargc, sizeof (argv0));
 
   size_t i = 0;
@@ -1215,7 +1217,7 @@ get_env_args (size_t *eargc, char ***eargv, struct argp_option *options)
     if (! key || ! is_valid_option (key)) goto next;
 
     char *option;
-    xasprintf (&option, "--%s=%s", key, value);
+    option = xasprintf ("--%s=%s", key, value);
     *eargv = add_to_array (&option, 1, *eargv, eargc, *eargc, sizeof (option));
 
   next:
@@ -1229,7 +1231,7 @@ char *
 command_line2config_option_name (const char *option_name)
 {
   char *option;
-  xasprintf (&option, "%s", option_name);
+  option = xasprintf ("%s", option_name);
   toupper_str (option);
   repl_str_char (option, '-', ' ');
   return option;
@@ -1239,7 +1241,7 @@ char *
 config2command_line_option_name (const char *option_name)
 {
   char *option;
-  xasprintf (&option, "%s", option_name);
+  option = xasprintf ("%s", option_name);
   tolower_str (option);
   repl_str_char (option, ' ', '-');
   return option;
@@ -1276,7 +1278,7 @@ get_config_args (size_t *cargc, char ***cargv, struct argp_option *options,
     return al_get_errno ();
   }
 
-  char *argv0; xasprintf (&argv0, "%s", argv[0]);
+  char *argv0; argv0 = xasprintf ("%s", argv[0]);
   *cargv = add_to_array (&argv0, 1, *cargv, cargc, *cargc, sizeof (argv0));
 
   ALLEGRO_CONFIG_ENTRY *iterator;
@@ -1291,7 +1293,7 @@ get_config_args (size_t *cargc, char ***cargv, struct argp_option *options,
     }
 
     char *option;
-    xasprintf (&option, "--%s=%s", key, value);
+    option = xasprintf ("--%s=%s", key, value);
     *cargv = add_to_array (&option, 1, *cargv, cargc, *cargc, sizeof (option));
 
   next:
@@ -1562,57 +1564,57 @@ get_paths (void)
   /* get resources path string */
   ALLEGRO_PATH *resources_path = al_get_standard_path (ALLEGRO_RESOURCES_PATH);
   resources_dir = (char *) al_path_cstr (resources_path, ALLEGRO_NATIVE_PATH_SEP);
-  xasprintf (&resources_dir, "%s", resources_dir);
+  resources_dir = xasprintf ("%s", resources_dir);
   al_destroy_path (resources_path);
 
   /* get temp path string */
   ALLEGRO_PATH *temp_path = al_get_standard_path (ALLEGRO_TEMP_PATH);
   temp_dir = (char *) al_path_cstr (temp_path, ALLEGRO_NATIVE_PATH_SEP);
-  xasprintf (&temp_dir, "%s", temp_dir);
+  temp_dir = xasprintf ("%s", temp_dir);
   al_destroy_path (temp_path);
 
   /* get user home path string */
   ALLEGRO_PATH *user_home_path = al_get_standard_path (ALLEGRO_USER_HOME_PATH);
   user_home_dir = (char *) al_path_cstr (user_home_path, ALLEGRO_NATIVE_PATH_SEP);
-  xasprintf (&user_home_dir, "%s", user_home_dir);
+  user_home_dir = xasprintf ("%s", user_home_dir);
   al_destroy_path (user_home_path);
 
   /* get user documents path string */
   ALLEGRO_PATH *user_documents_path = al_get_standard_path (ALLEGRO_USER_DOCUMENTS_PATH);
   user_documents_dir = (char *) al_path_cstr (user_documents_path, ALLEGRO_NATIVE_PATH_SEP);
-  xasprintf (&user_documents_dir, "%s", user_documents_dir);
+  user_documents_dir = xasprintf ("%s", user_documents_dir);
   al_destroy_path (user_documents_path);
 
   /* get user data path string */
   ALLEGRO_PATH *user_data_path = al_get_standard_path (ALLEGRO_USER_DATA_PATH);
   user_data_dir = (char *) al_path_cstr (user_data_path, ALLEGRO_NATIVE_PATH_SEP);
-  xasprintf (&user_data_dir, "%s", user_data_dir);
+  user_data_dir = xasprintf ("%s", user_data_dir);
   al_destroy_path (user_data_path);
 
   /* get user settings path string */
   ALLEGRO_PATH *user_settings_path = al_get_standard_path (ALLEGRO_USER_SETTINGS_PATH);
   user_settings_dir = (char *) al_path_cstr (user_settings_path, ALLEGRO_NATIVE_PATH_SEP);
-  xasprintf (&user_settings_dir, "%s", user_settings_dir);
+  user_settings_dir = xasprintf ("%s", user_settings_dir);
   al_destroy_path (user_settings_path);
 
   /* get executable file name */
   ALLEGRO_PATH *exename_path = al_get_standard_path (ALLEGRO_EXENAME_PATH);
   exe_filename = (char *) al_path_cstr (exename_path, ALLEGRO_NATIVE_PATH_SEP);
-  xasprintf (&exe_filename, "%s", exe_filename);
+  exe_filename = xasprintf ("%s", exe_filename);
   al_destroy_path (exename_path);
 
   /* get config file name */
-  xasprintf (&config_filename, "%smininim.mcf", user_settings_dir);
+  config_filename = xasprintf ("%smininim.mcf", user_settings_dir);
 
   /* get legacy LEVELS.DAT compatibility path */
-  xasprintf (&levels_dat_compat_filename, "LEVELS.DAT");
+  levels_dat_compat_filename = xasprintf ("LEVELS.DAT");
 
   /* get dialogs initial paths */
-  xasprintf (&load_config_dialog.initial_path, "%s", user_settings_dir);
-  xasprintf (&save_game_dialog.initial_path, "%s.msv", user_settings_dir);
-  xasprintf (&save_picture_dialog.initial_path, "%s.png", user_documents_dir);
-  xasprintf (&save_replay_dialog.initial_path, "%s.mrp", user_data_dir);
-  xasprintf (&load_replay_dialog.initial_path, "%s", user_data_dir);
+  load_config_dialog.initial_path = xasprintf ("%s", user_settings_dir);
+  save_game_dialog.initial_path = xasprintf ("%s.msv", user_settings_dir);
+  save_picture_dialog.initial_path = xasprintf ("%s.png", user_documents_dir);
+  save_replay_dialog.initial_path = xasprintf ("%s.mrp", user_data_dir);
+  load_replay_dialog.initial_path = xasprintf ("%s", user_data_dir);
 }
 
 void
@@ -1734,12 +1736,12 @@ save_game (char *filename, int priority)
   char *start_level_str, *start_time_str, *time_limit_str,
     *total_lives_str, *kca_str, *kcd_str;
 
-  xasprintf (&start_level_str, "%i", global_level.n);
-  xasprintf (&start_time_str, "%ju", start_level_time);
-  xasprintf (&time_limit_str, "%ju", time_limit);
-  xasprintf (&total_lives_str, "%i", total_lives);
-  xasprintf (&kca_str, "%i", skill.counter_attack_prob + 1);
-  xasprintf (&kcd_str, "%i", skill.counter_defense_prob + 1);
+  start_level_str = xasprintf ("%i", global_level.n);
+  start_time_str = xasprintf ("%ju", start_level_time);
+  time_limit_str = xasprintf ("%ju", time_limit);
+  total_lives_str = xasprintf ("%i", total_lives);
+  kca_str = xasprintf ("%i", skill.counter_attack_prob + 1);
+  kcd_str = xasprintf ("%i", skill.counter_defense_prob + 1);
 
   al_set_config_value (config, NULL, "FILE TYPE", "MININIM GAME SAVE");
   al_set_config_value (config, NULL, "START LEVEL", start_level_str);
@@ -1811,7 +1813,7 @@ handle_load_config_thread (int priority)
     }
 
     al_free (load_config_dialog.initial_path);
-    xasprintf (&load_config_dialog.initial_path, "%s",
+    load_config_dialog.initial_path = xasprintf ("%s",
                al_get_native_file_dialog_path (dialog, n - 1));
 
     ui_msg (priority, "%s", error_str);
@@ -1843,7 +1845,7 @@ handle_save_game_thread (int priority)
   if (filename) {
     save_game (filename, priority);
     al_free (save_game_dialog.initial_path);
-    xasprintf (&save_game_dialog.initial_path, "%s", filename);
+    save_game_dialog.initial_path = xasprintf ("%s", filename);
   }
   al_destroy_native_file_dialog (dialog);
   pause_animation (false);
@@ -1870,7 +1872,7 @@ handle_save_picture_thread (int priority)
       : "PICTURE SAVING FAILED";
     ui_msg (priority, "%s", error_str);
     al_free (save_picture_dialog.initial_path);
-    xasprintf (&save_picture_dialog.initial_path, "%s", filename);
+    save_picture_dialog.initial_path = xasprintf ("%s", filename);
   }
   al_destroy_native_file_dialog (dialog);
   pause_animation (false);
@@ -1953,7 +1955,7 @@ bool
 save_level (struct level *l)
 {
   char *f, *d;
-  xasprintf (&d, "%sdata/levels/", user_data_dir);
+  d = xasprintf ("%sdata/levels/", user_data_dir);
   if (! al_make_directory (d)) {
     error (0, al_get_errno (),
            "%s (%s): failed to create native level directory",
@@ -1961,7 +1963,7 @@ save_level (struct level *l)
     al_free (d);
     return false;
   }
-  xasprintf (&f, "%s%02d.mim", d, l->n);
+  f = xasprintf ("%s%02d.mim", d, l->n);
   if (! save_native_level (l, f)) {
     error (0, al_get_errno (),
            "%s (%s): failed to save native level file",

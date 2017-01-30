@@ -43,7 +43,7 @@ register_undo (struct undo *u, void *data, undo_f f, char *desc)
 
   u->pass[u->current].data = data;
   u->pass[u->current].f = f;
-  if (desc) xasprintf (&u->pass[u->current].desc, "%s", desc);
+  if (desc) u->pass[u->current].desc = xasprintf ("%s", desc);
   else u->pass[u->current].desc = NULL;
 
   if (editor_register && desc) editor_msg (desc, editor_register);
@@ -100,7 +100,7 @@ void
 end_undo_set (struct undo *u, char *desc)
 {
   if (desc) {
-    xasprintf (&u->pass[u->current].desc, "%s", desc);
+    u->pass[u->current].desc = xasprintf ("%s", desc);
     if (editor_register) editor_msg (desc, editor_register);
   } else u->pass[u->current].desc = NULL;
 }

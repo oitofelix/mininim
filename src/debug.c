@@ -33,7 +33,7 @@ save_guard_bitmap (enum anim_type type, int style, enum vm vm)
   default: prefix = "invalid"; break;
 
   }
-  xasprintf (&filename, "%s-%i.png", prefix, style);
+  filename = xasprintf ("%s-%i.png", prefix, style);
   ALLEGRO_BITMAP *b = get_guard_normal_bitmap (type);
   b = apply_guard_palette (b, type, style, vm);
   save_bitmap (filename, b);

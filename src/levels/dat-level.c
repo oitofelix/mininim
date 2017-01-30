@@ -31,7 +31,7 @@ struct level *
 load_dat_level (struct level *l, int n)
 {
   char *filename;
-  xasprintf (&filename, "%s", levels_dat_filename);
+  filename = xasprintf ("%s", levels_dat_filename);
 
   int8_t *dat =
     load_resource (filename, (load_resource_f) load_file);

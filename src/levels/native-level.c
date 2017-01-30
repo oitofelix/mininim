@@ -31,7 +31,7 @@ struct level *
 load_native_level (struct level *l, int n)
 {
   char *filename;
-  xasprintf (&filename, "data/levels/%02d.mim", n);
+  filename = xasprintf ("data/levels/%02d.mim", n);
 
   ALLEGRO_CONFIG *c =
     load_resource (filename, (load_resource_f) al_load_config_file);
@@ -94,7 +94,7 @@ load_native_level (struct level *l, int n)
 
     /* GUARD TYPE AND STYLE */
     /* GiT=t s */
-    xasprintf (&k, "G%iT", i);
+    k = xasprintf ("G%iT", i);
     v = al_get_config_value (c, NULL, k);
     al_free (k);
     if (! v) break;
@@ -103,7 +103,7 @@ load_native_level (struct level *l, int n)
 
     /* GUARD START POSITION AND DIRECTION */
     /* GiP=r f p d */
-    xasprintf (&k, "G%iP", i);
+    k = xasprintf ("G%iP", i);
     v = al_get_config_value (c, NULL, k);
     al_free (k);
     if (! v) break;
@@ -114,7 +114,7 @@ load_native_level (struct level *l, int n)
 
     /* GUARD SKILLS AND TOTAL LIVES */
     /* GiK=a b d e a r f x l */
-    xasprintf (&k, "G%iK", i);
+    k = xasprintf ("G%iK", i);
     v = al_get_config_value (c, NULL, k);
     al_free (k);
     if (! v) break;
@@ -130,7 +130,7 @@ load_native_level (struct level *l, int n)
   for (i = 1;; i++) {
     /* Li=l r a b */
     struct room_linking *r = llink (l, i);
-    xasprintf (&k, "L%i", i);
+    k = xasprintf ("L%i", i);
     v = al_get_config_value (c, NULL, k);
     al_free (k);
     if (! v) break;
@@ -141,7 +141,7 @@ load_native_level (struct level *l, int n)
   for (i = 0;; i++) {
     /* Ei=r f p n*/
     struct level_event *e = event (l, i);
-    xasprintf (&k, "E%i", i);
+    k = xasprintf ("E%i", i);
     v = al_get_config_value (c, NULL, k);
     al_free (k);
     if (! v) break;
@@ -155,7 +155,7 @@ load_native_level (struct level *l, int n)
     for (p.floor = 0; p.floor < FLOORS; p.floor++)
       for (p.place = 0; p.place < PLACES; p.place++) {
         /* Cr f p=f b e ff */
-        xasprintf (&k, "C%i %i %i", p.room, p.floor, p.place);
+        k = xasprintf ("C%i %i %i", p.room, p.floor, p.place);
         v = al_get_config_value (c, NULL, k);
         al_free (k);
         if (! v) goto end_con_loop;
@@ -182,27 +182,27 @@ save_native_level (struct level *l, char *filename)
 
   /* ENGINE VERSION */
   /* V=n */
-  xasprintf (&v, "%s", VERSION);
+  v = xasprintf ("%s", VERSION);
   al_set_config_value (c, NULL, "V", v);
   al_free (v);
 
   /* NOMINAL NUMBER */
   /* N=n */
-  xasprintf (&v, "%i", l->nominal_n);
+  v = xasprintf ("%i", l->nominal_n);
   al_set_config_value (c, NULL, "N", v);
   al_free (v);
 
   /* START POSITION AND DIRECTION*/
   /* P=r f p d s */
   struct pos *sp = &l->start_pos;
-  xasprintf (&v, "%i %i %i %i %i", sp->room, sp->floor, sp->place,
+  v = xasprintf ("%i %i %i %i %i", sp->room, sp->floor, sp->place,
              l->start_dir, l->has_sword);
   al_set_config_value (c, NULL, "P", v);
   al_free (v);
 
   /* ENVIRONMENT AND HUE */
   /* S=e h */
-  xasprintf (&v, "%i %i", l->em, l->hue);
+  v = xasprintf ("%i %i", l->em, l->hue);
   al_set_config_value (c, NULL, "S", v);
   al_free (v);
 
@@ -212,24 +212,24 @@ save_native_level (struct level *l, char *filename)
 
     /* GUARD TYPE AND STYLE */
     /* GiT=t s */
-    xasprintf (&k, "G%iT", i);
-    xasprintf (&v, "%i %i", g->type, g->style);
+    k = xasprintf ("G%iT", i);
+    v = xasprintf ("%i %i", g->type, g->style);
     al_set_config_value (c, NULL, k, v);
     al_free (k);
     al_free (v);
 
     /* GUARD START POSITION AND DIRECTION */
     /* GiP=r f p d */
-    xasprintf (&k, "G%iP", i);
-    xasprintf (&v, "%i %i %i %i", g->p.room, g->p.floor, g->p.place, g->dir);
+    k = xasprintf ("G%iP", i);
+    v = xasprintf ("%i %i %i %i", g->p.room, g->p.floor, g->p.place, g->dir);
     al_set_config_value (c, NULL, k, v);
     al_free (k);
     al_free (v);
 
     /* GUARD SKILLS AND TOTAL LIVES */
     /* GiK=a b d e a r f x l */
-    xasprintf (&k, "G%iK", i);
-    xasprintf (&v, "%i %i %i %i %i %i %i %i %i",
+    k = xasprintf ("G%iK", i);
+    v = xasprintf ("%i %i %i %i %i %i %i %i %i",
                g->skill.attack_prob, g->skill.counter_attack_prob,
                g->skill.defense_prob, g->skill.counter_defense_prob,
                g->skill.advance_prob, g->skill.return_prob,
@@ -244,8 +244,8 @@ save_native_level (struct level *l, char *filename)
   for (i = 1; i < ROOMS; i++) {
     /* Li=l r a b */
     struct room_linking *r = llink (l, i);
-    xasprintf (&k, "L%i", i);
-    xasprintf (&v, "%i %i %i %i", r->l, r->r, r->a, r->b);
+    k = xasprintf ("L%i", i);
+    v = xasprintf ("%i %i %i %i", r->l, r->r, r->a, r->b);
     al_set_config_value (c, NULL, k, v);
     al_free (k);
     al_free (v);
@@ -255,8 +255,8 @@ save_native_level (struct level *l, char *filename)
   for (i = 0; i < EVENTS; i++) {
     /* Ei=r f p n */
     struct level_event *e = event (l, i);
-    xasprintf (&k, "E%i", i);
-    xasprintf (&v, "%i %i %i %i", e->p.room, e->p.floor, e->p.place, e->next);
+    k = xasprintf ("E%i", i);
+    v = xasprintf ("%i %i %i %i", e->p.room, e->p.floor, e->p.place, e->next);
     al_set_config_value (c, NULL, k, v);
     al_free (k);
     al_free (v);
@@ -268,8 +268,8 @@ save_native_level (struct level *l, char *filename)
     for (p.floor = 0; p.floor < FLOORS; p.floor++)
       for (p.place = 0; p.place < PLACES; p.place++) {
         /* Cr f p=f b e ff */
-        xasprintf (&k, "C%i %i %i", p.room, p.floor, p.place);
-        xasprintf (&v, "%i %i %i %i", fg (&p), bg (&p),
+        k = xasprintf ("C%i %i %i", p.room, p.floor, p.place);
+        v = xasprintf ("%i %i %i %i", fg (&p), bg (&p),
                    ext (&p), con (&p)->fake);
         al_set_config_value (c, NULL, k, v);
         al_free (k);
@@ -340,27 +340,27 @@ get_conext_str (struct pos *p)
   switch (fg (p)) {
   case FLOOR:
     switch (e) {
-    case NO_ITEM: xasprintf (&s, "NO_ITEM"); break;
-    case EMPTY_POTION: xasprintf (&s, "EMPTY_POTION"); break;
-    case SMALL_LIFE_POTION: xasprintf (&s, "SMALL_LIFE_POTION"); break;
-    case BIG_LIFE_POTION: xasprintf (&s, "BIG_LIFE_POTION"); break;
-    case SMALL_POISON_POTION: xasprintf (&s, "SMALL_POISON_POTION"); break;
-    case BIG_POISON_POTION: xasprintf (&s, "BIG_POISON_POTION"); break;
-    case FLOAT_POTION: xasprintf (&s, "FLOAT_POTION"); break;
-    case FLIP_POTION: xasprintf (&s, "FLIP_POTION"); break;
-    case ACTIVATION_POTION: xasprintf (&s, "ACTIVATION_POTION"); break;
-    case SWORD: xasprintf (&s, "SWORD"); break;
+    case NO_ITEM: s = xasprintf ("NO_ITEM"); break;
+    case EMPTY_POTION: s = xasprintf ("EMPTY_POTION"); break;
+    case SMALL_LIFE_POTION: s = xasprintf ("SMALL_LIFE_POTION"); break;
+    case BIG_LIFE_POTION: s = xasprintf ("BIG_LIFE_POTION"); break;
+    case SMALL_POISON_POTION: s = xasprintf ("SMALL_POISON_POTION"); break;
+    case BIG_POISON_POTION: s = xasprintf ("BIG_POISON_POTION"); break;
+    case FLOAT_POTION: s = xasprintf ("FLOAT_POTION"); break;
+    case FLIP_POTION: s = xasprintf ("FLIP_POTION"); break;
+    case ACTIVATION_POTION: s = xasprintf ("ACTIVATION_POTION"); break;
+    case SWORD: s = xasprintf ("SWORD"); break;
     default: assert (false); break;
     }
     break;
   case LOOSE_FLOOR:
-    xasprintf (&s, "%s", e ? "CANT_FALL" : "FALL");
+    s = xasprintf ("%s", e ? "CANT_FALL" : "FALL");
     break;
   case SPIKES_FLOOR: case DOOR: case LEVEL_DOOR: case CHOPPER:
-    xasprintf (&s, "%i", e);
+    s = xasprintf ("%i", e);
     break;
   case OPENER_FLOOR: case CLOSER_FLOOR:
-    xasprintf (&s, "%i", e);
+    s = xasprintf ("%i", e);
     break;
   case CARPET:
     switch (e) {
@@ -372,7 +372,7 @@ get_conext_str (struct pos *p)
     case ARCH_CARPET_LEFT_01: s = "ARCH_CARPET_LEFT_01"; break;
     default: assert (false); break;
     }
-    if (s) xasprintf (&s, "%s", s);
+    if (s) s = xasprintf ("%s", s);
     break;
   case TCARPET:
     switch (e) {
@@ -384,7 +384,7 @@ get_conext_str (struct pos *p)
     case ARCH_CARPET_LEFT_01: s = "ARCH_CARPET_LEFT_01"; break;
     default: assert (false); break;
     }
-    if (s) xasprintf (&s, "%s", s);
+    if (s) s = xasprintf ("%s", s);
     break;
   default: break;
   }

@@ -80,7 +80,7 @@ load_audio (struct audio_source *as, enum audio_type audio_type,
     }
     break;
   case AUDIO_STREAM:
-    xasprintf (&as->data.stream, "%s", filename);
+    as->data.stream = xasprintf ("%s", filename);
     break;
   default: assert (false); break;
   }

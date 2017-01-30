@@ -686,7 +686,7 @@ static struct legacy_level *
 load_legacy_level_file (int n)
 {
   char *filename;
-  xasprintf (&filename, "data/legacy-levels/%02d", n);
+  filename = xasprintf ("data/legacy-levels/%02d", n);
 
   ALLEGRO_FILE *lvf =
     load_resource (filename, (load_resource_f) xfopen_r);

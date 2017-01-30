@@ -45,6 +45,9 @@
 #include "getpass.h"
 #include "nonblocking.h"
 #include "progname.h"
+#include "vasnprintf.h"
+#include "xprintf.h"
+#include "xvasprintf.h"
 
 #define ALLEGRO_UNSTABLE
 
@@ -71,7 +74,6 @@
 #include "memory.h"
 #include "random.h"
 #include "video.h"
-#include "xstdio.h"
 #include "file.h"
 #include "dialog.h"
 #include "xconfig.h"

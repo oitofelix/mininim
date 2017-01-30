@@ -278,7 +278,7 @@ load_replay (struct replay *replay_ret, char *filename)
   }
 
   /* filename */
-  xasprintf (&replay.filename, "%s", filename);
+  replay.filename = xasprintf ("%s", filename);
 
   *replay_ret = replay;
 
@@ -412,7 +412,7 @@ handle_save_replay_thread (int priority)
       : "REPLAY SAVING FAILED";
     ui_msg (priority, "%s", error_str);
     al_free (save_replay_dialog.initial_path);
-    xasprintf (&save_replay_dialog.initial_path, "%s", filename);
+    save_replay_dialog.initial_path = xasprintf ("%s", filename);
   } else ui_msg (priority, "RECORDING STOPPED");
   al_destroy_native_file_dialog (dialog);
   free_replay (replay);
@@ -462,8 +462,8 @@ handle_load_replay_thread (int priority)
     ui_msg (priority, "%s", error_str);
 
     al_free (load_replay_dialog.initial_path);
-    xasprintf (&load_replay_dialog.initial_path, "%s",
-               al_get_native_file_dialog_path (dialog, n - 1));
+    load_replay_dialog.initial_path =
+      xasprintf ("%s", al_get_native_file_dialog_path (dialog, n - 1));
 
     if (success) {
       size_t i;

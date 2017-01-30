@@ -721,7 +721,9 @@ load_menu (void)
 void
 save_menu (void)
 {
-  menu_sitem (SAVE_GAME_MID, true, game_icon, "&Game... (Ctrl+G)");
+  menu_sitem (SAVE_GAME_MID,
+              ! cutscene && ! title_demo && replay_mode == NO_REPLAY,
+              game_icon, "&Game... (Ctrl+G)");
 
   menu_sitem (SAVE_CONFIG_MID, false, settings_icon,
               "&Configuration...");
@@ -2209,7 +2211,7 @@ ui_audio_volume (float volume)
 {
   char *key = "SOUND GAIN";
   char *value;
-  xasprintf (&value, "%.1f", volume);
+  value = xasprintf ("%.1f", volume);
 
   set_audio_volume (volume);
 
@@ -2331,7 +2333,7 @@ ui_set_multi_room (int dw, int dh, bool correct_mouse)
 
   ui_msg (0, "MULTI-ROOM %ix%i", mr.w, mr.h);
 
-  xasprintf (&value, "%ix%i", mr.w, mr.h);
+  value = xasprintf ("%ix%i", mr.w, mr.h);
   ui_save_setting (key, value);
   al_free (value);
 
@@ -2795,16 +2797,16 @@ ui_undo_pass (struct undo *u, int dir, char *prefix)
   if (undo_msg) al_free (undo_msg);
 
   if (! b) {
-    if (prefix) xasprintf (&undo_msg, "NO FURTHER %s %s", prefix, dir_str);
-    else xasprintf (&undo_msg, "NO FURTHER %s", dir_str);
+    if (prefix) undo_msg = xasprintf ("NO FURTHER %s %s", prefix, dir_str);
+    else undo_msg = xasprintf ("NO FURTHER %s", dir_str);
     editor_msg (undo_msg, EDITOR_CYCLES_3);
     return;
   }
 
   undo_pass (u, dir, &text);
 
-  if (prefix) xasprintf (&undo_msg, "%s %s: %s", prefix, dir_str, text);
-  else xasprintf (&undo_msg, "%s: %s", dir_str, text);
+  if (prefix) undo_msg = xasprintf ("%s %s: %s", prefix, dir_str, text);
+  else undo_msg = xasprintf ("%s: %s", dir_str, text);
   editor_msg (undo_msg, EDITOR_CYCLES_3);
 }
 
@@ -2958,7 +2960,7 @@ ui_next_display_mode (void)
           goto next_display_mode;
         al_resize_display (display, d.width, d.height);
         ui_msg (0, "%s: %ix%i", key, d.width, d.height);
-        xasprintf (&value, "%i", display_mode);
+        value = xasprintf ("%i", display_mode);
         ui_save_setting (key, value);
         al_free (value);
       } else ui_msg (0, "DISPLAY MODES QUERYING FAILED");
