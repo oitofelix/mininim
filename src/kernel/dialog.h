@@ -23,15 +23,9 @@
 
 void init_dialog (void);
 void finalize_dialog (void);
-ALLEGRO_FILECHOOSER *
-create_native_file_dialog (char const *initial_path,
-                           char const *title,
-                           char const *patterns,
-                           int mode);
-void show_native_file_dialog (ALLEGRO_DISPLAY *display,
-                              ALLEGRO_FILECHOOSER *dialog);
-ALLEGRO_TEXTLOG *open_native_text_log (char const *title, int flags);
-ALLEGRO_EVENT_SOURCE *get_native_text_log_event_source (ALLEGRO_TEXTLOG *textlog);
+void print_text_log (char const *template, ...)
+  __attribute__ ((format (printf, 1, 2)));
+void close_text_log (ALLEGRO_EVENT *event);
 bool file_overwrite_dialog (char *filename);
 
 #endif	/* MININIM_DIALOG_H */

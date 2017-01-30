@@ -75,12 +75,12 @@ init_gamepad (void)
   if (! al_install_keyboard ())
     error (0, 0, "%s (void): cannot install keyboard", __func__);
 
-  al_register_event_source (event_queue, get_keyboard_event_source ());
+  al_register_event_source (event_queue, al_get_keyboard_event_source ());
 
   if (! al_install_joystick ())
     error (0, 0, "%s (void): cannot install joystick", __func__);
 
-  al_register_event_source (event_queue, get_joystick_event_source ());
+  al_register_event_source (event_queue, al_get_joystick_event_source ());
 
 #if HAPTIC_FEATURE
   if (! al_install_haptic ())
@@ -205,24 +205,6 @@ free_joystick (void)
     joystick_haptic = NULL;
   }
 #endif
-}
-
-ALLEGRO_EVENT_SOURCE *
-get_keyboard_event_source (void)
-{
-  ALLEGRO_EVENT_SOURCE *event_source = al_get_keyboard_event_source ();
-  if (! event_source)
-    error (0, 0, "%s: failed to get keyboard event source", __func__);
-  return event_source;
-}
-
-ALLEGRO_EVENT_SOURCE *
-get_joystick_event_source (void)
-{
-  ALLEGRO_EVENT_SOURCE *event_source = al_get_joystick_event_source ();
-  if (! event_source)
-    error (0, 0, "%s: failed to get joystick event source", __func__);
-  return event_source;
 }
 
 struct gamepad_state *

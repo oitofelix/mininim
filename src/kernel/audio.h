@@ -25,8 +25,6 @@
 void init_audio (void);
 void finalize_audio (void);
 void set_audio_volume (float volume);
-void set_mixer_gain (ALLEGRO_MIXER *mixer, float new_gain);
-ALLEGRO_MIXER *get_default_mixer (void);
 struct audio_source *load_audio (struct audio_source *as,
                                  enum audio_type, char *filename);
 union audio_instance_data play_audio (struct audio_source *as,

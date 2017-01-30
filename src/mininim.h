@@ -35,6 +35,8 @@
 #include <time.h>
 #include <glob.h>
 #include <locale.h>
+#include <errno.h>
+#include <unistd.h>
 #include "error.h"
 #include "argp.h"
 #include "progname.h"
@@ -63,12 +65,10 @@
 #include "pointer.h"
 #include "memory.h"
 #include "random.h"
-#include "timer.h"
 #include "video.h"
 #include "xstdio.h"
 #include "file.h"
 #include "dialog.h"
-#include "threads.h"
 #include "xconfig.h"
 #include "diff.h"
 
@@ -173,22 +173,15 @@
 #include "box.h"
 #include "replay.h"
 #include "ui.h"
-
+#include "xmath.h"
 
 /* functions */
+void free_argv (size_t *cargc, char ***cargv);
 void *dialog_thread (ALLEGRO_THREAD *thread, void *arg);
 void *message_box_thread (ALLEGRO_THREAD *thread, void *arg);
-bool load_config (char *filename, ALLEGRO_TEXTLOG *textlog, int priority);
+bool load_config (char *filename, enum file_type *ret_file_type,
+                  int priority);
 bool save_game (char *filename, int priority);
-int max_int (int a, int b);
-int min_int (int a, int b);
-double max_double (double a, double b);
-double min_double (double a, double b);
-int cint (int *x, int *y);
-unsigned char add_char (unsigned char a, signed char b);
-int int_to_range (int i, int min, int max);
-float dist_cart (float x0, float y0, float x1, float y1);
-bool equiv (bool a, bool b);
 void quit_game (void);
 struct level *level_module_next_level (struct level *l, int n);
 char *level_module_str (enum level_module m);
@@ -199,7 +192,6 @@ void handle_load_config_thread (int priority);
 void handle_save_game_thread (int priority);
 void handle_save_picture_thread (int priority);
 void handle_message_box_thread (void);
-int bool2bitmap_flags (bool v, bool h);
 
 /* variables */
 extern enum level_module level_module;

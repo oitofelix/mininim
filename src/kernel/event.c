@@ -20,26 +20,10 @@
 
 #include "mininim.h"
 
-ALLEGRO_EVENT_QUEUE *
-create_event_queue (void)
-{
-  ALLEGRO_EVENT_QUEUE *queue = al_create_event_queue ();
-  if (! queue) error (0, 0, "%s: failed to create queue", __func__);
-  return queue;
-}
-
 void
 drop_all_events_from_source  (ALLEGRO_EVENT_QUEUE *queue,
                               ALLEGRO_EVENT_SOURCE *src)
 {
   al_unregister_event_source (queue, src);
   al_register_event_source (queue, src);
-}
-
-void
-emit_user_event (ALLEGRO_EVENT_SOURCE *src, ALLEGRO_EVENT *event)
-{
-  if (! al_emit_user_event (src, event, NULL))
-    error (0, 0, "%s (%p, %p): event source not registered with any queue",
-            __func__, src, event);
 }

@@ -27,14 +27,10 @@ extern struct pos mouse_pos;
 /* functions */
 void init_mouse (void);
 void finalize_mouse (void);
-ALLEGRO_EVENT_SOURCE *get_mouse_event_source (void);
 struct mouse_coord *get_mouse_coord (struct mouse_coord *m);
 struct pos *get_mouse_pos (struct pos *p);
 void set_mouse_coord (struct mouse_coord *m);
 void set_mouse_pos (struct pos *p);
 void set_mouse_room (int room);
-void set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR id);
-void show_mouse_cursor (void);
-void hide_mouse_cursor (void);
 
 #endif	/* MININIM_POINTER_H */

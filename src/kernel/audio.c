@@ -38,9 +38,7 @@ init_audio (void)
     error (0, 0, "%s (void): cannot initialize audio", __func__);
   if (! al_init_acodec_addon ())
     error (0, 0, "%s (void): cannot initialize audio codecs", __func__);
-  if (! al_reserve_samples (RESERVED_AUDIO_SAMPLES))
-    error (0, 0, "%s (void): cannot reserve audio samples", __func__);
-
+  al_reserve_samples (RESERVED_AUDIO_SAMPLES);
   set_audio_volume (audio_volume);
 }
 
@@ -53,30 +51,15 @@ finalize_audio (void)
 void
 set_audio_volume (float volume)
 {
-  ALLEGRO_MIXER *mixer = get_default_mixer ();
-  set_mixer_gain (mixer, volume);
-  audio_volume = volume;
-}
-
-void
-set_mixer_gain (ALLEGRO_MIXER *mixer, float new_gain)
-{
-  if (! al_set_mixer_gain (mixer, new_gain))
-    error (0, 0, "%s (%p, %f): cannot set mixer gain", __func__, mixer, new_gain);
-}
-
-ALLEGRO_MIXER *
-get_default_mixer (void)
-{
   ALLEGRO_MIXER *mixer = al_get_default_mixer ();
-  if (! mixer) error (0, 0, "%s (void): default mixer not set", __func__);
-  return mixer;
+  al_set_mixer_gain (mixer, volume);
+  audio_volume = volume;
 }
 
 static ALLEGRO_AUDIO_STREAM *
 load_audio_stream (char *filename)
 {
-  ALLEGRO_MIXER *mixer = get_default_mixer ();
+  ALLEGRO_MIXER *mixer = al_get_default_mixer ();
   unsigned int freq = al_get_mixer_frequency(mixer);
   return al_load_audio_stream (filename, 2, (float) freq
                                / (float) DEFAULT_HZ);
@@ -135,11 +118,8 @@ play_audio (struct audio_source *as, struct pos *p, int anim_id)
   case AUDIO_SAMPLE:
     ai.position.sample = 0;
     ai.data.sample = al_create_sample_instance (as->data.sample);
-    if (! ai.data.sample) {
-      error (0, 0, "%s (%p): cannot create sample instance",
-             __func__, as->data.sample);
+    if (! ai.data.sample)
       return (union audio_instance_data) {.sample = NULL};
-    }
     break;
   case AUDIO_STREAM:
     ai.position.stream = 0;
@@ -227,7 +207,7 @@ play_audio_instances (void)
     }
 
     if (! ai->played) {
-      ALLEGRO_MIXER *mixer = get_default_mixer ();
+      ALLEGRO_MIXER *mixer = al_get_default_mixer ();
 
       ai->played = true;
       /* ai->volume = get_adjusted_sample_volume (ai); */
@@ -235,19 +215,12 @@ play_audio_instances (void)
       switch (ai->source->type) {
       case AUDIO_SAMPLE:
         al_set_sample_instance_gain (ai->data.sample, ai->volume);
-        if (! al_attach_sample_instance_to_mixer
-            (ai->data.sample, mixer))
-          error (0, 0, "%s: cannot attach sample instance to mixer (%p, %p)",
-                 __func__, ai->source->data.sample, ai->data.sample);
-        if (! al_play_sample_instance (ai->data.sample))
-          error (0, 0, "%s: cannot play sample instance (%p, %p)",
-                 __func__, ai->source->data.sample, ai->data.sample);
+        al_attach_sample_instance_to_mixer (ai->data.sample, mixer);
+        al_play_sample_instance (ai->data.sample);
         break;
       case AUDIO_STREAM:
         al_set_audio_stream_gain (ai->data.stream, ai->volume);
-        if (! al_attach_audio_stream_to_mixer (ai->data.stream, mixer))
-          error (0, 0, "%s: cannot attach audio stream to mixer (%p, %p)",
-                 __func__, ai->source->data.stream, ai->data.stream);
+        al_attach_audio_stream_to_mixer (ai->data.stream, mixer);
         break;
       }
     }

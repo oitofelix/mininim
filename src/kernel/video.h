@@ -24,7 +24,6 @@
 /* functions */
 void init_video (void);
 void finalize_video (void);
-ALLEGRO_EVENT_SOURCE *get_display_event_source (ALLEGRO_DISPLAY *display);
 void destroy_bitmap (ALLEGRO_BITMAP *bitmap);
 int memory_bitmap_flags (void);
 int video_bitmap_flags (void);
@@ -56,7 +55,6 @@ void draw_rectangle (ALLEGRO_BITMAP *to, float x1, float y1,
                      float thickness);
 void draw_text (ALLEGRO_BITMAP *bitmap, char const *text, float x, float y, int flags);
 bool draw_bottom_text (ALLEGRO_BITMAP *bitmap, char *text, int priority);
-void acknowledge_resize (void);
 void draw_fade (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to, float factor);
 void draw_roll_right (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
                       int total, int current);
@@ -71,7 +69,7 @@ void show (void);
 void flip_display (ALLEGRO_BITMAP *bitmap);
 bool is_fullscreen (void);
 void process_display_events (void);
-void get_display_mode (int index, ALLEGRO_DISPLAY_MODE *mode);
+int bool2bitmap_flags (bool v, bool h);
 
 /* special screens */
 void draw_logo (ALLEGRO_BITMAP *bitmap, char *text0, char *text1,

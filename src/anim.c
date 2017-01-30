@@ -42,12 +42,13 @@ play_anim (void (*draw_callback) (void),
   anim_cycle = 0;
   quit_anim = NO_QUIT;
 
-  acknowledge_resize ();
+  al_acknowledge_resize (display);
 
   ALLEGRO_EVENT event;
   anim_freq_real = anim_freq > 0 ? anim_freq : UNLIMITED_HZ;
-  timer = create_timer (anim_freq > 0 ? 1.0 / anim_freq : 1.0 / UNLIMITED_HZ);
-  al_register_event_source (event_queue, get_timer_event_source (timer));
+  timer = al_create_timer
+    (anim_freq > 0 ? 1.0 / anim_freq : 1.0 / UNLIMITED_HZ);
+  al_register_event_source (event_queue, al_get_timer_event_source (timer));
   al_flush_event_queue (event_queue);
   al_start_timer (timer);
 
@@ -100,19 +101,19 @@ play_anim (void (*draw_callback) (void),
         handle_message_box_thread ();
 
         /* load configuration */
-        handle_load_config_thread (0);
+        handle_load_config_thread (2);
 
         /* save game */
-        handle_save_game_thread (0);
+        handle_save_game_thread (2);
 
         /* save picture */
-        handle_save_picture_thread (0);
+        handle_save_picture_thread (2);
 
         /* save replay */
-        handle_save_replay_thread (0);
+        handle_save_replay_thread (2);
 
         /* load replay */
-        handle_load_replay_thread (0);
+        handle_load_replay_thread (2);
 
         kid_debug ();
 
@@ -152,7 +153,7 @@ play_anim (void (*draw_callback) (void),
           draw_bottom_text (uscreen, NULL, 0);
         }
         drop_all_events_from_source
-          (event_queue, get_timer_event_source (timer));
+          (event_queue, al_get_timer_event_source (timer));
         al_set_timer_count (timer, 0);
 
       /* fprintf (stderr, "KEY DOWN: %i, %s, %c\n", key.modifiers, */
@@ -177,7 +178,7 @@ play_anim (void (*draw_callback) (void),
     case ALLEGRO_EVENT_DISPLAY_RESIZE:
       force_full_redraw = true;
       show ();
-      acknowledge_resize ();
+      al_acknowledge_resize (display);
       break;
     case ALLEGRO_EVENT_DISPLAY_EXPOSE:
       show ();
@@ -191,7 +192,7 @@ play_anim (void (*draw_callback) (void),
       quit_anim = QUIT_GAME;
       break;
     case ALLEGRO_EVENT_NATIVE_DIALOG_CLOSE:
-      al_close_native_text_log ((ALLEGRO_TEXTLOG *) event.user.data1);
+      close_text_log (&event);
       break;
     case ALLEGRO_EVENT_JOYSTICK_CONFIGURATION:
       calibrate_joystick ();
@@ -335,7 +336,7 @@ cutscene_mode (bool val)
 {
   cutscene = val;
   game_menu ();
-  replay_menu ();
+  play_menu ();
   editor_menu ();
 }
 

@@ -22,9 +22,7 @@
 #define MININIM_EVENT_H
 
 /* Functions */
-ALLEGRO_EVENT_QUEUE *create_event_queue (void);
 void drop_all_events_from_source  (ALLEGRO_EVENT_QUEUE *queue,
                                    ALLEGRO_EVENT_SOURCE *src);
-void emit_user_event (ALLEGRO_EVENT_SOURCE *src, ALLEGRO_EVENT *event);
 
 #endif	/* MININIM_EVENT_H */

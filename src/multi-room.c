@@ -577,7 +577,8 @@ mr_update_last_settings (void)
   mr.full_update = false;
   if (mr.busy && ! is_dedicatedly_replaying ()) {
     mr.busy = false;
-    set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
+    al_set_system_mouse_cursor
+      (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
   }
 }
 
@@ -763,7 +764,7 @@ mr_busy (void)
 {
   if (mr.busy) return;
   mr.busy = true;
-  set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_BUSY);
+  al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_BUSY);
 }
 
 void

@@ -88,20 +88,19 @@ mininim_SOURCES = src/mininim.c src/mininim.h src/compatibility.h			\
   src/levels/consistency-level.c src/levels/consistency-level.h				\
   src/levels/legacy-level.c src/levels/legacy-level.h									\
   src/levels/dat-level.c src/levels/dat-level.h												\
-  src/levels/plv-level.c src/levels/plv-level.h src/kernel/timer.c		\
-  src/kernel/timer.h src/kernel/event.c src/kernel/event.h						\
-  src/kernel/video.c src/kernel/video.h src/kernel/audio.c						\
-  src/kernel/audio.h src/kernel/memory.c src/kernel/memory.h					\
-  src/kernel/gamepad.c src/kernel/gamepad.h src/kernel/pointer.c			\
-  src/kernel/pointer.h src/kernel/random.c src/kernel/random.h				\
-  src/kernel/array.c src/kernel/array.h src/kernel/xstdio.c						\
-  src/kernel/xstdio.h src/kernel/file.c src/kernel/file.h							\
-  src/kernel/dialog.c src/kernel/dialog.h src/kernel/threads.c				\
-  src/kernel/threads.h src/kernel/xconfig.c src/kernel/xconfig.h			\
-  src/kernel/diff.c src/kernel/diff.h src/menu.c src/menu.h						\
-  src/editor.c src/editor.h src/debug.c src/debug.h src/undo.c				\
-  src/undo.h src/multi-room.c src/multi-room.h src/box.c src/box.h		\
-  src/replay.c src/replay.h
+  src/levels/plv-level.c src/levels/plv-level.h src/kernel/event.c		\
+  src/kernel/event.h src/kernel/video.c src/kernel/video.h						\
+  src/kernel/audio.c src/kernel/audio.h src/kernel/memory.c						\
+  src/kernel/memory.h src/kernel/gamepad.c src/kernel/gamepad.h				\
+  src/kernel/pointer.c src/kernel/pointer.h src/kernel/random.c				\
+  src/kernel/random.h src/kernel/array.c src/kernel/array.h						\
+  src/kernel/xstdio.c src/kernel/xstdio.h src/kernel/file.c						\
+  src/kernel/file.h src/kernel/dialog.c src/kernel/dialog.h						\
+  src/kernel/xconfig.c src/kernel/xconfig.h src/kernel/diff.c					\
+  src/kernel/diff.h src/kernel/xmath.c src/kernel/xmath.h src/menu.c	\
+  src/menu.h src/editor.c src/editor.h src/debug.c src/debug.h				\
+  src/undo.c src/undo.h src/multi-room.c src/multi-room.h src/box.c		\
+  src/box.h src/replay.c src/replay.h
 
 ${mininim_OBJECTS}: ${top_builddir}/src/mininim.h.gch
 

@@ -53,8 +53,6 @@ void register_room (int room);
 void register_cons (void);
 void register_anims (void);
 void level_cleanup (void);
-bool display_remaining_time (int priority);
-void display_skill (struct anim *k);
 void pause_game (bool val);
 bool is_game_paused (void);
 void next_level (void);

@@ -104,6 +104,22 @@
 #define ANGEL_ICON "data/icons/angel.png"
 #define LIFE_EMPTY_ICON "data/icons/life-empty.png"
 #define LIFE_FULL_ICON "data/icons/life-full.png"
+#define SKILLS_ICON "data/icons/skills.png"
+#define TIME_ICON "data/icons/time.png"
+#define TIME_ADD_ICON "data/icons/time-add.png"
+#define TIME_SUB_ICON "data/icons/time-sub.png"
+#define ATTACK_ICON "data/icons/attack.png"
+#define ATTACK_ADD_ICON "data/icons/attack-add.png"
+#define ATTACK_SUB_ICON "data/icons/attack-sub.png"
+#define DEFENSE_ICON "data/icons/defense.png"
+#define DEFENSE_ADD_ICON "data/icons/defense-add.png"
+#define DEFENSE_SUB_ICON "data/icons/defense-sub.png"
+#define COUNTER_ATTACK_ICON "data/icons/counter-attack.png"
+#define COUNTER_ATTACK_ADD_ICON "data/icons/counter-attack-add.png"
+#define COUNTER_ATTACK_SUB_ICON "data/icons/counter-attack-sub.png"
+#define COUNTER_DEFENSE_ICON "data/icons/counter-defense.png"
+#define COUNTER_DEFENSE_ADD_ICON "data/icons/counter-defense-add.png"
+#define COUNTER_DEFENSE_SUB_ICON "data/icons/counter-defense-sub.png"
 
 enum main_menu {
   BASE_MID = 0,
@@ -207,9 +223,11 @@ enum main_menu {
   FLIP_GAMEPAD_VERTICAL_MID,
   FLIP_GAMEPAD_HORIZONTAL_MID,
 
-  REPLAY_MID,
+  PLAY_MID,
   PLAY_REPLAY_MID,
   RECORD_REPLAY_MID,
+  TIME_MID,
+  SKILLS_MID,
   TOGGLE_PAUSE_GAME_MID,
   NEXT_FRAME_MID,
   RESET_TIME_FREQ_MID,
@@ -229,6 +247,8 @@ enum main_menu {
   IMMORTAL_MID,
   FILL_LIFE_MID,
   ADD_LIFE_MID,
+  TIME_ADD_MID,
+  TIME_SUB_MID,
 
   HELP_MID,
   ABOUT_MID,
@@ -276,7 +296,7 @@ void gamepad_device_menu (void);
 ALLEGRO_BITMAP *flip_gamepad_icon (bool v, bool h);
 void flip_gamepad_menu (void);
 
-void replay_menu (void);
+void play_menu (void);
 
 void editor_menu (void);
 
@@ -291,6 +311,7 @@ void toggle_menu_visibility (void);
 void enable_menu (bool enable);
 
 void skip_level_widget (void);
+void statistics_widget (void);
 void pause_menu_widget (void);
 void speed_menu_widget (void);
 
@@ -303,9 +324,6 @@ void ui_editor (void);
 void ui_load_game (void);
 void ui_load_config (void);
 void ui_save_game (void);
-void ui_restart_level (void);
-void ui_previous_level (void);
-void ui_next_level (void);
 void ui_audio_volume (float volume);
 void ui_restart_game (void);
 void ui_start_game (void);
@@ -329,10 +347,12 @@ void ui_gamepad_mode (enum gpm new_gpm);
 void ui_flip_gamepad (bool v, bool h, bool save_only);
 
 void ui_play_replay (void);
-void ui_restart_replay_level (void);
-void ui_previous_replay (void);
-void ui_next_replay (void);
 void ui_record_replay (void);
+void ui_restart_level (void);
+void ui_previous_level (void);
+void ui_next_level (void);
+void ui_time (void);
+void ui_skills (void);
 void ui_decrease_time_frequency (void);
 void ui_increase_time_frequency (void);
 void ui_toggle_time_frequency_constraint (void);
@@ -349,6 +369,7 @@ void ui_float (void);
 void ui_immortal (bool immortal);
 void ui_fill_life (void);
 void ui_add_life (void);
+void ui_change_time (int m);
 
 void ui_version (void);
 void ui_about_screen (bool value);
@@ -356,7 +377,7 @@ void ui_about_screen (bool value);
 void ui_next_display_mode (void);
 
 
-error_t ui_save_setting (char *key, char *value);
+void ui_save_setting (char *key, char *value);
 bool ui_msg (int priority, const char *template, ...)
   __attribute__ ((format (printf, 2, 3)));
 bool ui_msg_clear (int priority);
@@ -366,5 +387,10 @@ bool ui_msg_clear (int priority);
 void ui_mirror_mode (bool mirror);
 bool in_mirror_mode (void);
 void mirror_mode (bool mirror);
+
+
+
+bool display_remaining_time (int priority);
+void display_skill (struct anim *k);
 
 #endif	/* MININIM_UI_H */

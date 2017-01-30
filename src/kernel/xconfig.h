@@ -21,15 +21,9 @@
 #ifndef MININIM_XCONFIG_H
 #define MININIM_XCONFIG_H
 
-ALLEGRO_CONFIG *create_config (void);
-ALLEGRO_CONFIG *load_config_file (const char *filename);
-ALLEGRO_CONFIG *load_config_file_f (ALLEGRO_FILE *file);
-void save_config_file (const char *filename,
-                       const ALLEGRO_CONFIG *config);
-void save_config_file_f (ALLEGRO_FILE *file,
-                         const ALLEGRO_CONFIG *config);
-ALLEGRO_CONFIG *
-merge_config (const ALLEGRO_CONFIG *cfg1,
-              const ALLEGRO_CONFIG *cfg2);
+void config_entry_file_type (const char *key, const char *value,
+                             enum file_type *file_type);
+char * file_type2str (enum file_type file_type);
+void remove_config_entry (ALLEGRO_CONFIG *config, char *section, char *key);
 
 #endif	/* MININIM_XCONFIG_H */

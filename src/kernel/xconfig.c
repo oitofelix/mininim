@@ -20,67 +20,41 @@
 
 #include "mininim.h"
 
-ALLEGRO_CONFIG *
-create_config (void)
+void
+config_entry_file_type (const char *key, const char *value,
+                        enum file_type *file_type)
 {
-  ALLEGRO_CONFIG *config = al_create_config ();
-
-  if (! config)
-    error (0, 0, "%s (void): failed to create configuration",
-           __func__);
-
-  return config;
+  if (strcasecmp (key, "FILE TYPE")) return;
+  else if (! strcasecmp (value, "MININIM CONFIGURATION"))
+    *file_type = CONFIG_FILE_TYPE;
+  else if (! strcasecmp (value, "MININIM GAME SAVE"))
+    *file_type = GAME_SAVE_FILE_TYPE;
+  else if (! strcasecmp (value, "MININIM LEVEL"))
+    *file_type = LEVEL_FILE_TYPE;
+  else *file_type = UNKNOWN_FILE_TYPE;
 }
 
-ALLEGRO_CONFIG *
-load_config_file (const char *filename)
+char *
+file_type2str (enum file_type file_type)
 {
-  ALLEGRO_CONFIG *config = al_load_config_file (filename);
-
-  if (! config)
-    error (0, 0, "%s (%s): failed to load configuration file",
-           __func__, filename);
-
-  return config;
-}
-
-ALLEGRO_CONFIG *
-load_config_file_f (ALLEGRO_FILE *file)
-{
-  ALLEGRO_CONFIG *config = al_load_config_file_f (file);
-
-  if (! config)
-    error (0, 0, "%s (%p): failed to load configuration file",
-           __func__, file);
-
-  return config;
+  switch (file_type) {
+  case UNKNOWN_FILE_TYPE: default: return "unknown type file";
+  case CONFIG_FILE_TYPE: return "configuration file";
+  case GAME_SAVE_FILE_TYPE: return "game save file";
+  case LEVEL_FILE_TYPE: return "level file";
+  }
 }
 
 void
-save_config_file (const char *filename, const ALLEGRO_CONFIG *config)
+remove_config_entry (ALLEGRO_CONFIG *config, char *section, char *key)
 {
-  if (! al_save_config_file (filename, config))
-    error (0, 0, "%s (%s, %p): failed to save configuration file",
-           __func__, filename, config);
-}
+  ALLEGRO_CONFIG_ENTRY *iterator;
+  char const *entry = al_get_first_config_entry (config, section, &iterator);
 
-void
-save_config_file_f (ALLEGRO_FILE *file, const ALLEGRO_CONFIG *config)
-{
-  if (! al_save_config_file_f (file, config))
-    error (0, 0, "%s (%p, %p): failed to save configuration file",
-           __func__, file, config);
-}
-
-ALLEGRO_CONFIG *
-merge_config (const ALLEGRO_CONFIG *cfg1,
-              const ALLEGRO_CONFIG *cfg2)
-{
-  ALLEGRO_CONFIG *config = al_merge_config (cfg1, cfg2);
-
-  if (! config)
-    error (0, 0, "%s (%p, %p): failed to merge configurations",
-           __func__, cfg1, cfg2);
-
-  return config;
+  while (entry) {
+    if (! strcasecmp (entry, key)) {
+      al_remove_config_key (config, section, entry);
+      entry = al_get_first_config_entry (config, section, &iterator);
+    } else entry = al_get_next_config_entry (&iterator);
+  }
 }

@@ -20,6 +20,8 @@
 
 #include "mininim.h"
 
+static ALLEGRO_TEXTLOG *text_log;
+
 void
 init_dialog (void)
 {
@@ -37,58 +39,32 @@ finalize_dialog (void)
   al_shutdown_native_dialog_addon ();
 }
 
-ALLEGRO_FILECHOOSER *
-create_native_file_dialog (char const *initial_path,
-                           char const *title,
-                           char const *patterns,
-                           int mode)
+void
+print_text_log (char const *template, ...)
 {
-  ALLEGRO_FILECHOOSER *dialog =
-    al_create_native_file_dialog (initial_path, title, patterns, mode);
+  if (! text_log)
+    text_log = al_open_native_text_log
+      ("MININIM log", ALLEGRO_TEXTLOG_MONOSPACE);
 
-  if (! dialog)
-    error (0, 0, "%s (%s, %s, %s, %i): failed to create native file dialog",
-           __func__, initial_path, title, patterns, mode);
+  al_register_event_source
+    (event_queue, al_get_native_text_log_event_source (text_log));
 
-  return dialog;
+  va_list ap;
+  va_start (ap, template);
+
+  char *text;
+  vasprintf (&text, template, ap);
+  al_append_native_text_log (text_log, text);
+  al_free (text);
+
+  va_end (ap);
 }
 
 void
-show_native_file_dialog (ALLEGRO_DISPLAY *display,
-                         ALLEGRO_FILECHOOSER *dialog)
+close_text_log (ALLEGRO_EVENT *event)
 {
-  /* It seems that on MinGW al_show_native_file_dialog returns false
-     when the dialog is cancelled, thus you may want to call
-     al_show_native_file_dialog directly. */
-
-  if (! al_show_native_file_dialog (display, dialog))
-    error (0, 0, "%s (%p, %p): failed to show native file dialog",
-           __func__, display, dialog);
-}
-
-ALLEGRO_TEXTLOG *
-open_native_text_log (char const *title, int flags)
-{
-  ALLEGRO_TEXTLOG *textlog = al_open_native_text_log (title, flags);
-
-  /* if (! textlog) */
-  /*   error (0, 0, "%s (%s, %i): failed to open native text log dialog", */
-  /*          __func__, title, flags); */
-
-  return textlog;
-}
-
-ALLEGRO_EVENT_SOURCE *
-get_native_text_log_event_source (ALLEGRO_TEXTLOG *textlog)
-{
-  ALLEGRO_EVENT_SOURCE *event_source =
-    al_get_native_text_log_event_source (textlog);
-
-  if (! event_source)
-    error (0, 0, "%s (%p): failed to get native text log dialog event source",
-           __func__, textlog);
-
-  return event_source;
+  al_close_native_text_log ((ALLEGRO_TEXTLOG *) event->user.data1);
+  text_log = NULL;
 }
 
 bool

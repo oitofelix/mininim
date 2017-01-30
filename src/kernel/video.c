@@ -73,7 +73,7 @@ init_video (void)
 
   if (display_mode >= 0) {
     ALLEGRO_DISPLAY_MODE d;
-    get_display_mode (display_mode, &d);
+    al_get_display_mode (display_mode, &d);
     display_width = d.width;
     display_height = d.height;
     al_set_new_display_refresh_rate (d.refresh_rate);
@@ -84,9 +84,11 @@ init_video (void)
   al_set_new_display_option (ALLEGRO_SINGLE_BUFFER, 1, ALLEGRO_SUGGEST);
 
   display = al_create_display (display_width, display_height);
-  if (! display) error (-1, 0, "%s (void): failed to initialize display", __func__);
+  if (! display)
+    error (-1, 0, "%s (void): failed to initialize display", __func__);
 
-  al_register_event_source (event_queue, get_display_event_source (display));
+  al_register_event_source (event_queue,
+                            al_get_display_event_source (display));
 
   set_target_backbuffer (display);
 
@@ -118,10 +120,10 @@ init_video (void)
   iscreen = create_bitmap (display_width, display_height);
   clear_bitmap (uscreen, TRANSPARENT_COLOR);
 
-  video_timer = create_timer (1.0 / EFFECT_HZ);
+  video_timer = al_create_timer (1.0 / EFFECT_HZ);
 
   al_register_event_source (event_queue,
-                            get_timer_event_source (video_timer));
+                            al_get_timer_event_source (video_timer));
 
   al_init_font_addon ();
   builtin_font = al_create_builtin_font ();
@@ -134,7 +136,7 @@ init_video (void)
 
   /* workaround to make Mac OS X render the title screen cutscene
      properly */
-  if (MACOSX_PORT) acknowledge_resize ();
+  if (MACOSX_PORT) al_acknowledge_resize (display);
 }
 
 void
@@ -150,16 +152,6 @@ finalize_video (void)
   al_shutdown_image_addon ();
   al_shutdown_font_addon ();
   al_shutdown_primitives_addon ();
-}
-
-ALLEGRO_EVENT_SOURCE *
-get_display_event_source (ALLEGRO_DISPLAY *display)
-{
-  ALLEGRO_EVENT_SOURCE *event_source = al_get_display_event_source (display);
-  if (! event_source)
-    error (-1, 0, "%s: failed to get display event source (%p)",
-           __func__,  display);
-  return event_source;
 }
 
 int
@@ -314,11 +306,6 @@ clone_bitmap (ALLEGRO_BITMAP *bitmap)
   ALLEGRO_BITMAP *new_bitmap = al_clone_bitmap (bitmap);
 
   al_set_new_bitmap_flags (flags);
-
-  if (! new_bitmap) {
-    error (-1, 0, "%s (%p): cannot clone bitmap", __func__, bitmap);
-    return NULL;
-  }
 
   validate_bitmap_for_mingw (new_bitmap);
 
@@ -694,23 +681,11 @@ flip_display (ALLEGRO_BITMAP *bitmap)
   force_full_redraw = false;
 }
 
-void
-get_display_mode (int index, ALLEGRO_DISPLAY_MODE *mode)
+int
+bool2bitmap_flags (bool v, bool h)
 {
-  if (! al_get_display_mode (index, mode))
-    error (0, 0, "%s (%i, %p): cannot get display mode", __func__, index, mode);
-}
-
-void
-acknowledge_resize (void)
-{
-  bool acknowledged;
-
-  acknowledged = al_acknowledge_resize (display);
-
-  if (! acknowledged  && ! is_fullscreen ())
-    error (0, 0, "%s: cannot acknowledge display resize (%p)",
-           __func__, display);
+  return (v ? ALLEGRO_FLIP_VERTICAL : 0)
+    | (h ? ALLEGRO_FLIP_HORIZONTAL : 0);
 }
 
 void
@@ -777,7 +752,7 @@ stop_video_effect (void)
   al_stop_timer (video_timer);
   al_set_timer_count (video_timer, 0);
   drop_all_events_from_source
-    (event_queue, get_timer_event_source (video_timer));
+    (event_queue, al_get_timer_event_source (video_timer));
   clear_bitmap (cutscene_screen, BLACK);
   draw_bitmap (effect_buffer, cutscene_screen, 0, 0, 0);
   effect_counter = 0;
@@ -887,7 +862,7 @@ process_display_events (void)
       show ();
       break;
     case ALLEGRO_EVENT_DISPLAY_RESIZE:
-      acknowledge_resize ();
+      al_acknowledge_resize (display);
       show ();
       break;
     case ALLEGRO_EVENT_DISPLAY_CLOSE:

@@ -347,7 +347,7 @@ prepare_for_recording_replay (void)
   recording_replay_countdown = SEC2CYC (3) - 1;
   anim_freq = DEFAULT_HZ;
   al_set_timer_speed (timer, 1.0 / anim_freq);
-  replay_menu ();
+  play_menu ();
 }
 
 void
@@ -385,7 +385,7 @@ create_save_replay_thread (void)
 {
   al_make_directory (user_data_dir);
   save_replay_dialog_thread =
-    create_thread (dialog_thread, &save_replay_dialog);
+    al_create_thread (dialog_thread, &save_replay_dialog);
   al_start_thread (save_replay_dialog_thread);
   level_start_replay_mode = NO_REPLAY;
   replay_mode = NO_REPLAY;
@@ -411,21 +411,21 @@ handle_save_replay_thread (int priority)
     char *error_str = save_replay (filename, replay)
       ? "REPLAY HAS BEEN SAVED"
       : "REPLAY SAVING FAILED";
-    ui_msg (priority, error_str);
+    ui_msg (priority, "%s", error_str);
     al_free (save_replay_dialog.initial_path);
     xasprintf (&save_replay_dialog.initial_path, "%s", filename);
   } else ui_msg (priority, "RECORDING STOPPED");
   al_destroy_native_file_dialog (dialog);
   free_replay (replay);
   pause_animation (false);
-  replay_menu ();
+  play_menu ();
 }
 
 void
 create_load_replay_thread (void)
 {
   load_replay_dialog_thread =
-    create_thread (dialog_thread, &load_replay_dialog);
+    al_create_thread (dialog_thread, &load_replay_dialog);
   al_start_thread (load_replay_dialog_thread);
 }
 
@@ -461,7 +461,7 @@ handle_load_replay_thread (int priority)
       ? "REPLAY HAS BEEN LOADED"
       : "REPLAY LOADING FAILED";
 
-    ui_msg (priority, error_str);
+    ui_msg (priority, "%s", error_str);
 
     al_free (load_replay_dialog.initial_path);
     xasprintf (&load_replay_dialog.initial_path, "%s",
@@ -493,13 +493,13 @@ stop_replaying (int priority)
   level_start_replay_mode = NO_REPLAY;
   anim_freq = DEFAULT_HZ;
   al_set_timer_speed (timer, 1.0 / anim_freq);
-  replay_menu ();
+  play_menu ();
 }
 
 void
 set_replay_mode_at_level_start (struct replay *replay)
 {
-  replay_menu ();
+  play_menu ();
 
   if (replay_index == 0) {
     replay_skipped = false;

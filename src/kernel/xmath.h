@@ -1,5 +1,5 @@
 /*
-  threads.h -- threads module;
+  xmath.h -- math module;
 
   Copyright (C) 2015, 2016, 2017 Bruno Félix Rezende Ribeiro
   <oitofelix@gnu.org>
@@ -18,12 +18,20 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MININIM_THREADS_H
-#define MININIM_THREADS_H
+#ifndef MININIM_XMATH_H
+#define MININIM_XMATH_H
 
-ALLEGRO_THREAD *create_thread (thread_f thread_func, void *arg);
-ALLEGRO_MUTEX *create_mutex (void);
-ALLEGRO_MUTEX *create_mutex_recursive (void);
-ALLEGRO_COND *create_cond (void);
+double max_double (double a, double b);
+double min_double (double a, double b);
+bool equiv (bool a, bool b);
+int round2multiple (int n, int m);
+int next_multiple (int n, int m);
+int precise_unit (int n, int m);
+int max_int (int a, int b);
+int min_int (int a, int b);
+int cint (int *x, int *y);
+unsigned char add_char (unsigned char a, signed char b);
+int int_to_range (int i, int min, int max);
+float dist_cart (float x0, float y0, float x1, float y1);
 
-#endif	/* MININIM_THREADS_H */
+#endif	/* MININIM_XMATH_H */

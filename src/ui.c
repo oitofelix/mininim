@@ -78,7 +78,11 @@ ALLEGRO_BITMAP *small_logo_icon,
   *drawing_icon, *first_icon, *last_icon, *jump_icon, *original_icon,
   *guard_icon, *fat_guard_icon, *vizier_icon, *skeleton_icon, *shadow_icon,
   *resurrect_icon, *death_icon, *feather_icon, *angel_icon, *life_empty_icon,
-  *life_full_icon;
+  *life_full_icon, *skills_icon, *time_icon, *time_add_icon, *time_sub_icon,
+  *attack_icon, *attack_add_icon, *attack_sub_icon, *defense_icon,
+  *defense_add_icon, *defense_sub_icon, *counter_attack_icon,
+  *counter_attack_add_icon, *counter_attack_sub_icon, *counter_defense_icon,
+  *counter_defense_add_icon, *counter_defense_sub_icon;
 
 
 
@@ -177,6 +181,22 @@ load_icons (void)
   angel_icon = load_icon (ANGEL_ICON);
   life_empty_icon = load_icon (LIFE_EMPTY_ICON);
   life_full_icon = load_icon (LIFE_FULL_ICON);
+  skills_icon = load_icon (SKILLS_ICON);
+  time_icon = load_icon (TIME_ICON);
+  time_add_icon = load_icon (TIME_ADD_ICON);
+  time_sub_icon = load_icon (TIME_SUB_ICON);
+  attack_icon = load_icon (ATTACK_ICON);
+  attack_add_icon = load_icon (ATTACK_ADD_ICON);
+  attack_sub_icon = load_icon (ATTACK_SUB_ICON);
+  defense_icon = load_icon (DEFENSE_ICON);
+  defense_add_icon = load_icon (DEFENSE_ADD_ICON);
+  defense_sub_icon = load_icon (DEFENSE_SUB_ICON);
+  counter_attack_icon = load_icon (COUNTER_ATTACK_ICON);
+  counter_attack_add_icon = load_icon (COUNTER_ATTACK_ADD_ICON);
+  counter_attack_sub_icon = load_icon (COUNTER_ATTACK_SUB_ICON);
+  counter_defense_icon = load_icon (COUNTER_DEFENSE_ICON);
+  counter_defense_add_icon = load_icon (COUNTER_DEFENSE_ADD_ICON);
+  counter_defense_sub_icon = load_icon (COUNTER_DEFENSE_SUB_ICON);
 }
 
 void
@@ -266,6 +286,22 @@ unload_icons (void)
   destroy_bitmap (angel_icon);
   destroy_bitmap (life_empty_icon);
   destroy_bitmap (life_full_icon);
+  destroy_bitmap (skills_icon);
+  destroy_bitmap (time_icon);
+  destroy_bitmap (time_add_icon);
+  destroy_bitmap (time_sub_icon);
+  destroy_bitmap (attack_icon);
+  destroy_bitmap (attack_add_icon);
+  destroy_bitmap (attack_sub_icon);
+  destroy_bitmap (defense_icon);
+  destroy_bitmap (defense_add_icon);
+  destroy_bitmap (defense_sub_icon);
+  destroy_bitmap (counter_attack_icon);
+  destroy_bitmap (counter_attack_add_icon);
+  destroy_bitmap (counter_attack_sub_icon);
+  destroy_bitmap (counter_defense_icon);
+  destroy_bitmap (counter_defense_add_icon);
+  destroy_bitmap (counter_defense_sub_icon);
 }
 
 
@@ -451,7 +487,7 @@ show_menu (void)
 #if MENU_FEATURE
   if (display_mode < 0) {
     al_set_display_menu (display, main_menu);
-    show_mouse_cursor ();
+    al_show_mouse_cursor (display);
   }
 #endif
 }
@@ -462,7 +498,7 @@ hide_menu (void)
 #if MENU_FEATURE
   if (is_fullscreen ()) {
     al_remove_display_menu (display);
-    hide_mouse_cursor ();
+    al_hide_mouse_cursor (display);
   }
 #endif
 }
@@ -515,7 +551,7 @@ create_main_menu (void)
 
   menu_sub (GAMEPAD_MID, true, NULL, "&Input");
 
-  menu_sub (REPLAY_MID, true, NULL, "&Replay");
+  menu_sub (PLAY_MID, true, NULL, "&Play");
 
   menu_sub (EDITOR_MID, can_edit (), NULL, "&Editor");
 
@@ -528,7 +564,7 @@ create_main_menu (void)
   game_menu ();
   view_menu ();
   gamepad_menu ();
-  replay_menu ();
+  play_menu ();
   editor_menu ();
   cheat_menu ();
   help_menu ();
@@ -566,7 +602,7 @@ game_menu (void)
 
   menu_sep ();
 
-  menu_ditem (cutscene || title_demo,
+  menu_ditem ((cutscene || title_demo) && play_time < time_limit,
               START_GAME_MID, RESTART_GAME_MID, true,
               right_icon, reload_icon,
               "Sta&rt (Enter)", "&Restart (Ctrl+R)");
@@ -1155,10 +1191,10 @@ flip_gamepad_menu (void)
 }
 
 void
-replay_menu (void)
+play_menu (void)
 {
 #if MENU_FEATURE
-  start_menu (main_menu, REPLAY_MID);
+  start_menu (main_menu, PLAY_MID);
 
   if (recording_replay_countdown >= 0
       || level_start_replay_mode == RECORD_REPLAY)
@@ -1179,6 +1215,8 @@ replay_menu (void)
 
     speed_menu_widget ();
 
+    statistics_widget ();
+
     break;
   case RECORD_REPLAY: record_replay:
 
@@ -1193,11 +1231,13 @@ replay_menu (void)
 
     pause_menu_widget ();
 
+    statistics_widget ();
+
     break;
   default: assert (false);
   case NO_REPLAY: no_replay:
 
-    menu_sitem (PLAY_REPLAY_MID, true, play_icon, "&Play... (F7)");
+    menu_sitem (PLAY_REPLAY_MID, true, play_icon, "Re&play... (F7)");
 
     menu_sitem (RECORD_REPLAY_MID, true, record_icon,
                 "&Record... (Alt+F7)");
@@ -1207,6 +1247,8 @@ replay_menu (void)
     pause_menu_widget ();
 
     speed_menu_widget ();
+
+    statistics_widget ();
 
     break;
   }
@@ -1271,6 +1313,13 @@ cheat_menu (void)
               ? "&Add container (Shift+T)"
               : "Fill &all containers (Shift+T)");
 
+  menu_sep ();
+
+  menu_sitem (TIME_ADD_MID, true, time_add_icon, "&Increase time (+)");
+
+  menu_sitem (TIME_SUB_MID, time_limit - play_time > 60 * DEFAULT_HZ,
+              time_sub_icon, "&Decrease time (-)");
+
   end_menu ();
 #endif
 }
@@ -1309,6 +1358,22 @@ skip_level_widget (void)
      ? replay_index > 0
      : ! cutscene && ! title_demo && global_level.n > 1,
      previous_icon, "Pre&vious (Shift+M)");
+}
+
+void
+statistics_widget (void)
+{
+#if MENU_FEATURE
+  menu_sep ();
+
+  menu_sitem
+    (TIME_MID, ! cutscene && ! title_demo && recording_replay_countdown < 0,
+     time_icon, "Ti&me (Space)");
+
+  menu_sitem
+    (SKILLS_MID, ! cutscene && ! title_demo && recording_replay_countdown < 0,
+     skills_icon, "S&kills (Tab)");
+#endif
 }
 
 void
@@ -1380,15 +1445,6 @@ menu_mid (intptr_t mid)
     break;
   case SAVE_GAME_MID:
     ui_save_game ();
-    break;
-  case RESTART_LEVEL_MID:
-    ui_restart_level ();
-    break;
-  case PREVIOUS_LEVEL_MID:
-    ui_previous_level ();
-    break;
-  case NEXT_LEVEL_MID:
-    ui_next_level ();
     break;
   case MIRROR_MODE_MID:
     ui_mirror_mode (! in_mirror_mode ());
@@ -1594,12 +1650,27 @@ menu_mid (intptr_t mid)
     break;
 
 
-    /* REPLAY */
+    /* PLAY */
   case PLAY_REPLAY_MID:
     ui_play_replay ();
     break;
   case RECORD_REPLAY_MID:
     ui_record_replay ();
+    break;
+  case RESTART_LEVEL_MID:
+    ui_restart_level ();
+    break;
+  case PREVIOUS_LEVEL_MID:
+    ui_previous_level ();
+    break;
+  case NEXT_LEVEL_MID:
+    ui_next_level ();
+    break;
+  case TIME_MID:
+    ui_time ();
+    break;
+  case SKILLS_MID:
+    ui_skills ();
     break;
   case TOGGLE_PAUSE_GAME_MID:
     ui_toggle_pause_game ();
@@ -1652,6 +1723,13 @@ menu_mid (intptr_t mid)
   case ADD_LIFE_MID:
     ui_add_life ();
     break;
+  case TIME_ADD_MID:
+    ui_change_time (+5);
+    break;
+  case TIME_SUB_MID:
+    ui_change_time (-5);
+    break;
+
 
 
     /* HELP */
@@ -2046,83 +2124,73 @@ level_key_bindings (void)
   else if (! active_menu
            && (was_key_pressed (0, ALLEGRO_KEY_SPACE)
                || was_joystick_button_pressed (joystick_time_button)))
-    display_remaining_time (0);
+    ui_time ();
 
-  /* +: increment time limit and display remaining time */
+  /* TAB: display skill */
+  else if (was_key_pressed (0, ALLEGRO_KEY_TAB))
+    ui_skills ();
+
+  /* +: increase time limit and display remaining time */
   else if (! active_menu
            && (was_key_pressed (0, ALLEGRO_KEY_EQUALS)
                || was_key_pressed (ALLEGRO_KEYMOD_SHIFT,
-                                   ALLEGRO_KEY_EQUALS))) {
-    if (replay_mode == NO_REPLAY) {
-      int t = time_limit - play_time;
-      int d = t > (60 * DEFAULT_HZ) ? (+60 * DEFAULT_HZ) : (+1 * DEFAULT_HZ);
-      time_limit += d;
-      display_remaining_time (0);
-    } else print_replay_mode (0);
-  }
+                                   ALLEGRO_KEY_EQUALS)))
+    ui_change_time (+1);
 
-  /* -: decrement time limit and display remaining time */
+  /* -: decrease time limit and display remaining time */
   else if (! active_menu
            && (was_key_pressed (0, ALLEGRO_KEY_MINUS)
-               || was_char_pressed ('_'))) {
-    if (replay_mode == NO_REPLAY) {
-      int t = time_limit - play_time;
-      int d = t > (60 * DEFAULT_HZ) ? (-60 * DEFAULT_HZ) : (-1 * DEFAULT_HZ);
-      time_limit += d;
-      display_remaining_time (0);
-    } else print_replay_mode (0);
-  }
+               || was_char_pressed ('_')))
+    ui_change_time (-1);
 
-  /* TAB: display skill */
-  else if (was_key_pressed (0, ALLEGRO_KEY_TAB)) {
-    struct anim *k = get_anim_by_id (current_kid_id);
-    display_skill (k);
-  }
-
-  /* CTRL+=: increment counter attack skill */
+  /* CTRL+=: increase counter attack skill */
   else if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_EQUALS)) {
     if (replay_mode == NO_REPLAY) {
       struct anim *k = get_anim_by_id (current_kid_id);
       if (k->skill.counter_attack_prob < 99)
         k->skill.counter_attack_prob++;
       display_skill (k);
+      skill = k->skill;
     } else print_replay_mode (0);
   }
 
-  /* CTRL+-: decrement counter attack skill */
+  /* CTRL+-: decrease counter attack skill */
   else if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_MINUS)) {
     if (replay_mode == NO_REPLAY) {
       struct anim *k = get_anim_by_id (current_kid_id);
       if (k->skill.counter_attack_prob > -1)
         k->skill.counter_attack_prob--;
       display_skill (k);
+      skill = k->skill;
     } else print_replay_mode (0);
   }
 
-  /* ALT+=: increment counter defense skill */
+  /* ALT+=: increase counter defense skill */
   else if (was_key_pressed (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_EQUALS)) {
     if (replay_mode == NO_REPLAY) {
       struct anim *k = get_anim_by_id (current_kid_id);
       if (k->skill.counter_defense_prob < 99)
         k->skill.counter_defense_prob++;
       display_skill (k);
+      skill = k->skill;
     } else print_replay_mode (0);
   }
 
-  /* ALT+-: decrement counter defense skill */
+  /* ALT+-: decrease counter defense skill */
   else if (was_key_pressed (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_MINUS)) {
     if (replay_mode == NO_REPLAY) {
       struct anim *k = get_anim_by_id (current_kid_id);
       if (k->skill.counter_defense_prob > -1)
         k->skill.counter_defense_prob--;
       display_skill (k);
+      skill = k->skill;
     } else print_replay_mode (0);
   }
 
   /* A: alternate between kid and its shadows */
   else if (! active_menu
            && was_key_pressed (0, ALLEGRO_KEY_A)) {
-    struct anim *k;
+    struct anim *k = NULL;
     do {
       k = &anima[(k - anima + 1) % anima_nmemb];
     } while (k->type != KID || ! k->controllable);
@@ -2137,7 +2205,7 @@ level_key_bindings (void)
   } else if (step_cycle == 0) {
     game_paused = true;
     step_cycle = -1;
-    replay_menu ();
+    play_menu ();
   }
 
   if (was_key_pressed (0, ALLEGRO_KEY_ESCAPE)
@@ -2182,7 +2250,7 @@ void
 ui_load_game (void)
 {
   load_config_dialog_thread =
-    create_thread (dialog_thread, &load_config_dialog);
+    al_create_thread (dialog_thread, &load_config_dialog);
   al_start_thread (load_config_dialog_thread);
 }
 
@@ -2190,7 +2258,7 @@ void
 ui_load_config (void)
 {
   load_config_dialog_thread =
-    create_thread (dialog_thread, &load_config_dialog);
+    al_create_thread (dialog_thread, &load_config_dialog);
   al_start_thread (load_config_dialog_thread);
 }
 
@@ -2198,46 +2266,9 @@ void
 ui_save_game (void)
 {
   save_game_dialog_thread =
-    create_thread (dialog_thread, &save_game_dialog);
+    al_create_thread (dialog_thread, &save_game_dialog);
   al_start_thread (save_game_dialog_thread);
   pause_animation (true);
-}
-
-void
-ui_restart_level (void)
-{
-  if (replay_mode == NO_REPLAY)
-    quit_anim = RESTART_LEVEL;
-  else if (replay_mode == PLAY_REPLAY)
-    quit_anim = REPLAY_RESTART_LEVEL;
-  else print_replay_mode (0);
-}
-
-void
-ui_previous_level (void)
-{
-  if (replay_mode == NO_REPLAY) {
-    ignore_level_cutscene = true;
-    next_level_number = global_level.n - 1;
-    quit_anim = NEXT_LEVEL;
-  } else if (replay_mode == PLAY_REPLAY) {
-    if (replay_index > 0) quit_anim = REPLAY_PREVIOUS;
-    else ui_msg (0, "NO PREVIOUS REPLAY");
-  } else print_replay_mode (0);
-}
-
-void
-ui_next_level (void)
-{
-  if (replay_mode == NO_REPLAY) {
-    ignore_level_cutscene = true;
-    next_level_number = global_level.n + 1;
-    quit_anim = NEXT_LEVEL;
-  } else if (replay_mode == PLAY_REPLAY) {
-    if (replay_index + 1 < replay_chain_nmemb)
-      quit_anim = REPLAY_NEXT;
-    else ui_msg (0, "NO NEXT REPLAY");
-  } else print_replay_mode (0);
 }
 
 void
@@ -2249,7 +2280,7 @@ ui_audio_volume (float volume)
 
   set_audio_volume (volume);
 
-  char *status;
+  char *status = NULL;
   if (volume == VOLUME_RANGE_MIN) status = "OFF";
   else if (volume < VOLUME_RANGE_LOW) status = "LOW";
   else if (volume < VOLUME_RANGE_MEDIUM) status = "MEDIUM";
@@ -2266,7 +2297,7 @@ void
 ui_screenshot (void)
 {
   save_picture_dialog_thread =
-    create_thread (dialog_thread, &save_picture_dialog);
+    al_create_thread (dialog_thread, &save_picture_dialog);
   al_start_thread (save_picture_dialog_thread);
   pause_animation (true);
 }
@@ -2299,7 +2330,7 @@ ui_full_screen (void)
     if (is_fullscreen ()) {
       al_set_display_flag (display, ALLEGRO_FULLSCREEN_WINDOW, false);
       value = "OFF";
-      show_mouse_cursor ();
+      al_show_mouse_cursor (display);
       show_menu ();
     } else {
       al_set_display_flag (display, ALLEGRO_FULLSCREEN_WINDOW, true);
@@ -2674,7 +2705,7 @@ void
 ui_flip_gamepad (bool v, bool h, bool save_only)
 {
   char *key = "GAMEPAD FLIP MODE";
-  char *value;
+  char *value = NULL;
 
   if (! v && ! h) value = "NONE";
   else if (v && ! h) value = "VERTICAL";
@@ -2714,25 +2745,77 @@ ui_record_replay (void)
   else {
     ui_msg (2, "RECORDING ABORTED");
     recording_replay_countdown = -1;
-    replay_menu ();
+    play_menu ();
   }
+}
+
+void
+ui_restart_level (void)
+{
+  if (replay_mode == NO_REPLAY)
+    quit_anim = RESTART_LEVEL;
+  else if (replay_mode == PLAY_REPLAY)
+    quit_anim = REPLAY_RESTART_LEVEL;
+  else print_replay_mode (0);
+}
+
+void
+ui_previous_level (void)
+{
+  if (replay_mode == NO_REPLAY) {
+    ignore_level_cutscene = true;
+    next_level_number = global_level.n - 1;
+    start_level_time = play_time;
+    quit_anim = NEXT_LEVEL;
+  } else if (replay_mode == PLAY_REPLAY) {
+    if (replay_index > 0) quit_anim = REPLAY_PREVIOUS;
+    else ui_msg (0, "NO PREVIOUS REPLAY");
+  } else print_replay_mode (0);
+}
+
+void
+ui_next_level (void)
+{
+  if (replay_mode == NO_REPLAY) {
+    ignore_level_cutscene = true;
+    next_level_number = global_level.n + 1;
+    start_level_time = play_time;
+    quit_anim = NEXT_LEVEL;
+  } else if (replay_mode == PLAY_REPLAY) {
+    if (replay_index + 1 < replay_chain_nmemb)
+      quit_anim = REPLAY_NEXT;
+    else ui_msg (0, "NO NEXT REPLAY");
+  } else print_replay_mode (0);
+}
+
+void
+ui_time (void)
+{
+  display_remaining_time (0);
+}
+
+void
+ui_skills (void)
+{
+  struct anim *k = get_anim_by_id (current_kid_id);
+  display_skill (k);
 }
 
 void
 ui_increase_time_frequency (void)
 {
   if (anim_freq >= DEFAULT_HZ)
-    ui_change_anim_freq (DEFAULT_HZ * ((anim_freq / DEFAULT_HZ) + 1));
-  else ui_change_anim_freq (2 * ((anim_freq / 2) + 1));
+    ui_change_anim_freq (next_multiple (anim_freq, DEFAULT_HZ));
+  else ui_change_anim_freq (next_multiple (anim_freq, 2));
 }
 
 void
 ui_decrease_time_frequency (void)
 {
   if (anim_freq > DEFAULT_HZ)
-    ui_change_anim_freq (DEFAULT_HZ * (anim_freq / DEFAULT_HZ - 1));
+    ui_change_anim_freq (next_multiple (anim_freq, -DEFAULT_HZ));
   else if (anim_freq > 2)
-    ui_change_anim_freq (2 * ((anim_freq / 2) - 1));
+    ui_change_anim_freq (next_multiple (anim_freq, -2));
 }
 
 void
@@ -2754,7 +2837,7 @@ ui_change_anim_freq (int f)
   anim_freq = f;
   al_set_timer_speed (timer, f > 0 ? 1.0 / f : 1.0 / UNLIMITED_HZ);
   if (f > 0) ui_msg (0, "TIME FREQ: %iHz", f);
-  replay_menu ();
+  play_menu ();
 }
 
 void
@@ -2762,7 +2845,7 @@ ui_toggle_pause_game (void)
 {
   if (is_game_paused ()) pause_game (false);
   else pause_game (true);
-  replay_menu ();
+  play_menu ();
 }
 
 void
@@ -2782,7 +2865,7 @@ print_game_paused (int priority)
   case NO_REPLAY: default: text = "GAME PAUSED"; break;
   }
 
-  ui_msg (priority, text);
+  ui_msg (priority, "%s", text);
 }
 
 void
@@ -2883,8 +2966,36 @@ ui_add_life (void)
   if (replay_mode == NO_REPLAY) {
     struct anim *k = get_anim_by_id (current_kid_id);
     increase_kid_total_lives (k);
-  }
-  else print_replay_mode (0);
+    total_lives = k->total_lives;
+  } else print_replay_mode (0);
+}
+
+void
+ui_change_time (int m)
+{
+  if (replay_mode == NO_REPLAY) {
+    static int last_r_min = -1;
+
+    if (last_r_min < 0)
+      last_r_min = precise_unit (time_limit - play_time, 60 * DEFAULT_HZ);
+
+    int64_t r = time_limit - play_time;
+    if (m < 0 && r <= 60 * DEFAULT_HZ) return;
+    else if (m > 0 && r <= 60 * DEFAULT_HZ)
+      time_limit = play_time + max_int (2, m) * 60 * DEFAULT_HZ;
+    else if (m < 0 && r <= -m * 60 * DEFAULT_HZ)
+      time_limit = play_time + 60 * DEFAULT_HZ;
+    else time_limit = play_time + next_multiple (r, m * 60 * DEFAULT_HZ);
+
+    int r_min = precise_unit (time_limit - play_time, 60 * DEFAULT_HZ);
+    if (r_min == last_r_min) {
+      time_limit += m * 60 * DEFAULT_HZ;
+      last_r_min = precise_unit (time_limit - play_time, 60 * DEFAULT_HZ);
+    } else last_r_min = r_min;
+
+    display_remaining_time (0);
+    cheat_menu ();
+  } else print_replay_mode (0);
 }
 
 
@@ -2904,7 +3015,7 @@ ui_about_screen (bool value)
     enable_menu (false);
     if (! message_box_thread_id) {
       message_box_thread_id =
-        create_thread (message_box_thread, &about_dialog);
+        al_create_thread (message_box_thread, &about_dialog);
       al_start_thread (message_box_thread_id);
     }
     about_screen = true;
@@ -2951,41 +3062,42 @@ ui_next_display_mode (void)
 
 
 
-error_t
+void
 ui_save_setting (char *key, char *value)
 {
   ALLEGRO_CONFIG *config = NULL;
 
-  if (al_filename_exists (config_filename))
+  if (al_filename_exists (config_filename)) {
     config = al_load_config_file (config_filename);
-  else if (value) {
-    if (! al_make_directory (user_settings_dir))
-      return al_get_errno ();
+    if (! config) goto error;
+    const char *file_type_str = al_get_config_value (config, NULL, "FILE TYPE");
+    if (! file_type_str || strcasecmp (file_type_str, "MININIM CONFIGURATION")) {
+      al_destroy_config (config);
+      config = al_create_config ();
+    }
+  } else if (value) {
+    if (! al_make_directory (user_settings_dir)) goto error;
     config = al_create_config ();
-  } else return 0;
+  } else return;
 
-  if (! config) return al_get_errno ();
+  if (! config) goto error;
 
-  ALLEGRO_CONFIG_ENTRY *iterator;
-  char const *entry = al_get_first_config_entry (config, NULL, &iterator);
+  remove_config_entry (config, NULL, "FILE TYPE");
+  al_set_config_value (config, NULL, "FILE TYPE", "MININIM CONFIGURATION");
 
-  while (entry) {
-    if (! strcasecmp (entry, key)) {
-      al_remove_config_key (config, NULL, entry);
-      entry = al_get_first_config_entry (config, NULL, &iterator);
-    } else entry = al_get_next_config_entry (&iterator);
-  }
-
+  remove_config_entry (config, NULL, key);
   if (value) al_set_config_value (config, NULL, key, value);
 
-  if (! al_save_config_file (config_filename, config)) {
-    al_destroy_config (config);
-    return al_get_errno ();
-  }
+  if (! al_save_config_file (config_filename, config)) goto error;
 
   al_destroy_config (config);
 
-  return 0;
+  return;
+
+ error:
+  if (config) al_destroy_config (config);
+  error (0, al_get_errno (), "can't save setting '%s=%s' to '%s'", key, value,
+         config_filename);
 }
 
 bool
@@ -3050,4 +3162,39 @@ ui_mirror_mode (bool mirror)
   game_menu ();
   view_menu ();
   gamepad_menu ();
+}
+
+
+
+
+bool
+display_remaining_time (int priority)
+{
+  int t = time_limit - play_time;
+  if (t < 0) t = 0;
+  int tm = t > (60 * DEFAULT_HZ)
+    ? precise_unit (t, 60 * DEFAULT_HZ)
+    : precise_unit (t, 1 * DEFAULT_HZ);
+  return ui_msg (priority, "%i %s", tm,
+                 t > (60 * DEFAULT_HZ)
+                 ? "MINUTES LEFT"
+                 : "SECONDS LEFT");
+}
+
+void
+display_skill (struct anim *k)
+{
+  struct anim *ke = get_anim_by_id (k->enemy_id);
+  if (ke)
+    ui_msg (0, "KCA%i KCD%i A%i CA%i D%i CD%i",
+            k->skill.counter_attack_prob + 1,
+            k->skill.counter_defense_prob + 1,
+            ke->skill.attack_prob + 1,
+            ke->skill.counter_attack_prob + 1,
+            ke->skill.defense_prob + 1,
+            ke->skill.counter_defense_prob + 1);
+  else
+    ui_msg (0, "KCA%i KCD%i",
+            k->skill.counter_attack_prob + 1,
+            k->skill.counter_defense_prob + 1);
 }

@@ -29,22 +29,13 @@ init_mouse (void)
   if (! al_install_mouse ())
     error (0, 0, "%s (void): cannot install mouse", __func__);
 
-  al_register_event_source (event_queue, get_mouse_event_source ());
+  al_register_event_source (event_queue, al_get_mouse_event_source ());
 }
 
 void
 finalize_mouse (void)
 {
   al_uninstall_mouse ();
-}
-
-ALLEGRO_EVENT_SOURCE *
-get_mouse_event_source (void)
-{
-  ALLEGRO_EVENT_SOURCE *event_source = al_get_mouse_event_source ();
-  if (! event_source)
-    error (0, 0, "%s: failed to get mouse event source", __func__);
-  return event_source;
 }
 
 struct mouse_coord *
@@ -185,9 +176,7 @@ set_mouse_coord (struct mouse_coord *m)
   if (flags & ALLEGRO_FLIP_VERTICAL)
     my = (h - 1) - my;
 
-  if (! al_set_mouse_xy (display, mx, my))
-    error (0, 0, "%s (%p): cannot set mouse xy coordinates (%i,%i)",
-           __func__, m, mx, my);
+  al_set_mouse_xy (display, mx, my);
 
   do {
     al_get_mouse_state (&mouse_state);
@@ -242,28 +231,4 @@ set_mouse_room (int room)
     int h = al_get_display_height (display);
     al_set_mouse_xy (display, w / 2, h / 2);
   }
-}
-
-void
-set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR id)
-{
-  if (! al_set_system_mouse_cursor (display, id))
-    error (0, 0, "%s (%i): cannot set system mouse cursor",
-           __func__, id);
-}
-
-void
-show_mouse_cursor (void)
-{
-  if (! al_show_mouse_cursor (display))
-    error (0, 0, "%s (void): cannot show mouse cursor",
-           __func__);
-}
-
-void
-hide_mouse_cursor (void)
-{
-  if (! al_hide_mouse_cursor (display))
-    error (0, 0, "%s (void): cannot hide mouse cursor",
-           __func__);
 }

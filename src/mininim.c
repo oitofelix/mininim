@@ -28,7 +28,6 @@ struct config_info {
     CI_COMMAND_LINE,
   } type;
   char *filename;
-  ALLEGRO_TEXTLOG *textlog;
 };
 
 bool ignore_main_config, ignore_environment;
@@ -59,15 +58,15 @@ ALLEGRO_THREAD *load_config_dialog_thread, *save_game_dialog_thread,
   *save_picture_dialog_thread, *message_box_thread_id;
 
 struct dialog load_config_dialog = {
-  .title = "Load configuration file",
-  .patterns = "*.mcf;*.MCF",
+  .title = "Load game/configuration file",
+  .patterns = "*.mcf;*.MCF;*.msv;*.MSV",
   .mode = ALLEGRO_FILECHOOSER_FILE_MUST_EXIST
   | ALLEGRO_FILECHOOSER_MULTIPLE,
 };
 
 struct dialog save_game_dialog = {
   .title = "Save game",
-  .patterns = "*.mcf;*.MCF",
+  .patterns = "*.msv;*.MSV",
   .mode = ALLEGRO_FILECHOOSER_SAVE,
 };
 
@@ -116,6 +115,7 @@ enum movements movements;
 bool title_demo;
 enum rendering rendering = BOTH_RENDERING;
 bool inhibit_screensaver = true;
+int play_game_counter;
 
 /* screams */
 bool scream;
@@ -138,12 +138,17 @@ static error_t parser (int key, char *arg, struct argp_state *state);
 static void print_paths (void);
 static void print_display_modes (void);
 static char *command_line2env_option_name (const char *option_name);
+static char *env2command_line_option_name (const char *option_name);
 static char *command_line2config_option_name (const char *option_name);
 static char *config2command_line_option_name (const char *option_name);
 static void get_paths (void);
+static bool is_valid_option (char *option);
+static void config_str2key_value (const char *str, char **key, char **value);
+static void get_env_args (size_t *eargc, char ***eargv,
+                          struct argp_option *options);
 static error_t get_config_args (size_t *cargc, char ***cargv,
                                 struct argp_option *options,
-                                char *filename);
+                                char *filename, enum file_type *ret_file_type);
 static error_t
 pre_parser (int key, char *arg, struct argp_state *state);
 static void give_dat_compat_preference (void);
@@ -154,13 +159,15 @@ static struct argp_option options[] = {
 
   {"load-config", LOAD_CONFIG_OPTION, "FILE", 0, "Load configuration file FILE.  The options set in FILE have the same precedence as the equivalent command line options given at its place of occurrence.  This can be done in-game using the CTRL+L key binding.", 0},
 
+  {"load-game", LOAD_CONFIG_OPTION, NULL, OPTION_ALIAS, NULL, 0},
+
   {"ignore-main-config", IGNORE_MAIN_CONFIG_OPTION, NULL, 0, "Ignore main configuration file.  The default is to parse it at the very beginning of each run.", 0},
 
   {"ignore-environment", IGNORE_ENVIRONMENT_OPTION, NULL, 0, "Ignore environment variables.  The default is to parse them after the main configuration file.", 0},
 
   {NULL, 0, NULL, OPTION_DOC, "There are three methods of configuration: command line options, environment variables and configuration files.  For every command line option of the form 'x-y' there is an equivalent environment variable option 'MININIM_X_Y' and an equivalent configuration file option 'x y'.  The multiple methods of configuration are cumulative but command line options override any other, while environment variables override the main configuration file.  In any method applicable later options override earlier ones in case their effects are totally or partially conflicting.  The option '--print-paths' shows, among other things, the expected file name of the main configuration file.", 0},
 
-  {NULL, 0, NULL, OPTION_DOC, "Notice that save files (CTRL+G) are a particular case of configuration files and should be loaded the same way.  When loaded in-game, configuration files take effect immediately, however some effects only become visible under certain conditions.  For instance save files show their effect only on game (re)start.", 0},
+  {NULL, 0, NULL, OPTION_DOC, "Notice that save files (CTRL+G) are a particular case of configuration files and should be loaded the same way.  The option '--load-game' is provided as a mnemonic alias.  When loaded in-game, configuration files take effect immediately.", 0},
 
   /* Level */
   {NULL, 0, NULL, 0, "Level:", 0},
@@ -278,7 +285,7 @@ static struct argp pre_argp = {options, pre_parser, args_doc, doc,
 static struct argp argp = {options, parser, args_doc, doc,
                            &argp_child, NULL, NULL};
 
-static char *
+char *
 key_to_option_name (int key, struct argp_state *state)
 {
   char *option_name;
@@ -306,7 +313,7 @@ key_to_option_name (int key, struct argp_state *state)
   return NULL;
 }
 
-static void
+void
 option_enum_value_error (int key, char *arg, struct argp_state *state,
                          char **enum_vals, bool invalid, int number)
 {
@@ -361,12 +368,10 @@ option_enum_value_error (int key, char *arg, struct argp_state *state,
   char *error_template = "%s'%s' %s '%s' argument %i.\n%s %s.";
   if (config_info->type == CI_CONFIGURATION_FILE
       && state->flags & ARGP_SILENT) {
-    al_append_native_text_log (config_info->textlog, error_template,
-                               config_file_prefix, arg, msg, option_name,
-                               number, msg2, valid_values);
-    al_append_native_text_log (config_info->textlog, "\n");
-  }
-  else argp_error (state, error_template,
+    print_text_log (error_template, config_file_prefix, arg, msg, option_name,
+                    number, msg2, valid_values);
+    print_text_log ("\n");
+  } else argp_error (state, error_template,
                    config_file_prefix, arg, msg, option_name,
                    number, msg2, valid_values);
 
@@ -377,7 +382,7 @@ option_enum_value_error (int key, char *arg, struct argp_state *state,
   al_free (config_file_prefix);
 }
 
-static void
+void
 option_arg_error (int key, char *arg, struct argp_state *state, int number, char *estr)
 {
   struct config_info *config_info = (struct config_info *) state->input;
@@ -409,12 +414,10 @@ option_arg_error (int key, char *arg, struct argp_state *state, int number, char
 
   if (config_info->type == CI_CONFIGURATION_FILE
       && state->flags & ARGP_SILENT) {
-    al_append_native_text_log (config_info->textlog, error_template,
-                               config_file_prefix, arg, msg, option_name,
-                               argument_msg, estr);
-    al_append_native_text_log (config_info->textlog, "\n");
-  }
-  else argp_error (state, error_template,
+    print_text_log (error_template, config_file_prefix, arg, msg, option_name,
+                    argument_msg, estr);
+    print_text_log ("\n");
+  } else argp_error (state, error_template,
                    config_file_prefix, arg, msg, option_name,
                    argument_msg, estr);
 
@@ -423,7 +426,7 @@ option_arg_error (int key, char *arg, struct argp_state *state, int number, char
   al_free (argument_msg);
 }
 
-static bool
+bool
 optval_to_bool (char *arg)
 {
   int i;
@@ -441,7 +444,7 @@ optval_to_bool (char *arg)
   return true;
 }
 
-static error_t
+error_t
 optval_to_int (int *retval, int key, char *arg, struct argp_state *state,
                struct int_range *r, int number)
 {
@@ -464,7 +467,7 @@ optval_to_int (int *retval, int key, char *arg, struct argp_state *state,
   return 0;
 }
 
-static error_t
+error_t
 optval_to_float (float *retval, int key, char *arg, struct argp_state *state,
                  struct float_range *r, int number)
 {
@@ -487,7 +490,7 @@ optval_to_float (float *retval, int key, char *arg, struct argp_state *state,
   return 0;
 }
 
-static error_t
+error_t
 optval_to_enum (int *retval, int key, char *arg, struct argp_state *state,
                 char **enum_vals, int number)
 {
@@ -520,7 +523,7 @@ optval_to_enum (int *retval, int key, char *arg, struct argp_state *state,
   return 0;
 }
 
-static error_t
+error_t
 option_get_args (int key, char *arg, struct argp_state *state, char s, ...)
 {
   va_list ap, at, av, ar, atype, aval, arange;
@@ -606,7 +609,7 @@ option_get_args (int key, char *arg, struct argp_state *state, char s, ...)
   return retval;
 }
 
-static error_t
+error_t
 pre_parser (int key, char *arg, struct argp_state *state)
 {
   switch (key) {
@@ -620,7 +623,7 @@ pre_parser (int key, char *arg, struct argp_state *state)
   return 0;
 }
 
-static error_t
+error_t
 parser (int key, char *arg, struct argp_state *state)
 {
   char **cargv = NULL;
@@ -629,6 +632,7 @@ parser (int key, char *arg, struct argp_state *state)
   struct config_info config_info;
   float float_val;
   int int_val0, int_val1, int_val2;
+  enum file_type file_type;
 
   char *level_module_enum[] = {"NATIVE", "LEGACY", "PLV", "DAT", "CONSISTENCY", NULL};
 
@@ -698,16 +702,17 @@ parser (int key, char *arg, struct argp_state *state)
   case IGNORE_ENVIRONMENT_OPTION:
     break;
   case LOAD_CONFIG_OPTION:
-    e = get_config_args (&cargc, &cargv, options, arg);
+    file_type = UNKNOWN_FILE_TYPE;
+    e = get_config_args (&cargc, &cargv, options, arg, &file_type);
     if (e) {
-      argp_failure (state, -1, e, "can't load configuration file '%s'", arg);
+      argp_failure (state, -1, e, "can't load %s '%s'",
+                    file_type2str (file_type), arg);
       return e;
     }
     config_info.type = CI_CONFIGURATION_FILE;
     config_info.filename = arg;
-    config_info.textlog = NULL;
     argp_parse (&argp, cargc, cargv, 0, NULL, &config_info);
-    destroy_array ((void **) &cargv, &cargc);
+    free_argv (&cargc, &cargv);
     break;
   case LEVEL_MODULE_OPTION:
     e = optval_to_enum (&i, key, arg, state, level_module_enum, 0);
@@ -1118,7 +1123,7 @@ Levels have been converted using module %s into native format at\n\
   return 0;
 }
 
-static void
+void
 version (FILE *stream, struct argp_state *state)
 {
   uint32_t allegro_version = al_get_allegro_version ();
@@ -1137,10 +1142,9 @@ version (FILE *stream, struct argp_state *state)
            "Using Allegro %i.%i.%i[%i].\n", /* Using Allegro... */
            PACKAGE, PACKAGE_NAME, VERSION,
            "2015, 2016, 2017", "oitofelix@gnu.org",
-           "\
-License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\n\
-This is free software: you are free to change and redistribute it.\n\
-There is NO WARRANTY, to the extent permitted by law.",
+           "MININIM is free software under GPLv3+.\n"
+           "You are free to change and redistribute it.\n"
+           "There is NO WARRANTY, to the extent permitted by law.",
 
            "Written by Bruno Félix Rezende Ribeiro.",
            allegro_major, allegro_minor, allegro_revision, allegro_release);
@@ -1167,43 +1171,61 @@ repl_str_char (char *str, char a, char b)
   for (i = 0; str[i] != 0; i++) if (str[i] == a) str[i] = b;
 }
 
-static char *
+char *
 command_line2env_option_name (const char *option_name)
 {
-  char *env_opt_name;
-  xasprintf (&env_opt_name, "MININIM_%s", option_name);
-  toupper_str (env_opt_name);
-  repl_str_char (env_opt_name, '-', '_');
-  return env_opt_name;
+  char *option;
+  xasprintf (&option, ENV_OPTION_PREFIX "%s", option_name);
+  toupper_str (option);
+  repl_str_char (option, '-', '_');
+  return option;
+}
+
+char *
+env2command_line_option_name (const char *option_name)
+{
+  if (memcmp (option_name, ENV_OPTION_PREFIX, sizeof (ENV_OPTION_PREFIX) - 1))
+    return NULL;
+  char *option;
+  xasprintf (&option, "%s", option_name + sizeof (ENV_OPTION_PREFIX) - 1);
+  tolower_str (option);
+  repl_str_char (option, '_', '-');
+  return option;
+}
+
+void
+config_str2key_value (const char *str, char **key, char **value)
+{
+  xasprintf (key, "%s", str);
+  repl_str_char (*key, '=', '\0');
+  *value = *key + strlen (*key) + 1;
 }
 
 void
 get_env_args (size_t *eargc, char ***eargv, struct argp_option *options)
 {
-  size_t i;
+  char *argv0; xasprintf (&argv0, "%s", argv[0]);
+  *eargv = add_to_array (&argv0, 1, *eargv, eargc, *eargc, sizeof (argv0));
 
-  *eargv = add_to_array (&argv[0], 1, *eargv, eargc, *eargc, sizeof (argv[0]));
+  size_t i = 0;
+  while (environ[i]) {
+    char *entry, *key, *value;
+    config_str2key_value (environ[i], &entry, &value);
+    key = env2command_line_option_name (entry);
+    if (! key || ! is_valid_option (key)) goto next;
 
-  for (i = 0; options[i].name != NULL
-         || options[i].key != 0
-         || options[i].arg != NULL
-         || options[i].flags != 0
-         || options[i].doc != NULL
-         || options[i].group != 0; i++) {
-    if (! options[i].name) continue;
-    char *env_opt_name = command_line2env_option_name (options[i].name);
-    char *env_opt_value = getenv (env_opt_name);
-    if (env_opt_value) {
-      char *option;
-      xasprintf (&option, "--%s=%s", options[i].name, env_opt_value);
-      *eargv = add_to_array (&option, 1, *eargv, eargc, *eargc, sizeof (option));
-    }
+    char *option;
+    xasprintf (&option, "--%s=%s", key, value);
+    *eargv = add_to_array (&option, 1, *eargv, eargc, *eargc, sizeof (option));
 
-    al_free (env_opt_name);
+  next:
+    al_free (entry);
+    if (key) al_free (key);
+    i++;
   }
 }
 
-static char *
+char *
 command_line2config_option_name (const char *option_name)
 {
   char *option;
@@ -1213,7 +1235,7 @@ command_line2config_option_name (const char *option_name)
   return option;
 }
 
-static char *
+char *
 config2command_line_option_name (const char *option_name)
 {
   char *option;
@@ -1241,23 +1263,33 @@ is_valid_option (char *option)
   return false;
 }
 
-static error_t
+error_t
 get_config_args (size_t *cargc, char ***cargv, struct argp_option *options,
-                 char *filename)
+                 char *filename, enum file_type *ret_file_type)
 {
-  *cargv = add_to_array (&argv[0], 1, *cargv, cargc, *cargc, sizeof (argv[0]));
+  enum file_type file_type = UNKNOWN_FILE_TYPE;
 
   ALLEGRO_CONFIG *config = al_load_config_file (filename);
-  if (! config) return al_get_errno ();
+  if (! config) {
+    if (ret_file_type) *ret_file_type = file_type;
+    free_argv (cargc, cargv);
+    return al_get_errno ();
+  }
+
+  char *argv0; xasprintf (&argv0, "%s", argv[0]);
+  *cargv = add_to_array (&argv0, 1, *cargv, cargc, *cargc, sizeof (argv0));
 
   ALLEGRO_CONFIG_ENTRY *iterator;
   char const *entry = al_get_first_config_entry (config, NULL, &iterator);
 
   while (entry) {
     char *key = config2command_line_option_name (entry);
-    if (! is_valid_option (key)) goto next;
-
     char const *value = al_get_config_value (config, NULL, entry);
+    if (! is_valid_option (key)) {
+      config_entry_file_type (entry, value, &file_type);
+      goto next;
+    }
+
     char *option;
     xasprintf (&option, "--%s=%s", key, value);
     *cargv = add_to_array (&option, 1, *cargv, cargc, *cargc, sizeof (option));
@@ -1269,7 +1301,25 @@ get_config_args (size_t *cargc, char ***cargv, struct argp_option *options,
 
   al_destroy_config (config);
 
+  if (ret_file_type) *ret_file_type = file_type;
+
+  if (file_type != CONFIG_FILE_TYPE && file_type != GAME_SAVE_FILE_TYPE) {
+    free_argv (cargc, cargv);
+    return EINVAL;
+  }
+
   return 0;
+}
+
+void
+free_argv (size_t *cargc, char ***cargv)
+{
+  assert (cargc);
+  assert (cargv);
+
+  size_t i;
+  for (i = 0; i < *cargc; i++) al_free ((*cargv)[i]);
+  destroy_array ((void *) cargv, cargc);
 }
 
 int
@@ -1301,16 +1351,20 @@ main (int _argc, char **_argv)
   al_init ();
 
   /* create primary event queue */
-  event_queue = create_event_queue ();
+  event_queue = al_create_event_queue ();
 
   /* get global paths */
   get_paths ();
 
+  /* get configuration file arguments */
+  enum file_type file_type = UNKNOWN_FILE_TYPE;
+  int e = get_config_args (&cargc, &cargv, options, config_filename, &file_type);
+  if (e && e != ENOENT)
+    error (0, e, "can't load %s '%s'", file_type2str (file_type),
+           config_filename);
+
   /* get environment variable arguments */
   get_env_args (&eargc, &eargv, options);
-
-  /* get configuration file arguments */
-  get_config_args (&cargc, &cargv, options, config_filename);
 
   /* size_t i; */
   /* for (i = 0; i < cargc; i++) printf ("%s\n", cargv[i]); */
@@ -1323,14 +1377,16 @@ main (int _argc, char **_argv)
   argp_parse (&pre_argp, argc, argv, 0, NULL, &config_info);
 
   /* parser */
-  if (! ignore_main_config) {
+  if (! ignore_main_config && cargc && cargv) {
     config_info.type = CI_CONFIGURATION_FILE;
     config_info.filename = config_filename;
     argp_parse (&argp, cargc, cargv, 0, NULL, &config_info);
+    free_argv (&cargc, &cargv);
   }
-  if (! ignore_environment) {
+  if (! ignore_environment && eargc && eargv) {
     config_info.type = CI_ENVIRONMENT_VARIABLES;
     argp_parse (&argp, eargc, eargv, 0, NULL, &config_info);
+    free_argv (&eargc, &eargv);
   }
   config_info.type = CI_COMMAND_LINE;
   argp_parse (&argp, argc, argv, 0, NULL, &config_info);
@@ -1350,10 +1406,10 @@ main (int _argc, char **_argv)
 
   al_inhibit_screensaver (inhibit_screensaver);
 
-  if (is_fullscreen ()) hide_mouse_cursor ();
-  else show_mouse_cursor ();
+  if (is_fullscreen ()) al_hide_mouse_cursor (display);
+  else al_show_mouse_cursor (display);
 
-  set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_BUSY);
+  al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_BUSY);
 
   load_callback = process_display_events;
   show ();
@@ -1368,7 +1424,7 @@ main (int _argc, char **_argv)
 
   show ();
 
-  set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
+  al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
 
   /* ----------------- */
   /* save_guard_bitmaps (VGA); */
@@ -1382,8 +1438,9 @@ main (int _argc, char **_argv)
   if (skip_title) goto play_game;
 
  restart_game:
+  play_time = 0;
   cutscene_mode (true);
-  set_system_mouse_cursor (ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
+  al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
   clear_bitmap (cutscene_screen, BLACK);
   clear_bitmap (uscreen, TRANSPARENT_COLOR);
   cutscene_started = false;
@@ -1432,18 +1489,32 @@ main (int _argc, char **_argv)
   goto restart_game;
 
  play_game:
-  cutscene_mode (false);
-  game_paused = false;
+  if (play_game_counter > 0) {
+    start_time = START_TIME;
+    time_limit = TIME_LIMIT;
+    start_level = 1;
+    initial_total_lives = KID_INITIAL_TOTAL_LIVES;
+    initial_current_lives = KID_INITIAL_CURRENT_LIVES;
+    skill.counter_attack_prob = INITIAL_KCA;
+    skill.counter_defense_prob = INITIAL_KCD;
+  }
+
   total_lives = initial_total_lives;
   current_lives = initial_current_lives;
   start_level_time = start_time;
+  cutscene_mode (false);
+  game_paused = false;
 
   int level = next_level_number >= 0 ? next_level_number : start_level;
   if (! level_module_next_level (&vanilla_level, level))
     exit (-1);
   play_level (&vanilla_level);
 
-  if (quit_anim == RESTART_GAME) goto restart_game;
+  if (quit_anim == LOAD_GAME) goto play_game;
+  else if (quit_anim == RESTART_GAME) {
+    play_game_counter++;
+    goto restart_game;
+  }
 
   quit_game ();
 
@@ -1474,7 +1545,7 @@ quit_game (void)
   exit (0);
 }
 
-static void
+void
 give_dat_compat_preference (void)
 {
   if (al_filename_exists (levels_dat_compat_filename)
@@ -1484,7 +1555,7 @@ give_dat_compat_preference (void)
   }
 }
 
-static void
+void
 get_paths (void)
 {
   /* get resources path string */
@@ -1537,13 +1608,13 @@ get_paths (void)
 
   /* get dialogs initial paths */
   xasprintf (&load_config_dialog.initial_path, "%s", user_settings_dir);
-  xasprintf (&save_game_dialog.initial_path, "%s.mcf", user_settings_dir);
+  xasprintf (&save_game_dialog.initial_path, "%s.msv", user_settings_dir);
   xasprintf (&save_picture_dialog.initial_path, "%s.png", user_documents_dir);
   xasprintf (&save_replay_dialog.initial_path, "%s.mrp", user_data_dir);
   xasprintf (&load_replay_dialog.initial_path, "%s", user_data_dir);
 }
 
-static void
+void
 print_paths (void)
 {
   printf ("Main configuration file: %s\n", config_filename);
@@ -1557,14 +1628,14 @@ print_paths (void)
   printf ("User settings: %s\n", user_settings_dir);
 }
 
-static void
+void
 print_display_modes (void)
 {
   printf ("Display Modes:\n");
   printf ("\t-1: desktop settings\n");
   int i, n = al_get_num_display_modes ();
   for (i = 0; i < n ; i++) {
-    ALLEGRO_DISPLAY_MODE d; get_display_mode (i, &d);
+    ALLEGRO_DISPLAY_MODE d; al_get_display_mode (i, &d);
     printf ("\t% 2i: %ix%i %iHz\n", i, d.width, d.height, d.refresh_rate);
   }
 }
@@ -1574,15 +1645,15 @@ dialog_thread (ALLEGRO_THREAD *thread, void *arg)
 {
   struct dialog *d = arg;
   enable_menu (false);
-  show_mouse_cursor ();
+  al_show_mouse_cursor (display);
 
   ALLEGRO_FILECHOOSER *dialog = NULL;
 
   do {
     if (dialog) al_destroy_native_file_dialog (dialog);
 
-    dialog = create_native_file_dialog (d->initial_path, d->title,
-                                        d->patterns, d->mode);
+    dialog = al_create_native_file_dialog (d->initial_path, d->title,
+                                           d->patterns, d->mode);
 
     al_show_native_file_dialog (display, dialog);
   } while (d->mode & ALLEGRO_FILECHOOSER_SAVE
@@ -1593,8 +1664,8 @@ dialog_thread (ALLEGRO_THREAD *thread, void *arg)
   al_set_thread_should_stop (thread);
 
   if (is_fullscreen () && ! is_showing_menu ())
-    hide_mouse_cursor ();
-  else show_mouse_cursor ();
+    al_hide_mouse_cursor (display);
+  else al_show_mouse_cursor (display);
 
   create_main_menu ();
 
@@ -1605,7 +1676,7 @@ void *
 message_box_thread (ALLEGRO_THREAD *thread, void *arg)
 {
   struct message_box *d = arg;
-  show_mouse_cursor ();
+  al_show_mouse_cursor (display);
 
   al_show_native_message_box
     (display, d->title, d->heading, d->text, d->buttons, d->flags);
@@ -1613,27 +1684,31 @@ message_box_thread (ALLEGRO_THREAD *thread, void *arg)
   al_set_thread_should_stop (thread);
 
   if (is_fullscreen () && ! is_showing_menu ())
-    hide_mouse_cursor ();
-  else show_mouse_cursor ();
+    al_hide_mouse_cursor (display);
+  else al_show_mouse_cursor (display);
 
   return NULL;
 }
 
 bool
-load_config (char *filename, ALLEGRO_TEXTLOG *textlog, int priority)
+load_config (char *filename, enum file_type *ret_file_type, int priority)
 {
   char **cargv = NULL;
   size_t cargc = 0;
   struct config_info config_info;
 
-  if (get_config_args (&cargc, &cargv, options, filename)) {
-    al_append_native_text_log (textlog, "cannot load configuration file '%s'\n");
+  enum file_type file_type = UNKNOWN_FILE_TYPE;
+  if (get_config_args (&cargc, &cargv, options, filename, &file_type)) {
+    print_text_log ("cannot load %s '%s'\n", file_type2str (file_type),
+                    filename);
+    if (ret_file_type) *ret_file_type = file_type;
     return false;
   }
 
+  if (ret_file_type) *ret_file_type = file_type;
+
   config_info.type = CI_CONFIGURATION_FILE;
   config_info.filename = filename;
-  config_info.textlog = textlog;
 
   bool parse_error = false;
   int last_arg_index, arg_index = -1;
@@ -1646,7 +1721,7 @@ load_config (char *filename, ALLEGRO_TEXTLOG *textlog, int priority)
     if (! parse_error) parse_error = e;
   } while (e && arg_index > last_arg_index);
 
-  destroy_array ((void **) &cargv, &cargc);
+  free_argv (&cargc, &cargv);
 
   return ! parse_error;
 }
@@ -1654,7 +1729,7 @@ load_config (char *filename, ALLEGRO_TEXTLOG *textlog, int priority)
 bool
 save_game (char *filename, int priority)
 {
-  ALLEGRO_CONFIG *config = create_config ();
+  ALLEGRO_CONFIG *config = al_create_config ();
   char *start_level_str, *start_time_str, *time_limit_str,
     *total_lives_str, *kca_str, *kcd_str;
 
@@ -1665,13 +1740,13 @@ save_game (char *filename, int priority)
   xasprintf (&kca_str, "%i", skill.counter_attack_prob + 1);
   xasprintf (&kcd_str, "%i", skill.counter_defense_prob + 1);
 
-  al_add_config_comment (config, NULL, "MININIM save file");
-  al_set_config_value (config, NULL, "start level", start_level_str);
-  al_set_config_value (config, NULL, "start time", start_time_str);
-  al_set_config_value (config, NULL, "time limit", time_limit_str);
-  al_set_config_value (config, NULL, "total lives", total_lives_str);
-  al_set_config_value (config, NULL, "kca", kca_str);
-  al_set_config_value (config, NULL, "kcd", kcd_str);
+  al_set_config_value (config, NULL, "FILE TYPE", "MININIM GAME SAVE");
+  al_set_config_value (config, NULL, "START LEVEL", start_level_str);
+  al_set_config_value (config, NULL, "START TIME", start_time_str);
+  al_set_config_value (config, NULL, "TIME LIMIT", time_limit_str);
+  al_set_config_value (config, NULL, "TOTAL LIVES", total_lives_str);
+  al_set_config_value (config, NULL, "KCA", kca_str);
+  al_set_config_value (config, NULL, "KCD", kcd_str);
 
   bool success = al_save_config_file (filename, config);
 
@@ -1679,7 +1754,7 @@ save_game (char *filename, int priority)
     ? "GAME HAS BEEN SAVED"
     : "GAME SAVING FAILED";
 
-  ui_msg (priority, error_str);
+  ui_msg (priority, "%s", error_str);
 
   al_destroy_config (config);
   al_free (start_level_str);
@@ -1705,35 +1780,46 @@ handle_load_config_thread (int priority)
   load_config_dialog_thread = NULL;
   size_t i;
   size_t n = al_get_native_file_dialog_count (dialog);
-  ALLEGRO_TEXTLOG *textlog = NULL;
 
   if (n > 0) {
-    textlog =
-      open_native_text_log ("Configuration loading results",
-                            ALLEGRO_TEXTLOG_MONOSPACE);
-
     bool success = true;
+    enum file_type file_type = UNKNOWN_FILE_TYPE;
     for (i = 0; i < n; i++) {
       char *filename = (char *) al_get_native_file_dialog_path (dialog, i);
-      if (! load_config (filename, textlog, priority))
+
+      if (! load_config (filename, &file_type, priority))
         success = false;
+
+      if (file_type == GAME_SAVE_FILE_TYPE) break;
     }
 
     char *error_str;
-    if (success) {
-      al_close_native_text_log (textlog);
-      error_str = "CONFIGURATION LOADED SUCCESSFULLY";
-    } else {
-      al_register_event_source
-        (event_queue, get_native_text_log_event_source (textlog));
-      error_str = "CONFIGURATION LOADED WITH ERRORS";
+    if (n == 1
+        && file_type != CONFIG_FILE_TYPE
+        && file_type != GAME_SAVE_FILE_TYPE)
+      error_str = "UNKNOWN FILE TYPE";
+    else {
+      if (success)
+        error_str = file_type == GAME_SAVE_FILE_TYPE
+          ? "GAME HAS BEEN LOADED"
+          : "CONFIGURATION HAS BEEN LOADED";
+      else
+        error_str = file_type == GAME_SAVE_FILE_TYPE
+          ? "GAME LOADED WITH ERRORS"
+          : "CONFIGURATION LOADED WITH ERRORS";
     }
-
-    ui_msg (priority, error_str);
 
     al_free (load_config_dialog.initial_path);
     xasprintf (&load_config_dialog.initial_path, "%s",
                al_get_native_file_dialog_path (dialog, n - 1));
+
+    ui_msg (priority, "%s", error_str);
+
+    if (file_type == GAME_SAVE_FILE_TYPE) {
+      play_game_counter = 0;
+      next_level_number = -1;
+      quit_anim = LOAD_GAME;
+    }
   }
 
   al_destroy_native_file_dialog (dialog);
@@ -1781,7 +1867,7 @@ handle_save_picture_thread (int priority)
       (filename, al_get_backbuffer (display))
       ? "PICTURE HAS BEEN SAVED"
       : "PICTURE SAVING FAILED";
-    ui_msg (priority, error_str);
+    ui_msg (priority, "%s", error_str);
     al_free (save_picture_dialog.initial_path);
     xasprintf (&save_picture_dialog.initial_path, "%s", filename);
   }
@@ -1799,48 +1885,6 @@ handle_message_box_thread (void)
   al_join_thread (message_box_thread_id, NULL);
   al_destroy_thread (message_box_thread_id);
   message_box_thread_id = NULL;
-}
-
-int
-max_int (int a, int b)
-{
-  return (a > b) ? a : b;
-}
-
-int
-min_int (int a, int b)
-{
-  return (a < b) ? a : b;
-}
-
-int
-cint (int *x, int *y)
-{
-  return *x - *y;
-}
-
-unsigned char
-add_char (unsigned char a, signed char b)
-{
-  if (b < 0 && -b > a) return 0;
-  if (b > 0 && b > UCHAR_MAX - a) return UCHAR_MAX;
-  return a + b;
-}
-
-int
-int_to_range (int i, int min, int max)
-{
-  if (i >= max) return max;
-  else if (i <= min) return min;
-  else return i;
-}
-
-float
-dist_cart (float x0, float y0, float x1, float y1)
-{
-  int dx = x0 - x1;
-  int dy = y0 - y1;
-  return sqrt (dx * dx + dy * dy);
 }
 
 struct level *
@@ -1926,29 +1970,4 @@ save_level (struct level *l)
     return false;
   }
   return true;
-}
-
-double
-max_double (double a, double b)
-{
-  return (a > b) ? a : b;
-}
-
-double
-min_double (double a, double b)
-{
-  return (a < b) ? a : b;
-}
-
-bool
-equiv (bool a, bool b)
-{
-  return (a && b) || (! a && ! b);
-}
-
-int
-bool2bitmap_flags (bool v, bool h)
-{
-  return (v ? ALLEGRO_FLIP_VERTICAL : 0)
-    | (h ? ALLEGRO_FLIP_HORIZONTAL : 0);
 }

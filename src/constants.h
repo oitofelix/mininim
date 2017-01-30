@@ -28,6 +28,8 @@
 #define OITOFELIX_FACE_BW "data/icons/oitofelix-face-bw.png"
 #define JOYSTICK_BIG_ICON "data/icons/joystick-big.png"
 
+#define ENV_OPTION_PREFIX "MININIM_"
+
 #define VOLUME_RANGE_MIN 0.0
 #define VOLUME_RANGE_LOW 0.3
 #define VOLUME_RANGE_MEDIUM 0.6

@@ -173,7 +173,7 @@ load_native_level (struct level *l, int n)
 bool
 save_native_level (struct level *l, char *filename)
 {
-  ALLEGRO_CONFIG *c = create_config ();
+  ALLEGRO_CONFIG *c = al_create_config ();
   char *k, *v;
   int i;
 

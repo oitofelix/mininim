@@ -63,8 +63,6 @@ int get_joystick_h_axis (void);
 int get_joystick_v_axis (void);
 ALLEGRO_JOYSTICK *calibrate_joystick (void);
 void free_joystick (void);
-ALLEGRO_EVENT_SOURCE *get_keyboard_event_source (void);
-ALLEGRO_EVENT_SOURCE *get_joystick_event_source (void);
 struct gamepad_state *get_gamepad_state (struct gamepad_state *k);
 error_t joystick_info (void);
 bool is_mod_key (int keycode);

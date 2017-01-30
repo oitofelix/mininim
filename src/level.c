@@ -32,7 +32,7 @@ struct level global_level;
 
 struct undo undo;
 
-static uint64_t last_auto_show_time;
+static int64_t last_auto_show_time;
 static bool level_number_shown;
 
 bool no_room_drawing;
@@ -294,12 +294,14 @@ play_level (struct level *lv)
     HLINE;
     printf ("RESTART REPLAY LEVEL\n");
     goto restart_level;
+    break;
   case RESTART_LEVEL:
   restart_level:
     retry_level = global_level.n;
     level_cleanup ();
     ui_msg_clear (0);
    goto start;
+   break;
   case NEXT_LEVEL:
   next_level:
     level_cleanup ();
@@ -321,6 +323,7 @@ play_level (struct level *lv)
       else if (quit_anim == QUIT_GAME) goto quit;
     }
     goto start;
+    break;
   case RESTART_GAME:
   restart_game:
     next_level_number = -1;
@@ -341,6 +344,7 @@ play_level (struct level *lv)
     else if (quit_anim == RESTART_LEVEL) goto restart_level;
     else if (quit_anim == RESTART_GAME) goto restart_game;
     else if (quit_anim == QUIT_GAME) goto quit;
+    goto restart_game;
     break;
   }
  quit:
@@ -783,54 +787,27 @@ draw_level (void)
 
   /* automatic remaining time display */
   if (! title_demo) {
-    uint64_t rem_time = time_limit - play_time;
-    uint64_t rem_time_sec = rem_time / DEFAULT_HZ;
-    uint64_t rem_time_min = (rem_time_sec / 60) + 1;
+    int64_t rem_time = time_limit - play_time;
+    int64_t rem_time_sec = precise_unit (rem_time, 1 * DEFAULT_HZ);
+    int64_t rem_time_min = precise_unit (rem_time, 60 * DEFAULT_HZ);
     if ((rem_time_min % 5 == 0
-         && last_auto_show_time != rem_time_min)
+         && labs (last_auto_show_time - rem_time_min) > 1)
         || rem_time_sec <= 60
         || (anim_cycle <= SEC2CYC (10)
-            && last_auto_show_time != rem_time_min)) {
+            && labs (last_auto_show_time - rem_time_min) > 1)) {
       if (rem_time_sec <= 60
           && (rem_time + 1) % DEFAULT_HZ == 0
           && ! play_time_stopped)
         play_audio (&press_key_audio, NULL, -1);
-      if (display_remaining_time (rem_time_sec <= 60 ? 0 : -2))
+      if (display_remaining_time (rem_time_sec <= 60 ? 0 : -2)) {
+        if (rem_time == 60 * DEFAULT_HZ) cheat_menu ();
         last_auto_show_time = rem_time_min;
+      }
     }
     if (rem_time <= 0) quit_anim = OUT_OF_TIME;
   }
 
   if (is_game_paused () && ! active_menu) print_game_paused (-1);
-}
-
-bool
-display_remaining_time (int priority)
-{
-  int t = (time_limit - play_time) / DEFAULT_HZ;
-  if (t < 0) t = 0;
-  int m = t / 60 + ((t % 60) ? 1 : 0);
-  return t > 60
-    ? ui_msg (priority, "%i MINUTES LEFT", m)
-    : ui_msg (priority, "%i SECONDS LEFT", t);
-}
-
-void
-display_skill (struct anim *k)
-{
-  struct anim *ke = get_anim_by_id (k->enemy_id);
-  if (ke)
-    ui_msg (0, "KCA%i KCD%i A%i CA%i D%i CD%i",
-            k->skill.counter_attack_prob + 1,
-            k->skill.counter_defense_prob + 1,
-            ke->skill.attack_prob + 1,
-            ke->skill.counter_attack_prob + 1,
-            ke->skill.defense_prob + 1,
-            ke->skill.counter_defense_prob + 1);
-  else
-    ui_msg (0, "KCA%i KCD%i",
-            k->skill.counter_attack_prob + 1,
-            k->skill.counter_defense_prob + 1);
 }
 
 static void
@@ -857,7 +834,7 @@ pause_game (bool val)
 {
   if (! val) ui_msg_clear (0);
   game_paused = val;
-  replay_menu ();
+  play_menu ();
 }
 
 bool
