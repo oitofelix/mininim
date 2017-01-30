@@ -40,12 +40,6 @@
 #define MACOSX_PORT false
 #endif
 
-/* environ */
-#if MACOSX_PORT
-#include <crt_externs.h>
-#define environ (*_NSGetEnviron())
-#endif
-
 /* Non-debug build runtime checking */
 #ifdef NDEBUG
 #define DEBUG false
