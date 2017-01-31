@@ -99,6 +99,9 @@ static void play_menu (void);
 static void editor_menu (void);
 
 static void cheat_menu (void);
+static void time_change_menu (void);
+static void kca_change_menu (void);
+static void kcd_change_menu (void);
 
 static void help_menu (void);
 
@@ -157,6 +160,9 @@ static void ui_immortal (bool immortal);
 static void ui_fill_life (void);
 static void ui_add_life (void);
 static void ui_change_time (int m);
+static void ui_change_prob_skill (int *skill, int new);
+static void ui_change_kca (int d);
+static void ui_change_kcd (int d);
 
 static void ui_version (void);
 static void ui_next_display_mode (void);
@@ -1318,12 +1324,44 @@ cheat_menu (void)
               ? "&Add container (Shift+T)"
               : "Fill &all containers (Shift+T)");
 
-  menu_sep (NULL);
+  menu_sub (TIME_CHANGE_MID, true, time_icon, time_change_menu, "&Time");
+  menu_sub (KCA_CHANGE_MID, true, counter_attack_icon,
+            kca_change_menu, "Counter a&ttack");
+  menu_sub (KCD_CHANGE_MID, true, counter_defense_icon,
+            kcd_change_menu, "Counter &defense");
+}
 
-  menu_sitem (TIME_ADD_MID, true, time_add_icon, "&Increase time (+)");
+void
+time_change_menu (void)
+{
+  menu_sitem (TIME_ADD_MID, true, time_add_icon, "&Increase (=)");
 
   menu_sitem (TIME_SUB_MID, time_limit - play_time > 60 * DEFAULT_HZ,
-              time_sub_icon, "&Decrease time (-)");
+              time_sub_icon, "&Decrease (-)");
+}
+
+void
+kca_change_menu (void)
+{
+  struct anim *k = get_anim_by_id (current_kid_id);
+
+  menu_sitem (KCA_ADD_MID, k && k->skill.counter_attack_prob < 99,
+              counter_attack_add_icon, "&Increase (Ctrl+=)");
+
+  menu_sitem (KCA_SUB_MID, k && k->skill.counter_attack_prob > -1,
+              counter_attack_sub_icon, "&Decrease (Ctrl+-)");
+}
+
+void
+kcd_change_menu (void)
+{
+  struct anim *k = get_anim_by_id (current_kid_id);
+
+  menu_sitem (KCD_ADD_MID, k && k->skill.counter_defense_prob < 99,
+              counter_defense_add_icon, "&Increase (Alt+=)");
+
+  menu_sitem (KCD_SUB_MID, k && k->skill.counter_defense_prob > -1,
+              counter_defense_sub_icon, "&Decrease (Alt+-)");
 }
 
 void
@@ -1733,10 +1771,22 @@ menu_mid (ALLEGRO_EVENT *event)
     ui_add_life ();
     break;
   case TIME_ADD_MID:
-    ui_change_time (+5);
+    ui_change_time (+10);
     break;
   case TIME_SUB_MID:
-    ui_change_time (-5);
+    ui_change_time (-10);
+    break;
+  case KCA_ADD_MID:
+    ui_change_kca (+10);
+    break;
+  case KCA_SUB_MID:
+    ui_change_kca (-10);
+    break;
+  case KCD_ADD_MID:
+    ui_change_kcd (+10);
+    break;
+  case KCD_SUB_MID:
+    ui_change_kcd (-10);
     break;
 
 
@@ -2162,48 +2212,20 @@ level_key_bindings (void)
     ui_change_time (-1);
 
   /* CTRL+=: increase counter attack skill */
-  else if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_EQUALS)) {
-    if (replay_mode == NO_REPLAY) {
-      struct anim *k = get_anim_by_id (current_kid_id);
-      if (k->skill.counter_attack_prob < 99)
-        k->skill.counter_attack_prob++;
-      display_skill (k);
-      skill = k->skill;
-    } else print_replay_mode (0);
-  }
+  else if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_EQUALS))
+    ui_change_kca (+1);
 
   /* CTRL+-: decrease counter attack skill */
-  else if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_MINUS)) {
-    if (replay_mode == NO_REPLAY) {
-      struct anim *k = get_anim_by_id (current_kid_id);
-      if (k->skill.counter_attack_prob > -1)
-        k->skill.counter_attack_prob--;
-      display_skill (k);
-      skill = k->skill;
-    } else print_replay_mode (0);
-  }
+  else if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_MINUS))
+    ui_change_kca (-1);
 
   /* ALT+=: increase counter defense skill */
-  else if (was_key_pressed (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_EQUALS)) {
-    if (replay_mode == NO_REPLAY) {
-      struct anim *k = get_anim_by_id (current_kid_id);
-      if (k->skill.counter_defense_prob < 99)
-        k->skill.counter_defense_prob++;
-      display_skill (k);
-      skill = k->skill;
-    } else print_replay_mode (0);
-  }
+  else if (was_key_pressed (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_EQUALS))
+    ui_change_kcd (+1);
 
   /* ALT+-: decrease counter defense skill */
-  else if (was_key_pressed (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_MINUS)) {
-    if (replay_mode == NO_REPLAY) {
-      struct anim *k = get_anim_by_id (current_kid_id);
-      if (k->skill.counter_defense_prob > -1)
-        k->skill.counter_defense_prob--;
-      display_skill (k);
-      skill = k->skill;
-    } else print_replay_mode (0);
-  }
+  else if (was_key_pressed (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_MINUS))
+    ui_change_kcd (-1);
 
   /* A: alternate between kid and its shadows */
   else if (! active_menu
@@ -3001,6 +3023,36 @@ ui_change_time (int m)
   } else print_replay_mode (0);
 }
 
+void
+ui_change_prob_skill (int *holder, int new)
+{
+  if (replay_mode == NO_REPLAY) {
+    struct anim *k = get_anim_by_id (current_kid_id);
+    new = new > -1 ? new : -1;
+    new = new < 99 ? new : 99;
+    *holder = new;
+    display_skill (k);
+    skill = k->skill;
+  } else print_replay_mode (0);
+}
+
+void
+ui_change_kca (int d)
+{
+  struct anim *k = get_anim_by_id (current_kid_id);
+  ui_change_prob_skill
+    (&k->skill.counter_attack_prob,
+     next_multiple (k->skill.counter_attack_prob + 1, d) - 1);
+}
+
+void
+ui_change_kcd (int d)
+{
+  struct anim *k = get_anim_by_id (current_kid_id);
+  ui_change_prob_skill
+    (&k->skill.counter_defense_prob,
+     next_multiple (k->skill.counter_defense_prob + 1, d) - 1);
+}
 
 
 
