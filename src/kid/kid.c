@@ -317,6 +317,8 @@ c_phantom_shadow_palette (ALLEGRO_COLOR c)
 static ALLEGRO_COLOR
 v_palette (ALLEGRO_COLOR c)
 {
+  if (color_eq (c, LIFE_COLOR_01)) return V_BLOOD_COLOR_01;
+  if (color_eq (c, LIFE_COLOR_02)) return V_BLOOD_COLOR_02;
   return c;
 }
 
@@ -332,6 +334,8 @@ e_palette (ALLEGRO_COLOR c)
   if (color_eq (c, V_KID_EYE_COLOR)) return E_KID_EYE_COLOR;
   if (color_eq (c, V_BLOOD_COLOR_01)) return E_BLOOD_COLOR_01;
   if (color_eq (c, V_BLOOD_COLOR_02)) return E_BLOOD_COLOR_02;
+  if (color_eq (c, LIFE_COLOR_01)) return E_BLOOD_COLOR_01;
+  if (color_eq (c, LIFE_COLOR_02)) return E_BLOOD_COLOR_02;
   return c;
 }
 
@@ -347,6 +351,8 @@ c_palette (ALLEGRO_COLOR c)
   if (color_eq (c, V_KID_EYE_COLOR)) return C_KID_EYE_COLOR;
   if (color_eq (c, V_BLOOD_COLOR_01)
       || color_eq (c, V_BLOOD_COLOR_02)) return C_BLOOD_COLOR;
+  if (color_eq (c, LIFE_COLOR_01)) return C_BLOOD_COLOR;
+  if (color_eq (c, LIFE_COLOR_02)) return C_BLOOD_COLOR;
   return c;
 }
 
@@ -410,7 +416,9 @@ draw_kid_lives (ALLEGRO_BITMAP *bitmap, struct anim *k,
 
   ALLEGRO_BITMAP *empty = NULL,
     *full = NULL;
-  palette pal = get_kid_palette (vm);
+  palette pal = k->shadow
+    ? get_shadow_life_palette (vm)
+    : get_kid_palette (vm);
   empty = apply_palette (v_kid_empty_life, pal);
   full = apply_palette (v_kid_full_life, pal);
 

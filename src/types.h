@@ -453,6 +453,8 @@ struct anim {
   /* depressible floor */
   struct pos df_pos[2];
   struct pos df_posb[2];
+
+  struct mr_origin mr_origin;
 };
 
 typedef struct coord *(*coord_f) (struct frame *, struct coord *);

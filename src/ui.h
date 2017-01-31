@@ -120,6 +120,7 @@
 #define COUNTER_DEFENSE_ICON "data/icons/counter-defense.png"
 #define COUNTER_DEFENSE_ADD_ICON "data/icons/counter-defense-add.png"
 #define COUNTER_DEFENSE_SUB_ICON "data/icons/counter-defense-sub.png"
+#define SHADOW_FACE_ICON "data/icons/shadow-face.png"
 
 /* MID arrays */
 #define SEP_MID_NMEMB 1000
@@ -255,6 +256,7 @@ enum main_menu {
   IMMORTAL_MID,
   FILL_LIFE_MID,
   ADD_LIFE_MID,
+  FELLOW_SHADOW_MID,
   TIME_CHANGE_MID,
   TIME_ADD_MID,
   TIME_SUB_MID,

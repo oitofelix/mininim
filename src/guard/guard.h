@@ -41,6 +41,7 @@ bool is_guard_by_type (enum anim_type t);
 void draw_guard_lives (ALLEGRO_BITMAP *bitmap, struct anim *g, enum vm vm);
 palette get_guard_palette (int style, enum vm vm);
 void apply_guard_mode (struct anim *g, enum gm gm);
+palette get_shadow_life_palette (enum vm vm);
 
 /* variables */
 extern struct anim *guarda;

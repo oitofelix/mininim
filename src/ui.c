@@ -159,6 +159,7 @@ static void ui_float (void);
 static void ui_immortal (bool immortal);
 static void ui_fill_life (void);
 static void ui_add_life (void);
+static void ui_fellow_shadow (void);
 static void ui_change_time (int m);
 static void ui_change_prob_skill (int *skill, int new);
 static void ui_change_kca (int d);
@@ -203,7 +204,7 @@ ALLEGRO_BITMAP *small_logo_icon,
   *attack_icon, *attack_add_icon, *attack_sub_icon, *defense_icon,
   *defense_add_icon, *defense_sub_icon, *counter_attack_icon,
   *counter_attack_add_icon, *counter_attack_sub_icon, *counter_defense_icon,
-  *counter_defense_add_icon, *counter_defense_sub_icon;
+  *counter_defense_add_icon, *counter_defense_sub_icon, *shadow_face_icon;
 
 
 
@@ -318,6 +319,7 @@ load_icons (void)
   counter_defense_icon = load_icon (COUNTER_DEFENSE_ICON);
   counter_defense_add_icon = load_icon (COUNTER_DEFENSE_ADD_ICON);
   counter_defense_sub_icon = load_icon (COUNTER_DEFENSE_SUB_ICON);
+  shadow_face_icon = load_icon (SHADOW_FACE_ICON);
 }
 
 void
@@ -423,6 +425,7 @@ unload_icons (void)
   destroy_bitmap (counter_defense_icon);
   destroy_bitmap (counter_defense_add_icon);
   destroy_bitmap (counter_defense_sub_icon);
+  destroy_bitmap (shadow_face_icon);
 }
 
 
@@ -1324,6 +1327,9 @@ cheat_menu (void)
               ? "&Add container (Shift+T)"
               : "Fill &all containers (Shift+T)");
 
+  menu_sitem (FELLOW_SHADOW_MID, k && k->current_lives > 0,
+              shadow_face_icon, "Fellow s&hadow (A)");
+
   menu_sub (TIME_CHANGE_MID, true, time_icon, time_change_menu, "&Time");
   menu_sub (KCA_CHANGE_MID, true, counter_attack_icon,
             kca_change_menu, "Counter a&ttack");
@@ -1769,6 +1775,9 @@ menu_mid (ALLEGRO_EVENT *event)
     break;
   case ADD_LIFE_MID:
     ui_add_life ();
+    break;
+  case FELLOW_SHADOW_MID:
+    ui_fellow_shadow ();
     break;
   case TIME_ADD_MID:
     ui_change_time (+10);
@@ -2229,14 +2238,8 @@ level_key_bindings (void)
 
   /* A: alternate between kid and its shadows */
   else if (! active_menu
-           && was_key_pressed (0, ALLEGRO_KEY_A)) {
-    struct anim *k = NULL;
-    do {
-      k = &anima[(k - anima + 1) % anima_nmemb];
-    } while (k->type != KID || ! k->controllable);
-    current_kid_id = k->id;
-    mr_focus_room (k->f.c.room);
-  }
+           && was_key_pressed (0, ALLEGRO_KEY_A))
+    ui_fellow_shadow ();
 
   /* ESC: pause game */
   if (step_cycle > 0) {
@@ -2993,6 +2996,30 @@ ui_add_life (void)
     struct anim *k = get_anim_by_id (current_kid_id);
     increase_kid_total_lives (k);
     total_lives = k->total_lives;
+  } else print_replay_mode (0);
+}
+
+void
+ui_fellow_shadow (void)
+{
+  if (replay_mode == NO_REPLAY) {
+    struct anim *old_k = get_anim_by_id (current_kid_id);
+    mr_save_origin (&old_k->mr_origin);
+    struct anim *k = old_k;
+    do {
+      k = &anima[(k - anima + 1) % anima_nmemb];
+    } while (k->type != KID || ! k->controllable);
+    if (k == old_k) {
+      /* after this old_k reference might not be valid anymore, until
+         get_anim_by_id is called again */
+      int i = create_anim (&anima[0], 0, NULL, 0);
+      k = &anima[i];
+    }
+    current_kid_id = k->id;
+    mr_restore_origin (&k->mr_origin);
+    mr.select_cycles = SELECT_CYCLES;
+    /* ui_msg (0, "PLAYER: %s", */
+    /*         current_kid_id ? "FELLOW SHADOW" : "KID"); */
   } else print_replay_mode (0);
 }
 

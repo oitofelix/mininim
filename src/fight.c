@@ -26,6 +26,10 @@ are_valid_opponents (struct anim *k0, struct anim *k1)
   /* no one fights oneself */
   if (k0->id == k1->id) return false;
 
+  /* no one fights one's own fellow shadows */
+  if (k0->shadow_of == k1->id || k1->shadow_of == k0->id)
+    return false;
+
   /* non-fightable characters can't fight */
   if (! is_fightable_anim (k0) || ! is_fightable_anim (k1))
     return false;
@@ -34,8 +38,8 @@ are_valid_opponents (struct anim *k0, struct anim *k1)
   if (! k0->fight || ! k1->fight)
     return false;
 
-  /* anyone fightable trying to fight the kid is fair game */
-  if (k0->id == 0 || k1->id == 0) return true;
+  /* fight against controllables is fair game */
+  if (k0->controllable || k1->controllable) return true;
 
   return false;
 }

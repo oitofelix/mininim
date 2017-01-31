@@ -398,8 +398,8 @@
 #define C_RED_GUARD_BLOOD_COLOR (C_BLOOD_COLOR)
 #define C_RED_GUARD_SPLASH_COLOR (C_BLOOD_COLOR)
 
-#define GUARD_LIFE_COLOR_01  (al_map_rgb (0, 0, 160))
-#define GUARD_LIFE_COLOR_02  (al_map_rgb (0, 167, 0))
+#define LIFE_COLOR_01  (al_map_rgb (0, 0, 160))
+#define LIFE_COLOR_02  (al_map_rgb (0, 167, 0))
 
 #define PRINCESS_SKIN_COLOR_01 (al_map_rgb (160, 80, 0))
 #define PRINCESS_SKIN_COLOR_02 (al_map_rgb (160, 0, 160))

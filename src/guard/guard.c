@@ -26,7 +26,6 @@ ALLEGRO_BITMAP *guard_life, *guard_splash;
 static ALLEGRO_COLOR c_shadow_life_palette (ALLEGRO_COLOR c);
 static ALLEGRO_COLOR e_shadow_life_palette (ALLEGRO_COLOR c);
 static ALLEGRO_COLOR v_shadow_life_palette (ALLEGRO_COLOR c);
-static palette get_shadow_life_palette (enum vm vm);
 static ALLEGRO_COLOR skeleton_life_palette (ALLEGRO_COLOR c);
 
 void
@@ -80,6 +79,7 @@ create_guard (struct anim *g0, struct anim *g1, struct pos *p, enum dir dir)
     g1->skill.counter_attack_prob = -1;
     g1->skill.counter_defense_prob = -1;
     g1->glory_sample = false;
+    g1->shadow_of = -1;
 
     if (g1->type == SHADOW) g1->shadow = true;
 
@@ -107,7 +107,7 @@ apply_guard_mode (struct anim *g, enum gm gm)
   }
 }
 
-static ALLEGRO_COLOR
+ALLEGRO_COLOR
 v_salmon_palette (ALLEGRO_COLOR c)
 {
   /* honor transparency */
@@ -141,7 +141,7 @@ v_salmon_palette (ALLEGRO_COLOR c)
   return c;
 }
 
-static ALLEGRO_COLOR
+ALLEGRO_COLOR
 v_light_blue_palette (ALLEGRO_COLOR c)
 {
   /* honor transparency */
@@ -176,7 +176,7 @@ v_light_blue_palette (ALLEGRO_COLOR c)
   return c;
 }
 
-static ALLEGRO_COLOR
+ALLEGRO_COLOR
 v_red_palette (ALLEGRO_COLOR c)
 {
   /* honor transparency */
@@ -210,7 +210,7 @@ v_red_palette (ALLEGRO_COLOR c)
   return c;
 }
 
-static ALLEGRO_COLOR
+ALLEGRO_COLOR
 v_orange_palette (ALLEGRO_COLOR c)
 {
   /* honor transparency */
@@ -244,7 +244,7 @@ v_orange_palette (ALLEGRO_COLOR c)
   return c;
 }
 
-static ALLEGRO_COLOR
+ALLEGRO_COLOR
 v_green_palette (ALLEGRO_COLOR c)
 {
   /* honor transparency */
@@ -278,7 +278,7 @@ v_green_palette (ALLEGRO_COLOR c)
   return c;
 }
 
-static ALLEGRO_COLOR
+ALLEGRO_COLOR
 v_dark_blue_palette (ALLEGRO_COLOR c)
 {
   /* honor transparency */
@@ -313,7 +313,7 @@ v_dark_blue_palette (ALLEGRO_COLOR c)
   return c;
 }
 
-static ALLEGRO_COLOR
+ALLEGRO_COLOR
 v_purple_palette (ALLEGRO_COLOR c)
 {
   /* honor transparency */
@@ -347,7 +347,7 @@ v_purple_palette (ALLEGRO_COLOR c)
   return c;
 }
 
-static ALLEGRO_COLOR
+ALLEGRO_COLOR
 v_yellow_palette (ALLEGRO_COLOR c)
 {
   /* honor transparency */
@@ -381,7 +381,7 @@ v_yellow_palette (ALLEGRO_COLOR c)
   return c;
 }
 
-static ALLEGRO_COLOR
+ALLEGRO_COLOR
 e_dark_red_palette (ALLEGRO_COLOR c)
 {
   /* honor transparency */
@@ -418,7 +418,7 @@ e_dark_red_palette (ALLEGRO_COLOR c)
   return c;
 }
 
-static ALLEGRO_COLOR
+ALLEGRO_COLOR
 e_red_palette (ALLEGRO_COLOR c)
 {
   /* honor transparency */
@@ -453,7 +453,7 @@ e_red_palette (ALLEGRO_COLOR c)
   return c;
 }
 
-static ALLEGRO_COLOR
+ALLEGRO_COLOR
 e_green_palette (ALLEGRO_COLOR c)
 {
   /* honor transparency */
@@ -488,7 +488,7 @@ e_green_palette (ALLEGRO_COLOR c)
   return c;
 }
 
-static ALLEGRO_COLOR
+ALLEGRO_COLOR
 c_green_palette (ALLEGRO_COLOR c)
 {
   /* honor transparency */
@@ -524,7 +524,7 @@ c_green_palette (ALLEGRO_COLOR c)
   return c;
 }
 
-static ALLEGRO_COLOR
+ALLEGRO_COLOR
 c_red_palette (ALLEGRO_COLOR c)
 {
   /* honor transparency */
@@ -736,46 +736,46 @@ draw_guard_lives (ALLEGRO_BITMAP *bitmap, struct anim *g, enum vm vm)
   pop_clipping_rectangle ();
 }
 
-static ALLEGRO_COLOR
+ALLEGRO_COLOR
 c_shadow_life_palette (ALLEGRO_COLOR c)
 {
   unsigned char r, g, b, a;
   al_unmap_rgba (c, &r, &g, &b, &a);
   if (a == 0) return c;
 
-  if (color_eq (c, GUARD_LIFE_COLOR_01)) return C_KID_SHADOW_CLOTHES_COLOR_01;
-  if (color_eq (c, GUARD_LIFE_COLOR_02)) return C_KID_SHADOW_CLOTHES_COLOR_02;
+  if (color_eq (c, LIFE_COLOR_01)) return C_KID_SHADOW_CLOTHES_COLOR_01;
+  if (color_eq (c, LIFE_COLOR_02)) return C_KID_SHADOW_CLOTHES_COLOR_02;
 
   return c;
 }
 
-static ALLEGRO_COLOR
+ALLEGRO_COLOR
 e_shadow_life_palette (ALLEGRO_COLOR c)
 {
   unsigned char r, g, b, a;
   al_unmap_rgba (c, &r, &g, &b, &a);
   if (a == 0) return c;
 
-  if (color_eq (c, GUARD_LIFE_COLOR_01)) return E_KID_SHADOW_CLOTHES_COLOR_01;
-  if (color_eq (c, GUARD_LIFE_COLOR_02)) return E_KID_SHADOW_CLOTHES_COLOR_02;
+  if (color_eq (c, LIFE_COLOR_01)) return E_KID_SHADOW_CLOTHES_COLOR_01;
+  if (color_eq (c, LIFE_COLOR_02)) return E_KID_SHADOW_CLOTHES_COLOR_02;
 
   return c;
 }
 
-static ALLEGRO_COLOR
+ALLEGRO_COLOR
 v_shadow_life_palette (ALLEGRO_COLOR c)
 {
   unsigned char r, g, b, a;
   al_unmap_rgba (c, &r, &g, &b, &a);
   if (a == 0) return c;
 
-  if (color_eq (c, GUARD_LIFE_COLOR_01)) return V_KID_SHADOW_CLOTHES_COLOR_01;
-  if (color_eq (c, GUARD_LIFE_COLOR_02)) return V_KID_SHADOW_CLOTHES_COLOR_02;
+  if (color_eq (c, LIFE_COLOR_01)) return V_KID_SHADOW_CLOTHES_COLOR_01;
+  if (color_eq (c, LIFE_COLOR_02)) return V_KID_SHADOW_CLOTHES_COLOR_02;
 
   return c;
 }
 
-static palette
+palette
 get_shadow_life_palette (enum vm vm)
 {
   switch (vm) {
@@ -786,7 +786,7 @@ get_shadow_life_palette (enum vm vm)
   return NULL;
 }
 
-static ALLEGRO_COLOR
+ALLEGRO_COLOR
 skeleton_life_palette (ALLEGRO_COLOR c)
 {
   unsigned char r, g, b, a;
