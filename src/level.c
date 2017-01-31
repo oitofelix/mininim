@@ -351,18 +351,18 @@ play_level (struct level *lv)
 
   if (! title_demo && replay_mode == PLAY_REPLAY) {
     if (! replay->complete) complete_replay_chain = false;
-    if (quit_anim == REPLAY_PREVIOUS
-        || quit_anim == REPLAY_NEXT) {
+    if (quit_anim == REPLAY_NEXT) {
       HLINE;
       printf ("REPLAY SKIPPED\n");
-      just_skipped_replay = quit_anim == REPLAY_PREVIOUS ? -1 : +1;
+      just_skipped_replay = replay_next_number < replay_index ? -1 : +1;
       replay_skipped = just_skipped_replay > 0;
     } else {
       print_replay_results (replay);
       just_skipped_replay = 0;
     }
 
-    if (quit_anim != REPLAY_PREVIOUS
+    if ((quit_anim != REPLAY_NEXT
+         || replay_next_number >= replay_index)
         && replay_index == replay_chain_nmemb - 1) {
       HLINE;
       printf ("REPLAY CHAIN END\n");
@@ -389,8 +389,8 @@ play_level (struct level *lv)
       default: assert (0); break;
       }
     } else {
-      int inc = quit_anim == REPLAY_PREVIOUS ? -1 : +1;
-      prepare_for_playing_replay (replay_index + inc);
+      prepare_for_playing_replay
+        (quit_anim == REPLAY_NEXT ? replay_next_number : replay_index + 1);
       goto next_level;
     }
   }

@@ -28,8 +28,8 @@ static void start_menu (ALLEGRO_MENU *parent, uint16_t id);
 static bool vmenu_item (uint16_t id, int flags, ALLEGRO_BITMAP *icon,
                         bool has_submenu, char const *title_template,
                         va_list ap);
-static bool menu_item (uint16_t id, int flags, ALLEGRO_BITMAP *icon,
-                       bool has_submenu, char const *title_template, ...)
+bool menu_item (uint16_t id, int flags, ALLEGRO_BITMAP *icon,
+                bool has_submenu, char const *title_template, ...)
   __attribute__ ((format (printf, 5, 6)));
 static bool menu_hitem (uint16_t id, bool enabled,
                         char const *title_template, ...)
@@ -45,10 +45,16 @@ static bool menu_ditem (bool first, uint16_t id0, uint16_t id1, bool enabled,
 static bool menu_sub (uint16_t id, bool enabled, ALLEGRO_BITMAP *icon,
                       void (*build_f) (void), char const *title_template, ...)
   __attribute__ ((format (printf, 5, 6)));
+static bool menu_array (uint16_t id, bool enabled, ALLEGRO_BITMAP *icon,
+                        void (*build_f) (uint16_t id, int index, int lower),
+                        uint64_t base_id, int id_nmemb, int nmemb, int index,
+                        char const *title_template, ...)
+  __attribute__ ((format (printf, 9, 10)));
 static bool menu_citem (uint16_t id, bool enabled, bool checked,
                         ALLEGRO_BITMAP *icon, char const *title_template, ...)
   __attribute__ ((format (printf, 5, 6)));
-static void menu_sep (void);
+static bool menu_sep (char const *title_template, ...)
+  __attribute__ ((format (printf, 1, 2)));
 static void end_menu (void);
 
 
@@ -97,7 +103,7 @@ static void cheat_menu (void);
 static void help_menu (void);
 
 static void skip_level_widget (void);
-static void jump_to_level_menu (void);
+static void jump_to_level_menu (uint16_t id, int index, int lower);
 static void statistics_widget (void);
 static void pause_menu_widget (void);
 static void speed_menu_widget (void);
@@ -130,9 +136,9 @@ static void ui_flip_gamepad (bool v, bool h, bool save_only);
 
 static void ui_play_replay (void);
 static void ui_record_replay (void);
-static void ui_restart_level (void);
-static void ui_previous_level (void);
-static void ui_next_level (void);
+static void ui_jump_to_level (int n);
+static void ui_jump_to_level_rel (int d);
+static void ui_jump_to_level_menu (uint16_t mid);
 static void ui_time (void);
 static void ui_skills (void);
 static void ui_decrease_time_frequency (void);
@@ -161,8 +167,9 @@ static void display_skill (struct anim *k);
 
 
 
-ALLEGRO_MENU *main_menu_id;
+static ALLEGRO_MENU *main_menu_id;
 bool main_menu_enabled;
+static int jump_to_level_menu_lower;
 
 ALLEGRO_BITMAP *small_logo_icon,
   *open_icon, *save_icon, *reload_icon, *quit_icon,
@@ -467,15 +474,15 @@ vmenu_item (uint16_t id, int flags, ALLEGRO_BITMAP *icon,
 
     /* update flags */
     if (cflags != flags) {
-      /* fprintf (stderr, "changed flags: %s (%i) -> %s (%i)\n", */
-      /*          ctitle, cflags, title, flags); */
+      /* fprintf (stderr, "changed flags: %i, %s (%i) -> %s (%i)\n", */
+      /*          id, ctitle, cflags, title, flags); */
       al_set_menu_item_flags (*am, -*am_i, flags);
     }
 
     /* update caption */
     if ((ctitle && ! title) || (! ctitle && title)
         || (ctitle && title && strcmp (ctitle, title))) {
-      /* fprintf (stderr, "changed caption: %s -> %s\n", ctitle, title); */
+      /* fprintf (stderr, "changed caption: %i, %s -> %s\n", id, ctitle, title); */
       al_set_menu_item_caption (*am, -*am_i, title);
     }
 
@@ -484,7 +491,7 @@ vmenu_item (uint16_t id, int flags, ALLEGRO_BITMAP *icon,
     /* update icon */
     if ((cicon && ! icon) || (! cicon && icon)
         || (cicon && icon && ! bitmap_heq (cicon, icon))) {
-      /* fprintf (stderr, "changed icon: %s -> %s\n", ctitle, title); */
+      /* fprintf (stderr, "changed icon: %i, %s -> %s\n", id, ctitle, title); */
       al_set_menu_item_icon (*am, -*am_i, clone_memory_bitmap (icon));
     }
 
@@ -495,7 +502,7 @@ vmenu_item (uint16_t id, int flags, ALLEGRO_BITMAP *icon,
   }
 
  replace:
-  /* fprintf (stderr, "replaced menu item: %s\n", title); */
+  /* fprintf (stderr, "replaced menu item: %i, %s\n", id, title); */
   al_remove_menu_item (*am, -*am_i);
   bool r = al_insert_menu_item (*am, -((*am_i)++), title,
                                 id, flags, clone_memory_bitmap (icon),
@@ -572,6 +579,39 @@ menu_sub (uint16_t id, bool enabled, ALLEGRO_BITMAP *icon,
 }
 
 bool
+menu_array (uint16_t id, bool enabled, ALLEGRO_BITMAP *icon,
+            void (*build_f) (uint16_t id, int index, int lower),
+            uint64_t base_id, int id_nmemb, int nmemb, int index,
+            char const *title_template, ...)
+{
+  va_list ap;
+  va_start (ap, title_template);
+  bool r = vmenu_item (id, enabled ? 0 : ALLEGRO_MENU_ITEM_DISABLED,
+                       icon, true, title_template, ap);
+  va_end (ap);
+  if (enabled && r) {
+    start_menu (append_menu[append_menu_depth], id);
+
+    int lower;
+    if (index <= id_nmemb / 2) lower = 0;
+    else if (index >= nmemb - id_nmemb / 2)
+      lower = nmemb - min_int (nmemb, id_nmemb);
+    else lower = index - id_nmemb / 2;
+
+    if (lower > 0) menu_sep ("...");
+
+    int i;
+    for (i = 0; i < min_int (nmemb, id_nmemb); i++)
+      build_f (base_id + i, lower + i, lower);
+
+    if (lower < nmemb - min_int (nmemb, id_nmemb)) menu_sep ("...");
+
+    end_menu ();
+  }
+  return r;
+}
+
+bool
 menu_citem (uint16_t id, bool enabled, bool checked, ALLEGRO_BITMAP *icon,
             char const *title_template, ...)
 {
@@ -588,13 +628,35 @@ menu_citem (uint16_t id, bool enabled, bool checked, ALLEGRO_BITMAP *icon,
   return r;
 }
 
-void
-menu_sep (void)
+bool
+menu_sep (char const *title_template, ...)
 {
-  int i = append_menu_item_index[append_menu_depth];
-  if (WINDOWS_PORT) menu_item (NO_MID + i, 0, NULL, false, NULL);
-  else menu_item (NO_MID + i, ALLEGRO_MENU_ITEM_DISABLED,
-                  NULL, false, "%s", "");
+  int i = 0;
+  bool r;
+
+  va_list ap;
+  va_start (ap, title_template);
+
+  ALLEGRO_MENU *menu;
+  int index;
+  while (al_find_menu_item (main_menu_id, SEP_MID + i, &menu, &index)
+         && (menu != append_menu[append_menu_depth]
+             || index != append_menu_item_index[append_menu_depth]))
+    i++;
+
+  assert (i < SEP_MID_NMEMB);
+
+  if (WINDOWS_PORT)
+    r = vmenu_item (SEP_MID + i,
+                    title_template ? ALLEGRO_MENU_ITEM_DISABLED : 0,
+                    NULL, false, title_template, ap);
+  else
+    r = vmenu_item (SEP_MID + i, ALLEGRO_MENU_ITEM_DISABLED, NULL, false,
+                    title_template ? title_template : "",
+                    title_template ? ap : NULL);
+
+  va_end (ap);
+  return r;
 }
 
 void
@@ -689,7 +751,7 @@ game_menu (void)
 
   menu_sub (SAVE_MID, true, save_icon,  save_menu, "&Save");
 
-  menu_sep ();
+  menu_sep (NULL);
 
   menu_sub (VOLUME_MID, true, volume_icon (audio_volume),
             volume_menu, "&Volume (Ctrl+S)");
@@ -697,7 +759,7 @@ game_menu (void)
   menu_citem (MIRROR_MODE_MID, true, in_mirror_mode (), horizontal_icon,
               "&Mirror");
 
-  menu_sep ();
+  menu_sep (NULL);
 
   menu_ditem ((cutscene || title_demo) && play_time < time_limit,
               START_GAME_MID, RESTART_GAME_MID, true,
@@ -767,7 +829,7 @@ view_menu (void)
   menu_sub (NAV_MID, ! cutscene && ! title_demo, navigation_icon,
             navigation_menu, "&Navigation");
 
-  menu_sep ();
+  menu_sep (NULL);
 
   menu_sub (VM_MID, true, vm_icon (vm), vm_menu, "&Video (F12)");
 
@@ -785,7 +847,7 @@ view_menu (void)
   menu_sub (FLIP_SCREEN_MID, true, flip_screen_icon (screen_flags),
             screen_flip_menu, "&Flip (Shift+I)");
 
-  menu_sep ();
+  menu_sep (NULL);
 
   menu_citem (ROOM_DRAWING_MID, ! cutscene && ! title_demo,
               ! no_room_drawing, drawing_icon,
@@ -795,7 +857,7 @@ view_menu (void)
               inhibit_screensaver, screensaver_icon,
               "&Inhibit screensaver");
 
-  menu_sep ();
+  menu_sep (NULL);
 
   menu_sitem (SCREENSHOT_MID, true, camera_icon, "&Screenshot... (Ctrl+P)");
 }
@@ -1099,7 +1161,7 @@ gamepad_menu (void)
   menu_sitem (GAMEPAD_CALIBRATE_MID, gpm == JOYSTICK, clock_icon,
               "&Calibrate (Ctrl+J)");
 
-  menu_sep ();
+  menu_sep (NULL);
 
   menu_sub (FLIP_GAMEPAD_MID, true,
             flip_gamepad_icon (flip_gamepad_vertical,
@@ -1159,7 +1221,7 @@ play_menu (void)
 
   switch (replay_mode) {
   case PLAY_REPLAY:
-    menu_hitem (NO_MID, false, "REPLAYING (%zu/%zu)",
+    menu_hitem (REPLAYING_HEADER_MID, false, "REPLAYING (%zu/%zu)",
                 replay_index + 1, replay_chain_nmemb);
 
     menu_sitem (PLAY_REPLAY_MID, true, stop_icon, "&Stop (F7)");
@@ -1175,7 +1237,7 @@ play_menu (void)
     break;
   case RECORD_REPLAY: record_replay:
 
-    menu_hitem (NO_MID, false, "RECORDING");
+    menu_hitem (RECORDING_HEADER_MID, false, "RECORDING");
 
     menu_sitem
       (RECORD_REPLAY_MID, true,
@@ -1256,7 +1318,7 @@ cheat_menu (void)
               ? "&Add container (Shift+T)"
               : "Fill &all containers (Shift+T)");
 
-  menu_sep ();
+  menu_sep (NULL);
 
   menu_sitem (TIME_ADD_MID, true, time_add_icon, "&Increase time (+)");
 
@@ -1273,9 +1335,14 @@ help_menu (void)
 void
 skip_level_widget (void)
 {
-  if (cutscene || title_demo) menu_sep ();
-  else menu_sub (JUMP_TO_LEVEL_MID, true, heading_icon,
-                 jump_to_level_menu, "LEVEL %i", global_level.n);
+  if (cutscene || title_demo) menu_sep (NULL);
+  else
+    menu_array (JUMP_TO_LEVEL_MID, true, heading_icon, jump_to_level_menu,
+                JUMP_TO_LEVEL_1_MID, JUMP_TO_LEVEL_MID_NMEMB,
+                replay_mode == PLAY_REPLAY ? replay_chain_nmemb : 14,
+                replay_mode == PLAY_REPLAY
+                ? replay_index : global_level.n - 1,
+                "LEVEL %i", global_level.n);
 
   menu_sitem (RESTART_LEVEL_MID, replay_mode == PLAY_REPLAY && ! title_demo
               ? true
@@ -1296,18 +1363,20 @@ skip_level_widget (void)
 }
 
 void
-jump_to_level_menu (void)
+jump_to_level_menu (uint16_t id, int index, int lower)
 {
-  int i;
-  for (i = 0; i < 14; i++)
-    menu_citem (LEVEL_1_MID + i, true, global_level.n == i + 1,
-                NULL, "%i", i + 1);
+  jump_to_level_menu_lower = lower;
+  if (replay_mode == PLAY_REPLAY)
+    menu_citem (id, true, replay_index == index,
+                NULL, "%i", replay_chain[index].start_level);
+  else menu_citem (id, true, global_level.n == index + 1,
+                   NULL, "%i", index + 1);
 }
 
 void
 statistics_widget (void)
 {
-  menu_sep ();
+  menu_sep (NULL);
 
   menu_sitem
     (TIME_MID, ! cutscene && ! title_demo && recording_replay_countdown < 0,
@@ -1322,8 +1391,8 @@ void
 pause_menu_widget (void)
 {
   if (is_game_paused ())
-    menu_hitem (NO_MID, false, "CYCLE: %ju", anim_cycle);
-  else menu_sep ();
+    menu_hitem (CYCLE_HEADER_MID, false, "CYCLE: %ju", anim_cycle);
+  else menu_sep (NULL);
 
   menu_sitem
     (TOGGLE_PAUSE_GAME_MID,
@@ -1344,7 +1413,7 @@ speed_menu_widget (void)
   if (! cutscene && ! title_demo && anim_freq > 0)
     menu_hitem (RESET_TIME_FREQ_MID, anim_freq != DEFAULT_HZ,
                 "FREQ: %iHz", anim_freq);
-  else menu_sep ();
+  else menu_sep (NULL);
 
   menu_citem
     (TOGGLE_TIME_FREQ_CONSTRAINT_MID,
@@ -1366,11 +1435,13 @@ speed_menu_widget (void)
 
 
 void
-menu_mid (intptr_t mid)
+menu_mid (ALLEGRO_EVENT *event)
 {
   /********/
   /* MENU */
   /********/
+
+  uint16_t mid = event->user.data1;
 
   switch (mid) {
 
@@ -1596,13 +1667,13 @@ menu_mid (intptr_t mid)
     ui_record_replay ();
     break;
   case RESTART_LEVEL_MID:
-    ui_restart_level ();
+    ui_jump_to_level_rel (+0);
     break;
   case PREVIOUS_LEVEL_MID:
-    ui_previous_level ();
+    ui_jump_to_level_rel (-1);
     break;
   case NEXT_LEVEL_MID:
-    ui_next_level ();
+    ui_jump_to_level_rel (+1);
     break;
   case TIME_MID:
     ui_time ();
@@ -1674,6 +1745,15 @@ menu_mid (intptr_t mid)
   case ABOUT_MID:
     ui_about_screen (true);
     break;
+
+
+
+    /* jump to level N */
+  case JUMP_TO_LEVEL_1_MID ...
+    JUMP_TO_LEVEL_1_MID + JUMP_TO_LEVEL_MID_NMEMB - 1:
+    ui_jump_to_level_menu (mid);
+    break;
+
   default: break;
   }
 }
@@ -1838,15 +1918,15 @@ level_key_bindings (void)
 
   /* CTRL+A: restart level */
   if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_A))
-    ui_restart_level ();
+    ui_jump_to_level_rel (+0);
 
   /* SHIFT+L: warp to next level */
   else if (was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_L))
-    ui_next_level ();
+    ui_jump_to_level_rel (+1);
 
   /* SHIFT+M: warp to previous level */
   else if (was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_M))
-    ui_previous_level ();
+    ui_jump_to_level_rel (-1);
 
   /* CTRL+G: save game */
   else if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_G)
@@ -2664,42 +2744,55 @@ ui_record_replay (void)
 }
 
 void
-ui_restart_level (void)
+ui_jump_to_level (int n)
 {
-  if (replay_mode == NO_REPLAY)
-    quit_anim = RESTART_LEVEL;
-  else if (replay_mode == PLAY_REPLAY)
-    quit_anim = REPLAY_RESTART_LEVEL;
-  else print_replay_mode (0);
-}
-
-void
-ui_previous_level (void)
-{
-  if (replay_mode == NO_REPLAY) {
-    ignore_level_cutscene = true;
-    next_level_number = global_level.n - 1;
-    start_level_time = play_time;
-    quit_anim = NEXT_LEVEL;
-  } else if (replay_mode == PLAY_REPLAY) {
-    if (replay_index > 0) quit_anim = REPLAY_PREVIOUS;
-    else ui_msg (0, "NO PREVIOUS REPLAY");
-  } else print_replay_mode (0);
-}
-
-void
-ui_next_level (void)
-{
-  if (replay_mode == NO_REPLAY) {
-    ignore_level_cutscene = true;
-    next_level_number = global_level.n + 1;
-    start_level_time = play_time;
-    quit_anim = NEXT_LEVEL;
-  } else if (replay_mode == PLAY_REPLAY) {
-    if (replay_index + 1 < replay_chain_nmemb)
+  switch (replay_mode) {
+  case NO_REPLAY:
+    if (n == global_level.n) {
+      quit_anim = RESTART_LEVEL;
+    } else {
+      ignore_level_cutscene = true;
+      next_level_number = n;
+      start_level_time = play_time;
+      quit_anim = NEXT_LEVEL;
+    }
+    break;
+  case PLAY_REPLAY:
+    if (n == replay_index)
+      quit_anim = REPLAY_RESTART_LEVEL;
+    else if (0 <= n && n < replay_chain_nmemb) {
+      replay_next_number = n;
       quit_anim = REPLAY_NEXT;
-    else ui_msg (0, "NO NEXT REPLAY");
-  } else print_replay_mode (0);
+    } else ui_msg (0, "%s", n < (int) replay_index
+                   ? "NO PREVIOUS REPLAY" : "NO NEXT REPLAY");
+    break;
+  default: print_replay_mode (0); break;
+  }
+}
+
+void
+ui_jump_to_level_rel (int d)
+{
+  ui_jump_to_level
+    (replay_mode == PLAY_REPLAY ? replay_index + d : global_level.n + d);
+}
+
+void
+ui_jump_to_level_menu (uint16_t mid)
+{
+  int n;
+  switch (replay_mode) {
+  case NO_REPLAY:
+    n = mid - JUMP_TO_LEVEL_1_MID + 1 + jump_to_level_menu_lower;
+    if (n == global_level.n) return;
+    break;
+  case PLAY_REPLAY:
+    n = mid - JUMP_TO_LEVEL_1_MID + jump_to_level_menu_lower;
+    if (n == replay_index) return;
+    break;
+  default: return;
+  }
+  ui_jump_to_level (n);
 }
 
 void

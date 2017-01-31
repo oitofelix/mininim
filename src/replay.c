@@ -40,6 +40,7 @@ bool valid_replay_chain;
 bool complete_replay_chain;
 bool replay_skipped;
 int just_skipped_replay;
+int replay_next_number;
 
 enum validate_replay_chain validate_replay_chain =
   NONE_VALIDATE_REPLAY_CHAIN;

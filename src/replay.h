@@ -107,6 +107,7 @@ extern bool valid_replay_chain;
 extern bool complete_replay_chain;
 extern bool replay_skipped;
 extern int just_skipped_replay;
+extern int replay_next_number;
 extern enum validate_replay_chain validate_replay_chain;
 
 extern ALLEGRO_THREAD *save_replay_dialog_thread,

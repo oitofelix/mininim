@@ -260,7 +260,7 @@ play_anim (void (*draw_callback) (void),
 
 
     case ALLEGRO_EVENT_MENU_CLICK:
-      menu_mid (event.user.data1);
+      menu_mid (&event);
       break;
 
 
@@ -311,7 +311,6 @@ play_anim (void (*draw_callback) (void),
     case OUT_OF_TIME: quit_anim = REPLAY_OUT_OF_TIME; break;
     case NEXT_LEVEL: quit_anim = REPLAY_COMPLETE; break;
     case REPLAY_INCOMPLETE: break;
-    case REPLAY_PREVIOUS: break;
     case REPLAY_NEXT: break;
     case REPLAY_RESTART_LEVEL: break;
     default:

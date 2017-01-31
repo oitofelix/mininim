@@ -121,6 +121,10 @@
 #define COUNTER_DEFENSE_ADD_ICON "data/icons/counter-defense-add.png"
 #define COUNTER_DEFENSE_SUB_ICON "data/icons/counter-defense-sub.png"
 
+/* MID arrays */
+#define SEP_MID_NMEMB 1000
+#define JUMP_TO_LEVEL_MID_NMEMB 21
+
 enum main_menu {
   BASE_MID = 0,
 
@@ -221,28 +225,17 @@ enum main_menu {
   FLIP_GAMEPAD_HORIZONTAL_MID,
 
   PLAY_MID,
+  REPLAYING_HEADER_MID,
   PLAY_REPLAY_MID,
+  RECORDING_HEADER_MID,
   RECORD_REPLAY_MID,
   JUMP_TO_LEVEL_MID,
-  LEVEL_1_MID,
-  LEVEL_2_MID,
-  LEVEL_3_MID,
-  LEVEL_4_MID,
-  LEVEL_5_MID,
-  LEVEL_6_MID,
-  LEVEL_7_MID,
-  LEVEL_8_MID,
-  LEVEL_9_MID,
-  LEVEL_10_MID,
-  LEVEL_11_MID,
-  LEVEL_12_MID,
-  LEVEL_13_MID,
-  LEVEL_14_MID,
   RESTART_LEVEL_MID,
   PREVIOUS_LEVEL_MID,
   NEXT_LEVEL_MID,
   TIME_MID,
   SKILLS_MID,
+  CYCLE_HEADER_MID,
   TOGGLE_PAUSE_GAME_MID,
   NEXT_FRAME_MID,
   RESET_TIME_FREQ_MID,
@@ -268,8 +261,11 @@ enum main_menu {
   HELP_MID,
   ABOUT_MID,
 
-  /* Used for pure caption items  */
-  NO_MID,
+  /* range used for separators */
+  SEP_MID,
+
+  /* range used for jump to level submenu */
+  JUMP_TO_LEVEL_1_MID = SEP_MID + SEP_MID_NMEMB,
 };
 
 /* functions */
@@ -281,7 +277,7 @@ void main_menu (void);
 void ui_about_screen (bool value);
 void ui_editor (void);
 
-void menu_mid (intptr_t mid);
+void menu_mid (ALLEGRO_EVENT *event);
 void anim_key_bindings (void);
 void level_key_bindings (void);
 
