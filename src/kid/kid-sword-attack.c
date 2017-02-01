@@ -128,7 +128,7 @@ flow (struct anim *k)
   if (k->i == 2 && k->enemy_defended_my_attack)
     k->i = 3;
 
-  if (k->i == -1) k->j = 1;
+  /* if (k->i == -1) k->j = 1; */
   if (k->i == 1 || k->i == 2) k->j = 19;
   if (k->i == 3 || k->i == 5) k->j = 17;
   if (k->i == 4) k->j = 7;
@@ -138,6 +138,7 @@ flow (struct anim *k)
   select_xframe (&k->xf, sword_frameset, k->j);
 
   if (k->oaction == kid_sword_defense) k->fo.dx += -1;
+  if (k->i == 0) k->xf.b = NULL;
   if (k->i == 1) k->xf.b = NULL;
   if (k->i == 3) k->xf.dx = -21, k->xf.dy = +7;
   if (k->i == 4) {

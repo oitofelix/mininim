@@ -31,6 +31,7 @@ void consider_enemy (struct anim *k0, struct anim *k1);
 void forget_enemy (struct anim *k);
 void enter_fight_mode (struct anim *k);
 void leave_fight_mode (struct anim *k);
+int dist_anims (struct anim *k0, struct anim *k1);
 bool is_in_range (struct anim *k0, struct anim *k1, int r);
 int dist_enemy (struct anim *k);
 void fight_follow (struct anim *k0, struct anim *k1);

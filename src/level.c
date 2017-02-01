@@ -626,6 +626,32 @@ compute_level (void)
   process_death ();
 
   struct anim *k = get_anim_by_id (current_kid_id);
+  struct anim *ke = get_anim_by_id (k->enemy_id);
+
+  /* if current controllable is a dead shadow, select source
+     controllable */
+  if (k->shadow && k->current_lives <= 0) {
+    k = get_anim_by_id (k->shadow_of);
+    ke = get_anim_by_id (k->enemy_id);
+    select_controllable (k);
+  }
+
+  /* change to the next controllable in imminent danger */
+  if (! ke || (ke && ke->enemy_id != k->id)) {
+    struct anim *kn = k, *kne = ke;
+    do {
+      kn = get_next_controllable (kn);
+      kne = get_anim_by_id (kn->enemy_id);
+      if (kne && kne->enemy_id == kn->id
+          && is_safe_to_follow (kne, kn, kne->f.dir)) {
+        select_controllable (kn);
+        k = kn;
+        ke = kne;
+        break;
+      }
+    } while (kn != k);
+  }
+
   camera_follow_kid = (k->f.c.room == mr.room)
     ? k->id : -1;
 
@@ -690,7 +716,6 @@ compute_level (void)
     mr.select_cycles = 0;
   }
 
-  struct anim *ke;
   if (mr.w > 1
       && k->current_lives > 0
       && k->f.c.room != 0
@@ -729,7 +754,7 @@ compute_level (void)
 static void
 process_death (void)
 {
-  struct anim *k = get_anim_by_id (current_kid_id);
+  struct anim *k = get_anim_by_id (0);
 
   /* Restart level after death */
   if (k->current_lives <= 0

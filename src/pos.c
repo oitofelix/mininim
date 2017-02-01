@@ -1297,7 +1297,7 @@ place_on_the_ground (struct frame *f, struct coord *c)
   struct pos pmbo;
   *c = f->c;
   survey (_mbo, pos, f, /* &mbo */ NULL, &pmbo, NULL);
-  c->y = (PLACE_HEIGHT * pmbo.floor + 55) - al_get_bitmap_height (f->b);
+  c->y = (PLACE_HEIGHT * pmbo.floor + 56) - al_get_bitmap_height (f->b);
   /* f->c.y += (PLACE_HEIGHT * pmbo.floor + 55) - mbo.y; */
   return c;
 }

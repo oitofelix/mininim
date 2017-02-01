@@ -116,9 +116,9 @@ enter_fight_logic (struct anim *k)
   /* non-fightable characters don't fight */
   if (! is_fightable_anim (k)) return;
 
-  /* has an enemy, no need to get another */
-  if (k->enemy_id != -1 && k->enemy_refraction < 0)
-    return;
+  /* /\* has an enemy, no need to get another *\/ */
+  /* if (k->enemy_id != -1 && k->enemy_refraction < 0) */
+  /*   return; */
 
   /* dead character doesn't fight */
   if (k->current_lives <= 0) return;
@@ -135,6 +135,15 @@ enter_fight_logic (struct anim *k)
 
     /* only valid opponents matter */
     if (! are_valid_opponents (k, a)) continue;
+
+    /* if has an enemy already, consider another only if closer */
+    if (k->enemy_id != -1 && k->enemy_refraction < 0) {
+      if (k->enemy_id == a->id) continue;
+      struct anim *ke = get_anim_by_id (k->enemy_id);
+      int da = dist_anims (k, a);
+      int de = dist_anims (k, ke);
+      if (da >= de || abs (da - de) < 8) continue;
+    }
 
     /* if seeing the character consider him an enemy */
     if (is_anim_seeing (k, a, k->f.dir)) {
@@ -523,8 +532,8 @@ leave_fight_mode (struct anim *k)
   k->key.down = true;
 }
 
-bool
-is_in_range (struct anim *k0, struct anim *k1, int r)
+int
+dist_anims (struct anim *k0, struct anim *k1)
 {
   struct coord m0, m1; struct pos p0, p1;
   survey (_m, pos, &k0->f, &m0, &p0, NULL);
@@ -532,9 +541,25 @@ is_in_range (struct anim *k0, struct anim *k1, int r)
   coord2room (&m1, m0.room, &m1);
   pos2room (&p1, p0.room, &p1);
 
-  return m1.room == m0.room
-    && p1.floor == p0.floor
-    && abs (m1.x - m0.x) < r;
+  if (m1.room == m0.room
+      && p1.floor == p0.floor)
+    return abs (m1.x - m0.x);
+  else return INT_MAX;
+}
+
+int
+dist_enemy (struct anim *k)
+{
+  struct anim *ke = get_anim_by_id (k->enemy_id);
+  if (! ke) return INT_MAX;
+  return dist_anims (k, ke);
+}
+
+bool
+is_in_range (struct anim *k0, struct anim *k1, int r)
+{
+  int d = dist_anims (k0, k1);
+  return d < r;
 }
 
 enum confg
@@ -546,25 +571,6 @@ fight_crel (struct anim *k, coord_f cf, int floor, int place)
   /* place sign indicates direction in relation to k orientation */
   int dir = (k->f.dir == LEFT) ? -1 : +1;
   return fg_rel (&p, floor, dir * place);
-}
-
-int
-dist_enemy (struct anim *k)
-{
-  struct anim *k1 = get_anim_by_id (k->enemy_id);
-
-  if (! k1) return INT_MAX;
-
-  struct frame f1 = k1->f;
-  frame2room (&f1, k->f.c.room, &f1.c);
-
-  struct coord m0, m1;
-  _m (&k->f, &m0);
-  _m (&f1, &m1);
-
-  if (m0.room != m1.room) return INT_MAX;
-
-  return abs (m1.x - m0.x);
 }
 
 bool

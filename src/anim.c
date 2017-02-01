@@ -399,6 +399,26 @@ destroy_anims (void)
 }
 
 struct anim *
+get_next_controllable (struct anim *k)
+{
+  do {
+    k = &anima[(k - anima + 1) % anima_nmemb];
+  } while (k->type != KID || ! k->controllable);
+  return k;
+}
+
+void
+select_controllable (struct anim *k)
+{
+  struct anim *old_k = get_anim_by_id (current_kid_id);
+  mr_save_origin (&old_k->mr_origin);
+  current_kid_id = k->id;
+  if (k->mr_origin.room && k->mr_origin.w && k->mr_origin.h)
+    mr_restore_origin (&k->mr_origin);
+  mr.select_cycles = SELECT_CYCLES;
+}
+
+struct anim *
 get_anim_by_id (int id)
 {
   int i;

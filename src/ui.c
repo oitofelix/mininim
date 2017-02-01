@@ -3004,22 +3004,14 @@ ui_fellow_shadow (void)
 {
   if (replay_mode == NO_REPLAY) {
     struct anim *old_k = get_anim_by_id (current_kid_id);
-    mr_save_origin (&old_k->mr_origin);
-    struct anim *k = old_k;
-    do {
-      k = &anima[(k - anima + 1) % anima_nmemb];
-    } while (k->type != KID || ! k->controllable);
+    struct anim *k = get_next_controllable (old_k);
     if (k == old_k) {
       /* after this old_k reference might not be valid anymore, until
-         get_anim_by_id is called again */
-      int i = create_anim (&anima[0], 0, NULL, 0);
-      k = &anima[i];
+         get_anim_by_id is called again on current_kid_id */
+      int id = create_anim (old_k, 0, NULL, 0);
+      k = get_anim_by_id (id);
     }
-    current_kid_id = k->id;
-    mr_restore_origin (&k->mr_origin);
-    mr.select_cycles = SELECT_CYCLES;
-    /* ui_msg (0, "PLAYER: %s", */
-    /*         current_kid_id ? "FELLOW SHADOW" : "KID"); */
+    select_controllable (k);
   } else print_replay_mode (0);
 }
 
