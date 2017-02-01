@@ -1389,8 +1389,8 @@ editor (void)
         editor_msg ("NATIVE LEVEL MODULE ONLY", EDITOR_CYCLES_2);
       else if (save_level (&global_level)) {
         copy_level (&vanilla_level, &global_level);
-        editor_msg ("LEVEL HAS BEEN SAVED", EDITOR_CYCLES_2);
-      } else editor_msg ("LEVEL SAVE FAILED", EDITOR_CYCLES_2);
+        editor_msg ("LEVEL SAVED", EDITOR_CYCLES_2);
+      } else editor_msg ("LEVEL SAVING FAILED", EDITOR_CYCLES_2);
       break;
     case 'L':
       while (undo_pass (&undo, -1, NULL));

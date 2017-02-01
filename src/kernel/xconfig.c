@@ -45,16 +45,36 @@ file_type2str (enum file_type file_type)
   }
 }
 
-void
+bool
 remove_config_entry (ALLEGRO_CONFIG *config, char *section, char *key)
 {
   ALLEGRO_CONFIG_ENTRY *iterator;
   char const *entry = al_get_first_config_entry (config, section, &iterator);
 
+  bool removed = false;
   while (entry) {
     if (! strcasecmp (entry, key)) {
-      al_remove_config_key (config, section, entry);
+      removed = al_remove_config_key (config, section, entry);
       entry = al_get_first_config_entry (config, section, &iterator);
     } else entry = al_get_next_config_entry (&iterator);
   }
+
+  return removed;
+}
+
+bool
+remove_config_section (ALLEGRO_CONFIG *config, char *section)
+{
+  ALLEGRO_CONFIG_SECTION *iterator;
+  char const *csection = al_get_first_config_section (config, &iterator);
+
+  bool removed = false;
+  while (csection) {
+    if (! strcasecmp (csection, section)) {
+      removed = al_remove_config_section (config, csection);
+      csection = al_get_first_config_section (config, &iterator);
+    } else csection = al_get_next_config_section (&iterator);
+  }
+
+  return removed;
 }

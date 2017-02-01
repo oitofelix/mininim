@@ -68,6 +68,15 @@ play_anim (void (*draw_callback) (void),
         /* update main menu */
         main_menu ();
 
+        /* check for replay favorite cycle */
+        if (replay_favorite_cycle > 0
+            && anim_cycle == replay_favorite_cycle) {
+          replay_favorite_cycle = 0;
+          change_anim_freq (DEFAULT_HZ);
+          pause_game (true);
+          ui_msg (2, "REPLAY FAVORITE REACHED");
+        }
+
         struct replay *replay = get_replay ();
 
         /* detect incomplete replays */
@@ -338,7 +347,14 @@ cutscene_mode (bool val)
   cutscene = val;
 }
 
-
+void
+change_anim_freq (int f)
+{
+  f = f < 0 ? 0 : f;
+  f = f > UNLIMITED_HZ ? UNLIMITED_HZ : f;
+  anim_freq = f;
+  al_set_timer_speed (timer, f > 0 ? 1.0 / f : 1.0 / UNLIMITED_HZ);
+}
 
 
 

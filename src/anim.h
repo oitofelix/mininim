@@ -26,6 +26,7 @@ void play_anim (void (*draw_callback) (void),
                 void (*compute_callback) (void));
 void pause_animation (bool val);
 void cutscene_mode (bool val);
+void change_anim_freq (int f);
 
 
 

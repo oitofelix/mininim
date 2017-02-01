@@ -52,6 +52,11 @@ struct replay {
   uint32_t final_kcd;
 };
 
+struct replay_favorite {
+  char *filename;
+  uint64_t cycle;
+};
+
 /* funtions */
 struct replay *get_replay (void);
 uint32_t pack_replay_config (void);
@@ -94,10 +99,20 @@ bool update_replay_progress (int *progress_ret);
 bool is_dedicatedly_replaying (void);
 void print_replay_chain_aborted (void);
 
+/* replay favorites */
+void add_replay_favorite (const char *filename, uint64_t cycle);
+void add_current_replay_favorite (void);
+void remove_replay_favorite (size_t i);
+void free_replay_favorites (void);
+bool print_replay_favorites (void);
+
 /* variables */
 extern struct replay recorded_replay;
 extern enum replay_mode level_start_replay_mode;
 extern enum replay_mode replay_mode;
+extern struct replay_favorite *replay_favorite;
+extern size_t replay_favorite_nmemb;
+extern uint64_t replay_favorite_cycle;
 extern int64_t recording_replay_countdown;
 extern struct replay *replay_chain;
 extern size_t replay_chain_nmemb;

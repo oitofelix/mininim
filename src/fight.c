@@ -238,7 +238,7 @@ fight_ai (struct anim *k)
     if (ke->has_sword) {
       place_on_the_ground (&ke->f, &ke->f.c);
       if (k->f.dir != ke->f.dir) {
-        if (is_falling (&ke->f, _tb, +0, +0))
+        if (is_falling (&ke->f, _tb, FIGHT_RANGE, FIGHT_RANGE))
           backoff_from_range (ke, k, FIGHT_RANGE, true, false);
         else
           backoff_from_range (k, ke, FIGHT_RANGE, true, false);
@@ -1199,10 +1199,6 @@ backoff_from_range (struct anim *k0, struct anim *k1, int r,
   kl = (kd->f.dir == LEFT) ? kd : ks;
   kr = (kd->f.dir == RIGHT) ? kd : ks;
 
-  /* necessary for preventing reminiscent values from interfering */
-  kl->fo.dy = +0;
-  kr->fo.dy = +0;
-
   int i = 0;
   while (is_in_range (k0, k1, r) && i <= (only_k1 ? 2 : 1) * r) {
     bool cl = kl == k0 && only_k1;
@@ -1210,15 +1206,8 @@ backoff_from_range (struct anim *k0, struct anim *k1, int r,
 
     if (cl && cr) break;
 
-    if (i++ % 2 && ! cl) {
-     kl->fo.dx = +1;
-     uncollide_back_fight (kl);
-     next_frame (&kl->f, &kl->f, &kl->fo);
-    } else if (! cr) {
-     kr->fo.dx = +1;
-     uncollide_back_fight (kr);
-     next_frame (&kr->f, &kr->f, &kr->fo);
-    }
+    if (i++ % 2 && ! cl) move_frame (&kl->f, _bb, +8, -1, -1);
+    else if (! cr) move_frame (&kr->f, _bb, +8, -1, -1);
   }
 }
 
@@ -1234,10 +1223,6 @@ get_in_range (struct anim *k0, struct anim *k1, int r,
   kl = (kd->f.dir == LEFT) ? kd : ks;
   kr = (kd->f.dir == RIGHT) ? kd : ks;
 
-  /* necessary for preventing reminiscent values from interfering */
-  kl->fo.dy = +0;
-  kr->fo.dy = +0;
-
   int i = 0;
   while (! is_in_range (k0, k1, r) && i <= (only_k1 ? 2 : 1) * r) {
     bool cl = kl == k0 && only_k1;
@@ -1245,16 +1230,8 @@ get_in_range (struct anim *k0, struct anim *k1, int r,
 
     if (cl && cr) break;
 
-    if (i++ % 2 && ! cl) {
-      kl->fo.dx = -1;
-      uncollide_front_fight (kl);
-      next_frame (&kl->f, &kl->f, &kl->fo);
-      kl->fo.dx = 0;
-    } else if (! cr) {
-      kr->fo.dx = -1;
-      uncollide_front_fight (kr);
-      next_frame (&kr->f, &kr->f, &kr->fo);
-    }
+    if (i++ % 2 && ! cl) move_frame (&kl->f, _bf, +2, +1, +1);
+    else if (! cr) move_frame (&kr->f, _bf, +2, +1, +1);
   }
 }
 

@@ -121,10 +121,14 @@
 #define COUNTER_DEFENSE_ADD_ICON "data/icons/counter-defense-add.png"
 #define COUNTER_DEFENSE_SUB_ICON "data/icons/counter-defense-sub.png"
 #define SHADOW_FACE_ICON "data/icons/shadow-face.png"
+#define HEART_ICON "data/icons/heart.png"
+#define PLUS_ICON "data/icons/plus.png"
+#define MINUS_ICON "data/icons/minus.png"
 
 /* MID arrays */
 #define SEP_MID_NMEMB 1000
 #define JUMP_TO_LEVEL_MID_NMEMB 21
+#define REPLAY_FAVORITE_MID_NMEMB 10
 
 enum main_menu {
   BASE_MID = 0,
@@ -230,6 +234,8 @@ enum main_menu {
   PLAY_REPLAY_MID,
   RECORDING_HEADER_MID,
   RECORD_REPLAY_MID,
+  REPLAY_FAVORITE_MID,
+  ADD_REPLAY_FAVORITE_MID,
   JUMP_TO_LEVEL_MID,
   RESTART_LEVEL_MID,
   PREVIOUS_LEVEL_MID,
@@ -269,11 +275,27 @@ enum main_menu {
   HELP_MID,
   ABOUT_MID,
 
-  /* range used for separators */
+  /* ----- ranges below ----- */
+
+  /* separator */
   SEP_MID,
 
-  /* range used for jump to level submenu */
-  JUMP_TO_LEVEL_1_MID = SEP_MID + SEP_MID_NMEMB,
+  /* jump to level */
+ JUMP_TO_LEVEL_1_MID =
+  SEP_MID + SEP_MID_NMEMB,
+
+  /* replay favorites */
+  REPLAY_FAVORITE_0_MID =
+  JUMP_TO_LEVEL_1_MID + JUMP_TO_LEVEL_MID_NMEMB,
+
+  GO_TO_REPLAY_FAVORITE_0_MID =
+  REPLAY_FAVORITE_0_MID + REPLAY_FAVORITE_MID_NMEMB,
+
+  REPLACE_REPLAY_FAVORITE_0_MID =
+  GO_TO_REPLAY_FAVORITE_0_MID + REPLAY_FAVORITE_MID_NMEMB,
+
+  REMOVE_REPLAY_FAVORITE_0_MID =
+  REPLACE_REPLAY_FAVORITE_0_MID + REPLAY_FAVORITE_MID_NMEMB,
 };
 
 /* functions */
@@ -300,11 +322,14 @@ bool in_mirror_mode (void);
 bool display_remaining_time (int priority);
 void print_game_paused (int priority);
 
-void ui_save_setting (char *key, char *value);
+bool ui_save_setting (char *section, char *key, char *value);
+char *ui_get_setting (char *section, char *key);
 bool ui_msg (int priority, const char *template, ...)
   __attribute__ ((format (printf, 2, 3)));
 bool ui_msg_clear (int priority);
 
+void ui_load_replay_favorites (void);
+void ui_go_to_replay_favorite (int i);
 
 /* variables */
 bool main_menu_enabled;

@@ -39,6 +39,7 @@
 #include <unistd.h>
 #include <getopt.h>
 #include <signal.h>
+#include <wchar.h>
 #include "error.h"
 #include "argp.h"
 #include "fnmatch.h"
@@ -181,6 +182,7 @@
 #include "replay.h"
 #include "ui.h"
 #include "xmath.h"
+#include "xstring.h"
 
 /* functions */
 void free_argv (size_t *cargc, char ***cargv);

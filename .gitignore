@@ -45,6 +45,7 @@ src/**/*.[ox]
 # Ignore Emacs backup files recursively.
 
 **/*~
+**/*\#*
 
 # Ignore gnulib files
 /gnulib

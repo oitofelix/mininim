@@ -26,6 +26,10 @@ struct replay *replay_chain;
 size_t replay_chain_nmemb;
 size_t replay_index;
 
+struct replay_favorite *replay_favorite;
+size_t replay_favorite_nmemb;
+uint64_t replay_favorite_cycle;
+
 enum replay_mode level_start_replay_mode;
 enum replay_mode replay_mode;
 
@@ -409,7 +413,7 @@ handle_save_replay_thread (int priority)
   struct replay *replay = &recorded_replay;
   if (filename) {
     char *error_str = save_replay (filename, replay)
-      ? "REPLAY HAS BEEN SAVED"
+      ? "REPLAY SAVED"
       : "REPLAY SAVING FAILED";
     ui_msg (priority, "%s", error_str);
     al_free (save_replay_dialog.initial_path);
@@ -457,7 +461,7 @@ handle_load_replay_thread (int priority)
     bool success = replay_chain_nmemb > 0;
 
     char *error_str = success
-      ? "REPLAY HAS BEEN LOADED"
+      ? "REPLAY LOADED"
       : "REPLAY LOADING FAILED";
 
     ui_msg (priority, "%s", error_str);
@@ -492,6 +496,7 @@ stop_replaying (int priority)
   level_start_replay_mode = NO_REPLAY;
   anim_freq = DEFAULT_HZ;
   al_set_timer_speed (timer, 1.0 / anim_freq);
+  replay_favorite_cycle = 0;
 }
 
 void
@@ -775,5 +780,70 @@ print_replay_chain_aborted (void)
     HLINE;
     printf ("REPLAY CHAIN ABORTED\n");
     HLINE;
+  }
+}
+
+
+
+
+
+void
+add_replay_favorite (const char *filename, uint64_t cycle)
+{
+  struct replay_favorite rf;
+  rf.filename = xasprintf ("%s", filename);
+  rf.cycle = cycle;
+
+  replay_favorite =
+    add_to_array (&rf, 1, replay_favorite, &replay_favorite_nmemb,
+                  replay_favorite_nmemb, sizeof (*replay_favorite));
+}
+
+void
+add_current_replay_favorite (void)
+{
+  assert (replay_mode == PLAY_REPLAY);
+  add_replay_favorite (replay_chain[replay_index].filename, anim_cycle);
+}
+
+void
+remove_replay_favorite (size_t i)
+{
+  replay_favorite =
+    remove_from_array (replay_favorite, &replay_favorite_nmemb,
+                       i, 1, sizeof (*replay_favorite));
+}
+
+void
+free_replay_favorites (void)
+{
+  size_t i;
+  for (i = 0; i < replay_favorite_nmemb; i++)
+    al_free (replay_favorite[i].filename);
+  destroy_array ((void *) &replay_favorite, &replay_favorite_nmemb);
+}
+
+bool
+print_replay_favorites (void)
+{
+  if (replay_favorite_nmemb > 0) {
+    HLINE;
+    printf ("REPLAY FAVORITES\n");
+    size_t i;
+    for (i = 0; i < replay_favorite_nmemb; i++) {
+      HLINE;
+      printf ("Index: %zu\n"
+              "File: %s\n"
+              "Cycle: %ju\n",
+              i, replay_favorite[i].filename,
+              replay_favorite[i].cycle);
+    }
+    HLINE;
+    return true;
+  } else {
+    HLINE;
+    printf ("NO REPLAY FAVORITES\n");
+    HLINE;
+    return false;
   }
 }

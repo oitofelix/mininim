@@ -9,7 +9,8 @@ system-posix vasnprintf-posix vasprintf-posix vdprintf-posix \
 vfprintf-posix vprintf-posix vsnprintf-posix vsprintf-posix \
 xprintf-posix xvasprintf-posix malloc-gnu calloc-gnu realloc-gnu \
 fnmatch-gnu getopt-gnu getpass-gnu stdio stdlib error argp strcase \
-strcasestr progname glob unistd nonblocking sigpipe environ
+strcasestr progname glob unistd nonblocking sigpipe environ mbsrtowcs \
+wcsrtombs wcslen wmemcpy
 
 mv build-aux/texinfo.tex{,.bkp}
 autoreconf --install --force

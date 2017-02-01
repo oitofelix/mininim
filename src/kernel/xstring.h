@@ -1,5 +1,5 @@
 /*
-  xconfig.h -- configuration module;
+  xstring.h -- string module;
 
   Copyright (C) 2015, 2016, 2017 Bruno Félix Rezende Ribeiro
   <oitofelix@gnu.org>
@@ -18,13 +18,17 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MININIM_XCONFIG_H
-#define MININIM_XCONFIG_H
+#ifndef MININIM_XSTRING_H
+#define MININIM_XSTRING_H
 
-void config_entry_file_type (const char *key, const char *value,
-                             enum file_type *file_type);
-char * file_type2str (enum file_type file_type);
-bool remove_config_entry (ALLEGRO_CONFIG *config, char *section, char *key);
-bool remove_config_section (ALLEGRO_CONFIG *config, char *section);
+#define SHORTEN_STRING_ELLIPSIS L"..."
 
-#endif	/* MININIM_XCONFIG_H */
+void tolower_str (char *str);
+void toupper_str (char *str);
+void repl_str_char (char *str, char a, char b);
+
+wchar_t *m2w_str (const char *s);
+char *w2m_str (const wchar_t *s);
+char *shorten_str (char *s, size_t max);
+
+#endif	/* MININIM_XSTRING_H */

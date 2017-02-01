@@ -133,6 +133,7 @@ struct skill skill = {.counter_attack_prob = INITIAL_KCA,
 static bool replay_info;
 static bool skip_title;
 static bool level_module_given;
+static int start_replay_favorite = -1;
 
 static error_t parser (int key, char *arg, struct argp_state *state);
 static void print_paths (void);
@@ -177,7 +178,6 @@ static struct argp_option options[] = {
   {"start-pos", START_POS_OPTION, "R,F,P", 0, "Make the kid start at room R, floor F and place P. The default is to let this decision to the level module.  R is an integer ranging from 1 to INT_MAX, F is an integer ranging from 0 to 2 and P is an integer ranging from 0 to 9.  This option has no effect on replays.", 0},
   {"mirror-level", MIRROR_LEVEL_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable level mirroring.  This option causes every level to be fully mirrored (cons+links) in the horizontal direction after they have been loaded by the active level module.  The default is FALSE.  You can accomplish a similar result in-game on a per level basis by using the 'E>LMBH' command.  See also the '--mirror-mode' option.", 0},
   {NULL, 0, NULL, OPTION_DOC, "If the option '--level-module' is not given and there is a LEVELS.DAT file in the working directory, the DAT level module is automatically used to load that file.  This is a compatibility measure for applications which depend upon this legacy behavior.", 0},
-  {NULL, 0, NULL, OPTION_DOC, "", 0},
 
   /* Time */
   {NULL, 0, NULL, 0, "Time:", 0},
@@ -237,8 +237,12 @@ static struct argp_option options[] = {
   {"record-replay", RECORD_REPLAY_OPTION, NULL, 0, "Starts recording replay countdown at game beginning.  Use this in conjunction with '--start-level' to start recording a given level.  This can be done in-game using the ALT+F7 key binding.", 0},
   {"replay-info", REPLAY_INFO_OPTION, NULL, OPTION_NO_USAGE, "Print information about all REPLAY files in replay chain and exit.  The 'initial' field of each replay summary lists arguments intended to be used for recording other replay files with same initial conditions.", 0},
   {"validate-replay-chain", VALIDATE_REPLAY_CHAIN_OPTION, "MODE", 0, "Validate replay chain.  Valid values for MODE are: NONE, READ and WRITE.  The default is NONE.  If MODE is READ, instead of reporting invalid sequent replay pairs, modify replay parameters just enough to validate pairs.  Notice that this requires consecutive replay levels to succeed.  WRITE does the same, additionally updating replay files in case the resulting chain is complete and valid.", 0},
+  {"print-replay-favorites", PRINT_REPLAY_FAVORITES_OPTION, NULL, OPTION_NO_USAGE, "Print replay favorites list.  Exit with zero status in case the list is non-empty (non-zero otherwise).", 0},
+  {"replay-favorite", REPLAY_FAVORITE_OPTION, "N", OPTION_NO_USAGE, "Go to replay favorite N at start.  See option '--print-replay-favorites' for the list of available replay favorites.", 0},
 
-  {NULL, 0, NULL, OPTION_DOC, "\nUnless '--replay-info' is specified, REPLAY files given on command line are added to the replay chain in order to play and check for completion and sequence validity.  The replay chain is sorted by increasing level order before processing.  For each replay in the chain a replay summary is printed.  Unless '--validate-replay-chain' is specified, in case there is any invalid sequent pairs in the chain, their incompatible options are printed between their replay summaries.  For any complete replay summary, its 'final' field lists arguments intended to be used for continuing the game from where its respective replay ends.  If the replay chain is complete and valid, MININIM automatically exits with zero status (non-zero otherwise).  Replay chains can be played in-game using the F7 key binding.  One can use '--time-frequency' and its related key bindings to control the playback speed, in particular use '--time-frequency=0' and '--rendering=NONE' for the fastest batch processing of replays.", 0},
+  {NULL, 0, NULL, OPTION_DOC, "Unless '--replay-info' is specified, REPLAY files given on command line are added to the replay chain in order to play and check for completion and sequence validity.  The replay chain is sorted by increasing level order before processing.  For each replay in the chain a replay summary is printed.  Unless '--validate-replay-chain' is specified, in case there is any invalid sequent pairs in the chain, their incompatible options are printed between their replay summaries.  For any complete replay summary, its 'final' field lists arguments intended to be used for continuing the game from where its respective replay ends.  If the replay chain is complete and valid, MININIM automatically exits with zero status (non-zero otherwise).  Replay chains can be played in-game using the F7 key binding.  One can use '--time-frequency' and its related key bindings to control the playback speed, in particular use '--time-frequency=0' and '--rendering=NONE' for the fastest batch processing of replays.", 0},
+
+  {NULL, 0, NULL, OPTION_DOC, "Replay favorites allow the user to conveniently reach previously marked points in replays.  They can be easily managed and used from the Play>Favorites menu and their records are kept in the main configuration file.", 0},
 
   /* Compatibility */
   {NULL, 0, NULL, 0, "Compatibility", 0},
@@ -273,6 +277,8 @@ The legacy command line interface present in versions 1.0, 1.3 and 1.4 of the or
 static char args_doc[] = "\n"
   "[REPLAY...]\n"
   "--replay-info [REPLAY...]\n"
+  "--print-replay-favorites\n"
+  "--replay-favorite=N\n"
   "--joystick-info\n"
   "--print-display-modes\n"
   "--print-paths\n"
@@ -697,6 +703,7 @@ parser (int key, char *arg, struct argp_state *state)
   struct float_range gamepad_rumble_gain_range = {0.0,1.0};
   struct int_range random_seed_range = {0, INT_MAX};
   struct float_range sound_gain_range = {0.0,1.0};
+  struct int_range replay_favorites_range = {0, replay_favorite_nmemb - 1};
 
   switch (key) {
   case IGNORE_MAIN_CONFIG_OPTION:
@@ -1038,6 +1045,18 @@ Levels have been converted using module %s into native format at\n\
   case REPLAY_INFO_OPTION:
     replay_info = true;
     break;
+  case PRINT_REPLAY_FAVORITES_OPTION:
+    if (print_replay_favorites ()) exit (0);
+    else exit (-1);
+    break;
+  case REPLAY_FAVORITE_OPTION:
+    if (! replay_favorite_nmemb)
+      error (-1, 0, "no replay favorites available");
+    e = optval_to_int (&i, key, arg, state, &replay_favorites_range, 0);
+    if (e) return e;
+    start_replay_favorite = i;
+    skip_title = true;
+    break;
   case RENDERING_OPTION:
     e = optval_to_enum (&i, key, arg, state, rendering_enum, 0);
     if (e) return e;
@@ -1150,27 +1169,6 @@ version (FILE *stream, struct argp_state *state)
 
            "Written by Bruno Félix Rezende Ribeiro.",
            allegro_major, allegro_minor, allegro_revision, allegro_release);
-}
-
-void
-tolower_str (char *str)
-{
-  size_t i;
-  for (i = 0; str[i] != 0; i++) str[i] = tolower (str[i]);
-}
-
-void
-toupper_str (char *str)
-{
-  size_t i;
-  for (i = 0; str[i] != 0; i++) str[i] = toupper (str[i]);
-}
-
-void
-repl_str_char (char *str, char a, char b)
-{
-  size_t i;
-  for (i = 0; str[i] != 0; i++) if (str[i] == a) str[i] = b;
 }
 
 char *
@@ -1358,6 +1356,9 @@ main (int _argc, char **_argv)
   /* get global paths */
   get_paths ();
 
+  /* load replay favorites */
+  ui_load_replay_favorites ();
+
   /* get configuration file arguments */
   enum file_type file_type = UNKNOWN_FILE_TYPE;
   int e = get_config_args (&cargc, &cargv, options, config_filename, &file_type);
@@ -1507,6 +1508,9 @@ main (int _argc, char **_argv)
   start_level_time = start_time;
   cutscene_mode (false);
   game_paused = false;
+
+  if (start_replay_favorite >= 0)
+    ui_go_to_replay_favorite (start_replay_favorite);
 
   int level = next_level_number >= 0 ? next_level_number : start_level;
   if (! level_module_next_level (&vanilla_level, level))
@@ -1754,7 +1758,7 @@ save_game (char *filename, int priority)
   bool success = al_save_config_file (filename, config);
 
   char *error_str = success
-    ? "GAME HAS BEEN SAVED"
+    ? "GAME SAVED"
     : "GAME SAVING FAILED";
 
   ui_msg (priority, "%s", error_str);
@@ -1804,8 +1808,8 @@ handle_load_config_thread (int priority)
     else {
       if (success)
         error_str = file_type == GAME_SAVE_FILE_TYPE
-          ? "GAME HAS BEEN LOADED"
-          : "CONFIGURATION HAS BEEN LOADED";
+          ? "GAME LOADED"
+          : "CONFIGURATION LOADED";
       else
         error_str = file_type == GAME_SAVE_FILE_TYPE
           ? "GAME LOADED WITH ERRORS"
@@ -1868,7 +1872,7 @@ handle_save_picture_thread (int priority)
   if (filename) {
     char *error_str = al_save_bitmap
       (filename, al_get_backbuffer (display))
-      ? "PICTURE HAS BEEN SAVED"
+      ? "PICTURE SAVED"
       : "PICTURE SAVING FAILED";
     ui_msg (priority, "%s", error_str);
     al_free (save_picture_dialog.initial_path);
