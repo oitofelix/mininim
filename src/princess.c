@@ -505,9 +505,9 @@ draw_princess_frame (ALLEGRO_BITMAP *bitmap, struct anim *p, enum vm vm)
   struct frame f = p->f;
 
   palette pal = NULL;
-  pal = get_kid_palette (vm);
-  f.b = apply_palette (f.b, pal);
   pal = get_princess_palette (vm);
+  f.b = apply_palette (f.b, pal);
+  pal = get_kid_palette (vm);
   f.b = apply_palette (f.b, pal);
 
   if (hgc) f.b = apply_palette (f.b, hgc_palette);

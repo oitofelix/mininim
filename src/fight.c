@@ -238,7 +238,7 @@ fight_ai (struct anim *k)
     if (ke->has_sword) {
       place_on_the_ground (&ke->f, &ke->f.c);
       if (k->f.dir != ke->f.dir) {
-        if (is_falling (&ke->f, _tb, FIGHT_RANGE, FIGHT_RANGE))
+        if (is_falling (&ke->f, _tb, +0, +0))
           backoff_from_range (ke, k, FIGHT_RANGE, true, false);
         else
           backoff_from_range (k, ke, FIGHT_RANGE, true, false);
@@ -1201,13 +1201,13 @@ backoff_from_range (struct anim *k0, struct anim *k1, int r,
 
   int i = 0;
   while (is_in_range (k0, k1, r) && i <= (only_k1 ? 2 : 1) * r) {
-    bool cl = kl == k0 && only_k1;
-    bool cr = kr == k0 && only_k1;
+    bool cl = (kl == k0 && only_k1) || is_falling (&kl->f, _bb, +0, +0);
+    bool cr = (kr == k0 && only_k1) || is_falling (&kr->f, _bb, +0, +0);
 
     if (cl && cr) break;
 
-    if (i++ % 2 && ! cl) move_frame (&kl->f, _bb, +8, -1, -1);
-    else if (! cr) move_frame (&kr->f, _bb, +8, -1, -1);
+    if (i++ % 2 && ! cl) move_frame (&kl->f, _bb, +0, -1, -1);
+    else if (! cr) move_frame (&kr->f, _bb, +0, -1, -1);
   }
 }
 
@@ -1225,13 +1225,13 @@ get_in_range (struct anim *k0, struct anim *k1, int r,
 
   int i = 0;
   while (! is_in_range (k0, k1, r) && i <= (only_k1 ? 2 : 1) * r) {
-    bool cl = kl == k0 && only_k1;
-    bool cr = kr == k0 && only_k1;
+    bool cl = (kl == k0 && only_k1) || is_falling (&kl->f, _bf, +0, +0);
+    bool cr = (kr == k0 && only_k1) || is_falling (&kr->f, _bf, +0, +0);
 
     if (cl && cr) break;
 
-    if (i++ % 2 && ! cl) move_frame (&kl->f, _bf, +2, +1, +1);
-    else if (! cr) move_frame (&kr->f, _bf, +2, +1, +1);
+    if (i++ % 2 && ! cl) move_frame (&kl->f, _bf, +0, +1, +1);
+    else if (! cr) move_frame (&kr->f, _bf, +0, +1, +1);
   }
 }
 

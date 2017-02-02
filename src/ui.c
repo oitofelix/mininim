@@ -3359,7 +3359,7 @@ ui_save_setting (char *section, char *key, char *value)
 
  error:
   if (config) al_destroy_config (config);
-  error (0, al_get_errno (), "can't save setting '[%s]%s=%s' to '%s'",
+  error (0, al_get_errno (), "can't save setting '[%s] %s=%s' to '%s'",
          section, key, value, config_filename);
   return false;
 }
