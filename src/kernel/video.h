@@ -100,6 +100,8 @@ struct drawn_rectangle *get_drawn_rectangle (ALLEGRO_BITMAP *bitmap);
 struct drawn_rectangle *merge_drawn_rectangle (ALLEGRO_BITMAP *bitmap,
                                                int x, int y, int w, int h);
 struct drawn_rectangle *pop_drawn_rectangle (void);
+void adjust_drawn_rectangle (ALLEGRO_BITMAP *bitmap, int dx, int dy,
+                             int dw, int dh);
 
 void push_clipping_rectangle (ALLEGRO_BITMAP *bitmap,
                               int x, int y, int w, int h);
@@ -128,5 +130,8 @@ extern int display_mode;
 extern bool ignore_clipping_rectangle_intersection;
 extern bool about_screen;
 extern ALLEGRO_BITMAP *oitofelix_face_gray, *oitofelix_face_bw;
+
+struct drawn_rectangle drawn_rectangle_stack[DRAWN_RECTANGLE_STACK_NMEMB_MAX];
+size_t drawn_rectangle_stack_nmemb;
 
 #endif	/* MININIM_VIDEO_H */

@@ -414,7 +414,7 @@ struct anim {
   bool attack_range_far, attack_range_near, hurt_enemy_in_counter_attack;
   int angry;
 
-  int no_walkf_timer;
+  int no_walkf_timer, death_timer;
 
   struct skill skill;
   int refraction;

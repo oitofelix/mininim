@@ -102,8 +102,7 @@ static bool
 physics_in (struct anim *k)
 {
   /* collision */
-  /* uncollide_back_fight (k); */
-  uncollide (&k->f, &k->fo, _bb, +0, +0, &k->fo, NULL);
+  uncollide_back_fight (k);
 
   /* fall */
   if (is_falling (&k->f, _mbo, +0, +0)) {

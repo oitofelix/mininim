@@ -145,9 +145,8 @@ legacy_level_start (void)
 void
 legacy_level_special_events (void)
 {
-  struct pos p, pm, pms;
-  struct coord m, ms;
-  struct anim *k = get_anim_by_id (current_kid_id);
+  struct pos p, pm;
+  struct anim *k = get_anim_by_id (0);
 
   /* title demo */
   if (title_demo) {
@@ -413,6 +412,12 @@ legacy_level_special_events (void)
 
   /* in the twelfth level */
   if (global_level.n == 12) {
+    struct anim *k = get_anim_by_id (current_kid_id);
+    struct anim *k0 = get_anim_by_id (0);
+
+    struct coord ms, m0;
+    struct pos pm, pm0, pms;
+
     struct pos sword_pos; new_pos (&sword_pos, &global_level, 15, 0, 1);
     struct pos first_hidden_floor_pos;
     new_pos (&first_hidden_floor_pos, &global_level, 2, 0, 7);
@@ -437,8 +442,8 @@ legacy_level_special_events (void)
       ks->fight = true;
       ks->controllable = false;
       ks->refraction = 12;
-      ks->current_lives = k->current_lives;
-      ks->total_lives = k->total_lives;
+      ks->current_lives = k0->current_lives;
+      ks->total_lives = k0->total_lives;
       ks->action = guard_normal;
       ks->f.dir = RIGHT;
       ks->glory_sample = true;
@@ -451,45 +456,52 @@ legacy_level_special_events (void)
 
     /* if shadow has appeared but not merged yet */
     if (ks) {
-      k->death_reason = ks->death_reason = SHADOW_FIGHT_DEATH;
+      k->death_reason = k0->death_reason
+        = ks->death_reason = SHADOW_FIGHT_DEATH;
       survey (_m, pos, &ks->f, &ms, &pms, NULL);
-      survey (_m, pos, &k->f, &m, &pm, NULL);
-      ks->p = pms;
-      k->p = pm;
+      survey (_m, pos, &k0->f, &m0, &pm0, NULL);
 
-      ks->keep_sword_fast = k->keep_sword_fast = false;
+      ks->p = pms;
+      k0->p = pm0;
+
+      ks->keep_sword_fast = k->keep_sword_fast =
+        k0->keep_sword_fast = false;
 
       /* any harm caused to the shadow reflects to the kid */
-      if (ks->action == guard_hit && ks->i == 0
-          && is_attacking (k)) {
+      if (ks->action == guard_hit && ks->i == 0) {
         mr.flicker = 2;
         mr.color = get_flicker_blood_color ();
-        play_audio (&harm_audio, NULL, k->id);
-        k->splash = true;
-        k->current_lives--;
-        kid_sword_hit (k);
+        play_audio (&harm_audio, NULL, k0->id);
+        k0->splash = true;
+        k0->current_lives--;
+        if (is_in_fight_mode (k0)) {
+          move_frame (&k0->f, _bb, +0, -4, -4);
+          kid_sword_hit (k0);
+        }
       }
 
       /* any harm caused to the kid reflects to the shadow */
-      if (k->action == kid_sword_hit && k->i == 0
-          && is_attacking (ks)) {
+      if (k0->action == kid_sword_hit && k0->i == 0) {
         mr.flicker = 2;
         mr.color = get_flicker_blood_color ();
         play_audio (&guard_hit_audio, NULL, ks->id);
         ks->splash = true;
         ks->current_lives--;
-        guard_hit (ks);
+        if (is_in_fight_mode (ks)) {
+          move_frame (&ks->f, _bb, +0, -4, -4);
+          guard_hit (ks);
+        }
       }
 
       /* if the shadow dies, the kid dies */
-      if (ks->current_lives <= 0 && k->current_lives > 0) {
-        k->splash = true;
-        kid_die (k);
+      if (ks->current_lives <= 0 && k0->current_lives > 0) {
+        k0->splash = true;
+        kid_die (k0);
         shadow_disappearance_wait = 4.5 * DEFAULT_HZ;
       }
 
       /* if the kid dies, the shadow dies */
-      if (k->current_lives <= 0 && ks->current_lives > 0) {
+      if (k0->current_lives <= 0 && ks->current_lives > 0) {
         ks->splash = true;
         guard_die (ks);
         shadow_disappearance_wait = 4.5 * DEFAULT_HZ;
@@ -499,7 +511,7 @@ legacy_level_special_events (void)
         shadow_disappearance_wait--;
 
       /* make the shadow disappear when the kid is dead */
-      if (k->current_lives <= 0
+      if (k0->current_lives <= 0
           && shadow_disappearance_wait == 0
           && ! ks->invisible) {
         mr.flicker = 8;
@@ -508,12 +520,22 @@ legacy_level_special_events (void)
       }
 
       /* if the kid keep his sword, the shadow does the same */
-      if (k->action == kid_keep_sword && ks->type == SHADOW) {
+      if (k0->action == kid_keep_sword
+          && ks->enemy_id == k0->id
+          && ks->f.dir != k0->f.dir
+          && ks->type == SHADOW) {
         ks->type = KID;
         ks->controllable = true;
         kid_keep_sword (ks);
         place_on_the_ground (&ks->f, &ks->f.c);
         move_frame (&ks->f, _tb, +0, -8, -8);
+        struct anim *kn = k0;
+        while (true) {
+          kn = get_next_controllable (kn);
+          if (kn == k0) break;
+          else if (kn->shadow_of == k0->id)
+            kid_keep_sword (kn);
+        }
       }
 
       /* if the kid change his mind and take the sword again, the
@@ -527,17 +549,17 @@ legacy_level_special_events (void)
 
       /* if both, the kid and the shadow, are not in fight mode and
          get close enough, a merge happens */
-      if (ks->type == KID && pms.room == pm.room && pms.floor == pm.floor
-          && abs (ms.x - m.x) <= 10) {
+      if (ks->type == KID && pms.room == pm0.room && pms.floor == pm0.floor
+          && abs (ms.x - m0.x) <= 10) {
         destroy_anim (ks);
         shadow_id = -1; ks = NULL;
         shadow_merged = true;
-        k = get_anim_by_id (current_kid_id);
-        play_audio (&success_audio, NULL, k->id);
-        k->f.dir = (k->f.dir == LEFT) ? RIGHT : LEFT;
-        place_on_the_ground (&k->f, &k->f.c);
-        kid_turn_run (k);
-        k->current_lives = ++k->total_lives;
+        k0 = get_anim_by_id (0);
+        play_audio (&success_audio, NULL, k0->id);
+        k0->f.dir = (k0->f.dir == LEFT) ? RIGHT : LEFT;
+        place_on_the_ground (&k0->f, &k0->f.c);
+        kid_turn_run (k0);
+        k0->current_lives = ++k0->total_lives;
         mr.flicker = 8;
         mr.color = WHITE;
         glow_duration = 12 * DEFAULT_HZ;
@@ -545,7 +567,7 @@ legacy_level_special_events (void)
       /* while the merge doesn't happen and neither the shadow nor the
          kid are in fight mode, the shadow's movements mirror the
          kid's */
-      else if (ks->type == KID) {
+      else if (ks->type == KID && current_kid_id == 0) {
         struct replay *replay = get_replay ();
         replay_gamepad_update (ks, replay, anim_cycle);
         bool l = ks->key.left;
@@ -557,16 +579,16 @@ legacy_level_special_events (void)
          making them glow intermittently */
     } else if (shadow_merged && glow_duration > 0) {
       glow_duration--;
-      k->shadow = (anim_cycle % 2);
+      k0->shadow = (anim_cycle % 2);
     }
     /* after the success music has finished to play, the kid goes
        normal again */
-    else if (shadow_merged) k->shadow = false;
+    else if (shadow_merged) k0->shadow = false;
 
     /* transform the empty space in hidden floors after the shadow and
        the kid has merged */
     if (shadow_merged
-        && k->f.c.room == 2
+        && k0->f.c.room == 2
         && fg (&first_hidden_floor_pos) == NO_FLOOR)
       for (new_pos (&p, &global_level, 2, 0, -4); p.place < PLACES;
            prel (&p, &p, +0, +1))
@@ -640,7 +662,7 @@ legacy_level_special_events (void)
 void
 legacy_level_end (struct pos *p)
 {
-  struct anim *k = get_anim_by_id (current_kid_id);
+  struct anim *k = get_anim_by_id (0);
 
   /* end music samples to play per level */
   if (level_end_wait < 0) {

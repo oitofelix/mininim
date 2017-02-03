@@ -607,15 +607,15 @@ apply_guard_palette (ALLEGRO_BITMAP *bitmap, enum anim_type type,
 {
   palette pal = NULL;
 
-  if (type == SHADOW) {
-    pal = get_kid_palette (vm);
-    bitmap = apply_palette (bitmap, pal);
-  }
-
   if (is_guard_by_type (type)) {
     pal = get_guard_palette (style, vm);
     bitmap = apply_palette (bitmap, pal);
   } else return bitmap;
+
+  if (type == SHADOW) {
+    pal = get_kid_palette (vm);
+    bitmap = apply_palette (bitmap, pal);
+  }
 
   if (hgc) bitmap = apply_palette (bitmap, hgc_palette);
 

@@ -82,6 +82,7 @@ kid_resurrect (struct anim *k)
   survey (_m, pos, &k->f, NULL, &pm, NULL);
   k->current_lives = k->total_lives;
   k->death_reason = NO_DEATH;
+  k->death_timer = 0;
   k->action = kid_normal;
   place_frame (&k->f, &k->f, kid_normal_00,
                &pm, k->f.dir == LEFT ? +16 : +16, +15);

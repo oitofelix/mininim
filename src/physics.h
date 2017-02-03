@@ -122,6 +122,8 @@ struct level *mirror_level_h (struct level *l);
 
 bool is_immediately_accessible_pos (struct pos *to, struct pos *from,
                                     struct frame *f);
+bool is_accessible (struct frame *f, coord_f cf, int dx0, int dx1);
+
 struct frame *
 move_frame (struct frame *f, coord_f cf, int dx,
             int move_left, int move_right);

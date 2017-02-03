@@ -538,6 +538,7 @@ register_anims (void)
   k->controllable = true;
   k->immortal = immortal_mode;
   k->has_sword = global_level.has_sword;
+  init_fellow_shadow_id ();
 
   /* create guards */
   int i;
@@ -628,29 +629,32 @@ compute_level (void)
   struct anim *k = get_anim_by_id (current_kid_id);
   struct anim *ke = get_anim_by_id (k->enemy_id);
 
-  /* if current controllable is a dead shadow, select source
-     controllable */
-  if (k->shadow && k->current_lives <= 0) {
-    k = get_anim_by_id (k->shadow_of);
-    ke = get_anim_by_id (k->enemy_id);
-    select_controllable (k);
+  /* if current controllable is a dead shadow, select its controllable
+     source */
+  if (k->shadow_of == 0 && k->current_lives <= 0) {
+    if (k->death_timer++ > SELECT_CYCLES) {
+      k->death_timer = 0;
+      k = get_anim_by_id (k->shadow_of);
+      ke = get_anim_by_id (k->enemy_id);
+      select_controllable_by_id (k->id);
+    }
   }
 
-  /* change to the next controllable in imminent danger */
-  if (! ke || (ke && ke->enemy_id != k->id)) {
-    struct anim *kn = k, *kne = ke;
-    do {
-      kn = get_next_controllable (kn);
-      kne = get_anim_by_id (kn->enemy_id);
-      if (kne && kne->enemy_id == kn->id
-          && is_safe_to_follow (kne, kn, kne->f.dir)) {
-        select_controllable (kn);
-        k = kn;
-        ke = kne;
-        break;
-      }
-    } while (kn != k);
-  }
+  /* /\* change to the next controllable in imminent danger *\/ */
+  /* if (! ke || (ke && ke->enemy_id != k->id)) { */
+  /*   struct anim *kn = k, *kne = ke; */
+  /*   do { */
+  /*     kn = get_next_controllable (kn); */
+  /*     kne = get_anim_by_id (kn->enemy_id); */
+  /*     if (kne && kne->enemy_id == kn->id */
+  /*         && is_safe_to_follow (kne, kn, kne->f.dir)) { */
+  /*       select_controllable (kn); */
+  /*       k = kn; */
+  /*       ke = kne; */
+  /*       break; */
+  /*     } */
+  /*   } while (kn != k); */
+  /* } */
 
   camera_follow_kid = (k->f.c.room == mr.room)
     ? k->id : -1;
@@ -677,6 +681,15 @@ compute_level (void)
   struct replay *replay = get_replay ();
   replay_gamepad_update (k, replay, anim_cycle);
 
+  /* non-current controllables must defend themselves */
+  for (i = 0; i < anima_nmemb; i++) {
+    struct anim *ks = &anima[i];
+    if ((ks->id == 0 || ks->shadow_of == 0)
+        && ks->id != current_kid_id
+        && is_in_fight_mode (ks))
+      anima[i].key.up = anima[i].key.shift = true;
+  }
+
   for (i = 0; i < anima_nmemb; i++) enter_fight_logic (&anima[i]);
   for (i = 0; i < anima_nmemb; i++) leave_fight_logic (&anima[i]);
   for (i = 0; i < anima_nmemb; i++) fight_ai (&anima[i]);
@@ -701,7 +714,12 @@ compute_level (void)
     if (a->no_walkf_timer > 0) a->no_walkf_timer--;
   }
 
-  fight_turn_controllable (k);
+  /* appropriately turn controllables */
+  for (i = 0; i < anima_nmemb; i++) {
+    struct anim *ks = &anima[i];
+    if (ks->id == 0 || ks->shadow_of == 0)
+      fight_turn_controllable (ks);
+  }
 
   clear_anims_keyboard_state ();
 
@@ -735,6 +753,9 @@ compute_level (void)
              && (mr.select_cycles == 0
                  || mr.room != k->f.c.room))
     mr.room_select = -1;
+
+  /* save individual multi-room origin */
+  mr_save_origin (&k->mr_origin);
 
   if (global_level.special_events) global_level.special_events ();
 

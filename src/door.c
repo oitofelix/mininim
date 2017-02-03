@@ -662,11 +662,10 @@ void
 draw_door_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f,
               enum em em, enum vm vm)
 {
-  push_drawn_rectangle (bitmap);
-
   draw_floor_base (bitmap, p, em, vm);
   draw_door_pole (bitmap, p, em, vm);
 
+  push_drawn_rectangle (bitmap);
   enum should_draw s = should_draw_face (p, f);
   int w = s == SHOULD_DRAW_PART ? DOOR_FG_WIDTH : FULL_WIDTH;
 
@@ -680,7 +679,6 @@ draw_door_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f,
       draw_door_grid (bitmap, p, fake_door_step (p), w, true, em, vm);
     draw_door_grid (bitmap, p, fake_door_step (p), w, false, em, vm);
   }
-
   redraw_drawn_rectangle (pop_drawn_rectangle (), p, em, vm);
 }
 

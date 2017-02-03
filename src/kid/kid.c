@@ -196,8 +196,8 @@ draw_kid_frame (ALLEGRO_BITMAP *bitmap, struct anim *k,
   xf.b = apply_palette (xf.b, pal);
 
   if (k->shadow) {
-    f.b = apply_guard_palette (f.b, SHADOW, 0, vm);
-    xf.b = apply_guard_palette (xf.b, SHADOW, 0, vm);
+    f.b = apply_guard_palette (f.b, SHADOW, k->style, vm);
+    xf.b = apply_guard_palette (xf.b, SHADOW, k->style, vm);
     /* palette pals = get_shadow_palette (vm); */
     /* f.b = apply_palette (f.b, pals); */
     /* xf.b = apply_palette (xf.b, pals); */
@@ -416,11 +416,21 @@ draw_kid_lives (ALLEGRO_BITMAP *bitmap, struct anim *k,
 
   ALLEGRO_BITMAP *empty = NULL,
     *full = NULL;
-  palette pal = k->shadow
-    ? get_shadow_life_palette (vm)
-    : get_kid_palette (vm);
-  empty = apply_palette (v_kid_empty_life, pal);
-  full = apply_palette (v_kid_full_life, pal);
+
+  if (k->shadow) {
+    if (k->style) {
+      empty = apply_guard_palette (v_kid_empty_life, SHADOW, k->style, vm);
+      full = apply_guard_palette (v_kid_full_life, SHADOW, k->style, vm);
+    } else {
+      palette pal = get_shadow_life_palette (vm);
+      empty = apply_palette (v_kid_empty_life, pal);
+      full = apply_palette (v_kid_full_life, pal);
+    }
+  } else {
+    palette pal = get_kid_palette (vm);
+    empty = apply_palette (v_kid_empty_life, pal);
+    full = apply_palette (v_kid_full_life, pal);
+  }
 
   if (hgc) {
     empty = apply_palette (empty, hgc_palette);
@@ -599,4 +609,39 @@ f = %i, p = %i, dn = %i, dp = %i, dc = %i, dcb = %i, df = %i, dl = %i, dcl = %i,
 
   }
   /* end kid hack */
+}
+
+
+
+
+
+int fellow_shadow_id[9];
+int last_fellow_shadow_id;
+
+void
+init_fellow_shadow_id (void)
+{
+  memset (&fellow_shadow_id[0], 0, sizeof (fellow_shadow_id));
+  last_fellow_shadow_id = 0;
+}
+
+int
+next_fellow_shadow_style (void)
+{
+  int style = mrandom (GUARD_STYLES_NMEMB - 1);
+  int max_tries = GUARD_STYLES_NMEMB;
+
+  size_t i;
+ restart:
+  for (i = 1; i < FELLOW_SHADOW_NMEMB; i++) {
+    struct anim *k = get_anim_by_id (fellow_shadow_id[i]);
+    if (! k->id) continue;
+    if (k->style == style) {
+      style = (style + 1) % GUARD_STYLES_NMEMB;
+      if (! max_tries--) assert (false);
+      goto restart;
+    }
+  }
+
+  return style;
 }

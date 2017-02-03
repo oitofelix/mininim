@@ -84,7 +84,7 @@ flow (struct anim *k)
 
   survey (_mt, pos, &k->f, NULL, &pmt, NULL);
   bool stairs = k->key.up && ! k->key.left && ! k->key.right
-    && is_in_front_open_level_door (&k->f, &k->p);
+    && k->shadow_of == - 1 && is_in_front_open_level_door (&k->f, &k->p);
 
   if (k->oaction == kid_normal
       && k->current_lives <= 0) {

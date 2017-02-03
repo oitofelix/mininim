@@ -58,8 +58,15 @@ void kid_haptic (struct anim *k, double duration);
 void kid_haptic_for_range (struct pos *p, coord_f cf, double r,
                            double duration);
 
+
+void init_fellow_shadow_id (void);
+int next_fellow_shadow_style (void);
+
+
 /* variables */
 extern int current_kid_id;
+extern int fellow_shadow_id[FELLOW_SHADOW_NMEMB];
+extern int last_fellow_shadow_id;
 
 extern ALLEGRO_BITMAP *v_kid_full_life, *v_kid_empty_life, *v_kid_splash;
 

@@ -81,9 +81,7 @@ flow (struct anim *k)
 
   bool keep_sword =
     (k->key.down && (! ke || ! is_in_range (k, ke, ATTACK_RANGE)))
-    || (k->auto_taken_sword
-        && (! ke || (ke->enemy_id != k->id
-                     && dist_anims (k, ke) > 4 * PLACE_WIDTH)));
+    || (k->auto_taken_sword && k->enemy_id == -1);
 
   if (k->oaction != kid_sword_normal) {
     k->i = -1;

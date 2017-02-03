@@ -205,7 +205,12 @@ play_anim (void (*draw_callback) (void),
       close_text_log (&event);
       break;
     case ALLEGRO_EVENT_JOYSTICK_CONFIGURATION:
-      calibrate_joystick ();
+      {
+        enum gpm gpm_old = gpm;
+        bool c = calibrate_joystick ();
+        if (gpm_old == JOYSTICK && ! c)
+          ui_gamepad_mode (KEYBOARD);
+      }
       break;
     case ALLEGRO_EVENT_JOYSTICK_BUTTON_DOWN:
       joystick_button = event.joystick.button;
@@ -424,14 +429,13 @@ get_next_controllable (struct anim *k)
 }
 
 void
-select_controllable (struct anim *k)
+select_controllable_by_id (int id)
 {
-  struct anim *old_k = get_anim_by_id (current_kid_id);
-  mr_save_origin (&old_k->mr_origin);
+  struct anim *k = get_anim_by_id (id);
   current_kid_id = k->id;
-  if (k->mr_origin.room && k->mr_origin.w && k->mr_origin.h)
+  if (! is_frame_visible (&k->f))
     mr_restore_origin (&k->mr_origin);
-  mr.select_cycles = SELECT_CYCLES;
+  mr_focus_room (k->f.c.room);
 }
 
 struct anim *

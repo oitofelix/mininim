@@ -137,7 +137,6 @@ static void ui_inhibit_screensaver (bool inhibit);
 static void ui_room_drawing (bool draw);
 static void ui_screenshot (void);
 
-static void ui_gamepad_mode (enum gpm new_gpm);
 static void ui_flip_gamepad (bool v, bool h, bool save_only);
 
 static void ui_play_replay (void);
@@ -166,7 +165,7 @@ static void ui_float (void);
 static void ui_immortal (bool immortal);
 static void ui_fill_life (void);
 static void ui_add_life (void);
-static void ui_fellow_shadow (void);
+static void ui_select_fellow_shadow (int);
 static void ui_change_time (int m);
 static void ui_change_prob_skill (int *skill, int new);
 static void ui_change_kca (int d);
@@ -1432,14 +1431,16 @@ help_menu (intptr_t index)
 void
 skip_level_widget (void)
 {
-  if (cutscene || title_demo) menu_sep (NULL);
-  else
+  if (cutscene || title_demo)
     menu_array (JUMP_TO_LEVEL_MID, true, heading_icon, jump_to_level_menu,
                 JUMP_TO_LEVEL_1_MID, JUMP_TO_LEVEL_MID_NMEMB,
-                replay_mode == PLAY_REPLAY ? replay_chain_nmemb : 14,
-                replay_mode == PLAY_REPLAY
-                ? replay_index : global_level.n - 1,
-                "LEVEL %i", global_level.n);
+                14, 0, "LEVEL");
+  else menu_array (JUMP_TO_LEVEL_MID, true, heading_icon, jump_to_level_menu,
+                   JUMP_TO_LEVEL_1_MID, JUMP_TO_LEVEL_MID_NMEMB,
+                   replay_mode == PLAY_REPLAY ? replay_chain_nmemb : 14,
+                   replay_mode == PLAY_REPLAY
+                   ? replay_index : global_level.n - 1,
+                   "LEVEL %i", global_level.n);
 
   menu_sitem (RESTART_LEVEL_MID, replay_mode == PLAY_REPLAY && ! title_demo
               ? true
@@ -1833,7 +1834,7 @@ menu_mid (ALLEGRO_EVENT *event)
     ui_add_life ();
     break;
   case FELLOW_SHADOW_MID:
-    ui_fellow_shadow ();
+    ui_select_fellow_shadow (0);
     break;
   case TIME_ADD_MID:
     ui_change_time (+10);
@@ -2310,10 +2311,46 @@ level_key_bindings (void)
   else if (was_key_pressed (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_MINUS))
     ui_change_kcd (-1);
 
-  /* A: alternate between kid and its shadows */
+  /* A: create fellow shadows */
   else if (! active_menu
            && was_key_pressed (0, ALLEGRO_KEY_A))
-    ui_fellow_shadow ();
+    ui_select_fellow_shadow (0);
+
+  else if (! active_menu
+           && was_key_pressed (0, ALLEGRO_KEY_1))
+    ui_select_fellow_shadow (1);
+
+  else if (! active_menu
+           && was_key_pressed (0, ALLEGRO_KEY_2))
+    ui_select_fellow_shadow (2);
+
+  else if (! active_menu
+           && was_key_pressed (0, ALLEGRO_KEY_3))
+    ui_select_fellow_shadow (3);
+
+  else if (! active_menu
+           && was_key_pressed (0, ALLEGRO_KEY_4))
+    ui_select_fellow_shadow (4);
+
+  else if (! active_menu
+           && was_key_pressed (0, ALLEGRO_KEY_5))
+    ui_select_fellow_shadow (5);
+
+  else if (! active_menu
+           && was_key_pressed (0, ALLEGRO_KEY_6))
+    ui_select_fellow_shadow (6);
+
+  else if (! active_menu
+           && was_key_pressed (0, ALLEGRO_KEY_7))
+    ui_select_fellow_shadow (7);
+
+  else if (! active_menu
+           && was_key_pressed (0, ALLEGRO_KEY_8))
+    ui_select_fellow_shadow (8);
+
+  else if (! active_menu
+           && was_key_pressed (0, ALLEGRO_KEY_9))
+    ui_select_fellow_shadow (9);
 
   /* ESC: pause game */
   if (step_cycle > 0) {
@@ -2879,9 +2916,11 @@ ui_jump_to_level_rel (int d)
 void
 ui_jump_to_level_menu (int i)
 {
+  if (title_demo) goto no_replay;
+
   int n;
   switch (replay_mode) {
-  case NO_REPLAY:
+  case NO_REPLAY: no_replay:
     n = i + 1 + jump_to_level_menu_lower;
     if (n == global_level.n) return;
     break;
@@ -3071,18 +3110,42 @@ ui_add_life (void)
 }
 
 void
-ui_fellow_shadow (void)
+ui_select_fellow_shadow (int n)
 {
   if (replay_mode == NO_REPLAY) {
-    struct anim *old_k = get_anim_by_id (current_kid_id);
-    struct anim *k = get_next_controllable (old_k);
-    if (k == old_k) {
-      /* after this old_k reference might not be valid anymore, until
-         get_anim_by_id is called again on current_kid_id */
-      int id = create_anim (old_k, 0, NULL, 0);
-      k = get_anim_by_id (id);
+    if (n) {
+      if (fellow_shadow_id[n])
+        select_controllable_by_id (fellow_shadow_id[n]);
+      else {
+        struct anim *k0 = get_anim_by_id (0);
+        if (k0->current_lives <= 0) return;
+        assert (n < FELLOW_SHADOW_NMEMB);
+        /* after this old_k reference might not be valid anymore, until
+           get_anim_by_id is called again on current_kid_id */
+        int id = create_anim (k0, 0, NULL, 0);
+        fellow_shadow_id[n] = id;
+        struct anim *k = get_anim_by_id (id);
+        /* necessary so next_fellow_shadow doesn't consider its color */
+        k->style = -1;
+        k->style = next_fellow_shadow_style ();
+        mr.flicker = 12;
+        mr.color = get_flicker_raise_sword_color ();
+        play_audio (&suspense_audio, NULL, k->id);
+        select_controllable_by_id (id);
+      }
+    } else {
+      if (current_kid_id) {
+        last_fellow_shadow_id = current_kid_id;
+        select_controllable_by_id (0);
+      } else {
+        if (last_fellow_shadow_id)
+          select_controllable_by_id (last_fellow_shadow_id);
+        else {
+          ui_msg (0, "NO FELLOW SHADOW");
+          return;
+        }
+      }
     }
-    select_controllable (k);
   } else print_replay_mode (0);
 }
 

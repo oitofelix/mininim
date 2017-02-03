@@ -47,8 +47,8 @@ static struct palette_cache {
 } *palette_cache = NULL;
 static size_t palette_cache_nmemb = 0;
 
-static struct drawn_rectangle drawn_rectangle_stack[DRAWN_RECTANGLE_STACK_NMEMB_MAX];
-static size_t drawn_rectangle_stack_nmemb;
+struct drawn_rectangle drawn_rectangle_stack[DRAWN_RECTANGLE_STACK_NMEMB_MAX];
+size_t drawn_rectangle_stack_nmemb;
 
 static struct clipping_rectangle clipping_rectangle_stack[CLIPPING_RECTANGLE_STACK_NMEMB_MAX];
 static size_t clipping_rectangle_stack_nmemb;
@@ -1019,6 +1019,17 @@ merge_drawn_rectangle (ALLEGRO_BITMAP *bitmap, int x, int y, int w, int h)
                    x, y, w, h,
                    &dr->x, &dr->y, &dr->w, &dr->h);
   return dr;
+}
+
+void
+adjust_drawn_rectangle (ALLEGRO_BITMAP *bitmap, int dx, int dy, int dw, int dh)
+{
+  struct drawn_rectangle *dr = get_drawn_rectangle (bitmap);
+  if (! dr) return;
+  dr->x += dx;
+  dr->y += dy;
+  dr->w += dw;
+  dr->h += dh;
 }
 
 struct drawn_rectangle *

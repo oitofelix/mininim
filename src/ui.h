@@ -328,6 +328,8 @@ bool ui_msg (int priority, const char *template, ...)
   __attribute__ ((format (printf, 2, 3)));
 bool ui_msg_clear (int priority);
 
+void ui_gamepad_mode (enum gpm new_gpm);
+
 void ui_load_replay_favorites (void);
 void ui_go_to_replay_favorite (int i);
 

@@ -1013,6 +1013,15 @@ is_immediately_accessible_pos (struct pos *to, struct pos *from,
   return false;
 }
 
+bool
+is_accessible (struct frame *f, coord_f cf, int dx0, int dx1)
+{
+  struct pos p0, p1;
+  surveyo (cf, dx0, +0, pos, f, NULL, &p0, NULL);
+  surveyo (cf, dx1, +0, pos, f, NULL, &p1, NULL);
+  return is_immediately_accessible_pos (&p1, &p0, f);
+}
+
 struct frame *
 move_frame (struct frame *f, coord_f cf, int dx, int move_left, int move_right)
 {

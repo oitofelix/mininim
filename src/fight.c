@@ -27,7 +27,8 @@ are_valid_opponents (struct anim *k0, struct anim *k1)
   if (k0->id == k1->id) return false;
 
   /* no one fights one's own fellow shadows */
-  if (k0->shadow_of == k1->id || k1->shadow_of == k0->id)
+  if ((k0->id == 0 || k0->shadow_of == 0)
+      && (k1->id == 0 || k1->shadow_of == 0))
     return false;
 
   /* non-fightable characters can't fight */
@@ -126,6 +127,12 @@ enter_fight_logic (struct anim *k)
   /* non-fighter doesn't fight */
   if (! k->fight) return;
 
+  /*  */
+  struct anim *ke = get_anim_by_id (k->enemy_id);
+  if (ke && is_in_range (k, ke, FIGHT_RANGE)
+      && is_attacking (ke) && ke->enemy_id == k->id)
+    return;
+
   int i;
   for (i = 0; i < anima_nmemb; i++) {
     struct anim *a = &anima[i];
@@ -136,34 +143,58 @@ enter_fight_logic (struct anim *k)
     /* only valid opponents matter */
     if (! are_valid_opponents (k, a)) continue;
 
-    /* if has an enemy already, consider another only if closer */
     if (k->enemy_id != -1 && k->enemy_refraction < 0) {
+      /**** has an enemy already ****/
+
       if (k->enemy_id == a->id) continue;
+
+      /*  */
+      if (is_in_range (k, a, FIGHT_RANGE)
+          && is_attacking (a) && a->enemy_id == k->id) {
+        if (is_on_back (k, a)) fight_turn (k);
+        consider_enemy (k, a);
+        return;
+      }
+
       struct anim *ke = get_anim_by_id (k->enemy_id);
       int da = dist_anims (k, a);
       int de = dist_anims (k, ke);
-      if (da >= de || abs (da - de) < 8) continue;
-    }
 
-    /* if seeing the character consider him an enemy */
-    if (is_anim_seeing (k, a, k->f.dir)) {
-      consider_enemy (k, a);
-      return;
-    }
+      if (da < de && abs (da - de) >= 8 && ! is_on_back (k, a)) {
+        consider_enemy (k, a);
+        return;
+      }
+    } else {
+      /**** has no enemy ****/
 
-    /* if hearing the character on the back, turn */
-    if (! k->controllable && is_hearing (k, a)
-        && is_on_back (k, a)
-        && anim_cycle - k->alert_cycle > 24) {
-      k->f.dir = (k->f.dir == LEFT) ? RIGHT : LEFT;
-      k->alert_cycle = anim_cycle;
-      return;
-    }
+      /* if seeing the character consider him an enemy */
+      if (is_anim_seeing (k, a, k->f.dir)) {
+        consider_enemy (k, a);
+        return;
+      }
 
-    /* if feeling the character's presence consider him an enemy */
-    if (is_near (k, a)) {
-      consider_enemy (k, a);
-      return;
+      /* if hearing the character on the back, turn */
+      if (! k->controllable && is_hearing (k, a)
+          && is_on_back (k, a)
+          && anim_cycle - k->alert_cycle > 24) {
+        k->f.dir = (k->f.dir == LEFT) ? RIGHT : LEFT;
+        k->alert_cycle = anim_cycle;
+        return;
+      }
+
+      /* if feeling the character's presence consider him an enemy */
+      if (is_near (k, a)) {
+        consider_enemy (k, a);
+        return;
+      }
+
+      /* if vigilant, look for a reachable opponent */
+      if (is_in_fight_mode (k)
+          && (a->id == 0 || a->shadow_of == 0)
+          && is_safe_to_follow (k, a, opposite_dir (k->f.dir))) {
+        consider_enemy (k, a);
+        return;
+      }
     }
   }
 }
@@ -489,6 +520,12 @@ fight_inversion_mechanics (struct anim *k, struct anim *ke)
     c = k->f.c;
     k->f.c = ke->f.c;
     ke->f.c = c;
+
+    if (k->f.dir == ke->f.dir) {
+      if (is_on_back (k, ke))
+        invert_frame_dir (&k->f, &k->f);
+      else invert_frame_dir (&ke->f, &ke->f);
+    }
 
     place_on_the_ground (&k->f, &k->f.c);
     place_on_the_ground (&ke->f, &ke->f.c);
@@ -1206,8 +1243,8 @@ backoff_from_range (struct anim *k0, struct anim *k1, int r,
 
     if (cl && cr) break;
 
-    if (i++ % 2 && ! cl) move_frame (&kl->f, _bb, +0, -1, -1);
-    else if (! cr) move_frame (&kr->f, _bb, +0, -1, -1);
+    if (i++ % 2 && ! cl) move_frame (&kl->f, _bb, +2, -1, -1);
+    else if (! cr) move_frame (&kr->f, _bb, +2, -1, -1);
   }
 }
 
@@ -1230,8 +1267,8 @@ get_in_range (struct anim *k0, struct anim *k1, int r,
 
     if (cl && cr) break;
 
-    if (i++ % 2 && ! cl) move_frame (&kl->f, _bf, +0, +1, +1);
-    else if (! cr) move_frame (&kr->f, _bf, +0, +1, +1);
+    if (i++ % 2 && ! cl) move_frame (&kl->f, _bf, +2, +1, +1);
+    else if (! cr) move_frame (&kr->f, _bf, +2, +1, +1);
   }
 }
 
