@@ -449,6 +449,24 @@ get_anim_by_id (int id)
 }
 
 struct anim *
+get_reciprocal_enemy (struct anim *k)
+{
+  if (! k) return NULL;
+  else if (k->enemy_id == -1) return NULL;
+  else if (k->enemy_id != -1 && k->enemy_refraction >= 0)
+    return NULL;
+  else if (k->enemy_id != -1) {
+    struct anim *ke = get_anim_by_id (k->enemy_id);
+    if (! ke) return NULL;
+    else if (ke->enemy_id == -1) return NULL;
+    else if (ke->enemy_id != -1 && ke->enemy_refraction >= 0)
+      return NULL;
+    else if (ke->enemy_id == k->id) return ke;
+    else return NULL;
+  } else return NULL;
+}
+
+struct anim *
 get_anim_dead_at_pos (struct pos *p)
 {
   int i;

@@ -3114,9 +3114,10 @@ ui_select_fellow_shadow (int n)
 {
   if (replay_mode == NO_REPLAY) {
     if (n) {
-      if (fellow_shadow_id[n])
+      if (fellow_shadow_id[n]) {
         select_controllable_by_id (fellow_shadow_id[n]);
-      else {
+        return;
+      } else {
         struct anim *k0 = get_anim_by_id (0);
         if (k0->current_lives <= 0) return;
         assert (n < FELLOW_SHADOW_NMEMB);
@@ -3132,16 +3133,38 @@ ui_select_fellow_shadow (int n)
         mr.color = get_flicker_raise_sword_color ();
         play_audio (&suspense_audio, NULL, k->id);
         select_controllable_by_id (id);
+        return;
       }
     } else {
       if (current_kid_id) {
         last_fellow_shadow_id = current_kid_id;
         select_controllable_by_id (0);
+        return;
       } else {
-        if (last_fellow_shadow_id)
-          select_controllable_by_id (last_fellow_shadow_id);
-        else {
-          ui_msg (0, "NO FELLOW SHADOW");
+        if (last_fellow_shadow_id) {
+          struct anim *k = get_anim_by_id (last_fellow_shadow_id);
+          if (k->current_lives > 0) {
+            select_controllable_by_id (last_fellow_shadow_id);
+            return;
+          } else {
+            size_t i;
+            for (i = 1; i < FELLOW_SHADOW_NMEMB; i++)
+              if (fellow_shadow_id[i]) {
+                struct anim *k = get_anim_by_id (fellow_shadow_id[i]);
+                if (k->current_lives > 0) {
+                  select_controllable_by_id (fellow_shadow_id[i]);
+                  return;
+                }
+              }
+            for (i = 1; i < FELLOW_SHADOW_NMEMB; i++)
+              if (! fellow_shadow_id[i]) {
+                ui_select_fellow_shadow (i);
+                return;
+              }
+            ui_msg (0, "NO FELLOW SHADOW");
+          }
+        } else {
+          ui_select_fellow_shadow (1);
           return;
         }
       }

@@ -632,7 +632,7 @@ compute_level (void)
   /* if current controllable is a dead shadow, select its controllable
      source */
   if (k->shadow_of == 0 && k->current_lives <= 0) {
-    if (k->death_timer++ > SELECT_CYCLES) {
+    if (k->death_timer++ > FELLOW_SHADOW_DEATH_WAIT_CYCLES) {
       k->death_timer = 0;
       k = get_anim_by_id (k->shadow_of);
       ke = get_anim_by_id (k->enemy_id);
@@ -684,10 +684,17 @@ compute_level (void)
   /* non-current controllables must defend themselves */
   for (i = 0; i < anima_nmemb; i++) {
     struct anim *ks = &anima[i];
-    if ((ks->id == 0 || ks->shadow_of == 0)
-        && ks->id != current_kid_id
-        && is_in_fight_mode (ks))
-      anima[i].key.up = anima[i].key.shift = true;
+
+    if ((ks->id != 0 && ks->shadow_of != 0)
+        || ks->id == current_kid_id
+        || ! is_in_fight_mode (ks)) continue;
+
+    struct anim *kse = get_reciprocal_enemy (ks);
+    if (kse && kse->refraction > 3
+        && ! is_in_range (ks, kse, FIGHT_RANGE)) {
+      if (ks->f.dir == LEFT) ks->key.left = true;
+      else ks->key.right = true;
+    } else ks->key.up = ks->key.shift = true;
   }
 
   for (i = 0; i < anima_nmemb; i++) enter_fight_logic (&anima[i]);

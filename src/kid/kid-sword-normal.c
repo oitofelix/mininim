@@ -73,10 +73,8 @@ flow (struct anim *k)
   k->attack_range_far = false;
   k->attack_range_near = false;
 
-  struct anim *ke = get_anim_by_id (k->enemy_id);
-  k->keep_sword_fast = (k->enemy_id != -1
-                        && ke->enemy_id == k->id
-                        && ke->current_lives > 0
+  struct anim *ke = get_reciprocal_enemy (k);
+  k->keep_sword_fast = (ke && ke->current_lives > 0
                         && ! is_anim_fall (&ke->f));
 
   bool keep_sword =

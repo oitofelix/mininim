@@ -1540,8 +1540,8 @@ quit_game (void)
   finalize_mouse ();
   finalize_gamepad ();
   finalize_audio ();
-  finalize_video ();
   finalize_dialog ();
+  finalize_video ();
 
   if (scream && kid_scream && guard_scream
       && fat_guard_scream && shadow_scream && skeleton_scream

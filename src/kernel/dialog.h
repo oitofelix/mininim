@@ -21,11 +21,15 @@
 #ifndef MININIM_DIALOG_H
 #define MININIM_DIALOG_H
 
+/* functions */
 void init_dialog (void);
 void finalize_dialog (void);
 void print_text_log (char const *template, ...)
   __attribute__ ((format (printf, 1, 2)));
 void close_text_log (ALLEGRO_EVENT *event);
 bool file_overwrite_dialog (char *filename);
+
+/* variables */
+extern ALLEGRO_TEXTLOG *text_log;
 
 #endif	/* MININIM_DIALOG_H */

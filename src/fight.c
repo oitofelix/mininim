@@ -127,7 +127,7 @@ enter_fight_logic (struct anim *k)
   /* non-fighter doesn't fight */
   if (! k->fight) return;
 
-  /*  */
+  /* give priority to currenty enemy in case he's attacking */
   struct anim *ke = get_anim_by_id (k->enemy_id);
   if (ke && is_in_range (k, ke, FIGHT_RANGE)
       && is_attacking (ke) && ke->enemy_id == k->id)
@@ -137,7 +137,7 @@ enter_fight_logic (struct anim *k)
   for (i = 0; i < anima_nmemb; i++) {
     struct anim *a = &anima[i];
 
-    /* no dead character is a valid oponent */
+    /* no dead character is a valid opponent */
     if (a->current_lives <= 0) continue;
 
     /* only valid opponents matter */
@@ -148,19 +148,22 @@ enter_fight_logic (struct anim *k)
 
       if (k->enemy_id == a->id) continue;
 
-      /*  */
+      /* if another enemy is attacking from back, give priority to
+         him */
       if (is_in_range (k, a, FIGHT_RANGE)
           && is_attacking (a) && a->enemy_id == k->id) {
-        if (is_on_back (k, a)) fight_turn (k);
+        if (k->f.dir == a->f.dir) fight_turn (k);
         consider_enemy (k, a);
         return;
       }
 
+      /* give priority to nearest potential enemy */
       struct anim *ke = get_anim_by_id (k->enemy_id);
       int da = dist_anims (k, a);
       int de = dist_anims (k, ke);
 
-      if (da < de && abs (da - de) >= 8 && ! is_on_back (k, a)) {
+      if (da < de && abs (da - de) >= 8 && ! is_on_back (k, a)
+          && (de > FIGHT_RANGE + PLACE_WIDTH || is_in_fight_mode (a))) {
         consider_enemy (k, a);
         return;
       }
@@ -173,25 +176,8 @@ enter_fight_logic (struct anim *k)
         return;
       }
 
-      /* if hearing the character on the back, turn */
-      if (! k->controllable && is_hearing (k, a)
-          && is_on_back (k, a)
-          && anim_cycle - k->alert_cycle > 24) {
-        k->f.dir = (k->f.dir == LEFT) ? RIGHT : LEFT;
-        k->alert_cycle = anim_cycle;
-        return;
-      }
-
       /* if feeling the character's presence consider him an enemy */
       if (is_near (k, a)) {
-        consider_enemy (k, a);
-        return;
-      }
-
-      /* if vigilant, look for a reachable opponent */
-      if (is_in_fight_mode (k)
-          && (a->id == 0 || a->shadow_of == 0)
-          && is_safe_to_follow (k, a, opposite_dir (k->f.dir))) {
         consider_enemy (k, a);
         return;
       }
@@ -202,13 +188,55 @@ enter_fight_logic (struct anim *k)
 void
 fight_ai (struct anim *k)
 {
+  /* dead characters don't fight */
+  if (k->current_lives <= 0) return;
+
   /* non-fightable characters don't fight */
   if (! is_fightable_anim (k)) return;
 
   /* controllables and non-fighters doesn't need AI to fight */
   if (k->controllable || ! k->fight) return;
 
-  /* if forgetting about an enemy, no need to fight */
+  /* for all characters... */
+  int i;
+  for (i = 0; i < anima_nmemb; i++) {
+    struct anim *a = &anima[i];
+
+    /* no dead character is a valid opponent */
+    if (a->current_lives <= 0) continue;
+
+    /* only valid opponents matter */
+    if (! are_valid_opponents (k, a)) continue;
+
+    /* if forgetting about an enemy look for a reachable opponent */
+    if (k->enemy_refraction >= 0
+        && (a->id == 0 || a->shadow_of == 0)
+        && is_anim_seeing (k, a, opposite_dir (k->f.dir))) {
+      fight_turn (k);
+      return;
+    }
+
+    /* without an enemy keep attention to noises */
+    struct anim *ke = get_anim_by_id (k->enemy_id);
+    int da = dist_anims (k, a);
+    int de = dist_anims (k, ke);
+
+    if ((! ke
+         || ((da < de && abs (da - de) >= 8)
+             && (de > FIGHT_RANGE + PLACE_WIDTH
+                 || ! is_safe_to_follow (k, ke, k->f.dir))))
+        && is_hearing (k, a)
+        && is_on_back (k, a)
+        && anim_cycle - k->alert_cycle > 24) {
+      if (is_in_fight_mode (k)) fight_turn (k);
+      else k->f.dir = (k->f.dir == LEFT) ? RIGHT : LEFT;
+      k->alert_cycle = anim_cycle;
+      consider_enemy (k, a);
+      return;
+    }
+  }
+
+  /* if forgetting about an enemy do nothing */
   if (k->enemy_refraction > 0) return;
 
   /* without an enemy or awareness, no need to fight */
@@ -572,6 +600,8 @@ leave_fight_mode (struct anim *k)
 int
 dist_anims (struct anim *k0, struct anim *k1)
 {
+  if (! k0 || ! k1) return INT_MAX;
+
   struct coord m0, m1; struct pos p0, p1;
   survey (_m, pos, &k0->f, &m0, &p0, NULL);
   survey (_m, pos, &k1->f, &m1, &p1, NULL);
@@ -931,13 +961,15 @@ is_on_back (struct anim *k0, struct anim *k1)
 {
   struct coord m0, m1;
 
-  _m (&k0->f, &m0);
-  _m (&k1->f, &m1);
+  coord_f cf = k0->f.dir == LEFT ? _mr : _ml;
+
+  _mf (&k0->f, &m0);
+  cf (&k1->f, &m1);
   coord2room (&m1, m0.room, &m1);
 
   return m1.room == m0.room
-    && ((k0->f.dir == LEFT && m1.x > m0.x)
-        || (k0->f.dir == RIGHT && m1.x < m0.x));
+    && ((k0->f.dir == LEFT && m1.x > m0.x + IS_ON_BACK_THRESHOLD)
+        || (k0->f.dir == RIGHT && m1.x < m0.x - IS_ON_BACK_THRESHOLD));
 }
 
 bool

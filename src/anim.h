@@ -37,6 +37,7 @@ void destroy_anim (struct anim *a);
 void destroy_anims (void);
 struct anim *get_next_controllable (struct anim *k);
 void select_controllable_by_id (int id);
+struct anim *get_reciprocal_enemy (struct anim *k);
 struct anim *get_anim_by_id (int id);
 struct anim *get_anim_dead_at_pos (struct pos *p);
 struct anim *get_guard_anim_by_level_id (int id);

@@ -20,7 +20,7 @@
 
 #include "mininim.h"
 
-static ALLEGRO_TEXTLOG *text_log;
+ALLEGRO_TEXTLOG *text_log;
 
 void
 init_dialog (void)
@@ -36,6 +36,10 @@ init_dialog (void)
 void
 finalize_dialog (void)
 {
+  if (text_log) {
+    al_close_native_text_log (text_log);
+    text_log = NULL;
+  }
   al_shutdown_native_dialog_addon ();
 }
 
