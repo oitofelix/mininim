@@ -165,7 +165,6 @@ static void ui_float (void);
 static void ui_immortal (bool immortal);
 static void ui_fill_life (void);
 static void ui_add_life (void);
-static void ui_select_fellow_shadow (int);
 static void ui_change_time (int m);
 static void ui_change_prob_skill (int *skill, int new);
 static void ui_change_kca (int d);
@@ -1379,9 +1378,6 @@ cheat_menu (intptr_t index)
               ? "&Add container (Shift+T)"
               : "Fill &all containers (Shift+T)");
 
-  menu_sitem (FELLOW_SHADOW_MID, k && k->current_lives > 0,
-              shadow_face_icon, "Fellow s&hadow (A)");
-
   menu_sub (TIME_CHANGE_MID, true, time_icon, time_change_menu, 0, "&Time");
   menu_sub (KCA_CHANGE_MID, true, counter_attack_icon,
             kca_change_menu, 0, "Counter a&ttack");
@@ -1832,9 +1828,6 @@ menu_mid (ALLEGRO_EVENT *event)
     break;
   case ADD_LIFE_MID:
     ui_add_life ();
-    break;
-  case FELLOW_SHADOW_MID:
-    ui_select_fellow_shadow (0);
     break;
   case TIME_ADD_MID:
     ui_change_time (+10);
@@ -2310,47 +2303,6 @@ level_key_bindings (void)
   /* ALT+-: decrease counter defense skill */
   else if (was_key_pressed (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_MINUS))
     ui_change_kcd (-1);
-
-  /* A: create fellow shadows */
-  else if (! active_menu
-           && was_key_pressed (0, ALLEGRO_KEY_A))
-    ui_select_fellow_shadow (0);
-
-  else if (! active_menu
-           && was_key_pressed (0, ALLEGRO_KEY_1))
-    ui_select_fellow_shadow (1);
-
-  else if (! active_menu
-           && was_key_pressed (0, ALLEGRO_KEY_2))
-    ui_select_fellow_shadow (2);
-
-  else if (! active_menu
-           && was_key_pressed (0, ALLEGRO_KEY_3))
-    ui_select_fellow_shadow (3);
-
-  else if (! active_menu
-           && was_key_pressed (0, ALLEGRO_KEY_4))
-    ui_select_fellow_shadow (4);
-
-  else if (! active_menu
-           && was_key_pressed (0, ALLEGRO_KEY_5))
-    ui_select_fellow_shadow (5);
-
-  else if (! active_menu
-           && was_key_pressed (0, ALLEGRO_KEY_6))
-    ui_select_fellow_shadow (6);
-
-  else if (! active_menu
-           && was_key_pressed (0, ALLEGRO_KEY_7))
-    ui_select_fellow_shadow (7);
-
-  else if (! active_menu
-           && was_key_pressed (0, ALLEGRO_KEY_8))
-    ui_select_fellow_shadow (8);
-
-  else if (! active_menu
-           && was_key_pressed (0, ALLEGRO_KEY_9))
-    ui_select_fellow_shadow (9);
 
   /* ESC: pause game */
   if (step_cycle > 0) {
@@ -3106,69 +3058,6 @@ ui_add_life (void)
     struct anim *k = get_anim_by_id (current_kid_id);
     increase_kid_total_lives (k);
     total_lives = k->total_lives;
-  } else print_replay_mode (0);
-}
-
-void
-ui_select_fellow_shadow (int n)
-{
-  if (replay_mode == NO_REPLAY) {
-    if (n) {
-      if (fellow_shadow_id[n]) {
-        select_controllable_by_id (fellow_shadow_id[n]);
-        return;
-      } else {
-        struct anim *k0 = get_anim_by_id (0);
-        if (k0->current_lives <= 0) return;
-        assert (n < FELLOW_SHADOW_NMEMB);
-        /* after this old_k reference might not be valid anymore, until
-           get_anim_by_id is called again on current_kid_id */
-        int id = create_anim (k0, 0, NULL, 0);
-        fellow_shadow_id[n] = id;
-        struct anim *k = get_anim_by_id (id);
-        /* necessary so next_fellow_shadow doesn't consider its color */
-        k->style = -1;
-        k->style = next_fellow_shadow_style ();
-        mr.flicker = 12;
-        mr.color = get_flicker_raise_sword_color ();
-        play_audio (&suspense_audio, NULL, k->id);
-        select_controllable_by_id (id);
-        return;
-      }
-    } else {
-      if (current_kid_id) {
-        last_fellow_shadow_id = current_kid_id;
-        select_controllable_by_id (0);
-        return;
-      } else {
-        if (last_fellow_shadow_id) {
-          struct anim *k = get_anim_by_id (last_fellow_shadow_id);
-          if (k->current_lives > 0) {
-            select_controllable_by_id (last_fellow_shadow_id);
-            return;
-          } else {
-            size_t i;
-            for (i = 1; i < FELLOW_SHADOW_NMEMB; i++)
-              if (fellow_shadow_id[i]) {
-                struct anim *k = get_anim_by_id (fellow_shadow_id[i]);
-                if (k->current_lives > 0) {
-                  select_controllable_by_id (fellow_shadow_id[i]);
-                  return;
-                }
-              }
-            for (i = 1; i < FELLOW_SHADOW_NMEMB; i++)
-              if (! fellow_shadow_id[i]) {
-                ui_select_fellow_shadow (i);
-                return;
-              }
-            ui_msg (0, "NO FELLOW SHADOW");
-          }
-        } else {
-          ui_select_fellow_shadow (1);
-          return;
-        }
-      }
-    }
   } else print_replay_mode (0);
 }
 

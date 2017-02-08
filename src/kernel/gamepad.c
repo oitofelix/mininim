@@ -37,7 +37,9 @@ static float joystick_h_center, joystick_v_center,
   joystick_right_released,
   joystick_down_released,
   joystick_left_released,
-  joystick_enter_released;
+  joystick_enter_released,
+  joystick_alt_released,
+  joystick_ctrl_released;
 float joystick_h_threshold = 0.1,
   joystick_v_threshold = 0.8;
 int joystick_shift_threshold = 100,
@@ -45,7 +47,9 @@ int joystick_shift_threshold = 100,
   joystick_right_threshold = 100,
   joystick_down_threshold = 100,
   joystick_left_threshold = 100,
-  joystick_enter_threshold = 100;
+  joystick_enter_threshold = 100,
+  joystick_alt_threshold = 100,
+  joystick_ctrl_threshold = 100;
 int joystick_h_stick = 0,
   joystick_h_axis = 0,
   joystick_v_stick = 0,
@@ -56,6 +60,8 @@ int joystick_h_stick = 0,
   joystick_left_button = 3,
   joystick_enter_button = 4,
   joystick_shift_button = 5,
+  joystick_alt_button = 6,
+  joystick_ctrl_button = 7,
   joystick_time_button = 8,
   joystick_pause_button = 9;
 
@@ -155,6 +161,8 @@ calibrate_joystick (void)
   joystick_down_released = get_joystick_button (joystick_down_button);
   joystick_left_released = get_joystick_button (joystick_left_button);
   joystick_enter_released = get_joystick_button (joystick_enter_button);
+  joystick_alt_released = get_joystick_button (joystick_alt_button);
+  joystick_ctrl_released = get_joystick_button (joystick_ctrl_button);
 
 #if HAPTIC_FEATURE
   joystick_haptic = al_get_haptic_from_joystick (joystick);
@@ -203,7 +211,7 @@ free_joystick (void)
 }
 
 struct gamepad_state *
-get_gamepad_state (struct gamepad_state *k)
+get_gamepad_state (struct gamepad_state *gs)
 {
   al_get_keyboard_state (&keyboard_state);
   bool up, down, left, right;
@@ -242,29 +250,37 @@ get_gamepad_state (struct gamepad_state *k)
     || (get_joystick_button (joystick_right_button) >
         joystick_right_released + joystick_right_threshold);
 
-  k->up = up;
-  k->down = down;
-  k->left = left;
-  k->right = right;
+  gs->up = up;
+  gs->down = down;
+  gs->left = left;
+  gs->right = right;
 
   if (flip_gamepad_vertical)
-    k->up = down, k->down = up;
+    gs->up = down, gs->down = up;
 
   if (flip_gamepad_horizontal)
-    k->left = right, k->right = left;
+    gs->left = right, gs->right = left;
 
-  k->shift = al_key_down (&keyboard_state, ALLEGRO_KEY_LSHIFT)
+  gs->shift = al_key_down (&keyboard_state, ALLEGRO_KEY_LSHIFT)
     || al_key_down (&keyboard_state, ALLEGRO_KEY_RSHIFT)
     || (get_joystick_button (joystick_shift_button) >
         joystick_shift_released + joystick_shift_threshold);
-  k->enter =
+  gs->enter =
     (al_key_down (&keyboard_state, ALLEGRO_KEY_ENTER)
      && ! get_key_modifiers ())
     || al_key_down (&keyboard_state, ALLEGRO_KEY_PAD_ENTER)
     || (get_joystick_button (joystick_enter_button) >
         joystick_enter_released + joystick_enter_threshold);
+  gs->ctrl = al_key_down (&keyboard_state, ALLEGRO_KEY_LCTRL)
+    || al_key_down (&keyboard_state, ALLEGRO_KEY_RCTRL)
+    || (get_joystick_button (joystick_ctrl_button) >
+        joystick_ctrl_released + joystick_ctrl_threshold);
+  gs->alt = al_key_down (&keyboard_state, ALLEGRO_KEY_ALT)
+    || al_key_down (&keyboard_state, ALLEGRO_KEY_ALTGR)
+    || (get_joystick_button (joystick_alt_button) >
+        joystick_alt_released + joystick_alt_threshold);
 
-  return k;
+  return gs;
 }
 
 error_t

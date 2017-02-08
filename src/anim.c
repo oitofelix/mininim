@@ -431,11 +431,17 @@ get_next_controllable (struct anim *k)
 void
 select_controllable_by_id (int id)
 {
+  struct anim *old_k = get_anim_by_id (current_kid_id);
   struct anim *k = get_anim_by_id (id);
-  current_kid_id = k->id;
+  current_kid_id = id;
+  if (id) {
+    k->death_timer = 0;
+    last_fellow_shadow_id = id;
+  }
   if (! is_frame_visible (&k->f))
     mr_restore_origin (&k->mr_origin);
-  mr_focus_room (k->f.c.room);
+  if (k->f.c.room != old_k->f.c.room)
+    mr_focus_room (k->f.c.room);
 }
 
 struct anim *

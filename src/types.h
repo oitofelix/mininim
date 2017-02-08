@@ -199,7 +199,7 @@ struct skill {
 };
 
 struct gamepad_state {
-  bool up, down, left, right, shift, enter;
+  bool up, down, left, right, shift, enter, ctrl, alt;
 };
 
 enum replay_mode {
@@ -455,6 +455,8 @@ struct anim {
   struct pos df_posb[2];
 
   struct mr_origin mr_origin;
+
+  bool ctrl_left, ctrl_right, alt_up;
 };
 
 typedef struct coord *(*coord_f) (struct frame *, struct coord *);

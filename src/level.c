@@ -629,6 +629,38 @@ compute_level (void)
   struct anim *k = get_anim_by_id (current_kid_id);
   struct anim *ke = get_anim_by_id (k->enemy_id);
 
+  if (is_game_paused ()) return;
+
+  struct replay *replay = get_replay ();
+  replay_gamepad_update (k, replay, anim_cycle);
+
+  if (! k->key.ctrl || ! k->key.left) k->ctrl_left = false;
+  if (! k->key.ctrl || ! k->key.right) k->ctrl_right = false;
+  if (! k->key.alt || ! k->key.up) k->alt_up = false;
+
+  /* process fellow shadow gamepad commands */
+  if (k->key.ctrl && k->key.left && ! k->ctrl_left) {
+    k->ctrl_left = true;
+    if (current_kid_id) next_fellow_shadow (-1);
+    else create_fellow_shadow ();
+    k = get_anim_by_id (current_kid_id);
+    ke = get_anim_by_id (k->enemy_id);
+    k->ctrl_left = true;
+  } else if (k->key.ctrl && k->key.right && ! k->ctrl_right) {
+    k->ctrl_right = true;
+    if (current_kid_id) next_fellow_shadow (+1);
+    else create_fellow_shadow ();
+    k = get_anim_by_id (current_kid_id);
+    ke = get_anim_by_id (k->enemy_id);
+    k->ctrl_right = true;
+  } else if (k->key.alt && k->key.up && ! k->alt_up) {
+    k->alt_up = true;
+    current_fellow_shadow ();
+    k = get_anim_by_id (current_kid_id);
+    ke = get_anim_by_id (k->enemy_id);
+    k->alt_up = true;
+  }
+
   /* if current controllable is a dead shadow, select its controllable
      source */
   if (k->shadow_of == 0 && k->current_lives <= 0) {
@@ -640,26 +672,8 @@ compute_level (void)
     }
   }
 
-  /* /\* change to the next controllable in imminent danger *\/ */
-  /* if (! ke || (ke && ke->enemy_id != k->id)) { */
-  /*   struct anim *kn = k, *kne = ke; */
-  /*   do { */
-  /*     kn = get_next_controllable (kn); */
-  /*     kne = get_anim_by_id (kn->enemy_id); */
-  /*     if (kne && kne->enemy_id == kn->id */
-  /*         && is_safe_to_follow (kne, kn, kne->f.dir)) { */
-  /*       select_controllable (kn); */
-  /*       k = kn; */
-  /*       ke = kne; */
-  /*       break; */
-  /*     } */
-  /*   } while (kn != k); */
-  /* } */
-
   camera_follow_kid = (k->f.c.room == mr.room)
     ? k->id : -1;
-
-  if (is_game_paused ()) return;
 
   /* this condition is necessary to honor any floor press the start
      level function might have */
@@ -677,9 +691,6 @@ compute_level (void)
   }
 
   compute_loose_floors ();
-
-  struct replay *replay = get_replay ();
-  replay_gamepad_update (k, replay, anim_cycle);
 
   /* non-current controllables must defend themselves */
   for (i = 0; i < anima_nmemb; i++) {

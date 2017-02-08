@@ -57,14 +57,19 @@ flow (struct anim *k)
   struct pos pmt;
 
   bool defense = k->key.up && ! k->key.shift
-    && ! k->key.left && ! k->key.right;
+    && ! k->key.left && ! k->key.right
+    && ! k->key.ctrl && ! k->key.alt;
   bool attack = k->key.shift && ! k->key.up
-    && ! k->key.left && ! k->key.right;
+    && ! k->key.left && ! k->key.right
+    && ! k->key.ctrl && ! k->key.alt;
   bool walkf = ! k->no_walkf_timer
     && (((k->f.dir == RIGHT) && k->key.right)
-        || ((k->f.dir == LEFT) && k->key.left));
-  bool walkb = ((k->f.dir == RIGHT) && k->key.left)
-    || ((k->f.dir == LEFT) && k->key.right);
+        || ((k->f.dir == LEFT) && k->key.left))
+    && ! k->key.ctrl;
+  bool walkb =
+    (((k->f.dir == RIGHT) && k->key.left)
+     || ((k->f.dir == LEFT) && k->key.right))
+    && ! k->key.ctrl;
 
   k->enemy_defended_my_attack = 0;
   k->enemy_counter_attacked_myself = 0;

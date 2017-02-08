@@ -210,9 +210,9 @@ static struct argp_option options[] = {
   {"gamepad-mode", GAMEPAD_MODE_OPTION, "GAMEPAD-MODE", 0, "Select gamepad mode.  Valid values for GAMEPAD-MODE are: KEYBOARD and JOYSTICK.  The default is JOYSTICK.  If a joystick is not available, it falls back to KEYBOARD.  This can be changed in-game using the CTRL+K and CTRL+J key bindings.", 0},
   {"gamepad-flip-mode", GAMEPAD_FLIP_MODE_OPTION, "GAMEPAD-FLIP-MODE", 0, "Select gamepad flip mode.  Valid values for GAMEPAD-FLIP-MODE are: NONE, VERTICAL, HORIZONTAL and VERTICAL-HORIZONTAL.  The default is NONE.  This can be changed in-game using the SHIFT+K key binding.", 0},
   {"joystick-axis-threshold", JOYSTICK_AXIS_THRESHOLD_OPTION, "FUNC,VALUE", 0, "Set joystick threshold to VALUE for the axis mapped to FUNC.  Valid values for FUNC are H and V.   VALUE is a floating point ranging from 0.0 to 1.0.  The default VALUE for H is 0.1 and for Y is 0.8.", 0},
-  {"joystick-button-threshold", JOYSTICK_BUTTON_THRESHOLD_OPTION, "FUNC,VALUE", 0, "Set joystick threshold to VALUE for the button mapped to FUNC.  Valid values for FUNC are: UP, RIGHT, DOWN, LEFT, ENTER, SHIFT.  VALUE is an integer ranging from 0 to 32767.  The default VALUE for any function is 100.", 0},
+  {"joystick-button-threshold", JOYSTICK_BUTTON_THRESHOLD_OPTION, "FUNC,VALUE", 0, "Set joystick threshold to VALUE for the button mapped to FUNC.  Valid values for FUNC are: UP, RIGHT, DOWN, LEFT, ENTER, SHIFT, CTRL, ALT.  VALUE is an integer ranging from 0 to 32767.  The default VALUE for any function is 100.", 0},
   {"joystick-axis", JOYSTICK_AXIS_OPTION, "FUNC,STICK,AXIS", 0, "Map function FUNC to joystick axis STICK,AXIS.  Valid values for FUNC are: H and V.  STICK,AXIS is a valid stick and axis pair.  The default STICK,AXIS for H is 0,0 and for V is 0,1.", 0},
-  {"joystick-button", JOYSTICK_BUTTON_OPTION, "FUNC,BUTTON", 0, "Map function FUNC to joystick button BUTTON.  Valid values for FUNC are: UP, RIGHT, DOWN, LEFT, ENTER, SHIFT, TIME, PAUSE.  BUTTON is a valid joystick button number.  The default BUTTON values are 0, 1, 2, 3, 4, 5, 8 and 9, respectively.", 0},
+  {"joystick-button", JOYSTICK_BUTTON_OPTION, "FUNC,BUTTON", 0, "Map function FUNC to joystick button BUTTON.  Valid values for FUNC are: UP, RIGHT, DOWN, LEFT, ENTER, SHIFT, CTRL, ALT, TIME, PAUSE.  BUTTON is a valid joystick button number.  The default BUTTON values are 0, 1, 2, 3, 4, 5, 8 and 9, respectively.", 0},
   {"joystick-info", JOYSTICK_INFO_OPTION, NULL, OPTION_NO_USAGE, "Print information about the primary joystick and exit.  Keep sticks/buttons pressed while invoking it to find out their respective assigned numbers.", 0},
   {"gamepad-rumble-gain", GAMEPAD_RUMBLE_GAIN_OPTION, "F", 0, "Set gamepad haptic rumble gain to F.  This number is multiplied by the intensity of rumble effects in order to scale they down proportionally in case the default is too intense for the available gamepad.  It's implemented in software and thus the GAIN gamepad feature is not required.  The default is 1.0.  Valid floating values range from 0.0 (disables rumble) to 1.0 (default intensity).  This option has no effect on replays."
 #if HAPTIC_FEATURE
@@ -665,12 +665,14 @@ parser (int key, char *arg, struct argp_state *state)
   char *joystick_axis_threshold_enum[] = {"H", "V", NULL};
 
   char *joystick_button_threshold_enum[] = {"UP", "RIGHT", "DOWN", "LEFT",
-                                            "ENTER", "SHIFT", NULL};
+                                            "ENTER", "SHIFT", "CTRL", "ALT",
+                                            NULL};
 
   char *joystick_axis_enum[] = {"H", "V", NULL};
 
   char *joystick_button_enum[] = {"UP", "RIGHT", "DOWN", "LEFT",
-                                  "ENTER", "SHIFT", "TIME", "PAUSE", NULL};
+                                  "ENTER", "SHIFT", "CTRL", "ALT",
+                                  "TIME", "PAUSE", NULL};
 
   char *multi_room_fit_mode_enum[] = {"NONE", "STRETCH", "RATIO", NULL};
 
@@ -979,6 +981,8 @@ Levels have been converted using module %s into native format at\n\
     case 3: joystick_left_threshold = int_val0; break;
     case 4: joystick_enter_threshold = int_val0; break;
     case 5: joystick_shift_threshold = int_val0; break;
+    case 6: joystick_ctrl_threshold = int_val0; break;
+    case 7: joystick_alt_threshold = int_val0; break;
     }
     break;
   case JOYSTICK_AXIS_OPTION:
@@ -1009,8 +1013,10 @@ Levels have been converted using module %s into native format at\n\
     case 3: joystick_left_button = int_val0; break;
     case 4: joystick_enter_button = int_val0; break;
     case 5: joystick_shift_button = int_val0; break;
-    case 6: joystick_time_button = int_val0; break;
-    case 7: joystick_pause_button = int_val0; break;
+    case 6: joystick_ctrl_button = int_val0; break;
+    case 7: joystick_alt_button = int_val0; break;
+    case 8: joystick_time_button = int_val0; break;
+    case 9: joystick_pause_button = int_val0; break;
     }
     break;
   case JOYSTICK_INFO_OPTION:

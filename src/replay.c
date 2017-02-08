@@ -98,6 +98,8 @@ pack_gamepad_state (struct gamepad_state *gs)
   pgs |= gs->right ? PACKED_GAMEPAD_STATE_RIGHT_BIT : 0;
   pgs |= gs->shift ? PACKED_GAMEPAD_STATE_SHIFT_BIT : 0;
   pgs |= gs->enter ? PACKED_GAMEPAD_STATE_ENTER_BIT : 0;
+  pgs |= gs->ctrl ? PACKED_GAMEPAD_STATE_CTRL_BIT : 0;
+  pgs |= gs->alt ? PACKED_GAMEPAD_STATE_ALT_BIT : 0;
   return pgs;
 }
 
@@ -111,6 +113,8 @@ unpack_gamepad_state (struct gamepad_state *gs, uint8_t pgs)
   gs->right = PACKED_GAMEPAD_STATE_RIGHT_BIT & pgs ? true : false;
   gs->shift = PACKED_GAMEPAD_STATE_SHIFT_BIT & pgs ? true : false;
   gs->enter = PACKED_GAMEPAD_STATE_ENTER_BIT & pgs ? true : false;
+  gs->ctrl = PACKED_GAMEPAD_STATE_CTRL_BIT & pgs ? true : false;
+  gs->alt = PACKED_GAMEPAD_STATE_ALT_BIT & pgs ? true : false;
   return gs;
 }
 

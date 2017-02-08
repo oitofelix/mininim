@@ -58,11 +58,20 @@ void kid_haptic (struct anim *k, double duration);
 void kid_haptic_for_range (struct pos *p, coord_f cf, double r,
                            double duration);
 
+
+
 
 void init_fellow_shadow_id (void);
+int fellow_shadow_count (void);
 int next_fellow_shadow_style (void);
+void next_fellow_shadow (int d);
+void current_fellow_shadow (void);
+void create_fellow_shadow (void);
 
 
+
+
+
 /* variables */
 extern int current_kid_id;
 extern int fellow_shadow_id[FELLOW_SHADOW_NMEMB];

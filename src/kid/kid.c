@@ -621,19 +621,32 @@ int last_fellow_shadow_id;
 void
 init_fellow_shadow_id (void)
 {
-  memset (&fellow_shadow_id[0], 0, sizeof (fellow_shadow_id));
+  size_t i;
+  fellow_shadow_id[0] = 0;
+  for (i = 1; i < FELLOW_SHADOW_NMEMB; i++) fellow_shadow_id[i] = -1;
   last_fellow_shadow_id = 0;
+}
+
+int
+fellow_shadow_count (void)
+{
+  size_t i;
+  int count = 0;
+  for (i = 1; i < FELLOW_SHADOW_NMEMB; i++)
+    if (fellow_shadow_id[i] > 0) count++;
+  return count;
 }
 
 int
 next_fellow_shadow_style (void)
 {
-  int style = mrandom (GUARD_STYLES_NMEMB - 1);
+  int style = prandom (GUARD_STYLES_NMEMB - 1);
   int max_tries = GUARD_STYLES_NMEMB;
 
   size_t i;
  restart:
   for (i = 1; i < FELLOW_SHADOW_NMEMB; i++) {
+    if (fellow_shadow_id[i] < 0) continue;
     struct anim *k = get_anim_by_id (fellow_shadow_id[i]);
     if (! k->id) continue;
     if (k->style == style) {
@@ -644,4 +657,81 @@ next_fellow_shadow_style (void)
   }
 
   return style;
+}
+
+void
+next_fellow_shadow (int d)
+{
+  if (! last_fellow_shadow_id) {
+    ui_msg (0, "NO FELLOW SHADOW");
+    return;
+  }
+
+  size_t i;
+  for (i = 1;
+       fellow_shadow_id[i] != last_fellow_shadow_id;
+       i = next_remainder (i, FELLOW_SHADOW_NMEMB, 1, d));
+
+  do {
+    i = next_remainder (i, FELLOW_SHADOW_NMEMB, 1, d);
+    if (fellow_shadow_id[i] < 0) continue;
+
+    struct anim *k = get_anim_by_id (fellow_shadow_id[i]);
+
+    if (fellow_shadow_id[i] == last_fellow_shadow_id) {
+      ui_msg (0, "NO FELLOW SHADOW");
+      return;
+    } else {
+      if (k->current_lives > 0) select_controllable_by_id (k->id);
+      else continue;
+      return;
+    }
+  } while (true);
+}
+
+void
+current_fellow_shadow (void)
+{
+  if (current_kid_id) select_controllable_by_id (0);
+  else {
+    if (last_fellow_shadow_id) {
+      select_controllable_by_id (last_fellow_shadow_id);
+      return;
+    } else ui_msg (0, "NO FELLOW SHADOW");
+  }
+}
+
+void
+create_fellow_shadow (void)
+{
+  size_t i;
+  for (i = 1; i < FELLOW_SHADOW_NMEMB; i++) {
+    if (fellow_shadow_id[i] < 0) {
+      struct anim *k0 = get_anim_by_id (0);
+      if (k0->current_lives <= 0) return;
+
+      int required_strength = fellow_shadow_count () + 1;
+
+      if (required_strength >= k0->current_lives) {
+        ui_msg (0, "NO STRENGTH");
+        return;
+      } else k0->current_lives += -required_strength;
+
+      /* after this old_k reference might not be valid anymore, until
+         get_anim_by_id is called again on current_kid_id */
+      int id = create_anim (k0, 0, NULL, 0);
+      fellow_shadow_id[i] = id;
+      struct anim *k = get_anim_by_id (id);
+      /* necessary so next_fellow_shadow doesn't consider its color */
+      k->style = -1;
+      k->style = next_fellow_shadow_style ();
+      k->current_lives += required_strength;
+      mr.flicker = 12;
+      mr.color = get_flicker_raise_sword_color ();
+      play_audio (&suspense_audio, NULL, k->id);
+      select_controllable_by_id (id);
+      return;
+    }
+  }
+  ui_msg (0, "NO FELLOW SHADOW");
 }

@@ -59,16 +59,24 @@ flow (struct anim *k)
   k->collision = false;
   k->hit_by_loose_floor = false;
 
-  bool turn = ((k->f.dir == RIGHT) && k->key.left)
-    || ((k->f.dir == LEFT) && k->key.right);
-  bool walk = ((k->f.dir == RIGHT) && k->key.right && k->key.shift)
-    || ((k->f.dir == LEFT) && k->key.left && k->key.shift);
-  bool run = (((k->f.dir == RIGHT) && k->key.right)
-              || ((k->f.dir == LEFT) && k->key.left)) && ! walk;
-  bool jump = ((k->f.dir == RIGHT) && k->key.right && k->key.up)
-    || ((k->f.dir == LEFT) && k->key.left && k->key.up);
+  bool turn =
+    (((k->f.dir == RIGHT) && k->key.left)
+     || ((k->f.dir == LEFT) && k->key.right))
+    && ! k->key.ctrl;
+  bool walk =
+    (((k->f.dir == RIGHT) && k->key.right && k->key.shift)
+     || ((k->f.dir == LEFT) && k->key.left && k->key.shift))
+    && ! k->key.ctrl;
+  bool run =
+    (((k->f.dir == RIGHT) && k->key.right)
+     || ((k->f.dir == LEFT) && k->key.left))
+    && ! walk && ! k->key.ctrl;
+  bool jump =
+    (((k->f.dir == RIGHT) && k->key.right && k->key.up)
+     || ((k->f.dir == LEFT) && k->key.left && k->key.up))
+    && ! k->key.ctrl;
   bool couch = k->key.down;
-  bool vjump = k->key.up;
+  bool vjump = k->key.up && ! k->key.ctrl && ! k->key.alt;
   bool take_sword = k->key.enter && k->has_sword;
 
   /* acquire item */

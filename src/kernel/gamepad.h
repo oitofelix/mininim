@@ -38,7 +38,9 @@ extern int joystick_shift_threshold,
   joystick_right_threshold,
   joystick_down_threshold,
   joystick_left_threshold,
-  joystick_enter_threshold;
+  joystick_enter_threshold,
+  joystick_ctrl_threshold,
+  joystick_alt_threshold;
 extern int joystick_h_stick,
   joystick_h_axis,
   joystick_v_stick,
@@ -49,6 +51,8 @@ extern int joystick_h_stick,
   joystick_left_button,
   joystick_enter_button,
   joystick_shift_button,
+  joystick_ctrl_button,
+  joystick_alt_button,
   joystick_time_button,
   joystick_pause_button;
 

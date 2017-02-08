@@ -103,3 +103,11 @@ dist_cart (float x0, float y0, float x1, float y1)
   int dy = y0 - y1;
   return sqrt (dx * dx + dy * dy);
 }
+
+int
+next_remainder (int n, int divisor, int offset, int direction)
+{
+  int c = n - offset + direction;
+  if (c < 0) c += divisor - offset;
+  return c % (divisor - offset) + offset;
+}
