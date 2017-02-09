@@ -1882,7 +1882,7 @@ enter_editor (void)
 void
 exit_editor (int priority)
 {
-  last_edit = edit;
+  if (edit != EDIT_NONE) last_edit = edit;
   edit = EDIT_NONE;
   msg = NULL;
   msg_cycles = 0;

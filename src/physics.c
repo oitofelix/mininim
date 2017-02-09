@@ -1204,6 +1204,38 @@ dist_collision (struct frame *f, coord_f cf, int left, int right,
   return abs (fo.dx);
 }
 
+void
+enforce_wall_collision (struct frame *f)
+{
+  struct pos pl, pr;
+  int dx = +2;
+  surveyo (_ml, dx, +0, pos, f, NULL, &pl, NULL);
+  surveyo (_mr, dx, +0, pos, f, NULL, &pr, NULL);
+
+  if (fg (&pl) != WALL || fg (&pr) != WALL)
+    return;
+
+  struct pos pll, prr;
+  prel (&pl, &pll, +0, -1);
+  prel (&pr, &prr, +0, +1);
+
+  int inc;
+  if (! is_collidable_at_right (&pll, f)
+      && is_collidable_at_left (&prr, f)) inc = -1;
+  else if (is_collidable_at_right (&pll, f)
+           && ! is_collidable_at_left (&prr, f)) inc = +1;
+  else if (f->dir == LEFT) inc = +1;
+  else inc = -1;
+
+  int max = PLACE_WIDTH;
+
+  do {
+    f->c.x += inc;
+    surveyo (_ml, dx, +0, pos, f, NULL, &pl, NULL);
+    surveyo (_mr, dx, +0, pos, f, NULL, &pr, NULL);
+  } while ((fg (&pl) == WALL || fg (&pr) == WALL) && max--);
+}
+
 
 
 

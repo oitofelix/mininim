@@ -708,17 +708,23 @@ compute_level (void)
     } else ks->key.up = ks->key.shift = true;
   }
 
+  /* fight AI */
   for (i = 0; i < anima_nmemb; i++) enter_fight_logic (&anima[i]);
   for (i = 0; i < anima_nmemb; i++) leave_fight_logic (&anima[i]);
   for (i = 0; i < anima_nmemb; i++) fight_ai (&anima[i]);
+
+  /* actions */
   for (i = 0; i < anima_nmemb; i++) {
     if (anima[i].next_action) {
       anima[i].next_action (&anima[i]);
       anima[i].next_action = NULL;
     } else anima[i].action (&anima[i]);
   }
+
+  /* fight mechanics */
   for (i = 0; i < anima_nmemb; i++) fight_mechanics (&anima[i]);
 
+  /* timers */
   for (i = 0; i < anima_nmemb; i++) {
     struct anim *a = &anima[i];
     if (a->float_timer && a->float_timer < FLOAT_TIMER_MAX) {
@@ -737,6 +743,11 @@ compute_level (void)
     struct anim *ks = &anima[i];
     if (ks->id == 0 || ks->shadow_of == 0)
       fight_turn_controllable (ks);
+  }
+
+  /* collision enforcement */
+  for (i = 0; i < anima_nmemb; i++) {
+    enforce_wall_collision (&anima[i].f);
   }
 
   clear_anims_keyboard_state ();

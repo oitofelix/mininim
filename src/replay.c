@@ -355,7 +355,7 @@ prepare_for_recording_replay (void)
 {
   recording_replay_countdown = SEC2CYC (3) - 1;
   anim_freq = DEFAULT_HZ;
-  al_set_timer_speed (timer, 1.0 / anim_freq);
+  if (timer) al_set_timer_speed (timer, 1.0 / anim_freq);
 }
 
 void

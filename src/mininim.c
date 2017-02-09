@@ -1499,6 +1499,9 @@ main (int _argc, char **_argv)
   goto restart_game;
 
  play_game:
+  min_legacy_level = min_int (min_legacy_level, start_level);
+  max_legacy_level = max_int (max_legacy_level, start_level);
+
   if (play_game_counter > 0) {
     start_time = START_TIME;
     time_limit = TIME_LIMIT;

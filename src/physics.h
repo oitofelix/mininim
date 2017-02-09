@@ -144,6 +144,7 @@ uncollide_static (struct frame *f,
 int
 dist_collision (struct frame *f, coord_f cf, int left, int right,
                 struct collision_info *ci_ret);
+void enforce_wall_collision (struct frame *f);
 
 
 
