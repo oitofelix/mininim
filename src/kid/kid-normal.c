@@ -76,7 +76,8 @@ flow (struct anim *k)
      || ((k->f.dir == LEFT) && k->key.left && k->key.up))
     && ! k->key.ctrl;
   bool couch = k->key.down;
-  bool vjump = k->key.up && ! k->key.ctrl && ! k->key.alt;
+  bool vjump = k->key.up && ! k->key.ctrl && ! k->key.alt
+    && anim_cycle - k->selection_cycle > SEC2CYC (2);
   bool take_sword = k->key.enter && k->has_sword;
 
   /* acquire item */

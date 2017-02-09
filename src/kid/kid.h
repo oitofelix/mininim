@@ -66,7 +66,7 @@ int fellow_shadow_count (void);
 int next_fellow_shadow_style (void);
 void next_fellow_shadow (int d);
 void current_fellow_shadow (void);
-void create_fellow_shadow (void);
+void create_fellow_shadow (bool select);
 
 
 

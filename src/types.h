@@ -457,6 +457,8 @@ struct anim {
   struct mr_origin mr_origin;
 
   bool ctrl_left, ctrl_right, alt_up;
+
+  uint64_t selection_cycle;
 };
 
 typedef struct coord *(*coord_f) (struct frame *, struct coord *);

@@ -442,6 +442,7 @@ select_controllable_by_id (int id)
     mr_restore_origin (&k->mr_origin);
   if (k->f.c.room != old_k->f.c.room)
     mr_focus_room (k->f.c.room);
+  k->selection_cycle = anim_cycle;
 }
 
 struct anim *

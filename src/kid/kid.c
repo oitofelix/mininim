@@ -702,7 +702,7 @@ current_fellow_shadow (void)
 }
 
 void
-create_fellow_shadow (void)
+create_fellow_shadow (bool select)
 {
   size_t i;
   for (i = 1; i < FELLOW_SHADOW_NMEMB; i++) {
@@ -717,9 +717,8 @@ create_fellow_shadow (void)
         return;
       } else k0->current_lives += -required_strength;
 
-      /* after this old_k reference might not be valid anymore, until
-         get_anim_by_id is called again on current_kid_id */
       int id = create_anim (k0, 0, NULL, 0);
+
       fellow_shadow_id[i] = id;
       struct anim *k = get_anim_by_id (id);
       /* necessary so next_fellow_shadow doesn't consider its color */
@@ -729,7 +728,16 @@ create_fellow_shadow (void)
       mr.flicker = 12;
       mr.color = get_flicker_raise_sword_color ();
       play_audio (&suspense_audio, NULL, k->id);
-      select_controllable_by_id (id);
+
+      if (select) select_controllable_by_id (id);
+      else {
+        struct anim *ke = get_anim_by_id (k->enemy_id);
+        if (ke) ke->enemy_id = id;
+        last_fellow_shadow_id = id;
+        k->selection_cycle = anim_cycle;
+        k->death_timer = 0;
+      }
+
       return;
     }
   }

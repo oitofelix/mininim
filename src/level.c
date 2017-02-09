@@ -626,10 +626,10 @@ compute_level (void)
   level_key_bindings ();
   process_death ();
 
+  if (is_game_paused ()) return;
+
   struct anim *k = get_anim_by_id (current_kid_id);
   struct anim *ke = get_anim_by_id (k->enemy_id);
-
-  if (is_game_paused ()) return;
 
   struct replay *replay = get_replay ();
   replay_gamepad_update (k, replay, anim_cycle);
@@ -642,14 +642,14 @@ compute_level (void)
   if (k->key.ctrl && k->key.left && ! k->ctrl_left) {
     k->ctrl_left = true;
     if (current_kid_id) next_fellow_shadow (-1);
-    else create_fellow_shadow ();
+    else create_fellow_shadow (! k->key.alt);
     k = get_anim_by_id (current_kid_id);
     ke = get_anim_by_id (k->enemy_id);
     k->ctrl_left = true;
   } else if (k->key.ctrl && k->key.right && ! k->ctrl_right) {
     k->ctrl_right = true;
     if (current_kid_id) next_fellow_shadow (+1);
-    else create_fellow_shadow ();
+    else create_fellow_shadow (! k->key.alt);
     k = get_anim_by_id (current_kid_id);
     ke = get_anim_by_id (k->enemy_id);
     k->ctrl_right = true;
@@ -756,7 +756,7 @@ compute_level (void)
       && k->current_lives > 0
       && k->f.c.room != 0
       && camera_follow_kid == k->id
-      && (ke = get_anim_by_id (k->enemy_id))
+      && (ke = get_reciprocal_enemy (k))
       && ! is_room_visible (ke->f.c.room)) {
     if (ke->f.c.room == roomd (&global_level, k->f.c.room, LEFT)) {
       mr_view_trans (LEFT);

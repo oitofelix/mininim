@@ -128,9 +128,8 @@ enter_fight_logic (struct anim *k)
   if (! k->fight) return;
 
   /* give priority to currenty enemy in case he's attacking */
-  struct anim *ke = get_anim_by_id (k->enemy_id);
-  if (ke && is_in_range (k, ke, FIGHT_RANGE)
-      && is_attacking (ke) && ke->enemy_id == k->id)
+  struct anim *ke = get_reciprocal_enemy (k);
+  if (ke && is_in_range (k, ke, FIGHT_RANGE) && is_attacking (ke))
     return;
 
   int i;
@@ -146,24 +145,44 @@ enter_fight_logic (struct anim *k)
     if (k->enemy_id != -1 && k->enemy_refraction < 0) {
       /**** has an enemy already ****/
 
+      /* don't consider current enemy */
       if (k->enemy_id == a->id) continue;
 
-      /* if another enemy is attacking from back, give priority to
-         him */
+      /* if another enemy is attacking, give priority to him */
+      struct anim *ae = get_anim_by_id (a->enemy_id);
       if (is_in_range (k, a, FIGHT_RANGE)
-          && is_attacking (a) && a->enemy_id == k->id) {
+          && is_attacking (a)
+          && (a->enemy_id == k->id
+              || ! is_in_range (a, ae, FIGHT_RANGE))) {
         if (k->f.dir == a->f.dir) fight_turn (k);
         consider_enemy (k, a);
         return;
       }
 
-      /* give priority to nearest potential enemy */
+      /* /\* below this only guards *\/ */
+      /* if (k->id != 0 && k->shadow_of != 0) continue; */
+
+      /* give priority to nearest enemy */
       struct anim *ke = get_anim_by_id (k->enemy_id);
       int da = dist_anims (k, a);
       int de = dist_anims (k, ke);
 
-      if (da < de && abs (da - de) >= 8 && ! is_on_back (k, a)
-          && (de > FIGHT_RANGE + PLACE_WIDTH || is_in_fight_mode (a))) {
+      if (da < de
+          && abs (da - de) >= PLACE_WIDTH
+          && ! is_on_back (k, a)
+          && (((de > FIGHT_RANGE + PLACE_WIDTH || is_in_fight_mode (a))
+               && a->enemy_id == k->id) || ke->enemy_id != k->id)) {
+        consider_enemy (k, a);
+        return;
+      }
+
+      /* give priority to unpaired enemy */
+      struct anim *kee = get_reciprocal_enemy (ke);
+      if (kee && kee->id != k->id
+          && (is_safe_to_follow (kee, ke, kee->f.dir)
+              || ! is_safe_to_follow (k, ke, k->f.dir))
+          && (is_anim_seeing (k, a, k->f.dir)
+              || is_hearing (k, a))) {
         consider_enemy (k, a);
         return;
       }
@@ -179,6 +198,15 @@ enter_fight_logic (struct anim *k)
       /* if feeling the character's presence consider him an enemy */
       if (is_near (k, a)) {
         consider_enemy (k, a);
+        return;
+      }
+
+      /* if forgetting about an enemy look for a reachable opponent */
+      if (is_in_fight_mode (k)
+          && (k->id != 0 && k->shadow_of != 0)
+          && (a->id == 0 || a->shadow_of == 0)
+          && is_anim_seeing (k, a, opposite_dir (k->f.dir))) {
+        fight_turn (k);
         return;
       }
     }
@@ -208,14 +236,6 @@ fight_ai (struct anim *k)
     /* only valid opponents matter */
     if (! are_valid_opponents (k, a)) continue;
 
-    /* if forgetting about an enemy look for a reachable opponent */
-    if (k->enemy_refraction >= 0
-        && (a->id == 0 || a->shadow_of == 0)
-        && is_anim_seeing (k, a, opposite_dir (k->f.dir))) {
-      fight_turn (k);
-      return;
-    }
-
     /* without an enemy keep attention to noises */
     struct anim *ke = get_anim_by_id (k->enemy_id);
     int da = dist_anims (k, a);
@@ -231,7 +251,6 @@ fight_ai (struct anim *k)
       if (is_in_fight_mode (k)) fight_turn (k);
       else k->f.dir = (k->f.dir == LEFT) ? RIGHT : LEFT;
       k->alert_cycle = anim_cycle;
-      consider_enemy (k, a);
       return;
     }
   }
@@ -379,7 +398,8 @@ fight_ai (struct anim *k)
   }
 
   /* if the enemy is not targeting you, do nothing more */
-  if (ke->enemy_id != -1 && ke->enemy_id != k->id) return;
+  struct anim *kee = get_reciprocal_enemy (ke);
+  if (kee && kee->id != k->id) return;
 
   /* in fight range, if the enemy is not attacking, go towards attack
      range (with probability, unless the enemy is not in fight mode,
@@ -663,8 +683,8 @@ bool
 is_attacking (struct anim *k)
 {
   if (! k) return false;
-  else return k->action == kid_sword_attack
-         || k->action == guard_attack
+  else return (k->action == kid_sword_attack && k->i <= 4)
+         || (k->action == guard_attack && k->i <= 4)
          || ((k->action == kid_sword_normal
               || k->action == guard_vigilant)
              && k->key.shift && ! k->key.up);
@@ -1144,7 +1164,7 @@ fight_turn_controllable (struct anim *k)
   struct anim *ke0 = get_anim_by_id (k->enemy_id);
 
   /* make the kid target the nearest enemy targeting him */
-  int i;
+  size_t i;
   for (i = 0; i < anima_nmemb; i++) {
     struct anim *a = &anima[i];
     if (a->enemy_id != k->id || ! is_fightable_anim (a))
@@ -1159,8 +1179,20 @@ fight_turn_controllable (struct anim *k)
   if (ke && ke0 && ke->f.dir != ke0->f.dir) t = 20;
   else t = -1;
 
-  if (ke && abs (dist_enemy (k) - d) > t)
+  if (ke && abs (dist_enemy (k) - d) > t) {
+    for (i = 0; i < anima_nmemb; i++) {
+      struct anim *a = &anima[i];
+      if (a->id == k->id || (a->id != 0 && a->shadow_of != 0))
+        continue;
+      int da = dist_anims (k, a);
+      if (da < d
+          /* && abs (da - d) >= 8 */
+          && a->enemy_id == ke->id
+          )
+        return;
+    }
     consider_enemy (k, ke);
+  }
 
   ke = get_anim_by_id (k->enemy_id);
   if (ke) {

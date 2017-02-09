@@ -58,10 +58,14 @@ flow (struct anim *k)
 
   bool defense = k->key.up && ! k->key.shift
     && ! k->key.left && ! k->key.right
-    && ! k->key.ctrl && ! k->key.alt;
+    && ! k->key.ctrl && ! k->key.alt
+    && k->enemy_id != -1
+    && k->enemy_refraction < 0;
   bool attack = k->key.shift && ! k->key.up
     && ! k->key.left && ! k->key.right
-    && ! k->key.ctrl && ! k->key.alt;
+    && ! k->key.ctrl && ! k->key.alt
+    && k->enemy_id != -1
+    && k->enemy_refraction < 0;
   bool walkf = ! k->no_walkf_timer
     && (((k->f.dir == RIGHT) && k->key.right)
         || ((k->f.dir == LEFT) && k->key.left))

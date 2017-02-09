@@ -146,7 +146,8 @@ void
 legacy_level_special_events (void)
 {
   struct pos p, pm;
-  struct anim *k = get_anim_by_id (0);
+  struct anim *k0 = get_anim_by_id (0);
+  struct anim *kc = get_anim_by_id (current_kid_id);
 
   /* title demo */
   if (title_demo) {
@@ -184,7 +185,7 @@ legacy_level_special_events (void)
   if (global_level.n == 1 && anim_cycle == 12
       && (retry_level != 1 || replay_mode != NO_REPLAY)) {
     play_audio (&suspense_audio, NULL, -1);
-    kid_haptic (k, KID_HAPTIC_LEGACY_COUCHING_START);
+    kid_haptic (kc, KID_HAPTIC_LEGACY_COUCHING_START);
   }
 
   /* in the third level */
@@ -192,13 +193,13 @@ legacy_level_special_events (void)
 
     /* level 3 checkpoint */
     if (! level_3_checkpoint
-        && k->f.c.prev_room == 7
-        && k->f.c.xd == LEFT
+        && k0->f.c.prev_room == 7
+        && k0->f.c.xd == LEFT
         && replay_mode == NO_REPLAY) {
       level_3_checkpoint = true;
-      checkpoint_total_lives = k->total_lives;
-      checkpoint_current_lives = k->current_lives;
-      checkpoint_skill = k->skill;
+      checkpoint_total_lives = k0->total_lives;
+      checkpoint_current_lives = k0->current_lives;
+      checkpoint_skill = k0->skill;
     }
 
     struct anim *s = NULL;
@@ -207,7 +208,7 @@ legacy_level_special_events (void)
        kid reaches the second place of the room 1 */
     struct pos skeleton_floor_pos;
     new_pos (&skeleton_floor_pos, &global_level, 1, 1, 5);
-    survey (_m, pos, &k->f, NULL, &pm, NULL);
+    survey (_m, pos, &kc->f, NULL, &pm, NULL);
     if (pm.room == 1
         && (pm.place == 2 || pm.place == 3)
         && fg (&skeleton_floor_pos) == SKELETON_FLOOR
@@ -255,16 +256,16 @@ legacy_level_special_events (void)
                          MIRROR, MIGNORE, MIGNORE, MIGNORE,
                          NULL, true, "MIRROR");
       play_audio (&suspense_audio, &mirror_pos, -1);
-      kid_haptic (k, KID_HAPTIC_LEGACY_MIRROR_APPEAR);
+      kid_haptic (kc, KID_HAPTIC_LEGACY_MIRROR_APPEAR);
     }
 
     /* if the kid is crossing the mirror, make his shadow appear */
     if (fg (&mirror_pos) == MIRROR
-        && is_valid_pos (&k->cross_mirror_p)
-        && peq (&k->cross_mirror_p, &mirror_pos)
+        && is_valid_pos (&kc->cross_mirror_p)
+        && peq (&kc->cross_mirror_p, &mirror_pos)
         && shadow_id == -1) {
-      k->current_lives = 1;
-      int id = create_anim (k, 0, NULL, 0);
+      k0->current_lives = 1;
+      int id = create_anim (k0, 0, NULL, 0);
       struct anim *ks = &anima[id];
       ks->fight = false;
       invert_frame_dir (&ks->f, &ks->f);
@@ -302,7 +303,7 @@ legacy_level_special_events (void)
         && fg (&door_pos) == DOOR
         && is_potion (&potion_pos)
         && door_at_pos (&door_pos)->i <= 25) {
-      int id = create_anim (k, 0, NULL, 0);
+      int id = create_anim (k0, 0, NULL, 0);
       struct anim *ks = &anima[id];
       ks->shadow = true;
       ks->fight = false;
@@ -343,7 +344,7 @@ legacy_level_special_events (void)
     /* create kid's shadow to wait for kid at room 1 */
     if (shadow_id == -1) {
       struct pos shadow_pos; new_pos (&shadow_pos, &global_level, 1, 1, 1);
-      int id = create_anim (k, 0, NULL, 0);
+      int id = create_anim (k0, 0, NULL, 0);
       ks = &anima[id];
       ks->fight = false;
       ks->shadow = true;
@@ -357,18 +358,18 @@ legacy_level_special_events (void)
     } else ks = get_anim_by_id (shadow_id);
 
     /* when kid enters room 1, play the suspense sound */
-    if (k->f.c.room == 1
+    if (kc->f.c.room == 1
         && ! played_sample) {
-      play_audio (&suspense_audio, NULL, k->id);
+      play_audio (&suspense_audio, NULL, kc->id);
       played_sample = true;
     }
 
     /* if kid opens the door and jumps to reach the other side of room
        1, make his shadow step over the closer floor */
-    survey (_m, pos, &k->f, NULL, &pm, NULL);
-    if (k->f.c.room == 1
-        && k->action == kid_run_jump
-        && k->i == 7
+    survey (_m, pos, &kc->f, NULL, &pm, NULL);
+    if (kc->f.c.room == 1
+        && kc->action == kid_run_jump
+        && kc->i == 7
         && pm.place <= 5) {
       ks->key.right = true;
       ks->key.shift = true;
@@ -376,9 +377,9 @@ legacy_level_special_events (void)
 
     /* when kid falls from room 1 to the room below it, quit to the
        next level */
-    if (k->f.c.room == roomd (&global_level, 1, BELOW)
-        && k->f.c.prev_room == 1
-        && k->f.c.xd == BELOW) next_level ();
+    if (k0->f.c.room == roomd (&global_level, 1, BELOW)
+        && k0->f.c.prev_room == 1
+        && k0->f.c.xd == BELOW) next_level ();
   }
 
   /* in the eighth level */
@@ -391,7 +392,7 @@ legacy_level_special_events (void)
     /* if the exit level door is open and the kid is at room 16,
        start counting (or continue if started already) for the mouse
        arrival */
-    if (k->f.c.room == 16 && mouse_timer <= 138
+    if (k0->f.c.room == 16 && mouse_timer <= 138
         && get_exit_level_door (&global_level, 0)) mouse_timer++;
 
     /* if enough cycles have passed since the start of the countdown
@@ -412,9 +413,6 @@ legacy_level_special_events (void)
 
   /* in the twelfth level */
   if (global_level.n == 12) {
-    struct anim *k = get_anim_by_id (current_kid_id);
-    struct anim *k0 = get_anim_by_id (0);
-
     struct coord ms, m0;
     struct pos pm, pm0, pms;
 
@@ -425,12 +423,12 @@ legacy_level_special_events (void)
 
     /* make the sword in room 15 disappear (kid's shadow has it) when
        the kid leaves room 18 to the right */
-    if (k->f.c.room == roomd (&global_level, 18, RIGHT)
+    if (kc->f.c.room == roomd (&global_level, 18, RIGHT)
         && ext (&sword_pos) == SWORD)
       set_ext (&sword_pos, NO_ITEM);
 
     /* make shadow fall in kid's front */
-    survey (_m, pos, &k->f, NULL, &pm, NULL);
+    survey (_m, pos, &kc->f, NULL, &pm, NULL);
     if (shadow_id == -1
         && ext (&sword_pos) != SWORD
         && pm.room == 15 && pm.place < 6
@@ -456,7 +454,7 @@ legacy_level_special_events (void)
 
     /* if shadow has appeared but not merged yet */
     if (ks) {
-      k->death_reason = k0->death_reason
+      kc->death_reason = k0->death_reason
         = ks->death_reason = SHADOW_FIGHT_DEATH;
       survey (_m, pos, &ks->f, &ms, &pms, NULL);
       survey (_m, pos, &k0->f, &m0, &pm0, NULL);
@@ -464,7 +462,7 @@ legacy_level_special_events (void)
       ks->p = pms;
       k0->p = pm0;
 
-      ks->keep_sword_fast = k->keep_sword_fast =
+      ks->keep_sword_fast = kc->keep_sword_fast =
         k0->keep_sword_fast = false;
 
       /* any harm caused to the shadow reflects to the kid */
@@ -540,7 +538,7 @@ legacy_level_special_events (void)
 
       /* if the kid change his mind and take the sword again, the
          shadow becomes offensive again too */
-      if (k->action == kid_take_sword && ks->type == KID) {
+      if (kc->action == kid_take_sword && ks->type == KID) {
         ks->type = SHADOW;
         ks->controllable = false;
         guard_normal (ks);
@@ -595,7 +593,7 @@ legacy_level_special_events (void)
         if (fg (&p) == NO_FLOOR) set_fg (&p, HIDDEN_FLOOR);
 
     /* when the kid enters room 23, go to the next level */
-    if (k->f.c.room == 23) {
+    if (k0->f.c.room == 23) {
       next_level ();
       coming_from_12 = true;
     }
@@ -605,8 +603,8 @@ legacy_level_special_events (void)
   if (global_level.n == 13) {
 
     /* make the top loose floors fall spontaneously */
-    if (k->f.c.room == 16 || k->f.c.room == 23) {
-      struct pos p; new_pos (&p, &global_level, k->f.c.room, -1, 0);
+    if (k0->f.c.room == 16 || k0->f.c.room == 23) {
+      struct pos p; new_pos (&p, &global_level, k0->f.c.room, -1, 0);
       p.place = prandom (9);
       activate_con (&p);
     }
@@ -615,10 +613,10 @@ legacy_level_special_events (void)
     if (v) {
       /* play a special tune when meeting the vizier for the first
          time */
-      if (k->f.c.room == v->f.c.room
+      if (kc->f.c.room == v->f.c.room
           && v->action == guard_normal
           && ! met_jaffar) {
-        play_audio (&meet_vizier_audio, NULL, k->id);
+        play_audio (&meet_vizier_audio, NULL, kc->id);
         met_jaffar = true;
         vizier_vigilant_wait = 2.2 * DEFAULT_HZ;
       }
@@ -636,8 +634,8 @@ legacy_level_special_events (void)
           && ! played_vizier_death_sample) {
         mr.flicker = 12;
         mr.color = WHITE;
-        stop_audio_instance (&meet_vizier_audio, NULL, k->id);
-        play_audio (&vizier_death_audio, NULL, k->id);
+        stop_audio_instance (&meet_vizier_audio, NULL, kc->id);
+        play_audio (&vizier_death_audio, NULL, kc->id);
         played_vizier_death_sample = true;
         play_time_stopped = true;
         display_remaining_time (-2);
@@ -647,7 +645,7 @@ legacy_level_special_events (void)
          the exit level door */
       struct pos p; new_pos (&p, &global_level, 24, 0, 0);
       if (v->current_lives <= 0
-          && k->f.c.room != v->f.c.room)
+          && kc->f.c.room != v->f.c.room)
         activate_con (&p);
     }
   }
@@ -655,7 +653,7 @@ legacy_level_special_events (void)
   /* in the fourteenth level */
   if (global_level.n == 14) {
     /* when the kid enters room 5, go to the next level */
-    if (k->f.c.room == 5) next_level ();
+    if (k0->f.c.room == 5) next_level ();
   }
 }
 
