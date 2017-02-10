@@ -1506,7 +1506,7 @@ is_constrained_pos (struct pos *p, struct frame *f)
 }
 
 bool
-is_in_front_open_level_door (struct frame *f, struct pos *p)
+is_in_front_level_door (struct frame *f, struct pos *p)
 {
   struct pos ptr, ptl, p_ret;
   surveyo (_tr, +8, 0, pos, f, NULL, &ptr, NULL);
@@ -1519,9 +1519,23 @@ is_in_front_open_level_door (struct frame *f, struct pos *p)
   else invalid_pos (&p_ret);
 
   if (is_valid_pos (&p_ret)) {
+    if (p) *p = p_ret;
+    return true;
+  }
+
+  return false;
+}
+
+bool
+is_in_front_open_level_door (struct frame *f, struct pos *p)
+{
+  struct pos p_ret;
+
+  if (is_in_front_level_door (f, &p_ret)) {
     struct level_door *d =
       level_door_at_pos (&p_ret);
-    if (d->action != CLOSE_LEVEL_DOOR && d->i <= 9) {
+    if (d->action != CLOSE_LEVEL_DOOR
+        && d->i <= LEVEL_DOOR_OPEN_MAX_STEP) {
       if (p) *p = p_ret;
       return true;
     }

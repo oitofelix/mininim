@@ -175,6 +175,7 @@ bool is_hang_pos_free (struct pos *hang_pos, enum dir d);
 
 
 bool is_constrained_pos (struct pos *p, struct frame *f);
+bool is_in_front_level_door (struct frame *f, struct pos *p);
 bool is_in_front_open_level_door (struct frame *f, struct pos *p);
 bool is_falling (struct frame *f, coord_f cf, int dx0, int dx1);
 

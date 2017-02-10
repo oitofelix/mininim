@@ -125,8 +125,19 @@ flow (struct anim *k)
     }
 
     if (vjump) {
-      kid_vjump (k);
-      return false;
+      struct pos p;
+      if (is_in_front_level_door (&k->f, &p)
+          && ! is_in_front_open_level_door (&k->f, NULL)) {
+        struct level_door *d =
+          level_door_at_pos (&p);
+        if (d->action != OPEN_LEVEL_DOOR) {
+          kid_vjump (k);
+          return false;
+        }
+      } else {
+        kid_vjump (k);
+        return false;
+      }
     }
     if (walk) {
       kid_walk (k);
