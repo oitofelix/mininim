@@ -25,5 +25,6 @@ void save_guard_bitmap (enum anim_type type, int style, enum vm vm);
 void save_guard_bitmaps (enum vm vm);
 void debug_pos (struct pos *p);
 void debug_random_seed (void);
+void L_dump_stack (lua_State *L);
 
 #endif	/* MININIM_DEBUG_H */

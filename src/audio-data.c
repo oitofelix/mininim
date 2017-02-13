@@ -74,7 +74,6 @@ struct audio_source big_life_potion_audio,
   small_life_potion_audio,
   success_audio,
   success_suspense_audio,
-  suspense_audio,
   vizier_and_princess_audio;
 
 void
@@ -134,7 +133,6 @@ load_audio_data (void)
   load_audio (&small_life_potion_audio, AUDIO_SAMPLE, SMALL_LIFE_POTION_AUDIO);
   load_audio (&success_audio, AUDIO_STREAM, SUCCESS_AUDIO);
   load_audio (&success_suspense_audio, AUDIO_STREAM, SUCCESS_SUSPENSE_AUDIO);
-  load_audio (&suspense_audio, AUDIO_SAMPLE, SUSPENSE_AUDIO);
   load_audio (&vizier_and_princess_audio, AUDIO_STREAM, VIZIER_AND_PRINCESS_AUDIO);
 }
 
@@ -194,6 +192,5 @@ unload_audio_data (void)
   destroy_audio (&small_life_potion_audio);
   destroy_audio (&success_audio);
   destroy_audio (&success_suspense_audio);
-  destroy_audio (&suspense_audio);
   destroy_audio (&vizier_and_princess_audio);
 }

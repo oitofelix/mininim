@@ -20,42 +20,42 @@
 
 #include "mininim.h"
 
-void *
-load_resource (char *filename, load_resource_f lrf)
+intptr_t
+load_resource (const char *filename, load_resource_f lrf, bool success)
 {
-  void *resource = NULL;
+  intptr_t resource = ! success;
   char *data_path_filename;
   char *user_data_path_filename;
   char *resources_path_filename;
   char *system_data_path_filename;
 
   /* user data path */
-  if (! resource) {
-    user_data_path_filename = xasprintf ("%s/%s", user_data_dir, filename);
+  if (! equiv (resource, success)) {
+    user_data_path_filename = xasprintf ("%s%s", user_data_dir, filename);
     resource = lrf (user_data_path_filename);
     al_free (user_data_path_filename);
   }
 
   /* data path */
-  if (data_dir && ! resource) {
-    data_path_filename = xasprintf ("%s/%s", data_dir, filename);
+  if (data_dir && ! equiv (resource, success)) {
+    data_path_filename = xasprintf ("%s%s", data_dir, filename);
     resource = lrf (data_path_filename);
     al_free (data_path_filename);
   }
 
   /* current working directory */
-  if (! resource) resource = lrf (filename);
+  if (! equiv (resource, success)) resource = lrf (filename);
 
   /* resources path */
-  if (! resource) {
-    resources_path_filename = xasprintf ("%s/%s", resources_dir, filename);
+  if (! equiv (resource, success)) {
+    resources_path_filename = xasprintf ("%s%s", resources_dir, filename);
     resource = lrf (resources_path_filename);
     al_free (resources_path_filename);
   }
 
   /* system data path */
-  if (! resource) {
-    system_data_path_filename = xasprintf ("%s/%s", system_data_dir, filename);
+  if (! equiv (resource, success)) {
+    system_data_path_filename = xasprintf ("%s%s", system_data_dir, filename);
     resource = lrf (system_data_path_filename);
     al_free (system_data_path_filename);
   }

@@ -1,5 +1,5 @@
 /*
-  file.h -- file module;
+  L_mininim.level_con.h -- mininim.level[{?, ?, ?}] script module;
 
   Copyright (C) 2015, 2016, 2017 Bruno Félix Rezende Ribeiro
   <oitofelix@gnu.org>
@@ -18,11 +18,9 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MININIM_FILE_H
-#define MININIM_FILE_H
+#ifndef MININIM_L_MININIM_LEVEL_CON_H
+#define MININIM_L_MININIM_LEVEL_CON_H
 
-intptr_t load_resource (const char *filename, load_resource_f lrf, bool success);
-ALLEGRO_FILE *xfopen_r (char *filename);
-int8_t *load_file (char *filename);
+void define_L_mininim_level_con (lua_State *L);
 
-#endif	/* MININIM_FILE_H */
+#endif	/* MININIM_L_MININIM_LEVEL_CON_H */

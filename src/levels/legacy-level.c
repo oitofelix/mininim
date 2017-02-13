@@ -53,6 +53,8 @@ static struct legacy_level *load_legacy_level_file (int n);
 void
 legacy_level_start (void)
 {
+  run_level_start_hook ();
+
   /* initialize some state */
   played_sample = false;
   shadow_id = mouse_id = skeleton_id = -1;
@@ -69,17 +71,6 @@ legacy_level_start (void)
   /* get kid */
   struct anim *k = get_anim_by_id (0);
 
-  /* make the kid turn as appropriate */
-  if (global_level.n == 13) {
-    k->f.dir = (k->f.dir == LEFT) ? RIGHT : LEFT;
-    k->next_action = kid_run;
-  } else if (global_level.n == 1)
-    k->next_action = kid_turn;
-  else {
-    k->f.dir = (k->f.dir == LEFT) ? RIGHT : LEFT;
-    k->next_action = kid_turn;
-  }
-
   /* define camera's starting room */
   if (global_level.n == 7) {
     mr_center_room (1);
@@ -91,17 +82,6 @@ legacy_level_start (void)
 
   /* if in level 14 stop the timer */
   if (global_level.n == 14) play_time_stopped = true;
-
-  /* in the first level */
-  if (global_level.n == 1) {
-    /* activate tile, usually to close the opened door in the starting
-       room */
-    struct pos p; new_pos (&p, &global_level, 5, 0, 2);
-    activate_con (&p);
-    /* if it's the first try make kid wait before uncouching */
-    if (retry_level != 1 || replay_mode != NO_REPLAY)
-      k->uncouch_slowly = true;
-  }
 
   /* in the third level */
   if (global_level.n == 3) {
@@ -145,6 +125,8 @@ legacy_level_start (void)
 void
 legacy_level_special_events (void)
 {
+  run_level_cycle_hook ();
+
   struct pos p, pm;
   struct anim *k0 = get_anim_by_id (0);
   struct anim *kc = get_anim_by_id (current_kid_id);
@@ -184,7 +166,7 @@ legacy_level_special_events (void)
   /* in the first level, first try, play the suspense sound */
   if (global_level.n == 1 && anim_cycle == 12
       && (retry_level != 1 || replay_mode != NO_REPLAY)) {
-    play_audio (&suspense_audio, NULL, -1);
+    /* play_audio (&suspense_audio, NULL, -1); */
     kid_haptic (kc, KID_HAPTIC_LEGACY_COUCHING_START);
   }
 
@@ -255,7 +237,7 @@ legacy_level_special_events (void)
       register_con_undo (&undo, &mirror_pos,
                          MIRROR, MIGNORE, MIGNORE, MIGNORE,
                          NULL, true, "MIRROR");
-      play_audio (&suspense_audio, &mirror_pos, -1);
+      L_play_audio ("SUSPENSE", &mirror_pos, -1);
       kid_haptic (kc, KID_HAPTIC_LEGACY_MIRROR_APPEAR);
     }
 
@@ -360,7 +342,7 @@ legacy_level_special_events (void)
     /* when kid enters room 1, play the suspense sound */
     if (kc->f.c.room == 1
         && ! played_sample) {
-      play_audio (&suspense_audio, NULL, kc->id);
+      L_play_audio ("SUSPENSE", NULL, kc->id);
       played_sample = true;
     }
 
@@ -708,8 +690,8 @@ load_legacy_level_file (int n)
   char *filename;
   filename = xasprintf ("data/legacy-levels/%02d", n);
 
-  ALLEGRO_FILE *lvf =
-    load_resource (filename, (load_resource_f) xfopen_r);
+  ALLEGRO_FILE *lvf = (ALLEGRO_FILE *)
+    load_resource (filename, (load_resource_f) xfopen_r, true);
 
   if (! lvf) {
     error (0, 0, "cannot read legacy level file %s", filename);

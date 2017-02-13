@@ -46,7 +46,7 @@ char *resources_dir,
   *user_documents_dir,
   *user_data_dir,
   *user_settings_dir,
-  *system_data_dir = PKGDATADIR,
+  *system_data_dir,
   *data_dir,
   *exe_filename,
   *config_filename,
@@ -102,6 +102,7 @@ bool force_em = false;
 enum hue hue = HUE_NONE;
 bool force_hue = false;
 enum gm gm = ORIGINAL_GM;
+char *audio_mode;
 bool immortal_mode;
 int initial_total_lives = KID_INITIAL_TOTAL_LIVES, total_lives;
 int initial_current_lives = KID_INITIAL_CURRENT_LIVES, current_lives;
@@ -1423,6 +1424,12 @@ main (int _argc, char **_argv)
   load_callback = process_display_events;
   show ();
 
+  /* initialize scripting environment */
+  init_script ();
+
+  /* load assets */
+  run_load_assets_hook ();
+
   load_icons ();
   load_oitofelix_face ();
   load_audio_data ();
@@ -1474,8 +1481,9 @@ main (int _argc, char **_argv)
   int min_legacy_level_bkp = min_legacy_level;
   int max_legacy_level_bkp = max_legacy_level;
   free_replay_chain ();
-  struct replay *replay_ptr =
-    load_resource ("data/replays/title.mrp", (load_resource_f) xload_replay);
+  struct replay *replay_ptr = (struct replay *)
+    load_resource ("data/replays/title.mrp", (load_resource_f) xload_replay,
+                   true);
   if (replay_ptr) {
     level_start_replay_mode = PLAY_REPLAY;
     struct replay *replay = &replay_ptr[0];
@@ -1540,6 +1548,8 @@ main (int _argc, char **_argv)
 void
 quit_game (void)
 {
+  finalize_script ();
+
   unload_icons ();
   unload_level ();
   unload_cutscenes ();
@@ -1610,6 +1620,9 @@ get_paths (void)
   user_settings_dir = xasprintf ("%s", user_settings_dir);
   al_destroy_path (user_settings_path);
 
+  /* system settings path string */
+  system_data_dir = xasprintf ("%s%c", PKGDATADIR, ALLEGRO_NATIVE_PATH_SEP);
+
   /* get executable file name */
   ALLEGRO_PATH *exename_path = al_get_standard_path (ALLEGRO_EXENAME_PATH);
   exe_filename = (char *) al_path_cstr (exename_path, ALLEGRO_NATIVE_PATH_SEP);
@@ -1636,7 +1649,7 @@ print_paths (void)
   printf ("Main configuration file: %s\n", config_filename);
   printf ("Executable file: %s\n", exe_filename);
   printf ("Resources: %s\n", resources_dir);
-  printf ("System data: %s%c\n", system_data_dir, ALLEGRO_NATIVE_PATH_SEP);
+  printf ("System data: %s\n", system_data_dir);
   printf ("Temporary: %s\n", temp_dir);
   printf ("User home: %s\n", user_home_dir);
   printf ("User documents: %s\n", user_documents_dir);

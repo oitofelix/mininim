@@ -100,7 +100,15 @@ mininim_SOURCES = src/mininim.c src/mininim.h src/compatibility.h			\
   src/kernel/xmath.h src/kernel/xstring.c src/kernel/xstring.h				\
   src/bmenu.c src/bmenu.h src/editor.c src/editor.h src/debug.c				\
   src/debug.h src/undo.c src/undo.h src/multi-room.c src/multi-room.h	\
-  src/box.c src/box.h src/replay.c src/replay.h
+  src/box.c src/box.h src/replay.c src/replay.h src/script/script.c		\
+  src/script/script.h src/script/L_mininim.c src/script/L_mininim.h		\
+  src/script/L_mininim.level.c src/script/L_mininim.level.h						\
+  src/script/L_mininim.level_con.c src/script/L_mininim.level_con.h		\
+  src/script/L_mininim.actor.c src/script/L_mininim.actor.h						\
+  src/script/L_mininim.actor_N.c src/script/L_mininim.actor_N.h				\
+  src/script/L_mininim.audio.c src/script/L_mininim.audio.h						\
+  src/script/L_mininim.audio_res.c src/script/L_mininim.audio_res.h		\
+  src/script/L_mininim.setting.c src/script/L_mininim.setting.h
 
 ${mininim_OBJECTS}: ${top_builddir}/src/mininim.h.gch
 
@@ -109,15 +117,16 @@ ${top_builddir}/src/mininim.h.gch: ${mininim_SOURCES:%.c=${srcdir}/%.h}
 
 CLEANFILES = ${top_builddir}/src/mininim.h.gch
 
-AM_CPPFLAGS = -DLOCALEDIR=\"$(localedir)\"												\
--DPKGDATADIR=\"$(pkgdatadir)\" -I$(top_builddir)/gnulib						\
--I$(top_srcdir)/gnulib -I${builddir}/src -I${srcdir}/src					\
--I${srcdir}/src/kernel -I${srcdir}/src/guard -I${srcdir}/src/kid	\
--I${srcdir}/src/levels -I${srcdir}/src/wall
+AM_CPPFLAGS = -DLOCALEDIR=\"$(localedir)\"											\
+-DPKGDATADIR=\"$(pkgdatadir)\" -I$(top_builddir)/gnulib					\
+${LUA_INCLUDE} -I$(top_srcdir)/gnulib -I${builddir}/src					\
+-I${srcdir}/src -I${srcdir}/src/kernel -I${srcdir}/src/guard		\
+-I${srcdir}/src/kid -I${srcdir}/src/levels -I${srcdir}/src/wall	\
+-I${srcdir}/src/script
 
-AM_CFLAGS = ${ALLEGRO_CFLAGS} ${ALLEGRO_IMAGE_CFLAGS}	\
-	${ALLEGRO_AUDIO_CFLAGS} ${ALLEGRO_ACODEC_CFLAGS}		\
-	${ALLEGRO_FONT_CFLAGS} ${ALLEGRO_PRIMITIVES_CFLAGS}	\
+AM_CFLAGS = ${ALLEGRO_CFLAGS} ${ALLEGRO_IMAGE_CFLAGS}					\
+	${ALLEGRO_AUDIO_CFLAGS} ${ALLEGRO_ACODEC_CFLAGS}						\
+	${ALLEGRO_FONT_CFLAGS} ${ALLEGRO_PRIMITIVES_CFLAGS}					\
 	${ALLEGRO_MAIN_CFLAGS} ${ALLEGRO_DIALOG_CFLAGS}
 
 if DEBUG
@@ -138,7 +147,7 @@ endif
 LIBS = -lm ${ALLEGRO_LIBS} ${ALLEGRO_IMAGE_LIBS}										\
   ${ALLEGRO_AUDIO_LIBS} ${ALLEGRO_ACODEC_LIBS} ${ALLEGRO_FONT_LIBS}	\
   ${ALLEGRO_PRIMITIVES_LIBS} ${ALLEGRO_MAIN_LIBS}										\
-  ${ALLEGRO_DIALOG_LIBS} ${mingw_ldadd}
+  ${ALLEGRO_DIALOG_LIBS} ${mingw_ldadd} ${LUA_LIB}
 LDADD = gnulib/libgnu.a
 
 gnulib/libgnu.a:

@@ -473,7 +473,7 @@ struct room_dist {
   bool visited;
 };
 
-typedef void *(*load_resource_f) (char *);
+typedef intptr_t (*load_resource_f) (const char *);
 
 typedef void *(*thread_f)(ALLEGRO_THREAD *thread, void *arg);
 

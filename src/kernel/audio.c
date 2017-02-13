@@ -27,7 +27,7 @@
 static struct audio_instance *audio_instance;
 static size_t audio_instance_nmemb;
 
-static ALLEGRO_AUDIO_STREAM *load_audio_stream (char *filename);
+static ALLEGRO_AUDIO_STREAM *load_audio_stream (const char *filename);
 
 float audio_volume = 1.0;
 
@@ -57,7 +57,7 @@ set_audio_volume (float volume)
 }
 
 static ALLEGRO_AUDIO_STREAM *
-load_audio_stream (char *filename)
+load_audio_stream (const char *filename)
 {
   ALLEGRO_MIXER *mixer = al_get_default_mixer ();
   unsigned int freq = al_get_mixer_frequency(mixer);
@@ -67,12 +67,12 @@ load_audio_stream (char *filename)
 
 struct audio_source *
 load_audio (struct audio_source *as, enum audio_type audio_type,
-            char *filename)
+            const char *filename)
 {
   switch (audio_type) {
   case AUDIO_SAMPLE:
-    as->data.sample =
-      load_resource (filename, (load_resource_f) al_load_sample);
+    as->data.sample = (ALLEGRO_SAMPLE *)
+      load_resource (filename, (load_resource_f) al_load_sample, true);
     if (! as->data.sample) {
       error (0, 0, "%s (\"%s\"): cannot load sample",
              __func__, filename);
@@ -123,9 +123,9 @@ play_audio (struct audio_source *as, struct pos *p, int anim_id)
     break;
   case AUDIO_STREAM:
     ai.position.stream = 0;
-    ai.data.stream =
+    ai.data.stream = (ALLEGRO_AUDIO_STREAM *)
       load_resource
-      (as->data.stream, (load_resource_f) load_audio_stream);
+      (as->data.stream, (load_resource_f) load_audio_stream, true);
     if (! ai.data.stream) {
       error (0, 0, "%s (\"%s\"): cannot load audio stream", __func__,
              as->data.stream);

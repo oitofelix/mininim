@@ -94,6 +94,10 @@ no)  profiling=false ;;
 esac],[profiling=false])
 AM_CONDITIONAL([PROFILING], [test x$profiling = xtrue])
 
+# Automake conditional for platform specific builds
+AM_CONDITIONAL([mingw_build], [expr "x$host_os" : "xmingw"])
+
+
 
 
 
@@ -120,11 +124,16 @@ AC_PROG_CC
 gl_EARLY
 gl_INIT
 
+
+
+
+
+##########
+### Check for Allegro library
+######
+
 allegro_minver=5.0.9
 
-AM_CONDITIONAL([mingw_build], [expr "x$host_os" : "xmingw"])
-
-# Check for Allegro library and its addons
 AS_CASE([$host],
 
 # MinGW
@@ -236,6 +245,22 @@ AC_SUBST([ALLEGRO_DIALOG_CFLAGS])
 AC_SUBST([ALLEGRO_DIALOG_LIBS])
 AC_SUBST([mingw_ldadd])
 
+
+
+
+
+##########
+### Check for Lua
+######
+
+AX_PROG_LUA([5.0], [], [], AC_MSG_ERROR([MININIM requires Lua 5.0 (or superior)]))
+AX_LUA_HEADERS(, AC_MSG_ERROR([MININIM requires Lua headers]))
+AX_LUA_LIBS(, AC_MSG_ERROR([MININIM requires Lua libraries]))
+dnl AX_LUA_READLINE(, AC_MSG_ERROR([MININIM requires GNU Readline]))
+
+
+
+
 ##########
 ### Check for programs needed to build documentation.
 ######

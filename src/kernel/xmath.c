@@ -111,3 +111,9 @@ next_remainder (int n, int divisor, int offset, int direction)
   if (c < 0) c += divisor - offset;
   return c % (divisor - offset) + offset;
 }
+
+bool
+invalid (int i)
+{
+  return i == INT_MIN;
+}

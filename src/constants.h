@@ -28,6 +28,8 @@
 #define OITOFELIX_FACE_BW "data/icons/oitofelix-face-bw.png"
 #define JOYSTICK_BIG_ICON "data/icons/joystick-big.png"
 
+#define INVALID (INT_MIN)
+
 #define APPEND_MENU_MAX_DEPTH 10
 #define ENV_OPTION_PREFIX "MININIM_"
 #define MENU_CAPTION_MAX_CHARS 30

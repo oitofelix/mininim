@@ -205,8 +205,8 @@ load_memory_bitmap (char *filename)
   int flags = al_get_new_bitmap_flags ();
   al_set_new_bitmap_flags (memory_bitmap_flags ());
 
-  ALLEGRO_BITMAP *bitmap =
-    load_resource (filename, (load_resource_f) al_load_bitmap);
+  ALLEGRO_BITMAP *bitmap = (ALLEGRO_BITMAP *)
+    load_resource (filename, (load_resource_f) al_load_bitmap, true);
 
   al_set_new_bitmap_flags (flags);
 
@@ -259,8 +259,8 @@ load_bitmap (char *filename)
 
   set_target_backbuffer (display);
 
-  ALLEGRO_BITMAP *bitmap =
-    load_resource (filename, (load_resource_f) al_load_bitmap);
+  ALLEGRO_BITMAP *bitmap = (ALLEGRO_BITMAP *)
+    load_resource (filename, (load_resource_f) al_load_bitmap, true);
 
   al_set_new_bitmap_flags (flags);
 

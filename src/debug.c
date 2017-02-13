@@ -60,3 +60,43 @@ debug_random_seed (void)
 {
   fprintf (stderr, "%ju 0x%X\n", anim_cycle, random_seed);
 }
+
+void
+L_dump_stack (lua_State *L)
+{
+  int i;
+  for (i = 1; i <= lua_gettop (L); i++) {
+    int type = lua_type (L, i);
+    switch (type) {
+    case LUA_TNIL: fprintf (stderr, "%i: nil\n", i); break;
+    case LUA_TNUMBER:
+      fprintf (stderr, "%i: %f\n", i, lua_tonumber (L, i));
+      break;
+    case LUA_TBOOLEAN:
+      fprintf (stderr, "%i: %s\n", i,
+               lua_toboolean (L, i) ? "true" : "false");
+      break;
+    case LUA_TSTRING:
+      fprintf (stderr, "%i: \"%s\"\n", i, lua_tostring (L, i));
+      break;
+    case LUA_TTABLE:
+      fprintf (stderr, "%i: [table]\n", i);
+      break;
+    case LUA_TFUNCTION:
+      fprintf (stderr, "%i: [function]\n", i);
+      break;
+    case LUA_TUSERDATA:
+      fprintf (stderr, "%i: [userdata]\n", i);
+      break;
+    case LUA_TTHREAD:
+      fprintf (stderr, "%i: [thread]\n", i);
+      break;
+    case LUA_TLIGHTUSERDATA:
+      fprintf (stderr, "%i: [lightuserdata]\n", i);
+      break;
+    default:
+      fprintf (stderr, "%i: [unknown]\n", i);
+      break;
+    }
+  }
+}

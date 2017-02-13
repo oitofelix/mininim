@@ -33,8 +33,9 @@ load_native_level (struct level *l, int n)
   char *filename;
   filename = xasprintf ("data/levels/%02d.mim", n);
 
-  ALLEGRO_CONFIG *c =
-    load_resource (filename, (load_resource_f) al_load_config_file);
+  ALLEGRO_CONFIG *c = (ALLEGRO_CONFIG *)
+    load_resource (filename, (load_resource_f) al_load_config_file,
+                   true);
 
   if (! c) {
     error (0, 0, "cannot read native level file %s", filename);

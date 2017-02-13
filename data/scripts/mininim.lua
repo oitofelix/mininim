@@ -1,5 +1,5 @@
-/*
-  file.h -- file module;
+--[[
+  mininim.lua -- main script;
 
   Copyright (C) 2015, 2016, 2017 Bruno Félix Rezende Ribeiro
   <oitofelix@gnu.org>
@@ -16,13 +16,19 @@
 
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+--]]
 
-#ifndef MININIM_FILE_H
-#define MININIM_FILE_H
+-- imports
+local M = mininim
+local legacy = require "legacy"
 
-intptr_t load_resource (const char *filename, load_resource_f lrf, bool success);
-ALLEGRO_FILE *xfopen_r (char *filename);
-int8_t *load_file (char *filename);
+-- called during loading screen for loading assets
+function M.load_assets_hook ()
+   local sblast = require "sblast"
+   sblast.load ()
+   M.setting.audio_mode = sblast.name
+end
 
-#endif	/* MININIM_FILE_H */
+-- special events
+M.level.start_hook = legacy.start_hook
+M.level.cycle_hook = legacy.cycle_hook

@@ -230,7 +230,7 @@ draw_start_kid (ALLEGRO_BITMAP *bitmap, enum vm vm)
   f.b = apply_palette (f.b, pal);
   if (hgc) f.b = apply_palette (f.b, hgc_palette);
   f.b = apply_palette (f.b, start_anim_palette);
-  f.flip = (global_level.start_dir == LEFT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
+  f.flip = (global_level.start_dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
   place_frame (&f, &f, f.b, &global_level.start_pos,
                global_level.start_dir == LEFT ? +28 : +22, +15);
   draw_frame (bitmap, &f);
@@ -727,7 +727,7 @@ create_fellow_shadow (bool select)
       k->current_lives += required_strength;
       mr.flicker = 12;
       mr.color = get_flicker_raise_sword_color ();
-      play_audio (&suspense_audio, NULL, k->id);
+      L_play_audio ("SUSPENSE", NULL, k->id);
 
       if (select) select_controllable_by_id (id);
       else {

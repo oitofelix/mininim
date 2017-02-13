@@ -26,7 +26,7 @@ void init_audio (void);
 void finalize_audio (void);
 void set_audio_volume (float volume);
 struct audio_source *load_audio (struct audio_source *as,
-                                 enum audio_type, char *filename);
+                                 enum audio_type, const char *filename);
 union audio_instance_data play_audio (struct audio_source *as,
                                       struct pos *p, int anim_id);
 int compare_audio_instances (const void *_ai0, const void *_ai1);

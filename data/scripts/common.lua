@@ -1,5 +1,5 @@
-/*
-  file.h -- file module;
+--[[
+  common.lua -- common script module;
 
   Copyright (C) 2015, 2016, 2017 Bruno Félix Rezende Ribeiro
   <oitofelix@gnu.org>
@@ -16,13 +16,28 @@
 
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+--]]
 
-#ifndef MININIM_FILE_H
-#define MININIM_FILE_H
+-- header
+local P = {type = "SCRIPT", name = "common"}
 
-intptr_t load_resource (const char *filename, load_resource_f lrf, bool success);
-ALLEGRO_FILE *xfopen_r (char *filename);
-int8_t *load_file (char *filename);
+-- imports
+local M = mininim
 
-#endif	/* MININIM_FILE_H */
+-- body
+setfenv (1, P)
+
+function invert_direction (direction)
+   if direction == "LEFT" then return "RIGHT" else return "LEFT" end
+end
+
+function sample (filename)
+   return M.audio.load (filename, "SAMPLE")
+end
+
+function stream (filename)
+   return M.audio.load (filename, "STREAM")
+end
+
+-- end
+return P

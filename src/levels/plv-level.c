@@ -33,8 +33,8 @@ load_plv_level (struct level *l, int n)
   char *filename;
   filename = xasprintf ("data/plv-levels/%02d.plv", n);
 
-  int8_t *plv =
-    load_resource (filename, (load_resource_f) load_file);
+  int8_t *plv = (int8_t *)
+    load_resource (filename, (load_resource_f) load_file, true);
 
   if (! plv) {
     error (0, 0, "cannot read plv level file %s", filename);

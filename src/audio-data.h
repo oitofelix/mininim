@@ -135,7 +135,6 @@ extern struct audio_source
   meet_vizier_audio,
   princess_waiting_audio,
   small_life_potion_audio,
-  suspense_audio,
   success_audio,
   success_suspense_audio,
   vizier_and_princess_audio;

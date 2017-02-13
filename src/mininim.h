@@ -23,6 +23,8 @@
 
 #include <config.h>
 
+/* C Library */
+
 #include <stdio.h>
 #include <string.h>
 #include <strings.h>
@@ -50,6 +52,7 @@
 #include "xprintf.h"
 #include "xvasprintf.h"
 
+/* Allegro */
 #define ALLEGRO_UNSTABLE
 
 #include <allegro5/allegro.h>
@@ -60,6 +63,12 @@
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_native_dialog.h>
 
+/* Lua */
+#include <lua.h>
+#include <lauxlib.h>
+#include <lualib.h>
+
+/* MININIM */
 #include "compatibility.h"
 
 #include "constants.h"
@@ -184,6 +193,16 @@
 #include "xmath.h"
 #include "xstring.h"
 
+#include "script.h"
+#include "L_mininim.h"
+#include "L_mininim.level.h"
+#include "L_mininim.level_con.h"
+#include "L_mininim.actor.h"
+#include "L_mininim.actor_N.h"
+#include "L_mininim.audio.h"
+#include "L_mininim.audio_res.h"
+#include "L_mininim.setting.h"
+
 /* functions */
 void free_argv (size_t *cargc, char ***cargv);
 void *dialog_thread (ALLEGRO_THREAD *thread, void *arg);
@@ -213,6 +232,7 @@ extern bool force_em;
 extern enum hue hue;
 extern bool force_hue;
 extern enum gpm gpm;
+extern char *audio_mode;
 extern bool immortal_mode;
 extern int initial_total_lives, total_lives,
   initial_current_lives, current_lives;

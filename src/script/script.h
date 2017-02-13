@@ -1,5 +1,5 @@
 /*
-  file.h -- file module;
+  script.h -- script module;
 
   Copyright (C) 2015, 2016, 2017 Bruno Félix Rezende Ribeiro
   <oitofelix@gnu.org>
@@ -18,11 +18,24 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MININIM_FILE_H
-#define MININIM_FILE_H
+#ifndef MININIM_SCRIPT_H
+#define MININIM_SCRIPT_H
 
-intptr_t load_resource (const char *filename, load_resource_f lrf, bool success);
-ALLEGRO_FILE *xfopen_r (char *filename);
-int8_t *load_file (char *filename);
+/* functions */
+void init_script (void);
+void finalize_script (void);
 
-#endif	/* MININIM_FILE_H */
+void *L_check_type (lua_State *L, int index, const char *tname);
+int L_error_invalid_key_string (lua_State *L, const char *key,
+                                const char *tname);
+int L_error_invalid_key_type (lua_State *L, int type, const char *tname);
+int L__tostring (lua_State *L);
+bool L_run_hook (lua_State *L);
+void L_set_registry (lua_State *L, const char *key);
+void L_get_registry (lua_State *L, const char *key);
+void L_push_interface (lua_State *L, const char *tname);
+
+/* variables */
+extern lua_State *L;
+
+#endif	/* MININIM_SCRIPT_H */
