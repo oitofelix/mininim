@@ -1,5 +1,5 @@
---[[
-  common.lua -- common script module;
+/*
+  L_mininim.video.h -- mininim.video script module;
 
   Copyright (C) 2015, 2016, 2017 Bruno Félix Rezende Ribeiro
   <oitofelix@gnu.org>
@@ -16,28 +16,14 @@
 
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
---]]
+*/
 
--- header
-local P = {type = "SCRIPT", name = "common"}
+#ifndef MININIM_L_MININIM_VIDEO_H
+#define MININIM_L_MININIM_VIDEO_H
 
--- imports
-local M = mininim
+void define_L_mininim_video (lua_State *L);
+ALLEGRO_BITMAP *L_bitmap (lua_State *L, char *object, enum em em, int index);
+struct coord *L_coord (lua_State *L, char *object, enum em em, int index,
+                       struct pos *p, struct coord *c_ret);
 
--- body
-setfenv (1, P)
-
-function invert_direction (direction)
-   if direction == "LEFT" then return "RIGHT" else return "LEFT" end
-end
-
-function sample (filename)
-   return M.audio.load (filename, "SAMPLE")
-end
-
-function stream (filename)
-   return M.audio.load (filename, "STREAM")
-end
-
--- end
-return P
+#endif	/* MININIM_L_MININIM_VIDEO_H */

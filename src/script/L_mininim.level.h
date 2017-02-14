@@ -24,5 +24,6 @@
 void define_L_mininim_level (lua_State *L);
 void run_level_start_hook (void);
 void run_level_cycle_hook (void);
+void L_push_pos (lua_State *L, struct pos *p);
 
 #endif	/* MININIM_L_MININIM_LEVEL_H */

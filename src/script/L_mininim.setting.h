@@ -23,5 +23,6 @@
 
 void define_L_mininim_setting (lua_State *L);
 void L_set_audio_mode (lua_State *L, int index);
+void L_set_video_mode (lua_State *L, int index);
 
 #endif	/* MININIM_L_MININIM_SETTING_H */

@@ -47,11 +47,11 @@ init_script (void)
 
   /* path */
   lua_settop (L, 0);
-  lua_pushfstring (L, "%sdata/scripts/?.lua;"
-                   "%sdata/scripts/?.lua;"
-                   "%sdata/scripts/?.lua;"
-                   "%sdata/scripts/?.lua;"
-                   "%sdata/scripts/?.lua;",
+  lua_pushfstring (L, "%sdata/?.lua;"
+                   "%sdata/?.lua;"
+                   "%sdata/?.lua;"
+                   "%sdata/?.lua;"
+                   "%sdata/?.lua;",
                    user_data_dir,
                    data_dir ? data_dir : "",
                    "",
@@ -71,7 +71,7 @@ init_script (void)
   /* load script */
   lua_settop (L, 0);
 
-  int e = load_resource ("data/scripts/mininim.lua",
+  int e = load_resource ("data/script/mininim.lua",
                          (load_resource_f) load_script, false);
 
   if (! e) {
@@ -126,32 +126,34 @@ L__tostring (lua_State *L)
 }
 
 bool
+L_call (lua_State *L, int nargs, int nresults, int errfunc)
+{
+  if (lua_pcall (L, nargs, nresults, errfunc)) {
+    error (0, 0, "%s", lua_tostring(L, -1));
+    lua_pop (L, 1);
+    return false;
+  } else return true;
+}
+
+bool
 L_run_hook (lua_State *L)
 {
-  if (! lua_isnil (L, -1)) {
-    if (lua_pcall (L, 0, 0, 0)) {
-      error (0, 0, "%s", lua_tostring(L, -1));
-      lua_pop (L, 1);
-      return false;
-    }
-  }
-  return true;
+  if (! lua_isnil (L, -1)) return L_call (L, 0, 0, 0);
+  else return true;
+}
+
+int
+L_set_registry (lua_State *L, int *r)
+{
+  luaL_unref (L, LUA_REGISTRYINDEX, *r);
+  *r = luaL_ref (L, LUA_REGISTRYINDEX);
+  return *r;
 }
 
 void
-L_set_registry (lua_State *L, const char *key)
+L_get_registry (lua_State *L, int r)
 {
-  lua_pushlightuserdata (L, (void *) key);
-  lua_pushvalue (L, -2);
-  lua_settable(L, LUA_REGISTRYINDEX);
-  lua_pop (L, 1);
-}
-
-void
-L_get_registry (lua_State *L, const char *key)
-{
-  lua_pushlightuserdata (L, (void *) key);
-  lua_gettable (L, LUA_REGISTRYINDEX);
+  lua_rawgeti (L, LUA_REGISTRYINDEX, r);
 }
 
 void

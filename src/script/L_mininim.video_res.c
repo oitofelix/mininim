@@ -1,5 +1,5 @@
---[[
-  mininim.lua -- main script;
+/*
+  L_mininim.video_res.c -- mininim.video[?][?] script module;
 
   Copyright (C) 2015, 2016, 2017 Bruno Félix Rezende Ribeiro
   <oitofelix@gnu.org>
@@ -16,19 +16,33 @@
 
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
---]]
+*/
 
--- imports
-local M = mininim
-local legacy = require "legacy"
+#include "mininim.h"
 
--- called during loading screen for loading assets
-function M.load_assets_hook ()
-   local sblast = require "sblast"
-   sblast.load ()
-   M.setting.audio_mode = sblast.name
-end
+static int __gc (lua_State *L);
 
--- special events
-M.level.start_hook = legacy.start_hook
-M.level.cycle_hook = legacy.cycle_hook
+void
+define_L_mininim_video_res (lua_State *L)
+{
+  luaL_newmetatable(L, "mininim.video[?][?]");
+
+  lua_pushstring (L, "__tostring");
+  lua_pushstring (L, "mininim.video[?][?]");
+  lua_pushcclosure (L, L__tostring, 1);
+  lua_rawset (L, -3);
+
+  lua_pushstring (L, "__gc");
+  lua_pushcfunction (L, __gc);
+  lua_rawset (L, -3);
+
+  lua_pop (L, 1);
+}
+
+int
+__gc (lua_State *L)
+{
+  ALLEGRO_BITMAP **b = lua_touserdata (L, 1);
+  destroy_bitmap (*b);
+  return 0;
+}

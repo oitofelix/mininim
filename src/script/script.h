@@ -30,9 +30,10 @@ int L_error_invalid_key_string (lua_State *L, const char *key,
                                 const char *tname);
 int L_error_invalid_key_type (lua_State *L, int type, const char *tname);
 int L__tostring (lua_State *L);
+bool L_call (lua_State *L, int nargs, int nresults, int errfunc);
 bool L_run_hook (lua_State *L);
-void L_set_registry (lua_State *L, const char *key);
-void L_get_registry (lua_State *L, const char *key);
+int L_set_registry (lua_State *L, int *r);
+void L_get_registry (lua_State *L, int r);
 void L_push_interface (lua_State *L, const char *tname);
 
 /* variables */

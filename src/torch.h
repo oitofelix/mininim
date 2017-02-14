@@ -21,28 +21,7 @@
 #ifndef MININIM_TORCH_H
 #define MININIM_TORCH_H
 
-/* dungeon cga */
-#define DC_TORCH "data/torch/dc.png"
-
-/* palace cga */
-#define PC_TORCH "data/torch/pc.png"
-
-/* dungeon ega */
-#define DE_TORCH "data/torch/de.png"
-
-/* palace ega */
-#define PE_TORCH "data/torch/pe.png"
-
-/* dungeon vga */
-#define DV_TORCH "data/torch/dv.png"
-
-/* palace vga */
-#define PV_TORCH "data/torch/pv.png"
-
-void load_torch (void);
-void unload_torch (void);
 void draw_torch (ALLEGRO_BITMAP *bitmap, struct pos *p,
                  enum em em, enum vm vm);
-struct coord *torch_coord (struct pos *p, struct coord *c);
 
 #endif	/* MININIM_TORCH_H */

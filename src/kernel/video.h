@@ -36,7 +36,7 @@ ALLEGRO_BITMAP *load_scaled_memory_bitmap (char *filename, int w, int h,
                                            int flags);
 ALLEGRO_BITMAP *clone_scaled_memory_bitmap (ALLEGRO_BITMAP *bitmap, int w,
                                             int h, int flags);
-ALLEGRO_BITMAP *load_bitmap (char *filename);
+ALLEGRO_BITMAP *load_bitmap (const char *filename);
 void validate_bitmap_for_mingw (ALLEGRO_BITMAP *bitmap);
 void save_bitmap (char *filename, ALLEGRO_BITMAP *bitmap);
 bool bitmap_heq (ALLEGRO_BITMAP *b0, ALLEGRO_BITMAP *b1);

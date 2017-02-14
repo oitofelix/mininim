@@ -65,6 +65,9 @@ play_anim (void (*draw_callback) (void),
     switch (event.type) {
     case ALLEGRO_EVENT_TIMER:
       if (event.timer.source == timer) {
+        /* ensures Lua stack is empty */
+        assert (! lua_gettop (L));
+
         /* update main menu */
         main_menu ();
 

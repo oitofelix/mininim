@@ -252,7 +252,7 @@ clone_scaled_memory_bitmap (ALLEGRO_BITMAP *bitmap, int w, int h, int flags)
 }
 
 ALLEGRO_BITMAP *
-load_bitmap (char *filename)
+load_bitmap (const char *filename)
 {
   int flags = al_get_new_bitmap_flags ();
   al_set_new_bitmap_flags (video_bitmap_flags ());
@@ -265,7 +265,7 @@ load_bitmap (char *filename)
   al_set_new_bitmap_flags (flags);
 
   if (! bitmap)
-    error (-1, 0, "%s: cannot load bitmap file '%s'",
+    error (0, 0, "%s: cannot load bitmap file '%s'",
            __func__, filename);
 
   validate_bitmap_for_mingw (bitmap);

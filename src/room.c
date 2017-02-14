@@ -39,7 +39,6 @@ load_room (void)
   load_level_door ();
   load_chopper ();
   load_bricks ();
-  load_torch ();
   load_window ();
   load_balcony ();
   load_arch ();
@@ -66,7 +65,6 @@ unload_room (void)
   unload_level_door ();
   unload_chopper ();
   unload_bricks ();
-  unload_torch ();
   unload_window ();
   unload_balcony ();
   unload_arch ();

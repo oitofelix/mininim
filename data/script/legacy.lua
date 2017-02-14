@@ -1,30 +1,30 @@
 --[[
-  legacy.lua -- legacy script module;
+   legacy.lua -- legacy script module;
 
-  Copyright (C) 2015, 2016, 2017 Bruno Félix Rezende Ribeiro
-  <oitofelix@gnu.org>
+   Copyright (C) 2015, 2016, 2017 Bruno Félix Rezende Ribeiro
+   <oitofelix@gnu.org>
 
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation; either version 3, or (at your option)
-  any later version.
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 3, or (at your option)
+   any later version.
 
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-  You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 --]]
 
 -- package header
-local P = {type = "SCRIPT", name = "LEGACY"}
+local P = {packge_type = "SPECIAL EVENTS", package_name = "LEGACY",
+           package_file = debug.getinfo (1, "S").short_src}
 
 -- imports
 local M = mininim
-local common = require "common"
-local invert_direction = common.invert_direction
+local common = require "script/common"
 
 -- body
 setfenv (1, P)
@@ -45,12 +45,12 @@ function start_hook ()
 
    -- make kid turn appropriately
    if level == 13 then
-      kid.direction = invert_direction (kid.direction)
+      kid.direction = common.opposite_direction (kid.direction)
       kid.action = "RUN"
    elseif level == 1 then
       kid.action = "TURN"
    else
-      kid.direction = invert_direction (kid.direction)
+      kid.direction = common.opposite_direction (kid.direction)
       kid.action = "TURN"
    end
 
@@ -77,6 +77,13 @@ function cycle_hook ()
          level_13_cycle_hook, level_14_cycle_hook}
    local hook = cycle_hooks[M.level.number]
    if hook then hook () end
+end
+
+-- load package interface
+function load ()
+   M.level.start_hook = start_hook
+   M.level.cycle_hook = cycle_hook
+   return P
 end
 
 -- end

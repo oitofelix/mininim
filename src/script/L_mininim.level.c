@@ -20,8 +20,8 @@
 
 #include "mininim.h"
 
-static const char level_start_hook_key = 'k';
-static const char level_cycle_hook_key = 'k';
+static int level_start_hook_ref = LUA_NOREF;
+static int level_cycle_hook_ref = LUA_NOREF;
 
 static int __index (lua_State *L);
 static int __newindex (lua_State *L);
@@ -31,7 +31,7 @@ static bool L_is_valid_pos (lua_State *L, int index, struct pos *p);
 void
 define_L_mininim_level (lua_State *L)
 {
-  luaL_newmetatable(L, "mininim.level");
+  luaL_newmetatable (L, "mininim.level");
 
   lua_pushstring (L, "__tostring");
   lua_pushstring (L, "mininim.level");
@@ -55,14 +55,14 @@ define_L_mininim_level (lua_State *L)
 void
 run_level_start_hook (void)
 {
-  L_get_registry (L, &level_start_hook_key);
+  L_get_registry (L, level_start_hook_ref);
   L_run_hook (L);
 }
 
 void
 run_level_cycle_hook (void)
 {
-  L_get_registry (L, &level_cycle_hook_key);
+  L_get_registry (L, level_cycle_hook_ref);
   L_run_hook (L);
 }
 
@@ -97,6 +97,24 @@ L_is_valid_pos (lua_State *L, int index, struct pos *p)
   return false;
 }
 
+void
+L_push_pos (lua_State *L, struct pos *p)
+{
+  lua_newtable (L);
+
+  /* room */
+  lua_pushnumber (L, p->room);
+  lua_rawseti (L, -2, 1);
+
+  /* floor */
+  lua_pushnumber (L, p->floor);
+  lua_rawseti (L, -2, 1);
+
+  /* place */
+  lua_pushnumber (L, p->place);
+  lua_rawseti (L, -2, 1);
+}
+
 int
 __index (lua_State *L)
 {
@@ -111,10 +129,10 @@ __index (lua_State *L)
       lua_pushnumber (L, global_level.n);
       return 1;
     } else if (! strcasecmp (key, "start_hook")) {
-      L_get_registry (L, &level_start_hook_key);
+      L_get_registry (L, level_start_hook_ref);
       return 1;
     } else if (! strcasecmp (key, "cycle_hook")) {
-      L_get_registry (L, &level_cycle_hook_key);
+      L_get_registry (L, level_cycle_hook_ref);
       return 1;
     } else if (! strcasecmp (key, "retry")) {
       lua_pushboolean (L, retry_level == global_level.n
@@ -144,13 +162,13 @@ __newindex (lua_State *L)
       return luaL_error (L, "mininim.level.number is read-only");
     else if (! strcasecmp (key, "start_hook")) {
       if (lua_isfunction (L, -1))
-        L_set_registry (L, &level_start_hook_key);
+        L_set_registry (L, &level_start_hook_ref);
       else
         return luaL_error (L, "mininim.level.start_hook must be a function");
       return 0;
     } else if (! strcasecmp (key, "cycle_hook")) {
       if (lua_isfunction (L, -1))
-        L_set_registry (L, &level_cycle_hook_key);
+        L_set_registry (L, &level_cycle_hook_ref);
       else
         return luaL_error (L, "mininim.level.cycle_hook must be a function");
       return 0;

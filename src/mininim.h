@@ -201,6 +201,8 @@
 #include "L_mininim.actor_N.h"
 #include "L_mininim.audio.h"
 #include "L_mininim.audio_res.h"
+#include "L_mininim.video.h"
+#include "L_mininim.video_res.h"
 #include "L_mininim.setting.h"
 
 /* functions */
@@ -233,6 +235,7 @@ extern enum hue hue;
 extern bool force_hue;
 extern enum gpm gpm;
 extern char *audio_mode;
+extern char *video_mode;
 extern bool immortal_mode;
 extern int initial_total_lives, total_lives,
   initial_current_lives, current_lives;

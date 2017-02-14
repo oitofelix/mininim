@@ -2671,9 +2671,9 @@ ui_vm (enum vm new_vm)
   }
 
   switch (vm) {
-  case VGA: value = "VGA"; break;
-  case EGA: value = "EGA"; break;
-  case CGA: value = hgc ? "HGC" : "CGA"; break;
+  case VGA: value = "VGA"; video_mode = "VGA"; break;
+  case EGA: value = "EGA"; video_mode = "EGA"; break;
+  case CGA: value = hgc ? "HGC" : "CGA"; video_mode = "CGA"; break;
   }
 
   ui_msg (0, "%s: %s", key, value);

@@ -1,5 +1,5 @@
---[[
-  sblast.lua -- Sound Blaster audio mode;
+/*
+  L_mininim.video_res.h -- mininim.video[?][?] script module;
 
   Copyright (C) 2015, 2016, 2017 Bruno Félix Rezende Ribeiro
   <oitofelix@gnu.org>
@@ -16,25 +16,11 @@
 
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
---]]
+*/
 
--- header
-local P = {type = "AUDIO MODE", name = "SBLAST"}
+#ifndef MININIM_L_MININIM_VIDEO_RES_H
+#define MININIM_L_MININIM_VIDEO_RES_H
 
--- imports
-local M = mininim
-local common = require "common"
+void define_L_mininim_video_res (lua_State *L);
 
--- body
-setfenv (1, P)
-
-function load ()
-   local sample = common.sample
-   local stream = common.stream
-
-   M.audio[name] =
-      {["SUSPENSE"] = sample "data/audio/suspense.ogg",}
-end
-
--- end
-return P
+#endif	/* MININIM_L_MININIM_VIDEO_RES_H */

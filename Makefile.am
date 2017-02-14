@@ -108,6 +108,8 @@ mininim_SOURCES = src/mininim.c src/mininim.h src/compatibility.h			\
   src/script/L_mininim.actor_N.c src/script/L_mininim.actor_N.h				\
   src/script/L_mininim.audio.c src/script/L_mininim.audio.h						\
   src/script/L_mininim.audio_res.c src/script/L_mininim.audio_res.h		\
+  src/script/L_mininim.video.c src/script/L_mininim.video.h						\
+  src/script/L_mininim.video_res.c src/script/L_mininim.video_res.h		\
   src/script/L_mininim.setting.c src/script/L_mininim.setting.h
 
 ${mininim_OBJECTS}: ${top_builddir}/src/mininim.h.gch

@@ -371,7 +371,7 @@ destroy_audio (struct audio_source *as)
 {
   switch (as->type) {
   case AUDIO_SAMPLE:
-    al_destroy_sample (as->data.sample);
+    if (as->data.sample) al_destroy_sample (as->data.sample);
     break;
   case AUDIO_STREAM:
     al_free (as->data.stream);

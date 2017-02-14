@@ -20,7 +20,7 @@
 
 #include "mininim.h"
 
-static const char load_assets_hook_key = 'k';
+static int load_assets_hook_ref = LUA_NOREF;
 
 static int __index (lua_State *L);
 static int __newindex (lua_State *L);
@@ -54,6 +54,9 @@ define_L_mininim (lua_State *L)
   /* mininim.audio */
   define_L_mininim_audio (L);
 
+  /* mininim.video */
+  define_L_mininim_video (L);
+
   /* mininim.setting */
   define_L_mininim_setting (L);
 }
@@ -61,7 +64,7 @@ define_L_mininim (lua_State *L)
 void
 run_load_assets_hook (void)
 {
-  L_get_registry (L, &load_assets_hook_key);
+  L_get_registry (L, load_assets_hook_ref);
   L_run_hook (L);
 }
 
@@ -76,8 +79,14 @@ __index (lua_State *L)
     if (! strcasecmp (key, "cycle")) {
       lua_pushnumber (L, anim_cycle);
       return 1;
+    } else if (! strcasecmp (key, "place_width")) {
+      lua_pushnumber (L, PLACE_WIDTH);
+      return 1;
+    } else if (! strcasecmp (key, "place_height")) {
+      lua_pushnumber (L, PLACE_HEIGHT);
+      return 1;
     } else if (! strcasecmp (key, "load_assets_hook")) {
-      L_get_registry (L, &load_assets_hook_key);
+      L_get_registry (L, load_assets_hook_ref);
       return 1;
     } else if (! strcasecmp (key, "level")) {
       L_push_interface (L, "mininim.level");
@@ -87,6 +96,9 @@ __index (lua_State *L)
       return 1;
     } else if (! strcasecmp (key, "audio")) {
       L_push_interface (L, "mininim.audio");
+      return 1;
+    } else if (! strcasecmp (key, "video")) {
+      L_push_interface (L, "mininim.video");
       return 1;
     } else if (! strcasecmp (key, "setting")) {
       L_push_interface (L, "mininim.setting");
@@ -106,7 +118,7 @@ __newindex (lua_State *L)
     key = lua_tostring (L, 2);
     if (! strcasecmp (key, "load_assets_hook")) {
       if (lua_isfunction (L, -1))
-        L_set_registry (L, &load_assets_hook_key);
+        L_set_registry (L, &load_assets_hook_ref);
       else
         return luaL_error (L, "mininim.load_assets_hook must be a function");
       return 0;

@@ -55,6 +55,9 @@ __index (lua_State *L)
     if (! strcasecmp (key, "audio_mode")) {
       lua_pushstring (L, audio_mode);
       return 1;
+    } else if (! strcasecmp (key, "video_mode")) {
+      lua_pushstring (L, video_mode);
+      return 1;
     } else return L_error_invalid_key_string (L, key, "mininim.setting");
   default: return L_error_invalid_key_type (L, type, "mininim.setting");
   }
@@ -71,6 +74,9 @@ __newindex (lua_State *L)
     if (! strcasecmp (key, "audio_mode")) {
       L_set_audio_mode (L, 3);
       return 0;
+    } else if (! strcasecmp (key, "video_mode")) {
+      L_set_video_mode (L, 3);
+      return 0;
     } else return L_error_invalid_key_string (L, key, "mininim.setting");
   default: return L_error_invalid_key_type (L, type, "mininim.setting");
   }
@@ -85,4 +91,15 @@ L_set_audio_mode (lua_State *L, int index)
     audio_mode = xasprintf ("%s", value);
   } else luaL_error
            (L, "mininim.setting.audio_mode must be a string");
+}
+
+void
+L_set_video_mode (lua_State *L, int index)
+{
+  const char *value = lua_tostring (L, 3);
+  if (value) {
+    if (video_mode) al_free (video_mode);
+    video_mode = xasprintf ("%s", value);
+  } else luaL_error
+           (L, "mininim.setting.video_mode must be a string");
 }

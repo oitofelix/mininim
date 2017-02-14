@@ -103,6 +103,7 @@ enum hue hue = HUE_NONE;
 bool force_hue = false;
 enum gm gm = ORIGINAL_GM;
 char *audio_mode;
+char *video_mode;
 bool immortal_mode;
 int initial_total_lives = KID_INITIAL_TOTAL_LIVES, total_lives;
 int initial_current_lives = KID_INITIAL_CURRENT_LIVES, current_lives;

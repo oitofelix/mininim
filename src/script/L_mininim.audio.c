@@ -20,7 +20,7 @@
 
 #include "mininim.h"
 
-static const char audio_mode_key = 'k';
+static int audio_mode_ref = LUA_NOREF;
 
 static int __index (lua_State *L);
 static int __newindex (lua_State *L);
@@ -46,7 +46,7 @@ define_L_mininim_audio (lua_State *L)
   lua_rawset (L, -3);
 
   lua_newtable (L);
-  L_set_registry (L, &audio_mode_key);
+  L_set_registry (L, &audio_mode_ref);
 
   lua_pop (L, 1);
 
@@ -67,13 +67,13 @@ __index (lua_State *L)
       return 1;
     } if (! strcasecmp (key, "current")) {
       if (audio_mode) {
-        L_get_registry (L, &audio_mode_key);
+        L_get_registry (L, audio_mode_ref);
         lua_pushstring (L, audio_mode);
         lua_gettable (L, 1);
       } else lua_pushnil (L);
       return 1;
     } else {
-      L_get_registry (L, &audio_mode_key);
+      L_get_registry (L, audio_mode_ref);
       lua_replace (L, 1);
       lua_gettable (L, 1);
       return 1;
@@ -91,12 +91,12 @@ __newindex (lua_State *L)
   case LUA_TSTRING:
     key = lua_tostring (L, 2);
     if (! strcasecmp (key, "load")) {
-      return luaL_error (L, "mininim.level.load is read-only");
+      return luaL_error (L, "mininim.audio.load is read-only");
     } else if (! strcasecmp (key, "current")) {
       L_set_audio_mode (L, 3);
       return 0;
     } else {
-      L_get_registry (L, &audio_mode_key);
+      L_get_registry (L, audio_mode_ref);
       lua_replace (L, 1);
       lua_settable (L, 1);
       return 0;
@@ -127,7 +127,7 @@ load (lua_State *L)
 void
 L_play_audio (char *key, struct pos *p, int anim_id)
 {
-  L_get_registry (L, &audio_mode_key);
+  L_get_registry (L, audio_mode_ref);
 
   if (! lua_istable (L, -1)) {
     lua_pop (L, 1);
