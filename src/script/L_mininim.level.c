@@ -88,7 +88,7 @@ L_is_valid_pos (lua_State *L, int index, struct pos *p)
   lua_Number place = lua_tonumber (L, -1);
   lua_pop (L, 1);
 
-  if (pos) new_pos (p, &global_level, room, floor, place);
+  if (p) new_pos (p, &global_level, room, floor, place);
 
   return true;
 

@@ -139,7 +139,10 @@ bool
 L_run_hook (lua_State *L)
 {
   if (! lua_isnil (L, -1)) return L_call (L, 0, 0, 0);
-  else return true;
+  else {
+    lua_pop (L, 1);
+    return true;
+  }
 }
 
 int

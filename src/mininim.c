@@ -104,6 +104,7 @@ bool force_hue = false;
 enum gm gm = ORIGINAL_GM;
 char *audio_mode;
 char *video_mode;
+char *env_mode;
 bool immortal_mode;
 int initial_total_lives = KID_INITIAL_TOTAL_LIVES, total_lives;
 int initial_current_lives = KID_INITIAL_CURRENT_LIVES, current_lives;
@@ -761,19 +762,22 @@ Levels have been converted using module %s into native format at\n\
     e = optval_to_enum (&i, key, arg, state, video_mode_enum, 0);
     if (e) return e;
     switch (i) {
-    case 0: vm = VGA; break;
-    case 1: vm = EGA; break;
-    case 2: vm = CGA; break;
-    case 3: vm = CGA, hgc = true; break;
+    case 0: vm = VGA; set_string_var (&video_mode, "VGA"); break;
+    case 1: vm = EGA; set_string_var (&video_mode, "EGA"); break;
+    case 2: vm = CGA; set_string_var (&video_mode, "CGA"); break;
+    case 3: vm = CGA, hgc = true; set_string_var (&video_mode, "HGC"); break;
     }
     break;
   case ENVIRONMENT_MODE_OPTION:
     e = optval_to_enum (&i, key, arg, state, environment_mode_enum, 0);
     if (e) return e;
     switch (i) {
-    case 0: force_em = false; break;
-    case 1: force_em = true, em = DUNGEON; break;
-    case 2: force_em = true, em = PALACE; break;
+    case 0: force_em = false;
+      set_string_var (&env_mode, "ORIGINAL"); break;
+    case 1: force_em = true, em = DUNGEON;
+      set_string_var (&env_mode, "DUNGEON"); break;
+    case 2: force_em = true, em = PALACE;
+      set_string_var (&env_mode, "PALACE"); break;
     }
     break;
   case HUE_MODE_OPTION:
@@ -1333,6 +1337,10 @@ free_argv (size_t *cargc, char ***cargv)
 int
 main (int _argc, char **_argv)
 {
+  set_string_var (&audio_mode, "SBLAST");
+  set_string_var (&video_mode, "VGA");
+  set_string_var (&env_mode, "DUNGEON");
+
   struct config_info config_info;
 
   /* glob command line for MinGW */

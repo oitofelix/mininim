@@ -126,10 +126,11 @@ ${LUA_INCLUDE} -I$(top_srcdir)/gnulib -I${builddir}/src					\
 -I${srcdir}/src/kid -I${srcdir}/src/levels -I${srcdir}/src/wall	\
 -I${srcdir}/src/script
 
-AM_CFLAGS = ${ALLEGRO_CFLAGS} ${ALLEGRO_IMAGE_CFLAGS}					\
-	${ALLEGRO_AUDIO_CFLAGS} ${ALLEGRO_ACODEC_CFLAGS}						\
-	${ALLEGRO_FONT_CFLAGS} ${ALLEGRO_PRIMITIVES_CFLAGS}					\
-	${ALLEGRO_MAIN_CFLAGS} ${ALLEGRO_DIALOG_CFLAGS}
+AM_CFLAGS = ${ALLEGRO_CFLAGS} ${ALLEGRO_IMAGE_CFLAGS}	\
+	${ALLEGRO_AUDIO_CFLAGS} ${ALLEGRO_ACODEC_CFLAGS}		\
+	${ALLEGRO_FONT_CFLAGS} ${ALLEGRO_PRIMITIVES_CFLAGS}	\
+	${ALLEGRO_MAIN_CFLAGS} ${ALLEGRO_DIALOG_CFLAGS}			\
+	${ALLEGRO_COLOR_CFLAGS}
 
 if DEBUG
   CFLAGS += -O0 -Wall -ggdb3 -Werror -Wno-error=unused-function	\
@@ -149,7 +150,8 @@ endif
 LIBS = -lm ${ALLEGRO_LIBS} ${ALLEGRO_IMAGE_LIBS}										\
   ${ALLEGRO_AUDIO_LIBS} ${ALLEGRO_ACODEC_LIBS} ${ALLEGRO_FONT_LIBS}	\
   ${ALLEGRO_PRIMITIVES_LIBS} ${ALLEGRO_MAIN_LIBS}										\
-  ${ALLEGRO_DIALOG_LIBS} ${mingw_ldadd} ${LUA_LIB}
+  ${ALLEGRO_DIALOG_LIBS} ${ALLEGRO_COLOR_LIBS} ${mingw_ldadd}				\
+  ${LUA_LIB}
 LDADD = gnulib/libgnu.a
 
 gnulib/libgnu.a:

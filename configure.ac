@@ -155,6 +155,8 @@ AS_CASE([$host],
    ALLEGRO_PRIMITIVES_LIBS="-lallegro_primitives${debug_suffix} ${ALLEGRO_LIBS}"
    ALLEGRO_DIALOG_CFLAGS="${ALLEGRO_CFLAGS}"
    ALLEGRO_DIALOG_LIBS="-lallegro_dialog${debug_suffix} ${ALLEGRO_LIBS}"
+   ALLEGRO_COLOR_CFLAGS="${ALLEGRO_CFLAGS}"
+   ALLEGRO_COLOR_LIBS="-lallegro_color${debug_suffix} ${ALLEGRO_LIBS}"
    mingw_ldadd="-lFLAC \
       -lfreetype \
       -lvorbisfile \
@@ -225,7 +227,15 @@ AS_CASE([$host],
    [allegro_dialog${debug_suffix}-5 >= $allegro_minver],,
     [PKG_CHECK_MODULES([ALLEGRO_DIALOG],
      [allegro_dialog${debug_suffix}-5.0 >= $allegro_minver],,
-     AC_MSG_ERROR([MININIM requires Allegro $allegro_minver (or superior) dialogs addon]))])])
+     AC_MSG_ERROR([MININIM requires Allegro $allegro_minver (or superior) dialogs addon]))])
+
+  PKG_CHECK_MODULES([ALLEGRO_COLOR],
+   [allegro_color${debug_suffix}-5 >= $allegro_minver],,
+    [PKG_CHECK_MODULES([ALLEGRO_COLOR],
+     [allegro_color${debug_suffix}-5.0 >= $allegro_minver],,
+     AC_MSG_ERROR([MININIM requires Allegro $allegro_minver (or superior) colors addon]))])
+
+])
 
 AC_SUBST([ALLEGRO_CFLAGS])
 AC_SUBST([ALLEGRO_LIBS])
@@ -243,6 +253,8 @@ AC_SUBST([ALLEGRO_MAIN_CFLAGS])
 AC_SUBST([ALLEGRO_MAIN_LIBS])
 AC_SUBST([ALLEGRO_DIALOG_CFLAGS])
 AC_SUBST([ALLEGRO_DIALOG_LIBS])
+AC_SUBST([ALLEGRO_COLOR_CFLAGS])
+AC_SUBST([ALLEGRO_COLOR_LIBS])
 AC_SUBST([mingw_ldadd])
 
 

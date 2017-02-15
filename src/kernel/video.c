@@ -359,9 +359,15 @@ compare_palette_caches (const void *pc0, const void *pc1)
 ALLEGRO_BITMAP *
 apply_palette (ALLEGRO_BITMAP *bitmap, palette p)
 {
+  return apply_palette_k (bitmap, p, p);
+}
+
+ALLEGRO_BITMAP *
+apply_palette_k (ALLEGRO_BITMAP *bitmap, palette p, const void *k)
+{
   if (! bitmap) return NULL;
 
-  ALLEGRO_BITMAP *cached = get_cached_palette (bitmap, p);
+  ALLEGRO_BITMAP *cached = get_cached_palette (bitmap, k);
   if (cached) return cached;
 
   int x, y;
@@ -377,7 +383,7 @@ apply_palette (ALLEGRO_BITMAP *bitmap, palette p)
 
   struct palette_cache pc;
   pc.ib = bitmap;
-  pc.pal = p;
+  pc.pal = k;
   pc.ob = rbitmap;
 
   palette_cache =

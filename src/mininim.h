@@ -62,6 +62,7 @@
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_native_dialog.h>
+#include <allegro5/allegro_color.h>
 
 /* Lua */
 #include <lua.h>
@@ -236,6 +237,7 @@ extern bool force_hue;
 extern enum gpm gpm;
 extern char *audio_mode;
 extern char *video_mode;
+extern char *env_mode;
 extern bool immortal_mode;
 extern int initial_total_lives, total_lives,
   initial_current_lives, current_lives;

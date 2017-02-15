@@ -22,8 +22,10 @@
 #define MININIM_L_MININIM_VIDEO_H
 
 void define_L_mininim_video (lua_State *L);
-ALLEGRO_BITMAP *L_bitmap (lua_State *L, char *object, enum em em, int index);
-struct coord *L_coord (lua_State *L, char *object, enum em em, int index,
+ALLEGRO_BITMAP *L_bitmap (lua_State *L, char *object, int index);
+struct coord *L_coord (lua_State *L, char *object, int index,
                        struct pos *p, struct coord *c_ret);
+ALLEGRO_BITMAP *L_apply_palette (lua_State *L, ALLEGRO_BITMAP *b,
+                                 char *palette);
 
 #endif	/* MININIM_L_MININIM_VIDEO_H */

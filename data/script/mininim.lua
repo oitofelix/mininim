@@ -24,7 +24,6 @@ local M = mininim
 -- called during loading screen for loading assets
 function M.load_assets_hook ()
    -- video modes
-   M.setting.video_mode = "VGA"
    require "vga/vga".load ()
    require "ega/ega".load ()
    require "cga/cga".load ()

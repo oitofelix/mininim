@@ -84,6 +84,8 @@ ALLEGRO_BITMAP *oitofelix_face (enum vm vm);
 /* palette */
 int compare_palette_caches (const void *pc0, const void *pc1);
 ALLEGRO_BITMAP *apply_palette (ALLEGRO_BITMAP *bitmap, palette p);
+ALLEGRO_BITMAP *apply_palette_k (ALLEGRO_BITMAP *bitmap, palette p,
+                                 const void *k);
 ALLEGRO_BITMAP *get_cached_palette (ALLEGRO_BITMAP *bitmap, palette p);
 ALLEGRO_COLOR hgc_palette (ALLEGRO_COLOR c);
 

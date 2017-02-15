@@ -25,6 +25,8 @@ local P = {package_type = "VIDEO MODE", package_name = "CGA",
 -- imports
 local M = mininim
 local common = require "script/common"
+local color = M.video.color
+local setmetatable = setmetatable
 
 local function b (filename)
    return common.load_bitmap (P, filename)
@@ -32,6 +34,13 @@ end
 
 -- body
 setfenv (1, P)
+
+local function hgc_palette (c)
+   if c == color (85, 255, 255) then return color (170, 170, 170)
+   elseif c == color (255, 85, 255) then return color (85, 85, 85)
+   else return c
+   end
+end
 
 function load ()
    local W = M.place_width
@@ -49,6 +58,12 @@ function load ()
                          coord = torch_coord}}}
 
    M.video[package_name] = V
+
+   local HGC = {}
+   setmetatable (HGC, {__index = V})
+   HGC.base_palette = hgc_palette
+   M.video["HGC"] = HGC
+
    return P
 end
 

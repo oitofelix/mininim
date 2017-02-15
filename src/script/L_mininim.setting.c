@@ -58,6 +58,9 @@ __index (lua_State *L)
     } else if (! strcasecmp (key, "video_mode")) {
       lua_pushstring (L, video_mode);
       return 1;
+    } else if (! strcasecmp (key, "env_mode")) {
+      lua_pushstring (L, env_mode);
+      return 1;
     } else return L_error_invalid_key_string (L, key, "mininim.setting");
   default: return L_error_invalid_key_type (L, type, "mininim.setting");
   }
@@ -72,10 +75,13 @@ __newindex (lua_State *L)
   case LUA_TSTRING:
     key = lua_tostring (L, 2);
     if (! strcasecmp (key, "audio_mode")) {
-      L_set_audio_mode (L, 3);
+      L_set_string_var (L, 3, "mininim.setting.audio_mode", &audio_mode);
       return 0;
     } else if (! strcasecmp (key, "video_mode")) {
-      L_set_video_mode (L, 3);
+      L_set_string_var (L, 3, "mininim.setting.video_mode", &video_mode);
+      return 0;
+    } else if (! strcasecmp (key, "env_mode")) {
+      L_set_string_var (L, 3, "mininim.setting.env_mode", &env_mode);
       return 0;
     } else return L_error_invalid_key_string (L, key, "mininim.setting");
   default: return L_error_invalid_key_type (L, type, "mininim.setting");
@@ -83,23 +89,16 @@ __newindex (lua_State *L)
 }
 
 void
-L_set_audio_mode (lua_State *L, int index)
+set_string_var (char **var, const char *value)
 {
-  const char *value = lua_tostring (L, 3);
-  if (value) {
-    if (audio_mode) al_free (audio_mode);
-    audio_mode = xasprintf ("%s", value);
-  } else luaL_error
-           (L, "mininim.setting.audio_mode must be a string");
+  if (*var) al_free (*var);
+  *var = xasprintf ("%s", value);
 }
 
 void
-L_set_video_mode (lua_State *L, int index)
+L_set_string_var (lua_State *L, int index, const char *name, char **var)
 {
-  const char *value = lua_tostring (L, 3);
-  if (value) {
-    if (video_mode) al_free (video_mode);
-    video_mode = xasprintf ("%s", value);
-  } else luaL_error
-           (L, "mininim.setting.video_mode must be a string");
+  const char *value = lua_tostring (L, index);
+  if (value) set_string_var (var, value);
+  else luaL_error (L, "%s must be a string", name);
 }

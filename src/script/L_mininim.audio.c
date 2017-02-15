@@ -66,11 +66,10 @@ __index (lua_State *L)
       lua_pushcfunction (L, load);
       return 1;
     } if (! strcasecmp (key, "current")) {
-      if (audio_mode) {
-        L_get_registry (L, audio_mode_ref);
-        lua_pushstring (L, audio_mode);
-        lua_gettable (L, 1);
-      } else lua_pushnil (L);
+      assert (audio_mode);
+      L_get_registry (L, audio_mode_ref);
+      lua_pushstring (L, audio_mode);
+      lua_gettable (L, 1);
       return 1;
     } else {
       L_get_registry (L, audio_mode_ref);
@@ -93,7 +92,7 @@ __newindex (lua_State *L)
     if (! strcasecmp (key, "load")) {
       return luaL_error (L, "mininim.audio.load is read-only");
     } else if (! strcasecmp (key, "current")) {
-      L_set_audio_mode (L, 3);
+      L_set_string_var (L, 3, "mininim.audio.current", &audio_mode);
       return 0;
     } else {
       L_get_registry (L, audio_mode_ref);
