@@ -145,7 +145,7 @@ void
 play_title (void)
 {
   cutscene_mode (true);
-  play_anim (title_anim, NULL);
+  play_anim (title_anim, NULL, NULL);
 }
 
 static void

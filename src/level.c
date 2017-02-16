@@ -23,6 +23,7 @@
 /* functions */
 static void draw_level (void);
 static void compute_level (void);
+static void cleanup_level (void);
 static void process_death (void);
 static void draw_lives (ALLEGRO_BITMAP *bitmap, struct anim *k, enum vm vm);
 
@@ -250,7 +251,7 @@ play_level (struct level *lv)
 
   level_number_shown = false;
 
-  play_anim (draw_level, compute_level);
+  play_anim (draw_level, compute_level, cleanup_level);
 
   if (title_demo) {
     if (quit_anim != RESTART_LEVEL && quit_anim != NEXT_LEVEL)
@@ -314,7 +315,7 @@ play_level (struct level *lv)
       cutscene_mode (true);
       stop_video_effect ();
       stop_audio_instances ();
-      play_anim (global_level.cutscene, NULL);
+      play_anim (global_level.cutscene, NULL, NULL);
       stop_video_effect ();
       stop_audio_instances ();
       if (quit_anim == NEXT_LEVEL) goto next_level;
@@ -337,7 +338,7 @@ play_level (struct level *lv)
     cutscene_mode (true);
     stop_video_effect ();
     stop_audio_instances ();
-    play_anim (cutscene_out_of_time_anim, NULL);
+    play_anim (cutscene_out_of_time_anim, NULL, NULL);
     stop_video_effect ();
     stop_audio_instances ();
     if (quit_anim == NEXT_LEVEL) goto next_level;
@@ -675,13 +676,6 @@ compute_level (void)
   camera_follow_kid = (k->f.c.room == mr.room)
     ? k->id : -1;
 
-  /* this condition is necessary to honor any floor press the start
-     level function might have */
-  if (anim_cycle > 0) {
-    unpress_opener_floors ();
-    unpress_closer_floors ();
-  }
-
   int prev_room = k->f.c.room;
 
   for (i = 0; i < anima_nmemb; i++) {
@@ -799,6 +793,13 @@ compute_level (void)
   register_changed_closer_floors ();
 
   if (! play_time_stopped) play_time++;
+}
+
+static void
+cleanup_level (void)
+{
+  unpress_opener_floors ();
+  unpress_closer_floors ();
 }
 
 static void

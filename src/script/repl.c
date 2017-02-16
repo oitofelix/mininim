@@ -388,7 +388,7 @@ static void lstop (lua_State *L, lua_Debug *ar) {
   (void)ar;  /* unused arg. */
   lua_sethook(L, NULL, 0, 0);
   lua_pushnil(L);
-  lua_error(L);
+  luaL_error(L, "thread interrupted");
 }
 
 
@@ -449,7 +449,8 @@ static int lcall (lua_State *L, int narg, int clear) {
   lua_rawget(L, LUA_GLOBALSINDEX);  /* get traceback function */
   lua_insert(L, base);  /* put it under chunk and args */
   sig_catch(SIGINT, laction);
-  lua_sethook (L, repl_multithread, LUA_MASKCOUNT, 1);
+  lua_sethook (L, repl_multithread,
+               LUA_MASKCALL | LUA_MASKRET | LUA_MASKCOUNT, 1);
   status = lua_pcall(L, narg, (clear ? 0 : LUA_MULTRET), base);
   sig_catch(SIGINT, SIG_DFL);
   lua_remove(L, base);  /* remove traceback function */

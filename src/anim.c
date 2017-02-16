@@ -37,7 +37,8 @@ size_t anima_nmemb;
 
 void
 play_anim (void (*draw_callback) (void),
-           void (*compute_callback) (void))
+           void (*compute_callback) (void),
+           void (*cleanup_callback) (void))
 {
   anim_cycle = 0;
   quit_anim = NO_QUIT;
@@ -153,6 +154,9 @@ play_anim (void (*draw_callback) (void),
           play_audio_instances ();
           if (! title_demo && replay_mode != PLAY_REPLAY)
             execute_haptic ();
+
+          if (cleanup_callback) cleanup_callback ();
+
           if (! is_game_paused ())
             anim_cycle++;
 
