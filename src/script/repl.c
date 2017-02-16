@@ -430,6 +430,15 @@ static void sig_catch(int sig, void (*handler)(int))
   sigaction(sig, &sa, 0);         /* XXX ignores errors */
 }
 
+void
+repl_multithread (lua_State *L, lua_Debug *ar)
+{
+  al_unlock_mutex (repl_mutex);
+  al_rest (0.0001);
+  al_lock_mutex (repl_mutex);
+  if (al_get_thread_should_stop (repl_thread))
+    luaL_error (L, "main thread terminated");
+}
 
 static int lcall (lua_State *L, int narg, int clear) {
   int status;
@@ -440,6 +449,7 @@ static int lcall (lua_State *L, int narg, int clear) {
   lua_rawget(L, LUA_GLOBALSINDEX);  /* get traceback function */
   lua_insert(L, base);  /* put it under chunk and args */
   sig_catch(SIGINT, laction);
+  lua_sethook (L, repl_multithread, LUA_MASKCOUNT, 1);
   status = lua_pcall(L, narg, (clear ? 0 : LUA_MULTRET), base);
   sig_catch(SIGINT, SIG_DFL);
   lua_remove(L, base);  /* remove traceback function */

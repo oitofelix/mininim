@@ -119,10 +119,10 @@ define luaprint
 				printf " metatable="
 				luaprinttable $uv.metatable
 			end
-			if $argc == 2 && $uv.env
-				printf " env="
-				luaprinttable $uv.env
-			end
+			# if $argc == 2 && $uv.env
+			# 	printf " env="
+			# 	luaprinttable $uv.env
+			# end
 		end
 		# other
 		if $type > 5 && $type != 7
