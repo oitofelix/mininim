@@ -21,6 +21,8 @@
 #ifndef MININIM_L_MININIM_AUDIO_RES_H
 #define MININIM_L_MININIM_AUDIO_RES_H
 
+#define L_MININIM_AUDIO_SOURCE L_MININIM_AUDIO ".source"
+
 void L_pushaudiosource (lua_State *L, struct audio_source *as);
 void define_L_mininim_audio_source (lua_State *L);
 int L_mininim_audio_source (lua_State *L);

@@ -727,7 +727,7 @@ create_fellow_shadow (bool select)
       k->current_lives += required_strength;
       mr.flicker = 12;
       mr.color = get_flicker_raise_sword_color ();
-      L_play_audio ("SUSPENSE", NULL, k->id);
+      L_play_audio (main_L, "SUSPENSE", NULL, k->id);
 
       if (select) select_controllable_by_id (id);
       else {

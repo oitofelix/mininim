@@ -31,7 +31,7 @@ static int __tostring (lua_State *L);
 void
 define_L_mininim_level (lua_State *L)
 {
-  luaL_newmetatable (L, "mininim.level");
+  luaL_newmetatable (L, L_MININIM_LEVEL);
 
   lua_pushstring (L, "__eq");
   lua_pushcfunction (L, __eq);
@@ -56,14 +56,14 @@ define_L_mininim_level (lua_State *L)
 }
 
 void
-run_level_start_hook (void)
+run_level_start_hook (lua_State *L)
 {
   L_get_registry (L, level_start_hook_ref);
   L_run_hook (L);
 }
 
 void
-run_level_cycle_hook (void)
+run_level_cycle_hook (lua_State *L)
 {
   L_get_registry (L, level_cycle_hook_ref);
   L_run_hook (L);
@@ -132,6 +132,6 @@ __newindex (lua_State *L)
 int
 __tostring (lua_State *L)
 {
-  lua_pushfstring (L, "MININIM LEVEL %d", global_level.n);
+  lua_pushfstring (L, "MININIM LEVEL %d INTERFACE", global_level.n);
   return 1;
 }

@@ -30,7 +30,7 @@ static int activate (lua_State *L);
 void
 define_L_mininim_level_position (lua_State *L)
 {
-  luaL_newmetatable(L, "mininim.level.position");
+  luaL_newmetatable(L, L_MININIM_LEVEL_POSITION);
 
   lua_pushstring (L, "__eq");
   lua_pushcfunction (L, __eq);
@@ -55,7 +55,7 @@ void
 L_pushpos (lua_State *L, struct pos *p)
 {
   struct pos *p_new = lua_newuserdata (L, sizeof (*p_new));
-  luaL_getmetatable (L, "mininim.level.position");
+  luaL_getmetatable (L, L_MININIM_LEVEL_POSITION);
   lua_setmetatable (L, -2);
   *p_new = *p;
 }
@@ -75,9 +75,10 @@ L_mininim_level_position (lua_State *L)
 int
 __eq (lua_State *L)
 {
-  struct pos *p0 = lua_touserdata (L, 1);
-  struct pos *p1 = lua_touserdata (L, 2);
-  lua_pushboolean (L, peq (p0, p1));
+  struct pos *p0 = luaL_checkudata (L, 1, L_MININIM_LEVEL_POSITION);
+  struct pos *p1 = luaL_checkudata (L, 2, L_MININIM_LEVEL_POSITION);
+  if (p0 && p1) lua_pushboolean (L, peq (p0, p1));
+  else lua_pushboolean (L, lua_rawequal (L, 1, 2));
   return 1;
 }
 
@@ -119,16 +120,17 @@ __newindex (lua_State *L)
 int
 __tostring (lua_State *L)
 {
-  struct pos *p = lua_touserdata (L, 1);
-  lua_pushfstring (L, "mininim.level.position (%d, %d, %d)",
-                   p->room, p->floor, p->place);
+  struct pos *p = luaL_checkudata (L, 1, L_MININIM_LEVEL_POSITION);
+  lua_pushfstring (L, L_MININIM_LEVEL_POSITION " (%d, %d, %d)",
+                   p ? p->room : -1, p ? p->floor : -1, p ? p->place : -1);
   return 1;
 }
 
 int
 activate (lua_State *L)
 {
-  struct pos *p = lua_touserdata (L, lua_upvalueindex (1));
-  activate_con (p);
+  struct pos *p =
+    luaL_checkudata (L, lua_upvalueindex (1), L_MININIM_LEVEL_POSITION);
+  if (p) activate_con (p);
   return 0;
 }

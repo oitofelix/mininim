@@ -1437,7 +1437,7 @@ main (int _argc, char **_argv)
   init_script ();
 
   /* load assets */
-  run_load_hook ();
+  run_load_hook (main_L);
 
   load_icons ();
   load_oitofelix_face ();

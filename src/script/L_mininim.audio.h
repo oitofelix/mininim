@@ -21,7 +21,9 @@
 #ifndef MININIM_L_MININIM_AUDIO_H
 #define MININIM_L_MININIM_AUDIO_H
 
+#define L_MININIM_AUDIO L_MININIM ".audio"
+
 void define_L_mininim_audio (lua_State *L);
-void L_play_audio (char *key, struct pos *p, int anim_id);
+void L_play_audio (lua_State *L, char *key, struct pos *p, int anim_id);
 
 #endif	/* MININIM_L_MININIM_AUDIO_H */

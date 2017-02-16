@@ -37,7 +37,7 @@ static int __tostring (lua_State *L);
 void
 define_L_mininim_actor (lua_State *L)
 {
-  luaL_newmetatable(L, "mininim.actor");
+  luaL_newmetatable(L, L_MININIM_ACTOR);
 
   lua_pushstring (L, "__eq");
   lua_pushcfunction (L, __eq);
@@ -62,7 +62,7 @@ void
 L_pushactor (lua_State *L, int id)
 {
   int *id_new = lua_newuserdata (L, sizeof (id_new));
-  luaL_getmetatable (L, "mininim.actor");
+  luaL_getmetatable (L, L_MININIM_ACTOR);
   lua_setmetatable (L, -2);
   *id_new = id;
 }
@@ -156,16 +156,24 @@ action_value (const char *action, enum anim_type type)
 int
 __eq (lua_State *L)
 {
-  int id0 = * (int *) lua_touserdata (L, 1);
-  int id1 = * (int *) lua_touserdata (L, 2);
-  lua_pushboolean (L, id0 == id1);
+  int *id0 = luaL_checkudata (L, 1, L_MININIM_ACTOR);
+  int *id1 = luaL_checkudata (L, 2, L_MININIM_ACTOR);
+  if (id0 && id1) lua_pushboolean (L, *id0 == *id1);
+  else lua_pushboolean (L, lua_rawequal (L, 1, 2));
   return 1;
 }
 
 int
 __index (lua_State *L)
 {
-  int id = * (int *) lua_touserdata (L, 1);
+  int *id_ptr = luaL_checkudata (L, 1, L_MININIM_ACTOR);
+
+  int id;
+  if (id_ptr) id = *id_ptr;
+  else {
+    lua_pushnil (L);
+    return 1;
+  }
 
   struct anim *a = get_anim_by_id (id);
   if (! a) {
@@ -204,7 +212,11 @@ __index (lua_State *L)
 int
 __newindex (lua_State *L)
 {
-  int id = * (int *) lua_touserdata (L, 1);
+  int *id_ptr = luaL_checkudata (L, 1, L_MININIM_ACTOR);
+
+  int id;
+  if (id_ptr) id = *id_ptr;
+  else return 0;
 
   struct anim *a = get_anim_by_id (id);
   if (! a) return 0;
@@ -246,7 +258,7 @@ __newindex (lua_State *L)
 int
 __tostring (lua_State *L)
 {
-  int id = * (int *) lua_touserdata (L, 1);
-  lua_pushfstring (L, "mininim.actor (%d)", id);
+  int *id = luaL_checkudata (L, 1, L_MININIM_ACTOR);
+  lua_pushfstring (L, L_MININIM_ACTOR " (%d)", id ? *id : -1);
   return 1;
 }

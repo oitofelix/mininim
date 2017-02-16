@@ -28,7 +28,7 @@ static int __tostring (lua_State *L);
 void
 define_L_mininim_setting (lua_State *L)
 {
-  luaL_newmetatable(L, "mininim.setting");
+  luaL_newmetatable(L, L_MININIM_SETTING);
 
   lua_pushstring (L, "__eq");
   lua_pushcfunction (L, __eq);

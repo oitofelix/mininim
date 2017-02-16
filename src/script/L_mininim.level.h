@@ -21,9 +21,11 @@
 #ifndef MININIM_L_MININIM_LEVEL_H
 #define MININIM_L_MININIM_LEVEL_H
 
+#define L_MININIM_LEVEL L_MININIM ".level"
+
 void define_L_mininim_level (lua_State *L);
-void run_level_start_hook (void);
-void run_level_cycle_hook (void);
+void run_level_start_hook (lua_State *L);
+void run_level_cycle_hook (lua_State *L);
 void L_pushpos (lua_State *L, struct pos *p);
 
 #endif	/* MININIM_L_MININIM_LEVEL_H */

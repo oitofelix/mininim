@@ -20,13 +20,13 @@
 
 #include "mininim.h"
 
-lua_State *L;
+lua_State *main_L;
 
 int
 load_script (const char *filename)
 {
-  assert (L);
-  int e = luaL_loadfile (L, filename);
+  assert (main_L);
+  int e = luaL_loadfile (main_L, filename);
   return e == LUA_ERRFILE;
 }
 
@@ -34,7 +34,8 @@ void
 init_script (void)
 {
   /* setup canonical environment */
-  L = lua_open ();
+  lua_State *L = lua_open ();
+  main_L = L;
 
   assert (L);
 
@@ -106,16 +107,17 @@ finalize_script (void)
   al_unlock_mutex (repl_mutex);
   al_join_thread (repl_thread, NULL);
   al_destroy_thread (repl_thread);
-  repl_thread = NULL;
   al_destroy_mutex (repl_mutex);
-  lua_close (L);
+  lua_close (main_L);
 }
 
 void *
 L_check_type (lua_State *L, int index, const char *tname)
 {
   void *ud = luaL_checkudata (L, index, tname);
-  if (! ud) luaL_error (L, "'%s' expected", tname);
+  if (! ud)
+    luaL_error (L, "%s expected, got %s", tname,
+                lua_typename (L, lua_type (L, index)));
   return ud;
 }
 

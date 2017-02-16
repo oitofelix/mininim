@@ -30,7 +30,7 @@ static int __tostring (lua_State *L);
 void
 define_L_mininim_audio (lua_State *L)
 {
-  luaL_newmetatable(L, "mininim.audio");
+  luaL_newmetatable(L, L_MININIM_AUDIO);
 
   lua_pushstring (L, "__eq");
   lua_pushcfunction (L, __eq);
@@ -58,7 +58,7 @@ define_L_mininim_audio (lua_State *L)
 }
 
 void
-L_play_audio (char *key, struct pos *p, int anim_id)
+L_play_audio (lua_State *L, char *key, struct pos *p, int anim_id)
 {
   L_get_registry (L, audio_mode_ref);
 
@@ -80,7 +80,7 @@ L_play_audio (char *key, struct pos *p, int anim_id)
   lua_gettable (L, -2);
   lua_remove (L, -2);
 
-  struct audio_source *as = luaL_checkudata (L, -1, "mininim.audio.source");
+  struct audio_source *as = luaL_checkudata (L, -1, L_MININIM_AUDIO_SOURCE);
 
   lua_pop (L, 1);
 

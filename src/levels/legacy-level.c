@@ -53,7 +53,7 @@ static struct legacy_level *load_legacy_level_file (int n);
 void
 legacy_level_start (void)
 {
-  run_level_start_hook ();
+  run_level_start_hook (main_L);
 
   /* initialize some state */
   played_sample = false;
@@ -125,7 +125,7 @@ legacy_level_start (void)
 void
 legacy_level_special_events (void)
 {
-  run_level_cycle_hook ();
+  run_level_cycle_hook (main_L);
 
   struct pos p, pm;
   struct anim *k0 = get_anim_by_id (0);
@@ -237,7 +237,7 @@ legacy_level_special_events (void)
       register_con_undo (&undo, &mirror_pos,
                          MIRROR, MIGNORE, MIGNORE, MIGNORE,
                          NULL, true, "MIRROR");
-      L_play_audio ("SUSPENSE", &mirror_pos, -1);
+      L_play_audio (main_L, "SUSPENSE", &mirror_pos, -1);
       kid_haptic (kc, KID_HAPTIC_LEGACY_MIRROR_APPEAR);
     }
 
@@ -342,7 +342,7 @@ legacy_level_special_events (void)
     /* when kid enters room 1, play the suspense sound */
     if (kc->f.c.room == 1
         && ! played_sample) {
-      L_play_audio ("SUSPENSE", NULL, kc->id);
+      L_play_audio (main_L, "SUSPENSE", NULL, kc->id);
       played_sample = true;
     }
 

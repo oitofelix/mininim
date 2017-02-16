@@ -21,7 +21,9 @@
 #ifndef MININIM_L_MININIM_H
 #define MININIM_L_MININIM_H
 
+#define L_MININIM "mininim"
+
 void define_L_mininim (lua_State *L);
-void run_load_hook (void);
+void run_load_hook (lua_State *L);
 
 #endif	/* MININIM_L_MININIM_H */

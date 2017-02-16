@@ -33,6 +33,6 @@ void L_get_registry (lua_State *L, int r);
 void L_push_interface (lua_State *L, const char *tname);
 
 /* variables */
-extern lua_State *L;
+extern lua_State *main_L;
 
 #endif	/* MININIM_SCRIPT_H */

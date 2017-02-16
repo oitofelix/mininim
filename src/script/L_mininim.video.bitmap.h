@@ -21,6 +21,8 @@
 #ifndef MININIM_L_MININIM_VIDEO_RES_H
 #define MININIM_L_MININIM_VIDEO_RES_H
 
+#define L_MININIM_VIDEO_BITMAP L_MININIM_VIDEO ".bitmap"
+
 void define_L_mininim_video_bitmap (lua_State *L);
 int L_mininim_video_bitmap (lua_State *L);
 

@@ -21,6 +21,8 @@
 #ifndef MININIM_L_MININIM_VIDEO_COLOR_H
 #define MININIM_L_MININIM_VIDEO_COLOR_H
 
+#define L_MININIM_VIDEO_COLOR L_MININIM_VIDEO ".color"
+
 void L_pushcolor (lua_State *L, ALLEGRO_COLOR c);
 void define_L_mininim_video_color (lua_State *L);
 int L_mininim_video_color (lua_State *L);

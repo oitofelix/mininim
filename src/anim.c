@@ -68,8 +68,8 @@ play_anim (void (*draw_callback) (void),
     case ALLEGRO_EVENT_TIMER:
       if (event.timer.source == timer) {
         /* ensures Lua stack is empty */
-        if (DEBUG && lua_gettop (L)) {
-          L_dump_stack (L);
+        if (DEBUG && lua_gettop (main_L)) {
+          L_dump_stack (main_L);
           assert (false);
         }
 

@@ -21,6 +21,8 @@
 #ifndef MININIM_L_MININIM_LEVEL_CON_H
 #define MININIM_L_MININIM_LEVEL_CON_H
 
+#define L_MININIM_LEVEL_POSITION L_MININIM_LEVEL ".position"
+
 void define_L_mininim_level_position (lua_State *L);
 int L_mininim_level_position (lua_State *L);
 void L_pushpos (lua_State *L, struct pos *p);

@@ -38,7 +38,7 @@ void
 define_L_mininim_video (lua_State *L)
 {
   /* mininim.video */
-  luaL_newmetatable(L, "mininim.video");
+  luaL_newmetatable(L, L_MININIM_VIDEO);
 
   lua_pushstring (L, "__eq");
   lua_pushcfunction (L, __eq);
@@ -213,7 +213,7 @@ ALLEGRO_BITMAP *
 L_bitmap (lua_State *L, char *object, int index)
 {
   if (! L_get_bitmap_property (L, object, index, "bitmap")) return NULL;
-  ALLEGRO_BITMAP **b = luaL_checkudata (L, -1, "mininim.video.bitmap");
+  ALLEGRO_BITMAP **b = luaL_checkudata (L, -1, L_MININIM_VIDEO_BITMAP);
   lua_pop (L, 1);
   return b ? *b : NULL;
 }
@@ -253,10 +253,11 @@ L_push_palette (lua_State *L, char *palette_name)
 ALLEGRO_COLOR
 L_palette (ALLEGRO_COLOR c)
 {
+  lua_State *L = main_L;
   lua_pushvalue (L, -1);
   L_pushcolor (L, c);
   L_call (L, 1, 1, 0);
-  ALLEGRO_COLOR *c_ptr = luaL_checkudata (L, -1, "mininim.video.color");
+  ALLEGRO_COLOR *c_ptr = luaL_checkudata (L, -1, L_MININIM_VIDEO_COLOR);
   ALLEGRO_COLOR c_ret = c_ptr ? *c_ptr : al_map_rgb (0, 0, 0);
   lua_pop (L, 1);
   return c_ret;

@@ -30,7 +30,7 @@ static int play (lua_State *L);
 void
 define_L_mininim_audio_source (lua_State *L)
 {
-  luaL_newmetatable(L, "mininim.audio.source");
+  luaL_newmetatable(L, L_MININIM_AUDIO_SOURCE);
 
   lua_pushstring (L, "__gc");
   lua_pushcfunction (L, __gc);
@@ -55,7 +55,7 @@ void
 L_pushaudiosource (lua_State *L, struct audio_source *as)
 {
   struct audio_source *as_new = lua_newuserdata (L, sizeof (*as_new));
-  luaL_getmetatable (L, "mininim.audio.source");
+  luaL_getmetatable (L, L_MININIM_AUDIO_SOURCE);
   lua_setmetatable (L, -2);
   *as_new = *as;
 }
@@ -80,17 +80,18 @@ L_mininim_audio_source (lua_State *L)
 int
 __gc (lua_State *L)
 {
-  struct audio_source *as = lua_touserdata (L, 1);
-  destroy_audio (as);
+  struct audio_source *as = luaL_checkudata (L, 1, L_MININIM_AUDIO_SOURCE);
+  if (as) destroy_audio (as);
   return 0;
 }
 
 int
 __eq (lua_State *L)
 {
-  struct audio_source *as0 = lua_touserdata (L, 1);
-  struct audio_source *as1 = lua_touserdata (L, 2);
-  lua_pushboolean (L, audio_source_eq (as0, as1));
+  struct audio_source *as0 = luaL_checkudata (L, 1, L_MININIM_AUDIO_SOURCE);
+  struct audio_source *as1 = luaL_checkudata (L, 2, L_MININIM_AUDIO_SOURCE);
+  if (as0 && as1) lua_pushboolean (L, audio_source_eq (as0, as1));
+  else lua_pushboolean (L, lua_rawequal (L, 1, 2));
   return 1;
 }
 
@@ -117,21 +118,23 @@ __index (lua_State *L)
 int
 __tostring (lua_State *L)
 {
-  struct audio_source *as = lua_touserdata (L, 1);
+  struct audio_source *as = luaL_checkudata (L, 1, L_MININIM_AUDIO_SOURCE);
 
-  switch (as->type) {
-  case AUDIO_SAMPLE:
-    {
-      char *str = xasprintf ("MININIM AUDIO SAMPLE %p", as->data.sample);
-      lua_pushstring (L, str);
-      al_free (str);
+  if (as)
+    switch (as->type) {
+    case AUDIO_SAMPLE:
+      {
+        char *str = xasprintf ("MININIM AUDIO SAMPLE %p", as->data.sample);
+        lua_pushstring (L, str);
+        al_free (str);
+      }
+      break;
+    case AUDIO_STREAM:
+      lua_pushfstring (L, "MININIM AUDIO STREAM %s", as->data.stream);
+      break;
+    default: assert (false); break;
     }
-    break;
-  case AUDIO_STREAM:
-    lua_pushfstring (L, "MININIM AUDIO %s", as->data.stream);
-    break;
-  default: assert (false); break;
-  }
+  else lua_pushstring (L, "MININIM AUDIO");
 
   return 1;
 }
@@ -139,11 +142,13 @@ __tostring (lua_State *L)
 int
 play (lua_State *L)
 {
-  struct audio_source *as = lua_touserdata (L, lua_upvalueindex (1));
+  struct audio_source *as =
+    luaL_checkudata (L, lua_upvalueindex (1), L_MININIM_AUDIO_SOURCE);
+  if (! as) return 0;
   int *id = NULL;
   struct pos *p = NULL;
-  id = luaL_checkudata (L, 1, "mininim.actor");
-  p = luaL_checkudata (L, 1, "mininim.level.position");
+  id = luaL_checkudata (L, 1, L_MININIM_ACTOR);
+  p = luaL_checkudata (L, 1, L_MININIM_LEVEL_POSITION);
   play_audio (as, p, (id && *id < anima_nmemb) ? *id : -1);
   return 0;
 }

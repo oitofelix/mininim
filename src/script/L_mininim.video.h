@@ -21,6 +21,8 @@
 #ifndef MININIM_L_MININIM_VIDEO_H
 #define MININIM_L_MININIM_VIDEO_H
 
+#define L_MININIM_VIDEO L_MININIM ".video"
+
 void define_L_mininim_video (lua_State *L);
 ALLEGRO_BITMAP *L_bitmap (lua_State *L, char *object, int index);
 struct coord *L_coord (lua_State *L, char *object, int index,

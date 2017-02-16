@@ -28,7 +28,7 @@ static int __tostring (lua_State *L);
 void
 define_L_mininim_video_color (lua_State *L)
 {
-  luaL_newmetatable(L, "mininim.video.color");
+  luaL_newmetatable(L, L_MININIM_VIDEO_COLOR);
 
   lua_pushstring (L, "__eq");
   lua_pushcfunction (L, __eq);
@@ -53,7 +53,7 @@ void
 L_pushcolor (lua_State *L, ALLEGRO_COLOR c)
 {
   ALLEGRO_COLOR *c_new = lua_newuserdata (L, sizeof (*c_new));
-  luaL_getmetatable (L, "mininim.video.color");
+  luaL_getmetatable (L, L_MININIM_VIDEO_COLOR);
   lua_setmetatable (L, -2);
   *c_new = c;
 }
@@ -81,16 +81,24 @@ L_mininim_video_color (lua_State *L)
 int
 __eq (lua_State *L)
 {
-  ALLEGRO_COLOR c0 = * (ALLEGRO_COLOR *) lua_touserdata (L, 1);
-  ALLEGRO_COLOR c1 = * (ALLEGRO_COLOR *) lua_touserdata (L, 2);
-  lua_pushboolean (L, color_eq (c0, c1));
+  ALLEGRO_COLOR *c0 = luaL_checkudata (L, 1, L_MININIM_VIDEO_COLOR);
+  ALLEGRO_COLOR *c1 = luaL_checkudata (L, 2, L_MININIM_VIDEO_COLOR);
+  if (c0 && c1) lua_pushboolean (L, color_eq (*c0, *c1));
+  else lua_pushboolean (L, lua_rawequal (L, 1, 2));
   return 1;
 }
 
 int
 __index (lua_State *L)
 {
-  ALLEGRO_COLOR c = * (ALLEGRO_COLOR *) lua_touserdata (L, 1);
+  ALLEGRO_COLOR *c_ptr = luaL_checkudata (L, 1, L_MININIM_VIDEO_COLOR);
+
+  ALLEGRO_COLOR c;
+  if (c_ptr) c = *c_ptr;
+  else {
+    lua_pushnil (L);
+    return 1;
+  }
 
   const char *key;
   int type = lua_type (L, 2);
@@ -137,7 +145,8 @@ __index (lua_State *L)
 int
 __newindex (lua_State *L)
 {
-  ALLEGRO_COLOR *c = lua_touserdata (L, 1);
+  ALLEGRO_COLOR *c = luaL_checkudata (L, 1, L_MININIM_VIDEO_COLOR);
+  if (! c) return 0;
 
   const char *key;
   int type = lua_type (L, 2);
@@ -183,9 +192,11 @@ __newindex (lua_State *L)
 int
 __tostring (lua_State *L)
 {
-  ALLEGRO_COLOR c = * (ALLEGRO_COLOR *) lua_touserdata (L, 1);
-  unsigned char r, g, b;
-  al_unmap_rgb (c, &r, &g, &b);
-  lua_pushfstring (L, "mininim.video.color (%d, %d, %d)", r, g, b);
+  ALLEGRO_COLOR *c = luaL_checkudata (L, 1, L_MININIM_VIDEO_COLOR);
+  if (c) {
+    unsigned char r, g, b;
+    al_unmap_rgb (*c, &r, &g, &b);
+    lua_pushfstring (L, L_MININIM_VIDEO_COLOR " (%d, %d, %d)", r, g, b);
+  } else lua_pushstring (L, L_MININIM_VIDEO_COLOR " (-1, -1, -1)");
   return 1;
 }

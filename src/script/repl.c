@@ -65,7 +65,7 @@ lhandler (char *line)
 }
 
 /* Read a line from the terminal with line editing */
-static int lua_readline(lua_State *repl_L, const char *prompt)
+static int lua_readline(lua_State *L, const char *prompt)
 {
   rl_callback_handler_install (prompt, lhandler);
 
@@ -85,16 +85,16 @@ static int lua_readline(lua_State *repl_L, const char *prompt)
 
   if (! lhandler_line) return 0;
 
-  lua_pushstring(repl_L, lhandler_line);
-  lua_pushliteral(repl_L, "\n");
-  lua_concat(repl_L, 2);
+  lua_pushstring(L, lhandler_line);
+  lua_pushliteral(L, "\n");
+  lua_concat(L, 2);
   free(lhandler_line);
   lhandler_line = NULL;
   return 1;
 }
 
 /* Add a line to the history */
-static void lua_saveline(lua_State *repl_L, const char *s)
+static void lua_saveline(lua_State *L, const char *s)
 {
   const char *p;
   for (p = s; isspace(*p); p++) ;
@@ -103,10 +103,10 @@ static void lua_saveline(lua_State *repl_L, const char *s)
     if (s[n] != '\n') {
       add_history(s);
     } else {
-      lua_pushlstring(repl_L, s, n);
-      s = lua_tostring(repl_L, -1);
+      lua_pushlstring(L, s, n);
+      s = lua_tostring(L, -1);
       add_history(s);
-      lua_pop(repl_L, 1);
+      lua_pop(L, 1);
     }
   }
 }
@@ -163,30 +163,30 @@ static int dmadd(dmlist *ml, const char *p, size_t pn, const char *s, int suf)
 }
 
 /* Get __index field of metatable of object on top of stack */
-static int getmetaindex(lua_State *repl_L)
+static int getmetaindex(lua_State *L)
 {
-  if (!lua_getmetatable(repl_L, -1)) { lua_pop(repl_L, 1); return 0; }
-  lua_pushstring(repl_L, "__index");
-  lua_rawget(repl_L, -2);
-  lua_replace(repl_L, -2);
-  if (lua_isnil(repl_L, -1) || lua_rawequal(repl_L, -1, -2)) { lua_pop(repl_L, 2); return 0; }
-  lua_replace(repl_L, -2);
+  if (!lua_getmetatable(L, -1)) { lua_pop(L, 1); return 0; }
+  lua_pushstring(L, "__index");
+  lua_rawget(L, -2);
+  lua_replace(L, -2);
+  if (lua_isnil(L, -1) || lua_rawequal(L, -1, -2)) { lua_pop(L, 2); return 0; }
+  lua_replace(L, -2);
   return 1;
 } /* 1: obj -- val, 0: obj -- */
 
 /* Get field from object on top of stack. Avoid calling metamethods */
-static int safegetfield(lua_State *repl_L, const char *s, size_t n)
+static int safegetfield(lua_State *L, const char *s, size_t n)
 {
   int i = 20; /* Avoid infinite metatable loops */
   do {
-    if (lua_istable(repl_L, -1)) {
-      lua_pushlstring(repl_L, s, n);
-      lua_rawget(repl_L, -2);
-      if (!lua_isnil(repl_L, -1)) { lua_replace(repl_L, -2); return 1; }
-      lua_pop(repl_L, 1);
+    if (lua_istable(L, -1)) {
+      lua_pushlstring(L, s, n);
+      lua_rawget(L, -2);
+      if (!lua_isnil(L, -1)) { lua_replace(L, -2); return 1; }
+      lua_pop(L, 1);
     }
-  } while (--i > 0 && getmetaindex(repl_L));
-  lua_pop(repl_L, 1);
+  } while (--i > 0 && getmetaindex(L));
+  lua_pop(L, 1);
   return 0;
 } /* 1: obj -- val, 0: obj -- */
 
@@ -260,7 +260,7 @@ error:
 }
 
 /* Initialize library */
-static void lua_initline(lua_State *repl_L, char *pname)
+static void lua_initline(lua_State *L, char *pname)
 {
   char *s;
 
@@ -282,7 +282,7 @@ static void lua_initline(lua_State *repl_L, char *pname)
 }
 
 /* Finalize library */
-static void lua_exitline(lua_State *repl_L)
+static void lua_exitline(lua_State *L)
 {
   /* Optionally save history file */
   if (myhist) write_history(myhist);
@@ -313,82 +313,82 @@ static const char* cpaths[] = {
   NULL
 };
 
-static void do_path(lua_State *repl_L)
+static void do_path(lua_State *L)
 {
   const char** p = paths;
   int any;
   if( done_path || suppress_path ) return;
-  if( ! repl_L ) return;
+  if( ! L ) return;
   done_path = 1;
-  lua_pushliteral(repl_L,"LUA_PATH");
-  lua_pushliteral(repl_L,"");
+  lua_pushliteral(L,"LUA_PATH");
+  lua_pushliteral(L,"");
   while( *p ) {
     any = 0;
     if( **p == '~' ) {
       const char* home = getenv("HOME");
       if( home ) {
-        lua_pushstring(repl_L,home);
-        lua_pushstring(repl_L,*p+1);
-        lua_pushliteral(repl_L,"/?.lua;");
-        lua_pushstring(repl_L,home);
-        lua_pushstring(repl_L,*p+1);
-        lua_pushliteral(repl_L,"/?;");
+        lua_pushstring(L,home);
+        lua_pushstring(L,*p+1);
+        lua_pushliteral(L,"/?.lua;");
+        lua_pushstring(L,home);
+        lua_pushstring(L,*p+1);
+        lua_pushliteral(L,"/?;");
         any = 6;
       }
     } else {
-      lua_pushstring(repl_L,*p);
-      lua_pushliteral(repl_L,"/?.lua;");
-      lua_pushstring(repl_L,*p);
-      lua_pushliteral(repl_L,"/?;");
+      lua_pushstring(L,*p);
+      lua_pushliteral(L,"/?.lua;");
+      lua_pushstring(L,*p);
+      lua_pushliteral(L,"/?;");
       any = 4;
     }
     if( any ) {
-      lua_concat(repl_L,any+1);
+      lua_concat(L,any+1);
     }
     p++;
   }
-  lua_pushliteral(repl_L, "?.lua;?");
-  lua_concat(repl_L,2);
-  lua_settable(repl_L, LUA_GLOBALSINDEX);
+  lua_pushliteral(L, "?.lua;?");
+  lua_concat(L,2);
+  lua_settable(L, LUA_GLOBALSINDEX);
   p=cpaths;
-  lua_pushliteral(repl_L,"LUA_CPATH");
-  lua_pushliteral(repl_L,"");
+  lua_pushliteral(L,"LUA_CPATH");
+  lua_pushliteral(L,"");
   while( *p ) {
     any = 0;
     if( **p == '~' ) {
       const char* home = getenv("HOME");
       if( home ) {
-        lua_pushstring(repl_L,home);
-        lua_pushstring(repl_L,*p+1);
-        lua_pushliteral(repl_L,"/?.so;");
-        lua_pushstring(repl_L,home);
-        lua_pushstring(repl_L,*p+1);
-        lua_pushliteral(repl_L,"/?;");
+        lua_pushstring(L,home);
+        lua_pushstring(L,*p+1);
+        lua_pushliteral(L,"/?.so;");
+        lua_pushstring(L,home);
+        lua_pushstring(L,*p+1);
+        lua_pushliteral(L,"/?;");
         any = 6;
       }
     } else {
-      lua_pushstring(repl_L,*p);
-      lua_pushliteral(repl_L,"/?.so;");
-      lua_pushstring(repl_L,*p);
-      lua_pushliteral(repl_L,"/?;");
+      lua_pushstring(L,*p);
+      lua_pushliteral(L,"/?.so;");
+      lua_pushstring(L,*p);
+      lua_pushliteral(L,"/?;");
       any = 4;
     }
     if( any ) {
-      lua_concat(repl_L,any+1);
+      lua_concat(L,any+1);
     }
     p++;
   }
-  lua_pushliteral(repl_L, "?.so;?");
-  lua_concat(repl_L,2);
-  lua_settable(repl_L, LUA_GLOBALSINDEX);
+  lua_pushliteral(L, "?.so;?");
+  lua_concat(L,2);
+  lua_settable(L, LUA_GLOBALSINDEX);
 }
 
 
-static void lstop (lua_State *repl_L, lua_Debug *ar) {
+static void lstop (lua_State *L, lua_Debug *ar) {
   (void)ar;  /* unused arg. */
-  lua_sethook(repl_L, NULL, 0, 0);
-  lua_pushnil(repl_L);
-  lua_error(repl_L);
+  lua_sethook(L, NULL, 0, 0);
+  lua_pushnil(L);
+  lua_error(L);
 }
 
 
@@ -402,21 +402,21 @@ static void l_message (const char *pname, const char *msg) {
 }
 
 
-static int report (lua_State *repl_L, int status) {
+static int report (lua_State *L, int status) {
   const char *msg;
   if (status) {
-    msg = lua_tostring(repl_L, -1);
+    msg = lua_tostring(L, -1);
     if (msg == NULL) {
       const char *str;
-      lua_getglobal(repl_L, "LUA_DEFAULT_ERROR");  /* try global variable */
-      str = lua_tostring(repl_L, -1);
-      lua_pop(repl_L, 1);
+      lua_getglobal(L, "LUA_DEFAULT_ERROR");  /* try global variable */
+      str = lua_tostring(L, -1);
+      lua_pop(L, 1);
       if (str) {
         if (*str != '\0') msg = str;
       } else msg = "(error with no message)";
     }
     if (msg) l_message(program_name, msg);
-    lua_pop(repl_L, 1);
+    lua_pop(L, 1);
   }
   return status;
 }
@@ -431,37 +431,37 @@ static void sig_catch(int sig, void (*handler)(int))
 }
 
 
-static int lcall (lua_State *repl_L, int narg, int clear) {
+static int lcall (lua_State *L, int narg, int clear) {
   int status;
-  int base = lua_gettop(repl_L) - narg;  /* function index */
-  do_path(repl_L);
-  //lua_settop(repl_L,base);
-  lua_pushliteral(repl_L, "_TRACEBACK");
-  lua_rawget(repl_L, LUA_GLOBALSINDEX);  /* get traceback function */
-  lua_insert(repl_L, base);  /* put it under chunk and args */
+  int base = lua_gettop(L) - narg;  /* function index */
+  do_path(L);
+  //lua_settop(L,base);
+  lua_pushliteral(L, "_TRACEBACK");
+  lua_rawget(L, LUA_GLOBALSINDEX);  /* get traceback function */
+  lua_insert(L, base);  /* put it under chunk and args */
   sig_catch(SIGINT, laction);
-  status = lua_pcall(repl_L, narg, (clear ? 0 : LUA_MULTRET), base);
+  status = lua_pcall(L, narg, (clear ? 0 : LUA_MULTRET), base);
   sig_catch(SIGINT, SIG_DFL);
-  lua_remove(repl_L, base);  /* remove traceback function */
+  lua_remove(L, base);  /* remove traceback function */
   return status;
 }
 
 
-static const char *get_prompt (lua_State *repl_L, int firstline) {
+static const char *get_prompt (lua_State *L, int firstline) {
   const char *p = NULL;
-  lua_pushstring(repl_L, firstline ? "_PROMPT" : "_PROMPT2");
-  lua_rawget(repl_L, LUA_GLOBALSINDEX);
-  p = lua_tostring(repl_L, -1);
+  lua_pushstring(L, firstline ? "_PROMPT" : "_PROMPT2");
+  lua_rawget(L, LUA_GLOBALSINDEX);
+  p = lua_tostring(L, -1);
   if (p == NULL) p = (firstline ? PROMPT : PROMPT2);
-  lua_pop(repl_L, 1);  /* remove global */
+  lua_pop(L, 1);  /* remove global */
   return p;
 }
 
 
-static int incomplete (lua_State *repl_L, int status) {
+static int incomplete (lua_State *L, int status) {
   if (status == LUA_ERRSYNTAX &&
-         strstr(lua_tostring(repl_L, -1), "near `<eof>'") != NULL) {
-    lua_pop(repl_L, 1);
+         strstr(lua_tostring(L, -1), "near `<eof>'") != NULL) {
+    lua_pop(L, 1);
     return 1;
   }
   else
@@ -469,59 +469,59 @@ static int incomplete (lua_State *repl_L, int status) {
 }
 
 
-static int load_string (lua_State *repl_L) {
+static int load_string (lua_State *L) {
   int status;
-  lua_settop(repl_L, 0);
-  if (lua_readline(repl_L, get_prompt(repl_L, 1)) == 0)  /* no input? */
+  lua_settop(L, 0);
+  if (lua_readline(L, get_prompt(L, 1)) == 0)  /* no input? */
     return -1;
-  if (lua_tostring(repl_L, -1)[0] == '=') {  /* line starts with `=' ? */
-    lua_pushfstring(repl_L, "return %s", lua_tostring(repl_L, -1)+1);/* `=' -> `return' */
-    lua_remove(repl_L, -2);  /* remove original line */
+  if (lua_tostring(L, -1)[0] == '=') {  /* line starts with `=' ? */
+    lua_pushfstring(L, "return %s", lua_tostring(L, -1)+1);/* `=' -> `return' */
+    lua_remove(L, -2);  /* remove original line */
   }
   for (;;) {  /* repeat until gets a complete line */
-    status = luaL_loadbuffer(repl_L, lua_tostring(repl_L, 1), lua_strlen(repl_L, 1), "=stdin");
-    if (!incomplete(repl_L, status)) break;  /* cannot try to add lines? */
-    if (lua_readline(repl_L, get_prompt(repl_L, 0)) == 0)  /* no more input? */
+    status = luaL_loadbuffer(L, lua_tostring(L, 1), lua_strlen(L, 1), "=stdin");
+    if (!incomplete(L, status)) break;  /* cannot try to add lines? */
+    if (lua_readline(L, get_prompt(L, 0)) == 0)  /* no more input? */
       return -1;
-    lua_concat(repl_L, lua_gettop(repl_L));  /* join lines */
+    lua_concat(L, lua_gettop(L));  /* join lines */
   }
-  lua_saveline(repl_L, lua_tostring(repl_L, 1));
-  lua_remove(repl_L, 1);  /* remove line */
+  lua_saveline(L, lua_tostring(L, 1));
+  lua_remove(L, 1);  /* remove line */
   return status;
 }
 
 
-static void manual_input (lua_State *repl_L) {
+static void manual_input (lua_State *L) {
   int status;
-  lua_initline(repl_L, "mininim");
-  do_path(repl_L);
+  lua_initline(L, "mininim");
+  do_path(L);
   while (! al_get_thread_should_stop (repl_thread)) {
-    status = load_string(repl_L);
+    status = load_string(L);
     if (status == -1) {
       if (! al_get_thread_should_stop (repl_thread))
         fprintf (rl_outstream, "\n");
       continue;
     }
-    if (status == 0) status = lcall(repl_L, 0, 0);
-    report(repl_L, status);
-    if (status == 0 && lua_gettop(repl_L) > 0) {  /* any result to print? */
-      lua_getglobal(repl_L, "print");
-      lua_insert(repl_L, 1);
-      if (lua_pcall(repl_L, lua_gettop(repl_L)-1, 0, 0) != 0)
+    if (status == 0) status = lcall(L, 0, 0);
+    report(L, status);
+    if (status == 0 && lua_gettop(L) > 0) {  /* any result to print? */
+      lua_getglobal(L, "print");
+      lua_insert(L, 1);
+      if (lua_pcall(L, lua_gettop(L)-1, 0, 0) != 0)
         l_message(program_name,
-                  lua_pushfstring(repl_L, "error calling `print' (%s)",
-                                  lua_tostring(repl_L, -1)));
+                  lua_pushfstring(L, "error calling `print' (%s)",
+                                  lua_tostring(L, -1)));
     }
   }
-  lua_settop(repl_L, 0);  /* clear stack */
+  lua_settop(L, 0);  /* clear stack */
   fputs("\n", rl_outstream);
-  lua_exitline(repl_L);
+  lua_exitline(L);
 }
 
-static int pmain (lua_State *repl_L) {
-  lua_pop (repl_L, 1);
-  do_path(repl_L);
-  manual_input(repl_L);
+static int pmain (lua_State *L) {
+  lua_pop (L, 1);
+  do_path(L);
+  manual_input(L);
   return 0;
 }
 
@@ -531,7 +531,7 @@ lua_State *repl_L;
 int repl_thread_ref = LUA_NOREF;
 
 void *
-repl (ALLEGRO_THREAD *thread, void *repl_L)
+repl (ALLEGRO_THREAD *thread, void *L)
 {
   al_lock_mutex (repl_mutex);
 
@@ -543,8 +543,8 @@ repl (ALLEGRO_THREAD *thread, void *repl_L)
   fprintf (rl_outstream, LUA_VERSION " " LUA_COPYRIGHT "\n");
 
   int status;
-  status = lua_cpcall (repl_L, &pmain, NULL);
-  report (repl_L, status);
+  status = lua_cpcall (L, &pmain, NULL);
+  report (L, status);
 
   rl_callback_handler_remove ();
 

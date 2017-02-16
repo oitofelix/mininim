@@ -30,7 +30,7 @@ static int __tostring (lua_State *L);
 void
 define_L_mininim (lua_State *L)
 {
-  luaL_newmetatable(L, "mininim");
+  luaL_newmetatable(L, L_MININIM);
 
   lua_pushstring (L, "__eq");
   lua_pushcfunction (L, __eq);
@@ -67,7 +67,7 @@ define_L_mininim (lua_State *L)
 }
 
 void
-run_load_hook (void)
+run_load_hook (lua_State *L)
 {
   L_get_registry (L, load_hook_ref);
   L_run_hook (L);
@@ -101,19 +101,19 @@ __index (lua_State *L)
       L_get_registry (L, load_hook_ref);
       return 1;
     } else if (! strcasecmp (key, "level")) {
-      L_push_interface (L, "mininim.level");
+      L_push_interface (L, L_MININIM_LEVEL);
       return 1;
     } else if (! strcasecmp (key, "actor")) {
       lua_pushcfunction (L, L_mininim_actor);
       return 1;
     } else if (! strcasecmp (key, "audio")) {
-      L_push_interface (L, "mininim.audio");
+      L_push_interface (L, L_MININIM_AUDIO);
       return 1;
     } else if (! strcasecmp (key, "video")) {
-      L_push_interface (L, "mininim.video");
+      L_push_interface (L, L_MININIM_VIDEO);
       return 1;
     } else if (! strcasecmp (key, "setting")) {
-      L_push_interface (L, "mininim.setting");
+      L_push_interface (L, L_MININIM_SETTING);
       return 1;
     } else break;
   default: break;
@@ -144,6 +144,6 @@ __newindex (lua_State *L)
 int
 __tostring (lua_State *L)
 {
-  lua_pushfstring (L, "MININIM %s", VERSION);
+  lua_pushfstring (L, "MININIM %s INTERFACE", VERSION);
   return 1;
 }

@@ -27,7 +27,7 @@ static int __tostring (lua_State *L);
 void
 define_L_mininim_video_bitmap (lua_State *L)
 {
-  luaL_newmetatable(L, "mininim.video.bitmap");
+  luaL_newmetatable(L, L_MININIM_VIDEO_BITMAP);
 
   lua_pushstring (L, "__gc");
   lua_pushcfunction (L, __gc);
@@ -53,7 +53,7 @@ L_mininim_video_bitmap (lua_State *L)
   *b = load_bitmap (filename);
 
   if (*b) {
-    luaL_getmetatable (L, "mininim.video.bitmap");
+    luaL_getmetatable (L, L_MININIM_VIDEO_BITMAP);
     lua_setmetatable (L, -2);
   } else {
     lua_pop (L, 1);
@@ -66,26 +66,27 @@ L_mininim_video_bitmap (lua_State *L)
 int
 __gc (lua_State *L)
 {
-  ALLEGRO_BITMAP **b = lua_touserdata (L, 1);
-  destroy_bitmap (*b);
+  ALLEGRO_BITMAP **b = luaL_checkudata (L, 1, L_MININIM_VIDEO_BITMAP);
+  if (b) destroy_bitmap (*b);
   return 0;
 }
 
 int
 __eq (lua_State *L)
 {
-  ALLEGRO_BITMAP **b0 = lua_touserdata (L, 1);
-  ALLEGRO_BITMAP **b1 = lua_touserdata (L, 2);
-  lua_pushboolean (L, *b0 == *b1);
+  ALLEGRO_BITMAP **b0 = luaL_checkudata (L, 1, L_MININIM_VIDEO_BITMAP);
+  ALLEGRO_BITMAP **b1 = luaL_checkudata (L, 2, L_MININIM_VIDEO_BITMAP);
+  if (b0 && b1) lua_pushboolean (L, *b0 == *b1);
+  else lua_pushboolean (L, lua_rawequal (L, 1, 2));
   return 1;
 }
 
 int
 __tostring (lua_State *L)
 {
-  ALLEGRO_BITMAP *b = * (ALLEGRO_BITMAP **) lua_touserdata (L, 1);
-  lua_pushfstring (L, "mininim.video.bitmap %dx%d",
-                   al_get_bitmap_width (b),
-                   al_get_bitmap_height (b));
+  ALLEGRO_BITMAP **b = luaL_checkudata (L, 1, L_MININIM_VIDEO_BITMAP);
+  lua_pushfstring (L, L_MININIM_VIDEO_BITMAP " %dx%d",
+                   b ? al_get_bitmap_width (*b) : 0,
+                   b ? al_get_bitmap_height (*b) : 0);
   return 1;
 }

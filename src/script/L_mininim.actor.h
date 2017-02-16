@@ -21,6 +21,8 @@
 #ifndef MININIM_L_MININIM_ACTOR_H
 #define MININIM_L_MININIM_ACTOR_H
 
+#define L_MININIM_ACTOR L_MININIM ".actor"
+
 void define_L_mininim_actor (lua_State *L);
 int L_mininim_actor (lua_State *L);
 void L_pushactor (lua_State *L, int id);
