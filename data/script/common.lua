@@ -38,15 +38,15 @@ function resource_filename (P, filename)
 end
 
 function load_bitmap (P, filename)
-   return M.video.load (resource_filename (P, filename))
+   return M.video.bitmap (resource_filename (P, filename))
 end
 
 function load_sample (P, filename)
-   return M.audio.load (resource_filename (P, filename), "SAMPLE")
+   return M.audio.source (resource_filename (P, filename), "SAMPLE")
 end
 
 function load_stream (P, filename)
-   return M.audio.load (resource_filename (P, filename), "STREAM")
+   return M.audio.source (resource_filename (P, filename), "STREAM")
 end
 
 function opposite_direction (direction)

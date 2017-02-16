@@ -22,5 +22,7 @@
 #define MININIM_L_MININIM_ACTOR_H
 
 void define_L_mininim_actor (lua_State *L);
+int L_mininim_actor (lua_State *L);
+void L_pushactor (lua_State *L, int id);
 
 #endif	/* MININIM_L_MININIM_ACTOR_H */

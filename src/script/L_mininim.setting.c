@@ -20,17 +20,18 @@
 
 #include "mininim.h"
 
+static int __eq (lua_State *L);
 static int __index (lua_State *L);
 static int __newindex (lua_State *L);
+static int __tostring (lua_State *L);
 
 void
 define_L_mininim_setting (lua_State *L)
 {
   luaL_newmetatable(L, "mininim.setting");
 
-  lua_pushstring (L, "__tostring");
-  lua_pushstring (L, "mininim.setting");
-  lua_pushcclosure (L, L__tostring, 1);
+  lua_pushstring (L, "__eq");
+  lua_pushcfunction (L, __eq);
   lua_rawset (L, -3);
 
   lua_pushstring (L, "__index");
@@ -41,7 +42,18 @@ define_L_mininim_setting (lua_State *L)
   lua_pushcfunction (L, __newindex);
   lua_rawset (L, -3);
 
+  lua_pushstring (L, "__tostring");
+  lua_pushcfunction (L, __tostring);
+  lua_rawset (L, -3);
+
   lua_pop (L, 1);
+}
+
+int
+__eq (lua_State *L)
+{
+  lua_pushboolean (L, true);
+  return 1;
 }
 
 int
@@ -61,9 +73,12 @@ __index (lua_State *L)
     } else if (! strcasecmp (key, "env_mode")) {
       lua_pushstring (L, env_mode);
       return 1;
-    } else return L_error_invalid_key_string (L, key, "mininim.setting");
-  default: return L_error_invalid_key_type (L, type, "mininim.setting");
+    } else break;
+  default: break;
   }
+
+  lua_pushnil (L);
+  return 1;
 }
 
 int
@@ -75,17 +90,26 @@ __newindex (lua_State *L)
   case LUA_TSTRING:
     key = lua_tostring (L, 2);
     if (! strcasecmp (key, "audio_mode")) {
-      L_set_string_var (L, 3, "mininim.setting.audio_mode", &audio_mode);
+      L_set_string_var (L, 3, &audio_mode);
       return 0;
     } else if (! strcasecmp (key, "video_mode")) {
-      L_set_string_var (L, 3, "mininim.setting.video_mode", &video_mode);
+      L_set_string_var (L, 3, &video_mode);
       return 0;
     } else if (! strcasecmp (key, "env_mode")) {
-      L_set_string_var (L, 3, "mininim.setting.env_mode", &env_mode);
+      L_set_string_var (L, 3, &env_mode);
       return 0;
-    } else return L_error_invalid_key_string (L, key, "mininim.setting");
-  default: return L_error_invalid_key_type (L, type, "mininim.setting");
+    } else break;
+  default: break;
   }
+
+  return 0;
+}
+
+int
+__tostring (lua_State *L)
+{
+  lua_pushstring (L, "MININIM SETTINGS INTERFACE");
+  return 1;
 }
 
 void
@@ -96,9 +120,8 @@ set_string_var (char **var, const char *value)
 }
 
 void
-L_set_string_var (lua_State *L, int index, const char *name, char **var)
+L_set_string_var (lua_State *L, int index, char **var)
 {
   const char *value = lua_tostring (L, index);
   if (value) set_string_var (var, value);
-  else luaL_error (L, "%s must be a string", name);
 }

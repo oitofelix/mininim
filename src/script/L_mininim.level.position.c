@@ -20,18 +20,20 @@
 
 #include "mininim.h"
 
+static int __eq (lua_State *L);
 static int __index (lua_State *L);
 static int __newindex (lua_State *L);
+static int __tostring (lua_State *L);
+
 static int activate (lua_State *L);
 
 void
-define_L_mininim_level_con (lua_State *L)
+define_L_mininim_level_position (lua_State *L)
 {
-  luaL_newmetatable(L, "mininim.level[{?, ?, ?}]");
+  luaL_newmetatable(L, "mininim.level.position");
 
-  lua_pushstring (L, "__tostring");
-  lua_pushstring (L, "mininim.level[{?, ?, ?}]");
-  lua_pushcclosure (L, L__tostring, 1);
+  lua_pushstring (L, "__eq");
+  lua_pushcfunction (L, __eq);
   lua_rawset (L, -3);
 
   lua_pushstring (L, "__index");
@@ -42,14 +44,46 @@ define_L_mininim_level_con (lua_State *L)
   lua_pushcfunction (L, __newindex);
   lua_rawset (L, -3);
 
+  lua_pushstring (L, "__tostring");
+  lua_pushcfunction (L, __tostring);
+  lua_rawset (L, -3);
+
   lua_pop (L, 1);
+}
+
+void
+L_pushpos (lua_State *L, struct pos *p)
+{
+  struct pos *p_new = lua_newuserdata (L, sizeof (*p_new));
+  luaL_getmetatable (L, "mininim.level.position");
+  lua_setmetatable (L, -2);
+  *p_new = *p;
+}
+
+int
+L_mininim_level_position (lua_State *L)
+{
+  int room = luaL_checknumber (L, 1);
+  int floor = luaL_checknumber (L, 2);
+  int place = luaL_checknumber (L, 3);
+  struct pos p;
+  new_pos (&p, &global_level, room, floor, place);
+  L_pushpos (L, &p);
+  return 1;
+}
+
+int
+__eq (lua_State *L)
+{
+  struct pos *p0 = lua_touserdata (L, 1);
+  struct pos *p1 = lua_touserdata (L, 2);
+  lua_pushboolean (L, peq (p0, p1));
+  return 1;
 }
 
 int
 __index (lua_State *L)
 {
-  /* struct pos *p = L_check_type (L, 1, "mininim.level[{?, ?, ?}]"); */
-
   const char *key;
   int type = lua_type (L, 2);
   switch (type) {
@@ -59,24 +93,36 @@ __index (lua_State *L)
       lua_pushvalue (L, 1);
       lua_pushcclosure (L, activate, 1);
       return 1;
-    } else return L_error_invalid_key_string (L, key, "mininim.level[{?, ?, ?}]");
-  default: return L_error_invalid_key_type (L, type, "mininim.level[{?, ?, ?}]");
+    } else break;
+  default: break;
   }
+
+  lua_pushnil (L);
+  return 1;
 }
 
 int
 __newindex (lua_State *L)
 {
-  /* struct pos *p = L_check_type (L, 1, "mininim.level[{?, ?, ?}]"); */
-
   const char *key;
   int type = lua_type (L, 2);
   switch (type) {
   case LUA_TSTRING:
     key = lua_tostring (L, 2);
-    return L_error_invalid_key_string (L, key, "mininim.level[{?, ?, ?}]");
-  default: return L_error_invalid_key_type (L, type, "mininim.level[{?, ?, ?}]");
+    break;
+  default: break;
   }
+
+  return 0;
+}
+
+int
+__tostring (lua_State *L)
+{
+  struct pos *p = lua_touserdata (L, 1);
+  lua_pushfstring (L, "mininim.level.position (%d, %d, %d)",
+                   p->room, p->floor, p->place);
+  return 1;
 }
 
 int

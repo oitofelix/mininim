@@ -22,19 +22,18 @@
 
 static int audio_mode_ref = LUA_NOREF;
 
+static int __eq (lua_State *L);
 static int __index (lua_State *L);
 static int __newindex (lua_State *L);
-
-static int load (lua_State *L);
+static int __tostring (lua_State *L);
 
 void
 define_L_mininim_audio (lua_State *L)
 {
   luaL_newmetatable(L, "mininim.audio");
 
-  lua_pushstring (L, "__tostring");
-  lua_pushstring (L, "mininim.audio");
-  lua_pushcclosure (L, L__tostring, 1);
+  lua_pushstring (L, "__eq");
+  lua_pushcfunction (L, __eq);
   lua_rawset (L, -3);
 
   lua_pushstring (L, "__index");
@@ -45,82 +44,17 @@ define_L_mininim_audio (lua_State *L)
   lua_pushcfunction (L, __newindex);
   lua_rawset (L, -3);
 
+  lua_pushstring (L, "__tostring");
+  lua_pushcfunction (L, __tostring);
+  lua_rawset (L, -3);
+
   lua_newtable (L);
   L_set_registry (L, &audio_mode_ref);
 
   lua_pop (L, 1);
 
-  /* mininim.audio[?][?] */
-  define_L_mininim_audio_res (L);
-}
-
-int
-__index (lua_State *L)
-{
-  const char *key;
-  int type = lua_type (L, 2);
-  switch (type) {
-  case LUA_TSTRING:
-    key = lua_tostring (L, 2);
-    if (! strcasecmp (key, "load")) {
-      lua_pushcfunction (L, load);
-      return 1;
-    } if (! strcasecmp (key, "current")) {
-      assert (audio_mode);
-      L_get_registry (L, audio_mode_ref);
-      lua_pushstring (L, audio_mode);
-      lua_gettable (L, 1);
-      return 1;
-    } else {
-      L_get_registry (L, audio_mode_ref);
-      lua_replace (L, 1);
-      lua_gettable (L, 1);
-      return 1;
-    }
-  default: return L_error_invalid_key_type (L, type, "mininim.audio");
-  }
-}
-
-int
-__newindex (lua_State *L)
-{
-  const char *key;
-  int type = lua_type (L, 2);
-  switch (type) {
-  case LUA_TSTRING:
-    key = lua_tostring (L, 2);
-    if (! strcasecmp (key, "load")) {
-      return luaL_error (L, "mininim.audio.load is read-only");
-    } else if (! strcasecmp (key, "current")) {
-      L_set_string_var (L, 3, "mininim.audio.current", &audio_mode);
-      return 0;
-    } else {
-      L_get_registry (L, audio_mode_ref);
-      lua_replace (L, 1);
-      lua_settable (L, 1);
-      return 0;
-    }
-  default: return L_error_invalid_key_type (L, type, "mininim.audio");
-  }
-}
-
-int
-load (lua_State *L)
-{
-  const char *filename = luaL_checkstring (L, 1);
-  const char *type_str = luaL_checkstring (L, 2);
-
-  enum audio_type type = AUDIO_SAMPLE;
-  if (! strcasecmp (type_str, "SAMPLE")) type = AUDIO_SAMPLE;
-  else if (! strcasecmp (type_str, "STREAM")) type = AUDIO_STREAM;
-  else return luaL_argerror (L, 2, "must be either \"SAMPLE\" or \"STREAM\"");
-
-  struct audio_source *as = lua_newuserdata (L, sizeof (*as));
-  load_audio (as, type, filename);
-  luaL_getmetatable (L, "mininim.audio[?][?]");
-  lua_setmetatable (L, -2);
-
-  return 1;
+  /* mininim.audio.source */
+  define_L_mininim_audio_source (L);
 }
 
 void
@@ -146,11 +80,78 @@ L_play_audio (char *key, struct pos *p, int anim_id)
   lua_gettable (L, -2);
   lua_remove (L, -2);
 
-  struct audio_source *as = luaL_checkudata (L, -1, "mininim.audio[?][?]");
+  struct audio_source *as = luaL_checkudata (L, -1, "mininim.audio.source");
 
   lua_pop (L, 1);
 
   if (! as) return;
 
   play_audio (as, p, anim_id);
+}
+
+int
+__eq (lua_State *L)
+{
+  lua_pushboolean (L, true);
+  return 1;
+}
+
+int
+__index (lua_State *L)
+{
+  const char *key;
+  int type = lua_type (L, 2);
+  switch (type) {
+  case LUA_TSTRING:
+    key = lua_tostring (L, 2);
+    if (! strcasecmp (key, "source")) {
+      lua_pushcfunction (L, L_mininim_audio_source);
+      return 1;
+    } else if (! strcasecmp (key, "current")) {
+      assert (audio_mode);
+      L_get_registry (L, audio_mode_ref);
+      lua_pushstring (L, audio_mode);
+      lua_gettable (L, 1);
+      return 1;
+    } else {
+      L_get_registry (L, audio_mode_ref);
+      lua_replace (L, 1);
+      lua_gettable (L, 1);
+      return 1;
+    }
+  default: break;
+  }
+
+  lua_pushnil (L);
+  return 1;
+}
+
+int
+__newindex (lua_State *L)
+{
+  const char *key;
+  int type = lua_type (L, 2);
+  switch (type) {
+  case LUA_TSTRING:
+    key = lua_tostring (L, 2);
+    if (! strcasecmp (key, "current")) {
+      L_set_string_var (L, 3, &audio_mode);
+      return 0;
+    } else {
+      L_get_registry (L, audio_mode_ref);
+      lua_replace (L, 1);
+      lua_settable (L, 1);
+      return 0;
+    }
+  default: break;
+  }
+
+  return 0;
+}
+
+int
+__tostring (lua_State *L)
+{
+  lua_pushstring (L, "MININIM AUDIO INTERFACE");
+  return 1;
 }

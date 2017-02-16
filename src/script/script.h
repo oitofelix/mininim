@@ -26,10 +26,6 @@ void init_script (void);
 void finalize_script (void);
 
 void *L_check_type (lua_State *L, int index, const char *tname);
-int L_error_invalid_key_string (lua_State *L, const char *key,
-                                const char *tname);
-int L_error_invalid_key_type (lua_State *L, int type, const char *tname);
-int L__tostring (lua_State *L);
 bool L_call (lua_State *L, int nargs, int nresults, int errfunc);
 bool L_run_hook (lua_State *L);
 int L_set_registry (lua_State *L, int *r);

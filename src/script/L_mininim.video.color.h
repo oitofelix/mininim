@@ -1,5 +1,5 @@
 /*
-  L_mininim.video_res.c -- mininim.video[?][?] script module;
+  L_mininim.video.color.h -- mininim.video.color script module;
 
   Copyright (C) 2015, 2016, 2017 Bruno Félix Rezende Ribeiro
   <oitofelix@gnu.org>
@@ -18,31 +18,11 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "mininim.h"
+#ifndef MININIM_L_MININIM_VIDEO_COLOR_H
+#define MININIM_L_MININIM_VIDEO_COLOR_H
 
-static int __gc (lua_State *L);
+void L_pushcolor (lua_State *L, ALLEGRO_COLOR c);
+void define_L_mininim_video_color (lua_State *L);
+int L_mininim_video_color (lua_State *L);
 
-void
-define_L_mininim_video_res (lua_State *L)
-{
-  luaL_newmetatable(L, "mininim.video[?][?]");
-
-  lua_pushstring (L, "__tostring");
-  lua_pushstring (L, "mininim.video[?][?]");
-  lua_pushcclosure (L, L__tostring, 1);
-  lua_rawset (L, -3);
-
-  lua_pushstring (L, "__gc");
-  lua_pushcfunction (L, __gc);
-  lua_rawset (L, -3);
-
-  lua_pop (L, 1);
-}
-
-int
-__gc (lua_State *L)
-{
-  ALLEGRO_BITMAP **b = lua_touserdata (L, 1);
-  destroy_bitmap (*b);
-  return 0;
-}
+#endif	/* MININIM_L_MININIM_VIDEO_COLOR_H */

@@ -25,8 +25,8 @@ ALLEGRO_DISPLAY *display;
 ALLEGRO_BITMAP *uscreen, *iscreen;
 ALLEGRO_TIMER *video_timer;
 uint64_t bottom_text_timer;
-int screen_flags = 0;
-int potion_flags = 0;
+int screen_flags;
+int potion_flags;
 bool hgc;
 ALLEGRO_BITMAP *cutscene_screen;
 ALLEGRO_BITMAP *effect_buffer;
@@ -44,8 +44,11 @@ ALLEGRO_BITMAP *oitofelix_face_gray, *oitofelix_face_bw;
 static struct palette_cache {
   ALLEGRO_BITMAP *ib, *ob;
   palette pal;
-} *palette_cache = NULL;
-static size_t palette_cache_nmemb = 0;
+  double time;
+} *palette_cache;
+static size_t palette_cache_nmemb;
+static size_t palette_cache_size;
+ssize_t palette_cache_size_limit = 4 * 1024 * 1024;
 
 struct drawn_rectangle drawn_rectangle_stack[DRAWN_RECTANGLE_STACK_NMEMB_MAX];
 size_t drawn_rectangle_stack_nmemb;
@@ -356,6 +359,45 @@ compare_palette_caches (const void *pc0, const void *pc1)
   else return 0;
 }
 
+int
+compare_palette_caches_by_time (const void *pc0, const void *pc1)
+{
+  struct palette_cache *p0 = (struct palette_cache *) pc0;
+  struct palette_cache *p1 = (struct palette_cache *) pc1;
+
+  if (p0->time < p1->time) return -1;
+  else if (p0->time > p1->time) return 1;
+  else return 0;
+}
+
+void
+enforce_palette_cache_limit (ALLEGRO_BITMAP *b)
+{
+  if (palette_cache_size_limit < 0 || palette_cache_nmemb == 0) return;
+
+  size_t additional_size = al_get_pixel_size (ALLEGRO_PIXEL_FORMAT_ANY)
+    * al_get_bitmap_width (b) * al_get_bitmap_height (b);
+
+  if (palette_cache_size + additional_size > palette_cache_size_limit) {
+
+    qsort (palette_cache, palette_cache_nmemb, sizeof (*palette_cache),
+           compare_palette_caches_by_time);
+
+    while (palette_cache_size + additional_size > palette_cache_size_limit
+           && palette_cache_nmemb > 0) {
+      palette_cache_size -= al_get_pixel_size (ALLEGRO_PIXEL_FORMAT_ANY)
+        * al_get_bitmap_width (palette_cache[0].ob)
+        * al_get_bitmap_height (palette_cache[0].ob);
+      palette_cache =
+        remove_from_array (palette_cache, &palette_cache_nmemb, 0, 1,
+                           sizeof (*palette_cache));
+    }
+
+    qsort (palette_cache, palette_cache_nmemb, sizeof (*palette_cache),
+           compare_palette_caches);
+  }
+}
+
 ALLEGRO_BITMAP *
 apply_palette (ALLEGRO_BITMAP *bitmap, palette p)
 {
@@ -369,6 +411,8 @@ apply_palette_k (ALLEGRO_BITMAP *bitmap, palette p, const void *k)
 
   ALLEGRO_BITMAP *cached = get_cached_palette (bitmap, k);
   if (cached) return cached;
+
+  enforce_palette_cache_limit (bitmap);
 
   int x, y;
   ALLEGRO_BITMAP *rbitmap = clone_bitmap (bitmap);
@@ -385,6 +429,10 @@ apply_palette_k (ALLEGRO_BITMAP *bitmap, palette p, const void *k)
   pc.ib = bitmap;
   pc.pal = k;
   pc.ob = rbitmap;
+  pc.time = al_get_time ();
+
+  palette_cache_size += al_get_pixel_size (ALLEGRO_PIXEL_FORMAT_ANY)
+    * w * h;
 
   palette_cache =
     add_to_array (&pc, 1, palette_cache, &palette_cache_nmemb,

@@ -42,6 +42,8 @@
 #include <getopt.h>
 #include <signal.h>
 #include <wchar.h>
+#include <ctype.h>
+
 #include "error.h"
 #include "argp.h"
 #include "fnmatch.h"
@@ -68,6 +70,10 @@
 #include <lua.h>
 #include <lauxlib.h>
 #include <lualib.h>
+
+/* readline */
+#include <readline/readline.h>
+#include <readline/history.h>
 
 /* MININIM */
 #include "compatibility.h"
@@ -195,15 +201,16 @@
 #include "xstring.h"
 
 #include "script.h"
+#include "repl.h"
 #include "L_mininim.h"
 #include "L_mininim.level.h"
-#include "L_mininim.level_con.h"
+#include "L_mininim.level.position.h"
 #include "L_mininim.actor.h"
-#include "L_mininim.actor_N.h"
 #include "L_mininim.audio.h"
-#include "L_mininim.audio_res.h"
+#include "L_mininim.audio.source.h"
 #include "L_mininim.video.h"
-#include "L_mininim.video_res.h"
+#include "L_mininim.video.bitmap.h"
+#include "L_mininim.video.color.h"
 #include "L_mininim.setting.h"
 
 /* functions */

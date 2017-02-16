@@ -38,12 +38,13 @@ init_script (void)
 
   assert (L);
 
-  luaopen_base(L);
-  luaopen_table(L);
-  luaopen_io(L);
-  luaopen_string(L);
-  luaopen_math(L);
-  luaopen_debug(L);
+  luaopen_base (L);
+  luaopen_table (L);
+  luaopen_io (L);
+  luaopen_string (L);
+  luaopen_math (L);
+  luaopen_debug (L);
+  luaopen_loadlib (L);
 
   /* path */
   lua_settop (L, 0);
@@ -88,12 +89,25 @@ init_script (void)
     exit (-1);
   }
 
+  /* REPL */
   lua_settop (L, 0);
+  repl_mutex = al_create_mutex_recursive ();
+  al_lock_mutex (repl_mutex);
+  repl_L = lua_newthread (L);
+  L_set_registry (L, &repl_thread_ref);
+  repl_thread = al_create_thread (repl, repl_L);
+  al_start_thread (repl_thread);
 }
 
 void
 finalize_script (void)
 {
+  al_set_thread_should_stop (repl_thread);
+  al_unlock_mutex (repl_mutex);
+  al_join_thread (repl_thread, NULL);
+  al_destroy_thread (repl_thread);
+  repl_thread = NULL;
+  al_destroy_mutex (repl_mutex);
   lua_close (L);
 }
 
@@ -103,26 +117,6 @@ L_check_type (lua_State *L, int index, const char *tname)
   void *ud = luaL_checkudata (L, index, tname);
   if (! ud) luaL_error (L, "'%s' expected", tname);
   return ud;
-}
-
-int
-L_error_invalid_key_string (lua_State *L, const char *key, const char *tname)
-{
-  return luaL_error (L, "\"%s\" is not a valid key for '%s'", key, tname);
-}
-
-int
-L_error_invalid_key_type (lua_State *L, int type, const char *tname)
-{
-  return luaL_error (L, "invalid key type '%s' for '%s'",
-                     lua_typename (L, type), tname);
-}
-
-int
-L__tostring (lua_State *L)
-{
-  lua_pushvalue (L, lua_upvalueindex (1));
-  return 1;
 }
 
 bool
@@ -138,7 +132,7 @@ L_call (lua_State *L, int nargs, int nresults, int errfunc)
 bool
 L_run_hook (lua_State *L)
 {
-  if (! lua_isnil (L, -1)) return L_call (L, 0, 0, 0);
+  if (lua_isfunction (L, -1)) return L_call (L, 0, 0, 0);
   else {
     lua_pop (L, 1);
     return true;

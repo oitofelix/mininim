@@ -132,6 +132,7 @@ extern int display_mode;
 extern bool ignore_clipping_rectangle_intersection;
 extern bool about_screen;
 extern ALLEGRO_BITMAP *oitofelix_face_gray, *oitofelix_face_bw;
+extern ssize_t palette_cache_size_limit;
 
 struct drawn_rectangle drawn_rectangle_stack[DRAWN_RECTANGLE_STACK_NMEMB_MAX];
 size_t drawn_rectangle_stack_nmemb;

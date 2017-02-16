@@ -22,14 +22,13 @@
 local M = mininim
 
 -- called during loading screen for loading assets
-function M.load_assets_hook ()
+function M.load_hook ()
    -- video modes
    require "vga/vga".load ()
    require "ega/ega".load ()
    require "cga/cga".load ()
 
    -- audio modes
-   M.setting.audio_mode = "SBLAST"
    require "sblast/sblast".load ()
 
    -- special events

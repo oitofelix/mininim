@@ -23,19 +23,18 @@
 static int level_start_hook_ref = LUA_NOREF;
 static int level_cycle_hook_ref = LUA_NOREF;
 
+static int __eq (lua_State *L);
 static int __index (lua_State *L);
 static int __newindex (lua_State *L);
-
-static bool L_is_valid_pos (lua_State *L, int index, struct pos *p);
+static int __tostring (lua_State *L);
 
 void
 define_L_mininim_level (lua_State *L)
 {
   luaL_newmetatable (L, "mininim.level");
 
-  lua_pushstring (L, "__tostring");
-  lua_pushstring (L, "mininim.level");
-  lua_pushcclosure (L, L__tostring, 1);
+  lua_pushstring (L, "__eq");
+  lua_pushcfunction (L, __eq);
   lua_rawset (L, -3);
 
   lua_pushstring (L, "__index");
@@ -46,10 +45,14 @@ define_L_mininim_level (lua_State *L)
   lua_pushcfunction (L, __newindex);
   lua_rawset (L, -3);
 
+  lua_pushstring (L, "__tostring");
+  lua_pushcfunction (L, __tostring);
+  lua_rawset (L, -3);
+
   lua_pop (L, 1);
 
-  /* mininim.level[{?, ?, ?}] */
-  define_L_mininim_level_con (L);
+  /* mininim.level.position */
+  define_L_mininim_level_position (L);
 }
 
 void
@@ -66,60 +69,16 @@ run_level_cycle_hook (void)
   L_run_hook (L);
 }
 
-bool
-L_is_valid_pos (lua_State *L, int index, struct pos *p)
+int
+__eq (lua_State *L)
 {
-  /* check room */
-  lua_rawgeti (L, index, 1);
-  if (! lua_isnumber (L, -1)) goto invalid;
-  lua_Number room = lua_tonumber (L, -1);
-  if (room <= 0) goto invalid;
-  lua_pop (L, 1);
-
-  /* check floor */
-  lua_rawgeti (L, index, 2);
-  if (! lua_isnumber (L, -1)) goto invalid;
-  lua_Number floor = lua_tonumber (L, -1);
-  lua_pop (L, 1);
-
-  /* check place */
-  lua_rawgeti (L, index, 3);
-  if (! lua_isnumber (L, -1)) goto invalid;
-  lua_Number place = lua_tonumber (L, -1);
-  lua_pop (L, 1);
-
-  if (p) new_pos (p, &global_level, room, floor, place);
-
-  return true;
-
- invalid:
-  lua_pop (L, 1);
-  return false;
-}
-
-void
-L_push_pos (lua_State *L, struct pos *p)
-{
-  lua_newtable (L);
-
-  /* room */
-  lua_pushnumber (L, p->room);
-  lua_rawseti (L, -2, 1);
-
-  /* floor */
-  lua_pushnumber (L, p->floor);
-  lua_rawseti (L, -2, 1);
-
-  /* place */
-  lua_pushnumber (L, p->place);
-  lua_rawseti (L, -2, 1);
+  lua_pushboolean (L, true);
+  return 1;
 }
 
 int
 __index (lua_State *L)
 {
-  struct pos p;
-
   const char *key;
   int type = lua_type (L, 2);
   switch (type) {
@@ -134,20 +93,19 @@ __index (lua_State *L)
     } else if (! strcasecmp (key, "cycle_hook")) {
       L_get_registry (L, level_cycle_hook_ref);
       return 1;
+    } else if (! strcasecmp (key, "position")) {
+      lua_pushcfunction (L, L_mininim_level_position);
+      return 1;
     } else if (! strcasecmp (key, "retry")) {
       lua_pushboolean (L, retry_level == global_level.n
                        && replay_mode == NO_REPLAY);
       return 1;
-    } else return L_error_invalid_key_string (L, key, "mininim.level");
-  case LUA_TTABLE:
-    if (! L_is_valid_pos (L, 2, &p)) return luaL_error (L, "invalid position");
-    struct pos *ud = lua_newuserdata (L, sizeof (*ud));
-    luaL_getmetatable (L, "mininim.level[{?, ?, ?}]");
-    lua_setmetatable (L, -2);
-    *ud = p;
-    return 1;
-  default: return L_error_invalid_key_type (L, type, "mininim.level");
+    } else break;
+  default: break;
   }
+
+  lua_pushnil (L);
+  return 1;
 }
 
 int
@@ -158,21 +116,22 @@ __newindex (lua_State *L)
   switch (type) {
   case LUA_TSTRING:
     key = lua_tostring (L, 2);
-    if (! strcasecmp (key, "number"))
-      return luaL_error (L, "mininim.level.number is read-only");
-    else if (! strcasecmp (key, "start_hook")) {
-      if (lua_isfunction (L, -1))
-        L_set_registry (L, &level_start_hook_ref);
-      else
-        return luaL_error (L, "mininim.level.start_hook must be a function");
+    if (! strcasecmp (key, "start_hook")) {
+      L_set_registry (L, &level_start_hook_ref);
       return 0;
     } else if (! strcasecmp (key, "cycle_hook")) {
-      if (lua_isfunction (L, -1))
-        L_set_registry (L, &level_cycle_hook_ref);
-      else
-        return luaL_error (L, "mininim.level.cycle_hook must be a function");
+      L_set_registry (L, &level_cycle_hook_ref);
       return 0;
-    } else return L_error_invalid_key_string (L, key, "mininim.level");
-  default: return L_error_invalid_key_type (L, type, "mininim.level");
+    } else break;
+  default: break;
   }
+
+  return 0;
+}
+
+int
+__tostring (lua_State *L)
+{
+  lua_pushfstring (L, "MININIM LEVEL %d", global_level.n);
+  return 1;
 }

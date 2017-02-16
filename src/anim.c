@@ -60,7 +60,9 @@ play_anim (void (*draw_callback) (void),
   joystick_button = -1;
 
   while (! quit_anim) {
+    al_unlock_mutex (repl_mutex);
     al_wait_for_event (event_queue, &event);
+    al_lock_mutex (repl_mutex);
 
     switch (event.type) {
     case ALLEGRO_EVENT_TIMER:

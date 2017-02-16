@@ -20,59 +20,233 @@
 
 #include "mininim.h"
 
+static const char *direction_string (enum dir d);
+static enum dir direction_value (const char *d);
+
+static const char *type_string (enum anim_type type);
+static enum anim_type type_value (const char *type);
+
+static const char *action_string (ACTION action);
+static ACTION action_value (const char *action, enum anim_type type);
+
+static int __eq (lua_State *L);
 static int __index (lua_State *L);
-static int new (lua_State *L);
+static int __newindex (lua_State *L);
+static int __tostring (lua_State *L);
 
 void
 define_L_mininim_actor (lua_State *L)
 {
   luaL_newmetatable(L, "mininim.actor");
 
-  lua_pushstring (L, "__tostring");
-  lua_pushstring (L, "mininim.actor");
-  lua_pushcclosure (L, L__tostring, 1);
+  lua_pushstring (L, "__eq");
+  lua_pushcfunction (L, __eq);
   lua_rawset (L, -3);
 
   lua_pushstring (L, "__index");
   lua_pushcfunction (L, __index);
   lua_rawset (L, -3);
 
-  lua_pop (L, 1);
+  lua_pushstring (L, "__newindex");
+  lua_pushcfunction (L, __newindex);
+  lua_rawset (L, -3);
 
-  /* mininim.actor[?] */
-  define_L_mininim_actor_N (L);
+  lua_pushstring (L, "__tostring");
+  lua_pushcfunction (L, __tostring);
+  lua_rawset (L, -3);
+
+  lua_pop (L, 1);
 }
 
+void
+L_pushactor (lua_State *L, int id)
+{
+  int *id_new = lua_newuserdata (L, sizeof (id_new));
+  luaL_getmetatable (L, "mininim.actor");
+  lua_setmetatable (L, -2);
+  *id_new = id;
+}
+
+int
+L_mininim_actor (lua_State *L)
+{
+  int id = luaL_checknumber (L, 1);
+  L_pushactor (L, id);
+  return 1;
+}
+
+const char *
+direction_string (enum dir dir)
+{
+  switch (dir) {
+  case LEFT: return "LEFT";
+  case RIGHT: return "RIGHT";
+  default: assert (0); return NULL;
+  }
+}
+
+enum dir
+direction_value (const char *dir)
+{
+  if (! strcasecmp (dir, "LEFT")) return LEFT;
+  else if (! strcasecmp (dir, "RIGHT")) return RIGHT;
+  else return INVALID;
+}
+
+const char *
+type_string (enum anim_type type)
+{
+  switch (type) {
+  case NO_ANIM: return "NONE";
+  case KID: return "KID";
+  case SHADOW: return "SHADOW";
+  case GUARD: return "GUARD";
+  case FAT_GUARD: return "FAT GUARD";
+  case SKELETON: return "SKELETON";
+  case VIZIER: return "VIZIER";
+  case PRINCESS: return "PRINCESS";
+  case MOUSE: return "MOUSE";
+  default: assert (0); return NULL;
+  }
+}
+
+enum anim_type
+type_value (const char *type)
+{
+  if (! strcasecmp (type, "NONE")) return NO_ANIM;
+  else if (! strcasecmp (type, "KID")) return KID;
+  else if (! strcasecmp (type, "SHADOW")) return SHADOW;
+  else if (! strcasecmp (type, "GUARD")) return GUARD;
+  else if (! strcasecmp (type, "FAT GUARD")) return FAT_GUARD;
+  else if (! strcasecmp (type, "SKELETON")) return SKELETON;
+  else if (! strcasecmp (type, "VIZIER")) return VIZIER;
+  else if (! strcasecmp (type, "PRINCESS")) return PRINCESS;
+  else if (! strcasecmp (type, "MOUSE")) return MOUSE;
+  else return INVALID;
+}
+
+const char *
+action_string (ACTION action)
+{
+  if (action == kid_turn) return "TURN";
+  else if (action == princess_turn) return "TURN";
+  else if (action == kid_run) return "RUN";
+  else if (action == mouse_run) return "RUN";
+  else return "UNKNOWN";
+}
+
+ACTION
+action_value (const char *action, enum anim_type type)
+{
+  if (! strcasecmp (action, "TURN")) {
+    switch (type) {
+    case KID: return kid_turn;
+    case PRINCESS: return princess_turn;
+    default: return NULL;
+    }
+  } else if (! strcasecmp (action, "RUN")) {
+    switch (type) {
+    case KID: return kid_run;
+    case MOUSE: return mouse_run;
+    default: return NULL;
+    }
+  } else return NULL;
+}
+
+int
+__eq (lua_State *L)
+{
+  int id0 = * (int *) lua_touserdata (L, 1);
+  int id1 = * (int *) lua_touserdata (L, 2);
+  lua_pushboolean (L, id0 == id1);
+  return 1;
+}
 
 int
 __index (lua_State *L)
 {
+  int id = * (int *) lua_touserdata (L, 1);
+
+  struct anim *a = get_anim_by_id (id);
+  if (! a) {
+    lua_pushnil (L);
+    return 1;
+  }
+
   const char *key;
-  int index;
   int type = lua_type (L, 2);
   switch (type) {
-  case LUA_TNUMBER:
-    index = lua_tonumber (L, 2);
-    if (index >= anima_nmemb)
-      return luaL_error (L, "mininim.actor[%d] does not exist", index);
-    int *ud = lua_newuserdata (L, sizeof (*ud));
-    luaL_getmetatable (L, "mininim.actor[?]");
-    lua_setmetatable (L, -2);
-    *ud = index;
-    return 1;
   case LUA_TSTRING:
     key = lua_tostring (L, 2);
-    if (! strcasecmp (key, "new")) {
-      lua_pushcfunction (L, new);
+    if (! strcasecmp (key, "id")) {
+      lua_pushnumber (L, id);
       return 1;
-    }
-    else return L_error_invalid_key_string (L, key, "mininim.actor");
-  default: return L_error_invalid_key_type (L, type, "mininim.actor");
+    } else if (! strcasecmp (key, "direction")) {
+      lua_pushstring (L, direction_string (a->f.dir));
+      return 1;
+    } else if (! strcasecmp (key, "type")) {
+      lua_pushstring (L, type_string (a->type));
+      return 1;
+    } else if (! strcasecmp (key, "action")) {
+      lua_pushstring (L, action_string (a->action));
+      return 1;
+    } else if (! strcasecmp (key, "delayed_stand_up")) {
+      lua_pushboolean (L, a->uncouch_slowly);
+      return 1;
+    } else break;
+  default: break;
   }
+
+  lua_pushnil (L);
+  return 1;
 }
 
 int
-new (lua_State *L)
+__newindex (lua_State *L)
 {
+  int id = * (int *) lua_touserdata (L, 1);
+
+  struct anim *a = get_anim_by_id (id);
+  if (! a) return 0;
+
+  const char *key;
+  int type = lua_type (L, 2);
+  switch (type) {
+  case LUA_TSTRING:
+    key = lua_tostring (L, 2);
+    if (! strcasecmp (key, "direction")) {
+      if (! lua_isstring (L, 3)) return 0;
+      enum dir dir = direction_value (lua_tostring (L, 3));
+      if (invalid (dir)) return 0;
+      else if (dir != a->f.dir) invert_frame_dir (&a->f, &a->f);
+      return 0;
+    } else if (! strcasecmp (key, "type")) {
+      if (! lua_isstring (L, 3)) return 0;
+      enum anim_type type = type_value (lua_tostring (L, 3));
+      if (invalid (type)) return 0;
+      if (!id) return 0;
+      a->type = type;
+      return 0;
+    } else if (! strcasecmp (key, "action")) {
+      if (! lua_isstring (L, 3)) return 0;
+      ACTION action = action_value (lua_tostring (L, 3), a->type);
+      if (! action) return 0;
+      a->next_action = action;
+      return 0;
+    } else if (! strcasecmp (key, "delayed_stand_up")) {
+      a->uncouch_slowly = lua_toboolean (L, 3);
+      return 0;
+    } else break;
+  default: break;
+  }
+
   return 0;
+}
+
+int
+__tostring (lua_State *L)
+{
+  int id = * (int *) lua_touserdata (L, 1);
+  lua_pushfstring (L, "mininim.actor (%d)", id);
+  return 1;
 }

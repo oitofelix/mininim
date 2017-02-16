@@ -23,6 +23,6 @@
 
 void define_L_mininim_setting (lua_State *L);
 void set_string_var (char **var, const char *value);
-void L_set_string_var (lua_State *L, int index, const char *name, char **var);
+void L_set_string_var (lua_State *L, int index, char **var);
 
 #endif	/* MININIM_L_MININIM_SETTING_H */

@@ -81,7 +81,7 @@ struct message_box about_dialog = {
   .title = "About",
   .heading = "MININIM " VERSION,
   .text =
-  "Copyright (C) " PACKAGE_COPYRIGHT_HOLDER " <oitofelix@gnu.org>\n\n"
+  "Copyright (C) 2015-2017 " PACKAGE_COPYRIGHT_HOLDER "\n\n"
 
   "MININIM is free software under GPLv3+.\n"
   "You are free to change and redistribute it.\n"
@@ -1437,7 +1437,7 @@ main (int _argc, char **_argv)
   init_script ();
 
   /* load assets */
-  run_load_assets_hook ();
+  run_load_hook ();
 
   load_icons ();
   load_oitofelix_face ();

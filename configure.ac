@@ -265,10 +265,11 @@ AC_SUBST([mingw_ldadd])
 ### Check for Lua
 ######
 
-AX_PROG_LUA([5.0], [], [], AC_MSG_ERROR([MININIM requires Lua 5.0 (or superior)]))
+AX_PROG_LUA([5.0], [5.1], [],
+  AC_MSG_ERROR([MININIM requires Lua 5.0 (or superior)]))
 AX_LUA_HEADERS(, AC_MSG_ERROR([MININIM requires Lua headers]))
 AX_LUA_LIBS(, AC_MSG_ERROR([MININIM requires Lua libraries]))
-dnl AX_LUA_READLINE(, AC_MSG_ERROR([MININIM requires GNU Readline]))
+AX_LUA_READLINE(, AC_MSG_ERROR([MININIM requires GNU Readline]))
 
 
 

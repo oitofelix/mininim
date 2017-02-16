@@ -25,13 +25,14 @@ local P = {packge_type = "SPECIAL EVENTS", package_name = "LEGACY",
 -- imports
 local M = mininim
 local common = require "script/common"
+local pos = M.level.position
 
 -- body
 setfenv (1, P)
 
 -- level 1
 local function level_01_cycle_hook ()
-   local kid = M.actor[0]
+   local kid = M.actor (0)
 
    if (M.cycle == 12 and not M.level.retry) then
       M.audio.current["SUSPENSE"].play ()
@@ -41,7 +42,7 @@ end
 -- executed before the first animation cycle of each level
 function start_hook ()
    local level = M.level.number
-   local kid = M.actor[0]
+   local kid = M.actor (0)
 
    -- make kid turn appropriately
    if level == 13 then
@@ -58,7 +59,7 @@ function start_hook ()
    if level == 1 then
       -- activate tile (originally closes opened door in starting
       -- room)
-      M.level[{5, 0, 2}].activate ()
+      pos (5, 0, 2).activate ()
 
       -- if not retrying the level, get up slowly
       if not M.level.retry then

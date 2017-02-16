@@ -1,5 +1,5 @@
 /*
-  L_mininim.video_res.h -- mininim.video[?][?] script module;
+  L_mininim.audio_res.h -- mininim.audio[?][?] script module;
 
   Copyright (C) 2015, 2016, 2017 Bruno Félix Rezende Ribeiro
   <oitofelix@gnu.org>
@@ -18,9 +18,11 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MININIM_L_MININIM_VIDEO_RES_H
-#define MININIM_L_MININIM_VIDEO_RES_H
+#ifndef MININIM_L_MININIM_AUDIO_RES_H
+#define MININIM_L_MININIM_AUDIO_RES_H
 
-void define_L_mininim_video_res (lua_State *L);
+void L_pushaudiosource (lua_State *L, struct audio_source *as);
+void define_L_mininim_audio_source (lua_State *L);
+int L_mininim_audio_source (lua_State *L);
 
-#endif	/* MININIM_L_MININIM_VIDEO_RES_H */
+#endif	/* MININIM_L_MININIM_AUDIO_RES_H */

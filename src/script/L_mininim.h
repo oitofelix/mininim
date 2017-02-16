@@ -22,6 +22,6 @@
 #define MININIM_L_MININIM_H
 
 void define_L_mininim (lua_State *L);
-void run_load_assets_hook (void);
+void run_load_hook (void);
 
 #endif	/* MININIM_L_MININIM_H */

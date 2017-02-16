@@ -20,19 +20,20 @@
 
 #include "mininim.h"
 
-static int load_assets_hook_ref = LUA_NOREF;
+static int load_hook_ref = LUA_NOREF;
 
+static int __eq (lua_State *L);
 static int __index (lua_State *L);
 static int __newindex (lua_State *L);
+static int __tostring (lua_State *L);
 
 void
 define_L_mininim (lua_State *L)
 {
   luaL_newmetatable(L, "mininim");
 
-  lua_pushstring (L, "__tostring");
-  lua_pushstring (L, "mininim");
-  lua_pushcclosure (L, L__tostring, 1);
+  lua_pushstring (L, "__eq");
+  lua_pushcfunction (L, __eq);
   lua_rawset (L, -3);
 
   lua_pushstring (L, "__index");
@@ -41,6 +42,10 @@ define_L_mininim (lua_State *L)
 
   lua_pushstring (L, "__newindex");
   lua_pushcfunction (L, __newindex);
+  lua_rawset (L, -3);
+
+  lua_pushstring (L, "__tostring");
+  lua_pushcfunction (L, __tostring);
   lua_rawset (L, -3);
 
   lua_pop (L, 1);
@@ -62,10 +67,17 @@ define_L_mininim (lua_State *L)
 }
 
 void
-run_load_assets_hook (void)
+run_load_hook (void)
 {
-  L_get_registry (L, load_assets_hook_ref);
+  L_get_registry (L, load_hook_ref);
   L_run_hook (L);
+}
+
+int
+__eq (lua_State *L)
+{
+  lua_pushboolean (L, true);
+  return 1;
 }
 
 int
@@ -85,14 +97,14 @@ __index (lua_State *L)
     } else if (! strcasecmp (key, "place_height")) {
       lua_pushnumber (L, PLACE_HEIGHT);
       return 1;
-    } else if (! strcasecmp (key, "load_assets_hook")) {
-      L_get_registry (L, load_assets_hook_ref);
+    } else if (! strcasecmp (key, "load_hook")) {
+      L_get_registry (L, load_hook_ref);
       return 1;
     } else if (! strcasecmp (key, "level")) {
       L_push_interface (L, "mininim.level");
       return 1;
     } else if (! strcasecmp (key, "actor")) {
-      L_push_interface (L, "mininim.actor");
+      lua_pushcfunction (L, L_mininim_actor);
       return 1;
     } else if (! strcasecmp (key, "audio")) {
       L_push_interface (L, "mininim.audio");
@@ -103,9 +115,12 @@ __index (lua_State *L)
     } else if (! strcasecmp (key, "setting")) {
       L_push_interface (L, "mininim.setting");
       return 1;
-    } else return L_error_invalid_key_string (L, key, "mininim");
-  default: return L_error_invalid_key_type (L, type, "mininim");
+    } else break;
+  default: break;
   }
+
+  lua_pushnil (L);
+  return 1;
 }
 
 int
@@ -116,13 +131,19 @@ __newindex (lua_State *L)
   switch (type) {
   case LUA_TSTRING:
     key = lua_tostring (L, 2);
-    if (! strcasecmp (key, "load_assets_hook")) {
-      if (lua_isfunction (L, -1))
-        L_set_registry (L, &load_assets_hook_ref);
-      else
-        return luaL_error (L, "mininim.load_assets_hook must be a function");
+    if (! strcasecmp (key, "load_hook")) {
+      L_set_registry (L, &load_hook_ref);
       return 0;
-    } else return L_error_invalid_key_string (L, key, "mininim");
-  default: return L_error_invalid_key_type (L, type, "mininim");
+    } else break;
+  default: break;
   }
+
+  return 0;
+}
+
+int
+__tostring (lua_State *L)
+{
+  lua_pushfstring (L, "MININIM %s", VERSION);
+  return 1;
 }

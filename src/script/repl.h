@@ -1,5 +1,5 @@
 /*
-  L_mininim.audio_res.h -- mininim.audio[?][?] script module;
+  repl.h -- Lua REPL module;
 
   Copyright (C) 2015, 2016, 2017 Bruno Félix Rezende Ribeiro
   <oitofelix@gnu.org>
@@ -18,9 +18,16 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MININIM_L_MININIM_AUDIO_RES_H
-#define MININIM_L_MININIM_AUDIO_RES_H
+#ifndef MININIM_XLUA_H
+#define MININIM_XLUA_H
 
-void define_L_mininim_audio_res (lua_State *L);
+/* functions */
+void *repl (ALLEGRO_THREAD *thread, void *repl_L);
 
-#endif	/* MININIM_L_MININIM_AUDIO_RES_H */
+/* variables */
+extern ALLEGRO_MUTEX *repl_mutex;
+extern ALLEGRO_THREAD *repl_thread;
+extern lua_State *repl_L;
+extern int repl_thread_ref;
+
+#endif	/* MININIM_XLUA_H */

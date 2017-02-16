@@ -100,17 +100,20 @@ mininim_SOURCES = src/mininim.c src/mininim.h src/compatibility.h			\
   src/kernel/xmath.h src/kernel/xstring.c src/kernel/xstring.h				\
   src/bmenu.c src/bmenu.h src/editor.c src/editor.h src/debug.c				\
   src/debug.h src/undo.c src/undo.h src/multi-room.c src/multi-room.h	\
-  src/box.c src/box.h src/replay.c src/replay.h src/script/script.c		\
-  src/script/script.h src/script/L_mininim.c src/script/L_mininim.h		\
+  src/box.c src/box.h src/replay.c src/replay.h src/script/repl.c			\
+  src/script/repl.h src/script/script.c src/script/script.h						\
+  src/script/L_mininim.c src/script/L_mininim.h												\
   src/script/L_mininim.level.c src/script/L_mininim.level.h						\
-  src/script/L_mininim.level_con.c src/script/L_mininim.level_con.h		\
-  src/script/L_mininim.actor.c src/script/L_mininim.actor.h						\
-  src/script/L_mininim.actor_N.c src/script/L_mininim.actor_N.h				\
-  src/script/L_mininim.audio.c src/script/L_mininim.audio.h						\
-  src/script/L_mininim.audio_res.c src/script/L_mininim.audio_res.h		\
-  src/script/L_mininim.video.c src/script/L_mininim.video.h						\
-  src/script/L_mininim.video_res.c src/script/L_mininim.video_res.h		\
-  src/script/L_mininim.setting.c src/script/L_mininim.setting.h
+  src/script/L_mininim.level.position.c																\
+  src/script/L_mininim.level.position.h src/script/L_mininim.actor.c	\
+  src/script/L_mininim.actor.h src/script/L_mininim.audio.c						\
+  src/script/L_mininim.audio.h src/script/L_mininim.audio.source.c		\
+  src/script/L_mininim.audio.source.h src/script/L_mininim.video.c		\
+  src/script/L_mininim.video.h src/script/L_mininim.video.bitmap.c		\
+  src/script/L_mininim.video.bitmap.h																	\
+  src/script/L_mininim.video.color.c																	\
+  src/script/L_mininim.video.color.h src/script/L_mininim.setting.c		\
+  src/script/L_mininim.setting.h
 
 ${mininim_OBJECTS}: ${top_builddir}/src/mininim.h.gch
 
@@ -147,7 +150,7 @@ if PROFILING
  CFLAGS += -O0 -pg --coverage
 endif
 
-LIBS = -lm ${ALLEGRO_LIBS} ${ALLEGRO_IMAGE_LIBS}										\
+LIBS = -lm -ldl -lreadline ${ALLEGRO_LIBS} ${ALLEGRO_IMAGE_LIBS}		\
   ${ALLEGRO_AUDIO_LIBS} ${ALLEGRO_ACODEC_LIBS} ${ALLEGRO_FONT_LIBS}	\
   ${ALLEGRO_PRIMITIVES_LIBS} ${ALLEGRO_MAIN_LIBS}										\
   ${ALLEGRO_DIALOG_LIBS} ${ALLEGRO_COLOR_LIBS} ${mingw_ldadd}				\

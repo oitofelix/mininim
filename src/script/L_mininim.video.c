@@ -22,18 +22,13 @@
 
 static int video_mode_ref = LUA_NOREF;
 
+static int __eq (lua_State *L);
 static int __index (lua_State *L);
 static int __newindex (lua_State *L);
-
-static int color (lua_State *L);
-static int __color_eq (lua_State *L);
-static void L_push_color (lua_State *L, ALLEGRO_COLOR c);
-static ALLEGRO_COLOR L_tocolor (lua_State *L, int index);
+static int __tostring (lua_State *L);
 
 static void L_push_palette (lua_State *L, char *palette_name);
 static ALLEGRO_COLOR L_palette (ALLEGRO_COLOR c);
-
-static int load (lua_State *L);
 
 static bool L_get_base_property (lua_State *L, char *object);
 static bool L_get_bitmap_property (lua_State *L, char *object, int index,
@@ -45,9 +40,8 @@ define_L_mininim_video (lua_State *L)
   /* mininim.video */
   luaL_newmetatable(L, "mininim.video");
 
-  lua_pushstring (L, "__tostring");
-  lua_pushstring (L, "mininim.video");
-  lua_pushcclosure (L, L__tostring, 1);
+  lua_pushstring (L, "__eq");
+  lua_pushcfunction (L, __eq);
   lua_rawset (L, -3);
 
   lua_pushstring (L, "__index");
@@ -58,23 +52,28 @@ define_L_mininim_video (lua_State *L)
   lua_pushcfunction (L, __newindex);
   lua_rawset (L, -3);
 
+  lua_pushstring (L, "__tostring");
+  lua_pushcfunction (L, __tostring);
+  lua_rawset (L, -3);
+
   lua_pop (L, 1);
 
   /* video mode table */
   lua_newtable (L);
   L_set_registry (L, &video_mode_ref);
 
+  /* mininim.video.bitmap */
+  define_L_mininim_video_bitmap (L);
+
   /* mininim.video.color */
-  luaL_newmetatable(L, "mininim.video.color");
+  define_L_mininim_video_color (L);
+}
 
-  lua_pushstring (L, "__eq");
-  lua_pushcfunction (L, __color_eq);
-  lua_rawset (L, -3);
-
-  lua_pop (L, 1);
-
-  /* mininim.video[?][?] */
-  define_L_mininim_video_res (L);
+int
+__eq (lua_State *L)
+{
+  lua_pushboolean (L, true);
+  return 1;
 }
 
 int
@@ -85,11 +84,14 @@ __index (lua_State *L)
   switch (type) {
   case LUA_TSTRING:
     key = lua_tostring (L, 2);
-    if (! strcasecmp (key, "load")) {
-      lua_pushcfunction (L, load);
+    if (! strcasecmp (key, "bitmap")) {
+      lua_pushcfunction (L, L_mininim_video_bitmap);
       return 1;
     } else if (! strcasecmp (key, "color")) {
-      lua_pushcfunction (L, color);
+      lua_pushcfunction (L, L_mininim_video_color);
+      return 1;
+    } else if (! strcasecmp (key, "palette_cache_size_limit")) {
+      lua_pushnumber (L, palette_cache_size_limit);
       return 1;
     } else if (! strcasecmp (key, "current")) {
       assert (video_mode);
@@ -103,8 +105,11 @@ __index (lua_State *L)
       lua_gettable (L, 1);
       return 1;
     }
-  default: return L_error_invalid_key_type (L, type, "mininim.video");
+  default: break;
   }
+
+  lua_pushnil (L);
+  return 1;
 }
 
 int
@@ -115,10 +120,8 @@ __newindex (lua_State *L)
   switch (type) {
   case LUA_TSTRING:
     key = lua_tostring (L, 2);
-    if (! strcasecmp (key, "load")) {
-      return luaL_error (L, "mininim.video.load is read-only");
-    } else if (! strcasecmp (key, "current")) {
-      L_set_string_var (L, 3, "mininim.video.current", &video_mode);
+    if (! strcasecmp (key, "current")) {
+      L_set_string_var (L, 3, &video_mode);
       return 0;
     } else {
       L_get_registry (L, video_mode_ref);
@@ -126,26 +129,16 @@ __newindex (lua_State *L)
       lua_settable (L, 1);
       return 0;
     }
-  default: return L_error_invalid_key_type (L, type, "mininim.video");
+  default: break;
   }
+
+  return 0;
 }
 
 int
-load (lua_State *L)
+__tostring (lua_State *L)
 {
-  const char *filename = luaL_checkstring (L, 1);
-
-  ALLEGRO_BITMAP **b = lua_newuserdata (L, sizeof (*b));
-  *b = load_bitmap (filename);
-
-  if (*b) {
-    luaL_getmetatable (L, "mininim.video[?][?]");
-    lua_setmetatable (L, -2);
-  } else {
-    lua_pop (L, 1);
-    lua_pushnil (L);
-  }
-
+  lua_pushstring (L, "MININIM VIDEO INTERFACE");
   return 1;
 }
 
@@ -220,7 +213,7 @@ ALLEGRO_BITMAP *
 L_bitmap (lua_State *L, char *object, int index)
 {
   if (! L_get_bitmap_property (L, object, index, "bitmap")) return NULL;
-  ALLEGRO_BITMAP **b = luaL_checkudata (L, -1, "mininim.video[?][?]");
+  ALLEGRO_BITMAP **b = luaL_checkudata (L, -1, "mininim.video.bitmap");
   lua_pop (L, 1);
   return b ? *b : NULL;
 }
@@ -249,50 +242,6 @@ L_coord (lua_State *L, char *object, int index, struct pos *p,
 }
 
 void
-L_push_color (lua_State *L, ALLEGRO_COLOR c)
-{
-  ALLEGRO_COLOR *c_new = lua_newuserdata (L, sizeof (*c_new));
-  luaL_getmetatable (L, "mininim.video.color");
-  lua_setmetatable (L, -2);
-  *c_new = c;
-}
-
-ALLEGRO_COLOR
-L_tocolor (lua_State *L, int index)
-{
-  return * (ALLEGRO_COLOR *) lua_touserdata (L, index);
-}
-
-int
-color (lua_State *L)
-{
-  if (lua_isnumber (L, 1)) {
-    int r = lua_tonumber (L, 1);
-    int g = lua_tonumber (L, 2);
-    int b = lua_tonumber (L, 3);
-    ALLEGRO_COLOR c = al_map_rgb (r, g, b);
-    L_push_color (L, c);
-    return 1;
-  } else if (lua_isstring (L, 1)) {
-    const char *string = lua_tostring (L, 1);
-    ALLEGRO_COLOR c = al_color_name (string);
-    if (color_eq (c, al_map_rgb (0, 0, 0)))
-      c = al_color_html (string);
-    L_push_color (L, c);
-    return 1;
-  } else return luaL_argerror (L, 1, "must be number or string");
-}
-
-int
-__color_eq (lua_State *L)
-{
-  ALLEGRO_COLOR c0 = L_tocolor (L, 1);
-  ALLEGRO_COLOR c1 = L_tocolor (L, 2);
-  lua_pushboolean (L, color_eq (c0, c1));
-  return 1;
-}
-
-void
 L_push_palette (lua_State *L, char *palette_name)
 {
   if (! L_get_base_property (L, palette_name)) {
@@ -305,9 +254,10 @@ ALLEGRO_COLOR
 L_palette (ALLEGRO_COLOR c)
 {
   lua_pushvalue (L, -1);
-  L_push_color (L, c);
+  L_pushcolor (L, c);
   L_call (L, 1, 1, 0);
-  ALLEGRO_COLOR c_ret = L_tocolor (L, -1);
+  ALLEGRO_COLOR *c_ptr = luaL_checkudata (L, -1, "mininim.video.color");
+  ALLEGRO_COLOR c_ret = c_ptr ? *c_ptr : al_map_rgb (0, 0, 0);
   lua_pop (L, 1);
   return c_ret;
 }

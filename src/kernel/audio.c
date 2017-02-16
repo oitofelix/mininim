@@ -65,6 +65,26 @@ load_audio_stream (const char *filename)
                                / (float) DEFAULT_HZ);
 }
 
+bool
+audio_source_eq (struct audio_source *as0, struct audio_source *as1)
+{
+  if (as0->type != as1->type) return false;
+
+  switch (as0->type) {
+  case AUDIO_SAMPLE:
+    return as0->data.sample == as1->data.sample;
+    break;
+  case AUDIO_STREAM:
+    if (WINDOWS_PORT)
+      return ! strcasecmp (as0->data.stream, as1->data.stream);
+    else return ! strcmp (as0->data.stream, as1->data.stream);
+    break;
+  default: assert (false); break;
+  }
+
+  return false;
+}
+
 struct audio_source *
 load_audio (struct audio_source *as, enum audio_type audio_type,
             const char *filename)
