@@ -69,18 +69,20 @@ static int lua_readline(lua_State *L, const char *prompt)
 {
   rl_callback_handler_install (prompt, lhandler);
 
+  al_unlock_mutex (repl_mutex);
   struct timeval timeout;
   fd_set set;
-  al_unlock_mutex (repl_mutex);
   while (! lhandler_line && ! al_get_thread_should_stop (repl_thread)) {
     FD_ZERO (&set);
     FD_SET (fileno (rl_instream), &set);
     timeout.tv_sec = 0;
     timeout.tv_usec = 100000;
-    if (select (FD_SETSIZE, &set, NULL, NULL, &timeout) > 0)
+    if (select (FD_SETSIZE, &set, NULL, NULL, &timeout) > 0) {
+      al_lock_mutex (repl_mutex);
       rl_callback_read_char ();
+      al_unlock_mutex (repl_mutex);
+    }
   }
-
   al_lock_mutex (repl_mutex);
 
   if (! lhandler_line) return 0;
@@ -186,7 +188,7 @@ static int safegetfield(lua_State *L, const char *s, size_t n)
       lua_pop(L, 1);
     }
   } while (--i > 0 && getmetaindex(L));
-  lua_pop(L, 1);
+  /* lua_pop(L, 1); */
   return 0;
 } /* 1: obj -- val, 0: obj -- */
 
@@ -197,6 +199,8 @@ static char **mycomplete(const char *text, int start, int end)
   const char *s;
   size_t i, n, dot;
   int savetop;
+
+  rl_completion_suppress_append = 1;
 
   if (!(text[0] == '\0' || isalpha(text[0]) || text[0] == '_')) return NULL;
 
@@ -221,22 +225,23 @@ static char **mycomplete(const char *text, int start, int end)
   do {
     if (lua_istable(repl_L, -1))
       for (lua_pushnil(repl_L); lua_next(repl_L, -2); lua_pop(repl_L, 1))
-	if (lua_type(repl_L, -2) == LUA_TSTRING) {
-	  s = lua_tostring(repl_L, -2);
-	  /* Only match names starting with '_' if explicitly requested */
-	  if (!strncmp(s, text+dot, n-dot) && valididentifier(s) &&
-	      (*s != '_' || text[dot] == '_')) {
-	    int suf = ' '; /* default suffix is a space */
-	    switch (lua_type(repl_L, -1)) {
-	    case LUA_TTABLE:	suf = '.'; break; /* No way to guess ':' */
-	    case LUA_TFUNCTION:	suf = '('; break;
-	    case LUA_TUSERDATA:
-	      if (lua_getmetatable(repl_L, -1)) { lua_pop(repl_L, 1); suf = ':'; }
-	      break;
-	    }
-	    if (dmadd(&ml, text, dot, s, suf)) goto error;
-	  }
-	}
+        if (lua_type(repl_L, -2) == LUA_TSTRING) {
+          s = lua_tostring(repl_L, -2);
+          /* Only match names starting with '_' if explicitly requested */
+          if (!strncmp(s, text+dot, n-dot) && valididentifier(s) &&
+              (*s != '_' || text[dot] == '_')) {
+            int suf = ' '; /* default suffix is a space */
+            switch (lua_type(repl_L, -1)) {
+            case LUA_TTABLE:	suf = '.'; break; /* No way to guess ':' */
+            case LUA_TFUNCTION:	suf = '('; break;
+            case LUA_TUSERDATA:
+              if (lua_getmetatable(repl_L, -1))
+                { lua_pop(repl_L, 1); suf = ':'; }
+              break;
+            }
+            if (dmadd(&ml, text, dot, s, suf)) goto error;
+          }
+        }
   } while (--i > 0 && getmetaindex(repl_L));
 
   if (ml.idx > 1) {
