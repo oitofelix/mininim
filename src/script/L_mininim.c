@@ -115,6 +115,15 @@ __index (lua_State *L)
     } else if (! strcasecmp (key, "setting")) {
       L_push_interface (L, L_MININIM_SETTING);
       return 1;
+    } else if (! strcasecmp (key, "clipboard")) {
+      if (al_clipboard_has_text (display)) {
+        char *text = al_get_clipboard_text (display);
+        if (text) al_free (text);
+        text = al_get_clipboard_text (display);
+        lua_pushstring (L, text);
+        if (text) al_free (text);
+      } else lua_pushnil (L);
+      return 1;
     } else break;
   default: break;
   }
@@ -133,6 +142,12 @@ __newindex (lua_State *L)
     key = lua_tostring (L, 2);
     if (! strcasecmp (key, "load_hook")) {
       L_set_registry (L, &load_hook_ref);
+      return 0;
+    } else if (! strcasecmp (key, "clipboard")) {
+      if (lua_isstring (L, 3)) {
+        const char *text = lua_tostring (L, 3);
+        al_set_clipboard_text (display, text);
+      }
       return 0;
     } else break;
   default: break;

@@ -256,9 +256,11 @@ L_palette (ALLEGRO_COLOR c)
   lua_State *L = main_L;
   lua_pushvalue (L, -1);
   L_pushcolor (L, c);
+  ALLEGRO_COLOR c_ret;
   L_call (L, 1, 1, 0);
   ALLEGRO_COLOR *c_ptr = luaL_checkudata (L, -1, L_MININIM_VIDEO_COLOR);
-  ALLEGRO_COLOR c_ret = c_ptr ? *c_ptr : al_map_rgb (0, 0, 0);
+  if (c_ptr) c_ret = *c_ptr;
+  else c_ret = c;
   lua_pop (L, 1);
   return c_ret;
 }

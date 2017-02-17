@@ -293,102 +293,6 @@ static void lua_exitline(lua_State *L)
   if (myhist) write_history(myhist);
 }
 
-/* These bits are added for Debian's -P functionality */
-
-static int done_path = 0;
-static int suppress_path = 0;
-
-static const char* paths[] = {
-  "~/.lua50",
-  "~/share/lua/50", // backward compatibility for the lua package
-  "~/share/lua50",
-  "/usr/share/lua/50",
-  "/usr/share/lua50", // backward compatibility for the lua package
-  "/usr/local/share/lua50",
-  NULL
-};
-
-static const char* cpaths[] = {
-  "~/.lua50",
-  "~/lib/lua/50",
-  "~/lib/lua50", // backward compatibility for the lua package
-  "/usr/lib/lua/50",
-  "/usr/lib/lua50", // backward compatibility for the lua package
-  "/usr/local/lib/lua50",
-  NULL
-};
-
-static void do_path(lua_State *L)
-{
-  const char** p = paths;
-  int any;
-  if( done_path || suppress_path ) return;
-  if( ! L ) return;
-  done_path = 1;
-  lua_pushliteral(L,"LUA_PATH");
-  lua_pushliteral(L,"");
-  while( *p ) {
-    any = 0;
-    if( **p == '~' ) {
-      const char* home = getenv("HOME");
-      if( home ) {
-        lua_pushstring(L,home);
-        lua_pushstring(L,*p+1);
-        lua_pushliteral(L,"/?.lua;");
-        lua_pushstring(L,home);
-        lua_pushstring(L,*p+1);
-        lua_pushliteral(L,"/?;");
-        any = 6;
-      }
-    } else {
-      lua_pushstring(L,*p);
-      lua_pushliteral(L,"/?.lua;");
-      lua_pushstring(L,*p);
-      lua_pushliteral(L,"/?;");
-      any = 4;
-    }
-    if( any ) {
-      lua_concat(L,any+1);
-    }
-    p++;
-  }
-  lua_pushliteral(L, "?.lua;?");
-  lua_concat(L,2);
-  lua_settable(L, LUA_GLOBALSINDEX);
-  p=cpaths;
-  lua_pushliteral(L,"LUA_CPATH");
-  lua_pushliteral(L,"");
-  while( *p ) {
-    any = 0;
-    if( **p == '~' ) {
-      const char* home = getenv("HOME");
-      if( home ) {
-        lua_pushstring(L,home);
-        lua_pushstring(L,*p+1);
-        lua_pushliteral(L,"/?.so;");
-        lua_pushstring(L,home);
-        lua_pushstring(L,*p+1);
-        lua_pushliteral(L,"/?;");
-        any = 6;
-      }
-    } else {
-      lua_pushstring(L,*p);
-      lua_pushliteral(L,"/?.so;");
-      lua_pushstring(L,*p);
-      lua_pushliteral(L,"/?;");
-      any = 4;
-    }
-    if( any ) {
-      lua_concat(L,any+1);
-    }
-    p++;
-  }
-  lua_pushliteral(L, "?.so;?");
-  lua_concat(L,2);
-  lua_settable(L, LUA_GLOBALSINDEX);
-}
-
-
 static void lstop (lua_State *L, lua_Debug *ar) {
   (void)ar;  /* unused arg. */
   lua_sethook(L, NULL, 0, 0);
@@ -448,7 +352,6 @@ repl_multithread (lua_State *L, lua_Debug *ar)
 static int lcall (lua_State *L, int narg, int clear) {
   int status;
   int base = lua_gettop(L) - narg;  /* function index */
-  do_path(L);
   //lua_settop(L,base);
   lua_pushliteral(L, "_TRACEBACK");
   lua_rawget(L, LUA_GLOBALSINDEX);  /* get traceback function */
@@ -457,6 +360,7 @@ static int lcall (lua_State *L, int narg, int clear) {
   lua_sethook (L, repl_multithread,
                LUA_MASKCALL | LUA_MASKRET | LUA_MASKCOUNT, 1);
   status = lua_pcall(L, narg, (clear ? 0 : LUA_MULTRET), base);
+  lua_sethook(L, NULL, 0, 0);
   sig_catch(SIGINT, SIG_DFL);
   lua_remove(L, base);  /* remove traceback function */
   return status;
@@ -510,7 +414,6 @@ static int load_string (lua_State *L) {
 static void manual_input (lua_State *L) {
   int status;
   lua_initline(L, "mininim");
-  do_path(L);
   while (! al_get_thread_should_stop (repl_thread)) {
     status = load_string(L);
     if (status == -1) {
@@ -536,7 +439,6 @@ static void manual_input (lua_State *L) {
 
 static int pmain (lua_State *L) {
   lua_pop (L, 1);
-  do_path(L);
   manual_input(L);
   return 0;
 }

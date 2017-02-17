@@ -127,6 +127,8 @@ L_call (lua_State *L, int nargs, int nresults, int errfunc)
   if (lua_pcall (L, nargs, nresults, errfunc)) {
     error (0, 0, "%s", lua_tostring(L, -1));
     lua_pop (L, 1);
+    int i;
+    for (i = 0; i < nresults; i++) lua_pushnil (L);
     return false;
   } else return true;
 }

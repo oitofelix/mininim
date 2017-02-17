@@ -25,6 +25,8 @@ local P = {package_type = "LIBRARY", package_name = "common",
 -- imports
 local string = string
 local M = mininim
+local loadstring = loadstring
+local assert = assert
 
 -- body
 setfenv (1, P)
@@ -47,6 +49,10 @@ end
 
 function load_stream (P, filename)
    return M.audio.source (resource_filename (P, filename), "STREAM")
+end
+
+function eval_clipboard ()
+   assert (loadstring (M.clipboard)) ()
 end
 
 function opposite_direction (direction)

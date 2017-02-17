@@ -138,6 +138,10 @@ init_video (void)
   /* workaround to make Mac OS X render the title screen cutscene
      properly */
   if (MACOSX_PORT) al_acknowledge_resize (display);
+
+  /* workaround bug in which first access to clipboard fails */
+  char *clipboard_text = al_get_clipboard_text (display);
+  if (clipboard_text) al_free (clipboard_text);
 }
 
 void
