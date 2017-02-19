@@ -62,9 +62,9 @@ play_anim (void (*draw_callback) (void),
 
   while (! quit_anim) {
     L_gc (main_L);
-    al_unlock_mutex (repl_mutex);
+    unlock_thread ();
     al_wait_for_event (event_queue, &event);
-    al_lock_mutex (repl_mutex);
+    lock_thread ();
 
     switch (event.type) {
     case ALLEGRO_EVENT_TIMER:

@@ -1,5 +1,5 @@
 --[[
-   cga.lua -- CGA video mode;
+   cga.lua -- CGA and HGC video modes;
 
    Copyright (C) 2015, 2016, 2017 Bruno Félix Rezende Ribeiro
    <oitofelix@gnu.org>
@@ -27,6 +27,7 @@ local M = mininim
 local common = require "script/common"
 local to_color_range = common.to_color_range
 local color = M.video.color
+local coordinate = M.video.coordinate
 local setmetatable = setmetatable
 
 local function b (filename)
@@ -42,19 +43,6 @@ local HGC_SELECTION = {}
 local function cga_selection_palette (c)
    if c.a == 0 then return c end
    return color (to_color_range (c.r - 128, c.g -128, c.b - 128))
-end
-
-function M.video.CGA (object, part, index, position)
-   local vm = M.setting.video_mode
-   local em = M.video.env_mode
-   local b, x, y
-
-   b = ASSET[object][em][part][index].bitmap
-   if (M.mouse.position == position and vm == "CGA") then
-      b = b.apply_palette (cga_selection_palette) end
-   x, y = ASSET[object][em][part][index].coord (position)
-
-   return b, x, y
 end
 
 function HGC_SELECTION.DUNGEON (c)
@@ -74,30 +62,41 @@ local function hgc_palette (c)
    end
 end
 
-function M.video.HGC (object, part, index, position)
-   local b, x, y = M.video.CGA (object, part, index, position)
+function M.video.CGA (object, part, index, position)
+   local vm = M.setting.video_mode
    local em = M.video.env_mode
+   local b, x, y
 
-   b = b.apply_palette (hgc_palette)
+   b = ASSET[object][em][part][index].bitmap
+
+   if (vm == "HGC") then b = b.apply_palette (hgc_palette) end
 
    if (M.mouse.position == position) then
-      b = b.apply_palette (HGC_SELECTION[em]) end
+      local palette
+      if vm == "CGA" then palette = cga_selection_palette
+      elseif vm == "HGC" then palette = HGC_SELECTION[em]
+      end
+      b = b.apply_palette (palette)
+   end
+   c = ASSET[object][em][part][index].coordinate (position)
 
-   return b, x, y
+   b.draw (c)
 end
 
 function load ()
    local W = M.place_width
    local H = M.place_height
 
+   M.video.HGC = M.video.CGA
+
    -- TORCH
-   local function torch_coord (p)
-      return W * (p.place + 1), H * p.floor + 23
+   local function torch_coordinate (p)
+      return coordinate (W * (p.place + 1), H * p.floor + 23)
    end
    ASSET.TORCH = {DUNGEON = {BASE = {{bitmap = b "torch/dungeon/00.png",
-                                      coord = torch_coord}}},
+                                      coordinate = torch_coordinate}}},
                   PALACE = {BASE = {{bitmap = b "torch/palace/00.png",
-                                     coord = torch_coord}}}}
+                                     coordinate = torch_coordinate}}}}
 
    return P
 end

@@ -100,7 +100,7 @@ init_script (void)
   /* REPL */
   lua_settop (L, 0);
   repl_mutex = al_create_mutex_recursive ();
-  al_lock_mutex (repl_mutex);
+  lock_thread ();
   repl_L = lua_newthread (L);
   L_set_registry_by_ref (L, &repl_thread_ref);
   repl_thread = al_create_thread (repl, repl_L);
@@ -111,7 +111,7 @@ void
 finalize_script (void)
 {
   al_set_thread_should_stop (repl_thread);
-  al_unlock_mutex (repl_mutex);
+  unlock_thread ();
   al_join_thread (repl_thread, NULL);
   al_destroy_thread (repl_thread);
   al_destroy_mutex (repl_mutex);
@@ -224,4 +224,17 @@ L_push_interface (lua_State *L, const char *tname)
   lua_newuserdata (L, 0);
   luaL_getmetatable (L, tname);
   lua_setmetatable (L, -2);
+}
+
+void
+lock_thread ()
+{
+  al_lock_mutex (repl_mutex);
+}
+
+void
+unlock_thread ()
+{
+  al_set_target_bitmap (NULL);
+  al_unlock_mutex (repl_mutex);
 }

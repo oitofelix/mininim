@@ -1,5 +1,5 @@
 /*
-  L_mininim.mouse.h -- mininim.actor[?] script module;
+  L_mininim.mouse.h -- mininim.mouse script module;
 
   Copyright (C) 2015, 2016, 2017 Bruno Félix Rezende Ribeiro
   <oitofelix@gnu.org>

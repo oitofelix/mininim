@@ -159,18 +159,19 @@ min_room_dist (struct room_dist room[], int *dmax)
 }
 
 bool
-coord_eq (struct coord *_c0, struct coord *_c1)
+coord_eq (struct coord *c0, struct coord *c1)
 {
-  assert (is_valid_coord (_c0) && is_valid_coord (_c1));
+  if (! is_valid_coord (c0) || ! is_valid_coord (c1))
+    return false;
 
-  struct coord c0, c1;
-  ncoord (_c0, &c0);
-  ncoord (_c1, &c1);
+  struct coord nc0, nc1;
+  ncoord (c0, &nc0);
+  ncoord (c1, &nc1);
 
-  return c0.l == c1.l
-    && c0.room == c1.room
-    && c0.x == c1.x
-    && c0.y == c1.y;
+  return nc0.l == nc1.l
+    && nc0.room == nc1.room
+    && nc0.x == nc1.x
+    && nc0.y == nc1.y;
 }
 
 struct coord *

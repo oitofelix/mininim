@@ -60,6 +60,9 @@ define_L_mininim_video (lua_State *L)
 
   /* mininim.video.color */
   define_L_mininim_video_color (L);
+
+  /* mininim.video.coordinate */
+  define_L_mininim_video_coordinate (L);
 }
 
 int
@@ -82,6 +85,9 @@ __index (lua_State *L)
       return 1;
     } else if (! strcasecmp (key, "color")) {
       lua_pushcfunction (L, L_mininim_video_color);
+      return 1;
+    } else if (! strcasecmp (key, "coordinate")) {
+      lua_pushcfunction (L, L_mininim_video_coordinate);
       return 1;
     } else if (! strcasecmp (key, "env_mode")) {
       if (! strcasecmp (env_mode, "ORIGINAL"))
@@ -145,15 +151,15 @@ __tostring (lua_State *L)
   return 1;
 }
 
-ALLEGRO_BITMAP *
-L_video_sprite (lua_State *L, char *object, char *part, int index,
-                struct pos *p, struct coord *c_ret)
+void
+L_video_draw (lua_State *L, char *object, char *part, int index,
+              struct pos *p)
 {
   L_get_registry_by_ref (L, video_mode_ref);
 
   if (! lua_istable (L, -1)) {
     lua_pop (L, 1);
-    return NULL;
+    return;
   }
 
   lua_pushstring (L, video_mode);
@@ -162,7 +168,7 @@ L_video_sprite (lua_State *L, char *object, char *part, int index,
 
   if (! lua_isfunction (L, -1)) {
     lua_pop (L, 1);
-    return NULL;
+    return;
   }
 
   lua_pushstring (L, object);
@@ -170,14 +176,5 @@ L_video_sprite (lua_State *L, char *object, char *part, int index,
   lua_pushnumber (L, index);
   L_pushposition (L, p);
 
-  L_call (L, 4, 3);
-
-  ALLEGRO_BITMAP **b_ptr = luaL_checkudata (L, -3, L_MININIM_VIDEO_BITMAP);
-
-  new_coord (c_ret, p->l, p->room,
-             lua_tonumber (L, -2), lua_tonumber (L, -1));
-
-  lua_pop (L, 3);
-
-  return b_ptr ? *b_ptr : NULL;
+  L_call (L, 4, 0);
 }

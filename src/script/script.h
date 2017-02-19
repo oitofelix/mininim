@@ -25,6 +25,9 @@
 void init_script (void);
 void finalize_script (void);
 
+void lock_thread (void);
+void unlock_thread (void);
+
 void *L_check_type (lua_State *L, int index, const char *tname);
 bool L_call (lua_State *L, int nargs, int nresults);
 bool L_run_hook (lua_State *L);

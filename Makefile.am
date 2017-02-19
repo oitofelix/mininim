@@ -112,9 +112,11 @@ mininim_SOURCES = src/mininim.c src/mininim.h src/compatibility.h			\
   src/script/L_mininim.video.h src/script/L_mininim.video.bitmap.c		\
   src/script/L_mininim.video.bitmap.h																	\
   src/script/L_mininim.video.color.c																	\
-  src/script/L_mininim.video.color.h src/script/L_mininim.setting.c		\
-  src/script/L_mininim.setting.h src/script/L_mininim.mouse.c					\
-  src/script/L_mininim.mouse.h
+  src/script/L_mininim.video.color.h																	\
+  src/script/L_mininim.video.coordinate.c															\
+  src/script/L_mininim.video.coordinate.h															\
+  src/script/L_mininim.setting.c src/script/L_mininim.setting.h				\
+  src/script/L_mininim.mouse.c src/script/L_mininim.mouse.h
 
 ${mininim_OBJECTS}: ${top_builddir}/src/mininim.h.gch
 

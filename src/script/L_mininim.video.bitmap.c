@@ -20,12 +20,15 @@
 
 #include "mininim.h"
 
+ALLEGRO_BITMAP *L_target_bitmap;
+
 static int __gc (lua_State *L);
 static int __eq (lua_State *L);
 static int __index (lua_State *L);
 static int __tostring (lua_State *L);
 
 static int L_apply_palette (lua_State *L);
+static int draw (lua_State *L);
 
 void
 define_L_mininim_video_bitmap (lua_State *L)
@@ -118,6 +121,10 @@ __index (lua_State *L)
       lua_pushvalue (L, 1);
       lua_pushcclosure (L, L_apply_palette, 1);
       return 1;
+    } else if (! strcasecmp (key, "draw")) {
+      lua_pushvalue (L, 1);
+      lua_pushcclosure (L, draw, 1);
+      return 1;
     } else break;
   default: break;
   }
@@ -171,4 +178,22 @@ L_apply_palette (lua_State *L)
   /* push result */
   L_pushbitmap (L, r);
   return 1;
+}
+
+int
+draw (lua_State *L)
+{
+  if (! L_target_bitmap) return 0;
+
+  ALLEGRO_BITMAP **b =
+    luaL_checkudata (L, lua_upvalueindex (1), L_MININIM_VIDEO_BITMAP);
+
+  if (! b) return 0;
+
+  struct coord *c = L_check_type (L, 1, L_MININIM_VIDEO_COORDINATE);
+  c->room = room_view;
+
+  draw_bitmapc (*b, L_target_bitmap, c, 0);
+
+  return 0;
 }

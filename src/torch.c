@@ -24,9 +24,7 @@ void
 draw_torch (ALLEGRO_BITMAP *bitmap, struct pos *p,
             enum em em, enum vm vm)
 {
-  struct coord c;
-  ALLEGRO_BITMAP *torch = L_video_sprite (main_L, "TORCH", "BASE", 1, p, &c);
-  if (! torch) return;
-
-  draw_bitmapc (torch, bitmap, &c, 0);
+  L_target_bitmap = bitmap;
+  L_video_draw (main_L, "TORCH", "BASE", 1, p);
+  L_target_bitmap = NULL;
 }

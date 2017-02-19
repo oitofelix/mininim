@@ -1,5 +1,5 @@
 /*
-  L_mininim.audio_res.c -- mininim.audio[?][?] script module;
+  L_mininim.audio.source.c -- mininim.audio.source script module;
 
   Copyright (C) 2015, 2016, 2017 Bruno Félix Rezende Ribeiro
   <oitofelix@gnu.org>

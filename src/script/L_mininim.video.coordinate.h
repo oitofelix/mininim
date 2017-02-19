@@ -1,5 +1,5 @@
 /*
-  L_mininim.audio.source.h -- mininim.audio.source script module;
+  L_mininim.video.coordinate.h -- mininim.video.coordinate script module;
 
   Copyright (C) 2015, 2016, 2017 Bruno Félix Rezende Ribeiro
   <oitofelix@gnu.org>
@@ -18,13 +18,13 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MININIM_L_MININIM_AUDIO_SOURCE_H
-#define MININIM_L_MININIM_AUDIO_SOURCE_H
+#ifndef MININIM_L_MININIM_VIDEO_COORDINATE_H
+#define MININIM_L_MININIM_VIDEO_COORDINATE_H
 
-#define L_MININIM_AUDIO_SOURCE L_MININIM_AUDIO ".source"
+#define L_MININIM_VIDEO_COORDINATE L_MININIM_VIDEO ".coordinate"
 
-void L_pushaudiosource (lua_State *L, struct audio_source *as);
-void define_L_mininim_audio_source (lua_State *L);
-int L_mininim_audio_source (lua_State *L);
+void define_L_mininim_video_coordinate (lua_State *L);
+int L_mininim_video_coordinate (lua_State *L);
+void L_pushcoordinate (lua_State *L, struct coord *p);
 
-#endif	/* MININIM_L_MININIM_AUDIO_SOURCE_H */
+#endif	/* MININIM_L_MININIM_VIDEO_COORDINATE_H */

@@ -1,5 +1,5 @@
 /*
-  L_mininim.level_con.c -- mininim.level[{?, ?, ?}] script module;
+  L_mininim.level.position.c -- mininim.level.position script module;
 
   Copyright (C) 2015, 2016, 2017 Bruno Félix Rezende Ribeiro
   <oitofelix@gnu.org>

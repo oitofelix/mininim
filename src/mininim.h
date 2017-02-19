@@ -211,6 +211,7 @@
 #include "L_mininim.video.h"
 #include "L_mininim.video.bitmap.h"
 #include "L_mininim.video.color.h"
+#include "L_mininim.video.coordinate.h"
 #include "L_mininim.setting.h"
 #include "L_mininim.mouse.h"
 

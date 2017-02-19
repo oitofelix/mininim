@@ -1,5 +1,5 @@
 /*
-  L_mininim.level_con.h -- mininim.level[{?, ?, ?}] script module;
+  L_mininim.level.position.h -- mininim.level.position script module;
 
   Copyright (C) 2015, 2016, 2017 Bruno Félix Rezende Ribeiro
   <oitofelix@gnu.org>
@@ -18,8 +18,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MININIM_L_MININIM_LEVEL_CON_H
-#define MININIM_L_MININIM_LEVEL_CON_H
+#ifndef MININIM_L_MININIM_LEVEL_POSITION_H
+#define MININIM_L_MININIM_LEVEL_POSITION_H
 
 #define L_MININIM_LEVEL_POSITION L_MININIM_LEVEL ".position"
 
@@ -27,4 +27,4 @@ void define_L_mininim_level_position (lua_State *L);
 int L_mininim_level_position (lua_State *L);
 void L_pushposition (lua_State *L, struct pos *p);
 
-#endif	/* MININIM_L_MININIM_LEVEL_CON_H */
+#endif	/* MININIM_L_MININIM_LEVEL_POSITION_H */

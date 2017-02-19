@@ -69,7 +69,7 @@ static int lua_readline(lua_State *L, const char *prompt)
 {
   rl_callback_handler_install (prompt, lhandler);
 
-  al_unlock_mutex (repl_mutex);
+  unlock_thread ();
   struct timeval timeout;
   fd_set set;
   while (! lhandler_line && ! al_get_thread_should_stop (repl_thread)) {
@@ -78,12 +78,12 @@ static int lua_readline(lua_State *L, const char *prompt)
     timeout.tv_sec = 0;
     timeout.tv_usec = 100000;
     if (select (FD_SETSIZE, &set, NULL, NULL, &timeout) > 0) {
-      al_lock_mutex (repl_mutex);
+      lock_thread ();
       rl_callback_read_char ();
-      al_unlock_mutex (repl_mutex);
+      unlock_thread ();
     }
   }
-  al_lock_mutex (repl_mutex);
+  lock_thread ();
 
   if (! lhandler_line) return 0;
 
@@ -342,9 +342,9 @@ static void sig_catch(int sig, void (*handler)(int))
 void
 repl_multithread (lua_State *L, lua_Debug *ar)
 {
-  al_unlock_mutex (repl_mutex);
+  unlock_thread ();
   al_rest (0.0001);
-  al_lock_mutex (repl_mutex);
+  lock_thread ();
   if (al_get_thread_should_stop (repl_thread))
     luaL_error (L, "main thread terminated");
 }
@@ -451,7 +451,7 @@ int repl_thread_ref = LUA_NOREF;
 void *
 repl (ALLEGRO_THREAD *thread, void *L)
 {
-  al_lock_mutex (repl_mutex);
+  lock_thread ();
 
   rl_instream = stdin;
   rl_outstream = stderr;
@@ -466,6 +466,6 @@ repl (ALLEGRO_THREAD *thread, void *L)
 
   rl_callback_handler_remove ();
 
-  al_unlock_mutex (repl_mutex);
+  unlock_thread ();
   return NULL;
 }
