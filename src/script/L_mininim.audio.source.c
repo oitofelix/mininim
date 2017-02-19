@@ -98,6 +98,13 @@ __eq (lua_State *L)
 int
 __index (lua_State *L)
 {
+  struct audio_source *as = luaL_checkudata (L, 1, L_MININIM_AUDIO_SOURCE);
+
+  if (! as) {
+    lua_pushnil (L);
+    return 1;
+  }
+
   const char *key;
   int type = lua_type (L, 2);
   switch (type) {

@@ -65,7 +65,12 @@ L_mininim_video_color (lua_State *L)
     int r = lua_tonumber (L, 1);
     int g = luaL_checknumber (L, 2);
     int b = luaL_checknumber (L, 3);
-    ALLEGRO_COLOR c = al_map_rgb (r, g, b);
+
+    ALLEGRO_COLOR c;
+    if (lua_isnumber (L, 4)) {
+      int a = lua_tonumber (L, 4);
+      c = al_map_rgba (r, g, b, a);
+    } else c = al_map_rgb (r, g, b);
     L_pushcolor (L, c);
     return 1;
   } else if (lua_isstring (L, 1)) {
@@ -75,7 +80,7 @@ L_mininim_video_color (lua_State *L)
       c = al_color_html (string);
     L_pushcolor (L, c);
     return 1;
-  } else return luaL_argerror (L, 1, "must be number or string");
+  } else return luaL_argerror (L, 1, "expecting number or string");
 }
 
 int
@@ -119,6 +124,11 @@ __index (lua_State *L)
       unsigned char r, g, b;
       al_unmap_rgb (c, &r, &g, &b);
       lua_pushnumber (L, b);
+      return 1;
+    } else if (! strcasecmp (key, "a")) {
+      unsigned char r, g, b, a;
+      al_unmap_rgba (c, &r, &g, &b, &a);
+      lua_pushnumber (L, a);
       return 1;
     } else if (! strcasecmp (key, "html")) {
       unsigned char r, g, b;
@@ -174,6 +184,13 @@ __newindex (lua_State *L)
       b = lua_tonumber (L, 3);
       *c = al_map_rgb (r, g, b);
       return 0;
+    } else if (! strcasecmp (key, "a")) {
+      if (! lua_isnumber (L, 3)) return 0;
+      unsigned char r, g, b, a;
+      al_unmap_rgba (*c, &r, &g, &b, &a);
+      a = lua_tonumber (L, 3);
+      *c = al_map_rgba (r, g, b, a);
+      return 0;
     } else if (! strcasecmp (key, "html")) {
       if (lua_isstring (L, 3))
         *c = al_color_html (lua_tostring (L, 3));
@@ -194,9 +211,9 @@ __tostring (lua_State *L)
 {
   ALLEGRO_COLOR *c = luaL_checkudata (L, 1, L_MININIM_VIDEO_COLOR);
   if (c) {
-    unsigned char r, g, b;
-    al_unmap_rgb (*c, &r, &g, &b);
-    lua_pushfstring (L, L_MININIM_VIDEO_COLOR " (%d, %d, %d)", r, g, b);
-  } else lua_pushstring (L, L_MININIM_VIDEO_COLOR " (-1, -1, -1)");
+    unsigned char r, g, b, a;
+    al_unmap_rgba (*c, &r, &g, &b, &a);
+    lua_pushfstring (L, L_MININIM_VIDEO_COLOR " (%d, %d, %d, %d)", r, g, b, a);
+  } else lua_pushstring (L, L_MININIM_VIDEO_COLOR " (-1, -1, -1, -1)");
   return 1;
 }

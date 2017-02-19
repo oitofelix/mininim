@@ -64,12 +64,15 @@ define_L_mininim (lua_State *L)
 
   /* mininim.setting */
   define_L_mininim_setting (L);
+
+  /* mininim.mouse */
+  define_L_mininim_mouse (L);
 }
 
 void
 run_load_hook (lua_State *L)
 {
-  L_get_registry (L, load_hook_ref);
+  L_get_registry_by_ref (L, load_hook_ref);
   L_run_hook (L);
 }
 
@@ -98,7 +101,7 @@ __index (lua_State *L)
       lua_pushnumber (L, PLACE_HEIGHT);
       return 1;
     } else if (! strcasecmp (key, "load_hook")) {
-      L_get_registry (L, load_hook_ref);
+      L_get_registry_by_ref (L, load_hook_ref);
       return 1;
     } else if (! strcasecmp (key, "level")) {
       L_push_interface (L, L_MININIM_LEVEL);
@@ -114,6 +117,9 @@ __index (lua_State *L)
       return 1;
     } else if (! strcasecmp (key, "setting")) {
       L_push_interface (L, L_MININIM_SETTING);
+      return 1;
+    } else if (! strcasecmp (key, "mouse")) {
+      L_push_interface (L, L_MININIM_MOUSE);
       return 1;
     } else if (! strcasecmp (key, "clipboard")) {
       if (al_clipboard_has_text (display)) {
@@ -141,7 +147,7 @@ __newindex (lua_State *L)
   case LUA_TSTRING:
     key = lua_tostring (L, 2);
     if (! strcasecmp (key, "load_hook")) {
-      L_set_registry (L, &load_hook_ref);
+      L_set_registry_by_ref (L, &load_hook_ref);
       return 0;
     } else if (! strcasecmp (key, "clipboard")) {
       if (lua_isstring (L, 3)) {

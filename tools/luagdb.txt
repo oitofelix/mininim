@@ -1,7 +1,10 @@
 # Lua GDB Helpers
 # Copyright (c) 2010 Michal Kottman
+#
+# Copyright (c) 2017 Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
+# Adapted to Lua 5.0; Improved functionality; Fixed bugs;
+#
 # License: MIT
-# Retro-adapted to Lua 5.0 by Bruno Félix Rezende Ribeiro <oitofelix@gnu.org>
 
 define luavalue
 	if $argc == 0
@@ -12,7 +15,7 @@ define luavalue
 		else
 			set $L = L
 		end
-		print L->base + ($arg0 - 1)
+		print $L->base + ($arg0 - 1)
 	end
 end
 document luavalue
@@ -23,9 +26,14 @@ document luavalue
 end
 
 define luaprinttable
-	if $argc != 1
+	if $argc == 0
 		help luaprinttable
 	else
+		if $argc == 2
+			set $L = $arg1
+		else
+			set $L = L
+		end
 		printf " { "
 		set $t = (Table *) $arg0
 		set $node = $t->node
@@ -42,7 +50,7 @@ define luaprinttable
 					set $str = (char *)($ts + 1)
 					printf "%s = ", $str
 				else
-					printf "<%s> = ", lua_typename(L, $key.tt)
+					printf "<%s> = ", lua_typename($L, $key.tt)
 				end
 				set $val = &($node->i_val)
 				luaprint $val
@@ -62,7 +70,7 @@ define luaprinttable
 	end
 end
 document luaprinttable
-	luaprinttable <table>
+	luaprinttable <table> [L]
 	Pretty-prints a Lua Table. Expects a pointer to Table.
 end
 
@@ -70,6 +78,11 @@ define luaprint
 	if $argc == 0
 		help luaprint
 	else
+		if $argc == 3
+			set $L = $arg2
+		else
+			set $L = L
+		end
 		set $v = $arg0
 		set $val = &($v.value)
 		set $type = $v.tt
@@ -103,11 +116,11 @@ define luaprint
 		if $type == 5
 			set $tab = &($val->gc->h)
 			printf "<tab> %p ", $tab
-			if $argc == 2
-				luaprinttable $tab
+			if $arg1 == 1
+				luaprinttable $tab $L
 				if $tab.metatable
 					printf " metatable="
-					luaprinttable $tab.metatable
+					luaprinttable $tab.metatable $L
 				end
 			end
 		end
@@ -115,23 +128,23 @@ define luaprint
 		if $type == 7
 			set $uv = $val->gc.u->uv
 			printf "<udata> %p size=%d", &($val->gc.u) + 1, $uv.len
-			if $argc == 2 && $uv.metatable
+			if $arg1 == 1 && $uv.metatable
 				printf " metatable="
-				luaprinttable $uv.metatable
+				luaprinttable $uv.metatable $L
 			end
-			# if $argc == 2 && $uv.env
+			# if $arg1 == 1 && $uv.env
 			# 	printf " env="
-			# 	luaprinttable $uv.env
+			# 	luaprinttable $uv.env $L
 			# end
 		end
 		# other
 		if $type > 5 && $type != 7
-			printf "<%s> %p", lua_typename(L, $type), $val
+			printf "<%s> %p", lua_typename($L, $type), $val->p
 		end
 	end
 end
 document luaprint
-	luaprint <value> [verbose]
+	luaprint <value> [verbose] [L]
 	Pretty-prints a TObject passed as argument. Expects a pointer to a TObject. When verbose is 1,
 	expands tables, metatables and userdata environments.
 end
@@ -147,7 +160,7 @@ define luastack
 	set $idx = 1
 	while $ptr < $L->top
 		printf "%03d: ", $idx
-		luaprint $ptr
+		luaprint $ptr 0 $L
 		printf "\n"
 		set $ptr = $ptr + 1
 		set $idx = $idx + 1
@@ -166,13 +179,13 @@ define luatrace
 		set $L = $arg0
 	end
   set $code = "return debug.traceback()"
-	if luaL_loadbuffer (L, $code, strlen ($code), "gdb") == 0
-		if lua_pcall(L, 0, 1, 0) == 0
-			printf "%s\n", lua_tostring (L, -1)
+	if luaL_loadbuffer ($L, $code, strlen ($code), "gdb") == 0
+		if lua_pcall($L, 0, 1, 0) == 0
+			printf "%s\n", lua_tostring ($L, -1)
 		else
-			printf "ERROR: %s\n", lua_tostring (L, -1)
+			printf "ERROR: %s\n", lua_tostring ($L, -1)
 		end
-		call lua_settop (L, -2)
+		call lua_settop ($L, -2)
 	end
 end
 document luatrace

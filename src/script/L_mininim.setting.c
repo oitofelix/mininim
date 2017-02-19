@@ -73,6 +73,9 @@ __index (lua_State *L)
     } else if (! strcasecmp (key, "env_mode")) {
       lua_pushstring (L, env_mode);
       return 1;
+    } else if (! strcasecmp (key, "hue_mode")) {
+      lua_pushstring (L, hue_mode);
+      return 1;
     } else break;
   default: break;
   }
@@ -97,6 +100,9 @@ __newindex (lua_State *L)
       return 0;
     } else if (! strcasecmp (key, "env_mode")) {
       L_set_string_var (L, 3, &env_mode);
+      return 0;
+    } else if (! strcasecmp (key, "hue_mode")) {
+      L_set_string_var (L, 3, &hue_mode);
       return 0;
     } else break;
   default: break;

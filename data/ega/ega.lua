@@ -25,6 +25,8 @@ local P = {package_type = "VIDEO MODE", package_name = "EGA",
 -- imports
 local M = mininim
 local common = require "script/common"
+local to_color_range = common.to_color_range
+local color = M.video.color
 
 local function b (filename)
    return common.load_bitmap (P, filename)
@@ -33,22 +35,38 @@ end
 -- body
 setfenv (1, P)
 
+local ASSET = {}
+
+local function selection_palette (c)
+   if c.a == 0 then return c end
+   return color (to_color_range (c.r + 64, c.g + 64, c.b + 64))
+end
+
+function M.video.EGA (object, part, index, position)
+   local em = M.video.env_mode
+   local b, x, y
+
+   b = ASSET[object][em][part][index].bitmap
+   if (M.mouse.position == position) then
+      b = b.apply_palette (selection_palette) end
+   x, y = ASSET[object][em][part][index].coord (position)
+
+   return b, x, y
+end
+
 function load ()
    local W = M.place_width
    local H = M.place_height
 
-   local V = {}
-
    -- TORCH
-   local function torch_coord (f, p)
-      return W * (p + 1), H * f + 23
+   local function torch_coord (p)
+      return W * (p.place + 1), H * p.floor + 23
    end
-   V.TORCH = {DUNGEON = {{bitmap = b "torch/dungeon/00.png",
-                          coord = torch_coord}},
-              PALACE = {{bitmap = b "torch/palace/00.png",
-                         coord = torch_coord}}}
+   ASSET.TORCH = {DUNGEON = {BASE = {{bitmap = b "torch/dungeon/00.png",
+                                      coord = torch_coord}}},
+                  PALACE = {BASE = {{bitmap = b "torch/palace/00.png",
+                                     coord = torch_coord}}}}
 
-   M.video[package_name] = V
    return P
 end
 

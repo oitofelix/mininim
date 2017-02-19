@@ -1,5 +1,5 @@
 /*
-  L_mininim.audio.c -- mininim.audio script module;
+  L_mininim.mouse.c -- mininim.mouse script module;
 
   Copyright (C) 2015, 2016, 2017 Bruno Félix Rezende Ribeiro
   <oitofelix@gnu.org>
@@ -20,17 +20,15 @@
 
 #include "mininim.h"
 
-static int audio_mode_ref = LUA_NOREF;
-
 static int __eq (lua_State *L);
 static int __index (lua_State *L);
 static int __newindex (lua_State *L);
 static int __tostring (lua_State *L);
 
 void
-define_L_mininim_audio (lua_State *L)
+define_L_mininim_mouse (lua_State *L)
 {
-  luaL_newmetatable(L, L_MININIM_AUDIO);
+  luaL_newmetatable(L, L_MININIM_MOUSE);
 
   lua_pushstring (L, "__eq");
   lua_pushcfunction (L, __eq);
@@ -48,45 +46,7 @@ define_L_mininim_audio (lua_State *L)
   lua_pushcfunction (L, __tostring);
   lua_rawset (L, -3);
 
-  lua_newtable (L);
-  L_set_registry_by_ref (L, &audio_mode_ref);
-
   lua_pop (L, 1);
-
-  /* mininim.audio.source */
-  define_L_mininim_audio_source (L);
-}
-
-void
-L_play_audio (lua_State *L, char *key, struct pos *p, int anim_id)
-{
-  L_get_registry_by_ref (L, audio_mode_ref);
-
-  if (! lua_istable (L, -1)) {
-    lua_pop (L, 1);
-    return;
-  }
-
-  lua_pushstring (L, audio_mode);
-  lua_rawget (L, -2);
-  lua_remove (L, -2);
-
-  if (! lua_istable (L, -1)) {
-    lua_pop (L, 1);
-    return;
-  }
-
-  lua_pushstring (L, key);
-  lua_rawget (L, -2);
-  lua_remove (L, -2);
-
-  struct audio_source *as = luaL_checkudata (L, -1, L_MININIM_AUDIO_SOURCE);
-
-  lua_pop (L, 1);
-
-  if (! as) return;
-
-  play_audio (as, p, anim_id);
 }
 
 int
@@ -104,21 +64,10 @@ __index (lua_State *L)
   switch (type) {
   case LUA_TSTRING:
     key = lua_tostring (L, 2);
-    if (! strcasecmp (key, "source")) {
-      lua_pushcfunction (L, L_mininim_audio_source);
+    if (! strcasecmp (key, "position")) {
+      L_pushposition (L, &mouse_pos);
       return 1;
-    } else if (! strcasecmp (key, "current")) {
-      assert (audio_mode);
-      L_get_registry_by_ref (L, audio_mode_ref);
-      lua_pushstring (L, audio_mode);
-      lua_rawget (L, -2);
-      return 1;
-    } else {
-      L_get_registry_by_ref (L, audio_mode_ref);
-      lua_replace (L, 1);
-      lua_rawget (L, 1);
-      return 1;
-    }
+    } else break;
   default: break;
   }
 
@@ -134,15 +83,7 @@ __newindex (lua_State *L)
   switch (type) {
   case LUA_TSTRING:
     key = lua_tostring (L, 2);
-    if (! strcasecmp (key, "current")) {
-      L_set_string_var (L, 3, &audio_mode);
-      return 0;
-    } else {
-      L_get_registry_by_ref (L, audio_mode_ref);
-      lua_replace (L, 1);
-      lua_settable (L, 1);
-      return 0;
-    }
+    break;
   default: break;
   }
 
@@ -152,6 +93,6 @@ __newindex (lua_State *L)
 int
 __tostring (lua_State *L)
 {
-  lua_pushstring (L, "MININIM AUDIO INTERFACE");
+  lua_pushstring (L, "MININIM MOUSE INTERFACE");
   return 1;
 }

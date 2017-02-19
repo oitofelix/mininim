@@ -26,11 +26,19 @@ void init_script (void);
 void finalize_script (void);
 
 void *L_check_type (lua_State *L, int index, const char *tname);
-bool L_call (lua_State *L, int nargs, int nresults, int errfunc);
+bool L_call (lua_State *L, int nargs, int nresults);
 bool L_run_hook (lua_State *L);
-int L_set_registry (lua_State *L, int *r);
-void L_get_registry (lua_State *L, int r);
+
+void L_set_registry_by_ptr (lua_State *L, void *p);
+void L_get_registry_by_ptr (lua_State *L, void *p);
+int L_set_registry_by_ref (lua_State *L, int *r);
+void L_get_registry_by_ref (lua_State *L, int r);
 void L_push_interface (lua_State *L, const char *tname);
+
+void L_set_weak_registry_by_ptr (lua_State *L, void *p);
+void L_get_weak_registry_by_ptr (lua_State *L, void *p);
+
+void L_gc (lua_State *L);
 
 /* variables */
 extern lua_State *main_L;

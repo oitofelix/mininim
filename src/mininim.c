@@ -105,6 +105,7 @@ enum gm gm = ORIGINAL_GM;
 char *audio_mode;
 char *video_mode;
 char *env_mode;
+char *hue_mode;
 bool immortal_mode;
 int initial_total_lives = KID_INITIAL_TOTAL_LIVES, total_lives;
 int initial_current_lives = KID_INITIAL_CURRENT_LIVES, current_lives;
@@ -784,12 +785,24 @@ Levels have been converted using module %s into native format at\n\
     e = optval_to_enum (&i, key, arg, state, hue_mode_enum, 0);
     if (e) return e;
     switch (i) {
-    case 0: force_hue = false; break;
-    case 1: force_hue = true, hue = HUE_NONE; break;
-    case 2: force_hue = true, hue = HUE_GREEN; break;
-    case 3: force_hue = true, hue = HUE_GRAY; break;
-    case 4: force_hue = true, hue = HUE_YELLOW; break;
-    case 5: force_hue = true, hue = HUE_BLUE; break;
+    case 0: force_hue = false;
+      set_string_var (&hue_mode, "ORIGINAL");
+      break;
+    case 1: force_hue = true, hue = HUE_NONE;
+      set_string_var (&hue_mode, "NONE");
+      break;
+    case 2: force_hue = true, hue = HUE_GREEN;
+      set_string_var (&hue_mode, "GREEN");
+      break;
+    case 3: force_hue = true, hue = HUE_GRAY;
+      set_string_var (&hue_mode, "GRAY");
+      break;
+    case 4: force_hue = true, hue = HUE_YELLOW;
+      set_string_var (&hue_mode, "YELLOW");
+      break;
+    case 5: force_hue = true, hue = HUE_BLUE;
+      set_string_var (&hue_mode, "BLUE");
+      break;
     }
     break;
   case GUARD_MODE_OPTION:
@@ -1340,6 +1353,7 @@ main (int _argc, char **_argv)
   set_string_var (&audio_mode, "SBLAST");
   set_string_var (&video_mode, "VGA");
   set_string_var (&env_mode, "DUNGEON");
+  set_string_var (&hue_mode, "NONE");
 
   struct config_info config_info;
 

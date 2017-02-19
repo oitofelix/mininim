@@ -52,7 +52,7 @@ define_L_mininim_level_position (lua_State *L)
 }
 
 void
-L_pushpos (lua_State *L, struct pos *p)
+L_pushposition (lua_State *L, struct pos *p)
 {
   struct pos *p_new = lua_newuserdata (L, sizeof (*p_new));
   luaL_getmetatable (L, L_MININIM_LEVEL_POSITION);
@@ -68,7 +68,7 @@ L_mininim_level_position (lua_State *L)
   int place = luaL_checknumber (L, 3);
   struct pos p;
   new_pos (&p, &global_level, room, floor, place);
-  L_pushpos (L, &p);
+  L_pushposition (L, &p);
   return 1;
 }
 
@@ -85,12 +85,28 @@ __eq (lua_State *L)
 int
 __index (lua_State *L)
 {
+  struct pos *p = luaL_checkudata (L, 1, L_MININIM_LEVEL_POSITION);
+
+  if (! p) {
+    lua_pushnil (L);
+    return 1;
+  }
+
   const char *key;
   int type = lua_type (L, 2);
   switch (type) {
   case LUA_TSTRING:
     key = lua_tostring (L, 2);
-    if (! strcasecmp (key, "activate")) {
+    if (! strcasecmp (key, "room")) {
+      lua_pushnumber (L, p->room);
+      return 1;
+    } else if (! strcasecmp (key, "floor")) {
+      lua_pushnumber (L, p->floor);
+      return 1;
+    } else if (! strcasecmp (key, "place")) {
+      lua_pushnumber (L, p->place);
+      return 1;
+    } else if (! strcasecmp (key, "activate")) {
       lua_pushvalue (L, 1);
       lua_pushcclosure (L, activate, 1);
       return 1;
@@ -105,12 +121,25 @@ __index (lua_State *L)
 int
 __newindex (lua_State *L)
 {
+  struct pos *p = luaL_checkudata (L, 1, L_MININIM_LEVEL_POSITION);
+
+  if (! p) return 0;
+
   const char *key;
   int type = lua_type (L, 2);
   switch (type) {
   case LUA_TSTRING:
     key = lua_tostring (L, 2);
-    break;
+    if (! strcasecmp (key, "room")) {
+      p->room = lua_tonumber (L, 3);
+      return 0;
+    } else if (! strcasecmp (key, "floor")) {
+      p->floor = lua_tonumber (L, 3);
+      return 0;
+    } else if (! strcasecmp (key, "place")) {
+      p->place = lua_tonumber (L, 3);
+      return 0;
+    } else break;
   default: break;
   }
 
@@ -131,6 +160,6 @@ activate (lua_State *L)
 {
   struct pos *p =
     luaL_checkudata (L, lua_upvalueindex (1), L_MININIM_LEVEL_POSITION);
-  if (p) activate_con (p);
+  if (p && is_valid_pos (p)) activate_con (p);
   return 0;
 }

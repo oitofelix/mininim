@@ -1,5 +1,5 @@
 /*
-  L_mininim.video_res.h -- mininim.video[?][?] script module;
+  L_mininim.mouse.h -- mininim.actor[?] script module;
 
   Copyright (C) 2015, 2016, 2017 Bruno Félix Rezende Ribeiro
   <oitofelix@gnu.org>
@@ -18,15 +18,11 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MININIM_L_MININIM_VIDEO_RES_H
-#define MININIM_L_MININIM_VIDEO_RES_H
+#ifndef MININIM_L_MININIM_MOUSE_H
+#define MININIM_L_MININIM_MOUSE_H
 
-#define L_MININIM_VIDEO_BITMAP L_MININIM_VIDEO ".bitmap"
+#define L_MININIM_MOUSE L_MININIM ".mouse"
 
-void L_pushbitmap (lua_State *L, ALLEGRO_BITMAP *b);
-void define_L_mininim_video_bitmap (lua_State *L);
-int L_mininim_video_bitmap (lua_State *L);
+void define_L_mininim_mouse (lua_State *L);
 
-ALLEGRO_COLOR L_palette (ALLEGRO_COLOR c);
-
-#endif	/* MININIM_L_MININIM_VIDEO_RES_H */
+#endif	/* MININIM_L_MININIM_MOUSE_H */

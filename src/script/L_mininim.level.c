@@ -58,15 +58,38 @@ define_L_mininim_level (lua_State *L)
 void
 run_level_start_hook (lua_State *L)
 {
-  L_get_registry (L, level_start_hook_ref);
+  L_get_registry_by_ref (L, level_start_hook_ref);
   L_run_hook (L);
 }
 
 void
 run_level_cycle_hook (lua_State *L)
 {
-  L_get_registry (L, level_cycle_hook_ref);
+  L_get_registry_by_ref (L, level_cycle_hook_ref);
   L_run_hook (L);
+}
+
+const char *
+env_mode_string (enum em em)
+{
+  switch (em) {
+  case DUNGEON: return "DUNGEON"; break;
+  case PALACE: return "PALACE"; break;
+  default: assert (false); return NULL; break;
+  }
+}
+
+const char *
+hue_mode_string (enum hue hue)
+{
+  switch (hue) {
+  case HUE_NONE: return "NONE"; break;
+  case HUE_GREEN: return "GREEN"; break;
+  case HUE_GRAY: return "GRAY"; break;
+  case HUE_YELLOW: return "YELLOW"; break;
+  case HUE_BLUE: return "BLUE"; break;
+  default: assert (false); return NULL; break;
+  }
 }
 
 int
@@ -87,11 +110,17 @@ __index (lua_State *L)
     if (! strcasecmp (key, "number")) {
       lua_pushnumber (L, global_level.n);
       return 1;
+    } else if (! strcasecmp (key, "env_mode")) {
+      lua_pushstring (L, env_mode_string (global_level.em));
+      return 1;
+    } else if (! strcasecmp (key, "hue_mode")) {
+      lua_pushstring (L, hue_mode_string (global_level.hue));
+      return 1;
     } else if (! strcasecmp (key, "start_hook")) {
-      L_get_registry (L, level_start_hook_ref);
+      L_get_registry_by_ref (L, level_start_hook_ref);
       return 1;
     } else if (! strcasecmp (key, "cycle_hook")) {
-      L_get_registry (L, level_cycle_hook_ref);
+      L_get_registry_by_ref (L, level_cycle_hook_ref);
       return 1;
     } else if (! strcasecmp (key, "position")) {
       lua_pushcfunction (L, L_mininim_level_position);
@@ -117,10 +146,10 @@ __newindex (lua_State *L)
   case LUA_TSTRING:
     key = lua_tostring (L, 2);
     if (! strcasecmp (key, "start_hook")) {
-      L_set_registry (L, &level_start_hook_ref);
+      L_set_registry_by_ref (L, &level_start_hook_ref);
       return 0;
     } else if (! strcasecmp (key, "cycle_hook")) {
-      L_set_registry (L, &level_cycle_hook_ref);
+      L_set_registry_by_ref (L, &level_cycle_hook_ref);
       return 0;
     } else break;
   default: break;

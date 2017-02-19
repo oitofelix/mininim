@@ -25,6 +25,11 @@ local P = {package_type = "VIDEO MODE", package_name = "VGA",
 -- imports
 local M = mininim
 local common = require "script/common"
+local to_color_range = common.to_color_range
+local color = M.video.color
+
+local pairs = pairs
+local print = print
 
 local function b (filename)
    return common.load_bitmap (P, filename)
@@ -33,22 +38,67 @@ end
 -- body
 setfenv (1, P)
 
+local ASSET = {}
+local HUE = {}
+local SELECTION = {}
+
+function HUE.GREEN (c)
+   if c.a == 0 then return c end
+   return color (to_color_range (c.r - 12, c.g + 16, c.b - 29))
+end
+
+function HUE.GRAY (c)
+   if c.a == 0 then return c end
+   return color (to_color_range (c.r + 13, c.g - 7, c.b - 52))
+end
+
+function HUE.YELLOW (c)
+   if c.a == 0 then return c end
+   return color (to_color_range (c.r + 78, c.g + 25, c.b - 64))
+end
+
+function HUE.BLUE (c)
+   if c.a == 0 then return c end
+   return color (to_color_range (c.r - 96, c.g - 80, c.b + 64))
+end
+
+function SELECTION.DUNGEON (c)
+   if c.a == 0 then return c end
+   return color (to_color_range (c.r + 64, c.g + 64, c.b + 64))
+end
+
+function SELECTION.PALACE (c)
+   if c.a == 0 then return c end
+   return color (to_color_range (c.r + 32, c.g + 32, c.b + 32))
+end
+
+function M.video.VGA (object, part, index, position)
+   local em = M.video.env_mode
+   local hue = M.video.hue_mode
+   local b, x, y
+
+   b = ASSET[object][em][part][index].bitmap
+   if (hue ~= "NONE") then b = b.apply_palette (HUE[hue]) end
+   if (M.mouse.position == position) then
+      b = b.apply_palette (SELECTION[em]) end
+   x, y = ASSET[object][em][part][index].coord (position)
+
+   return b, x, y
+end
+
 function load ()
    local W = M.place_width
    local H = M.place_height
 
-   local V = {}
-
    -- TORCH
-   local function torch_coord (f, p)
-      return W * (p + 1), H * f + 23
+   local function torch_coord (p)
+      return W * (p.place + 1), H * p.floor + 23
    end
-   V.TORCH = {DUNGEON = {{bitmap = b "torch/dungeon/00.png",
-                          coord = torch_coord}},
-              PALACE = {{bitmap = b "torch/palace/00.png",
-                         coord = torch_coord}}}
+   ASSET.TORCH = {DUNGEON = {BASE = {{bitmap = b "torch/dungeon/00.png",
+                                      coord = torch_coord}}},
+                  PALACE = {BASE = {{bitmap = b "torch/palace/00.png",
+                                     coord = torch_coord}}}}
 
-   M.video[package_name] = V
    return P
 end
 

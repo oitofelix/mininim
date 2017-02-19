@@ -24,17 +24,9 @@ void
 draw_torch (ALLEGRO_BITMAP *bitmap, struct pos *p,
             enum em em, enum vm vm)
 {
-  ALLEGRO_BITMAP *torch = L_bitmap (main_L, "TORCH", 1);
-  if (! torch) return;
-
-  torch = L_apply_palette (main_L, torch, "base_palette");
-
   struct coord c;
-  if (! L_coord (main_L, "TORCH", 1, p, &c)) return;
-
-  if (vm == VGA) torch = apply_hue_palette (torch);
-  if (peq (p, &mouse_pos))
-    torch = apply_palette (torch, selection_palette);
+  ALLEGRO_BITMAP *torch = L_video_sprite (main_L, "TORCH", "BASE", 1, p, &c);
+  if (! torch) return;
 
   draw_bitmapc (torch, bitmap, &c, 0);
 }

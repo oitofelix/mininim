@@ -2577,6 +2577,8 @@ ui_hue_mode (enum hue new_hue)
     break;
   }
 
+  set_string_var (&hue_mode, value);
+
   ui_msg (0, "%s: %s", key, value);
 
   ui_save_setting (NULL, key, value);

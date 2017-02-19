@@ -22,6 +22,8 @@
 
 lua_State *main_L;
 
+static int weak_registry_ref = LUA_NOREF;
+
 int
 load_script (const char *filename)
 {
@@ -62,7 +64,6 @@ init_script (void)
   lua_setglobal (L, "LUA_PATH");
 
   /* mininim */
-  lua_settop (L, 0);
   define_L_mininim (L);
 
   lua_newuserdata (L, 0);
@@ -70,9 +71,16 @@ init_script (void)
   lua_setmetatable (L, -2);
   lua_setglobal (L, "mininim");
 
-  /* load script */
-  lua_settop (L, 0);
+  /* weak registry */
+  lua_newtable (L);
+  lua_pushstring (L, "__mode");
+  lua_pushstring (L, "v");
+  lua_rawset (L, -3);
+  lua_pushvalue (L, -1);
+  lua_setmetatable (L, -2);
+  L_set_registry_by_ref (L, &weak_registry_ref);
 
+  /* load script */
   int e = load_resource ("data/script/mininim.lua",
                          (load_resource_f) load_script, false);
 
@@ -80,8 +88,7 @@ init_script (void)
     if (lua_isfunction (L, -1)) {
       if (lua_pcall (L, 0, 0, 0))
         error (-1, 0, "%s", lua_tostring(L, -1));
-    }
-    else error (-1, 0, "%s", lua_tostring(L, -1));
+    } else error (-1, 0, "%s", lua_tostring(L, -1));
   } else {
     while (lua_gettop (L)) {
       error (0, 0, "%s", lua_tostring(L, 1));
@@ -95,7 +102,7 @@ init_script (void)
   repl_mutex = al_create_mutex_recursive ();
   al_lock_mutex (repl_mutex);
   repl_L = lua_newthread (L);
-  L_set_registry (L, &repl_thread_ref);
+  L_set_registry_by_ref (L, &repl_thread_ref);
   repl_thread = al_create_thread (repl, repl_L);
   al_start_thread (repl_thread);
 }
@@ -122,29 +129,55 @@ L_check_type (lua_State *L, int index, const char *tname)
 }
 
 bool
-L_call (lua_State *L, int nargs, int nresults, int errfunc)
+L_call (lua_State *L, int nargs, int nresults)
 {
-  if (lua_pcall (L, nargs, nresults, errfunc)) {
+  int base = lua_gettop(L) - nargs;
+  lua_pushliteral(L, "_TRACEBACK");
+  lua_rawget(L, LUA_GLOBALSINDEX);
+  lua_insert(L, base);
+  if (lua_pcall (L, nargs, nresults, base)) {
     error (0, 0, "%s", lua_tostring(L, -1));
     lua_pop (L, 1);
+    lua_remove(L, base);
     int i;
     for (i = 0; i < nresults; i++) lua_pushnil (L);
     return false;
-  } else return true;
+  } else {
+    lua_remove(L, base);
+    return true;
+  }
 }
 
 bool
 L_run_hook (lua_State *L)
 {
-  if (lua_isfunction (L, -1)) return L_call (L, 0, 0, 0);
+  if (lua_isfunction (L, -1)) {
+    bool r = L_call (L, 0, 0);
+    return r;
+  }
   else {
     lua_pop (L, 1);
     return true;
   }
 }
 
+void
+L_set_registry_by_ptr (lua_State *L, void *p)
+{
+  lua_pushlightuserdata (L, p);
+  lua_insert (L, -2);
+  lua_rawset (L, LUA_REGISTRYINDEX);
+}
+
+void
+L_get_registry_by_ptr (lua_State *L, void *p)
+{
+  lua_pushlightuserdata (L, p);
+  lua_rawget (L, LUA_REGISTRYINDEX);
+}
+
 int
-L_set_registry (lua_State *L, int *r)
+L_set_registry_by_ref (lua_State *L, int *r)
 {
   luaL_unref (L, LUA_REGISTRYINDEX, *r);
   *r = luaL_ref (L, LUA_REGISTRYINDEX);
@@ -152,9 +185,37 @@ L_set_registry (lua_State *L, int *r)
 }
 
 void
-L_get_registry (lua_State *L, int r)
+L_get_registry_by_ref (lua_State *L, int r)
 {
   lua_rawgeti (L, LUA_REGISTRYINDEX, r);
+}
+
+void
+L_set_weak_registry_by_ptr (lua_State *L, void *p)
+{
+  L_get_registry_by_ref (L, weak_registry_ref);
+  lua_pushlightuserdata (L, p);
+  lua_pushvalue (L, -3);
+  lua_rawset (L, -3);
+  lua_pop (L, 2);
+}
+
+void
+L_get_weak_registry_by_ptr (lua_State *L, void *p)
+{
+  L_get_registry_by_ref (L, weak_registry_ref);
+  lua_pushlightuserdata (L, p);
+  lua_rawget (L, -2);
+  lua_remove (L, -2);
+}
+
+void
+L_gc (lua_State *L)
+{
+  int count = lua_getgccount (L);
+  int threshold = lua_getgcthreshold (L);
+  if (count < threshold) return;
+  palette_cache_gc (L);
 }
 
 void

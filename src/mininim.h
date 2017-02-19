@@ -212,6 +212,7 @@
 #include "L_mininim.video.bitmap.h"
 #include "L_mininim.video.color.h"
 #include "L_mininim.setting.h"
+#include "L_mininim.mouse.h"
 
 /* functions */
 void free_argv (size_t *cargc, char ***cargv);
@@ -245,6 +246,7 @@ extern enum gpm gpm;
 extern char *audio_mode;
 extern char *video_mode;
 extern char *env_mode;
+extern char *hue_mode;
 extern bool immortal_mode;
 extern int initial_total_lives, total_lives,
   initial_current_lives, current_lives;
