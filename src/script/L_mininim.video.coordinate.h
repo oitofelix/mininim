@@ -24,7 +24,8 @@
 #define L_MININIM_VIDEO_COORDINATE L_MININIM_VIDEO ".coordinate"
 
 void define_L_mininim_video_coordinate (lua_State *L);
-int L_mininim_video_coordinate (lua_State *L);
 void L_pushcoordinate (lua_State *L, struct coord *p);
+
+DECLARE_LUA (L_mininim_video_coordinate);
 
 #endif	/* MININIM_L_MININIM_VIDEO_COORDINATE_H */

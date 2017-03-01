@@ -46,7 +46,6 @@ init_script (void)
   luaopen_io (L);
   luaopen_string (L);
   luaopen_math (L);
-  luaopen_debug (L);
   luaopen_loadlib (L);
 
   /* path */
@@ -80,31 +79,35 @@ init_script (void)
   lua_setmetatable (L, -2);
   L_set_registry_by_ref (L, &weak_registry_ref);
 
+  /* REPL */
+  repl_mutex = al_create_mutex_recursive ();
+  repl_cond = al_create_cond ();
+  debug_cond = al_create_cond ();
+  lock_thread ();
+  repl_L = lua_newthread (L);
+  L_set_registry_by_ref (L, &repl_thread_ref);
+  repl_thread = al_create_thread (repl, repl_L);
+  al_start_thread (repl_thread);
+  al_wait_cond (repl_cond, repl_mutex);
+
   /* load script */
   int e = load_resource ("data/script/mininim.lua",
                          (load_resource_f) load_script, false);
 
   if (! e) {
-    if (lua_isfunction (L, -1)) {
-      if (lua_pcall (L, 0, 0, 0))
-        error (-1, 0, "%s", lua_tostring(L, -1));
-    } else error (-1, 0, "%s", lua_tostring(L, -1));
+    /* run-time error */
+    if (lua_isfunction (L, -1)) L_call (L, 0, 0);
+    /* syntax error */
+    else error (-1, 0, "%s", lua_tostring(L, -1));
   } else {
+    /* no script found */
     while (lua_gettop (L)) {
       error (0, 0, "%s", lua_tostring(L, 1));
       lua_remove (L, 1);
     }
     exit (-1);
   }
-
-  /* REPL */
   lua_settop (L, 0);
-  repl_mutex = al_create_mutex_recursive ();
-  lock_thread ();
-  repl_L = lua_newthread (L);
-  L_set_registry_by_ref (L, &repl_thread_ref);
-  repl_thread = al_create_thread (repl, repl_L);
-  al_start_thread (repl_thread);
 }
 
 void
@@ -115,6 +118,8 @@ finalize_script (void)
   al_join_thread (repl_thread, NULL);
   al_destroy_thread (repl_thread);
   al_destroy_mutex (repl_mutex);
+  al_destroy_cond (repl_cond);
+  al_destroy_cond (debug_cond);
   lua_close (main_L);
 }
 
@@ -122,21 +127,27 @@ void *
 L_check_type (lua_State *L, int index, const char *tname)
 {
   void *ud = luaL_checkudata (L, index, tname);
-  if (! ud)
-    luaL_error (L, "%s expected, got %s", tname,
-                lua_typename (L, lua_type (L, index)));
+  if (! ud) L_error_expected_got (L, index, tname);
   return ud;
+}
+
+int
+L_error_expected_got (lua_State *L, int index, const char *expected_tname)
+{
+  char *got_tname = L_typename (L, index);
+  lua_pushfstring (L, "%s expected, got %s", expected_tname, got_tname);
+  al_free (got_tname);
+  return lua_error (L);
 }
 
 bool
 L_call (lua_State *L, int nargs, int nresults)
 {
   int base = lua_gettop(L) - nargs;
-  lua_pushliteral(L, "_TRACEBACK");
-  lua_rawget(L, LUA_GLOBALSINDEX);
-  lua_insert(L, base);
+  lua_pushcfunction (L, L_TRACEBACK);
+  lua_insert (L, base);
   if (lua_pcall (L, nargs, nresults, base)) {
-    error (0, 0, "%s", lua_tostring(L, -1));
+    fprintf (stderr, "%s\n", lua_tostring(L, -1));
     lua_pop (L, 1);
     lua_remove(L, base);
     int i;

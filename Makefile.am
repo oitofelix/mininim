@@ -47,39 +47,36 @@ mininim_SOURCES = src/mininim.c src/mininim.h src/compatibility.h			\
   src/sword.c src/sword.h src/clock.c src/clock.h src/princess.c			\
   src/princess.h src/jaffar.c src/jaffar.h src/mouse.c src/mouse.h		\
   src/audio-data.c src/audio-data.h src/cutscenes.c src/cutscenes.h		\
-  src/fight.c src/fight.h src/dat.c src/dat.h src/wall/wall.c					\
-  src/wall/wall.h src/wall/wall-depedv.c src/wall/wall-depedv.h				\
-  src/wall/wall-pv.c src/wall/wall-pv.h src/wall/wall-dcpc.c					\
-  src/wall/wall-dcpc.h src/kid/kid.c src/kid/kid.h										\
-  src/kid/kid-normal.c src/kid/kid-normal.h src/kid/kid-walk.c				\
-  src/kid/kid-walk.h src/kid/kid-start-run.c src/kid/kid-start-run.h	\
-  src/kid/kid-run.c src/kid/kid-run.h src/kid/kid-stop-run.c					\
-  src/kid/kid-stop-run.h src/kid/kid-turn-run.c												\
-  src/kid/kid-turn-run.h src/kid/kid-couch.c src/kid/kid-couch.h			\
-  src/kid/kid-turn.c src/kid/kid-turn.h src/kid/kid-stabilize.c				\
-  src/kid/kid-stabilize.h src/kid/kid-jump.c src/kid/kid-jump.h				\
-  src/kid/kid-vjump.c src/kid/kid-vjump.h src/kid/kid-run-jump.c			\
-  src/kid/kid-run-jump.h src/kid/kid-misstep.c src/kid/kid-misstep.h	\
-  src/kid/kid-hang.c src/kid/kid-hang.h src/kid/kid-hang-wall.c				\
-  src/kid/kid-hang-wall.h src/kid/kid-hang-free.c											\
-  src/kid/kid-hang-free.h src/kid/kid-climb.c src/kid/kid-climb.h			\
-  src/kid/kid-unclimb.c src/kid/kid-unclimb.h src/kid/kid-fall.c			\
-  src/kid/kid-fall.h src/kid/kid-drink.c src/kid/kid-drink.h					\
-  src/kid/kid-raise-sword.c src/kid/kid-raise-sword.h									\
-  src/kid/kid-keep-sword.c src/kid/kid-keep-sword.h										\
-  src/kid/kid-take-sword.c src/kid/kid-take-sword.h										\
-  src/kid/kid-sword-normal.c src/kid/kid-sword-normal.h								\
-  src/kid/kid-sword-walkf.c src/kid/kid-sword-walkf.h									\
-  src/kid/kid-sword-walkb.c src/kid/kid-sword-walkb.h									\
-  src/kid/kid-sword-defense.c src/kid/kid-sword-defense.h							\
-  src/kid/kid-sword-attack.c src/kid/kid-sword-attack.h								\
-  src/kid/kid-sword-hit.c src/kid/kid-sword-hit.h src/kid/kid-die.c		\
-  src/kid/kid-die.h src/kid/kid-stairs.c src/kid/kid-stairs.h					\
-  src/guard/guard.c src/guard/guard.h src/guard/guard-normal.c				\
-  src/guard/guard-normal.h src/guard/guard-vigilant.c									\
-  src/guard/guard-vigilant.h src/guard/guard-hit.c										\
-  src/guard/guard-hit.h src/guard/guard-die.c src/guard/guard-die.h		\
-  src/guard/guard-fall.c src/guard/guard-fall.h												\
+  src/fight.c src/fight.h src/dat.c src/dat.h src/wall.c src/wall.h		\
+  src/kid/kid.c src/kid/kid.h src/kid/kid-normal.c										\
+  src/kid/kid-normal.h src/kid/kid-walk.c src/kid/kid-walk.h					\
+  src/kid/kid-start-run.c src/kid/kid-start-run.h src/kid/kid-run.c		\
+  src/kid/kid-run.h src/kid/kid-stop-run.c src/kid/kid-stop-run.h			\
+  src/kid/kid-turn-run.c src/kid/kid-turn-run.h src/kid/kid-couch.c		\
+  src/kid/kid-couch.h src/kid/kid-turn.c src/kid/kid-turn.h						\
+  src/kid/kid-stabilize.c src/kid/kid-stabilize.h src/kid/kid-jump.c	\
+  src/kid/kid-jump.h src/kid/kid-vjump.c src/kid/kid-vjump.h					\
+  src/kid/kid-run-jump.c src/kid/kid-run-jump.h src/kid/kid-misstep.c	\
+  src/kid/kid-misstep.h src/kid/kid-hang.c src/kid/kid-hang.h					\
+  src/kid/kid-hang-wall.c src/kid/kid-hang-wall.h											\
+  src/kid/kid-hang-free.c src/kid/kid-hang-free.h src/kid/kid-climb.c	\
+  src/kid/kid-climb.h src/kid/kid-unclimb.c src/kid/kid-unclimb.h			\
+  src/kid/kid-fall.c src/kid/kid-fall.h src/kid/kid-drink.c						\
+  src/kid/kid-drink.h src/kid/kid-raise-sword.c												\
+  src/kid/kid-raise-sword.h src/kid/kid-keep-sword.c									\
+  src/kid/kid-keep-sword.h src/kid/kid-take-sword.c										\
+  src/kid/kid-take-sword.h src/kid/kid-sword-normal.c									\
+  src/kid/kid-sword-normal.h src/kid/kid-sword-walkf.c								\
+  src/kid/kid-sword-walkf.h src/kid/kid-sword-walkb.c									\
+  src/kid/kid-sword-walkb.h src/kid/kid-sword-defense.c								\
+  src/kid/kid-sword-defense.h src/kid/kid-sword-attack.c							\
+  src/kid/kid-sword-attack.h src/kid/kid-sword-hit.c									\
+  src/kid/kid-sword-hit.h src/kid/kid-die.c src/kid/kid-die.h					\
+  src/kid/kid-stairs.c src/kid/kid-stairs.h src/guard/guard.c					\
+  src/guard/guard.h src/guard/guard-normal.c src/guard/guard-normal.h	\
+  src/guard/guard-vigilant.c src/guard/guard-vigilant.h								\
+  src/guard/guard-hit.c src/guard/guard-hit.h src/guard/guard-die.c		\
+  src/guard/guard-die.h src/guard/guard-fall.c src/guard/guard-fall.h	\
   src/guard/guard-walkf.c src/guard/guard-walkf.h											\
   src/guard/guard-walkb.c src/guard/guard-walkb.h											\
   src/guard/guard-attack.c src/guard/guard-attack.h										\
@@ -115,8 +112,14 @@ mininim_SOURCES = src/mininim.c src/mininim.h src/compatibility.h			\
   src/script/L_mininim.video.color.h																	\
   src/script/L_mininim.video.coordinate.c															\
   src/script/L_mininim.video.coordinate.h															\
+  src/script/L_mininim.video.rectangle.c															\
+  src/script/L_mininim.video.rectangle.h															\
   src/script/L_mininim.setting.c src/script/L_mininim.setting.h				\
-  src/script/L_mininim.mouse.c src/script/L_mininim.mouse.h
+  src/script/L_mininim.mouse.c src/script/L_mininim.mouse.h						\
+  src/script/L_mininim.multiroom.c src/script/L_mininim.multiroom.h		\
+  src/script/L_mininim.profiler.c src/script/L_mininim.profiler.h			\
+  src/script/L_mininim.debugger.c src/script/L_mininim.debugger.h			\
+  src/script/L_mininim.math.c src/script/L_mininim.math.h
 
 ${mininim_OBJECTS}: ${top_builddir}/src/mininim.h.gch
 

@@ -23,8 +23,6 @@
 ALLEGRO_BITMAP *room0;
 bool con_caching;
 
-ALLEGRO_COLOR room0_wall_color[3][4][11];
-
 struct multi_room mr;
 int room_view;
 
@@ -197,6 +195,7 @@ create_multi_room_bitmaps (void)
 void
 set_multi_room (int w, int h)
 {
+  if (w < 1 || h < 1) return;
   redim_multi_room (w, h);
   create_multi_room_bitmaps ();
 }
@@ -778,16 +777,6 @@ draw_multi_rooms (void)
     mr_busy ();
     force_full_redraw = true;
   }
-
-  if (anim_cycle == 0) {
-    generate_wall_colors_for_room (0, room0_wall_color);
-  }
-
-  if (em == PALACE && vm == VGA
-      && (mr_full_update
-          || em != mr.last.em
-          || vm != mr.last.vm))
-    generate_wall_colors ();
 
   if (mouse_pos.room != mr.last.mouse_pos.room
       || mouse_pos.floor != mr.last.mouse_pos.floor

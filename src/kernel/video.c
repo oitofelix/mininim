@@ -141,7 +141,7 @@ init_video (void)
 
   /* workaround bug in which first access to clipboard fails */
   char *clipboard_text = al_get_clipboard_text (display);
-  if (clipboard_text) al_free (clipboard_text);
+  al_free (clipboard_text);
 }
 
 void

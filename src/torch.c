@@ -21,10 +21,16 @@
 #include "mininim.h"
 
 void
-draw_torch (ALLEGRO_BITMAP *bitmap, struct pos *p,
-            enum em em, enum vm vm)
+draw_torch (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
+  lua_State *L = main_L;
+  if (! L_push_video_routine (L)) return;
+
+  lua_pushstring (L, "DRAW");
+  lua_pushstring (L, "TORCH");
+  L_pushposition (L, p);
+
   L_target_bitmap = bitmap;
-  L_video_draw (main_L, "TORCH", "BASE", 1, p);
+  L_call (L, 3, 0);
   L_target_bitmap = NULL;
 }

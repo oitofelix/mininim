@@ -102,14 +102,14 @@ bmenu_enum (struct bmenu_item *menu, char *prefix)
     } else {
       bmenu_str = xasprintf ("%s%c", prefix ? prefix : "", menu[i].key);
     }
-    if (tmp_str) al_free (tmp_str);
+    al_free (tmp_str);
     i++;
   }
   if (bmenu_str) {
     tmp_str = bmenu_str;
     bmenu_str = xasprintf ("%s%c", bmenu_str, '?');
   }
-  if (tmp_str) al_free (tmp_str);
+  al_free (tmp_str);
   char c = bmenu_opt (menu, bmenu_str);
   al_free (bmenu_str);
   return c;
@@ -133,7 +133,7 @@ bmenu_bool (struct bmenu_item *menu, char *prefix, bool exclusive, ...)
       bmenu_str = xasprintf ("%s%c%c", prefix ? prefix : "",
                  menu[i].key, *b ? '*' : '-');
     }
-    if (tmp_str) al_free (tmp_str);
+    al_free (tmp_str);
     i++;
   }
   if (bmenu_str) {
@@ -142,7 +142,7 @@ bmenu_bool (struct bmenu_item *menu, char *prefix, bool exclusive, ...)
   }
   va_end (ap);
 
-  if (tmp_str) al_free (tmp_str);
+  al_free (tmp_str);
   char c = bmenu_opt (menu, bmenu_str);
 
   if (c > 1) {

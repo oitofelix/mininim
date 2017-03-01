@@ -77,7 +77,7 @@ remove_from_array (void *base, size_t *nmemb, size_t index, size_t count, size_t
 void
 destroy_array (void **base, size_t *nmemb)
 {
-  if (*base && nmemb > 0) al_free (*base);
+  if (nmemb > 0) al_free (*base);
   *base = NULL;
   *nmemb = 0;
 }

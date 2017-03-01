@@ -20,7 +20,7 @@
 
 -- package header
 local P = {packge_type = "SPECIAL EVENTS", package_name = "LEGACY",
-           package_file = debug.getinfo (1, "S").short_src}
+           package_file = mininim.debugger.src}
 
 -- imports
 local M = mininim
@@ -37,6 +37,7 @@ local function level_01_cycle_hook ()
    if (M.cycle == 12 and not M.level.retry) then
       M.audio.current["SUSPENSE"].play ()
    end
+
 end
 
 -- executed before the first animation cycle of each level

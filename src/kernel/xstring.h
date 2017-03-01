@@ -26,7 +26,23 @@
 void tolower_str (char *str);
 void toupper_str (char *str);
 void repl_str_char (char *str, char a, char b);
+char *trim_string (char *s);
+char *repeat_char (char c, size_t n);
 
+
+
+
+
+char *hline (char c);
+void fmt_begin (int ncols);
+char *fmt_row (const char *fmt, ...);
+char *fmt_end (void);
+char *fmt_manual (const char *sep, ...);
+
+
+
+
+
 wchar_t *m2w_str (const char *s);
 char *w2m_str (const wchar_t *s);
 char *shorten_str (char *s, size_t max);

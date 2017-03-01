@@ -140,8 +140,6 @@ struct multi_room {
       struct star *s;
       size_t count;
     } stars[FLOORS][PLACES];
-
-    ALLEGRO_COLOR wall_color[3][4][11];
   } **cell;
 
   struct {

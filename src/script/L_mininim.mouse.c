@@ -20,10 +20,10 @@
 
 #include "mininim.h"
 
-static int __eq (lua_State *L);
-static int __index (lua_State *L);
-static int __newindex (lua_State *L);
-static int __tostring (lua_State *L);
+static DECLARE_LUA (__eq);
+static DECLARE_LUA (__index);
+static DECLARE_LUA (__newindex);
+static DECLARE_LUA (__tostring);
 
 void
 define_L_mininim_mouse (lua_State *L)
@@ -49,15 +49,14 @@ define_L_mininim_mouse (lua_State *L)
   lua_pop (L, 1);
 }
 
-int
-__eq (lua_State *L)
+BEGIN_LUA (__eq)
 {
   lua_pushboolean (L, true);
   return 1;
 }
+END_LUA
 
-int
-__index (lua_State *L)
+BEGIN_LUA (__index)
 {
   const char *key;
   int type = lua_type (L, 2);
@@ -74,9 +73,9 @@ __index (lua_State *L)
   lua_pushnil (L);
   return 1;
 }
+END_LUA
 
-int
-__newindex (lua_State *L)
+BEGIN_LUA (__newindex)
 {
   const char *key;
   int type = lua_type (L, 2);
@@ -89,10 +88,11 @@ __newindex (lua_State *L)
 
   return 0;
 }
+END_LUA
 
-int
-__tostring (lua_State *L)
+BEGIN_LUA (__tostring)
 {
   lua_pushstring (L, "MININIM MOUSE INTERFACE");
   return 1;
 }
+END_LUA

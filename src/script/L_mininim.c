@@ -22,10 +22,12 @@
 
 static int load_hook_ref = LUA_NOREF;
 
-static int __eq (lua_State *L);
-static int __index (lua_State *L);
-static int __newindex (lua_State *L);
-static int __tostring (lua_State *L);
+static DECLARE_LUA (__eq);
+static DECLARE_LUA (__index);
+static DECLARE_LUA (__newindex);
+static DECLARE_LUA (__tostring);
+
+static DECLARE_LUA (quit);
 
 void
 define_L_mininim (lua_State *L)
@@ -50,6 +52,9 @@ define_L_mininim (lua_State *L)
 
   lua_pop (L, 1);
 
+  /* global shortcuts */
+  lua_register (L, "_quit", quit);
+
   /* mininim.level */
   define_L_mininim_level (L);
 
@@ -67,6 +72,18 @@ define_L_mininim (lua_State *L)
 
   /* mininim.mouse */
   define_L_mininim_mouse (L);
+
+  /* mininim.multiroom */
+  define_L_mininim_multiroom (L);
+
+  /* mininim.profiler */
+  define_L_mininim_profiler (L);
+
+  /* mininim.debugger */
+  define_L_mininim_debugger (L);
+
+  /* mininim.math */
+  define_L_mininim_math (L);
 }
 
 void
@@ -76,15 +93,14 @@ run_load_hook (lua_State *L)
   L_run_hook (L);
 }
 
-int
-__eq (lua_State *L)
+BEGIN_LUA (__eq)
 {
   lua_pushboolean (L, true);
   return 1;
 }
+END_LUA
 
-int
-__index (lua_State *L)
+BEGIN_LUA (__index)
 {
   const char *key;
   int type = lua_type (L, 2);
@@ -121,13 +137,28 @@ __index (lua_State *L)
     } else if (! strcasecmp (key, "mouse")) {
       L_push_interface (L, L_MININIM_MOUSE);
       return 1;
+    } else if (! strcasecmp (key, "multiroom")) {
+      L_push_interface (L, L_MININIM_MULTIROOM);
+      return 1;
+    } else if (! strcasecmp (key, "profiler")) {
+      L_push_interface (L, L_MININIM_PROFILER);
+      return 1;
+    } else if (! strcasecmp (key, "debugger")) {
+      L_push_interface (L, L_MININIM_DEBUGGER);
+      return 1;
+    } else if (! strcasecmp (key, "math")) {
+      L_push_interface (L, L_MININIM_MATH);
+      return 1;
+    } else if (! strcasecmp (key, "quit")) {
+      lua_pushcfunction (L, quit);
+      return 1;
     } else if (! strcasecmp (key, "clipboard")) {
       if (al_clipboard_has_text (display)) {
         char *text = al_get_clipboard_text (display);
-        if (text) al_free (text);
+        al_free (text);
         text = al_get_clipboard_text (display);
         lua_pushstring (L, text);
-        if (text) al_free (text);
+        al_free (text);
       } else lua_pushnil (L);
       return 1;
     } else break;
@@ -137,9 +168,9 @@ __index (lua_State *L)
   lua_pushnil (L);
   return 1;
 }
+END_LUA
 
-int
-__newindex (lua_State *L)
+BEGIN_LUA (__newindex)
 {
   const char *key;
   int type = lua_type (L, 2);
@@ -161,10 +192,18 @@ __newindex (lua_State *L)
 
   return 0;
 }
+END_LUA
 
-int
-__tostring (lua_State *L)
+BEGIN_LUA (__tostring)
 {
   lua_pushfstring (L, "MININIM %s INTERFACE", VERSION);
   return 1;
 }
+END_LUA
+
+BEGIN_LUA (quit)
+{
+  quit_anim = QUIT_GAME;
+  return 0;
+}
+END_LUA

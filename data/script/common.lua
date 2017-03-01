@@ -20,11 +20,11 @@
 
 -- header
 local P = {package_type = "LIBRARY", package_name = "common",
-           package_file = debug.getinfo (1, "S").short_src}
+           package_file = mininim.debugger.src}
 
 -- imports
-local string = string
 local M = mininim
+local string = string
 local loadstring = loadstring
 local assert = assert
 local table = table
@@ -33,6 +33,9 @@ local pairs = pairs
 local tostring = tostring
 local io = io
 local math = math
+local os = os
+local debug = debug
+local print = print
 
 -- body
 setfenv (1, P)

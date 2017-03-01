@@ -21,6 +21,7 @@
 -- imports
 local M = mininim
 
+
 -- called during loading screen for loading assets
 function M.load_hook ()
    -- video modes

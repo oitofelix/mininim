@@ -507,7 +507,7 @@ vmenu_item (uint16_t id, int flags, ALLEGRO_BITMAP *icon,
       al_set_menu_item_caption (*am, -*am_i, title);
     }
 
-    if (title_template) al_free (title);
+    al_free (title);
 
     /* update icon */
     if ((cicon && ! icon) || (! cicon && icon)
@@ -528,7 +528,7 @@ vmenu_item (uint16_t id, int flags, ALLEGRO_BITMAP *icon,
   bool r = al_insert_menu_item (*am, -((*am_i)++), title,
                                 id, flags, clone_memory_bitmap (icon),
                                 submenu);
-  if (title_template) al_free (title);
+  al_free (title);
   return r;
 }
 
@@ -2980,7 +2980,7 @@ ui_undo_pass (struct undo *u, int dir, char *prefix)
 
   bool b = can_undo (u, dir);
 
-  if (undo_msg) al_free (undo_msg);
+  al_free (undo_msg);
 
   if (! b) {
     if (prefix) undo_msg = xasprintf ("NO FURTHER %s %s", prefix, dir_str);
@@ -3211,7 +3211,7 @@ ui_save_replay_favorites (void)
 
   char *section = NULL;
   do {
-    if (section) al_free (section);
+    al_free (section);
     section = xasprintf ("REPLAY FAVORITE %zu", i++);
   } while (ui_save_setting (section, NULL, NULL));
   al_free (section);
@@ -3232,8 +3232,8 @@ ui_load_replay_favorites (void)
     al_free (section);
 
     if (! file_str || ! cycle_str) {
-      if (file_str) al_free (file_str);
-      if (cycle_str) al_free (cycle_str);
+      al_free (file_str);
+      al_free (cycle_str);
       break;
     }
 

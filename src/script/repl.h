@@ -23,11 +23,14 @@
 
 /* functions */
 void *repl (ALLEGRO_THREAD *thread, void *repl_L);
+void repl_update_prompt (void);
 
 /* variables */
 extern ALLEGRO_MUTEX *repl_mutex;
 extern ALLEGRO_THREAD *repl_thread;
+extern ALLEGRO_COND *repl_cond;
 extern lua_State *repl_L;
 extern int repl_thread_ref;
+extern bool repl_prompt_ready;
 
 #endif	/* MININIM_XLUA_H */

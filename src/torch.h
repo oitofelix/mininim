@@ -21,7 +21,6 @@
 #ifndef MININIM_TORCH_H
 #define MININIM_TORCH_H
 
-void draw_torch (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                 enum em em, enum vm vm);
+void draw_torch (ALLEGRO_BITMAP *bitmap, struct pos *p);
 
 #endif	/* MININIM_TORCH_H */

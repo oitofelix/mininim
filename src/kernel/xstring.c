@@ -41,6 +41,175 @@ repl_str_char (char *str, char a, char b)
   for (i = 0; str[i] != 0; i++) if (str[i] == a) str[i] = b;
 }
 
+char *
+trim_string (char *s)
+{
+  ALLEGRO_USTR *us = al_ustr_new (s);
+  al_ustr_trim_ws (us);
+  char *rs = al_cstr_dup (us);
+  al_ustr_free (us);
+  return rs;
+}
+
+char *
+repeat_char (char c, size_t n)
+{
+  char *s = xcalloc (n + 1, sizeof (*s));
+  size_t i;
+  for (i = 0; i < n; i++) s[i] = c;
+  s[n] = '\0';
+  return s;
+}
+
+
+
+
+
+static size_t *fmt_width;
+static size_t fmt_width_nmemb;
+
+void
+fmt_begin (int ncols)
+{
+  assert (! fmt_width && fmt_width_nmemb == 0);
+  fmt_width = xcalloc (ncols, sizeof (*fmt_width));
+  memset (fmt_width, 0, ncols * sizeof (*fmt_width));
+  fmt_width_nmemb = ncols;
+}
+
+char *
+fmt_row (const char *fmt, ...)
+{
+  va_list ap;
+  va_start (ap, fmt);
+
+  char *r = NULL;
+
+  if (fmt) r = xvasprintf (fmt, ap);
+  else {
+    va_arg (ap, char *); /* ignore first */
+    size_t i;
+    for (i = 0; i < fmt_width_nmemb; i++) {
+      char *s = va_arg (ap, char *);
+      size_t l = strlen (s);
+      if (fmt_width[i] < l) fmt_width[i] = l;
+    }
+  }
+
+  va_end (ap);
+
+  return r;
+}
+
+char *
+fmt_end (void)
+{
+  const char *sep = " ";
+
+  struct winsize win;
+  if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &win) < 0)
+    win.ws_col = 80;
+
+  int total_width = 0;
+  size_t i;
+  for (i = 0; i < fmt_width_nmemb; i++)
+    total_width += fmt_width[i];
+
+  int avail_width =
+    max_int (0, win.ws_col - 1 - (fmt_width_nmemb - 1) * strlen (sep));
+
+  if (total_width == 0) total_width = 1;
+
+  char *h = xasprintf ("%%s");
+
+  for (i = 0; i < fmt_width_nmemb; i++) {
+    int w = (fmt_width[i] * avail_width) / total_width;
+    if (total_width < avail_width) {
+      w = fmt_width[i] + (avail_width - total_width) / fmt_width_nmemb;
+    } else if (w < fmt_width[i] / 2.0 && avail_width >= fmt_width[i] + 1) {
+      w = fmt_width[i];
+      total_width -= w;
+      avail_width -= w + 1;
+    }
+
+    assert (avail_width >= 0);
+
+    char *old_h = h;
+    h = xasprintf ("%1$s%%-%2$i.%2$is%3$s", old_h, w,
+                   i + 1 < fmt_width_nmemb ? sep : "");
+    al_free (old_h);
+  }
+
+  char *old_h = h;
+  h = xasprintf ("%s%%s", old_h);
+  al_free (old_h);
+
+  al_free (fmt_width);
+  fmt_width = NULL;
+  fmt_width_nmemb = 0;
+
+  return h;
+}
+
+char *
+fmt_manual (const char *sep, ...)
+{
+  int *width = NULL;
+  size_t width_nmemb = 0;
+
+  va_list ap;
+  va_start (ap, sep);
+
+  size_t i;
+  int w;
+  for (i = 0; (w = va_arg (ap, int)); i++)
+    width = add_to_array (&w, 1, width, &width_nmemb,
+                          width_nmemb, sizeof (w));
+
+  int fixed_width = (width_nmemb - 1) * strlen (sep);
+  int var_parts = 0;
+  for (i = 0; i < width_nmemb; i++)
+    if (width[i] > 0) fixed_width += width[i];
+    else var_parts += abs (width[i]);
+
+  struct winsize win;
+  if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &win) < 0)
+    win.ws_col = 80;
+
+  int avail_width = max_int (0, win.ws_col - 1 - fixed_width);
+  char *h = xasprintf ("%%s");
+  for (i = 0; i < width_nmemb; i++) {
+    int w;
+    if (width[i] > 0) w = width[i];
+    else w = (abs (width[i]) * avail_width) / var_parts;
+    char *old_h = h;
+    h = xasprintf ("%1$s%%-%2$i.%2$is%3$s", old_h, w,
+                   i + 1 < width_nmemb ? sep : "");
+    al_free (old_h);
+  }
+
+  char *old_h = h;
+  h = xasprintf ("%s%%s", old_h);
+  al_free (old_h);
+
+  va_end (ap);
+
+  return h;
+}
+
+char *
+hline (char c)
+{
+  struct winsize win;
+  if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &win) < 0)
+    win.ws_col = 80;
+  return repeat_char (c, win.ws_col - 1);
+}
+
+
+
+
+
 wchar_t *
 m2w_str (const char *s)
 {

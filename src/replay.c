@@ -303,10 +303,8 @@ xload_replay (char *filename)
 void
 free_replay (struct replay *replay)
 {
-  if (replay->packed_gamepad_state)
-    al_free (replay->packed_gamepad_state);
-  if (replay->filename)
-    al_free (replay->filename);
+  al_free (replay->packed_gamepad_state);
+  al_free (replay->filename);
   memset (replay, 0, sizeof (* replay));
 }
 

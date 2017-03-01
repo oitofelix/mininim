@@ -43,6 +43,7 @@
 #include <signal.h>
 #include <wchar.h>
 #include <ctype.h>
+#include <sys/ioctl.h>
 
 #include "error.h"
 #include "argp.h"
@@ -132,6 +133,7 @@
 #include "sword.h"
 #include "torch.h"
 #include "window.h"
+#include "wall.h"
 #include "dat.h"
 
 #include "guard.h"
@@ -184,11 +186,6 @@
 #include "dat-level.h"
 #include "plv-level.h"
 
-#include "wall.h"
-#include "wall-dcpc.h"
-#include "wall-depedv.h"
-#include "wall-pv.h"
-
 #include "bmenu.h"
 #include "editor.h"
 #include "debug.h"
@@ -212,8 +209,13 @@
 #include "L_mininim.video.bitmap.h"
 #include "L_mininim.video.color.h"
 #include "L_mininim.video.coordinate.h"
+#include "L_mininim.video.rectangle.h"
 #include "L_mininim.setting.h"
 #include "L_mininim.mouse.h"
+#include "L_mininim.multiroom.h"
+#include "L_mininim.profiler.h"
+#include "L_mininim.debugger.h"
+#include "L_mininim.math.h"
 
 /* functions */
 void free_argv (size_t *cargc, char ***cargv);

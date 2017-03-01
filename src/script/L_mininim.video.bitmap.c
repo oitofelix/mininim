@@ -22,13 +22,13 @@
 
 ALLEGRO_BITMAP *L_target_bitmap;
 
-static int __gc (lua_State *L);
-static int __eq (lua_State *L);
-static int __index (lua_State *L);
-static int __tostring (lua_State *L);
+static DECLARE_LUA (__gc);
+static DECLARE_LUA (__eq);
+static DECLARE_LUA (__index);
+static DECLARE_LUA (__tostring);
 
-static int L_apply_palette (lua_State *L);
-static int draw (lua_State *L);
+static DECLARE_LUA (L_apply_palette);
+static DECLARE_LUA (draw);
 
 void
 define_L_mininim_video_bitmap (lua_State *L)
@@ -73,25 +73,24 @@ L_pushbitmap (lua_State *L, ALLEGRO_BITMAP *b)
   } else lua_pushnil (L);
 }
 
-int
-L_mininim_video_bitmap (lua_State *L)
+BEGIN_LUA (L_mininim_video_bitmap)
 {
   const char *filename = luaL_checkstring (L, 1);
   ALLEGRO_BITMAP *b = load_bitmap (filename);
   L_pushbitmap (L, b);
   return 1;
 }
+END_LUA
 
-int
-__gc (lua_State *L)
+BEGIN_LUA (__gc)
 {
   ALLEGRO_BITMAP **b = luaL_checkudata (L, 1, L_MININIM_VIDEO_BITMAP);
   destroy_bitmap (*b);
   return 0;
 }
+END_LUA
 
-int
-__eq (lua_State *L)
+BEGIN_LUA (__eq)
 {
   ALLEGRO_BITMAP **b0 = luaL_checkudata (L, 1, L_MININIM_VIDEO_BITMAP);
   ALLEGRO_BITMAP **b1 = luaL_checkudata (L, 2, L_MININIM_VIDEO_BITMAP);
@@ -99,9 +98,9 @@ __eq (lua_State *L)
   else lua_pushboolean (L, lua_rawequal (L, 1, 2));
   return 1;
 }
+END_LUA
 
-int
-__index (lua_State *L)
+BEGIN_LUA (__index)
 {
   ALLEGRO_BITMAP **b_ptr = luaL_checkudata (L, 1, L_MININIM_VIDEO_BITMAP);
 
@@ -132,9 +131,9 @@ __index (lua_State *L)
   lua_pushnil (L);
   return 1;
 }
+END_LUA
 
-int
-__tostring (lua_State *L)
+BEGIN_LUA (__tostring)
 {
   ALLEGRO_BITMAP **b = luaL_checkudata (L, 1, L_MININIM_VIDEO_BITMAP);
   lua_pushfstring (L, L_MININIM_VIDEO_BITMAP " %dx%d",
@@ -142,6 +141,7 @@ __tostring (lua_State *L)
                    b ? al_get_bitmap_height (*b) : 0);
   return 1;
 }
+END_LUA
 
 ALLEGRO_COLOR
 L_palette (ALLEGRO_COLOR c)
@@ -158,8 +158,7 @@ L_palette (ALLEGRO_COLOR c)
   return c_ret;
 }
 
-int
-L_apply_palette (lua_State *L)
+BEGIN_LUA (L_apply_palette)
 {
   ALLEGRO_BITMAP **b =
     luaL_checkudata (L, lua_upvalueindex (1), L_MININIM_VIDEO_BITMAP);
@@ -179,9 +178,9 @@ L_apply_palette (lua_State *L)
   L_pushbitmap (L, r);
   return 1;
 }
+END_LUA
 
-int
-draw (lua_State *L)
+BEGIN_LUA (draw)
 {
   if (! L_target_bitmap) return 0;
 
@@ -193,7 +192,16 @@ draw (lua_State *L)
   struct coord *c = L_check_type (L, 1, L_MININIM_VIDEO_COORDINATE);
   c->room = room_view;
 
-  draw_bitmapc (*b, L_target_bitmap, c, 0);
+  float sx = lua_tonumber (L, 2);
+  float sy = lua_tonumber (L, 3);
+
+  float sw = lua_isnumber (L, 4)
+    ? lua_tonumber (L, 4) : al_get_bitmap_width (*b);
+  float sh = lua_isnumber (L, 5)
+    ? lua_tonumber (L, 5) : al_get_bitmap_height (*b);
+
+  draw_bitmap_regionc (*b, L_target_bitmap, sx, sy, sw, sh, c, 0);
 
   return 0;
 }
+END_LUA

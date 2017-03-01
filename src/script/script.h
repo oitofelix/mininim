@@ -21,6 +21,14 @@
 #ifndef MININIM_SCRIPT_H
 #define MININIM_SCRIPT_H
 
+#define BEGIN_LUA(name) int name (lua_State *L) {
+#define END_LUA }
+
+#define DECLARE_LUA(name) int name (lua_State *L)
+
+#define lua_abs_index(L, i) ((i) > 0 || (i) <= LUA_REGISTRYINDEX ? (i) : \
+                             lua_gettop(L) + (i) + 1)
+
 /* functions */
 void init_script (void);
 void finalize_script (void);
@@ -42,6 +50,9 @@ void L_set_weak_registry_by_ptr (lua_State *L, void *p);
 void L_get_weak_registry_by_ptr (lua_State *L, void *p);
 
 void L_gc (lua_State *L);
+
+int L_error_expected_got (lua_State *L, int index,
+                          const char *expected_tname);
 
 /* variables */
 extern lua_State *main_L;

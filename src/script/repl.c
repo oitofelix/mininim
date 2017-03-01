@@ -43,8 +43,6 @@
 
 #include "mininim.h"
 
-#define PROMPT "MININIM> "
-#define PROMPT2 ".......>> "
 #define LUA_HISTORY_ENV "MININIM_HISTORY"
 #define LUA_HISTSIZE_ENV "MININIM_HISTSIZE"
 
@@ -64,15 +62,28 @@ lhandler (char *line)
   else lhandler_line = line;
 }
 
+static bool should_update_prompt;
+bool repl_prompt_ready;
+
+void
+repl_update_prompt (void)
+{
+  should_update_prompt = true;
+}
+
 /* Read a line from the terminal with line editing */
 static int lua_readline(lua_State *L, const char *prompt)
 {
   rl_callback_handler_install (prompt, lhandler);
 
+  should_update_prompt = false;
+  repl_prompt_ready = true;
+
   unlock_thread ();
   struct timeval timeout;
   fd_set set;
-  while (! lhandler_line && ! al_get_thread_should_stop (repl_thread)) {
+  while (! lhandler_line && ! al_get_thread_should_stop (repl_thread)
+         && ! should_update_prompt) {
     FD_ZERO (&set);
     FD_SET (fileno (rl_instream), &set);
     timeout.tv_sec = 0;
@@ -84,6 +95,7 @@ static int lua_readline(lua_State *L, const char *prompt)
     }
   }
   lock_thread ();
+  repl_prompt_ready = false;
 
   if (! lhandler_line) return 0;
 
@@ -305,8 +317,7 @@ static void laction (int i) {
   lua_sethook(repl_L, lstop, LUA_MASKCALL | LUA_MASKRET | LUA_MASKCOUNT, 1);
 }
 
-static void l_message (const char *pname, const char *msg) {
-  if (pname) fprintf(rl_outstream, "%s: ", pname);
+static void l_message (const char *msg) {
   fprintf(rl_outstream, "%s\n", msg);
 }
 
@@ -324,7 +335,7 @@ static int report (lua_State *L, int status) {
         if (*str != '\0') msg = str;
       } else msg = "(error with no message)";
     }
-    if (msg) l_message(program_name, msg);
+    if (msg) l_message (msg);
     lua_pop(L, 1);
   }
   return status;
@@ -352,9 +363,8 @@ repl_multithread (lua_State *L, lua_Debug *ar)
 static int lcall (lua_State *L, int narg, int clear) {
   int status;
   int base = lua_gettop(L) - narg;  /* function index */
-  //lua_settop(L,base);
-  lua_pushliteral(L, "_TRACEBACK");
-  lua_rawget(L, LUA_GLOBALSINDEX);  /* get traceback function */
+
+  lua_pushcfunction (L, L_TRACEBACK);
   lua_insert(L, base);  /* put it under chunk and args */
   sig_catch(SIGINT, laction);
   lua_sethook (L, repl_multithread,
@@ -367,13 +377,13 @@ static int lcall (lua_State *L, int narg, int clear) {
 }
 
 
-static const char *get_prompt (lua_State *L, int firstline) {
-  const char *p = NULL;
-  lua_pushstring(L, firstline ? "_PROMPT" : "_PROMPT2");
-  lua_rawget(L, LUA_GLOBALSINDEX);
-  p = lua_tostring(L, -1);
-  if (p == NULL) p = (firstline ? PROMPT : PROMPT2);
-  lua_pop(L, 1);  /* remove global */
+static char *get_prompt (lua_State *L, int firstline) {
+  char *p = xasprintf
+    ("%s%s%s%s%s", firstline ? "MININIM" : ".......",
+     L_debugging || L_profiling? ":" : "",
+     L_debugging ? "D" : "",
+     L_profiling ? "P" : "",
+     firstline ? "> " : ">> ");
   return p;
 }
 
@@ -392,21 +402,30 @@ static int incomplete (lua_State *L, int status) {
 static int load_string (lua_State *L) {
   int status;
   lua_settop(L, 0);
-  if (lua_readline(L, get_prompt(L, 1)) == 0)  /* no input? */
-    return -1;
+
+  char *prompt = get_prompt(L, 1);
+  int rl_status = lua_readline(L, prompt);
+  al_free (prompt);
+  if (! rl_status) return -1;
+
   if (lua_tostring(L, -1)[0] == '=') {  /* line starts with `=' ? */
     lua_pushfstring(L, "return %s", lua_tostring(L, -1)+1);/* `=' -> `return' */
     lua_remove(L, -2);  /* remove original line */
   }
+
   for (;;) {  /* repeat until gets a complete line */
     status = luaL_loadbuffer(L, lua_tostring(L, 1), lua_strlen(L, 1), "=stdin");
     if (!incomplete(L, status)) break;  /* cannot try to add lines? */
-    if (lua_readline(L, get_prompt(L, 0)) == 0)  /* no more input? */
-      return -1;
+    char *prompt = get_prompt(L, 0);
+    int rl_status = lua_readline(L, prompt);
+    al_free (prompt);
+    if (! rl_status) return -1;
     lua_concat(L, lua_gettop(L));  /* join lines */
   }
+
   lua_saveline(L, lua_tostring(L, 1));
   lua_remove(L, 1);  /* remove line */
+
   return status;
 }
 
@@ -417,19 +436,24 @@ static void manual_input (lua_State *L) {
   while (! al_get_thread_should_stop (repl_thread)) {
     status = load_string(L);
     if (status == -1) {
-      if (! al_get_thread_should_stop (repl_thread))
+      if (! al_get_thread_should_stop (repl_thread)
+          && ! should_update_prompt)
         fprintf (rl_outstream, "\n");
       continue;
     }
     if (status == 0) status = lcall(L, 0, 0);
     report(L, status);
-    if (status == 0 && lua_gettop(L) > 0) {  /* any result to print? */
-      lua_getglobal(L, "print");
-      lua_insert(L, 1);
-      if (lua_pcall(L, lua_gettop(L)-1, 0, 0) != 0)
-        l_message(program_name,
-                  lua_pushfstring(L, "error calling `print' (%s)",
-                                  lua_tostring(L, -1)));
+    if (status == 0) {
+      fmt_begin (5);
+      get_cstack_report (L, NULL);
+      char *fmt = fmt_end ();
+      char *cstack_report = get_cstack_report (L, fmt);
+
+      if (strcmp (cstack_report, ""))
+        fprintf (stderr, "%s\n", cstack_report);
+      al_free (cstack_report);
+
+      al_free (fmt);
     }
   }
   lua_settop(L, 0);  /* clear stack */
@@ -447,18 +471,23 @@ ALLEGRO_MUTEX *repl_mutex;
 ALLEGRO_THREAD *repl_thread;
 lua_State *repl_L;
 int repl_thread_ref = LUA_NOREF;
+ALLEGRO_COND *repl_cond;
 
 void *
 repl (ALLEGRO_THREAD *thread, void *L)
 {
   lock_thread ();
 
+  al_broadcast_cond (repl_cond);
+
   rl_instream = stdin;
   rl_outstream = stderr;
 
-  fprintf (rl_outstream,
-           "MININIM %s %s\n\n", VERSION, about_dialog.text);
-  fprintf (rl_outstream, LUA_VERSION " " LUA_COPYRIGHT "\n");
+  if (! L_debugging) {
+    fprintf (rl_outstream,
+             "MININIM %s %s\n\n", VERSION, about_dialog.text);
+    fprintf (rl_outstream, LUA_VERSION " " LUA_COPYRIGHT "\n");
+  }
 
   int status;
   status = lua_cpcall (L, &pmain, NULL);

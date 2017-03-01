@@ -54,7 +54,7 @@ free_stars (struct pos *p)
 
   destroy_bitmap (stars->b);
   stars->b = NULL;
-  if (stars->s) al_free (stars->s);
+  al_free (stars->s);
   stars->s = NULL;
   stars->count = 0;
 }
@@ -71,7 +71,7 @@ generate_stars (struct pos *p)
   struct stars *stars = &mr.cell[x][y].stars[np.floor][np.place];
   destroy_bitmap (stars->b);
   stars->b = NULL;
-  if (stars->s) al_free (stars->s);
+  al_free (stars->s);
   stars->s = NULL;
   stars->count = 0;
 

@@ -363,7 +363,7 @@ option_enum_value_error (int key, char *arg, struct argp_state *state,
         valid_values = xasprintf ("'%s'", enum_vals[i]);
       else
         valid_values = xasprintf ("%s, '%s'", valid_values, enum_vals[i]);
-      if (tmpstr) al_free (tmpstr);
+      al_free (tmpstr);
     }
 
   char *msg2;
@@ -1245,7 +1245,7 @@ get_env_args (size_t *eargc, char ***eargv, struct argp_option *options)
 
   next:
     al_free (entry);
-    if (key) al_free (key);
+    al_free (key);
     i++;
   }
 }

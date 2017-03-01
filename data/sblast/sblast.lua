@@ -20,7 +20,7 @@
 
 -- header
 local P = {package_type = "AUDIO MODE", package_name = "SBLAST",
-           package_file = debug.getinfo (1, "S").short_src}
+           package_file = mininim.debugger.src}
 
 -- imports
 local M = mininim

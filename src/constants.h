@@ -201,7 +201,8 @@
 #define PACKED_CONFIG_MIRROR_LEVEL_BIT (1 << 0)
 #define PACKED_CONFIG_IMMORTAL_MODE_BIT (1 << 1)
 
-#define HLINE printf ("===============================================================================\n"); fflush (stdout);
+#define HLINE_STR "===============================================================================\n"
+#define HLINE printf (HLINE_STR); fflush (stdout);
 
 #define JOYSTICK_MAX_HAPTIC_EFFECTS 10
 

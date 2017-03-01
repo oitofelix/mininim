@@ -20,10 +20,10 @@
 
 #include "mininim.h"
 
-static int __eq (lua_State *L);
-static int __index (lua_State *L);
-static int __newindex (lua_State *L);
-static int __tostring (lua_State *L);
+static DECLARE_LUA (__eq);
+static DECLARE_LUA (__index);
+static DECLARE_LUA (__newindex);
+static DECLARE_LUA (__tostring);
 
 void
 define_L_mininim_video_coordinate (lua_State *L)
@@ -58,8 +58,7 @@ L_pushcoordinate (lua_State *L, struct coord *c)
   *c_new = *c;
 }
 
-int
-L_mininim_video_coordinate (lua_State *L)
+BEGIN_LUA (L_mininim_video_coordinate)
 {
   int x = luaL_checknumber (L, 1);
   int y = luaL_checknumber (L, 2);
@@ -68,19 +67,23 @@ L_mininim_video_coordinate (lua_State *L)
   L_pushcoordinate (L, &c);
   return 1;
 }
+END_LUA
 
-int
-__eq (lua_State *L)
+BEGIN_LUA (__eq)
 {
   struct coord *c0 = luaL_checkudata (L, 1, L_MININIM_VIDEO_COORDINATE);
   struct coord *c1 = luaL_checkudata (L, 2, L_MININIM_VIDEO_COORDINATE);
-  if (c0 && c1) lua_pushboolean (L, coord_eq (c0, c1));
+  if (c0 && c1) {
+    c0->room = room_view;
+    c1->room = room_view;
+    lua_pushboolean (L, coord_eq (c0, c1));
+  }
   else lua_pushboolean (L, lua_rawequal (L, 1, 2));
   return 1;
 }
+END_LUA
 
-int
-__index (lua_State *L)
+BEGIN_LUA (__index)
 {
   struct coord *c = luaL_checkudata (L, 1, L_MININIM_VIDEO_COORDINATE);
 
@@ -107,9 +110,9 @@ __index (lua_State *L)
   lua_pushnil (L);
   return 1;
 }
+END_LUA
 
-int
-__newindex (lua_State *L)
+BEGIN_LUA (__newindex)
 {
   struct coord *c = luaL_checkudata (L, 1, L_MININIM_VIDEO_COORDINATE);
 
@@ -132,12 +135,13 @@ __newindex (lua_State *L)
 
   return 0;
 }
+END_LUA
 
-int
-__tostring (lua_State *L)
+BEGIN_LUA (__tostring)
 {
   struct coord *c = luaL_checkudata (L, 1, L_MININIM_VIDEO_COORDINATE);
   lua_pushfstring (L, L_MININIM_VIDEO_COORDINATE " (%d, %d)",
                    c ? c->x : -1, c ? c->y : -1);
   return 1;
 }
+END_LUA

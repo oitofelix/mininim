@@ -534,6 +534,13 @@ frame2room (struct frame *f, int room, struct coord *cv)
   return cv;
 }
 
+bool
+rect_eq (struct rect *r0, struct rect *r1)
+{
+  return coord_eq (&r0->c, &r1->c)
+    && r0->w == r1->w && r0->h == r1->h;
+}
+
 struct coord *
 rect2room (struct rect *r, int room, struct coord *cv)
 {

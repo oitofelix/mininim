@@ -29,10 +29,10 @@ static enum anim_type type_value (const char *type);
 static const char *action_string (ACTION action);
 static ACTION action_value (const char *action, enum anim_type type);
 
-static int __eq (lua_State *L);
-static int __index (lua_State *L);
-static int __newindex (lua_State *L);
-static int __tostring (lua_State *L);
+static DECLARE_LUA (__eq);
+static DECLARE_LUA (__index);
+static DECLARE_LUA (__newindex);
+static DECLARE_LUA (__tostring);
 
 void
 define_L_mininim_actor (lua_State *L)
@@ -67,13 +67,13 @@ L_pushactor (lua_State *L, int id)
   *id_new = id;
 }
 
-int
-L_mininim_actor (lua_State *L)
+BEGIN_LUA (L_mininim_actor)
 {
   int id = luaL_checknumber (L, 1);
   L_pushactor (L, id);
   return 1;
 }
+END_LUA
 
 const char *
 direction_string (enum dir dir)
@@ -153,8 +153,7 @@ action_value (const char *action, enum anim_type type)
   } else return NULL;
 }
 
-int
-__eq (lua_State *L)
+BEGIN_LUA (__eq)
 {
   int *id0 = luaL_checkudata (L, 1, L_MININIM_ACTOR);
   int *id1 = luaL_checkudata (L, 2, L_MININIM_ACTOR);
@@ -162,9 +161,9 @@ __eq (lua_State *L)
   else lua_pushboolean (L, lua_rawequal (L, 1, 2));
   return 1;
 }
+END_LUA
 
-int
-__index (lua_State *L)
+BEGIN_LUA (__index)
 {
   int *id_ptr = luaL_checkudata (L, 1, L_MININIM_ACTOR);
 
@@ -208,9 +207,9 @@ __index (lua_State *L)
   lua_pushnil (L);
   return 1;
 }
+END_LUA
 
-int
-__newindex (lua_State *L)
+BEGIN_LUA (__newindex)
 {
   int *id_ptr = luaL_checkudata (L, 1, L_MININIM_ACTOR);
 
@@ -254,11 +253,12 @@ __newindex (lua_State *L)
 
   return 0;
 }
+END_LUA
 
-int
-__tostring (lua_State *L)
+BEGIN_LUA (__tostring)
 {
   int *id = luaL_checkudata (L, 1, L_MININIM_ACTOR);
   lua_pushfstring (L, L_MININIM_ACTOR " (%d)", id ? *id : -1);
   return 1;
 }
+END_LUA

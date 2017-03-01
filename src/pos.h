@@ -49,6 +49,7 @@ struct coord *nframe (struct frame *f, struct coord *c);
 struct pos *pos2room (struct pos *p, int room, struct pos *pv);
 struct coord *coord2room (struct coord *c, int room, struct coord *cv);
 struct coord *frame2room (struct frame *f, int room, struct coord *cv);
+bool rect_eq (struct rect *r0, struct rect *r1);
 struct coord *rect2room (struct rect *r, int room, struct coord *cv);
 bool coord4draw (struct coord *c, int room, struct coord *cv);
 int pos_mod (struct pos *p0, struct pos *p1);

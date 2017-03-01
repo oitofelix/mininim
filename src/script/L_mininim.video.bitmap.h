@@ -26,9 +26,10 @@
 /* functions */
 void L_pushbitmap (lua_State *L, ALLEGRO_BITMAP *b);
 void define_L_mininim_video_bitmap (lua_State *L);
-int L_mininim_video_bitmap (lua_State *L);
 
 ALLEGRO_COLOR L_palette (ALLEGRO_COLOR c);
+
+DECLARE_LUA (L_mininim_video_bitmap);
 
 /* variables */
 extern ALLEGRO_BITMAP *L_target_bitmap;
