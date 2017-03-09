@@ -12,14 +12,15 @@
 
 To build MININIM from this Git repository you'll need to have
 installed in your machine **Automake**, **Autoconf**, **GCC**, **GNU
-Make**, **gnulib**, **CMake**, and
+Make**, **gnulib**, **CMake**, **Lua 5.0**, **Readline** and
 [MININIM's fork of **Allegro**](https://github.com/oitofelix/allegro5).
 For apt based GNU/Linux distributions (Ubuntu, Debian, ...):
 
 ```
 sudo apt-get remove liballegro5-dev liballegro-image5-dev \
   liballegro-audio5-dev liballegro-acodec5-dev liballegro-dialog5-dev
-sudo apt-get install automake autoconf gcc make gnulib cmake
+sudo apt-get install automake autoconf gcc make gnulib cmake lua50 \
+  liblua50-dev liblualib50-dev libreadline-dev
 sudo apt-get build-dep allegro5
 git clone https://github.com/oitofelix/allegro5.git
 cd allegro5
@@ -30,7 +31,7 @@ cd ..
 git clone https://github.com/oitofelix/mininim.git
 cd mininim
 ./bootstrap
-./configure
+./configure LUA_LIB="-llua50 -llualib50"
 make
 ./mininim
 ```
