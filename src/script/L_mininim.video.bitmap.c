@@ -104,12 +104,7 @@ BEGIN_LUA (__index)
 {
   ALLEGRO_BITMAP **b_ptr = luaL_checkudata (L, 1, L_MININIM_VIDEO_BITMAP);
 
-  ALLEGRO_BITMAP *b;
-  if (b_ptr) b = *b_ptr;
-  else {
-    lua_pushnil (L);
-    return 1;
-  }
+  if (! b_ptr) return 0;
 
   const char *key;
   int type = lua_type (L, 2);

@@ -215,7 +215,7 @@ m2w_str (const char *s)
 {
   size_t ls = strlen (s);
   wchar_t *r = xcalloc (ls, sizeof (wchar_t));
-  mbsrtowcs (r, &s, ls * sizeof (wchar_t), NULL);
+  mbsrtowcs (r, &s, ls, NULL);
   r = xrealloc (r, (wcslen (r) + 1) * sizeof (*r));
   return r;
 }

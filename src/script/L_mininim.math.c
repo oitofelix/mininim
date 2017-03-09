@@ -122,11 +122,11 @@ END_LUA
 
 BEGIN_LUA (__newindex)
 {
-  const char *key;
+  /* const char *key; */
   int type = lua_type (L, 2);
   switch (type) {
   case LUA_TSTRING:
-    key = lua_tostring (L, 2);
+    /* key = lua_tostring (L, 2); */
     break;
   default: break;
   }

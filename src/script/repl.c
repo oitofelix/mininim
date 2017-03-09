@@ -57,7 +57,7 @@ lhandler (char *line)
   rl_callback_handler_remove ();
   if (! line) {
     fprintf (rl_outstream, "\n");
-    lhandler_line = xasprintf ("");
+    lhandler_line = xasprintf ("%s", "");
   }
   else lhandler_line = line;
 }
