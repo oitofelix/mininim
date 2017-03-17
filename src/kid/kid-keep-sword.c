@@ -20,69 +20,15 @@
 
 #include "mininim.h"
 
-struct frameset kid_keep_sword_frameset[KID_KEEP_SWORD_FRAMESET_NMEMB];
-
-static void init_kid_keep_sword_frameset (void);
-static bool flow (struct anim *k);
-static bool physics_in (struct anim *k);
-static void physics_out (struct anim *k);
-
-ALLEGRO_BITMAP *kid_keep_sword_00, *kid_keep_sword_01,
-  *kid_keep_sword_02, *kid_keep_sword_03, *kid_keep_sword_04,
-  *kid_keep_sword_05, *kid_keep_sword_06, *kid_keep_sword_07,
-  *kid_keep_sword_08, *kid_keep_sword_09;
-
-static void
-init_kid_keep_sword_frameset (void)
-{
-  struct frameset frameset[KID_KEEP_SWORD_FRAMESET_NMEMB] =
-    {{kid_keep_sword_00,+2,+0},{kid_keep_sword_01,-2,0},{kid_keep_sword_02,+0,0},
-     {kid_keep_sword_03,+1,0},{kid_keep_sword_04,-6,0},{kid_keep_sword_05,+2,0},
-     {kid_keep_sword_06,+3,0},{kid_keep_sword_07,+0,0},{kid_keep_sword_08,+3,0},
-     {kid_keep_sword_09,+0,0}};
-
-  memcpy (&kid_keep_sword_frameset, &frameset,
-          KID_KEEP_SWORD_FRAMESET_NMEMB * sizeof (struct frameset));
-}
+static bool flow (struct actor *k);
+static bool physics_in (struct actor *k);
+static void physics_out (struct actor *k);
 
 void
-load_kid_keep_sword (void)
-{
-  /* bitmaps */
-  kid_keep_sword_00 = load_bitmap (KID_KEEP_SWORD_00);
-  kid_keep_sword_01 = load_bitmap (KID_KEEP_SWORD_01);
-  kid_keep_sword_02 = load_bitmap (KID_KEEP_SWORD_02);
-  kid_keep_sword_03 = load_bitmap (KID_KEEP_SWORD_03);
-  kid_keep_sword_04 = load_bitmap (KID_KEEP_SWORD_04);
-  kid_keep_sword_05 = load_bitmap (KID_KEEP_SWORD_05);
-  kid_keep_sword_06 = load_bitmap (KID_KEEP_SWORD_06);
-  kid_keep_sword_07 = load_bitmap (KID_KEEP_SWORD_07);
-  kid_keep_sword_08 = load_bitmap (KID_KEEP_SWORD_08);
-  kid_keep_sword_09 = load_bitmap (KID_KEEP_SWORD_09);
-
-  /* frameset */
-  init_kid_keep_sword_frameset ();
-}
-
-void
-unload_kid_keep_sword (void)
-{
-  destroy_bitmap (kid_keep_sword_00);
-  destroy_bitmap (kid_keep_sword_01);
-  destroy_bitmap (kid_keep_sword_02);
-  destroy_bitmap (kid_keep_sword_03);
-  destroy_bitmap (kid_keep_sword_04);
-  destroy_bitmap (kid_keep_sword_05);
-  destroy_bitmap (kid_keep_sword_06);
-  destroy_bitmap (kid_keep_sword_07);
-  destroy_bitmap (kid_keep_sword_08);
-  destroy_bitmap (kid_keep_sword_09);
-}
-
-void
-kid_keep_sword (struct anim *k)
+kid_keep_sword (struct actor *k)
 {
   k->oaction = k->action;
+  k->oi = k->i;
   k->action = kid_keep_sword;
   k->f.flip = (k->f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
@@ -93,7 +39,7 @@ kid_keep_sword (struct anim *k)
 }
 
 static bool
-flow (struct anim *k)
+flow (struct actor *k)
 {
   if (k->oaction != kid_keep_sword) k->i = -1, k->wait = 1;
 
@@ -118,21 +64,21 @@ flow (struct anim *k)
 
   k->j = 24 + k->i;
 
-  select_frame (k, kid_keep_sword_frameset, k->i);
-  if (k->i < 4)
-    select_xframe (&k->xf, sword_frameset, k->j);
+  select_actor_frame (k, "KID", "KEEP_SWORD", k->i);
+  if (k->i < 4) select_actor_xframe (k, "KID", "SWORD", k->j);
 
   if (k->i == 8 && k->wait < 1) k->fo.dx = 0;
   if (k->i == 9 && k->wait < 2) k->fo.dx = 0;
-  if (k->keep_sword_fast && k->i % 2)
-    k->fo.dx += kid_keep_sword_frameset[k->i - 1].dx;
-  if (k->f.b == kid_sword_normal_00) k->fo.dx = +8;
+  if (k->keep_sword_fast && k->i % 2) {
+    k->fo.dx += actor_bitmap_dx (k, "KID", "KEEP_SWORD", k->i - 1);
+  }
+  if (k->oaction == kid_sword_normal) k->fo.dx = +8;
 
   return true;
 }
 
 static bool
-physics_in (struct anim *k)
+physics_in (struct actor *k)
 {
   /* collision */
   uncollide (&k->f, &k->fo, _bb, +5, +0, &k->fo, NULL);
@@ -141,7 +87,7 @@ physics_in (struct anim *k)
 }
 
 static void
-physics_out (struct anim *k)
+physics_out (struct actor *k)
 {
   /* depressible floors */
   keep_depressible_floor (k);

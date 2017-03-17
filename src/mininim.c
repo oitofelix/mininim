@@ -95,7 +95,6 @@ struct message_box about_dialog = {
 
 uint64_t play_time;
 bool play_time_stopped;
-enum vm vm = VGA;
 enum em em = DUNGEON;
 enum gpm gpm = JOYSTICK;
 bool force_em = false;
@@ -648,8 +647,6 @@ parser (int key, char *arg, struct argp_state *state)
 
   char *level_module_enum[] = {"NATIVE", "LEGACY", "PLV", "DAT", "CONSISTENCY", NULL};
 
-  char *video_mode_enum[] = {"VGA", "EGA", "CGA", "HGC", NULL};
-
   char *environment_mode_enum[] = {"ORIGINAL", "DUNGEON", "PALACE", NULL};
 
   char *hue_mode_enum[] = {"ORIGINAL", "NONE", "GREEN",
@@ -760,14 +757,7 @@ Levels have been converted using module %s into native format at\n\
     mirror_level = optval_to_bool (arg);
     break;
   case VIDEO_MODE_OPTION:
-    e = optval_to_enum (&i, key, arg, state, video_mode_enum, 0);
-    if (e) return e;
-    switch (i) {
-    case 0: vm = VGA; set_string_var (&video_mode, "VGA"); break;
-    case 1: vm = EGA; set_string_var (&video_mode, "EGA"); break;
-    case 2: vm = CGA; set_string_var (&video_mode, "CGA"); break;
-    case 3: vm = CGA, hgc = true; set_string_var (&video_mode, "HGC"); break;
-    }
+    set_string_var (&video_mode, arg);
     break;
   case ENVIRONMENT_MODE_OPTION:
     e = optval_to_enum (&i, key, arg, state, environment_mode_enum, 0);
@@ -1138,14 +1128,21 @@ Levels have been converted using module %s into native format at\n\
     else if (! strcasecmp ("TANDY", arg)) break;
 
     /* video */
-    else if (! strcasecmp ("CGA", arg)) vm = CGA;
+    else if (! strcasecmp ("CGA", arg))
+      set_string_var (&video_mode, "CGA");
     else if (! strcasecmp ("DRAW", arg)) break;
-    else if (! strcasecmp ("EGA", arg)) vm = EGA;
-    else if (! strcasecmp ("HERC", arg)) vm = CGA, hgc = true;
-    else if (! strcasecmp ("HGA", arg)) vm = CGA, hgc = true;
-    else if (! strcasecmp ("MCGA", arg)) vm = VGA;
-    else if (! strcasecmp ("TGA", arg)) vm = EGA;
-    else if (! strcasecmp ("VGA", arg)) vm = VGA;
+    else if (! strcasecmp ("EGA", arg))
+      set_string_var (&video_mode, "EGA");
+    else if (! strcasecmp ("HERC", arg))
+      set_string_var (&video_mode, "HGC");
+    else if (! strcasecmp ("HGA", arg))
+      set_string_var (&video_mode, "HGC");
+    else if (! strcasecmp ("MCGA", arg))
+      set_string_var (&video_mode, "VGA");
+    else if (! strcasecmp ("TGA", arg))
+      set_string_var (&video_mode, "EGA");
+    else if (! strcasecmp ("VGA", arg))
+      set_string_var (&video_mode, "VGA");
 
     /* memory */
     else if (! strcasecmp ("BYPASS", arg)) break;
@@ -1351,7 +1348,6 @@ int
 main (int _argc, char **_argv)
 {
   set_string_var (&audio_mode, "SBLAST");
-  set_string_var (&video_mode, "VGA");
   set_string_var (&env_mode, "DUNGEON");
   set_string_var (&hue_mode, "NONE");
 
@@ -1451,7 +1447,10 @@ main (int _argc, char **_argv)
   init_script ();
 
   /* load assets */
-  run_load_hook (main_L);
+  run_lua_hook (main_L, "load_hook");
+
+  /* setup video mode */
+  setup_video_mode (video_mode);
 
   load_icons ();
   load_oitofelix_face ();

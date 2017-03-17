@@ -129,7 +129,7 @@ v_clock_sand_palette (ALLEGRO_COLOR c)
 }
 
 void
-draw_clock (ALLEGRO_BITMAP *bitmap, int i, enum vm vm)
+draw_clock (ALLEGRO_BITMAP *bitmap, int i)
 {
   if (i == -1) return;
 
@@ -145,28 +145,28 @@ draw_clock (ALLEGRO_BITMAP *bitmap, int i, enum vm vm)
 
   palette pal = NULL;
 
-  switch (vm) {
-  case CGA:
-    clock_00 = c_clock_00;
-    clock_01 = c_clock_01;
-    clock_02 = c_clock_02;
-    clock_03 = c_clock_03;
-    clock_04 = c_clock_04;
-    clock_05 = c_clock_05;
-    clock_06 = c_clock_06;
-    pal = c_clock_sand_palette;
-    break;
-  case EGA:
-    clock_00 = e_clock_00;
-    clock_01 = e_clock_01;
-    clock_02 = e_clock_02;
-    clock_03 = e_clock_03;
-    clock_04 = e_clock_04;
-    clock_05 = e_clock_05;
-    clock_06 = e_clock_06;
-    pal = e_clock_sand_palette;
-    break;
-  case VGA:
+  /* switch (vm) { */
+  /* case CGA: */
+  /*   clock_00 = c_clock_00; */
+  /*   clock_01 = c_clock_01; */
+  /*   clock_02 = c_clock_02; */
+  /*   clock_03 = c_clock_03; */
+  /*   clock_04 = c_clock_04; */
+  /*   clock_05 = c_clock_05; */
+  /*   clock_06 = c_clock_06; */
+  /*   pal = c_clock_sand_palette; */
+  /*   break; */
+  /* case EGA: */
+  /*   clock_00 = e_clock_00; */
+  /*   clock_01 = e_clock_01; */
+  /*   clock_02 = e_clock_02; */
+  /*   clock_03 = e_clock_03; */
+  /*   clock_04 = e_clock_04; */
+  /*   clock_05 = e_clock_05; */
+  /*   clock_06 = e_clock_06; */
+  /*   pal = e_clock_sand_palette; */
+  /*   break; */
+  /* case VGA: */
     clock_00 = v_clock_00;
     clock_01 = v_clock_01;
     clock_02 = v_clock_02;
@@ -175,8 +175,8 @@ draw_clock (ALLEGRO_BITMAP *bitmap, int i, enum vm vm)
     clock_05 = v_clock_05;
     clock_06 = v_clock_06;
     pal = v_clock_sand_palette;
-    break;
-  }
+  /*   break; */
+  /* } */
 
   switch (i) {
   case 0: clock = clock_00; break;
@@ -196,10 +196,10 @@ draw_clock (ALLEGRO_BITMAP *bitmap, int i, enum vm vm)
 
   clock_sand = apply_palette (clock_sand, pal);
 
-  if (hgc) {
-    clock = apply_palette (clock, hgc_palette);
-    clock_sand = apply_palette (clock_sand, hgc_palette);
-  }
+  /* if (hgc) { */
+  /*   clock = apply_palette (clock, hgc_palette); */
+  /*   clock_sand = apply_palette (clock_sand, hgc_palette); */
+  /* } */
 
   draw_bitmap (clock, bitmap, 153, 141, 0);
   if (i < 6) draw_bitmap (clock_sand, bitmap, 162, 157, 0);

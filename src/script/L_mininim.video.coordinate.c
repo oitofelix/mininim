@@ -24,6 +24,8 @@ static DECLARE_LUA (__eq);
 static DECLARE_LUA (__index);
 static DECLARE_LUA (__newindex);
 static DECLARE_LUA (__tostring);
+static DECLARE_LUA (__add);
+static DECLARE_LUA (__sub);
 
 void
 define_L_mininim_video_coordinate (lua_State *L)
@@ -46,6 +48,14 @@ define_L_mininim_video_coordinate (lua_State *L)
   lua_pushcfunction (L, __tostring);
   lua_rawset (L, -3);
 
+  lua_pushstring (L, "__add");
+  lua_pushcfunction (L, __add);
+  lua_rawset (L, -3);
+
+  lua_pushstring (L, "__sub");
+  lua_pushcfunction (L, __sub);
+  lua_rawset (L, -3);
+
   lua_pop (L, 1);
 }
 
@@ -60,10 +70,11 @@ L_pushcoordinate (lua_State *L, struct coord *c)
 
 BEGIN_LUA (L_mininim_video_coordinate)
 {
-  int x = luaL_checknumber (L, 1);
-  int y = luaL_checknumber (L, 2);
+  int room = luaL_checknumber (L, 1);
+  double x = luaL_checknumber (L, 2);
+  double y = luaL_checknumber (L, 3);
   struct coord c;
-  new_coord (&c, &global_level, room_view, x, y);
+  new_coord (&c, &global_level, room, x, y);
   L_pushcoordinate (L, &c);
   return 1;
 }
@@ -73,11 +84,7 @@ BEGIN_LUA (__eq)
 {
   struct coord *c0 = luaL_checkudata (L, 1, L_MININIM_VIDEO_COORDINATE);
   struct coord *c1 = luaL_checkudata (L, 2, L_MININIM_VIDEO_COORDINATE);
-  if (c0 && c1) {
-    c0->room = room_view;
-    c1->room = room_view;
-    lua_pushboolean (L, coord_eq (c0, c1));
-  }
+  if (c0 && c1) lua_pushboolean (L, coord_eq (c0, c1));
   else lua_pushboolean (L, lua_rawequal (L, 1, 2));
   return 1;
 }
@@ -87,17 +94,17 @@ BEGIN_LUA (__index)
 {
   struct coord *c = luaL_checkudata (L, 1, L_MININIM_VIDEO_COORDINATE);
 
-  if (! c) {
-    lua_pushnil (L);
-    return 1;
-  }
+  if (! c) return 0;
 
   const char *key;
   int type = lua_type (L, 2);
   switch (type) {
   case LUA_TSTRING:
     key = lua_tostring (L, 2);
-    if (! strcasecmp (key, "x")) {
+    if (! strcasecmp (key, "room")) {
+      lua_pushnumber (L, c->room);
+      return 1;
+    } else if (! strcasecmp (key, "x")) {
       lua_pushnumber (L, c->x);
       return 1;
     } else if (! strcasecmp (key, "y")) {
@@ -107,8 +114,7 @@ BEGIN_LUA (__index)
   default: break;
   }
 
-  lua_pushnil (L);
-  return 1;
+  return 0;
 }
 END_LUA
 
@@ -123,7 +129,10 @@ BEGIN_LUA (__newindex)
   switch (type) {
   case LUA_TSTRING:
     key = lua_tostring (L, 2);
-    if (! strcasecmp (key, "x")) {
+    if (! strcasecmp (key, "room")) {
+      c->room = lua_tonumber (L, 3);
+      return 0;
+    } else if (! strcasecmp (key, "x")) {
       c->x = lua_tonumber (L, 3);
       return 0;
     } else if (! strcasecmp (key, "y")) {
@@ -137,10 +146,40 @@ BEGIN_LUA (__newindex)
 }
 END_LUA
 
+BEGIN_LUA (__add)
+{
+  struct coord *c0 = luaL_checkudata (L, 1, L_MININIM_VIDEO_COORDINATE);
+  struct coord *c1 = luaL_checkudata (L, 2, L_MININIM_VIDEO_COORDINATE);
+
+  if (! c0 || ! c1) return 0;
+
+  struct coord c;
+  new_coord (&c, &global_level, c0->room, c0->x + c1->x, c0->y + c1->y);
+  L_pushcoordinate (L, &c);
+
+  return 1;
+}
+END_LUA
+
+BEGIN_LUA (__sub)
+{
+  struct coord *c0 = luaL_checkudata (L, 1, L_MININIM_VIDEO_COORDINATE);
+  struct coord *c1 = luaL_checkudata (L, 2, L_MININIM_VIDEO_COORDINATE);
+
+  if (! c0 || ! c1) return 0;
+
+  struct coord c;
+  new_coord (&c, &global_level, c0->room, c0->x - c1->x, c0->y - c1->y);
+  L_pushcoordinate (L, &c);
+
+  return 1;
+}
+END_LUA
+
 BEGIN_LUA (__tostring)
 {
   struct coord *c = luaL_checkudata (L, 1, L_MININIM_VIDEO_COORDINATE);
-  lua_pushfstring (L, L_MININIM_VIDEO_COORDINATE " (%d, %d)",
+  lua_pushfstring (L, L_MININIM_VIDEO_COORDINATE " (%f, %f)",
                    c ? c->x : -1, c ? c->y : -1);
   return 1;
 }

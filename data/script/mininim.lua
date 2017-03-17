@@ -18,16 +18,13 @@
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 --]]
 
--- imports
-local M = mininim
-
-
 -- called during loading screen for loading assets
-function M.load_hook ()
+function MININIM.lua.load_hook ()
    -- video modes
+   require "vm-mac/vm-mac".load ()
    require "vga/vga".load ()
-   require "ega/ega".load ()
-   require "cga/cga".load ()
+   -- require "ega/ega".load ()
+   -- require "cga/cga".load ()
 
    -- audio modes
    require "sblast/sblast".load ()

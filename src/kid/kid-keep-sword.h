@@ -21,28 +21,6 @@
 #ifndef MININIM_KID_KEEP_SWORD_H
 #define MININIM_KID_KEEP_SWORD_H
 
-/* bitmaps */
-#define KID_KEEP_SWORD_00 "data/kid/keep-sword/00.png"
-#define KID_KEEP_SWORD_01 "data/kid/keep-sword/01.png"
-#define KID_KEEP_SWORD_02 "data/kid/keep-sword/02.png"
-#define KID_KEEP_SWORD_03 "data/kid/keep-sword/03.png"
-#define KID_KEEP_SWORD_04 "data/kid/keep-sword/04.png"
-#define KID_KEEP_SWORD_05 "data/kid/keep-sword/05.png"
-#define KID_KEEP_SWORD_06 "data/kid/keep-sword/06.png"
-#define KID_KEEP_SWORD_07 "data/kid/keep-sword/07.png"
-#define KID_KEEP_SWORD_08 "data/kid/keep-sword/08.png"
-#define KID_KEEP_SWORD_09 "data/kid/keep-sword/09.png"
-
-#define KID_KEEP_SWORD_FRAMESET_NMEMB 10
-extern struct frameset kid_keep_sword_frameset[KID_KEEP_SWORD_FRAMESET_NMEMB];
-
-void load_kid_keep_sword (void);
-void unload_kid_keep_sword (void);
-void kid_keep_sword (struct anim *k);
-
-extern ALLEGRO_BITMAP *kid_keep_sword_00, *kid_keep_sword_01,
-  *kid_keep_sword_02, *kid_keep_sword_03, *kid_keep_sword_04,
-  *kid_keep_sword_05, *kid_keep_sword_06, *kid_keep_sword_07,
-  *kid_keep_sword_08, *kid_keep_sword_09;
+void kid_keep_sword (struct actor *k);
 
 #endif	/* MININIM_KID_KEEP_SWORD_H */

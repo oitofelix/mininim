@@ -20,55 +20,15 @@
 
 #include "mininim.h"
 
-struct frameset kid_fall_frameset[KID_FALL_FRAMESET_NMEMB];
-
-static void init_kid_fall_frameset (void);
-static bool flow (struct anim *k);
-static bool physics_in (struct anim *k);
-static void physics_out (struct anim *k);
-
-ALLEGRO_BITMAP *kid_fall_00, *kid_fall_01, *kid_fall_02,
-  *kid_fall_03, *kid_fall_04;
-
-static void
-init_kid_fall_frameset (void)
-{
-  struct frameset frameset[KID_FALL_FRAMESET_NMEMB] =
-    {{kid_fall_00,+0,+0},{kid_fall_01,+0,+5},{kid_fall_02,+0,+10},
-     {kid_fall_03,+0,+11},{kid_fall_04,+0,+20}};
-
-  memcpy (&kid_fall_frameset, &frameset,
-          KID_FALL_FRAMESET_NMEMB * sizeof (struct frameset));
-}
+static bool flow (struct actor *k);
+static bool physics_in (struct actor *k);
+static void physics_out (struct actor *k);
 
 void
-load_kid_fall (void)
-{
-  /* bitmaps */
-  kid_fall_00 = load_bitmap (KID_FALL_00);
-  kid_fall_01 = load_bitmap (KID_FALL_01);
-  kid_fall_02 = load_bitmap (KID_FALL_02);
-  kid_fall_03 = load_bitmap (KID_FALL_03);
-  kid_fall_04 = load_bitmap (KID_FALL_04);
-
-  /* frameset */
-  init_kid_fall_frameset ();
-}
-
-void
-unload_kid_fall (void)
-{
-  destroy_bitmap (kid_fall_00);
-  destroy_bitmap (kid_fall_01);
-  destroy_bitmap (kid_fall_02);
-  destroy_bitmap (kid_fall_03);
-  destroy_bitmap (kid_fall_04);
-}
-
-void
-kid_fall (struct anim *k)
+kid_fall (struct actor *k)
 {
   k->oaction = k->action;
+  k->oi = k->i;
   k->action = kid_fall;
   k->f.flip = (k->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
@@ -79,7 +39,7 @@ kid_fall (struct anim *k)
 }
 
 static bool
-flow (struct anim *k)
+flow (struct actor *k)
 {
   if (k->oaction != kid_fall) {
     k->j = k->i;
@@ -88,15 +48,16 @@ flow (struct anim *k)
 
   k->i++;
 
-  k->fo.b = kid_fall_frameset[k->i > 4 ? 4 : k->i].frame;
-  k->fo.dx = kid_fall_frameset[k->i > 4 ? 4 : k->i].dx;
-  k->fo.dy = kid_fall_frameset[k->i > 4 ? 4 : k->i].dy;
+  int i = k->i > 4 ? 4 : k->i;
+  k->fo.b = actor_bitmap (k, "KID", "FALL", i);
+  k->fo.dx = actor_bitmap_dx (k, "KID", "FALL", i);
+  k->fo.dy = actor_bitmap_dy (k, "KID", "FALL", i);
 
   return true;
 }
 
 static bool
-physics_in (struct anim *k)
+physics_in (struct actor *k)
 {
   bool hang_back = ((k->f.dir == LEFT) ? k->key.right : k->key.left)
     && ! k->key.up && k->key.shift
@@ -135,15 +96,15 @@ physics_in (struct anim *k)
   } else if (k->oaction == kid_turn_run) {
     k->fo.dx = (k->float_timer > 0) ? +26 : +20;
     uncollide (&k->f, &k->fo, _bb, +0, +0, &k->fo, NULL);
-  } else if (k->oaction == kid_couch && k->collision) {
+  } else if (k->oaction == kid_crouch && k->collision) {
     k->collision = false;
     k->fo.dx += -16;
-  } else if (k->oaction == kid_couch) {
+  } else if (k->oaction == kid_crouch) {
     k->fo.dx += -12;
   } else if (k->i == 0
              && k->oaction != kid_normal
              && k->oaction != kid_hang_free
-             && k->oaction != kid_hang_wall
+             && k->oaction != kid_hang_non_free
              && k->oaction != kid_climb) {
     place_kid_in_initial_fall (k);
     k->inertia = 0;
@@ -156,7 +117,7 @@ physics_in (struct anim *k)
   uncollide (&k->f, &k->fo, _tf, -8, +0, &k->fo, NULL);
 
   /* hang front */
-  if (k->i > 4 && can_hang (&k->f, false, &k->hang_pos)
+  if (k->i > 4 && can_hang (k, false, &k->hang_pos)
       && hang_front && ! k->hang_limit) {
     k->hit_by_loose_floor = false;
     stop_audio_instance (&scream_audio, NULL, k->id);
@@ -168,7 +129,7 @@ physics_in (struct anim *k)
 
   /* hang back */
   if (movements == NATIVE_MOVEMENTS
-      && k->i > 4 && can_hang (&k->f, true, &k->hang_pos)
+      && k->i > 4 && can_hang (k, true, &k->hang_pos)
       && hang_back && ! k->hang_limit) {
     k->hit_by_loose_floor = false;
     stop_audio_instance (&scream_audio, NULL, k->id);
@@ -181,9 +142,10 @@ physics_in (struct anim *k)
   /* land on ground */
   struct frame_offset fo;
 
-  fo.b = kid_fall_frameset[k->i > 4 ? 4 : k->i].frame;
-  fo.dx = kid_fall_frameset[k->i > 4 ? 4 : k->i].dx;
-  fo.dy = kid_fall_frameset[k->i > 4 ? 4 : k->i].dy;
+  int i = k->i > 4 ? 4 : k->i;
+  fo.b = actor_bitmap (k, "KID", "FALL", i);
+  fo.dx = actor_bitmap_dx (k, "KID", "FALL", i);
+  fo.dy = actor_bitmap_dy (k, "KID", "FALL", i);
 
   if (k->float_timer) fo.dy = 14;
   else {
@@ -202,16 +164,19 @@ physics_in (struct anim *k)
   surveyo (_bf, -8, +0, pos, &nf, NULL, &pbf_nf, NULL);
 
   if (k->i > 1 &&
-      ! is_strictly_traversable (&pmbo)
+      ! is_traversable (&pmbo)
       && pmbo.floor != pmbo_nf.floor) {
     k->inertia = k->cinertia = 0;
     k->fo.dx = k->fo.dy = 0;
-    k->fo.b = kid_couch_frameset[0].frame;
-    k->f.b = kid_couch_frameset[0].frame;
-    survey (_bf, pos, &k->f, NULL, &pbf, NULL);
-    new_coord (&k->f.c, k->f.c.l, pbf.room,
-               k->f.c.x,
-               PLACE_HEIGHT * pbf.floor + 27);
+    k->fo.b = actor_bitmap (k, "KID", "CROUCH", 0);
+    k->f.b = actor_bitmap (k, "KID", "CROUCH", 0);
+
+    place_on_the_ground (&k->f, &k->f.c);
+
+    /* survey (_bf, pos, &k->f, NULL, &pbf, NULL); */
+    /* new_coord (&k->f.c, k->f.c.l, pbf.room, */
+    /*            k->f.c.x, */
+    /*            PLACE_HEIGHT * pbf.floor + 27); */
 
     move_frame (&k->f, _bf, -8, inertia, inertia);
 
@@ -228,7 +193,7 @@ physics_in (struct anim *k)
 
       if (k->current_lives > 0) {
         play_audio (&hit_ground_harm_audio, NULL, k->id);
-        k->uncouch_slowly = true;
+        k->uncrouch_slowly = true;
         kid_haptic (k, KID_HAPTIC_HARM);
       }
       if (k->id == current_kid_id) {
@@ -253,10 +218,9 @@ physics_in (struct anim *k)
         kid_die_suddenly (k);
         k->death_reason = FALL_DEATH;
       }
-    }
-    else {
+    } else {
       stop_audio_instance (&scream_audio, NULL, k->id);
-      kid_couch (k);
+      kid_crouch (k);
     }
 
     return false;
@@ -271,7 +235,7 @@ physics_in (struct anim *k)
 }
 
 static void
-physics_out (struct anim *k)
+physics_out (struct actor *k)
 {
   /* depressible floors */
   clear_depressible_floor (k);
@@ -291,18 +255,8 @@ physics_out (struct anim *k)
   }
 }
 
-bool
-is_kid_fall (struct frame *f)
-{
-  return f->b == kid_fall_00
-    || f->b == kid_fall_01
-    || f->b == kid_fall_02
-    || f->b == kid_fall_03
-    || f->b == kid_fall_04;
-}
-
 void
-place_kid_in_initial_fall (struct anim *k)
+place_kid_in_initial_fall (struct actor *k)
 {
   struct pos pbf, pmbo, pbb;
   struct pos fall_pos;
@@ -313,16 +267,16 @@ place_kid_in_initial_fall (struct anim *k)
 
   invalid_pos (&fall_pos);
 
-  if (is_strictly_traversable (&pmbo))
+  if (is_traversable (&pmbo))
     fall_pos = pmbo;
-  else if (is_strictly_traversable (&pbf))
+  else if (is_traversable (&pbf))
     fall_pos = pbf;
-  else if (is_strictly_traversable (&pbb))
+  else if (is_traversable (&pbb))
     fall_pos = pbb;
 
-  if (is_valid_pos (&fall_pos))
-    place_frame (&k->f, &k->f, kid_fall_frameset[0].frame,
-                 &fall_pos,
-                 (k->f.dir == LEFT) ? +20 : +14,
-                 (k->f.dir == LEFT) ? 18 : 18);
+  if (is_valid_pos (&fall_pos)) {
+    int dx = (k->f.dir == LEFT) ? +20 : +14;
+    int dy = (k->f.dir == LEFT) ? 18 : 18;
+    place_actor (k, &fall_pos, dx, dy, "KID", "FALL", 0);
+  }
 }

@@ -20,30 +20,31 @@
 
 -- package header
 local P = {packge_type = "SPECIAL EVENTS", package_name = "LEGACY",
-           package_file = mininim.debugger.src}
+           package_file = MININIM.debugger.src}
 
 -- imports
-local M = mininim
+local MININIM = MININIM
+local pos = MININIM.level.position
 local common = require "script/common"
-local pos = M.level.position
 
 -- body
 setfenv (1, P)
 
 -- level 1
 local function level_01_cycle_hook ()
-   local kid = M.actor (0)
+   local kid = MININIM.actor (0)
 
-   if (M.cycle == 12 and not M.level.retry) then
-      M.audio.current["SUSPENSE"].play ()
+   local am = MININIM.audio.mode
+
+   if (MININIM.cycle == 12 and not MININIM.level.retry) then
+      MININIM.lua.audio_mode[am].SUSPENSE.play ()
    end
-
 end
 
 -- executed before the first animation cycle of each level
 function start_hook ()
-   local level = M.level.number
-   local kid = M.actor (0)
+   local level = MININIM.level.number
+   local kid = MININIM.actor (0)
 
    -- make kid turn appropriately
    if level == 13 then
@@ -63,7 +64,7 @@ function start_hook ()
       pos (5, 0, 2).activate ()
 
       -- if not retrying the level, get up slowly
-      if not M.level.retry then
+      if not MININIM.level.retry then
          kid.delayed_stand_up = true
       end
    end
@@ -77,14 +78,14 @@ function cycle_hook ()
          level_07_cycle_hook, level_08_cycle_hook, level_09_cycle_hook,
          level_10_cycle_hook, level_11_cycle_hook, level_12_cycle_hook,
          level_13_cycle_hook, level_14_cycle_hook}
-   local hook = cycle_hooks[M.level.number]
+   local hook = cycle_hooks[MININIM.level.number]
    if hook then hook () end
 end
 
 -- load package interface
 function load ()
-   M.level.start_hook = start_hook
-   M.level.cycle_hook = cycle_hook
+   MININIM.lua.level_start_hook = start_hook
+   MININIM.lua.level_cycle_hook = cycle_hook
    return P
 end
 

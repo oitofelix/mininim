@@ -63,17 +63,16 @@
 /* functions */
 void load_jaffar (void);
 void unload_jaffar (void);
-void jaffar_normal (struct anim *jaffar);
-void jaffar_walk (struct anim *jaffar);
-void jaffar_open_arms (struct anim *jaffar);
-void jaffar_raise_arms (struct anim *jaffar);
-void jaffar_lower_arms (struct anim *jaffar);
-void jaffar_turn_walk (struct anim *jaffar);
-void draw_jaffar_frame (ALLEGRO_BITMAP *bitmap, struct anim *j,
-                        enum vm vm);
+void jaffar_normal (struct actor *jaffar);
+void jaffar_walk (struct actor *jaffar);
+void jaffar_open_arms (struct actor *jaffar);
+void jaffar_raise_arms (struct actor *jaffar);
+void jaffar_lower_arms (struct actor *jaffar);
+void jaffar_turn_walk (struct actor *jaffar);
+void draw_jaffar_frame (ALLEGRO_BITMAP *bitmap, struct actor *j);
 
 /* variables */
-extern struct anim jaffar; /* animation object */
+extern struct actor jaffar; /* animation object */
 
 extern ALLEGRO_BITMAP *jaffar_normal_00,
   *jaffar_walk_00, *jaffar_walk_01, *jaffar_walk_02, *jaffar_walk_03, *jaffar_walk_04,

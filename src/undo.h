@@ -27,13 +27,13 @@ bool can_undo (struct undo *u, int dir);
 bool undo_pass (struct undo *u, int dir, char **desc);
 void end_undo_set (struct undo *u, char *desc);
 
-/* CON */
-void register_con_undo (struct undo *u, struct pos *p,
+/* TILE */
+void register_tile_undo (struct undo *u, struct pos *p,
                         int f, int b, int e, int ff,
-                        union con_state *cs,
+                        union tile_state *cs,
                         bool ignore_intermediate,
                         char *desc);
-void con_undo (struct con_undo *d, int dir);
+void tile_undo (struct tile_undo *d, int dir);
 
 /* MIRROR POS */
 void register_mirror_pos_undo (struct undo *u, struct pos *p0, struct pos *p1,
@@ -58,18 +58,19 @@ register_event_undo (struct undo *u, int e, struct pos *p, bool next,
 void event_undo (struct event_undo *d, int dir);
 
 /* HORIZONTAL ROOM CONS MIRROR */
-void register_h_room_mirror_con_undo (struct undo *u, int _room, char *desc);
-void h_room_mirror_con_undo (int *room, int dir);
+void register_h_room_mirror_tile_undo (struct undo *u, int _room, char *desc);
+void h_room_mirror_tile_undo (int *room, int dir);
 
 /* VERTICAL ROOM CONS MIRROR */
-void register_v_room_mirror_con_undo (struct undo *u, int _room, char *desc);
-void v_room_mirror_con_undo (int *room, int dir);
+void register_v_room_mirror_tile_undo (struct undo *u, int _room, char *desc);
+void v_room_mirror_tile_undo (int *room, int dir);
 
-/* RANDOM ROOM CON MIRROR */
-void register_random_room_mirror_con_undo (struct undo *u, int _room,
+/* RANDOM ROOM TILE MIRROR */
+void register_random_room_mirror_tile_undo (struct undo *u, int _room,
                                            bool invert_dir,
                                            char *desc);
-void random_room_mirror_con_undo (struct random_room_mirror_con_undo *d, int dir);
+void random_room_mirror_tile_undo (struct random_room_mirror_tile_undo *d,
+                                   int dir);
 
 /* LINK */
 void register_link_undo (struct undo *u, struct room_linking l[ROOMS],
@@ -89,7 +90,8 @@ void register_toggle_has_sword_undo (struct undo *u, char *desc);
 void toggle_has_sword_undo (struct start_pos_undo *d, int dir);
 
 /* GUARD START POSITION */
-void register_guard_start_pos_undo (struct undo *u, int i, struct pos *p, char *desc);
+void register_guard_start_pos_undo (struct undo *u, int i, struct pos *p,
+                                    char *desc);
 void guard_start_pos_undo (struct guard_start_pos_undo *d, int dir);
 
 /* TOGGLE GUARD START DIRECTION */
@@ -97,7 +99,8 @@ void register_toggle_guard_start_dir_undo (struct undo *u, int i, char *desc);
 void toggle_guard_start_dir_undo (int *d, int dir);
 
 /* GUARD SKILL */
-void register_guard_skill_undo (struct undo *u, int i, struct skill *s, char *desc);
+void register_guard_skill_undo (struct undo *u, int i, struct skill *s,
+                                char *desc);
 void guard_skill_undo (struct guard_skill_undo *d, int dir);
 
 /* GUARD LIVES */
@@ -105,7 +108,8 @@ void register_guard_lives_undo (struct undo *u, int i, int l, char *desc);
 void guard_lives_undo (struct indexed_int_undo *d, int dir);
 
 /* GUARD TYPE */
-void register_guard_type_undo (struct undo *u, int i, enum anim_type t, char *desc);
+void register_guard_type_undo (struct undo *u, int i, enum actor_type t,
+                               char *desc);
 void guard_type_undo (struct indexed_int_undo *d, int dir);
 
 /* GUARD STYLE */

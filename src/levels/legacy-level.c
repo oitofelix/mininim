@@ -53,7 +53,7 @@ static struct legacy_level *load_legacy_level_file (int n);
 void
 legacy_level_start (void)
 {
-  run_level_start_hook (main_L);
+  run_lua_hook (main_L, "level_start_hook");
 
   /* initialize some state */
   played_sample = false;
@@ -69,7 +69,7 @@ legacy_level_start (void)
   vizier_vigilant_wait = -1;
 
   /* get kid */
-  struct anim *k = get_anim_by_id (0);
+  struct actor *k = get_actor_by_id (0);
 
   /* define camera's starting room */
   if (global_level.n == 7) {
@@ -93,12 +93,15 @@ legacy_level_start (void)
     struct pos p; new_pos (&p, &global_level, 2, 0, 6);
     if (level_3_checkpoint && replay_mode == NO_REPLAY) {
       struct pos plf; new_pos (&plf, &global_level, 7, 0, 4);
-      register_con_undo (&undo, &plf,
+      register_tile_undo (&undo, &plf,
                          NO_FLOOR, MIGNORE, MIGNORE, MIGNORE,
                          NULL, true, "NO FLOOR");
       k->f.dir = (k->f.dir == LEFT) ? RIGHT : LEFT;
-      place_frame (&k->f, &k->f, kid_normal_00, &p,
-                   k->f.dir == LEFT ? +22 : +31, +15);
+
+      int dx = k->f.dir == LEFT ? +22 : +31;
+      int dy = +15;
+      place_actor (k, &p, dx, dy, "KID", "NORMAL", 0);
+
       mr_center_room (2);
       k->total_lives = checkpoint_total_lives;
       k->current_lives = checkpoint_current_lives;
@@ -117,7 +120,7 @@ legacy_level_start (void)
   coming_from_12 = false;
 
   if (global_level.n == 13) {
-    struct anim *v = get_anim_by_id (1);
+    struct actor *v = get_actor_by_id (1);
     v->fight = false;
   }
 }
@@ -125,11 +128,11 @@ legacy_level_start (void)
 void
 legacy_level_special_events (void)
 {
-  run_level_cycle_hook (main_L);
+  run_lua_hook (main_L, "level_cycle_hook");
 
   struct pos p, pm;
-  struct anim *k0 = get_anim_by_id (0);
-  struct anim *kc = get_anim_by_id (current_kid_id);
+  struct actor *k0 = get_actor_by_id (0);
+  struct actor *kc = get_actor_by_id (current_kid_id);
 
   /* title demo */
   if (title_demo) {
@@ -184,7 +187,7 @@ legacy_level_special_events (void)
       checkpoint_skill = k0->skill;
     }
 
-    struct anim *s = NULL;
+    struct actor *s = NULL;
 
     /* raise the skeleton as soon as the exit door is open and the
        kid reaches the second place of the room 1 */
@@ -195,11 +198,11 @@ legacy_level_special_events (void)
         && (pm.place == 2 || pm.place == 3)
         && fg (&skeleton_floor_pos) == SKELETON_FLOOR
         && get_exit_level_door (&global_level, 0)) {
-      register_con_undo (&undo, &skeleton_floor_pos,
+      register_tile_undo (&undo, &skeleton_floor_pos,
                          FLOOR, MIGNORE, MIGNORE, MIGNORE,
                          NULL, true, "FLOOR");
-      skeleton_id = create_anim (NULL, SKELETON, &skeleton_floor_pos, LEFT);
-      s = &anima[skeleton_id];
+      skeleton_id = create_actor (NULL, SKELETON, &skeleton_floor_pos, LEFT);
+      s = &actor[skeleton_id];
       get_legacy_skill (2, &s->skill);
       s->has_sword = true;
       s->total_lives = INT_MAX;
@@ -212,15 +215,17 @@ legacy_level_special_events (void)
 
     /* when the skeleton falls into room 3, place him at the center of
        the screen waiting for the kid */
-    s = get_anim_by_id (skeleton_id);
+    s = get_actor_by_id (skeleton_id);
     if (s) {
       survey (_m, pos, &s->f, NULL, &pm, NULL);
       new_pos (&p, &global_level, 3, 1, 4);
       if (s->f.c.room == 3 && pm.floor == 0
-          && is_guard_fall (&s->f)) {
+          && s->action == guard_fall) {
         s->f.dir = RIGHT;
         s->action = guard_normal;
-        place_frame (&s->f, &s->f, skeleton_normal_00, &p, +16, +20);
+        int dx = +16;
+        int dy = +20;
+        place_actor (s, &p, dx, dy, "SKELETON", "NORMAL", 0);
       }
     }
   }
@@ -234,7 +239,7 @@ legacy_level_special_events (void)
     if (is_pos_visible (&mirror_pos)
         && fg (&mirror_pos) != MIRROR
         && get_exit_level_door (&global_level, 0)) {
-      register_con_undo (&undo, &mirror_pos,
+      register_tile_undo (&undo, &mirror_pos,
                          MIRROR, MIGNORE, MIGNORE, MIGNORE,
                          NULL, true, "MIRROR");
       L_play_audio (main_L, "SUSPENSE", &mirror_pos, -1);
@@ -247,8 +252,8 @@ legacy_level_special_events (void)
         && peq (&kc->cross_mirror_p, &mirror_pos)
         && shadow_id == -1) {
       k0->current_lives = 1;
-      int id = create_anim (k0, 0, NULL, 0);
-      struct anim *ks = &anima[id];
+      int id = create_actor (k0, 0, NULL, 0);
+      struct actor *ks = &actor[id];
       ks->fight = false;
       invert_frame_dir (&ks->f, &ks->f);
       ks->controllable = false;
@@ -261,11 +266,11 @@ legacy_level_special_events (void)
     /* make the kid's shadow run to the right until he disappears
        from view */
     if (shadow_id != -1) {
-      struct anim *ks = get_anim_by_id (shadow_id);
+      struct actor *ks = get_actor_by_id (shadow_id);
       if (is_frame_visible_at_room (&ks->f, mirror_pos.room))
         ks->key.right = true;
       else {
-        destroy_anim (ks);
+        destroy_actor (ks);
         shadow_id = -1;
       }
     }
@@ -285,8 +290,8 @@ legacy_level_special_events (void)
         && fg (&door_pos) == DOOR
         && is_potion (&potion_pos)
         && door_at_pos (&door_pos)->i <= 25) {
-      int id = create_anim (k0, 0, NULL, 0);
-      struct anim *ks = &anima[id];
+      int id = create_actor (k0, 0, NULL, 0);
+      struct actor *ks = &actor[id];
       ks->shadow = true;
       ks->fight = false;
       ks->f.dir = RIGHT;
@@ -295,8 +300,10 @@ legacy_level_special_events (void)
       ks->i = -1;
       ks->immortal = true;
       ks->dont_draw_lives = true;
-      place_frame (&ks->f, &ks->f, kid_normal_00, &shadow_pos,
-                   +0, +15);
+
+      int dx = +0;
+      int dy = +15;
+      place_actor (ks, &shadow_pos, dx, dy, "KID", "NORMAL", 0);
       shadow_id = id;
     }
 
@@ -304,7 +311,7 @@ legacy_level_special_events (void)
        reaches the potion, and then drink it.  Make him turn back
        running until he gets out of view */
     if (shadow_id != -1) {
-      struct anim *ks = get_anim_by_id (shadow_id);
+      struct actor *ks = get_actor_by_id (shadow_id);
       if (is_potion (&potion_pos)) {
         survey (_m, pos, &ks->f, NULL, &pm, NULL);
         pos2room (&pm, 24, &pm);
@@ -313,7 +320,7 @@ legacy_level_special_events (void)
       } else if (is_frame_visible_at_room (&ks->f, potion_pos.room))
         ks->key.left = true;
       else {
-        destroy_anim (ks);
+        destroy_actor (ks);
         shadow_id = -1;
       }
     }
@@ -321,23 +328,26 @@ legacy_level_special_events (void)
 
   /* in the sixth level */
   if (global_level.n == 6) {
-    struct anim *ks;
+    struct actor *ks;
 
     /* create kid's shadow to wait for kid at room 1 */
     if (shadow_id == -1) {
       struct pos shadow_pos; new_pos (&shadow_pos, &global_level, 1, 1, 1);
-      int id = create_anim (k0, 0, NULL, 0);
-      ks = &anima[id];
+      int id = create_actor (k0, 0, NULL, 0);
+      ks = &actor[id];
       ks->fight = false;
       ks->shadow = true;
       ks->f.dir = RIGHT;
       ks->controllable = false;
       ks->action = kid_normal;
       ks->dont_draw_lives = true;
-      place_frame (&ks->f, &ks->f, kid_normal_00, &shadow_pos,
-                   +9, +15);
+
+      int dx = +9;
+      int dy = +15;
+      place_actor (ks, &shadow_pos, dx, dy, "KID", "NORMAL", 0);
+
       shadow_id = id;
-    } else ks = get_anim_by_id (shadow_id);
+    } else ks = get_actor_by_id (shadow_id);
 
     /* when kid enters room 1, play the suspense sound */
     if (kc->f.c.room == 1
@@ -367,9 +377,9 @@ legacy_level_special_events (void)
   /* in the eighth level */
   if (global_level.n == 8) {
     struct pos mouse_pos; new_pos (&mouse_pos, &global_level, 16, 0, PLACES - 1);
-    struct anim *m = NULL;
+    struct actor *m = NULL;
 
-    if (mouse_id != -1) m = get_anim_by_id (mouse_id);
+    if (mouse_id != -1) m = get_actor_by_id (mouse_id);
 
     /* if the exit level door is open and the kid is at room 16,
        start counting (or continue if started already) for the mouse
@@ -380,15 +390,15 @@ legacy_level_special_events (void)
     /* if enough cycles have passed since the start of the countdown
        and the camera is at room 16, make the mouse appear */
     if (mouse_timer == 138 && is_room_visible (mouse_pos.room)) {
-      mouse_id = create_anim (NULL, MOUSE, &mouse_pos, RIGHT);
-      m = &anima[mouse_id];
+      mouse_id = create_actor (NULL, MOUSE, &mouse_pos, RIGHT);
+      m = &actor[mouse_id];
       m->f.flip = ALLEGRO_FLIP_HORIZONTAL;
     }
 
     /* make the mouse disapear as soon as it goes out of view */
     if (m && m->action == mouse_run && m->f.dir == RIGHT
         && ! is_frame_visible_at_room (&m->f, mouse_pos.room)) {
-        destroy_anim (m);
+        destroy_actor (m);
         mouse_id = -1;
     }
   }
@@ -401,7 +411,7 @@ legacy_level_special_events (void)
     struct pos sword_pos; new_pos (&sword_pos, &global_level, 15, 0, 1);
     struct pos first_hidden_floor_pos;
     new_pos (&first_hidden_floor_pos, &global_level, 2, 0, 7);
-    struct anim *ks = NULL;
+    struct actor *ks = NULL;
 
     /* make the sword in room 15 disappear (kid's shadow has it) when
        the kid leaves room 18 to the right */
@@ -417,8 +427,8 @@ legacy_level_special_events (void)
         && ! shadow_merged) {
       struct pos shadow_pos;
       new_pos (&shadow_pos, &global_level, 15, 0, 1);
-      shadow_id = create_anim (NULL, SHADOW, &shadow_pos, RIGHT);
-      ks = &anima[shadow_id];
+      shadow_id = create_actor (NULL, SHADOW, &shadow_pos, RIGHT);
+      ks = &actor[shadow_id];
       ks->fight = true;
       ks->controllable = false;
       ks->refraction = 12;
@@ -429,10 +439,10 @@ legacy_level_special_events (void)
       ks->glory_sample = true;
       get_legacy_skill (3, &ks->skill);
       guard_fall (ks);
-      struct frameset *frameset = get_guard_fall_frameset (ks->type);
-      place_frame (&ks->f, &ks->f, frameset[0].frame, &shadow_pos,
-                   +9, -20);
-    } else if (shadow_id != -1) ks = get_anim_by_id (shadow_id);
+      int dx = +9;
+      int dy = -20;
+      place_actor (ks, &shadow_pos, dx, dy, "SHADOW", "FALL", 0);
+    } else if (shadow_id != -1) ks = get_actor_by_id (shadow_id);
 
     /* if shadow has appeared but not merged yet */
     if (ks) {
@@ -448,7 +458,7 @@ legacy_level_special_events (void)
         k0->keep_sword_fast = false;
 
       /* any harm caused to the shadow reflects to the kid */
-      if (ks->action == guard_hit && ks->i == 0) {
+      if (ks->action == guard_sword_hit && ks->i == 0) {
         mr.flicker = 2;
         mr.color = get_flicker_blood_color ();
         play_audio (&harm_audio, NULL, k0->id);
@@ -469,7 +479,7 @@ legacy_level_special_events (void)
         ks->current_lives--;
         if (is_in_fight_mode (ks)) {
           move_frame (&ks->f, _bb, +0, -4, -4);
-          guard_hit (ks);
+          guard_sword_hit (ks);
         }
       }
 
@@ -509,7 +519,7 @@ legacy_level_special_events (void)
         kid_keep_sword (ks);
         place_on_the_ground (&ks->f, &ks->f.c);
         move_frame (&ks->f, _tb, +0, -8, -8);
-        struct anim *kn = k0;
+        struct actor *kn = k0;
         while (true) {
           kn = get_next_controllable (kn);
           if (kn == k0) break;
@@ -530,11 +540,11 @@ legacy_level_special_events (void)
       /* if both, the kid and the shadow, are not in fight mode and
          get close enough, a merge happens */
       if (ks->type == KID && pms.room == pm0.room && pms.floor == pm0.floor
-          && abs (ms.x - m0.x) <= 10) {
-        destroy_anim (ks);
+          && fabs (ms.x - m0.x) <= 10) {
+        destroy_actor (ks);
         shadow_id = -1; ks = NULL;
         shadow_merged = true;
-        k0 = get_anim_by_id (0);
+        k0 = get_actor_by_id (0);
         play_audio (&success_audio, NULL, k0->id);
         k0->f.dir = (k0->f.dir == LEFT) ? RIGHT : LEFT;
         place_on_the_ground (&k0->f, &k0->f.c);
@@ -588,10 +598,10 @@ legacy_level_special_events (void)
     if (k0->f.c.room == 16 || k0->f.c.room == 23) {
       struct pos p; new_pos (&p, &global_level, k0->f.c.room, -1, 0);
       p.place = prandom (9);
-      activate_con (&p);
+      activate_tile (&p);
     }
 
-    struct anim *v = get_anim_by_id (1);
+    struct actor *v = get_actor_by_id (1);
     if (v) {
       /* play a special tune when meeting the vizier for the first
          time */
@@ -628,7 +638,7 @@ legacy_level_special_events (void)
       struct pos p; new_pos (&p, &global_level, 24, 0, 0);
       if (v->current_lives <= 0
           && kc->f.c.room != v->f.c.room)
-        activate_con (&p);
+        activate_tile (&p);
     }
   }
 
@@ -642,7 +652,7 @@ legacy_level_special_events (void)
 void
 legacy_level_end (struct pos *p)
 {
-  struct anim *k = get_anim_by_id (0);
+  struct actor *k = get_actor_by_id (0);
 
   /* end music samples to play per level */
   if (level_end_wait < 0) {
@@ -756,6 +766,7 @@ interpret_legacy_level (struct level *l, int n)
         enum lgroup g = get_group (t);
 
         set_fake (&p, NO_FAKE);
+        set_bg (&p, BRICKS_5);
 
         switch (t) {
         case LT_EMPTY: set_fg (&p, NO_FLOOR); break;
@@ -787,7 +798,7 @@ interpret_legacy_level (struct level *l, int n)
           set_bg (&p, NO_BRICKS); break;
         case LT_EXIT_RIGHT: set_fg (&p, LEVEL_DOOR);
           set_bg (&p, NO_BRICKS); break;
-        case LT_CHOPPER: set_fg (&p, CHOPPER); break;
+        case LT_CHOMPER: set_fg (&p, CHOMPER); break;
         case LT_TORCH: set_fg (&p, FLOOR);
           set_bg (&p, TORCH); break;
         case LT_WALL: set_fg (&p, WALL); break;
@@ -828,31 +839,31 @@ interpret_legacy_level (struct level *l, int n)
         case LG_FREE:           /* ok */
           switch (b) {
           case LM_FREE_NOTHING_DUNGEON_BLUE_LINE_PALACE: /* ok */
-            set_bg (&p, (t == LT_EMPTY) ? NO_BRICKS : NO_BG);
+            set_bg (&p, (t == LT_EMPTY) ? NO_BRICKS : BRICKS_5);
             break;
           case LM_FREE_SPOT1_DUNGEON_NO_BLUE_LINE_PALACE: /* ok */
-            set_bg (&p, (t == LT_EMPTY) ? BRICKS_02 : BRICKS_00);
+            set_bg (&p, (t == LT_EMPTY) ? BRICKS_3 : BRICKS_1);
             break;
           case LM_FREE_SPOT2_DUNGEON_BLUE_LINE2_PALACE: /* ok */
-            set_bg (&p, (t == LT_EMPTY) ? BRICKS_03 : BRICKS_01);
+            set_bg (&p, (t == LT_EMPTY) ? BRICKS_4 : BRICKS_2);
             break;
           case LM_FREE_WINDOW:
             set_bg (&p, WINDOW);
             break;
           case LM_FREE_EMPTY_FAKE_FLOOR_NOTHING_DUNGEON_BLUE_LINE_PALACE: /* ok */
-            set_bg (&p, (t != LT_EMPTY) ? NO_BRICKS : NO_BG);
+            set_bg (&p, (t != LT_EMPTY) ? NO_BRICKS : BRICKS_5);
             set_fake (&p, FLOOR);
             break;
           case LM_FREE_FAKE_WALL_MARK: /* ok */
-            set_bg (&p, NO_BG);
+            set_bg (&p, BRICKS_5);
             set_fake (&p, WALL);
             break;
           case LM_FREE_FLOOR_FAKE_EMPTY_NOTHING_DUNGEON_NOTHING_PALACE: /* ok */
-            set_bg (&p, (t != LT_EMPTY) ? NO_BRICKS : NO_BG);
+            set_bg (&p, (t != LT_EMPTY) ? NO_BRICKS : BRICKS_5);
             set_fake (&p, NO_FLOOR);
             break;
           case LM_FREE_EMPTY_FAKE_FLOOR_SPOT1_DUNGEON_NO_BLUE_LINE_PALACE: /* ok */
-            set_bg (&p, (t != LT_EMPTY) ? BRICKS_02 : BRICKS_00);
+            set_bg (&p, (t != LT_EMPTY) ? BRICKS_3 : BRICKS_1);
             set_fake (&p, FLOOR);
             break;
           case LM_FREE_FAKE_WALL_NO_MARK: /* ok */
@@ -860,11 +871,11 @@ interpret_legacy_level (struct level *l, int n)
             set_fake (&p, WALL);
             break;
           case LM_FREE_FLOOR_FAKE_EMPTY_SPOT1_DUNGEON_BLUE_LINE_PALACE: /* ok */
-            set_bg (&p, (t != LT_EMPTY) ? BRICKS_02 : BRICKS_00);
+            set_bg (&p, (t != LT_EMPTY) ? BRICKS_3 : BRICKS_1);
             set_fake (&p, NO_FLOOR);
             break;
           case LM_FREE_SPOT3_DUNGEON_BLUE_LINE_PALACE: /* ok */
-            set_bg (&p, (t == LT_EMPTY) ? NO_BRICKS : NO_BG);
+            set_bg (&p, (t == LT_EMPTY) ? NO_BRICKS : BRICKS_5);
             break;
           }
           break;
@@ -897,11 +908,11 @@ interpret_legacy_level (struct level *l, int n)
         case LG_TAPEST:         /* ok */
           switch (b) {
           case LM_TAPEST_WITH_LATTICE:
-            set_ext (&p, ARCH_CARPET_LEFT_00); break;
+            set_ext (&p, 2); break;
           case LM_TAPEST_ALTERNATIVE_DESIGN:
-            set_ext (&p, CARPET_00); break;
+            set_ext (&p, 0); break;
           case LM_TAPEST_NORMAL:
-            set_ext (&p, CARPET_01); break;
+            set_ext (&p, 1); break;
           case LM_TAPEST_BLACK: break; /* needless */
             /* needless */
           case LM_TAPEST_WEIRD_1: break;
@@ -929,13 +940,13 @@ interpret_legacy_level (struct level *l, int n)
         case LG_TTOP:           /* ok */
           switch (b) {
           case LM_TTOP_WITH_LATTICE:
-            set_ext (&p, ARCH_CARPET_LEFT_00); break;
+            set_ext (&p, 2); break;
           case LM_TTOP_ALTERNATIVE_DESIGN:
             set_ext (&p, get_tile (&pl) == LT_LATTICE_SUPPORT ?
-                     ARCH_CARPET_RIGHT_00 : CARPET_00); break;
+                     4 : 0); break;
           case LM_TTOP_NORMAL:
             set_ext (&p, get_tile (&pl) == LT_LATTICE_SUPPORT ?
-                     ARCH_CARPET_RIGHT_01 : CARPET_01); break;
+                     5 : 1); break;
             /* needless */
           case LM_TTOP_BLACK_01: break;
           case LM_TTOP_BLACK_02: break;
@@ -961,28 +972,28 @@ interpret_legacy_level (struct level *l, int n)
           case LM_STUCK_OPEN: step = 5; break;
           }
           if (b & 0x80)
-            set_ext (&p, step + CHOPPER_STEPS); /* bloody status */
+            set_ext (&p, step + CHOMPER_STEPS); /* bloody status */
           break;
         case LG_WALL:           /* ok */
           switch (b) {
           case LM_WALL_MARK:
-            set_bg (&p, NO_BG); break;
+            set_bg (&p, BRICKS_5); break;
           case LM_WALL_NO_MARK:
             set_bg (&p, NO_BRICKS); break;
           case LM_WALL_FAKE_FLOOR_NOTHING_DUNGEON_BLUE_LINE_PALACE: /* ok */
-            set_bg (&p, (t == LT_EMPTY) ? NO_BRICKS : NO_BG);
+            set_bg (&p, (t == LT_EMPTY) ? NO_BRICKS : BRICKS_5);
             set_fake (&p, FLOOR);
             break;
           case LM_WALL_FAKE_EMPTY_NOTHING_DUNGEON_NOTHING_PALACE: /* ok */
-            set_bg (&p, (t != LT_EMPTY) ? NO_BRICKS : NO_BG);
+            set_bg (&p, (t != LT_EMPTY) ? NO_BRICKS : BRICKS_5);
             set_fake (&p, NO_FLOOR);
             break;
           case LM_WALL_FAKE_FLOOR_SPOT1_DUNGEON_NO_BLUE_LINE_PALACE: /* ok */
-            set_bg (&p, (t == LT_EMPTY) ? BRICKS_02 : BRICKS_00);
+            set_bg (&p, (t == LT_EMPTY) ? BRICKS_3 : BRICKS_1);
             set_fake (&p, FLOOR);
             break;
           case LM_WALL_FAKE_EMPTY_SPOT1_DUNGEON_BLUE_LINE_PALACE: /* ok */
-            set_bg (&p, (t != LT_EMPTY) ? BRICKS_02 : BRICKS_00);
+            set_bg (&p, (t != LT_EMPTY) ? BRICKS_3 : BRICKS_1);
             set_fake (&p, NO_FLOOR);
             break;
           }
@@ -1040,7 +1051,7 @@ interpret_legacy_level (struct level *l, int n)
     struct guard *g = guard (l, i + 1);
 
     if (lv.guard_location[i] > 29) {
-      g->type = NO_ANIM;
+      g->type = NO_ACTOR;
       continue;
     }
 
@@ -1242,7 +1253,7 @@ get_group (enum ltile t)
   case LT_TAPESTRY: return LG_TAPEST;
   case LT_POTION: return LG_POTION;
   case LT_TAPESTRY_TOP: return LG_TTOP;
-  case LT_CHOPPER: return LG_CHOMP;
+  case LT_CHOMPER: return LG_CHOMP;
   case LT_WALL: return LG_WALL;
   case LT_EXIT_LEFT: case LT_EXIT_RIGHT: return LG_EXIT;
   case LT_DROP_BUTTON: case LT_RAISE_BUTTON: return LG_EVENT;

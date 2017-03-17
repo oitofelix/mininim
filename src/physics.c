@@ -20,30 +20,30 @@
 
 #include "mininim.h"
 
-struct con *
-con (struct pos *p)
+struct tile *
+tile (struct pos *p)
 {
   struct pos np; npos (p, &np);
-  return &np.l->con[np.room][np.floor][np.place];
+  return &np.l->tile[np.room][np.floor][np.place];
 }
 
-struct con *
-crel (struct pos *p, int floor, int place)
+struct tile *
+tile_rel (struct pos *p, int floor, int place)
 {
   struct pos pr;
-  return con (prel (p, &pr, floor, place));
+  return tile (prel (p, &pr, floor, place));
 }
 
-enum conbg
+enum tile_bg
 bg_val (int b)
 {
-  return typed_int (b, CONBGS, 1, NULL, NULL);
+  return typed_int (b, TILE_BGS, 1, NULL, NULL);
 }
 
-enum confg
+enum tile_fg
 fg_val (int f)
 {
-  return typed_int (f, CONFGS, 1, NULL, NULL);
+  return typed_int (f, TILE_FGS, 1, NULL, NULL);
 }
 
 int
@@ -71,8 +71,8 @@ ext_val (int f, int e)
   case LEVEL_DOOR:
     return typed_int (e, LEVEL_DOOR_STEPS, LEVEL_DOOR_FASES, NULL, NULL);
 
-  case CHOPPER:
-    return typed_int (e, CHOPPER_STEPS, CHOPPER_FASES, NULL, NULL);
+  case CHOMPER:
+    return typed_int (e, CHOMPER_STEPS, CHOMPER_FASES, NULL, NULL);
 
   case CARPET:
   case TCARPET:
@@ -83,22 +83,22 @@ ext_val (int f, int e)
 }
 
 struct pos *
-clear_con (struct pos *p)
+clear_tile (struct pos *p)
 {
-  set_con (p, NO_FLOOR, NO_BG, NO_ITEM, NO_FAKE);
+  set_tile (p, NO_FLOOR, BRICKS_5, NO_ITEM, NO_FAKE);
   return p;
 }
 
 struct pos *
-random_con (struct pos *p)
+random_tile (struct pos *p)
 {
-  set_con (p, prandom (CONFGS - 1), prandom (CONBGS - 1),
-           prandom_max (), is_fake (p) ? prandom (CONFGS - 1) : NO_FAKE);
+  set_tile (p, prandom (TILE_FGS - 1), prandom (TILE_BGS - 1),
+           prandom_max (), is_fake (p) ? prandom (TILE_FGS - 1) : NO_FAKE);
   return p;
 }
 
 struct pos *
-set_con (struct pos *p, int f, int b, int e, int ff)
+set_tile (struct pos *p, int f, int b, int e, int ff)
 {
   set_fg (p, f);
   set_bg (p, b);
@@ -107,108 +107,108 @@ set_con (struct pos *p, int f, int b, int e, int ff)
   return p;
 }
 
-enum conbg
+enum tile_bg
 bg (struct pos *p)
 {
-  return bg_val (con (p)->bg);
+  return bg_val (tile (p)->bg);
 }
 
-enum confg
+enum tile_fg
 fg (struct pos *p)
 {
-  return fg_val (con (p)->fg);
+  return fg_val (tile (p)->fg);
 }
 
-enum confg
+enum tile_fg
 fake (struct pos *p)
 {
-  if (con (p)->fake < 0) return fg (p);
-  else return fg_val (con (p)->fake);
+  if (tile (p)->fake < 0) return fg (p);
+  else return fg_val (tile (p)->fake);
 }
 
 int
 ext (struct pos *p)
 {
-  struct con *c = con (p);
+  struct tile *c = tile (p);
   return ext_val (c->fg, c->ext);
 }
 
 int
 fake_ext (struct pos *p)
 {
-  struct con *c = con (p);
+  struct tile *c = tile (p);
   return ext_val (fake (p), c->ext);
 }
 
-enum conbg
+enum tile_bg
 set_bg (struct pos *p, int b)
 {
-  return con (p)->bg = bg_val (b);
+  return tile (p)->bg = bg_val (b);
 }
 
-enum confg
+enum tile_fg
 set_fg (struct pos *p, int f)
 {
-  return con (p)->fg = fg_val (f);
+  return tile (p)->fg = fg_val (f);
 }
 
-enum confg
+enum tile_fg
 set_fake (struct pos *p, int ff)
 {
-  enum confg f = fg_val (ff);
-  if (ff < 0) return con (p)->fake = NO_FAKE;
-  else return con (p)->fake = (f == fg (p) ? -1 : f);
+  enum tile_fg f = fg_val (ff);
+  if (ff < 0) return tile (p)->fake = NO_FAKE;
+  else return tile (p)->fake = (f == fg (p) ? -1 : f);
 }
 
 int
 set_ext (struct pos *p, int e)
 {
-  struct con *c = con (p);
+  struct tile *c = tile (p);
   return c->ext = ext_val (c->fg, e);
 }
 
-enum conbg
+enum tile_bg
 bg_rel (struct pos *p, int floor, int place)
 {
-  return bg_val (crel (p, floor, place)->bg);
+  return bg_val (tile_rel (p, floor, place)->bg);
 }
 
-enum confg
+enum tile_fg
 fg_rel (struct pos *p, int floor, int place)
 {
-  return fg_val (crel (p, floor, place)->fg);
+  return fg_val (tile_rel (p, floor, place)->fg);
 }
 
-enum confg
+enum tile_fg
 fake_rel (struct pos *p, int floor, int place)
 {
-  struct con *c = crel (p, floor, place);
+  struct tile *c = tile_rel (p, floor, place);
   return fg_val (c->fake < 0 ? c->fg : c->fake);
 }
 
 int
 ext_rel (struct pos *p, int floor, int place)
 {
-  struct con *c = crel (p, floor, place);
+  struct tile *c = tile_rel (p, floor, place);
   return ext_val (c->fg, c->ext);
 }
 
-enum conbg
+enum tile_bg
 set_bg_rel (struct pos *p, int floor, int place, int b)
 {
-  return crel (p, floor, place)->bg = bg_val (b);
+  return tile_rel (p, floor, place)->bg = bg_val (b);
 }
 
-enum confg
+enum tile_fg
 set_fg_rel (struct pos *p, int floor, int place, int f)
 {
-  return crel (p, floor, place)->fg = fg_val (f);
+  return tile_rel (p, floor, place)->fg = fg_val (f);
 }
 
 int
 set_ext_rel (struct pos *p, int floor, int place, int e)
 {
-  struct con *c = crel (p, floor, place);
+  struct tile *c = tile_rel (p, floor, place);
   return c->ext = ext_val (c->fg, e);
 }
 
@@ -231,7 +231,7 @@ llink (struct level *l, int r)
 }
 
 bool
-strictly_traversable_cs (enum confg t)
+traversable_cs (enum tile_fg t)
 {
   return t == NO_FLOOR
     || t == BIG_PILLAR_TOP
@@ -240,50 +240,52 @@ strictly_traversable_cs (enum confg t)
 }
 
 bool
-is_strictly_traversable (struct pos *p)
+is_traversable (struct pos *p)
 {
-  enum confg t = fg (p);
-  return strictly_traversable_cs (t);
+  enum tile_fg t = fg (p);
+  return traversable_cs (t);
 }
 
 bool
-is_strictly_traversable_fake (struct pos *p)
+is_traversable_fake (struct pos *p)
 {
-  enum confg t = fake (p);
-  return strictly_traversable_cs (t);
+  enum tile_fg t = fake (p);
+  return traversable_cs (t);
 }
 
 bool
-traversable_cs (enum confg t)
+potentially_traversable_cs (enum tile_fg t)
 {
-  return strictly_traversable_cs (t)
+  return traversable_cs (t)
     || t == LOOSE_FLOOR;
 }
 
 bool
-is_traversable (struct pos *p)
+is_potentially_traversable (struct pos *p)
 {
-  return traversable_cs (fg (p));
+  return potentially_traversable_cs (fg (p));
 }
 
 bool
 is_collidable_at_left (struct pos *p, struct frame *f)
 {
-  struct chopper *c;
+  struct chomper *c;
 
   switch (fg (p)) {
   case WALL:
     return true;
-  case CHOPPER:
-    c = chopper_at_pos (p);
+  case CHOMPER:
+    c = chomper_at_pos (p);
     if (! c->inactive) return false;
     switch (c->i) {
     case 0: case 4:
       return false;
-    case 1:
-      if (f && is_kid_run_jump_air (f))
-        return false;
-      else return true;
+    case 1: {
+      if (! f) return true;
+      struct actor *a = get_actor_by_id (f->parent_id);
+      if (! a) return true;
+      return ! is_kid_run_jump_air (a);
+    }
     case 2: case 3:
       return true;
     default: return false;
@@ -294,9 +296,9 @@ is_collidable_at_left (struct pos *p, struct frame *f)
 }
 
 bool
-potentially_collidable_at_left_cs (enum confg t)
+potentially_collidable_at_left_cs (enum tile_fg t)
 {
-  return t == WALL  || t == CHOPPER || t == MIRROR;
+  return t == WALL  || t == CHOMPER || t == MIRROR;
 }
 
 bool
@@ -315,9 +317,10 @@ is_collidable_at_right (struct pos *p, struct frame *f)
   case DOOR:
     if (! f) return false;
     _tf (f, &tf);
-    if (is_kid_couch (f) && door_at_pos (p)->i >= 32)
+    struct actor *a = get_actor_by_id (f->parent_id);
+    if (a && a->action == kid_crouch && door_at_pos (p)->i >= 32)
       return true;
-    else if (is_kid_couch (f)) return false;
+    else if (a && a->action == kid_crouch) return false;
     else if (tf.y <= door_grid_tip_y (p) - DOOR_GRID_TIP_THRESHOLD)
       return true;
     else return false;
@@ -326,7 +329,7 @@ is_collidable_at_right (struct pos *p, struct frame *f)
 }
 
 bool
-potentially_collidable_at_right_cs (enum confg t)
+potentially_collidable_at_right_cs (enum tile_fg t)
 {
   return t == WALL  || t == DOOR
     || t == TCARPET || t == CARPET;
@@ -341,8 +344,8 @@ is_potentially_collidable_at_right (struct pos *p)
 bool
 is_shockwave_medium (struct pos *p)
 {
-  enum confg f = fg (p);
-  return ! is_strictly_traversable (p)
+  enum tile_fg f = fg (p);
+  return ! is_traversable (p)
     && f != WALL
     && (f != LOOSE_FLOOR ||
         loose_floor_at_pos (p)->action != SHAKE_LOOSE_FLOOR);
@@ -351,7 +354,7 @@ is_shockwave_medium (struct pos *p)
 bool
 is_pillar (struct pos *p)
 {
-  enum confg t = fg (p);
+  enum tile_fg t = fg (p);
   return t == PILLAR
     || t == BIG_PILLAR_TOP
     || t == BIG_PILLAR_BOTTOM
@@ -359,16 +362,16 @@ is_pillar (struct pos *p)
 }
 
 bool
-is_rigid_con (struct pos *p)
+is_rigid_tile (struct pos *p)
 {
-  enum confg t = fg (p);
+  enum tile_fg t = fg (p);
   return is_pillar (p)
-    || t == WALL || t == DOOR || t == CHOPPER || t == MIRROR
+    || t == WALL || t == DOOR || t == CHOMPER || t == MIRROR
     || is_arch_top (p) || is_carpet (p);
 }
 
 bool
-carpet_cs (enum confg t)
+carpet_cs (enum tile_fg t)
 {
   return t == CARPET || t == TCARPET;
 }
@@ -376,7 +379,7 @@ carpet_cs (enum confg t)
 bool
 is_carpet (struct pos *p)
 {
-  enum confg t = fg (p);
+  enum tile_fg t = fg (p);
   return carpet_cs (t);
 }
 
@@ -387,7 +390,7 @@ is_arch_top (struct pos *p)
 }
 
 bool
-arch_top_cs (enum confg t)
+arch_top_cs (enum tile_fg t)
 {
   return t == ARCH_TOP_MID
     || t == ARCH_TOP_SMALL
@@ -398,7 +401,7 @@ arch_top_cs (enum confg t)
 bool
 is_door (struct pos *p)
 {
-  enum confg t = fg (p);
+  enum tile_fg t = fg (p);
   return t == DOOR
     || t == LEVEL_DOOR;
 }
@@ -406,7 +409,7 @@ is_door (struct pos *p)
 bool
 is_floor (struct pos *p)
 {
-  enum confg t = fg (p);
+  enum tile_fg t = fg (p);
   return t == FLOOR
     || t == BROKEN_FLOOR
     || t == SKELETON_FLOOR
@@ -421,20 +424,20 @@ is_floor (struct pos *p)
 bool
 is_floor_like (struct pos *p)
 {
-  enum confg t = fg (p);
+  enum tile_fg t = fg (p);
   return is_floor (p)
     || t == PILLAR
     || t == BIG_PILLAR_BOTTOM
     || t == DOOR
     || t == LEVEL_DOOR
-    || t == CHOPPER
+    || t == CHOMPER
     || t == MIRROR
     || t == CARPET
     || t == ARCH_BOTTOM;
 }
 
 bool
-item_fg_cs (enum confg t)
+item_fg_cs (enum tile_fg t)
 {
   return t == FLOOR
     || t == BROKEN_FLOOR
@@ -487,11 +490,11 @@ is_item (struct pos *p)
 bool
 is_fake (struct pos *p)
 {
-  return con (p)->fake >= 0 && fg (p) != fake (p);
+  return tile (p)->fake >= 0 && fg (p) != fake (p);
 }
 
 struct pos *
-first_confg (struct pos *p0, struct pos *p1, confg_set cs, struct pos *p)
+first_tile_fg (struct pos *p0, struct pos *p1, tile_fg_set cs, struct pos *p)
 {
   struct pos np0, np1;
 
@@ -562,7 +565,7 @@ bool
 is_event_at_pos (struct pos *p, void *data)
 {
   int *event = (int *) data;
-  enum confg t = fg (p);
+  enum tile_fg t = fg (p);
   int e = ext (p);
 
   return (t == OPENER_FLOOR || t == CLOSER_FLOOR)
@@ -657,12 +660,12 @@ exchange_kid_start_pos (struct pos *p0, struct pos *p1, bool invert_dir)
 }
 
 void
-exchange_anim_pos (struct pos *p0, struct pos *p1, bool invert_dir)
+exchange_actor_pos (struct pos *p0, struct pos *p1, bool invert_dir)
 {
   if (peq (p0, p1)) return;
   int i, j;
-  for (i = 0; i < anima_nmemb; i++) {
-    struct anim *a = &anima[i];
+  for (i = 0; i < actor_nmemb; i++) {
+    struct actor *a = &actor[i];
 
     struct pos p;
     survey (_m, pos, &a->f, NULL, &p, NULL);
@@ -701,31 +704,27 @@ exchange_falling_floor_pos (struct pos *p0, struct pos *p1)
     if (l->action != FALL_LOOSE_FLOOR) continue;
     if (peq (&l->p, p0)) {
       l->f.c.x = p1->place * PLACE_WIDTH;
-      l->f.c.y = p1->floor * PLACE_HEIGHT + (l->f.c.y % PLACE_HEIGHT);
+      l->f.c.y = p1->floor * PLACE_HEIGHT + fmod (l->f.c.y, PLACE_HEIGHT);
       l->p = *p1;
     } else if (peq (&l->p, p1)) {
       l->f.c.x = p0->place * PLACE_WIDTH;
-      l->f.c.y = p0->floor * PLACE_HEIGHT + (l->f.c.y % PLACE_HEIGHT);
+      l->f.c.y = p0->floor * PLACE_HEIGHT + fmod (l->f.c.y, PLACE_HEIGHT);
       l->p = *p0;
     }
   }
 }
 
 void
-invert_con_dir (struct pos *p)
+invert_tile_dir (struct pos *p)
 {
-  enum carpet_design c = ext (p);
+  int c = ext (p);
 
   switch (fg (p)) {
   case CARPET: case TCARPET:
-    if (c == ARCH_CARPET_LEFT_00)
-      set_ext (p, ARCH_CARPET_RIGHT_00);
-    else if (c == ARCH_CARPET_LEFT_01)
-      set_ext (p, ARCH_CARPET_RIGHT_01);
-    else if (c == ARCH_CARPET_RIGHT_00)
-      set_ext (p, ARCH_CARPET_LEFT_00);
-    else if (c == ARCH_CARPET_RIGHT_01)
-      set_ext (p, ARCH_CARPET_LEFT_01);
+    if (c == 2) set_ext (p, 4);
+    else if (c == 3) set_ext (p, 5);
+    else if (c == 4) set_ext (p, 2);
+    else if (c == 5) set_ext (p, 3);
     break;
   case ARCH_TOP_LEFT:
     set_fg (p, ARCH_TOP_RIGHT);
@@ -740,26 +739,26 @@ invert_con_dir (struct pos *p)
 void
 mirror_pos (struct pos *p0, struct pos *p1, bool invert_dir)
 {
-  union con_state cons0, cons1;
-  struct con con0, con1;
+  union tile_state cons0, cons1;
+  struct tile con0, con1;
   if (peq (p0, p1)) return;
 
-  con0 = *con (p0); copy_to_con_state (&cons0, p0);
-  con1 = *con (p1); copy_to_con_state (&cons1, p1);
-  *con (p0) = con1; copy_from_con_state (p0, &cons1);
-  *con (p1) = con0; copy_from_con_state (p1, &cons0);
+  con0 = *tile (p0); copy_to_tile_state (&cons0, p0);
+  con1 = *tile (p1); copy_to_tile_state (&cons1, p1);
+  *tile (p0) = con1; copy_from_tile_state (p0, &cons1);
+  *tile (p1) = con0; copy_from_tile_state (p1, &cons0);
   /* if (should_init (&con0, &con1)) { */
-    init_con_at_pos (p0);
-    init_con_at_pos (p1);
+    init_tile_at_pos (p0);
+    init_tile_at_pos (p1);
   /* } */
   if (invert_dir) {
-    invert_con_dir (p0);
-    invert_con_dir (p1);
+    invert_tile_dir (p0);
+    invert_tile_dir (p1);
   }
   exchange_event_pos (p0, p1);
   exchange_guard_pos (p0, p1, invert_dir);
   exchange_kid_start_pos (p0, p1, invert_dir);
-  exchange_anim_pos (p0, p1, invert_dir);
+  exchange_actor_pos (p0, p1, invert_dir);
   exchange_falling_floor_pos (p0, p1);
 
   register_changed_pos (p0);
@@ -767,12 +766,12 @@ mirror_pos (struct pos *p0, struct pos *p1, bool invert_dir)
 }
 
 struct pos *
-decorate_con (struct pos *p)
+decorate_tile (struct pos *p)
 {
   struct pos np;
 
-  enum confg f = fg (p);
-  enum conbg b = bg (p);
+  enum tile_fg f = fg (p);
+  enum tile_bg b = bg (p);
   int e = ext (p);
 
   switch (f) {
@@ -782,7 +781,7 @@ decorate_con (struct pos *p)
     case 0: set_fg (p, FLOOR); break;
     case 1: set_fg (p, BROKEN_FLOOR); break;
     case 2:
-      if (is_traversable (prel (p, &np, +0, -1))) break;
+      if (is_potentially_traversable (prel (p, &np, +0, -1))) break;
       set_fg (p, SKELETON_FLOOR);
       break;
     }
@@ -806,48 +805,46 @@ decorate_con (struct pos *p)
   if (b != WINDOW && b != BALCONY) {
     if (is_floor (p)
         || f == NO_FLOOR
-        || f == CHOPPER
+        || f == CHOMPER
         || f == MIRROR
         || f == ARCH_BOTTOM) {
       switch (prandom (4)) {
-      case 0: set_bg (p, NO_BG); break;
-      case 1: set_bg (p, BRICKS_01); break;
-      case 2: set_bg (p, BRICKS_02); break;
-      case 3: set_bg (p, BRICKS_03); break;
+      case 0: set_bg (p, BRICKS_2); break;
+      case 1: set_bg (p, BRICKS_3); break;
+      case 2: set_bg (p, BRICKS_4); break;
+      case 3: set_bg (p, BRICKS_5); break;
       case 4: set_bg (p, TORCH); break;
       }
     } else if (f == DOOR) {
       switch (prandom (4)) {
-      case 0: set_bg (p, NO_BG); break;
-      case 1: set_bg (p, BRICKS_01); break;
-      case 2: set_bg (p, BRICKS_02); break;
-      case 3: set_bg (p, BRICKS_03); break;
+      case 0: set_bg (p, BRICKS_2); break;
+      case 1: set_bg (p, BRICKS_3); break;
+      case 2: set_bg (p, BRICKS_4); break;
+      case 3: set_bg (p, BRICKS_5); break;
       }
     } else if (f == WALL
                && (wall_correlation (p) == SWS
                    || wall_correlation (p) == WWS))
-      set_bg (p, NO_BG);
+      set_bg (p, BRICKS_5);
     else set_bg (p, NO_BRICKS);
   }
 
   if (is_carpet (p)) {
     switch (e) {
-    case CARPET_00:
-    case CARPET_01:
-      set_ext (p, prandom (1) ? CARPET_00 : CARPET_01);
-      set_bg (p, NO_BG);
+    case 0:
+    case 1:
+      set_ext (p, prandom (1) ? 0 : 1);
+      set_bg (p, BRICKS_5);
       break;
-    case ARCH_CARPET_LEFT_00:
-    case ARCH_CARPET_LEFT_01:
-      set_ext (p, prandom (1)
-               ? ARCH_CARPET_LEFT_00 : ARCH_CARPET_LEFT_01);
-      set_bg (p, NO_BG);
+    case 2:
+    case 3:
+      set_ext (p, prandom (1) ? 2 : 3);
+      set_bg (p, BRICKS_5);
       break;
-    case ARCH_CARPET_RIGHT_00:
-    case ARCH_CARPET_RIGHT_01:
-      set_ext (p, prandom (1)
-               ? ARCH_CARPET_RIGHT_00 : ARCH_CARPET_RIGHT_01);
-      set_bg (p, NO_BG);
+    case 4:
+    case 5:
+      set_ext (p, prandom (1) ? 4 : 5);
+      set_bg (p, BRICKS_5);
       break;
     default: break;
     }
@@ -856,18 +853,18 @@ decorate_con (struct pos *p)
   return p;
 }
 
-struct con_copy *
-copy_con (struct con_copy *c, struct pos *p)
+struct tile_copy *
+copy_tile (struct tile_copy *c, struct pos *p)
 {
-  c->c = *con (p);
-  copy_to_con_state (&c->cs, p);
+  c->c = *tile (p);
+  copy_to_tile_state (&c->cs, p);
   return c;
 }
 
 struct pos *
-paste_con (struct pos *p, struct con_copy *c, char *desc)
+paste_tile (struct pos *p, struct tile_copy *c, char *desc)
 {
-  register_con_undo (&undo, p, c->c.fg, c->c.bg, c->c.ext, c->c.fake,
+  register_tile_undo (&undo, p, c->c.fg, c->c.bg, c->c.ext, c->c.fake,
                      &c->cs, true, desc);
   return p;
 }
@@ -878,7 +875,7 @@ copy_room (struct room_copy *rc, struct level *l, int room)
   struct pos p; new_pos (&p, l, room, -1, -1);
   for (p.floor = 0; p.floor < FLOORS; p.floor++)
     for (p.place = 0; p.place < PLACES; p.place++)
-      copy_con (&rc->c[p.floor][p.place], &p);
+      copy_tile (&rc->c[p.floor][p.place], &p);
   return rc;
 }
 
@@ -888,7 +885,7 @@ paste_room (struct level *l, int room, struct room_copy *rc, char *desc)
   struct pos p; new_pos (&p, l, room, -1, -1);
   for (p.floor = 0; p.floor < FLOORS; p.floor++)
     for (p.place = 0; p.place < PLACES; p.place++)
-      paste_con (&p, &rc->c[p.floor][p.place], NULL);
+      paste_tile (&p, &rc->c[p.floor][p.place], NULL);
   end_undo_set (&undo, desc);
   register_changed_room (room);
   return l;
@@ -897,12 +894,12 @@ paste_room (struct level *l, int room, struct room_copy *rc, char *desc)
 struct pos *
 apply_to_pos (struct pos *p, pos_trans f, char *desc)
 {
-  struct con c0, c1;
-  c0 = *con (p);
+  struct tile c0, c1;
+  c0 = *tile (p);
   f (p);
-  c1 = *con (p);
-  *con (p) = c0;
-  register_con_undo (&undo, p,
+  c1 = *tile (p);
+  *tile (p) = c0;
+  register_tile_undo (&undo, p,
                      c1.fg, c1.bg, c1.ext, c1.fake,
                      NULL, true, desc);
   return p;
@@ -920,35 +917,35 @@ apply_to_room (struct level *l, int room, pos_trans f, char *desc)
   return l;
 }
 
-enum con_diff
-con_diff (struct con *c0, struct con *c1)
+enum tile_diff
+tile_diff (struct tile *c0, struct tile *c1)
 {
-  enum confg fg0 = fg_val (c0->fg);
-  enum conbg bg0 = bg_val (c0->bg);
+  enum tile_fg fg0 = fg_val (c0->fg);
+  enum tile_bg bg0 = bg_val (c0->bg);
   int ext0 = ext_val (fg0, c0->ext);
   int fake0 = c0->fake;
 
-  enum confg fg1 = fg_val (c1->fg);
-  enum conbg bg1 = bg_val (c1->bg);
+  enum tile_fg fg1 = fg_val (c1->fg);
+  enum tile_bg bg1 = bg_val (c1->bg);
   int ext1 = ext_val (fg1, c1->ext);
   int fake1 = c1->fake;
 
   if (fg0 == fg1 && bg0 == bg1 && ext0 == ext1 && fake0 == fake1)
-    return CON_DIFF_NO_DIFF;
+    return TILE_DIFF_NO_DIFF;
 
   if (fg0 != fg1 && bg0 == bg1 && ext0 == ext1 && fake0 == fake1)
-    return CON_DIFF_FG;
+    return TILE_DIFF_FG;
 
   if (fg0 == fg1 && bg0 != bg1 && ext0 == ext1 && fake0 == fake1)
-    return CON_DIFF_BG;
+    return TILE_DIFF_BG;
 
   if (fg0 == fg1 && bg0 == bg1 && ext0 != ext1 && fake0 == fake1)
-    return CON_DIFF_EXT;
+    return TILE_DIFF_EXT;
 
   if (fg0 == fg1 && bg0 == bg1 && ext0 == ext1 && fake0 != fake1)
-    return CON_DIFF_FAKE;
+    return TILE_DIFF_FAKE;
 
-  return CON_DIFF_MIXED;
+  return TILE_DIFF_MIXED;
 }
 
 struct level *
@@ -995,18 +992,18 @@ is_immediately_accessible_pos (struct pos *to, struct pos *from,
       && ! is_collidable_at_left (to, f);
 
   if (peqr (to, from, +1, +0))
-    return is_strictly_traversable (from);
+    return is_traversable (from);
 
   struct pos from_b;
   prel (from, &from_b, +1, +0);
 
   if (peqr (to, from, +1, -1))
-    return is_strictly_traversable (from)
+    return is_traversable (from)
       && ! is_collidable_at_left (&from_b, f)
       && ! is_collidable_at_right (to, f);
 
   if (peqr (to, from, +1, +1))
-    return is_strictly_traversable (from)
+    return is_traversable (from)
       && ! is_collidable_at_right (&from_b, f)
       && ! is_collidable_at_left (to, f);
 
@@ -1034,7 +1031,7 @@ move_frame (struct frame *f, coord_f cf, int dx, int move_left, int move_right)
   surveyo (cf, dx, +0, pos, f, NULL, &p, NULL);
   surveyo (cf, dx, +0, pos, &nf, NULL, &np, NULL);
   while (! is_immediately_accessible_pos (&np, &p, &nf)
-         && abs (nf.c.x - f->c.x) < ORIGINAL_WIDTH) {
+         && fabs (nf.c.x - f->c.x) < ORIGINAL_WIDTH) {
     nf.c.x += nf.c.x < f->c.x ? +1 : -1;
     surveyo (cf, dx, +0, pos, &nf, NULL, &np, NULL);
   }
@@ -1053,7 +1050,7 @@ uncollide (struct frame *f, struct frame_offset *fo, coord_f cf,
 
   struct collision_info ci;
   invalid_pos (&ci.kid_p);
-  invalid_pos (&ci.con_p);
+  invalid_pos (&ci.tile_p);
 
   if (cutscene) {
     if (fo_ret) *fo_ret = nfo;
@@ -1108,14 +1105,14 @@ uncollide (struct frame *f, struct frame_offset *fo, coord_f cf,
         && ! is_immediately_accessible_pos (&pp, &p, &nf)) {
       if (inc_pos == -1) {
         if (is_collidable_at_left (&p, &nf))
-          ci.con_p = p;
+          ci.tile_p = p;
         else if (is_collidable_at_right (&pp, &nf))
-          ci.con_p = pp;
+          ci.tile_p = pp;
       } else {
         if (is_collidable_at_right (&p, &nf))
-          ci.con_p = p;
+          ci.tile_p = p;
         else if (is_collidable_at_left (&pp, &nf))
-          ci.con_p = pp;
+          ci.tile_p = pp;
       }
 
       c = true;
@@ -1269,8 +1266,8 @@ dist_next_place (struct frame *f, coord_f cf, pos_f pf,
 }
 
 bool
-is_on_con (struct frame *f, coord_f cf, pos_f pf,
-           int margin, bool reverse, int min_dist, enum confg t)
+is_on_tile (struct frame *f, coord_f cf, pos_f pf,
+           int margin, bool reverse, int min_dist, enum tile_fg t)
 {
   struct frame _f = *f;
   int dn = dist_next_place (&_f, cf, pf, margin, reverse);
@@ -1286,18 +1283,18 @@ is_on_con (struct frame *f, coord_f cf, pos_f pf,
 }
 
 int
-dist_con (struct frame *f, coord_f cf, pos_f pf,
-          int margin, bool reverse, enum confg t)
+dist_tile (struct frame *f, coord_f cf, pos_f pf,
+          int margin, bool reverse, enum tile_fg t)
 {
   if (cutscene) return PLACE_WIDTH + 1;
 
   int dn = dist_next_place (f, cf, pf, margin, reverse);
-  if (is_on_con (f, cf, pf, margin, reverse, dn, t)) return dn;
+  if (is_on_tile (f, cf, pf, margin, reverse, dn, t)) return dn;
   else return PLACE_WIDTH + 1;
 }
 
 int
-dist_chopper (struct frame *f, bool reverse)
+dist_chomper (struct frame *f, bool reverse)
 {
   if (cutscene) return PLACE_WIDTH + 1;
 
@@ -1307,13 +1304,13 @@ dist_chopper (struct frame *f, bool reverse)
   if (reverse) _f.dir = (_f.dir == LEFT) ? RIGHT : LEFT;
 
   survey (_tf, pos, &_f, NULL, &ptf, NULL);
-  enum confg ctf = fg (&ptf);
+  enum tile_fg ctf = fg (&ptf);
   prel (&ptf, &ptfr, +0, +1);
-  enum confg ctfr = fg (&ptfr);
+  enum tile_fg ctfr = fg (&ptfr);
 
-  if (_f.dir == LEFT && ctf == CHOPPER)
+  if (_f.dir == LEFT && ctf == CHOMPER)
     return dist_next_place (&_f, _tf, pos, +0, false);
-  else if (_f.dir == RIGHT && ctfr == CHOPPER)
+  else if (_f.dir == RIGHT && ctfr == CHOMPER)
     return dist_next_place (&_f, _tf, pos, +0, false);
 
   return PLACE_WIDTH + 1;
@@ -1326,13 +1323,13 @@ dist_fall (struct frame *f, bool reverse)
 
   int dnf, dbpt, datm, dats, datl, datr, dtc;
 
-  dnf = dist_con (f, _bf, pos, -4, reverse, NO_FLOOR);
-  dbpt = dist_con (f, _bf, pos, -4, reverse, BIG_PILLAR_TOP);
-  datm = dist_con (f, _bf, pos, -4, reverse, ARCH_TOP_MID);
-  dats = dist_con (f, _bf, pos, -4, reverse, ARCH_TOP_SMALL);
-  datl = dist_con (f, _bf, pos, -4, reverse, ARCH_TOP_LEFT);
-  datr = dist_con (f, _bf, pos, -4, reverse, ARCH_TOP_RIGHT);
-  dtc = dist_con (f, _bf, pos, -4, reverse, TCARPET);
+  dnf = dist_tile (f, _bf, pos, -4, reverse, NO_FLOOR);
+  dbpt = dist_tile (f, _bf, pos, -4, reverse, BIG_PILLAR_TOP);
+  datm = dist_tile (f, _bf, pos, -4, reverse, ARCH_TOP_MID);
+  dats = dist_tile (f, _bf, pos, -4, reverse, ARCH_TOP_SMALL);
+  datl = dist_tile (f, _bf, pos, -4, reverse, ARCH_TOP_LEFT);
+  datr = dist_tile (f, _bf, pos, -4, reverse, ARCH_TOP_RIGHT);
+  dtc = dist_tile (f, _bf, pos, -4, reverse, TCARPET);
 
   if (dnf <= PLACE_WIDTH) return dnf;
   if (dbpt <= PLACE_WIDTH) return dbpt;
@@ -1348,7 +1345,7 @@ dist_fall (struct frame *f, bool reverse)
 
 
 bool
-hangable_cs (enum confg t, enum dir d)
+hangable_cs (enum tile_fg t, enum dir d)
 {
   return t == FLOOR
     || t == BROKEN_FLOOR
@@ -1363,7 +1360,7 @@ hangable_cs (enum confg t, enum dir d)
     || t == BIG_PILLAR_BOTTOM
     || t == DOOR
     || t == LEVEL_DOOR
-    || (t == CHOPPER && d == LEFT)
+    || (t == CHOMPER && d == LEFT)
     || t == ARCH_BOTTOM
     || (t == CARPET && d == RIGHT)
     || (t == MIRROR && d == LEFT);
@@ -1374,20 +1371,20 @@ is_hangable_pos (struct pos *p, enum dir d)
 {
   int dir = (d == LEFT) ? -1 : +1;
 
-  enum confg f = fg (p);
-  enum confg fr = fg_rel (p, +0, +1);
+  enum tile_fg f = fg (p);
+  enum tile_fg fr = fg_rel (p, +0, +1);
 
   struct pos pa; prel (p, &pa, -1, 0);
   struct pos hanged_pos; prel (p, &hanged_pos, -1, dir);
-  enum confg fh = fg (&hanged_pos);
+  enum tile_fg fh = fg (&hanged_pos);
 
   return hangable_cs (fh, d)
     && (fh != LOOSE_FLOOR
         || loose_floor_at_pos (&hanged_pos)->action != RELEASE_LOOSE_FLOOR)
-    && is_strictly_traversable (&pa)
-    && ! (d == LEFT && f == CHOPPER)
+    && is_traversable (&pa)
+    && ! (d == LEFT && f == CHOMPER)
     && ! (d == LEFT && f == MIRROR)
-    && ! (d == RIGHT && fr == CHOPPER)
+    && ! (d == RIGHT && fr == CHOMPER)
     && ! (d == RIGHT && fr == MIRROR)
     && ! (d == RIGHT && is_carpet (p))
     && ! (d == RIGHT && is_carpet (&pa))
@@ -1397,9 +1394,9 @@ is_hangable_pos (struct pos *p, enum dir d)
 }
 
 bool
-can_hang (struct frame *f, bool reverse, struct pos *hang_pos)
+can_hang (struct actor *a, bool reverse, struct pos *hang_pos)
 {
-  struct frame _f = *f;
+  struct frame _f = a->f;
 
   if (reverse) _f.dir = (_f.dir == LEFT) ? RIGHT : LEFT;
 
@@ -1437,7 +1434,7 @@ can_hang (struct frame *f, bool reverse, struct pos *hang_pos)
 
   /* if (reverse) printf ("dist_coord = %f\n", d); */
 
-  if (is_kid_fall (&_f) && d > (reverse ? 22 : 18)) return false;
+  if (is_actor_fall (a) && d > (reverse ? 22 : 18)) return false;
 
   return true;
 }
@@ -1451,8 +1448,8 @@ get_hanged_pos (struct pos *hang_pos, enum dir d, struct pos *p)
   return p;
 }
 
-enum confg
-get_hanged_con (struct pos *hang_pos, enum dir d)
+enum tile_fg
+get_hanged_tile (struct pos *hang_pos, enum dir d)
 {
   struct pos p;
   return fg (get_hanged_pos (hang_pos, d, &p));
@@ -1461,7 +1458,7 @@ get_hanged_con (struct pos *hang_pos, enum dir d)
 bool
 is_hang_pos_critical (struct pos *hang_pos)
 {
-  return (is_traversable (hang_pos));
+  return (is_potentially_traversable (hang_pos));
 }
 
 bool
@@ -1469,7 +1466,7 @@ is_hang_pos_free (struct pos *hang_pos, enum dir d)
 {
   int dir = (d == LEFT) ? -1 : +1;
   struct pos ptf; prel (hang_pos, &ptf, 0, dir);
-  enum confg ctf = fg (&ptf);
+  enum tile_fg ctf = fg (&ptf);
   return ! (ctf == WALL || (ctf == DOOR && d == LEFT)
             || (is_carpet (&ptf) && d == LEFT));
 }
@@ -1486,19 +1483,19 @@ is_constrained_pos (struct pos *p, struct frame *f)
   prel (p, &p_1, +0, d * -1);
   prel (p, &p1, +0, d * +1);
   prel (p, &p2, +0, d * +2);
-  return is_strictly_traversable (&p_1)
+  return is_traversable (&p_1)
     && ((f->dir == LEFT &&
-         ((! is_strictly_traversable (&p1)
-           && is_strictly_traversable (&p2))
-          || (! is_strictly_traversable (&p1)
+         ((! is_traversable (&p1)
+           && is_traversable (&p2))
+          || (! is_traversable (&p1)
               && ! is_collidable_at_left (p, f)
               && ! is_collidable_at_right (&p1, f)
               && (is_collidable_at_left (&p1, f)
                   || is_collidable_at_right (&p2, f)))))
         || (f->dir == RIGHT &&
-            ((! is_strictly_traversable (&p1)
-              && is_strictly_traversable (&p2))
-             || (! is_strictly_traversable (&p1)
+            ((! is_traversable (&p1)
+              && is_traversable (&p2))
+             || (! is_traversable (&p1)
                  && ! is_collidable_at_right (p, f)
                  && ! is_collidable_at_left (&p1, f)
                  && (is_collidable_at_right (&p1, f)
@@ -1551,7 +1548,7 @@ is_falling (struct frame *f, coord_f cf, int dx0, int dx1)
   if (dx0 != dx1) surveyo (cf, dx0, +0, pos, f, NULL, &p0, NULL);
   surveyo (cf, dx1, +0, pos, f, NULL, &p1, NULL);
   return (dx0 == dx1 || is_immediately_accessible_pos (&p1, &p0, f))
-    && is_strictly_traversable (&p1);
+    && is_traversable (&p1);
 }
 
 
@@ -1559,7 +1556,7 @@ is_falling (struct frame *f, coord_f cf, int dx0, int dx1)
 
 
 void
-update_depressible_floor (struct anim *a, int dx0, int dx1)
+update_depressible_floor (struct actor *a, int dx0, int dx1)
 {
   if (cutscene) return;
 
@@ -1576,19 +1573,15 @@ update_depressible_floor (struct anim *a, int dx0, int dx1)
   c1.x += dir * dx1;
   pos (&c1, &p1);
 
-  if (a->current_lives <= 0 && fg (&p0) == CLOSER_FLOOR)
-    closer_floor_at_pos (&p0)->unresponsive = true;
   press_depressible_floor (&p0, a);
   a->df_pos[0] = p0;
 
-  if (a->current_lives <= 0 && fg (&p1) == CLOSER_FLOOR)
-    closer_floor_at_pos (&p1)->unresponsive = true;
   press_depressible_floor (&p1, a);
   a->df_pos[1] = p1;
 }
 
 void
-keep_depressible_floor (struct anim *a)
+keep_depressible_floor (struct actor *a)
 {
   struct pos *p0 = &a->df_pos[0];
   struct pos *p1 = &a->df_pos[1];
@@ -1598,28 +1591,28 @@ keep_depressible_floor (struct anim *a)
 }
 
 void
-clear_depressible_floor (struct anim *a)
+clear_depressible_floor (struct actor *a)
 {
   invalid_pos (&a->df_pos[0]);
   invalid_pos (&a->df_pos[1]);
 }
 
 void
-save_depressible_floor (struct anim *a)
+save_depressible_floor (struct actor *a)
 {
   a->df_posb[0] = a->df_pos[0];
   a->df_posb[1] = a->df_pos[1];
 }
 
 void
-restore_depressible_floor (struct anim *a)
+restore_depressible_floor (struct actor *a)
 {
   a->df_pos[0] = a->df_posb[0];
   a->df_pos[1] = a->df_posb[1];
 }
 
 void
-press_depressible_floor (struct pos *p, struct anim *a)
+press_depressible_floor (struct pos *p, struct actor *a)
 {
   if (cutscene || ! is_valid_pos (p)) return;
 
@@ -1637,7 +1630,7 @@ unhide_hidden_floor (struct pos *p)
 {
   if (fg (p) != HIDDEN_FLOOR) return;
   else {
-    register_con_undo
+    register_tile_undo
       (&undo, p,
        FLOOR, MIGNORE, MIGNORE, MIGNORE,
        NULL, false, "UNHIDE FLOOR");
@@ -1648,11 +1641,13 @@ unhide_hidden_floor (struct pos *p)
 
 
 void
-activate_con (struct pos *p)
+activate_tile (struct pos *p)
 {
   struct door *d;
   struct closer_floor *c;
   struct opener_floor *o;
+
+  if (! p || ! is_valid_pos (p)) return;
 
   switch (fg (p)) {
   case SPIKES_FLOOR:
@@ -1671,7 +1666,7 @@ activate_con (struct pos *p)
     press_closer_floor (p, NULL); break;
   case HIDDEN_FLOOR: unhide_hidden_floor (p); break;
   case LOOSE_FLOOR: release_loose_floor (p, NULL); break;
-  case CHOPPER: chopper_at_pos (p)->activate = true; break;
+  case CHOMPER: chomper_at_pos (p)->activate = true; break;
   case LEVEL_DOOR: level_door_at_pos (p)->action = OPEN_LEVEL_DOOR;
     break;
   default: break;
@@ -1679,7 +1674,7 @@ activate_con (struct pos *p)
 }
 
 char *
-get_confg_name (enum confg t)
+get_tile_fg_name (enum tile_fg t)
 {
   switch (t) {
   case NO_FLOOR: return "NO FLOOR";
@@ -1698,7 +1693,7 @@ get_confg_name (enum confg t)
   case WALL: return "WALL";
   case DOOR: return "DOOR";
   case LEVEL_DOOR: return "LEVEL DOOR";
-  case CHOPPER: return "CHOPPER";
+  case CHOMPER: return "CHOMPER";
   case MIRROR: return "MIRROR";
   case CARPET: return "CARPET";
   case TCARPET: return "TCARPET";
@@ -1712,15 +1707,15 @@ get_confg_name (enum confg t)
 }
 
 char *
-get_conbg_name (enum conbg t)
+get_tile_bg_name (enum tile_bg t)
 {
   switch (t) {
-  case NO_BG: return "NO BG";
-  case BRICKS_00: return "BRICKS 00";
-  case BRICKS_01: return "BRICKS 01";
-  case BRICKS_02: return "BRICKS 02";
-  case BRICKS_03: return "BRICKS 03";
   case NO_BRICKS: return "NO BRICKS";
+  case BRICKS_1: return "BRICKS 1";
+  case BRICKS_2: return "BRICKS 2";
+  case BRICKS_3: return "BRICKS 3";
+  case BRICKS_4: return "BRICKS 4";
+  case BRICKS_5: return "BRICKS 5";
   case TORCH: return "TORCH";
   case WINDOW: return "WINDOW";
   case BALCONY: return "BALCONY";

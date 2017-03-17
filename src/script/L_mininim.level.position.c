@@ -28,6 +28,7 @@ static DECLARE_LUA (__tostring);
 char *wall_correlation_string (enum wall_correlation wc);
 
 static DECLARE_LUA (activate);
+static DECLARE_LUA (relative);
 
 void
 define_L_mininim_level_position (lua_State *L)
@@ -100,10 +101,7 @@ BEGIN_LUA (__index)
 {
   struct pos *p = luaL_checkudata (L, 1, L_MININIM_LEVEL_POSITION);
 
-  if (! p) {
-    lua_pushnil (L);
-    return 1;
-  }
+  if (! p) return 0;
 
   const char *key;
   int type = lua_type (L, 2);
@@ -123,6 +121,13 @@ BEGIN_LUA (__index)
       struct pos np; npos (p, &np);
       L_pushposition (L, &np);
       return 1;
+    } else if (! strcasecmp (key, "relative")) {
+      lua_pushvalue (L, 1);
+      lua_pushcclosure (L, relative, 1);
+      return 1;
+    } else if (! strcasecmp (key, "traversable")) {
+      lua_pushboolean (L, is_traversable (p));
+      return 1;
     } else if (! strcasecmp (key, "wall_correlation")) {
       enum wall_correlation wc = wall_correlation (p);
       char * wc_str = wall_correlation_string (wc);
@@ -136,8 +141,7 @@ BEGIN_LUA (__index)
   default: break;
   }
 
-  lua_pushnil (L);
-  return 1;
+  return 0;
 }
 END_LUA
 
@@ -178,11 +182,21 @@ BEGIN_LUA (__tostring)
 }
 END_LUA
 
+BEGIN_LUA (relative)
+{
+  struct pos *p =
+    luaL_checkudata (L, lua_upvalueindex (1), L_MININIM_LEVEL_POSITION);
+  struct pos pr; prel (p, &pr, lua_tonumber (L, 1), lua_tonumber (L, 2));
+  L_pushposition (L, &pr);
+  return 1;
+}
+END_LUA
+
 BEGIN_LUA (activate)
 {
   struct pos *p =
     luaL_checkudata (L, lua_upvalueindex (1), L_MININIM_LEVEL_POSITION);
-  if (p && is_valid_pos (p)) activate_con (p);
+  activate_tile (p);
   return 0;
 }
 END_LUA

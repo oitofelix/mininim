@@ -21,23 +21,6 @@
 #ifndef MININIM_KID_START_RUN_H
 #define MININIM_KID_START_RUN_H
 
-/* bitmaps */
-#define KID_START_RUN_00 "data/kid/start-run/00.png"
-#define KID_START_RUN_01 "data/kid/start-run/01.png"
-#define KID_START_RUN_02 "data/kid/start-run/02.png"
-#define KID_START_RUN_03 "data/kid/start-run/03.png"
-#define KID_START_RUN_04 "data/kid/start-run/04.png"
-#define KID_START_RUN_05 "data/kid/start-run/05.png"
-
-#define KID_START_RUN_FRAMESET_NMEMB 6
-extern struct frameset kid_start_run_frameset[KID_START_RUN_FRAMESET_NMEMB];
-
-void load_kid_start_run (void);
-void unload_kid_start_run (void);
-void kid_start_run (struct anim *k);
-bool is_kid_start_run (struct frame *f);
-
-extern ALLEGRO_BITMAP *kid_start_run_00, *kid_start_run_01, *kid_start_run_02,
-  *kid_start_run_03, *kid_start_run_04, *kid_start_run_05;
+void kid_start_run (struct actor *k);
 
 #endif	/* MININIM_KID_START_RUN_H */

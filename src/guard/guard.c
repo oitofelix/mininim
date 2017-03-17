@@ -23,24 +23,14 @@
 /* bitmaps */
 ALLEGRO_BITMAP *guard_life, *guard_splash;
 
-static ALLEGRO_COLOR c_shadow_life_palette (ALLEGRO_COLOR c);
-static ALLEGRO_COLOR e_shadow_life_palette (ALLEGRO_COLOR c);
+/* static ALLEGRO_COLOR c_shadow_life_palette (ALLEGRO_COLOR c); */
+/* static ALLEGRO_COLOR e_shadow_life_palette (ALLEGRO_COLOR c); */
 static ALLEGRO_COLOR v_shadow_life_palette (ALLEGRO_COLOR c);
 static ALLEGRO_COLOR skeleton_life_palette (ALLEGRO_COLOR c);
 
 void
 load_guard (void)
 {
-  load_guard_normal ();
-  load_guard_vigilant ();
-  load_guard_hit ();
-  load_guard_die ();
-  load_guard_fall ();
-  load_guard_walkf ();
-  load_guard_walkb ();
-  load_guard_attack ();
-  load_guard_defense ();
-
   /* bitmaps */
   guard_life = load_bitmap (GUARD_LIFE);
   guard_splash = load_bitmap (GUARD_SPLASH);
@@ -49,26 +39,17 @@ load_guard (void)
 void
 unload_guard (void)
 {
-  unload_guard_normal ();
-  unload_guard_vigilant ();
-  unload_guard_hit ();
-  unload_guard_die ();
-  unload_guard_fall ();
-  unload_guard_walkf ();
-  unload_guard_walkb ();
-  unload_guard_attack ();
-  unload_guard_defense ();
-
   /* bitmaps */
   destroy_bitmap (guard_life);
   destroy_bitmap (guard_splash);
 }
 
-struct anim *
-create_guard (struct anim *g0, struct anim *g1, struct pos *p, enum dir dir)
+struct actor *
+create_guard (struct actor *g0, struct actor *g1, struct pos *p,
+              enum dir dir)
 {
   if (! g0) {
-    g1->f.b = get_guard_normal_bitmap (g1->type);
+    g1->f.b = actor_bitmap (g1, NULL, "NORMAL", 0);
     g1->fo.b = g1->f.b;
     g1->action = guard_normal;
     g1->total_lives = 3;
@@ -94,7 +75,7 @@ create_guard (struct anim *g0, struct anim *g1, struct pos *p, enum dir dir)
 }
 
 void
-apply_guard_mode (struct anim *g, enum gm gm)
+apply_guard_mode (struct actor *g, enum gm gm)
 {
   if (! is_guard (g) || replay_mode != NO_REPLAY) return;
   switch (gm) {
@@ -561,32 +542,32 @@ c_red_palette (ALLEGRO_COLOR c)
 }
 
 palette
-get_guard_palette (int style, enum vm vm)
+get_guard_palette (int style)
 {
-  switch (vm) {
-  case CGA:
-    switch (style) {
-    case 0: return c_green_palette;
-    case 1: default: return c_red_palette;
-    case 2: return c_red_palette;
-    case 3: return c_red_palette;
-    case 4: return c_red_palette;
-    case 5: return c_red_palette;
-    case 6: return c_red_palette;
-    case 7: return c_red_palette;
-    }
-  case EGA:
-    switch (style) {
-    case 0: return e_dark_red_palette;
-    case 1: default: return e_red_palette;
-    case 2: return e_red_palette;
-    case 3: return e_red_palette;
-    case 4: return e_green_palette;
-    case 5: return e_red_palette;
-    case 6: return e_green_palette;
-    case 7: return e_green_palette;
-    }
-  case VGA:
+  /* switch (vm) { */
+  /* case CGA: */
+  /*   switch (style) { */
+  /*   case 0: return c_green_palette; */
+  /*   case 1: default: return c_red_palette; */
+  /*   case 2: return c_red_palette; */
+  /*   case 3: return c_red_palette; */
+  /*   case 4: return c_red_palette; */
+  /*   case 5: return c_red_palette; */
+  /*   case 6: return c_red_palette; */
+  /*   case 7: return c_red_palette; */
+  /*   } */
+  /* case EGA: */
+  /*   switch (style) { */
+  /*   case 0: return e_dark_red_palette; */
+  /*   case 1: default: return e_red_palette; */
+  /*   case 2: return e_red_palette; */
+  /*   case 3: return e_red_palette; */
+  /*   case 4: return e_green_palette; */
+  /*   case 5: return e_red_palette; */
+  /*   case 6: return e_green_palette; */
+  /*   case 7: return e_green_palette; */
+  /*   } */
+  /* case VGA: */
     switch (style) {
     case 0: return v_salmon_palette;
     case 1: default: return v_light_blue_palette;
@@ -597,33 +578,33 @@ get_guard_palette (int style, enum vm vm)
     case 6: return v_purple_palette;
     case 7: return v_yellow_palette;
     }
-  }
+  /* } */
   return NULL;
 }
 
 ALLEGRO_BITMAP *
-apply_guard_palette (ALLEGRO_BITMAP *bitmap, enum anim_type type,
-                     int style, enum vm vm)
+apply_guard_palette (ALLEGRO_BITMAP *bitmap, enum actor_type type,
+                     int style)
 {
   palette pal = NULL;
 
   if (is_guard_by_type (type)) {
-    pal = get_guard_palette (style, vm);
+    pal = get_guard_palette (style);
     bitmap = apply_palette (bitmap, pal);
   } else return bitmap;
 
   if (type == SHADOW) {
-    pal = get_kid_palette (vm);
+    pal = get_kid_palette ();
     bitmap = apply_palette (bitmap, pal);
   }
 
-  if (hgc) bitmap = apply_palette (bitmap, hgc_palette);
+  /* if (hgc) bitmap = apply_palette (bitmap, hgc_palette); */
 
   return bitmap;
 }
 
 void
-draw_guard_frame (ALLEGRO_BITMAP *bitmap, struct anim *g, enum vm vm)
+draw_guard_frame (ALLEGRO_BITMAP *bitmap, struct actor *g)
 {
   struct coord c;
 
@@ -633,33 +614,34 @@ draw_guard_frame (ALLEGRO_BITMAP *bitmap, struct anim *g, enum vm vm)
   struct frame f = g->f;
   struct frame_offset xf = g->xf;
 
-  f.b = apply_guard_palette (f.b, g->type, g->style, vm);
-  xf.b = apply_guard_palette (xf.b, g->type, g->style, vm);
+  f.b = apply_guard_palette (f.b, g->type, g->style);
+  xf.b = apply_guard_palette (xf.b, g->type, g->style);
 
   draw_xframe (bitmap, &f, &xf);
   draw_frame (bitmap, &f);
 
   if (g->splash && g->type != SKELETON) {
     ALLEGRO_BITMAP *splash = (g->type == SHADOW) ? v_kid_splash : guard_splash;
-    palette pal = get_guard_palette (g->style, vm);
+    palette pal = get_guard_palette (g->style);
     splash = apply_palette (splash, pal);
-    if (hgc) splash = apply_palette (splash, hgc_palette);
+    /* if (hgc) splash = apply_palette (splash, hgc_palette); */
     draw_bitmapc (splash, bitmap, splash_coord (&g->f, &c), g->f.flip);
   }
 }
 
 void
-draw_start_guards (ALLEGRO_BITMAP *bitmap, enum vm vm)
+draw_start_guards (ALLEGRO_BITMAP *bitmap)
 {
   int i;
   for (i = 0; i < GUARDS; i++) {
     struct guard *g = guard (&global_level, i);
-    if (g->type == NO_ANIM) continue;
+    if (g->type == NO_ACTOR) continue;
     struct frame f;
     f.c.room = g->p.room;
-    f.b = get_guard_normal_bitmap (g->type);
-    f.b = apply_guard_palette (f.b, g->type, g->style, vm);
-    f.b = apply_palette (f.b, start_anim_palette);
+    const char *type = actor_type_string (g->type);
+    f.b = actor_bitmap (NULL, type, "NORMAL", 0);
+    f.b = apply_guard_palette (f.b, g->type, g->style);
+    f.b = apply_palette (f.b, start_actor_palette);
     f.flip = (g->dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
     place_frame (&f, &f, f.b, &g->p,
                  g->dir == LEFT ? +16 : +22, +14);
@@ -669,13 +651,13 @@ draw_start_guards (ALLEGRO_BITMAP *bitmap, enum vm vm)
 }
 
 bool
-is_guard (struct anim *a)
+is_guard (struct actor *a)
 {
   return is_guard_by_type (a->type);
 }
 
 bool
-is_guard_by_type (enum anim_type t)
+is_guard_by_type (enum actor_type t)
 {
   return t == SHADOW
     || t == GUARD
@@ -685,7 +667,7 @@ is_guard_by_type (enum anim_type t)
 }
 
 void
-draw_guard_lives (ALLEGRO_BITMAP *bitmap, struct anim *g, enum vm vm)
+draw_guard_lives (ALLEGRO_BITMAP *bitmap, struct actor *g)
 {
   if (g->dont_draw_lives) return;
   if (g->current_lives <= 0) return;
@@ -695,11 +677,13 @@ draw_guard_lives (ALLEGRO_BITMAP *bitmap, struct anim *g, enum vm vm)
 
   ALLEGRO_COLOR bg_color;
 
-  switch (vm) {
-  case CGA: bg_color = C_LIVES_RECT_COLOR; break;
-  case EGA: bg_color = E_LIVES_RECT_COLOR; break;
-  case VGA: bg_color = V_LIVES_RECT_COLOR; break;
-  }
+  /* switch (vm) { */
+  /* case CGA: bg_color = C_LIVES_RECT_COLOR; break; */
+  /* case EGA: bg_color = E_LIVES_RECT_COLOR; break; */
+  /* case VGA: */
+    bg_color = V_LIVES_RECT_COLOR;
+  /*   break; */
+  /* } */
 
   push_reset_clipping_rectangle (bitmap);
 
@@ -712,16 +696,16 @@ draw_guard_lives (ALLEGRO_BITMAP *bitmap, struct anim *g, enum vm vm)
 
   if ((g->type == SHADOW && g->style == 0)
       || g->type == KID) {
-    pal = get_shadow_life_palette (vm);
+    pal = get_shadow_life_palette ();
     life = apply_palette (life, pal);
   } else if (g->type == SKELETON && g->style == 0)
     life = apply_palette (life, skeleton_life_palette);
   else if (is_guard (g)) {
-    pal = get_guard_palette (g->style, vm);
+    pal = get_guard_palette (g->style);
     life = apply_palette (life, pal);
   }
 
-  if (hgc) life = apply_palette (life, hgc_palette);
+  /* if (hgc) life = apply_palette (life, hgc_palette); */
 
   if (current_lives <= GUARD_MINIMUM_LIVES_TO_BLINK && anim_cycle % 2) {
       pop_clipping_rectangle ();
@@ -736,31 +720,31 @@ draw_guard_lives (ALLEGRO_BITMAP *bitmap, struct anim *g, enum vm vm)
   pop_clipping_rectangle ();
 }
 
-ALLEGRO_COLOR
-c_shadow_life_palette (ALLEGRO_COLOR c)
-{
-  unsigned char r, g, b, a;
-  al_unmap_rgba (c, &r, &g, &b, &a);
-  if (a == 0) return c;
+/* ALLEGRO_COLOR */
+/* c_shadow_life_palette (ALLEGRO_COLOR c) */
+/* { */
+/*   unsigned char r, g, b, a; */
+/*   al_unmap_rgba (c, &r, &g, &b, &a); */
+/*   if (a == 0) return c; */
 
-  if (color_eq (c, LIFE_COLOR_01)) return C_KID_SHADOW_CLOTHES_COLOR_01;
-  if (color_eq (c, LIFE_COLOR_02)) return C_KID_SHADOW_CLOTHES_COLOR_02;
+/*   if (color_eq (c, LIFE_COLOR_01)) return C_KID_SHADOW_CLOTHES_COLOR_01; */
+/*   if (color_eq (c, LIFE_COLOR_02)) return C_KID_SHADOW_CLOTHES_COLOR_02; */
 
-  return c;
-}
+/*   return c; */
+/* } */
 
-ALLEGRO_COLOR
-e_shadow_life_palette (ALLEGRO_COLOR c)
-{
-  unsigned char r, g, b, a;
-  al_unmap_rgba (c, &r, &g, &b, &a);
-  if (a == 0) return c;
+/* ALLEGRO_COLOR */
+/* e_shadow_life_palette (ALLEGRO_COLOR c) */
+/* { */
+/*   unsigned char r, g, b, a; */
+/*   al_unmap_rgba (c, &r, &g, &b, &a); */
+/*   if (a == 0) return c; */
 
-  if (color_eq (c, LIFE_COLOR_01)) return E_KID_SHADOW_CLOTHES_COLOR_01;
-  if (color_eq (c, LIFE_COLOR_02)) return E_KID_SHADOW_CLOTHES_COLOR_02;
+/*   if (color_eq (c, LIFE_COLOR_01)) return E_KID_SHADOW_CLOTHES_COLOR_01; */
+/*   if (color_eq (c, LIFE_COLOR_02)) return E_KID_SHADOW_CLOTHES_COLOR_02; */
 
-  return c;
-}
+/*   return c; */
+/* } */
 
 ALLEGRO_COLOR
 v_shadow_life_palette (ALLEGRO_COLOR c)
@@ -776,14 +760,15 @@ v_shadow_life_palette (ALLEGRO_COLOR c)
 }
 
 palette
-get_shadow_life_palette (enum vm vm)
+get_shadow_life_palette (void)
 {
-  switch (vm) {
-  case CGA: return c_shadow_life_palette;
-  case EGA: return e_shadow_life_palette;
-  case VGA: return v_shadow_life_palette;
-  }
-  return NULL;
+  /* switch (vm) { */
+  /* case CGA: return c_shadow_life_palette; */
+  /* case EGA: return e_shadow_life_palette; */
+  /* case VGA: */
+    return v_shadow_life_palette;
+  /* } */
+  /* return NULL; */
 }
 
 ALLEGRO_COLOR

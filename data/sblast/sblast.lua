@@ -20,10 +20,10 @@
 
 -- header
 local P = {package_type = "AUDIO MODE", package_name = "SBLAST",
-           package_file = mininim.debugger.src}
+           package_file = MININIM.debugger.src}
 
 -- imports
-local M = mininim
+local MININIM = MININIM
 local common = require "script/common"
 
 local function p (filename)
@@ -38,7 +38,7 @@ end
 setfenv (1, P)
 
 function load ()
-   M.audio[package_name] =
+   MININIM.lua.audio_mode[package_name] =
       {SUSPENSE = p "audio/suspense.ogg"}
    return P
 end

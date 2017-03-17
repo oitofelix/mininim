@@ -20,26 +20,26 @@
 
 #include "mininim.h"
 
-struct anim princess;
+struct actor princess;
 
 #define TURN_FRAMESET_NMEMB 8
 #define STEP_BACK_FRAMESET_NMEMB 6
 #define LOOK_DOWN_FRAMESET_NMEMB 2
-#define COUCH_FRAMESET_NMEMB 11
+#define CROUCH_FRAMESET_NMEMB 11
 #define STROKE_FRAMESET_NMEMB 3
 #define TURN_EMBRACE_FRAMESET_NMEMB 14
 
 static struct frameset turn_frameset[TURN_FRAMESET_NMEMB];
 static struct frameset step_back_frameset[STEP_BACK_FRAMESET_NMEMB];
 static struct frameset look_down_frameset[LOOK_DOWN_FRAMESET_NMEMB];
-static struct frameset couch_frameset[COUCH_FRAMESET_NMEMB];
+static struct frameset crouch_frameset[CROUCH_FRAMESET_NMEMB];
 static struct frameset stroke_frameset[STROKE_FRAMESET_NMEMB];
 static struct frameset turn_embrace_frameset[TURN_EMBRACE_FRAMESET_NMEMB];
 
 static void init_turn_frameset (void);
 static void init_step_back_frameset (void);
 static void init_look_down_frameset (void);
-static void init_couch_frameset (void);
+static void init_crouch_frameset (void);
 static void init_stroke_frameset (void);
 static void init_turn_embrace_frameset (void);
 
@@ -50,10 +50,10 @@ ALLEGRO_BITMAP *princess_normal_00,
   *princess_step_back_00, *princess_step_back_01, *princess_step_back_02,
   *princess_step_back_03, *princess_step_back_04, *princess_step_back_05,
   *princess_look_down_00, *princess_look_down_01, *princess_rest_00,
-  *princess_couch_00, *princess_couch_01, *princess_couch_02,
-  *princess_couch_03, *princess_couch_04, *princess_couch_05,
-  *princess_couch_06, *princess_couch_07, *princess_couch_08,
-  *princess_couch_09, *princess_couch_10,
+  *princess_crouch_00, *princess_crouch_01, *princess_crouch_02,
+  *princess_crouch_03, *princess_crouch_04, *princess_crouch_05,
+  *princess_crouch_06, *princess_crouch_07, *princess_crouch_08,
+  *princess_crouch_09, *princess_crouch_10,
   *princess_stroke_00, *princess_stroke_01, *princess_stroke_02,
   *princess_turn_embrace_00, *princess_turn_embrace_01, *princess_turn_embrace_02,
   *princess_turn_embrace_03, *princess_turn_embrace_04, *princess_turn_embrace_05,
@@ -82,17 +82,17 @@ load_princess (void)
   princess_look_down_00 = load_bitmap (PRINCESS_LOOK_DOWN_00);
   princess_look_down_01 = load_bitmap (PRINCESS_LOOK_DOWN_01);
   princess_rest_00 = load_bitmap (PRINCESS_REST_00);
-  princess_couch_00 = load_bitmap (PRINCESS_COUCH_00);
-  princess_couch_01 = load_bitmap (PRINCESS_COUCH_01);
-  princess_couch_02 = load_bitmap (PRINCESS_COUCH_02);
-  princess_couch_03 = load_bitmap (PRINCESS_COUCH_03);
-  princess_couch_04 = load_bitmap (PRINCESS_COUCH_04);
-  princess_couch_05 = load_bitmap (PRINCESS_COUCH_05);
-  princess_couch_06 = load_bitmap (PRINCESS_COUCH_06);
-  princess_couch_07 = load_bitmap (PRINCESS_COUCH_07);
-  princess_couch_08 = load_bitmap (PRINCESS_COUCH_08);
-  princess_couch_09 = load_bitmap (PRINCESS_COUCH_09);
-  princess_couch_10 = load_bitmap (PRINCESS_COUCH_10);
+  princess_crouch_00 = load_bitmap (PRINCESS_CROUCH_00);
+  princess_crouch_01 = load_bitmap (PRINCESS_CROUCH_01);
+  princess_crouch_02 = load_bitmap (PRINCESS_CROUCH_02);
+  princess_crouch_03 = load_bitmap (PRINCESS_CROUCH_03);
+  princess_crouch_04 = load_bitmap (PRINCESS_CROUCH_04);
+  princess_crouch_05 = load_bitmap (PRINCESS_CROUCH_05);
+  princess_crouch_06 = load_bitmap (PRINCESS_CROUCH_06);
+  princess_crouch_07 = load_bitmap (PRINCESS_CROUCH_07);
+  princess_crouch_08 = load_bitmap (PRINCESS_CROUCH_08);
+  princess_crouch_09 = load_bitmap (PRINCESS_CROUCH_09);
+  princess_crouch_10 = load_bitmap (PRINCESS_CROUCH_10);
   princess_stroke_00 = load_bitmap (PRINCESS_STROKE_00);
   princess_stroke_01 = load_bitmap (PRINCESS_STROKE_01);
   princess_stroke_02 = load_bitmap (PRINCESS_STROKE_02);
@@ -115,7 +115,7 @@ load_princess (void)
   init_turn_frameset ();
   init_step_back_frameset ();
   init_look_down_frameset ();
-  init_couch_frameset ();
+  init_crouch_frameset ();
   init_stroke_frameset ();
   init_turn_embrace_frameset ();
 }
@@ -141,17 +141,17 @@ unload_princess (void)
   destroy_bitmap (princess_look_down_00);
   destroy_bitmap (princess_look_down_01);
   destroy_bitmap (princess_rest_00);
-  destroy_bitmap (princess_couch_00);
-  destroy_bitmap (princess_couch_01);
-  destroy_bitmap (princess_couch_02);
-  destroy_bitmap (princess_couch_03);
-  destroy_bitmap (princess_couch_04);
-  destroy_bitmap (princess_couch_05);
-  destroy_bitmap (princess_couch_06);
-  destroy_bitmap (princess_couch_07);
-  destroy_bitmap (princess_couch_08);
-  destroy_bitmap (princess_couch_09);
-  destroy_bitmap (princess_couch_10);
+  destroy_bitmap (princess_crouch_00);
+  destroy_bitmap (princess_crouch_01);
+  destroy_bitmap (princess_crouch_02);
+  destroy_bitmap (princess_crouch_03);
+  destroy_bitmap (princess_crouch_04);
+  destroy_bitmap (princess_crouch_05);
+  destroy_bitmap (princess_crouch_06);
+  destroy_bitmap (princess_crouch_07);
+  destroy_bitmap (princess_crouch_08);
+  destroy_bitmap (princess_crouch_09);
+  destroy_bitmap (princess_crouch_10);
   destroy_bitmap (princess_stroke_00);
   destroy_bitmap (princess_stroke_01);
   destroy_bitmap (princess_stroke_02);
@@ -208,16 +208,16 @@ init_look_down_frameset (void)
 }
 
 void
-init_couch_frameset (void)
+init_crouch_frameset (void)
 {
-  struct frameset frameset[COUCH_FRAMESET_NMEMB] =
-    {{princess_couch_00,+0,0},{princess_couch_01,-3,0},{princess_couch_02,+0,0},
-     {princess_couch_03,+0,0},{princess_couch_04,-2,0},{princess_couch_05,+1,0},
-     {princess_couch_06,+0,0},{princess_couch_07,+0,0},{princess_couch_08,+0,0},
-     {princess_couch_09,-2,0},{princess_couch_10,+4,0}};
+  struct frameset frameset[CROUCH_FRAMESET_NMEMB] =
+    {{princess_crouch_00,+0,0},{princess_crouch_01,-3,0},{princess_crouch_02,+0,0},
+     {princess_crouch_03,+0,0},{princess_crouch_04,-2,0},{princess_crouch_05,+1,0},
+     {princess_crouch_06,+0,0},{princess_crouch_07,+0,0},{princess_crouch_08,+0,0},
+     {princess_crouch_09,-2,0},{princess_crouch_10,+4,0}};
 
-  memcpy (&couch_frameset, &frameset,
-          COUCH_FRAMESET_NMEMB * sizeof (struct frameset));
+  memcpy (&crouch_frameset, &frameset,
+          CROUCH_FRAMESET_NMEMB * sizeof (struct frameset));
 }
 
 void
@@ -249,7 +249,7 @@ init_turn_embrace_frameset (void)
 
 
 void
-princess_normal (struct anim *princess)
+princess_normal (struct actor *princess)
 {
   princess->oaction = princess->action;
   princess->action = princess_normal;
@@ -258,13 +258,13 @@ princess_normal (struct anim *princess)
   princess->fo.b = princess_normal_00;
   princess->fo.dx = princess->fo.dy = +0;
 
-  if (princess->oaction == princess_uncouch) princess->fo.dx = -1;
+  if (princess->oaction == princess_uncrouch) princess->fo.dx = -1;
 
   next_frame (&princess->f, &princess->f, &princess->fo);
 }
 
 void
-princess_turn (struct anim *princess)
+princess_turn (struct actor *princess)
 {
   princess->oaction = princess->action;
   princess->action = princess_turn;
@@ -289,7 +289,7 @@ princess_turn (struct anim *princess)
 }
 
 void
-princess_step_back (struct anim *princess)
+princess_step_back (struct actor *princess)
 {
   princess->oaction = princess->action;
   princess->action = princess_step_back;
@@ -310,7 +310,7 @@ princess_step_back (struct anim *princess)
 }
 
 void
-princess_look_down (struct anim *princess)
+princess_look_down (struct actor *princess)
 {
   princess->oaction = princess->action;
   princess->action = princess_look_down;
@@ -325,7 +325,7 @@ princess_look_down (struct anim *princess)
 }
 
 void
-princess_rest (struct anim *princess)
+princess_rest (struct actor *princess)
 {
   princess->oaction = princess->action;
   princess->action = princess_rest;
@@ -338,13 +338,13 @@ princess_rest (struct anim *princess)
 }
 
 void
-princess_couch (struct anim *princess)
+princess_crouch (struct actor *princess)
 {
   princess->oaction = princess->action;
-  princess->action = princess_couch;
+  princess->action = princess_crouch;
   princess->f.flip = (princess->f.dir == RIGHT) ? 0 : ALLEGRO_FLIP_HORIZONTAL;
 
-  if (princess->oaction != princess_couch) {
+  if (princess->oaction != princess_crouch) {
     princess->i = -1;
     princess->j = 0;
   }
@@ -352,7 +352,7 @@ princess_couch (struct anim *princess)
   if (princess->i == 10) princess->j = 1;
   if (princess->i < 10) princess->i++;
 
-  select_frame (princess, couch_frameset, princess->i);
+  select_frame (princess, crouch_frameset, princess->i);
 
   if (princess->j) princess->fo.dx = 0;
 
@@ -360,28 +360,28 @@ princess_couch (struct anim *princess)
 }
 
 void
-princess_uncouch (struct anim *princess)
+princess_uncrouch (struct actor *princess)
 {
   princess->oaction = princess->action;
-  princess->action = princess_uncouch;
+  princess->action = princess_uncrouch;
   princess->f.flip = (princess->f.dir == RIGHT) ? 0 : ALLEGRO_FLIP_HORIZONTAL;
 
-  if (princess->oaction != princess_uncouch) princess->i = 10;
+  if (princess->oaction != princess_uncrouch) princess->i = 10;
 
   if (princess->i == 0) {
     princess_normal (princess);
     return;
   }
 
-  princess->fo.b = couch_frameset[--princess->i].frame;
-  princess->fo.dx = -couch_frameset[princess->i + 1].dx;
-  princess->fo.dy = -couch_frameset[princess->i + 1].dy;
+  princess->fo.b = crouch_frameset[--princess->i].frame;
+  princess->fo.dx = -crouch_frameset[princess->i + 1].dx;
+  princess->fo.dy = -crouch_frameset[princess->i + 1].dy;
 
   next_frame (&princess->f, &princess->f, &princess->fo);
 }
 
 void
-princess_stroke (struct anim *princess)
+princess_stroke (struct actor *princess)
 {
   princess->oaction = princess->action;
   princess->action = princess_stroke;
@@ -417,7 +417,7 @@ princess_stroke (struct anim *princess)
 }
 
 void
-princess_turn_embrace (struct anim *princess)
+princess_turn_embrace (struct actor *princess)
 {
   princess->oaction = princess->action;
   princess->action = princess_turn_embrace;
@@ -487,30 +487,31 @@ v_princess_palette (ALLEGRO_COLOR c)
 }
 
 palette
-get_princess_palette (enum vm vm)
+get_princess_palette (void)
 {
-  switch (vm) {
-  case CGA: return c_princess_palette;
-  case EGA: return e_princess_palette;
-  case VGA: return v_princess_palette;
-  }
-  return NULL;
+  /* switch (vm) { */
+  /* case CGA: return c_princess_palette; */
+  /* case EGA: return e_princess_palette; */
+  /* case VGA: */
+    return v_princess_palette;
+  /* } */
+  /* return NULL; */
 }
 
 void
-draw_princess_frame (ALLEGRO_BITMAP *bitmap, struct anim *p, enum vm vm)
+draw_princess_frame (ALLEGRO_BITMAP *bitmap, struct actor *p)
 {
   if (p->invisible) return;
 
   struct frame f = p->f;
 
   palette pal = NULL;
-  pal = get_princess_palette (vm);
+  pal = get_princess_palette ();
   f.b = apply_palette (f.b, pal);
-  pal = get_kid_palette (vm);
+  pal = get_kid_palette ();
   f.b = apply_palette (f.b, pal);
 
-  if (hgc) f.b = apply_palette (f.b, hgc_palette);
+  /* if (hgc) f.b = apply_palette (f.b, hgc_palette); */
 
   draw_frame (bitmap, &f);
 }

@@ -24,8 +24,6 @@
 #define L_MININIM_LEVEL L_MININIM ".level"
 
 void define_L_mininim_level (lua_State *L);
-void run_level_start_hook (lua_State *L);
-void run_level_cycle_hook (lua_State *L);
 
 const char *env_mode_string (enum em em);
 const char *hue_mode_string (enum hue hue);

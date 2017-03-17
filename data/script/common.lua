@@ -20,10 +20,10 @@
 
 -- header
 local P = {package_type = "LIBRARY", package_name = "common",
-           package_file = mininim.debugger.src}
+           package_file = MININIM.debugger.src}
 
 -- imports
-local M = mininim
+local MININIM = MININIM
 local string = string
 local loadstring = loadstring
 local assert = assert
@@ -36,32 +36,108 @@ local math = math
 local os = os
 local debug = debug
 local print = print
+local getmetatable = getmetatable
+local setmetatable = setmetatable
+local unpack = unpack
+local rawget = rawget
+local rawset = rawset
 
 -- body
 setfenv (1, P)
+
+function merge_recursively (metatable, o)
+   for k, v in pairs (metatable) do
+      local t = rawget (o, k)
+      if type (v) == "table"
+         and (t == nil or type (t) == "table")
+         and not string.find (k, "^_")
+      then
+         t = t or {}
+         rawset (o, k, t)
+         if not rawget (t, "_parent") then
+            rawset (t, "_parent", o) end
+         new (v, t)
+      elseif type (v) ~= "table"
+         and o[k] == nil
+         and getmetatable (o) ~= metatable
+         and not string.find (k, "^_")
+      then rawset (o, k, v) end
+   end
+
+   local meta_metatable = getmetatable (metatable)
+   if meta_metatable
+      and getmetatable (o) ~= metatable
+   then return merge_recursively (meta_metatable, o)
+   else return o end
+end
+
+function new (metatable, o, ...)
+   o = o or {}
+   o.__index = o
+
+   if metatable then
+      if not getmetatable (o) then
+         if not rawget (metatable, __index) then
+            metatable.__index = metatable end
+         setmetatable (o, metatable)
+      end
+
+      merge_recursively (metatable, o)
+
+      if metatable._new then
+         metatable._new (o, unpack (arg))
+      end
+   end
+
+   return o
+end
+
+function instanceof (o, metatable)
+   local m = getmetatable (o)
+   if m == metatable then return true
+   elseif not m then return false
+   else return instanceof (m, metatable)
+   end
+end
+
+function set_subtables_metatable (o, metatable)
+   for k, v in pairs (o) do
+      if type (v) == "table" and not getmetatable (v)
+      and not string.find (k, "^_") then
+         new (metatable, v)
+      end
+   end
+end
+
+
+-- Resources
 
 function base_directory (filename)
    return string.gsub (filename, "[/\][^/\]*$", "")
 end
 
-function resource_filename (P, filename)
-   return base_directory (P.package_file) .. "/" .. filename
+function resource_filename (P, filename, ...)
+   return base_directory (P.package_file) .. "/"
+      .. string.format (filename, unpack (arg))
 end
 
-function load_bitmap (P, filename)
-   return M.video.bitmap (resource_filename (P, filename))
+function load_bitmap (P, filename, ...)
+   return MININIM.video.bitmap (
+      resource_filename (P, filename, unpack (arg)))
 end
 
-function load_sample (P, filename)
-   return M.audio.source (resource_filename (P, filename), "SAMPLE")
+function load_sample (P, filename, ...)
+   return MININIM.audio.source (
+      resource_filename (P, filename, unpack (arg)), "SAMPLE")
 end
 
-function load_stream (P, filename)
-   return M.audio.source (resource_filename (P, filename), "STREAM")
+function load_stream (P, filename, ...)
+   return MININIM.audio.source (
+      resource_filename (P, filename, unpack (arg)), "STREAM")
 end
 
 function eval_clipboard ()
-   assert (loadstring (M.clipboard)) ()
+   assert (loadstring (MININIM.clipboard)) ()
 end
 
 function table_print (tt, indent, done)

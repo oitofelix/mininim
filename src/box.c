@@ -20,8 +20,8 @@
 
 #include "mininim.h"
 
-static ALLEGRO_COLOR e_box_palette (ALLEGRO_COLOR c);
-static ALLEGRO_COLOR c_box_palette (ALLEGRO_COLOR c);
+/* static ALLEGRO_COLOR e_box_palette (ALLEGRO_COLOR c); */
+/* static ALLEGRO_COLOR c_box_palette (ALLEGRO_COLOR c); */
 
 /* vga */
 static ALLEGRO_BITMAP *v_box_00, *v_box_01, *v_box_02;
@@ -45,7 +45,7 @@ unload_box (void)
 }
 
 static ALLEGRO_BITMAP *
-get_box_frame (int i, enum vm vm)
+get_box_frame (int i)
 {
   ALLEGRO_BITMAP *box = NULL;
 
@@ -55,24 +55,24 @@ get_box_frame (int i, enum vm vm)
   case 2: box = v_box_02; break;
   }
 
-  switch (vm) {
-  case CGA: box = apply_palette (box, c_box_palette); break;
-  case EGA: box = apply_palette (box, e_box_palette); break;
-  case VGA: break;
-  }
+  /* switch (vm) { */
+  /* case CGA: box = apply_palette (box, c_box_palette); break; */
+  /* case EGA: box = apply_palette (box, e_box_palette); break; */
+  /* case VGA: break; */
+  /* } */
 
-  if (hgc) box = apply_palette (box, hgc_palette);
+  /* if (hgc) box = apply_palette (box, hgc_palette); */
 
   return box;
 }
 
 void
-draw_box (ALLEGRO_BITMAP* bitmap, struct pos *p, enum vm vm)
+draw_box (ALLEGRO_BITMAP* bitmap, struct pos *p)
 {
   struct coord c;
   if (! peq (&mouse_pos, p)) return;
 
-  ALLEGRO_BITMAP *box = get_box_frame (anim_cycle % 3, vm);
+  ALLEGRO_BITMAP *box = get_box_frame (anim_cycle % 3);
   draw_bitmapc (box, bitmap, box_coord (p, &c), 0);
 }
 
@@ -85,16 +85,16 @@ box_coord (struct pos *p, struct coord *c)
                PLACE_HEIGHT * p->floor - 13);
 }
 
-static ALLEGRO_COLOR
-e_box_palette (ALLEGRO_COLOR c)
-{
-  if (color_eq (c, V_BOX_COLOR)) return E_BOX_COLOR;
-  else return c;
-}
+/* static ALLEGRO_COLOR */
+/* e_box_palette (ALLEGRO_COLOR c) */
+/* { */
+/*   if (color_eq (c, V_BOX_COLOR)) return E_BOX_COLOR; */
+/*   else return c; */
+/* } */
 
-static ALLEGRO_COLOR
-c_box_palette (ALLEGRO_COLOR c)
-{
-  if (color_eq (c, V_BOX_COLOR)) return C_BOX_COLOR;
-  else return c;
-}
+/* static ALLEGRO_COLOR */
+/* c_box_palette (ALLEGRO_COLOR c) */
+/* { */
+/*   if (color_eq (c, V_BOX_COLOR)) return C_BOX_COLOR; */
+/*   else return c; */
+/* } */

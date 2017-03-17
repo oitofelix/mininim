@@ -20,28 +20,15 @@
 
 #include "mininim.h"
 
-static bool flow (struct anim *k);
-static bool physics_in (struct anim *k);
-static void physics_out (struct anim *k);
-
-ALLEGRO_BITMAP *kid_sword_normal_00;
+static bool flow (struct actor *k);
+static bool physics_in (struct actor *k);
+static void physics_out (struct actor *k);
 
 void
-load_kid_sword_normal (void)
-{
-  kid_sword_normal_00 = load_bitmap (KID_SWORD_NORMAL_00);
-}
-
-void
-unload_kid_sword_normal (void)
-{
-  destroy_bitmap (kid_sword_normal_00);
-}
-
-void
-kid_sword_normal (struct anim *k)
+kid_sword_normal (struct actor *k)
 {
   k->oaction = k->action;
+  k->oi = k->i;
   k->action = kid_sword_normal;
   k->f.flip = (k->f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
@@ -52,7 +39,7 @@ kid_sword_normal (struct anim *k)
 }
 
 static bool
-flow (struct anim *k)
+flow (struct actor *k)
 {
   struct pos pmt;
 
@@ -82,9 +69,9 @@ flow (struct anim *k)
   k->attack_range_far = false;
   k->attack_range_near = false;
 
-  struct anim *ke = get_reciprocal_enemy (k);
+  struct actor *ke = get_reciprocal_enemy (k);
   k->keep_sword_fast = (ke && ke->current_lives > 0
-                        && ! is_anim_fall (&ke->f));
+                        && ! is_actor_fall (ke));
 
   bool keep_sword =
     (k->key.down && (! ke || ! is_in_range (k, ke, ATTACK_RANGE)))
@@ -131,13 +118,14 @@ flow (struct anim *k)
     }
   }
 
-  k->fo.b = kid_sword_normal_00;
-  k->fo.dx = k->fo.dy = +0;
-  select_xframe (&k->xf, sword_frameset, 13);
+  k->fo.b = actor_bitmap (k, "KID", "SWORD_NORMAL", 0);
+  k->fo.dx = actor_bitmap_dx (k, "KID", "SWORD_NORMAL", 0);
+  k->fo.dy = actor_bitmap_dy (k, "KID", "SWORD_NORMAL", 0);
+  select_actor_xframe (k, "KID", "SWORD", 13);
 
-  if (k->f.b == kid_take_sword_frameset[3].frame) k->fo.dx = -4;
-  if (k->f.b == kid_sword_walkf_frameset[1].frame) k->fo.dx = +5;
-  if (k->f.b == kid_sword_walkb_frameset[1].frame) k->fo.dx = +2;
+  if (k->oaction == kid_take_sword) k->fo.dx = -4;
+  if (k->oaction == kid_sword_walkf) k->fo.dx = +5;
+  if (k->oaction == kid_sword_walkb) k->fo.dx = +2;
 
   k->i++;
 
@@ -145,7 +133,7 @@ flow (struct anim *k)
 }
 
 static bool
-physics_in (struct anim *k)
+physics_in (struct actor *k)
 {
   /* collision */
   uncollide_static_fight (k);
@@ -161,10 +149,10 @@ physics_in (struct anim *k)
 }
 
 static void
-physics_out (struct anim *k)
+physics_out (struct actor *k)
 {
   /* depressible floors */
-  if (k->f.b == kid_take_sword_frameset[3].frame)
+  if (k->oaction == kid_take_sword)
     update_depressible_floor (k, -2, -27);
   else keep_depressible_floor (k);
 }

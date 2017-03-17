@@ -23,7 +23,66 @@
 
 #define L_MININIM_VIDEO L_MININIM ".video"
 
+extern int REAL_WIDTH;
+extern int REAL_HEIGHT;
+
 void define_L_mininim_video (lua_State *L);
-bool L_push_video_routine (lua_State *L);
+
+void video (ALLEGRO_BITMAP *bitmap, int nret, const char *command,
+            const char *object, uintptr_t index, uintptr_t part,
+            struct pos *p, int actor_id, int width);
+struct coord *_coord_object_index_part (struct coord *c_ret,
+                                        const char *object,
+                                        uintptr_t index, uintptr_t part,
+                                        struct pos *p, int actor_id);
+ALLEGRO_BITMAP *_bitmap_object_index_part (const char *object,
+                                           uintptr_t index, uintptr_t part);
+bool is_valid_video_mode (char *vm);
+char *next_video_mode (char *current_vm);
+void setup_video_mode (char *requested_vm);
+
+#define draw_object(bitmap, object, p)            \
+  video (bitmap, 0, "DRAW", object, 0, 0, p, -1, -1)
+
+#define draw_object_width(bitmap, object, p, width) \
+  video (bitmap, 0, "DRAW", object, 0, 0, p, -1, width)
+
+#define draw_object_part(bitmap, object, part, p)               \
+  video (bitmap, 0, "DRAW", object, 0, (uintptr_t) (part), p, -1, -1)
+
+#define draw_object_part_width(bitmap, object, part, p, width)      \
+  video (bitmap, 0, "DRAW", object, 0, (uintptr_t) (part), p, -1, width)
+
+#define draw_object_index_part(bitmap, object, index, part, p)          \
+  video (bitmap, 0, "DRAW", object, (uintptr_t) (index),                \
+         (uintptr_t) (part), p, -1, -1)
+
+#define draw_object_index_part_width(bitmap, object, index, part,       \
+  p, width)                                                             \
+  video (bitmap, 0, "DRAW", object, (uintptr_t) (index),                \
+         (uintptr_t) (part), p, -1, width)
+
+#define coord_object(c_ret, object, p)              \
+  _coord_object_index_part (c_ret, object, 0, 0, p, -1)
+
+#define coord_object_part(c_ret, object, part, p)                 \
+  _coord_object_index_part (c_ret, object, 0, (uintptr_t) (part), p, -1)
+
+#define coord_object_index_part(c_ret, object, index, part, p)       \
+  _coord_object_index_part (c_ret, object, (uintptr_t) (index),      \
+                            (uintptr_t) (part), p, -1)
+
+#define bitmap_object(object)                   \
+  _bitmap_object_index_part (object, 0, 0)
+
+#define bitmap_object_index(object, index)                \
+  _bitmap_object_index_part (object, (uintptr_t) (index), 0)
+
+#define bitmap_object_part(object, part)                  \
+  _bitmap_object_index_part (object, 0, (uintptr_t) (part))
+
+#define bitmap_object_index_part(object, index, part)            \
+  _bitmap_object_index_part (object, (uintptr_t) (index), \
+                             (uintptr_t) (part))
 
 #endif	/* MININIM_L_MININIM_VIDEO_H */

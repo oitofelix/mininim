@@ -21,23 +21,23 @@
 #include "mininim.h"
 
 struct pos *
-fix_con (struct pos *p)
+fix_tile (struct pos *p)
 {
-  enum confg f = fg (p);
-  enum confg fr = fg_rel (p, 0, +1);
-  enum confg fa = fg_rel (p, -1, 0);
+  enum tile_fg f = fg (p);
+  enum tile_fg fr = fg_rel (p, 0, +1);
+  enum tile_fg fa = fg_rel (p, -1, 0);
   struct pos np; npos (p, &np);
   struct pos pb; prel (p, &pb, +1, 0);
 
-  /* traversable on top of rigid con -> floor */
-  if (is_traversable (p) && is_rigid_con (&pb))
+  /* traversable on top of rigid tile -> floor */
+  if (is_potentially_traversable (p) && is_rigid_tile (&pb))
     set_fg (p, FLOOR);
 
   /* broken floor below non no floor -> floor */
   if (f == BROKEN_FLOOR && fa != NO_FLOOR)
     set_fg (p, FLOOR);
 
-  /* con at left of non-visible wall -> wall */
+  /* tile at left of non-visible wall -> wall */
   if (np.place == PLACES - 1 && f != WALL && fr == WALL)
     set_fg (p, WALL);
 
@@ -52,9 +52,9 @@ fix_con (struct pos *p)
 struct pos *
 fix_door_adjacent_to_wall_or_door (struct pos *p)
 {
-  enum confg f = fg (p);
-  enum confg fl = fg_rel (p, 0, -1);
-  enum confg fr = fg_rel (p, 0, +1);
+  enum tile_fg f = fg (p);
+  enum tile_fg fl = fg_rel (p, 0, -1);
+  enum tile_fg fr = fg_rel (p, 0, +1);
 
   /* DOOR's perspective*/
   if (f == DOOR &&
@@ -69,12 +69,12 @@ fix_door_adjacent_to_wall_or_door (struct pos *p)
 }
 
 /* fix: skeleton and spikes floors can't be a hangable
-   construction at left because there is no corner floor sprites to
+   tile at left because there is no corner floor sprites to
    render the perspective when the kid is climbing them */
 struct pos *
 fix_skeleton_or_spikes_floor_with_no_or_loose_floor_at_left (struct pos *p)
 {
-  enum confg f = fg (p);
+  enum tile_fg f = fg (p);
 
   struct pos ph; prel (p, &ph, +1, -1);
 
@@ -84,7 +84,7 @@ fix_skeleton_or_spikes_floor_with_no_or_loose_floor_at_left (struct pos *p)
     set_fg_rel (p, +0, -1, FLOOR);
 
   /* hangable position perspective  */
-  enum confg t = get_hanged_con (p, RIGHT);
+  enum tile_fg t = get_hanged_tile (p, RIGHT);
   if (is_hangable_pos (p, RIGHT)
       && (t == SKELETON_FLOOR || t == SPIKES_FLOOR))
     set_fg_rel (p, -1, +0, FLOOR);
@@ -96,9 +96,9 @@ fix_skeleton_or_spikes_floor_with_no_or_loose_floor_at_left (struct pos *p)
 struct pos *
 fix_adjacent_itens (struct pos *p)
 {
-  enum confg f = fg (p);
-  enum confg fl = fg_rel (p, 0, -1);
-  enum confg fr = fg_rel (p, 0, +1);
+  enum tile_fg f = fg (p);
+  enum tile_fg fl = fg_rel (p, 0, -1);
+  enum tile_fg fr = fg_rel (p, 0, +1);
 
   int el = ext_rel (p, 0, -1);
   int er = ext_rel (p, 0, +1);
@@ -117,7 +117,7 @@ fix_door_lacking_opener (struct pos *p)
 {
   int i;
 
-  enum confg f = fg (p);
+  enum tile_fg f = fg (p);
 
   if (f == DOOR || f == LEVEL_DOOR) {
     for (i = 0; i < EVENTS; i++)
@@ -127,7 +127,7 @@ fix_door_lacking_opener (struct pos *p)
     /* fprintf (stderr, "%s: replaced %s by %s at pos (%i, %i, %i)\n", */
     /*          __func__, "DOOR", "FLOOR", p->room, p->floor, p->place); */
 
-    set_con (p, FLOOR, NO_BG, NO_ITEM, NO_FAKE);
+    set_tile (p, FLOOR, BRICKS_5, NO_ITEM, NO_FAKE);
   }
 
   return p;
@@ -138,7 +138,7 @@ fix_door_lacking_opener (struct pos *p)
 struct pos *
 fix_opener_or_closer_lacking_door (struct pos *p)
 {
-  enum confg f = fg (p);
+  enum tile_fg f = fg (p);
 
   if (f == OPENER_FLOOR || f == CLOSER_FLOOR) {
     int i = ext (p);
@@ -154,7 +154,7 @@ fix_opener_or_closer_lacking_door (struct pos *p)
     /*          __func__, fg (p) == OPENER_FLOOR ? "OPENER_FLOOR" : "CLOSER_FLOOR", */
     /*          ext (p), "FLOOR", p->room, p->floor, p->place); */
 
-    set_con (p, FLOOR, NO_BG, NO_ITEM, NO_FAKE);
+    set_tile (p, FLOOR, BRICKS_5, NO_ITEM, NO_FAKE);
   }
 
   return p;
@@ -163,12 +163,12 @@ fix_opener_or_closer_lacking_door (struct pos *p)
 /* fix: wall, pillars, big pillars, doors and level doors shouldn't have
    background */
 struct pos *
-fix_confg_which_should_not_have_conbg (struct pos *p)
+fix_tile_fg_which_should_not_have_tile_bg (struct pos *p)
 {
-  enum confg f = fg (p);
+  enum tile_fg f = fg (p);
   if (f == WALL || f == PILLAR || f == BIG_PILLAR_TOP || f == BIG_PILLAR_BOTTOM
       || f == DOOR || f == LEVEL_DOOR)
-    set_bg (p, NO_BG);
+    set_bg (p, BRICKS_5);
 
   return p;
 }
@@ -178,9 +178,9 @@ fix_confg_which_should_not_have_conbg (struct pos *p)
 struct pos *
 fix_partial_big_pillar (struct pos *p)
 {
-  enum confg f = fg (p);
-  enum confg fa = fg_rel (p, -1, +0);
-  enum confg fb = fg_rel (p, +1, +0);
+  enum tile_fg f = fg (p);
+  enum tile_fg fa = fg_rel (p, -1, +0);
+  enum tile_fg fb = fg_rel (p, +1, +0);
 
   if ((f == BIG_PILLAR_BOTTOM && fa != BIG_PILLAR_TOP)
       || (f == BIG_PILLAR_TOP && fb != BIG_PILLAR_BOTTOM))
@@ -231,7 +231,7 @@ fix_room_0 (struct level *l)
   struct pos p; new_pos (&p, l, 0, -1, -1);
   for (p.floor = 0; p.floor < FLOORS; p.floor++)
     for (p.place = 0; p.place < PLACES; p.place++)
-      set_con (&p, WALL, NO_BG, NO_ITEM, NO_FAKE);
+      set_tile (&p, WALL, BRICKS_5, NO_ITEM, NO_FAKE);
 }
 
 /* fix rooms above room 0 in case they have traversable cons at the
@@ -243,7 +243,7 @@ fix_traversable_above_room_0 (struct level *l)
   for (p.room = 1; p.room < ROOMS; p.room++)
     for (p.place = 0; p.place < PLACES; p.place++) {
       if (roomd (p.l, p.room, BELOW) != 0) continue;
-      if (is_traversable (&p))
+      if (is_potentially_traversable (&p))
         set_fg (&p, SPIKES_FLOOR);
     }
 }

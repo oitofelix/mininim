@@ -91,7 +91,7 @@ get_mouse_pos (struct pos *p)
     return p;
   }
 
-  int ry = (m.c.y - 3) % PLACE_HEIGHT;
+  int ry = fmod (m.c.y - 3, PLACE_HEIGHT);
 
   pos_gen (&m.c, p, 0, 3);
 
@@ -103,7 +103,7 @@ get_mouse_pos (struct pos *p)
   struct pos p0;
 
   switch (fake (p)) {
-  case MIRROR: case CHOPPER:
+  case MIRROR: case CHOMPER:
   case WALL: case PILLAR: case BIG_PILLAR_TOP:
   case BIG_PILLAR_BOTTOM: case ARCH_BOTTOM:
   case ARCH_TOP_MID: case ARCH_TOP_SMALL:
@@ -196,7 +196,7 @@ set_mouse_pos (struct pos *p)
   m.mr.h = mr.h;
   m.mr.room = mr.room = np.room;
 
-  con_coord (&np, _m, &m.c);
+  tile_coord (&np, _m, &m.c);
 
   int x, y;
   if (! mr_coord (np.room, -1, &x, &y)) {

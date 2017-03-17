@@ -21,8 +21,6 @@
 #ifndef MININIM_KID_UNCLIMB_H
 #define MININIM_KID_UNCLIMB_H
 
-void load_kid_unclimb (void);
-void unload_kid_unclimb (void);
-void kid_unclimb (struct anim *k);
+void kid_unclimb (struct actor *k);
 
 #endif	/* MININIM_KID_UNCLIMB_H */

@@ -99,10 +99,7 @@ BEGIN_LUA (__index)
 
   ALLEGRO_COLOR c;
   if (c_ptr) c = *c_ptr;
-  else {
-    lua_pushnil (L);
-    return 1;
-  }
+  else return 0;
 
   const char *key;
   int type = lua_type (L, 2);
@@ -147,8 +144,7 @@ BEGIN_LUA (__index)
   default: break;
   }
 
-  lua_pushnil (L);
-  return 1;
+  return 0;
 }
 END_LUA
 

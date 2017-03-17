@@ -21,39 +21,12 @@
 #ifndef MININIM_MIRROR_H
 #define MININIM_MIRROR_H
 
-/* dungeon cga */
-#define DC_MIRROR "data/mirror/dc.png"
-
-/* palace cga */
-#define PC_MIRROR "data/mirror/pc.png"
-
-/* dungeon ega */
-#define DE_MIRROR "data/mirror/de.png"
-
-/* palace ega */
-#define PE_MIRROR "data/mirror/pe.png"
-
-/* dungeon vga */
-#define DV_MIRROR "data/mirror/dv.png"
-
-/* palace vga */
-#define PV_MIRROR "data/mirror/pv.png"
-
 /* variables */
 extern struct mirror *mirror;
 extern size_t mirror_nmemb;
 
 /* functions */
-void load_mirror (void);
-void unload_mirror (void);
-void draw_mirror (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                  enum em em, enum vm vm);
 void draw_mirror_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                     struct frame *f, enum em em, enum vm vm);
-void draw_floor_reflex (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                        enum em em, enum vm vm);
-struct coord *floor_reflex_coord (struct pos *p, struct coord *c);
-struct coord *mirror_coord (struct pos *p, struct coord *c);
-struct coord *mirror_reflex_coord (struct pos *p, struct coord *c);
+                     struct frame *f);
 
 #endif	/* MININIM_MIRROR_H */

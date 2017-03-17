@@ -20,8 +20,8 @@
 
 #include "mininim.h"
 
-static ALLEGRO_COLOR e_fire_palette (ALLEGRO_COLOR c);
-static ALLEGRO_COLOR c_fire_palette (ALLEGRO_COLOR c);
+/* static ALLEGRO_COLOR e_fire_palette (ALLEGRO_COLOR c); */
+/* static ALLEGRO_COLOR c_fire_palette (ALLEGRO_COLOR c); */
 
 /* vga */
 static ALLEGRO_BITMAP *v_fire_00, *v_fire_01, *v_fire_02, *v_fire_03,
@@ -58,7 +58,7 @@ unload_fire (void)
 }
 
 static ALLEGRO_BITMAP *
-get_fire_frame (int i, enum vm vm)
+get_fire_frame (int i)
 {
   ALLEGRO_BITMAP *fire = NULL;
 
@@ -74,28 +74,28 @@ get_fire_frame (int i, enum vm vm)
   case 8: fire = v_fire_08; break;
   }
 
-  switch (vm) {
-  case CGA: fire = apply_palette (fire, c_fire_palette); break;
-  case EGA: fire = apply_palette (fire, e_fire_palette); break;
-  case VGA: break;
-  }
+  /* switch (vm) { */
+  /* case CGA: fire = apply_palette (fire, c_fire_palette); break; */
+  /* case EGA: fire = apply_palette (fire, e_fire_palette); break; */
+  /* case VGA: break; */
+  /* } */
 
-  if (hgc) fire = apply_palette (fire, hgc_palette);
+  /* if (hgc) fire = apply_palette (fire, hgc_palette); */
 
   return fire;
 }
 
 void
-draw_fire (ALLEGRO_BITMAP* bitmap, struct pos *p, enum vm vm)
+draw_fire (ALLEGRO_BITMAP* bitmap, struct pos *p)
 {
   struct coord c;
   if (bg (p) != TORCH) return;
 
   ALLEGRO_BITMAP *fire =
-    get_fire_frame (prandom_pos_uniq (p, anim_cycle, 1, 8), vm);
+    get_fire_frame (prandom_pos_uniq (p, anim_cycle, 1, 8));
 
-  if (peq (p, &mouse_pos))
-    fire = apply_palette (fire, selection_palette);
+  /* if (peq (p, &mouse_pos)) */
+  /*   fire = apply_palette (fire, selection_palette); */
 
   int flip = prandom_pos (p, 1);
   fire_coord (p, &c);
@@ -104,12 +104,14 @@ draw_fire (ALLEGRO_BITMAP* bitmap, struct pos *p, enum vm vm)
 }
 
 void
-draw_princess_room_fire (ALLEGRO_BITMAP *bitmap, enum vm vm)
+draw_princess_room_fire (ALLEGRO_BITMAP *bitmap)
 {
   static int i = 0;
 
-  ALLEGRO_BITMAP *fire_0 = get_fire_frame (prandom_uniq (FIRE_RANDOM_SEED_0 + i, 1, 8), vm);
-  ALLEGRO_BITMAP *fire_1 = get_fire_frame (prandom_uniq (FIRE_RANDOM_SEED_1 + i, 1, 8), vm);
+  ALLEGRO_BITMAP *fire_0 =
+    get_fire_frame (prandom_uniq (FIRE_RANDOM_SEED_0 + i, 1, 8));
+  ALLEGRO_BITMAP *fire_1 =
+    get_fire_frame (prandom_uniq (FIRE_RANDOM_SEED_1 + i, 1, 8));
 
   draw_bitmap (fire_0, bitmap, 93, 99, 0);
   draw_bitmap (fire_1, bitmap, 211, 99, 0);
@@ -126,18 +128,18 @@ fire_coord (struct pos *p, struct coord *c)
                PLACE_HEIGHT * p->floor + 5);
 }
 
-static ALLEGRO_COLOR
-e_fire_palette (ALLEGRO_COLOR c)
-{
-  if (color_eq (c, V_FIRE_COLOR_01)) return E_FIRE_COLOR_01;
-  else if (color_eq (c, V_FIRE_COLOR_02)) return E_FIRE_COLOR_02;
-  else return c;
-}
+/* static ALLEGRO_COLOR */
+/* e_fire_palette (ALLEGRO_COLOR c) */
+/* { */
+/*   if (color_eq (c, V_FIRE_COLOR_01)) return E_FIRE_COLOR_01; */
+/*   else if (color_eq (c, V_FIRE_COLOR_02)) return E_FIRE_COLOR_02; */
+/*   else return c; */
+/* } */
 
-static ALLEGRO_COLOR
-c_fire_palette (ALLEGRO_COLOR c)
-{
-  if (color_eq (c, V_FIRE_COLOR_01)) return C_FIRE_COLOR_01;
-  else if (color_eq (c, V_FIRE_COLOR_02)) return C_FIRE_COLOR_02;
-  else return c;
-}
+/* static ALLEGRO_COLOR */
+/* c_fire_palette (ALLEGRO_COLOR c) */
+/* { */
+/*   if (color_eq (c, V_FIRE_COLOR_01)) return C_FIRE_COLOR_01; */
+/*   else if (color_eq (c, V_FIRE_COLOR_02)) return C_FIRE_COLOR_02; */
+/*   else return c; */
+/* } */

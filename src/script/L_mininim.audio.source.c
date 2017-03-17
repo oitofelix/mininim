@@ -99,10 +99,7 @@ BEGIN_LUA (__index)
 {
   struct audio_source *as = luaL_checkudata (L, 1, L_MININIM_AUDIO_SOURCE);
 
-  if (! as) {
-    lua_pushnil (L);
-    return 1;
-  }
+  if (! as) return 0;
 
   const char *key;
   int type = lua_type (L, 2);
@@ -117,8 +114,7 @@ BEGIN_LUA (__index)
   default: break;
   }
 
-  lua_pushnil (L);
-  return 1;
+  return 0;
 }
 END_LUA
 
@@ -155,7 +151,7 @@ BEGIN_LUA (play)
   struct pos *p = NULL;
   id = luaL_checkudata (L, 1, L_MININIM_ACTOR);
   p = luaL_checkudata (L, 1, L_MININIM_LEVEL_POSITION);
-  play_audio (as, p, (id && *id < anima_nmemb) ? *id : -1);
+  play_audio (as, p, (id && *id < actor_nmemb) ? *id : -1);
   return 0;
 }
 END_LUA

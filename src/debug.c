@@ -21,7 +21,7 @@
 #include "mininim.h"
 
 void
-save_guard_bitmap (enum anim_type type, int style, enum vm vm)
+save_guard_bitmap (enum actor_type type, int style)
 {
   char *filename = NULL, *prefix = NULL;
   switch (type) {
@@ -34,19 +34,21 @@ save_guard_bitmap (enum anim_type type, int style, enum vm vm)
 
   }
   filename = xasprintf ("%s-%i.png", prefix, style);
-  ALLEGRO_BITMAP *b = get_guard_normal_bitmap (type);
-  b = apply_guard_palette (b, type, style, vm);
+
+  const char *type_str = actor_type_string (type);
+  ALLEGRO_BITMAP *b = actor_bitmap (NULL, type_str, "NORMAL", 0);
+  b = apply_guard_palette (b, type, style);
   save_bitmap (filename, b);
   al_free (filename);
 }
 
 void
-save_guard_bitmaps (enum vm vm)
+save_guard_bitmaps (void)
 {
   int type, style;
   for (type = SHADOW; type <= VIZIER; type++)
     for (style = 0; style <= 7; style++)
-      save_guard_bitmap (type, style, vm);
+      save_guard_bitmap (type, style);
 }
 
 void

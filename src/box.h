@@ -28,7 +28,7 @@
 
 void load_box (void);
 void unload_box (void);
-void draw_box (ALLEGRO_BITMAP* bitmap, struct pos *p, enum vm vm);
+void draw_box (ALLEGRO_BITMAP* bitmap, struct pos *p);
 struct coord *box_coord (struct pos *p, struct coord *c);
 
 #endif	/* MININIM_BOX_H */

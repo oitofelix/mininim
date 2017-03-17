@@ -21,13 +21,6 @@
 #ifndef MININIM_KID_SWORD_NORMAL_H
 #define MININIM_KID_SWORD_NORMAL_H
 
-/* bitmaps */
-#define KID_SWORD_NORMAL_00 "data/kid/sword-normal/00.png"
-
-void load_kid_sword_normal (void);
-void unload_kid_sword_normal (void);
-void kid_sword_normal (struct anim *k);
-
-ALLEGRO_BITMAP *kid_sword_normal_00;
+void kid_sword_normal (struct actor *k);
 
 #endif	/* MININIM_KID_SWORD_NORMAL_H */

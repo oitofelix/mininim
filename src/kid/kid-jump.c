@@ -20,87 +20,15 @@
 
 #include "mininim.h"
 
-struct frameset kid_jump_frameset[KID_JUMP_FRAMESET_NMEMB];
-
-static void init_kid_jump_frameset (void);
-static bool flow (struct anim *k);
-static bool physics_in (struct anim *k);
-static void physics_out (struct anim *k);
-
-ALLEGRO_BITMAP *kid_jump_00, *kid_jump_01, *kid_jump_02, *kid_jump_03,
-  *kid_jump_04, *kid_jump_05, *kid_jump_06, *kid_jump_07, *kid_jump_08,
-  *kid_jump_09, *kid_jump_10, *kid_jump_11, *kid_jump_12, *kid_jump_13,
-  *kid_jump_14, *kid_jump_15, *kid_jump_16, *kid_jump_17;
-
-static void
-init_kid_jump_frameset (void)
-{
-  struct frameset frameset[KID_JUMP_FRAMESET_NMEMB] =
-    {{kid_jump_00,+0,0},{kid_jump_01,-2,0},{kid_jump_02,-3,0},
-     {kid_jump_03,-6,0},{kid_jump_04,-2,0},{kid_jump_05,-4,0},
-     {kid_jump_06,-1,0},{kid_jump_07,-12,0},{kid_jump_08,-19,0},
-     {kid_jump_09,-16,-6},{kid_jump_10,-2,+6},{kid_jump_11,-11,0},
-     {kid_jump_12,+5,0},{kid_jump_13,-13,0},{kid_jump_14,+0,0},
-     {kid_jump_15,-1,0},{kid_jump_16,-1,0},{kid_jump_17,+0,0}};
-
-  memcpy (&kid_jump_frameset, &frameset,
-          KID_JUMP_FRAMESET_NMEMB * sizeof (struct frameset));
-}
+static bool flow (struct actor *k);
+static bool physics_in (struct actor *k);
+static void physics_out (struct actor *k);
 
 void
-load_kid_jump (void)
-{
-  /* bitmaps */
-  kid_jump_00 = load_bitmap (KID_JUMP_00);
-  kid_jump_01 = load_bitmap (KID_JUMP_01);
-  kid_jump_02 = load_bitmap (KID_JUMP_02);
-  kid_jump_03 = load_bitmap (KID_JUMP_03);
-  kid_jump_04 = load_bitmap (KID_JUMP_04);
-  kid_jump_05 = load_bitmap (KID_JUMP_05);
-  kid_jump_06 = load_bitmap (KID_JUMP_06);
-  kid_jump_07 = load_bitmap (KID_JUMP_07);
-  kid_jump_08 = load_bitmap (KID_JUMP_08);
-  kid_jump_09 = load_bitmap (KID_JUMP_09);
-  kid_jump_10 = load_bitmap (KID_JUMP_10);
-  kid_jump_11 = load_bitmap (KID_JUMP_11);
-  kid_jump_12 = load_bitmap (KID_JUMP_12);
-  kid_jump_13 = load_bitmap (KID_JUMP_13);
-  kid_jump_14 = load_bitmap (KID_JUMP_14);
-  kid_jump_15 = load_bitmap (KID_JUMP_15);
-  kid_jump_16 = load_bitmap (KID_JUMP_16);
-  kid_jump_17 = load_bitmap (KID_JUMP_17);
-
-  /* frameset */
-  init_kid_jump_frameset ();
-}
-
-void
-unload_kid_jump (void)
-{
-  destroy_bitmap (kid_jump_00);
-  destroy_bitmap (kid_jump_01);
-  destroy_bitmap (kid_jump_02);
-  destroy_bitmap (kid_jump_03);
-  destroy_bitmap (kid_jump_04);
-  destroy_bitmap (kid_jump_05);
-  destroy_bitmap (kid_jump_06);
-  destroy_bitmap (kid_jump_07);
-  destroy_bitmap (kid_jump_08);
-  destroy_bitmap (kid_jump_09);
-  destroy_bitmap (kid_jump_10);
-  destroy_bitmap (kid_jump_11);
-  destroy_bitmap (kid_jump_12);
-  destroy_bitmap (kid_jump_13);
-  destroy_bitmap (kid_jump_14);
-  destroy_bitmap (kid_jump_15);
-  destroy_bitmap (kid_jump_16);
-  destroy_bitmap (kid_jump_17);
-}
-
-void
-kid_jump (struct anim *k)
+kid_jump (struct actor *k)
 {
   k->oaction = k->action;
+  k->oi = k->i;
   k->action = kid_jump;
   k->f.flip = (k->f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
@@ -111,7 +39,7 @@ kid_jump (struct anim *k)
 }
 
 static bool
-flow (struct anim *k)
+flow (struct actor *k)
 {
   struct pos pm, pmf, ptf;
 
@@ -164,18 +92,13 @@ flow (struct anim *k)
     return false;
   }
 
-  select_frame (k, kid_jump_frameset, k->i + 1);
-
-  if (k->f.b == kid_stabilize_frameset[0].frame) k->fo.dx = +2;
-  if (k->f.b == kid_stabilize_frameset[1].frame) k->fo.dx = +6;
-  if (k->f.b == kid_stabilize_frameset[2].frame) k->fo.dx = +4;
-  if (k->f.b == kid_stabilize_frameset[3].frame) k->fo.dx = +0;
+  select_actor_frame (k, "KID", "JUMP", k->i + 1);
 
   return true;
 }
 
 static bool
-physics_in (struct anim *k)
+physics_in (struct actor *k)
 {
   /* inertia */
   if (k->i >= 8 && k->i <= 10) k->inertia = 5;
@@ -188,7 +111,7 @@ physics_in (struct anim *k)
     : k->f.dir == LEFT ? -8 : -4;
   if (uncollide (&k->f, &k->fo, _bf, dx, dx, NULL, &k->ci)) {
     if (k->i < 7 || k->i > 10) kid_stabilize_collision (k);
-    else kid_couch_collision (k);
+    else kid_crouch_collision (k);
     return false;
   }
 
@@ -206,7 +129,7 @@ physics_in (struct anim *k)
 }
 
 static void
-physics_out (struct anim *k)
+physics_out (struct actor *k)
 {
   struct pos pmbo;
 
@@ -228,37 +151,19 @@ physics_out (struct anim *k)
 }
 
 bool
-is_kid_jump (struct frame *f)
+is_kid_jump_start (struct actor *k)
 {
-  int i;
-  for (i = 0; i < KID_JUMP_FRAMESET_NMEMB; i++)
-    if (f->b == kid_jump_frameset[i].frame) return true;
-  return false;
+  return k->action == kid_jump && k->i <= 5;
 }
 
 bool
-is_kid_jump_start (struct frame *f)
+is_kid_jump_air (struct actor *k)
 {
-  int i;
-  for (i = 0; i < 6; i++)
-    if (f->b == kid_jump_frameset[i].frame) return true;
-  return false;
+  return k->action == kid_jump && k->i >= 6 && k->i <= 10;
 }
 
 bool
-is_kid_jump_air (struct frame *f)
+is_kid_jump_landing (struct actor *k)
 {
-  int i;
-  for (i = 6; i < 11; i++)
-    if (f->b == kid_jump_frameset[i].frame) return true;
-  return false;
-}
-
-bool
-is_kid_jump_landing (struct frame *f)
-{
-  int i;
-  for (i = 11; i < KID_JUMP_FRAMESET_NMEMB; i++)
-    if (f->b == kid_jump_frameset[i].frame) return true;
-  return false;
+  return k->action == kid_jump && k->i >=11;
 }

@@ -28,23 +28,21 @@
 /* functions */
 void load_guard (void);
 void unload_guard (void);
-struct anim *create_guard (struct anim *g0, struct anim *g1,
+struct actor *create_guard (struct actor *g0, struct actor *g1,
                            struct pos *p, enum dir dir);
 ALLEGRO_BITMAP *apply_guard_palette (ALLEGRO_BITMAP *bitmap,
-                                     enum anim_type type, int style,
-                                     enum vm vm);
-void draw_guard_frame (ALLEGRO_BITMAP *bitmap, struct anim *g,
-                       enum vm);
-void draw_start_guards (ALLEGRO_BITMAP *bitmap, enum vm vm);
-bool is_guard (struct anim *a);
-bool is_guard_by_type (enum anim_type t);
-void draw_guard_lives (ALLEGRO_BITMAP *bitmap, struct anim *g, enum vm vm);
-palette get_guard_palette (int style, enum vm vm);
-void apply_guard_mode (struct anim *g, enum gm gm);
-palette get_shadow_life_palette (enum vm vm);
+                                     enum actor_type type, int style);
+void draw_guard_frame (ALLEGRO_BITMAP *bitmap, struct actor *g);
+void draw_start_guards (ALLEGRO_BITMAP *bitmap);
+bool is_guard (struct actor *a);
+bool is_guard_by_type (enum actor_type t);
+void draw_guard_lives (ALLEGRO_BITMAP *bitmap, struct actor *g);
+palette get_guard_palette (int style);
+void apply_guard_mode (struct actor *g, enum gm gm);
+palette get_shadow_life_palette (void);
 
 /* variables */
-extern struct anim *guarda;
+extern struct actor *guarda;
 extern size_t guarda_nmemb;
 
 #endif	/* MININIM_GUARD_H */

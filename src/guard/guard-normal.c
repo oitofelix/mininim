@@ -20,79 +20,15 @@
 
 #include "mininim.h"
 
-static bool flow (struct anim *g);
-static bool physics_in (struct anim *g);
-static void physics_out (struct anim *g);
-
-/* guard */
-ALLEGRO_BITMAP *guard_normal_00;
-
-/* fat guard */
-ALLEGRO_BITMAP *fat_guard_normal_00;
-
-/* vizier */
-ALLEGRO_BITMAP *vizier_normal_00;
-
-/* skeleton */
-ALLEGRO_BITMAP *skeleton_normal_00;
-
-/* shadow */
-ALLEGRO_BITMAP *shadow_normal_00;
-
-ALLEGRO_BITMAP *
-get_guard_normal_bitmap (enum anim_type t)
-{
-  switch (t) {
-  case GUARD: default: return guard_normal_00;
-  case FAT_GUARD: return fat_guard_normal_00;
-  case VIZIER: return vizier_normal_00;
-  case SKELETON: return skeleton_normal_00;
-  case SHADOW: return shadow_normal_00;
-  }
-}
+static bool flow (struct actor *g);
+static bool physics_in (struct actor *g);
+static void physics_out (struct actor *g);
 
 void
-load_guard_normal (void)
-{
-  /* guard */
-  guard_normal_00 = load_bitmap (GUARD_NORMAL_00);
-
-  /* fat guard */
-  fat_guard_normal_00 = load_bitmap (FAT_GUARD_NORMAL_00);
-
-  /* vizier */
-  vizier_normal_00 = load_bitmap (VIZIER_NORMAL_00);
-
-  /* skeleton */
-  skeleton_normal_00 = load_bitmap (SKELETON_NORMAL_00);
-
-  /* shadow */
-  shadow_normal_00 = load_bitmap (SHADOW_NORMAL_00);
-}
-
-void
-unload_guard_normal (void)
-{
-  /* guard */
-  destroy_bitmap (guard_normal_00);
-
-  /* fat guard */
-  destroy_bitmap (fat_guard_normal_00);
-
-  /* vizier */
-  destroy_bitmap (vizier_normal_00);
-
-  /* skeleton */
-  destroy_bitmap (skeleton_normal_00);
-
-  /* shadow */
-  destroy_bitmap (shadow_normal_00);
-}
-
-void
-guard_normal (struct anim *g)
+guard_normal (struct actor *g)
 {
   g->oaction = g->action;
+  g->oi = g->i;
   g->action = guard_normal;
   g->f.flip = (g->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
@@ -103,7 +39,7 @@ guard_normal (struct anim *g)
 }
 
 static bool
-flow (struct anim *g)
+flow (struct actor *g)
 {
   struct pos pmt;
 
@@ -121,14 +57,15 @@ flow (struct anim *g)
   if (g->oaction == guard_normal
       && vigilant
       && anim_cycle > 0) {
-    guard_vigilant (g);
+    guard_sword_normal (g);
     return false;
   }
 
-  g->fo.b = get_guard_normal_bitmap (g->type);
-  g->fo.dx = g->fo.dy = +0;
+  g->fo.b = actor_bitmap (g, NULL, "NORMAL", 0);
+  g->fo.dx = actor_bitmap_dx (g, NULL, "NORMAL", 0);
+  g->fo.dy = actor_bitmap_dy (g, NULL, "NORMAL", 0);
 
-  select_xframe (&g->xf, sword_frameset, 30);
+  select_actor_xframe (g, NULL, "SWORD", 30);
 
   if (g->type == VIZIER) g->xf.dy += +4;
   if (g->type == SKELETON) g->xf.dx += -5, g->xf.dy += -6;
@@ -137,7 +74,7 @@ flow (struct anim *g)
 }
 
 static bool
-physics_in (struct anim *g)
+physics_in (struct actor *g)
 {
   /* collision */
   uncollide_static_neutral (g);
@@ -155,7 +92,7 @@ physics_in (struct anim *g)
 }
 
 static void
-physics_out (struct anim *g)
+physics_out (struct actor *g)
 {
   /* depressible floors */
   update_depressible_floor (g, -7, -26);

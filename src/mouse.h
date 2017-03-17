@@ -28,11 +28,11 @@
 /* functions */
 void load_mouse (void);
 void unload_mouse (void);
-struct anim *create_mouse (struct anim *m0, struct anim *m1,
+struct actor *create_mouse (struct actor *m0, struct actor *m1,
                            struct pos *p, enum dir dir);
-void draw_mouse_frame (ALLEGRO_BITMAP *bitmap, struct anim *m, enum vm vm);
-void mouse_normal (struct anim *mouse);
-void mouse_run (struct anim *mouse);
+void draw_mouse_frame (ALLEGRO_BITMAP *bitmap, struct actor *m);
+void mouse_normal (struct actor *mouse);
+void mouse_run (struct actor *mouse);
 
 /* variables */
 extern ALLEGRO_BITMAP *mouse_normal_00, *mouse_run_00, *mouse_run_01;

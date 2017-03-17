@@ -20,24 +20,12 @@
 
 #include "mininim.h"
 
-static void draw_star (struct stars *stars, int i, enum vm vm);
-static void draw_stars (ALLEGRO_BITMAP *bitmap, struct stars *stars, enum vm vm);
-static ALLEGRO_COLOR get_star_color (int i, enum vm vm);
+static void draw_star (struct stars *stars, int i);
+static void draw_stars (ALLEGRO_BITMAP *bitmap, struct stars *stars);
+static ALLEGRO_COLOR get_star_color (int i);
 static int next_color (int color);
 static struct star *star_coord (struct pos *p, int i, struct star *s);
-static void redraw_stars_bitmap (struct stars *stars, enum vm vm);
-
-void
-load_stars (void)
-{
-  /* nothing */
-}
-
-void
-unload_stars (void)
-{
-  /* nothing */
-}
+static void redraw_stars_bitmap (struct stars *stars);
 
 void
 free_stars (struct pos *p)
@@ -95,32 +83,32 @@ generate_stars (struct pos *p)
   clear_bitmap (stars->b, TRANSPARENT_COLOR);
   new_coord (&stars->c, np.l, np.room, min_x, min_y);
 
-  redraw_stars_bitmap (stars, vm);
+  redraw_stars_bitmap (stars);
 }
 
 static ALLEGRO_COLOR
-get_star_color (int i, enum vm vm)
+get_star_color (int i)
 {
-  switch (vm) {
-  case CGA:
-    switch (i) {
-    case 0: return C_STAR_COLOR_01;
-    case 1: return C_STAR_COLOR_02;
-    case 2: return C_STAR_COLOR_03;
-    }
-  case EGA:
-    switch (i) {
-    case 0: return E_STAR_COLOR_01;
-    case 1: return E_STAR_COLOR_02;
-    case 2: return E_STAR_COLOR_03;
-    }
-  case VGA:
-    switch (i) {
-    case 0: return V_STAR_COLOR_01;
-    case 1: return V_STAR_COLOR_02;
-    case 2: return V_STAR_COLOR_03;
-    }
-  }
+  /* switch (vm) { */
+  /* case CGA: */
+  /*   switch (i) { */
+  /*   case 0: return C_STAR_COLOR_01; */
+  /*   case 1: return C_STAR_COLOR_02; */
+  /*   case 2: return C_STAR_COLOR_03; */
+  /*   } */
+  /* case EGA: */
+  /*   switch (i) { */
+  /*   case 0: return E_STAR_COLOR_01; */
+  /*   case 1: return E_STAR_COLOR_02; */
+  /*   case 2: return E_STAR_COLOR_03; */
+  /*   } */
+  /* case VGA: */
+  /*   switch (i) { */
+  /*   case 0: return V_STAR_COLOR_01; */
+  /*   case 1: return V_STAR_COLOR_02; */
+  /*   case 2: return V_STAR_COLOR_03; */
+  /*   } */
+  /* } */
   return V_STAR_COLOR_03;
 }
 
@@ -135,7 +123,7 @@ next_color (int c)
 }
 
 static void
-draw_stars (ALLEGRO_BITMAP *bitmap, struct stars *stars, enum vm vm)
+draw_stars (ALLEGRO_BITMAP *bitmap, struct stars *stars)
 {
   if (! stars->count) return;
 
@@ -146,29 +134,29 @@ draw_stars (ALLEGRO_BITMAP *bitmap, struct stars *stars, enum vm vm)
 
   int i = mrandom (stars->count - 1);
   stars->s[i].color = next_color (stars->s[i].color);
-  draw_star (stars, i, vm);
+  draw_star (stars, i);
   draw_bitmapc (stars->b, bitmap, &stars->c, 0);
 }
 
 void
-draw_star (struct stars *stars, int i, enum vm vm)
+draw_star (struct stars *stars, int i)
 {
   al_lock_bitmap (stars->b, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READWRITE);
   set_target_bitmap (stars->b);
   al_put_pixel (stars->s[i].x - stars->c.x, stars->s[i].y - stars->c.y,
-                get_star_color (stars->s[i].color, vm));
+                get_star_color (stars->s[i].color));
   al_unlock_bitmap (stars->b);
 }
 
 static void
-redraw_stars_bitmap (struct stars *stars, enum vm vm)
+redraw_stars_bitmap (struct stars *stars)
 {
   int i;
-  for (i = 0; i < stars->count; i++) draw_star (stars, i, vm);
+  for (i = 0; i < stars->count; i++) draw_star (stars, i);
 }
 
 void
-draw_princess_room_stars (ALLEGRO_BITMAP *bitmap, enum vm vm)
+draw_princess_room_stars (ALLEGRO_BITMAP *bitmap)
 {
   int i, min_x = INT_MAX, min_y = INT_MAX,
     max_x = INT_MIN, max_y = INT_MIN;
@@ -192,16 +180,16 @@ draw_princess_room_stars (ALLEGRO_BITMAP *bitmap, enum vm vm)
     stars.c.x = min_x;
     stars.c.y = min_y;
 
-    redraw_stars_bitmap (&stars, vm);
+    redraw_stars_bitmap (&stars);
   }
 
-  if (vm != mr.last.vm) redraw_stars_bitmap (&stars, vm);
+  /* if (vm != mr.last.vm) redraw_stars_bitmap (&stars, vm); */
 
-  draw_stars (bitmap, &stars, vm);
+  draw_stars (bitmap, &stars);
 }
 
 void
-draw_balcony_stars (ALLEGRO_BITMAP *bitmap, struct pos *p, enum vm vm)
+draw_balcony_stars (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   if (bg (p) != BALCONY) return;
   struct pos np; npos (p, &np);
@@ -213,9 +201,9 @@ draw_balcony_stars (ALLEGRO_BITMAP *bitmap, struct pos *p, enum vm vm)
   if (! stars->b || ! stars->s || ! stars->count)
     generate_stars (p);
 
-  if (vm != mr.last.vm) redraw_stars_bitmap (stars, vm);
+  /* if (vm != mr.last.vm) redraw_stars_bitmap (stars, vm); */
 
-  draw_stars (bitmap, stars, vm);
+  draw_stars (bitmap, stars);
 }
 
 static struct star *

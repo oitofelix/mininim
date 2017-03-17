@@ -20,28 +20,15 @@
 
 #include "mininim.h"
 
-static bool flow (struct anim *k);
-static bool physics_in (struct anim *k);
-static void physics_out (struct anim *k);
-
-ALLEGRO_BITMAP *kid_normal_00;
+static bool flow (struct actor *k);
+static bool physics_in (struct actor *k);
+static void physics_out (struct actor *k);
 
 void
-load_kid_normal (void)
-{
-  kid_normal_00 = load_bitmap (KID_NORMAL_00);
-}
-
-void
-unload_kid_normal (void)
-{
-  destroy_bitmap (kid_normal_00);
-}
-
-void
-kid_normal (struct anim *k)
+kid_normal (struct actor *k)
 {
   k->oaction = k->action;
+  k->oi = k->i;
   k->action = kid_normal;
   k->f.flip = (k->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
@@ -52,7 +39,7 @@ kid_normal (struct anim *k)
 }
 
 static bool
-flow (struct anim *k)
+flow (struct actor *k)
 {
   struct pos pmt;
 
@@ -75,7 +62,7 @@ flow (struct anim *k)
     (((k->f.dir == RIGHT) && k->key.right && k->key.up)
      || ((k->f.dir == LEFT) && k->key.left && k->key.up))
     && ! k->key.ctrl;
-  bool couch = k->key.down;
+  bool crouch = k->key.down;
   bool vjump = k->key.up && ! k->key.ctrl && ! k->key.alt
     && anim_cycle - k->selection_cycle > SEC2CYC (2);
   bool take_sword = k->key.enter && k->has_sword;
@@ -109,8 +96,8 @@ flow (struct anim *k)
       return false;
     }
 
-    if (couch) {
-      kid_couch (k);
+    if (crouch) {
+      kid_crouch (k);
       return false;
     }
 
@@ -152,11 +139,12 @@ flow (struct anim *k)
     }
 
     if (is_valid_pos (&k->item_pos)) {
-      if (is_potion (&k->item_pos))
-        place_frame (&k->f, &k->f, kid_couch_frameset[0].frame,
-                     &k->item_pos, (k->f.dir == LEFT)
-                     ? PLACE_WIDTH + 3 : +9, +27);
-      kid_couch (k);
+      if (is_potion (&k->item_pos)) {
+        int dx = (k->f.dir == LEFT) ? PLACE_WIDTH + 3 : +9;
+        int dy = +27;
+        place_actor (k, &k->item_pos, dx, dy, "KID", "CROUCH", 0);
+      }
+      kid_crouch (k);
       return false;
     }
 
@@ -166,16 +154,17 @@ flow (struct anim *k)
     }
   }
 
-  k->fo.b = kid_normal_00;
-  k->fo.dx = k->fo.dy = +0;
+  k->fo.b = actor_bitmap (k, "KID", "NORMAL", 0);
+  k->fo.dx = actor_bitmap_dx (k, "KID", "NORMAL", 0);
+  k->fo.dy = actor_bitmap_dy (k, "KID", "NORMAL", 0);
 
-  if (k->f.b == kid_stabilize_frameset[3].frame) k->fo.dx = +2;
-  if (k->f.b == kid_walk_frameset[11].frame) k->fo.dx = -1;
-  if (k->f.b == kid_jump_frameset[17].frame) k->fo.dx = -2;
-  if (k->f.b == kid_couch_frameset[12].frame) k->fo.dx = -2;
-  if (k->f.b == kid_vjump_frameset[17].frame) k->fo.dx = +2;
-  if (k->f.b == kid_drink_frameset[7].frame) k->fo.dx = +0;
-  if (k->f.b == kid_keep_sword_frameset[9].frame) k->fo.dx = +2;
+  if (k->oaction == kid_stabilize) k->fo.dx = +2;
+  if (k->oaction == kid_walk && k->oi == 11) k->fo.dx = -1;
+  if (k->oaction == kid_jump) k->fo.dx = -2;
+  if (k->oaction == kid_crouch) k->fo.dx = -2;
+  if (k->oaction == kid_vjump) k->fo.dx = +2;
+  if (k->oaction == kid_drink) k->fo.dx = +0;
+  if (k->oaction == kid_keep_sword) k->fo.dx = +2;
 
   k->xf.b = NULL;
 
@@ -183,7 +172,7 @@ flow (struct anim *k)
 }
 
 static bool
-physics_in (struct anim *k)
+physics_in (struct actor *k)
 {
   /* inertia */
   k->inertia = k->cinertia = 0;
@@ -202,7 +191,7 @@ physics_in (struct anim *k)
 }
 
 static void
-physics_out (struct anim *k)
+physics_out (struct actor *k)
 {
   /* depressible floors */
   keep_depressible_floor (k);

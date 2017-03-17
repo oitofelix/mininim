@@ -21,11 +21,6 @@
 #ifndef MININIM_KID_MISSTEP_H
 #define MININIM_KID_MISSTEP_H
 
-#define KID_MISSTEP_FRAMESET_NMEMB 11
-extern struct frameset kid_misstep_frameset[KID_MISSTEP_FRAMESET_NMEMB];
-
-void load_kid_misstep (void);
-void unload_kid_misstep (void);
-void kid_misstep (struct anim *k);
+void kid_misstep (struct actor *k);
 
 #endif	/* MININIM_KID_MISSTEP_H */

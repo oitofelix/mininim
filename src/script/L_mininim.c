@@ -20,7 +20,7 @@
 
 #include "mininim.h"
 
-static int load_hook_ref = LUA_NOREF;
+int mininim_lua_ref = LUA_NOREF;
 
 static DECLARE_LUA (__eq);
 static DECLARE_LUA (__index);
@@ -51,6 +51,10 @@ define_L_mininim (lua_State *L)
   lua_rawset (L, -3);
 
   lua_pop (L, 1);
+
+  /* lua table */
+  lua_newtable (L);
+  L_set_registry_by_ref (L, &mininim_lua_ref);
 
   /* global shortcuts */
   lua_register (L, "_quit", quit);
@@ -87,10 +91,44 @@ define_L_mininim (lua_State *L)
 }
 
 void
-run_load_hook (lua_State *L)
+error_lua_invalid (const char *template, ...)
 {
-  L_get_registry_by_ref (L, load_hook_ref);
-  L_run_hook (L);
+  va_list ap;
+  va_start (ap, template);
+  char *name = xvasprintf (template, ap);
+  fprintf (stderr, "error: \"MININIM.lua.%s\" invalid\n", name);
+  al_free (name);
+  va_end (ap);
+}
+
+bool
+call_lua_function (lua_State *L, const char *name, int nargs, int nresults)
+{
+  L_get_registry_by_ref (L, mininim_lua_ref);
+
+  lua_pushstring (L, name);
+  lua_rawget (L, -2);
+  lua_remove (L, -2);
+
+  if (! lua_isfunction (L, -1)) {
+    error_lua_invalid ("%s", name);
+    lua_pop (L, 1);
+    return false;
+  }
+
+  return L_call (L, nargs, nresults);
+}
+
+bool
+run_lua_hook (lua_State *L, const char *name)
+{
+  L_get_registry_by_ref (L, mininim_lua_ref);
+
+  lua_pushstring (L, name);
+  lua_rawget (L, -2);
+  lua_remove (L, -2);
+
+  return L_run_hook (L);
 }
 
 BEGIN_LUA (__eq)
@@ -115,9 +153,6 @@ BEGIN_LUA (__index)
       return 1;
     } else if (! strcasecmp (key, "place_height")) {
       lua_pushnumber (L, PLACE_HEIGHT);
-      return 1;
-    } else if (! strcasecmp (key, "load_hook")) {
-      L_get_registry_by_ref (L, load_hook_ref);
       return 1;
     } else if (! strcasecmp (key, "level")) {
       L_push_interface (L, L_MININIM_LEVEL);
@@ -152,6 +187,9 @@ BEGIN_LUA (__index)
     } else if (! strcasecmp (key, "quit")) {
       lua_pushcfunction (L, quit);
       return 1;
+    } else if (! strcasecmp (key, "lua")) {
+      L_get_registry_by_ref (L, mininim_lua_ref);
+      return 1;
     } else if (! strcasecmp (key, "clipboard")) {
       if (al_clipboard_has_text (display)) {
         char *text = al_get_clipboard_text (display);
@@ -165,8 +203,7 @@ BEGIN_LUA (__index)
   default: break;
   }
 
-  lua_pushnil (L);
-  return 1;
+  return 0;
 }
 END_LUA
 
@@ -177,10 +214,7 @@ BEGIN_LUA (__newindex)
   switch (type) {
   case LUA_TSTRING:
     key = lua_tostring (L, 2);
-    if (! strcasecmp (key, "load_hook")) {
-      L_set_registry_by_ref (L, &load_hook_ref);
-      return 0;
-    } else if (! strcasecmp (key, "clipboard")) {
+    if (! strcasecmp (key, "clipboard")) {
       if (lua_isstring (L, 3)) {
         const char *text = lua_tostring (L, 3);
         al_set_clipboard_text (display, text);

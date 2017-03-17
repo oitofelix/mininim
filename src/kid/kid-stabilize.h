@@ -21,22 +21,7 @@
 #ifndef MININIM_KID_STABILIZE_H
 #define MININIM_KID_STABILIZE_H
 
-#define KID_STABILIZE_00 "data/kid/stabilize/00.png"
-#define KID_STABILIZE_01 "data/kid/stabilize/01.png"
-#define KID_STABILIZE_02 "data/kid/stabilize/02.png"
-#define KID_STABILIZE_03 "data/kid/stabilize/03.png"
-
-#define KID_STABILIZE_FRAMESET_NMEMB 4
-extern struct frameset kid_stabilize_frameset[KID_STABILIZE_FRAMESET_NMEMB];
-
-void load_kid_stabilize (void);
-void unload_kid_stabilize (void);
-void kid_stabilize (struct anim *k);
-void kid_stabilize_collision (struct anim *k);
-void kid_stabilize_back_collision (struct anim *k);
-bool is_kid_stabilize (struct frame *f);
-
-extern ALLEGRO_BITMAP *kid_stabilize_00, *kid_stabilize_01,
-  *kid_stabilize_02, *kid_stabilize_03;
+void kid_stabilize (struct actor *k);
+void kid_stabilize_collision (struct actor *k);
 
 #endif	/* MININIM_KID_STABILIZE_H */

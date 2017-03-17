@@ -20,87 +20,15 @@
 
 #include "mininim.h"
 
-struct frameset kid_vjump_frameset[KID_VJUMP_FRAMESET_NMEMB];
-
-static void init_kid_vjump_frameset (void);
-static bool flow (struct anim *k);
-static bool physics_in (struct anim *k);
-static void physics_out (struct anim *k);
-
-ALLEGRO_BITMAP *kid_vjump_00, *kid_vjump_01, *kid_vjump_02, *kid_vjump_03,
-  *kid_vjump_04, *kid_vjump_05, *kid_vjump_06, *kid_vjump_07, *kid_vjump_08,
-  *kid_vjump_09, *kid_vjump_10, *kid_vjump_11, *kid_vjump_12, *kid_vjump_13,
-  *kid_vjump_14, *kid_vjump_15, *kid_vjump_16, *kid_vjump_17;
-
-static void
-init_kid_vjump_frameset (void)
-{
-  struct frameset frameset[KID_VJUMP_FRAMESET_NMEMB] =
-    {{kid_vjump_00,+3,+0},{kid_vjump_01,-1,+0},{kid_vjump_02,-1,+0},
-     {kid_vjump_03,+2,+0},{kid_vjump_04,+0,+0},{kid_vjump_05,-1,+0},
-     {kid_vjump_06,-1,+0},{kid_vjump_07,-3,+0},{kid_vjump_08,-1,+0},
-     {kid_vjump_09,-6,+0},{kid_vjump_10,+0,+0},{kid_vjump_11,+2,-3},
-     {kid_vjump_12,+3,-7},{kid_vjump_13,+0,+8},{kid_vjump_14,+3,+2},
-     {kid_vjump_15,-1,+0},{kid_vjump_16,+0,+0},{kid_vjump_17,+0,0}};
-
-  memcpy (&kid_vjump_frameset, &frameset,
-          KID_VJUMP_FRAMESET_NMEMB * sizeof (struct frameset));
-}
+static bool flow (struct actor *k);
+static bool physics_in (struct actor *k);
+static void physics_out (struct actor *k);
 
 void
-load_kid_vjump (void)
-{
-  /* bitmaps */
-  kid_vjump_00 = load_bitmap (KID_VJUMP_00);
-  kid_vjump_01 = load_bitmap (KID_VJUMP_01);
-  kid_vjump_02 = load_bitmap (KID_VJUMP_02);
-  kid_vjump_03 = load_bitmap (KID_VJUMP_03);
-  kid_vjump_04 = load_bitmap (KID_VJUMP_04);
-  kid_vjump_05 = load_bitmap (KID_VJUMP_05);
-  kid_vjump_06 = load_bitmap (KID_VJUMP_06);
-  kid_vjump_07 = load_bitmap (KID_VJUMP_07);
-  kid_vjump_08 = load_bitmap (KID_VJUMP_08);
-  kid_vjump_09 = load_bitmap (KID_VJUMP_09);
-  kid_vjump_10 = load_bitmap (KID_VJUMP_10);
-  kid_vjump_11 = load_bitmap (KID_VJUMP_11);
-  kid_vjump_12 = load_bitmap (KID_VJUMP_12);
-  kid_vjump_13 = load_bitmap (KID_VJUMP_13);
-  kid_vjump_14 = load_bitmap (KID_VJUMP_14);
-  kid_vjump_15 = load_bitmap (KID_VJUMP_15);
-  kid_vjump_16 = load_bitmap (KID_VJUMP_16);
-  kid_vjump_17 = load_bitmap (KID_VJUMP_17);
-
-  /* frameset */
-  init_kid_vjump_frameset ();
-}
-
-void
-unload_kid_vjump (void)
-{
-  destroy_bitmap (kid_vjump_00);
-  destroy_bitmap (kid_vjump_01);
-  destroy_bitmap (kid_vjump_02);
-  destroy_bitmap (kid_vjump_03);
-  destroy_bitmap (kid_vjump_04);
-  destroy_bitmap (kid_vjump_05);
-  destroy_bitmap (kid_vjump_06);
-  destroy_bitmap (kid_vjump_07);
-  destroy_bitmap (kid_vjump_08);
-  destroy_bitmap (kid_vjump_09);
-  destroy_bitmap (kid_vjump_10);
-  destroy_bitmap (kid_vjump_11);
-  destroy_bitmap (kid_vjump_12);
-  destroy_bitmap (kid_vjump_13);
-  destroy_bitmap (kid_vjump_14);
-  destroy_bitmap (kid_vjump_15);
-  destroy_bitmap (kid_vjump_16);
-  destroy_bitmap (kid_vjump_17);
-}
-
-void
-kid_vjump (struct anim *k)
+kid_vjump (struct actor *k)
 {
   k->oaction = k->action;
+  k->oi = k->i;
   k->action = kid_vjump;
   k->f.flip = (k->f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
@@ -111,7 +39,7 @@ kid_vjump (struct anim *k)
 }
 
 static bool
-flow (struct anim *k)
+flow (struct actor *k)
 {
   if (k->oaction != kid_vjump)
     k->i = -1, k->j = 0,
@@ -128,7 +56,7 @@ flow (struct anim *k)
     return false;
   }
 
-  if (k->oaction == kid_hang_wall
+  if (k->oaction == kid_hang_non_free
       || k->oaction == kid_hang_free) {
     k->just_hanged = true;
     k->i = 13;
@@ -136,7 +64,7 @@ flow (struct anim *k)
              && ! k->hit_ceiling) k->i = 12;
   else k->i++;
 
-  select_frame (k, kid_vjump_frameset, k->i);
+  select_actor_frame (k, "KID", "VJUMP", k->i);
 
   if (k->oaction == kid_hang_free
       && is_hang_pos_critical (&k->hang_pos))
@@ -160,13 +88,13 @@ flow (struct anim *k)
 }
 
 static bool
-physics_in (struct anim *k)
+physics_in (struct actor *k)
 {
   struct pos ptf, ptfb, ptr;
 
   /* collision */
   if (uncollide (&k->f, &k->fo, _bf, +0, +0, NULL, &k->ci)
-      && fg (&k->ci.con_p) == MIRROR)
+      && fg (&k->ci.tile_p) == MIRROR)
     uncollide (&k->f, &k->fo, _bf, +0, +0, &k->fo, &k->ci);
 
   /* fall */
@@ -181,8 +109,8 @@ physics_in (struct anim *k)
   surveyo (_tr, -4, +0, pos, &k->f, NULL, &ptr, NULL);
   struct pos ptra; prel (&ptr, &ptra, -1, 0);
   if (k->i == 12 && k->j == 1) {
-    k->hit_ceiling_fake = ! is_strictly_traversable_fake (&ptra);
-    k->hit_ceiling = ! is_strictly_traversable (&ptra) && ! k->hang;
+    k->hit_ceiling_fake = ! is_traversable_fake (&ptra);
+    k->hit_ceiling = ! is_traversable (&ptra) && ! k->hang;
   }
 
   /* hang */
@@ -212,18 +140,20 @@ physics_in (struct anim *k)
     k->fo.dx -= 0; k->hang = true;
   }
 
-  if (k->i == 0 && k->hang)
-    place_frame (&k->f, &k->f, kid_vjump_frameset[0].frame,
-                 &k->hang_pos, (k->f.dir == LEFT) ? +16 : +37, +16);
+  if (k->i == 0 && k->hang) {
+    int dx = (k->f.dir == LEFT) ? +16 : +37;
+    int dy = +16;
+    place_actor (k, &k->hang_pos, dx, dy, "KID", "VJUMP", 0);
+  }
 
   return true;
 }
 
 static void
-physics_out (struct anim *k)
+physics_out (struct actor *k)
 {
   struct pos ptf, ptb, pmbo;
-  enum confg ctf, ctb;
+  enum tile_fg ctf, ctb;
 
  /* depressible floors */
   if (k->i == 0 && k->hang
@@ -258,19 +188,7 @@ physics_out (struct anim *k)
 }
 
 bool
-is_kid_vjump (struct frame *f)
+is_kid_vjump_touching_above (struct actor *k)
 {
-  int i;
-  for (i = 0; i < KID_VJUMP_FRAMESET_NMEMB; i++)
-    if (f->b == kid_vjump_frameset[i].frame) return true;
-  return false;
-}
-
-bool
-is_kid_vjump_touching_above (struct frame *f)
-{
-  int i;
-  for (i = 12; i < 14; i++)
-    if (f->b == kid_vjump_frameset[i].frame) return true;
-  return false;
+  return k->action == kid_vjump && k->i >= 12 && k->i <= 13;
 }

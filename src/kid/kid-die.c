@@ -20,59 +20,12 @@
 
 #include "mininim.h"
 
-struct frameset kid_die_frameset[KID_DIE_FRAMESET_NMEMB];
-
-static void init_kid_die_frameset (void);
-static bool flow (struct anim *k);
-static bool physics_in (struct anim *k);
-static void physics_out (struct anim *k);
-
-ALLEGRO_BITMAP *kid_die_00, *kid_die_01, *kid_die_02, *kid_die_03,
-  *kid_die_04, *kid_die_05, *kid_die_spiked_00, *kid_die_chopped_00;
-
-static void
-init_kid_die_frameset (void)
-{
-  struct frameset frameset[KID_DIE_FRAMESET_NMEMB] =
-    {{kid_die_00,-1,0},{kid_die_01,+0,0},{kid_die_02,-3,+1},
-     {kid_die_03,-2,+2},{kid_die_04,+0,+3},{kid_die_05,+2,+1}};
-
-  memcpy (&kid_die_frameset, &frameset,
-          KID_DIE_FRAMESET_NMEMB * sizeof (struct frameset));
-}
+static bool flow (struct actor *k);
+static bool physics_in (struct actor *k);
+static void physics_out (struct actor *k);
 
 void
-load_kid_die (void)
-{
-  /* bitmaps */
-  kid_die_00 = load_bitmap (KID_DIE_00);
-  kid_die_01 = load_bitmap (KID_DIE_01);
-  kid_die_02 = load_bitmap (KID_DIE_02);
-  kid_die_03 = load_bitmap (KID_DIE_03);
-  kid_die_04 = load_bitmap (KID_DIE_04);
-  kid_die_05 = load_bitmap (KID_DIE_05);
-  kid_die_spiked_00 = load_bitmap (KID_DIE_SPIKED_00);
-  kid_die_chopped_00 = load_bitmap (KID_DIE_CHOPPED_00);
-
-  /* frameset */
-  init_kid_die_frameset ();
-}
-
-void
-unload_kid_die (void)
-{
-  destroy_bitmap (kid_die_00);
-  destroy_bitmap (kid_die_01);
-  destroy_bitmap (kid_die_02);
-  destroy_bitmap (kid_die_03);
-  destroy_bitmap (kid_die_04);
-  destroy_bitmap (kid_die_05);
-  destroy_bitmap (kid_die_spiked_00);
-  destroy_bitmap (kid_die_chopped_00);
-}
-
-void
-kid_resurrect (struct anim *k)
+kid_resurrect (struct actor *k)
 {
   k->splash = false;
   k->sword_immune = 16;
@@ -84,8 +37,11 @@ kid_resurrect (struct anim *k)
   k->death_reason = NO_DEATH;
   k->death_timer = 0;
   k->action = kid_normal;
-  place_frame (&k->f, &k->f, kid_normal_00,
-               &pm, k->f.dir == LEFT ? +16 : +16, +15);
+
+  int dx = k->f.dir == LEFT ? +16 : +16;
+  int dy = +15;
+  place_actor (k, &pm, dx, dy, "KID", "NORMAL", 0);
+
   if (fg (&k->p) == SPIKES_FLOOR)
     spikes_floor_at_pos (&k->p)->inactive = false;
   stop_audio_instance (&death_audio, NULL, k->id);
@@ -94,7 +50,7 @@ kid_resurrect (struct anim *k)
 }
 
 void
-kid_die_spiked (struct anim *k)
+kid_die_spiked (struct actor *k)
 {
   if (fg (&k->p) != SPIKES_FLOOR) {
     kid_die_properly (k);
@@ -102,6 +58,7 @@ kid_die_spiked (struct anim *k)
   }
 
   k->oaction = k->action;
+  k->oi = k->i;
   k->action = kid_die_spiked;
   k->f.flip = (k->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
@@ -129,9 +86,9 @@ kid_die_spiked (struct anim *k)
   }
 
   if (k->oaction != kid_die_spiked) {
-    place_frame (&k->f, &k->f, kid_die_spiked_00,
-                 &k->p, (k->f.dir == LEFT)
-                 ? +8 : +9, (k->f.dir == LEFT) ? +32 : +31);
+    int dx = (k->f.dir == LEFT) ? +8 : +9;
+    int dy = (k->f.dir == LEFT) ? +32 : +31;
+    place_actor (k, &k->p, dx, dy, "KID", "DIE", 6);
     kill_kid_shadows (k);
   }
 
@@ -139,34 +96,35 @@ kid_die_spiked (struct anim *k)
 }
 
 void
-kid_die_chopped (struct anim *k)
+kid_die_chomped (struct actor *k)
 {
-  if (fg (&k->p) != CHOPPER) {
+  if (fg (&k->p) != CHOMPER) {
     kid_die_properly (k);
     return;
   }
 
   k->oaction = k->action;
-  k->action = kid_die_chopped;
+  k->oi = k->i;
+  k->action = kid_die_chomped;
   k->f.flip = (k->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  if (k->oaction != kid_die_chopped) {
+  if (k->oaction != kid_die_chomped) {
     k->current_lives = 0;
     k->splash = true;
-    k->death_reason = CHOPPER_DEATH;
+    k->death_reason = CHOMPER_DEATH;
 
     if (k->id == current_kid_id) {
       mr.flicker = 2;
       mr.color = get_flicker_blood_color ();
       kid_haptic (k, KID_HAPTIC_DEATH);
     }
-    play_audio (&chopped_audio, NULL, k->id);
+    play_audio (&chomped_audio, NULL, k->id);
   }
 
-  if (k->oaction != kid_die_chopped) {
-    place_frame (&k->f, &k->f, kid_die_chopped_00,
-                 &k->p, (k->f.dir == LEFT)
-                 ? -8 : -7, +47);
+  if (k->oaction != kid_die_chomped) {
+    int dx = (k->f.dir == LEFT) ? -8 : -7;
+    int dy = +47;
+    place_actor (k, &k->p, dx, dy, "KID", "DIE", 7);
     kill_kid_shadows (k);
   }
 
@@ -174,23 +132,25 @@ kid_die_chopped (struct anim *k)
 }
 
 void
-kid_die_suddenly (struct anim *k)
+kid_die_suddenly (struct actor *k)
 {
-  enum confg f = fg (&k->p);
-  if (f == SPIKES_FLOOR || f == CHOPPER) {
+  enum tile_fg f = fg (&k->p);
+  if (f == SPIKES_FLOOR || f == CHOMPER) {
     kid_die_properly (k);
     return;
   }
 
   k->oaction = k->action;
+  k->oi = k->i;
   k->action = kid_die_suddenly;
   k->f.flip = (k->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
   k->current_lives = 0;
 
   if (k->oaction != kid_die_suddenly) {
-    place_frame (&k->f, &k->f, kid_die_05,
-                 &k->p, MIGNORE, +47);
+    int dx = MIGNORE;
+    int dy = +47;
+    place_actor (k, &k->p, dx, dy, "KID", "DIE", 5);
 
     move_frame (&k->f, _tf, +0, +4, +0);
 
@@ -216,7 +176,7 @@ kid_die_suddenly (struct anim *k)
 }
 
 void
-kid_die (struct anim *k)
+kid_die (struct actor *k)
 {
   if (k->action == kid_fall) {
     k->current_lives = 0;
@@ -224,6 +184,7 @@ kid_die (struct anim *k)
   }
 
   k->oaction = k->action;
+  k->oi = k->i;
   k->action = kid_die;
   k->f.flip = (k->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
@@ -234,12 +195,9 @@ kid_die (struct anim *k)
 }
 
 static bool
-flow (struct anim *k)
+flow (struct actor *k)
 {
   if (k->oaction != kid_die) {
-    /* place_frame (&k->f, &k->f, kid_die_frameset[0].frame, */
-    /*              &k->p, (k->f.dir == LEFT) */
-    /*              ? +13 : +21, +18); */
     k->i = -1, k->j = 0;
     k->xf.b = NULL;
   }
@@ -248,7 +206,7 @@ flow (struct anim *k)
 
   k->i = k->i < 5 ? k->i + 1 : 5;
 
-  select_frame (k, kid_die_frameset, k->i);
+  select_actor_frame (k, "KID", "DIE", k->i);
 
   if (k->j >= 1) k->fo.dx = k->fo.dy = 0;
   if (k->i == 5) k->j = 1;
@@ -261,7 +219,7 @@ flow (struct anim *k)
 }
 
 static bool
-physics_in (struct anim *k)
+physics_in (struct actor *k)
 {
   /* collision */
   uncollide (&k->f, &k->fo, _bb, +0, +0, &k->fo, NULL);
@@ -276,7 +234,7 @@ physics_in (struct anim *k)
 }
 
 static void
-physics_out (struct anim *k)
+physics_out (struct actor *k)
 {
   /* haptic */
   if (k->i == 0) kid_haptic (k, KID_HAPTIC_DEATH);
@@ -292,39 +250,27 @@ physics_out (struct anim *k)
 }
 
 bool
-is_kid_dead (struct frame *f)
+is_kid_dead (struct actor *k)
 {
-  int i;
-  for (i = 0; i < KID_DIE_FRAMESET_NMEMB; i++)
-    if (f->b == kid_die_frameset[i].frame) return true;
-
-  if (f->b == kid_die_spiked_00) return true;
-  if (f->b == kid_die_chopped_00) return true;
-
-  return false;
-}
-
-bool
-is_kid_chopped (struct frame *f)
-{
-  if (f->b == kid_die_chopped_00) return true;
-
-  return false;
+  return k->action == kid_die
+    || k->action == kid_die_suddenly
+    || k->action == kid_die_spiked
+    || k->action == kid_die_chomped;
 }
 
 void
-kill_kid_shadows (struct anim *k)
+kill_kid_shadows (struct actor *k)
 {
   struct pos pmt;
 
   int i;
-  for (i = 0; i < anima_nmemb; i++) {
-    struct anim *ks = &anima[i];
+  for (i = 0; i < actor_nmemb; i++) {
+    struct actor *ks = &actor[i];
 
     if (ks->type == KID
         && ks->shadow_of == k->id
         && ks->controllable
-        && ! is_kid_dead (&ks->f)) {
+        && ! is_kid_dead (ks)) {
       survey (_mt, pos, &ks->f, NULL, &pmt, NULL);
       ks->p = pmt;
       kid_die (ks);
@@ -333,11 +279,11 @@ kill_kid_shadows (struct anim *k)
 }
 
 void
-kid_die_properly (struct anim *k)
+kid_die_properly (struct actor *k)
 {
   switch (fg (&k->p)) {
   case SPIKES_FLOOR: kid_die_spiked (k); break;
-  case CHOPPER: kid_die_chopped (k); break;
+  case CHOMPER: kid_die_chomped (k); break;
   default: kid_die_suddenly (k); break;
   }
 }

@@ -34,11 +34,11 @@ struct audio_source big_life_potion_audio,
   harm_audio,
   scream_audio,
   spiked_audio,
-  chopped_audio,
+  chomped_audio,
   press_key_audio,
   mirror_audio,
   sword_defense_audio,
-  chopper_audio,
+  chomper_audio,
   door_open_audio,
   door_close_audio,
   door_end_audio,
@@ -92,11 +92,11 @@ load_audio_data (void)
   load_audio (&harm_audio, AUDIO_SAMPLE, HARM_AUDIO);
   load_audio (&scream_audio, AUDIO_SAMPLE, SCREAM_AUDIO);
   load_audio (&spiked_audio, AUDIO_SAMPLE, SPIKED_AUDIO);
-  load_audio (&chopped_audio, AUDIO_SAMPLE, CHOPPED_AUDIO);
+  load_audio (&chomped_audio, AUDIO_SAMPLE, CHOMPED_AUDIO);
   load_audio (&press_key_audio, AUDIO_SAMPLE, PRESS_KEY_AUDIO);
   load_audio (&mirror_audio, AUDIO_SAMPLE, MIRROR_AUDIO);
   load_audio (&sword_defense_audio, AUDIO_SAMPLE, SWORD_DEFENSE_AUDIO);
-  load_audio (&chopper_audio, AUDIO_SAMPLE, CHOPPER_AUDIO);
+  load_audio (&chomper_audio, AUDIO_SAMPLE, CHOMPER_AUDIO);
   load_audio (&door_open_audio, AUDIO_SAMPLE, DOOR_OPEN_AUDIO);
   load_audio (&door_close_audio, AUDIO_SAMPLE, DOOR_CLOSE_AUDIO);
   load_audio (&door_end_audio, AUDIO_SAMPLE, DOOR_END_AUDIO);
@@ -152,11 +152,11 @@ unload_audio_data (void)
   destroy_audio (&harm_audio);
   destroy_audio (&scream_audio);
   destroy_audio (&spiked_audio);
-  destroy_audio (&chopped_audio);
+  destroy_audio (&chomped_audio);
   destroy_audio (&press_key_audio);
   destroy_audio (&mirror_audio);
   destroy_audio (&sword_defense_audio);
-  destroy_audio (&chopper_audio);
+  destroy_audio (&chomper_audio);
   destroy_audio (&door_open_audio);
   destroy_audio (&door_close_audio);
   destroy_audio (&door_end_audio);

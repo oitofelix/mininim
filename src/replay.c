@@ -541,7 +541,7 @@ set_replay_mode_at_level_start (struct replay *replay)
 }
 
 void
-replay_gamepad_update (struct anim *a, struct replay *replay, uint64_t cycle)
+replay_gamepad_update (struct actor *a, struct replay *replay, uint64_t cycle)
 {
   memset (&a->key, 0, sizeof (a->key));
 

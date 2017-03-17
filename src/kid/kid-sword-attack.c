@@ -20,69 +20,15 @@
 
 #include "mininim.h"
 
-struct frameset kid_sword_attack_frameset[KID_SWORD_ATTACK_FRAMESET_NMEMB];
-
-static void init_kid_sword_attack_frameset (void);
-static bool flow (struct anim *k);
-static bool physics_in (struct anim *k);
-static void physics_out (struct anim *k);
-
-ALLEGRO_BITMAP *kid_sword_attack_00, *kid_sword_attack_01,
-  *kid_sword_attack_02, *kid_sword_attack_03, *kid_sword_attack_04,
-  *kid_sword_attack_05, *kid_sword_attack_06, *kid_sword_attack_counter_defense,
-  *kid_sword_attack_defended;
-
-static void
-init_kid_sword_attack_frameset (void)
-{
-  struct frameset frameset[KID_SWORD_ATTACK_FRAMESET_NMEMB] =
-    {{kid_sword_attack_00,+1,0},{kid_sword_attack_01,-8,0},
-     {kid_sword_attack_02,-8,0},{kid_sword_attack_03,-9,0},
-     {kid_sword_attack_04,+8,0},{kid_sword_attack_05,+8,0},
-     {kid_sword_attack_06,+8,0},{kid_sword_attack_counter_defense,-8,0}};
-
-  memcpy (&kid_sword_attack_frameset, &frameset,
-          KID_SWORD_ATTACK_FRAMESET_NMEMB * sizeof (struct frameset));
-}
+static bool flow (struct actor *k);
+static bool physics_in (struct actor *k);
+static void physics_out (struct actor *k);
 
 void
-load_kid_sword_attack (void)
-{
-  /* bitmaps */
-  kid_sword_attack_00 = load_bitmap (KID_SWORD_ATTACK_00);
-  kid_sword_attack_01 = load_bitmap (KID_SWORD_ATTACK_01);
-  kid_sword_attack_02 = load_bitmap (KID_SWORD_ATTACK_02);
-  kid_sword_attack_03 = load_bitmap (KID_SWORD_ATTACK_03);
-  kid_sword_attack_04 = load_bitmap (KID_SWORD_ATTACK_04);
-  kid_sword_attack_05 = load_bitmap (KID_SWORD_ATTACK_05);
-  kid_sword_attack_06 = load_bitmap (KID_SWORD_ATTACK_06);
-  kid_sword_attack_counter_defense = load_bitmap (KID_SWORD_ATTACK_COUNTER_DEFENSE);
-
-  kid_sword_attack_defended = load_bitmap (KID_SWORD_ATTACK_DEFENDED);
-
-  /* frameset */
-  init_kid_sword_attack_frameset ();
-}
-
-void
-unload_kid_sword_attack (void)
-{
-  destroy_bitmap (kid_sword_attack_00);
-  destroy_bitmap (kid_sword_attack_01);
-  destroy_bitmap (kid_sword_attack_02);
-  destroy_bitmap (kid_sword_attack_03);
-  destroy_bitmap (kid_sword_attack_04);
-  destroy_bitmap (kid_sword_attack_05);
-  destroy_bitmap (kid_sword_attack_06);
-  destroy_bitmap (kid_sword_attack_counter_defense);
-
-  destroy_bitmap (kid_sword_attack_defended);
-}
-
-void
-kid_sword_attack (struct anim *k)
+kid_sword_attack (struct actor *k)
 {
   k->oaction = k->action;
+  k->oi = k->i;
   k->action = kid_sword_attack;
   k->f.flip = (k->f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
@@ -93,7 +39,7 @@ kid_sword_attack (struct anim *k)
 }
 
 static bool
-flow (struct anim *k)
+flow (struct actor *k)
 {
   if (k->oaction != kid_sword_attack) {
     /* if (k->id == 0) */
@@ -134,8 +80,8 @@ flow (struct anim *k)
   if (k->i == 4) k->j = 7;
   if (k->i == 6) k->j = 18;
 
-  select_frame (k, kid_sword_attack_frameset, k->i + 1);
-  select_xframe (&k->xf, sword_frameset, k->j);
+  select_actor_frame (k, "KID", "SWORD_ATTACK", k->i + 1);
+  select_actor_xframe (k, "KID", "SWORD", k->j);
 
   if (k->oaction == kid_sword_defense) k->fo.dx += -1;
   if (k->i == 0) k->xf.b = NULL;
@@ -150,7 +96,7 @@ flow (struct anim *k)
 }
 
 static bool
-physics_in (struct anim *k)
+physics_in (struct actor *k)
 {
   /* collision */
   uncollide_front_fight (k);
@@ -166,7 +112,7 @@ physics_in (struct anim *k)
 }
 
 static void
-physics_out (struct anim *k)
+physics_out (struct actor *k)
 {
   /* sound */
   if (k->i == 3) play_audio (&sword_attack_audio, NULL, k->id);

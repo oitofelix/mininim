@@ -20,12 +20,8 @@
 
 #include "mininim.h"
 
-static int level_start_hook_ref = LUA_NOREF;
-static int level_cycle_hook_ref = LUA_NOREF;
-
 static DECLARE_LUA (__eq);
 static DECLARE_LUA (__index);
-static DECLARE_LUA (__newindex);
 static DECLARE_LUA (__tostring);
 
 void
@@ -41,10 +37,6 @@ define_L_mininim_level (lua_State *L)
   lua_pushcfunction (L, __index);
   lua_rawset (L, -3);
 
-  lua_pushstring (L, "__newindex");
-  lua_pushcfunction (L, __newindex);
-  lua_rawset (L, -3);
-
   lua_pushstring (L, "__tostring");
   lua_pushcfunction (L, __tostring);
   lua_rawset (L, -3);
@@ -53,20 +45,6 @@ define_L_mininim_level (lua_State *L)
 
   /* mininim.level.position */
   define_L_mininim_level_position (L);
-}
-
-void
-run_level_start_hook (lua_State *L)
-{
-  L_get_registry_by_ref (L, level_start_hook_ref);
-  L_run_hook (L);
-}
-
-void
-run_level_cycle_hook (lua_State *L)
-{
-  L_get_registry_by_ref (L, level_cycle_hook_ref);
-  L_run_hook (L);
 }
 
 const char *
@@ -115,12 +93,6 @@ BEGIN_LUA (__index)
     } else if (! strcasecmp (key, "hue_mode")) {
       lua_pushstring (L, hue_mode_string (global_level.hue));
       return 1;
-    } else if (! strcasecmp (key, "start_hook")) {
-      L_get_registry_by_ref (L, level_start_hook_ref);
-      return 1;
-    } else if (! strcasecmp (key, "cycle_hook")) {
-      L_get_registry_by_ref (L, level_cycle_hook_ref);
-      return 1;
     } else if (! strcasecmp (key, "position")) {
       lua_pushcfunction (L, L_mininim_level_position);
       return 1;
@@ -128,28 +100,6 @@ BEGIN_LUA (__index)
       lua_pushboolean (L, retry_level == global_level.n
                        && replay_mode == NO_REPLAY);
       return 1;
-    } else break;
-  default: break;
-  }
-
-  lua_pushnil (L);
-  return 1;
-}
-END_LUA
-
-BEGIN_LUA (__newindex)
-{
-  const char *key;
-  int type = lua_type (L, 2);
-  switch (type) {
-  case LUA_TSTRING:
-    key = lua_tostring (L, 2);
-    if (! strcasecmp (key, "start_hook")) {
-      L_set_registry_by_ref (L, &level_start_hook_ref);
-      return 0;
-    } else if (! strcasecmp (key, "cycle_hook")) {
-      L_set_registry_by_ref (L, &level_cycle_hook_ref);
-      return 0;
     } else break;
   default: break;
   }

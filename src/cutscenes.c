@@ -23,9 +23,9 @@
 /* functions */
 static ALLEGRO_BITMAP *create_background_pattern_bitmap (ALLEGRO_COLOR c);
 static void title_anim (void);
-static void draw_title_screen (ALLEGRO_BITMAP *bitmap, int i, enum vm vm);
-static void draw_ending_screen (ALLEGRO_BITMAP *bitmap, int i, enum vm vm);
-static void draw_princess_room (ALLEGRO_BITMAP *bitmap, enum vm vm);
+static void draw_title_screen (ALLEGRO_BITMAP *bitmap, int i);
+static void draw_ending_screen (ALLEGRO_BITMAP *bitmap, int i);
+static void draw_princess_room (ALLEGRO_BITMAP *bitmap);
 
 static ALLEGRO_BITMAP *c_main_background, *e_main_background, *v_main_background;
 static ALLEGRO_BITMAP *c_text_background, *e_text_background, *v_text_background;
@@ -43,7 +43,7 @@ bool cutscene_started;
 
 static int clock_type = -1;
 
-struct anim mouse, kid;
+struct actor mouse, kid;
 
 void
 load_cutscenes (void)
@@ -370,8 +370,8 @@ title_anim (void)
     break;
   }
 
-  if (i >= 11 && i <= 26) draw_princess_room (cutscene_screen, vm);
-  else draw_title_screen (cutscene_screen, i, vm);
+  if (i >= 11 && i <= 26) draw_princess_room (cutscene_screen);
+  else draw_title_screen (cutscene_screen, i);
 }
 
 void
@@ -423,7 +423,7 @@ cutscene_01_05_11_anim (void)
   }
 
   if (i < 2 || is_video_effect_started ())
-    draw_princess_room (cutscene_screen, vm);
+    draw_princess_room (cutscene_screen);
 }
 
 void
@@ -482,7 +482,7 @@ cutscene_11_little_time_left_anim (void)
   }
 
   if (i < 3 || is_video_effect_started ())
-    draw_princess_room (cutscene_screen, vm);
+    draw_princess_room (cutscene_screen);
 }
 
 void
@@ -542,7 +542,7 @@ cutscene_03_anim (void)
   }
 
   if (i < 2 || is_video_effect_started ())
-    draw_princess_room (cutscene_screen, vm);
+    draw_princess_room (cutscene_screen);
 }
 
 void
@@ -564,11 +564,11 @@ cutscene_07_anim (void)
   case 0:
     princess.f.c.x = 170;
     princess.f.c.y = 147;
-    princess.f.b = princess_couch_10;
+    princess.f.b = princess_crouch_10;
     princess.f.dir = RIGHT;
     princess.f.flip = 0;
     princess.invisible = false;
-    princess.action = princess_couch;
+    princess.action = princess_crouch;
 
     jaffar.invisible = true;
 
@@ -597,7 +597,7 @@ cutscene_07_anim (void)
   case 2:
     mouse.action (&mouse);
     if (mouse.f.c.x >= 320) {
-      princess_uncouch (&princess);
+      princess_uncrouch (&princess);
       i++;
     }
     break;
@@ -617,7 +617,7 @@ cutscene_07_anim (void)
   }
 
   if (i < 4 || is_video_effect_started ())
-    draw_princess_room (cutscene_screen, vm);
+    draw_princess_room (cutscene_screen);
 }
 
 void
@@ -669,7 +669,7 @@ cutscene_08_anim (void)
   case 2:
     if (mouse.f.c.x >= 204) mouse.action (&mouse);
     if (mouse.f.c.x <= 290) {
-      princess_couch (&princess);
+      princess_crouch (&princess);
       i++;
     }
     break;
@@ -700,7 +700,7 @@ cutscene_08_anim (void)
   }
 
   if (i < 5 || is_video_effect_started ())
-    draw_princess_room (cutscene_screen, vm);
+    draw_princess_room (cutscene_screen);
 }
 
 void
@@ -741,7 +741,7 @@ cutscene_14_anim (void)
 
     kid.f.c.x = 316;
     kid.f.c.y = 129;
-    kid.f.b = kid_start_run_frameset[5].frame;
+    kid.i = 5;
     kid.f.dir = LEFT;
     kid.f.flip = 0;
     kid.action = kid_start_run;
@@ -839,8 +839,8 @@ cutscene_14_anim (void)
   }
 
   if (i < 5 || (i == 5 && is_video_effect_started ()))
-    draw_princess_room (cutscene_screen, vm);
-  else draw_ending_screen (cutscene_screen, i, vm);
+    draw_princess_room (cutscene_screen);
+  else draw_ending_screen (cutscene_screen, i);
 }
 
 void
@@ -886,38 +886,38 @@ cutscene_out_of_time_anim (void)
   }
 
   if (i < 2 || is_video_effect_started ())
-    draw_princess_room (cutscene_screen, vm);
+    draw_princess_room (cutscene_screen);
 }
 
 static void
-draw_title_screen (ALLEGRO_BITMAP *bitmap, int i, enum vm vm)
+draw_title_screen (ALLEGRO_BITMAP *bitmap, int i)
 {
   ALLEGRO_BITMAP *main_background = NULL,
     *text_background = NULL,
     *background_pattern = NULL;
 
-  switch (vm) {
-  case CGA:
-    main_background = c_main_background;
-    text_background = c_text_background;
-    background_pattern = c_title_background_pattern;
-    break;
-  case EGA:
-    main_background = e_main_background;
-    text_background = e_text_background;
-    background_pattern = e_title_background_pattern;
-    break;
-  case VGA:
+  /* switch (vm) { */
+  /* case CGA: */
+  /*   main_background = c_main_background; */
+  /*   text_background = c_text_background; */
+  /*   background_pattern = c_title_background_pattern; */
+  /*   break; */
+  /* case EGA: */
+  /*   main_background = e_main_background; */
+  /*   text_background = e_text_background; */
+  /*   background_pattern = e_title_background_pattern; */
+  /*   break; */
+  /* case VGA: */
     main_background = v_main_background;
     text_background = v_text_background;
     background_pattern = v_title_background_pattern;
-    break;
-  }
+  /*   break; */
+  /* } */
 
-  if (hgc) {
-    main_background = apply_palette (main_background, hgc_palette);
-    text_background = apply_palette (text_background, hgc_palette);
-  }
+  /* if (hgc) { */
+  /*   main_background = apply_palette (main_background, hgc_palette); */
+  /*   text_background = apply_palette (text_background, hgc_palette); */
+  /* } */
 
   clear_bitmap (bitmap, BLACK);
   switch (i) {
@@ -952,34 +952,34 @@ draw_title_screen (ALLEGRO_BITMAP *bitmap, int i, enum vm vm)
 }
 
 static void
-draw_ending_screen (ALLEGRO_BITMAP *bitmap, int i, enum vm vm)
+draw_ending_screen (ALLEGRO_BITMAP *bitmap, int i)
 {
   ALLEGRO_BITMAP *main_background = NULL,
     *text_background = NULL,
     *background_pattern = NULL;
 
-  switch (vm) {
-  case CGA:
-    main_background = c_main_background;
-    text_background = c_text_background;
-    background_pattern = c_ending_background_pattern;
-    break;
-  case EGA:
-    main_background = e_main_background;
-    text_background = e_text_background;
-    background_pattern = e_ending_background_pattern;
-    break;
-  case VGA:
+  /* switch (vm) { */
+  /* case CGA: */
+  /*   main_background = c_main_background; */
+  /*   text_background = c_text_background; */
+  /*   background_pattern = c_ending_background_pattern; */
+  /*   break; */
+  /* case EGA: */
+  /*   main_background = e_main_background; */
+  /*   text_background = e_text_background; */
+  /*   background_pattern = e_ending_background_pattern; */
+  /*   break; */
+  /* case VGA: */
     main_background = v_main_background;
     text_background = v_text_background;
     background_pattern = v_ending_background_pattern;
-    break;
-  }
+  /*   break; */
+  /* } */
 
-  if (hgc) {
-    main_background = apply_palette (main_background, hgc_palette);
-    text_background = apply_palette (text_background, hgc_palette);
-  }
+  /* if (hgc) { */
+  /*   main_background = apply_palette (main_background, hgc_palette); */
+  /*   text_background = apply_palette (text_background, hgc_palette); */
+  /* } */
 
   clear_bitmap (bitmap, BLACK);
   switch (i) {
@@ -1005,39 +1005,39 @@ draw_ending_screen (ALLEGRO_BITMAP *bitmap, int i, enum vm vm)
 }
 
 static void
-draw_princess_room (ALLEGRO_BITMAP *bitmap, enum vm vm)
+draw_princess_room (ALLEGRO_BITMAP *bitmap)
 {
   ALLEGRO_BITMAP *princess_room = NULL,
     *princess_room_pillar = NULL;
 
-  switch (vm) {
-  case CGA:
-    princess_room = c_princess_room;
-    princess_room_pillar = c_princess_room_pillar;
-    break;
-  case EGA:
-    princess_room = e_princess_room;
-    princess_room_pillar = e_princess_room_pillar;
-    break;
-  case VGA:
+  /* switch (vm) { */
+  /* case CGA: */
+  /*   princess_room = c_princess_room; */
+  /*   princess_room_pillar = c_princess_room_pillar; */
+  /*   break; */
+  /* case EGA: */
+  /*   princess_room = e_princess_room; */
+  /*   princess_room_pillar = e_princess_room_pillar; */
+  /*   break; */
+  /* case VGA: */
     princess_room = v_princess_room;
     princess_room_pillar = v_princess_room_pillar;
-    break;
-  }
+  /*   break; */
+  /* } */
 
-  if (hgc) {
-    princess_room = apply_palette (princess_room, hgc_palette);
-    princess_room_pillar = apply_palette (princess_room_pillar, hgc_palette);
-  }
+  /* if (hgc) { */
+  /*   princess_room = apply_palette (princess_room, hgc_palette); */
+  /*   princess_room_pillar = apply_palette (princess_room_pillar, hgc_palette); */
+  /* } */
 
   clear_bitmap (bitmap, BLACK);
   draw_bitmap (princess_room, bitmap, 0, 0, 0);
-  draw_princess_room_stars (bitmap, vm);
-  draw_princess_room_fire (bitmap, vm);
-  draw_princess_frame (bitmap, &princess, vm);
-  draw_jaffar_frame (bitmap, &jaffar, vm);
-  draw_mouse_frame (bitmap, &mouse, vm);
-  draw_kid_frame (bitmap, &kid, vm);
-  draw_clock (bitmap, clock_type, vm);
+  draw_princess_room_stars (bitmap);
+  draw_princess_room_fire (bitmap);
+  draw_princess_frame (bitmap, &princess);
+  draw_jaffar_frame (bitmap, &jaffar);
+  draw_mouse_frame (bitmap, &mouse);
+  draw_kid_frame (bitmap, &kid);
+  draw_clock (bitmap, clock_type);
   draw_bitmap (princess_room_pillar, bitmap, 245, 120, 0);
 }

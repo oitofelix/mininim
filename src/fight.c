@@ -21,7 +21,7 @@
 #include "mininim.h"
 
 bool
-are_valid_opponents (struct anim *k0, struct anim *k1)
+are_valid_opponents (struct actor *k0, struct actor *k1)
 {
   /* no one fights oneself */
   if (k0->id == k1->id) return false;
@@ -32,7 +32,7 @@ are_valid_opponents (struct anim *k0, struct anim *k1)
     return false;
 
   /* non-fightable characters can't fight */
-  if (! is_fightable_anim (k0) || ! is_fightable_anim (k1))
+  if (! is_fightable_actor (k0) || ! is_fightable_actor (k1))
     return false;
 
   /* non-fighters don't fight */
@@ -46,7 +46,7 @@ are_valid_opponents (struct anim *k0, struct anim *k1)
 }
 
 void
-leave_fight_logic (struct anim *k)
+leave_fight_logic (struct actor *k)
 {
   /* dead character doesn't fight */
   if (k->current_lives <= 0) {
@@ -56,7 +56,7 @@ leave_fight_logic (struct anim *k)
   }
 
   /* non-fightable characters don't fight */
-  if (! is_fightable_anim (k)) return;
+  if (! is_fightable_actor (k)) return;
 
   /* no enemy, no need to forget */
   if (k->enemy_id == -1) return;
@@ -65,14 +65,14 @@ leave_fight_logic (struct anim *k)
   if (! k->fight) return;
 
   /* character that went upstairs doesn't fight */
-  if (is_kid_stairs (&k->f)) {
+  if (k->action == kid_stairs) {
     k->enemy_refraction = 0;
     forget_enemy (k);
     return;
   }
 
   /* who's the enemy? */
-  struct anim *ke = get_anim_by_id (k->enemy_id);
+  struct actor *ke = get_actor_by_id (k->enemy_id);
 
   /* if the enemy doesn't exist, forget about it */
   if (! ke) {
@@ -89,7 +89,7 @@ leave_fight_logic (struct anim *k)
   }
 
   /* if the enemy went up stairs, forget about him */
-  if (is_kid_stairs (&ke->f)) {
+  if (ke->action == kid_stairs) {
     k->enemy_refraction = 0;
     forget_enemy (k);
     return;
@@ -101,10 +101,10 @@ leave_fight_logic (struct anim *k)
   survey (_m, pos, &k->f, NULL, &p, NULL);
   survey (_m, pos, &ke->f, NULL, &pe, NULL);
   pos2room (&pe, p.room, &pe);
-  if (! is_anim_seeing (k, ke, k->f.dir)
+  if (! is_actor_seeing (k, ke, k->f.dir)
       && ! is_near (k, ke)
       && ! is_safe_to_follow (k, ke, k->f.dir)
-      && ! (is_on_back (k, ke) && is_anim_seeing (k, ke, odir)
+      && ! (is_on_back (k, ke) && is_actor_seeing (k, ke, odir)
             && p.floor == pe.floor)) {
     forget_enemy (k);
     return;
@@ -112,10 +112,10 @@ leave_fight_logic (struct anim *k)
 }
 
 void
-enter_fight_logic (struct anim *k)
+enter_fight_logic (struct actor *k)
 {
   /* non-fightable characters don't fight */
-  if (! is_fightable_anim (k)) return;
+  if (! is_fightable_actor (k)) return;
 
   /* /\* has an enemy, no need to get another *\/ */
   /* if (k->enemy_id != -1 && k->enemy_refraction < 0) */
@@ -128,13 +128,13 @@ enter_fight_logic (struct anim *k)
   if (! k->fight) return;
 
   /* give priority to currenty enemy in case he's attacking */
-  struct anim *ke = get_reciprocal_enemy (k);
+  struct actor *ke = get_reciprocal_enemy (k);
   if (ke && is_in_range (k, ke, FIGHT_RANGE) && is_attacking (ke))
     return;
 
   int i;
-  for (i = 0; i < anima_nmemb; i++) {
-    struct anim *a = &anima[i];
+  for (i = 0; i < actor_nmemb; i++) {
+    struct actor *a = &actor[i];
 
     /* no dead character is a valid opponent */
     if (a->current_lives <= 0) continue;
@@ -149,7 +149,7 @@ enter_fight_logic (struct anim *k)
       if (k->enemy_id == a->id) continue;
 
       /* if another enemy is attacking, give priority to him */
-      struct anim *ae = get_anim_by_id (a->enemy_id);
+      struct actor *ae = get_actor_by_id (a->enemy_id);
       if (is_in_range (k, a, FIGHT_RANGE)
           && is_attacking (a)
           && (a->enemy_id == k->id
@@ -163,9 +163,9 @@ enter_fight_logic (struct anim *k)
       /* if (k->id != 0 && k->shadow_of != 0) continue; */
 
       /* give priority to nearest enemy */
-      struct anim *ke = get_anim_by_id (k->enemy_id);
-      int da = dist_anims (k, a);
-      int de = dist_anims (k, ke);
+      struct actor *ke = get_actor_by_id (k->enemy_id);
+      int da = dist_actors (k, a);
+      int de = dist_actors (k, ke);
 
       if (da < de
           && abs (da - de) >= PLACE_WIDTH
@@ -177,11 +177,11 @@ enter_fight_logic (struct anim *k)
       }
 
       /* give priority to unpaired enemy */
-      struct anim *kee = get_reciprocal_enemy (ke);
+      struct actor *kee = get_reciprocal_enemy (ke);
       if (kee && kee->id != k->id
           && (is_safe_to_follow (kee, ke, kee->f.dir)
               || ! is_safe_to_follow (k, ke, k->f.dir))
-          && (is_anim_seeing (k, a, k->f.dir)
+          && (is_actor_seeing (k, a, k->f.dir)
               || is_hearing (k, a))) {
         consider_enemy (k, a);
         return;
@@ -190,7 +190,7 @@ enter_fight_logic (struct anim *k)
       /**** has no enemy ****/
 
       /* if seeing the character consider him an enemy */
-      if (is_anim_seeing (k, a, k->f.dir)) {
+      if (is_actor_seeing (k, a, k->f.dir)) {
         consider_enemy (k, a);
         return;
       }
@@ -205,7 +205,7 @@ enter_fight_logic (struct anim *k)
       if (is_in_fight_mode (k)
           && (k->id != 0 && k->shadow_of != 0)
           && (a->id == 0 || a->shadow_of == 0)
-          && is_anim_seeing (k, a, opposite_dir (k->f.dir))) {
+          && is_actor_seeing (k, a, opposite_dir (k->f.dir))) {
         fight_turn (k);
         return;
       }
@@ -214,21 +214,21 @@ enter_fight_logic (struct anim *k)
 }
 
 void
-fight_ai (struct anim *k)
+fight_ai (struct actor *k)
 {
   /* dead characters don't fight */
   if (k->current_lives <= 0) return;
 
   /* non-fightable characters don't fight */
-  if (! is_fightable_anim (k)) return;
+  if (! is_fightable_actor (k)) return;
 
   /* controllables and non-fighters doesn't need AI to fight */
   if (k->controllable || ! k->fight) return;
 
   /* for all characters... */
   int i;
-  for (i = 0; i < anima_nmemb; i++) {
-    struct anim *a = &anima[i];
+  for (i = 0; i < actor_nmemb; i++) {
+    struct actor *a = &actor[i];
 
     /* no dead character is a valid opponent */
     if (a->current_lives <= 0) continue;
@@ -237,9 +237,9 @@ fight_ai (struct anim *k)
     if (! are_valid_opponents (k, a)) continue;
 
     /* without an enemy keep attention to noises */
-    struct anim *ke = get_anim_by_id (k->enemy_id);
-    int da = dist_anims (k, a);
-    int de = dist_anims (k, ke);
+    struct actor *ke = get_actor_by_id (k->enemy_id);
+    int da = dist_actors (k, a);
+    int de = dist_actors (k, ke);
 
     if ((! ke
          || ((da < de && abs (da - de) >= 8)
@@ -271,7 +271,7 @@ fight_ai (struct anim *k)
   }
 
   /* who's the enemy? */
-  struct anim *ke = get_anim_by_id (k->enemy_id);
+  struct actor *ke = get_actor_by_id (k->enemy_id);
 
   /* what's the facing opposite direction? */
   enum dir odir = (k->f.dir == LEFT) ? RIGHT : LEFT;
@@ -287,14 +287,14 @@ fight_ai (struct anim *k)
   if (pe.room == p.room && pe.floor == p.floor)
     k->enemy_pos = pe;
   else if (pe.floor > p.floor && is_valid_pos (&k->enemy_pos)
-           && ! is_strictly_traversable (&k->enemy_pos))
+           && ! is_traversable (&k->enemy_pos))
     k->enemy_pos.place = pe.place;
 
   if (is_valid_pos (&k->enemy_pos)
-      && is_strictly_traversable (&k->enemy_pos)) {
+      && is_traversable (&k->enemy_pos)) {
     struct pos pp;
     int d = (p.place < k->enemy_pos.place) ? -1 : +1;
-    while (is_strictly_traversable (prel (&k->enemy_pos, &pp, +0, d)))
+    while (is_traversable (prel (&k->enemy_pos, &pp, +0, d)))
       k->enemy_pos = pp;
   }
 
@@ -303,15 +303,14 @@ fight_ai (struct anim *k)
       && is_in_range (k, ke, ATTACK_RANGE)
       && ! is_in_fight_mode (ke)
       && ! ke->immortal
-      && ! (is_kid_climb (&ke->f) && ke->i <= 7)
+      && ! (is_kid_climb (ke) && ke->i <= 7)
       && ke->f.dir != k->f.dir
       && ke->current_lives > 0
-      && ! is_kid_fall (&ke->f)
-      && ! is_kid_hang (&ke->f)
-      && ! ((is_kid_jump (&ke->f)
-             || is_kid_run_jump (&ke->f))
-            && strictly_traversable_cs
-            (fight_crel (ke, _m, +0, +0)))
+      && ke->action != kid_fall
+      && ! is_kid_hang (ke)
+      && ! ((ke->action == kid_jump || ke->action == kid_run_jump)
+            && traversable_cs
+            (fight_tile_rel (ke, _m, +0, +0)))
       && is_safe_to_attack (ke)) {
     if (ke->has_sword) {
       place_on_the_ground (&ke->f, &ke->f.c);
@@ -342,7 +341,7 @@ fight_ai (struct anim *k)
   }
 
   /* if the enemy is on the back, turn */
-  if (is_on_back (k, ke) && is_anim_seeing (k, ke, odir)
+  if (is_on_back (k, ke) && is_actor_seeing (k, ke, odir)
       && p.floor == pe.floor
       && ! is_in_range (k, ke, INVERSION_RANGE)) {
     if (is_safe_to_turn (k)) fight_turn (k);
@@ -351,7 +350,7 @@ fight_ai (struct anim *k)
   }
 
   /* if too near to a wall, back off to have room for an attack */
-  if (fight_crel (k, _m, +0, +1) == WALL
+  if (fight_tile_rel (k, _m, +0, +1) == WALL
       && is_safe_to_walkb (k)) {
     fight_walkb (k);
     return;
@@ -367,15 +366,15 @@ fight_ai (struct anim *k)
   /* if the enemy is trying to bypass, attack him */
   if (! is_in_fight_mode (ke)
       && ! ke->has_sword
-      && ! is_kid_stairs (&ke->f)
+      && ke->action != kid_stairs
       && ke->f.dir != k->f.dir
       && ke->current_lives > 0
       && ! is_on_back (k, ke)
-      && ((is_kid_run (&ke->f)
+      && ((ke->action == kid_run
            && is_in_range (k, ke, 3 * PLACE_WIDTH - 4))
-          || (is_kid_run_jump (&ke->f)
+          || (ke->action == kid_run_jump
               && is_in_range (k, ke, 4 * PLACE_WIDTH - 4))
-          || (is_kid_jump_air (&ke->f) && ke->i < 9
+          || (is_kid_jump_air (ke) && ke->i < 9
               && is_in_range (k, ke, 4 * PLACE_WIDTH)))) {
     if (is_safe_to_attack (k)) fight_attack (k);
     else if (is_safe_to_walkb (k)) fight_walkb (k);
@@ -385,20 +384,20 @@ fight_ai (struct anim *k)
   /* stays at least in the fight range.  Advance, unless the enemy is
      not running towards you */
   if (! is_in_range (k, ke, FIGHT_RANGE + 10)
-      && ! is_kid_stairs (&ke->f)
+      && ke->action != kid_stairs
       && (ke->f.dir == k->f.dir
           || p.room != pe.room
           || p.floor != pe.floor
-          || ! (is_kid_run (&ke->f)
-                || is_kid_run_jump (&ke->f)
-                || is_kid_jump (&ke->f)))
+          || ! (ke->action == kid_run
+                || ke->action == kid_run_jump
+                || ke->action == kid_jump))
       && is_safe_to_follow (k, ke, k->f.dir)) {
     fight_walkf (k);
     return;
   }
 
   /* if the enemy is not targeting you, do nothing more */
-  struct anim *kee = get_reciprocal_enemy (ke);
+  struct actor *kee = get_reciprocal_enemy (ke);
   if (kee && kee->id != k->id) return;
 
   /* in fight range, if the enemy is not attacking, go towards attack
@@ -406,7 +405,7 @@ fight_ai (struct anim *k)
      then go immediately) */
   if (is_in_range (k, ke, FIGHT_RANGE + 10)
       && ! is_in_range (k, ke, ATTACK_RANGE)
-      && ! is_kid_stairs (&ke->f)
+      && ke->action != kid_stairs
       && is_safe_to_follow (k, ke, k->f.dir)
       && (prandom (99) <= k->skill.advance_prob
           || prandom (99) < k->angry
@@ -448,9 +447,9 @@ fight_ai (struct anim *k)
   if (is_in_range (k, ke, ATTACK_RANGE)
       && ! is_attacking (ke)
       && ! is_on_back (k, ke)
-      && ! is_kid_stairs (&ke->f)
-      && ! ((is_kid_climb (&ke->f)
-             || is_kid_successfully_climbing (&ke->f))
+      && ke->action != kid_stairs
+      && ! ((is_kid_climb (ke)
+             || is_kid_successfully_climbing (ke))
             && ke->i >= 1)
       && ke->current_lives > 0
       && (prandom (99) <= k->skill.attack_prob
@@ -472,12 +471,12 @@ fight_ai (struct anim *k)
 }
 
 void
-fight_mechanics (struct anim *k)
+fight_mechanics (struct actor *k)
 {
   if (k->sword_immune > 0) k->sword_immune--;
 
   /* 'ke' is the attacking part */
-  struct anim *ke = get_anim_by_id (k->enemy_id);
+  struct actor *ke = get_actor_by_id (k->enemy_id);
 
   if (! ke || ke->enemy_id != k->id) return;
 
@@ -555,7 +554,7 @@ fight_mechanics (struct anim *k)
 }
 
 void
-fight_inversion_mechanics (struct anim *k, struct anim *ke)
+fight_inversion_mechanics (struct actor *k, struct actor *ke)
 {
   if (is_in_range (k, ke, INVERSION_RANGE)
       && is_in_fight_mode (k)
@@ -586,14 +585,14 @@ fight_inversion_mechanics (struct anim *k, struct anim *ke)
 }
 
 void
-consider_enemy (struct anim *k0, struct anim *k1)
+consider_enemy (struct actor *k0, struct actor *k1)
 {
   k0->enemy_id = k1->id;
   k0->enemy_refraction = -1;
 }
 
 void
-forget_enemy (struct anim *k)
+forget_enemy (struct actor *k)
 {
   if (k->enemy_refraction > 0) return;
   else if (k->enemy_refraction < 0) {
@@ -605,20 +604,20 @@ forget_enemy (struct anim *k)
 }
 
 void
-enter_fight_mode (struct anim *k)
+enter_fight_mode (struct actor *k)
 {
   if (! k->has_sword) return;
   k->key.enter = true;
 }
 
 void
-leave_fight_mode (struct anim *k)
+leave_fight_mode (struct actor *k)
 {
   k->key.down = true;
 }
 
 int
-dist_anims (struct anim *k0, struct anim *k1)
+dist_actors (struct actor *k0, struct actor *k1)
 {
   if (! k0 || ! k1) return INT_MAX;
 
@@ -630,27 +629,27 @@ dist_anims (struct anim *k0, struct anim *k1)
 
   if (m1.room == m0.room
       && p1.floor == p0.floor)
-    return abs (m1.x - m0.x);
+    return fabs (m1.x - m0.x);
   else return INT_MAX;
 }
 
 int
-dist_enemy (struct anim *k)
+dist_enemy (struct actor *k)
 {
-  struct anim *ke = get_anim_by_id (k->enemy_id);
+  struct actor *ke = get_actor_by_id (k->enemy_id);
   if (! ke) return INT_MAX;
-  return dist_anims (k, ke);
+  return dist_actors (k, ke);
 }
 
 bool
-is_in_range (struct anim *k0, struct anim *k1, int r)
+is_in_range (struct actor *k0, struct actor *k1, int r)
 {
-  int d = dist_anims (k0, k1);
+  int d = dist_actors (k0, k1);
   return d < r;
 }
 
-enum confg
-fight_crel (struct anim *k, coord_f cf, int floor, int place)
+enum tile_fg
+fight_tile_rel (struct actor *k, coord_f cf, int floor, int place)
 {
   struct pos p;
   survey (cf, pos, &k->f, NULL, &p, NULL);
@@ -661,7 +660,7 @@ fight_crel (struct anim *k, coord_f cf, int floor, int place)
 }
 
 bool
-is_in_fight_mode (struct anim *k)
+is_in_fight_mode (struct actor *k)
 {
   return k->action == kid_sword_normal
     || k->action == kid_sword_walkf
@@ -671,100 +670,87 @@ is_in_fight_mode (struct anim *k)
     || k->action == kid_take_sword
     || k->action == kid_sword_hit
 
-    || k->action == guard_vigilant
-    || k->action == guard_walkf
-    || k->action == guard_walkb
-    || k->action == guard_attack
-    || k->action == guard_defense
-    || k->action == guard_hit;
+    || k->action == guard_sword_normal
+    || k->action == guard_sword_walkf
+    || k->action == guard_sword_walkb
+    || k->action == guard_sword_attack
+    || k->action == guard_sword_defense
+    || k->action == guard_sword_hit;
 }
 
 bool
-is_attacking (struct anim *k)
+is_attacking (struct actor *k)
 {
   if (! k) return false;
   else return (k->action == kid_sword_attack && k->i <= 4)
-         || (k->action == guard_attack && k->i <= 4)
+         || (k->action == guard_sword_attack && k->i <= 4)
          || ((k->action == kid_sword_normal
-              || k->action == guard_vigilant)
+              || k->action == guard_sword_normal)
              && k->key.shift && ! k->key.up);
 }
 
 bool
-is_defending (struct anim *k)
+is_defending (struct actor *k)
 {
   if (! k) return false;
   else return k->action == kid_sword_defense
-         || k->action == guard_defense;
+         || k->action == guard_sword_defense;
 }
 
 bool
-is_walking (struct anim *k)
+is_walking (struct actor *k)
 {
   if (! k) return false;
   else return k->action == kid_sword_walkf
          || k->action == kid_sword_walkb
-         || k->action == guard_walkf
-         || k->action == guard_walkb;
+         || k->action == guard_sword_walkf
+         || k->action == guard_sword_walkb;
 }
 
 bool
-is_walkingb (struct anim *k)
+is_walkingb (struct actor *k)
 {
   if (! k) return false;
   else return k->action == kid_sword_walkb
-         || k->action == guard_walkb;
+         || k->action == guard_sword_walkb;
 }
 
 bool
-is_walkingf (struct anim *k)
+is_walkingf (struct actor *k)
 {
   if (! k) return false;
   else return k->action == kid_sword_walkf
-         || k->action == guard_walkf;
+         || k->action == guard_sword_walkf;
 }
 
 bool
-is_sword_hit (struct anim *k)
+is_sword_hit (struct actor *k)
 {
   if (! k) return false;
   else return k->action == kid_sword_hit
-         || k->action == guard_hit;
+         || k->action == guard_sword_hit;
 }
 
 bool
-is_at_defendable_attack_frame (struct anim *k)
+is_at_defendable_attack_frame (struct actor *k)
 {
-  return k->fo.b == kid_sword_attack_02
-    || k->fo.b == kid_sword_attack_03
-    || k->fo.b == guard_attack_03
-    || k->fo.b == guard_attack_04
-    || k->fo.b == fat_guard_attack_03
-    || k->fo.b == fat_guard_attack_04
-    || k->fo.b == vizier_attack_03
-    || k->fo.b == vizier_attack_04
-    || k->fo.b == skeleton_attack_03
-    || k->fo.b == skeleton_attack_04
-    || k->fo.b == shadow_attack_03
-    || k->fo.b == shadow_attack_04;
+  return (k->action == kid_sword_attack
+          && (k->i == 2 || k->i == 3))
+    || (k->action == guard_sword_attack
+        && (k->i == 3 || k->i == 4));
 }
 
 bool
-is_at_hit_frame (struct anim *k)
+is_at_hit_frame (struct actor *k)
 {
-  return k->fo.b == kid_sword_attack_03
-    || k->fo.b == guard_attack_04
-    || k->fo.b == fat_guard_attack_04
-    || k->fo.b == vizier_attack_04
-    || k->fo.b == skeleton_attack_04
-    || k->fo.b == shadow_attack_04;
+  return (k->action == kid_sword_attack && k->i == 3)
+    || (k->action == guard_sword_attack && k->i == 4);
 }
 
 void
-put_at_defense_frame (struct anim *k)
+put_at_defense_frame (struct actor *k)
 {
-  struct frameset *frameset;
-  struct anim *ke = get_anim_by_id (k->enemy_id);
+  struct actor *ke = get_actor_by_id (k->enemy_id);
 
   play_audio (&sword_defense_audio, NULL, k->id);
   stop_audio_instance (&sword_attack_audio, NULL, k->enemy_id);
@@ -772,18 +758,18 @@ put_at_defense_frame (struct anim *k)
   kid_haptic (ke, KID_HAPTIC_SWORD);
 
   switch (k->type) {
-  case NO_ANIM: default: break;
+  case NO_ACTOR: default: break;
   case KID:
-    select_frame (k, kid_sword_defense_frameset, 0);
+    select_actor_frame (k, "KID", "SWORD_DEFENSE", 0);
     next_frame (&k->f, &k->f, &k->fo);
 
-    select_frame (k, kid_sword_defense_frameset, 1);
+    select_actor_frame (k, "KID", "SWORD_DEFENSE", 1);
 
     if (ke->type == KID) {
-      select_xframe (&k->xf, sword_frameset, 11);
+      select_actor_xframe (k, "KID", "SWORD", 11);
       k->xf.dx = -13;
       k->xf.dy = +5;
-    } else select_xframe (&k->xf, sword_frameset, 14);
+    } else select_actor_xframe (k, "KID", "SWORD", 14);
 
     k->action = kid_sword_defense;
     uncollide_back_fight (k);
@@ -794,10 +780,9 @@ put_at_defense_frame (struct anim *k)
   case VIZIER:
   case SKELETON:
   case SHADOW:
-    frameset = get_guard_defense_frameset (k->type);
-    select_frame (k, frameset, 0);
-    select_xframe (&k->xf, sword_frameset, 11);
-    k->action = guard_defense;
+    select_actor_frame (k, NULL, "SWORD_DEFENSE", 0);
+    select_actor_xframe (k, NULL, "SWORD", 11);
+    k->action = guard_sword_defense;
     uncollide_back_fight (k);
     next_frame (&k->f, &k->f, &k->fo);
     break;
@@ -809,7 +794,7 @@ put_at_defense_frame (struct anim *k)
 }
 
 void
-put_at_attack_frame (struct anim *k)
+put_at_attack_frame (struct actor *k)
 {
   k->enemy_defended_my_attack = 2;
   k->enemy_counter_attacked_myself =
@@ -817,19 +802,20 @@ put_at_attack_frame (struct anim *k)
   k->i_counter_defended = k->i_counter_defended ? 2 : 0;
 
   switch (k->type) {
-  case NO_ANIM: default: break;
+  case NO_ACTOR: default: break;
   case KID:
     if (k->i == 3) return;
 
     k->f = k->of;
-    select_frame (k, kid_sword_attack_frameset, 0);
+    select_actor_frame (k, "KID", "SWORD_ATTACK", 0);
     next_frame (&k->f, &k->f, &k->fo);
-    select_frame (k, kid_sword_attack_frameset, 1);
+    select_actor_frame (k, "KID", "SWORD_ATTACK", 1);
     next_frame (&k->f, &k->f, &k->fo);
-    select_frame (k, kid_sword_attack_frameset, 2);
+    select_actor_frame (k, "KID", "SWORD_ATTACK", 2);
 
-    k->fo.b = kid_sword_attack_defended;
-    select_xframe (&k->xf, sword_frameset, 17);
+    /* sword attack defended */
+    k->fo.b = actor_bitmap (k, "KID", "SWORD_ATTACK", 8);
+    select_actor_xframe (k, "KID", "SWORD", 17);
     k->xf.dx = -21;
     k->xf.dy = +11;
     uncollide_back_fight (k);
@@ -840,11 +826,11 @@ put_at_attack_frame (struct anim *k)
   case VIZIER:
   case SKELETON:
   case SHADOW:
-    k->fo.b = get_guard_attack_defended_bitmap (k->type);
-    k->fo.dx = +1;
-    k->fo.dy = 0;
+    k->fo.b = actor_bitmap (k, NULL, "SWORD_ATTACK", 10);
+    k->fo.dx = actor_bitmap_dx (k, NULL, "SWORD_ATTACK", 10);
+    k->fo.dy = actor_bitmap_dy (k, NULL, "SWORD_ATTACK", 10);
 
-    select_xframe (&k->xf, sword_frameset, 8);
+    select_actor_xframe (k, NULL, "SWORD", 8);
     k->xf.dx = -13;
     k->xf.dy = -14;
     uncollide_back_fight (k);
@@ -854,7 +840,7 @@ put_at_attack_frame (struct anim *k)
 }
 
 bool
-opaque_cs (enum confg t)
+opaque_cs (enum tile_fg t)
 {
   return t == WALL || t == CARPET || t == TCARPET || t == MIRROR;
 }
@@ -862,19 +848,19 @@ opaque_cs (enum confg t)
 bool
 is_opaque_at_left (struct pos *p)
 {
-  enum confg t = fg (p);
+  enum tile_fg t = fg (p);
   return t == WALL || t == MIRROR;
 }
 
 bool
 is_opaque_at_right (struct pos *p)
 {
-  enum confg t = fg (p);
+  enum tile_fg t = fg (p);
   return t == WALL || t == CARPET || t == TCARPET;
 }
 
 bool
-is_anim_seeing (struct anim *k0, struct anim *k1, enum dir dir)
+is_actor_seeing (struct actor *k0, struct actor *k1, enum dir dir)
 {
   struct pos p0; survey (_m, pos, &k0->f, NULL, &p0, NULL);
   struct pos p1; survey (_m, pos, &k1->f, NULL, &p1, NULL);
@@ -887,13 +873,13 @@ is_anim_seeing (struct anim *k0, struct anim *k1, enum dir dir)
 }
 
 bool
-is_pos_seeing (struct pos *p0, struct anim *k1, enum dir dir)
+is_pos_seeing (struct pos *p0, struct actor *k1, enum dir dir)
 {
   struct coord m0, m1, mt1, mb1; struct pos p, p1, pk, pke;
-  con_coord (p0, _m, &m0);
+  tile_coord (p0, _m, &m0);
 
   coord_f cf;
-  if (is_kid_climb (&k1->f) || is_anim_fall (&k1->f)) {
+  if (is_kid_climb (k1) || is_actor_fall (k1)) {
     coord2room (_mt (&k1->f, &mt1), m0.room, &mt1);
     coord2room (_m (&k1->f, &m1), m0.room, &m1);
     coord2room (_mbo (&k1->f, &mb1), m0.room, &mb1);
@@ -932,7 +918,7 @@ is_pos_seeing (struct pos *p0, struct anim *k1, enum dir dir)
 
   if (peq (p0, &p1)) return true;
 
-  first_confg (&pk, &pke, opaque_cs, &p);
+  first_tile_fg (&pk, &pke, opaque_cs, &p);
 
   return p0->room == p1.room
     && m1.room == m0.room
@@ -943,7 +929,7 @@ is_pos_seeing (struct pos *p0, struct anim *k1, enum dir dir)
 }
 
 bool
-is_hearing (struct anim *k0, struct anim *k1)
+is_hearing (struct actor *k0, struct actor *k1)
 {
   struct pos p0, p1;
   survey (_m, pos, &k0->f, NULL, &p0, NULL);
@@ -953,18 +939,17 @@ is_hearing (struct anim *k0, struct anim *k1)
   pos2room (&p1, p0.room, &p1);
 
   return p1.room == p0.room
-    && (is_kid_run (&k1->f)
-        || is_kid_stop_run (&k1->f)
-        || is_kid_jump_landing (&k1->f)
-        || is_kid_run_jump_running (&k1->f)
-        || is_kid_run_jump_landing (&k1->f)
-        || (is_kid_couch (&k1->f)
-            && k1->fall)
+    && (k1->action == kid_run
+        || k1->action == kid_stop_run
+        || is_kid_jump_landing (k1)
+        || is_kid_run_jump_running (k1)
+        || is_kid_run_jump_landing (k1)
+        || (k1->action == kid_crouch && k1->fall)
         || k1->action == kid_take_sword);
 }
 
 bool
-is_pos_on_back (struct anim *k, struct pos *p)
+is_pos_on_back (struct actor *k, struct pos *p)
 {
   struct pos pm, pv;
   survey (_m, pos, &k->f, NULL, &pm, NULL);
@@ -977,7 +962,7 @@ is_pos_on_back (struct anim *k, struct pos *p)
 }
 
 bool
-is_on_back (struct anim *k0, struct anim *k1)
+is_on_back (struct actor *k0, struct actor *k1)
 {
   struct coord m0, m1;
 
@@ -993,7 +978,7 @@ is_on_back (struct anim *k0, struct anim *k1)
 }
 
 bool
-is_near (struct anim *k0, struct anim *k1)
+is_near (struct actor *k0, struct actor *k1)
 {
   struct coord m0, m1; struct pos p0, p1;
   survey (_m, pos, &k0->f, &m0, &p0, NULL);
@@ -1004,12 +989,12 @@ is_near (struct anim *k0, struct anim *k1)
   coord2room (&m1, m0.room, &m1);
 
   return m1.room == m0.room && p1.floor == p0.floor
-    && abs (m1.x - m0.x) < PLACE_WIDTH
-    && abs (m1.y - m0.y) < PLACE_HEIGHT;
+    && fabs (m1.x - m0.x) < PLACE_WIDTH
+    && fabs (m1.y - m0.y) < PLACE_HEIGHT;
 }
 
 bool
-is_safe_to_walkb (struct anim *k)
+is_safe_to_walkb (struct actor *k)
 {
   int df = dist_fall (&k->f, true);
   int dc = dist_collision (&k->f, _bb, +0, +0, &k->ci);
@@ -1017,28 +1002,28 @@ is_safe_to_walkb (struct anim *k)
 }
 
 bool
-is_safe_to_attack (struct anim *k)
+is_safe_to_attack (struct actor *k)
 {
   int df = dist_fall (&k->f, false);
   return df > PLACE_WIDTH;
 }
 
 bool
-is_safe_to_turn (struct anim *k)
+is_safe_to_turn (struct actor *k)
 {
   int df = dist_fall (&k->f, false);
   return (df > PLACE_WIDTH);
 }
 
 bool
-dangerous_cs (enum confg t)
+dangerous_cs (enum tile_fg t)
 {
-  return traversable_cs (t)
-    || t == WALL || t == CARPET || t == TCARPET || t == MIRROR || t == CHOPPER;
+  return potentially_traversable_cs (t)
+    || t == WALL || t == CARPET || t == TCARPET || t == MIRROR || t == CHOMPER;
 }
 
 bool
-door_cs (enum confg t)
+door_cs (enum tile_fg t)
 {
   return t == DOOR;
 }
@@ -1053,13 +1038,13 @@ is_safe_at_right (struct pos *p, struct frame *f)
 bool
 is_safe_at_left (struct pos *p)
 {
-  enum confg t = fg (p);
+  enum tile_fg t = fg (p);
 
-  return t != WALL && t != CHOPPER && t != MIRROR;
+  return t != WALL && t != CHOMPER && t != MIRROR;
 }
 
 bool
-is_safe_to_follow (struct anim *k0, struct anim *k1, enum dir dir)
+is_safe_to_follow (struct actor *k0, struct actor *k1, enum dir dir)
 {
   /* not aware of enemy position */
   if (! is_valid_pos (&k0->enemy_pos)) return false;
@@ -1080,15 +1065,15 @@ is_safe_to_follow (struct anim *k0, struct anim *k1, enum dir dir)
     /* enum dir odir = (dir == LEFT) ? RIGHT : LEFT; */
     /* if (is_on_back (k0, k1) && is_seeing (k0, k1, odir) */
     /*     && p0.floor == p1.floor) return true; */
-    if (is_anim_seeing (k0, k1, LEFT)
-        || is_anim_seeing (k0, k1, RIGHT)) return true;
+    if (is_actor_seeing (k0, k1, LEFT)
+        || is_actor_seeing (k0, k1, RIGHT)) return true;
     return false;
   }
 
   /* if falling the chasing is inevitable (necessary to prevent
      leave_fight_logic from forgeting enemy based on the facing
      direction of the is_in_range check) */
-  if (is_anim_fall (&k0->f)) return true;
+  if (is_actor_fall (k0)) return true;
 
   if (dir == LEFT) {
     if (! is_safe_at_left (&p0)) return false;
@@ -1109,36 +1094,36 @@ is_safe_to_follow (struct anim *k0, struct anim *k1, enum dir dir)
   }
 
   /* enemy went down */
-  if (is_traversable (&k0->enemy_pos)) {
+  if (is_potentially_traversable (&k0->enemy_pos)) {
     prel (&k0->enemy_pos, &pke, +1, +0);
-    if (is_traversable (&pke) || fg (&pke) == SPIKES_FLOOR)
+    if (is_potentially_traversable (&pke) || fg (&pke) == SPIKES_FLOOR)
       return false;
     int d = (dir == LEFT) ? -1 : +1;
     if (peq (&pk, &k0->enemy_pos)) return true;
     prel (&k0->enemy_pos, &pke, +0, -1 * d);
   } else if (peq (&p0, &k0->enemy_pos)
-             && ! (is_anim_seeing (k0, k1, LEFT)
-                   || is_anim_seeing (k0, k1, RIGHT)))
+             && ! (is_actor_seeing (k0, k1, LEFT)
+                   || is_actor_seeing (k0, k1, RIGHT)))
     return false;
 
-  first_confg (&pk, &pke, dangerous_cs, &p);
+  first_tile_fg (&pk, &pke, dangerous_cs, &p);
   if (is_valid_pos (&p)) return false;
 
-  first_confg (&pk, &pke, door_cs, &p);
+  first_tile_fg (&pk, &pke, door_cs, &p);
   if (! is_valid_pos (&p)) return true;
   else return door_at_pos (&p)->action == OPEN_DOOR
          || ! is_collidable_at_right (&p, &k0->f);
 }
 
 bool
-is_there_enough_room_to_fight (struct anim *k)
+is_there_enough_room_to_fight (struct actor *k)
 {
   return dist_collision (&k->f, _bf, +0, +0, &k->ci) > PLACE_WIDTH - 16
     || dist_collision (&k->f, _bb, +0, +0, &k->ci) > PLACE_WIDTH - 16;
 }
 
 void
-fight_turn (struct anim *k)
+fight_turn (struct actor *k)
 {
   invert_frame_dir (&k->f, &k->f);
 
@@ -1146,28 +1131,28 @@ fight_turn (struct anim *k)
     enter_fight_mode (k);
   else {
     struct pos p;
-    struct anim a = *k;
+    struct actor a = *k;
     a.i = -1;
-    anim_walkb (&a);
+    actor_walkb (&a);
     survey (_bb, pos, &a.f, NULL, &p, NULL);
-    if (! is_strictly_traversable (&p)
+    if (! is_traversable (&p)
         && is_there_enough_room_to_fight (&a)) *k = a;
   }
 }
 
 void
-fight_turn_controllable (struct anim *k)
+fight_turn_controllable (struct actor *k)
 {
   int d = INT_MAX;
   int t; /* threshold */
-  struct anim *ke = NULL;
-  struct anim *ke0 = get_anim_by_id (k->enemy_id);
+  struct actor *ke = NULL;
+  struct actor *ke0 = get_actor_by_id (k->enemy_id);
 
   /* make the kid target the nearest enemy targeting him */
   size_t i;
-  for (i = 0; i < anima_nmemb; i++) {
-    struct anim *a = &anima[i];
-    if (a->enemy_id != k->id || ! is_fightable_anim (a))
+  for (i = 0; i < actor_nmemb; i++) {
+    struct actor *a = &actor[i];
+    if (a->enemy_id != k->id || ! is_fightable_actor (a))
       continue;
     int de = dist_enemy (a);
     if (de < d) {
@@ -1180,11 +1165,11 @@ fight_turn_controllable (struct anim *k)
   else t = -1;
 
   if (ke && abs (dist_enemy (k) - d) > t) {
-    for (i = 0; i < anima_nmemb; i++) {
-      struct anim *a = &anima[i];
+    for (i = 0; i < actor_nmemb; i++) {
+      struct actor *a = &actor[i];
       if (a->id == k->id || (a->id != 0 && a->shadow_of != 0))
         continue;
-      int da = dist_anims (k, a);
+      int da = dist_actors (k, a);
       if (da < d
           /* && abs (da - d) >= 8 */
           && a->enemy_id == ke->id
@@ -1194,7 +1179,7 @@ fight_turn_controllable (struct anim *k)
     consider_enemy (k, ke);
   }
 
-  ke = get_anim_by_id (k->enemy_id);
+  ke = get_actor_by_id (k->enemy_id);
   if (ke) {
     struct pos p, pe;
     survey (_m, pos, &k->f, NULL, &p, NULL);
@@ -1211,37 +1196,37 @@ fight_turn_controllable (struct anim *k)
 }
 
 void
-fight_defense (struct anim *k)
+fight_defense (struct actor *k)
 {
   k->key.up = true;
 }
 
 void
-fight_attack (struct anim *k)
+fight_attack (struct actor *k)
 {
   k->key.shift = true;
 }
 
 void
-fight_walkf (struct anim *k)
+fight_walkf (struct actor *k)
 {
   if (k->f.dir == LEFT) k->key.left = true;
   else k->key.right = true;
 }
 
 void
-fight_walkb (struct anim *k)
+fight_walkb (struct actor *k)
 {
   if (k->f.dir == LEFT) k->key.right = true;
   else k->key.left = true;
 }
 
 void
-fight_hit (struct anim *k, struct anim *ke)
+fight_hit (struct actor *k, struct actor *ke)
 {
   if (k->immortal || k->sword_immune) return;
   if (k->current_lives <= 0) return;
-  if (is_anim_fall (&k->f) || is_kid_stairs (&k->f))
+  if (is_actor_fall (k) || k->action == kid_stairs)
     return;
 
   place_on_the_ground (&k->f, &k->f.c);
@@ -1261,15 +1246,15 @@ fight_hit (struct anim *k, struct anim *ke)
   if (is_attacking (k))
     move_frame (&k->f, _tb, +0, -8, -8);
 
-  if (k->current_lives <= 0 && ! is_strictly_traversable (&pb)) {
+  if (k->current_lives <= 0 && ! is_traversable (&pb)) {
     k->current_lives = 0;
     k->death_reason = FIGHT_DEATH;
     ke->alert_cycle = anim_cycle;
     /* prevent kid from passing through a collidable */
-    if (is_kid_hang (&k->f))
+    if (is_kid_hang (k))
       k->f.c.x += k->f.dir == LEFT ? +8 : -8;
-    anim_die (k);
-  } else anim_sword_hit (k);
+    actor_die (k);
+  } else actor_sword_hit (k);
 
   if (k->f.dir != ke->f.dir) {
     backoff_from_range (ke, k, ATTACK_RANGE - 20, true, false);
@@ -1289,10 +1274,10 @@ fight_hit (struct anim *k, struct anim *ke)
 }
 
 void
-backoff_from_range (struct anim *k0, struct anim *k1, int r,
+backoff_from_range (struct actor *k0, struct actor *k1, int r,
                     bool only_k1, bool k1_dominant)
 {
-  struct anim *kd, *ks, *kl, *kr;
+  struct actor *kd, *ks, *kl, *kr;
 
   kd = k1_dominant ? k1 : k0;
   ks = k1_dominant ? k0 : k1;
@@ -1313,10 +1298,10 @@ backoff_from_range (struct anim *k0, struct anim *k1, int r,
 }
 
 void
-get_in_range (struct anim *k0, struct anim *k1, int r,
+get_in_range (struct actor *k0, struct actor *k1, int r,
               bool only_k1, bool k1_dominant)
 {
-  struct anim *kd, *ks, *kl, *kr;
+  struct actor *kd, *ks, *kl, *kr;
 
   kd = k1_dominant ? k1 : k0;
   ks = k1_dominant ? k0 : k1;
@@ -1371,8 +1356,8 @@ void
 alert_guards (struct pos *p)
 {
   int i;
-  for (i = 0; i < anima_nmemb; i++) {
-    struct anim *g = &anima[i];
+  for (i = 0; i < actor_nmemb; i++) {
+    struct actor *g = &actor[i];
     if (is_guard (g) && is_pos_on_back (g, p)
         && g->current_lives > 0 && g->enemy_id == -1
         && anim_cycle - g->alert_cycle > 24) {

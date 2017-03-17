@@ -24,8 +24,7 @@
 #define WINDOW_TITLE "MININIM: The Advanced Prince of Persia Engine (a childhood dream)"
 #define LOGO_ICON "data/icons/mininim.png"
 #define SMALL_LOGO_ICON "data/icons/mininim-small.png"
-#define OITOFELIX_FACE_GRAY "data/icons/oitofelix-face-gray.png"
-#define OITOFELIX_FACE_BW "data/icons/oitofelix-face-bw.png"
+#define OITOFELIX_FACE "data/icons/oitofelix-face.png"
 #define JOYSTICK_BIG_ICON "data/icons/joystick-big.png"
 
 #define INVALID (INT_MIN)
@@ -65,6 +64,9 @@
 #define LFLOORS 3
 #define LPLACES 10
 
+#define INITIAL_PLACE_WIDTH 32
+#define INITIAL_PLACE_HEIGHT 63
+
 #define PLACE_WIDTH 32
 #define PLACE_HEIGHT 63
 
@@ -72,7 +74,8 @@
 #define CUTSCENE_HEIGHT 200
 
 #define ORIGINAL_WIDTH (PLACE_WIDTH * PLACES)
-#define ORIGINAL_HEIGHT (PLACE_HEIGHT * FLOORS + 11)
+#define ORIGINAL_HEIGHT (PLACE_HEIGHT * FLOORS + BOTTOM_ROW_HEIGHT)
+#define BOTTOM_ROW_HEIGHT 11
 #define DISPLAY_WIDTH (ORIGINAL_WIDTH * 2)
 #define DISPLAY_HEIGHT (ORIGINAL_HEIGHT * 2)
 
@@ -95,9 +98,9 @@
 #define LEVEL_DOOR_TOTAL (LEVEL_DOOR_STEPS * LEVEL_DOOR_FASES)
 #define LEVEL_DOOR_OPEN_MAX_STEP 9
 
-#define CHOPPER_STEPS 6
-#define CHOPPER_FASES 2
-#define CHOPPER_TOTAL (CHOPPER_STEPS * CHOPPER_FASES)
+#define CHOMPER_STEPS 6
+#define CHOMPER_FASES 2
+#define CHOMPER_TOTAL (CHOMPER_STEPS * CHOMPER_FASES)
 
 #define KID_INITIAL_TOTAL_LIVES 3
 #define KID_INITIAL_CURRENT_LIVES 3
@@ -130,9 +133,10 @@
 #define WALL_FG_WIDTH 12
 #define DOOR_FG_WIDTH 14
 #define CARPET_FG_WIDTH 12
+#define CARPET_DESIGNS 6
 
-#define CHOPPER_WAIT 10
-#define CHOPPER_FG_WIDTH 14
+#define CHOMPER_WAIT 10
+#define CHOMPER_FG_WIDTH 14
 
 #define DOOR_WAIT (5 * DEFAULT_HZ)
 #define DOOR_CLIMB_LIMIT 40
@@ -217,7 +221,7 @@
 #define KID_HAPTIC_DRINK 6.0
 #define KID_HAPTIC_STRONG_DRINK 12.0
 #define KID_HAPTIC_SUCCESS 12.0
-#define KID_HAPTIC_CHOPPER 5.0
+#define KID_HAPTIC_CHOMPER 5.0
 #define KID_HAPTIC_SPIKES 5.0
 #define KID_HAPTIC_LOOSE_FLOOR_BREAKING 5.0
 #define KID_HAPTIC_PRESS_ANY_KEY 3.0

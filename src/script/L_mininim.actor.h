@@ -26,6 +26,29 @@
 void define_L_mininim_actor (lua_State *L);
 void L_pushactor (lua_State *L, int id);
 
+const char *actor_type_string (enum actor_type type);
+enum actor_type actor_type_enum (const char *type);
+const char *actor_action_string (ACTION action);
+ACTION actor_action_enum (const char *action, enum actor_type type);
+
+bool select_actor_frame (struct actor *a, const char *type,
+                         const char *action, int i);
+bool select_actor_xframe (struct actor *a, const char *type,
+                          const char *xtype, int j);
+
+ALLEGRO_BITMAP *actor_bitmap (struct actor *a, const char *type,
+                              const char *action, int index);
+struct coord *actor_coord (struct coord *c_ret, struct actor *a,
+                           const char *type, const char *action,
+                           int index);
+int actor_bitmap_dx (struct actor *a, const char *type, const char *action,
+                     int index);
+int actor_bitmap_dy (struct actor *a, const char *type, const char *action,
+                     int index);
+void place_actor (struct actor *a, struct pos *p, int dx, int dy,
+                  const char *type, const char *action, int index);
+
+
 DECLARE_LUA (L_mininim_actor);
 
 #endif	/* MININIM_L_MININIM_ACTOR_H */

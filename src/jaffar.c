@@ -20,7 +20,7 @@
 
 #include "mininim.h"
 
-struct anim jaffar;
+struct actor jaffar;
 
 #define WALK_FRAMESET_NMEMB 8
 #define OPEN_ARMS_FRAMESET_NMEMB 2
@@ -220,7 +220,7 @@ init_turn_walk_frameset (void)
 
 
 void
-jaffar_normal (struct anim *jaffar)
+jaffar_normal (struct actor *jaffar)
 {
   jaffar->oaction = jaffar->action;
   jaffar->action = jaffar_normal;
@@ -236,7 +236,7 @@ jaffar_normal (struct anim *jaffar)
 }
 
 void
-jaffar_walk (struct anim *jaffar)
+jaffar_walk (struct actor *jaffar)
 {
   jaffar->oaction = jaffar->action;
   jaffar->action = jaffar_walk;
@@ -265,7 +265,7 @@ jaffar_walk (struct anim *jaffar)
 }
 
 void
-jaffar_open_arms (struct anim *jaffar)
+jaffar_open_arms (struct actor *jaffar)
 {
   jaffar->oaction = jaffar->action;
   jaffar->action = jaffar_open_arms;
@@ -284,7 +284,7 @@ jaffar_open_arms (struct anim *jaffar)
 }
 
 void
-jaffar_raise_arms (struct anim *jaffar)
+jaffar_raise_arms (struct actor *jaffar)
 {
   jaffar->oaction = jaffar->action;
   jaffar->action = jaffar_raise_arms;
@@ -300,7 +300,7 @@ jaffar_raise_arms (struct anim *jaffar)
 }
 
 void
-jaffar_lower_arms (struct anim *jaffar)
+jaffar_lower_arms (struct actor *jaffar)
 {
   jaffar->oaction = jaffar->action;
   jaffar->action = jaffar_lower_arms;
@@ -320,7 +320,7 @@ jaffar_lower_arms (struct anim *jaffar)
 }
 
 void
-jaffar_turn_walk (struct anim *jaffar)
+jaffar_turn_walk (struct actor *jaffar)
 {
   jaffar->oaction = jaffar->action;
   jaffar->action = jaffar_turn_walk;
@@ -348,17 +348,17 @@ jaffar_turn_walk (struct anim *jaffar)
 
 
 void
-draw_jaffar_frame (ALLEGRO_BITMAP *bitmap, struct anim *j, enum vm vm)
+draw_jaffar_frame (ALLEGRO_BITMAP *bitmap, struct actor *j)
 {
   if (j->invisible) return;
 
   struct frame f = j->f;
 
   palette pal = NULL;
-  pal = get_guard_palette (j->style, vm);
+  pal = get_guard_palette (j->style);
   f.b = apply_palette (f.b, pal);
 
-  if (hgc) f.b = apply_palette (f.b, hgc_palette);
+  /* if (hgc) f.b = apply_palette (f.b, hgc_palette); */
 
   draw_frame (bitmap, &f);
 }

@@ -21,22 +21,11 @@
 #ifndef MININIM_WALL_H
 #define MININIM_WALL_H
 
-void draw_wall_part (ALLEGRO_BITMAP *bitmap, struct pos *p, char *part);
-void draw_wall_part_width (ALLEGRO_BITMAP *bitmap, struct pos *p, char *part,
-                           int width);
-void draw_wall (ALLEGRO_BITMAP *bitmap, struct pos *p);
-
 enum should_draw should_draw_face (struct pos *p, struct frame *f);
 
-void draw_wall_left_cache (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_wall_base_cache (ALLEGRO_BITMAP *bitmap, struct pos *p);
-
-void draw_wall_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f,
-                   enum em em, enum vm vm);
+void draw_wall (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_wall_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f);
 
 enum wall_correlation wall_correlation (struct pos *p);
-
-struct coord *wall_base_coord (struct pos *p, struct coord *c);
-struct coord *wall_left_coord (struct pos *p, struct coord *c);
 
 #endif	/* MININIM_WALL_H */

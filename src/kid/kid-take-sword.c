@@ -20,53 +20,15 @@
 
 #include "mininim.h"
 
-struct frameset kid_take_sword_frameset[KID_TAKE_SWORD_FRAMESET_NMEMB];
-
-static void init_kid_take_sword_frameset (void);
-static bool flow (struct anim *k);
-static bool physics_in (struct anim *k);
-static void physics_out (struct anim *k);
-
-ALLEGRO_BITMAP *kid_take_sword_00, *kid_take_sword_01,
-  *kid_take_sword_02, *kid_take_sword_03;
-
-static void
-init_kid_take_sword_frameset (void)
-{
-  struct frameset frameset[KID_TAKE_SWORD_FRAMESET_NMEMB] =
-    {{kid_take_sword_00,-6,+0},{kid_take_sword_01,+0,0},
-     {kid_take_sword_02,-4,0},{kid_take_sword_03,-6,0}};
-
-  memcpy (&kid_take_sword_frameset, &frameset,
-          KID_TAKE_SWORD_FRAMESET_NMEMB * sizeof (struct frameset));
-}
+static bool flow (struct actor *k);
+static bool physics_in (struct actor *k);
+static void physics_out (struct actor *k);
 
 void
-load_kid_take_sword (void)
-{
-  /* bitmaps */
-  kid_take_sword_00 = load_bitmap (KID_TAKE_SWORD_00);
-  kid_take_sword_01 = load_bitmap (KID_TAKE_SWORD_01);
-  kid_take_sword_02 = load_bitmap (KID_TAKE_SWORD_02);
-  kid_take_sword_03 = load_bitmap (KID_TAKE_SWORD_03);
-
-  /* frameset */
-  init_kid_take_sword_frameset ();
-}
-
-void
-unload_kid_take_sword (void)
-{
-  destroy_bitmap (kid_take_sword_00);
-  destroy_bitmap (kid_take_sword_01);
-  destroy_bitmap (kid_take_sword_02);
-  destroy_bitmap (kid_take_sword_03);
-}
-
-void
-kid_take_sword (struct anim *k)
+kid_take_sword (struct actor *k)
 {
   k->oaction = k->action;
+  k->oi = k->i;
   k->action = kid_take_sword;
   k->f.flip = (k->f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
@@ -77,7 +39,7 @@ kid_take_sword (struct anim *k)
 }
 
 static bool
-flow (struct anim *k)
+flow (struct actor *k)
 {
   if (k->oaction != kid_take_sword) {
     k->auto_taken_sword = false;
@@ -93,13 +55,13 @@ flow (struct anim *k)
     return false;
   }
 
-  select_frame (k, kid_take_sword_frameset, k->i + 1);
+  select_actor_frame (k, "KID", "TAKE_SWORD", k->i + 1);
 
   return true;
 }
 
 static bool
-physics_in (struct anim *k)
+physics_in (struct actor *k)
 {
   /* collision */
   uncollide_back_fight (k);
@@ -114,7 +76,7 @@ physics_in (struct anim *k)
 }
 
 static void
-physics_out (struct anim *k)
+physics_out (struct actor *k)
 {
   /* sound */
   if (k->i == 0) play_audio (&take_sword_audio, NULL, k->id);

@@ -99,7 +99,7 @@ load_native_level (struct level *l, int n)
     v = al_get_config_value (c, NULL, k);
     al_free (k);
     if (! v) break;
-    g->type = NO_ANIM, g->style = 0;
+    g->type = NO_ACTOR, g->style = 0;
     sscanf (v, "%i %i", (int *) &g->type, (int *) &g->style);
 
     /* GUARD START POSITION AND DIRECTION */
@@ -150,21 +150,21 @@ load_native_level (struct level *l, int n)
             (int *) &e->next);
   }
 
-  /* CONSTRUCTIONS */
+  /* TILES */
   struct pos p; new_pos (&p, l, -1, -1, -1);
   for (p.room = 1;; p.room++)
     for (p.floor = 0; p.floor < FLOORS; p.floor++)
       for (p.place = 0; p.place < PLACES; p.place++) {
-        /* Cr f p=f b e ff */
-        k = xasprintf ("C%i %i %i", p.room, p.floor, p.place);
+        /* Tr f p=f b e ff */
+        k = xasprintf ("T%i %i %i", p.room, p.floor, p.place);
         v = al_get_config_value (c, NULL, k);
         al_free (k);
-        if (! v) goto end_con_loop;
+        if (! v) goto end_tile_loop;
         int f = 0, b = 0, e = 0, ff = -1;
         sscanf (v, "%i %i %i %i", (int *) &f, &b, &e, &ff);
-        set_con (&p, f, b, e, ff);
+        set_tile (&p, f, b, e, ff);
       }
- end_con_loop:
+ end_tile_loop:
 
   al_destroy_config (c);
 
@@ -263,15 +263,15 @@ save_native_level (struct level *l, char *filename)
     al_free (v);
   }
 
-  /* CONSTRUCTIONS */
+  /* TILES */
   struct pos p; new_pos (&p, l, -1, -1, -1);
   for (p.room = 1; p.room < ROOMS; p.room++)
     for (p.floor = 0; p.floor < FLOORS; p.floor++)
       for (p.place = 0; p.place < PLACES; p.place++) {
-        /* Cr f p=f b e ff */
-        k = xasprintf ("C%i %i %i", p.room, p.floor, p.place);
+        /* Tr f p=f b e ff */
+        k = xasprintf ("T%i %i %i", p.room, p.floor, p.place);
         v = xasprintf ("%i %i %i %i", fg (&p), bg (&p),
-                   ext (&p), con (&p)->fake);
+                   ext (&p), tile (&p)->fake);
         al_set_config_value (c, NULL, k, v);
         al_free (k);
         al_free (v);
@@ -283,7 +283,7 @@ save_native_level (struct level *l, char *filename)
 }
 
 char *
-get_confg_str (struct pos *p)
+get_tile_fg_str (struct pos *p)
 {
   switch (fg (p)) {
   case NO_FLOOR: return "NO_FLOOR";
@@ -302,7 +302,7 @@ get_confg_str (struct pos *p)
   case WALL: return "WALL";
   case DOOR: return "DOOR";
   case LEVEL_DOOR: return "LEVEL_DOOR";
-  case CHOPPER: return "CHOPPER";
+  case CHOMPER: return "CHOMPER";
   case MIRROR: return "MIRROR";
   case CARPET: return "CARPET";
   case TCARPET: return "TCARPET";
@@ -316,15 +316,15 @@ get_confg_str (struct pos *p)
 }
 
 char *
-get_conbg_str (struct pos *p)
+get_tile_bg_str (struct pos *p)
 {
   switch (bg (p)) {
-  case NO_BG: return "NO_BG";
-  case BRICKS_00: return "BRICKS_00";
-  case BRICKS_01: return "BRICKS_01";
-  case BRICKS_02: return "BRICKS_02";
-  case BRICKS_03: return "BRICKS_03";
   case NO_BRICKS: return "NO_BRICKS";
+  case BRICKS_1: return "BRICKS_1";
+  case BRICKS_2: return "BRICKS_2";
+  case BRICKS_3: return "BRICKS_3";
+  case BRICKS_4: return "BRICKS_4";
+  case BRICKS_5: return "BRICKS_5";
   case TORCH: return "TORCH";
   case WINDOW: return "WINDOW";
   case BALCONY: return "BALCONY";
@@ -333,7 +333,7 @@ get_conbg_str (struct pos *p)
 }
 
 char *
-get_conext_str (struct pos *p)
+get_tile_ext_str (struct pos *p)
 {
   char *s = NULL;
   int e = ext (p);
@@ -357,32 +357,21 @@ get_conext_str (struct pos *p)
   case LOOSE_FLOOR:
     s = xasprintf ("%s", e ? "CANT_FALL" : "FALL");
     break;
-  case SPIKES_FLOOR: case DOOR: case LEVEL_DOOR: case CHOPPER:
+  case SPIKES_FLOOR: case DOOR: case LEVEL_DOOR: case CHOMPER:
     s = xasprintf ("%i", e);
     break;
   case OPENER_FLOOR: case CLOSER_FLOOR:
     s = xasprintf ("%i", e);
     break;
   case CARPET:
-    switch (e) {
-    case CARPET_00: s = "CARPET_00"; break;
-    case CARPET_01: s = "CARPET_01"; break;
-    case ARCH_CARPET_RIGHT_00: s = "ARCH_CARPET_RIGHT_00"; break;
-    case ARCH_CARPET_RIGHT_01: s = "ARCH_CARPET_RIGHT_01"; break;
-    case ARCH_CARPET_LEFT_00: s = "ARCH_CARPET_LEFT_00"; break;
-    case ARCH_CARPET_LEFT_01: s = "ARCH_CARPET_LEFT_01"; break;
-    default: assert (false); break;
-    }
-    if (s) s = xasprintf ("%s", s);
-    break;
   case TCARPET:
     switch (e) {
-    case CARPET_00: s = "CARPET_00"; break;
-    case CARPET_01: s = "CARPET_01"; break;
-    case ARCH_CARPET_RIGHT_00: s = "ARCH_CARPET_RIGHT_00"; break;
-    case ARCH_CARPET_RIGHT_01: s = "ARCH_CARPET_RIGHT_01"; break;
-    case ARCH_CARPET_LEFT_00: s = "ARCH_CARPET_LEFT_00"; break;
-    case ARCH_CARPET_LEFT_01: s = "ARCH_CARPET_LEFT_01"; break;
+    case 0: s = "1"; break;
+    case 1: s = "2"; break;
+    case 2: s = "3"; break;
+    case 3: s = "4"; break;
+    case 4: s = "5"; break;
+    case 5: s = "6"; break;
     default: assert (false); break;
     }
     if (s) s = xasprintf ("%s", s);

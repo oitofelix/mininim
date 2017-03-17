@@ -30,39 +30,6 @@ void cutscene_mode (bool val);
 void change_anim_freq (int f);
 
 
-
-
-int create_anim (struct anim *a0, enum anim_type t,
-                 struct pos *p, enum dir dir);
-void destroy_anim (struct anim *a);
-void destroy_anims (void);
-struct anim *get_next_controllable (struct anim *k);
-void select_controllable_by_id (int id);
-struct anim *get_reciprocal_enemy (struct anim *k);
-struct anim *get_anim_by_id (int id);
-struct anim *get_anim_dead_at_pos (struct pos *p);
-struct anim *get_guard_anim_by_level_id (int id);
-void draw_anim_frame (ALLEGRO_BITMAP *bitmap, struct anim *a, enum vm vm);
-void draw_anims (ALLEGRO_BITMAP *bitmap, enum em em, enum vm vm);
-int compare_anims (const void *a0, const void *a1);
-void draw_anim_if_at_pos (ALLEGRO_BITMAP *bitmap, struct anim *a,
-                          struct pos *p, enum vm vm);
-void clear_anims_keyboard_state (void);
-bool is_anim_dead (struct frame *f);
-bool is_anim_chopped (struct frame *f);
-bool is_anim_fall (struct frame *f);
-bool is_fightable_anim (struct anim *a);
-void anim_die_suddenly (struct anim *a);
-void anim_die_spiked (struct anim *a);
-void anim_die_chopped (struct anim *a);
-void anim_die (struct anim *a);
-void anim_sword_hit (struct anim *a);
-void anim_fall (struct anim *a);
-void anim_walkf (struct anim *a);
-void anim_walkb (struct anim *a);
-struct coord *splash_coord (struct frame *f, struct coord *c);
-
-
 
 void draw_frame (ALLEGRO_BITMAP *bitmap, struct frame *f);
 void draw_xframe (ALLEGRO_BITMAP *bitmap, struct frame *f,
@@ -75,27 +42,15 @@ struct frame *splash_frame (struct frame *f, struct frame *nf);
 struct frame *next_frame (struct frame *f, struct frame *nf,
                           struct frame_offset *fo);
 struct frame *prev_frame (struct frame *f, struct frame *pf);
-void select_frame (struct anim *a, struct frameset *fs, int i);
+void select_frame (struct actor *a, struct frameset *fs, int i);
 void select_xframe (struct frame_offset *xf, struct frameset *fs, int j);
 bool frame_eq (struct frame *f0, struct frame *f1);
 struct frame *invert_frame_dir (struct frame *f0, struct frame *f1);
 bool wait_anim (int cycles);
-ALLEGRO_COLOR start_anim_palette (ALLEGRO_COLOR c);
-bool uncollide_static_neutral (struct anim *a);
-bool uncollide_static_kid_normal (struct anim *a);
-bool uncollide_static_fall (struct anim *a);
-bool uncollide_static_die (struct anim *a);
-bool uncollide_static_fight (struct anim *a);
-bool is_colliding_front_fight (struct anim *a);
-bool is_colliding_back_fight (struct anim *a);
-bool uncollide_front_fight (struct anim *a);
-bool uncollide_back_fight (struct anim *a);
 
 
 /* variables */
 extern bool pause_anim;
-extern struct anim *anima;
-extern size_t anima_nmemb;
 extern enum quit_anim quit_anim; /* set to true to quit animation */
 extern bool next_frame_inv; /* invert draw_anim offset interpretation  */
 extern bool cutscene; /* don't apply physics if set */

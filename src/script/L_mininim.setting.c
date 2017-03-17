@@ -79,8 +79,7 @@ BEGIN_LUA (__index)
   default: break;
   }
 
-  lua_pushnil (L);
-  return 1;
+  return 0;
 }
 END_LUA
 
@@ -121,8 +120,10 @@ END_LUA
 void
 set_string_var (char **var, const char *value)
 {
-  al_free (*var);
-  *var = xasprintf ("%s", value);
+  char *old_str = *var;
+  if (value) *var = xasprintf ("%s", value);
+  else *var = NULL;
+  al_free (old_str);
 }
 
 void

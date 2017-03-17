@@ -25,7 +25,7 @@ static void draw_level (void);
 static void compute_level (void);
 static void cleanup_level (void);
 static void process_death (void);
-static void draw_lives (ALLEGRO_BITMAP *bitmap, struct anim *k, enum vm vm);
+static void draw_lives (ALLEGRO_BITMAP *bitmap, struct actor *k);
 
 /* variables */
 struct level vanilla_level;
@@ -127,7 +127,7 @@ guard_eq (struct guard *g0, struct guard *g1)
 }
 
 bool
-con_eq (struct con *c0, struct con *c1)
+tile_eq (struct tile *c0, struct tile *c1)
 {
   return fg_val (c0->fg) == fg_val (c1->fg)
     && bg_val (c0->bg) == bg_val (c1->bg)
@@ -166,8 +166,8 @@ level_eq (struct level *l0, struct level *l1)
   for (p.room = 0; p.room < ROOMS; p.room++)
     for (p.floor = 0; p.floor < FLOORS; p.floor++)
       for (p.place = 0; p.place < PLACES; p.place++)
-        if (! con_eq (&l0->con[p.room][p.floor][p.place],
-                      &l1->con[p.room][p.floor][p.place]))
+        if (! tile_eq (&l0->tile[p.room][p.floor][p.place],
+                      &l1->tile[p.room][p.floor][p.place]))
           return false;
 
   return true;
@@ -230,7 +230,7 @@ play_level (struct level *lv)
   apply_mr_fit_mode ();
 
   register_cons ();
-  register_anims ();
+  register_actors ();
 
   stop_audio_instances ();
   play_time_stopped = false;
@@ -260,7 +260,7 @@ play_level (struct level *lv)
     return;
   }
 
-  struct anim *k = get_anim_by_id (current_kid_id);
+  struct actor *k = get_actor_by_id (current_kid_id);
 
   switch (quit_anim) {
   default:
@@ -398,7 +398,7 @@ play_level (struct level *lv)
 }
 
 void *
-con_struct_at_pos (struct pos *p)
+tile_struct_at_pos (struct pos *p)
 {
   switch (fg (p)) {
   case LOOSE_FLOOR: return loose_floor_at_pos (p);
@@ -407,22 +407,22 @@ con_struct_at_pos (struct pos *p)
   case SPIKES_FLOOR: return spikes_floor_at_pos (p);;
   case DOOR: return door_at_pos (p);
   case LEVEL_DOOR: return level_door_at_pos (p);
-  case CHOPPER: return chopper_at_pos (p);
+  case CHOMPER: return chomper_at_pos (p);
   default: return NULL;
   }
 }
 
 bool
-should_init (struct con *c0, struct con *c1)
+should_init (struct tile *c0, struct tile *c1)
 {
   return fg_val (c0->fg) == fg_val (c1->fg)
     && ext_val (c0->fg, c0->ext) != ext_val (c1->fg, c1->ext);
 }
 
 void
-copy_to_con_state (union con_state *to, struct pos *from_pos)
+copy_to_tile_state (union tile_state *to, struct pos *from_pos)
 {
-  void *from = con_struct_at_pos (from_pos);
+  void *from = tile_struct_at_pos (from_pos);
   switch (fg (from_pos)) {
   case LOOSE_FLOOR: copy_loose_floor (&to->loose_floor, from); break;
   case OPENER_FLOOR: copy_opener_floor (&to->opener_floor, from); break;
@@ -430,15 +430,15 @@ copy_to_con_state (union con_state *to, struct pos *from_pos)
   case SPIKES_FLOOR: copy_spikes_floor (&to->spikes_floor, from); break;
   case DOOR: copy_door (&to->door, from); break;
   case LEVEL_DOOR: copy_level_door (&to->level_door, from); break;
-  case CHOPPER: copy_chopper (&to->chopper, from); break;
+  case CHOMPER: copy_chomper (&to->chomper, from); break;
   default: break;
   }
 }
 
 void
-copy_from_con_state (struct pos *to_pos, union con_state *from)
+copy_from_tile_state (struct pos *to_pos, union tile_state *from)
 {
-  void *to = con_struct_at_pos (to_pos);
+  void *to = tile_struct_at_pos (to_pos);
   switch (fg (to_pos)) {
   case LOOSE_FLOOR: copy_loose_floor (to, &from->loose_floor); break;
   case OPENER_FLOOR: copy_opener_floor (to, &from->opener_floor); break;
@@ -446,13 +446,13 @@ copy_from_con_state (struct pos *to_pos, union con_state *from)
   case SPIKES_FLOOR: copy_spikes_floor (to, &from->spikes_floor); break;
   case DOOR: copy_door (to, &from->door); break;
   case LEVEL_DOOR: copy_level_door (to, &from->level_door); break;
-  case CHOPPER: copy_chopper (to, &from->chopper); break;
+  case CHOMPER: copy_chomper (to, &from->chomper); break;
   default: break;
   }
 }
 
 void
-init_con_at_pos (struct pos *p)
+init_tile_at_pos (struct pos *p)
 {
   switch (fg (p)) {
   case LOOSE_FLOOR: init_loose_floor (p, loose_floor_at_pos (p)); break;
@@ -461,13 +461,13 @@ init_con_at_pos (struct pos *p)
   case SPIKES_FLOOR: init_spikes_floor (p, spikes_floor_at_pos (p)); break;
   case DOOR: init_door (p, door_at_pos (p)); break;
   case LEVEL_DOOR: init_level_door (p, level_door_at_pos (p)); break;
-  case CHOPPER: init_chopper (p, chopper_at_pos (p)); break;
+  case CHOMPER: init_chomper (p, chomper_at_pos (p)); break;
   default: break;
   }
 }
 
 void
-destroy_con_at_pos (struct pos *p)
+destroy_tile_at_pos (struct pos *p)
 {
   switch (fg (p)) {
   case LOOSE_FLOOR: remove_loose_floor (loose_floor_at_pos (p)); break;
@@ -476,7 +476,7 @@ destroy_con_at_pos (struct pos *p)
   case SPIKES_FLOOR: remove_spikes_floor (spikes_floor_at_pos (p)); break;
   case DOOR: remove_door (door_at_pos (p)); break;
   case LEVEL_DOOR: remove_level_door (level_door_at_pos (p)); break;
-  case CHOPPER: remove_chopper (chopper_at_pos (p)); break;
+  case CHOMPER: remove_chomper (chomper_at_pos (p)); break;
   default: break;
   }
 }
@@ -490,12 +490,12 @@ destroy_cons (void)
   destroy_array ((void **) &spikes_floor, &spikes_floor_nmemb);
   destroy_array ((void **) &door, &door_nmemb);
   destroy_array ((void **) &level_door, &level_door_nmemb);
-  destroy_array ((void **) &chopper, &chopper_nmemb);
+  destroy_array ((void **) &chomper, &chomper_nmemb);
   destroy_array ((void **) &mirror, &mirror_nmemb);
 }
 
 void
-register_con_at_pos (struct pos *p)
+register_tile_at_pos (struct pos *p)
 {
   switch (fg (p)) {
   case LOOSE_FLOOR: register_loose_floor (p); break;
@@ -504,7 +504,7 @@ register_con_at_pos (struct pos *p)
   case SPIKES_FLOOR: register_spikes_floor (p); break;
   case DOOR: register_door (p); break;
   case LEVEL_DOOR: register_level_door (p); break;
-  case CHOPPER: register_chopper (p); break;
+  case CHOMPER: register_chomper (p); break;
   default: break;
   }
 }
@@ -515,7 +515,7 @@ register_room (int room)
   struct pos p; new_pos (&p, &global_level, room, -1, -1);
   for (p.floor = 0; p.floor < FLOORS; p.floor++)
     for (p.place = 0; p.place < PLACES; p.place++)
-      register_con_at_pos (&p);
+      register_tile_at_pos (&p);
 }
 
 void
@@ -527,12 +527,12 @@ register_cons (void)
 }
 
 void
-register_anims (void)
+register_actors (void)
 {
   /* create kid */
   struct pos kid_start_pos; get_kid_start_pos (&kid_start_pos);
-  int id = create_anim (NULL, KID, &kid_start_pos, global_level.start_dir);
-  struct anim *k = &anima[id];
+  int id = create_actor (NULL, KID, &kid_start_pos, global_level.start_dir);
+  struct actor *k = &actor[id];
   k->total_lives = total_lives;
   k->skill = skill;
   k->current_lives = total_lives;
@@ -545,31 +545,31 @@ register_anims (void)
   int i;
   for (i = 0; i < GUARDS; i++) {
     struct guard *g = guard (&global_level, i);
-    struct anim *a;
+    struct actor *a;
     int id;
     switch (g->type) {
-    case NO_ANIM: continue;
+    case NO_ACTOR: continue;
     case KID:
-      id = create_anim (NULL, KID, &g->p, g->dir);
-      anima[id].shadow = true;
+      id = create_actor (NULL, KID, &g->p, g->dir);
+      actor[id].shadow = true;
       break;
     case GUARD: default:
-      id = create_anim (NULL, GUARD, &g->p, g->dir);
+      id = create_actor (NULL, GUARD, &g->p, g->dir);
       break;
     case FAT_GUARD:
-      id = create_anim (NULL, FAT_GUARD, &g->p, g->dir);
+      id = create_actor (NULL, FAT_GUARD, &g->p, g->dir);
       break;
     case VIZIER:
-      id = create_anim (NULL, VIZIER, &g->p, g->dir);
+      id = create_actor (NULL, VIZIER, &g->p, g->dir);
       break;
     case SKELETON:
-      id = create_anim (NULL, SKELETON, &g->p, g->dir);
+      id = create_actor (NULL, SKELETON, &g->p, g->dir);
       break;
     case SHADOW:
-      id = create_anim (NULL, SHADOW, &g->p, g->dir);
+      id = create_actor (NULL, SHADOW, &g->p, g->dir);
       break;
     }
-    a = &anima[id];
+    a = &actor[id];
     apply_guard_mode (a, gm);
     a->level_id = i;
     a->has_sword = true;
@@ -588,7 +588,7 @@ register_anims (void)
 void
 level_cleanup (void)
 {
-  destroy_anims ();
+  destroy_actors ();
   destroy_cons ();
   free_undo (&undo);
 }
@@ -596,7 +596,6 @@ level_cleanup (void)
 void
 load_level (void)
 {
-  load_room ();
   load_fire ();
   load_potion ();
   load_sword ();
@@ -609,7 +608,6 @@ load_level (void)
 void
 unload_level (void)
 {
-  unload_room ();
   unload_fire ();
   unload_potion ();
   unload_sword ();
@@ -629,8 +627,8 @@ compute_level (void)
 
   if (is_game_paused ()) return;
 
-  struct anim *k = get_anim_by_id (current_kid_id);
-  struct anim *ke = get_anim_by_id (k->enemy_id);
+  struct actor *k = get_actor_by_id (current_kid_id);
+  struct actor *ke = get_actor_by_id (k->enemy_id);
 
   struct replay *replay = get_replay ();
   replay_gamepad_update (k, replay, anim_cycle);
@@ -644,21 +642,21 @@ compute_level (void)
     k->ctrl_left = true;
     if (current_kid_id) next_fellow_shadow (-1);
     else create_fellow_shadow (! k->key.alt);
-    k = get_anim_by_id (current_kid_id);
-    ke = get_anim_by_id (k->enemy_id);
+    k = get_actor_by_id (current_kid_id);
+    ke = get_actor_by_id (k->enemy_id);
     k->ctrl_left = true;
   } else if (k->key.ctrl && k->key.right && ! k->ctrl_right) {
     k->ctrl_right = true;
     if (current_kid_id) next_fellow_shadow (+1);
     else create_fellow_shadow (! k->key.alt);
-    k = get_anim_by_id (current_kid_id);
-    ke = get_anim_by_id (k->enemy_id);
+    k = get_actor_by_id (current_kid_id);
+    ke = get_actor_by_id (k->enemy_id);
     k->ctrl_right = true;
   } else if (k->key.alt && k->key.up && ! k->alt_up) {
     k->alt_up = true;
     current_fellow_shadow ();
-    k = get_anim_by_id (current_kid_id);
-    ke = get_anim_by_id (k->enemy_id);
+    k = get_actor_by_id (current_kid_id);
+    ke = get_actor_by_id (k->enemy_id);
     k->alt_up = true;
   }
 
@@ -667,8 +665,8 @@ compute_level (void)
   if (k->shadow_of == 0 && k->current_lives <= 0) {
     if (k->death_timer++ > FELLOW_SHADOW_DEATH_WAIT_CYCLES) {
       k->death_timer = 0;
-      k = get_anim_by_id (k->shadow_of);
-      ke = get_anim_by_id (k->enemy_id);
+      k = get_actor_by_id (k->shadow_of);
+      ke = get_actor_by_id (k->enemy_id);
       select_controllable_by_id (k->id);
     }
   }
@@ -678,8 +676,8 @@ compute_level (void)
 
   int prev_room = k->f.c.room;
 
-  for (i = 0; i < anima_nmemb; i++) {
-    struct anim *a = &anima[i];
+  for (i = 0; i < actor_nmemb; i++) {
+    struct actor *a = &actor[i];
     a->splash = false;
     a->xf.b = NULL;
   }
@@ -687,14 +685,14 @@ compute_level (void)
   compute_loose_floors ();
 
   /* non-current controllables must defend themselves */
-  for (i = 0; i < anima_nmemb; i++) {
-    struct anim *ks = &anima[i];
+  for (i = 0; i < actor_nmemb; i++) {
+    struct actor *ks = &actor[i];
 
     if ((ks->id != 0 && ks->shadow_of != 0)
         || ks->id == current_kid_id
         || ! is_in_fight_mode (ks)) continue;
 
-    struct anim *kse = get_reciprocal_enemy (ks);
+    struct actor *kse = get_reciprocal_enemy (ks);
     if (kse && kse->refraction > 3
         && ! is_in_range (ks, kse, FIGHT_RANGE)) {
       if (ks->f.dir == LEFT) ks->key.left = true;
@@ -703,24 +701,24 @@ compute_level (void)
   }
 
   /* fight AI */
-  for (i = 0; i < anima_nmemb; i++) enter_fight_logic (&anima[i]);
-  for (i = 0; i < anima_nmemb; i++) leave_fight_logic (&anima[i]);
-  for (i = 0; i < anima_nmemb; i++) fight_ai (&anima[i]);
+  for (i = 0; i < actor_nmemb; i++) enter_fight_logic (&actor[i]);
+  for (i = 0; i < actor_nmemb; i++) leave_fight_logic (&actor[i]);
+  for (i = 0; i < actor_nmemb; i++) fight_ai (&actor[i]);
 
   /* actions */
-  for (i = 0; i < anima_nmemb; i++) {
-    if (anima[i].next_action) {
-      anima[i].next_action (&anima[i]);
-      anima[i].next_action = NULL;
-    } else anima[i].action (&anima[i]);
+  for (i = 0; i < actor_nmemb; i++) {
+    if (actor[i].next_action) {
+      actor[i].next_action (&actor[i]);
+      actor[i].next_action = NULL;
+    } else actor[i].action (&actor[i]);
   }
 
   /* fight mechanics */
-  for (i = 0; i < anima_nmemb; i++) fight_mechanics (&anima[i]);
+  for (i = 0; i < actor_nmemb; i++) fight_mechanics (&actor[i]);
 
   /* timers */
-  for (i = 0; i < anima_nmemb; i++) {
-    struct anim *a = &anima[i];
+  for (i = 0; i < actor_nmemb; i++) {
+    struct actor *a = &actor[i];
     if (a->float_timer && a->float_timer < FLOAT_TIMER_MAX) {
       request_gamepad_rumble (0.5 * (sin (a->float_timer * 0.17) + 1),
                               1.0 / DEFAULT_HZ);
@@ -733,18 +731,18 @@ compute_level (void)
   }
 
   /* appropriately turn controllables */
-  for (i = 0; i < anima_nmemb; i++) {
-    struct anim *ks = &anima[i];
+  for (i = 0; i < actor_nmemb; i++) {
+    struct actor *ks = &actor[i];
     if (ks->id == 0 || ks->shadow_of == 0)
       fight_turn_controllable (ks);
   }
 
   /* collision enforcement */
-  for (i = 0; i < anima_nmemb; i++) {
-    enforce_wall_collision (&anima[i].f);
+  for (i = 0; i < actor_nmemb; i++) {
+    enforce_wall_collision (&actor[i].f);
   }
 
-  clear_anims_keyboard_state ();
+  clear_actors_keyboard_state ();
 
   if (k->f.c.room != prev_room
       && k->f.c.room != 0
@@ -787,7 +785,7 @@ compute_level (void)
   compute_spikes_floors ();
   compute_doors ();
   compute_level_doors ();
-  compute_choppers ();
+  compute_chompers ();
 
   register_changed_opener_floors ();
   register_changed_closer_floors ();
@@ -805,7 +803,7 @@ cleanup_level (void)
 static void
 process_death (void)
 {
-  struct anim *k = get_anim_by_id (0);
+  struct actor *k = get_actor_by_id (0);
 
   /* Restart level after death */
   if (k->current_lives <= 0
@@ -849,7 +847,7 @@ draw_level (void)
 {
   draw_multi_rooms ();
 
-  draw_lives (uscreen, get_anim_by_id (current_kid_id), vm);
+  draw_lives (uscreen, get_actor_by_id (current_kid_id));
 
   /* automatic level display */
   if (! title_demo && global_level.nominal_n >= 0
@@ -881,18 +879,18 @@ draw_level (void)
 }
 
 static void
-draw_lives (ALLEGRO_BITMAP *bitmap, struct anim *k, enum vm vm)
+draw_lives (ALLEGRO_BITMAP *bitmap, struct actor *k)
 {
   bool nrlc = no_recursive_links_continuity;
   no_recursive_links_continuity = true;
 
   if (is_room_visible (k->f.c.room)) {
-    draw_kid_lives (bitmap, k, vm);
-    struct anim *ke = NULL;
+    draw_kid_lives (bitmap, k);
+    struct actor *ke = NULL;
     if (k->enemy_id != -1) {
-      ke = get_anim_by_id (k->enemy_id);
+      ke = get_actor_by_id (k->enemy_id);
       if (ke && ke->enemy_id == k->id)
-        draw_guard_lives (bitmap, ke, vm);
+        draw_guard_lives (bitmap, ke);
     }
   }
 
@@ -915,7 +913,7 @@ is_game_paused (void)
 void
 next_level (void)
 {
-  struct anim *k = get_anim_by_id (current_kid_id);
+  struct actor *k = get_actor_by_id (current_kid_id);
 
   total_lives = k->total_lives;
   current_lives = k->current_lives;

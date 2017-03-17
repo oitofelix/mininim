@@ -87,7 +87,7 @@ void create_load_replay_thread (void);
 void handle_load_replay_thread (int priority);
 void stop_replaying (int priority);
 void set_replay_mode_at_level_start (struct replay *replay);
-void replay_gamepad_update (struct anim *a, struct replay *replay,
+void replay_gamepad_update (struct actor *a, struct replay *replay,
                             uint64_t cycle);
 void print_replay_mode (int priority);
 bool check_valid_replay_chain_pair (struct replay *r0, struct replay *r1);

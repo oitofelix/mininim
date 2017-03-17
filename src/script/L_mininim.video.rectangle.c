@@ -64,22 +64,24 @@ BEGIN_LUA (L_mininim_video_rectangle)
 {
   struct coord *c = luaL_checkudata (L, 1, L_MININIM_VIDEO_COORDINATE);
 
-  int x, y, w, h;
+  int room, x, y, w, h;
 
   if (c) {
+    room = c->room;
     x = c->x;
     y = c->y;
     w = lua_tonumber (L, 2);
     h = luaL_checknumber (L, 3);
   } else {
-    x = lua_tonumber (L, 1);
-    y = lua_tonumber (L, 2);
-    w = lua_tonumber (L, 3);
-    h = lua_tonumber (L, 4);
+    room = lua_tonumber (L, 1);
+    x = lua_tonumber (L, 2);
+    y = lua_tonumber (L, 3);
+    w = lua_tonumber (L, 4);
+    h = lua_tonumber (L, 5);
   }
 
   struct rect r;
-  new_rect (&r, room_view, x, y, w, h);
+  new_rect (&r, room, x, y, w, h);
   L_pushrectangle (L, &r);
   return 1;
 }
@@ -89,11 +91,8 @@ BEGIN_LUA (__eq)
 {
   struct rect *r0 = luaL_checkudata (L, 1, L_MININIM_VIDEO_RECTANGLE);
   struct rect *r1 = luaL_checkudata (L, 2, L_MININIM_VIDEO_RECTANGLE);
-  if (r0 && r1) {
-    r0->c.room = room_view;
-    r1->c.room = room_view;
-    lua_pushboolean (L, rect_eq (r0, r1));
-  } else lua_pushboolean (L, lua_rawequal (L, 1, 2));
+  if (r0 && r1) lua_pushboolean (L, rect_eq (r0, r1));
+  else lua_pushboolean (L, lua_rawequal (L, 1, 2));
   return 1;
 }
 END_LUA
@@ -102,10 +101,7 @@ BEGIN_LUA (__index)
 {
   struct rect *r = luaL_checkudata (L, 1, L_MININIM_VIDEO_RECTANGLE);
 
-  if (! r) {
-    lua_pushnil (L);
-    return 1;
-  }
+  if (! r) return 0;
 
   const char *key;
   int type = lua_type (L, 2);
@@ -114,6 +110,9 @@ BEGIN_LUA (__index)
     key = lua_tostring (L, 2);
     if (! strcasecmp (key, "coordinate")) {
       L_pushcoordinate (L, &r->c);
+      return 1;
+    } else if (! strcasecmp (key, "room")) {
+      lua_pushnumber (L, r->c.room);
       return 1;
     } else if (! strcasecmp (key, "x")) {
       lua_pushnumber (L, r->c.x);
@@ -135,8 +134,7 @@ BEGIN_LUA (__index)
   default: break;
   }
 
-  lua_pushnil (L);
-  return 1;
+  return 0;
 }
 END_LUA
 
@@ -155,6 +153,9 @@ BEGIN_LUA (__newindex)
       struct coord *c =luaL_checkudata (L, 3, L_MININIM_VIDEO_COORDINATE);
       if (! c) return 0;
       r->c = *c;
+      return 0;
+    } else if (! strcasecmp (key, "room")) {
+      r->c.room = lua_tonumber (L, 3);
       return 0;
     } else if (! strcasecmp (key, "x")) {
       r->c.x = lua_tonumber (L, 3);

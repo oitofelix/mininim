@@ -30,31 +30,29 @@
 void load_kid (void);
 void unload_kid (void);
 struct pos *get_kid_start_pos (struct pos *p);
-struct anim *create_kid (struct anim *k0, struct anim *k1,
+struct actor *create_kid (struct actor *k0, struct actor *k1,
                          struct pos *p, enum dir dir);
-void destroy_kid (struct anim *k);
-void draw_kid_frame (ALLEGRO_BITMAP *bitmap, struct anim *k,
-                     enum vm);
-void draw_start_kid (ALLEGRO_BITMAP *bitmap, enum vm vm);
-void draw_kid_lives (ALLEGRO_BITMAP *bitmap, struct anim *k,
-                     enum vm vm);
-void draw_kid_if_at_pos (ALLEGRO_BITMAP *bitmap, struct anim *k, struct pos *p,
-                         enum vm vm);
-palette get_kid_palette (enum vm vm);
-palette get_shadow_palette (enum vm vm);
+void destroy_kid (struct actor *k);
+void draw_kid_frame (ALLEGRO_BITMAP *bitmap, struct actor *k);
+void draw_start_kid (ALLEGRO_BITMAP *bitmap);
+void draw_kid_lives (ALLEGRO_BITMAP *bitmap, struct actor *k);
+void draw_kid_if_at_pos (ALLEGRO_BITMAP *bitmap, struct actor *k,
+                         struct pos *p);
+palette get_kid_palette (void);
+palette get_shadow_palette (void);
 ALLEGRO_COLOR colorful_shadow_palette (ALLEGRO_COLOR c);
 ALLEGRO_COLOR v_phantom_shadow_palette (ALLEGRO_COLOR c);
 ALLEGRO_COLOR e_phantom_shadow_palette (ALLEGRO_COLOR c);
 ALLEGRO_COLOR c_phantom_shadow_palette (ALLEGRO_COLOR c);
-void increase_kid_current_lives (struct anim *k);
-void increase_kid_total_lives (struct anim *k);
-void float_kid (struct anim *k);
+void increase_kid_current_lives (struct actor *k);
+void increase_kid_total_lives (struct actor *k);
+void float_kid (struct actor *k);
 ALLEGRO_COLOR get_flicker_blood_color (void);
 ALLEGRO_COLOR get_flicker_raise_sword_color (void);
 ALLEGRO_COLOR get_flicker_float_color (void);
 void kid_debug (void);
-void place_kid (struct anim *k, int room, int floor, int place);
-void kid_haptic (struct anim *k, double duration);
+void place_kid (struct actor *k, int room, int floor, int place);
+void kid_haptic (struct actor *k, double duration);
 void kid_haptic_for_range (struct pos *p, coord_f cf, double r,
                            double duration);
 

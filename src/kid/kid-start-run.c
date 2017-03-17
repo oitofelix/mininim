@@ -20,58 +20,15 @@
 
 #include "mininim.h"
 
-struct frameset kid_start_run_frameset[KID_START_RUN_FRAMESET_NMEMB];
-
-static void init_kid_start_run_frameset (void);
-static bool flow (struct anim *k);
-static bool physics_in (struct anim *k);
-static void physics_out (struct anim *k);
-
-ALLEGRO_BITMAP *kid_start_run_00, *kid_start_run_01, *kid_start_run_02,
-  *kid_start_run_03, *kid_start_run_04, *kid_start_run_05;
-
-static void
-init_kid_start_run_frameset (void)
-{
-  struct frameset frameset[KID_START_RUN_FRAMESET_NMEMB] =
-    {{kid_start_run_00,-1,0},{kid_start_run_01,-2,0},
-     {kid_start_run_02,-5,0},{kid_start_run_03,-1,0},
-     {kid_start_run_04,-7,0},{kid_start_run_05,-6,0}};
-
-  memcpy (&kid_start_run_frameset, &frameset,
-          KID_START_RUN_FRAMESET_NMEMB * sizeof (struct frameset));
-}
+static bool flow (struct actor *k);
+static bool physics_in (struct actor *k);
+static void physics_out (struct actor *k);
 
 void
-load_kid_start_run (void)
-{
-  /* bitmaps */
-  kid_start_run_00 = load_bitmap (KID_START_RUN_00);
-  kid_start_run_01 = load_bitmap (KID_START_RUN_01);
-  kid_start_run_02 = load_bitmap (KID_START_RUN_02);
-  kid_start_run_03 = load_bitmap (KID_START_RUN_03);
-  kid_start_run_04 = load_bitmap (KID_START_RUN_04);
-  kid_start_run_05 = load_bitmap (KID_START_RUN_05);
-
-  /* frameset */
-  init_kid_start_run_frameset ();
-}
-
-void
-unload_kid_start_run (void)
-{
-  destroy_bitmap (kid_start_run_00);
-  destroy_bitmap (kid_start_run_01);
-  destroy_bitmap (kid_start_run_02);
-  destroy_bitmap (kid_start_run_03);
-  destroy_bitmap (kid_start_run_04);
-  destroy_bitmap (kid_start_run_05);
-}
-
-void
-kid_start_run (struct anim *k)
+kid_start_run (struct actor *k)
 {
   k->oaction = k->action;
+  k->oi = k->i;
   k->action = kid_start_run;
   k->f.flip = (k->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
@@ -82,18 +39,18 @@ kid_start_run (struct anim *k)
 }
 
 static bool
-flow (struct anim *k)
+flow (struct actor *k)
 {
   if (k->oaction != kid_start_run) k->i = -1, k->misstep = false;
 
   bool run = (k->f.dir == RIGHT) ? k->key.right : k->key.left;
   bool turn_run = (k->f.dir == RIGHT) ? k->key.left : k->key.right;
-  bool couch = k->key.down;
+  bool crouch = k->key.down;
   bool jump = ((k->f.dir == RIGHT) && k->key.right && k->key.up)
     || ((k->f.dir == LEFT) && k->key.left && k->key.up);
 
-  if (couch) {
-    kid_couch (k);
+  if (crouch) {
+    kid_crouch (k);
     return false;
   }
 
@@ -113,19 +70,13 @@ flow (struct anim *k)
     return false;
   }
 
-  select_frame (k, kid_start_run_frameset, k->i + 1);
-
-  if (k->f.b == kid_turn_frameset[3].frame) k->fo.dx = +0;
-  if (k->f.b == kid_stabilize_frameset[0].frame) k->fo.dx = +2;
-  if (k->f.b == kid_stabilize_frameset[1].frame) k->fo.dx = +6;
-  if (k->f.b == kid_stabilize_frameset[2].frame) k->fo.dx = +4;
-  if (k->f.b == kid_stabilize_frameset[3].frame) k->fo.dx = +0;
+  select_actor_frame (k, "KID", "START_RUN", k->i + 1);
 
   return true;
 }
 
 static bool
-physics_in (struct anim *k)
+physics_in (struct actor *k)
 {
   /* inertia */
   k->inertia = 0;
@@ -148,18 +99,9 @@ physics_in (struct anim *k)
 }
 
 static void
-physics_out (struct anim *k)
+physics_out (struct actor *k)
 {
   /* depressible floors */
   if (k->i == 5) update_depressible_floor (k, -16, -19);
   else keep_depressible_floor (k);
-}
-
-bool
-is_kid_start_run (struct frame *f)
-{
-  int i;
-  for (i = 0; i < KID_START_RUN_FRAMESET_NMEMB; i++)
-    if (f->b == kid_start_run_frameset[i].frame) return true;
-  return false;
 }

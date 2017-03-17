@@ -59,7 +59,7 @@ void unload_clock (void);
 ALLEGRO_COLOR c_clock_sand_palette (ALLEGRO_COLOR c);
 ALLEGRO_COLOR e_clock_sand_palette (ALLEGRO_COLOR c);
 ALLEGRO_COLOR v_clock_sand_palette (ALLEGRO_COLOR c);
-void draw_clock (ALLEGRO_BITMAP *bitmap, int i, enum vm vm);
+void draw_clock (ALLEGRO_BITMAP *bitmap, int i);
 int get_clock_by_time_left (void);
 
 /* variables */

@@ -35,11 +35,11 @@
 #define HARM_AUDIO "data/audio/harm.ogg"
 #define SCREAM_AUDIO "data/audio/scream.ogg"
 #define SPIKED_AUDIO "data/audio/spiked.ogg"
-#define CHOPPED_AUDIO "data/audio/chopped.ogg"
+#define CHOMPED_AUDIO "data/audio/chomped.ogg"
 #define PRESS_KEY_AUDIO "data/audio/press-key.ogg"
 #define MIRROR_AUDIO "data/audio/mirror.ogg"
 #define SWORD_DEFENSE_AUDIO "data/audio/sword-defense.ogg"
-#define CHOPPER_AUDIO "data/audio/chopper.ogg"
+#define CHOMPER_AUDIO "data/audio/chomper.ogg"
 #define DOOR_OPEN_AUDIO "data/audio/door-open.ogg"
 #define DOOR_CLOSE_AUDIO "data/audio/door-close.ogg"
 #define DOOR_END_AUDIO "data/audio/door-end.ogg"
@@ -97,11 +97,11 @@ extern struct audio_source
   harm_audio,
   scream_audio,
   spiked_audio,
-  chopped_audio,
+  chomped_audio,
   press_key_audio,
   mirror_audio,
   sword_defense_audio,
-  chopper_audio,
+  chomper_audio,
   door_open_audio,
   door_close_audio,
   door_end_audio,

@@ -35,7 +35,8 @@ void link_room (struct level *l, int room0, int room1, enum dir dir);
 void mirror_link (struct level *l, int room, enum dir dir0, enum dir dir1);
 int room_dist (struct level *l, int r0, int r1, int max);
 int min_room_dist (struct room_dist room[], int *dmax);
-struct coord *new_coord (struct coord *c, struct level *l, int room, int x, int y);
+struct coord *new_coord (struct coord *c, struct level *l, int room,
+                         double x, double y);
 struct coord *invalid_coord (struct coord *c);
 bool is_valid_coord (struct coord *c);
 bool coord_eq (struct coord *_c0, struct coord *_c1);
@@ -79,7 +80,7 @@ enum dir opposite_dir (enum dir dir);
 enum dir perpendicular_dir (enum dir dir, int n);
 
 struct coord *
-con_coord (struct pos *p, coord_f cf, struct coord *c);
+tile_coord (struct pos *p, coord_f cf, struct coord *c);
 
 struct dim *dim (struct frame *f, struct dim *d);
 struct coord *_m (struct frame *f, struct coord *c);

@@ -24,6 +24,7 @@
 #define L_INVOKED_EVENT -2
 #define L_BREAK_EVENT -3
 #define L_WATCH_EVENT -4
+#define FULL_TRACEBACK_MAX_FRAMES 32
 
 bool L_debugging;
 ALLEGRO_COND *debug_cond;
@@ -51,6 +52,8 @@ struct debugger_break {
 } *debugger_break;
 size_t debugger_break_nmemb;
 
+static int upvalue_index_by_name (lua_State *L, int level, const char *name);
+static int local_index_by_name (lua_State *L, int level, const char *name);
 static void start_debugging (void);
 static void stop_debugging (void);
 static bool are_there_active_breaks (void);
@@ -59,7 +62,6 @@ static void enable_all_debugger_breaks (lua_State *L, bool enabled);
 static bool delete_debugger_break (lua_State *L, int id);
 static void delete_all_debugger_breaks (lua_State *L);
 static void invoke_debugger (lua_State *L, int event, enum debug_action a);
-static int starting_frame (int event);
 static void print_full_backtrace (lua_State *L, int event);
 static void print_compact_backtrace (lua_State *L, int event);
 static char *value_tostring (lua_State *L, int index);
@@ -132,7 +134,7 @@ define_L_mininim_debugger (lua_State *L)
   lua_register (L, "_cbt", cbt);
 
   /* Backtrace on error */
-  set_string_var (&bt_on_error, "COMPACT");
+  set_string_var (&bt_on_error, "FULL");
 
   lua_pop (L, 1);
 }
@@ -208,8 +210,7 @@ BEGIN_LUA (__index)
   default: break;
   }
 
-  lua_pushnil (L);
-  return 1;
+  return 0;
 }
 END_LUA
 
@@ -471,28 +472,30 @@ BEGIN_LUA (getlocal)
   int nargs = lua_gettop (L);
   int level;
   int local;
+  int arglocaln;
 
   if (nargs == 1) {
     level = 0;
-    local = luaL_checknumber (L, 1);
+    arglocaln = 1;
   } else {
     level = luaL_checknumber (L, 1);
-    local = luaL_checknumber (L, 2);
+    arglocaln = 2;
   }
 
+  if (lua_isnumber (L, arglocaln)) local = lua_tonumber (L, arglocaln);
+  else if (lua_isstring (L, arglocaln))
+    local = local_index_by_name (main_L, level, lua_tostring (L, arglocaln));
+  else return luaL_argerror (L, arglocaln, "expecting local index or name");
+
   lua_Debug ar;
-  if (! lua_getstack (main_L, level, &ar))
-    return luaL_error (L, "level %d out of range", level);
+  if (! lua_getstack (main_L, level, &ar)) return 0;
 
   const char *name = lua_getlocal (main_L, &ar, local);
 
   if (name) {
     lua_xmove (main_L, L, 1);
     return 1;
-  } else {
-    lua_pushnil (L);
-    return 1;
-  }
+  } else return 0;
 }
 END_LUA
 
@@ -501,18 +504,23 @@ BEGIN_LUA (getupvalue)
   int nargs = lua_gettop (L);
   int level;
   int up;
+  int argupn;
 
   if (nargs == 1) {
     level = 0;
-    up = luaL_checknumber (L, 1);
+    argupn = 1;
   } else {
     level = luaL_checknumber (L, 1);
-    up = luaL_checknumber (L, 2);
+    argupn = 2;
   }
 
+  if (lua_isnumber (L, argupn)) up = lua_tonumber (L, argupn);
+  else if (lua_isstring (L, argupn))
+    up = upvalue_index_by_name (main_L, level, lua_tostring (L, argupn));
+  else return luaL_argerror (L, argupn, "expecting upvalue index or name");
+
   lua_Debug ar;
-  if (! lua_getstack (main_L, level, &ar))
-    return luaL_error (L, "level %d out of range", level);
+  if (! lua_getstack (main_L, level, &ar)) return 0;
 
   lua_getinfo (main_L, "f", &ar);
   const char *name = lua_getupvalue (main_L, -1, up);
@@ -523,8 +531,7 @@ BEGIN_LUA (getupvalue)
     return 1;
   } else {
     lua_pop (main_L, 1);
-    lua_pushnil (L);
-    return 1;
+    return 0;
   }
 }
 END_LUA
@@ -534,20 +541,26 @@ BEGIN_LUA (setlocal)
   int nargs = lua_gettop (L);
   int level;
   int local;
+  int arglocaln;
 
   if (nargs == 2) {
     level = 0;
-    local = luaL_checknumber (L, 1);
-    lua_pushvalue (L, 2);
+    arglocaln = 1;
   } else {
     level = luaL_checknumber (L, 1);
-    local = luaL_checknumber (L, 2);
-    luaL_checkany(L, 3);
+    arglocaln = 2;
   }
 
+  if (lua_isnumber (L, arglocaln)) local = lua_tonumber (L, arglocaln);
+  else if (lua_isstring (L, arglocaln))
+    local = local_index_by_name (main_L, level, lua_tostring (L, arglocaln));
+  else return luaL_argerror (L, arglocaln, "expecting local index or name");
+
+  /* check new value */
+  luaL_checkany(L, arglocaln + 1);
+
   lua_Debug ar;
-  if (! lua_getstack (main_L, level, &ar))
-    return luaL_error (L, "level %d out of range", level);
+  if (! lua_getstack (main_L, level, &ar)) return 0;
 
   lua_xmove (L, main_L, 1);
   const char *name = lua_setlocal (main_L, &ar, local);
@@ -561,25 +574,31 @@ BEGIN_LUA (setupvalue)
 {
   int nargs = lua_gettop (L);
   int level;
-  int local;
+  int up;
+  int argupn;
 
   if (nargs == 2) {
     level = 0;
-    local = luaL_checknumber (L, 1);
-    lua_pushvalue (L, 2);
+    argupn = 1;
   } else {
     level = luaL_checknumber (L, 1);
-    local = luaL_checknumber (L, 2);
-    luaL_checkany(L, 3);
+    argupn = 2;
   }
 
+  if (lua_isnumber (L, argupn)) up = lua_tonumber (L, argupn);
+  else if (lua_isstring (L, argupn))
+    up = upvalue_index_by_name (main_L, level, lua_tostring (L, argupn));
+  else return luaL_argerror (L, argupn, "expecting upvalue index or name");
+
+  /* check new value */
+  luaL_checkany(L, argupn + 1);
+
   lua_Debug ar;
-  if (! lua_getstack (main_L, level, &ar))
-    return luaL_error (L, "level %d out of range", level);
+  if (! lua_getstack (main_L, level, &ar)) return 0;
 
   lua_getinfo (main_L, "f", &ar);
   lua_xmove (L, main_L, 1);
-  const char *name = lua_setupvalue (main_L, -2, local);
+  const char *name = lua_setupvalue (main_L, -2, up);
   lua_pop (main_L, 1);
 
   lua_pushstring (L, name);
@@ -590,7 +609,8 @@ END_LUA
 BEGIN_LUA (L_TRACEBACK)
 {
   char *report;
-  if (! strcmp (bt_on_error, "FULL"))
+  if (! strcmp (bt_on_error, "FULL")
+      && get_nframes (L) <= FULL_TRACEBACK_MAX_FRAMES)
     report = get_full_backtrace_report (L, L_ERROR_EVENT);
   else report = get_compact_backtrace_report (L, L_ERROR_EVENT);
 
@@ -604,6 +624,42 @@ BEGIN_LUA (L_TRACEBACK)
   return 1;
 }
 END_LUA
+
+int
+upvalue_index_by_name (lua_State *L, int level, const char *name)
+{
+  lua_Debug ar;
+  if (! lua_getstack (L, level, &ar)) return -1;
+
+  lua_getinfo (L, "f", &ar);
+
+  const char *cname;
+  int up = 0;
+  do {
+    cname = lua_getupvalue (L, -1, ++up);
+    lua_pop (L, 1);
+  } while (cname && strcmp (name, cname));
+
+  lua_pop (L, 1);
+
+  return cname ? up : -1;
+}
+
+int
+local_index_by_name (lua_State *L, int level, const char *name)
+{
+  lua_Debug ar;
+  if (! lua_getstack (L, level, &ar)) return -1;
+
+  const char *cname;
+  int local = 0;
+  do {
+    cname = lua_getlocal (L, &ar, ++local);
+    lua_pop (L, 1);
+  } while (cname && strcmp (name, cname));
+
+  return cname ? local : -1;
+}
 
 bool
 are_there_active_breaks (void)
@@ -705,13 +761,6 @@ invoke_debugger (lua_State *L, int event, enum debug_action a)
   ar.event = event;
   debug.action = a;
   debugger_hook (L, &ar);
-}
-
-int
-starting_frame (int event)
-{
-  return event == L_ERROR_EVENT || event == L_INVOKED_EVENT
-    ? 1 : 0;
 }
 
 void
@@ -957,7 +1006,7 @@ get_frame_header (lua_State *L, int level, int event)
   char *header = xasprintf ("#%i %s", level, id);
   al_free (id);
 
-  if (level == starting_frame (event)) {
+  if (level == 0) {
     char *old_header = header;
     header = xasprintf ("%s %s", old_header, event_tostring (event));
     al_free (old_header);
@@ -1083,9 +1132,8 @@ get_full_backtrace_report (lua_State *L, int event)
 {
   int nframes = get_nframes (L);
   int level;
-  int zframe = starting_frame (event);
   char *report = xasprintf ("");
-  for (level = nframes; level >= zframe; level--) {
+  for (level = nframes; level >= 0; level--) {
     lua_Debug ar;
     lua_getstack (L, level, &ar);
     lua_getinfo (L, "Snl", &ar);
@@ -1169,9 +1217,8 @@ get_compact_backtrace_report (lua_State *L, int event)
 {
   int nframes = get_nframes (L);
   int level;
-  int zframe = starting_frame (event);
   char *report = xasprintf ("");
-  for (level = nframes; level >= zframe; level--) {
+  for (level = nframes; level >= 0; level--) {
     lua_Debug ar;
     lua_getstack (L, level, &ar);
     lua_getinfo (L, "Snl", &ar);
@@ -1284,26 +1331,14 @@ debugger_hook (lua_State *L, lua_Debug *ar)
   case DEBUG_WATCH: break;
   case DEBUG_INVOKED: break;
   case DEBUG_STOPPED: default: assert (false); break;
-  case DEBUG_STEP:
-    if (event == LUA_HOOKRET) {
-      int nframes = get_nframes (L) - starting_frame (event);
-      if (nframes <= debug.nframes) break;
-      else goto end;
-    }
-    break;
+  case DEBUG_STEP: break;
   case DEBUG_NEXT: {
-    if (event == LUA_HOOKRET) {
-      int nframes = get_nframes (L) - starting_frame (event);
-      if (nframes < debug.nframes) break;
-      else goto end;
-    } else {
-      int nframes = get_nframes (L) - starting_frame (event);
-      if (nframes <= debug.nframes) break;
-      else goto end;
-    }
+    int nframes = get_nframes (L);
+    if (nframes <= debug.nframes) break;
+    else goto end;
   }
   case DEBUG_FINISH: {
-    int nframes = get_nframes (L) - starting_frame (event);
+    int nframes = get_nframes (L);
     if (nframes < debug.nframes) break;
     else goto end;
   }
@@ -1313,7 +1348,7 @@ debugger_hook (lua_State *L, lua_Debug *ar)
 
   print_full_backtrace (L, event);
 
-  debug.nframes = get_nframes (L) - starting_frame (event);
+  debug.nframes = get_nframes (L);
   debug.action = DEBUG_STOPPED;
 
   repl_update_prompt ();

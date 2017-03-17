@@ -20,56 +20,15 @@
 
 #include "mininim.h"
 
-struct frameset kid_sword_hit_frameset[KID_SWORD_HIT_FRAMESET_NMEMB];
-
-static void init_kid_sword_hit_frameset (void);
-static bool flow (struct anim *k);
-static bool physics_in (struct anim *k);
-static void physics_out (struct anim *k);
-
-ALLEGRO_BITMAP *kid_sword_hit_00, *kid_sword_hit_01,
-  *kid_sword_hit_02, *kid_sword_hit_03, *kid_sword_hit_04;
-
-static void
-init_kid_sword_hit_frameset (void)
-{
-  struct frameset frameset[KID_SWORD_HIT_FRAMESET_NMEMB] =
-    {{kid_sword_hit_00,+0,0},{kid_sword_hit_01,+0,0},
-     {kid_sword_hit_02,+4,0},{kid_sword_hit_03,+8,0},
-     {kid_sword_hit_04,+8,0}};
-
-  memcpy (&kid_sword_hit_frameset, &frameset,
-          KID_SWORD_HIT_FRAMESET_NMEMB * sizeof (struct frameset));
-}
+static bool flow (struct actor *k);
+static bool physics_in (struct actor *k);
+static void physics_out (struct actor *k);
 
 void
-load_kid_sword_hit (void)
-{
-  /* bitmaps */
-  kid_sword_hit_00 = load_bitmap (KID_SWORD_HIT_00);
-  kid_sword_hit_01 = load_bitmap (KID_SWORD_HIT_01);
-  kid_sword_hit_02 = load_bitmap (KID_SWORD_HIT_02);
-  kid_sword_hit_03 = load_bitmap (KID_SWORD_HIT_03);
-  kid_sword_hit_04 = load_bitmap (KID_SWORD_HIT_04);
-
-  /* frameset */
-  init_kid_sword_hit_frameset ();
-}
-
-void
-unload_kid_sword_hit (void)
-{
-  destroy_bitmap (kid_sword_hit_00);
-  destroy_bitmap (kid_sword_hit_01);
-  destroy_bitmap (kid_sword_hit_02);
-  destroy_bitmap (kid_sword_hit_03);
-  destroy_bitmap (kid_sword_hit_04);
-}
-
-void
-kid_sword_hit (struct anim *k)
+kid_sword_hit (struct actor *k)
 {
   k->oaction = k->action;
+  k->oi = k->i;
   k->action = kid_sword_hit;
   k->f.flip = (k->f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
@@ -80,7 +39,7 @@ kid_sword_hit (struct anim *k)
 }
 
 static bool
-flow (struct anim *k)
+flow (struct actor *k)
 {
   if (k->oaction != kid_sword_hit) {
     survey (_m, pos, &k->f, NULL, &k->p, NULL);
@@ -94,7 +53,7 @@ flow (struct anim *k)
     prel (&k->p, &pb, 0, d);
 
     if (k->current_lives > 0) kid_sword_normal (k);
-    else if (is_strictly_traversable (&pb)) {
+    else if (is_traversable (&pb)) {
         place_at_pos (&k->f, _m, &pb, &k->f.c);
         kid_fall (k);
     } else kid_die (k);
@@ -102,7 +61,7 @@ flow (struct anim *k)
     return false;
   }
 
-  select_frame (k, kid_sword_hit_frameset, k->i + 1);
+  select_actor_frame (k, "KID", "SWORD_HIT", k->i + 1);
 
   if (k->i == 0) k->j = 28;
   if (k->i == 1) k->j = 32;
@@ -110,7 +69,7 @@ flow (struct anim *k)
   if (k->i == 3) k->j = 7;
   if (k->i == 4) k->j = 17;
 
-  select_xframe (&k->xf, sword_frameset, k->j);
+  select_actor_xframe (k, "KID", "SWORD", k->j);
   if (! k->has_sword) k->xf.b = NULL;
 
   if (k->i == 0) k->xf.dx = -12, k->xf.dy = +2;
@@ -120,7 +79,7 @@ flow (struct anim *k)
 }
 
 static bool
-physics_in (struct anim *k)
+physics_in (struct actor *k)
 {
   /* collision */
   uncollide_back_fight (k);
@@ -136,7 +95,7 @@ physics_in (struct anim *k)
 }
 
 static void
-physics_out (struct anim *k)
+physics_out (struct actor *k)
 {
   /* depressible floors */
   if (k->i == 3) update_depressible_floor (k, -4, -33);

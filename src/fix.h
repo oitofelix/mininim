@@ -21,7 +21,7 @@
 #ifndef MININIM_FIX_H
 #define MININIM_FIX_H
 
-struct pos *fix_con (struct pos *p);
+struct pos *fix_tile (struct pos *p);
 
 /* -------------------------------------- */
 
@@ -34,7 +34,7 @@ struct pos *fix_skeleton_or_spikes_floor_with_no_or_loose_floor_at_left (struct 
 struct pos *fix_adjacent_itens (struct pos *p);
 struct pos *fix_door_lacking_opener (struct pos *p);
 struct pos *fix_opener_or_closer_lacking_door (struct pos *p);
-struct pos *fix_confg_which_should_not_have_conbg (struct pos *p);
+struct pos *fix_tile_fg_which_should_not_have_tile_bg (struct pos *p);
 struct pos *fix_partial_big_pillar (struct pos *p);
 
 bool is_there_event_handler (struct level *l, int e);

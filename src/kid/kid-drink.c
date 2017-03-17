@@ -20,80 +20,15 @@
 
 #include "mininim.h"
 
-struct frameset kid_drink_frameset[KID_DRINK_FRAMESET_NMEMB];
-
-static void init_kid_drink_frameset (void);
-static bool flow (struct anim *k);
-static bool physics_in (struct anim *k);
-static void physics_out (struct anim *k);
-
-ALLEGRO_BITMAP *kid_drink_00, *kid_drink_01, *kid_drink_02,
-  *kid_drink_03, *kid_drink_04, *kid_drink_05, *kid_drink_06,
-  *kid_drink_07, *kid_drink_08, *kid_drink_09, *kid_drink_10,
-  *kid_drink_11, *kid_drink_12, *kid_drink_13, *kid_drink_14;
-
-static void
-init_kid_drink_frameset (void)
-{
-  struct frameset frameset[KID_DRINK_FRAMESET_NMEMB] =
-    {{kid_drink_00,-7,0},{kid_drink_01,+1,+1},{kid_drink_02,+1,-1},
-     {kid_drink_03,+0,0},{kid_drink_04,+2,0},{kid_drink_05,-1,0},
-     {kid_drink_06,+1,0},{kid_drink_07,+6,0},{kid_drink_08,-1,0},
-     {kid_drink_09,+2,-1},{kid_drink_10,-2,+1},{kid_drink_11,+0,-1},
-     {kid_drink_12,-1,0},{kid_drink_13,+1,0},{kid_drink_14,+1,0}};
-
-  memcpy (&kid_drink_frameset, &frameset,
-          KID_DRINK_FRAMESET_NMEMB * sizeof (struct frameset));
-}
+static bool flow (struct actor *k);
+static bool physics_in (struct actor *k);
+static void physics_out (struct actor *k);
 
 void
-load_kid_drink (void)
-{
-  /* bitmaps */
-  kid_drink_00 = load_bitmap (KID_DRINK_00);
-  kid_drink_01 = load_bitmap (KID_DRINK_01);
-  kid_drink_02 = load_bitmap (KID_DRINK_02);
-  kid_drink_03 = load_bitmap (KID_DRINK_03);
-  kid_drink_04 = load_bitmap (KID_DRINK_04);
-  kid_drink_05 = load_bitmap (KID_DRINK_05);
-  kid_drink_06 = load_bitmap (KID_DRINK_06);
-  kid_drink_07 = load_bitmap (KID_DRINK_07);
-  kid_drink_08 = load_bitmap (KID_DRINK_08);
-  kid_drink_09 = load_bitmap (KID_DRINK_09);
-  kid_drink_10 = load_bitmap (KID_DRINK_10);
-  kid_drink_11 = load_bitmap (KID_DRINK_11);
-  kid_drink_12 = load_bitmap (KID_DRINK_12);
-  kid_drink_13 = load_bitmap (KID_DRINK_13);
-  kid_drink_14 = load_bitmap (KID_DRINK_14);
-
-  /* frameset */
-  init_kid_drink_frameset ();
-}
-
-void
-unload_kid_drink (void)
-{
-  destroy_bitmap (kid_drink_00);
-  destroy_bitmap (kid_drink_01);
-  destroy_bitmap (kid_drink_02);
-  destroy_bitmap (kid_drink_03);
-  destroy_bitmap (kid_drink_04);
-  destroy_bitmap (kid_drink_05);
-  destroy_bitmap (kid_drink_06);
-  destroy_bitmap (kid_drink_07);
-  destroy_bitmap (kid_drink_08);
-  destroy_bitmap (kid_drink_09);
-  destroy_bitmap (kid_drink_10);
-  destroy_bitmap (kid_drink_11);
-  destroy_bitmap (kid_drink_12);
-  destroy_bitmap (kid_drink_13);
-  destroy_bitmap (kid_drink_14);
-}
-
-void
-kid_drink (struct anim *k)
+kid_drink (struct actor *k)
 {
   k->oaction = k->action;
+  k->oi = k->i;
   k->action = kid_drink;
   k->f.flip = (k->f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
@@ -104,7 +39,7 @@ kid_drink (struct anim *k)
 }
 
 static bool
-flow (struct anim *k)
+flow (struct actor *k)
 {
   struct pos p; new_pos (&p, &global_level, -1, -1, -1);
 
@@ -158,19 +93,20 @@ flow (struct anim *k)
         switch (prandom_pos (&k->item_pos, 2)) {
         case 0: potion_flags ^= ALLEGRO_FLIP_VERTICAL; break;
         case 1: potion_flags ^= ALLEGRO_FLIP_HORIZONTAL; break;
-        case 2: potion_flags ^= ALLEGRO_FLIP_VERTICAL | ALLEGRO_FLIP_HORIZONTAL; break;
+        case 2: potion_flags ^= ALLEGRO_FLIP_VERTICAL
+            | ALLEGRO_FLIP_HORIZONTAL; break;
         }
       }
       kid_haptic (k, KID_HAPTIC_DRINK);
       break;
     case ACTIVATION_POTION: p.room = 8, p.floor = p.place = 0;
-      activate_con (&p);
+      activate_tile (&p);
       kid_haptic (k, KID_HAPTIC_DRINK);
       break;
     default: break;
     }
 
-  select_frame (k, kid_drink_frameset, k->i);
+  select_actor_frame (k, "KID", "DRINK", k->i);
 
   if (k->i == 14 && k->wait < 4) k->fo.dx = 0;
   if (k->i == 10 && k->reverse) k->fo.dx = -2, k->fo.dy = +1;
@@ -180,13 +116,13 @@ flow (struct anim *k)
 }
 
 static bool
-physics_in (struct anim *k)
+physics_in (struct actor *k)
 {
   return true;
 }
 
 static void
-physics_out (struct anim *k)
+physics_out (struct actor *k)
 {
   /* depressible floors */
   keep_depressible_floor (k);
@@ -198,7 +134,7 @@ physics_out (struct anim *k)
   /* consume bottle */
   if (k->i == 0) {
     k->item = ext (&k->item_pos);
-    register_con_undo (&undo, &k->item_pos,
+    register_tile_undo (&undo, &k->item_pos,
                        MIGNORE, MIGNORE, NO_ITEM, MIGNORE,
                        NULL, false, "CONSUME POTION");
   }

@@ -28,8 +28,8 @@ static void init_run_frameset (void);
 ALLEGRO_BITMAP *mouse_normal_00, *mouse_run_00, *mouse_run_01;
 
 static ALLEGRO_COLOR v_palette (ALLEGRO_COLOR c);
-static ALLEGRO_COLOR e_palette (ALLEGRO_COLOR c);
-static ALLEGRO_COLOR c_palette (ALLEGRO_COLOR c);
+/* static ALLEGRO_COLOR e_palette (ALLEGRO_COLOR c); */
+/* static ALLEGRO_COLOR c_palette (ALLEGRO_COLOR c); */
 
 void
 load_mouse (void)
@@ -52,8 +52,8 @@ unload_mouse (void)
 
 
 
-struct anim *
-create_mouse (struct anim *m0, struct anim *m1, struct pos *p, enum dir dir)
+struct actor *
+create_mouse (struct actor *m0, struct actor *m1, struct pos *p, enum dir dir)
 {
   if (! m0) {
     m1->f.b = mouse_normal_00;
@@ -75,45 +75,46 @@ v_palette (ALLEGRO_COLOR c)
   return c;
 }
 
-static ALLEGRO_COLOR
-e_palette (ALLEGRO_COLOR c)
-{
-  if (color_eq (c, V_MOUSE_FUR_COLOR)) return E_MOUSE_FUR_COLOR;
-  if (color_eq (c, V_MOUSE_SKIN_COLOR_01)) return E_MOUSE_SKIN_COLOR_01;
-  if (color_eq (c, V_MOUSE_SKIN_COLOR_02)) return E_MOUSE_SKIN_COLOR_02;
-  if (color_eq (c, V_MOUSE_SKIN_COLOR_03)) return E_MOUSE_SKIN_COLOR_03;
-  return c;
-}
+/* static ALLEGRO_COLOR */
+/* e_palette (ALLEGRO_COLOR c) */
+/* { */
+/*   if (color_eq (c, V_MOUSE_FUR_COLOR)) return E_MOUSE_FUR_COLOR; */
+/*   if (color_eq (c, V_MOUSE_SKIN_COLOR_01)) return E_MOUSE_SKIN_COLOR_01; */
+/*   if (color_eq (c, V_MOUSE_SKIN_COLOR_02)) return E_MOUSE_SKIN_COLOR_02; */
+/*   if (color_eq (c, V_MOUSE_SKIN_COLOR_03)) return E_MOUSE_SKIN_COLOR_03; */
+/*   return c; */
+/* } */
 
-static ALLEGRO_COLOR
-c_palette (ALLEGRO_COLOR c)
-{
-  if (color_eq (c, V_MOUSE_FUR_COLOR)) return C_MOUSE_FUR_COLOR;
-  if (color_eq (c, V_MOUSE_SKIN_COLOR_01)) return C_MOUSE_SKIN_COLOR_01;
-  if (color_eq (c, V_MOUSE_SKIN_COLOR_02)) return C_MOUSE_SKIN_COLOR_02;
-  if (color_eq (c, V_MOUSE_SKIN_COLOR_03)) return C_MOUSE_SKIN_COLOR_03;
-  return c;
-}
+/* static ALLEGRO_COLOR */
+/* c_palette (ALLEGRO_COLOR c) */
+/* { */
+/*   if (color_eq (c, V_MOUSE_FUR_COLOR)) return C_MOUSE_FUR_COLOR; */
+/*   if (color_eq (c, V_MOUSE_SKIN_COLOR_01)) return C_MOUSE_SKIN_COLOR_01; */
+/*   if (color_eq (c, V_MOUSE_SKIN_COLOR_02)) return C_MOUSE_SKIN_COLOR_02; */
+/*   if (color_eq (c, V_MOUSE_SKIN_COLOR_03)) return C_MOUSE_SKIN_COLOR_03; */
+/*   return c; */
+/* } */
 
 static palette
-get_palette (enum vm vm)
+get_palette (void)
 {
-  switch (vm) {
-  case CGA: return c_palette;
-  case EGA: return e_palette;
-  case VGA: return v_palette;
-  }
-  return NULL;
+  /* switch (vm) { */
+  /* case CGA: return c_palette; */
+  /* case EGA: return e_palette; */
+  /* case VGA: */
+    return v_palette;
+  /* } */
+  /* return NULL; */
 }
 
 void
-draw_mouse_frame (ALLEGRO_BITMAP *bitmap, struct anim *m, enum vm vm)
+draw_mouse_frame (ALLEGRO_BITMAP *bitmap, struct actor *m)
 {
   if (m->invisible) return;
   struct frame f = m->f;
-  palette pal = get_palette (vm);
+  palette pal = get_palette ();
   f.b = apply_palette (f.b, pal);
-  if (hgc) f.b = apply_palette (f.b, hgc_palette);
+  /* if (hgc) f.b = apply_palette (f.b, hgc_palette); */
   draw_frame (bitmap, &f);
 }
 
@@ -132,7 +133,7 @@ init_run_frameset (void)
 
 
 void
-mouse_normal (struct anim *m)
+mouse_normal (struct actor *m)
 {
   m->oaction = m->action;
   m->action = mouse_normal;
@@ -159,7 +160,7 @@ mouse_normal (struct anim *m)
 }
 
 void
-mouse_run (struct anim *m)
+mouse_run (struct actor *m)
 {
   m->oaction = m->action;
   m->action = mouse_run;
@@ -167,10 +168,10 @@ mouse_run (struct anim *m)
 
   m->dc = dist_collision (&m->f, _bf, -4, -4, &m->ci);
   m->df = dist_fall (&m->f, false);
-  m->dl = dist_con (&m->f, _bf, pos, -4, false, LOOSE_FLOOR);
+  m->dl = dist_tile (&m->f, _bf, pos, -4, false, LOOSE_FLOOR);
 
   if (uncollide (&m->f, &m->fo, _bf, m->dc, m->dc, NULL, &m->ci)
-      && fg (&m->ci.con_p) == DOOR)
+      && fg (&m->ci.tile_p) == DOOR)
     m->dc = PLACE_WIDTH + 1;
   if (! cutscene && (m->dc < 12 || m->df < 12 || m->dl < 12)) {
     mouse_normal (m);

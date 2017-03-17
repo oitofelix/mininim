@@ -26,8 +26,8 @@ static void end (struct pos *p);
 static void
 start (void)
 {
-  create_anim (&anima[0], 0, NULL, 0);
-  anima[1].controllable = true;
+  create_actor (&actor[0], 0, NULL, 0);
+  actor[1].controllable = true;
 }
 
 static void

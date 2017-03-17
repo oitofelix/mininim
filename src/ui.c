@@ -84,7 +84,7 @@ static ALLEGRO_BITMAP *gm_icon (enum gm gm);
 static void gm_menu (intptr_t index);
 static ALLEGRO_BITMAP *em_icon (enum em em);
 static void em_menu (intptr_t index);
-static ALLEGRO_BITMAP *vm_icon (enum vm vm);
+static ALLEGRO_BITMAP *vm_icon (void);
 static void vm_menu (intptr_t index);
 static ALLEGRO_BITMAP *flip_screen_icon (int flags);
 static void screen_flip_menu (intptr_t index);
@@ -131,7 +131,7 @@ static void ui_show_indirect_coordinates (void);
 static void ui_hue_mode (enum hue new_hue);
 static void ui_gm (enum gm new_gm);
 static void ui_em (enum em new_em);
-static void ui_vm (enum vm new_vm);
+static void ui_vm (char *new_vm);
 static void ui_flip_screen (int flags, bool correct_mouse, bool save_only);
 static void ui_inhibit_screensaver (bool inhibit);
 static void ui_room_drawing (bool draw);
@@ -173,7 +173,7 @@ static void ui_change_kcd (int d);
 static void ui_version (void);
 static void ui_next_display_mode (void);
 
-static void display_skill (struct anim *k);
+static void display_skill (struct actor *k);
 
 
 
@@ -853,7 +853,7 @@ view_menu (intptr_t index)
 
   menu_sep (NULL);
 
-  menu_sub (VM_MID, true, vm_icon (vm), vm_menu, 0, "&Video (F12)");
+  menu_sub (VM_MID, true, vm_icon (), vm_menu, 0, "&Video (F12)");
 
   menu_sub (EM_MID, ! cutscene && ! title_demo,
             force_em ? em_icon (em) : original_icon,
@@ -968,7 +968,7 @@ navigation_menu (intptr_t index)
 
   menu_sub (NAV_PAGE_MID, true, nav_page_icon, nav_page_menu, 0, "Scroll &page");
 
-  struct anim *k = get_anim_by_id (current_kid_id);
+  struct actor *k = get_actor_by_id (current_kid_id);
   menu_sitem (NAV_HOME_MID, k && k->f.c.room != mr.room,
               nav_home_icon, "&Home (Home)");
 
@@ -1127,26 +1127,22 @@ em_menu (intptr_t index)
 }
 
 ALLEGRO_BITMAP *
-vm_icon (enum vm vm)
+vm_icon (void)
 {
-  switch (vm) {
-  case VGA: return vga_icon; break;
-  case EGA: return ega_icon; break;
-  case CGA: return hgc ? hgc_icon : cga_icon; break;
-  default: assert (false); return NULL; break;
-  }
+  /* TODO: implement */
+  return NULL;
 }
 
 void
 vm_menu (intptr_t index)
 {
-  menu_citem (VGA_MID, true, vm == VGA, vga_icon, "&VGA");
+  /* menu_citem (VGA_MID, true, vm == VGA, vga_icon, "&VGA"); */
 
-  menu_citem (EGA_MID, true, vm == EGA, ega_icon, "&EGA");
+  /* menu_citem (EGA_MID, true, vm == EGA, ega_icon, "&EGA"); */
 
-  menu_citem (CGA_MID, true, vm == CGA && ! hgc, cga_icon, "&CGA");
+  /* menu_citem (CGA_MID, true, vm == CGA && ! hgc, cga_icon, "&CGA"); */
 
-  menu_citem (HGC_MID, true, vm == CGA && hgc, hgc_icon, "&HGC");
+  /* menu_citem (HGC_MID, true, vm == CGA && hgc, hgc_icon, "&HGC"); */
 }
 
 ALLEGRO_BITMAP *
@@ -1349,7 +1345,7 @@ editor_menu (intptr_t index)
 void
 cheat_menu (intptr_t index)
 {
-  struct anim *k = get_anim_by_id (current_kid_id);
+  struct actor *k = get_actor_by_id (current_kid_id);
 
   menu_sitem (KILL_ENEMY_MID, k && k->enemy_id > 0,
               death_icon, "&Kill enemy (K)");
@@ -1360,7 +1356,8 @@ cheat_menu (intptr_t index)
   menu_citem (IMMORTAL_MID, true, immortal_mode, angel_icon,
               "&Immortal (I)");
 
-  menu_sitem (FLOAT_MID, k && (k->current_lives > 0 || is_kid_fall (&k->f))
+  menu_sitem (FLOAT_MID, k
+              && (k->current_lives > 0 || k->action == kid_fall)
               && (k->float_timer == 0
                   || k->float_timer >= REFLOAT_MENU_THRESHOLD),
               feather_icon, "&Float (Shift+W)");
@@ -1397,7 +1394,7 @@ time_change_menu (intptr_t index)
 void
 kca_change_menu (intptr_t index)
 {
-  struct anim *k = get_anim_by_id (current_kid_id);
+  struct actor *k = get_actor_by_id (current_kid_id);
 
   menu_sitem (KCA_ADD_MID, k && k->skill.counter_attack_prob < 99,
               counter_attack_add_icon, "&Increase (Ctrl+=)");
@@ -1409,7 +1406,7 @@ kca_change_menu (intptr_t index)
 void
 kcd_change_menu (intptr_t index)
 {
-  struct anim *k = get_anim_by_id (current_kid_id);
+  struct actor *k = get_actor_by_id (current_kid_id);
 
   menu_sitem (KCD_ADD_MID, k && k->skill.counter_defense_prob < 99,
               counter_defense_add_icon, "&Increase (Alt+=)");
@@ -1650,7 +1647,7 @@ menu_mid (ALLEGRO_EVENT *event)
     mr_view_page_trans (BELOW);
     break;
   case NAV_HOME_MID:
-    mr_focus_room (get_anim_by_id (current_kid_id)->f.c.room);
+    mr_focus_room (get_actor_by_id (current_kid_id)->f.c.room);
     break;
   case NAV_CENTER_MID:
     mr_center_room (mr.room);
@@ -1707,16 +1704,16 @@ menu_mid (ALLEGRO_EVENT *event)
     ui_em (PALACE);
     break;
   case VGA_MID:
-    ui_vm (VGA);
+    ui_vm ("VGA");
     break;
   case EGA_MID:
-    ui_vm (EGA);
+    ui_vm ("EGA");
     break;
   case CGA_MID:
-    ui_vm (CGA);
+    ui_vm ("CGA");
     break;
   case HGC_MID:
-    ui_vm (HGC);
+    ui_vm ("HGC");
     break;
   case FLIP_SCREEN_VERTICAL_MID:
     ui_flip_screen (screen_flags ^ ALLEGRO_FLIP_VERTICAL, false, false);
@@ -2021,12 +2018,11 @@ anim_key_bindings (void)
   }
 
   /* F12: change video mode */
-  else if (was_key_pressed (0, ALLEGRO_KEY_F12))
-    switch (vm) {
-    case VGA: ui_vm (EGA); break;
-    case EGA: ui_vm (CGA); break;
-    case CGA: ui_vm (hgc ? VGA : HGC); break;
-    }
+  else if (was_key_pressed (0, ALLEGRO_KEY_F12)) {
+    char *next_vm = next_video_mode (video_mode);
+    ui_vm (next_vm);
+    al_free (next_vm);
+  }
 
   /* D: change display mode */
   else if (! active_menu && was_key_pressed (0, ALLEGRO_KEY_D))
@@ -2217,7 +2213,7 @@ level_key_bindings (void)
 
   /* HOME: focus multi-room view on kid */
   else if (was_key_pressed (0, ALLEGRO_KEY_HOME)) {
-    struct anim *k = get_anim_by_id (current_kid_id);
+    struct actor *k = get_actor_by_id (current_kid_id);
     mr_focus_room (k->f.c.room);
   }
 
@@ -2624,7 +2620,7 @@ ui_gm (enum gm new_gm)
 
   /* apply next guard mode */
   int i;
-  for (i = 0; i < anima_nmemb; i++) apply_guard_mode (&anima[i], gm);
+  for (i = 0; i < actor_nmemb; i++) apply_guard_mode (&actor[i], gm);
 
   ui_msg (0, "%s: %s", key, value);
 
@@ -2663,28 +2659,18 @@ ui_em (enum em new_em)
 }
 
 void
-ui_vm (enum vm new_vm)
+ui_vm (char *requested_vm)
 {
+  setup_video_mode (requested_vm);
+
+  if (! video_mode) {
+    ui_msg (0, "NO VIDEO MODE AVAILABLE");
+    return;
+  }
+
   char *key = "VIDEO MODE";
-  char *value;
-
-  if (new_vm == HGC) {
-    vm = CGA; hgc = true;
-  } else {
-    vm = new_vm; hgc = false;
-  }
-
-  switch (vm) {
-  case VGA: value = "VGA"; break;
-  case EGA: value = "EGA"; break;
-  case CGA: value = hgc ? "HGC" : "CGA"; break;
-  }
-
-  set_string_var (&video_mode, value);
-
-  ui_msg (0, "%s: %s", key, value);
-
-  ui_save_setting (NULL, key, value);
+  ui_msg (0, "%s: %s", key, video_mode);
+  ui_save_setting (NULL, key, video_mode);
 }
 
 void
@@ -2900,7 +2886,7 @@ ui_time (void)
 void
 ui_skills (void)
 {
-  struct anim *k = get_anim_by_id (current_kid_id);
+  struct actor *k = get_actor_by_id (current_kid_id);
   display_skill (k);
 }
 
@@ -3005,7 +2991,7 @@ void
 ui_resurrect (void)
 {
   if (replay_mode == NO_REPLAY) {
-    struct anim *k = get_anim_by_id (current_kid_id);
+    struct actor *k = get_actor_by_id (current_kid_id);
     kid_resurrect (k);
   } else print_replay_mode (0);
 }
@@ -3014,11 +3000,11 @@ void
 ui_kill_enemy (void)
 {
   if (replay_mode == NO_REPLAY) {
-    struct anim *k = get_anim_by_id (current_kid_id);
-    struct anim *ke = get_anim_by_id (k->enemy_id);
+    struct actor *k = get_actor_by_id (current_kid_id);
+    struct actor *ke = get_actor_by_id (k->enemy_id);
     if (ke) {
       survey (_m, pos, &ke->f, NULL, &ke->p, NULL);
-      anim_die (ke);
+      actor_die (ke);
       play_audio (&guard_hit_audio, NULL, ke->id);
     }
   } else print_replay_mode (0);
@@ -3028,7 +3014,7 @@ void
 ui_float (void)
 {
   if (replay_mode == NO_REPLAY) {
-    struct anim *k = get_anim_by_id (current_kid_id);
+    struct actor *k = get_actor_by_id (current_kid_id);
     float_kid (k);
   } else print_replay_mode (0);
 }
@@ -3039,7 +3025,7 @@ ui_immortal (bool immortal)
   if (replay_mode == NO_REPLAY) {
     char *key = "IMMORTAL MODE";
     char *value = immortal ? "ON" : "OFF";
-    struct anim *k = get_anim_by_id (current_kid_id);
+    struct actor *k = get_actor_by_id (current_kid_id);
     if (k->current_lives <= 0 && immortal) kid_resurrect (k);
     immortal_mode = immortal;
     k->immortal = immortal;
@@ -3052,7 +3038,7 @@ void
 ui_fill_life (void)
 {
   if (replay_mode == NO_REPLAY) {
-    struct anim *k = get_anim_by_id (current_kid_id);
+    struct actor *k = get_actor_by_id (current_kid_id);
     increase_kid_current_lives (k);
   } else print_replay_mode (0);
 }
@@ -3061,7 +3047,7 @@ void
 ui_add_life (void)
 {
   if (replay_mode == NO_REPLAY) {
-    struct anim *k = get_anim_by_id (current_kid_id);
+    struct actor *k = get_actor_by_id (current_kid_id);
     increase_kid_total_lives (k);
     total_lives = k->total_lives;
   } else print_replay_mode (0);
@@ -3098,7 +3084,7 @@ void
 ui_change_prob_skill (int *holder, int new)
 {
   if (replay_mode == NO_REPLAY) {
-    struct anim *k = get_anim_by_id (current_kid_id);
+    struct actor *k = get_actor_by_id (current_kid_id);
     new = new > -1 ? new : -1;
     new = new < 99 ? new : 99;
     *holder = new;
@@ -3110,7 +3096,7 @@ ui_change_prob_skill (int *holder, int new)
 void
 ui_change_kca (int d)
 {
-  struct anim *k = get_anim_by_id (current_kid_id);
+  struct actor *k = get_actor_by_id (current_kid_id);
   ui_change_prob_skill
     (&k->skill.counter_attack_prob,
      next_multiple (k->skill.counter_attack_prob + 1, d) - 1);
@@ -3119,7 +3105,7 @@ ui_change_kca (int d)
 void
 ui_change_kcd (int d)
 {
-  struct anim *k = get_anim_by_id (current_kid_id);
+  struct actor *k = get_actor_by_id (current_kid_id);
   ui_change_prob_skill
     (&k->skill.counter_defense_prob,
      next_multiple (k->skill.counter_defense_prob + 1, d) - 1);
@@ -3451,9 +3437,9 @@ display_remaining_time (int priority)
 }
 
 void
-display_skill (struct anim *k)
+display_skill (struct actor *k)
 {
-  struct anim *ke = get_anim_by_id (k->enemy_id);
+  struct actor *ke = get_actor_by_id (k->enemy_id);
   if (ke)
     ui_msg (0, "KCA%i KCD%i A%i CA%i D%i CD%i",
             k->skill.counter_attack_prob + 1,

@@ -1,6 +1,6 @@
 ENGINE_MODULES = prince anim pos physics level consistency stars			\
   floor broken-floor skeleton-floor loose-floor opener-floor					\
-  closer-floor spikes-floor door level-door pillar big-pillar chopper	\
+  closer-floor spikes-floor door level-door pillar big-pillar chomper	\
   bricks torch window balcony arch carpet mirror room fire potion			\
   sword clock princess jaffar mouse fight samples cutscenes
 WALL_MODULES = wall wall-depedv wall-pv wall-dcpc

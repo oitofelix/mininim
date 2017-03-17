@@ -20,26 +20,15 @@
 
 #include "mininim.h"
 
-static bool flow (struct anim *k);
-static bool physics_in (struct anim *k);
-static void physics_out (struct anim *k);
+static bool flow (struct actor *k);
+static bool physics_in (struct actor *k);
+static void physics_out (struct actor *k);
 
 void
-load_kid_unclimb (void)
-{
-  return;
-}
-
-void
-unload_kid_unclimb (void)
-{
-  return;
-}
-
-void
-kid_unclimb (struct anim *k)
+kid_unclimb (struct actor *k)
 {
   k->oaction = k->action;
+  k->oi = k->i;
   k->action = kid_unclimb;
   k->f.flip = (k->f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
@@ -50,7 +39,7 @@ kid_unclimb (struct anim *k)
 }
 
 static bool
-flow (struct anim *k)
+flow (struct actor *k)
 {
   struct pos hanged_pos;
 
@@ -66,15 +55,16 @@ flow (struct anim *k)
 
   if (k->i == 14) {
     get_hanged_pos (&k->hang_pos, k->f.dir, &hanged_pos);
-    place_frame (&k->f, &k->f, kid_climb_frameset[13].frame,
-                 &hanged_pos, 18, 25);
+    int dx = +18;
+    int dy = +25;
+    place_actor (k, &hanged_pos, dx, dy, "KID", "CLIMB", 13);
   }
 
   k->i--;
 
-  k->fo.b = kid_climb_frameset[k->i].frame;
-  k->fo.dx = -kid_climb_frameset[k->i + 1].dx;
-  k->fo.dy = -kid_climb_frameset[k->i + 1].dy;
+  k->fo.b = actor_bitmap (k, "KID", "CLIMB", k->i);
+  k->fo.dx = -actor_bitmap_dx (k, "KID", "CLIMB", k->i + 1);
+  k->fo.dy = -actor_bitmap_dy (k, "KID", "CLIMB", k->i + 1);
 
   if (k->oaction == kid_climb) k->fo.dx += +2;
   if (k->i == 1) k->fo.dx += -3;
@@ -83,7 +73,7 @@ flow (struct anim *k)
 }
 
 static bool
-physics_in (struct anim *k)
+physics_in (struct actor *k)
 {
   /* fall */
   if (is_falling (&k->f, _tf, +0, +0)) {
@@ -95,7 +85,7 @@ physics_in (struct anim *k)
 }
 
 static void
-physics_out (struct anim *k)
+physics_out (struct actor *k)
 {
   struct pos hanged_pos;
 

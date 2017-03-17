@@ -20,73 +20,15 @@
 
 #include "mininim.h"
 
-struct frameset kid_walk_frameset[KID_WALK_FRAMESET_NMEMB];
-
-static void init_kid_walk_frameset (void);
-static bool flow (struct anim *k);
-static bool physics_in (struct anim *k);
-static void physics_out (struct anim *k);
-
-ALLEGRO_BITMAP *kid_walk_00, *kid_walk_01, *kid_walk_02,
-  *kid_walk_03, *kid_walk_04, *kid_walk_05, *kid_walk_06,
-  *kid_walk_07, *kid_walk_08, *kid_walk_09, *kid_walk_10,
-  *kid_walk_11;
-
-static void
-init_kid_walk_frameset (void)
-{
-  struct frameset frameset[KID_WALK_FRAMESET_NMEMB] =
-    {{kid_walk_00,-1,0},{kid_walk_01,-1,0},{kid_walk_02,+0,0},
-     {kid_walk_03,-8,0},{kid_walk_04,-7,0},{kid_walk_05,-6,0},
-     {kid_walk_06,+3,0},{kid_walk_07,-2,0},{kid_walk_08,-1,0},
-     {kid_walk_09,-1,0},{kid_walk_10,-2,0},{kid_walk_11,+0,0}};
-
-  memcpy (&kid_walk_frameset, &frameset,
-          KID_WALK_FRAMESET_NMEMB * sizeof (struct frameset));
-}
+static bool flow (struct actor *k);
+static bool physics_in (struct actor *k);
+static void physics_out (struct actor *k);
 
 void
-load_kid_walk (void)
-{
-  /* bitmaps */
-  kid_walk_00 = load_bitmap (KID_WALK_00);
-  kid_walk_01 = load_bitmap (KID_WALK_01);
-  kid_walk_02 = load_bitmap (KID_WALK_02);
-  kid_walk_03 = load_bitmap (KID_WALK_03);
-  kid_walk_04 = load_bitmap (KID_WALK_04);
-  kid_walk_05 = load_bitmap (KID_WALK_05);
-  kid_walk_06 = load_bitmap (KID_WALK_06);
-  kid_walk_07 = load_bitmap (KID_WALK_07);
-  kid_walk_08 = load_bitmap (KID_WALK_08);
-  kid_walk_09 = load_bitmap (KID_WALK_09);
-  kid_walk_10 = load_bitmap (KID_WALK_10);
-  kid_walk_11 = load_bitmap (KID_WALK_11);
-
-  /* frameset */
-  init_kid_walk_frameset ();
-}
-
-void
-unload_kid_walk (void)
-{
-  destroy_bitmap (kid_walk_00);
-  destroy_bitmap (kid_walk_01);
-  destroy_bitmap (kid_walk_02);
-  destroy_bitmap (kid_walk_03);
-  destroy_bitmap (kid_walk_04);
-  destroy_bitmap (kid_walk_05);
-  destroy_bitmap (kid_walk_06);
-  destroy_bitmap (kid_walk_07);
-  destroy_bitmap (kid_walk_08);
-  destroy_bitmap (kid_walk_09);
-  destroy_bitmap (kid_walk_10);
-  destroy_bitmap (kid_walk_11);
-}
-
-void
-kid_walk (struct anim *k)
+kid_walk (struct actor *k)
 {
   k->oaction = k->action;
+  k->oi = k->i;
   k->action = kid_walk;
   k->f.flip = (k->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
@@ -97,29 +39,26 @@ kid_walk (struct anim *k)
 }
 
 static bool
-flow (struct anim *k)
+flow (struct actor *k)
 {
   struct pos pbf, pmbo;
 
   if (k->oaction != kid_walk) {
     survey (_bf, pos, &k->f, NULL, &pbf, NULL);
     survey (_mbo, pos, &k->f, NULL, &pmbo, NULL);
-    if (is_traversable (&pbf) || fg (&pbf) == CLOSER_FLOOR)
+    if (is_potentially_traversable (&pbf) || fg (&pbf) == CLOSER_FLOOR)
       k->p = pmbo;
     else k->p = pbf;
     k->i = k->walk = -1;
 
     k->dc = dist_collision (&k->f, _bf, -4, -4, &k->ci);
     k->df = dist_fall (&k->f, false);
-    k->dl = dist_con (&k->f, _bf, pos, -4, false, LOOSE_FLOOR);
-    k->dcl = dist_con (&k->f, _bf, pos, -4, false, CLOSER_FLOOR);
-    k->dch = dist_chopper (&k->f, false);
+    k->dl = dist_tile (&k->f, _bf, pos, -4, false, LOOSE_FLOOR);
+    k->dcl = dist_tile (&k->f, _bf, pos, -4, false, CLOSER_FLOOR);
+    k->dch = dist_chomper (&k->f, false);
 
     struct pos pf;
     prel (&k->p, &pf, +0, (k->f.dir == LEFT) ? -1 : +1);
-    if (k->dcl < PLACE_WIDTH + 1 && fg (&pf) == CLOSER_FLOOR
-        && closer_floor_at_pos (&pf)->broken)
-      k->dcl = PLACE_WIDTH + 1;
 
     k->dcd = 0;
 
@@ -131,7 +70,7 @@ flow (struct anim *k)
 
     if (k->dc <= PLACE_WIDTH
         && k->f.dir == LEFT
-        && fg (&k->ci.con_p) == MIRROR) {
+        && fg (&k->ci.tile_p) == MIRROR) {
       k->dcd = 5;
       k->dc -= k->dcd;
     }
@@ -143,14 +82,14 @@ flow (struct anim *k)
       /* k->dch -= k->dcd; */
     }
 
-    if (k->dch <= PLACE_WIDTH) k->confg = CHOPPER;
-    else if (k->df <= PLACE_WIDTH) k->confg = NO_FLOOR;
-    else if (k->dl <= PLACE_WIDTH) k->confg = LOOSE_FLOOR;
-    else if (k->dcl <= PLACE_WIDTH) k->confg = CLOSER_FLOOR;
+    if (k->dch <= PLACE_WIDTH) k->tile_fg = CHOMPER;
+    else if (k->df <= PLACE_WIDTH) k->tile_fg = NO_FLOOR;
+    else if (k->dl <= PLACE_WIDTH) k->tile_fg = LOOSE_FLOOR;
+    else if (k->dcl <= PLACE_WIDTH) k->tile_fg = CLOSER_FLOOR;
     else if (k->dc <= PLACE_WIDTH
-             && is_valid_pos (&k->ci.con_p))
-      k->confg = fg (&k->ci.con_p);
-    else k->confg = FLOOR;
+             && is_valid_pos (&k->ci.tile_p))
+      k->tile_fg = fg (&k->ci.tile_p);
+    else k->tile_fg = FLOOR;
   }
 
   if (k->i == -1) {
@@ -182,10 +121,12 @@ flow (struct anim *k)
                || k->dcl < 28 || k->dch < 28)
         k->walk = 3, dx = 22;
 
-      if (k->walk != -1 )
-        place_frame (&k->f, &k->f, kid_normal_00, &k->p,
-                     (k->f.dir == LEFT) ? +11 + dx + k->dcd
-                     : PLACE_WIDTH + 7 - dx - k->dcd, +15);
+      if (k->walk != -1 ) {
+        int pdx = (k->f.dir == LEFT) ? +11 + dx + k->dcd
+          : PLACE_WIDTH + 7 - dx - k->dcd;
+        int pdy = +15;
+        place_actor (k, &k->p, pdx, pdy, "KID", "NORMAL", 0);
+      }
     }
   } else if (k->i == 2 && k->walk == 0) k->i = 9;
   else if (k->i == 3 && k->walk == 1) k->i = 8;
@@ -193,27 +134,31 @@ flow (struct anim *k)
   else if (k->i == 5 && k->walk == 3) k->i = 6;
   else if (k->i == 11) {
     if (k->walk != -1) {
-      /* printf ("confg: %s\n", get_confg_name (k->confg)); */
+      /* printf ("tile_fg: %s\n", get_tile_fg_name (k->tile_fg)); */
 
-      if (k->confg == CHOPPER)
-        place_frame (&k->f, &k->f, kid_normal_00, &k->p,
-                     (k->f.dir == LEFT) ? +15
-                     : PLACE_WIDTH + 3, +15);
-      /* else if (k->confg == MIRROR && k->f.dir == LEFT) */
+      if (k->tile_fg == CHOMPER) {
+        int pdx = (k->f.dir == LEFT) ? +15 : PLACE_WIDTH + 3;
+        int pdy = +15;
+        place_actor (k, &k->p, pdx, pdy, "KID", "NORMAL", 0);
+      }
+      /* else if (k->tile_fg == MIRROR && k->f.dir == LEFT) */
       /*   place_frame (&k->f, &k->f, kid_normal_00, &k->p, */
       /*                +16 + k->dcd, +15); */
-      else place_frame (&k->f, &k->f, kid_normal_00, &k->p,
-                        (k->f.dir == LEFT) ? +11 + k->dcd
-                        : PLACE_WIDTH + 7 - k->dcd, +15);
+      else {
+        int pdx = (k->f.dir == LEFT) ? +11 + k->dcd
+          : PLACE_WIDTH + 7 - k->dcd;
+        int pdy = +15;
+        place_actor (k, &k->p, pdx, pdy, "KID", "NORMAL", 0);
+      }
     }
     kid_normal (k);
     k->misstep = false;
     return false;
   }
 
-  select_frame (k, kid_walk_frameset, k->i + 1);
+  select_actor_frame (k, "KID", "WALK", k->i + 1);
 
-  if (k->f.b == kid_turn_frameset[3].frame) k->fo.dx = +0;
+  /* if (k->f.b == kid_turn_frameset[3].frame) k->fo.dx = +0; */
 
   if (k->walk == 0) {
     if (k->dc > 4 && k->df > 4 && k->dl > 4 && k->dcl > 4)
@@ -235,7 +180,7 @@ flow (struct anim *k)
 }
 
 static bool
-physics_in (struct anim *k)
+physics_in (struct actor *k)
 {
   /* inertia */
   k->inertia = k->cinertia = 0;
@@ -254,7 +199,7 @@ physics_in (struct anim *k)
 }
 
 static void
-physics_out (struct anim *k)
+physics_out (struct actor *k)
 {
   /* depressible floors */
   int dx = 0;

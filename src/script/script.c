@@ -66,9 +66,9 @@ init_script (void)
   define_L_mininim (L);
 
   lua_newuserdata (L, 0);
-  luaL_getmetatable (L, "mininim");
+  luaL_getmetatable (L, L_MININIM);
   lua_setmetatable (L, -2);
-  lua_setglobal (L, "mininim");
+  lua_setglobal (L, "MININIM");
 
   /* weak registry */
   lua_newtable (L);
@@ -147,6 +147,7 @@ L_call (lua_State *L, int nargs, int nresults)
   lua_pushcfunction (L, L_TRACEBACK);
   lua_insert (L, base);
   if (lua_pcall (L, nargs, nresults, base)) {
+    if (repl_prompt_ready) fprintf (stderr, "\n");
     fprintf (stderr, "%s\n", lua_tostring(L, -1));
     lua_pop (L, 1);
     lua_remove(L, base);
@@ -165,8 +166,7 @@ L_run_hook (lua_State *L)
   if (lua_isfunction (L, -1)) {
     bool r = L_call (L, 0, 0);
     return r;
-  }
-  else {
+  } else {
     lua_pop (L, 1);
     return true;
   }

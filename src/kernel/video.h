@@ -41,6 +41,8 @@ void validate_bitmap_for_mingw (ALLEGRO_BITMAP *bitmap);
 void save_bitmap (char *filename, ALLEGRO_BITMAP *bitmap);
 bool bitmap_heq (ALLEGRO_BITMAP *b0, ALLEGRO_BITMAP *b1);
 bool color_eq (ALLEGRO_COLOR c0, ALLEGRO_COLOR c1);
+int get_bitmap_width (ALLEGRO_BITMAP *bitmap);
+int get_bitmap_height (ALLEGRO_BITMAP *bitmap);
 void set_target_bitmap (ALLEGRO_BITMAP *bitmap);
 void set_target_backbuffer (ALLEGRO_DISPLAY *display);
 void clear_bitmap (ALLEGRO_BITMAP *bitmap, ALLEGRO_COLOR color);
@@ -79,7 +81,6 @@ void show_logo (char *text0, char* text1, ALLEGRO_BITMAP *icon);
 void show_logo_replaying (void);
 void load_oitofelix_face (void);
 void unload_oitofelix_face (void);
-ALLEGRO_BITMAP *oitofelix_face (enum vm vm);
 
 /* palette */
 int compare_palette_caches (const void *pc0, const void *pc1);
@@ -113,6 +114,13 @@ bool merge_clipping_rectangle (ALLEGRO_BITMAP *bitmap, int x, int y,
                                int w, int h);
 void pop_clipping_rectangle (void);
 
+double IW (double w);
+double IH (double h);
+double OW (double w);
+double OH (double h);
+
+void video_rendering (bool enable);
+
 /* variables */
 extern bool force_full_redraw;
 extern ALLEGRO_DISPLAY *display;
@@ -123,7 +131,7 @@ extern ALLEGRO_BITMAP *black_screen;
 extern ALLEGRO_TIMER *video_timer;
 extern struct video_effect video_effect;
 extern int screen_flags, potion_flags;
-extern bool hgc;
+/* extern bool hgc; */
 extern int display_width, display_height;
 extern ALLEGRO_BITMAP *logo_icon;
 extern uint64_t bottom_text_timer;
@@ -132,7 +140,7 @@ extern void (*load_callback) (void);
 extern int display_mode;
 extern bool ignore_clipping_rectangle_intersection;
 extern bool about_screen;
-extern ALLEGRO_BITMAP *oitofelix_face_gray, *oitofelix_face_bw;
+extern ALLEGRO_BITMAP *oitofelix_face;
 extern ssize_t palette_cache_size_limit;
 
 struct drawn_rectangle drawn_rectangle_stack[DRAWN_RECTANGLE_STACK_NMEMB_MAX];

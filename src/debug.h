@@ -21,8 +21,8 @@
 #ifndef MININIM_DEBUG_H
 #define MININIM_DEBUG_H
 
-void save_guard_bitmap (enum anim_type type, int style, enum vm vm);
-void save_guard_bitmaps (enum vm vm);
+void save_guard_bitmap (enum actor_type type, int style);
+void save_guard_bitmaps (void);
 void debug_pos (struct pos *p);
 void debug_random_seed (void);
 void L_dump_stack (lua_State *L);

@@ -20,219 +20,12 @@
 
 #include "mininim.h"
 
-struct frameset guard_die_frameset[GUARD_DIE_FRAMESET_NMEMB];
-struct frameset fat_guard_die_frameset[GUARD_DIE_FRAMESET_NMEMB];
-struct frameset vizier_die_frameset[GUARD_DIE_FRAMESET_NMEMB];
-struct frameset skeleton_die_frameset[GUARD_DIE_FRAMESET_NMEMB];
-struct frameset shadow_die_frameset[GUARD_DIE_FRAMESET_NMEMB];
-
-static void init_guard_die_frameset (void);
-static void init_fat_guard_die_frameset (void);
-static void init_vizier_die_frameset (void);
-static void init_skeleton_die_frameset (void);
-static void init_shadow_die_frameset (void);
-static bool flow (struct anim *g);
-static bool physics_in (struct anim *g);
-static void physics_out (struct anim *g);
-
-/* guard */
-ALLEGRO_BITMAP *guard_die_00, *guard_die_01, *guard_die_02, *guard_die_03,
-  *guard_die_04, *guard_die_05, *guard_die_spiked_00, *guard_die_chopped_00;
-
-/* fat guard */
-ALLEGRO_BITMAP *fat_guard_die_00, *fat_guard_die_01, *fat_guard_die_02,
-  *fat_guard_die_03, *fat_guard_die_04, *fat_guard_die_05;
-
-/* vizier */
-ALLEGRO_BITMAP *vizier_die_00, *vizier_die_01, *vizier_die_02, *vizier_die_03,
-  *vizier_die_04, *vizier_die_05;
-
-/* skeleton */
-ALLEGRO_BITMAP *skeleton_die_00, *skeleton_die_01, *skeleton_die_02, *skeleton_die_03,
-  *skeleton_die_04, *skeleton_die_05, *skeleton_die_spiked_00,
-  *skeleton_die_chopped_00;
-
-/* shadow */
-ALLEGRO_BITMAP *shadow_die_00, *shadow_die_01, *shadow_die_02, *shadow_die_03,
-  *shadow_die_04, *shadow_die_05, *shadow_die_spiked_00,
-  *shadow_die_chopped_00;
-
-static void
-init_guard_die_frameset (void)
-{
-  struct frameset frameset[GUARD_DIE_FRAMESET_NMEMB] =
-    {{guard_die_00,-1,0},{guard_die_01,+0,0},{guard_die_02,-3,+1},
-     {guard_die_03,-2,+2},{guard_die_04,+0,+0},{guard_die_05,-2,+0}};
-
-  memcpy (&guard_die_frameset, &frameset,
-          GUARD_DIE_FRAMESET_NMEMB * sizeof (struct frameset));
-}
-
-static void
-init_fat_guard_die_frameset (void)
-{
-  struct frameset frameset[GUARD_DIE_FRAMESET_NMEMB] =
-    {{fat_guard_die_00,-1,0},{fat_guard_die_01,+0,0},{fat_guard_die_02,-3,+1},
-     {fat_guard_die_03,-2,+2},{fat_guard_die_04,+0,+0},{fat_guard_die_05,+0,+0}};
-
-  memcpy (&fat_guard_die_frameset, &frameset,
-          GUARD_DIE_FRAMESET_NMEMB * sizeof (struct frameset));
-}
-
-static void
-init_vizier_die_frameset (void)
-{
-  struct frameset frameset[GUARD_DIE_FRAMESET_NMEMB] =
-    {{vizier_die_00,-1,0},{vizier_die_01,+0,0},{vizier_die_02,-3,+1},
-     {vizier_die_03,-2,+2},{vizier_die_04,+0,+0},{vizier_die_05,-2,+0}};
-
-  memcpy (&vizier_die_frameset, &frameset,
-          GUARD_DIE_FRAMESET_NMEMB * sizeof (struct frameset));
-}
-
-static void
-init_skeleton_die_frameset (void)
-{
-  struct frameset frameset[GUARD_DIE_FRAMESET_NMEMB] =
-    {{skeleton_die_00,-8,+0},{skeleton_die_01,+0,+2},{skeleton_die_02,+0,+2},
-     {skeleton_die_03,+0,+0},{skeleton_die_04,+0,+0},{skeleton_die_05,+0,+0}};
-
-  memcpy (&skeleton_die_frameset, &frameset,
-          GUARD_DIE_FRAMESET_NMEMB * sizeof (struct frameset));
-}
-
-static void
-init_shadow_die_frameset (void)
-{
-  struct frameset frameset[GUARD_DIE_FRAMESET_NMEMB] =
-    {{shadow_die_00,-1,+0},{shadow_die_01,+0,+0},{shadow_die_02,-3,+1},
-     {shadow_die_03,-2,+1},{shadow_die_04,+0,+2},{shadow_die_05,+2,+1}};
-
-  memcpy (&shadow_die_frameset, &frameset,
-          GUARD_DIE_FRAMESET_NMEMB * sizeof (struct frameset));
-}
-
-struct frameset *
-get_guard_die_frameset (enum anim_type t)
-{
-  switch (t) {
-  case GUARD: default: return guard_die_frameset;
-  case FAT_GUARD: return fat_guard_die_frameset;
-  case VIZIER: return vizier_die_frameset;
-  case SKELETON: return skeleton_die_frameset;
-  case SHADOW: return shadow_die_frameset;
-  }
-}
+static bool flow (struct actor *g);
+static bool physics_in (struct actor *g);
+static void physics_out (struct actor *g);
 
 void
-load_guard_die (void)
-{
-  /* guard */
-  guard_die_00 = load_bitmap (GUARD_DIE_00);
-  guard_die_01 = load_bitmap (GUARD_DIE_01);
-  guard_die_02 = load_bitmap (GUARD_DIE_02);
-  guard_die_03 = load_bitmap (GUARD_DIE_03);
-  guard_die_04 = load_bitmap (GUARD_DIE_04);
-  guard_die_05 = load_bitmap (GUARD_DIE_05);
-  guard_die_spiked_00 = load_bitmap (GUARD_DIE_SPIKED_00);
-  guard_die_chopped_00 = load_bitmap (GUARD_DIE_CHOPPED_00);
-
-  /* fat guard */
-  fat_guard_die_00 = load_bitmap (FAT_GUARD_DIE_00);
-  fat_guard_die_01 = load_bitmap (FAT_GUARD_DIE_01);
-  fat_guard_die_02 = load_bitmap (FAT_GUARD_DIE_02);
-  fat_guard_die_03 = load_bitmap (FAT_GUARD_DIE_03);
-  fat_guard_die_04 = load_bitmap (FAT_GUARD_DIE_04);
-  fat_guard_die_05 = load_bitmap (FAT_GUARD_DIE_05);
-
-  /* vizier */
-  vizier_die_00 = load_bitmap (VIZIER_DIE_00);
-  vizier_die_01 = load_bitmap (VIZIER_DIE_01);
-  vizier_die_02 = load_bitmap (VIZIER_DIE_02);
-  vizier_die_03 = load_bitmap (VIZIER_DIE_03);
-  vizier_die_04 = load_bitmap (VIZIER_DIE_04);
-  vizier_die_05 = load_bitmap (VIZIER_DIE_05);
-
-  /* skeleton */
-  skeleton_die_00 = load_bitmap (SKELETON_DIE_00);
-  skeleton_die_01 = load_bitmap (SKELETON_DIE_01);
-  skeleton_die_02 = load_bitmap (SKELETON_DIE_02);
-  skeleton_die_03 = load_bitmap (SKELETON_DIE_03);
-  skeleton_die_04 = load_bitmap (SKELETON_DIE_04);
-  skeleton_die_05 = load_bitmap (SKELETON_DIE_05);
-  skeleton_die_spiked_00 = load_bitmap (SKELETON_DIE_SPIKED_00);
-  skeleton_die_chopped_00 = load_bitmap (SKELETON_DIE_CHOPPED_00);
-
-  /* shadow */
-  shadow_die_00 = load_bitmap (SHADOW_DIE_00);
-  shadow_die_01 = load_bitmap (SHADOW_DIE_01);
-  shadow_die_02 = load_bitmap (SHADOW_DIE_02);
-  shadow_die_03 = load_bitmap (SHADOW_DIE_03);
-  shadow_die_04 = load_bitmap (SHADOW_DIE_04);
-  shadow_die_05 = load_bitmap (SHADOW_DIE_05);
-  shadow_die_spiked_00 = load_bitmap (SHADOW_DIE_SPIKED_00);
-  shadow_die_chopped_00 = load_bitmap (SHADOW_DIE_CHOPPED_00);
-
-  /* frameset */
-  init_guard_die_frameset ();
-  init_fat_guard_die_frameset ();
-  init_vizier_die_frameset ();
-  init_skeleton_die_frameset ();
-  init_shadow_die_frameset ();
-}
-
-void
-unload_guard_die (void)
-{
-  /* guard */
-  destroy_bitmap (guard_die_00);
-  destroy_bitmap (guard_die_01);
-  destroy_bitmap (guard_die_02);
-  destroy_bitmap (guard_die_03);
-  destroy_bitmap (guard_die_04);
-  destroy_bitmap (guard_die_05);
-  destroy_bitmap (guard_die_spiked_00);
-  destroy_bitmap (guard_die_chopped_00);
-
-  /* fat guard */
-  destroy_bitmap (fat_guard_die_00);
-  destroy_bitmap (fat_guard_die_01);
-  destroy_bitmap (fat_guard_die_02);
-  destroy_bitmap (fat_guard_die_03);
-  destroy_bitmap (fat_guard_die_04);
-  destroy_bitmap (fat_guard_die_05);
-
-  /* vizier */
-  destroy_bitmap (vizier_die_00);
-  destroy_bitmap (vizier_die_01);
-  destroy_bitmap (vizier_die_02);
-  destroy_bitmap (vizier_die_03);
-  destroy_bitmap (vizier_die_04);
-  destroy_bitmap (vizier_die_05);
-
-  /* skeleton */
-  destroy_bitmap (skeleton_die_00);
-  destroy_bitmap (skeleton_die_01);
-  destroy_bitmap (skeleton_die_02);
-  destroy_bitmap (skeleton_die_03);
-  destroy_bitmap (skeleton_die_04);
-  destroy_bitmap (skeleton_die_05);
-  destroy_bitmap (skeleton_die_spiked_00);
-  destroy_bitmap (skeleton_die_chopped_00);
-
-  /* shadow */
-  destroy_bitmap (shadow_die_00);
-  destroy_bitmap (shadow_die_01);
-  destroy_bitmap (shadow_die_02);
-  destroy_bitmap (shadow_die_03);
-  destroy_bitmap (shadow_die_04);
-  destroy_bitmap (shadow_die_05);
-  destroy_bitmap (shadow_die_spiked_00);
-  destroy_bitmap (shadow_die_chopped_00);
-}
-
-void
-guard_resurrect (struct anim *g)
+guard_resurrect (struct actor *g)
 {
   g->splash = false;
   g->invisible = false;
@@ -243,15 +36,16 @@ guard_resurrect (struct anim *g)
   g->death_reason = NO_DEATH;
   g->action = guard_normal;
   g->glory_sample = false;
-  place_frame (&g->f, &g->f, get_guard_normal_bitmap (g->type),
-               &pm, g->f.dir == LEFT ? +16 : +22, +14);
+  int dx = g->f.dir == LEFT ? +16 : +22;
+  int dy = +14;
+  place_actor (g, &pm, dx, dy, NULL, "NORMAL", 0);
   place_on_the_ground (&g->f, &g->f.c);
   if (fg (&g->p) == SPIKES_FLOOR)
     spikes_floor_at_pos (&g->p)->inactive = false;
 }
 
 void
-raise_skeleton (struct anim *s)
+raise_skeleton (struct actor *s)
 {
   s->oaction = s->action;
   s->action = raise_skeleton;
@@ -259,8 +53,11 @@ raise_skeleton (struct anim *s)
 
   if (s->oaction != raise_skeleton) {
     play_audio (&skeleton_audio, NULL, s->id);
-    place_frame (&s->f, &s->f, skeleton_die_frameset[2].frame,
-                 &s->p, (s->f.dir == LEFT) ? +12 : +0, +43);
+
+    int dx = (s->f.dir == LEFT) ? +12 : +0;
+    int dy = +43;
+    place_actor (s, &s->p, dx, dy, "SKELETON", "DIE", 2);
+
     s->i = 2;
   }
 
@@ -269,24 +66,15 @@ raise_skeleton (struct anim *s)
     return;
   }
 
-  s->fo.b = skeleton_die_frameset[s->i].frame;
-  s->fo.dx = -skeleton_die_frameset[s->i + 1].dx;
-  s->fo.dy = -skeleton_die_frameset[s->i + 1].dy;
+  s->fo.b = actor_bitmap (s, "SKELETON", "DIE", s->i);
+  s->fo.dx = -actor_bitmap_dx (s, "SKELETON", "DIE", s->i + 1);
+  s->fo.dy = -actor_bitmap_dy (s, "SKELETON", "DIE", s->i + 1);
+
   next_frame (&s->f, &s->f, &s->fo);
 }
 
-ALLEGRO_BITMAP *
-get_guard_die_spiked_bitmap (enum anim_type t)
-{
-  switch (t) {
-  case GUARD: default: return guard_die_spiked_00;
-  case SKELETON: return skeleton_die_spiked_00;
-  case SHADOW: return shadow_die_spiked_00;
-  }
-}
-
 void
-guard_die_spiked (struct anim *g)
+guard_die_spiked (struct actor *g)
 {
   if (fg (&g->p) != SPIKES_FLOOR) {
     guard_die_properly (g);
@@ -294,6 +82,7 @@ guard_die_spiked (struct anim *g)
   }
 
   g->oaction = g->action;
+  g->oi = g->i;
   g->action = guard_die_spiked;
   g->f.flip = (g->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
@@ -316,7 +105,7 @@ guard_die_spiked (struct anim *g)
     else play_audio (&spiked_audio, NULL, g->id);
 
     if (! g->glory_sample) {
-      struct anim *k = get_anim_by_id (g->enemy_id);
+      struct actor *k = get_actor_by_id (g->enemy_id);
       play_audio (&glory_audio, NULL, g->id);
       kid_haptic (k, KID_HAPTIC_SUCCESS);
       g->glory_sample = true;
@@ -329,33 +118,23 @@ guard_die_spiked (struct anim *g)
   if (g->type == SKELETON) dy = +45;
   else dy = (g->f.dir == LEFT) ? +32 : +31;
 
-  ALLEGRO_BITMAP *bitmap = get_guard_die_spiked_bitmap (g->type);
-  place_frame (&g->f, &g->f, bitmap,
-               &g->p, (g->f.dir == LEFT) ? +8 : +9, dy);
+  int dx = (g->f.dir == LEFT) ? +8 : +9;
+  place_actor (g, &g->p, dx, dy, NULL, "DIE", 6);
 
   g->xf.b = NULL;
 }
 
-ALLEGRO_BITMAP *
-get_guard_die_chopped_bitmap (enum anim_type t)
-{
-  switch (t) {
-  case GUARD: default: return guard_die_chopped_00;
-  case SKELETON: return skeleton_die_chopped_00;
-  case SHADOW: return shadow_die_chopped_00;
-  }
-}
-
 void
-guard_die_chopped (struct anim *g)
+guard_die_chomped (struct actor *g)
 {
-  if (fg (&g->p) != CHOPPER) {
+  if (fg (&g->p) != CHOMPER) {
     guard_die_properly (g);
     return;
   }
 
   g->oaction = g->action;
-  g->action = guard_die_chopped;
+  g->oi = g->i;
+  g->action = guard_die_chomped;
   g->f.flip = (g->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
   int dx, dy;
@@ -368,12 +147,11 @@ guard_die_chopped (struct anim *g)
     dy = (g->type == SKELETON) ? +45 : +43;
   }
 
-  ALLEGRO_BITMAP *bitmap = get_guard_die_chopped_bitmap (g->type);
-  place_frame (&g->f, &g->f, bitmap, &g->p, dx, dy);
+  place_actor (g, &g->p, dx, dy, NULL, "DIE", 7);
 
-  if (g->oaction != guard_die_chopped
+  if (g->oaction != guard_die_chomped
       && ! g->glory_sample) {
-    struct anim *k = get_anim_by_id (g->enemy_id);
+    struct actor *k = get_actor_by_id (g->enemy_id);
     play_audio (&glory_audio, NULL, g->id);
     kid_haptic (k, KID_HAPTIC_SUCCESS);
     g->glory_sample = true;
@@ -384,29 +162,26 @@ guard_die_chopped (struct anim *g)
 }
 
 void
-guard_die_suddenly (struct anim *g)
+guard_die_suddenly (struct actor *g)
 {
-  enum confg f = fg (&g->p);
-  if ( f == SPIKES_FLOOR || f == CHOPPER) {
+  enum tile_fg f = fg (&g->p);
+  if ( f == SPIKES_FLOOR || f == CHOMPER) {
     guard_die_properly (g);
     return;
   }
 
   g->oaction = g->action;
+  g->oi = g->i;
   g->action = guard_die_suddenly;
   g->f.flip = (g->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  struct frameset *frameset = get_guard_die_frameset (g->type);
-
+  int dx = (g->f.dir == LEFT) ? +9 : +4;
   int dy = (g->type == SKELETON) ? +44 : +47;
-
-  place_frame (&g->f, &g->f, frameset[5].frame,
-               &g->p, (g->f.dir == LEFT)
-               ? +9 : +4, dy);
+  place_actor (g, &g->p, dx, dy, NULL, "DIE", 5);
 
   if (g->oaction != guard_die_suddenly
       && ! g->glory_sample) {
-    struct anim *k = get_anim_by_id (g->enemy_id);
+    struct actor *k = get_actor_by_id (g->enemy_id);
     play_audio (&glory_audio, NULL, g->id);
     kid_haptic (k, KID_HAPTIC_SUCCESS);
     g->glory_sample = true;
@@ -428,9 +203,10 @@ guard_die_suddenly (struct anim *g)
 }
 
 void
-guard_die (struct anim *g)
+guard_die (struct actor *g)
 {
   g->oaction = g->action;
+  g->oi = g->i;
   g->action = guard_die;
   g->f.flip = (g->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
@@ -441,18 +217,15 @@ guard_die (struct anim *g)
 }
 
 static bool
-flow (struct anim *g)
+flow (struct actor *g)
 {
   if (g->oaction != guard_die) {
-    /* place_frame (&g->f, &g->f, guard_die_frameset[0].frame, */
-    /*              &g->p, (g->f.dir == LEFT) */
-    /*              ? +13 : +21, (g->type == SHADOW) ? +18 : +17); */
     g->i = -1, g->j = 0;
     if (g->type == SKELETON)
       play_audio (&skeleton_audio, NULL, g->id);
 
     if (! g->glory_sample) {
-      struct anim *k = get_anim_by_id (g->enemy_id);
+      struct actor *k = get_actor_by_id (g->enemy_id);
       play_audio (&glory_audio, NULL, g->id);
       kid_haptic (k, KID_HAPTIC_SUCCESS);
       g->glory_sample = true;
@@ -465,8 +238,7 @@ flow (struct anim *g)
 
   g->i = g->i < 5 ? g->i + 1 : 5;
 
-  struct frameset *frameset = get_guard_die_frameset (g->type);
-  select_frame (g, frameset, g->i);
+  select_actor_frame (g, NULL, "DIE", g->i);
 
   if (g->j >= 1) g->fo.dx = g->fo.dy = 0;
   if (g->i == 5) g->j = 1;
@@ -476,7 +248,7 @@ flow (struct anim *g)
 }
 
 static bool
-physics_in (struct anim *g)
+physics_in (struct actor *g)
 {
   /* collision */
   uncollide (&g->f, &g->fo, _bb, +0, +0, &g->fo, NULL);
@@ -491,7 +263,7 @@ physics_in (struct anim *g)
 }
 
 static void
-physics_out (struct anim *g)
+physics_out (struct actor *g)
 {
   /* depressible floors */
   if (g->i == 0) update_depressible_floor (g, -6, -12);
@@ -504,63 +276,20 @@ physics_out (struct anim *g)
 }
 
 void
-guard_die_properly (struct anim *g)
+guard_die_properly (struct actor *g)
 {
   switch (fg (&g->p)) {
   case SPIKES_FLOOR: guard_die_spiked (g); break;
-  case CHOPPER: guard_die_chopped (g); break;
+  case CHOMPER: guard_die_chomped (g); break;
   default: guard_die_suddenly (g); break;
   }
 }
 
 bool
-is_guard_dead (struct frame *f)
+is_guard_dead (struct actor *g)
 {
-  int i;
-
-  /* guard */
-  for (i = 0; i < GUARD_DIE_FRAMESET_NMEMB; i++)
-    if (f->b == guard_die_frameset[i].frame) return true;
-
-  if (f->b == guard_die_spiked_00) return true;
-  if (f->b == guard_die_chopped_00) return true;
-
-  /* fat guard */
-  for (i = 0; i < GUARD_DIE_FRAMESET_NMEMB; i++)
-    if (f->b == fat_guard_die_frameset[i].frame) return true;
-
-  /* vizier */
-  for (i = 0; i < GUARD_DIE_FRAMESET_NMEMB; i++)
-    if (f->b == vizier_die_frameset[i].frame) return true;
-
-  /* skeleton */
-  for (i = 0; i < GUARD_DIE_FRAMESET_NMEMB; i++)
-    if (f->b == skeleton_die_frameset[i].frame) return true;
-
-  if (f->b == skeleton_die_spiked_00) return true;
-  if (f->b == skeleton_die_chopped_00) return true;
-
-  /* shadow */
-  for (i = 0; i < GUARD_DIE_FRAMESET_NMEMB; i++)
-    if (f->b == shadow_die_frameset[i].frame) return true;
-
-  if (f->b == shadow_die_spiked_00) return true;
-  if (f->b == shadow_die_chopped_00) return true;
-
-  return false;
-}
-
-bool
-is_guard_chopped (struct frame *f)
-{
-  /* guard */
-  if (f->b == guard_die_chopped_00) return true;
-
-  /* skeleton */
-  if (f->b == skeleton_die_chopped_00) return true;
-
-  /* shadow */
-  if (f->b == shadow_die_chopped_00) return true;
-
-  return false;
+  return g->action == guard_die
+    || g->action == guard_die_suddenly
+    || g->action == guard_die_spiked
+    || g->action == guard_die_chomped;
 }

@@ -20,47 +20,15 @@
 
 #include "mininim.h"
 
-struct frameset kid_sword_walkb_frameset[KID_SWORD_WALKB_FRAMESET_NMEMB];
-
-static void init_kid_sword_walkb_frameset (void);
-static bool flow (struct anim *k);
-static bool physics_in (struct anim *k);
-static void physics_out (struct anim *k);
-
-ALLEGRO_BITMAP *kid_sword_walkb_00, *kid_sword_walkb_01;
-
-static void
-init_kid_sword_walkb_frameset (void)
-{
-  struct frameset frameset[KID_SWORD_WALKB_FRAMESET_NMEMB] =
-    {{kid_sword_walkb_00,-1,0},{kid_sword_walkb_01,+11,0}};
-
-  memcpy (&kid_sword_walkb_frameset, &frameset,
-          KID_SWORD_WALKB_FRAMESET_NMEMB * sizeof (struct frameset));
-}
+static bool flow (struct actor *k);
+static bool physics_in (struct actor *k);
+static void physics_out (struct actor *k);
 
 void
-load_kid_sword_walkb (void)
-{
-  /* bitmaps */
-  kid_sword_walkb_00 = load_bitmap (KID_SWORD_WALKB_00);
-  kid_sword_walkb_01 = load_bitmap (KID_SWORD_WALKB_01);
-
-  /* frameset */
-  init_kid_sword_walkb_frameset ();
-}
-
-void
-unload_kid_sword_walkb (void)
-{
-  destroy_bitmap (kid_sword_walkb_00);
-  destroy_bitmap (kid_sword_walkb_01);
-}
-
-void
-kid_sword_walkb (struct anim *k)
+kid_sword_walkb (struct actor *k)
 {
   k->oaction = k->action;
+  k->oi = k->i;
   k->action = kid_sword_walkb;
   k->f.flip = (k->f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
@@ -71,7 +39,7 @@ kid_sword_walkb (struct anim *k)
 }
 
 static bool
-flow (struct anim *k)
+flow (struct actor *k)
 {
   if (k->oaction != kid_sword_walkb) k->i = -1;
 
@@ -83,16 +51,16 @@ flow (struct anim *k)
   if (k->i == -1) k->j = 10;
   if (k->i == 0) k->j = 17;
 
-  if (k->f.b == kid_sword_attack_frameset[5].frame) k->i = 0;
+  if (k->oaction == kid_sword_attack) k->i = 0;
 
-  select_frame (k, kid_sword_walkb_frameset, k->i + 1);
-  select_xframe (&k->xf, sword_frameset, k->j);
+  select_actor_frame (k, "KID", "SWORD_WALKB", k->i + 1);
+  select_actor_xframe (k, "KID", "SWORD", k->j);
 
   return true;
 }
 
 static bool
-physics_in (struct anim *k)
+physics_in (struct actor *k)
 {
   /* collision */
   uncollide_back_fight (k);
@@ -108,7 +76,7 @@ physics_in (struct anim *k)
 }
 
 static void
-physics_out (struct anim *k)
+physics_out (struct actor *k)
 {
   /* depressible floors */
   if (k->i == 1) update_depressible_floor (k, -1, -24);

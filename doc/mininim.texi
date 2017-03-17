@@ -129,94 +129,92 @@ welcome!  Please, contact the MININIM community at its forum
 
 
 
-@c --- Constructions;
-@node Constructions
-@chapter Constructions
-@cindex constructions
+@c --- Tiles;
+@node Tiles
+@chapter Tiles
+@cindex tiles
 
 @cindex position
 @cindex room
 @cindex floor
 @cindex place
-@cindex con
+@cindex tile
 @cindex screen
 @cindex tile
 Each @dfn{level} is comprised of @dfn{rooms}@footnote{The terminology
 used for @dfn{rooms} in the original game is @dfn{screens}.}.  Each room
 is comprised of three @dfn{floors}.  Each floor is comprised of 10
-@dfn{places}.  Each place holds a @dfn{construction} (or @dfn{con} for
-short).@footnote{The terminology used for @dfn{constructions} in the
-original game is @dfn{tiles}.}  The following figure illustrates this
-arrangement.
+@dfn{places}.  Each place holds a @dfn{tile}.  The following figure
+illustrates this arrangement.
 
 @center @image{mininim-figures/level-layout}
 
 @cindex coordinates, level
 @cindex level coordinates
-Therefore, any given construction is uniquely identified within a level
+Therefore, any given tile is uniquely identified within a level
 by the coordinates of its place@footnote{The term @emph{place} is used
 throughout the text to describe both the last coordinate of the triplet
 and the world space the triplet refers to.  Also, often the term
-@emph{place} is omitted and the text refers just to the construction
+@emph{place} is omitted and the text refers just to the tile
 itself, implying a reference to its place, as in ``the left
-construction'', meaning ``the construction one place to the left''.
+tile'', meaning ``the tile one place to the left''.
 Hopefully, these shouldn't be a source of ambiguity.}, which are defined
 as the triplet @emph{room}, @emph{floor} and @emph{place}:
 @math{(r,f,p)}.
 
-@cindex construction foreground
-@cindex foreground, construction
-@cindex construction background
-@cindex background, construction
-@cindex construction extension
-@cindex extension, construction
-Constructions are comprised of three elements: @emph{foreground},
-@emph{background} and @emph{extension}.  A @dfn{construction foreground}
+@cindex tile foreground
+@cindex foreground, tile
+@cindex tile background
+@cindex background, tile
+@cindex tile extension
+@cindex extension, tile
+Tiles are comprised of three elements: @emph{foreground},
+@emph{background} and @emph{extension}.  A @dfn{tile foreground}
 is the physical part the kid interacts with.  Physical properties
 determined by it are collision, hang and fall conditions, to name a few.
-On the other hand, a @dfn{construction background} is the part that yet
+On the other hand, a @dfn{tile background} is the part that yet
 visible, doesn't affect the kid in any way --- its sole purpose is
 ornamental; torches and windows are examples of this.  A
-@dfn{construction extension} is a modifier which tells how the con looks
+@dfn{tile extension} is a modifier which tells how the tile looks
 or behaves.  For example, items and door opening states are both
-expressed by them.  Any given construction can have only one extension.
+expressed by them.  Any given tile can have only one extension.
 The valid extensions are:
 
 @table @dfn
-@cindex con ext item
-@cindex item, con ext
+@cindex tile ext item
+@cindex item, tile ext
 @item Item
-This is a code indicating which item should be put on the construction.
+This is a code indicating which item should be put on the tile.
 Used by @code{FLOOR}.
-@cindex con ext can't fall
-@cindex can't fall, con ext
+@cindex tile ext can't fall
+@cindex can't fall, tile ext
 @item Can't fall
-This is a boolean indicating whether the construction should ignore
+This is a boolean indicating whether the tile should ignore
 fall conditions.  Used by @code{LOOSE_FLOOR}.
-@cindex con ext event
-@cindex event, con ext
+@cindex tile ext event
+@cindex event, tile ext
 @item Event
-This is an integer indicating which door event the construction
+This is an integer indicating which door event the tile
 triggers.  Used by @code{OPENER_FLOOR} and @code{CLOSER_FLOOR}.
-@cindex con ext step
-@cindex step, con ext
+@cindex tile ext step
+@cindex step, tile ext
 @item Step
 This is an integer indicating in which state, of a progressive set of
-configurations, a construction is in.  Used by @code{SPIKES_FLOOR},
-@code{DOOR}, @code{LEVEL_DOOR} and @code{CHOPPER}.
-@cindex con ext design
-@cindex design, con ext
+configurations, a tile is in.  Used by @code{SPIKES_FLOOR},
+@code{DOOR}, @code{LEVEL_DOOR} and @code{CHOMPER}.
+@cindex tile ext design
+@cindex design, tile ext
 @item Design
 This is a code indicating which alternative graphical design should be
-used to render the construction.  Used by @code{CARPET} and
+used to render the tile.  Used by @code{CARPET} and
 @code{TCARPET}.
 @end table
 
 Integer extensions (@emph{event} and @emph{step}) may be negative
-indicating that their respective constructions are broken.  Except for
+indicating that their respective tiles are broken.  Except for
 this, the negative integer extension @var{i} is equivalent to the
 non-negative @math{-i - 1} one.  While the @emph{event} extension may be
-negative for any construction that uses it (@code{OPENER_FLOOR} and
+negative for any tile that uses it (@code{OPENER_FLOOR} and
 @code{CLOSER_FLOOR}), the @emph{step} extension may only be so for
 @code{LEVEL_DOOR}.
 
@@ -226,7 +224,7 @@ negative for any construction that uses it (@code{OPENER_FLOOR} and
 @cindex relative positioning, non-directed
 @cindex positioning, non-directed relative
 
-In order to easily talk about the relations between constructions it's
+In order to easily talk about the relations between tiles it's
 necessary to define the @dfn{non-directed relative positioning} of a
 given place to its adjacent ones.  Consider the place @emph{C}, which
 has the coordinates @math{(r,f,p)}, and its 8 adjacent places, as shown
@@ -257,10 +255,10 @@ Then we define the following mapping between names and coordinates:
 
 @node Foregrounds
 @section Foregrounds
-@cindex construction foreground
-@cindex foreground, construction
+@cindex tile foreground
+@cindex foreground, tile
 
-Construction foregrounds have physical properties that determine how
+Tile foregrounds have physical properties that determine how
 they behave in certain events and also how the kid is affected by the
 interaction with them.
 
@@ -269,63 +267,63 @@ interaction with them.
 @cindex strictly traversable
 @cindex traversable, strictly
 @item Strictly traversable
-This property means that the construction can't support the kid
+This property means that the tile can't support the kid
 vertically at its bottom, thus he falls immediately when trying to rest
-on it.  Notice that cons having this property can't be @emph{hangable}.
+on it.  Notice that tiles having this property can't be @emph{hangable}.
 
 @cindex traversable
 @item Traversable
-This property means that the construction can't @emph{indefinitely}
+This property means that the tile can't @emph{indefinitely}
 support the kid vertically at its bottom, thus he @emph{eventually}
 falls when trying to rest on it.  Notice that @emph{strictly
 traversable} is a particular case of this.
 
 @cindex collidable
 @item Collidable
-This property means that the construction prevents the kid from passing
+This property means that the tile prevents the kid from passing
 through it horizontally, thus he collides (often recoiling from the
 impact) when trying to do so.
 
 @cindex semi-collidable
 @item Semi-collidable
-This property means that the construction is @emph{collidable} only
+This property means that the tile is @emph{collidable} only
 under certain circumstances.
 
 @cindex hangable
 @item Hangable
-This property means that the kid can hang on the construction's bottom,
+This property means that the kid can hang on the tile's bottom,
 in case there is an @emph{strictly traversable} one at its side.
 
 @cindex depressible
 @item Depressible
-This property means that the construction is sensible to pressure at its
+This property means that the tile is sensible to pressure at its
 top, thus some reaction is triggered when the kid exerts such pressure.
 
 @cindex trap
 @item Trap
-This property means that the construction might harm the kid.
+This property means that the tile might harm the kid.
 
 @cindex rigid
 @item Rigid
-This property means that the construction can't be smashed by a falling
-@code{LOOSE_FLOOR}, thus it stops at the con's top.
+This property means that the tile can't be smashed by a falling
+@code{LOOSE_FLOOR}, thus it stops at the tile's top.
 
 @cindex breakable
 @item Breakable
-This property means that the construction itself is broken by a falling
+This property means that the tile itself is broken by a falling
 @code{LOOSE_FLOOR}, instead of being replaced by @code{BROKEN_FLOOR}.
-Notice that all breakable cons are non-rigid and support a negative
+Notice that all breakable tiles are non-rigid and support a negative
 integer extension.
 
 @cindex dynamic
 @item Dynamic
-This property means that the construction has a set of distinct states
-in which it can be in.  Such states matter for how the construction
+This property means that the tile has a set of distinct states
+in which it can be in.  Such states matter for how the tile
 looks and behaves.
 @end table
 
 It's possible that some of these properties may apply only under certain
-conditions of the construction and/or the kid.
+conditions of the tile and/or the kid.
 
 @iftex
 @page
@@ -335,14 +333,14 @@ conditions of the construction and/or the kid.
 @subsection Floors
 @cindex floors
 
-@dfn{Floors} make the ground above constructions the kid stands on.  All
+@dfn{Floors} make the ground above tiles the kid stands on.  All
 of them are @emph{hangable}, except for @code{NO_FLOOR}.
 
 @multitable @columnfractions .19 .15 .15 .51
   @headitem Code @tab Dungeon @tab Palace @tab Notes
 
   @fgindex NO_FLOOR
-  @item @code{NO_FLOOR}@footnote{The @dfn{no floor} con is called
+  @item @code{NO_FLOOR}@footnote{The @dfn{no floor} tile is called
   @dfn{empty} in the original game.}
   @tab
   @tab
@@ -361,13 +359,13 @@ of them are @emph{hangable}, except for @code{NO_FLOOR}.
   @tab @center @image{mininim-figures/d-broken-floor}
   @tab @center @image{mininim-figures/p-broken-floor}
   @tab As soon as a falling @code{LOOSE_FLOOR} encounters a @emph{rigid}
-  construction, it disappears replacing the rigid con's top by a
+  tile, it disappears replacing the rigid tile's top by a
   @code{BROKEN_FLOOR}.  In contrast, if it encounters a @emph{non-rigid}
-  and @emph{non-traversable} construction, it disappears breaking that
-  very con in case that's @emph{breakable} or otherwise replacing that
+  and @emph{non-traversable} tile, it disappears breaking that
+  very tile in case that's @emph{breakable} or otherwise replacing that
   by a @code{BROKEN_FLOOR}.  Finally, if it encounters a
-  @emph{non-rigid} but @emph{traversable} construction, it pass through,
-  breaking over the con in case that is not @emph{strictly traversable}.
+  @emph{non-rigid} but @emph{traversable} tile, it pass through,
+  breaking over the tile in case that is not @emph{strictly traversable}.
   This uses no extension.
 
   @fgindex SKELETON_FLOOR
@@ -426,7 +424,7 @@ of them are @emph{hangable}, except for @code{NO_FLOOR}.
 
   @fgindex HIDDEN_FLOOR
   @item @code{HIDDEN_FLOOR}@footnote{The original game doesn't have a
-  @code{HIDDEN_FLOOR} construction by itself.}
+  @code{HIDDEN_FLOOR} tile by itself.}
   @tab
   @tab
   @tab This is rendered as @code{NO_FLOOR}, but as soon as the kid
@@ -438,7 +436,7 @@ of them are @emph{hangable}, except for @code{NO_FLOOR}.
 @subsection Pillars
 @cindex pillars
 
-@dfn{Pillars} are aesthetic supports for the constructions on the floor
+@dfn{Pillars} are aesthetic supports for the tiles on the floor
 above them.  All of them are @emph{hangable}, except for
 @code{BIG_PILLAR_TOP}, and @emph{rigid}.  Pillars use no extension.
 
@@ -491,7 +489,7 @@ level.  It's @emph{collidable}, @emph{rigid} and uses no extension.
 @subsection Doors
 @cindex doors
 
-@dfn{Doors} are constructions that conditionally separate levels and
+@dfn{Doors} are tiles that conditionally separate levels and
 in-level sections.  Both door types are @emph{hangable}, @emph{dynamic}
 and use the @emph{step} extension.  The extension determines the door
 opening level, ranging from fully open (0) to fully closed.
@@ -512,7 +510,7 @@ opening level, ranging from fully open (0) to fully closed.
   @fgindex LEVEL_DOOR
   @item @code{LEVEL_DOOR}@footnote{The @dfn{level door} is called simply
   @emph{exit} in the original game.  There it's divided into two
-  constructions: @emph{exit left} and @emph{exit right}.}
+  tiles: @emph{exit left} and @emph{exit right}.}
   @tab @center @image{mininim-figures/d-level-door}
   @tab @center @image{mininim-figures/p-level-door}
   @tab Often the kid progress through levels entering these.  This can
@@ -520,28 +518,27 @@ opening level, ranging from fully open (0) to fully closed.
   @emph{step} extension range from -44 to 43.
 @end multitable
 
-@node Chopper
-@subsection Chopper
-@cindex chopper
+@node Chomper
+@subsection Chomper
+@cindex chomper
 
-The @dfn{chopper}@footnote{The @dfn{chopper} is called @dfn{chomper} in
-the original game.} can leave the kid in half.  It's a @emph{trap},
+The @dfn{chomper} can leave the kid in half.  It's a @emph{trap},
 @emph{hangable at right}, @emph{rigid} and @emph{dynamic}.  It uses the
 @emph{step} extension which range from 0 to 5 and 128 to 133 (bloody
 counterpart).  With a @emph{step} of 0 or 128, it gets activated as soon
 as the kid is in the same room and floor and there is no wall in
 between.  It doesn't get activated by guards, but can kill them as well.
-Other @emph{steps} make it permanently inactive.  The chopper nullifies
+Other @emph{steps} make it permanently inactive.  The chomper nullifies
 the @emph{hangable at left (right resp.)} property of its top (top left
-resp.) construction.
+resp.) tile.
 
 @multitable @columnfractions .20 .40 .40
   @headitem Code @tab Dungeon @tab Palace
 
-  @fgindex CHOPPER
-  @item @code{CHOPPER}
-  @tab @center @image{mininim-figures/d-chopper}
-  @tab @center @image{mininim-figures/p-chopper}
+  @fgindex CHOMPER
+  @item @code{CHOMPER}
+  @tab @center @image{mininim-figures/d-chomper}
+  @tab @center @image{mininim-figures/p-chomper}
 @end multitable
 
 @node Mirror
@@ -553,7 +550,7 @@ trough, except if he is able to perform a running jump, whatever the
 side.  It's @emph{semi-collidable} at left, @emph{hangable at right},
 @emph{rigid} and uses no extension.  The mirror nullifies the
 @emph{hangable at left (right resp.)} property of its top (top left
-resp.) construction.
+resp.) tile.
 
 @multitable @columnfractions .20 .40 .40
   @headitem Code @tab Dungeon @tab Palace
@@ -569,14 +566,14 @@ resp.) construction.
 @cindex carpets
 
 @dfn{Carpets}@footnote{@dfn{Carpets} are called @emph{tapestry} in the
-original game.} are ornamental constructions often placed over
+original game.} are ornamental tiles often placed over
 @code{DOOR} cons.  They come in two flavors: @code{CARPET} and
 @code{TCARPET}; the watershed difference being the @emph{traversable}
 property, which the latter has but the former lacks.  Both are
 @emph{collidable} at right, @emph{rigid} and make use of the
-@emph{design} extension.  The @code{CARPET} construction is also
+@emph{design} extension.  The @code{CARPET} tile is also
 @emph{hangable at left}.  Also, carpets nullify the @emph{hangable at
-left} property of their @emph{right} and @emph{top right} constructions.
+left} property of their @emph{right} and @emph{top right} tiles.
 
 @multitable @columnfractions .15 .2 .2 .45
   @headitem Code @tab Dungeon @tab Palace @tab Notes
@@ -643,7 +640,7 @@ left} property of their @emph{right} and @emph{top right} constructions.
 @cindex arches
 
 @dfn{Arches}@footnote{@dfn{Arches} are called @dfn{lattices} in the
-original game.} are ornamental constructions that can be indefinitely
+original game.} are ornamental tiles that can be indefinitely
 chained together to make a structure that spans several rooms across.
 They are @emph{strictly traversable}, @emph{rigid} and use no extension.
 
@@ -683,7 +680,7 @@ They are @emph{strictly traversable}, @emph{rigid} and use no extension.
 @section Backgrounds
 @cindex backgrounds
 
-Any combination of construction background and foreground is allowed,
+Any combination of tile background and foreground is allowed,
 but be aware that some may simply not look right, or even not make a
 difference at all (like a torch behind a wall).
 
@@ -755,7 +752,7 @@ difference at all (like a torch behind a wall).
 @cindex items
 
 The item extension is used only by @code{FLOOR}.  Items are placed over
-the floor construction they belong to and animated.  They can be caught
+the floor tile they belong to and animated.  They can be caught
 by the kid by pressing the shift key.
 
 @multitable @columnfractions .3 .15 .55
@@ -814,7 +811,7 @@ by the kid by pressing the shift key.
   @item @code{ACTIVATION_POTION}
   @tab @center @image{mininim-figures/activation-potion}
   @tab This potion has the same graphics as @code{SMALL_POISON_POTION}
-  and is used to activate a construction.@footnote{In the original game
+  and is used to activate a tile.@footnote{In the original game
   the @emph{activation potion} is designed to be used in the potion
   level, a copy protection mechanism employed to stop people from
   sharing.  @strong{MININIM is free software}, and we repudiate this
@@ -938,9 +935,9 @@ the options @option{--joystick-axis-threshold} and
 @cindex relative positioning, directed
 
 The concept of @emph{directed relative positioning}, necessary to easily
-describe the relations between constructions and the kid is analogous to
+describe the relations between tiles and the kid is analogous to
 the already defined concept of @emph{non-directed relative positioning},
-used to describe relations between constructions.  Consider the kid's
+used to describe relations between tiles.  Consider the kid's
 place @emph{C}, which has the coordinates @math{(r,f,p)}, its 8 adjacent
 places and the direction the kid is facing, as shown in the following
 two figures.
@@ -973,12 +970,12 @@ Then we define the following mapping between names and coordinates:
 @cindex hangable place
 
 Quite a few movements might culminate in the kid hanging on a
-construction.  In order to describe the conditions in which that may
+tile.  In order to describe the conditions in which that may
 happen, it's necessary to define the concept of @emph{hangable place}.
 
 @cartouche
 @noindent@strong{Hangable place:} we say the kid's place is
-@dfn{hangable}, if (and only if) its top construction is @emph{strictly
+@dfn{hangable}, if (and only if) its top tile is @emph{strictly
 traversable} and its top front one is @emph{hangable} in the opposite
 direction.
 @end cartouche
@@ -1015,7 +1012,7 @@ Pressing @kbd{UP}, makes the kid perform a vertical jump.
 
 @center @image{mininim-figures/kid-normal-left} @arrow{} @image{mininim-figures/kid-vjump}
 
-In case his @emph{top construction} is @emph{strictly traversable} but
+In case his @emph{top tile} is @emph{strictly traversable} but
 he isn't in a @emph{hangable place}, he performs a long vertical jump
 and comes back to the @strong{exact} same position he was before the
 jump.@footnote{This is not so in the original game, where he moves a
@@ -1023,7 +1020,7 @@ little bit forward at each vertical jump.}
 
 @center @image{mininim-figures/kid-vjump} @arrow{} @image{mininim-figures/kid-normal-left}
 
-In case his @emph{top construction} is not @emph{strictly traversable}
+In case his @emph{top tile} is not @emph{strictly traversable}
 and his @emph{back place} is not @emph{hangable}, he performs a short
 vertical jump and then comes back to the exact same position he was
 before the jump.
@@ -1074,7 +1071,7 @@ He can jump over (up to) two @emph{places} across without falling.
 @cindex jump hang movement, normal
 
 In midair, if he's in a @emph{hangable place}, holding @kbd{SHIFT} and
-pressing @kbd{FRONT} makes him hang on the construction and enter
+pressing @kbd{FRONT} makes him hang on the tile and enter
 @emph{hang mode}.@footnote{The original game has no such movement.}
 
 @center @image{mininim-figures/kid-jump-floor-no-floor} @arrow{} @image{mininim-figures/kid-hang-left}
@@ -1087,7 +1084,7 @@ pressing @kbd{FRONT} makes him hang on the construction and enter
 
 If he's in a @emph{hangable place} for the opposite direction, holding
 @kbd{SHIFT} and pressing @kbd{BACK} makes him turn in midair, hang on
-the construction and enter @emph{hang mode}.@footnote{The original game
+the tile and enter @emph{hang mode}.@footnote{The original game
 has no such movement.}
 
 @center @image{mininim-figures/kid-jump-no-floor-floor} @arrow{} @image{mininim-figures/kid-hang-right}
@@ -1103,7 +1100,7 @@ carefully.
 @center @image{mininim-figures/kid-normal-left} @arrow{} @image{mininim-figures/kid-walk}
 
 He always safely stops before a collision, fall, loose floor, closer
-floor and chopper blade.
+floor and chomper blade.
 
 @center @image{mininim-figures/kid-walk-wall} @arrow{} @image{mininim-figures/kid-normal-wall}
 
@@ -1113,9 +1110,9 @@ floor and chopper blade.
 
 @center @image{mininim-figures/kid-walk-closer-floor} @arrow{} @image{mininim-figures/kid-normal-closer-floor}
 
-@center @image{mininim-figures/kid-walk-chopper} @arrow{} @image{mininim-figures/kid-normal-chopper}
+@center @image{mininim-figures/kid-walk-chomper} @arrow{} @image{mininim-figures/kid-normal-chomper}
 
-If the kid is just before a @emph{traversable} construction or a closer
+If the kid is just before a @emph{traversable} tile or a closer
 floor@footnote{The kid doesn't misstep for a closer floor in the
 original game.}, he misstep and gets back to his original position, as a
 warning of the eminent danger.
@@ -1175,7 +1172,7 @@ performs little crouching jumps forward.
 @cindex movement mode, run
 
 Pressing @kbd{FRONT}, makes the kid start to run.@footnote{Unless he is
-facing a @emph{collidable} construction with at most one place of
+facing a @emph{collidable} tile with at most one place of
 distance, in which case he performs a @emph{walk}.  Notice that in the
 original game the threshold is lower.}
 
@@ -1218,7 +1215,7 @@ repeats indefinitely.
 @cindex jump hang movement, running
 
 In midair, if he's in a @emph{hangable place}, holding @kbd{SHIFT} and
-pressing @kbd{FRONT} makes him hang on the construction and enter
+pressing @kbd{FRONT} makes him hang on the tile and enter
 @emph{hang mode}.@footnote{The original game has no such movement.}
 
 @center @image{mininim-figures/kid-run-jump-floor-no-floor} @arrow{} @image{mininim-figures/kid-hang-left}
@@ -1231,7 +1228,7 @@ pressing @kbd{FRONT} makes him hang on the construction and enter
 
 If he's in a @emph{hangable place} for the opposite direction, holding
 @kbd{SHIFT} and pressing @kbd{BACK} makes him turn in midair, hang on
-the construction and enter @emph{hang mode}.@footnote{The original game
+the tile and enter @emph{hang mode}.@footnote{The original game
 has no such movement.}
 
 @center @image{mininim-figures/kid-run-jump-no-floor-floor} @arrow{} @image{mininim-figures/kid-hang-right}
@@ -1266,7 +1263,7 @@ keeps it pressed.
 @cindex hang free
 @cindex hang non-free
 There are two modes of hanging: @emph{free} and @emph{non-free}.  The
-kid @dfn{hangs free} when his @emph{front construction} is not
+kid @dfn{hangs free} when his @emph{front tile} is not
 collidable in the direction of hanging.  Otherwise he @dfn{hangs
 non-free}.
 
@@ -1286,13 +1283,13 @@ By contrast, when @emph{hanging non-free} the kid keeps himself static.
 @cindex fall movement, hanging
 
 When @emph{hanging free}, there is a limit for how much time the kid can
-support his own weight, after which he drops from the construction.
+support his own weight, after which he drops from the tile.
 Releasing @kbd{SHIFT} in the meantime has the same effect.  The kid will
 fall either aligned with the @emph{hangable place's column} or with the
 @emph{hangable place's front column}, depending upon which his feet are
-in when he leaves the hanged construction.@footnote{It's not possible to
+in when he leaves the hanged tile.@footnote{It's not possible to
 perform such movements in the original game, because there the kid
-always falls over a @emph{non-strictly traversable} construction, in
+always falls over a @emph{non-strictly traversable} tile, in
 case there is one.}
 
 @center @image{mininim-figures/kid-hang-free-fall}
@@ -1312,7 +1309,7 @@ column}.
 When the kid is @emph{hanging free} in a place that is @emph{hangable}
 in both directions and his feet are in the @emph{hangable place},
 pressing @kbd{BACK} while holding @kbd{SHIFT}, makes him turn in midair
-and hang on the con at his back.@footnote{This movement is not present
+and hang on the tile at his back.@footnote{This movement is not present
 in the original game.}
 
 @center @image{mininim-figures/kid-hang-left-back-floor-no-floor-floor} @arrow{} @image{mininim-figures/kid-hang-right-floor-no-floor-floor}
@@ -1329,7 +1326,7 @@ the original game.}
 @cindex climb movement
 @cindex movement, climb
 
-Pressing @kbd{UP} while hanging makes the kid climb the construction for
+Pressing @kbd{UP} while hanging makes the kid climb the tile for
 both modes.
 
 @center @image{mininim-figures/kid-hang-climb-00} @arrow{} @image{mininim-figures/kid-hang-climb-01} @image{mininim-figures/kid-hang-climb-non-free-00} @arrow{} @image{mininim-figures/kid-hang-climb-non-free-01}
@@ -1343,12 +1340,12 @@ both modes.
 
 This mode is not really related to a key combination, but instead to a
 circumstance: the kid trying to support his own weight on an
-@emph{strictly traversable} construction.  When this happens he
+@emph{strictly traversable} tile.  When this happens he
 accelerates downwards (eventually reaching terminal velocity), until he
-encounters a @emph{non-strictly traversable} construction or hangs at a
+encounters a @emph{non-strictly traversable} tile or hangs at a
 @emph{hangable place} which might appear in his way down.
 
-If the kid hits a @emph{non-traversable} construction with sufficient
+If the kid hits a @emph{non-traversable} tile with sufficient
 speed, he is harmed or can even die.  Falling from a height of one floor
 inflicts no damage on him.  Two floors takes one life point.  Three or
 more kills him instantly.
@@ -1360,7 +1357,7 @@ more kills him instantly.
 
 When falling if the kid is passing through a @emph{hangable place} and
 his vertical velocity is low enough, and he's near enough to the
-@emph{hangable construction}, he is able to hang there and enter
+@emph{hangable tile}, he is able to hang there and enter
 @emph{hang mode} if the user holds @kbd{SHIFT} down.
 
 @center @image{mininim-figures/kid-fall-floor-front} @arrow{} @image{mininim-figures/kid-hang-left}
@@ -2090,7 +2087,7 @@ Make the kid start at room @var{r}, floor @var{f} and place @var{p}.
 The default is to let this decision to the level module.  @var{r} is an
 integer ranging from 1 to @code{INT_MAX}, @var{f} is an integer ranging
 from 0 to 2 and @var{p} is an integer ranging from 0 to 9.
-@xref{Constructions}.
+@xref{Tiles}.
 @end table
 
 @cindex @file{LEVELS.DAT}
@@ -2468,9 +2465,9 @@ A similar notation is used for unequivocal and brief menu command
 references in documentation.  Each top level menu is associated with a
 capital letter --- the level editor menu is associated with @samp{E},
 for instance.  If we want to describe the command to change the
-foreground construction to @code{BIG_PILLAR_TOP}, for example, we take
+foreground tile to @code{BIG_PILLAR_TOP}, for example, we take
 its path prefix, @samp{CFPT} and prefix it with the top level menu
-letter @samp{E}, like this: @samp{E>CFPT}.
+letter @samp{E}, like this: @samp{E>TFPT}.
 
 There are two universal keys (called @dfn{menu return keys}) that allow
 the user to go up into the menu hierarchy, from any type of command:
@@ -2513,15 +2510,15 @@ line is suppressed.
 Often menu commands apply to a particular place within a level.  The
 provided mechanism to select such a place is called @dfn{mouse
 selection}.  While it's enabled the mouse cursor can be used to select a
-particular place by simply pointing at the construction held by it.  The
-selected place's construction will be shown in a brighter or darker
+particular place by simply pointing at the tile held by it.  The
+selected place's tile will be shown in a brighter or darker
 color than its surroundings (depending upon the video and environment
 modes) like in the picture below.
 
 @center @image{mininim-figures/mouse-selection}
 
 As the user moves the cursor across the screen, the limits of each
-selected place is determined by which construction it holds, roughly
+selected place is determined by which tile it holds, roughly
 considering the depth of the region the cursor points to.
 
 It's easy to apply a place-targeting command to a whole contiguous
@@ -2542,7 +2539,7 @@ coordinates of a place within a level, meaning that commands may change
 the currently displayed room as well, when moving or restoring the mouse
 selection.
 
-The mouse selection can't be used to select constructions of the rooms
+The mouse selection can't be used to select tiles of the rooms
 above and below while at the current room, because the topmost pixels
 are reserved to selection pointing nowhere and the bottom region to the
 message line and menu system.
@@ -2815,312 +2812,312 @@ Each one of these menu commands and their sub-commands (recursively),
 are defined and explored in the following sections.
 
 
-@node Construction E>C
-@section Construction: E>C
-@cindex level editor, construction
-@cindex construction, level editor
-@mcindex E>C
+@node Tile E>T
+@section Tile: E>T
+@cindex level editor, tile
+@cindex tile, level editor
+@mcindex E>T
 
 This non-terminal command has sub-commands for setting and querying the
-three intrinsic construction components: @emph{foreground},
-@emph{background} and @emph{extension}.  @xref{Constructions}.  All
-commands in this hierarchy applies to the selected construction.  If the
+three intrinsic tile components: @emph{foreground},
+@emph{background} and @emph{extension}.  @xref{Tiles}.  All
+commands in this hierarchy applies to the selected tile.  If the
 mouse selection is pointing to nowhere when any command of this
-hierarchy is invoked, it displays @samp{SELECT CONSTRUCTION} on the
+hierarchy is invoked, it displays @samp{SELECT TILE} on the
 message line and sets the mouse cursor to @code{UNAVAILABLE}.
 Otherwise, the mouse cursor is set to @code{LINK}, unless an input
 command is applicable, in which case it's set to @code{QUESTION}.
 
 @center @kbd{C>FBEIARHCP}
 
-@node Foreground E>CF
-@subsection Foreground: E>CF
-@cindex level editor, construction foreground
-@cindex construction foreground, level editor
-@mcindex E>CF
+@node Foreground E>TF
+@subsection Foreground: E>TF
+@cindex level editor, tile foreground
+@cindex tile foreground, level editor
+@mcindex E>TF
 
-This non-terminal command has sub-commands for all possible construction
-foregrounds.  Each immediate sub-command represents a construction
+This non-terminal command has sub-commands for all possible tile
+foregrounds.  Each immediate sub-command represents a tile
 foreground class as described in @ref{Foregrounds}.
 
 @center @kbd{CF>FPWDCMRA}
 
-The only terminal sub-commands are @kbd{W} (Wall), @kbd{C} (Chopper) and
+The only terminal sub-commands are @kbd{W} (Wall), @kbd{C} (Chomper) and
 @kbd{M} (Mirror), because they represent classes with just one member.
 The remaining non-terminal commands are comprised solely of non-input
 commands, one for each member of the respective class.  Every non-input
 command in this hierarchy works in the same way: they immediately change
-the foreground of the selected construction.  The user may keep the
+the foreground of the selected tile.  The user may keep the
 respective command key pressed while moving the mouse selection around
 to easily apply a particular foreground to an wider region, as described
 in @ref{Mouse selection}.  This command hierarchy is structured as
 follows:
 
 @itemize
-@mcindex E>CFF
+@mcindex E>TFF
 @item @kbd{F} (Floor): @kbd{CFF>NFBSLPOCTH}.  @xref{Floors}.
 @table @kbd
-@mcindex E>CFFN
+@mcindex E>TFFN
 @item N
 @code{NO_FLOOR}
-@mcindex E>CFFF
+@mcindex E>TFFF
 @item F
 @code{FLOOR}
-@mcindex E>CFFB
+@mcindex E>TFFB
 @item B
 @code{BROKEN_FLOOR}
-@mcindex E>CFFS
+@mcindex E>TFFS
 @item S
 @code{SKELETON_FLOOR}
-@mcindex E>CFFL
+@mcindex E>TFFL
 @item L
 @code{LOOSE_FLOOR}
-@mcindex E>CFFP
+@mcindex E>TFFP
 @item P
 @code{SPIKES_FLOOR}
-@mcindex E>CFFO
+@mcindex E>TFFO
 @item O
 @code{OPENER_FLOOR}
-@mcindex E>CFFC
+@mcindex E>TFFC
 @item C
 @code{CLOSER_FLOOR}
-@mcindex E>CFFT
+@mcindex E>TFFT
 @item T
 @code{STUCK_FLOOR}
-@mcindex E>CFFH
+@mcindex E>TFFH
 @item H
 @code{HIDDEN_FLOOR}
 @end table
 
-@mcindex E>CFP
+@mcindex E>TFP
 @item @kbd{P} (Pillar): @kbd{CFP>PTBA}.  @xref{Pillars}.
 @table @kbd
-@mcindex E>CFPP
+@mcindex E>TFPP
 @item P
 @code{PILLAR}
-@mcindex E>CFPT
+@mcindex E>TFPT
 @item T
 @code{BIG_PILLAR_TOP}
-@mcindex E>CFPB
+@mcindex E>TFPB
 @item B
 @code{BIG_PILLAR_BOTTOM}
-@mcindex E>CFPA
+@mcindex E>TFPA
 @item A
 @code{ARCH_BOTTOM}
 @end table
 
-@mcindex E>CFW
+@mcindex E>TFW
 @item @kbd{W} @code{WALL}.  @xref{Wall}.
 
-@mcindex E>CFD
+@mcindex E>TFD
 @item @kbd{D} (Door): @kbd{CFD>DL}.  @xref{Doors}.
 @table @kbd
-@mcindex E>CFDD
+@mcindex E>TFDD
 @item D
 @code{DOOR}
-@mcindex E>CFDL
+@mcindex E>TFDL
 @item L
 @code{LEVEL_DOOR}
 @end table
 
-@mcindex E>CFC
-@item @kbd{C} @code{CHOPPER}.  @xref{Chopper}.
+@mcindex E>TFC
+@item @kbd{C} @code{CHOMPER}.  @xref{Chomper}.
 
-@mcindex E>CFM
+@mcindex E>TFM
 @item @kbd{M} @code{MIRROR}.  @xref{Mirror}.
 
-@mcindex E>CFR
+@mcindex E>TFR
 @item @kbd{R} (Carpet): @kbd{CFR>CT}.  @xref{Carpets}.
 @table @kbd
-@mcindex E>CFRC
+@mcindex E>TFRC
 @item C
 @code{CARPET}
-@mcindex E>CFRT
+@mcindex E>TFRT
 @item T
 @code{TCARPET}
 @end table
 
-@mcindex E>CFA
+@mcindex E>TFA
 @item @kbd{A} (Arch): @kbd{CFA>MSLR}.  @xref{Arches}.
 @table @kbd
-@mcindex E>CFAM
+@mcindex E>TFAM
 @item M
 @code{ARCH_TOP_MID}
-@mcindex E>CFAS
+@mcindex E>TFAS
 @item S
 @code{ARCH_TOP_SMALL}
-@mcindex E>CFAL
+@mcindex E>TFAL
 @item L
 @code{ARCH_TOP_LEFT}
-@mcindex E>CFAR
+@mcindex E>TFAR
 @item R
 @code{ARCH_TOP_RIGHT}
 @end table
 @end itemize
 
 
-@node Background E>CB
-@subsection Background: E>CB
-@cindex level editor, construction background
-@cindex construction background, level editor
-@mcindex E>CB
+@node Background E>TB
+@subsection Background: E>TB
+@cindex level editor, tile background
+@cindex tile background, level editor
+@mcindex E>TB
 
-This non-terminal command has sub-commands for all possible construction
+This non-terminal command has sub-commands for all possible tile
 backgrounds.  Each sub-command is non-input and represents a
-construction background as described in @ref{Backgrounds}.
+tile background as described in @ref{Backgrounds}.
 
 @center @kbd{CB>NG0123TWB}
 
 Every sub-command works in the same way: they immediately change the
-background of the selected construction.  The user may keep the
+background of the selected tile.  The user may keep the
 respective command key pressed while moving the mouse selection around
 to easily apply a particular background to an wider region, as described
 in @ref{Mouse selection}.  These sub-commands have the following
 meanings:
 
 @table @kbd
-@mcindex E>CBN
+@mcindex E>TBN
 @item N
 @code{NO_BRICKS}
-@mcindex E>CBG
+@mcindex E>TBG
 @item G
 @code{NO_BG}
-@mcindex E>CB0
+@mcindex E>TB0
 @item 0
 @code{BRICKS_00}
-@mcindex E>CB1
+@mcindex E>TB1
 @item 1
 @code{BRICKS_01}
-@mcindex E>CB2
+@mcindex E>TB2
 @item 2
 @code{BRICKS_02}
-@mcindex E>CB3
+@mcindex E>TB3
 @item 3
 @code{BRICKS_03}
-@mcindex E>CBT
+@mcindex E>TBT
 @item T
 @code{TORCH}
-@mcindex E>CBW
+@mcindex E>TBW
 @item W
 @code{WINDOW}
-@mcindex E>CBB
+@mcindex E>TBB
 @item B
 @code{BALCONY}
 @end table
 
-@node Extension E>CE
-@subsection Extension: E>CE
-@cindex level editor, construction extension
-@cindex construction extension, level editor
-@mcindex E>CE
+@node Extension E>TE
+@subsection Extension: E>TE
+@cindex level editor, tile extension
+@cindex tile extension, level editor
+@mcindex E>TE
 
-As described in @ref{Constructions}, any given construction foreground
+As described in @ref{Tiles}, any given tile foreground
 may or may not use one among a handful of extensions.  Which
-construction use which extension (if any) and what it means is described
+tile use which extension (if any) and what it means is described
 throughout @ref{Foregrounds}.  On that ground, the behavior of this
-command depends upon the selected construction's foreground.  If the
-selected con doesn't use any extension @samp{NO@tie{}EXTENSION} is
+command depends upon the selected tile's foreground.  If the
+selected tile doesn't use any extension @samp{NO@tie{}EXTENSION} is
 displayed on the message line and the mouse cursor is set to
 @code{UNAVAILABLE}.
 
-@node Item extension E>CE
+@node Item extension E>TE
 @subsubsection Item
-@cindex level editor, construction item extension
-@cindex construction item extension, level editor
+@cindex level editor, tile item extension
+@cindex tile item extension, level editor
 
-If the selected con uses the @emph{item extension} (@code{FLOOR}), this
+If the selected tile uses the @emph{item extension} (@code{FLOOR}), this
 command is non-terminal:
 
 @center @kbd{CE>NESBPOFLAW}
 
 Each one of its sub-commands is non-input and corresponds to one of the
 items listed in @ref{Items}.  All of them work in the same way: they
-immediately change the extension of the selected construction.  They
+immediately change the extension of the selected tile.  They
 have the following meanings:
 
 @table @kbd
-@mcindex E>CEN
+@mcindex E>TEN
 @item N
 @code{NO_ITEM}
-@mcindex E>CEE
+@mcindex E>TEE
 @item E
 @code{EMPTY_POTION}
-@mcindex E>CES
+@mcindex E>TES
 @item S
 @code{SMALL_LIFE_POTION}
-@mcindex E>CEB
+@mcindex E>TEB
 @item B
 @code{BIG_LIFE_POTION}
-@mcindex E>CEP
+@mcindex E>TEP
 @item P
 @code{SMALL_POISON_POTION}
-@mcindex E>CEO
+@mcindex E>TEO
 @item O
 @code{BIG_POISON_POTION}
-@mcindex E>CEF
+@mcindex E>TEF
 @item F
 @code{FLOAT_POTION}
-@mcindex E>CEL
+@mcindex E>TEL
 @item L
 @code{FLIP_POTION}
-@mcindex E>CEA
+@mcindex E>TEA
 @item A
 @code{ACTIVATION_POTION}
-@mcindex E>CEW
+@mcindex E>TEW
 @item W
 @code{SWORD}
 @end table
 
-@node Can't fall extension E>CE
+@node Can't fall extension E>TE
 @subsubsection Can't fall
-@cindex level editor, construction can't fall extension
-@cindex construction can't fall extension, level editor
+@cindex level editor, tile can't fall extension
+@cindex tile can't fall extension, level editor
 
-If the selected con uses the @emph{can't fall extension}
+If the selected tile uses the @emph{can't fall extension}
 (@code{LOOSE_FLOOR}), this command is a boolean input (see @ref{Boolean
 input}) where @var{c} is the @emph{can't fall extension} boolean value:
 
-@center @kbd{CE>Cc?}
+@center @kbd{CE>Tc?}
 
 Pressing @kbd{C} immediately toggles the @emph{can't fall extension} of
-the selected construction.
+the selected tile.
 
-@node Event extension E>CE
+@node Event extension E>TE
 @subsubsection Event
-@cindex level editor, construction event extension
-@cindex construction event extension, level editor
+@cindex level editor, tile event extension
+@cindex tile event extension, level editor
 
-If the selected con uses the @emph{event extension} (@code{OPENER_FLOOR}
+If the selected tile uses the @emph{event extension} (@code{OPENER_FLOOR}
 and @code{CLOSER_FLOOR}), this command is an integer input (see
 @ref{Integer input}):
 
 @center @kbd{CE>EVENT 0-255:i}
 
 Where @var{i} is the event currently triggered by the selected
-construction.  Changes in @var{I} takes effect immediately.
+tile.  Changes in @var{I} takes effect immediately.
 
-@node Step extension E>CE
+@node Step extension E>TE
 @subsubsection Step
-@cindex level editor, construction step extension
-@cindex construction step extension, level editor
+@cindex level editor, tile step extension
+@cindex tile step extension, level editor
 
-If the selected con uses the @emph{step extension} (@code{SPIKES_FLOOR},
-@code{DOOR}, @code{LEVEL_DOOR} and @code{CHOPPER}), this command is an
+If the selected tile uses the @emph{step extension} (@code{SPIKES_FLOOR},
+@code{DOOR}, @code{LEVEL_DOOR} and @code{CHOMPER}), this command is an
 integer input (see @ref{Integer input}):
 
 @center @kbd{CE>STEP 0-max:i}
 
 Where @var{max} is the maximum acceptable step and @var{i} is the
-current step value of the selected construction.  Changes in @var{i}
-takes effect immediately, and the selected dynamic construction gives
+current step value of the selected tile.  Changes in @var{i}
+takes effect immediately, and the selected dynamic tile gives
 instant visual feedback.
 
-@node Design extension E>CE
+@node Design extension E>TE
 @subsubsection Design
-@cindex level editor, construction design extension
-@cindex construction design extension, level editor
+@cindex level editor, tile design extension
+@cindex tile design extension, level editor
 
-If the selected con uses the @emph{design extension} (@code{CARPET} and
+If the selected tile uses the @emph{design extension} (@code{CARPET} and
 @code{TCARPET}), this command is non-terminal:
 
 @center @kbd{CE>01A} (@code{CARPET})
@@ -3128,77 +3125,77 @@ If the selected con uses the @emph{design extension} (@code{CARPET} and
 
 Each one of its sub-commands is non-input and corresponds to one of the
 carpet designs listed in @ref{Carpets}.  All of them work in the same
-way: they immediately change the extension of the selected construction.
+way: they immediately change the extension of the selected tile.
 They have the following meanings:
 
 @table @kbd
-@mcindex E>CE0
+@mcindex E>TE0
 @item 0
 @code{CARPET_00}
-@mcindex E>CE1
+@mcindex E>TE1
 @item 1
 @code{CARPET_01}
-@mcindex E>CEA
+@mcindex E>TEA
 @item A
 @code{ARCH_CARPET_LEFT}
-@mcindex E>CEB
+@mcindex E>TEB
 @item B
 @code{ARCH_CARPET_RIGHT_00}
-@mcindex E>CEC
+@mcindex E>TEC
 @item C
 @code{ARCH_CARPET_RIGHT_01}
 @end table
 
-@node Info E>CI
-@subsection Info: E>CI
-@cindex level editor, construction info
-@cindex construction info, level editor
-@mcindex E>CI
+@node Info E>TI
+@subsection Info: E>TI
+@cindex level editor, tile info
+@cindex tile info, level editor
+@mcindex E>TI
 
 This non-input command prints on the message line the three components
-of the selected construction in the following format:
+of the selected tile in the following format:
 
 @center @samp{FG/BG/EXT}
 
 Where @var{FG}, @var{BG} and @var{EXT} are the string representation of
-the selected con's foreground, background and extension, respectively.
+the selected tile's foreground, background and extension, respectively.
 
-@node Clear E>CA
-@subsection Clear: E>CA
-@cindex level editor, clear construction
-@cindex construction clear, level editor
-@cindex clear construction, level editor
-@mcindex E>CA
+@node Clear E>TA
+@subsection Clear: E>TA
+@cindex level editor, clear tile
+@cindex tile clear, level editor
+@cindex clear tile, level editor
+@mcindex E>TA
 
-This non-input command immediately sets the selected construction to
+This non-input command immediately sets the selected tile to
 @code{NO_FLOOR/NO_BG}, making the place empty.  The user may keep the
 respective command key pressed while moving the mouse selection around
 to easily empty an wider region, as described in @ref{Mouse selection}.
-To clear the constructions of an entire room at once see @ref{Clear
+To clear the tiles of an entire room at once see @ref{Clear
 E>RA}.
 
-@node Random E>CR
-@subsection Random: E>CR
-@cindex level editor, random construction
-@cindex construction random, level editor
-@cindex random construction, level editor
-@mcindex E>CR
+@node Random E>TR
+@subsection Random: E>TR
+@cindex level editor, random tile
+@cindex tile random, level editor
+@cindex random tile, level editor
+@mcindex E>TR
 
-This non-input command immediately sets the selected construction
+This non-input command immediately sets the selected tile
 randomly to any possible combination of foreground and background.  The
 user may keep the respective command key pressed while moving the mouse
 selection around to easily randomize an wider region, as described in
-@ref{Mouse selection}.  To randomize the constructions of an entire room
+@ref{Mouse selection}.  To randomize the tiles of an entire room
 at once see @ref{Random E>RR}.
 
-@node Exchange cons E>CH
-@subsection Exchange cons: E>CH
-@cindex level editor, construction exchange
-@cindex construction exchange, level editor
-@mcindex E>CH
+@node Exchange tiles E>TH
+@subsection Exchange cons: E>TH
+@cindex level editor, tile exchange
+@cindex tile exchange, level editor
+@mcindex E>TH
 
 This non-terminal command has sub-commands for exchanging two
-construction (swapping places) in their entirety: foreground, background
+tile (swapping places) in their entirety: foreground, background
 and extension.  If any of the following positions are referencing either
 of the exchanging places, they are updated to point to the exchanged
 places.
@@ -3215,56 +3212,56 @@ Each sub-command is non-input and represents a particular place mapping.
 @center @kbd{CH>HVR}
 
 Every sub-command works in the same way: they immediately exchange the
-selected construction with the one given by its particular mapping.
+selected tile with the one given by its particular mapping.
 These sub-commands have the following meanings:
 
 @table @kbd
-@mcindex E>CHH
+@mcindex E>THH
 @item H
 horizontal reflection.  Inverts the start facing direction of guards and
 the kid, and current facing direction of character instances as well.
-@mcindex E>CHV
+@mcindex E>THV
 @item V
 vertical reflection
-@mcindex E>CHR
+@mcindex E>THR
 @item R
 random place within the currently selected room
 @end table
 
-To apply the exchange to constructions of an entire room see
-@ref{Exchange cons E>RH}.
+To apply the exchange to tiles of an entire room see
+@ref{Exchange tiles E>RH}.
 
-@node Copy E>CC
-@subsection Copy: E>CC
-@cindex level editor, construction copy
-@cindex copy construction, level editor
-@cindex construction copy, level editor
-@mcindex E>CC
+@node Copy E>TC
+@subsection Copy: E>TC
+@cindex level editor, tile copy
+@cindex copy tile, level editor
+@cindex tile copy, level editor
+@mcindex E>TC
 
-This is a non-input command intended to copy the selected construction
+This is a non-input command intended to copy the selected tile
 in its entirety (foreground, background and extension) to a temporary
 memory area so it can later be retrieved and pasted elsewhere (see
-@ref{Paste E>CP}).  After invoked it briefly displays on the message
-line @samp{COPIED} to indicate that the selected con has been
-successfully stored.  Notice that only one construction can be held at a
+@ref{Paste E>TP}).  After invoked it briefly displays on the message
+line @samp{COPIED} to indicate that the selected tile has been
+successfully stored.  Notice that only one tile can be held at a
 time, so further invocations replace previously stored cons.  The
-construction originally held in the temporary area---before the first
+tile originally held in the temporary area---before the first
 successful invocation of this command---is @code{NO_FLOOR/NO_BG}.  To
-copy the constructions of an entire room see @ref{Copy E>RC}.
+copy the tiles of an entire room see @ref{Copy E>RC}.
 
-@node Paste E>CP
-@subsection Paste: E>CP
-@cindex level editor, construction paste
-@cindex paste construction, level editor
-@cindex construction paste, level editor
-@cindex E>CP
+@node Paste E>TP
+@subsection Paste: E>TP
+@cindex level editor, tile paste
+@cindex paste tile, level editor
+@cindex tile paste, level editor
+@cindex E>TP
 
 This is a non-input command intended to paste a previously copied
-construction over the selected one (see @ref{Copy E>CC}).  After invoked
-it immediately replaces the selected construction.  The user may keep
+tile over the selected one (see @ref{Copy E>TC}).  After invoked
+it immediately replaces the selected tile.  The user may keep
 the respective command key pressed while moving the mouse selection
-around to easily paste the same con onto an wider region, as described
-in @ref{Mouse selection}.  To paste the constructions of an entire room
+around to easily paste the same tile onto an wider region, as described
+in @ref{Mouse selection}.  To paste the tiles of an entire room
 see @ref{Paste E>RP}.
 
 @node Event E>E
@@ -3451,7 +3448,7 @@ other room linking to room B from the same direction.
 @end cartouche
 
 This non-terminal command has sub-commands for handling room linking,
-room constructions as a whole and navigating through rooms.
+room tiles as a whole and navigating through rooms.
 
 @center @kbd{R>JLSXARDHCP}
 
@@ -3489,8 +3486,8 @@ invocation.
 
 @node Room linking E>RL
 @subsection Room linking: E>RL
-@cindex level editor, construction room linking
-@cindex construction room linking, level editor
+@cindex level editor, tile room linking
+@cindex tile room linking, level editor
 @mcindex E>RL
 
 This non-terminal command has input sub-commands for all linking
@@ -3587,10 +3584,10 @@ invocation.
 @cindex room clear, level editor
 @mcindex E>RA
 
-This non-input command immediately sets the constructions of the
+This non-input command immediately sets the tiles of the
 currently displayed room to @code{NO_FLOOR/NO_BG}, making the room
 empty.  Useful if the user wants to construct a room from scratch.  To
-clear just a strict sub-region of a room see @ref{Clear E>CA}.
+clear just a strict sub-region of a room see @ref{Clear E>TA}.
 
 @node Random E>RR
 @subsection Random: E>RR
@@ -3599,11 +3596,11 @@ clear just a strict sub-region of a room see @ref{Clear E>CA}.
 @cindex room randomization, level editor
 @mcindex E>RR
 
-This non-input command immediately sets the constructions of the
+This non-input command immediately sets the tiles of the
 currently displayed room randomly to any possible combination of
 foreground and background.  Useful if the user doesn't have an initial
 idea for how the room should look like.  To randomize just a strict
-sub-region of a room see @ref{Random E>CR}.
+sub-region of a room see @ref{Random E>TR}.
 
 @node Decoration E>RD
 @subsection Decoration: E>RD
@@ -3613,19 +3610,19 @@ sub-region of a room see @ref{Random E>CR}.
 @mcindex E>RD
 
 This non-input command randomly redecorates the currently displayed
-room.  Constructions' foreground, background and extension may be
+room.  Tiles' foreground, background and extension may be
 changed as long as these changes are purely aesthetical.  Useful if the
 user doesn't have an strict idea for how the room decoration should look
 like.
 
-@node Exchange cons E>RH
+@node Exchange tiles E>RH
 @subsection Exchange cons: E>RH
-@cindex level editor, room construction exchange
-@cindex room construction exchange, level editor
+@cindex level editor, room tile exchange
+@cindex room tile exchange, level editor
 @mcindex E>RH
 
 This non-terminal command has sub-commands for exchanging all room
-constructions (swapping places) in their entirety: foreground,
+tiles (swapping places) in their entirety: foreground,
 background and extension.  If any of the following positions are
 referencing either of the exchanging places, they are updated to point
 to the exchanged places.
@@ -3642,7 +3639,7 @@ Each sub-command is non-input and represents a particular place mapping.
 @center @kbd{RH>HVR}
 
 Every sub-command works in the same way: they immediately exchange the
-constructions of the currently displayed room according to their
+tiles of the currently displayed room according to their
 particular mapping.  These sub-commands have the following meanings:
 
 @table @kbd
@@ -3658,8 +3655,8 @@ vertical reflection
 random place within the currently selected room
 @end table
 
-To apply the exchange to just a couple of constructions see
-@ref{Exchange cons E>CH}.
+To apply the exchange to just a couple of tiles see
+@ref{Exchange tiles E>TH}.
 
 @node Copy E>RC
 @subsection Copy: E>RC
@@ -3668,17 +3665,17 @@ To apply the exchange to just a couple of constructions see
 @cindex room copy, level editor
 @mcindex E>RC
 
-This is a non-input command intended to copy the constructions of the
+This is a non-input command intended to copy the tiles of the
 currently displayed room in their entirety (foreground, background and
 extension) to a temporary memory area so they can later be retrieved and
 pasted over another room (see @ref{Paste E>RP}).  After invoked it
 briefly displays on the message line @samp{COPIED} to indicate that the
-constructions of the current room have been successfully stored.  Notice
-that only one room may have its constructions held at a time, so further
-invocations replace previously stored cons.  The constructions
+tiles of the current room have been successfully stored.  Notice
+that only one room may have its tiles held at a time, so further
+invocations replace previously stored cons.  The tiles
 originally held in the temporary area---before the first successful
 invocation of this command---are @code{NO_FLOOR/NO_BG}.  To copy just
-one construction see @ref{Copy E>CC}.
+one tile see @ref{Copy E>TC}.
 
 @node Paste E>RP
 @subsection Paste: E>RP
@@ -3688,10 +3685,10 @@ one construction see @ref{Copy E>CC}.
 @cindex E>RP
 
 This is a non-input command intended to paste the previously copied
-constructions of an entire room over the currently displayed one (see
+tiles of an entire room over the currently displayed one (see
 @ref{Copy E>RC}).  After invoked it immediately replaces the
-constructions of the current room.  To paste just one construction see
-@ref{Paste E>CP}.
+tiles of the current room.  To paste just one tile see
+@ref{Paste E>TP}.
 
 @node Kid E>K
 @section Kid: E>K
@@ -3706,7 +3703,7 @@ as putting the kid in an arbitrary place on-the-fly.
 @center @kbd{K>PSJDW}
 
 While this command is active, a darker semi-transparent image of the kid
-is shown in his starting place, above all constructions and characters.
+is shown in his starting place, above all tiles and characters.
 A sword image with the same characteristics is shown near him, in case
 he starts with one.
 
@@ -3717,12 +3714,12 @@ he starts with one.
 @mcindex E>KP
 
 This non-input command instantly puts the kid in the selected
-construction's place.  This is useful for placing the kid in arbitrary
+tile's place.  This is useful for placing the kid in arbitrary
 positions throughout the level for testing.  The kid is placed at rest
 independently of the movement he is performing at the instant of
 invocation.  There is no restriction of placement, and he can be placed
 even inside walls.  If the mouse selection is pointing to nowhere when
-this command is invoked, it displays @samp{SELECT CONSTRUCTION} on the
+this command is invoked, it displays @samp{SELECT TILE} on the
 message line.
 
 @node Set start position E>KS
@@ -3732,10 +3729,10 @@ message line.
 @mcindex E>KS
 
 This non-input command instantly sets kid's starting position to the
-selected construction's place.  It gives instant visual feedback.  There
+selected tile's place.  It gives instant visual feedback.  There
 is no restriction of placement, and he can be placed even inside walls.
 If the mouse selection is pointing to nowhere when this command is
-invoked, it displays @samp{SELECT CONSTRUCTION} on the message line.
+invoked, it displays @samp{SELECT TILE} on the message line.
 
 @node Jump to start position E>KJ
 @subsection Jump to start position: E>KJ
@@ -3933,7 +3930,7 @@ selected guard is disabled, the mouse cursor is set to
 @code{UNAVAILABLE} and attempts to execute any other command will fail
 showing @samp{DISABLED GUARD} on the message line.  While commands of
 this hierarchy are active, darker semi-transparent images of the guards
-are shown in their starting place, above all constructions and
+are shown in their starting place, above all tiles and
 characters.
 
 @node Select guard E>GG
@@ -3962,13 +3959,13 @@ selection to the state it had before this command invocation.
 @mcindex E>GP
 
 This non-input command instantly puts the live instance of the currently
-selected guard in the selected construction's place.  This is useful for
+selected guard in the selected tile's place.  This is useful for
 placing guards in arbitrary positions throughout the level for testing.
 The guard is placed at rest independently of the movement he is
 performing at the instant of invocation.  There is no restriction of
 placement, and guards can be placed even inside walls.  If the mouse
 selection is pointing to nowhere when this command is invoked, it
-displays @samp{SELECT CONSTRUCTION} on the message line.  If the
+displays @samp{SELECT TILE} on the message line.  If the
 currently selected guard has no correspondent live instance, it displays
 @samp{NO LIVE INSTANCE} on the message line.
 
@@ -3979,11 +3976,11 @@ currently selected guard has no correspondent live instance, it displays
 @mcindex E>GS
 
 This non-input command instantly sets the starting position of the
-currently selected guard to the selected construction's place.  It gives
+currently selected guard to the selected tile's place.  It gives
 instant visual feedback.  There is no restriction of placement, and the
 guard can be placed even inside walls.  If the mouse selection is
 pointing to nowhere when this command is invoked, it displays
-@samp{SELECT CONSTRUCTION} on the message line.
+@samp{SELECT TILE} on the message line.
 
 @node Jump to start position E>GJ
 @subsection Jump to start position: E>GJ
@@ -4272,7 +4269,7 @@ succeeds, the level cache is updated and @samp{LEVEL HAS BEEN SAVED} is
 displayed on the message line.  Otherwise @samp{LEVEL SAVE FAILED} is
 shown and an error message describing the problem is printed out to the
 console.  The saved level can be fully reloaded using the @kbd{CTRL+A}
-key binding (see @ref{Game flow}), or may have only its constructions
+key binding (see @ref{Game flow}), or may have only its tiles
 reloaded---keeping every other element (like characters) in their curent
 state---using the reload command.  @xref{Reload E>LL}.
 
@@ -4282,11 +4279,11 @@ state---using the reload command.  @xref{Reload E>LL}.
 @cindex level reload, level editor
 @mcindex E>LL
 
-This non-input command restores the current level's cached
-constructions, which represent the level state at the moment of the
-latest save operation.  This command is useful for undoing unintended
-changes to the cons of a level when editing or playing it.  This command
-always succeeds, showing @samp{LEVEL RELOADED} on the message line.
+This non-input command restores the current level's cached tiles, which
+represent the level state at the moment of the latest save operation.
+This command is useful for undoing unintended changes to the tiles of a
+level when editing or playing it.  This command always succeeds, showing
+@samp{LEVEL RELOADED} on the message line.
 
 
 
@@ -4305,7 +4302,7 @@ Unlike these the native level format supports all features offered by
 the engine, including:
 
 @itemize
-@item Arbitrary combinations of construction foregrounds and
+@item Arbitrary combinations of tile foregrounds and
  backgrounds.
 @item Arbitrary number of guards per room.
 @item Guard type selected per guard.
@@ -4547,12 +4544,12 @@ next flag.  0 is @code{FALSE}, any other integer is @code{TRUE}.
 @end table
 
 
-@node Constructions Cr f p
-@section Constructions: Cr f p
-@cindex native level format, constructions
-@cindex constructions, native level format
+@node Tiles Cr f p
+@section Tiles: Cr f p
+@cindex native level format, tiles
+@cindex tiles, native level format
 
-Constructions are given by this key. @xref{Construction E>C}.
+Tiles are given by this key. @xref{Tile E>T}.
 
 @center @code{Cr f p=f b e}
 
@@ -4595,7 +4592,7 @@ Constructions are given by this key. @xref{Construction E>C}.
 @item 15
 @code{LEVEL_DOOR}
 @item 16
-@code{CHOPPER}
+@code{CHOMPER}
 @item 17
 @code{MIRROR}
 @item 18

@@ -32,9 +32,6 @@ int anim_freq_real;
 
 ALLEGRO_EVENT_QUEUE *event_queue;
 
-struct anim *anima;
-size_t anima_nmemb;
-
 void
 play_anim (void (*draw_callback) (void),
            void (*compute_callback) (void),
@@ -90,12 +87,12 @@ play_anim (void (*draw_callback) (void),
         struct replay *replay = get_replay ();
 
         /* detect incomplete replays */
-        struct anim *k;
+        struct actor *k;
         if (! title_demo
             && replay_mode == PLAY_REPLAY
             && (anim_cycle >= replay->packed_gamepad_state_nmemb
                 + REPLAY_STUCK_THRESHOLD
-                || ((k = get_anim_by_id (current_kid_id))
+                || ((k = get_actor_by_id (current_kid_id))
                     && k->current_lives <= 0
                     && death_timer >= SEC2CYC (8))))
           quit_anim = REPLAY_INCOMPLETE;
@@ -240,7 +237,7 @@ play_anim (void (*draw_callback) (void),
       case 1: ui_editor (); break;
       case 3:
         if (edit != EDIT_NONE)
-          ui_place_kid (get_anim_by_id (current_kid_id), &mouse_pos);
+          ui_place_kid (get_actor_by_id (current_kid_id), &mouse_pos);
         break;
       default: break;
       }
@@ -376,494 +373,6 @@ change_anim_freq (int f)
 
 
 
-int
-create_anim (struct anim *a0, enum anim_type t, struct pos *p, enum dir dir)
-{
-  struct anim a;
-  int i = anima_nmemb;
-  memset (&a, 0, sizeof (a));
-
-  if (a0) a = *a0;
-  else {
-    a.type = t;
-    a.original_type = t;
-    a.f.dir = dir;
-    new_coord (&a.f.c, p->l, p->room, -1, -1);
-    a.controllable = false;
-    invalid_pos (&a.enemy_pos);
-  }
-
-  a.id = i;
-  a.f.parent_id = i;
-  a.level_id = -1;
-
-  switch (a.type) {
-  case NO_ANIM: default: break;
-  case KID: create_kid (a0, &a, p, dir); break;
-  case GUARD:
-  case FAT_GUARD:
-  case VIZIER:
-  case SKELETON:
-  case SHADOW:
-    create_guard (a0, &a, p, dir); break;
-  case MOUSE: create_mouse (a0, &a, p, dir); break;
-  }
-
-  anima = add_to_array (&a, 1, anima, &anima_nmemb, i, sizeof (a));
-  return i;
-}
-
-void
-destroy_anim (struct anim *a)
-{
-  forget_enemy (a);
-
-  if (a->type == KID) destroy_kid (a);
-
-  size_t i =  a - anima;
-  anima = remove_from_array (anima, &anima_nmemb, i, 1, sizeof (*a));
-}
-
-void
-destroy_anims (void)
-{
-  while (anima_nmemb) destroy_anim (&anima[0]);
-  anima = NULL;
-  anima_nmemb = 0;
-}
-
-struct anim *
-get_next_controllable (struct anim *k)
-{
-  do {
-    k = &anima[(k - anima + 1) % anima_nmemb];
-  } while (k->type != KID || ! k->controllable);
-  return k;
-}
-
-void
-select_controllable_by_id (int id)
-{
-  struct anim *old_k = get_anim_by_id (current_kid_id);
-  struct anim *k = get_anim_by_id (id);
-  current_kid_id = id;
-  if (id) {
-    k->death_timer = 0;
-    last_fellow_shadow_id = id;
-  }
-  if (! is_frame_visible (&k->f))
-    mr_restore_origin (&k->mr_origin);
-  if (k->f.c.room != old_k->f.c.room)
-    mr_focus_room (k->f.c.room);
-  k->selection_cycle = anim_cycle;
-}
-
-struct anim *
-get_anim_by_id (int id)
-{
-  int i;
-  if (id < 0) return NULL;
-  for (i = 0; i < anima_nmemb; i++)
-    if (anima[i].id == id) return &anima[i];
-  return NULL;
-}
-
-struct anim *
-get_reciprocal_enemy (struct anim *k)
-{
-  if (! k) return NULL;
-  else if (k->enemy_id == -1) return NULL;
-  else if (k->enemy_id != -1 && k->enemy_refraction >= 0)
-    return NULL;
-  else if (k->enemy_id != -1) {
-    struct anim *ke = get_anim_by_id (k->enemy_id);
-    if (! ke) return NULL;
-    else if (ke->enemy_id == -1) return NULL;
-    else if (ke->enemy_id != -1 && ke->enemy_refraction >= 0)
-      return NULL;
-    else if (ke->enemy_id == k->id) return ke;
-    else return NULL;
-  } else return NULL;
-}
-
-struct anim *
-get_anim_dead_at_pos (struct pos *p)
-{
-  int i;
-  for (i = 0; i < anima_nmemb; i++)
-    if (anima[i].current_lives <= 0
-        && peq (&anima[i].p, p))
-      return &anima[i];
-  return NULL;
-}
-
-struct anim *
-get_guard_anim_by_level_id (int id)
-{
-  int i;
-  if (id < 0) return NULL;
-  for (i = 0; i < anima_nmemb; i++)
-    if (is_guard (&anima[i]) && anima[i].level_id == id)
-      return &anima[i];
-  return NULL;
-}
-
-void
-draw_anim_frame (ALLEGRO_BITMAP *bitmap, struct anim *a, enum vm vm)
-{
-  switch (a->type) {
-  case NO_ANIM: default: break;
-  case KID: draw_kid_frame (bitmap, a, vm); break;
-  case GUARD:
-  case FAT_GUARD:
-  case VIZIER:
-  case SKELETON:
-  case SHADOW:
-    draw_guard_frame (bitmap, a, vm); break;
-  case MOUSE: draw_mouse_frame (bitmap, a, vm); break;
-  }
-}
-
-void
-draw_anims (ALLEGRO_BITMAP *bitmap, enum em em, enum vm vm)
-{
-  struct anim *a;
-
-  /* coord_wa = true; */
-
-  qsort (anima, anima_nmemb, sizeof (*a), compare_anims);
-
-  size_t i;
-  for (i = 0; i < anima_nmemb; i++) {
-    a = &anima[i];
-    if (a->invisible) continue;
-    draw_anim_frame (bitmap, a, vm);
-    draw_room_anim_fg (bitmap, em, vm, a);
-  }
-
-  /* coord_wa = false; */
-}
-
-int
-compare_anims (const void *_a0, const void *_a1)
-{
-  struct coord tr0, tr1;
-
-  struct anim *a0 = (struct anim *) _a0;
-  struct anim *a1 = (struct anim *) _a1;
-
-  if (is_kid_stairs (&a0->f) && ! is_kid_stairs (&a1->f))
-    return -1;
-  if (! is_kid_stairs (&a0->f) && is_kid_stairs (&a1->f))
-    return 1;
-
-  _tr (&a0->f, &tr0);
-  _tr (&a1->f, &tr1);
-
-  coord2room (&tr1, tr0.room, &tr1);
-
-  if (tr0.room < tr1.room) return -1;
-  if (tr0.room > tr1.room) return 1;
-
-  if (is_near (a0, a1)) {
-    if (tr0.x < tr1.x) return -1;
-    if (tr0.x > tr1.x) return 1;
-    if (a0->id < a1->id) return -1;
-    if (a0->id > a1->id) return 1;
-  } else {
-    struct coord o = {tr0.l, tr0.room, 0, ORIGINAL_HEIGHT};
-
-    double d0 = dist_coord (&o, &tr0);
-    double d1 = dist_coord (&o, &tr1);
-
-    if (d0 < d1) return -1;
-    if (d0 > d1) return 1;
-  }
-
-  return 0;
-}
-
-void
-draw_anim_if_at_pos (ALLEGRO_BITMAP *bitmap, struct anim *a, struct pos *p,
-                     enum vm vm)
-{
-  struct coord nc;
-  struct pos np, pbl, pmbo, pbr, pml, pm, pmr, ptl, pmt, ptr;
-  survey (_bl, pos, &a->f, &nc, &pbl, &np);
-  survey (_mbo, pos, &a->f, &nc, &pmbo, &np);
-  survey (_br, pos, &a->f, &nc, &pbr, &np);
-  survey (_ml, pos, &a->f, &nc, &pml, &np);
-  survey (_m, pos, &a->f, &nc, &pm, &np);
-  survey (_mr, pos, &a->f, &nc, &pmr, &np);
-  survey (_tl, pos, &a->f, &nc, &ptl, &np);
-  survey (_mt, pos, &a->f, &nc, &pmt, &np);
-  survey (_tr, pos, &a->f, &nc, &ptr, &np);
-
-  if (! peq (&pbl, p)
-      && ! peq (&pmbo, p)
-      && ! peq (&pbr, p)
-      && ! peq (&pml, p)
-      && ! peq (&pm, p)
-      && ! peq (&pmr, p)
-      && ! peq (&ptl, p)
-      && ! peq (&pmt, p)
-      && ! peq (&ptr, p)) return;
-
-  draw_anim_frame (bitmap, a, vm);
-}
-
-void
-clear_anims_keyboard_state (void)
-{
-  int i;
-  for (i = 0; i < anima_nmemb; i++)
-    memset (&anima[i].key, 0, sizeof (anima[i].key));
-}
-
-bool
-is_anim_dead (struct frame *f)
-{
-  return is_kid_dead (f)
-    || is_guard_dead (f);
-}
-
-bool
-is_anim_chopped (struct frame *f)
-{
-  return is_kid_chopped (f)
-    || is_guard_chopped (f);
-}
-
-bool
-is_anim_fall (struct frame *f)
-{
-  return is_kid_fall (f)
-    || is_guard_fall (f);
-}
-
-bool
-is_fightable_anim (struct anim *a)
-{
-  return a->type == KID || a->type == SHADOW
-    || a->type == GUARD || a->type == FAT_GUARD
-    || a->type == SKELETON || a->type == VIZIER;
-}
-
-void
-anim_die_suddenly (struct anim *a)
-{
-  switch (a->type) {
-  case NO_ANIM: default: break;
-  case KID: kid_die_suddenly (a); break;
-  case GUARD:
-  case FAT_GUARD:
-  case VIZIER:
-  case SKELETON:
-  case SHADOW:
-    guard_die_suddenly (a); break;
-  }
-}
-
-void
-anim_die_spiked (struct anim *a)
-{
-  switch (a->type) {
-  case NO_ANIM: default: break;
-  case KID: kid_die_spiked (a); break;
-  case GUARD:
-  case FAT_GUARD:
-  case VIZIER:
-  case SKELETON:
-  case SHADOW:
-    guard_die_spiked (a); break;
-  }
-}
-
-void
-anim_die_chopped (struct anim *a)
-{
-  switch (a->type) {
-  case NO_ANIM: default: break;
-  case KID: kid_die_chopped (a); break;
-  case GUARD:
-  case FAT_GUARD:
-  case VIZIER:
-  case SKELETON:
-  case SHADOW:
-    guard_die_chopped (a); break;
-  }
-}
-
-void
-anim_die (struct anim *a)
-{
-  switch (a->type) {
-  case NO_ANIM: default: break;
-  case KID: kid_die (a); break;
-  case GUARD:
-  case FAT_GUARD:
-  case VIZIER:
-  case SKELETON:
-  case SHADOW:
-    guard_die (a); break;
-  }
-}
-
-void
-anim_sword_hit (struct anim *a)
-{
-  switch (a->type) {
-  case NO_ANIM: default: break;
-  case KID: kid_sword_hit (a); break;
-  case GUARD:
-  case FAT_GUARD:
-  case VIZIER:
-  case SKELETON:
-  case SHADOW:
-    guard_hit (a); break;
-  }
-}
-
-void
-anim_fall (struct anim *a)
-{
-  switch (a->type) {
-  case NO_ANIM: default: break;
-  case KID: kid_fall (a); break;
-  case GUARD:
-  case FAT_GUARD:
-  case VIZIER:
-  case SKELETON:
-  case SHADOW:
-    guard_fall (a); break;
-  }
-}
-
-void
-anim_walkf (struct anim *a)
-{
-  switch (a->type) {
-  case NO_ANIM: default: break;
-  case KID: kid_sword_walkf (a); break;
-  case GUARD:
-  case FAT_GUARD:
-  case VIZIER:
-  case SKELETON:
-  case SHADOW:
-    guard_walkf (a); break;
-  }
-}
-
-void
-anim_walkb (struct anim *a)
-{
-  switch (a->type) {
-  case NO_ANIM: default: break;
-  case KID: kid_sword_walkb (a); break;
-  case GUARD:
-  case FAT_GUARD:
-  case VIZIER:
-  case SKELETON:
-  case SHADOW:
-    guard_walkb (a); break;
-  }
-}
-
-struct coord *
-splash_coord (struct frame *f, struct coord *c)
-{
-  int w = al_get_bitmap_width (v_kid_splash);
-  int h = al_get_bitmap_height (v_kid_splash);
-  int fw = al_get_bitmap_width (f->b);
-  int fh = al_get_bitmap_height (f->b);
-  return
-    new_coord (c, f->c.l, f->c.room,
-               f->c.x + (fw / 2) - (w / 2),
-               f->c.y + (fh / 2) - (h / 2));
-}
-
-bool
-uncollide_static_neutral (struct anim *a)
-{
-  return uncollide_static (&a->f, &a->fo, _bf, 0, 0, _bb, 0, 0,
-                           &a->fo);
-}
-
-bool
-uncollide_static_kid_normal (struct anim *a)
-{
-  return uncollide_static (&a->f, &a->fo, _bf,
-                           COLLISION_FRONT_LEFT_NORMAL,
-                           COLLISION_FRONT_RIGHT_NORMAL,
-                           _bb,
-                           COLLISION_BACK_LEFT_NORMAL,
-                           COLLISION_BACK_RIGHT_NORMAL,
-                           &a->fo);
-}
-
-bool
-uncollide_static_fight (struct anim *a)
-{
-  return uncollide_static (&a->f, &a->fo, _bf,
-                           COLLISION_FRONT_LEFT_FIGHT,
-                           COLLISION_FRONT_RIGHT_FIGHT,
-                           _bb,
-                           COLLISION_BACK_LEFT_FIGHT,
-                           COLLISION_BACK_RIGHT_FIGHT,
-                           &a->fo);
-}
-
-bool
-is_colliding_front_fight (struct anim *a)
-{
-  return uncollide (&a->f, &a->fo, _bf,
-                    COLLISION_FRONT_LEFT_FIGHT,
-                    COLLISION_FRONT_RIGHT_FIGHT,
-                    NULL, &a->ci);
-}
-
-bool
-is_colliding_back_fight (struct anim *a)
-{
-  return uncollide (&a->f, &a->fo, _bb,
-                    COLLISION_BACK_LEFT_FIGHT,
-                    COLLISION_BACK_RIGHT_FIGHT,
-                    NULL, &a->ci);
-}
-
-bool
-uncollide_front_fight (struct anim *a)
-{
-  bool uf = uncollide (&a->f, &a->fo, _bf,
-                       COLLISION_FRONT_LEFT_FIGHT,
-                       COLLISION_FRONT_RIGHT_FIGHT,
-                       &a->fo, NULL);
-
-  bool ub = uncollide (&a->f, &a->fo, _bb,
-                       COLLISION_BACK_LEFT_FIGHT,
-                       COLLISION_BACK_RIGHT_FIGHT,
-                       &a->fo, NULL);
-  return uf || ub;
-}
-
-bool
-uncollide_back_fight (struct anim *a)
-{
-  bool ub = uncollide (&a->f, &a->fo, _bb,
-                       COLLISION_BACK_LEFT_FIGHT,
-                       COLLISION_BACK_RIGHT_FIGHT,
-                       &a->fo, NULL);
-
-  bool uf = uncollide (&a->f, &a->fo, _bf,
-                       COLLISION_FRONT_LEFT_FIGHT,
-                       COLLISION_FRONT_RIGHT_FIGHT,
-                       &a->fo, NULL);
-  return ub || uf;
-}
-
-
-
-
 void
 draw_frame (ALLEGRO_BITMAP *bitmap, struct frame *f)
 {
@@ -883,7 +392,7 @@ draw_xframe (ALLEGRO_BITMAP *bitmap, struct frame *f, struct frame_offset *xf)
 struct coord *
 xframe_coord (struct frame *f, struct frame_offset *xf, struct coord *c)
 {
-  int w = al_get_bitmap_width (xf->b);
+  int w = IW (get_bitmap_width (xf->b));
   _tf (f, c);
   return
     new_coord (c, f->c.l, f->c.room,
@@ -910,7 +419,7 @@ splash_frame (struct frame *f, struct frame *nf)
 }
 
 void
-select_frame (struct anim *a, struct frameset *fs, int i)
+select_frame (struct actor *a, struct frameset *fs, int i)
 {
   a->fo.b = fs[i].frame;
   a->fo.dx = fs[i].dx;
@@ -935,14 +444,17 @@ next_frame (struct frame *f, struct frame *nf, struct frame_offset *fo)
   nf->oc = f->c;
   nf->ob = f->b;
 
-  int ow = al_get_bitmap_width (nf->b);
-  int oh = al_get_bitmap_height (nf->b);
-  int w = al_get_bitmap_width (fo->b);
-  int h = al_get_bitmap_height (fo->b);
+  int ow = IW (get_bitmap_width (nf->b));
+  int oh = IH (get_bitmap_height (nf->b));
+  int w = IW (get_bitmap_width (fo->b));
+  int h = IH (get_bitmap_height (fo->b));
 
-  if (next_frame_inv) nf->c.x += (nf->dir == LEFT) ? ow - w - fo->dx : fo->dx;
-  else nf->c.x += (nf->dir == LEFT) ? fo->dx : ow - w - fo->dx;
-  nf->c.y += oh - h + fo->dy;
+  int dx = fo->dx;
+  int dy = fo->dy;
+
+  if (next_frame_inv) nf->c.x += (nf->dir == LEFT) ? ow - w - dx : dx;
+  else nf->c.x += (nf->dir == LEFT) ? dx : ow - w - dx;
+  nf->c.y += oh - h + dy;
 
   nf->b = fo->b;
   if (! cutscene) nframe (nf, &nf->c);
@@ -987,16 +499,4 @@ wait_anim (int cycles)
   static int i = 0;
   if (i == 0) i = cycles + 1;
   return --i;
-}
-
-ALLEGRO_COLOR
-start_anim_palette (ALLEGRO_COLOR c)
-{
-  unsigned char r, g, b, a;
-  al_unmap_rgba (c, &r, &g, &b, &a);
-  if (a == 0) return c;
-  r = add_char (r, -64);
-  g = add_char (g, -64);
-  b = add_char (b, -64);
-  return al_map_rgba (r, g, b, 100);
 }

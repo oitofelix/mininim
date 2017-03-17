@@ -150,13 +150,13 @@ manages to pass through them without being hit.
 @item Guards continue to advance towards the kid,
 even when he is running towards them.
 @item Guard mode changing doesn't work for guards
-that died falling, spiked or chopped.
+that died falling, spiked or chomped.
 @item Kid can't battle properly against more than one
 guard at once.
 @item Shadow death music in level 12 plays in a row if
 reviving kid with R repeatedly in a short period of time.
 @item Legacy level rooms above room 0 may have
-traversable constructions at bottom over room 0's walls.
+traversable tiles at bottom over room 0's walls.
 @item In legacy level 12 shadow appears sooner than
 expected if the kid manages to enter room 15 from below after exiting
 room 18 to the right.

@@ -20,51 +20,15 @@
 
 #include "mininim.h"
 
-struct frameset kid_sword_defense_frameset[KID_SWORD_DEFENSE_FRAMESET_NMEMB];
-
-static void init_kid_sword_defense_frameset (void);
-static bool flow (struct anim *k);
-static bool physics_in (struct anim *k);
-static void physics_out (struct anim *k);
-
-ALLEGRO_BITMAP *kid_sword_defense_00, *kid_sword_defense_01,
-  *kid_sword_defense_02;
-
-static void
-init_kid_sword_defense_frameset (void)
-{
-  struct frameset frameset[KID_SWORD_DEFENSE_FRAMESET_NMEMB] =
-    {{kid_sword_defense_00,+0,0},{kid_sword_defense_01,+0,0},
-     {kid_sword_defense_02,+0,0}};
-
-  memcpy (&kid_sword_defense_frameset, &frameset,
-          KID_SWORD_DEFENSE_FRAMESET_NMEMB * sizeof (struct frameset));
-}
+static bool flow (struct actor *k);
+static bool physics_in (struct actor *k);
+static void physics_out (struct actor *k);
 
 void
-load_kid_sword_defense (void)
-{
-  /* bitmaps */
-  kid_sword_defense_00 = load_bitmap (KID_SWORD_DEFENSE_00);
-  kid_sword_defense_01 = load_bitmap (KID_SWORD_DEFENSE_01);
-  kid_sword_defense_02 = load_bitmap (KID_SWORD_DEFENSE_02);
-
-  /* frameset */
-  init_kid_sword_defense_frameset ();
-}
-
-void
-unload_kid_sword_defense (void)
-{
-  destroy_bitmap (kid_sword_defense_00);
-  destroy_bitmap (kid_sword_defense_01);
-  destroy_bitmap (kid_sword_defense_02);
-}
-
-void
-kid_sword_defense (struct anim *k)
+kid_sword_defense (struct actor *k)
 {
   k->oaction = k->action;
+  k->oi = k->i;
   k->action = kid_sword_defense;
   k->f.flip = (k->f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
@@ -75,12 +39,12 @@ kid_sword_defense (struct anim *k)
 }
 
 static bool
-flow (struct anim *k)
+flow (struct actor *k)
 {
   if (k->oaction != kid_sword_defense) {
     k->i = -1;
 
-    struct anim *ke = get_anim_by_id (k->enemy_id);
+    struct actor *ke = get_actor_by_id (k->enemy_id);
     if (ke && k->i_counter_defended)
       ke->enemy_defended_my_attack = 1;
 
@@ -90,7 +54,7 @@ flow (struct anim *k)
     k->hurt_enemy_in_counter_attack = false;
   }
 
-  struct anim *ke = get_anim_by_id (k->enemy_id);
+  struct actor *ke = get_actor_by_id (k->enemy_id);
   if (k->i == 2) {
     kid_sword_attack (k);
     return false;
@@ -105,21 +69,21 @@ flow (struct anim *k)
   }
 
   if (k->oaction == kid_sword_attack) {
-    select_frame (k, kid_sword_walkb_frameset, 0);
+    select_actor_frame (k, "KID", "SWORD_WALKB", 0);
     k->j = 10;
-  } else if (k->f.b == kid_sword_walkb_frameset[0].frame) {
-    select_frame (k, kid_sword_defense_frameset, 1);
+  } else if (k->j == 10) {
+    select_actor_frame (k, "KID", "SWORD_DEFENSE", 1);
     k->fo.dx += 7;
     k->j = 14;
   } else {
-    select_frame (k, kid_sword_defense_frameset, k->i + 1);
+    select_actor_frame (k, "KID", "SWORD_DEFENSE", k->i + 1);
 
     if (k->i == 0) k->j = 28;
     if (k->i == 1) k->j = 14;
     if (k->i == 2) k->j = 15;
   }
 
-  select_xframe (&k->xf, sword_frameset, k->j);
+  select_actor_xframe (k, "KID", "SWORD", k->j);
 
   if (k->oaction == kid_sword_attack) k->fo.dx += +2;
 
@@ -131,7 +95,7 @@ flow (struct anim *k)
 }
 
 static bool
-physics_in (struct anim *k)
+physics_in (struct actor *k)
 {
   /* collision */
   uncollide_back_fight (k);
@@ -147,7 +111,7 @@ physics_in (struct anim *k)
 }
 
 static void
-physics_out (struct anim *k)
+physics_out (struct actor *k)
 {
   /* depressible floors */
   keep_depressible_floor (k);

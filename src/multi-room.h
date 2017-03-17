@@ -23,7 +23,7 @@
 
 /* variables */
 extern ALLEGRO_BITMAP *room0;
-extern bool con_caching;
+extern bool tile_caching;
 extern struct multi_room mr;
 extern int room_view;
 extern int mr_room, mr_x, mr_y;
@@ -58,9 +58,9 @@ void mr_view_page_trans (enum dir d);
 void draw_multi_rooms (void);
 void nmr_coord (int x, int y, int *rx, int *ry);
 bool mr_coord (int room0, enum dir dir, int *rx, int *ry);
-void update_room0_cache (enum em em, enum vm vm);
-void update_cache (enum em em, enum vm vm);
-void update_cache_pos (struct pos *p, enum em em, enum vm vm);
+void update_room0_cache (void);
+void update_cache (void);
+void update_cache_pos (struct pos *p);
 void register_changed_pos (struct pos *p);
 struct pos *get_changed_pos (struct pos *p);
 struct pos *get_changed_pos_by_room (int room);

@@ -20,43 +20,15 @@
 
 #include "mininim.h"
 
-struct frameset kid_misstep_frameset[KID_MISSTEP_FRAMESET_NMEMB];
-
-static void init_kid_misstep_frameset (void);
-static bool flow (struct anim *k);
-static bool physics_in (struct anim *k);
-static void physics_out (struct anim *k);
-
-static void
-init_kid_misstep_frameset (void)
-{
-  struct frameset frameset[KID_MISSTEP_FRAMESET_NMEMB] =
-    {{kid_walk_00,-1,0},{kid_walk_01,-1,0},{kid_walk_02,+0,0},
-     {kid_walk_03,-8,0},{kid_walk_04,-7,0},{kid_walk_05,-4,0},
-     {kid_jump_13,+8,0},{kid_couch_09,+8,0},{kid_couch_10,+3,0},
-     {kid_couch_11,+0,0},{kid_couch_12,+4,0}};
-
-  memcpy (&kid_misstep_frameset, &frameset,
-          KID_MISSTEP_FRAMESET_NMEMB * sizeof (struct frameset));
-}
+static bool flow (struct actor *k);
+static bool physics_in (struct actor *k);
+static void physics_out (struct actor *k);
 
 void
-load_kid_misstep (void)
-{
-  /* frameset */
-  init_kid_misstep_frameset ();
-}
-
-void
-unload_kid_misstep (void)
-{
-  /* for symmetry */
-}
-
-void
-kid_misstep (struct anim *k)
+kid_misstep (struct actor *k)
 {
   k->oaction = k->action;
+  k->oi = k->i;
   k->action = kid_misstep;
   k->f.flip = (k->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
@@ -67,24 +39,25 @@ kid_misstep (struct anim *k)
 }
 
 static bool
-flow (struct anim *k)
+flow (struct actor *k)
 {
   if (k->oaction != kid_misstep) k->i = -1, k->misstep = true;
 
   if (k->i == 10) {
-    place_frame (&k->f, &k->f, kid_normal_00, &k->p,
-                 (k->f.dir == LEFT) ? +11 : PLACE_WIDTH + 7, 15);
+    int dx = (k->f.dir == LEFT) ? +11 : PLACE_WIDTH + 7;
+    int dy = +15;
+    place_actor (k, &k->p, dx, dy, "KID", "NORMAL", 0);
     kid_normal (k);
     return false;
   }
 
-  select_frame (k, kid_misstep_frameset, k->i + 1);
+  select_actor_frame (k, "KID", "MISSTEP", k->i + 1);
 
   return true;
 }
 
 static bool
-physics_in (struct anim *k)
+physics_in (struct actor *k)
 {
   /* fall */
   if (is_falling (&k->f, _mba, +0, +0)) {
@@ -96,7 +69,7 @@ physics_in (struct anim *k)
 }
 
 static void
-physics_out (struct anim *k)
+physics_out (struct actor *k)
 {
   struct pos pmbo;
 

@@ -113,7 +113,7 @@ load_audio (struct audio_source *as, enum audio_type audio_type,
 }
 
 union audio_instance_data
-play_audio (struct audio_source *as, struct pos *p, int anim_id)
+play_audio (struct audio_source *as, struct pos *p, int actor_id)
 {
   if (rendering == NONE_RENDERING || rendering == VIDEO_RENDERING)
     return (union audio_instance_data) {NULL};
@@ -128,7 +128,7 @@ play_audio (struct audio_source *as, struct pos *p, int anim_id)
   ai.source = as;
   ai.played = false;
   ai.anim_cycle = anim_cycle;
-  ai.anim_id = anim_id;
+  ai.actor_id = actor_id;
   ai.volume = -1;
 
   if (p) npos (p, &ai.p);
@@ -189,7 +189,7 @@ get_audio_instance (union audio_instance_data data)
 
 struct audio_instance *
 search_audio_instance (struct audio_source *as, uint64_t anim_cycle,
-                       struct pos *p, int anim_id)
+                       struct pos *p, int actor_id)
 {
   size_t i;
   for (i = 0; i < audio_instance_nmemb; i++) {
@@ -201,7 +201,7 @@ search_audio_instance (struct audio_source *as, uint64_t anim_cycle,
              && as->data.stream == ai->source->data.stream))
         && (anim_cycle == 0 || anim_cycle - ai->anim_cycle < 2)
         && (! p || peq (p, &ai->p))
-        && (anim_id < 0 || anim_id == ai->anim_id))
+        && (actor_id < 0 || actor_id == ai->actor_id))
       return ai;
   }
   return NULL;
@@ -450,9 +450,9 @@ stop_audio_instances (void)
 }
 
 bool
-stop_audio_instance (struct audio_source *as, struct pos *p, int anim_id)
+stop_audio_instance (struct audio_source *as, struct pos *p, int actor_id)
 {
-  struct audio_instance *ai = search_audio_instance (as, 0, p, anim_id);
+  struct audio_instance *ai = search_audio_instance (as, 0, p, actor_id);
   if (ai) remove_audio_instance (ai);
   return ai;
 }

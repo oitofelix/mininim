@@ -39,17 +39,17 @@
 #define PRINCESS_LOOK_DOWN_00 "data/princess/look-down/00.png"
 #define PRINCESS_LOOK_DOWN_01 "data/princess/look-down/01.png"
 #define PRINCESS_REST_00 "data/princess/rest/00.png"
-#define PRINCESS_COUCH_00 "data/princess/couch/00.png"
-#define PRINCESS_COUCH_01 "data/princess/couch/01.png"
-#define PRINCESS_COUCH_02 "data/princess/couch/02.png"
-#define PRINCESS_COUCH_03 "data/princess/couch/03.png"
-#define PRINCESS_COUCH_04 "data/princess/couch/04.png"
-#define PRINCESS_COUCH_05 "data/princess/couch/05.png"
-#define PRINCESS_COUCH_06 "data/princess/couch/06.png"
-#define PRINCESS_COUCH_07 "data/princess/couch/07.png"
-#define PRINCESS_COUCH_08 "data/princess/couch/08.png"
-#define PRINCESS_COUCH_09 "data/princess/couch/09.png"
-#define PRINCESS_COUCH_10 "data/princess/couch/10.png"
+#define PRINCESS_CROUCH_00 "data/princess/crouch/00.png"
+#define PRINCESS_CROUCH_01 "data/princess/crouch/01.png"
+#define PRINCESS_CROUCH_02 "data/princess/crouch/02.png"
+#define PRINCESS_CROUCH_03 "data/princess/crouch/03.png"
+#define PRINCESS_CROUCH_04 "data/princess/crouch/04.png"
+#define PRINCESS_CROUCH_05 "data/princess/crouch/05.png"
+#define PRINCESS_CROUCH_06 "data/princess/crouch/06.png"
+#define PRINCESS_CROUCH_07 "data/princess/crouch/07.png"
+#define PRINCESS_CROUCH_08 "data/princess/crouch/08.png"
+#define PRINCESS_CROUCH_09 "data/princess/crouch/09.png"
+#define PRINCESS_CROUCH_10 "data/princess/crouch/10.png"
 #define PRINCESS_STROKE_00 "data/princess/stroke/00.png"
 #define PRINCESS_STROKE_01 "data/princess/stroke/01.png"
 #define PRINCESS_STROKE_02 "data/princess/stroke/02.png"
@@ -71,24 +71,23 @@
 /* functions */
 void load_princess (void);
 void unload_princess (void);
-void princess_normal (struct anim *princess);
-void princess_turn (struct anim *princess);
-void princess_step_back (struct anim *princess);
-void princess_look_down (struct anim *princess);
-void princess_rest (struct anim *princess);
-void princess_couch (struct anim *princess);
-void princess_uncouch (struct anim *princess);
-void princess_stroke (struct anim *princess);
-void princess_turn_embrace (struct anim *princess);
-void draw_princess_frame (ALLEGRO_BITMAP *bitmap, struct anim *p,
-                          enum vm vm);
-palette get_princess_palette (enum vm vm);
+void princess_normal (struct actor *princess);
+void princess_turn (struct actor *princess);
+void princess_step_back (struct actor *princess);
+void princess_look_down (struct actor *princess);
+void princess_rest (struct actor *princess);
+void princess_crouch (struct actor *princess);
+void princess_uncrouch (struct actor *princess);
+void princess_stroke (struct actor *princess);
+void princess_turn_embrace (struct actor *princess);
+void draw_princess_frame (ALLEGRO_BITMAP *bitmap, struct actor *p);
+palette get_princess_palette (void);
 ALLEGRO_COLOR c_princess_palette (ALLEGRO_COLOR c);
 ALLEGRO_COLOR e_princess_palette (ALLEGRO_COLOR c);
 ALLEGRO_COLOR v_princess_palette (ALLEGRO_COLOR c);
 
 /* variables */
-extern struct anim princess; /* princess animation object */
+extern struct actor princess;
 
 extern ALLEGRO_BITMAP *princess_normal_00,
   *princess_turn_00, *princess_turn_01, *princess_turn_02, *princess_turn_03,
@@ -96,10 +95,10 @@ extern ALLEGRO_BITMAP *princess_normal_00,
   *princess_step_back_00, *princess_step_back_01, *princess_step_back_02,
   *princess_step_back_03, *princess_step_back_04, *princess_step_back_05,
   *princess_look_down_00, *princess_look_down_01, *princess_rest_00,
-  *princess_couch_00, *princess_couch_01, *princess_couch_02,
-  *princess_couch_03, *princess_couch_04, *princess_couch_05,
-  *princess_couch_06, *princess_couch_07, *princess_couch_08,
-  *princess_couch_09, *princess_couch_10,
+  *princess_crouch_00, *princess_crouch_01, *princess_crouch_02,
+  *princess_crouch_03, *princess_crouch_04, *princess_crouch_05,
+  *princess_crouch_06, *princess_crouch_07, *princess_crouch_08,
+  *princess_crouch_09, *princess_crouch_10,
   *princess_stroke_00, *princess_stroke_01, *princess_stroke_02,
   *princess_turn_embrace_00, *princess_turn_embrace_01, *princess_turn_embrace_02,
   *princess_turn_embrace_03, *princess_turn_embrace_04, *princess_turn_embrace_05,

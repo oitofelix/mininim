@@ -20,47 +20,15 @@
 
 #include "mininim.h"
 
-struct frameset kid_sword_walkf_frameset[KID_SWORD_WALKF_FRAMESET_NMEMB];
-
-static void init_kid_sword_walkf_frameset (void);
-static bool flow (struct anim *k);
-static bool physics_in (struct anim *k);
-static void physics_out (struct anim *k);
-
-ALLEGRO_BITMAP *kid_sword_walkf_00, *kid_sword_walkf_01;
-
-static void
-init_kid_sword_walkf_frameset (void)
-{
-  struct frameset frameset[KID_SWORD_WALKF_FRAMESET_NMEMB] =
-    {{kid_sword_walkf_00,-14,0},{kid_sword_walkf_01,-4,0}};
-
-  memcpy (&kid_sword_walkf_frameset, &frameset,
-          KID_SWORD_WALKF_FRAMESET_NMEMB * sizeof (struct frameset));
-}
+static bool flow (struct actor *k);
+static bool physics_in (struct actor *k);
+static void physics_out (struct actor *k);
 
 void
-load_kid_sword_walkf (void)
-{
-  /* bitmaps */
-  kid_sword_walkf_00 = load_bitmap (KID_SWORD_WALKF_00);
-  kid_sword_walkf_01 = load_bitmap (KID_SWORD_WALKF_01);
-
-  /* frameset */
-  init_kid_sword_walkf_frameset ();
-}
-
-void
-unload_kid_sword_walkf (void)
-{
-  destroy_bitmap (kid_sword_walkf_00);
-  destroy_bitmap (kid_sword_walkf_01);
-}
-
-void
-kid_sword_walkf (struct anim *k)
+kid_sword_walkf (struct actor *k)
 {
   k->oaction = k->action;
+  k->oi = k->i;
   k->action = kid_sword_walkf;
   k->f.flip = (k->f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
@@ -71,7 +39,7 @@ kid_sword_walkf (struct anim *k)
 }
 
 static bool
-flow (struct anim *k)
+flow (struct actor *k)
 {
   if (k->oaction != kid_sword_walkf) k->i = -1;
 
@@ -80,8 +48,8 @@ flow (struct anim *k)
     return false;
   }
 
-  select_frame (k, kid_sword_walkf_frameset, k->i + 1);
-  select_xframe (&k->xf, sword_frameset, 13);
+  select_actor_frame (k, "KID", "SWORD_WALKF", k->i + 1);
+  select_actor_xframe (k, "KID", "SWORD", 13);
 
   if (k->i == 0) k->xf.dx = -19;
   if (k->i == 1) k->xf.dx = -21;
@@ -90,7 +58,7 @@ flow (struct anim *k)
 }
 
 static bool
-physics_in (struct anim *k)
+physics_in (struct actor *k)
 {
   /* collision */
   uncollide_front_fight (k);
@@ -106,7 +74,7 @@ physics_in (struct anim *k)
 }
 
 static void
-physics_out (struct anim *k)
+physics_out (struct actor *k)
 {
   /* depressible floors */
   if (k->i == 1) update_depressible_floor (k, -7, -35);

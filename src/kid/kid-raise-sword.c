@@ -20,53 +20,15 @@
 
 #include "mininim.h"
 
-struct frameset kid_raise_sword_frameset[KID_RAISE_SWORD_FRAMESET_NMEMB];
-
-static void init_kid_raise_sword_frameset (void);
-static bool flow (struct anim *k);
-static bool physics_in (struct anim *k);
-static void physics_out (struct anim *k);
-
-ALLEGRO_BITMAP *kid_raise_sword_00, *kid_raise_sword_01,
-  *kid_raise_sword_02, *kid_raise_sword_03;
-
-static void
-init_kid_raise_sword_frameset (void)
-{
-  struct frameset frameset[KID_RAISE_SWORD_FRAMESET_NMEMB] =
-    {{kid_raise_sword_00,-4,0},{kid_raise_sword_01,+0,0},
-     {kid_raise_sword_02,+1,0},{kid_raise_sword_03,-1,0}};
-
-  memcpy (&kid_raise_sword_frameset, &frameset,
-          KID_RAISE_SWORD_FRAMESET_NMEMB * sizeof (struct frameset));
-}
+static bool flow (struct actor *k);
+static bool physics_in (struct actor *k);
+static void physics_out (struct actor *k);
 
 void
-load_kid_raise_sword (void)
-{
-  /* bitmaps */
-  kid_raise_sword_00 = load_bitmap (KID_RAISE_SWORD_00);
-  kid_raise_sword_01 = load_bitmap (KID_RAISE_SWORD_01);
-  kid_raise_sword_02 = load_bitmap (KID_RAISE_SWORD_02);
-  kid_raise_sword_03 = load_bitmap (KID_RAISE_SWORD_03);
-
-  /* frameset */
-  init_kid_raise_sword_frameset ();
-}
-
-void
-unload_kid_raise_sword (void)
-{
-  destroy_bitmap (kid_raise_sword_00);
-  destroy_bitmap (kid_raise_sword_01);
-  destroy_bitmap (kid_raise_sword_02);
-  destroy_bitmap (kid_raise_sword_03);
-}
-
-void
-kid_raise_sword (struct anim *k)
+kid_raise_sword (struct actor *k)
 {
   k->oaction = k->action;
+  k->oi = k->i;
   k->action = kid_raise_sword;
   k->f.flip = (k->f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
@@ -77,7 +39,7 @@ kid_raise_sword (struct anim *k)
 }
 
 static bool
-flow (struct anim *k)
+flow (struct actor *k)
 {
   if (k->oaction != kid_raise_sword) k->i = -1, k->wait = 5;
 
@@ -92,8 +54,8 @@ flow (struct anim *k)
 
   k->j = 20 + k->i;
 
-  select_frame (k, kid_raise_sword_frameset, k->i);
-  select_xframe (&k->xf, sword_frameset, k->j);
+  select_actor_frame (k, "KID", "RAISE_SWORD", k->i);
+  select_actor_xframe (k, "KID", "SWORD", k->j);
 
   if (k->i == 0 && k->wait < 5) k->fo.dx = 0;
 
@@ -101,13 +63,13 @@ flow (struct anim *k)
 }
 
 static bool
-physics_in (struct anim *k)
+physics_in (struct actor *k)
 {
   return true;
 }
 
 static void
-physics_out (struct anim *k)
+physics_out (struct actor *k)
 {
   /* depressible floors */
   keep_depressible_floor (k);
@@ -124,7 +86,7 @@ physics_out (struct anim *k)
 
   /* consume sword */
   if (k->i == 0)
-    register_con_undo (&undo, &k->item_pos,
+    register_tile_undo (&undo, &k->item_pos,
                        MIGNORE, MIGNORE, NO_ITEM, MIGNORE,
                        NULL, false, "CONSUME SWORD");
 }

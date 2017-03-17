@@ -21,8 +21,6 @@
 #ifndef MININIM_KID_HANG_FREE_H
 #define MININIM_KID_HANG_FREE_H
 
-void load_kid_hang_free (void);
-void unload_kid_hang_free (void);
-void kid_hang_free (struct anim *k);
+void kid_hang_free (struct actor *k);
 
 #endif	/* MININIM_KID_HANG_FREE_H */

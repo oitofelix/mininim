@@ -20,26 +20,15 @@
 
 #include "mininim.h"
 
-static bool flow (struct anim *k);
-static bool physics_in (struct anim *k);
-static void physics_out (struct anim *k);
+static bool flow (struct actor *k);
+static bool physics_in (struct actor *k);
+static void physics_out (struct actor *k);
 
 void
-load_kid_hang_free (void)
-{
-  /* for symmetry */
-}
-
-void
-unload_kid_hang_free (void)
-{
-  /* for symmetry */
-}
-
-void
-kid_hang_free (struct anim *k)
+kid_hang_free (struct actor *k)
 {
   k->oaction = k->action;
+  k->oi = k->i;
   k->action = kid_hang_free;
   k->f.flip = (k->f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
@@ -50,7 +39,7 @@ kid_hang_free (struct anim *k)
 }
 
 static bool
-flow (struct anim *k)
+flow (struct actor *k)
 {
   struct pos np;
 
@@ -85,36 +74,39 @@ flow (struct anim *k)
 
   /* release */
   if ((! k->key.shift || k->hang_limit
-       || get_hanged_con (&k->hang_pos, k->f.dir) == NO_FLOOR)
+       || get_hanged_tile (&k->hang_pos, k->f.dir) == NO_FLOOR)
       && (k->i < 5 || k->j > -1)) {
     int dir = (k->f.dir == LEFT) ? -1 : +1;
     k->hang_limit = false;
-    if (! is_strictly_traversable (&k->hang_pos)
+    if (! is_traversable (&k->hang_pos)
         && k->i >= 4) {
-      place_frame (&k->f, &k->f, kid_vjump_frameset[13].frame,
-                   &k->hang_pos, (k->f.dir == LEFT) ? +7 : PLACE_WIDTH + 9, -8);
+      int dx = (k->f.dir == LEFT) ? +7 : PLACE_WIDTH + 9;
+      int dy = -8;
+      place_actor (k, &k->hang_pos, dx, dy, "KID", "VJUMP", 13);
       kid_vjump (k);
       return false;
     }
-    if (! is_strictly_traversable (prel (&k->hang_pos, &np, +0, dir))
+    if (! is_traversable (prel (&k->hang_pos, &np, +0, dir))
         && k->i <= 4) {
-      place_frame (&k->f, &k->f, kid_vjump_frameset[13].frame,
-                   &k->hang_pos, (k->f.dir == LEFT) ? +7 : PLACE_WIDTH + 5, -8);
+      int dx = (k->f.dir == LEFT) ? +7 : PLACE_WIDTH + 5;
+      int dy = -8;
+      place_actor (k, &k->hang_pos, dx, dy, "KID", "VJUMP", 13);
       kid_vjump (k);
       return false;
     }
-    if (is_strictly_traversable (&k->hang_pos)
+    if (is_traversable (&k->hang_pos)
         && k->i >= 4) {
-      place_frame (&k->f, &k->f, kid_fall_frameset[0].frame,
-                   &k->hang_pos, (k->f.dir == LEFT) ? +10 : +22, +4);
+      int dx = (k->f.dir == LEFT) ? +10 : +22;
+      int dy = +4;
+      place_actor (k, &k->hang_pos, dx, dy, "KID", "FALL", 0);
       kid_fall (k);
       return false;
     }
-    if (is_strictly_traversable (prel (&k->hang_pos, &np, +0, dir))
+    if (is_traversable (prel (&k->hang_pos, &np, +0, dir))
         && k->i <= 4) {
-      place_frame (&k->f, &k->f, kid_fall_frameset[0].frame,
-                   &k->hang_pos, (k->f.dir == LEFT)
-                   ? -10 : PLACE_WIDTH + 10, +12);
+      int dx = (k->f.dir == LEFT) ? -10 : PLACE_WIDTH + 10;
+      int dy = +12;
+      place_actor (k, &k->hang_pos, dx, dy, "KID", "FALL", 0);
       kid_fall (k);
       return false;
     }
@@ -136,13 +128,13 @@ flow (struct anim *k)
     k->reverse = true; k->i--;
   }
 
-  k->fo.b = kid_hang_frameset[k->i].frame;
-  k->fo.dx = (k->reverse) ? -kid_hang_frameset[k->i + 1].dx
-    : kid_hang_frameset[k->i].dx;
-  k->fo.dy = (k->reverse) ? -kid_hang_frameset[k->i + 1].dy
-    : kid_hang_frameset[k->i].dy;
+  k->fo.b = actor_bitmap (k, "KID", "HANG", k->i);
+  k->fo.dx = (k->reverse) ? -actor_bitmap_dx (k, "KID", "HANG", k->i + 1)
+    : actor_bitmap_dx (k, "KID", "HANG", k->i);
+  k->fo.dy = (k->reverse) ? -actor_bitmap_dy (k, "KID", "HANG", k->i + 1)
+    : actor_bitmap_dy (k, "KID", "HANG", k->i);
 
-  if (k->f.b == kid_hang_13) k->fo.dx = +0, k->fo.dy = +1;
+  if (k->oaction == kid_hang) k->fo.dx = +0, k->fo.dy = +1;
 
   if (k->reverse && k->j == 0 && k->i == 0
       && k->wait < 3) k->fo.dy = 0;
@@ -151,13 +143,13 @@ flow (struct anim *k)
 }
 
 static bool
-physics_in (struct anim *k)
+physics_in (struct actor *k)
 {
   return true;
 }
 
 static void
-physics_out (struct anim *k)
+physics_out (struct actor *k)
 {
   struct pos hanged_pos;
 

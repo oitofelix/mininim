@@ -32,13 +32,6 @@ struct key {
   int keycode;
 };
 
-/* video mode */
-enum vm {
-  CGA, EGA, VGA,
-};
-
-#define HGC (VGA + 1)
-
 /* environment mode */
 enum em {
   DUNGEON = 0, PALACE = 1,
@@ -78,7 +71,8 @@ enum dir {
 
 struct coord {
   struct level *l;
-  int room, x, y;
+  int room;
+  double x, y;
   int prev_room;
   enum dir xd;
 };
@@ -147,8 +141,8 @@ struct multi_room {
 
     int level;
     enum em em;
-    enum vm vm;
-    int hgc;
+    /* enum vm vm; */
+    /* int hgc; */
     enum hue hue;
     struct pos mouse_pos;
 
@@ -180,8 +174,8 @@ enum gm {
   ORIGINAL_GM, GUARD_GM, FAT_GUARD_GM, VIZIER_GM, SKELETON_GM, SHADOW_GM,
 };
 
-enum anim_type {
-  NO_ANIM = 0, KID = 1, SHADOW = 2, GUARD = 3, FAT_GUARD = 4,
+enum actor_type {
+  NO_ACTOR = 0, KID = 1, SHADOW = 2, GUARD = 3, FAT_GUARD = 4,
   SKELETON = 5, VIZIER = 6, PRINCESS = 7, MOUSE = 8,
 };
 
@@ -231,7 +225,7 @@ struct level {
   } event[EVENTS];
 
   struct guard {
-    enum anim_type type;
+    enum actor_type type;
     struct pos p;
     enum dir dir;
     struct skill skill;
@@ -239,9 +233,9 @@ struct level {
     int style;
   } guard[GUARDS];
 
-  struct con {
+  struct tile {
 
-    enum confg {
+    enum tile_fg {
       NO_FLOOR = 0,
       FLOOR = 1,
       BROKEN_FLOOR = 2,
@@ -258,7 +252,7 @@ struct level {
       WALL = 13,
       DOOR = 14,
       LEVEL_DOOR = 15,
-      CHOPPER = 16,
+      CHOMPER = 16,
       MIRROR = 17,
       CARPET = 18,
       TCARPET = 19,
@@ -267,38 +261,28 @@ struct level {
       ARCH_TOP_RIGHT = 22,
       ARCH_TOP_MID = 23,
       ARCH_TOP_SMALL = 24,
-      CONFGS
+      TILE_FGS
     } fg;
 
-    enum conbg {
-      NO_BG = 0,
-      BRICKS_00 = 1,
-      BRICKS_01 = 2,
-      BRICKS_02 = 3,
-      BRICKS_03 = 4,
-      NO_BRICKS = 5,
+    enum tile_bg {
+      NO_BRICKS = 0,
+      BRICKS_1 = 1,
+      BRICKS_2 = 2,
+      BRICKS_3 = 3,
+      BRICKS_4 = 4,
+      BRICKS_5 = 5,
       TORCH = 6,
       WINDOW = 7,
       BALCONY = 8,
-      CONBGS
+      TILE_BGS
     } bg;
 
     int ext;
 
     int fake;
 
-  } con[ROOMS][FLOORS][PLACES];
+  } tile[ROOMS][FLOORS][PLACES];
 };
-
-enum carpet_design {
-  CARPET_00 = 0,
-  CARPET_01 = 1,
-  ARCH_CARPET_LEFT_00 = 2,
-  ARCH_CARPET_LEFT_01 = 3,
-  ARCH_CARPET_RIGHT_00 = 4,
-  ARCH_CARPET_RIGHT_01 = 5,
-  CARPET_DESIGNS
-} carpet_design;
 
 enum item {
   NO_ITEM = 0,
@@ -358,12 +342,12 @@ struct diffset {
 
 /* avoid "'struct' declared inside parameter list" error for the
    ACTION definition */
-struct anim *_action;
-typedef void (*ACTION) (struct anim *a);
+struct actor *_action;
+typedef void (*ACTION) (struct actor *a);
 
-struct anim {
-  enum anim_type type;
-  enum anim_type original_type;
+struct actor {
+  enum actor_type type;
+  enum actor_type original_type;
 
   int id;
   int shadow_of;
@@ -389,7 +373,7 @@ struct anim {
   struct frame_offset xf;
 
   struct collision_info {
-    struct pos kid_p, con_p;
+    struct pos kid_p, tile_p;
   } ci;
 
   struct gamepad_state key;
@@ -398,10 +382,10 @@ struct anim {
   ACTION action;
   ACTION next_action;
   ACTION hang_caller;
-  int i, j, wait, repeat, cinertia, inertia, walk,
+  int i, oi, j, wait, repeat, cinertia, inertia, walk,
     total_lives, current_lives;
   bool reverse, collision, fall, hit_ceiling, hit_ceiling_fake,
-    just_hanged, hang, hang_limit, misstep, uncouch_slowly,
+    just_hanged, hang, hang_limit, misstep, uncrouch_slowly,
     keep_sword_fast, turn, shadow, splash, hit_by_loose_floor,
     invisible, has_sword, hurt, controllable, fight,
     edge_detection, auto_taken_sword, constrained_turn_run;
@@ -422,7 +406,7 @@ struct anim {
   int dc, df, dl, dcl, dch, dcd;
 
   bool immortal, poison_immune, loose_floor_immune, fall_immune,
-    spikes_immune, chopper_immune;
+    spikes_immune, chomper_immune;
 
   int sword_immune;
 
@@ -433,7 +417,7 @@ struct anim {
 
   int style;
 
-  enum confg confg;
+  enum tile_fg tile_fg;
 
   enum item item;
 
@@ -443,7 +427,7 @@ struct anim {
 
   enum death_reason {
     NO_DEATH, FALL_DEATH, LOOSE_FLOOR_DEATH, POTION_DEATH,
-    SPIKES_DEATH, CHOPPER_DEATH, FIGHT_DEATH, SHADOW_FIGHT_DEATH
+    SPIKES_DEATH, CHOMPER_DEATH, FIGHT_DEATH, SHADOW_FIGHT_DEATH
   } death_reason;
 
   bool glory_sample;
@@ -531,11 +515,11 @@ struct audio_instance {
   bool played;
   uint64_t anim_cycle;
   struct pos p;
-  int anim_id;
+  int actor_id;
   float volume;
 };
 
-typedef bool (*confg_set) (enum confg);
+typedef bool (*tile_fg_set) (enum tile_fg);
 
 typedef void (*room_callback_f) (int, int);
 
@@ -590,20 +574,24 @@ enum level_module {
 };
 
 enum edit {
-  EDIT_NONE, EDIT_MAIN, EDIT_CON, EDIT_FG, EDIT_FLOOR, EDIT_PILLAR,
+  EDIT_NONE, EDIT_MAIN, EDIT_TILE, EDIT_FG, EDIT_FLOOR, EDIT_PILLAR,
   EDIT_DOOR, EDIT_CARPET, EDIT_ARCH, EDIT_BG, EDIT_EXT,
-  EDIT_JUMP_ROOM, EDIT_NOMINAL_INFO, EDIT_EVENT, EDIT_EVENT_SET, EDIT_EVENT2CON,
-  EDIT_EVENT2FLOOR, EDIT_CON2EVENT, EDIT_ROOM, EDIT_LINK,
+  EDIT_JUMP_ROOM, EDIT_NOMINAL_INFO, EDIT_EVENT, EDIT_EVENT_SET,
+  EDIT_EVENT2TILE,
+  EDIT_EVENT2FLOOR, EDIT_TILE2EVENT, EDIT_ROOM, EDIT_LINK,
   EDIT_LINK_LEFT, EDIT_LINK_RIGHT, EDIT_LINK_ABOVE, EDIT_LINK_BELOW,
   EDIT_ROOM_EXCHANGE, EDIT_LINKING_SETTINGS, EDIT_KID, EDIT_LEVEL,
   EDIT_ENVIRONMENT, EDIT_HUE, EDIT_GUARD, EDIT_GUARD_SELECT, EDIT_GUARD_SKILL,
-  EDIT_GUARD_SKILL_ATTACK, EDIT_GUARD_SKILL_COUNTER_ATTACK, EDIT_GUARD_SKILL_DEFENSE,
-  EDIT_GUARD_SKILL_COUNTER_DEFENSE, EDIT_GUARD_SKILL_ADVANCE, EDIT_GUARD_SKILL_RETURN,
+  EDIT_GUARD_SKILL_ATTACK, EDIT_GUARD_SKILL_COUNTER_ATTACK,
+  EDIT_GUARD_SKILL_DEFENSE,
+  EDIT_GUARD_SKILL_COUNTER_DEFENSE, EDIT_GUARD_SKILL_ADVANCE,
+  EDIT_GUARD_SKILL_RETURN,
   EDIT_GUARD_SKILL_REFRACTION, EDIT_GUARD_SKILL_EXTRA_LIFE, EDIT_GUARD_LIVES,
   EDIT_GUARD_TYPE, EDIT_GUARD_STYLE, EDIT_SKILL_LEGACY_TEMPLATES,
-  EDIT_NOMINAL_NUMBER, EDIT_MIRROR_CON, EDIT_ROOM_MIRROR, EDIT_ROOM_MIRROR_CONS,
+  EDIT_NOMINAL_NUMBER, EDIT_MIRROR_TILE, EDIT_ROOM_MIRROR,
+  EDIT_ROOM_MIRROR_TILES,
   EDIT_ROOM_MIRROR_LINKS, EDIT_ROOM_MIRROR_BOTH, EDIT_LEVEL_MIRROR,
-  EDIT_LEVEL_MIRROR_CONS, EDIT_LEVEL_MIRROR_LINKS, EDIT_LEVEL_MIRROR_BOTH,
+  EDIT_LEVEL_MIRROR_TILES, EDIT_LEVEL_MIRROR_LINKS, EDIT_LEVEL_MIRROR_BOTH,
   EDIT_LEVEL_JUMP, EDIT_LEVEL_EXCHANGE, EDIT_NUMERICAL_INFO, EDIT_NUMERICAL_FG,
   EDIT_NUMERICAL_BG, EDIT_NUMERICAL_EXT,
 };
@@ -613,9 +601,9 @@ struct bmenu_item {
   char *desc;
 };
 
-enum con_diff {
-  CON_DIFF_NO_DIFF, CON_DIFF_FG, CON_DIFF_BG,
-  CON_DIFF_EXT, CON_DIFF_FAKE, CON_DIFF_MIXED,
+enum tile_diff {
+  TILE_DIFF_NO_DIFF, TILE_DIFF_FG, TILE_DIFF_BG,
+  TILE_DIFF_EXT, TILE_DIFF_FAKE, TILE_DIFF_MIXED,
 };
 
 struct dialog {
@@ -628,9 +616,18 @@ struct message_box {
   int flags;
 };
 
-/****************
- * CONSTRUCTIONS
- ****************/
+/*********
+ * TILES *
+ *********/
+
+struct opener_floor {
+  struct pos p;
+  int event;
+  bool pressed;
+  bool prev_pressed;
+  bool noise;
+  uint64_t priority;
+};
 
 struct closer_floor {
   struct pos p;
@@ -638,8 +635,6 @@ struct closer_floor {
   bool pressed;
   bool prev_pressed;
   bool noise;
-  bool broken;
-  bool unresponsive;
   uint64_t priority;
 };
 
@@ -672,6 +667,7 @@ struct loose_floor {
   int resist;
   int state;
   bool cant_fall;
+  bool broken;
 
   enum {
     NO_LOOSE_FLOOR_ACTION,
@@ -684,16 +680,6 @@ struct loose_floor {
   struct frame f;
 };
 
-struct opener_floor {
-  struct pos p;
-  int event;
-  bool pressed;
-  bool prev_pressed;
-  bool noise;
-  bool broken;
-  uint64_t priority;
-};
-
 struct spikes_floor {
   struct pos p;
   int i, wait, state;
@@ -701,7 +687,7 @@ struct spikes_floor {
   bool activate;
 };
 
-struct chopper {
+struct chomper {
   struct pos p;
   int i;
   int wait;
@@ -728,19 +714,19 @@ struct undo {
   int current;
 };
 
-union con_state {
+union tile_state {
   struct closer_floor closer_floor;
   struct opener_floor opener_floor;
   struct spikes_floor spikes_floor;
   struct loose_floor loose_floor;
   struct level_door level_door;
   struct door door;
-  struct chopper chopper;
+  struct chomper chomper;
 };
 
-struct con_undo {
-  struct con b, f;
-  union con_state bs, fs;
+struct tile_undo {
+  struct tile b, f;
+  union tile_state bs, fs;
   struct pos p;
 };
 
@@ -758,7 +744,7 @@ struct event_undo {
   struct level_event b, f;
 };
 
-struct random_room_mirror_con_undo {
+struct random_room_mirror_tile_undo {
   struct pos p[FLOORS][PLACES];
   int room;
   bool invert_dir;
@@ -792,13 +778,13 @@ struct int_undo {
 
 /* misc */
 
-struct con_copy {
-  struct con c;
-  union con_state cs;
+struct tile_copy {
+  struct tile c;
+  union tile_state cs;
 };
 
 struct room_copy {
-  struct con_copy c[FLOORS][PLACES];
+  struct tile_copy c[FLOORS][PLACES];
 };
 
 #endif	/* MININIM_TYPES_H */

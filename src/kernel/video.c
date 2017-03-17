@@ -27,7 +27,7 @@ ALLEGRO_TIMER *video_timer;
 uint64_t bottom_text_timer;
 int screen_flags;
 int potion_flags;
-bool hgc;
+/* bool hgc; */
 ALLEGRO_BITMAP *cutscene_screen;
 ALLEGRO_BITMAP *effect_buffer;
 ALLEGRO_BITMAP *black_screen;
@@ -39,7 +39,7 @@ int effect_counter;
 void (*load_callback) (void);
 int display_mode = -1;
 bool about_screen;
-ALLEGRO_BITMAP *oitofelix_face_gray, *oitofelix_face_bw;
+ALLEGRO_BITMAP *oitofelix_face;
 
 static struct palette_cache {
   ALLEGRO_BITMAP *ib, *ob;
@@ -252,8 +252,8 @@ clone_scaled_memory_bitmap (ALLEGRO_BITMAP *bitmap, int w, int h, int flags)
   al_set_target_bitmap (scaled_bitmap);
   al_clear_to_color (WINDOWS_PORT ? WHITE : TRANSPARENT_COLOR);
   al_draw_scaled_bitmap (bitmap, 0, 0,
-                         al_get_bitmap_width (bitmap),
-                         al_get_bitmap_height (bitmap),
+                         get_bitmap_width (bitmap),
+                         get_bitmap_height (bitmap),
                          0, 0, w, h, flags);
   return scaled_bitmap;
 }
@@ -378,8 +378,8 @@ void
 remove_palette_cache (lua_State *L, ssize_t i)
 {
   palette_cache_size -= al_get_pixel_size (ALLEGRO_PIXEL_FORMAT_ANY)
-    * al_get_bitmap_width (palette_cache[i].ob)
-    * al_get_bitmap_height (palette_cache[i].ob);
+    * get_bitmap_width (palette_cache[i].ob)
+    * get_bitmap_height (palette_cache[i].ob);
 
   L_get_registry_by_ptr (L, palette_cache[i].ob);
   if (lua_isnil (L, -1)) {
@@ -425,7 +425,7 @@ enforce_palette_cache_limit (lua_State *L, ALLEGRO_BITMAP *b)
   if (palette_cache_size_limit < 0 || palette_cache_nmemb == 0) return;
 
   size_t additional_size = al_get_pixel_size (ALLEGRO_PIXEL_FORMAT_ANY)
-    * al_get_bitmap_width (b) * al_get_bitmap_height (b);
+    * get_bitmap_width (b) * get_bitmap_height (b);
 
   if (palette_cache_size + additional_size > palette_cache_size_limit) {
 
@@ -465,8 +465,8 @@ apply_palette_k (ALLEGRO_BITMAP *bitmap, palette p, const void *k)
 
   int x, y;
   ALLEGRO_BITMAP *rbitmap = clone_bitmap (bitmap);
-  int w = al_get_bitmap_width (bitmap);
-  int h = al_get_bitmap_height (bitmap);
+  int w = get_bitmap_width (bitmap);
+  int h = get_bitmap_height (bitmap);
   al_lock_bitmap (rbitmap, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READWRITE);
   set_target_bitmap (rbitmap);
   for (y = 0; y < h; y++)
@@ -512,12 +512,12 @@ bitmap_heq (ALLEGRO_BITMAP *b0, ALLEGRO_BITMAP *b1)
   al_lock_bitmap (b0, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READONLY);
   al_lock_bitmap (b1, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READONLY);
 
-  int b0_w = al_get_bitmap_width (b0);
-  int b0_h = al_get_bitmap_height (b0);
+  int b0_w = get_bitmap_width (b0);
+  int b0_h = get_bitmap_height (b0);
   int b0_m = min_int (b0_w, b0_h);
 
-  int b1_w = al_get_bitmap_width (b1);
-  int b1_h = al_get_bitmap_height (b1);
+  int b1_w = get_bitmap_width (b1);
+  int b1_h = get_bitmap_height (b1);
   int b1_m = min_int (b1_w, b1_h);
 
   int l = min_int (b0_m, b1_m);
@@ -553,13 +553,25 @@ convert_mask_to_alpha (ALLEGRO_BITMAP *bitmap, ALLEGRO_COLOR mask_color)
   al_convert_mask_to_alpha (bitmap, mask_color);
 }
 
+int
+get_bitmap_width (ALLEGRO_BITMAP *bitmap)
+{
+  return bitmap ? al_get_bitmap_width (bitmap) : 0;
+}
+
+int
+get_bitmap_height (ALLEGRO_BITMAP *bitmap)
+{
+  return bitmap ? al_get_bitmap_height (bitmap) : 0;
+}
+
 void
 draw_bitmap (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
              float dx, float dy, int flags)
 {
   draw_bitmap_region (from, to, 0, 0,
-                      al_get_bitmap_width (from),
-                      al_get_bitmap_height (from),
+                      get_bitmap_width (from),
+                      get_bitmap_height (from),
                       dx, dy, flags);
 }
 
@@ -645,11 +657,13 @@ draw_bottom_text (ALLEGRO_BITMAP *bitmap, char *text, int priority)
   } else if (bottom_text_timer) {
     ALLEGRO_COLOR bg_color;
 
-    switch (vm) {
-    case CGA: bg_color = C_MSG_LINE_COLOR; break;
-    case EGA: bg_color = E_MSG_LINE_COLOR; break;
-    case VGA: bg_color = V_MSG_LINE_COLOR; break;
-    }
+    /* switch (vm) { */
+    /* case CGA: bg_color = C_MSG_LINE_COLOR; break; */
+    /* case EGA: bg_color = E_MSG_LINE_COLOR; break; */
+    /* case VGA: */
+      bg_color = V_MSG_LINE_COLOR;
+    /*   break; */
+    /* } */
 
     if (strlen (current_text) > BOTTOM_TEXT_MAX_LENGTH) {
       if (cycle++ % 2) {
@@ -712,12 +726,14 @@ draw_mr_select_rect (int x, int y, ALLEGRO_COLOR color)
   int w = al_get_display_width (display);
   int h = al_get_display_height (display);
   int tw, th; mr_get_resolution (&tw, &th);
+  tw = OW (tw);
+  th = OH (th);
 
   ALLEGRO_BITMAP *screen = mr.cell[x][y].screen;
-  int sw = al_get_bitmap_width (screen);
-  int sh = al_get_bitmap_height (screen);
-  float dx = ((ORIGINAL_WIDTH * x) * w) / (float) tw;
-  float dy = ((ROOM_HEIGHT * y) * h) / (float) th;
+  int sw = get_bitmap_width (screen);
+  int sh = get_bitmap_height (screen);
+  float dx = ((OW (ORIGINAL_WIDTH) * x) * w) / (float) tw;
+  float dy = ((OH (ROOM_HEIGHT) * y) * h) / (float) th;
   float dw = (sw * w) / (float) tw;
   float dh = (sh * h) / (float) th;
   al_draw_rectangle (dx, dy, dx + dw, dy + dh, color, 2);
@@ -736,8 +752,8 @@ flip_display (ALLEGRO_BITMAP *bitmap)
   else flags = screen_flags | potion_flags;
 
   if (bitmap) {
-    int bw = al_get_bitmap_width (bitmap);
-    int bh = al_get_bitmap_height (bitmap);
+    int bw = get_bitmap_width (bitmap);
+    int bh = get_bitmap_height (bitmap);
     set_target_backbuffer (display);
     al_draw_scaled_bitmap
       (bitmap, 0, 0, bw, bh, 0, 0, w, h, flags);
@@ -748,8 +764,8 @@ flip_display (ALLEGRO_BITMAP *bitmap)
       force_full_redraw = true;
     }
 
-    int iw = al_get_bitmap_width (iscreen);
-    int ih = al_get_bitmap_height (iscreen);
+    int iw = get_bitmap_width (iscreen);
+    int ih = get_bitmap_height (iscreen);
 
     if (iw != w || ih != h) {
       destroy_bitmap (iscreen);
@@ -761,16 +777,18 @@ flip_display (ALLEGRO_BITMAP *bitmap)
     int x, y;
     int tw, th;
     mr_get_resolution (&tw, &th);
+    tw = OW (tw);
+    th = OH (th);
 
     for (y = mr.h - 1; y >= 0; y--)
       for (x = 0; x < mr.w; x++) {
         ALLEGRO_BITMAP *screen =
           (mr.cell[x][y].room || no_room_drawing)
           ? mr.cell[x][y].screen : mr.cell[x][y].cache;
-        int sw = al_get_bitmap_width (screen);
-        int sh = al_get_bitmap_height (screen);
-        float dx = ((ORIGINAL_WIDTH * x) * w) / (float) tw;
-        float dy = ((ROOM_HEIGHT * y) * h) / (float) th;
+        int sw = get_bitmap_width (screen);
+        int sh = get_bitmap_height (screen);
+        float dx = ((OW (ORIGINAL_WIDTH) * x) * w) / (float) tw;
+        float dy = ((OH (ROOM_HEIGHT) * y) * h) / (float) th;
         float dw = (sw * w) / (float) tw;
         float dh = (sh * h) / (float) th;
 
@@ -816,8 +834,8 @@ flip_display (ALLEGRO_BITMAP *bitmap)
   }
 
   if (! about_screen) {
-    int uw = al_get_bitmap_width (uscreen);
-    int uh = al_get_bitmap_height (uscreen);
+    int uw = get_bitmap_width (uscreen);
+    int uh = get_bitmap_height (uscreen);
 
     al_draw_scaled_bitmap (uscreen, 0, 0, uw, uh, 0, 0, w, h, 0);
   }
@@ -847,8 +865,8 @@ void
 draw_roll_right (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
                  int total, int i)
 {
-  int w = al_get_bitmap_width (from);
-  int h = al_get_bitmap_height (from);
+  int w = get_bitmap_width (from);
+  int h = get_bitmap_height (from);
   float slice =  w / total;
   draw_bitmap_region (from, to, 0, 0, i * slice, h, 0, 0, 0);
 }
@@ -857,8 +875,8 @@ void
 draw_shutter (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
               int total, int i)
 {
-  int sw = al_get_bitmap_width (from);
-  int sh = al_get_bitmap_height (from);
+  int sw = get_bitmap_width (from);
+  int sh = get_bitmap_height (from);
 
   int sy;
   for (sy = 0; sy < sh; sy += total)
@@ -927,7 +945,7 @@ show (void)
     return;
   } else if (about_screen) {
     show_logo ("http://oitofelix.github.io/mininim/",
-               "http://forum.princed.org/", oitofelix_face (vm));
+               "http://forum.princed.org/", oitofelix_face);
     return;
   }
 
@@ -954,31 +972,31 @@ show (void)
       draw_bitmap (cutscene_screen, effect_buffer, 0, 0, 0);
       break;
     case VIDEO_FADE_IN:
-      switch (vm) {
-      case CGA: case EGA:
-        draw_shutter (cutscene_screen, effect_buffer, video_effect.duration / 4, effect_counter);
-        if (effect_counter >= video_effect.duration / 4)
-          effect_counter += video_effect.duration;
-        break;
-      case VGA:
+      /* switch (vm) { */
+      /* case CGA: case EGA: */
+      /*   draw_shutter (cutscene_screen, effect_buffer, video_effect.duration / 4, effect_counter); */
+      /*   if (effect_counter >= video_effect.duration / 4) */
+      /*     effect_counter += video_effect.duration; */
+      /*   break; */
+      /* case VGA: */
         draw_fade (cutscene_screen, effect_buffer, 1 - (float) effect_counter
                    / (float) video_effect.duration);
-        break;
-      }
+      /*   break; */
+      /* } */
       break;
     case VIDEO_FADE_OUT:
-      switch (vm) {
-      case CGA: case EGA:
-        draw_shutter (black_screen, effect_buffer, video_effect.duration / 4,
-                      effect_counter);
-        if (effect_counter >= video_effect.duration / 4)
-          effect_counter += video_effect.duration;
-        break;
-      case VGA:
+      /* switch (vm) { */
+      /* case CGA: case EGA: */
+      /*   draw_shutter (black_screen, effect_buffer, video_effect.duration / 4, */
+      /*                 effect_counter); */
+      /*   if (effect_counter >= video_effect.duration / 4) */
+      /*     effect_counter += video_effect.duration; */
+      /*   break; */
+      /* case VGA: */
         draw_fade (cutscene_screen, effect_buffer, (float) effect_counter
                    / (float) video_effect.duration);
-        break;
-      }
+        /* break; */
+      /* } */
       if (effect_counter + 1 >= video_effect.duration) clear_bitmap (effect_buffer, BLACK);
       break;
     case VIDEO_ROLL_RIGHT:
@@ -1187,8 +1205,8 @@ push_clipping_rectangle (ALLEGRO_BITMAP *bitmap, int x, int y, int w, int h)
 void
 push_reset_clipping_rectangle (ALLEGRO_BITMAP *bitmap)
 {
-  int w = bitmap ? al_get_bitmap_width (bitmap) : 0;
-  int h = bitmap ? al_get_bitmap_height (bitmap) : 0;
+  int w = bitmap ? get_bitmap_width (bitmap) : 0;
+  int h = bitmap ? get_bitmap_height (bitmap) : 0;
   push_clipping_rectangle (bitmap, 0, 0, w, h);
 }
 
@@ -1252,8 +1270,8 @@ draw_logo (ALLEGRO_BITMAP *bitmap, char *text0, char *text1,
 {
   int x = 145;
   int y = 40;
-  int w = al_get_bitmap_width (logo_icon);
-  int h = al_get_bitmap_height (logo_icon);
+  int w = get_bitmap_width (logo_icon);
+  int h = get_bitmap_height (logo_icon);
 
   push_reset_clipping_rectangle (bitmap);
 
@@ -1272,7 +1290,7 @@ draw_logo (ALLEGRO_BITMAP *bitmap, char *text0, char *text1,
 
   if (icon)
     draw_bitmap (icon, bitmap, (CUTSCENE_WIDTH / 2.0)
-                 - (al_get_bitmap_width (icon) / 2.0) - 2, 136, 0);
+                 - (get_bitmap_width (icon) / 2.0) - 2, 136, 0);
 
   al_draw_filled_rectangle (0, CUTSCENE_HEIGHT - 8,
                             CUTSCENE_WIDTH, CUTSCENE_HEIGHT,
@@ -1311,24 +1329,63 @@ show_logo (char *text0, char* text1, ALLEGRO_BITMAP *icon)
 void
 load_oitofelix_face (void)
 {
-  oitofelix_face_gray = load_bitmap (OITOFELIX_FACE_GRAY);
-  oitofelix_face_bw = load_bitmap (OITOFELIX_FACE_BW);
+  oitofelix_face = load_bitmap (OITOFELIX_FACE);
 }
 
 void
 unload_oitofelix_face (void)
 {
-  destroy_bitmap (oitofelix_face_gray);
-  destroy_bitmap (oitofelix_face_bw);
+  destroy_bitmap (oitofelix_face);
 }
 
-ALLEGRO_BITMAP *
-oitofelix_face (enum vm vm)
+double
+IW (double w)
 {
-  switch (vm) {
-  case VGA: return oitofelix_face_gray;
-  case EGA: return oitofelix_face_gray;
-  case CGA: return oitofelix_face_bw;
-  default: assert (false); return NULL;
+  return (w * ORIGINAL_WIDTH) / REAL_WIDTH;
+}
+
+double
+IH (double h)
+{
+  return (h * ORIGINAL_HEIGHT) / REAL_HEIGHT;
+}
+
+double
+OW (double w)
+{
+  return (w * REAL_WIDTH) / ORIGINAL_WIDTH;
+}
+
+double
+OH (double h)
+{
+  return (h * REAL_HEIGHT) / ORIGINAL_HEIGHT;
+}
+
+void
+video_rendering (bool enable)
+{
+  if (enable) {
+    switch (rendering) {
+    case BOTH_RENDERING: break;
+    case VIDEO_RENDERING: break;
+    case AUDIO_RENDERING:
+      rendering = BOTH_RENDERING;
+      break;
+    case NONE_RENDERING:
+      rendering = VIDEO_RENDERING;
+      break;
+    }
+  } else {
+    switch (rendering) {
+    case BOTH_RENDERING:
+      rendering = AUDIO_RENDERING;
+      break;
+    case VIDEO_RENDERING:
+      rendering = NONE_RENDERING;
+      break;
+    case AUDIO_RENDERING: break;
+    case NONE_RENDERING: break;
+    }
   }
 }

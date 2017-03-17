@@ -20,80 +20,15 @@
 
 #include "mininim.h"
 
-struct frameset kid_climb_frameset[KID_CLIMB_FRAMESET_NMEMB];
-
-static void init_kid_climb_frameset (void);
-static bool flow (struct anim *k);
-static bool physics_in (struct anim *k);
-static void physics_out (struct anim *k);
-
-ALLEGRO_BITMAP *kid_climb_00, *kid_climb_01, *kid_climb_02,
-  *kid_climb_03, *kid_climb_04, *kid_climb_05, *kid_climb_06,
-  *kid_climb_07, *kid_climb_08, *kid_climb_09, *kid_climb_10,
-  *kid_climb_11, *kid_climb_12, *kid_climb_13, *kid_climb_14;
-
-static void
-init_kid_climb_frameset (void)
-{
-  struct frameset frameset[KID_CLIMB_FRAMESET_NMEMB] =
-    {{kid_climb_00,+1,+0},{kid_climb_01,+0,-9},{kid_climb_02,-4,-5},
-     {kid_climb_03,-8,-6},{kid_climb_04,-5,-4},{kid_climb_05,-2,-5},
-     {kid_climb_06,-1,-5},{kid_climb_07,-4,-8},{kid_climb_08,+0,-4},
-     {kid_climb_09,+0,-1},{kid_climb_10,-3,-4},{kid_climb_11,+1,+0},
-     {kid_climb_12,+0,+0},{kid_climb_13,-1,+0},{kid_climb_14,+0,+0}};
-
-  memcpy (&kid_climb_frameset, &frameset,
-          KID_CLIMB_FRAMESET_NMEMB * sizeof (struct frameset));
-}
+static bool flow (struct actor *k);
+static bool physics_in (struct actor *k);
+static void physics_out (struct actor *k);
 
 void
-load_kid_climb (void)
-{
-  /* bitmaps */
-  kid_climb_00 = load_bitmap (KID_CLIMB_00);
-  kid_climb_01 = load_bitmap (KID_CLIMB_01);
-  kid_climb_02 = load_bitmap (KID_CLIMB_02);
-  kid_climb_03 = load_bitmap (KID_CLIMB_03);
-  kid_climb_04 = load_bitmap (KID_CLIMB_04);
-  kid_climb_05 = load_bitmap (KID_CLIMB_05);
-  kid_climb_06 = load_bitmap (KID_CLIMB_06);
-  kid_climb_07 = load_bitmap (KID_CLIMB_07);
-  kid_climb_08 = load_bitmap (KID_CLIMB_08);
-  kid_climb_09 = load_bitmap (KID_CLIMB_09);
-  kid_climb_10 = load_bitmap (KID_CLIMB_10);
-  kid_climb_11 = load_bitmap (KID_CLIMB_11);
-  kid_climb_12 = load_bitmap (KID_CLIMB_12);
-  kid_climb_13 = load_bitmap (KID_CLIMB_13);
-  kid_climb_14 = load_bitmap (KID_CLIMB_14);
-
-  /* frameset */
-  init_kid_climb_frameset ();
-}
-
-void
-unload_kid_climb (void)
-{
-  destroy_bitmap (kid_climb_00);
-  destroy_bitmap (kid_climb_01);
-  destroy_bitmap (kid_climb_02);
-  destroy_bitmap (kid_climb_03);
-  destroy_bitmap (kid_climb_04);
-  destroy_bitmap (kid_climb_05);
-  destroy_bitmap (kid_climb_06);
-  destroy_bitmap (kid_climb_07);
-  destroy_bitmap (kid_climb_08);
-  destroy_bitmap (kid_climb_09);
-  destroy_bitmap (kid_climb_10);
-  destroy_bitmap (kid_climb_11);
-  destroy_bitmap (kid_climb_12);
-  destroy_bitmap (kid_climb_13);
-  destroy_bitmap (kid_climb_14);
-}
-
-void
-kid_climb (struct anim *k)
+kid_climb (struct actor *k)
 {
   k->oaction = k->action;
+  k->oi = k->i;
   k->action = kid_climb;
   k->f.flip = (k->f.dir == RIGHT) ?  ALLEGRO_FLIP_HORIZONTAL : 0;
 
@@ -104,7 +39,7 @@ kid_climb (struct anim *k)
 }
 
 static bool
-flow (struct anim *k)
+flow (struct actor *k)
 {
   if (k->i <= 4)
     request_gamepad_rumble (0.8, 1.0 / DEFAULT_HZ);
@@ -118,19 +53,20 @@ flow (struct anim *k)
   get_hanged_pos (&k->hang_pos, k->f.dir, &hanged_pos);
 
   if (k->i == 14) {
-    kid_couch (k);
+    kid_crouch (k);
     return false;
   }
 
   if (k->i == -1) {
     int dir = (k->f.dir == LEFT) ? 0 : 1;
-    place_frame (&k->f, &k->f, kid_climb_frameset[0].frame,
-                 &k->hang_pos, PLACE_WIDTH * dir + 9, -9);
+    int dx = PLACE_WIDTH * dir + 9;
+    int dy = -9;
+    place_actor (k, &k->hang_pos, dx, dy, "KID", "CLIMB", 0);
   }
 
   if (k->wait == DOOR_WAIT_LOOK && k->i < 14) k->i++;
 
-  select_frame (k, kid_climb_frameset, k->i);
+  select_actor_frame (k, "KID", "CLIMB", k->i);
 
   /* climbing when looking left should let the kid near to the edge
      if it's not a door */
@@ -146,7 +82,7 @@ flow (struct anim *k)
 }
 
 static bool
-physics_in (struct anim *k)
+physics_in (struct actor *k)
 {
   /* fall */
   if (is_falling (&k->f, _tf, +0, +0)) {
@@ -156,7 +92,7 @@ physics_in (struct anim *k)
 
   /* door collision */
   struct pos ptf;
-  enum confg ctf;
+  enum tile_fg ctf;
   survey (_tf, pos, &k->f, NULL, &ptf, NULL);
   ctf = fg (&ptf);
   if (k->i == 3 && ctf == DOOR && k->f.dir == LEFT
@@ -172,7 +108,7 @@ physics_in (struct anim *k)
 }
 
 static void
-physics_out (struct anim *k)
+physics_out (struct actor *k)
 {
   struct pos hanged_pos;
 
@@ -183,29 +119,24 @@ physics_out (struct anim *k)
 }
 
 bool
-is_kid_climb (struct frame *f)
+is_kid_climb (struct actor *k)
 {
-  int i;
-  for (i = 0; i < 10; i++)
-    if (f->b == kid_climb_frameset[i].frame) return true;
-  return false;
+  return (k->action == kid_climb || k->action == kid_unclimb)
+    && k->i <= 9;
 }
 
 bool
-is_kid_successfully_climbing_at_pos (struct frame *f, struct pos *hang_pos,
+is_kid_successfully_climbing_at_pos (struct actor *k, struct pos *hang_pos,
                                      struct pos *p)
 {
   struct pos np;
-  int dir = (f->dir == LEFT) ? +1 : -1;
-  return is_kid_successfully_climbing (f)
+  int dir = (k->f.dir == LEFT) ? +1 : -1;
+  return is_kid_successfully_climbing (k)
     && peq (prel (p, &np, +1, dir), hang_pos);
 }
 
 bool
-is_kid_successfully_climbing (struct frame *f)
+is_kid_successfully_climbing (struct actor *k)
 {
-  int i;
-  for (i = 4; i < KID_CLIMB_FRAMESET_NMEMB; i++)
-    if (f->b == kid_climb_frameset[i].frame) return true;
-  return false;
+  return k->action == kid_climb && k->i >= 4;
 }

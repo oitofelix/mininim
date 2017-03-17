@@ -21,62 +21,11 @@
 #ifndef MININIM_LOOSE_FLOOR_H
 #define MININIM_LOOSE_FLOOR_H
 
-/* dungeon cga */
-#define DC_LOOSE_FLOOR_BASE_00 "data/loose-floor/dc-base-00.png"
-#define DC_LOOSE_FLOOR_LEFT_00 "data/loose-floor/dc-left-00.png"
-#define DC_LOOSE_FLOOR_RIGHT_00 "data/loose-floor/dc-right-00.png"
-#define DC_LOOSE_FLOOR_BASE_01 "data/loose-floor/dc-base-01.png"
-#define DC_LOOSE_FLOOR_LEFT_01 "data/loose-floor/dc-left-01.png"
-#define DC_LOOSE_FLOOR_RIGHT_01 "data/loose-floor/dc-right-01.png"
-
-/* palace cga */
-#define PC_LOOSE_FLOOR_BASE_00 "data/loose-floor/pc-base-00.png"
-#define PC_LOOSE_FLOOR_LEFT_00 "data/loose-floor/pc-left-00.png"
-#define PC_LOOSE_FLOOR_RIGHT_00 "data/loose-floor/pc-right-00.png"
-#define PC_LOOSE_FLOOR_BASE_01 "data/loose-floor/pc-base-01.png"
-#define PC_LOOSE_FLOOR_LEFT_01 "data/loose-floor/pc-left-01.png"
-#define PC_LOOSE_FLOOR_RIGHT_01 "data/loose-floor/pc-right-01.png"
-
-/* dungeon ega */
-#define DE_LOOSE_FLOOR_BASE_00 "data/loose-floor/de-base-00.png"
-#define DE_LOOSE_FLOOR_LEFT_00 "data/loose-floor/de-left-00.png"
-#define DE_LOOSE_FLOOR_RIGHT_00 "data/loose-floor/de-right-00.png"
-#define DE_LOOSE_FLOOR_BASE_01 "data/loose-floor/de-base-01.png"
-#define DE_LOOSE_FLOOR_LEFT_01 "data/loose-floor/de-left-01.png"
-#define DE_LOOSE_FLOOR_RIGHT_01 "data/loose-floor/de-right-01.png"
-
-/* palace ega */
-#define PE_LOOSE_FLOOR_BASE_00 "data/loose-floor/pe-base-00.png"
-#define PE_LOOSE_FLOOR_LEFT_00 "data/loose-floor/pe-left-00.png"
-#define PE_LOOSE_FLOOR_RIGHT_00 "data/loose-floor/pe-right-00.png"
-#define PE_LOOSE_FLOOR_BASE_01 "data/loose-floor/pe-base-01.png"
-#define PE_LOOSE_FLOOR_LEFT_01 "data/loose-floor/pe-left-01.png"
-#define PE_LOOSE_FLOOR_RIGHT_01 "data/loose-floor/pe-right-01.png"
-
-/* dungeon vga */
-#define DV_LOOSE_FLOOR_BASE_00 "data/loose-floor/dv-base-00.png"
-#define DV_LOOSE_FLOOR_LEFT_00 "data/loose-floor/dv-left-00.png"
-#define DV_LOOSE_FLOOR_RIGHT_00 "data/loose-floor/dv-right-00.png"
-#define DV_LOOSE_FLOOR_BASE_01 "data/loose-floor/dv-base-01.png"
-#define DV_LOOSE_FLOOR_LEFT_01 "data/loose-floor/dv-left-01.png"
-#define DV_LOOSE_FLOOR_RIGHT_01 "data/loose-floor/dv-right-01.png"
-
-/* palace vga */
-#define PV_LOOSE_FLOOR_BASE_00 "data/loose-floor/pv-base-00.png"
-#define PV_LOOSE_FLOOR_LEFT_00 "data/loose-floor/pv-left-00.png"
-#define PV_LOOSE_FLOOR_RIGHT_00 "data/loose-floor/pv-right-00.png"
-#define PV_LOOSE_FLOOR_BASE_01 "data/loose-floor/pv-base-01.png"
-#define PV_LOOSE_FLOOR_LEFT_01 "data/loose-floor/pv-left-01.png"
-#define PV_LOOSE_FLOOR_RIGHT_01 "data/loose-floor/pv-right-01.png"
-
 /* variables */
 extern struct loose_floor *loose_floor;
 extern size_t loose_floor_nmemb;
 
 /* functions */
-void load_loose_floor (void);
-void unload_loose_floor (void);
-ALLEGRO_BITMAP *create_loose_floor_01_bitmap (enum em em, enum vm vm);
 struct loose_floor *init_loose_floor (struct pos *p, struct loose_floor *l);
 void register_loose_floor (struct pos *p);
 void sort_loose_floors (void);
@@ -89,7 +38,7 @@ bool should_remove_loose_floor (struct loose_floor *l);
 void remove_loose_floor (struct loose_floor *l);
 void no_action_loose_floor (struct pos *p);
 void shake_loose_floor (struct pos *p);
-void release_loose_floor (struct pos *p, struct anim *a);
+void release_loose_floor (struct pos *p, struct actor *a);
 void fall_loose_floor (struct pos *p);
 void break_loose_floor (struct pos *p);
 void compute_loose_floors (void);
@@ -98,35 +47,9 @@ void compute_loose_floor_release (struct loose_floor *l);
 void compute_loose_floor_fall (struct loose_floor *l);
 void shake_loose_floor_row (struct pos *p);
 void sample_random_loose_floor (struct pos *p);
-ALLEGRO_BITMAP *get_correct_falling_loose_floor_bitmap (ALLEGRO_BITMAP *b);
-void draw_loose_floor (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                       enum em em, enum vm vm);
-void draw_loose_floor_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                            enum em em, enum vm vm);
-void draw_loose_floor_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                            enum em em, enum vm vm);
-void draw_loose_floor_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                             enum em em, enum vm vm);
-void draw_falling_loose_floor (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                               enum em em, enum vm vm);
-void draw_loose_floor_00 (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                          enum em em, enum vm vm);
-void draw_loose_floor_00_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                               enum em em, enum vm vm);
-void draw_loose_floor_00_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                               enum em em, enum vm vm);
-void draw_loose_floor_00_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                                enum em em, enum vm vm);
-void draw_loose_floor_01 (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                          enum em em, enum vm vm);
-void draw_loose_floor_01_base (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                               enum em em, enum vm vm);
-void draw_loose_floor_01_left (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                               enum em em, enum vm vm);
-void draw_loose_floor_01_right (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                                enum em em, enum vm vm);
-struct coord *loose_floor_left_coord (struct pos *p, struct coord *c);
-struct coord *loose_floor_right_coord (struct pos *p, struct coord *c);
+ALLEGRO_BITMAP *get_correct_falling_loose_floor_bitmap (bool broken);
+void draw_loose_floor (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_falling_loose_floor (ALLEGRO_BITMAP *bitmap, struct pos *p);
 void loose_floor_fall_debug (void);
 
 #endif	/* MININIM_LOOSE_FLOOR_H */

@@ -20,88 +20,38 @@
 
 #include "mininim.h"
 
-void
-draw_wall_part (ALLEGRO_BITMAP *bitmap, struct pos *p, char *part)
-{
-  lua_State *L = main_L;
-  if (! L_push_video_routine (L)) return;
-
-  lua_pushstring (L, "DRAW");
-  lua_pushstring (L, "WALL");
-  lua_pushstring (L, part);
-  L_pushposition (L, p);
-
-  L_target_bitmap = bitmap;
-  L_call (L, 4, 0);
-  L_target_bitmap = NULL;
-}
-
-void
-draw_wall_part_width (ALLEGRO_BITMAP *bitmap, struct pos *p, char *part,
-                      int width)
-{
-  lua_State *L = main_L;
-  if (! L_push_video_routine (L)) return;
-
-  lua_pushstring (L, "DRAW");
-  lua_pushstring (L, "WALL");
-  lua_pushstring (L, part);
-  L_pushposition (L, p);
-  if (width >= 0) lua_pushnumber (L, width);
-  else lua_pushnil (L);
-
-  L_target_bitmap = bitmap;
-  L_call (L, 5, 0);
-  L_target_bitmap = NULL;
-}
+static void draw_wall_cache (ALLEGRO_BITMAP *bitmap, struct pos *p);
 
 void
 draw_wall (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
-  draw_wall_part (bitmap, p, "BASE");
-  draw_wall_part (bitmap, p, "LEFT");
-  draw_wall_part (bitmap, p, "RIGHT");
-  draw_wall_part (bitmap, p, "TOP");
+  if (tile_caching) {
+    draw_object_part (bitmap, "WALL", "FRONT", p);
+    draw_object_part (bitmap, "WALL", "FACE", p);
+  } else draw_wall_cache (bitmap, p);
 }
 
 void
-draw_wall_left_cache (ALLEGRO_BITMAP *bitmap, struct pos *p)
+draw_wall_cache (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
-  struct coord c; wall_left_coord (p, &c);
+  struct coord c; coord_object_part (&c, "WALL", "FRONT", p);
   struct pos np; npos (p, &np);
-  struct coord nc; wall_left_coord (&np, &nc);
+  struct coord nc; coord_object_part (&nc, "WALL", "FRONT", &np);
   struct coord vc; coord2room (&c, room_view, &vc);
   int x, y;
   if (mr_coord (np.room, -1, &x, &y))
     draw_bitmap_regionc (mr.cell[x][y].cache, bitmap, nc.x, nc.y,
-                         PLACE_WIDTH, PLACE_HEIGHT - 3, &c, 0);
+                         PLACE_WIDTH, PLACE_HEIGHT, &c, 0);
   else if (mr_coord (vc.room, -1, &x, &y))
     draw_bitmap_regionc (mr.cell[x][y].cache, bitmap, vc.x, vc.y,
-                         PLACE_WIDTH, PLACE_HEIGHT - 3, &vc, 0);
+                         PLACE_WIDTH, PLACE_HEIGHT, &vc, 0);
   else if (mr_coord (p->room, -1, &x, &y))
     draw_bitmap_regionc (mr.cell[x][y].cache, bitmap, c.x, c.y,
-                         PLACE_WIDTH, PLACE_HEIGHT - 3, &c, 0);
-  else draw_wall_part (bitmap, p, "LEFT");
-}
-
-void
-draw_wall_base_cache (ALLEGRO_BITMAP *bitmap, struct pos *p)
-{
-  struct coord c; wall_base_coord (p, &c);
-  struct pos np; npos (p, &np);
-  struct coord nc; wall_base_coord (&np, &nc);
-  struct coord vc; coord2room (&c, room_view, &vc);
-  int x, y;
-  if (mr_coord (np.room, -1, &x, &y))
-    draw_bitmap_regionc (mr.cell[x][y].cache, bitmap, nc.x, nc.y,
-                         PLACE_WIDTH, 3, &c, 0);
-  else if (mr_coord (vc.room, -1, &x, &y))
-    draw_bitmap_regionc (mr.cell[x][y].cache, bitmap, vc.x, vc.y,
-                         PLACE_WIDTH, 3, &vc, 0);
-  else if (mr_coord (p->room, -1, &x, &y))
-    draw_bitmap_regionc (mr.cell[x][y].cache, bitmap, c.x, c.y,
-                         PLACE_WIDTH, 3, &c, 0);
-  else draw_wall_part (bitmap, p, "BASE");
+                         PLACE_WIDTH, PLACE_HEIGHT, &c, 0);
+  else {
+    draw_object_part (bitmap, "WALL", "FRONT", p);
+    draw_object_part (bitmap, "WALL", "FACE", p);
+  }
 }
 
 enum should_draw
@@ -122,11 +72,9 @@ should_draw_face (struct pos *p, struct frame *f)
 }
 
 void
-draw_wall_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f,
-              enum em em, enum vm vm)
+draw_wall_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f)
 {
-  draw_wall_base_cache (bitmap, p);
-  draw_wall_left_cache (bitmap, p);
+  draw_object_part (bitmap, "WALL", "FRONT", p);
 
   struct pos par; prel (p, &par, -1, +1);
   struct pos pr; prel (p, &pr, +0, +1);
@@ -134,16 +82,13 @@ draw_wall_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f,
   switch (should_draw_face (p, f)) {
   case SHOULD_DRAW_FULL:
     push_drawn_rectangle (bitmap);
-    draw_confg_right (bitmap, p, em, vm);
-    draw_confg_top (bitmap, p, em, vm);
-    redraw_drawn_rectangle (pop_drawn_rectangle (), p, em, vm);
+    draw_object_part (bitmap, "WALL", "FACE", p);
+    redraw_drawn_rectangle (pop_drawn_rectangle (), p);
     break;
   case SHOULD_DRAW_PART:
     push_drawn_rectangle (bitmap);
-    draw_wall_part_width (bitmap, p, "RIGHT", WALL_FG_WIDTH);
-    if (fake (&par) == NO_FLOOR)
-      draw_wall_part_width (bitmap, p, "TOP", WALL_FG_WIDTH);
-    redraw_drawn_rectangle (pop_drawn_rectangle (), p, em, vm);
+    draw_object_part_width (bitmap, "WALL", "FACE", p, WALL_FG_WIDTH);
+    redraw_drawn_rectangle (pop_drawn_rectangle (), p);
     break;
   case SHOULD_DRAW_NONE: default: break;
   }
@@ -154,30 +99,12 @@ wall_correlation (struct pos *p)
 {
   if (fake (p) != WALL) assert (false);
 
-  enum confg fl = fake_rel (p, 0, -1);
-  enum confg fr = fake_rel (p, 0, +1);
+  enum tile_fg fl = fake_rel (p, 0, -1);
+  enum tile_fg fr = fake_rel (p, 0, +1);
 
   if (fl != WALL && fr != WALL) return SWS;
   else if (fl != WALL && fr == WALL) return SWW;
   else if (fl == WALL && fr != WALL) return WWS;
   else if (fl == WALL && fr == WALL) return WWW;
   else return INVALID;
-}
-
-struct coord *
-wall_base_coord (struct pos *p, struct coord *c)
-{
-  return
-    new_coord (c, p->l, p->room,
-               PLACE_WIDTH * p->place,
-               PLACE_HEIGHT * (p->floor + 1));
-}
-
-struct coord *
-wall_left_coord (struct pos *p, struct coord *c)
-{
-  return
-    new_coord (c, p->l, p->room,
-               PLACE_WIDTH * p->place,
-               PLACE_HEIGHT * p->floor + 3);
 }

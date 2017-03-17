@@ -115,8 +115,7 @@ BEGIN_LUA (__index)
   default: break;
   }
 
-  lua_pushnil (L);
-  return 1;
+  return 0;
 }
 END_LUA
 
@@ -182,24 +181,24 @@ END_LUA
 
 BEGIN_LUA (uint32)
 {
-  int64_t a = lua_tonumber (L, 1);
-  lua_pushnumber (L, a & 0xFFFFFFFF);
+  uint32_t a = lua_tonumber (L, 1);
+  lua_pushnumber (L, a);
   return 1;
 }
 END_LUA
 
 BEGIN_LUA (uint16)
 {
-  int64_t a = lua_tonumber (L, 1);
-  lua_pushnumber (L, a & 0xFFFF);
+  uint16_t a = lua_tonumber (L, 1);
+  lua_pushnumber (L, a);
   return 1;
 }
 END_LUA
 
 BEGIN_LUA (uint8)
 {
-  int64_t a = lua_tonumber (L, 1);
-  lua_pushnumber (L, a & 0xFF);
+  uint8_t a = lua_tonumber (L, 1);
+  lua_pushnumber (L, a);
   return 1;
 }
 END_LUA

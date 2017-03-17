@@ -20,7 +20,7 @@
 
 #include "mininim.h"
 
-static bool con_undo_ignore_state;
+static bool tile_undo_ignore_state;
 
 void
 register_undo (struct undo *u, void *data, undo_f f, char *desc)
@@ -106,18 +106,18 @@ end_undo_set (struct undo *u, char *desc)
 }
 
 
-/*********************/
-/* CONSTRUCTION UNDO */
-/*********************/
+/*************/
+/* TILE UNDO */
+/*************/
 
 void
-register_con_undo (struct undo *u, struct pos *p,
+register_tile_undo (struct undo *u, struct pos *p,
                    int f, int b, int e, int ff,
-                   union con_state *cs,
+                   union tile_state *cs,
                    bool ignore_intermediate,
                    char *desc)
 {
-  struct con c;
+  struct tile c;
 
   c.fg = (f != MIGNORE) ? fg_val (f) : fg (p);
   c.bg = (b != MIGNORE) ? bg_val (b) : bg (p);
@@ -125,65 +125,65 @@ register_con_undo (struct undo *u, struct pos *p,
 
   if (ff != MIGNORE && ff != NO_FAKE) c.fake = fg_val (ff);
   else if (ff == NO_FAKE) c.fake = ff;
-  else c.fake = con (p)->fake;
+  else c.fake = tile (p)->fake;
 
   if (c.fg == c.fake) c.fake = -1;
 
-  struct con_undo *prev_data = u->count
-    ? (struct con_undo *) u->pass[u->current].data
+  struct tile_undo *prev_data = u->count
+    ? (struct tile_undo *) u->pass[u->current].data
     : NULL;
 
-  enum con_diff cd = con_diff (con (p), &c);
+  enum tile_diff cd = tile_diff (tile (p), &c);
 
   if (ignore_intermediate
       && prev_data
-      && u->pass[u->current].f == (undo_f) con_undo
+      && u->pass[u->current].f == (undo_f) tile_undo
       && peq (&prev_data->p, p)
-      && ((cd == con_diff (&prev_data->b, &prev_data->f)
-           && cd != CON_DIFF_MIXED
-           && cd != CON_DIFF_NO_DIFF)
+      && ((cd == tile_diff (&prev_data->b, &prev_data->f)
+           && cd != TILE_DIFF_MIXED
+           && cd != TILE_DIFF_NO_DIFF)
           || ! memcmp (&prev_data->b, &c, sizeof (c)))) {
-    con_undo_ignore_state = true;
+    tile_undo_ignore_state = true;
     undo_pass (u, -1, NULL);
-    con_undo_ignore_state = false;
+    tile_undo_ignore_state = false;
   }
 
-  if (! memcmp (con (p), &c, sizeof (c))) return;
+  if (! memcmp (tile (p), &c, sizeof (c))) return;
 
-  struct con_undo *d = xmalloc (sizeof (struct con_undo));
+  struct tile_undo *d = xmalloc (sizeof (struct tile_undo));
   d->p = *p;
-  d->b = *con (p);
+  d->b = *tile (p);
   d->f = c;
 
-  copy_to_con_state (&d->bs, p);
+  copy_to_tile_state (&d->bs, p);
 
-  *con (&d->p) = d->f;
+  *tile (&d->p) = d->f;
 
   /* if (should_init (&d->b, &d->f)) */
-  init_con_at_pos (&d->p);
+  init_tile_at_pos (&d->p);
 
   if (cs) {
     d->fs = *cs;
-    copy_from_con_state (p, cs);
-  } else copy_to_con_state (&d->fs, p);
+    copy_from_tile_state (p, cs);
+  } else copy_to_tile_state (&d->fs, p);
 
-  register_undo (u, d, (undo_f) con_undo, desc);
+  register_undo (u, d, (undo_f) tile_undo, desc);
 
   register_changed_pos (p);
 }
 
 void
-con_undo (struct con_undo *d, int dir)
+tile_undo (struct tile_undo *d, int dir)
 {
-  /* copy_to_con_state ((dir >= 0) ? &d->bs : &d->fs, &d->p); */
+  /* copy_to_tile_state ((dir >= 0) ? &d->bs : &d->fs, &d->p); */
 
-  *con (&d->p) = (dir >= 0) ? d->f : d->b;
+  *tile (&d->p) = (dir >= 0) ? d->f : d->b;
 
   /* if (should_init (&d->b, &d->f)) */
-  init_con_at_pos (&d->p);
+  init_tile_at_pos (&d->p);
 
-  if (! con_undo_ignore_state)
-    copy_from_con_state (&d->p, (dir >= 0) ? &d->fs : &d->bs);
+  if (! tile_undo_ignore_state)
+    copy_from_tile_state (&d->p, (dir >= 0) ? &d->fs : &d->bs);
 
   register_changed_pos (&d->p);
 }
@@ -310,16 +310,16 @@ event_undo (struct event_undo *d, int dir)
 /*******************************/
 
 void
-register_h_room_mirror_con_undo (struct undo *u, int _room, char *desc)
+register_h_room_mirror_tile_undo (struct undo *u, int _room, char *desc)
 {
   int *room = xmalloc (sizeof (* room));
   *room = _room;
-  register_undo (u, room, (undo_f) h_room_mirror_con_undo, desc);
-  h_room_mirror_con_undo (room, +1);
+  register_undo (u, room, (undo_f) h_room_mirror_tile_undo, desc);
+  h_room_mirror_tile_undo (room, +1);
 }
 
 void
-h_room_mirror_con_undo (int *room, int dir)
+h_room_mirror_tile_undo (int *room, int dir)
 {
   mirror_room_h (&global_level, *room);
 }
@@ -329,16 +329,16 @@ h_room_mirror_con_undo (int *room, int dir)
 /*****************************/
 
 void
-register_v_room_mirror_con_undo (struct undo *u, int _room, char *desc)
+register_v_room_mirror_tile_undo (struct undo *u, int _room, char *desc)
 {
   int *room = xmalloc (sizeof (* room));
   *room = _room;
-  register_undo (u, room, (undo_f) v_room_mirror_con_undo, desc);
-  v_room_mirror_con_undo (room, +1);
+  register_undo (u, room, (undo_f) v_room_mirror_tile_undo, desc);
+  v_room_mirror_tile_undo (room, +1);
 }
 
 void
-v_room_mirror_con_undo (int *room, int dir)
+v_room_mirror_tile_undo (int *room, int dir)
 {
   struct pos p0, p1;
   new_pos (&p0, &global_level, *room, -1, -1);
@@ -355,11 +355,11 @@ v_room_mirror_con_undo (int *room, int dir)
 /***************************/
 
 void
-register_random_room_mirror_con_undo (struct undo *u, int _room,
+register_random_room_mirror_tile_undo (struct undo *u, int _room,
                                       bool invert_dir,
                                       char *desc)
 {
-  struct random_room_mirror_con_undo *d = xmalloc (sizeof (* d));
+  struct random_room_mirror_tile_undo *d = xmalloc (sizeof (* d));
   d->room = _room;
   d->invert_dir = invert_dir;
 
@@ -368,13 +368,13 @@ register_random_room_mirror_con_undo (struct undo *u, int _room,
     for (p.place = 0; p.place < PLACES; p.place++)
       random_pos (&global_level, &d->p[p.floor][p.place]);
 
-  register_undo (u, d, (undo_f) random_room_mirror_con_undo, desc);
+  register_undo (u, d, (undo_f) random_room_mirror_tile_undo, desc);
 
-  random_room_mirror_con_undo (d, +1);
+  random_room_mirror_tile_undo (d, +1);
 }
 
 void
-random_room_mirror_con_undo (struct random_room_mirror_con_undo *d, int dir)
+random_room_mirror_tile_undo (struct random_room_mirror_tile_undo *d, int dir)
 {
   struct pos p0, p1;
   new_pos (&p0, &global_level, d->room, -1, -1);
@@ -545,7 +545,7 @@ guard_skill_undo (struct guard_skill_undo *d, int dir)
 {
   struct guard *g = guard (&global_level, d->i);
   g->skill = (dir >= 0) ? d->f_skill : d->b_skill;
-  struct anim *a = get_guard_anim_by_level_id (d->i);
+  struct actor *a = get_guard_actor_by_level_id (d->i);
   if (a) a->skill = g->skill;
 }
 
@@ -579,7 +579,8 @@ guard_lives_undo (struct indexed_int_undo *d, int dir)
 /**************/
 
 void
-register_guard_type_undo (struct undo *u, int i, enum anim_type t, char *desc)
+register_guard_type_undo (struct undo *u, int i, enum actor_type t,
+                          char *desc)
 {
   struct guard *g = guard (&global_level, i);
   if (g->type == t) return;

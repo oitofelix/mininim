@@ -175,7 +175,7 @@ coord_eq (struct coord *c0, struct coord *c1)
 }
 
 struct coord *
-new_coord (struct coord *c, struct level *l, int room, int x, int y)
+new_coord (struct coord *c, struct level *l, int room, double x, double y)
 {
   c->l = l;
   c->room = room;
@@ -505,8 +505,8 @@ frame2room (struct frame *f, int room, struct coord *cv)
   struct coord bl = *cv;
   struct coord br = *cv;
 
-  int w = al_get_bitmap_width (f->b);
-  int h = al_get_bitmap_height (f->b);
+  int w = IW (get_bitmap_width (f->b));
+  int h = IH (get_bitmap_height (f->b));
 
   tr.x = tl.x + w - 1;
   bl.y = tl.y + h - 1;
@@ -856,8 +856,8 @@ perpendicular_dir (enum dir dir, int n)
 struct dim *
 dim (struct frame *f, struct dim *d)
 {
-  d->w = al_get_bitmap_width (f->b);
-  d->h = al_get_bitmap_height (f->b);
+  d->w = IW (get_bitmap_width (f->b));
+  d->h = IH (get_bitmap_height (f->b));
   d->x = f->c.x;
   d->y = f->c.y;
   d->fx = (f->dir == LEFT) ? d->x : d->x + d->w - 1;
@@ -868,16 +868,16 @@ dim (struct frame *f, struct dim *d)
 /* cons coordinates */
 
 struct coord *
-con_coord (struct pos *p, coord_f cf, struct coord *c)
+tile_coord (struct pos *p, coord_f cf, struct coord *c)
 {
-  static ALLEGRO_BITMAP *con_bitmap = NULL;
+  static ALLEGRO_BITMAP *tile_bitmap = NULL;
 
-  if (! con_bitmap)
-    con_bitmap = create_bitmap (PLACE_WIDTH, PLACE_HEIGHT);
+  if (! tile_bitmap)
+    tile_bitmap = create_bitmap (PLACE_WIDTH, PLACE_HEIGHT);
   struct frame f;
 
   f.dir = LEFT;
-  f.b = con_bitmap;
+  f.b = tile_bitmap;
   new_coord (&f.c, p->l, p->room,
              PLACE_WIDTH * p->place + 15,
              PLACE_HEIGHT * p->floor + 3);
@@ -1230,8 +1230,8 @@ bitmap_rcoord (ALLEGRO_BITMAP *b, struct bitmap_rcoord *c)
   if (cached) return c;
 
   c->b = b;
-  int w = al_get_bitmap_width (b);
-  int h = al_get_bitmap_height (b);
+  int w = IW (get_bitmap_width (b));
+  int h = IH (get_bitmap_height (b));
   al_lock_bitmap (b, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READONLY);
 
   /* top left */
@@ -1301,12 +1301,10 @@ bitmap_rcoord (ALLEGRO_BITMAP *b, struct bitmap_rcoord *c)
 struct coord *
 place_on_the_ground (struct frame *f, struct coord *c)
 {
-  /* struct coord mbo; */
   struct pos pmbo;
   *c = f->c;
-  survey (_mbo, pos, f, /* &mbo */ NULL, &pmbo, NULL);
-  c->y = (PLACE_HEIGHT * pmbo.floor + 56) - al_get_bitmap_height (f->b);
-  /* f->c.y += (PLACE_HEIGHT * pmbo.floor + 55) - mbo.y; */
+  survey (_mbo, pos, f, NULL, &pmbo, NULL);
+  c->y = (PLACE_HEIGHT * pmbo.floor + 56) - IH (get_bitmap_height (f->b));
   return c;
 }
 

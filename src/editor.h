@@ -32,8 +32,8 @@ void editor (void);
 void enter_editor (void);
 void exit_editor (int priority);
 void editor_msg (char *m, uint64_t cycles);
-void ui_place_kid (struct anim *k, struct pos *p);
-void ui_place_guard (struct anim *g, struct pos *p);
+void ui_place_kid (struct actor *k, struct pos *p);
+void ui_place_guard (struct actor *g, struct pos *p);
 void editor_link (int room0, int room1, enum dir dir);
 void editor_mirror_link (int room, enum dir dir0, enum dir dir1);
 

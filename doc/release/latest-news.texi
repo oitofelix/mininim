@@ -50,7 +50,7 @@ symbolic links.
 @noindent @strong{Bug fixes:}
 
 @itemize
-@item Chopper doesn't handle step extension correctly.
+@item Chomper doesn't handle step extension correctly.
 @item Drawing of rooms with broken links is ill-behaved.  There are
 glitches in room drawing for rooms with more than one link to the same
 room, and kid drawing glitches for rooms linked to themselves, as well
