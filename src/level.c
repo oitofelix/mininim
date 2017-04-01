@@ -146,7 +146,7 @@ level_eq (struct level *l0, struct level *l1)
       || l0->start_dir != l1->start_dir
       || l0->has_sword != l1->has_sword
       || l0->em != l1->em
-      || l1->hue != l1->hue)
+      || l0->hue != l1->hue)
     return false;
 
   size_t i;

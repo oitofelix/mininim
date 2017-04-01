@@ -205,7 +205,8 @@ title_anim (void)
     }
     break;
   case 9:
-    if (! is_video_effect_started ()) i++; break;
+    if (! is_video_effect_started ()) i++;
+    break;
   case 10:
     if (! is_audio_instance_playing (ai_data)) {
       princess.f.c.x = 142;
