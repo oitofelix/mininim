@@ -674,8 +674,7 @@ menu_sep (char const *title_template, ...)
                     NULL, false, title_template, ap);
   else
     r = vmenu_item (SEP_MID + i, ALLEGRO_MENU_ITEM_DISABLED, NULL, false,
-                    title_template ? title_template : "",
-                    title_template ? ap : NULL);
+                    title_template ? title_template : "", ap);
 
   va_end (ap);
   return r;
