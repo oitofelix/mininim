@@ -315,7 +315,7 @@ END_LUA
 char *
 debugger_breaks_report (lua_State *L, const char *fmt)
 {
-  if (! debugger_break_nmemb) return xasprintf ("");
+  if (! debugger_break_nmemb) return xasprintf ("%s", "");
 
   char *header = fmt_row (fmt, "", "Id", "Type", "File", "Line",
                           "Cond", "Value", "Enabled", "");
@@ -903,7 +903,7 @@ char *
 get_file_line (const char *filename, size_t n)
 {
   FILE *file = fopen (filename, "r");
-  if (! file) return xasprintf ("");
+  if (! file) return xasprintf ("%s", "");
   size_t i;
   char *line = NULL;
   size_t line_size = 0;
@@ -917,7 +917,7 @@ get_file_line (const char *filename, size_t n)
     if (r < 0) {
       al_free (line);
       fclose (file);
-      return xasprintf ("");
+      return xasprintf ("%s", "");
     }
   }
   fclose (file);
@@ -996,7 +996,7 @@ char *
 get_frame_header (lua_State *L, int level, int event)
 {
   lua_Debug ar;
-  if (! lua_getstack (L, level, &ar)) return xasprintf ("");
+  if (! lua_getstack (L, level, &ar)) return xasprintf ("%s", "");
 
   lua_getinfo (L, "Snl", &ar);
 
@@ -1035,10 +1035,10 @@ get_upvalues_report (lua_State *L, int level, const char *fmt)
 {
   lua_Debug ar;
   int i;
-  if (! lua_getstack (L, level, &ar)) return xasprintf ("");
+  if (! lua_getstack (L, level, &ar)) return xasprintf ("%s", "");
   lua_getinfo (L, "u", &ar);
 
-  char *report = xasprintf ("");
+  char *report = xasprintf ("%s", "");
   const char *name;
   lua_getinfo(L, "f", &ar);
   for (i = 1; (name = lua_getupvalue (L, -1, i)); i++) {
@@ -1066,9 +1066,9 @@ get_locals_report (lua_State *L, int level, const char *fmt)
 {
   lua_Debug ar;
   int i;
-  if (! lua_getstack (L, level, &ar)) return xasprintf ("");
+  if (! lua_getstack (L, level, &ar)) return xasprintf ("%s", "");
 
-  char *report = xasprintf ("");
+  char *report = xasprintf ("%s", "");
   int nlocals = get_nlocals (L, level);
   for (i = 1; i <= nlocals; i++) {
     const char *name = lua_getlocal (L, &ar, i);
@@ -1093,7 +1093,7 @@ char *
 get_cstack_report (lua_State *L, const char *fmt)
 {
   int nvalues = lua_gettop (L);
-  char *report = xasprintf ("");
+  char *report = xasprintf ("%s", "");
   int i;
   for (i = 1; i <= nvalues; i++) {
     char *number = xasprintf ("%i", i);
@@ -1132,7 +1132,7 @@ get_full_backtrace_report (lua_State *L, int event)
 {
   int nframes = get_nframes (L);
   int level;
-  char *report = xasprintf ("");
+  char *report = xasprintf ("%s", "");
   for (level = nframes; level >= 0; level--) {
     lua_Debug ar;
     lua_getstack (L, level, &ar);
@@ -1217,7 +1217,7 @@ get_compact_backtrace_report (lua_State *L, int event)
 {
   int nframes = get_nframes (L);
   int level;
-  char *report = xasprintf ("");
+  char *report = xasprintf ("%s", "");
   for (level = nframes; level >= 0; level--) {
     lua_Debug ar;
     lua_getstack (L, level, &ar);

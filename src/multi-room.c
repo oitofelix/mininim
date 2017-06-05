@@ -486,13 +486,17 @@ mr_view_trans (enum dir d)
 
   switch (d) {
   case RIGHT:
-    if (mr.x > 0) dx = -1; break;
+    if (mr.x > 0) dx = -1;
+    break;
   case LEFT:
-    if (mr.x < mr.w - 1) dx = +1; break;
+    if (mr.x < mr.w - 1) dx = +1;
+    break;
   case BELOW:
-    if (mr.y > 0) dy = -1; break;
+    if (mr.y > 0) dy = -1;
+    break;
   case ABOVE:
-    if (mr.y < mr.h - 1) dy = +1; break;
+    if (mr.y < mr.h - 1) dy = +1;
+    break;
   }
 
   mr_set_origin (mr.room, mr.x + dx, mr.y + dy);

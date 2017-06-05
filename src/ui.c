@@ -3225,7 +3225,7 @@ ui_load_replay_favorites (void)
     }
 
     uint64_t cycle;
-    if (sscanf (cycle_str, "%zu", &cycle) != 1) break;
+    if (sscanf (cycle_str, "%ju", &cycle) != 1) break;
     add_replay_favorite (file_str, cycle);
 
     al_free (file_str);
