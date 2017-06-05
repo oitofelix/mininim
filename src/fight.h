@@ -31,7 +31,7 @@ void consider_enemy (struct actor *k0, struct actor *k1);
 void forget_enemy (struct actor *k);
 void enter_fight_mode (struct actor *k);
 void leave_fight_mode (struct actor *k);
-int dist_actors (struct actor *k0, struct actor *k1);
+lua_Number dist_actors (struct actor *k0, struct actor *k1);
 bool is_in_range (struct actor *k0, struct actor *k1, int r);
 int dist_enemy (struct actor *k);
 void fight_follow (struct actor *k0, struct actor *k1);
@@ -75,6 +75,6 @@ void alert_guards (struct pos *p);
 
 struct skill *get_perfect_skill (struct skill *fp);
 struct skill *upgrade_skill (struct skill *s0, struct skill *s1,
-                             int total_lives);
+                             int total_hp);
 
 #endif	/* MININIM_FIGHT_H */

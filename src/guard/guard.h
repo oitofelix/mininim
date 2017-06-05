@@ -21,13 +21,7 @@
 #ifndef MININIM_GUARD_H
 #define MININIM_GUARD_H
 
-/* bitmaps */
-#define GUARD_LIFE "data/life/guard.png"
-#define GUARD_SPLASH "data/splash/guard.png"
-
 /* functions */
-void load_guard (void);
-void unload_guard (void);
 struct actor *create_guard (struct actor *g0, struct actor *g1,
                            struct pos *p, enum dir dir);
 ALLEGRO_BITMAP *apply_guard_palette (ALLEGRO_BITMAP *bitmap,
@@ -36,10 +30,10 @@ void draw_guard_frame (ALLEGRO_BITMAP *bitmap, struct actor *g);
 void draw_start_guards (ALLEGRO_BITMAP *bitmap);
 bool is_guard (struct actor *a);
 bool is_guard_by_type (enum actor_type t);
-void draw_guard_lives (ALLEGRO_BITMAP *bitmap, struct actor *g);
+void draw_guard_hp (ALLEGRO_BITMAP *bitmap, struct actor *g);
 palette get_guard_palette (int style);
 void apply_guard_mode (struct actor *g, enum gm gm);
-palette get_shadow_life_palette (void);
+palette get_shadow_hp_palette (void);
 
 /* variables */
 extern struct actor *guarda;

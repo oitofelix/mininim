@@ -40,7 +40,7 @@ draw_carpet_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f)
 
   struct pos par; prel (p, &par, -1, +1);
 
-  switch (should_draw_face (p, f)) {
+  switch (should_draw_face (p, f, RIGHT)) {
   case SHOULD_DRAW_FULL:
     push_drawn_rectangle (bitmap);
     draw_object_index_part (bitmap, "CARPET", d, "FACE", p);

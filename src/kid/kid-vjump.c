@@ -44,7 +44,7 @@ flow (struct actor *k)
   if (k->oaction != kid_vjump)
     k->i = -1, k->j = 0,
       k->just_hanged = k->hit_ceiling =
-      k->hit_ceiling_fake = k->hang = k->misstep = false;
+      k->hit_ceiling_fake = k->hang = false;
 
   if (k->i == 12 && k->hang) {
     kid_hang (k);
@@ -65,20 +65,6 @@ flow (struct actor *k)
   else k->i++;
 
   select_actor_frame (k, "KID", "VJUMP", k->i);
-
-  if (k->oaction == kid_hang_free
-      && is_hang_pos_critical (&k->hang_pos))
-    k->fo.dx -= (k->f.dir == LEFT) ? 9 : 13;
-  if (k->hang && is_hang_pos_critical (&k->hang_pos)
-      && k->i == 11) k->fo.dx = +7;
-  if (k->hang && ! is_hang_pos_critical (&k->hang_pos)
-      && (k->i == 11 || k->i == 12)) {
-    k->fo.dx += -1;
-    k->fo.dy += -1;
-  }
-
-  if (k->i == 12 && k->hang)
-    k->fo.dx = is_hang_pos_critical (&k->hang_pos) ? +4 : -2;
 
   if (k->i == 12 && k->j++ > 0)
     k->fo.dx = 0, k->fo.dy += 2 * k->j + 1;
@@ -118,32 +104,20 @@ physics_in (struct actor *k)
   surveyo (_tf, -4, +0, pos, &k->f, NULL, &ptf, NULL);
   prel (&ptf, &ptfb, 0, dir);
   if (k->i == 0
-      && is_hangable_pos (&ptfb, k->f.dir)
-      /* && ! (fg (&ptf) == DOOR */
-      /*       && k->f.dir == LEFT */
-      /*       && is_collidable_at_right (&ptf, &k->f)) */
+      && is_hangable (&ptfb, k->f.dir)
       && is_immediately_accessible_pos (&ptfb, &ptf, &k->f)) {
     prel (&ptf, &k->hang_pos, 0, dir);
     pos2room (&k->hang_pos, k->f.c.room, &k->hang_pos);
-    k->fo.dx += is_hang_pos_critical (&k->hang_pos) ? -12 : -1;
     k->hang = true;
+    struct rect r; actor_rect (&r, k, "KID", "VJUMP", "HANG_BACK");
+    place_actor (k, &k->hang_pos, r.c.x, MIGNORE, "KID", "VJUMP", 0);
   } else if (k->i == 0
-             && is_hangable_pos (&ptf, k->f.dir)
-             /* && can_hang (&k->f, false, &k->hang_pos) */
-             /* && ! is_hang_pos_critical (&k->hang_pos) */
-             /* && (k->f.dir == LEFT || fg (&k->hang_pos) != DOOR) */
-             /* && uncollide (&k->f, &k->fo, NULL, +0, */
-             /*               false, &k->ci) != UNCOLLIDE_FRONT */
-             ) {
+             && is_hangable (&ptf, k->f.dir)) {
     k->hang_pos = ptf;
     pos2room (&k->hang_pos, k->f.c.room, &k->hang_pos);
-    k->fo.dx -= 0; k->hang = true;
-  }
-
-  if (k->i == 0 && k->hang) {
-    int dx = (k->f.dir == LEFT) ? +16 : +37;
-    int dy = +16;
-    place_actor (k, &k->hang_pos, dx, dy, "KID", "VJUMP", 0);
+    k->hang = true;
+    struct rect r; actor_rect (&r, k, "KID", "VJUMP", "HANG_FRONT");
+    place_actor (k, &k->hang_pos, r.c.x, MIGNORE, "KID", "VJUMP", 0);
   }
 
   return true;
@@ -154,6 +128,9 @@ physics_out (struct actor *k)
 {
   struct pos ptf, ptb, pmbo;
   enum tile_fg ctf, ctb;
+
+  /* place on the ground */
+  if (k->i <= 10 || k->i >= 14) place_on_the_ground (&k->f, &k->f.c);
 
  /* depressible floors */
   if (k->i == 0 && k->hang

@@ -32,7 +32,7 @@ ALLEGRO_BITMAP *cutscene_screen;
 ALLEGRO_BITMAP *effect_buffer;
 ALLEGRO_BITMAP *black_screen;
 struct video_effect video_effect = {.type = VIDEO_NO_EFFECT};
-static ALLEGRO_FONT *builtin_font;
+ALLEGRO_FONT *builtin_font;
 int display_width, display_height;
 ALLEGRO_BITMAP *logo_icon;
 int effect_counter;
@@ -129,10 +129,10 @@ init_video (void)
   al_init_font_addon ();
   builtin_font = al_create_builtin_font ();
   if (! builtin_font)
-    error (-1, 0, "%s (void): cannot create builtin font", __func__);
+    error (0, 0, "%s (void): cannot create builtin font", __func__);
 
   if (! al_init_primitives_addon ())
-    error (-1, 0, "%s (void): failed to initialize primitives addon",
+    error (0, 0, "%s (void): failed to initialize primitives addon",
            __func__);
 
   /* workaround to make Mac OS X render the title screen cutscene
@@ -272,14 +272,34 @@ load_bitmap (const char *filename)
   al_set_new_bitmap_flags (flags);
 
   if (! bitmap)
-    error (0, 0, "%s: cannot load bitmap file '%s'",
-           __func__, filename);
+    fprintf (stderr, "cannot load bitmap file '%s'\n", filename);
 
   validate_bitmap_for_mingw (bitmap);
 
   if (load_callback) load_callback ();
 
   return bitmap;
+}
+
+ALLEGRO_FONT *
+load_font (const char *filename)
+{
+  int flags = al_get_new_bitmap_flags ();
+  al_set_new_bitmap_flags (video_bitmap_flags ());
+
+  set_target_backbuffer (display);
+
+  ALLEGRO_FONT *font = (ALLEGRO_FONT *)
+    load_resource (filename, (load_resource_f) al_load_bitmap_font, true);
+
+  al_set_new_bitmap_flags (flags);
+
+  if (! font)
+    fprintf (stderr, "error: cannot load bitmap font file '%s'\n", filename);
+
+  if (load_callback) load_callback ();
+
+  return font;
 }
 
 void
@@ -339,6 +359,8 @@ clear_bitmap (ALLEGRO_BITMAP *bitmap, ALLEGRO_COLOR color)
 ALLEGRO_BITMAP *
 get_cached_palette (ALLEGRO_BITMAP *bitmap, palette p)
 {
+  if (! p) return NULL;
+
   struct palette_cache pc, *rpc;
   pc.ib = bitmap;
   pc.pal = p;
@@ -456,13 +478,65 @@ apply_palette_k (ALLEGRO_BITMAP *bitmap, palette p, const void *k)
 {
   if (! bitmap) return NULL;
 
-  if (palette_cache_size_limit) {
+  if (palette_cache_size_limit && k) {
     ALLEGRO_BITMAP *cached = get_cached_palette (bitmap, k);
     if (cached) return cached;
 
     enforce_palette_cache_limit (main_L, bitmap);
   }
 
+  /* BEGIN: Palette caching guardian */
+  if (k) {
+    static uint64_t last_cycle = 0;
+    static int consecutive_cycles = 0;
+
+    if (last_cycle == anim_cycle - 1)
+      consecutive_cycles++;
+    else
+      consecutive_cycles = 0;
+
+    if (consecutive_cycles >= 120) {
+      char *hl = hline ('-');
+      fprintf (stderr,
+               "%s\nWARNING: Palettes are being cached for each cycle.\n"
+               "This is probably a result of mutable cache keys.\n"
+               "This severely slows down MININIM and needlessly consumes"
+               " memory.\n"
+               "Please, consider fixing the %s video mode.\n",
+               hl, video_mode);
+      al_free (hl);
+      consecutive_cycles = 0;
+    }
+
+    last_cycle = anim_cycle;
+  } else {
+    static uint64_t last_cycle = 0;
+    static int consecutive_cycles = 0;
+
+    if (last_cycle == anim_cycle - 1)
+      consecutive_cycles++;
+    else
+      consecutive_cycles = 0;
+
+    if (consecutive_cycles >= 120) {
+      char *hl = hline ('-');
+      fprintf (stderr,
+               "%s\nWARNING: Palettes are being applied "
+               "for each cycle without caching.\n"
+               "This severely slows down MININIM.\n"
+               "Please, consider fixing the %s video mode.\n",
+               hl, video_mode);
+      al_free (hl);
+      consecutive_cycles = 0;
+    }
+
+    last_cycle = anim_cycle;
+  }
+  /* END: Palette caching guardian */
+
+  /* fprintf (stderr, "%ju: paletted again!!!\n", anim_cycle); */
+
+  /* Apply palette */
   int x, y;
   ALLEGRO_BITMAP *rbitmap = clone_bitmap (bitmap);
   int w = get_bitmap_width (bitmap);
@@ -474,7 +548,7 @@ apply_palette_k (ALLEGRO_BITMAP *bitmap, palette p, const void *k)
       al_put_pixel (x, y, p (al_get_pixel (rbitmap, x, y)));
   al_unlock_bitmap (rbitmap);
 
-  if (palette_cache_size_limit) {
+  if (palette_cache_size_limit && k) {
     /* In case it's Lua bitmap and palette */
     if (p == L_palette) {
       /* put palette into weak registry for GC tracking */
@@ -616,10 +690,12 @@ draw_filled_rectangle (ALLEGRO_BITMAP *to, float x1, float y1,
 }
 
 void
-draw_text (ALLEGRO_BITMAP *bitmap, char const *text, float x, float y, int flags)
+draw_text (ALLEGRO_BITMAP *bitmap, ALLEGRO_FONT *font,
+           ALLEGRO_COLOR c, float x, float y, int flags,
+           char const *text)
 {
   set_target_bitmap (bitmap);
-  al_draw_text (builtin_font, WHITE, x, y, flags, text);
+  al_draw_text (font, c, x, y, flags | ALLEGRO_ALIGN_INTEGER, text);
 }
 
 bool
@@ -655,16 +731,6 @@ draw_bottom_text (ALLEGRO_BITMAP *bitmap, char *text, int priority)
     bottom_text_timer = 0;
     cur_priority = INT_MIN;
   } else if (bottom_text_timer) {
-    ALLEGRO_COLOR bg_color;
-
-    /* switch (vm) { */
-    /* case CGA: bg_color = C_MSG_LINE_COLOR; break; */
-    /* case EGA: bg_color = E_MSG_LINE_COLOR; break; */
-    /* case VGA: */
-      bg_color = V_MSG_LINE_COLOR;
-    /*   break; */
-    /* } */
-
     if (strlen (current_text) > BOTTOM_TEXT_MAX_LENGTH) {
       if (cycle++ % 2) {
         if (dir % 2) {
@@ -687,13 +753,17 @@ draw_bottom_text (ALLEGRO_BITMAP *bitmap, char *text, int priority)
 
     push_reset_clipping_rectangle (bitmap);
 
-    draw_filled_rectangle (bitmap,
-                           0, CUTSCENE_HEIGHT - 8,
-                           CUTSCENE_WIDTH - 1, CUTSCENE_HEIGHT - 1,
-                           bg_color);
-    draw_text (bitmap, str,
-               CUTSCENE_WIDTH / 2.0, CUTSCENE_HEIGHT - 7,
-               ALLEGRO_ALIGN_CENTRE);
+    bool r = draw_object_part (bitmap, "TEXT", str, NULL);
+
+    if (! r) {
+      int x = 0;
+      int y = REAL_HEIGHT - al_get_font_line_height (builtin_font);
+      int w = REAL_WIDTH - 1;
+      int h = REAL_HEIGHT - 1;
+      draw_filled_rectangle (bitmap, x, y, w, h, BLACK);
+      draw_text (bitmap, builtin_font, WHITE, REAL_WIDTH / 2.0, y + 1,
+                 ALLEGRO_ALIGN_CENTRE, str);
+    }
 
     pop_clipping_rectangle ();
 
@@ -769,7 +839,8 @@ flip_display (ALLEGRO_BITMAP *bitmap)
 
     if (iw != w || ih != h) {
       destroy_bitmap (iscreen);
-      iscreen = clone_bitmap (al_get_backbuffer (display));
+      iscreen = create_bitmap (w, h);
+      /* iscreen = clone_bitmap (al_get_backbuffer (display)); */
     }
 
     al_set_target_bitmap (iscreen);
@@ -803,7 +874,7 @@ flip_display (ALLEGRO_BITMAP *bitmap)
     set_target_backbuffer (display);
     al_draw_bitmap (iscreen, 0, 0, flags);
 
-    if (mr.room_select > 0)
+    if ((mr.w > 1 || mr.h > 1) && mr.room_select > 0)
       for (y = mr.h - 1; y >= 0; y--)
         for (x = 0; x < mr.w; x++)
           if (mr.cell[x][y].room == mr.room_select) {
@@ -822,7 +893,7 @@ flip_display (ALLEGRO_BITMAP *bitmap)
         || mr.h != mr.last.h)
       mr.select_cycles = SELECT_CYCLES;
 
-    if (mr.select_cycles > 0) {
+    if ((mr.w > 1 || mr.h > 1) && mr.select_cycles > 0) {
       int rx = mr.x, ry = mr.y;
       if (flags & ALLEGRO_FLIP_HORIZONTAL)
         rx = (mr.w - 1) - mr.x;
@@ -1030,7 +1101,7 @@ process_display_events (void)
       show ();
       break;
     case ALLEGRO_EVENT_DISPLAY_CLOSE:
-      quit_game ();
+      exit (0);
       break;
     }
 }
@@ -1281,12 +1352,15 @@ draw_logo (ALLEGRO_BITMAP *bitmap, char *text0, char *text1,
   draw_bitmap (logo_icon, bitmap, x, y, 0);
 
   if (text0)
-    draw_text (bitmap, text0, CUTSCENE_WIDTH / 2.0, CUTSCENE_HEIGHT / 2.0,
-               ALLEGRO_ALIGN_CENTRE);
+    draw_text (bitmap, builtin_font,
+               WHITE, CUTSCENE_WIDTH / 2.0, CUTSCENE_HEIGHT / 2.0,
+               ALLEGRO_ALIGN_CENTRE, text0);
 
   if (text1)
-    draw_text (bitmap, text1, CUTSCENE_WIDTH / 2.0,
-               CUTSCENE_HEIGHT / 2.0 + 16, ALLEGRO_ALIGN_CENTRE);
+    draw_text (bitmap, builtin_font,
+               WHITE, CUTSCENE_WIDTH / 2.0,
+               CUTSCENE_HEIGHT / 2.0 + 16, ALLEGRO_ALIGN_CENTRE,
+               text1);
 
   if (icon)
     draw_bitmap (icon, bitmap, (CUTSCENE_WIDTH / 2.0)
@@ -1295,9 +1369,11 @@ draw_logo (ALLEGRO_BITMAP *bitmap, char *text0, char *text1,
   al_draw_filled_rectangle (0, CUTSCENE_HEIGHT - 8,
                             CUTSCENE_WIDTH, CUTSCENE_HEIGHT,
                             BLUE);
-  draw_text (bitmap, "MININIM " VERSION, CUTSCENE_WIDTH / 2.0,
+  draw_text (bitmap, builtin_font,
+             WHITE, CUTSCENE_WIDTH / 2.0,
              CUTSCENE_HEIGHT - 7,
-             ALLEGRO_ALIGN_CENTRE);
+             ALLEGRO_ALIGN_CENTRE,
+             "MININIM " VERSION);
 
   pop_clipping_rectangle ();
 }
@@ -1338,26 +1414,26 @@ unload_oitofelix_face (void)
   destroy_bitmap (oitofelix_face);
 }
 
-double
-IW (double w)
+lua_Number
+IW (lua_Number w)
 {
   return (w * ORIGINAL_WIDTH) / REAL_WIDTH;
 }
 
-double
-IH (double h)
+lua_Number
+IH (lua_Number h)
 {
   return (h * ORIGINAL_HEIGHT) / REAL_HEIGHT;
 }
 
-double
-OW (double w)
+lua_Number
+OW (lua_Number w)
 {
   return (w * REAL_WIDTH) / ORIGINAL_WIDTH;
 }
 
-double
-OH (double h)
+lua_Number
+OH (lua_Number h)
 {
   return (h * REAL_HEIGHT) / ORIGINAL_HEIGHT;
 }

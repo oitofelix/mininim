@@ -20,29 +20,9 @@
 
 #include "mininim.h"
 
-/* bitmaps */
-ALLEGRO_BITMAP *guard_life, *guard_splash;
-
-/* static ALLEGRO_COLOR c_shadow_life_palette (ALLEGRO_COLOR c); */
-/* static ALLEGRO_COLOR e_shadow_life_palette (ALLEGRO_COLOR c); */
-static ALLEGRO_COLOR v_shadow_life_palette (ALLEGRO_COLOR c);
-static ALLEGRO_COLOR skeleton_life_palette (ALLEGRO_COLOR c);
-
-void
-load_guard (void)
-{
-  /* bitmaps */
-  guard_life = load_bitmap (GUARD_LIFE);
-  guard_splash = load_bitmap (GUARD_SPLASH);
-}
-
-void
-unload_guard (void)
-{
-  /* bitmaps */
-  destroy_bitmap (guard_life);
-  destroy_bitmap (guard_splash);
-}
+/* static ALLEGRO_COLOR c_shadow_hp_palette (ALLEGRO_COLOR c); */
+/* static ALLEGRO_COLOR e_shadow_hp_palette (ALLEGRO_COLOR c); */
+static ALLEGRO_COLOR v_shadow_hp_palette (ALLEGRO_COLOR c);
 
 struct actor *
 create_guard (struct actor *g0, struct actor *g1, struct pos *p,
@@ -52,8 +32,8 @@ create_guard (struct actor *g0, struct actor *g1, struct pos *p,
     g1->f.b = actor_bitmap (g1, NULL, "NORMAL", 0);
     g1->fo.b = g1->f.b;
     g1->action = guard_normal;
-    g1->total_lives = 3;
-    g1->current_lives = 3;
+    g1->total_hp = 3;
+    g1->current_hp = 3;
     g1->enemy_id = -1;
     g1->fight = true;
     g1->has_sword = true;
@@ -81,7 +61,7 @@ apply_guard_mode (struct actor *g, enum gm gm)
   switch (gm) {
   case ORIGINAL_GM: g->type = g->original_type; break;
   case GUARD_GM: g->type = GUARD; break;
-  case FAT_GUARD_GM: g->type = FAT_GUARD; break;
+  case FAT_GM: g->type = FAT; break;
   case VIZIER_GM: g->type = VIZIER; break;
   case SKELETON_GM: g->type = SKELETON; break;
   case SHADOW_GM: g->type = SHADOW; break;
@@ -103,7 +83,7 @@ v_salmon_palette (ALLEGRO_COLOR c)
   /* SKELETON */
   if (color_eq (c, SKELETON_COLOR)) return V_SKELETON_COLOR;
 
-  /* GUARD, FAT_GUARD, VIZIER */
+  /* GUARD, FAT, VIZIER */
   if (color_eq (c, GUARD_SHOES_COLOR)) return V_SALMON_GUARD_SHOES_COLOR;
   if (color_eq (c, GUARD_PANTS_COLOR_01)) return V_SALMON_GUARD_PANTS_COLOR_01;
   if (color_eq (c, GUARD_PANTS_COLOR_02)) return V_SALMON_GUARD_PANTS_COLOR_02;
@@ -137,7 +117,7 @@ v_light_blue_palette (ALLEGRO_COLOR c)
   /* SKELETON */
   if (color_eq (c, SKELETON_COLOR)) return V_LIGHT_BLUE_GUARD_PANTS_COLOR_01;
 
-  /* GUARD, FAT_GUARD, VIZIER */
+  /* GUARD, FAT, VIZIER */
   if (color_eq (c, GUARD_SHOES_COLOR)) return V_LIGHT_BLUE_GUARD_SHOES_COLOR;
   if (color_eq (c, GUARD_PANTS_COLOR_01)) return V_LIGHT_BLUE_GUARD_PANTS_COLOR_01;
   if (color_eq (c, GUARD_PANTS_COLOR_02)) return V_LIGHT_BLUE_GUARD_PANTS_COLOR_02;
@@ -172,7 +152,7 @@ v_red_palette (ALLEGRO_COLOR c)
   /* SKELETON */
   if (color_eq (c, SKELETON_COLOR)) return V_RED_GUARD_PANTS_COLOR_01;
 
-  /* GUARD, FAT_GUARD, VIZIER */
+  /* GUARD, FAT, VIZIER */
   if (color_eq (c, GUARD_SHOES_COLOR)) return V_RED_GUARD_SHOES_COLOR;
   if (color_eq (c, GUARD_PANTS_COLOR_01)) return V_RED_GUARD_PANTS_COLOR_01;
   if (color_eq (c, GUARD_PANTS_COLOR_02)) return V_RED_GUARD_PANTS_COLOR_02;
@@ -206,7 +186,7 @@ v_orange_palette (ALLEGRO_COLOR c)
   /* SKELETON */
   if (color_eq (c, SKELETON_COLOR)) return V_ORANGE_GUARD_PANTS_COLOR_01;
 
-  /* GUARD, FAT_GUARD, VIZIER */
+  /* GUARD, FAT, VIZIER */
   if (color_eq (c, GUARD_SHOES_COLOR)) return V_ORANGE_GUARD_SHOES_COLOR;
   if (color_eq (c, GUARD_PANTS_COLOR_01)) return V_ORANGE_GUARD_PANTS_COLOR_01;
   if (color_eq (c, GUARD_PANTS_COLOR_02)) return V_ORANGE_GUARD_PANTS_COLOR_02;
@@ -240,7 +220,7 @@ v_green_palette (ALLEGRO_COLOR c)
   /* SKELETON */
   if (color_eq (c, SKELETON_COLOR)) return V_GREEN_GUARD_PANTS_COLOR_01;
 
-  /* GUARD, FAT_GUARD, VIZIER */
+  /* GUARD, FAT, VIZIER */
   if (color_eq (c, GUARD_SHOES_COLOR)) return V_GREEN_GUARD_SHOES_COLOR;
   if (color_eq (c, GUARD_PANTS_COLOR_01)) return V_GREEN_GUARD_PANTS_COLOR_01;
   if (color_eq (c, GUARD_PANTS_COLOR_02)) return V_GREEN_GUARD_PANTS_COLOR_02;
@@ -274,7 +254,7 @@ v_dark_blue_palette (ALLEGRO_COLOR c)
   /* SKELETON */
   if (color_eq (c, SKELETON_COLOR)) return V_DARK_BLUE_GUARD_PANTS_COLOR_01;
 
-  /* GUARD, FAT_GUARD, VIZIER */
+  /* GUARD, FAT, VIZIER */
   if (color_eq (c, GUARD_SHOES_COLOR)) return V_DARK_BLUE_GUARD_SHOES_COLOR;
   if (color_eq (c, GUARD_PANTS_COLOR_01)) return V_DARK_BLUE_GUARD_PANTS_COLOR_01;
   if (color_eq (c, GUARD_PANTS_COLOR_02)) return V_DARK_BLUE_GUARD_PANTS_COLOR_02;
@@ -309,7 +289,7 @@ v_purple_palette (ALLEGRO_COLOR c)
   /* SKELETON */
   if (color_eq (c, SKELETON_COLOR)) return V_PURPLE_GUARD_PANTS_COLOR_01;
 
-  /* GUARD, FAT_GUARD, VIZIER */
+  /* GUARD, FAT, VIZIER */
   if (color_eq (c, GUARD_SHOES_COLOR)) return V_PURPLE_GUARD_SHOES_COLOR;
   if (color_eq (c, GUARD_PANTS_COLOR_01)) return V_PURPLE_GUARD_PANTS_COLOR_01;
   if (color_eq (c, GUARD_PANTS_COLOR_02)) return V_PURPLE_GUARD_PANTS_COLOR_02;
@@ -343,7 +323,7 @@ v_yellow_palette (ALLEGRO_COLOR c)
   /* SKELETON */
   if (color_eq (c, SKELETON_COLOR)) return V_YELLOW_GUARD_PANTS_COLOR_01;
 
-  /* GUARD, FAT_GUARD, VIZIER */
+  /* GUARD, FAT, VIZIER */
   if (color_eq (c, GUARD_SHOES_COLOR)) return V_YELLOW_GUARD_SHOES_COLOR;
   if (color_eq (c, GUARD_PANTS_COLOR_01)) return V_YELLOW_GUARD_PANTS_COLOR_01;
   if (color_eq (c, GUARD_PANTS_COLOR_02)) return V_YELLOW_GUARD_PANTS_COLOR_02;
@@ -380,7 +360,7 @@ e_dark_red_palette (ALLEGRO_COLOR c)
   /* SKELETON */
   if (color_eq (c, SKELETON_COLOR)) return E_SKELETON_COLOR;
 
-  /* GUARD, FAT_GUARD, VIZIER */
+  /* GUARD, FAT, VIZIER */
   if (color_eq (c, GUARD_SHOES_COLOR)) return E_DARK_RED_GUARD_SHOES_COLOR;
   if (color_eq (c, GUARD_PANTS_COLOR_01)) return E_DARK_RED_GUARD_PANTS_COLOR_01;
   if (color_eq (c, GUARD_PANTS_COLOR_02)) return E_DARK_RED_GUARD_PANTS_COLOR_02;
@@ -415,7 +395,7 @@ e_red_palette (ALLEGRO_COLOR c)
   /* SKELETON */
   if (color_eq (c, SKELETON_COLOR)) return E_RED_GUARD_PANTS_COLOR_01;
 
-  /* GUARD, FAT_GUARD, VIZIER */
+  /* GUARD, FAT, VIZIER */
   if (color_eq (c, GUARD_SHOES_COLOR)) return E_RED_GUARD_SHOES_COLOR;
   if (color_eq (c, GUARD_PANTS_COLOR_01)) return E_RED_GUARD_PANTS_COLOR_01;
   if (color_eq (c, GUARD_PANTS_COLOR_02)) return E_RED_GUARD_PANTS_COLOR_02;
@@ -450,7 +430,7 @@ e_green_palette (ALLEGRO_COLOR c)
   /* SKELETON */
   if (color_eq (c, SKELETON_COLOR)) return E_GREEN_GUARD_PANTS_COLOR_01;
 
-  /* GUARD, FAT_GUARD, VIZIER */
+  /* GUARD, FAT, VIZIER */
   if (color_eq (c, GUARD_SHOES_COLOR)) return E_GREEN_GUARD_SHOES_COLOR;
   if (color_eq (c, GUARD_PANTS_COLOR_01)) return E_GREEN_GUARD_PANTS_COLOR_01;
   if (color_eq (c, GUARD_PANTS_COLOR_02)) return E_GREEN_GUARD_PANTS_COLOR_02;
@@ -486,7 +466,7 @@ c_green_palette (ALLEGRO_COLOR c)
   /* SKELETON */
   if (color_eq (c, SKELETON_COLOR)) return C_SKELETON_COLOR;
 
-  /* GUARD, FAT_GUARD, VIZIER */
+  /* GUARD, FAT, VIZIER */
   if (color_eq (c, GUARD_SHOES_COLOR)) return C_GREEN_GUARD_SHOES_COLOR;
   if (color_eq (c, GUARD_PANTS_COLOR_01)) return C_GREEN_GUARD_PANTS_COLOR_01;
   if (color_eq (c, GUARD_PANTS_COLOR_02)) return C_GREEN_GUARD_PANTS_COLOR_02;
@@ -522,7 +502,7 @@ c_red_palette (ALLEGRO_COLOR c)
   /* SKELETON */
   if (color_eq (c, SKELETON_COLOR)) return C_RED_GUARD_PANTS_COLOR_01;
 
-  /* GUARD, FAT_GUARD, VIZIER */
+  /* GUARD, FAT, VIZIER */
   if (color_eq (c, GUARD_SHOES_COLOR)) return C_RED_GUARD_SHOES_COLOR;
   if (color_eq (c, GUARD_PANTS_COLOR_01)) return C_RED_GUARD_PANTS_COLOR_01;
   if (color_eq (c, GUARD_PANTS_COLOR_02)) return C_RED_GUARD_PANTS_COLOR_02;
@@ -606,27 +586,33 @@ apply_guard_palette (ALLEGRO_BITMAP *bitmap, enum actor_type type,
 void
 draw_guard_frame (ALLEGRO_BITMAP *bitmap, struct actor *g)
 {
-  struct coord c;
+  push_reset_clipping_rectangle (bitmap);
+  draw_actor_part (bitmap, NULL, "MAIN", g);
+  pop_clipping_rectangle ();
 
-  if (! is_guard (g)) return;
-  if (g->invisible) return;
+  /* struct coord c; */
 
-  struct frame f = g->f;
-  struct frame_offset xf = g->xf;
+  /* if (! is_guard (g)) return; */
+  /* if (g->invisible) return; */
 
-  f.b = apply_guard_palette (f.b, g->type, g->style);
-  xf.b = apply_guard_palette (xf.b, g->type, g->style);
+  /* struct frame f = g->f; */
+  /* struct frame_offset xf = g->xf; */
 
-  draw_xframe (bitmap, &f, &xf);
-  draw_frame (bitmap, &f);
+  /* f.b = apply_guard_palette (f.b, g->type, g->style); */
+  /* xf.b = apply_guard_palette (xf.b, g->type, g->style); */
 
-  if (g->splash && g->type != SKELETON) {
-    ALLEGRO_BITMAP *splash = (g->type == SHADOW) ? v_kid_splash : guard_splash;
-    palette pal = get_guard_palette (g->style);
-    splash = apply_palette (splash, pal);
-    /* if (hgc) splash = apply_palette (splash, hgc_palette); */
-    draw_bitmapc (splash, bitmap, splash_coord (&g->f, &c), g->f.flip);
-  }
+  /* draw_xframe (bitmap, &f, &xf); */
+  /* draw_frame (bitmap, &f); */
+
+  /* if (g->splash && g->type != SKELETON) { */
+  /*   ALLEGRO_BITMAP *splash = (g->type == SHADOW) */
+  /*     ? v_kid_splash : guard_splash; */
+  /*   palette pal = get_guard_palette (g->style); */
+  /*   splash = apply_palette (splash, pal); */
+  /*   /\* if (hgc) splash = apply_palette (splash, hgc_palette); *\/ */
+  /*   draw_bitmapc (splash, bitmap, */
+  /*                 splash_coord (g->splash_bitmap, &g->f, &c), g->f.flip); */
+  /* } */
 }
 
 void
@@ -661,121 +647,66 @@ is_guard_by_type (enum actor_type t)
 {
   return t == SHADOW
     || t == GUARD
-    || t == FAT_GUARD
+    || t == FAT
     || t == VIZIER
     || t == SKELETON;
 }
 
 void
-draw_guard_lives (ALLEGRO_BITMAP *bitmap, struct actor *g)
+draw_guard_hp (ALLEGRO_BITMAP *bitmap, struct actor *g)
 {
-  if (g->dont_draw_lives) return;
-  if (g->current_lives <= 0) return;
-
-  int current_lives = (g->current_lives > 10)
-    ? 10 : g->current_lives;
-
-  ALLEGRO_COLOR bg_color;
-
-  /* switch (vm) { */
-  /* case CGA: bg_color = C_LIVES_RECT_COLOR; break; */
-  /* case EGA: bg_color = E_LIVES_RECT_COLOR; break; */
-  /* case VGA: */
-    bg_color = V_LIVES_RECT_COLOR;
-  /*   break; */
-  /* } */
-
   push_reset_clipping_rectangle (bitmap);
-
-  draw_filled_rectangle (bitmap, CUTSCENE_WIDTH - 7 * current_lives,
-                         CUTSCENE_HEIGHT - 8, CUTSCENE_WIDTH - 1,
-                         CUTSCENE_HEIGHT - 1, bg_color);
-
-  ALLEGRO_BITMAP *life = guard_life;
-  palette pal = NULL;
-
-  if ((g->type == SHADOW && g->style == 0)
-      || g->type == KID) {
-    pal = get_shadow_life_palette ();
-    life = apply_palette (life, pal);
-  } else if (g->type == SKELETON && g->style == 0)
-    life = apply_palette (life, skeleton_life_palette);
-  else if (is_guard (g)) {
-    pal = get_guard_palette (g->style);
-    life = apply_palette (life, pal);
-  }
-
-  /* if (hgc) life = apply_palette (life, hgc_palette); */
-
-  if (current_lives <= GUARD_MINIMUM_LIVES_TO_BLINK && anim_cycle % 2) {
-      pop_clipping_rectangle ();
-      return;
-  }
-
-  int i;
-  for (i = 0; i < current_lives; i++)
-    draw_bitmap (life, bitmap, CUTSCENE_WIDTH - 7 * (i + 1) + 1,
-                 CUTSCENE_HEIGHT - 6, 0);
-
+  draw_actor_part (bitmap, NULL, "HP", g);
   pop_clipping_rectangle ();
 }
 
 /* ALLEGRO_COLOR */
-/* c_shadow_life_palette (ALLEGRO_COLOR c) */
+/* c_shadow_hp_palette (ALLEGRO_COLOR c) */
 /* { */
 /*   unsigned char r, g, b, a; */
 /*   al_unmap_rgba (c, &r, &g, &b, &a); */
 /*   if (a == 0) return c; */
 
-/*   if (color_eq (c, LIFE_COLOR_01)) return C_KID_SHADOW_CLOTHES_COLOR_01; */
-/*   if (color_eq (c, LIFE_COLOR_02)) return C_KID_SHADOW_CLOTHES_COLOR_02; */
+/*   if (color_eq (c, HP_COLOR_01)) return C_KID_SHADOW_CLOTHES_COLOR_01; */
+/*   if (color_eq (c, HP_COLOR_02)) return C_KID_SHADOW_CLOTHES_COLOR_02; */
 
 /*   return c; */
 /* } */
 
 /* ALLEGRO_COLOR */
-/* e_shadow_life_palette (ALLEGRO_COLOR c) */
+/* e_shadow_hp_palette (ALLEGRO_COLOR c) */
 /* { */
 /*   unsigned char r, g, b, a; */
 /*   al_unmap_rgba (c, &r, &g, &b, &a); */
 /*   if (a == 0) return c; */
 
-/*   if (color_eq (c, LIFE_COLOR_01)) return E_KID_SHADOW_CLOTHES_COLOR_01; */
-/*   if (color_eq (c, LIFE_COLOR_02)) return E_KID_SHADOW_CLOTHES_COLOR_02; */
+/*   if (color_eq (c, HP_COLOR_01)) return E_KID_SHADOW_CLOTHES_COLOR_01; */
+/*   if (color_eq (c, HP_COLOR_02)) return E_KID_SHADOW_CLOTHES_COLOR_02; */
 
 /*   return c; */
 /* } */
 
 ALLEGRO_COLOR
-v_shadow_life_palette (ALLEGRO_COLOR c)
+v_shadow_hp_palette (ALLEGRO_COLOR c)
 {
   unsigned char r, g, b, a;
   al_unmap_rgba (c, &r, &g, &b, &a);
   if (a == 0) return c;
 
-  if (color_eq (c, LIFE_COLOR_01)) return V_KID_SHADOW_CLOTHES_COLOR_01;
-  if (color_eq (c, LIFE_COLOR_02)) return V_KID_SHADOW_CLOTHES_COLOR_02;
+  if (color_eq (c, HP_COLOR_01)) return V_KID_SHADOW_CLOTHES_COLOR_01;
+  if (color_eq (c, HP_COLOR_02)) return V_KID_SHADOW_CLOTHES_COLOR_02;
 
   return c;
 }
 
 palette
-get_shadow_life_palette (void)
+get_shadow_hp_palette (void)
 {
   /* switch (vm) { */
-  /* case CGA: return c_shadow_life_palette; */
-  /* case EGA: return e_shadow_life_palette; */
+  /* case CGA: return c_shadow_hp_palette; */
+  /* case EGA: return e_shadow_hp_palette; */
   /* case VGA: */
-    return v_shadow_life_palette;
+    return v_shadow_hp_palette;
   /* } */
   /* return NULL; */
-}
-
-ALLEGRO_COLOR
-skeleton_life_palette (ALLEGRO_COLOR c)
-{
-  unsigned char r, g, b, a;
-  al_unmap_rgba (c, &r, &g, &b, &a);
-  if (a == 0) return c;
-  return WHITE;
 }

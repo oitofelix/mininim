@@ -55,12 +55,6 @@ flow (struct actor *g)
 
   select_actor_xframe (g, NULL, "SWORD", g->j);
 
-  if (g->i == 1) g->xf.dx = -6, g->xf.dy = +8;
-  if (g->i == 2) g->xf.dx = -9, g->xf.dy = +11;
-
-  if (g->type == SKELETON) g->xf.dy += -3;
-  if (g->type == SHADOW) g->xf.dy += -2;
-
   return true;
 }
 
@@ -83,6 +77,9 @@ physics_in (struct actor *g)
 static void
 physics_out (struct actor *g)
 {
+  /* place on the ground */
+  place_on_the_ground (&g->f, &g->f.c);
+
   /* depressible floors */
   if (g->i == 2) update_depressible_floor (g, -3, -38);
   else keep_depressible_floor (g);

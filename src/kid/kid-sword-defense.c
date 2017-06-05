@@ -73,7 +73,6 @@ flow (struct actor *k)
     k->j = 10;
   } else if (k->j == 10) {
     select_actor_frame (k, "KID", "SWORD_DEFENSE", 1);
-    k->fo.dx += 7;
     k->j = 14;
   } else {
     select_actor_frame (k, "KID", "SWORD_DEFENSE", k->i + 1);
@@ -85,8 +84,6 @@ flow (struct actor *k)
 
   select_actor_xframe (k, "KID", "SWORD", k->j);
 
-  if (k->oaction == kid_sword_attack) k->fo.dx += +2;
-
   /* if (k->id == 0) */
   /*   printf ("kid_sword_defense: k->i = %i, k->fo.dx = %i\n", */
   /*           k->i, k->fo.dx); */
@@ -97,6 +94,9 @@ flow (struct actor *k)
 static bool
 physics_in (struct actor *k)
 {
+  /* place on the ground */
+  place_on_the_ground (&k->f, &k->f.c);
+
   /* collision */
   uncollide_back_fight (k);
 

@@ -175,9 +175,10 @@ fall_loose_floor (struct pos *p)
     register_tile_undo (&undo, &l->p,
                        NO_FLOOR, MIGNORE, MIGNORE, MIGNORE,
                        NULL, false, "LOOSE FLOOR RELEASE");
-    struct coord c; coord_object (&c, "FLOOR", p);
+    struct rect r; rect_object (&r, "FLOOR", p);
     l->f.flip = 0;
-    new_coord (&l->f.c, p->l, p->room, c.x, c.y + 3);
+    l->f.c = r.c;
+    l->f.c.y += 3;
     l->action = FALL_LOOSE_FLOOR;
     l->i = 0;
     l->state = 2;
@@ -333,7 +334,7 @@ compute_loose_floor_fall (struct loose_floor *l)
         && ! is_kid_hang_or_climb (a)
         && a->action != kid_fall) {
       a->splash = true;
-      a->current_lives--;
+      a->current_hp--;
       a->uncrouch_slowly = true;
       /* ensure kid doesn't crouch in thin air (might occur when hit
          while jumping, for example) */
@@ -343,7 +344,7 @@ compute_loose_floor_fall (struct loose_floor *l)
         mr.flicker = 2;
         mr.color = get_flicker_blood_color ();
       }
-      if (a->current_lives <= 0) {
+      if (a->current_hp <= 0) {
         a->p = kpmt;
         actor_die_suddenly (a);
         a->death_reason = LOOSE_FLOOR_DEATH;

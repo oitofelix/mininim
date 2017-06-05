@@ -20,115 +20,15 @@
 
 #include "mininim.h"
 
-/* cga */
-static ALLEGRO_BITMAP *c_normal_sword, *c_shiny_sword;
-
-/* ega */
-static ALLEGRO_BITMAP *e_normal_sword, *e_shiny_sword;
-
-/* vga */
-static ALLEGRO_BITMAP *v_normal_sword, *v_shiny_sword;
-
-static struct coord *sword_coord (struct pos *p, struct coord *c);
-
 void
-load_sword (void)
+draw_sword (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
-  /* cga */
-  c_normal_sword = load_bitmap (C_NORMAL_SWORD);
-  c_shiny_sword = load_bitmap (C_SHINY_SWORD);
-
-  /* ega */
-  e_normal_sword = load_bitmap (E_NORMAL_SWORD);
-  e_shiny_sword = load_bitmap (E_SHINY_SWORD);
-
-  /* vga */
-  v_normal_sword = load_bitmap (V_NORMAL_SWORD);
-  v_shiny_sword = load_bitmap (V_SHINY_SWORD);
-}
-
-void
-unload_sword (void)
-{
-  /* cga */
-  destroy_bitmap (c_normal_sword);
-  destroy_bitmap (c_shiny_sword);
-
-  /* ega */
-  destroy_bitmap (e_normal_sword);
-  destroy_bitmap (e_shiny_sword);
-
-  /* vga */
-  destroy_bitmap (v_normal_sword);
-  destroy_bitmap (v_shiny_sword);
-}
-
-ALLEGRO_BITMAP *
-sword_bitmap (void)
-{
-  /* switch (vm) { */
-  /* case CGA: return c_normal_sword; */
-  /* case EGA: return e_normal_sword; */
-  /* case VGA: */
-    return v_normal_sword;
-  /* } */
-  /* assert (false); */
-  /* return NULL; */
-}
-
-ALLEGRO_BITMAP *
-shiny_sword_bitmap (void)
-{
-  /* switch (vm) { */
-  /* case CGA: return c_shiny_sword; */
-  /* case EGA: return e_shiny_sword; */
-  /* case VGA: */
-    return v_shiny_sword;
-  /* } */
-  /* assert (false); */
-  /* return NULL; */
-}
-
-void
-draw_sword (ALLEGRO_BITMAP *bitmap, struct pos *p,
-            bool start_pos)
-{
-  ALLEGRO_BITMAP *normal_sword = sword_bitmap (),
-    *shiny_sword = shiny_sword_bitmap ();
-
-  /* if (hgc) { */
-  /*   normal_sword = apply_palette (normal_sword, hgc_palette); */
-  /*   shiny_sword = apply_palette (shiny_sword, hgc_palette); */
-  /* } */
-
-  if (start_pos) {
-    normal_sword = apply_palette (normal_sword, start_actor_palette);
-    shiny_sword = apply_palette (shiny_sword, start_actor_palette);
-  }
-
-  struct coord c;
-  ALLEGRO_BITMAP *sword = anim_cycle % 60 ? normal_sword : shiny_sword;
-  seedp (p);
-  draw_bitmapc (sword, bitmap, sword_coord (p, &c),
-                prandom (1) ? ALLEGRO_FLIP_HORIZONTAL : 0);
-  unseedp ();
-
-  if (! start_pos) {
-    push_clipping_rectangle (bitmap, OW (c.x), OH (c.y),
-                             get_bitmap_width (sword),
-                             get_bitmap_height (sword));
-    draw_tile_fg_front (bitmap, p, NULL);
-    pop_clipping_rectangle ();
-  }
-}
-
-struct coord *
-sword_coord (struct pos *p, struct coord *c)
-{
-  return
-    new_coord (c, p->l, p->room,
-               PLACE_WIDTH * p->place,
-               PLACE_HEIGHT * p->floor + 50);
+  push_drawn_rectangle (bitmap);
+  draw_object (bitmap, "SWORD_ITEM", p);
+  struct drawn_rectangle *dr = pop_drawn_rectangle ();
+  push_clipping_rectangle (dr->bitmap, dr->x, dr->y, dr->w, dr->h);
+  draw_tile_fg_front (bitmap, p, NULL);
+  pop_clipping_rectangle ();
 }
 
 bool

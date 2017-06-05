@@ -175,7 +175,7 @@ coord_eq (struct coord *c0, struct coord *c1)
 }
 
 struct coord *
-new_coord (struct coord *c, struct level *l, int room, double x, double y)
+new_coord (struct coord *c, struct level *l, int room, lua_Number x, lua_Number y)
 {
   c->l = l;
   c->room = room;
@@ -355,7 +355,7 @@ nframe (struct frame *f, struct coord *c)
         return c;
 
     *c = (f->dir == LEFT) ? nml : nmr;
-    int dx = (f->dir == LEFT) ? +3 : -3;
+    lua_Number dx = (f->dir == LEFT) ? +3 : -3;
     c->x -= d.w / 2 - dx;
     c->y -= d.h / 2;
   } else *c = f->c;
@@ -434,8 +434,8 @@ coord2room (struct coord *c, int room, struct coord *cv)
 
   cb = ca = cl = cr = *cv;
 
-  int mcb, mca, mcr, mcl;
-  mcb = mca = mcr = mcl = INT_MAX;
+  lua_Number mcb, mca, mcr, mcl;
+  mcb = mca = mcr = mcl = DBL_MAX;
 
   int ra, rb, rl, rr;
   int rab, rba, rlr, rrl;
@@ -478,10 +478,10 @@ coord2room (struct coord *c, int room, struct coord *cv)
     mcl = coord_mod (&cl);
   }
 
-  int lm = mcb;
-  lm = min_int (lm, mca);
-  lm = min_int (lm, mcr);
-  lm = min_int (lm, mcl);
+  lua_Number lm = mcb;
+  lm = fmin (lm, mca);
+  lm = fmin (lm, mcr);
+  lm = fmin (lm, mcl);
 
   if (lm == mcb) *cv = cb;
   else if (lm == mca) *cv = ca;
@@ -505,8 +505,8 @@ frame2room (struct frame *f, int room, struct coord *cv)
   struct coord bl = *cv;
   struct coord br = *cv;
 
-  int w = IW (get_bitmap_width (f->b));
-  int h = IH (get_bitmap_height (f->b));
+  lua_Number w = IW (get_bitmap_width (f->b));
+  lua_Number h = IH (get_bitmap_height (f->b));
 
   tr.x = tl.x + w - 1;
   bl.y = tl.y + h - 1;
@@ -532,6 +532,25 @@ frame2room (struct frame *f, int room, struct coord *cv)
   }
 
   return cv;
+}
+
+struct rect *
+new_rect (struct rect *r, int room, lua_Number x, lua_Number y,
+          lua_Number w, lua_Number h)
+{
+  new_coord (&r->c, &global_level, room, x, y);
+  r->w = w;
+  r->h = h;
+  return r;
+}
+
+struct rect *
+coord2rect (struct coord *c, struct rect *r)
+{
+  r->c = *c;
+  r->w = 0;
+  r->h = 0;
+  return r;
 }
 
 bool
@@ -619,7 +638,7 @@ coord_mod (struct coord *c)
 }
 
 struct pos *
-pos_gen (struct coord *c, struct pos *p, int dx, int dy)
+pos_gen (struct coord *c, struct pos *p, lua_Number dx, lua_Number dy)
 {
   int floor, place;
 
@@ -788,17 +807,17 @@ random_dir (void)
   }
 }
 
-double
+lua_Number
 dist_coord (struct coord *a, struct coord *b)
 {
-  int dx = a->x - b->x;
-  int dy = a->y - b->y;
+  lua_Number dx = a->x - b->x;
+  lua_Number dy = a->y - b->y;
   return sqrt (dx * dx + dy * dy);
 }
 
 struct frame *
 place_frame (struct frame *f, struct frame *nf, ALLEGRO_BITMAP *b,
-             struct pos *p, int dx, int dy)
+             struct pos *p, lua_Number dx, lua_Number dy)
 {
   struct pos pv;
   *nf = *f;
@@ -1112,7 +1131,8 @@ _bb (struct frame *f, struct coord *c)
 }
 
 struct coord *
-cf_rel (coord_f cf, struct frame *f, struct coord *c, int dx, int dy)
+cf_rel (coord_f cf, struct frame *f, struct coord *c, lua_Number dx,
+        lua_Number dy)
 {
   int dir;
 
@@ -1168,7 +1188,7 @@ survey (coord_f cf, pos_f pf, struct frame *f,
 }
 
 void
-surveyo (coord_f cf, int dx, int dy, pos_f pf, struct frame *f,
+surveyo (coord_f cf, lua_Number dx, lua_Number dy, pos_f pf, struct frame *f,
          struct coord *c, struct pos *p, struct pos *np)
 {
   assert (cf && f && (c || (pf && p) || (pf && np)));
@@ -1230,8 +1250,8 @@ bitmap_rcoord (ALLEGRO_BITMAP *b, struct bitmap_rcoord *c)
   if (cached) return c;
 
   c->b = b;
-  int w = IW (get_bitmap_width (b));
-  int h = IH (get_bitmap_height (b));
+  lua_Number w = IW (get_bitmap_width (b));
+  lua_Number h = IH (get_bitmap_height (b));
   al_lock_bitmap (b, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READONLY);
 
   /* top left */
@@ -1299,13 +1319,20 @@ bitmap_rcoord (ALLEGRO_BITMAP *b, struct bitmap_rcoord *c)
 }
 
 struct coord *
+place_on_the_ground_alternative (struct frame *f, struct coord *c,
+                                 lua_Number dy)
+{
+  struct pos pm;
+  *c = f->c;
+  survey (_m, pos, f, NULL, &pm, NULL);
+  c->y = (PLACE_HEIGHT * pm.floor + dy) - IH (get_bitmap_height (f->b));
+  return c;
+}
+
+struct coord *
 place_on_the_ground (struct frame *f, struct coord *c)
 {
-  struct pos pmbo;
-  *c = f->c;
-  survey (_mbo, pos, f, NULL, &pmbo, NULL);
-  c->y = (PLACE_HEIGHT * pmbo.floor + 56) - IH (get_bitmap_height (f->b));
-  return c;
+  return place_on_the_ground_alternative (f, c, 56);
 }
 
 struct coord *
@@ -1331,8 +1358,8 @@ place_at_pos (struct frame *f, coord_f cf, struct pos *p, struct coord *c)
   struct coord _c; cf (f, &_c);
   struct coord tl; _tl (f, &tl);
 
-  int dx = _c.x - tl.x;
-  int dy = _c.y - tl.y;
+  lua_Number dx = _c.x - tl.x;
+  lua_Number dy = _c.y - tl.y;
 
   c->l = p->l;
   c->room = p->room;

@@ -22,30 +22,28 @@
 
 bool no_recursive_links_continuity;
 
-struct rect *
-new_rect (struct rect *r, int room, int x, int y, int w, int h)
-{
-  new_coord (&r->c, &global_level, room, x, y);
-  r->w = w;
-  r->h = h;
-  return r;
-}
-
 void
 draw_filled_rect (ALLEGRO_BITMAP *to, struct rect *r,
                   ALLEGRO_COLOR color)
 {
   struct coord nc = r->c;
 
-  if (! cutscene && nc.room != room_view) {
+  if (! cutscene && nc.room > 0 && nc.room != room_view) {
     rect2room (r, room_view, &nc);
     if (nc.room != room_view) return;
   }
 
-  int x = OW (nc.x);
-  int y = OH (nc.y);
-  int w = OW (nc.x + r->w - 1);
-  int h = OH (nc.y + r->h - 1);
+  lua_Number x = nc.x;
+  lua_Number y = nc.y;
+  lua_Number w = nc.x + r->w - 1;
+  lua_Number h = nc.y + r->h - 1;
+
+  if (nc.room > 0) {
+    x = OW (x);
+    y = OH (y);
+    w = OW (w);
+    h = OH (h);
+  }
 
   draw_filled_rectangle (to, x, y, w, h, color);
 }
@@ -65,21 +63,22 @@ void
 draw_bitmapc (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
               struct coord *c, int flags)
 {
-  int w = IW (get_bitmap_width (from));
-  int h = IH (get_bitmap_height (from));
+  lua_Number w = IW (get_bitmap_width (from));
+  lua_Number h = IH (get_bitmap_height (from));
   draw_bitmap_regionc (from, to, 0, 0, w, h, c, flags);
 }
 
 void
 draw_bitmap_regionc (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
-                     float sx, float sy, float sw, float sh,
+                     lua_Number sx, lua_Number sy,
+                     lua_Number sw, lua_Number sh,
                      struct coord *c, int flags)
 {
   if (! from) return;
 
   struct coord nc = *c;
 
-  if (! cutscene && nc.room != room_view) {
+  if (! cutscene && nc.room > 0 && nc.room != room_view) {
     struct frame f;
     f.b = from;
     f.c = *c;
@@ -90,13 +89,14 @@ draw_bitmap_regionc (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
   draw_bitmap_region_o (from, to, sx, sy, sw, sh, nc.x, nc.y, flags);
 
   if (cutscene || tile_caching
+      || nc.room < 0
       || no_recursive_links_continuity) return;
 
-  int x = nc.x;
-  int y = nc.y;
   int room = nc.room;
-  int w = sw;
-  int h = sh;
+  lua_Number x = nc.x;
+  lua_Number y = nc.y;
+  lua_Number w = sw;
+  lua_Number h = sh;
 
   struct coord mc;
 
@@ -172,8 +172,9 @@ draw_bitmap_regionc (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
 
 void
 draw_bitmap_region_o (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
-                      float sx, float sy, float sw, float sh,
-                      float dx, float dy, int flags)
+                      lua_Number sx, lua_Number sy,
+                      lua_Number sw, lua_Number sh,
+                      lua_Number dx, lua_Number dy, int flags)
 {
   sx = OW (sx);
   sy = OH (sy);
@@ -405,7 +406,7 @@ draw_room_frame_front (ALLEGRO_BITMAP *bitmap, struct frame *f)
         draw_wall_fg (bitmap, &p, f);
         break;
       case CHOMPER:
-        draw_chomper_fg (bitmap, &p);
+        draw_chomper_fg (bitmap, &p, f);
         break;
       case MIRROR: draw_mirror_fg (bitmap, &p, f); break;
       case ARCH_TOP_MID:
@@ -524,9 +525,9 @@ draw_room_actor_front_sub (ALLEGRO_BITMAP *bitmap, struct actor *a)
 
     push_clipping_rectangle (bitmap,
                              OW (PLACE_WIDTH * ptl2.place),
-                             OH (PLACE_HEIGHT * ptl2.floor + 56),
+                             OH (PLACE_HEIGHT * ptl2.floor + 54),
                              OW (dx),
-                             OH (PLACE_HEIGHT - 56 + 3));
+                             OH (PLACE_HEIGHT - 54 + 3));
 
     push_drawn_rectangle (bitmap);
 
@@ -548,9 +549,9 @@ draw_room_actor_front_sub (ALLEGRO_BITMAP *bitmap, struct actor *a)
     if (f->dir == RIGHT) {
       push_clipping_rectangle (bitmap,
                                OW (PLACE_WIDTH * p.place),
-                               OH (PLACE_HEIGHT * p.floor + 56),
+                               OH (PLACE_HEIGHT * p.floor + 57),
                                OW (PLACE_WIDTH),
-                               OH (PLACE_HEIGHT - 53));
+                               OH (PLACE_HEIGHT - 57 + 3));
       push_drawn_rectangle (bitmap);
       draw_tile_fg (bitmap, &p);
       redraw_drawn_rectangle (pop_drawn_rectangle (), &p);
@@ -576,31 +577,19 @@ draw_room_actor_front_sub (ALLEGRO_BITMAP *bitmap, struct actor *a)
     pos2room (&pb, room_view, &pb);
 
     if (f->dir == RIGHT) {
-      int dy, w;
+      lua_Number dy, w;
 
-      if (a->i == 0 || a->i == 1 || a->i == 2
-          || a->i == 8 || a->i == 9) {
-        dy = 55;
-        w = 18;
-      } else if (a->i == 5 || a->i == 6) {
-        dy = 53;
-        w = 22;
-      } else if (a->i == 3 || a->i == 4 || a->i == 7) {
-        dy = 53;
-        w = 21;
-      } else {
-        dy = 53;
-        w = 21;
-      }
+      dy = 57;
+      w = 20;
 
       push_clipping_rectangle (bitmap,
                                OW (PLACE_WIDTH * p.place),
                                OH (PLACE_HEIGHT * p.floor + dy),
                                OW (w),
                                OH (PLACE_HEIGHT - dy + 3));
-      push_drawn_rectangle (bitmap);
+      /* push_drawn_rectangle (bitmap); */
       draw_tile_fg (bitmap, &p);
-      redraw_drawn_rectangle (pop_drawn_rectangle (), &p);
+      /* redraw_drawn_rectangle (pop_drawn_rectangle (), &p); */
     } else {
       push_clipping_rectangle (bitmap,
                                OW (PLACE_WIDTH * pb.place),
@@ -627,7 +616,7 @@ draw_room_actor_front_sub (ALLEGRO_BITMAP *bitmap, struct actor *a)
 
   /* splash */
   if (a->splash) {
-    struct frame sf; splash_frame (&a->f, &sf);
+    struct frame sf; splash_frame (a->splash_bitmap, &a->f, &sf);
     draw_room_frame_front (bitmap, &sf);
   }
 }
@@ -724,8 +713,8 @@ draw_tile_fg_front (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f)
   case SPIKES_FLOOR:
     draw_spikes_floor_fg (bitmap, p);
     break;
-  case OPENER_FLOOR: break;
-  case CLOSER_FLOOR: break;
+  case OPENER_FLOOR: return;
+  case CLOSER_FLOOR: return;
   case STUCK_FLOOR: return;
   case HIDDEN_FLOOR: return;
   case PILLAR:
@@ -745,7 +734,7 @@ draw_tile_fg_front (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f)
     break;
   case LEVEL_DOOR: break;
   case CHOMPER:
-    draw_chomper_fg (bitmap, p);
+    draw_chomper_fg (bitmap, p, f);
     break;
   case ARCH_BOTTOM:
     draw_object_part (bitmap, "ARCH_BOTTOM", "FRONT", p);
@@ -871,11 +860,9 @@ apply_hue_color (ALLEGRO_COLOR c)
 void
 draw_no_floor_selection (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
-  if (peq (p, &mouse_pos)) {
-    struct rect r;
-    new_rect (&r, p->room, p->place * PLACE_WIDTH + 25,
-              p->floor * PLACE_HEIGHT - 13,
-              PLACE_WIDTH, PLACE_HEIGHT);
-    draw_filled_rect (bitmap, &r, NO_FLOOR_SELECTION_COLOR);
-  }
+  struct rect r;
+  new_rect (&r, p->room, p->place * PLACE_WIDTH + 25,
+            p->floor * PLACE_HEIGHT - 13,
+            PLACE_WIDTH, PLACE_HEIGHT);
+  draw_filled_rect (bitmap, &r, NO_FLOOR_SELECTION_COLOR);
 }

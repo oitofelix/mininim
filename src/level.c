@@ -25,7 +25,7 @@ static void draw_level (void);
 static void compute_level (void);
 static void cleanup_level (void);
 static void process_death (void);
-static void draw_lives (ALLEGRO_BITMAP *bitmap, struct actor *k);
+static void draw_hp (ALLEGRO_BITMAP *bitmap, struct actor *k);
 
 /* variables */
 struct level vanilla_level;
@@ -96,7 +96,7 @@ skill_eq (struct skill *s0, struct skill *s1)
     && s0->advance_prob == s1->advance_prob
     && s0->return_prob == s1->return_prob
     && s0->refraction == s1->refraction
-    && s0->extra_life == s1->extra_life;
+    && s0->extra_hp == s1->extra_hp;
 }
 
 bool
@@ -122,7 +122,7 @@ guard_eq (struct guard *g0, struct guard *g1)
     && peq (&g0->p, &g1->p)
     && g0->dir == g1->dir
     && skill_eq (&g0->skill, &g1->skill)
-    && g0->total_lives == g1->total_lives
+    && g0->total_hp == g1->total_hp
     && g0->style == g1->style;
 }
 
@@ -269,25 +269,25 @@ play_level (struct level *lv)
   case REPLAY_OUT_OF_TIME:
     replay->complete = false;
     replay->reason = REPLAY_INCOMPLETE_OUT_OF_TIME;
-    replay->final_total_lives = k->total_lives;
+    replay->final_total_hp = k->total_hp;
     replay->final_kca = k->skill.counter_attack_prob + 1;
     replay->final_kcd = k->skill.counter_defense_prob + 1;
     break;
   case REPLAY_INCOMPLETE:
     replay->complete = false;
-    replay->reason = k->current_lives > 0
+    replay->reason = k->current_hp > 0
       ? REPLAY_INCOMPLETE_STUCK : REPLAY_INCOMPLETE_DEAD;
-    replay->final_total_lives = k->total_lives;
+    replay->final_total_hp = k->total_hp;
     replay->final_kca = k->skill.counter_attack_prob + 1;
     replay->final_kcd = k->skill.counter_defense_prob + 1;
     break;
   case REPLAY_COMPLETE:
     replay->complete = true;
     replay->reason = REPLAY_INCOMPLETE_NO_REASON;
-    replay->final_total_lives = k->total_lives;
+    replay->final_total_hp = k->total_hp;
     replay->final_kca = k->skill.counter_attack_prob + 1;
     replay->final_kcd = k->skill.counter_defense_prob + 1;
-    total_lives = k->total_lives;
+    total_hp = k->total_hp;
     skill = k->skill;
     start_level_time = play_time;
     break;
@@ -533,9 +533,9 @@ register_actors (void)
   struct pos kid_start_pos; get_kid_start_pos (&kid_start_pos);
   int id = create_actor (NULL, KID, &kid_start_pos, global_level.start_dir);
   struct actor *k = &actor[id];
-  k->total_lives = total_lives;
+  k->total_hp = total_hp;
   k->skill = skill;
-  k->current_lives = total_lives;
+  k->current_hp = total_hp;
   k->controllable = true;
   k->immortal = immortal_mode;
   k->has_sword = global_level.has_sword;
@@ -556,8 +556,8 @@ register_actors (void)
     case GUARD: default:
       id = create_actor (NULL, GUARD, &g->p, g->dir);
       break;
-    case FAT_GUARD:
-      id = create_actor (NULL, FAT_GUARD, &g->p, g->dir);
+    case FAT:
+      id = create_actor (NULL, FAT, &g->p, g->dir);
       break;
     case VIZIER:
       id = create_actor (NULL, VIZIER, &g->p, g->dir);
@@ -574,14 +574,14 @@ register_actors (void)
     a->level_id = i;
     a->has_sword = true;
     a->skill = g->skill;
-    a->total_lives = g->total_lives + g->skill.extra_life;
-    a->current_lives = g->total_lives;
+    a->total_hp = g->total_hp + g->skill.extra_hp;
+    a->current_hp = g->total_hp;
     if (global_level.n == 3 && semantics == LEGACY_SEMANTICS) {
-      a->total_lives = a->current_lives = INT_MAX;
-      a->dont_draw_lives = true;
+      a->total_hp = a->current_hp = INT_MAX;
+      a->dont_draw_hp = true;
     }
     a->style = g->style;
-    if (a->total_lives == 0) a->glory_sample = true;
+    if (a->total_hp == 0) a->glory_sample = true;
   }
 }
 
@@ -596,25 +596,13 @@ level_cleanup (void)
 void
 load_level (void)
 {
-  load_fire ();
-  load_potion ();
-  load_sword ();
-  load_kid ();
-  load_guard ();
   load_mouse ();
-  load_box ();
 }
 
 void
 unload_level (void)
 {
-  unload_fire ();
-  unload_potion ();
-  unload_sword ();
-  unload_kid ();
-  unload_guard ();
   unload_mouse ();
-  unload_box ();
 }
 
 static void
@@ -625,7 +613,10 @@ compute_level (void)
   level_key_bindings ();
   process_death ();
 
-  if (is_game_paused ()) return;
+  if (is_game_paused ()) {
+    keep_all_depressible_floors ();
+    return;
+  }
 
   struct actor *k = get_actor_by_id (current_kid_id);
   struct actor *ke = get_actor_by_id (k->enemy_id);
@@ -662,7 +653,7 @@ compute_level (void)
 
   /* if current controllable is a dead shadow, select its controllable
      source */
-  if (k->shadow_of == 0 && k->current_lives <= 0) {
+  if (k->shadow_of == 0 && k->current_hp <= 0) {
     if (k->death_timer++ > FELLOW_SHADOW_DEATH_WAIT_CYCLES) {
       k->death_timer = 0;
       k = get_actor_by_id (k->shadow_of);
@@ -739,7 +730,8 @@ compute_level (void)
 
   /* collision enforcement */
   for (i = 0; i < actor_nmemb; i++) {
-    enforce_wall_collision (&actor[i].f);
+    struct actor *a = &actor[i];
+    enforce_wall_collision (a);
   }
 
   clear_actors_keyboard_state ();
@@ -756,7 +748,7 @@ compute_level (void)
   }
 
   if (mr.w > 1
-      && k->current_lives > 0
+      && k->current_hp > 0
       && k->f.c.room != 0
       && camera_follow_kid == k->id
       && (ke = get_reciprocal_enemy (k))
@@ -806,7 +798,7 @@ process_death (void)
   struct actor *k = get_actor_by_id (0);
 
   /* Restart level after death */
-  if (k->current_lives <= 0
+  if (k->current_hp <= 0
       && ! is_game_paused ()) {
     death_timer++;
 
@@ -847,7 +839,7 @@ draw_level (void)
 {
   draw_multi_rooms ();
 
-  draw_lives (uscreen, get_actor_by_id (current_kid_id));
+  draw_hp (uscreen, get_actor_by_id (current_kid_id));
 
   /* automatic level display */
   if (! title_demo && global_level.nominal_n >= 0
@@ -879,18 +871,18 @@ draw_level (void)
 }
 
 static void
-draw_lives (ALLEGRO_BITMAP *bitmap, struct actor *k)
+draw_hp (ALLEGRO_BITMAP *bitmap, struct actor *k)
 {
   bool nrlc = no_recursive_links_continuity;
   no_recursive_links_continuity = true;
 
   if (is_room_visible (k->f.c.room)) {
-    draw_kid_lives (bitmap, k);
+    draw_kid_hp (bitmap, k);
     struct actor *ke = NULL;
     if (k->enemy_id != -1) {
       ke = get_actor_by_id (k->enemy_id);
       if (ke && ke->enemy_id == k->id)
-        draw_guard_lives (bitmap, ke);
+        draw_guard_hp (bitmap, ke);
     }
   }
 
@@ -915,8 +907,8 @@ next_level (void)
 {
   struct actor *k = get_actor_by_id (current_kid_id);
 
-  total_lives = k->total_lives;
-  current_lives = k->current_lives;
+  total_hp = k->total_hp;
+  current_hp = k->current_hp;
   skill = k->skill;
   start_level_time = play_time;
   next_level_number = global_level.n + 1;

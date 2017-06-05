@@ -113,7 +113,7 @@ load_native_level (struct level *l, int n)
     sscanf (v, "%i %i %i %i", &g->p.room, &g->p.floor, &g->p.place,
             (int *) &g->dir);
 
-    /* GUARD SKILLS AND TOTAL LIVES */
+    /* GUARD SKILLS AND TOTAL HP */
     /* GiK=a b d e a r f x l */
     k = xasprintf ("G%iK", i);
     v = al_get_config_value (c, NULL, k);
@@ -123,8 +123,8 @@ load_native_level (struct level *l, int n)
             &g->skill.attack_prob, &g->skill.counter_attack_prob,
             &g->skill.defense_prob, &g->skill.counter_defense_prob,
             &g->skill.advance_prob, &g->skill.return_prob,
-            &g->skill.refraction, &g->skill.extra_life,
-            &g->total_lives);
+            &g->skill.refraction, &g->skill.extra_hp,
+            &g->total_hp);
   }
 
   /* LINKS */
@@ -227,15 +227,15 @@ save_native_level (struct level *l, char *filename)
     al_free (k);
     al_free (v);
 
-    /* GUARD SKILLS AND TOTAL LIVES */
+    /* GUARD SKILLS AND TOTAL HP */
     /* GiK=a b d e a r f x l */
     k = xasprintf ("G%iK", i);
     v = xasprintf ("%i %i %i %i %i %i %i %i %i",
                g->skill.attack_prob, g->skill.counter_attack_prob,
                g->skill.defense_prob, g->skill.counter_defense_prob,
                g->skill.advance_prob, g->skill.return_prob,
-               g->skill.refraction, g->skill.extra_life,
-               g->total_lives);
+               g->skill.refraction, g->skill.extra_hp,
+               g->total_hp);
     al_set_config_value (c, NULL, k, v);
     al_free (k);
     al_free (v);
@@ -340,11 +340,18 @@ get_tile_ext_str (struct pos *p)
 
   switch (fg (p)) {
   case FLOOR:
+  case BROKEN_FLOOR:
+  case SKELETON_FLOOR:
+  case STUCK_FLOOR:
+  case HIDDEN_FLOOR:
+  case PILLAR:
+  case BIG_PILLAR_BOTTOM:
+  case ARCH_BOTTOM:
     switch (e) {
     case NO_ITEM: s = xasprintf ("NO_ITEM"); break;
     case EMPTY_POTION: s = xasprintf ("EMPTY_POTION"); break;
-    case SMALL_LIFE_POTION: s = xasprintf ("SMALL_LIFE_POTION"); break;
-    case BIG_LIFE_POTION: s = xasprintf ("BIG_LIFE_POTION"); break;
+    case SMALL_HP_POTION: s = xasprintf ("SMALL_HP_POTION"); break;
+    case BIG_HP_POTION: s = xasprintf ("BIG_HP_POTION"); break;
     case SMALL_POISON_POTION: s = xasprintf ("SMALL_POISON_POTION"); break;
     case BIG_POISON_POTION: s = xasprintf ("BIG_POISON_POTION"); break;
     case FLOAT_POTION: s = xasprintf ("FLOAT_POTION"); break;

@@ -46,7 +46,7 @@ flow (struct actor *g)
   bool vigilant = g->key.enter;
 
   if (g->oaction == guard_normal
-      && g->current_lives <= 0
+      && g->current_hp <= 0
       && anim_cycle > 0) {
     survey (_mt, pos, &g->f, NULL, &pmt, NULL);
     g->p = pmt;
@@ -62,13 +62,10 @@ flow (struct actor *g)
   }
 
   g->fo.b = actor_bitmap (g, NULL, "NORMAL", 0);
-  g->fo.dx = actor_bitmap_dx (g, NULL, "NORMAL", 0);
-  g->fo.dy = actor_bitmap_dy (g, NULL, "NORMAL", 0);
+  g->fo.dx = actor_dx (g, NULL, "NORMAL", 0);
+  g->fo.dy = actor_dy (g, NULL, "NORMAL", 0);
 
   select_actor_xframe (g, NULL, "SWORD", 30);
-
-  if (g->type == VIZIER) g->xf.dy += +4;
-  if (g->type == SKELETON) g->xf.dx += -5, g->xf.dy += -6;
 
   return true;
 }
@@ -94,6 +91,9 @@ physics_in (struct actor *g)
 static void
 physics_out (struct actor *g)
 {
+  /* place on the ground */
+  place_on_the_ground (&g->f, &g->f.c);
+
   /* depressible floors */
   update_depressible_floor (g, -7, -26);
 }

@@ -27,15 +27,30 @@ static void physics_out (struct actor *k);
 void
 kid_normal (struct actor *k)
 {
+  k->next_action = NULL;
+
   k->oaction = k->action;
   k->oi = k->i;
   k->action = kid_normal;
   k->f.flip = (k->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  if (! flow (k)) return;
-  if (! cutscene && ! physics_in (k)) return;
+  if (k->ignore_danger == 2) k->ignore_danger = 0;
+
+  if (! flow (k)) {
+    k->misstep = false;
+    k->ignore_danger = 0;
+    return;
+  }
+  if (! cutscene && ! physics_in (k)) {
+    k->misstep = false;
+    k->ignore_danger = 0;
+    return;
+  }
   next_frame (&k->f, &k->f, &k->fo);
   physics_out (k);
+
+  if (k->next_action == kid_walk && k->ignore_danger == 1)
+    k->ignore_danger = 2;
 }
 
 static bool
@@ -69,7 +84,7 @@ flow (struct actor *k)
 
   /* acquire item */
   invalid_pos (&k->item_pos);
-  if (k->key.shift) {
+  if (k->key.shift && ! walk) {
     struct pos pbf; survey (_bf, pos, &k->f, NULL, &pbf, NULL);
     struct pos pbf2; survey (_bf, posf, &k->f, NULL, &pbf2, NULL);
     if (is_potion (&pbf) || is_sword (&pbf))
@@ -83,7 +98,7 @@ flow (struct actor *k)
     && k->shadow_of == - 1 && is_in_front_open_level_door (&k->f, &k->p);
 
   if (k->oaction == kid_normal
-      && k->current_lives <= 0) {
+      && k->current_hp <= 0) {
     survey (_mt, pos, &k->f, NULL, &pmt, NULL);
     k->p = pmt;
     kid_die (k);
@@ -127,8 +142,8 @@ flow (struct actor *k)
       }
     }
     if (walk) {
-      kid_walk (k);
-      return false;
+      if (k->misstep) k->next_action = kid_misstep;
+      else k->next_action = kid_walk;
     }
 
     if (run) {
@@ -155,16 +170,8 @@ flow (struct actor *k)
   }
 
   k->fo.b = actor_bitmap (k, "KID", "NORMAL", 0);
-  k->fo.dx = actor_bitmap_dx (k, "KID", "NORMAL", 0);
-  k->fo.dy = actor_bitmap_dy (k, "KID", "NORMAL", 0);
-
-  if (k->oaction == kid_stabilize) k->fo.dx = +2;
-  if (k->oaction == kid_walk && k->oi == 11) k->fo.dx = -1;
-  if (k->oaction == kid_jump) k->fo.dx = -2;
-  if (k->oaction == kid_crouch) k->fo.dx = -2;
-  if (k->oaction == kid_vjump) k->fo.dx = +2;
-  if (k->oaction == kid_drink) k->fo.dx = +0;
-  if (k->oaction == kid_keep_sword) k->fo.dx = +2;
+  k->fo.dx = actor_dx (k, "KID", "NORMAL", 0);
+  k->fo.dy = actor_dy (k, "KID", "NORMAL", 0);
 
   k->xf.b = NULL;
 
@@ -193,6 +200,9 @@ physics_in (struct actor *k)
 static void
 physics_out (struct actor *k)
 {
+  /* place on the ground */
+  place_on_the_ground (&k->f, &k->f.c);
+
   /* depressible floors */
   keep_depressible_floor (k);
 }

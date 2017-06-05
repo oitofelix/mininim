@@ -82,7 +82,7 @@ flow (struct actor *g)
     }
 
     /* death */
-    if (g->current_lives <= 0) {
+    if (g->current_hp <= 0) {
       survey (_mt, pos, &g->f, NULL, &pmt, NULL);
       g->p = pmt;
       guard_die (g);
@@ -110,12 +110,6 @@ flow (struct actor *g)
 
   select_actor_frame (g, NULL, "SWORD_NORMAL", g->i == 2 ? g->i : g->i + 1);
   select_actor_xframe (g, NULL, "SWORD", 4);
-
-  if (g->oaction == guard_normal) g->fo.dx += -1;
-  if (g->oaction == guard_sword_walkf) g->fo.dx += +2;
-
-  if (g->type == SKELETON) g->xf.dy += -3;
-  if (g->type == SHADOW) g->xf.dy += -2;
 
   return true;
 }

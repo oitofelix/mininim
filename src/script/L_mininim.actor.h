@@ -26,6 +26,8 @@
 void define_L_mininim_actor (lua_State *L);
 void L_pushactor (lua_State *L, int id);
 
+const char *direction_string (enum dir d);
+enum dir direction_enum (const char *d);
 const char *actor_type_string (enum actor_type type);
 enum actor_type actor_type_enum (const char *type);
 const char *actor_action_string (ACTION action);
@@ -38,16 +40,30 @@ bool select_actor_xframe (struct actor *a, const char *type,
 
 ALLEGRO_BITMAP *actor_bitmap (struct actor *a, const char *type,
                               const char *action, int index);
-struct coord *actor_coord (struct coord *c_ret, struct actor *a,
-                           const char *type, const char *action,
-                           int index);
-int actor_bitmap_dx (struct actor *a, const char *type, const char *action,
-                     int index);
-int actor_bitmap_dy (struct actor *a, const char *type, const char *action,
-                     int index);
-void place_actor (struct actor *a, struct pos *p, int dx, int dy,
-                  const char *type, const char *action, int index);
+struct rect *_actor_rect (struct rect *c_ret, struct actor *a,
+                          const char *type, const char *action,
+                          uintptr_t index);
 
+#define actor_rect(r_ret, a, type, action, index)     \
+  _actor_rect (r_ret, a, type, action, (uintptr_t) (index))
+
+lua_Number _actor_dx (struct actor *a, const char *type, const char *action,
+                  uintptr_t index);
+
+#define actor_dx(a, type, action, index) \
+  _actor_dx (a, type, action, (uintptr_t) (index))
+
+lua_Number _actor_dy (struct actor *a, const char *type, const char *action,
+                      uintptr_t index);
+
+#define actor_dy(a, type, action, index) \
+  _actor_dy (a, type, action, (uintptr_t) (index))
+
+void place_actor (struct actor *a, struct pos *p,
+                  lua_Number dx, lua_Number dy,
+                  const char *type, const char *action, int index);
+void draw_actor_part (ALLEGRO_BITMAP *bitmap, const char *type,
+                      const char *part, struct actor *a);
 
 DECLARE_LUA (L_mininim_actor);
 

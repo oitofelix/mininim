@@ -61,10 +61,10 @@ flow (struct actor *k)
   /* hang front */
   if (movements == NATIVE_MOVEMENTS
       && hang_front && k->i >= 5  && k->i <= 9
-      && is_hangable_pos (&pmf, k->f.dir)
+      && is_hangable (&pmf, k->f.dir)
       && is_immediately_accessible_pos (&pmf, &pm, &k->f)) {
-    if (is_hangable_pos (&pm, k->f.dir)) k->hang_pos = pm;
-    else if (is_hangable_pos (&ptf, k->f.dir)) k->hang_pos = ptf;
+    if (is_hangable (&pm, k->f.dir)) k->hang_pos = pm;
+    else if (is_hangable (&ptf, k->f.dir)) k->hang_pos = ptf;
     pos2room (&k->hang_pos, k->f.c.room, &k->hang_pos);
     k->hang = true;
     play_audio (&hang_on_fall_audio, NULL, k->id);
@@ -76,7 +76,7 @@ flow (struct actor *k)
   /* hang back */
   if (movements == NATIVE_MOVEMENTS
       && k->i >= 5 && k->i <= 9
-      && hang_back && is_hangable_pos (&ptf, back_dir)
+      && hang_back && is_hangable (&ptf, back_dir)
       && is_immediately_accessible_pos (&ptf, &pm, &k->f)) {
     k->hang_pos = ptf;
     pos2room (&k->hang_pos, k->f.c.room, &k->hang_pos);
@@ -141,6 +141,9 @@ static void
 physics_out (struct actor *k)
 {
   struct pos pmbo;
+
+  /* place on the ground */
+  if (k->i <= 5) place_on_the_ground (&k->f, &k->f.c);
 
   /* depressible floors */
   if (k->i == 0) update_depressible_floor (k, -4, -10);

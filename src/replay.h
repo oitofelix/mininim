@@ -30,7 +30,7 @@ struct replay {
   uint32_t start_level;
   uint32_t start_time;
   int32_t time_limit;
-  uint32_t total_lives;
+  uint32_t total_hp;
   uint32_t kca;
   uint32_t kcd;
 
@@ -47,7 +47,7 @@ struct replay {
     REPLAY_INCOMPLETE_STUCK, REPLAY_INCOMPLETE_DEAD,
     REPLAY_INCOMPLETE_OUT_OF_TIME,
   } reason;
-  uint32_t final_total_lives;
+  uint32_t final_total_hp;
   uint32_t final_kca;
   uint32_t final_kcd;
 };

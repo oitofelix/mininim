@@ -41,13 +41,18 @@ kid_misstep (struct actor *k)
 static bool
 flow (struct actor *k)
 {
-  if (k->oaction != kid_misstep) k->i = -1, k->misstep = true;
+  if (k->oaction != kid_misstep) {
+    k->i = -1;
+    k->misstep = false;
+  }
 
   if (k->i == 10) {
-    int dx = (k->f.dir == LEFT) ? +11 : PLACE_WIDTH + 7;
-    int dy = +15;
-    place_actor (k, &k->p, dx, dy, "KID", "NORMAL", 0);
     kid_normal (k);
+
+    /* put kid nearest danger */
+    while (! is_in_danger (&k->p, &k->f, _tf, NULL))
+      k->f.c.x += k->f.dir == LEFT ? -1 : +1;
+
     return false;
   }
 
@@ -72,6 +77,9 @@ static void
 physics_out (struct actor *k)
 {
   struct pos pmbo;
+
+  /* place on the ground */
+  place_on_the_ground (&k->f, &k->f.c);
 
   /* depressible floors */
   keep_depressible_floor (k);

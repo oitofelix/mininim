@@ -21,7 +21,8 @@
 #ifndef MININIM_WALL_H
 #define MININIM_WALL_H
 
-enum should_draw should_draw_face (struct pos *p, struct frame *f);
+enum should_draw should_draw_face (struct pos *p, struct frame *f,
+                                   enum dir d);
 
 void draw_wall (ALLEGRO_BITMAP *bitmap, struct pos *p);
 void draw_wall_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f);

@@ -94,7 +94,7 @@
 #define JUMP_ICON "data/icons/jump.png"
 #define ORIGINAL_ICON "data/icons/original.png"
 #define GUARD_ICON "data/icons/guard.png"
-#define FAT_GUARD_ICON "data/icons/fat-guard.png"
+#define FAT_ICON "data/icons/fat.png"
 #define VIZIER_ICON "data/icons/vizier.png"
 #define SKELETON_ICON "data/icons/skeleton.png"
 #define SHADOW_ICON "data/icons/shadow.png"
@@ -102,8 +102,8 @@
 #define DEATH_ICON "data/icons/death.png"
 #define FEATHER_ICON "data/icons/feather.png"
 #define ANGEL_ICON "data/icons/angel.png"
-#define LIFE_EMPTY_ICON "data/icons/life-empty.png"
-#define LIFE_FULL_ICON "data/icons/life-full.png"
+#define HP_EMPTY_ICON "data/icons/hp-empty.png"
+#define HP_FULL_ICON "data/icons/hp-full.png"
 #define SKILLS_ICON "data/icons/skills.png"
 #define TIME_ICON "data/icons/time.png"
 #define TIME_ADD_ICON "data/icons/time-add.png"
@@ -199,7 +199,7 @@ enum main_menu {
   GM_MID,
   ORIGINAL_GM_MID,
   GUARD_GM_MID,
-  FAT_GUARD_GM_MID,
+  FAT_GM_MID,
   VIZIER_GM_MID,
   SKELETON_GM_MID,
   SHADOW_GM_MID,
@@ -260,8 +260,8 @@ enum main_menu {
   KILL_ENEMY_MID,
   FLOAT_MID,
   IMMORTAL_MID,
-  FILL_LIFE_MID,
-  ADD_LIFE_MID,
+  FILL_HP_MID,
+  ADD_HP_MID,
   FELLOW_SHADOW_MID,
   TIME_CHANGE_MID,
   TIME_ADD_MID,

@@ -21,7 +21,7 @@
 #include "mininim.h"
 
 /* audio */
-struct audio_source big_life_potion_audio,
+struct audio_source big_hp_potion_audio,
   step_audio,
   hit_ground_audio,
   hit_ground_harm_audio,
@@ -71,7 +71,7 @@ struct audio_source big_life_potion_audio,
   marry_jaffar_audio,
   meet_vizier_audio,
   princess_waiting_audio,
-  small_life_potion_audio,
+  small_hp_potion_audio,
   success_audio,
   success_suspense_audio,
   vizier_and_princess_audio;
@@ -79,7 +79,7 @@ struct audio_source big_life_potion_audio,
 void
 load_audio_data (void)
 {
-  load_audio (&big_life_potion_audio, AUDIO_SAMPLE, BIG_LIFE_POTION_AUDIO);
+  load_audio (&big_hp_potion_audio, AUDIO_SAMPLE, BIG_HP_POTION_AUDIO);
   load_audio (&step_audio, AUDIO_SAMPLE, STEP_AUDIO);
   load_audio (&hit_ground_audio, AUDIO_SAMPLE, HIT_GROUND_AUDIO);
   load_audio (&hit_ground_harm_audio, AUDIO_SAMPLE, HIT_GROUND_HARM_AUDIO);
@@ -130,7 +130,7 @@ load_audio_data (void)
   load_audio (&marry_jaffar_audio, AUDIO_STREAM, MARRY_JAFFAR_AUDIO);
   load_audio (&meet_vizier_audio, AUDIO_SAMPLE, MEET_VIZIER_AUDIO);
   load_audio (&princess_waiting_audio, AUDIO_STREAM, PRINCESS_WAITING_AUDIO);
-  load_audio (&small_life_potion_audio, AUDIO_SAMPLE, SMALL_LIFE_POTION_AUDIO);
+  load_audio (&small_hp_potion_audio, AUDIO_SAMPLE, SMALL_HP_POTION_AUDIO);
   load_audio (&success_audio, AUDIO_STREAM, SUCCESS_AUDIO);
   load_audio (&success_suspense_audio, AUDIO_STREAM, SUCCESS_SUSPENSE_AUDIO);
   load_audio (&vizier_and_princess_audio, AUDIO_STREAM, VIZIER_AND_PRINCESS_AUDIO);
@@ -139,7 +139,7 @@ load_audio_data (void)
 void
 unload_audio_data (void)
 {
-  destroy_audio (&big_life_potion_audio);
+  destroy_audio (&big_hp_potion_audio);
   destroy_audio (&step_audio);
   destroy_audio (&hit_ground_audio);
   destroy_audio (&hit_ground_harm_audio);
@@ -189,7 +189,7 @@ unload_audio_data (void)
   destroy_audio (&marry_jaffar_audio);
   destroy_audio (&meet_vizier_audio);
   destroy_audio (&princess_waiting_audio);
-  destroy_audio (&small_life_potion_audio);
+  destroy_audio (&small_hp_potion_audio);
   destroy_audio (&success_audio);
   destroy_audio (&success_suspense_audio);
   destroy_audio (&vizier_and_princess_audio);

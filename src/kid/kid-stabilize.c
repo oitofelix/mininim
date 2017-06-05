@@ -47,8 +47,11 @@ kid_stabilize_collision (struct actor *k)
   k->action = kid_stabilize_collision;
 
   int dx = (k->f.dir == LEFT) ? PLACE_WIDTH + 18 : -PLACE_WIDTH + 24;
-  int dy = +17;
-  place_actor (k, &k->ci.kid_p, dx, dy, "KID", "STABILIZE", 0);
+  place_actor (k, &k->ci.kid_p, dx, MIGNORE, "KID", "STABILIZE", 0);
+  place_on_the_ground (&k->f, &k->f.c);
+
+  /* collision is detected after actor's next frame has been selected */
+  k->i--;
 
   kid_stabilize (k);
 }
@@ -57,7 +60,7 @@ static bool
 flow (struct actor *k)
 {
   if (k->oaction != kid_stabilize) {
-    k->i = -1, k->misstep = false;
+    k->i = -1;
     if (k->oaction == kid_stabilize_collision) {
       k->i = 0; k->collision = true;
     } else k->collision = false;
@@ -128,6 +131,9 @@ physics_in (struct actor *k)
 static void
 physics_out (struct actor *k)
 {
+  /* place on the ground */
+  place_on_the_ground (&k->f, &k->f.c);
+
   /* depressible floors */
   if (k->collision && k->i == 1)
     update_depressible_floor (k, -13, -18);

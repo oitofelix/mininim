@@ -36,6 +36,7 @@ void remove_chomper (struct chomper *c);
 bool should_chomp (struct pos *p);
 void compute_chompers (void);
 void draw_chomper (ALLEGRO_BITMAP *bitmap, struct pos *p);
-void draw_chomper_fg (ALLEGRO_BITMAP *bitmap, struct pos *p);
+void draw_chomper_fg (ALLEGRO_BITMAP *bitmap, struct pos *p,
+                      struct frame *f);
 
 #endif	/* MININIM_CHOMPER_H */

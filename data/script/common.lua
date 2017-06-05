@@ -76,7 +76,9 @@ function new (metatable, o, ...)
    o.__index = o
 
    if metatable then
-      if not getmetatable (o) then
+      local original_metatable = getmetatable (o)
+
+      if not original_metatable then
          if not rawget (metatable, __index) then
             metatable.__index = metatable end
          setmetatable (o, metatable)
@@ -84,8 +86,8 @@ function new (metatable, o, ...)
 
       merge_recursively (metatable, o)
 
-      if metatable._new then
-         metatable._new (o, unpack (arg))
+      if metatable._new and not original_metatable then
+         metatable:_new (o, unpack (arg))
       end
    end
 
@@ -100,15 +102,10 @@ function instanceof (o, metatable)
    end
 end
 
-function set_subtables_metatable (o, metatable)
-   for k, v in pairs (o) do
-      if type (v) == "table" and not getmetatable (v)
-      and not string.find (k, "^_") then
-         new (metatable, v)
-      end
-   end
+function meta (metatable, instance)
+   if instanceof (instance, metatable)
+   then return instance else return metatable end
 end
-
 
 -- Resources
 
@@ -126,6 +123,11 @@ function load_bitmap (P, filename, ...)
       resource_filename (P, filename, unpack (arg)))
 end
 
+function load_font (P, filename, ...)
+   return MININIM.video.font (
+      resource_filename (P, filename, unpack (arg)))
+end
+
 function load_sample (P, filename, ...)
    return MININIM.audio.source (
       resource_filename (P, filename, unpack (arg)), "SAMPLE")
@@ -140,7 +142,7 @@ function eval_clipboard ()
    assert (loadstring (MININIM.clipboard)) ()
 end
 
-function table_print (tt, indent, done)
+function print_table (tt, indent, done)
   done = done or {}
   indent = indent or 0
   if type(tt) == "table" then
@@ -151,7 +153,7 @@ function table_print (tt, indent, done)
         io.write(string.format("[%s] => table\n", tostring (key)));
         io.write(string.rep (" ", indent+4)) -- indent it
         io.write("(\n");
-        table_print (value, indent + 7, done)
+        print_table (value, indent + 7, done)
         io.write(string.rep (" ", indent+4)) -- indent it
         io.write(")\n");
       else
@@ -172,6 +174,13 @@ function to_color_range (r, g, b)
    b = math.max (0, b)
    b = math.min (b, 255)
    return r, g, b
+end
+
+function palette_table_color (t, c)
+   for k, v in pairs (t) do
+      if k == c then return v end
+   end
+   return c
 end
 
 function opposite_direction (direction)

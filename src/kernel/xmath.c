@@ -20,18 +20,6 @@
 
 #include "mininim.h"
 
-double
-max_double (double a, double b)
-{
-  return (a > b) ? a : b;
-}
-
-double
-min_double (double a, double b)
-{
-  return (a < b) ? a : b;
-}
-
 bool
 equiv (bool a, bool b)
 {

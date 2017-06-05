@@ -29,6 +29,8 @@ char *wall_correlation_string (enum wall_correlation wc);
 
 static DECLARE_LUA (activate);
 static DECLARE_LUA (relative);
+static DECLARE_LUA (is_hangable_at);
+static DECLARE_LUA (is_free_at);
 
 void
 define_L_mininim_level_position (lua_State *L)
@@ -125,8 +127,19 @@ BEGIN_LUA (__index)
       lua_pushvalue (L, 1);
       lua_pushcclosure (L, relative, 1);
       return 1;
-    } else if (! strcasecmp (key, "traversable")) {
+    } else if (! strcasecmp (key, "is_hangable_at")) {
+      lua_pushvalue (L, 1);
+      lua_pushcclosure (L, is_hangable_at, 1);
+      return 1;
+    } else if (! strcasecmp (key, "is_free_at")) {
+      lua_pushvalue (L, 1);
+      lua_pushcclosure (L, is_free_at, 1);
+      return 1;
+    } else if (! strcasecmp (key, "is_traversable")) {
       lua_pushboolean (L, is_traversable (p));
+      return 1;
+    } else if (! strcasecmp (key, "is_critical")) {
+      lua_pushboolean (L, is_critical (p));
       return 1;
     } else if (! strcasecmp (key, "wall_correlation")) {
       enum wall_correlation wc = wall_correlation (p);
@@ -186,6 +199,7 @@ BEGIN_LUA (relative)
 {
   struct pos *p =
     luaL_checkudata (L, lua_upvalueindex (1), L_MININIM_LEVEL_POSITION);
+  if (! p) return 0;
   struct pos pr; prel (p, &pr, lua_tonumber (L, 1), lua_tonumber (L, 2));
   L_pushposition (L, &pr);
   return 1;
@@ -196,7 +210,34 @@ BEGIN_LUA (activate)
 {
   struct pos *p =
     luaL_checkudata (L, lua_upvalueindex (1), L_MININIM_LEVEL_POSITION);
+  if (! p) return 0;
   activate_tile (p);
   return 0;
+}
+END_LUA
+
+BEGIN_LUA (is_hangable_at)
+{
+  struct pos *p =
+    luaL_checkudata (L, lua_upvalueindex (1), L_MININIM_LEVEL_POSITION);
+  if (! p) return 0;
+  const char *dir_str = luaL_checkstring (L, 1);
+  enum dir dir = direction_enum (dir_str);
+  if (invalid (dir)) return 0;
+  lua_pushboolean (L, is_hangable (p, dir));
+  return 1;
+}
+END_LUA
+
+BEGIN_LUA (is_free_at)
+{
+  struct pos *p =
+    luaL_checkudata (L, lua_upvalueindex (1), L_MININIM_LEVEL_POSITION);
+  if (! p) return 0;
+  const char *dir_str = luaL_checkstring (L, 1);
+  enum dir dir = direction_enum (dir_str);
+  if (invalid (dir)) return 0;
+  lua_pushboolean (L, is_free (p, dir));
+  return 1;
 }
 END_LUA

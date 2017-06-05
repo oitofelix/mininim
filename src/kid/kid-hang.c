@@ -42,18 +42,16 @@ static bool
 flow (struct actor *k)
 {
   if (k->oaction != kid_hang)
-    k->i = -1, k->hang_caller = k->oaction, k->misstep = false;
+    k->i = -1, k->hang_caller = k->oaction;
 
-  int dir = (k->f.dir == LEFT) ? 0 : 1;
-  int dx = PLACE_WIDTH * dir + 7;
-  int dy = -9;
-  place_actor (k, &k->hang_pos, dx, dy, "KID", "HANG", 13);
+  struct rect r; actor_rect (&r, k, "KID", "HANG", "HANG");
+  place_actor (k, &k->hang_pos, r.c.x, r.c.y, "KID", "HANG", 13);
 
   if (k->i == -1 && k->oaction != kid_unclimb) {
     k->fo.b = actor_bitmap (k, "KID", "HANG", 13);
-    k->fo.dx = actor_bitmap_dx (k, "KID", "HANG", 13);
-    k->fo.dy = actor_bitmap_dy (k, "KID", "HANG", 13);;
-  } else if (is_hang_pos_free (&k->hang_pos, k->f.dir)) {
+    k->fo.dx = actor_dx (k, "KID", "HANG", 13);
+    k->fo.dy = actor_dy (k, "KID", "HANG", 13);
+  } else if (is_free (&k->hang_pos, k->f.dir)) {
     kid_hang_free (k);
     return false;
   } else {
@@ -78,12 +76,8 @@ physics_in (struct actor *k)
 static void
 physics_out (struct actor *k)
 {
-  struct pos hanged_pos;
-
   /* depressible floors */
-  clear_depressible_floor (k);
-  get_hanged_pos (&k->hang_pos, k->f.dir, &hanged_pos);
-  press_depressible_floor (&hanged_pos, k);
+  keep_depressible_floor (k);
 }
 
 bool

@@ -29,7 +29,8 @@ void
 guard_fall (struct actor *g)
 {
   g->oaction = g->action;
-  g->oi = g->i;
+  /* fall is detected after actor's next frame has been selected */
+  g->oi = g->i - 1;
   g->action = guard_fall;
   g->f.flip = (g->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
@@ -48,8 +49,8 @@ flow (struct actor *g)
 
   int i = g->i > 4 ? 4 : g->i;
   g->fo.b = actor_bitmap (g, NULL, "FALL", i);
-  g->fo.dx = actor_bitmap_dx (g, NULL, "FALL", i);
-  g->fo.dy = actor_bitmap_dy (g, NULL, "FALL", i);
+  g->fo.dx = actor_dx (g, NULL, "FALL", i);
+  g->fo.dy = actor_dy (g, NULL, "FALL", i);
 
   if (g->i == 0) g->j = 28;
   if (g->i == 1) g->j = 32;
@@ -101,8 +102,8 @@ physics_in (struct actor *g)
   /* land on ground */
   int i = g->i > 4 ? 4 : g->i;
   fo.b = actor_bitmap (g, NULL, "FALL", i);
-  fo.dx = actor_bitmap_dx (g, NULL, "FALL", i);
-  fo.dy = actor_bitmap_dy (g, NULL, "FALL", i);
+  fo.dx = actor_dx (g, NULL, "FALL", i);
+  fo.dy = actor_dy (g, NULL, "FALL", i);
 
   if (g->i > 0) g->fo.dx = -g->inertia;
   if (g->i > 2) {
@@ -135,11 +136,11 @@ physics_in (struct actor *g)
         && ! g->fall_immune) {
       g->hurt = true;
       g->splash = true;
-      g->current_lives--;
+      g->current_hp--;
 
-      if (g->i >= 10) g->current_lives = 0;
+      if (g->i >= 10) g->current_hp = 0;
 
-      if (g->current_lives > 0) g->uncrouch_slowly = true;
+      if (g->current_hp > 0) g->uncrouch_slowly = true;
     } else if (g->i > 3) {
       play_audio (&hit_ground_audio, NULL, g->id);
       g->hurt = false;
@@ -153,7 +154,7 @@ physics_in (struct actor *g)
     if (fg (&pmt) == SPIKES_FLOOR
         && ! spikes_floor_at_pos (&pmt)->inactive)
       guard_die_spiked (g);
-    else if (g->current_lives <= 0) {
+    else if (g->current_hp <= 0) {
       play_audio (&hit_ground_fatal_audio, NULL, g->id);
       guard_die_suddenly (g);
       g->death_reason = FALL_DEATH;
@@ -177,7 +178,7 @@ physics_out (struct actor *g)
 
   /* sound */
   if (g->i == 10
-      && g->current_lives > 0) {
+      && g->current_hp > 0) {
     play_audio (&scream_audio, NULL, g->id);
     if (scream)
       switch (g->type) {
@@ -187,10 +188,10 @@ physics_out (struct actor *g)
           guard_scream = true;
         }
         break;
-      case FAT_GUARD:
-        if (! fat_guard_scream) {
+      case FAT:
+        if (! fat_scream) {
           fprintf (stderr, "In MININIM, the fat guard screams...\n");
-          fat_guard_scream = true;
+          fat_scream = true;
         }
         break;
       case VIZIER:

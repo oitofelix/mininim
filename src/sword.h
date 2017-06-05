@@ -21,23 +21,7 @@
 #ifndef MININIM_SWORD_H
 #define MININIM_SWORD_H
 
-/* cga */
-#define C_NORMAL_SWORD "data/sword/c-normal.png"
-#define C_SHINY_SWORD "data/sword/c-shiny.png"
-
-/* ega */
-#define E_NORMAL_SWORD "data/sword/e-normal.png"
-#define E_SHINY_SWORD "data/sword/e-shiny.png"
-
-/* vga */
-#define V_NORMAL_SWORD "data/sword/v-normal.png"
-#define V_SHINY_SWORD "data/sword/v-shiny.png"
-
-void load_sword (void);
-void unload_sword (void);
-ALLEGRO_BITMAP *sword_bitmap (void);
-ALLEGRO_BITMAP *shiny_sword_bitmap (void);
-void draw_sword (ALLEGRO_BITMAP *bitmap, struct pos *p, bool start_pos);
+void draw_sword (ALLEGRO_BITMAP *bitmap, struct pos *p);
 bool is_sword_frame (struct frame *f);
 
 #endif	/* MININIM_SWORD_H */

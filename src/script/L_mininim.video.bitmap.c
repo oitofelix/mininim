@@ -197,8 +197,15 @@ BEGIN_LUA (L_apply_palette)
 
   /* apply palette */
   luaL_checktype (L, 1, LUA_TFUNCTION);
-  void *palette_ptr = (void *) lua_topointer (L, 1);
-  ALLEGRO_BITMAP *r = apply_palette_k (*b, L_palette, palette_ptr);
+
+  void *cache_key;
+  if (lua_isboolean (L, 2) && lua_toboolean (L, 2))
+    cache_key = (void *) lua_topointer (L, 1);
+  else cache_key = (void *) lua_topointer (L, 2);
+
+  lua_settop (L, 1);
+
+  ALLEGRO_BITMAP *r = apply_palette_k (*b, L_palette, cache_key);
   lua_pop (L, 1);
 
   /* push result */
@@ -227,29 +234,36 @@ BEGIN_LUA (draw)
   } else if (L_target_bitmap) target_bitmap = L_target_bitmap;
   else return luaL_error (L, "cannot draw");
 
-  struct coord *c =
-    luaL_checkudata (L, arg_offset + 1, L_MININIM_VIDEO_COORDINATE);
+  struct rect *r =
+    luaL_checkudata (L, arg_offset + 1, L_MININIM_VIDEO_RECTANGLE);
 
   int dx, dy;
-  if (c) arg_offset++;
+  if (r) arg_offset++;
   else if (lua_isnumber (L, arg_offset + 1)
            && lua_isnumber (L, arg_offset + 2)) {
     dx = lua_tonumber (L, arg_offset + 1);
     dy = lua_tonumber (L, arg_offset + 2);
     arg_offset += 2;
   } else return luaL_error (L, "bad argument #%d: %s or %s expected",
-                            arg_offset + 1, L_MININIM_VIDEO_COORDINATE,
+                            arg_offset + 1, L_MININIM_VIDEO_RECTANGLE,
                             "(dx, dy)");
 
   float sx = lua_tonumber (L, arg_offset + 1);
   float sy = lua_tonumber (L, arg_offset + 2);
 
-  float sw = lua_isnumber (L, arg_offset + 3)
-    ? lua_tonumber (L, arg_offset + 3) : get_bitmap_width (*b);
-  float sh = lua_isnumber (L, arg_offset + 4)
-    ? lua_tonumber (L, arg_offset + 4) : get_bitmap_height (*b);
+  float sw;
+  if (lua_isnumber (L, arg_offset + 3))
+    sw = lua_tonumber (L, arg_offset + 3);
+  else if (r && r->w > 0) sw = r->w;
+  else sw = get_bitmap_width (*b);
 
-  if (c) draw_bitmap_regionc (*b, target_bitmap, sx, sy, sw, sh, c, 0);
+  float sh;
+  if (lua_isnumber (L, arg_offset + 4))
+    sh = lua_tonumber (L, arg_offset + 4);
+  else if (r && r->h > 0) sh = r->h;
+  else sh = get_bitmap_height (*b);
+
+  if (r) draw_bitmap_regionc (*b, target_bitmap, sx, sy, sw, sh, &r->c, 0);
   else draw_bitmap_region (*b, target_bitmap, sx, sy, sw, sh, dx, dy, 0);
 
   return 0;
@@ -304,9 +318,9 @@ BEGIN_LUA (sub)
   int y = lua_tonumber (L, 2);
 
   int w = lua_isnumber (L, 3)
-    ? lua_tonumber (L, 3) : get_bitmap_width (*b);
+    ? lua_tonumber (L, 3) : get_bitmap_width (*b) - x;
   int h = lua_isnumber (L, 4)
-    ? lua_tonumber (L, 4) : get_bitmap_height (*b);
+    ? lua_tonumber (L, 4) : get_bitmap_height (*b) - y;
 
   ALLEGRO_BITMAP *sb = al_create_sub_bitmap (*b, x, y, w, h);
   L_pushbitmap (L, sb);

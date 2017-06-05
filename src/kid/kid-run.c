@@ -58,30 +58,41 @@ flow (struct actor *k)
 
   /* constrained turn run */
   if (jump && k->oaction == kid_turn_run
-      && k->constrained_turn_run)
-    move_frame (&k->f, _tb, +0, -4, -4);
+      && k->constrained_turn_run) {
+    k->edge_detection = true;
+    lua_Number dx = -actor_dx (k, "KID", "RUN", "CONSTRAINED_TURN_RUN");
+    move_frame (&k->f, _tb, +0, dx, dx);
+  }
 
   /* constrained run jump */
   if (jump && k->oaction == kid_run_jump) {
     struct pos ptf; surveyo (_tf, +0, +0, pos, &k->f, NULL, &ptf, NULL);
-    if (is_constrained_pos (&ptf, &k->f))
-      move_frame (&k->f, _tb, +0, -4, -4);
+    if (is_constrained_pos (&ptf, &k->f)) {
+      k->edge_detection = true;
+      lua_Number dx = -actor_dx (k, "KID", "RUN", "CONSTRAINED_RUN_JUMP");
+      move_frame (&k->f, _tb, +0, dx, dx);
+    }
   }
 
-  if (jump && k->oaction != kid_run_jump) {
+  if (jump && k->oaction != kid_run_jump
+      && (k->oaction != kid_turn_run
+          || k->constrained_turn_run)) {
     /* platform edge detection */
-    struct coord mf, cm; struct pos pmf;
-    survey (_mf, pos, &k->f, &mf, &pmf, NULL);
+    struct coord tf, cm; struct pos ptf;
+    surveyo (_tf, +4, +0, pos, &k->f, &tf, &ptf, NULL);
     int dir = (k->f.dir == LEFT) ? -1 : +1;
     struct pos p;
-    prel (&pmf, &p, +0, dir * 2);
+    prel (&ptf, &p, +0, dir * 2);
     tile_coord (&p, _m, &cm);
-    if (! (traversable_cs (fg_rel (&pmf, +0, dir * 2))
-           && ! traversable_cs (fg_rel (&pmf, +0, dir))
-           && dist_coord (&mf, &cm) > 2 * PLACE_WIDTH - 3)) {
+    if (traversable_cs (fg_rel (&ptf, +0, dir * 2))
+        && ! traversable_cs (fg_rel (&ptf, +0, dir))
+        && dist_coord (&tf, &cm)
+        > -actor_dx (k, "KID", "RUN", "EDGE_DETECTION_THRESHOLD"))
+      k->edge_detection = true;
+    else {
       kid_run_jump (k);
       return false;
-    } else k->edge_detection = true;
+    }
   }
 
   if (stop && k->oaction != kid_run_jump) {
@@ -125,6 +136,9 @@ physics_in (struct actor *k)
 static void
 physics_out (struct actor *k)
 {
+  /* place on the ground */
+  place_on_the_ground (&k->f, &k->f.c);
+
   /* depressible floors */
   if (k->i == 2) update_depressible_floor (k, -7, -13);
   else if (k->i == 5) update_depressible_floor (k, -5, -30);

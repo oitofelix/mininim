@@ -107,6 +107,9 @@ physics_in (struct actor *g)
 static void
 physics_out (struct actor *g)
 {
+  /* place on the ground */
+  place_on_the_ground (&g->f, &g->f.c);
+
   /* depressible floors */
   keep_depressible_floor (g);
 }

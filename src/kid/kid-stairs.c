@@ -45,9 +45,8 @@ static bool
 flow (struct actor *k)
 {
   if (k->oaction != kid_stairs) {
-    int dx = +3;
-    int dy = +16;
-    place_actor (k, &k->p, dx, dy, "KID", "STAIRS", 0);
+    struct rect r; actor_rect (&r, k, "KID", "STAIRS", "STAIRS");
+    place_actor (k, &k->p, r.c.x, r.c.y, "KID", "STAIRS", 0);
     k->i = k->j = -1;
   }
 

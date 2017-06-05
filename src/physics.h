@@ -73,7 +73,7 @@ struct room_linking *llink (struct level *l, int r);
 
 bool is_traversable (struct pos *p);
 bool is_traversable_fake (struct pos *p);
-bool is_potentially_traversable (struct pos *p);
+bool is_critical (struct pos *p);
 bool is_collidable_at_left (struct pos *p, struct frame *f);
 bool potentially_collidable_at_left_cs (enum tile_fg t);
 bool is_potentially_collidable_at_left (struct pos *p);
@@ -87,7 +87,7 @@ bool carpet_cs (enum tile_fg t);
 bool is_carpet (struct pos *p);
 bool is_arch_top (struct pos *p);
 bool traversable_cs (enum tile_fg t);
-bool potentially_traversable_cs (enum tile_fg t);
+bool critical_cs (enum tile_fg t);
 bool arch_top_cs (enum tile_fg t);
 bool is_door (struct pos *p);
 bool is_floor (struct pos *p);
@@ -126,7 +126,7 @@ bool is_accessible (struct frame *f, coord_f cf, int dx0, int dx1);
 
 struct frame *
 move_frame (struct frame *f, coord_f cf, int dx,
-            int move_left, int move_right);
+            lua_Number move_left, lua_Number move_right);
 
 bool
 uncollide (struct frame *f, struct frame_offset *fo, coord_f cf,
@@ -144,8 +144,9 @@ uncollide_static (struct frame *f,
 int
 dist_collision (struct frame *f, coord_f cf, int left, int right,
                 struct collision_info *ci_ret);
-void enforce_wall_collision (struct frame *f);
-
+void enforce_wall_collision (struct actor *a);
+bool is_in_danger (struct pos *p0, struct frame *f, coord_f cf,
+                   bool *misstep_ret);
 
 
 
@@ -164,12 +165,11 @@ dist_fall (struct frame *f, bool reverse);
 
 
 bool hangable_cs (enum tile_fg t, enum dir d);
-bool is_hangable_pos (struct pos *p, enum dir d);
+bool is_hangable (struct pos *p, enum dir d);
 bool can_hang (struct actor *a, bool reverse, struct pos *hang_pos);
 struct pos *get_hanged_pos (struct pos *hang_pos, enum dir d, struct pos *p);
 enum tile_fg get_hanged_tile (struct pos *hang_pos, enum dir d);
-bool is_hang_pos_critical (struct pos *hang_pos);
-bool is_hang_pos_free (struct pos *hang_pos, enum dir d);
+bool is_free (struct pos *hang_pos, enum dir d);
 
 
 
@@ -189,6 +189,7 @@ void save_depressible_floor (struct actor *a);
 void restore_depressible_floor (struct actor *a);
 void press_depressible_floor (struct pos *p, struct actor *a);
 void unhide_hidden_floor (struct pos *p);
+void keep_all_depressible_floors (void);
 
 
 

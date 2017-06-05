@@ -175,8 +175,8 @@ save_replay (char *filename, struct replay *replay)
   /* time limit */
   if (al_fwrite32le (f, replay->time_limit) != 4) return false;
 
-  /* total lives */
-  if (al_fwrite32le (f, replay->total_lives) != 4) return false;
+  /* total hp */
+  if (al_fwrite32le (f, replay->total_hp) != 4) return false;
 
   /* kca */
   if (al_fwrite32le (f, replay->kca) != 4) return false;
@@ -259,8 +259,8 @@ load_replay (struct replay *replay_ret, char *filename)
   replay.time_limit = al_fread32le (f);
   if (al_feof (f) || al_ferror (f)) return NULL;
 
-  /* total lives */
-  replay.total_lives = al_fread32le (f);
+  /* total hp */
+  replay.total_hp = al_fread32le (f);
   if (al_feof (f) || al_ferror (f)) return NULL;
 
   /* kca */
@@ -518,7 +518,7 @@ set_replay_mode_at_level_start (struct replay *replay)
     replay->start_level = global_level.n;
     replay->start_time = start_level_time;
     replay->time_limit = time_limit;
-    replay->total_lives = total_lives;
+    replay->total_hp = total_hp;
     replay->kca = skill.counter_attack_prob + 1;
     replay->kcd = skill.counter_defense_prob + 1;
     replay->random_seed = random_seed;
@@ -529,7 +529,7 @@ set_replay_mode_at_level_start (struct replay *replay)
     semantics = replay->semantics;
     start_level_time = replay->start_time;
     time_limit = replay->time_limit;
-    total_lives = replay->total_lives;
+    total_hp = replay->total_hp;
     skill.counter_attack_prob = replay->kca - 1;
     skill.counter_defense_prob = replay->kcd - 1;
     random_seed = replay->random_seed;
@@ -550,7 +550,7 @@ replay_gamepad_update (struct actor *a, struct replay *replay, uint64_t cycle)
       ui_msg (-1, "NO FURTHER REPLAY DATA");
   } else get_gamepad_state (&a->key);
 
-  if (replay_mode == RECORD_REPLAY && a->current_lives > 0)
+  if (replay_mode == RECORD_REPLAY && a->current_hp > 0)
     store_replay_gamepad_state (replay, &a->key, cycle);
 }
 
@@ -617,17 +617,17 @@ check_valid_replay_chain_pair (struct replay *r0, struct replay *r1)
       break;
     }
 
-  if (r1->total_lives > r0->final_total_lives)
+  if (r1->total_hp > r0->final_total_hp)
     switch (validate_replay_chain) {
     case READ_VALIDATE_REPLAY_CHAIN:
     case WRITE_VALIDATE_REPLAY_CHAIN:
-      printf ("CHANGED: --total-lives %u --> %u\n",
-              r1->total_lives, r0->final_total_lives);
-      r1->total_lives = r0->final_total_lives;
+      printf ("CHANGED: --total-hp %u --> %u\n",
+              r1->total_hp, r0->final_total_hp);
+      r1->total_hp = r0->final_total_hp;
       changed = true;
       break;
     case NONE_VALIDATE_REPLAY_CHAIN: default:
-      printf ("INVALID: --total-lives\n");
+      printf ("INVALID: --total-hp\n");
       valid = false;
       break;
     }
@@ -686,7 +686,7 @@ print_replay_info (struct replay *replay)
           "Version: %u\n"
           "Initial: --mirror-level=%s --immortal-mode=%s --movements=%s \\\n"
           "  --semantics=%s --start-level=%u --start-time=%u --time-limit=%i \\\n"
-          "  --total-lives=%u --kca=%u --kcd=%u\n"
+          "  --total-hp=%u --kca=%u --kcd=%u\n"
           "Random seed: 0x%X\n"
           "Cycles: %ju\n",
           replay->filename,
@@ -701,7 +701,7 @@ print_replay_info (struct replay *replay)
           replay->start_level,
           replay->start_time,
           replay->time_limit,
-          replay->total_lives,
+          replay->total_hp,
           replay->kca,
           replay->kcd,
           replay->random_seed,
@@ -717,7 +717,7 @@ print_replay_results (struct replay *replay)
           "Final: --mirror-level=%s --immortal-mode=%s --movements=%s \\\n"
           "  --semantics=%s --start-level=%u --start-time=%ju"
           " --time-limit=%i \\\n"
-          "  --total-lives=%u --kca=%i --kcd=%i\n",
+          "  --total-hp=%u --kca=%i --kcd=%i\n",
           replay->complete ? "YES" : "NO",
           replay_incomplete_str (replay->reason),
           replay->packed_boolean_config & PACKED_CONFIG_MIRROR_LEVEL_BIT
@@ -729,7 +729,7 @@ print_replay_results (struct replay *replay)
           replay->start_level + 1,
           replay->start_time + replay->packed_gamepad_state_nmemb,
           replay->time_limit,
-          replay->final_total_lives,
+          replay->final_total_hp,
           replay->final_kca,
           replay->final_kcd);
   fflush (stdout);

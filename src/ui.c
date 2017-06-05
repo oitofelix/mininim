@@ -163,8 +163,8 @@ static void ui_resurrect (void);
 static void ui_kill_enemy (void);
 static void ui_float (void);
 static void ui_immortal (bool immortal);
-static void ui_fill_life (void);
-static void ui_add_life (void);
+static void ui_fill_hp (void);
+static void ui_add_hp (void);
 static void ui_change_time (int m);
 static void ui_change_prob_skill (int *skill, int new);
 static void ui_change_kca (int d);
@@ -203,9 +203,9 @@ ALLEGRO_BITMAP *small_logo_icon,
   *nav_left_icon, *nav_right_icon, *nav_above_icon, *nav_below_icon,
   *nav_home_icon, *repeat_icon, *compass_icon, *compass2_icon,
   *drawing_icon, *first_icon, *last_icon, *jump_icon, *original_icon,
-  *guard_icon, *fat_guard_icon, *vizier_icon, *skeleton_icon, *shadow_icon,
-  *resurrect_icon, *death_icon, *feather_icon, *angel_icon, *life_empty_icon,
-  *life_full_icon, *skills_icon, *time_icon, *time_add_icon, *time_sub_icon,
+  *guard_icon, *fat_icon, *vizier_icon, *skeleton_icon, *shadow_icon,
+  *resurrect_icon, *death_icon, *feather_icon, *angel_icon, *hp_empty_icon,
+  *hp_full_icon, *skills_icon, *time_icon, *time_add_icon, *time_sub_icon,
   *attack_icon, *attack_add_icon, *attack_sub_icon, *defense_icon,
   *defense_add_icon, *defense_sub_icon, *counter_attack_icon,
   *counter_attack_add_icon, *counter_attack_sub_icon, *counter_defense_icon,
@@ -299,7 +299,7 @@ load_icons (void)
   jump_icon = load_icon (JUMP_ICON);
   original_icon = load_icon (ORIGINAL_ICON);
   guard_icon = load_icon (GUARD_ICON);
-  fat_guard_icon = load_icon (FAT_GUARD_ICON);
+  fat_icon = load_icon (FAT_ICON);
   vizier_icon = load_icon (VIZIER_ICON);
   skeleton_icon = load_icon (SKELETON_ICON);
   shadow_icon = load_icon (SHADOW_ICON);
@@ -307,8 +307,8 @@ load_icons (void)
   death_icon = load_icon (DEATH_ICON);
   feather_icon = load_icon (FEATHER_ICON);
   angel_icon = load_icon (ANGEL_ICON);
-  life_empty_icon = load_icon (LIFE_EMPTY_ICON);
-  life_full_icon = load_icon (LIFE_FULL_ICON);
+  hp_empty_icon = load_icon (HP_EMPTY_ICON);
+  hp_full_icon = load_icon (HP_FULL_ICON);
   skills_icon = load_icon (SKILLS_ICON);
   time_icon = load_icon (TIME_ICON);
   time_add_icon = load_icon (TIME_ADD_ICON);
@@ -408,7 +408,7 @@ unload_icons (void)
   destroy_bitmap (jump_icon);
   destroy_bitmap (original_icon);
   destroy_bitmap (guard_icon);
-  destroy_bitmap (fat_guard_icon);
+  destroy_bitmap (fat_icon);
   destroy_bitmap (vizier_icon);
   destroy_bitmap (skeleton_icon);
   destroy_bitmap (shadow_icon);
@@ -416,8 +416,8 @@ unload_icons (void)
   destroy_bitmap (death_icon);
   destroy_bitmap (feather_icon);
   destroy_bitmap (angel_icon);
-  destroy_bitmap (life_empty_icon);
-  destroy_bitmap (life_full_icon);
+  destroy_bitmap (hp_empty_icon);
+  destroy_bitmap (hp_full_icon);
   destroy_bitmap (skills_icon);
   destroy_bitmap (time_icon);
   destroy_bitmap (time_add_icon);
@@ -674,8 +674,7 @@ menu_sep (char const *title_template, ...)
                     NULL, false, title_template, ap);
   else
     r = vmenu_item (SEP_MID + i, ALLEGRO_MENU_ITEM_DISABLED, NULL, false,
-                    title_template ? title_template : "",
-                    title_template ? ap : NULL);
+                    title_template ? title_template : "", ap);
 
   va_end (ap);
   return r;
@@ -1073,7 +1072,7 @@ gm_icon (enum gm gm)
   switch (gm) {
   case ORIGINAL_GM: return original_icon; break;
   case GUARD_GM: return guard_icon; break;
-  case FAT_GUARD_GM: return fat_guard_icon; break;
+  case FAT_GM: return fat_icon; break;
   case VIZIER_GM: return vizier_icon; break;
   case SKELETON_GM: return skeleton_icon; break;
   case SHADOW_GM: return shadow_icon; break;
@@ -1090,8 +1089,8 @@ gm_menu (intptr_t index)
   menu_citem (GUARD_GM_MID, true, gm == GUARD_GM,
               gm_icon (GUARD_GM), "&Guard");
 
-  menu_citem (FAT_GUARD_GM_MID, true, gm == FAT_GUARD_GM,
-              gm_icon (FAT_GUARD_GM), "&Fat guard");
+  menu_citem (FAT_GM_MID, true, gm == FAT_GM,
+              gm_icon (FAT_GM), "&Fat guard");
 
   menu_citem (VIZIER_GM_MID, true, gm == VIZIER_GM,
               gm_icon (VIZIER_GM), "&Vizier");
@@ -1350,30 +1349,30 @@ cheat_menu (intptr_t index)
   menu_sitem (KILL_ENEMY_MID, k && k->enemy_id > 0,
               death_icon, "&Kill enemy (K)");
 
-  menu_sitem (RESURRECT_MID, k && k->current_lives <= 0,
+  menu_sitem (RESURRECT_MID, k && k->current_hp <= 0,
               resurrect_icon, "&Resurrect (R)");
 
   menu_citem (IMMORTAL_MID, true, immortal_mode, angel_icon,
               "&Immortal (I)");
 
   menu_sitem (FLOAT_MID, k
-              && (k->current_lives > 0 || k->action == kid_fall)
+              && (k->current_hp > 0 || k->action == kid_fall)
               && (k->float_timer == 0
                   || k->float_timer >= REFLOAT_MENU_THRESHOLD),
               feather_icon, "&Float (Shift+W)");
 
-  menu_sitem (FILL_LIFE_MID, k && k->current_lives > 0
-              && k->current_lives < k->total_lives,
-              life_empty_icon, "Fill &single container (Shift+S)");
+  menu_sitem (FILL_HP_MID, k && k->current_hp > 0
+              && k->current_hp < k->total_hp,
+              hp_empty_icon, "Fill &HP (Shift+S)");
 
-  menu_sitem (ADD_LIFE_MID,
-              k && k->current_lives > 0
-              && (k->current_lives < k->total_lives
-                  || k->total_lives < MAX_LIVES),
-              life_full_icon,
-              (! k || k->total_lives < MAX_LIVES)
-              ? "&Add container (Shift+T)"
-              : "Fill &all containers (Shift+T)");
+  menu_sitem (ADD_HP_MID,
+              k && k->current_hp > 0
+              && (k->current_hp < k->total_hp
+                  || k->total_hp < MAX_HP),
+              hp_full_icon,
+              (! k || k->total_hp < MAX_HP)
+              ? "&Add HP (Shift+T)"
+              : "Fill &all HP (Shift+T)");
 
   menu_sub (TIME_CHANGE_MID, true, time_icon, time_change_menu, 0, "&Time");
   menu_sub (KCA_CHANGE_MID, true, counter_attack_icon,
@@ -1682,8 +1681,8 @@ menu_mid (ALLEGRO_EVENT *event)
   case GUARD_GM_MID:
     ui_gm (GUARD_GM);
     break;
-  case FAT_GUARD_GM_MID:
-    ui_gm (FAT_GUARD_GM);
+  case FAT_GM_MID:
+    ui_gm (FAT_GM);
     break;
   case VIZIER_GM_MID:
     ui_gm (VIZIER_GM);
@@ -1704,16 +1703,16 @@ menu_mid (ALLEGRO_EVENT *event)
     ui_em (PALACE);
     break;
   case VGA_MID:
-    ui_vm ("VGA");
+    ui_vm ("DOS VGA");
     break;
   case EGA_MID:
-    ui_vm ("EGA");
+    ui_vm ("DOS EGA");
     break;
   case CGA_MID:
-    ui_vm ("CGA");
+    ui_vm ("DOS CGA");
     break;
   case HGC_MID:
-    ui_vm ("HGC");
+    ui_vm ("DOS HGA");
     break;
   case FLIP_SCREEN_VERTICAL_MID:
     ui_flip_screen (screen_flags ^ ALLEGRO_FLIP_VERTICAL, false, false);
@@ -1820,11 +1819,11 @@ menu_mid (ALLEGRO_EVENT *event)
   case IMMORTAL_MID:
     ui_immortal (! immortal_mode);
     break;
-  case FILL_LIFE_MID:
-    ui_fill_life ();
+  case FILL_HP_MID:
+    ui_fill_hp ();
     break;
-  case ADD_LIFE_MID:
-    ui_add_life ();
+  case ADD_HP_MID:
+    ui_add_hp ();
     break;
   case TIME_ADD_MID:
     ui_change_time (+10);
@@ -2060,8 +2059,8 @@ level_key_bindings (void)
   else if (was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_F11))
       switch (gm) {
       case ORIGINAL_GM: ui_gm (GUARD_GM); break;
-      case GUARD_GM: ui_gm (FAT_GUARD_GM); break;
-      case FAT_GUARD_GM: ui_gm (VIZIER_GM); break;
+      case GUARD_GM: ui_gm (FAT_GM); break;
+      case FAT_GM: ui_gm (VIZIER_GM); break;
       case VIZIER_GM: ui_gm (SKELETON_GM); break;
       case SKELETON_GM: ui_gm (SHADOW_GM); break;
       case SHADOW_GM: ui_gm (ORIGINAL_GM); break;
@@ -2253,13 +2252,13 @@ level_key_bindings (void)
   else if (was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_W))
     ui_float ();
 
-  /* SHIFT+S: incremet kid current lives */
+  /* SHIFT+S: incremet kid current hp */
   else if (was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_S))
-    ui_fill_life ();
+    ui_fill_hp ();
 
-  /* SHIFT+T: incremet kid total lives */
+  /* SHIFT+T: incremet kid total hp */
   else if (was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_T))
-    ui_add_life ();
+    ui_add_hp ();
 
   /* SPACE: display remaining time */
   else if (! active_menu
@@ -2600,9 +2599,9 @@ ui_gm (enum gm new_gm)
     gm = GUARD_GM;
     value = "GUARD";
     break;
-  case FAT_GUARD_GM:
-    gm = FAT_GUARD_GM;
-    value = "FAT-GUARD";
+  case FAT_GM:
+    gm = FAT_GM;
+    value = "FAT";
     break;
   case VIZIER_GM:
     gm = VIZIER_GM;
@@ -2671,6 +2670,8 @@ ui_vm (char *requested_vm)
   char *key = "VIDEO MODE";
   ui_msg (0, "%s: %s", key, video_mode);
   ui_save_setting (NULL, key, video_mode);
+
+  draw_bottom_text (uscreen, NULL, 0);
 }
 
 void
@@ -3026,7 +3027,7 @@ ui_immortal (bool immortal)
     char *key = "IMMORTAL MODE";
     char *value = immortal ? "ON" : "OFF";
     struct actor *k = get_actor_by_id (current_kid_id);
-    if (k->current_lives <= 0 && immortal) kid_resurrect (k);
+    if (k->current_hp <= 0 && immortal) kid_resurrect (k);
     immortal_mode = immortal;
     k->immortal = immortal;
     ui_msg (0, "%s: %s", key, value);
@@ -3035,21 +3036,21 @@ ui_immortal (bool immortal)
 }
 
 void
-ui_fill_life (void)
+ui_fill_hp (void)
 {
   if (replay_mode == NO_REPLAY) {
     struct actor *k = get_actor_by_id (current_kid_id);
-    increase_kid_current_lives (k);
+    increase_kid_current_hp (k);
   } else print_replay_mode (0);
 }
 
 void
-ui_add_life (void)
+ui_add_hp (void)
 {
   if (replay_mode == NO_REPLAY) {
     struct actor *k = get_actor_by_id (current_kid_id);
-    increase_kid_total_lives (k);
-    total_lives = k->total_lives;
+    increase_kid_total_hp (k);
+    total_hp = k->total_hp;
   } else print_replay_mode (0);
 }
 
@@ -3353,8 +3354,8 @@ ui_get_setting (char *section, char *key)
 
  error:
   if (config) al_destroy_config (config);
-  error (0, al_get_errno (), "can't get setting '[%s] %s' from '%s'",
-         section, key, config_filename);
+  /* error (0, al_get_errno (), "can't get setting '[%s] %s' from '%s'", */
+  /*        section, key, config_filename); */
   return NULL;
 }
 

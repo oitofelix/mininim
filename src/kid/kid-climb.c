@@ -58,22 +58,20 @@ flow (struct actor *k)
   }
 
   if (k->i == -1) {
-    int dir = (k->f.dir == LEFT) ? 0 : 1;
-    int dx = PLACE_WIDTH * dir + 9;
-    int dy = -9;
-    place_actor (k, &k->hang_pos, dx, dy, "KID", "CLIMB", 0);
+    struct rect r; actor_rect (&r, k, "KID", "CLIMB", "CLIMB");
+    place_actor (k, &k->hang_pos, r.c.x, r.c.y, "KID", "CLIMB", 0);
   }
 
   if (k->wait == DOOR_WAIT_LOOK && k->i < 14) k->i++;
 
   select_actor_frame (k, "KID", "CLIMB", k->i);
 
-  /* climbing when looking left should let the kid near to the edge
-     if it's not a door */
-  if (k->f.dir == LEFT && k->fo.dx != 0
-      && k->i % 2
-      && fg (&hanged_pos) != DOOR)
-    k->fo.dx += 1;
+  /* climbing a door when looking left should leave the kid farther
+     from the edge to avoid collision with its grid */
+  if (k->f.dir == LEFT
+      && k->fo.dx < 0
+      && fg (&hanged_pos) == DOOR)
+    k->fo.dx += -1;
 
   if (k->i == 3 && k->wait < DOOR_WAIT_LOOK)
     k->fo.dx = 0, k->fo.dy = 0;
@@ -85,7 +83,8 @@ static bool
 physics_in (struct actor *k)
 {
   /* fall */
-  if (is_falling (&k->f, _tf, +0, +0)) {
+  if (is_falling (&k->f, _tf, +0, +0)
+      && is_falling (&k->f, _mt, +0, +0)) {
     kid_fall (k);
     return false;
   }
@@ -110,19 +109,18 @@ physics_in (struct actor *k)
 static void
 physics_out (struct actor *k)
 {
-  struct pos hanged_pos;
+  /* place on the ground */
+  if (k->i >= 10) place_on_the_ground (&k->f, &k->f.c);
 
   /* depressible floors */
-  clear_depressible_floor (k);
-  get_hanged_pos (&k->hang_pos, k->f.dir, &hanged_pos);
-  press_depressible_floor (&hanged_pos, k);
+  keep_depressible_floor (k);
 }
 
 bool
 is_kid_climb (struct actor *k)
 {
   return (k->action == kid_climb || k->action == kid_unclimb)
-    && k->i <= 9;
+    /* && k->i <= 9 */;
 }
 
 bool
@@ -138,5 +136,5 @@ is_kid_successfully_climbing_at_pos (struct actor *k, struct pos *hang_pos,
 bool
 is_kid_successfully_climbing (struct actor *k)
 {
-  return k->action == kid_climb && k->i >= 4;
+  return is_kid_climb (k) && k->i >= 4;
 }

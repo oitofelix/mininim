@@ -24,7 +24,7 @@ struct chomper *chomper = NULL;
 size_t chomper_nmemb = 0;
 
 static void draw_blade (ALLEGRO_BITMAP *bitmap, struct pos *p,
-                        struct chomper *ch, int i, int w);
+                        struct chomper *ch, int i, lua_Number w);
 
 struct chomper *
 init_chomper (struct pos *p, struct chomper *c)
@@ -183,15 +183,15 @@ compute_chompers (void)
           || is_actor_fall (a)
           || a->immortal
           || a->chomper_immune
-          || (a->action == kid_walk && a->walk != -1)
           || is_collidable_at_right (&pl, &a->f))
         continue;
       struct pos pbf, pbb;
-      survey (_bf, pos, &a->f, NULL, &pbf, NULL);
-      survey (_bb, pos, &a->f, NULL, &pbb, NULL);
+      surveyo (_bf, -2, +0, pos, &a->f, NULL, &pbf, NULL);
+      surveyo (_bb, +0, +0, pos, &a->f, NULL, &pbb, NULL);
       pos2room (&pbf, c->p.room, &pbf);
       pos2room (&pbb, c->p.room, &pbb);
-      if ((((pbf.room == c->p.room
+      if (a->ignore_danger != 1
+          && (((pbf.room == c->p.room
              && pbf.floor == c->p.floor)
             || (pbb.room == c->p.room
                 && pbb.floor == c->p.floor))
@@ -215,14 +215,14 @@ compute_chompers (void)
 
 void
 draw_blade (ALLEGRO_BITMAP *bitmap, struct pos *p, struct chomper *ch,
-            int i, int w)
+            int i, lua_Number w)
 {
   draw_object_index_part_width (bitmap, "CHOMPER", i, "MAIN", p, w);
 
-  struct coord cl; coord_object_index_part (&cl, "CHOMPER", i, "MAIN", p);
-  struct coord cb; coord_object_index_part (&cb, "CHOMPER", i, "BLOOD", p);
+  struct rect rl; rect_object_index_part (&rl, "CHOMPER", i, "MAIN", p);
+  struct rect rb; rect_object_index_part (&rb, "CHOMPER", i, "BLOOD", p);
 
-  int bw = fabs (cb.x - cl.x);
+  double bw = w - fabs (rb.c.x - rl.c.x);
 
   if (ch && ch->blood)
     draw_object_index_part_width (bitmap, "CHOMPER", i, "BLOOD", p, bw);
@@ -243,16 +243,24 @@ draw_chomper (ALLEGRO_BITMAP *bitmap, struct pos *p)
 }
 
 void
-draw_chomper_fg (ALLEGRO_BITMAP *bitmap, struct pos *p)
+draw_chomper_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f)
 {
-  if (is_fake (p)) {
+  switch (should_draw_face (p, f, LEFT)) {
+  case SHOULD_DRAW_FULL: {
+    struct chomper *ch = chomper_at_pos (p);
+    if (! ch) return;
+    draw_blade (bitmap, p, ch, ch->i + 1, CHOMPER_FG_WIDTH + 3);
+    break;
+  }
+  case SHOULD_DRAW_PART:
     draw_blade (bitmap, p, NULL, abs (ext (p)) % 5 + 1,
                 CHOMPER_FG_WIDTH);
-    return;
+    break;
+  case SHOULD_DRAW_NONE: default: {
+    struct chomper *ch = chomper_at_pos (p);
+    if (! ch) return;
+    draw_blade (bitmap, p, ch, ch->i + 1, CHOMPER_FG_WIDTH);
+    break;
   }
-
-  struct chomper *ch = chomper_at_pos (p);
-  if (! ch) return;
-
-  draw_blade (bitmap, p, ch, ch->i + 1, CHOMPER_FG_WIDTH);
+  }
 }

@@ -48,12 +48,13 @@ flow (struct actor *k)
     return false;
   }
 
-  if (k->i == -1) k->j = 10;
-  if (k->i == 0) k->j = 17;
-
   if (k->oaction == kid_sword_attack) k->i = 0;
 
   select_actor_frame (k, "KID", "SWORD_WALKB", k->i + 1);
+
+  if (k->i == 0) k->j = 10;
+  if (k->i == 1) k->j = 17;
+
   select_actor_xframe (k, "KID", "SWORD", k->j);
 
   return true;
@@ -78,6 +79,9 @@ physics_in (struct actor *k)
 static void
 physics_out (struct actor *k)
 {
+  /* place on the ground */
+  place_on_the_ground (&k->f, &k->f.c);
+
   /* depressible floors */
   if (k->i == 1) update_depressible_floor (k, -1, -24);
   else keep_depressible_floor (k);

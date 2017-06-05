@@ -549,29 +549,29 @@ guard_skill_undo (struct guard_skill_undo *d, int dir)
   if (a) a->skill = g->skill;
 }
 
-/***************/
-/* GUARD LIVES */
-/***************/
+/************/
+/* GUARD HP */
+/************/
 
 void
-register_guard_lives_undo (struct undo *u, int i, int l, char *desc)
+register_guard_hp_undo (struct undo *u, int i, int l, char *desc)
 {
   struct guard *g = guard (&global_level, i);
-  if (g->total_lives == l) return;
+  if (g->total_hp == l) return;
 
   struct indexed_int_undo *d = xmalloc (sizeof (* d));
   d->i = i;
   d->b = l;
-  d->f = g->total_lives;
-  register_undo (u, d, (undo_f) guard_lives_undo, desc);
-  guard_lives_undo (d, +1);
+  d->f = g->total_hp;
+  register_undo (u, d, (undo_f) guard_hp_undo, desc);
+  guard_hp_undo (d, +1);
 }
 
 void
-guard_lives_undo (struct indexed_int_undo *d, int dir)
+guard_hp_undo (struct indexed_int_undo *d, int dir)
 {
   struct guard *g = guard (&global_level, d->i);
-  g->total_lives = (dir >= 0) ? d->f : d->b;
+  g->total_hp = (dir >= 0) ? d->f : d->b;
 }
 
 /**************/

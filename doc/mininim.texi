@@ -768,28 +768,28 @@ by the kid by pressing the shift key.
   @tab @center @image{mininim-figures/empty-potion}
   @tab This potion has no bubbles and no effect.
 
-  @extindex SMALL_LIFE_POTION
-  @item @code{SMALL_LIFE_POTION}
-  @tab @center @image{mininim-figures/small-life-potion}
-  @tab This potion has red bubbles and recovers one life point.
+  @extindex SMALL_HP_POTION
+  @item @code{SMALL_HP_POTION}
+  @tab @center @image{mininim-figures/small-hp-potion}
+  @tab This potion has red bubbles and recovers one HP.
 
-  @extindex BIG_LIFE_POTION
-  @item @code{BIG_LIFE_POTION}
-  @tab @center @image{mininim-figures/big-life-potion}
-  @tab This potion has red bubbles, adds one life point container and
-  recover all life points.
+  @extindex BIG_HP_POTION
+  @item @code{BIG_HP_POTION}
+  @tab @center @image{mininim-figures/big-hp-potion}
+  @tab This potion has red bubbles, adds one HP and
+  recover all empty HP.
 
   @extindex SMALL_POISON_POTION
   @item @code{SMALL_POISON_POTION}
   @tab @center @image{mininim-figures/small-poison-potion}
-  @tab This potion has blue bubbles and takes one life point.  It has
+  @tab This potion has blue bubbles and takes one HP.  It has
   the same graphics as @code{ACTIVATION_POTION}.
 
   @extindex BIG_POISON_POTION
   @item @code{BIG_POISON_POTION}@footnote{The big poison potion is not
   available in the original game.}
   @tab @center @image{mininim-figures/big-poison-potion}
-  @tab This potion has blue bubbles and takes all life point,
+  @tab This potion has blue bubbles and takes all HP,
   effectively killing the kid.
 
   @extindex FLOAT_POTION
@@ -1347,7 +1347,7 @@ encounters a @emph{non-strictly traversable} tile or hangs at a
 
 If the kid hits a @emph{non-traversable} tile with sufficient
 speed, he is harmed or can even die.  Falling from a height of one floor
-inflicts no damage on him.  Two floors takes one life point.  Three or
+inflicts no damage on him.  Two floors takes one HP.  Three or
 more kills him instantly.
 
 @subsection Falling hang
@@ -1445,7 +1445,7 @@ the kid may counter defend and the process restarts at the kid's counter
 attack stage, making for a chain of counter attacks and counter defenses
 whose length is determined only by the fighters' skills (and a little
 bit of luck).  Every counter attack that is not responded with a counter
-defense by the opponent, makes him lose a life point.
+defense by the opponent, makes him lose a HP.
 
 When standing still in this mode, releasing @kbd{UP} initiates an attack
 (but at the same time makes the kid briefly vulnerable to the enemy's
@@ -1602,13 +1602,13 @@ default mode is mortal.  Related to option @option{--immortal-mode}.
 
 @kindex SHIFT+S
 @item SHIFT+S
-Increment kid's current life points.
+Increment kid's current HP.
 
 @kindex SHIFT+T
-@cindex @code{--total-lives}, related key binding
+@cindex @code{--total-hp}, related key binding
 @item SHIFT+T
-Increment kid's total life points.  Related to option
-@option{--total-lives}.
+Increment kid's total HP.  Related to option
+@option{--total-hp}.
 @end table
 
 @node Kid special
@@ -2148,10 +2148,10 @@ Set kid's counter defense skill to @var{n}.  The default is @samp{0}.
 Valid integers range from @samp{0} to @samp{100}.  This can be changed
 in-game by the @kbd{ALT+=} and @kbd{ALT+-} key bindings.
 
-@optindex --total-lives
+@optindex --total-hp
 @cindex @kbd{SHIFT+T}, related option
-@item --total-lives=N
-Make the kid start with @var{n} total lives.  The default is @samp{3}.
+@item --total-hp=N
+Make the kid start with @var{n} total HP.  The default is @samp{3}.
 Valid integers range from @samp{1} to @samp{10}.  This can be changed
 in-game by the @kbd{SHIFT+T} key binding.
 @end table
@@ -3044,10 +3044,10 @@ have the following meanings:
 @code{EMPTY_POTION}
 @mcindex E>TES
 @item S
-@code{SMALL_LIFE_POTION}
+@code{SMALL_HP_POTION}
 @mcindex E>TEB
 @item B
-@code{BIG_LIFE_POTION}
+@code{BIG_HP_POTION}
 @mcindex E>TEP
 @item P
 @code{SMALL_POISON_POTION}
@@ -3854,8 +3854,8 @@ below.
 
 Like the kid, each guard has a starting position and facing direction,
 but naturally, every guard starts with a sword in his possession.  Each
-guard also has an arbitrary number of total lives.@footnote{In the
-original game the number of total lives is fixed per level and can't be
+guard also has an arbitrary number of total HP.@footnote{In the
+original game the number of total HP is fixed per level and can't be
 changed.}
 
 Each guard also has its own set of skills which influence how strong
@@ -3913,8 +3913,8 @@ which are not interpreted as percentage.
 How many cycles the guard is kept still after being hit, before being
 able to advance and attack.
 
-@item Extra lives
-How many lives to add to the common total lives.
+@item Extra HP
+How many HP to add to the common total HP.
 @end table
 
 This non-terminal command has sub-commands for setting all these
@@ -4058,7 +4058,7 @@ that are not probability-based.
 Refraction period
 @mcindex E>GKX
 @item X
-Extra lives
+Extra HP
 @end table
 
 Each one of these sub-commands is an integer input whose parameter
@@ -4077,19 +4077,19 @@ always starts at 0.
 
 @center @kbd{GjKL>L.SKILL 0-11:i}
 
-@node Lives E>GL
-@subsection Lives: E>GL
-@cindex level editor, guard lives
-@cindex guard lives, level editor
-@mcindex E>GL
+@node HP E>GH
+@subsection HP: E>GH
+@cindex level editor, guard HP
+@cindex guard HP, level editor
+@mcindex E>GH
 
-This command is used to set the total lives of the currently selected
+This command is used to set the total HP of the currently selected
 guard.  It's an integer input whose parameter @var{i} represents the
-guard's amount of lives.  @xref{Integer input}.
+guard's amount of HP.  @xref{Integer input}.
 
-@center @kbd{GjL>LIVES 0->:i}
+@center @kbd{GjL>HP 0->:i}
 
-@kbd{BACKSPACE} confirms the new total lives value, while @kbd{/}
+@kbd{BACKSPACE} confirms the new total HP value, while @kbd{/}
 maintains the current one.  If set to 0, the guard dies alone when the
 level starts.
 
@@ -4307,7 +4307,7 @@ the engine, including:
 @item Arbitrary number of guards per room.
 @item Guard type selected per guard.
 @item Guard style applicable to all guard types.
-@item Total lives and skills @emph{fine-tuned} per guard.
+@item Total HP and skills @emph{fine-tuned} per guard.
 @item Usable room 0.
 @item Arbitrary room linking.
 @item Hue selected per level.
@@ -4462,12 +4462,12 @@ direction.  0 is @code{LEFT}, 1 is @code{RIGHT}.
 @end table
 
 
-@node Guard skill and lives GiK
-@section Guard skill and lives: GiK
-@cindex native level format, guard skill and lives
-@cindex guard skill and lives, native level format
+@node Guard skill and HP GiK
+@section Guard skill and HP: GiK
+@cindex native level format, guard skill and HP
+@cindex guard skill and HP, native level format
 
-Guard skill (see @ref{Skill E>GK}) and lives (see @ref{Lives E>GL}) are
+Guard skill (see @ref{Skill E>GK}) and HP (see @ref{HP E>GH}) are
 given by this key.  Each probability value is an integer between -1 (0%)
 and 99 (100%), inclusive.
 
@@ -4491,9 +4491,9 @@ return probability.
 @item f
 refraction period.  Non-negative integer.
 @item x
-extra lives.  Non-negative integer.
+extra HP.  Non-negative integer.
 @item l
-lives.  Non-negative integer.
+HP.  Non-negative integer.
 @end table
 
 
@@ -4642,9 +4642,9 @@ Tiles are given by this key. @xref{Tile E>T}.
 @item 1
 @code{EMPTY_POTION}
 @item 2
-@code{SMALL_LIFE_POTION}
+@code{SMALL_HP_POTION}
 @item 3
-@code{BIG_LIFE_POTION}
+@code{BIG_HP_POTION}
 @item 4
 @code{SMALL_POISON_POTION}
 @item 5

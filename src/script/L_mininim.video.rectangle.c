@@ -24,6 +24,8 @@ static DECLARE_LUA (__eq);
 static DECLARE_LUA (__index);
 static DECLARE_LUA (__newindex);
 static DECLARE_LUA (__tostring);
+static DECLARE_LUA (__add);
+static DECLARE_LUA (__sub);
 
 static DECLARE_LUA (draw);
 
@@ -48,6 +50,14 @@ define_L_mininim_video_rectangle (lua_State *L)
   lua_pushcfunction (L, __tostring);
   lua_rawset (L, -3);
 
+  lua_pushstring (L, "__add");
+  lua_pushcfunction (L, __add);
+  lua_rawset (L, -3);
+
+  lua_pushstring (L, "__sub");
+  lua_pushcfunction (L, __sub);
+  lua_rawset (L, -3);
+
   lua_pop (L, 1);
 }
 
@@ -62,23 +72,14 @@ L_pushrectangle (lua_State *L, struct rect *r)
 
 BEGIN_LUA (L_mininim_video_rectangle)
 {
-  struct coord *c = luaL_checkudata (L, 1, L_MININIM_VIDEO_COORDINATE);
+  int room;
+  lua_Number x, y, w, h;
 
-  int room, x, y, w, h;
-
-  if (c) {
-    room = c->room;
-    x = c->x;
-    y = c->y;
-    w = lua_tonumber (L, 2);
-    h = luaL_checknumber (L, 3);
-  } else {
-    room = lua_tonumber (L, 1);
-    x = lua_tonumber (L, 2);
-    y = lua_tonumber (L, 3);
-    w = lua_tonumber (L, 4);
-    h = lua_tonumber (L, 5);
-  }
+  x = lua_tonumber (L, 1);
+  y = lua_tonumber (L, 2);
+  w = lua_tonumber (L, 3);
+  h = lua_tonumber (L, 4);
+  room = lua_tonumber (L, 5);
 
   struct rect r;
   new_rect (&r, room, x, y, w, h);
@@ -108,10 +109,7 @@ BEGIN_LUA (__index)
   switch (type) {
   case LUA_TSTRING:
     key = lua_tostring (L, 2);
-    if (! strcasecmp (key, "coordinate")) {
-      L_pushcoordinate (L, &r->c);
-      return 1;
-    } else if (! strcasecmp (key, "room")) {
+    if (! strcasecmp (key, "room")) {
       lua_pushnumber (L, r->c.room);
       return 1;
     } else if (! strcasecmp (key, "x")) {
@@ -149,12 +147,7 @@ BEGIN_LUA (__newindex)
   switch (type) {
   case LUA_TSTRING:
     key = lua_tostring (L, 2);
-    if (! strcasecmp (key, "coordinate")) {
-      struct coord *c =luaL_checkudata (L, 3, L_MININIM_VIDEO_COORDINATE);
-      if (! c) return 0;
-      r->c = *c;
-      return 0;
-    } else if (! strcasecmp (key, "room")) {
+    if (! strcasecmp (key, "room")) {
       r->c.room = lua_tonumber (L, 3);
       return 0;
     } else if (! strcasecmp (key, "x")) {
@@ -180,9 +173,42 @@ END_LUA
 BEGIN_LUA (__tostring)
 {
   struct rect *r = luaL_checkudata (L, 1, L_MININIM_VIDEO_RECTANGLE);
-  lua_pushfstring (L, L_MININIM_VIDEO_RECTANGLE " (%d, %d, %d, %d)",
+  lua_pushfstring (L, L_MININIM_VIDEO_RECTANGLE " (%d, %f, %f, %f, %f)",
+                   r ? r->c.room : -1,
                    r ? r->c.x : -1, r ? r->c.y : -1,
                    r ? r->w : -1, r ? r->h : -1);
+  return 1;
+}
+END_LUA
+
+BEGIN_LUA (__add)
+{
+  struct rect *r0 = luaL_checkudata (L, 1, L_MININIM_VIDEO_RECTANGLE);
+  struct rect *r1 = luaL_checkudata (L, 2, L_MININIM_VIDEO_RECTANGLE);
+
+  if (! r0 || ! r1) return 0;
+
+  struct rect r;
+  new_rect (&r, r0->c.room, r0->c.x + r1->c.x, r0->c.y + r1->c.y,
+            r0->w + r1->w, r0->h + r1->h);
+  L_pushrectangle (L, &r);
+
+  return 1;
+}
+END_LUA
+
+BEGIN_LUA (__sub)
+{
+  struct rect *r0 = luaL_checkudata (L, 1, L_MININIM_VIDEO_RECTANGLE);
+  struct rect *r1 = luaL_checkudata (L, 2, L_MININIM_VIDEO_RECTANGLE);
+
+  if (! r0 || ! r1) return 0;
+
+  struct rect r;
+  new_rect (&r, r0->c.room, r0->c.x - r1->c.x, r0->c.y - r1->c.y,
+            r0->w - r1->w, r0->h - r1->h);
+  L_pushrectangle (L, &r);
+
   return 1;
 }
 END_LUA

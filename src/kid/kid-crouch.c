@@ -50,6 +50,9 @@ kid_crouch_collision (struct actor *k)
   int dy = +27;
   place_actor (k, &k->ci.kid_p, dx, dy, "KID", "CROUCH", 0);
 
+  /* collision is detected after actor's next frame has been selected */
+  k->i--;
+
   kid_crouch (k);
 }
 
@@ -72,7 +75,7 @@ flow (struct actor *k)
   enum tile_fg ctf;
 
   if (k->oaction != kid_crouch) {
-    k->i = -1; k->fall = k->collision = k->misstep = false;
+    k->i = -1; k->fall = k->collision = false;
     k->wait = 0;
   }
 
@@ -102,7 +105,7 @@ flow (struct actor *k)
       && ! k->fall
       && ! k->hit_by_loose_floor
       && ! is_valid_pos (&k->item_pos)
-      && is_hangable_pos (&ph, k->f.dir)
+      && is_hangable (&ph, k->f.dir)
       && dist_next_place (&k->f, _tf, pos, 0, true) <= 24
       && ! (ctf == DOOR && k->f.dir == LEFT
             && door_at_pos (&ptf)->i > DOOR_CLIMB_LIMIT)) {
@@ -170,9 +173,7 @@ physics_in (struct actor *k)
       && fg (&k->ci.tile_p) == MIRROR)
     uncollide (&k->f, &k->fo, _bf, +0, +0, &k->fo, &k->ci);
   else if (! is_valid_pos (&k->item_pos))
-    uncollide (&k->f, &k->fo, _bf, COLLISION_FRONT_LEFT_NORMAL,
-               COLLISION_FRONT_RIGHT_NORMAL,
-               &k->fo, NULL);
+    uncollide (&k->f, &k->fo, _bf, +0, +0, &k->fo, NULL);
   if (k->key.down && ! crouch_jump) uncollide_static_kid_normal (k);
 
   /* fall */
@@ -193,6 +194,9 @@ physics_in (struct actor *k)
 static void
 physics_out (struct actor *k)
 {
+  /* place on the ground */
+  place_on_the_ground (&k->f, &k->f.c);
+
   /* depressible floors */
   if (k->i == 0) update_depressible_floor (k, -7, -9);
   else if (k->i == 2) update_depressible_floor (k, -1, -13);

@@ -41,6 +41,13 @@ kid_hang_free (struct actor *k)
 static bool
 flow (struct actor *k)
 {
+  /* change hang style in case tiles change on the fly (by level
+     editing for example) */
+  if (! is_free (&k->hang_pos, k->f.dir)) {
+    kid_hang (k);
+    return false;
+  }
+
   struct pos np;
 
   if (k->oaction != kid_hang_free)
@@ -54,7 +61,7 @@ flow (struct actor *k)
     /* hang back */
   if (movements == NATIVE_MOVEMENTS
       && k->i >= 7
-      && hang_back && is_hangable_pos (&k->hang_pos, back_dir)) {
+      && hang_back && is_hangable (&k->hang_pos, back_dir)) {
     play_audio (&hang_on_fall_audio, NULL, k->id);
     kid_haptic (k, KID_HAPTIC_HANG);
     kid_turn (k);
@@ -74,39 +81,33 @@ flow (struct actor *k)
 
   /* release */
   if ((! k->key.shift || k->hang_limit
-       || get_hanged_tile (&k->hang_pos, k->f.dir) == NO_FLOOR)
+       || get_hanged_tile (&k->hang_pos, k->f.dir) == NO_FLOOR
+       || ! is_hangable (&k->hang_pos, k->f.dir))
       && (k->i < 5 || k->j > -1)) {
     int dir = (k->f.dir == LEFT) ? -1 : +1;
     k->hang_limit = false;
     if (! is_traversable (&k->hang_pos)
         && k->i >= 4) {
-      int dx = (k->f.dir == LEFT) ? +7 : PLACE_WIDTH + 9;
-      int dy = -8;
-      place_actor (k, &k->hang_pos, dx, dy, "KID", "VJUMP", 13);
+      struct rect r; actor_rect (&r, k, "KID", "HANG", "FREE_VJUMP");
+      place_actor (k, &k->hang_pos, r.c.x, r.c.y, "KID", "VJUMP", 13);
       kid_vjump (k);
       return false;
-    }
-    if (! is_traversable (prel (&k->hang_pos, &np, +0, dir))
+    } else if (! is_traversable (prel (&k->hang_pos, &np, +0, dir))
         && k->i <= 4) {
-      int dx = (k->f.dir == LEFT) ? +7 : PLACE_WIDTH + 5;
-      int dy = -8;
-      place_actor (k, &k->hang_pos, dx, dy, "KID", "VJUMP", 13);
+      struct rect r; actor_rect (&r, k, "KID", "HANG", "FREE_VJUMP_FRONT");
+      place_actor (k, &k->hang_pos, r.c.x, r.c.y, "KID", "VJUMP", 13);
       kid_vjump (k);
       return false;
-    }
-    if (is_traversable (&k->hang_pos)
+    } else if (is_traversable (&k->hang_pos)
         && k->i >= 4) {
-      int dx = (k->f.dir == LEFT) ? +10 : +22;
-      int dy = +4;
-      place_actor (k, &k->hang_pos, dx, dy, "KID", "FALL", 0);
+      struct rect r; actor_rect (&r, k, "KID", "HANG", "FREE_FALL");
+      place_actor (k, &k->hang_pos, r.c.x, r.c.y, "KID", "FALL", 0);
       kid_fall (k);
       return false;
-    }
-    if (is_traversable (prel (&k->hang_pos, &np, +0, dir))
+    } else if (is_traversable (prel (&k->hang_pos, &np, +0, dir))
         && k->i <= 4) {
-      int dx = (k->f.dir == LEFT) ? -10 : PLACE_WIDTH + 10;
-      int dy = +12;
-      place_actor (k, &k->hang_pos, dx, dy, "KID", "FALL", 0);
+      struct rect r; actor_rect (&r, k, "KID", "HANG", "FREE_FALL_FRONT");
+      place_actor (k, &k->hang_pos, r.c.x, r.c.y, "KID", "FALL", 0);
       kid_fall (k);
       return false;
     }
@@ -129,15 +130,16 @@ flow (struct actor *k)
   }
 
   k->fo.b = actor_bitmap (k, "KID", "HANG", k->i);
-  k->fo.dx = (k->reverse) ? -actor_bitmap_dx (k, "KID", "HANG", k->i + 1)
-    : actor_bitmap_dx (k, "KID", "HANG", k->i);
-  k->fo.dy = (k->reverse) ? -actor_bitmap_dy (k, "KID", "HANG", k->i + 1)
-    : actor_bitmap_dy (k, "KID", "HANG", k->i);
-
-  if (k->oaction == kid_hang) k->fo.dx = +0, k->fo.dy = +1;
+  k->fo.dx = (k->reverse) ? -actor_dx (k, "KID", "HANG", k->i + 1)
+    : actor_dx (k, "KID", "HANG", k->i);
+  k->fo.dy = (k->reverse) ? -actor_dy (k, "KID", "HANG", k->i + 1)
+    : actor_dy (k, "KID", "HANG", k->i);
 
   if (k->reverse && k->j == 0 && k->i == 0
-      && k->wait < 3) k->fo.dy = 0;
+      && k->wait < 3) {
+    k->fo.dx = 0;
+    k->fo.dy = 0;
+  }
 
   return true;
 }
@@ -151,10 +153,6 @@ physics_in (struct actor *k)
 static void
 physics_out (struct actor *k)
 {
-  struct pos hanged_pos;
-
   /* depressible floors */
-  clear_depressible_floor (k);
-  get_hanged_pos (&k->hang_pos, k->f.dir, &hanged_pos);
-  press_depressible_floor (&hanged_pos, k);
+  keep_depressible_floor (k);
 }

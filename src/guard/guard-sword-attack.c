@@ -90,11 +90,11 @@ flow (struct actor *g)
 
   select_actor_xframe (g, NULL, "SWORD", g->j);
 
-  if (g->j == 1) g->xf.dy = +9;
-  if (g->j == 7) g->xf.dx = +0, g->xf.dy = +23;
-  if (g->j == 10) g->xf.dx = -10, g->xf.dy = +16;
+  /* if (g->j == 1) g->xf.dy = +9; */
+  /* if (g->j == 7) g->xf.dx = +0, g->xf.dy = +23; */
+  /* if (g->j == 10) g->xf.dx = -10, g->xf.dy = +16; */
 
-  if (g->i == 5 && g->enemy_defended_my_attack) g->fo.dx = -2;
+  /* if (g->i == 5 && g->enemy_defended_my_attack) g->fo.dx = -2; */
 
   if (g->type == SKELETON) g->xf.dy += -3;
   if (g->type == SHADOW) g->xf.dy += -2;
@@ -121,6 +121,9 @@ physics_in (struct actor *g)
 static void
 physics_out (struct actor *g)
 {
+  /* place on the ground */
+  place_on_the_ground (&g->f, &g->f.c);
+
   /* sound */
   if (g->i == 4) play_audio (&sword_attack_audio, NULL, g->id);
 

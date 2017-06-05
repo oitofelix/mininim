@@ -29,10 +29,10 @@ guard_resurrect (struct actor *g)
 {
   g->splash = false;
   g->invisible = false;
-  if (g->current_lives > 0) return;
+  if (g->current_hp > 0) return;
   struct pos pm;
   survey (_m, pos, &g->f, NULL, &pm, NULL);
-  g->current_lives = g->total_lives;
+  g->current_hp = g->total_hp;
   g->death_reason = NO_DEATH;
   g->action = guard_normal;
   g->glory_sample = false;
@@ -67,8 +67,8 @@ raise_skeleton (struct actor *s)
   }
 
   s->fo.b = actor_bitmap (s, "SKELETON", "DIE", s->i);
-  s->fo.dx = -actor_bitmap_dx (s, "SKELETON", "DIE", s->i + 1);
-  s->fo.dy = -actor_bitmap_dy (s, "SKELETON", "DIE", s->i + 1);
+  s->fo.dx = -actor_dx (s, "SKELETON", "DIE", s->i + 1);
+  s->fo.dy = -actor_dy (s, "SKELETON", "DIE", s->i + 1);
 
   next_frame (&s->f, &s->f, &s->fo);
 }
@@ -112,7 +112,7 @@ guard_die_spiked (struct actor *g)
     }
   }
 
-  g->current_lives = 0;
+  g->current_hp = 0;
 
   int dy;
   if (g->type == SKELETON) dy = +45;
@@ -157,7 +157,7 @@ guard_die_chomped (struct actor *g)
     g->glory_sample = true;
   }
 
-  g->current_lives = 0;
+  g->current_hp = 0;
   g->xf.b = NULL;
 }
 
@@ -187,7 +187,7 @@ guard_die_suddenly (struct actor *g)
     g->glory_sample = true;
   }
 
-  g->current_lives = 0;
+  g->current_hp = 0;
   g->xf.b = NULL;
 
   g->hit_by_loose_floor = false;
@@ -234,7 +234,7 @@ flow (struct actor *g)
     g->xf.b = NULL;
   }
 
-  g->current_lives = 0;
+  g->current_hp = 0;
 
   g->i = g->i < 5 ? g->i + 1 : 5;
 

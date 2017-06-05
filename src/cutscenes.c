@@ -747,7 +747,7 @@ cutscene_14_anim (void)
     kid.action = kid_start_run;
     kid.invisible = false;
     kid.key.left = true;
-    kid.current_lives = kid.total_lives = 3;
+    kid.current_hp = kid.total_hp = 3;
     kid_run (&kid);
 
     clock_type = -1;
@@ -1033,7 +1033,7 @@ draw_princess_room (ALLEGRO_BITMAP *bitmap)
   clear_bitmap (bitmap, BLACK);
   draw_bitmap (princess_room, bitmap, 0, 0, 0);
   draw_princess_room_stars (bitmap);
-  draw_princess_room_fire (bitmap);
+  /* draw_princess_room_fire (bitmap); */
   draw_princess_frame (bitmap, &princess);
   draw_jaffar_frame (bitmap, &jaffar);
   draw_mouse_frame (bitmap, &mouse);

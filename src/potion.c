@@ -20,341 +20,43 @@
 
 #include "mininim.h"
 
-/* dungeon cga */
-ALLEGRO_BITMAP *dc_small_potion, *dc_big_potion;
+static const char *potion_string (int e);
 
-/* palace cga */
-ALLEGRO_BITMAP *pc_small_potion, *pc_big_potion;
-
-/* dungeon ega */
-ALLEGRO_BITMAP *de_small_potion, *de_big_potion;
-
-/* palace ega */
-ALLEGRO_BITMAP *pe_small_potion, *pe_big_potion;
-
-/* dungeon vga */
-ALLEGRO_BITMAP *dv_small_potion, *dv_big_potion;
-
-/* palace vga */
-ALLEGRO_BITMAP *pv_small_potion, *pv_big_potion;
-
-/* palettable */
-ALLEGRO_BITMAP *bubble_00, *bubble_01, *bubble_02, *bubble_03, *bubble_04,
-  *bubble_05, *bubble_06;
-
-static struct coord *small_potion_coord (struct pos *p, struct coord *c);
-static struct coord *small_potion_bubble_coord (struct pos *p, struct coord *c);
-static struct coord *big_potion_coord (struct pos *p, struct coord *c);
-static struct coord *big_potion_bubble_coord (struct pos *p, struct coord *c);
-static ALLEGRO_COLOR empty_palette (ALLEGRO_COLOR c);
-static ALLEGRO_COLOR v_life_palette (ALLEGRO_COLOR c);
-static ALLEGRO_COLOR v_poison_palette (ALLEGRO_COLOR c);
-static ALLEGRO_COLOR v_float_palette (ALLEGRO_COLOR c);
-static ALLEGRO_COLOR v_flip_palette (ALLEGRO_COLOR c);
-/* static ALLEGRO_COLOR e_life_palette (ALLEGRO_COLOR c); */
-/* static ALLEGRO_COLOR e_poison_palette (ALLEGRO_COLOR c); */
-/* static ALLEGRO_COLOR e_float_palette (ALLEGRO_COLOR c); */
-/* static ALLEGRO_COLOR e_flip_palette (ALLEGRO_COLOR c); */
-/* static ALLEGRO_COLOR c_life_palette (ALLEGRO_COLOR c); */
-/* static ALLEGRO_COLOR c_poison_palette (ALLEGRO_COLOR c); */
-/* static ALLEGRO_COLOR c_float_palette (ALLEGRO_COLOR c); */
-/* static ALLEGRO_COLOR c_flip_palette (ALLEGRO_COLOR c); */
-
-void
-load_potion (void)
+const char *
+potion_string (int e)
 {
-  /* dungeon cga */
-  dc_small_potion = load_bitmap (DC_SMALL_POTION);
-  dc_big_potion = load_bitmap (DC_BIG_POTION);
-
-  /* palace cga */
-  pc_small_potion = load_bitmap (PC_SMALL_POTION);
-  pc_big_potion = load_bitmap (PC_BIG_POTION);
-
-  /* dungeon ega */
-  de_small_potion = load_bitmap (DE_SMALL_POTION);
-  de_big_potion = load_bitmap (DE_BIG_POTION);
-
-  /* palace ega */
-  pe_small_potion = load_bitmap (PE_SMALL_POTION);
-  pe_big_potion = load_bitmap (PE_BIG_POTION);
-
-  /* dungeon vga */
-  dv_small_potion = load_bitmap (DV_SMALL_POTION);
-  dv_big_potion = load_bitmap (DV_BIG_POTION);
-
-  /* palace vga */
-  pv_small_potion = load_bitmap (PV_SMALL_POTION);
-  pv_big_potion = load_bitmap (PV_BIG_POTION);
-
-  /* palettable */
-  bubble_00 = load_bitmap (BUBBLE_00);
-  bubble_01 = load_bitmap (BUBBLE_01);
-  bubble_02 = load_bitmap (BUBBLE_02);
-  bubble_03 = load_bitmap (BUBBLE_03);
-  bubble_04 = load_bitmap (BUBBLE_04);
-  bubble_05 = load_bitmap (BUBBLE_05);
-  bubble_06 = load_bitmap (BUBBLE_06);
-}
-
-void
-unload_potion (void)
-{
-  /* dungeon cga */
-  destroy_bitmap (dc_small_potion);
-  destroy_bitmap (dc_big_potion);
-
-  /* palace cga */
-  destroy_bitmap (pc_small_potion);
-  destroy_bitmap (pc_big_potion);
-
-  /* dungeon ega */
-  destroy_bitmap (de_small_potion);
-  destroy_bitmap (de_big_potion);
-
-  /* palace ega */
-  destroy_bitmap (pe_small_potion);
-  destroy_bitmap (pe_big_potion);
-
-  /* dungeon vga */
-  destroy_bitmap (dv_small_potion);
-  destroy_bitmap (dv_big_potion);
-
-  /* palace vga */
-  destroy_bitmap (pv_small_potion);
-  destroy_bitmap (pv_big_potion);
-
-  /* palettable */
-  destroy_bitmap (bubble_00);
-  destroy_bitmap (bubble_01);
-  destroy_bitmap (bubble_02);
-  destroy_bitmap (bubble_03);
-  destroy_bitmap (bubble_04);
-  destroy_bitmap (bubble_05);
-  destroy_bitmap (bubble_06);
-}
-
-static ALLEGRO_BITMAP *
-get_bubble_frame (int i)
-{
-  switch (i) {
-  case 0: return bubble_00;
-  case 1: return bubble_01;
-  case 2: return bubble_02;
-  case 3: return bubble_03;
-  case 4: return bubble_04;
-  case 5: return bubble_05;
-  case 6: return bubble_06;
+  switch (e) {
+  case NO_ITEM: return "NO_ITEM";
+  case EMPTY_POTION: return "EMPTY_POTION";
+  case SMALL_HP_POTION: return "SMALL_HP_POTION";
+  case BIG_HP_POTION: return "BIG_HP_POTION";
+  case SMALL_POISON_POTION: return "SMALL_POISON_POTION";
+  case BIG_POISON_POTION: return "BIG_POISON_POTION";
+  case FLOAT_POTION: return "FLOAT_POTION";
+  case FLIP_POTION: return "FLIP_POTION";
+  case ACTIVATION_POTION: return "ACTIVATION_POTION";
+  case SWORD: return "SWORD";
   default: assert (false); break;
   }
-
-  return NULL;
 }
 
 void
 draw_potion (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
-  if (! is_potion (p)) return;
-
-  ALLEGRO_BITMAP *small_potion = NULL,
-    *big_potion = NULL;
-
-  switch (em) {
-  case DUNGEON:
-    /* switch (vm) { */
-    /* case CGA: */
-    /*   small_potion = dc_small_potion; */
-    /*   big_potion = dc_big_potion; */
-    /*   break; */
-    /* case EGA: */
-    /*   small_potion = de_small_potion; */
-    /*   big_potion = de_big_potion; */
-    /*   break; */
-    /* case VGA: */
-      small_potion = dv_small_potion;
-      big_potion = dv_big_potion;
-    /*   break; */
-    /* } */
-    break;
-  case PALACE:
-    /* switch (vm) { */
-    /* case CGA: */
-    /*   small_potion = pc_small_potion; */
-    /*   big_potion = pc_big_potion; */
-    /*   break; */
-    /* case EGA: */
-    /*   small_potion = pe_small_potion; */
-    /*   big_potion = pe_big_potion; */
-    /*   break; */
-    /* case VGA: */
-      small_potion = pv_small_potion;
-      big_potion = pv_big_potion;
-    /*   break; */
-    /* } */
-    break;
-  }
-
-  ALLEGRO_BITMAP *bottle = NULL, *bubble = NULL;
-  struct coord bottle_coord, bubble_coord;
-  palette bubble_palette = NULL;
-
-  seedp (p);
-  enum item item = ext (p);
-
-  switch (item) {
-  case EMPTY_POTION:
-  case SMALL_LIFE_POTION:
-  case SMALL_POISON_POTION:
-  case ACTIVATION_POTION:
-    bottle = small_potion;
-    small_potion_coord (p, &bottle_coord);
-    small_potion_bubble_coord (p, &bubble_coord);
-    break;
-  case BIG_LIFE_POTION:
-  case BIG_POISON_POTION:
-  case FLOAT_POTION:
-  case FLIP_POTION:
-    bottle = big_potion;
-    big_potion_coord (p, &bottle_coord);
-    big_potion_bubble_coord (p, &bubble_coord);
-    break;
-  default: assert (false); break;
-  }
-
-  palette life_palette = NULL, poison_palette = NULL,
-    float_palette = NULL, flip_palette = NULL;
-
-  /* switch (vm) { */
-  /* case CGA: */
-  /*   life_palette = c_life_palette; */
-  /*   poison_palette = c_poison_palette; */
-  /*   float_palette = c_float_palette; */
-  /*   flip_palette = c_flip_palette; */
-  /*   break; */
-  /* case EGA: */
-  /*   life_palette = e_life_palette; */
-  /*   poison_palette = e_poison_palette; */
-  /*   float_palette = e_float_palette; */
-  /*   flip_palette = e_flip_palette; */
-  /*   break; */
-  /* case VGA: */
-    life_palette = v_life_palette;
-    poison_palette = v_poison_palette;
-    float_palette = v_float_palette;
-    flip_palette = v_flip_palette;
-  /*   break; */
-  /* } */
-
-  switch (item) {
-  case EMPTY_POTION: bubble_palette = empty_palette; break;
-  case SMALL_LIFE_POTION:
-  case BIG_LIFE_POTION: bubble_palette = life_palette; break;
-  case SMALL_POISON_POTION:
-  case BIG_POISON_POTION: bubble_palette = poison_palette; break;
-  case FLOAT_POTION: bubble_palette = float_palette; break;
-  case FLIP_POTION: bubble_palette = flip_palette; break;
-  case ACTIVATION_POTION: bubble_palette = poison_palette; break;
-  default: assert (false); break;
-  }
-
-  /* if (hgc) bottle = apply_palette (bottle, hgc_palette); */
-  draw_bitmapc (bottle, bitmap, &bottle_coord, 0);
-  bubble = get_bubble_frame (anim_cycle % 7);
-  bubble = apply_palette (bubble, bubble_palette);
-  /* if (hgc) bubble = apply_palette (bubble, hgc_palette); */
-  int r = prandom (1);
-  bubble_coord.x -= r;
-  draw_bitmapc (bubble, bitmap, &bubble_coord,
-                r ? ALLEGRO_FLIP_HORIZONTAL : 0);
-  unseedp ();
-
-  push_clipping_rectangle (bitmap, OW (bottle_coord.x),
-                           OH (bottle_coord.y),
-                           get_bitmap_width (bottle),
-                           get_bitmap_height (bottle));
-  merge_clipping_rectangle (bitmap, OW (bubble_coord.x),
-                            OH (bubble_coord.y),
-                            get_bitmap_width (bubble),
-                            get_bitmap_height (bubble));
+  push_drawn_rectangle (bitmap);
+  int e = ext (p);
+  const char *potion = potion_string (e);
+  draw_object (bitmap, potion, p);
+  struct drawn_rectangle *dr = pop_drawn_rectangle ();
+  push_clipping_rectangle (dr->bitmap, dr->x, dr->y, dr->w, dr->h);
   draw_tile_fg_front (bitmap, p, NULL);
   pop_clipping_rectangle ();
 }
 
-struct coord *
-small_potion_coord (struct pos *p, struct coord *c)
-{
-  return
-    new_coord (c, p->l, p->room,
-               PLACE_WIDTH * (p->place + 1) - 10,
-               PLACE_HEIGHT * p->floor + 47);
-}
-
-struct coord *
-small_potion_bubble_coord (struct pos *p, struct coord *c)
-{
-  return
-    new_coord (c, p->l, p->room,
-               PLACE_WIDTH * (p->place + 1) - 7,
-               PLACE_HEIGHT * p->floor + 38);
-}
-
-struct coord *
-big_potion_coord (struct pos *p, struct coord *c)
-{
-  return
-    new_coord (c, p->l, p->room,
-               PLACE_WIDTH * (p->place + 1) - 10,
-               PLACE_HEIGHT * p->floor + 43);
-}
-
-struct coord *
-big_potion_bubble_coord (struct pos *p, struct coord *c)
-{
-  return
-    new_coord (c, p->l, p->room,
-               PLACE_WIDTH * (p->place + 1) - 7,
-               PLACE_HEIGHT * p->floor + 34);
-}
-
-ALLEGRO_COLOR
-empty_palette (ALLEGRO_COLOR c)
-{
-  if (color_eq (c, WHITE)) return TRANSPARENT_COLOR;
-  else return c;
-}
-
-ALLEGRO_COLOR
-v_life_palette (ALLEGRO_COLOR c)
-{
-  if (color_eq (c, WHITE)) return V_LIFE_POTION_BUBBLE_COLOR;
-  else return c;
-}
-
-ALLEGRO_COLOR
-v_poison_palette (ALLEGRO_COLOR c)
-{
-  if (color_eq (c, WHITE)) return V_POISON_POTION_BUBBLE_COLOR;
-  else return c;
-}
-
-ALLEGRO_COLOR
-v_float_palette (ALLEGRO_COLOR c)
-{
-  if (color_eq (c, WHITE)) return V_FLOAT_POTION_BUBBLE_COLOR;
-  else return c;
-}
-
-ALLEGRO_COLOR
-v_flip_palette (ALLEGRO_COLOR c)
-{
-  if (color_eq (c, WHITE)) return V_FLIP_POTION_BUBBLE_COLOR;
-  else return c;
-}
-
 /* ALLEGRO_COLOR */
-/* e_life_palette (ALLEGRO_COLOR c) */
+/* e_hp_palette (ALLEGRO_COLOR c) */
 /* { */
-/*   if (color_eq (c, WHITE)) return E_LIFE_POTION_BUBBLE_COLOR; */
+/*   if (color_eq (c, WHITE)) return E_HP_POTION_BUBBLE_COLOR; */
 /*   else return c; */
 /* } */
 
@@ -380,9 +82,9 @@ v_flip_palette (ALLEGRO_COLOR c)
 /* } */
 
 /* ALLEGRO_COLOR */
-/* c_life_palette (ALLEGRO_COLOR c) */
+/* c_hp_palette (ALLEGRO_COLOR c) */
 /* { */
-/*   if (color_eq (c, WHITE)) return C_LIFE_POTION_BUBBLE_COLOR; */
+/*   if (color_eq (c, WHITE)) return C_HP_POTION_BUBBLE_COLOR; */
 /*   else return c; */
 /* } */
 

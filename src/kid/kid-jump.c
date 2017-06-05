@@ -44,7 +44,7 @@ flow (struct actor *k)
   struct pos pm, pmf, ptf;
 
   if (k->oaction != kid_jump)
-    k->i = -1, k->misstep = k->hang = false;
+    k->i = -1, k->hang = false;
 
   bool hang_front = ((k->f.dir == LEFT) ? k->key.left : k->key.right)
     && ! k->key.up && k->key.shift;
@@ -61,10 +61,10 @@ flow (struct actor *k)
   /* hang front */
   if (movements == NATIVE_MOVEMENTS
       && k->i >= 7 && k->i <= 10 && hang_front
-      && is_hangable_pos (&pmf, k->f.dir)
+      && is_hangable (&pmf, k->f.dir)
       && is_immediately_accessible_pos (&pmf, &pm, &k->f)) {
-    if (is_hangable_pos (&pm, k->f.dir)) k->hang_pos = pm;
-    else if (is_hangable_pos (&ptf, k->f.dir)) k->hang_pos = ptf;
+    if (is_hangable (&pm, k->f.dir)) k->hang_pos = pm;
+    else if (is_hangable (&ptf, k->f.dir)) k->hang_pos = ptf;
     pos2room (&k->hang_pos, k->f.c.room, &k->hang_pos);
     k->hang = true;
     play_audio (&hang_on_fall_audio, NULL, k->id);
@@ -76,7 +76,7 @@ flow (struct actor *k)
   /* hang back */
   if (movements == NATIVE_MOVEMENTS
       && k->i >= 7 && k->i <= 10
-      && hang_back && is_hangable_pos (&ptf, back_dir)
+      && hang_back && is_hangable (&ptf, back_dir)
       && is_immediately_accessible_pos (&ptf, &pm, &k->f)) {
     k->hang_pos = ptf;
     pos2room (&k->hang_pos, k->f.c.room, &k->hang_pos);
@@ -132,6 +132,9 @@ static void
 physics_out (struct actor *k)
 {
   struct pos pmbo;
+
+  /* place on the ground */
+  if (k->i <= 8 || k->i >= 11) place_on_the_ground (&k->f, &k->f.c);
 
   /* depressible floors */
   if (k->i == 8) clear_depressible_floor (k);

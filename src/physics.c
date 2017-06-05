@@ -254,16 +254,16 @@ is_traversable_fake (struct pos *p)
 }
 
 bool
-potentially_traversable_cs (enum tile_fg t)
+critical_cs (enum tile_fg t)
 {
   return traversable_cs (t)
     || t == LOOSE_FLOOR;
 }
 
 bool
-is_potentially_traversable (struct pos *p)
+is_critical (struct pos *p)
 {
-  return potentially_traversable_cs (fg (p));
+  return critical_cs (fg (p));
 }
 
 bool
@@ -460,8 +460,8 @@ is_potion_ext (struct pos *p)
 {
   enum item t = ext (p);
   return t == EMPTY_POTION
-    || t == SMALL_LIFE_POTION
-    || t == BIG_LIFE_POTION
+    || t == SMALL_HP_POTION
+    || t == BIG_HP_POTION
     || t == SMALL_POISON_POTION
     || t == BIG_POISON_POTION
     || t == FLOAT_POTION
@@ -781,7 +781,7 @@ decorate_tile (struct pos *p)
     case 0: set_fg (p, FLOOR); break;
     case 1: set_fg (p, BROKEN_FLOOR); break;
     case 2:
-      if (is_potentially_traversable (prel (p, &np, +0, -1))) break;
+      if (is_critical (prel (p, &np, +0, -1))) break;
       set_fg (p, SKELETON_FLOOR);
       break;
     }
@@ -1020,12 +1020,13 @@ is_accessible (struct frame *f, coord_f cf, int dx0, int dx1)
 }
 
 struct frame *
-move_frame (struct frame *f, coord_f cf, int dx, int move_left, int move_right)
+move_frame (struct frame *f, coord_f cf, int dx,
+            lua_Number move_left, lua_Number move_right)
 {
   /* positive move_dx moves foward, negative move_dx moves backward */
   struct pos p, np;
   struct frame nf = *f;
-  int move_dx = nf.dir == LEFT ? move_left : move_right;
+  lua_Number move_dx = nf.dir == LEFT ? move_left : move_right;
   int inc = nf.dir == LEFT ? -1 : +1;
   nf.c.x += inc * move_dx;
   surveyo (cf, dx, +0, pos, f, NULL, &p, NULL);
@@ -1093,7 +1094,7 @@ uncollide (struct frame *f, struct frame_offset *fo, coord_f cf,
   bool c = false;
   struct frame_offset cnfo;
   while (! is_immediately_accessible_pos (&p, &op, &nf)
-         && abs (nfo.dx) < ORIGINAL_WIDTH) {
+         && fabs (nfo.dx) < ORIGINAL_WIDTH) {
     struct pos pp = p;
     nfo.dx += inc;
     next_frame (f, &nf, &nfo);
@@ -1159,7 +1160,7 @@ uncollide_static (struct frame *f,
   if (! fo_ret) return c;
 
   while (! is_immediately_accessible_pos (&pf0, &pb0, &nf0)
-         && abs (fo0.dx) <= PLACE_WIDTH) {
+         && fabs (fo0.dx) <= PLACE_WIDTH) {
     fo0.dx++;
     next_frame (f, &nf0, &fo0);
     frame2room (&nf0, f->c.room, &nf0.c);
@@ -1168,7 +1169,7 @@ uncollide_static (struct frame *f,
   }
 
   while (! is_immediately_accessible_pos (&pf1, &pb1, &nf1)
-         && abs (fo1.dx) <= PLACE_WIDTH) {
+         && fabs (fo1.dx) <= PLACE_WIDTH) {
     fo1.dx--;
     next_frame (f, &nf1, &fo1);
     frame2room (&nf1, f->c.room, &nf1.c);
@@ -1176,8 +1177,8 @@ uncollide_static (struct frame *f,
     surveyo (cf_back, dx_back, +0, pos, &nf1, NULL, &pb1, NULL);
   }
 
-  int d0 = abs (fo0.dx - fo->dx);
-  int d1 = abs (fo1.dx - fo->dx);
+  int d0 = fabs (fo0.dx - fo->dx);
+  int d1 = fabs (fo1.dx - fo->dx);
   *fo_ret = (d0 < d1) ? fo0 : fo1;
   return c;
 }
@@ -1195,15 +1196,17 @@ dist_collision (struct frame *f, coord_f cf, int left, int right,
   int inc = cf_inc (f, cf);
 
   while (! uncollide (f, &fo, cf, left, right, NULL, ci_ret)
-         && abs (fo.dx) <= PLACE_WIDTH)
+         && fabs (fo.dx) <= PLACE_WIDTH)
     fo.dx += inc;
 
-  return abs (fo.dx);
+  return fabs (fo.dx);
 }
 
 void
-enforce_wall_collision (struct frame *f)
+enforce_wall_collision (struct actor *a)
 {
+  struct frame *f = &a->f;
+
   struct pos pl, pr;
   int dx = +2;
   surveyo (_ml, dx, +0, pos, f, NULL, &pl, NULL);
@@ -1224,15 +1227,49 @@ enforce_wall_collision (struct frame *f)
   else if (f->dir == LEFT) inc = +1;
   else inc = -1;
 
-  int max = PLACE_WIDTH;
+  int max = PLACES;
 
-  do {
-    f->c.x += inc;
-    surveyo (_ml, dx, +0, pos, f, NULL, &pl, NULL);
-    surveyo (_mr, dx, +0, pos, f, NULL, &pr, NULL);
-  } while ((fg (&pl) == WALL || fg (&pr) == WALL) && max--);
+  surveyo (_ml, dx, +0, pos, f, NULL, NULL, &pl);
+  surveyo (_mr, dx, +0, pos, f, NULL, NULL, &pr);
+  pos2room (&pr, pl.room, &pr);
+
+  while (fg (&pl) == WALL
+         && fg (&pr) == WALL
+         && abs (pl.place - pr.place) <= 1
+         && max--) {
+    f->c.x += PLACE_WIDTH * inc;
+    surveyo (_ml, dx, +0, pos, f, NULL, NULL, &pl);
+    surveyo (_mr, dx, +0, pos, f, NULL, NULL, &pr);
+    pos2room (&pr, pl.room, &pr);
+  }
 }
 
+bool
+is_in_danger (struct pos *p0, struct frame *f, coord_f cf, bool *misstep_ret)
+{
+  struct frame_offset fo;
+  fo.b = f->b;
+  fo.dx = -1;
+  fo.dy = 0;
+
+  struct pos p;
+  surveyo (cf, +0, +0, pos, f, NULL, &p, NULL);
+
+  if (uncollide (f, &fo, cf, +0, +6, NULL, NULL))
+    return true;
+
+  if (peq (p0, &p)) return false;
+
+  bool misstep = is_falling (f, cf, +0, +0)
+    || fg (&p) == LOOSE_FLOOR;
+
+  if (misstep && misstep_ret) *misstep_ret = misstep;
+
+  return misstep
+    || fg (&p) == CLOSER_FLOOR
+    || (f->dir == LEFT && fg (p0) == CHOMPER)
+    || (f->dir == RIGHT && fg (&p) == CHOMPER);
+}
 
 
 
@@ -1367,7 +1404,7 @@ hangable_cs (enum tile_fg t, enum dir d)
 }
 
 bool
-is_hangable_pos (struct pos *p, enum dir d)
+is_hangable (struct pos *p, enum dir d)
 {
   int dir = (d == LEFT) ? -1 : +1;
 
@@ -1410,10 +1447,10 @@ can_hang (struct actor *a, bool reverse, struct pos *hang_pos)
   survey (_bb, pos, &_f, NULL, &pbb, NULL);
   prel (&pbb, &pbbb, +0, (_f.dir == LEFT) ? +1 : -1);
 
-  bool hbf = is_hangable_pos (&pbf, _f.dir);
-  bool hmbo = is_hangable_pos (&pmbo, _f.dir);
-  bool hbb = is_hangable_pos (&pbb, _f.dir);
-  bool hbbb = is_hangable_pos (&pbbb, _f.dir);
+  bool hbf = is_hangable (&pbf, _f.dir);
+  bool hmbo = is_hangable (&pmbo, _f.dir);
+  bool hbb = is_hangable (&pbb, _f.dir);
+  bool hbbb = is_hangable (&pbbb, _f.dir);
 
   if (! hbf && ! hmbo && ! hbb && !hbbb)
     return false;
@@ -1456,13 +1493,7 @@ get_hanged_tile (struct pos *hang_pos, enum dir d)
 }
 
 bool
-is_hang_pos_critical (struct pos *hang_pos)
-{
-  return (is_potentially_traversable (hang_pos));
-}
-
-bool
-is_hang_pos_free (struct pos *hang_pos, enum dir d)
+is_free (struct pos *hang_pos, enum dir d)
 {
   int dir = (d == LEFT) ? -1 : +1;
   struct pos ptf; prel (hang_pos, &ptf, 0, dir);
@@ -1544,6 +1575,7 @@ is_in_front_open_level_door (struct frame *f, struct pos *p)
 bool
 is_falling (struct frame *f, coord_f cf, int dx0, int dx1)
 {
+  /* if (! f->b) return false; */
   struct pos p0, p1;
   if (dx0 != dx1) surveyo (cf, dx0, +0, pos, f, NULL, &p0, NULL);
   surveyo (cf, dx1, +0, pos, f, NULL, &p1, NULL);
@@ -1583,11 +1615,18 @@ update_depressible_floor (struct actor *a, int dx0, int dx1)
 void
 keep_depressible_floor (struct actor *a)
 {
-  struct pos *p0 = &a->df_pos[0];
-  struct pos *p1 = &a->df_pos[1];
+  if (is_kid_hang_or_climb (a)) {
+    struct pos hanged_pos;
+    clear_depressible_floor (a);
+    get_hanged_pos (&a->hang_pos, a->f.dir, &hanged_pos);
+    press_depressible_floor (&hanged_pos, a);
+  } else {
+    struct pos *p0 = &a->df_pos[0];
+    struct pos *p1 = &a->df_pos[1];
 
-  press_depressible_floor (p0, a);
-  press_depressible_floor (p1, a);
+    press_depressible_floor (p0, a);
+    press_depressible_floor (p1, a);
+  }
 }
 
 void
@@ -1636,6 +1675,15 @@ unhide_hidden_floor (struct pos *p)
        NULL, false, "UNHIDE FLOOR");
   }
 }
+
+void
+keep_all_depressible_floors (void)
+{
+  size_t i;
+  for (i = 0; i < actor_nmemb; i++)
+    keep_depressible_floor (&actor[i]);
+}
+
 
 
 
@@ -1729,8 +1777,8 @@ get_item_name (enum item t)
   switch (t) {
   case NO_ITEM: return "NO ITEM";
   case EMPTY_POTION: return "EMPTY POTION";
-  case SMALL_LIFE_POTION: return "SMALL LIFE POTION";
-  case BIG_LIFE_POTION: return "BIG LIFE POTION";
+  case SMALL_HP_POTION: return "SMALL HP POTION";
+  case BIG_HP_POTION: return "BIG HP POTION";
   case SMALL_POISON_POTION: return "SMALL POISON POTION";
   case BIG_POISON_POTION: return "BIG POISON POTION";
   case FLOAT_POTION: return "FLOAT POTION";

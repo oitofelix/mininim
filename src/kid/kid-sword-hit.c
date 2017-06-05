@@ -52,7 +52,7 @@ flow (struct actor *k)
     struct pos pb;
     prel (&k->p, &pb, 0, d);
 
-    if (k->current_lives > 0) kid_sword_normal (k);
+    if (k->current_hp > 0) kid_sword_normal (k);
     else if (is_traversable (&pb)) {
         place_at_pos (&k->f, _m, &pb, &k->f.c);
         kid_fall (k);
@@ -97,6 +97,9 @@ physics_in (struct actor *k)
 static void
 physics_out (struct actor *k)
 {
+  /* place on the ground */
+  place_on_the_ground (&k->f, &k->f.c);
+
   /* depressible floors */
   if (k->i == 3) update_depressible_floor (k, -4, -33);
   else if (k->i == 4) update_depressible_floor (k, -1, -24);

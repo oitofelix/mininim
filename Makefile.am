@@ -95,8 +95,8 @@ mininim_SOURCES = src/mininim.c src/mininim.h src/compatibility.h			\
 	  src/kernel/diff.h src/kernel/xmath.c src/kernel/xmath.h						\
 	  src/kernel/xstring.c src/kernel/xstring.h src/bmenu.c src/bmenu.h	\
 	  src/editor.c src/editor.h src/debug.c src/debug.h src/undo.c			\
-	  src/undo.h src/multi-room.c src/multi-room.h src/box.c src/box.h	\
-	  src/replay.c src/replay.h src/script/repl.c src/script/repl.h			\
+	  src/undo.h src/multi-room.c src/multi-room.h src/replay.c					\
+	  src/replay.h src/script/repl.c src/script/repl.h									\
 	  src/script/script.c src/script/script.h src/script/L_mininim.c		\
 	  src/script/L_mininim.h src/script/L_mininim.level.c								\
 	  src/script/L_mininim.level.h																			\
@@ -108,10 +108,10 @@ mininim_SOURCES = src/mininim.c src/mininim.h src/compatibility.h			\
 	  src/script/L_mininim.audio.source.h src/script/L_mininim.video.c	\
 	  src/script/L_mininim.video.h src/script/L_mininim.video.bitmap.c	\
 	  src/script/L_mininim.video.bitmap.h																\
+	  src/script/L_mininim.video.font.c																	\
+	  src/script/L_mininim.video.font.h																	\
 	  src/script/L_mininim.video.color.c																\
 	  src/script/L_mininim.video.color.h																\
-	  src/script/L_mininim.video.coordinate.c														\
-	  src/script/L_mininim.video.coordinate.h														\
 	  src/script/L_mininim.video.rectangle.c														\
 	  src/script/L_mininim.video.rectangle.h														\
 	  src/script/L_mininim.setting.c src/script/L_mininim.setting.h			\

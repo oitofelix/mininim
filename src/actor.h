@@ -52,7 +52,8 @@ void actor_sword_hit (struct actor *a);
 void actor_fall (struct actor *a);
 void actor_walkf (struct actor *a);
 void actor_walkb (struct actor *a);
-struct coord *splash_coord (struct frame *f, struct coord *c);
+struct coord *splash_coord (ALLEGRO_BITMAP *splash, struct frame *f,
+                            struct coord *c);
 ALLEGRO_COLOR start_actor_palette (ALLEGRO_COLOR c);
 
 

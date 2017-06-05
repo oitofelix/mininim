@@ -23,20 +23,24 @@
 
 #define L_MININIM_VIDEO L_MININIM ".video"
 
+#define VIDEO_INDEX_MAX 256
+
 extern int REAL_WIDTH;
 extern int REAL_HEIGHT;
 
 void define_L_mininim_video (lua_State *L);
 
-void video (ALLEGRO_BITMAP *bitmap, int nret, const char *command,
+bool video (ALLEGRO_BITMAP *bitmap, int nret, const char *command,
             const char *object, uintptr_t index, uintptr_t part,
-            struct pos *p, int actor_id, int width);
-struct coord *_coord_object_index_part (struct coord *c_ret,
-                                        const char *object,
-                                        uintptr_t index, uintptr_t part,
-                                        struct pos *p, int actor_id);
+            struct pos *p, int actor_id, lua_Number width);
+struct rect *_rect_object_index_part (struct rect *r_ret,
+                                      const char *object,
+                                      uintptr_t index, uintptr_t part,
+                                      struct pos *p, int actor_id);
 ALLEGRO_BITMAP *_bitmap_object_index_part (const char *object,
                                            uintptr_t index, uintptr_t part);
+lua_Number video_mode_value (const char *object);
+
 bool is_valid_video_mode (char *vm);
 char *next_video_mode (char *current_vm);
 void setup_video_mode (char *requested_vm);
@@ -62,15 +66,15 @@ void setup_video_mode (char *requested_vm);
   video (bitmap, 0, "DRAW", object, (uintptr_t) (index),                \
          (uintptr_t) (part), p, -1, width)
 
-#define coord_object(c_ret, object, p)              \
-  _coord_object_index_part (c_ret, object, 0, 0, p, -1)
+#define rect_object(r_ret, object, p)              \
+  _rect_object_index_part (r_ret, object, 0, 0, p, -1)
 
-#define coord_object_part(c_ret, object, part, p)                 \
-  _coord_object_index_part (c_ret, object, 0, (uintptr_t) (part), p, -1)
+#define rect_object_part(r_ret, object, part, p)                 \
+  _rect_object_index_part (r_ret, object, 0, (uintptr_t) (part), p, -1)
 
-#define coord_object_index_part(c_ret, object, index, part, p)       \
-  _coord_object_index_part (c_ret, object, (uintptr_t) (index),      \
-                            (uintptr_t) (part), p, -1)
+#define rect_object_index_part(r_ret, object, index, part, p)       \
+  _rect_object_index_part (r_ret, object, (uintptr_t) (index),      \
+                           (uintptr_t) (part), p, -1)
 
 #define bitmap_object(object)                   \
   _bitmap_object_index_part (object, 0, 0)

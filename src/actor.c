@@ -48,7 +48,7 @@ create_actor (struct actor *a0, enum actor_type t, struct pos *p, enum dir dir)
   case NO_ACTOR: default: break;
   case KID: create_kid (a0, &a, p, dir); break;
   case GUARD:
-  case FAT_GUARD:
+  case FAT:
   case VIZIER:
   case SKELETON:
   case SHADOW:
@@ -138,7 +138,7 @@ get_actor_dead_at_pos (struct pos *p)
 {
   int i;
   for (i = 0; i < actor_nmemb; i++)
-    if (actor[i].current_lives <= 0
+    if (actor[i].current_hp <= 0
         && peq (&actor[i].p, p))
       return &actor[i];
   return NULL;
@@ -162,7 +162,7 @@ draw_actor_frame (ALLEGRO_BITMAP *bitmap, struct actor *a)
   case NO_ACTOR: default: break;
   case KID: draw_kid_frame (bitmap, a); break;
   case GUARD:
-  case FAT_GUARD:
+  case FAT:
   case VIZIER:
   case SKELETON:
   case SHADOW: draw_guard_frame (bitmap, a); break;
@@ -219,8 +219,8 @@ compare_actors (const void *_a0, const void *_a1)
   } else {
     struct coord o = {tr0.l, tr0.room, 0, ORIGINAL_HEIGHT};
 
-    double d0 = dist_coord (&o, &tr0);
-    double d1 = dist_coord (&o, &tr1);
+    lua_Number d0 = dist_coord (&o, &tr0);
+    lua_Number d1 = dist_coord (&o, &tr1);
 
     if (d0 < d1) return -1;
     if (d0 > d1) return 1;
@@ -290,7 +290,7 @@ bool
 is_fightable_actor (struct actor *a)
 {
   return a->type == KID || a->type == SHADOW
-    || a->type == GUARD || a->type == FAT_GUARD
+    || a->type == GUARD || a->type == FAT
     || a->type == SKELETON || a->type == VIZIER;
 }
 
@@ -301,7 +301,7 @@ actor_die_suddenly (struct actor *a)
   case NO_ACTOR: default: break;
   case KID: kid_die_suddenly (a); break;
   case GUARD:
-  case FAT_GUARD:
+  case FAT:
   case VIZIER:
   case SKELETON:
   case SHADOW:
@@ -316,7 +316,7 @@ actor_die_spiked (struct actor *a)
   case NO_ACTOR: default: break;
   case KID: kid_die_spiked (a); break;
   case GUARD:
-  case FAT_GUARD:
+  case FAT:
   case VIZIER:
   case SKELETON:
   case SHADOW:
@@ -331,7 +331,7 @@ actor_die_chomped (struct actor *a)
   case NO_ACTOR: default: break;
   case KID: kid_die_chomped (a); break;
   case GUARD:
-  case FAT_GUARD:
+  case FAT:
   case VIZIER:
   case SKELETON:
   case SHADOW:
@@ -346,7 +346,7 @@ actor_die (struct actor *a)
   case NO_ACTOR: default: break;
   case KID: kid_die (a); break;
   case GUARD:
-  case FAT_GUARD:
+  case FAT:
   case VIZIER:
   case SKELETON:
   case SHADOW:
@@ -361,7 +361,7 @@ actor_sword_hit (struct actor *a)
   case NO_ACTOR: default: break;
   case KID: kid_sword_hit (a); break;
   case GUARD:
-  case FAT_GUARD:
+  case FAT:
   case VIZIER:
   case SKELETON:
   case SHADOW:
@@ -376,7 +376,7 @@ actor_fall (struct actor *a)
   case NO_ACTOR: default: break;
   case KID: kid_fall (a); break;
   case GUARD:
-  case FAT_GUARD:
+  case FAT:
   case VIZIER:
   case SKELETON:
   case SHADOW:
@@ -391,7 +391,7 @@ actor_walkf (struct actor *a)
   case NO_ACTOR: default: break;
   case KID: kid_sword_walkf (a); break;
   case GUARD:
-  case FAT_GUARD:
+  case FAT:
   case VIZIER:
   case SKELETON:
   case SHADOW:
@@ -406,7 +406,7 @@ actor_walkb (struct actor *a)
   case NO_ACTOR: default: break;
   case KID: kid_sword_walkb (a); break;
   case GUARD:
-  case FAT_GUARD:
+  case FAT:
   case VIZIER:
   case SKELETON:
   case SHADOW:
@@ -415,12 +415,12 @@ actor_walkb (struct actor *a)
 }
 
 struct coord *
-splash_coord (struct frame *f, struct coord *c)
+splash_coord (ALLEGRO_BITMAP *splash, struct frame *f, struct coord *c)
 {
-  int w = IW (get_bitmap_width (v_kid_splash));
-  int h = IH (get_bitmap_height (v_kid_splash));
-  int fw = IW (get_bitmap_width (f->b));
-  int fh = IH (get_bitmap_height (f->b));
+  lua_Number w = IW (get_bitmap_width (splash));
+  lua_Number h = IH (get_bitmap_height (splash));
+  lua_Number fw = IW (get_bitmap_width (f->b));
+  lua_Number fh = IH (get_bitmap_height (f->b));
   return
     new_coord (c, f->c.l, f->c.room,
                f->c.x + (fw / 2) - (w / 2),

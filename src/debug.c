@@ -26,7 +26,7 @@ save_guard_bitmap (enum actor_type type, int style)
   char *filename = NULL, *prefix = NULL;
   switch (type) {
   case GUARD: prefix = "guard"; break;
-  case FAT_GUARD: prefix = "fat-guard"; break;
+  case FAT: prefix = "fat"; break;
   case VIZIER: prefix = "vizier"; break;
   case SKELETON: prefix = "skeleton"; break;
   case SHADOW: prefix = "shadow"; break;
@@ -61,6 +61,27 @@ void
 debug_random_seed (void)
 {
   fprintf (stderr, "%ju 0x%X\n", anim_cycle, random_seed);
+}
+
+void
+debug_actor (struct actor *a)
+{
+  char *hl = hline ('=');
+  fprintf (stderr, "%s\n"
+           "action: %s\n"
+           "previous_action: %s\n"
+           "index: %i\n"
+           "direction: %s\n"
+           "dx: %f\n"
+           "dy: %f\n",
+           hl,
+           actor_action_string (a->action),
+           actor_action_string (a->oaction),
+           a->i + 1,
+           direction_string (a->f.dir),
+           -a->fo.dx,
+           -a->fo.dy);
+  al_free (hl);
 }
 
 void

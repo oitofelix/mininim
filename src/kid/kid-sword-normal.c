@@ -70,7 +70,7 @@ flow (struct actor *k)
   k->attack_range_near = false;
 
   struct actor *ke = get_reciprocal_enemy (k);
-  k->keep_sword_fast = (ke && ke->current_lives > 0
+  k->keep_sword_fast = (ke && ke->current_hp > 0
                         && ! is_actor_fall (ke));
 
   bool keep_sword =
@@ -83,7 +83,7 @@ flow (struct actor *k)
   }
 
   if (k->oaction == kid_sword_normal
-      && k->current_lives <= 0) {
+      && k->current_hp <= 0) {
     survey (_mt, pos, &k->f, NULL, &pmt, NULL);
     k->p = pmt;
     kid_die (k);
@@ -119,13 +119,9 @@ flow (struct actor *k)
   }
 
   k->fo.b = actor_bitmap (k, "KID", "SWORD_NORMAL", 0);
-  k->fo.dx = actor_bitmap_dx (k, "KID", "SWORD_NORMAL", 0);
-  k->fo.dy = actor_bitmap_dy (k, "KID", "SWORD_NORMAL", 0);
+  k->fo.dx = actor_dx (k, "KID", "SWORD_NORMAL", 0);
+  k->fo.dy = actor_dy (k, "KID", "SWORD_NORMAL", 0);
   select_actor_xframe (k, "KID", "SWORD", 13);
-
-  if (k->oaction == kid_take_sword) k->fo.dx = -4;
-  if (k->oaction == kid_sword_walkf) k->fo.dx = +5;
-  if (k->oaction == kid_sword_walkb) k->fo.dx = +2;
 
   k->i++;
 
@@ -151,6 +147,9 @@ physics_in (struct actor *k)
 static void
 physics_out (struct actor *k)
 {
+  /* place on the ground */
+  place_on_the_ground (&k->f, &k->f.c);
+
   /* depressible floors */
   if (k->oaction == kid_take_sword)
     update_depressible_floor (k, -2, -27);

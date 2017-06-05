@@ -59,16 +59,16 @@ flow (struct actor *k)
   if (k->i == 14 && k->wait == 1)
     switch (k->item) {
     case EMPTY_POTION: break;
-    case SMALL_LIFE_POTION: increase_kid_current_lives (k); break;
-    case BIG_LIFE_POTION: increase_kid_total_lives (k); break;
+    case SMALL_HP_POTION: increase_kid_current_hp (k); break;
+    case BIG_HP_POTION: increase_kid_total_hp (k); break;
     case SMALL_POISON_POTION:
       if (k->immortal
           || k->poison_immune) break;
-      k->current_lives--;
+      k->current_hp--;
       k->splash = true;
       play_audio (&harm_audio, NULL, k->id);
       kid_haptic (k, KID_HAPTIC_HARM);
-      if (k->current_lives == 0) k->death_reason = POTION_DEATH;
+      if (k->current_hp == 0) k->death_reason = POTION_DEATH;
       if (k->id == current_kid_id) {
         mr.flicker = 2;
         mr.color = get_flicker_blood_color ();
@@ -77,7 +77,7 @@ flow (struct actor *k)
     case BIG_POISON_POTION:
       if (k->immortal
           || k->poison_immune) break;
-      k->current_lives = 0;
+      k->current_hp = 0;
       k->splash = true;
       k->death_reason = POTION_DEATH;
       play_audio (&harm_audio, NULL, k->id);
@@ -109,8 +109,6 @@ flow (struct actor *k)
   select_actor_frame (k, "KID", "DRINK", k->i);
 
   if (k->i == 14 && k->wait < 4) k->fo.dx = 0;
-  if (k->i == 10 && k->reverse) k->fo.dx = -2, k->fo.dy = +1;
-  if (k->i == 7 && k->reverse) k->fo.dx = +1;
 
   return true;
 }
@@ -124,6 +122,9 @@ physics_in (struct actor *k)
 static void
 physics_out (struct actor *k)
 {
+  /* place on the ground */
+  place_on_the_ground (&k->f, &k->f.c);
+
   /* depressible floors */
   keep_depressible_floor (k);
 

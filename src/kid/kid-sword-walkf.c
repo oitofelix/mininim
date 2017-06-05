@@ -51,9 +51,6 @@ flow (struct actor *k)
   select_actor_frame (k, "KID", "SWORD_WALKF", k->i + 1);
   select_actor_xframe (k, "KID", "SWORD", 13);
 
-  if (k->i == 0) k->xf.dx = -19;
-  if (k->i == 1) k->xf.dx = -21;
-
   return true;
 }
 
@@ -76,6 +73,9 @@ physics_in (struct actor *k)
 static void
 physics_out (struct actor *k)
 {
+  /* place on the ground */
+  place_on_the_ground (&k->f, &k->f.c);
+
   /* depressible floors */
   if (k->i == 1) update_depressible_floor (k, -7, -35);
   else keep_depressible_floor (k);

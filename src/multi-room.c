@@ -174,9 +174,6 @@ redim_multi_room (int w, int h)
 void
 create_multi_room_bitmaps (void)
 {
-  set_target_backbuffer (display);
-  al_set_new_bitmap_flags (ALLEGRO_VIDEO_BITMAP);
-
   int x, y;
   for (x = 0; x < mr.w; x++)
     for (y = 0; y < mr.h; y++) {
@@ -592,12 +589,14 @@ draw_animated_background (ALLEGRO_BITMAP *bitmap, int room)
 
   for (p.floor = FLOORS; p.floor >= 0; p.floor--)
     for (p.place = -1; p.place < PLACES; p.place++)
-      draw_no_floor_selection (bitmap, &p);
+      if (peq (&p, &mouse_pos))
+        draw_no_floor_selection (bitmap, &p);
 
   for (p.floor = FLOORS; p.floor >= -1; p.floor--)
     for (p.place = -1; p.place < PLACES; p.place++) {
       if (fake (&p) == WALL) continue;
-      draw_fire (bitmap, &p);
+      if (bg (&p) == TORCH)
+        draw_object (bitmap, "FIRE", &p);
       draw_balcony_stars (bitmap, &p);
     }
 }
@@ -620,8 +619,8 @@ draw_animated_foreground (ALLEGRO_BITMAP *bitmap, int room)
 
   for (p.floor = FLOORS; p.floor >= -1; p.floor--)
     for (p.place = -1; p.place < PLACES; p.place++) {
-      draw_potion (bitmap, &p);
-      if (is_sword (&p)) draw_sword (bitmap, &p, false);
+      if (is_potion (&p)) draw_potion (bitmap, &p);
+      if (is_sword (&p)) draw_sword (bitmap, &p);
     }
 
   /* editor graphics */
@@ -639,8 +638,8 @@ draw_animated_foreground (ALLEGRO_BITMAP *bitmap, int room)
   case EDIT_GUARD_SKILL_ADVANCE:
   case EDIT_GUARD_SKILL_RETURN:
   case EDIT_GUARD_SKILL_REFRACTION:
-  case EDIT_GUARD_SKILL_EXTRA_LIFE:
-  case EDIT_GUARD_LIVES:
+  case EDIT_GUARD_SKILL_EXTRA_HP:
+  case EDIT_GUARD_HP:
     draw_start_guards (bitmap);
     break;
   case EDIT_KID:
@@ -651,7 +650,8 @@ draw_animated_foreground (ALLEGRO_BITMAP *bitmap, int room)
 
   for (p.floor = FLOORS; p.floor >= -1; p.floor--)
     for (p.place = -1; p.place < PLACES; p.place++)
-      draw_box (bitmap, &p);
+      if (peq (&mouse_pos, &p))
+        draw_object (bitmap, "BOX", &p);
 }
 
 void
@@ -662,8 +662,8 @@ update_room0_cache (void)
   invalid_pos (&mouse_pos);
   tile_caching = true;
 
-  if (! room0)
-    room0 = create_bitmap (OW (ORIGINAL_WIDTH), OH (ORIGINAL_HEIGHT));
+  destroy_bitmap (room0);
+  room0 = create_bitmap (OW (ORIGINAL_WIDTH), OH (ORIGINAL_HEIGHT));
 
   clear_bitmap (room0, TRANSPARENT_COLOR);
 

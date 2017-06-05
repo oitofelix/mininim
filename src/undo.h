@@ -103,9 +103,9 @@ void register_guard_skill_undo (struct undo *u, int i, struct skill *s,
                                 char *desc);
 void guard_skill_undo (struct guard_skill_undo *d, int dir);
 
-/* GUARD LIVES */
-void register_guard_lives_undo (struct undo *u, int i, int l, char *desc);
-void guard_lives_undo (struct indexed_int_undo *d, int dir);
+/* GUARD HP */
+void register_guard_hp_undo (struct undo *u, int i, int l, char *desc);
+void guard_hp_undo (struct indexed_int_undo *d, int dir);
 
 /* GUARD TYPE */
 void register_guard_type_undo (struct undo *u, int i, enum actor_type t,

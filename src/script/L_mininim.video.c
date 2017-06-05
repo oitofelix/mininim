@@ -23,8 +23,6 @@
 int REAL_WIDTH = ORIGINAL_WIDTH;
 int REAL_HEIGHT = ORIGINAL_HEIGHT;
 
-#define NUMERIC_INDEX_MAX 256
-
 static DECLARE_LUA ( __eq);
 static DECLARE_LUA (__index);
 static DECLARE_LUA (__tostring);
@@ -63,11 +61,11 @@ define_L_mininim_video (lua_State *L)
   /* mininim.video.bitmap */
   define_L_mininim_video_bitmap (L);
 
+  /* mininim.video.font */
+  define_L_mininim_video_font (L);
+
   /* mininim.video.color */
   define_L_mininim_video_color (L);
-
-  /* mininim.video.coordinate */
-  define_L_mininim_video_coordinate (L);
 
   /* mininim.video.rectangle */
   define_L_mininim_video_rectangle (L);
@@ -90,17 +88,23 @@ BEGIN_LUA (__index)
     if (! strcasecmp (key, "bitmap")) {
       lua_pushcfunction (L, L_mininim_video_bitmap);
       return 1;
+    } if (! strcasecmp (key, "font")) {
+      lua_pushcfunction (L, L_mininim_video_font);
+      return 1;
     } else if (! strcasecmp (key, "color")) {
       lua_pushcfunction (L, L_mininim_video_color);
-      return 1;
-    } else if (! strcasecmp (key, "coordinate")) {
-      lua_pushcfunction (L, L_mininim_video_coordinate);
       return 1;
     } else if (! strcasecmp (key, "rectangle")) {
       lua_pushcfunction (L, L_mininim_video_rectangle);
       return 1;
     } else if (! strcasecmp (key, "mode")) {
       lua_pushstring (L, video_mode);
+      return 1;
+    } else if (! strcasecmp (key, "original_width")) {
+      lua_pushnumber (L, ORIGINAL_WIDTH);
+      return 1;
+    } else if (! strcasecmp (key, "original_height")) {
+      lua_pushnumber (L, ORIGINAL_HEIGHT);
       return 1;
     } else if (! strcasecmp (key, "env_mode")) {
       if (! strcasecmp (env_mode, "ORIGINAL"))
@@ -166,16 +170,16 @@ L_push_video_routine (lua_State *L)
   return true;
 }
 
-void
+bool
 video (ALLEGRO_BITMAP *bitmap, int nret, const char *command,
        const char *object, uintptr_t index, uintptr_t part,
-       struct pos *p, int actor_id, int width)
+       struct pos *p, int actor_id, lua_Number width)
 {
   lua_State *L = main_L;
   if (! L_push_video_routine (L)) {
     int i;
     for (i = 0; i < nret; i++) lua_pushnil (L);
-    return;
+    return false;
   }
 
   int nargs = 0;
@@ -191,13 +195,13 @@ video (ALLEGRO_BITMAP *bitmap, int nret, const char *command,
   }
 
   if (index) {
-    if (index <= NUMERIC_INDEX_MAX) lua_pushnumber (L, index);
+    if (index <= VIDEO_INDEX_MAX) lua_pushnumber (L, index);
     else lua_pushstring (L, (char *) index);
     nargs++;
   }
 
   if (part) {
-    if (part <= NUMERIC_INDEX_MAX) lua_pushnumber (L, part);
+    if (part <= VIDEO_INDEX_MAX) lua_pushnumber (L, part);
     else lua_pushstring (L, (char *) part);
     nargs++;
   }
@@ -218,8 +222,10 @@ video (ALLEGRO_BITMAP *bitmap, int nret, const char *command,
   }
 
   L_target_bitmap = bitmap;
-  L_call (L, nargs, nret);
+  bool r = L_call (L, nargs, nret);
   L_target_bitmap = NULL;
+
+  return r;
 }
 
 void
@@ -232,14 +238,14 @@ video_command_error (const char *command, const char *object,
 
   char *index_str;
   if (index) {
-    if (index <= NUMERIC_INDEX_MAX)
+    if (index <= VIDEO_INDEX_MAX)
       index_str = xasprintf (" %ju", index);
     else index_str = xasprintf (" %s", (char *) index);
   } else index_str = xasprintf ("");
 
   char *part_str;
   if (part) {
-    if (part <= NUMERIC_INDEX_MAX)
+    if (part <= VIDEO_INDEX_MAX)
       part_str = xasprintf (" %ju", part);
     else part_str = xasprintf (" %s", (char *) part);
   } else part_str = xasprintf ("");
@@ -252,25 +258,27 @@ video_command_error (const char *command, const char *object,
   al_free (part_str);
 }
 
-struct coord *
-_coord_object_index_part (struct coord *c_ret, const char *object,
-                          uintptr_t index, uintptr_t part,
-                          struct pos *p, int actor_id)
+struct rect *
+_rect_object_index_part (struct rect *r_ret, const char *object,
+                         uintptr_t index, uintptr_t part,
+                         struct pos *p, int actor_id)
 {
   lua_State *L = main_L;
 
-  video (NULL, 1, "COORDINATE", object, index, part, p, actor_id, -1);
+  bool r = video (NULL, 1, "RECTANGLE", object, index, part, p,
+                  actor_id, -1);
 
-  struct coord *c_ptr =
-    luaL_checkudata (L, -1, L_MININIM_VIDEO_COORDINATE);
+  struct rect *r_ptr =
+    luaL_checkudata (L, -1, L_MININIM_VIDEO_RECTANGLE);
 
   lua_pop (L, 1);
 
-  if (c_ptr) {
-    *c_ret = *c_ptr;
-    return c_ret;
+  if (r && r_ptr) {
+    *r_ret = *r_ptr;
+    return r_ret;
   } else {
-    video_command_error ("COORDINATE", object, index, part);
+    new_rect (r_ret, 0, 0, 0, 0, 0);
+    video_command_error ("RECTANGLE", object, index, part);
     return NULL;
   }
 }
@@ -281,29 +289,31 @@ _bitmap_object_index_part (const char *object, uintptr_t index,
 {
   lua_State *L = main_L;
 
-  video (NULL, 1, "BITMAP", object, index, part, NULL, -1, -1);
+  bool r = video (NULL, 1, "BITMAP", object, index, part, NULL, -1, -1);
 
   ALLEGRO_BITMAP **b_ptr =
     luaL_checkudata (L, -1, L_MININIM_VIDEO_BITMAP);
 
   lua_pop (L, 1);
 
-  if (b_ptr) return *b_ptr;
+  if (r && b_ptr) return *b_ptr;
   else {
     video_command_error ("BITMAP", object, index, part);
     return NULL;
   }
 }
 
-int
+lua_Number
 video_mode_value (const char *object)
 {
   lua_State *L = main_L;
 
-  video (NULL, 1, "VALUE", object, 0, 0, NULL, -1, -1);
+  bool r = video (NULL, 1, "VALUE", object, 0, 0, NULL, -1, -1);
 
-  int n = lua_tonumber (L, -1);
+  if (! r || ! lua_isnumber (L, -1))
+    video_command_error ("VALUE", object, 0, 0);
 
+  lua_Number n = lua_tonumber (L, -1);
   lua_pop (L, 1);
 
   return n;
@@ -396,8 +406,25 @@ setup_video_mode (char *requested_vm)
     return;
   }
 
+  size_t i;
+  for (i = 0; i < actor_nmemb; i++) {
+    struct actor *a = &actor[i];
+    a->f.b = NULL;
+    a->f.c.x = round (a->f.c.x);
+    a->f.c.y = round (a->f.c.y);
+  }
+
   REAL_WIDTH = w;
   REAL_HEIGHT = h;
 
-  set_multi_room (mr.fit_w, mr.fit_h);
+  destroy_bitmap (uscreen);
+  uscreen = create_bitmap (OW (CUTSCENE_WIDTH), OH (CUTSCENE_HEIGHT));
+  clear_bitmap (uscreen, TRANSPARENT_COLOR);
+
+  set_multi_room (mr.w, mr.h);
+
+  update_room0_cache ();
+  update_cache ();
+
+  if (is_game_paused ()) step_cycle = 1;
 }

@@ -30,10 +30,10 @@ kid_resurrect (struct actor *k)
   k->splash = false;
   k->sword_immune = 16;
   k->invisible = false;
-  if (k->current_lives > 0) return;
+  if (k->current_hp > 0) return;
   struct pos pm;
   survey (_m, pos, &k->f, NULL, &pm, NULL);
-  k->current_lives = k->total_lives;
+  k->current_hp = k->total_hp;
   k->death_reason = NO_DEATH;
   k->death_timer = 0;
   k->action = kid_normal;
@@ -73,7 +73,7 @@ kid_die_spiked (struct actor *k)
   }
 
   if (k->oaction != kid_die_spiked) {
-    k->current_lives = 0;
+    k->current_hp = 0;
     k->splash = true;
     k->death_reason = SPIKES_DEATH;
 
@@ -85,12 +85,11 @@ kid_die_spiked (struct actor *k)
     play_audio (&spiked_audio, NULL, k->id);
   }
 
-  if (k->oaction != kid_die_spiked) {
-    int dx = (k->f.dir == LEFT) ? +8 : +9;
-    int dy = (k->f.dir == LEFT) ? +32 : +31;
-    place_actor (k, &k->p, dx, dy, "KID", "DIE", 6);
-    kill_kid_shadows (k);
-  }
+  int dx = (k->f.dir == LEFT) ? +8 : +9;
+  int dy = (k->f.dir == LEFT) ? +32 : +31;
+  place_actor (k, &k->p, dx, dy, "KID", "DIE", 6);
+
+  if (k->oaction != kid_die_spiked) kill_kid_shadows (k);
 
   k->xf.b = NULL;
 }
@@ -109,7 +108,7 @@ kid_die_chomped (struct actor *k)
   k->f.flip = (k->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
   if (k->oaction != kid_die_chomped) {
-    k->current_lives = 0;
+    k->current_hp = 0;
     k->splash = true;
     k->death_reason = CHOMPER_DEATH;
 
@@ -121,12 +120,10 @@ kid_die_chomped (struct actor *k)
     play_audio (&chomped_audio, NULL, k->id);
   }
 
-  if (k->oaction != kid_die_chomped) {
-    int dx = (k->f.dir == LEFT) ? -8 : -7;
-    int dy = +47;
-    place_actor (k, &k->p, dx, dy, "KID", "DIE", 7);
-    kill_kid_shadows (k);
-  }
+  struct rect r; actor_rect (&r, k, "KID", "DIE", "CHOMPED");
+  place_actor (k, &k->p, r.c.x, r.c.y, "KID", "DIE", 7);
+
+  if (k->oaction != kid_die_chomped) kill_kid_shadows (k);
 
   k->xf.b = NULL;
 }
@@ -145,13 +142,12 @@ kid_die_suddenly (struct actor *k)
   k->action = kid_die_suddenly;
   k->f.flip = (k->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
-  k->current_lives = 0;
+  k->current_hp = 0;
+
+  k->f.b = actor_bitmap (k, "KID", "DIE", 5);
+  place_on_the_ground_alternative (&k->f, &k->f.c, PLACE_HEIGHT);
 
   if (k->oaction != kid_die_suddenly) {
-    int dx = MIGNORE;
-    int dy = +47;
-    place_actor (k, &k->p, dx, dy, "KID", "DIE", 5);
-
     move_frame (&k->f, _tf, +0, +4, +0);
 
     survey (_m, pos, &k->f, NULL, &k->p, NULL);
@@ -179,7 +175,7 @@ void
 kid_die (struct actor *k)
 {
   if (k->action == kid_fall) {
-    k->current_lives = 0;
+    k->current_hp = 0;
     return;
   }
 
@@ -202,7 +198,7 @@ flow (struct actor *k)
     k->xf.b = NULL;
   }
 
-  k->current_lives = 0;
+  k->current_hp = 0;
 
   k->i = k->i < 5 ? k->i + 1 : 5;
 
@@ -221,6 +217,10 @@ flow (struct actor *k)
 static bool
 physics_in (struct actor *k)
 {
+  /* place on ground */
+  if (k->i == 5) place_on_the_ground_alternative
+                   (&k->f, &k->f.c, PLACE_HEIGHT);
+
   /* collision */
   uncollide (&k->f, &k->fo, _bb, +0, +0, &k->fo, NULL);
 

@@ -47,7 +47,7 @@ static bool
 flow (struct actor *k)
 {
   if (k->oaction != kid_turn)
-    k->i = -1, k->misstep = k->hang = false;
+    k->i = -1, k->hang = false;
 
   if (! k->turn)
     k->turn = ((k->f.dir == RIGHT) && k->key.left)
@@ -65,7 +65,8 @@ flow (struct actor *k)
     if (k->hang) kid_hang (k);
     else if (k->turn) {
       k->i = -1; k->turn = false;
-      k->action = kid_normal;
+      /* k->action = kid_normal; */
+      k->f.dir = (k->f.dir == LEFT) ? RIGHT : LEFT;
       kid_turn (k);
     }
     else if (crouch) kid_crouch (k);
@@ -128,6 +129,9 @@ physics_in (struct actor *k)
 static void
 physics_out (struct actor *k)
 {
+  /* place on the ground */
+  place_on_the_ground (&k->f, &k->f.c);
+
   /* depressible floors */
   keep_depressible_floor (k);
 }

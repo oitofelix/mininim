@@ -34,20 +34,20 @@ draw_wall (ALLEGRO_BITMAP *bitmap, struct pos *p)
 void
 draw_wall_cache (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
-  struct coord c; coord_object_part (&c, "WALL", "FRONT", p);
+  struct rect r; rect_object_part (&r, "WALL", "FRONT", p);
   struct pos np; npos (p, &np);
-  struct coord nc; coord_object_part (&nc, "WALL", "FRONT", &np);
-  struct coord vc; coord2room (&c, room_view, &vc);
+  struct rect nr; rect_object_part (&nr, "WALL", "FRONT", &np);
+  struct coord vc; coord2room (&r.c, room_view, &vc);
   int x, y;
   if (mr_coord (np.room, -1, &x, &y))
-    draw_bitmap_regionc (mr.cell[x][y].cache, bitmap, nc.x, nc.y,
-                         PLACE_WIDTH, PLACE_HEIGHT, &c, 0);
+    draw_bitmap_regionc (mr.cell[x][y].cache, bitmap, nr.c.x, nr.c.y,
+                         PLACE_WIDTH, PLACE_HEIGHT, &r.c, 0);
   else if (mr_coord (vc.room, -1, &x, &y))
     draw_bitmap_regionc (mr.cell[x][y].cache, bitmap, vc.x, vc.y,
                          PLACE_WIDTH, PLACE_HEIGHT, &vc, 0);
   else if (mr_coord (p->room, -1, &x, &y))
-    draw_bitmap_regionc (mr.cell[x][y].cache, bitmap, c.x, c.y,
-                         PLACE_WIDTH, PLACE_HEIGHT, &c, 0);
+    draw_bitmap_regionc (mr.cell[x][y].cache, bitmap, r.c.x, r.c.y,
+                         PLACE_WIDTH, PLACE_HEIGHT, &r.c, 0);
   else {
     draw_object_part (bitmap, "WALL", "FRONT", p);
     draw_object_part (bitmap, "WALL", "FACE", p);
@@ -55,18 +55,22 @@ draw_wall_cache (ALLEGRO_BITMAP *bitmap, struct pos *p)
 }
 
 enum should_draw
-should_draw_face (struct pos *p, struct frame *f)
+should_draw_face (struct pos *p0, struct frame *f, enum dir d)
 {
   if (! f) return false;
+
+  struct pos p;
+  if (d == LEFT) prel (p0, &p, +0, -1);
+  else p = *p0;
 
   struct pos ptr, ptl;
   surveyo (_tr, -4, +10, pos, f, NULL, &ptr, NULL);
   surveyo (_tl, -14, +10, pos, f, NULL, &ptl, NULL);
 
-  if (is_fake (p)) return SHOULD_DRAW_PART;
+  if (is_fake (p0)) return SHOULD_DRAW_PART;
   else if (is_sword_frame (f))
     return SHOULD_DRAW_NONE;
-  else if (peq (&ptr, p) || peq (&ptl, p))
+  else if (peq (&ptr, &p) || peq (&ptl, &p))
     return SHOULD_DRAW_FULL;
   else return SHOULD_DRAW_NONE;
 }
@@ -76,10 +80,7 @@ draw_wall_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f)
 {
   draw_object_part (bitmap, "WALL", "FRONT", p);
 
-  struct pos par; prel (p, &par, -1, +1);
-  struct pos pr; prel (p, &pr, +0, +1);
-
-  switch (should_draw_face (p, f)) {
+  switch (should_draw_face (p, f, RIGHT)) {
   case SHOULD_DRAW_FULL:
     push_drawn_rectangle (bitmap);
     draw_object_part (bitmap, "WALL", "FACE", p);

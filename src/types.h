@@ -62,7 +62,7 @@ struct frameset {
 };
 
 struct dim {
-  int x, y, w, h, fx, bx;
+  lua_Number x, y, w, h, fx, bx;
 };
 
 enum dir {
@@ -72,14 +72,14 @@ enum dir {
 struct coord {
   struct level *l;
   int room;
-  double x, y;
+  lua_Number x, y;
   int prev_room;
   enum dir xd;
 };
 
 struct rect {
   struct coord c;
-  int w, h;
+  lua_Number w, h;
 };
 
 struct star {
@@ -171,11 +171,11 @@ struct mr_room_list {
 };
 
 enum gm {
-  ORIGINAL_GM, GUARD_GM, FAT_GUARD_GM, VIZIER_GM, SKELETON_GM, SHADOW_GM,
+  ORIGINAL_GM, GUARD_GM, FAT_GM, VIZIER_GM, SKELETON_GM, SHADOW_GM,
 };
 
 enum actor_type {
-  NO_ACTOR = 0, KID = 1, SHADOW = 2, GUARD = 3, FAT_GUARD = 4,
+  NO_ACTOR = 0, KID = 1, SHADOW = 2, GUARD = 3, FAT = 4,
   SKELETON = 5, VIZIER = 6, PRINCESS = 7, MOUSE = 8,
 };
 
@@ -187,7 +187,7 @@ struct skill {
   int advance_prob;
   int return_prob;
   int refraction;
-  int extra_life;
+  int extra_hp;
 };
 
 struct gamepad_state {
@@ -229,7 +229,7 @@ struct level {
     struct pos p;
     enum dir dir;
     struct skill skill;
-    int total_lives;
+    int total_hp;
     int style;
   } guard[GUARDS];
 
@@ -287,8 +287,8 @@ struct level {
 enum item {
   NO_ITEM = 0,
   EMPTY_POTION = 1,
-  SMALL_LIFE_POTION = 2,
-  BIG_LIFE_POTION = 3,
+  SMALL_HP_POTION = 2,
+  BIG_HP_POTION = 3,
   SMALL_POISON_POTION = 4,
   BIG_POISON_POTION = 5,
   FLOAT_POTION = 6,
@@ -367,7 +367,7 @@ struct actor {
 
   struct frame_offset {
     ALLEGRO_BITMAP *b;
-    int dx, dy;
+    lua_Number dx, dy;
   } fo;
 
   struct frame_offset xf;
@@ -382,13 +382,18 @@ struct actor {
   ACTION action;
   ACTION next_action;
   ACTION hang_caller;
-  int i, oi, j, wait, repeat, cinertia, inertia, walk,
-    total_lives, current_lives;
+  int i, oi, j, wait, repeat, cinertia, inertia,
+    total_hp, current_hp;
   bool reverse, collision, fall, hit_ceiling, hit_ceiling_fake,
     just_hanged, hang, hang_limit, misstep, uncrouch_slowly,
-    keep_sword_fast, turn, shadow, splash, hit_by_loose_floor,
+    keep_sword_fast, turn, shadow, hit_by_loose_floor,
     invisible, has_sword, hurt, controllable, fight,
     edge_detection, auto_taken_sword, constrained_turn_run;
+
+  int ignore_danger;
+
+  ALLEGRO_BITMAP *splash_bitmap;
+  bool splash;
 
   int enemy_defended_my_attack, enemy_counter_attacked_myself,
     i_counter_defended;
@@ -413,7 +418,7 @@ struct actor {
   int enemy_id;
   int enemy_refraction;
 
-  bool dont_draw_lives;
+  bool dont_draw_hp;
 
   int style;
 
@@ -551,7 +556,7 @@ enum options {
   VIDEO_MODE_OPTION = 256, ENVIRONMENT_MODE_OPTION, GUARD_MODE_OPTION,
   SOUND_GAIN_OPTION, DISPLAY_FLIP_MODE_OPTION, GAMEPAD_FLIP_MODE_OPTION,
   MIRROR_MODE_OPTION, BLIND_MODE_OPTION, IMMORTAL_MODE_OPTION,
-  TOTAL_LIVES_OPTION, START_LEVEL_OPTION, TIME_LIMIT_OPTION,
+  TOTAL_HP_OPTION, START_LEVEL_OPTION, TIME_LIMIT_OPTION,
   KCA_OPTION, KCD_OPTION, DATA_PATH_OPTION, FULLSCREEN_OPTION,
   WINDOW_POSITION_OPTION, WINDOW_DIMENSIONS_OPTION,
   INHIBIT_SCREENSAVER_OPTION, PRINT_PATHS_OPTION, PRINT_DISPLAY_MODES_OPTION,
@@ -586,7 +591,7 @@ enum edit {
   EDIT_GUARD_SKILL_DEFENSE,
   EDIT_GUARD_SKILL_COUNTER_DEFENSE, EDIT_GUARD_SKILL_ADVANCE,
   EDIT_GUARD_SKILL_RETURN,
-  EDIT_GUARD_SKILL_REFRACTION, EDIT_GUARD_SKILL_EXTRA_LIFE, EDIT_GUARD_LIVES,
+  EDIT_GUARD_SKILL_REFRACTION, EDIT_GUARD_SKILL_EXTRA_HP, EDIT_GUARD_HP,
   EDIT_GUARD_TYPE, EDIT_GUARD_STYLE, EDIT_SKILL_LEGACY_TEMPLATES,
   EDIT_NOMINAL_NUMBER, EDIT_MIRROR_TILE, EDIT_ROOM_MIRROR,
   EDIT_ROOM_MIRROR_TILES,

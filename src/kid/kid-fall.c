@@ -28,7 +28,8 @@ void
 kid_fall (struct actor *k)
 {
   k->oaction = k->action;
-  k->oi = k->i;
+  /* fall is detected after actor's next frame has been selected */
+  k->oi = k->i - 1;
   k->action = kid_fall;
   k->f.flip = (k->f.dir == RIGHT) ? ALLEGRO_FLIP_HORIZONTAL : 0;
 
@@ -42,7 +43,7 @@ static bool
 flow (struct actor *k)
 {
   if (k->oaction != kid_fall) {
-    k->j = k->i;
+    /* k->j = k->i; */
     k->i = -1;
   }
 
@@ -50,8 +51,8 @@ flow (struct actor *k)
 
   int i = k->i > 4 ? 4 : k->i;
   k->fo.b = actor_bitmap (k, "KID", "FALL", i);
-  k->fo.dx = actor_bitmap_dx (k, "KID", "FALL", i);
-  k->fo.dy = actor_bitmap_dy (k, "KID", "FALL", i);
+  k->fo.dx = actor_dx (k, "KID", "FALL", i);
+  k->fo.dy = actor_dy (k, "KID", "FALL", i);
 
   return true;
 }
@@ -62,11 +63,11 @@ physics_in (struct actor *k)
   bool hang_back = ((k->f.dir == LEFT) ? k->key.right : k->key.left)
     && ! k->key.up && k->key.shift
     && (k->i < 9 || k->float_timer)
-    && k->current_lives > 0;
+    && k->current_hp > 0;
 
   bool hang_front = k->key.shift && ! hang_back
     && (k->i < 9 || k->float_timer)
-    && k->current_lives > 0;
+    && k->current_hp > 0;
 
   /* fall speed */
   int inertia = k->inertia;
@@ -75,7 +76,7 @@ physics_in (struct actor *k)
   if (k->i <= 4 || k->float_timer) speed = 0;
   else speed = +21 + 3 * (k->i - 5);
 
-  if (k->float_timer && k->float_timer < FLOAT_TIMER_MAX) {
+  if (k->i > 0 && k->float_timer && k->float_timer < FLOAT_TIMER_MAX) {
     /* floating */
     k->fo.dx = -k->inertia / 2 - 2;
     k->fo.dy = +5;
@@ -86,35 +87,21 @@ physics_in (struct actor *k)
     if (k->i == 4) k->fo.dx += +4;
   }
 
-  if (k->oaction == kid_jump
-      && (k->j == 10 || k->j == 11)) {
-    k->fo.dx = -4;
-    k->fo.dy = +8;
-  } else if (k->oaction == kid_run_jump && k->j == 10) {
-    k->fo.dx = -8;
-    k->fo.dy = +4;
-  } else if (k->oaction == kid_turn_run) {
-    k->fo.dx = (k->float_timer > 0) ? +26 : +20;
-    uncollide (&k->f, &k->fo, _bb, +0, +0, &k->fo, NULL);
-  } else if (k->oaction == kid_crouch && k->collision) {
-    k->collision = false;
-    k->fo.dx += -16;
-  } else if (k->oaction == kid_crouch) {
-    k->fo.dx += -12;
-  } else if (k->i == 0
-             && k->oaction != kid_normal
-             && k->oaction != kid_hang_free
-             && k->oaction != kid_hang_non_free
-             && k->oaction != kid_climb) {
+  if (k->i == 0
+      && ! k->fo.dx
+      && k->oaction != kid_normal
+      && k->oaction != kid_hang_free
+      && k->oaction != kid_hang_non_free
+      && k->oaction != kid_climb) {
     place_kid_in_initial_fall (k);
     k->inertia = 0;
   }
 
   /* printf ("inertia: %i\n", k->inertia); */
 
-  /* collision */
-  uncollide (&k->f, &k->fo, _bf, -8, +0, &k->fo, NULL);
-  uncollide (&k->f, &k->fo, _tf, -8, +0, &k->fo, NULL);
+  /* /\* collision *\/ */
+  /* uncollide (&k->f, &k->fo, _bf, +0, +0, &k->fo, NULL); */
+  /* uncollide (&k->f, &k->fo, _tf, +0, +0, &k->fo, NULL); */
 
   /* hang front */
   if (k->i > 4 && can_hang (k, false, &k->hang_pos)
@@ -144,8 +131,8 @@ physics_in (struct actor *k)
 
   int i = k->i > 4 ? 4 : k->i;
   fo.b = actor_bitmap (k, "KID", "FALL", i);
-  fo.dx = actor_bitmap_dx (k, "KID", "FALL", i);
-  fo.dy = actor_bitmap_dy (k, "KID", "FALL", i);
+  fo.dx = actor_dx (k, "KID", "FALL", i);
+  fo.dy = actor_dy (k, "KID", "FALL", i);
 
   if (k->float_timer) fo.dy = 14;
   else {
@@ -187,11 +174,11 @@ physics_in (struct actor *k)
         && ! k->float_timer) {
       k->hurt = true;
       k->splash = true;
-      k->current_lives--;
+      k->current_hp--;
 
-      if (k->i >= 10) k->current_lives = 0;
+      if (k->i >= 10) k->current_hp = 0;
 
-      if (k->current_lives > 0) {
+      if (k->current_hp > 0) {
         play_audio (&hit_ground_harm_audio, NULL, k->id);
         k->uncrouch_slowly = true;
         kid_haptic (k, KID_HAPTIC_HARM);
@@ -207,7 +194,7 @@ physics_in (struct actor *k)
     } else k->hurt = false;
 
     survey (_mt, pos, &k->f, NULL, &pmt, NULL);
-    if (k->current_lives <= 0) {
+    if (k->current_hp <= 0) {
       stop_audio_instance (&scream_audio, NULL, k->id);
       k->p = pmt;
       if (fg (&pmt) == SPIKES_FLOOR
@@ -243,7 +230,7 @@ physics_out (struct actor *k)
   /* sound */
   if (k->i == 10
       && ! k->float_timer
-      && k->current_lives > 0) {
+      && k->current_hp > 0) {
     play_audio (&scream_audio, NULL, k->id);
     kid_haptic (k, KID_HAPTIC_SCREAM);
     if (scream) {

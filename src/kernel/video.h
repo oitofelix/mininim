@@ -37,6 +37,7 @@ ALLEGRO_BITMAP *load_scaled_memory_bitmap (char *filename, int w, int h,
 ALLEGRO_BITMAP *clone_scaled_memory_bitmap (ALLEGRO_BITMAP *bitmap, int w,
                                             int h, int flags);
 ALLEGRO_BITMAP *load_bitmap (const char *filename);
+ALLEGRO_FONT *load_font (const char *filename);
 void validate_bitmap_for_mingw (ALLEGRO_BITMAP *bitmap);
 void save_bitmap (char *filename, ALLEGRO_BITMAP *bitmap);
 bool bitmap_heq (ALLEGRO_BITMAP *b0, ALLEGRO_BITMAP *b1);
@@ -56,7 +57,9 @@ void draw_filled_rectangle (ALLEGRO_BITMAP *to, float x1, float y1,
 void draw_rectangle (ALLEGRO_BITMAP *to, float x1, float y1,
                      float x2, float y2, ALLEGRO_COLOR color,
                      float thickness);
-void draw_text (ALLEGRO_BITMAP *bitmap, char const *text, float x, float y, int flags);
+void draw_text (ALLEGRO_BITMAP *bitmap, ALLEGRO_FONT *font,
+                ALLEGRO_COLOR c, float x, float y, int flags,
+                char const *text);
 bool draw_bottom_text (ALLEGRO_BITMAP *bitmap, char *text, int priority);
 void draw_fade (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to, float factor);
 void draw_roll_right (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
@@ -114,10 +117,10 @@ bool merge_clipping_rectangle (ALLEGRO_BITMAP *bitmap, int x, int y,
                                int w, int h);
 void pop_clipping_rectangle (void);
 
-double IW (double w);
-double IH (double h);
-double OW (double w);
-double OH (double h);
+lua_Number IW (lua_Number w);
+lua_Number IH (lua_Number h);
+lua_Number OW (lua_Number w);
+lua_Number OH (lua_Number h);
 
 void video_rendering (bool enable);
 
@@ -142,6 +145,7 @@ extern bool ignore_clipping_rectangle_intersection;
 extern bool about_screen;
 extern ALLEGRO_BITMAP *oitofelix_face;
 extern ssize_t palette_cache_size_limit;
+extern ALLEGRO_FONT *builtin_font;
 
 struct drawn_rectangle drawn_rectangle_stack[DRAWN_RECTANGLE_STACK_NMEMB_MAX];
 size_t drawn_rectangle_stack_nmemb;

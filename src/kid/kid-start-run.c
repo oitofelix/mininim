@@ -41,7 +41,7 @@ kid_start_run (struct actor *k)
 static bool
 flow (struct actor *k)
 {
-  if (k->oaction != kid_start_run) k->i = -1, k->misstep = false;
+  if (k->oaction != kid_start_run) k->i = -1;
 
   bool run = (k->f.dir == RIGHT) ? k->key.right : k->key.left;
   bool turn_run = (k->f.dir == RIGHT) ? k->key.left : k->key.right;
@@ -101,6 +101,9 @@ physics_in (struct actor *k)
 static void
 physics_out (struct actor *k)
 {
+  /* place on the ground */
+  place_on_the_ground (&k->f, &k->f.c);
+
   /* depressible floors */
   if (k->i == 5) update_depressible_floor (k, -16, -19);
   else keep_depressible_floor (k);

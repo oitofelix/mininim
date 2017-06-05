@@ -93,7 +93,7 @@ play_anim (void (*draw_callback) (void),
             && (anim_cycle >= replay->packed_gamepad_state_nmemb
                 + REPLAY_STUCK_THRESHOLD
                 || ((k = get_actor_by_id (current_kid_id))
-                    && k->current_lives <= 0
+                    && k->current_hp <= 0
                     && death_timer >= SEC2CYC (8))))
           quit_anim = REPLAY_INCOMPLETE;
 
@@ -255,6 +255,9 @@ play_anim (void (*draw_callback) (void),
     case ALLEGRO_EVENT_MOUSE_AXES:
       if (pause_anim) break;
       if (edit == EDIT_NONE) break;
+
+      keep_all_depressible_floors ();
+
       int dz = event.mouse.dz;  /* vertical */
       int dw = event.mouse.dw;  /* horizontal */
 
@@ -376,8 +379,6 @@ change_anim_freq (int f)
 void
 draw_frame (ALLEGRO_BITMAP *bitmap, struct frame *f)
 {
-  if (! f->b) return;
-
   draw_bitmapc (f->b, bitmap, &f->c, f->flip);
 }
 
@@ -392,7 +393,7 @@ draw_xframe (ALLEGRO_BITMAP *bitmap, struct frame *f, struct frame_offset *xf)
 struct coord *
 xframe_coord (struct frame *f, struct frame_offset *xf, struct coord *c)
 {
-  int w = IW (get_bitmap_width (xf->b));
+  lua_Number w = IW (get_bitmap_width (xf->b));
   _tf (f, c);
   return
     new_coord (c, f->c.l, f->c.room,
@@ -410,11 +411,11 @@ xframe_frame (struct frame *f, struct frame_offset *xf, struct frame *nf)
 }
 
 struct frame *
-splash_frame (struct frame *f, struct frame *nf)
+splash_frame (ALLEGRO_BITMAP *splash, struct frame *f, struct frame *nf)
 {
   *nf = *f;
-  nf->b = v_kid_splash;
-  splash_coord (f, &nf->c);
+  nf->b = splash;
+  splash_coord (splash, f, &nf->c);
   return nf;
 }
 
@@ -441,16 +442,18 @@ next_frame (struct frame *f, struct frame *nf, struct frame_offset *fo)
 {
   *nf = *f;
 
+  if (! f->b) nf->b = fo->b;
+
   nf->oc = f->c;
   nf->ob = f->b;
 
-  int ow = IW (get_bitmap_width (nf->b));
-  int oh = IH (get_bitmap_height (nf->b));
-  int w = IW (get_bitmap_width (fo->b));
-  int h = IH (get_bitmap_height (fo->b));
+  lua_Number ow = IW (get_bitmap_width (nf->b));
+  lua_Number oh = IH (get_bitmap_height (nf->b));
+  lua_Number w = IW (get_bitmap_width (fo->b));
+  lua_Number h = IH (get_bitmap_height (fo->b));
 
-  int dx = fo->dx;
-  int dy = fo->dy;
+  lua_Number dx = fo->dx;
+  lua_Number dy = fo->dy;
 
   if (next_frame_inv) nf->c.x += (nf->dir == LEFT) ? ow - w - dx : dx;
   else nf->c.x += (nf->dir == LEFT) ? dx : ow - w - dx;

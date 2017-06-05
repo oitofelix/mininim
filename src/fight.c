@@ -49,7 +49,7 @@ void
 leave_fight_logic (struct actor *k)
 {
   /* dead character doesn't fight */
-  if (k->current_lives <= 0) {
+  if (k->current_hp <= 0) {
     k->enemy_refraction = 0;
     forget_enemy (k);
     return;
@@ -82,7 +82,7 @@ leave_fight_logic (struct actor *k)
   }
 
   /* if the enemy is dead no need to worry about him */
-  if (ke->current_lives <= 0) {
+  if (ke->current_hp <= 0) {
     k->enemy_refraction = 0;
     forget_enemy (k);
     return;
@@ -122,7 +122,7 @@ enter_fight_logic (struct actor *k)
   /*   return; */
 
   /* dead character doesn't fight */
-  if (k->current_lives <= 0) return;
+  if (k->current_hp <= 0) return;
 
   /* non-fighter doesn't fight */
   if (! k->fight) return;
@@ -137,7 +137,7 @@ enter_fight_logic (struct actor *k)
     struct actor *a = &actor[i];
 
     /* no dead character is a valid opponent */
-    if (a->current_lives <= 0) continue;
+    if (a->current_hp <= 0) continue;
 
     /* only valid opponents matter */
     if (! are_valid_opponents (k, a)) continue;
@@ -217,7 +217,7 @@ void
 fight_ai (struct actor *k)
 {
   /* dead characters don't fight */
-  if (k->current_lives <= 0) return;
+  if (k->current_hp <= 0) return;
 
   /* non-fightable characters don't fight */
   if (! is_fightable_actor (k)) return;
@@ -231,7 +231,7 @@ fight_ai (struct actor *k)
     struct actor *a = &actor[i];
 
     /* no dead character is a valid opponent */
-    if (a->current_lives <= 0) continue;
+    if (a->current_hp <= 0) continue;
 
     /* only valid opponents matter */
     if (! are_valid_opponents (k, a)) continue;
@@ -305,7 +305,7 @@ fight_ai (struct actor *k)
       && ! ke->immortal
       && ! (is_kid_climb (ke) && ke->i <= 7)
       && ke->f.dir != k->f.dir
-      && ke->current_lives > 0
+      && ke->current_hp > 0
       && ke->action != kid_fall
       && ! is_kid_hang (ke)
       && ! ((ke->action == kid_jump || ke->action == kid_run_jump)
@@ -334,7 +334,7 @@ fight_ai (struct actor *k)
   if (ke->type == KID
       && is_in_range (k, ke, INVERSION_RANGE)
       && ! is_in_fight_mode (ke)
-      && ke->current_lives > 0) {
+      && ke->current_hp > 0) {
     if (is_safe_to_walkb (k)) fight_walkb (k);
     else if (is_safe_to_turn (k)) fight_turn (k);
     return;
@@ -368,7 +368,7 @@ fight_ai (struct actor *k)
       && ! ke->has_sword
       && ke->action != kid_stairs
       && ke->f.dir != k->f.dir
-      && ke->current_lives > 0
+      && ke->current_hp > 0
       && ! is_on_back (k, ke)
       && ((ke->action == kid_run
            && is_in_range (k, ke, 3 * PLACE_WIDTH - 4))
@@ -427,7 +427,7 @@ fight_ai (struct actor *k)
       && (prandom (99) <= k->skill.defense_prob
           || prandom (99) < k->angry
           || k->refraction > 0)
-      && ke->current_lives > 0) {
+      && ke->current_hp > 0) {
     fight_defense (k);
     fight_attack (k);
     return;
@@ -451,7 +451,7 @@ fight_ai (struct actor *k)
       && ! ((is_kid_climb (ke)
              || is_kid_successfully_climbing (ke))
             && ke->i >= 1)
-      && ke->current_lives > 0
+      && ke->current_hp > 0
       && (prandom (99) <= k->skill.attack_prob
           || ! is_in_fight_mode (ke))) {
     if (is_safe_to_attack (k)) fight_attack (k);
@@ -505,7 +505,8 @@ fight_mechanics (struct actor *k)
 
   if (! ke->enemy_counter_attacked_myself)
     ke->enemy_counter_attacked_myself =
-      (ke->enemy_defended_my_attack && k->key.shift
+      (ke->enemy_defended_my_attack
+       && (k->key.shift || ! k->controllable)
        && (prandom (99) <= k->skill.counter_attack_prob
            || prandom (99) < k->angry)
        && (ke->attack_range_near || k->attack_range_near)
@@ -516,6 +517,11 @@ fight_mechanics (struct actor *k)
       (ke->enemy_counter_attacked_myself && ke->key.up
        && (prandom (99) <= ke->skill.counter_defense_prob
            || k->angry));
+
+  /* ***** */
+  ke->enemy_counter_attacked_myself = true;
+  ke->i_counter_defended = true;
+  /* ***** */
 
   if (! k->hurt_enemy_in_counter_attack)
     k->hurt_enemy_in_counter_attack =
@@ -616,7 +622,7 @@ leave_fight_mode (struct actor *k)
   k->key.down = true;
 }
 
-int
+lua_Number
 dist_actors (struct actor *k0, struct actor *k1)
 {
   if (! k0 || ! k1) return INT_MAX;
@@ -776,7 +782,7 @@ put_at_defense_frame (struct actor *k)
     next_frame (&k->f, &k->f, &k->fo);
     break;
   case GUARD:
-  case FAT_GUARD:
+  case FAT:
   case VIZIER:
   case SKELETON:
   case SHADOW:
@@ -814,21 +820,27 @@ put_at_attack_frame (struct actor *k)
     select_actor_frame (k, "KID", "SWORD_ATTACK", 2);
 
     /* sword attack defended */
+    k->i = 8;
+
     k->fo.b = actor_bitmap (k, "KID", "SWORD_ATTACK", 8);
+    k->fo.dx += actor_dx (k, "KID", "SWORD_ATTACK", 8);
+    k->fo.dy += actor_dy (k, "KID", "SWORD_ATTACK", 8);
+
     select_actor_xframe (k, "KID", "SWORD", 17);
-    k->xf.dx = -21;
-    k->xf.dy = +11;
+
     uncollide_back_fight (k);
     next_frame (&k->f, &k->f, &k->fo);
+
+    k->i = 3;
     break;
   case GUARD:
-  case FAT_GUARD:
+  case FAT:
   case VIZIER:
   case SKELETON:
   case SHADOW:
     k->fo.b = actor_bitmap (k, NULL, "SWORD_ATTACK", 10);
-    k->fo.dx = actor_bitmap_dx (k, NULL, "SWORD_ATTACK", 10);
-    k->fo.dy = actor_bitmap_dy (k, NULL, "SWORD_ATTACK", 10);
+    k->fo.dx = actor_dx (k, NULL, "SWORD_ATTACK", 10);
+    k->fo.dy = actor_dy (k, NULL, "SWORD_ATTACK", 10);
 
     select_actor_xframe (k, NULL, "SWORD", 8);
     k->xf.dx = -13;
@@ -884,7 +896,7 @@ is_pos_seeing (struct pos *p0, struct actor *k1, enum dir dir)
     coord2room (_m (&k1->f, &m1), m0.room, &m1);
     coord2room (_mbo (&k1->f, &mb1), m0.room, &mb1);
 
-    double dt, dm, db;
+    lua_Number dt, dm, db;
     dt = (mt1.room == m0.room) ? dist_coord (&m0, &mt1) : INFINITY;
     dm = (m1.room == m0.room) ? dist_coord (&m0, &m1) : INFINITY;
     db = (mb1.room == m0.room) ? dist_coord (&m0, &mb1) : INFINITY;
@@ -1018,7 +1030,7 @@ is_safe_to_turn (struct actor *k)
 bool
 dangerous_cs (enum tile_fg t)
 {
-  return potentially_traversable_cs (t)
+  return critical_cs (t)
     || t == WALL || t == CARPET || t == TCARPET || t == MIRROR || t == CHOMPER;
 }
 
@@ -1094,9 +1106,9 @@ is_safe_to_follow (struct actor *k0, struct actor *k1, enum dir dir)
   }
 
   /* enemy went down */
-  if (is_potentially_traversable (&k0->enemy_pos)) {
+  if (is_critical (&k0->enemy_pos)) {
     prel (&k0->enemy_pos, &pke, +1, +0);
-    if (is_potentially_traversable (&pke) || fg (&pke) == SPIKES_FLOOR)
+    if (is_critical (&pke) || fg (&pke) == SPIKES_FLOOR)
       return false;
     int d = (dir == LEFT) ? -1 : +1;
     if (peq (&pk, &k0->enemy_pos)) return true;
@@ -1225,18 +1237,18 @@ void
 fight_hit (struct actor *k, struct actor *ke)
 {
   if (k->immortal || k->sword_immune) return;
-  if (k->current_lives <= 0) return;
+  if (k->current_hp <= 0) return;
   if (is_actor_fall (k) || k->action == kid_stairs)
     return;
 
   place_on_the_ground (&k->f, &k->f.c);
   k->xf.b = NULL;
 
-  if (! is_in_fight_mode (k)) k->current_lives = 0;
-  else k->current_lives--;
+  if (! is_in_fight_mode (k)) k->current_hp = 0;
+  else k->current_hp--;
 
   if (! is_guard (ke))
-    upgrade_skill (&ke->skill, &k->skill, k->total_lives);
+    upgrade_skill (&ke->skill, &k->skill, k->total_hp);
 
   int d = (k->f.dir == LEFT) ? +1 : -1;
   struct pos pb;
@@ -1246,8 +1258,8 @@ fight_hit (struct actor *k, struct actor *ke)
   if (is_attacking (k))
     move_frame (&k->f, _tb, +0, -8, -8);
 
-  if (k->current_lives <= 0 && ! is_traversable (&pb)) {
-    k->current_lives = 0;
+  if (k->current_hp <= 0 && ! is_traversable (&pb)) {
+    k->current_hp = 0;
     k->death_reason = FIGHT_DEATH;
     ke->alert_cycle = anim_cycle;
     /* prevent kid from passing through a collidable */
@@ -1331,23 +1343,23 @@ get_perfect_skill (struct skill *skill)
   skill->advance_prob = -1;
   skill->return_prob = 99;
   skill->refraction = 0;
-  skill->extra_life = INT_MAX - 6;
+  skill->extra_hp = INT_MAX - 6;
   return skill;
 }
 
 struct skill *
-upgrade_skill (struct skill *s0, struct skill *s1, int total_lives)
+upgrade_skill (struct skill *s0, struct skill *s1, int total_hp)
 {
   int ca = (s1->attack_prob + s1->counter_attack_prob) / 2;
   int cd = (s1->defense_prob + s1->counter_defense_prob) / 2;
 
   if (s0->counter_attack_prob < ca)
     s0->counter_attack_prob +=
-      (ca - s0->counter_attack_prob) / (2 * total_lives);
+      (ca - s0->counter_attack_prob) / (2 * total_hp);
 
   if (s0->counter_defense_prob < cd)
     s0->counter_defense_prob +=
-      (cd - s0->counter_defense_prob) / (2 * total_lives);
+      (cd - s0->counter_defense_prob) / (2 * total_hp);
 
   return s0;
 }
@@ -1359,7 +1371,7 @@ alert_guards (struct pos *p)
   for (i = 0; i < actor_nmemb; i++) {
     struct actor *g = &actor[i];
     if (is_guard (g) && is_pos_on_back (g, p)
-        && g->current_lives > 0 && g->enemy_id == -1
+        && g->current_hp > 0 && g->enemy_id == -1
         && anim_cycle - g->alert_cycle > 24) {
       invert_frame_dir (&g->f, &g->f);
       g->alert_cycle = anim_cycle;

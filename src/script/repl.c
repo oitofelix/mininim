@@ -43,12 +43,11 @@
 
 #include "mininim.h"
 
-#define LUA_HISTORY_ENV "MININIM_HISTORY"
-#define LUA_HISTSIZE_ENV "MININIM_HISTSIZE"
+#define MININIM_HISTORY_ENV "MININIM_HISTORY"
+#define MININIM_HISTSIZE_ENV "MININIM_HISTSIZE"
+#define MININIM_HISTSIZE_DEFAULT 1024
 
-static char *myhist;
-static int myhistsize;
-
+char *myhist;
 static char *lhandler_line;
 
 static void
@@ -292,17 +291,22 @@ static void lua_initline(lua_State *L, char *pname)
   rl_initialize();
 
   /* Start using history, optionally set history size and load history file */
-  using_history();
-  if ((s = getenv(LUA_HISTSIZE_ENV)) &&
-      (myhistsize = atoi(s))) stifle_history(myhistsize);
-  if ((myhist = getenv(LUA_HISTORY_ENV))) read_history(myhist);
+  using_history ();
+  int myhistsize;
+  s = getenv (MININIM_HISTSIZE_ENV);
+  if (s) myhistsize = atoi (s);
+  else myhistsize = MININIM_HISTSIZE_DEFAULT;
+  stifle_history (myhistsize);
+  myhist = getenv (MININIM_HISTORY_ENV);
+  if (! myhist) myhist = history_filename;
+  read_history (myhist);
 }
 
 /* Finalize library */
 static void lua_exitline(lua_State *L)
 {
   /* Optionally save history file */
-  if (myhist) write_history(myhist);
+  write_history (myhist);
 }
 
 static void lstop (lua_State *L, lua_Debug *ar) {
@@ -341,15 +345,6 @@ static int report (lua_State *L, int status) {
   return status;
 }
 
-static void sig_catch(int sig, void (*handler)(int))
-{
-  struct sigaction sa;
-  sa.sa_handler = handler;
-  sa.sa_flags = 0;
-  sigemptyset(&sa.sa_mask);
-  sigaction(sig, &sa, 0);         /* XXX ignores errors */
-}
-
 void
 repl_multithread (lua_State *L, lua_Debug *ar)
 {
@@ -366,12 +361,12 @@ static int lcall (lua_State *L, int narg, int clear) {
 
   lua_pushcfunction (L, L_TRACEBACK);
   lua_insert(L, base);  /* put it under chunk and args */
-  sig_catch(SIGINT, laction);
+  sighandler_t handler = signal (SIGINT, laction);
   lua_sethook (L, repl_multithread,
                LUA_MASKCALL | LUA_MASKRET | LUA_MASKCOUNT, 1);
   status = lua_pcall(L, narg, (clear ? 0 : LUA_MULTRET), base);
   lua_sethook(L, NULL, 0, 0);
-  sig_catch(SIGINT, SIG_DFL);
+  signal (SIGINT, handler);
   lua_remove(L, base);  /* remove traceback function */
   return status;
 }

@@ -78,6 +78,9 @@ physics_in (struct actor *k)
 static void
 physics_out (struct actor *k)
 {
+  /* place on the ground */
+  place_on_the_ground (&k->f, &k->f.c);
+
   /* sound */
   if (k->i == 0) play_audio (&take_sword_audio, NULL, k->id);
 

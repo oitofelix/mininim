@@ -174,8 +174,8 @@ editor (void)
   struct bmenu_item items_menu[] =
     {{'N', "NO ITEM"},
      {'E', "EMPTY POTION"},
-     {'S', "SMALL LIFE POTION"},
-     {'B', "BIG LIFE POTION"},
+     {'S', "SMALL HP POTION"},
+     {'B', "BIG HP POTION"},
      {'P', "SMALL POISON POTION"},
      {'O', "BIG POISON POTION"},
      {'F', "FLOAT POTION"},
@@ -276,7 +276,7 @@ editor (void)
      {'J', "JUMP TO START POSITION"},
      {'D', "TOGGLE START DIRECTION"},
      {'K', "SKILL>"},
-     {'L', "LIVES<"},
+     {'H', "HP<"},
      {'T', "TYPE<"},
      {'Y', "STYLE<"},
      {0}};
@@ -289,7 +289,7 @@ editor (void)
      {'V', "ADVANCE<"},
      {'R', "RETURN<"},
      {'F', "REFRACTION PERIOD<"},
-     {'X', "EXTRA LIVES<"},
+     {'X', "EXTRA HP<"},
      {'L', "LEGACY TEMPLATES<"},
      {0}};
 
@@ -757,8 +757,8 @@ editor (void)
       switch (c) {
       case 'N': e = NO_ITEM; break;
       case 'E': e = EMPTY_POTION; break;
-      case 'S': e = SMALL_LIFE_POTION; break;
-      case 'B': e = BIG_LIFE_POTION; break;
+      case 'S': e = SMALL_HP_POTION; break;
+      case 'B': e = BIG_HP_POTION; break;
       case 'P': e = SMALL_POISON_POTION; break;
       case 'O': e = BIG_POISON_POTION; break;
       case 'F': e = FLOAT_POTION; break;
@@ -1656,18 +1656,18 @@ editor (void)
         break;
       }
       edit = EDIT_GUARD_SKILL; break;
-    case 'L':
+    case 'H':
       if (! is_guard_by_type (g->type)) {
         editor_msg ("DISABLED GUARD", EDITOR_CYCLES_1);
         break;
       }
-      edit = EDIT_GUARD_LIVES;
-      s = g->total_lives; break;
+      edit = EDIT_GUARD_HP;
+      s = g->total_hp; break;
     case 'T': edit = EDIT_GUARD_TYPE;
       bb = g->type;
       b0 = (! is_guard_by_type (g->type)) ? true : false;
       b1 = (g->type == GUARD) ? true : false;
-      b2 = (g->type == FAT_GUARD) ? true : false;
+      b2 = (g->type == FAT) ? true : false;
       b3 = (g->type == VIZIER) ? true : false;
       b4 = (g->type == SKELETON) ? true : false;
       b5 = (g->type == SHADOW) ? true : false;
@@ -1724,8 +1724,8 @@ editor (void)
       s = g->skill.return_prob + 1; break;
     case 'F': edit = EDIT_GUARD_SKILL_REFRACTION;
       s = g->skill.refraction; break;
-    case 'X': edit = EDIT_GUARD_SKILL_EXTRA_LIFE;
-      s = g->skill.extra_life; break;
+    case 'X': edit = EDIT_GUARD_SKILL_EXTRA_HP;
+      s = g->skill.extra_hp; break;
     case 'L': edit = EDIT_SKILL_LEGACY_TEMPLATES;
       s = 0;
       break;
@@ -1796,16 +1796,16 @@ editor (void)
     if (c == 1) register_guard_skill_undo (&undo, guard_index, &skill_buf,
                                              "GUARD REFRACTION SKILL");
     break;
-  case EDIT_GUARD_SKILL_EXTRA_LIFE:
-    c = bmenu_skill ("KX>EXT.LIFE", &g->skill.extra_life, INT_MAX,
+  case EDIT_GUARD_SKILL_EXTRA_HP:
+    c = bmenu_skill ("KX>EXT.HP", &g->skill.extra_hp, INT_MAX,
                     EDIT_GUARD_SKILL);
     if (c == 1) register_guard_skill_undo (&undo, guard_index, &skill_buf,
-                                           "GUARD EXTRA LIFE SKILL");
+                                           "GUARD EXTRA HP SKILL");
     break;
-  case EDIT_GUARD_LIVES:
-    c = bmenu_skill ("L>LIVES", &g->total_lives, INT_MAX, EDIT_GUARD);
-    if (c == 1) register_guard_lives_undo (&undo, guard_index, s,
-                                           "GUARD TOTAL LIVES");
+  case EDIT_GUARD_HP:
+    c = bmenu_skill ("L>HP", &g->total_hp, INT_MAX, EDIT_GUARD);
+    if (c == 1) register_guard_hp_undo (&undo, guard_index, s,
+                                           "GUARD TOTAL HP");
     break;
   case EDIT_GUARD_TYPE:
     al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
@@ -1817,7 +1817,7 @@ editor (void)
     b0 = b1 = b2 = b3 = b4 = b5 = 0;
     if (g->type == NO_ACTOR) b0 = true;
     if (g->type == GUARD) b1 = true;
-    if (g->type == FAT_GUARD) b2 = true;
+    if (g->type == FAT) b2 = true;
     if (g->type == VIZIER) b3 = true;
     if (g->type == SKELETON) b4 = true;
     if (g->type == SHADOW) b5 = true;
@@ -1826,8 +1826,8 @@ editor (void)
     case 0: break;
     case 1:
       edit = EDIT_GUARD;
-      if (is_guard_by_type (g->type) && ! g->total_lives)
-        g->total_lives = 3;
+      if (is_guard_by_type (g->type) && ! g->total_hp)
+        g->total_hp = 3;
       if (is_guard_by_type (g->type) && ! g->skill.attack_prob)
         get_legacy_skill (0, &g->skill);
       register_guard_type_undo (&undo, guard_index, bb,
@@ -1836,7 +1836,7 @@ editor (void)
     default:
       if (b0) g->type = NO_ACTOR;
       if (b1) g->type = GUARD;
-      if (b2) g->type = FAT_GUARD;
+      if (b2) g->type = FAT;
       if (b3) g->type = VIZIER;
       if (b4) g->type = SKELETON;
       if (b5) g->type = SHADOW;
@@ -2034,6 +2034,8 @@ ui_place_kid (struct actor *k, struct pos *p)
   int dy = +15;
   place_actor (k, p, dx, dy, "KID", "NORMAL", 0);
 
+  k->misstep = false;
+  k->ignore_danger = 0;
   kid_normal (k);
   if (! is_game_paused ()) update_depressible_floor (k, -4, -10);
 }

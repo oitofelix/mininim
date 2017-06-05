@@ -25,6 +25,7 @@ void save_guard_bitmap (enum actor_type type, int style);
 void save_guard_bitmaps (void);
 void debug_pos (struct pos *p);
 void debug_random_seed (void);
+void debug_actor (struct actor *a);
 void L_dump_stack (lua_State *L);
 
 #endif	/* MININIM_DEBUG_H */

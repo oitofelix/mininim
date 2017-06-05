@@ -66,7 +66,7 @@ flow (struct actor *k)
   if (k->oaction == kid_start_run && turn_run && k->i == 0) {
     struct pos ptf; surveyo (_tf, +0, +0, pos, &k->f, NULL, &ptf, NULL);
     if (is_constrained_pos (&ptf, &k->f)) {
-      k->fo.dx += +12;
+      k->fo.dx += actor_dx (k, "KID", "STOP_RUN", "CONSTRAINED_TURN_RUN");
       k->constrained_turn_run = true;
     }
   }
@@ -92,7 +92,7 @@ physics_in (struct actor *k)
                   &k->fo, NULL);
 
   /* fall */
-  if (is_falling (&k->f, _tf, -4, -4)) {
+  if (! k->constrained_turn_run && is_falling (&k->f, _tf, -4, -4)) {
     kid_fall (k);
     return false;
   }
@@ -103,6 +103,9 @@ physics_in (struct actor *k)
 void
 physics_out (struct actor *k)
 {
+  /* place on the ground */
+  place_on_the_ground (&k->f, &k->f.c);
+
   /* depressible floors */
   if (k->i == 0) update_depressible_floor (k, -1, -5);
   else if (k->i == 2) update_depressible_floor (k, -2, -7);

@@ -182,7 +182,6 @@
 #include "debug.h"
 #include "undo.h"
 #include "multi-room.h"
-#include "box.h"
 #include "replay.h"
 #include "ui.h"
 #include "xmath.h"
@@ -198,8 +197,8 @@
 #include "L_mininim.audio.source.h"
 #include "L_mininim.video.h"
 #include "L_mininim.video.bitmap.h"
+#include "L_mininim.video.font.h"
 #include "L_mininim.video.color.h"
-#include "L_mininim.video.coordinate.h"
 #include "L_mininim.video.rectangle.h"
 #include "L_mininim.setting.h"
 #include "L_mininim.mouse.h"
@@ -215,7 +214,6 @@ void *message_box_thread (ALLEGRO_THREAD *thread, void *arg);
 bool load_config (char *filename, enum file_type *ret_file_type,
                   int priority);
 bool save_game (char *filename, int priority);
-void quit_game (void);
 struct level *level_module_next_level (struct level *l, int n);
 char *level_module_str (enum level_module m);
 char *movements_str (enum movements m);
@@ -242,8 +240,8 @@ extern char *video_mode;
 extern char *env_mode;
 extern char *hue_mode;
 extern bool immortal_mode;
-extern int initial_total_lives, total_lives,
-  initial_current_lives, current_lives;
+extern int initial_total_hp, total_hp,
+  initial_current_hp, current_hp;
 extern int start_level;
 extern struct pos start_pos;
 extern uint64_t start_level_time;
@@ -261,6 +259,7 @@ extern char *resources_dir,
   *data_dir,
   *exe_filename,
   *config_filename,
+  *history_filename,
   *levels_dat_filename;
 extern enum semantics semantics;
 extern enum movements movements;
@@ -272,7 +271,7 @@ extern bool inhibit_screensaver;
 extern bool scream;
 extern bool kid_scream;
 extern bool guard_scream;
-extern bool fat_guard_scream;
+extern bool fat_scream;
 extern bool shadow_scream;
 extern bool skeleton_scream;
 extern bool vizier_scream;

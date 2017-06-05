@@ -67,17 +67,17 @@
 #define C_KID_SHADOW_SKIN_COLOR (al_map_rgb (255, 255, 255))
 #define C_KID_SHADOW_EYE_COLOR (al_map_rgb (255, 85, 255))
 
-#define V_LIFE_POTION_BUBBLE_COLOR (al_map_rgb (224, 0, 48))
+#define V_HP_POTION_BUBBLE_COLOR (al_map_rgb (224, 0, 48))
 #define V_POISON_POTION_BUBBLE_COLOR (al_map_rgb (80, 84, 248))
 #define V_FLOAT_POTION_BUBBLE_COLOR (al_map_rgb (84, 252, 84))
 #define V_FLIP_POTION_BUBBLE_COLOR (al_map_rgb (255, 255, 0))
 
-#define E_LIFE_POTION_BUBBLE_COLOR (al_map_rgb (255, 85, 85))
+#define E_HP_POTION_BUBBLE_COLOR (al_map_rgb (255, 85, 85))
 #define E_POISON_POTION_BUBBLE_COLOR (al_map_rgb (85, 85, 255))
 #define E_FLOAT_POTION_BUBBLE_COLOR (al_map_rgb (85, 255, 85))
 #define E_FLIP_POTION_BUBBLE_COLOR (al_map_rgb (255, 255, 85))
 
-#define C_LIFE_POTION_BUBBLE_COLOR (al_map_rgb (255, 85, 255))
+#define C_HP_POTION_BUBBLE_COLOR (al_map_rgb (255, 85, 255))
 #define C_POISON_POTION_BUBBLE_COLOR (al_map_rgb (85, 255, 255))
 #define C_FLOAT_POTION_BUBBLE_COLOR_01 (al_map_rgb (255, 255, 255))
 #define C_FLOAT_POTION_BUBBLE_COLOR_02 (al_map_rgb (255, 85, 255))
@@ -124,18 +124,18 @@
 #define PE_BRICKS_COLOR (al_map_rgb (0, 0, 160))
 #define PC_BRICKS_COLOR (al_map_rgb (85, 255, 255))
 
-#define C_LIVE_COLOR (al_map_rgb (255, 85, 255))
-#define E_LIVE_COLOR_01 (al_map_rgb (255, 85, 85))
-#define E_LIVE_COLOR_02 (al_map_rgb (170, 0, 0))
-#define V_LIVE_COLOR_01 (al_map_rgb (228, 0, 0))
-#define V_LIVE_COLOR_02 (al_map_rgb (184, 0, 0))
+#define C_HP_COLOR (al_map_rgb (255, 85, 255))
+#define E_HP_COLOR_01 (al_map_rgb (255, 85, 85))
+#define E_HP_COLOR_02 (al_map_rgb (170, 0, 0))
+#define V_HP_COLOR_01 (al_map_rgb (228, 0, 0))
+#define V_HP_COLOR_02 (al_map_rgb (184, 0, 0))
 
 #define C_TEXT_LINE_COLOR (al_map_rgb (0, 0, 0))
 #define V_TEXT_LINE_COLOR (al_map_rgb (0, 0, 0))
 
-#define V_LIVES_RECT_COLOR (al_map_rgb (0, 0, 0))
-#define C_LIVES_RECT_COLOR (al_map_rgb (0, 0, 0))
-#define E_LIVES_RECT_COLOR (al_map_rgb (0, 0, 0))
+#define V_HP_RECT_COLOR (al_map_rgb (0, 0, 0))
+#define C_HP_RECT_COLOR (al_map_rgb (0, 0, 0))
+#define E_HP_RECT_COLOR (al_map_rgb (0, 0, 0))
 
 #define V_MSG_LINE_COLOR (al_map_rgb (0, 0, 0))
 #define E_MSG_LINE_COLOR (al_map_rgb (0, 0, 0))
@@ -398,8 +398,8 @@
 #define C_RED_GUARD_BLOOD_COLOR (C_BLOOD_COLOR)
 #define C_RED_GUARD_SPLASH_COLOR (C_BLOOD_COLOR)
 
-#define LIFE_COLOR_01  (al_map_rgb (0, 0, 160))
-#define LIFE_COLOR_02  (al_map_rgb (0, 167, 0))
+#define HP_COLOR_01  (al_map_rgb (0, 0, 160))
+#define HP_COLOR_02  (al_map_rgb (0, 167, 0))
 
 #define PRINCESS_SKIN_COLOR_01 (al_map_rgb (160, 80, 0))
 #define PRINCESS_SKIN_COLOR_02 (al_map_rgb (160, 0, 160))

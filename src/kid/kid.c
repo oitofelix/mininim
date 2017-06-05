@@ -22,29 +22,9 @@
 
 int current_kid_id;
 
-ALLEGRO_BITMAP *v_kid_full_life, *v_kid_empty_life, *v_kid_splash;
-
 static ALLEGRO_COLOR v_palette (ALLEGRO_COLOR c);
 /* static ALLEGRO_COLOR e_palette (ALLEGRO_COLOR c); */
 /* static ALLEGRO_COLOR c_palette (ALLEGRO_COLOR c); */
-
-void
-load_kid (void)
-{
-  /* bitmap */
-  v_kid_full_life = load_bitmap (V_KID_FULL_LIFE);
-  v_kid_empty_life = load_bitmap (V_KID_EMPTY_LIFE);
-  v_kid_splash = load_bitmap (V_KID_SPLASH);
-}
-
-void
-unload_kid (void)
-{
-  /* bitmaps */
-  destroy_bitmap (v_kid_full_life);
-  destroy_bitmap (v_kid_empty_life);
-  destroy_bitmap (v_kid_splash);
-}
 
 struct pos *
 get_kid_start_pos (struct pos *p)
@@ -67,8 +47,8 @@ create_kid (struct actor *k0, struct actor *k1, struct pos *p, enum dir dir)
     k1->fo.b = actor_bitmap (NULL, "KID", "NORMAL", 0);
     k1->action = kid_normal;
     invalid_pos (&k1->item_pos);
-    k1->total_lives = KID_INITIAL_TOTAL_LIVES;
-    k1->current_lives = KID_INITIAL_CURRENT_LIVES;
+    k1->total_hp = KID_INITIAL_TOTAL_HP;
+    k1->current_hp = KID_INITIAL_CURRENT_HP;
     k1->fight = true;
     k1->enemy_id = -1;
     k1->skill.counter_attack_prob = -1;
@@ -123,39 +103,34 @@ get_shadow_palette (void)
 void
 draw_kid_frame (ALLEGRO_BITMAP *bitmap, struct actor *k)
 {
-  struct coord c;
+  push_reset_clipping_rectangle (bitmap);
+  draw_actor_part (bitmap, "KID", "MAIN", k);
+  pop_clipping_rectangle ();
 
-  if (k->invisible) return;
+  /* if (k->invisible) return; */
 
-  struct frame f = k->f;
-  struct frame_offset xf = k->xf;
+  /* struct frame f = k->f; */
+  /* struct frame_offset xf = k->xf; */
 
-  palette pal = get_kid_palette ();
-  f.b = apply_palette (f.b, pal);
-  xf.b = apply_palette (xf.b, pal);
+  /* palette pal = get_kid_palette (); */
+  /* f.b = apply_palette (f.b, pal); */
+  /* xf.b = apply_palette (xf.b, pal); */
 
-  if (k->shadow) {
-    f.b = apply_guard_palette (f.b, SHADOW, k->style);
-    xf.b = apply_guard_palette (xf.b, SHADOW, k->style);
-    /* palette pals = get_shadow_palette (vm); */
-    /* f.b = apply_palette (f.b, pals); */
-    /* xf.b = apply_palette (xf.b, pals); */
-  }
+  /* if (k->shadow) { */
+  /*   f.b = apply_guard_palette (f.b, SHADOW, k->style); */
+  /*   xf.b = apply_guard_palette (xf.b, SHADOW, k->style); */
+  /*   palette pals = get_shadow_palette (vm); */
+  /*   f.b = apply_palette (f.b, pals); */
+  /*   xf.b = apply_palette (xf.b, pals); */
+  /* } */
 
   /* if (hgc) { */
   /*   f.b = apply_palette (f.b, hgc_palette); */
   /*   xf.b = apply_palette (xf.b, hgc_palette); */
   /* } */
 
-  draw_frame (bitmap, &f);
-  draw_xframe (bitmap, &f, &xf);
-
-  if (k->splash) {
-    ALLEGRO_BITMAP *splash = apply_palette (v_kid_splash, pal);
-    /* if (hgc) splash = apply_palette (splash, hgc_palette); */
-    draw_bitmapc (splash, bitmap, splash_coord (&k->f, &c), k->f.flip);
-  }
-
+  /* draw_xframe (bitmap, &f, &xf); */
+  /* draw_frame (bitmap, &f); */
 }
 
 void
@@ -176,7 +151,7 @@ draw_start_kid (ALLEGRO_BITMAP *bitmap)
 
   /* sword */
   if (global_level.has_sword)
-    draw_sword (bitmap, &global_level.start_pos, true);
+    draw_sword (bitmap, &global_level.start_pos);
 }
 
 ALLEGRO_COLOR
@@ -257,8 +232,8 @@ c_phantom_shadow_palette (ALLEGRO_COLOR c)
 static ALLEGRO_COLOR
 v_palette (ALLEGRO_COLOR c)
 {
-  if (color_eq (c, LIFE_COLOR_01)) return V_BLOOD_COLOR_01;
-  if (color_eq (c, LIFE_COLOR_02)) return V_BLOOD_COLOR_02;
+  if (color_eq (c, HP_COLOR_01)) return V_BLOOD_COLOR_01;
+  if (color_eq (c, HP_COLOR_02)) return V_BLOOD_COLOR_02;
   return c;
 }
 
@@ -274,8 +249,8 @@ v_palette (ALLEGRO_COLOR c)
 /*   if (color_eq (c, V_KID_EYE_COLOR)) return E_KID_EYE_COLOR; */
 /*   if (color_eq (c, V_BLOOD_COLOR_01)) return E_BLOOD_COLOR_01; */
 /*   if (color_eq (c, V_BLOOD_COLOR_02)) return E_BLOOD_COLOR_02; */
-/*   if (color_eq (c, LIFE_COLOR_01)) return E_BLOOD_COLOR_01; */
-/*   if (color_eq (c, LIFE_COLOR_02)) return E_BLOOD_COLOR_02; */
+/*   if (color_eq (c, HP_COLOR_01)) return E_BLOOD_COLOR_01; */
+/*   if (color_eq (c, HP_COLOR_02)) return E_BLOOD_COLOR_02; */
 /*   return c; */
 /* } */
 
@@ -291,8 +266,8 @@ v_palette (ALLEGRO_COLOR c)
 /*   if (color_eq (c, V_KID_EYE_COLOR)) return C_KID_EYE_COLOR; */
 /*   if (color_eq (c, V_BLOOD_COLOR_01) */
 /*       || color_eq (c, V_BLOOD_COLOR_02)) return C_BLOOD_COLOR; */
-/*   if (color_eq (c, LIFE_COLOR_01)) return C_BLOOD_COLOR; */
-/*   if (color_eq (c, LIFE_COLOR_02)) return C_BLOOD_COLOR; */
+/*   if (color_eq (c, HP_COLOR_01)) return C_BLOOD_COLOR; */
+/*   if (color_eq (c, HP_COLOR_02)) return C_BLOOD_COLOR; */
 /*   return c; */
 /* } */
 
@@ -328,82 +303,23 @@ place_kid (struct actor *k, int room, int floor, int place)
   place_actor (k, &p, dx, dy, "KID", "NORMAL", 0);
 }
 
-
 void
-draw_kid_lives (ALLEGRO_BITMAP *bitmap, struct actor *k)
+draw_kid_hp (ALLEGRO_BITMAP *bitmap, struct actor *k)
 {
-  if (k->dont_draw_lives) return;
-  if (k->current_lives <= 0) return;
-
-  int current_lives = (k->current_lives < 0) ? 0 : k->current_lives;
-  current_lives = (k->current_lives > 10) ? 10 : k->current_lives;
-
-  int total_lives = (k->total_lives < 0) ? 0 : k->total_lives;
-  total_lives = (k->total_lives > 10) ? 10 : k->total_lives;
-
-  ALLEGRO_COLOR bg_color;
-
-  /* switch (vm) { */
-  /* case CGA: bg_color = C_LIVES_RECT_COLOR; break; */
-  /* case EGA: bg_color = E_LIVES_RECT_COLOR; break; */
-  /* case VGA: */
-    bg_color = V_LIVES_RECT_COLOR;
-  /*   break; */
-  /* } */
-
   push_reset_clipping_rectangle (bitmap);
-
-  draw_filled_rectangle (bitmap, 0, CUTSCENE_HEIGHT - 8,
-                         7 * total_lives - 1,
-                         CUTSCENE_HEIGHT - 1, bg_color);
-
-  ALLEGRO_BITMAP *empty = NULL,
-    *full = NULL;
-
-  if (k->shadow) {
-    if (k->style) {
-      empty = apply_guard_palette (v_kid_empty_life, SHADOW, k->style);
-      full = apply_guard_palette (v_kid_full_life, SHADOW, k->style);
-    } else {
-      palette pal = get_shadow_life_palette ();
-      empty = apply_palette (v_kid_empty_life, pal);
-      full = apply_palette (v_kid_full_life, pal);
-    }
-  } else {
-    palette pal = get_kid_palette ();
-    empty = apply_palette (v_kid_empty_life, pal);
-    full = apply_palette (v_kid_full_life, pal);
-  }
-
-  /* if (hgc) { */
-  /*   empty = apply_palette (empty, hgc_palette); */
-  /*   full = apply_palette (full, hgc_palette); */
-  /* } */
-
-  int i;
-  for (i = 0; i < total_lives; i++)
-    draw_bitmap (empty, bitmap, 7 * i, CUTSCENE_HEIGHT - 6, 0);
-
-  if (current_lives <= KID_MINIMUM_LIVES_TO_BLINK && anim_cycle % 2) {
-      pop_clipping_rectangle ();
-      return;
-  }
-
-  for (i = 0; i < current_lives; i++)
-    draw_bitmap (full, bitmap, 7 * i, CUTSCENE_HEIGHT - 6, 0);
-
+  draw_actor_part (bitmap, "KID", "HP", k);
   pop_clipping_rectangle ();
 }
 
 void
-increase_kid_current_lives (struct actor *k)
+increase_kid_current_hp (struct actor *k)
 {
-  if (k->current_lives <= 0
-      || k->current_lives >= k->total_lives) return;
+  if (k->current_hp <= 0
+      || k->current_hp >= k->total_hp) return;
 
-  k->current_lives++;
-  if (! is_audio_source_playing (&small_life_potion_audio))
-    play_audio (&small_life_potion_audio, NULL, k->id);
+  k->current_hp++;
+  if (! is_audio_source_playing (&small_hp_potion_audio))
+    play_audio (&small_hp_potion_audio, NULL, k->id);
   if (k->id == current_kid_id) {
     mr.flicker = 8;
     mr.color = get_flicker_blood_color ();
@@ -413,16 +329,16 @@ increase_kid_current_lives (struct actor *k)
 }
 
 void
-increase_kid_total_lives (struct actor *k)
+increase_kid_total_hp (struct actor *k)
 {
-  if ((k->total_lives >= MAX_LIVES && k->current_lives >= k->total_lives)
-      || k->current_lives <= 0)
+  if ((k->total_hp >= MAX_HP && k->current_hp >= k->total_hp)
+      || k->current_hp <= 0)
     return;
 
-  if (k->total_lives < 10) k->total_lives++;
-  k->current_lives = k->total_lives;
-  if (! is_audio_source_playing (&big_life_potion_audio))
-    play_audio (&big_life_potion_audio, NULL, k->id);
+  if (k->total_hp < 10) k->total_hp++;
+  k->current_hp = k->total_hp;
+  if (! is_audio_source_playing (&big_hp_potion_audio))
+    play_audio (&big_hp_potion_audio, NULL, k->id);
   if (k->id == current_kid_id) {
     mr.flicker = 8;
     mr.color = get_flicker_blood_color ();
@@ -434,7 +350,7 @@ increase_kid_total_lives (struct actor *k)
 void
 float_kid (struct actor *k)
 {
-  if (k->current_lives <= 0 && k->action != kid_fall) return;
+  if (k->current_hp <= 0 && k->action != kid_fall) return;
   k->float_timer = 1;
   stop_audio_instance (&scream_audio, NULL, k->id);
   while (stop_audio_instance (&floating_audio, NULL, k->id));
@@ -495,7 +411,7 @@ kid_haptic (struct actor *k, double cycles)
 }
 
 void
-kid_haptic_for_range (struct pos *p, coord_f cf, double r, double cycles)
+kid_haptic_for_range (struct pos *p, coord_f cf, lua_Number r, double cycles)
 {
   struct actor *k = get_actor_by_id (current_kid_id);
   struct pos pk;
@@ -628,7 +544,7 @@ next_fellow_shadow (int d)
       ui_msg (0, "NO FELLOW SHADOW");
       return;
     } else {
-      if (k->current_lives > 0) select_controllable_by_id (k->id);
+      if (k->current_hp > 0) select_controllable_by_id (k->id);
       else continue;
       return;
     }
@@ -654,14 +570,14 @@ create_fellow_shadow (bool select)
   for (i = 1; i < FELLOW_SHADOW_NMEMB; i++) {
     if (fellow_shadow_id[i] < 0) {
       struct actor *k0 = get_actor_by_id (0);
-      if (k0->current_lives <= 0) return;
+      if (k0->current_hp <= 0) return;
 
       int required_strength = fellow_shadow_count () + 1;
 
-      if (required_strength >= k0->current_lives) {
+      if (required_strength >= k0->current_hp) {
         ui_msg (0, "NO STRENGTH");
         return;
-      } else k0->current_lives += -required_strength;
+      } else k0->current_hp += -required_strength;
 
       int id = create_actor (k0, 0, NULL, 0);
 
@@ -670,7 +586,7 @@ create_fellow_shadow (bool select)
       /* necessary so next_fellow_shadow doesn't consider its color */
       k->style = -1;
       k->style = next_fellow_shadow_style ();
-      k->current_lives += required_strength;
+      k->current_hp += required_strength;
       mr.flicker = 12;
       mr.color = get_flicker_raise_sword_color ();
       L_play_audio (main_L, "SUSPENSE", NULL, k->id);

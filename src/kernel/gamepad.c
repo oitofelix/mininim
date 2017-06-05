@@ -539,9 +539,9 @@ void
 request_gamepad_rumble (double intensity, double duration)
 {
   gamepad_rumble_intensity =
-    max_double (intensity, gamepad_rumble_intensity);
+    fmax (intensity, gamepad_rumble_intensity);
   gamepad_rumble_duration =
-    max_double (duration, gamepad_rumble_duration);
+    fmax (duration, gamepad_rumble_duration);
 }
 
 void

@@ -21,21 +21,14 @@
 #ifndef MININIM_KID_H
 #define MININIM_KID_H
 
-/* bitmaps */
-#define V_KID_FULL_LIFE "data/life/v-kid-full.png"
-#define V_KID_EMPTY_LIFE "data/life/v-kid-empty.png"
-#define V_KID_SPLASH "data/splash/v-kid.png"
-
 /* functions */
-void load_kid (void);
-void unload_kid (void);
 struct pos *get_kid_start_pos (struct pos *p);
 struct actor *create_kid (struct actor *k0, struct actor *k1,
                          struct pos *p, enum dir dir);
 void destroy_kid (struct actor *k);
 void draw_kid_frame (ALLEGRO_BITMAP *bitmap, struct actor *k);
 void draw_start_kid (ALLEGRO_BITMAP *bitmap);
-void draw_kid_lives (ALLEGRO_BITMAP *bitmap, struct actor *k);
+void draw_kid_hp (ALLEGRO_BITMAP *bitmap, struct actor *k);
 void draw_kid_if_at_pos (ALLEGRO_BITMAP *bitmap, struct actor *k,
                          struct pos *p);
 palette get_kid_palette (void);
@@ -44,8 +37,8 @@ ALLEGRO_COLOR colorful_shadow_palette (ALLEGRO_COLOR c);
 ALLEGRO_COLOR v_phantom_shadow_palette (ALLEGRO_COLOR c);
 ALLEGRO_COLOR e_phantom_shadow_palette (ALLEGRO_COLOR c);
 ALLEGRO_COLOR c_phantom_shadow_palette (ALLEGRO_COLOR c);
-void increase_kid_current_lives (struct actor *k);
-void increase_kid_total_lives (struct actor *k);
+void increase_kid_current_hp (struct actor *k);
+void increase_kid_total_hp (struct actor *k);
 void float_kid (struct actor *k);
 ALLEGRO_COLOR get_flicker_blood_color (void);
 ALLEGRO_COLOR get_flicker_raise_sword_color (void);
@@ -74,7 +67,5 @@ void create_fellow_shadow (bool select);
 extern int current_kid_id;
 extern int fellow_shadow_id[FELLOW_SHADOW_NMEMB];
 extern int last_fellow_shadow_id;
-
-extern ALLEGRO_BITMAP *v_kid_full_life, *v_kid_empty_life, *v_kid_splash;
 
 #endif	/* MININIM_KID_H */

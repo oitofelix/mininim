@@ -74,23 +74,16 @@ flow (struct actor *k)
   if (k->i == 2 && k->enemy_defended_my_attack)
     k->i = 3;
 
-  /* if (k->i == -1) k->j = 1; */
-  if (k->i == 1 || k->i == 2) k->j = 19;
-  if (k->i == 3 || k->i == 5) k->j = 17;
-  if (k->i == 4) k->j = 7;
-  if (k->i == 6) k->j = 18;
-
   select_actor_frame (k, "KID", "SWORD_ATTACK", k->i + 1);
-  select_actor_xframe (k, "KID", "SWORD", k->j);
 
-  if (k->oaction == kid_sword_defense) k->fo.dx += -1;
-  if (k->i == 0) k->xf.b = NULL;
-  if (k->i == 1) k->xf.b = NULL;
-  if (k->i == 3) k->xf.dx = -21, k->xf.dy = +7;
-  if (k->i == 4) {
-    if (k->enemy_defended_my_attack) k->fo.dx = -1;
-    k->xf.dx = -7, k->xf.dy = +17;
-  }
+  if (k->i == 0) k->j = 1;
+  if (k->i == 1) k->j = 16;
+  if (k->i == 2 || k->i == 3) k->j = 19;
+  if (k->i == 4 || k->i == 6) k->j = 17;
+  if (k->i == 5) k->j = 7;
+  if (k->i == 7) k->j = 18;
+
+  select_actor_xframe (k, "KID", "SWORD", k->j);
 
   return true;
 }
@@ -114,6 +107,9 @@ physics_in (struct actor *k)
 static void
 physics_out (struct actor *k)
 {
+  /* place on the ground */
+  place_on_the_ground (&k->f, &k->f.c);
+
   /* sound */
   if (k->i == 3) play_audio (&sword_attack_audio, NULL, k->id);
 

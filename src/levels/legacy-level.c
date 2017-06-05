@@ -24,8 +24,8 @@ int min_legacy_level = 1;
 int max_legacy_level = 14;
 
 static int level_3_checkpoint;
-static int checkpoint_total_lives;
-static int checkpoint_current_lives;
+static int checkpoint_total_hp;
+static int checkpoint_current_hp;
 static bool coming_from_12;
 static struct skill checkpoint_skill;
 static int shadow_id;
@@ -41,7 +41,7 @@ static int level_end_wait = -1;
 static int shadow_disappearance_wait = -1;
 static int vizier_vigilant_wait = -1;
 
-static int life_table[] = {4, 3, 3, 3, 3, 4, 5, 4, 4, 5, 5, 5, 4, 6, 0, 0};
+static int hp_table[] = {4, 3, 3, 3, 3, 4, 5, 4, 4, 5, 5, 5, 4, 6, 0, 0};
 
 struct legacy_level lv;
 
@@ -103,8 +103,8 @@ legacy_level_start (void)
       place_actor (k, &p, dx, dy, "KID", "NORMAL", 0);
 
       mr_center_room (2);
-      k->total_lives = checkpoint_total_lives;
-      k->current_lives = checkpoint_current_lives;
+      k->total_hp = checkpoint_total_hp;
+      k->current_hp = checkpoint_current_hp;
       k->skill = checkpoint_skill;
     }
   }
@@ -114,8 +114,8 @@ legacy_level_start (void)
   if (global_level.n == 10) screen_flags &= ~ ALLEGRO_FLIP_VERTICAL;
 
   /* level 13 adjustements */
-  if (coming_from_12) k->current_lives = current_lives;
-  else k->current_lives = total_lives;
+  if (coming_from_12) k->current_hp = current_hp;
+  else k->current_hp = total_hp;
 
   coming_from_12 = false;
 
@@ -182,8 +182,8 @@ legacy_level_special_events (void)
         && k0->f.c.xd == LEFT
         && replay_mode == NO_REPLAY) {
       level_3_checkpoint = true;
-      checkpoint_total_lives = k0->total_lives;
-      checkpoint_current_lives = k0->current_lives;
+      checkpoint_total_hp = k0->total_hp;
+      checkpoint_current_hp = k0->current_hp;
       checkpoint_skill = k0->skill;
     }
 
@@ -205,9 +205,9 @@ legacy_level_special_events (void)
       s = &actor[skeleton_id];
       get_legacy_skill (2, &s->skill);
       s->has_sword = true;
-      s->total_lives = INT_MAX;
-      s->current_lives = INT_MAX;
-      s->dont_draw_lives = true;
+      s->total_hp = INT_MAX;
+      s->current_hp = INT_MAX;
+      s->dont_draw_hp = true;
       s->p = skeleton_floor_pos;
       s->refraction = 16;
       raise_skeleton (s);
@@ -251,13 +251,13 @@ legacy_level_special_events (void)
         && is_valid_pos (&kc->cross_mirror_p)
         && peq (&kc->cross_mirror_p, &mirror_pos)
         && shadow_id == -1) {
-      k0->current_lives = 1;
+      k0->current_hp = 1;
       int id = create_actor (k0, 0, NULL, 0);
       struct actor *ks = &actor[id];
       ks->fight = false;
       invert_frame_dir (&ks->f, &ks->f);
       ks->controllable = false;
-      ks->dont_draw_lives = true;
+      ks->dont_draw_hp = true;
       ks->immortal = true;
       ks->shadow = true;
       shadow_id = id;
@@ -299,7 +299,7 @@ legacy_level_special_events (void)
       ks->action = kid_run;
       ks->i = -1;
       ks->immortal = true;
-      ks->dont_draw_lives = true;
+      ks->dont_draw_hp = true;
 
       int dx = +0;
       int dy = +15;
@@ -340,7 +340,7 @@ legacy_level_special_events (void)
       ks->f.dir = RIGHT;
       ks->controllable = false;
       ks->action = kid_normal;
-      ks->dont_draw_lives = true;
+      ks->dont_draw_hp = true;
 
       int dx = +9;
       int dy = +15;
@@ -432,8 +432,8 @@ legacy_level_special_events (void)
       ks->fight = true;
       ks->controllable = false;
       ks->refraction = 12;
-      ks->current_lives = k0->current_lives;
-      ks->total_lives = k0->total_lives;
+      ks->current_hp = k0->current_hp;
+      ks->total_hp = k0->total_hp;
       ks->action = guard_normal;
       ks->f.dir = RIGHT;
       ks->glory_sample = true;
@@ -463,7 +463,7 @@ legacy_level_special_events (void)
         mr.color = get_flicker_blood_color ();
         play_audio (&harm_audio, NULL, k0->id);
         k0->splash = true;
-        k0->current_lives--;
+        k0->current_hp--;
         if (is_in_fight_mode (k0)) {
           move_frame (&k0->f, _bb, +0, -4, -4);
           kid_sword_hit (k0);
@@ -476,7 +476,7 @@ legacy_level_special_events (void)
         mr.color = get_flicker_blood_color ();
         play_audio (&guard_hit_audio, NULL, ks->id);
         ks->splash = true;
-        ks->current_lives--;
+        ks->current_hp--;
         if (is_in_fight_mode (ks)) {
           move_frame (&ks->f, _bb, +0, -4, -4);
           guard_sword_hit (ks);
@@ -484,14 +484,14 @@ legacy_level_special_events (void)
       }
 
       /* if the shadow dies, the kid dies */
-      if (ks->current_lives <= 0 && k0->current_lives > 0) {
+      if (ks->current_hp <= 0 && k0->current_hp > 0) {
         k0->splash = true;
         kid_die (k0);
         shadow_disappearance_wait = 4.5 * DEFAULT_HZ;
       }
 
       /* if the kid dies, the shadow dies */
-      if (k0->current_lives <= 0 && ks->current_lives > 0) {
+      if (k0->current_hp <= 0 && ks->current_hp > 0) {
         ks->splash = true;
         guard_die (ks);
         shadow_disappearance_wait = 4.5 * DEFAULT_HZ;
@@ -501,7 +501,7 @@ legacy_level_special_events (void)
         shadow_disappearance_wait--;
 
       /* make the shadow disappear when the kid is dead */
-      if (k0->current_lives <= 0
+      if (k0->current_hp <= 0
           && shadow_disappearance_wait == 0
           && ! ks->invisible) {
         mr.flicker = 8;
@@ -549,7 +549,7 @@ legacy_level_special_events (void)
         k0->f.dir = (k0->f.dir == LEFT) ? RIGHT : LEFT;
         place_on_the_ground (&k0->f, &k0->f.c);
         kid_turn_run (k0);
-        k0->current_lives = ++k0->total_lives;
+        k0->current_hp = ++k0->total_hp;
         mr.flicker = 8;
         mr.color = WHITE;
         glow_duration = 12 * DEFAULT_HZ;
@@ -622,7 +622,7 @@ legacy_level_special_events (void)
 
       /* when the vizier dies do some video effect, play a tune, stop
          the play timer and display the remaining time */
-      if (v->current_lives <= 0
+      if (v->current_hp <= 0
           && ! played_vizier_death_sample) {
         mr.flicker = 12;
         mr.color = WHITE;
@@ -636,7 +636,7 @@ legacy_level_special_events (void)
       /* after vizier's death activate certain tile in order to open
          the exit level door */
       struct pos p; new_pos (&p, &global_level, 24, 0, 0);
-      if (v->current_lives <= 0
+      if (v->current_hp <= 0
           && kc->f.c.room != v->f.c.room)
         activate_tile (&p);
     }
@@ -927,8 +927,8 @@ interpret_legacy_level (struct level *l, int n)
         case LG_POTION:         /* ok */
           switch (b) {
           case LM_POTION_EMPTY: set_ext (&p, EMPTY_POTION); break;
-          case LM_POTION_HEALTH_POINT: set_ext (&p, SMALL_LIFE_POTION); break;
-          case LM_POTION_LIFE: set_ext (&p, BIG_LIFE_POTION); break;
+          case LM_POTION_HEALTH_POINT: set_ext (&p, SMALL_HP_POTION); break;
+          case LM_POTION_HP: set_ext (&p, BIG_HP_POTION); break;
           case LM_POTION_FEATHER_FALL: set_ext (&p, FLOAT_POTION); break;
           case LM_POTION_INVERT: set_ext (&p, FLIP_POTION); break;
           case LM_POTION_POISON: set_ext (&p, SMALL_POISON_POTION); break;
@@ -1058,7 +1058,7 @@ interpret_legacy_level (struct level *l, int n)
     /* TYPE AND STYLE: ok */
     switch (n) {
     case 3: g->type = SKELETON; g->style = 0; break;
-    case 6: g->type = FAT_GUARD; g->style = 1; break;
+    case 6: g->type = FAT; g->style = 1; break;
     case 12: g->type = SHADOW; g->style = 0; break;
     case 13: g->type = VIZIER; g->style = 0; break;
     default: g->type = GUARD;
@@ -1075,7 +1075,7 @@ interpret_legacy_level (struct level *l, int n)
 
     /* SKILL: ok */
     get_legacy_skill (lv.guard_skill[i], &g->skill);
-    g->total_lives = life_table[n];
+    g->total_hp = hp_table[n];
 
     /* printf ("(%i, %i, %i), style: %i\n", */
     /*         g->p.room, g->p.floor, g->p.place, g->style); */
@@ -1112,7 +1112,7 @@ get_legacy_skill (int i, struct skill *skill)
     skill->advance_prob = 99;
     skill->return_prob = -1;
     skill->refraction = 16;
-    skill->extra_life = 0;
+    skill->extra_hp = 0;
     break;
   case 1:
     skill->attack_prob = 38;
@@ -1122,7 +1122,7 @@ get_legacy_skill (int i, struct skill *skill)
     skill->advance_prob = 77;
     skill->return_prob = 21;
     skill->refraction = 16;
-    skill->extra_life = 0;
+    skill->extra_hp = 0;
     break;
   case 2:
     skill->attack_prob = 23;
@@ -1132,7 +1132,7 @@ get_legacy_skill (int i, struct skill *skill)
     skill->advance_prob = 77;
     skill->return_prob = 21;
     skill->refraction = 16;
-    skill->extra_life = 0;
+    skill->extra_hp = 0;
     break;
   case 3:
     skill->attack_prob = 23;
@@ -1142,7 +1142,7 @@ get_legacy_skill (int i, struct skill *skill)
     skill->advance_prob = 77;
     skill->return_prob = 21;
     skill->refraction = 16;
-    skill->extra_life = 0;
+    skill->extra_hp = 0;
     break;
   case 4:
     skill->attack_prob = 23;
@@ -1152,7 +1152,7 @@ get_legacy_skill (int i, struct skill *skill)
     skill->advance_prob = 99;
     skill->return_prob = -1;
     skill->refraction = 8;
-    skill->extra_life = 1;
+    skill->extra_hp = 1;
     break;
   case 5:
     skill->attack_prob = 15;
@@ -1162,7 +1162,7 @@ get_legacy_skill (int i, struct skill *skill)
     skill->advance_prob = 99;
     skill->return_prob = -1;
     skill->refraction = 8;
-    skill->extra_life = 0;
+    skill->extra_hp = 0;
     break;
   case 6:
     skill->attack_prob = 38;
@@ -1172,7 +1172,7 @@ get_legacy_skill (int i, struct skill *skill)
     skill->advance_prob = 77;
     skill->return_prob = 21;
     skill->refraction = 8;
-    skill->extra_life = 0;
+    skill->extra_hp = 0;
     break;
   case 7:
     skill->attack_prob = 85;
@@ -1182,7 +1182,7 @@ get_legacy_skill (int i, struct skill *skill)
     skill->advance_prob = -1;
     skill->return_prob = 99;
     skill->refraction = 8;
-    skill->extra_life = 0;
+    skill->extra_hp = 0;
     break;
   case 8:
     skill->attack_prob = -1;
@@ -1192,7 +1192,7 @@ get_legacy_skill (int i, struct skill *skill)
     skill->advance_prob = -1;
     skill->return_prob = 99;
     skill->refraction = 0;
-    skill->extra_life = 0;
+    skill->extra_hp = 0;
     break;
   case 9:
     skill->attack_prob = 18;
@@ -1202,7 +1202,7 @@ get_legacy_skill (int i, struct skill *skill)
     skill->advance_prob = 99;
     skill->return_prob = -1;
     skill->refraction = 8;
-    skill->extra_life = 0;
+    skill->extra_hp = 0;
     break;
   case 10:
     skill->attack_prob = 12;
@@ -1212,7 +1212,7 @@ get_legacy_skill (int i, struct skill *skill)
     skill->advance_prob = 38;
     skill->return_prob = 60;
     skill->refraction = 0;
-    skill->extra_life = 0;
+    skill->extra_hp = 0;
     break;
   case 11:
     skill->attack_prob = 18;
@@ -1222,7 +1222,7 @@ get_legacy_skill (int i, struct skill *skill)
     skill->advance_prob = 38;
     skill->return_prob = 60;
     skill->refraction = 0;
-    skill->extra_life = 0;
+    skill->extra_hp = 0;
   }
 
   return skill;

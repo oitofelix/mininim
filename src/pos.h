@@ -36,7 +36,7 @@ void mirror_link (struct level *l, int room, enum dir dir0, enum dir dir1);
 int room_dist (struct level *l, int r0, int r1, int max);
 int min_room_dist (struct room_dist room[], int *dmax);
 struct coord *new_coord (struct coord *c, struct level *l, int room,
-                         double x, double y);
+                         lua_Number x, lua_Number y);
 struct coord *invalid_coord (struct coord *c);
 bool is_valid_coord (struct coord *c);
 bool coord_eq (struct coord *_c0, struct coord *_c1);
@@ -50,12 +50,16 @@ struct coord *nframe (struct frame *f, struct coord *c);
 struct pos *pos2room (struct pos *p, int room, struct pos *pv);
 struct coord *coord2room (struct coord *c, int room, struct coord *cv);
 struct coord *frame2room (struct frame *f, int room, struct coord *cv);
+struct rect *new_rect (struct rect *r, int room, lua_Number x, lua_Number y,
+                       lua_Number w, lua_Number h);
+struct rect *coord2rect (struct coord *c, struct rect *r);
 bool rect_eq (struct rect *r0, struct rect *r1);
 struct coord *rect2room (struct rect *r, int room, struct coord *cv);
 bool coord4draw (struct coord *c, int room, struct coord *cv);
 int pos_mod (struct pos *p0, struct pos *p1);
 int coord_mod (struct coord *c);
-struct pos *pos_gen (struct coord *c, struct pos *p, int dx, int dy);
+struct pos *pos_gen (struct coord *c, struct pos *p,
+                     lua_Number dx, lua_Number dy);
 struct pos *posb (struct coord *c, struct pos *p);
 struct pos *pos (struct coord *c, struct pos *p);
 struct pos *posf (struct coord *c, struct pos *p);
@@ -71,10 +75,10 @@ struct pos *random_pos (struct level *l, struct pos *p);
 struct pos *get_new_rel_pos (struct pos *old_src, struct pos *old_dest,
                              struct pos *new_src, struct pos *new_dest);
 enum dir random_dir (void);
-double dist_coord (struct coord *a, struct coord *b);
+lua_Number dist_coord (struct coord *a, struct coord *b);
 struct frame *place_frame (struct frame *f, struct frame *nf,
                            ALLEGRO_BITMAP *b, struct pos *p,
-                           int dx, int dy);
+                           lua_Number dx, lua_Number dy);
 coord_f opposite_cf (coord_f cf);
 enum dir opposite_dir (enum dir dir);
 enum dir perpendicular_dir (enum dir dir, int n);
@@ -100,14 +104,15 @@ struct coord *_bf (struct frame *f, struct coord *c);
 struct coord *_bb (struct frame *f, struct coord *c);
 
 struct coord *
-cf_rel (coord_f cf, struct frame *f, struct coord *c, int dx, int dy);
+cf_rel (coord_f cf, struct frame *f, struct coord *c,
+        lua_Number dx, lua_Number dy);
 int cf_inc (struct frame *f, coord_f cf);
 
 void
 survey (coord_f cf, pos_f pf, struct frame *f,
         struct coord *c, struct pos *p, struct pos *np);
 void
-surveyo (coord_f cf, int dx, int dy, pos_f pf, struct frame *f,
+surveyo (coord_f cf, lua_Number dx, lua_Number dy, pos_f pf, struct frame *f,
          struct coord *c, struct pos *p, struct pos *np);
 
 bool is_pixel_transparent (ALLEGRO_BITMAP *bitmap, int x, int y);
@@ -117,6 +122,9 @@ struct bitmap_rcoord *get_cached_bitmap_rcoord (ALLEGRO_BITMAP *b,
 struct bitmap_rcoord *bitmap_rcoord (ALLEGRO_BITMAP *b,
                                      struct bitmap_rcoord *c);
 
+struct coord *place_on_the_ground_alternative (struct frame *f,
+                                               struct coord *c,
+                                               lua_Number dy);
 struct coord *place_on_the_ground (struct frame *f, struct coord *c);
 struct coord *place_at_distance (struct frame *f0, coord_f cf0,
                                  struct frame *f1, coord_f cf1,

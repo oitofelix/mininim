@@ -50,6 +50,7 @@ char *resources_dir,
   *data_dir,
   *exe_filename,
   *config_filename,
+  *history_filename,
   *levels_dat_filename = "data/dat-levels/LEVELS.DAT";
 
 char *levels_dat_compat_filename;
@@ -106,8 +107,8 @@ char *video_mode;
 char *env_mode;
 char *hue_mode;
 bool immortal_mode;
-int initial_total_lives = KID_INITIAL_TOTAL_LIVES, total_lives;
-int initial_current_lives = KID_INITIAL_CURRENT_LIVES, current_lives;
+int initial_total_hp = KID_INITIAL_TOTAL_HP, total_hp;
+int initial_current_hp = KID_INITIAL_CURRENT_HP, current_hp;
 int start_level = 1;
 struct pos start_pos = {NULL, -1,-1,-1};
 uint64_t time_limit = TIME_LIMIT;
@@ -124,7 +125,7 @@ int play_game_counter;
 bool scream;
 bool kid_scream;
 bool guard_scream;
-bool fat_guard_scream;
+bool fat_scream;
 bool shadow_scream;
 bool skeleton_scream;
 bool vizier_scream;
@@ -137,7 +138,10 @@ static bool replay_info;
 static bool skip_title;
 static bool level_module_given;
 static int start_replay_favorite = -1;
+volatile static sig_atomic_t quitting_in_progress = 0;
 
+static void quit_game (void);
+static void quit_game_sighandler (int signum);
 static error_t parser (int key, char *arg, struct argp_state *state);
 static void print_paths (void);
 static void print_display_modes (void);
@@ -190,16 +194,16 @@ static struct argp_option options[] = {
 
   /* Skills */
   {NULL, 0, NULL, 0, "Skills:", 0},
-  {"total-lives", TOTAL_LIVES_OPTION, "N", 0, "Make the kid start with N total lives.  The default is 3.  Valid integers range from 1 to INT_MAX.  This can be changed in-game using the SHIFT+T key binding.  Notice that only a maximum of 10 lives are displayed in the bottom line.", 0},
+  {"total-hp", TOTAL_HP_OPTION, "N", 0, "Make the kid start with N total HP.  The default is 3.  Valid integers range from 1 to INT_MAX.  This can be changed in-game using the SHIFT+T key binding.  Notice that only a maximum of 10 HP are displayed in the bottom line.", 0},
   {"kca", KCA_OPTION, "N", 0, "Set kid's counter attack skill to N.  The default is 0 (zero).  Valid integers range from 0 to 100.  This can be changed in-game using the CTRL+= and CTRL+- key bindings.", 0},
   {"kcd", KCD_OPTION, "N", 0, "Set kid's counter defense skill to N.  The default is 0 (zero).  Valid integers range from 0 to 100.  This can be changed in-game using the ALT+= and ALT+- key bindings.", 0},
   {"immortal-mode", IMMORTAL_MODE_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable immortal mode.  In immortal mode the kid can't be harmed.  The default is FALSE.  This can be changed in-game using the I key binding.", 0},
 
   /* Rendering */
   {NULL, 0, NULL, 0, "Rendering:", 0},
-  {"video-mode", VIDEO_MODE_OPTION, "VIDEO-MODE", 0, "Select video mode.  Valid values for VIDEO-MODE are: VGA, EGA, CGA and HGC.  The default is VGA.  This can be changed in-game using the F12 key binding.", 0},
+  {"video-mode", VIDEO_MODE_OPTION, "VIDEO-MODE", 0, "Select video mode.  Valid values for VIDEO-MODE are: VGA, EGA, CGA and HGA.  The default is VGA.  This can be changed in-game using the F12 key binding.", 0},
   {"environment-mode", ENVIRONMENT_MODE_OPTION, "ENVIRONMENT-MODE", 0, "Select environment mode.  Valid values for ENVIRONMENT-MODE are: ORIGINAL, DUNGEON and PALACE.  The ORIGINAL value gives level modules autonomy in this choice for each particular level. This is the default.  This can be changed in-game using the F11 key binding.", 0},
-  {"guard-mode", GUARD_MODE_OPTION, "GUARD-MODE", 0, "Select guard mode.  Valid values for GUARD-MODE are: ORIGINAL, GUARD, FAT-GUARD, VIZIER, SKELETON and SHADOW.  The ORIGINAL value gives level modules autonomy in this choice for each particular guard.  This is the default.  This can be changed in-game using the SHIFT+F11 key binding.  This option has no effect on replays.", 0},
+  {"guard-mode", GUARD_MODE_OPTION, "GUARD-MODE", 0, "Select guard mode.  Valid values for GUARD-MODE are: ORIGINAL, GUARD, FAT, VIZIER, SKELETON and SHADOW.  The ORIGINAL value gives level modules autonomy in this choice for each particular guard.  This is the default.  This can be changed in-game using the SHIFT+F11 key binding.  This option has no effect on replays.", 0},
 {"hue-mode", HUE_MODE_OPTION, "HUE-MODE", 0, "Select hue mode.  Valid values for HUE-MODE are: ORIGINAL, NONE, GREEN, GRAY, YELLOW and BLUE.  The ORIGINAL value gives level modules autonomy in this choice for each particular level.  This is the default.  For the classic behavior of the first version of the original game use NONE.  This can be changed in-game using the ALT+F11 key binding.", 0},
   {"display-flip-mode", DISPLAY_FLIP_MODE_OPTION, "DISPLAY-FLIP-MODE", 0, "Select display flip mode.  Valid values for DISPLAY-FLIP-MODE are: NONE, VERTICAL, HORIZONTAL and VERTICAL-HORIZONTAL.  The default is NONE.  This can be changed in-game using the SHIFT+I key binding.", 0},
   {"mirror-mode", MIRROR_MODE_OPTION, "BOOLEAN", OPTION_ARG_OPTIONAL, "Enable/disable mirror mode.  In mirror mode the screen and the keyboard are flipped horizontally.  This is equivalent of specifying both the options --display-flip-mode=HORIZONTAL and --gamepad-flip-mode=HORIZONTAL.  The default is FALSE.  This can be changed in-game using the SHIFT+I and SHIFT+K key bindings for the display and keyboard, respectively.  See also the '--mirror-level' option.", 0},
@@ -652,7 +656,7 @@ parser (int key, char *arg, struct argp_state *state)
   char *hue_mode_enum[] = {"ORIGINAL", "NONE", "GREEN",
                            "GRAY", "YELLOW", "BLUE", NULL};
 
-  char *guard_mode_enum[] = {"ORIGINAL", "GUARD", "FAT-GUARD",
+  char *guard_mode_enum[] = {"ORIGINAL", "GUARD", "FAT",
                              "VIZIER", "SKELETON", "SHADOW", NULL};
 
   char *display_flip_mode_enum[] = {"NONE", "VERTICAL", "HORIZONTAL",
@@ -685,7 +689,7 @@ parser (int key, char *arg, struct argp_state *state)
 
   char *validate_replay_chain_enum[] = {"NONE", "READ", "WRITE", NULL};
 
-  struct int_range total_lives_range = {1, INT_MAX};
+  struct int_range total_hp_range = {1, INT_MAX};
   struct int_range start_level_range = {0, INT_MAX};
   struct int_range start_pos_room_range = {1, INT_MAX};
   struct int_range start_pos_floor_range = {0, 2};
@@ -801,7 +805,7 @@ Levels have been converted using module %s into native format at\n\
     switch (i) {
     case 0: gm = ORIGINAL_GM; break;
     case 1: gm = GUARD_GM; break;
-    case 2: gm = FAT_GUARD_GM; break;
+    case 2: gm = FAT_GM; break;
     case 3: gm = VIZIER_GM; break;
     case 4: gm = SKELETON_GM; break;
     case 5: gm = SHADOW_GM; break;
@@ -881,10 +885,10 @@ Levels have been converted using module %s into native format at\n\
   case IMMORTAL_MODE_OPTION:
     immortal_mode = optval_to_bool (arg);
     break;
-  case TOTAL_LIVES_OPTION:
-    e = optval_to_int (&i, key, arg, state, &total_lives_range, 0);
+  case TOTAL_HP_OPTION:
+    e = optval_to_int (&i, key, arg, state, &total_hp_range, 0);
     if (e) return e;
-    initial_total_lives = i;
+    initial_total_hp = i;
     break;
   case START_LEVEL_OPTION:
     e = optval_to_int (&i, key, arg, state, &start_level_range, 0);
@@ -1129,20 +1133,20 @@ Levels have been converted using module %s into native format at\n\
 
     /* video */
     else if (! strcasecmp ("CGA", arg))
-      set_string_var (&video_mode, "CGA");
+      set_string_var (&video_mode, "DOS CGA");
     else if (! strcasecmp ("DRAW", arg)) break;
     else if (! strcasecmp ("EGA", arg))
-      set_string_var (&video_mode, "EGA");
+      set_string_var (&video_mode, "DOS EGA");
     else if (! strcasecmp ("HERC", arg))
-      set_string_var (&video_mode, "HGC");
+      set_string_var (&video_mode, "DOS HGA");
     else if (! strcasecmp ("HGA", arg))
-      set_string_var (&video_mode, "HGC");
+      set_string_var (&video_mode, "DOS HGA");
     else if (! strcasecmp ("MCGA", arg))
-      set_string_var (&video_mode, "VGA");
+      set_string_var (&video_mode, "DOS VGA");
     else if (! strcasecmp ("TGA", arg))
-      set_string_var (&video_mode, "EGA");
+      set_string_var (&video_mode, "DOS EGA");
     else if (! strcasecmp ("VGA", arg))
-      set_string_var (&video_mode, "VGA");
+      set_string_var (&video_mode, "DOS VGA");
 
     /* memory */
     else if (! strcasecmp ("BYPASS", arg)) break;
@@ -1382,12 +1386,17 @@ main (int _argc, char **_argv)
   /* get global paths */
   get_paths ();
 
+  /* ensure basic path structure */
+  al_make_directory (user_data_dir);
+  al_make_directory (user_settings_dir);
+
   /* load replay favorites */
   ui_load_replay_favorites ();
 
   /* get configuration file arguments */
   enum file_type file_type = UNKNOWN_FILE_TYPE;
-  int e = get_config_args (&cargc, &cargv, options, config_filename, &file_type);
+  int e = get_config_args (&cargc, &cargv, options, config_filename,
+                           &file_type);
   if (e && e != ENOENT)
     error (0, e, "can't load %s '%s'", file_type2str (file_type),
            config_filename);
@@ -1443,6 +1452,12 @@ main (int _argc, char **_argv)
   load_callback = process_display_events;
   show ();
 
+  /* register exit cleanup function */
+  atexit (quit_game);
+  signal (SIGINT, quit_game_sighandler);
+  signal (SIGHUP, quit_game_sighandler);
+  signal (SIGTERM, quit_game_sighandler);
+
   /* initialize scripting environment */
   init_script ();
 
@@ -1496,7 +1511,7 @@ main (int _argc, char **_argv)
 
   stop_audio_instances ();
   stop_video_effect ();
-  if (quit_anim == QUIT_GAME) quit_game ();
+  if (quit_anim == QUIT_GAME) exit (0);
   else if (quit_anim == RESTART_GAME) goto restart_game;
   else if (quit_anim != CUTSCENE_END) goto play_game;
 
@@ -1522,7 +1537,7 @@ main (int _argc, char **_argv)
 
   stop_audio_instances ();
   stop_video_effect ();
-  if (quit_anim == QUIT_GAME) quit_game ();
+  if (quit_anim == QUIT_GAME) exit (0);
   else if (quit_anim == RESTART_GAME) goto restart_game;
   else if (quit_anim != CUTSCENE_END) goto play_game;
 
@@ -1536,14 +1551,14 @@ main (int _argc, char **_argv)
     start_time = START_TIME;
     time_limit = TIME_LIMIT;
     start_level = 1;
-    initial_total_lives = KID_INITIAL_TOTAL_LIVES;
-    initial_current_lives = KID_INITIAL_CURRENT_LIVES;
+    initial_total_hp = KID_INITIAL_TOTAL_HP;
+    initial_current_hp = KID_INITIAL_CURRENT_HP;
     skill.counter_attack_prob = INITIAL_KCA;
     skill.counter_defense_prob = INITIAL_KCD;
   }
 
-  total_lives = initial_total_lives;
-  current_lives = initial_current_lives;
+  total_hp = initial_total_hp;
+  current_hp = initial_current_hp;
   start_level_time = start_time;
   cutscene_mode (false);
   game_paused = false;
@@ -1561,8 +1576,6 @@ main (int _argc, char **_argv)
     play_game_counter++;
     goto restart_game;
   }
-
-  quit_game ();
 
   return 0;
 }
@@ -1585,12 +1598,20 @@ quit_game (void)
   finalize_video ();
 
   if (scream && kid_scream && guard_scream
-      && fat_guard_scream && shadow_scream && skeleton_scream
+      && fat_scream && shadow_scream && skeleton_scream
       && vizier_scream  && princess_scream && mouse_scream)
     fprintf (stderr, "In MININIM, everybody screams!\n");
   else fprintf (stderr, "MININIM: Hope you enjoyed it!\n");
+}
 
-  exit (0);
+void
+quit_game_sighandler (int signum)
+{
+  if (quitting_in_progress) raise (signum);
+  quitting_in_progress = 1;
+  quit_game ();
+  signal (signum, SIG_DFL);
+  raise (signum);
 }
 
 void
@@ -1654,6 +1675,9 @@ get_paths (void)
   /* get config file name */
   config_filename = xasprintf ("%smininim.mcf", user_settings_dir);
 
+  /* get history file name */
+  history_filename = xasprintf ("%shistory", user_settings_dir);
+
   /* get legacy LEVELS.DAT compatibility path */
   levels_dat_compat_filename = xasprintf ("LEVELS.DAT");
 
@@ -1669,6 +1693,7 @@ void
 print_paths (void)
 {
   printf ("Main configuration file: %s\n", config_filename);
+  printf ("REPL history file: %s\n", history_filename);
   printf ("Executable file: %s\n", exe_filename);
   printf ("Resources: %s\n", resources_dir);
   printf ("System data: %s\n", system_data_dir);
@@ -1782,12 +1807,12 @@ save_game (char *filename, int priority)
 {
   ALLEGRO_CONFIG *config = al_create_config ();
   char *start_level_str, *start_time_str, *time_limit_str,
-    *total_lives_str, *kca_str, *kcd_str;
+    *total_hp_str, *kca_str, *kcd_str;
 
   start_level_str = xasprintf ("%i", global_level.n);
   start_time_str = xasprintf ("%ju", start_level_time);
   time_limit_str = xasprintf ("%ju", time_limit);
-  total_lives_str = xasprintf ("%i", total_lives);
+  total_hp_str = xasprintf ("%i", total_hp);
   kca_str = xasprintf ("%i", skill.counter_attack_prob + 1);
   kcd_str = xasprintf ("%i", skill.counter_defense_prob + 1);
 
@@ -1795,7 +1820,7 @@ save_game (char *filename, int priority)
   al_set_config_value (config, NULL, "START LEVEL", start_level_str);
   al_set_config_value (config, NULL, "START TIME", start_time_str);
   al_set_config_value (config, NULL, "TIME LIMIT", time_limit_str);
-  al_set_config_value (config, NULL, "TOTAL LIVES", total_lives_str);
+  al_set_config_value (config, NULL, "TOTAL HP", total_hp_str);
   al_set_config_value (config, NULL, "KCA", kca_str);
   al_set_config_value (config, NULL, "KCD", kcd_str);
 
@@ -1811,7 +1836,7 @@ save_game (char *filename, int priority)
   al_free (start_level_str);
   al_free (start_time_str);
   al_free (time_limit_str);
-  al_free (total_lives_str);
+  al_free (total_hp_str);
   al_free (kca_str);
   al_free (kcd_str);
 

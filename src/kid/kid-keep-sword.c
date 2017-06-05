@@ -69,10 +69,8 @@ flow (struct actor *k)
 
   if (k->i == 8 && k->wait < 1) k->fo.dx = 0;
   if (k->i == 9 && k->wait < 2) k->fo.dx = 0;
-  if (k->keep_sword_fast && k->i % 2) {
-    k->fo.dx += actor_bitmap_dx (k, "KID", "KEEP_SWORD", k->i - 1);
-  }
-  if (k->oaction == kid_sword_normal) k->fo.dx = +8;
+  if (k->keep_sword_fast && k->i % 2)
+    k->fo.dx += actor_dx (k, "KID", "KEEP_SWORD", k->i - 1);
 
   return true;
 }
@@ -89,6 +87,9 @@ physics_in (struct actor *k)
 static void
 physics_out (struct actor *k)
 {
+  /* place on the ground */
+  place_on_the_ground (&k->f, &k->f.c);
+
   /* depressible floors */
   keep_depressible_floor (k);
 }

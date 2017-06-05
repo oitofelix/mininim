@@ -82,6 +82,9 @@ physics_in (struct actor *k)
 static void
 physics_out (struct actor *k)
 {
+  /* place on the ground */
+  place_on_the_ground (&k->f, &k->f.c);
+
   /* haptic */
   request_gamepad_rumble (0.5 - k->i / 8, 1.0 / DEFAULT_HZ);
 

@@ -22,7 +22,7 @@
 #define MININIM_AUDIO_DATA_H
 
 /* audio data */
-#define BIG_LIFE_POTION_AUDIO "data/audio/big-life-potion.ogg"
+#define BIG_HP_POTION_AUDIO "data/audio/big-hp-potion.ogg"
 #define STEP_AUDIO "data/audio/step.ogg"
 #define HIT_GROUND_AUDIO "data/audio/hit-ground.ogg"
 #define HIT_GROUND_HARM_AUDIO "data/audio/hit-ground-harm.ogg"
@@ -73,7 +73,7 @@
 #define MEET_VIZIER_AUDIO "data/audio/meet-vizier.ogg"
 #define PRINCESS_WAITING_AUDIO "data/audio/princess-waiting.ogg"
 #define VIZIER_AND_PRINCESS_AUDIO "data/audio/vizier-and-princess.ogg"
-#define SMALL_LIFE_POTION_AUDIO "data/audio/small-life-potion.ogg"
+#define SMALL_HP_POTION_AUDIO "data/audio/small-hp-potion.ogg"
 #define SUCCESS_AUDIO "data/audio/success.ogg"
 #define SUCCESS_SUSPENSE_AUDIO "data/audio/success-suspense.ogg"
 #define SUSPENSE_AUDIO "data/audio/suspense.ogg"
@@ -84,7 +84,7 @@ void unload_audio_data (void);
 
 /* audio variables */
 extern struct audio_source
-  big_life_potion_audio,
+  big_hp_potion_audio,
   step_audio,
   hit_ground_audio,
   hit_ground_harm_audio,
@@ -134,7 +134,7 @@ extern struct audio_source
   marry_jaffar_audio,
   meet_vizier_audio,
   princess_waiting_audio,
-  small_life_potion_audio,
+  small_hp_potion_audio,
   success_audio,
   success_suspense_audio,
   vizier_and_princess_audio;

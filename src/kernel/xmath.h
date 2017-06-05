@@ -21,8 +21,6 @@
 #ifndef MININIM_XMATH_H
 #define MININIM_XMATH_H
 
-double max_double (double a, double b);
-double min_double (double a, double b);
 bool equiv (bool a, bool b);
 int round2multiple (int n, int m);
 int next_multiple (int n, int m);

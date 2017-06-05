@@ -30,7 +30,7 @@ fix_tile (struct pos *p)
   struct pos pb; prel (p, &pb, +1, 0);
 
   /* traversable on top of rigid tile -> floor */
-  if (is_potentially_traversable (p) && is_rigid_tile (&pb))
+  if (is_critical (p) && is_rigid_tile (&pb))
     set_fg (p, FLOOR);
 
   /* broken floor below non no floor -> floor */
@@ -80,12 +80,12 @@ fix_skeleton_or_spikes_floor_with_no_or_loose_floor_at_left (struct pos *p)
 
   /* skeleton and spike's perspective */
   if ((f == SKELETON_FLOOR || f == SPIKES_FLOOR)
-      && is_hangable_pos (&ph, RIGHT))
+      && is_hangable (&ph, RIGHT))
     set_fg_rel (p, +0, -1, FLOOR);
 
   /* hangable position perspective  */
   enum tile_fg t = get_hanged_tile (p, RIGHT);
-  if (is_hangable_pos (p, RIGHT)
+  if (is_hangable (p, RIGHT)
       && (t == SKELETON_FLOOR || t == SPIKES_FLOOR))
     set_fg_rel (p, -1, +0, FLOOR);
 
@@ -243,8 +243,7 @@ fix_traversable_above_room_0 (struct level *l)
   for (p.room = 1; p.room < ROOMS; p.room++)
     for (p.place = 0; p.place < PLACES; p.place++) {
       if (roomd (p.l, p.room, BELOW) != 0) continue;
-      if (is_potentially_traversable (&p))
-        set_fg (&p, SPIKES_FLOOR);
+      if (is_critical (&p)) set_fg (&p, SPIKES_FLOOR);
     }
 }
 

@@ -28,13 +28,14 @@ extern bool no_recursive_links_continuity;
 void draw_bitmapc (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
                    struct coord *c, int flags);
 void draw_bitmap_regionc (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
-                          float sx, float sy, float sw, float sh,
+                          lua_Number sx, lua_Number sy,
+                          lua_Number sw, lua_Number sh,
                           struct coord *c, int flags);
 void draw_bitmap_region_o (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
-                           float sx, float sy, float sw, float sh,
-                           float dx, float dy, int flags);
+                           lua_Number sx, lua_Number sy,
+                           lua_Number sw, lua_Number sh,
+                           lua_Number dx, lua_Number dy, int flags);
 
-struct rect *new_rect (struct rect *r, int room, int x, int y, int w, int h);
 void draw_filled_rect (ALLEGRO_BITMAP *to, struct rect *r,
                        ALLEGRO_COLOR color);
 void clear_rect_to_color (ALLEGRO_BITMAP *to, struct rect *r,

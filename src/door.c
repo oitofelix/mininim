@@ -249,9 +249,9 @@ close_door (struct level *l, int e, uint64_t priority)
 int
 door_grid_tip_y (struct pos *p)
 {
-  struct coord c;
-  coord_object_index_part (&c, "DOOR", door_at_pos (p)->i + 1, "TIP", p);
-  return c.y;
+  struct rect r;
+  rect_object_index_part (&r, "DOOR", door_at_pos (p)->i + 1, "TIP", p);
+  return r.c.y;
 }
 
 int
@@ -273,7 +273,7 @@ draw_door_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f)
   draw_object_part (bitmap, "DOOR", "FRONT", p);
 
   push_drawn_rectangle (bitmap);
-  enum should_draw s = should_draw_face (p, f);
+  enum should_draw s = should_draw_face (p, f, RIGHT);
   int w = s == SHOULD_DRAW_PART ? DOOR_FG_WIDTH : FULL_WIDTH;
 
   if (s != SHOULD_DRAW_NONE
