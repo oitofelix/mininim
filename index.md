@@ -256,6 +256,25 @@ best place to obtain help is at its
   vertically)
 
 
+**Level Editor Chart**
+
+The following schematic chart documents MININIM's level editor
+functionality.
+
+<a taget="_blank" href="https://github.com/oitofelix/mininim/releases/download/v201701122309/MININIM_201701122309_EDITORHELP-01.jpg">
+    <img style="border: 0px;" src="https://github.com/oitofelix/mininim/releases/download/v201701122309/MININIM_201701122309_EDITORHELP-01-thumbnail.jpg"alt="MININIM's level editor">
+</a>
+
+- [JPG](https://github.com/oitofelix/mininim/releases/download/v201701122309/MININIM_201701122309_EDITORHELP-01.jpg)
+- [PDF](https://github.com/oitofelix/mininim/releases/download/v201701122309/MININIM_201701122309_EDITORHELP.pdf)
+- [AI](https://github.com/oitofelix/mininim/releases/download/v201701122309/MININIM_201701122309_EDITORHELP.ai)
+
+Thanks to [Gutxi Haitz Céspedes](http://www.gutxihaitz.com/) who
+designed and released it freely under the
+[CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) and
+[GNU FDL v1.3+](http://www.gnu.org/licenses/fdl.html) licenses.
+
+
 ### Links
 
 - [Homepage](http://oitofelix.github.io/mininim/)
