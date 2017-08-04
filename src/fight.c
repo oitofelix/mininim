@@ -518,10 +518,14 @@ fight_mechanics (struct actor *k)
        && (prandom (99) <= ke->skill.counter_defense_prob
            || k->angry));
 
-  /* ***** */
-  ke->enemy_counter_attacked_myself = true;
-  ke->i_counter_defended = true;
-  /* ***** */
+  /* /\* DEBUG: endless counter attack/defense chain ***** *\/ */
+  /* ke->enemy_counter_attacked_myself = true; */
+  /* ke->i_counter_defended = true; */
+  /* /\* **************************** *\/ */
+
+  /* /\* DEBUG: no defense whatsoever *\/ */
+  /* ke->enemy_defended_my_attack = 0; */
+  /* /\* **************************** *\/ */
 
   if (! k->hurt_enemy_in_counter_attack)
     k->hurt_enemy_in_counter_attack =
@@ -532,7 +536,10 @@ fight_mechanics (struct actor *k)
   /* printf ("ke->enemy_defended_my_attack = %i, ke->i = %i, k->key.up = %i\n", */
   /*         ke->enemy_defended_my_attack, ke->i, k->key.up); */
 
-  if (! ke->enemy_defended_my_attack && is_at_hit_frame (ke)
+  ke->placed_at_attack_frame = false;
+
+  if (! ke->enemy_defended_my_attack
+      && is_at_hit_frame (ke)
       && ! is_on_back (ke, k)
       && (ke->attack_range_far || ! is_in_fight_mode (k))
       && ((is_in_range (k, ke, HIT_RANGE + 4) && is_in_fight_mode (k))
@@ -540,8 +547,10 @@ fight_mechanics (struct actor *k)
     fight_hit (k, ke);
   else if (ke->hurt_enemy_in_counter_attack
            && is_at_hit_frame (ke)
-           && ! is_on_back (ke, k)) fight_hit (k, ke);
-  else if (ke->enemy_defended_my_attack == 1
+           && ! is_on_back (ke, k))
+    fight_hit (k, ke);
+  else if (! ke->hurt_enemy_in_counter_attack
+           && ke->enemy_defended_my_attack == 1
            && is_at_defendable_attack_frame (ke)) {
     if (is_in_range (k, ke, HIT_RANGE + 8)
         || is_defending (k)) {
@@ -549,6 +558,7 @@ fight_mechanics (struct actor *k)
       get_in_range (ke, k, ATTACK_RANGE - 6, false, false);
       put_at_attack_frame (ke);
       put_at_defense_frame (k);
+      ke->placed_at_attack_frame = true;
     } else ke->enemy_defended_my_attack = false;
   }
 
@@ -740,10 +750,8 @@ is_sword_hit (struct actor *k)
 bool
 is_at_defendable_attack_frame (struct actor *k)
 {
-  return (k->action == kid_sword_attack
-          && (k->i == 2 || k->i == 3))
-    || (k->action == guard_sword_attack
-        && (k->i == 3 || k->i == 4));
+  return (k->action == kid_sword_attack && k->i == 2)
+    || (k->action == guard_sword_attack && k->i == 3);
 }
 
 bool
@@ -771,11 +779,9 @@ put_at_defense_frame (struct actor *k)
 
     select_actor_frame (k, "KID", "SWORD_DEFENSE", 1);
 
-    if (ke->type == KID) {
+    if (ke->type == KID)
       select_actor_xframe (k, "KID", "SWORD", 11);
-      k->xf.dx = -13;
-      k->xf.dy = +5;
-    } else select_actor_xframe (k, "KID", "SWORD", 14);
+    else select_actor_xframe (k, "KID", "SWORD", 14);
 
     k->action = kid_sword_defense;
     uncollide_back_fight (k);
@@ -843,10 +849,10 @@ put_at_attack_frame (struct actor *k)
     k->fo.dy = actor_dy (k, NULL, "SWORD_ATTACK", 10);
 
     select_actor_xframe (k, NULL, "SWORD", 8);
-    k->xf.dx = -13;
-    k->xf.dy = -14;
     uncollide_back_fight (k);
     next_frame (&k->f, &k->f, &k->fo);
+
+    k->i = 4;
     break;
   }
 }
@@ -1283,6 +1289,8 @@ fight_hit (struct actor *k, struct actor *ke)
     mr.color = get_flicker_blood_color ();
     play_audio (&harm_audio, NULL, k->id);
   } else play_audio (&guard_hit_audio, NULL, k->id);
+
+  stop_audio_instance (&sword_attack_audio, NULL, ke->id);
 }
 
 void

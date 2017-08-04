@@ -2186,11 +2186,11 @@ video.KID.SWORD = new (
    video.FRAMESET, {}, {
       {0, -18}, {7, -5}, {17, -4}, {18, -20}, {16, -13},
       {-9, -1}, {7, -18}, {0, -17}, {7, 4}, {7, 8},
-      {11, -13}, {10, -14}, {22, -12}, {28, -10},
+      {11, -13}, {13, -5}, {22, -12}, {28, -10},
       {13, 5}, {1, 11}, {0, -5}, {15, -15}, {14, -4},
       {22, -10}, {7, 11}, {14, 11}, {14, 11}, {14, 5},
       {28, -3}, {28, -8}, {21, -7}, {14, -5}, {14, -2},
-      {0, -12}, {12, -23}, {0, 0}, {14, -9}, {5, -12}})
+      {0, -12}, {12, -23}, {0, 0}, {13, -10}, {5, -12}})
 
 video.KID.SWORD[14].rect = function (self, a)
    if a.action == "SWORD_WALKF" then
@@ -2322,7 +2322,7 @@ video.GUARD.SWORD_DEFENSE = new (
 -- GUARD SWORD HIT
 video.GUARD.SWORD_HIT = new (
    video.FRAMESET, {}, {
-      {0, 0}, {0, 0}, {-4, 0}, {-8, 0}, {-8, 0}})
+      {0, 0}, {0, 0}, {-8, 0}, {-8, 0}, {-8, 0}})
 
 -- GUARD FALL
 video.GUARD.FALL = new (
@@ -2350,7 +2350,22 @@ end
 
 video.GUARD.SWORD.offset[8] = {0, -23}
 
+video.GUARD.SWORD[9].rect = function (self, a)
+   if a.action == "SWORD_ATTACK" and a.index == 4
+   then return offset (13, 14)
+   else return video.FRAME.rect (self, a) end
+end
+
 video.GUARD.SWORD.offset[11] = {10, -16}
+video.GUARD.SWORD.offset[12] = {10, -14}
+
+video.GUARD.SWORD[29].rect = function (self, a)
+   if a.action == "SWORD_HIT" and a.index == 1
+   then return offset (11, -5)
+   else return video.FRAME.rect (self, a) end
+end
+
+video.GUARD.SWORD.offset[30] = {11, -15}
 
 -- FAT
 video.FAT = new (video.GUARD)
@@ -2383,20 +2398,7 @@ for i, v in ipairs (video.SKELETON.SWORD) do
    end
 end
 
--- video.SKELETON.SWORD.offset[4] = {18, -17}
--- video.SKELETON.SWORD.offset[5] = {16, -10}
-
--- video.SKELETON.SWORD[5].rect = function (self, a)
---    if a.action == "SWORD_WALKF" then
---       if a.index == 2 then return offset (6, -5)
---       elseif a.index == 3 then return offset (9, -8)
---       end
---    else return video.FRAME.rect (self, a) end
--- end
-
--- video.SKELETON.SWORD.offset[9] = {7, 7}
--- video.SKELETON.SWORD.offset[11] = {10, -13}
--- video.SKELETON.SWORD.offset[31] = {17, -17}
+video.SKELETON.SWORD.offset[31] = {17, -20}
 
 -- SHADOW
 video.SHADOW = new (video.GUARD)
@@ -2408,19 +2410,20 @@ video.SHADOW.DIE = new (
       {-2, -1}, {0, 0}, {0, 0}})
 
 -- SHADOW SWORD
-video.SHADOW.SWORD.offset[4] = {15, -18}
-video.SHADOW.SWORD.offset[5] = {16, -11}
-
-video.SHADOW.SWORD[5].rect = function (self, a)
-   if a.action == "SWORD_WALKF" then
-      if a.index == 2 then return offset (6, -6)
-      elseif a.index == 3 then return offset (9, -9)
-      end
-   else return video.FRAME.rect (self, a) end
+for i, v in ipairs (video.SHADOW.SWORD) do
+   local rect = v.rect
+   v.rect = function (self, a)
+      return rect (self, a) + offset (0, 2)
+   end
 end
 
-video.SHADOW.SWORD.offset[9] = {7, 6}
-video.SHADOW.SWORD.offset[11] = {10, -14}
+video.SHADOW.SWORD[9].rect = function (self, a)
+   if a.action == "SWORD_ATTACK" and a.index == 4
+   then return offset (13, 14)
+   else return video.FRAME.rect (self, a) + offset (0, 2) end
+end
+
+video.SHADOW.SWORD.offset[30] = {0, -12}
 
 -- ASSET
 local ASSET = new ()

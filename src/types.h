@@ -396,7 +396,7 @@ struct actor {
   bool splash;
 
   int enemy_defended_my_attack, enemy_counter_attacked_myself,
-    i_counter_defended;
+    i_counter_defended, placed_at_attack_frame;
   bool i_initiated_attack;
   bool attack_range_far, attack_range_near, hurt_enemy_in_counter_attack;
   int angry;

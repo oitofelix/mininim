@@ -1836,11 +1836,11 @@ video.KID.SWORD = new (
    video.FRAMESET, {}, {
       {0, -18}, {10.5, -6.5}, {17, -4}, {18, -20}, {14.5, -11},
       {-9, -1}, {7, -18}, {1, -20}, {12, 1}, {7, 8},
-      {18.5, -14}, {10, -14}, {22, -12}, {18.5, -7.5},
+      {18.5, -14}, {13, -5}, {22, -12}, {18.5, -7.5},
       {10, 9}, {-1.5, 16}, {-0.5, -4.5}, {16, -14.5}, {11.5, -1.5},
       {17.5, -10.5}, {4, 11}, {5, 10}, {4, 10}, {7, 5},
       {16, -2}, {17, -6}, {15, -11}, {3, -10}, {12.5, -2},
-      {0, -12}, {12, -23}, {0, 0}, {14, -9}, {5, -12}})
+      {-4, -12}, {12, -23}, {0, 0}, {14, -9}, {5, -12}})
 
 video.KID.SWORD[14].rect = function (self, a)
    if a.action == "SWORD_WALKF" then
@@ -1861,6 +1861,12 @@ end
 video.KID.SWORD[20].rect = function (self, a)
    if a.action == "SWORD_ATTACK" and a.index == 4
    then return offset (17.5, -8.5)
+   else return video.FRAME.rect (self, a) end
+end
+
+video.KID.SWORD[33].rect = function (self, a)
+   if a.action == "SWORD_HIT" and a.index == 2
+   then return offset (10, -6)
    else return video.FRAME.rect (self, a) end
 end
 
@@ -1971,7 +1977,7 @@ video.GUARD.SWORD_WALKF = new (
 
 -- GUARD SWORD WALKB
 video.GUARD.SWORD_WALKB = new (
-   video.FRAMESET, {}, {{0, 0}, {-9, 0}})
+   video.FRAMESET, {}, {{-4, 0}, {-8, 0}})
 
 -- GUARD SWORD ATTACK
 video.GUARD.SWORD_ATTACK = new (
@@ -1986,7 +1992,7 @@ video.GUARD.SWORD_DEFENSE = new (
 -- GUARD SWORD HIT
 video.GUARD.SWORD_HIT = new (
    video.FRAMESET, {}, {
-      {0, 0}, {0, 0}, {-4, 0}, {-8, 0}, {-8, 0}})
+      {0, 0}, {0, 0}, {-8, 0}, {-8, 0}, {-8, 0}})
 
 -- GUARD FALL
 video.GUARD.FALL = new (
@@ -2002,9 +2008,12 @@ video.GUARD.DIE = new (
 -- GUARD SWORD
 video.GUARD.SWORD = new (video.KID.SWORD)
 
+video.GUARD.SWORD.offset[1] = {2.5, -17}
 video.GUARD.SWORD.offset[4] = {20, -16}
-
 video.GUARD.SWORD.offset[5] = {14.5, -10}
+video.GUARD.SWORD.offset[6] = {-4, 0}
+video.GUARD.SWORD.offset[7] = {8, -16}
+video.GUARD.SWORD.offset[8] = {-1, -21}
 
 video.GUARD.SWORD[5].rect = function (self, a)
    if a.action == "SWORD_WALKF" then
@@ -2014,7 +2023,17 @@ video.GUARD.SWORD[5].rect = function (self, a)
    else return video.FRAME.rect (self, a) end
 end
 
+video.GUARD.SWORD[9].rect = function (self, a)
+   if a.action == "SWORD_ATTACK" and a.index == 4
+   then return offset (13, 10)
+   else return video.FRAME.rect (self, a) end
+end
+
+video.GUARD.SWORD.offset[10] = {6, 7}
 video.GUARD.SWORD.offset[11] = {7, -16.5}
+video.GUARD.SWORD.offset[12] = {8, -12}
+video.GUARD.SWORD.offset[13] = {18, -8}
+video.GUARD.SWORD.offset[30] = {14, -16}
 
 -- FAT
 video.FAT = new (video.GUARD)
@@ -2096,8 +2115,8 @@ video.VIZIER.SWORD_WALKF = new (
 
 -- VIZIER SWORD
 video.VIZIER.SWORD.offset[4] = {21, -16}
-
 video.VIZIER.SWORD.offset[5] = {15.5, -10.5}
+video.VIZIER.SWORD.offset[6] = {-3.5, -1}
 
 video.VIZIER.SWORD[5].rect = function (self, a)
    if a.action == "SWORD_WALKF" then
@@ -2145,8 +2164,9 @@ video.SKELETON.DIE = new (
       {0, 0}, {0, 0}, {0, 0}})
 
 -- SKELETON SWORD
+video.SKELETON.SWORD.offset[1] = {3, -17}
+video.SKELETON.SWORD.offset[3] = {19.5, -1.5}
 video.SKELETON.SWORD.offset[4] = {18, -14}
-
 video.SKELETON.SWORD.offset[5] = {16, -8}
 
 video.SKELETON.SWORD[5].rect = function (self, a)
@@ -2157,10 +2177,12 @@ video.SKELETON.SWORD[5].rect = function (self, a)
    else return video.FRAME.rect (self, a) end
 end
 
+video.SKELETON.SWORD.offset[6] = {-3.5, 2.5}
+video.SKELETON.SWORD.offset[7] = {7, -14}
 video.SKELETON.SWORD.offset[9] = {13, 4}
-
+video.SKELETON.SWORD.offset[10] = {4.5, 10}
 video.SKELETON.SWORD.offset[11] = {11, -14}
-
+video.SKELETON.SWORD.offset[12] = {7, -12}
 video.SKELETON.SWORD.offset[31] = {15.5, -20}
 
 -- SHADOW
@@ -2197,8 +2219,8 @@ video.SHADOW.DIE = new (
       {-2, -1}, {0, 0}, {0, 0}})
 
 -- SHADOW SWORD
+video.SHADOW.SWORD.offset[3] = {19.5, -2.5}
 video.SHADOW.SWORD.offset[4] = {19, -15}
-
 video.SHADOW.SWORD.offset[5] = {15, -9}
 
 video.SHADOW.SWORD[5].rect = function (self, a)
@@ -2211,10 +2233,11 @@ video.SHADOW.SWORD[5].rect = function (self, a)
    else return video.FRAME.rect (self, a) end
 end
 
+video.SHADOW.SWORD.offset[6] = {-3.5, 1}
+video.SHADOW.SWORD.offset[7] = {7.5, -15.5}
 video.SHADOW.SWORD.offset[9] = {12.5, 1.5}
-
 video.SHADOW.SWORD.offset[11] = {9.5, -14.5}
-
+video.SHADOW.SWORD.offset[12] = {8, -14}
 video.SHADOW.SWORD.offset[31] = {12, -23.5}
 
 -- ASSET

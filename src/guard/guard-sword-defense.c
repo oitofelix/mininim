@@ -76,11 +76,6 @@ flow (struct actor *g)
 
   if (g->i == 1) g->xf.b = NULL;
 
-  if (g->oaction == guard_sword_attack) g->fo.dx += +2;
-
-  if (g->type == SKELETON) g->xf.dy += -3;
-  if (g->type == SHADOW) g->xf.dy += -2;
-
   /* if (g->id == 0) */
   /*   printf ("guard_sword_defense: g->i = %i, g->fo.dx = %i\n", */
   /*           g->i, g->fo.dx); */

@@ -68,11 +68,9 @@ flow (struct actor *k)
     return false;
   }
 
-  if (k->i == 3 && k->enemy_defended_my_attack)
-    move_frame (&k->f, _tb, +0, -9, -9);
-
-  if (k->i == 2 && k->enemy_defended_my_attack)
-    k->i = 3;
+  /* TODO: query video mode for these offsets */
+  if (k->i == 3 && k->placed_at_attack_frame)
+    move_frame (&k->f, _tb, +0, +8, +8);
 
   select_actor_frame (k, "KID", "SWORD_ATTACK", k->i + 1);
 
@@ -111,7 +109,9 @@ physics_out (struct actor *k)
   place_on_the_ground (&k->f, &k->f.c);
 
   /* sound */
-  if (k->i == 3) play_audio (&sword_attack_audio, NULL, k->id);
+  if (k->i == 3
+      && ! search_audio_instance (&guard_hit_audio, 0, NULL, k->enemy_id))
+    play_audio (&sword_attack_audio, NULL, k->id);
 
   /* depressible floors */
   if (k->i == 2) update_depressible_floor (k, -8, -40);

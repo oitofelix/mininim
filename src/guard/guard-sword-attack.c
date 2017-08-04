@@ -69,11 +69,9 @@ flow (struct actor *g)
     return false;
   }
 
-  if (g->i == 4 && g->enemy_defended_my_attack)
-    move_frame (&g->f, _tb, +0, -9, -9);
-
-  if (g->i == 3 && g->enemy_defended_my_attack)
-    g->i = 4;
+  /* TODO: query video mode for these offsets */
+  if (g->i == 4 && g->placed_at_attack_frame)
+    move_frame (&g->f, _tb, +0, +8, +8);
 
   select_actor_frame (g, NULL, "SWORD_ATTACK", g->i + 1);
 
@@ -89,15 +87,6 @@ flow (struct actor *g)
   if (g->i == 9) g->j = 10;
 
   select_actor_xframe (g, NULL, "SWORD", g->j);
-
-  /* if (g->j == 1) g->xf.dy = +9; */
-  /* if (g->j == 7) g->xf.dx = +0, g->xf.dy = +23; */
-  /* if (g->j == 10) g->xf.dx = -10, g->xf.dy = +16; */
-
-  /* if (g->i == 5 && g->enemy_defended_my_attack) g->fo.dx = -2; */
-
-  if (g->type == SKELETON) g->xf.dy += -3;
-  if (g->type == SHADOW) g->xf.dy += -2;
 
   return true;
 }
@@ -125,7 +114,9 @@ physics_out (struct actor *g)
   place_on_the_ground (&g->f, &g->f.c);
 
   /* sound */
-  if (g->i == 4) play_audio (&sword_attack_audio, NULL, g->id);
+  if (g->i == 4
+      && ! search_audio_instance (&harm_audio, 0, NULL, g->enemy_id))
+    play_audio (&sword_attack_audio, NULL, g->id);
 
   /* depressible floors */
   if (g->i == 3) update_depressible_floor (g, -4, -41);

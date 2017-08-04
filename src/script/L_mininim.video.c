@@ -234,21 +234,21 @@ video_command_error (const char *command, const char *object,
 {
   char *object_str;
   if (object) object_str = xasprintf (" %s", object);
-  else object_str = xasprintf ("");
+  else object_str = xasprintf ("%s", "");
 
   char *index_str;
   if (index) {
     if (index <= VIDEO_INDEX_MAX)
       index_str = xasprintf (" %ju", index);
     else index_str = xasprintf (" %s", (char *) index);
-  } else index_str = xasprintf ("");
+  } else index_str = xasprintf ("%s", "");
 
   char *part_str;
   if (part) {
     if (part <= VIDEO_INDEX_MAX)
       part_str = xasprintf (" %ju", part);
     else part_str = xasprintf (" %s", (char *) part);
-  } else part_str = xasprintf ("");
+  } else part_str = xasprintf ("%s", "");
 
   fprintf (stderr, "error: video command \"%s%s%s%s\" failed\n",
            command, object_str, index_str, part_str);

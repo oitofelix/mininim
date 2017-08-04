@@ -347,6 +347,10 @@ legacy_level_special_events (void)
       place_actor (ks, &shadow_pos, dx, dy, "KID", "NORMAL", 0);
 
       shadow_id = id;
+
+      /* update references */
+      k0 = get_actor_by_id (0);
+      kc = get_actor_by_id (current_kid_id);
     } else ks = get_actor_by_id (shadow_id);
 
     /* when kid enters room 1, play the suspense sound */

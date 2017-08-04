@@ -72,8 +72,8 @@ flow (struct actor *k)
   select_actor_xframe (k, "KID", "SWORD", k->j);
   if (! k->has_sword) k->xf.b = NULL;
 
-  if (k->i == 0) k->xf.dx = -12, k->xf.dy = +2;
-  if (k->i == 1) k->xf.dy += -2;
+  /* if (k->i == 0) k->xf.dx = -12, k->xf.dy = +2; */
+  /* if (k->i == 1) k->xf.dy += -2; */
 
   return true;
 }

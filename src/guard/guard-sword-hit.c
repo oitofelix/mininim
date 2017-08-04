@@ -66,18 +66,17 @@ flow (struct actor *g)
 
   if (g->i == 0) g->j = 28;
   if (g->i == 1) g->j = 32;
-  if (g->i == 2 && g->type == SHADOW) g->j = 29;
+  if (g->i == 2) g->j = 29;
   if (g->i == 3) g->j = 7;
   if (g->i == 4) g->j = 3;
 
   select_actor_xframe (g, NULL, "SWORD", g->j);
 
-  if (g->i == 0) g->xf.dx = -12, g->xf.dy = +4;
-  if (g->i == 2 && g->type != SHADOW) g->xf.b = NULL;
-  if (g->i == 3) g->xf.dx = +0, g->xf.dy = +23;
+  /* if (g->i == 0) g->xf.dx = -12, g->xf.dy = +4; */
+  /* if (g->i == 3) g->xf.dx = +0, g->xf.dy = +23; */
 
-  if (g->type == SKELETON) g->xf.dy += -3;
-  if (g->type == SHADOW && g->i != 2) g->xf.dy += -2;
+  /* if (g->type == SKELETON) g->xf.dy += -3; */
+  /* if (g->type == SHADOW && g->i != 2) g->xf.dy += -2; */
 
   return true;
 }
