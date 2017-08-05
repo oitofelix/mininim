@@ -918,7 +918,7 @@ function video.DOOR.GRID:create_bitmap (i)
               11, 9, 7, 7}
 
    local function eraser (row, max_col)
-      for x = 0, max_col do b.set_pixel (x, row - 1, TRANSPARENT) end
+      for x = 0, max_col - 7 do b.set_pixel (x, row - 1, TRANSPARENT) end
    end
 
    table.foreachi (t, eraser)
@@ -1058,7 +1058,7 @@ function video.ARCH_BOTTOM.MAIN:rect (p)
 end
 
 function video.ARCH_BOTTOM.FRONT:rect (p)
-   return coord (PLACE_WIDTH * p.place + 9,
+   return coord (PLACE_WIDTH * p.place + 8.5,
                  PLACE_HEIGHT * p.floor,
                  p.room)
 end
@@ -1078,19 +1078,19 @@ local carpet = new (video.OBJECT, {MAIN = {}, MAIN_TRAVERSABLE = {},
 
 function carpet.MAIN:rect (p)
    return coord (PLACE_WIDTH * p.place,
-                 PLACE_HEIGHT * p.floor - 10,
+                 PLACE_HEIGHT * p.floor - 9,
                  p.room)
 end
 
 function carpet.MAIN_TRAVERSABLE:rect (p)
    return coord (PLACE_WIDTH * p.place + 25,
-                 PLACE_HEIGHT * p.floor - 10,
+                 PLACE_HEIGHT * p.floor - 9,
                  p.room)
 end
 
 function carpet.FACE:rect (p)
    return coord (PLACE_WIDTH * (p.place + 1),
-                 PLACE_HEIGHT * p.floor - 7,
+                 PLACE_HEIGHT * p.floor - 6.5,
                  p.room)
 end
 
@@ -1115,7 +1115,7 @@ video.CARPET[4].FACE.rect = video.CARPET[3].FACE.rect
 
 video.CARPET[5].MAIN_TRAVERSABLE.rect = function (self, p)
    return coord (PLACE_WIDTH * p.place,
-                 PLACE_HEIGHT * p.floor - 10,
+                 PLACE_HEIGHT * p.floor - 9,
                  p.room)
 end
 
@@ -1141,7 +1141,7 @@ function video.MIRROR.MAIN:rect (p)
 end
 
 function video.MIRROR.FACE:rect (p)
-   return coord (PLACE_WIDTH * p.place,
+   return coord (PLACE_WIDTH * p.place + .5,
                  PLACE_HEIGHT * p.floor + 3,
                  p.room)
 end
@@ -2255,7 +2255,7 @@ function ASSET:load ()
    self:load_torch ()
    self:load_fire ()
    self:load_window ()
-   -- self:load_balcony ()
+   self:load_balcony ()
    self:load_floor ()
    self:load_skeleton_floor ()
    self:load_broken_floor ()
@@ -2269,13 +2269,13 @@ function ASSET:load ()
    self:load_door ()
    self:load_level_door ()
    self:load_chomper ()
-   -- self:load_arch_bottom ()
-   -- self:load_arch_top_mid ()
-   -- self:load_arch_top_small ()
-   -- self:load_arch_top_left ()
-   -- self:load_arch_top_right ()
-   -- self:load_carpet ()
-   -- self:load_mirror ()
+   self:load_arch_bottom ()
+   self:load_arch_top_mid ()
+   self:load_arch_top_small ()
+   self:load_arch_top_left ()
+   self:load_arch_top_right ()
+   self:load_carpet ()
+   self:load_mirror ()
    if self.em == "dungeon" then self:load_dungeon_wall ()
    else self:load_palace_wall () end
 
