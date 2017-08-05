@@ -237,6 +237,7 @@ draw_level_door_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct actor *a)
 void
 draw_level_door_floor (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
-  draw_object (bitmap, fake_level_door_broken (p)
-               ? "BROKEN_FLOOR" : "FLOOR", p);
+  if (fake_level_door_broken (p))
+    draw_object_part (bitmap, "BROKEN_FLOOR", "MAIN", p);
+  else draw_object (bitmap, "FLOOR", p);
 }

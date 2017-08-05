@@ -242,6 +242,8 @@ draw_chomper (ALLEGRO_BITMAP *bitmap, struct pos *p)
   draw_blade (bitmap, p, ch, ch->i + 1, FULL_WIDTH);
 }
 
+/* TODO: query video mode for CHOMPER_FG_WIDTH */
+
 void
 draw_chomper_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f)
 {
