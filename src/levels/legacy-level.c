@@ -780,8 +780,7 @@ interpret_legacy_level (struct level *l, int n)
           break;
         case LT_SPIKES: set_fg (&p, SPIKES_FLOOR); break;
         case LT_PILLAR: set_fg (&p, PILLAR); break;
-        case LT_GATE: set_fg (&p, DOOR);
-          set_bg (&p, NO_BRICKS); break;
+        case LT_GATE: set_fg (&p, DOOR); break;
         case LT_STUCK_BUTTON: set_fg (&p, STUCK_FLOOR); break;
         case LT_DROP_BUTTON: set_fg (&p, CLOSER_FLOOR); break;
         case LT_TAPESTRY: set_fg (&p, CARPET); break;
@@ -793,8 +792,7 @@ interpret_legacy_level (struct level *l, int n)
         case LT_LOOSE_BOARD:
           set_fg (&p, LOOSE_FLOOR);
           set_ext (&p, mlf); break;
-        case LT_TAPESTRY_TOP: set_fg (&p, TCARPET);
-          set_bg (&p, NO_BRICKS); break;
+        case LT_TAPESTRY_TOP: set_fg (&p, TCARPET); break;
         case LT_MIRROR: set_fg (&p, MIRROR); break;
         case LT_DEBRIS: set_fg (&p, BROKEN_FLOOR); break;
         case LT_RAISE_BUTTON: set_fg (&p, OPENER_FLOOR); break;
@@ -912,11 +910,15 @@ interpret_legacy_level (struct level *l, int n)
         case LG_TAPEST:         /* ok */
           switch (b) {
           case LM_TAPEST_WITH_LATTICE:
-            set_ext (&p, 2); break;
+            set_ext (&p, 2);
+            set_bg (&p, NO_BRICKS);
+            break;
           case LM_TAPEST_ALTERNATIVE_DESIGN:
             set_ext (&p, 0); break;
           case LM_TAPEST_NORMAL:
-            set_ext (&p, 1); break;
+            set_ext (&p, 1);
+            set_bg (&p, NO_BRICKS);
+            break;
           case LM_TAPEST_BLACK: break; /* needless */
             /* needless */
           case LM_TAPEST_WEIRD_1: break;
@@ -944,13 +946,17 @@ interpret_legacy_level (struct level *l, int n)
         case LG_TTOP:           /* ok */
           switch (b) {
           case LM_TTOP_WITH_LATTICE:
-            set_ext (&p, 2); break;
+            set_ext (&p, 2);
+            set_bg (&p, NO_BRICKS);
+            break;
           case LM_TTOP_ALTERNATIVE_DESIGN:
             set_ext (&p, get_tile (&pl) == LT_LATTICE_SUPPORT ?
                      4 : 0); break;
           case LM_TTOP_NORMAL:
             set_ext (&p, get_tile (&pl) == LT_LATTICE_SUPPORT ?
-                     5 : 1); break;
+                     5 : 1);
+            set_bg (&p, NO_BRICKS);
+            break;
             /* needless */
           case LM_TTOP_BLACK_01: break;
           case LM_TTOP_BLACK_02: break;

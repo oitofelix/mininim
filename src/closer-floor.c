@@ -215,8 +215,6 @@ draw_closer_floor (ALLEGRO_BITMAP *bitmap, struct pos *p)
 
   if (c->pressed) {
     struct pos pl; prel (p, &pl, +0, +1);
-    if (is_traversable (&pl))
-      draw_object_part (bitmap, "CLOSER_FLOOR", "PRESSED_TRAVERSABLE", p);
-    else draw_object_part (bitmap, "CLOSER_FLOOR", "PRESSED", p);
+    draw_object_part (bitmap, "CLOSER_FLOOR", "PRESSED", p);
   } else draw_object_part (bitmap, "CLOSER_FLOOR", "UNPRESSED", p);
 }

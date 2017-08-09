@@ -38,7 +38,7 @@ draw_filled_rect (ALLEGRO_BITMAP *to, struct rect *r,
   lua_Number w = nc.x + r->w - 1;
   lua_Number h = nc.y + r->h - 1;
 
-  if (nc.room > 0) {
+  if (nc.room >= 0) {
     x = OW (x);
     y = OH (y);
     w = OW (w);

@@ -79,7 +79,7 @@ BEGIN_LUA (L_mininim_video_rectangle)
   y = lua_tonumber (L, 2);
   w = lua_tonumber (L, 3);
   h = lua_tonumber (L, 4);
-  room = lua_tonumber (L, 5);
+  room = (lua_type (L, 5) == LUA_TNONE) ? -1 : lua_tonumber (L, 5);
 
   struct rect r;
   new_rect (&r, room, x, y, w, h);

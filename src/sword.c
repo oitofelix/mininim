@@ -28,6 +28,8 @@ draw_sword (ALLEGRO_BITMAP *bitmap, struct pos *p)
   struct drawn_rectangle *dr = pop_drawn_rectangle ();
   push_clipping_rectangle (dr->bitmap, dr->x, dr->y, dr->w, dr->h);
   draw_tile_fg_front (bitmap, p, NULL);
+  struct pos pr; prel (p, &pr, +0, +1);
+  draw_tile_fg_front (bitmap, &pr, NULL);
   pop_clipping_rectangle ();
 }
 

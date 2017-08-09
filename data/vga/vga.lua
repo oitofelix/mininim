@@ -862,8 +862,7 @@ end
 
 -- CLOSER FLOOR
 local o = {UNPRESSED = new (video.OBJECT),
-           PRESSED = new (video.OBJECT),
-           PRESSED_TRAVERSABLE = new (video.OBJECT)}
+           PRESSED = new (video.OBJECT)}
 video.CLOSER_FLOOR = new (video.OBJECT, o)
 
 function video.CLOSER_FLOOR.UNPRESSED:rect (p)
@@ -873,12 +872,6 @@ function video.CLOSER_FLOOR.UNPRESSED:rect (p)
 end
 
 function video.CLOSER_FLOOR.PRESSED:rect (p)
-   return coord (PLACE_WIDTH * p.place,
-                 PLACE_HEIGHT * p.floor + 50,
-                 p.room)
-end
-
-function video.CLOSER_FLOOR.PRESSED_TRAVERSABLE:rect (p)
    return coord (PLACE_WIDTH * p.place,
                  PLACE_HEIGHT * p.floor + 51,
                  p.room)
@@ -2670,8 +2663,6 @@ function ASSET:load_closer_floor ()
       load_bitmap ("%s/closer-floor/unpressed.png", self.em)
    o.PRESSED.bitmap =
       load_bitmap ("%s/closer-floor/pressed.png", self.em)
-   o.PRESSED_TRAVERSABLE.bitmap =
-      load_bitmap ("%s/closer-floor/pressed-traversable.png", self.em)
    self.CLOSER_FLOOR = o
 end
 

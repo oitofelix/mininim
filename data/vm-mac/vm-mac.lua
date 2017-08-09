@@ -448,13 +448,13 @@ end
 video.BRICKS_PALACE[1].ignore = true
 video.BRICKS_PALACE[1].rect = function (self, p)
    return coord (PLACE_WIDTH * (p.place + 1),
-                 PLACE_HEIGHT * p.floor + 29,
+                 PLACE_HEIGHT * p.floor + 22,
                  p.room)
 end
 
 video.BRICKS_PALACE[2].rect = function (self, p)
    return coord (PLACE_WIDTH * (p.place + 1),
-                 PLACE_HEIGHT * p.floor + 26,
+                 PLACE_HEIGHT * p.floor + 18,
                  p.room)
 end
 
@@ -466,8 +466,8 @@ video.BRICKS_PALACE[5].rect = video.BRICKS_PALACE[1].rect
 video.TORCH_DUNGEON = new (video.OBJECT)
 
 function video.TORCH_DUNGEON:rect (p)
-   return coord (PLACE_WIDTH * (p.place + 1) + 10.5,
-                 PLACE_HEIGHT * p.floor + 22,
+   return coord (PLACE_WIDTH * (p.place + 1) + 11.5,
+                 PLACE_HEIGHT * p.floor + 20.5,
                  p.room)
 end
 
@@ -476,7 +476,7 @@ video.TORCH_PALACE = new (video.OBJECT)
 
 function video.TORCH_PALACE:rect (p)
    return coord (PLACE_WIDTH * (p.place + 1),
-                 PLACE_HEIGHT * p.floor + 23,
+                 PLACE_HEIGHT * p.floor + 20.5,
                  p.room)
 end
 
@@ -484,8 +484,8 @@ end
 video.FIRE = new (video.OBJECT)
 
 function video.FIRE:rect (p)
-   return coord (PLACE_WIDTH * (p.place + 1) + 8,
-                 PLACE_HEIGHT * p.floor + 5,
+   return coord (PLACE_WIDTH * (p.place + 1) + 9,
+                 PLACE_HEIGHT * p.floor + 3.5,
                  p.room)
 end
 
@@ -542,18 +542,33 @@ function video.SKELETON_FLOOR:rect (p)
                  p.room)
 end
 
--- BROKEN FLOOR
-video.BROKEN_FLOOR = new (video.OBJECT, {MAIN = {}, FRONT = {}})
+-- BROKEN FLOOR (DUNGEON)
+video.BROKEN_FLOOR_DUNGEON = new (video.OBJECT, {MAIN = {}, FRONT = {}})
 
-function video.BROKEN_FLOOR.MAIN:rect (p)
+function video.BROKEN_FLOOR_DUNGEON.MAIN:rect (p)
    return coord (PLACE_WIDTH * p.place,
                  PLACE_HEIGHT * p.floor + 48.5,
                  p.room)
 end
 
-function video.BROKEN_FLOOR.FRONT:rect (p)
+function video.BROKEN_FLOOR_DUNGEON.FRONT:rect (p)
    return coord (PLACE_WIDTH * p.place + 0.5,
                  PLACE_HEIGHT * p.floor + 53.5,
+                 p.room)
+end
+
+-- BROKEN FLOOR (PALACE)
+video.BROKEN_FLOOR_PALACE = new (video.OBJECT, {MAIN = {}, FRONT = {}})
+
+function video.BROKEN_FLOOR_PALACE.MAIN:rect (p)
+   return coord (PLACE_WIDTH * p.place,
+                 PLACE_HEIGHT * p.floor + 49,
+                 p.room)
+end
+
+function video.BROKEN_FLOOR_PALACE.FRONT:rect (p)
+   return coord (PLACE_WIDTH * p.place,
+                 PLACE_HEIGHT * p.floor + 54,
                  p.room)
 end
 
@@ -585,8 +600,7 @@ end
 
 -- CLOSER FLOOR
 local o = {UNPRESSED = new (video.OBJECT),
-           PRESSED = new (video.OBJECT),
-           PRESSED_TRAVERSABLE = new (video.OBJECT)}
+           PRESSED = new (video.OBJECT)}
 video.CLOSER_FLOOR = new (video.OBJECT, o)
 
 function video.CLOSER_FLOOR.UNPRESSED:rect (p)
@@ -596,12 +610,6 @@ function video.CLOSER_FLOOR.UNPRESSED:rect (p)
 end
 
 function video.CLOSER_FLOOR.PRESSED:rect (p)
-   return coord (PLACE_WIDTH * p.place,
-                 PLACE_HEIGHT * p.floor + 51,
-                 p.room)
-end
-
-function video.CLOSER_FLOOR.PRESSED_TRAVERSABLE:rect (p)
    return coord (PLACE_WIDTH * p.place,
                  PLACE_HEIGHT * p.floor + 51,
                  p.room)
@@ -683,96 +691,74 @@ end
 
 -- SPIKES FLOOR (PALACE)
 local o = new ()
-o.FLOOR = new (video.FLOOR)
-for i = 1, 5 do o[i] = {LEFT = {}, RIGHT = {}, FRONT = {}} end
+for i = 1, 6 do
+   o[i] = {MAIN = {}}
+   if i > 1 then o[i].FRONT = {} end
+end
 video.SPIKES_FLOOR_PALACE = new (video.OBJECT, o)
 
-video.SPIKES_FLOOR_PALACE[1].LEFT.rect = function (self, p)
+video.SPIKES_FLOOR_PALACE[1].MAIN.rect = function (self, p)
    return coord (PLACE_WIDTH * p.place,
-                 PLACE_HEIGHT * p.floor + 49,
+                 PLACE_HEIGHT * p.floor + 50,
                  p.room)
 end
 
-video.SPIKES_FLOOR_PALACE[1].RIGHT.rect = function (self, p)
-   return coord (PLACE_WIDTH * (p.place + 1),
-                 PLACE_HEIGHT * p.floor + 49,
-                 p.room)
-end
-
-video.SPIKES_FLOOR_PALACE[1].FRONT.rect = function (self, p)
+video.SPIKES_FLOOR_PALACE[2].MAIN.rect = function (self, p)
    return coord (PLACE_WIDTH * p.place,
-                 PLACE_HEIGHT * p.floor + 55,
-                 p.room)
-end
-
-video.SPIKES_FLOOR_PALACE[2].LEFT.rect = function (self, p)
-   return coord (PLACE_WIDTH * p.place,
-                 PLACE_HEIGHT * p.floor + 42,
-                 p.room)
-end
-
-video.SPIKES_FLOOR_PALACE[2].RIGHT.rect = function (self, p)
-   return coord (PLACE_WIDTH * (p.place + 1),
-                 PLACE_HEIGHT * p.floor + 44,
+                 PLACE_HEIGHT * p.floor + 50,
                  p.room)
 end
 
 video.SPIKES_FLOOR_PALACE[2].FRONT.rect = function (self, p)
-   return coord (PLACE_WIDTH * p.place,
-                 PLACE_HEIGHT * p.floor + 48,
+   return coord (PLACE_WIDTH * p.place + 9.5,
+                 PLACE_HEIGHT * p.floor + 55,
                  p.room)
 end
 
-video.SPIKES_FLOOR_PALACE[3].LEFT.rect = function (self, p)
+video.SPIKES_FLOOR_PALACE[3].MAIN.rect = function (self, p)
+   return coord (PLACE_WIDTH * p.place,
+                 PLACE_HEIGHT * p.floor + 40,
+                 p.room)
+end
+
+video.SPIKES_FLOOR_PALACE[3].FRONT.rect = function (self, p)
+   return coord (PLACE_WIDTH * p.place + 8.5,
+                 PLACE_HEIGHT * p.floor + 47,
+                 p.room)
+end
+
+video.SPIKES_FLOOR_PALACE[4].MAIN.rect = function (self, p)
+   return coord (PLACE_WIDTH * p.place,
+                 PLACE_HEIGHT * p.floor + 33,
+                 p.room)
+end
+
+video.SPIKES_FLOOR_PALACE[4].FRONT.rect = function (self, p)
+   return coord (PLACE_WIDTH * p.place + 7.5,
+                 PLACE_HEIGHT * p.floor + 36,
+                 p.room)
+end
+
+video.SPIKES_FLOOR_PALACE[5].MAIN.rect = function (self, p)
    return coord (PLACE_WIDTH * p.place,
                  PLACE_HEIGHT * p.floor + 34,
                  p.room)
 end
 
-video.SPIKES_FLOOR_PALACE[3].RIGHT.rect = function (self, p)
-   return coord (PLACE_WIDTH * (p.place + 1),
-                 PLACE_HEIGHT * p.floor + 41,
-                 p.room)
-end
-
-video.SPIKES_FLOOR_PALACE[3].FRONT.rect = function (self, p)
-   return coord (PLACE_WIDTH * p.place,
-                 PLACE_HEIGHT * p.floor + 37,
-                 p.room)
-end
-
-video.SPIKES_FLOOR_PALACE[4].LEFT.rect = function (self, p)
-   return coord (PLACE_WIDTH * p.place,
-                 PLACE_HEIGHT * p.floor + 35,
-                 p.room)
-end
-
-video.SPIKES_FLOOR_PALACE[4].RIGHT.rect = function (self, p)
-   return coord (PLACE_WIDTH * (p.place + 1),
-                 PLACE_HEIGHT * p.floor + 36,
-                 p.room)
-end
-
-video.SPIKES_FLOOR_PALACE[4].FRONT.rect = function (self, p)
-   return coord (PLACE_WIDTH * p.place,
-                 PLACE_HEIGHT * p.floor + 38,
-                 p.room)
-end
-
-video.SPIKES_FLOOR_PALACE[5].LEFT.rect = function (self, p)
-   return coord (PLACE_WIDTH * p.place,
-                 PLACE_HEIGHT * p.floor + 35,
-                 p.room)
-end
-
-video.SPIKES_FLOOR_PALACE[5].RIGHT.rect = function (self, p)
-   return coord (PLACE_WIDTH * (p.place + 1),
-                 PLACE_HEIGHT * p.floor + 37,
-                 p.room)
-end
-
 video.SPIKES_FLOOR_PALACE[5].FRONT.rect = function (self, p)
+   return coord (PLACE_WIDTH * p.place + 7.5,
+                 PLACE_HEIGHT * p.floor + 37,
+                 p.room)
+end
+
+video.SPIKES_FLOOR_PALACE[6].MAIN.rect = function (self, p)
    return coord (PLACE_WIDTH * p.place,
+                 PLACE_HEIGHT * p.floor + 34,
+                 p.room)
+end
+
+video.SPIKES_FLOOR_PALACE[6].FRONT.rect = function (self, p)
+   return coord (PLACE_WIDTH * p.place + 7.5,
                  PLACE_HEIGHT * p.floor + 39,
                  p.room)
 end
@@ -802,7 +788,7 @@ function video.PILLAR_PALACE.MAIN:rect (p)
 end
 
 function video.PILLAR_PALACE.FRONT:rect (p)
-   return coord (PLACE_WIDTH * p.place + 8,
+   return coord (PLACE_WIDTH * p.place + 12.5,
                  PLACE_HEIGHT * p.floor + 3,
                  p.room)
 end
@@ -827,13 +813,13 @@ video.BIG_PILLAR_TOP_DUNGEON = new (video.OBJECT, {MAIN = {}, FRONT = {}})
 
 function video.BIG_PILLAR_TOP_DUNGEON.MAIN:rect (p)
    return coord (PLACE_WIDTH * p.place + 8.5,
-                 PLACE_HEIGHT * p.floor - 8.5,
+                 PLACE_HEIGHT * p.floor - 4.5,
                  p.room)
 end
 
 function video.BIG_PILLAR_TOP_DUNGEON.FRONT:rect (p)
    return coord (PLACE_WIDTH * p.place + 8.5,
-                 PLACE_HEIGHT * p.floor - 1,
+                 PLACE_HEIGHT * p.floor + 3,
                  p.room)
 end
 
@@ -841,13 +827,13 @@ end
 video.BIG_PILLAR_TOP_PALACE = new (video.OBJECT, {MAIN = {}, FRONT = {}})
 
 function video.BIG_PILLAR_TOP_PALACE.MAIN:rect (p)
-   return coord (PLACE_WIDTH * p.place + 10,
-                 PLACE_HEIGHT * p.floor - 6,
+   return coord (PLACE_WIDTH * p.place + 8,
+                 PLACE_HEIGHT * p.floor - 4.5,
                  p.room)
 end
 
 function video.BIG_PILLAR_TOP_PALACE.FRONT:rect (p)
-   return coord (PLACE_WIDTH * p.place + 10,
+   return coord (PLACE_WIDTH * p.place + 8,
                  PLACE_HEIGHT * p.floor + 3,
                  p.room)
 end
@@ -932,12 +918,6 @@ video.LEVEL_DOOR = new (
 
 local LEVEL_DOOR_STEPS = 44
 
-function video.LEVEL_DOOR.SLIDE:rect (p)
-   return coord (PLACE_WIDTH * p.place + 17,
-                 PLACE_HEIGHT * p.floor - 3.5,
-                 p.room)
-end
-
 function video.LEVEL_DOOR.SLIDE:create ()
    local parent = self._parent
    for i = 1, LEVEL_DOOR_STEPS do
@@ -985,24 +965,37 @@ function video.LEVEL_DOOR_DUNGEON.FRONT:rect (p)
                  p.room)
 end
 
+function video.LEVEL_DOOR_DUNGEON.SLIDE:rect (p)
+   return coord (PLACE_WIDTH * p.place + 17,
+                 PLACE_HEIGHT * p.floor - 3.5,
+                 p.room)
+end
+
+
 -- LEVEL DOOR (PALACE)
 video.LEVEL_DOOR_PALACE = new (video.LEVEL_DOOR)
 
 function video.LEVEL_DOOR_PALACE.ENTER:rect (p)
    return coord (PLACE_WIDTH * p.place,
-                 PLACE_HEIGHT * p.floor - 10,
+                 PLACE_HEIGHT * p.floor - 17,
                  p.room)
 end
 
 function video.LEVEL_DOOR_PALACE.EXIT:rect (p)
    return coord (PLACE_WIDTH * p.place,
-                 PLACE_HEIGHT * p.floor - 10,
+                 PLACE_HEIGHT * p.floor - 17,
                  p.room)
 end
 
 function video.LEVEL_DOOR_PALACE.FRONT:rect (p)
    return coord (PLACE_WIDTH * (p.place + 1),
-                 PLACE_HEIGHT * p.floor - 10,
+                 PLACE_HEIGHT * p.floor - 17,
+                 p.room)
+end
+
+function video.LEVEL_DOOR_PALACE.SLIDE:rect (p)
+   return coord (PLACE_WIDTH * p.place + 13,
+                 PLACE_HEIGHT * p.floor - 5,
                  p.room)
 end
 
@@ -1172,14 +1165,14 @@ end
 video.WALL_PALACE = new (video.WALL, {mark = {}})
 
 video.WALL_PALACE.color =
-   {C (216, 168, 88),
-    C (224, 164, 92),
-    C (224, 168, 96),
-    C (216, 160, 84),
-    C (224, 164, 92),
-    C (216, 164, 88),
-    C (224, 168, 88),
-    C (216, 168, 96)}
+   {C (222, 148, 79),
+    C (235, 151, 71),
+    C (220, 138, 66),
+    C (225, 145, 74),
+    C (232, 158, 76),
+    C (222, 151, 66), -- made up color
+    C (230, 138, 58),
+    C (204, 125, 56)}
 
 video.WALL_PALACE.color_cache = {}
 
@@ -1240,8 +1233,8 @@ function video.WALL_PALACE:brick_rect (p, row, col)
 
    return rect (x + t[row + 1].x,
                 y + t[row + 1].y,
-                t[row + 1].w,
-                t[row + 1].h,
+                t[row + 1].w + .5,
+                t[row + 1].h + .5,
                 p.room)
 end
 
@@ -1249,25 +1242,25 @@ function video.WALL_PALACE:mark_frame (p, i)
    local r = prandom_seq_pos (p, i, 1, 2) + 1
    local t = {
       {self.mark[r],
-       function (p) return coord (PLACE_WIDTH * (p.place + 1) - 8,
-                                  PLACE_HEIGHT * p.floor + 3,
-                                  p.room) end},
+       function (self, p) return coord (PLACE_WIDTH * (p.place + 1) - .5,
+                                        PLACE_HEIGHT * p.floor + 3,
+                                        p.room) end},
       {self.mark[r + 3],
-       function (p) return coord (PLACE_WIDTH * p.place,
-                                  PLACE_HEIGHT * p.floor + 17,
-                                  p.room) end},
+       function (self, p) return coord (PLACE_WIDTH * p.place,
+                                        PLACE_HEIGHT * p.floor + 16,
+                                        p.room) end},
       {self.mark[r + 6],
-       function (p) return coord (PLACE_WIDTH * p.place,
-                                  PLACE_HEIGHT * p.floor + 38,
-                                  p.room) end},
+       function (self, p) return coord (PLACE_WIDTH * p.place,
+                                        PLACE_HEIGHT * p.floor + 37,
+                                        p.room) end},
       {self.mark[r + 9],
-       function (p) return coord (PLACE_WIDTH * p.place,
-                                  PLACE_HEIGHT * p.floor + 58,
-                                  p.room) end},
+       function (self, p) return coord (PLACE_WIDTH * p.place,
+                                        PLACE_HEIGHT * p.floor + 56,
+                                        p.room) end},
       {self.mark[r + 12],
-       function (p) return coord (PLACE_WIDTH * p.place,
-                                  PLACE_HEIGHT * p.floor + 63,
-                                  p.room) end}}
+       function (self, p) return coord (PLACE_WIDTH * p.place,
+                                        PLACE_HEIGHT * p.floor + 63,
+                                        p.room) end}}
    return unpack (t[i + 1])
 end
 
@@ -1279,9 +1272,9 @@ function video.WALL_PALACE:draw_brick (p, row, col)
    wc = apply_palettes_to_color (wc, p)
    self:brick_rect (p, row, col).draw (wc)
    local b0, c0 = self:mark_frame (p, row)
-   draw (self, b0, c0, p)
+   if b0 then draw (self, b0, c0, p) end
    local b1, c1 = self:mark_frame (p, row + 1)
-   draw (self, b1, c1, p)
+   if b1 then draw (self, b1, c1, p) end
 end
 
 function video.WALL_PALACE.FRONT:DRAW (p, width)
@@ -2429,7 +2422,7 @@ function ASSET:load_skeleton_floor ()
 end
 
 function ASSET:load_broken_floor ()
-   local o = new (video.BROKEN_FLOOR)
+   local o = new (video["BROKEN_FLOOR_" .. string.upper (self.em)])
    o.MAIN.bitmap = load_bitmap ("%s/broken-floor/main.png", self.em)
    o.FRONT.bitmap = load_bitmap ("%s/broken-floor/front.png", self.em)
    self.BROKEN_FLOOR = o
@@ -2455,15 +2448,10 @@ function ASSET:load_closer_floor ()
       load_bitmap ("%s/closer-floor/unpressed.png", self.em)
    o.PRESSED.bitmap =
       load_bitmap ("%s/closer-floor/pressed.png", self.em)
-   o.PRESSED_TRAVERSABLE.bitmap =
-      load_bitmap ("%s/closer-floor/pressed-traversable.png", self.em)
    self.CLOSER_FLOOR = o
 end
 
 function ASSET:load_spikes_floor ()
-   -- temporary
-   if self.em == "palace" then return end
-
    local o = new (video["SPIKES_FLOOR_" .. string.upper (self.em)])
    for i = 1, 6 do
       o[i].MAIN.bitmap =
@@ -2497,9 +2485,6 @@ function ASSET:load_big_pillar_top ()
 end
 
 function ASSET:load_door ()
-   -- temporary
-   if self.em == "palace" then return end
-
    local o = new (video.DOOR)
    o.MAIN.bitmap = load_bitmap ("%s/door/main.png", self.em)
    o.FRONT.bitmap = load_bitmap ("%s/door/front.png", self.em)
@@ -2510,9 +2495,6 @@ function ASSET:load_door ()
 end
 
 function ASSET:load_level_door ()
-   -- temporary
-   if self.em == "palace" then return end
-
    local o = new (video["LEVEL_DOOR_" .. string.upper (self.em)])
    o.ENTER.bitmap = load_bitmap ("%s/level-door/enter.png", self.em)
    o.EXIT.bitmap = load_bitmap ("%s/level-door/exit.png", self.em)
@@ -2523,9 +2505,6 @@ function ASSET:load_level_door ()
 end
 
 function ASSET:load_chomper ()
-   -- temporary
-   if self.em == "palace" then return end
-
    local chomper = new (video.CHOMPER)
    for i = 1, 5 do
       chomper[i].MAIN.bitmap =
@@ -2627,7 +2606,7 @@ end
 -- Load assets
 function load ()
    asset.DUNGEON = new (ASSET, {}, "DUNGEON"):load ()
-   -- asset.PALACE = new (ASSET, {}, "PALACE"):load ()
+   asset.PALACE = new (ASSET, {}, "PALACE"):load ()
    local font_bmp = load_bitmap ("font.png")
    asset.font = font (font_bmp, 32, 95, 97, 122)
    return P
