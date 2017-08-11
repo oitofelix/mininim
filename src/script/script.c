@@ -22,6 +22,7 @@
 
 lua_State *main_L;
 
+static int table_getn_ref = LUA_NOREF;
 static int weak_registry_ref = LUA_NOREF;
 
 int
@@ -69,6 +70,13 @@ init_script (void)
   luaL_getmetatable (L, L_MININIM);
   lua_setmetatable (L, -2);
   lua_setglobal (L, "MININIM");
+
+  /* table.getn reference */
+  lua_pushstring(L, "table");
+  lua_gettable(L, LUA_GLOBALSINDEX);
+  lua_pushstring(L, "getn");
+  lua_gettable(L, -2);
+  L_set_registry_by_ref (L, &table_getn_ref);
 
   /* weak registry */
   lua_newtable (L);
@@ -237,10 +245,35 @@ L_push_interface (lua_State *L, const char *tname)
   lua_setmetatable (L, -2);
 }
 
+int
+lua_getn (lua_State *L, int index)
+{
+  index = lua_abs_index (L, index);
+  if (lua_type (L, index) != LUA_TTABLE)
+    return 0;
+  L_get_registry_by_ref (L, table_getn_ref);
+  lua_pushvalue (L, index);
+  lua_call (L, 1, 1);
+  int nmemb = lua_tonumber (L, -1);
+  lua_pop (L, 1);
+  return nmemb;
+}
+
+lua_Number
+L_rawgeti_tonumber (lua_State *L, int index, int n)
+{
+  index = lua_abs_index (L, index);
+  lua_rawgeti (L, index, n);
+  lua_Number r = lua_tonumber (L, -1);
+  lua_pop (L, 1);
+  return r;
+}
+
 void
 lock_thread ()
 {
   al_lock_mutex (repl_mutex);
+  al_set_target_backbuffer (display);
 }
 
 void

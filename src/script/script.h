@@ -36,6 +36,9 @@ void finalize_script (void);
 void lock_thread (void);
 void unlock_thread (void);
 
+int lua_getn (lua_State *L, int index);
+lua_Number L_rawgeti_tonumber (lua_State *L, int index, int n);
+
 void *L_check_type (lua_State *L, int index, const char *tname);
 bool L_call (lua_State *L, int nargs, int nresults);
 bool L_run_hook (lua_State *L);

@@ -263,8 +263,21 @@ BEGIN_LUA (draw)
   else if (r && r->h > 0) sh = r->h;
   else sh = get_bitmap_height (*b);
 
+  ALLEGRO_SHADER **s =
+    luaL_checkudata (L, lua_gettop (L), L_MININIM_VIDEO_SHADER);
+
+  if (s) {
+    al_set_target_bitmap (target_bitmap);
+    al_use_shader (*s);
+  }
+
   if (r) draw_bitmap_regionc (*b, target_bitmap, sx, sy, sw, sh, &r->c, 0);
   else draw_bitmap_region (*b, target_bitmap, sx, sy, sw, sh, dx, dy, 0);
+
+  if (s) {
+    al_set_target_bitmap (target_bitmap);
+    al_use_shader (NULL);
+  }
 
   return 0;
 }
@@ -282,7 +295,7 @@ BEGIN_LUA (set_pixel)
 
   if (! b) return 0;
 
-  set_target_bitmap (*b);
+  al_set_target_bitmap (*b);
   /* al_lock_bitmap (*b, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READWRITE); */
   al_put_pixel (x, y, *c);
 

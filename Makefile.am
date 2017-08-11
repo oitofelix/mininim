@@ -114,6 +114,8 @@ mininim_SOURCES = src/mininim.c src/mininim.h src/compatibility.h			\
 	  src/script/L_mininim.video.color.h																\
 	  src/script/L_mininim.video.rectangle.c														\
 	  src/script/L_mininim.video.rectangle.h														\
+	  src/script/L_mininim.video.shader.c																\
+	  src/script/L_mininim.video.shader.h																\
 	  src/script/L_mininim.setting.c src/script/L_mininim.setting.h			\
 	  src/script/L_mininim.mouse.c src/script/L_mininim.mouse.h					\
 	  src/script/L_mininim.multiroom.c src/script/L_mininim.multiroom.h	\

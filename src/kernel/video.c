@@ -48,7 +48,7 @@ static struct palette_cache {
 } *palette_cache;
 static size_t palette_cache_nmemb;
 static size_t palette_cache_size;
-ssize_t palette_cache_size_limit = 4 * 1024 * 1024;
+ssize_t palette_cache_size_limit = 12 * 1024 * 1024;
 
 struct drawn_rectangle drawn_rectangle_stack[DRAWN_RECTANGLE_STACK_NMEMB_MAX];
 size_t drawn_rectangle_stack_nmemb;
@@ -69,7 +69,8 @@ init_video (void)
                                : ALLEGRO_FULLSCREEN)
                             | ALLEGRO_RESIZABLE
                             | ALLEGRO_GENERATE_EXPOSE_EVENTS
-                            | ALLEGRO_GTK_TOPLEVEL);
+                            | ALLEGRO_GTK_TOPLEVEL
+                            | ALLEGRO_PROGRAMMABLE_PIPELINE);
 
   display_width = display_width ? display_width : DISPLAY_WIDTH;
   display_height = display_height ? display_height : DISPLAY_HEIGHT;
@@ -93,7 +94,7 @@ init_video (void)
   al_register_event_source (event_queue,
                             al_get_display_event_source (display));
 
-  set_target_backbuffer (display);
+  al_set_target_backbuffer (display);
 
   al_set_window_title (display, WINDOW_TITLE);
   logo_icon = load_bitmap (LOGO_ICON);
@@ -197,7 +198,7 @@ create_memory_bitmap (int w, int h)
 ALLEGRO_BITMAP *
 create_bitmap (int w, int h)
 {
-  set_target_backbuffer (display);
+  al_set_target_backbuffer (display);
   int flags = al_get_new_bitmap_flags ();
   al_set_new_bitmap_flags (video_bitmap_flags ());
   ALLEGRO_BITMAP *bitmap = al_create_bitmap (w, h);
@@ -264,7 +265,7 @@ load_bitmap (const char *filename)
   int flags = al_get_new_bitmap_flags ();
   al_set_new_bitmap_flags (video_bitmap_flags ());
 
-  set_target_backbuffer (display);
+  al_set_target_backbuffer (display);
 
   ALLEGRO_BITMAP *bitmap = (ALLEGRO_BITMAP *)
     load_resource (filename, (load_resource_f) al_load_bitmap, true);
@@ -287,7 +288,7 @@ load_font (const char *filename)
   int flags = al_get_new_bitmap_flags ();
   al_set_new_bitmap_flags (video_bitmap_flags ());
 
-  set_target_backbuffer (display);
+  al_set_target_backbuffer (display);
 
   ALLEGRO_FONT *font = (ALLEGRO_FONT *)
     load_resource (filename, (load_resource_f) al_load_bitmap_font, true);
@@ -300,6 +301,41 @@ load_font (const char *filename)
   if (load_callback) load_callback ();
 
   return font;
+}
+
+static ALLEGRO_SHADER *target_shader;
+static ALLEGRO_SHADER_TYPE target_shader_type;
+
+static ALLEGRO_SHADER *
+attach_shader_source_file_sub (const char *filename)
+{
+  if (! al_filename_exists (filename)) return NULL;
+  else return al_attach_shader_source_file
+         (target_shader, target_shader_type, filename)
+         ? target_shader : NULL;
+}
+
+bool
+attach_shader_source_file (ALLEGRO_SHADER *shader, const char *filename)
+{
+  target_shader = shader;
+  target_shader_type = str_end_matches (filename, ".frag")
+    ? ALLEGRO_PIXEL_SHADER : ALLEGRO_VERTEX_SHADER;
+
+  ALLEGRO_SHADER *s = (ALLEGRO_SHADER *)
+    load_resource (filename, (load_resource_f)
+                   attach_shader_source_file_sub, true);
+
+  return s ? true : false;
+}
+
+const char *
+get_shader_platform (ALLEGRO_SHADER *s)
+{
+  if (s) {
+    return (al_get_shader_platform (s) == ALLEGRO_SHADER_GLSL)
+      ? "GLSL" : "HLSL";
+  } else return "NONE";
 }
 
 void
@@ -326,7 +362,7 @@ clone_bitmap (ALLEGRO_BITMAP *bitmap)
   int flags = al_get_new_bitmap_flags ();
   al_set_new_bitmap_flags (video_bitmap_flags ());
 
-  set_target_backbuffer (display);
+  al_set_target_backbuffer (display);
 
   ALLEGRO_BITMAP *new_bitmap = al_clone_bitmap (bitmap);
 
@@ -338,21 +374,9 @@ clone_bitmap (ALLEGRO_BITMAP *bitmap)
 }
 
 void
-set_target_bitmap (ALLEGRO_BITMAP *bitmap)
-{
-  al_set_target_bitmap (bitmap);
-}
-
-void
-set_target_backbuffer (ALLEGRO_DISPLAY *display)
-{
-  set_target_bitmap (al_get_backbuffer (display));
-}
-
-void
 clear_bitmap (ALLEGRO_BITMAP *bitmap, ALLEGRO_COLOR color)
 {
-  set_target_bitmap (bitmap);
+  al_set_target_bitmap (bitmap);
   al_clear_to_color (color);
 }
 
@@ -542,7 +566,7 @@ apply_palette_k (ALLEGRO_BITMAP *bitmap, palette p, const void *k)
   int w = get_bitmap_width (bitmap);
   int h = get_bitmap_height (bitmap);
   al_lock_bitmap (rbitmap, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READWRITE);
-  set_target_bitmap (rbitmap);
+  al_set_target_bitmap (rbitmap);
   for (y = 0; y < h; y++)
     for (x = 0; x < w; x++)
       al_put_pixel (x, y, p (al_get_pixel (rbitmap, x, y)));
@@ -658,7 +682,7 @@ draw_bitmap_region (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
     return;
 
   merge_drawn_rectangle (to, dx, dy, sw, sh);
-  set_target_bitmap (to);
+  al_set_target_bitmap (to);
 
   int cx, cy, cw, ch;
   al_get_clipping_rectangle (&cx, &cy, &cw, &ch);
@@ -675,7 +699,7 @@ draw_rectangle (ALLEGRO_BITMAP *to, float x1, float y1,
 {
   if (rendering == NONE_RENDERING || rendering == AUDIO_RENDERING)
     return;
-  set_target_bitmap (to);
+  al_set_target_bitmap (to);
   al_draw_rectangle (x1 + 1, y1, x2 + 1, y2, color, thickness);
 }
 
@@ -685,7 +709,7 @@ draw_filled_rectangle (ALLEGRO_BITMAP *to, float x1, float y1,
 {
   if (rendering == NONE_RENDERING || rendering == AUDIO_RENDERING)
     return;
-  set_target_bitmap (to);
+  al_set_target_bitmap (to);
   al_draw_filled_rectangle (x1, y1, x2 + 1, y2 + 1, color);
 }
 
@@ -694,7 +718,7 @@ draw_text (ALLEGRO_BITMAP *bitmap, ALLEGRO_FONT *font,
            ALLEGRO_COLOR c, float x, float y, int flags,
            char const *text)
 {
-  set_target_bitmap (bitmap);
+  al_set_target_bitmap (bitmap);
   al_draw_text (font, c, x, y, flags | ALLEGRO_ALIGN_INTEGER, text);
 }
 
@@ -824,7 +848,7 @@ flip_display (ALLEGRO_BITMAP *bitmap)
   if (bitmap) {
     int bw = get_bitmap_width (bitmap);
     int bh = get_bitmap_height (bitmap);
-    set_target_backbuffer (display);
+    al_set_target_backbuffer (display);
     al_draw_scaled_bitmap
       (bitmap, 0, 0, bw, bh, 0, 0, w, h, flags);
   } else {
@@ -871,7 +895,7 @@ flip_display (ALLEGRO_BITMAP *bitmap)
             (screen, 0, 0, sw, sh, dx, dy, dw, dh, 0);
       }
 
-    set_target_backbuffer (display);
+    al_set_target_backbuffer (display);
     al_draw_bitmap (iscreen, 0, 0, flags);
 
     if ((mr.w > 1 || mr.h > 1) && mr.room_select > 0)
@@ -959,7 +983,7 @@ draw_pattern (ALLEGRO_BITMAP *bitmap, int ox, int oy, int w, int h,
               ALLEGRO_COLOR color_0, ALLEGRO_COLOR color_1)
 {
   int x, y;
-  set_target_bitmap (bitmap);
+  al_set_target_bitmap (bitmap);
   al_lock_bitmap (bitmap, ALLEGRO_PIXEL_FORMAT_ANY,
                   ALLEGRO_LOCK_READWRITE);
   for (y = oy; y < oy + h; y++)
@@ -1250,7 +1274,7 @@ push_clipping_rectangle (ALLEGRO_BITMAP *bitmap, int x, int y, int w, int h)
 {
   assert (clipping_rectangle_stack_nmemb < CLIPPING_RECTANGLE_STACK_NMEMB_MAX);
 
-  set_target_bitmap (bitmap);
+  al_set_target_bitmap (bitmap);
 
   /* save current */
   int cx, cy, cw, ch;
@@ -1291,7 +1315,7 @@ merge_clipping_rectangle (ALLEGRO_BITMAP *bitmap, int x, int y, int w, int h)
        i >= 0 && clipping_rectangle_stack[i].bitmap != bitmap; i--);
   if (i < 0) return false;
 
-  set_target_bitmap (clipping_rectangle_stack[i].bitmap);
+  al_set_target_bitmap (clipping_rectangle_stack[i].bitmap);
 
   /* get current */
   int cx, cy, cw, ch;
@@ -1330,7 +1354,7 @@ pop_clipping_rectangle (void)
   int y = clipping_rectangle_stack[i].y;
   int w = clipping_rectangle_stack[i].w;
   int h = clipping_rectangle_stack[i].h;
-  set_target_bitmap (bitmap);
+  al_set_target_bitmap (bitmap);
   al_set_clipping_rectangle (x, y, w, h);
   clipping_rectangle_stack_nmemb--;
 }

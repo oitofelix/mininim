@@ -35,6 +35,7 @@ local io = io
 local math = math
 local os = os
 local debug = debug
+local _debug = _debug
 local print = print
 local getmetatable = getmetatable
 local setmetatable = setmetatable
@@ -118,6 +119,14 @@ function resource_filename (P, filename, ...)
       .. string.format (filename, unpack (arg))
 end
 
+function load_shader (P, ...)
+   local function append_base_directory (i, filename)
+      arg[i] = base_directory (P.package_file) .. "/" .. arg[i]
+   end
+   table.foreachi (arg, append_base_directory)
+   return MININIM.video.shader (unpack (arg))
+end
+
 function load_bitmap (P, filename, ...)
    return MININIM.video.bitmap (
       resource_filename (P, filename, unpack (arg)))
@@ -181,6 +190,26 @@ function palette_table_color (t, c)
       if k == c then return v end
    end
    return c
+end
+
+function palette_table_to_shader (t)
+   if t == nil then return end
+   local palette_table_in, palette_table_out = {}, {}
+   for k, v in pairs (t) do
+      local i = {k.r / 255, k.g / 255, k.b / 255, k.a / 255}
+      local o = {v.r / 255, v.g / 255, v.b / 255, v.a / 255}
+      table.insert (palette_table_in, i)
+      table.insert (palette_table_out, o)
+   end
+   if table.getn (palette_table_in) < 64
+   then table.insert (palette_table_in, {-1, -1, -1, -1})
+   end
+   local p = string.lower (MININIM.video.shader_platform)
+   local shader = load_shader (P, "default."..p..".vert",
+                               "palette-table."..p..".frag")
+   shader.palette_table_in = palette_table_in
+   shader.palette_table_out = palette_table_out
+   return shader
 end
 
 function opposite_direction (direction)

@@ -607,11 +607,20 @@ BEGIN_LUA (draw)
   struct frame_offset xf = a->xf;
 
   ALLEGRO_BITMAP **bitmap = luaL_checkudata (L, 1, L_MININIM_VIDEO_BITMAP);
+  if (bitmap) f.b = *bitmap;
+
   ALLEGRO_BITMAP **xbitmap = luaL_checkudata (L, 2, L_MININIM_VIDEO_BITMAP);
+  if (xbitmap) xf.b = *xbitmap;
+
   ALLEGRO_BITMAP **splash = luaL_checkudata (L, 3, L_MININIM_VIDEO_BITMAP);
 
-  if (bitmap) f.b = *bitmap;
-  if (xbitmap) xf.b = *xbitmap;
+  ALLEGRO_SHADER **s =
+    luaL_checkudata (L, lua_gettop (L), L_MININIM_VIDEO_SHADER);
+
+  if (s) {
+    al_set_target_bitmap (L_target_bitmap);
+    al_use_shader (*s);
+  }
 
   draw_xframe (L_target_bitmap, &f, &xf);
   draw_frame (L_target_bitmap, &f);
@@ -621,6 +630,11 @@ BEGIN_LUA (draw)
     draw_bitmapc (*splash, L_target_bitmap,
                   splash_coord (*splash, &f, &c), f.flip);
     a->splash_bitmap = *splash;
+  }
+
+  if (s) {
+    al_set_target_bitmap (L_target_bitmap);
+    al_use_shader (NULL);
   }
 
   return 0;

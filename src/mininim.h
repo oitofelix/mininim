@@ -200,6 +200,7 @@
 #include "L_mininim.video.font.h"
 #include "L_mininim.video.color.h"
 #include "L_mininim.video.rectangle.h"
+#include "L_mininim.video.shader.h"
 #include "L_mininim.setting.h"
 #include "L_mininim.mouse.h"
 #include "L_mininim.multiroom.h"

@@ -38,14 +38,14 @@ ALLEGRO_BITMAP *clone_scaled_memory_bitmap (ALLEGRO_BITMAP *bitmap, int w,
                                             int h, int flags);
 ALLEGRO_BITMAP *load_bitmap (const char *filename);
 ALLEGRO_FONT *load_font (const char *filename);
+bool attach_shader_source_file (ALLEGRO_SHADER *shader, const char *filename);
+const char *get_shader_platform (ALLEGRO_SHADER *shader);
 void validate_bitmap_for_mingw (ALLEGRO_BITMAP *bitmap);
 void save_bitmap (char *filename, ALLEGRO_BITMAP *bitmap);
 bool bitmap_heq (ALLEGRO_BITMAP *b0, ALLEGRO_BITMAP *b1);
 bool color_eq (ALLEGRO_COLOR c0, ALLEGRO_COLOR c1);
 int get_bitmap_width (ALLEGRO_BITMAP *bitmap);
 int get_bitmap_height (ALLEGRO_BITMAP *bitmap);
-void set_target_bitmap (ALLEGRO_BITMAP *bitmap);
-void set_target_backbuffer (ALLEGRO_DISPLAY *display);
 void clear_bitmap (ALLEGRO_BITMAP *bitmap, ALLEGRO_COLOR color);
 void draw_bitmap (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
                   float dx, float dy, int flags);

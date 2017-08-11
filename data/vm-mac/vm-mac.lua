@@ -47,6 +47,7 @@ local rect = MININIM.video.rectangle
 local pos = MININIM.level.position
 local bitmap = MININIM.video.bitmap
 local font = MININIM.video.font
+local shader = MININIM.video.shader
 
 local TRANSPARENT = C (0, 0, 0, 0)
 
@@ -56,6 +57,7 @@ local instanceof = common.instanceof
 local meta = common.meta
 local to_color_range = common.to_color_range
 local palette_table_color = common.palette_table_color
+local palette_table_to_shader = common.palette_table_to_shader
 
 -- body
 setfenv (1, P)
@@ -79,6 +81,10 @@ local offset
 local apply_palettes_to_color
 local apply_palettes
 local draw
+
+function load_shader (...)
+   return common.load_shader (P, unpack (arg))
+end
 
 function load_bitmap (filename, ...)
    return common.load_bitmap (P, filename, unpack (arg))
@@ -229,13 +235,108 @@ function selection.PALACE (c)
    return C (to_color_range (c.r + 32, c.g + 32, c.b + 32))
 end
 
--- video
+-- Video
 local video = new ()
 
 -- VALUE
 video.VALUE = {
    WIDTH = REAL_WIDTH,
    HEIGHT = REAL_HEIGHT}
+
+-- Palette tables
+video.PT = {}
+
+video.PT.kid_hp = {
+   [C (0, 0, 160)] = C (228, 0, 0),
+   [C (0, 167, 0)] = C (184, 0, 0)}
+
+video.PT.shadow_hp = {
+   [C (0, 0, 160)] = C (64, 64, 64),
+   [C (0, 167, 0)] = C (32, 32, 32)}
+
+video.PT.skeleton_hp = {
+   [C (0, 0, 160)] = C ("white"),
+   [C (0, 167, 0)] = C ("white")}
+
+video.PT.kid_splash = {
+   [C (0, 0, 160)] = C (228, 0, 0),
+   [C (255, 80, 255)] = C (184, 0, 0)}
+
+-- Styles
+video.PT.style = {}
+
+-- Salmon
+video.PT.style[0] = nil
+
+-- Light blue
+video.PT.style[1] = nil
+
+-- Red
+video.PT.style[2] = {
+   -- Guard's turban and pants
+   [C (171, 207, 89)] = C (208, 60, 0),
+   [C (127, 127, 0)] = C (168, 48, 0),
+   [C (121, 70, 0)] = C (128, 36, 0),
+
+   -- -- Guard's coat
+   [C (92, 255, 120)] = C (220, 168, 255),
+   [C (0, 220, 74)] = C (176, 136, 252),
+   [C (0, 120, 0)] = C (132, 104, 192),
+
+   -- Guard's belt
+   [C (255, 0, 255)] = C (225, 82, 230),
+   [C (128, 42, 122)] = C (184, 40, 188),
+
+   -- -- Guard's sleeves and shoes
+   [C (5, 167, 232)] = C (255, 144, 144),
+   [C (2, 124, 244)] = C (252, 120, 120),
+   [C (0, 81, 255)] = C (200, 96, 96),
+
+   -- -- Skeleton
+   -- [C (250, 250, 250)] = C (),
+   -- [C (255, 197, 120)] = C (),
+   -- [C (174, 102, 0)] = C (),
+   -- [C (110, 48, 0)] = C (),
+
+   -- Shadow's turban
+   [C (110, 184, 255)] = C (208, 60, 0),
+   [C (38, 94, 255)] = C (168, 48, 0),
+   [C (0, 0, 135)] = C (128, 36, 0),
+
+   -- -- Shadow's shirt
+   [C (255, 16, 0)] = C (176, 136, 252),
+   [C (189, 0, 4)] = C (132, 104, 192),
+
+   -- -- Shadow's pants
+   [C (248, 248, 248)] = C (208, 60, 0),
+   [C (189, 194, 202)] = C (168, 48, 0),
+   [C (120, 125, 125)] = C (128, 36, 0),
+
+   -- Shadow's shoes
+   [C (255, 139, 70)] = C (252, 120, 120),
+   [C (220, 74, 0)] = C (200, 96, 96),
+}
+
+-- Orange
+video.PT.style[3] = nil
+
+-- Green
+video.PT.style[4] = nil
+
+-- Dark blue
+video.PT.style[5] = nil
+
+-- Purple
+video.PT.style[6] = nil
+
+-- Yellow
+video.PT.style[7] = nil
+
+-- Build style shaders
+video.SHADER = {style = {}}
+for i = 0, 7 do
+   video.SHADER.style[i] = palette_table_to_shader (video.PT.style[i])
+end
 
 -- OBJECT
 video.OBJECT = new ()
@@ -1869,6 +1970,8 @@ function video.GUARD.MAIN:DRAW (a)
    local bitmap = a.bitmap
    local xbitmap = a.xbitmap
 
+   local style_shader = video.SHADER.style[2]
+
    -- local pt = video.PT.style[a.style]
    -- function palette (c)
    --    return palette_table_color (pt, c)
@@ -1884,7 +1987,7 @@ function video.GUARD.MAIN:DRAW (a)
       -- splash = splash.apply_palette (palette, pt)
    end
 
-   a.draw (bitmap, xbitmap, splash)
+   a.draw (bitmap, xbitmap, splash, style_shader)
 end
 
 -- GUARD HP

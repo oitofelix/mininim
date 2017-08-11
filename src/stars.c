@@ -142,7 +142,7 @@ void
 draw_star (struct stars *stars, int i)
 {
   al_lock_bitmap (stars->b, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READWRITE);
-  set_target_bitmap (stars->b);
+  al_set_target_bitmap (stars->b);
   al_put_pixel (stars->s[i].x - stars->c.x, stars->s[i].y - stars->c.y,
                 get_star_color (stars->s[i].color));
   al_unlock_bitmap (stars->b);

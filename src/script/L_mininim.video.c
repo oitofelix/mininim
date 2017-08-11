@@ -69,6 +69,9 @@ define_L_mininim_video (lua_State *L)
 
   /* mininim.video.rectangle */
   define_L_mininim_video_rectangle (L);
+
+  /* mininim.video.shader */
+  define_L_mininim_video_shader (L);
 }
 
 BEGIN_LUA (__eq)
@@ -88,7 +91,7 @@ BEGIN_LUA (__index)
     if (! strcasecmp (key, "bitmap")) {
       lua_pushcfunction (L, L_mininim_video_bitmap);
       return 1;
-    } if (! strcasecmp (key, "font")) {
+    } else if (! strcasecmp (key, "font")) {
       lua_pushcfunction (L, L_mininim_video_font);
       return 1;
     } else if (! strcasecmp (key, "color")) {
@@ -96,6 +99,24 @@ BEGIN_LUA (__index)
       return 1;
     } else if (! strcasecmp (key, "rectangle")) {
       lua_pushcfunction (L, L_mininim_video_rectangle);
+      return 1;
+    } else if (! strcasecmp (key, "shader")) {
+      lua_pushcfunction (L, L_mininim_video_shader);
+      return 1;
+    } else if (! strcasecmp (key, "shader_platform")) {
+      ALLEGRO_SHADER *s = al_create_shader (ALLEGRO_SHADER_AUTO);
+      lua_pushstring (L, get_shader_platform (s));
+      al_destroy_shader (s);
+      return 1;
+    } else if (! strcasecmp (key, "default_vertex_shader_source")) {
+      const char *s = al_get_default_shader_source
+        (ALLEGRO_SHADER_AUTO, ALLEGRO_VERTEX_SHADER);
+      lua_pushstring (L, s);
+      return 1;
+    } else if (! strcasecmp (key, "default_fragment_shader_source")) {
+      const char *s = al_get_default_shader_source
+        (ALLEGRO_SHADER_AUTO, ALLEGRO_PIXEL_SHADER);
+      lua_pushstring (L, s);
       return 1;
     } else if (! strcasecmp (key, "mode")) {
       lua_pushstring (L, video_mode);

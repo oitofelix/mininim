@@ -61,7 +61,12 @@ repeat_char (char c, size_t n)
   return s;
 }
 
-
+bool
+str_end_matches (const char *s, const char *m)
+{
+  size_t ls = strlen (s), lm = strlen (m);
+  return ls >= lm && ! strcasecmp (s + ls - lm, m);
+}
 
 
 

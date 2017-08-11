@@ -1,5 +1,5 @@
 /*
-  xstring.h -- string module;
+  L_mininim.video.shader.h -- mininim.video.shader script module;
 
   Copyright (C) 2015, 2016, 2017 Bruno Félix Rezende Ribeiro
   <oitofelix@gnu.org>
@@ -18,34 +18,15 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MININIM_XSTRING_H
-#define MININIM_XSTRING_H
+#ifndef MININIM_L_MININIM_VIDEO_SHADER_H
+#define MININIM_L_MININIM_VIDEO_SHADER_H
 
-#define SHORTEN_STRING_ELLIPSIS L"..."
+#define L_MININIM_VIDEO_SHADER L_MININIM_VIDEO ".shader"
 
-void tolower_str (char *str);
-void toupper_str (char *str);
-void repl_str_char (char *str, char a, char b);
-char *trim_string (char *s);
-char *repeat_char (char c, size_t n);
-bool str_end_matches (const char *s, const char *m);
+/* functions */
+void L_pushshader (lua_State *L, ALLEGRO_SHADER *s);
+void define_L_mininim_video_shader (lua_State *L);
 
+DECLARE_LUA (L_mininim_video_shader);
 
-
-
-
-char *hline (char c);
-void fmt_begin (int ncols);
-char *fmt_row (const char *fmt, ...);
-char *fmt_end (void);
-char *fmt_manual (const char *sep, ...);
-
-
-
-
-
-wchar_t *m2w_str (const char *s);
-char *w2m_str (const wchar_t *s);
-char *shorten_str (char *s, size_t max);
-
-#endif	/* MININIM_XSTRING_H */
+#endif	/* MININIM_L_MININIM_VIDEO_SHADER_H */
