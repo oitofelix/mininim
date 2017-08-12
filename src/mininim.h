@@ -43,7 +43,9 @@
 #include <signal.h>
 #include <wchar.h>
 #include <ctype.h>
+#include <termios.h>
 #include <sys/ioctl.h>
+#include <sys/select.h>
 
 #include "error.h"
 #include "argp.h"
@@ -78,6 +80,10 @@
 
 /* MININIM */
 #include "compatibility.h"
+
+#if WINDOWS_PORT
+#include <windows.h>
+#endif
 
 #include "constants.h"
 #include "types.h"

@@ -144,8 +144,7 @@ AM_CFLAGS = ${ALLEGRO_CFLAGS} ${ALLEGRO_IMAGE_CFLAGS}	\
 	${ALLEGRO_COLOR_CFLAGS}
 
 if DEBUG
-  CFLAGS += -O0 -Wall -ggdb3 -Werror -Wno-error=unused-function	\
-  -Wno-error=unused-variable
+  CFLAGS += -O0 -Wall -ggdb3
 else
   CFLAGS += -O3 -g0
 endif
@@ -158,12 +157,14 @@ if PROFILING
  CFLAGS += -O0 -pg --coverage
 endif
 
-LIBS = -lm -ldl -lreadline ${ALLEGRO_LIBS} ${ALLEGRO_IMAGE_LIBS}		\
-  ${ALLEGRO_AUDIO_LIBS} ${ALLEGRO_ACODEC_LIBS} ${ALLEGRO_FONT_LIBS}	\
-  ${ALLEGRO_PRIMITIVES_LIBS} ${ALLEGRO_MAIN_LIBS}										\
-  ${ALLEGRO_DIALOG_LIBS} ${ALLEGRO_COLOR_LIBS} ${mingw_ldadd}				\
-  ${LUA_LIB}
-LDADD = gnulib/libgnu.a
+LIBS = -lm -lreadline ${ALLEGRO_LIBS} ${ALLEGRO_IMAGE_LIBS}				\
+${ALLEGRO_AUDIO_LIBS} ${ALLEGRO_ACODEC_LIBS} ${ALLEGRO_FONT_LIBS}	\
+${ALLEGRO_PRIMITIVES_LIBS} ${ALLEGRO_MAIN_LIBS}										\
+${ALLEGRO_DIALOG_LIBS} ${ALLEGRO_COLOR_LIBS} ${mingw_ldadd}				\
+${LUA_LIB}
+
+LDADD = gnulib/libgnu.a $(LIBSOCKET) $(LIB_SELECT) $(LTLIBINTL)	\
+$(LTLIBTHREAD)
 
 gnulib/libgnu.a:
 	cd gnulib && $(MAKE)

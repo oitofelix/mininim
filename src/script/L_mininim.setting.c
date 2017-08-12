@@ -75,6 +75,9 @@ BEGIN_LUA (__index)
     } else if (! strcasecmp (key, "hue_mode")) {
       lua_pushstring (L, hue_mode);
       return 1;
+    } else if (! strcasecmp (key, "repl_priority")) {
+      lua_pushnumber (L, repl_priority);
+      return 1;
     } else break;
   default: break;
   }
@@ -101,6 +104,9 @@ BEGIN_LUA (__newindex)
       return 0;
     } else if (! strcasecmp (key, "hue_mode")) {
       L_set_string_var (L, 3, &hue_mode);
+      return 0;
+    } else if (! strcasecmp (key, "repl_priority")) {
+      repl_priority = lua_tonumber (L, 3);
       return 0;
     } else break;
   default: break;

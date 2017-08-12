@@ -1455,7 +1455,9 @@ main (int _argc, char **_argv)
   /* register exit cleanup function */
   atexit (quit_game);
   signal (SIGINT, quit_game_sighandler);
+#ifdef SIGHUP
   signal (SIGHUP, quit_game_sighandler);
+#endif
   signal (SIGTERM, quit_game_sighandler);
 
   /* initialize scripting environment */

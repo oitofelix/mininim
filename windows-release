@@ -3,9 +3,9 @@
 set -e
 
 GCC_LIBS="stdc++-6 gcc_s_sjlj-1"
-ALLEGRO_DEP_LIBS="ogg-0 vorbis-0 vorbisfile-3 FLAC-8"
+DEP_LIBS="ogg-0 vorbis-0 vorbisfile-3 FLAC-8 readline6"
 ALLEGRO_LIBS="allegro allegro_acodec allegro_audio allegro_dialog \
-allegro_font allegro_image allegro_primitives"
+allegro_font allegro_image allegro_primitives allegro_color"
 
 HOST=i686-w64-mingw32
 BUILD=x86_64-linux-gnu
@@ -38,13 +38,14 @@ mkdir -p $RELEASE_DIR
 
 # copy MININIM executable, data and documentation
 cp -r data mininim.exe doc/mininim.pdf $RELEASE_DIR
+find $RELEASE_DIR -name '*~' -delete
 
 # copy libs
 for f in $GCC_LIBS
 do cp -v /usr/lib/gcc/$HOST/4.9-win32/lib$f.dll $RELEASE_DIR
 done
 
-for f in $ALLEGRO_DEP_LIBS
+for f in $DEP_LIBS
 do cp -v /usr/$HOST/bin/lib$f.dll $RELEASE_DIR
 done
 
@@ -68,6 +69,7 @@ fi
 
 # create package
 cd release
+rm -rf ${RELEASE_DIR#release/}.zip
 zip -9r ${RELEASE_DIR#release/} ${RELEASE_DIR#release/}
 cd ..
 

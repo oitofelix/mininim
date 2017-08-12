@@ -47,6 +47,8 @@
 #define MININIM_HISTSIZE_ENV "MININIM_HISTSIZE"
 #define MININIM_HISTSIZE_DEFAULT 1024
 
+int repl_priority = 512;
+
 char *myhist;
 static char *lhandler_line;
 
@@ -87,11 +89,12 @@ static int lua_readline(lua_State *L, const char *prompt)
     FD_SET (fileno (rl_instream), &set);
     timeout.tv_sec = 0;
     timeout.tv_usec = 100000;
-    if (select (FD_SETSIZE, &set, NULL, NULL, &timeout) > 0) {
-      lock_thread ();
-      rl_callback_read_char ();
-      unlock_thread ();
-    }
+    int r = select (FD_SETSIZE, &set, NULL, NULL, &timeout);
+    /* QUESTION: it used to be a thread locking around
+       rl_callback_read_char, but it was removed because it didn't
+       play nice with the Windows port.  Is it practically
+       safer/useful to use that for other systems? */
+    if (r > 0) rl_callback_read_char ();
   }
   lock_thread ();
   repl_prompt_ready = false;
@@ -349,7 +352,6 @@ void
 repl_multithread (lua_State *L, lua_Debug *ar)
 {
   unlock_thread ();
-  al_rest (0.0001);
   lock_thread ();
   if (al_get_thread_should_stop (repl_thread))
     luaL_error (L, "main thread terminated");
@@ -362,8 +364,8 @@ static int lcall (lua_State *L, int narg, int clear) {
   lua_pushcfunction (L, L_TRACEBACK);
   lua_insert(L, base);  /* put it under chunk and args */
   sighandler_t handler = signal (SIGINT, laction);
-  lua_sethook (L, repl_multithread,
-               LUA_MASKCALL | LUA_MASKRET | LUA_MASKCOUNT, 1);
+  if (repl_priority > 0)
+    lua_sethook (L, repl_multithread, LUA_MASKCOUNT, repl_priority);
   status = lua_pcall(L, narg, (clear ? 0 : LUA_MULTRET), base);
   lua_sethook(L, NULL, 0, 0);
   signal (SIGINT, handler);

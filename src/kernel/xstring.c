@@ -106,14 +106,24 @@ fmt_row (const char *fmt, ...)
   return r;
 }
 
+int
+term_cols (void)
+{
+#if WINDOWS_PORT
+  CONSOLE_SCREEN_BUFFER_INFO csbi;
+  GetConsoleScreenBufferInfo (GetStdHandle (STD_OUTPUT_HANDLE), &csbi);
+  return csbi.srWindow.Right - csbi.srWindow.Left + 1;
+#else
+  struct winsize win;
+  if (ioctl (STDOUT_FILENO, TIOCGWINSZ, &win) < 0) return 80;
+  else return win.ws_col;
+#endif
+}
+
 char *
 fmt_end (void)
 {
   const char *sep = " ";
-
-  struct winsize win;
-  if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &win) < 0)
-    win.ws_col = 80;
 
   int total_width = 0;
   size_t i;
@@ -121,7 +131,7 @@ fmt_end (void)
     total_width += fmt_width[i];
 
   int avail_width =
-    max_int (0, win.ws_col - 1 - (fmt_width_nmemb - 1) * strlen (sep));
+    max_int (0, term_cols () - 1 - (fmt_width_nmemb - 1) * strlen (sep));
 
   if (total_width == 0) total_width = 1;
 
@@ -177,11 +187,7 @@ fmt_manual (const char *sep, ...)
     if (width[i] > 0) fixed_width += width[i];
     else var_parts += abs (width[i]);
 
-  struct winsize win;
-  if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &win) < 0)
-    win.ws_col = 80;
-
-  int avail_width = max_int (0, win.ws_col - 1 - fixed_width);
+  int avail_width = max_int (0, term_cols () - 1 - fixed_width);
   char *h = xasprintf ("%%s");
   for (i = 0; i < width_nmemb; i++) {
     int w;
@@ -205,10 +211,7 @@ fmt_manual (const char *sep, ...)
 char *
 hline (char c)
 {
-  struct winsize win;
-  if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &win) < 0)
-    win.ws_col = 80;
-  return repeat_char (c, win.ws_col - 1);
+  return repeat_char (c, term_cols () - 1);
 }
 
 

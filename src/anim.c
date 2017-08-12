@@ -59,9 +59,12 @@ play_anim (void (*draw_callback) (void),
 
   while (! quit_anim) {
     L_gc (main_L);
-    unlock_thread ();
-    al_wait_for_event (event_queue, &event);
-    lock_thread ();
+
+    if (al_is_event_queue_empty (event_queue)) {
+      unlock_thread ();
+      al_wait_for_event (event_queue, &event);
+      lock_thread ();
+    } else al_get_next_event (event_queue, &event);
 
     switch (event.type) {
     case ALLEGRO_EVENT_TIMER:

@@ -22,8 +22,6 @@
 include ../documentation.am
 
 
-
-
 
 #######################
 # Automake directives #

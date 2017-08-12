@@ -32,5 +32,6 @@ extern ALLEGRO_COND *repl_cond;
 extern lua_State *repl_L;
 extern int repl_thread_ref;
 extern bool repl_prompt_ready;
+extern int repl_priority;
 
 #endif	/* MININIM_XLUA_H */
