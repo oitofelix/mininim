@@ -257,7 +257,8 @@ door_grid_tip_y (struct pos *p)
 int
 fake_door_step (struct pos *p)
 {
-  return is_fake (p) ? fake_ext (p) : door_at_pos (p)->i;
+  /* return is_fake (p) ? fake_ext (p) : door_at_pos (p)->i; */
+  return is_fake (p) ? DOOR_STEPS - 1 : door_at_pos (p)->i;
 }
 
 void

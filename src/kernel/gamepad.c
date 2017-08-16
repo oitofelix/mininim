@@ -295,7 +295,7 @@ joystick_info (void)
       ALLEGRO_BITMAP *joystick_big_icon =
         load_bitmap (JOYSTICK_BIG_ICON);
       show_logo ("Querying joystick...", NULL, joystick_big_icon);
-      destroy_bitmap (joystick_big_icon);
+      al_destroy_bitmap (joystick_big_icon);
     }
     init_gamepad ();
     calibrate_joystick ();

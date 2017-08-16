@@ -25,8 +25,11 @@
 struct level *next_native_level (struct level *l, int n);
 struct level *load_native_level (struct level *l, int n);
 bool save_native_level (struct level *l, char *filename);
-char *get_tile_fg_str (struct pos *p);
-char *get_tile_bg_str (struct pos *p);
 char *get_tile_ext_str (struct pos *p);
+
+/* variables */
+extern char *tile_fg_str[TILE_FGS];
+extern char *tile_bg_str[TILE_BGS];
+extern char *item_str[ITEMS];
 
 #endif	/* MININIM_NATIVE_LEVEL_H */

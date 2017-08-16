@@ -92,38 +92,38 @@ void
 unload_cutscenes (void)
 {
   /* cga */
-  destroy_bitmap (c_main_background);
-  destroy_bitmap (c_text_background);
-  destroy_bitmap (c_title_background_pattern);
-  destroy_bitmap (c_ending_background_pattern);
-  destroy_bitmap (c_princess_room);
-  destroy_bitmap (c_princess_room_pillar);
+  al_destroy_bitmap (c_main_background);
+  al_destroy_bitmap (c_text_background);
+  al_destroy_bitmap (c_title_background_pattern);
+  al_destroy_bitmap (c_ending_background_pattern);
+  al_destroy_bitmap (c_princess_room);
+  al_destroy_bitmap (c_princess_room_pillar);
 
   /* ega */
-  destroy_bitmap (e_main_background);
-  destroy_bitmap (e_text_background);
-  destroy_bitmap (e_title_background_pattern);
-  destroy_bitmap (e_ending_background_pattern);
-  destroy_bitmap (e_princess_room);
-  destroy_bitmap (e_princess_room_pillar);
+  al_destroy_bitmap (e_main_background);
+  al_destroy_bitmap (e_text_background);
+  al_destroy_bitmap (e_title_background_pattern);
+  al_destroy_bitmap (e_ending_background_pattern);
+  al_destroy_bitmap (e_princess_room);
+  al_destroy_bitmap (e_princess_room_pillar);
 
   /* vga */
-  destroy_bitmap (v_main_background);
-  destroy_bitmap (v_text_background);
-  destroy_bitmap (v_title_background_pattern);
-  destroy_bitmap (v_ending_background_pattern);
-  destroy_bitmap (v_princess_room);
-  destroy_bitmap (v_princess_room_pillar);
+  al_destroy_bitmap (v_main_background);
+  al_destroy_bitmap (v_text_background);
+  al_destroy_bitmap (v_title_background_pattern);
+  al_destroy_bitmap (v_ending_background_pattern);
+  al_destroy_bitmap (v_princess_room);
+  al_destroy_bitmap (v_princess_room_pillar);
 
   /* bitmap */
-  destroy_bitmap (message_presents);
-  destroy_bitmap (message_author);
-  destroy_bitmap (message_game_name);
-  destroy_bitmap (message_copyright);
-  destroy_bitmap (text_in_the_absence);
-  destroy_bitmap (text_marry_jaffar);
-  destroy_bitmap (text_credits);
-  destroy_bitmap (text_the_tyrant);
+  al_destroy_bitmap (message_presents);
+  al_destroy_bitmap (message_author);
+  al_destroy_bitmap (message_game_name);
+  al_destroy_bitmap (message_copyright);
+  al_destroy_bitmap (text_in_the_absence);
+  al_destroy_bitmap (text_marry_jaffar);
+  al_destroy_bitmap (text_credits);
+  al_destroy_bitmap (text_the_tyrant);
 
   /* modules */
   unload_princess ();

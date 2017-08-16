@@ -21,6 +21,7 @@
 #include "mininim.h"
 
 lua_State *main_L;
+ALLEGRO_MUTEX *L_mutex;
 
 static int table_getn_ref = LUA_NOREF;
 static int weak_registry_ref = LUA_NOREF;
@@ -88,15 +89,15 @@ init_script (void)
   L_set_registry_by_ref (L, &weak_registry_ref);
 
   /* REPL */
-  repl_mutex = al_create_mutex_recursive ();
+  L_mutex = al_create_mutex_recursive ();
   repl_cond = al_create_cond ();
   debug_cond = al_create_cond ();
-  lock_thread ();
+  lock_lua ();
   repl_L = lua_newthread (L);
   L_set_registry_by_ref (L, &repl_thread_ref);
   repl_thread = al_create_thread (repl, repl_L);
   al_start_thread (repl_thread);
-  al_wait_cond (repl_cond, repl_mutex);
+  al_wait_cond (repl_cond, L_mutex);
 
   /* load script */
   int e = load_resource ("data/script/mininim.lua",
@@ -109,6 +110,7 @@ init_script (void)
     else error (-1, 0, "%s", lua_tostring(L, -1));
   } else {
     /* no script found */
+    lua_remove (L, 1);
     while (lua_gettop (L)) {
       error (0, 0, "%s", lua_tostring(L, 1));
       lua_remove (L, 1);
@@ -122,10 +124,10 @@ void
 finalize_script (void)
 {
   al_set_thread_should_stop (repl_thread);
-  unlock_thread ();
+  unlock_lua ();
   al_join_thread (repl_thread, NULL);
   al_destroy_thread (repl_thread);
-  al_destroy_mutex (repl_mutex);
+  al_destroy_mutex (L_mutex);
   al_destroy_cond (repl_cond);
   al_destroy_cond (debug_cond);
   lua_close (main_L);
@@ -270,15 +272,23 @@ L_rawgeti_tonumber (lua_State *L, int index, int n)
 }
 
 void
-lock_thread ()
+lock_lua ()
 {
-  al_lock_mutex (repl_mutex);
+  al_lock_mutex (L_mutex);
   al_set_target_backbuffer (display);
 }
 
 void
-unlock_thread ()
+unlock_lua ()
 {
   al_set_target_bitmap (NULL);
-  al_unlock_mutex (repl_mutex);
+  al_unlock_mutex (L_mutex);
+}
+
+void
+L_set_string_var (lua_State *L, int index, char **var)
+{
+  index = lua_abs_index (L, index);
+  const char *value = lua_tostring (L, index);
+  if (value) set_string_var (var, value);
 }

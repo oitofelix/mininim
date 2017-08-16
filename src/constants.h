@@ -21,7 +21,7 @@
 #ifndef MININIM_CONSTANTS_H
 #define MININIM_CONSTANTS_H
 
-#define WINDOW_TITLE "MININIM: The Advanced Prince of Persia Engine (a childhood dream)"
+#define WINDOW_TITLE "MININIM"
 #define LOGO_ICON "data/icons/mininim.png"
 #define SMALL_LOGO_ICON "data/icons/mininim-small.png"
 #define OITOFELIX_FACE "data/icons/oitofelix-face.png"
@@ -127,6 +127,9 @@
 #define EFFECT_HZ 30
 #define UNLIMITED_HZ 10000
 #define REPLAY_STUCK_THRESHOLD 204
+
+#define MENU_PERIOD 0.1
+#define IUP_PERIOD 0.05
 
 #define SELECT_CYCLES (SEC2CYC (3))
 

@@ -4,6 +4,7 @@ set -e
 
 GCC_LIBS="stdc++-6 gcc_s_sjlj-1"
 DEP_LIBS="ogg-0 vorbis-0 vorbisfile-3 FLAC-8 readline6"
+DEP_LIBS_NOPREFIX="iup"
 ALLEGRO_LIBS="allegro allegro_acodec allegro_audio allegro_dialog \
 allegro_font allegro_image allegro_primitives allegro_color"
 
@@ -49,6 +50,10 @@ for f in $DEP_LIBS
 do cp -v /usr/$HOST/bin/lib$f.dll $RELEASE_DIR
 done
 
+for f in $DEP_LIBS_NOPREFIX
+do cp -v /usr/$HOST/bin/$f.dll $RELEASE_DIR
+done
+
 for f in $ALLEGRO_LIBS
 do
     # if [ "$1" != "--enable-debug" ]
@@ -62,16 +67,26 @@ done
 # copy Allegro configuration
 unix2dos -n allegro5.cfg $RELEASE_DIR/allegro5.cfg
 
+# convert Lua scripts line ending
+for f in $(find data -iname '*.lua')
+do unix2dos -n $f $RELEASE_DIR/$f
+done
+
+# convert shaders line ending
+for f in $(find data -iname '*.frag' -or -iname '*.vert')
+do unix2dos -n $f $RELEASE_DIR/$f
+done
+
 # strip them all
 if [ "$1" != "--enable-debug" ]
 then $HOST-strip $RELEASE_DIR/{*.dll,*.exe}
 fi
 
-# create package
-cd release
-rm -rf ${RELEASE_DIR#release/}.zip
-zip -9r ${RELEASE_DIR#release/} ${RELEASE_DIR#release/}
-cd ..
+# # create package
+# cd release
+# rm -rf ${RELEASE_DIR#release/}.zip
+# zip -9r ${RELEASE_DIR#release/} ${RELEASE_DIR#release/}
+# cd ..
 
-# remove temporary release directory
-rm -rf $RELEASE_DIR
+# # remove temporary release directory
+# rm -rf $RELEASE_DIR

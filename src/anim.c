@@ -44,11 +44,21 @@ play_anim (void (*draw_callback) (void),
 
   ALLEGRO_EVENT event;
   anim_freq_real = anim_freq > 0 ? anim_freq : UNLIMITED_HZ;
+
   timer = al_create_timer
     (anim_freq > 0 ? 1.0 / anim_freq : 1.0 / UNLIMITED_HZ);
   al_register_event_source (event_queue, al_get_timer_event_source (timer));
+  menu_timer = al_create_timer (MENU_PERIOD);
+  al_register_event_source
+    (event_queue,al_get_timer_event_source (menu_timer));
+  iup_timer = al_create_timer (IUP_PERIOD);
+  al_register_event_source
+    (event_queue,al_get_timer_event_source (iup_timer));
+
   al_flush_event_queue (event_queue);
   al_start_timer (timer);
+  al_start_timer (menu_timer);
+  al_start_timer (iup_timer);
 
   double prev_time = al_get_time ();
 
@@ -61,22 +71,36 @@ play_anim (void (*draw_callback) (void),
     L_gc (main_L);
 
     if (al_is_event_queue_empty (event_queue)) {
-      unlock_thread ();
+      unlock_lua ();
       al_wait_for_event (event_queue, &event);
-      lock_thread ();
+      lock_lua ();
     } else al_get_next_event (event_queue, &event);
 
     switch (event.type) {
     case ALLEGRO_EVENT_TIMER:
-      if (event.timer.source == timer) {
+      if (event.timer.source == iup_timer) {
+        /* IUP events */
+#if WINDOWS_PORT
+        IupFlush ();
+#else
+        for (int i = 1; i <= 100; i++) IupLoopStep ();
+#endif
+        drop_all_events_from_source
+          (event_queue, al_get_timer_event_source (iup_timer));
+        al_set_timer_count (iup_timer, 0);
+      } else if (event.timer.source == video_timer) {
+        if (rendering == BOTH_RENDERING || rendering == VIDEO_RENDERING)
+          show ();
+        else stop_video_effect ();
+        /* drop_all_events_from_source */
+        /*   (event_queue, get_timer_event_source (video_timer)); */
+        /* al_set_timer_count (video_timer, 0); */
+      } else if (event.timer.source == timer) {
         /* ensures Lua stack is empty */
         if (DEBUG && lua_gettop (main_L)) {
           L_dump_stack (main_L);
           assert (false);
         }
-
-        /* update main menu */
-        main_menu ();
 
         /* check for replay favorite cycle */
         if (replay_favorite_cycle > 0
@@ -189,13 +213,12 @@ play_anim (void (*draw_callback) (void),
 
         key.keycode = 0;
         joystick_button = -1;
-      } else if (event.timer.source == video_timer) {
-        if (rendering == BOTH_RENDERING || rendering == VIDEO_RENDERING)
-          show ();
-        else stop_video_effect ();
-        /* drop_all_events_from_source */
-        /*   (event_queue, get_timer_event_source (video_timer)); */
-        /* al_set_timer_count (video_timer, 0); */
+      } else if (event.timer.source == menu_timer) {
+        /* update main menu to reflect programatic changes */
+        main_menu ();
+        drop_all_events_from_source
+          (event_queue, al_get_timer_event_source (menu_timer));
+        al_set_timer_count (menu_timer, 0);
       }
       break;
     case ALLEGRO_EVENT_DISPLAY_RESIZE:

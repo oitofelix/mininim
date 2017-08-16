@@ -122,19 +122,3 @@ BEGIN_LUA (__tostring)
   return 1;
 }
 END_LUA
-
-void
-set_string_var (char **var, const char *value)
-{
-  char *old_str = *var;
-  if (value) *var = xasprintf ("%s", value);
-  else *var = NULL;
-  al_free (old_str);
-}
-
-void
-L_set_string_var (lua_State *L, int index, char **var)
-{
-  const char *value = lua_tostring (L, index);
-  if (value) set_string_var (var, value);
-}

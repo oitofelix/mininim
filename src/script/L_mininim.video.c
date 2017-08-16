@@ -438,7 +438,7 @@ setup_video_mode (char *requested_vm)
   REAL_WIDTH = w;
   REAL_HEIGHT = h;
 
-  destroy_bitmap (uscreen);
+  al_destroy_bitmap (uscreen);
   uscreen = create_bitmap (OW (CUTSCENE_WIDTH), OH (CUTSCENE_HEIGHT));
   clear_bitmap (uscreen, TRANSPARENT_COLOR);
 

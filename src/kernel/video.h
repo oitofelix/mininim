@@ -24,7 +24,6 @@
 /* functions */
 void init_video (void);
 void finalize_video (void);
-void destroy_bitmap (ALLEGRO_BITMAP *bitmap);
 int memory_bitmap_flags (void);
 int video_bitmap_flags (void);
 ALLEGRO_BITMAP *create_memory_bitmap (int w, int h);

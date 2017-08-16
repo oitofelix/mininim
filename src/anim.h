@@ -58,6 +58,8 @@ extern bool cutscene; /* don't apply physics if set */
 extern uint64_t anim_cycle;
 extern ALLEGRO_EVENT_QUEUE *event_queue;
 extern ALLEGRO_TIMER *timer;
+ALLEGRO_TIMER *menu_timer;
+ALLEGRO_TIMER *iup_timer;
 extern int anim_freq;
 extern int anim_freq_real;
 

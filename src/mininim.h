@@ -78,6 +78,9 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 
+/* IUP */
+#include <iup/iup.h>
+
 /* MININIM */
 #include "compatibility.h"
 
@@ -185,11 +188,13 @@
 
 #include "bmenu.h"
 #include "editor.h"
+#include "editor-gui.h"
 #include "debug.h"
 #include "undo.h"
 #include "multi-room.h"
 #include "replay.h"
 #include "ui.h"
+#include "gui.h"
 #include "xmath.h"
 #include "xstring.h"
 
@@ -293,5 +298,9 @@ extern struct dialog load_config_dialog, save_game_dialog,
   save_picture_dialog;
 
 extern struct message_box about_dialog;
+
+extern int exit_code;
+
+#define exit(x) ((exit)(exit_code = (x)))
 
 #endif	/* MININIM_MININIM_H */

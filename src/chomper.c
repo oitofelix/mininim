@@ -232,7 +232,8 @@ void
 draw_chomper (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   if (is_fake (p)) {
-    draw_blade (bitmap, p, NULL, abs (ext (p)) % 5 + 1, FULL_WIDTH);
+    draw_blade (bitmap, p, NULL, 3, FULL_WIDTH);
+    /* draw_blade (bitmap, p, NULL, abs (ext (p)) % 5 + 1, FULL_WIDTH); */
     return;
   }
 

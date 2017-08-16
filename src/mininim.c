@@ -20,6 +20,8 @@
 
 #include "mininim.h"
 
+int exit_code = EXIT_SUCCESS;
+
 enum level_module level_module;
 
 struct config_info {
@@ -1460,6 +1462,9 @@ main (int _argc, char **_argv)
 #endif
   signal (SIGTERM, quit_game_sighandler);
 
+  /* Initialize GUI */
+  init_gui (_argc, _argv);
+
   /* initialize scripting environment */
   init_script ();
 
@@ -1579,13 +1584,15 @@ main (int _argc, char **_argv)
     goto restart_game;
   }
 
-  return 0;
+  return EXIT_SUCCESS;
 }
 
 void
 quit_game (void)
 {
   finalize_script ();
+
+  IupClose ();
 
   unload_icons ();
   unload_level ();
@@ -1602,8 +1609,10 @@ quit_game (void)
   if (scream && kid_scream && guard_scream
       && fat_scream && shadow_scream && skeleton_scream
       && vizier_scream  && princess_scream && mouse_scream)
-    fprintf (stderr, "In MININIM, everybody screams!\n");
-  else fprintf (stderr, "MININIM: Hope you enjoyed it!\n");
+    fprintf (stderr, "In MININIM, everybody screams! ;)\n");
+  else if (exit_code != EXIT_SUCCESS)
+    error (0, 0, "MININIM: exiting with error! :(");
+  else fprintf (stderr, "MININIM: Hope you enjoyed it! :)\n");
 }
 
 void

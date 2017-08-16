@@ -194,8 +194,5 @@ void keep_all_depressible_floors (void);
 
 
 void activate_tile (struct pos *p);
-char *get_tile_fg_name (enum tile_fg t);
-char *get_tile_bg_name (enum tile_bg t);
-char *get_item_name (enum item t);
 
 #endif	/* MININIM_PHYSICS_H */

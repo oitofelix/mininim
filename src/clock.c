@@ -75,36 +75,36 @@ void
 unload_clock (void)
 {
   /* cga */
-  destroy_bitmap (c_clock_00);
-  destroy_bitmap (c_clock_01);
-  destroy_bitmap (c_clock_02);
-  destroy_bitmap (c_clock_03);
-  destroy_bitmap (c_clock_04);
-  destroy_bitmap (c_clock_05);
-  destroy_bitmap (c_clock_06);
+  al_destroy_bitmap (c_clock_00);
+  al_destroy_bitmap (c_clock_01);
+  al_destroy_bitmap (c_clock_02);
+  al_destroy_bitmap (c_clock_03);
+  al_destroy_bitmap (c_clock_04);
+  al_destroy_bitmap (c_clock_05);
+  al_destroy_bitmap (c_clock_06);
 
   /* ega */
-  destroy_bitmap (e_clock_00);
-  destroy_bitmap (e_clock_01);
-  destroy_bitmap (e_clock_02);
-  destroy_bitmap (e_clock_03);
-  destroy_bitmap (e_clock_04);
-  destroy_bitmap (e_clock_05);
-  destroy_bitmap (e_clock_06);
+  al_destroy_bitmap (e_clock_00);
+  al_destroy_bitmap (e_clock_01);
+  al_destroy_bitmap (e_clock_02);
+  al_destroy_bitmap (e_clock_03);
+  al_destroy_bitmap (e_clock_04);
+  al_destroy_bitmap (e_clock_05);
+  al_destroy_bitmap (e_clock_06);
 
   /* vga */
-  destroy_bitmap (v_clock_00);
-  destroy_bitmap (v_clock_01);
-  destroy_bitmap (v_clock_02);
-  destroy_bitmap (v_clock_03);
-  destroy_bitmap (v_clock_04);
-  destroy_bitmap (v_clock_05);
-  destroy_bitmap (v_clock_06);
+  al_destroy_bitmap (v_clock_00);
+  al_destroy_bitmap (v_clock_01);
+  al_destroy_bitmap (v_clock_02);
+  al_destroy_bitmap (v_clock_03);
+  al_destroy_bitmap (v_clock_04);
+  al_destroy_bitmap (v_clock_05);
+  al_destroy_bitmap (v_clock_06);
 
   /* palettable */
-  destroy_bitmap (clock_sand_00);
-  destroy_bitmap (clock_sand_01);
-  destroy_bitmap (clock_sand_02);
+  al_destroy_bitmap (clock_sand_00);
+  al_destroy_bitmap (clock_sand_01);
+  al_destroy_bitmap (clock_sand_02);
 }
 
 ALLEGRO_COLOR

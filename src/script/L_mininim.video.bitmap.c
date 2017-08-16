@@ -99,7 +99,7 @@ END_LUA
 BEGIN_LUA (__gc)
 {
   ALLEGRO_BITMAP **b = luaL_checkudata (L, 1, L_MININIM_VIDEO_BITMAP);
-  destroy_bitmap (*b);
+  al_destroy_bitmap (*b);
   return 0;
 }
 END_LUA

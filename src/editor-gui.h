@@ -1,5 +1,5 @@
 /*
-  repl.h -- Lua REPL module;
+  editor-dialog.h -- editor dialog module;
 
   Copyright (C) 2015, 2016, 2017 Bruno Félix Rezende Ribeiro
   <oitofelix@gnu.org>
@@ -18,19 +18,12 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MININIM_XLUA_H
-#define MININIM_XLUA_H
+#ifndef MININIM_EDITOR_DIALOG_H
+#define MININIM_EDITOR_DIALOG_H
 
 /* functions */
-void *repl (ALLEGRO_THREAD *thread, void *repl_L);
-void repl_update_prompt (void);
+void show_editor_gui (void);
+void hide_editor_gui (void);
+void update_editor_gui (void);
 
-/* variables */
-extern ALLEGRO_THREAD *repl_thread;
-extern ALLEGRO_COND *repl_cond;
-extern lua_State *repl_L;
-extern int repl_thread_ref;
-extern bool repl_prompt_ready;
-extern int repl_priority;
-
-#endif	/* MININIM_XLUA_H */
+#endif	/* MININIM_EDITOR_DIALOG_H */

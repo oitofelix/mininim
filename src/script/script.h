@@ -33,8 +33,8 @@
 void init_script (void);
 void finalize_script (void);
 
-void lock_thread (void);
-void unlock_thread (void);
+void lock_lua (void);
+void unlock_lua (void);
 
 int lua_getn (lua_State *L, int index);
 lua_Number L_rawgeti_tonumber (lua_State *L, int index, int n);
@@ -57,7 +57,10 @@ void L_gc (lua_State *L);
 int L_error_expected_got (lua_State *L, int index,
                           const char *expected_tname);
 
+void L_set_string_var (lua_State *L, int index, char **var);
+
 /* variables */
 extern lua_State *main_L;
+extern ALLEGRO_MUTEX *L_mutex;
 
 #endif	/* MININIM_SCRIPT_H */

@@ -30,18 +30,18 @@ include documentation.am
 
 bin_PROGRAMS = mininim
 mininim_SOURCES = src/mininim.c src/mininim.h src/compatibility.h			\
-	  src/ui.c src/ui.h src/constants.h src/types.h src/colors.h				\
-	  src/anim.c src/anim.h src/actor.c src/actor.h src/pos.c src/pos.h	\
-	  src/physics.c src/physics.h src/level.c src/level.h src/fix.c			\
-	  src/fix.h src/stars.c src/stars.h src/loose-floor.c								\
-	  src/loose-floor.h src/opener-floor.c src/opener-floor.h						\
-	  src/closer-floor.c src/closer-floor.h src/spikes-floor.c					\
-	  src/spikes-floor.h src/door.c src/door.h src/level-door.c					\
-	  src/level-door.h src/chomper.c src/chomper.h src/carpet.c					\
-	  src/carpet.h src/mirror.c src/mirror.h src/room.c src/room.h			\
-	  src/fire.c src/fire.h src/potion.c src/potion.h src/sword.c				\
-	  src/sword.h src/clock.c src/clock.h src/princess.c src/princess.h	\
-	  src/jaffar.c src/jaffar.h src/mouse.c src/mouse.h									\
+	  src/ui.c src/ui.h src/gui.c src/gui.h src/constants.h src/types.h	\
+	  src/colors.h src/anim.c src/anim.h src/actor.c src/actor.h				\
+	  src/pos.c src/pos.h src/physics.c src/physics.h src/level.c				\
+	  src/level.h src/fix.c src/fix.h src/stars.c src/stars.h						\
+	  src/loose-floor.c src/loose-floor.h src/opener-floor.c						\
+	  src/opener-floor.h src/closer-floor.c src/closer-floor.h					\
+	  src/spikes-floor.c src/spikes-floor.h src/door.c src/door.h				\
+	  src/level-door.c src/level-door.h src/chomper.c src/chomper.h			\
+	  src/carpet.c src/carpet.h src/mirror.c src/mirror.h src/room.c		\
+	  src/room.h src/fire.c src/fire.h src/potion.c src/potion.h				\
+	  src/sword.c src/sword.h src/clock.c src/clock.h src/princess.c		\
+	  src/princess.h src/jaffar.c src/jaffar.h src/mouse.c src/mouse.h	\
 	  src/audio-data.c src/audio-data.h src/cutscenes.c src/cutscenes.h	\
 	  src/fight.c src/fight.h src/dat.c src/dat.h src/wall.c src/wall.h	\
 	  src/kid/kid.c src/kid/kid.h src/kid/kid-normal.c									\
@@ -94,12 +94,12 @@ mininim_SOURCES = src/mininim.c src/mininim.h src/compatibility.h			\
 	  src/kernel/xconfig.c src/kernel/xconfig.h src/kernel/diff.c				\
 	  src/kernel/diff.h src/kernel/xmath.c src/kernel/xmath.h						\
 	  src/kernel/xstring.c src/kernel/xstring.h src/bmenu.c src/bmenu.h	\
-	  src/editor.c src/editor.h src/debug.c src/debug.h src/undo.c			\
-	  src/undo.h src/multi-room.c src/multi-room.h src/replay.c					\
-	  src/replay.h src/script/repl.c src/script/repl.h									\
-	  src/script/script.c src/script/script.h src/script/L_mininim.c		\
-	  src/script/L_mininim.h src/script/L_mininim.level.c								\
-	  src/script/L_mininim.level.h																			\
+	  src/editor.c src/editor.h src/editor-gui.c src/editor-gui.h				\
+	  src/debug.c src/debug.h src/undo.c src/undo.h src/multi-room.c		\
+	  src/multi-room.h src/replay.c src/replay.h src/script/repl.c			\
+	  src/script/repl.h src/script/script.c src/script/script.h					\
+	  src/script/L_mininim.c src/script/L_mininim.h											\
+	  src/script/L_mininim.level.c src/script/L_mininim.level.h					\
 	  src/script/L_mininim.level.position.c															\
 	  src/script/L_mininim.level.position.h															\
 	  src/script/L_mininim.actor.c src/script/L_mininim.actor.h					\
@@ -122,11 +122,6 @@ mininim_SOURCES = src/mininim.c src/mininim.h src/compatibility.h			\
 	  src/script/L_mininim.profiler.c src/script/L_mininim.profiler.h		\
 	  src/script/L_mininim.debugger.c src/script/L_mininim.debugger.h		\
 	  src/script/L_mininim.math.c src/script/L_mininim.math.h
-
-${mininim_OBJECTS}: ${top_builddir}/src/mininim.h.gch
-
-${top_builddir}/src/mininim.h.gch: ${mininim_SOURCES:%.c=${srcdir}/%.h}
-	$(AM_V_CC) $(COMPILE) ${AM_CFLAGS} -o $@ -c $<
 
 CLEANFILES = ${top_builddir}/src/mininim.h.gch
 
@@ -166,15 +161,23 @@ ${LUA_LIB}
 LDADD = gnulib/libgnu.a $(LIBSOCKET) $(LIB_SELECT) $(LTLIBINTL)	\
 $(LTLIBTHREAD)
 
-gnulib/libgnu.a:
-	cd gnulib && $(MAKE)
-
 if mingw_build
-  LDADD += mininim.rc.$(OBJEXT)
+  LDADD += mininim.rc.$(OBJEXT) -liup
   # AM_CFLAGS += -mwindows
+else
+	LDADD	+= -liupmot
 endif
 SUFFIXES = .rc
 WINDRES = ${host}-windres
+
+${mininim_OBJECTS}: ${top_builddir}/src/mininim.h.gch
+
+${top_builddir}/src/mininim.h.gch: ${mininim_SOURCES:%.c=${srcdir}/%.h}
+	$(AM_V_CC) $(COMPILE) ${AM_CFLAGS} -o $@ -c $<
+
+gnulib/libgnu.a:
+	cd gnulib && $(MAKE)
+
 %.rc.$(OBJEXT): %.rc
 	$(WINDRES) $(WINDRESFLAGS) -o $@ $<
 

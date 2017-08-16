@@ -98,7 +98,7 @@ init_video (void)
 
   al_set_window_title (display, WINDOW_TITLE);
   logo_icon = load_bitmap (LOGO_ICON);
-  al_set_display_icon (display, logo_icon);
+  if (logo_icon) al_set_display_icon (display, logo_icon);
 
   cutscene = true;
 
@@ -148,12 +148,13 @@ init_video (void)
 void
 finalize_video (void)
 {
-  destroy_bitmap (logo_icon);
-  destroy_bitmap (uscreen);
-  destroy_bitmap (effect_buffer);
-  destroy_bitmap (black_screen);
+  al_destroy_bitmap (logo_icon);
+  al_destroy_bitmap (uscreen);
+  al_destroy_bitmap (effect_buffer);
+  al_destroy_bitmap (black_screen);
   al_destroy_font (builtin_font);
   al_destroy_timer (video_timer);
+  al_set_display_menu (display, NULL);
   al_destroy_display (display);
   al_shutdown_image_addon ();
   al_shutdown_font_addon ();
@@ -341,19 +342,13 @@ get_shader_platform (ALLEGRO_SHADER *s)
 void
 validate_bitmap_for_mingw (ALLEGRO_BITMAP *bitmap)
 {
-  if (! WINDOWS_PORT) return;
+  if (! WINDOWS_PORT || ! bitmap) return;
 
   /* work around a bug (MinGW target), where bitmaps are loaded as
      black/transparent images */
   al_lock_bitmap(bitmap, ALLEGRO_PIXEL_FORMAT_ANY,
 		 ALLEGRO_LOCK_READWRITE);
   al_unlock_bitmap(bitmap);
-}
-
-void
-destroy_bitmap (ALLEGRO_BITMAP *bitmap)
-{
-  al_destroy_bitmap (bitmap);
 }
 
 ALLEGRO_BITMAP *
@@ -431,7 +426,7 @@ remove_palette_cache (lua_State *L, ssize_t i)
   if (lua_isnil (L, -1)) {
     /* C bitmap */
     lua_pop (L, 1);
-    destroy_bitmap (palette_cache[i].ob);
+    al_destroy_bitmap (palette_cache[i].ob);
   } else {
     /* Lua bitmap */
     lua_pop (L, 1);
@@ -678,7 +673,7 @@ draw_bitmap_region (ALLEGRO_BITMAP *from, ALLEGRO_BITMAP *to,
                     float sx, float sy, float sw, float sh,
                     float dx, float dy, int flags)
 {
-  if (rendering == NONE_RENDERING || rendering == AUDIO_RENDERING)
+  if (! from || rendering == NONE_RENDERING || rendering == AUDIO_RENDERING)
     return;
 
   merge_drawn_rectangle (to, dx, dy, sw, sh);
@@ -862,7 +857,7 @@ flip_display (ALLEGRO_BITMAP *bitmap)
     int ih = get_bitmap_height (iscreen);
 
     if (iw != w || ih != h) {
-      destroy_bitmap (iscreen);
+      al_destroy_bitmap (iscreen);
       iscreen = create_bitmap (w, h);
       /* iscreen = clone_bitmap (al_get_backbuffer (display)); */
     }
@@ -1435,7 +1430,7 @@ load_oitofelix_face (void)
 void
 unload_oitofelix_face (void)
 {
-  destroy_bitmap (oitofelix_face);
+  al_destroy_bitmap (oitofelix_face);
 }
 
 lua_Number

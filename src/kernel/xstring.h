@@ -29,6 +29,7 @@ void repl_str_char (char *str, char a, char b);
 char *trim_string (char *s);
 char *repeat_char (char c, size_t n);
 bool str_end_matches (const char *s, const char *m);
+void set_string_var (char **var, const char *value);
 
 
 

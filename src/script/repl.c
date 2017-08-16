@@ -47,7 +47,11 @@
 #define MININIM_HISTSIZE_ENV "MININIM_HISTSIZE"
 #define MININIM_HISTSIZE_DEFAULT 1024
 
+#if WINDOWS_PORT
 int repl_priority = 512;
+#else
+int repl_priority = 1;
+#endif
 
 char *myhist;
 static char *lhandler_line;
@@ -80,7 +84,7 @@ static int lua_readline(lua_State *L, const char *prompt)
   should_update_prompt = false;
   repl_prompt_ready = true;
 
-  unlock_thread ();
+  unlock_lua ();
   struct timeval timeout;
   fd_set set;
   while (! lhandler_line && ! al_get_thread_should_stop (repl_thread)
@@ -96,7 +100,7 @@ static int lua_readline(lua_State *L, const char *prompt)
        safer/useful to use that for other systems? */
     if (r > 0) rl_callback_read_char ();
   }
-  lock_thread ();
+  lock_lua ();
   repl_prompt_ready = false;
 
   if (! lhandler_line) return 0;
@@ -351,8 +355,8 @@ static int report (lua_State *L, int status) {
 void
 repl_multithread (lua_State *L, lua_Debug *ar)
 {
-  unlock_thread ();
-  lock_thread ();
+  unlock_lua ();
+  lock_lua ();
   if (al_get_thread_should_stop (repl_thread))
     luaL_error (L, "main thread terminated");
 }
@@ -464,7 +468,6 @@ static int pmain (lua_State *L) {
   return 0;
 }
 
-ALLEGRO_MUTEX *repl_mutex;
 ALLEGRO_THREAD *repl_thread;
 lua_State *repl_L;
 int repl_thread_ref = LUA_NOREF;
@@ -473,7 +476,7 @@ ALLEGRO_COND *repl_cond;
 void *
 repl (ALLEGRO_THREAD *thread, void *L)
 {
-  lock_thread ();
+  lock_lua ();
 
   al_broadcast_cond (repl_cond);
 
@@ -492,6 +495,6 @@ repl (ALLEGRO_THREAD *thread, void *L)
 
   rl_callback_handler_remove ();
 
-  unlock_thread ();
+  unlock_lua ();
   return NULL;
 }

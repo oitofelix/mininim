@@ -215,6 +215,32 @@ ALLEGRO_BITMAP *small_logo_icon,
 
 
 
+const char *load_led_error_msg;
+
+intptr_t
+load_led_sub (const char *filename)
+{
+  if (! al_filename_exists (filename)) return false;
+  const char *msg = IupLoad (filename);
+  if (msg) {
+    load_led_error_msg = msg;
+    return false;
+  }
+  return true;
+}
+
+bool
+load_led (const char *filename)
+{
+  load_led_error_msg = NULL;
+  bool success = load_resource (filename, (load_resource_f) load_led_sub,
+                                true);
+  if (success) return true;
+  if (load_led_error_msg) error (0, 0, "%s", load_led_error_msg);
+  else error (0, 0, "LED file \"%s\" not found", filename);
+  return false;
+}
+
 ALLEGRO_BITMAP *
 load_icon (char *filename)
 {
@@ -334,110 +360,110 @@ load_icons (void)
 void
 unload_icons (void)
 {
-  destroy_bitmap (small_logo_icon);
-  destroy_bitmap (open_icon);
-  destroy_bitmap (save_icon);
-  destroy_bitmap (reload_icon);
-  destroy_bitmap (quit_icon);
-  destroy_bitmap (full_screen_icon);
-  destroy_bitmap (windows_icon);
-  destroy_bitmap (camera_icon);
-  destroy_bitmap (play_icon);
-  destroy_bitmap (record_icon);
-  destroy_bitmap (stop_icon);
-  destroy_bitmap (eject_icon);
-  destroy_bitmap (backward_icon);
-  destroy_bitmap (forward_icon);
-  destroy_bitmap (pause_icon);
-  destroy_bitmap (previous_icon);
-  destroy_bitmap (next_icon);
-  destroy_bitmap (screen_icon);
-  destroy_bitmap (right_icon);
-  destroy_bitmap (dungeon_icon);
-  destroy_bitmap (palace_icon);
-  destroy_bitmap (green_icon);
-  destroy_bitmap (gray_icon);
-  destroy_bitmap (yellow_icon);
-  destroy_bitmap (blue_icon);
-  destroy_bitmap (black_icon);
-  destroy_bitmap (vga_icon);
-  destroy_bitmap (ega_icon);
-  destroy_bitmap (cga_icon);
-  destroy_bitmap (hgc_icon);
-  destroy_bitmap (vertical_icon);
-  destroy_bitmap (horizontal_icon);
-  destroy_bitmap (keyboard_icon);
-  destroy_bitmap (joystick_icon);
-  destroy_bitmap (cancel_icon);
-  destroy_bitmap (clock_icon);
-  destroy_bitmap (edit_icon);
-  destroy_bitmap (joystick2_icon);
-  destroy_bitmap (undo_icon);
-  destroy_bitmap (redo_icon);
-  destroy_bitmap (screensaver_icon);
-  destroy_bitmap (joystick3_icon);
-  destroy_bitmap (volume_off_icon);
-  destroy_bitmap (volume_low_icon);
-  destroy_bitmap (volume_medium_icon);
-  destroy_bitmap (volume_high_icon);
-  destroy_bitmap (game_icon);
-  destroy_bitmap (settings_icon);
-  destroy_bitmap (zoom_none_icon);
-  destroy_bitmap (zoom_stretch_icon);
-  destroy_bitmap (zoom_ratio_icon);
-  destroy_bitmap (vertical_horizontal_icon);
-  destroy_bitmap (zoom_out_icon);
-  destroy_bitmap (zoom_in_icon);
-  destroy_bitmap (heading_icon);
-  destroy_bitmap (zoom_icon);
-  destroy_bitmap (navigation_icon);
-  destroy_bitmap (nav_select_icon);
-  destroy_bitmap (nav_cell_icon);
-  destroy_bitmap (nav_page_icon);
-  destroy_bitmap (nav_left_icon);
-  destroy_bitmap (nav_right_icon);
-  destroy_bitmap (nav_above_icon);
-  destroy_bitmap (nav_below_icon);
-  destroy_bitmap (nav_home_icon);
-  destroy_bitmap (repeat_icon);
-  destroy_bitmap (compass_icon);
-  destroy_bitmap (compass2_icon);
-  destroy_bitmap (drawing_icon);
-  destroy_bitmap (first_icon);
-  destroy_bitmap (last_icon);
-  destroy_bitmap (jump_icon);
-  destroy_bitmap (original_icon);
-  destroy_bitmap (guard_icon);
-  destroy_bitmap (fat_icon);
-  destroy_bitmap (vizier_icon);
-  destroy_bitmap (skeleton_icon);
-  destroy_bitmap (shadow_icon);
-  destroy_bitmap (resurrect_icon);
-  destroy_bitmap (death_icon);
-  destroy_bitmap (feather_icon);
-  destroy_bitmap (angel_icon);
-  destroy_bitmap (hp_empty_icon);
-  destroy_bitmap (hp_full_icon);
-  destroy_bitmap (skills_icon);
-  destroy_bitmap (time_icon);
-  destroy_bitmap (time_add_icon);
-  destroy_bitmap (time_sub_icon);
-  destroy_bitmap (attack_icon);
-  destroy_bitmap (attack_add_icon);
-  destroy_bitmap (attack_sub_icon);
-  destroy_bitmap (defense_icon);
-  destroy_bitmap (defense_add_icon);
-  destroy_bitmap (defense_sub_icon);
-  destroy_bitmap (counter_attack_icon);
-  destroy_bitmap (counter_attack_add_icon);
-  destroy_bitmap (counter_attack_sub_icon);
-  destroy_bitmap (counter_defense_icon);
-  destroy_bitmap (counter_defense_add_icon);
-  destroy_bitmap (counter_defense_sub_icon);
-  destroy_bitmap (shadow_face_icon);
-  destroy_bitmap (heart_icon);
-  destroy_bitmap (plus_icon);
-  destroy_bitmap (minus_icon);
+  al_destroy_bitmap (small_logo_icon);
+  al_destroy_bitmap (open_icon);
+  al_destroy_bitmap (save_icon);
+  al_destroy_bitmap (reload_icon);
+  al_destroy_bitmap (quit_icon);
+  al_destroy_bitmap (full_screen_icon);
+  al_destroy_bitmap (windows_icon);
+  al_destroy_bitmap (camera_icon);
+  al_destroy_bitmap (play_icon);
+  al_destroy_bitmap (record_icon);
+  al_destroy_bitmap (stop_icon);
+  al_destroy_bitmap (eject_icon);
+  al_destroy_bitmap (backward_icon);
+  al_destroy_bitmap (forward_icon);
+  al_destroy_bitmap (pause_icon);
+  al_destroy_bitmap (previous_icon);
+  al_destroy_bitmap (next_icon);
+  al_destroy_bitmap (screen_icon);
+  al_destroy_bitmap (right_icon);
+  al_destroy_bitmap (dungeon_icon);
+  al_destroy_bitmap (palace_icon);
+  al_destroy_bitmap (green_icon);
+  al_destroy_bitmap (gray_icon);
+  al_destroy_bitmap (yellow_icon);
+  al_destroy_bitmap (blue_icon);
+  al_destroy_bitmap (black_icon);
+  al_destroy_bitmap (vga_icon);
+  al_destroy_bitmap (ega_icon);
+  al_destroy_bitmap (cga_icon);
+  al_destroy_bitmap (hgc_icon);
+  al_destroy_bitmap (vertical_icon);
+  al_destroy_bitmap (horizontal_icon);
+  al_destroy_bitmap (keyboard_icon);
+  al_destroy_bitmap (joystick_icon);
+  al_destroy_bitmap (cancel_icon);
+  al_destroy_bitmap (clock_icon);
+  al_destroy_bitmap (edit_icon);
+  al_destroy_bitmap (joystick2_icon);
+  al_destroy_bitmap (undo_icon);
+  al_destroy_bitmap (redo_icon);
+  al_destroy_bitmap (screensaver_icon);
+  al_destroy_bitmap (joystick3_icon);
+  al_destroy_bitmap (volume_off_icon);
+  al_destroy_bitmap (volume_low_icon);
+  al_destroy_bitmap (volume_medium_icon);
+  al_destroy_bitmap (volume_high_icon);
+  al_destroy_bitmap (game_icon);
+  al_destroy_bitmap (settings_icon);
+  al_destroy_bitmap (zoom_none_icon);
+  al_destroy_bitmap (zoom_stretch_icon);
+  al_destroy_bitmap (zoom_ratio_icon);
+  al_destroy_bitmap (vertical_horizontal_icon);
+  al_destroy_bitmap (zoom_out_icon);
+  al_destroy_bitmap (zoom_in_icon);
+  al_destroy_bitmap (heading_icon);
+  al_destroy_bitmap (zoom_icon);
+  al_destroy_bitmap (navigation_icon);
+  al_destroy_bitmap (nav_select_icon);
+  al_destroy_bitmap (nav_cell_icon);
+  al_destroy_bitmap (nav_page_icon);
+  al_destroy_bitmap (nav_left_icon);
+  al_destroy_bitmap (nav_right_icon);
+  al_destroy_bitmap (nav_above_icon);
+  al_destroy_bitmap (nav_below_icon);
+  al_destroy_bitmap (nav_home_icon);
+  al_destroy_bitmap (repeat_icon);
+  al_destroy_bitmap (compass_icon);
+  al_destroy_bitmap (compass2_icon);
+  al_destroy_bitmap (drawing_icon);
+  al_destroy_bitmap (first_icon);
+  al_destroy_bitmap (last_icon);
+  al_destroy_bitmap (jump_icon);
+  al_destroy_bitmap (original_icon);
+  al_destroy_bitmap (guard_icon);
+  al_destroy_bitmap (fat_icon);
+  al_destroy_bitmap (vizier_icon);
+  al_destroy_bitmap (skeleton_icon);
+  al_destroy_bitmap (shadow_icon);
+  al_destroy_bitmap (resurrect_icon);
+  al_destroy_bitmap (death_icon);
+  al_destroy_bitmap (feather_icon);
+  al_destroy_bitmap (angel_icon);
+  al_destroy_bitmap (hp_empty_icon);
+  al_destroy_bitmap (hp_full_icon);
+  al_destroy_bitmap (skills_icon);
+  al_destroy_bitmap (time_icon);
+  al_destroy_bitmap (time_add_icon);
+  al_destroy_bitmap (time_sub_icon);
+  al_destroy_bitmap (attack_icon);
+  al_destroy_bitmap (attack_add_icon);
+  al_destroy_bitmap (attack_sub_icon);
+  al_destroy_bitmap (defense_icon);
+  al_destroy_bitmap (defense_add_icon);
+  al_destroy_bitmap (defense_sub_icon);
+  al_destroy_bitmap (counter_attack_icon);
+  al_destroy_bitmap (counter_attack_add_icon);
+  al_destroy_bitmap (counter_attack_sub_icon);
+  al_destroy_bitmap (counter_defense_icon);
+  al_destroy_bitmap (counter_defense_add_icon);
+  al_destroy_bitmap (counter_defense_sub_icon);
+  al_destroy_bitmap (shadow_face_icon);
+  al_destroy_bitmap (heart_icon);
+  al_destroy_bitmap (plus_icon);
+  al_destroy_bitmap (minus_icon);
 }
 
 
@@ -700,6 +726,7 @@ show_menu (void)
   if (display_mode < 0) {
     al_set_display_menu (display, main_menu_id);
     al_show_mouse_cursor (display);
+    if (menu_timer) al_start_timer (menu_timer);
   }
 }
 
@@ -709,6 +736,7 @@ hide_menu (void)
   if (is_fullscreen ()) {
     al_remove_display_menu (display);
     al_hide_mouse_cursor (display);
+    if (menu_timer) al_stop_timer (menu_timer);
   }
 }
 

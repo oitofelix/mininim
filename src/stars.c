@@ -40,7 +40,7 @@ free_stars (struct pos *p)
 
   if (! stars->b || ! stars->s || ! stars->count) return;
 
-  destroy_bitmap (stars->b);
+  al_destroy_bitmap (stars->b);
   stars->b = NULL;
   al_free (stars->s);
   stars->s = NULL;
@@ -57,7 +57,7 @@ generate_stars (struct pos *p)
   if (! mr_coord (np.room, -1, &x, &y)) return;
 
   struct stars *stars = &mr.cell[x][y].stars[np.floor][np.place];
-  destroy_bitmap (stars->b);
+  al_destroy_bitmap (stars->b);
   stars->b = NULL;
   al_free (stars->s);
   stars->s = NULL;

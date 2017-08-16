@@ -282,55 +282,58 @@ save_native_level (struct level *l, char *filename)
   return r;
 }
 
-char *
-get_tile_fg_str (struct pos *p)
-{
-  switch (fg (p)) {
-  case NO_FLOOR: return "NO_FLOOR";
-  case FLOOR: return "FLOOR";
-  case BROKEN_FLOOR: return "BROKEN_FLOOR";
-  case SKELETON_FLOOR: return "SKELETON_FLOOR";
-  case LOOSE_FLOOR: return "LOOSE_FLOOR";
-  case SPIKES_FLOOR: return "SPIKES_FLOOR";
-  case OPENER_FLOOR: return "OPENER_FLOOR";
-  case CLOSER_FLOOR: return "CLOSER_FLOOR";
-  case STUCK_FLOOR: return "STUCK_FLOOR";
-  case HIDDEN_FLOOR: return "HIDDEN_FLOOR";
-  case PILLAR: return "PILLAR";
-  case BIG_PILLAR_BOTTOM: return "BIG_PILLAR_BOTTOM";
-  case BIG_PILLAR_TOP: return "BIG_PILLAR_TOP";
-  case WALL: return "WALL";
-  case DOOR: return "DOOR";
-  case LEVEL_DOOR: return "LEVEL_DOOR";
-  case CHOMPER: return "CHOMPER";
-  case MIRROR: return "MIRROR";
-  case CARPET: return "CARPET";
-  case TCARPET: return "TCARPET";
-  case ARCH_BOTTOM: return "ARCH_BOTTOM";
-  case ARCH_TOP_LEFT: return "ARCH_TOP_LEFT";
-  case ARCH_TOP_RIGHT: return "ARCH_TOP_RIGHT";
-  case ARCH_TOP_MID: return "ARCH_TOP_MID";
-  case ARCH_TOP_SMALL: return "ARCH_TOP_SMALL";
-  default: return NULL;
-  }
-}
+char *tile_fg_str[TILE_FGS] = {
+  [NO_FLOOR] = "NO_FLOOR",
+  [FLOOR] = "FLOOR",
+  [BROKEN_FLOOR] = "BROKEN_FLOOR",
+  [SKELETON_FLOOR] = "SKELETON_FLOOR",
+  [LOOSE_FLOOR] = "LOOSE_FLOOR",
+  [SPIKES_FLOOR] = "SPIKES_FLOOR",
+  [OPENER_FLOOR] = "OPENER_FLOOR",
+  [CLOSER_FLOOR] = "CLOSER_FLOOR",
+  [STUCK_FLOOR] = "STUCK_FLOOR",
+  [HIDDEN_FLOOR] = "HIDDEN_FLOOR",
+  [PILLAR] = "PILLAR",
+  [BIG_PILLAR_BOTTOM] = "BIG_PILLAR_BOTTOM",
+  [BIG_PILLAR_TOP] = "BIG_PILLAR_TOP",
+  [WALL] = "WALL",
+  [DOOR] = "DOOR",
+  [LEVEL_DOOR] = "LEVEL_DOOR",
+  [CHOMPER] = "CHOMPER",
+  [MIRROR] = "MIRROR",
+  [CARPET] = "CARPET",
+  [TCARPET] = "TCARPET",
+  [ARCH_BOTTOM] = "ARCH_BOTTOM",
+  [ARCH_TOP_LEFT] = "ARCH_TOP_LEFT",
+  [ARCH_TOP_RIGHT] = "ARCH_TOP_RIGHT",
+  [ARCH_TOP_MID] = "ARCH_TOP_MID",
+  [ARCH_TOP_SMALL] = "ARCH_TOP_SMALL",
+};
 
-char *
-get_tile_bg_str (struct pos *p)
-{
-  switch (bg (p)) {
-  case NO_BRICKS: return "NO_BRICKS";
-  case BRICKS_1: return "BRICKS_1";
-  case BRICKS_2: return "BRICKS_2";
-  case BRICKS_3: return "BRICKS_3";
-  case BRICKS_4: return "BRICKS_4";
-  case BRICKS_5: return "BRICKS_5";
-  case TORCH: return "TORCH";
-  case WINDOW: return "WINDOW";
-  case BALCONY: return "BALCONY";
-  default: return NULL;
-  }
-}
+char *tile_bg_str[TILE_BGS] = {
+  [NO_BRICKS] = "NO_BRICKS",
+  [BRICKS_1] = "BRICKS_1",
+  [BRICKS_2] = "BRICKS_2",
+  [BRICKS_3] = "BRICKS_3",
+  [BRICKS_4] = "BRICKS_4",
+  [BRICKS_5] = "BRICKS_5",
+  [TORCH] = "TORCH",
+  [WINDOW] = "WINDOW",
+  [BALCONY] = "BALCONY",
+};
+
+char *item_str[ITEMS] = {
+  [NO_ITEM] = "NO_ITEM",
+  [EMPTY_POTION] = "EMPTY_POTION",
+  [SMALL_HP_POTION] = "SMALL_HP_POTION",
+  [BIG_HP_POTION] = "BIG_HP_POTION",
+  [SMALL_POISON_POTION] = "SMALL_POISON_POTION",
+  [BIG_POISON_POTION] = "BIG_POISON_POTION",
+  [FLOAT_POTION] = "FLOAT_POTION",
+  [FLIP_POTION] = "FLIP_POTION",
+  [ACTIVATION_POTION] = "ACTIVATION_POTION",
+  [SWORD] = "SWORD",
+};
 
 char *
 get_tile_ext_str (struct pos *p)
@@ -347,19 +350,7 @@ get_tile_ext_str (struct pos *p)
   case PILLAR:
   case BIG_PILLAR_BOTTOM:
   case ARCH_BOTTOM:
-    switch (e) {
-    case NO_ITEM: s = xasprintf ("NO_ITEM"); break;
-    case EMPTY_POTION: s = xasprintf ("EMPTY_POTION"); break;
-    case SMALL_HP_POTION: s = xasprintf ("SMALL_HP_POTION"); break;
-    case BIG_HP_POTION: s = xasprintf ("BIG_HP_POTION"); break;
-    case SMALL_POISON_POTION: s = xasprintf ("SMALL_POISON_POTION"); break;
-    case BIG_POISON_POTION: s = xasprintf ("BIG_POISON_POTION"); break;
-    case FLOAT_POTION: s = xasprintf ("FLOAT_POTION"); break;
-    case FLIP_POTION: s = xasprintf ("FLIP_POTION"); break;
-    case ACTIVATION_POTION: s = xasprintf ("ACTIVATION_POTION"); break;
-    case SWORD: s = xasprintf ("SWORD"); break;
-    default: assert (false); break;
-    }
+    s = xasprintf ("%s", item_str[e]);
     break;
   case LOOSE_FLOOR:
     s = xasprintf ("%s", e ? "CANT_FALL" : "FALL");

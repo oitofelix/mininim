@@ -28,7 +28,7 @@ include ../documentation.am
 #######################
 
 if HELP2MAN
-SUBDIRS = man
+#SUBDIRS = man
 endif
 
 TEXI2DVI := ${TEXI2DVI} ${texinfo_includes}

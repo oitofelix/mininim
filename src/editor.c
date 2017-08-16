@@ -57,6 +57,8 @@ editor (void)
 {
   if (edit == EDIT_NONE) return;
 
+  update_editor_gui ();
+
   struct bmenu_item bmain_menu[] =
     {{'T', "TILE>"},
      {'E', "EVENT>"},
@@ -549,7 +551,7 @@ editor (void)
     case 'H': f = HIDDEN_FLOOR; break;
     }
 
-    str = xasprintf ("%s%s", fake_fg ? "FAKE " : "", get_tile_fg_name (f));
+    str = xasprintf ("%s%s", fake_fg ? "FAKE " : "", tile_fg_str[f]);
     register_tile_undo (&undo, &p,
                        ! fake_fg ? f : MIGNORE,
                        MIGNORE, MIGNORE,
@@ -579,7 +581,7 @@ editor (void)
     case 'A': f = ARCH_BOTTOM; break;
     }
 
-    str = xasprintf ("%s%s", fake_fg ? "FAKE " : "", get_tile_fg_name (f));
+    str = xasprintf ("%s%s", fake_fg ? "FAKE " : "", tile_fg_str[f]);
     register_tile_undo (&undo, &p,
                        ! fake_fg ? f : MIGNORE,
                        MIGNORE, MIGNORE,
@@ -611,7 +613,7 @@ editor (void)
     case 'L': f = LEVEL_DOOR; break;
     }
 
-    str = xasprintf ("%s%s", fake_fg ? "FAKE " : "", get_tile_fg_name (f));
+    str = xasprintf ("%s%s", fake_fg ? "FAKE " : "", tile_fg_str[f]);
     register_tile_undo (&undo, &p,
                        ! fake_fg ? f : MIGNORE,
                        MIGNORE, MIGNORE,
@@ -639,7 +641,7 @@ editor (void)
     case 'T': f = TCARPET; break;
     }
 
-    str = xasprintf ("%s%s", fake_fg ? "FAKE " : "", get_tile_fg_name (f));
+    str = xasprintf ("%s%s", fake_fg ? "FAKE " : "", tile_fg_str[f]);
     register_tile_undo (&undo, &p,
                        ! fake_fg ? f : MIGNORE,
                        MIGNORE, MIGNORE,
@@ -669,7 +671,7 @@ editor (void)
     case 'R': f = ARCH_TOP_RIGHT; break;
     }
 
-    str = xasprintf ("%s%s", fake_fg ? "FAKE " : "", get_tile_fg_name (f));
+    str = xasprintf ("%s%s", fake_fg ? "FAKE " : "", tile_fg_str[f]);
     register_tile_undo (&undo, &p,
                        ! fake_fg ? f : MIGNORE,
                        MIGNORE, MIGNORE,
@@ -710,7 +712,7 @@ editor (void)
 
     register_tile_undo (&undo, &p,
                        MIGNORE, b, MIGNORE, MIGNORE,
-                       NULL, true, get_tile_bg_name (b));
+                       NULL, true, tile_bg_str[b]);
     break;
   case EDIT_NUMERICAL_BG:
     if (! is_valid_pos (&p)) {
@@ -769,7 +771,7 @@ editor (void)
 
       register_tile_undo (&undo, &p,
                          MIGNORE, MIGNORE, e, MIGNORE,
-                         NULL, true, get_item_name (e));
+                         NULL, true, item_str[e]);
       break;
     case LOOSE_FLOOR:
       al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
@@ -893,9 +895,9 @@ editor (void)
     free_ext_str = false;
 
     f = fg (&p);
-    fg_str = get_tile_fg_name (f);
-    bg_str = get_tile_bg_name (bg (&p));
-    fake_str = is_fake (&p) ? get_tile_fg_name (fake (&p)) : NULL;
+    fg_str = tile_fg_str[f];
+    bg_str = tile_bg_str[bg (&p)];
+    fake_str = is_fake (&p) ? tile_fg_str[fake (&p)] : NULL;
 
     e = ext (&p);
 
@@ -903,7 +905,7 @@ editor (void)
     case FLOOR: case BROKEN_FLOOR: case SKELETON_FLOOR:
     case STUCK_FLOOR: case HIDDEN_FLOOR: case PILLAR:
     case BIG_PILLAR_BOTTOM: case ARCH_BOTTOM:
-      ext_str = get_item_name (e);
+      ext_str = item_str[e];
       break;
     case LOOSE_FLOOR:
       ext_str = e ? "CAN'T FALL" : "FALL";
@@ -1868,11 +1870,13 @@ void
 enter_editor (void)
 {
   edit = last_edit;
+  show_editor_gui ();
 }
 
 void
 exit_editor (int priority)
 {
+  hide_editor_gui ();
   if (edit != EDIT_NONE) last_edit = edit;
   edit = EDIT_NONE;
   msg = NULL;

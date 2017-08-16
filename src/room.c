@@ -297,7 +297,7 @@ draw_tile_fg (ALLEGRO_BITMAP *bitmap, struct pos *p)
     draw_closer_floor (bitmap, p);
     break;
   case STUCK_FLOOR:
-    draw_object_index_part (bitmap, "CLOSER_FLOOR", "PRESSED", "LEFT", p);
+    draw_object_part (bitmap, "CLOSER_FLOOR", "PRESSED", p);
     break;
   case HIDDEN_FLOOR: return;
   case PILLAR:
@@ -760,6 +760,37 @@ draw_tile_fg_front (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f)
   case MIRROR: draw_mirror_fg (bitmap, p, f); break;
   default: assert (false); break;
   }
+}
+
+ALLEGRO_BITMAP *
+get_tile_fg_bitmap (struct tile *tile_ref, float scale)
+{
+  float sx = (scale * ORIGINAL_WIDTH) / REAL_WIDTH;
+  float sy = (scale * ORIGINAL_HEIGHT) / REAL_HEIGHT;
+  int w = OW (2 * PLACE_WIDTH) * sx;
+  int h_ex = 20;
+  int h = OH (PLACE_HEIGHT + 3 + h_ex) * sy;
+  ALLEGRO_BITMAP *b = create_bitmap (w, h);
+  clear_bitmap (b, TRANSPARENT_COLOR);
+  ALLEGRO_TRANSFORM trans;
+  al_build_transform (&trans, 0, OH(h_ex) * sx, sx, sy, 0);
+  al_set_target_bitmap (b);
+  al_use_transform (&trans);
+  struct pos p; new_pos (&p, &global_level, room_view, 0, 0);
+  struct tile *t = tile (&p);
+  struct tile t_bkp = *t;
+
+  /* workaround for showing proper graphics */
+  t->fg = carpet_cs (tile_ref->fg) ? tile_ref->fg : 0;
+
+  t->fake = tile_ref->fg;
+  t->ext = tile_ref->ext;
+  tile_caching = true;
+  if (tile_ref->fg == LEVEL_DOOR) draw_level_door (b, &p);
+  draw_tile_fg (b, &p);
+  tile_caching = false;
+  *t = t_bkp;
+  return b;
 }
 
 ALLEGRO_COLOR

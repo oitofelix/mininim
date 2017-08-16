@@ -134,8 +134,8 @@ destroy_multi_room (void)
   if (mr.cell) {
     for (x = 0; x < mr.w; x++) {
       for (y = 0; y < mr.h; y++) {
-        destroy_bitmap (mr.cell[x][y].screen);
-        destroy_bitmap (mr.cell[x][y].cache);
+        al_destroy_bitmap (mr.cell[x][y].screen);
+        al_destroy_bitmap (mr.cell[x][y].cache);
       }
       al_free (mr.cell[x]);
       al_free (mr.last.cell[x]);
@@ -182,8 +182,8 @@ create_multi_room_bitmaps (void)
         - (y < mr.h - 1 ? 8 : 0);
       sw = OW (sw);
       sh = OH (sh);
-      destroy_bitmap (mr.cell[x][y].screen);
-      destroy_bitmap (mr.cell[x][y].cache);
+      al_destroy_bitmap (mr.cell[x][y].screen);
+      al_destroy_bitmap (mr.cell[x][y].cache);
       mr.cell[x][y].screen = create_bitmap (sw, sh);
       mr.cell[x][y].cache = create_bitmap (sw, sh);
       clear_bitmap (mr.cell[x][y].screen, BLACK);
@@ -666,7 +666,7 @@ update_room0_cache (void)
   invalid_pos (&mouse_pos);
   tile_caching = true;
 
-  destroy_bitmap (room0);
+  al_destroy_bitmap (room0);
   room0 = create_bitmap (OW (ORIGINAL_WIDTH), OH (ORIGINAL_HEIGHT));
 
   clear_bitmap (room0, TRANSPARENT_COLOR);

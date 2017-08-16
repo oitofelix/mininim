@@ -299,6 +299,8 @@ enum main_menu {
 };
 
 /* functions */
+bool load_led (const char *filename);
+
 void load_icons (void);
 void unload_icons (void);
 

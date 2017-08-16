@@ -20,32 +20,12 @@
 
 #include "mininim.h"
 
-static const char *potion_string (int e);
-
-const char *
-potion_string (int e)
-{
-  switch (e) {
-  case NO_ITEM: return "NO_ITEM";
-  case EMPTY_POTION: return "EMPTY_POTION";
-  case SMALL_HP_POTION: return "SMALL_HP_POTION";
-  case BIG_HP_POTION: return "BIG_HP_POTION";
-  case SMALL_POISON_POTION: return "SMALL_POISON_POTION";
-  case BIG_POISON_POTION: return "BIG_POISON_POTION";
-  case FLOAT_POTION: return "FLOAT_POTION";
-  case FLIP_POTION: return "FLIP_POTION";
-  case ACTIVATION_POTION: return "ACTIVATION_POTION";
-  case SWORD: return "SWORD";
-  default: assert (false); break;
-  }
-}
-
 void
 draw_potion (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   push_drawn_rectangle (bitmap);
   int e = ext (p);
-  const char *potion = potion_string (e);
+  const char *potion = item_str[e];
   draw_object (bitmap, potion, p);
   struct drawn_rectangle *dr = pop_drawn_rectangle ();
   push_clipping_rectangle (dr->bitmap, dr->x, dr->y, dr->w, dr->h);

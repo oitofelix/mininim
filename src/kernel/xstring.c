@@ -68,6 +68,15 @@ str_end_matches (const char *s, const char *m)
   return ls >= lm && ! strcasecmp (s + ls - lm, m);
 }
 
+void
+set_string_var (char **var, const char *value)
+{
+  char *old_str = *var;
+  if (value) *var = xasprintf ("%s", value);
+  else *var = NULL;
+  al_free (old_str);
+}
+
 
 
 static size_t *fmt_width;

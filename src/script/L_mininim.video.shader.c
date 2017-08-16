@@ -82,8 +82,12 @@ BEGIN_LUA (L_mininim_video_shader)
     }
     const char *filename = lua_tostring (L, i);
     if (! attach_shader_source_file (s, filename)) {
-      fprintf (stderr, "cannot attach shader source file '%s'\n%s\n",
-               filename, al_get_shader_log (s));
+      const char *log = al_get_shader_log (s);
+      if (strcmp (log, ""))
+        fprintf (stderr, "cannot attach shader source file '%s'\n%s\n",
+                 filename, log);
+      else fprintf (stderr, "cannot find shader source file '%s'\n",
+                    filename);
       al_destroy_shader (s);
       return 0;
     }
