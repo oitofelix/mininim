@@ -313,7 +313,7 @@ play_anim (void (*draw_callback) (void),
 
 
     case ALLEGRO_EVENT_MENU_CLICK:
-      menu_mid (&event);
+      process_main_menu_event (&event);
       break;
 
 

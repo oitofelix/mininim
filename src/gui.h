@@ -22,6 +22,7 @@
 #define MININIM_GUI_H
 
 void init_gui (int argc, char **argv);
+bool load_led (const char *filename);
 Ihandle *bitmap_to_iup_image (ALLEGRO_BITMAP *b, ALLEGRO_COLOR bg);
 void set_button_bitmap (Ihandle *ih, ALLEGRO_BITMAP *b);
 void dialog_fit_natural_size (Ihandle *ih);

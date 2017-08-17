@@ -30,6 +30,32 @@ init_gui (int argc, char **argv)
   IupSetHandle ("logo_icon", logo_icon_image);
 }
 
+const char *load_led_error_msg;
+
+intptr_t
+load_led_sub (const char *filename)
+{
+  if (! al_filename_exists (filename)) return false;
+  const char *msg = IupLoad (filename);
+  if (msg) {
+    load_led_error_msg = msg;
+    return false;
+  }
+  return true;
+}
+
+bool
+load_led (const char *filename)
+{
+  load_led_error_msg = NULL;
+  bool success = load_resource (filename, (load_resource_f) load_led_sub,
+                                true);
+  if (success) return true;
+  if (load_led_error_msg) error (0, 0, "%s", load_led_error_msg);
+  else error (0, 0, "LED file \"%s\" not found", filename);
+  return false;
+}
+
 Ihandle *
 bitmap_to_iup_image (ALLEGRO_BITMAP *b, ALLEGRO_COLOR bg)
 {

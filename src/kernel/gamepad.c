@@ -289,7 +289,8 @@ joystick_info (void)
   int i, j;
 
   if (! al_is_joystick_installed ()) {
-    if (HAPTIC_FEATURE && WINDOWS_PORT) {
+#if WINDOWS_PORT
+    if (HAPTIC_FEATURE) {
       init_dialog ();
       init_video ();
       ALLEGRO_BITMAP *joystick_big_icon =
@@ -297,6 +298,7 @@ joystick_info (void)
       show_logo ("Querying joystick...", NULL, joystick_big_icon);
       al_destroy_bitmap (joystick_big_icon);
     }
+#endif
     init_gamepad ();
     calibrate_joystick ();
   }

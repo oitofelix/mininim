@@ -136,9 +136,11 @@ init_video (void)
     error (0, 0, "%s (void): failed to initialize primitives addon",
            __func__);
 
+#if MACOSX_PORT
   /* workaround to make Mac OS X render the title screen cutscene
      properly */
-  if (MACOSX_PORT) al_acknowledge_resize (display);
+  al_acknowledge_resize (display);
+#endif
 
   /* workaround bug in which first access to clipboard fails */
   char *clipboard_text = al_get_clipboard_text (display);
@@ -252,7 +254,11 @@ clone_scaled_memory_bitmap (ALLEGRO_BITMAP *bitmap, int w, int h, int flags)
 {
   ALLEGRO_BITMAP *scaled_bitmap = create_memory_bitmap (w, h);
   al_set_target_bitmap (scaled_bitmap);
-  al_clear_to_color (WINDOWS_PORT ? WHITE : TRANSPARENT_COLOR);
+#if WINDOWS_PORT
+  al_clear_to_color (WHITE);
+#else
+  al_clear_to_color (TRANSPARENT_COLOR);
+#endif
   al_draw_scaled_bitmap (bitmap, 0, 0,
                          get_bitmap_width (bitmap),
                          get_bitmap_height (bitmap),
@@ -342,13 +348,14 @@ get_shader_platform (ALLEGRO_SHADER *s)
 void
 validate_bitmap_for_mingw (ALLEGRO_BITMAP *bitmap)
 {
-  if (! WINDOWS_PORT || ! bitmap) return;
-
+#if WINDOWS_PORT
+  if (! bitmap) return;
   /* work around a bug (MinGW target), where bitmaps are loaded as
      black/transparent images */
   al_lock_bitmap(bitmap, ALLEGRO_PIXEL_FORMAT_ANY,
 		 ALLEGRO_LOCK_READWRITE);
   al_unlock_bitmap(bitmap);
+#endif
 }
 
 ALLEGRO_BITMAP *

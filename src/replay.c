@@ -849,3 +849,12 @@ print_replay_favorites (void)
     return false;
   }
 }
+
+int
+replay_favorite_index_by_menu (ALLEGRO_MENU *menu)
+{
+  size_t i;
+  int m = min_int (replay_favorite_nmemb, UINT16_MAX);
+  for (i = 0; i < m; i++) if (replay_favorite[i].m == menu) return i;
+  return -1;
+}

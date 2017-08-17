@@ -55,6 +55,14 @@ struct replay {
 struct replay_favorite {
   char *filename;
   uint64_t cycle;
+  ALLEGRO_MENU *m;
+  uint16_t mid;
+};
+
+enum replay_favorite_menu_commands {
+  GO_TO_REPLAY_FAVORITE = 1,
+  REPLACE_REPLAY_FAVORITE,
+  REMOVE_REPLAY_FAVORITE,
 };
 
 /* funtions */
@@ -105,6 +113,7 @@ void add_current_replay_favorite (void);
 void remove_replay_favorite (size_t i);
 void free_replay_favorites (void);
 bool print_replay_favorites (void);
+int replay_favorite_index_by_menu (ALLEGRO_MENU *menu);
 
 /* variables */
 extern struct replay recorded_replay;

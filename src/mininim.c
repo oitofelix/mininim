@@ -1360,22 +1360,22 @@ main (int _argc, char **_argv)
   struct config_info config_info;
 
   /* glob command line for MinGW */
-  if (WINDOWS_PORT) {
-    glob_t gl; memset (&gl, 0, sizeof (gl));
-    size_t i;
-    for (i = 0; i < _argc; i++) {
-      repl_str_char (_argv[i], ALLEGRO_NATIVE_PATH_SEP, '/');
-      glob (_argv[i], GLOB_APPEND | GLOB_NOCHECK | GLOB_NOESCAPE
-            | GLOB_PERIOD | GLOB_BRACE | GLOB_NOMAGIC | GLOB_TILDE,
-            NULL, &gl);
-    }
-    argc = gl.gl_pathc;
-    argv = gl.gl_pathv;
-  } else {
-    /* make command-line arguments available globally */
-    argc = _argc;
-    argv = _argv;
+#if WINDOWS_PORT
+  glob_t gl; memset (&gl, 0, sizeof (gl));
+  size_t i;
+  for (i = 0; i < _argc; i++) {
+    repl_str_char (_argv[i], ALLEGRO_NATIVE_PATH_SEP, '/');
+    glob (_argv[i], GLOB_APPEND | GLOB_NOCHECK | GLOB_NOESCAPE
+          | GLOB_PERIOD | GLOB_BRACE | GLOB_NOMAGIC | GLOB_TILDE,
+          NULL, &gl);
   }
+  argc = gl.gl_pathc;
+  argv = gl.gl_pathv;
+#else
+  /* make command-line arguments available globally */
+  argc = _argc;
+  argv = _argv;
+#endif
 
   set_program_name (argv[0]);
 

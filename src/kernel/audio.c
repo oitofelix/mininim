@@ -75,9 +75,11 @@ audio_source_eq (struct audio_source *as0, struct audio_source *as1)
     return as0->data.sample == as1->data.sample;
     break;
   case AUDIO_STREAM:
-    if (WINDOWS_PORT)
-      return ! strcasecmp (as0->data.stream, as1->data.stream);
-    else return ! strcmp (as0->data.stream, as1->data.stream);
+#if WINDOWS_PORT
+    return ! strcasecmp (as0->data.stream, as1->data.stream);
+#else
+    return ! strcmp (as0->data.stream, as1->data.stream);
+#endif
     break;
   default: assert (false); break;
   }
