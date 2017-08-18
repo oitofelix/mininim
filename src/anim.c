@@ -345,7 +345,7 @@ play_anim (void (*draw_callback) (void),
 
       if (pause_anim) break;
 
-      anim_key_bindings ();
+      animation_hotkeys_cb (NULL, 0);
       break;
     }
   }

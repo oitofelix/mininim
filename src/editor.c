@@ -48,6 +48,27 @@ uint64_t editor_register;
 
 bool selection_locked;
 
+void
+change_tile_fg (struct pos *p, enum tile_fg f)
+{
+  char *str = xasprintf ("%s", tile_fg_str[f]);
+  register_tile_undo (&undo, p,
+                      f, MIGNORE, MIGNORE, MIGNORE,
+                      NULL, true, str);
+  al_free (str);
+}
+
+void
+change_tile_fake (struct pos *p, enum tile_fg f)
+{
+  char *str = xasprintf ("FAKE %s", tile_fg_str[f]);
+  register_tile_undo (&undo, p,
+                      MIGNORE, MIGNORE, MIGNORE, f,
+                      NULL, true, str);
+  al_free (str);
+}
+
+
 bool
 can_edit (void)
 {
@@ -523,7 +544,8 @@ editor (void)
   case EDIT_FLOOR:
     if (! is_valid_pos (&p)) {
       editor_msg ("SELECT TILE", EDITOR_CYCLES_0);
-      al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
+      al_set_system_mouse_cursor
+        (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       if (was_bmenu_return_pressed (true)) edit = EDIT_FG;
       break;
     }
@@ -553,13 +575,9 @@ editor (void)
     case 'H': f = HIDDEN_FLOOR; break;
     }
 
-    str = xasprintf ("%s%s", fake_fg ? "FAKE " : "", tile_fg_str[f]);
-    register_tile_undo (&undo, &p,
-                       ! fake_fg ? f : MIGNORE,
-                       MIGNORE, MIGNORE,
-                       fake_fg ? f : MIGNORE,
-                       NULL, true, str);
-    al_free (str);
+    if (fake_fg) change_tile_fake (&p, f);
+    else change_tile_fg (&p, f);
+
     break;
   case EDIT_PILLAR:
     if (! is_valid_pos (&p)) {

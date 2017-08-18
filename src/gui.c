@@ -20,14 +20,34 @@
 
 #include "mininim.h"
 
+static int gui_global_keyboard_cb (int c, int press);
+
 void
 init_gui (int argc, char **argv)
 {
   /* Initialize IUP */
   IupOpen(&argc, &argv);
+
+  /* Integrate keyboard events */
+  IupSetGlobal ("AUTOREPEAT", "YES");
+  IupSetGlobal ("INPUTCALLBACKS", "YES");
+  IupSetFunction ("GLOBALKEYPRESS_CB", (Icallback) gui_global_keyboard_cb);
+
   Ihandle *logo_icon_image =
     bitmap_to_iup_image (logo_icon, TRANSPARENT_COLOR);
   IupSetHandle ("logo_icon", logo_icon_image);
+}
+
+int
+gui_global_keyboard_cb (int c, int press)
+{
+  if (! press) return IUP_CONTINUE;
+
+  if (animation_hotkeys_cb (NULL, c) == IUP_IGNORE)
+    return IUP_IGNORE;
+  else if (level_hotkeys_cb (NULL, c) == IUP_IGNORE)
+    return IUP_IGNORE;
+  else return IUP_CONTINUE;
 }
 
 const char *load_led_error_msg;

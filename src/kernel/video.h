@@ -35,6 +35,8 @@ ALLEGRO_BITMAP *load_scaled_memory_bitmap (char *filename, int w, int h,
                                            int flags);
 ALLEGRO_BITMAP *clone_scaled_memory_bitmap (ALLEGRO_BITMAP *bitmap, int w,
                                             int h, int flags);
+ALLEGRO_BITMAP *clone_scaled_bitmap (ALLEGRO_BITMAP *bitmap, int w,
+                                     int h, int flags);
 ALLEGRO_BITMAP *load_bitmap (const char *filename);
 ALLEGRO_FONT *load_font (const char *filename);
 bool attach_shader_source_file (ALLEGRO_SHADER *shader, const char *filename);

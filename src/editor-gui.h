@@ -22,6 +22,8 @@
 #define MININIM_EDITOR_DIALOG_H
 
 /* functions */
+int editor_key_cb (Ihandle *ih, int c);
+
 void show_editor_gui (void);
 void hide_editor_gui (void);
 void update_editor_gui (void);

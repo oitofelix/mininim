@@ -148,11 +148,7 @@ ALLEGRO_EVENT_SOURCE *aux_menu_event_source (void);
 void show_aux_menu (void);
 void aux_menu (void);
 
-void ui_about_screen (bool value);
-void ui_editor (void);
-
 void dispatch_menu_event (ALLEGRO_EVENT *event);
-void anim_key_bindings (void);
 void level_key_bindings (void);
 
 void show_menu (void);
@@ -172,10 +168,30 @@ bool ui_msg (int priority, const char *template, ...)
   __attribute__ ((format (printf, 2, 3)));
 bool ui_msg_clear (int priority);
 
-void ui_gamepad_mode (enum gpm new_gpm);
-
 void ui_load_replay_favorites (void);
 void ui_go_to_replay_favorite (int i);
+
+void ui_load_game (void);
+void ui_screenshot (void);
+void ui_record_replay (void);
+void ui_play_replay (void);
+void ui_restart_game (void);
+void ui_quit_game (void);
+void ui_change_anim_freq (int f);
+void ui_about_screen (bool value);
+void ui_editor (void);
+void ui_version (void);
+void ui_audio_volume (float volume);
+void ui_full_screen (void);
+void ui_flip_screen (int flags, bool correct_mouse, bool save_only);
+void ui_flip_gamepad (bool v, bool h, bool save_only);
+void ui_gamepad_mode (enum gpm new_gpm);
+void ui_hue_mode (enum hue new_hue);
+void ui_em (enum em new_em);
+void ui_vm (char *new_vm);
+void ui_next_display_mode (void);
+void ui_jump_to_level_rel (int d);
+void ui_save_game (void);
 
 /* variables */
 bool main_menu_enabled;

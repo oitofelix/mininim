@@ -427,10 +427,16 @@ setup_video_mode (char *requested_vm)
     return;
   }
 
-  size_t i;
-  for (i = 0; i < actor_nmemb; i++) {
+  size_t ba_nmemb = actor_nmemb;
+  ALLEGRO_BITMAP **ba = xcalloc (ba_nmemb, sizeof (*ba));
+
+  for (size_t i = 0; i < actor_nmemb; i++) {
     struct actor *a = &actor[i];
-    a->f.b = NULL;
+
+    int bw = (w * get_bitmap_width (a->f.b)) / REAL_WIDTH;
+    int bh = (h * get_bitmap_height (a->f.b)) / REAL_HEIGHT;
+
+    a->f.b = ba[i] = create_bitmap (bw, bh);
     a->f.c.x = round (a->f.c.x);
     a->f.c.y = round (a->f.c.y);
   }
@@ -447,5 +453,13 @@ setup_video_mode (char *requested_vm)
   update_room0_cache ();
   update_cache ();
 
-  if (is_game_paused ()) step_cycle = 1;
+  if (! cutscene) {
+    if (is_game_paused ()) step_cycle = 1;
+    compute_level ();
+    draw_level ();
+    cleanup_level ();
+  }
+
+  for (size_t i = 0; i < ba_nmemb; i++) al_destroy_bitmap (ba[i]);
+  al_free (ba);
 }

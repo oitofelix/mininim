@@ -129,46 +129,30 @@ static void statistics_widget (void);
 static void pause_menu_widget (void);
 static void speed_menu_widget (void);
 
-static void ui_load_game (void);
 static void ui_load_config (void);
-static void ui_save_game (void);
-static void ui_audio_volume (float volume);
 static void ui_mirror_mode (bool mirror);
-static void ui_restart_game (void);
 static void ui_start_game (void);
-static void ui_quit_game (void);
 
-static void ui_full_screen (void);
 static void ui_zoom_fit (enum mr_fit_mode fit);
 static bool ui_set_multi_room (int dw, int dh, bool correct_mouse);
 static void ui_show_coordinates (void);
 static void ui_show_indirect_coordinates (void);
-static void ui_hue_mode (enum hue new_hue);
+
 static void ui_gm (enum gm new_gm);
-static void ui_em (enum em new_em);
-static void ui_vm (char *new_vm);
-static void ui_flip_screen (int flags, bool correct_mouse, bool save_only);
 static void ui_inhibit_screensaver (bool inhibit);
 static void ui_room_drawing (bool draw);
-static void ui_screenshot (void);
 
-static void ui_flip_gamepad (bool v, bool h, bool save_only);
-
-static void ui_play_replay (void);
-static void ui_record_replay (void);
 static void ui_save_replay_favorites (void);
 static void ui_add_replay_favorite (void);
 static void ui_replace_replay_favorite (int i);
 static void ui_remove_replay_favorite (int i);
 static void ui_jump_to_level (int n);
-static void ui_jump_to_level_rel (int d);
 static void ui_jump_to_level_menu (int i);
 static void ui_time (void);
 static void ui_skills (void);
 static void ui_decrease_time_frequency (void);
 static void ui_increase_time_frequency (void);
 static void ui_toggle_time_frequency_constraint (void);
-static void ui_change_anim_freq (int f);
 static void ui_toggle_pause_game (void);
 static void ui_next_frame (void);
 
@@ -184,9 +168,6 @@ static void ui_change_time (int m);
 static void ui_change_prob_skill (int *skill, int new);
 static void ui_change_kca (int d);
 static void ui_change_kcd (int d);
-
-static void ui_version (void);
-static void ui_next_display_mode (void);
 
 static void display_skill (struct actor *k);
 
@@ -1003,7 +984,7 @@ main_menu (void)
             0, "He&lp");
 
 #if WINDOWS_PORT
-  menu.main.unlock_selection =
+  item.main.unlock_selection =
     menu_sitem (selection_locked, NULL, "(L)");
 #else
   if (edit != EDIT_NONE)
@@ -1235,7 +1216,7 @@ navigation_menu (intptr_t index)
     menu_hitem (true, "ROOM %i", mr.room);
 
   menu_sub (&menu.main.view.nav.select.m, true, nav_select_icon,
-            nav_select_menu, 0, "&Selection");
+            nav_select_menu, 0, "Room &Selection");
 
   menu_sub (&menu.main.view.nav.cell.m, true, nav_cell_icon,
             nav_cell_menu, 0, "Scroll &row");
@@ -2059,176 +2040,14 @@ process_aux_menu_event (ALLEGRO_EVENT *event)
 
 
 void
-anim_key_bindings (void)
-{
-  /****************/
-  /* KEY BINDINGS */
-  /****************/
-
-  /* CTRL+L: load game */
-  if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_L)
-      && ! load_config_dialog_thread)
-    ui_load_game ();
-
-  /* CTRL+P: screenshot */
-  else if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_P)
-           && ! save_picture_dialog_thread)
-    ui_screenshot ();
-
-  /* ALT+F7: start/stop replay recording */
-  else if (! command_line_replay
-           && (((title_demo || replay_mode != PLAY_REPLAY)
-                && was_key_pressed (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_F7))
-               || ((replay_mode == RECORD_REPLAY
-                    || recording_replay_countdown > 0)
-                   && was_key_pressed (0, ALLEGRO_KEY_F7))))
-    ui_record_replay ();
-
-  /* F7: load replay/stop replaying */
-  else if (! command_line_replay
-           && ((replay_mode != RECORD_REPLAY
-                && was_key_pressed (0, ALLEGRO_KEY_F7))
-               || (replay_mode == PLAY_REPLAY
-                   && was_key_pressed
-                   (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_F7))))
-    ui_play_replay ();
-
-  /* CTRL+R: restart game */
-  else if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_R))
-    ui_restart_game ();
-
-  /* CTRL+Q: quit game */
-  else if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_Q))
-    ui_quit_game ();
-
-  /* (: decrease time frequency */
-  else if (was_char_pressed ('('))
-    ui_change_anim_freq (anim_freq - 1);
-
-  /* ): increase time frenquency */
-  else if (was_char_pressed (')'))
-    ui_change_anim_freq (anim_freq + 1);
-
-  /* F8: enable/disable level editor */
-  else if (was_key_pressed (0, ALLEGRO_KEY_F8))
-    ui_editor ();
-
-  /* CTRL+V: show engine name and version */
-  else if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_V))
-    ui_version ();
-
-  /* CTRL+S: enable/disable sound */
-  else if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_S)) {
-    if (audio_volume == VOLUME_RANGE_MIN) ui_audio_volume (VOLUME_LOW);
-    else if (audio_volume < VOLUME_RANGE_LOW) ui_audio_volume (VOLUME_MEDIUM);
-    else if (audio_volume < VOLUME_RANGE_MEDIUM) ui_audio_volume (VOLUME_HIGH);
-    else if (audio_volume <= VOLUME_RANGE_MAX) ui_audio_volume (VOLUME_OFF);
-  }
-
-  /* F: enable/disable fullscreen mode */
-  else if ((! active_menu && was_key_pressed (0, ALLEGRO_KEY_F))
-           || was_key_pressed (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_ENTER))
-    ui_full_screen ();
-
-  /* SHIFT+I: flip screen */
-  else if (was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_I)) {
-    switch (screen_flags) {
-    case 0: ui_flip_screen (ALLEGRO_FLIP_VERTICAL, true, false); break;
-    case ALLEGRO_FLIP_VERTICAL:
-      ui_flip_screen (ALLEGRO_FLIP_HORIZONTAL, true, false); break;
-    case ALLEGRO_FLIP_HORIZONTAL:
-      ui_flip_screen (ALLEGRO_FLIP_VERTICAL | ALLEGRO_FLIP_HORIZONTAL,
-                      true, false);
-      break;
-    case ALLEGRO_FLIP_VERTICAL | ALLEGRO_FLIP_HORIZONTAL:
-    default: ui_flip_screen (0, true, false); break;
-    }
-  }
-
-  /* SHIFT+K: flip gamepad */
-  else if (was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_K)) {
-    if (! flip_gamepad_vertical && ! flip_gamepad_horizontal)
-      ui_flip_gamepad (true, false, false);
-    else if (flip_gamepad_vertical && ! flip_gamepad_horizontal)
-      ui_flip_gamepad (false, true, false);
-    else if (! flip_gamepad_vertical && flip_gamepad_horizontal)
-      ui_flip_gamepad (true, true, false);
-    else if (flip_gamepad_vertical && flip_gamepad_horizontal)
-      ui_flip_gamepad (false, false, false);
-  }
-
-  /* CTRL+K: keyboard mode (disables joystick) */
-  else if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_K))
-    ui_gamepad_mode (KEYBOARD);
-
-  /* CTRL+J: joystick mode */
-  else if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_J))
-    ui_gamepad_mode (JOYSTICK);
-
-  /* ALT+F11: change hue palette */
-  else if (was_key_pressed (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_F11)) {
-    if (force_hue)
-      switch (hue) {
-      case HUE_NONE: ui_hue_mode (HUE_GREEN); break;
-      case HUE_GREEN: ui_hue_mode (HUE_GRAY); break;
-      case HUE_GRAY: ui_hue_mode (HUE_YELLOW); break;
-      case HUE_YELLOW: ui_hue_mode (HUE_BLUE); break;
-      case HUE_BLUE: ui_hue_mode (HUE_ORIGINAL); break;
-      }
-    else ui_hue_mode (HUE_NONE);
-  }
-
-  /* F11: change environment mode */
-  else if (was_key_pressed (0, ALLEGRO_KEY_F11)) {
-    if (force_em) {
-      switch (em) {
-      case DUNGEON: ui_em (PALACE); break;
-      case PALACE: ui_em (ORIGINAL_EM); break;
-      }
-    } else ui_em (DUNGEON);
-  }
-
-  /* F12: change video mode */
-  else if (was_key_pressed (0, ALLEGRO_KEY_F12)) {
-    char *next_vm = next_video_mode (video_mode);
-    ui_vm (next_vm);
-    al_free (next_vm);
-  }
-
-  /* D: change display mode */
-  else if (! active_menu && was_key_pressed (0, ALLEGRO_KEY_D))
-    ui_next_display_mode ();
-}
-
-
-
-
-
-
-void
 level_key_bindings (void)
 {
   if (title_demo) return;
 
-  /* CTRL+A: restart level */
-  if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_A))
-    ui_jump_to_level_rel (+0);
-
-  /* SHIFT+L: warp to next level */
-  else if (was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_L))
-    ui_jump_to_level_rel (+1);
-
-  /* SHIFT+M: warp to previous level */
-  else if (was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_M))
-    ui_jump_to_level_rel (-1);
-
-  /* CTRL+G: save game */
-  else if (was_key_pressed (ALLEGRO_KEYMOD_CTRL, ALLEGRO_KEY_G)
-      && ! save_game_dialog_thread)
-    ui_save_game ();
+  level_hotkeys_cb (NULL, 0);
 
   /* SHIFT+F11: change guard mode */
-  else if (was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_F11))
+  if (was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_F11))
       switch (gm) {
       case ORIGINAL_GM: ui_gm (GUARD_GM); break;
       case GUARD_GM: ui_gm (FAT_GM); break;
@@ -2556,7 +2375,7 @@ ui_audio_volume (float volume)
   else if (volume < VOLUME_RANGE_MEDIUM) status = "MEDIUM";
   else if (volume <= VOLUME_RANGE_MAX) status = "HIGH";
 
-  ui_msg (0, "SOUND %s", status);
+  ui_msg (1, "SOUND %s", status);
 
   ui_save_setting (NULL, key, value);
   al_free (value);
@@ -2574,6 +2393,7 @@ ui_screenshot (void)
 void
 ui_restart_game (void)
 {
+  exit_editor (0);
   quit_anim = RESTART_GAME;
 }
 
@@ -2607,10 +2427,10 @@ ui_full_screen (void)
       if (edit == EDIT_NONE) hide_menu ();
     }
 
-    ui_msg (0, "%s: %s", key, value);
+    ui_msg (1, "%s: %s", key, value);
 
     ui_save_setting (NULL, key, value);
-  } else ui_msg (0, "NON-DESKTOP MODE IS FULLSCREEN ONLY");
+  } else ui_msg (1, "NON-DESKTOP MODE IS FULLSCREEN ONLY");
 }
 
 void
@@ -2639,7 +2459,7 @@ ui_zoom_fit (enum mr_fit_mode fit)
 
   apply_mr_fit_mode ();
 
-  ui_msg (0, "ZOOM FIT: %s", value);
+  ui_msg (1, "ZOOM FIT: %s", value);
 
   ui_save_setting (NULL, key, value);
 }
@@ -2651,7 +2471,7 @@ ui_set_multi_room (int dw, int dh, bool correct_mouse)
   char *value;
 
   if (mr.w + dw < 1 || mr.h + dh < 1) {
-    ui_msg (0, "MULTI-ROOM %ix%i", mr.w, mr.h);
+    ui_msg (1, "MULTI-ROOM %ix%i", mr.w, mr.h);
     return false;
   }
 
@@ -2666,7 +2486,7 @@ ui_set_multi_room (int dw, int dh, bool correct_mouse)
   if (mr_coord (m.c.room, -1, NULL, NULL) && correct_mouse)
     set_mouse_coord (&m);
 
-  ui_msg (0, "MULTI-ROOM %ix%i", mr.w, mr.h);
+  ui_msg (1, "MULTI-ROOM %ix%i", mr.w, mr.h);
 
   value = xasprintf ("%ix%i", mr.w, mr.h);
   ui_save_setting (NULL, key, value);
@@ -2686,7 +2506,7 @@ ui_show_coordinates (void)
 
   mr.select_cycles = SELECT_CYCLES;
 
-  ui_msg (0, "S%i L%i R%i A%i B%i", s, l, r, a, b);
+  ui_msg (1, "S%i L%i R%i A%i B%i", s, l, r, a, b);
 }
 
 void
@@ -2701,7 +2521,7 @@ ui_show_indirect_coordinates (void)
 
   mr.select_cycles = SELECT_CYCLES;
 
-  ui_msg (0, "LV%i AL%i AR%i BL%i BR%i",
+  ui_msg (1, "LV%i AL%i AR%i BL%i BR%i",
           global_level.n, al, ar, bl, br);
 }
 
@@ -2746,7 +2566,7 @@ ui_hue_mode (enum hue new_hue)
 
   set_string_var (&hue_mode, value);
 
-  ui_msg (0, "%s: %s", key, value);
+  ui_msg (1, "%s: %s", key, value);
 
   ui_save_setting (NULL, key, value);
 }
@@ -2793,7 +2613,7 @@ ui_gm (enum gm new_gm)
   int i;
   for (i = 0; i < actor_nmemb; i++) apply_guard_mode (&actor[i], gm);
 
-  ui_msg (0, "%s: %s", key, value);
+  ui_msg (1, "%s: %s", key, value);
 
   ui_save_setting (NULL, key, value);
 }
@@ -2824,7 +2644,7 @@ ui_em (enum em new_em)
 
   set_string_var (&env_mode, value);
 
-  ui_msg (0, "%s: %s", key, value);
+  ui_msg (1, "%s: %s", key, value);
 
   ui_save_setting (NULL, key, value);
 }
@@ -2835,12 +2655,12 @@ ui_vm (char *requested_vm)
   setup_video_mode (requested_vm);
 
   if (! video_mode) {
-    ui_msg (0, "NO VIDEO MODE AVAILABLE");
+    ui_msg (1, "NO VIDEO MODE AVAILABLE");
     return;
   }
 
   char *key = "VIDEO MODE";
-  ui_msg (0, "%s: %s", key, video_mode);
+  ui_msg (1, "%s: %s", key, video_mode);
   ui_save_setting (NULL, key, video_mode);
 
   draw_bottom_text (uscreen, NULL, 0);
@@ -2891,7 +2711,7 @@ ui_flip_screen (int flags, bool correct_mouse, bool save_only)
   potion_flags = 0;
   screen_flags = flags;
 
-  ui_msg (0, "%s: %s", key, value);
+  ui_msg (1, "%s: %s", key, value);
 
   ui_flip_gamepad (flip_gamepad_vertical, flip_gamepad_horizontal, true);
   ui_save_setting (NULL, "MIRROR MODE", NULL);
@@ -2906,7 +2726,7 @@ ui_inhibit_screensaver (bool inhibit)
   inhibit_screensaver = inhibit;
   al_inhibit_screensaver (inhibit_screensaver);
 
-  ui_msg (0, "%s: %s", key, value);
+  ui_msg (1, "%s: %s", key, value);
 
   ui_save_setting (NULL, key, value);
 }
@@ -2920,7 +2740,7 @@ ui_room_drawing (bool draw)
   no_room_drawing = ! draw;
   force_full_redraw = true;
 
-  ui_msg (0, "%s: %s", key, value);
+  ui_msg (1, "%s: %s", key, value);
 }
 
 void
@@ -2932,7 +2752,7 @@ ui_gamepad_mode (enum gpm new_gpm)
   switch (new_gpm) {
   case KEYBOARD:
     gpm = KEYBOARD;
-    ui_msg (0, "KEYBOARD MODE");
+    ui_msg (1, "KEYBOARD MODE");
     value = "KEYBOARD";
     ui_save_setting (NULL, key, value);
     break;
@@ -2943,9 +2763,9 @@ ui_gamepad_mode (enum gpm new_gpm)
       value = "JOYSTICK";
       ui_save_setting (NULL, key, value);
       gamepad_rumble (1.0, 0.6);
-      ui_msg (0, "JOYSTICK %s",
+      ui_msg (1, "JOYSTICK %s",
               old_gpm == JOYSTICK ? "CALIBRATED" : "MODE");
-    } else ui_msg (0, "JOYSTICK NOT FOUND");
+    } else ui_msg (1, "JOYSTICK NOT FOUND");
     break;
   default: assert (false);
   }
@@ -2969,7 +2789,7 @@ ui_flip_gamepad (bool v, bool h, bool save_only)
   flip_gamepad_vertical = v;
   flip_gamepad_horizontal = h;
 
-  ui_msg (0, "%s: %s", key, value);
+  ui_msg (1, "%s: %s", key, value);
 
   ui_flip_screen (screen_flags, false, true);
   ui_save_setting (NULL, "MIRROR MODE", NULL);
@@ -3016,7 +2836,7 @@ ui_jump_to_level (int n)
     else if (0 <= n && n < replay_chain_nmemb) {
       replay_next_number = n;
       quit_anim = REPLAY_NEXT;
-    } else ui_msg (0, "%s", n < (int) replay_index
+    } else ui_msg (1, "%s", n < (int) replay_index
                    ? "NO PREVIOUS REPLAY" : "NO NEXT REPLAY");
     break;
   default: print_replay_mode (0); break;
@@ -3095,7 +2915,7 @@ void
 ui_change_anim_freq (int f)
 {
   change_anim_freq (f);
-  if (f > 0) ui_msg (0, "TIME FREQ: %iHz", f);
+  if (f > 0) ui_msg (1, "TIME FREQ: %iHz", f);
 }
 
 void
@@ -3202,7 +3022,7 @@ ui_immortal (bool immortal)
     if (k->current_hp <= 0 && immortal) kid_resurrect (k);
     immortal_mode = immortal;
     k->immortal = immortal;
-    ui_msg (0, "%s: %s", key, value);
+    ui_msg (1, "%s: %s", key, value);
     ui_save_setting (NULL, key, value);
   } else print_replay_mode (0);
 }
@@ -3290,7 +3110,7 @@ ui_change_kcd (int d)
 void
 ui_version (void)
 {
-  ui_msg (0, "MININIM %s", VERSION);
+  ui_msg (1, "MININIM %s", VERSION);
 }
 
 void
@@ -3319,7 +3139,7 @@ ui_next_display_mode (void)
   char *value;
 
   if (display_mode < 0)
-    ui_msg (0, "DISPLAY MODE: DESKTOP");
+    ui_msg (1, "DISPLAY MODE: DESKTOP");
   else {
     int n = al_get_num_display_modes ();
     if (n) {
@@ -3334,12 +3154,12 @@ ui_next_display_mode (void)
             && display_mode != display_mode_bkp)
           goto next_display_mode;
         al_resize_display (display, d.width, d.height);
-        ui_msg (0, "%s: %ix%i", key, d.width, d.height);
+        ui_msg (1, "%s: %ix%i", key, d.width, d.height);
         value = xasprintf ("%i", display_mode);
         ui_save_setting (NULL, key, value);
         al_free (value);
-      } else ui_msg (0, "DISPLAY MODES QUERYING FAILED");
-    } else ui_msg (0, "NO DISPLAY MODE AVAILABLE");
+      } else ui_msg (1, "DISPLAY MODES QUERYING FAILED");
+    } else ui_msg (1, "NO DISPLAY MODE AVAILABLE");
   }
 }
 
@@ -3416,14 +3236,14 @@ ui_add_replay_favorite (void)
     if (replay_favorite[i].cycle == anim_cycle
         && ! strcmp (replay_favorite[i].filename,
                      replay_chain[replay_index].filename)) {
-      ui_msg (0, "DUPLICATE REPLAY FAVORITE");
+      ui_msg (1, "DUPLICATE REPLAY FAVORITE");
       return;
     }
   if (replay_favorite_nmemb < REPLAY_FAVORITE_MID_NMEMB) {
     add_current_replay_favorite ();
     ui_save_replay_favorites ();
-    ui_msg (0, "REPLAY FAVORITE ADDED");
-  } else ui_msg (0, "NO REPLAY FAVORITE SLOT FREE");
+    ui_msg (1, "REPLAY FAVORITE ADDED");
+  } else ui_msg (1, "NO REPLAY FAVORITE SLOT FREE");
 }
 
 void
@@ -3446,7 +3266,7 @@ ui_replace_replay_favorite (int i)
     xasprintf ("%s", replay_chain[replay_index].filename);
   replay_favorite[i].cycle = anim_cycle;
   ui_save_replay_favorites ();
-  ui_msg (0, "REPLAY FAVORITE REPLACED");
+  ui_msg (1, "REPLAY FAVORITE REPLACED");
 }
 
 void
@@ -3454,7 +3274,7 @@ ui_remove_replay_favorite (int i)
 {
   remove_replay_favorite (i);
   ui_save_replay_favorites ();
-  ui_msg (0, "REPLAY FAVORITE REMOVED");
+  ui_msg (1, "REPLAY FAVORITE REMOVED");
 }
 
 
@@ -3585,7 +3405,7 @@ ui_mirror_mode (bool mirror)
 
   mirror_mode (mirror);
 
-  ui_msg (0, "%s: %s", key, value);
+  ui_msg (1, "%s: %s", key, value);
 
   ui_save_setting (NULL, "DISPLAY FLIP MODE", NULL);
   ui_save_setting (NULL, "GAMEPAD FLIP MODE", NULL);
@@ -3614,7 +3434,7 @@ display_skill (struct actor *k)
 {
   struct actor *ke = get_actor_by_id (k->enemy_id);
   if (ke)
-    ui_msg (0, "KCA%i KCD%i A%i CA%i D%i CD%i",
+    ui_msg (1, "KCA%i KCD%i A%i CA%i D%i CD%i",
             k->skill.counter_attack_prob + 1,
             k->skill.counter_defense_prob + 1,
             ke->skill.attack_prob + 1,
@@ -3622,7 +3442,7 @@ display_skill (struct actor *k)
             ke->skill.defense_prob + 1,
             ke->skill.counter_defense_prob + 1);
   else
-    ui_msg (0, "KCA%i KCD%i",
+    ui_msg (1, "KCA%i KCD%i",
             k->skill.counter_attack_prob + 1,
             k->skill.counter_defense_prob + 1);
 }

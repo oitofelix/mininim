@@ -34,6 +34,10 @@ extern int next_level_number;
 extern bool ignore_level_cutscene;
 extern uint64_t death_timer;
 
+void draw_level (void);
+void compute_level (void);
+void cleanup_level (void);
+
 void load_level (void);
 void unload_level (void);
 struct level *copy_level (struct level *ld, struct level *ls);

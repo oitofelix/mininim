@@ -80,6 +80,7 @@
 
 /* IUP */
 #include <iup/iup.h>
+#include <iup/iupcbs.h>
 
 /* MININIM */
 #include "compatibility.h"
@@ -193,6 +194,7 @@
 #include "undo.h"
 #include "multi-room.h"
 #include "replay.h"
+#include "hotkeys.h"
 #include "ui.h"
 #include "gui.h"
 #include "xmath.h"

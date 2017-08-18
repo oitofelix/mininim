@@ -30,6 +30,7 @@ char *trim_string (char *s);
 char *repeat_char (char c, size_t n);
 bool str_end_matches (const char *s, const char *m);
 void set_string_var (char **var, const char *value);
+int str2enum (char *enum2str[], char *str);
 
 
 

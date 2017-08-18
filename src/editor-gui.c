@@ -20,15 +20,20 @@
 
 #include "mininim.h"
 
+static int editor_gui_hotkeys_cb (Ihandle *ih, int c);
+static int move_selection_hotkeys_cb (Ihandle *ih, int c);
+
 static Ihandle *editor_dialog (void);
 static void update_editor_dialog (struct pos *p);
 
 static Ihandle *tile_fg_button (void);
-static int tile_fg_button_action (Ihandle *ih);
-static void update_tile_fg_button (struct tile *t);
+static int tile_fg_button_cb (Ihandle *ih);
+static void update_tile_fg_button (struct pos *p);
+
+static int change_tile_fg_cb (Ihandle *ih);
 
 static Ihandle *tile_fg_dialog (void);
-void update_tile_fg_dialog (void);
+void update_tile_fg_dialog (struct pos *p);
 
 
 /*********************************************************************
@@ -58,8 +63,57 @@ update_editor_gui (void)
   if (IupGetInt (editor_dialog (), "VISIBLE"))
     update_editor_dialog (&selection_pos);
   if (IupGetInt (tile_fg_dialog (), "VISIBLE"))
-    update_tile_fg_dialog ();
+    update_tile_fg_dialog (&selection_pos);
 }
+
+
+
+/*********************************************************************
+ * hotkeys
+ *********************************************************************/
+
+int
+editor_gui_hotkeys_cb (Ihandle *ih, int c)
+{
+  if (move_selection_hotkeys_cb (ih, c) == IUP_IGNORE)
+    return IUP_IGNORE;
+  else return IUP_CONTINUE;
+}
+
+int
+move_selection_hotkeys_cb (Ihandle *ih, int c)
+{
+  if (! selection_locked) return IUP_CONTINUE;
+
+  struct pos p;
+
+  switch (c) {
+  case K_UP:
+    prel (&selection_pos, &p, -1, +0);
+    break;
+  case K_LEFT:
+    prel (&selection_pos, &p, +0, -1);
+    break;
+  case K_RIGHT:
+    prel (&selection_pos, &p, +0, +1);
+    break;
+  case K_DOWN:
+    prel (&selection_pos, &p, +1, +0);
+    break;
+  default:
+    return IUP_CONTINUE;
+  }
+
+  npos (&p, &p);
+
+  if (p.room) {
+    selection_pos = p;
+    mr_focus_room (p.room);
+  }
+
+  return IUP_IGNORE;
+}
+
 
 
 
@@ -101,7 +155,7 @@ editor_dialog (void)
        "TABTITLE3 = Kid,"
        "TABTITLE4 = Guard,"
        "TABTITLE5 = Level")),
-     "TITLE = \"MININIM : Editor\","
+     "TITLE = \"MININIM: Editor\","
      "ICON = logo_icon");
 
   struct pos p; new_pos (&p, &global_level, room_view, 0, 0);
@@ -109,13 +163,15 @@ editor_dialog (void)
 
   dialog_fit_natural_size (ih);
 
+  IupSetCallback (ih, "K_ANY", (Icallback) editor_gui_hotkeys_cb);
+
   return ih;
 }
 
 void
 update_editor_dialog (struct pos *p)
 {
-  if (is_valid_pos (p)) update_tile_fg_button (tile (p));
+  update_tile_fg_button (p);
 
   /* update tile_fg_name label */
   /* .... */
@@ -136,12 +192,12 @@ tile_fg_button (void)
     (IupSetAttributes
      (IupButton (NULL, NULL),
       "IMAGE = NOIMAGE"),
-     "ACTION", tile_fg_button_action,
+     "ACTION", tile_fg_button_cb,
      NULL);
 }
 
 int
-tile_fg_button_action (Ihandle *ih)
+tile_fg_button_cb (Ihandle *ih)
 {
   bool visible = IupGetInt (tile_fg_dialog (), "VISIBLE");
   if (visible) IupHide (tile_fg_dialog ());
@@ -150,7 +206,7 @@ tile_fg_button_action (Ihandle *ih)
 }
 
 void
-update_tile_fg_button (struct tile *t)
+update_tile_fg_button (struct pos *p)
 {
   static struct {
     char *video_mode;
@@ -159,24 +215,47 @@ update_tile_fg_button (struct tile *t)
     struct tile tile;
   } last;
 
+  IupSetAttribute
+    (tile_fg_button (), "ACTIVE", is_valid_pos (p) ? "YES" : "NO");
+
+  struct tile *t;
+  bool valid_pos = is_valid_pos (p);
+  if (valid_pos) t = tile (p);
+
   if (last.video_mode
       && ! strcmp (video_mode, last.video_mode)
       && last.em == em
       && last.hue == hue
-      && last.tile.fg == t->fg
-      && (last.tile.ext == t->ext
+      && (! valid_pos || last.tile.fg == t->fg)
+      && (! valid_pos || last.tile.ext == t->ext
           || ! carpet_cs (last.tile.fg))) return;
   else {
     set_string_var (&last.video_mode, video_mode);
     last.em = em;
     last.hue = hue;
-    last.tile = *t;
+    if (valid_pos) last.tile = *t;
   }
 
-  ALLEGRO_BITMAP *b = get_tile_fg_bitmap (t, 2);
+  ALLEGRO_BITMAP *b = get_tile_fg_bitmap (valid_pos ? t : &last.tile, 2);
   set_button_bitmap (tile_fg_button (), b);
   al_destroy_bitmap (b);
 }
+
+
+/*********************************************************************
+ * change_tile_fg_cb
+ *********************************************************************/
+
+int
+change_tile_fg_cb (Ihandle *ih)
+{
+  if (! is_valid_pos (&selection_pos)) return IUP_DEFAULT;
+  char *name = IupGetAttribute (ih, "NAME");
+  enum tile_fg f = str2enum (tile_fg_str, name);
+  change_tile_fg (&selection_pos, f);
+  return IUP_DEFAULT;
+}
+
 
 
 /*********************************************************************
@@ -348,6 +427,7 @@ tile_fg_dialog (void)
            IupLabel ("ARCH_TOP_RIGHT"),
            NULL),
           NULL),
+         "NAME = GRID,"
          "ORIENTATION = HORIZONTAL,"
          "NUMDIV = 5,"
          "SIZECOL = -1,"
@@ -364,24 +444,47 @@ tile_fg_dialog (void)
         IupSetAttributes (IupFill (), "RASTERSIZE = 0x10"),
         NULL),
        "ALIGNMENT = ACENTER")),
-     "TITLE = \"MININIM : Editor/Foreground\","
+     "TITLE = \"MININIM: Editor/Foreground\","
      "ICON = logo_icon");
 
-  update_tile_fg_dialog ();
+  struct pos p; new_pos (&p, &global_level, room_view, 0, 0);
+  update_tile_fg_dialog (&p);
 
   dialog_fit_natural_size (ih);
+
+  IupSetCallback (ih, "K_ANY", (Icallback) editor_gui_hotkeys_cb);
+
+  for (int i = 0; i < TILE_FGS; i++) {
+    Ihandle *button =
+      IupGetDialogChild (ih, tile_fg_str [i]);
+
+    /* make the button black so its selection is white (at least in
+       Motif) */
+    IupSetAttribute (button, "BGCOLOR", "0 0 0");
+
+    /* centralize label */
+    Ihandle *vbox = IupGetParent (button);
+    IupSetAttribute (vbox, "ALIGNMENT", "ACENTER");
+
+    /* set callback */
+    IupSetCallback (button, "ACTION", change_tile_fg_cb);
+  }
 
   return ih;
 }
 
 void
-update_tile_fg_dialog (void)
+update_tile_fg_dialog (struct pos *p)
 {
   static struct {
     char *video_mode;
     enum em em;
     enum hue hue;
   } last;
+
+  /* update active status */
+  Ihandle *grid = IupGetDialogChild (tile_fg_dialog (), "GRID");
+  IupSetAttribute (grid, "ACTIVE", is_valid_pos (p) ? "YES" : "NO");
 
   if (last.video_mode
       && ! strcmp (video_mode, last.video_mode)
@@ -397,18 +500,10 @@ update_tile_fg_dialog (void)
     Ihandle *button =
       IupGetDialogChild (tile_fg_dialog (), tile_fg_str [i]);
 
-    /* Make the button black so its selection is white (at least in
-       Motif) */
-    IupSetAttribute (button, "BGCOLOR", "0 0 0");
-
     /* update image */
     struct tile t = {.fg = i, .ext = 0};
     ALLEGRO_BITMAP *b = get_tile_fg_bitmap (&t, 1);
     set_button_bitmap (button, b);
     al_destroy_bitmap (b);
-
-    /* centralize label */
-    Ihandle *vbox = IupGetParent (button);
-    IupSetAttribute (vbox, "ALIGNMENT", "ACENTER");
   }
 }

@@ -21,9 +21,6 @@
 #include "mininim.h"
 
 /* functions */
-static void draw_level (void);
-static void compute_level (void);
-static void cleanup_level (void);
 static void process_death (void);
 static void draw_hp (ALLEGRO_BITMAP *bitmap, struct actor *k);
 
@@ -605,7 +602,7 @@ unload_level (void)
   unload_mouse ();
 }
 
-static void
+void
 compute_level (void)
 {
   size_t i;
@@ -785,7 +782,7 @@ compute_level (void)
   if (! play_time_stopped) play_time++;
 }
 
-static void
+void
 cleanup_level (void)
 {
   unpress_opener_floors ();
@@ -834,7 +831,7 @@ process_death (void)
 }
 
 
-static void
+void
 draw_level (void)
 {
   draw_multi_rooms ();

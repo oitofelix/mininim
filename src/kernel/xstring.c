@@ -77,6 +77,16 @@ set_string_var (char **var, const char *value)
   al_free (old_str);
 }
 
+int
+str2enum (char *enum2str[], char *str)
+{
+  for (size_t i = 0; enum2str[i]; i++)
+    if (! strcmp (str, enum2str[i])) return i;
+  return -1;
+}
+
+
+
 
 
 static size_t *fmt_width;

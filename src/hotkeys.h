@@ -1,5 +1,5 @@
 /*
-  native-level.h -- native level module;
+  hotkeys.h -- hotkeys module;
 
   Copyright (C) 2015, 2016, 2017 Bruno Félix Rezende Ribeiro
   <oitofelix@gnu.org>
@@ -18,18 +18,10 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MININIM_NATIVE_LEVEL_H
-#define MININIM_NATIVE_LEVEL_H
+#ifndef MININIM_HOTKEYS_H
+#define MININIM_HOTKEYS_H
 
-/* functions */
-struct level *next_native_level (struct level *l, int n);
-struct level *load_native_level (struct level *l, int n);
-bool save_native_level (struct level *l, char *filename);
-char *get_tile_ext_str (struct pos *p);
+int animation_hotkeys_cb (Ihandle *ih, int c);
+int level_hotkeys_cb (Ihandle *ih, int c);
 
-/* variables */
-extern char *tile_fg_str[];
-extern char *tile_bg_str[];
-extern char *item_str[];
-
-#endif	/* MININIM_NATIVE_LEVEL_H */
+#endif	/* MININIM_HOTKEYS_H */

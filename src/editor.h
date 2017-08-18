@@ -28,6 +28,9 @@ extern uint64_t editor_register;
 extern bool selection_locked;
 
 /* functions */
+void change_tile_fg (struct pos *p, enum tile_fg f);
+void change_tile_fake (struct pos *p, enum tile_fg f);
+
 bool can_edit (void);
 void editor (void);
 void enter_editor (void);

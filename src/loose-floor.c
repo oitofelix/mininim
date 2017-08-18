@@ -301,7 +301,7 @@ compute_loose_floor_fall (struct loose_floor *l)
 
   struct frame nf;
   struct frame_offset fo;
-  fo.b = l->f.b;
+  fo.b = l->f.b = get_correct_falling_loose_floor_bitmap (l->broken);
   fo.dx = 0;
   fo.dy = speed;
   next_frame (&l->f, &nf, &fo);

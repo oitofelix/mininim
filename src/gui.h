@@ -21,6 +21,7 @@
 #ifndef MININIM_GUI_H
 #define MININIM_GUI_H
 
+/* functions */
 void init_gui (int argc, char **argv);
 bool load_led (const char *filename);
 Ihandle *bitmap_to_iup_image (ALLEGRO_BITMAP *b, ALLEGRO_COLOR bg);

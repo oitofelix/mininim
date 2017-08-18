@@ -265,6 +265,19 @@ clone_scaled_memory_bitmap (ALLEGRO_BITMAP *bitmap, int w, int h, int flags)
 }
 
 ALLEGRO_BITMAP *
+clone_scaled_bitmap (ALLEGRO_BITMAP *bitmap, int w, int h, int flags)
+{
+  ALLEGRO_BITMAP *scaled_bitmap = create_bitmap (w, h);
+  al_set_target_bitmap (scaled_bitmap);
+  al_clear_to_color (TRANSPARENT_COLOR);
+  al_draw_scaled_bitmap (bitmap, 0, 0,
+                         get_bitmap_width (bitmap),
+                         get_bitmap_height (bitmap),
+                         0, 0, w, h, flags);
+  return scaled_bitmap;
+}
+
+ALLEGRO_BITMAP *
 load_bitmap (const char *filename)
 {
   int flags = al_get_new_bitmap_flags ();

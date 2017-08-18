@@ -182,7 +182,7 @@ draw_actors (ALLEGRO_BITMAP *bitmap)
   size_t i;
   for (i = 0; i < actor_nmemb; i++) {
     a = &actor[i];
-    if (a->invisible) continue;
+    if (a->invisible || ! a->f.b) continue;
     draw_actor_frame (bitmap, a);
     draw_room_actor_front (bitmap, a);
   }

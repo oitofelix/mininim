@@ -30,18 +30,19 @@ include documentation.am
 
 bin_PROGRAMS = mininim
 mininim_SOURCES = src/mininim.c src/mininim.h src/compatibility.h			\
-	  src/ui.c src/ui.h src/gui.c src/gui.h src/constants.h src/types.h	\
-	  src/colors.h src/anim.c src/anim.h src/actor.c src/actor.h				\
-	  src/pos.c src/pos.h src/physics.c src/physics.h src/level.c				\
-	  src/level.h src/fix.c src/fix.h src/stars.c src/stars.h						\
-	  src/loose-floor.c src/loose-floor.h src/opener-floor.c						\
-	  src/opener-floor.h src/closer-floor.c src/closer-floor.h					\
-	  src/spikes-floor.c src/spikes-floor.h src/door.c src/door.h				\
-	  src/level-door.c src/level-door.h src/chomper.c src/chomper.h			\
-	  src/carpet.c src/carpet.h src/mirror.c src/mirror.h src/room.c		\
-	  src/room.h src/fire.c src/fire.h src/potion.c src/potion.h				\
-	  src/sword.c src/sword.h src/clock.c src/clock.h src/princess.c		\
-	  src/princess.h src/jaffar.c src/jaffar.h src/mouse.c src/mouse.h	\
+	  src/ui.c src/ui.h src/hotkeys.c src/hotkeys.h src/gui.c src/gui.h	\
+	  src/constants.h src/types.h src/colors.h src/anim.c src/anim.h		\
+	  src/actor.c src/actor.h src/pos.c src/pos.h src/physics.c					\
+	  src/physics.h src/level.c src/level.h src/fix.c src/fix.h					\
+	  src/stars.c src/stars.h src/loose-floor.c src/loose-floor.h				\
+	  src/opener-floor.c src/opener-floor.h src/closer-floor.c					\
+	  src/closer-floor.h src/spikes-floor.c src/spikes-floor.h					\
+	  src/door.c src/door.h src/level-door.c src/level-door.h						\
+	  src/chomper.c src/chomper.h src/carpet.c src/carpet.h							\
+	  src/mirror.c src/mirror.h src/room.c src/room.h src/fire.c				\
+	  src/fire.h src/potion.c src/potion.h src/sword.c src/sword.h			\
+	  src/clock.c src/clock.h src/princess.c src/princess.h							\
+	  src/jaffar.c src/jaffar.h src/mouse.c src/mouse.h									\
 	  src/audio-data.c src/audio-data.h src/cutscenes.c src/cutscenes.h	\
 	  src/fight.c src/fight.h src/dat.c src/dat.h src/wall.c src/wall.h	\
 	  src/kid/kid.c src/kid/kid.h src/kid/kid-normal.c									\

@@ -282,7 +282,7 @@ save_native_level (struct level *l, char *filename)
   return r;
 }
 
-char *tile_fg_str[TILE_FGS] = {
+char *tile_fg_str[] = {
   [NO_FLOOR] = "NO_FLOOR",
   [FLOOR] = "FLOOR",
   [BROKEN_FLOOR] = "BROKEN_FLOOR",
@@ -308,9 +308,10 @@ char *tile_fg_str[TILE_FGS] = {
   [ARCH_TOP_RIGHT] = "ARCH_TOP_RIGHT",
   [ARCH_TOP_MID] = "ARCH_TOP_MID",
   [ARCH_TOP_SMALL] = "ARCH_TOP_SMALL",
+  NULL,
 };
 
-char *tile_bg_str[TILE_BGS] = {
+char *tile_bg_str[] = {
   [NO_BRICKS] = "NO_BRICKS",
   [BRICKS_1] = "BRICKS_1",
   [BRICKS_2] = "BRICKS_2",
@@ -320,9 +321,10 @@ char *tile_bg_str[TILE_BGS] = {
   [TORCH] = "TORCH",
   [WINDOW] = "WINDOW",
   [BALCONY] = "BALCONY",
+  NULL
 };
 
-char *item_str[ITEMS] = {
+char *item_str[] = {
   [NO_ITEM] = "NO_ITEM",
   [EMPTY_POTION] = "EMPTY_POTION",
   [SMALL_HP_POTION] = "SMALL_HP_POTION",
@@ -333,6 +335,7 @@ char *item_str[ITEMS] = {
   [FLIP_POTION] = "FLIP_POTION",
   [ACTIVATION_POTION] = "ACTIVATION_POTION",
   [SWORD] = "SWORD",
+  NULL
 };
 
 char *
