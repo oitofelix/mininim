@@ -124,20 +124,34 @@
 #define HEART_ICON "data/icons/heart.png"
 #define PLUS_ICON "data/icons/plus.png"
 #define MINUS_ICON "data/icons/minus.png"
+#define LOCK_ICON "data/icons/lock.png"
+#define UNLOCK_ICON "data/icons/unlock.png"
 
 #define JUMP_TO_LEVEL_MID_NMEMB 21
 #define REPLAY_FAVORITE_MID_NMEMB 10
+
+#define MENU_ID_MIN 1
+#define MENU_ID_MAX ((1 << 16) - 1)
+#define MAIN_MENU_ID_MIN MENU_ID_MIN
+#define MAIN_MENU_ID_MAX (MENU_ID_MAX / 2)
+#define AUX_MENU_ID_MIN (MAIN_MENU_ID_MAX + 1)
+#define AUX_MENU_ID_MAX MENU_ID_MAX
 
 /* functions */
 void load_icons (void);
 void unload_icons (void);
 
+ALLEGRO_EVENT_SOURCE *main_menu_event_source (void);
 void main_menu (void);
+
+ALLEGRO_EVENT_SOURCE *aux_menu_event_source (void);
+void show_aux_menu (void);
+void aux_menu (void);
 
 void ui_about_screen (bool value);
 void ui_editor (void);
 
-void process_main_menu_event (ALLEGRO_EVENT *event);
+void dispatch_menu_event (ALLEGRO_EVENT *event);
 void anim_key_bindings (void);
 void level_key_bindings (void);
 

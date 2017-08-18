@@ -55,6 +55,13 @@ play_anim (void (*draw_callback) (void),
   al_register_event_source
     (event_queue,al_get_timer_event_source (iup_timer));
 
+  /* register menu event sources */
+  al_register_event_source
+    (event_queue, al_get_default_menu_event_source ());
+  al_register_event_source (event_queue, main_menu_event_source ());
+  aux_menu ();
+  al_register_event_source (event_queue, aux_menu_event_source ());
+
   al_flush_event_queue (event_queue);
   al_start_timer (timer);
   al_start_timer (menu_timer);
@@ -138,8 +145,10 @@ play_anim (void (*draw_callback) (void),
         /* replay handler */
         start_recording_replay (2);
 
-        /* update mouse pos */
-        if (! cutscene) get_mouse_pos (&mouse_pos);
+        /* update selection position */
+        if (! cutscene && ! selection_locked) {
+          get_mouse_pos (&selection_pos);
+        }
 
         /* message box */
         handle_message_box_thread ();
@@ -263,7 +272,7 @@ play_anim (void (*draw_callback) (void),
       case 1: ui_editor (); break;
       case 3:
         if (edit != EDIT_NONE)
-          ui_place_kid (get_actor_by_id (current_kid_id), &mouse_pos);
+          ui_place_kid (get_actor_by_id (current_kid_id), &selection_pos);
         break;
       default: break;
       }
@@ -277,6 +286,11 @@ play_anim (void (*draw_callback) (void),
 
       /* struct mouse_coord mc; get_mouse_coord (&mc); */
       /* printf ("%i,%i,%i\n", mc.c.room, mc.c.x, mc.c.y); */
+      break;
+    case ALLEGRO_EVENT_MOUSE_BUTTON_UP:
+      /* for some reason popup menus don't show properly in response
+         to ALLEGRO_EVENT_MOUSE_BUTTON_DOWN */
+      if (event.mouse.button == 2) show_aux_menu ();
       break;
     case ALLEGRO_EVENT_MOUSE_AXES:
       if (pause_anim) break;
@@ -313,7 +327,7 @@ play_anim (void (*draw_callback) (void),
 
 
     case ALLEGRO_EVENT_MENU_CLICK:
-      process_main_menu_event (&event);
+      dispatch_menu_event (&event);
       break;
 
 

@@ -25,7 +25,7 @@ static uint16_t append_menu_item_index[APPEND_MENU_MAX_DEPTH];
 static uint16_t append_menu_id;
 static int append_menu_depth = -1;
 
-static void start_menu (ALLEGRO_MENU *parent);
+static void start_menu (ALLEGRO_MENU *parent, uint16_t base_id);
 static uint16_t vmenu_item (int flags, ALLEGRO_BITMAP *icon,
                             ALLEGRO_MENU **submenu,
                             char const *title_template, va_list ap);
@@ -72,6 +72,9 @@ static void end_menu (void);
 
 
 
+static void process_main_menu_event (ALLEGRO_EVENT *event);
+static void process_aux_menu_event (ALLEGRO_EVENT *event);
+
 static ALLEGRO_BITMAP *load_icon (char *filename);
 
 static ALLEGRO_BITMAP *volume_icon (float volume);
@@ -192,8 +195,10 @@ static void display_skill (struct actor *k);
 
 
 static struct {
+  /* main display menu */
   struct {
     ALLEGRO_MENU *m;
+    ALLEGRO_EVENT_SOURCE *event_source;
     struct {
       ALLEGRO_MENU *m;
       struct {
@@ -265,7 +270,7 @@ static struct {
         ALLEGRO_MENU *m;
         uint16_t vertical, horizontal;
       } flip;
-      uint16_t full_screen, room_drawing,
+      uint16_t windowed, full_screen, room_drawing,
         inhibit_screensaver, screenshot;
     } view;
     struct {
@@ -298,7 +303,7 @@ static struct {
     } play;
     struct {
       ALLEGRO_MENU *m;
-      uint16_t mode, undo, redo;
+      uint16_t editor_mode, play_mode, undo, redo;
     } editor;
     struct {
       ALLEGRO_MENU *m;
@@ -321,7 +326,15 @@ static struct {
       ALLEGRO_MENU *m;
       uint16_t about;
     } help;
+    uint16_t unlock_selection;
   } main;
+
+  /* auxiliary popup menu */
+  struct {
+    ALLEGRO_MENU *m;
+    ALLEGRO_EVENT_SOURCE *event_source;
+    uint16_t lock_selection, unlock_selection;
+  } aux;
 } menu;
 
 bool main_menu_enabled;
@@ -354,7 +367,7 @@ ALLEGRO_BITMAP *small_logo_icon,
   *defense_add_icon, *defense_sub_icon, *counter_attack_icon,
   *counter_attack_add_icon, *counter_attack_sub_icon, *counter_defense_icon,
   *counter_defense_add_icon, *counter_defense_sub_icon, *shadow_face_icon,
-  *heart_icon, *plus_icon, *minus_icon;
+  *heart_icon, *plus_icon, *minus_icon, *lock_icon, *unlock_icon;
 
 
 
@@ -362,11 +375,20 @@ ALLEGRO_BITMAP *small_logo_icon,
 ALLEGRO_BITMAP *
 load_icon (char *filename)
 {
+  ALLEGRO_BITMAP *b;
+  int w, h;
+
 #if WINDOWS_PORT
-  return load_scaled_memory_bitmap (filename, 13, 13, 0);
+  w = h = 13;
 #else
-  return load_scaled_memory_bitmap (filename, 16, 16, 0);
+  w = h = 16;
 #endif
+
+  b = load_scaled_memory_bitmap (filename, w, h, 0);
+
+  if (! b) error (0, 0, "Cannot load icon \"%s\"", filename);
+
+  return b;
 }
 
 void
@@ -476,6 +498,8 @@ load_icons (void)
   heart_icon = load_icon (HEART_ICON);
   plus_icon = load_icon (PLUS_ICON);
   minus_icon = load_icon (MINUS_ICON);
+  lock_icon = load_icon (LOCK_ICON);
+  unlock_icon = load_icon (UNLOCK_ICON);
 }
 
 void
@@ -585,6 +609,8 @@ unload_icons (void)
   al_destroy_bitmap (heart_icon);
   al_destroy_bitmap (plus_icon);
   al_destroy_bitmap (minus_icon);
+  al_destroy_bitmap (lock_icon);
+  al_destroy_bitmap (unlock_icon);
 }
 
 
@@ -592,11 +618,11 @@ unload_icons (void)
 
 
 void
-start_menu (ALLEGRO_MENU *parent)
+start_menu (ALLEGRO_MENU *parent, uint16_t base_id)
 {
   append_menu_depth++;
   assert (append_menu_depth < APPEND_MENU_MAX_DEPTH);
-  if (append_menu_depth == 0) append_menu_id = 0;
+  if (append_menu_depth == 0) append_menu_id = base_id - 1;
   append_menu[append_menu_depth] = parent;
   append_menu_item_index[append_menu_depth] = 0;
 }
@@ -727,10 +753,9 @@ menu_ditem (bool first, uint16_t *id0, uint16_t *id1, bool enabled,
                             first ? title_template0 : title_template1,
                             ap);
   va_end (ap);
-  if (id0 != id1) {
-    *id0 = first ? id : 0;
-    *id1 = first ? 0 : id;
-  } else *id0 = id;
+  assert (id0 != id1);
+  *id0 = first ? id : 0;
+  *id1 = first ? 0 : id;
 }
 
 uint16_t
@@ -744,7 +769,7 @@ menu_sub (ALLEGRO_MENU **submenu, bool enabled, ALLEGRO_BITMAP *icon,
                             icon, submenu, title_template, ap);
   va_end (ap);
   if (enabled && build_f && *submenu) {
-    start_menu (*submenu);
+    start_menu (*submenu, 0);
     build_f (data);
     end_menu ();
   }
@@ -763,7 +788,7 @@ menu_array (ALLEGRO_MENU **submenu, bool enabled, ALLEGRO_BITMAP *icon,
                             icon, submenu, title_template, ap);
   va_end (ap);
   if (enabled && build_f && *submenu) {
-    start_menu (*submenu);
+    start_menu (*submenu, 0);
 
     int lower;
     if (index <= id_nmemb / 2) lower = 0;
@@ -869,11 +894,20 @@ is_showing_menu (void)
 
 
 
+ALLEGRO_EVENT_SOURCE *
+main_menu_event_source (void)
+{
+  return menu.main.event_source;
+}
+
 void
 main_menu (void)
 {
-  if (! menu.main.m) menu.main.m = al_create_menu ();
-  start_menu (menu.main.m);
+  if (! menu.main.m) {
+    menu.main.m = al_create_menu ();
+    menu.main.event_source = al_enable_menu_event_source (menu.main.m);
+  }
+  start_menu (menu.main.m, MAIN_MENU_ID_MIN);
 
   menu_sub (&menu.main.game.m, main_menu_enabled, NULL, game_menu,
             0, "&Game");
@@ -895,6 +929,15 @@ main_menu (void)
 
   menu_sub (&menu.main.help.m, main_menu_enabled, NULL, help_menu,
             0, "He&lp");
+
+#if WINDOWS_PORT
+  menu.main.unlock_selection =
+    menu_sitem (selection_locked, NULL, "(L)");
+#else
+  if (edit != EDIT_NONE)
+    menu.main.unlock_selection =
+      menu_sitem (selection_locked, lock_icon, "%s", "");
+#endif
 
   end_menu ();
 }
@@ -993,7 +1036,7 @@ void
 view_menu (intptr_t index)
 {
   menu_ditem (is_fullscreen (),
-              &menu.main.view.full_screen, &menu.main.view.full_screen,
+              &menu.main.view.windowed, &menu.main.view.full_screen,
               true, windows_icon, full_screen_icon,
               "&Windowed (F)", "&Fullscreen (F)");
 
@@ -1501,7 +1544,7 @@ void
 editor_menu (intptr_t index)
 {
   menu_ditem (edit == EDIT_NONE,
-              &menu.main.editor.mode, &menu.main.editor.mode,
+              &menu.main.editor.editor_mode, &menu.main.editor.play_mode,
               true, edit_icon, joystick2_icon,
               "&Edit (F8)", "&Play (F8)");
 
@@ -1715,6 +1758,62 @@ speed_menu_widget (void)
 
 
 void
+aux_menu (void)
+{
+  if (! menu.aux.m) {
+    menu.aux.m = al_create_popup_menu ();
+    menu.aux.event_source =
+      al_enable_menu_event_source (menu.aux.m);
+  }
+  start_menu (menu.aux.m, AUX_MENU_ID_MIN);
+
+  menu_ditem (! selection_locked,
+              &menu.aux.lock_selection, &menu.aux.unlock_selection,
+              true, lock_icon, unlock_icon,
+              "&Lock selection", "&Unlock selection");
+
+  end_menu ();
+}
+
+void
+show_aux_menu (void)
+{
+  if (edit == EDIT_NONE) return;
+  aux_menu ();
+  al_popup_menu (menu.aux.m, display);
+}
+
+ALLEGRO_EVENT_SOURCE *
+aux_menu_event_source (void)
+{
+  return menu.aux.event_source;
+}
+
+
+
+
+
+void
+dispatch_menu_event (ALLEGRO_EVENT *event)
+{
+  uint16_t id = event->user.data1;
+
+  if (id >= MAIN_MENU_ID_MIN && id <= MAIN_MENU_ID_MAX)
+    process_main_menu_event (event);
+  else if (id >= AUX_MENU_ID_MIN && id <= AUX_MENU_ID_MAX)
+    process_aux_menu_event (event);
+  else return;
+
+  /* A bug in Allegro prevents the following better and correct code
+     from working, so as a hopefully temporary workaround, we
+     discriminate based on menu item ids. */
+  /* if (event->user.source == menu.main.event_source) */
+  /*   process_main_menu_event (event); */
+  /* else if (event->user.source == menu.aux.event_source) */
+  /*   process_aux_menu_event (event); */
+}
+
+void
 process_main_menu_event (ALLEGRO_EVENT *event)
 {
   uint16_t id = event->user.data1;
@@ -1739,7 +1838,9 @@ process_main_menu_event (ALLEGRO_EVENT *event)
     ui_audio_volume (VOLUME_MEDIUM);
   else if (id == menu.main.game.volume.high)
     ui_audio_volume (VOLUME_HIGH);
-  else if (id == menu.main.view.full_screen) ui_full_screen ();
+  else if (id == menu.main.view.full_screen
+           || id == menu.main.view.windowed)
+    ui_full_screen ();
   else if (id == menu.main.view.room_drawing)
     ui_room_drawing (no_room_drawing);
   else if (id == menu.main.view.inhibit_screensaver)
@@ -1835,7 +1936,9 @@ process_main_menu_event (ALLEGRO_EVENT *event)
     ui_increase_time_frequency ();
   else if (id == menu.main.play.replay_favorite.add)
     ui_add_replay_favorite ();
-  else if (id == menu.main.editor.mode) ui_editor ();
+  else if (id == menu.main.editor.editor_mode
+           || id == menu.main.editor.play_mode)
+    ui_editor ();
   else if (id == menu.main.editor.undo)
     ui_undo_pass (&undo, -1, NULL);
   else if (id == menu.main.editor.redo)
@@ -1853,6 +1956,8 @@ process_main_menu_event (ALLEGRO_EVENT *event)
   else if (id == menu.main.cheat.kcd.add) ui_change_kcd (+10);
   else if (id == menu.main.cheat.kcd.sub) ui_change_kcd (-10);
   else if (id == menu.main.help.about) ui_about_screen (true);
+  else if (id == menu.main.unlock_selection)
+    selection_locked = ! selection_locked;
   else if (m == menu.main.play.jump_to_level.m)
     ui_jump_to_level_menu (id - menu.main.play.jump_to_level._id);
   else if ((i = replay_favorite_index_by_menu (m)) >= 0) {
@@ -1866,7 +1971,16 @@ process_main_menu_event (ALLEGRO_EVENT *event)
   }
 }
 
+void
+process_aux_menu_event (ALLEGRO_EVENT *event)
+{
+  uint16_t id = event->user.data1;
+  /* ALLEGRO_MENU *m = (ALLEGRO_MENU *) event->user.data3; */
+  /* int i; */
 
+  if (id == menu.aux.lock_selection || id == menu.aux.unlock_selection)
+    selection_locked = ! selection_locked;
+}
 
 
 

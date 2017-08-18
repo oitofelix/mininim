@@ -56,7 +56,7 @@ void
 update_editor_gui (void)
 {
   if (IupGetInt (editor_dialog (), "VISIBLE"))
-    update_editor_dialog (&mouse_pos);
+    update_editor_dialog (&selection_pos);
   if (IupGetInt (tile_fg_dialog (), "VISIBLE"))
     update_tile_fg_dialog ();
 }

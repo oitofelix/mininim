@@ -25,6 +25,7 @@
 extern enum edit edit;
 extern enum edit last_edit;
 extern uint64_t editor_register;
+extern bool selection_locked;
 
 /* functions */
 bool can_edit (void);

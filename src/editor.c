@@ -46,6 +46,8 @@ enum edit edit;
 enum edit last_edit = EDIT_MAIN;
 uint64_t editor_register;
 
+bool selection_locked;
+
 bool
 can_edit (void)
 {
@@ -304,7 +306,7 @@ editor (void)
      {'H', "SHADOW"},
      {0}};
 
-  struct pos p = mouse_pos;
+  struct pos p = selection_pos;
   static struct guard *g;
   static struct pos p0;
   static bool fake_fg;

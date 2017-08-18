@@ -102,9 +102,6 @@ init_video (void)
 
   cutscene = true;
 
-  al_register_event_source
-    (event_queue, al_get_default_menu_event_source ());
-
   main_menu_enabled = false;
   main_menu ();
   if (! is_fullscreen ()) show_menu ();
@@ -243,6 +240,7 @@ ALLEGRO_BITMAP *
 load_scaled_memory_bitmap (char *filename, int w, int h, int flags)
 {
   ALLEGRO_BITMAP *bitmap = load_memory_bitmap (filename);
+  if (! bitmap) return NULL;
   ALLEGRO_BITMAP *scaled_bitmap =
     clone_scaled_memory_bitmap (bitmap, w, h, flags);
   al_destroy_bitmap (bitmap);

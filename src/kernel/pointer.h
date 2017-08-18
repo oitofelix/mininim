@@ -22,7 +22,7 @@
 #define MININIM_POINTER_H
 
 /* variables */
-extern struct pos mouse_pos;
+extern struct pos selection_pos;
 
 /* functions */
 void init_mouse (void);

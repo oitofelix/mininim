@@ -572,9 +572,10 @@ mr_update_last_settings (void)
   /* mr.last.vm = vm; */
   /* mr.last.hgc = hgc; */
   mr.last.hue = hue;
-  mr.last.mouse_pos = mouse_pos;
+  mr.last.selection_pos = selection_pos;
   mr.last.display_width = al_get_display_width (display);
   mr.last.display_height = al_get_display_height (display);
+  mr.last.edit = edit;
 
   mr.full_update = false;
   if (mr.busy && ! is_dedicatedly_replaying ()) {
@@ -593,8 +594,8 @@ draw_animated_background (ALLEGRO_BITMAP *bitmap, int room)
 
   for (p.floor = FLOORS; p.floor >= 0; p.floor--)
     for (p.place = -1; p.place < PLACES; p.place++)
-      if (peq (&p, &mouse_pos))
-        draw_no_floor_selection (bitmap, &p);
+      if (edit != EDIT_NONE && peq (&p, &selection_pos))
+        draw_object (bitmap, "BACKGROUND_SELECTION", &p);
 
   for (p.floor = FLOORS; p.floor >= -1; p.floor--)
     for (p.place = -1; p.place < PLACES; p.place++) {
@@ -654,7 +655,7 @@ draw_animated_foreground (ALLEGRO_BITMAP *bitmap, int room)
 
   for (p.floor = FLOORS; p.floor >= -1; p.floor--)
     for (p.place = -1; p.place < PLACES; p.place++)
-      if (peq (&mouse_pos, &p))
+      if (edit != EDIT_NONE && peq (&selection_pos, &p))
         draw_object (bitmap, "BOX", &p);
 }
 
@@ -662,8 +663,8 @@ void
 update_room0_cache (void)
 {
   room_view = 0;
-  struct pos mouse_pos_bkp = mouse_pos;
-  invalid_pos (&mouse_pos);
+  struct pos selection_pos_bkp = selection_pos;
+  invalid_pos (&selection_pos);
   tile_caching = true;
 
   al_destroy_bitmap (room0);
@@ -676,7 +677,7 @@ update_room0_cache (void)
   draw_room (room0, 0);
 
   tile_caching = false;
-  mouse_pos = mouse_pos_bkp;
+  selection_pos = selection_pos_bkp;
 }
 
 void
@@ -788,14 +789,15 @@ draw_multi_rooms (void)
     force_full_redraw = true;
   }
 
-  if (mouse_pos.room != mr.last.mouse_pos.room
-      || mouse_pos.floor != mr.last.mouse_pos.floor
-      || mouse_pos.place != mr.last.mouse_pos.place) {
-    if (is_valid_pos (&mouse_pos))
-      register_changed_pos (&mouse_pos);
+  if (selection_pos.room != mr.last.selection_pos.room
+      || selection_pos.floor != mr.last.selection_pos.floor
+      || selection_pos.place != mr.last.selection_pos.place
+      || edit != mr.last.edit) {
+    if (is_valid_pos (&selection_pos))
+      register_changed_pos (&selection_pos);
 
-    if (is_valid_pos (&mr.last.mouse_pos))
-      register_changed_pos (&mr.last.mouse_pos);
+    if (is_valid_pos (&mr.last.selection_pos))
+      register_changed_pos (&mr.last.selection_pos);
   }
 
   if (anim_cycle == 0

@@ -108,7 +108,8 @@ function apply_palettes_to_color (c, p)
 
    if hm ~= "NONE" then c = hue[hm] (c) end
 
-   if p == MININIM.mouse.position then c = selection[em] (c) end
+   if MININIM.editing and p == MININIM.mouse.selection_position then
+      c = selection[em] (c) end
 
    return c
 end
@@ -119,7 +120,7 @@ function apply_palettes (b, p)
 
    if hm ~= "NONE" then b = b.apply_palette (hue[hm], true) end
 
-   if p == MININIM.mouse.position then
+   if MININIM.editing and p == MININIM.mouse.selection_position then
       b = b.apply_palette (selection[em], true) end
 
    return b
@@ -396,10 +397,16 @@ function video.OBJECT:CREATE_BITMAP ()
 end
 
 -- BOX
-video.BOX = new (video.OBJECT, {{}, {}, {}})
+video.BOX = new (video.OBJECT, {{}, {}, {}, {}, {}, {}})
+
+function video.BOX.lock_palette (c)
+   if c == C ("white") then return C ("red") end
+   return c
+end
 
 function video.BOX:DRAW (p)
    local i = mod (MININIM.cycle, 3) + 1
+   if MININIM.mouse.selection_locked then i = i + 3 end
    self[i]:DRAW (p)
 end
 
@@ -409,7 +416,7 @@ video.BOX[1].rect = function (self, p)
                  p.room)
 end
 
-for i = 2, 3 do video.BOX[i].rect = video.BOX[1].rect end
+for i = 2, 6 do video.BOX[i].rect = video.BOX[1].rect end
 
 -- SWORD ITEM
 video.SWORD_ITEM = new (video.OBJECT, {normal = {}, shiny = {}})
@@ -593,7 +600,7 @@ end
 function video.FIRE:DRAW (p)
    local em = MININIM.video.env_mode
    local b = self[mod (MININIM.cycle, 9) + 1].bitmap
-   if p == MININIM.mouse.position then
+   if MININIM.editing and p == MININIM.mouse.selection_position then
       b = b.apply_palette (selection[em], true) end
    b.draw (self:rect (p))
 end
@@ -2440,6 +2447,10 @@ function ASSET:load_box ()
    for i = 1, 3 do
       o[i].bitmap = load_bitmap ("box/%i.png", i)
    end
+   for i = 4, 6 do
+      o[i].bitmap = o[i - 3].bitmap
+         .apply_palette (video.BOX.lock_palette, true)
+   end
    self.BOX = o
 end
 
@@ -2733,6 +2744,16 @@ MININIM.lua.video_mode["Macintosh Color"] = function (command, object, ...)
       rect (x, y, w, h).draw (C (0, 0, 0))
       asset.font.draw (arg[1], REAL_WIDTH / 2,
                        REAL_HEIGHT - asset.font.height + 3)
+      return
+   end
+
+   if command == "DRAW" and object == "BACKGROUND_SELECTION" then
+      local p = arg[1]
+      local x = OW (p.place * PLACE_WIDTH + 25)
+      local y = OH (p.floor * PLACE_HEIGHT - 13)
+      local w = OW (PLACE_WIDTH)
+      local h = OH (PLACE_HEIGHT)
+      rect (x, y, w, h).draw (C (64, 64, 64))
       return
    end
 

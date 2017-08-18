@@ -887,13 +887,3 @@ apply_hue_color (ALLEGRO_COLOR c)
   case HUE_BLUE: return blue_hue_palette (c);
   }
 }
-
-void
-draw_no_floor_selection (ALLEGRO_BITMAP *bitmap, struct pos *p)
-{
-  struct rect r;
-  new_rect (&r, p->room, p->place * PLACE_WIDTH + 25,
-            p->floor * PLACE_HEIGHT - 13,
-            PLACE_WIDTH, PLACE_HEIGHT);
-  draw_filled_rect (bitmap, &r, NO_FLOOR_SELECTION_COLOR);
-}

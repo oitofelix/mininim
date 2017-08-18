@@ -380,7 +380,8 @@ legacy_level_special_events (void)
 
   /* in the eighth level */
   if (global_level.n == 8) {
-    struct pos mouse_pos; new_pos (&mouse_pos, &global_level, 16, 0, PLACES - 1);
+    struct pos mouse_pos; new_pos (&mouse_pos, &global_level, 16,
+                                   0, PLACES - 1);
     struct actor *m = NULL;
 
     if (mouse_id != -1) m = get_actor_by_id (mouse_id);
