@@ -203,17 +203,13 @@ static struct {
       ALLEGRO_MENU *m;
       struct {
         ALLEGRO_MENU *m;
-        uint16_t game, config, level;
       } load;
       struct {
         ALLEGRO_MENU *m;
-        uint16_t game, config, level;
       } save;
       struct {
         ALLEGRO_MENU *m;
-        uint16_t off, low, medium, high;
       } volume;
-      uint16_t mirror, start, restart, quit;
     } game;
     struct {
       ALLEGRO_MENU *m;
@@ -221,34 +217,25 @@ static struct {
         ALLEGRO_MENU *m;
         struct {
           ALLEGRO_MENU *m;
-          uint16_t none, stretch, ratio;
         } fit;
         struct {
           ALLEGRO_MENU *m;
-          uint16_t both, vertical, horizontal;
         } in;
         struct {
           ALLEGRO_MENU *m;
-          uint16_t both, vertical, horizontal;
         } out;
-        uint16_t reset;
       } zoom;
       struct {
         ALLEGRO_MENU *m;
         struct {
           ALLEGRO_MENU *m;
-          uint16_t left, above, right, below;
         } select;
         struct {
           ALLEGRO_MENU *m;
-          uint16_t left, above, right, below;
         } cell;
         struct {
           ALLEGRO_MENU *m;
-          uint16_t left, above, right, below;
         } page;
-        uint16_t current_room,
-          home, center, coord, ind_coord;
       } nav;
       struct {
         ALLEGRO_MENU *m;
@@ -256,43 +243,135 @@ static struct {
       } vm;
       struct {
         ALLEGRO_MENU *m;
-        uint16_t original, dungeon, palace;
       } em;
       struct {
         ALLEGRO_MENU *m;
-        uint16_t original, none, green, gray, yellow, blue;
       } hue;
       struct {
         ALLEGRO_MENU *m;
-        uint16_t original, guard, fat, vizier, skeleton, shadow;
       } gm;
       struct {
         ALLEGRO_MENU *m;
+      } flip;
+    } view;
+    struct {
+      ALLEGRO_MENU *m;
+      struct {
+        ALLEGRO_MENU *m;
+      } device;
+      struct {
+        ALLEGRO_MENU *m;
+      } flip;
+    } gamepad;
+    struct {
+      ALLEGRO_MENU *m;
+      struct {
+        ALLEGRO_MENU *m;
+      } replay_favorite;
+      struct {
+        ALLEGRO_MENU *m;
+      } jump_to_level;
+    } play;
+    struct {
+      ALLEGRO_MENU *m;
+    } editor;
+    struct {
+      ALLEGRO_MENU *m;
+      struct {
+        ALLEGRO_MENU *m;
+      } time;
+      struct {
+        ALLEGRO_MENU *m;
+      } kca;
+      struct {
+        ALLEGRO_MENU *m;
+      } kcd;
+    } cheat;
+    struct {
+      ALLEGRO_MENU *m;
+    } help;
+  } main;
+
+  /* auxiliary popup menu */
+  struct {
+    ALLEGRO_MENU *m;
+    ALLEGRO_EVENT_SOURCE *event_source;
+  } aux;
+} menu;
+
+static struct {
+  /* main display menu */
+  struct {
+    struct {
+      struct {
+        uint16_t game, config, level;
+      } load;
+      struct {
+        uint16_t game, config, level;
+      } save;
+      struct {
+        uint16_t off, low, medium, high;
+      } volume;
+      uint16_t mirror, start, restart, quit;
+    } game;
+    struct {
+      struct {
+        struct {
+          uint16_t none, stretch, ratio;
+        } fit;
+        struct {
+          uint16_t both, vertical, horizontal;
+        } in;
+        struct {
+          uint16_t both, vertical, horizontal;
+        } out;
+        uint16_t reset;
+      } zoom;
+      struct {
+        struct {
+          uint16_t left, above, right, below;
+        } select;
+        struct {
+          uint16_t left, above, right, below;
+        } cell;
+        struct {
+          uint16_t left, above, right, below;
+        } page;
+        uint16_t current_room,
+          home, center, coord, ind_coord;
+      } nav;
+      struct {
+        /* TODO: implement */
+      } vm;
+      struct {
+        uint16_t original, dungeon, palace;
+      } em;
+      struct {
+        uint16_t original, none, green, gray, yellow, blue;
+      } hue;
+      struct {
+        uint16_t original, guard, fat, vizier, skeleton, shadow;
+      } gm;
+      struct {
         uint16_t vertical, horizontal;
       } flip;
       uint16_t windowed, full_screen, room_drawing,
         inhibit_screensaver, screenshot;
     } view;
     struct {
-      ALLEGRO_MENU *m;
       struct {
-        ALLEGRO_MENU *m;
         uint16_t keyboard, joystick;
       } device;
       struct {
-        ALLEGRO_MENU *m;
         uint16_t vertical, horizontal;
       } flip;
       uint16_t calibrate;
     } gamepad;
     struct {
-      ALLEGRO_MENU *m;
       struct {
-        ALLEGRO_MENU *m;
         uint16_t add;
       } replay_favorite;
       struct {
-        ALLEGRO_MENU *m;
         uint16_t _id;
       } jump_to_level;
       uint16_t play_replay, record_replay,
@@ -302,28 +381,22 @@ static struct {
         decrease_time_freq, increase_time_freq;
     } play;
     struct {
-      ALLEGRO_MENU *m;
       uint16_t editor_mode, play_mode, undo, redo;
     } editor;
     struct {
-      ALLEGRO_MENU *m;
       struct {
-        ALLEGRO_MENU *m;
         uint16_t add, sub;
       } time;
       struct {
-        ALLEGRO_MENU *m;
         uint16_t add, sub;
       } kca;
       struct {
-        ALLEGRO_MENU *m;
         uint16_t add, sub;
       } kcd;
       uint16_t kill_enemy, resurrect, immortal,
         kid_float, fill_hp, add_hp;
     } cheat;
     struct {
-      ALLEGRO_MENU *m;
       uint16_t about;
     } help;
     uint16_t unlock_selection;
@@ -331,11 +404,9 @@ static struct {
 
   /* auxiliary popup menu */
   struct {
-    ALLEGRO_MENU *m;
-    ALLEGRO_EVENT_SOURCE *event_source;
     uint16_t lock_selection, unlock_selection;
   } aux;
-} menu;
+} item;
 
 bool main_menu_enabled;
 static int jump_to_level_menu_lower;
@@ -903,6 +974,7 @@ main_menu_event_source (void)
 void
 main_menu (void)
 {
+  memset (&item.main, 0, sizeof (item.main));
   if (! menu.main.m) {
     menu.main.m = al_create_menu ();
     menu.main.event_source = al_enable_menu_event_source (menu.main.m);
@@ -935,7 +1007,7 @@ main_menu (void)
     menu_sitem (selection_locked, NULL, "(L)");
 #else
   if (edit != EDIT_NONE)
-    menu.main.unlock_selection =
+    item.main.unlock_selection =
       menu_sitem (selection_locked, lock_icon, "%s", "");
 #endif
 
@@ -968,65 +1040,65 @@ game_menu (intptr_t index)
             volume_icon (audio_volume), volume_menu, 0,
             "&Volume (Ctrl+S)");
 
-  menu.main.game.mirror =
+  item.main.game.mirror =
     menu_citem (true, in_mirror_mode (), horizontal_icon, "&Mirror");
 
   menu_sep (NULL);
 
   menu_ditem ((cutscene || title_demo) && play_time < time_limit,
-              &menu.main.game.start, &menu.main.game.restart, true,
+              &item.main.game.start, &item.main.game.restart, true,
               right_icon, reload_icon,
               "Sta&rt (Enter)", "&Restart (Ctrl+R)");
 
-  menu.main.game.quit =
+  item.main.game.quit =
     menu_sitem (true, quit_icon, "&Quit (Ctrl+Q)");
 }
 
 void
 load_menu (intptr_t index)
 {
-  menu.main.game.load.game =
+  item.main.game.load.game =
     menu_sitem (true, game_icon, "&Game... (Ctrl+L)");
 
-  menu.main.game.load.config =
+  item.main.game.load.config =
     menu_sitem (true, settings_icon, "&Configuration... (Ctrl+L)");
 
-  menu.main.game.load.level =
+  item.main.game.load.level =
     menu_sitem (false, NULL, "&Level file...");
 }
 
 void
 save_menu (intptr_t index)
 {
-  menu.main.game.save.game =
+  item.main.game.save.game =
     menu_sitem (! cutscene && ! title_demo && replay_mode == NO_REPLAY,
                 game_icon, "&Game... (Ctrl+G)");
 
-  menu.main.game.save.config =
+  item.main.game.save.config =
     menu_sitem (false, settings_icon, "&Configuration...");
 
-  menu.main.game.save.level =
+  item.main.game.save.level =
     menu_sitem (false, NULL, "&Level file...");
 }
 
 void
 volume_menu (intptr_t index)
 {
-  menu.main.game.volume.off =
+  item.main.game.volume.off =
     menu_citem (true, audio_volume == VOLUME_RANGE_MIN,
                 volume_off_icon, "&Off");
 
-  menu.main.game.volume.low =
+  item.main.game.volume.low =
     menu_citem (true, audio_volume > VOLUME_RANGE_MIN
                 && audio_volume < VOLUME_RANGE_LOW,
                 volume_low_icon, "&Low");
 
-  menu.main.game.volume.medium =
+  item.main.game.volume.medium =
     menu_citem (true, audio_volume >= VOLUME_RANGE_LOW
                 && audio_volume < VOLUME_RANGE_MEDIUM,
                 volume_medium_icon, "&Medium");
 
-  menu.main.game.volume.high =
+  item.main.game.volume.high =
     menu_citem (true, audio_volume >= VOLUME_RANGE_MEDIUM
                 && audio_volume <= VOLUME_RANGE_MAX,
                 volume_high_icon, "&High");
@@ -1036,7 +1108,7 @@ void
 view_menu (intptr_t index)
 {
   menu_ditem (is_fullscreen (),
-              &menu.main.view.windowed, &menu.main.view.full_screen,
+              &item.main.view.windowed, &item.main.view.full_screen,
               true, windows_icon, full_screen_icon,
               "&Windowed (F)", "&Fullscreen (F)");
 
@@ -1068,24 +1140,24 @@ view_menu (intptr_t index)
 
   menu_sep (NULL);
 
-  menu.main.view.room_drawing =
+  item.main.view.room_drawing =
     menu_citem (! cutscene && ! title_demo, ! no_room_drawing, drawing_icon,
                 "Room &drawing (Shift+B)");
 
-  menu.main.view.inhibit_screensaver =
+  item.main.view.inhibit_screensaver =
     menu_citem (true, inhibit_screensaver, screensaver_icon,
                 "&Inhibit screensaver");
 
   menu_sep (NULL);
 
-  menu.main.view.screenshot =
+  item.main.view.screenshot =
     menu_sitem (true, camera_icon, "&Screenshot... (Ctrl+P)");
 }
 
 void
 zoom_menu (intptr_t index)
 {
-  menu.main.view.zoom.reset =
+  item.main.view.zoom.reset =
     menu_hitem (! cutscene && ! title_demo
                 && (mr.w != 2 || mr.h != 2
                     || mr.fit_mode != MR_FIT_NONE),
@@ -1116,15 +1188,15 @@ zoom_fit_icon (enum mr_fit_mode fit)
 void
 zoom_fit_menu (intptr_t index)
 {
-  menu.main.view.zoom.fit.none =
+  item.main.view.zoom.fit.none =
     menu_citem (true, mr.fit_mode == MR_FIT_NONE, zoom_none_icon,
                 "&None");
 
-  menu.main.view.zoom.fit.stretch =
+  item.main.view.zoom.fit.stretch =
     menu_citem (true, mr.fit_mode == MR_FIT_STRETCH, zoom_stretch_icon,
                 "&Stretch");
 
-  menu.main.view.zoom.fit.ratio =
+  item.main.view.zoom.fit.ratio =
     menu_citem (true, mr.fit_mode == MR_FIT_RATIO, zoom_ratio_icon,
                 "&Ratio");
 }
@@ -1132,34 +1204,34 @@ zoom_fit_menu (intptr_t index)
 void
 zoom_out_menu (intptr_t index)
 {
-  menu.main.view.zoom.out.both =
+  item.main.view.zoom.out.both =
     menu_sitem (true, vertical_horizontal_icon, "&Both (])");
 
-  menu.main.view.zoom.out.vertical =
+  item.main.view.zoom.out.vertical =
     menu_sitem (true, vertical_icon, "&Vertical (Alt+])");
 
-  menu.main.view.zoom.out.horizontal =
+  item.main.view.zoom.out.horizontal =
     menu_sitem (true, horizontal_icon, "&Horizontal (Ctrl+])");
 }
 
 void
 zoom_in_menu (intptr_t index)
 {
-  menu.main.view.zoom.in.both =
+  item.main.view.zoom.in.both =
     menu_sitem (mr.w > 1 && mr.h > 1, vertical_horizontal_icon,
                 "&Both ([)");
 
-  menu.main.view.zoom.in.vertical =
+  item.main.view.zoom.in.vertical =
     menu_sitem (mr.h > 1, vertical_icon, "&Vertical (Alt+[)");
 
-  menu.main.view.zoom.in.horizontal =
+  item.main.view.zoom.in.horizontal =
     menu_sitem (mr.w > 1, horizontal_icon, "&Horizontal (Ctrl+[)");
 }
 
 void
 navigation_menu (intptr_t index)
 {
-  menu.main.view.nav.current_room =
+  item.main.view.nav.current_room =
     menu_hitem (true, "ROOM %i", mr.room);
 
   menu_sub (&menu.main.view.nav.select.m, true, nav_select_icon,
@@ -1172,35 +1244,35 @@ navigation_menu (intptr_t index)
             nav_page_menu, 0, "Scroll &page");
 
   struct actor *k = get_actor_by_id (current_kid_id);
-  menu.main.view.nav.home =
+  item.main.view.nav.home =
     menu_sitem (k && k->f.c.room != mr.room, nav_home_icon, "&Home (Home)");
 
-  menu.main.view.nav.center =
+  item.main.view.nav.center =
     menu_sitem (true, repeat_icon, "Cen&ter (Shift+Home)");
 
-  menu.main.view.nav.coord =
+  item.main.view.nav.coord =
     menu_sitem (true, compass_icon, "C&oordinates (C)");
 
-  menu.main.view.nav.ind_coord =
+  item.main.view.nav.ind_coord =
     menu_sitem (true, compass2_icon, "&Indirect coordinates (Shift+C)");
 }
 
 void
 nav_select_menu (intptr_t index)
 {
-  menu.main.view.nav.select.left =
+  item.main.view.nav.select.left =
     menu_sitem (roomd (&global_level, mr.room, LEFT),
                 nav_left_icon, "&Left (H)");
 
-  menu.main.view.nav.select.above =
+  item.main.view.nav.select.above =
     menu_sitem (roomd (&global_level, mr.room, ABOVE),
                 nav_above_icon, "&Above (U)");
 
-  menu.main.view.nav.select.right =
+  item.main.view.nav.select.right =
     menu_sitem (roomd (&global_level, mr.room, RIGHT),
                 nav_right_icon, "&Right (J)");
 
-  menu.main.view.nav.select.below =
+  item.main.view.nav.select.below =
     menu_sitem (roomd (&global_level, mr.room, BELOW),
                 nav_below_icon, "&Below (N)");
 }
@@ -1208,32 +1280,32 @@ nav_select_menu (intptr_t index)
 void
 nav_cell_menu (intptr_t index)
 {
-  menu.main.view.nav.cell.left =
+  item.main.view.nav.cell.left =
     menu_sitem (true, nav_left_icon, "&Left (Shift+H)");
 
-  menu.main.view.nav.cell.above =
+  item.main.view.nav.cell.above =
     menu_sitem (true, nav_above_icon, "&Above (Shift+U)");
 
-  menu.main.view.nav.cell.right =
+  item.main.view.nav.cell.right =
     menu_sitem (true, nav_right_icon, "&Right (Shift+J)");
 
-  menu.main.view.nav.cell.below =
+  item.main.view.nav.cell.below =
     menu_sitem (true, nav_below_icon, "&Below (Shift+N)");
 }
 
 void
 nav_page_menu (intptr_t index)
 {
-  menu.main.view.nav.page.left =
+  item.main.view.nav.page.left =
     menu_sitem (true, nav_left_icon, "&Left (Alt+H)");
 
-  menu.main.view.nav.page.above =
+  item.main.view.nav.page.above =
     menu_sitem (true, nav_above_icon, "&Above (Alt+U)");
 
-  menu.main.view.nav.page.right =
+  item.main.view.nav.page.right =
     menu_sitem (true, nav_right_icon, "&Right (Alt+J)");
 
-  menu.main.view.nav.page.below =
+  item.main.view.nav.page.below =
     menu_sitem (true, nav_below_icon, "&Below (Alt+N)");
 }
 
@@ -1253,23 +1325,23 @@ hue_icon (enum hue hue)
 void
 hue_mode_menu (intptr_t index)
 {
-  menu.main.view.hue.original =
+  item.main.view.hue.original =
     menu_citem (true, ! force_hue, original_icon, "&Original");
 
-  menu.main.view.hue.none =
+  item.main.view.hue.none =
     menu_citem (true, force_hue && hue == HUE_NONE, black_icon, "&None");
 
-  menu.main.view.hue.green =
+  item.main.view.hue.green =
     menu_citem (true, force_hue && hue == HUE_GREEN, green_icon, "&Green");
 
-  menu.main.view.hue.gray =
+  item.main.view.hue.gray =
     menu_citem (true, force_hue && hue == HUE_GRAY, gray_icon, "G&ray");
 
-  menu.main.view.hue.yellow =
+  item.main.view.hue.yellow =
     menu_citem (true, force_hue && hue == HUE_YELLOW,
                 yellow_icon, "&Yellow");
 
-  menu.main.view.hue.blue =
+  item.main.view.hue.blue =
     menu_citem (true, force_hue && hue == HUE_BLUE, blue_icon, "&Blue");
 }
 
@@ -1290,24 +1362,24 @@ gm_icon (enum gm gm)
 void
 gm_menu (intptr_t index)
 {
-  menu.main.view.gm.original =
+  item.main.view.gm.original =
     menu_citem (true, gm == ORIGINAL_GM, gm_icon (ORIGINAL_GM),
                 "&Original");
 
-  menu.main.view.gm.guard =
+  item.main.view.gm.guard =
     menu_citem (true, gm == GUARD_GM, gm_icon (GUARD_GM), "&Guard");
 
-  menu.main.view.gm.fat =
+  item.main.view.gm.fat =
     menu_citem (true, gm == FAT_GM, gm_icon (FAT_GM), "&Fat");
 
-  menu.main.view.gm.vizier =
+  item.main.view.gm.vizier =
     menu_citem (true, gm == VIZIER_GM, gm_icon (VIZIER_GM), "&Vizier");
 
-  menu.main.view.gm.skeleton =
+  item.main.view.gm.skeleton =
     menu_citem (true, gm == SKELETON_GM, gm_icon (SKELETON_GM),
                 "&Skeleton");
 
-  menu.main.view.gm.shadow =
+  item.main.view.gm.shadow =
     menu_citem (true, gm == SHADOW_GM, gm_icon (SHADOW_GM), "S&hadow");
 }
 
@@ -1324,14 +1396,14 @@ em_icon (enum em em)
 void
 em_menu (intptr_t index)
 {
-  menu.main.view.em.original =
+  item.main.view.em.original =
     menu_citem (true, ! force_em, original_icon, "&Original");
 
-  menu.main.view.em.dungeon =
+  item.main.view.em.dungeon =
     menu_citem (true, force_em && em == DUNGEON, dungeon_icon,
                 "&Dungeon");
 
-  menu.main.view.em.palace =
+  item.main.view.em.palace =
     menu_citem (true, force_em && em == PALACE, palace_icon, "&Palace");
 }
 
@@ -1364,11 +1436,11 @@ flip_screen_icon (int flags)
 void
 screen_flip_menu (intptr_t index)
 {
-  menu.main.view.flip.vertical =
+  item.main.view.flip.vertical =
     menu_citem (true, screen_flags & ALLEGRO_FLIP_VERTICAL,
                 vertical_icon, "&Vertical");
 
-  menu.main.view.flip.horizontal =
+  item.main.view.flip.horizontal =
     menu_citem (true, screen_flags & ALLEGRO_FLIP_HORIZONTAL,
                 horizontal_icon, "&Horizontal");
 }
@@ -1379,7 +1451,7 @@ gamepad_menu (intptr_t index)
   menu_sub (&menu.main.gamepad.device.m, true,
             gamepad_device_icon (gpm), gamepad_device_menu, 0, "&Device");
 
-  menu.main.gamepad.calibrate =
+  item.main.gamepad.calibrate =
     menu_sitem (gpm == JOYSTICK, clock_icon, "&Calibrate (Ctrl+J)");
 
   menu_sep (NULL);
@@ -1403,11 +1475,11 @@ gamepad_device_icon (enum gpm gpm)
 void
 gamepad_device_menu (intptr_t index)
 {
-  menu.main.gamepad.device.keyboard =
+  item.main.gamepad.device.keyboard =
     menu_citem (true, gpm == KEYBOARD, keyboard_icon,
                 "&Keyboard (Ctrl+K)");
 
-  menu.main.gamepad.device.joystick =
+  item.main.gamepad.device.joystick =
     menu_citem (joystick, gpm == JOYSTICK, joystick_icon,
                 "&Joystick (Ctrl+J)");
 }
@@ -1426,11 +1498,11 @@ flip_gamepad_icon (bool v, bool h)
 void
 flip_gamepad_menu (intptr_t index)
 {
-  menu.main.gamepad.flip.vertical =
+  item.main.gamepad.flip.vertical =
     menu_citem (true, flip_gamepad_vertical, vertical_icon,
                 "&Vertical");
 
-  menu.main.gamepad.flip.horizontal =
+  item.main.gamepad.flip.horizontal =
     menu_citem (true, flip_gamepad_horizontal, horizontal_icon,
                 "&Horizontal");
 }
@@ -1449,7 +1521,7 @@ play_menu (intptr_t index)
     menu_hitem (false, "REPLAYING (%zu/%zu)",
                 replay_index + 1, replay_chain_nmemb);
 
-    menu.main.play.play_replay =
+    item.main.play.play_replay =
       menu_sitem (true, stop_icon, "&Stop (F7)");
 
     menu_sub (&menu.main.play.replay_favorite.m, ! title_demo,
@@ -1469,7 +1541,7 @@ play_menu (intptr_t index)
 
     menu_hitem (false, "RECORDING");
 
-    menu.main.play.record_replay =
+    item.main.play.record_replay =
       menu_sitem (true,
                   replay_mode == RECORD_REPLAY
                   ? stop_icon : eject_icon,
@@ -1484,10 +1556,10 @@ play_menu (intptr_t index)
   default: assert (false);
   case NO_REPLAY: no_replay:
 
-    menu.main.play.play_replay =
+    item.main.play.play_replay =
       menu_sitem (true, play_icon, "Re&play... (F7)");
 
-    menu.main.play.record_replay =
+    item.main.play.record_replay =
       menu_sitem (true, record_icon, "&Record... (Alt+F7)");
 
     menu_sub (&menu.main.play.replay_favorite.m,
@@ -1509,7 +1581,7 @@ play_menu (intptr_t index)
 void
 replay_favorite_menu (intptr_t index)
 {
-  menu.main.play.replay_favorite.add =
+  item.main.play.replay_favorite.add =
     menu_sitem (! title_demo && replay_mode == PLAY_REPLAY,
                 plus_icon, "&Add");
 
@@ -1544,14 +1616,14 @@ void
 editor_menu (intptr_t index)
 {
   menu_ditem (edit == EDIT_NONE,
-              &menu.main.editor.editor_mode, &menu.main.editor.play_mode,
+              &item.main.editor.editor_mode, &item.main.editor.play_mode,
               true, edit_icon, joystick2_icon,
               "&Edit (F8)", "&Play (F8)");
 
-  menu.main.editor.undo =
+  item.main.editor.undo =
     menu_sitem (can_undo (&undo, -1), undo_icon, "&Undo (Ctrl+Z)");
 
-  menu.main.editor.redo =
+  item.main.editor.redo =
     menu_sitem (can_undo (&undo, +1), redo_icon, "&Redo (Ctrl+Y)");
 }
 
@@ -1560,27 +1632,27 @@ cheat_menu (intptr_t index)
 {
   struct actor *k = get_actor_by_id (current_kid_id);
 
-  menu.main.cheat.kill_enemy =
+  item.main.cheat.kill_enemy =
     menu_sitem (k && k->enemy_id > 0, death_icon, "&Kill enemy (K)");
 
-  menu.main.cheat.resurrect =
+  item.main.cheat.resurrect =
     menu_sitem (k && k->current_hp <= 0, resurrect_icon, "&Resurrect (R)");
 
-  menu.main.cheat.immortal =
+  item.main.cheat.immortal =
     menu_citem (true, immortal_mode, angel_icon, "&Immortal (I)");
 
-  menu.main.cheat.kid_float =
+  item.main.cheat.kid_float =
     menu_sitem (k && (k->current_hp > 0 || k->action == kid_fall)
                 && (k->float_timer == 0
                     || k->float_timer >= REFLOAT_MENU_THRESHOLD),
                 feather_icon, "&Float (Shift+W)");
 
-  menu.main.cheat.fill_hp =
+  item.main.cheat.fill_hp =
     menu_sitem (k && k->current_hp > 0
                 && k->current_hp < k->total_hp,
                 hp_empty_icon, "Fill &HP (Shift+S)");
 
-  menu.main.cheat.add_hp =
+  item.main.cheat.add_hp =
     menu_sitem (k && k->current_hp > 0
                 && (k->current_hp < k->total_hp
                     || k->total_hp < MAX_HP),
@@ -1602,10 +1674,10 @@ cheat_menu (intptr_t index)
 void
 time_change_menu (intptr_t index)
 {
-  menu.main.cheat.time.add =
+  item.main.cheat.time.add =
     menu_sitem (true, time_add_icon, "&Increase (=)");
 
-  menu.main.cheat.time.sub =
+  item.main.cheat.time.sub =
     menu_sitem (time_limit - play_time > 60 * DEFAULT_HZ, time_sub_icon,
                 "&Decrease (-)");
 }
@@ -1615,11 +1687,11 @@ kca_change_menu (intptr_t index)
 {
   struct actor *k = get_actor_by_id (current_kid_id);
 
-  menu.main.cheat.kca.add =
+  item.main.cheat.kca.add =
     menu_sitem (k && k->skill.counter_attack_prob < 99,
                 counter_attack_add_icon, "&Increase (Ctrl+=)");
 
-  menu.main.cheat.kca.sub =
+  item.main.cheat.kca.sub =
     menu_sitem (k && k->skill.counter_attack_prob > -1,
                 counter_attack_sub_icon, "&Decrease (Ctrl+-)");
 }
@@ -1629,11 +1701,11 @@ kcd_change_menu (intptr_t index)
 {
   struct actor *k = get_actor_by_id (current_kid_id);
 
-  menu.main.cheat.kcd.add =
+  item.main.cheat.kcd.add =
   menu_sitem (k && k->skill.counter_defense_prob < 99,
               counter_defense_add_icon, "&Increase (Alt+=)");
 
-  menu.main.cheat.kcd.sub =
+  item.main.cheat.kcd.sub =
     menu_sitem (k && k->skill.counter_defense_prob > -1,
                 counter_defense_sub_icon, "&Decrease (Alt+-)");
 }
@@ -1641,7 +1713,7 @@ kcd_change_menu (intptr_t index)
 void
 help_menu (intptr_t index)
 {
-  menu.main.help.about =
+  item.main.help.about =
     menu_sitem (true, small_logo_icon, "&About");
 }
 
@@ -1649,12 +1721,12 @@ void
 skip_level_widget (void)
 {
   if (cutscene || title_demo)
-    menu.main.play.jump_to_level._id =
+    item.main.play.jump_to_level._id =
       menu_array (&menu.main.play.jump_to_level.m, true, heading_icon,
                   jump_to_level_menu, JUMP_TO_LEVEL_MID_NMEMB, 14, 0,
                   "LEVEL");
   else
-    menu.main.play.jump_to_level._id =
+    item.main.play.jump_to_level._id =
       menu_array (&menu.main.play.jump_to_level.m, true, heading_icon,
                   jump_to_level_menu, JUMP_TO_LEVEL_MID_NMEMB,
                   replay_mode == PLAY_REPLAY
@@ -1663,19 +1735,19 @@ skip_level_widget (void)
                   ? replay_index : global_level.n - 1,
                   "LEVEL %i", global_level.n);
 
-  menu.main.play.restart_level =
+  item.main.play.restart_level =
     menu_sitem (replay_mode == PLAY_REPLAY && ! title_demo
               ? true
               : ! cutscene && ! title_demo,
               repeat_icon, "R&epeat (Ctrl+A)");
 
-  menu.main.play.next_level =
+  item.main.play.next_level =
     menu_sitem (replay_mode == PLAY_REPLAY && ! title_demo
                 ? replay_index + 1 < replay_chain_nmemb
                 : ! cutscene && ! title_demo && global_level.n < 14,
                 next_icon, "&Next (Shift+L)");
 
-  menu.main.play.previous_level =
+  item.main.play.previous_level =
     menu_sitem (replay_mode == PLAY_REPLAY && ! title_demo
                 ? replay_index > 0
                 : ! cutscene && ! title_demo && global_level.n > 1,
@@ -1698,12 +1770,12 @@ statistics_widget (void)
 {
   menu_sep (NULL);
 
-  menu.main.play.time =
+  item.main.play.time =
     menu_sitem
     (! cutscene && ! title_demo && recording_replay_countdown < 0,
      time_icon, "Ti&me (Space)");
 
-  menu.main.play.skills =
+  item.main.play.skills =
     menu_sitem
     (! cutscene && ! title_demo && recording_replay_countdown < 0,
      skills_icon, "S&kills (Tab)");
@@ -1716,13 +1788,13 @@ pause_menu_widget (void)
     menu_hitem (false, "CYCLE: %ju", anim_cycle);
   else menu_sep (NULL);
 
-  menu.main.play.pause_game =
+  item.main.play.pause_game =
     menu_sitem
     (! cutscene && ! title_demo && recording_replay_countdown < 0,
      is_game_paused () ? play_icon : pause_icon,
      is_game_paused () ? "&Continue" : "Pau&se (Esc)");
 
-  menu.main.play.next_frame =
+  item.main.play.next_frame =
     menu_sitem (is_game_paused () && ! cutscene && ! title_demo
                 && recording_replay_countdown < 0,
                 forward_icon, "Next &frame (Esc)");
@@ -1732,21 +1804,21 @@ void
 speed_menu_widget (void)
 {
   if (! cutscene && ! title_demo && anim_freq > 0)
-    menu.main.play.reset_time_freq =
+    item.main.play.reset_time_freq =
       menu_hitem (anim_freq != DEFAULT_HZ, "FREQ: %iHz", anim_freq);
   else menu_sep (NULL);
 
-  menu.main.play.toggle_time_freq_constraint =
+  item.main.play.toggle_time_freq_constraint =
     menu_citem
     (! cutscene && ! title_demo, anim_freq > 0, cancel_icon,
      "Frequency cons&traint");
 
-  menu.main.play.decrease_time_freq =
+  item.main.play.decrease_time_freq =
     menu_sitem
     (anim_freq > 2 && ! cutscene && ! title_demo, backward_icon,
      "&Decrease frequecy [(]");
 
-  menu.main.play.increase_time_freq =
+  item.main.play.increase_time_freq =
     menu_sitem
     (anim_freq != 0 && ! cutscene && ! title_demo, forward_icon,
      "&Increase frequecy [)]");
@@ -1760,6 +1832,7 @@ speed_menu_widget (void)
 void
 aux_menu (void)
 {
+  memset (&item.aux, 0, sizeof (item.aux));
   if (! menu.aux.m) {
     menu.aux.m = al_create_popup_menu ();
     menu.aux.event_source =
@@ -1768,7 +1841,7 @@ aux_menu (void)
   start_menu (menu.aux.m, AUX_MENU_ID_MIN);
 
   menu_ditem (! selection_locked,
-              &menu.aux.lock_selection, &menu.aux.unlock_selection,
+              &item.aux.lock_selection, &item.aux.unlock_selection,
               true, lock_icon, unlock_icon,
               "&Lock selection", "&Unlock selection");
 
@@ -1820,146 +1893,146 @@ process_main_menu_event (ALLEGRO_EVENT *event)
   ALLEGRO_MENU *m = (ALLEGRO_MENU *) event->user.data3;
   int i;
 
-  if (id == menu.main.game.mirror) ui_mirror_mode (! in_mirror_mode ());
-  else if (id == menu.main.game.start) ui_start_game ();
-  else if (id == menu.main.game.restart) ui_restart_game ();
-  else if (id == menu.main.game.quit) ui_quit_game ();
-  else if (id == menu.main.game.load.game) ui_load_game ();
-  else if (id == menu.main.game.load.config) ui_load_config ();
-  else if (id == menu.main.game.load.level) /* not implemented */;
-  else if (id == menu.main.game.save.game) ui_save_game ();
-  else if (id == menu.main.game.save.config) /* not implemented */;
-  else if (id == menu.main.game.save.level) /* not implemented */;
-  else if (id == menu.main.game.volume.off)
+  if (id == item.main.game.mirror) ui_mirror_mode (! in_mirror_mode ());
+  else if (id == item.main.game.start) ui_start_game ();
+  else if (id == item.main.game.restart) ui_restart_game ();
+  else if (id == item.main.game.quit) ui_quit_game ();
+  else if (id == item.main.game.load.game) ui_load_game ();
+  else if (id == item.main.game.load.config) ui_load_config ();
+  else if (id == item.main.game.load.level) /* not implemented */;
+  else if (id == item.main.game.save.game) ui_save_game ();
+  else if (id == item.main.game.save.config) /* not implemented */;
+  else if (id == item.main.game.save.level) /* not implemented */;
+  else if (id == item.main.game.volume.off)
     ui_audio_volume (VOLUME_OFF);
-  else if (id == menu.main.game.volume.low)
+  else if (id == item.main.game.volume.low)
     ui_audio_volume (VOLUME_LOW);
-  else if (id == menu.main.game.volume.medium)
+  else if (id == item.main.game.volume.medium)
     ui_audio_volume (VOLUME_MEDIUM);
-  else if (id == menu.main.game.volume.high)
+  else if (id == item.main.game.volume.high)
     ui_audio_volume (VOLUME_HIGH);
-  else if (id == menu.main.view.full_screen
-           || id == menu.main.view.windowed)
+  else if (id == item.main.view.full_screen
+           || id == item.main.view.windowed)
     ui_full_screen ();
-  else if (id == menu.main.view.room_drawing)
+  else if (id == item.main.view.room_drawing)
     ui_room_drawing (no_room_drawing);
-  else if (id == menu.main.view.inhibit_screensaver)
+  else if (id == item.main.view.inhibit_screensaver)
     ui_inhibit_screensaver (! inhibit_screensaver);
-  else if (id == menu.main.view.screenshot)
+  else if (id == item.main.view.screenshot)
     ui_screenshot ();
-  else if (id == menu.main.view.zoom.reset) {
+  else if (id == item.main.view.zoom.reset) {
     ui_zoom_fit (MR_FIT_NONE);
     ui_set_multi_room (2 - mr.w, 2 - mr.h, false);
-  } else if (id == menu.main.view.zoom.fit.none)
+  } else if (id == item.main.view.zoom.fit.none)
     ui_zoom_fit (MR_FIT_NONE);
-  else if (id == menu.main.view.zoom.fit.stretch)
+  else if (id == item.main.view.zoom.fit.stretch)
     ui_zoom_fit (MR_FIT_STRETCH);
-  else if (id == menu.main.view.zoom.fit.ratio)
+  else if (id == item.main.view.zoom.fit.ratio)
     ui_zoom_fit (MR_FIT_RATIO);
-  else if (id == menu.main.view.zoom.in.both)
+  else if (id == item.main.view.zoom.in.both)
     ui_set_multi_room (-1, -1, false);
-  else if (id == menu.main.view.zoom.in.vertical)
+  else if (id == item.main.view.zoom.in.vertical)
     ui_set_multi_room (+0, -1, false);
-  else if (id == menu.main.view.zoom.in.horizontal)
+  else if (id == item.main.view.zoom.in.horizontal)
     ui_set_multi_room (-1, +0, false);
-  else if (id == menu.main.view.zoom.out.both)
+  else if (id == item.main.view.zoom.out.both)
     ui_set_multi_room (+1, +1, false);
-  else if (id == menu.main.view.zoom.out.vertical)
+  else if (id == item.main.view.zoom.out.vertical)
     ui_set_multi_room (+0, +1, false);
-  else if (id == menu.main.view.zoom.out.horizontal)
+  else if (id == item.main.view.zoom.out.horizontal)
     ui_set_multi_room (+1, +0, false);
-  else if (id == menu.main.view.nav.current_room)
+  else if (id == item.main.view.nav.current_room)
     mr.select_cycles = SELECT_CYCLES;
-  else if (id == menu.main.view.nav.home)
+  else if (id == item.main.view.nav.home)
     mr_focus_room (get_actor_by_id (current_kid_id)->f.c.room);
-  else if (id == menu.main.view.nav.center)
+  else if (id == item.main.view.nav.center)
     mr_center_room (mr.room);
-  else if (id == menu.main.view.nav.coord)
+  else if (id == item.main.view.nav.coord)
     ui_show_coordinates ();
-  else if (id == menu.main.view.nav.ind_coord)
+  else if (id == item.main.view.nav.ind_coord)
     ui_show_indirect_coordinates ();
-  else if (id == menu.main.view.nav.select.left) mr_select_trans (LEFT);
-  else if (id == menu.main.view.nav.select.above) mr_select_trans (ABOVE);
-  else if (id == menu.main.view.nav.select.right) mr_select_trans (RIGHT);
-  else if (id == menu.main.view.nav.select.below) mr_select_trans (BELOW);
-  else if (id == menu.main.view.nav.cell.left) mr_view_trans (LEFT);
-  else if (id == menu.main.view.nav.cell.above) mr_view_trans (ABOVE);
-  else if (id == menu.main.view.nav.cell.right) mr_view_trans (RIGHT);
-  else if (id == menu.main.view.nav.cell.below) mr_view_trans (BELOW);
-  else if (id == menu.main.view.nav.page.left) mr_view_page_trans (LEFT);
-  else if (id == menu.main.view.nav.page.above) mr_view_page_trans (ABOVE);
-  else if (id == menu.main.view.nav.page.right) mr_view_page_trans (RIGHT);
-  else if (id == menu.main.view.nav.page.below) mr_view_page_trans (BELOW);
-  else if (id == menu.main.view.em.original) ui_em (ORIGINAL_EM);
-  else if (id == menu.main.view.em.dungeon) ui_em (DUNGEON);
-  else if (id == menu.main.view.em.palace) ui_em (PALACE);
-  else if (id == menu.main.view.hue.original) ui_hue_mode (HUE_ORIGINAL);
-  else if (id == menu.main.view.hue.none) ui_hue_mode (HUE_NONE);
-  else if (id == menu.main.view.hue.green) ui_hue_mode (HUE_GREEN);
-  else if (id == menu.main.view.hue.gray) ui_hue_mode (HUE_GRAY);
-  else if (id == menu.main.view.hue.yellow) ui_hue_mode (HUE_YELLOW);
-  else if (id == menu.main.view.hue.blue) ui_hue_mode (HUE_BLUE);
-  else if (id == menu.main.view.gm.original) ui_gm (ORIGINAL_GM);
-  else if (id == menu.main.view.gm.guard) ui_gm (GUARD_GM);
-  else if (id == menu.main.view.gm.fat) ui_gm (FAT_GM);
-  else if (id == menu.main.view.gm.vizier) ui_gm (VIZIER_GM);
-  else if (id == menu.main.view.gm.skeleton) ui_gm (SKELETON_GM);
-  else if (id == menu.main.view.gm.shadow) ui_gm (SHADOW_GM);
-  else if (id == menu.main.view.flip.vertical)
+  else if (id == item.main.view.nav.select.left) mr_select_trans (LEFT);
+  else if (id == item.main.view.nav.select.above) mr_select_trans (ABOVE);
+  else if (id == item.main.view.nav.select.right) mr_select_trans (RIGHT);
+  else if (id == item.main.view.nav.select.below) mr_select_trans (BELOW);
+  else if (id == item.main.view.nav.cell.left) mr_view_trans (LEFT);
+  else if (id == item.main.view.nav.cell.above) mr_view_trans (ABOVE);
+  else if (id == item.main.view.nav.cell.right) mr_view_trans (RIGHT);
+  else if (id == item.main.view.nav.cell.below) mr_view_trans (BELOW);
+  else if (id == item.main.view.nav.page.left) mr_view_page_trans (LEFT);
+  else if (id == item.main.view.nav.page.above) mr_view_page_trans (ABOVE);
+  else if (id == item.main.view.nav.page.right) mr_view_page_trans (RIGHT);
+  else if (id == item.main.view.nav.page.below) mr_view_page_trans (BELOW);
+  else if (id == item.main.view.em.original) ui_em (ORIGINAL_EM);
+  else if (id == item.main.view.em.dungeon) ui_em (DUNGEON);
+  else if (id == item.main.view.em.palace) ui_em (PALACE);
+  else if (id == item.main.view.hue.original) ui_hue_mode (HUE_ORIGINAL);
+  else if (id == item.main.view.hue.none) ui_hue_mode (HUE_NONE);
+  else if (id == item.main.view.hue.green) ui_hue_mode (HUE_GREEN);
+  else if (id == item.main.view.hue.gray) ui_hue_mode (HUE_GRAY);
+  else if (id == item.main.view.hue.yellow) ui_hue_mode (HUE_YELLOW);
+  else if (id == item.main.view.hue.blue) ui_hue_mode (HUE_BLUE);
+  else if (id == item.main.view.gm.original) ui_gm (ORIGINAL_GM);
+  else if (id == item.main.view.gm.guard) ui_gm (GUARD_GM);
+  else if (id == item.main.view.gm.fat) ui_gm (FAT_GM);
+  else if (id == item.main.view.gm.vizier) ui_gm (VIZIER_GM);
+  else if (id == item.main.view.gm.skeleton) ui_gm (SKELETON_GM);
+  else if (id == item.main.view.gm.shadow) ui_gm (SHADOW_GM);
+  else if (id == item.main.view.flip.vertical)
     ui_flip_screen (screen_flags ^ ALLEGRO_FLIP_VERTICAL, false, false);
-  else if (id == menu.main.view.flip.horizontal)
+  else if (id == item.main.view.flip.horizontal)
     ui_flip_screen (screen_flags ^ ALLEGRO_FLIP_HORIZONTAL, false, false);
-  else if (id == menu.main.gamepad.calibrate) ui_gamepad_mode (JOYSTICK);
-  else if (id == menu.main.gamepad.device.keyboard) ui_gamepad_mode (KEYBOARD);
-  else if (id == menu.main.gamepad.device.joystick)
+  else if (id == item.main.gamepad.calibrate) ui_gamepad_mode (JOYSTICK);
+  else if (id == item.main.gamepad.device.keyboard) ui_gamepad_mode (KEYBOARD);
+  else if (id == item.main.gamepad.device.joystick)
     ui_gamepad_mode (JOYSTICK);
-  else if (id == menu.main.gamepad.flip.vertical)
+  else if (id == item.main.gamepad.flip.vertical)
     ui_flip_gamepad (! flip_gamepad_vertical, flip_gamepad_horizontal, false);
-  else if (id == menu.main.gamepad.flip.horizontal)
+  else if (id == item.main.gamepad.flip.horizontal)
     ui_flip_gamepad (flip_gamepad_vertical, ! flip_gamepad_horizontal, false);
-  else if (id == menu.main.play.play_replay) ui_play_replay ();
-  else if (id == menu.main.play.record_replay) ui_record_replay ();
-  else if (id == menu.main.play.restart_level) ui_jump_to_level_rel (+0);
-  else if (id == menu.main.play.next_level) ui_jump_to_level_rel (+1);
-  else if (id == menu.main.play.previous_level) ui_jump_to_level_rel (-1);
-  else if (id == menu.main.play.time) ui_time ();
-  else if (id == menu.main.play.skills) ui_skills ();
-  else if (id == menu.main.play.pause_game) ui_toggle_pause_game ();
-  else if (id == menu.main.play.next_frame) ui_next_frame ();
-  else if (id == menu.main.play.reset_time_freq)
+  else if (id == item.main.play.play_replay) ui_play_replay ();
+  else if (id == item.main.play.record_replay) ui_record_replay ();
+  else if (id == item.main.play.restart_level) ui_jump_to_level_rel (+0);
+  else if (id == item.main.play.next_level) ui_jump_to_level_rel (+1);
+  else if (id == item.main.play.previous_level) ui_jump_to_level_rel (-1);
+  else if (id == item.main.play.time) ui_time ();
+  else if (id == item.main.play.skills) ui_skills ();
+  else if (id == item.main.play.pause_game) ui_toggle_pause_game ();
+  else if (id == item.main.play.next_frame) ui_next_frame ();
+  else if (id == item.main.play.reset_time_freq)
     ui_change_anim_freq (DEFAULT_HZ);
-  else if (id == menu.main.play.toggle_time_freq_constraint)
+  else if (id == item.main.play.toggle_time_freq_constraint)
     ui_toggle_time_frequency_constraint ();
-  else if (id == menu.main.play.decrease_time_freq)
+  else if (id == item.main.play.decrease_time_freq)
     ui_decrease_time_frequency ();
-  else if (id == menu.main.play.increase_time_freq)
+  else if (id == item.main.play.increase_time_freq)
     ui_increase_time_frequency ();
-  else if (id == menu.main.play.replay_favorite.add)
+  else if (id == item.main.play.replay_favorite.add)
     ui_add_replay_favorite ();
-  else if (id == menu.main.editor.editor_mode
-           || id == menu.main.editor.play_mode)
+  else if (id == item.main.editor.editor_mode
+           || id == item.main.editor.play_mode)
     ui_editor ();
-  else if (id == menu.main.editor.undo)
+  else if (id == item.main.editor.undo)
     ui_undo_pass (&undo, -1, NULL);
-  else if (id == menu.main.editor.redo)
+  else if (id == item.main.editor.redo)
     ui_undo_pass (&undo, +1, NULL);
-  else if (id == menu.main.cheat.kill_enemy) ui_kill_enemy ();
-  else if (id == menu.main.cheat.resurrect) ui_resurrect ();
-  else if (id == menu.main.cheat.immortal) ui_immortal (! immortal_mode);
-  else if (id == menu.main.cheat.kid_float) ui_float ();
-  else if (id == menu.main.cheat.fill_hp) ui_fill_hp ();
-  else if (id == menu.main.cheat.add_hp) ui_add_hp ();
-  else if (id == menu.main.cheat.time.add) ui_change_time (+10);
-  else if (id == menu.main.cheat.time.sub) ui_change_time (-10);
-  else if (id == menu.main.cheat.kca.add) ui_change_kca (+10);
-  else if (id == menu.main.cheat.kca.sub) ui_change_kca (-10);
-  else if (id == menu.main.cheat.kcd.add) ui_change_kcd (+10);
-  else if (id == menu.main.cheat.kcd.sub) ui_change_kcd (-10);
-  else if (id == menu.main.help.about) ui_about_screen (true);
-  else if (id == menu.main.unlock_selection)
+  else if (id == item.main.cheat.kill_enemy) ui_kill_enemy ();
+  else if (id == item.main.cheat.resurrect) ui_resurrect ();
+  else if (id == item.main.cheat.immortal) ui_immortal (! immortal_mode);
+  else if (id == item.main.cheat.kid_float) ui_float ();
+  else if (id == item.main.cheat.fill_hp) ui_fill_hp ();
+  else if (id == item.main.cheat.add_hp) ui_add_hp ();
+  else if (id == item.main.cheat.time.add) ui_change_time (+10);
+  else if (id == item.main.cheat.time.sub) ui_change_time (-10);
+  else if (id == item.main.cheat.kca.add) ui_change_kca (+10);
+  else if (id == item.main.cheat.kca.sub) ui_change_kca (-10);
+  else if (id == item.main.cheat.kcd.add) ui_change_kcd (+10);
+  else if (id == item.main.cheat.kcd.sub) ui_change_kcd (-10);
+  else if (id == item.main.help.about) ui_about_screen (true);
+  else if (id == item.main.unlock_selection)
     selection_locked = ! selection_locked;
   else if (m == menu.main.play.jump_to_level.m)
-    ui_jump_to_level_menu (id - menu.main.play.jump_to_level._id);
+    ui_jump_to_level_menu (id - item.main.play.jump_to_level._id);
   else if ((i = replay_favorite_index_by_menu (m)) >= 0) {
     if (id - replay_favorite[i].mid == GO_TO_REPLAY_FAVORITE)
       ui_go_to_replay_favorite (i);
@@ -1978,7 +2051,7 @@ process_aux_menu_event (ALLEGRO_EVENT *event)
   /* ALLEGRO_MENU *m = (ALLEGRO_MENU *) event->user.data3; */
   /* int i; */
 
-  if (id == menu.aux.lock_selection || id == menu.aux.unlock_selection)
+  if (id == item.aux.lock_selection || id == item.aux.unlock_selection)
     selection_locked = ! selection_locked;
 }
 

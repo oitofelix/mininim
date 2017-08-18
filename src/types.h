@@ -320,7 +320,7 @@ enum item {
   ACTIVATION_POTION = 8,
   SWORD = 9,
   ITEMS
-} item;
+};
 
 enum should_draw {
   SHOULD_DRAW_NONE, SHOULD_DRAW_PART, SHOULD_DRAW_FULL,
