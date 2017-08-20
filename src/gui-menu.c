@@ -26,6 +26,8 @@ static uint16_t append_menu_id;
 static int append_menu_depth = -1;
 
 static void start_menu (ALLEGRO_MENU *parent, uint16_t base_id);
+static uint16_t get_menu_item_id (ALLEGRO_MENU *parent, int index,
+                                  uint16_t start_id);
 static uint16_t vmenu_item (int flags, ALLEGRO_BITMAP *icon,
                             ALLEGRO_MENU **submenu,
                             char const *title_template, va_list ap);
@@ -635,6 +637,18 @@ start_menu (ALLEGRO_MENU *parent, uint16_t base_id)
 }
 
 uint16_t
+get_menu_item_id (ALLEGRO_MENU *parent, int index, uint16_t start_id)
+{
+  for (uint16_t i = start_id; i <= MENU_ID_MAX; i++) {
+    ALLEGRO_MENU *f_menu;
+    int f_index;
+    if (al_find_menu_item (parent, i, &f_menu, &f_index)
+        && f_menu == parent && f_index == index) return i;
+  }
+  return 0;
+}
+
+uint16_t
 vmenu_item (int flags, ALLEGRO_BITMAP *icon, ALLEGRO_MENU **submenu,
             char const *title_template, va_list ap)
 {
@@ -655,8 +669,12 @@ vmenu_item (int flags, ALLEGRO_BITMAP *icon, ALLEGRO_MENU **submenu,
 
   if (al_find_menu_item (*am, id, &f_menu, &f_index) || submenu) {
     if ((f_menu != *am || f_index != *am_i) && ! submenu) {
-      al_remove_menu_item (f_menu, -f_index);
-      goto replace;
+      uint16_t new_id = get_menu_item_id (*am, *am_i, id + 1);
+      if (new_id) append_menu_id = id = new_id;
+      else {
+        al_remove_menu_item (f_menu, -f_index);
+        goto replace;
+      }
     }
 
     int cflags = al_get_menu_item_flags (*am, -*am_i);
