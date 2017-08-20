@@ -427,18 +427,22 @@ setup_video_mode (char *requested_vm)
     return;
   }
 
-  size_t ba_nmemb = actor_nmemb;
-  ALLEGRO_BITMAP **ba = xcalloc (ba_nmemb, sizeof (*ba));
+  ALLEGRO_BITMAP **ba = NULL;
+  size_t ba_nmemb = 0;
+  if (w != REAL_WIDTH && h != REAL_HEIGHT) {
+    ba_nmemb = actor_nmemb;
+    ba = xcalloc (ba_nmemb, sizeof (*ba));
 
-  for (size_t i = 0; i < actor_nmemb; i++) {
-    struct actor *a = &actor[i];
+    for (size_t i = 0; i < actor_nmemb; i++) {
+      struct actor *a = &actor[i];
 
-    int bw = (w * get_bitmap_width (a->f.b)) / REAL_WIDTH;
-    int bh = (h * get_bitmap_height (a->f.b)) / REAL_HEIGHT;
+      int bw = (w * get_bitmap_width (a->f.b)) / REAL_WIDTH;
+      int bh = (h * get_bitmap_height (a->f.b)) / REAL_HEIGHT;
 
-    a->f.b = ba[i] = create_bitmap (bw, bh);
-    a->f.c.x = round (a->f.c.x);
-    a->f.c.y = round (a->f.c.y);
+      a->f.b = ba[i] = create_bitmap (bw, bh);
+      if (w != REAL_WIDTH) a->f.c.x = round (a->f.c.x);
+      if (h != REAL_HEIGHT) a->f.c.y = round (a->f.c.y);
+    }
   }
 
   REAL_WIDTH = w;
@@ -453,13 +457,12 @@ setup_video_mode (char *requested_vm)
   update_room0_cache ();
   update_cache ();
 
-  if (! cutscene) {
-    if (is_game_paused ()) step_cycle = 1;
-    compute_level ();
-    draw_level ();
-    cleanup_level ();
-  }
+  if (is_game_paused ()) step_cycle = 1;
+  if (anim_compute_callback) anim_compute_callback ();
+  if (anim_draw_callback) anim_draw_callback ();
+  if (anim_cleanup_callback) anim_cleanup_callback ();
 
-  for (size_t i = 0; i < ba_nmemb; i++) al_destroy_bitmap (ba[i]);
+  if (ba && ba_nmemb)
+    for (size_t i = 0; i < ba_nmemb; i++) al_destroy_bitmap (ba[i]);
   al_free (ba);
 }

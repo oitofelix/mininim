@@ -189,14 +189,15 @@
 
 #include "bmenu.h"
 #include "editor.h"
-#include "editor-gui.h"
 #include "debug.h"
 #include "undo.h"
 #include "multi-room.h"
 #include "replay.h"
 #include "hotkeys.h"
-#include "ui.h"
+#include "ui-command.h"
 #include "gui.h"
+#include "gui-menu.h"
+#include "gui-editor.h"
 #include "xmath.h"
 #include "xstring.h"
 

@@ -27,6 +27,8 @@ enum file_type {
 
 typedef int (* m_comparison_fn_t) (const void *, const void *);
 
+typedef void (* anim_callback_t) (void);
+
 struct key {
   int modifiers;
   int keycode;

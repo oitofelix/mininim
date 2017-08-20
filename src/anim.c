@@ -32,13 +32,24 @@ int anim_freq_real;
 
 ALLEGRO_EVENT_QUEUE *event_queue;
 
+anim_callback_t anim_draw_callback, anim_compute_callback,
+  anim_cleanup_callback;
+
 void
-play_anim (void (*draw_callback) (void),
-           void (*compute_callback) (void),
-           void (*cleanup_callback) (void))
+play_anim (anim_callback_t draw_callback,
+           anim_callback_t compute_callback,
+           anim_callback_t cleanup_callback)
 {
+  assert (! anim_cycle
+          && ! anim_draw_callback
+          && ! anim_compute_callback
+          && ! anim_cleanup_callback);
+
   anim_cycle = 0;
   quit_anim = NO_QUIT;
+  anim_draw_callback = draw_callback;
+  anim_compute_callback = compute_callback;
+  anim_cleanup_callback = cleanup_callback;
 
   al_acknowledge_resize (display);
 
@@ -182,7 +193,7 @@ play_anim (void (*draw_callback) (void),
           uint32_t random_seed_before_draw;
           if (replay_mode != NO_REPLAY)
             random_seed_before_draw = random_seed;
-          draw_callback ();
+          if (draw_callback) draw_callback ();
           if (replay_mode != NO_REPLAY)
             random_seed = random_seed_before_draw;
           play_audio_instances ();
@@ -390,6 +401,9 @@ play_anim (void (*draw_callback) (void),
 
   al_stop_timer (timer);
   anim_cycle = 0;
+  anim_draw_callback = NULL;
+  anim_compute_callback = NULL;
+  anim_cleanup_callback = NULL;
 }
 
 void

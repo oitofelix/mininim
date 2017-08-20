@@ -22,9 +22,9 @@
 #define MININIM_ANIM_H
 
 /* functions */
-void play_anim (void (*draw_callback) (void),
-                void (*compute_callback) (void),
-                void (*cleanup_callback) (void));
+void play_anim (anim_callback_t draw_callback,
+                anim_callback_t compute_callback,
+                anim_callback_t cleanup_callback);
 void pause_animation (bool val);
 void cutscene_mode (bool val);
 void change_anim_freq (int f);
@@ -51,6 +51,8 @@ bool wait_anim (int cycles);
 
 
 /* variables */
+extern anim_callback_t anim_draw_callback, anim_compute_callback,
+  anim_cleanup_callback;
 extern bool pause_anim;
 extern enum quit_anim quit_anim; /* set to true to quit animation */
 extern bool next_frame_inv; /* invert draw_anim offset interpretation  */

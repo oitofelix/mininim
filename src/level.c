@@ -605,9 +605,16 @@ unload_level (void)
 void
 compute_level (void)
 {
-  size_t i;
+  if (step_cycle > 0) {
+    game_paused = false;
+    step_cycle--;
+  } else if (step_cycle == 0) {
+    game_paused = true;
+    step_cycle = -1;
+  }
 
-  level_key_bindings ();
+  level_hotkeys_cb (NULL, 0);
+
   process_death ();
 
   if (is_game_paused ()) {
@@ -664,7 +671,7 @@ compute_level (void)
 
   int prev_room = k->f.c.room;
 
-  for (i = 0; i < actor_nmemb; i++) {
+  for (size_t i = 0; i < actor_nmemb; i++) {
     struct actor *a = &actor[i];
     a->splash = false;
     a->xf.b = NULL;
@@ -673,7 +680,7 @@ compute_level (void)
   compute_loose_floors ();
 
   /* non-current controllables must defend themselves */
-  for (i = 0; i < actor_nmemb; i++) {
+  for (size_t i = 0; i < actor_nmemb; i++) {
     struct actor *ks = &actor[i];
 
     if ((ks->id != 0 && ks->shadow_of != 0)
@@ -689,12 +696,12 @@ compute_level (void)
   }
 
   /* fight AI */
-  for (i = 0; i < actor_nmemb; i++) enter_fight_logic (&actor[i]);
-  for (i = 0; i < actor_nmemb; i++) leave_fight_logic (&actor[i]);
-  for (i = 0; i < actor_nmemb; i++) fight_ai (&actor[i]);
+  for (size_t i = 0; i < actor_nmemb; i++) enter_fight_logic (&actor[i]);
+  for (size_t i = 0; i < actor_nmemb; i++) leave_fight_logic (&actor[i]);
+  for (size_t i = 0; i < actor_nmemb; i++) fight_ai (&actor[i]);
 
   /* actions */
-  for (i = 0; i < actor_nmemb; i++) {
+  for (size_t i = 0; i < actor_nmemb; i++) {
     if (actor[i].next_action) {
       actor[i].next_action (&actor[i]);
       actor[i].next_action = NULL;
@@ -702,10 +709,10 @@ compute_level (void)
   }
 
   /* fight mechanics */
-  for (i = 0; i < actor_nmemb; i++) fight_mechanics (&actor[i]);
+  for (size_t i = 0; i < actor_nmemb; i++) fight_mechanics (&actor[i]);
 
   /* timers */
-  for (i = 0; i < actor_nmemb; i++) {
+  for (size_t i = 0; i < actor_nmemb; i++) {
     struct actor *a = &actor[i];
     if (a->float_timer && a->float_timer < FLOAT_TIMER_MAX) {
       request_gamepad_rumble (0.5 * (sin (a->float_timer * 0.17) + 1),
@@ -719,14 +726,14 @@ compute_level (void)
   }
 
   /* appropriately turn controllables */
-  for (i = 0; i < actor_nmemb; i++) {
+  for (size_t i = 0; i < actor_nmemb; i++) {
     struct actor *ks = &actor[i];
     if (ks->id == 0 || ks->shadow_of == 0)
       fight_turn_controllable (ks);
   }
 
   /* collision enforcement */
-  for (i = 0; i < actor_nmemb; i++) {
+  for (size_t i = 0; i < actor_nmemb; i++) {
     struct actor *a = &actor[i];
     enforce_wall_collision (a);
   }

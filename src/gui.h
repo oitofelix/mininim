@@ -28,5 +28,8 @@ Ihandle *bitmap_to_iup_image (ALLEGRO_BITMAP *b, ALLEGRO_COLOR bg);
 void set_button_bitmap (Ihandle *ih, ALLEGRO_BITMAP *b);
 void dialog_fit_natural_size (Ihandle *ih);
 int hide_dialog (Ihandle *ih);
+void gui_control_active (Ihandle *ih, bool a);
+int gui_default_key_cb (Ihandle *ih, int c);
+int gui_empty_value_to_0 (Ihandle *ih);
 
 #endif	/* MININIM_GUI_H */

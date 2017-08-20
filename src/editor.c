@@ -582,7 +582,8 @@ editor (void)
   case EDIT_PILLAR:
     if (! is_valid_pos (&p)) {
       editor_msg ("SELECT TILE", EDITOR_CYCLES_0);
-      al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
+      al_set_system_mouse_cursor
+        (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       if (was_bmenu_return_pressed (true)) edit = EDIT_FG;
       break;
     }
@@ -601,18 +602,15 @@ editor (void)
     case 'A': f = ARCH_BOTTOM; break;
     }
 
-    str = xasprintf ("%s%s", fake_fg ? "FAKE " : "", tile_fg_str[f]);
-    register_tile_undo (&undo, &p,
-                       ! fake_fg ? f : MIGNORE,
-                       MIGNORE, MIGNORE,
-                       fake_fg ? f : MIGNORE,
-                       NULL, true, str);
-    al_free (str);
+    if (fake_fg) change_tile_fake (&p, f);
+    else change_tile_fg (&p, f);
+
     break;
   case EDIT_DOOR:
     if (! is_valid_pos (&p)) {
       editor_msg ("SELECT TILE", EDITOR_CYCLES_0);
-      al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
+      al_set_system_mouse_cursor
+        (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       if (was_bmenu_return_pressed (true)) edit = EDIT_FG;
       break;
     }
@@ -633,18 +631,15 @@ editor (void)
     case 'L': f = LEVEL_DOOR; break;
     }
 
-    str = xasprintf ("%s%s", fake_fg ? "FAKE " : "", tile_fg_str[f]);
-    register_tile_undo (&undo, &p,
-                       ! fake_fg ? f : MIGNORE,
-                       MIGNORE, MIGNORE,
-                       fake_fg ? f : MIGNORE,
-                       NULL, true, str);
-    al_free (str);
+    if (fake_fg) change_tile_fake (&p, f);
+    else change_tile_fg (&p, f);
+
     break;
   case EDIT_CARPET:
     if (! is_valid_pos (&p)) {
       editor_msg ("SELECT TILE", EDITOR_CYCLES_0);
-      al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
+      al_set_system_mouse_cursor
+        (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       if (was_bmenu_return_pressed (true)) edit = EDIT_FG;
       break;
     }
@@ -661,18 +656,15 @@ editor (void)
     case 'T': f = TCARPET; break;
     }
 
-    str = xasprintf ("%s%s", fake_fg ? "FAKE " : "", tile_fg_str[f]);
-    register_tile_undo (&undo, &p,
-                       ! fake_fg ? f : MIGNORE,
-                       MIGNORE, MIGNORE,
-                       fake_fg ? f : MIGNORE,
-                       NULL, true, str);
-    al_free (str);
+    if (fake_fg) change_tile_fake (&p, f);
+    else change_tile_fg (&p, f);
+
     break;
   case EDIT_ARCH:
     if (! is_valid_pos (&p)) {
       editor_msg ("SELECT TILE", EDITOR_CYCLES_0);
-      al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
+      al_set_system_mouse_cursor
+        (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       if (was_bmenu_return_pressed (true)) edit = EDIT_FG;
       break;
     }
@@ -691,18 +683,15 @@ editor (void)
     case 'R': f = ARCH_TOP_RIGHT; break;
     }
 
-    str = xasprintf ("%s%s", fake_fg ? "FAKE " : "", tile_fg_str[f]);
-    register_tile_undo (&undo, &p,
-                       ! fake_fg ? f : MIGNORE,
-                       MIGNORE, MIGNORE,
-                       fake_fg ? f : MIGNORE,
-                       NULL, true, str);
-    al_free (str);
+    if (fake_fg) change_tile_fake (&p, f);
+    else change_tile_fg (&p, f);
+
     break;
   case EDIT_BG:
     if (! is_valid_pos (&p)) {
       editor_msg ("SELECT TILE", EDITOR_CYCLES_0);
-      al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
+      al_set_system_mouse_cursor
+        (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       if (was_bmenu_return_pressed (true)) edit = EDIT_TILE;
       break;
     }

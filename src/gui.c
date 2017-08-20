@@ -20,7 +20,7 @@
 
 #include "mininim.h"
 
-static int gui_global_keyboard_cb (int c, int press);
+/* static int gui_global_keyboard_cb (int c, int press); */
 
 void
 init_gui (int argc, char **argv)
@@ -30,25 +30,25 @@ init_gui (int argc, char **argv)
 
   /* Integrate keyboard events */
   IupSetGlobal ("AUTOREPEAT", "YES");
-  IupSetGlobal ("INPUTCALLBACKS", "YES");
-  IupSetFunction ("GLOBALKEYPRESS_CB", (Icallback) gui_global_keyboard_cb);
+  /* IupSetGlobal ("INPUTCALLBACKS", "YES"); */
+  /* IupSetFunction ("GLOBALKEYPRESS_CB", (Icallback) gui_global_keyboard_cb); */
 
   Ihandle *logo_icon_image =
     bitmap_to_iup_image (logo_icon, TRANSPARENT_COLOR);
   IupSetHandle ("logo_icon", logo_icon_image);
 }
 
-int
-gui_global_keyboard_cb (int c, int press)
-{
-  if (! press) return IUP_CONTINUE;
+/* int */
+/* gui_global_keyboard_cb (int c, int press) */
+/* { */
+/*   if (! press) return IUP_CONTINUE; */
 
-  if (animation_hotkeys_cb (NULL, c) == IUP_IGNORE)
-    return IUP_IGNORE;
-  else if (level_hotkeys_cb (NULL, c) == IUP_IGNORE)
-    return IUP_IGNORE;
-  else return IUP_CONTINUE;
-}
+/*   if (animation_hotkeys_cb (NULL, c) == IUP_IGNORE) */
+/*     return IUP_IGNORE; */
+/*   else if (level_hotkeys_cb (NULL, c) == IUP_IGNORE) */
+/*     return IUP_IGNORE; */
+/*   else return IUP_CONTINUE; */
+/* } */
 
 const char *load_led_error_msg;
 
@@ -134,5 +134,31 @@ int
 hide_dialog (Ihandle *ih)
 {
   IupHide (IupGetDialog (ih));
+  return IUP_DEFAULT;
+}
+
+/* Update active status.  This function based on the method of first
+   assessing the current control state is necessary because (specially
+   for Windows) the IUP driver may insist in redrawing the control
+   even when there is no change in state, resulting in random
+   graphical glitches if done recurrently. */
+void
+gui_control_active (Ihandle *ih, bool a)
+{
+  bool b = IupGetInt (ih, "ACTIVE");
+  if (! equiv (a, b)) IupSetInt (ih, "ACTIVE", a);
+}
+
+int
+gui_default_key_cb (Ihandle *ih, int c)
+{
+  return IUP_DEFAULT;
+}
+
+int
+gui_empty_value_to_0 (Ihandle *ih)
+{
+  char *v = IupGetAttribute (ih, "VALUE");
+  if (! strlen (v)) IupSetAttribute (ih, "VALUE", "0");
   return IUP_DEFAULT;
 }

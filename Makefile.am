@@ -30,7 +30,7 @@ include documentation.am
 
 bin_PROGRAMS = mininim
 mininim_SOURCES = src/mininim.c src/mininim.h src/compatibility.h			\
-	  src/ui.c src/ui.h src/hotkeys.c src/hotkeys.h src/gui.c src/gui.h	\
+	  src/ui-command.c src/ui-command.h src/hotkeys.c src/hotkeys.h			\
 	  src/constants.h src/types.h src/colors.h src/anim.c src/anim.h		\
 	  src/actor.c src/actor.h src/pos.c src/pos.h src/physics.c					\
 	  src/physics.h src/level.c src/level.h src/fix.c src/fix.h					\
@@ -95,8 +95,9 @@ mininim_SOURCES = src/mininim.c src/mininim.h src/compatibility.h			\
 	  src/kernel/xconfig.c src/kernel/xconfig.h src/kernel/diff.c				\
 	  src/kernel/diff.h src/kernel/xmath.c src/kernel/xmath.h						\
 	  src/kernel/xstring.c src/kernel/xstring.h src/bmenu.c src/bmenu.h	\
-	  src/editor.c src/editor.h src/editor-gui.c src/editor-gui.h				\
-	  src/debug.c src/debug.h src/undo.c src/undo.h src/multi-room.c		\
+	  src/editor.c src/editor.h src/gui.c src/gui.h src/gui-menu.c			\
+	  src/gui-menu.h src/gui-editor.c src/gui-editor.h src/debug.c			\
+	  src/debug.h src/undo.c src/undo.h src/multi-room.c								\
 	  src/multi-room.h src/replay.c src/replay.h src/script/repl.c			\
 	  src/script/repl.h src/script/script.c src/script/script.h					\
 	  src/script/L_mininim.c src/script/L_mininim.h											\
