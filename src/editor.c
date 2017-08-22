@@ -68,6 +68,15 @@ change_tile_fake (struct pos *p, enum tile_fg f)
   al_free (str);
 }
 
+void
+change_tile_bg (struct pos *p, enum tile_bg b)
+{
+  register_tile_undo (&undo, p,
+                      MIGNORE, b, MIGNORE, MIGNORE,
+                      NULL, true, tile_bg_str[b]);
+}
+
+
 
 bool
 can_edit (void)
@@ -80,7 +89,7 @@ editor (void)
 {
   if (edit == EDIT_NONE) return;
 
-  update_editor_gui ();
+  gui_run_callback_IFn ("_UPDATE_CB", gui_editor_dialog);
 
   struct bmenu_item bmain_menu[] =
     {{'T', "TILE>"},
@@ -1875,17 +1884,18 @@ editor (void)
   editor_register = EDITOR_CYCLES_NONE;
 }
 
-void
-enter_editor (void)
+int
+enter_editor (Ihandle *ih)
 {
   edit = last_edit;
-  show_editor_gui ();
+  IupShow (gui_editor_dialog);
+  return IUP_DEFAULT;
 }
 
-void
-exit_editor (int priority)
+int
+exit_editor (Ihandle *ih)
 {
-  hide_editor_gui ();
+  IupHide (gui_editor_dialog);
   if (edit != EDIT_NONE) last_edit = edit;
   edit = EDIT_NONE;
   msg = NULL;
@@ -1893,9 +1903,10 @@ exit_editor (int priority)
   reset_menu ();
   if (! is_dedicatedly_replaying ())
     al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
-  if (is_game_paused ()) print_game_paused (priority);
-  else ui_msg_clear (priority);
+  if (is_game_paused ()) print_game_paused (0);
+  else ui_msg_clear (0);
   mr.room_select = -1;
+  return IUP_DEFAULT;
 }
 
 static char

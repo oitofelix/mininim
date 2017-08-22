@@ -95,13 +95,12 @@ mininim_SOURCES = src/mininim.c src/mininim.h src/compatibility.h			\
 	  src/kernel/xconfig.c src/kernel/xconfig.h src/kernel/diff.c				\
 	  src/kernel/diff.h src/kernel/xmath.c src/kernel/xmath.h						\
 	  src/kernel/xstring.c src/kernel/xstring.h src/bmenu.c src/bmenu.h	\
-	  src/editor.c src/editor.h src/gui.c src/gui.h src/gui-menu.c			\
-	  src/gui-menu.h src/gui-editor.c src/gui-editor.h src/debug.c			\
-	  src/debug.h src/undo.c src/undo.h src/multi-room.c								\
-	  src/multi-room.h src/replay.c src/replay.h src/script/repl.c			\
-	  src/script/repl.h src/script/script.c src/script/script.h					\
-	  src/script/L_mininim.c src/script/L_mininim.h											\
-	  src/script/L_mininim.level.c src/script/L_mininim.level.h					\
+	  src/editor.c src/editor.h src/debug.c src/debug.h src/undo.c			\
+	  src/undo.h src/multi-room.c src/multi-room.h src/replay.c					\
+	  src/replay.h src/script/repl.c src/script/repl.h									\
+	  src/script/script.c src/script/script.h src/script/L_mininim.c		\
+	  src/script/L_mininim.h src/script/L_mininim.level.c								\
+	  src/script/L_mininim.level.h																			\
 	  src/script/L_mininim.level.position.c															\
 	  src/script/L_mininim.level.position.h															\
 	  src/script/L_mininim.actor.c src/script/L_mininim.actor.h					\
@@ -123,7 +122,11 @@ mininim_SOURCES = src/mininim.c src/mininim.h src/compatibility.h			\
 	  src/script/L_mininim.multiroom.c src/script/L_mininim.multiroom.h	\
 	  src/script/L_mininim.profiler.c src/script/L_mininim.profiler.h		\
 	  src/script/L_mininim.debugger.c src/script/L_mininim.debugger.h		\
-	  src/script/L_mininim.math.c src/script/L_mininim.math.h
+	  src/script/L_mininim.math.c src/script/L_mininim.math.h						\
+	  src/gui/gui.c src/gui/gui.h src/gui/gui-menu.c src/gui/gui-menu.h	\
+	  src/gui/gui-editor-dialog.c src/gui/gui-editor-dialog.h						\
+	  src/gui/gui-tile-part-control.c src/gui/gui-tile-part-control.h		\
+	  src/gui/gui-tile-part-dialog.c src/gui/gui-tile-part-dialog.h
 
 CLEANFILES = ${top_builddir}/src/mininim.h.gch
 
@@ -132,7 +135,7 @@ AM_CPPFLAGS = -DLOCALEDIR=\"$(localedir)\"											\
 ${LUA_INCLUDE} -I$(top_srcdir)/gnulib -I${builddir}/src					\
 -I${srcdir}/src -I${srcdir}/src/kernel -I${srcdir}/src/guard		\
 -I${srcdir}/src/kid -I${srcdir}/src/levels -I${srcdir}/src/wall	\
--I${srcdir}/src/script
+-I${srcdir}/src/script -I${srcdir}/src/gui
 
 AM_CFLAGS = ${ALLEGRO_CFLAGS} ${ALLEGRO_IMAGE_CFLAGS}	\
 	${ALLEGRO_AUDIO_CFLAGS} ${ALLEGRO_ACODEC_CFLAGS}		\
@@ -165,7 +168,12 @@ $(LTLIBTHREAD)
 
 if mingw_build
   LDADD += mininim.rc.$(OBJEXT) -liup
-  # AM_CFLAGS += -mwindows
+# AM_CFLAGS += -mwindows
+
+# Use this for linking IUP statically:
+#
+# -l:libiup.a -l:libgdi32.a -l:libcomdlg32.a -l:libcomctl32.a \
+# -l:libuuid.a -l:liboleaut32.a -l:libole32.a
 else
 	LDADD	+= -liupmot
 endif

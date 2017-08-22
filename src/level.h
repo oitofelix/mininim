@@ -33,6 +33,7 @@ extern struct undo undo;
 extern int next_level_number;
 extern bool ignore_level_cutscene;
 extern uint64_t death_timer;
+extern Ihandle *gui_editor_dialog;
 
 void draw_level (void);
 void compute_level (void);

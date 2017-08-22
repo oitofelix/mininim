@@ -1,5 +1,5 @@
 /*
-  debug.h -- debug module;
+  gui-editor-dialog.h -- GUI editor dialog module;
 
   Copyright (C) 2015, 2016, 2017 Bruno Félix Rezende Ribeiro
   <oitofelix@gnu.org>
@@ -18,15 +18,10 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MININIM_DEBUG_H
-#define MININIM_DEBUG_H
+#ifndef MININIM_GUI_EDITOR_H
+#define MININIM_GUI_EDITOR_H
 
-void save_guard_bitmap (enum actor_type type, int style);
-void save_guard_bitmaps (void);
-void debug_pos (struct pos *p);
-void debug_random_seed (void);
-void debug_actor (struct actor *a);
-void L_dump_stack (lua_State *L);
-void gdb (void);
+/* functions */
+Ihandle *gui_create_editor_dialog (void);
 
-#endif	/* MININIM_DEBUG_H */
+#endif	/* MININIM_GUI_EDITOR_H */

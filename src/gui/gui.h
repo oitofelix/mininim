@@ -23,13 +23,23 @@
 
 /* functions */
 void init_gui (int argc, char **argv);
+void finalize_gui (void);
+
 bool load_led (const char *filename);
-Ihandle *bitmap_to_iup_image (ALLEGRO_BITMAP *b, ALLEGRO_COLOR bg);
-void set_button_bitmap (Ihandle *ih, ALLEGRO_BITMAP *b);
+
+Ihandle *bitmap_to_iup_image (ALLEGRO_BITMAP *b, palette p);
+void gui_set_image (Ihandle *ih, ALLEGRO_BITMAP *b, palette p);
+ALLEGRO_COLOR transp_to_black (ALLEGRO_COLOR c);
+ALLEGRO_COLOR white_to_transp (ALLEGRO_COLOR c);
+
 void dialog_fit_natural_size (Ihandle *ih);
 int hide_dialog (Ihandle *ih);
 void gui_control_active (Ihandle *ih, bool a);
 int gui_default_key_cb (Ihandle *ih, int c);
+int gui_debug_print_key_cb (Ihandle *ih, int c);
 int gui_empty_value_to_0 (Ihandle *ih);
+
+int gui_run_callback_IFn (const char *name, Ihandle *ih);
+int gui_run_callback_IFni (const char *name, Ihandle *ih, int i);
 
 #endif	/* MININIM_GUI_H */

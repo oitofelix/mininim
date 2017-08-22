@@ -21,6 +21,10 @@
 #ifndef MININIM_TYPES_H
 #define MININIM_TYPES_H
 
+enum tile_part {
+  TILE_FG = 1 << 0, TILE_BG = 1 << 1, TILE_EXT = 1 << 2, TILE_FAKE = 1 << 3,
+};
+
 enum file_type {
   UNKNOWN_FILE_TYPE, CONFIG_FILE_TYPE, GAME_SAVE_FILE_TYPE, LEVEL_FILE_TYPE,
 };
@@ -57,6 +61,8 @@ struct pos {
   struct level *l;
   int room, floor, place;
 };
+
+typedef void (* change_tile_part_t) (struct pos *p, int i);
 
 struct frameset {
   ALLEGRO_BITMAP *frame;

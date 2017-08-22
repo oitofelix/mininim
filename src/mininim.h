@@ -195,11 +195,14 @@
 #include "replay.h"
 #include "hotkeys.h"
 #include "ui-command.h"
-#include "gui.h"
-#include "gui-menu.h"
-#include "gui-editor.h"
 #include "xmath.h"
 #include "xstring.h"
+
+#include "gui.h"
+#include "gui-menu.h"
+#include "gui-editor-dialog.h"
+#include "gui-tile-part-control.h"
+#include "gui-tile-part-dialog.h"
 
 #include "script.h"
 #include "repl.h"

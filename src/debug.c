@@ -123,3 +123,11 @@ L_dump_stack (lua_State *L)
     }
   }
 }
+
+void
+gdb (void)
+{
+  /* Putting "break gdb" inside yours GDB init script you can
+     programatically invoke GDB by using this function. */
+  return;
+}

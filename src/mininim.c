@@ -1591,8 +1591,7 @@ void
 quit_game (void)
 {
   finalize_script ();
-
-  IupClose ();
+  finalize_gui ();
 
   unload_icons ();
   unload_level ();

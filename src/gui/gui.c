@@ -20,35 +20,25 @@
 
 #include "mininim.h"
 
-/* static int gui_global_keyboard_cb (int c, int press); */
-
 void
 init_gui (int argc, char **argv)
 {
   /* Initialize IUP */
-  IupOpen(&argc, &argv);
+  IupOpen (&argc, &argv);
 
-  /* Integrate keyboard events */
   IupSetGlobal ("AUTOREPEAT", "YES");
-  /* IupSetGlobal ("INPUTCALLBACKS", "YES"); */
-  /* IupSetFunction ("GLOBALKEYPRESS_CB", (Icallback) gui_global_keyboard_cb); */
 
-  Ihandle *logo_icon_image =
-    bitmap_to_iup_image (logo_icon, TRANSPARENT_COLOR);
-  IupSetHandle ("logo_icon", logo_icon_image);
+  Ihandle *logo_icon_image = bitmap_to_iup_image (logo_icon, NULL);
+  IupSetHandle ("LOGO_ICON", logo_icon_image);
 }
 
-/* int */
-/* gui_global_keyboard_cb (int c, int press) */
-/* { */
-/*   if (! press) return IUP_CONTINUE; */
-
-/*   if (animation_hotkeys_cb (NULL, c) == IUP_IGNORE) */
-/*     return IUP_IGNORE; */
-/*   else if (level_hotkeys_cb (NULL, c) == IUP_IGNORE) */
-/*     return IUP_IGNORE; */
-/*   else return IUP_CONTINUE; */
-/* } */
+void
+finalize_gui (void)
+{
+  IupExitLoop ();
+  IupFlush ();
+  IupClose ();
+}
 
 const char *load_led_error_msg;
 
@@ -77,7 +67,7 @@ load_led (const char *filename)
 }
 
 Ihandle *
-bitmap_to_iup_image (ALLEGRO_BITMAP *b, ALLEGRO_COLOR bg)
+bitmap_to_iup_image (ALLEGRO_BITMAP *b, palette p)
 {
   if (! b) return NULL;
 
@@ -91,7 +81,7 @@ bitmap_to_iup_image (ALLEGRO_BITMAP *b, ALLEGRO_COLOR bg)
   for (y = 0; y < h; y++)
     for (x = 0; x < w; x++) {
       ALLEGRO_COLOR c = al_get_pixel (b, x, y);
-      if (color_eq (c, TRANSPARENT_COLOR)) c = bg;
+      if (p) c = p (c);
       unsigned char r, g, b, a;
       al_unmap_rgba (c, &r, &g, &b, &a);
       int pos = (y * w + x) * s;
@@ -108,14 +98,28 @@ bitmap_to_iup_image (ALLEGRO_BITMAP *b, ALLEGRO_COLOR bg)
 }
 
 void
-set_button_bitmap (Ihandle *ih, ALLEGRO_BITMAP *b)
+gui_set_image (Ihandle *ih, ALLEGRO_BITMAP *b, palette p)
 {
   Ihandle *old_image = IupGetAttributeHandle (ih, "IMAGE");
-  Ihandle *new_image = bitmap_to_iup_image (b, BLACK);
+  Ihandle *new_image = bitmap_to_iup_image (b, p);
   IupSetAttributeHandle (ih, "IMAGE", new_image);
   IupSetAttribute (ih, "RASTERSIZE", NULL);
   /* ATTENTION: the old bitmap is destroyed! */
   IupDestroy (old_image);
+}
+
+ALLEGRO_COLOR
+transp_to_black (ALLEGRO_COLOR c)
+{
+  if (color_eq (c, TRANSPARENT_COLOR)) return BLACK;
+  else return c;
+}
+
+ALLEGRO_COLOR
+white_to_transp (ALLEGRO_COLOR c)
+{
+  if (color_eq (c, WHITE)) return TRANSPARENT_COLOR;
+  else return c;
 }
 
 void
@@ -145,6 +149,11 @@ hide_dialog (Ihandle *ih)
 void
 gui_control_active (Ihandle *ih, bool a)
 {
+  /* Only consider changing the active status of the control if its
+     already mapped, otherwise a bug in Motif might cause the
+     application to hang up. */
+  if (! IupGetAttribute (ih, "WID")) return;
+
   bool b = IupGetInt (ih, "ACTIVE");
   if (! equiv (a, b)) IupSetInt (ih, "ACTIVE", a);
 }
@@ -156,9 +165,34 @@ gui_default_key_cb (Ihandle *ih, int c)
 }
 
 int
+gui_debug_print_key_cb (Ihandle *ih, int c)
+{
+  fprintf (stderr, "Key pressed: %x\n", c);
+  return IUP_CONTINUE;
+}
+
+int
 gui_empty_value_to_0 (Ihandle *ih)
 {
   char *v = IupGetAttribute (ih, "VALUE");
   if (! strlen (v)) IupSetAttribute (ih, "VALUE", "0");
   return IUP_DEFAULT;
+}
+
+int
+gui_run_callback_IFn (const char *name, Ihandle *ih)
+{
+  if (! ih) return IUP_DEFAULT;
+  IFn cb = (IFn) IupGetCallback (ih, name);
+  if (cb) return cb (ih);
+  else return IUP_DEFAULT;
+}
+
+int
+gui_run_callback_IFni (const char *name, Ihandle *ih, int i)
+{
+  if (! ih) return IUP_DEFAULT;
+  IFni cb = (IFni) IupGetCallback (ih, name);
+  if (cb) return cb (ih, i);
+  else return IUP_DEFAULT;
 }

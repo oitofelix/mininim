@@ -30,11 +30,12 @@ extern bool selection_locked;
 /* functions */
 void change_tile_fg (struct pos *p, enum tile_fg f);
 void change_tile_fake (struct pos *p, enum tile_fg f);
+void change_tile_bg (struct pos *p, enum tile_bg b);
 
 bool can_edit (void);
 void editor (void);
-void enter_editor (void);
-void exit_editor (int priority);
+int enter_editor (Ihandle *ih);
+int exit_editor (Ihandle *ih);
 void editor_msg (char *m, uint64_t cycles);
 void ui_place_kid (struct actor *k, struct pos *p);
 void ui_place_guard (struct actor *g, struct pos *p);

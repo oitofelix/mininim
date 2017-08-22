@@ -763,7 +763,7 @@ draw_tile_fg_front (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f)
 }
 
 ALLEGRO_BITMAP *
-get_tile_fg_bitmap (struct tile *tile_ref, float scale)
+get_tile_bitmap (struct tile *tile_ref, float scale, enum tile_part parts)
 {
   float sx = (scale * ORIGINAL_WIDTH) / REAL_WIDTH;
   float sy = (scale * ORIGINAL_HEIGHT) / REAL_HEIGHT;
@@ -783,11 +783,26 @@ get_tile_fg_bitmap (struct tile *tile_ref, float scale)
   /* workaround for showing proper graphics */
   t->fg = carpet_cs (tile_ref->fg) ? tile_ref->fg : 0;
 
-  t->fake = tile_ref->fg;
+  if ((parts & TILE_FG) && ! (parts & TILE_FAKE))
+    t->fake = tile_ref->fg;
+
+  t->bg = tile_ref->bg;
   t->ext = tile_ref->ext;
   tile_caching = true;
-  if (tile_ref->fg == LEVEL_DOOR) draw_level_door (b, &p);
-  draw_tile_fg (b, &p);
+
+  if (parts & TILE_BG) {
+    enum tile_fg fake_bkp = t->fake;
+    if (t->fake == LEVEL_DOOR) t->fake = NO_FLOOR;
+    draw_tile_bg (b, &p);
+    if (t->bg == TORCH) draw_object (b, "FIRE", &p);
+    t->fake = fake_bkp;
+  }
+
+  if (parts & TILE_FG || parts & TILE_FAKE) {
+    if (tile_ref->fg == LEVEL_DOOR) draw_level_door (b, &p);
+    draw_tile_fg (b, &p);
+  }
+
   tile_caching = false;
   *t = t_bkp;
   return b;

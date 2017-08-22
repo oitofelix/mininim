@@ -461,7 +461,7 @@ load_icons (void)
   zoom_icon = load_icon (ZOOM_ICON);
   navigation_icon = load_icon (NAVIGATION_ICON);
   nav_select_icon = load_icon (NAV_SELECT_ICON);
-  nav_cell_icon = load_icon (NAV_CELL_ICON);
+  nav_cell_icon = load_icon (NAV_ROW_ICON);
   nav_page_icon = load_icon (NAV_PAGE_ICON);
   nav_left_icon = load_icon (NAV_LEFT_ICON);
   nav_right_icon = load_icon (NAV_RIGHT_ICON);

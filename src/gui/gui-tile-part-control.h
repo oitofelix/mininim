@@ -1,5 +1,5 @@
 /*
-  gui-editor.h -- graphical user interface editor module;
+  gui-tile-part-control.c -- editor GUI tile part control module;
 
   Copyright (C) 2015, 2016, 2017 Bruno Félix Rezende Ribeiro
   <oitofelix@gnu.org>
@@ -18,14 +18,10 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MININIM_GUI_EDITOR_H
-#define MININIM_GUI_EDITOR_H
+#ifndef MININIM_GUI_TILE_PART_CONTROL_H
+#define MININIM_GUI_TILE_PART_CONTROL_H
 
-/* functions */
-int editor_key_cb (Ihandle *ih, int c);
+Ihandle *gui_create_tile_part_control  (struct pos *p,
+                                        enum tile_part tile_part);
 
-void show_editor_gui (void);
-void hide_editor_gui (void);
-void update_editor_gui (void);
-
-#endif	/* MININIM_GUI_EDITOR_H */
+#endif	/* MININIM_GUI_TILE_PART_CONTROL */

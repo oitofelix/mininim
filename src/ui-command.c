@@ -31,7 +31,7 @@ ui_editor (void)
     if (cutscene) toggle_menu_visibility ();
     else {
       if (replay_mode == NO_REPLAY ) {
-        enter_editor ();
+        enter_editor (NULL);
         show_menu ();
       } else  {
         toggle_menu_visibility ();
@@ -39,7 +39,7 @@ ui_editor (void)
       }
     }
   } else {
-    exit_editor (0);
+    exit_editor (NULL);
     hide_menu ();
   }
 }
@@ -102,7 +102,7 @@ ui_screenshot (void)
 void
 ui_restart_game (void)
 {
-  exit_editor (0);
+  exit_editor (NULL);
   quit_anim = RESTART_GAME;
 }
 

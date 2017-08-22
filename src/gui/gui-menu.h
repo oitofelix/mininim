@@ -78,7 +78,7 @@
 #define ZOOM_ICON "data/icons/zoom.png"
 #define NAVIGATION_ICON "data/icons/navigation.png"
 #define NAV_SELECT_ICON "data/icons/nav-select.png"
-#define NAV_CELL_ICON "data/icons/nav-cell.png"
+#define NAV_ROW_ICON "data/icons/nav-row.png"
 #define NAV_PAGE_ICON "data/icons/nav-page.png"
 #define NAV_LEFT_ICON "data/icons/nav-left.png"
 #define NAV_RIGHT_ICON "data/icons/nav-right.png"
@@ -155,7 +155,6 @@ void hide_menu (void);
 bool is_showing_menu (void);
 void toggle_menu_visibility (void);
 
-/* variables */
 bool main_menu_enabled;
 
 #endif	/* MININIM_GUI_MENU_H */
