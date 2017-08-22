@@ -757,7 +757,8 @@ editor (void)
   case EDIT_EXT:
     if (! is_valid_pos (&p)) {
       editor_msg ("SELECT TILE", EDITOR_CYCLES_0);
-      al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
+      al_set_system_mouse_cursor
+        (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       if (was_bmenu_return_pressed (true)) edit = EDIT_TILE;
       break;
     }

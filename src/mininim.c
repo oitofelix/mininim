@@ -1462,9 +1462,6 @@ main (int _argc, char **_argv)
 #endif
   signal (SIGTERM, quit_game_sighandler);
 
-  /* Initialize GUI */
-  init_gui (_argc, _argv);
-
   /* initialize scripting environment */
   init_script ();
 
@@ -1495,6 +1492,9 @@ main (int _argc, char **_argv)
 
   main_menu_enabled = true;
   main_menu ();
+
+  /* Initialize GUI */
+  init_gui (_argc, _argv);
 
   if (skip_title) goto play_game;
 

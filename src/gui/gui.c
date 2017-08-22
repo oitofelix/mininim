@@ -20,6 +20,8 @@
 
 #include "mininim.h"
 
+Ihandle *gui_editor_dialog;
+
 void
 init_gui (int argc, char **argv)
 {
@@ -30,11 +32,15 @@ init_gui (int argc, char **argv)
 
   Ihandle *logo_icon_image = bitmap_to_iup_image (logo_icon, NULL);
   IupSetHandle ("LOGO_ICON", logo_icon_image);
+
+  gui_editor_dialog = gui_create_editor_dialog ();
 }
 
 void
 finalize_gui (void)
 {
+  IupDestroy (gui_editor_dialog);
+
   IupExitLoop ();
   IupFlush ();
   IupClose ();

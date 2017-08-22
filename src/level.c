@@ -23,7 +23,6 @@
 /* functions */
 static void process_death (void);
 static void draw_hp (ALLEGRO_BITMAP *bitmap, struct actor *k);
-void create_level_dialogs (void);
 
 /* variables */
 struct level vanilla_level;
@@ -42,8 +41,6 @@ int camera_follow_kid;
 int next_level_number = -1;
 bool ignore_level_cutscene;
 uint64_t death_timer;
-
-Ihandle *gui_editor_dialog;
 
 struct level *
 copy_level (struct level *ld, struct level *ls)
@@ -250,8 +247,6 @@ play_level (struct level *lv)
     exit_editor (NULL);
 
   level_number_shown = false;
-
-  create_level_dialogs ();
 
   play_anim (draw_level, compute_level, cleanup_level);
 
@@ -922,11 +917,4 @@ next_level (void)
   start_level_time = play_time;
   next_level_number = global_level.n + 1;
   quit_anim = NEXT_LEVEL;
-}
-
-void
-create_level_dialogs (void)
-{
-  if (! gui_editor_dialog)
-    gui_editor_dialog = gui_create_editor_dialog ();
 }

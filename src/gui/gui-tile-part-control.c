@@ -152,6 +152,11 @@ show_cb (Ihandle *ih, int state)
 int
 destroy_cb (Ihandle *ih)
 {
+  Ihandle *tile_part_dialog =
+    (void *) IupGetAttribute (ih, "_TILE_PART_DIALOG");
+
+  if (tile_part_dialog) IupDestroy (tile_part_dialog);
+
   struct last *last = (void *) IupGetAttribute (ih, "_LAST");
   al_free (last);
   return IUP_DEFAULT;
