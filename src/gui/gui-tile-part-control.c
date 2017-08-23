@@ -59,13 +59,26 @@ gui_create_tile_part_control (struct pos *p, enum tile_part tile_part)
     change_tile_part = (change_tile_part_t) change_tile_bg;
     title = "Background";
     break;
+  case TILE_EXT_ITEM:
+    tile_part_str = tile_item_str;
+    tile_parts = TILE_ITEMS;
+    change_tile_part = (change_tile_part_t) change_tile_ext;
+    title = "Item Extension";
+    break;
+  case TILE_EXT_DESIGN:
+    tile_part_str = NULL;
+    tile_parts = TILE_DESIGNS;
+    change_tile_part = (change_tile_part_t) change_tile_ext;
+    title = "Design Extension";
+    break;
   default: assert (false);
     return NULL;
   }
 
+  Ihandle *vbox;
   ih = IupSetCallbacks
     (IupFrame
-     (IupSetAttributes
+     (vbox = IupSetAttributes
       (IupVbox
        (IupFill (),
         button = IupSetCallbacks
@@ -97,6 +110,17 @@ gui_create_tile_part_control (struct pos *p, enum tile_part tile_part)
      "_UPDATE_CB", _update_cb,
      NULL);
 
+  switch (tile_part) {
+  case TILE_EXT_ITEM:
+  case TILE_EXT_FALL:
+  case TILE_EXT_EVENT:
+  case TILE_EXT_STEP:
+  case TILE_EXT_DESIGN:
+    IupSetAttribute (vbox, "NORMALIZERGROUP", "TILE_EXT_NORM");
+    break;
+  default: break;
+  }
+
   IupSetAttribute (ih, "TITLE", title);
 
   IupSetAttribute (ih, "_POS", (void *) p);
@@ -113,8 +137,11 @@ gui_create_tile_part_control (struct pos *p, enum tile_part tile_part)
   memset (last, 0, sizeof (*last));
   IupSetAttribute (ih, "_LAST", (void *) last);
 
-  for (int i = 0; tile_part_str[i]; i++)
-    IupSetAttributeId (list, "", i + 1, tile_part_str[i]);
+  for (int i = 0; i < tile_parts; i++)
+    if (tile_part_str)
+      IupSetAttributeId (list, "", i + 1, tile_part_str[i]);
+    else IupSetStrfId (list, "", i + 1, "%i", i);
+
   IupSetInt (list, "VISIBLEITEMS", tile_parts);
 
   IupSetInt (spin, "SPINMAX", tile_parts - 1);
@@ -201,12 +228,16 @@ _update_cb (Ihandle *ih)
       && last->em == em
       && last->hue == hue
       && (tile_part != TILE_FG
-          || ((fg_val (last->tile.fg) == fg_val (t->fg))
-              && (ext_val (last->tile.fg, last->tile.ext) ==
-                  ext_val (t->fg, t->ext)
-                  || ! carpet_cs (fg_val (last->tile.fg)))))
+          || fg_val (last->tile.fg) == fg_val (t->fg))
       && (tile_part != TILE_BG
-          || (bg_val (last->tile.bg) == bg_val (t->bg))))
+          || bg_val (last->tile.bg) == bg_val (t->bg))
+      && ((tile_part != TILE_EXT_ITEM
+           && tile_part != TILE_EXT_FALL
+           && tile_part != TILE_EXT_EVENT
+           && tile_part != TILE_EXT_STEP
+           && tile_part != TILE_EXT_DESIGN)
+          || ext_val (last->tile.fg, last->tile.ext)
+          == ext_val (t->fg, t->ext)))
     return IUP_DEFAULT;
   else update (ih, t);
 
@@ -233,6 +264,13 @@ update (Ihandle *ih, struct tile *t)
   switch (tile_part) {
   case TILE_FG: i = fg_val (t->fg); break;
   case TILE_BG: i = bg_val (t->bg); break;
+  case TILE_EXT_ITEM:
+  case TILE_EXT_FALL:
+  case TILE_EXT_EVENT:
+  case TILE_EXT_STEP:
+  case TILE_EXT_DESIGN:
+    i = ext_val (t->fg, t->ext);
+    break;
   default: assert (false); return;
   }
 

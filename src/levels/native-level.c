@@ -324,7 +324,7 @@ char *tile_bg_str[] = {
   NULL
 };
 
-char *item_str[] = {
+char *tile_item_str[] = {
   [NO_ITEM] = "NO_ITEM",
   [EMPTY_POTION] = "EMPTY_POTION",
   [SMALL_HP_POTION] = "SMALL_HP_POTION",
@@ -353,7 +353,7 @@ get_tile_ext_str (struct pos *p)
   case PILLAR:
   case BIG_PILLAR_BOTTOM:
   case ARCH_BOTTOM:
-    s = xasprintf ("%s", item_str[e]);
+    s = xasprintf ("%s", tile_item_str[e]);
     break;
   case LOOSE_FLOOR:
     s = xasprintf ("%s", e ? "CANT_FALL" : "FALL");

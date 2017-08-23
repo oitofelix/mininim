@@ -22,7 +22,7 @@
 function MININIM.lua.load_hook ()
    -- video modes
    require "vm-mac/vm-mac".load ()
-   -- require "vga/vga".load ()
+   require "vga/vga".load ()
    -- require "ega/ega".load ()
    -- require "cga/cga".load ()
 

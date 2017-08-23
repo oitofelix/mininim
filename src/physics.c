@@ -53,7 +53,7 @@ ext_val (int f, int e)
   case FLOOR: case BROKEN_FLOOR: case SKELETON_FLOOR:
   case STUCK_FLOOR: case HIDDEN_FLOOR: case PILLAR:
   case BIG_PILLAR_BOTTOM: case ARCH_BOTTOM:
-    return typed_int (e, ITEMS, 1, NULL, NULL);
+    return typed_int (e, TILE_ITEMS, 1, NULL, NULL);
 
   case LOOSE_FLOOR:
     return typed_int (e, LOOSE_FLOOR_STEPS, LOOSE_FLOOR_FASES, NULL, NULL);
@@ -456,9 +456,8 @@ is_item_fg (struct pos *p)
 }
 
 bool
-is_potion_ext (struct pos *p)
+potion_ext_cs (int t)
 {
-  enum item t = ext (p);
   return t == EMPTY_POTION
     || t == SMALL_HP_POTION
     || t == BIG_HP_POTION
@@ -467,6 +466,13 @@ is_potion_ext (struct pos *p)
     || t == FLOAT_POTION
     || t == FLIP_POTION
     || t == ACTIVATION_POTION;
+}
+
+bool
+is_potion_ext (struct pos *p)
+{
+  enum item t = ext (p);
+  return potion_ext_cs (t);
 }
 
 bool
@@ -491,6 +497,59 @@ bool
 is_fake (struct pos *p)
 {
   return tile (p)->fake >= 0 && fg (p) != fake (p);
+}
+
+bool
+fall_fg_cs (enum tile_fg t)
+{
+  return t == LOOSE_FLOOR;
+}
+
+bool
+is_fall_fg (struct pos *p)
+{
+  return fall_fg_cs (fg (p));
+}
+
+bool
+event_fg_cs (enum tile_fg t)
+{
+  return t == OPENER_FLOOR
+    || t == CLOSER_FLOOR;
+}
+
+bool
+is_event_fg (struct pos *p)
+{
+  return event_fg_cs (fg (p));
+}
+
+bool
+step_fg_cs (enum tile_fg t)
+{
+  return t == SPIKES_FLOOR
+    || t == DOOR
+    || t == LEVEL_DOOR
+    || t == CHOMPER;
+}
+
+bool
+is_step_fg (struct pos *p)
+{
+  return step_fg_cs (fg (p));
+}
+
+bool
+design_fg_cs (enum tile_fg t)
+{
+  return t == CARPET
+    || t == TCARPET;
+}
+
+bool
+is_design_fg (struct pos *p)
+{
+  return design_fg_cs (fg (p));
 }
 
 struct pos *

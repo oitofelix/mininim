@@ -25,7 +25,7 @@ draw_potion (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   push_drawn_rectangle (bitmap);
   int e = ext (p);
-  const char *potion = item_str[e];
+  const char *potion = tile_item_str[e];
   draw_object (bitmap, potion, p);
   struct drawn_rectangle *dr = pop_drawn_rectangle ();
   push_clipping_rectangle (dr->bitmap, dr->x, dr->y, dr->w, dr->h);

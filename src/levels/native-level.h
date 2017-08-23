@@ -30,6 +30,6 @@ char *get_tile_ext_str (struct pos *p);
 /* variables */
 extern char *tile_fg_str[];
 extern char *tile_bg_str[];
-extern char *item_str[];
+extern char *tile_item_str[];
 
 #endif	/* MININIM_NATIVE_LEVEL_H */

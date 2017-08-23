@@ -51,11 +51,9 @@ bool selection_locked;
 void
 change_tile_fg (struct pos *p, enum tile_fg f)
 {
-  char *str = xasprintf ("%s", tile_fg_str[f]);
   register_tile_undo (&undo, p,
                       f, MIGNORE, MIGNORE, MIGNORE,
-                      NULL, true, str);
-  al_free (str);
+                      NULL, true, tile_fg_str[f]);
 }
 
 void
@@ -76,6 +74,27 @@ change_tile_bg (struct pos *p, enum tile_bg b)
                       NULL, true, tile_bg_str[b]);
 }
 
+void
+change_tile_ext (struct pos *p, int e)
+{
+  char *str;
+  if (is_item_fg (p)) str = xasprintf ("%s", tile_item_str[e]);
+  /* else if (is_fall_fg (p)) str = ; */
+  /* else if (is_event_fg (p)) str = ; */
+  /* else if (is_step_fg (p)) str = ; */
+  else if (is_design_fg (p)) str = xasprintf ("DESIGN %i", e);
+  /* else { */
+  /*   assert (false); */
+  /*   return NULL; */
+  /* } */
+  else return;
+
+  register_tile_undo (&undo, p,
+                      MIGNORE, MIGNORE, e, MIGNORE,
+                      NULL, true, str);
+
+  al_free (str);
+}
 
 
 bool
@@ -790,7 +809,7 @@ editor (void)
 
       register_tile_undo (&undo, &p,
                          MIGNORE, MIGNORE, e, MIGNORE,
-                         NULL, true, item_str[e]);
+                         NULL, true, tile_item_str[e]);
       break;
     case LOOSE_FLOOR:
       al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
@@ -924,7 +943,7 @@ editor (void)
     case FLOOR: case BROKEN_FLOOR: case SKELETON_FLOOR:
     case STUCK_FLOOR: case HIDDEN_FLOOR: case PILLAR:
     case BIG_PILLAR_BOTTOM: case ARCH_BOTTOM:
-      ext_str = item_str[e];
+      ext_str = tile_item_str[e];
       break;
     case LOOSE_FLOOR:
       ext_str = e ? "CAN'T FALL" : "FALL";

@@ -22,6 +22,8 @@
 
 Ihandle *gui_editor_dialog;
 
+static void globalctrlfunc_cb (int c);
+
 void
 init_gui (int argc, char **argv)
 {
@@ -29,6 +31,7 @@ init_gui (int argc, char **argv)
   IupOpen (&argc, &argv);
 
   IupSetGlobal ("AUTOREPEAT", "YES");
+  IupSetFunction ("GLOBALCTRLFUNC_CB", (Icallback) globalctrlfunc_cb);
 
   Ihandle *logo_icon_image = bitmap_to_iup_image (logo_icon, NULL);
   IupSetHandle ("LOGO_ICON", logo_icon_image);
@@ -44,6 +47,12 @@ finalize_gui (void)
   IupExitLoop ();
   IupFlush ();
   IupClose ();
+}
+
+void
+globalctrlfunc_cb (int c)
+{
+  IupShow(IupLayoutDialog(gui_editor_dialog));
 }
 
 const char *load_led_error_msg;
@@ -131,7 +140,7 @@ white_to_transp (ALLEGRO_COLOR c)
 void
 dialog_fit_natural_size (Ihandle *ih)
 {
-  IupSetAttribute (ih, "RASTERSIZE", NULL);
+  IupResetAttribute (ih, "RASTERSIZE");
   IupRefresh (ih);
   const char *ns = IupGetAttribute (ih, "NATURALSIZE");
   IupSetAtt (NULL, ih, "MINSIZE", ns, "MAXSIZE", ns, NULL);

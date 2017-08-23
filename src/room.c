@@ -786,21 +786,49 @@ get_tile_bitmap (struct tile *tile_ref, float scale, enum tile_part parts)
   if ((parts & TILE_FG) && ! (parts & TILE_FAKE))
     t->fake = tile_ref->fg;
 
+  if (parts & TILE_EXT_DESIGN) {
+    t->fake = TCARPET;
+    t->fg = TCARPET;
+  }
   t->bg = tile_ref->bg;
-  t->ext = tile_ref->ext;
+  t->ext = ((parts & TILE_EXT) ||
+            (parts & TILE_EXT_ITEM)
+            || (parts & TILE_EXT_DESIGN))
+    ? tile_ref->ext : 0;
   tile_caching = true;
 
   if (parts & TILE_BG) {
     enum tile_fg fake_bkp = t->fake;
     if (t->fake == LEVEL_DOOR) t->fake = NO_FLOOR;
     draw_tile_bg (b, &p);
-    if (t->bg == TORCH) draw_object (b, "FIRE", &p);
+    if (t->bg == TORCH) {
+      uint16_t anim_cycle_bkp = anim_cycle;
+      anim_cycle = 0;
+      draw_object (b, "FIRE", &p);
+      anim_cycle = anim_cycle_bkp;
+    }
     t->fake = fake_bkp;
   }
 
-  if (parts & TILE_FG || parts & TILE_FAKE) {
+  if (parts & TILE_FG || parts & TILE_FAKE
+      || parts & TILE_EXT_DESIGN) {
     if (tile_ref->fg == LEVEL_DOOR) draw_level_door (b, &p);
     draw_tile_fg (b, &p);
+  }
+
+  if (parts & TILE_EXT_ITEM) {
+    if (potion_ext_cs (t->ext)) {
+      uint16_t anim_cycle_bkp = anim_cycle;
+      anim_cycle = 3;
+      const char *potion = tile_item_str[t->ext];
+      draw_object (b, potion, &p);
+      anim_cycle = anim_cycle_bkp;
+    } else if (t->ext == SWORD) {
+      uint16_t anim_cycle_bkp = anim_cycle;
+      anim_cycle = 1;
+      draw_object (b, "SWORD_ITEM", &p);
+      anim_cycle = anim_cycle_bkp;
+    }
   }
 
   tile_caching = false;

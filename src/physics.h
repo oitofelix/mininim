@@ -94,11 +94,21 @@ bool is_floor (struct pos *p);
 bool is_floor_like (struct pos *p);
 bool item_fg_cs (enum tile_fg t);
 bool is_item_fg (struct pos *p);
+bool potion_ext_cs (int t);
 bool is_potion_ext (struct pos *p);
 bool is_potion (struct pos *p);
 bool is_sword (struct pos *p);
 bool is_item (struct pos *p);
 bool is_fake (struct pos *p);
+bool fall_fg_cs (enum tile_fg t);
+bool is_fall_fg (struct pos *p);
+bool event_fg_cs (enum tile_fg t);
+bool is_event_fg (struct pos *p);
+bool step_fg_cs (enum tile_fg t);
+bool is_step_fg (struct pos *p);
+bool design_fg_cs (enum tile_fg t);
+bool is_design_fg (struct pos *p);
+
 struct pos *first_tile_fg (struct pos *p0, struct pos *p1,
                          tile_fg_set cs, struct pos *p);
 struct pos *next_pos_by_pred (struct pos *p, int dir,

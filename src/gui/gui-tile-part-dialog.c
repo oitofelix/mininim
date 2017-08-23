@@ -42,12 +42,22 @@ gui_create_tile_part_dialog (Ihandle *parent)
   Ihandle *vbox[tile_parts + 1];
   memset (&vbox, 0, sizeof (vbox));
 
-  for (int i = 0; tile_part_str [i]; i++) {
+  for (int i = 0; i < tile_parts; i++) {
     Ihandle *button = IupButton (NULL, NULL);
-    IupSetAtt (NULL, button, "NAME", tile_part_str[i],
-               "BGCOLOR", "0 0 0", NULL);
+
+    if (tile_part_str)
+      IupSetAttribute (button, "NAME", tile_part_str[i]);
+    else IupSetStrf (button, "NAME", "%i", i);
+
+    IupSetAttribute (button, "BGCOLOR", "0 0 0");
+
     IupSetCallback (button, "ACTION", change_tile_part_from_button_cb);
-    Ihandle *label = IupLabel (tile_part_str[i]);
+    Ihandle *label = IupLabel (NULL);
+
+    if (tile_part_str)
+      IupSetAttribute (label, "TITLE", tile_part_str[i]);
+    else IupSetStrf (label, "TITLE", "%i", i);
+
     vbox[i] = IupVbox (button, label, NULL);
     IupSetAttribute (vbox[i], "ALIGNMENT", "ACENTER");
   }
@@ -84,7 +94,7 @@ gui_create_tile_part_dialog (Ihandle *parent)
      "_UPDATE_CB", _update_cb,
      NULL);
 
-  IupSetInt (grid, "NUMDIV", sqrt (tile_parts));
+  IupSetInt (grid, "NUMDIV", tile_parts / (int) sqrt (tile_parts));
 
   IupSetStrf (ih, "TITLE", "MININIM: Tile %s",
               IupGetAttribute (parent, "TITLE"));
@@ -154,20 +164,33 @@ update (Ihandle *ih)
   Ihandle *parent = (void *) IupGetAttribute (ih, "_PARENT");
   enum tile_part tile_part = IupGetInt (parent, "_TILE_PART");
   char **tile_part_str = (void *) IupGetAttribute (parent, "_TILE_PART_STR");
+  int tile_parts = IupGetInt (parent, "_TILE_PARTS");
 
   /* update images */
-  for (int i = 0; tile_part_str [i]; i++) {
-    Ihandle *button = IupGetDialogChild (ih, tile_part_str [i]);
+  for (int i = 0; i < tile_parts; i++) {
+    Ihandle *button;
+
+    if (tile_part_str)
+      button = IupGetDialogChild (ih, tile_part_str [i]);
+    else {
+      char *name = xasprintf ("%i", i);
+      button = IupGetDialogChild (ih, name);
+      al_free (name);
+    }
 
     struct tile t;
 
     switch (tile_part) {
     case TILE_FG: t.fg = i; break;
     case TILE_BG: t.bg = i; break;
+    case TILE_EXT_ITEM:
+    case TILE_EXT_FALL:
+    case TILE_EXT_EVENT:
+    case TILE_EXT_STEP:
+    case TILE_EXT_DESIGN: t.ext = i; break;
     default: assert (false); return;
     }
 
-    t.ext = 0;
     ALLEGRO_BITMAP *b = get_tile_bitmap (&t, 1, tile_part);
     gui_set_image (button, b, transp_to_black);
     al_destroy_bitmap (b);
@@ -187,8 +210,12 @@ change_tile_part_from_button_cb (Ihandle *ih)
   change_tile_part_t change_tile_part = (void *)
     IupGetAttribute (parent, "_CHANGE_TILE_PART");
 
-  char *name = IupGetAttribute (ih, "NAME");
-  int i = str2enum (tile_part_str, name);
+  int i;
+  if (tile_part_str) {
+    char *name = IupGetAttribute (ih, "NAME");
+    i = str2enum (tile_part_str, name);
+  } else i = IupGetInt (ih, "NAME");
+
   change_tile_part (p, i);
 
   return IUP_DEFAULT;

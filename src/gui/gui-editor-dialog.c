@@ -20,6 +20,7 @@
 
 #include "mininim.h"
 
+char *tile_ext_control_name (struct pos *p);
 static int show_cb (Ihandle *ih, int state);
 static int _update_cb (Ihandle *ih);
 static int k_any (Ihandle *ih, int c);
@@ -49,6 +50,8 @@ gui_create_editor_dialog (void)
   Ihandle *nav_page_label, *nav_page_left_button,
     *nav_page_right_button, *nav_page_above_button,
     *nav_page_below_button;
+
+  Ihandle *zbox;
 
   Ihandle *ih = IupSetCallbacks
     (IupSetAttributes
@@ -167,6 +170,19 @@ gui_create_editor_dialog (void)
            IupSetAttributes
            (gui_create_tile_part_control (&selection_pos, TILE_BG),
             "NAME = TILE_BG_CONTROL"),
+
+           IupSetAttributes
+           (zbox = IupZbox
+            (IupSetAttributes
+             (gui_create_tile_part_control (&selection_pos, TILE_EXT_ITEM),
+              "NAME = TILE_EXT_ITEM_CONTROL"),
+             IupSetAttributes
+             (gui_create_tile_part_control (&selection_pos, TILE_EXT_DESIGN),
+              "NAME = TILE_EXT_DESIGN_CONTROL"),
+             NULL),
+            "NAME = TILE_EXT,"
+            "ALIGNMENT = ACENTER"),
+
            NULL),
           IupVbox (NULL),
           IupVbox (NULL),
@@ -300,9 +316,27 @@ gui_create_editor_dialog (void)
 
   gui_run_callback_IFn ("_UPDATE_CB", ih);
 
+  Ihandle *norm = IupGetHandle ("TILE_EXT_NORM");
+  IupSetAttribute (norm, "NORMALIZE", "BOTH");
+
   dialog_fit_natural_size (ih);
 
   return ih;
+}
+
+char *
+tile_ext_control_name (struct pos *p)
+{
+  if (is_item_fg (p)) return "TILE_EXT_ITEM_CONTROL";
+  /* else if (is_fall_fg (p)) return "TILE_EXT_FALL_CONTROL"; */
+  /* else if (is_event_fg (p)) return "TILE_EXT_EVENT_CONTROL"; */
+  /* else if (is_step_fg (p)) return "TILE_EXT_STEP_CONTROL"; */
+  else if (is_design_fg (p)) return "TILE_EXT_DESIGN_CONTROL";
+  /* else { */
+  /*   assert (false); */
+  /*   return NULL; */
+  /* } */
+  else return NULL;
 }
 
 int
@@ -312,6 +346,16 @@ show_cb (Ihandle *ih, int state)
     ("SHOW_CB", IupGetDialogChild (ih, "TILE_FG_CONTROL"), state);
   gui_run_callback_IFni
     ("SHOW_CB", IupGetDialogChild (ih, "TILE_BG_CONTROL"), state);
+
+  char *name = tile_ext_control_name (&selection_pos);
+  if (name) {
+    Ihandle *c = IupGetDialogChild (ih, "TILE_EXT");
+    Ihandle *sc = IupGetDialogChild (ih, name);
+    int p = IupGetChildPos (c, sc);
+    IupSetInt (c, "VALUEPOS", p);
+    gui_run_callback_IFni ("SHOW_CB", sc, state);
+  }
+
   return IUP_DEFAULT;
 }
 
@@ -324,6 +368,15 @@ _update_cb (Ihandle *ih)
     ("_UPDATE_CB", IupGetDialogChild (ih, "TILE_FG_CONTROL"));
   gui_run_callback_IFn
     ("_UPDATE_CB", IupGetDialogChild (ih, "TILE_BG_CONTROL"));
+
+  char *name = tile_ext_control_name (&selection_pos);
+  if (name) {
+    Ihandle *c = IupGetDialogChild (ih, "TILE_EXT");
+    Ihandle *sc = IupGetDialogChild (ih, name);
+    int p = IupGetChildPos (c, sc);
+    IupSetInt (c, "VALUEPOS", p);
+    gui_run_callback_IFn ("_UPDATE_CB", sc);
+  }
 
   return IUP_DEFAULT;
 }

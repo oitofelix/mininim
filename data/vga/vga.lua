@@ -568,7 +568,7 @@ function video.POTION:DRAW (p)
    bottle.draw (self:rect (p))
 
    local i = mod (MININIM.cycle, 7) + 1
-   if self[i] then
+   if self[i] and self[i].bitmap then
       local bubble = self[i].bitmap
       if self.palette then
          bubble = bubble.apply_palette (self.palette, true) end
