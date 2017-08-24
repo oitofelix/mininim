@@ -79,15 +79,14 @@ change_tile_ext (struct pos *p, int e)
 {
   char *str;
   if (is_item_fg (p)) str = xasprintf ("%s", tile_item_str[e]);
-  /* else if (is_fall_fg (p)) str = ; */
-  /* else if (is_event_fg (p)) str = ; */
-  /* else if (is_step_fg (p)) str = ; */
-  else if (is_design_fg (p)) str = xasprintf ("DESIGN %i", e);
-  /* else { */
-  /*   assert (false); */
-  /*   return NULL; */
-  /* } */
-  else return;
+  else if (is_fall_fg (p)) str = xasprintf ("FALL EXT %i", e);
+  else if (is_event_fg (p)) str = xasprintf ("EVENT EXT %i", e);
+  else if (is_step_fg (p)) str = xasprintf ("STEP EXT %i", e);
+  else if (is_design_fg (p)) str = xasprintf ("DESIGN EXT %i", e);
+  else {
+    assert (false);
+    return NULL;
+  }
 
   register_tile_undo (&undo, p,
                       MIGNORE, MIGNORE, e, MIGNORE,

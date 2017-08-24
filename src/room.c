@@ -786,16 +786,27 @@ get_tile_bitmap (struct tile *tile_ref, float scale, enum tile_part parts)
   if ((parts & TILE_FG) && ! (parts & TILE_FAKE))
     t->fake = tile_ref->fg;
 
-  if (parts & TILE_EXT_DESIGN) {
-    t->fake = TCARPET;
-    t->fg = TCARPET;
-  }
+  if (parts & TILE_EXT_DESIGN)
+    t->fg = t->fake = TCARPET;
+
   t->bg = tile_ref->bg;
   t->ext = ((parts & TILE_EXT) ||
             (parts & TILE_EXT_ITEM)
             || (parts & TILE_EXT_DESIGN))
     ? tile_ref->ext : 0;
   tile_caching = true;
+
+  if (parts & TILE_EXT_STEP_SPIKES_FLOOR) {
+    t->fg = t->fake = SPIKES_FLOOR;
+    t->ext = tile_ref->ext;
+    init_tile_at_pos (&p);
+  }
+
+  if (parts & TILE_EXT_STEP_CHOMPER) {
+    t->fg = t->fake = CHOMPER;
+    t->ext = tile_ref->ext;
+    init_tile_at_pos (&p);
+  }
 
   if (parts & TILE_BG) {
     enum tile_fg fake_bkp = t->fake;
@@ -811,7 +822,9 @@ get_tile_bitmap (struct tile *tile_ref, float scale, enum tile_part parts)
   }
 
   if (parts & TILE_FG || parts & TILE_FAKE
-      || parts & TILE_EXT_DESIGN) {
+      || parts & TILE_EXT_DESIGN
+      || parts & TILE_EXT_STEP_SPIKES_FLOOR
+      || parts & TILE_EXT_STEP_CHOMPER) {
     if (tile_ref->fg == LEVEL_DOOR) draw_level_door (b, &p);
     draw_tile_fg (b, &p);
   }

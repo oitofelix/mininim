@@ -173,9 +173,9 @@ level_eq (struct level *l0, struct level *l1)
 void
 replace_playing_level (struct level *l)
 {
-  destroy_cons ();
+  destroy_tiles ();
   copy_level (&global_level, l);
-  register_cons ();
+  register_tiles ();
   em = global_level.em;
   hue = global_level.hue;
   mr.full_update = true;
@@ -226,7 +226,7 @@ play_level (struct level *lv)
 
   apply_mr_fit_mode ();
 
-  register_cons ();
+  register_tiles ();
   register_actors ();
 
   stop_audio_instances ();
@@ -479,7 +479,7 @@ destroy_tile_at_pos (struct pos *p)
 }
 
 void
-destroy_cons (void)
+destroy_tiles (void)
 {
   destroy_array ((void **) &loose_floor, &loose_floor_nmemb);
   destroy_array ((void **) &opener_floor, &opener_floor_nmemb);
@@ -516,7 +516,7 @@ register_room (int room)
 }
 
 void
-register_cons (void)
+register_tiles (void)
 {
   int room;
   for (room = 0; room < ROOMS; room++)
@@ -586,7 +586,7 @@ void
 level_cleanup (void)
 {
   destroy_actors ();
-  destroy_cons ();
+  destroy_tiles ();
   free_undo (&undo);
 }
 

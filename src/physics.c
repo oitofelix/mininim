@@ -63,7 +63,8 @@ ext_val (int f, int e)
 
   case OPENER_FLOOR:
   case CLOSER_FLOOR:
-    return typed_int (e, EVENTS, 2, NULL, NULL);
+    return e;
+    /* return typed_int (e, EVENTS, 1, NULL, NULL); */
 
   case DOOR:
     return typed_int (e, DOOR_STEPS, DOOR_FASES, NULL, NULL);

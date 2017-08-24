@@ -34,12 +34,16 @@ static void update (Ihandle *ih, struct tile *t);
 static int button_action_cb (Ihandle *ih);
 static int change_tile_part_from_list_cb (Ihandle *ih);
 static int change_tile_part_from_spin_cb (Ihandle *ih);
+static int change_tile_part_from_val_cb (Ihandle *ih);
+static int toggle_action_cb (Ihandle *ih, int state);
+static int fall_toggle_action_cb (Ihandle *ih, int state);
 
 
 Ihandle *
 gui_create_tile_part_control (struct pos *p, enum tile_part tile_part)
 {
-  Ihandle *ih, *button, *list, *spin;
+  Ihandle *ih, *button = NULL, *val = NULL, *toggle = NULL,
+    *fall_toggle = NULL, *list, *spin, *insertion_point;
 
   char **tile_part_str;
   int tile_parts;
@@ -67,9 +71,45 @@ gui_create_tile_part_control (struct pos *p, enum tile_part tile_part)
     break;
   case TILE_EXT_DESIGN:
     tile_part_str = NULL;
-    tile_parts = TILE_DESIGNS;
+    tile_parts = CARPET_DESIGNS;
     change_tile_part = (change_tile_part_t) change_tile_ext;
     title = "Design Extension";
+    break;
+  case TILE_EXT_STEP_SPIKES_FLOOR:
+    tile_part_str = NULL;
+    tile_parts = SPIKES_TOTAL;
+    change_tile_part = (change_tile_part_t) change_tile_ext;
+    title = "Step Extension";
+    break;
+  case TILE_EXT_STEP_CHOMPER:
+    tile_part_str = NULL;
+    tile_parts = CHOMPER_TOTAL;
+    change_tile_part = (change_tile_part_t) change_tile_ext;
+    title = "Step Extension";
+    break;
+  case TILE_EXT_STEP_DOOR:
+    tile_part_str = NULL;
+    tile_parts = DOOR_TOTAL;
+    change_tile_part = (change_tile_part_t) change_tile_ext;
+    title = "Step Extension";
+    break;
+  case TILE_EXT_STEP_LEVEL_DOOR:
+    tile_part_str = NULL;
+    tile_parts = LEVEL_DOOR_STEPS;
+    change_tile_part = (change_tile_part_t) change_tile_ext;
+    title = "Step Extension";
+    break;
+  case TILE_EXT_EVENT:
+    tile_part_str = NULL;
+    tile_parts = 0;
+    change_tile_part = (change_tile_part_t) change_tile_ext;
+    title = "Event Extension";
+    break;
+  case TILE_EXT_FALL:
+    tile_part_str = NULL;
+    tile_parts = 0;
+    change_tile_part = (change_tile_part_t) change_tile_ext;
+    title = "Fall Extension";
     break;
   default: assert (false);
     return NULL;
@@ -81,28 +121,7 @@ gui_create_tile_part_control (struct pos *p, enum tile_part tile_part)
      (vbox = IupSetAttributes
       (IupVbox
        (IupFill (),
-        button = IupSetCallbacks
-        (IupSetAttributes
-         (IupButton (NULL, NULL),
-          "IMAGE = NOIMAGE"),
-         "ACTION", button_action_cb,
-         NULL),
-        list = IupSetCallbacks
-        (IupSetAttributes
-         (IupList (NULL),
-          "DROPDOWN = YES"),
-         "VALUECHANGED_CB", change_tile_part_from_list_cb,
-         NULL),
-        spin = IupSetCallbacks
-        (IupSetAttributes
-         (IupText (NULL),
-          "SPIN = YES,"
-          "SPINWRAP = YES,"
-          "MASK = /d/d"),
-         "VALUECHANGED_CB", change_tile_part_from_spin_cb,
-         "KILLFOCUS_CB", gui_empty_value_to_0,
-         NULL),
-        IupFill (),
+        insertion_point = IupFill (),
         NULL),
        "ALIGNMENT = ACENTER")),
      "DESTROY_CB", destroy_cb,
@@ -111,10 +130,110 @@ gui_create_tile_part_control (struct pos *p, enum tile_part tile_part)
      NULL);
 
   switch (tile_part) {
+  case TILE_FG:
+  case TILE_BG:
+  case TILE_EXT_ITEM:
+  case TILE_EXT_DESIGN:
+  case TILE_EXT_STEP_SPIKES_FLOOR:
+  case TILE_EXT_STEP_CHOMPER:
+    spin = IupSetCallbacks
+      (IupSetAttributes
+       (IupText (NULL),
+        "SPIN = YES,"
+        "SPINWRAP = YES,"
+        "MASK = /d/d"),
+       "VALUECHANGED_CB", change_tile_part_from_spin_cb,
+       "KILLFOCUS_CB", gui_empty_value_to_0,
+       NULL);
+    IupInsert (vbox, insertion_point, spin);
+
+    list = IupSetCallbacks
+      (IupSetAttributes
+       (IupList (NULL),
+        "DROPDOWN = YES"),
+       "VALUECHANGED_CB", change_tile_part_from_list_cb,
+       NULL);
+    IupInsert (vbox, spin, list);
+
+    button = IupSetCallbacks
+      (IupSetAttributes
+       (IupButton (NULL, NULL),
+        "IMAGE = NOIMAGE"),
+       "ACTION", button_action_cb,
+       NULL);
+    IupInsert (vbox, list, button);
+    break;
+  case TILE_EXT_STEP_DOOR:
+  case TILE_EXT_STEP_LEVEL_DOOR:
+    spin = IupSetCallbacks
+      (IupSetAttributes
+       (IupText (NULL),
+        "SPIN = YES,"
+        "SPINWRAP = YES,"
+        "MASK = /d/d"),
+       "VALUECHANGED_CB", change_tile_part_from_spin_cb,
+       "KILLFOCUS_CB", gui_empty_value_to_0,
+       NULL);
+    IupInsert (vbox, insertion_point, spin);
+
+    toggle = IupSetCallbacks
+      (IupSetAttributes
+       (IupToggle (NULL, NULL),
+        "ACTIVE = NO"),
+       "ACTION", (Icallback) toggle_action_cb,
+       NULL);
+    IupInsert (vbox, spin, toggle);
+
+    val = IupSetCallbacks
+      (IupSetAttributes
+       (IupVal ("VERTICAL"),
+        "TICKPOS = BOTH,"
+        "INVERTED = NO"),
+       "VALUECHANGED_CB", change_tile_part_from_val_cb,
+       NULL);
+    int w = IupGetInt (val, "RASTERSIZE");
+    int h = 175;
+    IupSetStrf (val, "RASTERSIZE", "%ix%i", w, h);
+    IupSetDouble (val, "PAGESTEP", 10.0 / tile_parts);
+    IupSetDouble (val, "SHOWTICKS", tile_parts);
+    IupSetDouble (val, "STEP", 1.0 / tile_parts);
+    IupSetDouble (val, "MAX", tile_parts - 1);
+    IupInsert (vbox, toggle, val);
+
+    if (tile_part == TILE_EXT_STEP_LEVEL_DOOR)
+      IupSetAttribute (toggle, "ACTIVE", "YES");
+
+    break;
+  case TILE_EXT_EVENT:
+    spin = IupSetCallbacks
+      (IupSetAttributes
+       (IupText (NULL),
+        "SPIN = NO,"
+        "MASK = /d*,"
+        "VISIBLECOLUMNS = 10"),
+       "VALUECHANGED_CB", change_tile_part_from_spin_cb,
+       "KILLFOCUS_CB", gui_empty_value_to_0,
+       NULL);
+    IupInsert (vbox, insertion_point, spin);
+    break;
+  case TILE_EXT_FALL:
+    fall_toggle = IupSetCallbacks
+      (IupToggle ("Can't fall", NULL),
+       "ACTION", (Icallback) fall_toggle_action_cb,
+       NULL);
+    IupInsert (vbox, insertion_point, fall_toggle);
+    break;
+  default: break;
+  }
+
+  switch (tile_part) {
   case TILE_EXT_ITEM:
   case TILE_EXT_FALL:
   case TILE_EXT_EVENT:
-  case TILE_EXT_STEP:
+  case TILE_EXT_STEP_SPIKES_FLOOR:
+  case TILE_EXT_STEP_DOOR:
+  case TILE_EXT_STEP_LEVEL_DOOR:
+  case TILE_EXT_STEP_CHOMPER:
   case TILE_EXT_DESIGN:
     IupSetAttribute (vbox, "NORMALIZERGROUP", "TILE_EXT_NORM");
     break;
@@ -130,6 +249,8 @@ gui_create_tile_part_control (struct pos *p, enum tile_part tile_part)
   IupSetInt (ih, "_TILE_PARTS", tile_parts);
 
   IupSetAttribute (ih, "_BUTTON", (void *) button);
+  IupSetAttribute (ih, "_VAL", (void *) val);
+  IupSetAttribute (ih, "_FALL_TOGGLE", (void *) fall_toggle);
   IupSetAttribute (ih, "_LIST", (void *) list);
   IupSetAttribute (ih, "_SPIN", (void *) spin);
 
@@ -146,8 +267,10 @@ gui_create_tile_part_control (struct pos *p, enum tile_part tile_part)
 
   IupSetInt (spin, "SPINMAX", tile_parts - 1);
 
-  Ihandle *tile_part_dialog = gui_create_tile_part_dialog (ih);
-  IupSetAttribute (ih, "_TILE_PART_DIALOG", (void *) tile_part_dialog);
+  if (button) {
+    Ihandle *tile_part_dialog = gui_create_tile_part_dialog (ih);
+    IupSetAttribute (ih, "_TILE_PART_DIALOG", (void *) tile_part_dialog);
+  }
 
   struct tile t;
   memset (&t, 0, sizeof (t));
@@ -164,11 +287,11 @@ show_cb (Ihandle *ih, int state)
 
   if (tile_part_dialog) {
     if (state == IUP_SHOW) {
-      bool was_visible = IupGetInt (tile_part_dialog, "WAS_VISIBLE");
-      IupSetInt (tile_part_dialog, "VISIBLE", was_visible);
+      bool _was_visible = IupGetInt (tile_part_dialog, "_WAS_VISIBLE");
+      IupSetInt (tile_part_dialog, "VISIBLE", _was_visible);
     } else if (state == IUP_HIDE) {
       bool visible = IupGetInt (tile_part_dialog, "VISIBLE");
-      IupSetInt (tile_part_dialog, "WAS_VISIBLE", visible);
+      IupSetInt (tile_part_dialog, "_WAS_VISIBLE", visible);
       IupHide (tile_part_dialog);
     }
   }
@@ -233,11 +356,17 @@ _update_cb (Ihandle *ih)
           || bg_val (last->tile.bg) == bg_val (t->bg))
       && ((tile_part != TILE_EXT_ITEM
            && tile_part != TILE_EXT_FALL
-           && tile_part != TILE_EXT_EVENT
-           && tile_part != TILE_EXT_STEP
+           && tile_part != TILE_EXT_STEP_SPIKES_FLOOR
+           && tile_part != TILE_EXT_STEP_DOOR
+           && tile_part != TILE_EXT_STEP_LEVEL_DOOR
+           && tile_part != TILE_EXT_STEP_CHOMPER
            && tile_part != TILE_EXT_DESIGN)
-          || ext_val (last->tile.fg, last->tile.ext)
-          == ext_val (t->fg, t->ext)))
+          || (fg_val (last->tile.fg) == fg_val (t->fg)
+              && ext_val (last->tile.fg, last->tile.ext)
+              == ext_val (t->fg, t->ext)))
+      && (tile_part != TILE_EXT_EVENT
+          || (fg_val (last->tile.fg) == fg_val (t->fg)
+              && last->tile.ext == t->ext)))
     return IUP_DEFAULT;
   else update (ih, t);
 
@@ -266,19 +395,36 @@ update (Ihandle *ih, struct tile *t)
   case TILE_BG: i = bg_val (t->bg); break;
   case TILE_EXT_ITEM:
   case TILE_EXT_FALL:
-  case TILE_EXT_EVENT:
-  case TILE_EXT_STEP:
+  case TILE_EXT_STEP_SPIKES_FLOOR:
+  case TILE_EXT_STEP_DOOR:
+  case TILE_EXT_STEP_LEVEL_DOOR:
+  case TILE_EXT_STEP_CHOMPER:
   case TILE_EXT_DESIGN:
     i = ext_val (t->fg, t->ext);
     break;
+  case TILE_EXT_EVENT:
+    i = t->ext;
+    break;
   default: assert (false); return;
   }
+
+  Ihandle *val = (void *) IupGetAttribute (ih, "_VAL");
+  IupSetInt (val, "VALUE", i);
 
   Ihandle *list = (void *) IupGetAttribute (ih, "_LIST");
   IupSetInt (list, "VALUE", i + 1);
 
   Ihandle *spin = (void *) IupGetAttribute (ih, "_SPIN");
-  IupSetInt (spin, "SPINVALUE", i);
+  if (IupGetInt (spin, "SPIN")) IupSetInt (spin, "SPINVALUE", i);
+  else {
+    /* This verification step is necessary in order for the text
+       control to behave correctly under Windows */
+    int j = IupGetInt (spin, "VALUE");
+    if (i != j) IupSetInt (spin, "VALUE", i);
+  }
+
+  Ihandle *fall_toggle = (void *) IupGetAttribute (ih, "_FALL_TOGGLE");
+  IupSetInt (fall_toggle, "VALUE", i);
 }
 
 
@@ -310,8 +456,83 @@ change_tile_part_from_spin_cb (Ihandle *ih)
   change_tile_part_t change_tile_part =
     (void *) IupGetAttribute (ih, "_CHANGE_TILE_PART");
 
-  int i = IupGetInt (ih, "SPINVALUE");
+  int i;
+  if (IupGetInt (ih, "SPIN")) i = IupGetInt (ih, "SPINVALUE");
+  else i = IupGetInt (ih, "VALUE");
+
   change_tile_part (p, i);
 
+  return IUP_DEFAULT;
+}
+
+int
+change_tile_part_from_val_cb (Ihandle *ih)
+{
+  struct pos *p = (void *) IupGetAttribute (ih, "_POS");
+
+  if (! is_valid_pos (p)) return IUP_DEFAULT;
+
+  change_tile_part_t change_tile_part =
+    (void *) IupGetAttribute (ih, "_CHANGE_TILE_PART");
+
+  int i = IupGetInt (ih, "VALUE");
+  change_tile_part (p, i);
+
+  return IUP_DEFAULT;
+}
+
+int
+toggle_action_cb (Ihandle *ih, int state)
+{
+  Ihandle *val = (void *) IupGetAttribute (ih, "_VAL");
+  Ihandle *spin = (void *) IupGetAttribute (ih, "_SPIN");
+  int tile_parts = IupGetInt (ih, "_TILE_PARTS");
+
+  int cv = IupGetInt (spin, "SPINVALUE");
+  int nv;
+
+  IupUnmap (spin);
+
+  if (state) {
+    nv = cv + tile_parts;
+
+    IupSetDouble (val, "MIN", tile_parts);
+    IupSetDouble (val, "MAX", 2 * tile_parts - 1);
+    IupSetDouble (val, "VALUE", nv);
+
+    IupSetInt (spin, "SPINMIN", tile_parts);
+    IupSetInt (spin, "SPINMAX", 2 * tile_parts - 1);
+    IupSetInt (spin, "SPINVALUE", nv);
+  } else {
+    nv = cv - tile_parts;
+
+    IupSetDouble (val, "MIN", 0);
+    IupSetDouble (val, "MAX", tile_parts - 1);
+    IupSetDouble (val, "VALUE", nv);
+
+    IupSetInt (spin, "SPINMIN", 0);
+    IupSetInt (spin, "SPINMAX", tile_parts - 1);
+    IupSetInt (spin, "SPINVALUE", nv);
+  }
+
+  change_tile_part_t change_tile_part =
+    (void *) IupGetAttribute (ih, "_CHANGE_TILE_PART");
+  struct pos *p = (void *) IupGetAttribute (ih, "_POS");
+  change_tile_part (p, nv);
+
+  IupMap (spin);
+  IupRefreshChildren (IupGetParent (spin));
+  IupFlush ();
+
+  return IUP_DEFAULT;
+}
+
+int
+fall_toggle_action_cb (Ihandle *ih, int state)
+{
+  change_tile_part_t change_tile_part =
+    (void *) IupGetAttribute (ih, "_CHANGE_TILE_PART");
+  struct pos *p = (void *) IupGetAttribute (ih, "_POS");
+  change_tile_part (p, state ? 1 : 0);
   return IUP_DEFAULT;
 }

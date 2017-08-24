@@ -32,7 +32,6 @@ void gui_set_image (Ihandle *ih, ALLEGRO_BITMAP *b, palette p);
 ALLEGRO_COLOR transp_to_black (ALLEGRO_COLOR c);
 ALLEGRO_COLOR white_to_transp (ALLEGRO_COLOR c);
 
-void dialog_fit_natural_size (Ihandle *ih);
 int hide_dialog (Ihandle *ih);
 void gui_control_active (Ihandle *ih, bool a);
 int gui_default_key_cb (Ihandle *ih, int c);

@@ -174,11 +174,48 @@ gui_create_editor_dialog (void)
            IupSetAttributes
            (zbox = IupZbox
             (IupSetAttributes
+             (IupFrame
+              (IupSetAttributes
+               (IupVbox
+                (IupFill (),
+                 IupLabel ("NO EXTENSION"),
+                 IupFill (),
+                 NULL),
+                "ALIGNMENT = ACENTER,"
+                "NORMALIZERGROUP = TILE_EXT_NORM")),
+              "TITLE = Extension,"
+              "NAME = TILE_EXT_NONE_CONTROL,"
+              "ACTIVE = NO"),
+             IupSetAttributes
              (gui_create_tile_part_control (&selection_pos, TILE_EXT_ITEM),
               "NAME = TILE_EXT_ITEM_CONTROL"),
              IupSetAttributes
              (gui_create_tile_part_control (&selection_pos, TILE_EXT_DESIGN),
               "NAME = TILE_EXT_DESIGN_CONTROL"),
+             IupSetAttributes
+             (gui_create_tile_part_control
+              (&selection_pos, TILE_EXT_STEP_SPIKES_FLOOR),
+              "NAME = TILE_EXT_STEP_SPIKES_FLOOR_CONTROL"),
+             IupSetAttributes
+             (gui_create_tile_part_control
+              (&selection_pos, TILE_EXT_STEP_CHOMPER),
+              "NAME = TILE_EXT_STEP_CHOMPER_CONTROL"),
+             IupSetAttributes
+             (gui_create_tile_part_control
+              (&selection_pos, TILE_EXT_STEP_DOOR),
+              "NAME = TILE_EXT_STEP_DOOR_CONTROL"),
+             IupSetAttributes
+             (gui_create_tile_part_control
+              (&selection_pos, TILE_EXT_STEP_LEVEL_DOOR),
+              "NAME = TILE_EXT_STEP_LEVEL_DOOR_CONTROL"),
+             IupSetAttributes
+             (gui_create_tile_part_control
+              (&selection_pos, TILE_EXT_EVENT),
+              "NAME = TILE_EXT_EVENT_CONTROL"),
+             IupSetAttributes
+             (gui_create_tile_part_control
+              (&selection_pos, TILE_EXT_FALL),
+              "NAME = TILE_EXT_FALL_CONTROL"),
              NULL),
             "NAME = TILE_EXT,"
             "ALIGNMENT = ACENTER"),
@@ -319,8 +356,6 @@ gui_create_editor_dialog (void)
   Ihandle *norm = IupGetHandle ("TILE_EXT_NORM");
   IupSetAttribute (norm, "NORMALIZE", "BOTH");
 
-  dialog_fit_natural_size (ih);
-
   return ih;
 }
 
@@ -328,33 +363,38 @@ char *
 tile_ext_control_name (struct pos *p)
 {
   if (is_item_fg (p)) return "TILE_EXT_ITEM_CONTROL";
-  /* else if (is_fall_fg (p)) return "TILE_EXT_FALL_CONTROL"; */
-  /* else if (is_event_fg (p)) return "TILE_EXT_EVENT_CONTROL"; */
-  /* else if (is_step_fg (p)) return "TILE_EXT_STEP_CONTROL"; */
+  else if (is_fall_fg (p)) return "TILE_EXT_FALL_CONTROL";
+  else if (is_event_fg (p)) return "TILE_EXT_EVENT_CONTROL";
+  else if (fg (p) == SPIKES_FLOOR)
+    return "TILE_EXT_STEP_SPIKES_FLOOR_CONTROL";
+  else if (fg (p) == DOOR)
+    return "TILE_EXT_STEP_DOOR_CONTROL";
+  else if (fg (p) == LEVEL_DOOR)
+    return "TILE_EXT_STEP_LEVEL_DOOR_CONTROL";
+  else if (fg (p) == CHOMPER)
+    return "TILE_EXT_STEP_CHOMPER_CONTROL";
   else if (is_design_fg (p)) return "TILE_EXT_DESIGN_CONTROL";
-  /* else { */
-  /*   assert (false); */
-  /*   return NULL; */
-  /* } */
-  else return NULL;
+  else return "TILE_EXT_NONE_CONTROL";
 }
 
 int
 show_cb (Ihandle *ih, int state)
 {
+  if (state == IUP_SHOW) {
+    char *ns = IupGetAttribute (ih, "NATURALSIZE");
+    IupSetAttribute (ih, "MINSIZE", ns);
+  }
+
   gui_run_callback_IFni
     ("SHOW_CB", IupGetDialogChild (ih, "TILE_FG_CONTROL"), state);
   gui_run_callback_IFni
     ("SHOW_CB", IupGetDialogChild (ih, "TILE_BG_CONTROL"), state);
 
+  Ihandle *c = IupGetDialogChild (ih, "TILE_EXT");
   char *name = tile_ext_control_name (&selection_pos);
-  if (name) {
-    Ihandle *c = IupGetDialogChild (ih, "TILE_EXT");
-    Ihandle *sc = IupGetDialogChild (ih, name);
-    int p = IupGetChildPos (c, sc);
-    IupSetInt (c, "VALUEPOS", p);
-    gui_run_callback_IFni ("SHOW_CB", sc, state);
-  }
+  Ihandle *nsc = IupGetDialogChild (ih, name);
+  IupSetAttribute (c, "VALUE_HANDLE", (void *) nsc);
+  gui_run_callback_IFni ("SHOW_CB", nsc, state);
 
   return IUP_DEFAULT;
 }
@@ -369,14 +409,29 @@ _update_cb (Ihandle *ih)
   gui_run_callback_IFn
     ("_UPDATE_CB", IupGetDialogChild (ih, "TILE_BG_CONTROL"));
 
-  char *name = tile_ext_control_name (&selection_pos);
-  if (name) {
-    Ihandle *c = IupGetDialogChild (ih, "TILE_EXT");
-    Ihandle *sc = IupGetDialogChild (ih, name);
-    int p = IupGetChildPos (c, sc);
-    IupSetInt (c, "VALUEPOS", p);
-    gui_run_callback_IFn ("_UPDATE_CB", sc);
-  }
+  Ihandle *c = IupGetDialogChild (ih, "TILE_EXT");
+  Ihandle *csc = (void *) IupGetAttribute (c, "VALUE_HANDLE");
+  if (is_valid_pos (&selection_pos)) {
+    char *name = tile_ext_control_name (&selection_pos);
+    Ihandle *nsc = IupGetDialogChild (ih, name);
+    if (csc != nsc) {
+      Ihandle *tile_part_dialog =
+        (void *) IupGetAttribute (csc, "_TILE_PART_DIALOG");
+      if (tile_part_dialog) {
+        int dialog_visible = IupGetInt (tile_part_dialog, "VISIBLE");
+        IupSetInt (c, "_DIALOG_VISIBLE", dialog_visible);
+        IupHide (tile_part_dialog);
+      }
+      IupSetAttribute (c, "VALUE_HANDLE", (void *) nsc);
+      tile_part_dialog = (void *)
+        IupGetAttribute (nsc, "_TILE_PART_DIALOG");
+      if (tile_part_dialog) {
+        int dialog_visible = IupGetInt (c, "_DIALOG_VISIBLE");
+        if (dialog_visible) IupShow (tile_part_dialog);
+      }
+    }
+    gui_run_callback_IFn ("_UPDATE_CB", nsc);
+  } else gui_run_callback_IFn ("_UPDATE_CB", csc);
 
   return IUP_DEFAULT;
 }

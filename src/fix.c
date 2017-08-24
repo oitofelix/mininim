@@ -234,7 +234,7 @@ fix_room_0 (struct level *l)
       set_tile (&p, WALL, BRICKS_5, NO_ITEM, NO_FAKE);
 }
 
-/* fix rooms above room 0 in case they have traversable cons at the
+/* fix rooms above room 0 in case they have traversable tiles at the
    bottom */
 void
 fix_traversable_above_room_0 (struct level *l)

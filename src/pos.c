@@ -884,7 +884,7 @@ dim (struct frame *f, struct dim *d)
   return d;
 }
 
-/* cons coordinates */
+/* tiles coordinates */
 
 struct coord *
 tile_coord (struct pos *p, coord_f cf, struct coord *c)

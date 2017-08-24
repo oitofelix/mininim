@@ -31,7 +31,10 @@ init_gui (int argc, char **argv)
   IupOpen (&argc, &argv);
 
   IupSetGlobal ("AUTOREPEAT", "YES");
+
+#if DEBUG
   IupSetFunction ("GLOBALCTRLFUNC_CB", (Icallback) globalctrlfunc_cb);
+#endif
 
   Ihandle *logo_icon_image = bitmap_to_iup_image (logo_icon, NULL);
   IupSetHandle ("LOGO_ICON", logo_icon_image);
@@ -52,7 +55,7 @@ finalize_gui (void)
 void
 globalctrlfunc_cb (int c)
 {
-  IupShow(IupLayoutDialog(gui_editor_dialog));
+  IupShow (IupLayoutDialog (NULL));
 }
 
 const char *load_led_error_msg;
@@ -137,18 +140,6 @@ white_to_transp (ALLEGRO_COLOR c)
   else return c;
 }
 
-void
-dialog_fit_natural_size (Ihandle *ih)
-{
-  IupResetAttribute (ih, "RASTERSIZE");
-  IupRefresh (ih);
-  const char *ns = IupGetAttribute (ih, "NATURALSIZE");
-  IupSetAtt (NULL, ih, "MINSIZE", ns, "MAXSIZE", ns, NULL);
-#if WINDOWS_PORT
-  IupSetAttribute (ih, "MAXBOX", "NO");
-#endif
-}
-
 int
 hide_dialog (Ihandle *ih)
 {
@@ -189,6 +180,8 @@ gui_debug_print_key_cb (Ihandle *ih, int c)
 int
 gui_empty_value_to_0 (Ihandle *ih)
 {
+  /* This works for spins as well (no need to modify "SPINVALUE"
+     attribute) */
   char *v = IupGetAttribute (ih, "VALUE");
   if (! strlen (v)) IupSetAttribute (ih, "VALUE", "0");
   return IUP_DEFAULT;

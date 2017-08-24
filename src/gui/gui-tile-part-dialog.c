@@ -26,6 +26,7 @@ struct last {
   enum hue hue;
 };
 
+static int show_cb (Ihandle *ih, int state);
 static int destroy_cb (Ihandle *ih);
 static int k_any (Ihandle *ih, int c);
 static int _update_cb (Ihandle *ih);
@@ -69,7 +70,7 @@ gui_create_tile_part_dialog (Ihandle *parent)
      (IupDialog
       (IupSetAttributes
        (IupVbox
-        (IupSetAttributes (IupFill (), "RASTERSIZE = 0x10"),
+        (IupSetAttributes (IupFill (), "MINSIZE = 0x10"),
          IupSetAttributes
          (grid = IupGridBoxv (vbox),
           "NAME = GRID,"
@@ -83,12 +84,16 @@ gui_create_tile_part_dialog (Ihandle *parent)
          IupSetAttributes (IupFill (), "RASTERSIZE = 0x15"),
          IupSetCallbacks
          (IupSetAttributes
-          (IupButton ("&Close", NULL), "PADDING = 32"),
+          (IupButton ("&Close", NULL),
+           "PADDING = 32,"
+           "MAXSIZE = 128x48"),
           "ACTION", hide_dialog, NULL),
-         IupSetAttributes (IupFill (), "RASTERSIZE = 0x10"),
+         IupSetAttributes (IupFill (), "MINSIZE = 0x10"),
          NULL),
-        "ALIGNMENT = ACENTER")),
+        "ALIGNMENT = ACENTER,"
+        "EXPANDCHILDREN = YES")),
       "ICON = LOGO_ICON"),
+     "SHOW_CB", (Icallback) show_cb,
      "DESTROY_CB", destroy_cb,
      "K_ANY", k_any,
      "_UPDATE_CB", _update_cb,
@@ -107,9 +112,17 @@ gui_create_tile_part_dialog (Ihandle *parent)
 
   update (ih);
 
-  dialog_fit_natural_size (ih);
-
   return ih;
+}
+
+int
+show_cb (Ihandle *ih, int state)
+{
+  if (state == IUP_SHOW) {
+    char *ns = IupGetAttribute (ih, "NATURALSIZE");
+    IupSetAttribute (ih, "MINSIZE", ns);
+  }
+  return IUP_DEFAULT;
 }
 
 int
@@ -186,7 +199,10 @@ update (Ihandle *ih)
     case TILE_EXT_ITEM:
     case TILE_EXT_FALL:
     case TILE_EXT_EVENT:
-    case TILE_EXT_STEP:
+    case TILE_EXT_STEP_SPIKES_FLOOR:
+    case TILE_EXT_STEP_DOOR:
+    case TILE_EXT_STEP_LEVEL_DOOR:
+    case TILE_EXT_STEP_CHOMPER:
     case TILE_EXT_DESIGN: t.ext = i; break;
     default: assert (false); return;
     }

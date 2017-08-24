@@ -25,6 +25,8 @@ enum tile_part {
   TILE_FG = 1 << 0, TILE_BG = 1 << 1, TILE_EXT = 1 << 2, TILE_FAKE = 1 << 3,
   TILE_EXT_ITEM = 1 << 4, TILE_EXT_FALL = 1 << 5, TILE_EXT_EVENT = 1 << 6,
   TILE_EXT_STEP = 1 << 7, TILE_EXT_DESIGN = 1 << 8,
+  TILE_EXT_STEP_SPIKES_FLOOR = 1 << 9, TILE_EXT_STEP_DOOR = 1 << 10,
+  TILE_EXT_STEP_LEVEL_DOOR = 1 << 11, TILE_EXT_STEP_CHOMPER = 1 << 12,
 };
 
 enum file_type {
@@ -331,8 +333,6 @@ enum item {
   SWORD = 9,
   TILE_ITEMS
 };
-
-#define TILE_DESIGNS 6
 
 enum should_draw {
   SHOULD_DRAW_NONE, SHOULD_DRAW_PART, SHOULD_DRAW_FULL,
