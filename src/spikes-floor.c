@@ -263,9 +263,8 @@ void
 draw_spikes_floor (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   if (is_fake (p)) {
-    draw_object_index_part (bitmap, "SPIKES_FLOOR", 6, "MAIN", p);
-    /* int i = abs (ext (p)) % 6; */
-    /* draw_object_index_part (bitmap, "SPIKES_FLOOR", i + 1, "MAIN", p); */
+    int i = abs (ext (p)) % 6;
+    draw_object_index_part (bitmap, "SPIKES_FLOOR", i + 1, "MAIN", p);
     return;
   }
 
@@ -278,10 +277,9 @@ void
 draw_spikes_floor_fg (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   if (is_fake (p)) {
-    draw_object_index_part (bitmap, "SPIKES_FLOOR", 6, "FRONT", p);
-    /* int i = abs (ext (p)) % 6; */
-    /* if (i) draw_object_index_part (bitmap, "SPIKES_FLOOR", i + 1, */
-    /*                                "FRONT", p); */
+    int i = abs (ext (p)) % 6;
+    if (i) draw_object_index_part (bitmap, "SPIKES_FLOOR", i + 1,
+                                   "FRONT", p);
     return;
   }
 

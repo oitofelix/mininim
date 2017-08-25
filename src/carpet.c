@@ -24,7 +24,7 @@ void
 draw_carpet (ALLEGRO_BITMAP *bitmap, struct pos *p)
 {
   enum tile_fg f = fake (p);
-  int d = ext (p) + 1;
+  int d = fake_ext (p) + 1;
 
   draw_object_index_part (bitmap, "CARPET", d, f == CARPET
                           ? "MAIN" : "MAIN_TRAVERSABLE", p);
@@ -35,7 +35,7 @@ draw_carpet (ALLEGRO_BITMAP *bitmap, struct pos *p)
 void
 draw_carpet_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f)
 {
-  int d = ext (p) + 1;
+  int d = fake_ext (p) + 1;
   draw_object_index_part (bitmap, "CARPET", d, "FRONT", p);
 
   struct pos par; prel (p, &par, -1, +1);

@@ -958,11 +958,12 @@ main_menu (void)
 
 #if WINDOWS_PORT
   item.main.unlock_selection =
-    menu_sitem (selection_locked, NULL, "(L)");
+    menu_sitem (main_menu_enabled && selection_locked, NULL, "(L)");
 #else
   if (edit != EDIT_NONE)
     item.main.unlock_selection =
-      menu_sitem (selection_locked, lock_icon, "%s", "");
+      menu_sitem (main_menu_enabled && selection_locked,
+                  lock_icon, "%s", "");
 #endif
 
   end_menu ();

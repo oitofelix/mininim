@@ -126,7 +126,9 @@ mininim_SOURCES = src/mininim.c src/mininim.h src/compatibility.h			\
 	  src/gui/gui.c src/gui/gui.h src/gui/gui-menu.c src/gui/gui-menu.h	\
 	  src/gui/gui-editor-dialog.c src/gui/gui-editor-dialog.h						\
 	  src/gui/gui-tile-part-control.c src/gui/gui-tile-part-control.h		\
-	  src/gui/gui-tile-part-dialog.c src/gui/gui-tile-part-dialog.h
+	  src/gui/gui-tile-part-dialog.c src/gui/gui-tile-part-dialog.h			\
+	  src/gui/gui-tile-clipboard-control.c															\
+	  src/gui/gui-tile-clipboard-control.h
 
 CLEANFILES = ${top_builddir}/src/mininim.h.gch
 

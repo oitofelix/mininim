@@ -763,7 +763,8 @@ draw_tile_fg_front (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f)
 }
 
 ALLEGRO_BITMAP *
-get_tile_bitmap (struct tile *tile_ref, float scale, enum tile_part parts)
+get_tile_bitmap (struct tile *tile_ref, union tile_state *ts,
+                 float scale, enum tile_part part)
 {
   float sx = (scale * ORIGINAL_WIDTH) / REAL_WIDTH;
   float sy = (scale * ORIGINAL_HEIGHT) / REAL_HEIGHT;
@@ -779,57 +780,68 @@ get_tile_bitmap (struct tile *tile_ref, float scale, enum tile_part parts)
   struct pos p; new_pos (&p, &global_level, room_view, 0, 0);
   struct tile *t = tile (&p);
   struct tile t_bkp = *t;
+  *t = (struct tile)
+    {.fg = NO_FLOOR, .bg = NO_BRICKS, .ext = 0, .fake = -1};
 
-  /* workaround for showing proper graphics */
-  t->fg = carpet_cs (tile_ref->fg) ? tile_ref->fg : 0;
+  switch (part) {
+  case TILE_ALL:
+    *t = *tile_ref;
+    break;
+  case TILE_FG:
+  case TILE_FAKE:
+    t->fg = (part == TILE_FG)
+      ? fg_tile (tile_ref) : fake_tile (tile_ref);
 
-  if ((parts & TILE_FG) && ! (parts & TILE_FAKE))
-    t->fake = tile_ref->fg;
+    switch (fg_tile (t)) {
+    case LOOSE_FLOOR:
+      t->fg = NO_FLOOR;
+      t->fake = LOOSE_FLOOR;
+      break;
+    case CHOMPER: t->ext = 2; break;
+    case SPIKES_FLOOR: t->ext = 5; break;
+    case DOOR: t->ext = DOOR_STEPS - 1; break;
+    case LEVEL_DOOR: t->ext = LEVEL_DOOR_STEPS - 1; break;
+    default: break;
+    }
 
-  if (parts & TILE_EXT_DESIGN)
-    t->fg = t->fake = TCARPET;
+    break;
+  case TILE_BG:
+    t->bg = tile_ref->bg;
+    break;
+  case TILE_EXT_ITEM:
+    t->ext = tile_ref->ext;
+    break;
+  case TILE_EXT_DESIGN:
+    t->fg = TCARPET;
+    t->ext = tile_ref->ext;
+    break;
+  case TILE_EXT_STEP_SPIKES_FLOOR:
+    t->fg = SPIKES_FLOOR;
+    t->ext = tile_ref->ext;
+    break;
+  case TILE_EXT_STEP_CHOMPER:
+    t->fg = CHOMPER;
+    t->ext = tile_ref->ext;
+    break;
+  default: assert (false); return NULL;
+  }
 
-  t->bg = tile_ref->bg;
-  t->ext = ((parts & TILE_EXT) ||
-            (parts & TILE_EXT_ITEM)
-            || (parts & TILE_EXT_DESIGN))
-    ? tile_ref->ext : 0;
+  if (ts) copy_from_tile_state (&p, ts);
+  else init_tile_at_pos (&p);
+
   tile_caching = true;
 
-  if (parts & TILE_EXT_STEP_SPIKES_FLOOR) {
-    t->fg = t->fake = SPIKES_FLOOR;
-    t->ext = tile_ref->ext;
-    init_tile_at_pos (&p);
+  if (t->bg == TORCH) {
+    uint16_t anim_cycle_bkp = anim_cycle;
+    anim_cycle = 0;
+    draw_object (b, "FIRE", &p);
+    anim_cycle = anim_cycle_bkp;
   }
 
-  if (parts & TILE_EXT_STEP_CHOMPER) {
-    t->fg = t->fake = CHOMPER;
-    t->ext = tile_ref->ext;
-    init_tile_at_pos (&p);
-  }
+  draw_tile_bg (b, &p);
+  draw_tile_fg (b, &p);
 
-  if (parts & TILE_BG) {
-    enum tile_fg fake_bkp = t->fake;
-    if (t->fake == LEVEL_DOOR) t->fake = NO_FLOOR;
-    draw_tile_bg (b, &p);
-    if (t->bg == TORCH) {
-      uint16_t anim_cycle_bkp = anim_cycle;
-      anim_cycle = 0;
-      draw_object (b, "FIRE", &p);
-      anim_cycle = anim_cycle_bkp;
-    }
-    t->fake = fake_bkp;
-  }
-
-  if (parts & TILE_FG || parts & TILE_FAKE
-      || parts & TILE_EXT_DESIGN
-      || parts & TILE_EXT_STEP_SPIKES_FLOOR
-      || parts & TILE_EXT_STEP_CHOMPER) {
-    if (tile_ref->fg == LEVEL_DOOR) draw_level_door (b, &p);
-    draw_tile_fg (b, &p);
-  }
-
-  if (parts & TILE_EXT_ITEM) {
+  if (part == TILE_EXT_ITEM || part == TILE_ALL) {
     if (potion_ext_cs (t->ext)) {
       uint16_t anim_cycle_bkp = anim_cycle;
       anim_cycle = 3;
@@ -846,6 +858,7 @@ get_tile_bitmap (struct tile *tile_ref, float scale, enum tile_part parts)
 
   tile_caching = false;
   *t = t_bkp;
+
   return b;
 }
 

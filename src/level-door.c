@@ -108,8 +108,7 @@ remove_level_door (struct level_door *d)
 int
 fake_level_door_step (struct pos *p)
 {
-  /* return is_fake (p) ? fake_ext (p) : level_door_at_pos (p)->i; */
-  return is_fake (p) ? LEVEL_DOOR_STEPS - 1 : level_door_at_pos (p)->i;
+  return is_fake (p) ? fake_ext (p) : level_door_at_pos (p)->i;
 }
 
 bool

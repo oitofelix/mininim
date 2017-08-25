@@ -20,8 +20,8 @@
 
 #include "mininim.h"
 
-struct pos *
-fix_tile (struct pos *p)
+union tile_state *
+fix_tile (struct pos *p, void *data)
 {
   enum tile_fg f = fg (p);
   enum tile_fg fr = fg_rel (p, 0, +1);
@@ -41,7 +41,7 @@ fix_tile (struct pos *p)
   if (np.place == PLACES - 1 && f != WALL && fr == WALL)
     set_fg (p, WALL);
 
-  return p;
+  return NULL;
 }
 
 /* ------------------------------------------------------------------- */

@@ -22,6 +22,7 @@
 #define MININIM_TYPES_H
 
 enum tile_part {
+  TILE_ALL = 0,
   TILE_FG = 1 << 0, TILE_BG = 1 << 1, TILE_EXT = 1 << 2, TILE_FAKE = 1 << 3,
   TILE_EXT_ITEM = 1 << 4, TILE_EXT_FALL = 1 << 5, TILE_EXT_EVENT = 1 << 6,
   TILE_EXT_STEP = 1 << 7, TILE_EXT_DESIGN = 1 << 8,
@@ -489,7 +490,7 @@ typedef struct pos *(*pos_f) (struct coord *, struct pos *);
 typedef struct coord *(*pos2coord_f) (struct pos *, struct coord *);
 typedef bool (*pos_pred) (struct pos *, void *);
 typedef bool (*int_pred) (int, void *);
-typedef struct pos * (*pos_trans) (struct pos *);
+typedef union tile_state * (*pos_trans) (struct pos *, void *data);
 
 struct room_dist {
   int dist;

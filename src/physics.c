@@ -83,19 +83,19 @@ ext_val (int f, int e)
   }
 }
 
-struct pos *
-clear_tile (struct pos *p)
+union tile_state *
+clear_tile (struct pos *p, void *data)
 {
   set_tile (p, NO_FLOOR, BRICKS_5, NO_ITEM, NO_FAKE);
-  return p;
+  return NULL;
 }
 
-struct pos *
-random_tile (struct pos *p)
+union tile_state *
+random_tile (struct pos *p, void *data)
 {
   set_tile (p, prandom (TILE_FGS - 1), prandom (TILE_BGS - 1),
            prandom_max (), is_fake (p) ? prandom (TILE_FGS - 1) : NO_FAKE);
-  return p;
+  return NULL;
 }
 
 struct pos *
@@ -109,29 +109,52 @@ set_tile (struct pos *p, int f, int b, int e, int ff)
 }
 
 enum tile_bg
+bg_tile (struct tile *t)
+{
+  return bg_val (t->bg);
+}
+
+enum tile_bg
 bg (struct pos *p)
 {
-  return bg_val (tile (p)->bg);
+  return bg_tile (tile (p));
+}
+
+enum tile_fg
+fg_tile (struct tile *t)
+{
+  return fg_val (t->fg);
 }
 
 enum tile_fg
 fg (struct pos *p)
 {
-  return fg_val (tile (p)->fg);
+  return fg_tile (tile (p));
+}
+
+enum tile_fg
+fake_tile (struct tile *t)
+{
+  if (t->fake < 0) return fg_tile (t);
+  else return fg_val (t->fake);
 }
 
 enum tile_fg
 fake (struct pos *p)
 {
-  if (tile (p)->fake < 0) return fg (p);
-  else return fg_val (tile (p)->fake);
+  return fake_tile (tile (p));
+}
+
+int
+ext_tile (struct tile *t)
+{
+  return ext_val (t->fg, t->ext);
 }
 
 int
 ext (struct pos *p)
 {
-  struct tile *c = tile (p);
-  return ext_val (c->fg, c->ext);
+  return ext_tile (tile (p));
 }
 
 int
@@ -825,8 +848,8 @@ mirror_pos (struct pos *p0, struct pos *p1, bool invert_dir)
   register_changed_pos (p1);
 }
 
-struct pos *
-decorate_tile (struct pos *p)
+union tile_state *
+decorate_tile (struct pos *p, void *data)
 {
   struct pos np;
 
@@ -910,7 +933,7 @@ decorate_tile (struct pos *p)
     }
   }
 
-  return p;
+  return NULL;
 }
 
 struct tile_copy *
@@ -921,12 +944,11 @@ copy_tile (struct tile_copy *c, struct pos *p)
   return c;
 }
 
-struct pos *
-paste_tile (struct pos *p, struct tile_copy *c, char *desc)
+union tile_state *
+paste_tile (struct pos *p, struct tile_copy *c)
 {
-  register_tile_undo (&undo, p, c->c.fg, c->c.bg, c->c.ext, c->c.fake,
-                     &c->cs, true, desc);
-  return p;
+  *tile (p) = c->c;
+  return &c->cs;
 }
 
 struct room_copy *
@@ -945,35 +967,45 @@ paste_room (struct level *l, int room, struct room_copy *rc, char *desc)
   struct pos p; new_pos (&p, l, room, -1, -1);
   for (p.floor = 0; p.floor < FLOORS; p.floor++)
     for (p.place = 0; p.place < PLACES; p.place++)
-      paste_tile (&p, &rc->c[p.floor][p.place], NULL);
+      apply_to_pos (&p, (pos_trans) paste_tile,
+                    &rc->c[p.floor][p.place], NULL);
   end_undo_set (&undo, desc);
   register_changed_room (room);
   return l;
 }
 
 struct pos *
-apply_to_pos (struct pos *p, pos_trans f, char *desc)
+apply_to_pos (struct pos *p, pos_trans f, void *data, char *desc)
 {
   struct tile c0, c1;
   c0 = *tile (p);
-  f (p);
+  union tile_state *ts = f (p, data);
   c1 = *tile (p);
   *tile (p) = c0;
   register_tile_undo (&undo, p,
-                     c1.fg, c1.bg, c1.ext, c1.fake,
-                     NULL, true, desc);
+                      c1.fg, c1.bg, c1.ext, c1.fake,
+                      ts, true, desc);
   return p;
 }
 
 struct level *
-apply_to_room (struct level *l, int room, pos_trans f, char *desc)
+apply_to_room (struct level *l, int room, pos_trans f,
+               void *data, char *desc)
 {
   struct pos p; new_pos (&p, l, room, -1, -1);
   for (p.floor = 0; p.floor < FLOORS; p.floor++)
     for (p.place = 0; p.place < PLACES; p.place++)
-      apply_to_pos (&p, f, NULL);
+      apply_to_pos (&p, f, data, NULL);
   end_undo_set (&undo, desc);
   register_changed_room (room);
+  return l;
+}
+
+struct level *
+apply_to_level (struct level *l, pos_trans f, void *data, char *desc)
+{
+  for (int i = 1; i < ROOMS; i++) apply_to_room (l, i, f, data, NULL);
+  end_undo_set (&undo, desc);
   return l;
 }
 

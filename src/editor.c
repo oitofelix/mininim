@@ -85,7 +85,7 @@ change_tile_ext (struct pos *p, int e)
   else if (is_design_fg (p)) str = xasprintf ("DESIGN EXT %i", e);
   else {
     assert (false);
-    return NULL;
+    return;
   }
 
   register_tile_undo (&undo, p,
@@ -427,13 +427,13 @@ editor (void)
     case 'I': edit = EDIT_NOMINAL_INFO; break;
     case 'N': edit = EDIT_NUMERICAL_INFO; break;
     case 'A':
-      apply_to_pos (&p, clear_tile, "CLEAR TILE");
+      apply_to_pos (&p, clear_tile, NULL, "CLEAR TILE");
       break;
     case 'R':
-      apply_to_pos (&p, random_tile, "RANDOMIZE TILE");
+      apply_to_pos (&p, random_tile, NULL, "RANDOMIZE TILE");
       break;
     case 'D':
-      apply_to_pos (&p, decorate_tile, "DECORATE TILE");
+      apply_to_pos (&p, decorate_tile, NULL, "DECORATE TILE");
       break;
     case 'M': edit = EDIT_MIRROR_TILE; break;
     case 'C':
@@ -441,10 +441,10 @@ editor (void)
       editor_msg ("COPY TILE", EDITOR_CYCLES_3);
       break;
     case 'P':
-      paste_tile (&p, &tile_copy, "PASTE TILE");
+      apply_to_pos (&p, (pos_trans) paste_tile, &tile_copy, "PASTE TILE");
       break;
     case '!':
-      apply_to_pos (&p, fix_tile, "FIX TILE");
+      apply_to_pos (&p, fix_tile, NULL, "FIX TILE");
       break;
     }
     break;
@@ -1123,15 +1123,15 @@ editor (void)
       get_mouse_coord (&last_mouse_coord);
       edit = EDIT_ROOM_EXCHANGE; break;
     case 'A':
-      apply_to_room (&global_level, mr.room, clear_tile,
+      apply_to_room (&global_level, mr.room, clear_tile, NULL,
                      "CLEAR ROOM");
       break;
     case 'R':
-      apply_to_room (&global_level, mr.room, random_tile,
+      apply_to_room (&global_level, mr.room, random_tile, NULL,
                      "RANDOMIZE ROOM");
       break;
     case 'D':
-      apply_to_room (&global_level, mr.room, decorate_tile,
+      apply_to_room (&global_level, mr.room, decorate_tile, NULL,
                      "DECORATE ROOM");
       break;
     case 'M': edit = EDIT_ROOM_MIRROR; break;
@@ -1143,7 +1143,7 @@ editor (void)
       paste_room (&global_level, mr.room, &room_copy, "PASTE ROOM");
       break;
     case '!':
-      apply_to_room (&global_level, mr.room, fix_tile, "FIX ROOM");
+      apply_to_room (&global_level, mr.room, fix_tile, NULL, "FIX ROOM");
       break;
     }
     break;
@@ -1376,19 +1376,13 @@ editor (void)
       next_level_number = global_level.n;
       break;
     case 'A':
-      for (i = 1; i < ROOMS; i++)
-        apply_to_room (&global_level, i, clear_tile, NULL);
-      end_undo_set (&undo, "CLEAR LEVEL");
+      apply_to_level (&global_level, clear_tile, NULL, "CLEAR LEVEL");
       break;
     case 'R':
-      for (i = 1; i < ROOMS; i++)
-        apply_to_room (&global_level, i, random_tile, NULL);
-      end_undo_set (&undo, "RANDOMIZE LEVEL");
+      apply_to_level (&global_level, random_tile, NULL, "RANDOMIZE LEVEL");
       break;
     case 'D':
-      for (i = 1; i < ROOMS; i++)
-        apply_to_room (&global_level, i, decorate_tile, NULL);
-      end_undo_set (&undo, "DECORATE LEVEL");
+      apply_to_level (&global_level, decorate_tile, NULL, "DECORATE LEVEL");
       break;
     case 'M': edit = EDIT_LEVEL_MIRROR; break;
     case 'C':
@@ -1427,9 +1421,7 @@ editor (void)
       editor_msg ("LEVEL RELOADED", EDITOR_CYCLES_2);
       break;
     case '!':
-      for (i = 1; i < ROOMS; i++)
-        apply_to_room (&global_level, i, fix_tile, NULL);
-      end_undo_set (&undo, "FIX LEVEL");
+      apply_to_level (&global_level, fix_tile, NULL, "FIX LEVEL");
       break;
     }
     al_free (str);

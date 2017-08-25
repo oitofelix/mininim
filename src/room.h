@@ -53,8 +53,9 @@ void draw_tile_fg_front (ALLEGRO_BITMAP *bitmap, struct pos *p,
 void draw_room_frame_front (ALLEGRO_BITMAP *bitmap, struct frame *f);
 /* void draw_room_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, */
 /*                    struct frame *f); */
-ALLEGRO_BITMAP *get_tile_bitmap (struct tile *t, float scale,
-                                 enum tile_part parts);
+ALLEGRO_BITMAP *get_tile_bitmap (struct tile *tile_ref,
+                                 union tile_state *ts,
+                                 float scale, enum tile_part part);
 
 ALLEGRO_BITMAP *apply_hue_palette (ALLEGRO_BITMAP *bitmap);
 ALLEGRO_COLOR apply_hue_color (ALLEGRO_COLOR c);

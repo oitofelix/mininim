@@ -204,10 +204,11 @@ update (Ihandle *ih)
     case TILE_EXT_STEP_LEVEL_DOOR:
     case TILE_EXT_STEP_CHOMPER:
     case TILE_EXT_DESIGN: t.ext = i; break;
+    case TILE_FAKE: t.fake = i; break;
     default: assert (false); return;
     }
 
-    ALLEGRO_BITMAP *b = get_tile_bitmap (&t, 1, tile_part);
+    ALLEGRO_BITMAP *b = get_tile_bitmap (&t, NULL, 1, tile_part);
     gui_set_image (button, b, transp_to_black);
     al_destroy_bitmap (b);
   }

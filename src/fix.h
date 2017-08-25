@@ -21,7 +21,7 @@
 #ifndef MININIM_FIX_H
 #define MININIM_FIX_H
 
-struct pos *fix_tile (struct pos *p);
+union tile_state *fix_tile (struct pos *p, void *data);
 
 /* -------------------------------------- */
 

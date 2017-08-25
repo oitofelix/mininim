@@ -28,25 +28,32 @@ struct tile *tile_rel (struct pos *p, int floor, int place);
 enum tile_bg bg_val (int b);
 enum tile_fg fg_val (int f);
 int ext_val (int f, int e);
-struct pos *clear_tile (struct pos *p);
-struct pos *random_tile (struct pos *p);
-struct pos *decorate_tile (struct pos *p);
+union tile_state *clear_tile (struct pos *p, void *data);
+union tile_state *random_tile (struct pos *p, void *data);
+union tile_state *decorate_tile (struct pos *p, void *data);
 struct pos *set_tile (struct pos *p, int f, int b, int e, int ff);
 
 struct tile_copy *copy_tile (struct tile_copy *c, struct pos *p);
-struct pos *paste_tile (struct pos *p, struct tile_copy *c, char *desc);
+union tile_state *paste_tile (struct pos *p, struct tile_copy *c);
 struct room_copy *copy_room (struct room_copy *rc, struct level *l, int room);
 struct level *paste_room (struct level *l, int room,
                            struct room_copy *rc, char *desc);
 
-struct pos * apply_to_pos (struct pos *p, pos_trans f, char *desc);
+struct pos * apply_to_pos (struct pos *p, pos_trans f,
+                           void *data, char *desc);
 struct level *apply_to_room (struct level *l, int room,
-                             struct pos * (*f) (struct pos *),
+                             pos_trans f, void *data,
                              char *desc);
+struct level *apply_to_level (struct level *l, pos_trans f,
+                              void *data, char *desc);
 
+enum tile_bg bg_tile (struct tile *t);
 enum tile_bg bg (struct pos *p);
+enum tile_fg fg_tile (struct tile *t);
 enum tile_fg fg (struct pos *p);
+enum tile_fg fake_tile (struct tile *t);
 enum tile_fg fake (struct pos *p);
+int ext_tile (struct tile *t);
 int ext (struct pos *p);
 int fake_ext (struct pos *p);
 

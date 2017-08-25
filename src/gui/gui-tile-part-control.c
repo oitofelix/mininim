@@ -111,6 +111,12 @@ gui_create_tile_part_control (struct pos *p, enum tile_part tile_part)
     change_tile_part = (change_tile_part_t) change_tile_ext;
     title = "Fall Extension";
     break;
+  case TILE_FAKE:
+    tile_part_str = tile_fg_str;
+    tile_parts = TILE_FGS;
+    change_tile_part = (change_tile_part_t) change_tile_fake;
+    title = "Fake";
+    break;
   default: assert (false);
     return NULL;
   }
@@ -136,6 +142,7 @@ gui_create_tile_part_control (struct pos *p, enum tile_part tile_part)
   case TILE_EXT_DESIGN:
   case TILE_EXT_STEP_SPIKES_FLOOR:
   case TILE_EXT_STEP_CHOMPER:
+  case TILE_FAKE:
     spin = IupSetCallbacks
       (IupSetAttributes
        (IupText (NULL),
@@ -272,9 +279,7 @@ gui_create_tile_part_control (struct pos *p, enum tile_part tile_part)
     IupSetAttribute (ih, "_TILE_PART_DIALOG", (void *) tile_part_dialog);
   }
 
-  struct tile t;
-  memset (&t, 0, sizeof (t));
-  update (ih, &t);
+  update (ih, &last->tile);
 
   return ih;
 }
@@ -351,9 +356,9 @@ _update_cb (Ihandle *ih)
       && last->em == em
       && last->hue == hue
       && (tile_part != TILE_FG
-          || fg_val (last->tile.fg) == fg_val (t->fg))
+          || fg_tile (&last->tile) == fg_tile (t))
       && (tile_part != TILE_BG
-          || bg_val (last->tile.bg) == bg_val (t->bg))
+          || bg_tile (&last->tile) == bg_tile (t))
       && ((tile_part != TILE_EXT_ITEM
            && tile_part != TILE_EXT_FALL
            && tile_part != TILE_EXT_STEP_SPIKES_FLOOR
@@ -361,12 +366,13 @@ _update_cb (Ihandle *ih)
            && tile_part != TILE_EXT_STEP_LEVEL_DOOR
            && tile_part != TILE_EXT_STEP_CHOMPER
            && tile_part != TILE_EXT_DESIGN)
-          || (fg_val (last->tile.fg) == fg_val (t->fg)
-              && ext_val (last->tile.fg, last->tile.ext)
-              == ext_val (t->fg, t->ext)))
+          || (fg_tile (&last->tile) == fg_tile (t)
+              && ext_tile (&last->tile) == ext_tile (t)))
       && (tile_part != TILE_EXT_EVENT
-          || (fg_val (last->tile.fg) == fg_val (t->fg)
-              && last->tile.ext == t->ext)))
+          || (fg_tile (&last->tile) == fg_tile (t)
+              && last->tile.ext == t->ext))
+      && (tile_part != TILE_FAKE
+          || fake_tile (&last->tile) == fake_tile (t)))
     return IUP_DEFAULT;
   else update (ih, t);
 
@@ -384,15 +390,17 @@ update (Ihandle *ih, struct tile *t)
   last->hue = hue;
   last->tile = *t;
 
-  ALLEGRO_BITMAP *b = get_tile_bitmap (t, 2, tile_part);
   Ihandle *button = (void *) IupGetAttribute (ih, "_BUTTON");
-  gui_set_image (button, b, transp_to_black);
-  al_destroy_bitmap (b);
+  if (button) {
+    ALLEGRO_BITMAP *b = get_tile_bitmap (t, NULL, 2, tile_part);
+    gui_set_image (button, b, transp_to_black);
+    al_destroy_bitmap (b);
+  }
 
   int i;
   switch (tile_part) {
-  case TILE_FG: i = fg_val (t->fg); break;
-  case TILE_BG: i = bg_val (t->bg); break;
+  case TILE_FG: i = fg_tile (t); break;
+  case TILE_BG: i = bg_tile (t); break;
   case TILE_EXT_ITEM:
   case TILE_EXT_FALL:
   case TILE_EXT_STEP_SPIKES_FLOOR:
@@ -400,23 +408,24 @@ update (Ihandle *ih, struct tile *t)
   case TILE_EXT_STEP_LEVEL_DOOR:
   case TILE_EXT_STEP_CHOMPER:
   case TILE_EXT_DESIGN:
-    i = ext_val (t->fg, t->ext);
+    i = ext_tile (t);
     break;
   case TILE_EXT_EVENT:
     i = t->ext;
     break;
+  case TILE_FAKE: i = fake_tile (t); break;
   default: assert (false); return;
   }
 
   Ihandle *val = (void *) IupGetAttribute (ih, "_VAL");
-  IupSetInt (val, "VALUE", i);
+  if (val) IupSetInt (val, "VALUE", i);
 
   Ihandle *list = (void *) IupGetAttribute (ih, "_LIST");
-  IupSetInt (list, "VALUE", i + 1);
+  if (list) IupSetInt (list, "VALUE", i + 1);
 
   Ihandle *spin = (void *) IupGetAttribute (ih, "_SPIN");
-  if (IupGetInt (spin, "SPIN")) IupSetInt (spin, "SPINVALUE", i);
-  else {
+  if (spin && IupGetInt (spin, "SPIN")) IupSetInt (spin, "SPINVALUE", i);
+  else if (spin) {
     /* This verification step is necessary in order for the text
        control to behave correctly under Windows */
     int j = IupGetInt (spin, "VALUE");
@@ -424,7 +433,7 @@ update (Ihandle *ih, struct tile *t)
   }
 
   Ihandle *fall_toggle = (void *) IupGetAttribute (ih, "_FALL_TOGGLE");
-  IupSetInt (fall_toggle, "VALUE", i);
+  if (fall_toggle) IupSetInt (fall_toggle, "VALUE", i);
 }
 
 

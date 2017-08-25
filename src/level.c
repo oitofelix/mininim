@@ -126,9 +126,10 @@ guard_eq (struct guard *g0, struct guard *g1)
 bool
 tile_eq (struct tile *c0, struct tile *c1)
 {
-  return fg_val (c0->fg) == fg_val (c1->fg)
-    && bg_val (c0->bg) == bg_val (c1->bg)
-    && ext_val (c0->fg, c0->ext) == ext_val (c1->fg, c1->ext);
+  return fg_tile (c0) == fg_tile (c1)
+    && bg_tile (c0) == bg_tile (c1)
+    && ext_tile (c0) == ext_tile (c1)
+    && fake_tile (c0) == fake_tile (c1);
 }
 
 bool
