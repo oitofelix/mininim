@@ -92,7 +92,7 @@ static void zoom_fit_menu (intptr_t index);
 static void zoom_out_menu (intptr_t index);
 static void zoom_in_menu (intptr_t index);
 static void navigation_menu (intptr_t index);
-static void nav_select_menu (intptr_t index);
+static void nav_room_menu (intptr_t index);
 static void nav_cell_menu (intptr_t index);
 static void nav_page_menu (intptr_t index);
 static ALLEGRO_BITMAP *hue_icon (enum hue hue);
@@ -365,7 +365,7 @@ ALLEGRO_BITMAP *small_logo_icon,
   *game_icon, *settings_icon, *zoom_none_icon, *zoom_stretch_icon,
   *zoom_ratio_icon, *vertical_horizontal_icon, *zoom_out_icon,
   *zoom_in_icon, *heading_icon, *zoom_icon,
-  *navigation_icon, *nav_select_icon, *nav_cell_icon, *nav_page_icon,
+  *navigation_icon, *nav_room_icon, *nav_cell_icon, *nav_page_icon,
   *nav_left_icon, *nav_right_icon, *nav_above_icon, *nav_below_icon,
   *nav_home_icon, *repeat_icon, *compass_icon, *compass2_icon,
   *drawing_icon, *first_icon, *last_icon, *jump_icon, *original_icon,
@@ -460,7 +460,7 @@ load_icons (void)
   heading_icon = load_icon (HEADING_ICON);
   zoom_icon = load_icon (ZOOM_ICON);
   navigation_icon = load_icon (NAVIGATION_ICON);
-  nav_select_icon = load_icon (NAV_SELECT_ICON);
+  nav_room_icon = load_icon (NAV_ROOM_ICON);
   nav_cell_icon = load_icon (NAV_ROW_ICON);
   nav_page_icon = load_icon (NAV_PAGE_ICON);
   nav_left_icon = load_icon (NAV_LEFT_ICON);
@@ -571,7 +571,7 @@ unload_icons (void)
   al_destroy_bitmap (heading_icon);
   al_destroy_bitmap (zoom_icon);
   al_destroy_bitmap (navigation_icon);
-  al_destroy_bitmap (nav_select_icon);
+  al_destroy_bitmap (nav_room_icon);
   al_destroy_bitmap (nav_cell_icon);
   al_destroy_bitmap (nav_page_icon);
   al_destroy_bitmap (nav_left_icon);
@@ -1189,8 +1189,8 @@ navigation_menu (intptr_t index)
   item.main.view.nav.current_room =
     menu_hitem (true, "ROOM %i", mr.room);
 
-  menu_sub (&menu.main.view.nav.select.m, true, nav_select_icon,
-            nav_select_menu, 0, "Room &Selection");
+  menu_sub (&menu.main.view.nav.select.m, true, nav_room_icon,
+            nav_room_menu, 0, "Room &Selection");
 
   menu_sub (&menu.main.view.nav.cell.m, true, nav_cell_icon,
             nav_cell_menu, 0, "Scroll &row");
@@ -1213,7 +1213,7 @@ navigation_menu (intptr_t index)
 }
 
 void
-nav_select_menu (intptr_t index)
+nav_room_menu (intptr_t index)
 {
   item.main.view.nav.select.left =
     menu_sitem (roomd (&global_level, mr.room, LEFT),

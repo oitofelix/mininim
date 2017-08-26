@@ -36,14 +36,14 @@ static int paste_button_action_cb (Ihandle *ih);
 
 
 Ihandle *
-gui_create_tile_clipboard_control (struct pos *p)
+gui_create_tile_clipboard_control (struct pos *p, char *norm_group)
 {
-  Ihandle *ih, *button, *radio;
+  Ihandle *ih, *vbox, *button, *radio;
 
   ih = IupSetCallbacks
     (IupSetAttributes
      (IupFrame
-      (IupSetAttributes
+      (vbox = IupSetAttributes
        (IupVbox
         (IupFill (),
          button = IupSetCallbacks
@@ -63,25 +63,24 @@ gui_create_tile_clipboard_control (struct pos *p)
          radio = IupRadio
          (IupHbox
           (IupSetAttributes
-           (IupToggle ("Tile", NULL),
-            "TIP = \"Tile pasting scope\""),
+           (IupToggle ("P", NULL),
+            "TIP = \"Place pasting scope\""),
            IupSetAttributes
-           (IupToggle ("Room", NULL),
+           (IupToggle ("R", NULL),
             "TIP = \"Room pasting scope\""),
            IupSetAttributes
-           (IupToggle ("Level", NULL),
+           (IupToggle ("L", NULL),
             "TIP = \"Level pasting scope\""),
            NULL)),
          IupFill (),
          NULL),
-        "ALIGNMENT = ACENTER")),
+        "ALIGNMENT = ACENTER,")),
       "TITLE = Clipboard"),
      "DESTROY_CB", destroy_cb,
      "_UPDATE_CB", _update_cb,
      NULL);
 
-  Ihandle *norm = IupGetHandle ("CLIPBOARD_BUTTON_NORM");
-  IupSetAttribute (norm, "NORMALIZE", "BOTH");
+  IupSetAttribute (vbox, "NORMALIZERGROUP", norm_group);
 
   IupSetAttribute (ih, "_BUTTON", (void *) button);
   IupSetAttribute (ih, "_RADIO", (void *) radio);
@@ -138,7 +137,7 @@ update (Ihandle *ih)
 
   Ihandle *button = (void *) IupGetAttribute (ih, "_BUTTON");
   ALLEGRO_BITMAP *b = get_tile_bitmap
-    (&last->tile_copy.c, &last->tile_copy.cs, 2, TILE_ALL);
+    (&last->tile_copy.c, &last->tile_copy.cs, 1.5, TILE_ALL);
   gui_set_image (button, b, transp_to_black);
   al_destroy_bitmap (b);
 }
@@ -161,13 +160,13 @@ paste_button_action_cb (Ihandle *ih)
   Ihandle *radio = (void *) IupGetAttribute (ih, "_RADIO");
   Ihandle *toggle = (void *) IupGetAttribute (radio, "VALUE_HANDLE");
   char *title = IupGetAttribute (toggle, "TITLE");
-  if (! strcmp (title, "Tile"))
+  if (! strcmp (title, "P"))
     apply_to_pos (p, (pos_trans) paste_tile,
                   &last->tile_copy, "PASTE TILE");
-  else if (! strcmp (title, "Room"))
+  else if (! strcmp (title, "R"))
     apply_to_room (&global_level, mr.room, (pos_trans) paste_tile,
                    &last->tile_copy, "PASTE TILE (ROOM)");
-  else if (! strcmp (title, "Level"))
+  else if (! strcmp (title, "L"))
     apply_to_level (&global_level, (pos_trans) paste_tile,
                     &last->tile_copy, "PASTE TILE (LEVEL)");
   else assert (NULL);

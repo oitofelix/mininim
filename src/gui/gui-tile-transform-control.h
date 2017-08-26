@@ -1,5 +1,5 @@
 /*
-  gui-tile-part-control.c -- editor GUI tile part control module;
+  gui-tile-transform-control.c -- editor GUI tile transform control module;
 
   Copyright (C) 2015, 2016, 2017 Bruno Félix Rezende Ribeiro
   <oitofelix@gnu.org>
@@ -18,10 +18,10 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MININIM_GUI_TILE_PART_CONTROL_H
-#define MININIM_GUI_TILE_PART_CONTROL_H
+#ifndef MININIM_GUI_TILE_TRANSFORM_CONTROL_H
+#define MININIM_GUI_TILE_TRANSFORM_CONTROL_H
 
-Ihandle *gui_create_tile_part_control
-(struct pos *p, enum tile_part tile_part, char *norm_group);
+Ihandle *gui_create_tile_transform_control
+(struct pos *p, char *norm_group);
 
-#endif	/* MININIM_GUI_TILE_PART_CONTROL */
+#endif	/* MININIM_GUI_TILE_TRANSFORM_CONTROL */

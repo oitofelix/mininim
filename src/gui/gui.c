@@ -204,3 +204,17 @@ gui_run_callback_IFni (const char *name, Ihandle *ih, int i)
   if (cb) return cb (ih, i);
   else return IUP_DEFAULT;
 }
+
+void
+dialog_fit_natural_size (Ihandle *ih)
+{
+  IupSetAttribute (ih, "RASTERSIZE", NULL);
+  IupRefresh (ih);
+  const char *size = IupGetAttribute (ih, "NATURALSIZE");
+  IupSetAttribute (ih, "MINSIZE", size);
+#if WINDOWS_PORT
+  IupSetAttribute (ih, "RESIZE", "NO");
+#else
+  IupSetAttribute (ih, "MAXSIZE", size);
+#endif
+}

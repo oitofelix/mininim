@@ -77,7 +77,8 @@
 #define HEADING_ICON "data/icons/heading.png"
 #define ZOOM_ICON "data/icons/zoom.png"
 #define NAVIGATION_ICON "data/icons/navigation.png"
-#define NAV_SELECT_ICON "data/icons/nav-select.png"
+#define NAV_PLACE_ICON "data/icons/nav-place.png"
+#define NAV_ROOM_ICON "data/icons/nav-room.png"
 #define NAV_ROW_ICON "data/icons/nav-row.png"
 #define NAV_PAGE_ICON "data/icons/nav-page.png"
 #define NAV_LEFT_ICON "data/icons/nav-left.png"
@@ -130,6 +131,13 @@
 #define MINUS_ICON "data/icons/minus.png"
 #define LOCK_ICON "data/icons/lock.png"
 #define UNLOCK_ICON "data/icons/unlock.png"
+#define TOOLS_ICON "data/icons/tools.png"
+#define CLEAR_ICON "data/icons/clear.png"
+#define RANDOM_ICON "data/icons/random.png"
+#define DECORATION_ICON "data/icons/decoration.png"
+#define FIX_ICON "data/icons/fix.png"
+#define MIRROR_ICON "data/icons/mirror.png"
+#define SHUFFLE_ICON "data/icons/shuffle.png"
 
 #define JUMP_TO_LEVEL_MID_NMEMB 21
 #define REPLAY_FAVORITE_MID_NMEMB 10

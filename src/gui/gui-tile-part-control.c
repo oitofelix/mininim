@@ -40,10 +40,12 @@ static int fall_toggle_action_cb (Ihandle *ih, int state);
 
 
 Ihandle *
-gui_create_tile_part_control (struct pos *p, enum tile_part tile_part)
+gui_create_tile_part_control (struct pos *p, enum tile_part tile_part,
+                              char *norm_group)
 {
   Ihandle *ih, *button = NULL, *val = NULL, *toggle = NULL,
-    *fall_toggle = NULL, *list, *spin, *insertion_point;
+    *fall_toggle = NULL, *list = NULL, *spin = NULL,
+    *insertion_point;
 
   char **tile_part_str;
   int tile_parts;
@@ -199,7 +201,7 @@ gui_create_tile_part_control (struct pos *p, enum tile_part tile_part)
        "VALUECHANGED_CB", change_tile_part_from_val_cb,
        NULL);
     int w = IupGetInt (val, "RASTERSIZE");
-    int h = 175;
+    int h = 131;
     IupSetStrf (val, "RASTERSIZE", "%ix%i", w, h);
     IupSetDouble (val, "PAGESTEP", 10.0 / tile_parts);
     IupSetDouble (val, "SHOWTICKS", tile_parts);
@@ -233,19 +235,7 @@ gui_create_tile_part_control (struct pos *p, enum tile_part tile_part)
   default: break;
   }
 
-  switch (tile_part) {
-  case TILE_EXT_ITEM:
-  case TILE_EXT_FALL:
-  case TILE_EXT_EVENT:
-  case TILE_EXT_STEP_SPIKES_FLOOR:
-  case TILE_EXT_STEP_DOOR:
-  case TILE_EXT_STEP_LEVEL_DOOR:
-  case TILE_EXT_STEP_CHOMPER:
-  case TILE_EXT_DESIGN:
-    IupSetAttribute (vbox, "NORMALIZERGROUP", "TILE_EXT_NORM");
-    break;
-  default: break;
-  }
+  IupSetAttribute (vbox, "NORMALIZERGROUP", norm_group);
 
   IupSetAttribute (ih, "TITLE", title);
 
@@ -392,7 +382,7 @@ update (Ihandle *ih, struct tile *t)
 
   Ihandle *button = (void *) IupGetAttribute (ih, "_BUTTON");
   if (button) {
-    ALLEGRO_BITMAP *b = get_tile_bitmap (t, NULL, 2, tile_part);
+    ALLEGRO_BITMAP *b = get_tile_bitmap (t, NULL, 1.5, tile_part);
     gui_set_image (button, b, transp_to_black);
     al_destroy_bitmap (b);
   }

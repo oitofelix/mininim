@@ -39,10 +39,15 @@ gui_create_editor_dialog (void)
   Ihandle *zoom_out_label, *zoom_out_vh_button, *zoom_out_v_button,
     *zoom_out_h_button;
 
-  Ihandle *nav_select_label, *nav_select_left_button,
-    *nav_select_right_button, *nav_select_above_button,
-    *nav_select_below_button, *nav_select_al_button,
-    *nav_select_ar_button, *nav_select_bl_button, *nav_select_br_button;
+  Ihandle *nav_place_label, *nav_place_left_button,
+    *nav_place_right_button, *nav_place_above_button,
+    *nav_place_below_button, *nav_place_al_button,
+    *nav_place_ar_button, *nav_place_bl_button, *nav_place_br_button;
+
+  Ihandle *nav_room_label, *nav_room_left_button,
+    *nav_room_right_button, *nav_room_above_button,
+    *nav_room_below_button, *nav_room_al_button,
+    *nav_room_ar_button, *nav_room_bl_button, *nav_room_br_button;
 
   Ihandle *nav_row_label, *nav_row_left_button,
     *nav_row_right_button, *nav_row_above_button,
@@ -63,172 +68,257 @@ gui_create_editor_dialog (void)
        (IupFill (),
         IupSetAttributes
         (IupHbox
-         (IupSetAttributes
+         (
+
+          IupSetAttributes
           (IupFrame
-           (IupSetAttributes
-            (IupGridBox
-             (zoom_label = IupLabel (NULL),
-              zoom_none_button = IupButton (NULL, NULL),
-              zoom_stretch_button = IupButton (NULL, NULL),
-              zoom_ratio_button = IupButton (NULL, NULL),
-              zoom_in_label = IupLabel (NULL),
-              zoom_in_v_button = IupButton (NULL, NULL),
-              zoom_in_vh_button = IupButton (NULL, NULL),
-              zoom_in_h_button = IupButton (NULL, NULL),
-              zoom_out_label = IupLabel (NULL),
-              zoom_out_v_button = IupButton (NULL, NULL),
-              zoom_out_vh_button = IupButton (NULL, NULL),
-              zoom_out_h_button = IupButton (NULL, NULL),
-              NULL),
-             "ORIENTATION = HORIZONTAL,"
-             "NUMDIV = 4,"
-             "SIZECOL = -1,"
-             "SIZELIN = -1,"
-             "NORMALIZESIZE = BOTH")),
+           (IupVbox
+            (IupFill (),
+             IupSetAttributes
+             (IupGridBox
+              (zoom_label = IupLabel (NULL),
+               zoom_none_button = IupButton (NULL, NULL),
+               zoom_stretch_button = IupButton (NULL, NULL),
+               zoom_ratio_button = IupButton (NULL, NULL),
+               zoom_in_label = IupLabel (NULL),
+               zoom_in_v_button = IupButton (NULL, NULL),
+               zoom_in_vh_button = IupButton (NULL, NULL),
+               zoom_in_h_button = IupButton (NULL, NULL),
+               zoom_out_label = IupLabel (NULL),
+               zoom_out_v_button = IupButton (NULL, NULL),
+               zoom_out_vh_button = IupButton (NULL, NULL),
+               zoom_out_h_button = IupButton (NULL, NULL),
+               NULL),
+              "ORIENTATION = HORIZONTAL,"
+              "NUMDIV = 4,"
+              "SIZECOL = -1,"
+              "SIZELIN = -1,"
+              "NORMALIZESIZE = BOTH,"),
+             IupFill (),
+             NULL)),
            "TITLE = Zoom"),
 
+          IupFill (),
+
           IupSetAttributes
           (IupFrame
-           (IupSetAttributes
-            (IupGridBox
-             (nav_select_al_button = IupButton (NULL, NULL),
-              nav_select_above_button = IupButton (NULL, NULL),
-              nav_select_ar_button = IupButton (NULL, NULL),
-              nav_select_left_button = IupButton (NULL, NULL),
-              nav_select_label =
-              IupSetAttributes
-              (IupLabel (NULL),
-               "ALIGNMENT = ACENTER:ACENTER"),
-              nav_select_right_button = IupButton (NULL, NULL),
-              nav_select_bl_button = IupButton (NULL, NULL),
-              nav_select_below_button = IupButton (NULL, NULL),
-              nav_select_br_button = IupButton (NULL, NULL),
-              NULL),
-             "ORIENTATION = HORIZONTAL,"
-             "NUMDIV = 3,"
-             "SIZECOL = -1,"
-             "SIZELIN = -1,"
-             "NORMALIZESIZE = BOTH,")),
+           (IupVbox
+            (IupFill (),
+             IupSetAttributes
+             (IupGridBox
+              (nav_place_al_button = IupButton (NULL, NULL),
+               nav_place_above_button = IupButton (NULL, NULL),
+               nav_place_ar_button = IupButton (NULL, NULL),
+               nav_place_left_button = IupButton (NULL, NULL),
+               nav_place_label =
+               IupSetAttributes
+               (IupLabel (NULL),
+                "ALIGNMENT = ACENTER:ACENTER"),
+               nav_place_right_button = IupButton (NULL, NULL),
+               nav_place_bl_button = IupButton (NULL, NULL),
+               nav_place_below_button = IupButton (NULL, NULL),
+               nav_place_br_button = IupButton (NULL, NULL),
+               NULL),
+              "ORIENTATION = HORIZONTAL,"
+              "NUMDIV = 3,"
+              "SIZECOL = -1,"
+              "SIZELIN = -1,"
+              "NORMALIZESIZE = BOTH,"),
+             IupFill (),
+             NULL)),
+           "TITLE = Place"),
+
+          IupFill (),
+
+          IupSetAttributes
+          (IupFrame
+           (IupVbox
+            (IupFill (),
+             IupSetAttributes
+             (IupGridBox
+              (nav_room_al_button = IupButton (NULL, NULL),
+               nav_room_above_button = IupButton (NULL, NULL),
+               nav_room_ar_button = IupButton (NULL, NULL),
+               nav_room_left_button = IupButton (NULL, NULL),
+               nav_room_label =
+               IupSetAttributes
+               (IupLabel (NULL),
+                "ALIGNMENT = ACENTER:ACENTER"),
+               nav_room_right_button = IupButton (NULL, NULL),
+               nav_room_bl_button = IupButton (NULL, NULL),
+               nav_room_below_button = IupButton (NULL, NULL),
+               nav_room_br_button = IupButton (NULL, NULL),
+               NULL),
+              "ORIENTATION = HORIZONTAL,"
+              "NUMDIV = 3,"
+              "SIZECOL = -1,"
+              "SIZELIN = -1,"
+              "NORMALIZESIZE = BOTH,"),
+             IupFill (),
+             NULL)),
            "TITLE = Room"),
 
-          IupSetAttributes
-          (IupFrame
-           (IupSetAttributes
-            (IupGridBox
-             (nav_row_al_button = IupButton (NULL, NULL),
-              nav_row_above_button = IupButton (NULL, NULL),
-              nav_row_ar_button = IupButton (NULL, NULL),
-              nav_row_left_button = IupButton (NULL, NULL),
-              nav_row_label =
-              IupSetAttributes
-              (IupLabel (NULL),
-               "ALIGNMENT = ACENTER:ACENTER"),
-              nav_row_right_button = IupButton (NULL, NULL),
-              nav_row_bl_button = IupButton (NULL, NULL),
-              nav_row_below_button = IupButton (NULL, NULL),
-              nav_row_br_button = IupButton (NULL, NULL),
-              NULL),
-             "ORIENTATION = HORIZONTAL,"
-             "NUMDIV = 3,"
-             "SIZECOL = -1,"
-             "SIZELIN = -1,"
-             "NORMALIZESIZE = BOTH,")),
-           "TITLE = Row"),
+          IupFill (),
 
           IupSetAttributes
           (IupFrame
-           (IupSetAttributes
-            (IupGridBox
-             (nav_page_al_button = IupButton (NULL, NULL),
-              nav_page_above_button = IupButton (NULL, NULL),
-              nav_page_ar_button = IupButton (NULL, NULL),
-              nav_page_left_button = IupButton (NULL, NULL),
-              nav_page_label =
-              IupSetAttributes
-              (IupLabel (NULL),
-               "ALIGNMENT = ACENTER:ACENTER"),
-              nav_page_right_button = IupButton (NULL, NULL),
-              nav_page_bl_button = IupButton (NULL, NULL),
-              nav_page_below_button = IupButton (NULL, NULL),
-              nav_page_br_button = IupButton (NULL, NULL),
-              NULL),
-             "ORIENTATION = HORIZONTAL,"
-             "NUMDIV = 3,"
-             "SIZECOL = -1,"
-             "SIZELIN = -1,"
-             "NORMALIZESIZE = BOTH,")),
+           (IupVbox
+            (IupFill (),
+             IupSetAttributes
+             (IupGridBox
+              (nav_row_al_button = IupButton (NULL, NULL),
+               nav_row_above_button = IupButton (NULL, NULL),
+               nav_row_ar_button = IupButton (NULL, NULL),
+               nav_row_left_button = IupButton (NULL, NULL),
+               nav_row_label =
+               IupSetAttributes
+               (IupLabel (NULL),
+                "ALIGNMENT = ACENTER:ACENTER"),
+               nav_row_right_button = IupButton (NULL, NULL),
+               nav_row_bl_button = IupButton (NULL, NULL),
+               nav_row_below_button = IupButton (NULL, NULL),
+               nav_row_br_button = IupButton (NULL, NULL),
+               NULL),
+              "ORIENTATION = HORIZONTAL,"
+              "NUMDIV = 3,"
+              "SIZECOL = -1,"
+              "SIZELIN = -1,"
+              "NORMALIZESIZE = BOTH,"),
+             IupFill (),
+             NULL)),
+           "TITLE = Row"),
+
+          IupFill (),
+
+          IupSetAttributes
+          (IupFrame
+           (IupVbox
+            (IupFill (),
+             IupSetAttributes
+             (IupGridBox
+              (nav_page_al_button = IupButton (NULL, NULL),
+               nav_page_above_button = IupButton (NULL, NULL),
+               nav_page_ar_button = IupButton (NULL, NULL),
+               nav_page_left_button = IupButton (NULL, NULL),
+               nav_page_label =
+               IupSetAttributes
+               (IupLabel (NULL),
+                "ALIGNMENT = ACENTER:ACENTER"),
+               nav_page_right_button = IupButton (NULL, NULL),
+               nav_page_bl_button = IupButton (NULL, NULL),
+               nav_page_below_button = IupButton (NULL, NULL),
+               nav_page_br_button = IupButton (NULL, NULL),
+               NULL),
+              "ORIENTATION = HORIZONTAL,"
+              "NUMDIV = 3,"
+              "SIZECOL = -1,"
+              "SIZELIN = -1,"
+              "NORMALIZESIZE = BOTH,"),
+             IupFill (),
+             NULL)),
            "TITLE = Page"),
 
           NULL),
          "ALIGNMENT = ACENTER"),
+
         IupSetAttributes
         (IupTabs
-         (IupHbox
-          (IupSetAttributes
-           (gui_create_tile_part_control (&selection_pos, TILE_FG),
-            "NAME = TILE_FG_CONTROL"),
-           IupSetAttributes
-           (gui_create_tile_part_control (&selection_pos, TILE_BG),
-            "NAME = TILE_BG_CONTROL"),
+         (IupSetAttributes
+          (IupGridBox
+           (
+            IupSetAttributes
+            (gui_create_tile_part_control
+             (&selection_pos, TILE_FG, "TILE_PART_NORM"),
+             "NAME = TILE_FG_CONTROL"),
 
-           IupSetAttributes
-           (zbox = IupZbox
-            (IupSetAttributes
-             (IupFrame
-              (IupSetAttributes
-               (IupVbox
-                (IupFill (),
-                 IupLabel ("NO EXTENSION"),
-                 IupFill (),
-                 NULL),
-                "ALIGNMENT = ACENTER,"
-                "NORMALIZERGROUP = TILE_EXT_NORM")),
-              "TITLE = Extension,"
-              "NAME = TILE_EXT_NONE_CONTROL,"
-              "ACTIVE = NO"),
-             IupSetAttributes
-             (gui_create_tile_part_control (&selection_pos, TILE_EXT_ITEM),
-              "NAME = TILE_EXT_ITEM_CONTROL"),
-             IupSetAttributes
-             (gui_create_tile_part_control (&selection_pos, TILE_EXT_DESIGN),
-              "NAME = TILE_EXT_DESIGN_CONTROL"),
-             IupSetAttributes
-             (gui_create_tile_part_control
-              (&selection_pos, TILE_EXT_STEP_SPIKES_FLOOR),
-              "NAME = TILE_EXT_STEP_SPIKES_FLOOR_CONTROL"),
-             IupSetAttributes
-             (gui_create_tile_part_control
-              (&selection_pos, TILE_EXT_STEP_CHOMPER),
-              "NAME = TILE_EXT_STEP_CHOMPER_CONTROL"),
-             IupSetAttributes
-             (gui_create_tile_part_control
-              (&selection_pos, TILE_EXT_STEP_DOOR),
-              "NAME = TILE_EXT_STEP_DOOR_CONTROL"),
-             IupSetAttributes
-             (gui_create_tile_part_control
-              (&selection_pos, TILE_EXT_STEP_LEVEL_DOOR),
-              "NAME = TILE_EXT_STEP_LEVEL_DOOR_CONTROL"),
-             IupSetAttributes
-             (gui_create_tile_part_control
-              (&selection_pos, TILE_EXT_EVENT),
-              "NAME = TILE_EXT_EVENT_CONTROL"),
-             IupSetAttributes
-             (gui_create_tile_part_control
-              (&selection_pos, TILE_EXT_FALL),
-              "NAME = TILE_EXT_FALL_CONTROL"),
-             NULL),
-            "NAME = TILE_EXT,"
-            "ALIGNMENT = ACENTER"),
+            IupSetAttributes
+            (gui_create_tile_part_control
+             (&selection_pos, TILE_BG, "TILE_PART_NORM"),
+             "NAME = TILE_BG_CONTROL"),
 
-           IupSetAttributes
-           (gui_create_tile_part_control (&selection_pos, TILE_FAKE),
-            "NAME = TILE_FAKE_CONTROL"),
+            IupSetAttributes
+            (zbox = IupZbox
+             (IupSetAttributes
+              (IupFrame
+               (IupSetAttributes
+                (IupVbox
+                 (IupFill (),
+                  IupLabel ("NO EXTENSION"),
+                  IupFill (),
+                  NULL),
+                 "ALIGNMENT = ACENTER,"
+                 "NORMALIZERGROUP = TILE_PART_NORM")),
+               "TITLE = Extension,"
+               "NAME = TILE_EXT_NONE_CONTROL,"
+               "ACTIVE = NO"),
+              IupSetAttributes
+              (gui_create_tile_part_control
+               (&selection_pos, TILE_EXT_ITEM, "TILE_PART_NORM"),
+               "NAME = TILE_EXT_ITEM_CONTROL"),
+              IupSetAttributes
+              (gui_create_tile_part_control
+               (&selection_pos, TILE_EXT_DESIGN, "TILE_PART_NORM"),
+               "NAME = TILE_EXT_DESIGN_CONTROL"),
+              IupSetAttributes
+              (gui_create_tile_part_control
+               (&selection_pos, TILE_EXT_STEP_SPIKES_FLOOR, "TILE_PART_NORM"),
+               "NAME = TILE_EXT_STEP_SPIKES_FLOOR_CONTROL"),
+              IupSetAttributes
+              (gui_create_tile_part_control
+               (&selection_pos, TILE_EXT_STEP_CHOMPER, "TILE_PART_NORM"),
+               "NAME = TILE_EXT_STEP_CHOMPER_CONTROL"),
+              IupSetAttributes
+              (gui_create_tile_part_control
+               (&selection_pos, TILE_EXT_STEP_DOOR, "TILE_PART_NORM"),
+               "NAME = TILE_EXT_STEP_DOOR_CONTROL"),
+              IupSetAttributes
+              (gui_create_tile_part_control
+               (&selection_pos, TILE_EXT_STEP_LEVEL_DOOR, "TILE_PART_NORM"),
+               "NAME = TILE_EXT_STEP_LEVEL_DOOR_CONTROL"),
+              IupSetAttributes
+              (gui_create_tile_part_control
+               (&selection_pos, TILE_EXT_EVENT, "TILE_PART_NORM"),
+               "NAME = TILE_EXT_EVENT_CONTROL"),
+              IupSetAttributes
+              (gui_create_tile_part_control
+               (&selection_pos, TILE_EXT_FALL, "TILE_PART_NORM"),
+               "NAME = TILE_EXT_FALL_CONTROL"),
+              NULL),
+             "NAME = TILE_EXT,"
+             "ALIGNMENT = ACENTER"),
 
-           IupSetAttributes
-           (gui_create_tile_clipboard_control (&selection_pos),
-            "NAME = TILE_CLIPBOARD_CONTROL"),
+            IupSetAttributes
+            (gui_create_tile_part_control
+             (&selection_pos, TILE_FAKE, "TILE_PART_NORM"),
+             "NAME = TILE_FAKE_CONTROL"),
 
-           NULL),
+            IupSetAttributes
+            (gui_create_tile_clipboard_control
+             (&selection_pos, "TILE_PART_NORM"),
+             "NAME = TILE_CLIPBOARD_CONTROL"),
+
+            IupSetAttributes
+            (gui_create_tile_transform_control
+             (&selection_pos, "TILE_PART_NORM"),
+             "NAME = TILE_TRANSFORM_CONTROL"),
+
+            IupSetAttributes
+            (gui_create_tile_mirror_control
+             (&selection_pos, "TILE_PART_NORM"),
+             "NAME = TILE_MIRROR_CONTROL"),
+
+            IupSetAttributes
+            (gui_create_tile_move_control
+             (&selection_pos, "TILE_PART_NORM"),
+             "NAME = TILE_MOVE_CONTROL"),
+
+            NULL),
+           "ORIENTATION = HORIZONTAL,"
+           "NUMDIV = 4,"
+           "SIZECOL = -1,"
+           "SIZELIN = -1,"
+           "NGAPCOL = 5,"
+           "NGAPLIN = 5,"),
           IupVbox (NULL),
           IupVbox (NULL),
           IupVbox (NULL),
@@ -240,7 +330,8 @@ gui_create_editor_dialog (void)
          "TABTITLE2 = Room,"
          "TABTITLE3 = Kid,"
          "TABTITLE4 = Guard,"
-         "TABTITLE5 = Level"),
+         "TABTITLE5 = Level,"),
+
         IupSetAttributes
         (IupHbox
          (IupSetAttributes
@@ -256,14 +347,16 @@ gui_create_editor_dialog (void)
               "TIP = \"Usual game key bindings work anywhere\""),
              NULL)),
            "TITLE = Hotkeys"),
+
           IupFill (),
+
           IupSetCallbacks
           (IupButton ("&Close", NULL),
            "ACTION", exit_editor,
            NULL),
           NULL),
          "ALIGNMENT = ACENTER,"
-         "PADDING = 16"),
+         "PADDING = 16,"),
         IupFill (),
         NULL)),
       "TITLE = \"MININIM: Editor\","
@@ -322,9 +415,13 @@ gui_create_editor_dialog (void)
   al_destroy_bitmap (v_icon);
   al_destroy_bitmap (h_icon);
 
-  ALLEGRO_BITMAP *nav_select_icon = load_memory_bitmap (NAV_SELECT_ICON);
-  gui_set_image (nav_select_label, nav_select_icon, NULL);
-  al_destroy_bitmap (nav_select_icon);
+  ALLEGRO_BITMAP *nav_place_icon = load_memory_bitmap (NAV_PLACE_ICON);
+  gui_set_image (nav_place_label, nav_place_icon, NULL);
+  al_destroy_bitmap (nav_place_icon);
+
+  ALLEGRO_BITMAP *nav_room_icon = load_memory_bitmap (NAV_ROOM_ICON);
+  gui_set_image (nav_room_label, nav_room_icon, NULL);
+  al_destroy_bitmap (nav_room_icon);
 
   ALLEGRO_BITMAP *nav_row_icon = load_memory_bitmap (NAV_ROW_ICON);
   gui_set_image (nav_row_label, nav_row_icon, NULL);
@@ -344,15 +441,25 @@ gui_create_editor_dialog (void)
   ALLEGRO_BITMAP *nav_bl_icon = load_memory_bitmap (NAV_BL_ICON);
   ALLEGRO_BITMAP *nav_br_icon = load_memory_bitmap (NAV_BR_ICON);
 
-  gui_set_image (nav_select_left_button, nav_left_icon, NULL);
-  gui_set_image (nav_select_above_button, nav_above_icon, NULL);
-  gui_set_image (nav_select_right_button, nav_right_icon, NULL);
-  gui_set_image (nav_select_below_button, nav_below_icon, NULL);
+  gui_set_image (nav_place_left_button, nav_left_icon, NULL);
+  gui_set_image (nav_place_above_button, nav_above_icon, NULL);
+  gui_set_image (nav_place_right_button, nav_right_icon, NULL);
+  gui_set_image (nav_place_below_button, nav_below_icon, NULL);
 
-  gui_set_image (nav_select_al_button, nav_al_icon, NULL);
-  gui_set_image (nav_select_ar_button, nav_ar_icon, NULL);
-  gui_set_image (nav_select_bl_button, nav_bl_icon, NULL);
-  gui_set_image (nav_select_br_button, nav_br_icon, NULL);
+  gui_set_image (nav_place_al_button, nav_al_icon, NULL);
+  gui_set_image (nav_place_ar_button, nav_ar_icon, NULL);
+  gui_set_image (nav_place_bl_button, nav_bl_icon, NULL);
+  gui_set_image (nav_place_br_button, nav_br_icon, NULL);
+
+  gui_set_image (nav_room_left_button, nav_left_icon, NULL);
+  gui_set_image (nav_room_above_button, nav_above_icon, NULL);
+  gui_set_image (nav_room_right_button, nav_right_icon, NULL);
+  gui_set_image (nav_room_below_button, nav_below_icon, NULL);
+
+  gui_set_image (nav_room_al_button, nav_al_icon, NULL);
+  gui_set_image (nav_room_ar_button, nav_ar_icon, NULL);
+  gui_set_image (nav_room_bl_button, nav_bl_icon, NULL);
+  gui_set_image (nav_room_br_button, nav_br_icon, NULL);
 
   gui_set_image (nav_row_left_button, nav_left_icon, NULL);
   gui_set_image (nav_row_above_button, nav_above_icon, NULL);
@@ -381,8 +488,10 @@ gui_create_editor_dialog (void)
 
   gui_run_callback_IFn ("_UPDATE_CB", ih);
 
-  Ihandle *norm = IupGetHandle ("TILE_EXT_NORM");
+  Ihandle *norm = IupGetHandle ("TILE_PART_NORM");
   IupSetAttribute (norm, "NORMALIZE", "BOTH");
+
+  dialog_fit_natural_size (ih);
 
   return ih;
 }
@@ -408,11 +517,6 @@ tile_ext_control_name (struct pos *p)
 int
 show_cb (Ihandle *ih, int state)
 {
-  if (state == IUP_SHOW) {
-    char *ns = IupGetAttribute (ih, "NATURALSIZE");
-    IupSetAttribute (ih, "MINSIZE", ns);
-  }
-
   gui_run_callback_IFni
     ("SHOW_CB", IupGetDialogChild (ih, "TILE_FG_CONTROL"), state);
   gui_run_callback_IFni
@@ -429,6 +533,15 @@ show_cb (Ihandle *ih, int state)
 
   gui_run_callback_IFni
     ("SHOW_CB", IupGetDialogChild (ih, "TILE_CLIPBOARD_CONTROL"), state);
+
+  gui_run_callback_IFni
+    ("SHOW_CB", IupGetDialogChild (ih, "TILE_TRANSFORM_CONTROL"), state);
+
+  gui_run_callback_IFni
+    ("SHOW_CB", IupGetDialogChild (ih, "TILE_MIRROR_CONTROL"), state);
+
+  gui_run_callback_IFni
+    ("SHOW_CB", IupGetDialogChild (ih, "TILE_MOVE_CONTROL"), state);
 
   return IUP_DEFAULT;
 }
@@ -472,6 +585,15 @@ _update_cb (Ihandle *ih)
 
   gui_run_callback_IFn
     ("_UPDATE_CB", IupGetDialogChild (ih, "TILE_CLIPBOARD_CONTROL"));
+
+  gui_run_callback_IFn
+    ("_UPDATE_CB", IupGetDialogChild (ih, "TILE_TRANSFORM_CONTROL"));
+
+  gui_run_callback_IFn
+    ("_UPDATE_CB", IupGetDialogChild (ih, "TILE_MIRROR_CONTROL"));
+
+  gui_run_callback_IFn
+    ("_UPDATE_CB", IupGetDialogChild (ih, "TILE_MOVE_CONTROL"));
 
   return IUP_DEFAULT;
 }

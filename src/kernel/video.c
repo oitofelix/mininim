@@ -216,6 +216,9 @@ load_memory_bitmap (char *filename)
   ALLEGRO_BITMAP *bitmap = (ALLEGRO_BITMAP *)
     load_resource (filename, (load_resource_f) al_load_bitmap, true);
 
+  if (! bitmap)
+    fprintf (stderr, "cannot load bitmap file '%s'\n", filename);
+
   al_set_new_bitmap_flags (flags);
 
   return bitmap;

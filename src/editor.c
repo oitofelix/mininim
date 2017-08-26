@@ -452,7 +452,8 @@ editor (void)
     if (! is_valid_pos (&p)) {
       editor_msg ("SELECT TILE", EDITOR_CYCLES_0);
       if (was_bmenu_return_pressed (true)) edit = EDIT_TILE;
-      al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
+      al_set_system_mouse_cursor
+        (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       break;
     }
     al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);

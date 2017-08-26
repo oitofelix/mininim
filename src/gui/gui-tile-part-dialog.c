@@ -112,16 +112,14 @@ gui_create_tile_part_dialog (Ihandle *parent)
 
   update (ih);
 
+  dialog_fit_natural_size (ih);
+
   return ih;
 }
 
 int
 show_cb (Ihandle *ih, int state)
 {
-  if (state == IUP_SHOW) {
-    char *ns = IupGetAttribute (ih, "NATURALSIZE");
-    IupSetAttribute (ih, "MINSIZE", ns);
-  }
   return IUP_DEFAULT;
 }
 

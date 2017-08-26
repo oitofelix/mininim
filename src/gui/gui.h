@@ -41,4 +41,6 @@ int gui_empty_value_to_0 (Ihandle *ih);
 int gui_run_callback_IFn (const char *name, Ihandle *ih);
 int gui_run_callback_IFni (const char *name, Ihandle *ih, int i);
 
+void dialog_fit_natural_size (Ihandle *ih);
+
 #endif	/* MININIM_GUI_H */
