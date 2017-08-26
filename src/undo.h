@@ -29,10 +29,10 @@ void end_undo_set (struct undo *u, char *desc);
 
 /* TILE */
 void register_tile_undo (struct undo *u, struct pos *p,
-                        int f, int b, int e, int ff,
-                        union tile_state *cs,
-                        bool ignore_intermediate,
-                        char *desc);
+                         int f, int b, int e, int ff,
+                         union tile_state *cs,
+                         intptr_t ignore_id,
+                         char *desc);
 void tile_undo (struct tile_undo *d, int dir);
 
 /* MIRROR POS */

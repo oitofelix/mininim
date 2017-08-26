@@ -133,7 +133,12 @@ mininim_SOURCES = src/mininim.c src/mininim.h src/compatibility.h			\
 	  src/gui/gui-tile-transform-control.h															\
 	  src/gui/gui-tile-mirror-control.c																	\
 	  src/gui/gui-tile-mirror-control.h src/gui/gui-tile-move-control.c	\
-	  src/gui/gui-tile-move-control.h
+	  src/gui/gui-tile-move-control.h src/gui/gui-position-control.c		\
+	  src/gui/gui-position-control.h																		\
+	  src/gui/gui-editor-toolbar-control.c															\
+	  src/gui/gui-editor-toolbar-control.h															\
+	  src/gui/gui-directional-control.c																	\
+	  src/gui/gui-directional-control.h
 
 CLEANFILES = ${top_builddir}/src/mininim.h.gch
 

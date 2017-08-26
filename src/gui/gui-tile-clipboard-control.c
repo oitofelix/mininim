@@ -38,7 +38,8 @@ static int paste_button_action_cb (Ihandle *ih);
 Ihandle *
 gui_create_tile_clipboard_control (struct pos *p, char *norm_group)
 {
-  Ihandle *ih, *vbox, *button, *radio;
+  Ihandle *ih, *vbox, *button, *radio, *place_toggle, *room_toggle,
+    *level_toggle;
 
   ih = IupSetCallbacks
     (IupSetAttributes
@@ -52,6 +53,7 @@ gui_create_tile_clipboard_control (struct pos *p, char *norm_group)
             "IMAGE = NOIMAGE,"
             "TIP = \"Click to copy\""),
            "ACTION", copy_button_action_cb,
+           "DESTROY_CB", gui_destroy_image_cb,
            NULL),
          IupSetCallbacks
          (IupSetAttributes
@@ -62,13 +64,13 @@ gui_create_tile_clipboard_control (struct pos *p, char *norm_group)
           NULL),
          radio = IupRadio
          (IupHbox
-          (IupSetAttributes
+          (place_toggle = IupSetAttributes
            (IupToggle ("P", NULL),
             "TIP = \"Place pasting scope\""),
-           IupSetAttributes
+           room_toggle = IupSetAttributes
            (IupToggle ("R", NULL),
             "TIP = \"Room pasting scope\""),
-           IupSetAttributes
+           level_toggle = IupSetAttributes
            (IupToggle ("L", NULL),
             "TIP = \"Level pasting scope\""),
            NULL)),
@@ -84,6 +86,9 @@ gui_create_tile_clipboard_control (struct pos *p, char *norm_group)
 
   IupSetAttribute (ih, "_BUTTON", (void *) button);
   IupSetAttribute (ih, "_RADIO", (void *) radio);
+  IupSetAttribute (ih, "_PLACE_TOGGLE", (void *) place_toggle);
+  IupSetAttribute (ih, "_ROOM_TOGGLE", (void *) room_toggle);
+  IupSetAttribute (ih, "_LEVEL_TOGGLE", (void *) level_toggle);
 
   IupSetAttribute (ih, "_POS", (void *) p);
 
@@ -157,19 +162,20 @@ paste_button_action_cb (Ihandle *ih)
 {
   struct last *last = (void *) IupGetAttribute (ih, "_LAST");
   struct pos *p = (void *) IupGetAttribute (ih, "_POS");
+
+  Ihandle *place_toggle = (void *) IupGetAttribute (ih, "_PLACE_TOGGLE");
+  Ihandle *room_toggle = (void *) IupGetAttribute (ih, "_ROOM_TOGGLE");
+  Ihandle *level_toggle = (void *) IupGetAttribute (ih, "_LEVEL_TOGGLE");
   Ihandle *radio = (void *) IupGetAttribute (ih, "_RADIO");
-  Ihandle *toggle = (void *) IupGetAttribute (radio, "VALUE_HANDLE");
-  char *title = IupGetAttribute (toggle, "TITLE");
-  if (! strcmp (title, "P"))
-    apply_to_pos (p, (pos_trans) paste_tile,
-                  &last->tile_copy, "PASTE TILE");
-  else if (! strcmp (title, "R"))
-    apply_to_room (&global_level, mr.room, (pos_trans) paste_tile,
-                   &last->tile_copy, "PASTE TILE (ROOM)");
-  else if (! strcmp (title, "L"))
-    apply_to_level (&global_level, (pos_trans) paste_tile,
-                    &last->tile_copy, "PASTE TILE (LEVEL)");
-  else assert (NULL);
+  Ihandle *selected = (void *) IupGetAttribute (radio, "VALUE_HANDLE");
+
+  enum scope scope;
+  if (selected == place_toggle) scope = PLACE_SCOPE;
+  else if (selected == room_toggle) scope = ROOM_SCOPE;
+  else if (selected == level_toggle) scope = LEVEL_SCOPE;
+  else assert (false);
+
+  apply_to_scope (p, (pos_trans) paste_tile, &last->tile_copy, "PASTE", scope);
 
   return IUP_DEFAULT;
 }

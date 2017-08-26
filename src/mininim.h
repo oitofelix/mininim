@@ -207,6 +207,9 @@
 #include "gui-tile-transform-control.h"
 #include "gui-tile-mirror-control.h"
 #include "gui-tile-move-control.h"
+#include "gui-position-control.h"
+#include "gui-editor-toolbar-control.h"
+#include "gui-directional-control.h"
 
 #include "script.h"
 #include "repl.h"

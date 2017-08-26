@@ -112,10 +112,10 @@ end_undo_set (struct undo *u, char *desc)
 
 void
 register_tile_undo (struct undo *u, struct pos *p,
-                   int f, int b, int e, int ff,
-                   union tile_state *cs,
-                   bool ignore_intermediate,
-                   char *desc)
+                    int f, int b, int e, int ff,
+                    union tile_state *cs,
+                    intptr_t ignore_id,
+                    char *desc)
 {
   struct tile c;
 
@@ -133,16 +133,11 @@ register_tile_undo (struct undo *u, struct pos *p,
     ? (struct tile_undo *) u->pass[u->current].data
     : NULL;
 
-  enum tile_diff cd = tile_diff (tile (p), &c);
-
-  if (ignore_intermediate
+  if (ignore_id
       && prev_data
       && u->pass[u->current].f == (undo_f) tile_undo
-      && peq (&prev_data->p, p)
-      && ((cd == tile_diff (&prev_data->b, &prev_data->f)
-           && cd != TILE_DIFF_MIXED
-           && cd != TILE_DIFF_NO_DIFF)
-          || ! memcmp (&prev_data->b, &c, sizeof (c)))) {
+      && prev_data->ignore_id == ignore_id
+      && peq (&prev_data->p, p)) {
     tile_undo_ignore_state = true;
     undo_pass (u, -1, NULL);
     tile_undo_ignore_state = false;
@@ -154,6 +149,7 @@ register_tile_undo (struct undo *u, struct pos *p,
   d->p = *p;
   d->b = *tile (p);
   d->f = c;
+  d->ignore_id = ignore_id;
 
   copy_to_tile_state (&d->bs, p);
 

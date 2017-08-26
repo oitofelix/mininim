@@ -21,15 +21,18 @@
 #include "mininim.h"
 
 static int _update_cb (Ihandle *ih);
+static int button_action_cb (Ihandle *ih);
 
 
 Ihandle *
 gui_create_tile_transform_control (struct pos *p, char *norm_group)
 {
-  Ihandle *ih, *vbox, *transform_radio;
+  Ihandle *ih, *vbox;
 
-  Ihandle *transform_label, *clear_button, *randomize_button,
+  Ihandle *label, *clear_button, *randomize_button,
     *decorate_button, *fix_button;
+
+  Ihandle *radio, *place_toggle, *room_toggle, *level_toggle;
 
   ih = IupSetCallbacks
     (IupSetAttributes
@@ -40,19 +43,37 @@ gui_create_tile_transform_control (struct pos *p, char *norm_group)
 
          IupSetAttributes
          (IupGridBox
-          (transform_label = IupLabel (NULL),
-           clear_button = IupSetAttributes
-           (IupButton (NULL, NULL),
-            "TIP = \"Clear\""),
-           randomize_button = IupSetAttributes
-           (IupButton (NULL, NULL),
-            "TIP = \"Randomize\""),
-           decorate_button = IupSetAttributes
-           (IupButton (NULL, NULL),
-            "TIP = \"Decorate\""),
-           fix_button = IupSetAttributes
-           (IupButton (NULL, NULL),
-            "TIP = \"Fix\""),
+          (label = IupSetAttributes
+           (IupLabel (NULL),
+            "IMAGE = TOOLS_ICON,"),
+           clear_button = IupSetCallbacks
+           (IupSetAttributes
+            (IupButton (NULL, NULL),
+             "IMAGE = CLEAR_ICON,"
+             "TIP = \"Clear\""),
+            "ACTION", button_action_cb,
+            NULL),
+           randomize_button = IupSetCallbacks
+           (IupSetAttributes
+            (IupButton (NULL, NULL),
+             "IMAGE = RANDOM_ICON,"
+             "TIP = \"Randomize\""),
+            "ACTION", button_action_cb,
+            NULL),
+           decorate_button = IupSetCallbacks
+           (IupSetAttributes
+            (IupButton (NULL, NULL),
+             "IMAGE = DECORATION_ICON,"
+             "TIP = \"Decorate\""),
+            "ACTION", button_action_cb,
+            NULL),
+           fix_button = IupSetCallbacks
+           (IupSetAttributes
+            (IupButton (NULL, NULL),
+             "IMAGE = FIX_ICON,"
+             "TIP = \"Fix\""),
+            "ACTION", button_action_cb,
+            NULL),
            NULL),
           "ORIENTATION = HORIZONTAL,"
           "NUMDIV = 5,"
@@ -60,17 +81,17 @@ gui_create_tile_transform_control (struct pos *p, char *norm_group)
           "SIZELIN = -1,"
           "NORMALIZESIZE = BOTH,"),
 
-         transform_radio = IupRadio
+         radio = IupRadio
          (IupHbox
-          (IupSetAttributes
+          (place_toggle = IupSetAttributes
            (IupToggle ("P", NULL),
-            "TIP = \"Place tooling scope\""),
-           IupSetAttributes
+            "TIP = \"Place transforming scope\""),
+           room_toggle = IupSetAttributes
            (IupToggle ("R", NULL),
-            "TIP = \"Room tooling scope\""),
-           IupSetAttributes
+            "TIP = \"Room transforming scope\""),
+           level_toggle = IupSetAttributes
            (IupToggle ("L", NULL),
-            "TIP = \"Level tooling scope\""),
+            "TIP = \"Level transforming scope\""),
            NULL)),
 
          IupFill (),
@@ -81,29 +102,18 @@ gui_create_tile_transform_control (struct pos *p, char *norm_group)
      "_UPDATE_CB", _update_cb,
      NULL);
 
-  ALLEGRO_BITMAP *transform_icon = load_memory_bitmap (TOOLS_ICON);
-  gui_set_image (transform_label, transform_icon, NULL);
-  al_destroy_bitmap (transform_icon);
-
-  ALLEGRO_BITMAP *clear_icon = load_memory_bitmap (CLEAR_ICON);
-  gui_set_image (clear_button, clear_icon, NULL);
-  al_destroy_bitmap (clear_icon);
-
-  ALLEGRO_BITMAP *random_icon = load_memory_bitmap (RANDOM_ICON);
-  gui_set_image (randomize_button, random_icon, NULL);
-  al_destroy_bitmap (random_icon);
-
-  ALLEGRO_BITMAP *decoration_icon = load_memory_bitmap (DECORATION_ICON);
-  gui_set_image (decorate_button, decoration_icon, NULL);
-  al_destroy_bitmap (decoration_icon);
-
-  ALLEGRO_BITMAP *fix_icon = load_memory_bitmap (FIX_ICON);
-  gui_set_image (fix_button, fix_icon, NULL);
-  al_destroy_bitmap (fix_icon);
-
   IupSetAttribute (vbox, "NORMALIZERGROUP", norm_group);
 
-  IupSetAttribute (ih, "_TRANSFORM_RADIO", (void *) transform_radio);
+  IupSetAttribute (ih, "_CLEAR_BUTTON", (void *) clear_button);
+  IupSetAttribute (ih, "_RANDOMIZE_BUTTON", (void *) randomize_button);
+  IupSetAttribute (ih, "_DECORATE_BUTTON", (void *) decorate_button);
+  IupSetAttribute (ih, "_FIX_BUTTON", (void *) fix_button);
+
+  IupSetAttribute (ih, "_RADIO", (void *) radio);
+  IupSetAttribute (ih, "_PLACE_TOGGLE", (void *) place_toggle);
+  IupSetAttribute (ih, "_ROOM_TOGGLE", (void *) room_toggle);
+  IupSetAttribute (ih, "_LEVEL_TOGGLE", (void *) level_toggle);
+
   IupSetAttribute (ih, "_POS", (void *) p);
 
   return ih;
@@ -116,6 +126,49 @@ _update_cb (Ihandle *ih)
 
   struct pos *p = (void *) IupGetAttribute (ih, "_POS");
   gui_control_active (ih, is_valid_pos (p));
+
+  return IUP_DEFAULT;
+}
+
+int
+button_action_cb (Ihandle *ih)
+{
+  Ihandle *clear_button = (void *) IupGetAttribute (ih, "_CLEAR_BUTTON");
+  Ihandle *randomize_button = (void *) IupGetAttribute (ih, "_RANDOMIZE_BUTTON");
+  Ihandle *decorate_button = (void *) IupGetAttribute (ih, "_DECORATE_BUTTON");
+  Ihandle *fix_button = (void *) IupGetAttribute (ih, "_FIX_BUTTON");
+
+  Ihandle *place_toggle = (void *) IupGetAttribute (ih, "_PLACE_TOGGLE");
+  Ihandle *room_toggle = (void *) IupGetAttribute (ih, "_ROOM_TOGGLE");
+  Ihandle *level_toggle = (void *) IupGetAttribute (ih, "_LEVEL_TOGGLE");
+  Ihandle *radio = (void *) IupGetAttribute (ih, "_RADIO");
+  Ihandle *selected = (void *) IupGetAttribute (radio, "VALUE_HANDLE");
+
+  struct pos *p = (void *) IupGetAttribute (ih, "_POS");
+
+  enum scope scope;
+  if (selected == place_toggle) scope = PLACE_SCOPE;
+  else if (selected == room_toggle) scope = ROOM_SCOPE;
+  else if (selected == level_toggle) scope = LEVEL_SCOPE;
+  else assert (false);
+
+  pos_trans trans;
+  char *desc;
+  if (ih == clear_button) {
+    trans = clear_tile;
+    desc = "CLEAR";
+  } else if (ih == randomize_button) {
+    trans = random_tile;
+    desc = "RANDOMIZE";
+  } else if (ih == decorate_button) {
+    trans = decorate_tile;
+    desc = "DECORATE";
+  } else if (ih == fix_button) {
+    trans = fix_tile;
+    desc = "FIX";
+  }
+
+  apply_to_scope (p, trans, NULL, desc, scope);
 
   return IUP_DEFAULT;
 }

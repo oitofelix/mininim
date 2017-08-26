@@ -22,6 +22,9 @@
 
 bool no_recursive_links_continuity;
 
+static void draw_arch_bottom_fg (ALLEGRO_BITMAP *bitmap, struct pos *p);
+static void draw_big_pillar_bottom_fg (ALLEGRO_BITMAP *bitmap, struct pos *p);
+
 void
 draw_filled_rect (ALLEGRO_BITMAP *to, struct rect *r,
                   ALLEGRO_COLOR color)
@@ -350,6 +353,22 @@ draw_tile_fg (ALLEGRO_BITMAP *bitmap, struct pos *p)
 }
 
 void
+draw_arch_bottom_fg (ALLEGRO_BITMAP *bitmap, struct pos *p)
+{
+  push_drawn_rectangle (bitmap);
+  draw_object_part (bitmap, "ARCH_BOTTOM", "FRONT", p);
+  redraw_drawn_rectangle (pop_drawn_rectangle (), p);
+}
+
+void
+draw_big_pillar_bottom_fg (ALLEGRO_BITMAP *bitmap, struct pos *p)
+{
+  push_drawn_rectangle (bitmap);
+  draw_object_part (bitmap, "BIG_PILLAR_BOTTOM", "FRONT", p);
+  redraw_drawn_rectangle (pop_drawn_rectangle (), p);
+}
+
+void
 draw_room_frame_front (ALLEGRO_BITMAP *bitmap, struct frame *f)
 {
   struct pos ptl, pbr, ptl2, pbr2;
@@ -394,13 +413,13 @@ draw_room_frame_front (ALLEGRO_BITMAP *bitmap, struct frame *f)
         draw_object_part (bitmap, "PILLAR", "FRONT", &p);
         break;
       case BIG_PILLAR_BOTTOM:
-        draw_object_part (bitmap, "BIG_PILLAR_BOTTOM", "FRONT", &p);
+        draw_big_pillar_bottom_fg (bitmap, &p);
         break;
       case BIG_PILLAR_TOP:
         draw_object_part (bitmap, "BIG_PILLAR_TOP", "FRONT", &p);
         break;
       case ARCH_BOTTOM:
-        draw_object_part (bitmap, "ARCH_BOTTOM", "FRONT", &p);
+        draw_arch_bottom_fg (bitmap, &p);
         break;
       case WALL:
         draw_wall_fg (bitmap, &p, f);
@@ -721,7 +740,7 @@ draw_tile_fg_front (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f)
     draw_object_part (bitmap, "PILLAR", "FRONT", p);
     break;
   case BIG_PILLAR_BOTTOM:
-    draw_object_part (bitmap, "BIG_PILLAR_BOTTOM", "FRONT", p);
+    draw_big_pillar_bottom_fg (bitmap, p);
     break;
   case BIG_PILLAR_TOP:
     draw_object_part (bitmap, "BIG_PILLAR_TOP", "FRONT", p);
@@ -737,7 +756,7 @@ draw_tile_fg_front (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f)
     draw_chomper_fg (bitmap, p, f);
     break;
   case ARCH_BOTTOM:
-    draw_object_part (bitmap, "ARCH_BOTTOM", "FRONT", p);
+    draw_arch_bottom_fg (bitmap, p);
     break;
   case ARCH_TOP_MID:
     draw_object (bitmap, "ARCH_TOP_MID", p);
@@ -777,7 +796,7 @@ get_tile_bitmap (struct tile *tile_ref, union tile_state *ts,
   al_build_transform (&trans, 0, OH(h_ex) * sx, sx, sy, 0);
   al_set_target_bitmap (b);
   al_use_transform (&trans);
-  struct pos p; new_pos (&p, &global_level, room_view, 0, 0);
+  struct pos p; new_pos (&p, &global_level, 0, 0, 0);
   struct tile *t = tile (&p);
   struct tile t_bkp = *t;
   *t = (struct tile)

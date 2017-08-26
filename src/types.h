@@ -21,6 +21,10 @@
 #ifndef MININIM_TYPES_H
 #define MININIM_TYPES_H
 
+enum scope {
+  PLACE_SCOPE, ROOM_SCOPE, LEVEL_SCOPE,
+};
+
 enum tile_part {
   TILE_ALL = 0,
   TILE_FG = 1 << 0, TILE_BG = 1 << 1, TILE_EXT = 1 << 2, TILE_FAKE = 1 << 3,
@@ -747,6 +751,7 @@ struct tile_undo {
   struct tile b, f;
   union tile_state bs, fs;
   struct pos p;
+  intptr_t ignore_id;
 };
 
 struct mirror_pos_undo {

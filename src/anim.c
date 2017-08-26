@@ -85,6 +85,9 @@ play_anim (anim_callback_t draw_callback,
   key.keycode = 0;
   joystick_button = -1;
 
+  invalid_pos (&selection_pos);
+  selection_locked = false;
+
   while (! quit_anim) {
     L_gc (main_L);
 
@@ -282,8 +285,10 @@ play_anim (anim_callback_t draw_callback,
       switch (event.mouse.button) {
       case 1: ui_editor (); break;
       case 3:
-        if (edit != EDIT_NONE)
-          ui_place_kid (get_actor_by_id (current_kid_id), &selection_pos);
+        if (edit != EDIT_NONE) {
+          struct pos p; get_mouse_pos (&p);
+          ui_place_kid (get_actor_by_id (current_kid_id), &p);
+        }
         break;
       default: break;
       }

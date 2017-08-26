@@ -77,6 +77,9 @@ static void end_menu (void);
 static void process_main_menu_event (ALLEGRO_EVENT *event);
 static void process_aux_menu_event (ALLEGRO_EVENT *event);
 
+static void load_icons (void);
+static void unload_icons (void);
+
 static ALLEGRO_BITMAP *load_icon (char *filename);
 
 static ALLEGRO_BITMAP *volume_icon (float volume);
@@ -381,6 +384,18 @@ ALLEGRO_BITMAP *small_logo_icon,
 
 
 
+void
+init_gui_menu (void)
+{
+  load_icons ();
+}
+
+void
+finalize_gui_menu (void)
+{
+  unload_icons ();
+}
+
 ALLEGRO_BITMAP *
 load_icon (char *filename)
 {
@@ -433,8 +448,8 @@ load_icons (void)
   ega_icon = load_icon (EGA_ICON);
   cga_icon = load_icon (CGA_ICON);
   hgc_icon = load_icon (HGC_ICON);
-  vertical_icon = load_icon (VERTICAL_ICON);
-  horizontal_icon = load_icon (HORIZONTAL_ICON);
+  vertical_icon = load_icon (V_ICON);
+  horizontal_icon = load_icon (H_ICON);
   keyboard_icon = load_icon (KEYBOARD_ICON);
   joystick_icon = load_icon (JOYSTICK_ICON);
   cancel_icon = load_icon (CANCEL_ICON);
@@ -454,19 +469,19 @@ load_icons (void)
   zoom_none_icon = load_icon (ZOOM_NONE_ICON);
   zoom_stretch_icon = load_icon (ZOOM_STRETCH_ICON);
   zoom_ratio_icon = load_icon (ZOOM_RATIO_ICON);
-  vertical_horizontal_icon = load_icon (VERTICAL_HORIZONTAL_ICON);
+  vertical_horizontal_icon = load_icon (VH_ICON);
   zoom_out_icon = load_icon (ZOOM_OUT_ICON);
   zoom_in_icon = load_icon (ZOOM_IN_ICON);
   heading_icon = load_icon (HEADING_ICON);
   zoom_icon = load_icon (ZOOM_ICON);
   navigation_icon = load_icon (NAVIGATION_ICON);
-  nav_room_icon = load_icon (NAV_ROOM_ICON);
-  nav_cell_icon = load_icon (NAV_ROW_ICON);
-  nav_page_icon = load_icon (NAV_PAGE_ICON);
-  nav_left_icon = load_icon (NAV_LEFT_ICON);
-  nav_right_icon = load_icon (NAV_RIGHT_ICON);
-  nav_above_icon = load_icon (NAV_ABOVE_ICON);
-  nav_below_icon = load_icon (NAV_BELOW_ICON);
+  nav_room_icon = load_icon (ROOM_ICON);
+  nav_cell_icon = load_icon (ROW_ICON);
+  nav_page_icon = load_icon (PAGE_ICON);
+  nav_left_icon = load_icon (L_ICON);
+  nav_right_icon = load_icon (R_ICON);
+  nav_above_icon = load_icon (A_ICON);
+  nav_below_icon = load_icon (B_ICON);
   nav_home_icon = load_icon (NAV_HOME_ICON);
   repeat_icon = load_icon (REPEAT_ICON);
   compass_icon = load_icon (COMPASS_ICON);

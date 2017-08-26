@@ -34,6 +34,7 @@ ALLEGRO_COLOR white_to_transp (ALLEGRO_COLOR c);
 
 int hide_dialog (Ihandle *ih);
 void gui_control_active (Ihandle *ih, bool a);
+void gui_control_image (Ihandle *ih, Ihandle *new_image, bool c);
 int gui_default_key_cb (Ihandle *ih, int c);
 int gui_debug_print_key_cb (Ihandle *ih, int c);
 int gui_empty_value_to_0 (Ihandle *ih);
@@ -42,5 +43,7 @@ int gui_run_callback_IFn (const char *name, Ihandle *ih);
 int gui_run_callback_IFni (const char *name, Ihandle *ih, int i);
 
 void dialog_fit_natural_size (Ihandle *ih);
+
+int gui_destroy_image_cb (Ihandle *ih);
 
 #endif	/* MININIM_GUI_H */

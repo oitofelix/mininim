@@ -22,7 +22,14 @@
 
 Ihandle *gui_editor_dialog;
 
+#define LOAD_ICON(token) load_icon (token, #token)
+#define UNLOAD_ICON(token) unload_icon (#token)
+
 static void globalctrlfunc_cb (int c);
+static void load_icon (char *filename, char *handle_name);
+static void unload_icon (char *handle_name);
+static void load_icons (void);
+static void unload_icons (void);
 
 void
 init_gui (int argc, char **argv)
@@ -36,6 +43,8 @@ init_gui (int argc, char **argv)
   IupSetFunction ("GLOBALCTRLFUNC_CB", (Icallback) globalctrlfunc_cb);
 #endif
 
+  load_icons ();
+
   Ihandle *logo_icon_image = bitmap_to_iup_image (logo_icon, NULL);
   IupSetHandle ("LOGO_ICON", logo_icon_image);
 
@@ -47,9 +56,93 @@ finalize_gui (void)
 {
   IupDestroy (gui_editor_dialog);
 
+  unload_icons ();
+
   IupExitLoop ();
   IupFlush ();
   IupClose ();
+}
+
+void
+load_icon (char *filename, char *handle_name)
+{
+  ALLEGRO_BITMAP *icon_bitmap = load_memory_bitmap (filename);
+  Ihandle *icon = bitmap_to_iup_image (icon_bitmap, NULL);
+  al_destroy_bitmap (icon_bitmap);
+  IupSetHandle (handle_name, icon);
+}
+
+void
+unload_icon (char *handle_name)
+{
+  Ihandle *icon = IupGetHandle (handle_name);
+  IupDestroy (icon);
+}
+
+void
+load_icons (void)
+{
+  LOAD_ICON (ZOOM_ICON);
+  LOAD_ICON (ZOOM_NONE_ICON);
+  LOAD_ICON (ZOOM_STRETCH_ICON);
+  LOAD_ICON (ZOOM_RATIO_ICON);
+  LOAD_ICON (ZOOM_IN_ICON);
+  LOAD_ICON (ZOOM_OUT_ICON);
+  LOAD_ICON (VH_ICON);
+  LOAD_ICON (V_ICON);
+  LOAD_ICON (H_ICON);
+  LOAD_ICON (PLACE_ICON);
+  LOAD_ICON (ROOM_ICON);
+  LOAD_ICON (ROW_ICON);
+  LOAD_ICON (PAGE_ICON);
+  LOAD_ICON (L_ICON);
+  LOAD_ICON (R_ICON);
+  LOAD_ICON (A_ICON);
+  LOAD_ICON (B_ICON);
+  LOAD_ICON (AL_ICON);
+  LOAD_ICON (AR_ICON);
+  LOAD_ICON (BL_ICON);
+  LOAD_ICON (BR_ICON);
+  LOAD_ICON (TOOLS_ICON);
+  LOAD_ICON (CLEAR_ICON);
+  LOAD_ICON (RANDOM_ICON);
+  LOAD_ICON (DECORATION_ICON);
+  LOAD_ICON (FIX_ICON);
+  LOAD_ICON (MIRROR_ICON);
+  LOAD_ICON (SHUFFLE_ICON);
+}
+
+void
+unload_icons (void)
+{
+  UNLOAD_ICON (ZOOM_ICON);
+  UNLOAD_ICON (ZOOM_NONE_ICON);
+  UNLOAD_ICON (ZOOM_STRETCH_ICON);
+  UNLOAD_ICON (ZOOM_RATIO_ICON);
+  UNLOAD_ICON (ZOOM_IN_ICON);
+  UNLOAD_ICON (ZOOM_OUT_ICON);
+  UNLOAD_ICON (VH_ICON);
+  UNLOAD_ICON (V_ICON);
+  UNLOAD_ICON (H_ICON);
+  UNLOAD_ICON (PLACE_ICON);
+  UNLOAD_ICON (ROOM_ICON);
+  UNLOAD_ICON (ROW_ICON);
+  UNLOAD_ICON (PAGE_ICON);
+  UNLOAD_ICON (L_ICON);
+  UNLOAD_ICON (R_ICON);
+  UNLOAD_ICON (A_ICON);
+  UNLOAD_ICON (B_ICON);
+  UNLOAD_ICON (AL_ICON);
+  UNLOAD_ICON (AR_ICON);
+  UNLOAD_ICON (BL_ICON);
+  UNLOAD_ICON (BR_ICON);
+  UNLOAD_ICON (TOOLS_ICON);
+  UNLOAD_ICON (CLEAR_ICON);
+  UNLOAD_ICON (RANDOM_ICON);
+  UNLOAD_ICON (DECORATION_ICON);
+  UNLOAD_ICON (FIX_ICON);
+  UNLOAD_ICON (MIRROR_ICON);
+  UNLOAD_ICON (SHUFFLE_ICON);
 }
 
 void
@@ -164,6 +257,15 @@ gui_control_active (Ihandle *ih, bool a)
   if (! equiv (a, b)) IupSetInt (ih, "ACTIVE", a);
 }
 
+void
+gui_control_image (Ihandle *ih, Ihandle *new_image, bool c)
+{
+  if (! c) return;
+  Ihandle *old_image = IupGetAttributeHandle (ih, "IMAGE");
+  if (old_image == new_image) return;
+  IupSetAttributeHandle (ih, "IMAGE", new_image);
+}
+
 int
 gui_default_key_cb (Ihandle *ih, int c)
 {
@@ -217,4 +319,12 @@ dialog_fit_natural_size (Ihandle *ih)
 #else
   IupSetAttribute (ih, "MAXSIZE", size);
 #endif
+}
+
+int
+gui_destroy_image_cb (Ihandle *ih)
+{
+  Ihandle *image = IupGetAttributeHandle (ih, "IMAGE");
+  if (image) IupDestroy (image);
+  return IUP_DEFAULT;
 }

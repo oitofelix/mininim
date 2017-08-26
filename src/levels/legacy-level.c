@@ -95,7 +95,7 @@ legacy_level_start (void)
       struct pos plf; new_pos (&plf, &global_level, 7, 0, 4);
       register_tile_undo (&undo, &plf,
                          NO_FLOOR, MIGNORE, MIGNORE, MIGNORE,
-                         NULL, true, "NO FLOOR");
+                         NULL, false, "NO FLOOR");
       k->f.dir = (k->f.dir == LEFT) ? RIGHT : LEFT;
 
       int dx = k->f.dir == LEFT ? +22 : +31;
@@ -200,7 +200,7 @@ legacy_level_special_events (void)
         && get_exit_level_door (&global_level, 0)) {
       register_tile_undo (&undo, &skeleton_floor_pos,
                          FLOOR, MIGNORE, MIGNORE, MIGNORE,
-                         NULL, true, "FLOOR");
+                         NULL, false, "FLOOR");
       skeleton_id = create_actor (NULL, SKELETON, &skeleton_floor_pos, LEFT);
       s = &actor[skeleton_id];
       get_legacy_skill (2, &s->skill);
@@ -241,7 +241,7 @@ legacy_level_special_events (void)
         && get_exit_level_door (&global_level, 0)) {
       register_tile_undo (&undo, &mirror_pos,
                          MIRROR, MIGNORE, MIGNORE, MIGNORE,
-                         NULL, true, "MIRROR");
+                         NULL, false, "MIRROR");
       L_play_audio (main_L, "SUSPENSE", &mirror_pos, -1);
       kid_haptic (kc, KID_HAPTIC_LEGACY_MIRROR_APPEAR);
     }

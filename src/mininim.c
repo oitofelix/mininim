@@ -1471,7 +1471,8 @@ main (int _argc, char **_argv)
   /* setup video mode */
   setup_video_mode (video_mode);
 
-  load_icons ();
+  init_gui_menu ();
+
   load_oitofelix_face ();
   load_audio_data ();
   load_level ();
@@ -1592,8 +1593,8 @@ quit_game (void)
 {
   finalize_script ();
   finalize_gui ();
+  finalize_gui_menu ();
 
-  unload_icons ();
   unload_level ();
   unload_cutscenes ();
   unload_audio_data ();

@@ -52,7 +52,9 @@ gui_create_tile_part_dialog (Ihandle *parent)
 
     IupSetAttribute (button, "BGCOLOR", "0 0 0");
 
-    IupSetCallback (button, "ACTION", change_tile_part_from_button_cb);
+    IupSetCallbacks (button, "ACTION", change_tile_part_from_button_cb,
+                     "DESTROY_CB", gui_destroy_image_cb, NULL);
+
     Ihandle *label = IupLabel (NULL);
 
     if (tile_part_str)
@@ -120,6 +122,7 @@ gui_create_tile_part_dialog (Ihandle *parent)
 int
 show_cb (Ihandle *ih, int state)
 {
+  if (state == IUP_SHOW) IupSetInt (ih, "_WAS_VISIBLE", false);
   return IUP_DEFAULT;
 }
 
@@ -151,6 +154,33 @@ _update_cb (Ihandle *ih)
   Ihandle *grid = IupGetDialogChild (ih, "GRID");
 
   gui_control_active (grid, is_valid_pos (p));
+
+  /* focus button */
+  if (! IupGetInt (ih, "_WAS_VISIBLE")) {
+    IupSetInt (ih, "_WAS_VISIBLE", true);
+
+    enum tile_part tile_part = IupGetInt (parent, "_TILE_PART");
+    char **tile_part_str = (void *) IupGetAttribute (parent, "_TILE_PART_STR");
+
+    int i;
+    switch (tile_part) {
+    case TILE_FG: i = fg (p); break;
+    case TILE_BG: i = bg (p); break;
+    case TILE_EXT_ITEM:
+    case TILE_EXT_STEP_SPIKES_FLOOR:
+    case TILE_EXT_STEP_CHOMPER:
+    case TILE_EXT_DESIGN: i = ext (p); break;
+    case TILE_FAKE: i = fake (p); break;
+    default: assert (false);
+    }
+
+    char *name;
+    if (tile_part_str) name = xasprintf ("%s", tile_part_str [i]);
+    else name = xasprintf ("%i", i);
+    Ihandle *button = IupGetDialogChild (ih, name);
+    IupSetFocus (button);
+    al_free (name);
+  }
 
   struct last *last = (void *) IupGetAttribute (ih, "_LAST");
 
@@ -195,11 +225,7 @@ update (Ihandle *ih)
     case TILE_FG: t.fg = i; break;
     case TILE_BG: t.bg = i; break;
     case TILE_EXT_ITEM:
-    case TILE_EXT_FALL:
-    case TILE_EXT_EVENT:
     case TILE_EXT_STEP_SPIKES_FLOOR:
-    case TILE_EXT_STEP_DOOR:
-    case TILE_EXT_STEP_LEVEL_DOOR:
     case TILE_EXT_STEP_CHOMPER:
     case TILE_EXT_DESIGN: t.ext = i; break;
     case TILE_FAKE: t.fake = i; break;
@@ -231,7 +257,10 @@ change_tile_part_from_button_cb (Ihandle *ih)
     i = str2enum (tile_part_str, name);
   } else i = IupGetInt (ih, "NAME");
 
+  struct tile t;
+  t = *tile (p);
   change_tile_part (p, i);
+  if (tile_eq (tile (p), &t)) IupHide (IupGetDialog (ih));
 
   return IUP_DEFAULT;
 }

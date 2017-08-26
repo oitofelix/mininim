@@ -42,19 +42,37 @@ gui_create_tile_mirror_control (struct pos *p, char *norm_group)
 
          IupSetAttributes
          (IupGridBox
-          (mirror_label = IupLabel (NULL),
-           mirror_v_button = IupSetAttributes
-           (IupButton (NULL, NULL),
-            "TIP = \"Mirror tile vertically\""),
-           mirror_vh_button = IupSetAttributes
-           (IupButton (NULL, NULL),
-            "TIP = \"Mirror tile in both directions\""),
-           mirror_h_button = IupSetAttributes
-           (IupButton (NULL, NULL),
-            "TIP = \"Mirror tile horizontally\""),
-           mirror_r_button = IupSetAttributes
-           (IupButton (NULL, NULL),
-            "TIP = \"Mirror tile randomly\""),
+          (mirror_label = IupSetAttributes
+           (IupLabel (NULL),
+            "IMAGE = MIRROR_ICON,"),
+           mirror_v_button = IupSetCallbacks
+           (IupSetAttributes
+            (IupButton (NULL, NULL),
+             "IMAGE = V_ICON,"
+             "TIP = \"Mirror tile vertically\""),
+            "ACTION", NULL,
+            NULL),
+           mirror_vh_button = IupSetCallbacks
+           (IupSetAttributes
+            (IupButton (NULL, NULL),
+             "IMAGE = VH_ICON,"
+             "TIP = \"Mirror tile in both directions\""),
+            "ACTION", NULL,
+            NULL),
+           mirror_h_button = IupSetCallbacks
+           (IupSetAttributes
+            (IupButton (NULL, NULL),
+             "IMAGE = H_ICON,"
+             "TIP = \"Mirror tile horizontally\""),
+            "ACTION", NULL,
+            NULL),
+           mirror_r_button = IupSetCallbacks
+           (IupSetAttributes
+            (IupButton (NULL, NULL),
+             "IMAGE = SHUFFLE_ICON,"
+             "TIP = \"Mirror tile randomly\""),
+            "ACTION", NULL,
+            NULL),
            NULL),
           "ORIENTATION = HORIZONTAL,"
           "NUMDIV = 5,"
@@ -110,26 +128,6 @@ gui_create_tile_mirror_control (struct pos *p, char *norm_group)
       "TITLE = Mirror"),
      "_UPDATE_CB", _update_cb,
      NULL);
-
-  ALLEGRO_BITMAP *mirror_icon = load_memory_bitmap (MIRROR_ICON);
-  gui_set_image (mirror_label, mirror_icon, NULL);
-  al_destroy_bitmap (mirror_icon);
-
-  ALLEGRO_BITMAP *v_icon = load_memory_bitmap (VERTICAL_ICON);
-  gui_set_image (mirror_v_button, v_icon, NULL);
-  al_destroy_bitmap (v_icon);
-
-  ALLEGRO_BITMAP *vh_icon = load_memory_bitmap (VERTICAL_HORIZONTAL_ICON);
-  gui_set_image (mirror_vh_button, vh_icon, NULL);
-  al_destroy_bitmap (vh_icon);
-
-  ALLEGRO_BITMAP *h_icon = load_memory_bitmap (HORIZONTAL_ICON);
-  gui_set_image (mirror_h_button, h_icon, NULL);
-  al_destroy_bitmap (h_icon);
-
-  ALLEGRO_BITMAP *shuffle_icon = load_memory_bitmap (SHUFFLE_ICON);
-  gui_set_image (mirror_r_button, shuffle_icon, NULL);
-  al_destroy_bitmap (shuffle_icon);
 
   IupSetAttribute (vbox, "NORMALIZERGROUP", norm_group);
 

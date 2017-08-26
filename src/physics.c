@@ -967,15 +967,15 @@ paste_room (struct level *l, int room, struct room_copy *rc, char *desc)
   struct pos p; new_pos (&p, l, room, -1, -1);
   for (p.floor = 0; p.floor < FLOORS; p.floor++)
     for (p.place = 0; p.place < PLACES; p.place++)
-      apply_to_pos (&p, (pos_trans) paste_tile,
-                    &rc->c[p.floor][p.place], NULL);
+      apply_to_place (&p, (pos_trans) paste_tile,
+                      &rc->c[p.floor][p.place], NULL);
   end_undo_set (&undo, desc);
   register_changed_room (room);
   return l;
 }
 
-struct pos *
-apply_to_pos (struct pos *p, pos_trans f, void *data, char *desc)
+void
+apply_to_place (struct pos *p, pos_trans f, void *data, char *desc)
 {
   struct tile c0, c1;
   c0 = *tile (p);
@@ -984,29 +984,49 @@ apply_to_pos (struct pos *p, pos_trans f, void *data, char *desc)
   *tile (p) = c0;
   register_tile_undo (&undo, p,
                       c1.fg, c1.bg, c1.ext, c1.fake,
-                      ts, true, desc);
-  return p;
+                      ts, (intptr_t) f, desc);
 }
 
-struct level *
+void
 apply_to_room (struct level *l, int room, pos_trans f,
                void *data, char *desc)
 {
   struct pos p; new_pos (&p, l, room, -1, -1);
   for (p.floor = 0; p.floor < FLOORS; p.floor++)
     for (p.place = 0; p.place < PLACES; p.place++)
-      apply_to_pos (&p, f, data, NULL);
+      apply_to_place (&p, f, data, NULL);
   end_undo_set (&undo, desc);
   register_changed_room (room);
-  return l;
 }
 
-struct level *
+void
 apply_to_level (struct level *l, pos_trans f, void *data, char *desc)
 {
   for (int i = 1; i < ROOMS; i++) apply_to_room (l, i, f, data, NULL);
   end_undo_set (&undo, desc);
-  return l;
+}
+
+void
+apply_to_scope (struct pos *p, pos_trans f, void *data, char *base_desc,
+                enum scope scope)
+{
+  char *desc;
+  switch (scope) {
+  case PLACE_SCOPE:
+    desc = xasprintf ("%s (PLACE)", base_desc);
+    apply_to_place (p, f, data, desc);
+    break;
+  case ROOM_SCOPE:
+    desc = xasprintf ("%s (ROOM)", base_desc);
+    apply_to_room (p->l, p->room, f, data, desc);
+    break;
+  case LEVEL_SCOPE:
+    desc = xasprintf ("%s (LEVEL)", base_desc);
+    apply_to_level (p->l, f, data, desc);
+    break;
+  default: assert (false); return;
+  }
+  al_free (desc);
 }
 
 enum tile_diff

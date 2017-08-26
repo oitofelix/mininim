@@ -21,7 +21,7 @@
 #include "mininim.h"
 
 static char bmenu_int_ext (struct pos *p, int steps, int fases,
-                          char *prefix, char *b_str, char *undo_ext);
+                          char *prefix, char *b_str);
 static char bmenu_select_room (enum edit up_edit, char *prefix);
 static char bmenu_select_level (enum edit up_edit, char *prefix);
 static char bmenu_link (enum dir dir);
@@ -53,7 +53,8 @@ change_tile_fg (struct pos *p, enum tile_fg f)
 {
   register_tile_undo (&undo, p,
                       f, MIGNORE, MIGNORE, MIGNORE,
-                      NULL, true, tile_fg_str[f]);
+                      NULL, (intptr_t) change_tile_fg,
+                      tile_fg_str[f]);
 }
 
 void
@@ -62,7 +63,7 @@ change_tile_fake (struct pos *p, enum tile_fg f)
   char *str = xasprintf ("FAKE %s", tile_fg_str[f]);
   register_tile_undo (&undo, p,
                       MIGNORE, MIGNORE, MIGNORE, f,
-                      NULL, true, str);
+                      NULL, (intptr_t) change_tile_fake, str);
   al_free (str);
 }
 
@@ -71,7 +72,8 @@ change_tile_bg (struct pos *p, enum tile_bg b)
 {
   register_tile_undo (&undo, p,
                       MIGNORE, b, MIGNORE, MIGNORE,
-                      NULL, true, tile_bg_str[b]);
+                      NULL, (intptr_t) change_tile_bg,
+                      tile_bg_str[b]);
 }
 
 void
@@ -90,7 +92,7 @@ change_tile_ext (struct pos *p, int e)
 
   register_tile_undo (&undo, p,
                       MIGNORE, MIGNORE, e, MIGNORE,
-                      NULL, true, str);
+                      NULL, (intptr_t) change_tile_ext, str);
 
   al_free (str);
 }
@@ -416,24 +418,24 @@ editor (void)
       fake_fg = true; break;
     case '-':
       register_tile_undo (&undo, &p,
-                         MIGNORE, MIGNORE, MIGNORE, NO_FAKE,
-                         NULL, true, "UNFAKE");
+                          MIGNORE, MIGNORE, MIGNORE, NO_FAKE,
+                          NULL, (intptr_t) "UNFAKE", "UNFAKE");
       break;
     case '+':
       register_tile_undo (&undo, &p,
                          fake (&p), MIGNORE, MIGNORE, fg (&p),
-                         NULL, true, "FG<->FAKE");
+                          NULL, (intptr_t) "FG<->FAKE", "FG<->FAKE");
       break;
     case 'I': edit = EDIT_NOMINAL_INFO; break;
     case 'N': edit = EDIT_NUMERICAL_INFO; break;
     case 'A':
-      apply_to_pos (&p, clear_tile, NULL, "CLEAR TILE");
+      apply_to_place (&p, clear_tile, NULL, "CLEAR TILE");
       break;
     case 'R':
-      apply_to_pos (&p, random_tile, NULL, "RANDOMIZE TILE");
+      apply_to_place (&p, random_tile, NULL, "RANDOMIZE TILE");
       break;
     case 'D':
-      apply_to_pos (&p, decorate_tile, NULL, "DECORATE TILE");
+      apply_to_place (&p, decorate_tile, NULL, "DECORATE TILE");
       break;
     case 'M': edit = EDIT_MIRROR_TILE; break;
     case 'C':
@@ -441,10 +443,10 @@ editor (void)
       editor_msg ("COPY TILE", EDITOR_CYCLES_3);
       break;
     case 'P':
-      apply_to_pos (&p, (pos_trans) paste_tile, &tile_copy, "PASTE TILE");
+      apply_to_place (&p, (pos_trans) paste_tile, &tile_copy, "PASTE TILE");
       break;
     case '!':
-      apply_to_pos (&p, fix_tile, NULL, "FIX TILE");
+      apply_to_place (&p, fix_tile, NULL, "FIX TILE");
       break;
     }
     break;
@@ -511,33 +513,27 @@ editor (void)
     case 'W':
       if ((! fake_fg && fg (&p) == WALL)
           || (fake_fg && fake (&p) == WALL)) break;
-      register_tile_undo (&undo, &p,
-                         ! fake_fg ? WALL : MIGNORE,
-                         MIGNORE, MIGNORE,
-                         fake_fg ? WALL : MIGNORE,
-                         NULL, true,
-                         fake_fg ? "FAKE WALL" : "WALL");
+
+      if (fake_fg) change_tile_fake (&p, WALL);
+      else change_tile_fg (&p, WALL);
+
       break;
     case 'D': edit = EDIT_DOOR; break;
     case 'C':
       if ((! fake_fg && fg (&p) == CHOMPER)
           || (fake_fg && fake (&p) == CHOMPER)) break;
-      register_tile_undo (&undo, &p,
-                         ! fake_fg ? CHOMPER : MIGNORE,
-                         MIGNORE, MIGNORE,
-                         fake_fg ? CHOMPER : MIGNORE,
-                         NULL, true,
-                         fake_fg ? "FAKE CHOMPER" : "CHOMPER");
+
+      if (fake_fg) change_tile_fake (&p, CHOMPER);
+      else change_tile_fg (&p, CHOMPER);
+
       break;
     case 'M':
       if ((! fake_fg && fg (&p) == MIRROR)
           || (fake_fg && fake (&p) == MIRROR)) break;
-      register_tile_undo (&undo, &p,
-                         ! fake_fg ? MIRROR : MIGNORE,
-                         MIGNORE, MIGNORE,
-                         fake_fg ? MIRROR : MIGNORE,
-                         NULL, true,
-                         fake_fg ? "FAKE MIRROR" : "MIRROR");
+
+      if (fake_fg) change_tile_fake (&p, MIRROR);
+      else change_tile_fg (&p, MIRROR);
+
       break;
     case 'R': edit = EDIT_CARPET; break;
     case 'A': edit = EDIT_ARCH; break;
@@ -559,12 +555,10 @@ editor (void)
     case 1: edit = EDIT_FG; break;
     default:
       editor_register = EDITOR_CYCLES_NONE;
-      register_tile_undo (&undo, &p,
-                         ! fake_fg ? i : MIGNORE,
-                         MIGNORE, MIGNORE,
-                         fake_fg ? i : MIGNORE,
-                         NULL, true,
-                         fake_fg ? "FAKE # FG" : "# FG");
+
+      if (fake_fg) change_tile_fake (&p, i);
+      else change_tile_fg (&p, i);
+
       editor_register = EDITOR_CYCLES_3;
       break;
     }
@@ -747,9 +741,8 @@ editor (void)
     case 'B': b = BALCONY; break;
     }
 
-    register_tile_undo (&undo, &p,
-                       MIGNORE, b, MIGNORE, MIGNORE,
-                       NULL, true, tile_bg_str[b]);
+    change_tile_bg (&p, b);
+
     break;
   case EDIT_NUMERICAL_BG:
     if (! is_valid_pos (&p)) {
@@ -766,9 +759,9 @@ editor (void)
     case 1: edit = EDIT_BG; break;
     default:
       editor_register = EDITOR_CYCLES_NONE;
-      register_tile_undo (&undo, &p,
-                         MIGNORE, i, MIGNORE, MIGNORE,
-                         NULL, true, "# BG");
+
+      change_tile_bg (&p, i);
+
       editor_register = EDITOR_CYCLES_3;
       break;
     }
@@ -807,9 +800,8 @@ editor (void)
       case 'W': e = SWORD; break;
       }
 
-      register_tile_undo (&undo, &p,
-                         MIGNORE, MIGNORE, e, MIGNORE,
-                         NULL, true, tile_item_str[e]);
+      change_tile_ext (&p, e);
+
       break;
     case LOOSE_FLOOR:
       al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
@@ -821,31 +813,24 @@ editor (void)
         edit = EDIT_TILE; break;
       }
 
-      register_tile_undo (&undo, &p,
-                         MIGNORE, MIGNORE, b0, MIGNORE,
-                         NULL, true, "CAN'T FALL EXTENSION");
+      change_tile_ext (&p, b0);
 
       break;
     case SPIKES_FLOOR:
-      bmenu_int_ext (&p, SPIKES_STEPS, SPIKES_FASES,
-                    "CE>STEP", NULL, "STEP EXTENSION");
+      bmenu_int_ext (&p, SPIKES_STEPS, SPIKES_FASES, "CE>STEP", NULL);
       break;
     case OPENER_FLOOR:
     case CLOSER_FLOOR:
-      bmenu_int_ext (&p, EVENTS, 2,
-                    "CE>EVENT", "B", "EVENT EXTENSION");
+      bmenu_int_ext (&p, EVENTS, 2, "CE>EVENT", "B");
       break;
     case DOOR:
-      bmenu_int_ext (&p, DOOR_STEPS, DOOR_FASES,
-                    "CE>STEP", NULL, "STEP EXTENSION");
+      bmenu_int_ext (&p, DOOR_STEPS, DOOR_FASES, "CE>STEP", NULL);
       break;
     case LEVEL_DOOR:
-      bmenu_int_ext (&p, LEVEL_DOOR_STEPS, LEVEL_DOOR_FASES,
-                    "CE>STEP", "B", "STEP EXTENSION");
+      bmenu_int_ext (&p, LEVEL_DOOR_STEPS, LEVEL_DOOR_FASES, "CE>STEP", "B");
       break;
     case CHOMPER:
-      bmenu_int_ext (&p, CHOMPER_STEPS, CHOMPER_FASES,
-                    "CE>STEP", "B", "STEP EXTENSION");
+      bmenu_int_ext (&p, CHOMPER_STEPS, CHOMPER_FASES, "CE>STEP", "B");
       break;
     case CARPET:
       al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
@@ -865,9 +850,8 @@ editor (void)
       case '6': e = 5; break;
       }
 
-      register_tile_undo (&undo, &p,
-                         MIGNORE, MIGNORE, e, MIGNORE,
-                         NULL, true, "DESIGN EXTENSION");
+      change_tile_ext (&p, e);
+
       break;
     case TCARPET:
       al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
@@ -887,9 +871,8 @@ editor (void)
       case '6': e = 5; break;
       }
 
-      register_tile_undo (&undo, &p,
-                         MIGNORE, MIGNORE, e, MIGNORE,
-                         NULL, true, "DESIGN EXTENSION");
+      change_tile_ext (&p, e);
+
       break;
     default:
       al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
@@ -913,9 +896,9 @@ editor (void)
     case 1: edit = EDIT_TILE; break;
     default:
       editor_register = EDITOR_CYCLES_NONE;
-      register_tile_undo (&undo, &p,
-                         MIGNORE, MIGNORE, i, MIGNORE,
-                         NULL, true, "# EXT");
+
+      change_tile_ext (&p, i);
+
       editor_register = EDITOR_CYCLES_3;
       break;
     }
@@ -1923,7 +1906,7 @@ exit_editor (Ihandle *ih)
 
 static char
 bmenu_int_ext (struct pos *p, int steps, int fases,
-              char *prefix, char *b_str, char *undo_str)
+              char *prefix, char *b_str)
 {
   al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
   r = typed_int (ext (p), steps, fases, NULL, &bb);
@@ -1937,9 +1920,9 @@ bmenu_int_ext (struct pos *p, int steps, int fases,
   if (c == ' ') r += steps;
 
   editor_register = EDITOR_CYCLES_NONE;
-  register_tile_undo (&undo, p,
-                     MIGNORE, MIGNORE, r, MIGNORE,
-                     NULL, true, undo_str);
+
+  change_tile_ext (p, r);
+
   editor_register = EDITOR_CYCLES_3;
 
   return c;
@@ -2057,7 +2040,7 @@ void
 ui_place_kid (struct actor *k, struct pos *p)
 {
   if (! is_valid_pos (p)) {
-    editor_msg ("SELECT TILE", EDITOR_CYCLES_1);
+    editor_msg ("SELECT PLACE", EDITOR_CYCLES_1);
     return;
   }
   if (! k) {

@@ -169,6 +169,7 @@ gui_create_tile_part_control (struct pos *p, enum tile_part tile_part,
        (IupButton (NULL, NULL),
         "IMAGE = NOIMAGE"),
        "ACTION", button_action_cb,
+       "DESTROY_CB", gui_destroy_image_cb,
        NULL);
     IupInsert (vbox, list, button);
     break;
