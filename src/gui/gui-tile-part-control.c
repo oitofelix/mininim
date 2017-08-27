@@ -20,6 +20,12 @@
 
 #include "mininim.h"
 
+#if WINDOWS_PORT
+#define LIST_VISIBLECOLUMNS 9
+#else
+#define LIST_VISIBLECOLUMNS 14
+#endif
+
 struct last {
   char *video_mode;
   enum em em;
@@ -159,7 +165,8 @@ gui_create_tile_part_control (struct pos *p, enum tile_part tile_part,
     list = IupSetCallbacks
       (IupSetAttributes
        (IupList (NULL),
-        "DROPDOWN = YES"),
+        "DROPDOWN = YES,"
+        "VISIBLECOLUMNS = " STR (LIST_VISIBLECOLUMNS) ","),
        "VALUECHANGED_CB", change_tile_part_from_list_cb,
        NULL);
     IupInsert (vbox, spin, list);
@@ -167,7 +174,8 @@ gui_create_tile_part_control (struct pos *p, enum tile_part tile_part,
     button = IupSetCallbacks
       (IupSetAttributes
        (IupButton (NULL, NULL),
-        "IMAGE = NOIMAGE"),
+        "IMAGE = NOIMAGE,"
+        "TIP = \"Click to open selection dialog\""),
        "ACTION", button_action_cb,
        "DESTROY_CB", gui_destroy_image_cb,
        NULL);
@@ -202,7 +210,7 @@ gui_create_tile_part_control (struct pos *p, enum tile_part tile_part,
        "VALUECHANGED_CB", change_tile_part_from_val_cb,
        NULL);
     int w = IupGetInt (val, "RASTERSIZE");
-    int h = 131;
+    int h = 98;
     IupSetStrf (val, "RASTERSIZE", "%ix%i", w, h);
     IupSetDouble (val, "PAGESTEP", 10.0 / tile_parts);
     IupSetDouble (val, "SHOWTICKS", tile_parts);
@@ -220,7 +228,7 @@ gui_create_tile_part_control (struct pos *p, enum tile_part tile_part,
        (IupText (NULL),
         "SPIN = NO,"
         "MASK = /d*,"
-        "VISIBLECOLUMNS = 10"),
+        "VISIBLECOLUMNS = 6"),
        "VALUECHANGED_CB", change_tile_part_from_spin_cb,
        "KILLFOCUS_CB", gui_empty_value_to_0,
        NULL);
@@ -383,7 +391,7 @@ update (Ihandle *ih, struct tile *t)
 
   Ihandle *button = (void *) IupGetAttribute (ih, "_BUTTON");
   if (button) {
-    ALLEGRO_BITMAP *b = get_tile_bitmap (t, NULL, 1.5, tile_part);
+    ALLEGRO_BITMAP *b = get_tile_bitmap (t, NULL, 1, tile_part);
     gui_set_image (button, b, transp_to_black);
     al_destroy_bitmap (b);
   }
@@ -413,6 +421,10 @@ update (Ihandle *ih, struct tile *t)
 
   Ihandle *list = (void *) IupGetAttribute (ih, "_LIST");
   if (list) IupSetInt (list, "VALUE", i + 1);
+
+  char *list_value_str = IupGetAttribute (list, "VALUESTRING");
+  if (list_value_str && strlen (list_value_str) > LIST_VISIBLECOLUMNS)
+    IupSetStrAttribute (list, "TIP", list_value_str);
 
   Ihandle *spin = (void *) IupGetAttribute (ih, "_SPIN");
   if (spin && IupGetInt (spin, "SPIN")) IupSetInt (spin, "SPINVALUE", i);

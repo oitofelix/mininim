@@ -199,8 +199,10 @@
 #include "xstring.h"
 
 #include "gui.h"
+#include "gui-icons.h"
 #include "gui-menu.h"
 #include "gui-editor-dialog.h"
+#include "gui-undo-control.h"
 #include "gui-tile-part-control.h"
 #include "gui-tile-part-dialog.h"
 #include "gui-tile-clipboard-control.h"
@@ -315,5 +317,8 @@ extern struct message_box about_dialog;
 extern int exit_code;
 
 #define exit(x) ((exit)(exit_code = (x)))
+
+#define _STR(x) #x
+#define STR(x) _STR(x)
 
 #endif	/* MININIM_MININIM_H */

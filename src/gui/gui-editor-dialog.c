@@ -47,85 +47,105 @@ gui_create_editor_dialog (void)
     (IupSetAttributes
      (IupDialog
       (IupVbox
-       (IupFill (),
+       (
+        IupFill (),
+
         IupSetAttributes
-        (IupHbox
-         (
+        (gui_create_undo_control (&undo, NULL),
+         "NAME = UNDO_CONTROL"),
 
-          IupSetAttributes
-          (IupFrame
-           (IupVbox
-            (IupFill (),
+        IupFill (),
+
+        IupSetAttributes
+        (IupFrame
+         (IupVbox
+          (
+           IupFill (),
+
+           IupSetAttributes
+           (IupHbox
+            (
              IupSetAttributes
-             (IupGridBox
-              (zoom_label = IupSetAttributes
-               (IupLabel (NULL),
-                "IMAGE = ZOOM_ICON"),
-               zoom_none_button = IupSetAttributes
-               (IupButton (NULL, NULL),
-                "IMAGE = ZOOM_NONE_ICON"),
-               zoom_stretch_button = IupSetAttributes
-               (IupButton (NULL, NULL),
-                "IMAGE = ZOOM_STRETCH_ICON"),
-               zoom_ratio_button = IupSetAttributes
-               (IupButton (NULL, NULL),
-                "IMAGE = ZOOM_RATIO_ICON"),
-               zoom_in_label = IupSetAttributes
-               (IupLabel (NULL),
-                "IMAGE = ZOOM_IN_ICON"),
-               zoom_in_v_button = IupSetAttributes
-               (IupButton (NULL, NULL),
-                "IMAGE = V_ICON"),
-               zoom_in_vh_button = IupSetAttributes
-               (IupButton (NULL, NULL),
-                "IMAGE = VH_ICON"),
-               zoom_in_h_button = IupSetAttributes
-               (IupButton (NULL, NULL),
-                "IMAGE = H_ICON"),
-               zoom_out_label = IupSetAttributes
-               (IupLabel (NULL),
-                "IMAGE = ZOOM_OUT_ICON"),
-               zoom_out_v_button = IupSetAttributes
-               (IupButton (NULL, NULL),
-                "IMAGE = V_ICON"),
-               zoom_out_vh_button = IupSetAttributes
-               (IupButton (NULL, NULL),
-                "IMAGE = VH_ICON"),
-               zoom_out_h_button = IupSetAttributes
-               (IupButton (NULL, NULL),
-                "IMAGE = H_ICON"),
-               NULL),
-              "ORIENTATION = HORIZONTAL,"
-              "NUMDIV = 4,"
-              "SIZECOL = -1,"
-              "SIZELIN = -1,"
-              "NORMALIZESIZE = BOTH,"),
+             (IupFrame
+              (IupVbox
+               (IupFill (),
+                IupSetAttributes
+                (IupGridBox
+                 (zoom_label = IupSetAttributes
+                  (IupLabel (NULL),
+                   "IMAGE = ZOOM_ICON"),
+                  zoom_none_button = IupSetAttributes
+                  (IupButton (NULL, NULL),
+                   "IMAGE = ZOOM_NONE_ICON"),
+                  zoom_stretch_button = IupSetAttributes
+                  (IupButton (NULL, NULL),
+                   "IMAGE = ZOOM_STRETCH_ICON"),
+                  zoom_ratio_button = IupSetAttributes
+                  (IupButton (NULL, NULL),
+                   "IMAGE = ZOOM_RATIO_ICON"),
+                  zoom_in_label = IupSetAttributes
+                  (IupLabel (NULL),
+                   "IMAGE = ZOOM_IN_ICON"),
+                  zoom_in_v_button = IupSetAttributes
+                  (IupButton (NULL, NULL),
+                   "IMAGE = V_ICON"),
+                  zoom_in_vh_button = IupSetAttributes
+                  (IupButton (NULL, NULL),
+                   "IMAGE = VH_ICON"),
+                  zoom_in_h_button = IupSetAttributes
+                  (IupButton (NULL, NULL),
+                   "IMAGE = H_ICON"),
+                  zoom_out_label = IupSetAttributes
+                  (IupLabel (NULL),
+                   "IMAGE = ZOOM_OUT_ICON"),
+                  zoom_out_v_button = IupSetAttributes
+                  (IupButton (NULL, NULL),
+                   "IMAGE = V_ICON"),
+                  zoom_out_vh_button = IupSetAttributes
+                  (IupButton (NULL, NULL),
+                   "IMAGE = VH_ICON"),
+                  zoom_out_h_button = IupSetAttributes
+                  (IupButton (NULL, NULL),
+                   "IMAGE = H_ICON"),
+                  NULL),
+                 "ORIENTATION = HORIZONTAL,"
+                 "NUMDIV = 4,"
+                 "SIZECOL = -1,"
+                 "SIZELIN = -1,"
+                 "NORMALIZESIZE = BOTH,"),
+                IupFill (),
+                NULL)),
+              "TITLE = Zoom"),
+
              IupFill (),
-             NULL)),
-           "TITLE = Zoom"),
 
-          IupFill (),
+             place_dir_ctrl = gui_create_directional_control
+             ("Place", "PLACE_ICON", NULL, NULL),
 
-          place_dir_ctrl = gui_create_directional_control
-          ("Place", "PLACE_ICON", NULL, NULL),
+             IupFill (),
 
-          IupFill (),
+             room_dir_ctrl = gui_create_directional_control
+             ("Room", "ROOM_ICON", NULL, NULL),
 
-          room_dir_ctrl = gui_create_directional_control
-          ("Room", "ROOM_ICON", NULL, NULL),
+             IupFill (),
 
-          IupFill (),
+             row_dir_ctrl = gui_create_directional_control
+             ("Row", "ROW_ICON", NULL, NULL),
 
-          row_dir_ctrl = gui_create_directional_control
-          ("Row", "ROW_ICON", NULL, NULL),
+             IupFill (),
 
-          IupFill (),
+             page_dir_ctrl = gui_create_directional_control
+             ("Page", "PAGE_ICON", NULL, NULL),
 
-          page_dir_ctrl = gui_create_directional_control
-          ("Page", "PAGE_ICON", NULL, NULL),
+             NULL),
+            "ALIGNMENT = ACENTER"),
 
-          NULL),
-         "ALIGNMENT = ACENTER"),
+           IupFill (),
+
+           NULL)),
+         "SUNKEN = YES,"),
+
+        IupFill (),
 
         IupSetAttributes
         (IupTabs
@@ -246,7 +266,7 @@ gui_create_editor_dialog (void)
             (IupSetAttributes
              (IupToggle ("&Selection", NULL),
               "NAME = SELECTION_HOTKEYS_TOGGLE,"
-              "TIP = \"Arrow keys move the locked tile selection\","),
+              "TIP = \"Arrow keys move the locked place selection\","),
              IupSetAttributes
              (IupToggle ("&Game", NULL),
               "NAME = GAME_HOTKEYS_TOGGLE,"
@@ -267,12 +287,13 @@ gui_create_editor_dialog (void)
           IupFill (),
 
           IupSetCallbacks
-          (IupButton ("&Close", NULL),
+          (IupSetAttributes
+           (IupButton ("&Close", NULL),
+            "PADDING = 16,"),
            "ACTION", exit_editor,
            NULL),
           NULL),
-         "ALIGNMENT = ACENTER,"
-         "PADDING = 16,"),
+         "ALIGNMENT = ACENTER,"),
         IupFill (),
         NULL)),
       "TITLE = \"MININIM: Editor\","
@@ -317,6 +338,9 @@ int
 show_cb (Ihandle *ih, int state)
 {
   gui_run_callback_IFni
+    ("SHOW_CB", IupGetDialogChild (ih, "UNDO_CONTROL"), state);
+
+  gui_run_callback_IFni
     ("SHOW_CB", IupGetDialogChild (ih, "TILE_FG_CONTROL"), state);
   gui_run_callback_IFni
     ("SHOW_CB", IupGetDialogChild (ih, "TILE_BG_CONTROL"), state);
@@ -357,7 +381,11 @@ _update_cb (Ihandle *ih)
   if (! IupGetInt (ih, "VISIBLE")) return IUP_DEFAULT;
 
   gui_run_callback_IFn
+    ("_UPDATE_CB", IupGetDialogChild (ih, "UNDO_CONTROL"));
+
+  gui_run_callback_IFn
     ("_UPDATE_CB", IupGetDialogChild (ih, "TILE_FG_CONTROL"));
+
   gui_run_callback_IFn
     ("_UPDATE_CB", IupGetDialogChild (ih, "TILE_BG_CONTROL"));
 

@@ -31,6 +31,9 @@ int ext_val (int f, int e);
 union tile_state *clear_tile (struct pos *p, void *data);
 union tile_state *random_tile (struct pos *p, void *data);
 union tile_state *decorate_tile (struct pos *p, void *data);
+union tile_state *unfake_tile (struct pos *p, void *data);
+union tile_state *fg_fake_exchange (struct pos *p, void *data);
+
 struct pos *set_tile (struct pos *p, int f, int b, int e, int ff);
 
 struct tile_copy *copy_tile (struct tile_copy *c, struct pos *p);

@@ -98,6 +98,23 @@ random_tile (struct pos *p, void *data)
   return NULL;
 }
 
+union tile_state *
+unfake_tile (struct pos *p, void *data)
+{
+  set_fake (p, NO_FAKE);
+  return NULL;
+}
+
+union tile_state *
+fg_fake_exchange (struct pos *p, void *data)
+{
+  enum tile_fg f = fg (p);
+  int ff =  fake (p);
+  set_fg (p, ff);
+  set_fake (p, f);
+  return NULL;
+}
+
 struct pos *
 set_tile (struct pos *p, int f, int b, int e, int ff)
 {

@@ -20,7 +20,6 @@
 
 #include "mininim.h"
 
-static int destroy_cb (Ihandle *ih);
 static int _update_cb (Ihandle *ih);
 static int button_action_cb (Ihandle *ih);
 
@@ -30,7 +29,7 @@ gui_create_editor_toolbar_control (char *norm_group)
 {
   Ihandle *ih;
 
-  Ihandle *lock_button;
+  Ihandle *lock_button, *pause_button;
 
   ih = IupSetCallbacks
     (IupSetAttributes
@@ -38,49 +37,34 @@ gui_create_editor_toolbar_control (char *norm_group)
       (lock_button = IupSetCallbacks
        (IupSetAttributes
         (IupButton (NULL, NULL),
-         "IMAGE = NOIMAGE,"
-         "FLAT = YES,"),
+         "IMAGE = UNLOCK_ICON,"
+         "FLAT = YES,"
+         "CANFOCUS = NO,"),
+        "ACTION", button_action_cb,
+        NULL),
+       pause_button = IupSetCallbacks
+       (IupSetAttributes
+        (IupButton (NULL, NULL),
+         "IMAGE = PAUSE_ICON,"
+         "FLAT = YES,"
+         "CANFOCUS = NO,"),
         "ACTION", button_action_cb,
         NULL),
        NULL),
       "ORIENTATION = HORIZONTAL,"
-      "NUMDIV = 1,"
+      "NUMDIV = 2,"
       "SIZECOL = -1,"
       "SIZELIN = -1,"
       "NORMALIZESIZE = BOTH,"),
-     "DESTROY_CB", destroy_cb,
      "_UPDATE_CB", _update_cb,
      NULL);
-
-  ALLEGRO_BITMAP *lock_icon_bitmap = load_memory_bitmap (LOCK_ICON);
-  Ihandle *lock_icon = bitmap_to_iup_image (lock_icon_bitmap, NULL);
-  al_destroy_bitmap (lock_icon_bitmap);
-  IupSetAttribute (ih, "_LOCK_ICON", (void *) lock_icon);
-
-  ALLEGRO_BITMAP *unlock_icon_bitmap = load_memory_bitmap (UNLOCK_ICON);
-  Ihandle *unlock_icon = bitmap_to_iup_image (unlock_icon_bitmap, NULL);
-  al_destroy_bitmap (unlock_icon_bitmap);
-  IupSetAttribute (ih, "_UNLOCK_ICON", (void *) unlock_icon);
-
-  IupSetAttributeHandle (lock_button, "IMAGE", unlock_icon);
 
   IupSetAttribute (ih, "NORMALIZERGROUP", norm_group);
 
   IupSetAttribute (ih, "_LOCK_BUTTON", (void *) lock_button);
+  IupSetAttribute (ih, "_PAUSE_BUTTON", (void *) pause_button);
 
   return ih;
-}
-
-int
-destroy_cb (Ihandle *ih)
-{
-  Ihandle *lock_icon = (void *) IupGetAttribute (ih, "_LOCK_ICON");
-  IupDestroy (lock_icon);
-
-  Ihandle *unlock_icon = (void *) IupGetAttribute (ih, "_UNLOCK_ICON");
-  IupDestroy (unlock_icon);
-
-  return IUP_DEFAULT;
 }
 
 int
@@ -89,11 +73,19 @@ _update_cb (Ihandle *ih)
   if (! IupGetInt (ih, "VISIBLE")) return IUP_DEFAULT;
 
   Ihandle *lock_button = (void *) IupGetAttribute (ih, "_LOCK_BUTTON");
-  Ihandle *lock_icon = (void *) IupGetAttribute (ih, "_LOCK_ICON");
-  Ihandle *unlock_icon = (void *) IupGetAttribute (ih, "_UNLOCK_ICON");
+  Ihandle *pause_button = (void *) IupGetAttribute (ih, "_PAUSE_BUTTON");
 
-  gui_control_image (lock_button, lock_icon, selection_locked);
-  gui_control_image (lock_button, unlock_icon, ! selection_locked);
+  gui_set_stock_image (lock_button, selection_locked
+                       ? "LOCK_ICON" : "UNLOCK_ICON");
+
+  gui_set_tip (lock_button, selection_locked
+               ? "Unlock place selection" : "Lock place selection");
+
+  gui_set_stock_image (pause_button, is_game_paused ()
+                       ? "PLAY_ICON" : "PAUSE_ICON");
+
+  gui_set_tip (pause_button, is_game_paused ()
+               ? "Continue game" : "Pause game");
 
   return IUP_DEFAULT;
 }
@@ -101,5 +93,15 @@ _update_cb (Ihandle *ih)
 int
 button_action_cb (Ihandle *ih)
 {
+  Ihandle *lock_button = (void *) IupGetAttribute (ih, "_LOCK_BUTTON");
+  Ihandle *pause_button = (void *) IupGetAttribute (ih, "_PAUSE_BUTTON");
+
+  if (ih == lock_button) {
+    if (! selection_locked)
+      new_pos (&selection_pos, &global_level, mr.room, 1,  4);
+    selection_locked = ! selection_locked;
+  } else if (ih == pause_button)
+    ui_toggle_pause_game ();
+
   return IUP_DEFAULT;
 }

@@ -42,9 +42,11 @@ gui_create_tile_mirror_control (struct pos *p, char *norm_group)
 
          IupSetAttributes
          (IupGridBox
-          (mirror_label = IupSetAttributes
+          (
+           mirror_label = IupSetAttributes
            (IupLabel (NULL),
             "IMAGE = MIRROR_ICON,"),
+
            mirror_v_button = IupSetCallbacks
            (IupSetAttributes
             (IupButton (NULL, NULL),
@@ -52,6 +54,7 @@ gui_create_tile_mirror_control (struct pos *p, char *norm_group)
              "TIP = \"Mirror tile vertically\""),
             "ACTION", NULL,
             NULL),
+
            mirror_vh_button = IupSetCallbacks
            (IupSetAttributes
             (IupButton (NULL, NULL),
@@ -59,6 +62,7 @@ gui_create_tile_mirror_control (struct pos *p, char *norm_group)
              "TIP = \"Mirror tile in both directions\""),
             "ACTION", NULL,
             NULL),
+
            mirror_h_button = IupSetCallbacks
            (IupSetAttributes
             (IupButton (NULL, NULL),
@@ -66,6 +70,11 @@ gui_create_tile_mirror_control (struct pos *p, char *norm_group)
              "TIP = \"Mirror tile horizontally\""),
             "ACTION", NULL,
             NULL),
+
+           IupFill (),
+
+           IupFill (),
+
            mirror_r_button = IupSetCallbacks
            (IupSetAttributes
             (IupButton (NULL, NULL),
@@ -75,7 +84,7 @@ gui_create_tile_mirror_control (struct pos *p, char *norm_group)
             NULL),
            NULL),
           "ORIENTATION = HORIZONTAL,"
-          "NUMDIV = 5,"
+          "NUMDIV = 4,"
           "SIZECOL = -1,"
           "SIZELIN = -1,"
           "NORMALIZESIZE = BOTH,"),
@@ -105,7 +114,7 @@ gui_create_tile_mirror_control (struct pos *p, char *norm_group)
          IupHbox
          (tiles_toggle = IupSetCallbacks
           (IupSetAttributes
-           (IupToggle ("Tiles", NULL),
+           (IupToggle ("T", NULL),
             "VALUE = YES,"
             "ACTIVE = NO,"
             "TIP = \"Mirror tiles\""),
@@ -113,7 +122,7 @@ gui_create_tile_mirror_control (struct pos *p, char *norm_group)
            NULL),
           links_toggle = IupSetCallbacks
           (IupSetAttributes
-           (IupToggle ("Links", NULL),
+           (IupToggle ("L", NULL),
             "VALUE = YES,"
             "ACTIVE = NO,"
             "TIP = \"Mirror links\""),

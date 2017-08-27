@@ -345,7 +345,7 @@ static struct {
 
   /* auxiliary popup menu */
   struct {
-    uint16_t lock_selection, unlock_selection;
+    uint16_t lock_selection, unlock_selection, relock_selection;
   } aux;
 } item;
 
@@ -380,6 +380,8 @@ ALLEGRO_BITMAP *small_logo_icon,
   *counter_attack_add_icon, *counter_attack_sub_icon, *counter_defense_icon,
   *counter_defense_add_icon, *counter_defense_sub_icon, *shadow_face_icon,
   *heart_icon, *plus_icon, *minus_icon, *lock_icon, *unlock_icon;
+
+static struct pos aux_pos;
 
 
 
@@ -1810,6 +1812,11 @@ aux_menu (void)
   }
   start_menu (menu.aux.m, AUX_MENU_ID_MIN);
 
+  if (selection_locked)
+    item.aux.relock_selection =
+      menu_sitem (is_valid_pos (&aux_pos), lock_icon,
+                  "&Relock selection");
+
   menu_ditem (! selection_locked,
               &item.aux.lock_selection, &item.aux.unlock_selection,
               true, lock_icon, unlock_icon,
@@ -1822,6 +1829,7 @@ void
 show_aux_menu (void)
 {
   if (edit == EDIT_NONE) return;
+  get_mouse_pos (&aux_pos);
   aux_menu ();
   al_popup_menu (menu.aux.m, display);
 }
@@ -2024,4 +2032,6 @@ process_aux_menu_event (ALLEGRO_EVENT *event)
 
   if (id == item.aux.lock_selection || id == item.aux.unlock_selection)
     selection_locked = ! selection_locked;
+  else if (id == item.aux.relock_selection)
+    selection_pos = aux_pos;
 }

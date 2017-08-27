@@ -31,10 +31,14 @@ Ihandle *bitmap_to_iup_image (ALLEGRO_BITMAP *b, palette p);
 void gui_set_image (Ihandle *ih, ALLEGRO_BITMAP *b, palette p);
 ALLEGRO_COLOR transp_to_black (ALLEGRO_COLOR c);
 ALLEGRO_COLOR white_to_transp (ALLEGRO_COLOR c);
+void gui_set_stock_image (Ihandle *ih, char *new_image_hname);
+void gui_set_tip (Ihandle *ih, char *new_tip);
 
 int hide_dialog (Ihandle *ih);
+
 void gui_control_active (Ihandle *ih, bool a);
-void gui_control_image (Ihandle *ih, Ihandle *new_image, bool c);
+void gui_control_int_value (Ihandle *ih, int new_value);
+
 int gui_default_key_cb (Ihandle *ih, int c);
 int gui_debug_print_key_cb (Ihandle *ih, int c);
 int gui_empty_value_to_0 (Ihandle *ih);

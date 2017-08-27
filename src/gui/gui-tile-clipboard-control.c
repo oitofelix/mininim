@@ -58,7 +58,7 @@ gui_create_tile_clipboard_control (struct pos *p, char *norm_group)
          IupSetCallbacks
          (IupSetAttributes
           (IupButton ("&Paste", NULL),
-           "PADDING = 16,"
+           "PADDING = 8,"
            "TIP = \"Paste tile at selected scope\""),
           "ACTION", paste_button_action_cb,
           NULL),
@@ -142,7 +142,7 @@ update (Ihandle *ih)
 
   Ihandle *button = (void *) IupGetAttribute (ih, "_BUTTON");
   ALLEGRO_BITMAP *b = get_tile_bitmap
-    (&last->tile_copy.c, &last->tile_copy.cs, 1.5, TILE_ALL);
+    (&last->tile_copy.c, &last->tile_copy.cs, 1, TILE_ALL);
   gui_set_image (button, b, transp_to_black);
   al_destroy_bitmap (b);
 }

@@ -40,8 +40,8 @@ gui_create_tile_part_dialog (Ihandle *parent)
   int tile_parts = IupGetInt (parent, "_TILE_PARTS");
   char **tile_part_str = (void *) IupGetAttribute (parent, "_TILE_PART_STR");
 
-  Ihandle *vbox[tile_parts + 1];
-  memset (&vbox, 0, sizeof (vbox));
+  Ihandle *buttons[tile_parts + 1];
+  memset (&buttons, 0, sizeof (buttons));
 
   for (int i = 0; i < tile_parts; i++) {
     Ihandle *button = IupButton (NULL, NULL);
@@ -55,14 +55,10 @@ gui_create_tile_part_dialog (Ihandle *parent)
     IupSetCallbacks (button, "ACTION", change_tile_part_from_button_cb,
                      "DESTROY_CB", gui_destroy_image_cb, NULL);
 
-    Ihandle *label = IupLabel (NULL);
+    if (tile_part_str) IupSetAttribute (button, "TIP", tile_part_str[i]);
+    else IupSetStrf (button, "TIP", "%i", i);
 
-    if (tile_part_str)
-      IupSetAttribute (label, "TITLE", tile_part_str[i]);
-    else IupSetStrf (label, "TITLE", "%i", i);
-
-    vbox[i] = IupVbox (button, label, NULL);
-    IupSetAttribute (vbox[i], "ALIGNMENT", "ACENTER");
+    buttons[i] = button;
   }
 
   Ihandle *grid;
@@ -74,7 +70,7 @@ gui_create_tile_part_dialog (Ihandle *parent)
        (IupVbox
         (IupSetAttributes (IupFill (), "MINSIZE = 0x10"),
          IupSetAttributes
-         (grid = IupGridBoxv (vbox),
+         (grid = IupGridBoxv (buttons),
           "NAME = GRID,"
           "ORIENTATION = HORIZONTAL,"
           "SIZECOL = -1,"
@@ -87,13 +83,11 @@ gui_create_tile_part_dialog (Ihandle *parent)
          IupSetCallbacks
          (IupSetAttributes
           (IupButton ("&Close", NULL),
-           "PADDING = 32,"
-           "MAXSIZE = 128x48"),
+           "PADDING = 16,"),
           "ACTION", hide_dialog, NULL),
          IupSetAttributes (IupFill (), "MINSIZE = 0x10"),
          NULL),
-        "ALIGNMENT = ACENTER,"
-        "EXPANDCHILDREN = YES")),
+        "ALIGNMENT = ACENTER,")),
       "ICON = LOGO_ICON"),
      "SHOW_CB", (Icallback) show_cb,
      "DESTROY_CB", destroy_cb,

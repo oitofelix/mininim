@@ -110,6 +110,14 @@ load_icons (void)
   LOAD_ICON (FIX_ICON);
   LOAD_ICON (MIRROR_ICON);
   LOAD_ICON (SHUFFLE_ICON);
+  LOAD_ICON (LOCK_ICON);
+  LOAD_ICON (UNLOCK_ICON);
+  LOAD_ICON (PAUSE_ICON);
+  LOAD_ICON (PLAY_ICON);
+  LOAD_ICON (UNMASK_ICON);
+  LOAD_ICON (MASK_EXCHANGE_ICON);
+  LOAD_ICON (UNDO_ICON);
+  LOAD_ICON (REDO_ICON);
 }
 
 void
@@ -143,6 +151,14 @@ unload_icons (void)
   UNLOAD_ICON (FIX_ICON);
   UNLOAD_ICON (MIRROR_ICON);
   UNLOAD_ICON (SHUFFLE_ICON);
+  UNLOAD_ICON (LOCK_ICON);
+  UNLOAD_ICON (UNLOCK_ICON);
+  UNLOAD_ICON (PAUSE_ICON);
+  UNLOAD_ICON (PLAY_ICON);
+  UNLOAD_ICON (UNMASK_ICON);
+  UNLOAD_ICON (MASK_EXCHANGE_ICON);
+  UNLOAD_ICON (UNDO_ICON);
+  UNLOAD_ICON (REDO_ICON);
 }
 
 void
@@ -219,6 +235,23 @@ gui_set_image (Ihandle *ih, ALLEGRO_BITMAP *b, palette p)
   IupDestroy (old_image);
 }
 
+void
+gui_set_stock_image (Ihandle *ih, char *new_image_hname)
+{
+  Ihandle *old_image = IupGetAttributeHandle (ih, "IMAGE");
+  Ihandle *new_image = IupGetHandle (new_image_hname);
+  if (old_image == new_image) return;
+  IupSetAttribute (ih, "IMAGE", new_image_hname);
+}
+
+void
+gui_set_tip (Ihandle *ih, char *new_tip)
+{
+  char *old_tip = IupGetAttribute (ih, "TIP");
+  if (new_tip == old_tip) return;
+  IupSetAttribute (ih, "TIP", new_tip);
+}
+
 ALLEGRO_COLOR
 transp_to_black (ALLEGRO_COLOR c)
 {
@@ -258,12 +291,11 @@ gui_control_active (Ihandle *ih, bool a)
 }
 
 void
-gui_control_image (Ihandle *ih, Ihandle *new_image, bool c)
+gui_control_int_value (Ihandle *ih, int new_value)
 {
-  if (! c) return;
-  Ihandle *old_image = IupGetAttributeHandle (ih, "IMAGE");
-  if (old_image == new_image) return;
-  IupSetAttributeHandle (ih, "IMAGE", new_image);
+  int old_value = IupGetInt (ih, "VALUE");
+  if (old_value == new_value) return;
+  IupSetInt (ih, "VALUE", new_value);
 }
 
 int

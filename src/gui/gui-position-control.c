@@ -44,7 +44,8 @@ gui_create_position_control (struct pos *p, char *norm_group)
            "SPIN = YES,"
            "SPINWRAP = YES,"
            "MASK = /d+,"
-           "ACTIVE = NO,"),
+           "ACTIVE = NO,"
+           "TIP = \"Level\","),
           "VALUECHANGED_CB", valuechanged_cb,
           "KILLFOCUS_CB", killfocus_cb,
           NULL),
@@ -54,7 +55,8 @@ gui_create_position_control (struct pos *p, char *norm_group)
           (IupText (NULL),
            "SPIN = YES,"
            "SPINWRAP = YES,"
-           "MASK = /d+,"),
+           "MASK = /d+,"
+           "TIP = \"Room\","),
           "VALUECHANGED_CB", valuechanged_cb,
           "KILLFOCUS_CB", killfocus_cb,
           NULL),
@@ -64,7 +66,8 @@ gui_create_position_control (struct pos *p, char *norm_group)
           (IupText (NULL),
            "SPIN = YES,"
            "SPINWRAP = YES,"
-           "MASK = /d,"),
+           "MASK = /d,"
+           "TIP = \"Floor\","),
           "VALUECHANGED_CB", valuechanged_cb,
           "KILLFOCUS_CB", killfocus_cb,
           NULL),
@@ -74,7 +77,8 @@ gui_create_position_control (struct pos *p, char *norm_group)
           (IupText (NULL),
            "SPIN = YES,"
            "SPINWRAP = YES,"
-           "MASK = /d,"),
+           "MASK = /d,"
+           "TIP = \"Place\","),
           "VALUECHANGED_CB", valuechanged_cb,
           "KILLFOCUS_CB", killfocus_cb,
           NULL),
@@ -99,17 +103,10 @@ gui_create_position_control (struct pos *p, char *norm_group)
   IupSetInt (floor_spin, "SPINMAX", FLOORS - 1);
   IupSetInt (place_spin, "SPINMAX", PLACES - 1);
 
-#if WINDOWS_PORT
-  IupSetInt (level_spin, "SIZE", 32);
-  IupSetInt (room_spin, "SIZE", 32);
-  IupSetInt (floor_spin, "SIZE", 24);
-  IupSetInt (place_spin, "SIZE", 24);
-#else
-  IupSetInt (level_spin, "VISIBLECOLUMNS", 3);
-  IupSetInt (room_spin, "VISIBLECOLUMNS", 3);
+  IupSetInt (level_spin, "VISIBLECOLUMNS", 2);
+  IupSetInt (room_spin, "VISIBLECOLUMNS", 2);
   IupSetInt (floor_spin, "VISIBLECOLUMNS", 1);
   IupSetInt (place_spin, "VISIBLECOLUMNS", 1);
-#endif
 
   struct pos *last_p = xmalloc (sizeof (*last_p));
   invalid_pos (last_p);

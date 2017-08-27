@@ -31,13 +31,9 @@ register_undo (struct undo *u, void *data, undo_f f, char *desc)
     u->current = -1;
   }
 
-  size_t i;
-  for (i = u->current + 1; i < u->count; i++) {
-    al_free (u->pass[i].data);
-    al_free (u->pass[i].desc);
-  }
+  free_undo_tail (u);
 
-  u->count = u->current + 2;
+  u->count++;
   u->pass = xrealloc (u->pass, u->count * sizeof (* u->pass));
   u->current++;
 
@@ -47,6 +43,18 @@ register_undo (struct undo *u, void *data, undo_f f, char *desc)
   else u->pass[u->current].desc = NULL;
 
   if (editor_register && desc) editor_msg (desc, editor_register);
+}
+
+void
+free_undo_tail (struct undo *u)
+{
+  size_t i;
+  for (i = u->current + 1; i < u->count; i++) {
+    al_free (u->pass[i].data);
+    al_free (u->pass[i].desc);
+  }
+
+  u->count = u->current + 1;
 }
 
 void
@@ -99,10 +107,20 @@ undo_pass (struct undo *u, int dir, char **desc)
 void
 end_undo_set (struct undo *u, char *desc)
 {
+  if (! u->count) return;
   if (desc) {
     u->pass[u->current].desc = xasprintf ("%s", desc);
     if (editor_register) editor_msg (desc, editor_register);
   } else u->pass[u->current].desc = NULL;
+}
+
+int
+current_macro_undo (struct undo *u)
+{
+  int current = -1;
+  for (int i = 0; i <= u->current; i++)
+    if (u->pass[i].desc) current++;
+  return current;
 }
 
 
@@ -140,6 +158,7 @@ register_tile_undo (struct undo *u, struct pos *p,
       && peq (&prev_data->p, p)) {
     tile_undo_ignore_state = true;
     undo_pass (u, -1, NULL);
+    free_undo_tail (u);
     tile_undo_ignore_state = false;
   }
 

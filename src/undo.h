@@ -22,10 +22,12 @@
 #define MININIM_UNDO_H
 
 void register_undo (struct undo *u, void *data, undo_f f, char *desc);
+void free_undo_tail (struct undo *u);
 void free_undo (struct undo *u);
 bool can_undo (struct undo *u, int dir);
 bool undo_pass (struct undo *u, int dir, char **desc);
 void end_undo_set (struct undo *u, char *desc);
+int current_macro_undo (struct undo *u);
 
 /* TILE */
 void register_tile_undo (struct undo *u, struct pos *p,

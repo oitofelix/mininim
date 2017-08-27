@@ -123,10 +123,12 @@ mininim_SOURCES = src/mininim.c src/mininim.h src/compatibility.h			\
 	  src/script/L_mininim.profiler.c src/script/L_mininim.profiler.h		\
 	  src/script/L_mininim.debugger.c src/script/L_mininim.debugger.h		\
 	  src/script/L_mininim.math.c src/script/L_mininim.math.h						\
-	  src/gui/gui.c src/gui/gui.h src/gui/gui-menu.c src/gui/gui-menu.h	\
-	  src/gui/gui-editor-dialog.c src/gui/gui-editor-dialog.h						\
-	  src/gui/gui-tile-part-control.c src/gui/gui-tile-part-control.h		\
-	  src/gui/gui-tile-part-dialog.c src/gui/gui-tile-part-dialog.h			\
+	  src/gui/gui.c src/gui/gui.h src/gui/gui-icons.h										\
+	  src/gui/gui-menu.c src/gui/gui-menu.h src/gui/gui-editor-dialog.c	\
+	  src/gui/gui-editor-dialog.h src/gui/gui-undo-control.c						\
+	  src/gui/gui-undo-control.h src/gui/gui-tile-part-control.c				\
+	  src/gui/gui-tile-part-control.h src/gui/gui-tile-part-dialog.c		\
+	  src/gui/gui-tile-part-dialog.h																		\
 	  src/gui/gui-tile-clipboard-control.c															\
 	  src/gui/gui-tile-clipboard-control.h															\
 	  src/gui/gui-tile-transform-control.c															\

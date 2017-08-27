@@ -30,7 +30,7 @@ gui_create_tile_transform_control (struct pos *p, char *norm_group)
   Ihandle *ih, *vbox;
 
   Ihandle *label, *clear_button, *randomize_button,
-    *decorate_button, *fix_button;
+    *decorate_button, *fix_button, *unfake_button, *fg_fake_button;
 
   Ihandle *radio, *place_toggle, *room_toggle, *level_toggle;
 
@@ -43,9 +43,11 @@ gui_create_tile_transform_control (struct pos *p, char *norm_group)
 
          IupSetAttributes
          (IupGridBox
-          (label = IupSetAttributes
+          (
+           label = IupSetAttributes
            (IupLabel (NULL),
             "IMAGE = TOOLS_ICON,"),
+
            clear_button = IupSetCallbacks
            (IupSetAttributes
             (IupButton (NULL, NULL),
@@ -53,6 +55,7 @@ gui_create_tile_transform_control (struct pos *p, char *norm_group)
              "TIP = \"Clear\""),
             "ACTION", button_action_cb,
             NULL),
+
            randomize_button = IupSetCallbacks
            (IupSetAttributes
             (IupButton (NULL, NULL),
@@ -60,6 +63,7 @@ gui_create_tile_transform_control (struct pos *p, char *norm_group)
              "TIP = \"Randomize\""),
             "ACTION", button_action_cb,
             NULL),
+
            decorate_button = IupSetCallbacks
            (IupSetAttributes
             (IupButton (NULL, NULL),
@@ -67,6 +71,9 @@ gui_create_tile_transform_control (struct pos *p, char *norm_group)
              "TIP = \"Decorate\""),
             "ACTION", button_action_cb,
             NULL),
+
+           IupFill (),
+
            fix_button = IupSetCallbacks
            (IupSetAttributes
             (IupButton (NULL, NULL),
@@ -74,9 +81,26 @@ gui_create_tile_transform_control (struct pos *p, char *norm_group)
              "TIP = \"Fix\""),
             "ACTION", button_action_cb,
             NULL),
+
+           unfake_button = IupSetCallbacks
+           (IupSetAttributes
+            (IupButton (NULL, NULL),
+             "IMAGE = UNMASK_ICON,"
+             "TIP = \"Unfake\""),
+            "ACTION", button_action_cb,
+            NULL),
+
+           fg_fake_button = IupSetCallbacks
+           (IupSetAttributes
+            (IupButton (NULL, NULL),
+             "IMAGE = MASK_EXCHANGE_ICON,"
+             "TIP = \"Foreground <-> Fake\""),
+            "ACTION", button_action_cb,
+            NULL),
+
            NULL),
           "ORIENTATION = HORIZONTAL,"
-          "NUMDIV = 5,"
+          "NUMDIV = 4,"
           "SIZECOL = -1,"
           "SIZELIN = -1,"
           "NORMALIZESIZE = BOTH,"),
@@ -108,6 +132,8 @@ gui_create_tile_transform_control (struct pos *p, char *norm_group)
   IupSetAttribute (ih, "_RANDOMIZE_BUTTON", (void *) randomize_button);
   IupSetAttribute (ih, "_DECORATE_BUTTON", (void *) decorate_button);
   IupSetAttribute (ih, "_FIX_BUTTON", (void *) fix_button);
+  IupSetAttribute (ih, "_UNFAKE_BUTTON", (void *) unfake_button);
+  IupSetAttribute (ih, "_FG_FAKE_BUTTON", (void *) fg_fake_button);
 
   IupSetAttribute (ih, "_RADIO", (void *) radio);
   IupSetAttribute (ih, "_PLACE_TOGGLE", (void *) place_toggle);
@@ -127,6 +153,16 @@ _update_cb (Ihandle *ih)
   struct pos *p = (void *) IupGetAttribute (ih, "_POS");
   gui_control_active (ih, is_valid_pos (p));
 
+  Ihandle *unfake_button = (void *) IupGetAttribute (ih, "_UNFAKE_BUTTON");
+  Ihandle *fg_fake_button = (void *) IupGetAttribute (ih, "_FG_FAKE_BUTTON");
+
+  Ihandle *place_toggle = (void *) IupGetAttribute (ih, "_PLACE_TOGGLE");
+  Ihandle *radio = (void *) IupGetAttribute (ih, "_RADIO");
+  Ihandle *selected = (void *) IupGetAttribute (radio, "VALUE_HANDLE");
+
+  gui_control_active (unfake_button, is_fake (p) || selected != place_toggle);
+  gui_control_active (fg_fake_button, is_fake (p) || selected != place_toggle);
+
   return IUP_DEFAULT;
 }
 
@@ -137,6 +173,8 @@ button_action_cb (Ihandle *ih)
   Ihandle *randomize_button = (void *) IupGetAttribute (ih, "_RANDOMIZE_BUTTON");
   Ihandle *decorate_button = (void *) IupGetAttribute (ih, "_DECORATE_BUTTON");
   Ihandle *fix_button = (void *) IupGetAttribute (ih, "_FIX_BUTTON");
+  Ihandle *unfake_button = (void *) IupGetAttribute (ih, "_UNFAKE_BUTTON");
+  Ihandle *fg_fake_button = (void *) IupGetAttribute (ih, "_FG_FAKE_BUTTON");
 
   Ihandle *place_toggle = (void *) IupGetAttribute (ih, "_PLACE_TOGGLE");
   Ihandle *room_toggle = (void *) IupGetAttribute (ih, "_ROOM_TOGGLE");
@@ -166,7 +204,13 @@ button_action_cb (Ihandle *ih)
   } else if (ih == fix_button) {
     trans = fix_tile;
     desc = "FIX";
-  }
+  } else if (ih == unfake_button) {
+    trans = unfake_tile;
+    desc = "UNFAKE";
+  } else if (ih == fg_fake_button) {
+    trans = fg_fake_exchange;
+    desc = "FG<->FAKE";
+  } else assert (false);
 
   apply_to_scope (p, trans, NULL, desc, scope);
 
