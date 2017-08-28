@@ -193,8 +193,8 @@ valuechanged_cb (Ihandle *ih)
   int current = current_macro_undo (undo) + 2;
   int new = IupGetInt (list, "VALUE");
 
-  for (; new < current; current--) undo_pass (undo, -1, NULL);
-  for (; new > current; current++) undo_pass (undo, +1, NULL);
+  for (; new < current; current--) ui_undo_pass (undo, -1, NULL);
+  for (; new > current; current++) ui_undo_pass (undo, +1, NULL);
 
   return IUP_DEFAULT;
 }

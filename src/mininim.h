@@ -212,6 +212,7 @@
 #include "gui-position-control.h"
 #include "gui-editor-toolbar-control.h"
 #include "gui-directional-control.h"
+#include "gui-coordinates-control.h"
 
 #include "script.h"
 #include "repl.h"

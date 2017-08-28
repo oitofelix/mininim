@@ -51,98 +51,112 @@ gui_create_editor_dialog (void)
         IupFill (),
 
         IupSetAttributes
-        (gui_create_undo_control (&undo, NULL),
-         "NAME = UNDO_CONTROL"),
+        (IupHbox
+         (
+          IupSetAttributes
+          (gui_create_undo_control (&undo, NULL),
+           "NAME = UNDO_CONTROL"),
+
+          IupFill (),
+
+          IupSetAttributes
+          (gui_create_coordinates_control (&global_level, NULL),
+           "NAME = COORDINATES_CONTROL"),
+
+          NULL),
+         "ALIGNMENT = ACENTER"),
 
         IupFill (),
 
         IupSetAttributes
         (IupFrame
-         (IupVbox
-          (
-           IupFill (),
+         (IupSetAttributes
+          (IupVbox
+           (
+            IupFill (),
 
-           IupSetAttributes
-           (IupHbox
-            (
-             IupSetAttributes
-             (IupFrame
-              (IupVbox
-               (IupFill (),
-                IupSetAttributes
-                (IupGridBox
-                 (zoom_label = IupSetAttributes
-                  (IupLabel (NULL),
-                   "IMAGE = ZOOM_ICON"),
-                  zoom_none_button = IupSetAttributes
-                  (IupButton (NULL, NULL),
-                   "IMAGE = ZOOM_NONE_ICON"),
-                  zoom_stretch_button = IupSetAttributes
-                  (IupButton (NULL, NULL),
-                   "IMAGE = ZOOM_STRETCH_ICON"),
-                  zoom_ratio_button = IupSetAttributes
-                  (IupButton (NULL, NULL),
-                   "IMAGE = ZOOM_RATIO_ICON"),
-                  zoom_in_label = IupSetAttributes
-                  (IupLabel (NULL),
-                   "IMAGE = ZOOM_IN_ICON"),
-                  zoom_in_v_button = IupSetAttributes
-                  (IupButton (NULL, NULL),
-                   "IMAGE = V_ICON"),
-                  zoom_in_vh_button = IupSetAttributes
-                  (IupButton (NULL, NULL),
-                   "IMAGE = VH_ICON"),
-                  zoom_in_h_button = IupSetAttributes
-                  (IupButton (NULL, NULL),
-                   "IMAGE = H_ICON"),
-                  zoom_out_label = IupSetAttributes
-                  (IupLabel (NULL),
-                   "IMAGE = ZOOM_OUT_ICON"),
-                  zoom_out_v_button = IupSetAttributes
-                  (IupButton (NULL, NULL),
-                   "IMAGE = V_ICON"),
-                  zoom_out_vh_button = IupSetAttributes
-                  (IupButton (NULL, NULL),
-                   "IMAGE = VH_ICON"),
-                  zoom_out_h_button = IupSetAttributes
-                  (IupButton (NULL, NULL),
-                   "IMAGE = H_ICON"),
-                  NULL),
-                 "ORIENTATION = HORIZONTAL,"
-                 "NUMDIV = 4,"
-                 "SIZECOL = -1,"
-                 "SIZELIN = -1,"
-                 "NORMALIZESIZE = BOTH,"),
-                IupFill (),
-                NULL)),
-              "TITLE = Zoom"),
+            IupSetAttributes
+            (IupHbox
+             (
+              IupSetAttributes
+              (IupFrame
+               (IupVbox
+                (IupFill (),
+                 IupSetAttributes
+                 (IupGridBox
+                  (zoom_label = IupSetAttributes
+                   (IupLabel (NULL),
+                    "IMAGE = ZOOM_ICON"),
+                   zoom_none_button = IupSetAttributes
+                   (IupButton (NULL, NULL),
+                    "IMAGE = ZOOM_NONE_ICON"),
+                   zoom_stretch_button = IupSetAttributes
+                   (IupButton (NULL, NULL),
+                    "IMAGE = ZOOM_STRETCH_ICON"),
+                   zoom_ratio_button = IupSetAttributes
+                   (IupButton (NULL, NULL),
+                    "IMAGE = ZOOM_RATIO_ICON"),
+                   zoom_in_label = IupSetAttributes
+                   (IupLabel (NULL),
+                    "IMAGE = ZOOM_IN_ICON"),
+                   zoom_in_v_button = IupSetAttributes
+                   (IupButton (NULL, NULL),
+                    "IMAGE = V_ICON"),
+                   zoom_in_vh_button = IupSetAttributes
+                   (IupButton (NULL, NULL),
+                    "IMAGE = VH_ICON"),
+                   zoom_in_h_button = IupSetAttributes
+                   (IupButton (NULL, NULL),
+                    "IMAGE = H_ICON"),
+                   zoom_out_label = IupSetAttributes
+                   (IupLabel (NULL),
+                    "IMAGE = ZOOM_OUT_ICON"),
+                   zoom_out_v_button = IupSetAttributes
+                   (IupButton (NULL, NULL),
+                    "IMAGE = V_ICON"),
+                   zoom_out_vh_button = IupSetAttributes
+                   (IupButton (NULL, NULL),
+                    "IMAGE = VH_ICON"),
+                   zoom_out_h_button = IupSetAttributes
+                   (IupButton (NULL, NULL),
+                    "IMAGE = H_ICON"),
+                   NULL),
+                  "ORIENTATION = HORIZONTAL,"
+                  "NUMDIV = 4,"
+                  "SIZECOL = -1,"
+                  "SIZELIN = -1,"
+                  "NORMALIZESIZE = BOTH,"),
+                 IupFill (),
+                 NULL)),
+               "TITLE = Zoom"),
 
-             IupFill (),
+              IupFill (),
 
-             place_dir_ctrl = gui_create_directional_control
-             ("Place", "PLACE_ICON", NULL, NULL),
+              place_dir_ctrl = gui_create_directional_control
+              ("Place", "PLACE_ICON", NULL, NULL),
 
-             IupFill (),
+              IupFill (),
 
-             room_dir_ctrl = gui_create_directional_control
-             ("Room", "ROOM_ICON", NULL, NULL),
+              room_dir_ctrl = gui_create_directional_control
+              ("Room", "ROOM_ICON", NULL, NULL),
 
-             IupFill (),
+              IupFill (),
 
-             row_dir_ctrl = gui_create_directional_control
-             ("Row", "ROW_ICON", NULL, NULL),
+              row_dir_ctrl = gui_create_directional_control
+              ("Row", "ROW_ICON", NULL, NULL),
 
-             IupFill (),
+              IupFill (),
 
-             page_dir_ctrl = gui_create_directional_control
-             ("Page", "PAGE_ICON", NULL, NULL),
+              page_dir_ctrl = gui_create_directional_control
+              ("Page", "PAGE_ICON", NULL, NULL),
 
-             NULL),
-            "ALIGNMENT = ACENTER"),
+              NULL),
+             "ALIGNMENT = ACENTER"),
 
-           IupFill (),
+            IupFill (),
 
-           NULL)),
+            NULL),
+           "ALIGNMENT = ACENTER")),
          "SUNKEN = YES,"),
 
         IupFill (),
@@ -341,6 +355,9 @@ show_cb (Ihandle *ih, int state)
     ("SHOW_CB", IupGetDialogChild (ih, "UNDO_CONTROL"), state);
 
   gui_run_callback_IFni
+    ("SHOW_CB", IupGetDialogChild (ih, "COORDINATES_CONTROL"), state);
+
+  gui_run_callback_IFni
     ("SHOW_CB", IupGetDialogChild (ih, "TILE_FG_CONTROL"), state);
   gui_run_callback_IFni
     ("SHOW_CB", IupGetDialogChild (ih, "TILE_BG_CONTROL"), state);
@@ -382,6 +399,9 @@ _update_cb (Ihandle *ih)
 
   gui_run_callback_IFn
     ("_UPDATE_CB", IupGetDialogChild (ih, "UNDO_CONTROL"));
+
+  gui_run_callback_IFn
+    ("_UPDATE_CB", IupGetDialogChild (ih, "COORDINATES_CONTROL"));
 
   gui_run_callback_IFn
     ("_UPDATE_CB", IupGetDialogChild (ih, "TILE_FG_CONTROL"));

@@ -140,7 +140,9 @@ mininim_SOURCES = src/mininim.c src/mininim.h src/compatibility.h			\
 	  src/gui/gui-editor-toolbar-control.c															\
 	  src/gui/gui-editor-toolbar-control.h															\
 	  src/gui/gui-directional-control.c																	\
-	  src/gui/gui-directional-control.h
+	  src/gui/gui-directional-control.h																	\
+	  src/gui/gui-coordinates-control.c																	\
+	  src/gui/gui-coordinates-control.h
 
 CLEANFILES = ${top_builddir}/src/mininim.h.gch
 
