@@ -379,7 +379,8 @@ ALLEGRO_BITMAP *small_logo_icon,
   *defense_add_icon, *defense_sub_icon, *counter_attack_icon,
   *counter_attack_add_icon, *counter_attack_sub_icon, *counter_defense_icon,
   *counter_defense_add_icon, *counter_defense_sub_icon, *shadow_face_icon,
-  *heart_icon, *plus_icon, *minus_icon, *lock_icon, *unlock_icon;
+  *heart_icon, *plus_icon, *minus_icon, *lock_icon, *lock_icon_trimmed,
+  *unlock_icon;
 
 static struct pos aux_pos;
 
@@ -525,6 +526,7 @@ load_icons (void)
   plus_icon = load_icon (PLUS_ICON);
   minus_icon = load_icon (MINUS_ICON);
   lock_icon = load_icon (LOCK_ICON);
+  lock_icon_trimmed = trim_bitmap (lock_icon, TRANSPARENT_COLOR);
   unlock_icon = load_icon (UNLOCK_ICON);
 }
 
@@ -636,6 +638,7 @@ unload_icons (void)
   al_destroy_bitmap (plus_icon);
   al_destroy_bitmap (minus_icon);
   al_destroy_bitmap (lock_icon);
+  al_destroy_bitmap (lock_icon_trimmed);
   al_destroy_bitmap (unlock_icon);
 }
 
@@ -980,7 +983,7 @@ main_menu (void)
   if (edit != EDIT_NONE)
     item.main.unlock_selection =
       menu_sitem (main_menu_enabled && selection_locked,
-                  lock_icon, "%s", "");
+                  lock_icon_trimmed, "%s", "");
 #endif
 
   end_menu ();

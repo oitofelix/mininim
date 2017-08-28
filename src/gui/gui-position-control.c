@@ -24,6 +24,8 @@ static int destroy_cb (Ihandle *ih);
 static int _update_cb (Ihandle *ih);
 static int valuechanged_cb (Ihandle *ih);
 static int killfocus_cb (Ihandle *ih);
+static int level_spin_killfocus_cb (Ihandle *ih);
+static int level_spin_k_esc_cb (Ihandle *ih);
 
 
 Ihandle *
@@ -38,16 +40,19 @@ gui_create_position_control (struct pos *p, char *norm_group)
      (IupFrame
       (hbox = IupSetAttributes
        (IupHbox
-        (level_spin = IupSetCallbacks
+        (
+         level_spin = IupSetCallbacks
          (IupSetAttributes
           (IupText (NULL),
            "SPIN = YES,"
            "SPINWRAP = YES,"
            "MASK = /d+,"
-           "ACTIVE = NO,"
+           /* "ACTIVE = NO," */
            "TIP = \"Level\","),
-          "VALUECHANGED_CB", valuechanged_cb,
-          "KILLFOCUS_CB", killfocus_cb,
+          /* "VALUECHANGED_CB", valuechanged_cb, */
+          "KILLFOCUS_CB", level_spin_killfocus_cb,
+          "K_CR", level_spin_killfocus_cb,
+          "K_ESC", level_spin_k_esc_cb,
           NULL),
 
          room_spin = IupSetCallbacks
@@ -99,6 +104,7 @@ gui_create_position_control (struct pos *p, char *norm_group)
   IupSetAttribute (ih, "_FLOOR_SPIN", (void *) floor_spin);
   IupSetAttribute (ih, "_PLACE_SPIN", (void *) place_spin);
 
+  IupSetInt (level_spin, "SPINMAX", 14);
   IupSetInt (room_spin, "SPINMAX", ROOMS - 1);
   IupSetInt (floor_spin, "SPINMAX", FLOORS - 1);
   IupSetInt (place_spin, "SPINMAX", PLACES - 1);
@@ -128,15 +134,18 @@ _update_cb (Ihandle *ih)
 {
   if (! IupGetInt (ih, "VISIBLE")) return IUP_DEFAULT;
 
+  Ihandle *level_spin = (void *) IupGetAttribute (ih, "_LEVEL_SPIN");
+  Ihandle *room_spin = (void *) IupGetAttribute (ih, "_ROOM_SPIN");
+  Ihandle *floor_spin = (void *) IupGetAttribute (ih, "_FLOOR_SPIN");
+  Ihandle *place_spin = (void *) IupGetAttribute (ih, "_PLACE_SPIN");
+
   struct pos *p = (void *) IupGetAttribute (ih, "_POS");
-  gui_control_active (ih, is_valid_pos (p) && selection_locked);
+  gui_control_active (room_spin, is_valid_pos (p) && selection_locked);
+  gui_control_active (floor_spin, is_valid_pos (p) && selection_locked);
+  gui_control_active (place_spin, is_valid_pos (p) && selection_locked);
 
   struct pos *last_p = (void *) IupGetAttribute (ih, "_LAST_POS");
   if (! peq (p, last_p) && p->room > 0) {
-    Ihandle *level_spin = (void *) IupGetAttribute (ih, "_LEVEL_SPIN");
-    Ihandle *room_spin = (void *) IupGetAttribute (ih, "_ROOM_SPIN");
-    Ihandle *floor_spin = (void *) IupGetAttribute (ih, "_FLOOR_SPIN");
-    Ihandle *place_spin = (void *) IupGetAttribute (ih, "_PLACE_SPIN");
     struct pos np; npos (p, &np);
     *last_p = np;
     IupSetInt (level_spin, "SPINVALUE", np.l->n);
@@ -164,7 +173,7 @@ valuechanged_cb (Ihandle *ih)
   if (room > 0) {
     struct pos np; new_pos (&np, p->l, room, floor, place);
     *p = np;
-    mr_focus_room (np.room);
+    mr_scroll_into_view (np.room);
   }
 
   return IUP_DEFAULT;
@@ -186,5 +195,24 @@ killfocus_cb (Ihandle *ih)
   gui_empty_value_to_0 (room_spin);
   gui_empty_value_to_0 (floor_spin);
   gui_empty_value_to_0 (place_spin);
+  return IUP_DEFAULT;
+}
+
+int
+level_spin_killfocus_cb (Ihandle *ih)
+{
+  int n = IupGetInt (ih, "SPINVALUE");
+  struct pos *p = (void *) IupGetAttribute (ih, "_POS");
+  if (n > 0 && p->l->n != n) ui_jump_to_level (n);
+  else if (n == 0) IupSetInt (ih, "SPINVALUE", p->l->n);
+  return IUP_DEFAULT;
+}
+
+int
+level_spin_k_esc_cb (Ihandle *ih)
+{
+  int n = IupGetInt (ih, "SPINVALUE");
+  struct pos *p = (void *) IupGetAttribute (ih, "_POS");
+  if (p->l->n != n) IupSetInt (ih, "SPINVALUE", p->l->n);
   return IUP_DEFAULT;
 }

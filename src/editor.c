@@ -109,6 +109,7 @@ editor (void)
 {
   if (edit == EDIT_NONE) return;
 
+  mr.select_cycles = SELECT_CYCLES;
   gui_run_callback_IFn ("_UPDATE_CB", gui_editor_dialog);
 
   struct bmenu_item bmain_menu[] =

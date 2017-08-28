@@ -36,8 +36,10 @@ void gui_set_tip (Ihandle *ih, char *new_tip);
 
 int hide_dialog (Ihandle *ih);
 
-void gui_control_active (Ihandle *ih, bool a);
-void gui_control_int_value (Ihandle *ih, int new_value);
+bool gui_control_active (Ihandle *ih, bool a);
+bool gui_control_attribute (Ihandle *ih, char *name, char *value);
+bool gui_control_strf_attribute (Ihandle *ih, char *name, char *format, ...)
+  __attribute__ ((format (printf, 3, 4)));
 
 int gui_default_key_cb (Ihandle *ih, int c);
 int gui_debug_print_key_cb (Ihandle *ih, int c);

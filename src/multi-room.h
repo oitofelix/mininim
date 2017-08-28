@@ -45,6 +45,7 @@ bool mr_leftmost_cell (int *rx, int *ry);
 bool mr_bottommost_cell (int *rx, int *ry);
 bool mr_rightmost_cell (int *rx, int *ry);
 struct mr_origin *mr_save_origin (struct mr_origin *o);
+bool mr_origin_eq (struct mr_origin *a, struct mr_origin *b);
 void mr_restore_origin (struct mr_origin *o);
 void mr_map_room (int r, int x, int y);
 void mr_set_origin (int room, int x, int y);
@@ -52,6 +53,7 @@ void mr_center_room (int room);
 void mr_focus_room (int room);
 void mr_focus_cell (int x, int y);
 void mr_focus_mouse (void);
+void mr_scroll_into_view (int room);
 void mr_select_trans (enum dir d);
 void mr_view_trans (enum dir d);
 void mr_view_page_trans (enum dir d);
@@ -76,7 +78,7 @@ bool mr_room_list_has_room (struct mr_room_list *l, int room);
 struct mr_room_list *mr_get_room_list (struct mr_room_list *l);
 void mr_destroy_room_list (struct mr_room_list *l);
 int mr_count_uniq_rooms (void);
-void mr_stabilize_origin (struct mr_origin *o, enum dir d);
+void mr_stabilize_origin (struct mr_origin *o);
 void mr_busy (void);
 
 #endif	/* MININIM_MULTI_ROOM_H */

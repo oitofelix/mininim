@@ -304,6 +304,48 @@ load_bitmap (const char *filename)
   return bitmap;
 }
 
+ALLEGRO_BITMAP *
+trim_bitmap (ALLEGRO_BITMAP *b, ALLEGRO_COLOR t)
+{
+  int x0, y0, x1, y1, xl, yl, xr, yr;
+  int w0 = get_bitmap_width (b);
+  int h0 = get_bitmap_height (b);
+  xl = w0;
+  yl = h0;
+  xr = 0;
+  yr = 0;
+
+  al_lock_bitmap (b, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READONLY);
+  for (y0 = 0; y0 < h0; y0++)
+    for (x0 = 0; x0 < w0; x0++) {
+      ALLEGRO_COLOR c = al_get_pixel (b, x0, y0);
+      if (! color_eq (c, t)) {
+        xl = min_int (xl, x0);
+        yl = min_int (yl, y0);
+        break;
+      }
+    }
+
+  for (y1 = h0 - 1; y1 >= 0; y1--)
+    for (x1 = w0 - 1; x1 >= 0; x1--) {
+      ALLEGRO_COLOR c = al_get_pixel (b, x1, y1);
+      if (! color_eq (c, t)) {
+        xr  = max_int (xr, x1);
+        yr  = max_int (yr, y1);
+        break;
+      }
+    }
+  al_unlock_bitmap (b);
+
+  int w = xr - xl + 1;
+  int h = yr - yl + 1;
+
+  /* fprintf (stderr, "%i,%i,%i,%i\n", xl, yl, xr, yr); */
+  /* fprintf (stderr, "%i,%i:%ix%i\n", xl, yl, w, h); */
+
+  return al_create_sub_bitmap (b, xl, yl, w, h);
+}
+
 ALLEGRO_FONT *
 load_font (const char *filename)
 {

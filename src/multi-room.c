@@ -370,6 +370,14 @@ mr_save_origin (struct mr_origin *o)
   return o;
 }
 
+bool
+mr_origin_eq (struct mr_origin *a, struct mr_origin *b)
+{
+  return a->w == b->w && a->h == b->h
+    && a->x == b->x && a->y == b->y
+    && a->room == b->room;
+}
+
 void
 mr_restore_origin (struct mr_origin *o)
 {
@@ -397,7 +405,7 @@ mr_set_origin (int room, int rx, int ry)
 }
 
 void
-mr_stabilize_origin (struct mr_origin *o, enum dir d)
+mr_stabilize_origin (struct mr_origin *o)
 {
   int x, y, tx, ty;
   float ld, cd = INFINITY;
@@ -479,7 +487,7 @@ mr_view_trans (enum dir d)
       r = roomd (&global_level, r, d);
       if (r) {
         mr_set_origin (r, x, y);
-        mr_stabilize_origin (&o, d);
+        mr_stabilize_origin (&o);
         return;
       }
     }
@@ -500,7 +508,7 @@ mr_view_trans (enum dir d)
   }
 
   mr_set_origin (mr.room, mr.x + dx, mr.y + dy);
-  mr_stabilize_origin (&o, d);
+  mr_stabilize_origin (&o);
 }
 
 void
@@ -536,7 +544,32 @@ mr_view_page_trans (enum dir d)
     break;
   }
 
-  mr_stabilize_origin (&o, d);
+  mr_stabilize_origin (&o);
+}
+
+void
+mr_scroll_into_view (int room)
+{
+  if (is_room_visible (room)) return;
+
+  struct mr_origin o;
+  mr_save_origin (&o);
+
+  enum dir dir;
+  for (dir = LEFT; dir <= BELOW; dir++) {
+    mr_restore_origin (&o);
+    struct mr_origin a, b;
+    do {
+      mr_save_origin (&a);
+      mr_view_trans (dir);
+      mr_save_origin (&b);
+      if (is_room_visible (a.room))
+        mr_focus_room (a.room);
+      if (is_room_visible (room)) return;
+    } while (! mr_origin_eq (&a, &b));
+  }
+
+  mr_center_room (room);
 }
 
 bool

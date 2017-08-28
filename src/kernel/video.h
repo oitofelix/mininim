@@ -39,6 +39,7 @@ ALLEGRO_BITMAP *clone_scaled_bitmap (ALLEGRO_BITMAP *bitmap, int w,
                                      int h, int flags);
 ALLEGRO_BITMAP *load_bitmap (const char *filename);
 ALLEGRO_FONT *load_font (const char *filename);
+ALLEGRO_BITMAP *trim_bitmap (ALLEGRO_BITMAP *b, ALLEGRO_COLOR t);
 bool attach_shader_source_file (ALLEGRO_SHADER *shader, const char *filename);
 const char *get_shader_platform (ALLEGRO_SHADER *shader);
 void validate_bitmap_for_mingw (ALLEGRO_BITMAP *bitmap);

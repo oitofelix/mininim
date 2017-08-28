@@ -118,6 +118,8 @@ load_icons (void)
   LOAD_ICON (MASK_EXCHANGE_ICON);
   LOAD_ICON (UNDO_ICON);
   LOAD_ICON (REDO_ICON);
+  LOAD_ICON (FULL_SCREEN_ICON);
+  LOAD_ICON (WINDOWS_ICON);
 }
 
 void
@@ -159,6 +161,8 @@ unload_icons (void)
   UNLOAD_ICON (MASK_EXCHANGE_ICON);
   UNLOAD_ICON (UNDO_ICON);
   UNLOAD_ICON (REDO_ICON);
+  UNLOAD_ICON (FULLSCREEN_ICON);
+  UNLOAD_ICON (WINDOWS_ICON);
 }
 
 void
@@ -278,24 +282,47 @@ hide_dialog (Ihandle *ih)
    for Windows) the IUP driver may insist in redrawing the control
    even when there is no change in state, resulting in random
    graphical glitches if done recurrently. */
-void
+bool
 gui_control_active (Ihandle *ih, bool a)
 {
   /* Only consider changing the active status of the control if its
      already mapped, otherwise a bug in Motif might cause the
      application to hang up. */
-  if (! IupGetAttribute (ih, "WID")) return;
+  if (! IupGetAttribute (ih, "WID")) return false;
 
   bool b = IupGetInt (ih, "ACTIVE");
-  if (! equiv (a, b)) IupSetInt (ih, "ACTIVE", a);
+  if (! equiv (a, b)) {
+    IupSetInt (ih, "ACTIVE", a);
+    return true;
+  } else return false;
 }
 
-void
-gui_control_int_value (Ihandle *ih, int new_value)
+bool
+gui_control_attribute (Ihandle *ih, char *name, char *value)
 {
-  int old_value = IupGetInt (ih, "VALUE");
-  if (old_value == new_value) return;
-  IupSetInt (ih, "VALUE", new_value);
+  char *old_value = IupGetAttribute (ih, name);
+  if (! strcmp (old_value, value)) return false;
+  IupSetAttribute (ih, name, value);
+  return true;
+}
+
+bool
+gui_control_strf_attribute (Ihandle *ih, char *name, char *format, ...)
+{
+  bool r = false;
+  va_list ap;
+  va_start (ap, format);
+  char *value = NULL;
+  vasprintf (&value, format, ap);
+  char *old_value = IupGetAttribute (ih, name);
+  if (! equiv (old_value, value)
+      || (old_value && value && strcmp (old_value, value))) {
+    IupSetStrAttribute (ih, name, value);
+    r = true;
+  }
+  al_free (value);
+  va_end (ap);
+  return r;
 }
 
 int

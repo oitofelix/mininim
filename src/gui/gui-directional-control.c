@@ -92,7 +92,10 @@ gui_create_directional_control (char *title, char *c_image_hname,
         "NUMDIV = 3,"
         "SIZECOL = -1,"
         "SIZELIN = -1,"
-        "NORMALIZESIZE = BOTH,"),
+        /* "NORMALIZESIZE = BOTH," */
+        "ALIGNMENTLIN = ACENTER,"
+        "ALIGNMENTCOL = ACENTER,"
+        ),
        IupFill (),
        NULL),
       "ALIGNMENT = ACENTER"));

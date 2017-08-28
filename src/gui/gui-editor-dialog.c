@@ -30,7 +30,7 @@ static int move_selection_hotkeys_cb (Ihandle *ih, int c);
 Ihandle *
 gui_create_editor_dialog (void)
 {
-  Ihandle *zoom_label,*zoom_none_button, *zoom_stretch_button,
+  Ihandle *zoom_button, *zoom_none_button, *zoom_stretch_button,
     *zoom_ratio_button;
 
   Ihandle *zoom_in_label, *zoom_in_vh_button, *zoom_in_v_button,
@@ -84,9 +84,10 @@ gui_create_editor_dialog (void)
                 (IupFill (),
                  IupSetAttributes
                  (IupGridBox
-                  (zoom_label = IupSetAttributes
-                   (IupLabel (NULL),
-                    "IMAGE = ZOOM_ICON"),
+                  (zoom_button = IupSetAttributes
+                   (IupButton (NULL, NULL),
+                    "IMAGE = ZOOM_ICON,"
+                    "FLAT = YES,"),
                    zoom_none_button = IupSetAttributes
                    (IupButton (NULL, NULL),
                     "IMAGE = ZOOM_NONE_ICON"),
@@ -125,7 +126,9 @@ gui_create_editor_dialog (void)
                   "NUMDIV = 4,"
                   "SIZECOL = -1,"
                   "SIZELIN = -1,"
-                  "NORMALIZESIZE = BOTH,"),
+                  /* "NORMALIZESIZE = BOTH," */
+                  "ALIGNMENTLIN = ACENTER,"
+                  "ALIGNMENTCOL = ACENTER,"),
                  IupFill (),
                  NULL)),
                "TITLE = Zoom"),
@@ -507,7 +510,7 @@ move_selection_hotkeys_cb (Ihandle *ih, int c)
 
   if (p.room) {
     selection_pos = p;
-    mr_focus_room (p.room);
+    mr_scroll_into_view (p.room);
   }
 
   return IUP_IGNORE;
