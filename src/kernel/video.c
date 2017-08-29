@@ -107,8 +107,8 @@ init_video (void)
   if (! is_fullscreen ()) show_menu ();
 
   if (mr.fit_w == 0 && mr.fit_h == 0) {
-    mr.fit_w = 2;
-    mr.fit_h = 2;
+    mr.fit_w = 1;
+    mr.fit_h = 1;
   }
   set_multi_room (mr.fit_w, mr.fit_h);
 

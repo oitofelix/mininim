@@ -22,16 +22,16 @@
 
 static int _update_cb (Ihandle *ih);
 static int toggle_action_cb (Ihandle *ih, int state);
+static int button_action_cb (Ihandle *ih);
 
 
 Ihandle *
 gui_create_tile_mirror_control (struct pos *p, char *norm_group)
 {
-  Ihandle *ih, *vbox, *mirror_radio, *tiles_toggle, *links_toggle,
-    *mirror_place_toggle, *mirror_room_toggle, *mirror_level_toggle;
+  Ihandle *ih, *vbox, *radio, *tiles_toggle, *links_toggle,
+    *place_toggle, *room_toggle, *level_toggle;
 
-  Ihandle *mirror_label, *mirror_v_button, *mirror_vh_button,
-    *mirror_h_button, *mirror_r_button;
+  Ihandle *label, *v_button, *vh_button, *h_button, *r_button;
 
   ih = IupSetCallbacks
     (IupSetAttributes
@@ -43,44 +43,44 @@ gui_create_tile_mirror_control (struct pos *p, char *norm_group)
          IupSetAttributes
          (IupGridBox
           (
-           mirror_label = IupSetAttributes
+           label = IupSetAttributes
            (IupLabel (NULL),
             "IMAGE = MIRROR_ICON,"),
 
-           mirror_v_button = IupSetCallbacks
+           v_button = IupSetCallbacks
            (IupSetAttributes
             (IupButton (NULL, NULL),
              "IMAGE = V_ICON,"
-             "TIP = \"Mirror tile vertically\""),
-            "ACTION", NULL,
+             "TIP = \"Vertical\""),
+            "ACTION", button_action_cb,
             NULL),
 
-           mirror_vh_button = IupSetCallbacks
+           vh_button = IupSetCallbacks
            (IupSetAttributes
             (IupButton (NULL, NULL),
              "IMAGE = VH_ICON,"
-             "TIP = \"Mirror tile in both directions\""),
-            "ACTION", NULL,
+             "TIP = \"Vertical+Horizontal\""),
+            "ACTION", button_action_cb,
             NULL),
 
-           mirror_h_button = IupSetCallbacks
+           h_button = IupSetCallbacks
            (IupSetAttributes
             (IupButton (NULL, NULL),
              "IMAGE = H_ICON,"
-             "TIP = \"Mirror tile horizontally\""),
-            "ACTION", NULL,
+             "TIP = \"Horizontal\""),
+            "ACTION", button_action_cb,
             NULL),
 
            IupFill (),
 
            IupFill (),
 
-           mirror_r_button = IupSetCallbacks
+           r_button = IupSetCallbacks
            (IupSetAttributes
             (IupButton (NULL, NULL),
              "IMAGE = SHUFFLE_ICON,"
-             "TIP = \"Mirror tile randomly\""),
-            "ACTION", NULL,
+             "TIP = \"Random\""),
+            "ACTION", button_action_cb,
             NULL),
            NULL),
           "ORIENTATION = HORIZONTAL,"
@@ -89,24 +89,24 @@ gui_create_tile_mirror_control (struct pos *p, char *norm_group)
           "SIZELIN = -1,"
           "NORMALIZESIZE = BOTH,"),
 
-         mirror_radio = IupRadio
+         radio = IupRadio
          (IupHbox
           (IupSetCallbacks
            (IupSetAttributes
-            (mirror_place_toggle = IupToggle ("P", NULL),
-             "TIP = \"Place mirroring scope\""),
+            (place_toggle = IupToggle ("P", NULL),
+             "TIP = \"Place scope\""),
             "ACTION", (Icallback) toggle_action_cb,
             NULL),
            IupSetCallbacks
            (IupSetAttributes
-            (mirror_room_toggle = IupToggle ("R", NULL),
-             "TIP = \"Room mirroring scope\""),
+            (room_toggle = IupToggle ("R", NULL),
+             "TIP = \"Room scope\""),
             "ACTION", (Icallback) toggle_action_cb,
             NULL),
            IupSetCallbacks
            (IupSetAttributes
-            (mirror_level_toggle = IupToggle ("L", NULL),
-             "TIP = \"Level mirroring scope\""),
+            (level_toggle = IupToggle ("L", NULL),
+             "TIP = \"Level scope\""),
             "ACTION", (Icallback) toggle_action_cb,
             NULL),
            NULL)),
@@ -117,7 +117,7 @@ gui_create_tile_mirror_control (struct pos *p, char *norm_group)
            (IupToggle ("T", NULL),
             "VALUE = YES,"
             "ACTIVE = NO,"
-            "TIP = \"Mirror tiles\""),
+            "TIP = \"Tiles\""),
            "ACTION", (Icallback) toggle_action_cb,
            NULL),
           links_toggle = IupSetCallbacks
@@ -125,7 +125,7 @@ gui_create_tile_mirror_control (struct pos *p, char *norm_group)
            (IupToggle ("L", NULL),
             "VALUE = YES,"
             "ACTIVE = NO,"
-            "TIP = \"Mirror links\""),
+            "TIP = \"Links\""),
            "ACTION", (Icallback) toggle_action_cb,
            NULL),
           NULL),
@@ -140,10 +140,14 @@ gui_create_tile_mirror_control (struct pos *p, char *norm_group)
 
   IupSetAttribute (vbox, "NORMALIZERGROUP", norm_group);
 
-  IupSetAttribute (ih, "_MIRROR_RADIO", (void *) mirror_radio);
-  IupSetAttribute (ih, "_MIRROR_PLACE_TOGGLE", (void *) mirror_place_toggle);
-  IupSetAttribute (ih, "_MIRROR_ROOM_TOGGLE", (void *) mirror_room_toggle);
-  IupSetAttribute (ih, "_MIRROR_LEVEL_TOGGLE", (void *) mirror_level_toggle);
+  IupSetAttribute (ih, "_V_BUTTON", (void *) v_button);
+  IupSetAttribute (ih, "_VH_BUTTON", (void *) vh_button);
+  IupSetAttribute (ih, "_H_BUTTON", (void *) h_button);
+  IupSetAttribute (ih, "_R_BUTTON", (void *) r_button);
+  IupSetAttribute (ih, "_RADIO", (void *) radio);
+  IupSetAttribute (ih, "_PLACE_TOGGLE", (void *) place_toggle);
+  IupSetAttribute (ih, "_ROOM_TOGGLE", (void *) room_toggle);
+  IupSetAttribute (ih, "_LEVEL_TOGGLE", (void *) level_toggle);
   IupSetAttribute (ih, "_TILES_TOGGLE", (void *) tiles_toggle);
   IupSetAttribute (ih, "_LINKS_TOGGLE", (void *) links_toggle);
   IupSetAttribute (ih, "_POS", (void *) p);
@@ -167,16 +171,98 @@ toggle_action_cb (Ihandle *ih, int state)
 {
   Ihandle *tiles_toggle = (void *) IupGetAttribute (ih, "_TILES_TOGGLE");
   Ihandle *links_toggle = (void *) IupGetAttribute (ih, "_LINKS_TOGGLE");
-  Ihandle *mirror_place_toggle =
-    (void *) IupGetAttribute (ih, "_MIRROR_PLACE_TOGGLE");
+  Ihandle *place_toggle =
+    (void *) IupGetAttribute (ih, "_PLACE_TOGGLE");
 
   if (ih == tiles_toggle && ! state)
     IupSetInt (links_toggle, "VALUE", true);
   else if (ih == links_toggle && ! state)
     IupSetInt (tiles_toggle, "VALUE", true);
   else {
-    gui_control_active (tiles_toggle, ih != mirror_place_toggle);
-    gui_control_active (links_toggle, ih != mirror_place_toggle);
+    gui_control_active (tiles_toggle, ih != place_toggle);
+    gui_control_active (links_toggle, ih != place_toggle);
+  }
+
+  return IUP_DEFAULT;
+}
+
+int
+button_action_cb (Ihandle *ih)
+{
+  Ihandle *v_button = (void *) IupGetAttribute (ih, "_V_BUTTON");
+  Ihandle *vh_button = (void *) IupGetAttribute (ih, "_VH_BUTTON");
+  Ihandle *h_button = (void *) IupGetAttribute (ih, "_H_BUTTON");
+  Ihandle *r_button = (void *) IupGetAttribute (ih, "_R_BUTTON");
+
+  Ihandle *radio = (void *) IupGetAttribute (ih, "_RADIO");
+  Ihandle *place_toggle = (void *) IupGetAttribute (ih, "_PLACE_TOGGLE");
+  Ihandle *room_toggle = (void *) IupGetAttribute (ih, "_ROOM_TOGGLE");
+  Ihandle *level_toggle = (void *) IupGetAttribute (ih, "_LEVEL_TOGGLE");
+  Ihandle *tiles_toggle = (void *) IupGetAttribute (ih, "_TILES_TOGGLE");
+  Ihandle *links_toggle = (void *) IupGetAttribute (ih, "_LINKS_TOGGLE");
+
+  Ihandle *scope = (void *) IupGetAttribute (radio, "VALUE_HANDLE");
+
+  bool v = ih == v_button || ih == vh_button;
+  bool h = ih == h_button || ih == vh_button;
+  bool r = ih == r_button;
+  bool place = scope == place_toggle;
+  bool room = scope == room_toggle;
+  bool level = scope == level_toggle;
+  bool tiles = IupGetInt (tiles_toggle, "VALUE");
+  bool links = IupGetInt (links_toggle, "VALUE");
+
+  struct pos *p = (void *) IupGetAttribute (ih, "_POS");
+  struct pos p0;
+
+  struct room_linking l[ROOMS];
+
+  if (v && h) {
+
+  } else if (v) {
+    if (place) {
+      reflect_pos_v (p, &p0);
+      register_mirror_pos_undo (&undo, p, &p0, false, "MIRROR TILE V.");
+    } else if (room) {
+      if (tiles && links) {
+        register_v_room_mirror_tile_undo (&undo, p->room, NULL);
+        memcpy (&l, &p->l->link, sizeof (l));
+        editor_mirror_link (p->room, ABOVE, BELOW);
+        register_link_undo (&undo, l, "ROOM MIRROR TILES+LINKS V.");
+      } else if (tiles)
+        register_v_room_mirror_tile_undo
+          (&undo, p->room, "ROOM MIRROR TILES V.");
+      else if (links) {
+        memcpy (&l, &p->l->link, sizeof (l));
+        editor_mirror_link (p->room, ABOVE, BELOW);
+        register_link_undo (&undo, l, "ROOM MIRROR LINKS V.");
+      }
+    } else if (level) {
+      if (tiles && links) {
+        for (int i = 1; i < ROOMS; i++) {
+          register_v_room_mirror_tile_undo (&undo, i, NULL);
+          memcpy (&l, &p->l->link, sizeof (l));
+          mirror_link (p->l, i, ABOVE, BELOW);
+          register_link_undo (&undo, l, NULL);
+        }
+        end_undo_set (&undo, "LEVEL MIRROR TILES+LINKS V.");
+      } else if (tiles) {
+        for (int i = 1; i < ROOMS; i++)
+          register_v_room_mirror_tile_undo (&undo, i, NULL);
+        end_undo_set (&undo, "LEVEL MIRROR TILES V.");
+      } else if (links) {
+        for (int i = 1; i < ROOMS; i++) {
+          memcpy (&l, &p->l->link, sizeof (l));
+          mirror_link (p->l, i, ABOVE, BELOW);
+          register_link_undo (&undo, l, NULL);
+        }
+        end_undo_set (&undo, "LEVEL MIRROR LINKS V.");
+      }
+    }
+  } else if (h) {
+
+  } else if (r) {
+
   }
 
   return IUP_DEFAULT;

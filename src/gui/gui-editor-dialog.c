@@ -30,19 +30,6 @@ static int move_selection_hotkeys_cb (Ihandle *ih, int c);
 Ihandle *
 gui_create_editor_dialog (void)
 {
-  Ihandle *zoom_button, *zoom_none_button, *zoom_stretch_button,
-    *zoom_ratio_button;
-
-  Ihandle *zoom_in_label, *zoom_in_vh_button, *zoom_in_v_button,
-    *zoom_in_h_button;
-
-  Ihandle *zoom_out_label, *zoom_out_vh_button, *zoom_out_v_button,
-    *zoom_out_h_button;
-
-  Ihandle *place_dir_ctrl, *room_dir_ctrl, *row_dir_ctrl, *page_dir_ctrl;
-
-  Ihandle *zbox;
-
   Ihandle *ih = IupSetCallbacks
     (IupSetAttributes
      (IupDialog
@@ -79,78 +66,30 @@ gui_create_editor_dialog (void)
             (IupHbox
              (
               IupSetAttributes
-              (IupFrame
-               (IupVbox
-                (IupFill (),
-                 IupSetAttributes
-                 (IupGridBox
-                  (zoom_button = IupSetAttributes
-                   (IupButton (NULL, NULL),
-                    "IMAGE = ZOOM_ICON,"
-                    "FLAT = YES,"),
-                   zoom_none_button = IupSetAttributes
-                   (IupButton (NULL, NULL),
-                    "IMAGE = ZOOM_NONE_ICON"),
-                   zoom_stretch_button = IupSetAttributes
-                   (IupButton (NULL, NULL),
-                    "IMAGE = ZOOM_STRETCH_ICON"),
-                   zoom_ratio_button = IupSetAttributes
-                   (IupButton (NULL, NULL),
-                    "IMAGE = ZOOM_RATIO_ICON"),
-                   zoom_in_label = IupSetAttributes
-                   (IupLabel (NULL),
-                    "IMAGE = ZOOM_IN_ICON"),
-                   zoom_in_v_button = IupSetAttributes
-                   (IupButton (NULL, NULL),
-                    "IMAGE = V_ICON"),
-                   zoom_in_vh_button = IupSetAttributes
-                   (IupButton (NULL, NULL),
-                    "IMAGE = VH_ICON"),
-                   zoom_in_h_button = IupSetAttributes
-                   (IupButton (NULL, NULL),
-                    "IMAGE = H_ICON"),
-                   zoom_out_label = IupSetAttributes
-                   (IupLabel (NULL),
-                    "IMAGE = ZOOM_OUT_ICON"),
-                   zoom_out_v_button = IupSetAttributes
-                   (IupButton (NULL, NULL),
-                    "IMAGE = V_ICON"),
-                   zoom_out_vh_button = IupSetAttributes
-                   (IupButton (NULL, NULL),
-                    "IMAGE = VH_ICON"),
-                   zoom_out_h_button = IupSetAttributes
-                   (IupButton (NULL, NULL),
-                    "IMAGE = H_ICON"),
-                   NULL),
-                  "ORIENTATION = HORIZONTAL,"
-                  "NUMDIV = 4,"
-                  "SIZECOL = -1,"
-                  "SIZELIN = -1,"
-                  /* "NORMALIZESIZE = BOTH," */
-                  "ALIGNMENTLIN = ACENTER,"
-                  "ALIGNMENTCOL = ACENTER,"),
-                 IupFill (),
-                 NULL)),
-               "TITLE = Zoom"),
+              (gui_create_zoom_control (NULL),
+               "NAME = ZOOM_CONTROL"),
 
               IupFill (),
 
-              place_dir_ctrl = gui_create_directional_control
-              ("Place", "PLACE_ICON", NULL, NULL),
+              IupSetAttributes
+              (gui_create_place_control (&selection_pos, NULL),
+               "NAME = PLACE_CONTROL"),
 
               IupFill (),
 
-              room_dir_ctrl = gui_create_directional_control
+              /* ACITION (center button): center view on current
+                 room */
+              gui_create_directional_control
               ("Room", "ROOM_ICON", NULL, NULL),
 
               IupFill (),
 
-              row_dir_ctrl = gui_create_directional_control
+              gui_create_directional_control
               ("Row", "ROW_ICON", NULL, NULL),
 
               IupFill (),
 
-              page_dir_ctrl = gui_create_directional_control
+              gui_create_directional_control
               ("Page", "PAGE_ICON", NULL, NULL),
 
               NULL),
@@ -180,7 +119,7 @@ gui_create_editor_dialog (void)
              "NAME = TILE_BG_CONTROL"),
 
             IupSetAttributes
-            (zbox = IupZbox
+            (IupZbox
              (IupSetAttributes
               (IupFrame
                (IupSetAttributes
@@ -320,6 +259,7 @@ gui_create_editor_dialog (void)
      "K_ANY", (Icallback) k_any,
      "SHOW_CB", (Icallback) show_cb,
      "CLOSE_CB", exit_editor,
+     "RESIZE_CB", gui_resize_cb,
      "_UPDATE_CB", _update_cb,
      NULL);
 
@@ -359,6 +299,12 @@ show_cb (Ihandle *ih, int state)
 
   gui_run_callback_IFni
     ("SHOW_CB", IupGetDialogChild (ih, "COORDINATES_CONTROL"), state);
+
+  gui_run_callback_IFni
+    ("SHOW_CB", IupGetDialogChild (ih, "ZOOM_CONTROL"), state);
+
+  gui_run_callback_IFni
+    ("SHOW_CB", IupGetDialogChild (ih, "PLACE_CONTROL"), state);
 
   gui_run_callback_IFni
     ("SHOW_CB", IupGetDialogChild (ih, "TILE_FG_CONTROL"), state);
@@ -405,6 +351,12 @@ _update_cb (Ihandle *ih)
 
   gui_run_callback_IFn
     ("_UPDATE_CB", IupGetDialogChild (ih, "COORDINATES_CONTROL"));
+
+  gui_run_callback_IFn
+    ("_UPDATE_CB", IupGetDialogChild (ih, "ZOOM_CONTROL"));
+
+  gui_run_callback_IFn
+    ("_UPDATE_CB", IupGetDialogChild (ih, "PLACE_CONTROL"));
 
   gui_run_callback_IFn
     ("_UPDATE_CB", IupGetDialogChild (ih, "TILE_FG_CONTROL"));
@@ -487,31 +439,17 @@ move_selection_hotkeys_cb (Ihandle *ih, int c)
 {
   if (! selection_locked) return IUP_CONTINUE;
 
-  struct pos p;
+  enum dir d;
 
   switch (c) {
-  case K_UP:
-    prel (&selection_pos, &p, -1, +0);
-    break;
-  case K_LEFT:
-    prel (&selection_pos, &p, +0, -1);
-    break;
-  case K_RIGHT:
-    prel (&selection_pos, &p, +0, +1);
-    break;
-  case K_DOWN:
-    prel (&selection_pos, &p, +1, +0);
-    break;
-  default:
-    return IUP_CONTINUE;
+  case K_UP: d = ABOVE; break;
+  case K_LEFT: d = LEFT; break;
+  case K_RIGHT: d = RIGHT; break;
+  case K_DOWN: d = BELOW; break;
+  default: return IUP_CONTINUE;
   }
 
-  npos (&p, &p);
-
-  if (p.room) {
-    selection_pos = p;
-    mr_scroll_into_view (p.room);
-  }
+  ui_move_locked_place_selection (d);
 
   return IUP_IGNORE;
 }

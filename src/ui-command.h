@@ -76,6 +76,7 @@ void ui_skills (void);
 void ui_change_time (int m);
 void ui_change_kca (int d);
 void ui_change_kcd (int d);
+void ui_home (void);
 
 void ui_load_config (void);
 void ui_mirror_mode (bool mirror);
@@ -93,5 +94,7 @@ void ui_increase_time_frequency (void);
 void ui_toggle_time_frequency_constraint (void);
 void ui_toggle_pause_game (void);
 void ui_next_frame (void);
+
+void ui_move_locked_place_selection (enum dir d);
 
 #endif	/* MININIM_UI_COMMAND_H */

@@ -32,13 +32,13 @@ void gui_set_image (Ihandle *ih, ALLEGRO_BITMAP *b, palette p);
 ALLEGRO_COLOR transp_to_black (ALLEGRO_COLOR c);
 ALLEGRO_COLOR white_to_transp (ALLEGRO_COLOR c);
 void gui_set_stock_image (Ihandle *ih, char *new_image_hname);
-void gui_set_tip (Ihandle *ih, char *new_tip);
 
 int hide_dialog (Ihandle *ih);
 
 bool gui_control_active (Ihandle *ih, bool a);
 bool gui_control_attribute (Ihandle *ih, char *name, char *value);
-bool gui_control_strf_attribute (Ihandle *ih, char *name, char *format, ...)
+bool gui_control_attribute_str (Ihandle *ih, char *name, char *value);
+bool gui_control_attribute_strf (Ihandle *ih, char *name, char *format, ...)
   __attribute__ ((format (printf, 3, 4)));
 
 int gui_default_key_cb (Ihandle *ih, int c);
@@ -50,6 +50,7 @@ int gui_run_callback_IFni (const char *name, Ihandle *ih, int i);
 
 void dialog_fit_natural_size (Ihandle *ih);
 
+void gui_resize_cb (Ihandle *ih, int width, int height);
 int gui_destroy_image_cb (Ihandle *ih);
 
 #endif	/* MININIM_GUI_H */

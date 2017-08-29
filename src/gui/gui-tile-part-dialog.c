@@ -92,6 +92,7 @@ gui_create_tile_part_dialog (Ihandle *parent)
      "SHOW_CB", (Icallback) show_cb,
      "DESTROY_CB", destroy_cb,
      "K_ANY", k_any,
+     "RESIZE_CB", gui_resize_cb,
      "_UPDATE_CB", _update_cb,
      NULL);
 

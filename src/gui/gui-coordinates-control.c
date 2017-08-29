@@ -387,7 +387,7 @@ update_label (Ihandle *ih, int room0, int room1, int room2, int room3)
 void
 update_link (Ihandle *ih, int room)
 {
-  gui_control_strf_attribute (ih, "TITLE", "%2i", room);
+  gui_control_attribute_strf (ih, "TITLE", "%2i", room);
   gui_control_active (ih, room > 0);
 }
 

@@ -357,7 +357,7 @@ ALLEGRO_BITMAP *small_logo_icon,
   *full_screen_icon, *windows_icon, *camera_icon, *play_icon,
   *record_icon, *stop_icon, *eject_icon, *backward_icon,
   *forward_icon, *pause_icon, *previous_icon, *next_icon,
-  *screen_icon, *right_icon, *dungeon_icon,
+  *screen_icon, *start_icon, *dungeon_icon,
   *palace_icon, *green_icon, *gray_icon, *yellow_icon,
   *blue_icon, *black_icon, *vga_icon, *ega_icon, *cga_icon,
   *hgc_icon, *vertical_icon, *horizontal_icon,
@@ -366,11 +366,11 @@ ALLEGRO_BITMAP *small_logo_icon,
   *screensaver_icon, *joystick3_icon, *volume_off_icon,
   *volume_low_icon, *volume_medium_icon, *volume_high_icon,
   *game_icon, *settings_icon, *zoom_none_icon, *zoom_stretch_icon,
-  *zoom_ratio_icon, *vertical_horizontal_icon, *zoom_out_icon,
+  *zoom_ratio_icon, *vh_icon, *zoom_out_icon,
   *zoom_in_icon, *heading_icon, *zoom_icon,
-  *navigation_icon, *nav_room_icon, *nav_cell_icon, *nav_page_icon,
-  *nav_left_icon, *nav_right_icon, *nav_above_icon, *nav_below_icon,
-  *nav_home_icon, *repeat_icon, *compass_icon, *compass2_icon,
+  *navigation_icon, *room_icon, *cell_icon, *page_icon,
+  *l_icon, *r_icon, *a_icon, *b_icon,
+  *home_icon, *repeat_icon, *compass_icon, *compass2_icon,
   *drawing_icon, *first_icon, *last_icon, *jump_icon, *original_icon,
   *guard_icon, *fat_icon, *vizier_icon, *skeleton_icon, *shadow_icon,
   *resurrect_icon, *death_icon, *feather_icon, *angel_icon, *hp_empty_icon,
@@ -439,7 +439,7 @@ load_icons (void)
   previous_icon = load_icon (PREVIOUS_ICON);
   next_icon = load_icon (NEXT_ICON);
   screen_icon = load_icon (SCREEN_ICON);
-  right_icon = load_icon (RIGHT_ICON);
+  start_icon = load_icon (START_ICON);
   dungeon_icon = load_icon (DUNGEON_ICON);
   palace_icon = load_icon (PALACE_ICON);
   green_icon = load_icon (GREEN_ICON);
@@ -472,20 +472,20 @@ load_icons (void)
   zoom_none_icon = load_icon (ZOOM_NONE_ICON);
   zoom_stretch_icon = load_icon (ZOOM_STRETCH_ICON);
   zoom_ratio_icon = load_icon (ZOOM_RATIO_ICON);
-  vertical_horizontal_icon = load_icon (VH_ICON);
+  vh_icon = load_icon (VH_ICON);
   zoom_out_icon = load_icon (ZOOM_OUT_ICON);
   zoom_in_icon = load_icon (ZOOM_IN_ICON);
   heading_icon = load_icon (HEADING_ICON);
   zoom_icon = load_icon (ZOOM_ICON);
   navigation_icon = load_icon (NAVIGATION_ICON);
-  nav_room_icon = load_icon (ROOM_ICON);
-  nav_cell_icon = load_icon (ROW_ICON);
-  nav_page_icon = load_icon (PAGE_ICON);
-  nav_left_icon = load_icon (L_ICON);
-  nav_right_icon = load_icon (R_ICON);
-  nav_above_icon = load_icon (A_ICON);
-  nav_below_icon = load_icon (B_ICON);
-  nav_home_icon = load_icon (NAV_HOME_ICON);
+  room_icon = load_icon (ROOM_ICON);
+  cell_icon = load_icon (ROW_ICON);
+  page_icon = load_icon (PAGE_ICON);
+  l_icon = load_icon (L_ICON);
+  r_icon = load_icon (R_ICON);
+  a_icon = load_icon (A_ICON);
+  b_icon = load_icon (B_ICON);
+  home_icon = load_icon (HOME_ICON);
   repeat_icon = load_icon (REPEAT_ICON);
   compass_icon = load_icon (COMPASS_ICON);
   compass2_icon = load_icon (COMPASS2_ICON);
@@ -551,7 +551,7 @@ unload_icons (void)
   al_destroy_bitmap (previous_icon);
   al_destroy_bitmap (next_icon);
   al_destroy_bitmap (screen_icon);
-  al_destroy_bitmap (right_icon);
+  al_destroy_bitmap (start_icon);
   al_destroy_bitmap (dungeon_icon);
   al_destroy_bitmap (palace_icon);
   al_destroy_bitmap (green_icon);
@@ -584,20 +584,20 @@ unload_icons (void)
   al_destroy_bitmap (zoom_none_icon);
   al_destroy_bitmap (zoom_stretch_icon);
   al_destroy_bitmap (zoom_ratio_icon);
-  al_destroy_bitmap (vertical_horizontal_icon);
+  al_destroy_bitmap (vh_icon);
   al_destroy_bitmap (zoom_out_icon);
   al_destroy_bitmap (zoom_in_icon);
   al_destroy_bitmap (heading_icon);
   al_destroy_bitmap (zoom_icon);
   al_destroy_bitmap (navigation_icon);
-  al_destroy_bitmap (nav_room_icon);
-  al_destroy_bitmap (nav_cell_icon);
-  al_destroy_bitmap (nav_page_icon);
-  al_destroy_bitmap (nav_left_icon);
-  al_destroy_bitmap (nav_right_icon);
-  al_destroy_bitmap (nav_above_icon);
-  al_destroy_bitmap (nav_below_icon);
-  al_destroy_bitmap (nav_home_icon);
+  al_destroy_bitmap (room_icon);
+  al_destroy_bitmap (cell_icon);
+  al_destroy_bitmap (page_icon);
+  al_destroy_bitmap (l_icon);
+  al_destroy_bitmap (r_icon);
+  al_destroy_bitmap (a_icon);
+  al_destroy_bitmap (b_icon);
+  al_destroy_bitmap (home_icon);
   al_destroy_bitmap (repeat_icon);
   al_destroy_bitmap (compass_icon);
   al_destroy_bitmap (compass2_icon);
@@ -1022,7 +1022,7 @@ game_menu (intptr_t index)
 
   menu_ditem ((cutscene || title_demo) && play_time < time_limit,
               &item.main.game.start, &item.main.game.restart, true,
-              right_icon, reload_icon,
+              start_icon, reload_icon,
               "Sta&rt (Enter)", "&Restart (Ctrl+R)");
 
   item.main.game.quit =
@@ -1180,7 +1180,7 @@ void
 zoom_out_menu (intptr_t index)
 {
   item.main.view.zoom.out.both =
-    menu_sitem (true, vertical_horizontal_icon, "&Both (])");
+    menu_sitem (true, vh_icon, "&Both (])");
 
   item.main.view.zoom.out.vertical =
     menu_sitem (true, vertical_icon, "&Vertical (Alt+])");
@@ -1193,7 +1193,7 @@ void
 zoom_in_menu (intptr_t index)
 {
   item.main.view.zoom.in.both =
-    menu_sitem (mr.w > 1 && mr.h > 1, vertical_horizontal_icon,
+    menu_sitem (mr.w > 1 && mr.h > 1, vh_icon,
                 "&Both ([)");
 
   item.main.view.zoom.in.vertical =
@@ -1209,18 +1209,18 @@ navigation_menu (intptr_t index)
   item.main.view.nav.current_room =
     menu_hitem (true, "ROOM %i", mr.room);
 
-  menu_sub (&menu.main.view.nav.select.m, true, nav_room_icon,
+  menu_sub (&menu.main.view.nav.select.m, true, room_icon,
             nav_room_menu, 0, "Room &Selection");
 
-  menu_sub (&menu.main.view.nav.cell.m, true, nav_cell_icon,
+  menu_sub (&menu.main.view.nav.cell.m, true, cell_icon,
             nav_cell_menu, 0, "Scroll &row");
 
-  menu_sub (&menu.main.view.nav.page.m, true, nav_page_icon,
+  menu_sub (&menu.main.view.nav.page.m, true, page_icon,
             nav_page_menu, 0, "Scroll &page");
 
   struct actor *k = get_actor_by_id (current_kid_id);
   item.main.view.nav.home =
-    menu_sitem (k && k->f.c.room != mr.room, nav_home_icon, "&Home (Home)");
+    menu_sitem (k && k->f.c.room != mr.room, home_icon, "&Home (Home)");
 
   item.main.view.nav.center =
     menu_sitem (true, repeat_icon, "Cen&ter (Shift+Home)");
@@ -1237,51 +1237,51 @@ nav_room_menu (intptr_t index)
 {
   item.main.view.nav.select.left =
     menu_sitem (roomd (&global_level, mr.room, LEFT),
-                nav_left_icon, "&Left (H)");
+                l_icon, "&Left (H)");
 
   item.main.view.nav.select.above =
     menu_sitem (roomd (&global_level, mr.room, ABOVE),
-                nav_above_icon, "&Above (U)");
+                a_icon, "&Above (U)");
 
   item.main.view.nav.select.right =
     menu_sitem (roomd (&global_level, mr.room, RIGHT),
-                nav_right_icon, "&Right (J)");
+                r_icon, "&Right (J)");
 
   item.main.view.nav.select.below =
     menu_sitem (roomd (&global_level, mr.room, BELOW),
-                nav_below_icon, "&Below (N)");
+                b_icon, "&Below (N)");
 }
 
 void
 nav_cell_menu (intptr_t index)
 {
   item.main.view.nav.cell.left =
-    menu_sitem (true, nav_left_icon, "&Left (Shift+H)");
+    menu_sitem (true, l_icon, "&Left (Shift+H)");
 
   item.main.view.nav.cell.above =
-    menu_sitem (true, nav_above_icon, "&Above (Shift+U)");
+    menu_sitem (true, a_icon, "&Above (Shift+U)");
 
   item.main.view.nav.cell.right =
-    menu_sitem (true, nav_right_icon, "&Right (Shift+J)");
+    menu_sitem (true, r_icon, "&Right (Shift+J)");
 
   item.main.view.nav.cell.below =
-    menu_sitem (true, nav_below_icon, "&Below (Shift+N)");
+    menu_sitem (true, b_icon, "&Below (Shift+N)");
 }
 
 void
 nav_page_menu (intptr_t index)
 {
   item.main.view.nav.page.left =
-    menu_sitem (true, nav_left_icon, "&Left (Alt+H)");
+    menu_sitem (true, l_icon, "&Left (Alt+H)");
 
   item.main.view.nav.page.above =
-    menu_sitem (true, nav_above_icon, "&Above (Alt+U)");
+    menu_sitem (true, a_icon, "&Above (Alt+U)");
 
   item.main.view.nav.page.right =
-    menu_sitem (true, nav_right_icon, "&Right (Alt+J)");
+    menu_sitem (true, r_icon, "&Right (Alt+J)");
 
   item.main.view.nav.page.below =
-    menu_sitem (true, nav_below_icon, "&Below (Alt+N)");
+    menu_sitem (true, b_icon, "&Below (Alt+N)");
 }
 
 ALLEGRO_BITMAP *
@@ -1403,7 +1403,7 @@ flip_screen_icon (int flags)
   case ALLEGRO_FLIP_VERTICAL: return vertical_icon;
   case ALLEGRO_FLIP_HORIZONTAL: return horizontal_icon;
   case ALLEGRO_FLIP_VERTICAL | ALLEGRO_FLIP_HORIZONTAL:
-    return vertical_horizontal_icon;
+    return vh_icon;
   default: assert (false); return NULL;
   }
 }
@@ -1465,7 +1465,7 @@ flip_gamepad_icon (bool v, bool h)
   if (! v && ! h) return joystick3_icon;
   else if (v && ! h) return vertical_icon;
   else if (! v && h) return horizontal_icon;
-  else if (v && h) return vertical_horizontal_icon;
+  else if (v && h) return vh_icon;
   else assert (false);
   return NULL;
 }
@@ -1579,7 +1579,7 @@ void
 replay_favorite_item_menu (intptr_t index)
 {
   /* GO_TO_REPLAY_FAVORITE */
-  menu_sitem (true, right_icon, "&Go");
+  menu_sitem (true, start_icon, "&Go");
   /* REPLACE_REPLAY_FAVORITE */
   menu_sitem (! title_demo && replay_mode == PLAY_REPLAY,
               jump_icon, "&Replace");
@@ -1903,7 +1903,7 @@ process_main_menu_event (ALLEGRO_EVENT *event)
     ui_screenshot ();
   else if (id == item.main.view.zoom.reset) {
     ui_zoom_fit (MR_FIT_NONE);
-    ui_set_multi_room (2 - mr.w, 2 - mr.h, false);
+    ui_set_multi_room (1 - mr.w, 1 - mr.h, false);
   } else if (id == item.main.view.zoom.fit.none)
     ui_zoom_fit (MR_FIT_NONE);
   else if (id == item.main.view.zoom.fit.stretch)
@@ -1925,7 +1925,7 @@ process_main_menu_event (ALLEGRO_EVENT *event)
   else if (id == item.main.view.nav.current_room)
     mr.select_cycles = SELECT_CYCLES;
   else if (id == item.main.view.nav.home)
-    mr_focus_room (get_actor_by_id (current_kid_id)->f.c.room);
+    ui_home ();
   else if (id == item.main.view.nav.center)
     mr_center_room (mr.room);
   else if (id == item.main.view.nav.coord)

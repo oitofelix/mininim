@@ -550,8 +550,10 @@ draw_room_actor_front_sub (ALLEGRO_BITMAP *bitmap, struct actor *a)
 
     push_drawn_rectangle (bitmap);
 
+    tile_caching = true;
     draw_tile_fg (bitmap, &ptl2);
     draw_tile_fg (bitmap, &ptr);
+    tile_caching = false;
 
     redraw_drawn_rectangle (pop_drawn_rectangle (), &ptl2);
 

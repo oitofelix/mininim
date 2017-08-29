@@ -27,8 +27,10 @@ gui_create_directional_control (char *title, char *c_image_hname,
 {
   Ihandle *ih, *vbox;
 
-  Ihandle *c_label, *l_button, *r_button, *a_button, *b_button,
+  Ihandle *c_button, *l_button, *r_button, *a_button, *b_button,
     *al_button, *ar_button, *bl_button, *br_button;
+
+  Ihandle *radio, *h_toggle, *v_toggle;
 
   ih = IupFrame
     (vbox = IupSetAttributes
@@ -60,9 +62,13 @@ gui_create_directional_control (char *title, char *c_image_hname,
            "IMAGE = L_ICON"),
           "ACTION", action_cb,
           NULL),
-         c_label = IupSetAttributes
-         (IupLabel (NULL),
-          "ALIGNMENT = ACENTER:ACENTER"),
+         c_button = IupSetCallbacks
+         (IupSetAttributes
+          (IupButton (NULL, NULL),
+           "ALIGNMENT = ACENTER:ACENTER,"
+           "FLAT = YES,"),
+          "ACTION", action_cb,
+          NULL),
          r_button = IupSetCallbacks
          (IupSetAttributes
           (IupButton (NULL, NULL),
@@ -96,22 +102,38 @@ gui_create_directional_control (char *title, char *c_image_hname,
         "ALIGNMENTLIN = ACENTER,"
         "ALIGNMENTCOL = ACENTER,"
         ),
+
+       radio = IupRadio
+       (IupHbox
+        (v_toggle = IupSetAttributes
+         (IupToggle ("V", NULL),
+          "TIP = \"Vertical first\""),
+         h_toggle = IupSetAttributes
+         (IupToggle ("H", NULL),
+          "TIP = \"Horizontal first\""),
+         NULL)),
+
        IupFill (),
        NULL),
       "ALIGNMENT = ACENTER"));
 
   IupSetAttribute (ih, "TITLE", title);
-  IupSetAttribute (c_label, "IMAGE", c_image_hname);
+  IupSetAttribute (c_button, "IMAGE", c_image_hname);
   IupSetAttribute (vbox, "NORMALIZERGROUP", norm_group);
 
   IupSetAttribute (ih, "_AL_BUTTON", (void *) al_button);
   IupSetAttribute (ih, "_A_BUTTON", (void *) a_button);
   IupSetAttribute (ih, "_AR_BUTTON", (void *) ar_button);
   IupSetAttribute (ih, "_L_BUTTON", (void *) l_button);
+  IupSetAttribute (ih, "_C_BUTTON", (void *) c_button);
   IupSetAttribute (ih, "_R_BUTTON", (void *) r_button);
   IupSetAttribute (ih, "_BL_BUTTON", (void *) bl_button);
   IupSetAttribute (ih, "_B_BUTTON", (void *) b_button);
   IupSetAttribute (ih, "_BR_BUTTON", (void *) br_button);
+
+  IupSetAttribute (ih, "_RADIO", (void *) radio);
+  IupSetAttribute (ih, "_V_TOGGLE", (void *) v_toggle);
+  IupSetAttribute (ih, "_H_TOGGLE", (void *) h_toggle);
 
   return ih;
 }

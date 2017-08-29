@@ -109,13 +109,13 @@ gui_create_tile_transform_control (struct pos *p, char *norm_group)
          (IupHbox
           (place_toggle = IupSetAttributes
            (IupToggle ("P", NULL),
-            "TIP = \"Place transforming scope\""),
+            "TIP = \"Place scope\""),
            room_toggle = IupSetAttributes
            (IupToggle ("R", NULL),
-            "TIP = \"Room transforming scope\""),
+            "TIP = \"Room scope\""),
            level_toggle = IupSetAttributes
            (IupToggle ("L", NULL),
-            "TIP = \"Level transforming scope\""),
+            "TIP = \"Level scope\""),
            NULL)),
 
          IupFill (),

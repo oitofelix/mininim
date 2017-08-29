@@ -814,6 +814,13 @@ ui_change_kcd (int d)
      next_multiple (k->skill.counter_defense_prob + 1, d) - 1);
 }
 
+void
+ui_home (void)
+{
+  mr_focus_room (get_actor_by_id (current_kid_id)->f.c.room);
+}
+
+
 
 
 
@@ -1155,4 +1162,38 @@ display_skill (struct actor *k)
     ui_msg (1, "KCA%i KCD%i",
             k->skill.counter_attack_prob + 1,
             k->skill.counter_defense_prob + 1);
+}
+
+
+
+
+void
+ui_move_locked_place_selection (enum dir d)
+{
+  if (! selection_locked) return;
+
+  struct pos p;
+
+  switch (d) {
+  case ABOVE:
+    prel (&selection_pos, &p, -1, +0);
+    break;
+  case LEFT:
+    prel (&selection_pos, &p, +0, -1);
+    break;
+  case RIGHT:
+    prel (&selection_pos, &p, +0, +1);
+    break;
+  case BELOW:
+    prel (&selection_pos, &p, +1, +0);
+    break;
+  default: assert (false);
+  }
+
+  npos (&p, &p);
+
+  if (p.room) {
+    selection_pos = p;
+    mr_scroll_into_view (p.room);
+  }
 }

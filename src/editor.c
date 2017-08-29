@@ -424,7 +424,7 @@ editor (void)
       break;
     case '+':
       register_tile_undo (&undo, &p,
-                         fake (&p), MIGNORE, MIGNORE, fg (&p),
+                          fake (&p), MIGNORE, MIGNORE, fg (&p),
                           NULL, (intptr_t) "FG<->FAKE", "FG<->FAKE");
       break;
     case 'I': edit = EDIT_NOMINAL_INFO; break;

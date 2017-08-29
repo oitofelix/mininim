@@ -120,6 +120,7 @@ load_icons (void)
   LOAD_ICON (REDO_ICON);
   LOAD_ICON (FULL_SCREEN_ICON);
   LOAD_ICON (WINDOWS_ICON);
+  LOAD_ICON (HOME_ICON);
 }
 
 void
@@ -163,6 +164,7 @@ unload_icons (void)
   UNLOAD_ICON (REDO_ICON);
   UNLOAD_ICON (FULLSCREEN_ICON);
   UNLOAD_ICON (WINDOWS_ICON);
+  UNLOAD_ICON (HOME_ICON);
 }
 
 void
@@ -248,14 +250,6 @@ gui_set_stock_image (Ihandle *ih, char *new_image_hname)
   IupSetAttribute (ih, "IMAGE", new_image_hname);
 }
 
-void
-gui_set_tip (Ihandle *ih, char *new_tip)
-{
-  char *old_tip = IupGetAttribute (ih, "TIP");
-  if (new_tip == old_tip) return;
-  IupSetAttribute (ih, "TIP", new_tip);
-}
-
 ALLEGRO_COLOR
 transp_to_black (ALLEGRO_COLOR c)
 {
@@ -301,13 +295,22 @@ bool
 gui_control_attribute (Ihandle *ih, char *name, char *value)
 {
   char *old_value = IupGetAttribute (ih, name);
+  if (old_value == value) return false;
+  IupSetAttribute (ih, name, value);
+  return true;
+}
+
+bool
+gui_control_attribute_str (Ihandle *ih, char *name, char *value)
+{
+  char *old_value = IupGetAttribute (ih, name);
   if (! strcmp (old_value, value)) return false;
   IupSetAttribute (ih, name, value);
   return true;
 }
 
 bool
-gui_control_strf_attribute (Ihandle *ih, char *name, char *format, ...)
+gui_control_attribute_strf (Ihandle *ih, char *name, char *format, ...)
 {
   bool r = false;
   va_list ap;
@@ -376,8 +379,15 @@ dialog_fit_natural_size (Ihandle *ih)
 #if WINDOWS_PORT
   IupSetAttribute (ih, "RESIZE", "NO");
 #else
-  IupSetAttribute (ih, "MAXSIZE", size);
+  /* IupSetAttribute (ih, "MAXSIZE", size); */
 #endif
+}
+
+void
+gui_resize_cb (Ihandle *ih, int width, int height)
+{
+  IupSetAttribute (ih, "RASTERSIZE", NULL);
+  IupRefresh (ih);
 }
 
 int
