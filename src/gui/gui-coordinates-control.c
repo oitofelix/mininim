@@ -321,57 +321,39 @@ _update_cb (Ihandle *ih)
   Ihandle *lb_link = (void *) IupGetAttribute (ih, "_LB_LINK");
   Ihandle *rb_link = (void *) IupGetAttribute (ih, "_RB_LINK");
 
-  int s = mr.room;
-  int l = roomd (level, s, LEFT);
-  int r = roomd (level, s, RIGHT);
-  int a = roomd (level, s, ABOVE);
-  int b = roomd (level, s, BELOW);
+  struct link_survey ls;
+  link_survey (&ls, level, mr.room);
 
-  int lr = roomd (level, l, RIGHT);
-  int rl = roomd (level, r, LEFT);
-  int ab = roomd (level, a, BELOW);
-  int ba = roomd (level, b, ABOVE);
+  update_label (l_label, ls.s, ls.l, ls.s, ls.lr);
+  update_label (r_label, ls.s, ls.r, ls.s, ls.rl);
+  update_label (a_label, ls.s, ls.a, ls.s, ls.ab);
+  update_label (b_label, ls.s, ls.b, ls.s, ls.ba);
 
-  int al = roomd (level, a, LEFT);
-  int ar = roomd (level, a, RIGHT);
-  int bl = roomd (level, b, LEFT);
-  int br = roomd (level, b, RIGHT);
+  update_link (s_link, ls.s);
+  update_link (l_link, ls.l);
+  update_link (r_link, ls.r);
+  update_link (a_link, ls.a);
+  update_link (b_link, ls.b);
 
-  int la = roomd (level, l, ABOVE);
-  int ra = roomd (level, r, ABOVE);
-  int lb = roomd (level, l, BELOW);
-  int rb = roomd (level, r, BELOW);
+  update_label (al_label, ls.a, ls.l, ls.al, ls.la);
+  update_label (ar_label, ls.a, ls.r, ls.ar, ls.ra);
+  update_label (bl_label, ls.b, ls.l, ls.bl, ls.lb);
+  update_label (br_label, ls.b, ls.r, ls.br, ls.rb);
 
-  update_label (l_label, s, l, s, lr);
-  update_label (r_label, s, r, s, rl);
-  update_label (a_label, s, a, s, ab);
-  update_label (b_label, s, b, s, ba);
+  update_link (al_link, ls.al);
+  update_link (ar_link, ls.ar);
+  update_link (bl_link, ls.bl);
+  update_link (br_link, ls.br);
 
-  update_link (s_link, s);
-  update_link (l_link, l);
-  update_link (r_link, r);
-  update_link (a_link, a);
-  update_link (b_link, b);
+  update_label (la_label, ls.l, ls.a, ls.la, ls.al);
+  update_label (ra_label, ls.r, ls.a, ls.ra, ls.ar);
+  update_label (lb_label, ls.l, ls.b, ls.lb, ls.bl);
+  update_label (rb_label, ls.r, ls.b, ls.rb, ls.br);
 
-  update_label (al_label, a, l, al, la);
-  update_label (ar_label, a, r, ar, ra);
-  update_label (bl_label, b, l, bl, lb);
-  update_label (br_label, b, r, br, rb);
-
-  update_link (al_link, al);
-  update_link (ar_link, ar);
-  update_link (bl_link, bl);
-  update_link (br_link, br);
-
-  update_label (la_label, l, a, la, al);
-  update_label (ra_label, r, a, ra, ar);
-  update_label (lb_label, l, b, lb, bl);
-  update_label (rb_label, r, b, rb, br);
-
-  update_link (la_link, la);
-  update_link (ra_link, ra);
-  update_link (lb_link, lb);
-  update_link (rb_link, rb);
+  update_link (la_link, ls.la);
+  update_link (ra_link, ls.ra);
+  update_link (lb_link, ls.lb);
+  update_link (rb_link, ls.rb);
 
   return IUP_DEFAULT;
 }

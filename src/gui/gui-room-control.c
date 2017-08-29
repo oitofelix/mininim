@@ -1,5 +1,5 @@
 /*
-  gui-place-control.c -- GUI place control module;
+  gui-room-control.c -- GUI room control module;
 
   Copyright (C) 2015, 2016, 2017 Bruno Félix Rezende Ribeiro
   <oitofelix@gnu.org>
@@ -25,18 +25,16 @@ static int _update_cb (Ihandle *ih);
 
 
 Ihandle *
-gui_create_place_control (struct pos *p, char *norm_group)
+gui_create_room_control (char *norm_group)
 {
   Ihandle *ih = IupSetCallbacks
     (gui_create_directional_control
-     ("Place", "PLACE_ICON", button_action_cb, norm_group),
+     ("Room", "ROOM_ICON", button_action_cb, norm_group),
      "_UPDATE_CB", _update_cb,
      NULL);
 
-  IupSetAttribute (ih, "_POS", (void *) p);
-
   Ihandle *c_button = (void *) IupGetAttribute (ih, "_C_BUTTON");
-  IupSetAttribute (c_button, "TIP", "Place kid at selection");
+  IupSetAttribute (c_button, "TIP", "Center view");
 
   return ih;
 }
@@ -45,9 +43,6 @@ int
 _update_cb (Ihandle *ih)
 {
   if (! IupGetInt (ih, "VISIBLE")) return IUP_DEFAULT;
-
-  gui_control_active (ih, selection_locked);
-  if (! selection_locked) return IUP_DEFAULT;
 
   Ihandle *l_button = (void *) IupGetAttribute (ih, "_L_BUTTON");
   Ihandle *r_button = (void *) IupGetAttribute (ih, "_R_BUTTON");
@@ -64,26 +59,24 @@ _update_cb (Ihandle *ih)
   Ihandle *v_toggle = (void *) IupGetAttribute (ih, "_V_TOGGLE");
   Ihandle *h_toggle = (void *) IupGetAttribute (ih, "_H_TOGGLE");
 
-  struct pos *p = (void *) IupGetAttribute (ih, "_POS");
+  struct link_survey ls;
+  link_survey (&ls, &global_level, mr.room);
 
-  struct pos_survey ps;
-  pos_survey (&ps, p);
-
-  gui_control_active (l_button, ps.l.room);
-  gui_control_active (r_button, ps.r.room);
-  gui_control_active (a_button, ps.a.room);
-  gui_control_active (b_button, ps.b.room);
+  gui_control_active (l_button, ls.l);
+  gui_control_active (r_button, ls.r);
+  gui_control_active (a_button, ls.a);
+  gui_control_active (b_button, ls.b);
 
   if (selected == v_toggle) {
-    gui_control_active (al_button, ps.al.room);
-    gui_control_active (ar_button, ps.ar.room);
-    gui_control_active (bl_button, ps.bl.room);
-    gui_control_active (br_button, ps.br.room);
+    gui_control_active (al_button, ls.al);
+    gui_control_active (ar_button, ls.ar);
+    gui_control_active (bl_button, ls.bl);
+    gui_control_active (br_button, ls.br);
   } else if (selected == h_toggle) {
-    gui_control_active (al_button, ps.la.room);
-    gui_control_active (ar_button, ps.ra.room);
-    gui_control_active (bl_button, ps.lb.room);
-    gui_control_active (br_button, ps.rb.room);
+    gui_control_active (al_button, ls.la);
+    gui_control_active (ar_button, ls.ra);
+    gui_control_active (bl_button, ls.lb);
+    gui_control_active (br_button, ls.rb);
   }
 
   return IUP_DEFAULT;
@@ -109,44 +102,42 @@ button_action_cb (Ihandle *ih)
   Ihandle *v_toggle = (void *) IupGetAttribute (ih, "_V_TOGGLE");
   Ihandle *h_toggle = (void *) IupGetAttribute (ih, "_H_TOGGLE");
 
-  struct pos *p = (void *) IupGetAttribute (ih, "_POS");
-
-  if (ih == c_button) ui_place_kid (get_actor_by_id (current_kid_id), p);
-  else if (ih == l_button) ui_move_locked_place_selection (LEFT);
-  else if (ih == r_button) ui_move_locked_place_selection (RIGHT);
-  else if (ih == a_button) ui_move_locked_place_selection (ABOVE);
-  else if (ih == b_button) ui_move_locked_place_selection (BELOW);
+  if (ih == c_button) mr_center_room (mr.room);
+  else if (ih == l_button) mr_select_trans (LEFT);
+  else if (ih == r_button) mr_select_trans (RIGHT);
+  else if (ih == a_button) mr_select_trans (ABOVE);
+  else if (ih == b_button) mr_select_trans (BELOW);
   else if (ih == al_button) {
     if (selected == v_toggle) {
-      ui_move_locked_place_selection (ABOVE);
-      ui_move_locked_place_selection (LEFT);
+      mr_select_trans (ABOVE);
+      mr_select_trans (LEFT);
     } else if (selected == h_toggle) {
-      ui_move_locked_place_selection (LEFT);
-      ui_move_locked_place_selection (ABOVE);
+      mr_select_trans (LEFT);
+      mr_select_trans (ABOVE);
     }
   } else if (ih == ar_button) {
     if (selected == v_toggle) {
-      ui_move_locked_place_selection (ABOVE);
-      ui_move_locked_place_selection (RIGHT);
+      mr_select_trans (ABOVE);
+      mr_select_trans (RIGHT);
     } else if (selected == h_toggle) {
-      ui_move_locked_place_selection (RIGHT);
-      ui_move_locked_place_selection (ABOVE);
+      mr_select_trans (RIGHT);
+      mr_select_trans (ABOVE);
     }
   } else if (ih == bl_button) {
     if (selected == v_toggle) {
-      ui_move_locked_place_selection (BELOW);
-      ui_move_locked_place_selection (LEFT);
+      mr_select_trans (BELOW);
+      mr_select_trans (LEFT);
     } else if (selected == h_toggle) {
-      ui_move_locked_place_selection (LEFT);
-      ui_move_locked_place_selection (BELOW);
+      mr_select_trans (LEFT);
+      mr_select_trans (BELOW);
     }
   } else if (ih == br_button) {
     if (selected == v_toggle) {
-      ui_move_locked_place_selection (BELOW);
-      ui_move_locked_place_selection (RIGHT);
+      mr_select_trans (BELOW);
+      mr_select_trans (RIGHT);
     } else if (selected == h_toggle) {
-      ui_move_locked_place_selection (RIGHT);
-      ui_move_locked_place_selection (BELOW);
+      mr_select_trans (RIGHT);
+      mr_select_trans (BELOW);
     }
   }
 

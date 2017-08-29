@@ -1206,6 +1206,57 @@ surveyo (coord_f cf, lua_Number dx, lua_Number dy, pos_f pf, struct frame *f,
   npos (pf (c, p), np);
 }
 
+struct link_survey *
+link_survey (struct link_survey *ls, struct level *level, int room)
+{
+  ls->s = room;
+
+  ls->l = roomd (level, ls->s, LEFT);
+  ls->r = roomd (level, ls->s, RIGHT);
+  ls->a = roomd (level, ls->s, ABOVE);
+  ls->b = roomd (level, ls->s, BELOW);
+
+  ls->lr = roomd (level, ls->l, RIGHT);
+  ls->rl = roomd (level, ls->r, LEFT);
+  ls->ab = roomd (level, ls->a, BELOW);
+  ls->ba = roomd (level, ls->b, ABOVE);
+
+  ls->al = roomd (level, ls->a, LEFT);
+  ls->ar = roomd (level, ls->a, RIGHT);
+  ls->bl = roomd (level, ls->b, LEFT);
+  ls->br = roomd (level, ls->b, RIGHT);
+
+  ls->la = roomd (level, ls->l, ABOVE);
+  ls->ra = roomd (level, ls->r, ABOVE);
+  ls->lb = roomd (level, ls->l, BELOW);
+  ls->rb = roomd (level, ls->r, BELOW);
+
+  return ls;
+}
+
+struct pos_survey *
+pos_survey (struct pos_survey *ps, struct pos *p)
+{
+  npos (p, &ps->s);
+
+  prel (p, &ps->l, +0, -1); npos (&ps->l, &ps->l);
+  prel (p, &ps->r, +0, +1); npos (&ps->r, &ps->r);
+  prel (p, &ps->a, -1, +0); npos (&ps->a, &ps->a);
+  prel (p, &ps->b, +1, +0); npos (&ps->b, &ps->b);
+
+  prel (&ps->a, &ps->al, +0, -1); npos (&ps->al, &ps->al);
+  prel (&ps->a, &ps->ar, +0, +1); npos (&ps->ar, &ps->ar);
+  prel (&ps->b, &ps->bl, +0, -1); npos (&ps->bl, &ps->bl);
+  prel (&ps->b, &ps->br, +0, +1); npos (&ps->br, &ps->br);
+
+  prel (&ps->l, &ps->la, -1, +0); npos (&ps->la, &ps->la);
+  prel (&ps->l, &ps->lb, +1, +0); npos (&ps->lb, &ps->lb);
+  prel (&ps->r, &ps->ra, -1, +0); npos (&ps->ra, &ps->ra);
+  prel (&ps->r, &ps->rb, +1, +0); npos (&ps->rb, &ps->rb);
+
+  return ps;
+}
+
 bool
 is_pixel_transparent (ALLEGRO_BITMAP *bitmap, int x, int y)
 {

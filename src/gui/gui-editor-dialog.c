@@ -77,10 +77,9 @@ gui_create_editor_dialog (void)
 
               IupFill (),
 
-              /* ACITION (center button): center view on current
-                 room */
-              gui_create_directional_control
-              ("Room", "ROOM_ICON", NULL, NULL),
+              IupSetAttributes
+              (gui_create_room_control (NULL),
+               "NAME = ROOM_CONTROL"),
 
               IupFill (),
 
@@ -307,6 +306,9 @@ show_cb (Ihandle *ih, int state)
     ("SHOW_CB", IupGetDialogChild (ih, "PLACE_CONTROL"), state);
 
   gui_run_callback_IFni
+    ("SHOW_CB", IupGetDialogChild (ih, "ROOM_CONTROL"), state);
+
+  gui_run_callback_IFni
     ("SHOW_CB", IupGetDialogChild (ih, "TILE_FG_CONTROL"), state);
   gui_run_callback_IFni
     ("SHOW_CB", IupGetDialogChild (ih, "TILE_BG_CONTROL"), state);
@@ -357,6 +359,9 @@ _update_cb (Ihandle *ih)
 
   gui_run_callback_IFn
     ("_UPDATE_CB", IupGetDialogChild (ih, "PLACE_CONTROL"));
+
+  gui_run_callback_IFn
+    ("_UPDATE_CB", IupGetDialogChild (ih, "ROOM_CONTROL"));
 
   gui_run_callback_IFn
     ("_UPDATE_CB", IupGetDialogChild (ih, "TILE_FG_CONTROL"));

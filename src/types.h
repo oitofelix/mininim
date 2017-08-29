@@ -123,6 +123,21 @@ struct clipping_rectangle {
   int x, y, w, h;
 };
 
+struct link_survey {
+  int s;
+  int l, r, a, b;
+  int lr, rl, ab, ba;
+  int al, ar, bl, br;
+  int la, ra, lb, rb;
+};
+
+struct pos_survey {
+  struct pos s;
+  struct pos l, r, a, b;
+  struct pos al, ar, bl, br;
+  struct pos la, lb, ra, rb;
+};
+
 enum edit {
   EDIT_NONE, EDIT_MAIN, EDIT_TILE, EDIT_FG, EDIT_FLOOR, EDIT_PILLAR,
   EDIT_DOOR, EDIT_CARPET, EDIT_ARCH, EDIT_BG, EDIT_EXT,

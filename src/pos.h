@@ -115,6 +115,10 @@ void
 surveyo (coord_f cf, lua_Number dx, lua_Number dy, pos_f pf, struct frame *f,
          struct coord *c, struct pos *p, struct pos *np);
 
+struct link_survey *link_survey (struct link_survey *ls, struct level *level,
+                                 int room);
+struct pos_survey *pos_survey (struct pos_survey *ps, struct pos *p);
+
 bool is_pixel_transparent (ALLEGRO_BITMAP *bitmap, int x, int y);
 int compare_bitmap_rcoords (const void *_c0, const void *_c1);
 struct bitmap_rcoord *get_cached_bitmap_rcoord (ALLEGRO_BITMAP *b,
