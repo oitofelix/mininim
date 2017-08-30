@@ -118,6 +118,7 @@ int
 destroy_cb (Ihandle *ih)
 {
   struct last *last = (void *) IupGetAttribute (ih, "_LAST");
+  al_free (last->desc);
   al_free (last);
   return IUP_DEFAULT;
 }
@@ -139,8 +140,6 @@ _update_cb (Ihandle *ih)
 
   if (last->count != undo->count
       || last->current != undo->current
-      || (undo->current >= 0
-          && last->desc != undo->pass[undo->current].desc)
       || (undo->current >= 0 && last->desc && undo->pass[undo->current].desc
           && strcmp (last->desc, undo->pass[undo->current].desc)))
     update (ih);
@@ -155,7 +154,9 @@ update (Ihandle *ih)
   struct last *last = (void *) IupGetAttribute (ih, "_LAST");
   last->current = undo->current;
   last->count = undo->count;
-  if (undo->current >= 0) last->desc = undo->pass[undo->current].desc;
+  al_free (last->desc);
+  if (undo->current >= 0)
+    last->desc = xasprintf ("%s", undo->pass[undo->current].desc);
   else last->desc = NULL;
 
   Ihandle *list = (void *) IupGetAttribute (ih, "_LIST");
@@ -167,6 +168,8 @@ update (Ihandle *ih)
       if (i == undo->current)
         IupSetInt (list, "VALUE", IupGetInt (list, "COUNT"));
     }
+
+  IupUpdate (list);
 }
 
 int

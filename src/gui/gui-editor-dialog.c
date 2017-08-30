@@ -83,13 +83,15 @@ gui_create_editor_dialog (void)
 
               IupFill (),
 
-              gui_create_directional_control
-              ("Row", "ROW_ICON", NULL, NULL),
+              IupSetAttributes
+              (gui_create_row_control (NULL),
+               "NAME = ROW_CONTROL"),
 
               IupFill (),
 
-              gui_create_directional_control
-              ("Page", "PAGE_ICON", NULL, NULL),
+              IupSetAttributes
+              (gui_create_page_control (NULL),
+               "NAME = PAGE_CONTROL"),
 
               NULL),
              "ALIGNMENT = ACENTER"),
@@ -309,6 +311,12 @@ show_cb (Ihandle *ih, int state)
     ("SHOW_CB", IupGetDialogChild (ih, "ROOM_CONTROL"), state);
 
   gui_run_callback_IFni
+    ("SHOW_CB", IupGetDialogChild (ih, "ROW_CONTROL"), state);
+
+  gui_run_callback_IFni
+    ("SHOW_CB", IupGetDialogChild (ih, "PAGE_CONTROL"), state);
+
+  gui_run_callback_IFni
     ("SHOW_CB", IupGetDialogChild (ih, "TILE_FG_CONTROL"), state);
   gui_run_callback_IFni
     ("SHOW_CB", IupGetDialogChild (ih, "TILE_BG_CONTROL"), state);
@@ -362,6 +370,12 @@ _update_cb (Ihandle *ih)
 
   gui_run_callback_IFn
     ("_UPDATE_CB", IupGetDialogChild (ih, "ROOM_CONTROL"));
+
+  gui_run_callback_IFn
+    ("_UPDATE_CB", IupGetDialogChild (ih, "ROW_CONTROL"));
+
+  gui_run_callback_IFn
+    ("_UPDATE_CB", IupGetDialogChild (ih, "PAGE_CONTROL"));
 
   gui_run_callback_IFn
     ("_UPDATE_CB", IupGetDialogChild (ih, "TILE_FG_CONTROL"));

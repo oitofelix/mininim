@@ -1809,7 +1809,7 @@ function video.KID.HANG.FREE_FALL:rect (a)
 end
 
 function video.KID.HANG.FREE_FALL_FRONT:rect (a)
-   local dx = a.direction == "LEFT" and -6 or 28
+   local dx = a.direction == "LEFT" and -6 or 32
    local dy = 12
    return offset (dx, dy)
 end

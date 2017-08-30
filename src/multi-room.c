@@ -451,7 +451,7 @@ mr_focus_mouse (void)
 }
 
 void
-mr_select_trans (enum dir d)
+mr_room_trans (enum dir d)
 {
   int dx = +0, dy = +0;
   switch (d) {
@@ -471,80 +471,41 @@ mr_select_trans (enum dir d)
 }
 
 void
-mr_view_trans (enum dir d)
+mr_row_trans (enum dir d)
 {
-  int x, y, dx = +0, dy = +0;
+  int dx = +0, dy = +0, r;
 
   mr.select_cycles = SELECT_CYCLES;
-
-  struct mr_origin o;
-  mr_save_origin (&o);
-
-  for (y = mr.h - 1; y >= 0; y--)
-    for (x = 0; x < mr.w; x++) {
-      int r = mr.cell[x][y].room;
-      if (r <= 0) continue;
-      r = roomd (&global_level, r, d);
-      if (r) {
-        mr_set_origin (r, x, y);
-        mr_stabilize_origin (&o);
-        return;
-      }
-    }
 
   switch (d) {
   case RIGHT:
     if (mr.x > 0) dx = -1;
+    r = roomd (&global_level, mr.room, RIGHT);
     break;
   case LEFT:
     if (mr.x < mr.w - 1) dx = +1;
+    r = roomd (&global_level, mr.room, LEFT);
     break;
   case BELOW:
     if (mr.y > 0) dy = -1;
+    r = roomd (&global_level, mr.room, BELOW);
     break;
   case ABOVE:
     if (mr.y < mr.h - 1) dy = +1;
+    r = roomd (&global_level, mr.room, ABOVE);
     break;
   }
 
+  if (! dx && ! dy && r) mr.room = r;
+
   mr_set_origin (mr.room, mr.x + dx, mr.y + dy);
-  mr_stabilize_origin (&o);
 }
 
 void
-mr_view_page_trans (enum dir d)
+mr_page_trans (enum dir d)
 {
-  int x, y;
-
-  mr.select_cycles = SELECT_CYCLES;
-
-  struct mr_origin o;
-  mr_save_origin (&o);
-
-  switch (d) {
-  case RIGHT:
-    mr_rightmost_cell (&x, &y);
-    mr_set_origin (mr.cell[x][y].room, 0, y);
-    mr_view_trans (RIGHT);
-    break;
-  case LEFT:
-    mr_leftmost_cell (&x, &y);
-    mr_set_origin (mr.cell[x][y].room, mr.w - 1, y);
-    mr_view_trans (LEFT);
-    break;
-  case BELOW:
-    mr_bottommost_cell (&x, &y);
-    mr_set_origin (mr.cell[x][y].room, x, 0);
-    mr_view_trans (BELOW);
-    break;
-  case ABOVE:
-    mr_topmost_cell (&x, &y);
-    mr_set_origin (mr.cell[x][y].room, x, mr.h - 1);
-    mr_view_trans (ABOVE);
-    break;
-  }
-
-  mr_stabilize_origin (&o);
+  int n = (d == LEFT || d == RIGHT) ? mr.w : mr.h;
+  for (int i = 0; i < n; i++) mr_row_trans (d);
 }
 
 void
@@ -561,7 +522,7 @@ mr_scroll_into_view (int room)
     struct mr_origin a, b;
     do {
       mr_save_origin (&a);
-      mr_view_trans (dir);
+      mr_row_trans (dir);
       mr_save_origin (&b);
       if (is_room_visible (a.room))
         mr_focus_room (a.room);

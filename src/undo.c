@@ -155,7 +155,9 @@ register_tile_undo (struct undo *u, struct pos *p,
       && prev_data
       && u->pass[u->current].f == (undo_f) tile_undo
       && prev_data->ignore_id == ignore_id
-      && peq (&prev_data->p, p)) {
+      && peq (&prev_data->p, p)
+      && u->pass[u->current].desc
+      && desc) {
     tile_undo_ignore_state = true;
     undo_pass (u, -1, NULL);
     free_undo_tail (u);

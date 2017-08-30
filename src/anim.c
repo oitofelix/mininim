@@ -333,10 +333,10 @@ play_anim (anim_callback_t draw_callback,
       if (flip_gamepad_vertical) dz *= -1;
       if (flip_gamepad_horizontal) dw *= -1;
 
-      if (dz < 0) while (dz++ < 0) mr_view_trans (BELOW);
-      else if (dz > 0) while (dz-- > 0) mr_view_trans (ABOVE);
-      if (dw < 0) while (dw++ < 0) mr_view_trans (LEFT);
-      else if (dw > 0) while (dw-- > 0) mr_view_trans (RIGHT);
+      if (dz < 0) while (dz++ < 0) mr_row_trans (BELOW);
+      else if (dz > 0) while (dz-- > 0) mr_row_trans (ABOVE);
+      if (dw < 0) while (dw++ < 0) mr_row_trans (LEFT);
+      else if (dw > 0) while (dw-- > 0) mr_row_trans (RIGHT);
 
       break;
 

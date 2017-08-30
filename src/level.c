@@ -759,11 +759,11 @@ compute_level (void)
       && (ke = get_reciprocal_enemy (k))
       && ! is_room_visible (ke->f.c.room)) {
     if (ke->f.c.room == roomd (&global_level, k->f.c.room, LEFT)) {
-      mr_view_trans (LEFT);
+      mr_row_trans (LEFT);
       mr_focus_room (k->f.c.room);
       mr.room_select = ke->f.c.room;
     } else if (ke->f.c.room == roomd (&global_level, k->f.c.room, RIGHT)) {
-      mr_view_trans (RIGHT);
+      mr_row_trans (RIGHT);
       mr_focus_room (k->f.c.room);
       mr.room_select = ke->f.c.room;
     }

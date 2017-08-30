@@ -260,7 +260,45 @@ button_action_cb (Ihandle *ih)
       }
     }
   } else if (h) {
-
+    if (place) {
+      reflect_pos_h (p, &p0);
+      register_mirror_pos_undo (&undo, p, &p0, true, "MIRROR TILE H.");
+    } else if (room) {
+      if (tiles && links) {
+        register_h_room_mirror_tile_undo (&undo, p->room, NULL);
+        memcpy (&l, &p->l->link, sizeof (l));
+        editor_mirror_link (p->room, LEFT, RIGHT);
+        register_link_undo (&undo, l, "ROOM MIRROR TILES+LINKS H.");
+      } else if (tiles)
+        register_h_room_mirror_tile_undo
+          (&undo, p->room, "ROOM MIRROR TILES H.");
+      else if (links) {
+        memcpy (&l, &p->l->link, sizeof (l));
+        editor_mirror_link (p->room, LEFT, RIGHT);
+        register_link_undo (&undo, l, "ROOM MIRROR LINKS H.");
+      }
+    } else if (level) {
+      if (tiles && links) {
+        for (int i = 1; i < ROOMS; i++) {
+          register_h_room_mirror_tile_undo (&undo, i, NULL);
+          memcpy (&l, &p->l->link, sizeof (l));
+          mirror_link (p->l, i, LEFT, RIGHT);
+          register_link_undo (&undo, l, NULL);
+        }
+        end_undo_set (&undo, "LEVEL MIRROR TILES+LINKS H.");
+      } else if (tiles) {
+        for (int i = 1; i < ROOMS; i++)
+          register_h_room_mirror_tile_undo (&undo, i, NULL);
+        end_undo_set (&undo, "LEVEL MIRROR TILES H.");
+      } else if (links) {
+        for (int i = 1; i < ROOMS; i++) {
+          memcpy (&l, &p->l->link, sizeof (l));
+          mirror_link (p->l, i, LEFT, RIGHT);
+          register_link_undo (&undo, l, NULL);
+        }
+        end_undo_set (&undo, "LEVEL MIRROR LINKS H.");
+      }
+    }
   } else if (r) {
 
   }

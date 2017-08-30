@@ -206,6 +206,8 @@
 #include "gui-zoom-control.h"
 #include "gui-place-control.h"
 #include "gui-room-control.h"
+#include "gui-row-control.h"
+#include "gui-page-control.h"
 #include "gui-tile-part-control.h"
 #include "gui-tile-part-dialog.h"
 #include "gui-tile-clipboard-control.h"

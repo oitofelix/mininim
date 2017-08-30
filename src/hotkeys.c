@@ -302,7 +302,7 @@ level_hotkeys_cb (Ihandle *ih, int c)
            || (flip_gamepad_horizontal
                && ((! active_menu && was_key_pressed (0, ALLEGRO_KEY_J))
                    || c == K_j)))
-    mr_select_trans (LEFT);
+    mr_room_trans (LEFT);
 
   /* J: select room at right (H if flipped horizontally) */
   else if ((! flip_gamepad_horizontal
@@ -311,7 +311,7 @@ level_hotkeys_cb (Ihandle *ih, int c)
            || (flip_gamepad_horizontal
                && ((! active_menu && was_key_pressed (0, ALLEGRO_KEY_H))
                    || c == K_h)))
-    mr_select_trans (RIGHT);
+    mr_room_trans (RIGHT);
 
   /* U: select room above (N if flipped vertically) */
   else if ((! flip_gamepad_vertical
@@ -320,7 +320,7 @@ level_hotkeys_cb (Ihandle *ih, int c)
            || (flip_gamepad_vertical
                && ((! active_menu && was_key_pressed (0, ALLEGRO_KEY_N))
                    || c == K_n)))
-    mr_select_trans (ABOVE);
+    mr_room_trans (ABOVE);
 
   /* N: select room below (U if flipped vertically) */
   else if ((! flip_gamepad_vertical
@@ -329,7 +329,7 @@ level_hotkeys_cb (Ihandle *ih, int c)
            || (flip_gamepad_vertical
                && ((! active_menu && was_key_pressed (0, ALLEGRO_KEY_U))
                    || c == K_u)))
-    mr_select_trans (BELOW);
+    mr_room_trans (BELOW);
 
   /* SHIFT+H: multi-room view to left (J if flipped horizontally) */
   else if ((! flip_gamepad_horizontal
@@ -340,7 +340,7 @@ level_hotkeys_cb (Ihandle *ih, int c)
                && ((! active_menu
                     && was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_J))
                    || c == K_J)))
-    mr_view_trans (LEFT);
+    mr_row_trans (LEFT);
 
   /* SHIFT+J: multi-room view to right (H if flipped horizontally) */
   else if ((! flip_gamepad_horizontal
@@ -351,7 +351,7 @@ level_hotkeys_cb (Ihandle *ih, int c)
                && ((! active_menu
                     && was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_H))
                    || c == K_H)))
-    mr_view_trans (RIGHT);
+    mr_row_trans (RIGHT);
 
   /* SHIFT+U: multi-room view above (N if flipped vertically) */
   else if ((! flip_gamepad_vertical
@@ -362,7 +362,7 @@ level_hotkeys_cb (Ihandle *ih, int c)
                && ((! active_menu
                     && was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_N))
                    || c == K_N)))
-    mr_view_trans (ABOVE);
+    mr_row_trans (ABOVE);
 
   /* SHIFT+N: multi-room view below (U if flipped vertically) */
   else if ((! flip_gamepad_vertical
@@ -373,7 +373,7 @@ level_hotkeys_cb (Ihandle *ih, int c)
                && ((! active_menu
                     && was_key_pressed (ALLEGRO_KEYMOD_SHIFT, ALLEGRO_KEY_U))
                    || c == K_U)))
-    mr_view_trans (BELOW);
+    mr_row_trans (BELOW);
 
   /* ALT+H: multi-room page view to left (J if flipped horizontally) */
   else if ((! flip_gamepad_horizontal
@@ -384,7 +384,7 @@ level_hotkeys_cb (Ihandle *ih, int c)
                && ((! active_menu
                     && was_key_pressed (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_J))
                    || c == K_mJ)))
-    mr_view_page_trans (LEFT);
+    mr_page_trans (LEFT);
 
   /* ALT+J: multi-room page view to right (H if flipped horizontally) */
   else if ((! flip_gamepad_horizontal
@@ -395,7 +395,7 @@ level_hotkeys_cb (Ihandle *ih, int c)
                && ((! active_menu
                     && was_key_pressed (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_H))
                    || c == K_mH)))
-    mr_view_page_trans (RIGHT);
+    mr_page_trans (RIGHT);
 
   /* ALT+U: multi-room page view above (N if flipped vertically) */
   else if ((! flip_gamepad_vertical
@@ -406,7 +406,7 @@ level_hotkeys_cb (Ihandle *ih, int c)
                && ((! active_menu
                     && was_key_pressed (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_N))
                    || c == K_mN)))
-    mr_view_page_trans (ABOVE);
+    mr_page_trans (ABOVE);
 
   /* ALT+N: multi-room page view below (U if flipped vertically) */
   else if ((! flip_gamepad_vertical
@@ -417,7 +417,7 @@ level_hotkeys_cb (Ihandle *ih, int c)
                && ((! active_menu
                     && was_key_pressed (ALLEGRO_KEYMOD_ALT, ALLEGRO_KEY_U))
                    || c == K_mU)))
-    mr_view_page_trans (BELOW);
+    mr_page_trans (BELOW);
 
   /* HOME: focus multi-room view on kid */
   else if (was_key_pressed (0, ALLEGRO_KEY_HOME)

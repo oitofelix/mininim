@@ -44,11 +44,12 @@ static uint16_t menu_sitem (bool enabled, ALLEGRO_BITMAP *icon,
   __attribute__ ((format (printf, 3, 4)));
 
 static void menu_ditem (bool first, uint16_t *id0, uint16_t *id1,
-                        bool enabled, ALLEGRO_BITMAP *icon0,
+                        bool enabled0, bool enabled1,
+                        ALLEGRO_BITMAP *icon0,
                         ALLEGRO_BITMAP *icon1,
                         char const *title_template0,
                         char const *title_template1, ...)
-  __attribute__ ((format (printf, 8, 9)));
+  __attribute__ ((format (printf, 9, 10)));
 
 static uint16_t menu_sub (ALLEGRO_MENU **submenu, bool enabled,
                           ALLEGRO_BITMAP *icon,
@@ -345,7 +346,7 @@ static struct {
 
   /* auxiliary popup menu */
   struct {
-    uint16_t lock_selection, unlock_selection, relock_selection;
+    uint16_t lock_selection, unlock_selection, relock_selection, select_room;
   } aux;
 } item;
 
@@ -787,13 +788,14 @@ menu_sitem (bool enabled, ALLEGRO_BITMAP *icon, char const *title_template, ...)
 }
 
 void
-menu_ditem (bool first, uint16_t *id0, uint16_t *id1, bool enabled,
-            ALLEGRO_BITMAP *icon0, ALLEGRO_BITMAP *icon1,
+menu_ditem (bool first, uint16_t *id0, uint16_t *id1, bool enabled0,
+            bool enabled1, ALLEGRO_BITMAP *icon0, ALLEGRO_BITMAP *icon1,
             char const *title_template0, char const *title_template1, ...)
 {
   va_list ap;
   va_start (ap, title_template1);
-  uint16_t id = vmenu_item (enabled ? 0 : ALLEGRO_MENU_ITEM_DISABLED,
+  uint16_t id = vmenu_item ((first && enabled0) || (! first && enabled1)
+                            ? 0 : ALLEGRO_MENU_ITEM_DISABLED,
                             first ? icon0 : icon1, NULL,
                             first ? title_template0 : title_template1,
                             ap);
@@ -1021,7 +1023,7 @@ game_menu (intptr_t index)
   menu_sep (NULL);
 
   menu_ditem ((cutscene || title_demo) && play_time < time_limit,
-              &item.main.game.start, &item.main.game.restart, true,
+              &item.main.game.start, &item.main.game.restart, true, true,
               start_icon, reload_icon,
               "Sta&rt (Enter)", "&Restart (Ctrl+R)");
 
@@ -1084,7 +1086,7 @@ view_menu (intptr_t index)
 {
   menu_ditem (is_fullscreen (),
               &item.main.view.windowed, &item.main.view.full_screen,
-              true, windows_icon, full_screen_icon,
+              true, true, windows_icon, full_screen_icon,
               "&Windowed (F)", "&Fullscreen (F)");
 
   menu_sub (&menu.main.view.zoom.m, ! cutscene && ! title_demo,
@@ -1592,7 +1594,7 @@ editor_menu (intptr_t index)
 {
   menu_ditem (edit == EDIT_NONE,
               &item.main.editor.editor_mode, &item.main.editor.play_mode,
-              true, edit_icon, joystick2_icon,
+              true, true, edit_icon, joystick2_icon,
               "&Edit (F8)", "&Play (F8)");
 
   item.main.editor.undo =
@@ -1817,13 +1819,18 @@ aux_menu (void)
 
   if (selection_locked)
     item.aux.relock_selection =
-      menu_sitem (is_valid_pos (&aux_pos), lock_icon,
+      menu_sitem (is_valid_pos (&aux_pos)
+                  && ! peq (&aux_pos, &selection_pos), lock_icon,
                   "&Relock selection");
 
   menu_ditem (! selection_locked,
               &item.aux.lock_selection, &item.aux.unlock_selection,
-              true, lock_icon, unlock_icon,
+              is_valid_pos (&aux_pos), true, lock_icon, unlock_icon,
               "&Lock selection", "&Unlock selection");
+
+  item.aux.select_room =
+    menu_sitem (is_valid_pos (&aux_pos) && mr.room != aux_pos.room, room_icon,
+                "Select &Room");
 
   end_menu ();
 }
@@ -1932,18 +1939,18 @@ process_main_menu_event (ALLEGRO_EVENT *event)
     ui_show_coordinates ();
   else if (id == item.main.view.nav.ind_coord)
     ui_show_indirect_coordinates ();
-  else if (id == item.main.view.nav.select.left) mr_select_trans (LEFT);
-  else if (id == item.main.view.nav.select.above) mr_select_trans (ABOVE);
-  else if (id == item.main.view.nav.select.right) mr_select_trans (RIGHT);
-  else if (id == item.main.view.nav.select.below) mr_select_trans (BELOW);
-  else if (id == item.main.view.nav.cell.left) mr_view_trans (LEFT);
-  else if (id == item.main.view.nav.cell.above) mr_view_trans (ABOVE);
-  else if (id == item.main.view.nav.cell.right) mr_view_trans (RIGHT);
-  else if (id == item.main.view.nav.cell.below) mr_view_trans (BELOW);
-  else if (id == item.main.view.nav.page.left) mr_view_page_trans (LEFT);
-  else if (id == item.main.view.nav.page.above) mr_view_page_trans (ABOVE);
-  else if (id == item.main.view.nav.page.right) mr_view_page_trans (RIGHT);
-  else if (id == item.main.view.nav.page.below) mr_view_page_trans (BELOW);
+  else if (id == item.main.view.nav.select.left) mr_room_trans (LEFT);
+  else if (id == item.main.view.nav.select.above) mr_room_trans (ABOVE);
+  else if (id == item.main.view.nav.select.right) mr_room_trans (RIGHT);
+  else if (id == item.main.view.nav.select.below) mr_room_trans (BELOW);
+  else if (id == item.main.view.nav.cell.left) mr_row_trans (LEFT);
+  else if (id == item.main.view.nav.cell.above) mr_row_trans (ABOVE);
+  else if (id == item.main.view.nav.cell.right) mr_row_trans (RIGHT);
+  else if (id == item.main.view.nav.cell.below) mr_row_trans (BELOW);
+  else if (id == item.main.view.nav.page.left) mr_page_trans (LEFT);
+  else if (id == item.main.view.nav.page.above) mr_page_trans (ABOVE);
+  else if (id == item.main.view.nav.page.right) mr_page_trans (RIGHT);
+  else if (id == item.main.view.nav.page.below) mr_page_trans (BELOW);
   else if (id == item.main.view.em.original) ui_em (ORIGINAL_EM);
   else if (id == item.main.view.em.dungeon) ui_em (DUNGEON);
   else if (id == item.main.view.em.palace) ui_em (PALACE);
@@ -2037,4 +2044,6 @@ process_aux_menu_event (ALLEGRO_EVENT *event)
     selection_locked = ! selection_locked;
   else if (id == item.aux.relock_selection)
     selection_pos = aux_pos;
+  else if (id == item.aux.select_room)
+    mr_focus_room (aux_pos.room);
 }
