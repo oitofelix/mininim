@@ -23,23 +23,12 @@
 union tile_state *
 fix_tile (struct pos *p, void *data)
 {
-  enum tile_fg f = fg (p);
-  enum tile_fg fr = fg_rel (p, 0, +1);
-  enum tile_fg fa = fg_rel (p, -1, 0);
-  struct pos np; npos (p, &np);
   struct pos pb; prel (p, &pb, +1, 0);
 
-  /* traversable on top of rigid tile -> floor */
-  if (is_critical (p) && is_rigid_tile (&pb))
+  /* traversable on top of wall -> floor */
+  if (is_critical (p)
+      && (fg (&pb) == WALL || fg (&pb) == PILLAR))
     set_fg (p, FLOOR);
-
-  /* broken floor below non no floor -> floor */
-  if (f == BROKEN_FLOOR && fa != NO_FLOOR)
-    set_fg (p, FLOOR);
-
-  /* tile at left of non-visible wall -> wall */
-  if (np.place == PLACES - 1 && f != WALL && fr == WALL)
-    set_fg (p, WALL);
 
   return NULL;
 }

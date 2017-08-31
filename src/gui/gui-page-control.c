@@ -67,7 +67,7 @@ button_action_cb (Ihandle *ih)
   Ihandle *v_toggle = (void *) IupGetAttribute (ih, "_V_TOGGLE");
   Ihandle *h_toggle = (void *) IupGetAttribute (ih, "_H_TOGGLE");
 
-  if (ih == c_button) mr_center_room (mr.room);
+  if (ih == c_button) mr_simple_center_room (mr.room);
   else if (ih == l_button) mr_page_trans (LEFT);
   else if (ih == r_button) mr_page_trans (RIGHT);
   else if (ih == a_button) mr_page_trans (ABOVE);

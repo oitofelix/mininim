@@ -218,7 +218,58 @@ button_action_cb (Ihandle *ih)
   struct room_linking l[ROOMS];
 
   if (v && h) {
-
+    if (place) {
+      reflect_pos_h (p, &p0);
+      reflect_pos_v (&p0, &p0);
+      register_mirror_pos_undo (&undo, p, &p0, true, "MIRROR TILE H+V.");
+    } else if (room) {
+      if (tiles && links) {
+        register_h_room_mirror_tile_undo
+          (&undo, p->room, NULL);
+        register_v_room_mirror_tile_undo
+          (&undo, p->room, NULL);
+        memcpy (&l, &p->l->link, sizeof (l));
+        editor_mirror_link (p->room, LEFT, RIGHT);
+        editor_mirror_link (p->room, ABOVE, BELOW);
+        register_link_undo (&undo, l, "ROOM MIRROR TILES+LINKS H+V.");
+      } else if (tiles) {
+        register_h_room_mirror_tile_undo
+          (&undo, p->room, NULL);
+        register_v_room_mirror_tile_undo
+          (&undo, p->room, "ROOM MIRROR TILES H+V.");
+      } else if (links) {
+        memcpy (&l, &p->l->link, sizeof (l));
+        editor_mirror_link (p->room, LEFT, RIGHT);
+        editor_mirror_link (p->room, ABOVE, BELOW);
+        register_link_undo (&undo, l, "ROOM MIRROR LINKS H+V.");
+      }
+    } else if (level) {
+      if (tiles && links) {
+        for (int i = 1; i < ROOMS; i++) {
+          register_h_room_mirror_tile_undo (&undo, i, NULL);
+          register_v_room_mirror_tile_undo (&undo, i, NULL);
+          memcpy (&l, &p->l->link, sizeof (l));
+          mirror_link (p->l, i, LEFT, RIGHT);
+          mirror_link (p->l, i, ABOVE, BELOW);
+          register_link_undo (&undo, l, NULL);
+        }
+        end_undo_set (&undo, "LEVEL MIRROR TILES+LINKS H+V.");
+      } else if (tiles) {
+        for (int i = 1; i < ROOMS; i++) {
+          register_h_room_mirror_tile_undo (&undo, i, NULL);
+          register_v_room_mirror_tile_undo (&undo, i, NULL);
+        }
+        end_undo_set (&undo, "LEVEL MIRROR TILES H+V.");
+      } else if (links) {
+        for (int i = 1; i < ROOMS; i++) {
+          memcpy (&l, &p->l->link, sizeof (l));
+          mirror_link (p->l, i, LEFT, RIGHT);
+          mirror_link (p->l, i, ABOVE, BELOW);
+          register_link_undo (&undo, l, NULL);
+        }
+        end_undo_set (&undo, "LEVEL MIRROR LINKS H+V.");
+      }
+    }
   } else if (v) {
     if (place) {
       reflect_pos_v (p, &p0);

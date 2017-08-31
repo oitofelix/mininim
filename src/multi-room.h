@@ -50,6 +50,7 @@ void mr_restore_origin (struct mr_origin *o);
 void mr_map_room (int r, int x, int y);
 void mr_set_origin (int room, int x, int y);
 void mr_center_room (int room);
+void mr_simple_center_room (int room);
 void mr_focus_room (int room);
 void mr_focus_cell (int x, int y);
 void mr_focus_mouse (void);

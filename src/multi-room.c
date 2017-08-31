@@ -321,7 +321,7 @@ mr_center_room (int room)
       mr_leftmost_cell (&cx, &cy);
       int cl = cx;
       mr_rightmost_cell (&cx, &cy);
-      int cr = (mr.w - 1) - cx;;
+      int cr = (mr.w - 1) - cx;
       int d = abs (ca - cb) + abs (cl - cr);
       float dc = dist_cart (x, y, (mr.w - 1) / 2, (mr.h - 1) / 2);
       if (c > lc
@@ -337,6 +337,12 @@ mr_center_room (int room)
 
   mr_set_origin (room, lx, ly);
   mr.select_cycles = SELECT_CYCLES;
+}
+
+void
+mr_simple_center_room (int room)
+{
+  mr_set_origin (room, mr.w / 2, mr.h / 2);
 }
 
 void
@@ -524,8 +530,6 @@ mr_scroll_into_view (int room)
       mr_save_origin (&a);
       mr_row_trans (dir);
       mr_save_origin (&b);
-      if (is_room_visible (a.room))
-        mr_focus_room (a.room);
       if (is_room_visible (room)) return;
     } while (! mr_origin_eq (&a, &b));
   }

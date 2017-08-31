@@ -34,7 +34,7 @@ gui_create_room_control (char *norm_group)
      NULL);
 
   Ihandle *c_button = (void *) IupGetAttribute (ih, "_C_BUTTON");
-  IupSetAttribute (c_button, "TIP", "Center view");
+  IupSetAttribute (c_button, "TIP", "Optimal view");
 
   return ih;
 }

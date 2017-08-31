@@ -103,9 +103,9 @@ get_shadow_palette (void)
 void
 draw_kid_frame (ALLEGRO_BITMAP *bitmap, struct actor *k)
 {
-  push_reset_clipping_rectangle (bitmap);
+  /* push_reset_clipping_rectangle (bitmap); */
   draw_actor_part (bitmap, "KID", "MAIN", k);
-  pop_clipping_rectangle ();
+  /* pop_clipping_rectangle (); */
 
   /* if (k->invisible) return; */
 

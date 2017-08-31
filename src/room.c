@@ -208,9 +208,11 @@ redraw_drawn_rectangle (struct drawn_rectangle *dr, struct pos *p)
   pos2room (&ptl, room_view, &ptl);
   pos2room (&pbr, room_view, &pbr);
   struct pos p0 = ptl;
-  for (p0.floor = pbr.floor; p0.floor >= ptl.floor; p0.floor--)
+  for (p0.floor = pbr.floor; p0.floor >= ptl.floor; p0.floor--) {
+    if (p0.floor > p->floor) continue;
     for (p0.place = ptl.place; p0.place <= pbr.place; p0.place++)
       if (! peq (&p0, p)) draw_tile_fg (dr->bitmap, &p0);
+  }
 
   pop_clipping_rectangle ();
 }
