@@ -2040,8 +2040,10 @@ process_aux_menu_event (ALLEGRO_EVENT *event)
   /* ALLEGRO_MENU *m = (ALLEGRO_MENU *) event->user.data3; */
   /* int i; */
 
-  if (id == item.aux.lock_selection || id == item.aux.unlock_selection)
+  if (id == item.aux.lock_selection || id == item.aux.unlock_selection) {
     selection_locked = ! selection_locked;
+    selection_pos = aux_pos;
+  }
   else if (id == item.aux.relock_selection)
     selection_pos = aux_pos;
   else if (id == item.aux.select_room)

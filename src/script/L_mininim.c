@@ -193,6 +193,9 @@ BEGIN_LUA (__index)
     } else if (! strcasecmp (key, "editing")) {
       lua_pushboolean (L, edit != EDIT_NONE);
       return 1;
+    } else if (! strcasecmp (key, "paused")) {
+      lua_pushboolean (L, is_game_paused ());
+      return 1;
     } else if (! strcasecmp (key, "clipboard")) {
       if (al_clipboard_has_text (display)) {
         char *text = al_get_clipboard_text (display);

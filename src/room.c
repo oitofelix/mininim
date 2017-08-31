@@ -223,10 +223,8 @@ draw_room (ALLEGRO_BITMAP *bitmap, int room)
   struct pos p; new_pos (&p, &global_level, room, -1, -1);
 
   for (p.floor = FLOORS; p.floor >= -1; p.floor--)
-    for (p.place = -1; p.place < PLACES; p.place++) {
+    for (p.place = -1; p.place < PLACES; p.place++)
       draw_tile_bg (bitmap, &p);
-      free_stars (&p);
-    }
 
   for (p.floor = FLOORS; p.floor >= -1; p.floor--)
     for (p.place = -1; p.place <= PLACES; p.place++)

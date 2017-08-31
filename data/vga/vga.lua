@@ -199,7 +199,6 @@ function prandom_seq_pos (p, n, pr, max)
    return r
 end
 
-
 -- Palettes
 local function blood_palette (c)
    if c == C ("white") then return C (228, 0, 0)
@@ -806,6 +805,94 @@ function video.BALCONY:rect (p)
    return coord (PLACE_WIDTH * p.place,
                  PLACE_HEIGHT * p.floor - 17,
                  p.room)
+end
+
+-- STARS
+
+-- Princess' room star coordinates
+--    static struct star s[6] = {
+--     {20,97,0}, {16,104,1}, {23,110,0},
+--      {17,116,1}, {24,120,2}, {18,128,2}};
+
+video.STARS = new (video.OBJECT)
+
+video.STARS.color = {C (80, 84, 80), C (168, 168, 168), C (255, 255, 255)}
+video.STARS.constellation = {}
+
+function video.STARS:rect (p)
+   local r = video.BALCONY:rect (p)
+   r.x = r.x + 20
+   r.y = r.y + 12
+   r.width = OW (23)
+   r.height = OH (28)
+   return r
+end
+
+function video.STARS:next_color (i)
+   if i == 1 or i == 3 then return 2
+   else return prandom (1) == 0 and 1 or 3 end
+end
+
+function video.STARS:draw_star (c, r, i)
+   c.b.set_pixel (c[i].x, c[i].y, self.color [c[i].color])
+end
+
+function video.STARS:star_xy (c, r, j)
+   local x, y, unique
+
+   repeat
+      unique = true
+      x = prandom (c.n - 1) * div (r.width - 1, c.n - 1)
+      for i = 1, j - 1 do
+         if c[i].x == x then
+            unique = false
+            break
+         end
+      end
+   until unique
+
+   repeat
+      unique = true
+      y = prandom (c.n - 1) * div (r.height - 1, c.n - 1)
+      for i = 1, j - 1 do
+         if c[i].y == y then
+            unique = false
+            break
+         end
+      end
+   until unique
+
+   return x, y
+end
+
+function video.STARS:DRAW (p)
+   local r = self:rect (p)
+   local np = p.normal
+   local k = np.room..","..np.floor..","..np.place
+   local c = self.constellation[k]
+
+   if not c then
+      self.constellation[k] = {}
+      c = self.constellation[k]
+      c.b = bitmap (r.width, r.height)
+      c.n = 7
+      seedp (p)
+      for i = 1, c.n do
+         c[i] = {}
+         c[i].x, c[i].y = self:star_xy (c, r, i)
+         c[i].color = prandom (2) + 1
+         self:draw_star (c, r, i)
+      end
+      unseedp ()
+   end
+
+   if (mod (MININIM.cycle, 4) == 0 and not MININIM.paused) then
+      local i = prandom (c.n - 1) + 1
+      c[i].color = self:next_color (c[i].color)
+      self:draw_star (c, r, i)
+   end
+
+   c.b.draw (r)
 end
 
 -- FLOOR
@@ -1574,7 +1661,7 @@ function video.WALL_PALACE:generate_colors_for_room (room)
             local color
             repeat color = bcolor + prandom (3)
             until color ~= ocolor
-            self.color_cache[room][floor.."\0"..row.."\0"..col]
+            self.color_cache[room][floor..","..row..","..col]
                = self.color[color + 1]
             ocolor = color
          end
@@ -1589,7 +1676,7 @@ function video.WALL_PALACE:cached_color (p, row, col)
    if not self.color_cache[np.room] then
       self:generate_colors_for_room (np.room) end
    return
-      self.color_cache[np.room][np.floor.."\0"..row.."\0"..np.place + col]
+      self.color_cache[np.room][np.floor..","..row..","..np.place + col]
 end
 
 function video.WALL_PALACE:brick_rect (p, row, col)
@@ -2413,6 +2500,7 @@ function ASSET:load ()
    self:load_fire ()
    self:load_window ()
    self:load_balcony ()
+   self:load_stars ()
    self:load_floor ()
    self:load_skeleton_floor ()
    self:load_broken_floor ()
@@ -2633,6 +2721,11 @@ function ASSET:load_balcony ()
    local o = new (video.BALCONY)
    o.bitmap = load_bitmap ("%s/balcony.png", self.em)
    self.BALCONY = o
+end
+
+function ASSET:load_stars ()
+   local o = new (video.STARS)
+   self.STARS = o
 end
 
 function ASSET:load_floor ()

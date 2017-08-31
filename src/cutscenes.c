@@ -1033,7 +1033,7 @@ draw_princess_room (ALLEGRO_BITMAP *bitmap)
 
   clear_bitmap (bitmap, BLACK);
   draw_bitmap (princess_room, bitmap, 0, 0, 0);
-  draw_princess_room_stars (bitmap);
+  /* draw_princess_room_stars (bitmap); */
   /* draw_princess_room_fire (bitmap); */
   draw_princess_frame (bitmap, &princess);
   draw_jaffar_frame (bitmap, &jaffar);

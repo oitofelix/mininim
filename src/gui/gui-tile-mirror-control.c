@@ -351,7 +351,49 @@ button_action_cb (Ihandle *ih)
       }
     }
   } else if (r) {
-
+    if (place) {
+      random_pos (p->l, &p0);
+      p0.room = p->room;
+      register_mirror_pos_undo (&undo, p, &p0, false, "MIRROR TILE R.");
+    } else if (room) {
+      if (tiles && links) {
+        register_random_room_mirror_tile_undo
+          (&undo, mr.room, false, NULL);
+        memcpy (&l, &p->l->link, sizeof (l));
+        editor_mirror_link (mr.room, random_dir (), random_dir ());
+        register_link_undo (&undo, l, "ROOM MIRROR TILES+LINKS R.");
+      } else if (tiles)
+        register_random_room_mirror_tile_undo
+          (&undo, mr.room, false, "ROOM MIRROR TILES R.");
+      else if (links) {
+        memcpy (&l, &p->l->link, sizeof (l));
+        editor_mirror_link (mr.room, random_dir (), random_dir ());
+        register_link_undo (&undo, l, "ROOM MIRROR LINKS R.");
+      }
+    } else if (level) {
+      if (tiles && links) {
+        for (int i = 1; i < ROOMS; i++) {
+          register_random_room_mirror_tile_undo
+            (&undo, i, false, NULL);
+          memcpy (&l, &p->l->link, sizeof (l));
+          mirror_link (p->l, i, random_dir (), random_dir ());
+          register_link_undo (&undo, l, NULL);
+        }
+        end_undo_set (&undo, "LEVEL MIRROR TILES+LINKS R.");
+      } else if (tiles) {
+        for (int i = 1; i < ROOMS; i++)
+          register_random_room_mirror_tile_undo
+            (&undo, i, false, NULL);
+        end_undo_set (&undo, "LEVEL MIRROR TILES R.");
+      } else if (links) {
+        for (int i = 1; i < ROOMS; i++) {
+          memcpy (&l, &p->l->link, sizeof (l));
+          mirror_link (p->l, i, random_dir (), random_dir ());
+          register_link_undo (&undo, l, NULL);
+        }
+        end_undo_set (&undo, "LEVEL MIRROR LINKS R.");
+      }
+    }
   }
 
   return IUP_DEFAULT;

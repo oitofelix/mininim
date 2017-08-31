@@ -52,7 +52,7 @@ draw_mirror_fg (ALLEGRO_BITMAP *bitmap, struct pos *p, struct frame *f)
 
     invert_frame_dir (&a->f, &a->f);
 
-    /* draw mirror properly */
+    /* draw mirror */
     push_reset_clipping_rectangle (bitmap);
     draw_object_part_width (bitmap, "MIRROR", "FACE", p, 19);
     pop_clipping_rectangle ();

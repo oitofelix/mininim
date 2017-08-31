@@ -600,7 +600,8 @@ draw_animated_background (ALLEGRO_BITMAP *bitmap, int room)
       if (fake (&p) == WALL) continue;
       if (bg (&p) == TORCH)
         draw_object (bitmap, "FIRE", &p);
-      draw_balcony_stars (bitmap, &p);
+      if (bg (&p) == BALCONY)
+        draw_object (bitmap, "STARS", &p);
     }
 }
 

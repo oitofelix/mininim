@@ -655,7 +655,7 @@ local_index_by_name (lua_State *L, int level, const char *name)
   int local = 0;
   do {
     cname = lua_getlocal (L, &ar, ++local);
-    lua_pop (L, 1);
+    if (cname) lua_pop (L, 1);
   } while (cname && strcmp (name, cname));
 
   return cname ? local : -1;

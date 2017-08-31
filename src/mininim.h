@@ -132,7 +132,6 @@
 #include "room.h"
 #include "audio-data.h"
 #include "spikes-floor.h"
-#include "stars.h"
 #include "sword.h"
 #include "wall.h"
 #include "dat.h"

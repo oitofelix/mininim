@@ -99,11 +99,6 @@ struct rect {
   lua_Number w, h;
 };
 
-struct star {
-  int x, y;
-  int color;
-};
-
 struct pixel_coord {
   int x, y;
 };
@@ -182,13 +177,6 @@ struct multi_room {
     ALLEGRO_BITMAP *cache;
     bool done;
     int room;
-
-    struct stars {
-      ALLEGRO_BITMAP *b;
-      struct coord c;
-      struct star *s;
-      size_t count;
-    } stars[FLOORS][PLACES];
   } **cell;
 
   struct {
