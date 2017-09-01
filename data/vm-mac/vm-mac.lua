@@ -637,6 +637,7 @@ video.STARS = new (video.OBJECT)
 
 video.STARS.color = {C (80, 84, 80), C (168, 168, 168), C (255, 255, 255)}
 video.STARS.constellation = {}
+video.STARS.n = 7
 
 function video.STARS:rect (p)
    local r = video.BALCONY:rect (p)
@@ -694,7 +695,7 @@ function video.STARS:DRAW (p)
       self.constellation[k] = {}
       c = self.constellation[k]
       c.b = bitmap (r.width, r.height)
-      c.n = 7
+      c.n = self.n
       seedp (p)
       for i = 1, c.n do
          c[i] = {}

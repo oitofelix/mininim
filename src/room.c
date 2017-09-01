@@ -830,7 +830,7 @@ get_tile_bitmap (struct tile *tile_ref, union tile_state *ts,
     t->bg = tile_ref->bg;
     break;
   case TILE_EXT_ITEM:
-    t->ext = tile_ref->ext;
+    t->ext = ext_val (FLOOR, tile_ref->ext);
     break;
   case TILE_EXT_DESIGN:
     t->fg = TCARPET;

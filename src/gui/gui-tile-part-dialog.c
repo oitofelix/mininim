@@ -215,6 +215,7 @@ update (Ihandle *ih)
     }
 
     struct tile t;
+    memset (&t, 0, sizeof (t));
 
     switch (tile_part) {
     case TILE_FG: t.fg = i; break;

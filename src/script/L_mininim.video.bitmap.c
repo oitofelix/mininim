@@ -173,10 +173,12 @@ BEGIN_LUA (__tostring)
 }
 END_LUA
 
+static lua_State *state_L;
+
 ALLEGRO_COLOR
 L_palette (ALLEGRO_COLOR c)
 {
-  lua_State *L = main_L;
+  lua_State *L = state_L;
   lua_pushvalue (L, -1);
   L_pushcolor (L, c);
   ALLEGRO_COLOR c_ret;
@@ -205,6 +207,7 @@ BEGIN_LUA (L_apply_palette)
 
   lua_settop (L, 1);
 
+  state_L = L;
   ALLEGRO_BITMAP *r = apply_palette_k (*b, L_palette, cache_key);
   lua_pop (L, 1);
 

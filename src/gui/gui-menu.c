@@ -660,7 +660,7 @@ start_menu (ALLEGRO_MENU *parent, uint16_t base_id)
 uint16_t
 get_menu_item_id (ALLEGRO_MENU *parent, int index, uint16_t start_id)
 {
-  for (uint16_t i = start_id; i <= MENU_ID_MAX; i++) {
+  for (int i = start_id; i <= MENU_ID_MAX; i++) {
     ALLEGRO_MENU *f_menu;
     int f_index;
     if (al_find_menu_item (parent, i, &f_menu, &f_index)
