@@ -29,8 +29,8 @@ bool load_led (const char *filename);
 
 Ihandle *bitmap_to_iup_image (ALLEGRO_BITMAP *b, palette p);
 void gui_set_image (Ihandle *ih, ALLEGRO_BITMAP *b, palette p);
-ALLEGRO_COLOR transp_to_black (ALLEGRO_COLOR c);
-ALLEGRO_COLOR white_to_transp (ALLEGRO_COLOR c);
+ALLEGRO_COLOR transp_to_black (ALLEGRO_COLOR c, void *data);
+ALLEGRO_COLOR white_to_transp (ALLEGRO_COLOR c, void *data);
 void gui_set_stock_image (Ihandle *ih, char *new_image_hname);
 
 int hide_dialog (Ihandle *ih);

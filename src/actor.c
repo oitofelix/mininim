@@ -428,7 +428,7 @@ splash_coord (ALLEGRO_BITMAP *splash, struct frame *f, struct coord *c)
 }
 
 ALLEGRO_COLOR
-start_actor_palette (ALLEGRO_COLOR c)
+start_actor_palette (ALLEGRO_COLOR c, void *data)
 {
   unsigned char r, g, b, a;
   al_unmap_rgba (c, &r, &g, &b, &a);

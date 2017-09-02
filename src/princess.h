@@ -82,9 +82,9 @@ void princess_stroke (struct actor *princess);
 void princess_turn_embrace (struct actor *princess);
 void draw_princess_frame (ALLEGRO_BITMAP *bitmap, struct actor *p);
 palette get_princess_palette (void);
-ALLEGRO_COLOR c_princess_palette (ALLEGRO_COLOR c);
-ALLEGRO_COLOR e_princess_palette (ALLEGRO_COLOR c);
-ALLEGRO_COLOR v_princess_palette (ALLEGRO_COLOR c);
+ALLEGRO_COLOR c_princess_palette (ALLEGRO_COLOR c, void *data);
+ALLEGRO_COLOR e_princess_palette (ALLEGRO_COLOR c, void *data);
+ALLEGRO_COLOR v_princess_palette (ALLEGRO_COLOR c, void *data);
 
 /* variables */
 extern struct actor princess;

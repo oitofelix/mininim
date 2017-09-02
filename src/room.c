@@ -884,7 +884,7 @@ get_tile_bitmap (struct tile *tile_ref, union tile_state *ts,
 }
 
 ALLEGRO_COLOR
-green_hue_palette (ALLEGRO_COLOR c)
+green_hue_palette (ALLEGRO_COLOR c, void *data)
 {
   unsigned char r, g, b, a;
   al_unmap_rgba (c, &r, &g, &b, &a);
@@ -896,7 +896,7 @@ green_hue_palette (ALLEGRO_COLOR c)
 }
 
 ALLEGRO_COLOR
-gray_hue_palette (ALLEGRO_COLOR c)
+gray_hue_palette (ALLEGRO_COLOR c, void *data)
 {
   unsigned char r, g, b, a;
   al_unmap_rgba (c, &r, &g, &b, &a);
@@ -908,7 +908,7 @@ gray_hue_palette (ALLEGRO_COLOR c)
 }
 
 ALLEGRO_COLOR
-yellow_hue_palette (ALLEGRO_COLOR c)
+yellow_hue_palette (ALLEGRO_COLOR c, void* data)
 {
   unsigned char r, g, b, a;
   al_unmap_rgba (c, &r, &g, &b, &a);
@@ -920,7 +920,7 @@ yellow_hue_palette (ALLEGRO_COLOR c)
 }
 
 ALLEGRO_COLOR
-blue_hue_palette (ALLEGRO_COLOR c)
+blue_hue_palette (ALLEGRO_COLOR c, void *data)
 {
   unsigned char r, g, b, a;
   al_unmap_rgba (c, &r, &g, &b, &a);
@@ -971,9 +971,9 @@ apply_hue_color (ALLEGRO_COLOR c)
 {
   switch (hue) {
   case HUE_NONE: default: return c;
-  case HUE_GREEN: return green_hue_palette (c);
-  case HUE_GRAY: return gray_hue_palette (c);
-  case HUE_YELLOW: return yellow_hue_palette (c);
-  case HUE_BLUE: return blue_hue_palette (c);
+  case HUE_GREEN: return green_hue_palette (c, NULL);
+  case HUE_GRAY: return gray_hue_palette (c, NULL);
+  case HUE_YELLOW: return yellow_hue_palette (c, NULL);
+  case HUE_BLUE: return blue_hue_palette (c, NULL);
   }
 }

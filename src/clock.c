@@ -108,21 +108,21 @@ unload_clock (void)
 }
 
 ALLEGRO_COLOR
-c_clock_sand_palette (ALLEGRO_COLOR c)
+c_clock_sand_palette (ALLEGRO_COLOR c, void *data)
 {
   if (color_eq (c, CLOCK_SAND_COLOR)) return C_CLOCK_SAND_COLOR;
   return c;
 }
 
 ALLEGRO_COLOR
-e_clock_sand_palette (ALLEGRO_COLOR c)
+e_clock_sand_palette (ALLEGRO_COLOR c, void *data)
 {
   if (color_eq (c, CLOCK_SAND_COLOR)) return E_CLOCK_SAND_COLOR;
   return c;
 }
 
 ALLEGRO_COLOR
-v_clock_sand_palette (ALLEGRO_COLOR c)
+v_clock_sand_palette (ALLEGRO_COLOR c, void *data)
 {
   if (color_eq (c, CLOCK_SAND_COLOR)) return V_CLOCK_SAND_COLOR;
   return c;

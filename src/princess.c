@@ -442,7 +442,7 @@ princess_turn_embrace (struct actor *princess)
 
 
 ALLEGRO_COLOR
-c_princess_palette (ALLEGRO_COLOR c)
+c_princess_palette (ALLEGRO_COLOR c, void *data)
 {
   if (color_eq (c, PRINCESS_SKIN_COLOR_01)) return C_PRINCESS_SKIN_COLOR_01;
   if (color_eq (c, PRINCESS_SKIN_COLOR_02)) return C_PRINCESS_SKIN_COLOR_02;
@@ -457,7 +457,7 @@ c_princess_palette (ALLEGRO_COLOR c)
 }
 
 ALLEGRO_COLOR
-e_princess_palette (ALLEGRO_COLOR c)
+e_princess_palette (ALLEGRO_COLOR c, void *data)
 {
   if (color_eq (c, PRINCESS_SKIN_COLOR_01)) return E_PRINCESS_SKIN_COLOR_01;
   if (color_eq (c, PRINCESS_SKIN_COLOR_02)) return E_PRINCESS_SKIN_COLOR_02;
@@ -472,7 +472,7 @@ e_princess_palette (ALLEGRO_COLOR c)
 }
 
 ALLEGRO_COLOR
-v_princess_palette (ALLEGRO_COLOR c)
+v_princess_palette (ALLEGRO_COLOR c, void *data)
 {
   if (color_eq (c, PRINCESS_SKIN_COLOR_01)) return V_PRINCESS_SKIN_COLOR_01;
   if (color_eq (c, PRINCESS_SKIN_COLOR_02)) return V_PRINCESS_SKIN_COLOR_02;

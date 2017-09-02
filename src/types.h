@@ -519,7 +519,7 @@ struct video_effect {
   ALLEGRO_COLOR color;
 };
 
-typedef ALLEGRO_COLOR (*palette) (ALLEGRO_COLOR c);
+typedef ALLEGRO_COLOR (*palette) (ALLEGRO_COLOR c, void *data);
 
 enum quit_anim {
   NO_QUIT, RESTART_LEVEL, NEXT_LEVEL, RESTART_GAME,

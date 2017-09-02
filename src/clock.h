@@ -56,9 +56,9 @@
 /* functions */
 void load_clock (void);
 void unload_clock (void);
-ALLEGRO_COLOR c_clock_sand_palette (ALLEGRO_COLOR c);
-ALLEGRO_COLOR e_clock_sand_palette (ALLEGRO_COLOR c);
-ALLEGRO_COLOR v_clock_sand_palette (ALLEGRO_COLOR c);
+ALLEGRO_COLOR c_clock_sand_palette (ALLEGRO_COLOR c, void *data);
+ALLEGRO_COLOR e_clock_sand_palette (ALLEGRO_COLOR c, void *data);
+ALLEGRO_COLOR v_clock_sand_palette (ALLEGRO_COLOR c, void *data);
 void draw_clock (ALLEGRO_BITMAP *bitmap, int i);
 int get_clock_by_time_left (void);
 

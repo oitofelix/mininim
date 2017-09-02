@@ -22,7 +22,7 @@
 
 int current_kid_id;
 
-static ALLEGRO_COLOR v_palette (ALLEGRO_COLOR c);
+static ALLEGRO_COLOR v_palette (ALLEGRO_COLOR c, void *data);
 /* static ALLEGRO_COLOR e_palette (ALLEGRO_COLOR c); */
 /* static ALLEGRO_COLOR c_palette (ALLEGRO_COLOR c); */
 
@@ -155,7 +155,7 @@ draw_start_kid (ALLEGRO_BITMAP *bitmap)
 }
 
 ALLEGRO_COLOR
-colorful_shadow_palette (ALLEGRO_COLOR c)
+colorful_shadow_palette (ALLEGRO_COLOR c, void *data)
 {
   unsigned char r, g, b, a;
   al_unmap_rgba (c, &r, &g, &b, &a);
@@ -179,7 +179,7 @@ colorful_shadow_palette (ALLEGRO_COLOR c)
 }
 
 ALLEGRO_COLOR
-v_phantom_shadow_palette (ALLEGRO_COLOR c)
+v_phantom_shadow_palette (ALLEGRO_COLOR c, void *data)
 {
   unsigned char r, g, b, a;
   al_unmap_rgba (c, &r, &g, &b, &a);
@@ -194,7 +194,7 @@ v_phantom_shadow_palette (ALLEGRO_COLOR c)
 }
 
 ALLEGRO_COLOR
-e_phantom_shadow_palette (ALLEGRO_COLOR c)
+e_phantom_shadow_palette (ALLEGRO_COLOR c, void *data)
 {
   unsigned char r, g, b, a;
   al_unmap_rgba (c, &r, &g, &b, &a);
@@ -213,7 +213,7 @@ e_phantom_shadow_palette (ALLEGRO_COLOR c)
 }
 
 ALLEGRO_COLOR
-c_phantom_shadow_palette (ALLEGRO_COLOR c)
+c_phantom_shadow_palette (ALLEGRO_COLOR c, void *data)
 {
   unsigned char r, g, b, a;
   al_unmap_rgba (c, &r, &g, &b, &a);
@@ -230,7 +230,7 @@ c_phantom_shadow_palette (ALLEGRO_COLOR c)
 }
 
 static ALLEGRO_COLOR
-v_palette (ALLEGRO_COLOR c)
+v_palette (ALLEGRO_COLOR c, void *data)
 {
   if (color_eq (c, HP_COLOR_01)) return V_BLOOD_COLOR_01;
   if (color_eq (c, HP_COLOR_02)) return V_BLOOD_COLOR_02;

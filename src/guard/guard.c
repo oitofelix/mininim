@@ -22,7 +22,7 @@
 
 /* static ALLEGRO_COLOR c_shadow_hp_palette (ALLEGRO_COLOR c); */
 /* static ALLEGRO_COLOR e_shadow_hp_palette (ALLEGRO_COLOR c); */
-static ALLEGRO_COLOR v_shadow_hp_palette (ALLEGRO_COLOR c);
+static ALLEGRO_COLOR v_shadow_hp_palette (ALLEGRO_COLOR c, void *data);
 
 struct actor *
 create_guard (struct actor *g0, struct actor *g1, struct pos *p,
@@ -69,7 +69,7 @@ apply_guard_mode (struct actor *g, enum gm gm)
 }
 
 ALLEGRO_COLOR
-v_salmon_palette (ALLEGRO_COLOR c)
+v_salmon_palette (ALLEGRO_COLOR c, void *data)
 {
   /* honor transparency */
   unsigned char r, g, b, a;
@@ -103,7 +103,7 @@ v_salmon_palette (ALLEGRO_COLOR c)
 }
 
 ALLEGRO_COLOR
-v_light_blue_palette (ALLEGRO_COLOR c)
+v_light_blue_palette (ALLEGRO_COLOR c, void *data)
 {
   /* honor transparency */
   unsigned char r, g, b, a;
@@ -138,7 +138,7 @@ v_light_blue_palette (ALLEGRO_COLOR c)
 }
 
 ALLEGRO_COLOR
-v_red_palette (ALLEGRO_COLOR c)
+v_red_palette (ALLEGRO_COLOR c, void *data)
 {
   /* honor transparency */
   unsigned char r, g, b, a;
@@ -172,7 +172,7 @@ v_red_palette (ALLEGRO_COLOR c)
 }
 
 ALLEGRO_COLOR
-v_orange_palette (ALLEGRO_COLOR c)
+v_orange_palette (ALLEGRO_COLOR c, void *data)
 {
   /* honor transparency */
   unsigned char r, g, b, a;
@@ -206,7 +206,7 @@ v_orange_palette (ALLEGRO_COLOR c)
 }
 
 ALLEGRO_COLOR
-v_green_palette (ALLEGRO_COLOR c)
+v_green_palette (ALLEGRO_COLOR c, void *data)
 {
   /* honor transparency */
   unsigned char r, g, b, a;
@@ -240,7 +240,7 @@ v_green_palette (ALLEGRO_COLOR c)
 }
 
 ALLEGRO_COLOR
-v_dark_blue_palette (ALLEGRO_COLOR c)
+v_dark_blue_palette (ALLEGRO_COLOR c, void *data)
 {
   /* honor transparency */
   unsigned char r, g, b, a;
@@ -275,7 +275,7 @@ v_dark_blue_palette (ALLEGRO_COLOR c)
 }
 
 ALLEGRO_COLOR
-v_purple_palette (ALLEGRO_COLOR c)
+v_purple_palette (ALLEGRO_COLOR c, void *data)
 {
   /* honor transparency */
   unsigned char r, g, b, a;
@@ -309,7 +309,7 @@ v_purple_palette (ALLEGRO_COLOR c)
 }
 
 ALLEGRO_COLOR
-v_yellow_palette (ALLEGRO_COLOR c)
+v_yellow_palette (ALLEGRO_COLOR c, void *data)
 {
   /* honor transparency */
   unsigned char r, g, b, a;
@@ -343,7 +343,7 @@ v_yellow_palette (ALLEGRO_COLOR c)
 }
 
 ALLEGRO_COLOR
-e_dark_red_palette (ALLEGRO_COLOR c)
+e_dark_red_palette (ALLEGRO_COLOR c, void *data)
 {
   /* honor transparency */
   unsigned char r, g, b, a;
@@ -380,7 +380,7 @@ e_dark_red_palette (ALLEGRO_COLOR c)
 }
 
 ALLEGRO_COLOR
-e_red_palette (ALLEGRO_COLOR c)
+e_red_palette (ALLEGRO_COLOR c, void *data)
 {
   /* honor transparency */
   unsigned char r, g, b, a;
@@ -415,7 +415,7 @@ e_red_palette (ALLEGRO_COLOR c)
 }
 
 ALLEGRO_COLOR
-e_green_palette (ALLEGRO_COLOR c)
+e_green_palette (ALLEGRO_COLOR c, void *data)
 {
   /* honor transparency */
   unsigned char r, g, b, a;
@@ -450,7 +450,7 @@ e_green_palette (ALLEGRO_COLOR c)
 }
 
 ALLEGRO_COLOR
-c_green_palette (ALLEGRO_COLOR c)
+c_green_palette (ALLEGRO_COLOR c, void *data)
 {
   /* honor transparency */
   unsigned char r, g, b, a;
@@ -486,7 +486,7 @@ c_green_palette (ALLEGRO_COLOR c)
 }
 
 ALLEGRO_COLOR
-c_red_palette (ALLEGRO_COLOR c)
+c_red_palette (ALLEGRO_COLOR c, void *data)
 {
   /* honor transparency */
   unsigned char r, g, b, a;
@@ -687,7 +687,7 @@ draw_guard_hp (ALLEGRO_BITMAP *bitmap, struct actor *g)
 /* } */
 
 ALLEGRO_COLOR
-v_shadow_hp_palette (ALLEGRO_COLOR c)
+v_shadow_hp_palette (ALLEGRO_COLOR c, void *data)
 {
   unsigned char r, g, b, a;
   al_unmap_rgba (c, &r, &g, &b, &a);

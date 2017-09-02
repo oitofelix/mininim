@@ -27,7 +27,7 @@ static void init_run_frameset (void);
 /* variables */
 ALLEGRO_BITMAP *mouse_normal_00, *mouse_run_00, *mouse_run_01;
 
-static ALLEGRO_COLOR v_palette (ALLEGRO_COLOR c);
+static ALLEGRO_COLOR v_palette (ALLEGRO_COLOR c, void *data);
 /* static ALLEGRO_COLOR e_palette (ALLEGRO_COLOR c); */
 /* static ALLEGRO_COLOR c_palette (ALLEGRO_COLOR c); */
 
@@ -70,7 +70,7 @@ create_mouse (struct actor *m0, struct actor *m1, struct pos *p, enum dir dir)
 }
 
 static ALLEGRO_COLOR
-v_palette (ALLEGRO_COLOR c)
+v_palette (ALLEGRO_COLOR c, void *data)
 {
   return c;
 }

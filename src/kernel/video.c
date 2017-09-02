@@ -553,19 +553,24 @@ enforce_palette_cache_limit (lua_State *L, ALLEGRO_BITMAP *b)
 ALLEGRO_BITMAP *
 apply_palette (ALLEGRO_BITMAP *bitmap, palette p)
 {
-  return apply_palette_k (bitmap, p, p);
+  return apply_palette_k (bitmap, p, p, NULL);
 }
 
 ALLEGRO_BITMAP *
-apply_palette_k (ALLEGRO_BITMAP *bitmap, palette p, const void *k)
+apply_palette_k (ALLEGRO_BITMAP *bitmap, palette p, const void *k,
+                 void *data)
 {
   if (! bitmap) return NULL;
+
+  lua_State *L;
+  if (p == L_palette && data) L = data;
+  else L = main_L;
 
   if (palette_cache_size_limit && k) {
     ALLEGRO_BITMAP *cached = get_cached_palette (bitmap, k);
     if (cached) return cached;
 
-    enforce_palette_cache_limit (main_L, bitmap);
+    enforce_palette_cache_limit (L, bitmap);
   }
 
   /* BEGIN: Palette caching guardian */
@@ -628,19 +633,19 @@ apply_palette_k (ALLEGRO_BITMAP *bitmap, palette p, const void *k)
   al_set_target_bitmap (rbitmap);
   for (y = 0; y < h; y++)
     for (x = 0; x < w; x++)
-      al_put_pixel (x, y, p (al_get_pixel (rbitmap, x, y)));
+      al_put_pixel (x, y, p (al_get_pixel (rbitmap, x, y), data));
   al_unlock_bitmap (rbitmap);
 
   if (palette_cache_size_limit && k) {
     /* In case it's Lua bitmap and palette */
     if (p == L_palette) {
       /* put palette into weak registry for GC tracking */
-      lua_pushvalue (main_L, -1);
-      L_set_weak_registry_by_ptr (main_L, (void *) k);
+      lua_pushvalue (L, -1);
+      L_set_weak_registry_by_ptr (L, (void *) k);
 
       /* put output bitmap into registry to prevent GC collection */
-      L_pushbitmap (main_L, rbitmap);
-      L_set_registry_by_ptr (main_L, rbitmap);
+      L_pushbitmap (L, rbitmap);
+      L_set_registry_by_ptr (L, rbitmap);
     }
 
     struct palette_cache pc;

@@ -214,7 +214,7 @@ bitmap_to_iup_image (ALLEGRO_BITMAP *b, palette p)
   for (y = 0; y < h; y++)
     for (x = 0; x < w; x++) {
       ALLEGRO_COLOR c = al_get_pixel (b, x, y);
-      if (p) c = p (c);
+      if (p) c = p (c, NULL);
       unsigned char r, g, b, a;
       al_unmap_rgba (c, &r, &g, &b, &a);
       int pos = (y * w + x) * s;
@@ -251,14 +251,14 @@ gui_set_stock_image (Ihandle *ih, char *new_image_hname)
 }
 
 ALLEGRO_COLOR
-transp_to_black (ALLEGRO_COLOR c)
+transp_to_black (ALLEGRO_COLOR c, void *data)
 {
   if (color_eq (c, TRANSPARENT_COLOR)) return BLACK;
   else return c;
 }
 
 ALLEGRO_COLOR
-white_to_transp (ALLEGRO_COLOR c)
+white_to_transp (ALLEGRO_COLOR c, void *data)
 {
   if (color_eq (c, WHITE)) return TRANSPARENT_COLOR;
   else return c;

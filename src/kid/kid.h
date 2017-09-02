@@ -33,10 +33,10 @@ void draw_kid_if_at_pos (ALLEGRO_BITMAP *bitmap, struct actor *k,
                          struct pos *p);
 palette get_kid_palette (void);
 palette get_shadow_palette (void);
-ALLEGRO_COLOR colorful_shadow_palette (ALLEGRO_COLOR c);
-ALLEGRO_COLOR v_phantom_shadow_palette (ALLEGRO_COLOR c);
-ALLEGRO_COLOR e_phantom_shadow_palette (ALLEGRO_COLOR c);
-ALLEGRO_COLOR c_phantom_shadow_palette (ALLEGRO_COLOR c);
+ALLEGRO_COLOR colorful_shadow_palette (ALLEGRO_COLOR c, void *data);
+ALLEGRO_COLOR v_phantom_shadow_palette (ALLEGRO_COLOR c, void *data);
+ALLEGRO_COLOR e_phantom_shadow_palette (ALLEGRO_COLOR c, void *data);
+ALLEGRO_COLOR c_phantom_shadow_palette (ALLEGRO_COLOR c, void *data);
 void increase_kid_current_hp (struct actor *k);
 void increase_kid_total_hp (struct actor *k);
 void float_kid (struct actor *k);
