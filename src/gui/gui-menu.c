@@ -1136,7 +1136,7 @@ zoom_menu (intptr_t index)
 {
   item.main.view.zoom.reset =
     menu_hitem (! cutscene && ! title_demo
-                && (mr.w != 2 || mr.h != 2
+                && (mr.w != 1 || mr.h != 1
                     || mr.fit_mode != MR_FIT_NONE),
                 "MULTI-ROOM %ix%i", mr.w, mr.h);
 

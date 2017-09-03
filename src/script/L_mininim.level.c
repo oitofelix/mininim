@@ -22,6 +22,7 @@
 
 static DECLARE_LUA (__eq);
 static DECLARE_LUA (__index);
+static DECLARE_LUA (__newindex);
 static DECLARE_LUA (__tostring);
 
 void
@@ -35,6 +36,10 @@ define_L_mininim_level (lua_State *L)
 
   lua_pushstring (L, "__index");
   lua_pushcfunction (L, __index);
+  lua_rawset (L, -3);
+
+  lua_pushstring (L, "__newindex");
+  lua_pushcfunction (L, __newindex);
   lua_rawset (L, -3);
 
   lua_pushstring (L, "__tostring");
@@ -100,6 +105,25 @@ BEGIN_LUA (__index)
       lua_pushboolean (L, retry_level == global_level.n
                        && replay_mode == NO_REPLAY);
       return 1;
+    } else break;
+  default: break;
+  }
+
+  return 0;
+}
+END_LUA
+
+BEGIN_LUA (__newindex)
+{
+  const char *key;
+  int type = lua_type (L, 2);
+  switch (type) {
+  case LUA_TSTRING:
+    key = lua_tostring (L, 2);
+    if (! strcasecmp (key, "number")) {
+      int n = lua_tonumber (L, 3);
+      ui_jump_to_level (n);
+      return 0;
     } else break;
   default: break;
   }

@@ -25,6 +25,7 @@
 
 /* functions */
 void define_L_mininim_debugger (lua_State *L);
+void L_debug_main_thread (void);
 void debugger_hook (lua_State *L, lua_Debug *ar);
 char *ar_tostring (lua_Debug *ar);
 char *get_cstack_report (lua_State *L, const char *fmt);

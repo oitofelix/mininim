@@ -284,12 +284,11 @@ play_anim (anim_callback_t draw_callback,
 
       switch (event.mouse.button) {
       case 1: ui_editor (); break;
-      case 3:
-        if (edit != EDIT_NONE) {
-          struct pos p; get_mouse_pos (&p);
-          ui_place_kid (get_actor_by_id (current_kid_id), &p);
-        }
+      case 3: {
+        struct pos p; get_mouse_pos (&p);
+        ui_place_kid (get_actor_by_id (current_kid_id), &p);
         break;
+      }
       default: break;
       }
 
@@ -503,9 +502,6 @@ next_frame (struct frame *f, struct frame *nf, struct frame_offset *fo)
 
   if (! f->b) nf->b = fo->b;
 
-  nf->oc = f->c;
-  nf->ob = f->b;
-
   lua_Number ow = IW (get_bitmap_width (nf->b));
   lua_Number oh = IH (get_bitmap_height (nf->b));
   lua_Number w = IW (get_bitmap_width (fo->b));
@@ -521,15 +517,6 @@ next_frame (struct frame *f, struct frame *nf, struct frame_offset *fo)
   nf->b = fo->b;
   if (! cutscene) nframe (nf, &nf->c);
   return nf;
-}
-
-struct frame *
-prev_frame (struct frame *f, struct frame *pf)
-{
-  *pf = *f;
-  pf->c = f->oc;
-  pf->b = f->ob;
-  return pf;
 }
 
 bool

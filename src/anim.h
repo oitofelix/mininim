@@ -42,7 +42,6 @@ struct frame *splash_frame (ALLEGRO_BITMAP *splash, struct frame *f,
                             struct frame *nf);
 struct frame *next_frame (struct frame *f, struct frame *nf,
                           struct frame_offset *fo);
-struct frame *prev_frame (struct frame *f, struct frame *pf);
 void select_frame (struct actor *a, struct frameset *fs, int i);
 void select_xframe (struct frame_offset *xf, struct frameset *fs, int j);
 bool frame_eq (struct frame *f0, struct frame *f1);

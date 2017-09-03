@@ -618,7 +618,7 @@ compute_level (void)
 
   process_death ();
 
-  if (is_game_paused ()) {
+  if (is_game_paused () && ! changing_vm) {
     keep_all_depressible_floors ();
     return;
   }

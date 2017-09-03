@@ -27,6 +27,7 @@
 
 extern int REAL_WIDTH;
 extern int REAL_HEIGHT;
+extern bool changing_vm;
 
 void define_L_mininim_video (lua_State *L);
 

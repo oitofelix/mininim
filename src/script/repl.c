@@ -62,9 +62,9 @@ lhandler (char *line)
   rl_callback_handler_remove ();
   if (! line) {
     fprintf (rl_outstream, "\n");
+    L_debug_main_thread ();
     lhandler_line = xasprintf ("%s", "");
-  }
-  else lhandler_line = line;
+  } else lhandler_line = line;
 }
 
 static bool should_update_prompt;

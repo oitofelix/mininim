@@ -241,6 +241,12 @@ BEGIN_LUA (__tostring)
 }
 END_LUA
 
+void
+L_debug_main_thread (void)
+{
+  invoke_debugger (main_L, L_INVOKED_EVENT, DEBUG_INVOKED);
+}
+
 BEGIN_LUA (debug_here)
 {
   if (L != main_L) return luaL_error (L, "Only main thread may be debugged");
@@ -754,13 +760,13 @@ delete_all_debugger_breaks (lua_State *L)
 void
 invoke_debugger (lua_State *L, int event, enum debug_action a)
 {
-  if (L != main_L) return;
+  if (L != main_L || L_debugging) return;
   start_debugging ();
-  lua_Debug ar;
-  lua_getstack (L, 1, &ar);
-  ar.event = event;
+  /* lua_Debug ar; */
+  /* lua_getstack (L, 1, &ar); */
+  /* ar.event = event; */
   debug.action = a;
-  debugger_hook (L, &ar);
+  /* debugger_hook (L, &ar); */
 }
 
 void

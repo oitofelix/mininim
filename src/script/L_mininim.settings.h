@@ -1,5 +1,5 @@
 /*
-  L_mininim.setting.h -- mininim.setting script module;
+  L_mininim.settings.h -- mininim.settings script module;
 
   Copyright (C) 2015, 2016, 2017 Bruno Félix Rezende Ribeiro
   <oitofelix@gnu.org>
@@ -18,11 +18,11 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MININIM_L_MININIM_SETTING_H
-#define MININIM_L_MININIM_SETTING_H
+#ifndef MININIM_L_MININIM_SETTINGS_H
+#define MININIM_L_MININIM_SETTINGS_H
 
-#define L_MININIM_SETTING L_MININIM ".setting"
+#define L_MININIM_SETTINGS L_MININIM ".settings"
 
-void define_L_mininim_setting (lua_State *L);
+void define_L_mininim_settings (lua_State *L);
 
-#endif	/* MININIM_L_MININIM_SETTING_H */
+#endif	/* MININIM_L_MININIM_SETTINGS_H */

@@ -22,6 +22,7 @@
 
 int REAL_WIDTH = ORIGINAL_WIDTH;
 int REAL_HEIGHT = ORIGINAL_HEIGHT;
+bool changing_vm;
 
 static DECLARE_LUA ( __eq);
 static DECLARE_LUA (__index);
@@ -403,6 +404,8 @@ next_video_mode (char *current_vm)
 void
 setup_video_mode (char *requested_vm)
 {
+  if (changing_vm) return;
+
   if (is_valid_video_mode (requested_vm))
     set_string_var (&video_mode, requested_vm);
   else if (! is_valid_video_mode (video_mode))
@@ -427,7 +430,11 @@ setup_video_mode (char *requested_vm)
     return;
   }
 
-  ALLEGRO_BITMAP **ba = NULL;
+  struct {
+    ALLEGRO_BITMAP *f;
+    ALLEGRO_BITMAP *of;
+    ALLEGRO_BITMAP *fo;
+  } *ba = NULL;
   size_t ba_nmemb = 0;
   if (w != REAL_WIDTH && h != REAL_HEIGHT) {
     ba_nmemb = actor_nmemb;
@@ -436,12 +443,28 @@ setup_video_mode (char *requested_vm)
     for (size_t i = 0; i < actor_nmemb; i++) {
       struct actor *a = &actor[i];
 
-      int bw = (w * get_bitmap_width (a->f.b)) / REAL_WIDTH;
-      int bh = (h * get_bitmap_height (a->f.b)) / REAL_HEIGHT;
+      int fw = (w * get_bitmap_width (a->f.b)) / REAL_WIDTH;
+      int fh = (h * get_bitmap_height (a->f.b)) / REAL_HEIGHT;
+      a->f.b = ba[i].f = create_bitmap (fw, fh);
 
-      a->f.b = ba[i] = create_bitmap (bw, bh);
-      if (w != REAL_WIDTH) a->f.c.x = round (a->f.c.x);
-      if (h != REAL_HEIGHT) a->f.c.y = round (a->f.c.y);
+      int ofw = (w * get_bitmap_width (a->of.b)) / REAL_WIDTH;
+      int ofh = (h * get_bitmap_height (a->of.b)) / REAL_HEIGHT;
+      a->of.b = ba[i].of = create_bitmap (ofw, ofh);
+
+      int fow = (w * get_bitmap_width (a->fo.b)) / REAL_WIDTH;
+      int foh = (h * get_bitmap_height (a->fo.b)) / REAL_HEIGHT;
+      a->fo.b = ba[i].fo = create_bitmap (fow, foh);
+
+      if (w != REAL_WIDTH) {
+        a->f.c.x = round (a->f.c.x);
+        a->of.c.x = round (a->of.c.x);
+        a->fo.dx = round (a->fo.dx);
+      }
+      if (h != REAL_HEIGHT) {
+        a->f.c.y = round (a->f.c.y);
+        a->of.c.y = round (a->of.c.y);
+        a->fo.dy = round (a->fo.dy);
+      }
     }
   }
 
@@ -457,12 +480,20 @@ setup_video_mode (char *requested_vm)
   update_room0_cache ();
   update_cache ();
 
+  changing_vm = true;
+
   if (is_game_paused ()) step_cycle = 1;
   if (anim_compute_callback) anim_compute_callback ();
   if (anim_draw_callback) anim_draw_callback ();
   if (anim_cleanup_callback) anim_cleanup_callback ();
 
+  changing_vm = false;
+
   if (ba && ba_nmemb)
-    for (size_t i = 0; i < ba_nmemb; i++) al_destroy_bitmap (ba[i]);
+    for (size_t i = 0; i < ba_nmemb; i++) {
+      al_destroy_bitmap (ba[i].f);
+      al_destroy_bitmap (ba[i].of);
+      al_destroy_bitmap (ba[i].fo);
+    }
   al_free (ba);
 }

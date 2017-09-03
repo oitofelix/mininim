@@ -401,8 +401,6 @@ struct actor {
     int parent_id;
     struct coord c;
     ALLEGRO_BITMAP *b;
-    struct coord oc;
-    ALLEGRO_BITMAP *ob;
     enum dir dir;
     int flip;
   } f;

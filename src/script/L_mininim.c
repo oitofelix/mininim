@@ -28,6 +28,7 @@ static DECLARE_LUA (__newindex);
 static DECLARE_LUA (__tostring);
 
 static DECLARE_LUA (quit);
+static DECLARE_LUA (rest);
 
 void
 define_L_mininim (lua_State *L)
@@ -71,8 +72,8 @@ define_L_mininim (lua_State *L)
   /* mininim.video */
   define_L_mininim_video (L);
 
-  /* mininim.setting */
-  define_L_mininim_setting (L);
+  /* mininim.settings */
+  define_L_mininim_settings (L);
 
   /* mininim.mouse */
   define_L_mininim_mouse (L);
@@ -166,8 +167,8 @@ BEGIN_LUA (__index)
     } else if (! strcasecmp (key, "video")) {
       L_push_interface (L, L_MININIM_VIDEO);
       return 1;
-    } else if (! strcasecmp (key, "setting")) {
-      L_push_interface (L, L_MININIM_SETTING);
+    } else if (! strcasecmp (key, "settings")) {
+      L_push_interface (L, L_MININIM_SETTINGS);
       return 1;
     } else if (! strcasecmp (key, "mouse")) {
       L_push_interface (L, L_MININIM_MOUSE);
@@ -205,6 +206,9 @@ BEGIN_LUA (__index)
         al_free (text);
       } else lua_pushnil (L);
       return 1;
+    } else if (! strcasecmp (key, "rest")) {
+      lua_pushcfunction (L, rest);
+      return 1;
     } else break;
   default: break;
   }
@@ -226,6 +230,10 @@ BEGIN_LUA (__newindex)
         al_set_clipboard_text (display, text);
       }
       return 0;
+    } else if (! strcasecmp (key, "paused")) {
+      bool pause = lua_toboolean (L, 3);
+      pause_game (pause);
+      return 0;
     } else break;
   default: break;
   }
@@ -244,6 +252,16 @@ END_LUA
 BEGIN_LUA (quit)
 {
   quit_anim = QUIT_GAME;
+  return 0;
+}
+END_LUA
+
+BEGIN_LUA (rest)
+{
+  double seconds = lua_tonumber (L, 1);
+  unlock_lua ();
+  al_rest (seconds);
+  lock_lua ();
   return 0;
 }
 END_LUA

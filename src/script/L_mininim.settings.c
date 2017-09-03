@@ -1,5 +1,5 @@
 /*
-  L_mininim.setting.c -- mininim.setting script module;
+  L_mininim.settings.c -- mininim.settings script module;
 
   Copyright (C) 2015, 2016, 2017 Bruno Félix Rezende Ribeiro
   <oitofelix@gnu.org>
@@ -26,9 +26,9 @@ static DECLARE_LUA (__newindex);
 static DECLARE_LUA (__tostring);
 
 void
-define_L_mininim_setting (lua_State *L)
+define_L_mininim_settings (lua_State *L)
 {
-  luaL_newmetatable(L, L_MININIM_SETTING);
+  luaL_newmetatable(L, L_MININIM_SETTINGS);
 
   lua_pushstring (L, "__eq");
   lua_pushcfunction (L, __eq);
@@ -97,7 +97,10 @@ BEGIN_LUA (__newindex)
       L_set_string_var (L, 3, &audio_mode);
       return 0;
     } else if (! strcasecmp (key, "video_mode")) {
-      L_set_string_var (L, 3, &video_mode);
+      char *mode = (char *) lua_tostring (L, 3);
+      lock_lua ();
+      ui_vm (mode);
+      unlock_lua ();
       return 0;
     } else if (! strcasecmp (key, "env_mode")) {
       L_set_string_var (L, 3, &env_mode);
@@ -118,7 +121,7 @@ END_LUA
 
 BEGIN_LUA (__tostring)
 {
-  lua_pushstring (L, "MININIM SETTING INTERFACE");
+  lua_pushstring (L, "MININIM SETTINGS INTERFACE");
   return 1;
 }
 END_LUA

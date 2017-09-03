@@ -775,9 +775,19 @@ put_at_defense_frame (struct actor *k)
   case NO_ACTOR: default: break;
   case KID:
     select_actor_frame (k, "KID", "SWORD_DEFENSE", 0);
+
+    /* place on the ground */
+    place_on_the_ground (&k->f, &k->f.c);
+
     next_frame (&k->f, &k->f, &k->fo);
 
+    /* place on the ground */
+    place_on_the_ground (&k->f, &k->f.c);
+
     select_actor_frame (k, "KID", "SWORD_DEFENSE", 1);
+
+    /* place on the ground */
+    place_on_the_ground (&k->f, &k->f.c);
 
     if (ke->type == KID)
       select_actor_xframe (k, "KID", "SWORD", 11);
@@ -786,6 +796,10 @@ put_at_defense_frame (struct actor *k)
     k->action = kid_sword_defense;
     uncollide_back_fight (k);
     next_frame (&k->f, &k->f, &k->fo);
+
+    /* place on the ground */
+    place_on_the_ground (&k->f, &k->f.c);
+
     break;
   case GUARD:
   case FAT:
@@ -793,10 +807,18 @@ put_at_defense_frame (struct actor *k)
   case SKELETON:
   case SHADOW:
     select_actor_frame (k, NULL, "SWORD_DEFENSE", 0);
+
+    /* place on the ground */
+    place_on_the_ground (&k->f, &k->f.c);
+
     select_actor_xframe (k, NULL, "SWORD", 11);
     k->action = guard_sword_defense;
     uncollide_back_fight (k);
     next_frame (&k->f, &k->f, &k->fo);
+
+    /* place on the ground */
+    place_on_the_ground (&k->f, &k->f.c);
+
     break;
   }
 
@@ -819,11 +841,34 @@ put_at_attack_frame (struct actor *k)
     if (k->i == 3) return;
 
     k->f = k->of;
+
+    /* place on the ground */
+    place_on_the_ground (&k->f, &k->f.c);
+
     select_actor_frame (k, "KID", "SWORD_ATTACK", 0);
+
+    /* place on the ground */
+    place_on_the_ground (&k->f, &k->f.c);
+
     next_frame (&k->f, &k->f, &k->fo);
+
+    /* place on the ground */
+    place_on_the_ground (&k->f, &k->f.c);
+
     select_actor_frame (k, "KID", "SWORD_ATTACK", 1);
+
+    /* place on the ground */
+    place_on_the_ground (&k->f, &k->f.c);
+
     next_frame (&k->f, &k->f, &k->fo);
+
+    /* place on the ground */
+    place_on_the_ground (&k->f, &k->f.c);
+
     select_actor_frame (k, "KID", "SWORD_ATTACK", 2);
+
+    /* place on the ground */
+    place_on_the_ground (&k->f, &k->f.c);
 
     /* sword attack defended */
     k->i = 8;
@@ -836,6 +881,9 @@ put_at_attack_frame (struct actor *k)
 
     uncollide_back_fight (k);
     next_frame (&k->f, &k->f, &k->fo);
+
+    /* place on the ground */
+    place_on_the_ground (&k->f, &k->f.c);
 
     k->i = 3;
     break;
@@ -851,6 +899,9 @@ put_at_attack_frame (struct actor *k)
     select_actor_xframe (k, NULL, "SWORD", 8);
     uncollide_back_fight (k);
     next_frame (&k->f, &k->f, &k->fo);
+
+    /* place on the ground */
+    place_on_the_ground (&k->f, &k->f.c);
 
     k->i = 4;
     break;
