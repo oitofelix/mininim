@@ -106,11 +106,15 @@ The following additional features are planned to be implemented soon.
 
 ### Media
 
-[![MININIM multi-room features](https://img.youtube.com/vi/i8kXFLuZ8Io/0.jpg)](https://www.youtube.com/watch?v=i8kXFLuZ8Io)
+The following videos demonstrate features that are already implemented
+and will come up in the next release.  If you like MININIM and want to
+show your appreciation or enable oitofelix to spend more time on its
+development (so these features come out faster and better),
+[__PLEASE, CONSIDER SUPPORTING MININIM DEVELOPMENT!__](/funding.html)
 
-Notice that animations, physics, level editor, multi-room support and
-other features have been further improved since this video was
-recorded.
+[![MININIM Menu and Replays](https://img.youtube.com/vi/qvZFpOMrqdE/0.jpg)](https://www.youtube.com/watch?v=qvZFpOMrqdE)
+
+[![MININIM Lua and Video Modes](https://img.youtube.com/vi/mj_GPdXnYDQ&t=214s/0.jpg)](https://www.youtube.com/watch?v=mj_GPdXnYDQ&t=214s)
 
 [PODebug](http://www.podebug.com/2016/08/029-recriando-prince-of-persia-dois-projetos-brasileiros/)
 has a podcast episode from august 2016 titled _Recriando Prince of
