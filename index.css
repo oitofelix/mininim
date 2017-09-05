@@ -2,7 +2,7 @@
     display: flex;
 }
 
-#markdown div.h > p {
+#markdown div.h > * {
     flex: auto;
 }
 

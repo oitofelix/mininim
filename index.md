@@ -113,9 +113,11 @@ development (so these features come out faster and better),
 [__PLEASE, CONSIDER SUPPORTING MININIM DEVELOPMENT!__](/funding.html)
 
 <div class="h" markdown="1">
-[![MININIM Menu and Replays](https://img.youtube.com/vi/qvZFpOMrqdE/0.jpg)](https://www.youtube.com/watch?v=qvZFpOMrqdE)
 
-[![MININIM Lua and Video Modes](https://img.youtube.com/vi/mj_GPdXnYDQ/0.jpg)](https://www.youtube.com/watch?v=mj_GPdXnYDQ)
+<a target="_blank" href="https://www.youtube.com/watch?v=qvZFpOMrqdE"><img src="https://img.youtube.com/vi/qvZFpOMrqdE/0.jpg" alt="MININIM Menu and Replays" /></a>
+
+<a target="_blank" href="https://www.youtube.com/watch?v=mj_GPdXnYDQ"><img src="https://img.youtube.com/vi/mj_GPdXnYDQ/0.jpg" alt="MININIM Lua and Video Modes" /></a>
+
 </div>
 
 [PODebug](http://www.podebug.com/2016/08/029-recriando-prince-of-persia-dois-projetos-brasileiros/)
