@@ -1,3 +1,11 @@
+#markdown div.h {
+    display: flex;
+}
+
+#markdown div.h > p {
+    flex: auto;
+}
+
 #markdown img {
     display: block;
     margin-left: auto;

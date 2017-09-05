@@ -112,7 +112,7 @@ show your appreciation or enable oitofelix to spend more time on its
 development (so these features come out faster and better),
 [__PLEASE, CONSIDER SUPPORTING MININIM DEVELOPMENT!__](/funding.html)
 
-<div style="display: inline-block" markdown="1">
+<div class="h" markdown="1">
 [![MININIM Menu and Replays](https://img.youtube.com/vi/qvZFpOMrqdE/0.jpg)](https://www.youtube.com/watch?v=qvZFpOMrqdE)
 
 [![MININIM Lua and Video Modes](https://img.youtube.com/vi/mj_GPdXnYDQ/0.jpg)](https://www.youtube.com/watch?v=mj_GPdXnYDQ)
