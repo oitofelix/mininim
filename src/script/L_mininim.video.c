@@ -405,6 +405,8 @@ void
 setup_video_mode (char *requested_vm)
 {
   if (changing_vm) return;
+  changing_vm = true;
+  lock_lua ();
 
   if (is_valid_video_mode (requested_vm))
     set_string_var (&video_mode, requested_vm);
@@ -416,6 +418,8 @@ setup_video_mode (char *requested_vm)
     REAL_WIDTH = ORIGINAL_WIDTH;
     REAL_HEIGHT = ORIGINAL_HEIGHT;
     video_rendering (false);
+    changing_vm = false;
+    unlock_lua ();
     return;
   }
 
@@ -427,6 +431,8 @@ setup_video_mode (char *requested_vm)
     REAL_HEIGHT = ORIGINAL_HEIGHT;
     set_string_var (&video_mode, NULL);
     video_rendering (false);
+    changing_vm = false;
+    unlock_lua ();
     return;
   }
 
@@ -439,21 +445,28 @@ setup_video_mode (char *requested_vm)
   if (w != REAL_WIDTH && h != REAL_HEIGHT) {
     ba_nmemb = actor_nmemb;
     ba = xcalloc (ba_nmemb, sizeof (*ba));
+    memset (ba, 0, ba_nmemb * sizeof (*ba));
 
     for (size_t i = 0; i < actor_nmemb; i++) {
       struct actor *a = &actor[i];
 
-      int fw = (w * get_bitmap_width (a->f.b)) / REAL_WIDTH;
-      int fh = (h * get_bitmap_height (a->f.b)) / REAL_HEIGHT;
-      a->f.b = ba[i].f = create_bitmap (fw, fh);
+      if (a->f.b) {
+        int fw = (w * get_bitmap_width (a->f.b)) / REAL_WIDTH;
+        int fh = (h * get_bitmap_height (a->f.b)) / REAL_HEIGHT;
+        a->f.b = ba[i].f = create_bitmap (fw, fh);
+      }
 
-      int ofw = (w * get_bitmap_width (a->of.b)) / REAL_WIDTH;
-      int ofh = (h * get_bitmap_height (a->of.b)) / REAL_HEIGHT;
-      a->of.b = ba[i].of = create_bitmap (ofw, ofh);
+      if (a->of.b) {
+        int ofw = (w * get_bitmap_width (a->of.b)) / REAL_WIDTH;
+        int ofh = (h * get_bitmap_height (a->of.b)) / REAL_HEIGHT;
+        a->of.b = ba[i].of = create_bitmap (ofw, ofh);
+      }
 
-      int fow = (w * get_bitmap_width (a->fo.b)) / REAL_WIDTH;
-      int foh = (h * get_bitmap_height (a->fo.b)) / REAL_HEIGHT;
-      a->fo.b = ba[i].fo = create_bitmap (fow, foh);
+      if (a->fo.b) {
+        int fow = (w * get_bitmap_width (a->fo.b)) / REAL_WIDTH;
+        int foh = (h * get_bitmap_height (a->fo.b)) / REAL_HEIGHT;
+        a->fo.b = ba[i].fo = create_bitmap (fow, foh);
+      }
 
       if (w != REAL_WIDTH) {
         a->f.c.x = round (a->f.c.x);
@@ -480,20 +493,19 @@ setup_video_mode (char *requested_vm)
   update_room0_cache ();
   update_cache ();
 
-  changing_vm = true;
-
   if (is_game_paused ()) step_cycle = 1;
   if (anim_compute_callback) anim_compute_callback ();
   if (anim_draw_callback) anim_draw_callback ();
   if (anim_cleanup_callback) anim_cleanup_callback ();
 
-  changing_vm = false;
-
   if (ba && ba_nmemb)
     for (size_t i = 0; i < ba_nmemb; i++) {
-      al_destroy_bitmap (ba[i].f);
-      al_destroy_bitmap (ba[i].of);
-      al_destroy_bitmap (ba[i].fo);
+      if (ba[i].f) al_destroy_bitmap (ba[i].f);
+      if (ba[i].of) al_destroy_bitmap (ba[i].of);
+      if (ba[i].fo) al_destroy_bitmap (ba[i].fo);
     }
   al_free (ba);
+
+  changing_vm = false;
+  unlock_lua ();
 }

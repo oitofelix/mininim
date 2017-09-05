@@ -1130,6 +1130,30 @@ _bb (struct frame *f, struct coord *c)
                d.y + d.h - 1);
 }
 
+coord_f
+str2coord_f (const char *name)
+{
+  if (! name) return NULL;
+
+  if (! strcasecmp (name, "M")) return _m;
+  else if (! strcasecmp (name, "MT")) return _mt;
+  else if (! strcasecmp (name, "MBO")) return _mbo;
+  else if (! strcasecmp (name, "ML")) return _ml;
+  else if (! strcasecmp (name, "MR")) return _mr;
+  else if (! strcasecmp (name, "MF")) return _mf;
+  else if (! strcasecmp (name, "MBA")) return _mba;
+  else if (! strcasecmp (name, "TL")) return _tl;
+  else if (! strcasecmp (name, "TR")) return _tr;
+  else if (! strcasecmp (name, "TF")) return _tf;
+  else if (! strcasecmp (name, "TB")) return _tb;
+  else if (! strcasecmp (name, "BL")) return _bl;
+  else if (! strcasecmp (name, "BR")) return _br;
+  else if (! strcasecmp (name, "BF")) return _bf;
+  else if (! strcasecmp (name, "BB")) return _bb;
+
+  return NULL;
+}
+
 struct coord *
 cf_rel (coord_f cf, struct frame *f, struct coord *c, lua_Number dx,
         lua_Number dy)

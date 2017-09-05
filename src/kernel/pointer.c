@@ -95,10 +95,10 @@ get_mouse_pos (struct pos *p)
 
   pos_gen (&m.c, p, 0, 3);
 
-  if (edit == EDIT_NONE) {
-    invalid_pos (p);
-    return p;
-  }
+  /* if (edit == EDIT_NONE) { */
+  /*   invalid_pos (p); */
+  /*   return p; */
+  /* } */
 
   struct pos p0;
 

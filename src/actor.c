@@ -177,7 +177,7 @@ draw_actors (ALLEGRO_BITMAP *bitmap)
 
   /* coord_wa = true; */
 
-  qsort (actor, actor_nmemb, sizeof (*a), compare_actors);
+  /* qsort (actor, actor_nmemb, sizeof (*a), compare_actors); */
 
   size_t i;
   for (i = 0; i < actor_nmemb; i++) {

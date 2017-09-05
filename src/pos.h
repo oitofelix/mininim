@@ -103,6 +103,8 @@ struct coord *_br (struct frame *f, struct coord *c);
 struct coord *_bf (struct frame *f, struct coord *c);
 struct coord *_bb (struct frame *f, struct coord *c);
 
+coord_f str2coord_f (const char *name);
+
 struct coord *
 cf_rel (coord_f cf, struct frame *f, struct coord *c,
         lua_Number dx, lua_Number dy);

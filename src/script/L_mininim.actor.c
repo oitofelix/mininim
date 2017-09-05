@@ -26,6 +26,7 @@ static DECLARE_LUA (__newindex);
 static DECLARE_LUA (__tostring);
 
 static DECLARE_LUA (draw);
+static DECLARE_LUA (position);
 
 void
 define_L_mininim_actor (lua_State *L)
@@ -484,6 +485,10 @@ BEGIN_LUA (__index)
     } else if (! strcasecmp (key, "is_reversed")) {
       lua_pushboolean (L, a->reverse);
       return 1;
+    } else if (! strcasecmp (key, "position")) {
+      lua_pushvalue (L, 1);
+      lua_pushcclosure (L, position, 1);
+      return 1;
     } else break;
   default: break;
   }
@@ -640,6 +645,31 @@ BEGIN_LUA (draw)
   return 0;
 }
 END_LUA
+
+BEGIN_LUA (position)
+{
+  int *id_ptr = luaL_checkudata (L, lua_upvalueindex (1), L_MININIM_ACTOR);
+
+  int id;
+  if (id_ptr) id = *id_ptr;
+  else return 0;
+
+  struct actor *a = get_actor_by_id (id);
+  if (! a) return 0;
+
+  const char *name = lua_tostring (L, 1);
+  coord_f cf = str2coord_f (name);
+
+  cf = cf ? cf : _m;
+
+  struct pos p;
+  survey (cf, pos, &a->f, NULL, NULL, &p);
+  L_pushposition (L, &p);
+
+  return 1;
+}
+END_LUA
+
 
 bool
 select_actor_frame (struct actor *a, const char *type, const char *action,
