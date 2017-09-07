@@ -20,7 +20,15 @@
 
 #include "mininim.h"
 
+struct last {
+  char *video_mode;
+  enum em em;
+  enum hue hue;
+} last;
+
 Ihandle *gui_editor_dialog;
+
+Ihandle *tile_icon[TILE_FGS];
 
 #define LOAD_ICON(token) load_icon (token, #token)
 #define UNLOAD_ICON(token) unload_icon (#token)
@@ -30,6 +38,8 @@ static void load_icon (char *filename, char *handle_name);
 static void unload_icon (char *handle_name);
 static void load_icons (void);
 static void unload_icons (void);
+static void load_tile_icon_array (void);
+static void unload_tile_icon_array (void);
 
 void
 init_gui (int argc, char **argv)
@@ -45,6 +55,8 @@ init_gui (int argc, char **argv)
 
   load_icons ();
 
+  load_tile_icon_array ();
+
   Ihandle *logo_icon_image = bitmap_to_iup_image (logo_icon, NULL);
   IupSetHandle ("LOGO_ICON", logo_icon_image);
 
@@ -57,6 +69,8 @@ finalize_gui (void)
   IupDestroy (gui_editor_dialog);
 
   unload_icons ();
+
+  unload_tile_icon_array ();
 
   IupExitLoop ();
   IupFlush ();
@@ -121,6 +135,9 @@ load_icons (void)
   LOAD_ICON (FULL_SCREEN_ICON);
   LOAD_ICON (WINDOWS_ICON);
   LOAD_ICON (HOME_ICON);
+  LOAD_ICON (EVENT_ICON);
+  LOAD_ICON (TOP_ICON);
+  LOAD_ICON (BOTTOM_ICON);
 }
 
 void
@@ -165,6 +182,43 @@ unload_icons (void)
   UNLOAD_ICON (FULLSCREEN_ICON);
   UNLOAD_ICON (WINDOWS_ICON);
   UNLOAD_ICON (HOME_ICON);
+  UNLOAD_ICON (EVENT_ICON);
+  UNLOAD_ICON (TOP_ICON);
+  UNLOAD_ICON (BOTTOM_ICON);
+}
+
+void
+load_tile_icon_array (void)
+{
+  set_string_var (&last.video_mode, video_mode);
+  last.em = em;
+  last.hue = hue;
+
+  struct tile t; memset (&t, 0, sizeof (t));
+  for (t.fg = 0; t.fg < TILE_FGS; t.fg++) {
+    if (tile_icon[t.fg]) IupDestroy (tile_icon[t.fg]);
+    ALLEGRO_BITMAP *b = get_tile_bitmap (&t, NULL, REAL_WIDTH / ORIGINAL_WIDTH,
+                                         TILE_FG);
+    ALLEGRO_BITMAP *b_scaled = clone_scaled_bitmap (b, 16, 16, 0);
+    tile_icon[t.fg] = bitmap_to_iup_image (b_scaled, NULL);
+    al_destroy_bitmap (b_scaled);
+    al_destroy_bitmap (b);
+  }
+}
+
+void
+unload_tile_icon_array (void)
+{
+  for (enum tile_fg f = 0; f < TILE_FGS; f++)
+    if (tile_icon[f]) IupDestroy (tile_icon[f]);
+}
+
+void
+gui_update (void)
+{
+  if ((last.video_mode && strcmp (video_mode, last.video_mode))
+      || last.em != em || last.hue != hue)
+    load_tile_icon_array ();
 }
 
 void

@@ -106,7 +106,10 @@ gui_create_editor_dialog (void)
 
         IupSetAttributes
         (IupTabs
-         (IupSetAttributes
+         (
+
+          /* Tiles */
+          IupSetAttributes
           (IupGridBox
            (
             IupSetAttributes
@@ -202,7 +205,13 @@ gui_create_editor_dialog (void)
            "SIZELIN = -1,"
            "NGAPCOL = 5,"
            "NGAPLIN = 5,"),
-          IupVbox (NULL),
+
+          /* Events */
+          IupSetAttributes
+          (gui_create_editor_events_control
+           (NULL, &global_level),
+           "NAME = EVENTS_CONTROL"),
+
           IupVbox (NULL),
           IupVbox (NULL),
           IupVbox (NULL),
@@ -343,6 +352,9 @@ show_cb (Ihandle *ih, int state)
     ("SHOW_CB", IupGetDialogChild (ih, "TILE_MOVE_CONTROL"), state);
 
   gui_run_callback_IFni
+    ("SHOW_CB", IupGetDialogChild (ih, "EVENTS_CONTROL"), state);
+
+  gui_run_callback_IFni
     ("SHOW_CB", IupGetDialogChild (ih, "POSITION_CONTROL"), state);
 
   gui_run_callback_IFni
@@ -421,6 +433,9 @@ _update_cb (Ihandle *ih)
 
   gui_run_callback_IFn
     ("_UPDATE_CB", IupGetDialogChild (ih, "TILE_MOVE_CONTROL"));
+
+  gui_run_callback_IFn
+    ("_UPDATE_CB", IupGetDialogChild (ih, "EVENTS_CONTROL"));
 
   gui_run_callback_IFn
     ("_UPDATE_CB", IupGetDialogChild (ih, "POSITION_CONTROL"));

@@ -140,5 +140,8 @@
 #define SHUFFLE_ICON "data/icons/shuffle.png"
 #define UNMASK_ICON "data/icons/unmask.png"
 #define MASK_EXCHANGE_ICON "data/icons/mask-exchange.png"
+#define EVENT_ICON "data/icons/event.png"
+#define TOP_ICON "data/icons/top.png"
+#define BOTTOM_ICON "data/icons/bottom.png"
 
 #endif	/* MININIM_GUI_ICONS_H */

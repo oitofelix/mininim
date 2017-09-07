@@ -105,6 +105,7 @@ play_anim (anim_callback_t draw_callback,
         IupFlush ();
 #else
         for (int i = 1; i <= 100; i++) IupLoopStep ();
+        IupFlush ();
 #endif
         drop_all_events_from_source
           (event_queue, al_get_timer_event_source (iup_timer));

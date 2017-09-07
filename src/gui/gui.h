@@ -25,6 +25,8 @@
 void init_gui (int argc, char **argv);
 void finalize_gui (void);
 
+void gui_update (void);
+
 bool load_led (const char *filename);
 
 Ihandle *bitmap_to_iup_image (ALLEGRO_BITMAP *b, palette p);
@@ -52,5 +54,8 @@ void dialog_fit_natural_size (Ihandle *ih);
 
 void gui_resize_cb (Ihandle *ih, int width, int height);
 int gui_destroy_image_cb (Ihandle *ih);
+
+/* variables */
+extern Ihandle *tile_icon[TILE_FGS];
 
 #endif	/* MININIM_GUI_H */

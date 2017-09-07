@@ -337,6 +337,9 @@ trim_bitmap (ALLEGRO_BITMAP *b, ALLEGRO_COLOR t)
     }
   al_unlock_bitmap (b);
 
+  if (xl > xr) xl = xr = 0;
+  if (yl > yr) yl = yr = 0;
+
   int w = xr - xl + 1;
   int h = yr - yl + 1;
 
