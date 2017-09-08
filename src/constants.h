@@ -53,14 +53,12 @@
 
 #define MIGNORE (INT_MIN)
 
-#define ROOMS 25
 #define FLOORS 3
 #define PLACES 10
-#define EVENTS 256
-#define GUARDS 25
 
 #define LEVENTS 256
 #define LROOMS 24
+#define LGUARDS LROOMS
 #define LFLOORS 3
 #define LPLACES 10
 

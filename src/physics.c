@@ -256,19 +256,19 @@ set_ext_rel (struct pos *p, int floor, int place, int e)
 struct level_event *
 event (struct level *l, int e)
 {
-  return &l->event[typed_int (e, EVENTS, 1, NULL, NULL)];
+  return &l->event[typed_int (e, l->event_nmemb, 1, NULL, NULL)];
 }
 
 struct guard *
 guard (struct level *l, int g)
 {
-  return &l->guard[typed_int (g, GUARDS, 1, NULL, NULL)];
+  return &l->guard[typed_int (g, l->guard_nmemb, 1, NULL, NULL)];
 }
 
 struct room_linking *
 llink (struct level *l, int r)
 {
-  return &l->link[room_val (r)];
+  return &l->link[room_val (l, r)];
 }
 
 bool
@@ -627,13 +627,14 @@ next_pos_by_pred (struct pos *p, int dir, pos_pred pred, void *data)
   struct pos q = *p;
 
   if (q.room < 0 || q.floor < 0 || q.place < 0) new_pos (&q, q.l, 0, 0, -1);
-  if (q.room > ROOMS - 1 || q.floor > FLOORS - 1 || q.place > PLACES - 1)
-    new_pos (&q, q.l, ROOMS - 1, FLOORS - 1, PLACES);
+  if (q.room > p->l->room_nmemb - 1 || q.floor > FLOORS - 1
+      || q.place > PLACES - 1)
+    new_pos (&q, q.l, p->l->room_nmemb - 1, FLOORS - 1, PLACES);
 
   if (dir < 0) {
     goto loop_prev;
 
-    for (q.room = ROOMS - 1; q.room >= 0; q.room--)
+    for (q.room = p->l->room_nmemb - 1; q.room >= 0; q.room--)
       for (q.floor = FLOORS - 1; q.floor >= 0; q.floor--)
         for (q.place = PLACES - 1; q.place >= 0; q.place--) {
           if (pred (&q, data)) {
@@ -646,7 +647,7 @@ next_pos_by_pred (struct pos *p, int dir, pos_pred pred, void *data)
   } else {
     goto loop_next;
 
-    for (q.room = 0; q.room < ROOMS; q.room++)
+    for (q.room = 0; q.room < p->l->room_nmemb; q.room++)
       for (q.floor = 0; q.floor < FLOORS; q.floor++)
         for (q.place = 0; q.place < PLACES; q.place++) {
           if (pred (&q, data)) {
@@ -719,8 +720,8 @@ void
 exchange_event_pos (struct pos *p0, struct pos *p1)
 {
   if (peq (p0, p1)) return;
-  int i;
-  for (i = 0; i < EVENTS; i++)
+  size_t i;
+  for (i = 0; i < p0->l->event_nmemb; i++)
     if (peq (&event (p0->l, i)->p, p0))
       event (p1->l, i)->p = *p1;
     else if (peq (&event (p1->l, i)->p, p1))
@@ -732,7 +733,7 @@ exchange_guard_pos (struct pos *p0, struct pos *p1, bool invert_dir)
 {
   if (peq (p0, p1)) return;
   int i;
-  for (i = 0; i < GUARDS; i++)
+  for (i = 0; i < p0->l->guard_nmemb; i++)
     if (peq (&guard (p0->l, i)->p, p0)) {
       guard (p1->l, i)->p = *p1;
       if (invert_dir)
@@ -1019,7 +1020,7 @@ apply_to_room (struct level *l, int room, pos_trans f,
 void
 apply_to_level (struct level *l, pos_trans f, void *data, char *desc)
 {
-  for (int i = 1; i < ROOMS; i++) apply_to_room (l, i, f, data, NULL);
+  for (int i = 1; i < l->room_nmemb; i++) apply_to_room (l, i, f, data, NULL);
   end_undo_set (&undo, desc);
 }
 
@@ -1095,7 +1096,7 @@ struct level *
 mirror_level_h (struct level *l)
 {
   int i;
-  for (i = 1; i < ROOMS; i++) {
+  for (i = 1; i < l->room_nmemb; i++) {
     mirror_room_h (l, i);
     mirror_link (l, i, LEFT, RIGHT);
   }

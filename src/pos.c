@@ -38,9 +38,9 @@ typed_int (int i, int n, int f, int *nr, int *nf)
 }
 
 int
-room_val (int r)
+room_val (struct level *l, int r)
 {
-  return typed_int (r, ROOMS, 1, NULL, NULL);
+  return typed_int (r, l->room_nmemb, 1, NULL, NULL);
 }
 
 int *
@@ -58,13 +58,13 @@ roomd_ptr (struct level *l, int room, enum dir dir)
 int
 roomd (struct level *l, int room, enum dir dir)
 {
-  return room_val (*roomd_ptr (l, room, dir));
+  return room_val (l, *roomd_ptr (l, room, dir));
 }
 
 void
 link_room (struct level *l, int room0, int room1, enum dir dir)
 {
-  if (room0) *roomd_ptr (l, room0, dir) = room_val (room1);
+  if (room0) *roomd_ptr (l, room0, dir) = room_val (l, room1);
 }
 
 void
@@ -96,7 +96,7 @@ is_room_adjacent (struct level *l, int room0, int room1)
 int
 room_dist (struct level *lv, int r0, int r1, int max)
 {
-  struct room_dist room[ROOMS];
+  struct room_dist room[lv->room_nmemb];
 
   /* begin optimization block */
   if (r0 == r1) return 0;
@@ -109,7 +109,7 @@ room_dist (struct level *lv, int r0, int r1, int max)
   /* end optimization block */
 
   int i;
-  for (i = 0; i < ROOMS; i++) {
+  for (i = 0; i < lv->room_nmemb; i++) {
     room[i].dist = INT_MAX;
     room[i].visited = false;
   }
@@ -118,7 +118,7 @@ room_dist (struct level *lv, int r0, int r1, int max)
   int dmax = 0;
 
   int u;
-  while ((u = min_room_dist (room, &dmax)) != -1
+  while ((u = min_room_dist (room, lv->room_nmemb, &dmax)) != -1
          && dmax <= max) {
     if (u == r1) break;
     room[u].visited = true;
@@ -138,13 +138,15 @@ room_dist (struct level *lv, int r0, int r1, int max)
 }
 
 int
-min_room_dist (struct room_dist room[], int *dmax)
+min_room_dist (size_t room_nmemb;
+               struct room_dist room[room_nmemb],
+               size_t room_nmemb, int *dmax)
 {
   int r = -1;
   int d = INT_MAX;
 
   int i;
-  for (i = 0; i < ROOMS; i++)
+  for (i = 0; i < room_nmemb; i++)
     if (! room[i].visited) {
       if (room[i].dist < d) {
         d = room[i].dist;
@@ -307,7 +309,7 @@ npos (struct pos *p, struct pos *np)
 
   bool m;
 
-  np->room = room_val (np->room);
+  np->room = room_val (np->l, np->room);
 
   do {
     m = false;
@@ -770,7 +772,7 @@ reflect_pos_v (struct pos *p0, struct pos *p1)
 struct pos *
 random_pos (struct level *l, struct pos *p)
 {
-  return new_pos (p, l, prandom (ROOMS - 2) + 1, prandom (FLOORS - 1),
+  return new_pos (p, l, prandom (l->room_nmemb - 2) + 1, prandom (FLOORS - 1),
                   prandom (PLACES - 1));
 }
 

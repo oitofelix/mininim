@@ -105,7 +105,10 @@ gui_create_position_control (struct pos *p, char *norm_group)
   IupSetAttribute (ih, "_PLACE_SPIN", (void *) place_spin);
 
   IupSetInt (level_spin, "SPINMAX", 14);
-  IupSetInt (room_spin, "SPINMAX", ROOMS - 1);
+
+  /* TODO: update this value when creating more rooms */
+  /* IupSetInt (room_spin, "SPINMAX", p->l->room_nmemb - 1); */
+
   IupSetInt (floor_spin, "SPINMAX", FLOORS - 1);
   IupSetInt (place_spin, "SPINMAX", PLACES - 1);
 

@@ -619,7 +619,7 @@ void
 draw_start_guards (ALLEGRO_BITMAP *bitmap)
 {
   int i;
-  for (i = 0; i < GUARDS; i++) {
+  for (i = 0; i < global_level.guard_nmemb; i++) {
     struct guard *g = guard (&global_level, i);
     if (g->type == NO_ACTOR) continue;
     struct frame f;

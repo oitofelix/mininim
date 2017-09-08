@@ -41,7 +41,13 @@ void cleanup_level (void);
 
 void load_level (void);
 void unload_level (void);
+
+struct level *new_level (struct level *l,
+                         size_t room_nmemb,
+                         size_t event_nmemb,
+                         size_t guard_nmemb);
 struct level *copy_level (struct level *ld, struct level *ls);
+void destroy_level (struct level *l);
 struct level *normalize_level (struct level *l);
 
 void replace_playing_level (struct level *l);

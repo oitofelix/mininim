@@ -43,14 +43,59 @@ bool ignore_level_cutscene;
 uint64_t death_timer;
 
 struct level *
+new_level (struct level *l, size_t room_nmemb, size_t event_nmemb,
+           size_t guard_nmemb)
+{
+  l->room_nmemb = room_nmemb;
+  l->tile = xcalloc (l->room_nmemb, sizeof (*l->tile));
+  l->link = xcalloc (l->room_nmemb, sizeof (*l->link));
+
+  l->event_nmemb = event_nmemb;
+  l->event = xcalloc (l->event_nmemb, sizeof (*l->event));
+
+  l->guard_nmemb = guard_nmemb;
+  l->guard = xcalloc (l->guard_nmemb, sizeof (*l->guard));
+
+  normalize_level (l);
+
+  return l;
+}
+
+struct level *
 copy_level (struct level *ld, struct level *ls)
 {
-  size_t i;
+  destroy_level (ld);
+
   *ld = *ls;
-  ld->start_pos.l = ld;
-  for (i = 0; i < EVENTS; i++) event (ld, i)->p.l = ld;
-  for (i = 0; i < GUARDS; i++) guard (ld, i)->p.l = ld;
+
+  /* tile */
+  ld->tile = copy_array
+    (ls->tile, ls->room_nmemb, &ld->room_nmemb, sizeof (*ld->tile));
+
+  /* link */
+  ld->link = copy_array
+    (ls->link, ls->room_nmemb, &ld->room_nmemb, sizeof (*ld->link));
+
+  /* events */
+  ld->event = copy_array
+    (ls->event, ls->event_nmemb, &ld->event_nmemb, sizeof (*ld->event));
+
+  /* guards */
+  ld->guard = copy_array
+    (ls->guard, ls->guard_nmemb, &ld->guard_nmemb, sizeof (*ld->guard));
+
+  normalize_level (ld);
+
   return ld;
+}
+
+void
+destroy_level (struct level *l)
+{
+  destroy_array ((void **) &l->event, &l->event_nmemb);
+  destroy_array ((void **) &l->guard, &l->guard_nmemb);
+  destroy_array ((void **) &l->tile, &l->room_nmemb);
+  destroy_array ((void **) &l->link, &l->room_nmemb);
 }
 
 struct level *
@@ -66,13 +111,13 @@ normalize_level (struct level *l)
   l->start_pos.l = l;
   npos (&l->start_pos, &l->start_pos);
 
-  for (i = 0; i < EVENTS; i++) {
+  for (i = 0; i < l->event_nmemb; i++) {
     struct level_event *e = event (l, i);
     e->p.l = l;
     npos (&e->p, &e->p);
   }
 
-  for (i = 0; i < GUARDS; i++) {
+  for (i = 0; i < l->guard_nmemb; i++) {
     struct guard *g = guard (l, i);
     g->p.l = l;
     if (g->dir != LEFT && g->dir != RIGHT)
@@ -99,10 +144,10 @@ skill_eq (struct skill *s0, struct skill *s1)
 bool
 room_linking_eq (struct room_linking *rl0, struct room_linking *rl1)
 {
-  return room_val (rl0->l) == room_val (rl1->l)
-    && room_val (rl0->r) == room_val (rl1->r)
-    && room_val (rl0->a) == room_val (rl1->a)
-    && room_val (rl0->b) == room_val (rl1->b);
+  return rl0->l == rl1->l
+    && rl0->r == rl1->r
+    && rl0->a == rl1->a
+    && rl0->b == rl1->b;
 }
 
 bool
@@ -147,21 +192,23 @@ level_eq (struct level *l0, struct level *l1)
       || l0->hue != l1->hue)
     return false;
 
-  size_t i;
-  for (i = 0; i < ROOMS; i++)
+  if (l0->room_nmemb != l1->room_nmemb) return false;
+  for (size_t i = 0; i < l0->room_nmemb; i++)
     if (! room_linking_eq (llink (l0, i), llink (l1, i)))
       return false;
 
-  for (i = 0; i < EVENTS; i++)
+  if (l0->event_nmemb != l1->event_nmemb) return false;
+  for (size_t i = 0; i < l0->event_nmemb; i++)
     if (! level_event_eq (event (l0, i), event (l1, i)))
       return false;
 
-  for (i = 0; i < GUARDS; i++)
+  if (l0->guard_nmemb != l1->guard_nmemb) return false;
+  for (size_t i = 0; i < l0->guard_nmemb; i++)
     if (! guard_eq (guard (l0, i), guard (l1, i)))
       return false;
 
   struct pos p;
-  for (p.room = 0; p.room < ROOMS; p.room++)
+  for (p.room = 0; p.room < l0->room_nmemb; p.room++)
     for (p.floor = 0; p.floor < FLOORS; p.floor++)
       for (p.place = 0; p.place < PLACES; p.place++)
         if (! tile_eq (&l0->tile[p.room][p.floor][p.place],
@@ -520,7 +567,7 @@ void
 register_tiles (void)
 {
   int room;
-  for (room = 0; room < ROOMS; room++)
+  for (room = 0; room < global_level.room_nmemb; room++)
     register_room (room);
 }
 
@@ -541,7 +588,7 @@ register_actors (void)
 
   /* create guards */
   int i;
-  for (i = 0; i < GUARDS; i++) {
+  for (i = 0; i < global_level.guard_nmemb; i++) {
     struct guard *g = guard (&global_level, i);
     struct actor *a;
     int id;

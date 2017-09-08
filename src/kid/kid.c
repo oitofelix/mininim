@@ -278,7 +278,7 @@ place_kid (struct actor *k, int room, int floor, int place)
 
   struct pos p;
   new_pos (&p, k->f.c.l, -1, -1, -1);
-  for (p.room = room; p.room < ROOMS; p.room++)
+  for (p.room = room; p.room < k->f.c.l->room_nmemb; p.room++)
     for (p.floor = floor; p.floor < FLOORS; p.floor++)
       for (p.place = place; p.place < PLACES; p.place++) {
         enum tile_fg f = fg (&p);

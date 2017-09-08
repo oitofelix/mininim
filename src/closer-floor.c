@@ -29,7 +29,7 @@ init_closer_floor (struct pos *p, struct closer_floor *c)
   memset (c, 0, sizeof (*c));
 
   int n;
-  typed_int (ext (p), EVENTS, 1, &n, NULL);
+  typed_int (ext (p), p->l->event_nmemb, 1, &n, NULL);
 
   npos (p, &c->p);
   c->event = n;

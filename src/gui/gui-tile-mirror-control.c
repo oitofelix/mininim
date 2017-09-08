@@ -215,8 +215,6 @@ button_action_cb (Ihandle *ih)
   struct pos *p = (void *) IupGetAttribute (ih, "_POS");
   struct pos p0;
 
-  struct room_linking l[ROOMS];
-
   if (v && h) {
     if (place) {
       reflect_pos_h (p, &p0);
@@ -228,44 +226,52 @@ button_action_cb (Ihandle *ih)
           (&undo, p->room, NULL);
         register_v_room_mirror_tile_undo
           (&undo, p->room, NULL);
-        memcpy (&l, &p->l->link, sizeof (l));
+        struct room_linking *l =
+          copy_array (p->l->link, p->l->room_nmemb, NULL, sizeof (*l));
         editor_mirror_link (p->room, LEFT, RIGHT);
         editor_mirror_link (p->room, ABOVE, BELOW);
         register_link_undo (&undo, l, "ROOM MIRROR TILES+LINKS H+V.");
+        destroy_array ((void **) &l, NULL);
       } else if (tiles) {
         register_h_room_mirror_tile_undo
           (&undo, p->room, NULL);
         register_v_room_mirror_tile_undo
           (&undo, p->room, "ROOM MIRROR TILES H+V.");
       } else if (links) {
-        memcpy (&l, &p->l->link, sizeof (l));
+        struct room_linking *l =
+          copy_array (p->l->link, p->l->room_nmemb, NULL, sizeof (*l));
         editor_mirror_link (p->room, LEFT, RIGHT);
         editor_mirror_link (p->room, ABOVE, BELOW);
         register_link_undo (&undo, l, "ROOM MIRROR LINKS H+V.");
+        destroy_array ((void **) &l, NULL);
       }
     } else if (level) {
       if (tiles && links) {
-        for (int i = 1; i < ROOMS; i++) {
+        for (int i = 1; i < p->l->room_nmemb; i++) {
           register_h_room_mirror_tile_undo (&undo, i, NULL);
           register_v_room_mirror_tile_undo (&undo, i, NULL);
-          memcpy (&l, &p->l->link, sizeof (l));
+          struct room_linking *l =
+            copy_array (p->l->link, p->l->room_nmemb, NULL, sizeof (*l));
           mirror_link (p->l, i, LEFT, RIGHT);
           mirror_link (p->l, i, ABOVE, BELOW);
           register_link_undo (&undo, l, NULL);
+          destroy_array ((void **) &l, NULL);
         }
         end_undo_set (&undo, "LEVEL MIRROR TILES+LINKS H+V.");
       } else if (tiles) {
-        for (int i = 1; i < ROOMS; i++) {
+        for (int i = 1; i < p->l->room_nmemb; i++) {
           register_h_room_mirror_tile_undo (&undo, i, NULL);
           register_v_room_mirror_tile_undo (&undo, i, NULL);
         }
         end_undo_set (&undo, "LEVEL MIRROR TILES H+V.");
       } else if (links) {
-        for (int i = 1; i < ROOMS; i++) {
-          memcpy (&l, &p->l->link, sizeof (l));
+        for (int i = 1; i < p->l->room_nmemb; i++) {
+          struct room_linking *l =
+            copy_array (p->l->link, p->l->room_nmemb, NULL, sizeof (*l));
           mirror_link (p->l, i, LEFT, RIGHT);
           mirror_link (p->l, i, ABOVE, BELOW);
           register_link_undo (&undo, l, NULL);
+          destroy_array ((void **) &l, NULL);
         }
         end_undo_set (&undo, "LEVEL MIRROR LINKS H+V.");
       }
@@ -277,35 +283,43 @@ button_action_cb (Ihandle *ih)
     } else if (room) {
       if (tiles && links) {
         register_v_room_mirror_tile_undo (&undo, p->room, NULL);
-        memcpy (&l, &p->l->link, sizeof (l));
+        struct room_linking *l =
+          copy_array (p->l->link, p->l->room_nmemb, NULL, sizeof (*l));
         editor_mirror_link (p->room, ABOVE, BELOW);
         register_link_undo (&undo, l, "ROOM MIRROR TILES+LINKS V.");
+        destroy_array ((void **) &l, NULL);
       } else if (tiles)
         register_v_room_mirror_tile_undo
           (&undo, p->room, "ROOM MIRROR TILES V.");
       else if (links) {
-        memcpy (&l, &p->l->link, sizeof (l));
+        struct room_linking *l =
+          copy_array (p->l->link, p->l->room_nmemb, NULL, sizeof (*l));
         editor_mirror_link (p->room, ABOVE, BELOW);
         register_link_undo (&undo, l, "ROOM MIRROR LINKS V.");
+        destroy_array ((void **) &l, NULL);
       }
     } else if (level) {
       if (tiles && links) {
-        for (int i = 1; i < ROOMS; i++) {
+        for (int i = 1; i < p->l->room_nmemb; i++) {
           register_v_room_mirror_tile_undo (&undo, i, NULL);
-          memcpy (&l, &p->l->link, sizeof (l));
+          struct room_linking *l =
+            copy_array (p->l->link, p->l->room_nmemb, NULL, sizeof (*l));
           mirror_link (p->l, i, ABOVE, BELOW);
           register_link_undo (&undo, l, NULL);
+          destroy_array ((void **) &l, NULL);
         }
         end_undo_set (&undo, "LEVEL MIRROR TILES+LINKS V.");
       } else if (tiles) {
-        for (int i = 1; i < ROOMS; i++)
+        for (int i = 1; i < p->l->room_nmemb; i++)
           register_v_room_mirror_tile_undo (&undo, i, NULL);
         end_undo_set (&undo, "LEVEL MIRROR TILES V.");
       } else if (links) {
-        for (int i = 1; i < ROOMS; i++) {
-          memcpy (&l, &p->l->link, sizeof (l));
+        for (int i = 1; i < p->l->room_nmemb; i++) {
+          struct room_linking *l =
+            copy_array (p->l->link, p->l->room_nmemb, NULL, sizeof (*l));
           mirror_link (p->l, i, ABOVE, BELOW);
           register_link_undo (&undo, l, NULL);
+          destroy_array ((void **) &l, NULL);
         }
         end_undo_set (&undo, "LEVEL MIRROR LINKS V.");
       }
@@ -317,35 +331,43 @@ button_action_cb (Ihandle *ih)
     } else if (room) {
       if (tiles && links) {
         register_h_room_mirror_tile_undo (&undo, p->room, NULL);
-        memcpy (&l, &p->l->link, sizeof (l));
+        struct room_linking *l =
+          copy_array (p->l->link, p->l->room_nmemb, NULL, sizeof (*l));
         editor_mirror_link (p->room, LEFT, RIGHT);
         register_link_undo (&undo, l, "ROOM MIRROR TILES+LINKS H.");
+        destroy_array ((void **) &l, NULL);
       } else if (tiles)
         register_h_room_mirror_tile_undo
           (&undo, p->room, "ROOM MIRROR TILES H.");
       else if (links) {
-        memcpy (&l, &p->l->link, sizeof (l));
+        struct room_linking *l =
+          copy_array (p->l->link, p->l->room_nmemb, NULL, sizeof (*l));
         editor_mirror_link (p->room, LEFT, RIGHT);
         register_link_undo (&undo, l, "ROOM MIRROR LINKS H.");
+        destroy_array ((void **) &l, NULL);
       }
     } else if (level) {
       if (tiles && links) {
-        for (int i = 1; i < ROOMS; i++) {
+        for (int i = 1; i < p->l->room_nmemb; i++) {
           register_h_room_mirror_tile_undo (&undo, i, NULL);
-          memcpy (&l, &p->l->link, sizeof (l));
+          struct room_linking *l =
+            copy_array (p->l->link, p->l->room_nmemb, NULL, sizeof (*l));
           mirror_link (p->l, i, LEFT, RIGHT);
           register_link_undo (&undo, l, NULL);
+          destroy_array ((void **) &l, NULL);
         }
         end_undo_set (&undo, "LEVEL MIRROR TILES+LINKS H.");
       } else if (tiles) {
-        for (int i = 1; i < ROOMS; i++)
+        for (int i = 1; i < p->l->room_nmemb; i++)
           register_h_room_mirror_tile_undo (&undo, i, NULL);
         end_undo_set (&undo, "LEVEL MIRROR TILES H.");
       } else if (links) {
-        for (int i = 1; i < ROOMS; i++) {
-          memcpy (&l, &p->l->link, sizeof (l));
+        for (int i = 1; i < p->l->room_nmemb; i++) {
+          struct room_linking *l =
+            copy_array (p->l->link, p->l->room_nmemb, NULL, sizeof (*l));
           mirror_link (p->l, i, LEFT, RIGHT);
           register_link_undo (&undo, l, NULL);
+          destroy_array ((void **) &l, NULL);
         }
         end_undo_set (&undo, "LEVEL MIRROR LINKS H.");
       }
@@ -359,37 +381,45 @@ button_action_cb (Ihandle *ih)
       if (tiles && links) {
         register_random_room_mirror_tile_undo
           (&undo, mr.room, false, NULL);
-        memcpy (&l, &p->l->link, sizeof (l));
+        struct room_linking *l =
+          copy_array (p->l->link, p->l->room_nmemb, NULL, sizeof (*l));
         editor_mirror_link (mr.room, random_dir (), random_dir ());
         register_link_undo (&undo, l, "ROOM MIRROR TILES+LINKS R.");
+        destroy_array ((void **) &l, NULL);
       } else if (tiles)
         register_random_room_mirror_tile_undo
           (&undo, mr.room, false, "ROOM MIRROR TILES R.");
       else if (links) {
-        memcpy (&l, &p->l->link, sizeof (l));
+        struct room_linking *l =
+          copy_array (p->l->link, p->l->room_nmemb, NULL, sizeof (*l));
         editor_mirror_link (mr.room, random_dir (), random_dir ());
         register_link_undo (&undo, l, "ROOM MIRROR LINKS R.");
+        destroy_array ((void **) &l, NULL);
       }
     } else if (level) {
       if (tiles && links) {
-        for (int i = 1; i < ROOMS; i++) {
+        for (int i = 1; i < p->l->room_nmemb; i++) {
           register_random_room_mirror_tile_undo
             (&undo, i, false, NULL);
-          memcpy (&l, &p->l->link, sizeof (l));
+          struct room_linking *l =
+            copy_array (p->l->link, p->l->room_nmemb, NULL, sizeof (*l));
           mirror_link (p->l, i, random_dir (), random_dir ());
           register_link_undo (&undo, l, NULL);
+          destroy_array ((void **) &l, NULL);
         }
         end_undo_set (&undo, "LEVEL MIRROR TILES+LINKS R.");
       } else if (tiles) {
-        for (int i = 1; i < ROOMS; i++)
+        for (int i = 1; i < p->l->room_nmemb; i++)
           register_random_room_mirror_tile_undo
             (&undo, i, false, NULL);
         end_undo_set (&undo, "LEVEL MIRROR TILES R.");
       } else if (links) {
-        for (int i = 1; i < ROOMS; i++) {
-          memcpy (&l, &p->l->link, sizeof (l));
+        for (int i = 1; i < p->l->room_nmemb; i++) {
+          struct room_linking *l =
+            copy_array (p->l->link, p->l->room_nmemb, NULL, sizeof (*l));
           mirror_link (p->l, i, random_dir (), random_dir ());
           register_link_undo (&undo, l, NULL);
+          destroy_array ((void **) &l, NULL);
         }
         end_undo_set (&undo, "LEVEL MIRROR LINKS R.");
       }

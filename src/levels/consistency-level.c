@@ -48,9 +48,9 @@ next_consistency_level (struct level *l, int n)
 
   size_t i;
   random_pos (l, &l->start_pos);
-  for (i = 0; i < EVENTS; i++)
+  for (i = 0; i < l->event_nmemb; i++)
     random_pos (l, &event (l, i)->p);
-  for (i = 0; i < GUARDS; i++)
+  for (i = 0; i < l->guard_nmemb; i++)
     random_pos (l, &guard (l, i)->p);
 
   l->n = n;

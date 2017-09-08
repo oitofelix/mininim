@@ -196,7 +196,7 @@ _update_tree_cb (Ihandle *ih)
   destroy_userdata (ih);
   IupSetAttribute (tree, "DELNODE0", "ALL");
 
-  for (int e = 0; e < EVENTS; e++) {
+  for (int e = 0; e < level->event_nmemb; e++) {
     struct pos *p = &event (level, e)->p;
     if (p->room < 0) p->room = 0;
     int target_id = add_target (tree, p);

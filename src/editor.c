@@ -367,7 +367,7 @@ editor (void)
   char *str = NULL, c;
   int i;
 
-  struct room_linking l[ROOMS];
+  struct room_linking *l;
 
   enum tile_fg f;
   enum tile_bg b;
@@ -822,7 +822,7 @@ editor (void)
       break;
     case OPENER_FLOOR:
     case CLOSER_FLOOR:
-      bmenu_int_ext (&p, EVENTS, 2, "CE>EVENT", "B");
+      bmenu_int_ext (&p, global_level.event_nmemb, 2, "CE>EVENT", "B");
       break;
     case DOOR:
       bmenu_int_ext (&p, DOOR_STEPS, DOOR_FASES, "CE>STEP", NULL);
@@ -1011,7 +1011,8 @@ editor (void)
       set_mouse_pos (&event (&global_level, s)->p);
     }
     bb = event (&global_level, s)->next;
-    switch (bmenu_int (&s, &bb, 0, EVENTS - 1, "ED>EVENT", "N")) {
+    switch (bmenu_int (&s, &bb, 0,
+                       global_level.event_nmemb - 1, "ED>EVENT", "N")) {
     case -1: set_mouse_coord (&last_mouse_coord); edit = EDIT_EVENT; break;
     case 0: break;
     case 1:
@@ -1028,7 +1029,8 @@ editor (void)
       al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
       set_mouse_pos (&last_event2floor_pos);
     }
-    switch (bmenu_list (&s, &r, t, 0, EVENTS - 1, "EF>EVENT")) {
+    switch (bmenu_list (&s, &r, t, 0,
+                        global_level.event_nmemb - 1, "EF>EVENT")) {
     case -1: set_mouse_coord (&last_mouse_coord); edit = EDIT_EVENT; break;
     case 0: break;
     case 1:
@@ -1037,7 +1039,7 @@ editor (void)
       break;
     default:
       if (s) {
-        if (t + s >= 0 && t + s < EVENTS) {
+        if (t + s >= 0 && t + s < global_level.event_nmemb) {
           t += s;
           invalid_pos (&last_event2floor_pos);
         } else s = 0;
@@ -1057,27 +1059,32 @@ editor (void)
       al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
       if (! peq (&p, &p0)) {
         t = -1;
-        next_int_by_pred (&t, 0, 0, EVENTS - 1, is_pos_at_event, &p);
+        next_int_by_pred (&t, 0, 0,
+                          global_level.event_nmemb - 1, is_pos_at_event, &p);
         p0 = p;
       }
-      switch (bmenu_list (NULL, &r, t, 0, EVENTS - 1, "ER>EVENT")) {
+      switch (bmenu_list (NULL, &r, t, 0,
+                          global_level.event_nmemb - 1, "ER>EVENT")) {
       case -1: edit = EDIT_EVENT; break;
       case 0: break;
       case 1: last_event = t; edit = EDIT_EVENT; break;
       default:
-        if (r) next_int_by_pred (&t, r, 0, EVENTS - 1, is_pos_at_event, &p);
+        if (r) next_int_by_pred
+                 (&t, r, 0, global_level.event_nmemb - 1, is_pos_at_event, &p);
         break;
       }
     }
     break;
   case EDIT_EVENT_SET:
     if (! is_valid_pos (&p)) {
-      al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
+      al_set_system_mouse_cursor
+        (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE);
       editor_msg ("SELECT TILE", EDITOR_CYCLES_0);
       if (was_bmenu_return_pressed (true)) edit = EDIT_EVENT;
     } else {
       al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
-      switch (bmenu_int (&s, &bb, 0, EVENTS - 1, "ES>EVENT", "N")) {
+      switch (bmenu_int (&s, &bb, 0, global_level.event_nmemb - 1,
+                         "ES>EVENT", "N")) {
       case -1: edit = EDIT_EVENT; break;
       case 0: break;
       case 1:
@@ -1176,25 +1183,33 @@ editor (void)
     switch (bmenu_enum (mirror_dir_menu, "RML>")) {
     case -1: case 1: edit = EDIT_ROOM_MIRROR; break;
     case 'H':
-      memcpy (&l, &global_level.link, sizeof (l));
+      l = copy_array (global_level.link, global_level.room_nmemb,
+                      NULL, sizeof (*l));
       editor_mirror_link (mr.room, LEFT, RIGHT);
       register_link_undo (&undo, l, "ROOM MIRROR LINKS H.");
+      destroy_array ((void **) &l, NULL);
       break;
     case 'V':
-      memcpy (&l, &global_level.link, sizeof (l));
+      l = copy_array (global_level.link, global_level.room_nmemb,
+                      NULL, sizeof (*l));
       editor_mirror_link (mr.room, ABOVE, BELOW);
       register_link_undo (&undo, l, "ROOM MIRROR LINKS V.");
+      destroy_array ((void **) &l, NULL);
       break;
     case 'B':
-      memcpy (&l, &global_level.link, sizeof (l));
+      l = copy_array (global_level.link, global_level.room_nmemb,
+                      NULL, sizeof (*l));
       editor_mirror_link (mr.room, LEFT, RIGHT);
       editor_mirror_link (mr.room, ABOVE, BELOW);
       register_link_undo (&undo, l, "ROOM MIRROR LINKS H+V.");
+      destroy_array ((void **) &l, NULL);
       break;
     case 'R':
-      memcpy (&l, &global_level.link, sizeof (l));
+      l = copy_array (global_level.link, global_level.room_nmemb,
+                      NULL, sizeof (*l));
       editor_mirror_link (mr.room, random_dir (), random_dir ());
       register_link_undo (&undo, l, "ROOM MIRROR LINKS R.");
+      destroy_array ((void **) &l, NULL);
       break;
     }
     break;
@@ -1206,33 +1221,41 @@ editor (void)
     case -1: case 1: edit = EDIT_ROOM_MIRROR; break;
     case 'H':
       register_h_room_mirror_tile_undo (&undo, mr.room, NULL);
-      memcpy (&l, &global_level.link, sizeof (l));
+      l = copy_array (global_level.link, global_level.room_nmemb,
+                      NULL, sizeof (*l));
       editor_mirror_link (mr.room, LEFT, RIGHT);
       register_link_undo (&undo, l, "ROOM MIRROR TILES+LINKS H.");
+      destroy_array ((void **) &l, NULL);
       break;
     case 'V':
       register_v_room_mirror_tile_undo
         (&undo, mr.room, NULL);
-      memcpy (&l, &global_level.link, sizeof (l));
+      l = copy_array (global_level.link, global_level.room_nmemb,
+                      NULL, sizeof (*l));
       editor_mirror_link (mr.room, ABOVE, BELOW);
       register_link_undo (&undo, l, "ROOM MIRROR TILES+LINKS V.");
+      destroy_array ((void **) &l, NULL);
       break;
     case 'B':
       register_h_room_mirror_tile_undo
         (&undo, mr.room, NULL);
       register_v_room_mirror_tile_undo
         (&undo, mr.room, NULL);
-      memcpy (&l, &global_level.link, sizeof (l));
+      l = copy_array (global_level.link, global_level.room_nmemb,
+                      NULL, sizeof (*l));
       editor_mirror_link (mr.room, LEFT, RIGHT);
       editor_mirror_link (mr.room, ABOVE, BELOW);
       register_link_undo (&undo, l, "ROOM MIRROR TILES+LINKS H+V.");
+      destroy_array ((void **) &l, NULL);
       break;
     case 'R':
       register_random_room_mirror_tile_undo
         (&undo, mr.room, false, NULL);
-      memcpy (&l, &global_level.link, sizeof (l));
+      l = copy_array (global_level.link, global_level.room_nmemb,
+                      NULL, sizeof (*l));
       editor_mirror_link (mr.room, random_dir (), random_dir ());
       register_link_undo (&undo, l, "ROOM MIRROR TILES+LINKS R.");
+      destroy_array ((void **) &l, NULL);
       break;
     }
     break;
@@ -1281,7 +1304,8 @@ editor (void)
     mr.room_select = last_mouse_coord.c.room;
 
     if (r == 1) {
-      memcpy (&l, &global_level.link, sizeof (l));
+      l = copy_array (global_level.link, global_level.room_nmemb,
+                      NULL, sizeof (*l));
 
       int room0 = last_mouse_coord.c.room;
       int room1 = mr.room;
@@ -1293,6 +1317,7 @@ editor (void)
       last_mouse_coord.mr.room = room1;
       set_mouse_coord (&last_mouse_coord);
       mr.room_select = -1;
+      destroy_array ((void **) &l, NULL);
     } else if (r == -1) mr.room_select = -1;
     break;
   case EDIT_LINKING_SETTINGS:
@@ -1445,24 +1470,24 @@ editor (void)
     switch (bmenu_enum (mirror_dir_menu, str)) {
     case -1: case 1: edit = EDIT_LEVEL_MIRROR; break;
     case 'H':
-      for (i = 1; i < ROOMS; i++)
+      for (i = 1; i < global_level.room_nmemb; i++)
         register_h_room_mirror_tile_undo (&undo, i, NULL);
       end_undo_set (&undo, "LEVEL MIRROR TILES H.");
       break;
     case 'V':
-      for (i = 1; i < ROOMS; i++)
+      for (i = 1; i < global_level.room_nmemb; i++)
         register_v_room_mirror_tile_undo (&undo, i, NULL);
       end_undo_set (&undo, "LEVEL MIRROR TILES V.");
       break;
     case 'B':
-      for (i = 1; i < ROOMS; i++) {
+      for (i = 1; i < global_level.room_nmemb; i++) {
         register_h_room_mirror_tile_undo (&undo, i, NULL);
         register_v_room_mirror_tile_undo (&undo, i, NULL);
       }
       end_undo_set (&undo, "LEVEL MIRROR TILES H+V.");
       break;
     case 'R':
-      for (i = 1; i < ROOMS; i++)
+      for (i = 1; i < global_level.room_nmemb; i++)
         register_random_room_mirror_tile_undo
           (&undo, i, false, NULL);
       end_undo_set (&undo, "LEVEL MIRROR TILES R.");
@@ -1476,35 +1501,43 @@ editor (void)
     switch (bmenu_enum (mirror_dir_menu, str)) {
     case -1: case 1: edit = EDIT_LEVEL_MIRROR; break;
     case 'H':
-      for (i = 1; i < ROOMS; i++) {
-        memcpy (&l, &global_level.link, sizeof (l));
+      for (i = 1; i < global_level.room_nmemb; i++) {
+        l = copy_array (global_level.link, global_level.room_nmemb,
+                        NULL, sizeof (*l));
         mirror_link (&global_level, i, LEFT, RIGHT);
         register_link_undo (&undo, l, NULL);
+        destroy_array ((void **) &l, NULL);
       }
       end_undo_set (&undo, "LEVEL MIRROR LINKS H.");
       break;
     case 'V':
-      for (i = 1; i < ROOMS; i++) {
-        memcpy (&l, &global_level.link, sizeof (l));
+      for (i = 1; i < global_level.room_nmemb; i++) {
+        l = copy_array (global_level.link, global_level.room_nmemb,
+                        NULL, sizeof (*l));
         mirror_link (&global_level, i, ABOVE, BELOW);
         register_link_undo (&undo, l, NULL);
+        destroy_array ((void **) &l, NULL);
       }
       end_undo_set (&undo, "LEVEL MIRROR LINKS V.");
       break;
     case 'B':
-      for (i = 1; i < ROOMS; i++) {
-        memcpy (&l, &global_level.link, sizeof (l));
+      for (i = 1; i < global_level.room_nmemb; i++) {
+        l = copy_array (global_level.link, global_level.room_nmemb,
+                        NULL, sizeof (*l));
         mirror_link (&global_level, i, LEFT, RIGHT);
         mirror_link (&global_level, i, ABOVE, BELOW);
         register_link_undo (&undo, l, NULL);
+        destroy_array ((void **) &l, NULL);
       }
       end_undo_set (&undo, "LEVEL MIRROR LINKS H+V.");
       break;
     case 'R':
-      for (i = 1; i < ROOMS; i++) {
-        memcpy (&l, &global_level.link, sizeof (l));
+      for (i = 1; i < global_level.room_nmemb; i++) {
+        l = copy_array (global_level.link, global_level.room_nmemb,
+                        NULL, sizeof (*l));
         mirror_link (&global_level, i, random_dir (), random_dir ());
         register_link_undo (&undo, l, NULL);
+        destroy_array ((void **) &l, NULL);
       }
       end_undo_set (&undo, "LEVEL MIRROR LINKS R.");
       break;
@@ -1517,41 +1550,49 @@ editor (void)
     switch (bmenu_enum (mirror_dir_menu, str)) {
     case -1: case 1: edit = EDIT_LEVEL_MIRROR; break;
     case 'H':
-      for (i = 1; i < ROOMS; i++) {
+      for (i = 1; i < global_level.room_nmemb; i++) {
         register_h_room_mirror_tile_undo (&undo, i, NULL);
-        memcpy (&l, &global_level.link, sizeof (l));
+        l = copy_array (global_level.link, global_level.room_nmemb,
+                        NULL, sizeof (*l));
         mirror_link (&global_level, i, LEFT, RIGHT);
         register_link_undo (&undo, l, NULL);
+        destroy_array ((void **) &l, NULL);
       }
       end_undo_set (&undo, "LEVEL MIRROR TILES+LINKS H.");
       break;
     case 'V':
-      for (i = 1; i < ROOMS; i++) {
+      for (i = 1; i < global_level.room_nmemb; i++) {
         register_v_room_mirror_tile_undo (&undo, i, NULL);
-        memcpy (&l, &global_level.link, sizeof (l));
+        l = copy_array (global_level.link, global_level.room_nmemb,
+                        NULL, sizeof (*l));
         mirror_link (&global_level, i, ABOVE, BELOW);
         register_link_undo (&undo, l, NULL);
+        destroy_array ((void **) &l, NULL);
       }
       end_undo_set (&undo, "LEVEL MIRROR TILES+LINKS V.");
       break;
     case 'B':
-      for (i = 1; i < ROOMS; i++) {
+      for (i = 1; i < global_level.room_nmemb; i++) {
         register_h_room_mirror_tile_undo (&undo, i, NULL);
         register_v_room_mirror_tile_undo (&undo, i, NULL);
-        memcpy (&l, &global_level.link, sizeof (l));
+        l = copy_array (global_level.link, global_level.room_nmemb,
+                        NULL, sizeof (*l));
         mirror_link (&global_level, i, LEFT, RIGHT);
         mirror_link (&global_level, i, ABOVE, BELOW);
         register_link_undo (&undo, l, NULL);
+        destroy_array ((void **) &l, NULL);
       }
       end_undo_set (&undo, "LEVEL MIRROR TILES+LINKS H+V.");
       break;
     case 'R':
-      for (i = 1; i < ROOMS; i++) {
+      for (i = 1; i < global_level.room_nmemb; i++) {
         register_random_room_mirror_tile_undo
           (&undo, i, false, NULL);
-        memcpy (&l, &global_level.link, sizeof (l));
+        l = copy_array (global_level.link, global_level.room_nmemb,
+                        NULL, sizeof (*l));
         mirror_link (&global_level, i, random_dir (), random_dir ());
         register_link_undo (&undo, l, NULL);
+        destroy_array ((void **) &l, NULL);
       }
       end_undo_set (&undo, "LEVEL MIRROR TILES+LINKS R.");
       break;
@@ -1701,7 +1742,7 @@ editor (void)
   case EDIT_GUARD_SELECT:
     mouse2guard (s);
     str = xasprintf ("G%iG>GUARD", guard_index);
-    switch (bmenu_int (&s, NULL, 0, GUARDS - 1, str, NULL)) {
+    switch (bmenu_int (&s, NULL, 0, global_level.guard_nmemb - 1, str, NULL)) {
     case -1: edit = EDIT_GUARD;
       set_mouse_coord (&last_mouse_coord); break;
     case 0: break;
@@ -1935,7 +1976,7 @@ bmenu_select_room (enum edit up_edit, char *prefix)
   mr_focus_mouse ();
   int room = mr.room;
   al_set_system_mouse_cursor (display, ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION);
-  char r = bmenu_int (&room, NULL, 0, ROOMS - 1, prefix, NULL);
+  char r = bmenu_int (&room, NULL, 0, global_level.room_nmemb - 1, prefix, NULL);
   switch (r) {
   case -1: edit = up_edit;
     set_mouse_coord (&last_mouse_coord);
@@ -1982,12 +2023,14 @@ bmenu_link (enum dir dir)
   mr.room_select = last_mouse_coord.c.room;
 
   if (r == 1) {
-    struct room_linking l[ROOMS];
-    memcpy (&l, &global_level.link, sizeof (l));
+    struct room_linking *l =
+      copy_array (global_level.link, global_level.room_nmemb,
+                  NULL, sizeof (*l));
     editor_link (last_mouse_coord.c.room, mr.room, dir);
     register_link_undo (&undo, l, "LINK");
     set_mouse_coord (&last_mouse_coord);
     mr.room_select = -1;
+    destroy_array ((void **) &l, NULL);
   } else if (r == -1) mr.room_select = -1;
 
   return r;

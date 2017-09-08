@@ -29,7 +29,7 @@ init_opener_floor (struct pos *p, struct opener_floor *o)
   memset (o, 0, sizeof (*o));
 
   int n;
-  typed_int (ext (p), EVENTS, 1, &n, NULL);
+  typed_int (ext (p), p->l->event_nmemb, 1, &n, NULL);
 
   npos (p, &o->p);
   o->event = n;

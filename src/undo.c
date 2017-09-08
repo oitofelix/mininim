@@ -23,7 +23,8 @@
 static bool tile_undo_ignore_state;
 
 void
-register_undo (struct undo *u, void *data, undo_f f, char *desc)
+register_undo (struct undo *u, void *data, undo_f f,
+               destroy_undo_f df, char *desc)
 {
   if (! u->pass || ! u->count || u->current == -1) {
     u->pass = NULL;
@@ -39,6 +40,7 @@ register_undo (struct undo *u, void *data, undo_f f, char *desc)
 
   u->pass[u->current].data = data;
   u->pass[u->current].f = f;
+  u->pass[u->current].df = df;
   if (desc) u->pass[u->current].desc = xasprintf ("%s", desc);
   else u->pass[u->current].desc = NULL;
 
@@ -50,6 +52,7 @@ free_undo_tail (struct undo *u)
 {
   size_t i;
   for (i = u->current + 1; i < u->count; i++) {
+    if (u->pass[i].df) u->pass[i].df (u->pass[i].data);
     al_free (u->pass[i].data);
     al_free (u->pass[i].desc);
   }
@@ -62,6 +65,7 @@ free_undo (struct undo *u)
 {
   size_t i;
   for (i = 0; i < u->count; i++) {
+    if (u->pass[i].df) u->pass[i].df (u->pass[i].data);
     al_free (u->pass[i].data);
     al_free (u->pass[i].desc);
   }
@@ -184,7 +188,7 @@ register_tile_undo (struct undo *u, struct pos *p,
     copy_from_tile_state (p, cs);
   } else copy_to_tile_state (&d->fs, p);
 
-  register_undo (u, d, (undo_f) tile_undo, desc);
+  register_undo (u, d, (undo_f) tile_undo, NULL, desc);
 
   register_changed_pos (p);
 }
@@ -219,7 +223,7 @@ register_mirror_pos_undo (struct undo *u, struct pos *p0, struct pos *p1,
   d->p0 = *p0;
   d->p1 = *p1;
   d->invert_dir = invert_dir;
-  register_undo (u, d, (undo_f) mirror_pos_undo, desc);
+  register_undo (u, d, (undo_f) mirror_pos_undo, NULL, desc);
   mirror_pos_undo (d, +1);
 }
 
@@ -246,12 +250,13 @@ register_level_undo (struct undo *u, struct level *l, char *desc)
 {
   if (level_eq (&global_level, l)) return;
 
-  struct level_undo *d = xmalloc (sizeof (struct level_undo));
+  struct level_undo *d = xmalloc (sizeof (*d));
+  memset (d, 0, sizeof (*d));
   copy_level (&d->b, &global_level);
   copy_level (&d->f, l);
   d->f.n = global_level.n;
   d->f.nominal_n = global_level.nominal_n;
-  register_undo (u, d, (undo_f) level_undo, desc);
+  register_undo (u, d, (undo_f) level_undo, NULL, desc);
   level_undo (d, +1);
 }
 
@@ -272,7 +277,7 @@ register_level_exchange_undo (struct undo *u, int n, char *desc)
 
   int *d = xmalloc (sizeof (* d));
   *d = n;
-  register_undo (u, d, (undo_f) level_exchange_undo, desc);
+  register_undo (u, d, (undo_f) level_exchange_undo, NULL, desc);
   level_exchange_undo (d, +1);
 }
 
@@ -312,7 +317,7 @@ register_event_undo (struct undo *u, int e, struct pos *p, bool next,
   d->b = *event (p->l, e);
   d->f.p = *p;
   d->f.next = next;
-  register_undo (u, d, (undo_f) event_undo, desc);
+  register_undo (u, d, (undo_f) event_undo, NULL, desc);
   event_undo (d, +1);
 }
 
@@ -331,7 +336,7 @@ register_h_room_mirror_tile_undo (struct undo *u, int _room, char *desc)
 {
   int *room = xmalloc (sizeof (* room));
   *room = _room;
-  register_undo (u, room, (undo_f) h_room_mirror_tile_undo, desc);
+  register_undo (u, room, (undo_f) h_room_mirror_tile_undo, NULL, desc);
   h_room_mirror_tile_undo (room, +1);
 }
 
@@ -350,7 +355,7 @@ register_v_room_mirror_tile_undo (struct undo *u, int _room, char *desc)
 {
   int *room = xmalloc (sizeof (* room));
   *room = _room;
-  register_undo (u, room, (undo_f) v_room_mirror_tile_undo, desc);
+  register_undo (u, room, (undo_f) v_room_mirror_tile_undo, NULL, desc);
   v_room_mirror_tile_undo (room, +1);
 }
 
@@ -385,7 +390,7 @@ register_random_room_mirror_tile_undo (struct undo *u, int _room,
     for (p.place = 0; p.place < PLACES; p.place++)
       random_pos (&global_level, &d->p[p.floor][p.place]);
 
-  register_undo (u, d, (undo_f) random_room_mirror_tile_undo, desc);
+  register_undo (u, d, (undo_f) random_room_mirror_tile_undo, NULL, desc);
 
   random_room_mirror_tile_undo (d, +1);
 }
@@ -419,22 +424,36 @@ random_room_mirror_tile_undo (struct random_room_mirror_tile_undo *d, int dir)
 /********/
 
 void
-register_link_undo (struct undo *u, struct room_linking l[ROOMS],
-                    char *desc)
+register_link_undo (struct undo *u, struct room_linking *l, char *desc)
 {
-  if (! memcmp (l, &global_level.link, sizeof (global_level.link))) return;
+  if (! memcmp
+      (l, global_level.link, global_level.room_nmemb
+       * sizeof (*global_level.link))) return;
 
-  struct link_undo *d = xmalloc (sizeof (struct link_undo));
-  memcpy (&d->b, l, sizeof (d->b));
-  memcpy (&d->f, &global_level.link, sizeof (d->f));
-  register_undo (u, d, (undo_f) link_undo, desc);
+  struct link_undo *d = xmalloc (sizeof (*d));
+  d->b = copy_array (l, global_level.room_nmemb, NULL,
+                     sizeof (*d->b));
+  d->f = copy_array (global_level.link, global_level.room_nmemb, NULL,
+                     sizeof (*d->f));
+  register_undo (u, d, (undo_f) link_undo, (destroy_undo_f) destroy_link_undo,
+                 desc);
   link_undo (d, +1);
 }
 
 void
 link_undo (struct link_undo *d, int dir)
 {
-  memcpy (&global_level.link, (dir >= 0) ? &d->f : &d->b, sizeof (d->f));
+  destroy_array ((void **) &global_level.link, NULL);
+  global_level.link = copy_array
+    ((dir >= 0) ? d->f : d->b, global_level.room_nmemb,
+     NULL, sizeof (*global_level.link));
+}
+
+void
+destroy_link_undo (struct link_undo *d)
+{
+  destroy_array ((void **) &d->b, NULL);
+  destroy_array ((void **) &d->f, NULL);
 }
 
 /******************/
@@ -449,7 +468,7 @@ register_start_pos_undo (struct undo *u, struct pos *p, char *desc)
   struct start_pos_undo *d = xmalloc (sizeof (* d));
   d->b = p->l->start_pos;
   npos (p, &d->f);
-  register_undo (u, d, (undo_f) start_pos_undo, desc);
+  register_undo (u, d, (undo_f) start_pos_undo, NULL, desc);
   start_pos_undo (d, +1);
 }
 
@@ -467,7 +486,7 @@ start_pos_undo (struct start_pos_undo *d, int dir)
 void
 register_toggle_start_dir_undo (struct undo *u, char *desc)
 {
-  register_undo (u, NULL, (undo_f) toggle_start_dir_undo, desc);
+  register_undo (u, NULL, (undo_f) toggle_start_dir_undo, NULL, desc);
   toggle_start_dir_undo (NULL, +1);
 }
 
@@ -484,7 +503,7 @@ toggle_start_dir_undo (struct start_pos_undo *d, int dir)
 void
 register_toggle_has_sword_undo (struct undo *u, char *desc)
 {
-  register_undo (u, NULL, (undo_f) toggle_has_sword_undo, desc);
+  register_undo (u, NULL, (undo_f) toggle_has_sword_undo, NULL, desc);
   toggle_has_sword_undo (NULL, +1);
 }
 
@@ -508,7 +527,7 @@ register_guard_start_pos_undo (struct undo *u, int i, struct pos *p, char *desc)
   d->i = i;
   d->b = g->p;
   npos (p, &d->f);
-  register_undo (u, d, (undo_f) guard_start_pos_undo, desc);
+  register_undo (u, d, (undo_f) guard_start_pos_undo, NULL, desc);
   guard_start_pos_undo (d, +1);
 }
 
@@ -528,7 +547,7 @@ register_toggle_guard_start_dir_undo (struct undo *u, int i, char *desc)
 {
   int *d = xmalloc (sizeof (* d));
   *d = i;
-  register_undo (u, d, (undo_f) toggle_guard_start_dir_undo, desc);
+  register_undo (u, d, (undo_f) toggle_guard_start_dir_undo, NULL, desc);
   toggle_guard_start_dir_undo (d, +1);
 }
 
@@ -553,7 +572,7 @@ register_guard_skill_undo (struct undo *u, int i, struct skill *s, char *desc)
   d->i = i;
   d->b_skill = *s;
   d->f_skill = g->skill;
-  register_undo (u, d, (undo_f) guard_skill_undo, desc);
+  register_undo (u, d, (undo_f) guard_skill_undo, NULL, desc);
   guard_skill_undo (d, +1);
 }
 
@@ -580,7 +599,7 @@ register_guard_hp_undo (struct undo *u, int i, int l, char *desc)
   d->i = i;
   d->b = l;
   d->f = g->total_hp;
-  register_undo (u, d, (undo_f) guard_hp_undo, desc);
+  register_undo (u, d, (undo_f) guard_hp_undo, NULL, desc);
   guard_hp_undo (d, +1);
 }
 
@@ -606,7 +625,7 @@ register_guard_type_undo (struct undo *u, int i, enum actor_type t,
   d->i = i;
   d->b = t;
   d->f = g->type;
-  register_undo (u, d, (undo_f) guard_type_undo, desc);
+  register_undo (u, d, (undo_f) guard_type_undo, NULL, desc);
   guard_type_undo (d, +1);
 }
 
@@ -631,7 +650,7 @@ register_guard_style_undo (struct undo *u, int i, int s, char *desc)
   d->i = i;
   d->b = s;
   d->f = g->style;
-  register_undo (u, d, (undo_f) guard_style_undo, desc);
+  register_undo (u, d, (undo_f) guard_style_undo, NULL, desc);
   guard_style_undo (d, +1);
 }
 
@@ -655,7 +674,7 @@ register_int_undo (struct undo *u, int *f, int b, undo_f func, char *desc)
   d->i = f;
   d->b = b;
   d->f = *f;
-  register_undo (u, d, (undo_f) func, desc);
+  register_undo (u, d, (undo_f) func, NULL, desc);
   func (d, +1);
 }
 

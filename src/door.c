@@ -207,7 +207,7 @@ open_door (struct level *l, int e, uint64_t priority, bool stay_open)
       break;
     }
   } while (event (l, e++)->next
-           && e < EVENTS);
+           && e < l->event_nmemb);
 }
 
 void
@@ -243,7 +243,7 @@ close_door (struct level *l, int e, uint64_t priority)
       break;
     }
   } while (event (l, e++)->next
-           && e < EVENTS);
+           && e < l->event_nmemb);
 }
 
 int

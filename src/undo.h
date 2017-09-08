@@ -21,7 +21,8 @@
 #ifndef MININIM_UNDO_H
 #define MININIM_UNDO_H
 
-void register_undo (struct undo *u, void *data, undo_f f, char *desc);
+void register_undo (struct undo *u, void *data, undo_f f,
+                    destroy_undo_f df, char *desc);
 void free_undo_tail (struct undo *u);
 void free_undo (struct undo *u);
 bool can_undo (struct undo *u, int dir);
@@ -75,9 +76,10 @@ void random_room_mirror_tile_undo (struct random_room_mirror_tile_undo *d,
                                    int dir);
 
 /* LINK */
-void register_link_undo (struct undo *u, struct room_linking l[ROOMS],
+void register_link_undo (struct undo *u, struct room_linking *l,
                          char *desc);
 void link_undo (struct link_undo *d, int dir);
+void destroy_link_undo (struct link_undo *d);
 
 /* START POSITION */
 void register_start_pos_undo (struct undo *u, struct pos *p, char *desc);

@@ -38,7 +38,7 @@ optimize_changed_pos (void)
   if (changed_pos_nmemb < FLOORS * PLACES) return;
   size_t total = 0;
   struct pos p; new_pos (&p, &global_level, -1, -1, -1);
-  for (p.room = 1; p.room < ROOMS; p.room++) {
+  for (p.room = 1; p.room < global_level.room_nmemb; p.room++) {
     int per_room = 0;
     if (has_room_changed (p.room)) continue;
     for (p.floor = 0; p.floor < FLOORS; p.floor++)
@@ -721,7 +721,7 @@ update_cache_pos (struct pos *p)
   struct pos q = *p;
   int x, y;
 
-  for (q.room = 1; q.room < ROOMS; q.room++) {
+  for (q.room = 1; q.room < p->l->room_nmemb; q.room++) {
     for (y = mr.h - 1; y >= 0; y--)
       for (x = 0; x < mr.w; x++)
         if (mr.cell[x][y].room == q.room)

@@ -261,12 +261,14 @@ struct level {
 
   struct room_linking {
     int l, r, a, b;
-  } link[ROOMS];
+  } *link;
 
   struct level_event {
     struct pos p;
     bool next;
-  } event[EVENTS];
+  } *event;
+
+  size_t event_nmemb;
 
   struct guard {
     enum actor_type type;
@@ -275,7 +277,9 @@ struct level {
     struct skill skill;
     int total_hp;
     int style;
-  } guard[GUARDS];
+  } *guard;
+
+  size_t guard_nmemb;
 
   struct tile {
 
@@ -325,7 +329,9 @@ struct level {
 
     int fake;
 
-  } tile[ROOMS][FLOORS][PLACES];
+  } (*tile)[FLOORS][PLACES];
+
+  size_t room_nmemb;
 };
 
 enum item {
@@ -726,11 +732,13 @@ struct chomper {
  ********/
 
 typedef void (*undo_f) (void *data, int dir);
+typedef void (*destroy_undo_f) (void *data);
 
 struct undo {
   struct undo_pass {
     void *data;
     undo_f f;
+    destroy_undo_f df;
     char *desc;
   } *pass;
 
@@ -776,7 +784,7 @@ struct random_room_mirror_tile_undo {
 };
 
 struct link_undo {
-  struct room_linking b[ROOMS], f[ROOMS];
+  struct room_linking *b, *f;
 };
 
 struct start_pos_undo {

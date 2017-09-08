@@ -54,7 +54,8 @@ add_to_array (void *s_base, size_t s_nmemb,
 }
 
 void *
-remove_from_array (void *base, size_t *nmemb, size_t index, size_t count, size_t size)
+remove_from_array (void *base, size_t *nmemb, size_t index, size_t count,
+                   size_t size)
 {
   /* Sanity checks */
   assert (base != NULL && *nmemb != 0);
@@ -74,10 +75,18 @@ remove_from_array (void *base, size_t *nmemb, size_t index, size_t count, size_t
   return xrealloc (base, *nmemb * size);
 }
 
+void *
+copy_array (void *s_base, size_t s_nmemb, size_t *d_nmemb, size_t size)
+{
+  void *d_base = xcalloc (s_nmemb, size);
+  if (d_nmemb) *d_nmemb = s_nmemb;
+  return memcpy (d_base, s_base, s_nmemb * size);
+}
+
 void
 destroy_array (void **base, size_t *nmemb)
 {
-  if (nmemb > 0) al_free (*base);
+  if (! nmemb || (nmemb && *nmemb > 0)) al_free (*base);
   *base = NULL;
-  *nmemb = 0;
+  if (nmemb) *nmemb = 0;
 }

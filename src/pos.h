@@ -25,7 +25,7 @@ extern bool coord_wa;
 
 /* types */
 int typed_int (int i, int n, int f, int *nr, int *nf);
-int room_val (int r);
+int room_val (struct level *l, int r);
 
 int *roomd_ptr (struct level *l, int room, enum dir dir);
 int roomd (struct level *l, int room, enum dir dir);
@@ -34,7 +34,9 @@ bool is_room_adjacent (struct level *l, int room0, int room1);
 void link_room (struct level *l, int room0, int room1, enum dir dir);
 void mirror_link (struct level *l, int room, enum dir dir0, enum dir dir1);
 int room_dist (struct level *l, int r0, int r1, int max);
-int min_room_dist (struct room_dist room[], int *dmax);
+int min_room_dist (size_t room_nmemb;
+                   struct room_dist room[room_nmemb],
+                   size_t room_nmemb, int *dmax);
 struct coord *new_coord (struct coord *c, struct level *l, int room,
                          lua_Number x, lua_Number y);
 struct coord *invalid_coord (struct coord *c);

@@ -725,7 +725,9 @@ interpret_legacy_level (struct level *l, int n)
   struct pos p;
   new_pos (&p, l, -1, -1, -1);
 
+  destroy_level (l);
   memset (l, 0, sizeof (*l));
+  new_level (l, LROOMS + 1, LEVENTS, LGUARDS);
   l->n = n;
   if (n == 13) l->nominal_n = 12;
   else if (n == 14) l->nominal_n = -1;

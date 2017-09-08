@@ -21,11 +21,13 @@
 #ifndef MININIM_ARRAY_H
 #define MININIM_ARRAY_H
 
-void * add_to_array (void *s_base, size_t s_nmemb,
+void *add_to_array (void *s_base, size_t s_nmemb,
                      void *d_base, size_t *d_nmemb, size_t d_index,
                      size_t size);
-void * remove_from_array (void *base, size_t *nmemb, size_t index,
+void *remove_from_array (void *base, size_t *nmemb, size_t index,
                           size_t count, size_t size);
+void *copy_array (void *s_base, size_t s_nmemb, size_t *d_nmemb,
+                  size_t size);
 void destroy_array (void **base, size_t *nmemb);
 
 #endif	/* MININIM_ARRAY_H */

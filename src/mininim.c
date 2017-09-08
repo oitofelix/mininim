@@ -1353,6 +1353,9 @@ free_argv (size_t *cargc, char ***cargv)
 int
 main (int _argc, char **_argv)
 {
+  /* Init global level structure */
+  new_level (&global_level, 1, 1, 1);
+
   set_string_var (&audio_mode, "SBLAST");
   set_string_var (&env_mode, "DUNGEON");
   set_string_var (&hue_mode, "NONE");
@@ -1605,6 +1608,8 @@ quit_game (void)
   finalize_audio ();
   finalize_dialog ();
   finalize_video ();
+
+  destroy_level (&global_level);
 
   if (scream && kid_scream && guard_scream
       && fat_scream && shadow_scream && skeleton_scream

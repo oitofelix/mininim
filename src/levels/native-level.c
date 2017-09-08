@@ -208,7 +208,7 @@ save_native_level (struct level *l, char *filename)
   al_free (v);
 
   /* GUARDS */
-  for (i = 0; i < GUARDS; i++) {
+  for (i = 0; i < l->guard_nmemb; i++) {
     struct guard *g = guard (l, i);
 
     /* GUARD TYPE AND STYLE */
@@ -242,7 +242,7 @@ save_native_level (struct level *l, char *filename)
   }
 
   /* LINKS */
-  for (i = 1; i < ROOMS; i++) {
+  for (i = 1; i < l->room_nmemb; i++) {
     /* Li=l r a b */
     struct room_linking *r = llink (l, i);
     k = xasprintf ("L%i", i);
@@ -253,10 +253,10 @@ save_native_level (struct level *l, char *filename)
   }
 
   /* EVENTS */
-  for (i = 0; i < EVENTS; i++) {
+  for (size_t i = 0; i < l->event_nmemb; i++) {
     /* Ei=r f p n */
     struct level_event *e = event (l, i);
-    k = xasprintf ("E%i", i);
+    k = xasprintf ("E%zu", i);
     v = xasprintf ("%i %i %i %i", e->p.room, e->p.floor, e->p.place, e->next);
     al_set_config_value (c, NULL, k, v);
     al_free (k);
@@ -265,7 +265,7 @@ save_native_level (struct level *l, char *filename)
 
   /* TILES */
   struct pos p; new_pos (&p, l, -1, -1, -1);
-  for (p.room = 1; p.room < ROOMS; p.room++)
+  for (p.room = 1; p.room < l->room_nmemb; p.room++)
     for (p.floor = 0; p.floor < FLOORS; p.floor++)
       for (p.place = 0; p.place < PLACES; p.place++) {
         /* Tr f p=f b e ff */

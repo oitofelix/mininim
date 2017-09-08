@@ -109,7 +109,7 @@ fix_door_lacking_opener (struct pos *p)
   enum tile_fg f = fg (p);
 
   if (f == DOOR || f == LEVEL_DOOR) {
-    for (i = 0; i < EVENTS; i++)
+    for (i = 0; i < p->l->event_nmemb; i++)
       if (peq (&event (p->l, i)->p, p)
           && is_there_event_handler (p->l, i)) return p;
 
@@ -137,7 +137,7 @@ fix_opener_or_closer_lacking_door (struct pos *p)
       if (is_valid_pos (&le->p)
           && (fg (&le->p) == DOOR || fg (&le->p) == LEVEL_DOOR))
         return p;
-    } while (le->next && ++i < EVENTS);
+    } while (le->next && ++i < p->l->event_nmemb);
 
     /* fprintf (stderr, "%s: replaced %s (event %i) by %s at pos (%i, %i, %i)\n", */
     /*          __func__, fg (p) == OPENER_FLOOR ? "OPENER_FLOOR" : "CLOSER_FLOOR", */
@@ -181,14 +181,14 @@ fix_partial_big_pillar (struct pos *p)
 void
 make_links_locally_consistent (struct level *l, int prev_room, int current_room)
 {
-  if (roomd (l, prev_room, LEFT) == room_val (current_room))
-    llink (l, current_room)->r = room_val (prev_room);
+  if (roomd (l, prev_room, LEFT) == room_val (l, current_room))
+    llink (l, current_room)->r = room_val (l, prev_room);
   else if (roomd (l, prev_room, RIGHT) == current_room)
-    llink (l, current_room)->l = room_val (prev_room);
+    llink (l, current_room)->l = room_val (l, prev_room);
   else if (roomd (l, prev_room, ABOVE) == current_room)
-    llink (l, current_room)->b = room_val (prev_room);
+    llink (l, current_room)->b = room_val (l, prev_room);
   else if (roomd (l, prev_room, BELOW) == current_room)
-    llink (l, current_room)->a = room_val (prev_room);
+    llink (l, current_room)->a = room_val (l, prev_room);
 }
 
 bool
@@ -196,14 +196,14 @@ is_there_event_handler (struct level *l, int e)
 {
   int i = 0;
   struct pos p; new_pos (&p, l, -1, -1, -1);
-  for (p.room = 1; p.room < ROOMS; p.room++)
+  for (p.room = 1; p.room < l->room_nmemb; p.room++)
     for (p.floor = 0; p.floor < FLOORS; p.floor++)
       for (p.place = 0; p.place < PLACES; p.place++) {
         if (fg (&p) == OPENER_FLOOR) {
           i = ext (&p);
           do {
             if (i == e) return true;
-          } while (event (p.l, i++)->next && i < EVENTS);
+          } while (event (p.l, i++)->next && i < l->event_nmemb);
         }
       }
   return false;
@@ -229,7 +229,7 @@ void
 fix_traversable_above_room_0 (struct level *l)
 {
   struct pos p; new_pos (&p, l, -1, 2, -1);
-  for (p.room = 1; p.room < ROOMS; p.room++)
+  for (p.room = 1; p.room < l->room_nmemb; p.room++)
     for (p.place = 0; p.place < PLACES; p.place++) {
       if (roomd (p.l, p.room, BELOW) != 0) continue;
       if (is_critical (&p)) set_fg (&p, SPIKES_FLOOR);
@@ -266,7 +266,7 @@ void
 make_link_globally_unique (struct level *l, int room, enum dir dir)
 {
   int i;
-  for (i = 1; i < ROOMS; i++) {
+  for (i = 1; i < l->room_nmemb; i++) {
     if (room != i && roomd (l, i, dir) == roomd (l, room, dir))
       link_room (l, i, 0, dir);
   }
@@ -352,8 +352,8 @@ circular_linking (struct level *lv)
   llink (lv, 2)->r = 1;
 
   struct pos p; new_pos (&p, lv, -1, -1, -1);
-  for (p.room = 3; p.room < ROOMS; p.room++) {
-    for (room = 1; room < ROOMS; room++) {
+  for (p.room = 3; p.room < lv->room_nmemb; p.room++) {
+    for (room = 1; room < lv->room_nmemb; room++) {
       if (p.room == room) continue;
 
       if (! llink (lv, room)->l) {
