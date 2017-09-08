@@ -48,6 +48,7 @@ load_native_level (struct level *l, int n)
   const char *v;
   int i;
 
+  destroy_level (l);
   memset (l, 0, sizeof (*l));
 
   l->n = n;
@@ -91,7 +92,8 @@ load_native_level (struct level *l, int n)
 
   /* GUARDS */
   for (i = 0;; i++) {
-    struct guard *g = guard (l, i);
+    struct guard g;
+    memset (&g, 0, sizeof (g));
 
     /* GUARD TYPE AND STYLE */
     /* GiT=t s */
@@ -99,8 +101,8 @@ load_native_level (struct level *l, int n)
     v = al_get_config_value (c, NULL, k);
     al_free (k);
     if (! v) break;
-    g->type = NO_ACTOR, g->style = 0;
-    sscanf (v, "%i %i", (int *) &g->type, (int *) &g->style);
+    g.type = NO_ACTOR, g.style = 0;
+    sscanf (v, "%i %i", (int *) &g.type, (int *) &g.style);
 
     /* GUARD START POSITION AND DIRECTION */
     /* GiP=r f p d */
@@ -108,10 +110,10 @@ load_native_level (struct level *l, int n)
     v = al_get_config_value (c, NULL, k);
     al_free (k);
     if (! v) break;
-    new_pos (&g->p, NULL, 0, 0, 0);
-    g->dir = LEFT;
-    sscanf (v, "%i %i %i %i", &g->p.room, &g->p.floor, &g->p.place,
-            (int *) &g->dir);
+    new_pos (&g.p, NULL, 0, 0, 0);
+    g.dir = LEFT;
+    sscanf (v, "%i %i %i %i", &g.p.room, &g.p.floor, &g.p.place,
+            (int *) &g.dir);
 
     /* GUARD SKILLS AND TOTAL HP */
     /* GiK=a b d e a r f x l */
@@ -120,39 +122,61 @@ load_native_level (struct level *l, int n)
     al_free (k);
     if (! v) break;
     sscanf (v, "%i %i %i %i %i %i %i %i %i",
-            &g->skill.attack_prob, &g->skill.counter_attack_prob,
-            &g->skill.defense_prob, &g->skill.counter_defense_prob,
-            &g->skill.advance_prob, &g->skill.return_prob,
-            &g->skill.refraction, &g->skill.extra_hp,
-            &g->total_hp);
+            &g.skill.attack_prob, &g.skill.counter_attack_prob,
+            &g.skill.defense_prob, &g.skill.counter_defense_prob,
+            &g.skill.advance_prob, &g.skill.return_prob,
+            &g.skill.refraction, &g.skill.extra_hp,
+            &g.total_hp);
+
+    l->guard = add_to_array (&g, 1, l->guard, &l->guard_nmemb,
+                             l->guard_nmemb, sizeof (*l->guard));
   }
 
   /* LINKS */
+
+  /* Room 0  */
+  l->link = xcalloc (1, sizeof (*l->link));
+  memset (l->link, 0, 1 * sizeof (*l->link));
+  l->room_nmemb = 1;
+
   for (i = 1;; i++) {
     /* Li=l r a b */
-    struct room_linking *r = llink (l, i);
+    struct room_linking r;
+    memset (&r, 0, sizeof (r));
+
     k = xasprintf ("L%i", i);
     v = al_get_config_value (c, NULL, k);
     al_free (k);
     if (! v) break;
-    sscanf (v, "%i %i %i %i", &r->l, &r->r, &r->a, &r->b);
+    sscanf (v, "%i %i %i %i", &r.l, &r.r, &r.a, &r.b);
+
+    l->link = add_to_array (&r, 1, l->link, &l->room_nmemb,
+                            l->room_nmemb, sizeof (*l->link));
   }
 
   /* EVENTS */
   for (i = 0;; i++) {
     /* Ei=r f p n*/
-    struct level_event *e = event (l, i);
+    struct level_event e;
+    memset (&e, 0, sizeof (e));
+
     k = xasprintf ("E%i", i);
     v = al_get_config_value (c, NULL, k);
     al_free (k);
     if (! v) break;
-    sscanf (v, "%i %i %i %i", &e->p.room, &e->p.floor, &e->p.place,
-            (int *) &e->next);
+    sscanf (v, "%i %i %i %i", &e.p.room, &e.p.floor, &e.p.place,
+            (int *) &e.next);
+
+    l->event = add_to_array (&e, 1, l->event, &l->event_nmemb,
+                             l->event_nmemb, sizeof (*l->event));
   }
 
   /* TILES */
+  l->tile = xcalloc (l->room_nmemb, sizeof (*l->tile));
+  memset (l->tile, 0, l->room_nmemb * sizeof (*l->tile));
+
   struct pos p; new_pos (&p, l, -1, -1, -1);
-  for (p.room = 1;; p.room++)
+  for (p.room = 1; p.room < l->room_nmemb; p.room++)
     for (p.floor = 0; p.floor < FLOORS; p.floor++)
       for (p.place = 0; p.place < PLACES; p.place++) {
         /* Tr f p=f b e ff */

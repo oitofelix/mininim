@@ -80,7 +80,7 @@ copy_array (void *s_base, size_t s_nmemb, size_t *d_nmemb, size_t size)
 {
   void *d_base = xcalloc (s_nmemb, size);
   if (d_nmemb) *d_nmemb = s_nmemb;
-  return memcpy (d_base, s_base, s_nmemb * size);
+  return memmove (d_base, s_base, s_nmemb * size);
 }
 
 void
