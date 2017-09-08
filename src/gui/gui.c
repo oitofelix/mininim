@@ -138,6 +138,7 @@ load_icons (void)
   LOAD_ICON (EVENT_ICON);
   LOAD_ICON (TOP_ICON);
   LOAD_ICON (BOTTOM_ICON);
+  LOAD_ICON (RELOAD_ICON);
 }
 
 void
@@ -185,6 +186,7 @@ unload_icons (void)
   UNLOAD_ICON (EVENT_ICON);
   UNLOAD_ICON (TOP_ICON);
   UNLOAD_ICON (BOTTOM_ICON);
+  UNLOAD_ICON (RELOAD_ICON);
 }
 
 void

@@ -25,6 +25,7 @@ static int show_cb (Ihandle *ih, int state);
 static int _update_cb (Ihandle *ih);
 static int k_any (Ihandle *ih, int c);
 static int move_selection_hotkeys_cb (Ihandle *ih, int c);
+static int tabchange_cb (Ihandle *ih, Ihandle *new_tab, Ihandle *old_tab);
 
 
 Ihandle *
@@ -104,125 +105,128 @@ gui_create_editor_dialog (void)
 
         IupFill (),
 
-        IupSetAttributes
-        (IupTabs
-         (
+        IupSetCallbacks
+        (IupSetAttributes
+         (IupTabs
+          (
 
-          /* Tiles */
-          IupSetAttributes
-          (IupGridBox
-           (
-            IupSetAttributes
-            (gui_create_tile_part_control
-             (&selection_pos, TILE_FG, "TILE_PART_NORM"),
-             "NAME = TILE_FG_CONTROL"),
+           /* Tiles */
+           IupSetAttributes
+           (IupGridBox
+            (
+             IupSetAttributes
+             (gui_create_tile_part_control
+              (&selection_pos, TILE_FG, "TILE_PART_NORM"),
+              "NAME = TILE_FG_CONTROL"),
 
-            IupSetAttributes
-            (gui_create_tile_part_control
-             (&selection_pos, TILE_BG, "TILE_PART_NORM"),
-             "NAME = TILE_BG_CONTROL"),
+             IupSetAttributes
+             (gui_create_tile_part_control
+              (&selection_pos, TILE_BG, "TILE_PART_NORM"),
+              "NAME = TILE_BG_CONTROL"),
 
-            IupSetAttributes
-            (IupZbox
-             (IupSetAttributes
-              (IupFrame
-               (IupSetAttributes
-                (IupVbox
-                 (IupFill (),
-                  IupLabel ("NO EXTENSION"),
-                  IupFill (),
-                  NULL),
-                 "ALIGNMENT = ACENTER,"
-                 "NORMALIZERGROUP = TILE_PART_NORM")),
-               "TITLE = Extension,"
-               "NAME = TILE_EXT_NONE_CONTROL,"
-               "ACTIVE = NO"),
-              IupSetAttributes
-              (gui_create_tile_part_control
-               (&selection_pos, TILE_EXT_ITEM, "TILE_PART_NORM"),
-               "NAME = TILE_EXT_ITEM_CONTROL"),
-              IupSetAttributes
-              (gui_create_tile_part_control
-               (&selection_pos, TILE_EXT_DESIGN, "TILE_PART_NORM"),
-               "NAME = TILE_EXT_DESIGN_CONTROL"),
-              IupSetAttributes
-              (gui_create_tile_part_control
-               (&selection_pos, TILE_EXT_STEP_SPIKES_FLOOR, "TILE_PART_NORM"),
-               "NAME = TILE_EXT_STEP_SPIKES_FLOOR_CONTROL"),
-              IupSetAttributes
-              (gui_create_tile_part_control
-               (&selection_pos, TILE_EXT_STEP_CHOMPER, "TILE_PART_NORM"),
-               "NAME = TILE_EXT_STEP_CHOMPER_CONTROL"),
-              IupSetAttributes
-              (gui_create_tile_part_control
-               (&selection_pos, TILE_EXT_STEP_DOOR, "TILE_PART_NORM"),
-               "NAME = TILE_EXT_STEP_DOOR_CONTROL"),
-              IupSetAttributes
-              (gui_create_tile_part_control
-               (&selection_pos, TILE_EXT_STEP_LEVEL_DOOR, "TILE_PART_NORM"),
-               "NAME = TILE_EXT_STEP_LEVEL_DOOR_CONTROL"),
-              IupSetAttributes
-              (gui_create_tile_part_control
-               (&selection_pos, TILE_EXT_EVENT, "TILE_PART_NORM"),
-               "NAME = TILE_EXT_EVENT_CONTROL"),
-              IupSetAttributes
-              (gui_create_tile_part_control
-               (&selection_pos, TILE_EXT_FALL, "TILE_PART_NORM"),
-               "NAME = TILE_EXT_FALL_CONTROL"),
-              NULL),
-             "NAME = TILE_EXT,"
-             "ALIGNMENT = ACENTER"),
+             IupSetAttributes
+             (IupZbox
+              (IupSetAttributes
+               (IupFrame
+                (IupSetAttributes
+                 (IupVbox
+                  (IupFill (),
+                   IupLabel ("NO EXTENSION"),
+                   IupFill (),
+                   NULL),
+                  "ALIGNMENT = ACENTER,"
+                  "NORMALIZERGROUP = TILE_PART_NORM")),
+                "TITLE = Extension,"
+                "NAME = TILE_EXT_NONE_CONTROL,"
+                "ACTIVE = NO"),
+               IupSetAttributes
+               (gui_create_tile_part_control
+                (&selection_pos, TILE_EXT_ITEM, "TILE_PART_NORM"),
+                "NAME = TILE_EXT_ITEM_CONTROL"),
+               IupSetAttributes
+               (gui_create_tile_part_control
+                (&selection_pos, TILE_EXT_DESIGN, "TILE_PART_NORM"),
+                "NAME = TILE_EXT_DESIGN_CONTROL"),
+               IupSetAttributes
+               (gui_create_tile_part_control
+                (&selection_pos, TILE_EXT_STEP_SPIKES_FLOOR, "TILE_PART_NORM"),
+                "NAME = TILE_EXT_STEP_SPIKES_FLOOR_CONTROL"),
+               IupSetAttributes
+               (gui_create_tile_part_control
+                (&selection_pos, TILE_EXT_STEP_CHOMPER, "TILE_PART_NORM"),
+                "NAME = TILE_EXT_STEP_CHOMPER_CONTROL"),
+               IupSetAttributes
+               (gui_create_tile_part_control
+                (&selection_pos, TILE_EXT_STEP_DOOR, "TILE_PART_NORM"),
+                "NAME = TILE_EXT_STEP_DOOR_CONTROL"),
+               IupSetAttributes
+               (gui_create_tile_part_control
+                (&selection_pos, TILE_EXT_STEP_LEVEL_DOOR, "TILE_PART_NORM"),
+                "NAME = TILE_EXT_STEP_LEVEL_DOOR_CONTROL"),
+               IupSetAttributes
+               (gui_create_tile_part_control
+                (&selection_pos, TILE_EXT_EVENT, "TILE_PART_NORM"),
+                "NAME = TILE_EXT_EVENT_CONTROL"),
+               IupSetAttributes
+               (gui_create_tile_part_control
+                (&selection_pos, TILE_EXT_FALL, "TILE_PART_NORM"),
+                "NAME = TILE_EXT_FALL_CONTROL"),
+               NULL),
+              "NAME = TILE_EXT,"
+              "ALIGNMENT = ACENTER"),
 
-            IupSetAttributes
-            (gui_create_tile_part_control
-             (&selection_pos, TILE_FAKE, "TILE_PART_NORM"),
-             "NAME = TILE_FAKE_CONTROL"),
+             IupSetAttributes
+             (gui_create_tile_part_control
+              (&selection_pos, TILE_FAKE, "TILE_PART_NORM"),
+              "NAME = TILE_FAKE_CONTROL"),
 
-            IupSetAttributes
-            (gui_create_tile_clipboard_control
-             (&selection_pos, "TILE_PART_NORM"),
-             "NAME = TILE_CLIPBOARD_CONTROL"),
+             IupSetAttributes
+             (gui_create_tile_clipboard_control
+              (&selection_pos, "TILE_PART_NORM"),
+              "NAME = TILE_CLIPBOARD_CONTROL"),
 
-            IupSetAttributes
-            (gui_create_tile_transform_control
-             (&selection_pos, "TILE_PART_NORM"),
-             "NAME = TILE_TRANSFORM_CONTROL"),
+             IupSetAttributes
+             (gui_create_tile_transform_control
+              (&selection_pos, "TILE_PART_NORM"),
+              "NAME = TILE_TRANSFORM_CONTROL"),
 
-            IupSetAttributes
-            (gui_create_tile_mirror_control
-             (&selection_pos, "TILE_PART_NORM"),
-             "NAME = TILE_MIRROR_CONTROL"),
+             IupSetAttributes
+             (gui_create_tile_mirror_control
+              (&selection_pos, "TILE_PART_NORM"),
+              "NAME = TILE_MIRROR_CONTROL"),
 
-            IupSetAttributes
-            (gui_create_tile_move_control
-             (&selection_pos, "TILE_PART_NORM"),
-             "NAME = TILE_MOVE_CONTROL"),
+             IupSetAttributes
+             (gui_create_tile_move_control
+              (&selection_pos, "TILE_PART_NORM"),
+              "NAME = TILE_MOVE_CONTROL"),
 
-            NULL),
-           "ORIENTATION = HORIZONTAL,"
-           "NUMDIV = 4,"
-           "SIZECOL = -1,"
-           "SIZELIN = -1,"
-           "NGAPCOL = 5,"
-           "NGAPLIN = 5,"),
+             NULL),
+            "ORIENTATION = HORIZONTAL,"
+            "NUMDIV = 4,"
+            "SIZECOL = -1,"
+            "SIZELIN = -1,"
+            "NGAPCOL = 5,"
+            "NGAPLIN = 5,"),
 
-          /* Events */
-          IupSetAttributes
-          (gui_create_editor_events_control
-           (NULL, &global_level),
-           "NAME = EVENTS_CONTROL"),
+           /* Events */
+           IupSetAttributes
+           (gui_create_editor_events_control
+            (NULL, &global_level),
+            "NAME = EVENTS_CONTROL"),
 
-          IupVbox (NULL),
-          IupVbox (NULL),
-          IupVbox (NULL),
-          IupVbox (NULL),
-          NULL),
-         "TABTITLE0 = Tile,"
-         "TABTITLE1 = Event,"
-         "TABTITLE2 = Room,"
-         "TABTITLE3 = Kid,"
-         "TABTITLE4 = Guard,"
-         "TABTITLE5 = Level,"),
+           IupVbox (NULL),
+           IupVbox (NULL),
+           IupVbox (NULL),
+           IupVbox (NULL),
+           NULL),
+          "TABTITLE0 = Tile,"
+          "TABTITLE1 = Event,"
+          "TABTITLE2 = Room,"
+          "TABTITLE3 = Kid,"
+          "TABTITLE4 = Guard,"
+          "TABTITLE5 = Level,"),
+         "TABCHANGE_CB", (Icallback) tabchange_cb,
+         NULL),
 
         IupSetAttributes
         (IupHbox
@@ -486,4 +490,10 @@ move_selection_hotkeys_cb (Ihandle *ih, int c)
   ui_move_locked_place_selection (d);
 
   return IUP_IGNORE;
+}
+
+int
+tabchange_cb (Ihandle *ih, Ihandle *new_tab, Ihandle *old_tab)
+{
+  return IUP_DEFAULT;
 }

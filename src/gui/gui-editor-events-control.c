@@ -28,26 +28,28 @@ struct last {
   char *video_mode;
   enum em em;
   enum hue hue;
+  int level_n;
 };
 
 static void destroy_userdata (Ihandle *ih);
 static int destroy_cb (Ihandle *ih);
 static int show_cb (Ihandle *ih, int state);
 static int _update_cb (Ihandle *ih);
-static void update (Ihandle *ih);
+static int _update_tree_cb (Ihandle *ih);
 static void update_target_icons (Ihandle *ih);
 
-static int get_target (Ihandle *ih, struct pos *p);
-static int last_target_id (Ihandle *ih);
-static int add_target (Ihandle *ih, struct pos *p);
+static int last_node_id (Ihandle *tree, int parent_id);
 
-static int get_event (Ihandle *ih, int target_id, int e);
-static int last_event_id (Ihandle *ih, int target_id);
-static int add_event (Ihandle *ih, int target_id, int e);
+static int get_target (Ihandle *tree, struct pos *p);
+static int add_target (Ihandle *tree, struct pos *p);
 
-static int get_source (Ihandle *ih, int event_id, struct pos *p);
-static int last_source_id (Ihandle *ih, int event_id);
-static int add_source (Ihandle *ih, int event_id, struct pos *p);
+static int get_event (Ihandle *tree, int target_id, int e);
+static int add_event (Ihandle *tree, int target_id, int e);
+
+static int get_source (Ihandle *tree, int event_id, struct pos *p);
+static int add_source (Ihandle *tree, int event_id, struct pos *p);
+
+static int selection_cb (Ihandle *ih, int id, int status);
 
 
 Ihandle *
@@ -55,26 +57,45 @@ gui_create_editor_events_control (char *norm_group, struct level *level)
 {
   Ihandle *ih;
 
-  Ihandle *tree;
+  Ihandle *tree, *refresh_button;
 
   ih = IupSetCallbacks
     (IupSetAttributes
-     (tree = IupTree (),
-      "ADDROOT = NO,"
-      "ADDEXPANDED = NO,"),
+     (IupHbox
+      (tree = IupSetCallbacks
+       (IupSetAttributes
+        (IupTree (),
+         "ADDROOT = NO,"
+         "ADDEXPANDED = NO,"),
+        "SELECTION_CB", (Icallback) selection_cb,
+        NULL),
+
+       refresh_button =
+       IupSetCallbacks
+       (IupSetAttributes
+        (IupButton (NULL, NULL),
+         "IMAGE = RELOAD_ICON,"
+         "TIP = \"Refresh\","),
+        "ACTION", _update_tree_cb,
+        NULL),
+
+       NULL),
+      "ALIGNMENT = ACENTER,"),
      "DESTROY_CB", destroy_cb,
      "SHOW_CB", (Icallback) show_cb,
      "_UPDATE_CB", _update_cb,
+     "_UPDATE_TREE_CB", _update_tree_cb,
      NULL);
 
-  IupSetAttribute (ih, "IMAGELEAF", "EVENT_ICON");
-  IupSetAttribute (ih, "IMAGEBRANCHCOLLAPSED", "EVENT_ICON");
-  IupSetAttribute (ih, "IMAGEBRANCHEXPANDED", "EVENT_ICON");
+  IupSetAttribute (tree, "IMAGELEAF", "EVENT_ICON");
+  IupSetAttribute (tree, "IMAGEBRANCHCOLLAPSED", "EVENT_ICON");
+  IupSetAttribute (tree, "IMAGEBRANCHEXPANDED", "EVENT_ICON");
 
   IupSetAttribute (ih, "NORMALIZERGROUP", norm_group);
 
   IupSetAttribute (ih, "_LEVEL", (void *) level);
   IupSetAttribute (ih, "_TREE", (void *) tree);
+  IupSetAttribute (ih, "_REFRESH_BUTTON", (void *) refresh_button);
 
   struct last *last = xmalloc (sizeof (*last));
   memset (last, 0, sizeof (*last));
@@ -88,10 +109,13 @@ gui_create_editor_events_control (char *norm_group, struct level *level)
 void
 destroy_userdata (Ihandle *ih)
 {
-  int count = IupGetInt (ih, "COUNT");
+  Ihandle *tree = (void *) IupGetAttribute (ih, "_TREE");
+
+  int count = IupGetInt (tree, "COUNT");
   for (int id = 0; id < count ; id++) {
-    void *userdata = (void *) IupGetAttributeId (ih, "USERDATA", id);
+    void *userdata = IupTreeGetUserId (tree, id);
     al_free (userdata);
+    IupTreeSetUserId (tree, id, NULL);
   }
 }
 
@@ -112,7 +136,7 @@ show_cb (Ihandle *ih, int state)
   if (state == IUP_SHOW) {
     Ihandle *tree = (void *) IupGetAttribute (ih, "_TREE");
     int count = IupGetInt (tree, "COUNT");
-    if (! count) update (tree);
+    if (! count) _update_tree_cb (ih);
   }
   return IUP_DEFAULT;
 }
@@ -122,12 +146,14 @@ _update_cb (Ihandle *ih)
 {
   if (! IupGetInt (ih, "VISIBLE")) return IUP_DEFAULT;
 
-  Ihandle *tree = (void *) IupGetAttribute (ih, "_TREE");
+  struct level *level = (void *) IupGetAttribute (ih, "_LEVEL");
   struct last *last = (void *) IupGetAttribute (ih, "_LAST");
 
   if ((last->video_mode && strcmp (video_mode, last->video_mode))
       || last->em != em || last->hue != hue)
-    update_target_icons (tree);
+    update_target_icons (ih);
+
+  if (last->level_n != level->n) _update_tree_cb (ih);
 
   return IUP_DEFAULT;
 }
@@ -135,6 +161,7 @@ _update_cb (Ihandle *ih)
 void
 update_target_icons (Ihandle *ih)
 {
+  Ihandle *tree = (void *) IupGetAttribute (ih, "_TREE");
   struct last *last = (void *) IupGetAttribute (ih, "_LAST");
 
   set_string_var (&last->video_mode, video_mode);
@@ -143,182 +170,175 @@ update_target_icons (Ihandle *ih)
 
   gui_update ();
 
-  int count = IupGetInt (ih, "COUNT");
+  int count = IupGetInt (tree, "COUNT");
   for (int id = 0; id < count; id++) {
-    int depth = IupGetIntId (ih, "DEPTH", id);
+    int depth = IupGetIntId (tree, "DEPTH", id);
     if (depth != TARGET_DEPTH) continue;
-    struct pos *np = (void *) IupGetAttributeId (ih, "USERDATA", id);
-    IupSetAttributeHandleId (ih, "IMAGE", id, tile_icon[fg (np)]);
-    IupSetAttributeHandleId (ih, "IMAGEEXPANDED", id, tile_icon[fg (np)]);
+    struct pos *np = IupTreeGetUserId (tree, id);
+    IupSetAttributeHandleId (tree, "IMAGE", id, tile_icon[fg (np)]);
+    IupSetAttributeHandleId (tree, "IMAGEEXPANDED", id, tile_icon[fg (np)]);
   }
 }
 
-void
-update (Ihandle *ih)
+int
+_update_tree_cb (Ihandle *ih)
 {
-  struct level *level = (void *) IupGetAttribute (ih, "_LEVEL");
   Ihandle *tree = (void *) IupGetAttribute (ih, "_TREE");
+  struct level *level = (void *) IupGetAttribute (ih, "_LEVEL");
+
+  struct last *last = (void *) IupGetAttribute (ih, "_LAST");
+  last->level_n = level->n;
+
+  int value = IupGetInt (tree, "VALUE");
+
+  IupSetAttribute (tree, "AUTOREDRAW", "NO");
 
   destroy_userdata (ih);
   IupSetAttribute (tree, "DELNODE0", "ALL");
 
   for (int e = 0; e < EVENTS; e++) {
     struct pos *p = &event (level, e)->p;
-    if (p->room > 0) {
-      int target_id = add_target (ih, p);
+    if (p->room < 0) p->room = 0;
+    int target_id = add_target (tree, p);
+    int event_id = add_event (tree, target_id, e);
 
-      IupSetAttributeHandleId (ih, "IMAGE", target_id, tile_icon[fg (p)]);
-      IupSetAttributeHandleId (ih, "IMAGEEXPANDED", target_id, tile_icon[fg (p)]);
+    for (int i = 0; i < opener_floor_nmemb; i++) {
+      struct opener_floor *o = &opener_floor[i];
+      if (ext (&o->p) == e) add_source (tree, event_id, &o->p);
+    }
 
-      int event_id = add_event (ih, target_id, e);
-
-      for (int i = 0; i < opener_floor_nmemb; i++) {
-        struct opener_floor *o = &opener_floor[i];
-        if (ext (&o->p) == e) {
-          int source_id = add_source (ih, event_id, &o->p);
-          IupSetAttributeId (ih, "IMAGE", source_id, "TOP_ICON");
-        }
-      }
-
-      for (int i = 0; i < closer_floor_nmemb; i++) {
-        struct closer_floor *c = &closer_floor[i];
-        if (ext (&c->p) == e) {
-          int source_id = add_source (ih, event_id, &c->p);
-          IupSetAttributeId (ih, "IMAGE", source_id, "BOTTOM_ICON");
-        }
-      }
+    for (int i = 0; i < closer_floor_nmemb; i++) {
+      struct closer_floor *c = &closer_floor[i];
+      if (ext (&c->p) == e) add_source (tree, event_id, &c->p);
     }
   }
+
+  IupSetAttribute (tree, "AUTOREDRAW", "YES");
+
+  IupSetInt (tree, "VALUE", value);
+
+  return IUP_DEFAULT;
 }
 
 int
-get_target (Ihandle *ih, struct pos *p)
+last_node_id (Ihandle *tree, int parent_id)
 {
-  int count = IupGetInt (ih, "COUNT");
+  int last_id = -1;
+  int parent_depth = IupGetIntId (tree, "DEPTH", parent_id);
+  int count = IupGetInt (tree, "COUNT");
+  for (int id = parent_id + 1; id < count; id++) {
+    int depth = IupGetIntId (tree, "DEPTH", id);
+    if (depth == parent_depth + 1) last_id = id;
+    if (depth <= parent_depth || id == count - 1)
+      return last_id;
+  }
+  return -1;
+}
+
+int
+get_target (Ihandle *tree, struct pos *p)
+{
+  int count = IupGetInt (tree, "COUNT");
   for (int id = 0; id < count; id++) {
-    int depth = IupGetIntId (ih, "DEPTH", id);
-    if (depth != TARGET_DEPTH) continue;
-    struct pos *np = (void *) IupGetAttributeId (ih, "USERDATA", id);
+    int depth = IupGetIntId (tree, "DEPTH", id);
+    if (depth > TARGET_DEPTH) continue;
+    struct pos *np = IupTreeGetUserId (tree, id);
     if (peq (p, np)) return id;
   }
   return -1;
 }
 
 int
-last_target_id (Ihandle *ih)
+add_target (Ihandle *tree, struct pos *p)
 {
-  IupSetAttribute (ih, "VALUE", "LAST");
-  for (int id = IupGetInt (ih, "VALUE"); id >= 0; id--) {
-    int depth = IupGetIntId (ih, "DEPTH", id);
-    if (depth == TARGET_DEPTH) return id;
-  }
-  return -1;
-}
-
-int
-add_target (Ihandle *ih, struct pos *p)
-{
-  int id = get_target (ih, p);
+  int id = get_target (tree, p);
   if (id >= 0) return id;
-  id = last_target_id (ih);
-  IupSetStrfId (ih, "INSERTBRANCH", id,
+  id = last_node_id (tree, -1);
+  IupSetStrfId (tree, "INSERTBRANCH", id,
                 "%s (%i,%i,%i)",
                 tile_fg_str [fg (p)],
                 p->room, p->floor, p->place);
   struct pos *np = xmalloc (sizeof (*np));
   *np = *p;
-  id = IupGetInt (ih, "LASTADDNODE");
-  IupSetAttributeId (ih, "USERDATA", id, (void *) np);
+  id = IupGetInt (tree, "LASTADDNODE");
+  IupTreeSetUserId (tree, id, np);
+  IupSetAttributeHandleId (tree, "IMAGE", id, tile_icon[fg (p)]);
+  IupSetAttributeHandleId (tree, "IMAGEEXPANDED", id, tile_icon[fg (p)]);
   return id;
 }
 
 int
-get_event (Ihandle *ih, int target_id, int e)
+get_event (Ihandle *tree, int target_id, int e)
 {
-  int count = IupGetInt (ih, "COUNT");
+  int count = IupGetInt (tree, "COUNT");
   for (int id = target_id + 1; id < count; id++) {
-    int depth = IupGetIntId (ih, "DEPTH", id);
-    if (depth != EVENT_DEPTH) break;
-    int *ne = (void *) IupGetAttributeId (ih, "USERDATA", id);
+    int depth = IupGetIntId (tree, "DEPTH", id);
+    if (depth > EVENT_DEPTH) continue;
+    else if (depth < EVENT_DEPTH) break;
+    int *ne = IupTreeGetUserId (tree, id);
     if (e == *ne) return id;
   }
   return -1;
 }
 
 int
-last_event_id (Ihandle *ih, int target_id)
+add_event (Ihandle *tree, int target_id, int e)
 {
-  int count = IupGetInt (ih, "COUNT");
-  for (int id = target_id + 1; id < count; id++) {
-    int depth = IupGetIntId (ih, "DEPTH", id);
-    if (depth != EVENT_DEPTH)
-      return (id - 1 > target_id) ? id - 1 : -1;
-  }
-  return -1;
-}
-
-int
-add_event (Ihandle *ih, int target_id, int e)
-{
-  int id = get_event (ih, target_id, e);
+  int id = get_event (tree, target_id, e);
   if (id >= 0) return id;
-  id = last_event_id (ih, target_id);
+  id = last_node_id (tree, target_id);
   const char *command;
   if (id < 0) {
     command = "ADDBRANCH";
     id = target_id;
   } else command = "INSERTBRANCH";
-  IupSetStrfId (ih, command, id, "Event %i", e);
+  IupSetStrfId (tree, command, id, "Event %i", e);
   int *ne = xmalloc (sizeof (*ne));
   *ne = e;
-  id = IupGetInt (ih, "LASTADDNODE");
-  IupSetAttributeId (ih, "USERDATA", id, (void *) ne);
+  id = IupGetInt (tree, "LASTADDNODE");
+  IupTreeSetUserId (tree, id, ne);
   return id;
 }
 
 int
-get_source (Ihandle *ih, int event_id, struct pos *p)
+get_source (Ihandle *tree, int event_id, struct pos *p)
 {
-  int count = IupGetInt (ih, "COUNT");
+  int count = IupGetInt (tree, "COUNT");
   for (int id = event_id + 1; id < count; id++) {
-    int depth = IupGetIntId (ih, "DEPTH", id);
-    if (depth != SOURCE_DEPTH) break;
-    struct pos *np = (void *) IupGetAttributeId (ih, "USERDATA", id);
+    int depth = IupGetIntId (tree, "DEPTH", id);
+    if (depth < SOURCE_DEPTH) break;
+    struct pos *np = IupTreeGetUserId (tree, id);
     if (peq (p, np)) return id;
   }
   return -1;
 }
 
 int
-last_source_id (Ihandle *ih, int event_id)
+add_source (Ihandle *tree, int event_id, struct pos *p)
 {
-  int count = IupGetInt (ih, "COUNT");
-  for (int id = event_id + 1; id < count; id++) {
-    int depth = IupGetIntId (ih, "DEPTH", id);
-    if (depth != SOURCE_DEPTH)
-      return (id - 1 > event_id) ? id - 1 : -1;
-  }
-  return -1;
-}
-
-int
-add_source (Ihandle *ih, int event_id, struct pos *p)
-{
-  int id = get_source (ih, event_id, p);
+  int id = get_source (tree, event_id, p);
   if (id >= 0) return id;
-  id = last_source_id (ih, event_id);
+  id = last_node_id (tree, event_id);
   const char *command;
   if (id < 0) {
     command = "ADDLEAF";
     id = event_id;
   } else command = "INSERTLEAFT";
-  IupSetStrfId (ih, command, id,
+  IupSetStrfId (tree, command, id,
                 "%s (%i,%i,%i)",
                 tile_fg_str [fg (p)],
                 p->room, p->floor, p->place);
   struct pos *np = xmalloc (sizeof (*np));
   *np = *p;
-  id = IupGetInt (ih, "LASTADDNODE");
-  IupSetAttributeId (ih, "USERDATA", id, (void *) np);
+  id = IupGetInt (tree, "LASTADDNODE");
+  IupTreeSetUserId (tree, id, np);
+  IupSetAttributeId (tree, "IMAGE", id,
+                     fg (p) == OPENER_FLOOR
+                     ? "TOP_ICON" : "BOTTOM_ICON");
   return id;
+}
+
+int selection_cb (Ihandle *tree, int id, int status)
+{
+  return IUP_DEFAULT;
 }
