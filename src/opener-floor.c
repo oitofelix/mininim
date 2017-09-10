@@ -96,22 +96,16 @@ opener_floor_by_event (struct pos *p, int event, int dir)
 {
   struct opener_floor *o;
   if (p) o = opener_floor_at_pos (p);
-  else o = &opener_floor[0];
 
-  if (! o) {
-    o = &opener_floor[0];
+  if (! p || ! o) {
+    o = &opener_floor[dir < 0 ? opener_floor_nmemb - 1 : 0];
     p = NULL;
   }
 
-  int i;
-
-  if (dir < 0)
-    for (i = o - opener_floor - (p ? 1 : 0); i >= 0; i--) {
+  if (dir < 0) for (size_t i = (o - opener_floor) - (p ? 1 : 0); i >= 0; i--) {
       if (opener_floor[i].event == event) return &opener_floor[i];
-    }
-  else
-    for (i = o - opener_floor + (p ? 1 : 0);
-         i < opener_floor_nmemb; i++) {
+    } else for (size_t i = (o - opener_floor) + (p ? 1 : 0);
+                i < opener_floor_nmemb; i++) {
       if (opener_floor[i].event == event) return &opener_floor[i];
     }
 

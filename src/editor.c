@@ -77,6 +77,19 @@ change_tile_bg (struct pos *p, enum tile_bg b)
 }
 
 void
+select_pos (struct pos *p)
+{
+  struct pos np;
+  npos (p, &np);
+
+  if (! np.room) return;
+
+  selection_locked = true;
+  selection_pos = np;
+  mr_scroll_into_view (np.room);
+}
+
+void
 change_tile_ext (struct pos *p, int e)
 {
   char *str;

@@ -21,6 +21,7 @@
 #include "mininim.h"
 
 ALLEGRO_MOUSE_STATE mouse_state;
+struct pos mouse_pos;
 struct pos selection_pos;
 
 void

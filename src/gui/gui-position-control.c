@@ -106,9 +106,6 @@ gui_create_position_control (struct pos *p, char *norm_group)
 
   IupSetInt (level_spin, "SPINMAX", 14);
 
-  /* TODO: update this value when creating more rooms */
-  /* IupSetInt (room_spin, "SPINMAX", p->l->room_nmemb - 1); */
-
   IupSetInt (floor_spin, "SPINMAX", FLOORS - 1);
   IupSetInt (place_spin, "SPINMAX", PLACES - 1);
 
@@ -146,6 +143,7 @@ _update_cb (Ihandle *ih)
   gui_control_active (room_spin, is_valid_pos (p) && selection_locked);
   gui_control_active (floor_spin, is_valid_pos (p) && selection_locked);
   gui_control_active (place_spin, is_valid_pos (p) && selection_locked);
+  gui_control_int (room_spin, "SPINMAX", p->l->room_nmemb - 1);
 
   struct pos *last_p = (void *) IupGetAttribute (ih, "_LAST_POS");
   if (! peq (p, last_p) && p->room > 0) {

@@ -38,6 +38,7 @@ void gui_set_stock_image (Ihandle *ih, char *new_image_hname);
 int hide_dialog (Ihandle *ih);
 
 bool gui_control_active (Ihandle *ih, bool a);
+bool gui_control_int (Ihandle *ih, char *name, int value);
 bool gui_control_attribute (Ihandle *ih, char *name, char *value);
 bool gui_control_attribute_str (Ihandle *ih, char *name, char *value);
 bool gui_control_attribute_strf (Ihandle *ih, char *name, char *format, ...)

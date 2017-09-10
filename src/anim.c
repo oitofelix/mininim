@@ -85,6 +85,7 @@ play_anim (anim_callback_t draw_callback,
   key.keycode = 0;
   joystick_button = -1;
 
+  invalid_pos (&mouse_pos);
   invalid_pos (&selection_pos);
   selection_locked = false;
 
@@ -161,8 +162,10 @@ play_anim (anim_callback_t draw_callback,
         start_recording_replay (2);
 
         /* update selection position */
-        if (! cutscene && ! selection_locked) {
-          get_mouse_pos (&selection_pos);
+        if (! cutscene) {
+          get_mouse_pos (&mouse_pos);
+          if (! selection_locked)
+            get_mouse_pos (&selection_pos);
         }
 
         /* message box */

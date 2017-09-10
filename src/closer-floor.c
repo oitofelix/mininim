@@ -97,22 +97,16 @@ closer_floor_by_event (struct pos *p, int event, int dir)
 {
   struct closer_floor *c;
   if (p) c = closer_floor_at_pos (p);
-  else c = &closer_floor[0];
 
-  if (! c) {
-    c = &closer_floor[0];
+  if (! p || ! c) {
+    c = &closer_floor[dir < 0 ? closer_floor_nmemb - 1 : 0];
     p = NULL;
   }
 
-  int i;
-
-  if (dir < 0)
-    for (i = c - closer_floor - (p ? 1 : 0); i >= 0; i--) {
+  if (dir < 0) for (size_t i = (c - closer_floor) - (p ? 1 : 0); i >= 0; i--) {
       if (closer_floor[i].event == event) return &closer_floor[i];
-    }
-  else
-    for (i = c - closer_floor + (p ? 1 : 0);
-         i < closer_floor_nmemb; i++) {
+    } else for (size_t i = (c - closer_floor) + (p ? 1 : 0);
+                i < closer_floor_nmemb; i++) {
       if (closer_floor[i].event == event) return &closer_floor[i];
     }
 

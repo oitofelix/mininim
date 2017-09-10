@@ -139,6 +139,10 @@ load_icons (void)
   LOAD_ICON (TOP_ICON);
   LOAD_ICON (BOTTOM_ICON);
   LOAD_ICON (RELOAD_ICON);
+  LOAD_ICON (NEXT_ICON);
+  LOAD_ICON (PREVIOUS_ICON);
+  LOAD_ICON (EVENT_SOURCE_ICON);
+  LOAD_ICON (EVENT_TARGET_ICON);
 }
 
 void
@@ -187,6 +191,10 @@ unload_icons (void)
   UNLOAD_ICON (TOP_ICON);
   UNLOAD_ICON (BOTTOM_ICON);
   UNLOAD_ICON (RELOAD_ICON);
+  UNLOAD_ICON (NEXT_ICON);
+  UNLOAD_ICON (PREVIOUS_ICON);
+  UNLOAD_ICON (EVENT_SOURCE_ICON);
+  UNLOAD_ICON (EVENT_TARGET_ICON);
 }
 
 void
@@ -345,6 +353,15 @@ gui_control_active (Ihandle *ih, bool a)
     IupSetInt (ih, "ACTIVE", a);
     return true;
   } else return false;
+}
+
+bool
+gui_control_int (Ihandle *ih, char *name, int value)
+{
+  int old_value = IupGetInt (ih, name);
+  if (old_value == value) return false;
+  IupSetInt (ih, name, value);
+  return true;
 }
 
 bool

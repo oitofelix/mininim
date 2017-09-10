@@ -108,7 +108,9 @@ function apply_palettes_to_color (c, p)
 
    if hm ~= "NONE" then c = hue[hm] (c) end
 
-   if MININIM.editing and p == MININIM.mouse.selection_position then
+   if MININIM.editing and
+      (p == MININIM.mouse.position
+       or p == MININIM.mouse.selection_position) then
       c = selection[em] (c) end
 
    return c
@@ -120,7 +122,9 @@ function apply_palettes (b, p)
 
    if hm ~= "NONE" then b = b.apply_palette (hue[hm], true) end
 
-   if MININIM.editing and p == MININIM.mouse.selection_position then
+   if MININIM.editing and
+      (p == MININIM.mouse.position
+       or p == MININIM.mouse.selection_position) then
       b = b.apply_palette (selection[em], true) end
 
    return b
@@ -404,9 +408,9 @@ function video.BOX.lock_palette (c)
    return c
 end
 
-function video.BOX:DRAW (p)
+function video.BOX:DRAW (part, p)
    local i = mod (MININIM.cycle, 3) + 1
-   if MININIM.mouse.selection_locked then i = i + 3 end
+   if part == 2 then i = i + 3 end
    self[i]:DRAW (p)
 end
 
@@ -600,7 +604,9 @@ end
 function video.FIRE:DRAW (p)
    local em = MININIM.video.env_mode
    local b = self[mod (MININIM.cycle, 9) + 1].bitmap
-   if MININIM.editing and p == MININIM.mouse.selection_position then
+   if MININIM.editing and
+      (p == MININIM.mouse.position
+       or p == MININIM.mouse.selection_position) then
       b = b.apply_palette (selection[em], true) end
    b.draw (self:rect (p))
 end

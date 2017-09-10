@@ -1190,10 +1190,5 @@ ui_move_locked_place_selection (enum dir d)
   default: assert (false);
   }
 
-  npos (&p, &p);
-
-  if (p.room) {
-    selection_pos = p;
-    mr_scroll_into_view (p.room);
-  }
+  select_pos (&p);
 }

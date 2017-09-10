@@ -63,7 +63,10 @@ BEGIN_LUA (__index)
   switch (type) {
   case LUA_TSTRING:
     key = lua_tostring (L, 2);
-    if (! strcasecmp (key, "selection_position")) {
+    if (! strcasecmp (key, "position")) {
+      L_pushposition (L, &mouse_pos);
+      return 1;
+    } else if (! strcasecmp (key, "selection_position")) {
       L_pushposition (L, &selection_pos);
       return 1;
     } else if (! strcasecmp (key, "selection_locked")) {

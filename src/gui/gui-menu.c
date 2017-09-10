@@ -2018,7 +2018,7 @@ process_main_menu_event (ALLEGRO_EVENT *event)
   else if (id == item.main.cheat.kcd.sub) ui_change_kcd (-10);
   else if (id == item.main.help.about) ui_about_screen (true);
   else if (id == item.main.unlock_selection)
-    selection_locked = ! selection_locked;
+    selection_locked = false;
   else if (m == menu.main.play.jump_to_level.m)
     ui_jump_to_level_menu (id - item.main.play.jump_to_level._id,
                            jump_to_level_menu_lower);
@@ -2040,12 +2040,12 @@ process_aux_menu_event (ALLEGRO_EVENT *event)
   /* ALLEGRO_MENU *m = (ALLEGRO_MENU *) event->user.data3; */
   /* int i; */
 
-  if (id == item.aux.lock_selection || id == item.aux.unlock_selection) {
+  if (id == item.aux.lock_selection)
+    select_pos (&aux_pos);
+  else if (id == item.aux.unlock_selection)
     selection_locked = ! selection_locked;
-    selection_pos = aux_pos;
-  }
   else if (id == item.aux.relock_selection)
-    selection_pos = aux_pos;
+    select_pos (&aux_pos);
   else if (id == item.aux.select_room)
     mr_focus_room (aux_pos.room);
 }

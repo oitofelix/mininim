@@ -188,6 +188,7 @@ struct multi_room {
     /* int hgc; */
     enum hue hue;
     struct pos selection_pos;
+    struct pos mouse_pos;
     enum edit edit;
 
     int display_width, display_height;
