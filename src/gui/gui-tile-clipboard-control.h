@@ -22,6 +22,6 @@
 #define MININIM_GUI_TILE_CLIPBOARD_CONTROL_H
 
 Ihandle *gui_create_tile_clipboard_control
-(struct pos *p, char *norm_group);
+(struct pos *p, struct rect_sel *rs, char *norm_group);
 
 #endif	/* MININIM_GUI_TILE_CLIPBOARD_CONTROL */

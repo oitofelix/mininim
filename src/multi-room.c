@@ -661,11 +661,19 @@ draw_animated_foreground (ALLEGRO_BITMAP *bitmap, int room)
     for (p.place = -1; p.place < PLACES; p.place++)
       if (edit != EDIT_NONE) {
         int part = 0;
-        if (peq (&mouse_pos, &p)) part = 1;
-        else if (peq (&selection_pos, &p) && selection_locked) part = 2;
-        else if (is_valid_rect_sel (&global_rect_sel)
-                 && is_pos_in_rect_sel (&global_rect_sel, &p))
-          part = 3;
+        bool s1 = peq (&mouse_pos, &p);
+        bool s2 = peq (&selection_pos, &p) && selection_locked;
+        bool s3 = is_valid_rect_sel (&global_rect_sel)
+          && is_pos_in_rect_sel (&global_rect_sel, &p);
+
+        if (s1 && s2 && s3) part = anim_cycle % 3 + 1;
+        else if (s1 && s2) part = anim_cycle % 2 ? 1 : 2;
+        else if (s2 && s3) part = anim_cycle % 2 ? 2 : 3;
+        else if (s1 && s3) part = anim_cycle % 2 ? 1 : 3;
+        else if (s1) part = 1;
+        else if (s2) part = 2;
+        else if (s3) part = 3;
+
         if (part) draw_object_part (bitmap, "BOX", part, &p);
       }
 }

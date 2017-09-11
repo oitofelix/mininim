@@ -36,7 +36,9 @@ static int paste_button_action_cb (Ihandle *ih);
 
 
 Ihandle *
-gui_create_tile_clipboard_control (struct pos *p, char *norm_group)
+gui_create_tile_clipboard_control (struct pos *p,
+                                   struct rect_sel *rs,
+                                   char *norm_group)
 {
   Ihandle *ih, *vbox, *button, *radio, *place_toggle, *room_toggle,
     *level_toggle;
@@ -91,6 +93,7 @@ gui_create_tile_clipboard_control (struct pos *p, char *norm_group)
   IupSetAttribute (ih, "_LEVEL_TOGGLE", (void *) level_toggle);
 
   IupSetAttribute (ih, "_POS", (void *) p);
+  IupSetAttribute (ih, "_RECT_SEL", (void *) rs);
 
   struct last *last = xmalloc (sizeof (*last));
   memset (last, 0, sizeof (*last));
@@ -115,9 +118,13 @@ _update_cb (Ihandle *ih)
   if (! IupGetInt (ih, "VISIBLE")) return IUP_DEFAULT;
 
   struct pos *p = (void *) IupGetAttribute (ih, "_POS");
-  gui_control_active (ih, is_valid_pos (p));
+  struct rect_sel *rs = (void *) IupGetAttribute (ih, "_RECT_SEL");
+  gui_control_active (ih, is_valid_pos (p) || is_valid_rect_sel (rs));
 
-  if (! is_valid_pos (p)) return IUP_DEFAULT;
+  Ihandle *button = (void *) IupGetAttribute (ih, "_BUTTON");
+  gui_control_active (button, is_valid_pos (p));
+
+  if (! is_valid_pos (p) && ! is_valid_rect_sel (rs)) return IUP_DEFAULT;
 
   struct last *last = (void *) IupGetAttribute (ih, "_LAST");
 
@@ -152,6 +159,7 @@ copy_button_action_cb (Ihandle *ih)
 {
   struct last *last = (void *) IupGetAttribute (ih, "_LAST");
   struct pos *p = (void *) IupGetAttribute (ih, "_POS");
+  if (! is_valid_pos (p)) return IUP_DEFAULT;
   copy_tile (&last->tile_copy, p);
   update (ih);
   return IUP_DEFAULT;
@@ -162,6 +170,7 @@ paste_button_action_cb (Ihandle *ih)
 {
   struct last *last = (void *) IupGetAttribute (ih, "_LAST");
   struct pos *p = (void *) IupGetAttribute (ih, "_POS");
+  struct rect_sel *rs = (void *) IupGetAttribute (ih, "_RECT_SEL");
 
   Ihandle *place_toggle = (void *) IupGetAttribute (ih, "_PLACE_TOGGLE");
   Ihandle *room_toggle = (void *) IupGetAttribute (ih, "_ROOM_TOGGLE");
@@ -170,12 +179,15 @@ paste_button_action_cb (Ihandle *ih)
   Ihandle *selected = (void *) IupGetAttribute (radio, "VALUE_HANDLE");
 
   enum scope scope;
-  if (selected == place_toggle) scope = PLACE_SCOPE;
-  else if (selected == room_toggle) scope = ROOM_SCOPE;
+  if (selected == place_toggle)
+    scope = is_valid_rect_sel (rs) ? PLACE_RECT_SEL_SCOPE : PLACE_SCOPE;
+  else if (selected == room_toggle)
+    scope = is_valid_rect_sel (rs) ? ROOM_RECT_SEL_SCOPE : ROOM_SCOPE;
   else if (selected == level_toggle) scope = LEVEL_SCOPE;
   else assert (false);
 
-  apply_to_scope (p, (pos_trans) paste_tile, &last->tile_copy, "PASTE", scope);
+  apply_to_scope (p, rs, (pos_trans) paste_tile, &last->tile_copy, "PASTE",
+                  scope);
 
   return IUP_DEFAULT;
 }

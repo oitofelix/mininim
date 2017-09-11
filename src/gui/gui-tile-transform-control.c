@@ -25,7 +25,8 @@ static int button_action_cb (Ihandle *ih);
 
 
 Ihandle *
-gui_create_tile_transform_control (struct pos *p, char *norm_group)
+gui_create_tile_transform_control (struct pos *p, struct rect_sel *rs,
+                                   char *norm_group)
 {
   Ihandle *ih, *vbox;
 
@@ -141,6 +142,7 @@ gui_create_tile_transform_control (struct pos *p, char *norm_group)
   IupSetAttribute (ih, "_LEVEL_TOGGLE", (void *) level_toggle);
 
   IupSetAttribute (ih, "_POS", (void *) p);
+  IupSetAttribute (ih, "_RECT_SEL", (void *) rs);
 
   return ih;
 }
@@ -151,7 +153,8 @@ _update_cb (Ihandle *ih)
   if (! IupGetInt (ih, "VISIBLE")) return IUP_DEFAULT;
 
   struct pos *p = (void *) IupGetAttribute (ih, "_POS");
-  gui_control_active (ih, is_valid_pos (p));
+  struct rect_sel *rs = (void *) IupGetAttribute (ih, "_RECT_SEL");
+  gui_control_active (ih, is_valid_pos (p) || is_valid_rect_sel (rs));
 
   Ihandle *unfake_button = (void *) IupGetAttribute (ih, "_UNFAKE_BUTTON");
   Ihandle *fg_fake_button = (void *) IupGetAttribute (ih, "_FG_FAKE_BUTTON");
@@ -183,10 +186,13 @@ button_action_cb (Ihandle *ih)
   Ihandle *selected = (void *) IupGetAttribute (radio, "VALUE_HANDLE");
 
   struct pos *p = (void *) IupGetAttribute (ih, "_POS");
+  struct rect_sel *rs = (void *) IupGetAttribute (ih, "_RECT_SEL");
 
   enum scope scope;
-  if (selected == place_toggle) scope = PLACE_SCOPE;
-  else if (selected == room_toggle) scope = ROOM_SCOPE;
+  if (selected == place_toggle)
+    scope = is_valid_rect_sel (rs) ? PLACE_RECT_SEL_SCOPE : PLACE_SCOPE;
+  else if (selected == room_toggle)
+    scope = is_valid_rect_sel (rs) ? ROOM_RECT_SEL_SCOPE : ROOM_SCOPE;
   else if (selected == level_toggle) scope = LEVEL_SCOPE;
   else assert (false);
 
@@ -212,7 +218,7 @@ button_action_cb (Ihandle *ih)
     desc = "FG<->FAKE";
   } else assert (false);
 
-  apply_to_scope (p, trans, NULL, desc, scope);
+  apply_to_scope (p, rs, trans, NULL, desc, scope);
 
   return IUP_DEFAULT;
 }

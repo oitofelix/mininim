@@ -29,7 +29,8 @@ gui_create_editor_toolbar_control (char *norm_group)
 {
   Ihandle *ih;
 
-  Ihandle *lock_button, *pause_button, *full_screen_button, *home_button;
+  Ihandle *lock_button, *pause_button, *full_screen_button, *home_button,
+    *clear_rect_sel_button;
 
   ih = IupSetCallbacks
     (IupSetAttributes
@@ -39,6 +40,16 @@ gui_create_editor_toolbar_control (char *norm_group)
        (IupSetAttributes
         (IupButton (NULL, NULL),
          "IMAGE = UNLOCK_ICON,"
+         "FLAT = YES,"
+         "CANFOCUS = NO,"),
+        "ACTION", button_action_cb,
+        NULL),
+
+       clear_rect_sel_button = IupSetCallbacks
+       (IupSetAttributes
+        (IupButton (NULL, NULL),
+         "IMAGE = CLEAR_RECT_SEL_ICON,"
+         "TIP = \"Clear rectangular selection\","
          "FLAT = YES,"
          "CANFOCUS = NO,"),
         "ACTION", button_action_cb,
@@ -73,7 +84,7 @@ gui_create_editor_toolbar_control (char *norm_group)
 
        NULL),
       "ORIENTATION = HORIZONTAL,"
-      "NUMDIV = 4,"
+      "NUMDIV = 5,"
       "SIZECOL = -1,"
       "SIZELIN = -1,"
       "NORMALIZESIZE = BOTH,"),
@@ -83,6 +94,7 @@ gui_create_editor_toolbar_control (char *norm_group)
   IupSetAttribute (ih, "NORMALIZERGROUP", norm_group);
 
   IupSetAttribute (ih, "_LOCK_BUTTON", (void *) lock_button);
+  IupSetAttribute (ih, "_CLEAR_RECT_SEL_BUTTON", (void *) clear_rect_sel_button);
   IupSetAttribute (ih, "_PAUSE_BUTTON", (void *) pause_button);
   IupSetAttribute (ih, "_FULL_SCREEN_BUTTON", (void *) full_screen_button);
   IupSetAttribute (ih, "_HOME_BUTTON", (void *) home_button);
@@ -96,6 +108,8 @@ _update_cb (Ihandle *ih)
   if (! IupGetInt (ih, "VISIBLE")) return IUP_DEFAULT;
 
   Ihandle *lock_button = (void *) IupGetAttribute (ih, "_LOCK_BUTTON");
+  Ihandle *clear_rect_sel_button =
+    (void *) IupGetAttribute (ih, "_CLEAR_RECT_SEL_BUTTON");
   Ihandle *pause_button = (void *) IupGetAttribute (ih, "_PAUSE_BUTTON");
   Ihandle *full_screen_button =
     (void *) IupGetAttribute (ih, "_FULL_SCREEN_BUTTON");
@@ -103,11 +117,15 @@ _update_cb (Ihandle *ih)
 
   /* Lock */
   gui_set_stock_image (lock_button, selection_locked
-                       ? "LOCK_ICON" : "UNLOCK_ICON");
+                       ? "UNLOCK_ICON" : "LOCK_ICON");
 
   gui_control_attribute (lock_button, "TIP", selection_locked
                          ? "Unlock place selection"
                          : "Lock place selection");
+
+  /* Rectangular selection */
+  gui_control_active (clear_rect_sel_button,
+                      is_valid_rect_sel (&global_rect_sel));
 
   /* Pause */
   gui_set_stock_image (pause_button, is_game_paused ()
@@ -135,6 +153,8 @@ int
 button_action_cb (Ihandle *ih)
 {
   Ihandle *lock_button = (void *) IupGetAttribute (ih, "_LOCK_BUTTON");
+  Ihandle *clear_rect_sel_button =
+    (void *) IupGetAttribute (ih, "_CLEAR_RECT_SEL_BUTTON");
   Ihandle *pause_button = (void *) IupGetAttribute (ih, "_PAUSE_BUTTON");
   Ihandle *full_screen_button =
     (void *) IupGetAttribute (ih, "_FULL_SCREEN_BUTTON");
@@ -144,7 +164,9 @@ button_action_cb (Ihandle *ih)
     if (! selection_locked)
       new_pos (&selection_pos, &global_level, global_mr.room, 1,  4);
     selection_locked = ! selection_locked;
-  } else if (ih == pause_button) ui_toggle_pause_game ();
+  } else if (ih == clear_rect_sel_button)
+    destroy_rect_sel (&global_rect_sel);
+  else if (ih == pause_button) ui_toggle_pause_game ();
   else if (ih == full_screen_button) ui_full_screen ();
   else if (ih == home_button) ui_home ();
 

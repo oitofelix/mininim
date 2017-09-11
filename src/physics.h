@@ -43,11 +43,16 @@ struct level *paste_room (struct level *l, int room,
                            struct room_copy *rc, char *desc);
 
 void apply_to_place (struct pos *p, pos_trans f, void *data, char *desc);
+void apply_to_place_rect_sel (struct rect_sel *rs, pos_trans f,
+                              void *data, char *desc);
 void apply_to_room (struct level *l, int room, pos_trans f, void *data,
                     char *desc);
+void apply_to_room_rect_sel (struct rect_sel *rs, pos_trans f,
+                             void *data, char *desc);
+
 void apply_to_level (struct level *l, pos_trans f, void *data, char *desc);
-void apply_to_scope (struct pos *p, pos_trans f, void *data, char *base_desc,
-                     enum scope scope);
+void apply_to_scope (struct pos *p, struct rect_sel *rs, pos_trans f,
+                     void *data, char *base_desc, enum scope scope);
 
 enum tile_bg bg_tile (struct tile *t);
 enum tile_bg bg (struct pos *p);

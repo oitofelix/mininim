@@ -146,5 +146,6 @@
 #define EVENT_SOURCE_ICON "data/icons/event-source.png"
 #define EVENT_TARGET_ICON "data/icons/event-target.png"
 #define RECT_SEL_ICON "data/icons/rect-sel.png"
+#define CLEAR_RECT_SEL_ICON "data/icons/clear-rect-sel.png"
 
 #endif	/* MININIM_GUI_ICONS_H */

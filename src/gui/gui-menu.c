@@ -346,8 +346,8 @@ static struct {
 
   /* auxiliary popup menu */
   struct {
-    uint16_t lock_selection, unlock_selection, relock_selection, select_room,
-      rect_sel;
+    uint16_t lock_selection, unlock_selection, select_room,
+      rect_sel, clear_rect_sel;
   } aux;
 } item;
 
@@ -382,7 +382,7 @@ ALLEGRO_BITMAP *small_logo_icon,
   *counter_attack_add_icon, *counter_attack_sub_icon, *counter_defense_icon,
   *counter_defense_add_icon, *counter_defense_sub_icon, *shadow_face_icon,
   *heart_icon, *plus_icon, *minus_icon, *lock_icon, *lock_icon_trimmed,
-  *unlock_icon, *rect_sel_icon;
+  *unlock_icon, *rect_sel_icon, *clear_rect_sel_icon;
 
 struct pos aux_pos;
 
@@ -530,6 +530,7 @@ load_icons (void)
   lock_icon_trimmed = trim_bitmap (lock_icon, TRANSPARENT_COLOR);
   unlock_icon = load_icon (UNLOCK_ICON);
   rect_sel_icon = load_icon (RECT_SEL_ICON);
+  clear_rect_sel_icon = load_icon (CLEAR_RECT_SEL_ICON);
 }
 
 void
@@ -643,6 +644,7 @@ unload_icons (void)
   al_destroy_bitmap (lock_icon_trimmed);
   al_destroy_bitmap (unlock_icon);
   al_destroy_bitmap (rect_sel_icon);
+  al_destroy_bitmap (clear_rect_sel_icon);
 }
 
 
@@ -980,15 +982,15 @@ main_menu (void)
   menu_sub (&menu.main.help.m, main_menu_enabled, NULL, help_menu,
             0, "He&lp");
 
-#if WINDOWS_PORT
-  item.main.unlock_selection =
-    menu_sitem (main_menu_enabled && selection_locked, NULL, "(L)");
-#else
-  if (edit != EDIT_NONE)
-    item.main.unlock_selection =
-      menu_sitem (main_menu_enabled && selection_locked,
-                  lock_icon_trimmed, "%s", "");
-#endif
+/* #if WINDOWS_PORT */
+/*   item.main.unlock_selection = */
+/*     menu_sitem (main_menu_enabled && selection_locked, NULL, "(L)"); */
+/* #else */
+/*   if (edit != EDIT_NONE) */
+/*     item.main.unlock_selection = */
+/*       menu_sitem (main_menu_enabled && selection_locked, */
+/*                   lock_icon_trimmed, "%s", ""); */
+/* #endif */
 
   end_menu ();
 }
@@ -1819,26 +1821,27 @@ aux_menu (void)
   }
   start_menu (menu.aux.m, AUX_MENU_ID_MIN);
 
-  if (selection_locked)
-    item.aux.relock_selection =
-      menu_sitem (is_valid_pos (&aux_pos)
-                  && ! peq (&aux_pos, &selection_pos), lock_icon,
-                  "&Relock selection");
+  item.aux.lock_selection =
+    menu_sitem (is_valid_pos (&aux_pos),
+                lock_icon, selection_locked
+                ? "Re&lock place selection"
+                : "&Lock place selection");
 
-  menu_ditem (! selection_locked,
-              &item.aux.lock_selection, &item.aux.unlock_selection,
-              is_valid_pos (&aux_pos), true, lock_icon, unlock_icon,
-              "&Lock selection", "&Unlock selection");
-
-  item.aux.select_room =
-    menu_sitem (is_valid_pos (&aux_pos) && global_mr.room != aux_pos.room, room_icon,
-                "Select &Room");
+  item.aux.unlock_selection =
+    menu_sitem (selection_locked, unlock_icon, "&Unlock place selection");
 
   item.aux.rect_sel =
     menu_sitem (is_valid_pos (&aux_pos) && is_valid_pos (&selection_pos)
-                && selection_locked
-                /* && ! peq (&aux_pos, &selection_pos) */, rect_sel_icon,
-                "Rectangular &Selection");
+                && selection_locked, rect_sel_icon,
+                "Set &rectangular selection");
+
+  item.aux.clear_rect_sel =
+    menu_sitem (is_valid_rect_sel (&global_rect_sel), clear_rect_sel_icon,
+                "&Clear rectangular selection");
+
+  item.aux.select_room =
+    menu_sitem (is_valid_pos (&aux_pos) && global_mr.room != aux_pos.room,
+                room_icon, "Set room as &MR origin");
 
   end_menu ();
 }
@@ -2064,8 +2067,6 @@ process_aux_menu_event (ALLEGRO_EVENT *event)
     select_pos (&global_mr, &aux_pos);
   else if (id == item.aux.unlock_selection)
     selection_locked = ! selection_locked;
-  else if (id == item.aux.relock_selection)
-    select_pos (&global_mr, &aux_pos);
   else if (id == item.aux.select_room)
     mr_focus_room (&global_mr, aux_pos.room);
   else if (id == item.aux.rect_sel) {
@@ -2074,5 +2075,6 @@ process_aux_menu_event (ALLEGRO_EVENT *event)
                                  &selection_pos, &aux_pos);
     if (! success)
       ui_msg (1, "INVALID START-END POINTS FOR MR ORIGIN");
-  }
+  } else if (id == item.aux.clear_rect_sel)
+    destroy_rect_sel (&global_rect_sel);
 }
